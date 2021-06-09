@@ -85,7 +85,7 @@ static void *WpaThreadMain(void *p)
     const char *startCmd = (const char *)p;
     struct StWpaMainParam param = {0};
     SplitCmdString(startCmd, &param);
-    void *handleLibWpa = dlopen("/system/lib/libwpa.so", RTLD_NOW | RTLD_LOCAL);
+    void *handleLibWpa = dlopen("/system/lib/libwpa.z.so", RTLD_NOW | RTLD_LOCAL);
     if (handleLibWpa == NULL) {
         LOGE("dlopen libwpa failed.");
         return NULL;

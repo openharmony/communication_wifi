@@ -38,6 +38,8 @@ const int SCAN_TYPE_LOW_POWER = 1;
 const int SCAN_TYPE_HIGH_ACCURACY = 2;
 const int SCAN_TYPE_INVALID = 0xFF;
 const int MAX_WAIT_SCAN_RESULT_TIME = 60 * 1000;
+const int SCAN_24GHZ_MAX_FREQUENCY = 2500;
+const int SCAN_5GHZ_MIN_FREQUENCY = 5000;
 
 class ScanStateMachine : public StateMachine {
 public:
@@ -66,9 +68,9 @@ public:
          */
         explicit InitState(ScanStateMachine *paraScanStateMachine);
         ~InitState();
-        void Enter();
-        void Exit();
-        bool ProcessMessage(InternalMessage *msg);
+        void GoInState();
+        void GoOutState();
+        bool ExecuteStateMsg(InternalMessage *msg);
 
     private:
         ScanStateMachine *pScanStateMachine;
@@ -92,9 +94,9 @@ public:
          */
         explicit HardwareReady(ScanStateMachine *paraScanStateMachine);
         ~HardwareReady();
-        void Enter();
-        void Exit();
-        bool ProcessMessage(InternalMessage *msg);
+        void GoInState();
+        void GoOutState();
+        bool ExecuteStateMsg(InternalMessage *msg);
 
     private:
         ScanStateMachine *pScanStateMachine;
@@ -108,9 +110,9 @@ public:
          */
         explicit CommonScan(ScanStateMachine *paraScanStateMachine);
         ~CommonScan();
-        void Enter();
-        void Exit();
-        bool ProcessMessage(InternalMessage *msg);
+        void GoInState();
+        void GoOutState();
+        bool ExecuteStateMsg(InternalMessage *msg);
 
     private:
         ScanStateMachine *pScanStateMachine;
@@ -124,9 +126,9 @@ public:
          */
         explicit CommonScanUnworked(ScanStateMachine *paraScanStateMachine);
         ~CommonScanUnworked();
-        void Enter();
-        void Exit();
-        bool ProcessMessage(InternalMessage *msg);
+        void GoInState();
+        void GoOutState();
+        bool ExecuteStateMsg(InternalMessage *msg);
 
     private:
         ScanStateMachine *pScanStateMachine;
@@ -140,9 +142,9 @@ public:
          */
         explicit CommonScanning(ScanStateMachine *paraScanStateMachine);
         ~CommonScanning();
-        void Enter();
-        void Exit();
-        bool ProcessMessage(InternalMessage *msg);
+        void GoInState();
+        void GoOutState();
+        bool ExecuteStateMsg(InternalMessage *msg);
 
     private:
         ScanStateMachine *pScanStateMachine;
@@ -156,9 +158,9 @@ public:
          */
         explicit PnoScan(ScanStateMachine *paraScanStateMachine);
         ~PnoScan();
-        void Enter();
-        void Exit();
-        bool ProcessMessage(InternalMessage *msg);
+        void GoInState();
+        void GoOutState();
+        bool ExecuteStateMsg(InternalMessage *msg);
 
     private:
         ScanStateMachine *pScanStateMachine;
@@ -172,9 +174,9 @@ public:
          */
         explicit PnoScanHardware(ScanStateMachine *paraScanStateMachine);
         ~PnoScanHardware();
-        void Enter();
-        void Exit();
-        bool ProcessMessage(InternalMessage *msg);
+        void GoInState();
+        void GoOutState();
+        bool ExecuteStateMsg(InternalMessage *msg);
 
     private:
         ScanStateMachine *pScanStateMachine;
@@ -188,9 +190,9 @@ public:
          */
         explicit CommonScanAfterPno(ScanStateMachine *paraScanStateMachine);
         ~CommonScanAfterPno();
-        void Enter();
-        void Exit();
-        bool ProcessMessage(InternalMessage *msg);
+        void GoInState();
+        void GoOutState();
+        bool ExecuteStateMsg(InternalMessage *msg);
 
     private:
         ScanStateMachine *pScanStateMachine;
@@ -204,9 +206,9 @@ public:
          */
         explicit PnoScanSoftware(ScanStateMachine *paraScanStateMachine);
         ~PnoScanSoftware();
-        void Enter();
-        void Exit();
-        bool ProcessMessage(InternalMessage *msg);
+        void GoInState();
+        void GoOutState();
+        bool ExecuteStateMsg(InternalMessage *msg);
 
     private:
         ScanStateMachine *pScanStateMachine;
@@ -220,9 +222,9 @@ public:
          */
         explicit PnoSwScanFree(ScanStateMachine *paraScanStateMachine);
         ~PnoSwScanFree();
-        void Enter();
-        void Exit();
-        bool ProcessMessage(InternalMessage *msg);
+        void GoInState();
+        void GoOutState();
+        bool ExecuteStateMsg(InternalMessage *msg);
 
     private:
         ScanStateMachine *pScanStateMachine;
@@ -236,9 +238,9 @@ public:
          */
         explicit PnoSwScanning(ScanStateMachine *paraScanStateMachine);
         ~PnoSwScanning();
-        void Enter();
-        void Exit();
-        bool ProcessMessage(InternalMessage *msg);
+        void GoInState();
+        void GoOutState();
+        bool ExecuteStateMsg(InternalMessage *msg);
 
     private:
         ScanStateMachine *pScanStateMachine;
@@ -352,8 +354,6 @@ private:
      * @param scanResults - Scan internal scan results[out]
      */
     void ConvertScanResults(std::vector<WifiScanResult> &wifiScanResults, std::vector<InterScanResult> &scanResults);
-    void OnQuitting();
-    void OnHalting();
     /**
      * @Description  Reporting Status to ScanService.
      *

@@ -23,7 +23,7 @@
 
 namespace OHOS {
 namespace Wifi {
-DEFINE_WIFILOG_LABEL("WifiScanStub");
+DEFINE_WIFILOG_SCAN_LABEL("WifiScanStub");
 WifiScanStub::WifiScanStub() : callback_(nullptr), mSingleCallback(false)
 {}
 
@@ -188,8 +188,9 @@ int WifiScanStub::OnGetScanInfoList(uint32_t code, MessageParcel &data, MessageP
             reply.WriteCString(result[i].ssid.c_str());
             reply.WriteCString(result[i].capabilities.c_str());
             reply.WriteInt32(result[i].frequency);
-            reply.WriteInt32(result[i].level);
+            reply.WriteInt32(result[i].rssi);
             reply.WriteInt32(result[i].timestamp);
+            reply.WriteInt32(result[i].band);
         }
     }
     return ret;

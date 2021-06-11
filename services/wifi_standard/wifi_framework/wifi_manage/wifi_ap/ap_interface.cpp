@@ -18,10 +18,8 @@
 #include "ap_service.h"
 #include "ap_state_machine.h"
 #include "wifi_ap_nat_manager.h"
-#include "wifi_log.h"
+#include "wifi_logger.h"
 
-#undef LOG_TAG
-#define LOG_TAG "OHWIFI_AP_ApInterface"
 namespace OHOS {
 namespace Wifi {
 ApInterface::ApInterface()

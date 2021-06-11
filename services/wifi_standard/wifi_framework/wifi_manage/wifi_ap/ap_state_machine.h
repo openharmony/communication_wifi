@@ -89,9 +89,6 @@ private:
     ApStateMachine();
     virtual ~ApStateMachine();
     void Init();
-    virtual void OnQuitting() override;
-    virtual void OnHalting() override;
-
     DISALLOW_COPY_AND_ASSIGN(ApStateMachine);
 
 private:

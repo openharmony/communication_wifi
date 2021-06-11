@@ -20,52 +20,51 @@
 
 namespace OHOS {
 namespace Wifi {
-static const int SM_QUIT_CMD = -1;
 static const int SM_INIT_CMD = -2;
-StateMachine::StateMachine(const std::string &name) : pSmHandler(nullptr), mStateName(name)
+StateMachine::StateMachine(const std::string &name) : pStateMachineHandler(nullptr), mStateName(name)
 {}
 
 StateMachine::~StateMachine()
 {
     LOGD("StateMachine::~StateMachine");
-    if (pSmHandler != nullptr) {
-        delete pSmHandler;
+    if (pStateMachineHandler != nullptr) {
+        delete pStateMachineHandler;
     }
 }
 
 bool StateMachine::InitialStateMachine()
 {
-    pSmHandler = new (std::nothrow) SmHandler(this);
-    if (pSmHandler == nullptr) {
-        LOGE("pSmHandler alloc failed.\n");
+    pStateMachineHandler = new (std::nothrow) StateMachineHandler(this);
+    if (pStateMachineHandler == nullptr) {
+        LOGE("pStateMachineHandler alloc failed.\n");
         return false;
     }
 
-    if (!pSmHandler->InitialSmHandler()) {
-        LOGE("InitialSmHandler failed.\n");
+    if (!pStateMachineHandler->InitialSmHandler()) {
+        LOGE("InitialStateMachineHandler failed.\n");
         return false;
     }
 
     return true;
 }
 
-void StateMachine::Start()
+void StateMachine::StartStateMachine()
 {
-    if (pSmHandler == nullptr) {
-        LOGE("Start StateMachine failed, smHandler is nullptr!");
+    if (pStateMachineHandler == nullptr) {
+        LOGE("Start StateMachine failed, pStateMachineHandler is nullptr!");
         return;
     }
 
-    pSmHandler->CompleteConstruction();
+    pStateMachineHandler->BuildTreeComplete();
     return;
 }
 
-void StateMachine::SetHandler(SmHandler *smHandler)
+void StateMachine::SetHandler(StateMachineHandler *handler)
 {
-    pSmHandler = smHandler;
+    pStateMachineHandler = handler;
 }
 
-void StateMachine::UnhandledMessage(InternalMessage *msg)
+void StateMachine::NotExecutedMessage(InternalMessage *msg)
 {
     if (msg == nullptr) {
         return;
@@ -73,78 +72,79 @@ void StateMachine::UnhandledMessage(InternalMessage *msg)
     LOGD("msg not handled  msg:%{public}d", msg->GetMessageName());
 }
 
-void StateMachine::AddState(State *state, State *parent)
+void StateMachine::StatePlus(State *state, State *upper)
 {
-    pSmHandler->AddState(state, parent);
+    pStateMachineHandler->StatePlus(state, upper);
 }
 
-void StateMachine::RemoveState(State *state)
+void StateMachine::StateDelete(State *state)
 {
-    pSmHandler->RemoveState(state);
+    pStateMachineHandler->StateDelete(state);
 }
 
-void StateMachine::SetInitialState(State *initialState)
+void StateMachine::SetFirstState(State *firstState)
 {
-    pSmHandler->SetInitialState(initialState);
-}
-void StateMachine::TransitionTo(State *destState)
-{
-    pSmHandler->TransitionTo(destState);
+    pStateMachineHandler->SetFirstState(firstState);
 }
 
-void StateMachine::DeferMessage(InternalMessage *msg)
+void StateMachine::SwitchState(State *targetState)
 {
-    pSmHandler->DeferMessage(msg);
+    pStateMachineHandler->SwitchState(targetState);
+}
+
+void StateMachine::DelayMessage(InternalMessage *msg)
+{
+    pStateMachineHandler->DelayMessage(msg);
 }
 
 void StateMachine::StopHandlerThread()
 {
-    pSmHandler->StopHandlerThread();
+    pStateMachineHandler->StopHandlerThread();
 }
 
-InternalMessage *StateMachine::ObtainMessage()
+InternalMessage *StateMachine::CreateMessage()
 {
-    return MessageManage::GetInstance().Obtain();
+    return MessageManage::GetInstance().CreateMessage();
 }
 
-InternalMessage *StateMachine::ObtainMessage(InternalMessage *orig)
+InternalMessage *StateMachine::CreateMessage(InternalMessage *orig)
 {
     if (orig == nullptr) {
         return nullptr;
     }
-    return MessageManage::GetInstance().Obtain(orig);
+    return MessageManage::GetInstance().CreateMessage(orig);
 }
 
-InternalMessage *StateMachine::ObtainMessage(int what)
+InternalMessage *StateMachine::CreateMessage(int msgName)
 {
-    return MessageManage::GetInstance().Obtain(what);
+    return MessageManage::GetInstance().CreateMessage(msgName);
 }
 
-InternalMessage *StateMachine::ObtainMessage(int what, int arg1)
+InternalMessage *StateMachine::CreateMessage(int msgName, int param1)
 {
-    return MessageManage::GetInstance().Obtain(what, arg1, 0);
+    return MessageManage::GetInstance().CreateMessage(msgName, param1, 0);
 }
 
-InternalMessage *StateMachine::ObtainMessage(int what, int arg1, int arg2)
+InternalMessage *StateMachine::CreateMessage(int msgName, int param1, int param2)
 {
-    return MessageManage::GetInstance().Obtain(what, arg1, arg2);
+    return MessageManage::GetInstance().CreateMessage(msgName, param1, param2);
 }
 
-void StateMachine::SendMessage(int what)
+void StateMachine::SendMessage(int msgName)
 {
-    pSmHandler->SendMessage(ObtainMessage(what));
+    pStateMachineHandler->SendMessage(CreateMessage(msgName));
     return;
 }
 
-void StateMachine::SendMessage(int what, int arg1)
+void StateMachine::SendMessage(int msgName, int param1)
 {
-    pSmHandler->SendMessage(ObtainMessage(what, arg1));
+    pStateMachineHandler->SendMessage(CreateMessage(msgName, param1));
     return;
 }
 
-void StateMachine::SendMessage(int what, int arg1, int arg2)
+void StateMachine::SendMessage(int msgName, int param1, int param2)
 {
-    pSmHandler->SendMessage(ObtainMessage(what, arg1, arg2));
+    pStateMachineHandler->SendMessage(CreateMessage(msgName, param1, param2));
     return;
 }
 
@@ -153,129 +153,106 @@ void StateMachine::SendMessage(InternalMessage *msg)
     if (msg == nullptr) {
         return;
     }
-    pSmHandler->SendMessage(msg);
+    pStateMachineHandler->SendMessage(msg);
     return;
 }
 
-void StateMachine::SendMessageDelayed(int what, long delayMillis)
+void StateMachine::MessageExecutedLater(int msgName, int64_t delayTimeMs)
 {
-    pSmHandler->SendMessageDelayed(ObtainMessage(what), delayMillis);
+    pStateMachineHandler->MessageExecutedLater(CreateMessage(msgName), delayTimeMs);
     return;
 }
 
-void StateMachine::SendMessageDelayed(int what, int arg1, long delayMillis)
+void StateMachine::MessageExecutedLater(int msgName, int param1, int64_t delayTimeMs)
 {
-    pSmHandler->SendMessageDelayed(ObtainMessage(what, arg1), delayMillis);
+    pStateMachineHandler->MessageExecutedLater(CreateMessage(msgName, param1), delayTimeMs);
     return;
 }
 
-void StateMachine::SendMessageDelayed(int what, int arg1, int arg2, long delayMillis)
+void StateMachine::MessageExecutedLater(int msgName, int param1, int param2, int64_t delayTimeMs)
 {
-    pSmHandler->SendMessageDelayed(ObtainMessage(what, arg1, arg2), delayMillis);
+    pStateMachineHandler->MessageExecutedLater(CreateMessage(msgName, param1, param2), delayTimeMs);
     return;
 }
 
-void StateMachine::SendMessageDelayed(InternalMessage *msg, long delayMillis)
+void StateMachine::MessageExecutedLater(InternalMessage *msg, int64_t delayTimeMs)
 {
-    pSmHandler->SendMessageDelayed(msg, delayMillis);
+    pStateMachineHandler->MessageExecutedLater(msg, delayTimeMs);
     return;
 }
 
-void StateMachine::StartTimer(int timerName, long interval)
+void StateMachine::StartTimer(int timerName, int64_t interval)
 {
-    LOGD("Enter StateMachine::StartTimer, timerName is %{public}d, interval is %ld.", timerName, interval);
-    SendMessageDelayed(timerName, interval);
+    LOGD("Enter StateMachine::StartTimer, timerName is %{public}d, interval is %lld.", timerName, interval);
+    MessageExecutedLater(timerName, interval);
     return;
 }
 
 void StateMachine::StopTimer(int timerName)
 {
     LOGD("Enter StateMachine::StopTimer, timerName is %{public}d.", timerName);
-    pSmHandler->DeleteMessageFromQueue(timerName);
+    pStateMachineHandler->DeleteMessageFromQueue(timerName);
     return;
 }
 
-SmHandler::SmHandler(StateMachine *pStateMgr)
+StateMachineHandler::StateMachineHandler(StateMachine *pStateMgr)
 {
-    mStateInfo.clear();
-    mStateList.clear();
-    mStateListTopIndex = -1;
-    mSequenceStateList.clear();
-    mSequenceStateListCount = 0;
-    mDeferredMessages.clear();
-    pSM = pStateMgr;
-    pInitialState = nullptr;
-    pDestState = nullptr;
-    mHasQuit = false;
-    mIsConstructionCompleted = false;
-    mTransitionInProgress = false;
+    mStateInfoMap.clear();
+    mStateVector.clear();
+    mStateVectorTopIndex = -1;
+    mSequenceStateVector.clear();
+    mSequenceStateVectorCount = 0;
+    mDelayedMessages.clear();
+    pStateMachine = pStateMgr;
+    pFirstState = nullptr;
+    pTargetState = nullptr;
+    mQuitFlag = false;
+    mBuildCompleteFlag = false;
+    mSwitchingStateFlag = false;
     pCurrentMsg = nullptr;
-    pQuittingState = nullptr;
-    pHaltingState = nullptr;
 }
 
-SmHandler::~SmHandler()
+StateMachineHandler::~StateMachineHandler()
 {
-    LOGD("SmHandler::~SmHandler");
-    if (pQuittingState != nullptr) {
-        delete pQuittingState;
-    }
-
-    if (pHaltingState != nullptr) {
-        delete pHaltingState;
-    }
-
+    LOGD("StateMachineHandler::~StateMachineHandler");
     StopHandlerThread();
-    ReleaseDeferredMessages();
-    CleanupAfterQuitting();
-
+    ReleaseDelayedMessages();
+    ClearWhenQuit();
     return;
 }
 
-bool SmHandler::InitialSmHandler()
+bool StateMachineHandler::InitialSmHandler()
 {
     if (!InitialHandler()) {
         return false;
     }
-
-    pQuittingState = new (std::nothrow) QuittingState();
-    if (pQuittingState == nullptr) {
-        LOGE("Failed to init quitting state!");
-        return false;
-    }
-
-    pHaltingState = new (std::nothrow) HaltingState();
-    if (pHaltingState == nullptr) {
-        LOGE("Failed to init halting state!");
-        return false;
-    }
-
     return true;
 }
 
-StateInfo *SmHandler::AddState(State *state, State *parent)
+StateInfo *StateMachineHandler::StatePlus(State *state, State *upper)
 {
-    LOGD("SmHandler::AddState function.");
+    LOGD("StateMachineHandler::StatePlus function.");
 
-    StateInfo *parentStateInfo = nullptr;
-    StateInfoMap::iterator it = mStateInfo.begin();
-    if (parent != nullptr) {
-        it = mStateInfo.find(parent->GetName());
-        if (it != mStateInfo.end()) {
-            parentStateInfo = it->second;
+    StateInfo *upperStateInfo = nullptr;
+    StateInfoMap::iterator it = mStateInfoMap.begin();
+    if (upper != nullptr) {
+        it = mStateInfoMap.find(upper->GetStateName());
+        if (it != mStateInfoMap.end()) {
+            upperStateInfo = it->second;
         }
-        if (parentStateInfo == nullptr) {
-            LOGD("parentStateInfo is null, add parent first. parent->GetName():%{public}s", parent->GetName().c_str());
-            /* Recursively add our parent as it's not been added yet. */
-            AddState(parent, nullptr);
+        if (upperStateInfo == nullptr) {
+            LOGD("upperStateInfo is null, add upper first. upper->GetStateName():%{public}s",
+                upper->GetStateName().c_str());
+            /* Recursively add our upper as it's not been added yet. */
+            StatePlus(upper, nullptr);
         } else {
-            LOGD("parentStateInfo is not null, go on.");
+            LOGD("upperStateInfo is not null, go on.");
         }
     }
 
     StateInfo *stateInfo = nullptr;
-    it = mStateInfo.find(state->GetName());
-    if (it != mStateInfo.end()) {
+    it = mStateInfoMap.find(state->GetStateName());
+    if (it != mStateInfoMap.end()) {
         stateInfo = it->second;
     }
     if (stateInfo == nullptr) {
@@ -284,16 +261,16 @@ StateInfo *SmHandler::AddState(State *state, State *parent)
             LOGE("failed to new StateInfo!");
             return nullptr;
         }
-        mStateInfo.insert(StateInfoMap::value_type(state->GetName(), stateInfo));
+        mStateInfoMap.insert(StateInfoMap::value_type(state->GetStateName(), stateInfo));
     }
 
     /* Validate that we aren't adding the same state in two different hierarchies. */
-    if (stateInfo->parentStateInfo != nullptr && stateInfo->parentStateInfo != parentStateInfo) {
+    if (stateInfo->upperStateInfo != nullptr && stateInfo->upperStateInfo != upperStateInfo) {
         LOGE("The same state cannot be added to two different hierarchies!");
     }
 
     stateInfo->state = state;
-    stateInfo->parentStateInfo = parentStateInfo;
+    stateInfo->upperStateInfo = upperStateInfo;
     stateInfo->active = false;
 
     LOGD("successfully added a new state!");
@@ -301,49 +278,49 @@ StateInfo *SmHandler::AddState(State *state, State *parent)
     return stateInfo;
 }
 
-void SmHandler::RemoveState(State *state)
+void StateMachineHandler::StateDelete(State *state)
 {
-    StateInfoMap::iterator it = mStateInfo.find(state->GetName());
+    StateInfoMap::iterator it = mStateInfoMap.find(state->GetStateName());
     StateInfo *stateInfo = nullptr;
-    if (it != mStateInfo.end()) {
+    if (it != mStateInfoMap.end()) {
         stateInfo = it->second;
     }
     if (stateInfo == nullptr || stateInfo->active) {
         return;
     }
 
-    it = mStateInfo.begin();
-    while (it != mStateInfo.end()) {
-        if (it->second->parentStateInfo == stateInfo) {
+    it = mStateInfoMap.begin();
+    while (it != mStateInfoMap.end()) {
+        if (it->second->upperStateInfo == stateInfo) {
             return;
         }
         ++it;
     }
 
-    it = mStateInfo.find(state->GetName());
-    if (it != mStateInfo.end()) {
+    it = mStateInfoMap.find(state->GetStateName());
+    if (it != mStateInfoMap.end()) {
         delete it->second;
         it->second = nullptr;
-        mStateInfo.erase(it);
+        mStateInfoMap.erase(it);
     }
 }
 
-void SmHandler::SetInitialState(State *initialState)
+void StateMachineHandler::SetFirstState(State *firstState)
 {
-    pInitialState = initialState;
+    pFirstState = firstState;
 }
 
-void SmHandler::CompleteConstruction()
+void StateMachineHandler::BuildTreeComplete()
 {
     /* Determines the maximum depth of the state hierarchy. */
     int maxDepth = 0;
-    StateInfoMap::iterator it = mStateInfo.begin();
-    while (it != mStateInfo.end()) {
+    StateInfoMap::iterator it = mStateInfoMap.begin();
+    while (it != mStateInfoMap.end()) {
         int depth = 0;
         StateInfo *tempStateInfo = it->second;
         while (tempStateInfo != nullptr) {
             depth++;
-            tempStateInfo = tempStateInfo->parentStateInfo;
+            tempStateInfo = tempStateInfo->upperStateInfo;
         }
 
         if (maxDepth < depth) {
@@ -353,49 +330,45 @@ void SmHandler::CompleteConstruction()
         ++it;
     }
 
-    LOGD("SmHandler::CompleteConstruction, maxDepth:%{public}d", maxDepth);
-    mStateList.reserve(maxDepth);
-    mSequenceStateList.reserve(maxDepth);
-
-    SetupInitialStateVector();
-
-    SendMessageAtTime(pSM->ObtainMessage(SM_INIT_CMD), 0);
-
+    LOGD("StateMachineHandler::BuildTreeComplete, maxDepth:%{public}d", maxDepth);
+    mStateVector.reserve(maxDepth);
+    mSequenceStateVector.reserve(maxDepth);
+    BuildStateInitVector();
+    MessageExecutedAtTime(pStateMachine->CreateMessage(SM_INIT_CMD), 0);
     return;
 }
 
-void SmHandler::SetupInitialStateVector()
+void StateMachineHandler::BuildStateInitVector()
 {
-    LOGD("SmHandler::SetupInitialStateVector");
+    LOGD("StateMachineHandler::BuildStateInitVector");
 
-    if (pInitialState == nullptr) {
-        LOGE("SmHandler::SetupInitialStateVector  please set initial state first!");
+    if (pFirstState == nullptr) {
+        LOGE("StateMachineHandler::BuildStateInitVector  please set initial state first!");
         return;
     }
 
-    StateInfoMap::iterator it = mStateInfo.find(pInitialState->GetName());
+    StateInfoMap::iterator it = mStateInfoMap.find(pFirstState->GetStateName());
     StateInfo *startStateInfo = nullptr;
-    if (it != mStateInfo.end()) {
+    if (it != mStateInfoMap.end()) {
         startStateInfo = it->second;
     }
 
-    for (mSequenceStateListCount = 0; startStateInfo != nullptr; mSequenceStateListCount++) {
-        mSequenceStateList[mSequenceStateListCount] = startStateInfo;
-        startStateInfo = startStateInfo->parentStateInfo;
+    for (mSequenceStateVectorCount = 0; startStateInfo != nullptr; mSequenceStateVectorCount++) {
+        mSequenceStateVector[mSequenceStateVectorCount] = startStateInfo;
+        startStateInfo = startStateInfo->upperStateInfo;
     }
 
-    /* Clearing the stateList. */
-    mStateListTopIndex = -1;
-
-    MoveSequenceStateListToStateList();
+    /* Clearing the StateVector. */
+    mStateVectorTopIndex = -1;
+    MoveSequenceToStateVector();
 }
 
-StateInfo *SmHandler::SetupTempStateStackWithStatesToEnter(State *destState)
+StateInfo *StateMachineHandler::BuildSequenceStateVector(State *targetState)
 {
-    mSequenceStateListCount = 0;
-    StateInfoMap::iterator it = mStateInfo.find(destState->GetName());
+    mSequenceStateVectorCount = 0;
+    StateInfoMap::iterator it = mStateInfoMap.find(targetState->GetStateName());
     StateInfo *curStateInfo = nullptr;
-    if (it != mStateInfo.end()) {
+    if (it != mStateInfoMap.end()) {
         curStateInfo = it->second;
     }
 
@@ -404,246 +377,227 @@ StateInfo *SmHandler::SetupTempStateStackWithStatesToEnter(State *destState)
     }
 
     do {
-        mSequenceStateList[mSequenceStateListCount++] = curStateInfo;
-        curStateInfo = curStateInfo->parentStateInfo;
+        mSequenceStateVector[mSequenceStateVectorCount++] = curStateInfo;
+        curStateInfo = curStateInfo->upperStateInfo;
     } while ((curStateInfo != nullptr) && (!curStateInfo->active));
 
     return curStateInfo;
 }
 
-void SmHandler::MoveDeferredMessageAtFrontOfQueue()
+void StateMachineHandler::PlaceDelayedMsgQueueTop()
 {
-    LOGD("Enter SmHandler::MoveDeferredMessageAtFrontOfQueue.");
+    LOGD("Enter StateMachineHandler::PlaceDelayedMsgQueueTop.");
 
-    for (int i = mDeferredMessages.size() - 1; i >= 0; i--) {
-        InternalMessage *curMsg = mDeferredMessages[i];
+    for (int i = mDelayedMessages.size() - 1; i >= 0; i--) {
+        InternalMessage *curMsg = mDelayedMessages[i];
         if (curMsg == nullptr) {
-            LOGE("SmHandler::MoveDeferredMessageAtFrontOfQueue: curMsg is null.");
+            LOGE("StateMachineHandler::PlaceDelayedMsgQueueTop: curMsg is null.");
             continue;
         }
-        SendMessageAtFrontOfQueue(curMsg);
+        PlaceMessageTopOfQueue(curMsg);
     }
-    mDeferredMessages.clear();
+    mDelayedMessages.clear();
 
     return;
 }
 
-void SmHandler::ReleaseDeferredMessages()
+void StateMachineHandler::ReleaseDelayedMessages()
 {
-    for (int i = mDeferredMessages.size() - 1; i >= 0; i--) {
-        InternalMessage *curMsg = mDeferredMessages[i];
+    for (int i = mDelayedMessages.size() - 1; i >= 0; i--) {
+        InternalMessage *curMsg = mDelayedMessages[i];
         if (curMsg != nullptr) {
             delete curMsg;
         }
     }
-    mDeferredMessages.clear();
+    mDelayedMessages.clear();
 
     return;
 }
 
-int SmHandler::MoveSequenceStateListToStateList()
+int StateMachineHandler::MoveSequenceToStateVector()
 {
-    LOGD("SmHandler::MoveSequenceStateListToStateList mSequenceStateListCount:%{public}d", mSequenceStateListCount);
+    LOGD("StateMachineHandler::MoveSequenceToStateVector mSequenceStateVectorCount:%{public}d",
+        mSequenceStateVectorCount);
 
-    int newIndex = mStateListTopIndex + 1;
-    int i = mSequenceStateListCount - 1;
+    int newIndex = mStateVectorTopIndex + 1;
+    int i = mSequenceStateVectorCount - 1;
     int j = newIndex;
     while (i >= 0) {
-        mStateList[j] = mSequenceStateList[i];
+        mStateVector[j] = mSequenceStateVector[i];
         j += 1;
         i -= 1;
     }
 
-    mStateListTopIndex = j - 1;
-
+    mStateVectorTopIndex = j - 1;
     return newIndex;
 }
 
-void SmHandler::TransitionTo(State *destState)
+void StateMachineHandler::SwitchState(State *targetState)
 {
-    pDestState = static_cast<State *>(destState);
+    pTargetState = static_cast<State *>(targetState);
 }
 
-void SmHandler::CleanupAfterQuitting()
+void StateMachineHandler::ClearWhenQuit()
 {
-    pSM->SetHandler(nullptr);
-    pSM = nullptr;
+    pStateMachine->SetHandler(nullptr);
+    pStateMachine = nullptr;
     pCurrentMsg = nullptr;
-    mStateList.clear();
-    mSequenceStateList.clear();
-    mDeferredMessages.clear();
-    pInitialState = nullptr;
-    pDestState = nullptr;
-    mHasQuit = true;
+    mStateVector.clear();
+    mSequenceStateVector.clear();
+    mDelayedMessages.clear();
+    pFirstState = nullptr;
+    pTargetState = nullptr;
+    mQuitFlag = true;
 
-    StateInfoMap::iterator it = mStateInfo.begin();
-    while (it != mStateInfo.end()) {
+    StateInfoMap::iterator it = mStateInfoMap.begin();
+    while (it != mStateInfoMap.end()) {
         delete it->second;
         it->second = nullptr;
-        it = mStateInfo.erase(it);
+        it = mStateInfoMap.erase(it);
     }
-    mStateInfo.clear();
+    mStateInfoMap.clear();
 }
 
-void SmHandler::PerformTransitions(State *msgProcessedState, InternalMessage *msg)
+void StateMachineHandler::PerformSwitchState(State *msgProcessedState, InternalMessage *msg)
 {
     if (msgProcessedState == nullptr || msg == nullptr) {
         LOGE("poniter is null.");
     }
 
-    State *destState = pDestState;
-
-    if (destState != nullptr) {
-        LOGD("SmHandler::PerformTransitions destState name is: %{public}s", destState->GetName().c_str());
+    State *targetState = pTargetState;
+    if (targetState != nullptr) {
+        LOGD("StateMachineHandler::PerformSwitchState targetState name is: %{public}s",
+            targetState->GetStateName().c_str());
         while (true) {
-            StateInfo *commonStateInfo = SetupTempStateStackWithStatesToEnter(destState);
-            mTransitionInProgress = true;
-            InvokeExitMethods(commonStateInfo);
+            StateInfo *commonStateInfo = BuildSequenceStateVector(targetState);
+            mSwitchingStateFlag = true;
+            CallTreeStateExits(commonStateInfo);
 
-            int stateListEnteringIndex = MoveSequenceStateListToStateList();
-            InvokeEnterMethods(stateListEnteringIndex);
+            int stateListEnteringIndex = MoveSequenceToStateVector();
+            CallTreeStateEnters(stateListEnteringIndex);
 
-            MoveDeferredMessageAtFrontOfQueue();
+            PlaceDelayedMsgQueueTop();
 
-            if (destState != pDestState) {
-                destState = pDestState;
+            if (targetState != pTargetState) {
+                targetState = pTargetState;
             } else {
                 break;
             }
         }
-        pDestState = nullptr;
-    }
-
-    if (destState != nullptr) {
-        if (destState->GetName() == pQuittingState->GetName()) {
-            pSM->OnQuitting();
-            CleanupAfterQuitting();
-        } else if (destState->GetName() == pHaltingState->GetName()) {
-            pSM->OnHalting();
-        }
+        pTargetState = nullptr;
     }
 
     return;
 }
 
-void SmHandler::HandleMessage(InternalMessage *msg)
+void StateMachineHandler::ExecuteMessage(InternalMessage *msg)
 {
     if (msg == nullptr) {
         return;
     }
-    if (!mHasQuit) {
-        if (pSM != nullptr && msg->GetMessageName() != SM_INIT_CMD && msg->GetMessageName() != SM_QUIT_CMD) {
+    if (!mQuitFlag) {
+        if (pStateMachine != nullptr && msg->GetMessageName() != SM_INIT_CMD) {
         }
 
         pCurrentMsg = msg;
 
         State *msgProcessedState = nullptr;
-        if (mIsConstructionCompleted) {
-            LOGD("SmHandler::HandleMessage  ProcessMsg!");
-            msgProcessedState = ProcessMsg(msg);
-        } else if (!mIsConstructionCompleted && msg->GetMessageName() == SM_INIT_CMD) {
-            LOGD("SmHandler::HandleMessage  msg: SM_INIT_CMD");
-            mIsConstructionCompleted = true;
-            InvokeEnterMethods(0);
+        if (mBuildCompleteFlag) {
+            LOGD("StateMachineHandler::ExecuteMessage  ExecuteTreeStateMsg!");
+            msgProcessedState = ExecuteTreeStateMsg(msg);
+        } else if (!mBuildCompleteFlag && msg->GetMessageName() == SM_INIT_CMD) {
+            LOGD("StateMachineHandler::ExecuteMessage  msg: SM_INIT_CMD");
+            mBuildCompleteFlag = true;
+            CallTreeStateEnters(0);
         } else {
             LOGE("The start method not called!");
         }
 
-        if (pSM != nullptr) {
-            PerformTransitions(msgProcessedState, msg);
+        if (pStateMachine != nullptr) {
+            PerformSwitchState(msgProcessedState, msg);
         } else {
             LOGE("poniter is null.");
         }
 
-        if (pSM != nullptr && msg->GetMessageName() != SM_INIT_CMD && msg->GetMessageName() != SM_QUIT_CMD) {
+        if (pStateMachine != nullptr && msg->GetMessageName() != SM_INIT_CMD) {
         }
     }
 
     return;
 }
 
-void SmHandler::DeferMessage(InternalMessage *msg)
+void StateMachineHandler::DelayMessage(InternalMessage *msg)
 {
+    LOGD("Enter StateMachineHandler::DelayMessage.");
     if (msg == nullptr) {
         return;
     }
-    LOGD("Enter SmHandler::DeferMessage.");
 
-    InternalMessage *newMsg = pSM->ObtainMessage(msg);
+    InternalMessage *newMsg = pStateMachine->CreateMessage(msg);
     if (newMsg == nullptr) {
-        LOGE("SmHandler::DeferMessage: newMsg is null.");
+        LOGE("StateMachineHandler::DelayMessage: newMsg is null.");
         return;
     }
-
-    mDeferredMessages.push_back(newMsg);
+    mDelayedMessages.push_back(newMsg);
     return;
 }
 
-State *SmHandler::ProcessMsg(InternalMessage *msg)
+State *StateMachineHandler::ExecuteTreeStateMsg(InternalMessage *msg)
 {
+    LOGD("StateMachineHandler::ExecuteTreeStateMsg mStateVectorTopIndex:%{public}d", mStateVectorTopIndex);
     if (msg == nullptr) {
         return nullptr;
     }
-    LOGD("SmHandler::ProcessMsg mStateListTopIndex:%{public}d", mStateListTopIndex);
-    StateInfo *curStateInfo = mStateList[mStateListTopIndex];
+
+    StateInfo *curStateInfo = mStateVector[mStateVectorTopIndex];
     if (curStateInfo == nullptr) {
         LOGE("StateInfo is null.");
         return nullptr;
     }
 
-    if (IsQuit(msg)) {
-        TransitionTo(static_cast<State *>(pQuittingState));
-    } else {
-        while (curStateInfo->state && (!curStateInfo->state->ProcessMessage(msg))) {
-            curStateInfo = curStateInfo->parentStateInfo;
+    while (curStateInfo->state && (!curStateInfo->state->ExecuteStateMsg(msg))) {
+        curStateInfo = curStateInfo->upperStateInfo;
 
-            if (curStateInfo == nullptr) {
-                pSM->UnhandledMessage(msg);
-                break;
-            }
+        if (curStateInfo == nullptr) {
+            pStateMachine->NotExecutedMessage(msg);
+            break;
         }
     }
 
     return (curStateInfo != nullptr) ? curStateInfo->state : nullptr;
 }
 
-void SmHandler::InvokeExitMethods(StateInfo *commonStateInfo)
+void StateMachineHandler::CallTreeStateExits(StateInfo *commonStateInfo)
 {
-    while ((mStateListTopIndex >= 0) && (mStateList[mStateListTopIndex] != commonStateInfo)) {
-        if (mStateList[mStateListTopIndex] != nullptr) {
-            State *curState = mStateList[mStateListTopIndex]->state;
+    while ((mStateVectorTopIndex >= 0) && (mStateVector[mStateVectorTopIndex] != commonStateInfo)) {
+        if (mStateVector[mStateVectorTopIndex] != nullptr) {
+            State *curState = mStateVector[mStateVectorTopIndex]->state;
             if (curState != nullptr) {
-                curState->Exit();
+                curState->GoOutState();
             }
-            mStateList[mStateListTopIndex]->active = false;
+            mStateVector[mStateVectorTopIndex]->active = false;
         }
-        mStateListTopIndex -= 1;
+        mStateVectorTopIndex -= 1;
     }
 }
 
-void SmHandler::InvokeEnterMethods(int index)
+void StateMachineHandler::CallTreeStateEnters(int index)
 {
-    for (int i = index; i <= mStateListTopIndex; i++) {
-        if (index == mStateListTopIndex) {
+    for (int i = index; i <= mStateVectorTopIndex; i++) {
+        if (index == mStateVectorTopIndex) {
             /* Last enter state for transition. */
-            mTransitionInProgress = false;
+            mSwitchingStateFlag = false;
         }
-        LOGD("SmHandler::InvokeEnterMethods  mStateListTopIndex:%{public}d, i: %{public}d", mStateListTopIndex, i);
-        if (mStateList[i] != nullptr && mStateList[i]->state != nullptr) {
-            mStateList[i]->state->Enter();
-            mStateList[i]->active = true;
+        LOGD("StateMachineHandler::CallTreeStateEnters  mStateVectorTopIndex:%{public}d, i: %{public}d",
+            mStateVectorTopIndex,
+            i);
+        if (mStateVector[i] != nullptr && mStateVector[i]->state != nullptr) {
+            mStateVector[i]->state->GoInState();
+            mStateVector[i]->active = true;
         }
     }
     /* ensure flag set to false if no methods called. */
-    mTransitionInProgress = false;
-}
-
-bool SmHandler::IsQuit(InternalMessage *msg)
-{
-    if (msg == nullptr) {
-        return false;
-    }
-    return (msg->GetMessageName() == SM_QUIT_CMD);
+    mSwitchingStateFlag = false;
 }
 }  // namespace Wifi
 }  // namespace OHOS

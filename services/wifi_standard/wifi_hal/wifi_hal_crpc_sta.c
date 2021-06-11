@@ -122,8 +122,8 @@ int RpcGetScanResults(RpcServer *server, Context *context)
             WriteInt(context, results[i].siglv);
             WriteStr(context, results[i].flags);
             WriteStr(context, results[i].ssid);
-            long currTime = clockTime.tv_sec * secComplex * secComplex + clockTime.tv_nsec / secComplex;
-            WriteLong(context, currTime);
+            int64_t currTime = (int64_t)clockTime.tv_sec * secComplex * secComplex + clockTime.tv_nsec / secComplex;
+            WriteInt64(context, currTime);
         }
     }
     WriteEnd(context);
@@ -262,110 +262,6 @@ int RpcDisconnect(RpcServer *server, Context *context)
         return -1;
     }
     WifiErrorNo err = Disconnect();
-    WriteBegin(context, 0);
-    WriteInt(context, err);
-    WriteEnd(context);
-    return 0;
-}
-
-int RpcSetExternalSim(RpcServer *server, Context *context)
-{
-    if (server == NULL || context == NULL) {
-        return -1;
-    }
-    int useExternalSim = 0;
-    if (ReadInt(context, &useExternalSim) < 0) {
-        return -1;
-    }
-    WifiErrorNo err = SetExternalSim(useExternalSim);
-    WriteBegin(context, 0);
-    WriteInt(context, err);
-    WriteEnd(context);
-    return 0;
-}
-
-int RpcSetBluetoothCoexistenceScanMode(RpcServer *server, Context *context)
-{
-    if (server == NULL || context == NULL) {
-        return -1;
-    }
-    int mode = 0;
-    if (ReadInt(context, &mode) < 0) {
-        return -1;
-    }
-    WifiErrorNo err = SetBluetoothCoexistenceScanMode(mode);
-    WriteBegin(context, 0);
-    WriteInt(context, err);
-    WriteEnd(context);
-    return 0;
-}
-
-int RpcStopFilteringMulticastV4Packets(RpcServer *server, Context *context)
-{
-    if (server == NULL || context == NULL) {
-        return -1;
-    }
-    WifiErrorNo err = StopFilteringMulticastV4Packets();
-    WriteBegin(context, 0);
-    WriteInt(context, err);
-    WriteEnd(context);
-    return 0;
-}
-
-int RpcStopFilteringMulticastV6Packets(RpcServer *server, Context *context)
-{
-    if (server == NULL || context == NULL) {
-        return -1;
-    }
-    WifiErrorNo err = StopFilteringMulticastV6Packets();
-    WriteBegin(context, 0);
-    WriteInt(context, err);
-    WriteEnd(context);
-    return 0;
-}
-
-int RpcEnableStaAutoReconnect(RpcServer *server, Context *context)
-{
-    if (server == NULL || context == NULL) {
-        return -1;
-    }
-    int enable = 0;
-    if (ReadInt(context, &enable) < 0) {
-        return -1;
-    }
-    WifiErrorNo err = EnableStaAutoReconnect(enable);
-    WriteBegin(context, 0);
-    WriteInt(context, err);
-    WriteEnd(context);
-    return 0;
-}
-
-int RpcSetConcurrencyPriority(RpcServer *server, Context *context)
-{
-    if (server == NULL || context == NULL) {
-        return -1;
-    }
-    int isStaHigherPriority = 0;
-    if (ReadInt(context, &isStaHigherPriority) < 0) {
-        return -1;
-    }
-    WifiErrorNo err = SetConcurrencyPriority(isStaHigherPriority);
-    WriteBegin(context, 0);
-    WriteInt(context, err);
-    WriteEnd(context);
-    return 0;
-}
-
-int RpcSetSuspendModeEnabled(RpcServer *server, Context *context)
-{
-    if (server == NULL || context == NULL) {
-        return -1;
-    }
-    int enable = 0;
-    if (ReadInt(context, &enable) < 0) {
-        return -1;
-    }
-    WifiErrorNo err = SetSuspendModeEnabled(enable);
     WriteBegin(context, 0);
     WriteInt(context, err);
     WriteEnd(context);

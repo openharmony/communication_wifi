@@ -23,7 +23,7 @@
 #include "wifi_hal_common_func.h"
 
 #undef LOG_TAG
-#define LOG_TAG "WifiWpaStaHal"
+#define LOG_TAG "wifi_supplicant_hal"
 
 /*
  * Network interface name, which is hardcoded temporarily and

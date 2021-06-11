@@ -15,7 +15,7 @@
 
 #include "wifi_manager.h"
 #include "wifi_global_func.h"
-#include "wifi_log.h"
+#include "wifi_logger.h"
 #include "wifi_sta_hal_interface.h"
 #include "wifi_auth_center.h"
 #include "wifi_config_center.h"
@@ -23,8 +23,7 @@
 #include "wifi_service_manager.h"
 #include "wifi_settings.h"
 
-#undef LOG_TAG
-#define LOG_TAG "OHWIFI_MANAGER_MANAGER"
+DEFINE_WIFILOG_LABEL("WifiManager");
 
 namespace OHOS {
 namespace Wifi {
@@ -36,7 +35,7 @@ WifiManager &WifiManager::GetInstance()
         std::unique_lock<std::mutex> lock(gInitMutex);
         if (gWifiManager.GetInitStatus() == INIT_UNKNOWN) {
             if (gWifiManager.Init() != 0) {
-                LOGE("Failed to `WifiManager::Init` !");
+                WIFI_LOGE("Failed to `WifiManager::Init` !");
             }
         }
     }
@@ -53,22 +52,22 @@ WifiManager::~WifiManager()
 int WifiManager::Init()
 {
     if (WifiConfigCenter::GetInstance().Init() < 0) {
-        LOGE("WifiConfigCenter Init failed!");
+        WIFI_LOGE("WifiConfigCenter Init failed!");
         mInitStatus_ = CONFIG_CENTER_INIT_FAILED;
         return -1;
     }
     if (WifiAuthCenter::GetInstance().Init() < 0) {
-        LOGE("WifiAuthCenter Init failed!");
+        WIFI_LOGE("WifiAuthCenter Init failed!");
         mInitStatus_ = AUTH_CENTER_INIT_FAILED;
         return -1;
     }
     if (WifiServiceManager::GetInstance().Init() < 0) {
-        LOGE("WifiServiceManager Init failed!");
+        WIFI_LOGE("WifiServiceManager Init failed!");
         mInitStatus_ = SERVICE_MANAGER_INIT_FAILED;
         return -1;
     }
     if (WifiEventBroadcast::GetInstance().Init() < 0) {
-        LOGE("WifiEventBroadcast Init failed!");
+        WIFI_LOGE("WifiEventBroadcast Init failed!");
         mInitStatus_ = EVENT_BROADCAST_INIT_FAILED;
         return -1;
     }
@@ -76,7 +75,7 @@ int WifiManager::Init()
 
     int ret = pthread_create(&mTid, nullptr, DealServiceUpMsg, this);
     if (ret != 0) {
-        LOGE("In WifiManager create message deal thread failed!");
+        WIFI_LOGE("In WifiManager create message deal thread failed!");
         mInitStatus_ = TASK_THREAD_INIT_FAILED;
         return -1;
     }
@@ -102,10 +101,10 @@ void WifiManager::Exit()
 
 int WifiManager::PushMsg(const std::string &name, const WifiRequestMsgInfo &msg)
 {
-    LOGD("WifiManager::PushMsg name: %{public}s", name.c_str());
+    WIFI_LOGD("WifiManager::PushMsg name: %{public}s", name.c_str());
     BaseService *p = WifiServiceManager::GetInstance().GetServiceInst(name);
     if (p == nullptr) {
-        LOGE("Get Service %{public}s failed!", name.c_str());
+        WIFI_LOGE("Get Service %{public}s failed!", name.c_str());
         return -1;
     }
     p->PushMsg(const_cast<WifiRequestMsgInfo *>(&msg));
@@ -119,15 +118,15 @@ WifiMessageQueue<WifiResponseMsgInfo> *WifiManager::GetMessageQueue()
 
 int WifiManager::AddDeviceConfig(const WifiDeviceConfig &config, int &networkId)
 {
-    LOGI("Enter WifiManager::AddDeviceConfig");
+    WIFI_LOGI("Enter WifiManager::AddDeviceConfig");
     WifiDeviceConfig tempDeviceConfig;
     if (WifiSettings::GetInstance().GetDeviceConfig(config.ssid, DEVICE_CONFIG_INDEX_SSID, tempDeviceConfig) == 0) {
         networkId = tempDeviceConfig.networkId;
         return 0;
     } else {
-        LOGD("Add a new device config, request wpa to create network id");
+        WIFI_LOGD("Add a new device config, request wpa to create network id");
         if (WifiStaHalInterface::GetInstance().GetNextNetworkId(networkId) != WIFI_IDL_OPT_OK) {
-            LOGE("Failed to GetNextNetworkId!");
+            WIFI_LOGE("Failed to GetNextNetworkId!");
             return -1;
         }
         tempDeviceConfig = config;
@@ -147,14 +146,13 @@ int WifiManager::AddDeviceConfig(const WifiDeviceConfig &config, int &networkId)
     idlConfig.eap = config.wifiEapConfig.eap;
     idlConfig.identity = config.wifiEapConfig.identity;
     idlConfig.password = config.wifiEapConfig.password;
-    idlConfig.authAlgorithms = config.allowedAuthAlgorithms;
     idlConfig.wepKeyIdx = config.wepTxKeyIndex;
     for (int i = 0; i < MAX_WEPKEYS_SIZE; i++) {
         idlConfig.wepKeys[i] = config.wepKeys[i];
     }
 
     if (WifiStaHalInterface::GetInstance().SetDeviceConfig(networkId, idlConfig) != WIFI_IDL_OPT_OK) {
-        LOGE("Failed to SetDeviceConfig");
+        WIFI_LOGE("Failed to SetDeviceConfig");
     }
     return 0;
 }
@@ -174,9 +172,9 @@ void *WifiManager::DealServiceUpMsg(void *p)
             continue;
         }
         /* deal msg begin */
-        LOGI("receive msgcode %{public}d", msg.msgCode);
+        WIFI_LOGI("receive msgcode %{public}d", msg.msgCode);
         if (msg.msgCode == WifiInternalMsgCode::MAIN_EXIT_CODE) {
-            LOGI("Receive thread exit msg!");
+            WIFI_LOGI("Receive thread exit msg!");
             return nullptr;
         } else if (msg.msgCode > WifiInternalMsgCode::STA_START_MSG_CODE &&
                    msg.msgCode < WifiInternalMsgCode::STA_END_MSG_CODE) {
@@ -188,7 +186,7 @@ void *WifiManager::DealServiceUpMsg(void *p)
                    msg.msgCode < WifiInternalMsgCode::SCAN_END_MSG_CODE) {
             DealScanUpMsg(msg);
         } else {
-            LOGI("not deal this msgcode %{public}d, ignore it!", msg.msgCode);
+            WIFI_LOGI("not deal this msgcode %{public}d, ignore it!", msg.msgCode);
         }
     }
     return nullptr;
@@ -216,7 +214,7 @@ void WifiManager::DealStaUpMsg(WifiManager *pInstance, const WifiResponseMsgInfo
             break;
         }
         default: {
-            LOGI("not deal this msgcode %{public}d, ignore it!", msg.msgCode);
+            WIFI_LOGI("not deal this msgcode %{public}d, ignore it!", msg.msgCode);
             break;
         }
     }
@@ -240,7 +238,7 @@ void WifiManager::DealApUpMsg(const WifiResponseMsgInfo &msg)
             break;
         }
         default: {
-            LOGI("not deal this msgcode %{public}d, ignore it!", msg.msgCode);
+            WIFI_LOGI("not deal this msgcode %{public}d, ignore it!", msg.msgCode);
             break;
         }
     }
@@ -275,7 +273,7 @@ void WifiManager::DealScanUpMsg(const WifiResponseMsgInfo &msg)
             break;
         }
         default: {
-            LOGI("not deal this msgcode %{public}d, ignore it!", msg.msgCode);
+            WIFI_LOGI("not deal this msgcode %{public}d, ignore it!", msg.msgCode);
             break;
         }
     }
@@ -284,7 +282,7 @@ void WifiManager::DealScanUpMsg(const WifiResponseMsgInfo &msg)
 
 void WifiManager::UploadOpenWifiFailedEvent()
 {
-    LOGD("DealStaOpenRes:upload wifi open failed event!");
+    WIFI_LOGD("DealStaOpenRes:upload wifi open failed event!");
     WifiEventCallbackMsg cbMsg;
     cbMsg.msgCode = WIFI_CBK_MSG_STATE_CHANGE;
     cbMsg.msgData = static_cast<int>(WifiState::UNKNOWN);
@@ -295,7 +293,7 @@ void WifiManager::UploadOpenWifiFailedEvent()
 
 void WifiManager::UploadOpenWifiSuccessfulEvent()
 {
-    LOGD("DealStaOpenRes:wifi open successfully!");
+    WIFI_LOGD("DealStaOpenRes:wifi open successfully!");
     WifiConfigCenter::GetInstance().SetWifiMidState(WifiOprMidState::OPENING, WifiOprMidState::RUNNING);
     WifiConfigCenter::GetInstance().SetStaLastRunState(true);
 
@@ -311,7 +309,7 @@ void WifiManager::DealStaOpenRes(WifiManager *pInstance, const WifiResponseMsgIn
     if (msg.params.result == (int)OperateResState::OPEN_WIFI_FAILED) {
         UploadOpenWifiFailedEvent();
     } else if (msg.params.result == (int)OperateResState::OPEN_WIFI_DISABLED) {
-        LOGD("DealStaOpenRes:wifi open failed,close wifi sta service!");
+        WIFI_LOGD("DealStaOpenRes:wifi open failed,close wifi sta service!");
         DealStaCloseRes(msg);
     } else {
         UploadOpenWifiSuccessfulEvent();
@@ -323,23 +321,23 @@ void WifiManager::DealStaOpenRes(WifiManager *pInstance, const WifiResponseMsgIn
         bool bflag = false;
         do {
             if (!WifiConfigCenter::GetInstance().SetScanMidState(scanState, WifiOprMidState::OPENING)) {
-                LOGD("set scan mid state opening failed! may be other activity has been operated");
+                WIFI_LOGD("set scan mid state opening failed! may be other activity has been operated");
                 bflag = true;
                 break;
             }
             if (WifiServiceManager::GetInstance().CheckAndEnforceService(WIFI_SERVICE_SCAN) < 0) {
-                LOGE("Load %{public}s service failed!", WIFI_SERVICE_SCAN);
+                WIFI_LOGE("Load %{public}s service failed!", WIFI_SERVICE_SCAN);
                 break;
             }
             WifiMessageQueue<WifiResponseMsgInfo> *mqUp = pInstance->mMqUp.get();
             auto srvInst = WifiServiceManager::GetInstance().GetServiceInst(WIFI_SERVICE_SCAN);
             if (srvInst == nullptr) {
-                LOGE("Failed to get service instance!");
+                WIFI_LOGE("Failed to get service instance!");
                 break;
             }
             int ret = srvInst->Init(mqUp);
             if (ret < 0) {
-                LOGE("Init %{public}s service failed!", WIFI_SERVICE_SCAN);
+                WIFI_LOGE("Init %{public}s service failed!", WIFI_SERVICE_SCAN);
                 WifiServiceManager::GetInstance().UnloadService(WIFI_SERVICE_SCAN);
                 break;
             }
@@ -356,7 +354,7 @@ void WifiManager::DealStaOpenRes(WifiManager *pInstance, const WifiResponseMsgIn
 void WifiManager::DealStaCloseRes(const WifiResponseMsgInfo &msg)
 {
     if (msg.params.result == (int)OperateResState::CLOSE_WIFI_FAILED) {
-        LOGD("DealStaCloseRes:upload wifi close failed event!");
+        WIFI_LOGD("DealStaCloseRes:upload wifi close failed event!");
         WifiEventCallbackMsg cbMsg;
         cbMsg.msgCode = WIFI_CBK_MSG_STATE_CHANGE;
         cbMsg.msgData = static_cast<int>(WifiState::UNKNOWN);

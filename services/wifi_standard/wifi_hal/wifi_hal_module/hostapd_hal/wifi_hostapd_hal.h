@@ -12,9 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-#ifndef WIFI_HOSTAPD_CLI_HAL_H
-#define WIFI_HOSTAPD_CLI_HAL_H
+#ifndef WIFI_HOSTAPD_HAL_H
+#define WIFI_HOSTAPD_HAL_H
 
 #include <dirent.h>
 #include <malloc.h>
@@ -50,7 +49,6 @@ extern "C" {
 #define BUFFER_SIZE_32 32
 #define BUFFER_SIZE_16 16
 
-/* *************** hostapd_cli struct ******************* */
 typedef struct StStatusInfo {
     char state[BUFFER_SIZE_16];
     char phy[BUFFER_SIZE_16];
@@ -90,8 +88,6 @@ typedef struct StDeviceInfo {
     int txBytes;
 } DeviceInfo;
 
-/* ************** hostapd_cli struct end ***************** */
-
 /* Defines the HAL device structure. */
 typedef struct StWifiHostapdHalDevice {
     struct wpa_ctrl *ctrlConn;
@@ -123,6 +119,7 @@ typedef struct StWifiHostapdHalDevice {
  * @return WifiHostapdHalDevice*
  */
 WifiHostapdHalDevice *GetWifiHostapdDev(void);
+
 /**
  * @Description Release the Wifi Hostapd Dev object.
  *
@@ -132,4 +129,4 @@ void ReleaseHostapdDev(void);
 #ifdef __cplusplus
 }
 #endif
-#endif /* WIFI_HOSTAPD_CLI_HAL_H */
+#endif /* WIFI_HOSTAPD_HAL_H */

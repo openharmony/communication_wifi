@@ -14,9 +14,9 @@
  */
 
 #include "scan_service.h"
+#include "wifi_logger.h"
 
-#undef LOG_TAG
-#define LOG_TAG "OHWIFI_SCAN_SERVICE"
+DEFINE_WIFILOG_SCAN_LABEL("ScanStateMachine");
 
 namespace OHOS {
 namespace Wifi {
@@ -41,7 +41,7 @@ ScanService::ScanService()
 
 ScanService::~ScanService()
 {
-    LOGI("Enter ScanService::~ScanService.\n");
+    WIFI_LOGI("Enter ScanService::~ScanService.\n");
 
     if (pScanMonitor != nullptr) {
         delete pScanMonitor;
@@ -54,38 +54,38 @@ ScanService::~ScanService()
 
 bool ScanService::InitScanService(WifiMessageQueue<WifiResponseMsgInfo> *messageQueueUp)
 {
-    LOGI("Enter ScanService::InitScanService.\n");
+    WIFI_LOGI("Enter ScanService::InitScanService.\n");
 
     if (messageQueueUp == nullptr) {
-        LOGE("messageQueueUp is null.\n");
+        WIFI_LOGE("messageQueueUp is null.\n");
         return false;
     }
     pMessageQueueUp = messageQueueUp;
 
     pScanStateMachine = new (std::nothrow) ScanStateMachine();
     if (pScanStateMachine == nullptr) {
-        LOGE("Alloc pScanStateMachine failed.\n");
+        WIFI_LOGE("Alloc pScanStateMachine failed.\n");
         return false;
     }
 
     if (!pScanStateMachine->InitScanStateMachine()) {
-        LOGE("InitScanStateMachine failed.\n");
+        WIFI_LOGE("InitScanStateMachine failed.\n");
         return false;
     }
 
     if (!pScanStateMachine->EnrollScanStatusListener(
         std::bind(&ScanService::HandleScanStatusReport, this, std::placeholders::_1))) {
-        LOGE("ScanStateMachine_->EnrollScanStatusListener failed.\n");
+        WIFI_LOGE("ScanStateMachine_->EnrollScanStatusListener failed.\n");
         return false;
     }
     pScanMonitor = new (std::nothrow) ScanMonitor();
     if (pScanMonitor == nullptr) {
-        LOGE("Alloc pScanMonitor failed.\n");
+        WIFI_LOGE("Alloc pScanMonitor failed.\n");
         return false;
     }
 
     if (!pScanMonitor->InitScanMonitor()) {
-        LOGE("InitScanMonitor failed.\n");
+        WIFI_LOGE("InitScanMonitor failed.\n");
         return false;
     }
 
@@ -93,7 +93,7 @@ bool ScanService::InitScanService(WifiMessageQueue<WifiResponseMsgInfo> *message
         (WifiStaHalInterface::GetInstance().GetSupportFrequencies(SCAN_BAND_5_GHZ, freqs5G) != WIFI_IDL_OPT_OK) ||
         (WifiStaHalInterface::GetInstance().GetSupportFrequencies(SCAN_BAND_5_GHZ_DFS_ONLY, freqsDfs) !=
         WIFI_IDL_OPT_OK)) {
-        LOGE("GetSupportFrequencies failed.\n");
+        WIFI_LOGE("GetSupportFrequencies failed.\n");
     }
     GetScanControlInfo();
     GetScreenState();
@@ -104,7 +104,7 @@ bool ScanService::InitScanService(WifiMessageQueue<WifiResponseMsgInfo> *message
 
 void ScanService::UnInitScanService()
 {
-    LOGI("Enter ScanService::UnInitScanService.\n");
+    WIFI_LOGI("Enter ScanService::UnInitScanService.\n");
     pScanStateMachine->SendMessage(static_cast<int>(CMD_SCAN_FINISH));
     scanStartedFlag = false;
 
@@ -116,7 +116,7 @@ void ScanService::UnInitScanService()
 
 void ScanService::HandleScanStatusReport(ScanStatusReport &scanStatusReport)
 {
-    LOGI("Enter ScanService::HandleScanStatusReport.\n");
+    WIFI_LOGI("Enter ScanService::HandleScanStatusReport.\n");
 
     switch (scanStatusReport.status) {
         case SCAN_STARTED_STATUS: {
@@ -155,7 +155,7 @@ void ScanService::HandleScanStatusReport(ScanStatusReport &scanStatusReport)
             break;
         }
         default: {
-            LOGI("HandleStatusReport: status is error.\n");
+            WIFI_LOGI("HandleStatusReport: status is error.\n");
             break;
         }
     }
@@ -164,7 +164,7 @@ void ScanService::HandleScanStatusReport(ScanStatusReport &scanStatusReport)
 
 void ScanService::HandleInnerEventReport(ScanInnerEventType innerEvent)
 {
-    LOGI("Enter ScanService::HandleInnerEventReport.\n");
+    WIFI_LOGI("Enter ScanService::HandleInnerEventReport.\n");
 
     switch (innerEvent) {
         case SYSTEM_SCAN_TIMER: {
@@ -187,7 +187,7 @@ void ScanService::HandleInnerEventReport(ScanInnerEventType innerEvent)
 
 void ScanService::NotifyScanServiceStatus(int msgCode)
 {
-    LOGI("Enter ScanService::NotifyScanServiceStatus.\n");
+    WIFI_LOGI("Enter ScanService::NotifyScanServiceStatus.\n");
 
     WifiResponseMsgInfo notifyScanMsg;
     notifyScanMsg.msgCode = msgCode;
@@ -197,7 +197,7 @@ void ScanService::NotifyScanServiceStatus(int msgCode)
 
 void ScanService::NotifyScanResult(int msgCode, int result)
 {
-    LOGI("Enter ScanService::NotifyScanResult.\n");
+    WIFI_LOGI("Enter ScanService::NotifyScanResult.\n");
 
     WifiResponseMsgInfo notifyScanMsg;
     notifyScanMsg.msgCode = msgCode;
@@ -208,17 +208,17 @@ void ScanService::NotifyScanResult(int msgCode, int result)
 
 bool ScanService::Scan(bool externFlag)
 {
-    LOGI("Enter ScanService::Scan.\n");
+    WIFI_LOGI("Enter ScanService::Scan.\n");
 
     if (!scanStartedFlag) {
-        LOGE("Scan service has not started.\n");
+        WIFI_LOGE("Scan service has not started.\n");
         return false;
     }
 
     if (externFlag) {
         int appId = 0;
         if (!AllowExternScan(appId)) {
-            LOGE("AllowExternScan return false.\n");
+            WIFI_LOGE("AllowExternScan return false.\n");
             return false;
         }
     }
@@ -229,7 +229,7 @@ bool ScanService::Scan(bool externFlag)
      * hidden network list
      */
     if (!GetHiddenNetworkSsidList(scanConfig.hiddenNetworkSsid)) {
-        LOGE("GetHiddenNetworkSsidList failed.\n");
+        WIFI_LOGE("GetHiddenNetworkSsidList failed.\n");
     }
 
     scanConfig.scanBand = SCAN_BAND_BOTH_WITH_DFS;
@@ -237,7 +237,7 @@ bool ScanService::Scan(bool externFlag)
     scanConfig.externFlag = externFlag;
     scanConfig.scanStyle = SCAN_TYPE_HIGH_ACCURACY;
     if (!SingleScan(scanConfig)) {
-        LOGE("SingleScan failed.\n");
+        WIFI_LOGE("SingleScan failed.\n");
         return false;
     }
 
@@ -246,28 +246,28 @@ bool ScanService::Scan(bool externFlag)
 
 bool ScanService::Scan(const WifiScanParams &params)
 {
-    LOGI("Enter ScanService::Scan.\n");
+    WIFI_LOGI("Enter ScanService::Scan.\n");
 
     if (!scanStartedFlag) {
-        LOGE("Scan service has not started.\n");
+        WIFI_LOGE("Scan service has not started.\n");
         return false;
     }
 
     int appId = 0;
     if (!AllowExternScan(appId)) {
-        LOGE("AllowExternScan return false.\n");
+        WIFI_LOGE("AllowExternScan return false.\n");
         return false;
     }
 
     if ((params.band < static_cast<int>(SCAN_BAND_UNSPECIFIED)) ||
         (params.band > static_cast<int>(SCAN_BAND_BOTH_WITH_DFS))) {
-        LOGE("params.band is error.\n");
+        WIFI_LOGE("params.band is error.\n");
         return false;
     }
 
     /* When the frequency is specified, the band must be SCAN_BAND_UNSPECIFIED */
     if (params.freqs.empty() && (params.band == static_cast<int>(SCAN_BAND_UNSPECIFIED))) {
-        LOGE("params is error.\n");
+        WIFI_LOGE("params is error.\n");
         return false;
     }
 
@@ -284,7 +284,7 @@ bool ScanService::Scan(const WifiScanParams &params)
          * hidden network list
          */
         if (!GetHiddenNetworkSsidList(scanConfig.hiddenNetworkSsid)) {
-            LOGE("GetHiddenNetworkSsidList failed.\n");
+            WIFI_LOGE("GetHiddenNetworkSsidList failed.\n");
         }
     }
 
@@ -296,7 +296,7 @@ bool ScanService::Scan(const WifiScanParams &params)
     scanConfig.scanStyle = SCAN_TYPE_HIGH_ACCURACY;
 
     if (!SingleScan(scanConfig)) {
-        LOGE("SingleScan failed.\n");
+        WIFI_LOGE("SingleScan failed.\n");
         return false;
     }
 
@@ -305,11 +305,11 @@ bool ScanService::Scan(const WifiScanParams &params)
 
 bool ScanService::SingleScan(ScanConfig &scanConfig)
 {
-    LOGI("Enter ScanService::SingleScan.\n");
+    WIFI_LOGI("Enter ScanService::SingleScan.\n");
 
     GetAllowBandFreqsControlInfo(scanConfig.scanBand, scanConfig.scanFreqs);
     if ((scanConfig.scanBand == SCAN_BAND_UNSPECIFIED) && (scanConfig.scanFreqs.empty())) {
-        LOGE("Have no allowed band or freq.\n");
+        WIFI_LOGE("Have no allowed band or freq.\n");
         return false;
     }
 
@@ -328,7 +328,7 @@ bool ScanService::SingleScan(ScanConfig &scanConfig)
     } else if (scanConfig.scanBand != SCAN_BAND_BOTH_WITH_DFS) {
         /* Converting frequency bands to frequencies */
         if (!GetBandFreqs(scanConfig.scanBand, interConfig.scanFreqs)) {
-            LOGE("GetBandFreqs failed.\n");
+            WIFI_LOGE("GetBandFreqs failed.\n");
             return false;
         }
     }
@@ -336,23 +336,23 @@ bool ScanService::SingleScan(ScanConfig &scanConfig)
     /* Save the configuration */
     int requestIndex = StoreRequestScanConfig(scanConfig, interConfig);
     if (requestIndex == MAX_SCAN_CONFIG_STORE_INDEX) {
-        LOGE("StoreRequestScanConfig failed.\n");
+        WIFI_LOGE("StoreRequestScanConfig failed.\n");
         return false;
     }
 
     /* Construct a message */
     InternalMessage *interMessage =
-        pScanStateMachine->ObtainMessage(static_cast<int>(CMD_START_COMMON_SCAN), requestIndex);
+        pScanStateMachine->CreateMessage(static_cast<int>(CMD_START_COMMON_SCAN), requestIndex);
     if (interMessage == nullptr) {
         scanConfigMap.erase(requestIndex);
-        LOGE("ObtainMessage failed.\n");
+        WIFI_LOGE("CreateMessage failed.\n");
         return false;
     }
 
     if (!AddScanMessageBody(interMessage, interConfig)) {
         scanConfigMap.erase(requestIndex);
-        MessageManage::GetInstance().Recycle(interMessage);
-        LOGE("AddScanMessageBody failed.\n");
+        MessageManage::GetInstance().ReclaimMsg(interMessage);
+        WIFI_LOGE("AddScanMessageBody failed.\n");
         return false;
     }
 
@@ -362,7 +362,7 @@ bool ScanService::SingleScan(ScanConfig &scanConfig)
 
 bool ScanService::GetBandFreqs(ScanBandType band, std::vector<int> &freqs)
 {
-    LOGI("Enter ScanService::GetBandFreqs.\n");
+    WIFI_LOGI("Enter ScanService::GetBandFreqs.\n");
 
     switch (band) {
         case SCAN_BAND_24_GHZ: {
@@ -400,29 +400,29 @@ bool ScanService::GetBandFreqs(ScanBandType band, std::vector<int> &freqs)
         }
 
         default:
-            LOGE("bandType(%{public}d) is error.\n", band);
+            WIFI_LOGE("bandType(%{public}d) is error.\n", band);
             return false;
     }
 }
 
 bool ScanService::AddScanMessageBody(InternalMessage *interMessage, const InterScanConfig &interConfig)
 {
-    LOGI("Enter ScanService::AddScanMessageBody.\n");
+    WIFI_LOGI("Enter ScanService::AddScanMessageBody.\n");
 
     if (interMessage == nullptr) {
-        LOGE("interMessage is null.\n");
+        WIFI_LOGE("interMessage is null.\n");
         return false;
     }
 
     interMessage->AddIntMessageBody(interConfig.hiddenNetworkSsid.size());
     std::vector<std::string>::const_iterator iter = interConfig.hiddenNetworkSsid.begin();
-    for (; iter != interConfig.hiddenNetworkSsid.end(); iter++) {
+    for (; iter != interConfig.hiddenNetworkSsid.end(); ++iter) {
         interMessage->AddStringMessageBody(*iter);
     }
 
     interMessage->AddIntMessageBody(interConfig.scanFreqs.size());
     std::vector<int>::const_iterator iterFreq = interConfig.scanFreqs.begin();
-    for (; iterFreq != interConfig.scanFreqs.end(); iterFreq++) {
+    for (; iterFreq != interConfig.scanFreqs.end(); ++iterFreq) {
         interMessage->AddIntMessageBody(*iterFreq);
     }
 
@@ -438,7 +438,7 @@ bool ScanService::AddScanMessageBody(InternalMessage *interMessage, const InterS
 
 int ScanService::StoreRequestScanConfig(const ScanConfig &scanConfig, const InterScanConfig &interConfig)
 {
-    LOGI("Enter ScanService::StoreRequestScanConfig.\n");
+    WIFI_LOGI("Enter ScanService::StoreRequestScanConfig.\n");
 
     int i = 0;
     for (i = 0; i < MAX_SCAN_CONFIG_STORE_INDEX; i++) {
@@ -464,7 +464,8 @@ int ScanService::StoreRequestScanConfig(const ScanConfig &scanConfig, const Inte
 
     struct timespec times = {0, 0};
     clock_gettime(CLOCK_MONOTONIC, &times);
-    storeScanConfig.scanTime = times.tv_sec * SECOND_TO_MICRO_SECOND + times.tv_nsec / SECOND_TO_MILLI_SECOND;
+    storeScanConfig.scanTime =
+        static_cast<int64_t>(times.tv_sec) * SECOND_TO_MICRO_SECOND + times.tv_nsec / SECOND_TO_MILLI_SECOND;
     storeScanConfig.fullScanFlag = scanConfig.fullScanFlag;
     storeScanConfig.externFlag = scanConfig.externFlag;
 
@@ -475,9 +476,9 @@ int ScanService::StoreRequestScanConfig(const ScanConfig &scanConfig, const Inte
 
 void ScanService::HandleCommonScanFailed(std::vector<int> &requestIndexList)
 {
-    LOGI("Enter ScanService::HandleCommonScanFailed.\n");
+    WIFI_LOGI("Enter ScanService::HandleCommonScanFailed.\n");
 
-    for (std::vector<int>::iterator reqIter = requestIndexList.begin(); reqIter != requestIndexList.end(); reqIter++) {
+    for (std::vector<int>::iterator reqIter = requestIndexList.begin(); reqIter != requestIndexList.end(); ++reqIter) {
         ScanConfigMap::iterator configIter = scanConfigMap.find(*reqIter);
         /* No configuration found. */
         if (configIter == scanConfigMap.end()) {
@@ -500,11 +501,11 @@ void ScanService::HandleCommonScanFailed(std::vector<int> &requestIndexList)
 void ScanService::HandleCommonScanResult(
     std::vector<int> &requestIndexList, std::vector<InterScanResult> &scanResultList)
 {
-    LOGI("Enter ScanService::HandleCommonScanResult.\n");
+    WIFI_LOGI("Enter ScanService::HandleCommonScanResult.\n");
 
     bool fullScanInclude = false;
     bool fullScanStored = false;
-    for (std::vector<int>::iterator reqIter = requestIndexList.begin(); reqIter != requestIndexList.end(); reqIter++) {
+    for (std::vector<int>::iterator reqIter = requestIndexList.begin(); reqIter != requestIndexList.end(); ++reqIter) {
         ScanConfigMap::iterator configIter = scanConfigMap.find(*reqIter);
         /* No configuration found. */
         if (configIter == scanConfigMap.end()) {
@@ -522,12 +523,12 @@ void ScanService::HandleCommonScanResult(
                 fullScanStored = true;
                 NotifyScanResult(SCAN_RES, static_cast<int>(ScanResultState::SCAN_OK));
             } else {
-                LOGE("StoreFullScanResult failed.\n");
+                WIFI_LOGE("StoreFullScanResult failed.\n");
             }
             /* Specify Scan Result */
         } else {
             if (!StoreUserScanResult(configIter->second, scanResultList)) {
-                LOGE("StoreUserScanResult failed.\n");
+                WIFI_LOGE("StoreUserScanResult failed.\n");
             }
             NotifyScanResult(SCAN_PARAM_RES, static_cast<int>(ScanResultState::SCAN_OK));
         }
@@ -537,7 +538,7 @@ void ScanService::HandleCommonScanResult(
 
     /* Send the scanning result to the module registered for listening */
     ScanResultHandlerMap::iterator handleIter = scanResultHandlerMap.begin();
-    for (; handleIter != scanResultHandlerMap.end(); handleIter++) {
+    for (; handleIter != scanResultHandlerMap.end(); ++handleIter) {
         if (handleIter->second) {
             handleIter->second(scanResultList);
         }
@@ -552,14 +553,14 @@ void ScanService::HandleCommonScanResult(
 bool ScanService::StoreFullScanResult(
     const StoreScanConfig &scanConfig, const std::vector<InterScanResult> &scanResultList)
 {
-    LOGI("Enter ScanService::StoreFullScanResult.\n");
+    WIFI_LOGI("Enter ScanService::StoreFullScanResult.\n");
 
     /* Filtering result */
-    LOGI("scanConfig.scanTime is %ld.\n", scanConfig.scanTime);
-    LOGI("Receive %{public}d scan results.\n", (int)(scanResultList.size()));
+    WIFI_LOGI("scanConfig.scanTime is %lld.\n", scanConfig.scanTime);
+    WIFI_LOGI("Receive %{public}d scan results.\n", (int)(scanResultList.size()));
     std::vector<WifiScanInfo> filterScanResult;
     std::vector<InterScanResult>::const_iterator iter = scanResultList.begin();
-    for (; iter != scanResultList.end(); iter++) {
+    for (; iter != scanResultList.end(); ++iter) {
         char tmpBuf[128] = "";
         EncryptLogMsg(iter->ssid.c_str(), tmpBuf, sizeof(tmpBuf));
         WifiScanInfo scanInfo;
@@ -567,14 +568,15 @@ bool ScanService::StoreFullScanResult(
         scanInfo.ssid = iter->ssid;
         scanInfo.capabilities = iter->capabilities;
         scanInfo.frequency = iter->frequency;
-        scanInfo.level = iter->level;
+        scanInfo.rssi = iter->rssi;
         scanInfo.timestamp = iter->timestamp;
+        scanInfo.band = iter->band;
 
         filterScanResult.push_back(scanInfo);
     }
 
     if (WifiSettings::GetInstance().SaveScanInfoList(filterScanResult) != 0) {
-        LOGE("WifiSettings::GetInstance().SaveScanInfoList failed.\n");
+        WIFI_LOGE("WifiSettings::GetInstance().SaveScanInfoList failed.\n");
         return false;
     }
 
@@ -584,12 +586,12 @@ bool ScanService::StoreFullScanResult(
 bool ScanService::StoreUserScanResult(
     const StoreScanConfig &scanConfig, const std::vector<InterScanResult> &scanResultList)
 {
-    LOGI("Enter ScanService::StoreUserScanResult.\n");
+    WIFI_LOGI("Enter ScanService::StoreUserScanResult.\n");
 
     /* Filtering result */
     std::vector<WifiScanInfo> filterScanResult;
     std::vector<InterScanResult>::const_iterator iter = scanResultList.begin();
-    for (; iter != scanResultList.end(); iter++) {
+    for (; iter != scanResultList.end(); ++iter) {
         /* Timestamp filtering */
         if ((iter->timestamp) <= scanConfig.scanTime) {
             continue;
@@ -618,8 +620,9 @@ bool ScanService::StoreUserScanResult(
         scanInfo.ssid = iter->ssid;
         scanInfo.capabilities = iter->capabilities;
         scanInfo.frequency = iter->frequency;
-        scanInfo.level = iter->level;
+        scanInfo.rssi = iter->rssi;
         scanInfo.timestamp = iter->timestamp;
+        scanInfo.band = iter->band;
         filterScanResult.push_back(scanInfo);
     }
 
@@ -633,7 +636,7 @@ bool ScanService::StoreUserScanResult(
 
 void ScanService::ReportScanResults(const std::vector<InterScanResult> &scanResultList)
 {
-    LOGI("Enter ScanService::ReportScanResults.\n");
+    WIFI_LOGI("Enter ScanService::ReportScanResults.\n");
 
     /* Filtering result */
     std::vector<WifiScanInfo> scanInfoList;
@@ -650,18 +653,19 @@ void ScanService::ReportScanResults(const std::vector<InterScanResult> &scanResu
 void ScanService::ConvertScanResults(
     const std::vector<InterScanResult> &scanResultList, std::vector<WifiScanInfo> &scanInfoList)
 {
-    LOGI("Enter ScanService::ConvertScanResults.\n");
+    WIFI_LOGI("Enter ScanService::ConvertScanResults.\n");
 
     /* Filtering result */
     std::vector<InterScanResult>::const_iterator iter = scanResultList.begin();
-    for (; iter != scanResultList.end(); iter++) {
+    for (; iter != scanResultList.end(); ++iter) {
         WifiScanInfo scanInfo;
         scanInfo.bssid = iter->bssid;
         scanInfo.ssid = iter->ssid;
         scanInfo.capabilities = iter->capabilities;
         scanInfo.frequency = iter->frequency;
-        scanInfo.level = iter->level;
+        scanInfo.rssi = iter->rssi;
         scanInfo.timestamp = iter->timestamp;
+        scanInfo.band = iter->band;
         scanInfoList.push_back(scanInfo);
     }
 
@@ -674,30 +678,30 @@ void ScanService::ConvertScanResults(
  */
 bool ScanService::BeginPnoScan()
 {
-    LOGI("Enter ScanService::BeginPnoScan.\n");
+    WIFI_LOGI("Enter ScanService::BeginPnoScan.\n");
 
     if (isPnoScanBegined) {
-        LOGI("PNO scan has started.\n");
+        WIFI_LOGI("PNO scan has started.\n");
         return false;
     }
 
     if (!AllowPnoScan()) {
-        LOGI("AllowPnoScan return false.\n");
+        WIFI_LOGI("AllowPnoScan return false.\n");
         return false;
     }
 
     PnoScanConfig pnoScanConfig;
     /* Obtain the network list from the configuration center. */
     if (!GetSavedNetworkSsidList(pnoScanConfig.savedNetworkSsid)) {
-        LOGE("GetSavedNetworkSsidList failed.\n");
+        WIFI_LOGE("GetSavedNetworkSsidList failed.\n");
         return false;
     }
     if (pnoScanConfig.savedNetworkSsid.size() == 0) {
-        LOGE("Have no saved network, not need to start PNO scan.\n");
+        WIFI_LOGE("Have no saved network, not need to start PNO scan.\n");
         return false;
     }
     if (!GetHiddenNetworkSsidList(pnoScanConfig.hiddenNetworkSsid)) {
-        LOGE("GetHiddenNetworkSsidList failed.\n");
+        WIFI_LOGE("GetHiddenNetworkSsidList failed.\n");
         return false;
     }
 
@@ -713,12 +717,12 @@ bool ScanService::BeginPnoScan()
     InterScanConfig interConfig;
     interConfig.fullScanFlag = true;
     if (!GetBandFreqs(SCAN_BAND_BOTH_WITH_DFS, interConfig.scanFreqs)) {
-        LOGE("GetBandFreqs failed.\n");
+        WIFI_LOGE("GetBandFreqs failed.\n");
         return false;
     }
 
     if (!PnoScan(pnoScanConfig, interConfig)) {
-        LOGE("PnoScan failed.\n");
+        WIFI_LOGE("PnoScan failed.\n");
         return false;
     }
     isPnoScanBegined = true;
@@ -728,44 +732,45 @@ bool ScanService::BeginPnoScan()
 
 bool ScanService::PnoScan(const PnoScanConfig &pnoScanConfig, const InterScanConfig &interScanConfig)
 {
-    LOGI("Enter ScanService::PnoScan.\n");
+    WIFI_LOGI("Enter ScanService::PnoScan.\n");
 
     /* Construct a message. */
-    InternalMessage *interMessage = pScanStateMachine->ObtainMessage(CMD_START_PNO_SCAN);
+    InternalMessage *interMessage = pScanStateMachine->CreateMessage(CMD_START_PNO_SCAN);
     if (interMessage == nullptr) {
-        LOGE("ObtainMessage failed.\n");
+        WIFI_LOGE("CreateMessage failed.\n");
         return false;
     }
 
     if (!AddPnoScanMessageBody(interMessage, pnoScanConfig)) {
-        MessageManage::GetInstance().Recycle(interMessage);
-        LOGE("AddPnoScanMessageBody failed.\n");
+        MessageManage::GetInstance().ReclaimMsg(interMessage);
+        WIFI_LOGE("AddPnoScanMessageBody failed.\n");
         return false;
     }
 
     if (!AddScanMessageBody(interMessage, interScanConfig)) {
-        MessageManage::GetInstance().Recycle(interMessage);
-        LOGE("AddScanMessageBody failed.\n");
+        MessageManage::GetInstance().ReclaimMsg(interMessage);
+        WIFI_LOGE("AddScanMessageBody failed.\n");
         return false;
     }
 
-    LOGI("Begin: send message.");
+    WIFI_LOGI("Begin: send message.");
     pScanStateMachine->SendMessage(interMessage);
-    LOGI("End: send message.");
+    WIFI_LOGI("End: send message.");
 
     struct timespec times = {0, 0};
     clock_gettime(CLOCK_MONOTONIC, &times);
-    pnoScanStartTime = times.tv_sec * SECOND_TO_MILLI_SECOND + times.tv_nsec / SECOND_TO_MICRO_SECOND;
+    pnoScanStartTime =
+        static_cast<int64_t>(times.tv_sec) * SECOND_TO_MILLI_SECOND + times.tv_nsec / SECOND_TO_MICRO_SECOND;
 
     return true;
 }
 
 bool ScanService::AddPnoScanMessageBody(InternalMessage *interMessage, const PnoScanConfig &pnoScanConfig)
 {
-    LOGI("Enter ScanService::AddPnoScanMessageBody.\n");
+    WIFI_LOGI("Enter ScanService::AddPnoScanMessageBody.\n");
 
     if (interMessage == nullptr) {
-        LOGE("interMessage is null.\n");
+        WIFI_LOGE("interMessage is null.\n");
         return false;
     }
 
@@ -775,19 +780,19 @@ bool ScanService::AddPnoScanMessageBody(InternalMessage *interMessage, const Pno
 
     interMessage->AddIntMessageBody(pnoScanConfig.hiddenNetworkSsid.size());
     std::vector<std::string>::const_iterator iter = pnoScanConfig.hiddenNetworkSsid.begin();
-    for (; iter != pnoScanConfig.hiddenNetworkSsid.end(); iter++) {
+    for (; iter != pnoScanConfig.hiddenNetworkSsid.end(); ++iter) {
         interMessage->AddStringMessageBody(*iter);
     }
 
     interMessage->AddIntMessageBody(pnoScanConfig.savedNetworkSsid.size());
     std::vector<std::string>::const_iterator iter2 = pnoScanConfig.savedNetworkSsid.begin();
-    for (; iter2 != pnoScanConfig.savedNetworkSsid.end(); iter2++) {
+    for (; iter2 != pnoScanConfig.savedNetworkSsid.end(); ++iter2) {
         interMessage->AddStringMessageBody(*iter2);
     }
 
     interMessage->AddIntMessageBody(pnoScanConfig.freqs.size());
     std::vector<int>::const_iterator iter3 = pnoScanConfig.freqs.begin();
-    for (; iter3 != pnoScanConfig.freqs.end(); iter3++) {
+    for (; iter3 != pnoScanConfig.freqs.end(); ++iter3) {
         interMessage->AddIntMessageBody(*iter3);
     }
 
@@ -796,25 +801,25 @@ bool ScanService::AddPnoScanMessageBody(InternalMessage *interMessage, const Pno
 
 void ScanService::HandlePnoScanResult(std::vector<InterScanResult> &scanResultList)
 {
-    LOGI("Enter ScanService::HandlePnoScanResult.\n");
+    WIFI_LOGI("Enter ScanService::HandlePnoScanResult.\n");
 
     std::vector<InterScanResult> filterScanResult;
     std::vector<InterScanResult>::iterator iter = scanResultList.begin();
-    for (; iter != scanResultList.end(); iter++) {
+    for (; iter != scanResultList.end(); ++iter) {
         if ((iter->timestamp / SECOND_TO_MILLI_SECOND) > pnoScanStartTime) {
             filterScanResult.push_back(*iter);
-            LOGI("InterScanResult.bssid is %s.\n", iter->bssid.c_str());
-            LOGI("InterScanResult.ssid is %s.\n", iter->ssid.c_str());
-            LOGI("InterScanResult.capabilities is %{public}s.\n", iter->capabilities.c_str());
-            LOGI("InterScanResult.frequency is %{public}d.\n", iter->frequency);
-            LOGI("InterScanResult.level is %{public}d.\n", iter->level);
-            LOGI("InterScanResult.timestamp is %ld.\n", iter->timestamp);
+            WIFI_LOGI("InterScanResult.bssid is %s.\n", iter->bssid.c_str());
+            WIFI_LOGI("InterScanResult.ssid is %s.\n", iter->ssid.c_str());
+            WIFI_LOGI("InterScanResult.capabilities is %{public}s.\n", iter->capabilities.c_str());
+            WIFI_LOGI("InterScanResult.frequency is %{public}d.\n", iter->frequency);
+            WIFI_LOGI("InterScanResult.rssi is %{public}d.\n", iter->rssi);
+            WIFI_LOGI("InterScanResult.timestamp is %lld.\n", iter->timestamp);
         }
     }
 
     /* Send the scanning result to the module registered for listening */
     PnoScanResultHandlerMap::iterator handleIter = pnoScanResultHandlerMap.begin();
-    for (; handleIter != pnoScanResultHandlerMap.end(); handleIter++) {
+    for (; handleIter != pnoScanResultHandlerMap.end(); ++handleIter) {
         if (handleIter->second) {
             handleIter->second(filterScanResult);
         }
@@ -828,7 +833,7 @@ void ScanService::HandlePnoScanResult(std::vector<InterScanResult> &scanResultLi
 
 void ScanService::EndPnoScan()
 {
-    LOGI("Enter ScanService::EndPnoScan.\n");
+    WIFI_LOGI("Enter ScanService::EndPnoScan.\n");
 
     if (!isPnoScanBegined) {
         return;
@@ -841,7 +846,7 @@ void ScanService::EndPnoScan()
 
 void ScanService::HandleScreenStatusChanged(bool screenOn)
 {
-    LOGI("Enter ScanService::HandleScreenStatusChanged.");
+    WIFI_LOGI("Enter ScanService::HandleScreenStatusChanged.");
 
     isScreenOn = screenOn;
     SystemScanProcess(false);
@@ -850,7 +855,7 @@ void ScanService::HandleScreenStatusChanged(bool screenOn)
 
 void ScanService::HandleStaStatusChanged(int status)
 {
-    LOGI("Enter ScanService::HandleStaStatusChanged.");
+    WIFI_LOGI("Enter ScanService::HandleStaStatusChanged.");
 
     staStatus = status;
     switch (staStatus) {
@@ -873,17 +878,17 @@ void ScanService::HandleStaStatusChanged(int status)
 
 void ScanService::SystemScanProcess(bool scanAtOnce)
 {
-    LOGI("Enter ScanService::SystemScanProcess.");
+    WIFI_LOGI("Enter ScanService::SystemScanProcess.");
     StopSystemScan();
-    LOGD("isScreenOn is:%{public}d", isScreenOn);
+    WIFI_LOGD("isScreenOn is:%{public}d", isScreenOn);
     if (isScreenOn) {
         for (auto iter = scanControlInfo.scanIntervalList.begin(); iter != scanControlInfo.scanIntervalList.end();
-             iter++) {
+             ++iter) {
             if (iter->scanScene == SCAN_SCENE_ALL && iter->scanMode == ScanMode::SYSTEM_TIMER_SCAN &&
                 iter->isSingle == false) {
-                LOGD("iter->intervalMode is:%{public}d", iter->intervalMode);
-                LOGD("iter->interval is:%{public}d", iter->interval);
-                LOGD("iter->count is:%{public}d", iter->count);
+                WIFI_LOGD("iter->intervalMode is:%{public}d", iter->intervalMode);
+                WIFI_LOGD("iter->interval is:%{public}d", iter->interval);
+                WIFI_LOGD("iter->count is:%{public}d", iter->count);
                 systemScanIntervalMode.scanIntervalMode.intervalMode = iter->intervalMode;
                 systemScanIntervalMode.scanIntervalMode.interval = iter->interval;
                 systemScanIntervalMode.scanIntervalMode.count = iter->count;
@@ -892,7 +897,7 @@ void ScanService::SystemScanProcess(bool scanAtOnce)
         StartSystemTimerScan(scanAtOnce);
     } else {
         if (!BeginPnoScan()) {
-            LOGE("BeginPnoScan failed.");
+            WIFI_LOGE("BeginPnoScan failed.");
             return;
         }
     }
@@ -902,7 +907,7 @@ void ScanService::SystemScanProcess(bool scanAtOnce)
 
 void ScanService::StopSystemScan()
 {
-    LOGI("Enter ScanService::StopSystemScan.");
+    WIFI_LOGI("Enter ScanService::StopSystemScan.");
 
     pScanStateMachine->StopTimer(static_cast<int>(SYSTEM_SCAN_TIMER));
     EndPnoScan();
@@ -913,16 +918,17 @@ void ScanService::StopSystemScan()
 
 void ScanService::StartSystemTimerScan(bool scanAtOnce)
 {
-    LOGI("Enter ScanService::StartSystemTimerScan.");
+    WIFI_LOGI("Enter ScanService::StartSystemTimerScan.");
 
     if (!AllowSystemTimerScan()) {
-        LOGI("AllowSystemTimerScan return false.");
+        WIFI_LOGI("AllowSystemTimerScan return false.");
         return;
     }
 
     struct timespec times = {0, 0};
     clock_gettime(CLOCK_MONOTONIC, &times);
-    long nowTime = times.tv_sec * SECOND_TO_MILLI_SECOND + times.tv_nsec / SECOND_TO_MICRO_SECOND;
+    int64_t nowTime =
+        static_cast<int64_t>(times.tv_sec) * SECOND_TO_MILLI_SECOND + times.tv_nsec / SECOND_TO_MICRO_SECOND;
     int sinceLastScan = 0;
     if (lastSystemScanTime != 0) {
         sinceLastScan = nowTime - lastSystemScanTime;
@@ -933,20 +939,20 @@ void ScanService::StartSystemTimerScan(bool scanAtOnce)
      * or the time since the last scan is longer than the scan interval
      */
     int scanTime = SYSTEM_SCAN_INIT_TIME;
-    LOGD("interval:%{public}d", systemScanIntervalMode.scanIntervalMode.interval);
+    WIFI_LOGD("interval:%{public}d", systemScanIntervalMode.scanIntervalMode.interval);
     if (systemScanIntervalMode.scanIntervalMode.interval > 0) {
         scanTime = systemScanIntervalMode.scanIntervalMode.interval;
     }
     if (scanAtOnce || (lastSystemScanTime == 0) ||
         (sinceLastScan >= systemScanIntervalMode.scanIntervalMode.interval)) {
         if (!Scan(false)) {
-            LOGE("Scan failed.");
+            WIFI_LOGE("Scan failed.");
         }
         lastSystemScanTime = nowTime;
     } else {
         scanTime = systemScanIntervalMode.scanIntervalMode.interval - sinceLastScan;
     }
-    LOGD("scanTime: %{public}d,  interval:%{public}d,  count:%{public}d",
+    WIFI_LOGD("scanTime: %{public}d,  interval:%{public}d,  count:%{public}d",
         scanTime,
         systemScanIntervalMode.scanIntervalMode.interval,
         systemScanIntervalMode.scanIntervalMode.count);
@@ -963,7 +969,7 @@ void ScanService::HandleSystemScanTimeout()
 
 void ScanService::DisconnectedTimerScan()
 {
-    LOGI("Enter ScanService::DisconnectedTimerScan.\n");
+    WIFI_LOGI("Enter ScanService::DisconnectedTimerScan.\n");
 
     pScanStateMachine->StartTimer(static_cast<int>(DISCONNECTED_SCAN_TIMER), DISCONNECTED_SCAN_INTERVAL);
     return;
@@ -971,14 +977,14 @@ void ScanService::DisconnectedTimerScan()
 
 void ScanService::HandleDisconnectedScanTimeout()
 {
-    LOGI("Enter ScanService::HandleDisconnectedScanTimeout.\n");
+    WIFI_LOGI("Enter ScanService::HandleDisconnectedScanTimeout.\n");
 
     if (staStatus != static_cast<int>(OperateResState::DISCONNECT_DISCONNECTED)) {
         return;
     }
 
     if (!Scan(false)) {
-        LOGE("Scan failed.");
+        WIFI_LOGE("Scan failed.");
     }
     pScanStateMachine->StartTimer(static_cast<int>(DISCONNECTED_SCAN_TIMER), DISCONNECTED_SCAN_INTERVAL);
 
@@ -987,15 +993,15 @@ void ScanService::HandleDisconnectedScanTimeout()
 
 void ScanService::RestartPnoScanTimeOut()
 {
-    LOGI("Enter ScanService::RestartPnoScanTimeOut.\n");
+    WIFI_LOGI("Enter ScanService::RestartPnoScanTimeOut.\n");
     pnoScanFailedNum++;
     if (pnoScanFailedNum > MAX_PNO_SCAN_FAILED_NUM) {
-        LOGE("Over max pno failed number.");
+        WIFI_LOGE("Over max pno failed number.");
         return;
     }
 
     if (!BeginPnoScan()) {
-        LOGE("BeginPnoScan failed.");
+        WIFI_LOGE("BeginPnoScan failed.");
         return;
     }
 
@@ -1004,10 +1010,10 @@ void ScanService::RestartPnoScanTimeOut()
 
 void ScanService::GetScanControlInfo()
 {
-    LOGI("Enter ScanService::GetScanControlInfo.\n");
+    WIFI_LOGI("Enter ScanService::GetScanControlInfo.\n");
 
     if (WifiSettings::GetInstance().GetScanControlInfo(scanControlInfo) != 0) {
-        LOGE("WifiSettings::GetInstance().GetScanControlInfo failed");
+        WIFI_LOGE("WifiSettings::GetInstance().GetScanControlInfo failed");
     }
 
     return;
@@ -1015,7 +1021,7 @@ void ScanService::GetScanControlInfo()
 
 void ScanService::GetScreenState()
 {
-    LOGI("Enter ScanService::GetScreenState.\n");
+    WIFI_LOGI("Enter ScanService::GetScreenState.\n");
     int screenState = WifiSettings::GetInstance().GetScreenState();
     isScreenOn = true;
     if (screenState == SCREEN_CLOSED) {
@@ -1027,7 +1033,7 @@ void ScanService::GetScreenState()
 
 void ScanService::SetOperateAppMode(int appMode)
 {
-    LOGI("Enter ScanService::SetOperateAppMode.\n");
+    WIFI_LOGI("Enter ScanService::SetOperateAppMode.\n");
     operateAppMode = appMode;
 
     return;
@@ -1035,7 +1041,7 @@ void ScanService::SetOperateAppMode(int appMode)
 
 ScanMode ScanService::GetOperateAppMode()
 {
-    LOGI("Enter ScanService::GetOperateAppMode.\n");
+    WIFI_LOGI("Enter ScanService::GetOperateAppMode.\n");
     ScanMode scanMode = ScanMode::SYS_FOREGROUND_SCAN;
     switch (operateAppMode) {
         case APP_FOREGROUND_SCAN:
@@ -1055,7 +1061,7 @@ ScanMode ScanService::GetOperateAppMode()
             break;
 
         default:
-            LOGE("operateAppMode %{public}d is invalid.", operateAppMode);
+            WIFI_LOGE("operateAppMode %{public}d is invalid.", operateAppMode);
             break;
     }
 
@@ -1064,27 +1070,27 @@ ScanMode ScanService::GetOperateAppMode()
 
 bool ScanService::AllowExternScan(int appId)
 {
-    LOGI("Enter ScanService::AllowExternScan.\n");
+    WIFI_LOGI("Enter ScanService::AllowExternScan.\n");
     int staScene = GetStaScene();
     ScanMode scanMode = GetOperateAppMode();
-    LOGD("staScene is %{public}d, scanMode is %{public}d", staScene, (int)scanMode);
+    WIFI_LOGD("staScene is %{public}d, scanMode is %{public}d", staScene, (int)scanMode);
 
     if (!AllowExternScanByForbid(staScene, scanMode)) {
-        LOGD("extern scan not allow by forbid mode");
+        WIFI_LOGD("extern scan not allow by forbid mode");
         return false;
     }
     if (!AllowExternScanByInterval(appId, staScene, scanMode)) {
-        LOGD("extern scan not allow by interval mode");
+        WIFI_LOGD("extern scan not allow by interval mode");
         return false;
     }
 
-    LOGD("extern scan has allowed");
+    WIFI_LOGD("extern scan has allowed");
     return true;
 }
 
 bool ScanService::AllowSystemTimerScan()
 {
-    LOGI("Enter ScanService::AllowSystemTimerScan.\n");
+    WIFI_LOGI("Enter ScanService::AllowSystemTimerScan.\n");
 
     if (staStatus != static_cast<int>(OperateResState::DISCONNECT_DISCONNECTED) &&
         staStatus != static_cast<int>(OperateResState::CONNECT_AP_CONNECTED)) {
@@ -1104,16 +1110,16 @@ bool ScanService::AllowSystemTimerScan()
     }
 
     if (!AllowScanDuringStaScene(staScene, ScanMode::SYSTEM_TIMER_SCAN)) {
-        LOGD("system timer scan not allowed, staScene is %{public}d", staScene);
+        WIFI_LOGD("system timer scan not allowed, staScene is %{public}d", staScene);
         return false;
     }
 
     if (!AllowScanDuringCustomScene(ScanMode::SYSTEM_TIMER_SCAN)) {
-        LOGD("system timer scan not allowed");
+        WIFI_LOGD("system timer scan not allowed");
         return false;
     }
 
-    for (auto iter = scanControlInfo.scanIntervalList.begin(); iter != scanControlInfo.scanIntervalList.end(); iter++) {
+    for (auto iter = scanControlInfo.scanIntervalList.begin(); iter != scanControlInfo.scanIntervalList.end(); ++iter) {
         if (iter->scanScene == SCAN_SCENE_ALL && iter->scanMode == ScanMode::SYSTEM_TIMER_SCAN &&
             iter->isSingle == false) {
             if (!SystemScanByInterval(systemScanIntervalMode.expScanCount,
@@ -1124,13 +1130,13 @@ bool ScanService::AllowSystemTimerScan()
         }
     }
 
-    LOGD("allow system timer scan");
+    WIFI_LOGD("allow system timer scan");
     return true;
 }
 
 bool ScanService::AllowPnoScan()
 {
-    LOGI("Enter ScanService::AllowPnoScan.\n");
+    WIFI_LOGI("Enter ScanService::AllowPnoScan.\n");
 
     if (staStatus != static_cast<int>(OperateResState::DISCONNECT_DISCONNECTED)) {
         return false;
@@ -1141,15 +1147,15 @@ bool ScanService::AllowPnoScan()
         return false;
     }
     if (!AllowScanDuringStaScene(staScene, ScanMode::PNO_SCAN)) {
-        LOGD("pnoScan is not allowed for forbid map, staScene is %{public}d", staScene);
+        WIFI_LOGD("pnoScan is not allowed for forbid map, staScene is %{public}d", staScene);
         return false;
     }
     if (!AllowScanDuringCustomScene(ScanMode::PNO_SCAN)) {
-        LOGD("pnoScan is not allowed for forbid map");
+        WIFI_LOGD("pnoScan is not allowed for forbid map");
         return false;
     }
 
-    for (auto iter = scanControlInfo.scanIntervalList.begin(); iter != scanControlInfo.scanIntervalList.end(); iter++) {
+    for (auto iter = scanControlInfo.scanIntervalList.begin(); iter != scanControlInfo.scanIntervalList.end(); ++iter) {
         if (iter->scanScene == SCAN_SCENE_ALL && iter->scanMode == ScanMode::PNO_SCAN && iter->isSingle == false) {
             pnoScanIntervalMode.scanIntervalMode.intervalMode = iter->intervalMode;
             pnoScanIntervalMode.scanIntervalMode.interval = iter->interval;
@@ -1158,18 +1164,18 @@ bool ScanService::AllowPnoScan()
                 pnoScanIntervalMode.fixedCurrentTime,
                 pnoScanIntervalMode.scanIntervalMode.interval,
                 pnoScanIntervalMode.scanIntervalMode.count)) {
-                LOGD("pnoScan is not allowed for interval mode");
+                WIFI_LOGD("pnoScan is not allowed for interval mode");
                 return false;
             }
         }
     }
-    LOGD("pno scan is allowed");
+    WIFI_LOGD("pno scan is allowed");
     return true;
 }
 
 bool ScanService::AllowExternScanByForbid(int staScene, ScanMode scanMode)
 {
-    LOGI("Enter ScanService::AllowExternScanByForbid.\n");
+    WIFI_LOGI("Enter ScanService::AllowExternScanByForbid.\n");
 
     if (IsExternScanning()) {
         if (!AllowScanDuringScanning(scanMode)) {
@@ -1205,7 +1211,7 @@ bool ScanService::AllowExternScanByForbid(int staScene, ScanMode scanMode)
 
 bool ScanService::AllowExternScanByInterval(int appId, int staScene, ScanMode scanMode)
 {
-    LOGI("Enter ScanService::AllowExternScanByInterval.\n");
+    WIFI_LOGI("Enter ScanService::AllowExternScanByInterval.\n");
 
     if (!AllowExternScanByIntervalMode(appId, staScene, scanMode)) {
         return false;
@@ -1230,7 +1236,7 @@ bool ScanService::AllowExternScanByInterval(int appId, int staScene, ScanMode sc
 
 int ScanService::GetStaScene()
 {
-    LOGI("Enter ScanService::GetStaScene.\n");
+    WIFI_LOGI("Enter ScanService::GetStaScene.\n");
 
     switch (staStatus) {
         case static_cast<int>(OperateResState::CONNECT_AP_CONNECTED):
@@ -1252,9 +1258,9 @@ int ScanService::GetStaScene()
 
 bool ScanService::IsExternScanning()
 {
-    LOGI("Enter ScanService::IsExternScanning.\n");
+    WIFI_LOGI("Enter ScanService::IsExternScanning.\n");
 
-    for (auto iter = scanConfigMap.begin(); iter != scanConfigMap.end(); iter++) {
+    for (auto iter = scanConfigMap.begin(); iter != scanConfigMap.end(); ++iter) {
         if (iter->second.externFlag) {
             return true;
         }
@@ -1264,7 +1270,7 @@ bool ScanService::IsExternScanning()
 
 void ScanService::GetAllowBandFreqsControlInfo(ScanBandType &scanBand, std::vector<int> &freqs)
 {
-    LOGI("Enter ScanService::GetAllowBandFreqsControlInfo.\n");
+    WIFI_LOGI("Enter ScanService::GetAllowBandFreqsControlInfo.\n");
 
     int staScene = GetStaScene();
 
@@ -1284,7 +1290,7 @@ void ScanService::GetAllowBandFreqsControlInfo(ScanBandType &scanBand, std::vect
     }
     auto forbidIter = scanControlInfo.scanForbidMap.find(SCAN_SCENE_ALL);
     if (forbidIter != scanControlInfo.scanForbidMap.end()) {
-        for (auto iter = forbidIter->second.begin(); iter != forbidIter->second.end(); iter++) {
+        for (auto iter = forbidIter->second.begin(); iter != forbidIter->second.end(); ++iter) {
             if (iter->scanMode == ScanMode::BAND_24GHZ_SCAN) {
                 allow24Ghz = false;
             }
@@ -1295,7 +1301,7 @@ void ScanService::GetAllowBandFreqsControlInfo(ScanBandType &scanBand, std::vect
     }
 
     if ((!allow24Ghz) && (!allow5Ghz)) {
-        LOGE("Both 2.4G and 5G are not allowed");
+        WIFI_LOGE("Both 2.4G and 5G are not allowed");
         scanBand = SCAN_BAND_UNSPECIFIED;
         freqs.clear();
         return;
@@ -1316,7 +1322,7 @@ void ScanService::GetAllowBandFreqsControlInfo(ScanBandType &scanBand, std::vect
 
 ScanBandType ScanService::ConvertBandNotAllow24G(ScanBandType scanBand)
 {
-    LOGI("Enter ScanService::ConvertBandNotAllow24G.\n");
+    WIFI_LOGI("Enter ScanService::ConvertBandNotAllow24G.\n");
 
     switch (scanBand) {
         case SCAN_BAND_24_GHZ:
@@ -1340,7 +1346,7 @@ ScanBandType ScanService::ConvertBandNotAllow24G(ScanBandType scanBand)
 
 ScanBandType ScanService::ConvertBandNotAllow5G(ScanBandType scanBand)
 {
-    LOGI("Enter ScanService::ConvertBandNotAllow5G.\n");
+    WIFI_LOGI("Enter ScanService::ConvertBandNotAllow5G.\n");
 
     switch (scanBand) {
         case SCAN_BAND_24_GHZ:
@@ -1358,14 +1364,14 @@ ScanBandType ScanService::ConvertBandNotAllow5G(ScanBandType scanBand)
 
 void ScanService::Delete24GhzFreqs(std::vector<int> &freqs)
 {
-    LOGI("Enter ScanService::Delete24GhzFreqs.\n");
+    WIFI_LOGI("Enter ScanService::Delete24GhzFreqs.\n");
 
     auto iter = freqs.begin();
     while (iter != freqs.end()) {
         if (*iter < FREQS_24G_MAX_VALUE) {
             freqs.erase(iter);
         } else {
-            iter++;
+            ++iter;
         }
     }
 
@@ -1374,14 +1380,14 @@ void ScanService::Delete24GhzFreqs(std::vector<int> &freqs)
 
 void ScanService::Delete5GhzFreqs(std::vector<int> &freqs)
 {
-    LOGI("Enter ScanService::Delete24GhzFreqs.\n");
+    WIFI_LOGI("Enter ScanService::Delete24GhzFreqs.\n");
 
     auto iter = freqs.begin();
     while (iter != freqs.end()) {
         if (*iter > FREQS_5G_MIN_VALUE) {
             freqs.erase(iter);
         } else {
-            iter++;
+            ++iter;
         }
     }
 
@@ -1390,15 +1396,15 @@ void ScanService::Delete5GhzFreqs(std::vector<int> &freqs)
 
 bool ScanService::GetSavedNetworkSsidList(std::vector<std::string> &savedNetworkSsid)
 {
-    LOGI("Enter ScanService::GetSavedNetworkSsidList.\n");
+    WIFI_LOGI("Enter ScanService::GetSavedNetworkSsidList.\n");
 
     std::vector<WifiDeviceConfig> deviceConfigs;
     if (WifiSettings::GetInstance().GetDeviceConfig(deviceConfigs) != 0) {
-        LOGE("WifiSettings::GetInstance().GetDeviceConfig failed");
+        WIFI_LOGE("WifiSettings::GetInstance().GetDeviceConfig failed");
         return false;
     }
 
-    for (auto iter = deviceConfigs.begin(); iter != deviceConfigs.end(); iter++) {
+    for (auto iter = deviceConfigs.begin(); iter != deviceConfigs.end(); ++iter) {
         if ((iter->status == static_cast<int>(WifiDeviceConfigStatus::ENABLED)) && (!(iter->isPasspoint)) &&
             (!(iter->isEphemeral))) {
             savedNetworkSsid.push_back(iter->ssid);
@@ -1410,15 +1416,15 @@ bool ScanService::GetSavedNetworkSsidList(std::vector<std::string> &savedNetwork
 
 bool ScanService::GetHiddenNetworkSsidList(std::vector<std::string> &hiddenNetworkSsid)
 {
-    LOGI("Enter ScanService::GetHiddenNetworkSsidList.\n");
+    WIFI_LOGI("Enter ScanService::GetHiddenNetworkSsidList.\n");
 
     std::vector<WifiDeviceConfig> deviceConfigs;
     if (WifiSettings::GetInstance().GetDeviceConfig(deviceConfigs) != 0) {
-        LOGE("WifiSettings::GetInstance().GetDeviceConfig failed");
+        WIFI_LOGE("WifiSettings::GetInstance().GetDeviceConfig failed");
         return false;
     }
 
-    for (auto iter = deviceConfigs.begin(); iter != deviceConfigs.end(); iter++) {
+    for (auto iter = deviceConfigs.begin(); iter != deviceConfigs.end(); ++iter) {
         if (iter->hiddenSSID) {
             hiddenNetworkSsid.push_back(iter->ssid);
         }
@@ -1429,10 +1435,10 @@ bool ScanService::GetHiddenNetworkSsidList(std::vector<std::string> &hiddenNetwo
 
 void ScanService::SetCustomScene(int scene, time_t currentTime)
 {
-    LOGI("Enter ScanService::SetCustomScene.\n");
+    WIFI_LOGI("Enter ScanService::SetCustomScene.\n");
 
     if (scene < static_cast<int>(SCAN_SCENE_DEEP_SLEEP) || scene >= static_cast<int>(SCAN_SCENE_ALL)) {
-        LOGE("invalid CustomScene status:%{public}d", scene);
+        WIFI_LOGE("invalid CustomScene status:%{public}d", scene);
         return;
     }
     customSceneTimeMap[scene] = currentTime;
@@ -1442,7 +1448,7 @@ void ScanService::SetCustomScene(int scene, time_t currentTime)
 
 void ScanService::ClearScanControlValue()
 {
-    LOGI("Enter ScanService::ClearScanControlValue.\n");
+    WIFI_LOGI("Enter ScanService::ClearScanControlValue.\n");
 
     staCurrentTime = 0;
     customCurrentTime = 0;
@@ -1454,7 +1460,7 @@ void ScanService::ClearScanControlValue()
 
 void ScanService::SetStaCurrentTime()
 {
-    LOGI("Enter ScanService::SetStaCurrentTime.\n");
+    WIFI_LOGI("Enter ScanService::SetStaCurrentTime.\n");
     time_t now = time(0);
     staCurrentTime = now;
 
@@ -1463,11 +1469,11 @@ void ScanService::SetStaCurrentTime()
 
 bool ScanService::AllowScanDuringScanning(ScanMode scanMode)
 {
-    LOGI("Enter ScanService::AllowScanDuringScanning.\n");
+    WIFI_LOGI("Enter ScanService::AllowScanDuringScanning.\n");
 
     auto forbidIter = scanControlInfo.scanForbidMap.find(SCAN_SCENE_SCANNING);
     if (forbidIter != scanControlInfo.scanForbidMap.end()) {
-        for (auto iter = forbidIter->second.begin(); iter != forbidIter->second.end(); iter++) {
+        for (auto iter = forbidIter->second.begin(); iter != forbidIter->second.end(); ++iter) {
             if (iter->scanMode == scanMode) {
                 return false;
             }
@@ -1478,11 +1484,11 @@ bool ScanService::AllowScanDuringScanning(ScanMode scanMode)
 
 bool ScanService::AllowScanDuringScreenOff(ScanMode scanMode)
 {
-    LOGI("Enter ScanService::AllowScanDuringScreenOff.\n");
+    WIFI_LOGI("Enter ScanService::AllowScanDuringScreenOff.\n");
 
     auto forbidIter = scanControlInfo.scanForbidMap.find(SCAN_SCENE_SCREEN_OFF);
     if (forbidIter != scanControlInfo.scanForbidMap.end()) {
-        for (auto iter = forbidIter->second.begin(); iter != forbidIter->second.end(); iter++) {
+        for (auto iter = forbidIter->second.begin(); iter != forbidIter->second.end(); ++iter) {
             if (iter->scanMode == scanMode) {
                 return false;
             }
@@ -1493,13 +1499,13 @@ bool ScanService::AllowScanDuringScreenOff(ScanMode scanMode)
 
 bool ScanService::AllowScanDuringStaScene(int staScene, ScanMode scanMode)
 {
-    LOGI("Enter ScanService::AllowScanDuringStaScene.\n");
+    WIFI_LOGI("Enter ScanService::AllowScanDuringStaScene.\n");
 
     time_t now = time(0);
 
     auto forbidIter = scanControlInfo.scanForbidMap.find(staScene);
     if (forbidIter != scanControlInfo.scanForbidMap.end()) {
-        for (auto iter = forbidIter->second.begin(); iter != forbidIter->second.end(); iter++) {
+        for (auto iter = forbidIter->second.begin(); iter != forbidIter->second.end(); ++iter) {
             /* forbid scan mode found in scan scene */
             if (iter->scanMode == scanMode) {
                 /* Unconditional scan control for forbidCount times */
@@ -1523,14 +1529,14 @@ bool ScanService::AllowScanDuringStaScene(int staScene, ScanMode scanMode)
 
 bool ScanService::AllowScanDuringCustomScene(ScanMode scanMode)
 {
-    LOGI("Enter ScanService::AllowScanDuringCustomScene.\n");
+    WIFI_LOGI("Enter ScanService::AllowScanDuringCustomScene.\n");
 
     time_t now = time(0);
     auto customIter = customSceneTimeMap.begin();
-    for (; customIter != customSceneTimeMap.end(); customIter++) {
+    for (; customIter != customSceneTimeMap.end(); ++customIter) {
         auto forbidIter = scanControlInfo.scanForbidMap.find(customIter->first);
         if (forbidIter != scanControlInfo.scanForbidMap.end()) {
-            for (auto iter = forbidIter->second.begin(); iter != forbidIter->second.end(); iter++) {
+            for (auto iter = forbidIter->second.begin(); iter != forbidIter->second.end(); ++iter) {
                 /* forbid scan mode found in scan scene */
                 if (iter->scanMode == scanMode) {
                     /* Unconditional scan control for forbidCount times */
@@ -1555,12 +1561,13 @@ bool ScanService::AllowScanDuringCustomScene(ScanMode scanMode)
 
 bool ScanService::AllowExternScanByIntervalMode(int appId, int scanScene, ScanMode scanMode)
 {
-    LOGI("Enter ScanService::AllowExternScanByIntervalMode.\n");
+    WIFI_LOGI("Enter ScanService::AllowExternScanByIntervalMode.\n");
 
     for (auto intervalListIter = scanControlInfo.scanIntervalList.begin();
          intervalListIter != scanControlInfo.scanIntervalList.end();
-         intervalListIter++) {
-        LOGD("scanScene:%{public}d,  scanMode:%{public}d", intervalListIter->scanScene, intervalListIter->scanMode);
+         ++intervalListIter) {
+        WIFI_LOGD(
+            "scanScene:%{public}d,  scanMode:%{public}d", intervalListIter->scanScene, intervalListIter->scanMode);
         /* Determine whether control is required in the current scene and scan mode. */
         if (intervalListIter->scanScene == scanScene && intervalListIter->scanMode == scanMode) {
             /* If a single application is distinguished */
@@ -1581,13 +1588,13 @@ bool ScanService::AllowExternScanByIntervalMode(int appId, int scanScene, ScanMo
 
 bool ScanService::AllowExternScanByCustomScene(int appId, ScanMode scanMode)
 {
-    LOGI("Enter ScanService::AllowExternScanByCustomScene.\n");
+    WIFI_LOGI("Enter ScanService::AllowExternScanByCustomScene.\n");
 
     auto customIter = customSceneTimeMap.begin();
-    for (; customIter != customSceneTimeMap.end(); customIter++) {
+    for (; customIter != customSceneTimeMap.end(); ++customIter) {
         for (auto intervalListIter = scanControlInfo.scanIntervalList.begin();
              intervalListIter != scanControlInfo.scanIntervalList.end();
-             intervalListIter++) {
+             ++intervalListIter) {
             /* Determine whether control is required in the current scene and scan mode. */
             if (intervalListIter->scanScene == customIter->first && intervalListIter->scanMode == scanMode) {
                 /* If a single application is distinguished */
@@ -1609,10 +1616,10 @@ bool ScanService::AllowExternScanByCustomScene(int appId, ScanMode scanMode)
 
 bool ScanService::AllowSingleAppScanByInterval(int appId, ScanIntervalMode scanIntervalMode)
 {
-    LOGI("Enter ScanService::AllowSingleAppScan.\n");
+    WIFI_LOGI("Enter ScanService::AllowSingleAppScan.\n");
 
     bool appIdExisted = false;
-    for (auto forbidListIter = appForbidList.begin(); forbidListIter != appForbidList.end(); forbidListIter++) {
+    for (auto forbidListIter = appForbidList.begin(); forbidListIter != appForbidList.end(); ++forbidListIter) {
         if (forbidListIter->appID == appId &&
             forbidListIter->scanIntervalMode.scanScene == scanIntervalMode.scanScene &&
             forbidListIter->scanIntervalMode.scanMode == scanIntervalMode.scanMode) {
@@ -1630,7 +1637,7 @@ bool ScanService::AllowSingleAppScanByInterval(int appId, ScanIntervalMode scanI
         singleAppForbid.scanIntervalMode.count = scanIntervalMode.count;
         appForbidList.push_back(singleAppForbid);
     }
-    for (auto iter = appForbidList.begin(); iter != appForbidList.end(); iter++) {
+    for (auto iter = appForbidList.begin(); iter != appForbidList.end(); ++iter) {
         if (iter->appID == appId && iter->scanIntervalMode.scanScene == scanIntervalMode.scanScene &&
             iter->scanIntervalMode.scanMode == scanIntervalMode.scanMode) {
             if (!ExternScanByInterval(appId, *iter)) {
@@ -1643,11 +1650,11 @@ bool ScanService::AllowSingleAppScanByInterval(int appId, ScanIntervalMode scanI
 
 bool ScanService::AllowFullAppScanByInterval(int appId, ScanIntervalMode scanIntervalMode)
 {
-    LOGI("Enter ScanService::AllowFullAppScan.\n");
+    WIFI_LOGI("Enter ScanService::AllowFullAppScan.\n");
 
     bool fullAppExisted = false;
     for (auto fullAppForbidIter = fullAppForbidList.begin(); fullAppForbidIter != fullAppForbidList.end();
-         fullAppForbidIter++) {
+         ++fullAppForbidIter) {
         if (fullAppForbidIter->scanIntervalMode.scanScene == scanIntervalMode.scanScene &&
             fullAppForbidIter->scanIntervalMode.scanMode == scanIntervalMode.scanMode) {
             fullAppExisted = true;
@@ -1662,7 +1669,7 @@ bool ScanService::AllowFullAppScanByInterval(int appId, ScanIntervalMode scanInt
         singleAppForbid.scanIntervalMode.count = scanIntervalMode.count;
         fullAppForbidList.push_back(singleAppForbid);
     }
-    for (auto iter = fullAppForbidList.begin(); iter != fullAppForbidList.end(); iter++) {
+    for (auto iter = fullAppForbidList.begin(); iter != fullAppForbidList.end(); ++iter) {
         if (iter->scanIntervalMode.scanScene == scanIntervalMode.scanScene &&
             iter->scanIntervalMode.scanMode == scanIntervalMode.scanMode) {
             if (!ExternScanByInterval(appId, *iter)) {
@@ -1675,7 +1682,7 @@ bool ScanService::AllowFullAppScanByInterval(int appId, ScanIntervalMode scanInt
 
 bool ScanService::PnoScanByInterval(int &fixedScanCount, time_t &fixedScanTime, int &interval, int &count)
 {
-    LOGI("Enter ScanService::PnoScanByInterval.\n");
+    WIFI_LOGI("Enter ScanService::PnoScanByInterval.\n");
 
     time_t now = time(0);
     /* First scan */
@@ -1698,7 +1705,7 @@ bool ScanService::PnoScanByInterval(int &fixedScanCount, time_t &fixedScanTime, 
 
 bool ScanService::SystemScanByInterval(int &expScanCount, int &interval, int &count)
 {
-    LOGI("Enter ScanService::SystemScanByInterval.\n");
+    WIFI_LOGI("Enter ScanService::SystemScanByInterval.\n");
     /*
      * Exponential interval. The value of interval is the initial value.
      * After the value is multiplied by 2, the last fixed interval is used.
@@ -1713,7 +1720,7 @@ bool ScanService::SystemScanByInterval(int &expScanCount, int &interval, int &co
 
 bool ScanService::ExternScanByInterval(int appID, SingleAppForbid &singleAppForbid)
 {
-    LOGI("Enter ScanService::ExternScanByInterval.\n");
+    WIFI_LOGI("Enter ScanService::ExternScanByInterval.\n");
 
     switch (singleAppForbid.scanIntervalMode.intervalMode) {
         case IntervalMode::INTERVAL_FIXED:
@@ -1747,7 +1754,7 @@ bool ScanService::ExternScanByInterval(int appID, SingleAppForbid &singleAppForb
 
 bool ScanService::AllowScanByIntervalFixed(int &fixedScanCount, time_t &fixedScanTime, int &interval, int &count)
 {
-    LOGI("Enter ScanService::AllowScanByIntervalFixed.\n");
+    WIFI_LOGI("Enter ScanService::AllowScanByIntervalFixed.\n");
 
     time_t now = time(0);
     /* First scan */
@@ -1775,7 +1782,7 @@ bool ScanService::AllowScanByIntervalFixed(int &fixedScanCount, time_t &fixedSca
 
 bool ScanService::AllowScanByIntervalExp(int &expScanCount, int &interval, int &count)
 {
-    LOGI("Enter ScanService::AllowScanByIntervalExp.\n");
+    WIFI_LOGI("Enter ScanService::AllowScanByIntervalExp.\n");
 
     /*
      * Exponential interval. The value of interval is the initial value.
@@ -1792,9 +1799,9 @@ bool ScanService::AllowScanByIntervalExp(int &expScanCount, int &interval, int &
 bool ScanService::AllowScanByIntervalContinue(
     time_t &continueScanTime, int &lessThanIntervalNum, int &interval, int &count)
 {
-    LOGI("Enter ScanService::AllowScanByIntervalContinue.\n");
+    WIFI_LOGI("Enter ScanService::AllowScanByIntervalContinue.\n");
 
-    LOGD("lessThanIntervalNum:%d, interval:%d, count:%d", lessThanIntervalNum, interval, count);
+    WIFI_LOGD("lessThanIntervalNum:%d, interval:%d, count:%d", lessThanIntervalNum, interval, count);
     time_t now = time(0);
     /* First scan */
     if (continueScanTime == 0) {
@@ -1821,7 +1828,7 @@ bool ScanService::AllowScanByIntervalContinue(
 bool ScanService::AllowScanByIntervalBlocklist(
     int appId, time_t &blockListScanTime, int &lessThanIntervalNum, int &interval, int &count)
 {
-    LOGI("Enter ScanService::AllowScanByIntervalBlocklist.\n");
+    WIFI_LOGI("Enter ScanService::AllowScanByIntervalBlocklist.\n");
 
     time_t now = time(0);
     if (now - blockListScanTime >= interval) {
@@ -1837,7 +1844,7 @@ bool ScanService::AllowScanByIntervalBlocklist(
     }
     /* If the app ID is in the blocklist, extern scan is forbidden. */
     if (std::find(scanBlocklist.begin(), scanBlocklist.end(), appId) != scanBlocklist.end()) {
-        LOGD("extern scan not allowed by blocklist");
+        WIFI_LOGD("extern scan not allowed by blocklist");
         return false;
     }
     /* First scan */

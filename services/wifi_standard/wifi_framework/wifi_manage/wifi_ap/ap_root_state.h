@@ -40,20 +40,20 @@ public:
      * @param None
      * @return None
      */
-    virtual void Enter() override;
+    virtual void GoInState() override;
     /**
      * @Description  realize pure base class method: called when exit root state.
      * @param None
      * @return None
      */
-    virtual void Exit() override;
+    virtual void GoOutState() override;
     /**
      * @Description  realize pure base class method: Messages that cannot be
                      processed in the sub-state are recorded in the root state.
      * @param msg - message to be processed
-     * @return HANDLED：Processed successfully
+     * @return EXECUTED：Processed successfully
      */
-    virtual bool ProcessMessage(InternalMessage *msg) override;
+    virtual bool ExecuteStateMsg(InternalMessage *msg) override;
 };
 }  // namespace Wifi
 }  // namespace OHOS

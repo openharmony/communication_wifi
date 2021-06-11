@@ -20,7 +20,7 @@
 #include "wifi_errcode.h"
 #include "wifi_event_broadcast.h"
 #include "wifi_hotspot_death_recipient.h"
-DEFINE_WIFILOG_LABEL("WifiHotspotStub");
+DEFINE_WIFILOG_HOTSPOT_LABEL("WifiHotspotStub");
 
 namespace OHOS {
 namespace Wifi {

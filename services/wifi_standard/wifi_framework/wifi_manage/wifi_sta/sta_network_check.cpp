@@ -14,9 +14,9 @@
  */
 #include "sta_network_check.h"
 #include "if_config.h"
+#include "wifi_logger.h"
 
-#undef LOG_TAG
-#define LOG_TAG "OHWIFI_STA_NET_CHECK"
+DEFINE_WIFILOG_LABEL("StaNetworkCheck");
 
 namespace OHOS {
 namespace Wifi {
@@ -32,14 +32,14 @@ StaNetworkCheck::StaNetworkCheck(NetStateHandler handle)
 
 StaNetworkCheck::~StaNetworkCheck()
 {
-    LOGI("StaNetworkCheck::~StaNetworkCheck enter\n");
+    WIFI_LOGI("StaNetworkCheck::~StaNetworkCheck enter\n");
     ExitNetCheckThread();
-    LOGI("StaNetworkCheck::~StaNetworkCheck complete\n");
+    WIFI_LOGI("StaNetworkCheck::~StaNetworkCheck complete\n");
 }
 
 void StaNetworkCheck::HttpDetection()
 {
-    LOGI("Enter httpDetection");
+    WIFI_LOGI("Enter httpDetection");
     /* Detect portal hotspot and send message to InterfaceSeervice if result is yes. */
     HttpRequest httpRequest;
     std::string httpReturn;
@@ -47,7 +47,7 @@ void StaNetworkCheck::HttpDetection()
 
     if (httpRequest.HttpGet(httpMsg, httpReturn) == 0) {
         if (httpReturn.find("204") != std::string::npos) {
-            LOGE("This network is normal!");
+            WIFI_LOGE("This network is normal!");
             if ((lastNetState != NETWORK_STATE_WORKING) && (isExitNetCheckThread == false) &&
                 (isStopNetCheck == false)) {
                 netStateHandler(StaNetState::NETWORK_STATE_WORKING);
@@ -56,11 +56,11 @@ void StaNetworkCheck::HttpDetection()
             return;
         } else {
             /* Callback result to InterfaceService. */
-            LOGI("This network is portal AP, need certification!");
+            WIFI_LOGI("This network is portal AP, need certification!");
             return;
         }
     }
-    LOGE("This network cant online!");
+    WIFI_LOGE("This network cant online!");
     if ((lastNetState != NETWORK_STATE_NOWORKING) && (isExitNetCheckThread == false) && (isStopNetCheck == false)) {
         netStateHandler(StaNetState::NETWORK_STATE_NOWORKING);
     }
@@ -69,16 +69,16 @@ void StaNetworkCheck::HttpDetection()
 
 void StaNetworkCheck::RunNetCheckThreadFunc()
 {
-    LOGI("enter RunNetCheckThreadFunc!\n");
+    WIFI_LOGI("enter RunNetCheckThreadFunc!\n");
     for (;;) {
         std::unique_lock<std::mutex> lck(mMutex);
         while (isStopNetCheck) {
-            LOGI("waiting for sigal\n");
+            WIFI_LOGI("waiting for sigal\n");
             mCondition.wait(lck);
         }
 
         if (isExitNetCheckThread) {
-            LOGI("break the loop\n");
+            WIFI_LOGI("break the loop\n");
             break;
         }
         lck.unlock();
@@ -91,7 +91,7 @@ ErrCode StaNetworkCheck::InitNetCheckThread()
 {
     pDealNetCheckThread = new (std::nothrow) std::thread(&StaNetworkCheck::RunNetCheckThreadFunc, this);
     if (pDealNetCheckThread == nullptr) {
-        LOGE("In StaNetworkCheck start NetCheck thread failed!\n");
+        WIFI_LOGE("In StaNetworkCheck start NetCheck thread failed!\n");
         return ErrCode::WIFI_OPT_FAILED;
     }
     return ErrCode::WIFI_OPT_SUCCESS;
@@ -99,14 +99,14 @@ ErrCode StaNetworkCheck::InitNetCheckThread()
 
 void StaNetworkCheck::StopNetCheckThread()
 {
-    LOGI("enter StopNetCheckThread!\n");
+    WIFI_LOGI("enter StopNetCheckThread!\n");
     std::unique_lock<std::mutex> lck(mMutex);
     isStopNetCheck = true;
 }
 
 void StaNetworkCheck::SignalNetCheckThread(int ipType)
 {
-    LOGI("enter SignalNetCheckThread!\n");
+    WIFI_LOGI("enter SignalNetCheckThread!\n");
     lastNetState = NETWORK_STATE_UNKNOW;
     currentIpType = ipType;
     isStopNetCheck = false;

@@ -34,10 +34,9 @@
 #include "network_interface.h"
 #include "ap_state_machine.h"
 #include "log_helper.h"
-#include "wifi_log.h"
+#include "wifi_logger.h"
 
-#undef LOG_TAG
-#define LOG_TAG "OHWIFI_AP_WifiApDhcpInterface"
+DEFINE_WIFILOG_HOTSPOT_LABEL("WifiApDhcpInterface");
 #define DHCP_USER "nobody"
 
 /* Receives the SIGCHLD signal of the DHCP server process. */
@@ -57,7 +56,7 @@ static void SigChld(int signo)
          */
         childPid = waitpid(dhcpPid, &status, WUNTRACED | WNOHANG);
         if (childPid == dhcpPid) {
-            LOGE("DHCP server is dead. then stop hotspot.");
+            WIFI_LOGE("DHCP server is dead. then stop hotspot.");
             OHOS::Wifi::ApStateMachine::GetInstance().SendMessage(
                 static_cast<int>(OHOS::Wifi::ApStatemachineEvent::CMD_STOP_HOTSPOT));
         }
@@ -136,7 +135,7 @@ bool WifiApDhcpInterface::AssignIpAddr(Ipv4Address &ipv4, Ipv6Address &ipv6,
     if (isIpV4) {
         ipv4 = AssignIpAddrV4(vecIpv4Addr, IP_V4_MASK);
         if (ipv4 == Ipv4Address::INVALID_INET_ADDRESS) {
-            LOGE("Failed to allocate the IP address.");
+            WIFI_LOGE("Failed to allocate the IP address.");
             return false;
         }
     } else { /* ipv6 */
@@ -147,7 +146,7 @@ bool WifiApDhcpInterface::AssignIpAddr(Ipv4Address &ipv4, Ipv6Address &ipv6,
             /* ipv6-nat ip6tables must support IPv6-NAT. */
             prefixIp = AssignIpAddrV6(vecIpv6Addr);
             if (!prefixIp.IsValid()) {
-                LOGE("Failed to allocate the IP address.");
+                WIFI_LOGE("Failed to allocate the IP address.");
                 return false;
             }
         } else {
@@ -157,13 +156,13 @@ bool WifiApDhcpInterface::AssignIpAddr(Ipv4Address &ipv4, Ipv6Address &ipv6,
 
         char hidePrefixIp[MAX_IP_LENGTH + 1] = {0};
         EncryptLogMsg(prefixIp.GetPrefix().c_str(), hidePrefixIp, sizeof(hidePrefixIp));
-        LOGI("prefixIp:%{public}s/%zu.", hidePrefixIp, prefixIp.GetAddressPrefixLength());
+        WIFI_LOGI("prefixIp:%{public}s/%{public}zu.", hidePrefixIp, prefixIp.GetAddressPrefixLength());
 
         MacAddress macAddr = MacAddress::Create("");
-        LOGW("generate EUI64 addr failed and use rand addr.");
+        WIFI_LOGW("generate EUI64 addr failed and use rand addr.");
         ipv6 = Ipv6Address::Create(
             prefixIp.GetAddressWithString(), prefixIp.GetAddressPrefixLength(), 0); /* use Rnd address */
-        LOGI("ifcIp:%s.", ipv6.GetAddressWithString().c_str());
+        WIFI_LOGI("ifcIp:%s.", ipv6.GetAddressWithString().c_str());
     }
     return true;
 }
@@ -194,7 +193,7 @@ bool WifiApDhcpInterface::ForkExecProcess(const std::string hotspotInterface, co
         nullptr
     };
     if (execv(args[0], const_cast<char *const *>(args))) {
-        LOGE("execv failed: [ %{public}s ] \n", DHCP_SERVER_FILE.c_str());
+        WIFI_LOGE("execv failed: [ %{public}s ] \n", DHCP_SERVER_FILE.c_str());
     }
     _exit(-1);
     return true;
@@ -202,7 +201,7 @@ bool WifiApDhcpInterface::ForkExecProcess(const std::string hotspotInterface, co
 
 bool WifiApDhcpInterface::ForkParentProcess()
 {
-    LOGI("DHCP server pid is %{public}d.\n", mPidDhcp);
+    WIFI_LOGI("DHCP server pid is %{public}d.\n", mPidDhcp);
     RegisterSignal();
     if (!CreateListen()) {
         StopDhcpServer();
@@ -219,7 +218,7 @@ bool WifiApDhcpInterface::StartDhcpServer(const std::string hotspotInterface, co
     std::string ipMask;
 
     if (mPidDhcp != 0) {
-        LOGI("%{public}s already started.", DHCP_SERVER_FILE.c_str());
+        WIFI_LOGI("%{public}s already started.", DHCP_SERVER_FILE.c_str());
         return true;
     }
 
@@ -236,9 +235,9 @@ bool WifiApDhcpInterface::StartDhcpServer(const std::string hotspotInterface, co
     ipMask = Ipv4.GetMaskWithString();
     /* IPV6 should send like FC::2 to the DHCP server. do not have /64. */
 
-    LOGI("Starting [ %{public}s ].", DHCP_SERVER_FILE.c_str());
+    WIFI_LOGI("Starting [ %{public}s ].", DHCP_SERVER_FILE.c_str());
     if ((pid = fork()) < 0) {
-        LOGE("fork failed: %{public}s", strerror(errno));
+        WIFI_LOGE("fork failed: %{public}s", strerror(errno));
         return false;
     }
     mUseIfc.push_back(hotspotInterface);
@@ -262,28 +261,28 @@ bool WifiApDhcpInterface::StopDhcpServer()
     }
     mUseIfc.clear();
     if (mPidDhcp == 0) {
-        LOGI("[ %{public}s ] already stoppend.", DHCP_SERVER_FILE.c_str());
+        WIFI_LOGI("[ %{public}s ] already stoppend.", DHCP_SERVER_FILE.c_str());
         return true;
     }
 
     if (!DestroyListen()) {
-        LOGE("DestroyListen is failed.");
+        WIFI_LOGE("DestroyListen is failed.");
         /* Listening cannot be canceled, but the process still needs to be killed. */
     }
 
     if (kill(mPidDhcp, SIGTERM) == -1) {
         if (ESRCH == errno) {
             /* Normal. The subprocess is dead. The SIGCHLD signal triggers the stop hotspot. */
-            LOGI("Normal:DHCP PID is not exist.");
+            WIFI_LOGI("Normal:DHCP PID is not exist.");
             mPidDhcp = 0;
             return true;
         }
-        LOGE("kill [ %{public}s ] failed: %{public}s\n", DHCP_SERVER_FILE.c_str(), strerror(errno));
+        WIFI_LOGE("kill [ %{public}s ] failed: %{public}s\n", DHCP_SERVER_FILE.c_str(), strerror(errno));
         return false;
     }
 
     if (waitpid(mPidDhcp, nullptr, 0) == -1) {
-        LOGE("waitpid [ %{public}s ] failed:%{public}s\n", DHCP_SERVER_FILE.c_str(), strerror(errno));
+        WIFI_LOGE("waitpid [ %{public}s ] failed:%{public}s\n", DHCP_SERVER_FILE.c_str(), strerror(errno));
         return false;
     }
 
@@ -296,11 +295,11 @@ void WifiApDhcpInterface::RegisterSignal() const
     struct sigaction newAction {};
 
     if (sigfillset(&newAction.sa_mask) == -1) {
-        LOGE("sigfillset failed. %{public}s", strerror(errno));
+        WIFI_LOGE("sigfillset failed. %{public}s", strerror(errno));
     }
 
     if (sigdelset(&newAction.sa_mask, SIGCHLD) == -1) {
-        LOGE("sigdelset failed. %{public}s", strerror(errno));
+        WIFI_LOGE("sigdelset failed. %{public}s", strerror(errno));
     }
 
     newAction.sa_handler = SigChld;
@@ -308,7 +307,7 @@ void WifiApDhcpInterface::RegisterSignal() const
     newAction.sa_restorer = nullptr;
 
     if (sigaction(SIGCHLD, &newAction, nullptr) == -1) {
-        LOGE("sigaction failed. %{public}s", strerror(errno));
+        WIFI_LOGE("sigaction failed. %{public}s", strerror(errno));
     }
 }
 
@@ -317,7 +316,7 @@ void WifiApDhcpInterface::UnregisterSignal() const
     struct sigaction newAction {};
 
     if (sigemptyset(&newAction.sa_mask) == -1) {
-        LOGE("sigfillset failed. %{public}s", strerror(errno));
+        WIFI_LOGE("sigfillset failed. %{public}s", strerror(errno));
     }
 
     newAction.sa_handler = SIG_DFL;
@@ -325,7 +324,7 @@ void WifiApDhcpInterface::UnregisterSignal() const
     newAction.sa_restorer = nullptr;
 
     if (sigaction(SIGCHLD, &newAction, nullptr) == -1) {
-        LOGE("sigaction failed. %{public}s", strerror(errno));
+        WIFI_LOGE("sigaction failed. %{public}s", strerror(errno));
     }
 }
 
@@ -333,12 +332,12 @@ bool WifiApDhcpInterface::CreateListen()
 {
     const int maxListenNum = 20;
     if (unlink(SOCKFD_PATH.c_str()) == -1) {
-        LOGE("Normal:Delete  %{public}s  failed.  %{public}s", SOCKFD_PATH.c_str(), strerror(errno));
+        WIFI_LOGE("Normal:Delete  %{public}s  failed.  %{public}s", SOCKFD_PATH.c_str(), strerror(errno));
     }
 
     mFdSocketListen = socket(AF_UNIX, SOCK_STREAM, 0);
     if (mFdSocketListen == -1) {
-        LOGE("create socket fd failed.   %{public}s", strerror(errno));
+        WIFI_LOGE("create socket fd failed.   %{public}s", strerror(errno));
         return false;
     }
 
@@ -352,13 +351,13 @@ bool WifiApDhcpInterface::CreateListen()
     }
 
     if (bind(mFdSocketListen, reinterpret_cast<struct sockaddr *>(&serverAddr), sizeof(serverAddr)) == -1) {
-        LOGE("bind failed.   %{public}s", strerror(errno));
+        WIFI_LOGE("bind failed.   %{public}s", strerror(errno));
         close(mFdSocketListen);
         return false;
     }
 
     if (listen(mFdSocketListen, maxListenNum) < 0) {
-        LOGE("listen failed. %{public}s", strerror(errno));
+        WIFI_LOGE("listen failed. %{public}s", strerror(errno));
         close(mFdSocketListen);
         return false;
     }
@@ -370,7 +369,7 @@ bool WifiApDhcpInterface::CreateListen()
 bool WifiApDhcpInterface::DestroyListen()
 {
     if (shutdown(mFdSocketListen, SHUT_RDWR) == -1) {
-        LOGE("shutdown listen socket fd failed: %{public}s \n", strerror(errno));
+        WIFI_LOGE("shutdown listen socket fd failed: %{public}s \n", strerror(errno));
         return false;
     }
     close(mFdSocketListen);
@@ -392,12 +391,12 @@ void WifiApDhcpInterface::DealClientReport(ClientInfo *pClient) const
         return;
     }
 
-    LOGI("get client info from dhcp: \n len: %{public}d bytes \n check: %04x \n name: %{public}s \n",
+    WIFI_LOGI("get client info from dhcp: \n len: %{public}d bytes \n check: %04x \n name: %{public}s \n",
         pClient->len,
         pClient->check,
         pClient->name);
-    LOGI("mac: %s \n", pClient->macAddr);
-    LOGI("ip: %s \n ipType: %{public}d \n\n", pClient->ipAddr, pClient->ipType);
+    WIFI_LOGI("mac: %s \n", pClient->macAddr);
+    WIFI_LOGI("ip: %s \n ipType: %{public}d \n\n", pClient->ipAddr, pClient->ipType);
 
     /* The correct client information is obtained, which is accessed through
      * the p_client pointer. */
@@ -409,7 +408,7 @@ void WifiApDhcpInterface::DealClientReport(ClientInfo *pClient) const
 
         mDhcpCallback(staInfo);
     } else {
-        LOGE("Unregistered DHCP server callback.");
+        WIFI_LOGE("Unregistered DHCP server callback.");
     }
 }
 
@@ -420,11 +419,11 @@ void WifiApDhcpInterface::DealReadHandle(int clientSockfd) const
         ssize_t tempLen2 = 0;
         tempLen2 = read(clientSockfd, reinterpret_cast<unsigned char *>(&tempLen), sizeof(tempLen));
         if (tempLen2 == -1) {
-            LOGE("read length error: %{public}s \n", strerror(errno));
+            WIFI_LOGE("read length error: %{public}s \n", strerror(errno));
             break;
         }
         if (tempLen2 == 0) {
-            LOGI("read of EOF.");
+            WIFI_LOGI("read of EOF.");
             break;
         }
 
@@ -435,13 +434,13 @@ void WifiApDhcpInterface::DealReadHandle(int clientSockfd) const
         unsigned int msgLen = tempLen + sizeof(tempLen);
         ClientInfo *pClient = (ClientInfo *)calloc(msgLen, sizeof(char));
         if (pClient == nullptr) {
-            LOGE("calloc error: %{public}s \n", strerror(errno));
+            WIFI_LOGE("calloc error: %{public}s \n", strerror(errno));
             break;
         }
         pClient->len = tempLen;
         tempLen2 = read(clientSockfd, &pClient->check, tempLen);
         if (tempLen2 != tempLen) {
-            LOGE("read error \n");
+            WIFI_LOGE("read error \n");
             if (pClient != nullptr) {
                 free(pClient);
                 pClient = nullptr;
@@ -467,13 +466,13 @@ void WifiApDhcpInterface::DealListen() const
         clientSockfd = accept(mFdSocketListen, reinterpret_cast<struct sockaddr *>(&clientAddr), &len);
         if (clientSockfd == -1) {
             if ((errno == EINVAL) || (errno == EBADF)) { /* WifiApDhcpInterface::DestroyListen invoking shutdown. */
-                LOGE("Normal: Stop listening and shutdown the socket fd.");
+                WIFI_LOGE("Normal: Stop listening and shutdown the socket fd.");
             } else {
-                LOGE("accept failed: %{public}s.\n", strerror(errno));
+                WIFI_LOGE("accept failed: %{public}s.\n", strerror(errno));
             }
             break;
         }
-        LOGI("accept ok\n");
+        WIFI_LOGI("accept ok\n");
         DealReadHandle(clientSockfd);
 
         close(clientSockfd);
@@ -499,7 +498,7 @@ bool WifiApDhcpInterface::CompareSubNet(const std::vector<Ipv4Address> &vecIpAdd
         struct in_addr IpAddrSubNet_in_addr;
 
         if (inet_aton(IpAddr.GetAddressWithString().c_str(), &IpAddr_in_addr) < 0) {
-            LOGE("fatal error,base address construct error. %{public}s\n", strerror(errno));
+            WIFI_LOGE("fatal error,base address construct error. %{public}s\n", strerror(errno));
             return true;
         }
 
@@ -518,14 +517,14 @@ Ipv4Address WifiApDhcpInterface::AssignIpAddrV4(
     std::string ifcIp = "127.0.0.1";
     /* Mask */
     if (inet_aton(mask.c_str(), &maskInAddr) < 0) {
-        LOGE("mask:inet_aton   error: %{public}s\n", strerror(errno));
+        WIFI_LOGE("mask:inet_aton   error: %{public}s\n", strerror(errno));
         return Ipv4Address::INVALID_INET_ADDRESS;
     }
     struct in_addr ifcIpInAddr {};
     struct in_addr ifcSubNetInAddr {};
     /* IfcIp */
     if (inet_aton(ifcIp.c_str(), &ifcIpInAddr) < 0) {
-        LOGE("ifcIp:inet_aton   error: %{public}s\n", strerror(errno));
+        WIFI_LOGE("ifcIp:inet_aton   error: %{public}s\n", strerror(errno));
         return Ipv4Address::INVALID_INET_ADDRESS;
     }
 
@@ -542,7 +541,7 @@ Ipv4Address WifiApDhcpInterface::AssignIpAddrV4(
             cSubnet++;
             if (cSubnet == 0xFF) {
                 /* No valid value. */
-                LOGE("No available IPv4 address is found.\n");
+                WIFI_LOGE("No available IPv4 address is found.\n");
                 return Ipv4Address::INVALID_INET_ADDRESS;
             } else {
                 ifcSubNetInAddr.s_addr = (ifcSubNetInAddr.s_addr & htonl(IN_CLASSB_NET)) |
@@ -569,14 +568,14 @@ Ipv6Address WifiApDhcpInterface::AssignIpAddrV6(const std::vector<Ipv6Address> &
         for (auto IpAddr : vecIpAddr) {
             struct in6_addr IpAddr_in6_addr;
             if (inet_pton(AF_INET6, IpAddr.GetAddressWithString().c_str(), &IpAddr_in6_addr) < 0) {
-                LOGI("IpAddr:bad ip:%s and inet_aton error: %{public}s",
+                WIFI_LOGI("IpAddr:bad ip:%s and inet_aton error: %{public}s",
                     IpAddr.GetAddressWithString().c_str(),
                     strerror(errno));
                 continue;
             }
             if (memcmp(&IpAddr_in6_addr, &ipPre, sizeof(ipPre)) == 0) {
                 isValidSubNet = false;
-                LOGI("same IP: %x and %x", IpAddr_in6_addr.s6_addr32[0], IpAddr_in6_addr.s6_addr32[1]);
+                WIFI_LOGI("same IP: %x and %x", IpAddr_in6_addr.s6_addr32[0], IpAddr_in6_addr.s6_addr32[1]);
                 break;
             }
         }
@@ -587,13 +586,13 @@ Ipv6Address WifiApDhcpInterface::AssignIpAddrV6(const std::vector<Ipv6Address> &
                 EncryptLogMsg(retStr, hideRetStr, sizeof(hideRetStr));
                 return Ipv6Address::Create(std::string(retStr), GENE_V6_ADDR_LEN, 0);
             } else {
-                LOGE("inet_ntop error:%{public}s ", strerror(errno));
+                WIFI_LOGE("inet_ntop error:%{public}s ", strerror(errno));
                 return Ipv6Address::INVALID_INET6_ADDRESS;
             }
         }
         loopNum--;
     }
-    LOGE("Fatal error,can not generate valid ULA addr!");
+    WIFI_LOGE("Fatal error,can not generate valid ULA addr!");
     return Ipv6Address::INVALID_INET6_ADDRESS;
 }
 }  // namespace Wifi

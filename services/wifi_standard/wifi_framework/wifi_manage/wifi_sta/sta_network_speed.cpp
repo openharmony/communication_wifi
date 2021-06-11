@@ -13,9 +13,9 @@
  * limitations under the License.
  */
 #include "sta_network_speed.h"
+#include "wifi_logger.h"
 
-#undef LOG_TAG
-#define LOG_TAG "OHWIFI_STA_NET_SPEED"
+DEFINE_WIFILOG_LABEL("StaNetWorkSpeed");
 
 namespace OHOS {
 namespace Wifi {
@@ -24,12 +24,12 @@ StaNetWorkSpeed::StaNetWorkSpeed()
 
 StaNetWorkSpeed::~StaNetWorkSpeed()
 {
-    LOGI("StaNetWorkSpeed::~StaNetWorkSpeed enter");
+    WIFI_LOGI("StaNetWorkSpeed::~StaNetWorkSpeed enter");
 }
 
 void StaNetWorkSpeed::GetNetSpeed(std::string &strRx, std::string &strTx)
 {
-    LOGE("enter GetNetSpeed\n");
+    WIFI_LOGE("enter GetNetSpeed\n");
     long rxBytesPre = 0;
     long txBytesPre = 0;
     long rxBytesNext = 0;
@@ -59,8 +59,8 @@ void StaNetWorkSpeed::GetNetSpeed(std::string &strRx, std::string &strTx)
         strTx = std::to_string((txBytesNext - txBytesPre) / MAXIMUM_BYTE);
         strTx += "KB/s";
     }
-    LOGI("GetNetSpeed strRx =  %{public}s\n", strRx.c_str());
-    LOGI("GetNetSpeed strTx =  %{public}s\n", strTx.c_str());
+    WIFI_LOGI("GetNetSpeed strRx =  %{public}s\n", strRx.c_str());
+    WIFI_LOGI("GetNetSpeed strTx =  %{public}s\n", strTx.c_str());
 }
 
 std::vector<std::string> StaNetWorkSpeed::SplitString(std::string source, const std::string delim)

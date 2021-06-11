@@ -158,62 +158,6 @@ WifiErrorNo Disconnect(void);
 WifiErrorNo SetPowerSave(BOOL enable);
 
 /**
- * @Description Use DFS (Whether to use an external SIM card to process SIM/USIM cards).
- *
- * @param useExternalSim - Bool value, whether to use.
- * @return WifiErrorNo
- */
-WifiErrorNo SetExternalSim(int useExternalSim);
-
-/**
- * @Description Enable Bluetooth coexistence scanning mode.
- *
- * @param mode - Mode ID.
- * @return WifiErrorNo
- */
-WifiErrorNo SetBluetoothCoexistenceScanMode(int mode);
-
-/**
- * @Description Filtering IPv4 Multicast Packets.
- *
- * @return WifiErrorNo
- */
-WifiErrorNo StopFilteringMulticastV4Packets(void);
-
-/**
- * @Description Filtering IPv6 Multicast Packets.
- *
- * @return WifiErrorNo
- */
-WifiErrorNo StopFilteringMulticastV6Packets(void);
-
-/**
- * @Description Set whether to enable automatic reconnection.
- *
- * @param enable - Bool value.
- * @return WifiErrorNo
- */
-WifiErrorNo EnableStaAutoReconnect(int enable);
-
-/**
- * @Description Setting the Priority When STAs and P2P Services Coexist.
- *
- * @param isStaHigherPriority - Bool value Indicates whether the STA
- *                              is preferentially selected.
- * @return WifiErrorNo
- */
-WifiErrorNo SetConcurrencyPriority(int isStaHigherPriority);
-
-/**
- * @Description High-performance lock, which corresponds to disabling the
- *              suspend mode of wpa-supplicant.
- *
- * @param enable - Bool value.
- * @return WifiErrorNo
- */
-WifiErrorNo SetSuspendModeEnabled(int enable);
-
-/**
  * @Description Obtaining the STA Support Capability.
  *
  * @param capabilities - STA capability.

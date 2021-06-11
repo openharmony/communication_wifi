@@ -13,29 +13,16 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_WIFIINTERFACEINFO_H
-#define OHOS_WIFIINTERFACEINFO_H
-
-#include <string>
+#ifndef OHOS_WIFI_LOG_TAGS_H
+#define OHOS_WIFI_LOG_TAGS_H
 
 namespace OHOS {
 namespace Wifi {
-typedef enum InterfaceType { IFACE_TYPE_AP, IFACE_TYPE_STA_FOR_CONNECTIVITY, IFACE_TYPE_STA_FOR_SCAN } InterfaceType;
-
-class WifiInterfaceInfo {
-public:
-    WifiInterfaceInfo()
-    {}
-    ~WifiInterfaceInfo()
-    {}
-
-    int id;
-    InterfaceType type;
-    std::string name;
-    bool isUp = false;
-    long featureSet = 0;
-};
+const unsigned int LOG_ID_WIFI = 0xD001560;
+const unsigned int LOG_ID_WIFI_HOTSPOT = LOG_ID_WIFI | 0x01;
+const unsigned int LOG_ID_WIFI_SCAN = LOG_ID_WIFI | 0x02;
+const unsigned int LOG_ID_WIFI_P2P = LOG_ID_WIFI | 0x03;
+const unsigned int LOG_ID_WIFI_AWARE = LOG_ID_WIFI | 0x04;
 }  // namespace Wifi
 }  // namespace OHOS
-
 #endif

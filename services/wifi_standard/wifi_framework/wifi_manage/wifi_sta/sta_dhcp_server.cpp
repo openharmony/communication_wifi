@@ -15,9 +15,8 @@
 #include "sta_dhcp_server.h"
 #include "securec.h"
 #include "if_config.h"
-
-#undef LOG_TAG
-#define LOG_TAG "OHWIFI_STA_DHCP_SERVER"
+#include "wifi_logger.h"
+DEFINE_WIFILOG_LABEL("StaDhcpServer");
 
 const std::string IPV4_DNS1 = "8.8.8.8";
 const std::string IPV4_DNS2 = "8.8.4.4";
@@ -44,26 +43,26 @@ StaDhcpServer::StaDhcpServer(DhcpResultHandler handler)
 
 StaDhcpServer::~StaDhcpServer()
 {
-    LOGI("StaDhcpServer::~StaDhcpServer enter");
+    WIFI_LOGI("StaDhcpServer::~StaDhcpServer enter");
     ExitDhcpThread();
-    LOGI("StaDhcpServer::~StaDhcpServer complete");
+    WIFI_LOGI("StaDhcpServer::~StaDhcpServer complete");
 }
 
 void StaDhcpServer::RunDhcpThreadFunc()
 {
-    LOGE("enter runDhcpThreadFunc\n");
+    WIFI_LOGE("enter runDhcpThreadFunc\n");
     if (StartDhcpServer() != 0) {
-        LOGE("startDhcpServer error\n");
+        WIFI_LOGE("startDhcpServer error\n");
         return;
     }
 
     while (1) {
         std::unique_lock<std::mutex> lck(mMutex);
         while (!isWakeDhcp) {
-            LOGE("waiting for sigal\n");
+            WIFI_LOGE("waiting for sigal\n");
             mCondition.wait(lck);
         }
-        LOGE("unlock and start dhcp client\n");
+        WIFI_LOGE("unlock and start dhcp client\n");
         if (isExitDhcpThread) {
             break;
         }
@@ -80,7 +79,7 @@ void StaDhcpServer::RunDhcpThreadFunc()
         close(serverSockfd);
         serverSockfd = -1;
     }
-    LOGI("dhcp thread over\n");
+    WIFI_LOGI("dhcp thread over\n");
 }
 
 void StaDhcpServer::SetDhcpParam()
@@ -113,7 +112,7 @@ ErrCode StaDhcpServer::StartDhcpServer()
     }
     serverSockfd = socket(AF_UNIX, SOCK_STREAM, 0);
     if (serverSockfd < 0) {
-        LOGE("startDhcpServer: failed to create server socket!");
+        WIFI_LOGE("startDhcpServer: failed to create server socket!");
         return ErrCode::WIFI_OPT_FAILED;
     }
     bool bFlag = false;
@@ -122,16 +121,16 @@ ErrCode StaDhcpServer::StartDhcpServer()
         timeout.tv_sec = DHCP_ACCEPT_DELAY;
         timeout.tv_usec = 0;
         if (setsockopt(serverSockfd, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(struct timeval)) == -1) {
-            LOGE("startDhcpServer: failed to set accept timeout!");
+            WIFI_LOGE("startDhcpServer: failed to set accept timeout!");
             break;
         }
 
         if (bind(serverSockfd, (struct sockaddr *)&serverAddr, sizeof(serverAddr)) < 0) {
-            LOGE("startDhcpServer: failed to bind dhcp server socket!");
+            WIFI_LOGE("startDhcpServer: failed to bind dhcp server socket!");
             break;
         }
         if (listen(serverSockfd, MAX_LISTEN) < 0) {
-            LOGE("startDhcpServer: failed to listen!");
+            WIFI_LOGE("startDhcpServer: failed to listen!");
             break;
         }
         bFlag = true;
@@ -147,20 +146,20 @@ ErrCode StaDhcpServer::StartDhcpServer()
 ErrCode StaDhcpServer::CheckDhcpInfo(int &dhcpResultIndex)
 {
     if (mReceive.iptype > StaIpType::IPTYPE_IPV6) {
-        LOGE("CheckDhcpInfo ip type error\n");
+        WIFI_LOGE("CheckDhcpInfo ip type error\n");
         dhcpResultIndex = StaIpType::IPTYPE_IPV4;
         return ErrCode::WIFI_OPT_FAILED;
     } else if (mReceive.iptype == StaIpType::IPTYPE_IPV4) {
-        LOGE("CheckDhcpInfo ip type ipv4\n");
+        WIFI_LOGE("CheckDhcpInfo ip type ipv4\n");
         dhcpResultIndex = StaIpType::IPTYPE_IPV4;
     } else {
-        LOGE("CheckDhcpInfo ip type ipv6\n");
+        WIFI_LOGE("CheckDhcpInfo ip type ipv6\n");
         dhcpResultIndex = StaIpType::IPTYPE_IPV6;
     }
 
     if (mReceive.datasize != (sizeof(mReceive.iptype) + strlen(mReceive.ip) + strlen(mReceive.gateway) +
         strlen(mReceive.subnet) + strlen(mReceive.dns) + sizeof(mReceive.leasetime))) {
-        LOGE("CheckDhcpInfo datasize error\n");
+        WIFI_LOGE("CheckDhcpInfo datasize error\n");
         return ErrCode::WIFI_OPT_FAILED;
     }
 
@@ -193,7 +192,7 @@ void StaDhcpServer::StartDhcpClient()
 
     /* The subprocess starts the DHCP_CLIENT_FILE process. */
     if (execv(args[0], const_cast<char *const *>(args))) {
-        LOGE("execv %s failed!\n", args[0]);
+        WIFI_LOGE("execv %s failed!\n", args[0]);
     }
     _exit(-1);
 }
@@ -207,7 +206,7 @@ void StaDhcpServer::CreateSocketServer()
     for (int index = 0; index < ipNumber; index++) {
         clientSockfd = accept(serverSockfd, (struct sockaddr *)&clientAddr, &clientLen);
         if (clientSockfd == -1) {
-            LOGE("startDhcpClient accept failed\n");
+            WIFI_LOGE("startDhcpClient accept failed\n");
             continue;
         }
 
@@ -253,7 +252,7 @@ ErrCode StaDhcpServer::ForkForDhcp()
 {
     pid_t pid = fork();
     if (pid < 0) {
-        LOGE("In StaDhcpServer fork failed.");
+        WIFI_LOGE("In StaDhcpServer fork failed.");
         return ErrCode::WIFI_OPT_FAILED;
     } else if (pid == 0) {
         StartDhcpClient();
@@ -267,7 +266,7 @@ void StaDhcpServer::KillDhcpClient() const
 {
     FILE *pp = popen("./dhcpc -x", "r");
     if (pp == nullptr) {
-        LOGE("In StaDhcpServer openDhcpClient popen failed!\n");
+        WIFI_LOGE("In StaDhcpServer openDhcpClient popen failed!\n");
         return;
     }
 
@@ -279,7 +278,7 @@ ErrCode StaDhcpServer::InitDhcpThread()
 {
     pDealDhcpThread = new (std::nothrow)std::thread(&StaDhcpServer::RunDhcpThreadFunc, this);
     if (pDealDhcpThread == nullptr) {
-        LOGE("In StaDhcpServer create message start Dhcp server thread failed!");
+        WIFI_LOGE("In StaDhcpServer create message start Dhcp server thread failed!");
         return ErrCode::WIFI_OPT_FAILED;
     }
     return ErrCode::WIFI_OPT_SUCCESS;

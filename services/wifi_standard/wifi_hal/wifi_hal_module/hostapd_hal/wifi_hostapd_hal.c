@@ -12,7 +12,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 #include "wifi_hostapd_hal.h"
 #include <malloc.h>
 #include <poll.h>
@@ -27,7 +26,7 @@
 #include "wifi_log.h"
 
 #undef LOG_TAG
-#define LOG_TAG "WifiHostapdHal"
+#define LOG_TAG "wifi_hostapd_hal"
 
 #define CONFIG_PATH_DIR "/data/misc/wifi/hostapd"
 

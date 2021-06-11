@@ -15,9 +15,9 @@
 #include "sta_interface.h"
 #include "wifi_log.h"
 #include "define.h"
+#include "wifi_logger.h"
 
-#undef LOG_TAG
-#define LOG_TAG "OHWIFI_STA_INTERFACE"
+DEFINE_WIFILOG_LABEL("StaInterface");
 
 namespace OHOS {
 namespace Wifi {
@@ -26,7 +26,7 @@ StaInterface::StaInterface() : pStaService(nullptr)
 
 StaInterface::~StaInterface()
 {
-    LOGI("StaInterface::~StaInterface");
+    WIFI_LOGI("StaInterface::~StaInterface");
     if (pStaService != nullptr) {
         delete pStaService;
     }
@@ -34,27 +34,27 @@ StaInterface::~StaInterface()
 
 int StaInterface::Init(WifiMessageQueue<WifiResponseMsgInfo> *mqUp)
 {
-    LOGD("Enter StaInterface::Init.\n");
+    WIFI_LOGD("Enter StaInterface::Init.\n");
     if (mqUp == nullptr) {
-        LOGE("mqUp is null.\n");
+        WIFI_LOGE("mqUp is null.\n");
         return -1;
     }
 
     pStaService = new (std::nothrow) StaService();
     if (pStaService == nullptr) {
-        LOGE("New StaService failed.\n");
+        WIFI_LOGE("New StaService failed.\n");
         return -1;
     }
 
     if (pStaService->InitStaService(mqUp) != WIFI_OPT_SUCCESS) {
-        LOGE("InitStaService failed.\n");
+        WIFI_LOGE("InitStaService failed.\n");
         delete pStaService;
         pStaService = nullptr;
         return -1;
     }
 
     if (pStaService->EnableWifi() != WIFI_OPT_SUCCESS) {
-        LOGE("EnableWifi failed.\n");
+        WIFI_LOGE("EnableWifi failed.\n");
         UnInit();
         return -1;
     }
@@ -78,10 +78,10 @@ int StaInterface::InitStaHandleMap()
 
 int StaInterface::UnInit()
 {
-    LOGD("Enter StaInterface::UnInit.\n");
+    WIFI_LOGD("Enter StaInterface::UnInit.\n");
     int ret = 0;
     if (pStaService->DisableWifi() != WIFI_OPT_SUCCESS) {
-        LOGD("DisableWifi failed.\n");
+        WIFI_LOGD("DisableWifi failed.\n");
         return -1;
     }
 
@@ -90,9 +90,9 @@ int StaInterface::UnInit()
 
 int StaInterface::PushMsg(WifiRequestMsgInfo *requestMsg)
 {
-    LOGD("Enter StaInterface::PushMsg\n");
+    WIFI_LOGD("Enter StaInterface::PushMsg\n");
     if (requestMsg == nullptr) {
-        LOGE("requestMsg is null.\n");
+        WIFI_LOGE("requestMsg is null.\n");
         return -1;
     }
 
@@ -108,7 +108,7 @@ int StaInterface::PushMsg(WifiRequestMsgInfo *requestMsg)
 
 void StaInterface::WifiStaCmdConnectReq(const WifiRequestMsgInfo *requestMsg)
 {
-    LOGD("Enter StaInterface::WifiStaCmdConnectReq.\n");
+    WIFI_LOGD("Enter StaInterface::WifiStaCmdConnectReq.\n");
 
     if (requestMsg->params.argInt >= 0) {
         pStaService->ConnectTo(requestMsg->params.argInt);
@@ -120,72 +120,72 @@ void StaInterface::WifiStaCmdConnectReq(const WifiRequestMsgInfo *requestMsg)
 void StaInterface::WifiStaCmdReconnectReq(const WifiRequestMsgInfo *requestMsg)
 {
     if (requestMsg == nullptr) {
-        LOGE("requestMsg is null\n");
+        WIFI_LOGE("requestMsg is null\n");
     }
-    LOGD("Enter StaInterface::WifiStaCmdReconnectReq.\n");
+    WIFI_LOGD("Enter StaInterface::WifiStaCmdReconnectReq.\n");
     pStaService->ReConnect();
 }
 
 void StaInterface::WifiStaCmdReassociateReq(const WifiRequestMsgInfo *requestMsg)
 {
     if (requestMsg == nullptr) {
-        LOGE("requestMsg is null\n");
+        WIFI_LOGE("requestMsg is null\n");
     }
-    LOGD("Enter StaInterface::WifiStaCmdReassociateReq.\n");
+    WIFI_LOGD("Enter StaInterface::WifiStaCmdReassociateReq.\n");
     pStaService->ReAssociate();
 }
 
 void StaInterface::WifiStaCmdDisconnectReq(const WifiRequestMsgInfo *requestMsg)
 {
     if (requestMsg == nullptr) {
-        LOGE("requestMsg is null\n");
+        WIFI_LOGE("requestMsg is null\n");
     }
-    LOGD("Enter StaInterface::WifiStaCmdDisconnectReq.\n");
+    WIFI_LOGD("Enter StaInterface::WifiStaCmdDisconnectReq.\n");
     pStaService->Disconnect();
 }
 
 void StaInterface::WifiStaCmdRemoveDeviceReq(const WifiRequestMsgInfo *requestMsg)
 {
     if (requestMsg == nullptr) {
-        LOGE("requestMsg is null\n");
+        WIFI_LOGE("requestMsg is null\n");
         return;
     }
-    LOGD("Enter StaInterface::WifiStaCmdRemoveDeviceReq.\n");
+    WIFI_LOGD("Enter StaInterface::WifiStaCmdRemoveDeviceReq.\n");
     pStaService->RemoveDeviceConfig(requestMsg->params.argInt);
 }
 
 void StaInterface::WifiStaCmdStartWpsReq(const WifiRequestMsgInfo *requestMsg)
 {
     if (requestMsg == nullptr) {
-        LOGE("requestMsg is null\n");
+        WIFI_LOGE("requestMsg is null\n");
         return;
     }
-    LOGD("Enter StaInterface::WifiStaCmdStartWpsReq.\n");
+    WIFI_LOGD("Enter StaInterface::WifiStaCmdStartWpsReq.\n");
     pStaService->StartWps(requestMsg->params.wpsConfig);
 }
 
 void StaInterface::WifiStaCmdCancelWpsReq(const WifiRequestMsgInfo *requestMsg)
 {
     if (requestMsg == nullptr) {
-        LOGE("requestMsg is null\n");
+        WIFI_LOGE("requestMsg is null\n");
     }
-    LOGD("Enter StaInterface::WifiStaCmdCancelWpsReq.\n");
+    WIFI_LOGD("Enter StaInterface::WifiStaCmdCancelWpsReq.\n");
     pStaService->CancelWps();
 }
 
 void StaInterface::WifiStaCmdConnectManagerReq(const WifiRequestMsgInfo *requestMsg)
 {
-    LOGI("Connection management information transferred successfully.\n");
+    WIFI_LOGI("Connection management information transferred successfully.\n");
     pStaService->SyncLinkInfo(requestMsg->params.scanResults);
-    pStaService->ConnectivityManager(requestMsg->params.scanResults);
+    pStaService->AutoConnectService(requestMsg->params.scanResults);
 }
 
 void StaInterface::WifiStaCmdSetCountryCodeReq(const WifiRequestMsgInfo *requestMsg)
 {
     if (requestMsg == nullptr) {
-        LOGE("requestMsg is null\n");
+        WIFI_LOGE("requestMsg is null\n");
     }
-    LOGD("Enter StaInterface::WifiStaCmdSetCountryCodeReq.\n");
+    WIFI_LOGD("Enter StaInterface::WifiStaCmdSetCountryCodeReq.\n");
     pStaService->SetCountryCode();
 }
 

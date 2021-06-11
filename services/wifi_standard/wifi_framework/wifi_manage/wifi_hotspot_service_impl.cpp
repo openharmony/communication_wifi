@@ -25,7 +25,7 @@
 #include "define.h"
 #include "wifi_logger.h"
 
-DEFINE_WIFILOG_LABEL("WifiHotspotServiceImpl");
+DEFINE_WIFILOG_HOTSPOT_LABEL("WifiHotspotServiceImpl");
 
 namespace OHOS {
 namespace Wifi {

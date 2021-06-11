@@ -147,14 +147,4 @@ int RpcRequestFirmwareDebugDump(RpcServer *server, Context *context);
  * @return int - 0 Success, -1 Failed.
  */
 int RpcSetPowerMode(RpcServer *server, Context *context);
-
-/**
- * @Description Parse the context to obtain data. Call the corresponding function
- *              SetLatencyMode and assemble the function to obtain data.
- *
- * @param server - Pointer to the global structure of the communication server.
- * @param context - Pointer to the global communication context structure of the server.
- * @return int - 0 Success, -1 Failed.
- */
-int RpcSetLatencyMode(RpcServer *server, Context *context);
 #endif

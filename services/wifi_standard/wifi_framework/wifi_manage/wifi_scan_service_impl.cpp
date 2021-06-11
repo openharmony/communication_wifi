@@ -27,7 +27,7 @@
 #include "define.h"
 #include "wifi_scan_callback_proxy.h"
 
-DEFINE_WIFILOG_LABEL("WifiScanServiceImpl");
+DEFINE_WIFILOG_SCAN_LABEL("WifiScanServiceImpl");
 namespace OHOS {
 namespace Wifi {
 std::mutex WifiScanServiceImpl::g_instanceLock;

@@ -184,12 +184,12 @@ private:
     PnoScanResultHandlerMap pnoScanResultHandlerMap;        /* Map of obtaining PNO scanning results */
     ScanConfigMap scanConfigMap;                            /* Save Scan Configuration */
     int scanConfigStoreIndex;                               /* Index for saving the scan configuration */
-    long pnoScanStartTime;                                  /* PNO scanning start time */
+    int64_t pnoScanStartTime;                               /* PNO scanning start time */
     bool isScreenOn;                                        /* Screen state */
     int staStatus;                                          /* STA state */
     bool isPnoScanBegined;                                  /* The PNO scanning has been started */
     bool autoNetworkSelection;                              /* Automatic network selection */
-    long lastSystemScanTime;                                /* Last System Scan Time */
+    int64_t lastSystemScanTime;                             /* Last System Scan Time */
     int pnoScanFailedNum;                                   /* Number of PNO Scan Failures */
     ScanControlInfo scanControlInfo;                        /* Scan Control Policy */
     int operateAppMode;                                     /* Operation app type */

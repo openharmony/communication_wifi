@@ -39,13 +39,13 @@ public:
     /**
      * @Description  Implement pure base class methods:Called when entering
                      the state，When receiving the start AP，Switch to the
-                     current state by ApIdleState and call Enter to initialize
+                     current state by ApIdleState and call GoInState to initialize
                      hot spots(Start the wifi driver，Set hostapd to start
                      hotspot mode，Set blocklist, etc.)
      * @param None
      * @return None
      */
-    virtual void Enter() override;
+    virtual void GoInState() override;
     /**
      * @Description  Implement pure base class methods:Called when exiting
                      the state，Called when the hotspot is closed or the
@@ -54,15 +54,15 @@ public:
      * @param None
      * @return None
      */
-    virtual void Exit() override;
+    virtual void GoOutState() override;
     /**
      * @Description  Implement pure base class methods:The CMD processed
                      when the AP is in the running state (such as updating
                      the blocklist to hostapd)
      * @param msg - processed message
-     * @return HANDLED：Processed successfully    NOT_HANDLED: Processed failed
+     * @return EXECUTED：Processed successfully    NOT_EXECUTED: Processed failed
      */
-    virtual bool ProcessMessage(InternalMessage *msg) override;
+    virtual bool ExecuteStateMsg(InternalMessage *msg) override;
 
 private:
     /**

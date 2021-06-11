@@ -27,15 +27,15 @@ namespace OHOS {
 namespace Wifi {
 #define CMD_SET_OPERATIONAL_MODE 1
 /* Message Processed */
-static const bool HANDLED = true;
+static const bool EXECUTED = true;
 /* The message is not processed. */
-static const bool NOT_HANDLED = false;
+static const bool NOT_EXECUTED = false;
 
-class SmHandler;
+class StateMachineHandler;
 class StateMachine {
 public:
     /**
-     * @Description : SmHandler Initialization Function
+     * @Description : StateMachine Initialization Function
      *
      * @return true :success, false : failed.
      */
@@ -45,23 +45,21 @@ public:
      * @Description : Start StateMachine.
      *
      */
-    void Start();
-    virtual void OnQuitting() = 0;
-    virtual void OnHalting() = 0;
+    void StartStateMachine();
 
     /**
      * @Description : Set Handler.
      *
-     * @param smHandler - SmHandler instance.[in]
+     * @param handler - StateMachineHandler instance.[in]
      */
-    void SetHandler(SmHandler *smHandler);
+    void SetHandler(StateMachineHandler *handler);
 
     /**
      * @Description : The Message is not handled.
      *
      * @param msg - Message object.[in]
      */
-    void UnhandledMessage(InternalMessage *msg);
+    void NotExecutedMessage(InternalMessage *msg);
 
     /**
      * @Description Stop Handler Thread.
@@ -75,7 +73,7 @@ public:
      * @param timerName - Timer Name.[in]
      * @param interval - Timer duration, in milliseconds.[in]
      */
-    void StartTimer(int timerName, long interval);
+    void StartTimer(int timerName, int64_t interval);
 
     /**
      * @Description : Stop the timer.
@@ -89,7 +87,7 @@ public:
      *
      * @return InternalMessage* : Pointer to the constructed internal message.
      */
-    InternalMessage *ObtainMessage();
+    InternalMessage *CreateMessage();
 
     /**
      * @Description : Construct an information message based on
@@ -98,61 +96,61 @@ public:
      * @param orig - Original message.[in]
      * @return InternalMessage* : Pointer to the constructed internal message.
      */
-    InternalMessage *ObtainMessage(InternalMessage *orig);
+    InternalMessage *CreateMessage(InternalMessage *orig);
 
     /**
      * @Description : Construct internal messages.
      *
-     * @param what - Message Name.[in]
+     * @param msgName - Message Name.[in]
      * @return InternalMessage* : Pointer to the constructed internal message.
      */
-    InternalMessage *ObtainMessage(int what);
+    InternalMessage *CreateMessage(int msgName);
 
     /**
      * @Description : Construct internal messages.
      *
-     * @param what - Message Name.[in]
-     * @param arg1 - Message parameters.[in]
+     * @param msgName - Message Name.[in]
+     * @param param1 - Message parameters.[in]
      * @return InternalMessage* : Pointer to the constructed internal message.
      */
-    InternalMessage *ObtainMessage(int what, int arg1);
+    InternalMessage *CreateMessage(int msgName, int param1);
 
     /**
      * @Description : Construct internal messages.
      *
-     * @param what - Message Name.[in]
-     * @param arg1 - Message parameters.[in]
-     * @param arg2 - Message parameters.[in]
+     * @param msgName - Message Name.[in]
+     * @param param1 - Message parameters.[in]
+     * @param param2 - Message parameters.[in]
      * @return InternalMessage* : Pointer to the constructed internal message.
      */
-    InternalMessage *ObtainMessage(int what, int arg1, int arg2);
+    InternalMessage *CreateMessage(int msgName, int param1, int param2);
 
     /**
      * @Description : Constructs internal messages and places the
      * messages in the message queue of the state machine.
      *
-     * @param what - Message name.[in]
+     * @param msgName - Message name.[in]
      */
-    void SendMessage(int what);
+    void SendMessage(int msgName);
 
     /**
      * @Description : Constructs internal messages and places the messages
      * in the message queue of the state machine.
      *
-     * @param what - Message name.[in]
-     * @param arg1 - Message parameter.[in]
+     * @param msgName - Message name.[in]
+     * @param param1 - Message parameter.[in]
      */
-    void SendMessage(int what, int arg1);
+    void SendMessage(int msgName, int param1);
 
     /**
      * @Description : Constructs internal messages and places the messages
      * in the message queue of the state machine.
      *
-     * @param what - Message name.[in]
-     * @param arg1 - Message parameter.[in]
-     * @param arg2 - Message parameter.[in]
+     * @param msgName - Message name.[in]
+     * @param param1 - Message parameter.[in]
+     * @param param2 - Message parameter.[in]
      */
-    void SendMessage(int what, int arg1, int arg2);
+    void SendMessage(int msgName, int param1, int param2);
 
     /**
      * @Description : Puts messages into the message queue of the state machine.
@@ -166,33 +164,33 @@ public:
      * message queue of the state machine. The messages are processed
      * after the specified delay time.
      *
-     * @param what - Message Name.[in]
-     * @param delayMillis - Delay time, in milliseconds.[in]
+     * @param msgName - Message Name.[in]
+     * @param delayTimeMs - Delay time, in milliseconds.[in]
      */
-    void SendMessageDelayed(int what, long delayMillis);
+    void MessageExecutedLater(int msgName, int64_t delayTimeMs);
 
     /**
      * @Description : Constructs internal messages and places them in the
      * message queue of the state machine. The messages are processed
      * after the specified delay time.
      *
-     * @param what - Message Name.[in]
-     * @param arg1 - Message parameters.[in]
-     * @param delayMillis - Delay time, in milliseconds.[in]
+     * @param msgName - Message Name.[in]
+     * @param param1 - Message parameters.[in]
+     * @param delayTimeMs - Delay time, in milliseconds.[in]
      */
-    void SendMessageDelayed(int what, int arg1, long delayMillis);
+    void MessageExecutedLater(int msgName, int param1, int64_t delayTimeMs);
 
     /**
      * @Description : Constructs internal messages and places them in the
      * message queue of the state machine. The messages are processed
      * after the specified delay time.
      *
-     * @param what - Message Name.[in]
-     * @param arg1 - Message parameters.[in]
-     * @param arg2 - Message parameters.[in]
-     * @param delayMillis - Delay time, in milliseconds.[in]
+     * @param msgName - Message Name.[in]
+     * @param param1 - Message parameters.[in]
+     * @param param2 - Message parameters.[in]
+     * @param delayTimeMs - Delay time, in milliseconds.[in]
      */
-    void SendMessageDelayed(int what, int arg1, int arg2, long delayMillis);
+    void MessageExecutedLater(int msgName, int param1, int param2, int64_t delayTimeMs);
 
     /**
      * @Description : Constructs internal messages and places them in the
@@ -200,9 +198,9 @@ public:
      * after the specified delay time.
      *
      * @param msg - Message to be sent.[in]
-     * @param delayMillis - Delay time, in milliseconds.[in]
+     * @param delayTimeMs - Delay time, in milliseconds.[in]
      */
-    void SendMessageDelayed(InternalMessage *msg, long delayMillis);
+    void MessageExecutedLater(InternalMessage *msg, int64_t delayTimeMs);
 
 protected:
     /**
@@ -222,104 +220,70 @@ protected:
      * @Description : Add state.
      *
      * @param state - state.[in]
-     * @param parent - parent state.[in]
+     * @param upper - upper state.[in]
      */
-    void AddState(State *state, State *parent);
+    void StatePlus(State *state, State *upper);
 
     /**
      * @Description : Remove state.
      *
      * @param state - state.[in]
      */
-    void RemoveState(State *state);
+    void StateDelete(State *state);
 
     /**
      * @Description : Set initial state.
      *
-     * @param initialState - Initial state.[in]
+     * @param firstState - Initial state.[in]
      */
-    void SetInitialState(State *initialState);
+    void SetFirstState(State *firstState);
 
     /**
      * @Description : Transition to orther state.
      *
-     * @param destState - state.[in]
+     * @param targetState - state.[in]
      */
-    void TransitionTo(State *destState);
+    void SwitchState(State *targetState);
 
     /**
      * @Description : Delay Message.
      *
      * @param msg - Message object.[in]
      */
-    void DeferMessage(InternalMessage *msg);
+    void DelayMessage(InternalMessage *msg);
 
 private:
-    SmHandler *pSmHandler;
+    StateMachineHandler *pStateMachineHandler;
     std::string mStateName;
 };
 
 typedef struct StateInfo {
     State *state;
-    StateInfo *parentStateInfo;
+    StateInfo *upperStateInfo;
     bool active;
 } StateInfo;
 
-class SmHandler : public Handler {
+class StateMachineHandler : public Handler {
 public:
-    class QuittingState : public State {
-    public:
-        QuittingState() : State("QuittingState")
-        {}
-        ~QuittingState()
-        {}
-        void Enter()
-        {}
-        void Exit()
-        {}
-        bool ProcessMessage(InternalMessage *msg)
-        {
-            if (msg == nullptr) {
-                return NOT_HANDLED;
-            }
-            return NOT_HANDLED;
-        }
-    };
-
-    class HaltingState : public State {
-    public:
-        HaltingState() : State("HaltingState")
-        {}
-        ~HaltingState()
-        {}
-        void Enter()
-        {}
-        void Exit()
-        {}
-        bool ProcessMessage(InternalMessage *msg)
-        {
-            if (msg == nullptr) {
-                return NOT_HANDLED;
-            }
-            return HANDLED;
-        }
-    };
+    using StateInfoMap = std::map<std::string, StateInfo *>;
+    using StateVector = std::vector<StateInfo *>;
+    using DelayedMessage = std::vector<InternalMessage *>;
 
     /**
      * @Description : Construct a new state machine Handler:: StateMachine Handler object.
      *
      * @param pStateMgr - Handler pointer.[in]
      */
-    explicit SmHandler(StateMachine *pStateMgr);
+    explicit StateMachineHandler(StateMachine *pStateMgr);
 
     /**
      * @Description : Destroy the StateMachine Handler:: StateMachine Handler object.
      *
      */
-    ~SmHandler();
+    ~StateMachineHandler();
 
     /**
-     * @Description : SmHandler Initialization Function.
+     * @Description : StateMachineHandler Initialization Function.
      *
      * @return true : success, false : failed.
      */
@@ -329,72 +293,72 @@ public:
      * @Description : Add a new state.
      *
      * @param state - State to be added.[in]
-     * @param parent - parent of state.[in]
+     * @param upper - upper of state.[in]
      * @return StateInfo*
      */
-    StateInfo *AddState(State *state, State *parent);
+    StateInfo *StatePlus(State *state, State *upper);
 
     /**
      * @Description : Delete a state.
      *
      * @param state - State to be deleted.[in]
      */
-    void RemoveState(State *state);
+    void StateDelete(State *state);
 
     /**
      * @Description : Sets the Initialization State.
      *
-     * @param initialState - Initialization State.[in]
+     * @param firstState - Initialization State.[in]
      */
-    void SetInitialState(State *initialState);
+    void SetFirstState(State *firstState);
 
     /**
      * @Description : State transition function.
      *
-     * @param destState - Destination State.[in]
+     * @param targetState - Destination State.[in]
      */
-    void TransitionTo(State *destState);
+    void SwitchState(State *targetState);
 
     /**
      * @Description : Delay Message Processing Function.
      *
      * @param msg - Message body pointer.[in]
      */
-    void DeferMessage(InternalMessage *msg);
+    void DelayMessage(InternalMessage *msg);
 
     /**
      * @Description : The state machine is constructed.
      *
      */
-    void CompleteConstruction();
+    void BuildTreeComplete();
 
 private:
     /**
      * @Description : Sets the initial state sequence.
      *
      */
-    void SetupInitialStateVector();
+    void BuildStateInitVector();
 
     /**
-     * @Description : Writes the inactive parent states of destState
-     * and destState to the sequenceStateList list.
+     * @Description : Writes the inactive upper states of targetState
+     * and targetState to the sequenceStateVector list.
      *
-     * @param destState - Target State Machine.[in]
+     * @param targetState - Target State Machine.[in]
      * @return StateInfo*
      */
-    StateInfo *SetupTempStateStackWithStatesToEnter(State *destState);
+    StateInfo *BuildSequenceStateVector(State *targetState);
 
     /**
-     * @Description : Move Deferred Message At Front Of Queue.
+     * @Description : Move Delayed Message At Front Of Queue.
      *
      */
-    void MoveDeferredMessageAtFrontOfQueue();
+    void PlaceDelayedMsgQueueTop();
 
     /**
-     * @Description : Release all messages in deferred Messages.
+     * @Description : Release all messages in delayed Messages.
      *
      */
-    void ReleaseDeferredMessages();
+    void ReleaseDelayedMessages();
 
     /**
      * @Description : Fill the status in the sequential status
@@ -402,23 +366,23 @@ private:
      *
      * @return int
      */
-    int MoveSequenceStateListToStateList();
+    int MoveSequenceToStateVector();
 
     /**
-     * @Description : Invoke the ProcessMessage interface of the current state
+     * @Description : Invoke the ExecuteStateMsg interface of the current state
      * to process messages sent to the state machine. The entry/exit of the
      * state machine is also called, and the delayed messagei s put back
      * into queue when transitioning to a new state.
      *
      * @param msg - Messages.[in]
      */
-    void HandleMessage(InternalMessage *msg);
+    void ExecuteMessage(InternalMessage *msg) override;
 
     /**
      * @Description : Clean up After Quitting.
      *
      */
-    void CleanupAfterQuitting();
+    void ClearWhenQuit();
 
     /**
      * @Description : Performing Status Transitions.
@@ -426,81 +390,65 @@ private:
      * @param msgProcessedState - Message processing status.[in]
      * @param msg - Messages.[in]
      */
-    void PerformTransitions(State *msgProcessedState, InternalMessage *msg);
+    void PerformSwitchState(State *msgProcessedState, InternalMessage *msg);
 
     /**
      * @Description : Process messages. If the current state doesnot process it,
-     * the parent state processing is called, and so on. If all parent states
-     * are not processed, invoke the UnhandledMessage method of the state machine.
+     * the upper state processing is called, and so on. If all upper states
+     * are not processed, invoke the NotExecutedMessage method of the state machine.
      *
      * @param msg - Message body pointer.[in]
      * @return State*
      */
-    State *ProcessMsg(InternalMessage *msg);
+    State *ExecuteTreeStateMsg(InternalMessage *msg);
 
     /**
-     * @Description : Invoke Exit() for each state from the first
-     * state in the list to the public parent state.
+     * @Description : Invoke GoOutState() for each state from the first
+     * state in the list to the public upper state.
      *
-     * @param commonStateInfo - common parent state machine.[in]
+     * @param commonStateInfo - common upper state machine.[in]
      */
-    void InvokeExitMethods(StateInfo *commonStateInfo);
+    void CallTreeStateExits(StateInfo *commonStateInfo);
 
     /**
-     * @Description : Call the Enter method from the start state
+     * @Description : Call the GoInState method from the start state
      * index to the top of the state stack.
      *
      * @param index - Start state index of the
      *                                 state machine list.
      */
-    void InvokeEnterMethods(int index);
-
-    /**
-     * @Description : Is Quit or not
-     *
-     * @param msg - Message body pointer.[in]
-     * @return true : success, false: failed.
-     */
-    bool IsQuit(InternalMessage *msg);
+    void CallTreeStateEnters(int index);
 
 private:
-    typedef std::map<std::string, StateInfo *> StateInfoMap;
-    typedef std::vector<StateInfo *> StateList;
-    typedef std::vector<InternalMessage *> DeferredMessage;
-
     /* All state mappings of the state machine */
-    StateInfoMap mStateInfo;
-    /* From child state to parent state list */
-    StateList mStateList;
-    /* Top index of mStateList */
-    int mStateListTopIndex;
-    /* From parent state to child state list */
-    StateList mSequenceStateList;
-    /* Top of mSequenceStateList */
-    int mSequenceStateListCount;
-    /* Deferred Message Queue */
-    DeferredMessage mDeferredMessages;
+    StateInfoMap mStateInfoMap;
+    /* From child state to upper state list */
+    StateVector mStateVector;
+    /* Top index of mStateVector */
+    int mStateVectorTopIndex;
+    /* From upper state to child state list */
+    StateVector mSequenceStateVector;
+    /* Top of mSequenceStateVector */
+    int mSequenceStateVectorCount;
+    /* Delayed Message Queue */
+    DelayedMessage mDelayedMessages;
     /* State machine instance */
-    StateMachine *pSM;
+    StateMachine *pStateMachine;
     /* Initial state */
-    State *pInitialState;
+    State *pFirstState;
     /* Target Status */
-    State *pDestState;
+    State *pTargetState;
     /* StateMachine exit or not */
-    bool mHasQuit;
+    bool mQuitFlag;
     /* Whether the state machine has been built */
-    bool mIsConstructionCompleted;
+    bool mBuildCompleteFlag;
     /*
      * All State exit/enter calls are true before the
      * last enter call in the target state.
      */
-    bool mTransitionInProgress;
+    bool mSwitchingStateFlag;
     /* Current Message */
     InternalMessage *pCurrentMsg;
-    /* Exit state */
-    QuittingState *pQuittingState;
-    /* Pauses */
-    HaltingState *pHaltingState;
 };
 }  // namespace Wifi
 }  // namespace OHOS

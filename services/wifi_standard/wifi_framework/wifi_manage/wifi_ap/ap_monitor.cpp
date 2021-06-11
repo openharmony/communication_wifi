@@ -17,15 +17,14 @@
 #include "ap_state_machine.h"
 #include "internal_message.h"
 #include "log_helper.h"
-#include "wifi_log.h"
+#include "wifi_logger.h"
 #include "wifi_settings.h"
 
-#undef LOG_TAG
-#define LOG_TAG "OHWIFI_AP_ApMonitor"
+DEFINE_WIFILOG_HOTSPOT_LABEL("ApMonitor");
 extern "C" void OnStaJoinOrLeave(const CStationInfo *cinfo)
 {
     if (cinfo == nullptr) {
-        LOGE("fatal error!");
+        WIFI_LOGE("fatal error!");
         return;
     }
     OHOS::Wifi::StationInfo info;
@@ -62,7 +61,7 @@ void ApMonitor::DeleteInstance()
 
 void ApMonitor::StationChangeEvent(StationInfo &staInfo, const int event) const
 {
-    LOGI("StationChangeEvent  event: [%{public}d]", event);
+    WIFI_LOGI("StationChangeEvent  event: [%{public}d]", event);
     if (event == WIFI_IDL_CBK_CMD_STA_JOIN) {
         ApStateMachine::GetInstance().StationJoin(staInfo);
     }
@@ -73,13 +72,13 @@ void ApMonitor::StationChangeEvent(StationInfo &staInfo, const int event) const
 
 void ApMonitor::OnHotspotStateEvent(int state) const
 {
-    LOGI("update HotspotConfig result is [%{public}d]\n", state);
+    WIFI_LOGI("update HotspotConfig result is [%{public}d]\n", state);
     if (state == WIFI_IDL_CBK_CMD_AP_DISABLE) {
         ApStateMachine::GetInstance().UpdateHotspotConfigResult(false);
     } else if (state == WIFI_IDL_CBK_CMD_AP_ENABLE) {
         ApStateMachine::GetInstance().UpdateHotspotConfigResult(true);
     } else {
-        LOGE("Error: Incorrect status code [%{public}d]", state);
+        WIFI_LOGE("Error: Incorrect status code [%{public}d]", state);
     }
 }
 
@@ -89,9 +88,9 @@ void ApMonitor::StartMonitor()
     wifiApEventCallback.onStaJoinOrLeave = OnStaJoinOrLeave;
 
     WifiApDhcpInterface::DhcpCallback callback = [](StationInfo &staInfo) {
-        LOGI("name     = [%s]", staInfo.deviceName.c_str());
-        LOGI("mac      = [%s]", staInfo.bssid.c_str());
-        LOGI("ip       = [%s]", staInfo.ipAddr.c_str());
+        WIFI_LOGI("name     = [%s]", staInfo.deviceName.c_str());
+        WIFI_LOGI("mac      = [%s]", staInfo.bssid.c_str());
+        WIFI_LOGI("ip       = [%s]", staInfo.ipAddr.c_str());
         ApStateMachine::GetInstance().StationJoin(staInfo);
     };
 

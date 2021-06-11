@@ -16,10 +16,9 @@
 #include "ap_service.h"
 #include "log_helper.h"
 #include "unistd.h"
-#include "wifi_log.h"
+#include "wifi_logger.h"
 
-#undef LOG_TAG
-#define LOG_TAG "OHWIFI_AP_ApStationsManager"
+DEFINE_WIFILOG_HOTSPOT_LABEL("ApStationsManager");
 namespace OHOS {
 namespace Wifi {
 ApStationsManager::ApStationsManager()
@@ -64,14 +63,14 @@ bool ApStationsManager::EnableAllBlockList() const
 {
     std::vector<StationInfo> results;
     if (WifiSettings::GetInstance().GetBlockList(results)) {
-        LOGE("failed to get blocklist");
+        WIFI_LOGE("failed to get blocklist");
         return false;
     }
     std::string mac;
     bool ret = true;
     for (std::vector<StationInfo>::iterator iter = results.begin(); iter != results.end(); iter++) {
         if (WifiApHalInterface::GetInstance().AddBlockByMac(iter->bssid) != WifiErrorNo::WIFI_IDL_OPT_OK) {
-            LOGE("error:Failed to add block mac:%s.", iter->bssid.c_str());
+            WIFI_LOGE("error:Failed to add block mac:%s.", iter->bssid.c_str());
             ret = false;
         }
     }
@@ -80,11 +79,11 @@ bool ApStationsManager::EnableAllBlockList() const
 
 void ApStationsManager::StationLeave(const std::string &mac) const
 {
-    LOGI("StationLeave mac:%s", mac.c_str());
+    WIFI_LOGI("StationLeave mac:%s", mac.c_str());
     StationInfo staInfo;
     std::vector<StationInfo> results;
     if (WifiSettings::GetInstance().GetStationList(results)) {
-        LOGE("failed to GetStationList");
+        WIFI_LOGE("failed to GetStationList");
         return;
     }
     auto it = results.begin();
@@ -92,7 +91,7 @@ void ApStationsManager::StationLeave(const std::string &mac) const
         if (it->bssid == mac) {
             staInfo = *it;
             if (!DelAssociationStation(staInfo)) {
-                LOGE("DelAssociationStation failed");
+                WIFI_LOGE("DelAssociationStation failed");
                 return;
             }
             break;
@@ -105,10 +104,10 @@ void ApStationsManager::StationLeave(const std::string &mac) const
 void ApStationsManager::StationJoin(const StationInfo &staInfo) const
 {
     StationInfo staInfoTemp = staInfo;
-    LOGI("enter ApStationManager::StationJoin");
+    WIFI_LOGI("enter ApStationManager::StationJoin");
     std::vector<StationInfo> results;
     if (WifiSettings::GetInstance().GetStationList(results)) {
-        LOGE("failed to GetStationList");
+        WIFI_LOGE("failed to GetStationList");
         return;
     }
     auto it = results.begin();
@@ -122,7 +121,7 @@ void ApStationsManager::StationJoin(const StationInfo &staInfo) const
     }
 
     if (!AddAssociationStation(staInfoTemp)) {
-        LOGE("AddAssociationStation failed");
+        WIFI_LOGE("AddAssociationStation failed");
         return;
     }
 
@@ -137,13 +136,13 @@ bool ApStationsManager::DisConnectStation(const StationInfo &staInfo) const
     std::string mac = staInfo.bssid;
     int ret = static_cast<int>(WifiApHalInterface::GetInstance().DisconnectStaByMac(mac));
     if (ret != WifiErrorNo::WIFI_IDL_OPT_OK) {
-        LOGE("failed to DisConnectStation staInfo bssid:%s, address:%s, name:%s. failed",
+        WIFI_LOGE("failed to DisConnectStation staInfo bssid:%s, address:%s, name:%s. failed",
             staInfo.bssid.c_str(),
             staInfo.ipAddr.c_str(),
             staInfo.deviceName.c_str());
         return false;
     }
-    LOGI("DisConnectStation staInfo bssid:%s, address:%s, name:%s. ok",
+    WIFI_LOGI("DisConnectStation staInfo bssid:%s, address:%s, name:%s. ok",
         staInfo.bssid.c_str(),
         staInfo.ipAddr.c_str(),
         staInfo.deviceName.c_str());
@@ -155,7 +154,7 @@ std::vector<std::string> ApStationsManager::GetAllConnectedStations() const
     std::vector<std::string> staMacList;
     if (WifiApHalInterface::GetInstance().GetStationList(staMacList) == WifiErrorNo::WIFI_IDL_OPT_OK) {
         for (size_t i = 0; i < staMacList.size(); ++i) {
-            LOGI("staMacList[%zu]：%s", i, staMacList[i].c_str());
+            WIFI_LOGI("staMacList[%{public}zu]:%{public}s", i, staMacList[i].c_str());
         }
     }
     return staMacList;

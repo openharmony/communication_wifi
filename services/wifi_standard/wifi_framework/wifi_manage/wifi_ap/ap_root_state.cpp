@@ -16,10 +16,9 @@
 #include <typeinfo>
 #include "ap_macro.h"
 #include "ap_state_machine.h"
-#include "wifi_log.h"
+#include "wifi_logger.h"
 
-#undef LOG_TAG
-#define LOG_TAG "OHWIFI_AP_ApRootState"
+DEFINE_WIFILOG_HOTSPOT_LABEL("ApRootState");
 namespace OHOS {
 namespace Wifi {
 ApRootState::ApRootState() : State("ApRootState")
@@ -28,26 +27,26 @@ ApRootState::ApRootState() : State("ApRootState")
 ApRootState::~ApRootState()
 {}
 
-void ApRootState::Enter()
+void ApRootState::GoInState()
 {
-    LOGI("%{public}s  Enter", GetName().c_str());
+    WIFI_LOGI("%{public}s  Enter", GetStateName().c_str());
 }
 
-void ApRootState::Exit()
+void ApRootState::GoOutState()
 {
-    LOGI("%{public}s  Exit", GetName().c_str());
+    WIFI_LOGI("%{public}s  Exit", GetStateName().c_str());
 }
 
-bool ApRootState::ProcessMessage(InternalMessage *msg)
+bool ApRootState::ExecuteStateMsg(InternalMessage *msg)
 {
     if (msg == nullptr) {
-        LOGE("fatal error!");
+        WIFI_LOGE("fatal error!");
         return false;
     }
     int msgName = msg->GetMessageName();
 
-    LOGI("msg = [%{public}dpublic}d] is not handled.", msgName);
-    return HANDLED;
+    WIFI_LOGI("msg = [%{public}dpublic}d] is not handled.", msgName);
+    return EXECUTED;
 }
 }  // namespace Wifi
 }  // namespace OHOS

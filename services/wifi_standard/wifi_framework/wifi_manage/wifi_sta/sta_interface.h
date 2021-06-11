@@ -99,8 +99,8 @@ private:
      */
     void WifiStaCmdCancelWpsReq(const WifiRequestMsgInfo *requestMsg);
     /**
-     * @Description: Start the process of ConnectivityManager when
-                     receive the opening ConnectivityManager request.
+     * @Description: Start the process of StaAutoConnectService when
+                     receive the opening StaAutoConnectService request.
      *
      * @param requestMsg - request message
      */

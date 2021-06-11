@@ -18,8 +18,7 @@
 #include "define.h"
 #include "wifi_settings.h"
 
-#undef LOG_TAG
-#define LOG_TAG "OHWIFI_MANAGER_SERVICE_MANAGER"
+DEFINE_WIFILOG_LABEL("WifiServiceManager");
 
 namespace OHOS {
 namespace Wifi {
@@ -71,32 +70,32 @@ int WifiServiceManager::CheckPreLoadService(void)
 
 int WifiServiceManager::CheckAndEnforceService(const std::string &name, bool bCreate)
 {
-    LOGD("WifiServiceManager::CheckAndEnforceService name: %{public}s", name.c_str());
+    WIFI_LOGD("WifiServiceManager::CheckAndEnforceService name: %{public}s", name.c_str());
     std::string dlname;
     if (GetServiceDll(name, dlname) < 0) {
-        LOGE("%{public}s does not support", name.c_str());
+        WIFI_LOGE("%{public}s does not support", name.c_str());
         return -1;
     }
-    LOGD("WifiServiceManager::CheckAndEnforceService get dllname: %{public}s", dlname.c_str());
+    WIFI_LOGD("WifiServiceManager::CheckAndEnforceService get dllname: %{public}s", dlname.c_str());
     std::unique_lock<std::mutex> lock(mMutex);
     if (mServiceHandleMap.find(name) == mServiceHandleMap.end()) {
         ServiceHandle tmp;
         tmp.handle = dlopen(dlname.c_str(), RTLD_LAZY);
         if (tmp.handle == nullptr) {
-            LOGE("dlopen %{public}s failed: %{public}s!", dlname.c_str(), dlerror());
+            WIFI_LOGE("dlopen %{public}s failed: %{public}s!", dlname.c_str(), dlerror());
             return -1;
         }
         tmp.create = (BaseService* (*)()) dlsym(tmp.handle, "Create");
         tmp.destroy = (void *(*)(BaseService*))dlsym(tmp.handle, "Destroy");
         if (tmp.create == nullptr || tmp.destroy == nullptr) {
-            LOGE("%{public}s dlsym Create or Destroy failed!", dlname.c_str());
+            WIFI_LOGE("%{public}s dlsym Create or Destroy failed!", dlname.c_str());
             dlclose(tmp.handle);
             return -1;
         }
         if (bCreate) {
             tmp.bs = tmp.create();
             if (tmp.bs == nullptr) {
-                LOGE("create feature service is nullptr");
+                WIFI_LOGE("create feature service is nullptr");
             }
         }
         mServiceHandleMap.emplace(std::make_pair(name, tmp));
@@ -106,16 +105,16 @@ int WifiServiceManager::CheckAndEnforceService(const std::string &name, bool bCr
 
 BaseService *WifiServiceManager::GetServiceInst(const std::string &name)
 {
-    LOGD("WifiServiceManager::GetServiceInst name: %{public}s", name.c_str());
+    WIFI_LOGD("WifiServiceManager::GetServiceInst name: %{public}s", name.c_str());
     std::unique_lock<std::mutex> lock(mMutex);
     auto iter = mServiceHandleMap.find(name);
     if (iter != mServiceHandleMap.end()) {
         if (iter->second.bs == nullptr) {
-            LOGD("WifiServiceManager::GetServiceInst start create feature service");
+            WIFI_LOGD("WifiServiceManager::GetServiceInst start create feature service");
             iter->second.bs = iter->second.create();
         }
         if (iter->second.bs == nullptr) {
-            LOGE("WifiServiceManager::GetServiceInst feature service is nullptr");
+            WIFI_LOGE("WifiServiceManager::GetServiceInst feature service is nullptr");
         }
         return iter->second.bs;
     }
@@ -125,7 +124,7 @@ BaseService *WifiServiceManager::GetServiceInst(const std::string &name)
 int WifiServiceManager::UnloadService(const std::string &name)
 {
     bool bPreLoad = WifiSettings::GetInstance().IsModulePreLoad(name);
-    LOGD("WifiServiceManager::UnloadService name: %{public}s", name.c_str());
+    WIFI_LOGD("WifiServiceManager::UnloadService name: %{public}s", name.c_str());
     std::unique_lock<std::mutex> lock(mMutex);
     auto iter = mServiceHandleMap.find(name);
     if (iter != mServiceHandleMap.end()) {
@@ -143,7 +142,7 @@ int WifiServiceManager::UnloadService(const std::string &name)
 
 void WifiServiceManager::UninstallAllService()
 {
-    LOGD("WifiServiceManager::UninstallAllService");
+    WIFI_LOGD("WifiServiceManager::UninstallAllService");
     std::unique_lock<std::mutex> lock(mMutex);
     for (auto iter = mServiceHandleMap.begin(); iter != mServiceHandleMap.end(); ++iter) {
         ServiceHandle &tmp = iter->second;

@@ -82,7 +82,7 @@ typedef enum WifiHalEvent {
 } WifiHalEvent;
 
 #define WIFI_BSSID_LENGTH 128
-#define WIFI_SSID_LENGTH 128
+#define WIFI_SSID_LENGTH 132
 #define WIFI_SCAN_RESULT_CAPABILITY_LENGTH 256
 #define WIFI_NETWORK_CONFIG_VALUE_LENGTH 128
 #define WIFI_MAC_LENGTH 17
@@ -176,9 +176,6 @@ typedef enum SupplicantStatusCode {
     /* * Network with the provided id does not exist. */
     FAILURE_NETWORK_UNKNOWN
 } SupplicantStatusCode;
-
-/* Low-latency mode */
-typedef enum LatencyMode { NORMAL = 0, LOW = 1 } LatencyMode;
 
 /**
  * Enum values indicating the status of operation.

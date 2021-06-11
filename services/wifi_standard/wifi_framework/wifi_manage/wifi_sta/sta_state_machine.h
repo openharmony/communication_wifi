@@ -57,7 +57,7 @@ static const int BLOCK_LIST_CLEAR_TIMER = 20 * 1000;
 
 /* Signal levels are classified into: 0 1 2 3 4 ,the max is 4. */
 static const int MAX_LEVEL = 4;
-const std::string SUPPLICANT_BSSID_ANY = "any";
+const std::string WPA_BSSID_ANY = "any";
 
 class StaStateMachine : public StateMachine {
 public:
@@ -69,16 +69,13 @@ public:
      * @Description  Definition of member function of State base class in StaStateMachine.
      *
      */
-    class DefaultState : public State {
+    class RootState : public State {
     public:
-        explicit DefaultState(StaStateMachine *pStaStateMachine);
-        ~DefaultState() override;
-        void Enter() override;
-        void Exit() override;
-        bool ProcessMessage(InternalMessage *msg) override;
-
-    private:
-        StaStateMachine *pStaStateMachine;
+        explicit RootState();
+        ~RootState() override;
+        void GoInState() override;
+        void GoOutState() override;
+        bool ExecuteStateMsg(InternalMessage *msg) override;
     };
     /**
      * @Description : Definition of member function of InitState class in StaStateMachine.
@@ -88,10 +85,9 @@ public:
     public:
         explicit InitState(StaStateMachine *pStaStateMachine);
         ~InitState() override;
-        void Enter() override;
-        void Exit() override;
-        bool ProcessMessage(InternalMessage *msg) override;
-        void CleanUp();
+        void GoInState() override;
+        void GoOutState() override;
+        bool ExecuteStateMsg(InternalMessage *msg) override;
 
     private:
         StaStateMachine *pStaStateMachine;
@@ -105,9 +101,9 @@ public:
         explicit WpaStartingState(StaStateMachine *pStaStateMachine);
         ~WpaStartingState() override;
         void InitWpsSettings();
-        void Enter() override;
-        void Exit() override;
-        bool ProcessMessage(InternalMessage *msg) override;
+        void GoInState() override;
+        void GoOutState() override;
+        bool ExecuteStateMsg(InternalMessage *msg) override;
 
     private:
         StaStateMachine *pStaStateMachine;
@@ -120,9 +116,9 @@ public:
     public:
         explicit WpaStartedState(StaStateMachine *pStaStateMachine);
         ~WpaStartedState() override;
-        void Enter() override;
-        void Exit() override;
-        bool ProcessMessage(InternalMessage *msg) override;
+        void GoInState() override;
+        void GoOutState() override;
+        bool ExecuteStateMsg(InternalMessage *msg) override;
 
     private:
         StaStateMachine *pStaStateMachine;
@@ -135,69 +131,66 @@ public:
     public:
         explicit WpaStoppingState(StaStateMachine *pStaStateMachine);
         ~WpaStoppingState() override;
-        void Enter() override;
-        void Exit() override;
-        bool ProcessMessage(InternalMessage *msg) override;
+        void GoInState() override;
+        void GoOutState() override;
+        bool ExecuteStateMsg(InternalMessage *msg) override;
 
     private:
         StaStateMachine *pStaStateMachine;
     };
     /**
-     * @Description  Definition of member function of ConnectState class in StaStateMachine.
+     * @Description  Definition of member function of LinkState class in StaStateMachine.
      *
      */
-    class ConnectState : public State {
+    class LinkState : public State {
     public:
-        explicit ConnectState(StaStateMachine *pStaStateMachine);
-        ~ConnectState() override;
-        void Enter() override;
-        void Exit() override;
-        bool ProcessMessage(InternalMessage *msg) override;
+        explicit LinkState(StaStateMachine *pStaStateMachine);
+        ~LinkState() override;
+        void GoInState() override;
+        void GoOutState() override;
+        bool ExecuteStateMsg(InternalMessage *msg) override;
 
     private:
         StaStateMachine *pStaStateMachine;
     };
     /**
-     * @Description  Definition of member function of DisconnectingState class in StaStateMachine.
+     * @Description  Definition of member function of SeparatingState class in StaStateMachine.
      *
      */
-    class DisconnectingState : public State {
+    class SeparatingState : public State {
     public:
-        explicit DisconnectingState(StaStateMachine *pStaStateMachine);
-        ~DisconnectingState() override;
-        void Enter() override;
-        void Exit() override;
-        bool ProcessMessage(InternalMessage *msg) override;
+        explicit SeparatingState();
+        ~SeparatingState() override;
+        void GoInState() override;
+        void GoOutState() override;
+        bool ExecuteStateMsg(InternalMessage *msg) override;
+    };
+    /**
+     * @Description  Definition of member function of SeparatedState class in StaStateMachine.
+     *
+     */
+    class SeparatedState : public State {
+    public:
+        explicit SeparatedState(StaStateMachine *pStaStateMachine);
+        ~SeparatedState() override;
+        void GoInState() override;
+        void GoOutState() override;
+        bool ExecuteStateMsg(InternalMessage *msg) override;
 
     private:
         StaStateMachine *pStaStateMachine;
     };
     /**
-     * @Description  Definition of member function of DisconnectedState class in StaStateMachine.
+     * @Description  Definition of member function of ApLinkedState class in StaStateMachine.
      *
      */
-    class DisconnectedState : public State {
+    class ApLinkedState : public State {
     public:
-        explicit DisconnectedState(StaStateMachine *pStaStateMachine);
-        ~DisconnectedState() override;
-        void Enter() override;
-        void Exit() override;
-        bool ProcessMessage(InternalMessage *msg) override;
-
-    private:
-        StaStateMachine *pStaStateMachine;
-    };
-    /**
-     * @Description  Definition of member function of ApConnectedState class in StaStateMachine.
-     *
-     */
-    class ApConnectedState : public State {
-    public:
-        explicit ApConnectedState(StaStateMachine *pStaStateMachine);
-        ~ApConnectedState() override;
-        void Enter() override;
-        void Exit() override;
-        bool ProcessMessage(InternalMessage *msg) override;
+        explicit ApLinkedState(StaStateMachine *pStaStateMachine);
+        ~ApLinkedState() override;
+        void GoInState() override;
+        void GoOutState() override;
+        bool ExecuteStateMsg(InternalMessage *msg) override;
 
     private:
         StaStateMachine *pStaStateMachine;
@@ -206,58 +199,55 @@ public:
      * @Description  Definition of member function of WpsState class in StaStateMachine.
      *
      */
-    class WpsState : public State {
+    class StaWpsState : public State {
     public:
-        explicit WpsState(StaStateMachine *pStaStateMachine);
-        ~WpsState() override;
-        void Enter() override;
-        void Exit() override;
-        bool ProcessMessage(InternalMessage *msg) override;
+        explicit StaWpsState(StaStateMachine *pStaStateMachine);
+        ~StaWpsState() override;
+        void GoInState() override;
+        void GoOutState() override;
+        bool ExecuteStateMsg(InternalMessage *msg) override;
 
     private:
         StaStateMachine *pStaStateMachine;
     };
     /**
-     * @Description  Definition of member function of ObtainingIpState class in StaStateMachine.
+     * @Description  Definition of member function of GetIpState class in StaStateMachine.
      *
      */
-    class ObtainingIpState : public State {
+    class GetIpState : public State {
     public:
-        explicit ObtainingIpState(StaStateMachine *pStaStateMachine);
-        ~ObtainingIpState() override;
-        void Enter() override;
-        void Exit() override;
-        bool ProcessMessage(InternalMessage *msg) override;
+        explicit GetIpState(StaStateMachine *pStaStateMachine);
+        ~GetIpState() override;
+        void GoInState() override;
+        void GoOutState() override;
+        bool ExecuteStateMsg(InternalMessage *msg) override;
 
     private:
         StaStateMachine *pStaStateMachine;
     };
     /**
-     * @Description  Definition of member function of ConnectedState class in StaStateMachine.
+     * @Description  Definition of member function of LinkedState class in StaStateMachine.
      *
      */
-    class ConnectedState : public State {
+    class LinkedState : public State {
     public:
-        explicit ConnectedState(StaStateMachine *pStaStateMachine);
-        ~ConnectedState() override;
-        void Enter() override;
-        void Exit() override;
-        bool ProcessMessage(InternalMessage *msg) override;
-
-    private:
-        StaStateMachine *pStaStateMachine;
+        explicit LinkedState();
+        ~LinkedState() override;
+        void GoInState() override;
+        void GoOutState() override;
+        bool ExecuteStateMsg(InternalMessage *msg) override;
     };
     /**
-     * @Description  Definition of member function of RoamingState class in StaStateMachine.
+     * @Description  Definition of member function of ApRoamingState class in StaStateMachine.
      *
      */
-    class RoamingState : public State {
+    class ApRoamingState : public State {
     public:
-        explicit RoamingState(StaStateMachine *pStaStateMachine);
-        ~RoamingState() override;
-        void Enter() override;
-        void Exit() override;
-        bool ProcessMessage(InternalMessage *msg) override;
+        explicit ApRoamingState(StaStateMachine *pStaStateMachine);
+        ~ApRoamingState() override;
+        void GoInState() override;
+        void GoOutState() override;
+        bool ExecuteStateMsg(InternalMessage *msg) override;
 
     private:
         StaStateMachine *pStaStateMachine;
@@ -282,10 +272,6 @@ public:
      * @param msgCode - operating results code.(in)
      */
     void NotifyResult(int msgCode, int stateCode = 0);
-    void OnQuitting()
-    {}
-    void OnHalting()
-    {}
     /**
      * @Description  Start roaming connection.
      *
@@ -428,14 +414,6 @@ private:
     void SetOperationalMode(int mode);
     void SetSuspendMode(bool enabled);
     void SetPowerSave(bool enabled);
-    /**
-     * @Description  Setting target Bssid
-     *
-     * @param config - Wifi device config(in)
-     * @param bssid - the mac address of wifi(in)
-     * @return success: true failed: false
-     */
-    bool SetTargetBssid(const WifiDeviceConfig &config, std::string &bssid);
     /**
      * @Description  Configure static ipaddress.
      *
@@ -593,19 +571,19 @@ private:
     StaNetworkCheck *pNetcheck;
     WifiMessageQueue<WifiResponseMsgInfo> *msgQueueUp; /* Uplink message queue. */
 
-    DefaultState *pDefaultState;
+    RootState *pRootState;
     InitState *pInitState;
     WpaStartingState *pWpaStartingState; /* Starting wpa_supplicant state. */
     WpaStartedState *pWpaStartedState;   /* Started wpa_supplicant state. */
     WpaStoppingState *pWpaStoppingState; /* Stopping wpa_supplicant state. */
-    ConnectState *pConnectState;
-    DisconnectingState *pDisconnectingState;
-    DisconnectedState *pDisconnectedState;
-    ApConnectedState *pApConnectedState;
-    WpsState *pWpsState;
-    ObtainingIpState *pObtainingIpState;
-    ConnectedState *pConnectedState;
-    RoamingState *pRoamingState;
+    LinkState *pLinkState;
+    SeparatingState *pSeparatingState;
+    SeparatedState *pSeparatedState;
+    ApLinkedState *pApLinkedState;
+    StaWpsState *pWpsState;
+    GetIpState *pGetIpState;
+    LinkedState *pLinkedState;
+    ApRoamingState *pApRoamingState;
 };
 }  // namespace Wifi
 }  // namespace OHOS

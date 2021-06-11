@@ -349,48 +349,6 @@ WifiErrorNo SetPowerSave(BOOL enable)
     return WIFI_HAL_SUCCESS;
 }
 
-WifiErrorNo SetExternalSim(int useExternalSim)
-{
-    LOGD("SetExternalSim() %{public}d", useExternalSim);
-    return WIFI_HAL_SUCCESS;
-}
-
-WifiErrorNo SetBluetoothCoexistenceScanMode(int mode)
-{
-    LOGD("SetBluetoothCoexistenceScanMode() %{public}d", mode);
-    return WIFI_HAL_SUCCESS;
-}
-
-WifiErrorNo StopFilteringMulticastV4Packets(void)
-{
-    LOGD("StopFilteringMulticastV4Packets()");
-    return WIFI_HAL_SUCCESS;
-}
-
-WifiErrorNo StopFilteringMulticastV6Packets(void)
-{
-    LOGD("StopFilteringMulticastV6Packets()");
-    return WIFI_HAL_SUCCESS;
-}
-
-WifiErrorNo EnableStaAutoReconnect(int enable)
-{
-    LOGD("EnableStaAutoReconnect() %{public}d", enable);
-    return WIFI_HAL_SUCCESS;
-}
-
-WifiErrorNo SetConcurrencyPriority(int isStaHigherPriority)
-{
-    LOGD("SetConcurrencyPriority() %{public}d", isStaHigherPriority);
-    return WIFI_HAL_SUCCESS;
-}
-
-WifiErrorNo SetSuspendModeEnabled(int enable)
-{
-    LOGD("SetSuspendModeEnabled() %{public}d", enable);
-    return WIFI_HAL_SUCCESS;
-}
-
 WifiErrorNo GetStaCapabilities(int32_t *capabilities)
 {
     LOGD("GetStaCapabilities: This function is not supported currently.");

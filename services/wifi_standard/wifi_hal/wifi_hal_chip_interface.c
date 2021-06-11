@@ -238,10 +238,3 @@ WifiErrorNo SetPowerMode(uint8_t mode)
     LOGI("SetPowerMode() %{public}u", mode);
     return WIFI_HAL_SUCCESS;
 }
-
-WifiStatus SetLatencyMode(LatencyMode mode)
-{
-    LOGI("SetLatencyMode is not supported! mode %{public}u", mode);
-    struct WifiStatus status = {ERROR_NOT_SUPPORTED, "not supported"};
-    return status;
-}

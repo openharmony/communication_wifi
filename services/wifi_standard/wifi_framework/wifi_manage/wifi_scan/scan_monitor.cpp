@@ -13,9 +13,9 @@
  * limitations under the License.
  */
 #include "scan_monitor.h"
+#include "wifi_logger.h"
 
-#undef LOG_TAG
-#define LOG_TAG "OHWIFI_SCAN_MONITOR"
+DEFINE_WIFILOG_SCAN_LABEL("ScanStateMachine");
 
 namespace OHOS {
 namespace Wifi {
@@ -29,13 +29,13 @@ ScanMonitor::~ScanMonitor()
 
 bool ScanMonitor::InitScanMonitor()
 {
-    LOGI("Enter ScanMonitor::InitScanMonitor.\n");
+    WIFI_LOGI("Enter ScanMonitor::InitScanMonitor.\n");
 
     SupplicantEventCallback eventCallback;
     eventCallback.onScanNotify = &(ScanMonitor::ReceiveScanEventFromIdl);
     eventCallback.pInstance = (void *)this;
     if (WifiSupplicantHalInterface::GetInstance().RigisterSupplicantEventCallback(eventCallback) != WIFI_IDL_OPT_OK) {
-        LOGE("RigisterSupplicantEventCallback failed.\n");
+        WIFI_LOGE("RigisterSupplicantEventCallback failed.\n");
         return false;
     }
 
@@ -50,9 +50,9 @@ void ScanMonitor::SetScanStateMachine(ScanStateMachine *paraScanStateMachine)
 
 void ScanMonitor::ReceiveScanEventFromIdl(int result, void *pInstance)
 {
-    LOGI("Enter ScanMonitor::ReceiveScanEventFromIdl, result is %{public}d.\n", result);
+    WIFI_LOGI("Enter ScanMonitor::ReceiveScanEventFromIdl, result is %{public}d.\n", result);
     if (pInstance == nullptr) {
-        LOGE("pInstance is null.\n");
+        WIFI_LOGE("pInstance is null.\n");
         return;
     }
 
@@ -63,7 +63,7 @@ void ScanMonitor::ReceiveScanEventFromIdl(int result, void *pInstance)
 
 void ScanMonitor::ProcessReceiveScanEvent(int result)
 {
-    LOGI("Enter ScanMonitor::ProcessReceiveScanEvent, result is %{public}d.\n", result);
+    WIFI_LOGI("Enter ScanMonitor::ProcessReceiveScanEvent, result is %{public}d.\n", result);
 
     switch (result) {
         case SINGLE_SCAN_OVER_OK: {
@@ -79,7 +79,7 @@ void ScanMonitor::ProcessReceiveScanEvent(int result)
             break;
         }
         default: {
-            LOGE("result is error.\n");
+            WIFI_LOGE("result is error.\n");
             break;
         }
     }

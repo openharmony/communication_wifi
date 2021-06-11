@@ -18,7 +18,7 @@
 #include "define.h"
 #include "wifi_event_broadcast.h"
 
-DEFINE_WIFILOG_LABEL("WifiScanCallbackProxy");
+DEFINE_WIFILOG_SCAN_LABEL("WifiScanCallbackProxy");
 
 namespace OHOS {
 namespace Wifi {

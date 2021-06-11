@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef OHOS_WIFI_NETWOREVALUATOR_H
-#define OHOS_WIFI_NETWOREVALUATOR_H
+#ifndef OHOS_WIFI_NETWORAPPRAISAL_H
+#define OHOS_WIFI_NETWORAPPRAISAL_H
 
 #include <vector>
 #include "wifi_errcode.h"
@@ -27,15 +27,13 @@ static const int MIN_24_FREQUENCY = 2400;
 static const int MAX_24_FREQUENCY = 2500;
 static const int MIN_5_FREQUENCY = 5000;
 static const int MAX_5_FREQUENCY = 5900;
-class StaNetworkEvaluator {
+class StaDeviceAppraisal {
 public:
-    virtual ~StaNetworkEvaluator()
+    virtual ~StaDeviceAppraisal()
     {}
 
-    /* Some evaluators must be updated with new scan results */
-    virtual void Update(const std::vector<WifiScanInfo> &scanResults) = 0;
-    virtual ErrCode NetworkEvaluators(
-        WifiDeviceConfig &candidate, std::vector<WifiScanInfo> &scanResults, WifiLinkedInfo &info) = 0;
+    virtual ErrCode DeviceAppraisals(
+        WifiDeviceConfig &electedDevice, std::vector<WifiScanInfo> &scanResults, WifiLinkedInfo &info) = 0;
 };
 }  // namespace Wifi
 }  // namespace OHOS

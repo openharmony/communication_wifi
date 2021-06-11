@@ -12,9 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-#ifndef WIFI_WPA_CLI_HAL_H
-#define WIFI_WPA_CLI_HAL_H
+#ifndef WIFI_WPA_SUPPLICANT_HAL_H
+#define WIFI_WPA_SUPPLICANT_HAL_H
 
 #include <sys/cdefs.h>
 #include <sys/types.h>

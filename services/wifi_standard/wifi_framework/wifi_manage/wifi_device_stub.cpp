@@ -136,12 +136,6 @@ void WifiDeviceStub::ReadWifiDeviceConfig(MessageParcel &data, WifiDeviceConfig 
     config.wepTxKeyIndex = data.ReadInt32();
     config.priority = data.ReadInt32();
     config.hiddenSSID = data.ReadBool();
-    config.isEnableWPAICertified = data.ReadBool();
-    config.allowedKeyManagement = data.ReadInt32();
-    config.allowedProtocols = data.ReadInt32();
-    config.allowedAuthAlgorithms = data.ReadInt32();
-    config.allowedPairwiseCiphers = data.ReadInt32();
-    config.allowedGroupCiphers = data.ReadInt32();
     config.wifiIpConfig.assignMethod = AssignIpMethod(data.ReadInt32());
     ReadIpAddress(data, config.wifiIpConfig.staticIpAddress.ipAddress.address);
     config.wifiIpConfig.staticIpAddress.ipAddress.prefixLength = data.ReadInt32();
@@ -195,12 +189,6 @@ void WifiDeviceStub::WriteWifiDeviceConfig(MessageParcel &reply, const WifiDevic
     reply.WriteInt32(config.wepTxKeyIndex);
     reply.WriteInt32(config.priority);
     reply.WriteBool(config.hiddenSSID);
-    reply.WriteBool(config.isEnableWPAICertified);
-    reply.WriteInt32(config.allowedKeyManagement);
-    reply.WriteInt32(config.allowedProtocols);
-    reply.WriteInt32(config.allowedAuthAlgorithms);
-    reply.WriteInt32(config.allowedPairwiseCiphers);
-    reply.WriteInt32(config.allowedGroupCiphers);
     reply.WriteInt32((int)config.wifiIpConfig.assignMethod);
     WriteIpAddress(reply, config.wifiIpConfig.staticIpAddress.ipAddress.address);
     reply.WriteInt32(config.wifiIpConfig.staticIpAddress.ipAddress.prefixLength);

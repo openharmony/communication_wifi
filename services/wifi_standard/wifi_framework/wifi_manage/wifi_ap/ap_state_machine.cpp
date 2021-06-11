@@ -16,10 +16,9 @@
 #include <typeinfo>
 #include "ipv4_address.h"
 #include "ipv6_address.h"
-#include "wifi_log.h"
+#include "wifi_logger.h"
 
-#undef LOG_TAG
-#define LOG_TAG "OHWIFI_AP_ApStateMachine"
+DEFINE_WIFILOG_HOTSPOT_LABEL("ApStateMachine");
 namespace OHOS {
 namespace Wifi {
 ApStateMachine *ApStateMachine::g_instance = nullptr;
@@ -39,7 +38,7 @@ ApStateMachine &ApStateMachine::GetInstance()
         if (g_instance && g_instance->InitialStateMachine()) {
             g_instance->Init();
         } else {
-            LOGE("init ApStateMachine error");
+            WIFI_LOGE("init ApStateMachine error");
             delete g_instance;
             g_instance = nullptr;
         }
@@ -57,18 +56,18 @@ void ApStateMachine::DeleteInstance()
 
 void ApStateMachine::Init()
 {
-    LOGI("ApStateMachine::Init");
-    AddState(&mApRootState, nullptr);
-    AddState(&mApIdleState, &mApRootState);
-    AddState(&mApStartedState, &mApRootState);
+    WIFI_LOGI("ApStateMachine::Init");
+    StatePlus(&mApRootState, nullptr);
+    StatePlus(&mApIdleState, &mApRootState);
+    StatePlus(&mApStartedState, &mApRootState);
 
-    SetInitialState(&mApIdleState);
-    Start();
+    SetFirstState(&mApIdleState);
+    StartStateMachine();
 }
 
 void ApStateMachine::StationJoin(StationInfo &staInfo)
 {
-    InternalMessage *msg = ObtainMessage();
+    InternalMessage *msg = CreateMessage();
     msg->SetMessageName(static_cast<int>(ApStatemachineEvent::CMD_STATION_JOIN));
     msg->AddStringMessageBody(staInfo.deviceName);
     msg->AddStringMessageBody(staInfo.bssid);
@@ -78,7 +77,7 @@ void ApStateMachine::StationJoin(StationInfo &staInfo)
 
 void ApStateMachine::StationLeave(StationInfo &staInfo)
 {
-    InternalMessage *msg = ObtainMessage();
+    InternalMessage *msg = CreateMessage();
     msg->SetMessageName(static_cast<int>(ApStatemachineEvent::CMD_STATION_LEAVE));
     msg->AddStringMessageBody(staInfo.deviceName);
     msg->AddStringMessageBody(staInfo.bssid);
@@ -88,7 +87,7 @@ void ApStateMachine::StationLeave(StationInfo &staInfo)
 
 void ApStateMachine::SetHotspotConfig(const HotspotConfig &cfg)
 {
-    InternalMessage *msg = ObtainMessage();
+    InternalMessage *msg = CreateMessage();
     msg->SetMessageName(static_cast<int>(ApStatemachineEvent::CMD_SET_HOTSPOT_CONFIG));
     msg->AddStringMessageBody(cfg.GetSsid());
     msg->AddStringMessageBody(cfg.GetPreSharedKey());
@@ -101,7 +100,7 @@ void ApStateMachine::SetHotspotConfig(const HotspotConfig &cfg)
 
 void ApStateMachine::AddBlockList(const StationInfo &staInfo)
 {
-    InternalMessage *msg = ObtainMessage();
+    InternalMessage *msg = CreateMessage();
     msg->SetMessageName(static_cast<int>(ApStatemachineEvent::CMD_ADD_BLOCK_LIST));
     msg->AddStringMessageBody(staInfo.deviceName);
     msg->AddStringMessageBody(staInfo.bssid);
@@ -111,7 +110,7 @@ void ApStateMachine::AddBlockList(const StationInfo &staInfo)
 
 void ApStateMachine::DelBlockList(const StationInfo &staInfo)
 {
-    InternalMessage *msg = ObtainMessage();
+    InternalMessage *msg = CreateMessage();
     msg->SetMessageName(static_cast<int>(ApStatemachineEvent::CMD_DEL_BLOCK_LIST));
     msg->AddStringMessageBody(staInfo.deviceName);
     msg->AddStringMessageBody(staInfo.bssid);
@@ -121,7 +120,7 @@ void ApStateMachine::DelBlockList(const StationInfo &staInfo)
 
 void ApStateMachine::DisconnetStation(const StationInfo &staInfo)
 {
-    InternalMessage *msg = ObtainMessage();
+    InternalMessage *msg = CreateMessage();
     msg->SetMessageName(static_cast<int>(ApStatemachineEvent::CMD_DISCONNECT_STATION));
     msg->AddStringMessageBody(staInfo.deviceName);
     msg->AddStringMessageBody(staInfo.bssid);
@@ -132,16 +131,6 @@ void ApStateMachine::DisconnetStation(const StationInfo &staInfo)
 void ApStateMachine::UpdateHotspotConfigResult(const bool result)
 {
     SendMessage(static_cast<int>(ApStatemachineEvent::CMD_UPDATE_HOTSPOTCONFIG_RESULT), result ? 1 : 0);
-}
-
-void ApStateMachine::OnQuitting()
-{
-    LOGI("[ApStateMachine] OnQuitting");
-}
-
-void ApStateMachine::OnHalting()
-{
-    LOGI("[ApStateMachine] OnHalting");
 }
 }  // namespace Wifi
 }  // namespace OHOS

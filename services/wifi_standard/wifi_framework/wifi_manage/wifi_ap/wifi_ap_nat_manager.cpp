@@ -22,11 +22,9 @@
 #include <fstream>
 #include <vector>
 #include "network_interface.h"
-#include "wifi_log.h"
+#include "wifi_logger.h"
 
-
-#undef LOG_TAG
-#define LOG_TAG "OHWIFI_AP_WifiApNatManager"
+DEFINE_WIFILOG_HOTSPOT_LABEL("WifiApNatManager");
 
 const std::string SYSTEM_COMMAND_IP = "/system/bin/ip";
 const std::string SYSTEM_COMMAND_IPTABLES = "/system/bin/iptables";
@@ -57,7 +55,7 @@ void WifiApNatManager::DeleteInstance()
 
 bool WifiApNatManager::EnableInterfaceNat(bool enable, std::string inInterfaceName, std::string outInterfaceName) const
 {
-    LOGI("EnableInterfaceNat enable [%{public}s], inInterfaceName [%s]  outInterfaceName "
+    WIFI_LOGI("EnableInterfaceNat enable [%{public}s], inInterfaceName [%s]  outInterfaceName "
          "[%s]",
         enable ? "true" : "false",
         inInterfaceName.c_str(),
@@ -65,27 +63,27 @@ bool WifiApNatManager::EnableInterfaceNat(bool enable, std::string inInterfaceNa
 
     if (!NetworkInterface::IsValidInterfaceName(inInterfaceName) ||
         !NetworkInterface::IsValidInterfaceName(outInterfaceName)) {
-        LOGE("Invalid interface name.");
+        WIFI_LOGE("Invalid interface name.");
         return false;
     }
 
     if (inInterfaceName == outInterfaceName) {
-        LOGE("Duplicate interface name.");
+        WIFI_LOGE("Duplicate interface name.");
         return false;
     }
 
     if (!SetForwarding(enable)) {
-        LOGE("SetForwarding failed.");
+        WIFI_LOGE("SetForwarding failed.");
         return false;
     }
 
     if (!SetInterfaceRoute(enable)) {
-        LOGE("SetInterfaceRoute failed.");
+        WIFI_LOGE("SetInterfaceRoute failed.");
         return false;
     }
 
     if (!SetInterfaceNat(enable, outInterfaceName)) {
-        LOGE("SetInterfaceNat failed.");
+        WIFI_LOGE("SetInterfaceNat failed.");
         return false;
     }
 
@@ -94,7 +92,7 @@ bool WifiApNatManager::EnableInterfaceNat(bool enable, std::string inInterfaceNa
 
 bool WifiApNatManager::SetForwarding(bool enable) const
 {
-    LOGI("SetForwarding enable = %{public}s.", enable ? "true" : "false");
+    WIFI_LOGI("SetForwarding enable = %{public}s.", enable ? "true" : "false");
 
     bool bResult = true;
     const std::string content = enable ? "1" : "0";
@@ -167,7 +165,7 @@ bool WifiApNatManager::WriteDataToFile(const std::string &fileName, const std::s
 {
     std::ofstream outf(fileName, std::ios::out);
     if (!outf) {
-        LOGE("write content [%s] to file [%s] failed. error: %{public}s.",
+        WIFI_LOGE("write content [%s] to file [%s] failed. error: %{public}s.",
             content.c_str(),
             fileName.c_str(),
             strerror(errno));
@@ -186,11 +184,11 @@ bool WifiApNatManager::ExecCommand(const std::vector<std::string> &vecCommandArg
         command += " ";
     }
 
-    LOGE("exec cmd: [%s]", command.c_str());
+    WIFI_LOGE("exec cmd: [%s]", command.c_str());
 
     int ret = system(command.c_str());
     if (ret == -1 || ret == SYSTEM_NOT_EXECUTED) {
-        LOGE("exec failed. cmd: %s, error:%{public}s", command.c_str(), strerror(errno));
+        WIFI_LOGE("exec failed. cmd: %s, error:%{public}s", command.c_str(), strerror(errno));
         return false;
     }
 

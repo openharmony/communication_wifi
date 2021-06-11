@@ -12,7 +12,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 #ifndef OHOS_STA_MONITOR_H
 #define OHOS_STA_MONITOR_H
 
@@ -21,8 +20,6 @@
 
 namespace OHOS {
 namespace Wifi {
-static const int MAX_DATA_SIZE = 10;
-
 class StaMonitor {
 public:
     /**

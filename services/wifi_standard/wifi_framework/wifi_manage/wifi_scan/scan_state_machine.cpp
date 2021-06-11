@@ -13,9 +13,9 @@
  * limitations under the License.
  */
 #include "scan_state_machine.h"
+#include "wifi_logger.h"
 
-#undef LOG_TAG
-#define LOG_TAG "OHWIFI_SCAN_STATE_MACHINE"
+DEFINE_WIFILOG_SCAN_LABEL("ScanStateMachine");
 
 namespace OHOS {
 namespace Wifi {
@@ -43,7 +43,7 @@ ScanStateMachine::ScanStateMachine()
 
 ScanStateMachine::~ScanStateMachine()
 {
-    LOGI("Enter ScanStateMachine::~ScanStateMachine.\n");
+    WIFI_LOGI("Enter ScanStateMachine::~ScanStateMachine.\n");
 
     /* Stop the thread. Otherwise, a problem occurs */
     StopHandlerThread();
@@ -96,13 +96,13 @@ ScanStateMachine::~ScanStateMachine()
 
 bool ScanStateMachine::InitScanStateMachine()
 {
-    LOGI("Enter InitScanStateMachine.\n");
+    WIFI_LOGI("Enter InitScanStateMachine.\n");
 
     /* init supportHwPnoFlag value */
     supportHwPnoFlag = WifiSettings::GetInstance().GetSupportHwPnoFlag();
 
     if (!InitialStateMachine()) {
-        LOGE("Initial StateMachine failed.\n");
+        WIFI_LOGE("Initial StateMachine failed.\n");
         return false;
     }
 
@@ -115,17 +115,17 @@ bool ScanStateMachine::InitScanStateMachine()
     };
 
     BuildScanStateTree();
-    SetInitialState(initState);
-    Start();
+    SetFirstState(initState);
+    StartStateMachine();
     return true;
 }
 
 bool ScanStateMachine::EnrollScanStatusListener(ScanStatusReportHandler handler)
 {
-    LOGI("Enter ScanStateMachine::EnrollScanStatusListener.\n");
+    WIFI_LOGI("Enter ScanStateMachine::EnrollScanStatusListener.\n");
 
     if (!handler) {
-        LOGE("handler is null.\n");
+        WIFI_LOGE("handler is null.\n");
         return false;
     }
 
@@ -141,30 +141,30 @@ ScanStateMachine::InitState::InitState(ScanStateMachine *paraScanStateMachine) :
 ScanStateMachine::InitState::~InitState()
 {}
 
-void ScanStateMachine::InitState::Enter()
+void ScanStateMachine::InitState::GoInState()
 {
-    LOGI("Enter ScanStateMachine::InitState::Enter.\n");
+    WIFI_LOGI("Enter ScanStateMachine::InitState::GoInState.\n");
     pScanStateMachine->runningScans.clear();
     pScanStateMachine->waitingScans.clear();
 
     if (pScanStateMachine->quitFlag) {
-        LOGI("Notify finish ScanStateMachine.\n");
+        WIFI_LOGI("Notify finish ScanStateMachine.\n");
         pScanStateMachine->ReportStatusChange(SCAN_FINISHED_STATUS);
     }
     return;
 }
 
-void ScanStateMachine::InitState::Exit()
+void ScanStateMachine::InitState::GoOutState()
 {
-    LOGI("Enter ScanStateMachine::InitState::Exit.\n");
+    WIFI_LOGI("Enter ScanStateMachine::InitState::GoOutState.\n");
     return;
 }
 
-bool ScanStateMachine::InitState::ProcessMessage(InternalMessage *msg)
+bool ScanStateMachine::InitState::ExecuteStateMsg(InternalMessage *msg)
 {
-    LOGI("Enter ScanStateMachine::InitState::ProcessMessage.\n");
+    WIFI_LOGI("Enter ScanStateMachine::InitState::ExecuteStateMsg.\n");
     if (msg == nullptr) {
-        LOGE("msg is null.\n");
+        WIFI_LOGE("msg is null.\n");
         return true;
     }
 
@@ -178,7 +178,7 @@ bool ScanStateMachine::InitState::ProcessMessage(InternalMessage *msg)
             return true;
 
         case CMD_START_COMMON_SCAN:
-            pScanStateMachine->ReportCommonScanFailed(msg->GetArg1());
+            pScanStateMachine->ReportCommonScanFailed(msg->GetParam1());
             return true;
 
         case CMD_START_PNO_SCAN:
@@ -191,12 +191,12 @@ bool ScanStateMachine::InitState::ProcessMessage(InternalMessage *msg)
             return true;
 
         case HARDWARE_LOAD_EVENT:
-            pScanStateMachine->TransitionTo(pScanStateMachine->hardwareReadyState);
+            pScanStateMachine->SwitchState(pScanStateMachine->hardwareReadyState);
             pScanStateMachine->ReportStatusChange(SCAN_STARTED_STATUS);
             return true;
 
         case HARDWARE_UNLOAD_EVENT:
-            pScanStateMachine->TransitionTo(pScanStateMachine->initState);
+            pScanStateMachine->SwitchState(pScanStateMachine->initState);
             pScanStateMachine->quitFlag = true;
             return true;
 
@@ -204,7 +204,7 @@ bool ScanStateMachine::InitState::ProcessMessage(InternalMessage *msg)
         case SCAN_RESULT_EVENT:
         case PNO_SCAN_RESULT_EVENT:
         case SCAN_FAILED_EVENT:
-            LOGE("ignored scan results event.\n");
+            WIFI_LOGE("ignored scan results event.\n");
             return true;
 
         case SYSTEM_SCAN_TIMER:
@@ -226,23 +226,23 @@ ScanStateMachine::HardwareReady::HardwareReady(ScanStateMachine *paraScanStateMa
 ScanStateMachine::HardwareReady::~HardwareReady()
 {}
 
-void ScanStateMachine::HardwareReady::Enter()
+void ScanStateMachine::HardwareReady::GoInState()
 {
-    LOGI("Enter ScanStateMachine::HardwareReady::Enter.\n");
+    WIFI_LOGI("Enter ScanStateMachine::HardwareReady::GoInState.\n");
     return;
 }
 
-void ScanStateMachine::HardwareReady::Exit()
+void ScanStateMachine::HardwareReady::GoOutState()
 {
-    LOGI("Enter ScanStateMachine::HardwareReady::Exit.\n");
+    WIFI_LOGI("Enter ScanStateMachine::HardwareReady::GoOutState.\n");
     return;
 }
 
-bool ScanStateMachine::HardwareReady::ProcessMessage(InternalMessage *msg)
+bool ScanStateMachine::HardwareReady::ExecuteStateMsg(InternalMessage *msg)
 {
-    LOGI("ScanStateMachine::HardwareReady::ProcessMessage.\n");
+    WIFI_LOGI("ScanStateMachine::HardwareReady::ExecuteStateMsg.\n");
     if (msg == nullptr) {
-        LOGE("msg is null.\n");
+        WIFI_LOGE("msg is null.\n");
         return true;
     }
 
@@ -268,30 +268,30 @@ ScanStateMachine::CommonScan::CommonScan(ScanStateMachine *paraScanStateMachine)
 ScanStateMachine::CommonScan::~CommonScan()
 {}
 
-void ScanStateMachine::CommonScan::Enter()
+void ScanStateMachine::CommonScan::GoInState()
 {
-    LOGI("Enter ScanStateMachine::CommonScan::Enter.\n");
+    WIFI_LOGI("Enter ScanStateMachine::CommonScan::GoInState.\n");
     return;
 }
 
-void ScanStateMachine::CommonScan::Exit()
+void ScanStateMachine::CommonScan::GoOutState()
 {
-    LOGI("Enter ScanStateMachine::CommonScan::Exit.\n");
+    WIFI_LOGI("Enter ScanStateMachine::CommonScan::GoOutState.\n");
     pScanStateMachine->ReportCommonScanFailedAndClear(false);
     return;
 }
 
-bool ScanStateMachine::CommonScan::ProcessMessage(InternalMessage *msg)
+bool ScanStateMachine::CommonScan::ExecuteStateMsg(InternalMessage *msg)
 {
-    LOGI("ScanStateMachine::CommonScan::ProcessMessage.\n");
+    WIFI_LOGI("ScanStateMachine::CommonScan::ExecuteStateMsg.\n");
     if (msg == nullptr) {
-        LOGE("msg is null.\n");
+        WIFI_LOGE("msg is null.\n");
         return true;
     }
 
     switch (msg->GetMessageName()) {
         case CMD_STOP_COMMON_SCAN:
-            pScanStateMachine->RemoveCommonScanRequest(msg->GetArg1());
+            pScanStateMachine->RemoveCommonScanRequest(msg->GetParam1());
             return true;
 
         default:
@@ -308,24 +308,24 @@ ScanStateMachine::CommonScanUnworked::CommonScanUnworked(ScanStateMachine *paraS
 ScanStateMachine::CommonScanUnworked::~CommonScanUnworked()
 {}
 
-void ScanStateMachine::CommonScanUnworked::Enter()
+void ScanStateMachine::CommonScanUnworked::GoInState()
 {
-    LOGI("Enter ScanStateMachine::CommonScanUnworked::Enter.\n");
+    WIFI_LOGI("Enter ScanStateMachine::CommonScanUnworked::GoInState.\n");
     pScanStateMachine->StartNewCommonScan();
     return;
 }
 
-void ScanStateMachine::CommonScanUnworked::Exit()
+void ScanStateMachine::CommonScanUnworked::GoOutState()
 {
-    LOGI("Enter ScanStateMachine::CommonScanUnworked::Exit.\n");
+    WIFI_LOGI("Enter ScanStateMachine::CommonScanUnworked::GoOutState.\n");
     return;
 }
 
-bool ScanStateMachine::CommonScanUnworked::ProcessMessage(InternalMessage *msg)
+bool ScanStateMachine::CommonScanUnworked::ExecuteStateMsg(InternalMessage *msg)
 {
-    LOGI("ScanStateMachine::CommonScanUnworked::ProcessMessage.\n");
+    WIFI_LOGI("ScanStateMachine::CommonScanUnworked::ExecuteStateMsg.\n");
     if (msg == nullptr) {
-        LOGE("msg is null.\n");
+        WIFI_LOGE("msg is null.\n");
         return true;
     }
 
@@ -352,15 +352,15 @@ ScanStateMachine::CommonScanning::CommonScanning(ScanStateMachine *paraScanState
 ScanStateMachine::CommonScanning::~CommonScanning()
 {}
 
-void ScanStateMachine::CommonScanning::Enter()
+void ScanStateMachine::CommonScanning::GoInState()
 {
-    LOGI("Enter ScanStateMachine::CommonScanning::Enter.\n");
+    WIFI_LOGI("Enter ScanStateMachine::CommonScanning::GoInState.\n");
     return;
 }
 
-void ScanStateMachine::CommonScanning::Exit()
+void ScanStateMachine::CommonScanning::GoOutState()
 {
-    LOGI("Enter ScanStateMachine::CommonScanning::Exit.\n");
+    WIFI_LOGI("Enter ScanStateMachine::CommonScanning::GoOutState.\n");
     pScanStateMachine->ClearRunningScanSettings();
     pScanStateMachine->ReportCommonScanFailedAndClear(true);
     pScanStateMachine->StopTimer(int(WAIT_SCAN_RESULT_TIMER));
@@ -372,11 +372,11 @@ void ScanStateMachine::CommonScanning::Exit()
  * @param msg - Internal message class, which is used to send messages to the state machine.[in]
  * @return success: true, failed: false
  */
-bool ScanStateMachine::CommonScanning::ProcessMessage(InternalMessage *msg)
+bool ScanStateMachine::CommonScanning::ExecuteStateMsg(InternalMessage *msg)
 {
-    LOGI("Enter ScanStateMachine::CommonScanning::ProcessMessage.\n");
+    WIFI_LOGI("Enter ScanStateMachine::CommonScanning::ExecuteStateMsg.\n");
     if (msg == nullptr) {
-        LOGE("msg is null.\n");
+        WIFI_LOGE("msg is null.\n");
         return true;
     }
 
@@ -387,19 +387,19 @@ bool ScanStateMachine::CommonScanning::ProcessMessage(InternalMessage *msg)
 
         case SCAN_RESULT_EVENT:
             pScanStateMachine->CommonScanResultProcess();
-            pScanStateMachine->TransitionTo(pScanStateMachine->commonScanUnworkedState);
+            pScanStateMachine->SwitchState(pScanStateMachine->commonScanUnworkedState);
             return true;
 
         case SCAN_FAILED_EVENT:
-            LOGE("scan failed.");
+            WIFI_LOGE("scan failed.");
             pScanStateMachine->ReportCommonScanFailedAndClear(true);
-            pScanStateMachine->TransitionTo(pScanStateMachine->commonScanUnworkedState);
+            pScanStateMachine->SwitchState(pScanStateMachine->commonScanUnworkedState);
             return true;
 
         case WAIT_SCAN_RESULT_TIMER:
-            LOGE("get scan result time out.");
+            WIFI_LOGE("get scan result time out.");
             pScanStateMachine->ReportCommonScanFailedAndClear(true);
-            pScanStateMachine->TransitionTo(pScanStateMachine->commonScanUnworkedState);
+            pScanStateMachine->SwitchState(pScanStateMachine->commonScanUnworkedState);
             return true;
 
         /*
@@ -408,7 +408,7 @@ bool ScanStateMachine::CommonScanning::ProcessMessage(InternalMessage *msg)
          */
         case CMD_START_PNO_SCAN:
         case CMD_RESTART_PNO_SCAN:
-            pScanStateMachine->DeferMessage(msg);
+            pScanStateMachine->DelayMessage(msg);
             return true;
 
         default:
@@ -424,24 +424,24 @@ ScanStateMachine::PnoScan::PnoScan(ScanStateMachine *paraScanStateMachine) : Sta
 ScanStateMachine::PnoScan::~PnoScan()
 {}
 
-void ScanStateMachine::PnoScan::Enter()
+void ScanStateMachine::PnoScan::GoInState()
 {
-    LOGI("Enter ScanStateMachine::PnoScan::Enter.\n");
+    WIFI_LOGI("Enter ScanStateMachine::PnoScan::GoInState.\n");
     return;
 }
 
-void ScanStateMachine::PnoScan::Exit()
+void ScanStateMachine::PnoScan::GoOutState()
 {
-    LOGI("Enter ScanStateMachine::PnoScan::Exit.\n");
+    WIFI_LOGI("Enter ScanStateMachine::PnoScan::GoOutState.\n");
     pScanStateMachine->StopPnoScanHardware();
     return;
 }
 
-bool ScanStateMachine::PnoScan::ProcessMessage(InternalMessage *msg)
+bool ScanStateMachine::PnoScan::ExecuteStateMsg(InternalMessage *msg)
 {
-    LOGI("ScanStateMachine::PnoScan::ProcessMessage.\n");
+    WIFI_LOGI("ScanStateMachine::PnoScan::ExecuteStateMsg.\n");
     if (msg == nullptr) {
-        LOGE("msg is null.\n");
+        WIFI_LOGE("msg is null.\n");
     }
     return false;
 }
@@ -455,27 +455,27 @@ ScanStateMachine::PnoScanHardware::PnoScanHardware(ScanStateMachine *paraScanSta
 ScanStateMachine::PnoScanHardware::~PnoScanHardware()
 {}
 
-void ScanStateMachine::PnoScanHardware::Enter()
+void ScanStateMachine::PnoScanHardware::GoInState()
 {
-    LOGI("Enter ScanStateMachine::PnoScanHardware::Enter.\n");
+    WIFI_LOGI("Enter ScanStateMachine::PnoScanHardware::GoInState.\n");
     if (!pScanStateMachine->StartPnoScanHardware()) {
-        LOGE("StartPnoScanHardware failed.");
+        WIFI_LOGE("StartPnoScanHardware failed.");
         return;
     }
     return;
 }
 
-void ScanStateMachine::PnoScanHardware::Exit()
+void ScanStateMachine::PnoScanHardware::GoOutState()
 {
-    LOGI("Enter ScanStateMachine::PnoScanHardware::Exit.\n");
+    WIFI_LOGI("Enter ScanStateMachine::PnoScanHardware::GoOutState.\n");
     return;
 }
 
-bool ScanStateMachine::PnoScanHardware::ProcessMessage(InternalMessage *msg)
+bool ScanStateMachine::PnoScanHardware::ExecuteStateMsg(InternalMessage *msg)
 {
-    LOGI("ScanStateMachine::PnoScanHardware::ProcessMessage.\n");
+    WIFI_LOGI("ScanStateMachine::PnoScanHardware::ExecuteStateMsg.\n");
     if (msg == nullptr) {
-        LOGE("msg is null.\n");
+        WIFI_LOGE("msg is null.\n");
         return true;
     }
 
@@ -499,8 +499,8 @@ bool ScanStateMachine::PnoScanHardware::ProcessMessage(InternalMessage *msg)
             return true;
 
         case CMD_START_COMMON_SCAN:
-            pScanStateMachine->DeferMessage(msg);
-            pScanStateMachine->TransitionTo(pScanStateMachine->hardwareReadyState);
+            pScanStateMachine->DelayMessage(msg);
+            pScanStateMachine->SwitchState(pScanStateMachine->hardwareReadyState);
             return true;
 
         default:
@@ -518,16 +518,16 @@ ScanStateMachine::CommonScanAfterPno::CommonScanAfterPno(ScanStateMachine *paraS
 ScanStateMachine::CommonScanAfterPno::~CommonScanAfterPno()
 {}
 
-void ScanStateMachine::CommonScanAfterPno::Enter()
+void ScanStateMachine::CommonScanAfterPno::GoInState()
 {
-    LOGI("Enter ScanStateMachine::CommonScanAfterPno::Enter.\n");
+    WIFI_LOGI("Enter ScanStateMachine::CommonScanAfterPno::GoInState.\n");
     pScanStateMachine->CommonScanAfterPnoProcess();
     return;
 }
 
-void ScanStateMachine::CommonScanAfterPno::Exit()
+void ScanStateMachine::CommonScanAfterPno::GoOutState()
 {
-    LOGI("Enter ScanStateMachine::CommonScanAfterPno::Exit.\n");
+    WIFI_LOGI("Enter ScanStateMachine::CommonScanAfterPno::GoOutState.\n");
     if (!pScanStateMachine->remainWaitResultTimer) {
         pScanStateMachine->StopTimer(static_cast<int>(WAIT_SCAN_RESULT_TIMER));
     }
@@ -536,28 +536,28 @@ void ScanStateMachine::CommonScanAfterPno::Exit()
     return;
 }
 
-bool ScanStateMachine::CommonScanAfterPno::ProcessMessage(InternalMessage *msg)
+bool ScanStateMachine::CommonScanAfterPno::ExecuteStateMsg(InternalMessage *msg)
 {
-    LOGI("ScanStateMachine::CommonScanAfterPno::ProcessMessage.\n");
+    WIFI_LOGI("ScanStateMachine::CommonScanAfterPno::ExecuteStateMsg.\n");
     if (msg == nullptr) {
-        LOGE("msg is null.\n");
+        WIFI_LOGE("msg is null.\n");
         return true;
     }
 
     switch (msg->GetMessageName()) {
         case SCAN_RESULT_EVENT:
             pScanStateMachine->CommonScanAfterPnoResult();
-            pScanStateMachine->TransitionTo(pScanStateMachine->pnoScanHardwareState);
+            pScanStateMachine->SwitchState(pScanStateMachine->pnoScanHardwareState);
             return true;
 
         case SCAN_FAILED_EVENT:
         case WAIT_SCAN_RESULT_TIMER:
-            pScanStateMachine->TransitionTo(pScanStateMachine->pnoScanHardwareState);
+            pScanStateMachine->SwitchState(pScanStateMachine->pnoScanHardwareState);
             return true;
 
         case CMD_START_PNO_SCAN:
         case PNO_SCAN_RESULT_EVENT:
-            LOGE("Ignore the message.\n");
+            WIFI_LOGE("Ignore the message.\n");
             return true;
 
         /*
@@ -566,8 +566,8 @@ bool ScanStateMachine::CommonScanAfterPno::ProcessMessage(InternalMessage *msg)
          * the status is changed
          */
         case CMD_START_COMMON_SCAN:
-            pScanStateMachine->DeferMessage(msg);
-            pScanStateMachine->TransitionTo(pScanStateMachine->commonScanningState);
+            pScanStateMachine->DelayMessage(msg);
+            pScanStateMachine->SwitchState(pScanStateMachine->commonScanningState);
             pScanStateMachine->remainWaitResultTimer = true;
             return true;
 
@@ -588,30 +588,30 @@ ScanStateMachine::PnoScanSoftware::PnoScanSoftware(ScanStateMachine *paraScanSta
 ScanStateMachine::PnoScanSoftware::~PnoScanSoftware()
 {}
 
-void ScanStateMachine::PnoScanSoftware::Enter()
+void ScanStateMachine::PnoScanSoftware::GoInState()
 {
-    LOGI("Enter ScanStateMachine::PnoScanSoftware::Enter.\n");
-    LOGI("Start scan first!");
+    WIFI_LOGI("Enter ScanStateMachine::PnoScanSoftware::GoInState.\n");
+    WIFI_LOGI("Start scan first!");
 
     if (!pScanStateMachine->StartNewSoftwareScan()) {
-        LOGE("failed to start new softwareScan");
+        WIFI_LOGE("failed to start new softwareScan");
     }
     return;
 }
 
-void ScanStateMachine::PnoScanSoftware::Exit()
+void ScanStateMachine::PnoScanSoftware::GoOutState()
 {
-    LOGI("Enter ScanStateMachine::PnoScanSoftware::Exit.\n");
+    WIFI_LOGI("Enter ScanStateMachine::PnoScanSoftware::GoOutState.\n");
     pScanStateMachine->StopTimer(static_cast<int>(SOFTWARE_PNO_SCAN_TIMER));
     return;
 }
 
-bool ScanStateMachine::PnoScanSoftware::ProcessMessage(InternalMessage *msg)
+bool ScanStateMachine::PnoScanSoftware::ExecuteStateMsg(InternalMessage *msg)
 {
-    LOGI("Enter ScanStateMachine::PnoScanSoftware::ProcessMessage.\n");
+    WIFI_LOGI("Enter ScanStateMachine::PnoScanSoftware::ExecuteStateMsg.\n");
 
     if (msg == nullptr) {
-        LOGE("msg is null.\n");
+        WIFI_LOGE("msg is null.\n");
         return true;
     }
 
@@ -633,24 +633,24 @@ ScanStateMachine::PnoSwScanFree::PnoSwScanFree(ScanStateMachine *paraScanStateMa
 ScanStateMachine::PnoSwScanFree::~PnoSwScanFree()
 {}
 
-void ScanStateMachine::PnoSwScanFree::Enter()
+void ScanStateMachine::PnoSwScanFree::GoInState()
 {
-    LOGI("Enter ScanStateMachine::PnoSwScanFree::Enter.\n");
+    WIFI_LOGI("Enter ScanStateMachine::PnoSwScanFree::GoInState.\n");
     return;
 }
 
-void ScanStateMachine::PnoSwScanFree::Exit()
+void ScanStateMachine::PnoSwScanFree::GoOutState()
 {
-    LOGI("Enter ScanStateMachine::PnoSwScanFree::Exit.\n");
+    WIFI_LOGI("Enter ScanStateMachine::PnoSwScanFree::GoOutState.\n");
     return;
 }
 
-bool ScanStateMachine::PnoSwScanFree::ProcessMessage(InternalMessage *msg)
+bool ScanStateMachine::PnoSwScanFree::ExecuteStateMsg(InternalMessage *msg)
 {
-    LOGI("Enter ScanStateMachine::PnoSwScanFree::ProcessMessage.\n");
+    WIFI_LOGI("Enter ScanStateMachine::PnoSwScanFree::ExecuteStateMsg.\n");
 
     if (msg == nullptr) {
-        LOGE("msg is null.\n");
+        WIFI_LOGE("msg is null.\n");
         return true;
     }
 
@@ -663,14 +663,15 @@ bool ScanStateMachine::PnoSwScanFree::ProcessMessage(InternalMessage *msg)
             pScanStateMachine->PnoScanSoftwareProcess(msg);
             return true;
         case CMD_START_COMMON_SCAN:
-            pScanStateMachine->DeferMessage(msg);
-            pScanStateMachine->TransitionTo(pScanStateMachine->hardwareReadyState);
+            pScanStateMachine->DelayMessage(msg);
+            pScanStateMachine->SwitchState(pScanStateMachine->hardwareReadyState);
             return true;
         case SOFTWARE_PNO_SCAN_TIMER:
-            LOGI("softwarePno scanscanInterval is %{public}d.\n", pScanStateMachine->runningPnoScanConfig.scanInterval);
+            WIFI_LOGI(
+                "softwarePno scanscanInterval is %{public}d.\n", pScanStateMachine->runningPnoScanConfig.scanInterval);
 
             if (!pScanStateMachine->RepeatStartCommonScan()) {
-                LOGE("Failed to start scan");
+                WIFI_LOGE("Failed to start scan");
             }
             pScanStateMachine->StartTimer(static_cast<int>(SOFTWARE_PNO_SCAN_TIMER),
                 (pScanStateMachine->runningPnoScanConfig.scanInterval) * SECOND_TO_MILLI_SECOND);
@@ -689,55 +690,55 @@ ScanStateMachine::PnoSwScanning::PnoSwScanning(ScanStateMachine *paraScanStateMa
 ScanStateMachine::PnoSwScanning::~PnoSwScanning()
 {}
 
-void ScanStateMachine::PnoSwScanning::Enter()
+void ScanStateMachine::PnoSwScanning::GoInState()
 {
-    LOGI("Enter ScanStateMachine::PnoSwScanning::Enter.\n");
+    WIFI_LOGI("Enter ScanStateMachine::PnoSwScanning::GoInState.\n");
     return;
 }
 
-void ScanStateMachine::PnoSwScanning::Exit()
+void ScanStateMachine::PnoSwScanning::GoOutState()
 {
-    LOGI("Enter ScanStateMachine::PnoSwScanning::Exit.\n");
+    WIFI_LOGI("Enter ScanStateMachine::PnoSwScanning::GoOutState.\n");
     pScanStateMachine->StopTimer(static_cast<int>(WAIT_SCAN_RESULT_TIMER));
     return;
 }
 
-bool ScanStateMachine::PnoSwScanning::ProcessMessage(InternalMessage *msg)
+bool ScanStateMachine::PnoSwScanning::ExecuteStateMsg(InternalMessage *msg)
 {
-    LOGI("Enter ScanStateMachine::PnoSwScanning::ProcessMessage.\n");
+    WIFI_LOGI("Enter ScanStateMachine::PnoSwScanning::ExecuteStateMsg.\n");
     if (msg == nullptr) {
-        LOGE("msg is null.\n");
+        WIFI_LOGE("msg is null.\n");
         return true;
     }
 
     switch (msg->GetMessageName()) {
         case SCAN_RESULT_EVENT:
             pScanStateMachine->SoftwareScanResultProcess();
-            pScanStateMachine->TransitionTo(pScanStateMachine->pnoSwScanFreeState);
+            pScanStateMachine->SwitchState(pScanStateMachine->pnoSwScanFreeState);
             return true;
 
         case SCAN_FAILED_EVENT:
-            LOGE("scan failed");
-            pScanStateMachine->TransitionTo(pScanStateMachine->pnoSwScanFreeState);
+            WIFI_LOGE("scan failed");
+            pScanStateMachine->SwitchState(pScanStateMachine->pnoSwScanFreeState);
             return true;
 
         case WAIT_SCAN_RESULT_TIMER:
-            LOGE("get scan result timed out");
-            pScanStateMachine->TransitionTo(pScanStateMachine->pnoSwScanFreeState);
+            WIFI_LOGE("get scan result timed out");
+            pScanStateMachine->SwitchState(pScanStateMachine->pnoSwScanFreeState);
             return true;
 
         case CMD_START_PNO_SCAN:
-            LOGE("The SwPnoScan is in progress and cannot be performed repeatedly.");
+            WIFI_LOGE("The SwPnoScan is in progress and cannot be performed repeatedly.");
             pScanStateMachine->PnoScanFailedProcess();
             return true;
         case CMD_RESTART_PNO_SCAN:
         case CMD_START_COMMON_SCAN:
-            pScanStateMachine->DeferMessage(msg);
+            pScanStateMachine->DelayMessage(msg);
             return true;
 
         case SOFTWARE_PNO_SCAN_TIMER:
-            LOGI("Scanning is in progress. Please wait for the scan result.");
-            pScanStateMachine->DeferMessage(msg);
+            WIFI_LOGI("Scanning is in progress. Please wait for the scan result.");
+            pScanStateMachine->DelayMessage(msg);
             return true;
 
         default:
@@ -747,7 +748,7 @@ bool ScanStateMachine::PnoSwScanning::ProcessMessage(InternalMessage *msg)
 
 void ScanStateMachine::CommonScanRequestProcess(InternalMessage *interMessage)
 {
-    LOGI("ScanStateMachine::CommonScanRequestProcess.\n");
+    WIFI_LOGI("ScanStateMachine::CommonScanRequestProcess.\n");
 
     int requestIndex = 0;
     InterScanConfig scanConfig;
@@ -756,7 +757,7 @@ void ScanStateMachine::CommonScanRequestProcess(InternalMessage *interMessage)
         return;
     }
     if (!VerifyScanStyle(scanConfig.scanStyle)) {
-        LOGE("invalid scan type");
+        WIFI_LOGE("invalid scan type");
         return;
     }
     waitingScans.insert(std::pair<int, InterScanConfig>(requestIndex, scanConfig));
@@ -768,16 +769,16 @@ void ScanStateMachine::CommonScanRequestProcess(InternalMessage *interMessage)
 bool ScanStateMachine::GetCommonScanRequestInfo(
     InternalMessage *interMessage, int &requestIndex, InterScanConfig &scanConfig)
 {
-    LOGI("Enter ScanStateMachine::GetRequestMsgInfo.\n");
+    WIFI_LOGI("Enter ScanStateMachine::GetRequestMsgInfo.\n");
 
     if (interMessage == nullptr) {
-        LOGE("interMessage is null.");
+        WIFI_LOGE("interMessage is null.");
         return false;
     }
 
-    requestIndex = interMessage->GetArg1();
+    requestIndex = interMessage->GetParam1();
     if (!GetCommonScanConfig(interMessage, scanConfig)) {
-        LOGE("GetCommonScanConfig failed.");
+        WIFI_LOGE("GetCommonScanConfig failed.");
         return false;
     }
 
@@ -786,10 +787,10 @@ bool ScanStateMachine::GetCommonScanRequestInfo(
 
 bool ScanStateMachine::GetCommonScanConfig(InternalMessage *interMessage, InterScanConfig &scanConfig)
 {
-    LOGI("Enter ScanStateMachine::GetCommonScanConfig.\n");
+    WIFI_LOGI("Enter ScanStateMachine::GetCommonScanConfig.\n");
 
     if (interMessage == nullptr) {
-        LOGE("interMessage is null.");
+        WIFI_LOGE("interMessage is null.");
         return false;
     }
 
@@ -798,7 +799,7 @@ bool ScanStateMachine::GetCommonScanConfig(InternalMessage *interMessage, InterS
     for (int i = 0; i < hiddenSize; i++) {
         std::string hiddenSsid = interMessage->GetStringFromMessage();
         if (hiddenSsid.empty()) {
-            LOGE("Message body is error.");
+            WIFI_LOGE("Message body is error.");
             return false;
         }
         scanConfig.hiddenNetworkSsid.push_back(hiddenSsid);
@@ -809,7 +810,7 @@ bool ScanStateMachine::GetCommonScanConfig(InternalMessage *interMessage, InterS
     for (int i = 0; i < freqSize; i++) {
         int freq = interMessage->GetIntFromMessage();
         if (freq == 0) {
-            LOGE("Message body is error.");
+            WIFI_LOGE("Message body is error.");
             return false;
         }
         scanConfig.scanFreqs.push_back(freq);
@@ -827,7 +828,7 @@ bool ScanStateMachine::GetCommonScanConfig(InternalMessage *interMessage, InterS
 
 void ScanStateMachine::StartNewCommonScan()
 {
-    LOGI("Enter ScanStateMachine::StartNewCommonScan.\n");
+    WIFI_LOGI("Enter ScanStateMachine::StartNewCommonScan.\n");
 
     if (waitingScans.size() == 0) {
         ContinuePnoScanProcess();
@@ -838,12 +839,12 @@ void ScanStateMachine::StartNewCommonScan()
     bool hasFullScan = false;
     /* Traverse the request list and combine parameters */
     std::map<int, InterScanConfig>::iterator configIter = waitingScans.begin();
-    for (; configIter != waitingScans.end(); configIter++) {
+    for (; configIter != waitingScans.end(); ++configIter) {
         runningScanSettings.scanStyle = MergeScanStyle(runningScanSettings.scanStyle, configIter->second.scanStyle);
 
         std::vector<std::string>::iterator hiddenIter = configIter->second.hiddenNetworkSsid.begin();
         /* Remove duplicate hidden list */
-        for (; hiddenIter != configIter->second.hiddenNetworkSsid.end(); hiddenIter++) {
+        for (; hiddenIter != configIter->second.hiddenNetworkSsid.end(); ++hiddenIter) {
             if (std::find(runningScanSettings.hiddenNetworkSsid.begin(),
                 runningScanSettings.hiddenNetworkSsid.end(),
                 *hiddenIter) != runningScanSettings.hiddenNetworkSsid.end()) {
@@ -861,7 +862,7 @@ void ScanStateMachine::StartNewCommonScan()
             } else {
                 std::vector<int>::iterator freqIter = configIter->second.scanFreqs.begin();
                 /* Repetitions are eliminated */
-                for (; freqIter != configIter->second.scanFreqs.end(); freqIter++) {
+                for (; freqIter != configIter->second.scanFreqs.end(); ++freqIter) {
                     if (std::find(runningScanSettings.scanFreqs.begin(),
                         runningScanSettings.scanFreqs.end(),
                         *freqIter) != runningScanSettings.scanFreqs.end()) {
@@ -881,8 +882,8 @@ void ScanStateMachine::StartNewCommonScan()
 
     runningScans.swap(waitingScans);
     waitingScans.clear();
-    TransitionTo(commonScanningState);
-    LOGI("StartNewCommonScan success.\n");
+    SwitchState(commonScanningState);
+    WIFI_LOGI("StartNewCommonScan success.\n");
 
     return;
 }
@@ -897,24 +898,24 @@ void ScanStateMachine::ClearRunningScanSettings()
 
 bool ScanStateMachine::StartSingleCommonScan(WifiScanParam &scanParam)
 {
-    LOGI("Enter ScanStateMachine::StartSingleCommonScan.\n");
+    WIFI_LOGI("Enter ScanStateMachine::StartSingleCommonScan.\n");
 
-    for (auto freqIter = scanParam.scanFreqs.begin(); freqIter != scanParam.scanFreqs.end(); freqIter++) {
-        LOGI("freq is %{public}d.\n", *freqIter);
+    for (auto freqIter = scanParam.scanFreqs.begin(); freqIter != scanParam.scanFreqs.end(); ++freqIter) {
+        WIFI_LOGI("freq is %{public}d.\n", *freqIter);
     }
 
     for (auto hiddenIter = scanParam.hiddenNetworkSsid.begin(); hiddenIter != scanParam.hiddenNetworkSsid.end();
-         hiddenIter++) {
-        LOGI("hidden ssid is %{public}s.\n", hiddenIter->c_str());
+         ++hiddenIter) {
+        WIFI_LOGI("hidden ssid is %{public}s.\n", hiddenIter->c_str());
     }
 
-    LOGI("Begin call Scan.\n");
+    WIFI_LOGI("Begin call Scan.\n");
     WifiErrorNo ret = WifiStaHalInterface::GetInstance().Scan(scanParam);
     if ((ret != WIFI_IDL_OPT_OK) && (ret != WIFI_IDL_OPT_SCAN_BUSY)) {
-        LOGE("WifiStaHalInterface::GetInstance().scan failed.");
+        WIFI_LOGE("WifiStaHalInterface::GetInstance().scan failed.");
         return false;
     }
-    LOGI("End call Scan.\n");
+    WIFI_LOGI("End call Scan.\n");
 
     /*
      * Start the timer. If no result is returned for a long time, the scanning
@@ -927,7 +928,7 @@ bool ScanStateMachine::StartSingleCommonScan(WifiScanParam &scanParam)
 
 void ScanStateMachine::CommonScanWhenRunning(InternalMessage *interMessage)
 {
-    LOGI("Enter ScanStateMachine::CommonScanWhenRunning.\n");
+    WIFI_LOGI("Enter ScanStateMachine::CommonScanWhenRunning.\n");
 
     int requestIndex = MAX_SCAN_CONFIG_STORE_INDEX;
     InterScanConfig scanConfig;
@@ -947,7 +948,7 @@ void ScanStateMachine::CommonScanWhenRunning(InternalMessage *interMessage)
 
 bool ScanStateMachine::ActiveCoverNewScan(InterScanConfig &interScanConfig)
 {
-    LOGI("Enter ScanStateMachine::ActiveCoverNewScan.\n");
+    WIFI_LOGI("Enter ScanStateMachine::ActiveCoverNewScan.\n");
 
     if (!ActiveScanStyle(interScanConfig.scanStyle)) {
         return false;
@@ -964,7 +965,7 @@ bool ScanStateMachine::ActiveCoverNewScan(InterScanConfig &interScanConfig)
         }
 
         for (auto freqIter = interScanConfig.scanFreqs.begin(); freqIter != interScanConfig.scanFreqs.end();
-             freqIter++) {
+             ++freqIter) {
             if (std::find(runningScanSettings.scanFreqs.begin(), runningScanSettings.scanFreqs.end(), *freqIter) ==
                 runningScanSettings.scanFreqs.end()) {
                 return false;
@@ -982,7 +983,7 @@ bool ScanStateMachine::ActiveCoverNewScan(InterScanConfig &interScanConfig)
 
     for (auto hiddenIter = interScanConfig.hiddenNetworkSsid.begin();
          hiddenIter != interScanConfig.hiddenNetworkSsid.end();
-         hiddenIter++) {
+         ++hiddenIter) {
         if (std::find(runningScanSettings.hiddenNetworkSsid.begin(),
             runningScanSettings.hiddenNetworkSsid.end(),
             *hiddenIter) == runningScanSettings.hiddenNetworkSsid.end()) {
@@ -995,11 +996,11 @@ bool ScanStateMachine::ActiveCoverNewScan(InterScanConfig &interScanConfig)
 
 void ScanStateMachine::CommonScanResultProcess()
 {
-    LOGI("Enter ScanStateMachine::CommonScanResultProcess.\n");
+    WIFI_LOGI("Enter ScanStateMachine::CommonScanResultProcess.\n");
 
     ScanStatusReport scanStatusReport;
     if (!GetScanResults(scanStatusReport.scanResultList)) {
-        LOGE("GetScanResults failed.");
+        WIFI_LOGE("GetScanResults failed.");
         ReportCommonScanFailedAndClear(true);
         return;
     }
@@ -1017,16 +1018,16 @@ void ScanStateMachine::CommonScanResultProcess()
 void ScanStateMachine::ConvertScanResults(
     std::vector<WifiScanResult> &wifiScanResults, std::vector<InterScanResult> &scanResults)
 {
-    LOGI("Enter ScanStateMachine::ConvertScanResults.\n");
+    WIFI_LOGI("Enter ScanStateMachine::ConvertScanResults.\n");
 
     std::vector<WifiScanResult>::iterator iter = wifiScanResults.begin();
-    for (; iter != wifiScanResults.end(); iter++) {
+    for (; iter != wifiScanResults.end(); ++iter) {
         InterScanResult singleResult;
         singleResult.bssid = iter->bssid;
         singleResult.ssid = iter->ssid;
         singleResult.capabilities = iter->capability;
         singleResult.frequency = iter->frequency;
-        singleResult.level = iter->signalLevel;
+        singleResult.rssi = iter->signalLevel;
         singleResult.timestamp = iter->timestamp;
 
         scanResults.push_back(singleResult);
@@ -1035,20 +1036,9 @@ void ScanStateMachine::ConvertScanResults(
     return;
 }
 
-void ScanStateMachine::OnQuitting()
-{
-    LOGI("Enter ScanStateMachine::OnQuitting.\n");
-    return;
-}
-void ScanStateMachine::OnHalting()
-{
-    LOGI("ScanStateMachine::OnQuitting.\n");
-    return;
-}
-
 void ScanStateMachine::ReportStatusChange(ScanStatus status)
 {
-    LOGI("Enter ScanStateMachine::ReportStatusChange.\n");
+    WIFI_LOGI("Enter ScanStateMachine::ReportStatusChange.\n");
 
     ScanStatusReport scanStatusReport;
     scanStatusReport.status = status;
@@ -1061,7 +1051,7 @@ void ScanStateMachine::ReportStatusChange(ScanStatus status)
 
 void ScanStateMachine::ReportScanInnerEvent(ScanInnerEventType innerEvent)
 {
-    LOGI("Enter ScanStateMachine::ReportScanInnerEvent, event is %{public}d.\n", innerEvent);
+    WIFI_LOGI("Enter ScanStateMachine::ReportScanInnerEvent, event is %{public}d.\n", innerEvent);
 
     ScanStatusReport scanStatusReport;
     scanStatusReport.status = SCAN_INNER_EVENT;
@@ -1075,7 +1065,7 @@ void ScanStateMachine::ReportScanInnerEvent(ScanInnerEventType innerEvent)
 
 void ScanStateMachine::ReportCommonScanFailed(int requestIndex)
 {
-    LOGI("Enter ScanStateMachine::ReportCommonScanFailed.\n");
+    WIFI_LOGI("Enter ScanStateMachine::ReportCommonScanFailed.\n");
 
     if (requestIndex == MAX_SCAN_CONFIG_STORE_INDEX) {
         return;
@@ -1093,7 +1083,7 @@ void ScanStateMachine::ReportCommonScanFailed(int requestIndex)
 
 void ScanStateMachine::ReportCommonScanFailedAndClear(bool runningFlag)
 {
-    LOGI("Enter ScanStateMachine::ReportCommonScanFailedAndClear.\n");
+    WIFI_LOGI("Enter ScanStateMachine::ReportCommonScanFailedAndClear.\n");
 
     ScanStatusReport scanStatusReport;
     if (runningFlag) {
@@ -1119,7 +1109,7 @@ void ScanStateMachine::ReportCommonScanFailedAndClear(bool runningFlag)
 void ScanStateMachine::GetRunningIndexList(std::vector<int> &runningIndexList)
 {
     std::map<int, InterScanConfig>::iterator iter = runningScans.begin();
-    for (; iter != runningScans.end(); iter++) {
+    for (; iter != runningScans.end(); ++iter) {
         runningIndexList.push_back(iter->first);
     }
 
@@ -1129,7 +1119,7 @@ void ScanStateMachine::GetRunningIndexList(std::vector<int> &runningIndexList)
 void ScanStateMachine::GetWaitingIndexList(std::vector<int> &waitingIndexList)
 {
     std::map<int, InterScanConfig>::iterator iter = waitingScans.begin();
-    for (; iter != waitingScans.end(); iter++) {
+    for (; iter != waitingScans.end(); ++iter) {
         waitingIndexList.push_back(iter->first);
     }
 
@@ -1151,7 +1141,7 @@ bool ScanStateMachine::ActiveScanStyle(int scanStyle)
         case SCAN_TYPE_HIGH_ACCURACY:
             return true;
         default:
-            LOGE("invalid scan style.");
+            WIFI_LOGE("invalid scan style.");
             return false;
     }
 }
@@ -1165,14 +1155,14 @@ int ScanStateMachine::MergeScanStyle(int currentScanStyle, int newScanStyle)
         case SCAN_TYPE_HIGH_ACCURACY:
             return currentScanStyle;
         default:
-            LOGE("invalid scan style.");
+            WIFI_LOGE("invalid scan style.");
             return newScanStyle;
     }
 }
 
 void ScanStateMachine::RemoveCommonScanRequest(int requestIndex)
 {
-    LOGI("Enter ScanStateMachine::RemoveCommonScanRequest.\n");
+    WIFI_LOGI("Enter ScanStateMachine::RemoveCommonScanRequest.\n");
 
     if (runningScans.count(requestIndex) == 1) {
         runningScans.erase(requestIndex);
@@ -1187,17 +1177,17 @@ void ScanStateMachine::RemoveCommonScanRequest(int requestIndex)
 
 void ScanStateMachine::PnoScanRequestProcess(InternalMessage *interMessage)
 {
-    LOGI("ScanStateMachine::PnoScanRequestProcess.\n");
+    WIFI_LOGI("ScanStateMachine::PnoScanRequestProcess.\n");
 
     if (!GetPnoScanRequestInfo(interMessage)) {
-        LOGE("GetPnoScanRequestInfo failed.\n");
+        WIFI_LOGE("GetPnoScanRequestInfo failed.\n");
         return;
     }
 
     if (supportHwPnoFlag) {
-        TransitionTo(pnoScanHardwareState);
+        SwitchState(pnoScanHardwareState);
     } else {
-        TransitionTo(pnoScanSoftwareState);
+        SwitchState(pnoScanSoftwareState);
     }
 
     return;
@@ -1205,16 +1195,16 @@ void ScanStateMachine::PnoScanRequestProcess(InternalMessage *interMessage)
 
 void ScanStateMachine::ContinuePnoScanProcess()
 {
-    LOGI("ScanStateMachine::ContinuePnoScanProcess.\n");
+    WIFI_LOGI("ScanStateMachine::ContinuePnoScanProcess.\n");
 
     if (!pnoConfigStoredFlag) {
         return;
     }
 
     if (supportHwPnoFlag) {
-        TransitionTo(pnoScanHardwareState);
+        SwitchState(pnoScanHardwareState);
     } else {
-        TransitionTo(pnoScanSoftwareState);
+        SwitchState(pnoScanSoftwareState);
     }
 
     return;
@@ -1222,19 +1212,19 @@ void ScanStateMachine::ContinuePnoScanProcess()
 
 void ScanStateMachine::PnoScanHardwareProcess(InternalMessage *interMessage)
 {
-    LOGI("ScanStateMachine::PnoScanHardwareProcess.\n");
+    WIFI_LOGI("ScanStateMachine::PnoScanHardwareProcess.\n");
     if (runningHwPnoFlag) {
-        LOGE("Hardware Pno scan is running.");
+        WIFI_LOGE("Hardware Pno scan is running.");
         return;
     }
 
     if (!GetPnoScanRequestInfo(interMessage)) {
-        LOGE("GetPnoScanRequestInfo failed.");
+        WIFI_LOGE("GetPnoScanRequestInfo failed.");
         return;
     }
 
     if (!StartPnoScanHardware()) {
-        LOGE("StartPnoScanHardware failed.");
+        WIFI_LOGE("StartPnoScanHardware failed.");
         return;
     }
 
@@ -1243,14 +1233,14 @@ void ScanStateMachine::PnoScanHardwareProcess(InternalMessage *interMessage)
 
 bool ScanStateMachine::StartPnoScanHardware()
 {
-    LOGI("ScanStateMachine::StartPnoScanHardware.\n");
+    WIFI_LOGI("ScanStateMachine::StartPnoScanHardware.\n");
     if (runningHwPnoFlag) {
-        LOGE("Hardware Pno scan is running.");
+        WIFI_LOGE("Hardware Pno scan is running.");
         return true;
     }
 
     if (!pnoConfigStoredFlag) {
-        LOGE("Pno config has not stored.");
+        WIFI_LOGE("Pno config has not stored.");
         return true;
     }
 
@@ -1264,10 +1254,10 @@ bool ScanStateMachine::StartPnoScanHardware()
     pnoScanParam.savedSsid.assign(
         runningPnoScanConfig.savedNetworkSsid.begin(), runningPnoScanConfig.savedNetworkSsid.end());
     pnoScanParam.scanFreqs.assign(runningPnoScanConfig.freqs.begin(), runningPnoScanConfig.freqs.end());
-    LOGI("pnoScanParam.scanInterval is %{public}d.\n", pnoScanParam.scanInterval);
+    WIFI_LOGI("pnoScanParam.scanInterval is %{public}d.\n", pnoScanParam.scanInterval);
     WifiErrorNo ret = WifiStaHalInterface::GetInstance().StartPnoScan(pnoScanParam);
     if ((ret != WIFI_IDL_OPT_OK) && (ret != WIFI_IDL_OPT_SCAN_BUSY)) {
-        LOGE("WifiStaHalInterface::GetInstance().StartPnoScan failed.");
+        WIFI_LOGE("WifiStaHalInterface::GetInstance().StartPnoScan failed.");
         PnoScanFailedProcess();
         return false;
     }
@@ -1278,18 +1268,18 @@ bool ScanStateMachine::StartPnoScanHardware()
 
 void ScanStateMachine::StopPnoScanHardware()
 {
-    LOGI("ScanStateMachine::StopPnoScanHardware.\n");
+    WIFI_LOGI("ScanStateMachine::StopPnoScanHardware.\n");
 
     if (!supportHwPnoFlag) {
         return;
     }
     if (!runningHwPnoFlag) {
-        LOGE("Hardware Pno scan is not running.");
+        WIFI_LOGE("Hardware Pno scan is not running.");
     }
 
     /* Invoke the IDL interface to stop PNO scanning */
     if (WifiStaHalInterface::GetInstance().StopPnoScan() != WIFI_IDL_OPT_OK) {
-        LOGE("WifiStaHalInterface::GetInstance().StopPnoScan failed.");
+        WIFI_LOGE("WifiStaHalInterface::GetInstance().StopPnoScan failed.");
     }
 
     runningHwPnoFlag = false;
@@ -1298,10 +1288,10 @@ void ScanStateMachine::StopPnoScanHardware()
 
 void ScanStateMachine::UpdatePnoScanRequest(InternalMessage *interMessage)
 {
-    LOGI("Enter ScanStateMachine::UpdatePnoScanRequest.\n");
+    WIFI_LOGI("Enter ScanStateMachine::UpdatePnoScanRequest.\n");
 
     if (!GetPnoScanRequestInfo(interMessage)) {
-        LOGE("GetPnoScanRequestInfo failed.");
+        WIFI_LOGE("GetPnoScanRequestInfo failed.");
         return;
     }
 
@@ -1310,23 +1300,23 @@ void ScanStateMachine::UpdatePnoScanRequest(InternalMessage *interMessage)
 
 bool ScanStateMachine::GetPnoScanRequestInfo(InternalMessage *interMessage)
 {
-    LOGI("Enter ScanStateMachine::GetPnoScanRequestInfo.\n");
+    WIFI_LOGI("Enter ScanStateMachine::GetPnoScanRequestInfo.\n");
 
     if (interMessage == nullptr) {
-        LOGE("interMessage is null.");
+        WIFI_LOGE("interMessage is null.");
         PnoScanFailedProcess();
         return false;
     }
 
     ClearPnoScanConfig();
     if (!GetPnoScanConfig(interMessage, runningPnoScanConfig)) {
-        LOGE("GetPnoScanConfig failed.");
+        WIFI_LOGE("GetPnoScanConfig failed.");
         PnoScanFailedProcess();
         return false;
     }
 
     if (!GetCommonScanConfig(interMessage, runningScanConfigForPno)) {
-        LOGE("GetCommonScanConfig failed.");
+        WIFI_LOGE("GetCommonScanConfig failed.");
         PnoScanFailedProcess();
         return false;
     }
@@ -1343,10 +1333,10 @@ bool ScanStateMachine::GetPnoScanRequestInfo(InternalMessage *interMessage)
 
 bool ScanStateMachine::GetPnoScanConfig(InternalMessage *interMessage, PnoScanConfig &pnoScanConfig)
 {
-    LOGI("Enter ScanStateMachine::GetPnoScanConfig.\n");
+    WIFI_LOGI("Enter ScanStateMachine::GetPnoScanConfig.\n");
 
     if (interMessage == nullptr) {
-        LOGE("interMessage is null.");
+        WIFI_LOGE("interMessage is null.");
         return false;
     }
 
@@ -1359,7 +1349,7 @@ bool ScanStateMachine::GetPnoScanConfig(InternalMessage *interMessage, PnoScanCo
     for (int i = 0; i < hiddenSize; i++) {
         std::string hiddenSsid = interMessage->GetStringFromMessage();
         if (hiddenSsid.empty()) {
-            LOGE("Message body is error.");
+            WIFI_LOGE("Message body is error.");
             return false;
         }
         pnoScanConfig.hiddenNetworkSsid.push_back(hiddenSsid);
@@ -1370,7 +1360,7 @@ bool ScanStateMachine::GetPnoScanConfig(InternalMessage *interMessage, PnoScanCo
     for (int i = 0; i < iSavedSize; i++) {
         std::string savedSizeStr = interMessage->GetStringFromMessage();
         if (savedSizeStr.empty()) {
-            LOGE("Message body is error.");
+            WIFI_LOGE("Message body is error.");
             return false;
         }
         pnoScanConfig.savedNetworkSsid.push_back(savedSizeStr);
@@ -1380,7 +1370,7 @@ bool ScanStateMachine::GetPnoScanConfig(InternalMessage *interMessage, PnoScanCo
     for (int i = 0; i < freqsSize; i++) {
         int freqs = interMessage->GetIntFromMessage();
         if (freqs == 0) {
-            LOGE("Message body is error.");
+            WIFI_LOGE("Message body is error.");
             return false;
         }
         pnoScanConfig.freqs.push_back(freqs);
@@ -1391,21 +1381,21 @@ bool ScanStateMachine::GetPnoScanConfig(InternalMessage *interMessage, PnoScanCo
 
 void ScanStateMachine::HwPnoScanResultProcess()
 {
-    LOGI("Enter ScanStateMachine::HwPnoScanResultProcess.\n");
+    WIFI_LOGI("Enter ScanStateMachine::HwPnoScanResultProcess.\n");
 
     if (!runningHwPnoFlag) {
-        LOGE("Hardware pno scan is not running.");
+        WIFI_LOGE("Hardware pno scan is not running.");
         return;
     }
 
     std::vector<InterScanResult> scanResults;
     if (!GetScanResults(scanResults)) {
-        LOGE("GetScanResults failed.");
+        WIFI_LOGE("GetScanResults failed.");
         return;
     }
 
     if (NeedCommonScanAfterPno(scanResults)) {
-        TransitionTo(commonScanAfterPnoState);
+        SwitchState(commonScanAfterPnoState);
         return;
     }
 
@@ -1415,7 +1405,7 @@ void ScanStateMachine::HwPnoScanResultProcess()
 
 void ScanStateMachine::ReportPnoScanResults(std::vector<InterScanResult> &scanResults)
 {
-    LOGI("Enter ScanStateMachine::ReportPnoScanResults.\n");
+    WIFI_LOGI("Enter ScanStateMachine::ReportPnoScanResults.\n");
 
     ScanStatusReport scanStatusReport;
     scanStatusReport.status = PNO_SCAN_RESULT;
@@ -1428,16 +1418,16 @@ void ScanStateMachine::ReportPnoScanResults(std::vector<InterScanResult> &scanRe
 
 bool ScanStateMachine::NeedCommonScanAfterPno(std::vector<InterScanResult> &scanResults)
 {
-    LOGI("Enter ScanStateMachine::NeedCommonScanAfterPno.\n");
+    WIFI_LOGI("Enter ScanStateMachine::NeedCommonScanAfterPno.\n");
     if (scanResults.size() > 0) {
-        LOGI("Enter UpdateNetworkScoreCache.[%{public}s]\n", scanResults[0].bssid.c_str());
+        WIFI_LOGI("Enter UpdateNetworkScoreCache.[%{public}s]\n", scanResults[0].bssid.c_str());
     }
     return false;
 }
 
 void ScanStateMachine::CommonScanAfterPnoProcess()
 {
-    LOGI("Enter ScanStateMachine::CommonScanAfterPnoProcess.\n");
+    WIFI_LOGI("Enter ScanStateMachine::CommonScanAfterPnoProcess.\n");
 
     StopPnoScanHardware();
     WifiScanParam scanParam;
@@ -1445,8 +1435,8 @@ void ScanStateMachine::CommonScanAfterPnoProcess()
         runningScanConfigForPno.hiddenNetworkSsid.begin(), runningScanConfigForPno.hiddenNetworkSsid.end());
     scanParam.scanFreqs.assign(runningScanConfigForPno.scanFreqs.begin(), runningScanConfigForPno.scanFreqs.end());
     if (!StartSingleCommonScan(scanParam)) {
-        LOGE("StartSingleCommonScan failed.\n");
-        TransitionTo(pnoScanHardwareState);
+        WIFI_LOGE("StartSingleCommonScan failed.\n");
+        SwitchState(pnoScanHardwareState);
         return;
     }
 
@@ -1455,11 +1445,11 @@ void ScanStateMachine::CommonScanAfterPnoProcess()
 
 void ScanStateMachine::CommonScanAfterPnoResult()
 {
-    LOGI("Enter ScanStateMachine::CommonScanAfterPnoResult.\n");
+    WIFI_LOGI("Enter ScanStateMachine::CommonScanAfterPnoResult.\n");
 
     std::vector<InterScanResult> scanResults;
     if (!GetScanResults(scanResults)) {
-        LOGE("GetScanResults failed.");
+        WIFI_LOGE("GetScanResults failed.");
         return;
     }
 
@@ -1469,7 +1459,7 @@ void ScanStateMachine::CommonScanAfterPnoResult()
 
 void ScanStateMachine::PnoScanFailedProcess()
 {
-    LOGI("Enter ScanStateMachine::PnoScanFailedProcess.\n");
+    WIFI_LOGI("Enter ScanStateMachine::PnoScanFailedProcess.\n");
 
     runningHwPnoFlag = false;
     runningSwPnoFlag = false;
@@ -1502,26 +1492,35 @@ void ScanStateMachine::ClearPnoScanConfig()
 
 bool ScanStateMachine::GetScanResults(std::vector<InterScanResult> &scanResults)
 {
-    LOGI("Enter ScanStateMachine::GetScanResults.\n");
+    WIFI_LOGI("Enter ScanStateMachine::GetScanResults.\n");
 
     std::vector<WifiScanResult> wifiScanResults;
-    LOGI("Begin: QueryScanResults.");
+    WIFI_LOGI("Begin: QueryScanResults.");
     if (WifiStaHalInterface::GetInstance().QueryScanResults(wifiScanResults) != WIFI_IDL_OPT_OK) {
-        LOGE("WifiStaHalInterface::GetInstance().QueryScanResults failed.");
+        WIFI_LOGE("WifiStaHalInterface::GetInstance().QueryScanResults failed.");
         return false;
     }
-    LOGI("End: QueryScanResults.");
+    WIFI_LOGI("End: QueryScanResults.");
 
     ConvertScanResults(wifiScanResults, scanResults);
+    for (auto iter = scanResults.begin(); iter != scanResults.end(); iter++) {
+        if (iter->frequency < SCAN_24GHZ_MAX_FREQUENCY) {
+            iter->band = 0;
+        } else if (iter->frequency > SCAN_5GHZ_MIN_FREQUENCY) {
+            iter->band = 1;
+        } else {
+            WIFI_LOGE("invalid frequency value: %d", iter->frequency);
+        }
+    }
     return true;
 }
 
 bool ScanStateMachine::StartNewSoftwareScan()
 {
-    LOGI("Enter ScanStateMachine::StartNewSoftwareScan.\n");
+    WIFI_LOGI("Enter ScanStateMachine::StartNewSoftwareScan.\n");
 
     if (!RepeatStartCommonScan()) {
-        LOGE("failed to start common single scan");
+        WIFI_LOGE("failed to start common single scan");
         return false;
     }
     StartTimer(int(SOFTWARE_PNO_SCAN_TIMER), (runningPnoScanConfig.scanInterval) * SECOND_TO_MILLI_SECOND);
@@ -1531,10 +1530,10 @@ bool ScanStateMachine::StartNewSoftwareScan()
 
 bool ScanStateMachine::RepeatStartCommonScan()
 {
-    LOGI("Enter ScanStateMachine::RepeatStartCommonScan.\n");
+    WIFI_LOGI("Enter ScanStateMachine::RepeatStartCommonScan.\n");
 
     if (!pnoConfigStoredFlag) {
-        LOGE("Pno config has not stored.");
+        WIFI_LOGE("Pno config has not stored.");
         return false;
     }
 
@@ -1549,17 +1548,17 @@ bool ScanStateMachine::RepeatStartCommonScan()
     }
 
     runningSwPnoFlag = true;
-    TransitionTo(pnoSwScanningState);
+    SwitchState(pnoSwScanningState);
 
     return true;
 }
 
 void ScanStateMachine::StopPnoScanSoftware()
 {
-    LOGI("ScanStateMachine::StopPnoScanSoftware.\n");
+    WIFI_LOGI("ScanStateMachine::StopPnoScanSoftware.\n");
 
     if (!runningSwPnoFlag) {
-        LOGE("Software Pno scan is not running.");
+        WIFI_LOGE("Software Pno scan is not running.");
         return;
     }
 
@@ -1573,20 +1572,20 @@ void ScanStateMachine::StopPnoScanSoftware()
 
 void ScanStateMachine::PnoScanSoftwareProcess(InternalMessage *interMessage)
 {
-    LOGI("ScanStateMachine::PnoScanSoftwareProcess.\n");
+    WIFI_LOGI("ScanStateMachine::PnoScanSoftwareProcess.\n");
 
     if (runningSwPnoFlag) {
-        LOGE("Software Pno scan is running.");
+        WIFI_LOGE("Software Pno scan is running.");
         return;
     }
 
     if (!GetPnoScanRequestInfo(interMessage)) {
-        LOGE("GetPnoScanRequestInfo failed.");
+        WIFI_LOGE("GetPnoScanRequestInfo failed.");
         return;
     }
 
     if (!StartNewSoftwareScan()) {
-        LOGE("StartPnoScanSoftware failed.");
+        WIFI_LOGE("StartPnoScanSoftware failed.");
         return;
     }
 
@@ -1595,11 +1594,11 @@ void ScanStateMachine::PnoScanSoftwareProcess(InternalMessage *interMessage)
 
 void ScanStateMachine::SoftwareScanResultProcess()
 {
-    LOGI("Enter ScanStateMachine::SoftwareScanResultProcess.\n");
+    WIFI_LOGI("Enter ScanStateMachine::SoftwareScanResultProcess.\n");
 
     std::vector<InterScanResult> scanResults;
     if (!GetScanResults(scanResults)) {
-        LOGE("GetScanResults failed.");
+        WIFI_LOGE("GetScanResults failed.");
     }
 
     ReportPnoScanResults(scanResults);
@@ -1608,35 +1607,35 @@ void ScanStateMachine::SoftwareScanResultProcess()
 
 bool ScanStateMachine::InitCommonScanState()
 {
-    LOGI("Enter ScanStateMachine::InitCommonScanState.\n");
+    WIFI_LOGI("Enter ScanStateMachine::InitCommonScanState.\n");
 
     initState = new (std::nothrow) InitState(this);
     if (initState == nullptr) {
-        LOGE("Alloc initState failed.\n");
+        WIFI_LOGE("Alloc initState failed.\n");
         return false;
     }
 
     hardwareReadyState = new (std::nothrow) HardwareReady(this);
     if (hardwareReadyState == nullptr) {
-        LOGE("Alloc hardwareReadyState failed.\n");
+        WIFI_LOGE("Alloc hardwareReadyState failed.\n");
         return false;
     }
 
     commonScanState = new (std::nothrow) CommonScan(this);
     if (commonScanState == nullptr) {
-        LOGE("Alloc commonScanState failed.\n");
+        WIFI_LOGE("Alloc commonScanState failed.\n");
         return false;
     }
 
     commonScanUnworkedState = new (std::nothrow) CommonScanUnworked(this);
     if (commonScanUnworkedState == nullptr) {
-        LOGE("Alloc commonScanUnworkedState failed.\n");
+        WIFI_LOGE("Alloc commonScanUnworkedState failed.\n");
         return false;
     }
 
     commonScanningState = new (std::nothrow) CommonScanning(this);
     if (commonScanningState == nullptr) {
-        LOGE("Alloc commonScanningState failed.\n");
+        WIFI_LOGE("Alloc commonScanningState failed.\n");
         return false;
     }
 
@@ -1645,41 +1644,41 @@ bool ScanStateMachine::InitCommonScanState()
 
 bool ScanStateMachine::InitPnoScanState()
 {
-    LOGI("Enter ScanStateMachine::InitPnoScanState.\n");
+    WIFI_LOGI("Enter ScanStateMachine::InitPnoScanState.\n");
 
     pnoScanState = new (std::nothrow) PnoScan(this);
     if (pnoScanState == nullptr) {
-        LOGE("Alloc pnoScanState failed.\n");
+        WIFI_LOGE("Alloc pnoScanState failed.\n");
         return false;
     }
 
     pnoScanHardwareState = new (std::nothrow) PnoScanHardware(this);
     if (pnoScanHardwareState == nullptr) {
-        LOGE("Alloc pnoScanHardwareState failed.\n");
+        WIFI_LOGE("Alloc pnoScanHardwareState failed.\n");
         return false;
     }
 
     commonScanAfterPnoState = new (std::nothrow) CommonScanAfterPno(this);
     if (commonScanAfterPnoState == nullptr) {
-        LOGE("Alloc commonScanAfterPnoState failed.\n");
+        WIFI_LOGE("Alloc commonScanAfterPnoState failed.\n");
         return false;
     }
 
     pnoScanSoftwareState = new (std::nothrow) PnoScanSoftware(this);
     if (pnoScanSoftwareState == nullptr) {
-        LOGE("Alloc pnoScanSoftwareState failed.\n");
+        WIFI_LOGE("Alloc pnoScanSoftwareState failed.\n");
         return false;
     }
 
     pnoSwScanFreeState = new (std::nothrow) PnoSwScanFree(this);
     if (pnoSwScanFreeState == nullptr) {
-        LOGE("Alloc pnoSwScanFreeState failed.\n");
+        WIFI_LOGE("Alloc pnoSwScanFreeState failed.\n");
         return false;
     }
 
     pnoSwScanningState = new (std::nothrow) PnoSwScanning(this);
     if (pnoSwScanningState == nullptr) {
-        LOGE("Alloc pnoSwScanningState failed.\n");
+        WIFI_LOGE("Alloc pnoSwScanningState failed.\n");
         return false;
     }
 
@@ -1688,35 +1687,35 @@ bool ScanStateMachine::InitPnoScanState()
 
 void ScanStateMachine::BuildScanStateTree()
 {
-    LOGI("Enter ScanStateMachine::BuildScanStateTree.\n");
+    WIFI_LOGI("Enter ScanStateMachine::BuildScanStateTree.\n");
 
-    AddState(initState, nullptr);
-    AddState(hardwareReadyState, initState);
-    AddState(commonScanState, hardwareReadyState);
-    AddState(commonScanUnworkedState, commonScanState);
-    AddState(commonScanningState, commonScanState);
-    AddState(pnoScanState, hardwareReadyState);
-    AddState(pnoScanHardwareState, pnoScanState);
-    AddState(commonScanAfterPnoState, pnoScanHardwareState);
-    AddState(pnoScanSoftwareState, pnoScanState);
-    AddState(pnoSwScanFreeState, pnoScanSoftwareState);
-    AddState(pnoSwScanningState, pnoScanSoftwareState);
+    StatePlus(initState, nullptr);
+    StatePlus(hardwareReadyState, initState);
+    StatePlus(commonScanState, hardwareReadyState);
+    StatePlus(commonScanUnworkedState, commonScanState);
+    StatePlus(commonScanningState, commonScanState);
+    StatePlus(pnoScanState, hardwareReadyState);
+    StatePlus(pnoScanHardwareState, pnoScanState);
+    StatePlus(commonScanAfterPnoState, pnoScanHardwareState);
+    StatePlus(pnoScanSoftwareState, pnoScanState);
+    StatePlus(pnoSwScanFreeState, pnoScanSoftwareState);
+    StatePlus(pnoSwScanningState, pnoScanSoftwareState);
 }
 
 void ScanStateMachine::InitState::LoadDriver()
 {
-    LOGI("Enter ScanStateMachine::LoadDriver.\n");
-    pScanStateMachine->TransitionTo(pScanStateMachine->hardwareReadyState);
+    WIFI_LOGI("Enter ScanStateMachine::LoadDriver.\n");
+    pScanStateMachine->SwitchState(pScanStateMachine->hardwareReadyState);
     pScanStateMachine->ReportStatusChange(SCAN_STARTED_STATUS);
-    LOGI("Start Scan Service Success.\n");
+    WIFI_LOGI("Start Scan Service Success.\n");
 }
 
 void ScanStateMachine::InitState::UnLoadDriver()
 {
-    LOGI("Enter ScanStateMachine::UnLoadDriver.\n");
-    pScanStateMachine->TransitionTo(pScanStateMachine->initState);
+    WIFI_LOGI("Enter ScanStateMachine::UnLoadDriver.\n");
+    pScanStateMachine->SwitchState(pScanStateMachine->initState);
     pScanStateMachine->quitFlag = true;
-    LOGI("Stop Scan Service Success.\n");
+    WIFI_LOGI("Stop Scan Service Success.\n");
 }
 }  // namespace Wifi
 }  // namespace OHOS

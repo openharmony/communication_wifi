@@ -16,10 +16,9 @@
 #include <unistd.h>
 #include "ap_state_machine.h"
 #include "log_helper.h"
-#include "wifi_log.h"
+#include "wifi_logger.h"
 
-#undef LOG_TAG
-#define LOG_TAG "OHWIFI_AP_ApService"
+DEFINE_WIFILOG_HOTSPOT_LABEL("ApService");
 namespace OHOS {
 namespace Wifi {
 ApService &ApService::GetInstance()
@@ -37,7 +36,7 @@ ApService::ApService() : mMsgQueueUp(nullptr)
 int ApService::Init(WifiMessageQueue<WifiResponseMsgInfo> *mqUp)
 {
     if (mqUp == nullptr) {
-        LOGE("fatal error!");
+        WIFI_LOGE("fatal error!");
         return -1;
     }
     mMsgQueueUp = mqUp;
@@ -54,10 +53,10 @@ int ApService::UnInit(void) const
 int ApService::PushMsg(const WifiRequestMsgInfo *msg) const
 {
     if (msg == nullptr) {
-        LOGE("fatal error!");
+        WIFI_LOGE("fatal error!");
         return -1;
     }
-    LOGI("Receive a message from the ServiceManager. msgCode = [%{public}d]", msg->msgCode);
+    WIFI_LOGI("Receive a message from the ServiceManager. msgCode = [%{public}d]", msg->msgCode);
     switch (static_cast<WifiInternalMsgCode>(msg->msgCode)) {
         case WifiInternalMsgCode::AP_ADD_BLOCK_LIST_REQ: {
             AddBlockList(msg->params.stationInfo);
@@ -92,7 +91,7 @@ void ApService::BroadcastMsg(const WifiResponseMsgInfo &upMsg) const
 void ApService::OnApStateChange(const ApState &state) const
 {
     if (WifiSettings::GetInstance().SetHotspotState(static_cast<int>(state))) {
-        LOGE("WifiSetting change state failed");
+        WIFI_LOGE("WifiSetting change state failed");
     }
     switch (state) {
         case ApState::AP_STATE_IDLE: {
@@ -118,7 +117,7 @@ void ApService::OnHotspotStaJoin(const StationInfo &info) const
     WifiResponseMsgInfo msgInfo;
     msgInfo.params.staInfo = info;
     msgInfo.msgCode = AP_JOIN_RES;
-    LOGI("OnHotspotStaJoin:,%{public}d,%s,%s,%s",
+    WIFI_LOGI("OnHotspotStaJoin:,%{public}d,%s,%s,%s",
         msgInfo.msgCode,
         msgInfo.params.staInfo.bssid.c_str(),
         msgInfo.params.staInfo.deviceName.c_str(),
@@ -131,7 +130,7 @@ void ApService::OnHotspotStaLeave(const StationInfo &info) const
     WifiResponseMsgInfo msgInfo;
     msgInfo.params.staInfo = info;
     msgInfo.msgCode = AP_LEAVE_RES;
-    LOGI("OnHotspotStaleave:,%{public}d,%s,%s,%s",
+    WIFI_LOGI("OnHotspotStaleave:,%{public}d,%s,%s,%s",
         msgInfo.msgCode,
         msgInfo.params.staInfo.bssid.c_str(),
         msgInfo.params.staInfo.deviceName.c_str(),

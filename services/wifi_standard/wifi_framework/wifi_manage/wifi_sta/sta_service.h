@@ -17,7 +17,7 @@
 #define OHOS_WIFI_SERVICE_H
 
 #include "wifi_internal_msg.h"
-#include "sta_connectivity_manager.h"
+#include "sta_auto_connect_service.h"
 #include "sta_monitor.h"
 #include "sta_state_machine.h"
 
@@ -131,21 +131,21 @@ public:
      */
     ErrCode SetCountryCode() const;
     /**
-     * @Description  ConnectivityManager process scan results.
+     * @Description StaAutoConnectService process scan results.
      *
      * @Output: Return operating results to Interface Service after enable wifi
                 successfully through NotifyResult function instead of returning
                 result immediately.
      * @Return success: WIFI_OPT_SUCCESS  failed: WIFI_OPT_FAILED
      */
-    ErrCode ConnectivityManager(const std::vector<WifiScanInfo> &scanResults);
+    ErrCode AutoConnectService(const std::vector<WifiScanInfo> &scanResults);
     ErrCode SyncLinkInfo(const std::vector<WifiScanInfo> &scanResults);
 
 private:
     StaStateMachine *pStaStateMachine;
     StaMonitor *pStaMonitor;
     WifiMessageQueue<WifiResponseMsgInfo> *msgQueueUp;
-    StaConnectivityManager *pStaConnectivityManager;
+    StaAutoConnectService *pStaAutoConnectService;
 };
 }  // namespace Wifi
 }  // namespace OHOS

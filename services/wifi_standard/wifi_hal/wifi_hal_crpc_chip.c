@@ -332,20 +332,3 @@ int RpcSetPowerMode(RpcServer *server, Context *context)
     WriteEnd(context);
     return 0;
 }
-
-int RpcSetLatencyMode(RpcServer *server, Context *context)
-{
-    if (server == NULL || context == NULL) {
-        return -1;
-    }
-    int mode = 0;
-    if (ReadInt(context, &mode) < 0) {
-        return -1;
-    }
-
-    struct WifiStatus status = SetLatencyMode(mode);
-    WriteBegin(context, 0);
-    WriteInt(context, (int)status.code);
-    WriteEnd(context);
-    return 0;
-}

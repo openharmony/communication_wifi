@@ -103,7 +103,6 @@ static int InitRpcFuncMapChip(void)
     ret += PushRpcFunc("GetComboModes", RpcGetComboModes);
     ret += PushRpcFunc("RequestFirmwareDebugDump", RpcRequestFirmwareDebugDump);
     ret += PushRpcFunc("SetPowerMode", RpcSetPowerMode);
-    ret += PushRpcFunc("SetLatencyMode", RpcSetLatencyMode);
     return ret;
 }
 
@@ -134,13 +133,6 @@ static int InitRpcFuncMapSta(void)
     ret += PushRpcFunc("Reconnect", RpcReconnect);
     ret += PushRpcFunc("Reassociate", RpcReassociate);
     ret += PushRpcFunc("Disconnect", RpcDisconnect);
-    ret += PushRpcFunc("SetExternalSim", RpcSetExternalSim);
-    ret += PushRpcFunc("SetBluetoothCoexistenceScanMode", RpcSetBluetoothCoexistenceScanMode);
-    ret += PushRpcFunc("StopFilteringMulticastV4Packets", RpcStopFilteringMulticastV4Packets);
-    ret += PushRpcFunc("StopFilteringMulticastV6Packets", RpcStopFilteringMulticastV6Packets);
-    ret += PushRpcFunc("EnableStaAutoReconnect", RpcEnableStaAutoReconnect);
-    ret += PushRpcFunc("SetConcurrencyPriority", RpcSetConcurrencyPriority);
-    ret += PushRpcFunc("SetSuspendModeEnabled", RpcSetSuspendModeEnabled);
     ret += PushRpcFunc("GetStaCapabilities", RpcGetStaCapabilities);
     ret += PushRpcFunc("GetDeviceMacAddress", RpcGetDeviceMacAddress);
     ret += PushRpcFunc("GetFrequencies", RpcGetFrequencies);

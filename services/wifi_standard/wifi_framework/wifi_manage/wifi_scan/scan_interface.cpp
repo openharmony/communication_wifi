@@ -13,9 +13,9 @@
  * limitations under the License.
  */
 #include "scan_interface.h"
+#include "wifi_logger.h"
 
-#undef LOG_TAG
-#define LOG_TAG "OHWIFI_SCAN_INTERFACE"
+DEFINE_WIFILOG_SCAN_LABEL("ScanStateMachine");
 
 namespace OHOS {
 namespace Wifi {
@@ -24,7 +24,7 @@ ScanInterface::ScanInterface() : pScanService(nullptr)
 
 ScanInterface::~ScanInterface()
 {
-    LOGI("Enter ScanInterface::~ScanInterface.");
+    WIFI_LOGI("Enter ScanInterface::~ScanInterface.");
     if (pScanService != nullptr) {
         delete pScanService;
         pScanService = nullptr;
@@ -33,21 +33,21 @@ ScanInterface::~ScanInterface()
 
 int ScanInterface::Init(WifiMessageQueue<WifiResponseMsgInfo> *mqUp)
 {
-    LOGI("Enter ScanInterface::Init.");
+    WIFI_LOGI("Enter ScanInterface::Init.");
 
     if (mqUp == nullptr) {
-        LOGE("mqUp is null.");
+        WIFI_LOGE("mqUp is null.");
         return -1;
     }
 
     pScanService = new (std::nothrow) ScanService();
     if (pScanService == nullptr) {
-        LOGE("New ScanService failed.");
+        WIFI_LOGE("New ScanService failed.");
         return -1;
     }
 
     if (!(pScanService->InitScanService(mqUp))) {
-        LOGE("InitScanService failed.");
+        WIFI_LOGE("InitScanService failed.");
         delete pScanService;
         pScanService = nullptr;
         return -1;
@@ -58,7 +58,7 @@ int ScanInterface::Init(WifiMessageQueue<WifiResponseMsgInfo> *mqUp)
 
 int ScanInterface::UnInit()
 {
-    LOGI("Enter ScanInterface::UnInit.");
+    WIFI_LOGI("Enter ScanInterface::UnInit.");
     if (pScanService != nullptr) {
         pScanService->UnInitScanService();
     }
@@ -67,10 +67,10 @@ int ScanInterface::UnInit()
 
 int ScanInterface::PushMsg(WifiRequestMsgInfo *requestMsg)
 {
-    LOGI("Enter ScanInterface::PushMsg");
+    WIFI_LOGI("Enter ScanInterface::PushMsg");
 
     if (requestMsg == nullptr) {
-        LOGE("requestMsg is null.");
+        WIFI_LOGE("requestMsg is null.");
         return -1;
     }
 
@@ -80,9 +80,9 @@ int ScanInterface::PushMsg(WifiRequestMsgInfo *requestMsg)
 
 void ScanInterface::HandleRequestMsg(const WifiRequestMsgInfo *requestMsg)
 {
-    LOGI("Enter ScanInterface::HandleRequestMsg");
+    WIFI_LOGI("Enter ScanInterface::HandleRequestMsg");
     if (requestMsg == nullptr) {
-        LOGE("requestMsg is null.");
+        WIFI_LOGE("requestMsg is null.");
         return;
     }
 
@@ -121,55 +121,55 @@ void ScanInterface::HandleRequestMsg(const WifiRequestMsgInfo *requestMsg)
             break;
 
         default:
-            LOGE("requestMsg->msgCode is error.");
+            WIFI_LOGE("requestMsg->msgCode is error.");
             break;
     }
 }
 
 void ScanInterface::DealScanMsg()
 {
-    LOGI("Enter ScanInterface::DealScanMsg");
+    WIFI_LOGI("Enter ScanInterface::DealScanMsg");
 
     if (!(pScanService->Scan(true))) {
-        LOGE("pScanService->Scan failed.");
+        WIFI_LOGE("pScanService->Scan failed.");
     }
     return;
 }
 
 void ScanInterface::DealScanParamMsg(const WifiRequestMsgInfo *requestMsg)
 {
-    LOGI("Enter ScanInterface::DealScanParamMsg");
+    WIFI_LOGI("Enter ScanInterface::DealScanParamMsg");
     if (requestMsg == nullptr) {
-        LOGE("requestMsg is null.");
+        WIFI_LOGE("requestMsg is null.");
         return;
     }
 
     if (!(pScanService->Scan(requestMsg->params.wifiScanParams))) {
-        LOGE("pScanService->Scan failed.");
+        WIFI_LOGE("pScanService->Scan failed.");
     }
     return;
 }
 
 void ScanInterface::DealScanReconnectMsg()
 {
-    LOGI("Enter ScanInterface::DealScanReconnectMsg");
+    WIFI_LOGI("Enter ScanInterface::DealScanReconnectMsg");
 
     if (!(pScanService->Scan(false))) {
-        LOGE("pScanService->Scan failed.");
+        WIFI_LOGE("pScanService->Scan failed.");
     }
     return;
 }
 
 void ScanInterface::DealScreenChangeMsg(const WifiRequestMsgInfo *requestMsg)
 {
-    LOGI("Enter ScanInterface::DealScreenChangeMsg");
+    WIFI_LOGI("Enter ScanInterface::DealScreenChangeMsg");
     if (requestMsg == nullptr) {
-        LOGE("requestMsg is invalid.");
+        WIFI_LOGE("requestMsg is invalid.");
         return;
     }
 
     if (requestMsg->params.wifiMockState.type != MODE_STATE_SCREEN) {
-        LOGE("requestMsg->params->wifiMockState is invalid.");
+        WIFI_LOGE("requestMsg->params->wifiMockState is invalid.");
         return;
     }
     bool screenOn = true;
@@ -182,9 +182,9 @@ void ScanInterface::DealScreenChangeMsg(const WifiRequestMsgInfo *requestMsg)
 
 void ScanInterface::DealStaNotifyScanMsg(const WifiRequestMsgInfo *requestMsg)
 {
-    LOGI("Enter ScanInterface::DealStaNotifyScanMsg");
+    WIFI_LOGI("Enter ScanInterface::DealStaNotifyScanMsg");
     if (requestMsg == nullptr) {
-        LOGE("requestMsg is null.");
+        WIFI_LOGE("requestMsg is null.");
         return;
     }
 
@@ -195,14 +195,14 @@ void ScanInterface::DealStaNotifyScanMsg(const WifiRequestMsgInfo *requestMsg)
 
 void ScanInterface::DealAppModeChangeMsg(const WifiRequestMsgInfo *requestMsg)
 {
-    LOGI("Enter ScanInterface::DealAppModeChangeMsg");
+    WIFI_LOGI("Enter ScanInterface::DealAppModeChangeMsg");
     if (requestMsg == nullptr) {
-        LOGE("requestMsg is null.");
+        WIFI_LOGE("requestMsg is null.");
         return;
     }
 
     if (requestMsg->params.wifiMockState.type != MODE_STATE_APP_RUN) {
-        LOGE("requestMsg->params->wifiMockState is invalid.");
+        WIFI_LOGE("requestMsg->params->wifiMockState is invalid.");
         return;
     }
     pScanService->SetOperateAppMode(requestMsg->params.wifiMockState.state);
@@ -211,14 +211,14 @@ void ScanInterface::DealAppModeChangeMsg(const WifiRequestMsgInfo *requestMsg)
 
 void ScanInterface::DealCustomSceneChangeMsg(const WifiRequestMsgInfo *requestMsg)
 {
-    LOGI("Enter ScanInterface::DealCustomSceneChangeMsg");
+    WIFI_LOGI("Enter ScanInterface::DealCustomSceneChangeMsg");
     if (requestMsg == nullptr) {
-        LOGE("requestMsg is null.");
+        WIFI_LOGE("requestMsg is null.");
         return;
     }
 
     if (requestMsg->params.wifiMockState.type < MODE_STATE_POWER_SAVING) {
-        LOGE("requestMsg->params->wifiMockState is invalid.");
+        WIFI_LOGE("requestMsg->params->wifiMockState is invalid.");
         return;
     }
     time_t now = time(0);

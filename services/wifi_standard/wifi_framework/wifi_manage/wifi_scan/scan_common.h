@@ -19,6 +19,8 @@
 #include <string>
 #include <vector>
 
+namespace OHOS {
+namespace Wifi {
 static const int MIN_SYSTEM_SCAN_INTERVAL = 20;
 static const int MAX_SYSTEM_SCAN_INTERVAL = 160;
 static const int MAX_SCAN_CONFIG_STORE_INDEX = 10000;
@@ -93,7 +95,7 @@ struct StoreScanConfig {
     std::string ssid;           /* Specifies the SSID in parameter scanning. */
     std::string bssid;          /* Specifies the BSSID carried in parameter scanning. */
     std::vector<int> scanFreqs; /* Only APs with specified frequencies are scanned. */
-    long scanTime;              /* Scan Start Time */
+    int64_t scanTime;           /* Scan Start Time */
     bool fullScanFlag;          /* Flag of scan without specifying parameters */
     bool externFlag;            /* Flag indicating whether the request is an external scan. */
 
@@ -177,14 +179,16 @@ struct InterScanResult {
                                * supported by the access point
                                */
     int frequency;            /* Access point frequency */
-    int level;                /* signal strength */
-    long timestamp;           /* Timestamp of scanning */
+    int rssi;                 /* signal strength */
+    int64_t timestamp;        /* Timestamp of scanning */
+    int band;                 /* ap band: 0 - 2.4GHZ, 1 - 5GHZ */
 
     InterScanResult()
     {
         frequency = 0;
-        level = 0;
+        rssi = 0;
         timestamp = 0;
+        band = -1;
     }
 };
 
@@ -211,5 +215,6 @@ struct ScanStatusReport {
 using ScanStatusReportHandler = std::function<void(ScanStatusReport &scanStatusReport)>;
 using ScanResultHandler = std::function<void(std::vector<InterScanResult> &scanResultList)>;
 using PnoScanResultHandler = std::function<void(std::vector<InterScanResult> &pnoScanResultList)>;
-
+}  // namespace Wifi
+}  // namespace OHOS
 #endif

@@ -146,14 +146,6 @@ WifiErrorNo RequestFirmwareDebugDump(unsigned char *bytes, int32_t *size);
  */
 WifiErrorNo SetPowerMode(uint8_t mode);
 
-/**
- * @Description API to set the wifi latency mode.
- *
- * @param mode
- * @return WifiStatus
- */
-WifiStatus SetLatencyMode(LatencyMode mode);
-
 #ifdef __cplusplus
 }
 #endif

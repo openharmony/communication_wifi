@@ -91,10 +91,5 @@ WifiErrorNo WifiChipHalInterface::SetWifiPowerMode(int mode)
 {
     return mIdlClient->SetWifiPowerMode(mode);
 }
-
-WifiStatus WifiChipHalInterface::SetLatencyMode(int mode)
-{
-    return mIdlClient->ReqSetLatencyMode(mode);
-}
 }  // namespace Wifi
 }  // namespace OHOS

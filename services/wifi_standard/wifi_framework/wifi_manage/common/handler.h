@@ -67,28 +67,28 @@ public:
 
     /**
      * @Description : Send a message, place the message in the message queue, and
-                     process the message after delayMillis is delayed.
+                     process the message after delayTimeMs is delayed.
      *
      * @param msg - Message to be sent.[in]
-     * @param delayMillis - Delay Time.[in]
+     * @param delayTimeMs - Delay Time.[in]
      */
-    void SendMessageDelayed(InternalMessage *msg, long delayMillis);
+    void MessageExecutedLater(InternalMessage *msg, int64_t delayTimeMs);
 
     /**
      * @Description : Send a message, place the message in the message queue, and
-                     process the message at the uptimeMillis time point.
+                     process the message at the execTime time point.
      *
      * @param msg - Message to be sent.[in]
-     * @param uptimeMillis - Time when a message is processed.[in]
+     * @param execTime - Time when a message is processed.[in]
      */
-    void SendMessageAtTime(InternalMessage *msg, long uptimeMillis);
+    void MessageExecutedAtTime(InternalMessage *msg, int64_t execTime);
 
     /**
      * @Description : Send a message and place the message at the top of the message queue.
      *
      * @param msg - Message to be sent.[in]
      */
-    void SendMessageAtFrontOfQueue(InternalMessage *msg);
+    void PlaceMessageTopOfQueue(InternalMessage *msg);
 
     /**
      * @Description : Delete messages from the queue.
@@ -102,24 +102,24 @@ public:
      *
      * @param msg - Messages to be processed.[in]
      */
-    void DispatchMessage(InternalMessage *msg);
+    void DistributeMessage(InternalMessage *msg);
 
     /**
-     * @Description : Invoke the ProcessMessage interface of the current state
+     * @Description : Invoke the ExecuteStateMsg interface of the current state
                      to process messages sent to the state machine. The entry/exit
                     of the state machine is also called, and the delayed message
                     is put back into queue when transitioning to a new state.
     *
     * @param msg - Messages.[in]
     */
-    virtual void HandleMessage(InternalMessage *msg) = 0;
+    virtual void ExecuteMessage(InternalMessage *msg) = 0;
 
     /**
      * @Description : Obtains messages from the message queue, distributes the
                          messages, and recycles the messages.
      *
      */
-    void GetAndHandleMessage();
+    void GetAndDistributeMessage();
 
 private:
     /* message queue. */

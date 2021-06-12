@@ -19,10 +19,9 @@
 #include <iostream>
 #include <random>
 #include "log_helper.h"
-#include "wifi_log.h"
+#include "wifi_logger.h"
 
-#undef LOG_TAG
-#define LOG_TAG "OHWIFI_AP_ApConfigUse"
+DEFINE_WIFILOG_HOTSPOT_LABEL("ApConfigUse");
 
 namespace OHOS {
 namespace Wifi {
@@ -67,7 +66,7 @@ void ApConfigUse::TransformFrequencyIntoChannel(std::vector<int> &freqVector, st
     for (size_t i = 0; i < freqVector.size(); ++i) {
         channel = TransformFrequencyIntoChannel(freqVector[i]);
         if (channel == -1) {
-            LOGW("Invalid Freq:%{public}d", freqVector[i]);
+            WIFI_LOGW("Invalid Freq:%{public}d", freqVector[i]);
         } else {
             chanVector.push_back(channel);
         }
@@ -79,7 +78,7 @@ void ApConfigUse::TransformFrequencyIntoChannel(std::vector<int> &freqVector, st
         printList += std::to_string(chanVector[i]);
         printList += "  ";
     }
-    LOGD("TransformFrequencyIntoChannel:size:(%zu) to (%zu).list: %{public}s",
+    WIFI_LOGD("TransformFrequencyIntoChannel:size:(%{public}zu) to (%{public}zu).list: %{public}s",
         freqVector.size(),
         chanVector.size(),
         printList.c_str());
@@ -87,27 +86,27 @@ void ApConfigUse::TransformFrequencyIntoChannel(std::vector<int> &freqVector, st
 
 bool ApConfigUse::SetConfig(HotspotConfig &apConfig) const
 {
-    LOGI("enter SetConfig");
+    WIFI_LOGI("enter SetConfig");
     std::string countryCode;
     WifiSettings::GetInstance().GetCountryCode(countryCode);
     if (WifiApHalInterface::GetInstance().SetWifiCountryCode(countryCode) != WifiErrorNo::WIFI_IDL_OPT_OK) {
-        LOGE("set countryCode:%{public}s failed.", countryCode.c_str());
+        WIFI_LOGE("set countryCode:%{public}s failed.", countryCode.c_str());
         return false;
     }
 
-    LOGI("HotspotConfig::SSID         = %s", apConfig.GetSsid().c_str());
-    LOGI("HotspotConfig::preSharedKey = %s", apConfig.GetPreSharedKey().c_str());
-    LOGI("HotspotConfig::securityType = %{public}d", static_cast<int>(apConfig.GetSecurityType()));
-    LOGI("HotspotConfig::band         = %{public}d", static_cast<int>(apConfig.GetBand()));
-    LOGI("HotspotConfig::channel      = %{public}d", apConfig.GetChannel());
-    LOGI("HotspotConfig::maxConn      = %{public}d", apConfig.GetMaxConn());
-    LOGI("HotspotConfig  CountryCode  = %{public}s", countryCode.c_str());
+    WIFI_LOGI("HotspotConfig::SSID         = %s", apConfig.GetSsid().c_str());
+    WIFI_LOGI("HotspotConfig::preSharedKey = %s", apConfig.GetPreSharedKey().c_str());
+    WIFI_LOGI("HotspotConfig::securityType = %{public}d", static_cast<int>(apConfig.GetSecurityType()));
+    WIFI_LOGI("HotspotConfig::band         = %{public}d", static_cast<int>(apConfig.GetBand()));
+    WIFI_LOGI("HotspotConfig::channel      = %{public}d", apConfig.GetChannel());
+    WIFI_LOGI("HotspotConfig::maxConn      = %{public}d", apConfig.GetMaxConn());
+    WIFI_LOGI("HotspotConfig  CountryCode  = %{public}s", countryCode.c_str());
 
     if (WifiApHalInterface::GetInstance().SetSoftApConfig(apConfig) != WifiErrorNo::WIFI_IDL_OPT_OK) {
-        LOGE("set hostapd hotspot config failed.");
+        WIFI_LOGE("set hostapd hotspot config failed.");
         return false;
     }
-    LOGI("SetConfig OK!");
+    WIFI_LOGI("SetConfig OK!");
     return true;
 }
 
@@ -126,10 +125,10 @@ bool ApConfigUse::ObtainValidChannels() const
     std::vector<int> allowed5GFreq, allowed2GFreq;
     std::vector<int> allowed5GChan, allowed2GChan;
     if (WifiApHalInterface::GetInstance().GetFrequenciesByBand(static_cast<int>(BandType::BAND_2GHZ), allowed2GFreq)) {
-        LOGE("failed to get 2.4G channel");
+        WIFI_LOGE("failed to get 2.4G channel");
     }
     if (WifiApHalInterface::GetInstance().GetFrequenciesByBand(static_cast<int>(BandType::BAND_5GHZ), allowed5GFreq)) {
-        LOGE("failed to get 5G channel");
+        WIFI_LOGE("failed to get 5G channel");
     }
 
     TransformFrequencyIntoChannel(allowed5GFreq, allowed5GChan);
@@ -140,7 +139,7 @@ bool ApConfigUse::ObtainValidChannels() const
     ChanTbs[BandType::BAND_5GHZ] = allowed5GChan;
 
     if (WifiSettings::GetInstance().SetValidChannels(ChanTbs)) {
-        LOGE("failed to SetValidChannels");
+        WIFI_LOGE("failed to SetValidChannels");
         return false;
     }
     return true;
@@ -161,7 +160,7 @@ void ApConfigUse::CheckBandChannel(HotspotConfig &apConfig) const
         }
     }
     if (!cfgValid) {
-        LOGW("Error band or error channels in band, use 2.4G band default channel.");
+        WIFI_LOGW("Error band or error channels in band, use 2.4G band default channel.");
         apConfig.SetBand(BandType::BAND_2GHZ);
         apConfig.SetChannel(AP_CHANNEL_DEFAULT);
     }

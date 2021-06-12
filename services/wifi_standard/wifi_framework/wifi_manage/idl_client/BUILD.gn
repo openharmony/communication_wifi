@@ -89,13 +89,9 @@ ohos_shared_library("wifi_idl_client") {
     "wifi_ap_hal_interface.cpp",
     "wifi_base_hal_interface.cpp",
     "wifi_chip_hal_interface.cpp",
-    "wifi_device_manager.cpp",
-    "wifi_hal_interface.cpp",
     "wifi_idl_client.cpp",
-    "wifi_interface_manager.cpp",
     "wifi_sta_hal_interface.cpp",
     "wifi_supplicant_hal_interface.cpp",
-    "wifi_vendor_interface.cpp",
   ]
 
   configs = [ ":wifi_fw_common_header" ]

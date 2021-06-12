@@ -124,12 +124,6 @@ void WifiDeviceProxy::WriteDeviceConfig(const WifiDeviceConfig &config, MessageP
     data.WriteInt32(config.wepTxKeyIndex);
     data.WriteInt32(config.priority);
     data.WriteBool(config.hiddenSSID);
-    data.WriteBool(config.isEnableWPAICertified);
-    data.WriteInt32(config.allowedKeyManagement);
-    data.WriteInt32(config.allowedProtocols);
-    data.WriteInt32(config.allowedAuthAlgorithms);
-    data.WriteInt32(config.allowedPairwiseCiphers);
-    data.WriteInt32(config.allowedGroupCiphers);
     data.WriteInt32((int)config.wifiIpConfig.assignMethod);
     WriteIpAddress(data, config.wifiIpConfig.staticIpAddress.ipAddress.address);
     data.WriteInt32(config.wifiIpConfig.staticIpAddress.ipAddress.prefixLength);
@@ -242,12 +236,6 @@ void WifiDeviceProxy::ParseDeviceConfigs(MessageParcel &reply, std::vector<WifiD
         config.wepTxKeyIndex = reply.ReadInt32();
         config.priority = reply.ReadInt32();
         config.hiddenSSID = reply.ReadBool();
-        config.isEnableWPAICertified = reply.ReadBool();
-        config.allowedKeyManagement = reply.ReadInt32();
-        config.allowedProtocols = reply.ReadInt32();
-        config.allowedAuthAlgorithms = reply.ReadInt32();
-        config.allowedPairwiseCiphers = reply.ReadInt32();
-        config.allowedGroupCiphers = reply.ReadInt32();
         config.wifiIpConfig.assignMethod = AssignIpMethod(reply.ReadInt32());
         ReadIpAddress(reply, config.wifiIpConfig.staticIpAddress.ipAddress.address);
         config.wifiIpConfig.staticIpAddress.ipAddress.prefixLength = reply.ReadInt32();

@@ -15,29 +15,13 @@ import("//build/ohos.gni")
 
 group("etc") {
   deps = [
-    ":hostapd.conf",
-    ":wifi_standard.rc",
-    ":wpa_supplicant.conf",
+    ":wifi_standard.rc"
   ]
 }
 
 ohos_prebuilt_etc("wifi_standard.rc") {
   source = "wifi_standard.rc"
   relative_install_dir = "init"
-  part_name = "wifi_standard"
-  subsystem_name = "communication"
-}
-
-ohos_prebuilt_etc("wpa_supplicant.conf") {
-  source = "wpa_supplicant.conf"
-  relative_install_dir = "wifi"
-  part_name = "wifi_standard"
-  subsystem_name = "communication"
-}
-
-ohos_prebuilt_etc("hostapd.conf") {
-  source = "hostapd.conf"
-  relative_install_dir = "wifi"
   part_name = "wifi_standard"
   subsystem_name = "communication"
 }

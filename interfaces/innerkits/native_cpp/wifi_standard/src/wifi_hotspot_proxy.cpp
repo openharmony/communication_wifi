@@ -19,7 +19,7 @@
 #include "wifi_logger.h"
 #include "wifi_hotspot_callback_stub.h"
 
-DEFINE_WIFILOG_LABEL("WifiHotspotProxy");
+DEFINE_WIFILOG_HOTSPOT_LABEL("WifiHotspotProxy");
 namespace OHOS {
 namespace Wifi {
 static WifiHotspotCallbackStub *g_wifiHotspotCallbackStub = new WifiHotspotCallbackStub;

@@ -371,30 +371,3 @@ WifiErrorNo SetPowerMode(uint8_t mode)
     UnlockRpcClient(client);
     return result;
 }
-
-WifiStatus SetLatencyMode(LatencyMode mode)
-{
-    struct WifiStatus status;
-
-    RpcClient *client = GetChipRpcClient();
-    LockRpcClient(client);
-    Context *context = client->context;
-    WriteBegin(context, 0);
-    WriteFunc(context, "SetLatencyMode");
-    WriteInt(context, (int)mode);
-    WriteEnd(context);
-    int ret = RemoteCall(client);
-    if (ret < 0) {
-        LOGE("SetLatencyMode:remote call failed!");
-        status.code = (int)WIFI_IDL_OPT_FAILED;
-        UnlockRpcClient(client);
-        return status;
-    }
-    int result = WIFI_IDL_OPT_FAILED;
-    ReadInt(context, &result);
-    ReadClientEnd(client);
-    UnlockRpcClient(client);
-
-    status.code = result;
-    return status;
-}

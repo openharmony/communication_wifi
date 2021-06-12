@@ -17,7 +17,7 @@
 #include "wifi_msg.h"
 #include "define.h"
 
-DEFINE_WIFILOG_LABEL("WifiScanCallbackStub");
+DEFINE_WIFILOG_SCAN_LABEL("WifiScanCallbackStub");
 
 namespace OHOS {
 namespace Wifi {

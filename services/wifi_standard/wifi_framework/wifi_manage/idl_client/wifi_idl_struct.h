@@ -27,7 +27,7 @@ struct WifiIdlDeviceConfig {
     int networkId;
     int priority;
     int scanSsid;
-    int authAlgorithms; /* WifiDeviceConfig.allowedAuthAlgorithms */
+    int authAlgorithms;
     int wepKeyIdx;
     std::string wepKeys[MAX_WEPKEYS_SIZE]; /* max set 4 wepkeys */
     std::string ssid;

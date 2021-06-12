@@ -18,7 +18,7 @@
 #include "wifi_msg.h"
 #include "define.h"
 
-DEFINE_WIFILOG_LABEL("WifiHotspotCallbackStub");
+DEFINE_WIFILOG_HOTSPOT_LABEL("WifiHotspotCallbackStub");
 namespace OHOS {
 namespace Wifi {
 WifiHotspotCallbackStub::WifiHotspotCallbackStub() : userCallback_(nullptr), mRemoteDied(false)

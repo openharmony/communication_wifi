@@ -115,14 +115,6 @@ public:
      * @return WifiErrorNo
      */
     WifiErrorNo SetWifiPowerMode(int mode);
-
-    /**
-     * @Description API to set the wifi latency mode.
-     *
-     * @param mode
-     * @return WifiStatus
-     */
-    WifiStatus SetLatencyMode(int mode);
 };
 }  // namespace Wifi
 }  // namespace OHOS

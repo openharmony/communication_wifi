@@ -18,7 +18,7 @@
 #include "wifi_scan_callback_stub.h"
 
 namespace OHOS {
-DEFINE_WIFILOG_LABEL("WifiScanProxy");
+DEFINE_WIFILOG_SCAN_LABEL("WifiScanProxy");
 namespace Wifi {
 static WifiScanCallbackStub g_wifiScanCallbackStub;
 
@@ -204,8 +204,9 @@ ErrCode WifiScanProxy::GetScanInfoList(std::vector<WifiScanInfo> &result)
         info.ssid = reply.ReadCString();
         info.capabilities = reply.ReadCString();
         info.frequency = reply.ReadInt32();
-        info.level = reply.ReadInt32();
+        info.rssi = reply.ReadInt32();
         info.timestamp = reply.ReadInt32();
+        info.band = reply.ReadInt32();
         result.emplace_back(info);
     }
     return WIFI_OPT_SUCCESS;

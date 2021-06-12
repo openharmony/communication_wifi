@@ -100,14 +100,14 @@ public:
      *
      * @return int
      */
-    int GetArg1() const;
+    int GetParam1() const;
 
     /**
      * @Description : Obtains the second parameter in the message body.
      *
      * @return int
      */
-    int GetArg2() const;
+    int GetParam2() const;
 
     /**
      * @Description : Obtains the message object.
@@ -152,32 +152,18 @@ public:
     void CopyMessageBody(const MessageBody &origBody);
 
     /**
-     * @Description : Get reply.
-     *
-     * @return InternalMessage*
-     */
-    InternalMessage *GetReplyTo() const;
-
-    /**
-     * @Description ： Get sending uid.
-     *
-     * @return int
-     */
-    int GetSendingUid() const;
-
-    /**
      * @Description : Get next message.
      *
      * @return InternalMessage*
      */
-    InternalMessage *GetNext() const;
+    InternalMessage *GetNextMsg() const;
 
     /**
      * @Description : Obtains time.
      *
-     * @return long
+     * @return int64_t
      */
-    long GetWhen() const;
+    int64_t GetHandleTime() const;
 
     /**
      * @Description : Set message name.
@@ -189,16 +175,16 @@ public:
     /**
      * @Description : Set the first parameter in the message body.
      *
-     * @param arg1 - The first parameter.[in]
+     * @param param1 - The first parameter.[in]
      */
-    void SetArg1(int arg1);
+    void SetParam1(int param1);
 
     /**
      * @Description : Set the second parameter in the message body.
      *
-     * @param arg2 - The second parameter.[in]
+     * @param param2 - The second parameter.[in]
      */
-    void SetArg2(int arg2);
+    void SetParam2(int param2);
 
     /**
      * @Description : Release Message Object.
@@ -227,53 +213,35 @@ public:
     void ClearMessageBody();
 
     /**
-     * @Description : Set reply message pointer.
-     *
-     * @param replyTo - reply meassage pointer.[in]
-     */
-    void SetReplyTo(InternalMessage *replyTo);
-
-    /**
-     * @Description : Sets the UID to be sent.
-     *
-     * @param sendingUid - UID to be sent.[in]
-     */
-    void SetSendingUid(int sendingUid);
-
-    /**
      * @Description : Sets next message.
      *
      * @param next - The next message.[in]
      */
-    void SetNext(InternalMessage *next);
+    void SetNextMsg(InternalMessage *nextMsg);
 
     /**
      * @Description : Set the time.
      *
-     * @param when - Time.[in]
+     * @param time - Time.[in]
      */
-    void SetWhen(long when);
+    void SetHandleTime(int64_t time);
 
     /* Message Name */
     int mMsgName;
     /* Parameter 1 */
-    int mArg1;
+    int mParam1;
     /* Parameter 2 */
-    int mArg2;
+    int mParam2;
     /* Message body, which can be empty and can be directly copied. */
     char *pMessageObj;
     /* Message bodies that cannot be directly copied */
     MessageBody mMessageBody;
     /* Message body length */
     int mObjSize;
-    /* Replying to a Message */
-    InternalMessage *pReplyTo;
-    /* Sender UID */
-    int mSendingUid;
     /* Next message in the resource pool or message queue */
-    InternalMessage *pNext;
+    InternalMessage *pNextMsg;
     /* Message execution time */
-    long mWhen;
+    int64_t mHandleTime;
 };
 class MessageManage {
 public:
@@ -289,7 +257,7 @@ public:
      *
      * @return InternalMessage*
      */
-    InternalMessage *Obtain();
+    InternalMessage *CreateMessage();
 
     /**
      * @Description : Obtain original messages.
@@ -297,7 +265,7 @@ public:
      * @param orig - Original messages.[in]
      * @return InternalMessage*
      */
-    InternalMessage *Obtain(const InternalMessage *orig);
+    InternalMessage *CreateMessage(const InternalMessage *orig);
 
     /**
      * @Description : Obtains the message name.
@@ -305,24 +273,24 @@ public:
      * @param messageName - Message name.[in]
      * @return InternalMessage*
      */
-    InternalMessage *Obtain(int messageName);
+    InternalMessage *CreateMessage(int messageName);
 
     /**
      * @Description : Obtaining Message Information.
      *
      * @param messageName - Message name.[in]
-     * @param arg1 - arg1.[in]
-     * @param arg2 - arg2.[in]
+     * @param param1 - param1.[in]
+     * @param param2 - param2.[in]
      * @return InternalMessage*
      */
-    InternalMessage *Obtain(int messageName, int arg1, int arg2);
+    InternalMessage *CreateMessage(int messageName, int param1, int param2);
 
     /**
      * @Description :Recycle message.
      *
      * @param m - message.[in]
      */
-    void Recycle(InternalMessage *m);
+    void ReclaimMsg(InternalMessage *m);
 
     /**
      * @Description : Release pool.
@@ -345,11 +313,11 @@ public:
 
 private:
     /* Maximum number of messages in the message resource pool */
-    const int MAX_POOL_SIZE;
+    const int MAX_MSG_NUM_IN_POOL = 50;
     /* Message resource pool */
-    InternalMessage *pSPool;
+    InternalMessage *pMsgPool;
     /* Number of messages in the message resource pool */
-    int pSPoolSize;
+    int mMsgPoolSize;
     /* Mutex for operating the message resource pool */
     std::mutex mPoolMutex;
     static std::unique_ptr<MessageManage> msgManage;

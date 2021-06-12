@@ -82,6 +82,19 @@ int WriteLong(Context *context, long lData)
     return ContextAppendWrite(context, szTmp, strlen(szTmp));
 }
 
+int WriteInt64(Context *context, int64_t iData)
+{
+    if (context == NULL) {
+        return -1;
+    }
+
+    char szTmp[TMP_CHAR_LEN] = {0};
+    if (snprintf_s(szTmp, sizeof(szTmp), sizeof(szTmp) - 1, "%lld%c", iData, context->cSplit) < 0) {
+        return -1;
+    }
+    return ContextAppendWrite(context, szTmp, strlen(szTmp));
+}
+
 int WriteDouble(Context *context, double dData)
 {
     if (context == NULL) {
@@ -272,6 +285,22 @@ int ReadLong(Context *context, long *pLong)
         return len;
     }
     *pLong = atol(szTmp);
+    context->nPos += len + 1;
+    return 0;
+}
+
+int ReadInt64(Context *context, int64_t *pInt64)
+{
+    if (context == NULL) {
+        return -1;
+    }
+
+    char szTmp[TMP_CHAR_LEN] = {0};
+    int len = ReadNextNum(context, szTmp, sizeof(szTmp));
+    if (len < 0) {
+        return len;
+    }
+    *pInt64 = atoll(szTmp);
     context->nPos += len + 1;
     return 0;
 }

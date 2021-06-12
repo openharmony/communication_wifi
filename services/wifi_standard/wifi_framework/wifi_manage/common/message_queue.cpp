@@ -33,7 +33,7 @@ MessageQueue::~MessageQueue()
     InternalMessage *current = pMessageQueue;
     InternalMessage *next = nullptr;
     while (current != nullptr) {
-        next = current->GetNext();
+        next = current->GetNextMsg();
         delete current;
         current = next;
     }
@@ -41,7 +41,7 @@ MessageQueue::~MessageQueue()
     return;
 }
 
-bool MessageQueue::AddMessageToQueue(InternalMessage *message, long when)
+bool MessageQueue::AddMessageToQueue(InternalMessage *message, int64_t handleTime)
 {
     if (message == nullptr) {
         LOGE("message is null.\n");
@@ -49,12 +49,12 @@ bool MessageQueue::AddMessageToQueue(InternalMessage *message, long when)
     }
 
     if (mNeedQuit) {
-        MessageManage::GetInstance().Recycle(message);
+        MessageManage::GetInstance().ReclaimMsg(message);
         LOGE("Already quit the message queue.\n");
         return false;
     }
 
-    message->SetWhen(when);
+    message->SetHandleTime(handleTime);
     bool needWake = false;
     /*
      * If the queue is empty, the current message needs to be executed
@@ -65,8 +65,8 @@ bool MessageQueue::AddMessageToQueue(InternalMessage *message, long when)
     {
         std::unique_lock<std::mutex> lck(mMtxQueue);
         InternalMessage *pTop = pMessageQueue;
-        if (pTop == nullptr || when == 0 || when < pTop->GetWhen()) {
-            message->SetNext(pTop);
+        if (pTop == nullptr || handleTime == 0 || handleTime < pTop->GetHandleTime()) {
+            message->SetNextMsg(pTop);
             pMessageQueue = message;
             needWake = mIsBlocked;
             /* Inserts messages in the middle of the queue based on the execution time. */
@@ -75,10 +75,10 @@ bool MessageQueue::AddMessageToQueue(InternalMessage *message, long when)
             InternalMessage *pCurrent = pTop;
             while (pCurrent != nullptr) {
                 pPrev = pCurrent;
-                pCurrent = pCurrent->GetNext();
-                if (pCurrent == nullptr || when < pCurrent->GetWhen()) {
-                    message->SetNext(pCurrent);
-                    pPrev->SetNext(message);
+                pCurrent = pCurrent->GetNextMsg();
+                if (pCurrent == nullptr || handleTime < pCurrent->GetHandleTime()) {
+                    message->SetNextMsg(pCurrent);
+                    pPrev->SetNextMsg(message);
                     break;
                 }
             }
@@ -106,18 +106,18 @@ bool MessageQueue::DeleteMessageFromQueue(int messageName)
     InternalMessage *pCurrent = pTop;
     while (pCurrent != nullptr) {
         InternalMessage *pPrev = pCurrent;
-        pCurrent = pCurrent->GetNext();
+        pCurrent = pCurrent->GetNextMsg();
         if ((pCurrent != nullptr) && (pCurrent->GetMessageName() == messageName)) {
-            InternalMessage *pNext = pCurrent->GetNext();
-            pPrev->SetNext(pNext);
-            MessageManage::GetInstance().Recycle(pCurrent);
-            pCurrent = pNext;
+            InternalMessage *pNextMsg = pCurrent->GetNextMsg();
+            pPrev->SetNextMsg(pNextMsg);
+            MessageManage::GetInstance().ReclaimMsg(pCurrent);
+            pCurrent = pNextMsg;
         }
     }
 
     if (pTop->GetMessageName() == messageName) {
-        pMessageQueue = pTop->GetNext();
-        MessageManage::GetInstance().Recycle(pTop);
+        pMessageQueue = pTop->GetNextMsg();
+        MessageManage::GetInstance().ReclaimMsg(pTop);
     }
 
     return true;
@@ -135,21 +135,21 @@ InternalMessage *MessageQueue::GetNextMessage()
             LOGE("gettimeofday failed.\n");
             return nullptr;
         }
-        long nowTime = curTime.tv_sec * TIME_USEC_1000 + curTime.tv_usec / TIME_USEC_1000;
+        int64_t nowTime = static_cast<int64_t>(curTime.tv_sec) * TIME_USEC_1000 + curTime.tv_usec / TIME_USEC_1000;
 
         {
             std::unique_lock<std::mutex> lck(mMtxQueue);
             InternalMessage *curMsg = pMessageQueue;
             if (curMsg != nullptr) {
-                if (nowTime < curMsg->GetWhen()) {
+                if (nowTime < curMsg->GetHandleTime()) {
                     /* The execution time of the first message is not reached.
                        The remaining time is blocked here. */
-                    nextBlockTime = curMsg->GetWhen() - nowTime;
+                    nextBlockTime = curMsg->GetHandleTime() - nowTime;
                 } else {
                     /* Return the first message. */
                     mIsBlocked = false;
-                    pMessageQueue = curMsg->GetNext();
-                    curMsg->SetNext(nullptr);
+                    pMessageQueue = curMsg->GetNextMsg();
+                    curMsg->SetNextMsg(nullptr);
                     return curMsg;
                 }
             } else {

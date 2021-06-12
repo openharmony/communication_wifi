@@ -16,6 +16,7 @@
 #ifndef CRPC_SERIAL_H
 #define CRPC_SERIAL_H
 
+#include <stdint.h>
 #include "common.h"
 #include "context.h"
 
@@ -58,6 +59,15 @@ int WriteInt(Context *context, int i);
  * @return int - 0 Success; -1 Failed
  */
 int WriteLong(Context *context, long L);
+
+/**
+ * @Description Write data of the int64 type
+ *
+ * @param context - Communication Context
+ * @param i - int64 integer
+ * @return int - 0 Success; -1 Failed
+ */
+int WriteInt64(Context *context, int64_t i);
 
 /**
  * @Description Write data of the double type
@@ -131,6 +141,15 @@ int ReadInt(Context *context, int *i);
  * @return int - 0 Success; < 0 read error
  */
 int ReadLong(Context *context, long *L);
+
+/**
+ * @Description Reads data of the int64 type from the context
+ *
+ * @param context - Communication Context
+ * @param i - pointer to a int64
+ * @return int - 0 Success; < 0 read error
+ */
+int ReadInt64(Context *context, int64_t *i);
 
 /**
  * @Description Reads data of the double type from the context

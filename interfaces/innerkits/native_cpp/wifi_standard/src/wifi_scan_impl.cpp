@@ -19,7 +19,7 @@
 #include "wifi_logger.h"
 #include "wifi_scan_proxy.h"
 
-DEFINE_WIFILOG_LABEL("WifiScanImpl");
+DEFINE_WIFILOG_SCAN_LABEL("WifiScanImpl");
 
 namespace OHOS {
 namespace Wifi {

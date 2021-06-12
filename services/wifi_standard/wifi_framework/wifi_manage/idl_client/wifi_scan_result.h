@@ -27,7 +27,7 @@ public:
     std::string infoElement;
     int frequency;
     int signalLevel;
-    long timestamp;
+    int64_t timestamp;
     std::string capability;
     bool associated;
 };

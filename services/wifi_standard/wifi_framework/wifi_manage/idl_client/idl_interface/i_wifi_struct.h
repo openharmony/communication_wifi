@@ -25,7 +25,7 @@ typedef char BOOL;
 #define TRUE 1
 #define FALSE 0
 
-#define WIFI_SSID_LENGTH 128
+#define WIFI_SSID_LENGTH 132
 #define WIFI_BSSID_LENGTH 128
 #define WIFI_SCAN_RESULT_ELEMENT_LENGTH 256
 #define WIFI_SCAN_RESULT_CAPABILITIES_LENGTH 256
@@ -96,7 +96,7 @@ typedef struct ScanResult {
     char infoElement[WIFI_SCAN_RESULT_ELEMENT_LENGTH];
     int frequency;
     int signalLevel;
-    long timestamp;
+    int64_t timestamp;
     char capability[WIFI_SCAN_RESULT_CAPABILITIES_LENGTH];
     int associated;
 } ScanResult;
@@ -174,9 +174,6 @@ typedef enum SupplicantStatusCode {
     /* * Network with the provided id does not exist. */
     FAILURE_NETWORK_UNKNOWN
 } SupplicantStatusCode;
-
-/* Low-latency mode */
-typedef enum LatencyMode { NORMAL = 0, LOW = 1 } LatencyMode;
 
 /**
  * Enum values indicating the status of operation.

@@ -79,12 +79,12 @@ void *Handler::RunHandleThreadFunc(void *pInstance)
     }
 
     Handler *pHandler = (Handler *)pInstance;
-    pHandler->GetAndHandleMessage();
+    pHandler->GetAndDistributeMessage();
 
     return nullptr;
 }
 
-void Handler::GetAndHandleMessage()
+void Handler::GetAndDistributeMessage()
 {
     if (pMyQueue == nullptr) {
         LOGE("pMyQueue is null.\n");
@@ -98,8 +98,8 @@ void Handler::GetAndHandleMessage()
             continue;
         }
 
-        DispatchMessage(msg);
-        MessageManage::GetInstance().Recycle(msg);
+        DistributeMessage(msg);
+        MessageManage::GetInstance().ReclaimMsg(msg);
     }
 
     return;
@@ -113,19 +113,19 @@ void Handler::SendMessage(InternalMessage *msg)
     }
 
     LOGD("Handler::SendMessage msg:%{public}d", msg->GetMessageName());
-    SendMessageDelayed(msg, 0);
+    MessageExecutedLater(msg, 0);
     return;
 }
 
-void Handler::SendMessageDelayed(InternalMessage *msg, long delayMillis)
+void Handler::MessageExecutedLater(InternalMessage *msg, int64_t delayTimeMs)
 {
     if (msg == nullptr) {
-        LOGE("Handler::SendMessageDelayed: msg is null.");
+        LOGE("Handler::MessageExecutedLater: msg is null.");
         return;
     }
 
-    LOGD("Handler::SendMessageDelayed msg:%{public}d", msg->GetMessageName());
-    long delayTime = delayMillis;
+    LOGD("Handler::MessageExecutedLater msg:%{public}d", msg->GetMessageName());
+    int64_t delayTime = delayTimeMs;
     if (delayTime < 0) {
         delayTime = 0;
     }
@@ -136,26 +136,26 @@ void Handler::SendMessageDelayed(InternalMessage *msg, long delayMillis)
         LOGE("gettimeofday failed.\n");
         return;
     }
-    long nowTime = curTime.tv_sec * USEC_1000 + curTime.tv_usec / USEC_1000;
+    int64_t nowTime = static_cast<int64_t>(curTime.tv_sec) * USEC_1000 + curTime.tv_usec / USEC_1000;
 
-    SendMessageAtTime(msg, nowTime + delayTime);
+    MessageExecutedAtTime(msg, nowTime + delayTime);
     return;
 }
 
-void Handler::SendMessageAtTime(InternalMessage *msg, long uptimeMillis)
+void Handler::MessageExecutedAtTime(InternalMessage *msg, int64_t execTime)
 {
     if (msg == nullptr) {
-        LOGE("Handler::SendMessageAtTime: msg is null.");
+        LOGE("Handler::MessageExecutedAtTime: msg is null.");
         return;
     }
 
-    LOGD("Handler::SendMessageAtTime msg: %{public}d", msg->GetMessageName());
+    LOGD("Handler::MessageExecutedAtTime msg: %{public}d", msg->GetMessageName());
     if (pMyQueue == nullptr) {
         LOGE("pMyQueue is null.\n");
         return;
     }
 
-    if (pMyQueue->AddMessageToQueue(msg, uptimeMillis) != true) {
+    if (pMyQueue->AddMessageToQueue(msg, execTime) != true) {
         LOGE("AddMessageToQueue failed.\n");
         return;
     }
@@ -163,14 +163,14 @@ void Handler::SendMessageAtTime(InternalMessage *msg, long uptimeMillis)
     return;
 }
 
-void Handler::SendMessageAtFrontOfQueue(InternalMessage *msg)
+void Handler::PlaceMessageTopOfQueue(InternalMessage *msg)
 {
     if (msg == nullptr) {
-        LOGE("Handler::SendMessageAtFrontOfQueue: msg is null.");
+        LOGE("Handler::PlaceMessageTopOfQueue: msg is null.");
         return;
     }
 
-    LOGD("Handler::SendMessageAtFrontOfQueue msg: %{public}d", msg->GetMessageName());
+    LOGD("Handler::PlaceMessageTopOfQueue msg: %{public}d", msg->GetMessageName());
     if (pMyQueue == nullptr) {
         LOGE("pMyQueue is null.\n");
         return;
@@ -200,12 +200,12 @@ void Handler::DeleteMessageFromQueue(int messageName)
     return;
 }
 
-void Handler::DispatchMessage(InternalMessage *msg)
+void Handler::DistributeMessage(InternalMessage *msg)
 {
     if (msg == nullptr) {
         return;
     }
-    HandleMessage(msg);
+    ExecuteMessage(msg);
     return;
 }
 }  // namespace Wifi

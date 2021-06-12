@@ -966,16 +966,6 @@ WifiErrorNo WifiIdlClient::SetWifiPowerMode(int mode)
     return WIFI_IDL_OPT_OK;
 }
 
-WifiStatus WifiIdlClient::ReqSetLatencyMode(int mode)
-{
-    if (pRpcClient == nullptr) {
-        WifiStatus status = {ERROR_UNKNOWN, "UNKNOWN"};
-        return status;
-    }
-    LatencyMode latencyMode = (LatencyMode)mode;
-    return SetLatencyMode(latencyMode);
-}
-
 WifiErrorNo WifiIdlClient::ReqStartSupplicant(void)
 {
     if (pRpcClient == nullptr) {

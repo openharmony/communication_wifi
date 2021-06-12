@@ -75,14 +75,12 @@ void MessageBody::CopyMessageBody(const MessageBody &origBody)
 
 InternalMessage::InternalMessage()
     : mMsgName(0),
-      mArg1(0),
-      mArg2(0),
+      mParam1(0),
+      mParam2(0),
       pMessageObj(nullptr),
       mObjSize(0),
-      pReplyTo(nullptr),
-      mSendingUid(0),
-      pNext(nullptr),
-      mWhen(0)
+      pNextMsg(nullptr),
+      mHandleTime(0)
 {}
 
 InternalMessage::~InternalMessage()
@@ -100,14 +98,14 @@ int InternalMessage::GetMessageName() const
     return mMsgName;
 }
 
-int InternalMessage::GetArg1() const
+int InternalMessage::GetParam1() const
 {
-    return mArg1;
+    return mParam1;
 }
 
-int InternalMessage::GetArg2() const
+int InternalMessage::GetParam2() const
 {
-    return mArg2;
+    return mParam2;
 }
 
 const char *InternalMessage::GetMessageObj() const
@@ -141,24 +139,14 @@ void InternalMessage::CopyMessageBody(const MessageBody &origBody)
     return;
 }
 
-InternalMessage *InternalMessage::GetReplyTo() const
+InternalMessage *InternalMessage::GetNextMsg() const
 {
-    return pReplyTo;
+    return pNextMsg;
 }
 
-int InternalMessage::GetSendingUid() const
+int64_t InternalMessage::GetHandleTime() const
 {
-    return mSendingUid;
-}
-
-InternalMessage *InternalMessage::GetNext() const
-{
-    return pNext;
-}
-
-long InternalMessage::GetWhen() const
-{
-    return mWhen;
+    return mHandleTime;
 }
 
 void InternalMessage::SetMessageName(int msgName)
@@ -167,15 +155,15 @@ void InternalMessage::SetMessageName(int msgName)
     return;
 }
 
-void InternalMessage::SetArg1(int arg1)
+void InternalMessage::SetParam1(int param1)
 {
-    mArg1 = arg1;
+    mParam1 = param1;
     return;
 }
 
-void InternalMessage::SetArg2(int arg2)
+void InternalMessage::SetParam2(int param2)
 {
-    mArg2 = arg2;
+    mParam2 = param2;
     return;
 }
 
@@ -207,27 +195,15 @@ void InternalMessage::ClearMessageBody()
     return;
 }
 
-void InternalMessage::SetReplyTo(InternalMessage *replyTo)
+void InternalMessage::SetNextMsg(InternalMessage *nextMsg)
 {
-    pReplyTo = replyTo;
+    pNextMsg = nextMsg;
     return;
 }
 
-void InternalMessage::SetSendingUid(int sendingUid)
+void InternalMessage::SetHandleTime(int64_t time)
 {
-    mSendingUid = sendingUid;
-    return;
-}
-
-void InternalMessage::SetNext(InternalMessage *next)
-{
-    pNext = next;
-    return;
-}
-
-void InternalMessage::SetWhen(long when)
-{
-    mWhen = when;
+    mHandleTime = time;
     return;
 }
 
@@ -241,7 +217,7 @@ MessageManage &MessageManage::GetInstance()
     return *msgManage;
 }
 
-MessageManage::MessageManage() : MAX_POOL_SIZE(MAX_POOL_SIZE_INIT), pSPool(nullptr), pSPoolSize(0)
+MessageManage::MessageManage() : pMsgPool(nullptr), mMsgPoolSize(0)
 {}
 
 MessageManage::~MessageManage()
@@ -250,15 +226,15 @@ MessageManage::~MessageManage()
     return;
 }
 
-InternalMessage *MessageManage::Obtain()
+InternalMessage *MessageManage::CreateMessage()
 {
     {
         std::unique_lock<std::mutex> lock(mPoolMutex);
-        if (pSPool != nullptr) {
-            InternalMessage *m = pSPool;
-            pSPool = m->GetNext();
-            m->SetNext(nullptr);
-            pSPoolSize--;
+        if (pMsgPool != nullptr) {
+            InternalMessage *m = pMsgPool;
+            pMsgPool = m->GetNextMsg();
+            m->SetNextMsg(nullptr);
+            mMsgPoolSize--;
             return m;
         }
     }
@@ -267,26 +243,24 @@ InternalMessage *MessageManage::Obtain()
     return pMessage;
 }
 
-InternalMessage *MessageManage::Obtain(const InternalMessage *orig)
+InternalMessage *MessageManage::CreateMessage(const InternalMessage *orig)
 {
-    InternalMessage *m = Obtain();
+    InternalMessage *m = CreateMessage();
     if (m == nullptr) {
         return nullptr;
     }
 
     m->SetMessageName(orig->GetMessageName());
-    m->SetArg1(orig->GetArg1());
-    m->SetArg2(orig->GetArg2());
+    m->SetParam1(orig->GetParam1());
+    m->SetParam2(orig->GetParam2());
     m->CopyMessageBody(orig->GetMessageBody());
-    m->SetReplyTo(orig->GetReplyTo());
-    m->SetSendingUid(orig->GetSendingUid());
 
     return m;
 }
 
-InternalMessage *MessageManage::Obtain(int messageName)
+InternalMessage *MessageManage::CreateMessage(int messageName)
 {
-    InternalMessage *m = Obtain();
+    InternalMessage *m = CreateMessage();
     if (m == nullptr) {
         return nullptr;
     }
@@ -295,39 +269,37 @@ InternalMessage *MessageManage::Obtain(int messageName)
     return m;
 }
 
-InternalMessage *MessageManage::Obtain(int messageName, int arg1, int arg2)
+InternalMessage *MessageManage::CreateMessage(int messageName, int param1, int param2)
 {
-    InternalMessage *m = Obtain();
+    InternalMessage *m = CreateMessage();
     if (m == nullptr) {
         return nullptr;
     }
 
     m->SetMessageName(messageName);
-    m->SetArg1(arg1);
-    m->SetArg2(arg2);
+    m->SetParam1(param1);
+    m->SetParam2(param2);
     return m;
 }
 
-void MessageManage::Recycle(InternalMessage *m)
+void MessageManage::ReclaimMsg(InternalMessage *m)
 {
     if (m == nullptr) {
         return;
     }
 
     m->SetMessageName(0);
-    m->SetArg1(0);
-    m->SetArg2(0);
+    m->SetParam1(0);
+    m->SetParam2(0);
     m->ReleaseMessageObj();
     m->ClearMessageBody();
-    m->SetReplyTo(nullptr);
-    m->SetSendingUid(-1);
 
     {
         std::unique_lock<std::mutex> lock(mPoolMutex);
-        if (pSPoolSize < MAX_POOL_SIZE) {
-            m->SetNext(pSPool);
-            pSPool = m;
-            pSPoolSize++;
+        if (mMsgPoolSize < MAX_MSG_NUM_IN_POOL) {
+            m->SetNextMsg(pMsgPool);
+            pMsgPool = m;
+            mMsgPoolSize++;
             return;
         }
     }
@@ -339,10 +311,10 @@ void MessageManage::Recycle(InternalMessage *m)
 void MessageManage::ReleasePool()
 {
     std::unique_lock<std::mutex> lock(mPoolMutex);
-    InternalMessage *current = pSPool;
+    InternalMessage *current = pMsgPool;
     InternalMessage *next = nullptr;
     while (current != nullptr) {
-        next = current->GetNext();
+        next = current->GetNextMsg();
         delete current;
         current = next;
     }

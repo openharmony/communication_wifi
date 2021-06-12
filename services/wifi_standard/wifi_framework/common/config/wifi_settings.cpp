@@ -134,7 +134,7 @@ int WifiSettings::GetScanInfoList(std::vector<WifiScanInfo> &results)
 {
     struct timespec clkTime = {0, 0};
     clock_gettime(CLOCK_MONOTONIC, &clkTime);
-    long curr = clkTime.tv_sec * MSEC * MSEC + clkTime.tv_nsec / MSEC; /* us */
+    int64_t curr = static_cast<int64_t>(clkTime.tv_sec) * MSEC * MSEC + clkTime.tv_nsec / MSEC; /* us */
     std::unique_lock<std::mutex> lock(mInfoMutex);
     for (auto iter = mWifiScanInfoList.begin(); iter != mWifiScanInfoList.end(); ++iter) {
         if (iter->timestamp + WIFI_GET_SCAN_RESULT_VALID_TIMESTAMP * MSEC * MSEC < curr) {
@@ -861,37 +861,15 @@ int WifiSettings::GetscoretacticsSecurityScore()
     return mWifiConfig.scoretacticsSecurityScore;
 }
 
-int WifiSettings::SetsavedNetworkEvaluatorPriority(const int &priority)
+int WifiSettings::SetsavedDeviceAppraisalPriority(const int &priority)
 {
-    mWifiConfig.savedNetworkEvaluatorPriority = priority;
+    mWifiConfig.savedDeviceAppraisalPriority = priority;
     return 0;
 }
 
-int WifiSettings::GetsavedNetworkEvaluatorPriority()
+int WifiSettings::GetsavedDeviceAppraisalPriority()
 {
-    return mWifiConfig.savedNetworkEvaluatorPriority;
-}
-
-int WifiSettings::SetscoredNetworkEvaluatorPriority(const int &priority)
-{
-    mWifiConfig.scoredNetworkEvaluatorPriority = priority;
-    return 0;
-}
-
-int WifiSettings::GetscoredNetworkEvaluatorPriority()
-{
-    return mWifiConfig.scoredNetworkEvaluatorPriority;
-}
-
-int WifiSettings::SetpasspointNetworkEvaluatorPriority(const int &priority)
-{
-    mWifiConfig.passpointNetworkEvaluatorPriority = priority;
-    return 0;
-}
-
-int WifiSettings::GetpasspointNetworkEvaluatorPriority()
-{
-    return mWifiConfig.passpointNetworkEvaluatorPriority;
+    return mWifiConfig.savedDeviceAppraisalPriority;
 }
 
 bool WifiSettings::IsModulePreLoad(const std::string &name)

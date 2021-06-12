@@ -219,6 +219,8 @@ static void NativeCppScanInfoToJsScanInfo(const std::vector<WifiScanInfo>& vecCp
 
         jsScanInfo.ssid = e.ssid;
         jsScanInfo.bssid = e.bssid;
+        jsScanInfo.rssi = e.rssi;
+        jsScanInfo.band = e.band;
         jsScanInfo.frequency = e.frequency;
         jsScanInfo.timestamp = e.timestamp;
         vecJsScnIanfo.push_back(jsScanInfo);

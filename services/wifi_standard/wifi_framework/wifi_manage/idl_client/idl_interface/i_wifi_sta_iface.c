@@ -530,7 +530,7 @@ WifiErrorNo GetScanResults(ScanResult *results, int *size)
             ReadInt(context, &results[i].signalLevel);
             ReadStr(context, results[i].capability, WIFI_SCAN_RESULT_CAPABILITIES_LENGTH);
             ReadStr(context, results[i].ssid, WIFI_SSID_LENGTH);
-            ReadLong(context, &results[i].timestamp);
+            ReadInt64(context, &results[i].timestamp);
         }
     }
     ReadClientEnd(client);

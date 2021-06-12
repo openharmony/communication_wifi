@@ -43,10 +43,10 @@ public:
      * @Description : Inserting Messages into Queues.
      *
      * @param message - Message to be inserted.[in]
-     * @param when - Message execution time.[in]
+     * @param handleTime - Message execution time.[in]
      * @return true : success, false : failed.
      */
-    bool AddMessageToQueue(InternalMessage *message, long when);
+    bool AddMessageToQueue(InternalMessage *message, int64_t handleTime);
 
     /**
      * @Description : Delete messages from the queue.

@@ -140,20 +140,6 @@ enum class IsWpsConnected {
     WPS_CONNECTED = 0,
     WPS_INVALID = -1,
 };
-/* WifiLock mode */
-enum class WifiLockMode {
-    WIFI_MODE_FULL = 0,
-    WIFI_MODE_SCAN_ONLY = 1,
-    WIFI_MODE_FULL_HIGH_PERF = 2,
-    WIFI_MODE_FULL_LOW_LATENCY = 3,
-    WIFI_MODE_NO_LOCKS_HELD = 4
-};
-
-enum class LowLatecySupport {
-    LOW_LATENCY_SUPPORT_UNDEFINED = 0,
-    LOW_LATENCY_SUPPORTED = 1,
-    LOW_LATENCY_NOT_SUPPORTED = 2
-};
 
 /* WPS config */
 struct WpsConfig {
@@ -357,41 +343,8 @@ struct WifiDeviceConfig {
     int priority;
     /* is hidden network */
     bool hiddenSSID;
-    /* Is enable WPAI Certified */
-    bool isEnableWPAICertified;
-    /**
-     * support encryption mode, use bit define enable/disable;
-     * 0: NONE,1:WPA_PSK,2:WPA_EAP,3:IEEE8021X example:
-     * value is 7 and binary is 0111, this defines
-     * support NONE, WPA_PSK and WPA_EAP
-     */
-    unsigned int allowedKeyManagement;
-    /**
-     * support encryption protocols, use bit define enable/disable
-     * 0: WPA, 1: RSN example: value is 2 and binary is 0010,
-     * this defines support RSN.
-     */
-    int allowedProtocols;
-    /**
-     * support auth algorithms, use bit define enable/disable;
-     * bit 0: OPEN 1: SHARED 2 LEAP example: value is 3 and binary
-     * is 0011, this defines support OPEN and SHARED。
-     */
-    int allowedAuthAlgorithms;
-    /**
-     * support PairwiseCiphers, use bit define enable/disable;
-     * 0: NONE 1: TKIP 2:CCMP example: value is 3 and binary is 0011,
-     * this defines support NONE and TKIP.
-     */
-    int allowedPairwiseCiphers;
     /* Random mac address */
     std::string macAddress;
-    /**
-     * support GroupCiphers, use bit define enable/disable;
-     * 0: WEP40, 1: WEP104, 2: TKIP, 3: CCMP example: value is 7 and
-     * binary is 0111, this defines support WEP40, WEP104 and TKIP.
-     */
-    int allowedGroupCiphers;
     WifiIpConfig wifiIpConfig;
     WifiEapConfig wifiEapConfig;
     WifiProxyConfig wifiProxyconfig;
@@ -410,12 +363,6 @@ struct WifiDeviceConfig {
         wepTxKeyIndex = 0;
         priority = 0;
         hiddenSSID = false;
-        isEnableWPAICertified = false;
-        allowedKeyManagement = 0;
-        allowedProtocols = 0;
-        allowedAuthAlgorithms = 0;
-        allowedPairwiseCiphers = 0;
-        allowedGroupCiphers = 0;
         wifiPrivacySetting = WifiPrivacyConfig::RANDOMMAC;
         rssi = -100;
     }
@@ -470,27 +417,6 @@ struct WifiMockState {
     {
         type = 0;
         state = 0;
-    }
-};
-
-struct SingleAppForbid {
-    int appID;
-    ScanIntervalMode scanIntervalMode;
-    int lessThanIntervalNum;
-    time_t continueScanTime;
-    time_t blockListScanTime;
-    int expScanCount;
-    int fixedScanCount;
-    time_t fixedCurrentTime;
-    SingleAppForbid()
-    {
-        appID = 0;
-        lessThanIntervalNum = 0;
-        continueScanTime = 0;
-        blockListScanTime = 0;
-        expScanCount = 0;
-        fixedScanCount = 0;
-        fixedCurrentTime = 0;
     }
 };
 

@@ -37,12 +37,6 @@ static void ClearWifiDeviceConfig(WifiDeviceConfig &item)
     item.wepTxKeyIndex = 0;
     item.priority = 0;
     item.hiddenSSID = false;
-    item.isEnableWPAICertified = false;
-    item.allowedKeyManagement = 0;
-    item.allowedProtocols = 0;
-    item.allowedAuthAlgorithms = 0;
-    item.allowedPairwiseCiphers = 0;
-    item.allowedGroupCiphers = 0;
     return;
 }
 
@@ -146,18 +140,6 @@ static void SetWifiDeviceConfig(WifiDeviceConfig &item, const std::string &key, 
     }
     if (key == "hiddenSSID") {
         item.hiddenSSID = std::stoi(value);
-    } else if (key == "isEnableWPAICertified") {
-        item.isEnableWPAICertified = std::stoi(value);
-    } else if (key == "allowedKeyManagement") {
-        item.allowedKeyManagement = std::stoi(value);
-    } else if (key == "allowedProtocols") {
-        item.allowedProtocols = std::stoi(value);
-    } else if (key == "allowedAuthAlgorithms") {
-        item.allowedAuthAlgorithms = std::stoi(value);
-    } else if (key == "allowedPairwiseCiphers") {
-        item.allowedPairwiseCiphers = std::stoi(value);
-    } else if (key == "allowedGroupCiphers") {
-        item.allowedGroupCiphers = std::stoi(value);
     } else if (key.compare(0, strlen("wepKeys"), "wepKeys") == 0) {
         int pos = std::stoi(key.substr(strlen("wepKeys") + 1));
         if (pos >= 0 && pos < WEPKEYS_SIZE) {
@@ -282,12 +264,6 @@ static std::string OutPutWifiDeviceConfig(WifiDeviceConfig &item)
     ss << "wepTxKeyIndex=" << item.wepTxKeyIndex << std::endl;
     ss << "priority=" << item.priority << std::endl;
     ss << "hiddenSSID=" << (int)item.hiddenSSID << std::endl;
-    ss << "isEnableWPAICertified=" << (int)item.isEnableWPAICertified << std::endl;
-    ss << "allowedKeyManagement=" << item.allowedKeyManagement << std::endl;
-    ss << "allowedProtocols=" << item.allowedProtocols << std::endl;
-    ss << "allowedAuthAlgorithms=" << item.allowedAuthAlgorithms << std::endl;
-    ss << "allowedPairwiseCiphers=" << item.allowedPairwiseCiphers << std::endl;
-    ss << "allowedGroupCiphers=" << item.allowedGroupCiphers << std::endl;
     for (int i = 0; i < WEPKEYS_SIZE; ++i) {
         ss << "wepKeys_" << i << "=" << item.wepKeys[i] << std::endl;
     }
@@ -466,9 +442,7 @@ void ClearTClass<WifiConfig>(WifiConfig &item)
     item.scanAlwaysSwitch = false;
     item.staAirplaneMode = false;
     item.staLastState = false;
-    item.savedNetworkEvaluatorPriority = PRIORITY_1;
-    item.scoredNetworkEvaluatorPriority = PRIORITY_2;
-    item.passpointNetworkEvaluatorPriority = PRIORITY_3;
+    item.savedDeviceAppraisalPriority = PRIORITY_1;
     item.scoretacticsScoreSlope = SCORE_SLOPE;
     item.scoretacticsInitScore = INIT_SCORE;
     item.scoretacticsSameBssidScore = SAME_BSSID_SCORE;
@@ -506,12 +480,8 @@ static int SetWifiConfigValueFirst(WifiConfig &item, const std::string &key, con
         item.staAirplaneMode = (std::stoi(value) != 0); /* 0 -> false 1 -> true */
     } else if (key == "staLastState") {
         item.staLastState = (std::stoi(value) != 0);
-    } else if (key == "savedNetworkEvaluatorPriority") {
-        item.savedNetworkEvaluatorPriority = std::stoi(value);
-    } else if (key == "scoredNetworkEvaluatorPriority") {
-        item.scoredNetworkEvaluatorPriority = std::stoi(value);
-    } else if (key == "passpointNetworkEvaluatorPriority") {
-        item.passpointNetworkEvaluatorPriority = std::stoi(value);
+    } else if (key == "savedDeviceAppraisalPriority") {
+        item.savedDeviceAppraisalPriority = std::stoi(value);
     } else if (key == "scoretacticsScoreSlope") {
         item.scoretacticsScoreSlope = std::stoi(value);
     } else if (key == "scoretacticsInitScore") {
@@ -593,9 +563,7 @@ std::string OutTClassString<WifiConfig>(WifiConfig &item)
     ss << "scanAlwaysSwitch=" << item.scanAlwaysSwitch << std::endl; /* bool false->0 true->1 */
     ss << "staAirplaneMode=" << item.staAirplaneMode << std::endl;
     ss << "staLastState=" << item.staLastState << std::endl;
-    ss << "savedNetworkEvaluatorPriority=" << item.savedNetworkEvaluatorPriority << std::endl;
-    ss << "scoredNetworkEvaluatorPriority=" << item.scoredNetworkEvaluatorPriority << std::endl;
-    ss << "passpointNetworkEvaluatorPriority=" << item.passpointNetworkEvaluatorPriority << std::endl;
+    ss << "savedDeviceAppraisalPriority=" << item.savedDeviceAppraisalPriority << std::endl;
     ss << "scoretacticsScoreSlope=" << item.scoretacticsScoreSlope << std::endl;
     ss << "scoretacticsInitScore=" << item.scoretacticsInitScore << std::endl;
     ss << "scoretacticsSameBssidScore=" << item.scoretacticsSameBssidScore << std::endl;

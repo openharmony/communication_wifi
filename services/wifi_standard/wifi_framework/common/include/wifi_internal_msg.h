@@ -193,6 +193,27 @@ struct WifiEventCallbackMsg {
     }
 };
 
+struct SingleAppForbid {
+    int appID;
+    ScanIntervalMode scanIntervalMode;
+    int lessThanIntervalNum;
+    time_t continueScanTime;
+    time_t blockListScanTime;
+    int expScanCount;
+    int fixedScanCount;
+    time_t fixedCurrentTime;
+    SingleAppForbid()
+    {
+        appID = 0;
+        lessThanIntervalNum = 0;
+        continueScanTime = 0;
+        blockListScanTime = 0;
+        expScanCount = 0;
+        fixedScanCount = 0;
+        fixedCurrentTime = 0;
+    }
+};
+
 enum class DhcpIpType { /* dhcp IP type: ipv4 ipv6 mix */
     DHCP_IPTYPE_IPV4,
     DHCP_IPTYPE_IPV6,
@@ -213,9 +234,7 @@ struct WifiConfig {
      * set false;
      */
     bool staLastState;
-    int savedNetworkEvaluatorPriority;
-    int scoredNetworkEvaluatorPriority;
-    int passpointNetworkEvaluatorPriority;
+    int savedDeviceAppraisalPriority;
     int scoretacticsScoreSlope;
     int scoretacticsInitScore;
     int scoretacticsSameBssidScore;
@@ -249,9 +268,7 @@ struct WifiConfig {
         scanAlwaysSwitch = false;
         staAirplaneMode = false;
         staLastState = false;
-        savedNetworkEvaluatorPriority = PRIORITY_1;
-        scoredNetworkEvaluatorPriority = PRIORITY_2;
-        passpointNetworkEvaluatorPriority = PRIORITY_3;
+        savedDeviceAppraisalPriority = PRIORITY_1;
         scoretacticsScoreSlope = SCORE_SLOPE;
         scoretacticsInitScore = INIT_SCORE;
         scoretacticsSameBssidScore = SAME_BSSID_SCORE;

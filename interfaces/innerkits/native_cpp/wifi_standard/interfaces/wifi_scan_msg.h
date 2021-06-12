@@ -19,6 +19,7 @@
 #include <map>
 #include <string>
 #include <vector>
+#include <cstdint>
 
 namespace OHOS {
 namespace Wifi {
@@ -81,14 +82,16 @@ struct WifiScanInfo {
      */
     std::string capabilities;
     int frequency;
-    int level; /* signal level */
-    long timestamp;
+    int rssi; /* signal level */
+    int64_t timestamp;
+    int band;  /* ap band: 0 - 2.4GHZ, 1 - 5GHZ */
 
     WifiScanInfo()
     {
         frequency = 0;
-        level = 0;
+        rssi = 0;
         timestamp = 0;
+        band = -1;
     }
 };
 

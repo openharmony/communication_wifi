@@ -37,18 +37,18 @@ public:
     virtual ~State();
 
 public:
-    virtual void Enter() = 0;
-    virtual void Exit() = 0;
-    virtual bool ProcessMessage(InternalMessage *msg) = 0;
+    virtual void GoInState() = 0;
+    virtual void GoOutState() = 0;
+    virtual bool ExecuteStateMsg(InternalMessage *msg) = 0;
 
     /**
      * @Description : Obtains state name.
      *
      * @return std::string
      */
-    std::string GetName();
+    std::string GetStateName();
 
-    std::string mName;
+    std::string mStateName;
 };
 }  // namespace Wifi
 }  // namespace OHOS

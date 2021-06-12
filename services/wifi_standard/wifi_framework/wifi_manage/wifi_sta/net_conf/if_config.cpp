@@ -28,9 +28,6 @@
 #include "if_config.h"
 #include "ip_tools.h"
 
-#undef LOG_TAG
-#define LOG_TAG "OHWIFI_STA_IF_CONFIG"
-
 namespace OHOS {
 namespace Wifi {
 const std::string SYSTEM_COMMAND_IP = "/system/bin/ip";

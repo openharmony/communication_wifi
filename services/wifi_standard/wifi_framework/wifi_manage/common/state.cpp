@@ -20,15 +20,15 @@
 
 namespace OHOS {
 namespace Wifi {
-State::State(const std::string &name) : mName(name)
+State::State(const std::string &name) : mStateName(name)
 {}
 
 State::~State()
 {}
 
-std::string State::GetName()
+std::string State::GetStateName()
 {
-    return mName;
+    return mStateName;
 }
 }  // namespace Wifi
 }  // namespace OHOS

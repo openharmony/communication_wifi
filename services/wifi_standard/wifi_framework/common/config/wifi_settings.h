@@ -694,49 +694,19 @@ public:
     int GetscoretacticsSecurityScore();
 
     /**
-     * @Description Set the saved network evaluator priority
+     * @Description Set the saved device appraisal priority
      *
      * @param priority - priority
      * @return int - 0 success
      */
-    int SetsavedNetworkEvaluatorPriority(const int &priority);
+    int SetsavedDeviceAppraisalPriority(const int &priority);
 
     /**
-     * @Description Get the saved network evaluator priority
+     * @Description Get the saved device appraisal priority
      *
      * @return int - priority
      */
-    int GetsavedNetworkEvaluatorPriority();
-
-    /**
-     * @Description Set the priority of the network evaluator for the score.
-     *
-     * @param priority - priority
-     * @return int - 0 success
-     */
-    int SetscoredNetworkEvaluatorPriority(const int &priority);
-
-    /**
-     * @Description Get the priority of the network evaluator for the score
-     *
-     * @return int - priority
-     */
-    int GetscoredNetworkEvaluatorPriority();
-
-    /**
-     * @Description Set Pass Network Evaluator Priority
-     *
-     * @param priority - priority
-     * @return int - 0 success
-     */
-    int SetpasspointNetworkEvaluatorPriority(const int &priority);
-
-    /**
-     * @Description Get Pass Network Evaluator Priority
-     *
-     * @return int - priority
-     */
-    int GetpasspointNetworkEvaluatorPriority();
+    int GetsavedDeviceAppraisalPriority();
 
     /**
      * @Description Judge the Module need preloaded or not

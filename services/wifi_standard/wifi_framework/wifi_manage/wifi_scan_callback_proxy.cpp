@@ -16,7 +16,7 @@
 #include "wifi_scan_callback_proxy.h"
 #include "wifi_logger.h"
 #include "define.h"
-#include "wifi_event_broadcast.h"
+#include "wifi_internal_event_dispatcher.h"
 
 DEFINE_WIFILOG_SCAN_LABEL("WifiScanCallbackProxy");
 
@@ -44,8 +44,8 @@ void WifiScanCallbackProxy::OnWifiScanStateChanged(int state)
             break;
         case DEAD_OBJECT: {
             WIFI_LOGE("Failed to SendRequest, remote object has dead!");
-            if (WifiEventBroadcast::GetInstance().HasScanRemote(Remote())) {
-                WifiEventBroadcast::GetInstance().RemoveScanCallback(Remote());
+            if (WifiInternalEventDispatcher::GetInstance().HasScanRemote(Remote())) {
+                WifiInternalEventDispatcher::GetInstance().RemoveScanCallback(Remote());
             }
             break;
         }

@@ -18,7 +18,7 @@
 #include "wifi_logger.h"
 #include "string_ex.h"
 #include "wifi_errcode.h"
-#include "wifi_event_broadcast.h"
+#include "wifi_internal_event_dispatcher.h"
 #include "wifi_hotspot_death_recipient.h"
 DEFINE_WIFILOG_HOTSPOT_LABEL("WifiHotspotStub");
 
@@ -311,7 +311,7 @@ void WifiHotspotStub::OnRegisterCallBack(
                 WIFI_LOGD("AddDeathRecipient!");
             }
             if (callback_ != nullptr) {
-                WifiEventBroadcast::GetInstance().AddHotspotCallback(remote, callback_);
+                WifiInternalEventDispatcher::GetInstance().AddHotspotCallback(remote, callback_);
             }
         }
     } while (0);

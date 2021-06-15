@@ -20,7 +20,7 @@
 #include "wifi_config_center.h"
 #include "wifi_manager.h"
 #include "wifi_service_manager.h"
-#include "wifi_event_broadcast.h"
+#include "wifi_internal_event_dispatcher.h"
 #include "wifi_logger.h"
 #include "define.h"
 #include "wifi_logger.h"
@@ -483,7 +483,7 @@ ErrCode WifiHotspotServiceImpl::RegisterCallBack(const sptr<IWifiHotspotCallback
         WIFI_LOGE("RegisterCallBack:VerifyWifiConnectionPermission() PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
-    WifiEventBroadcast::GetInstance().SetSingleHotspotCallback(callback);
+    WifiInternalEventDispatcher::GetInstance().SetSingleHotspotCallback(callback);
     return WIFI_OPT_SUCCESS;
 }
 }  // namespace Wifi

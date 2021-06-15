@@ -19,7 +19,7 @@
 #include "wifi_internal_msg.h"
 #include "wifi_auth_center.h"
 #include "wifi_config_center.h"
-#include "wifi_event_broadcast.h"
+#include "wifi_internal_event_dispatcher.h"
 #include "wifi_manager.h"
 #include "wifi_service_manager.h"
 #include "wifi_logger.h"
@@ -490,12 +490,7 @@ ErrCode WifiDeviceServiceImpl::RegisterCallBackClient(
         return WIFI_OPT_PERMISSION_DENIED;
     }
 
-    if (WifiPermissionUtils::VerifyWifiConnectionPermission() == PERMISSION_DENIED) {
-        WIFI_LOGE("RegisterCallBackClient:VerifyWifiConnectionPermission() PERMISSION_DENIED!");
-        return WIFI_OPT_PERMISSION_DENIED;
-    }
-
-    WifiEventBroadcast::GetInstance().SetSingleStaCallback(callback);
+    WifiInternalEventDispatcher::GetInstance().SetSingleStaCallback(callback);
     return WIFI_OPT_SUCCESS;
 }
 

@@ -18,7 +18,7 @@
 #include "wifi_logger.h"
 #include "wifi_msg.h"
 #include "wifi_device_callback_proxy.h"
-#include "wifi_event_broadcast.h"
+#include "wifi_internal_event_dispatcher.h"
 #include "wifi_device_death_recipient.h"
 
 DEFINE_WIFILOG_LABEL("WifiDeviceStub");
@@ -484,7 +484,7 @@ void WifiDeviceStub::OnRegisterCallBackClient(uint32_t code, MessageParcel &data
                 WIFI_LOGD("AddDeathRecipient!");
             }
             if (callback_ != nullptr) {
-                WifiEventBroadcast::GetInstance().AddStaCallback(remote, callback_);
+                WifiInternalEventDispatcher::GetInstance().AddStaCallback(remote, callback_);
             }
             ret = WIFI_OPT_SUCCESS;
         }

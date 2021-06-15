@@ -18,7 +18,7 @@
 #include "wifi_msg.h"
 #include "define.h"
 #include "wifi_scan_callback_proxy.h"
-#include "wifi_event_broadcast.h"
+#include "wifi_internal_event_dispatcher.h"
 #include "wifi_scan_death_recipient.h"
 
 namespace OHOS {
@@ -223,7 +223,7 @@ int WifiScanStub::OnRegisterCallBack(uint32_t code, MessageParcel &data, Message
                 WIFI_LOGD("AddDeathRecipient!");
             }
             if (callback_ != nullptr) {
-                WifiEventBroadcast::GetInstance().AddScanCallback(remote, callback_);
+                WifiInternalEventDispatcher::GetInstance().AddScanCallback(remote, callback_);
             }
             ret = WIFI_OPT_SUCCESS;
         }

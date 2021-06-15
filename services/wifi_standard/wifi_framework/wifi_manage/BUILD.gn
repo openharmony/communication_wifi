@@ -14,7 +14,7 @@
 import("//build/ohos.gni")
 import("//build/ohos/sa_profile/sa_profile.gni")
 import("//build/ohos_var.gni")
-
+import("//foundation/appexecfwk/standard/appexecfwk.gni")
 ################################################################################
 
 config("wifi_manager_service_header") {
@@ -35,6 +35,16 @@ config("wifi_manager_service_header") {
     "//foundation/communication/wifi/services/wifi_standard/wifi_framework/wifi_manage/common",
     "//foundation/communication/wifi/services/wifi_standard/wifi_framework/wifi_manage/idl_client",
     "//foundation/communication/wifi/services/wifi_standard/wifi_framework/wifi_manage/idl_client/idl_interface",
+    "${even_path}/cesfwk/kits/native/include",
+    "${even_path}/cesfwk/innerkits/include",
+    "${aafwk_path}/interfaces/innerkits/want/include",
+    "${aafwk_path}/interfaces/innerkits/want/include/ohos/aafwk/content",
+    "//foundation/distributedschedule/dmsfwk/services/dtbschedmgr/include",
+    "//foundation/aafwk/intent/interfaces/innerkits/base/include",
+    "//foundation/appexecfwk/adapter/interfaces/innerkits/appexecfwk_base/include",
+    "//foundation/appexecfwk/standard/interfaces/innerkits/libeventhandler/include",
+    "//foundation/aafwk/standard/interfaces/innerkits/base/include",
+    "//foundation/appexecfwk/standard/interfaces/innerkits/appexecfwk_base/include"
   ]
 }
 
@@ -108,9 +118,10 @@ ohos_shared_library("wifi_manager_service") {
     "//foundation/communication/wifi/services/wifi_standard/wifi_framework/common/utils/wifi_global_func.cpp",
     "//foundation/communication/wifi/services/wifi_standard/wifi_framework/wifi_manage/common/wifi_permission_helper.cpp",
     "//foundation/communication/wifi/services/wifi_standard/wifi_framework/wifi_manage/common/wifi_permission_utils.cpp",
+    "//foundation/communication/wifi/services/wifi_standard/wifi_framework/common/utils/wifi_common_event_helper.cpp",
     "wifi_auth_center.cpp",
     "wifi_config_center.cpp",
-    "wifi_event_broadcast.cpp",
+    "wifi_internal_event_dispatcher.cpp",
     "wifi_manager.cpp",
     "wifi_service_manager.cpp",
   ]
@@ -121,6 +132,10 @@ ohos_shared_library("wifi_manager_service") {
     "//foundation/communication/wifi/services/wifi_standard/wifi_framework/wifi_manage/idl_client:wifi_idl_client",
     "//foundation/distributedschedule/safwk/interfaces/innerkits/safwk:system_ability_fwk",
     "//utils/native/base:utils",
+    "${even_path}/common:libevent_common",
+    "${aafwk_path}/interfaces/innerkits/base:base",
+    "${aafwk_path}/interfaces/innerkits/want:want",
+    "//base/notification/ces_standard/cesfwk/kits/native:cesfwk_kits",
   ]
 
   defines = [

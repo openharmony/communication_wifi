@@ -15,14 +15,14 @@
 
 #include "wifi_hotspot_death_recipient.h"
 #include "wifi_logger.h"
-#include "wifi_event_broadcast.h"
+#include "wifi_internal_event_dispatcher.h"
 DEFINE_WIFILOG_HOTSPOT_LABEL("WifiScanDeathRecipient");
 namespace OHOS {
 namespace Wifi {
 void WifiHotspotDeathRecipient::OnRemoteDied(const wptr<IRemoteObject>& remoteObject)
 {
     WIFI_LOGD("WifiHotspotDeathRecipient::OnRemoteDied!");
-    WifiEventBroadcast::GetInstance().RemoveHotspotCallback(remoteObject.promote());
+    WifiInternalEventDispatcher::GetInstance().RemoveHotspotCallback(remoteObject.promote());
 }
 }  // namespace Wifi
 }  // namespace OHOS

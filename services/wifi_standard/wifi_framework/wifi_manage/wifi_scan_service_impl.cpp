@@ -21,7 +21,7 @@
 #include "wifi_config_center.h"
 #include "wifi_manager.h"
 #include "wifi_service_manager.h"
-#include "wifi_event_broadcast.h"
+#include "wifi_internal_event_dispatcher.h"
 #include "wifi_internal_msg.h"
 #include "wifi_logger.h"
 #include "define.h"
@@ -183,7 +183,7 @@ ErrCode WifiScanServiceImpl::GetScanInfoList(std::vector<WifiScanInfo> &result)
 ErrCode WifiScanServiceImpl::RegisterCallBack(const sptr<IWifiScanCallback> &callback)
 {
     WIFI_LOGI("WifiScanServiceImpl::RegisterCallBack!");
-    WifiEventBroadcast::GetInstance().SetSingleScanCallback(callback);
+    WifiInternalEventDispatcher::GetInstance().SetSingleScanCallback(callback);
     return WIFI_OPT_SUCCESS;
 }
 }  // namespace Wifi

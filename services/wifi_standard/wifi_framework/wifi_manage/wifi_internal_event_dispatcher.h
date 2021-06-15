@@ -39,13 +39,13 @@ namespace Wifi {
 using StaCallbackMapType = std::map<sptr<IRemoteObject>, sptr<IWifiDeviceCallBack>>;
 using ScanCallbackMapType = std::map<sptr<IRemoteObject>, sptr<IWifiScanCallback>>;
 using HotspotCallbackMapType = std::map<sptr<IRemoteObject>, sptr<IWifiHotspotCallback>>;
-class WifiEventBroadcast {
+class WifiInternalEventDispatcher {
 public:
-    WifiEventBroadcast();
-    ~WifiEventBroadcast();
+    WifiInternalEventDispatcher();
+    ~WifiInternalEventDispatcher();
 
     /**
-     * @Description Init WifiEventBroadcast object
+     * @Description Init WifiInternalEventDispatcher object
      *
      * @return int - init result, when 0 means success, other means some fails happened
      */
@@ -80,12 +80,12 @@ public:
      *                 registration list one by one. The BpWifiCallbackService
      *                 method will eventually be called
      *
-     * @param p WifiEventBroadcast this Object
+     * @param p WifiInternalEventDispatcher this Object
      * @return void* - nullptr, not care this now
      */
     static void *Run(void *p);
 
-    static WifiEventBroadcast &GetInstance();
+    static WifiInternalEventDispatcher &GetInstance();
     int AddStaCallback(const sptr<IRemoteObject> &remote, const sptr<IWifiDeviceCallBack> &callback);
     int SetSingleStaCallback(const sptr<IWifiDeviceCallBack> &callback);
     sptr<IWifiDeviceCallBack> GetSingleStaCallback() const;
@@ -106,9 +106,13 @@ public:
     void InvokeDeviceCallbacks(const WifiEventCallbackMsg &msg);
     void InvokeHotspotCallbacks(const WifiEventCallbackMsg &msg);
 private:
-    static void DealStaCallbackMsg(WifiEventBroadcast *pInstance, const WifiEventCallbackMsg &msg);
-    static void DealScanCallbackMsg(WifiEventBroadcast *pInstance, const WifiEventCallbackMsg &msg);
-    static void DealHotspotCallbackMsg(WifiEventBroadcast *pInstance, const WifiEventCallbackMsg &msg);
+    static void DealStaCallbackMsg(WifiInternalEventDispatcher *pInstance, const WifiEventCallbackMsg &msg);
+    static void DealScanCallbackMsg(WifiInternalEventDispatcher *pInstance, const WifiEventCallbackMsg &msg);
+    static void DealHotspotCallbackMsg(WifiInternalEventDispatcher *pInstance, const WifiEventCallbackMsg &msg);
+
+    static void PublishConnectionStateChangedEvent(int state, const WifiLinkedInfo &info);
+
+    static void PublishWifiStateChangedEvent(int state);
 
 private:
     bool mSystemNotifyInit;

@@ -19,7 +19,7 @@
 #include "wifi_sta_hal_interface.h"
 #include "wifi_auth_center.h"
 #include "wifi_config_center.h"
-#include "wifi_event_broadcast.h"
+#include "wifi_internal_event_dispatcher.h"
 #include "wifi_service_manager.h"
 #include "wifi_settings.h"
 
@@ -66,8 +66,8 @@ int WifiManager::Init()
         mInitStatus_ = SERVICE_MANAGER_INIT_FAILED;
         return -1;
     }
-    if (WifiEventBroadcast::GetInstance().Init() < 0) {
-        WIFI_LOGE("WifiEventBroadcast Init failed!");
+    if (WifiInternalEventDispatcher::GetInstance().Init() < 0) {
+        WIFI_LOGE("WifiInternalEventDispatcher Init failed!");
         mInitStatus_ = EVENT_BROADCAST_INIT_FAILED;
         return -1;
     }
@@ -88,7 +88,7 @@ void WifiManager::Exit()
 {
     WifiServiceManager::GetInstance().UninstallAllService();
     WifiStaHalInterface::GetInstance().ExitAllIdlClient();
-    WifiEventBroadcast::GetInstance().Exit();
+    WifiInternalEventDispatcher::GetInstance().Exit();
     if (mTid != 0) {
         mRunFlag = false;
         WifiResponseMsgInfo msg;
@@ -262,7 +262,7 @@ void WifiManager::DealScanUpMsg(const WifiResponseMsgInfo &msg)
             WifiEventCallbackMsg cbMsg;
             cbMsg.msgCode = WIFI_CBK_MSG_SCAN_STATE_CHANGE;
             cbMsg.msgData = msg.params.result;
-            WifiEventBroadcast::GetInstance().AddBroadCastMsg(cbMsg);
+            WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
             break;
         }
         case WifiInternalMsgCode::SCAN_RESULT_RES: {
@@ -286,7 +286,7 @@ void WifiManager::UploadOpenWifiFailedEvent()
     WifiEventCallbackMsg cbMsg;
     cbMsg.msgCode = WIFI_CBK_MSG_STATE_CHANGE;
     cbMsg.msgData = static_cast<int>(WifiState::UNKNOWN);
-    WifiEventBroadcast::GetInstance().AddBroadCastMsg(cbMsg);
+    WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
 
     return;
 }
@@ -300,7 +300,7 @@ void WifiManager::UploadOpenWifiSuccessfulEvent()
     WifiEventCallbackMsg cbMsg;
     cbMsg.msgCode = WIFI_CBK_MSG_STATE_CHANGE;
     cbMsg.msgData = static_cast<int>(WifiState::ENABLED);
-    WifiEventBroadcast::GetInstance().AddBroadCastMsg(cbMsg);
+    WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
 
     return;
 }
@@ -358,7 +358,7 @@ void WifiManager::DealStaCloseRes(const WifiResponseMsgInfo &msg)
         WifiEventCallbackMsg cbMsg;
         cbMsg.msgCode = WIFI_CBK_MSG_STATE_CHANGE;
         cbMsg.msgData = static_cast<int>(WifiState::UNKNOWN);
-        WifiEventBroadcast::GetInstance().AddBroadCastMsg(cbMsg);
+        WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
     }
 
     WifiServiceManager::GetInstance().UnloadService(WIFI_SERVICE_STA); /* uninstalling sta service */
@@ -369,7 +369,7 @@ void WifiManager::DealStaCloseRes(const WifiResponseMsgInfo &msg)
     WifiEventCallbackMsg cbMsg;
     cbMsg.msgCode = WIFI_CBK_MSG_STATE_CHANGE;
     cbMsg.msgData = static_cast<int>(WifiState::DISABLED);
-    WifiEventBroadcast::GetInstance().AddBroadCastMsg(cbMsg);
+    WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
 
     /**
      * Check unload SCAN service
@@ -408,7 +408,7 @@ void WifiManager::DealStaConnChanged(const WifiResponseMsgInfo &msg)
     cbMsg.msgCode = WIFI_CBK_MSG_CONNECTION_CHANGE;
     cbMsg.msgData = static_cast<int>(ConvertConnStateInternal(OperateResState(msg.params.result)));
     cbMsg.linkInfo = msg.params.linkedInfo;
-    WifiEventBroadcast::GetInstance().AddBroadCastMsg(cbMsg);
+    WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
 
     /* Pushing the connection status to the scanning service */
     if (msg.params.result == static_cast<int>(OperateResState::CONNECT_CONNECTING) ||
@@ -429,7 +429,7 @@ void WifiManager::DealApOpenRes()
     WifiEventCallbackMsg cbMsg;
     cbMsg.msgCode = WIFI_CBK_MSG_HOTSPOT_STATE_CHANGE;
     cbMsg.msgData = static_cast<int>(ApState::AP_STATE_STARTED);
-    WifiEventBroadcast::GetInstance().AddBroadCastMsg(cbMsg);
+    WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
     return;
 }
 
@@ -440,7 +440,7 @@ void WifiManager::DealApCloseRes()
     WifiEventCallbackMsg cbMsg;
     cbMsg.msgCode = WIFI_CBK_MSG_HOTSPOT_STATE_CHANGE;
     cbMsg.msgData = static_cast<int>(ApState::AP_STATE_CLOSED);
-    WifiEventBroadcast::GetInstance().AddBroadCastMsg(cbMsg);
+    WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
     return;
 }
 
@@ -452,7 +452,7 @@ void WifiManager::DealApConnChanged(const WifiResponseMsgInfo &msg)
         cbMsg.msgCode = WIFI_CBK_MSG_HOTSPOT_STATE_LEAVE;
     }
     cbMsg.staInfo = msg.params.staInfo;
-    WifiEventBroadcast::GetInstance().AddBroadCastMsg(cbMsg);
+    WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
     return;
 }
 
@@ -468,7 +468,7 @@ void WifiManager::DealWpsChanged(const WifiResponseMsgInfo &msg)
             cbMsg.pinCode = std::string(8 - len, '0') + cbMsg.pinCode;
         }
     }
-    WifiEventBroadcast::GetInstance().AddBroadCastMsg(cbMsg);
+    WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
     return;
 }
 } // namespace Wifi

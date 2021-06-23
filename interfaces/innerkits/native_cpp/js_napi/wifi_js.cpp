@@ -211,6 +211,31 @@ static void ScanInfoToJsArray(const napi_env& env, const std::vector<JsWifiScanI
     }
 }
 
+void FillSecurityType(int& jsSecurityType, const WifiSecurity& cppSecurityType)
+{
+    switch (cppSecurityType) {
+        case WifiSecurity::OPEN:
+            jsSecurityType = WIFI_SEC_TYPE_OPEN;
+            break;
+
+        case WifiSecurity::WEP:
+            jsSecurityType = WIFI_SEC_TYPE_WEP;
+            break;
+
+        case WifiSecurity::PSK:
+            jsSecurityType = WIFI_SEC_TYPE_PSK;
+            break;
+
+        case WifiSecurity::SAE:
+            jsSecurityType = WIFI_SEC_TYPE_SAE;
+            break;
+
+        default:
+            jsSecurityType = WIFI_SEC_TYPE_INVALID;
+            break;
+    }
+}
+
 static void NativeCppScanInfoToJsScanInfo(const std::vector<WifiScanInfo>& vecCppScanInfos,
     std::vector<JsWifiScanInfo>& vecJsScnIanfo)
 {
@@ -219,6 +244,7 @@ static void NativeCppScanInfoToJsScanInfo(const std::vector<WifiScanInfo>& vecCp
 
         jsScanInfo.ssid = e.ssid;
         jsScanInfo.bssid = e.bssid;
+        FillSecurityType(jsScanInfo.securityType, e.securityType);
         jsScanInfo.rssi = e.rssi;
         jsScanInfo.band = e.band;
         jsScanInfo.frequency = e.frequency;

@@ -1029,10 +1029,59 @@ void ScanStateMachine::ConvertScanResults(
         singleResult.frequency = iter->frequency;
         singleResult.rssi = iter->signalLevel;
         singleResult.timestamp = iter->timestamp;
-
+        GetSecurityTypeAndBand(singleResult);
         scanResults.push_back(singleResult);
     }
 
+    return;
+}
+
+void ScanStateMachine::GetSecurityTypeAndBand(InterScanResult &scanResult)
+{
+    WIFI_LOGI("Enter ScanStateMachine::GetSecurityTypeAndBand.\n");
+
+    if (scanResult.frequency < SCAN_24GHZ_MAX_FREQUENCY) {
+        scanResult.band = SCAN_24GHZ_BAND;
+    } else if (scanResult.frequency > SCAN_5GHZ_MIN_FREQUENCY) {
+        scanResult.band = SCAN_5GHZ_BAND;
+    } else {
+        WIFI_LOGE("invalid frequency value: %{public}d", scanResult.frequency);
+        scanResult.band = 0;
+    }
+
+    scanResult.securityType = WifiSecurity::OPEN;
+    if (scanResult.capabilities.find("WAPI-PSK") != std::string::npos) {
+        scanResult.securityType = WifiSecurity::WAPI_PSK;
+        return;
+    }
+    if (scanResult.capabilities.find("PSK") != std::string::npos) {
+        scanResult.securityType = WifiSecurity::PSK;
+        return;
+    }
+    if (scanResult.capabilities.find("WEP") != std::string::npos) {
+        scanResult.securityType = WifiSecurity::WEP;
+        return;
+    }
+    if (scanResult.capabilities.find("EAP_SUITE_B_192") != std::string::npos) {
+        scanResult.securityType = WifiSecurity::EAP_SUITE_B;
+        return;
+    }
+    if (scanResult.capabilities.find("EAP") != std::string::npos) {
+        scanResult.securityType = WifiSecurity::EAP;
+        return;
+    }
+    if (scanResult.capabilities.find("SAE") != std::string::npos) {
+        scanResult.securityType = WifiSecurity::SAE;
+        return;
+    }
+    if (scanResult.capabilities.find("OWE") != std::string::npos) {
+        scanResult.securityType = WifiSecurity::OWE;
+        return;
+    }
+    if (scanResult.capabilities.find("CERT") != std::string::npos) {
+        scanResult.securityType = WifiSecurity::WAPI_CERT;
+        return;
+    }
     return;
 }
 
@@ -1503,15 +1552,6 @@ bool ScanStateMachine::GetScanResults(std::vector<InterScanResult> &scanResults)
     WIFI_LOGI("End: QueryScanResults.");
 
     ConvertScanResults(wifiScanResults, scanResults);
-    for (auto iter = scanResults.begin(); iter != scanResults.end(); iter++) {
-        if (iter->frequency < SCAN_24GHZ_MAX_FREQUENCY) {
-            iter->band = 0;
-        } else if (iter->frequency > SCAN_5GHZ_MIN_FREQUENCY) {
-            iter->band = 1;
-        } else {
-            WIFI_LOGE("invalid frequency value: %d", iter->frequency);
-        }
-    }
     return true;
 }
 

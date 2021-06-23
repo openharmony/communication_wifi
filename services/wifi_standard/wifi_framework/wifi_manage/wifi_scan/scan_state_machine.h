@@ -40,6 +40,8 @@ const int SCAN_TYPE_INVALID = 0xFF;
 const int MAX_WAIT_SCAN_RESULT_TIME = 60 * 1000;
 const int SCAN_24GHZ_MAX_FREQUENCY = 2500;
 const int SCAN_5GHZ_MIN_FREQUENCY = 5000;
+const int SCAN_24GHZ_BAND = 1;
+const int SCAN_5GHZ_BAND = 2;
 
 class ScanStateMachine : public StateMachine {
 public:
@@ -354,6 +356,12 @@ private:
      * @param scanResults - Scan internal scan results[out]
      */
     void ConvertScanResults(std::vector<WifiScanResult> &wifiScanResults, std::vector<InterScanResult> &scanResults);
+    /**
+     * @Description The band and security type are parsed from the scanning result obtained by the IDL.
+     *
+     * @param scanResult - scan result[inout]
+     */
+    void GetSecurityTypeAndBand(InterScanResult &scanResult);
     /**
      * @Description  Reporting Status to ScanService.
      *

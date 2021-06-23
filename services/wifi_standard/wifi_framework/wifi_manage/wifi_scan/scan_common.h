@@ -187,11 +187,11 @@ struct InterScanResult {
 
     InterScanResult()
     {
-          frequency = 0;
-          band = 0;
-          rssi = 0;
-          securityType = WifiSecurity::INVALID;
-          timestamp = 0;
+        frequency = 0;
+        band = 0;
+        rssi = 0;
+        securityType = WifiSecurity::INVALID;
+        timestamp = 0;
     }
 };
 

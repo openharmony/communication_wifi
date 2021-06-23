@@ -52,6 +52,39 @@ enum class ScanMode {
     SCAN_MODE_MAX            /* Invalid value */
 };
 
+enum class WifiSecurity {
+    OPEN = 0,
+    WEP = 1,
+    PSK = 2,
+    EAP = 3,
+    SAE = 4,
+    EAP_SUITE_B = 5,
+    OWE = 6,
+    WAPI_CERT = 7,
+    WAPI_PSK = 8,
+    INVALID = -1
+};
+
+enum class WifiChannelWidth {
+    WIDTH_20MHZ = 0,
+    WIDTH_40MHZ = 1,
+    WIDTH_80MHZ = 2,
+    WIDTH_160MHZ = 3,
+    WIDTH_80MHZ_PLUS = 4,
+    WIDTH_INVALID
+};
+
+struct WifiInfoElem {
+    unsigned int id;
+    std::vector<char> content;
+
+    WifiInfoElem() : id(0)
+    {}
+
+    ~WifiInfoElem()
+    {}
+};
+
 enum class ScanResultState {
     SCAN_OK = 0,
     SCAN_FAIL,
@@ -82,16 +115,27 @@ struct WifiScanInfo {
      */
     std::string capabilities;
     int frequency;
+    int band;  /* ap band: 1 - 2.4GHZ, 2 - 5GHZ */
+    WifiChannelWidth channelWidth;
+    int centerFreq0;
+    int centerFreq1;
     int rssi; /* signal level */
+    WifiSecurity securityType;
+    std::vector<WifiInfoElem> infoElems;
+    int64_t features;
     int64_t timestamp;
-    int band;  /* ap band: 0 - 2.4GHZ, 1 - 5GHZ */
 
     WifiScanInfo()
     {
         frequency = 0;
+        band = 0;
+        channelWidth = WifiChannelWidth::WIDTH_INVALID;
+        centerFreq0 = 0;
+        centerFreq1 = 0;
         rssi = 0;
+        securityType = WifiSecurity::INVALID;
+        features = 0;
         timestamp = 0;
-        band = -1;
     }
 };
 

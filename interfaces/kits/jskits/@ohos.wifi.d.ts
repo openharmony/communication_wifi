@@ -174,7 +174,7 @@ declare namespace wifi {
         /** Received signal strength indicator (RSSI) */
         rssi: number;
 
-        /** Frequency band */
+        /** Frequency band, 1: 2.4G, 2: 5G */
         band: number;
 
         /** Frequency */

@@ -18,6 +18,7 @@
 #include <functional>
 #include <string>
 #include <vector>
+#include "wifi_scan_msg.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -179,16 +180,18 @@ struct InterScanResult {
                                * supported by the access point
                                */
     int frequency;            /* Access point frequency */
+    int band;                 /* ap band, 1: 2.4G, 2: 5G */
     int rssi;                 /* signal strength */
+    WifiSecurity securityType;
     int64_t timestamp;        /* Timestamp of scanning */
-    int band;                 /* ap band: 0 - 2.4GHZ, 1 - 5GHZ */
 
     InterScanResult()
     {
         frequency = 0;
+        band = 0;
         rssi = 0;
+        securityType = WifiSecurity::INVALID;
         timestamp = 0;
-        band = -1;
     }
 };
 

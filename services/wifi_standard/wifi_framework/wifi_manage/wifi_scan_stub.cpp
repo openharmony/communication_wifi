@@ -189,8 +189,21 @@ int WifiScanStub::OnGetScanInfoList(uint32_t code, MessageParcel &data, MessageP
             reply.WriteCString(result[i].capabilities.c_str());
             reply.WriteInt32(result[i].frequency);
             reply.WriteInt32(result[i].rssi);
-            reply.WriteInt32(result[i].timestamp);
+            reply.WriteInt64(result[i].timestamp);
             reply.WriteInt32(result[i].band);
+            reply.WriteInt32(static_cast<int>(result[i].securityType));
+            reply.WriteInt32(static_cast<int>(result[i].channelWidth));
+            reply.WriteInt32(result[i].centerFreq0);
+            reply.WriteInt32(result[i].centerFreq1);
+            reply.WriteInt64(result[i].features);
+            reply.WriteInt32(result[i].infoElems.size());
+            for (unsigned int m = 0; m < result[i].infoElems.size(); ++m) {
+                reply.WriteInt32(result[i].infoElems[m].id);
+                reply.WriteInt32(result[i].infoElems[m].content.size());
+                for (unsigned int n = 0; n < result[i].infoElems[m].content.size(); ++n) {
+                    reply.WriteInt8(result[i].infoElems[m].content[n]);
+                }
+            }
         }
     }
     return ret;

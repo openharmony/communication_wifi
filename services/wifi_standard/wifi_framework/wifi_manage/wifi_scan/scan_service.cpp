@@ -571,6 +571,7 @@ bool ScanService::StoreFullScanResult(
         scanInfo.rssi = iter->rssi;
         scanInfo.timestamp = iter->timestamp;
         scanInfo.band = iter->band;
+        scanInfo.securityType = iter->securityType;
 
         filterScanResult.push_back(scanInfo);
     }
@@ -623,6 +624,7 @@ bool ScanService::StoreUserScanResult(
         scanInfo.rssi = iter->rssi;
         scanInfo.timestamp = iter->timestamp;
         scanInfo.band = iter->band;
+        scanInfo.securityType = iter->securityType;
         filterScanResult.push_back(scanInfo);
     }
 
@@ -666,6 +668,7 @@ void ScanService::ConvertScanResults(
         scanInfo.rssi = iter->rssi;
         scanInfo.timestamp = iter->timestamp;
         scanInfo.band = iter->band;
+        scanInfo.securityType = iter->securityType;
         scanInfoList.push_back(scanInfo);
     }
 

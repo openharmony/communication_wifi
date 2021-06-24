@@ -205,8 +205,24 @@ ErrCode WifiScanProxy::GetScanInfoList(std::vector<WifiScanInfo> &result)
         info.capabilities = reply.ReadCString();
         info.frequency = reply.ReadInt32();
         info.rssi = reply.ReadInt32();
-        info.timestamp = reply.ReadInt32();
+        info.timestamp = reply.ReadInt64();
         info.band = reply.ReadInt32();
+        info.securityType = static_cast<WifiSecurity>(reply.ReadInt32());
+        info.channelWidth = static_cast<WifiChannelWidth>(reply.ReadInt32());
+        info.centerFreq0 = reply.ReadInt32();
+        info.centerFreq1 = reply.ReadInt32();
+        info.features = reply.ReadInt64();
+        int ieSize = reply.ReadInt32();
+        for (int m = 0; m < ieSize; ++m) {
+            WifiInfoElem tempWifiInfoElem;
+            tempWifiInfoElem.id = reply.ReadInt32();
+            int contentSize = reply.ReadInt32();
+            for (int n = 0; n < contentSize; n++) {
+                char tempChar = static_cast<char>(reply.ReadInt8());
+                tempWifiInfoElem.content.emplace_back(tempChar);
+            }
+            info.infoElems.emplace_back(tempWifiInfoElem);
+        }
         result.emplace_back(info);
     }
     return WIFI_OPT_SUCCESS;

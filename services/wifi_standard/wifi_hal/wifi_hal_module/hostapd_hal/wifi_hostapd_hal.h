@@ -20,7 +20,6 @@
 #include <pthread.h>
 #include <stdbool.h>
 #include <string.h>
-#include <sys/cdefs.h>
 #include <sys/types.h>
 #include "wifi_hal_struct.h"
 

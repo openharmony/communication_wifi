@@ -15,7 +15,6 @@
 #ifndef WIFI_WPA_SUPPLICANT_HAL_H
 #define WIFI_WPA_SUPPLICANT_HAL_H
 
-#include <sys/cdefs.h>
 #include <sys/types.h>
 #include <stdlib.h>
 #include <string.h>

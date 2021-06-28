@@ -14,6 +14,7 @@
  */
 
 #include <unistd.h>
+#include <error.h>
 #include <arpa/inet.h>
 #include <net/if.h>
 #include <net/route.h>
@@ -35,14 +36,11 @@ const std::string IFNAME = "wlan0";
 const int SYSTEM_COMMAND_ERR_1 = -1;
 const int SYSTEM_COMMAND_ERR_2 = 127;
 const int IPV6_SUFFIX_LEN = 3;
-std::unique_ptr<IfConfig> IfConfig::g_ifConfig;
 
 IfConfig &IfConfig::GetInstance()
 {
-    if (g_ifConfig.get() == nullptr) {
-        g_ifConfig = std::make_unique<IfConfig>();
-    }
-    return *g_ifConfig;
+    static IfConfig ifConfig;
+    return ifConfig;
 }
 
 IfConfig::IfConfig()
@@ -55,7 +53,7 @@ IfConfig::~IfConfig()
  * @Description : Execute script commands
  * @Return success:true failed:false
  */
-bool IfConfig::ExecCommand(const std::vector<std::string> &vecCommandArg) const
+bool IfConfig::ExecCommand(const std::vector<std::string> &vecCommandArg)
 {
     std::string command;
     for (auto iter : vecCommandArg) {
@@ -76,11 +74,11 @@ bool IfConfig::ExecCommand(const std::vector<std::string> &vecCommandArg) const
  * @Description : Set the network card address, routing, DNS
  * @Return success:0 failed:-1
  */
-int IfConfig::SetIfAddr(const DhcpResult &dhcpResult) const
+int IfConfig::SetIfAddr(const DhcpResult &dhcpResult)
 {
     int ret = -1;
-    // 2 is the ip_type num
-    for (int i = 0; i < 2; i++) {
+    const int ipTypeNum = 2;
+    for (int i = 0; i < ipTypeNum; i++) {
         if (dhcpResult[i].isOptSuc) {
             ret = 0;
 
@@ -104,7 +102,7 @@ int IfConfig::SetIfAddr(const DhcpResult &dhcpResult) const
  * @Description : Set DNS
  * @Return None
  */
-void IfConfig::SetNetDns(std::string ifName, std::string dns1, std::string dns2) const
+void IfConfig::SetNetDns(const std::string& ifName, const std::string& dns1, const std::string& dns2)
 {
     std::vector<std::string> ipRouteCmd;
     ipRouteCmd.clear();
@@ -124,7 +122,7 @@ void IfConfig::SetNetDns(std::string ifName, std::string dns1, std::string dns2)
  * @Description : Flush the IpAddr
  * @Return None
  */
-void IfConfig::FlushIpAddr(std::string ifName, int ipType) const
+void IfConfig::FlushIpAddr(const std::string& ifName, const int& ipType)
 {
     std::vector<std::string> ipRouteCmd;
     ipRouteCmd.clear();
@@ -175,7 +173,8 @@ void IfConfig::FlushIpAddr(std::string ifName, int ipType) const
  * @Description : Add the IpAddr
  * @Return None
  */
-void IfConfig::AddIpAddr(std::string ifName, std::string ipAddr, std::string mask, int ipType) const
+void IfConfig::AddIpAddr(
+    const std::string &ifName, const std::string &ipAddr, const std::string &mask, const int &ipType)
 {
     if (ipType == static_cast<int>(StaIpType::IPTYPE_IPV4)) {
         struct ifreq ifr;
@@ -239,8 +238,8 @@ void IfConfig::AddIpAddr(std::string ifName, std::string ipAddr, std::string mas
  * @Description : Add Route
  * @Return None
  */
-void IfConfig::AddIfRoute(
-    std::string ifName, std::string ipAddr, std::string mask, std::string gateWay, int ipType) const
+void IfConfig::AddIfRoute(const std::string &ifName, const std::string &ipAddr, const std::string &mask,
+    const std::string &gateWay, const int &ipType)
 {
     if (ipType == static_cast<int>(StaIpType::IPTYPE_IPV4)) {
         AddIpv4Route(ifName, ipAddr, mask, gateWay);
@@ -254,7 +253,8 @@ void IfConfig::AddIfRoute(
  * @Description : set Ipv4 Route
  * @Return None
  */
-void IfConfig::AddIpv4Route(std::string ifName, std::string ipAddr, std::string mask, std::string gateWay) const
+void IfConfig::AddIpv4Route(
+    const std::string &ifName, const std::string &ipAddr, const std::string &mask, const std::string &gateWay)
 {
     std::vector<std::string> ipRouteCmd;
     ipRouteCmd.clear();
@@ -312,7 +312,8 @@ void IfConfig::AddIpv4Route(std::string ifName, std::string ipAddr, std::string 
  * @Description : set Ipv6 Route
  * @Return None
  */
-void IfConfig::AddIpv6Route(std::string ifName, std::string ipAddr, std::string mask, std::string gateWay) const
+void IfConfig::AddIpv6Route(
+    const std::string &ifName, const std::string &ipAddr, const std::string &mask, const std::string &gateWay)
 {
     std::vector<std::string> ipRouteCmd;
     ipRouteCmd.clear();
@@ -370,7 +371,8 @@ void IfConfig::AddIpv6Route(std::string ifName, std::string ipAddr, std::string 
  * @param noProxys - objects to bypass proxy[in]
  * @Return None
  */
-void IfConfig::SetProxy(bool isAuto, std::string proxy, std::string port, std::string noProxys, std::string pac) const
+void IfConfig::SetProxy(
+    bool isAuto, const std::string &proxy, const std::string &port, const std::string &noProxys, const std::string &pac)
 {
     LOGI("SetProxy pac=[%s]\n", pac.c_str());
     std::vector<std::string> ipRouteCmd;

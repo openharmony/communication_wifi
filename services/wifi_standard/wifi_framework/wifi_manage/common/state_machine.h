@@ -232,9 +232,9 @@ protected:
     void StateDelete(State *state);
 
     /**
-     * @Description : Set initial state.
+     * @Description : Set first state.
      *
-     * @param firstState - Initial state.[in]
+     * @param firstState - First state.[in]
      */
     void SetFirstState(State *firstState);
 

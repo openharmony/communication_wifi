@@ -244,17 +244,17 @@ ErrCode StaService::SetCountryCode() const
     return WIFI_OPT_SUCCESS;
 }
 
-ErrCode StaService::AutoConnectService(const std::vector<WifiScanInfo> &scanResults)
+ErrCode StaService::AutoConnectService(const std::vector<WifiScanInfo> &scanInfos)
 {
     WIFI_LOGI("Enter StaService::AutoConnectService.\n");
-    pStaAutoConnectService->OnScanResultsReadyHandler(scanResults);
+    pStaAutoConnectService->OnScanInfosReadyHandler(scanInfos);
     return WIFI_OPT_SUCCESS;
 }
 
-ErrCode StaService::SyncLinkInfo(const std::vector<WifiScanInfo> &scanResults)
+ErrCode StaService::SyncLinkInfo(const std::vector<WifiScanInfo> &scanInfos)
 {
     WIFI_LOGI("Enter StaService::SyncLinkInfo.\n");
-    pStaStateMachine->SyncLinkInfo(scanResults);
+    pStaStateMachine->SyncLinkInfo(scanInfos);
     return WIFI_OPT_SUCCESS;
 }
 }  // namespace Wifi

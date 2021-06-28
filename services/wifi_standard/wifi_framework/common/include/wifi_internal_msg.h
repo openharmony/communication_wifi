@@ -130,6 +130,7 @@ enum class OperateResState {
     DISCONNECT_DISCONNECTED,           /* disconnect succeed */
     CONNECT_PASSWORD_WRONG,            /* wrong password */
     CONNECT_OBTAINING_IP,              /* obtain ip */
+    CONNECT_OBTAINING_IP_FAIL
 };
 
 struct WifiRequestParams {
@@ -138,7 +139,7 @@ struct WifiRequestParams {
     HotspotConfig hotspotConfig;
     WifiDeviceConfig deviceConfig;
     StationInfo stationInfo;
-    std::vector<WifiScanInfo> scanResults;
+    std::vector<WifiScanInfo> scanInfos;
     WifiMockState wifiMockState;
     int argInt;
 
@@ -154,7 +155,7 @@ struct WifiResponseParams {
     int argInt;
     WifiLinkedInfo linkedInfo;
     StationInfo staInfo;
-    std::vector<WifiScanInfo> scanResults;
+    std::vector<WifiScanInfo> scanInfos;
     WifiResponseParams() : result(0), argInt(0)
     {}
 };

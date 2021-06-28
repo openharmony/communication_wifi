@@ -477,7 +477,7 @@ void StaStateMachine::StopWifiProcess()
         /* The current state of StaStateMachine transfers to InitState. */
         SwitchState(pInitState);
     } else {
-        WIFI_LOGE("StopWifiProcess failedï¼Œand errcode is %{public}d", errorNo);
+        WIFI_LOGE("StopWifiProcess failed, and errcode is %{public}d", errorNo);
         NotifyResult(WifiInternalMsgCode::STA_OPEN_RES, static_cast<int>(OperateResState::CLOSE_WIFI_FAILED));
     }
 }
@@ -687,7 +687,7 @@ void StaStateMachine::DealConnectionEvent(InternalMessage *msg)
         wpsState = SetupMethod::INVALID;
     }
     /* Notify result to InterfaceService. */
-    NotifyResult(WifiInternalMsgCode::STA_CONNECT_RES, static_cast<int>(OperateResState::CONNECT_AP_CONNECTED));
+    NotifyResult(WifiInternalMsgCode::STA_CONNECT_RES, static_cast<int>(OperateResState::CONNECT_OBTAINING_IP));
 
     /* The current state of StaStateMachine transfers to GetIpState. */
     SwitchState(pGetIpState);
@@ -997,13 +997,13 @@ void StaStateMachine::OnNetworkConnectionEvent(int networkId, std::string bssid)
     SendMessage(msg);
 }
 
-void StaStateMachine::SyncLinkInfo(const std::vector<WifiScanInfo> &scanResults)
+void StaStateMachine::SyncLinkInfo(const std::vector<WifiScanInfo> &scanInfos)
 {
     WIFI_LOGI("Enter StaStateMachine::SyncLinkInfo.\n");
-    if (scanResults.empty()) {
+    if (scanInfos.empty()) {
         return;
     }
-    for (auto scanInfo : scanResults) {
+    for (auto scanInfo : scanInfos) {
         if ((scanInfo.ssid == linkedInfo.ssid) && (scanInfo.bssid == linkedInfo.bssid)) {
             InternalMessage *msg = CreateMessage();
             if (msg == nullptr) {
@@ -1497,7 +1497,7 @@ void StaStateMachine::HandleDhcpResult(const DhcpResult &dhcpResult)
     bool isGetIpSuc = false;
     bool isSetIpSuc = false;
 
-    /* number 2 is the number of ip_typeã€? */
+    /* number 2 is the number of ip_type */
     for (int index = 0; index < 2; index++) {
         WIFI_LOGI("HandleDhcpResult:isOptSuc=%{public}d, iptype=%{public}d, ip=%s, gateway=%s, "
              "subnet=%s",
@@ -1525,7 +1525,7 @@ void StaStateMachine::HandleDhcpResult(const DhcpResult &dhcpResult)
     if (!isGetIpSuc) {
         SaveLinkstate(ConnState::CONNECTED, DetailedState::NOTWORKING);
         statusId = static_cast<int>(WifiDeviceConfigStatus::DISABLED);
-        NotifyResult(WifiInternalMsgCode::STA_CONNECT_RES, static_cast<int>(OperateResState::CONNECT_NETWORK_DISABLED));
+        NotifyResult(WifiInternalMsgCode::STA_CONNECT_RES, static_cast<int>(OperateResState::CONNECT_OBTAINING_IP_FAIL));
         WIFI_LOGE("HandleDhcpResult get ip addr failed!");
         return;
     }
@@ -1538,6 +1538,7 @@ void StaStateMachine::HandleDhcpResult(const DhcpResult &dhcpResult)
         return;
     } else {
         WIFI_LOGI("HandleDhcpResult SetIfConfig succeed!");
+        NotifyResult(WifiInternalMsgCode::STA_CONNECT_RES, static_cast<int>(OperateResState::CONNECT_AP_CONNECTED));
         /* Update the uplink and downlink network rates periodically. */
         StartTimer(static_cast<int>(CMD_GET_NETWORK_SPEED), STA_NETWORK_SPEED_DELAY);
     }

@@ -28,18 +28,27 @@ public:
 
     static IfConfig &GetInstance();
 
-    int SetIfAddr(const DhcpResult &dhcpResult) const;
-    void SetNetDns(std::string ifName, std::string dns1, std::string dns2) const;
-    void FlushIpAddr(std::string ifName, int ipType) const;
-    void AddIpAddr(std::string ifName, std::string ipAddr, std::string mask, int ipType) const;
-    void AddIfRoute(std::string ifName, std::string ipAddr, std::string mask, std::string gateWay, int ipType) const;
-    void AddIpv4Route(std::string ifName, std::string ipAddr, std::string mask, std::string gateWay) const;
-    void AddIpv6Route(std::string ifName, std::string ipAddr, std::string mask, std::string gateWay) const;
-    void SetProxy(bool isAuto, std::string proxy, std::string port, std::string noProxys, std::string pac) const;
-    bool ExecCommand(const std::vector<std::string> &vecCommandArg) const;
+    int SetIfAddr(const DhcpResult &dhcpResult);
 
-private:
-    static std::unique_ptr<IfConfig> g_ifConfig;
+    void SetNetDns(const std::string &ifName, const std::string &dns1, const std::string &dns2);
+
+    void FlushIpAddr(const std::string &ifName, const int &ipType);
+
+    void AddIpAddr(const std::string &ifName, const std::string &ipAddr, const std::string &mask, const int &ipType);
+
+    void AddIfRoute(const std::string &ifName, const std::string &ipAddr, const std::string &mask,
+        const std::string &gateWay, const int &ipType);
+
+    void AddIpv4Route(
+        const std::string &ifName, const std::string &ipAddr, const std::string &mask, const std::string &gateWay);
+
+    void AddIpv6Route(
+        const std::string &ifName, const std::string &ipAddr, const std::string &mask, const std::string &gateWay);
+
+    void SetProxy(bool isAuto, const std::string &proxy, const std::string &port, const std::string &noProxys,
+        const std::string &pac);
+
+    bool ExecCommand(const std::vector<std::string> &vecCommandArg);
 };
 }  // namespace Wifi
 }  // namespace OHOS

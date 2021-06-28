@@ -84,7 +84,7 @@ void NetworkInterface::Dump(const std::string &interfaceName)
 
     ipv4.Dump();
 
-    LOGI("\tIPv6  size   [%d]", vecIPv6.size());
+    LOGI("\tIPv6  size   [%zu]", vecIPv6.size());
     for (const auto &item : vecIPv6) {
         item.Dump();
     }

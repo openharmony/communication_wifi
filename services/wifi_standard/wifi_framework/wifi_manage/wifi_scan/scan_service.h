@@ -77,7 +77,7 @@ public:
      * @param msgCode - Operation Result Code[in]
      * @param result - Indicates whether the operation is successful or failed[in]
      */
-    void NotifyScanResult(int msgCode, int result);
+    void NotifyScanInfo(int msgCode, int result);
     /**
      * @Description Start a complete Wi-Fi scan.
      *
@@ -173,15 +173,15 @@ public:
 
 private:
     using ScanConfigMap = std::map<int, StoreScanConfig>;
-    using ScanResultHandlerMap = std::map<std::string, ScanResultHandler>;
-    using PnoScanResultHandlerMap = std::map<std::string, PnoScanResultHandler>;
+    using ScanInfoHandlerMap = std::map<std::string, ScanInfoHandler>;
+    using PnoScanInfoHandlerMap = std::map<std::string, PnoScanInfoHandler>;
 
     ScanStateMachine *pScanStateMachine;                    /* Scanning state machine pointer */
     ScanMonitor *pScanMonitor;                              /* Scanning Monitor Pointer */
     WifiMessageQueue<WifiResponseMsgInfo> *pMessageQueueUp; /* Queue for returning messages */
     bool scanStartedFlag;                                   /* The scanning is started */
-    ScanResultHandlerMap scanResultHandlerMap;              /* Map of obtaining the scanning result */
-    PnoScanResultHandlerMap pnoScanResultHandlerMap;        /* Map of obtaining PNO scanning results */
+    ScanInfoHandlerMap scanInfoHandlerMap;              /* Map of obtaining the scanning result */
+    PnoScanInfoHandlerMap pnoScanInfoHandlerMap;        /* Map of obtaining PNO scanning results */
     ScanConfigMap scanConfigMap;                            /* Save Scan Configuration */
     int scanConfigStoreIndex;                               /* Index for saving the scan configuration */
     int64_t pnoScanStartTime;                               /* PNO scanning start time */
@@ -239,34 +239,34 @@ private:
      * @Description Save the scanning result in the configuration center.
      *
      * @param scanConfig - scan Config[in]
-     * @param scanResultList - scan result list[in]
+     * @param scanInfoList - scan result list[in]
      * @return success: true, failed: false
      */
-    bool StoreFullScanResult(const StoreScanConfig &scanConfig, const std::vector<InterScanResult> &scanResultList);
+    bool StoreFullScanInfo(const StoreScanConfig &scanConfig, const std::vector<InterScanInfo> &scanInfoList);
     /**
      * @Description Saves the scanning result of specified parameters in the configuration center.
      *
      * @param scanConfig - scan Config[in]
-     * @param scanResultList - scan result list[in]
+     * @param scanInfoList - scan result list[in]
      * @return success: true, failed: false
      */
-    bool StoreUserScanResult(const StoreScanConfig &scanConfig, const std::vector<InterScanResult> &scanResultList);
+    bool StoreUserScanInfo(const StoreScanConfig &scanConfig, const std::vector<InterScanInfo> &scanInfoList);
     /**
      * @Description Sends the scanning result to the interface service,
      *              which then sends the scanning result to the connection
      *              management module for processing.
      *
-     * @param scanResultList - scan result list[in]
+     * @param scanInfoList - scan result list[in]
      */
-    void ReportScanResults(const std::vector<InterScanResult> &scanResultList);
+    void ReportScanInfos(const std::vector<InterScanInfo> &interScanList);
     /**
      * @Description Convert the scanning result to the format of the interface service.
      *
-     * @param scanResultList - scan result list[in]
+     * @param scanInfoList - scan result list[in]
      * @param scanInfoList - Converted list[out]
      */
-    void ConvertScanResults(
-        const std::vector<InterScanResult> &scanResultList, std::vector<WifiScanInfo> &scanInfoList);
+    void ConvertScanInfos(
+        const std::vector<InterScanInfo> &interScanList, std::vector<WifiScanInfo> &scanInfoList);
     /**
      * @Description Enter the PNO scanning message body.
      *
@@ -305,9 +305,9 @@ private:
      * @Description Callback function for obtaining the scanning result
      *
      * @param requestIndexList - Request Index List[in]
-     * @param scanResultList - Scan Result List[in]
+     * @param scanInfoList - Scan Info List[in]
      */
-    void HandleCommonScanResult(std::vector<int> &requestIndexList, std::vector<InterScanResult> &scanResultList);
+    void HandleCommonScanInfo(std::vector<int> &requestIndexList, std::vector<InterScanInfo> &scanInfoList);
     /**
      * @Description Common scanning failure processing
      *
@@ -317,9 +317,9 @@ private:
     /**
      * @Description Callback function for obtaining the PNO scanning result
      *
-     * @param scanResultList - Scan Result List[in]
+     * @param scanInfoList - Scan Info List[in]
      */
-    void HandlePnoScanResult(std::vector<InterScanResult> &scanResultList);
+    void HandlePnoScanInfo(std::vector<InterScanInfo> &scanInfoList);
     /**
      * @Description PNO scanning failed, Restart after a delay.
      *

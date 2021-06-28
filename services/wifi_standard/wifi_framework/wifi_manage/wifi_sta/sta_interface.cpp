@@ -176,8 +176,8 @@ void StaInterface::WifiStaCmdCancelWpsReq(const WifiRequestMsgInfo *requestMsg)
 void StaInterface::WifiStaCmdConnectManagerReq(const WifiRequestMsgInfo *requestMsg)
 {
     WIFI_LOGI("Connection management information transferred successfully.\n");
-    pStaService->SyncLinkInfo(requestMsg->params.scanResults);
-    pStaService->AutoConnectService(requestMsg->params.scanResults);
+    pStaService->SyncLinkInfo(requestMsg->params.scanInfos);
+    pStaService->AutoConnectService(requestMsg->params.scanInfos);
 }
 
 void StaInterface::WifiStaCmdSetCountryCodeReq(const WifiRequestMsgInfo *requestMsg)

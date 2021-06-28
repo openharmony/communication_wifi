@@ -17,13 +17,16 @@
 #include "common_event_manager.h"
 #include "common_event.h"
 #include "common_event_data.h"
+#include "wifi_logger.h"
 
 using namespace OHOS::EventFwk;
+DEFINE_WIFILOG_LABEL("WifiCommonEventHelper");
 namespace OHOS {
 namespace Wifi {
 bool WifiCommonEventHelper::PublishEvent(const std::string &eventAction, const int &code, const std::string &data,
     const std::vector<std::string> &permissions)
 {
+    WIFI_LOGD("publish event[%{public}s], code:%{public}d",eventAction.c_str(),code);
     Want want;
     want.SetAction(eventAction);
     CommonEventData commonData;
@@ -33,20 +36,33 @@ bool WifiCommonEventHelper::PublishEvent(const std::string &eventAction, const i
     if (permissions.size() > 0) {
         CommonEventPublishInfo publishInfo;
         publishInfo.SetSubscriberPermissions(permissions);
-        return CommonEventManager::PublishCommonEvent(commonData, publishInfo);
+        if (!CommonEventManager::PublishCommonEvent(commonData,publishInfo)) {
+            WIFI_LOGE("failed to publish event[%s], code:%d",eventAction.c_str(),code);
+            return false;
+        }
+        return true;
     }
-    return CommonEventManager::PublishCommonEvent(commonData);
+    if (!CommonEventManager::PublishCommonEvent(commonData)) {
+        WIFI_LOGE("failed to publish event[%{public}s], code:%{public}d",eventAction.c_str(),code);
+        return false;
+    }
+    return true;
 }
 
 bool WifiCommonEventHelper::PublishEvent(const std::string &eventAction, const int &code, const std::string &data)
 {
+    WIFI_LOGD("publish event[%{public}s], code:%{public}d",eventAction.c_str(),code);
     Want want;
     want.SetAction(eventAction);
     CommonEventData commonData;
     commonData.SetWant(want);
     commonData.SetCode(code);
     commonData.SetData(data);
-    return CommonEventManager::PublishCommonEvent(commonData);
+    if (!CommonEventManager::PublishCommonEvent(commonData)) {
+        WIFI_LOGE("failed to publish event[%{public}s], code:%{public}d",eventAction.c_str(),code);
+        return false;
+    }
+    return true;
 }
 
 bool WifiCommonEventHelper::PublishPowerStateChangeEvent(const int &code, const std::string &data)

@@ -138,8 +138,8 @@ public:
                 result immediately.
      * @Return success: WIFI_OPT_SUCCESS  failed: WIFI_OPT_FAILED
      */
-    ErrCode AutoConnectService(const std::vector<WifiScanInfo> &scanResults);
-    ErrCode SyncLinkInfo(const std::vector<WifiScanInfo> &scanResults);
+    ErrCode AutoConnectService(const std::vector<WifiScanInfo> &scanInfos);
+    ErrCode SyncLinkInfo(const std::vector<WifiScanInfo> &scanInfos);
 
 private:
     StaStateMachine *pStaStateMachine;

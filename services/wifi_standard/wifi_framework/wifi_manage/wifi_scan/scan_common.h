@@ -171,7 +171,7 @@ enum ScanStatus {
 };
 
 /* Scan Result */
-struct InterScanResult {
+struct InterScanInfo {
     std::string bssid;        /* Access point address */
     std::string ssid;         /* Network Name */
     std::string capabilities; /*
@@ -185,7 +185,7 @@ struct InterScanResult {
     WifiSecurity securityType;
     int64_t timestamp;        /* Timestamp of scanning */
 
-    InterScanResult()
+    InterScanInfo()
     {
         frequency = 0;
         band = 0;
@@ -201,7 +201,7 @@ struct ScanStatusReport {
                                                   * Request index list,
                                                   * which is used for common scanning of reported events.
                                                   */
-    std::vector<InterScanResult> scanResultList; /*
+    std::vector<InterScanInfo> scanInfoList; /*
                                                   * Scan result,
                                                   * which is used for reporting
                                                   * common and PNO scan results.
@@ -216,8 +216,8 @@ struct ScanStatusReport {
 };
 
 using ScanStatusReportHandler = std::function<void(ScanStatusReport &scanStatusReport)>;
-using ScanResultHandler = std::function<void(std::vector<InterScanResult> &scanResultList)>;
-using PnoScanResultHandler = std::function<void(std::vector<InterScanResult> &pnoScanResultList)>;
+using ScanInfoHandler = std::function<void(std::vector<InterScanInfo> &scanInfoList)>;
+using PnoScanInfoHandler = std::function<void(std::vector<InterScanInfo> &pnoScanInfoList)>;
 }  // namespace Wifi
 }  // namespace OHOS
 #endif

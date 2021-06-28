@@ -268,7 +268,7 @@ void WifiManager::DealScanUpMsg(const WifiResponseMsgInfo &msg)
         case WifiInternalMsgCode::SCAN_RESULT_RES: {
             WifiRequestMsgInfo staMsg;
             staMsg.msgCode = WifiInternalMsgCode::STA_CONNECT_MANAGE_REQ;
-            staMsg.params.scanResults = msg.params.scanResults;
+            staMsg.params.scanInfos = msg.params.scanInfos;
             WifiManager::GetInstance().PushMsg(WIFI_SERVICE_STA, staMsg);
             break;
         }

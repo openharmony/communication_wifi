@@ -209,8 +209,8 @@ ErrCode WifiScanProxy::GetScanInfoList(std::vector<WifiScanInfo> &result)
         info.band = reply.ReadInt32();
         info.securityType = static_cast<WifiSecurity>(reply.ReadInt32());
         info.channelWidth = static_cast<WifiChannelWidth>(reply.ReadInt32());
-        info.centerFreq0 = reply.ReadInt32();
-        info.centerFreq1 = reply.ReadInt32();
+        info.centerFrequency0 = reply.ReadInt32();
+        info.centerFrequency1 = reply.ReadInt32();
         info.features = reply.ReadInt64();
         int ieSize = reply.ReadInt32();
         for (int m = 0; m < ieSize; ++m) {

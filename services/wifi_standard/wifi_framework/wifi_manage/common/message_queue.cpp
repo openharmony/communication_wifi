@@ -89,6 +89,7 @@ bool MessageQueue::AddMessageToQueue(InternalMessage *message, int64_t handleTim
     if (needWake) {
         std::unique_lock<std::mutex> lck(mMtxBlock);
         mCvQueue.notify_all();
+        mIsBlocked = false;
     }
 
     return true;
@@ -140,6 +141,7 @@ InternalMessage *MessageQueue::GetNextMessage()
         {
             std::unique_lock<std::mutex> lck(mMtxQueue);
             InternalMessage *curMsg = pMessageQueue;
+            mIsBlocked = true;
             if (curMsg != nullptr) {
                 if (nowTime < curMsg->GetHandleTime()) {
                     /* The execution time of the first message is not reached.
@@ -158,12 +160,13 @@ InternalMessage *MessageQueue::GetNextMessage()
             }
         }
 
-        mIsBlocked = true;
         std::unique_lock<std::mutex> lck(mMtxBlock);
-        if (mCvQueue.wait_for(lck, std::chrono::milliseconds(nextBlockTime)) == std::cv_status::timeout) {
-            LOGD("mCvQueue timeout.\n");
-        } else {
-            LOGD("Wake up.\n");
+        if (mIsBlocked && (!mNeedQuit)) {
+            if (mCvQueue.wait_for(lck, std::chrono::milliseconds(nextBlockTime)) == std::cv_status::timeout) {
+                LOGD("mCvQueue timeout.\n");
+            } else {
+                LOGD("Wake up.\n");
+            }
         }
         mIsBlocked = false;
     }
@@ -178,6 +181,7 @@ void MessageQueue::StopQueueLoop()
     if (mIsBlocked) {
         std::unique_lock<std::mutex> lck(mMtxBlock);
         mCvQueue.notify_all();
+        mIsBlocked = false;
     }
 
     return;

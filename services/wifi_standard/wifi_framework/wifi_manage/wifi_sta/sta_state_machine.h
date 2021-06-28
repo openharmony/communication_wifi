@@ -288,9 +288,9 @@ public:
     /**
      * @Description  Synchronize the linked information
      *
-     * @param scanResults - the results obtaining by scanning(in)
+     * @param scanInfos - the results obtaining by scanning(in)
      */
-    void SyncLinkInfo(const std::vector<WifiScanInfo> &scanResults);
+    void SyncLinkInfo(const std::vector<WifiScanInfo> &scanInfos);
     /**
      * @Description  Set country code
      *

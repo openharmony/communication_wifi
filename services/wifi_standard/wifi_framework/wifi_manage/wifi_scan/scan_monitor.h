@@ -53,15 +53,15 @@ private:
     ScanStateMachine *pScanStateMachine;
 
     /**
-     * @Description  Send Scan Result.
+     * @Description  Send Scan Info.
      *
      */
-    void SendScanResultEvent();
+    void SendScanInfoEvent();
     /**
      * @Description  Send Pno scanning results.
      *
      */
-    void SendPnoScanResultEvent();
+    void SendPnoScanInfoEvent();
     /**
      * @Description  Sending Scan Failure Events.
      *

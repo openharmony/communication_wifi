@@ -59,7 +59,7 @@ public:
      *
      * @param scanInfos - The list of scanning results(in)
      */
-    void OnScanResultsReadyHandler(const std::vector<WifiScanInfo> &scanInfos);
+    void OnScanInfosReadyHandler(const std::vector<WifiScanInfo> &scanInfos);
     /**
      * @Description  Whether tracking should enable or disable scanned BSSIDs
      *
@@ -163,7 +163,7 @@ private:
      * @param scanInfos - WifiScanInfo list of all APs in the range(in)
      * @param blockedBssids - Blocklisted BSSID List(in)
      * @param info - Current Connected Device(in)
-     * @param availableScanInfos - Available Scan Result(out)
+     * @param availableScanInfos - Available Scan Info(out)
      */
     void GetAvailableScanInfos(std::vector<WifiScanInfo> &availableScanInfos,
         const std::vector<WifiScanInfo> &scanInfos, std::vector<std::string> &blockedBssids, WifiLinkedInfo &info);

@@ -59,9 +59,9 @@ ErrCode StaAutoConnectService::InitAutoConnectService()
     return WIFI_OPT_SUCCESS;
 }
 
-void StaAutoConnectService::OnScanResultsReadyHandler(const std::vector<WifiScanInfo> &scanInfos)
+void StaAutoConnectService::OnScanInfosReadyHandler(const std::vector<WifiScanInfo> &scanInfos)
 {
-    WIFI_LOGI("Enter StaAutoConnectService::OnScanResultsReadyHandler.\n");
+    WIFI_LOGI("Enter StaAutoConnectService::OnScanInfosReadyHandler.\n");
     ClearOvertimeBlockedBssid(); /* Refreshing the BSSID Blocklist */
 
     WifiLinkedInfo info;
@@ -302,7 +302,7 @@ ErrCode StaAutoConnectService::AutoSelectDevice(WifiDeviceConfig &electedDevice,
 {
     WIFI_LOGI("Enter StaAutoConnectService::SelectNetwork.\n");
     if (scanInfos.empty()) {
-        WIFI_LOGE("No scanResult.\n");
+        WIFI_LOGE("No scanInfo.\n");
         return WIFI_OPT_FAILED;
     }
 
@@ -319,7 +319,7 @@ ErrCode StaAutoConnectService::AutoSelectDevice(WifiDeviceConfig &electedDevice,
     /* Filter out unnecessary networks. */
     GetAvailableScanInfos(availableScanInfos, scanInfos, blockedBssids, info);
     if (availableScanInfos.empty()) {
-        WIFI_LOGE("No scanResult available.\n");
+        WIFI_LOGE("No scanInfo available.\n");
         return WIFI_OPT_FAILED;
     }
     /*
@@ -564,7 +564,7 @@ void StaAutoConnectService::GetAvailableScanInfos(std::vector<WifiScanInfo> &ava
     if (scanInfos.empty()) {
         return;
     }
-    bool scanResultsContainCurrentBssid = false;
+    bool scanInfosContainCurrentBssid = false;
 
     for (auto scanInfo : scanInfos) {
         if (scanInfo.ssid.size() == 0) {
@@ -573,7 +573,7 @@ void StaAutoConnectService::GetAvailableScanInfos(std::vector<WifiScanInfo> &ava
 
         /* Check whether the scanning result contains the current BSSID. */
         if (info.connState == ConnState::CONNECTED && scanInfo.bssid == info.bssid) {
-            scanResultsContainCurrentBssid = true;
+            scanInfosContainCurrentBssid = true;
         }
 
         auto itr = find(blockedBssids.begin(), blockedBssids.end(), scanInfo.bssid);
@@ -602,8 +602,8 @@ void StaAutoConnectService::GetAvailableScanInfos(std::vector<WifiScanInfo> &ava
      * results. We will not act on these scans to avoid network switching that may
      * trigger disconnections.
      */
-    if (info.connState == ConnState::CONNECTED && !scanResultsContainCurrentBssid) {
-        WIFI_LOGI("scanResult is be cleared.\n");
+    if (info.connState == ConnState::CONNECTED && !scanInfosContainCurrentBssid) {
+        WIFI_LOGI("scanInfo is be cleared.\n");
         availableScanInfos.clear();
     }
     return;

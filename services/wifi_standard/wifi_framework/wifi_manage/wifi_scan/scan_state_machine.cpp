@@ -386,7 +386,7 @@ bool ScanStateMachine::CommonScanning::ExecuteStateMsg(InternalMessage *msg)
             return true;
 
         case SCAN_RESULT_EVENT:
-            pScanStateMachine->CommonScanResultProcess();
+            pScanStateMachine->CommonScanInfoProcess();
             pScanStateMachine->SwitchState(pScanStateMachine->commonScanUnworkedState);
             return true;
 
@@ -495,7 +495,7 @@ bool ScanStateMachine::PnoScanHardware::ExecuteStateMsg(InternalMessage *msg)
             return true;
 
         case PNO_SCAN_RESULT_EVENT:
-            pScanStateMachine->HwPnoScanResultProcess();
+            pScanStateMachine->HwPnoScanInfoProcess();
             return true;
 
         case CMD_START_COMMON_SCAN:
@@ -713,7 +713,7 @@ bool ScanStateMachine::PnoSwScanning::ExecuteStateMsg(InternalMessage *msg)
 
     switch (msg->GetMessageName()) {
         case SCAN_RESULT_EVENT:
-            pScanStateMachine->SoftwareScanResultProcess();
+            pScanStateMachine->SoftwareScanInfoProcess();
             pScanStateMachine->SwitchState(pScanStateMachine->pnoSwScanFreeState);
             return true;
 
@@ -994,13 +994,13 @@ bool ScanStateMachine::ActiveCoverNewScan(InterScanConfig &interScanConfig)
     return true;
 }
 
-void ScanStateMachine::CommonScanResultProcess()
+void ScanStateMachine::CommonScanInfoProcess()
 {
-    WIFI_LOGI("Enter ScanStateMachine::CommonScanResultProcess.\n");
+    WIFI_LOGI("Enter ScanStateMachine::CommonScanInfoProcess.\n");
 
     ScanStatusReport scanStatusReport;
-    if (!GetScanResults(scanStatusReport.scanResultList)) {
-        WIFI_LOGE("GetScanResults failed.");
+    if (!GetScanInfos(scanStatusReport.scanInfoList)) {
+        WIFI_LOGE("GetScanInfos failed.");
         ReportCommonScanFailedAndClear(true);
         return;
     }
@@ -1015,71 +1015,71 @@ void ScanStateMachine::CommonScanResultProcess()
     return;
 }
 
-void ScanStateMachine::ConvertScanResults(
-    std::vector<WifiScanResult> &wifiScanResults, std::vector<InterScanResult> &scanResults)
+void ScanStateMachine::ConvertScanInfos(
+    std::vector<WifiScanResult> &wifiScanResults, std::vector<InterScanInfo> &scanInfos)
 {
-    WIFI_LOGI("Enter ScanStateMachine::ConvertScanResults.\n");
+    WIFI_LOGI("Enter ScanStateMachine::ConvertScanInfos.\n");
 
     std::vector<WifiScanResult>::iterator iter = wifiScanResults.begin();
     for (; iter != wifiScanResults.end(); ++iter) {
-        InterScanResult singleResult;
-        singleResult.bssid = iter->bssid;
-        singleResult.ssid = iter->ssid;
-        singleResult.capabilities = iter->capability;
-        singleResult.frequency = iter->frequency;
-        singleResult.rssi = iter->signalLevel;
-        singleResult.timestamp = iter->timestamp;
-        GetSecurityTypeAndBand(singleResult);
-        scanResults.push_back(singleResult);
+        InterScanInfo singleInfo;
+        singleInfo.bssid = iter->bssid;
+        singleInfo.ssid = iter->ssid;
+        singleInfo.capabilities = iter->capability;
+        singleInfo.frequency = iter->frequency;
+        singleInfo.rssi = iter->signalLevel;
+        singleInfo.timestamp = iter->timestamp;
+        GetSecurityTypeAndBand(singleInfo);
+        scanInfos.push_back(singleInfo);
     }
 
     return;
 }
 
-void ScanStateMachine::GetSecurityTypeAndBand(InterScanResult &scanResult)
+void ScanStateMachine::GetSecurityTypeAndBand(InterScanInfo &scanInfo)
 {
     WIFI_LOGI("Enter ScanStateMachine::GetSecurityTypeAndBand.\n");
 
-    if (scanResult.frequency < SCAN_24GHZ_MAX_FREQUENCY) {
-        scanResult.band = SCAN_24GHZ_BAND;
-    } else if (scanResult.frequency > SCAN_5GHZ_MIN_FREQUENCY) {
-        scanResult.band = SCAN_5GHZ_BAND;
+    if (scanInfo.frequency < SCAN_24GHZ_MAX_FREQUENCY) {
+        scanInfo.band = SCAN_24GHZ_BAND;
+    } else if (scanInfo.frequency > SCAN_5GHZ_MIN_FREQUENCY) {
+        scanInfo.band = SCAN_5GHZ_BAND;
     } else {
-        WIFI_LOGE("invalid frequency value: %{public}d", scanResult.frequency);
-        scanResult.band = 0;
+        WIFI_LOGE("invalid frequency value: %{public}d", scanInfo.frequency);
+        scanInfo.band = 0;
     }
 
-    scanResult.securityType = WifiSecurity::OPEN;
-    if (scanResult.capabilities.find("WAPI-PSK") != std::string::npos) {
-        scanResult.securityType = WifiSecurity::WAPI_PSK;
+    scanInfo.securityType = WifiSecurity::OPEN;
+    if (scanInfo.capabilities.find("WAPI-PSK") != std::string::npos) {
+        scanInfo.securityType = WifiSecurity::WAPI_PSK;
         return;
     }
-    if (scanResult.capabilities.find("PSK") != std::string::npos) {
-        scanResult.securityType = WifiSecurity::PSK;
+    if (scanInfo.capabilities.find("PSK") != std::string::npos) {
+        scanInfo.securityType = WifiSecurity::PSK;
         return;
     }
-    if (scanResult.capabilities.find("WEP") != std::string::npos) {
-        scanResult.securityType = WifiSecurity::WEP;
+    if (scanInfo.capabilities.find("WEP") != std::string::npos) {
+        scanInfo.securityType = WifiSecurity::WEP;
         return;
     }
-    if (scanResult.capabilities.find("EAP_SUITE_B_192") != std::string::npos) {
-        scanResult.securityType = WifiSecurity::EAP_SUITE_B;
+    if (scanInfo.capabilities.find("EAP_SUITE_B_192") != std::string::npos) {
+        scanInfo.securityType = WifiSecurity::EAP_SUITE_B;
         return;
     }
-    if (scanResult.capabilities.find("EAP") != std::string::npos) {
-        scanResult.securityType = WifiSecurity::EAP;
+    if (scanInfo.capabilities.find("EAP") != std::string::npos) {
+        scanInfo.securityType = WifiSecurity::EAP;
         return;
     }
-    if (scanResult.capabilities.find("SAE") != std::string::npos) {
-        scanResult.securityType = WifiSecurity::SAE;
+    if (scanInfo.capabilities.find("SAE") != std::string::npos) {
+        scanInfo.securityType = WifiSecurity::SAE;
         return;
     }
-    if (scanResult.capabilities.find("OWE") != std::string::npos) {
-        scanResult.securityType = WifiSecurity::OWE;
+    if (scanInfo.capabilities.find("OWE") != std::string::npos) {
+        scanInfo.securityType = WifiSecurity::OWE;
         return;
     }
-    if (scanResult.capabilities.find("CERT") != std::string::npos) {
-        scanResult.securityType = WifiSecurity::WAPI_CERT;
+    if (scanInfo.capabilities.find("CERT") != std::string::npos) {
+        scanInfo.securityType = WifiSecurity::WAPI_CERT;
         return;
     }
     return;
@@ -1428,48 +1428,48 @@ bool ScanStateMachine::GetPnoScanConfig(InternalMessage *interMessage, PnoScanCo
     return true;
 }
 
-void ScanStateMachine::HwPnoScanResultProcess()
+void ScanStateMachine::HwPnoScanInfoProcess()
 {
-    WIFI_LOGI("Enter ScanStateMachine::HwPnoScanResultProcess.\n");
+    WIFI_LOGI("Enter ScanStateMachine::HwPnoScanInfoProcess.\n");
 
     if (!runningHwPnoFlag) {
         WIFI_LOGE("Hardware pno scan is not running.");
         return;
     }
 
-    std::vector<InterScanResult> scanResults;
-    if (!GetScanResults(scanResults)) {
-        WIFI_LOGE("GetScanResults failed.");
+    std::vector<InterScanInfo> scanInfos;
+    if (!GetScanInfos(scanInfos)) {
+        WIFI_LOGE("GetScanInfos failed.");
         return;
     }
 
-    if (NeedCommonScanAfterPno(scanResults)) {
+    if (NeedCommonScanAfterPno(scanInfos)) {
         SwitchState(commonScanAfterPnoState);
         return;
     }
 
-    ReportPnoScanResults(scanResults);
+    ReportPnoScanInfos(scanInfos);
     return;
 }
 
-void ScanStateMachine::ReportPnoScanResults(std::vector<InterScanResult> &scanResults)
+void ScanStateMachine::ReportPnoScanInfos(std::vector<InterScanInfo> &scanInfos)
 {
-    WIFI_LOGI("Enter ScanStateMachine::ReportPnoScanResults.\n");
+    WIFI_LOGI("Enter ScanStateMachine::ReportPnoScanInfos.\n");
 
     ScanStatusReport scanStatusReport;
     scanStatusReport.status = PNO_SCAN_RESULT;
-    scanStatusReport.scanResultList.assign(scanResults.begin(), scanResults.end());
+    scanStatusReport.scanInfoList.assign(scanInfos.begin(), scanInfos.end());
     if (scanStatusReportHandler) {
         scanStatusReportHandler(scanStatusReport);
     }
     return;
 }
 
-bool ScanStateMachine::NeedCommonScanAfterPno(std::vector<InterScanResult> &scanResults)
+bool ScanStateMachine::NeedCommonScanAfterPno(std::vector<InterScanInfo> &scanInfos)
 {
     WIFI_LOGI("Enter ScanStateMachine::NeedCommonScanAfterPno.\n");
-    if (scanResults.size() > 0) {
-        WIFI_LOGI("Enter UpdateNetworkScoreCache.[%{public}s]\n", scanResults[0].bssid.c_str());
+    if (scanInfos.size() > 0) {
+        WIFI_LOGI("Enter UpdateNetworkScoreCache.[%{public}s]\n", scanInfos[0].bssid.c_str());
     }
     return false;
 }
@@ -1496,13 +1496,13 @@ void ScanStateMachine::CommonScanAfterPnoResult()
 {
     WIFI_LOGI("Enter ScanStateMachine::CommonScanAfterPnoResult.\n");
 
-    std::vector<InterScanResult> scanResults;
-    if (!GetScanResults(scanResults)) {
-        WIFI_LOGE("GetScanResults failed.");
+    std::vector<InterScanInfo> scanInfos;
+    if (!GetScanInfos(scanInfos)) {
+        WIFI_LOGE("GetScanInfos failed.");
         return;
     }
 
-    ReportPnoScanResults(scanResults);
+    ReportPnoScanInfos(scanInfos);
     return;
 }
 
@@ -1539,9 +1539,9 @@ void ScanStateMachine::ClearPnoScanConfig()
     return;
 }
 
-bool ScanStateMachine::GetScanResults(std::vector<InterScanResult> &scanResults)
+bool ScanStateMachine::GetScanInfos(std::vector<InterScanInfo> &scanInfos)
 {
-    WIFI_LOGI("Enter ScanStateMachine::GetScanResults.\n");
+    WIFI_LOGI("Enter ScanStateMachine::GetScanInfos.\n");
 
     std::vector<WifiScanResult> wifiScanResults;
     WIFI_LOGI("Begin: QueryScanResults.");
@@ -1551,7 +1551,7 @@ bool ScanStateMachine::GetScanResults(std::vector<InterScanResult> &scanResults)
     }
     WIFI_LOGI("End: QueryScanResults.");
 
-    ConvertScanResults(wifiScanResults, scanResults);
+    ConvertScanInfos(wifiScanResults, scanInfos);
     return true;
 }
 
@@ -1632,16 +1632,16 @@ void ScanStateMachine::PnoScanSoftwareProcess(InternalMessage *interMessage)
     return;
 }
 
-void ScanStateMachine::SoftwareScanResultProcess()
+void ScanStateMachine::SoftwareScanInfoProcess()
 {
-    WIFI_LOGI("Enter ScanStateMachine::SoftwareScanResultProcess.\n");
+    WIFI_LOGI("Enter ScanStateMachine::SoftwareScanInfoProcess.\n");
 
-    std::vector<InterScanResult> scanResults;
-    if (!GetScanResults(scanResults)) {
-        WIFI_LOGE("GetScanResults failed.");
+    std::vector<InterScanInfo> scanInfos;
+    if (!GetScanInfos(scanInfos)) {
+        WIFI_LOGE("GetScanInfos failed.");
     }
 
-    ReportPnoScanResults(scanResults);
+    ReportPnoScanInfos(scanInfos);
     return;
 }
 

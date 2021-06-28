@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_WIFI_EVENT_BROAD_CAST_H
-#define OHOS_WIFI_EVENT_BROAD_CAST_H
+#ifndef OHOS_WIFI_INTERNAL_EVENT_DISPATCHER_H
+#define OHOS_WIFI_INTERNAL_EVENT_DISPATCHER_H
 
 #include <atomic>
 #include <chrono>

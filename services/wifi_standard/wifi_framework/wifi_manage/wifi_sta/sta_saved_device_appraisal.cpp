@@ -43,8 +43,8 @@ ErrCode StaSavedDeviceAppraisal::DeviceAppraisals(
     WIFI_LOGI("Enter StaSavedDeviceAppraisal::DeviceAppraisals.\n");
     int highestScore = 0;
     int sign = 0;
-    WifiScanInfo scanResultCandidate;
-    scanResultCandidate.rssi = VALUE_LIMIT_MIN_RSSI;
+    WifiScanInfo scanInfoElected;
+    scanInfoElected.rssi = VALUE_LIMIT_MIN_RSSI;
 
     for (auto scanInfo : scanInfos) {
         if (scanInfo.bssid.size() == 0) {
@@ -66,9 +66,9 @@ ErrCode StaSavedDeviceAppraisal::DeviceAppraisals(
         WIFI_LOGI(
             "The device %s score is %{public}d.rssi is %{public}d.\n", scanInfo.ssid.c_str(), score, scanInfo.rssi);
 
-        if (score > highestScore || (score == highestScore && scanInfo.rssi > scanResultCandidate.rssi)) {
+        if (score > highestScore || (score == highestScore && scanInfo.rssi > scanInfoElected.rssi)) {
             highestScore = score;
-            scanResultCandidate.rssi = scanInfo.rssi;
+            scanInfoElected.rssi = scanInfo.rssi;
             electedDevice = device;
             sign = 1;
         }

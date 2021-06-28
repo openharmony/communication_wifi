@@ -85,7 +85,7 @@ struct WifiInfoElem {
     {}
 };
 
-enum class ScanResultState {
+enum class ScanHandleNotify {
     SCAN_OK = 0,
     SCAN_FAIL,
 };
@@ -117,8 +117,8 @@ struct WifiScanInfo {
     int frequency;
     int band;  /* ap band: 1 - 2.4GHZ, 2 - 5GHZ */
     WifiChannelWidth channelWidth;
-    int centerFreq0;
-    int centerFreq1;
+    int centerFrequency0;
+    int centerFrequency1;
     int rssi; /* signal level */
     WifiSecurity securityType;
     std::vector<WifiInfoElem> infoElems;
@@ -130,8 +130,8 @@ struct WifiScanInfo {
         frequency = 0;
         band = 0;
         channelWidth = WifiChannelWidth::WIDTH_INVALID;
-        centerFreq0 = 0;
-        centerFreq1 = 0;
+        centerFrequency0 = 0;
+        centerFrequency1 = 0;
         rssi = 0;
         securityType = WifiSecurity::INVALID;
         features = 0;

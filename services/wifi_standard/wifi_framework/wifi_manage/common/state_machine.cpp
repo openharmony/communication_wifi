@@ -74,31 +74,61 @@ void StateMachine::NotExecutedMessage(InternalMessage *msg)
 
 void StateMachine::StatePlus(State *state, State *upper)
 {
+    if (pStateMachineHandler == nullptr) {
+        LOGE("Start StateMachine failed, pStateMachineHandler is nullptr!");
+        return;
+    }
+
     pStateMachineHandler->StatePlus(state, upper);
 }
 
 void StateMachine::StateDelete(State *state)
 {
+    if (pStateMachineHandler == nullptr) {
+        LOGE("Start StateMachine failed, pStateMachineHandler is nullptr!");
+        return;
+    }
+
     pStateMachineHandler->StateDelete(state);
 }
 
 void StateMachine::SetFirstState(State *firstState)
 {
+    if (pStateMachineHandler == nullptr) {
+        LOGE("Start StateMachine failed, pStateMachineHandler is nullptr!");
+        return;
+    }
+
     pStateMachineHandler->SetFirstState(firstState);
 }
 
 void StateMachine::SwitchState(State *targetState)
 {
+    if (pStateMachineHandler == nullptr) {
+        LOGE("Start StateMachine failed, pStateMachineHandler is nullptr!");
+        return;
+    }
+
     pStateMachineHandler->SwitchState(targetState);
 }
 
 void StateMachine::DelayMessage(InternalMessage *msg)
 {
+    if (pStateMachineHandler == nullptr) {
+        LOGE("Start StateMachine failed, pStateMachineHandler is nullptr!");
+        return;
+    }
+
     pStateMachineHandler->DelayMessage(msg);
 }
 
 void StateMachine::StopHandlerThread()
 {
+    if (pStateMachineHandler == nullptr) {
+        LOGE("Start StateMachine failed, pStateMachineHandler is nullptr!");
+        return;
+    }
+
     pStateMachineHandler->StopHandlerThread();
 }
 
@@ -231,7 +261,7 @@ bool StateMachineHandler::InitialSmHandler()
 
 StateInfo *StateMachineHandler::StatePlus(State *state, State *upper)
 {
-    LOGD("StateMachineHandler::StatePlus function.");
+    LOGD("Enter StateMachineHandler::StatePlus function.");
 
     StateInfo *upperStateInfo = nullptr;
     StateInfoMap::iterator it = mStateInfoMap.begin();
@@ -331,8 +361,8 @@ void StateMachineHandler::BuildTreeComplete()
     }
 
     LOGD("StateMachineHandler::BuildTreeComplete, maxDepth:%{public}d", maxDepth);
-    mStateVector.reserve(maxDepth);
-    mSequenceStateVector.reserve(maxDepth);
+    mStateVector.resize(maxDepth);
+    mSequenceStateVector.resize(maxDepth);
     BuildStateInitVector();
     MessageExecutedAtTime(pStateMachine->CreateMessage(SM_INIT_CMD), 0);
     return;

@@ -348,20 +348,20 @@ private:
      * @Description  Processing after the ScanMonitor scan success message is received.
      *
      */
-    void CommonScanResultProcess();
+    void CommonScanInfoProcess();
     /**
      * @Description  Processing after the ScanMonitor scan success message is received.
      *
-     * @param wifiScanResults - Scanning result queried from the bottom layer[in]
-     * @param scanResults - Scan internal scan results[out]
+     * @param wifiScanInfos - Scanning result queried from the bottom layer[in]
+     * @param scanInfos - Scan internal scan results[out]
      */
-    void ConvertScanResults(std::vector<WifiScanResult> &wifiScanResults, std::vector<InterScanResult> &scanResults);
+    void ConvertScanInfos(std::vector<WifiScanResult> &wifiScanInfos, std::vector<InterScanInfo> &scanInfos);
     /**
      * @Description The band and security type are parsed from the scanning result obtained by the IDL.
-     *
-     * @param scanResult - scan result[inout]
+     * 
+     * @param scanInfo - scan result[inout]
      */
-    void GetSecurityTypeAndBand(InterScanResult &scanResult);
+    void GetSecurityTypeAndBand(InterScanInfo &scanInfo);
     /**
      * @Description  Reporting Status to ScanService.
      *
@@ -486,20 +486,20 @@ private:
      * @Description  Processing after receiving a PNO scan success message from the ScanMonitor.
      *
      */
-    void HwPnoScanResultProcess();
+    void HwPnoScanInfoProcess();
     /**
      * @Description  Send the scanning result to ScanService.
      *
-     * @param scanResults - pno scan result
+     * @param scanInfos - pno scan result
      */
-    void ReportPnoScanResults(std::vector<InterScanResult> &scanResults);
+    void ReportPnoScanInfos(std::vector<InterScanInfo> &scanInfos);
     /**
      * @Description  Determine whether to start a common scan after hardware PNO.
      *
-     * @param scanResults - PNO scanning result
+     * @param scanInfos - PNO scanning result
      * @return success:true, failed:false
      */
-    bool NeedCommonScanAfterPno(std::vector<InterScanResult> &scanResults);
+    bool NeedCommonScanAfterPno(std::vector<InterScanInfo> &scanInfos);
     /**
      * @Description  Common scanning after hardware PNO.
      *
@@ -523,10 +523,10 @@ private:
     /**
      * @Description  Obtain the scanning result from the IDL.
      *
-     * @param scanResults - scan result[out]
+     * @param scanInfos - scan result[out]
      * @return success:true, failed:false
      */
-    bool GetScanResults(std::vector<InterScanResult> &scanResults);
+    bool GetScanInfos(std::vector<InterScanInfo> &scanInfos);
     /**
      * @Description  start PNO Software Scanning.
      *
@@ -555,7 +555,7 @@ private:
      * @Description  Invoke the IDL client to obtain the software scanning result.
      *
      */
-    void SoftwareScanResultProcess();
+    void SoftwareScanInfoProcess();
     /**
      * @Description  Constructing the State Tree of the Scan State Machine.
      *

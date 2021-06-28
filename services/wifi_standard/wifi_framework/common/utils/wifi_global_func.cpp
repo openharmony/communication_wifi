@@ -144,6 +144,10 @@ ConnectionState ConvertConnStateInternal(OperateResState resState)
     switch (resState) {
         case OperateResState::CONNECT_CONNECTING:
             return ConnectionState::CONNECT_CONNECTING;
+        case OperateResState::CONNECT_OBTAINING_IP:
+            return ConnectionState::CONNECT_OBTAINING_IP;
+        case OperateResState::CONNECT_OBTAINING_IP_FAIL:
+            return ConnectionState::CONNECT_OBTAINING_IP_FAIL;
         case OperateResState::CONNECT_AP_CONNECTED:
             return ConnectionState::CONNECT_AP_CONNECTED;
         case OperateResState::CONNECT_CHECK_PORTAL:

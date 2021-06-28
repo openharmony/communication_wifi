@@ -67,7 +67,7 @@ void ScanMonitor::ProcessReceiveScanEvent(int result)
 
     switch (result) {
         case SINGLE_SCAN_OVER_OK: {
-            SendScanResultEvent();
+            SendScanInfoEvent();
             break;
         }
         case SINGLE_SCAN_FAILED: {
@@ -75,7 +75,7 @@ void ScanMonitor::ProcessReceiveScanEvent(int result)
             break;
         }
         case PNO_SCAN_OVER_OK: {
-            SendPnoScanResultEvent();
+            SendPnoScanInfoEvent();
             break;
         }
         default: {
@@ -87,13 +87,13 @@ void ScanMonitor::ProcessReceiveScanEvent(int result)
     return;
 }
 
-void ScanMonitor::SendScanResultEvent()
+void ScanMonitor::SendScanInfoEvent()
 {
     pScanStateMachine->SendMessage(static_cast<int>(SCAN_RESULT_EVENT));
     return;
 }
 
-void ScanMonitor::SendPnoScanResultEvent()
+void ScanMonitor::SendPnoScanInfoEvent()
 {
     pScanStateMachine->SendMessage(static_cast<int>(PNO_SCAN_RESULT_EVENT));
     return;

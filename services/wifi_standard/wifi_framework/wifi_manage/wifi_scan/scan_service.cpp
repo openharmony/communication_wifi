@@ -132,7 +132,7 @@ void ScanService::HandleScanStatusReport(ScanStatusReport &scanStatusReport)
             break;
         }
         case COMMON_SCAN_SUCCESS: {
-            HandleCommonScanResult(scanStatusReport.requestIndexList, scanStatusReport.scanResultList);
+            HandleCommonScanInfo(scanStatusReport.requestIndexList, scanStatusReport.scanInfoList);
             break;
         }
         case COMMON_SCAN_FAILED: {
@@ -141,7 +141,7 @@ void ScanService::HandleScanStatusReport(ScanStatusReport &scanStatusReport)
         }
         case PNO_SCAN_RESULT: {
             pnoScanFailedNum = 0;
-            HandlePnoScanResult(scanStatusReport.scanResultList);
+            HandlePnoScanInfo(scanStatusReport.scanInfoList);
             break;
         }
         case PNO_SCAN_FAILED: {
@@ -195,9 +195,9 @@ void ScanService::NotifyScanServiceStatus(int msgCode)
     return;
 }
 
-void ScanService::NotifyScanResult(int msgCode, int result)
+void ScanService::NotifyScanInfo(int msgCode, int result)
 {
-    WIFI_LOGI("Enter ScanService::NotifyScanResult.\n");
+    WIFI_LOGI("Enter ScanService::NotifyScanInfo.\n");
 
     WifiResponseMsgInfo notifyScanMsg;
     notifyScanMsg.msgCode = msgCode;
@@ -487,9 +487,9 @@ void ScanService::HandleCommonScanFailed(std::vector<int> &requestIndexList)
 
         /* Notification of the end of scanning */
         if (configIter->second.fullScanFlag) {
-            NotifyScanResult(SCAN_RES, static_cast<int>(ScanResultState::SCAN_FAIL));
+            NotifyScanInfo(SCAN_RES, static_cast<int>(ScanHandleNotify::SCAN_FAIL));
         } else {
-            NotifyScanResult(SCAN_PARAM_RES, static_cast<int>(ScanResultState::SCAN_FAIL));
+            NotifyScanInfo(SCAN_PARAM_RES, static_cast<int>(ScanHandleNotify::SCAN_FAIL));
         }
 
         scanConfigMap.erase(*reqIter);
@@ -498,10 +498,10 @@ void ScanService::HandleCommonScanFailed(std::vector<int> &requestIndexList)
     return;
 }
 
-void ScanService::HandleCommonScanResult(
-    std::vector<int> &requestIndexList, std::vector<InterScanResult> &scanResultList)
+void ScanService::HandleCommonScanInfo(
+    std::vector<int> &requestIndexList, std::vector<InterScanInfo> &scanInfoList)
 {
-    WIFI_LOGI("Enter ScanService::HandleCommonScanResult.\n");
+    WIFI_LOGI("Enter ScanService::HandleCommonScanInfo.\n");
 
     bool fullScanInclude = false;
     bool fullScanStored = false;
@@ -512,55 +512,55 @@ void ScanService::HandleCommonScanResult(
             continue;
         }
 
-        /* Full Scan Result */
+        /* Full Scan Info */
         if (configIter->second.fullScanFlag) {
             fullScanInclude = true;
             if (fullScanStored) {
                 continue;
             }
 
-            if (StoreFullScanResult(configIter->second, scanResultList)) {
+            if (StoreFullScanInfo(configIter->second, scanInfoList)) {
                 fullScanStored = true;
-                NotifyScanResult(SCAN_RES, static_cast<int>(ScanResultState::SCAN_OK));
+                NotifyScanInfo(SCAN_RES, static_cast<int>(ScanHandleNotify::SCAN_OK));
             } else {
-                WIFI_LOGE("StoreFullScanResult failed.\n");
+                WIFI_LOGE("StoreFullScanInfo failed.\n");
             }
-            /* Specify Scan Result */
+            /* Specify Scan Info */
         } else {
-            if (!StoreUserScanResult(configIter->second, scanResultList)) {
-                WIFI_LOGE("StoreUserScanResult failed.\n");
+            if (!StoreUserScanInfo(configIter->second, scanInfoList)) {
+                WIFI_LOGE("StoreUserScanInfo failed.\n");
             }
-            NotifyScanResult(SCAN_PARAM_RES, static_cast<int>(ScanResultState::SCAN_OK));
+            NotifyScanInfo(SCAN_PARAM_RES, static_cast<int>(ScanHandleNotify::SCAN_OK));
         }
 
         scanConfigMap.erase(*reqIter);
     }
 
     /* Send the scanning result to the module registered for listening */
-    ScanResultHandlerMap::iterator handleIter = scanResultHandlerMap.begin();
-    for (; handleIter != scanResultHandlerMap.end(); ++handleIter) {
+    ScanInfoHandlerMap::iterator handleIter = scanInfoHandlerMap.begin();
+    for (; handleIter != scanInfoHandlerMap.end(); ++handleIter) {
         if (handleIter->second) {
-            handleIter->second(scanResultList);
+            handleIter->second(scanInfoList);
         }
     }
 
     /* Send the result to the interface service. */
-    ReportScanResults(scanResultList);
+    ReportScanInfos(scanInfoList);
 
     return;
 }
 
-bool ScanService::StoreFullScanResult(
-    const StoreScanConfig &scanConfig, const std::vector<InterScanResult> &scanResultList)
+bool ScanService::StoreFullScanInfo(
+    const StoreScanConfig &scanConfig, const std::vector<InterScanInfo> &scanInfoList)
 {
-    WIFI_LOGI("Enter ScanService::StoreFullScanResult.\n");
+    WIFI_LOGI("Enter ScanService::StoreFullScanInfo.\n");
 
     /* Filtering result */
     WIFI_LOGI("scanConfig.scanTime is %lld.\n", scanConfig.scanTime);
-    WIFI_LOGI("Receive %{public}d scan results.\n", (int)(scanResultList.size()));
-    std::vector<WifiScanInfo> filterScanResult;
-    std::vector<InterScanResult>::const_iterator iter = scanResultList.begin();
-    for (; iter != scanResultList.end(); ++iter) {
+    WIFI_LOGI("Receive %{public}d scan results.\n", (int)(scanInfoList.size()));
+    std::vector<WifiScanInfo> filterScanInfo;
+    std::vector<InterScanInfo>::const_iterator iter = scanInfoList.begin();
+    for (; iter != scanInfoList.end(); ++iter) {
         char tmpBuf[128] = "";
         EncryptLogMsg(iter->ssid.c_str(), tmpBuf, sizeof(tmpBuf));
         WifiScanInfo scanInfo;
@@ -573,10 +573,10 @@ bool ScanService::StoreFullScanResult(
         scanInfo.band = iter->band;
         scanInfo.securityType = iter->securityType;
 
-        filterScanResult.push_back(scanInfo);
+        filterScanInfo.push_back(scanInfo);
     }
 
-    if (WifiSettings::GetInstance().SaveScanInfoList(filterScanResult) != 0) {
+    if (WifiSettings::GetInstance().SaveScanInfoList(filterScanInfo) != 0) {
         WIFI_LOGE("WifiSettings::GetInstance().SaveScanInfoList failed.\n");
         return false;
     }
@@ -584,15 +584,15 @@ bool ScanService::StoreFullScanResult(
     return true;
 }
 
-bool ScanService::StoreUserScanResult(
-    const StoreScanConfig &scanConfig, const std::vector<InterScanResult> &scanResultList)
+bool ScanService::StoreUserScanInfo(
+    const StoreScanConfig &scanConfig, const std::vector<InterScanInfo> &scanInfoList)
 {
-    WIFI_LOGI("Enter ScanService::StoreUserScanResult.\n");
+    WIFI_LOGI("Enter ScanService::StoreUserScanInfo.\n");
 
     /* Filtering result */
-    std::vector<WifiScanInfo> filterScanResult;
-    std::vector<InterScanResult>::const_iterator iter = scanResultList.begin();
-    for (; iter != scanResultList.end(); ++iter) {
+    std::vector<WifiScanInfo> filterScanInfo;
+    std::vector<InterScanInfo>::const_iterator iter = scanInfoList.begin();
+    for (; iter != scanInfoList.end(); ++iter) {
         /* Timestamp filtering */
         if ((iter->timestamp) <= scanConfig.scanTime) {
             continue;
@@ -625,7 +625,7 @@ bool ScanService::StoreUserScanResult(
         scanInfo.timestamp = iter->timestamp;
         scanInfo.band = iter->band;
         scanInfo.securityType = iter->securityType;
-        filterScanResult.push_back(scanInfo);
+        filterScanInfo.push_back(scanInfo);
     }
 
     /*
@@ -636,30 +636,30 @@ bool ScanService::StoreUserScanResult(
     return true;
 }
 
-void ScanService::ReportScanResults(const std::vector<InterScanResult> &scanResultList)
+void ScanService::ReportScanInfos(const std::vector<InterScanInfo> &interScanList)
 {
-    WIFI_LOGI("Enter ScanService::ReportScanResults.\n");
+    WIFI_LOGI("Enter ScanService::ReportScanInfos.\n");
 
     /* Filtering result */
     std::vector<WifiScanInfo> scanInfoList;
-    ConvertScanResults(scanResultList, scanInfoList);
+    ConvertScanInfos(interScanList, scanInfoList);
 
     /* Notification interface service */
     WifiResponseMsgInfo notifyScanMsg;
     notifyScanMsg.msgCode = SCAN_RESULT_RES;
-    notifyScanMsg.params.scanResults = scanInfoList;
+    notifyScanMsg.params.scanInfos = scanInfoList;
     pMessageQueueUp->Push(notifyScanMsg);
     return;
 }
 
-void ScanService::ConvertScanResults(
-    const std::vector<InterScanResult> &scanResultList, std::vector<WifiScanInfo> &scanInfoList)
+void ScanService::ConvertScanInfos(
+    const std::vector<InterScanInfo> &interScanList, std::vector<WifiScanInfo> &scanInfoList)
 {
-    WIFI_LOGI("Enter ScanService::ConvertScanResults.\n");
+    WIFI_LOGI("Enter ScanService::ConvertScanInfos.\n");
 
     /* Filtering result */
-    std::vector<InterScanResult>::const_iterator iter = scanResultList.begin();
-    for (; iter != scanResultList.end(); ++iter) {
+    std::vector<InterScanInfo>::const_iterator iter = interScanList.begin();
+    for (; iter != interScanList.end(); ++iter) {
         WifiScanInfo scanInfo;
         scanInfo.bssid = iter->bssid;
         scanInfo.ssid = iter->ssid;
@@ -802,34 +802,34 @@ bool ScanService::AddPnoScanMessageBody(InternalMessage *interMessage, const Pno
     return true;
 }
 
-void ScanService::HandlePnoScanResult(std::vector<InterScanResult> &scanResultList)
+void ScanService::HandlePnoScanInfo(std::vector<InterScanInfo> &scanInfoList)
 {
-    WIFI_LOGI("Enter ScanService::HandlePnoScanResult.\n");
+    WIFI_LOGI("Enter ScanService::HandlePnoScanInfo.\n");
 
-    std::vector<InterScanResult> filterScanResult;
-    std::vector<InterScanResult>::iterator iter = scanResultList.begin();
-    for (; iter != scanResultList.end(); ++iter) {
+    std::vector<InterScanInfo> filterScanInfo;
+    std::vector<InterScanInfo>::iterator iter = scanInfoList.begin();
+    for (; iter != scanInfoList.end(); ++iter) {
         if ((iter->timestamp / SECOND_TO_MILLI_SECOND) > pnoScanStartTime) {
-            filterScanResult.push_back(*iter);
-            WIFI_LOGI("InterScanResult.bssid is %s.\n", iter->bssid.c_str());
-            WIFI_LOGI("InterScanResult.ssid is %s.\n", iter->ssid.c_str());
-            WIFI_LOGI("InterScanResult.capabilities is %{public}s.\n", iter->capabilities.c_str());
-            WIFI_LOGI("InterScanResult.frequency is %{public}d.\n", iter->frequency);
-            WIFI_LOGI("InterScanResult.rssi is %{public}d.\n", iter->rssi);
-            WIFI_LOGI("InterScanResult.timestamp is %lld.\n", iter->timestamp);
+            filterScanInfo.push_back(*iter);
+            WIFI_LOGI("InterScanInfo.bssid is %s.\n", iter->bssid.c_str());
+            WIFI_LOGI("InterScanInfo.ssid is %s.\n", iter->ssid.c_str());
+            WIFI_LOGI("InterScanInfo.capabilities is %{public}s.\n", iter->capabilities.c_str());
+            WIFI_LOGI("InterScanInfo.frequency is %{public}d.\n", iter->frequency);
+            WIFI_LOGI("InterScanInfo.rssi is %{public}d.\n", iter->rssi);
+            WIFI_LOGI("InterScanInfo.timestamp is %lld.\n", iter->timestamp);
         }
     }
 
     /* Send the scanning result to the module registered for listening */
-    PnoScanResultHandlerMap::iterator handleIter = pnoScanResultHandlerMap.begin();
-    for (; handleIter != pnoScanResultHandlerMap.end(); ++handleIter) {
+    PnoScanInfoHandlerMap::iterator handleIter = pnoScanInfoHandlerMap.begin();
+    for (; handleIter != pnoScanInfoHandlerMap.end(); ++handleIter) {
         if (handleIter->second) {
-            handleIter->second(filterScanResult);
+            handleIter->second(filterScanInfo);
         }
     }
 
     /* send message to main service */
-    ReportScanResults(filterScanResult);
+    ReportScanInfos(filterScanInfo);
 
     return;
 }

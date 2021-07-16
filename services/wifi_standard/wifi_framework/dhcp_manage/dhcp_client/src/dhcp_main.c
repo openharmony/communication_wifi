@@ -1,0 +1,378 @@
+/*
+ * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+#include <strings.h>
+#include <stdlib.h>
+#include <sys/types.h>
+#include <signal.h>
+#include <unistd.h>
+#include <string.h>
+#include <sys/stat.h>
+#include <stdio.h>
+#include <errno.h>
+
+#include "securec.h"
+#include "dhcp_client.h"
+#include "dhcp_function.h"
+
+#undef LOG_TAG
+#define LOG_TAG "WifiDhcpMain"
+
+/* Static declared. */
+static int Usage(void);
+static int RunChildProcess(void);
+static int CreateDaemon(void);
+static int CheckClientProParam(int argc, char *argv[]);
+static int GetClientOption(int argc, char *argv[]);
+static int InitSpecifiedClientCfg(int argc, char *argv[]);
+static int ExecClientProAction(const char *action);
+static int GetClientNetworkInfo(void);
+
+static struct DhcpClientCfg *g_cltCfg;
+
+/* Static defined. */
+static int Usage(void)
+{
+    printf("\nUsage:  dhcp_client_service ACTION INTERFACE [OPTION]\n");
+    printf("  ACTION = start|stop|status|help|ver\n");
+    printf("    start     - start INTERFACE's network interface service\n");
+    printf("    stop      - stop INTERFACE's network interface service\n");
+    printf("    status    - show INTERFACE's service status and exit\n");
+    printf("    help      - displays usage info, INTERFACE is optional\n");
+    printf("    ver       - displays client version, INTERFACE is optional\n");
+    printf("  INTERFACE = ifname, eg: wlan0\n");
+    printf("  OPTION = -w <directory>|-a or -4 or -6\n");
+    printf("    -w <directory> - specify the client's working directory\n");
+    printf("    -a - handle dhcp v4 and v6\n");
+    printf("    -4 - only handle dhcp v4\n");
+    printf("    -6 - only handle dhcp v6\n");
+    printf("\n========== running process operate ==========\n");
+    printf("  send dhcp release packet  =  kill -USR1 <pid>  \n");
+    printf("  send dhcp renew   packet  =  kill -USR2 <pid>  \n\n");
+    return DHCP_OPT_SUCCESS;
+}
+
+static int RunChildProcess(void)
+{
+    if (setpgrp() == -1) {
+        LOGE("RunChildProcess() can not change process group, return!\n");
+        return DHCP_OPT_FAILED;
+    }
+
+    if (signal(SIGHUP, SIG_IGN) == SIG_ERR) {
+        LOGE("RunChildProcess() signal SIGHUP SIG_ERR, return!\n");
+        return DHCP_OPT_FAILED;
+    }
+
+    /* Ensure we can never get a controlling terminal. */
+    pid_t childPid;
+    switch (childPid = fork()) {
+        case -1:
+            LOGE("RunChildProcess() fork grandchild failed, return!\n");
+            return DHCP_OPT_FAILED;
+        case 0:
+            /* Grandchild process continue run. */
+            break;
+        default:
+            /* Child process exit now. */
+            exit(EXIT_SUCCESS);
+    }
+    LOGI("RunChildProcess() child: fork grand suc, childPid:%{public}d,pid():%{public}d,ppid():%{public}d.\n",
+        childPid, getpid(), getppid());
+    return DHCP_OPT_SUCCESS;
+}
+
+static int CreateDaemon(void)
+{
+    LOGI("CreateDaemon() enter, pid:%{public}d, ppid:%{public}d.\n", getpid(), getppid());
+
+    /* A daemon process need close all open files. */
+    if (fclose(stdin) != 0) {
+        LOGE("CreateDaemon() fclose stdin error:%{public}s!\n", strerror(errno));
+        return DHCP_OPT_FAILED;
+    }
+    if (fclose(stdout) != 0) {
+        LOGE("CreateDaemon() fclose stdout error:%{public}s!\n", strerror(errno));
+        return DHCP_OPT_FAILED;
+    }
+    if (fclose(stderr) != 0) {
+        LOGE("CreateDaemon() fclose stderr error:%{public}s!\n", strerror(errno));
+        return DHCP_OPT_FAILED;
+    }
+
+    /* Ensure that the process is not a fork subprocess, init process id is 1. */
+    if (getppid() == 1) {
+        LOGI("CreateDaemon() getppid() == 1, the process's parent is already init process!\n");
+        /* Set default permissions for files and directories. */
+        umask(DEFAULT_UMASK);
+        return DHCP_OPT_SUCCESS;
+    }
+
+    pid_t pid;
+    switch (pid = fork()) {
+        case -1:
+            LOGE("CreateDaemon() fork first child failed, return!\n");
+            return DHCP_OPT_FAILED;
+        case 0:
+            if (RunChildProcess() != DHCP_OPT_SUCCESS) {
+                LOGE("CreateDaemon() RunChildProcess failed, return!\n");
+                return DHCP_OPT_FAILED;
+            };
+            /* Child process continue run. */
+            break;
+        default:
+            /* Parent process exit now. */
+            exit(EXIT_SUCCESS);
+    }
+
+    /* We have forked, setpgrp, forked once more, from now on, we are a daemon process. */
+    LOGI("CreateDaemon() grandchild continue run, pid:%{public}d,getpid():%{public}d,getppid():%{public}d.\n",
+        pid, getpid(), getppid());
+    umask(DEFAULT_UMASK);
+    return DHCP_OPT_SUCCESS;
+}
+
+static int CheckClientProParam(int argc, char *argv[])
+{
+    if (argc <= NUMBER_ONE) {
+        printf("CheckClientProParam() argc:%d error, please input valid ACTION!\n", argc);
+        Usage();
+        return -1;
+    }
+
+    /* Check client process param ACTION "help","ver". */
+    const char *cmdParam = argv[NUMBER_ONE];
+    if (strncasecmp(cmdParam, "help", NUMBER_FOUR) == 0) {
+        Usage();
+        return 1;
+    } else if (strncasecmp(cmdParam, "ver", NUMBER_THREE) == 0) {
+        printf("%s, version %s\n", DHCPC_NAME, DHCPC_VERSION);
+        return 1;
+    } else {
+        /* Check client process param ACTION "start","stop","status". */
+        if ((strncasecmp(cmdParam, "start", NUMBER_FIVE) != 0) && (strncasecmp(cmdParam, "stop", NUMBER_FOUR) != 0) &&
+            (strncasecmp(cmdParam, "status", NUMBER_FIVE) != 0)) {
+            printf("CheckClientProParam() argv[1]:%s error, please input valid ACTION!\n", cmdParam);
+            Usage();
+            return -1;
+        }
+        /* Check client process running argc. */
+        if (argc <= NUMBER_TWO) {
+            printf("CheckClientProParam() argc:%d error, please input valid INTERFACE!\n", argc);
+            Usage();
+            return -1;
+        }
+    }
+    return 0;
+}
+
+static int GetClientOption(int argc, char *argv[])
+{
+    int ch;
+    while ((ch = getopt(argc - NUMBER_TWO, argv + NUMBER_TWO, "w:a46")) != -1) {
+        switch (ch) {
+            case 'w':   /* Specify the client's working directory. */
+                LOGI("GetClientOption() cur workdir:%{public}s, optarg:%{public}s\n", g_cltCfg->workdir, optarg);
+                if (strncpy_s(g_cltCfg->workdir, sizeof(g_cltCfg->workdir), optarg, DIR_MAX_LEN - 1) != EOK) {
+                    return -1;
+                }
+                break;
+            case 'a':    /* Handle dhcp v4 and v6. */
+                g_cltCfg->iptype = DHCP_IP_TYPE_ALL;
+                break;
+            case '4':    /* Only handle dhcp v4. */
+                LOGI("GetClientOption() cur iptype:%{public}u, optarg:%{public}s\n", g_cltCfg->iptype, optarg);
+                g_cltCfg->iptype = DHCP_IP_TYPE_V4;
+                break;
+            case '6':    /* Only handle dhcp v6. */
+                g_cltCfg->iptype = DHCP_IP_TYPE_V6;
+                break;
+            default:
+                printf("GetClientOption() please input valid OPTION!\n");
+                Usage();
+                return -1;
+        }
+    }
+    return 0;
+}
+
+static int InitSpecifiedClientCfg(int argc, char *argv[])
+{
+    g_cltCfg = GetDhcpClientCfg();
+    if ((strncpy_s(g_cltCfg->workdir, sizeof(g_cltCfg->workdir), WORKDIR, DIR_MAX_LEN - 1) != EOK) ||
+        (strncpy_s(g_cltCfg->interface, sizeof(g_cltCfg->interface), argv[NUMBER_TWO], INFNAME_SIZE - 1) != EOK)) {
+        return -1;
+    }
+    g_cltCfg->iptype = DHCP_IP_TYPE_ALL;
+    if ((argc > NUMBER_THREE) && (GetClientOption(argc, argv) != 0)) {
+        return -1;
+    }
+
+    if (strlen(g_cltCfg->workdir) > 0) {
+        int n = snprintf_s(g_cltCfg->confFile,
+            DIR_MAX_LEN, DIR_MAX_LEN - 1, "%s%s", g_cltCfg->workdir, DHCPC_CONF);
+        if (n < 0) {
+            return -1;
+        }
+        n = snprintf_s(g_cltCfg->pidFile,
+            DIR_MAX_LEN, DIR_MAX_LEN - 1, "%s%s.pid", g_cltCfg->workdir, g_cltCfg->interface);
+        if (n < 0) {
+            return -1;
+        }
+        n = snprintf_s(g_cltCfg->resultFile,
+            DIR_MAX_LEN, DIR_MAX_LEN - 1, "%s%s.result", g_cltCfg->workdir, g_cltCfg->interface);
+        if (n < 0) {
+            return -1;
+        }
+    }
+    LOGI("InitSpecifiedClientCfg() "
+              "g_cltCfg->workdir:%{public}s,confFile:%{public}s,pidFile:%{public}s,resultFile:%{public}s, "
+              "iptype:%{public}d\n",
+        g_cltCfg->workdir,
+        g_cltCfg->confFile,
+        g_cltCfg->pidFile,
+        g_cltCfg->resultFile,
+        g_cltCfg->iptype);
+    return 0;
+}
+
+static int ExecClientProAction(const char *action)
+{
+    /* Stop the specified network interface service. */
+    if (strncasecmp(action, "stop", NUMBER_FOUR) == 0) {
+        if (StopProcess(g_cltCfg->pidFile) != DHCP_OPT_SUCCESS) {
+            LOGI("ExecClientProAction() StopProcess pidFile:%{public}s not success.\n", g_cltCfg->pidFile);
+        } else {
+            LOGI("ExecClientProAction() StopProcess pidFile:%{public}s success.\n", g_cltCfg->pidFile);
+        }
+        return 1;
+    }
+
+    /* Get the specified client process running status. */
+    int proStatus = GetProStatus(g_cltCfg->pidFile);
+    if (strncasecmp(action, "status", NUMBER_FIVE) == 0) {
+        LOGI("ExecClientProAction() action:%{public}s GetProStatus proStatus:%{public}d.\n", action, proStatus);
+        return 1;
+    }
+
+    /* Check the specified client process param ACTION. */
+    if (strncasecmp(action, "start", NUMBER_FIVE) != 0) {
+        LOGE("ExecClientProAction() argv[1]:%{public}s error, please input valid ACTION!\n", action);
+        Usage();
+        return -1;
+    }
+    if (proStatus == 1) {
+        LOGI("ExecClientProAction() the specified client process is already started!\n");
+        return 1;
+    }
+
+    /* Create a daemon process. */
+    if (CreateDaemon() != DHCP_OPT_SUCCESS) {
+        LOGE("ExecClientProAction() CreateDaemon failed!\n");
+        return -1;
+    }
+
+    /* Init the specified client process id info. */
+    if (InitPidfile(g_cltCfg->workdir, g_cltCfg->pidFile, getpid()) != DHCP_OPT_SUCCESS) {
+        LOGE("ExecClientProAction() InitPidfile failed, interface:%{public}s.\n", g_cltCfg->interface);
+        return -1;
+    }
+
+    return 0;
+}
+
+static int GetClientNetworkInfo(void)
+{
+    if (GetLocalInterface(g_cltCfg->interface, &g_cltCfg->ifaceIndex, g_cltCfg->hwaddr, NULL) != DHCP_OPT_SUCCESS) {
+        LOGE("GetClientNetworkInfo() GetLocalInterface failed, interface:%{public}s.\n", g_cltCfg->interface);
+        return -1;
+    }
+    char macAddr[MAC_ADDR_LEN * MAC_ADDR_CHAR_NUM];
+    if (memset_s(macAddr, sizeof(macAddr), 0, sizeof(macAddr)) != EOK) {
+        return -1;
+    }
+    HwaddrNtoa(g_cltCfg->hwaddr, MAC_ADDR_LEN, macAddr, sizeof(macAddr));
+    LOGI("GetClientNetworkInfo() g_cltCfg->interface:%{public}s -> ifaceIndex:%{private}d,hwaddr:%{private}s.\n",
+        g_cltCfg->interface, g_cltCfg->ifaceIndex, macAddr);
+
+    if (GetLocalIp(g_cltCfg->interface, &g_cltCfg->ipaddr4) != DHCP_OPT_SUCCESS) {
+        LOGE("GetClientNetworkInfo() failed, g_cltCfg->interface:%{public}s.\n", g_cltCfg->interface);
+        return -1;
+    }
+    char *cIp = Ip4IntConToStr(g_cltCfg->ipaddr4, true);
+    if (cIp == NULL) {
+        LOGE("GetClientNetworkInfo() Ip4IntConToStr g_cltCfg->ipaddr4 failed!\n");
+        return -1;
+    }
+    LOGI("GetClientNetworkInfo() GetLocalIp interface:%{public}s -> ipaddr4:%{private}u - %{private}s.\n",
+        g_cltCfg->interface, g_cltCfg->ipaddr4, cIp);
+    free(cIp);
+
+    /* Generate clientid for the specified client process interface. */
+    if (g_cltCfg->clientid == NULL) {
+        g_cltCfg->clientid = malloc(DHCP_OPT_CODE_BYTES + DHCP_OPT_LEN_BYTES + MAC_ADDR_LEN + 1);
+        if (g_cltCfg->clientid == NULL) {
+            LOGE("GetClientNetworkInfo() g_cltCfg->clientid malloc failed!\n");
+            return -1;
+        }
+        g_cltCfg->clientid[DHCP_OPT_CODE_INDEX] = DHO_CLIENTID;
+        g_cltCfg->clientid[DHCP_OPT_LEN_INDEX] = MAC_ADDR_LEN + 1;
+        /* Generate format: 1 + hwaddr. */
+        g_cltCfg->clientid[DHCP_OPT_DATA_INDEX] = NUMBER_ONE;
+        if (memcpy_s(g_cltCfg->clientid + DHCP_OPT_DATA_INDEX + 1,
+            MAC_ADDR_LEN,
+            g_cltCfg->hwaddr,
+            MAC_ADDR_LEN) != EOK) {
+            return -1;
+        }
+    }
+
+    return 0;
+}
+
+int main(int argc, char *argv[])
+{
+    /* Check client process running param ACTION. */
+    int nCheck = CheckClientProParam(argc, argv);
+    if (nCheck != 0) {
+        return (nCheck == 1) ? EXIT_SUCCESS : EXIT_FAILURE;
+    }
+
+    /* Init the specified client process config. */
+    if (InitSpecifiedClientCfg(argc, argv) != 0) {
+        return EXIT_FAILURE;
+    }
+
+    /* Exec the specified client process ACTION. */
+    const char *cmdParam = argv[NUMBER_ONE];
+    int nExec = ExecClientProAction(cmdParam);
+    if (nExec != 0) {
+        return (nExec == 1) ? EXIT_SUCCESS : EXIT_FAILURE;
+    }
+
+    /* Get the specified client process interface network info. */
+    int nGet = GetClientNetworkInfo();
+    if (nGet != 0) {
+        return (nGet == 1) ? EXIT_SUCCESS : EXIT_FAILURE;
+    }
+
+    /* Start the specified network interface service. */
+    if (StartProcess() != DHCP_OPT_SUCCESS) {
+        LOGE("main() StartProcess failed!\n");
+        return EXIT_FAILURE;
+    }
+
+    LOGI("main() end, argc:%{public}d.\n", argc);
+    return EXIT_SUCCESS;
+}

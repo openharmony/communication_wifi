@@ -47,7 +47,7 @@ public:
      *
      * @param ipType - Type of IP to be obtained [in]
      */
-    void SignalNetCheckThread(int ipType);
+    void SignalNetCheckThread();
     /**
      * @Description : stop the NetCheck processing thread.
      *
@@ -58,7 +58,6 @@ private:
     std::thread *pDealNetCheckThread;
     NetStateHandler netStateHandler;
     StaNetState lastNetState;
-    int currentIpType;
 
     /**
      * @Description : Detect Internet ability

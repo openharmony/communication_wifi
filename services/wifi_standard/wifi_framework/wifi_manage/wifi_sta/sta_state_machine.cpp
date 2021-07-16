@@ -49,7 +49,10 @@ StaStateMachine::StaStateMachine()
       targetRoamBssid(WPA_BSSID_ANY),
       currentTpType(IPTYPE_IPV4),
       isWpsConnect(IsWpsConnected::WPS_INVALID),
-      pDhcpServer(nullptr),
+      getIpSucNum(0),
+      getIpFailNum(0),
+      pDhcpService(nullptr),
+      pDhcpResultNotify(nullptr),
       pNetSpeed(nullptr),
       pNetcheck(nullptr),
       msgQueueUp(nullptr),
@@ -85,9 +88,10 @@ StaStateMachine::~StaStateMachine()
     ParsePointer(pGetIpState);
     ParsePointer(pLinkedState);
     ParsePointer(pApRoamingState);
-    ParsePointer(pDhcpServer);
     ParsePointer(pNetSpeed);
     ParsePointer(pNetcheck);
+    ParsePointer(pDhcpResultNotify);
+    ParsePointer(pDhcpService);
 }
 
 /* ---------------------------Initialization functions------------------------------ */
@@ -107,13 +111,11 @@ ErrCode StaStateMachine::InitStaStateMachine()
     StartStateMachine();
     InitStaSMHandleMap();
 
-    pDhcpServer =
-        new (std::nothrow) StaDhcpServer(std::bind(&StaStateMachine::HandleDhcpResult, this, std::placeholders::_1));
-    if (pDhcpServer == nullptr) {
+    pDhcpService = new (std::nothrow) DhcpService();
+    if (pDhcpService == nullptr) {
         WIFI_LOGE("pDhcpServer is null\n");
         return WIFI_OPT_FAILED;
     }
-    pDhcpServer->InitDhcpThread();
 
     pNetcheck = new (std::nothrow)
         StaNetworkCheck(std::bind(&StaStateMachine::HandleNetCheckResult, this, std::placeholders::_1));
@@ -157,6 +159,8 @@ ErrCode StaStateMachine::InitStaStates()
     tmpErrNumber += JudgmentEmpty(pApRoamingState);
     pNetSpeed = new StaNetWorkSpeed();
     tmpErrNumber += JudgmentEmpty(pNetSpeed);
+    pDhcpResultNotify = new DhcpResultNotify(this);
+    tmpErrNumber += JudgmentEmpty(pDhcpResultNotify);
     if (tmpErrNumber != 0) {
         WIFI_LOGE("InitStaStates some one state is null\n");
         return WIFI_OPT_FAILED;
@@ -450,6 +454,11 @@ bool StaStateMachine::WpaStartedState::ExecuteStateMsg(InternalMessage *msg)
 void StaStateMachine::StopWifiProcess()
 {
     WIFI_LOGD("Enter StaStateMachine::StopWifiProcess.\n");
+    if (currentTpType == IPTYPE_IPV4) {
+        pDhcpService->StopDhcpClient(IF_NAME, false);
+    } else {
+        pDhcpService->StopDhcpClient(IF_NAME, true);
+    }
     if (lastNetworkId != INVALID_NETWORK_ID) {
         if (statusId == static_cast<int>(WifiDeviceConfigStatus::DISABLED)) {
             WIFI_LOGD("The network status is DISABLED:1.\n");
@@ -463,6 +472,9 @@ void StaStateMachine::StopWifiProcess()
         WifiSettings::GetInstance().SyncDeviceConfig();
     }
     WIFI_LOGD("linkedInfo network = %{public}d", linkedInfo.networkId);
+
+    DhcpInfo dhcpInfo;
+    WifiSettings::GetInstance().SaveDhcpInfo(dhcpInfo);
 
     /* clear connection information. */
     InitWifiLinkedInfo();
@@ -701,6 +713,13 @@ void StaStateMachine::DealDisconnectEvent(InternalMessage *msg)
 
     WIFI_LOGD("Enter DealDisconnectEvent.\n");
     pNetcheck->StopNetCheckThread();
+    if (currentTpType == IPTYPE_IPV4) {
+        pDhcpService->StopDhcpClient(IF_NAME, false);
+    } else {
+        pDhcpService->StopDhcpClient(IF_NAME, true);
+    }
+    getIpSucNum = 0;
+    getIpFailNum = 0;
     if (statusId == static_cast<int>(WifiDeviceConfigStatus::DISABLED)) {
         WIFI_LOGD("The network status is DISABLED:1.\n");
         WifiSettings::GetInstance().SetDeviceState(lastNetworkId, static_cast<int>(WifiDeviceConfigStatus::DISABLED));
@@ -713,6 +732,9 @@ void StaStateMachine::DealDisconnectEvent(InternalMessage *msg)
 
     WifiSettings::GetInstance().SyncDeviceConfig();
     statusId = static_cast<int>(WifiDeviceConfigStatus::INVALID);
+
+    DhcpInfo dhcpInfo;
+    WifiSettings::GetInstance().SaveDhcpInfo(dhcpInfo);
     /* Initialize connection informatoin. */
     InitWifiLinkedInfo();
     if (lastLinkedInfo.detailedState == DetailedState::CONNECTING) {
@@ -1413,7 +1435,17 @@ void StaStateMachine::GetIpState::GoInState()
         }
     } else {
         pStaStateMachine->currentTpType = static_cast<int>(WifiSettings::GetInstance().GetDhcpIpType());
-        pStaStateMachine->pDhcpServer->SignalDhcpThread(pStaStateMachine->currentTpType);
+        if (pStaStateMachine->currentTpType == IPTYPE_IPV4) {
+            pStaStateMachine->pDhcpService->StartDhcpClient(IF_NAME, false);
+        } else {
+            pStaStateMachine->pDhcpService->StartDhcpClient(IF_NAME, true);
+        }
+        if (pStaStateMachine->pDhcpService->GetDhcpResult(IF_NAME, pStaStateMachine->pDhcpResultNotify, 15) != 0) {
+            LOGE(" Dhcp connection failed.\n");
+            pStaStateMachine->NotifyResult(
+                WifiInternalMsgCode::STA_CONNECT_RES, static_cast<int>(OperateResState::CONNECT_NETWORK_DISABLED));
+            pStaStateMachine->DisConnectProcess();
+        }
     }
 
     return;
@@ -1439,117 +1471,45 @@ bool StaStateMachine::ConfigStaticIpAddress(StaticIpAddress &staticIpAddress)
     WIFI_LOGI("Enter StaStateMachine::SetDhcpResultFromStatic.");
 
     DhcpResult result;
-
     switch (currentTpType) {
         case IPTYPE_IPV4: {
-            result[0].isOptSuc = true;
-            result[0].iptype = IPTYPE_IPV4;
-            result[0].ip = staticIpAddress.ipAddress.address.GetIpv4Address();
-            result[0].gateWay = staticIpAddress.gateway.GetIpv4Address();
-            result[0].subnet = staticIpAddress.GetIpv4Mask();
-            result[0].dns = staticIpAddress.dnsServer1.GetIpv4Address();
-            result[0].dns2 = staticIpAddress.dnsServer2.GetIpv4Address();
-            result[1].isOptSuc = false;
+            result.strYourCli = staticIpAddress.ipAddress.address.GetIpv4Address();
+            result.strRouter1 = staticIpAddress.gateway.GetIpv4Address();
+            result.strSubnet = staticIpAddress.GetIpv4Mask();
+            result.strDns1 = staticIpAddress.dnsServer1.GetIpv4Address();
+            pDhcpResultNotify->OnSuccess(1, IF_NAME, result);
+
             break;
         }
         case IPTYPE_IPV6: {
-            result[0].isOptSuc = false;
-
-            result[1].isOptSuc = true;
-            result[1].iptype = IPTYPE_IPV6;
-            result[1].ip = staticIpAddress.ipAddress.address.GetIpv6Address();
-            result[1].gateWay = staticIpAddress.gateway.GetIpv6Address();
-            result[1].subnet = staticIpAddress.GetIpv6Mask();
-            result[1].dns = staticIpAddress.dnsServer1.GetIpv6Address();
-            result[1].dns2 = staticIpAddress.dnsServer2.GetIpv6Address();
+            result.strYourCli = staticIpAddress.ipAddress.address.GetIpv6Address();
+            result.strRouter1 = staticIpAddress.gateway.GetIpv6Address();
+            result.strSubnet = staticIpAddress.GetIpv6Mask();
+            result.strDns1 = staticIpAddress.dnsServer1.GetIpv6Address();
+            pDhcpResultNotify->OnSuccess(1, IF_NAME, result);
             break;
         }
         case IPTYPE_MIX: {
-            result[0].isOptSuc = true;
-            result[0].iptype = IPTYPE_IPV4;
-            result[0].ip = staticIpAddress.ipAddress.address.GetIpv4Address();
-            result[0].gateWay = staticIpAddress.gateway.GetIpv4Address();
-            result[0].subnet = staticIpAddress.GetIpv4Mask();
-            result[0].dns = staticIpAddress.dnsServer1.GetIpv4Address();
-            result[0].dns2 = staticIpAddress.dnsServer2.GetIpv4Address();
+            result.iptype = IPTYPE_IPV4;
+            result.strYourCli = staticIpAddress.ipAddress.address.GetIpv4Address();
+            result.strRouter1 = staticIpAddress.gateway.GetIpv4Address();
+            result.strSubnet = staticIpAddress.GetIpv4Mask();
+            result.strDns1 = staticIpAddress.dnsServer1.GetIpv4Address();
+            pDhcpResultNotify->OnSuccess(1, IF_NAME, result);
 
-            result[1].isOptSuc = true;
-            result[1].iptype = IPTYPE_IPV6;
-            result[1].ip = staticIpAddress.ipAddress.address.GetIpv6Address();
-            result[1].gateWay = staticIpAddress.gateway.GetIpv6Address();
-            result[1].subnet = staticIpAddress.GetIpv6Mask();
-            result[1].dns = staticIpAddress.dnsServer1.GetIpv6Address();
-            result[1].dns2 = staticIpAddress.dnsServer2.GetIpv6Address();
+            result.iptype = IPTYPE_IPV6;
+            result.strYourCli = staticIpAddress.ipAddress.address.GetIpv6Address();
+            result.strRouter1 = staticIpAddress.gateway.GetIpv6Address();
+            result.strSubnet = staticIpAddress.GetIpv6Mask();
+            result.strDns1 = staticIpAddress.dnsServer1.GetIpv6Address();
+            pDhcpResultNotify->OnSuccess(1, IF_NAME, result);
             break;
         }
 
         default:
             return false;
     }
-
-    HandleDhcpResult(result);
     return true;
-}
-
-void StaStateMachine::HandleDhcpResult(const DhcpResult &dhcpResult)
-{
-    WIFI_LOGI("Enter HandleDhcpResult");
-    bool isGetIpSuc = false;
-    bool isSetIpSuc = false;
-
-    /* number 2 is the number of ip_type */
-    for (int index = 0; index < 2; index++) {
-        WIFI_LOGI("HandleDhcpResult:isOptSuc=%{public}d, iptype=%{public}d, ip=%s, gateway=%s, "
-             "subnet=%s",
-            dhcpResult[index].isOptSuc,
-            dhcpResult[index].iptype,
-            dhcpResult[index].ip.c_str(),
-            dhcpResult[index].gateWay.c_str(),
-            dhcpResult[index].subnet.c_str());
-        if (dhcpResult[index].isOptSuc) {
-            /* Configures network adapter. */
-            if (index == 0) {
-                linkedInfo.ipAddress = IpTools::ConvertIpv4Address(dhcpResult[index].ip);
-                WifiSettings::GetInstance().SaveLinkedInfo(linkedInfo);
-            }
-            isGetIpSuc = true;
-        }
-    }
-
-    /* Configures network adapter. */
-    int ret = IfConfig::GetInstance().SetIfAddr(dhcpResult);
-    if (ret == 0) {
-        isSetIpSuc = true;
-    }
-
-    if (!isGetIpSuc) {
-        SaveLinkstate(ConnState::CONNECTED, DetailedState::NOTWORKING);
-        statusId = static_cast<int>(WifiDeviceConfigStatus::DISABLED);
-        NotifyResult(WifiInternalMsgCode::STA_CONNECT_RES, static_cast<int>(OperateResState::CONNECT_OBTAINING_IP_FAIL));
-        WIFI_LOGE("HandleDhcpResult get ip addr failed!");
-        return;
-    }
-
-    if (!isSetIpSuc) {
-        SaveLinkstate(ConnState::CONNECTED, DetailedState::NOTWORKING);
-        statusId = static_cast<int>(WifiDeviceConfigStatus::DISABLED);
-        NotifyResult(WifiInternalMsgCode::STA_CONNECT_RES, static_cast<int>(OperateResState::CONNECT_NETWORK_DISABLED));
-        WIFI_LOGE("HandleDhcpResult SetIfConfig failed!");
-        return;
-    } else {
-        WIFI_LOGI("HandleDhcpResult SetIfConfig succeed!");
-        NotifyResult(WifiInternalMsgCode::STA_CONNECT_RES, static_cast<int>(OperateResState::CONNECT_AP_CONNECTED));
-        /* Update the uplink and downlink network rates periodically. */
-        StartTimer(static_cast<int>(CMD_GET_NETWORK_SPEED), STA_NETWORK_SPEED_DELAY);
-    }
-
-    sleep(SLEEPTIME); /* Wait for the network adapter information to take effect. */
-
-    /* Portal hotspot checking. */
-    if (PortalHttpDetection() != 0) {
-        pNetcheck->SignalNetCheckThread(currentTpType);
-    }
-    /* Check whether the Internet access is normal by ping command. */
 }
 
 void StaStateMachine::HandleNetCheckResult(StaNetState netState)
@@ -1772,6 +1732,83 @@ void StaStateMachine::SetWifiLinkedInfo(int networkId)
             }
         }
     }
+}
+
+
+/* ------------------ state machine dhcp callback function ----------------- */
+
+StaStateMachine::DhcpResultNotify::DhcpResultNotify(StaStateMachine *staStateMachine)
+{
+    pStaStateMachine = staStateMachine;
+}
+
+StaStateMachine::DhcpResultNotify::~DhcpResultNotify()
+{}
+
+void StaStateMachine::DhcpResultNotify::OnSuccess(int status, const std::string &ifname, DhcpResult &result)
+{
+    WIFI_LOGI("Enter DhcpResultNotify::OnSuccess");
+    if (ifname.compare("wlan0") == 0) {
+        WIFI_LOGD("iptype=%d, ip=%s, gateway=%s, subnet=%s, serverAddress=%s, leaseDuration=%d",
+            result.iptype,
+            result.strYourCli.c_str(),
+            result.strSubnet.c_str(),
+            result.strRouter1.c_str(),
+            result.strServer.c_str(),
+            result.uLeaseTime);
+
+        if (result.iptype == 0) {
+            DhcpInfo dhcpInfo;
+            dhcpInfo.ipAddress = IpTools::ConvertIpv4Address(result.strYourCli);
+            dhcpInfo.netGate = IpTools::ConvertIpv4Address(result.strRouter1);
+            dhcpInfo.netMask = IpTools::ConvertIpv4Address(result.strSubnet);
+            dhcpInfo.dns1 = IpTools::ConvertIpv4Address(result.strDns1);
+            dhcpInfo.dns2 = IpTools::ConvertIpv4Address(result.strDns2);
+            dhcpInfo.serverAddress = IpTools::ConvertIpv4Address(result.strServer);
+            dhcpInfo.leaseDuration = result.uLeaseTime;
+            WifiSettings::GetInstance().SaveDhcpInfo(dhcpInfo);
+            pStaStateMachine->linkedInfo.ipAddress = IpTools::ConvertIpv4Address(result.strYourCli);
+            WifiSettings::GetInstance().SaveLinkedInfo(pStaStateMachine->linkedInfo);
+        }
+
+        IfConfig::GetInstance().SetIfAddr(result, result.iptype);
+        if (pStaStateMachine->getIpSucNum == 0) {
+            pStaStateMachine->SaveLinkstate(ConnState::CONNECTED, DetailedState::CONNECTED);
+            pStaStateMachine->NotifyResult(
+                WifiInternalMsgCode::STA_CONNECT_RES, static_cast<int>(OperateResState::CONNECT_AP_CONNECTED));
+            /* Wait for the network adapter information to take effect. */
+            sleep(SLEEPTIME);
+
+            /* Check whether the Internet access is normal by send http. */
+            pStaStateMachine->pNetcheck->SignalNetCheckThread();
+        }
+        pStaStateMachine->getIpSucNum++;
+        return;
+    }
+}
+
+void StaStateMachine::DhcpResultNotify::OnFailed(int status, const std::string &ifname, const std::string &reason)
+{
+    WIFI_LOGI("Enter DhcpResultNotify::OnFailed");
+    if (ifname.compare("wlan0") == 0) {
+        if (pStaStateMachine->currentTpType != IPTYPE_IPV4) {
+            if (pStaStateMachine->getIpSucNum == 0 && pStaStateMachine->getIpFailNum == 1) {
+                pStaStateMachine->NotifyResult(
+                    WifiInternalMsgCode::STA_CONNECT_RES, static_cast<int>(OperateResState::CONNECT_OBTAINING_IP_FAIL));
+                pStaStateMachine->DisConnectProcess();
+            }
+        } else {
+            pStaStateMachine->NotifyResult(
+                WifiInternalMsgCode::STA_CONNECT_RES, static_cast<int>(OperateResState::CONNECT_OBTAINING_IP_FAIL));
+            pStaStateMachine->DisConnectProcess();
+        }
+        pStaStateMachine->getIpFailNum++;
+    }
+}
+
+void StaStateMachine::DhcpResultNotify::OnSerExitNotify(const std::string &ifname)
+{
+    WIFI_LOGI("Enter DhcpResultNotify::OnSerExitNotify");
 }
 
 /* ------------------ state machine Comment function ----------------- */

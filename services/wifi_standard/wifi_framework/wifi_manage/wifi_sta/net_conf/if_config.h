@@ -17,6 +17,7 @@
 
 #include <memory>
 #include "wifi_log.h"
+#include "dhcp_define.h"
 #include "sta_define.h"
 
 namespace OHOS {
@@ -28,7 +29,14 @@ public:
 
     static IfConfig &GetInstance();
 
-    int SetIfAddr(const DhcpResult &dhcpResult);
+    /**
+     * @Description : Set the If Addr object
+     *
+     * @param dhcpInfo - dhcp information[in]
+     * @param ipType - ip type[in]
+     * @return int
+     */
+    int SetIfAddr(const DhcpResult &dhcpInfo, int ipType);
 
     void SetNetDns(const std::string &ifName, const std::string &dns1, const std::string &dns2);
 

@@ -260,31 +260,45 @@ void WifiInternalEventDispatcher::DealStaCallbackMsg(WifiInternalEventDispatcher
 
 void WifiInternalEventDispatcher::PublishConnectionStateChangedEvent(int state, const WifiLinkedInfo &info)
 {
-    std::string eventData = "Idle";
-    switch (info.connState) {
-        case ConnState::CONNECTING:
+    std::string eventData = "Other";
+    switch (state) {
+        case int(OHOS::Wifi::ConnectionState::CONNECT_CONNECTING):
             eventData = "Connecting";
             break;
-        case ConnState::AUTHENTICATING:
-            eventData = "Authenticating";
+        case int(OHOS::Wifi::ConnectionState::CONNECT_OBTAINING_IP):
+            eventData = "OBtaingIp";
             break;
-        case ConnState::OBTAINING_IPADDR:
-            eventData = "ObtainingIpaddress";
+        case int(OHOS::Wifi::ConnectionState::CONNECT_OBTAINING_IP_FAIL):
+            eventData = "OBtaingIpFail";
             break;
-        case ConnState::CONNECTED:
-            eventData = "Connected";
+        case int(OHOS::Wifi::ConnectionState::CONNECT_AP_CONNECTED):
+            eventData = "ApConnecting";
             break;
-        case ConnState::SUSPENDED:
-            eventData = "Suspended";
+        case int(OHOS::Wifi::ConnectionState::CONNECT_CHECK_PORTAL):
+            eventData = "Connecting";
             break;
-        case ConnState::DISCONNECTING:
-            eventData = "Disconnecting";
+        case int(OHOS::Wifi::ConnectionState::CONNECT_NETWORK_ENABLED):
+            eventData = "NetworkEnabled";
             break;
-        case ConnState::DISCONNECTED:
+        case int(OHOS::Wifi::ConnectionState::CONNECT_NETWORK_DISABLED):
+            eventData = "NetworkDisabled";
+            break;
+        case int(OHOS::Wifi::ConnectionState::DISCONNECT_DISCONNECTING):
+            eventData = "DisconnectDisconnecting";
+            break;
+        case int(OHOS::Wifi::ConnectionState::DISCONNECT_DISCONNECTED):
             eventData = "Disconnected";
             break;
-        default:
+        case int(OHOS::Wifi::ConnectionState::CONNECT_PASSWORD_WRONG):
+            eventData = "ConnectPasswordWrong";
             break;
+        case int(OHOS::Wifi::ConnectionState::CONNECT_CONNECTING_TIMEOUT):
+            eventData = "ConnectingTimeout";
+            break;
+        default: {
+            eventData = "UnknownState";
+            break;
+        }
     }
     if (!WifiCommonEventHelper::PublishConnectionStateChangedEvent(state, eventData)) {
         WIFI_LOGE("failed to publish connection state changed event!");

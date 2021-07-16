@@ -25,6 +25,7 @@ const unsigned int LOG_ID_WIFI_HOTSPOT = LOG_ID_WIFI | 0x01;
 const unsigned int LOG_ID_WIFI_SCAN = LOG_ID_WIFI | 0x02;
 const unsigned int LOG_ID_WIFI_P2P = LOG_ID_WIFI | 0x03;
 const unsigned int LOG_ID_WIFI_AWARE = LOG_ID_WIFI | 0x04;
+const unsigned int LOG_ID_WIFI_DHCP = LOG_ID_WIFI | 0x05;
 
 #define DEFINE_WIFILOG_LABEL(name) \
     static constexpr OHOS::HiviewDFX::HiLogLabel WIFI_LOG_LABEL = {LOG_CORE, OHOS::Wifi::LOG_ID_WIFI, name};

@@ -74,27 +74,6 @@ typedef enum EnumStaIpType {
     IPTYPE_BUTT,
 } StaIpType;
 
-typedef struct TagDhcpResult {
-    int iptype;
-    bool isOptSuc;
-    std::string ip;
-    std::string gateWay;
-    std::string subnet;
-    std::string dns;
-    std::string dns2;
-
-    TagDhcpResult()
-    {
-        iptype = 0;
-        isOptSuc = false;
-        subnet = "255.255.255.0";
-        dns = "8.8.8.8";
-        dns2 = "8.8.4.4";
-    }
-} DhcpResult[2];
-
-typedef std::function<void(DhcpResult &pDhcpResult)> DhcpResultHandler;
-
 typedef enum EnumStaNetState {
     NETWORK_STATE_UNKNOW,
     NETWORK_STATE_WORKING,

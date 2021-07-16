@@ -26,9 +26,10 @@
 #include "wifi_msg.h"
 #include "state_machine.h"
 #include "wifi_sta_hal_interface.h"
-#include "sta_dhcp_server.h"
 #include "sta_network_speed.h"
 #include "sta_network_check.h"
+#include "dhcp_service.h"
+#include "i_dhcp_result_notify.h"
 #include "sta_define.h"
 
 namespace OHOS {
@@ -253,6 +254,48 @@ public:
         StaStateMachine *pStaStateMachine;
     };
 
+    class DhcpResultNotify : public IDhcpResultNotify {
+    public:
+        /**
+         * @Description : Construct a new dhcp result notify object
+         *
+         */
+        explicit DhcpResultNotify(StaStateMachine *pStaStateMachine);
+
+        /**
+         * @Description : Destroy the dhcp result notify object
+         *
+         */
+        ~DhcpResultNotify() override;
+
+        /**
+         * @Description : Get dhcp result of specified interface success notify asynchronously
+         *
+         * @param status - int
+         * @param ifname - interface name,eg:wlan0
+         * @param result - dhcp result
+         */
+        void OnSuccess(int status, const std::string &ifname, DhcpResult &result) override;
+
+        /**
+         * @Description : Get dhcp result of specified interface failed notify asynchronously
+         *
+         * @param status - int
+         * @param ifname - interface name,eg:wlan0
+         * @param reason - failed reason
+         */
+        void OnFailed(int status, const std::string &ifname, const std::string &reason) override;
+
+        /**
+        * @Description : Get the abnormal exit notify of dhcp server process.
+        *
+        * @param ifname - interface name,eg:wlan0
+        */
+        void OnSerExitNotify(const std::string& ifname) override;
+    private:
+        StaStateMachine *pStaStateMachine;
+    };
+
 public:
     /**
      * @Description  Initialize StaStateMachine
@@ -422,12 +465,6 @@ private:
     bool ConfigStaticIpAddress(StaticIpAddress &staticIpAddress);
     int PortalHttpDetection();
     /**
-     * @Description  Processing obtaining result of ip from dhcp.
-     *
-     * @param dhcpResult - the results needed to handle from dhcp(in)
-     */
-    void HandleDhcpResult(const DhcpResult &dhcpResult);
-    /**
      * @Description  the process of handling network check results.
      *
      * @param netState - the state of connecting network(in)
@@ -564,9 +601,12 @@ private:
     std::string targetRoamBssid;
     int currentTpType;
     IsWpsConnected isWpsConnect;
+    int getIpSucNum;
+    int getIpFailNum;
     WifiLinkedInfo linkedInfo;
     WifiLinkedInfo lastLinkedInfo;
-    StaDhcpServer *pDhcpServer;
+    IDhcpService *pDhcpService;
+    DhcpResultNotify *pDhcpResultNotify;
     StaNetWorkSpeed *pNetSpeed;
     StaNetworkCheck *pNetcheck;
     WifiMessageQueue<WifiResponseMsgInfo> *msgQueueUp; /* Uplink message queue. */

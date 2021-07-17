@@ -27,7 +27,6 @@ StaNetworkCheck::StaNetworkCheck(NetStateHandler handle)
     lastNetState = NETWORK_STATE_UNKNOW;
     isStopNetCheck = true;
     isExitNetCheckThread = false;
-    currentIpType = -1;
 }
 
 StaNetworkCheck::~StaNetworkCheck()
@@ -104,11 +103,10 @@ void StaNetworkCheck::StopNetCheckThread()
     isStopNetCheck = true;
 }
 
-void StaNetworkCheck::SignalNetCheckThread(int ipType)
+void StaNetworkCheck::SignalNetCheckThread()
 {
     WIFI_LOGI("enter SignalNetCheckThread!\n");
     lastNetState = NETWORK_STATE_UNKNOW;
-    currentIpType = ipType;
     isStopNetCheck = false;
     std::unique_lock<std::mutex> lck(mMutex);
     mCondition.notify_one();

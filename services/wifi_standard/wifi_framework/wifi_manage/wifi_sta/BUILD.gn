@@ -25,7 +25,6 @@ ohos_shared_library("wifi_sta_service") {
     "//foundation/communication/wifi/services/wifi_standard/wifi_framework/common/log/log_helper.c",
     "//foundation/communication/wifi/services/wifi_standard/wifi_framework/common/net_helper/http_request.cpp",
     "//foundation/communication/wifi/services/wifi_standard/wifi_framework/common/net_helper/ip_tools.cpp",
-    "sta_dhcp_server.cpp",
     "sta_network_check.cpp",
     "sta_network_speed.cpp",
     "sta_interface.cpp",
@@ -58,6 +57,8 @@ ohos_shared_library("wifi_sta_service") {
     "//foundation/communication/wifi/services/wifi_standard/depends/include/system/core/libutils/include",
     "//foundation/communication/wifi/services/wifi_standard/depends/include/system/core/base/include",
     "//foundation/communication/wifi/services/wifi_standard/depends/include/system/libbase/include",
+    "//foundation/communication/wifi/services/wifi_standard/wifi_framework/dhcp_manage/mgr_service/include",
+    "//foundation/communication/wifi/services/wifi_standard/wifi_framework/dhcp_manage/mgr_service/interfaces",
   ]
 
   cflags_cc = [
@@ -73,6 +74,7 @@ ohos_shared_library("wifi_sta_service") {
   deps = [
     "//foundation/communication/wifi/services/wifi_standard/wifi_framework/wifi_manage:wifi_manager_service",
     "//foundation/communication/wifi/services/wifi_standard/wifi_framework/wifi_manage/idl_client:wifi_idl_client",
+    "//foundation/communication/wifi/services/wifi_standard/wifi_framework/dhcp_manage/mgr_service:dhcp_manager_service",
     "//utils/native/base:utils",
   ]
 

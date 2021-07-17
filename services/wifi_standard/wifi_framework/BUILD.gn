@@ -31,3 +31,10 @@ group("wifi_manage") {
     "//foundation/communication/wifi/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta:wifi_sta_service",
   ]
 }
+
+group("dhcp_manage") {
+  deps = [
+    "//foundation/communication/wifi/services/wifi_standard/wifi_framework/dhcp_manage/mgr_service:dhcp_manager_service",
+    "//foundation/communication/wifi/services/wifi_standard/wifi_framework/dhcp_manage/dhcp_client:dhcp_client_service"
+  ]
+}

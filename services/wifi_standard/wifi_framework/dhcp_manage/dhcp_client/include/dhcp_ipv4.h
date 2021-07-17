@@ -12,18 +12,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#ifndef OHOS_IP4_H
+#define OHOS_IP4_H
 
-#ifndef OHOS_WIFI_LOG_TAGS_H
-#define OHOS_WIFI_LOG_TAGS_H
+#include <stdint.h>
 
-namespace OHOS {
-namespace Wifi {
-const unsigned int LOG_ID_WIFI = 0xD001560;
-const unsigned int LOG_ID_WIFI_HOTSPOT = LOG_ID_WIFI | 0x01;
-const unsigned int LOG_ID_WIFI_SCAN = LOG_ID_WIFI | 0x02;
-const unsigned int LOG_ID_WIFI_P2P = LOG_ID_WIFI | 0x03;
-const unsigned int LOG_ID_WIFI_AWARE = LOG_ID_WIFI | 0x04;
-const unsigned int LOG_ID_WIFI_DHCP = LOG_ID_WIFI | 0x05;
-}  // namespace Wifi
-}  // namespace OHOS
+#include "dhcp_define.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+int SetIpv4State(int state);
+int InitSignalHandle(void);
+
+int GetPacketHeaderInfo(struct DhcpPacket *packet, uint8_t type);
+int GetPacketCommonInfo(struct DhcpPacket *packet);
+int DhcpDiscover(uint32_t transid, uint32_t requestip);
+int DhcpRequest(uint32_t transid, uint32_t reqip, uint32_t servip);
+int DhcpRenew(uint32_t transid, uint32_t clientip, uint32_t serverip);
+int DhcpRelease(uint32_t clientip, uint32_t serverip);
+int StartIpv4(void);
+
+#ifdef __cplusplus
+}
+#endif
 #endif

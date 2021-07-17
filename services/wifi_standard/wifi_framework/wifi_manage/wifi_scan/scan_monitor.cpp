@@ -15,7 +15,7 @@
 #include "scan_monitor.h"
 #include "wifi_logger.h"
 
-DEFINE_WIFILOG_SCAN_LABEL("ScanStateMachine");
+DEFINE_WIFILOG_SCAN_LABEL("ScanMonitor");
 
 namespace OHOS {
 namespace Wifi {

@@ -14,6 +14,7 @@
  */
 
 #include <unistd.h>
+#include <error.h>
 #include <arpa/inet.h>
 #include <net/if.h>
 #include <net/route.h>
@@ -73,28 +74,21 @@ bool IfConfig::ExecCommand(const std::vector<std::string> &vecCommandArg)
  * @Description : Set the network card address, routing, DNS
  * @Return success:0 failed:-1
  */
-int IfConfig::SetIfAddr(const DhcpResult &dhcpResult)
+int IfConfig::SetIfAddr(const DhcpResult &dhcpResult, int ipType)
 {
-    int ret = -1;
-    const int ipTypeNum = 2;
-    for (int i = 0; i < ipTypeNum; i++) {
-        if (dhcpResult[i].isOptSuc) {
-            ret = 0;
-
-            SetNetDns(IFNAME, dhcpResult[i].dns, dhcpResult[i].dns2);
-
-            FlushIpAddr(IFNAME, dhcpResult[i].iptype);
-
-            AddIpAddr(IFNAME, dhcpResult[i].ip, dhcpResult[i].subnet, dhcpResult[i].iptype);
-
-            AddIfRoute(IFNAME, dhcpResult[i].ip, dhcpResult[i].subnet, dhcpResult[i].gateWay, dhcpResult[i].iptype);
-        }
-    }
-
-    if (ret == 0) {
-        LOGI("set addr succeed!");
-    }
-    return ret;
+    LOGD("ipType=%d, ip=%s, gateway=%s, subnet=%s, strDns1=%s, strDns2=%s",
+        dhcpResult.iptype,
+        dhcpResult.strYourCli.c_str(),
+        dhcpResult.strSubnet.c_str(),
+        dhcpResult.strRouter1.c_str(),
+        dhcpResult.strDns1.c_str(),
+        dhcpResult.strDns2.c_str());
+    SetNetDns(IFNAME, dhcpResult.strDns1, dhcpResult.strDns2);
+    FlushIpAddr(IFNAME, ipType);
+    AddIpAddr(IFNAME, dhcpResult.strYourCli, dhcpResult.strSubnet, ipType);
+    AddIfRoute(IFNAME, dhcpResult.strYourCli, dhcpResult.strSubnet, dhcpResult.strRouter1, ipType);
+    LOGI("set addr succeed!");
+    return 0;
 }
 
 /**

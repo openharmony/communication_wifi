@@ -170,7 +170,7 @@ enum ScanStatus {
     SCAN_STATUS_INVALID       /* Invalid value */
 };
 
-/* Scan Result */
+/* Scan Info */
 struct InterScanInfo {
     std::string bssid;        /* Access point address */
     std::string ssid;         /* Network Name */
@@ -187,11 +187,11 @@ struct InterScanInfo {
 
     InterScanInfo()
     {
-        frequency = 0;
-        band = 0;
-        rssi = 0;
-        securityType = WifiSecurity::INVALID;
-        timestamp = 0;
+          frequency = 0;
+          band = 0;
+          rssi = 0;
+          securityType = WifiSecurity::INVALID;
+          timestamp = 0;
     }
 };
 

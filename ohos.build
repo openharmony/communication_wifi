@@ -5,6 +5,7 @@
           "module_list": [
               "//foundation/communication/wifi/interfaces/innerkits/native_cpp/wifi_standard/src:wifi_sdk",
               "//foundation/communication/wifi/services/wifi_standard/wifi_framework:wifi_manage",
+          "//foundation/communication/wifi/services/wifi_standard/wifi_framework:dhcp_manage",
               "//foundation/communication/wifi/services/wifi_standard/wifi_hal:wifi_hal_service",
               "//foundation/communication/wifi/services/wifi_standard/wifi_framework:wifi_system_ability",
               "//foundation/communication/wifi/services/wifi_standard/sa_profile:wifi_standard_sa_profile"
@@ -36,6 +37,12 @@
                           "header_base": "//foundation/communication/wifi/services/wifi_standard/wifi_framework/wifi_manage/idl_client"
                       }
                   }
+              ]
+          },
+          "dhcp_manage": {
+              "module_list": [
+                  "//foundation/communication/wifi/services/wifi_standard/wifi_framework/dhcp_manage:dhcp_manager_service",
+                  "//foundation/communication/wifi/services/wifi_standard/wifi_framework/dhcp_manage/dhcp_client:dhcp_client_service"
               ]
           },
           "wifi_hal_service": [

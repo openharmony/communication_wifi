@@ -1,0 +1,199 @@
+/*
+ * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+#ifndef OHOS_DHCP_CLIENT_SERVICE_IMPL_H
+#define OHOS_DHCP_CLIENT_SERVICE_IMPL_H
+
+#include <map>
+#include <list>
+#include <thread>
+#include <mutex>
+
+#include "i_dhcp_client_service.h"
+#include "dhcp_define.h"
+
+
+namespace OHOS {
+namespace Wifi {
+struct DhcpResultReq {
+    int timeouts;
+    int getTimestamp;
+    IDhcpResultNotify *pResultNotify;
+
+    DhcpResultReq()
+    {
+        timeouts = RECEIVER_TIMEOUT;
+        getTimestamp = 0;
+        pResultNotify = nullptr;
+    }
+};
+class DhcpClientServiceImpl : public IDhcpClientService {
+public:
+    /**
+     * @Description : Construct a new dhcp client service object.
+     *
+     */
+    DhcpClientServiceImpl();
+
+    /**
+     * @Description : Destroy the dhcp client service object.
+     *
+     */
+    ~DhcpClientServiceImpl() override;
+
+    /**
+     * @Description : Start dhcp client service of specified interface.
+     *
+     * @param ifname - interface name, eg:wlan0 [in]
+     * @param bIpv6 - can or not get ipv6 [in]
+     * @Return : success - DHCP_OPT_SUCCESS, failed - others.
+     */
+    int StartDhcpClient(const std::string& ifname, bool bIpv6) override;
+
+    /**
+     * @Description : Stop dhcp client service of specified interface.
+     *
+     * @param ifname - interface name, eg:wlan0 [in]
+     * @param bIpv6 - can or not get ipv6 [in]
+     * @Return : success - DHCP_OPT_SUCCESS, failed - others.
+     */
+    int StopDhcpClient(const std::string& ifname, bool bIpv6) override;
+
+    /**
+     * @Description : Get dhcp client service running status of specified interface.
+     *
+     * @param ifname - interface name, eg:wlan0 [in]
+     * @Return : 0 - not start, 1 - normal started, -1 - not normal.
+     */
+    int GetDhcpStatus(const std::string& ifname) override;
+
+    /**
+     * @Description : Obtain the dhcp result of specified interface asynchronously.
+     *
+     * @param ifname - interface name, eg:wlan0 [in]
+     * @param dhcp - dhcp result notify [in]
+     * @param timeouts - timeout interval [in]
+     * @Return : success - DHCP_OPT_SUCCESS, failed - others.
+     */
+    int GetDhcpResult(const std::string& ifname, IDhcpResultNotify *pResultNotify, int timeouts) override;
+
+    /**
+     * @Description : Obtain the dhcp info of specified interface synchronously.
+     *
+     * @param ifname - interface name, eg:wlan0 [in]
+     * @param dhcp - dhcp info [out]
+     * @Return : success - DHCP_OPT_SUCCESS, failed - others.
+     */
+    int GetDhcpInfo(const std::string& ifname, DhcpServiceInfo& dhcp) override;
+
+    /**
+     * @Description : Renew dhcp client service of specified interface.
+     *
+     * @param ifname - interface name, eg:wlan0 [in]
+     * @Return : success - DHCP_OPT_SUCCESS, failed - others.
+     */
+    int RenewDhcpClient(const std::string& ifname) override;
+
+    /**
+     * @Description : Release dhcp client service of specified interface.
+     *
+     * @param ifname - interface name, eg:wlan0 [in]
+     * @Return : success - DHCP_OPT_SUCCESS, failed - others.
+     */
+    int ReleaseDhcpClient(const std::string& ifname) override;
+
+    /**
+     * @Description : Handle dhcp packet info.
+     *
+     * @param ifname - interface name, eg:wlan0 [in]
+     * @param packetResult - dhcp packet result [in]
+     * @param success - get success is true, get failed is false [in]
+     */
+    void DhcpPacketInfoHandle(const std::string& ifname, struct DhcpPacketResult &packetResult, bool success = true);
+
+    /**
+     * @Description : Handle dhcp result.
+     *
+     * @param second - sleep second number [out]
+     */
+    void DhcpResultHandle(uint32_t &second);
+
+    /**
+     * @Description : Get the dhcp client process pid of specified interface.
+     *
+     * @param ifname - interface name, eg:wlan0 [in]
+     * @Return : The dhcp client process pid.
+     */
+    pid_t GetDhcpClientProPid(const std::string& ifname);
+
+private:
+    /**
+     * @Description : Start dhcp result handle threads.
+     *
+     * @Return : success - DHCP_OPT_SUCCESS, failed - others.
+     */
+    int InitDhcpMgrThread();
+    /**
+     * @Description : Exit dhcp result handle threads and recv msg threads.
+     *
+     */
+    void ExitDhcpMgrThread();
+    /**
+     * @Description : Check dhcp result req is or not timeout.
+     *
+     */
+    void CheckTimeout();
+    /**
+     * @Description : Dhcp result handle threads execution function.
+     *
+     */
+    void RunDhcpResultHandleThreadFunc();
+    /**
+     * @Description : Dhcp recv msg threads execution function.
+     *
+     * @param ifname - interface name, eg:wlan0 [in]
+     */
+    void RunDhcpRecvMsgThreadFunc(const std::string& ifname);
+    /**
+     * @Description : Fork child process function for start or stop dhcp process.
+     *
+     * @param ifname - interface name, eg:wlan0 [in]
+     * @param bIpv6 - can or not get ipv6 [in]
+     * @Return : success - DHCP_OPT_SUCCESS, failed - others.
+     */
+    int ForkExecChildProcess(const std::string& ifname, bool bIpv6, bool bStart = false);
+    /**
+     * @Description : Fork parent process function for handle dhcp function.
+     *
+     * @param ifname - interface name, eg:wlan0 [in]
+     * @param bIpv6 - can or not get ipv6 [in]
+     * @Return : success - DHCP_OPT_SUCCESS, failed - others.
+     */
+    int ForkExecParentProcess(const std::string& ifname, bool bIpv6, bool bStart = false, pid_t pid = 0);
+
+private:
+    std::mutex mResultNotifyMutex;
+    std::mutex mRecvMsgThreadMutex;
+    bool isExitDhcpResultHandleThread;
+    std::thread *pDhcpResultHandleThread;
+    std::map<std::string, std::thread *> m_mapDhcpRecvMsgThread;
+
+    std::map<std::string, DhcpServiceInfo> m_mapDhcpInfo;
+    std::map<std::string, DhcpResult> m_mapDhcpResult;
+    std::map<std::string, std::list<DhcpResultReq*>> m_mapDhcpResultNotify;
+};
+}  // namespace Wifi
+}  // namespace OHOS
+#endif

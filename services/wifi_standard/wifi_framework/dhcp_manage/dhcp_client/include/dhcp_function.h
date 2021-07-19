@@ -18,16 +18,11 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <stdbool.h>
+#include <sys/types.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-/* Temporarily fix compilation errors begin */
-#ifndef pid_t
-#define pid_t int
-#endif
-/* Temporarily fix compilation errors end */
 
 bool Ip4StrConToInt(const char *strIp, uint32_t *uIp, bool bHost);
 char *Ip4IntConToStr(uint32_t uIp, bool bHost);

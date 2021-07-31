@@ -35,8 +35,6 @@ config("wifi_manager_service_header") {
     "//foundation/communication/wifi/services/wifi_standard/wifi_framework/wifi_manage/common",
     "//foundation/communication/wifi/services/wifi_standard/wifi_framework/wifi_manage/idl_client",
     "//foundation/communication/wifi/services/wifi_standard/wifi_framework/wifi_manage/idl_client/idl_interface",
-    "${even_path}/cesfwk/kits/native/include",
-    "${even_path}/cesfwk/innerkits/include",
     "${aafwk_path}/interfaces/innerkits/want/include",
     "${aafwk_path}/interfaces/innerkits/want/include/ohos/aafwk/content",
     "//foundation/distributedschedule/dmsfwk/services/dtbschedmgr/include",
@@ -44,7 +42,7 @@ config("wifi_manager_service_header") {
     "//foundation/appexecfwk/adapter/interfaces/innerkits/appexecfwk_base/include",
     "//foundation/appexecfwk/standard/interfaces/innerkits/libeventhandler/include",
     "//foundation/aafwk/standard/interfaces/innerkits/base/include",
-    "//foundation/appexecfwk/standard/interfaces/innerkits/appexecfwk_base/include"
+    "//foundation/appexecfwk/standard/interfaces/innerkits/appexecfwk_base/include",
   ]
 }
 
@@ -132,10 +130,8 @@ ohos_shared_library("wifi_manager_service") {
     "//foundation/communication/wifi/services/wifi_standard/wifi_framework/wifi_manage/idl_client:wifi_idl_client",
     "//foundation/distributedschedule/safwk/interfaces/innerkits/safwk:system_ability_fwk",
     "//utils/native/base:utils",
-    "${even_path}/common:libevent_common",
     "${aafwk_path}/interfaces/innerkits/base:base",
     "${aafwk_path}/interfaces/innerkits/want:want",
-    "//base/notification/ces_standard/cesfwk/kits/native:cesfwk_kits",
   ]
 
   defines = [
@@ -145,7 +141,10 @@ ohos_shared_library("wifi_manager_service") {
 
   configs = [ ":wifi_manager_service_header" ]
 
-  external_deps = [ "ipc:ipc_core" ]
+  external_deps = [
+    "ces_standard:cesfwk_innerkits",
+    "ipc:ipc_core",  
+  ]
 
   part_name = "wifi_standard"
   subsystem_name = "communication"

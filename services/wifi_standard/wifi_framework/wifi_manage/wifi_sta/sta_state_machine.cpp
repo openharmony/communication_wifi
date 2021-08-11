@@ -89,9 +89,16 @@ StaStateMachine::~StaStateMachine()
     ParsePointer(pLinkedState);
     ParsePointer(pApRoamingState);
     ParsePointer(pNetSpeed);
-    ParsePointer(pNetcheck);
+    if (pDhcpService != nullptr) {
+        if (currentTpType == IPTYPE_IPV4) {
+            pDhcpService->StopDhcpClient(IF_NAME, false);
+        } else {
+            pDhcpService->StopDhcpClient(IF_NAME, true);
+        }
+    }
     ParsePointer(pDhcpResultNotify);
     ParsePointer(pDhcpService);
+    ParsePointer(pNetcheck);
 }
 
 /* ---------------------------Initialization functions------------------------------ */

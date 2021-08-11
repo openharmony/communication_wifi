@@ -25,11 +25,22 @@ ohos_shared_library("wifi_native_js") {
     "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
     "//foundation/communication/wifi/interfaces/innerkits/native_cpp/wifi_standard/include",
     "//foundation/communication/wifi/services/wifi_standard/wifi_framework/common/net_helper",
+    "//base/notification/ces_standard/frameworks/core/include",
   ]
 
-  sources = [ "wifi_js.cpp" ]
+  sources = [
+    "wifi_napi_device.cpp",
+    "wifi_napi_entry.cpp",
+    "wifi_napi_event.cpp",
+    "wifi_napi_hotspot.cpp",
+    "wifi_napi_p2p.cpp",
+    "wifi_napi_utils.cpp",
+  ]
   deps = [
     "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog",
+    "//base/notification/ces_standard/frameworks/core:cesfwk_core",
+    "//base/notification/ces_standard/frameworks/native:cesfwk_innerkits",
+    "//foundation/aafwk/standard/interfaces/innerkits/want:want",
     "//foundation/ace/napi:ace_napi",
     "//foundation/communication/wifi/interfaces/innerkits/native_cpp/wifi_standard/src:wifi_sdk",
     "//utils/native/base:utils",

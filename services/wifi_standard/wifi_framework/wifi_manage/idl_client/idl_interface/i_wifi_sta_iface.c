@@ -538,6 +538,50 @@ WifiErrorNo GetScanResults(ScanResult *results, int *size)
     return result;
 }
 
+ScanResult* GetScanInfos(int *size)
+{
+    RpcClient *client = GetStaRpcClient();
+    LockRpcClient(client);
+    Context *context = client->context;
+    WriteBegin(context, 0);
+    WriteFunc(context, "GetScanResults");
+    WriteInt(context, *size);
+    WriteEnd(context);
+    int ret = RemoteCall(client);
+    if (ret < 0) {
+        LOGE("GetScanInfos: remote call failed!");
+        UnlockRpcClient(client);
+        return NULL;
+    }
+    int result = WIFI_IDL_OPT_FAILED;
+    ScanResult* scanInfos = NULL;
+    ReadInt(context, &result);
+    if (result != WIFI_IDL_OPT_OK) {
+        LOGE("server GetScanInfos deal failed!");
+    } else {
+        ReadInt(context, size);
+        LOGI("GetScanInfos size: %{public}d", *size);
+        if (size > 0) {
+            scanInfos = (ScanResult *)calloc(*size, sizeof(ScanResult));
+            if (scanInfos != NULL) {
+                for (int i = 0; i < *size; ++i) {
+                    ReadStr(context, scanInfos[i].bssid, WIFI_BSSID_LENGTH);
+                    ReadInt(context, &scanInfos[i].frequency);
+                    ReadInt(context, &scanInfos[i].signalLevel);
+                    ReadStr(context, scanInfos[i].capability, WIFI_SCAN_RESULT_CAPABILITIES_LENGTH);
+                    ReadStr(context, scanInfos[i].ssid, WIFI_SSID_LENGTH);
+                    ReadInt64(context, &scanInfos[i].timestamp);
+                }
+            } else {
+                LOGE("GetScanInfos alloc mem failed!");
+            }
+        }
+    }
+    ReadClientEnd(client);
+    UnlockRpcClient(client);
+    return scanInfos;
+}
+
 WifiErrorNo StartPnoScan(const PnoScanSettings *settings)
 {
     if (settings == NULL) {

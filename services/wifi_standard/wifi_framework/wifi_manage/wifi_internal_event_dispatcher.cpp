@@ -54,7 +54,8 @@ int WifiInternalEventDispatcher::SendSystemNotifyMsg() /* parameters */
     return 0;
 }
 
-int WifiInternalEventDispatcher::AddStaCallback(const sptr<IRemoteObject> &remote, const sptr<IWifiDeviceCallBack> &callback)
+int WifiInternalEventDispatcher::AddStaCallback(
+    const sptr<IRemoteObject> &remote, const sptr<IWifiDeviceCallBack> &callback)
 {
     WIFI_LOGD("WifiInternalEventDispatcher::AddStaCallback!");
     if (remote == nullptr || callback == nullptr) {
@@ -101,7 +102,8 @@ bool WifiInternalEventDispatcher::HasStaRemote(const sptr<IRemoteObject> &remote
     return false;
 }
 
-int WifiInternalEventDispatcher::AddScanCallback(const sptr<IRemoteObject> &remote, const sptr<IWifiScanCallback> &callback)
+int WifiInternalEventDispatcher::AddScanCallback(
+    const sptr<IRemoteObject> &remote, const sptr<IWifiScanCallback> &callback)
 {
     WIFI_LOGD("WifiInternalEventDispatcher::AddCallbackClient!");
     if (remote == nullptr || callback == nullptr) {
@@ -112,6 +114,7 @@ int WifiInternalEventDispatcher::AddScanCallback(const sptr<IRemoteObject> &remo
     mScanCallbacks[remote] = callback;
     return 0;
 }
+
 int WifiInternalEventDispatcher::RemoveScanCallback(const sptr<IRemoteObject> &remote)
 {
     if (remote != nullptr) {
@@ -159,6 +162,7 @@ int WifiInternalEventDispatcher::AddHotspotCallback(
     mHotspotCallbacks[remote] = callback;
     return 0;
 }
+
 int WifiInternalEventDispatcher::RemoveHotspotCallback(const sptr<IRemoteObject> &remote)
 {
     if (remote != nullptr) {
@@ -207,12 +211,15 @@ int WifiInternalEventDispatcher::AddBroadCastMsg(const WifiEventCallbackMsg &msg
 
 void WifiInternalEventDispatcher::Exit()
 {
-    mRunFlag = false;
-    mCondition.notify_one();
-    pthread_join(mTid, nullptr);
+    if (mRunFlag) {
+        mRunFlag = false;
+        mCondition.notify_one();
+        pthread_join(mTid, nullptr);
+    }
 }
 
-void WifiInternalEventDispatcher::DealStaCallbackMsg(WifiInternalEventDispatcher *pInstance, const WifiEventCallbackMsg &msg)
+void WifiInternalEventDispatcher::DealStaCallbackMsg(
+    WifiInternalEventDispatcher *pInstance, const WifiEventCallbackMsg &msg)
 {
     switch (msg.msgCode) {
         case WIFI_CBK_MSG_STATE_CHANGE:
@@ -315,7 +322,9 @@ void WifiInternalEventDispatcher::PublishWifiStateChangedEvent(int state)
     }
     WIFI_LOGD("publish wifi state changed event.");
 }
-void WifiInternalEventDispatcher::DealScanCallbackMsg(WifiInternalEventDispatcher *pInstance, const WifiEventCallbackMsg &msg)
+
+void WifiInternalEventDispatcher::DealScanCallbackMsg(
+    WifiInternalEventDispatcher *pInstance, const WifiEventCallbackMsg &msg)
 {
     auto callback = pInstance->GetSingleScanCallback();
     if (callback != nullptr) {
@@ -381,6 +390,7 @@ void WifiInternalEventDispatcher::InvokeDeviceCallbacks(const WifiEventCallbackM
         }
     }
 }
+
 void WifiInternalEventDispatcher::InvokeHotspotCallbacks(const WifiEventCallbackMsg &msg)
 {
     HotspotCallbackMapType callbacks = mHotspotCallbacks;
@@ -405,7 +415,9 @@ void WifiInternalEventDispatcher::InvokeHotspotCallbacks(const WifiEventCallback
         }
     }
 }
-void WifiInternalEventDispatcher::DealHotspotCallbackMsg(WifiInternalEventDispatcher *pInstance, const WifiEventCallbackMsg &msg)
+
+void WifiInternalEventDispatcher::DealHotspotCallbackMsg(
+    WifiInternalEventDispatcher *pInstance, const WifiEventCallbackMsg &msg)
 {
     auto callback = pInstance->GetSingleHotspotCallback();
     if (callback != nullptr) {

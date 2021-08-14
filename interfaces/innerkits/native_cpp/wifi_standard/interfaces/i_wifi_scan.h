@@ -54,7 +54,7 @@ public:
      * @param params - WifiScanParams object
      * @return ErrCode - operation result
      */
-    virtual ErrCode Scan(const WifiScanParams &params) = 0;
+    virtual ErrCode AdvanceScan(const WifiScanParams &params) = 0;
 
     /**
      * @Description Check whether the ScanAlways mode is enabled
@@ -73,6 +73,14 @@ public:
     virtual ErrCode GetScanInfoList(std::vector<WifiScanInfo> &result) = 0;
 
     virtual ErrCode RegisterCallBack(const sptr<IWifiScanCallback> &callback) = 0;
+
+    /**
+     * @Description Get supported features
+     *
+     * @param features - return supported features
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode GetSupportedFeatures(long &features) = 0;
 };
 }  // namespace Wifi
 }  // namespace OHOS

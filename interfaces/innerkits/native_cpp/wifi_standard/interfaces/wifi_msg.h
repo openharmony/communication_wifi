@@ -423,23 +423,23 @@ struct WifiMockState {
 };
 
 /* DHCP info */
-struct DhcpInfo {
+struct IpInfo {
     int ipAddress;     /* ip address */
-    int netGate;       /* gate */
-    int netMask;       /* mask */
-    int dns1;          /* main dns */
-    int dns2;          /* backup dns */
-    int serverAddress; /* DHCP server's address */
+    int gateway;       /* gate */
+    int netmask;       /* mask */
+    int primaryDns;          /* main dns */
+    int secondDns;          /* backup dns */
+    int serverIp; /* DHCP server's address */
     int leaseDuration;
 
-    DhcpInfo()
+    IpInfo()
     {
         ipAddress = 0;
-        netGate = 0;
-        netMask = 0;
-        dns1 = 0;
-        dns2 = 0;
-        serverAddress = 0;
+        gateway = 0;
+        netmask = 0;
+        primaryDns = 0;
+        secondDns = 0;
+        serverIp = 0;
         leaseDuration = 0;
     }
 };

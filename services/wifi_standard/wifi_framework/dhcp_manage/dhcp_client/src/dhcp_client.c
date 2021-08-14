@@ -30,7 +30,7 @@
 #define LOG_TAG "WifiDhcpClient"
 
 /* Default options. */
-static struct DhcpClientCfg g_clientCfg = {"", "", "", "", "", 0, 0, DHCP_IP_TYPE_NONE, {'\0'}, NULL, NULL, false};
+static struct DhcpClientCfg g_clientCfg = {"", "", "", "", "", 0, 0, DHCP_IP_TYPE_NONE, {'\0'}, NULL, false};
 
 struct DhcpClientCfg *GetDhcpClientCfg(void)
 {
@@ -44,11 +44,11 @@ int StartProcess(void)
         return DHCP_OPT_FAILED;
     }
 
-    if ((g_clientCfg.iptype == DHCP_IP_TYPE_ALL) || (g_clientCfg.iptype == DHCP_IP_TYPE_V6)) {
+    if ((g_clientCfg.getMode == DHCP_IP_TYPE_ALL) || (g_clientCfg.getMode == DHCP_IP_TYPE_V6)) {
         /* Handle dhcp v6. */
     }
 
-    if ((g_clientCfg.iptype == DHCP_IP_TYPE_ALL) || (g_clientCfg.iptype == DHCP_IP_TYPE_V4)) {
+    if ((g_clientCfg.getMode == DHCP_IP_TYPE_ALL) || (g_clientCfg.getMode == DHCP_IP_TYPE_V4)) {
         /* Handle dhcp v4. */
         StartIpv4();
     }

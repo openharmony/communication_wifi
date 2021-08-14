@@ -17,6 +17,7 @@
 #include "wifi_global_func.h"
 #include "wifi_logger.h"
 #include "wifi_sta_hal_interface.h"
+#include "wifi_chip_hal_interface.h"
 #include "wifi_auth_center.h"
 #include "wifi_config_center.h"
 #include "wifi_internal_event_dispatcher.h"
@@ -43,11 +44,13 @@ WifiManager &WifiManager::GetInstance()
     return gWifiManager;
 }
 
-WifiManager::WifiManager() : mTid(0), mRunFlag(true), mInitStatus_(INIT_UNKNOWN)
+WifiManager::WifiManager() : mTid(0), mRunFlag(true), mInitStatus_(INIT_UNKNOWN), mSupportedFeatures(0)
 {}
 
 WifiManager::~WifiManager()
-{}
+{
+    WIFI_LOGI("WifiManager::~WifiManager");
+}
 
 int WifiManager::Init()
 {
@@ -95,6 +98,7 @@ void WifiManager::Exit()
         msg.msgCode = WifiInternalMsgCode::MAIN_EXIT_CODE;
         mMqUp->Push(msg);
         pthread_join(mTid, nullptr);
+        mTid = 0;
     }
     return;
 }
@@ -154,6 +158,30 @@ int WifiManager::AddDeviceConfig(const WifiDeviceConfig &config, int &networkId)
     if (WifiStaHalInterface::GetInstance().SetDeviceConfig(networkId, idlConfig) != WIFI_IDL_OPT_OK) {
         WIFI_LOGE("Failed to SetDeviceConfig");
     }
+    return 0;
+}
+
+void WifiManager::AddSupportedFeatures(WifiFeatures feature)
+{
+    mSupportedFeatures |= static_cast<long>(feature);
+}
+
+int WifiManager::GetSupportedFeatures(long &features)
+{
+    int capability = 0;
+    if (WifiChipHalInterface::GetInstance().GetChipCapabilities(capability) != WIFI_IDL_OPT_OK) {
+        WIFI_LOGE("Failed to get chip capability!");
+        return -1;
+    }
+    long supportedFeatures = mSupportedFeatures;
+    supportedFeatures |= static_cast<long>(WifiFeatures::WIFI_FEATURE_INFRA);
+    supportedFeatures |= static_cast<long>(WifiFeatures::WIFI_FEATURE_INFRA_5G);
+    supportedFeatures |= static_cast<long>(WifiFeatures::WIFI_FEATURE_PASSPOINT);
+    supportedFeatures |= static_cast<long>(WifiFeatures::WIFI_FEATURE_AP_STA);
+    supportedFeatures |= static_cast<long>(WifiFeatures::WIFI_FEATURE_WPA3_SAE);
+    supportedFeatures |= static_cast<long>(WifiFeatures::WIFI_FEATURE_WPA3_SUITE_B);
+    supportedFeatures |= static_cast<long>(WifiFeatures::WIFI_FEATURE_OWE);
+    features = (supportedFeatures & capability);
     return 0;
 }
 
@@ -304,6 +332,7 @@ void WifiManager::UploadOpenWifiSuccessfulEvent()
 
     return;
 }
+
 void WifiManager::DealStaOpenRes(WifiManager *pInstance, const WifiResponseMsgInfo &msg)
 {
     if (msg.params.result == (int)OperateResState::OPEN_WIFI_FAILED) {

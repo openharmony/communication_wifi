@@ -40,10 +40,11 @@ public:
 
     ErrCode SetScanControlInfo(const ScanControlInfo &info) override;
     ErrCode Scan() override;
-    ErrCode Scan(const WifiScanParams &params) override;
+    ErrCode AdvanceScan(const WifiScanParams &params) override;
     ErrCode IsWifiClosedScan(bool &bOpen) override;
     ErrCode GetScanInfoList(std::vector<WifiScanInfo> &result) override;
     ErrCode RegisterCallBack(const sptr<IWifiScanCallback> &callback) override;
+    ErrCode GetSupportedFeatures(long &features) override;
 
 private:
     bool Init();

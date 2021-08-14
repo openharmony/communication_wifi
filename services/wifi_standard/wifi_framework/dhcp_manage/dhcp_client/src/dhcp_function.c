@@ -48,11 +48,11 @@ bool Ip4StrConToInt(const char *strIp, uint32_t *uIp, bool bHost)
     struct in_addr addr4;
     int nRet = inet_pton(AF_INET, strIp, &addr4);
     if (nRet != 1) {
-        LOGE("Ip4StrConToInt strIp:%{public}s failed, inet_pton nRet:%{public}d!\n", strIp, nRet);
+        LOGE("Ip4StrConToInt strIp:%{private}s failed, inet_pton nRet:%{public}d!\n", strIp, nRet);
         if (nRet == 0) {
-            LOGE("Ip4StrConToInt strIp:%{public}s not in presentation format!\n", strIp);
+            LOGE("Ip4StrConToInt strIp:%{private}s not in presentation format!\n", strIp);
         } else {
-            LOGE("Ip4StrConToInt strIp:%{public}s inet_pton does not contain a valid address family!\n", strIp);
+            LOGE("Ip4StrConToInt strIp:%{private}s inet_pton does not contain a valid address family!\n", strIp);
         }
         return false;
     }
@@ -77,17 +77,17 @@ char *Ip4IntConToStr(uint32_t uIp, bool bHost)
     }
     const char *p = inet_ntop(AF_INET, &addr4, bufIp4, INET_ADDRSTRLEN);
     if (p == NULL) {
-        LOGE("Ip4IntConToStr uIp:%{public}u failed, inet_ntop p == NULL!\n", uIp);
+        LOGE("Ip4IntConToStr uIp:%{private}u failed, inet_ntop p == NULL!\n", uIp);
         return NULL;
     }
 
     char *strIp = (char *)malloc(INET_ADDRSTRLEN);
     if (strIp == NULL) {
-        LOGE("Ip4IntConToStr uIp:%{public}u failed, strIp malloc failed!\n", uIp);
+        LOGE("Ip4IntConToStr uIp:%{private}u failed, strIp malloc failed!\n", uIp);
         return NULL;
     }
     if (strncpy_s(strIp, INET_ADDRSTRLEN, bufIp4, strlen(bufIp4)) != EOK) {
-        LOGE("Ip4IntConToStr uIp:%{public}u failed, strIp strncpy_s failed!\n", uIp);
+        LOGE("Ip4IntConToStr uIp:%{private}u failed, strIp strncpy_s failed!\n", uIp);
         free(strIp);
         return NULL;
     }
@@ -108,50 +108,49 @@ bool Ip6StrConToChar(const char *strIp, uint8_t chIp[], size_t chlen)
     }
     int nRet = inet_pton(AF_INET6, strIp, &addr6);
     if (nRet != 1) {
-        LOGE("Ip6StrConToChar strIp:%{public}s failed, inet_pton nRet:%{public}d!\n", strIp, nRet);
+        LOGE("Ip6StrConToChar strIp:%{private}s failed, inet_pton nRet:%{public}d!\n", strIp, nRet);
         if (nRet == 0) {
-            LOGE("Ip6StrConToChar strIp:%{public}s not in presentation format!\n", strIp);
+            LOGE("Ip6StrConToChar strIp:%{private}s not in presentation format!\n", strIp);
         } else {
-            LOGE("Ip6StrConToChar strIp:%{public}s inet_pton does not contain a valid address family!\n", strIp);
+            LOGE("Ip6StrConToChar strIp:%{private}s inet_pton does not contain a valid address family!\n", strIp);
         }
         return false;
     }
 
-    LOGI("Ip6StrConToChar strIp:%{public}s -> \n", strIp);
+    LOGI("Ip6StrConToChar strIp:%{private}s -> \n", strIp);
     for (size_t i = 0; i < chlen; i++) {
-        LOGI("Ip6StrConToChar addr6.s6_addr: %{public}zu - %{public}02x\n", i, addr6.s6_addr[i]);
+        LOGI("Ip6StrConToChar addr6.s6_addr: %{private}zu - %{private}02x\n", i, addr6.s6_addr[i]);
         chIp[i] = addr6.s6_addr[i];
     }
 
     return true;
 }
 
-const char *HwaddrNtoa(const unsigned char *hwaddr, size_t hwlen, char *buf, size_t buflen)
+const char *MacChConToMacStr(const unsigned char *pChMac, size_t chLen, char *pStrMac, size_t strLen)
 {
-    const unsigned char *hp = NULL;
-    const unsigned char *ep = NULL;
-    char *p = NULL;
-
-    if (buf == NULL || hwlen == 0) {
+    if ((pChMac == NULL) || (chLen == 0)) {
+        LOGE("MacChConToMacStr failed, pChMac == NULL or chLen == 0!\n");
         return NULL;
     }
 
-    if (hwlen * MAC_ADDR_CHAR_NUM > buflen) {
+    if ((pStrMac == NULL) || (strLen < (chLen * MAC_ADDR_CHAR_NUM))) {
+        LOGE("MacChConToMacStr failed, pStrMac == NULL or strLen:%{public}d error!\n", (int)strLen);
         return NULL;
     }
 
-    hp = (const unsigned char *)hwaddr;
-    ep = hp + hwlen;
-    p = buf;
-
-    while (hp < ep) {
-        if (hp != hwaddr) {
-            *p++ = ':';
+    const unsigned char *pSrc = pChMac;
+    const unsigned char *pSrcEnd = pSrc + chLen;
+    char *pDest = pStrMac;
+    for (; pSrc < pSrcEnd; pSrc++) {
+        /* The first character of pStrMac starts with a letter, not ':'. */
+        if (pSrc != pChMac) {
+            *(pDest++) = ':';
         }
-        p += snprintf_s(p, MAC_ADDR_CHAR_NUM, MAC_ADDR_CHAR_NUM - 1, "%.2x", *hp++);
+        pDest += snprintf_s(pDest, MAC_ADDR_CHAR_NUM, MAC_ADDR_CHAR_NUM - 1, "%.2x", *pSrc);
     }
-    *p++ = '\0';
-    return buf;
+    /* The last character of pStrMac ends with '\0'. */
+    *(pDest++) = '\0';
+    return pStrMac;
 }
 
 int GetLocalInterface(const char *ifname, int *ifindex, unsigned char *hwaddr, uint32_t *ifaddr4)
@@ -256,13 +255,13 @@ int GetLocalIp(const char *ifname, uint32_t *ifaddr4)
         if (family == AF_INET) {
             uint32_t hostIp = 0;
             if (!Ip4StrConToInt(strIp, &hostIp, true)) {
-                LOGE("GetLocalIp() %{public}s failed, Ip4StrConToInt strIp:%{public}s error!\n", ifname, strIp);
+                LOGE("GetLocalIp() %{public}s failed, Ip4StrConToInt strIp:%{private}s error!\n", ifname, strIp);
                 return DHCP_OPT_FAILED;
             }
-            LOGI("GetLocalIp() %{public}s, AF_INET str:%{public}s -> host:%{public}u.\n", ifname, strIp, hostIp);
+            LOGI("GetLocalIp() %{public}s, AF_INET str:%{private}s -> host:%{private}u.\n", ifname, strIp, hostIp);
             *ifaddr4 = hostIp;
         } else {
-            LOGI("GetLocalIp() %{public}s, AF_INET6 strIp:%{public}s.\n", ifname, strIp);
+            LOGI("GetLocalIp() %{public}s, AF_INET6 strIp:%{private}s.\n", ifname, strIp);
         }
     }
 
@@ -279,10 +278,10 @@ int SetLocalInterface(const char *ifname, uint32_t ifaddr4)
 
     char *cIp = Ip4IntConToStr(ifaddr4, true);
     if (cIp == NULL) {
-        LOGE("SetLocalInterface() %{public}s failed, Ip4IntConToStr addr4:%{public}u failed!\n", ifname, ifaddr4);
+        LOGE("SetLocalInterface() %{public}s failed, Ip4IntConToStr addr4:%{private}u failed!\n", ifname, ifaddr4);
         return DHCP_OPT_FAILED;
     }
-    LOGI("SetLocalInterface() %{public}s, ifaddr4:%{public}u -> %{public}s.\n", ifname, ifaddr4, cIp);
+    LOGI("SetLocalInterface() %{public}s, ifaddr4:%{private}u -> %{private}s.\n", ifname, ifaddr4, cIp);
     free(cIp);
 
     int fd;
@@ -395,4 +394,44 @@ pid_t GetPID(const char *pidFile)
     close(fd);
 
     return atoi(buf);
+}
+
+int CreateDirs(const char *dirs, int mode)
+{
+    if ((dirs == NULL) || (strlen(dirs) == 0) || (strlen(dirs) >= DIR_MAX_LEN)) {
+        LOGE("CreateDirs() dirs:%{public}s error!\n", dirs);
+        return DHCP_OPT_FAILED;
+    }
+
+    int nSrcLen = (int)strlen(dirs);
+    char strDir[DIR_MAX_LEN] = {0};
+    if (strncpy_s(strDir, sizeof(strDir), dirs, strlen(dirs)) != EOK) {
+        LOGE("CreateDirs() strncpy_s dirs:%{public}s failed!\n", dirs);
+        return DHCP_OPT_FAILED;
+    }
+    if (strDir[nSrcLen - 1] != '/') {
+        if (nSrcLen == (DIR_MAX_LEN - 1)) {
+            LOGE("CreateDirs() dirs:%{public}s len:%{public}d error!\n", dirs, nSrcLen);
+            return DHCP_OPT_FAILED;
+        }
+        if (strcat_s(strDir, sizeof(strDir), "/") != EOK) {
+            LOGE("CreateDirs() strcat_s strDir:%{public}s failed!\n", strDir);
+            return DHCP_OPT_FAILED;
+        }
+        nSrcLen++;
+    }
+
+    int i = (strDir[0] == '/') ? 1 : 0;
+    for (; i <= nSrcLen - 1; i++) {
+        if (strDir[i] == '/') {
+            strDir[i] = 0;
+            if ((access(strDir, F_OK) != 0) && (mkdir(strDir, mode) != 0)) {
+                LOGE("CreateDirs() mkdir %{public}s %{public}.4o failed:%{public}s!\n", strDir, mode, strerror(errno));
+                return DHCP_OPT_FAILED;
+            }
+            strDir[i] = '/';
+        }
+    }
+    LOGI("CreateDirs() %{public}s %{public}.4o success.\n", dirs, mode);
+    return DHCP_OPT_SUCCESS;
 }

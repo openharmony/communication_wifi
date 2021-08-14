@@ -79,10 +79,16 @@ ErrCode WifiDeviceImpl::AddDeviceConfig(const WifiDeviceConfig &config, int &res
     return client_->AddDeviceConfig(config, result);
 }
 
-ErrCode WifiDeviceImpl::RemoveDeviceConfig(int networkId)
+ErrCode WifiDeviceImpl::RemoveDevice(int networkId)
 {
     RETURN_IF_FAIL(client_);
-    return client_->RemoveDeviceConfig(networkId);
+    return client_->RemoveDevice(networkId);
+}
+
+ErrCode WifiDeviceImpl::RemoveAllDevice()
+{
+    RETURN_IF_FAIL(client_);
+    return client_->RemoveAllDevice();
 }
 
 ErrCode WifiDeviceImpl::GetDeviceConfigs(std::vector<WifiDeviceConfig> &result)
@@ -103,16 +109,16 @@ ErrCode WifiDeviceImpl::DisableDeviceConfig(int networkId)
     return client_->DisableDeviceConfig(networkId);
 }
 
-ErrCode WifiDeviceImpl::ConnectTo(int networkId)
+ErrCode WifiDeviceImpl::ConnectToNetwork(int networkId)
 {
     RETURN_IF_FAIL(client_);
-    return client_->ConnectTo(networkId);
+    return client_->ConnectToNetwork(networkId);
 }
 
-ErrCode WifiDeviceImpl::ConnectTo(const WifiDeviceConfig &config)
+ErrCode WifiDeviceImpl::ConnectToDevice(const WifiDeviceConfig &config)
 {
     RETURN_IF_FAIL(client_);
-    return client_->ConnectTo(config);
+    return client_->ConnectToDevice(config);
 }
 
 ErrCode WifiDeviceImpl::ReConnect()
@@ -163,10 +169,10 @@ ErrCode WifiDeviceImpl::GetLinkedInfo(WifiLinkedInfo &info)
     return client_->GetLinkedInfo(info);
 }
 
-ErrCode WifiDeviceImpl::GetDhcpInfo(DhcpInfo &info)
+ErrCode WifiDeviceImpl::GetIpInfo(IpInfo &info)
 {
     RETURN_IF_FAIL(client_);
-    return client_->GetDhcpInfo(info);
+    return client_->GetIpInfo(info);
 }
 
 ErrCode WifiDeviceImpl::SetCountryCode(const std::string &countryCode)
@@ -191,6 +197,22 @@ ErrCode WifiDeviceImpl::RegisterCallBackClient(const std::string &name, const sp
 {
     RETURN_IF_FAIL(client_);
     return client_->RegisterCallBackClient(name, callback);
+}
+
+ErrCode WifiDeviceImpl::GetSupportedFeatures(long &features)
+{
+    RETURN_IF_FAIL(client_);
+    return client_->GetSupportedFeatures(features);
+}
+
+bool WifiDeviceImpl::IsFeatureSupported(long feature)
+{
+    RETURN_IF_FAIL(client_);
+    long tmpFeatures = 0;
+    if (client_->GetSupportedFeatures(tmpFeatures) != WIFI_OPT_SUCCESS) {
+        return false;
+    }
+    return ((tmpFeatures & feature) == feature);
 }
 }  // namespace Wifi
 }  // namespace OHOS

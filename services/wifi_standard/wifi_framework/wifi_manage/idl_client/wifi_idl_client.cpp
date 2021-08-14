@@ -394,12 +394,23 @@ WifiErrorNo WifiIdlClient::ReqStopPnoScan(void)
     return StopPnoScan();
 }
 
-WifiErrorNo WifiIdlClient::RemoveDeviceConfig(int networkId)
+WifiErrorNo WifiIdlClient::RemoveDevice(int networkId)
 {
     if (pRpcClient == nullptr) {
         return WIFI_IDL_OPT_FAILED;
     }
+    if (networkId < 0) {
+        return WIFI_IDL_OPT_INVALID_PARAM;
+    }
     return RemoveNetwork(networkId);
+}
+
+WifiErrorNo WifiIdlClient::ClearDeviceConfig(void) const
+{
+    if (pRpcClient == nullptr) {
+        return WIFI_IDL_OPT_FAILED;
+    }
+    return RemoveNetwork(-1);
 }
 
 WifiErrorNo WifiIdlClient::GetNextNetworkId(int &networkId)

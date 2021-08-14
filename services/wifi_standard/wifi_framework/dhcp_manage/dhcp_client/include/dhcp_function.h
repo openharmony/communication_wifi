@@ -18,7 +18,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <stdbool.h>
-#include <sys/types.h>
+#include <unistd.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -27,14 +27,13 @@ extern "C" {
 bool Ip4StrConToInt(const char *strIp, uint32_t *uIp, bool bHost);
 char *Ip4IntConToStr(uint32_t uIp, bool bHost);
 bool Ip6StrConToChar(const char *strIp, uint8_t chIp[], size_t chlen);
-
-const char *HwaddrNtoa(const unsigned char *hwaddr, size_t hwlen, char *buf, size_t buflen);
+const char *MacChConToMacStr(const unsigned char *pChMac, size_t chLen, char *pStrMac, size_t strLen);
 int GetLocalInterface(const char *ifname, int *ifindex, unsigned char *hwaddr, uint32_t *ifaddr4);
 int GetLocalIp(const char *ifname, uint32_t *ifaddr4);
 int SetLocalInterface(const char *ifname, uint32_t ifaddr4);
-
 int InitPidfile(const char *pidDir, const char *pidFile, pid_t pid);
 pid_t GetPID(const char *pidFile);
+int CreateDirs(const char *dirs, int mode);
 
 #ifdef __cplusplus
 }

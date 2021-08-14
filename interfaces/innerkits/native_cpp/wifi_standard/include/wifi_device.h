@@ -58,7 +58,14 @@ public:
      * @param networkId - want to remove device config's network id
      * @return ErrCode - operation result
      */
-    virtual ErrCode RemoveDeviceConfig(int networkId) = 0;
+    virtual ErrCode RemoveDevice(int networkId) = 0;
+
+    /**
+     * @Description Remove all device configs.
+     *
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode RemoveAllDevice() = 0;
 
     /**
      * @Description Get all the device configs.
@@ -69,29 +76,12 @@ public:
     virtual ErrCode GetDeviceConfigs(std::vector<WifiDeviceConfig> &result) = 0;
 
     /**
-     * @Description Enable device config, when set attemptEnable, disable other device config.
-     *
-     * @param networkId - need enable device config's network id
-     * @param attemptEnable - if set true, disable other device config
-     * @return ErrCode - operation result
-     */
-    virtual ErrCode EnableDeviceConfig(int networkId, bool attemptEnable) = 0;
-
-    /**
-     * @Description Disable Wi-Fi device configuration.
-     *
-     * @param networkId - device config's network id
-     * @return ErrCode - operation result
-     */
-    virtual ErrCode DisableDeviceConfig(int networkId) = 0;
-
-    /**
      * @Description Connecting to a Specified Network.
      *
      * @param networkId - network id
      * @return ErrCode - operation result
      */
-    virtual ErrCode ConnectTo(int networkId) = 0;
+    virtual ErrCode ConnectToNetwork(int networkId) = 0;
 
     /**
      * @Description Connect To a network base WifiDeviceConfig object.
@@ -99,21 +89,7 @@ public:
      * @param config - WifiDeviceConfig object
      * @return ErrCode - operation result
      */
-    virtual ErrCode ConnectTo(const WifiDeviceConfig &config) = 0;
-
-    /**
-     * @Description Reconnect to the currently active network.
-     *
-     * @return ErrCode - operation result
-     */
-    virtual ErrCode ReConnect() = 0;
-
-    /**
-     * @Description ReAssociate network.
-     *
-     * @return ErrCode - operation result
-     */
-    virtual ErrCode ReAssociate(void) = 0;
+    virtual ErrCode ConnectToDevice(const WifiDeviceConfig &config) = 0;
 
     /**
      * @Description Disconnect.
@@ -121,21 +97,6 @@ public:
      * @return ErrCode - operation result
      */
     virtual ErrCode Disconnect(void) = 0;
-
-    /**
-     * @Description Enable WPS connection.
-     *
-     * @param config - WpsConfig object
-     * @return ErrCode - operation result
-     */
-    virtual ErrCode StartWps(const WpsConfig &config) = 0;
-
-    /**
-     * @Description Close the WPS connection.
-     *
-     * @return ErrCode - operation result
-     */
-    virtual ErrCode CancelWps(void) = 0;
 
     /**
      * @Description Check whether Wi-Fi is active.
@@ -160,14 +121,6 @@ public:
      * @return ErrCode - operation result
      */
     virtual ErrCode GetLinkedInfo(WifiLinkedInfo &info) = 0;
-
-    /**
-     * @Description Obtaining dhcp request information.
-     *
-     * @param info - DhcpInfo object
-     * @return ErrCode - operation result
-     */
-    virtual ErrCode GetDhcpInfo(DhcpInfo &info) = 0;
 
     /**
      * @Description Set the country code.
@@ -203,6 +156,23 @@ public:
      * @return ErrCode - operation result
      */
     virtual ErrCode GetSignalLevel(const int &rssi, const int &band, int &level) = 0;
+
+    /**
+     * @Description Get supported features
+     *
+     * @param features - return supported features
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode GetSupportedFeatures(long &features) = 0;
+
+    /**
+     * @Description Check if supported input feature
+     *
+     * @param feature - input feature
+     * @return true - supported
+     * @return false - unsupported
+     */
+    virtual bool IsFeatureSupported(long feature) = 0;
 };
 }  // namespace Wifi
 }  // namespace OHOS

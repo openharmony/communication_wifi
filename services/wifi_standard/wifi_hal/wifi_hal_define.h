@@ -59,6 +59,7 @@ typedef enum WifiErrorNo {
     WIFI_HAL_VENDOR_TOO_MANY_REQUESTS,
     WIFI_HAL_VENDOR_OUT_OF_MEMORY,
     WIFI_HAL_VENDOR_BUSY,
+    WIFI_HAL_INVALID_PARAM,
 } WifiErrorNo;
 
 /* ID of the callback event for registering the Hal service. */

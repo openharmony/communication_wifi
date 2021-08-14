@@ -72,10 +72,10 @@ ErrCode WifiScanImpl::Scan()
     return client_->Scan();
 }
 
-ErrCode WifiScanImpl::Scan(const WifiScanParams &params)
+ErrCode WifiScanImpl::AdvanceScan(const WifiScanParams &params)
 {
     RETURN_IF_FAIL(client_);
-    return client_->Scan(params);
+    return client_->AdvanceScan(params);
 }
 
 ErrCode WifiScanImpl::IsWifiClosedScan(bool &bOpen)
@@ -94,6 +94,22 @@ ErrCode WifiScanImpl::RegisterCallBack(const sptr<IWifiScanCallback> &callback)
 {
     RETURN_IF_FAIL(client_);
     return client_->RegisterCallBack(callback);
+}
+
+ErrCode WifiScanImpl::GetSupportedFeatures(long &features)
+{
+    RETURN_IF_FAIL(client_);
+    return client_->GetSupportedFeatures(features);
+}
+
+bool WifiScanImpl::IsFeatureSupported(long feature)
+{
+    RETURN_IF_FAIL(client_);
+    long tmpFeatures = 0;
+    if (client_->GetSupportedFeatures(tmpFeatures) != WIFI_OPT_SUCCESS) {
+        return false;
+    }
+    return ((tmpFeatures & feature) == feature);
 }
 }  // namespace Wifi
 }  // namespace OHOS

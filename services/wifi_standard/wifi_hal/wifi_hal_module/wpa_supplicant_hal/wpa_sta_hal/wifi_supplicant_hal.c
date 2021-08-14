@@ -20,6 +20,7 @@
 #include "securec.h"
 #include "wifi_log.h"
 #include "common/wpa_ctrl.h"
+#include "utils/common.h" /* request for printf_decode to decode wpa's returned ssid info */
 #include "wifi_hal_common_func.h"
 
 #undef LOG_TAG
@@ -318,6 +319,7 @@ static int WpaCliCmdStatus(struct WpaHalCmdStatus *pcmd)
             pcmd->freq = atoi(value);
         } else if (strcmp(key, "ssid") == 0) {
             MySafeCopy(pcmd->ssid, sizeof(pcmd->ssid), value);
+            printf_decode((u8 *)pcmd->ssid, sizeof(pcmd->ssid), pcmd->ssid);
         } else if (strcmp(key, "id") == 0) {
             pcmd->id = atoi(value);
         } else if (strcmp(key, "key_mgmt") == 0) {
@@ -527,7 +529,14 @@ static int WpaCliCmdRemoveNetwork(int networkId)
 {
     char cmdbuf[CMD_BUFFER_SMALL_SIZE] = {0};
     char buf[REPLY_BUF_SMALL_LENGTH] = {0};
-    int res = snprintf_s(cmdbuf, sizeof(cmdbuf), sizeof(cmdbuf) - 1, "%s %d", "REMOVE_NETWORK", networkId);
+    int res;
+    if (networkId == -1) {
+        res = snprintf_s(cmdbuf, sizeof(cmdbuf), sizeof(cmdbuf) - 1, "REMOVE_NETWORK all");
+    } else if (networkId >= 0) {
+        res = snprintf_s(cmdbuf, sizeof(cmdbuf), sizeof(cmdbuf) - 1, "%s %d", "REMOVE_NETWORK", networkId);
+    } else {
+        return -1;
+    }
     if (res < 0) {
         LOGD("snprintf err");
         return -1;
@@ -806,6 +815,7 @@ static void ListNetworkProcess(NetworkList *pcmd, char *tmpBuf, int bufLeng)
             if (strcpy_s(pcmd->ssid, sizeof(pcmd->ssid), tmpBuf + start) != EOK) {
                 break;
             }
+            printf_decode((u8 *)pcmd->ssid, sizeof(pcmd->ssid), pcmd->ssid);
         } else if (i == SCAN_RESULT_TWO) {
             if (strcpy_s(pcmd->bssid, sizeof(pcmd->bssid), tmpBuf + start) != EOK) {
                 break;
@@ -980,6 +990,7 @@ static int DelScanResultLine(ScanResult *pcmd, char *srcBuf, int length)
                 fail = 1;
                 break;
             }
+            printf_decode((u8 *)pcmd->ssid, sizeof(pcmd->ssid), pcmd->ssid);
             start = length;
             break;
         }

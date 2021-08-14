@@ -69,6 +69,7 @@ int StaInterface::InitStaHandleMap()
     staHandleFuncMap[WifiInternalMsgCode::STA_REASSOCIATE_REQ] = &StaInterface::WifiStaCmdReassociateReq;
     staHandleFuncMap[WifiInternalMsgCode::STA_DISCONNECT_REQ] = &StaInterface::WifiStaCmdDisconnectReq;
     staHandleFuncMap[WifiInternalMsgCode::STA_REMOVE_DEVICE_REQ] = &StaInterface::WifiStaCmdRemoveDeviceReq;
+    staHandleFuncMap[WifiInternalMsgCode::STA_REMOVE_ALL_DEVICE_REQ] = &StaInterface::WifiStaCmdRemoveAllDeviceReq;
     staHandleFuncMap[WifiInternalMsgCode::STA_START_WPS_REQ] = &StaInterface::WifiStaCmdStartWpsReq;
     staHandleFuncMap[WifiInternalMsgCode::STA_CANCEL_WPS_REQ] = &StaInterface::WifiStaCmdCancelWpsReq;
     staHandleFuncMap[WifiInternalMsgCode::STA_CONNECT_MANAGE_REQ] = &StaInterface::WifiStaCmdConnectManagerReq;
@@ -111,9 +112,9 @@ void StaInterface::WifiStaCmdConnectReq(const WifiRequestMsgInfo *requestMsg)
     WIFI_LOGD("Enter StaInterface::WifiStaCmdConnectReq.\n");
 
     if (requestMsg->params.argInt >= 0) {
-        pStaService->ConnectTo(requestMsg->params.argInt);
+        pStaService->ConnectToNetwork(requestMsg->params.argInt);
     } else {
-        pStaService->ConnectTo(requestMsg->params.deviceConfig);
+        pStaService->ConnectToDevice(requestMsg->params.deviceConfig);
     }
 }
 
@@ -151,7 +152,17 @@ void StaInterface::WifiStaCmdRemoveDeviceReq(const WifiRequestMsgInfo *requestMs
         return;
     }
     WIFI_LOGD("Enter StaInterface::WifiStaCmdRemoveDeviceReq.\n");
-    pStaService->RemoveDeviceConfig(requestMsg->params.argInt);
+    pStaService->RemoveDevice(requestMsg->params.argInt);
+}
+
+void StaInterface::WifiStaCmdRemoveAllDeviceReq(const WifiRequestMsgInfo *requestMsg)
+{
+    if (requestMsg == nullptr) {
+        WIFI_LOGE("requestMsg is null\n");
+        return;
+    }
+    WIFI_LOGD("Enter StaInterface::WifiStaCmdRemoveAllDeviceReq.\n");
+    pStaService->RemoveAllDevice();
 }
 
 void StaInterface::WifiStaCmdStartWpsReq(const WifiRequestMsgInfo *requestMsg)

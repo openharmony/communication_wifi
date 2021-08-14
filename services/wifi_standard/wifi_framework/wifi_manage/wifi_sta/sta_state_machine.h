@@ -413,6 +413,11 @@ private:
      */
     void RemoveDeviceConfigProcess(const InternalMessage *msg);
     /**
+     * @Description  Remove all network configuration.
+     * 
+     */
+    void RemoveAllDeviceConfigProcess();
+    /**
      * @Description  Processing after a success response is returned after Wi-Fi
                      is enabled successfully, such as setting the MAC address and
                      saving the connection information.

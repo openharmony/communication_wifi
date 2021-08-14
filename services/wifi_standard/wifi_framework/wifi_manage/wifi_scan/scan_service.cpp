@@ -516,6 +516,7 @@ void ScanService::HandleCommonScanInfo(
         if (configIter->second.fullScanFlag) {
             fullScanInclude = true;
             if (fullScanStored) {
+                scanConfigMap.erase(*reqIter);
                 continue;
             }
 

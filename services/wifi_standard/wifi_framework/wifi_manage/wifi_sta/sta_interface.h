@@ -87,6 +87,13 @@ private:
      */
     void WifiStaCmdRemoveDeviceReq(const WifiRequestMsgInfo *requestMsg);
     /**
+     * @Description: Start the process of removing all device configuration
+                     when receive the request of removing device configuration.
+     *
+     * @param requestMsg - request message
+     */
+    void WifiStaCmdRemoveAllDeviceReq(const WifiRequestMsgInfo *requestMsg);
+    /**
      * @Description: Start Wps connection process when receive the wps connecting request.
      *
      * @param requestMsg - request message

@@ -137,6 +137,23 @@ public:
      * @return ErrCode - operation result
      */
     ErrCode RegisterCallBack(const sptr<IWifiHotspotCallback> &callback) override;
+
+    /**
+     * @Description Get supported features
+     *
+     * @param features - return supported features
+     * @return ErrCode - operation result
+     */
+    ErrCode GetSupportedFeatures(long &features) override;
+
+    /**
+     * @Description Check if supported input feature
+     *
+     * @param feature - input feature
+     * @return true - supported
+     * @return false - unsupported
+     */
+    bool IsFeatureSupported(long feature) override;
 private:
     int systemAbilityId_;
     sptr<IWifiHotspot> client_;

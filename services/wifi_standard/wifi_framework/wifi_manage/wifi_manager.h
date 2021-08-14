@@ -97,6 +97,21 @@ public:
     int AddDeviceConfig(const WifiDeviceConfig &config, int &networkId);
 
     /**
+     * @Description Get supported features
+     *
+     * @param features - output supported features
+     * @return int - operate result
+     */
+    int GetSupportedFeatures(long &features);
+
+    /**
+     * @Description Add supported feature
+     *
+     * @param feature
+     */
+    void AddSupportedFeatures(WifiFeatures feature);
+
+    /**
      * @Description Deal message from feature service, Obtain the message and process the message
      *              based on the message code
      *
@@ -127,6 +142,7 @@ private:
     std::unique_ptr<WifiMessageQueue<WifiResponseMsgInfo>> mMqUp;
 
     InitStatus mInitStatus_;
+    long mSupportedFeatures;
 };
 } // namespace Wifi
 } // namespace OHOS

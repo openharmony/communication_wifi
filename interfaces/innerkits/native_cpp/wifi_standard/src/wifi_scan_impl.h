@@ -43,22 +43,6 @@ public:
     virtual ErrCode Scan() override;
 
     /**
-     * @Description Start scan with specified params
-     *
-     * @param params - WifiScanParams object
-     * @return ErrCode - operation result
-     */
-    virtual ErrCode Scan(const WifiScanParams &params) override;
-
-    /**
-     * @Description Check whether the ScanAlways mode is enabled
-     *
-     * @param bOpen - true / false
-     * @return ErrCode - operation result
-     */
-    virtual ErrCode IsWifiClosedScan(bool &bOpen) override;
-
-    /**
      * @Description Obtain the scanning result
      *
      * @param result - Get result venctor of WifiScanInfo
@@ -67,6 +51,39 @@ public:
     virtual ErrCode GetScanInfoList(std::vector<WifiScanInfo> &result) override;
 
     virtual ErrCode RegisterCallBack(const sptr<IWifiScanCallback> &callback) override;
+
+    /**
+     * @Description Get supported features
+     *
+     * @param features - return supported features
+     * @return ErrCode - operation result
+     */
+    ErrCode GetSupportedFeatures(long &features) override;
+
+    /**
+     * @Description Check if supported input feature
+     *
+     * @param feature - input feature
+     * @return true - supported
+     * @return false - unsupported
+     */
+    bool IsFeatureSupported(long feature) override;
+
+    /**
+     * @Description Check whether the ScanAlways mode is enabled
+     *
+     * @param bOpen - true / false
+     * @return ErrCode - operation result
+     */
+    ErrCode IsWifiClosedScan(bool &bOpen);
+
+    /**
+     * @Description Start scan with specified params
+     *
+     * @param params - WifiScanParams object
+     * @return ErrCode - operation result
+     */
+    ErrCode AdvanceScan(const WifiScanParams &params);
 
 private:
     int systemAbilityId_;

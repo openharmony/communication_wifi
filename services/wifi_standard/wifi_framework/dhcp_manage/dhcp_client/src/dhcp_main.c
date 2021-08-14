@@ -183,20 +183,20 @@ static int GetClientOption(int argc, char *argv[])
     while ((ch = getopt(argc - NUMBER_TWO, argv + NUMBER_TWO, "w:a46")) != -1) {
         switch (ch) {
             case 'w':   /* Specify the client's working directory. */
-                LOGI("GetClientOption() cur workdir:%{public}s, optarg:%{public}s\n", g_cltCfg->workdir, optarg);
-                if (strncpy_s(g_cltCfg->workdir, sizeof(g_cltCfg->workdir), optarg, DIR_MAX_LEN - 1) != EOK) {
+                LOGI("GetClientOption() cur workDir:%{public}s, optarg:%{public}s\n", g_cltCfg->workDir, optarg);
+                if (strncpy_s(g_cltCfg->workDir, sizeof(g_cltCfg->workDir), optarg, DIR_MAX_LEN - 1) != EOK) {
                     return -1;
                 }
                 break;
             case 'a':    /* Handle dhcp v4 and v6. */
-                g_cltCfg->iptype = DHCP_IP_TYPE_ALL;
+                g_cltCfg->getMode = DHCP_IP_TYPE_ALL;
                 break;
             case '4':    /* Only handle dhcp v4. */
-                LOGI("GetClientOption() cur iptype:%{public}u, optarg:%{public}s\n", g_cltCfg->iptype, optarg);
-                g_cltCfg->iptype = DHCP_IP_TYPE_V4;
+                LOGI("GetClientOption() cur getMode:%{public}u, optarg:%{public}s\n", g_cltCfg->getMode, optarg);
+                g_cltCfg->getMode = DHCP_IP_TYPE_V4;
                 break;
             case '6':    /* Only handle dhcp v6. */
-                g_cltCfg->iptype = DHCP_IP_TYPE_V6;
+                g_cltCfg->getMode = DHCP_IP_TYPE_V6;
                 break;
             default:
                 printf("GetClientOption() please input valid OPTION!\n");
@@ -210,41 +210,47 @@ static int GetClientOption(int argc, char *argv[])
 static int InitSpecifiedClientCfg(int argc, char *argv[])
 {
     g_cltCfg = GetDhcpClientCfg();
-    if ((strncpy_s(g_cltCfg->workdir, sizeof(g_cltCfg->workdir), WORKDIR, DIR_MAX_LEN - 1) != EOK) ||
-        (strncpy_s(g_cltCfg->interface, sizeof(g_cltCfg->interface), argv[NUMBER_TWO], INFNAME_SIZE - 1) != EOK)) {
-        return -1;
+    if ((strncpy_s(g_cltCfg->workDir, sizeof(g_cltCfg->workDir), WORKDIR, DIR_MAX_LEN - 1) != EOK) ||
+        (strncpy_s(g_cltCfg->ifaceName, sizeof(g_cltCfg->ifaceName), argv[NUMBER_TWO], INFNAME_SIZE - 1) != EOK)) {
+        return DHCP_OPT_FAILED;
     }
-    g_cltCfg->iptype = DHCP_IP_TYPE_ALL;
+    g_cltCfg->getMode = DHCP_IP_TYPE_ALL;
     if ((argc > NUMBER_THREE) && (GetClientOption(argc, argv) != 0)) {
-        return -1;
+        LOGE("InitSpecifiedClientCfg() GetClientOption failed!\n");
+        return DHCP_OPT_FAILED;
     }
 
-    if (strlen(g_cltCfg->workdir) > 0) {
-        int n = snprintf_s(g_cltCfg->confFile,
-            DIR_MAX_LEN, DIR_MAX_LEN - 1, "%s%s", g_cltCfg->workdir, DHCPC_CONF);
-        if (n < 0) {
-            return -1;
-        }
-        n = snprintf_s(g_cltCfg->pidFile,
-            DIR_MAX_LEN, DIR_MAX_LEN - 1, "%s%s.pid", g_cltCfg->workdir, g_cltCfg->interface);
-        if (n < 0) {
-            return -1;
-        }
-        n = snprintf_s(g_cltCfg->resultFile,
-            DIR_MAX_LEN, DIR_MAX_LEN - 1, "%s%s.result", g_cltCfg->workdir, g_cltCfg->interface);
-        if (n < 0) {
-            return -1;
-        }
+    if (strlen(g_cltCfg->workDir) == 0) {
+        LOGE("InitSpecifiedClientCfg() g_cltCfg->workDir:%{public}s error!\n", g_cltCfg->workDir);
+        return DHCP_OPT_FAILED;
+    }
+    if (CreateDirs(g_cltCfg->workDir, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH) != DHCP_OPT_SUCCESS) {
+        LOGE("InitSpecifiedClientCfg() CreateDirs %{public}s failed!\n", g_cltCfg->workDir);
+        return DHCP_OPT_FAILED;
+    }
+
+    int n = snprintf_s(g_cltCfg->confFile, DIR_MAX_LEN, DIR_MAX_LEN - 1, "%s%s", g_cltCfg->workDir, DHCPC_CONF);
+    if (n < 0) {
+        return DHCP_OPT_FAILED;
+    }
+    n = snprintf_s(g_cltCfg->pidFile, DIR_MAX_LEN, DIR_MAX_LEN - 1, "%s%s.pid", g_cltCfg->workDir, g_cltCfg->ifaceName);
+    if (n < 0) {
+        return DHCP_OPT_FAILED;
+    }
+    n = snprintf_s(
+        g_cltCfg->resultFile, DIR_MAX_LEN, DIR_MAX_LEN - 1, "%s%s.result", g_cltCfg->workDir, g_cltCfg->ifaceName);
+    if (n < 0) {
+        return DHCP_OPT_FAILED;
     }
     LOGI("InitSpecifiedClientCfg() "
-              "g_cltCfg->workdir:%{public}s,confFile:%{public}s,pidFile:%{public}s,resultFile:%{public}s, "
-              "iptype:%{public}d\n",
-        g_cltCfg->workdir,
+         "g_cltCfg->workDir:%{public}s,confFile:%{public}s,pidFile:%{public}s,resultFile:%{public}s, "
+         "getMode:%{public}d\n",
+        g_cltCfg->workDir,
         g_cltCfg->confFile,
         g_cltCfg->pidFile,
         g_cltCfg->resultFile,
-        g_cltCfg->iptype);
-    return 0;
+        g_cltCfg->getMode);
+    return DHCP_OPT_SUCCESS;
 }
 
 static int ExecClientProAction(const char *action)
@@ -284,8 +290,8 @@ static int ExecClientProAction(const char *action)
     }
 
     /* Init the specified client process id info. */
-    if (InitPidfile(g_cltCfg->workdir, g_cltCfg->pidFile, getpid()) != DHCP_OPT_SUCCESS) {
-        LOGE("ExecClientProAction() InitPidfile failed, interface:%{public}s.\n", g_cltCfg->interface);
+    if (InitPidfile(g_cltCfg->workDir, g_cltCfg->pidFile, getpid()) != DHCP_OPT_SUCCESS) {
+        LOGE("ExecClientProAction() InitPidfile failed, ifaceName:%{public}s.\n", g_cltCfg->ifaceName);
         return -1;
     }
 
@@ -294,51 +300,51 @@ static int ExecClientProAction(const char *action)
 
 static int GetClientNetworkInfo(void)
 {
-    if (GetLocalInterface(g_cltCfg->interface, &g_cltCfg->ifaceIndex, g_cltCfg->hwaddr, NULL) != DHCP_OPT_SUCCESS) {
-        LOGE("GetClientNetworkInfo() GetLocalInterface failed, interface:%{public}s.\n", g_cltCfg->interface);
-        return -1;
+    if (GetLocalInterface(g_cltCfg->ifaceName, &g_cltCfg->ifaceIndex, g_cltCfg->ifaceMac, NULL) != DHCP_OPT_SUCCESS) {
+        LOGE("GetClientNetworkInfo() GetLocalInterface failed, ifaceName:%{public}s.\n", g_cltCfg->ifaceName);
+        return DHCP_OPT_FAILED;
     }
     char macAddr[MAC_ADDR_LEN * MAC_ADDR_CHAR_NUM];
     if (memset_s(macAddr, sizeof(macAddr), 0, sizeof(macAddr)) != EOK) {
-        return -1;
+        return DHCP_OPT_FAILED;
     }
-    HwaddrNtoa(g_cltCfg->hwaddr, MAC_ADDR_LEN, macAddr, sizeof(macAddr));
-    LOGI("GetClientNetworkInfo() g_cltCfg->interface:%{public}s -> ifaceIndex:%{private}d,hwaddr:%{private}s.\n",
-        g_cltCfg->interface, g_cltCfg->ifaceIndex, macAddr);
+    MacChConToMacStr(g_cltCfg->ifaceMac, MAC_ADDR_LEN, macAddr, sizeof(macAddr));
+    LOGI("GetClientNetworkInfo() g_cltCfg->ifaceName:%{public}s -> ifaceIndex:%{private}d,ifaceMac:%{private}s.\n",
+        g_cltCfg->ifaceName, g_cltCfg->ifaceIndex, macAddr);
 
-    if (GetLocalIp(g_cltCfg->interface, &g_cltCfg->ipaddr4) != DHCP_OPT_SUCCESS) {
-        LOGE("GetClientNetworkInfo() failed, g_cltCfg->interface:%{public}s.\n", g_cltCfg->interface);
-        return -1;
+    if (GetLocalIp(g_cltCfg->ifaceName, &g_cltCfg->ifaceIpv4) != DHCP_OPT_SUCCESS) {
+        LOGE("GetClientNetworkInfo() failed, g_cltCfg->ifaceName:%{public}s.\n", g_cltCfg->ifaceName);
+        return DHCP_OPT_FAILED;
     }
-    char *cIp = Ip4IntConToStr(g_cltCfg->ipaddr4, true);
+    char *cIp = Ip4IntConToStr(g_cltCfg->ifaceIpv4, true);
     if (cIp == NULL) {
-        LOGE("GetClientNetworkInfo() Ip4IntConToStr g_cltCfg->ipaddr4 failed!\n");
-        return -1;
+        LOGE("GetClientNetworkInfo() Ip4IntConToStr g_cltCfg->ifaceIpv4 failed!\n");
+        return DHCP_OPT_FAILED;
     }
-    LOGI("GetClientNetworkInfo() GetLocalIp interface:%{public}s -> ipaddr4:%{private}u - %{private}s.\n",
-        g_cltCfg->interface, g_cltCfg->ipaddr4, cIp);
+    LOGI("GetClientNetworkInfo() GetLocalIp ifaceName:%{public}s -> ifaceIpv4:%{private}u - %{private}s.\n",
+        g_cltCfg->ifaceName, g_cltCfg->ifaceIpv4, cIp);
     free(cIp);
 
     /* Generate clientid for the specified client process interface. */
-    if (g_cltCfg->clientid == NULL) {
-        g_cltCfg->clientid = malloc(DHCP_OPT_CODE_BYTES + DHCP_OPT_LEN_BYTES + MAC_ADDR_LEN + 1);
-        if (g_cltCfg->clientid == NULL) {
-            LOGE("GetClientNetworkInfo() g_cltCfg->clientid malloc failed!\n");
-            return -1;
+    if (g_cltCfg->pOptClientId == NULL) {
+        g_cltCfg->pOptClientId = malloc(DHCP_OPT_CODE_BYTES + DHCP_OPT_LEN_BYTES + MAC_ADDR_LEN + 1);
+        if (g_cltCfg->pOptClientId == NULL) {
+            LOGE("GetClientNetworkInfo() g_cltCfg->pOptClientId malloc failed!\n");
+            return DHCP_OPT_FAILED;
         }
-        g_cltCfg->clientid[DHCP_OPT_CODE_INDEX] = DHO_CLIENTID;
-        g_cltCfg->clientid[DHCP_OPT_LEN_INDEX] = MAC_ADDR_LEN + 1;
-        /* Generate format: 1 + hwaddr. */
-        g_cltCfg->clientid[DHCP_OPT_DATA_INDEX] = NUMBER_ONE;
-        if (memcpy_s(g_cltCfg->clientid + DHCP_OPT_DATA_INDEX + 1,
+        g_cltCfg->pOptClientId[DHCP_OPT_CODE_INDEX] = DHO_CLIENTID;
+        g_cltCfg->pOptClientId[DHCP_OPT_LEN_INDEX] = MAC_ADDR_LEN + 1;
+        /* Generate format: 1 + ifaceMac. */
+        g_cltCfg->pOptClientId[DHCP_OPT_DATA_INDEX] = NUMBER_ONE;
+        if (memcpy_s(g_cltCfg->pOptClientId + DHCP_OPT_DATA_INDEX + 1,
             MAC_ADDR_LEN,
-            g_cltCfg->hwaddr,
+            g_cltCfg->ifaceMac,
             MAC_ADDR_LEN) != EOK) {
-            return -1;
+            return DHCP_OPT_FAILED;
         }
     }
 
-    return 0;
+    return DHCP_OPT_SUCCESS;
 }
 
 int main(int argc, char *argv[])
@@ -350,7 +356,8 @@ int main(int argc, char *argv[])
     }
 
     /* Init the specified client process config. */
-    if (InitSpecifiedClientCfg(argc, argv) != 0) {
+    if (InitSpecifiedClientCfg(argc, argv) != DHCP_OPT_SUCCESS) {
+        LOGE("main() InitSpecifiedClientCfg failed!\n");
         return EXIT_FAILURE;
     }
 
@@ -362,9 +369,9 @@ int main(int argc, char *argv[])
     }
 
     /* Get the specified client process interface network info. */
-    int nGet = GetClientNetworkInfo();
-    if (nGet != 0) {
-        return (nGet == 1) ? EXIT_SUCCESS : EXIT_FAILURE;
+    if (GetClientNetworkInfo() != DHCP_OPT_SUCCESS) {
+        LOGE("main() GetClientNetworkInfo failed!\n");
+        return EXIT_FAILURE;
     }
 
     /* Start the specified network interface service. */

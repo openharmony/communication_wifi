@@ -117,9 +117,9 @@ ErrCode StaService::DisableWifi() const
     return WIFI_OPT_SUCCESS;
 }
 
-ErrCode StaService::ConnectTo(const WifiDeviceConfig &config) const
+ErrCode StaService::ConnectToDevice(const WifiDeviceConfig &config) const
 {
-    WIFI_LOGI("Enter StaService::ConnectTo.\n");
+    WIFI_LOGI("Enter StaService::ConnectToDevice.\n");
     int networkId = -1;
     WifiDeviceConfig tempDeviceConfig;
     if (WifiSettings::GetInstance().GetDeviceConfig(config.ssid, DEVICE_CONFIG_INDEX_SSID, tempDeviceConfig) == 0) {
@@ -131,10 +131,10 @@ ErrCode StaService::ConnectTo(const WifiDeviceConfig &config) const
     } else {
         WIFI_LOGD("Connect to a new network\n");
         if (WifiStaHalInterface::GetInstance().GetNextNetworkId(networkId) != WIFI_IDL_OPT_OK) {
-            WIFI_LOGE("StaService::ConnectTo GetNextNetworkId failed!");
+            WIFI_LOGE("StaService::ConnectToDevice GetNextNetworkId failed!");
             return WIFI_OPT_FAILED;
         }
-        WIFI_LOGI("StaService::ConnectTo GetNextNetworkId succeed!");
+        WIFI_LOGI("StaService::ConnectToDevice GetNextNetworkId succeed!");
         tempDeviceConfig = config;
         tempDeviceConfig.networkId = networkId;
     }
@@ -161,17 +161,17 @@ ErrCode StaService::ConnectTo(const WifiDeviceConfig &config) const
     }
 
     if (WifiStaHalInterface::GetInstance().SetDeviceConfig(networkId, idlConfig) != WIFI_IDL_OPT_OK) {
-        WIFI_LOGE("StaService::ConnectTo SetDeviceConfig failed!");
+        WIFI_LOGE("StaService::ConnectToDevice SetDeviceConfig failed!");
         return WIFI_OPT_FAILED;
     }
-    WIFI_LOGI("StaService::ConnectTo  SetDeviceConfig succeed!");
+    WIFI_LOGI("StaService::ConnectToDevice  SetDeviceConfig succeed!");
     pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_CONNECT_NETWORK, networkId, NETWORK_SELECTED_BY_THE_USER);
     return WIFI_OPT_SUCCESS;
 }
 
-ErrCode StaService::ConnectTo(int networkId) const
+ErrCode StaService::ConnectToNetwork(int networkId) const
 {
-    WIFI_LOGI("Enter StaService::ConnectTo, networkId is %{public}d.\n", networkId);
+    WIFI_LOGI("Enter StaService::ConnectToNetwork, networkId is %{public}d.\n", networkId);
 
     WifiDeviceConfig config;
     int ret = WifiSettings::GetInstance().GetDeviceConfig(networkId, config);
@@ -199,10 +199,17 @@ ErrCode StaService::ReAssociate() const
     return WIFI_OPT_SUCCESS;
 }
 
-ErrCode StaService::RemoveDeviceConfig(int networkId) const
+ErrCode StaService::RemoveDevice(int networkId) const
 {
-    WIFI_LOGI("Enter StaService::RemoveDeviceConfig.\n");
+    WIFI_LOGI("Enter StaService::RemoveDevice.\n");
     pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_REMOVE_DEVICE_CONFIG, networkId);
+    return WIFI_OPT_SUCCESS;
+}
+
+ErrCode StaService::RemoveAllDevice() const
+{
+    WIFI_LOGI("Enter StaService::RemoveAllDevice.\n");
+    pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_REMOVE_All_DEVICE_CONFIG);
     return WIFI_OPT_SUCCESS;
 }
 

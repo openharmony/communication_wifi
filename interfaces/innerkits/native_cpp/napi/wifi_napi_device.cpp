@@ -451,7 +451,7 @@ napi_value ConnectToNetwork(napi_env env, napi_callback_info info)
     napi_get_value_int32(env, argv[0], &networkId);
 
     NAPI_ASSERT(env, wifiDevicePtr != nullptr, "[NAPI] Wifi device instance is null.");
-    ErrCode ret = wifiDevicePtr->ConnectTo(networkId);
+    ErrCode ret = wifiDevicePtr->ConnectToNetwork(networkId);
     napi_value result;
     napi_get_boolean(env, ret == WIFI_OPT_SUCCESS, &result);
     return result;
@@ -471,7 +471,7 @@ napi_value ConnectToDevice(napi_env env, napi_callback_info info)
     NAPI_ASSERT(env, wifiDevicePtr != nullptr, "[NAPI] Wifi device instance is null.");
     WifiDeviceConfig config;
     JsObjToDeviceConfig(env, argv[0], config);
-    ErrCode ret = wifiDevicePtr->ConnectTo(config);
+    ErrCode ret = wifiDevicePtr->ConnectToDevice(config);
 
     napi_value result;
     napi_get_boolean(env, ret == WIFI_OPT_SUCCESS, &result);

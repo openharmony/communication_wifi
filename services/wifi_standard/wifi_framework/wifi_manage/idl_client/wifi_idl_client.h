@@ -215,7 +215,14 @@ public:
      * @param networkId
      * @return WifiErrorNo
      */
-    WifiErrorNo RemoveDeviceConfig(int networkId);
+    WifiErrorNo RemoveDevice(int networkId);
+
+    /**
+     * @Description Clears the network configuration information saved by wpa_supplicant.
+     *
+     * @return WifiErrorNo
+     */
+    WifiErrorNo ClearDeviceConfig(void) const;
 
     /**
      * @Description Request to obtain the next network ID.

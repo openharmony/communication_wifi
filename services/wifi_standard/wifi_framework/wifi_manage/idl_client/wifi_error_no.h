@@ -42,6 +42,7 @@ typedef enum WifiErrorNo {
     WIFI_IDL_VENDOR_TOO_MANY_REQUESTS,
     WIFI_IDL_VENDOR_OUT_OF_MEMORY,
     WIFI_IDL_VENDOR_BUSY,
+    WIFI_IDL_OPT_INVALID_PARAM,
 } WifiErrorNo;
 
 #endif

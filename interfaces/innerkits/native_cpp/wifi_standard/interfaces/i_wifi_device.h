@@ -58,7 +58,14 @@ public:
      * @param networkId - want to remove device config's network id
      * @return ErrCode - operation result
      */
-    virtual ErrCode RemoveDeviceConfig(int networkId) = 0;
+    virtual ErrCode RemoveDevice(int networkId) = 0;
+
+    /**
+     * @Description Delete all device configs.
+     *
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode RemoveAllDevice() = 0;
 
     /**
      * @Description Get all the device configs
@@ -91,7 +98,7 @@ public:
      * @param networkId - network id
      * @return ErrCode - operation result
      */
-    virtual ErrCode ConnectTo(int networkId) = 0;
+    virtual ErrCode ConnectToNetwork(int networkId) = 0;
 
     /**
      * @Description Connect To a network base WifiDeviceConfig object
@@ -99,7 +106,7 @@ public:
      * @param config - WifiDeviceConfig object
      * @return ErrCode - operation result
      */
-    virtual ErrCode ConnectTo(const WifiDeviceConfig &config) = 0;
+    virtual ErrCode ConnectToDevice(const WifiDeviceConfig &config) = 0;
 
     /**
      * @Description Reconnect to the currently active network
@@ -164,10 +171,10 @@ public:
     /**
      * @Description Obtaining DHCP Request Information
      *
-     * @param info - DhcpInfo object
+     * @param info - IpInfo object
      * @return ErrCode - operation result
      */
-    virtual ErrCode GetDhcpInfo(DhcpInfo &info) = 0;
+    virtual ErrCode GetIpInfo(IpInfo &info) = 0;
 
     /**
      * @Description Set the Country Code
@@ -203,6 +210,14 @@ public:
      * @return ErrCode - operation result
      */
     virtual ErrCode GetSignalLevel(const int &rssi, const int &band, int &level) = 0;
+
+    /**
+     * @Description Get supported features
+     *
+     * @param features - return supported features
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode GetSupportedFeatures(long &features) = 0;
 
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.wifi.IWifiDeviceService");

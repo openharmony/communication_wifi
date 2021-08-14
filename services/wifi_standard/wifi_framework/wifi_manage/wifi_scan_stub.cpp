@@ -65,6 +65,10 @@ int WifiScanStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessagePar
             ret = OnRegisterCallBack(code, data, reply, option);
             break;
         }
+        case WIFI_SVR_CMD_GET_SUPPORTED_FEATURES: {
+            ret = OnGetSupportedFeatures(code, data, reply, option);
+            break;
+        }
         default: {
             ret = IPCObjectStub::OnRemoteRequest(code, data, reply, option);
         }
@@ -152,7 +156,7 @@ int WifiScanStub::OnScanByParams(uint32_t code, MessageParcel &data, MessageParc
     }
     params.band = data.ReadInt32();
 
-    int ret = Scan(params);
+    int ret = AdvanceScan(params);
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
 
@@ -245,6 +249,22 @@ int WifiScanStub::OnRegisterCallBack(uint32_t code, MessageParcel &data, Message
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
     return 0;
+}
+
+int WifiScanStub::OnGetSupportedFeatures(
+    uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
+{
+    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+    long features = 0;
+    int ret = GetSupportedFeatures(features);
+    reply.WriteInt32(0);
+    reply.WriteInt32(ret);
+
+    if (ret == WIFI_OPT_SUCCESS) {
+        reply.WriteInt64(features);
+    }
+
+    return ret;
 }
 
 bool WifiScanStub::IsSingleCallback() const

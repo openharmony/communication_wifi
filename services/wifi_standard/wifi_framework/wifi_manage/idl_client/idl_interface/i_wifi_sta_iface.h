@@ -196,6 +196,16 @@ WifiErrorNo StartScan(const ScanSettings *settings);
 WifiErrorNo GetScanResults(ScanResult *results, int *size);
 
 /**
+ * @Description Obtain the scanning result, the caller needs to release the return
+ *              pointer if it is not NULL
+ *
+ * @param results
+ * @param size
+ * @return ScanResult pointer
+ */
+ScanResult* GetScanInfos(int *size);
+
+/**
  * @Description Initiate PNO scanning.
  *
  * @param settings

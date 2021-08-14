@@ -297,14 +297,10 @@ WifiErrorNo WifiIdlClient::QueryScanResults(std::vector<WifiScanResult> &scanRes
     if (pRpcClient == nullptr) {
         return WIFI_IDL_OPT_FAILED;
     }
-    ScanResult results[WIFI_IDL_GET_MAX_SCAN_RESULT];
-    if (memset_s(results, sizeof(results), 0, sizeof(results)) != EOK) {
-        return WIFI_IDL_OPT_FAILED;
-    }
     int size = WIFI_IDL_GET_MAX_SCAN_RESULT;
-    WifiErrorNo err = GetScanResults(results, &size);
-    if (err != WIFI_IDL_OPT_OK) {
-        return err;
+    ScanResult* results = GetScanInfos(&size);
+    if (results == NULL) {
+        return WIFI_IDL_OPT_FAILED;
     }
     for (int i = 0; i < size; ++i) {
         WifiScanResult tmp;
@@ -318,7 +314,9 @@ WifiErrorNo WifiIdlClient::QueryScanResults(std::vector<WifiScanResult> &scanRes
         tmp.associated = results[i].associated;
         scanResults.emplace_back(tmp);
     }
-    return err;
+    free(results);
+    results = NULL;
+    return WIFI_IDL_OPT_OK;
 }
 
 WifiErrorNo WifiIdlClient::ConvertPnoScanParam(const WifiPnoScanParam &param, PnoScanSettings *pSettings)

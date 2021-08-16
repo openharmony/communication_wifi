@@ -876,7 +876,7 @@ WifiErrorNo WifiIdlClient::GetChipIds(std::vector<int> &ids)
     if (pRpcClient == nullptr) {
         return WIFI_IDL_OPT_FAILED;
     }
-    LOGD("start GetChipIds %{public}d", ids.size()); /* fixed compile error, -Werror,-Wunused-parameter */
+    LOGD("start GetChipIds %{public}zu", ids.size()); /* fixed compile error, -Werror,-Wunused-parameter */
     return WIFI_IDL_OPT_OK;
 }
 

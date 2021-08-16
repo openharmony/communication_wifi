@@ -148,7 +148,7 @@ static bool GetWifiScanInfoList(const napi_env& env, napi_value& arrayResult)
         return false;
     }
 
-    WIFI_LOGI("[Napi Device] GetScanInfoList, size: %{public}d", vecCppScanInfos.size());
+    WIFI_LOGI("[Napi Device] GetScanInfoList, size: %{public}zu", vecCppScanInfos.size());
     napi_create_array_with_length(env, vecCppScanInfos.size(), &arrayResult);
     return NativeScanInfosToJsObj(env, arrayResult, vecCppScanInfos);
 }

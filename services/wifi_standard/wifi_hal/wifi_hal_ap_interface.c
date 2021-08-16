@@ -182,7 +182,7 @@ WifiErrorNo SetMacFilter(const unsigned char *mac, int lenMac)
 {
     LOGD("SetMacFilter:mac: %s, len_mac: %{public}d", (const char *)mac, lenMac);
     if (WIFI_MAC_LENGTH != strlen((const char *)mac) || WIFI_MAC_LENGTH != lenMac) {
-        LOGD("Mac size not correct! mac len %{public}d, request lenMac %{public}d", strlen((const char *)mac), lenMac);
+        LOGD("Mac size not correct! mac len %{public}zu, request lenMac %{public}d", strlen((const char *)mac), lenMac);
         return WIFI_HAL_FAILED;
     }
     WifiHostapdHalDevice *hostapdHalDevice = GetWifiHostapdDev();
@@ -201,7 +201,7 @@ WifiErrorNo DelMacFilter(const unsigned char *mac, int lenMac)
 {
     LOGI("DelMacFilter:mac: %s, len_mac: %{public}d", (const char *)mac, lenMac);
     if (WIFI_MAC_LENGTH != strlen((const char *)mac) || WIFI_MAC_LENGTH != lenMac) {
-        LOGD("Mac size not correct! mac len %{public}d, request lenMac %{public}d", strlen((const char *)mac), lenMac);
+        LOGD("Mac size not correct! mac len %{public}zu, request lenMac %{public}d", strlen((const char *)mac), lenMac);
         return WIFI_HAL_FAILED;
     }
     WifiHostapdHalDevice *hostapdHalDevice = GetWifiHostapdDev();
@@ -220,7 +220,7 @@ WifiErrorNo DisassociateSta(const unsigned char *mac, int lenMac)
 {
     LOGI("DisassociateSta:mac: %s, len_mac: %{public}d", (const char *)mac, lenMac);
     if (WIFI_MAC_LENGTH != strlen((const char *)mac) || WIFI_MAC_LENGTH != lenMac) {
-        LOGD("Mac size not correct! mac len %{public}d, request lenMac %{public}d", strlen((const char *)mac), lenMac);
+        LOGD("Mac size not correct! mac len %{public}zu, request lenMac %{public}d", strlen((const char *)mac), lenMac);
         return WIFI_HAL_FAILED;
     }
     WifiHostapdHalDevice *hostapdHalDevice = GetWifiHostapdDev();

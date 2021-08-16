@@ -12,6 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#include <inttypes.h>
 #include "state_machine.h"
 #include "wifi_log.h"
 
@@ -213,7 +214,7 @@ void StateMachine::MessageExecutedLater(InternalMessage *msg, int64_t delayTimeM
 
 void StateMachine::StartTimer(int timerName, int64_t interval)
 {
-    LOGD("Enter StateMachine::StartTimer, timerName is %{public}d, interval is %lld.", timerName, interval);
+    LOGD("Enter StateMachine::StartTimer, timerName is %{public}d, interval is %" PRIu64 "", timerName, interval);
     MessageExecutedLater(timerName, interval);
     return;
 }

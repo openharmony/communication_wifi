@@ -170,27 +170,30 @@ int GetLocalInterface(const char *ifname, int *ifindex, unsigned char *hwaddr, u
     }
 
     if (memset_s(&iface, sizeof(iface), 0, sizeof(iface)) != EOK) {
+        close(fd);
         LOGE("GetLocalInterface() ifname:%{public}s failed, memset_s error!\n", ifname);
         return DHCP_OPT_FAILED;
     }
     if (strncpy_s(iface.ifr_name, sizeof(iface.ifr_name), ifname, strlen(ifname)) != EOK) {
+        close(fd);
         LOGE("GetLocalInterface() ifname:%{public}s failed, strncpy_s error!\n", ifname);
         return DHCP_OPT_FAILED;
     }
 
     if (ioctl(fd, SIOCGIFINDEX, &iface) != 0) {
-        LOGE("GetLocalInterface() %{public}s failed, SIOCGIFINDEX err:%{public}s!\n", ifname, strerror(errno));
         close(fd);
+        LOGE("GetLocalInterface() %{public}s failed, SIOCGIFINDEX err:%{public}s!\n", ifname, strerror(errno));
         return DHCP_OPT_FAILED;
     }
     *ifindex = iface.ifr_ifindex;
 
     if (ioctl(fd, SIOCGIFHWADDR, &iface) != 0) {
-        LOGE("GetLocalInterface() %{public}s failed, SIOCGIFHWADDR err:%{public}s!\n", ifname, strerror(errno));
         close(fd);
+        LOGE("GetLocalInterface() %{public}s failed, SIOCGIFHWADDR err:%{public}s!\n", ifname, strerror(errno));
         return DHCP_OPT_FAILED;
     }
     if (memcpy_s(hwaddr, MAC_ADDR_LEN, iface.ifr_hwaddr.sa_data, MAC_ADDR_LEN) != EOK) {
+        close(fd);
         LOGE("GetLocalInterface() ifname:%{public}s failed, memcpy_s error!\n", ifname);
         return DHCP_OPT_FAILED;
     }
@@ -294,25 +297,29 @@ int SetLocalInterface(const char *ifname, uint32_t ifaddr4)
     }
 
     if (memset_s(&ifr, sizeof(ifr), 0, sizeof(ifr)) != EOK) {
+        close(fd);
         return DHCP_OPT_FAILED;
     }
     if (strncpy_s(ifr.ifr_name, sizeof(ifr.ifr_name), ifname, strlen(ifname)) != EOK) {
+        close(fd);
         return DHCP_OPT_FAILED;
     }
 
     if (memset_s(&sin, sizeof(sin), 0, sizeof(sin)) != EOK) {
+        close(fd);
         return DHCP_OPT_FAILED;
     }
     sin.sin_family = AF_INET;
     sin.sin_addr.s_addr = htonl(ifaddr4);
     if (memcpy_s(&ifr.ifr_addr, sizeof(ifr.ifr_addr), &sin, sizeof(struct sockaddr)) != EOK) {
+        close(fd);
         return DHCP_OPT_FAILED;
     }
 
     /* Similar to the system command: ifconfig ifname ifaddr4. */
     if (ioctl(fd, SIOCSIFADDR, &ifr) < 0) {
-        LOGE("SetLocalInterface() %{public}s failed, SIOCSIFADDR err:%{public}s!\n", ifname, strerror(errno));
         close(fd);
+        LOGE("SetLocalInterface() %{public}s failed, SIOCSIFADDR err:%{public}s!\n", ifname, strerror(errno));
         return DHCP_OPT_FAILED;
     }
 

@@ -422,6 +422,7 @@ napi_value AddDeviceConfig(napi_env env, napi_callback_info info)
 
     WifiDeviceConfig *config = new WifiDeviceConfig();
     if (config == NULL) {
+        delete asCallbackInfo;
         return UndefinedNapiValue(env);
     }
     JsObjToDeviceConfig(env, argv[0], *config);

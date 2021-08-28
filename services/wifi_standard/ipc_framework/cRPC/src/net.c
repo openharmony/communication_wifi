@@ -14,6 +14,8 @@
  */
 #include "net.h"
 #include "log.h"
+#include "common.h"
+
 #undef LOG_TAG
 #define LOG_TAG "OHWIFI_RPC_NET"
 

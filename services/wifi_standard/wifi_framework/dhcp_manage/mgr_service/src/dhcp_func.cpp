@@ -196,18 +196,20 @@ int DhcpFunc::GetLocalIp(const std::string ethInf, std::string& localIp)
     }
 
     if (strncpy_s(ifr.ifr_name, IFNAMSIZ, ethInf.c_str(), IFNAMSIZ - 1) != EOK) {
+        close(sd);
         return -1;
     }
     ifr.ifr_name[IFNAMSIZ - 1] = 0;
 
     // if error: No such device
     if (ioctl(sd, SIOCGIFADDR, &ifr) < 0) {
-        WIFI_LOGE("GetLocalIp ioctl ethInf:%{public}s,strerror:%{public}s!\n", ethInf.c_str(), strerror(errno));
         close(sd);
+        WIFI_LOGE("GetLocalIp ioctl ethInf:%{public}s,strerror:%{public}s!\n", ethInf.c_str(), strerror(errno));
         return -1;
     }
 
     if (memcpy_s(&sin, sizeof(sin), &ifr.ifr_addr, sizeof(sin)) != EOK) {
+        close(sd);
         return -1;
     }
     char ip[IP_SIZE] = { 0 };
@@ -233,6 +235,7 @@ int DhcpFunc::GetLocalMac(const std::string ethInf, std::string& ethMac)
     }
 
     if (strncpy_s(ifr.ifr_name, IFNAMSIZ, ethInf.c_str(), IFNAMSIZ - 1) != EOK) {
+        close(sd);
         return -1;
     }
 

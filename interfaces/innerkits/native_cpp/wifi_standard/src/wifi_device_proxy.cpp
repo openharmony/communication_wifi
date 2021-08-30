@@ -173,7 +173,7 @@ ErrCode WifiDeviceProxy::AddDeviceConfig(const WifiDeviceConfig &config, int &re
     return WIFI_OPT_SUCCESS;
 }
 
-ErrCode WifiDeviceProxy::RemoveDeviceConfig(int networkId)
+ErrCode WifiDeviceProxy::RemoveDevice(int networkId)
 {
     if (mRemoteDied) {
         WIFI_LOGD("failed to `%{public}s`,remote service is died!", __func__);
@@ -189,6 +189,35 @@ ErrCode WifiDeviceProxy::RemoveDeviceConfig(int networkId)
         WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d", WIFI_SVR_CMD_REMOVE_DEVICE_CONFIG, error);
         return ErrCode(error);
     }
+    int exception = reply.ReadInt32();
+    if (exception) {
+        return WIFI_OPT_FAILED;
+    }
+    int ret = reply.ReadInt32();
+    if (ret != WIFI_OPT_SUCCESS) {
+        return ErrCode(ret);
+    }
+
+    return WIFI_OPT_SUCCESS;
+}
+
+ErrCode WifiDeviceProxy::RemoveAllDevice()
+{
+    if (mRemoteDied) {
+        WIFI_LOGD("failed to `%{public}s`,remote service is died!", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    MessageOption option;
+    MessageParcel data;
+    MessageParcel reply;
+    data.WriteInt32(0);
+
+    int error = Remote()->SendRequest(WIFI_SVR_CMD_REMOVE_ALL_DEVICE_CONFIG, data, reply, option);
+    if (error != ERR_NONE) {
+        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d", WIFI_SVR_CMD_REMOVE_ALL_DEVICE_CONFIG, error);
+        return ErrCode(error);
+    }
+
     int exception = reply.ReadInt32();
     if (exception) {
         return WIFI_OPT_FAILED;
@@ -345,7 +374,7 @@ ErrCode WifiDeviceProxy::DisableDeviceConfig(int networkId)
     return WIFI_OPT_SUCCESS;
 }
 
-ErrCode WifiDeviceProxy::ConnectTo(int networkId)
+ErrCode WifiDeviceProxy::ConnectToNetwork(int networkId)
 {
     if (mRemoteDied) {
         WIFI_LOGD("failed to `%{public}s`,remote service is died!", __func__);
@@ -373,7 +402,7 @@ ErrCode WifiDeviceProxy::ConnectTo(int networkId)
     return WIFI_OPT_SUCCESS;
 }
 
-ErrCode WifiDeviceProxy::ConnectTo(const WifiDeviceConfig &config)
+ErrCode WifiDeviceProxy::ConnectToDevice(const WifiDeviceConfig &config)
 {
     if (mRemoteDied) {
         WIFI_LOGD("failed to `%{public}s`,remote service is died!", __func__);
@@ -662,7 +691,7 @@ ErrCode WifiDeviceProxy::GetLinkedInfo(WifiLinkedInfo &info)
     return WIFI_OPT_SUCCESS;
 }
 
-ErrCode WifiDeviceProxy::GetDhcpInfo(DhcpInfo &info)
+ErrCode WifiDeviceProxy::GetIpInfo(IpInfo &info)
 {
     if (mRemoteDied) {
         WIFI_LOGD("failed to `%{public}s`,remote service is died!", __func__);
@@ -687,11 +716,11 @@ ErrCode WifiDeviceProxy::GetDhcpInfo(DhcpInfo &info)
     }
 
     info.ipAddress = reply.ReadInt32();
-    info.netGate = reply.ReadInt32();
-    info.netMask = reply.ReadInt32();
-    info.dns1 = reply.ReadInt32();
-    info.dns2 = reply.ReadInt32();
-    info.serverAddress = reply.ReadInt32();
+    info.gateway = reply.ReadInt32();
+    info.netmask = reply.ReadInt32();
+    info.primaryDns = reply.ReadInt32();
+    info.secondDns = reply.ReadInt32();
+    info.serverIp = reply.ReadInt32();
     info.leaseDuration = reply.ReadInt32();
     return WIFI_OPT_SUCCESS;
 }
@@ -813,6 +842,33 @@ ErrCode WifiDeviceProxy::GetSignalLevel(const int &rssi, const int &band, int &l
     }
 
     level = reply.ReadInt32();
+    return WIFI_OPT_SUCCESS;
+}
+
+ErrCode WifiDeviceProxy::GetSupportedFeatures(long &features)
+{
+    if (mRemoteDied) {
+        WIFI_LOGD("failed to `%{public}s`,remote service is died!", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    MessageOption option;
+    MessageParcel data, reply;
+    data.WriteInt32(0);
+    int error = Remote()->SendRequest(WIFI_SVR_CMD_GET_SUPPORTED_FEATURES, data, reply, option);
+    if (error != ERR_NONE) {
+        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d", WIFI_SVR_CMD_GET_SUPPORTED_FEATURES, error);
+        return ErrCode(error);
+    }
+    int exception = reply.ReadInt32();
+    if (exception) {
+        return WIFI_OPT_FAILED;
+    }
+    int ret = reply.ReadInt32();
+    if (ret != WIFI_OPT_SUCCESS) {
+        return ErrCode(ret);
+    }
+
+    features = reply.ReadInt64();
     return WIFI_OPT_SUCCESS;
 }
 

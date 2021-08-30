@@ -49,7 +49,7 @@ public:
      * @param params - WifiScanParams object
      * @return ErrCode - operation result
      */
-    virtual ErrCode Scan(const WifiScanParams &params) override;
+    virtual ErrCode AdvanceScan(const WifiScanParams &params) override;
 
     /**
      * @Description Check whether the ScanAlways mode is enabled
@@ -68,6 +68,14 @@ public:
     virtual ErrCode GetScanInfoList(std::vector<WifiScanInfo> &result) override;
 
     virtual ErrCode RegisterCallBack(const sptr<IWifiScanCallback> &callback) override;
+
+    /**
+     * @Description Get supported features
+     *
+     * @param features - return supported features
+     * @return ErrCode - operation result
+     */
+    ErrCode GetSupportedFeatures(long &features) override;
 
     void OnRemoteDied(const wptr<IRemoteObject>& remoteObject) override;
 private:

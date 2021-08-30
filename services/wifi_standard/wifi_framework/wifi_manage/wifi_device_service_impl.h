@@ -46,7 +46,9 @@ public:
 
     ErrCode AddDeviceConfig(const WifiDeviceConfig &config, int &result) override;
 
-    ErrCode RemoveDeviceConfig(int networkId) override;
+    ErrCode RemoveDevice(int networkId) override;
+
+    ErrCode RemoveAllDevice() override;
 
     ErrCode GetDeviceConfigs(std::vector<WifiDeviceConfig> &result) override;
 
@@ -54,9 +56,9 @@ public:
 
     ErrCode DisableDeviceConfig(int networkId) override;
 
-    ErrCode ConnectTo(int networkId) override;
+    ErrCode ConnectToNetwork(int networkId) override;
 
-    ErrCode ConnectTo(const WifiDeviceConfig &config) override;
+    ErrCode ConnectToDevice(const WifiDeviceConfig &config) override;
 
     ErrCode ReConnect() override;
 
@@ -74,7 +76,7 @@ public:
 
     ErrCode GetLinkedInfo(WifiLinkedInfo &info) override;
 
-    ErrCode GetDhcpInfo(DhcpInfo &info) override;
+    ErrCode GetIpInfo(IpInfo &info) override;
 
     ErrCode SetCountryCode(const std::string &countryCode) override;
 
@@ -83,6 +85,8 @@ public:
     ErrCode RegisterCallBackClient(const std::string &name, const sptr<IWifiDeviceCallBack> &callback) override;
 
     ErrCode GetSignalLevel(const int &rssi, const int &band, int &level) override;
+
+    ErrCode GetSupportedFeatures(long &features) override;
 
 private:
     bool Init();

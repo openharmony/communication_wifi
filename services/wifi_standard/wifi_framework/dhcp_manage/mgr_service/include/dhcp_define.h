@@ -19,6 +19,7 @@
 #include <string>
 #include <cstdint>
 #include <netinet/ip.h>
+#include <sys/stat.h>
 
 
 namespace OHOS {
@@ -49,6 +50,8 @@ const int SLEEP_TIME_200_MS     = 200 * 1000;
 const int SLEEP_TIME_500_MS     = 500 * 1000;
 const int PID_MAX_LEN           = 16;
 const int DEFAULT_UMASK         = 027;
+const int DIR_MAX_LEN           = 256;
+const int DIR_DEFAULT_MODE      = S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH;
 const std::string IP4_SEPARATOR(".");
 const std::string IP6_SEPARATOR(":");
 const std::string DHCP_WORK_DIR("/data/dhcp/");
@@ -143,6 +146,7 @@ struct DhcpRange {
     std::string strTagName; /* dhcp-range tag name */
     std::string strStartip; /* dhcp-range start ip */
     std::string strEndip;   /* dhcp-range end ip */
+    std::string strSubnet;  /* dhcp-range subnet */
 
     DhcpRange()
     {
@@ -151,6 +155,7 @@ struct DhcpRange {
         strTagName = "";
         strStartip = "";
         strEndip = "";
+        strSubnet = "";
     }
 };
 }  // namespace Wifi

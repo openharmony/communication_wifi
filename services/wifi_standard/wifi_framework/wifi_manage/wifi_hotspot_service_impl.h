@@ -157,6 +157,15 @@ public:
      * @return ErrCode - operation result
      */
     ErrCode RegisterCallBack(const sptr<IWifiHotspotCallback> &callback) override;
+
+    /**
+     * @Description Get supported feature
+     *
+     * @param features - return supported feature
+     * @return ErrCode - operation result
+     */
+    ErrCode GetSupportedFeatures(long &features) override;
+
 private:
     bool Init();
     ErrCode CheckCanEnableHotspot(void);

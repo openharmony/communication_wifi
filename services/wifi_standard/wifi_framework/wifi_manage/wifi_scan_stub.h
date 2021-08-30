@@ -42,6 +42,7 @@ private:
     int OnIsWifiClosedScan(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
     int OnGetScanInfoList(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
     int OnRegisterCallBack(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
+    int OnGetSupportedFeatures(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
 
     sptr<IWifiScanCallback> callback_;
     sptr<IRemoteObject::DeathRecipient> deathRecipient_;

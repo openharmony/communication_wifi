@@ -56,7 +56,14 @@ public:
      * @param networkId - want to remove device config's network id
      * @return ErrCode - operation result
      */
-    ErrCode RemoveDeviceConfig(int networkId) override;
+    ErrCode RemoveDevice(int networkId) override;
+
+    /**
+     * @Description Remove all device configs.
+     *
+     * @return ErrCode - operation result
+     */
+    ErrCode RemoveAllDevice() override;
 
     /**
      * @Description Get all the device configs
@@ -67,29 +74,12 @@ public:
     ErrCode GetDeviceConfigs(std::vector<WifiDeviceConfig> &result) override;
 
     /**
-     * @Description Enable device config, when set attemptEnable, disable other device config
-     *
-     * @param networkId - need enable device config's network id
-     * @param attemptEnable - if set true, disable other device config
-     * @return ErrCode - operation result
-     */
-    ErrCode EnableDeviceConfig(int networkId, bool attemptEnable) override;
-
-    /**
-     * @Description Disable Wi-Fi device configuration.
-     *
-     * @param networkId - device config's network id
-     * @return ErrCode - operation result
-     */
-    ErrCode DisableDeviceConfig(int networkId) override;
-
-    /**
      * @Description Connecting to a Specified Network
      *
      * @param networkId - network id
      * @return ErrCode - operation result
      */
-    ErrCode ConnectTo(int networkId) override;
+    ErrCode ConnectToNetwork(int networkId) override;
 
     /**
      * @Description Connect To a network base WifiDeviceConfig object
@@ -97,21 +87,7 @@ public:
      * @param config - WifiDeviceConfig object
      * @return ErrCode - operation result
      */
-    ErrCode ConnectTo(const WifiDeviceConfig &config) override;
-
-    /**
-     * @Description Reconnect to the currently active network
-     *
-     * @return ErrCode - operation result
-     */
-    ErrCode ReConnect() override;
-
-    /**
-     * @Description ReAssociate network
-     *
-     * @return ErrCode - operation result
-     */
-    ErrCode ReAssociate(void) override;
+    ErrCode ConnectToDevice(const WifiDeviceConfig &config) override;
 
     /**
      * @Description Disconnect
@@ -119,21 +95,6 @@ public:
      * @return ErrCode - operation result
      */
     ErrCode Disconnect(void) override;
-
-    /**
-     * @Description Enable WPS connection
-     *
-     * @param config - WpsConfig object
-     * @return ErrCode - operation result
-     */
-    ErrCode StartWps(const WpsConfig &config) override;
-
-    /**
-     * @Description Close the WPS connection
-     *
-     * @return ErrCode - operation result
-     */
-    ErrCode CancelWps(void) override;
 
     /**
      * @Description Check whether Wi-Fi is active
@@ -158,14 +119,6 @@ public:
      * @return ErrCode - operation result
      */
     ErrCode GetLinkedInfo(WifiLinkedInfo &info) override;
-
-    /**
-     * @Description Obtaining DHCP Request Information
-     *
-     * @param info - DhcpInfo object
-     * @return ErrCode - operation result
-     */
-    ErrCode GetDhcpInfo(DhcpInfo &info) override;
 
     /**
      * @Description Set the Country Code
@@ -201,6 +154,77 @@ public:
      * @return ErrCode - operation result
      */
     ErrCode GetSignalLevel(const int &rssi, const int &band, int &level) override;
+
+    /**
+     * @Description Get supported features
+     *
+     * @param features - return supported features
+     * @return ErrCode - operation result
+     */
+    ErrCode GetSupportedFeatures(long &features) override;
+
+    /**
+     * @Description Check if supported input feature
+     *
+     * @param feature - input feature
+     * @return true - supported
+     * @return false - unsupported
+     */
+    bool IsFeatureSupported(long feature) override;
+
+    /**
+     * @Description Enable device config, when set attemptEnable, disable other device config
+     *
+     * @param networkId - need enable device config's network id
+     * @param attemptEnable - if set true, disable other device config
+     * @return ErrCode - operation result
+     */
+    ErrCode EnableDeviceConfig(int networkId, bool attemptEnable);
+
+    /**
+     * @Description Disable Wi-Fi device configuration.
+     *
+     * @param networkId - device config's network id
+     * @return ErrCode - operation result
+     */
+    ErrCode DisableDeviceConfig(int networkId);
+
+    /**
+     * @Description Obtaining ip Request Information
+     *
+     * @param info - IpInfo object
+     * @return ErrCode - operation result
+     */
+    ErrCode GetIpInfo(IpInfo &info);
+
+    /**
+     * @Description Reconnect to the currently active network
+     *
+     * @return ErrCode - operation result
+     */
+    ErrCode ReConnect();
+
+    /**
+     * @Description ReAssociate network
+     *
+     * @return ErrCode - operation result
+     */
+    ErrCode ReAssociate(void);
+
+    /**
+     * @Description Enable WPS connection
+     *
+     * @param config - WpsConfig object
+     * @return ErrCode - operation result
+     */
+    ErrCode StartWps(const WpsConfig &config);
+
+    /**
+     * @Description Close the WPS connection
+     *
+     * @return ErrCode - operation result
+     */
+    ErrCode CancelWps(void);
 
 private:
     int systemAbilityId_;

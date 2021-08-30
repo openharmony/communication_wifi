@@ -171,7 +171,7 @@ int WifiSettings::AddDeviceConfig(const WifiDeviceConfig &config)
     return config.networkId;
 }
 
-int WifiSettings::RemoveDeviceConfig(int networkId)
+int WifiSettings::RemoveDevice(int networkId)
 {
     std::unique_lock<std::mutex> lock(mConfigMutex);
     auto iter = mWifiDeviceConfig.find(networkId);
@@ -179,6 +179,13 @@ int WifiSettings::RemoveDeviceConfig(int networkId)
         mWifiDeviceConfig.erase(iter);
     }
     return 0;
+}
+
+void WifiSettings::ClearDeviceConfig(void)
+{
+    std::unique_lock<std::mutex> lock(mConfigMutex);
+    mWifiDeviceConfig.clear();
+    return;
 }
 
 int WifiSettings::GetDeviceConfig(std::vector<WifiDeviceConfig> &results)
@@ -313,17 +320,17 @@ int WifiSettings::AddWpsDeviceConfig(const WifiDeviceConfig &config)
     return 0;
 }
 
-int WifiSettings::GetDhcpInfo(DhcpInfo &info)
+int WifiSettings::GetIpInfo(IpInfo &info)
 {
     std::unique_lock<std::mutex> lock(mInfoMutex);
-    info = mWifiDhcpInfo;
+    info = mWifiIpInfo;
     return 0;
 }
 
-int WifiSettings::SaveDhcpInfo(const DhcpInfo &info)
+int WifiSettings::SaveIpInfo(const IpInfo &info)
 {
     std::unique_lock<std::mutex> lock(mInfoMutex);
-    mWifiDhcpInfo = info;
+    mWifiIpInfo = info;
     return 0;
 }
 

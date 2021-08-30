@@ -63,6 +63,7 @@ enum WifiInternalMsgCode {
     STA_CANCEL_WPS_REQ,
     STA_CANCEL_WPS_RES,
     STA_REMOVE_DEVICE_REQ,
+    STA_REMOVE_ALL_DEVICE_REQ,
     STA_CONNECT_MANAGE_REQ,
     STA_SET_COUNTRY_CODE,
     STA_END_MSG_CODE, /* IDENTIFY: MAX MSGCODE FOR STA SERVICE . PLEASE ADD NEW CODE FOR STA BEFORE THIS ! */
@@ -131,6 +132,19 @@ enum class OperateResState {
     CONNECT_PASSWORD_WRONG,            /* wrong password */
     CONNECT_OBTAINING_IP,              /* obtain ip */
     CONNECT_OBTAINING_IP_FAIL
+};
+
+enum class WifiFeatures {
+    WIFI_FEATURE_INFRA = 0x0001,             // The feature id indicates support basic infrastructure mode
+    WIFI_FEATURE_INFRA_5G = 0x0002,          // The feature id indicates support 5 GHz Band
+    WIFI_FEATURE_PASSPOINT = 0x0004,         // The feature id indicates support GAS/ANQP
+    WIFI_FEATURE_P2P = 0x0008,               // The feature id indicates support Wifi-Direct
+    WIFI_FEATURE_MOBILE_HOTSPOT = 0x0010,    // The feature id indicates support Soft AP
+    WIFI_FEATURE_AWARE = 0x0040,             // The feature id indicates support Wi-Fi AWare networking
+    WIFI_FEATURE_AP_STA = 0x8000,            // The feature id indicates support AP STA Concurrency
+    WIFI_FEATURE_WPA3_SAE = 0x8000000,       // The feature id indicates support WPA3-Personal SAE
+    WIFI_FEATURE_WPA3_SUITE_B = 0x10000000,  // The feature id indicates support WPA3-Enterprise Suite-B
+    WIFI_FEATURE_OWE = 0x20000000,           // The feature id indicates support Enhanced Open
 };
 
 struct WifiRequestParams {

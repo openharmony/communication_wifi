@@ -29,7 +29,7 @@ declare namespace wifi {
      * @return Returns {@code true} if the operation is successful; returns {@code false} otherwise.
      *
      * @since 6
-     * @hide SystemApi
+     * @systemapi Hide this for inner system use.
      */
     function enableWifi(): boolean;
 
@@ -39,7 +39,7 @@ declare namespace wifi {
      * @return Returns {@code true} if the operation is successful; returns {@code false} otherwise.
      *
      * @since 6
-     * @hide SystemApi
+     * @systemapi Hide this for inner system use.
      */
     function disableWifi(): boolean;
 
@@ -82,7 +82,7 @@ declare namespace wifi {
      *
      * @devices phone, tablet
      * @since 6
-     * @hide SystemApi
+     * @systemapi Hide this for inner system use.
      */
     function addDeviceConfig(config: WifiDeviceConfig): Promise<number>;
     function addDeviceConfig(config: WifiDeviceConfig, callback: AsyncCallback<number>): void;
@@ -94,7 +94,7 @@ declare namespace wifi {
      * @return Returns {@code true} if the network connection is successful; returns {@code false} otherwise.
      *
      * @since 6
-     * @hide SystemApi
+     * @systemapi Hide this for inner system use.
      */
     function connectToNetwork(networkId: number): boolean;
 
@@ -106,7 +106,7 @@ declare namespace wifi {
      *
      * @devices phone, tablet
      * @since 6
-     * @hide SystemApi
+     * @systemapi Hide this for inner system use.
      */
     function connectToDevice(config: WifiDeviceConfig): boolean;
 
@@ -116,7 +116,7 @@ declare namespace wifi {
      * @return Returns {@code true} for disconnecting network success, returns {@code false} otherwise.
      *
      * @since 6
-     * @hide SystemApi
+     * @systemapi Hide this for inner system use.
      */
     function disconnect(): boolean;
 
@@ -136,7 +136,7 @@ declare namespace wifi {
      *
      * @devices phone, tablet
      * @since 6
-     * @hide SystemApi
+     * @systemapi Hide this for inner system use.
      */
     interface WifiDeviceConfig {
         /** Wi-Fi SSID: the maximum length is 32 */

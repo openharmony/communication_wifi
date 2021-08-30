@@ -141,9 +141,14 @@ WifiErrorNo WifiStaHalInterface::StopPnoScan(void)
     return mIdlClient->ReqStopPnoScan();
 }
 
-WifiErrorNo WifiStaHalInterface::RemoveDeviceConfig(int networkId)
+WifiErrorNo WifiStaHalInterface::RemoveDevice(int networkId)
 {
-    return mIdlClient->RemoveDeviceConfig(networkId);
+    return mIdlClient->RemoveDevice(networkId);
+}
+
+WifiErrorNo WifiStaHalInterface::ClearDeviceConfig(void) const
+{
+    return mIdlClient->ClearDeviceConfig();
 }
 
 WifiErrorNo WifiStaHalInterface::GetNextNetworkId(int &networkId)

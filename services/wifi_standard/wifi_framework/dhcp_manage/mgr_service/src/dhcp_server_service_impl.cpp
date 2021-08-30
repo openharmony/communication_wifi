@@ -37,6 +37,8 @@ DhcpServerServiceImpl::DhcpServerServiceImpl()
     m_mapDhcpSerExitNotify.clear();
     bDhcpSerProExitThread = false;
     pDhcpSerProExitThread = nullptr;
+
+    DhcpFunc::CreateDirs(DHCP_SERVER_CONFIG_DIR);
 }
 
 DhcpServerServiceImpl::~DhcpServerServiceImpl()
@@ -178,8 +180,8 @@ int DhcpServerServiceImpl::PutDhcpRange(const std::string &tagName, const DhcpRa
         return DHCP_OPT_FAILED;
     }
     if ((range.iptype == -1) || range.strStartip.empty() || range.strEndip.empty()) {
-        WIFI_LOGE("PutDhcpRange() tagName:%{public}s failed, range.iptype:%{public}d or strStartip:%{public}s or "
-                  "strEndip:%{public}s error!\n",
+        WIFI_LOGE("PutDhcpRange() tagName:%{public}s failed, range.iptype:%{public}d or strStartip:%{private}s or "
+                  "strEndip:%{private}s error!\n",
             tagName.c_str(),
             range.iptype,
             range.strStartip.c_str(),
@@ -202,7 +204,7 @@ int DhcpServerServiceImpl::PutDhcpRange(const std::string &tagName, const DhcpRa
             if ((iterRange.iptype == range.iptype) && (iterRange.strStartip == range.strStartip) &&
                 (iterRange.strEndip == range.strEndip)) {
                 WIFI_LOGE("PutDhcpRange() tagName:%{public}s failed, "
-                          "range.iptype:%{public}d,strStartip:%{public}s,strEndip:%{public}s already exist!\n",
+                          "range.iptype:%{public}d,strStartip:%{private}s,strEndip:%{private}s already exist!\n",
                     tagName.c_str(),
                     range.iptype,
                     range.strStartip.c_str(),
@@ -229,8 +231,8 @@ int DhcpServerServiceImpl::RemoveDhcpRange(const std::string &tagName, const Dhc
         return DHCP_OPT_FAILED;
     }
     if ((range.iptype == -1) || range.strStartip.empty() || range.strEndip.empty()) {
-        WIFI_LOGE("RemoveDhcpRange() tagName:%{public}s failed, range.iptype:%{public}d or strStartip:%{public}s or "
-                  "strEndip:%{public}s error!\n",
+        WIFI_LOGE("RemoveDhcpRange() tagName:%{public}s failed, range.iptype:%{public}d or strStartip:%{private}s or "
+                  "strEndip:%{private}s error!\n",
             tagName.c_str(),
             range.iptype,
             range.strStartip.c_str(),
@@ -247,7 +249,7 @@ int DhcpServerServiceImpl::RemoveDhcpRange(const std::string &tagName, const Dhc
                 (iterRange->strEndip == range.strEndip)) {
                 m_mapTagDhcpRange[tagName].erase(iterRange++);
                 WIFI_LOGI("RemoveDhcpRange() find tagName:%{public}s, "
-                          "range.iptype:%{public}d,strStartip:%{public}s,strEndip:%{public}s, erase.\n",
+                          "range.iptype:%{public}d,strStartip:%{private}s,strEndip:%{private}s, erase.\n",
                     tagName.c_str(),
                     range.iptype,
                     range.strStartip.c_str(),
@@ -290,8 +292,8 @@ int DhcpServerServiceImpl::SetDhcpRange(const std::string &ifname, const DhcpRan
         return DHCP_OPT_FAILED;
     }
     if ((range.iptype == -1) || range.strStartip.empty() || range.strEndip.empty()) {
-        WIFI_LOGE("SetDhcpRange() ifname:%{public}s failed, range.iptype:%{public}d or strStartip:%{public}s or "
-                  "strEndip:%{public}s error!\n",
+        WIFI_LOGE("SetDhcpRange() ifname:%{public}s failed, range.iptype:%{public}d or strStartip:%{private}s or "
+                  "strEndip:%{private}s error!\n",
             ifname.c_str(), range.iptype, range.strStartip.c_str(), range.strEndip.c_str());
         return DHCP_OPT_FAILED;
     }
@@ -316,7 +318,7 @@ int DhcpServerServiceImpl::SetDhcpRange(const std::string &ifname, const DhcpRan
             if ((iterRange.iptype == range.iptype) && (iterRange.strStartip == range.strStartip) &&
                 (iterRange.strEndip == range.strEndip)) {
                 WIFI_LOGE("SetDhcpRange() ifname:%{public}s failed, "
-                          "range.iptype:%{public}d,strStartip:%{public}s,strEndip:%{public}s already exist!\n",
+                          "range.iptype:%{public}d,strStartip:%{private}s,strEndip:%{private}s already exist!\n",
                     ifname.c_str(), range.iptype, range.strStartip.c_str(), range.strEndip.c_str());
                 return DHCP_OPT_FAILED;
             }
@@ -574,15 +576,15 @@ int DhcpServerServiceImpl::CheckAndUpdateConf(const std::string &ifname)
     bool bValidRange = false;
     for (auto iterRange : iterRangeMap->second) {
         if (((iterRange.iptype != 0) && (iterRange.iptype != 1)) || (iterRange.leaseHours <= 0) ||
-            (iterRange.strStartip.length() <= 0) || (iterRange.strEndip.length() <= 0)) {
+            (iterRange.strStartip.size() == 0) || (iterRange.strEndip.size() == 0)) {
             WIFI_LOGE("CheckAndUpdateConf() failed, "
-                      "iptype:%{public}d,leaseHours:%{public}d,strStartip:%{public}s,strEndip:%{public}s error!\n",
+                      "iptype:%{public}d,leaseHours:%{public}d,strStartip:%{private}s,strEndip:%{private}s error!\n",
                 iterRange.iptype, iterRange.leaseHours, iterRange.strStartip.c_str(), iterRange.strEndip.c_str());
             continue;
         }
 
         std::string strTag = "";
-        if (iterRange.strTagName.length() > 0) {
+        if (iterRange.strTagName.size() > 0) {
             strTag = "set:" + iterRange.strTagName + ",";
         }
         if (iterRange.iptype == 0) {
@@ -621,7 +623,7 @@ int DhcpServerServiceImpl::DeleteInfConf(const std::string &if_filename)
 bool DhcpServerServiceImpl::CheckIpAddrRange(const DhcpRange &range)
 {
     if (((range.iptype != 0) && (range.iptype != 1)) || range.strStartip.empty() || range.strEndip.empty()) {
-        WIFI_LOGE("CheckIpAddrRange() range.iptype:%{public}d,strStartip:%{public}s,strEndip:%{public}s error!\n",
+        WIFI_LOGE("CheckIpAddrRange() range.iptype:%{public}d,strStartip:%{private}s,strEndip:%{private}s error!\n",
             range.iptype, range.strStartip.c_str(), range.strEndip.c_str());
         return false;
     }
@@ -629,19 +631,20 @@ bool DhcpServerServiceImpl::CheckIpAddrRange(const DhcpRange &range)
     if (range.iptype == 0) {
         uint32_t uStartIp = 0;
         if (!DhcpFunc::Ip4StrConToInt(range.strStartip, uStartIp)) {
-            WIFI_LOGE("CheckIpAddrRange() Ip4StrConToInt failed, range.iptype:%{public}d,strStartip:%{public}s!\n",
+            WIFI_LOGE("CheckIpAddrRange() Ip4StrConToInt failed, range.iptype:%{public}d,strStartip:%{private}s!\n",
                 range.iptype, range.strStartip.c_str());
             return false;
         }
         uint32_t uEndIp = 0;
         if (!DhcpFunc::Ip4StrConToInt(range.strEndip, uEndIp)) {
-            WIFI_LOGE("CheckIpAddrRange() Ip4StrConToInt failed, range.iptype:%{public}d,strEndip:%{public}s!\n",
+            WIFI_LOGE("CheckIpAddrRange() Ip4StrConToInt failed, range.iptype:%{public}d,strEndip:%{private}s!\n",
                 range.iptype, range.strEndip.c_str());
             return false;
         }
         /* check ip4 start and end ip */
         if (uStartIp >= uEndIp) {
-            WIFI_LOGE("CheckIpAddrRange() failed, uStartIp:%{public}u not less uEndIp:%{public}u!\n", uStartIp, uEndIp);
+            WIFI_LOGE(
+                "CheckIpAddrRange() failed, uStartIp:%{private}u not less uEndIp:%{private}u!\n", uStartIp, uEndIp);
             return false;
         }
     } else {
@@ -664,7 +667,7 @@ bool DhcpServerServiceImpl::CheckIpAddrRange(const DhcpRange &range)
             }
 
             if (CheckDhcpRangeConflict(dhcpRange, range)) {
-                WIFI_LOGE("CheckIpAddrRange() Conflict yes, type:%{public}d,Start:%{public}s,End:%{public}s error!\n",
+                WIFI_LOGE("CheckIpAddrRange() Conflict yes, type:%{public}d,Start:%{private}s,End:%{private}s error!\n",
                     range.iptype, range.strStartip.c_str(), range.strEndip.c_str());
                 return false;
             }
@@ -692,31 +695,31 @@ bool DhcpServerServiceImpl::CheckDhcpRangeConflict(const DhcpRange &srcRange, co
             return false;
         }
         if (uSrcStartIp >= uSrcEndIp) {
-            WIFI_LOGE("CheckDhcpRangeConflict() Start:%{public}u not less End:%{public}u!\n", uSrcStartIp, uSrcEndIp);
+            WIFI_LOGE("CheckDhcpRangeConflict() Start:%{private}u not less End:%{private}u!\n", uSrcStartIp, uSrcEndIp);
             return false;
         }
 
         uint32_t uAddStartIp = 0;
         if (!DhcpFunc::Ip4StrConToInt(addRange.strStartip, uAddStartIp)) {
-            WIFI_LOGE("CheckDhcpRangeConflict() Ip4StrConToInt failed, iptype:%{public}d,strStartip:%{public}s!\n",
+            WIFI_LOGE("CheckDhcpRangeConflict() Ip4StrConToInt failed, iptype:%{public}d,strStartip:%{private}s!\n",
                 addRange.iptype, addRange.strStartip.c_str());
             return false;
         }
         uint32_t uAddEndIp = 0;
         if (!DhcpFunc::Ip4StrConToInt(addRange.strEndip, uAddEndIp)) {
-            WIFI_LOGE("CheckDhcpRangeConflict() Ip4StrConToInt failed, iptype:%{public}d,strEndip:%{public}s!\n",
+            WIFI_LOGE("CheckDhcpRangeConflict() Ip4StrConToInt failed, iptype:%{public}d,strEndip:%{private}s!\n",
                 addRange.iptype, addRange.strEndip.c_str());
             return false;
         }
         if (uAddStartIp >= uAddEndIp) {
-            WIFI_LOGE("CheckDhcpRangeConflict() Start:%{public}u not less End:%{public}u!\n", uAddStartIp, uAddEndIp);
+            WIFI_LOGE("CheckDhcpRangeConflict() Start:%{private}u not less End:%{private}u!\n", uAddStartIp, uAddEndIp);
             return false;
         }
 
         if (!((uAddStartIp > uSrcEndIp) || (uAddEndIp < uSrcStartIp))) {
             WIFI_LOGI("CheckDhcpRangeConflict yes,srcRange.iptype:%{public}d, "
-                "strStartip:%{public}s-uSrcStartIp:%{public}u, strEndip:%{public}s-uSrcEndIp:%{public}u, "
-                "addRange.strStartip:%{public}s-uAddStartIp:%{public}u, strEndip:%{public}s-uAddEndIp:%{public}u.\n",
+                "strStartip:%{private}s-uSrcStartIp:%{private}u, strEndip:%{private}s-uSrcEndIp:%{private}u, "
+                "addRange.strStartip:%{private}s->%{private}u, strEndip:%{private}s->%{private}u.\n",
                 srcRange.iptype, srcRange.strStartip.c_str(), uSrcStartIp, srcRange.strEndip.c_str(),
                 uSrcEndIp, addRange.strStartip.c_str(), uAddStartIp, addRange.strEndip.c_str(), uAddEndIp);
             return true;
@@ -735,8 +738,8 @@ bool DhcpServerServiceImpl::CheckTagDhcpRange(std::list<DhcpRange> &tagRange, st
         for (auto iterInfValue : infRange) {
             if ((iterInfValue.iptype == iterTagValue.iptype) && (iterInfValue.strStartip == iterTagValue.strStartip) &&
                 (iterInfValue.strEndip == iterTagValue.strEndip)) {
-                WIFI_LOGE("CheckTagDhcpRange() failed, iterTagValue.iptype:%{public}d, strStartip:%{public}s, "
-                          "strEndip:%{public}s already exist!\n",
+                WIFI_LOGE("CheckTagDhcpRange() failed, iterTagValue.iptype:%{public}d, strStartip:%{private}s, "
+                          "strEndip:%{private}s already exist!\n",
                     iterTagValue.iptype,
                     iterTagValue.strStartip.c_str(),
                     iterTagValue.strEndip.c_str());
@@ -759,8 +762,6 @@ void DhcpServerServiceImpl::RunDhcpSerProExitThreadFunc()
             continue;
         }
         if (!mProExitSig || mStopServer) {
-            WIFI_LOGI("RunDhcpSerProExitThreadFunc() has notify reqs, but sig:%{public}d, stop:%{public}d.",
-                mProExitSig, mStopServer);
             usleep(SLEEP_TIME_500_MS);
             continue;
         }

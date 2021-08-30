@@ -53,7 +53,6 @@ WifiDeviceServiceImpl::~WifiDeviceServiceImpl()
 
 void WifiDeviceServiceImpl::OnStart()
 {
-    WifiManager::GetInstance();
     if (mState == ServiceRunningState::STATE_RUNNING) {
         WIFI_LOGD("Service has already started.");
         return;
@@ -64,12 +63,15 @@ void WifiDeviceServiceImpl::OnStart()
         return;
     }
     mState = ServiceRunningState::STATE_RUNNING;
+    WIFI_LOGI("Start sta service!");
+    WifiManager::GetInstance();
 }
 
 void WifiDeviceServiceImpl::OnStop()
 {
     mState = ServiceRunningState::STATE_NOT_START;
     mPublishFlag = false;
+    WIFI_LOGI("Stop sta service!");
 }
 
 bool WifiDeviceServiceImpl::Init()
@@ -184,10 +186,10 @@ ErrCode WifiDeviceServiceImpl::AddDeviceConfig(const WifiDeviceConfig &config, i
     return WIFI_OPT_SUCCESS;
 }
 
-ErrCode WifiDeviceServiceImpl::RemoveDeviceConfig(int networkId)
+ErrCode WifiDeviceServiceImpl::RemoveDevice(int networkId)
 {
     if (WifiPermissionUtils::VerifySetWifiInfoPermission() == PERMISSION_DENIED) {
-        WIFI_LOGE("RemoveDeviceConfig:VerifySetWifiInfoPermission PERMISSION_DENIED!");
+        WIFI_LOGE("RemoveDevice:VerifySetWifiInfoPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
 
@@ -198,6 +200,26 @@ ErrCode WifiDeviceServiceImpl::RemoveDeviceConfig(int networkId)
     WifiRequestMsgInfo msg;
     msg.msgCode = WifiInternalMsgCode::STA_REMOVE_DEVICE_REQ;
     msg.params.argInt = networkId;
+    if (WifiManager::GetInstance().PushMsg(WIFI_SERVICE_STA, msg) < 0) {
+        WIFI_LOGE("send remove device config msg failed!");
+        return WIFI_OPT_FAILED;
+    }
+    return WIFI_OPT_SUCCESS;
+}
+
+ErrCode WifiDeviceServiceImpl::RemoveAllDevice()
+{
+    if (WifiPermissionUtils::VerifySetWifiInfoPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("RemoveAllDevice:VerifySetWifiInfoPermission PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+
+    if (!IsStaServiceRunning()) {
+        return WIFI_OPT_STA_NOT_OPENED;
+    }
+
+    WifiRequestMsgInfo msg;
+    msg.msgCode = WifiInternalMsgCode::STA_REMOVE_ALL_DEVICE_REQ;
     if (WifiManager::GetInstance().PushMsg(WIFI_SERVICE_STA, msg) < 0) {
         WIFI_LOGE("send remove device config msg failed!");
         return WIFI_OPT_FAILED;
@@ -247,10 +269,10 @@ ErrCode WifiDeviceServiceImpl::DisableDeviceConfig(int networkId)
     return WIFI_OPT_SUCCESS;
 }
 
-ErrCode WifiDeviceServiceImpl::ConnectTo(int networkId)
+ErrCode WifiDeviceServiceImpl::ConnectToNetwork(int networkId)
 {
     if (WifiPermissionUtils::VerifySetWifiInfoPermission() == PERMISSION_DENIED) {
-        WIFI_LOGE("ConnectTo:VerifySetWifiInfoPermission PERMISSION_DENIED!");
+        WIFI_LOGE("ConnectToNetwork:VerifySetWifiInfoPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
 
@@ -268,10 +290,10 @@ ErrCode WifiDeviceServiceImpl::ConnectTo(int networkId)
     return WIFI_OPT_SUCCESS;
 }
 
-ErrCode WifiDeviceServiceImpl::ConnectTo(const WifiDeviceConfig &config)
+ErrCode WifiDeviceServiceImpl::ConnectToDevice(const WifiDeviceConfig &config)
 {
     if (WifiPermissionUtils::VerifySetWifiInfoPermission() == PERMISSION_DENIED) {
-        WIFI_LOGE("ConnectTo with config:VerifySetWifiInfoPermission PERMISSION_DENIED!");
+        WIFI_LOGE("ConnectToDevice with config:VerifySetWifiInfoPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
 
@@ -433,14 +455,14 @@ ErrCode WifiDeviceServiceImpl::GetLinkedInfo(WifiLinkedInfo &info)
     return WIFI_OPT_SUCCESS;
 }
 
-ErrCode WifiDeviceServiceImpl::GetDhcpInfo(DhcpInfo &info)
+ErrCode WifiDeviceServiceImpl::GetIpInfo(IpInfo &info)
 {
     if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
-        WIFI_LOGE("GetDhcpInfo:VerifyGetWifiInfoPermission() PERMISSION_DENIED!");
+        WIFI_LOGE("GetIpInfo:VerifyGetWifiInfoPermission() PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
 
-    WifiConfigCenter::GetInstance().GetDhcpInfo(info);
+    WifiConfigCenter::GetInstance().GetIpInfo(info);
     return WIFI_OPT_SUCCESS;
 }
 
@@ -502,6 +524,20 @@ ErrCode WifiDeviceServiceImpl::GetSignalLevel(const int &rssi, const int &band, 
     }
 
     level = WifiConfigCenter::GetInstance().GetSignalLevel(rssi, band);
+    return WIFI_OPT_SUCCESS;
+}
+
+ErrCode WifiDeviceServiceImpl::GetSupportedFeatures(long &features)
+{
+    if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("GetSupportedFeatures:VerifyGetWifiInfoPermission() PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+    int ret = WifiManager::GetInstance().GetSupportedFeatures(features);
+    if (ret < 0) {
+        WIFI_LOGE("Failed to get supported features!");
+        return WIFI_OPT_FAILED;
+    }
     return WIFI_OPT_SUCCESS;
 }
 

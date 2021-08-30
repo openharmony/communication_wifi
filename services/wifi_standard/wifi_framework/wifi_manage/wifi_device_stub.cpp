@@ -38,7 +38,8 @@ void WifiDeviceStub::InitHandleMap()
     handleFuncMap[WIFI_SVR_CMD_ENABLE_WIFI] = &WifiDeviceStub::OnEnableWifi;
     handleFuncMap[WIFI_SVR_CMD_DISABLE_WIFI] = &WifiDeviceStub::OnDisableWifi;
     handleFuncMap[WIFI_SVR_CMD_ADD_DEVICE_CONFIG] = &WifiDeviceStub::OnAddDeviceConfig;
-    handleFuncMap[WIFI_SVR_CMD_REMOVE_DEVICE_CONFIG] = &WifiDeviceStub::OnRemoveDeviceConfig;
+    handleFuncMap[WIFI_SVR_CMD_REMOVE_DEVICE_CONFIG] = &WifiDeviceStub::OnRemoveDevice;
+    handleFuncMap[WIFI_SVR_CMD_REMOVE_ALL_DEVICE_CONFIG] = &WifiDeviceStub::OnRemoveAllDevice;
     handleFuncMap[WIFI_SVR_CMD_GET_DEVICE_CONFIGS] = &WifiDeviceStub::OnGetDeviceConfigs;
     handleFuncMap[WIFI_SVR_CMD_ENABLE_DEVICE] = &WifiDeviceStub::OnEnableDeviceConfig;
     handleFuncMap[WIFI_SVR_CMD_DISABLE_DEVICE] = &WifiDeviceStub::OnDisableDeviceConfig;
@@ -52,11 +53,12 @@ void WifiDeviceStub::InitHandleMap()
     handleFuncMap[WIFI_SVR_CMD_IS_WIFI_ACTIVE] = &WifiDeviceStub::OnIsWifiActive;
     handleFuncMap[WIFI_SVR_CMD_GET_WIFI_STATE] = &WifiDeviceStub::OnGetWifiState;
     handleFuncMap[WIFI_SVR_CMD_GET_LINKED_INFO] = &WifiDeviceStub::OnGetLinkedInfo;
-    handleFuncMap[WIFI_SVR_CMD_GET_DHCP_INFO] = &WifiDeviceStub::OnGetDhcpInfo;
+    handleFuncMap[WIFI_SVR_CMD_GET_DHCP_INFO] = &WifiDeviceStub::OnGetIpInfo;
     handleFuncMap[WIFI_SVR_CMD_SET_COUNTRY_CODE] = &WifiDeviceStub::OnSetCountryCode;
     handleFuncMap[WIFI_SVR_CMD_GET_COUNTRY_CODE] = &WifiDeviceStub::OnGetCountryCode;
     handleFuncMap[WIFI_SVR_CMD_REGISTER_CALLBACK_CLIENT] = &WifiDeviceStub::OnRegisterCallBackClient;
     handleFuncMap[WIFI_SVR_CMD_GET_SIGNAL_LEVEL] = &WifiDeviceStub::OnGetSignalLevel;
+    handleFuncMap[WIFI_SVR_CMD_GET_SUPPORTED_FEATURES] = &WifiDeviceStub::OnGetSupportedFeatures;
     return;
 }
 
@@ -223,11 +225,21 @@ void WifiDeviceStub::WriteIpAddress(MessageParcel &reply, const WifiIpAddress &a
     return;
 }
 
-void WifiDeviceStub::OnRemoveDeviceConfig(uint32_t code, MessageParcel &data, MessageParcel &reply)
+void WifiDeviceStub::OnRemoveDevice(uint32_t code, MessageParcel &data, MessageParcel &reply)
 {
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
     int networkId = data.ReadInt32();
-    int ret = RemoveDeviceConfig(networkId);
+    int ret = RemoveDevice(networkId);
+    reply.WriteInt32(0);
+    reply.WriteInt32(ret);
+
+    return;
+}
+
+void WifiDeviceStub::OnRemoveAllDevice(uint32_t code, MessageParcel &data, MessageParcel &reply)
+{
+    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+    int ret = RemoveAllDevice();
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
 
@@ -279,7 +291,7 @@ void WifiDeviceStub::OnConnectTo(uint32_t code, MessageParcel &data, MessageParc
 {
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
     int networkId = data.ReadInt32();
-    int ret = ConnectTo(networkId);
+    int ret = ConnectToNetwork(networkId);
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
 
@@ -291,7 +303,7 @@ void WifiDeviceStub::OnConnect2To(uint32_t code, MessageParcel &data, MessagePar
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
     WifiDeviceConfig config;
     ReadWifiDeviceConfig(data, config);
-    int ret = ConnectTo(config);
+    int ret = ConnectToDevice(config);
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
 
@@ -410,21 +422,21 @@ void WifiDeviceStub::OnGetLinkedInfo(uint32_t code, MessageParcel &data, Message
     return;
 }
 
-void WifiDeviceStub::OnGetDhcpInfo(uint32_t code, MessageParcel &data, MessageParcel &reply)
+void WifiDeviceStub::OnGetIpInfo(uint32_t code, MessageParcel &data, MessageParcel &reply)
 {
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
-    DhcpInfo info;
-    int ret = GetDhcpInfo(info);
+    IpInfo info;
+    int ret = GetIpInfo(info);
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
 
     if (ret == WIFI_OPT_SUCCESS) {
         reply.WriteInt32(info.ipAddress);
-        reply.WriteInt32(info.netGate);
-        reply.WriteInt32(info.netMask);
-        reply.WriteInt32(info.dns1);
-        reply.WriteInt32(info.dns2);
-        reply.WriteInt32(info.serverAddress);
+        reply.WriteInt32(info.gateway);
+        reply.WriteInt32(info.netmask);
+        reply.WriteInt32(info.primaryDns);
+        reply.WriteInt32(info.secondDns);
+        reply.WriteInt32(info.serverIp);
         reply.WriteInt32(info.leaseDuration);
     }
 
@@ -506,6 +518,21 @@ void WifiDeviceStub::OnGetSignalLevel(uint32_t code, MessageParcel &data, Messag
     if (ret == WIFI_OPT_SUCCESS) {
         reply.WriteInt32(level);
     }
+    return;
+}
+
+void WifiDeviceStub::OnGetSupportedFeatures(uint32_t code, MessageParcel &data, MessageParcel &reply)
+{
+    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+    long features = 0;
+    int ret = GetSupportedFeatures(features);
+    reply.WriteInt32(0);
+    reply.WriteInt32(ret);
+
+    if (ret == WIFI_OPT_SUCCESS) {
+        reply.WriteInt64(features);
+    }
+
     return;
 }
 }  // namespace Wifi

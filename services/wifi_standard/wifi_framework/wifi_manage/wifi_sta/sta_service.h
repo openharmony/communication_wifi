@@ -67,7 +67,7 @@ public:
                 result immediately.
      * @Return success: WIFI_OPT_SUCCESS  failed: WIFI_OPT_FAILED
      */
-    ErrCode ConnectTo(const WifiDeviceConfig &config) const;
+    ErrCode ConnectToDevice(const WifiDeviceConfig &config) const;
     /**
      * @Description  Connecting to a specified network.
      *
@@ -77,7 +77,7 @@ public:
                 result immediately.
      * @Return success: WIFI_OPT_SUCCESS  failed: WIFI_OPT_FAILED
      */
-    ErrCode ConnectTo(int networkId) const;
+    ErrCode ConnectToNetwork(int networkId) const;
     /**
      * @Description  Reconnect to currently active network.
      *
@@ -96,7 +96,13 @@ public:
      * @param networkId -The NetworkId is going to be removed.(in)
      * @Return success: WIFI_OPT_SUCCESS  failed: WIFI_OPT_FAILED
      */
-    ErrCode RemoveDeviceConfig(int networkId) const;
+    ErrCode RemoveDevice(int networkId) const;
+    /**
+     * @Description  Remove all network
+     *
+     * @Return success: WIFI_OPT_SUCCESS  failed: WIFI_OPT_FAILED
+     */
+    ErrCode RemoveAllDevice() const;
     /**
      * @Description  Disconnect to the network
      *

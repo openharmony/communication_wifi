@@ -40,7 +40,8 @@ private:
     void OnEnableWifi(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnDisableWifi(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnAddDeviceConfig(uint32_t code, MessageParcel &data, MessageParcel &reply);
-    void OnRemoveDeviceConfig(uint32_t code, MessageParcel &data, MessageParcel &reply);
+    void OnRemoveDevice(uint32_t code, MessageParcel &data, MessageParcel &reply);
+    void OnRemoveAllDevice(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnGetDeviceConfigs(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnEnableDeviceConfig(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnDisableDeviceConfig(uint32_t code, MessageParcel &data, MessageParcel &reply);
@@ -54,11 +55,12 @@ private:
     void OnIsWifiActive(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnGetWifiState(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnGetLinkedInfo(uint32_t code, MessageParcel &data, MessageParcel &reply);
-    void OnGetDhcpInfo(uint32_t code, MessageParcel &data, MessageParcel &reply);
+    void OnGetIpInfo(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnSetCountryCode(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnGetCountryCode(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnRegisterCallBackClient(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnGetSignalLevel(uint32_t code, MessageParcel &data, MessageParcel &reply);
+    void OnGetSupportedFeatures(uint32_t code, MessageParcel &data, MessageParcel &reply);
 
 private:
     void ReadWifiDeviceConfig(MessageParcel &data, WifiDeviceConfig &config);

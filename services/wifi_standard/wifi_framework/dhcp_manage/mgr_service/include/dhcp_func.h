@@ -54,6 +54,7 @@ public:
     static int GetDhcpPacketResult(const std::string& filename, struct DhcpPacketResult &result);
     static int InitPidfile(const std::string& piddir, const std::string& pidfile);
     static pid_t GetPID(const std::string& pidfile);
+    static int CreateDirs(const std::string dirs, int mode = DIR_DEFAULT_MODE);
 };
 }  // namespace Wifi
 }  // namespace OHOS

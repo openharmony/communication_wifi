@@ -143,6 +143,23 @@ public:
      * @return ErrCode - operation result
      */
     virtual ErrCode RegisterCallBack(const sptr<IWifiHotspotCallback> &callback) = 0;
+
+    /**
+     * @Description Get supported features
+     *
+     * @param features - return supported features
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode GetSupportedFeatures(long &features) = 0;
+
+    /**
+     * @Description Check if supported input feature
+     *
+     * @param feature - input feature
+     * @return true - supported
+     * @return false - unsupported
+     */
+    virtual bool IsFeatureSupported(long feature) = 0;
 };
 }  // namespace Wifi
 }  // namespace OHOS

@@ -35,19 +35,17 @@ enum DHCP_IP_TYPE {
 };
 
 struct DhcpClientCfg {
-    char workdir[DIR_MAX_LEN];
-    char confFile[DIR_MAX_LEN];
-    char pidFile[DIR_MAX_LEN];
-    char resultFile[DIR_MAX_LEN];
-    char interface[INFNAME_SIZE];       /* The name of the interface to use */
-    int  ifaceIndex;                    /* Index number of the interface to use */
-    unsigned int ipaddr4;               /* ipv4 of the interface to use */
-    unsigned int iptype;
-    unsigned char hwaddr[MAC_ADDR_LEN]; /* HWaddr of the interface to use */
-
-    unsigned char *clientid;            /* Optional client id to use */
-    unsigned char *hostname;            /* Optional hostname to use */
-    bool timeoutExit;                   /* Send packet timed out */
+    char workDir[DIR_MAX_LEN];              /* Current process working directory. */
+    char confFile[DIR_MAX_LEN];             /* Current process Configuration Directory. */
+    char pidFile[DIR_MAX_LEN];              /* Current process pid file. */
+    char resultFile[DIR_MAX_LEN];           /* Save the obtained IPv4 result. */
+    char ifaceName[INFNAME_SIZE];           /* Name of the network interface used by the current process. */
+    int  ifaceIndex;                        /* Index of the network interface used by the current process. */
+    unsigned int ifaceIpv4;                 /* IPv4 of the network interface used by the current process. */
+    unsigned int getMode;                   /* Current process obtaining IPv4 address mode. */
+    unsigned char ifaceMac[MAC_ADDR_LEN];   /* Mac addr of the network interface used by the current process. */
+    unsigned char *pOptClientId;            /* DHCP packet options field clientid. */
+    bool timeoutExit;                       /* DHCP packet sending times out and exits automatically. */
 };
 
 int StartProcess(void);

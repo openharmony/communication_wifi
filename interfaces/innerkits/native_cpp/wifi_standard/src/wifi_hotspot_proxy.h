@@ -148,6 +148,14 @@ public:
      */
     ErrCode RegisterCallBack(const sptr<IWifiHotspotCallback> &callback) override;
 
+    /**
+     * @Description Get supported features
+     *
+     * @param features - return supported features
+     * @return ErrCode - operation result
+     */
+    ErrCode GetSupportedFeatures(long &features) override;
+
     void OnRemoteDied(const wptr<IRemoteObject>& remoteObject) override;
 private:
     static BrokerDelegator<WifiHotspotProxy> g_delegator;

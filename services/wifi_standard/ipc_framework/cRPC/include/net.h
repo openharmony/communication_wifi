@@ -16,8 +16,6 @@
 #ifndef CRPC_NET_H
 #define CRPC_NET_H
 
-#include "common.h"
-
 #ifdef __cplusplus
 extern "C" {
 #endif

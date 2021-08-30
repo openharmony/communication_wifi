@@ -54,7 +54,6 @@ WifiHotspotServiceImpl::~WifiHotspotServiceImpl()
 
 void WifiHotspotServiceImpl::OnStart()
 {
-    WifiManager::GetInstance();
     if (mState == ServiceRunningState::STATE_RUNNING) {
         WIFI_LOGD("Service has already started.");
         return;
@@ -65,12 +64,15 @@ void WifiHotspotServiceImpl::OnStart()
         return;
     }
     mState = ServiceRunningState::STATE_RUNNING;
+    WIFI_LOGI("Start ap service!");
+    WifiManager::GetInstance().AddSupportedFeatures(WifiFeatures::WIFI_FEATURE_MOBILE_HOTSPOT);
 }
 
 void WifiHotspotServiceImpl::OnStop()
 {
     mState = ServiceRunningState::STATE_NOT_START;
     mPublishFlag = false;
+    WIFI_LOGI("Stop ap service!");
 }
 
 bool WifiHotspotServiceImpl::Init()
@@ -484,6 +486,20 @@ ErrCode WifiHotspotServiceImpl::RegisterCallBack(const sptr<IWifiHotspotCallback
         return WIFI_OPT_PERMISSION_DENIED;
     }
     WifiInternalEventDispatcher::GetInstance().SetSingleHotspotCallback(callback);
+    return WIFI_OPT_SUCCESS;
+}
+
+ErrCode WifiHotspotServiceImpl::GetSupportedFeatures(long &features)
+{
+    if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("GetSupportedFeatures:VerifyGetWifiInfoPermission() PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+    int ret = WifiManager::GetInstance().GetSupportedFeatures(features);
+    if (ret < 0) {
+        WIFI_LOGE("Failed to get supported features!");
+        return WIFI_OPT_FAILED;
+    }
     return WIFI_OPT_SUCCESS;
 }
 }  // namespace Wifi

@@ -23,20 +23,18 @@ extern "C" {
 #endif
 
 int CreateRawSocket(int *rawFd);
-int BindRawSocket(const int rawFd, const int ifaceIndex, const uint8_t *ifaceAddr);
-
 int CreateKernelSocket(int *sockFd);
+int BindRawSocket(const int rawFd, const int ifaceIndex, const uint8_t *ifaceAddr);
 int BindKernelSocket(const int sockFd, const char *ifaceName, const uint32_t sockIp, const int sockPort, bool bCast);
-
 int SendToDhcpPacket(
     const struct DhcpPacket *sendPacket, uint32_t srcIp, uint32_t destIp, int destIndex, const uint8_t *destHwaddr);
 int SendDhcpPacket(struct DhcpPacket *sendPacket, uint32_t srcIp, uint32_t destIp);
 int CheckReadBytes(const int count, const int totLen);
-int CheckUdpPacket(struct UdpDhcpPacket *packet, const int totLen);
-int CheckPacketIpSum(struct UdpDhcpPacket *udpPacket, const int bytes);
-int CheckPacketUdpSum(struct UdpDhcpPacket *udpPacket, const int bytes);
-int GetDhcpRawPacket(struct DhcpPacket *getPacket, int fd);
-int GetDhcpPacket(struct DhcpPacket *getPacket, int fd);
+int CheckUdpPacket(struct UdpDhcpPacket *pPacket, const int totLen);
+int CheckPacketIpSum(struct UdpDhcpPacket *pPacket, const int bytes);
+int CheckPacketUdpSum(struct UdpDhcpPacket *pPacket, const int bytes);
+int GetDhcpRawPacket(struct DhcpPacket *getPacket, int rawFd);
+int GetDhcpKernelPacket(struct DhcpPacket *getPacket, int sockFd);
 
 #ifdef __cplusplus
 }

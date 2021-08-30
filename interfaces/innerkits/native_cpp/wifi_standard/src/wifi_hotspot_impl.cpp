@@ -148,5 +148,21 @@ ErrCode WifiHotspotImpl::RegisterCallBack(const sptr<IWifiHotspotCallback> &call
     RETURN_IF_FAIL(client_);
     return client_->RegisterCallBack(callback);
 }
+
+ErrCode WifiHotspotImpl::GetSupportedFeatures(long &features)
+{
+    RETURN_IF_FAIL(client_);
+    return client_->GetSupportedFeatures(features);
+}
+
+bool WifiHotspotImpl::IsFeatureSupported(long feature)
+{
+    RETURN_IF_FAIL(client_);
+    long tmpFeatures = 0;
+    if (client_->GetSupportedFeatures(tmpFeatures) != WIFI_OPT_SUCCESS) {
+        return false;
+    }
+    return ((tmpFeatures & feature) == feature);
+}
 }  // namespace Wifi
 }  // namespace OHOS

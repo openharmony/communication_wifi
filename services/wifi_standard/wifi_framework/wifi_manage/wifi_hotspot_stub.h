@@ -54,6 +54,8 @@ private:
     void OnGetValidBands(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
     void OnGetValidChannels(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
     void OnRegisterCallBack(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
+    void OnGetSupportedFeatures(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
+
 private:
     HandleFuncMap handleFuncMap;
     sptr<IRemoteObject::DeathRecipient> deathRecipient_;

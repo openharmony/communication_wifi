@@ -309,6 +309,12 @@ bool StaStateMachine::InitState::ExecuteStateMsg(InternalMessage *msg)
             pStaStateMachine->RemoveDeviceConfigProcess(msg);
             break;
         }
+
+        case WIFI_SVR_CMD_STA_REMOVE_All_DEVICE_CONFIG: {
+            ret = EXECUTED;
+            pStaStateMachine->RemoveAllDeviceConfigProcess();
+            break;
+        }
         default:
             break;
     }
@@ -452,6 +458,12 @@ bool StaStateMachine::WpaStartedState::ExecuteStateMsg(InternalMessage *msg)
             break;
         }
 
+        case WIFI_SVR_CMD_STA_REMOVE_All_DEVICE_CONFIG: {
+            ret = EXECUTED;
+            pStaStateMachine->RemoveAllDeviceConfigProcess();
+            break;
+        }
+
         default:
             break;
     }
@@ -480,8 +492,8 @@ void StaStateMachine::StopWifiProcess()
     }
     WIFI_LOGD("linkedInfo network = %{public}d", linkedInfo.networkId);
 
-    DhcpInfo dhcpInfo;
-    WifiSettings::GetInstance().SaveDhcpInfo(dhcpInfo);
+    IpInfo ipInfo;
+    WifiSettings::GetInstance().SaveIpInfo(ipInfo);
 
     /* clear connection information. */
     InitWifiLinkedInfo();
@@ -509,7 +521,7 @@ void StaStateMachine::RemoveDeviceConfigProcess(const InternalMessage *msg)
 
     WIFI_LOGD("Enter StaStateMachine::RemoveDeviceConfigProcess.\n");
     /* Remove network configuration. */
-    if (WifiStaHalInterface::GetInstance().RemoveDeviceConfig(msg->GetParam1()) == WIFI_IDL_OPT_OK) {
+    if (WifiStaHalInterface::GetInstance().RemoveDevice(msg->GetParam1()) == WIFI_IDL_OPT_OK) {
         WIFI_LOGD("Remove device config successfully!");
 
         if (WifiStaHalInterface::GetInstance().SaveDeviceConfig() != WIFI_IDL_OPT_OK) {
@@ -521,9 +533,28 @@ void StaStateMachine::RemoveDeviceConfigProcess(const InternalMessage *msg)
     }
 
     /* Remove network configuration directly without notification to InterfaceService. */
-    WifiSettings::GetInstance().RemoveDeviceConfig(msg->GetParam1());
+    WifiSettings::GetInstance().RemoveDevice(msg->GetParam1());
     if (WifiSettings::GetInstance().SyncDeviceConfig() != 0) {
         WIFI_LOGE("RemoveDeviceConfigProcess-SyncDeviceConfig() failed!");
+    }
+}
+
+void StaStateMachine::RemoveAllDeviceConfigProcess()
+{
+    WIFI_LOGD("Enter StaStateMachine::RemoveAllDeviceConfigProcess.\n");
+    if (WifiStaHalInterface::GetInstance().ClearDeviceConfig() == WIFI_IDL_OPT_OK) {
+        WIFI_LOGD("Remove all device config successfully!");
+
+        if (WifiStaHalInterface::GetInstance().SaveDeviceConfig() != WIFI_IDL_OPT_OK) {
+            WIFI_LOGE("RemoveAllDeviceConfig:SaveDeviceConfig failed!");
+        }
+    } else {
+        WIFI_LOGE("RemoveAllDeviceConfig failed!");
+    }
+
+    WifiSettings::GetInstance().ClearDeviceConfig();
+    if (WifiSettings::GetInstance().SyncDeviceConfig() != 0) {
+        WIFI_LOGE("RemoveAllDeviceConfigProcess-SyncDeviceConfig() failed!");
     }
 }
 
@@ -740,8 +771,8 @@ void StaStateMachine::DealDisconnectEvent(InternalMessage *msg)
     WifiSettings::GetInstance().SyncDeviceConfig();
     statusId = static_cast<int>(WifiDeviceConfigStatus::INVALID);
 
-    DhcpInfo dhcpInfo;
-    WifiSettings::GetInstance().SaveDhcpInfo(dhcpInfo);
+    IpInfo ipInfo;
+    WifiSettings::GetInstance().SaveIpInfo(ipInfo);
     /* Initialize connection informatoin. */
     InitWifiLinkedInfo();
     if (lastLinkedInfo.detailedState == DetailedState::CONNECTING) {
@@ -862,12 +893,7 @@ void StaStateMachine::StartWpsMode(InternalMessage *msg)
 
 void StaStateMachine::RemoveAllDeviceConfigs()
 {
-    std::vector<WifiWpaNetworkList> wpaNetworkList;
-    WifiStaHalInterface::GetInstance().GetNetworkList(wpaNetworkList);
-    for (std::vector<WifiWpaNetworkList>::iterator iter = wpaNetworkList.begin(); iter != wpaNetworkList.end();
-         ++iter) {
-        WifiStaHalInterface::GetInstance().RemoveDeviceConfig(iter->id);
-    }
+    WifiStaHalInterface::GetInstance().ClearDeviceConfig();
     WifiStaHalInterface::GetInstance().SaveDeviceConfig();
     WIFI_LOGD("Remove all device configurations completed!");
     return;
@@ -1765,15 +1791,15 @@ void StaStateMachine::DhcpResultNotify::OnSuccess(int status, const std::string 
             result.uLeaseTime);
 
         if (result.iptype == 0) {
-            DhcpInfo dhcpInfo;
-            dhcpInfo.ipAddress = IpTools::ConvertIpv4Address(result.strYourCli);
-            dhcpInfo.netGate = IpTools::ConvertIpv4Address(result.strRouter1);
-            dhcpInfo.netMask = IpTools::ConvertIpv4Address(result.strSubnet);
-            dhcpInfo.dns1 = IpTools::ConvertIpv4Address(result.strDns1);
-            dhcpInfo.dns2 = IpTools::ConvertIpv4Address(result.strDns2);
-            dhcpInfo.serverAddress = IpTools::ConvertIpv4Address(result.strServer);
-            dhcpInfo.leaseDuration = result.uLeaseTime;
-            WifiSettings::GetInstance().SaveDhcpInfo(dhcpInfo);
+            IpInfo ipInfo;
+            ipInfo.ipAddress = IpTools::ConvertIpv4Address(result.strYourCli);
+            ipInfo.gateway = IpTools::ConvertIpv4Address(result.strRouter1);
+            ipInfo.netmask = IpTools::ConvertIpv4Address(result.strSubnet);
+            ipInfo.primaryDns = IpTools::ConvertIpv4Address(result.strDns1);
+            ipInfo.secondDns = IpTools::ConvertIpv4Address(result.strDns2);
+            ipInfo.serverIp = IpTools::ConvertIpv4Address(result.strServer);
+            ipInfo.leaseDuration = result.uLeaseTime;
+            WifiSettings::GetInstance().SaveIpInfo(ipInfo);
             pStaStateMachine->linkedInfo.ipAddress = IpTools::ConvertIpv4Address(result.strYourCli);
             WifiSettings::GetInstance().SaveLinkedInfo(pStaStateMachine->linkedInfo);
         }

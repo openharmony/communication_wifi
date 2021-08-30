@@ -102,9 +102,9 @@ int WifiConfigCenter::AddDeviceConfig(const WifiDeviceConfig &config)
     return WifiSettings::GetInstance().AddDeviceConfig(config);
 }
 
-int WifiConfigCenter::RemoveDeviceConfig(int networkId)
+int WifiConfigCenter::RemoveDevice(int networkId)
 {
-    return WifiSettings::GetInstance().RemoveDeviceConfig(networkId);
+    return WifiSettings::GetInstance().RemoveDevice(networkId);
 }
 
 int WifiConfigCenter::GetDeviceConfig(std::vector<WifiDeviceConfig> &results)
@@ -117,9 +117,9 @@ int WifiConfigCenter::SetDeviceState(int networkId, int state, bool bSetOther)
     return WifiSettings::GetInstance().SetDeviceState(networkId, state, bSetOther);
 }
 
-int WifiConfigCenter::GetDhcpInfo(DhcpInfo &info)
+int WifiConfigCenter::GetIpInfo(IpInfo &info)
 {
-    return WifiSettings::GetInstance().GetDhcpInfo(info);
+    return WifiSettings::GetInstance().GetIpInfo(info);
 }
 
 int WifiConfigCenter::GetLinkedInfo(WifiLinkedInfo &info)

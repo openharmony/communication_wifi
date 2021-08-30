@@ -45,6 +45,8 @@
 #define WIFI_SVR_CMD_GET_SIGNAL_LEVEL 0x101C          /* get signal level */
 #define WIFI_SVR_CMD_SET_SCAN_CONTROL_INFO 0x1022     /* set scan control policy */
 #define WIFI_SVR_CMD_REGISTER_SCAN_CALLBACK 0x1023    /* register scan callback */
+#define WIFI_SVR_CMD_REMOVE_ALL_DEVICE_CONFIG 0x1024  /* remove all network configs */
+#define WIFI_SVR_CMD_GET_SUPPORTED_FEATURES 0x1025
 
 /* -------------ap module message define----------------- */
 #define WIFI_SVR_CMD_ENABLE_WIFI_AP 0x1100      /* open ap */

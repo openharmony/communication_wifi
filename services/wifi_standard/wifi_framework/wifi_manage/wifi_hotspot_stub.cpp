@@ -49,6 +49,7 @@ void WifiHotspotStub::InitHandleMap()
     handleFuncMap[WIFI_SVR_CMD_GET_VALID_BANDS] = &WifiHotspotStub::OnGetValidBands;
     handleFuncMap[WIFI_SVR_CMD_GET_VALID_CHANNELS] = &WifiHotspotStub::OnGetValidChannels;
     handleFuncMap[WIFI_SVR_CMD_REGISTER_HOTSPOT_CALLBACK] = &WifiHotspotStub::OnRegisterCallBack;
+    handleFuncMap[WIFI_SVR_CMD_GET_SUPPORTED_FEATURES] = &WifiHotspotStub::OnGetSupportedFeatures;
     return;
 }
 
@@ -317,6 +318,22 @@ void WifiHotspotStub::OnRegisterCallBack(
     } while (0);
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
+    return;
+}
+
+void WifiHotspotStub::OnGetSupportedFeatures(
+    uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
+{
+    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+    long features = 0;
+    int ret = GetSupportedFeatures(features);
+    reply.WriteInt32(0);
+    reply.WriteInt32(ret);
+
+    if (ret == WIFI_OPT_SUCCESS) {
+        reply.WriteInt64(features);
+    }
+
     return;
 }
 }  // namespace Wifi

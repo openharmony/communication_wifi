@@ -54,7 +54,6 @@ WifiScanServiceImpl::~WifiScanServiceImpl()
 
 void WifiScanServiceImpl::OnStart()
 {
-    WifiManager::GetInstance();
     if (mState == ServiceRunningState::STATE_RUNNING) {
         WIFI_LOGD("Service has already started.");
         return;
@@ -65,11 +64,15 @@ void WifiScanServiceImpl::OnStart()
         return;
     }
     mState = ServiceRunningState::STATE_RUNNING;
+    WIFI_LOGI("Start scan service!");
+    WifiManager::GetInstance();
 }
+
 void WifiScanServiceImpl::OnStop()
 {
     mState = ServiceRunningState::STATE_NOT_START;
     mPublishFlag = false;
+    WIFI_LOGI("Stop scan service!");
 }
 
 bool WifiScanServiceImpl::Init()
@@ -103,6 +106,7 @@ ErrCode WifiScanServiceImpl::SetScanControlInfo(const ScanControlInfo &info)
 
     return WIFI_OPT_SUCCESS;
 }
+
 ErrCode WifiScanServiceImpl::Scan()
 {
     WIFI_LOGI("Scan");
@@ -127,7 +131,8 @@ ErrCode WifiScanServiceImpl::Scan()
 
     return WIFI_OPT_SUCCESS;
 }
-ErrCode WifiScanServiceImpl::Scan(const WifiScanParams &params)
+
+ErrCode WifiScanServiceImpl::AdvanceScan(const WifiScanParams &params)
 {
     WIFI_LOGI("Scan with WifiScanParams, band %{public}u", params.band);
     if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
@@ -151,6 +156,7 @@ ErrCode WifiScanServiceImpl::Scan(const WifiScanParams &params)
 
     return WIFI_OPT_SUCCESS;
 }
+
 ErrCode WifiScanServiceImpl::IsWifiClosedScan(bool &bOpen)
 {
     WIFI_LOGI("IsWifiClosedScan");
@@ -184,6 +190,20 @@ ErrCode WifiScanServiceImpl::RegisterCallBack(const sptr<IWifiScanCallback> &cal
 {
     WIFI_LOGI("WifiScanServiceImpl::RegisterCallBack!");
     WifiInternalEventDispatcher::GetInstance().SetSingleScanCallback(callback);
+    return WIFI_OPT_SUCCESS;
+}
+
+ErrCode WifiScanServiceImpl::GetSupportedFeatures(long &features)
+{
+    if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("GetSupportedFeatures:VerifyGetWifiInfoPermission() PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+    int ret = WifiManager::GetInstance().GetSupportedFeatures(features);
+    if (ret < 0) {
+        WIFI_LOGE("Failed to get supported features!");
+        return WIFI_OPT_FAILED;
+    }
     return WIFI_OPT_SUCCESS;
 }
 }  // namespace Wifi

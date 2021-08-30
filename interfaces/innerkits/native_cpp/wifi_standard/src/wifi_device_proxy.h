@@ -56,7 +56,14 @@ public:
      * @param networkId - want to remove device config's network id
      * @return ErrCode - operation result
      */
-    ErrCode RemoveDeviceConfig(int networkId) override;
+    ErrCode RemoveDevice(int networkId) override;
+
+    /**
+     * @Description Delete all device configs.
+     *
+     * @return ErrCode - operation result
+     */
+    ErrCode RemoveAllDevice() override;
 
     /**
      * @Description Get all the device configs
@@ -89,7 +96,7 @@ public:
      * @param networkId - network id
      * @return ErrCode - operation result
      */
-    ErrCode ConnectTo(int networkId) override;
+    ErrCode ConnectToNetwork(int networkId) override;
 
     /**
      * @Description Connect To a network base WifiDeviceConfig object
@@ -97,7 +104,7 @@ public:
      * @param config - WifiDeviceConfig object
      * @return ErrCode - operation result
      */
-    ErrCode ConnectTo(const WifiDeviceConfig &config) override;
+    ErrCode ConnectToDevice(const WifiDeviceConfig &config) override;
 
     /**
      * @Description Reconnect to the currently active network
@@ -162,10 +169,10 @@ public:
     /**
      * @Description Obtaining DHCP Request Information
      *
-     * @param info - DhcpInfo object
+     * @param info - IpInfo object
      * @return ErrCode - operation result
      */
-    ErrCode GetDhcpInfo(DhcpInfo &info) override;
+    ErrCode GetIpInfo(IpInfo &info) override;
 
     /**
      * @Description Set the Country Code
@@ -201,6 +208,14 @@ public:
      * @return ErrCode - operation result
      */
     ErrCode GetSignalLevel(const int &rssi, const int &band, int &level) override;
+
+    /**
+     * @Description Get supported features
+     *
+     * @param features - return supported features
+     * @return ErrCode - operation result
+     */
+    ErrCode GetSupportedFeatures(long &features) override;
 
     void OnRemoteDied(const wptr<IRemoteObject> &remoteObject) override;
 

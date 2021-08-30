@@ -56,17 +56,17 @@ bool DhcpFunc::Ip4StrConToInt(const std::string& strIp, uint32_t& uIp)
     struct in_addr addr4;
     int nRet = inet_pton(AF_INET, strIp.c_str(), &addr4);
     if (nRet != 1) {
-        WIFI_LOGE("Ip4StrConToInt strIp:%{public}s failed, nRet:%{public}d!\n", strIp.c_str(), nRet);
+        WIFI_LOGE("Ip4StrConToInt strIp:%{private}s failed, nRet:%{public}d!\n", strIp.c_str(), nRet);
         if (nRet == 0) {
-            WIFI_LOGE("Ip4StrConToInt strIp:%{public}s not in presentation format!\n", strIp.c_str());
+            WIFI_LOGE("Ip4StrConToInt strIp:%{private}s not in presentation format!\n", strIp.c_str());
         } else {
-            WIFI_LOGE("Ip4StrConToInt strIp:%{public}s inet_pton not contain a valid address!\n", strIp.c_str());
+            WIFI_LOGE("Ip4StrConToInt strIp:%{private}s inet_pton not contain a valid address!\n", strIp.c_str());
         }
         return false;
     }
 
     uIp = ntohl(addr4.s_addr);
-    WIFI_LOGI("Ip4StrConToInt strIp:%{public}s -> uIp:%{public}u.\n", strIp.c_str(), uIp);
+    WIFI_LOGI("Ip4StrConToInt strIp:%{private}s -> uIp:%{private}u.\n", strIp.c_str(), uIp);
 
     return true;
 }
@@ -83,10 +83,10 @@ std::string DhcpFunc::Ip4IntConToStr(uint32_t uIp)
     struct in_addr addr4;
     addr4.s_addr = htonl(uIp);
     if (inet_ntop(AF_INET, &addr4, bufIp4, INET_ADDRSTRLEN) == NULL) {
-        WIFI_LOGE("Ip4IntConToStr uIp:%{public}u failed, inet_ntop NULL!\n", uIp);
+        WIFI_LOGE("Ip4IntConToStr uIp:%{private}u failed, inet_ntop NULL!\n", uIp);
     } else {
         strIp = bufIp4;
-        WIFI_LOGI("Ip4IntConToStr uIp:%{public}u -> strIp:%{public}s.\n", uIp, strIp.c_str());
+        WIFI_LOGI("Ip4IntConToStr uIp:%{private}u -> strIp:%{private}s.\n", uIp, strIp.c_str());
     }
 
     return strIp;
@@ -105,11 +105,11 @@ bool DhcpFunc::Ip6StrConToChar(const std::string& strIp, uint8_t chIp[], size_t 
     }
     int nRet = inet_pton(AF_INET6, strIp.c_str(), &addr6);
     if (nRet != 1) {
-        WIFI_LOGE("Ip6StrConToChar inet_pton strIp:%{public}s failed, nRet:%{public}d!\n", strIp.c_str(), nRet);
+        WIFI_LOGE("Ip6StrConToChar inet_pton strIp:%{private}s failed, nRet:%{public}d!\n", strIp.c_str(), nRet);
         if (nRet == 0) {
-            WIFI_LOGE("Ip6StrConToChar strIp:%{public}s not in presentation format!\n", strIp.c_str());
+            WIFI_LOGE("Ip6StrConToChar strIp:%{private}s not in presentation format!\n", strIp.c_str());
         } else {
-            WIFI_LOGE("Ip6StrConToChar strIp:%{public}s inet_pton not contain a valid address!\n", strIp.c_str());
+            WIFI_LOGE("Ip6StrConToChar strIp:%{private}s inet_pton not contain a valid address!\n", strIp.c_str());
         }
         return false;
     }
@@ -138,7 +138,7 @@ std::string DhcpFunc::Ip6CharConToStr(uint8_t chIp[], int size)
         WIFI_LOGE("Ip6CharConToStr chIp failed, inet_ntop NULL!\n");
     } else {
         strIp = bufIp6;
-        WIFI_LOGI("Ip6CharConToStr chIp -> strIp:%{public}s.\n", strIp.c_str());
+        WIFI_LOGI("Ip6CharConToStr chIp -> strIp:%{private}s.\n", strIp.c_str());
     }
 
     return strIp;
@@ -162,20 +162,20 @@ bool DhcpFunc::CheckIpStr(const std::string& strIp)
         bIp6 = true;
     }
     if ((!bIp4 && !bIp6) || (bIp4 && bIp6)) {
-        WIFI_LOGE("CheckIpStr strIp:%{public}s error, bIp4:%{public}d,bIp6:%{public}d!\n", strIp.c_str(), bIp4, bIp6);
+        WIFI_LOGE("CheckIpStr strIp:%{private}s error, bIp4:%{public}d,bIp6:%{public}d!\n", strIp.c_str(), bIp4, bIp6);
         return false;
     }
 
     if (bIp4) {
         uint32_t uIp = 0;
         if (!Ip4StrConToInt(strIp, uIp)) {
-            WIFI_LOGE("CheckIpStr Ip4StrConToInt failed, strIp:%{public}s.\n", strIp.c_str());
+            WIFI_LOGE("CheckIpStr Ip4StrConToInt failed, strIp:%{private}s.\n", strIp.c_str());
             return false;
         }
     } else {
         uint8_t	addr6[sizeof(struct in6_addr)] = {0};
         if (!Ip6StrConToChar(strIp, addr6, sizeof(struct in6_addr))) {
-            WIFI_LOGE("CheckIpStr Ip6StrConToChar failed, strIp:%{public}s.\n", strIp.c_str());
+            WIFI_LOGE("CheckIpStr Ip6StrConToChar failed, strIp:%{private}s.\n", strIp.c_str());
             return false;
         }
     }
@@ -196,18 +196,20 @@ int DhcpFunc::GetLocalIp(const std::string ethInf, std::string& localIp)
     }
 
     if (strncpy_s(ifr.ifr_name, IFNAMSIZ, ethInf.c_str(), IFNAMSIZ - 1) != EOK) {
+        close(sd);
         return -1;
     }
     ifr.ifr_name[IFNAMSIZ - 1] = 0;
 
     // if error: No such device
     if (ioctl(sd, SIOCGIFADDR, &ifr) < 0) {
-        WIFI_LOGE("GetLocalIp ioctl ethInf:%{public}s,strerror:%{public}s!\n", ethInf.c_str(), strerror(errno));
         close(sd);
+        WIFI_LOGE("GetLocalIp ioctl ethInf:%{public}s,strerror:%{public}s!\n", ethInf.c_str(), strerror(errno));
         return -1;
     }
 
     if (memcpy_s(&sin, sizeof(sin), &ifr.ifr_addr, sizeof(sin)) != EOK) {
+        close(sd);
         return -1;
     }
     char ip[IP_SIZE] = { 0 };
@@ -233,6 +235,7 @@ int DhcpFunc::GetLocalMac(const std::string ethInf, std::string& ethMac)
     }
 
     if (strncpy_s(ifr.ifr_name, IFNAMSIZ, ethInf.c_str(), IFNAMSIZ - 1) != EOK) {
+        close(sd);
         return -1;
     }
 
@@ -557,6 +560,46 @@ pid_t DhcpFunc::GetPID(const std::string& pidfile)
     close(fd);
 
     return atoi(buf);
+}
+
+int DhcpFunc::CreateDirs(const std::string dirs, int mode)
+{
+    if (dirs.empty() || (dirs.size() >= DIR_MAX_LEN)) {
+        WIFI_LOGE("CreateDirs() dirs:%{public}s error!\n", dirs.c_str());
+        return DHCP_OPT_FAILED;
+    }
+
+    int nSrcLen = (int)dirs.size();
+    char strDir[DIR_MAX_LEN] = {0};
+    if (strncpy_s(strDir, sizeof(strDir), dirs.c_str(), dirs.size()) != EOK) {
+        WIFI_LOGE("CreateDirs() strncpy_s dirs:%{public}s failed!\n", dirs.c_str());
+        return DHCP_OPT_FAILED;
+    }
+    if (strDir[nSrcLen - 1] != '/') {
+        if (nSrcLen == (DIR_MAX_LEN - 1)) {
+            WIFI_LOGE("CreateDirs() dirs:%{public}s len:%{public}d error!\n", dirs.c_str(), nSrcLen);
+            return DHCP_OPT_FAILED;
+        }
+        if (strcat_s(strDir, sizeof(strDir), "/") != EOK) {
+            WIFI_LOGE("CreateDirs() strcat_s strDir:%{public}s failed!\n", strDir);
+            return DHCP_OPT_FAILED;
+        }
+        nSrcLen++;
+    }
+
+    int i = (strDir[0] == '/') ? 1 : 0;
+    for (; i <= nSrcLen - 1; i++) {
+        if (strDir[i] == '/') {
+            strDir[i] = 0;
+            if ((access(strDir, F_OK) != 0) && (mkdir(strDir, mode) != 0)) {
+                WIFI_LOGE("CreateDirs() mkdir %{public}s %{public}.4o %{public}s!\n", strDir, mode, strerror(errno));
+                return DHCP_OPT_FAILED;
+            }
+            strDir[i] = '/';
+        }
+    }
+    WIFI_LOGI("CreateDirs() %{public}s %{public}.4o success.\n", dirs.c_str(), mode);
+    return DHCP_OPT_SUCCESS;
 }
 }  // namespace Wifi
 }  // namespace OHOS

@@ -32,32 +32,27 @@
 #define LOG_TAG "WifiDhcpSocket"
 
 
-static uint16_t CheckSum(u_int16_t *addr, int count)
+static uint16_t GetCheckSum(uint16_t *pData, int nBytes)
 {
-    /* Compute Internet Checksum for "count" bytes beginning at location "addr". */
-    register int32_t sum = 0;
-    u_int16_t *source = addr;
+    uint32_t uTotalSum = 0;
 
-    while (count > 1)  {
-        /*  This is the inner loop */
-        sum += *source++;
-        count -= DHCP_UINT16_BYTES;
+    /* Calculates the network checksum by 2 bytes. */
+    while (nBytes >= DHCP_UINT16_BYTES)  {
+        uTotalSum += *pData++;
+        nBytes -= DHCP_UINT16_BYTES;
+    }
+    /* Calculate the network checksum based on the remaining bytes. */
+    if (nBytes > 0) {
+        uint16_t u16Sum;
+        *(uint8_t *)(&u16Sum) = *(uint8_t *)pData;
+        uTotalSum += u16Sum;
+    }
+    /* Checksum conversion from 32-bit to 16-bit. */
+    while (uTotalSum >> DHCP_UINT16_BITS) {
+        uTotalSum = (uTotalSum & 0xffff) + (uTotalSum >> DHCP_UINT16_BITS);
     }
 
-    /*  Add left-over byte, if any */
-    if (count > 0) {
-        /* Make sure that the left-over byte is added correctly both with little and big endian hosts */
-        u_int16_t tmp;
-        *(unsigned char *)(&tmp) = *(unsigned char *)source;
-        sum += tmp;
-    }
-
-    /*  Fold 32-bit sum to 16 bits */
-    while (sum >> DHCP_UINT16_BITS) {
-        sum = (sum & 0xffff) + (sum >> DHCP_UINT16_BITS);
-    }
-
-    return ~sum;
+    return (uint16_t)(~uTotalSum);
 }
 
 /* Raw socket can receive data frames or data packets from the local network interface. */
@@ -69,6 +64,18 @@ int CreateRawSocket(int *rawFd)
         return SOCKET_OPT_FAILED;
     }
     *rawFd = sockFd;
+    return SOCKET_OPT_SUCCESS;
+}
+
+/* Kernel socket can receive data frames or data packets from the local network interface, ip and port. */
+int CreateKernelSocket(int *sockFd)
+{
+    int nFd = socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP);
+    if (nFd == -1) {
+        LOGE("CreateKernelSocket() failed, socket error:%{public}s.\n", strerror(errno));
+        return SOCKET_OPT_FAILED;
+    }
+    *sockFd = nFd;
     return SOCKET_OPT_SUCCESS;
 }
 
@@ -103,18 +110,6 @@ int BindRawSocket(const int rawFd, const int ifaceIndex, const uint8_t *ifaceAdd
         return SOCKET_OPT_FAILED;
     }
 
-    return SOCKET_OPT_SUCCESS;
-}
-
-/* Kernel socket can receive data frames or data packets from the local network interface, ip and port. */
-int CreateKernelSocket(int *sockFd)
-{
-    int nFd = socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP);
-    if (nFd == -1) {
-        LOGE("CreateKernelSocket() failed, socket error:%{public}s.\n", strerror(errno));
-        return SOCKET_OPT_FAILED;
-    }
-    *sockFd = nFd;
     return SOCKET_OPT_SUCCESS;
 }
 
@@ -214,12 +209,12 @@ int SendToDhcpPacket(
         close(nFd);
         return SOCKET_OPT_FAILED;
     }
-    udpPackets.udp.check = CheckSum((u_int16_t *)&udpPackets, sizeof(struct UdpDhcpPacket));
+    udpPackets.udp.check = GetCheckSum((uint16_t *)&udpPackets, sizeof(struct UdpDhcpPacket));
     udpPackets.ip.ihl = sizeof(udpPackets.ip) >> DHCP_UINT16_BYTES;
     udpPackets.ip.version = IPVERSION;
     udpPackets.ip.tot_len = htons(sizeof(struct UdpDhcpPacket));
     udpPackets.ip.ttl = IPDEFTTL;
-    udpPackets.ip.check = CheckSum((u_int16_t *)&(udpPackets.ip), sizeof(udpPackets.ip));
+    udpPackets.ip.check = GetCheckSum((uint16_t *)&(udpPackets.ip), sizeof(udpPackets.ip));
 
     ssize_t nBytes = sendto(nFd, &udpPackets, sizeof(udpPackets), 0, (struct sockaddr *)&rawAddr, sizeof(rawAddr));
     if (nBytes <= 0) {
@@ -236,7 +231,7 @@ int SendDhcpPacket(struct DhcpPacket *sendPacket, uint32_t srcIp, uint32_t destI
     int nFd = -1;
     if ((CreateKernelSocket(&nFd) != SOCKET_OPT_SUCCESS) ||
         (BindKernelSocket(nFd, NULL, srcIp, BOOTP_CLIENT, false) != SOCKET_OPT_SUCCESS)) {
-        LOGE("SendDhcpPacket() fd:%{public}d,srcIp:%{public}u failed!\n", nFd, srcIp);
+        LOGE("SendDhcpPacket() fd:%{public}d,srcIp:%{private}u failed!\n", nFd, srcIp);
         return SOCKET_OPT_FAILED;
     }
 
@@ -259,7 +254,7 @@ int SendDhcpPacket(struct DhcpPacket *sendPacket, uint32_t srcIp, uint32_t destI
     if (nBytes <= 0) {
         LOGE("SendDhcpPacket() fd:%{public}d failed, write error:%{public}s.\n", nFd, strerror(errno));
     } else {
-        LOGI("SendDhcpPacket() fd:%{public}d, srcIp:%{public}u, bytes:%{public}d.\n", nFd, srcIp, (int)nBytes);
+        LOGI("SendDhcpPacket() fd:%{public}d, srcIp:%{private}u, bytes:%{public}d.\n", nFd, srcIp, (int)nBytes);
     }
     close(nFd);
     return (nBytes <= 0) ? SOCKET_OPT_FAILED : SOCKET_OPT_SUCCESS;
@@ -290,10 +285,10 @@ int CheckReadBytes(const int count, const int totLen)
     return SOCKET_OPT_SUCCESS;
 }
 
-int CheckUdpPacket(struct UdpDhcpPacket *packet, const int totLen)
+int CheckUdpPacket(struct UdpDhcpPacket *pPacket, const int totLen)
 {
-    if (packet == NULL) {
-        LOGE("CheckUdpPacket() failed, packet == NULL!\n");
+    if (pPacket == NULL) {
+        LOGE("CheckUdpPacket() failed, pPacket == NULL!\n");
         return SOCKET_OPT_FAILED;
     }
 
@@ -302,112 +297,112 @@ int CheckUdpPacket(struct UdpDhcpPacket *packet, const int totLen)
         return SOCKET_OPT_FAILED;
     }
 
-    if ((packet->ip.protocol != IPPROTO_UDP) || (packet->ip.version != IPVERSION)) {
-        LOGE("CheckUdpPacket() failed, packet->ip.protocol:%{public}d or version:%{public}u error!\n",
-            packet->ip.protocol, packet->ip.version);
+    if ((pPacket->ip.protocol != IPPROTO_UDP) || (pPacket->ip.version != IPVERSION)) {
+        LOGE("CheckUdpPacket() failed, pPacket->ip.protocol:%{public}d or version:%{public}u error!\n",
+            pPacket->ip.protocol, pPacket->ip.version);
         return SOCKET_OPT_FAILED;
     }
 
-    uint32_t uIhl = (uint32_t)(sizeof(packet->ip) >> DHCP_UINT16_BYTES);
-    if (packet->ip.ihl != uIhl) {
-        LOGE("CheckUdpPacket() failed, packet->ip.ihl:%{public}u error, uIhl:%{public}u!\n", packet->ip.ihl, uIhl);
+    uint32_t uIhl = (uint32_t)(sizeof(pPacket->ip) >> DHCP_UINT16_BYTES);
+    if (pPacket->ip.ihl != uIhl) {
+        LOGE("CheckUdpPacket() failed, pPacket->ip.ihl:%{public}u error, uIhl:%{public}u!\n", pPacket->ip.ihl, uIhl);
         return SOCKET_OPT_FAILED;
     }
 
-    if (packet->udp.dest != htons(BOOTP_CLIENT)) {
-        LOGE("CheckUdpPacket() failed, packet->udp.dest:%{public}d error, htons:%{public}d!\n",
-            packet->udp.dest, htons(BOOTP_CLIENT));
+    if (pPacket->udp.dest != htons(BOOTP_CLIENT)) {
+        LOGE("CheckUdpPacket() failed, pPacket->udp.dest:%{public}d error, htons:%{public}d!\n",
+            pPacket->udp.dest, htons(BOOTP_CLIENT));
         return SOCKET_OPT_FAILED;
     }
 
-    uint16_t uLen = (uint16_t)(totLen - (int)sizeof(packet->ip));
-    if (ntohs(packet->udp.len) != uLen) {
-        LOGE("CheckUdpPacket() failed, packet->udp.len:%{public}d error, uLen:%{public}d!\n", packet->udp.len, uLen);
+    uint16_t uLen = (uint16_t)(totLen - (int)sizeof(pPacket->ip));
+    if (ntohs(pPacket->udp.len) != uLen) {
+        LOGE("CheckUdpPacket() failed, pPacket->udp.len:%{public}d error, uLen:%{public}d!\n", pPacket->udp.len, uLen);
         return SOCKET_OPT_FAILED;
     }
     LOGI("CheckUdpPacket() success, totLen:%{public}d.\n", totLen);
     return SOCKET_OPT_SUCCESS;
 }
 
-int CheckPacketIpSum(struct UdpDhcpPacket *udpPacket, const int bytes)
+int CheckPacketIpSum(struct UdpDhcpPacket *pPacket, const int bytes)
 {
-    if (udpPacket == NULL) {
+    if (pPacket == NULL) {
         return SOCKET_OPT_FAILED;
     }
 
-    if (CheckUdpPacket(udpPacket, bytes) != SOCKET_OPT_SUCCESS) {
+    if (CheckUdpPacket(pPacket, bytes) != SOCKET_OPT_SUCCESS) {
         usleep(SLEEP_TIME_500_MS);
         return SOCKET_OPT_FAILED;
     }
 
     /* Check packet ip sum. */
-    u_int16_t check = udpPacket->ip.check;
-    udpPacket->ip.check = 0;
-    uint16_t uCheckSum = CheckSum((u_int16_t *)&(udpPacket->ip), sizeof(udpPacket->ip));
-    if (check != uCheckSum) {
-        LOGE("CheckPacketIpSum() failed, ip.check:%{public}d, uCheckSum:%{public}d!\n", check, uCheckSum);
+    uint16_t uCheck = pPacket->ip.check;
+    pPacket->ip.check = 0;
+    uint16_t uCheckSum = GetCheckSum((uint16_t *)&(pPacket->ip), sizeof(pPacket->ip));
+    if (uCheck != uCheckSum) {
+        LOGE("CheckPacketIpSum() failed, ip.check:%{public}d, uCheckSum:%{public}d!\n", uCheck, uCheckSum);
         return SOCKET_OPT_ERROR;
     }
     LOGI("CheckPacketIpSum() success, bytes:%{public}d.\n", bytes);
     return SOCKET_OPT_SUCCESS;
 }
 
-int CheckPacketUdpSum(struct UdpDhcpPacket *udpPacket, const int bytes)
+int CheckPacketUdpSum(struct UdpDhcpPacket *pPacket, const int bytes)
 {
-    if (udpPacket == NULL) {
-        LOGE("CheckPacketUdpSum() failed, udpPacket == NULL!\n");
+    if (pPacket == NULL) {
+        LOGE("CheckPacketUdpSum() failed, pPacket == NULL!\n");
         return SOCKET_OPT_FAILED;
     }
 
     /* Check packet udp sum. */
-    u_int16_t check = udpPacket->udp.check;
-    udpPacket->udp.check = 0;
-    u_int32_t source = udpPacket->ip.saddr;
-    u_int32_t dest = udpPacket->ip.daddr;
-    if (memset_s(&udpPacket->ip, sizeof(udpPacket->ip), 0, sizeof(udpPacket->ip)) != EOK) {
+    uint16_t uCheck = pPacket->udp.check;
+    pPacket->udp.check = 0;
+    u_int32_t source = pPacket->ip.saddr;
+    u_int32_t dest = pPacket->ip.daddr;
+    if (memset_s(&pPacket->ip, sizeof(pPacket->ip), 0, sizeof(pPacket->ip)) != EOK) {
         LOGE("CheckPacketUdpSum() failed, memset_s ERROR!\n");
         return SOCKET_OPT_FAILED;
     }
-    udpPacket->ip.protocol = IPPROTO_UDP;
-    udpPacket->ip.saddr = source;
-    udpPacket->ip.daddr = dest;
-    udpPacket->ip.tot_len = udpPacket->udp.len;
-    uint16_t uCheckSum = CheckSum((u_int16_t *)udpPacket, bytes);
-    if (check && (check != uCheckSum)) {
-        LOGE("CheckPacketUdpSum() failed, udp.check:%{public}d, uCheckSum:%{public}d!\n", check, uCheckSum);
+    pPacket->ip.protocol = IPPROTO_UDP;
+    pPacket->ip.saddr = source;
+    pPacket->ip.daddr = dest;
+    pPacket->ip.tot_len = pPacket->udp.len;
+    uint16_t uCheckSum = GetCheckSum((uint16_t *)pPacket, bytes);
+    if (uCheck && (uCheck != uCheckSum)) {
+        LOGE("CheckPacketUdpSum() failed, udp.check:%{public}d, uCheckSum:%{public}d!\n", uCheck, uCheckSum);
         return SOCKET_OPT_FAILED;
     }
     LOGI("CheckPacketUdpSum() success, bytes:%{public}d.\n", bytes);
     return SOCKET_OPT_SUCCESS;
 }
 
-int GetDhcpRawPacket(struct DhcpPacket *getPacket, int fd)
+int GetDhcpRawPacket(struct DhcpPacket *getPacket, int rawFd)
 {
     if (getPacket == NULL) {
         return SOCKET_OPT_FAILED;
     }
 
     /* Get and check udp dhcp packet bytes. */
-    struct UdpDhcpPacket packet;
-    if (memset_s(&packet, sizeof(struct UdpDhcpPacket), 0, sizeof(struct UdpDhcpPacket)) != EOK) {
+    struct UdpDhcpPacket udpPackets;
+    if (memset_s(&udpPackets, sizeof(struct UdpDhcpPacket), 0, sizeof(struct UdpDhcpPacket)) != EOK) {
         return SOCKET_OPT_FAILED;
     }
-    int nBytes = read(fd, &packet, sizeof(struct UdpDhcpPacket));
-    int nRet = CheckReadBytes(nBytes, (int)ntohs(packet.ip.tot_len));
+    int nBytes = read(rawFd, &udpPackets, sizeof(struct UdpDhcpPacket));
+    int nRet = CheckReadBytes(nBytes, (int)ntohs(udpPackets.ip.tot_len));
     if (nRet != SOCKET_OPT_SUCCESS) {
         usleep(SLEEP_TIME_200_MS);
         return nRet;
     }
 
     /* Check udp dhcp packet sum. */
-    nBytes = (int)ntohs(packet.ip.tot_len);
-    if (((nRet = CheckPacketIpSum(&packet, nBytes)) != SOCKET_OPT_SUCCESS) ||
-        ((nRet = CheckPacketUdpSum(&packet, nBytes)) != SOCKET_OPT_SUCCESS)) {
+    nBytes = (int)ntohs(udpPackets.ip.tot_len);
+    if (((nRet = CheckPacketIpSum(&udpPackets, nBytes)) != SOCKET_OPT_SUCCESS) ||
+        ((nRet = CheckPacketUdpSum(&udpPackets, nBytes)) != SOCKET_OPT_SUCCESS)) {
         return nRet;
     }
 
-    int nDhcpPacket = nBytes - (int)(sizeof(packet.ip) + sizeof(packet.udp));
-    if (memcpy_s(getPacket, sizeof(struct DhcpPacket), &(packet.data), nDhcpPacket) != EOK) {
+    int nDhcpPacket = nBytes - (int)(sizeof(udpPackets.ip) + sizeof(udpPackets.udp));
+    if (memcpy_s(getPacket, sizeof(struct DhcpPacket), &(udpPackets.data), nDhcpPacket) != EOK) {
         LOGE("GetDhcpRawPacket() memcpy_s packet.data failed!\n");
         return SOCKET_OPT_FAILED;
     }
@@ -418,24 +413,21 @@ int GetDhcpRawPacket(struct DhcpPacket *getPacket, int fd)
     return nDhcpPacket;
 }
 
-int GetDhcpPacket(struct DhcpPacket *getPacket, int fd)
+int GetDhcpKernelPacket(struct DhcpPacket *getPacket, int sockFd)
 {
     if (getPacket == NULL) {
         return SOCKET_OPT_FAILED;
     }
 
-    int bytes;
-    if (memset_s(getPacket, sizeof(struct DhcpPacket), 0, sizeof(struct DhcpPacket)) != EOK) {
-        return SOCKET_OPT_FAILED;
-    }
-    if ((bytes = read(fd, getPacket, sizeof(struct DhcpPacket))) < 0) {
-        LOGE("GetDhcpPacket() couldn't read on kernel listening socket, error:%{public}s!\n", strerror(errno));
+    int nBytes = -1;
+    if ((nBytes = read(sockFd, getPacket, sizeof(struct DhcpPacket))) == -1) {
+        LOGE("GetDhcpKernelPacket() couldn't read on kernel listening socket, error:%{public}s!\n", strerror(errno));
         return SOCKET_OPT_ERROR;
     }
 
     if (ntohl(getPacket->cookie) != MAGIC_COOKIE) {
-        LOGE("GetDhcpPacket() cook:%{public}x error, COOK:%{public}x!\n", ntohl(getPacket->cookie), MAGIC_COOKIE);
+        LOGE("GetDhcpKernelPacket() cook:%{public}x error, COOK:%{public}x!\n", ntohl(getPacket->cookie), MAGIC_COOKIE);
         return SOCKET_OPT_FAILED;
     }
-    return bytes;
+    return nBytes;
 }

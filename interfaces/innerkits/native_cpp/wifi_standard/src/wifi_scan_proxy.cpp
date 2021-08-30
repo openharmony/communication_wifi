@@ -35,6 +35,7 @@ WifiScanProxy::WifiScanProxy(const sptr<IRemoteObject> &remote) : IRemoteProxy<I
 
 WifiScanProxy::~WifiScanProxy()
 {}
+
 ErrCode WifiScanProxy::SetScanControlInfo(const ScanControlInfo &info)
 {
     if (mRemoteDied) {
@@ -112,7 +113,7 @@ ErrCode WifiScanProxy::Scan()
     return WIFI_OPT_SUCCESS;
 }
 
-ErrCode WifiScanProxy::Scan(const WifiScanParams &params)
+ErrCode WifiScanProxy::AdvanceScan(const WifiScanParams &params)
 {
     if (mRemoteDied) {
         WIFI_LOGD("failed to `%{public}s`,remote service is died!", __func__);
@@ -255,6 +256,34 @@ ErrCode WifiScanProxy::RegisterCallBack(const sptr<IWifiScanCallback> &callback)
     WIFI_LOGD("RegisterCallBack is finished: result=%{public}d", ret);
     return WIFI_OPT_SUCCESS;
 }
+
+ErrCode WifiScanProxy::GetSupportedFeatures(long &features)
+{
+    if (mRemoteDied) {
+        WIFI_LOGD("failed to `%{public}s`,remote service is died!", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    MessageOption option;
+    MessageParcel data, reply;
+    data.WriteInt32(0);
+    int error = Remote()->SendRequest(WIFI_SVR_CMD_GET_SUPPORTED_FEATURES, data, reply, option);
+    if (error != ERR_NONE) {
+        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d", WIFI_SVR_CMD_GET_SUPPORTED_FEATURES, error);
+        return ErrCode(error);
+    }
+    int exception = reply.ReadInt32();
+    if (exception) {
+        return WIFI_OPT_FAILED;
+    }
+    int ret = reply.ReadInt32();
+    if (ret != WIFI_OPT_SUCCESS) {
+        return ErrCode(ret);
+    }
+
+    features = reply.ReadInt64();
+    return WIFI_OPT_SUCCESS;
+}
+
 void WifiScanProxy::OnRemoteDied(const wptr<IRemoteObject>& remoteObject)
 {
     WIFI_LOGD("Remote service is died!");

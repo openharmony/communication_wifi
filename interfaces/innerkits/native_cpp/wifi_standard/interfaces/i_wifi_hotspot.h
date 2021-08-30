@@ -150,6 +150,14 @@ public:
      * @return ErrCode - operation result
      */
     virtual ErrCode RegisterCallBack(const sptr<IWifiHotspotCallback> &callback) = 0;
+
+    /**
+     * @Description Get supported features
+     *
+     * @param features - return supported features
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode GetSupportedFeatures(long &features) = 0;
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.wifi.IWifiHotspotService");
 };

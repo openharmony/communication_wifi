@@ -132,7 +132,7 @@ public:
      * @param networkId - want to remove a networkId
      * @return int - 0 success
      */
-    int RemoveDeviceConfig(int networkId);
+    int RemoveDevice(int networkId);
 
     /**
      * @Description Get all saved wifi device config
@@ -157,10 +157,10 @@ public:
     /**
      * @Description Get the dhcp info
      *
-     * @param info - output DhcpInfo struct
+     * @param info - output IpInfo struct
      * @return int - 0 success
      */
-    int GetDhcpInfo(DhcpInfo &info);
+    int GetIpInfo(IpInfo &info);
 
     /**
      * @Description Get current link info

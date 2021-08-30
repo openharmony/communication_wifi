@@ -156,7 +156,13 @@ public:
      * @param networkId - a networkId that is to be removed
      * @return int - 0 success ,other is failed
      */
-    int RemoveDeviceConfig(int networkId);
+    int RemoveDevice(int networkId);
+
+    /**
+     * @Description Remove all saved wifi device config
+     *
+     */
+    void ClearDeviceConfig(void);
 
     /**
      * @Description Get all saved wifi device config
@@ -222,18 +228,18 @@ public:
     /**
      * @Description Get the dhcp info
      *
-     * @param info - output DhcpInfo struct
+     * @param info - output IpInfo struct
      * @return int - 0 success
      */
-    int GetDhcpInfo(DhcpInfo &info);
+    int GetIpInfo(IpInfo &info);
 
     /**
      * @Description Save dhcp info
      *
-     * @param info - input DhcpInfo struct
+     * @param info - input IpInfo struct
      * @return int - 0 success
      */
-    int SaveDhcpInfo(const DhcpInfo &info);
+    int SaveIpInfo(const IpInfo &info);
 
     /**
      * @Description Get current link info
@@ -771,7 +777,7 @@ private:
     std::vector<WifiScanInfo> mWifiScanInfoList;
     ScanControlInfo mScanControlInfo;
     std::map<int, WifiDeviceConfig> mWifiDeviceConfig;
-    DhcpInfo mWifiDhcpInfo;
+    IpInfo mWifiIpInfo;
     WifiLinkedInfo mWifiLinkedInfo;
     std::string mMacAddress;
     std::string mCountryCode;

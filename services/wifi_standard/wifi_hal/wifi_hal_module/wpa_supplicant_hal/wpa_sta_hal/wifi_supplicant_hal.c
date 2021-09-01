@@ -30,7 +30,7 @@
  * Network interface name, which is hardcoded temporarily and
  * needs to be automatically created by the netlink interface.
  */
-#define CONFIG_CTRL_IFACE_NAME "wlan0"
+#define CONFIG_CTRL_IFACE_NAME "127.0.0.1:9877"
 
 #define WPS_EVENT_PBC_OVERLAP "WPS-OVERLAP-DETECTED PBC session overlap"
 WifiHalDevice *g_wpaHalDev = NULL;

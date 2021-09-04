@@ -169,16 +169,13 @@ static napi_value ScanInfoToCallBack(const napi_env& env, AsyncCallbackInfo *asC
     napi_create_async_work(
         env, nullptr, resourceName,
         [](napi_env env, void* data) {
-            AsyncCallbackInfo *asCallbackInfo = (AsyncCallbackInfo *)data;
-            napi_value arrayResult;
-            asCallbackInfo->isSuccess = GetWifiScanInfoList(env, arrayResult);
-            asCallbackInfo->result = arrayResult;
         },
         [](napi_env env, napi_status status, void* data) {
-            AsyncCallbackInfo* asCallbackInfo = (AsyncCallbackInfo *)data;
             napi_value undefine;
             napi_get_undefined(env, &undefine);
             napi_value callback;
+            AsyncCallbackInfo* asCallbackInfo = (AsyncCallbackInfo *)data;
+            asCallbackInfo->isSuccess = GetWifiScanInfoList(env, asCallbackInfo->result);
             if (asCallbackInfo->isSuccess) {
                 napi_get_reference_value(env, asCallbackInfo->callback[0], &callback);
                 napi_call_function(env, nullptr, callback, 1, &asCallbackInfo->result, &undefine);
@@ -191,7 +188,6 @@ static napi_value ScanInfoToCallBack(const napi_env& env, AsyncCallbackInfo *asC
                     napi_throw_error(env, "error", "get scan info callback func is null");
                 }
             }
-
             if (asCallbackInfo->callback[0] != nullptr) {
                 napi_delete_reference(env, asCallbackInfo->callback[0]);
             }
@@ -221,13 +217,10 @@ static napi_value ScanInfoToPromise(const napi_env& env, AsyncCallbackInfo *asCa
         nullptr,
         resourceName,
         [](napi_env env, void *data) {
-            AsyncCallbackInfo *asCallbackInfo = (AsyncCallbackInfo *)data;
-            napi_value arrayResult;
-            asCallbackInfo->isSuccess = GetWifiScanInfoList(env, arrayResult);
-            asCallbackInfo->result = arrayResult;
         },
         [](napi_env env, napi_status status, void *data) {
             AsyncCallbackInfo *asCallbackInfo = (AsyncCallbackInfo *)data;
+            asCallbackInfo->isSuccess = GetWifiScanInfoList(env, asCallbackInfo->result);
             if (asCallbackInfo->isSuccess) {
                 napi_resolve_deferred(asCallbackInfo->env, asCallbackInfo->deferred, asCallbackInfo->result);
             } else {
@@ -287,10 +280,11 @@ static void ConvertEncryptionMode(const SecTypeJs& securityType, std::string& ke
     }
 }
 
-static void JsObjToDeviceConfig(const napi_env& env, const napi_value& object, WifiDeviceConfig& cppConfig) {
-    JsObjectToString(env, object, "ssid", 33, cppConfig.ssid); /* ssid max length is 32 + '\0' */
-    JsObjectToString(env, object, "bssid", 12, cppConfig.bssid);
-    JsObjectToString(env, object, "preSharedKey", 256, cppConfig.preSharedKey);
+static void JsObjToDeviceConfig(const napi_env& env, const napi_value& object, WifiDeviceConfig& cppConfig)
+{
+    JsObjectToString(env, object, "ssid", 33, cppConfig.ssid); /* 33: ssid max length is 32 + '\0' */
+    JsObjectToString(env, object, "bssid", 18, cppConfig.bssid); /* 18: max bssid length for string type */
+    JsObjectToString(env, object, "preSharedKey", 256, cppConfig.preSharedKey); /* 256: max length */
     JsObjectToBool(env, object, "isHiddenSsid", cppConfig.hiddenSSID);
     int type = static_cast<int>(SecTypeJs::SEC_TYPE_INVALID);
     JsObjectToInt(env, object, "securityType", type);
@@ -332,15 +326,13 @@ static napi_value AddDeviceConfigCallBack(const napi_env& env, AsyncCallbackInfo
     napi_create_async_work(
         env, nullptr, resourceName,
         [](napi_env env, void* data) {
-            AsyncCallbackInfo *asCallbackInfo = (AsyncCallbackInfo *)data;
-            AddDeviceConfigImpl(env, asCallbackInfo);
         },
         [](napi_env env, napi_status status, void* data) {
             AsyncCallbackInfo* asCallbackInfo = (AsyncCallbackInfo *)data;
-
+            AddDeviceConfigImpl(env, asCallbackInfo);
+            napi_value callback;
             napi_value undefine;
             napi_get_undefined(env, &undefine);
-            napi_value callback;
             if (asCallbackInfo->isSuccess) {
                 napi_get_reference_value(env, asCallbackInfo->callback[0], &callback);
                 napi_call_function(env, nullptr, callback, 1, &asCallbackInfo->result, &undefine);
@@ -353,7 +345,6 @@ static napi_value AddDeviceConfigCallBack(const napi_env& env, AsyncCallbackInfo
                     napi_throw_error(env, "error", "add wifi config callback func is null");
                 }
             }
-
             if (asCallbackInfo->callback[0] != nullptr) {
                 napi_delete_reference(env, asCallbackInfo->callback[0]);
             }
@@ -384,11 +375,10 @@ static napi_value AddDeviceConfigPromise(const napi_env& env, AsyncCallbackInfo 
         nullptr,
         resourceName,
         [](napi_env env, void *data) {
-            AsyncCallbackInfo *asCallbackInfo = (AsyncCallbackInfo *)data;
-            AddDeviceConfigImpl(env, asCallbackInfo);
         },
         [](napi_env env, napi_status status, void *data) {
             AsyncCallbackInfo *asCallbackInfo = (AsyncCallbackInfo *)data;
+            AddDeviceConfigImpl(env, asCallbackInfo);
             if (asCallbackInfo->isSuccess) {
                 napi_resolve_deferred(asCallbackInfo->env, asCallbackInfo->deferred, asCallbackInfo->result);
             } else {
@@ -499,6 +489,7 @@ napi_value GetSignalLevel(napi_env env, napi_callback_info info)
     napi_value argv[2];
     napi_value thisVar;
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, NULL));
+    /* the input have 2 parameters */
     NAPI_ASSERT(env, argc == 2, "Wrong number of arguments");
 
     napi_valuetype type1;
@@ -523,6 +514,5 @@ napi_value GetSignalLevel(napi_env env, napi_callback_info info)
     napi_create_uint32(env, level, &result);
     return result;
 }
-
 }  // namespace Wifi
 }  // namespace OHOS

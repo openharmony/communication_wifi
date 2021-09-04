@@ -561,7 +561,7 @@ ScanResult* GetScanInfos(int *size)
     } else {
         ReadInt(context, size);
         LOGI("GetScanInfos size: %{public}d", *size);
-        if (size > 0) {
+        if (*size > 0) {
             scanInfos = (ScanResult *)calloc(*size, sizeof(ScanResult));
             if (scanInfos != NULL) {
                 for (int i = 0; i < *size; ++i) {

@@ -300,7 +300,7 @@ WifiErrorNo WifiIdlClient::QueryScanResults(std::vector<WifiScanResult> &scanRes
     int size = WIFI_IDL_GET_MAX_SCAN_RESULT;
     ScanResult* results = GetScanInfos(&size);
     if (results == NULL) {
-        return WIFI_IDL_OPT_FAILED;
+        return size == 0 ? WIFI_IDL_OPT_OK : WIFI_IDL_OPT_FAILED;
     }
     for (int i = 0; i < size; ++i) {
         WifiScanResult tmp;

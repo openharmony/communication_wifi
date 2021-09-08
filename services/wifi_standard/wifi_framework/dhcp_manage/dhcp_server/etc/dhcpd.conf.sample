@@ -1,0 +1,53 @@
+#################### default ####################
+# Server identifier.
+#serverId=192.168.150.200
+
+# Default subnet mask.
+#netmask=255.255.255.0
+
+# Default gateway.
+#gateway=192.168.150.254
+
+# Lease time value.
+leaseTime=43200
+# Renewal time value.
+#renewalTime=21600
+# Rebinding time value.
+#rebindingTime=34560
+
+# Address Range: {beginIp},{endIp}
+#pool=192.168.150.100,192.168.150.200
+
+# Ip distribue mode [0|1]: 0-random, 1-sequence(default).
+#distribution=0
+
+# Broadcast flags enable [0|1]: 0-no, 1-yes(default).
+
+# Domain name server IP address: <dns1> [,<dns2>] [,<dns3>] ...
+dns=8.8.8.8,8.8.4.4,114.114.114.114
+
+#################### interface1 ####################
+# Network interface name, if this parameter is specified, the item is mandatory.(interface config)
+interface=wlan1
+# Server identifier, if this parameter is specified, the item is mandatory.
+server=192.168.150.200
+# Subnet mask, if this parameter is specified, the item is mandatory.
+netmask=255.255.255.0
+gateway=192.168.150.255
+
+#leaseTime=6000
+pool=192.168.150.100,192.168.150.200
+#dns=8.8.8.8,8.8.4.4,114.114.114.114
+
+#################### interface2 ####################
+# Network interface name, if this parameter is specified, the item is mandatory.
+#interface=wlan2
+# Server identifier, if this parameter is specified, the item is mandatory.
+#server=192.168.255.200
+# Subnet mask, if this parameter is specified, the item is mandatory.
+#netmask=255.255.255.0
+
+#gateway=192.168.255.255
+#leaseTime=8000
+#pool=192.168.255.2,192.168.255.254
+#dns=8.8.8.8,8.8.4.4,114.114.114.114

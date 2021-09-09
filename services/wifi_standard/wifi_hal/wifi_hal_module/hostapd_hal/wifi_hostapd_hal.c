@@ -487,7 +487,7 @@ static int SetApInfo(HostsapdConfig *info)
         LOGE("SetApChannel failed. retval %{public}d", retval);
         return retval;
     }
-    if ((retval = SetApMaxConn(info->maxConn)) != 0) {
+    if (info->maxConn >= 0 && (retval = SetApMaxConn(info->maxConn)) != 0) {
         LOGE("SetApMaxConn failed. retval %{public}d", retval);
         return retval;
     }

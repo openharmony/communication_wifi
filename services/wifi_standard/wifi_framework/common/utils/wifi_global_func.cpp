@@ -15,12 +15,22 @@
 #include "wifi_global_func.h"
 #include <algorithm>
 #include "wifi_log.h"
-
 #undef LOG_TAG
-#define LOG_TAG "OHWIFI_COMMON_GLOBAL_FUNC"
+#define LOG_TAG "WifiGlobalFunc"
 
 namespace OHOS {
 namespace Wifi {
+constexpr int FREP_2G_MIN = 2412;
+constexpr int FREP_2G_MAX = 2472;
+
+constexpr int FREP_5G_MIN = 5170;
+constexpr int FREP_5G_MAX = 5825;
+constexpr int CHANNEL_14_FREP = 2484;
+constexpr int CHANNEL_14 = 14;
+constexpr int CENTER_FREP_DIFF = 5;
+constexpr int CHANNEL_2G_MIN = 1;
+constexpr int CHANNEL_5G_MIN = 34;
+
 ErrCode CfgCheckSsid(const HotspotConfig &cfg)
 {
     if (cfg.GetSsid().length() < MIN_SSID_LEN || cfg.GetSsid().length() > MAX_SSID_LEN) {
@@ -54,14 +64,6 @@ ErrCode CfgCheckChannel(const HotspotConfig &cfg, ChannelsTable &channInfoFromCe
     return ((it == channels.end()) ? ErrCode::WIFI_OPT_INVALID_PARAM : ErrCode::WIFI_OPT_SUCCESS);
 }
 
-ErrCode CfgCheckMaxconnum(const HotspotConfig &cfg)
-{
-    if (cfg.GetMaxConn() < 1 || cfg.GetMaxConn() > MAX_AP_CONN) {
-        return ErrCode::WIFI_OPT_INVALID_PARAM;
-    }
-    return ErrCode::WIFI_OPT_SUCCESS;
-}
-
 ErrCode IsValidHotspotConfig(const HotspotConfig &cfg, const HotspotConfig &cfgFromCenter,
     std::vector<BandType> &bandsFromCenter, ChannelsTable &channInfoFromCenter)
 {
@@ -93,9 +95,6 @@ ErrCode IsValidHotspotConfig(const HotspotConfig &cfg, const HotspotConfig &cfgF
         }
     }
 
-    if (CfgCheckMaxconnum(cfg) == ErrCode::WIFI_OPT_INVALID_PARAM) {
-        return ErrCode::WIFI_OPT_INVALID_PARAM;
-    }
     return ErrCode::WIFI_OPT_SUCCESS;
 }
 
@@ -144,10 +143,6 @@ ConnectionState ConvertConnStateInternal(OperateResState resState)
     switch (resState) {
         case OperateResState::CONNECT_CONNECTING:
             return ConnectionState::CONNECT_CONNECTING;
-        case OperateResState::CONNECT_OBTAINING_IP:
-            return ConnectionState::CONNECT_OBTAINING_IP;
-        case OperateResState::CONNECT_OBTAINING_IP_FAIL:
-            return ConnectionState::CONNECT_OBTAINING_IP_FAIL;
         case OperateResState::CONNECT_AP_CONNECTED:
             return ConnectionState::CONNECT_AP_CONNECTED;
         case OperateResState::CONNECT_CHECK_PORTAL:
@@ -166,6 +161,14 @@ ConnectionState ConvertConnStateInternal(OperateResState resState)
             return ConnectionState::CONNECT_PASSWORD_WRONG;
         case OperateResState::CONNECT_CONNECTING_TIMEOUT:
             return ConnectionState::CONNECT_CONNECTING_TIMEOUT;
+        case OperateResState::CONNECT_OBTAINING_IP:
+            return ConnectionState::CONNECT_OBTAINING_IP;
+        case OperateResState::CONNECT_OBTAINING_IP_FAILED:
+            return ConnectionState::CONNECT_OBTAINING_IP_FAILED;
+        case OperateResState::CONNECT_ASSOCIATING:
+            return ConnectionState::CONNECT_ASSOCIATING;
+        case OperateResState::CONNECT_ASSOCIATED:
+            return ConnectionState::CONNECT_ASSOCIATED;
         default:
             return ConnectionState::UNKNOWN;
     }
@@ -229,6 +232,53 @@ void SplitString(const std::string &str, const std::string &split, std::vector<s
         vec.push_back(tmpStr);
     }
     return;
+}
+
+void TransformFrequencyIntoChannel(const std::vector<int> &freqVector, std::vector<int> &chanVector)
+{
+    int channel;
+    for (size_t i = 0; i < freqVector.size(); ++i) {
+        if (freqVector[i] >= FREP_2G_MIN && freqVector[i] <= FREP_2G_MAX) {
+            channel = (freqVector[i] - FREP_2G_MIN) / CENTER_FREP_DIFF + CHANNEL_2G_MIN;
+        } else if (freqVector[i] == CHANNEL_14_FREP) {
+            channel = CHANNEL_14;
+        } else if (freqVector[i] >= FREP_5G_MIN && freqVector[i] <= FREP_5G_MAX) {
+            channel = (freqVector[i] - FREP_5G_MIN) / CENTER_FREP_DIFF + CHANNEL_5G_MIN;
+        } else {
+            LOGW("Invalid Freq:%d", freqVector[i]);
+            continue;
+        }
+        chanVector.push_back(channel);
+    }
+}
+
+bool IsValid24GHz(int freq)
+{
+    return freq > 2400 && freq < 2500;
+}
+
+bool IsValid5GHz(int freq)
+{
+    return freq > 4900 && freq < 5900;
+}
+
+void CheckBandChannel(HotspotConfig &apConfig, const std::map<BandType, std::vector<int32_t>> &validChanTable)
+{
+    bool cfgValid = false;
+    auto it = validChanTable.find(apConfig.GetBand());
+    if (it != validChanTable.end() && it->second.size() != 0) {
+        for (auto vecIt = it->second.begin(); vecIt != it->second.end(); ++vecIt) {
+            if (*vecIt == apConfig.GetChannel()) {
+                cfgValid = true;
+                break;
+            }
+        }
+    }
+    if (!cfgValid) {
+        LOGW("Error band or error channels in band, use 2.4G band default channel.");
+        apConfig.SetBand(BandType::BAND_2GHZ);
+        apConfig.SetChannel(AP_CHANNEL_DEFAULT);
+    }
 }
 }  // namespace Wifi
 }  // namespace OHOS

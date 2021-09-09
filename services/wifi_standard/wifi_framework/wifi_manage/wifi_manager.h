@@ -16,19 +16,18 @@
 #ifndef OHOS_WIFIMANAGER_H
 #define OHOS_WIFIMANAGER_H
 
-#include <pthread.h>
-#include <atomic>
-#include <chrono>
-#include <condition_variable>
-#include <memory>
-#include <mutex>
 #include <string>
-#include <unordered_map>
 #include <vector>
-#include "wifi_internal_msg.h"
-#include "wifi_message_queue.h"
+#include <thread>
+#include <deque>
+#include <mutex>
+#include <condition_variable>
+
 #include "define.h"
-#include "wifi_msg.h"
+#include "wifi_internal_msg.h"
+#include "sta_service_callback.h"
+#include "iscan_service_callbacks.h"
+#include "i_ap_service_callbacks.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -43,12 +42,19 @@ enum InitStatus {
     TASK_THREAD_INIT_FAILED = 5,
 };
 
+enum class WifiCloseServiceCode {
+    STA_SERVICE_CLOSE,
+    SCAN_SERVICE_CLOSE,
+    AP_SERVICE_CLOSE,
+    SERVICE_THREAD_EXIT,
+};
+
 class WifiManager {
 public:
     WifiManager();
     ~WifiManager();
     /**
-     * @Description Initialize submodules and message processing threads
+     * @Description Initialize submodules and message processing threads.
      *              1. Initializing the Configuration Center
      *              2. Initialization permission management
      *              3. Initializing Service Management
@@ -56,23 +62,12 @@ public:
      *              5. Initializing a Message Queue
      *              6. Initialize the message processing thread
      *
-     * @return int - Init result, when 0 means success, other means some fails happened
+     * @return int - Init result, when 0 means success, other means some fails happened.
      */
     int Init();
 
     /**
-     * @Description Send a message to a feature service
-     *              1. Search the service management module for the feature service based on the name
-     *              2. Get the object and then invoke the PushMsg method of the object
-     *
-     * @param name - Feature Service Name
-     * @param msg - Pushes message
-     * @return int - 0 success; -1 feature service not exist
-     */
-    int PushMsg(const std::string &name, const WifiRequestMsgInfo &msg);
-
-    /**
-     * @Description When exiting, the system exits each submodule and then exits the message processing thread
+     * @Description When exiting, the system exits each submodule and then exits the message processing thread.
      *              1. Uninstall each feature service
      *              2. Exit the event broadcast module
      *              3. Wait for the message processing thread to exit
@@ -81,20 +76,25 @@ public:
     void Exit();
 
     /**
-     * @Description Get message queue object
+     * @Description Get the sta callback object.
      *
-     * @return WifiMessageQueue<WifiResponseMsgInfo>* - message queue reference
+     * @return StaServiceCallback - return mStaCallback
      */
-    WifiMessageQueue<WifiResponseMsgInfo> *GetMessageQueue();
+    StaServiceCallback GetStaCallback(void);
 
     /**
-     * @Description Add a new device config
+     * @Description Get the scan callback object.
      *
-     * @param config device config
-     * @param networkId return device's network id
-     * @return int - operate result, 0 success -1 failed
+     * @return IScanSerivceCallbacks - return mScanCallback
      */
-    int AddDeviceConfig(const WifiDeviceConfig &config, int &networkId);
+    IScanSerivceCallbacks GetScanCallback(void);
+
+    /**
+     * @Description Get the ap callback object.
+     *
+     * @return IApServiceCallbacks - return mApCallback
+     */
+    IApServiceCallbacks GetApCallback(void);
 
     /**
      * @Description Get supported features
@@ -111,37 +111,43 @@ public:
      */
     void AddSupportedFeatures(WifiFeatures feature);
 
-    /**
-     * @Description Deal message from feature service, Obtain the message and process the message
-     *              based on the message code
-     *
-     * @param p - WifiManager object
-     * @return void* - nullptr, not care this return value
-     */
-    static void *DealServiceUpMsg(void *p);
     static WifiManager &GetInstance();
 
 private:
-    static void DealStaUpMsg(WifiManager *pInstance, const WifiResponseMsgInfo &msg);
-    static void DealApUpMsg(const WifiResponseMsgInfo &msg);
-    static void DealScanUpMsg(const WifiResponseMsgInfo &msg);
-    static void UploadOpenWifiFailedEvent();
-    static void UploadOpenWifiSuccessfulEvent();
-    static void DealStaOpenRes(WifiManager *pInstance, const WifiResponseMsgInfo &msg);
-    static void DealStaCloseRes(const WifiResponseMsgInfo &msg);
-    static void DealStaConnChanged(const WifiResponseMsgInfo &msg);
-    static void DealApOpenRes();
-    static void DealApCloseRes();
-    static void DealApConnChanged(const WifiResponseMsgInfo &msg);
-    static void DealWpsChanged(const WifiResponseMsgInfo &msg);
-
+    void PushServiceCloseMsg(WifiCloseServiceCode code);
+    void InitStaCallback(void);
+    void InitScanCallback(void);
+    void InitApCallback(void);
     InitStatus GetInitStatus();
-private:
-    pthread_t mTid;
-    std::atomic<bool> mRunFlag;
-    std::unique_ptr<WifiMessageQueue<WifiResponseMsgInfo>> mMqUp;
+    static void DealCloseServiceMsg(WifiManager &manager);
+    static void CloseStaService(void);
+    static void CloseApService(void);
+    static void CloseScanService(void);
+    static void DealStaOpenRes(OperateResState state);
+    static void DealStaCloseRes(OperateResState state);
+    static void DealStaConnChanged(OperateResState state, const WifiLinkedInfo &info);
+    static void DealWpsChanged(WpsStartState state, const int pinCode);
+    static void DealStreamChanged(StreamDirection direction);
+    static void DealRssiChanged(int rssi);
+    static void CheckAndStartScanService(void);
+    static void CheckAndStopScanService(void);
+    static void DealScanOpenRes(void);
+    static void DealScanCloseRes(void);
+    static void DealScanFinished(int state);
+    static void DealScanInfoNotify(std::vector<InterScanInfo> &results);
+    static void DealApStateChanged(ApState bState);
+    static void DealApGetStaJoin(const StationInfo &info);
+    static void DealApGetStaLeave(const StationInfo &info);
 
-    InitStatus mInitStatus_;
+private:
+    std::thread mCloseServiceThread;
+    std::mutex mMutex;
+    std::condition_variable mCondition;
+    std::deque<WifiCloseServiceCode> mEventQue;
+    StaServiceCallback mStaCallback;
+    IScanSerivceCallbacks mScanCallback;
+    IApServiceCallbacks mApCallback;
+    InitStatus mInitStatus;
     long mSupportedFeatures;
 };
 } // namespace Wifi

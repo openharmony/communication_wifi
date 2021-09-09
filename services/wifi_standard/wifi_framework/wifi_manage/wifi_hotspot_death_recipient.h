@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_WIFI_SCAN_CALLBACK_DEATH_H
-#define OHOS_WIFI_SCAN_CALLBACK_DEATH_H
+#ifndef OHOS_WIFI_HOTSPOT_DEATH_RECIPIENT_H
+#define OHOS_WIFI_HOTSPOT_DEATH_RECIPIENT_H
 #include "iremote_object.h"
 
 namespace OHOS {

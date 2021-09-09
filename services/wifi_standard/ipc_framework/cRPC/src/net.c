@@ -14,10 +14,8 @@
  */
 #include "net.h"
 #include "log.h"
-#include "common.h"
-
 #undef LOG_TAG
-#define LOG_TAG "OHWIFI_RPC_NET"
+#define LOG_TAG "WifiRpcNet"
 
 int SetNonBlock(int fd, int type)
 {
@@ -50,7 +48,7 @@ int MyRead(int fd, char *buf, int count)
             if (errno == EWOULDBLOCK || errno == EINTR || errno == EAGAIN) {
                 break;
             } else {
-                LOGE("read failed! error is %d", errno);
+                LOGE("read failed! error is %{public}d", errno);
                 return SOCK_ERR;
             }
         } else {
@@ -60,7 +58,7 @@ int MyRead(int fd, char *buf, int count)
     }
     buf[pos] = 0;
 #ifdef DEBUG
-    LOGD("read: %s", buf);
+    LOGD("read: %{private}s", buf);
 #endif
     return pos;
 }
@@ -76,7 +74,7 @@ int MyWrite(int fd, const char *buf, int count)
             if (errno == EINTR || errno == EWOULDBLOCK || errno == EAGAIN) {
                 break;
             } else {
-                LOGE("write failed! error is %d", errno);
+                LOGE("write failed! error is %{public}d", errno);
                 return SOCK_ERR;
             }
         }
@@ -85,7 +83,7 @@ int MyWrite(int fd, const char *buf, int count)
         char *szTmp = (char *)calloc(tmpSize, sizeof(char));
         if (szTmp != NULL) {
             if (strncpy_s(szTmp, tmpSize, buf + pos, ret) == EOK) {
-                LOGD("write: %s", szTmp);
+                LOGD("write: %{private}s", szTmp);
             }
             free(szTmp);
         }
@@ -134,6 +132,7 @@ int CreateUnixServer(const char *path, int backlog)
         close(sock);
         return -1;
     }
+    fcntl(sock, F_SETFD, FD_CLOEXEC);
     if (listen(sock, backlog) < 0) {
         LOGE("listen failed!");
         close(sock);

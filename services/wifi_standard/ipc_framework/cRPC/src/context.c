@@ -266,30 +266,27 @@ int ContextWriteNet(Context *context)
 
     if (context->wBegin == context->wEnd) {
         return 0;
-    } else if (context->wBegin < context->wEnd) {
+    }
+    if (context->wBegin < context->wEnd) {
         int ret = MyWrite(context->fd, context->szWrite + context->wBegin, context->wEnd - context->wBegin);
         if (ret > 0) {
             context->wBegin += ret;
         }
         return ret;
-    } else {
-        int len = context->wCapacity - context->wBegin;
-        int ret = MyWrite(context->fd, context->szWrite + context->wBegin, len);
-        if (ret < 0) {
-            return ret;
-        } else if (ret < len) {
-            context->wBegin += ret;
-            return ret;
-        } else {
-            context->wBegin = 0;
-            ret = MyWrite(context->fd, context->szWrite, context->wEnd);
-            if (ret < 0) {
-                return ret;
-            } else {
-                context->wBegin = ret;
-                return ret;
-            }
-        }
     }
-    return 0;
+    int len = context->wCapacity - context->wBegin;
+    int ret = MyWrite(context->fd, context->szWrite + context->wBegin, len);
+    if (ret < 0) {
+        return ret;
+    }
+    if (ret < len) {
+        context->wBegin += ret;
+        return ret;
+    }
+    context->wBegin = 0;
+    ret = MyWrite(context->fd, context->szWrite, context->wEnd);
+    if (ret > 0) {
+        context->wBegin = ret;
+    }
+    return ret;
 }

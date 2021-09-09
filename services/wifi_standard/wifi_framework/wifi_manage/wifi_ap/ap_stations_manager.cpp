@@ -13,12 +13,13 @@
  * limitations under the License.
  */
 #include "ap_stations_manager.h"
-#include "ap_service.h"
+#include "ap_state_machine.h"
 #include "log_helper.h"
 #include "unistd.h"
 #include "wifi_logger.h"
 
 DEFINE_WIFILOG_HOTSPOT_LABEL("ApStationsManager");
+
 namespace OHOS {
 namespace Wifi {
 ApStationsManager::ApStationsManager()
@@ -97,7 +98,7 @@ void ApStationsManager::StationLeave(const std::string &mac) const
             break;
         }
     }
-    ApService::GetInstance().OnHotspotStaLeave(staInfo);
+    ApStateMachine::GetInstance().BroadCastStationChange(staInfo, ApStatemachineEvent::CMD_STATION_LEAVE);
     return;
 }
 
@@ -126,7 +127,7 @@ void ApStationsManager::StationJoin(const StationInfo &staInfo) const
     }
 
     if (it == results.end() || it->ipAddr != staInfo.ipAddr) {
-        ApService::GetInstance().OnHotspotStaJoin(staInfoTemp);
+        ApStateMachine::GetInstance().BroadCastStationChange(staInfoTemp, ApStatemachineEvent::CMD_STATION_JOIN);
     }
     return;
 }

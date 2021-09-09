@@ -38,7 +38,7 @@ sptr<WifiScanServiceImpl> WifiScanServiceImpl::GetInstance()
     if (g_instance == nullptr) {
         std::lock_guard<std::mutex> autoLock(g_instanceLock);
         if (g_instance == nullptr) {
-            auto service = new WifiScanServiceImpl;
+            auto service = new (std::nothrow) WifiScanServiceImpl;
             g_instance = service;
         }
     }
@@ -92,16 +92,17 @@ ErrCode WifiScanServiceImpl::SetScanControlInfo(const ScanControlInfo &info)
 {
     WIFI_LOGI("WifiScanServiceImpl::SetScanControlInfo");
     if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
-        WIFI_LOGE("SetScanControlInfo:VerifySetWifiInfoPermission PERMISSION_DENIED!");
+        WIFI_LOGE("SetScanControlInfo:VerifyGetWifiInfoPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
 
     WifiConfigCenter::GetInstance().SetScanControlInfo(info);
-    WifiRequestMsgInfo msg;
-    msg.msgCode = WifiInternalMsgCode::SCAN_CONTROL_REQ;
-    if (WifiManager::GetInstance().PushMsg(WIFI_SERVICE_SCAN, msg) < 0) {
-        WIFI_LOGE("send scan msg failed!");
-        return WIFI_OPT_FAILED;
+    if (IsScanServiceRunning()) {
+        IScanService *pService = WifiServiceManager::GetInstance().GetScanServiceInst();
+        if (pService == nullptr) {
+            return WIFI_OPT_SCAN_NOT_OPENED;
+        }
+        return pService->OnControlStrategyChanged();
     }
 
     return WIFI_OPT_SUCCESS;
@@ -110,51 +111,39 @@ ErrCode WifiScanServiceImpl::SetScanControlInfo(const ScanControlInfo &info)
 ErrCode WifiScanServiceImpl::Scan()
 {
     WIFI_LOGI("Scan");
-
     if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
-        WIFI_LOGE("Scan:VerifySetWifiInfoPermission PERMISSION_DENIED!");
+        WIFI_LOGE("Scan:VerifyGetWifiInfoPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
 
-    WifiOprMidState curState = WifiConfigCenter::GetInstance().GetScanMidState();
-    if (curState != WifiOprMidState::RUNNING) {
-        WIFI_LOGD("scan service does not started!");
+    if (!IsScanServiceRunning()) {
         return WIFI_OPT_SCAN_NOT_OPENED;
     }
 
-    WifiRequestMsgInfo msg;
-    msg.msgCode = WifiInternalMsgCode::SCAN_REQ;
-    if (WifiManager::GetInstance().PushMsg(WIFI_SERVICE_SCAN, msg) < 0) {
-        WIFI_LOGE("send scan msg failed!");
-        return WIFI_OPT_FAILED;
+    IScanService *pService = WifiServiceManager::GetInstance().GetScanServiceInst();
+    if (pService == nullptr) {
+        return WIFI_OPT_SCAN_NOT_OPENED;
     }
-
-    return WIFI_OPT_SUCCESS;
+    return pService->Scan(true);
 }
 
 ErrCode WifiScanServiceImpl::AdvanceScan(const WifiScanParams &params)
 {
     WIFI_LOGI("Scan with WifiScanParams, band %{public}u", params.band);
     if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
-        WIFI_LOGE("Scan with WifiScanParams:VerifySetWifiInfoPermission PERMISSION_DENIED!");
+        WIFI_LOGE("Scan with WifiScanParams:VerifyGetWifiInfoPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
 
-    WifiOprMidState curState = WifiConfigCenter::GetInstance().GetScanMidState();
-    if (curState != WifiOprMidState::RUNNING) {
-        WIFI_LOGD("scan service does not started!");
+    if (!IsScanServiceRunning()) {
         return WIFI_OPT_SCAN_NOT_OPENED;
     }
 
-    WifiRequestMsgInfo msg;
-    msg.msgCode = WifiInternalMsgCode::SCAN_PARAM_REQ;
-    msg.params.wifiScanParams = params;
-    if (WifiManager::GetInstance().PushMsg(WIFI_SERVICE_SCAN, msg) < 0) {
-        WIFI_LOGE("send scan msg failed!");
-        return WIFI_OPT_FAILED;
+    IScanService *pService = WifiServiceManager::GetInstance().GetScanServiceInst();
+    if (pService == nullptr) {
+        return WIFI_OPT_SCAN_NOT_OPENED;
     }
-
-    return WIFI_OPT_SUCCESS;
+    return pService->ScanWithParam(params);
 }
 
 ErrCode WifiScanServiceImpl::IsWifiClosedScan(bool &bOpen)
@@ -179,7 +168,7 @@ ErrCode WifiScanServiceImpl::GetScanInfoList(std::vector<WifiScanInfo> &result)
     }
 
     if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
-        WIFI_LOGE("GetScanInfoList:VerifyGetScanInfosPermission PERMISSION_DENIED!");
+        WIFI_LOGE("GetScanInfoList:VerifyGetWifiInfoPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
     WifiConfigCenter::GetInstance().GetScanInfoList(result);
@@ -205,6 +194,16 @@ ErrCode WifiScanServiceImpl::GetSupportedFeatures(long &features)
         return WIFI_OPT_FAILED;
     }
     return WIFI_OPT_SUCCESS;
+}
+
+bool WifiScanServiceImpl::IsScanServiceRunning()
+{
+    WifiOprMidState curState = WifiConfigCenter::GetInstance().GetScanMidState();
+    if (curState != WifiOprMidState::RUNNING) {
+        WIFI_LOGD("scan service does not started!");
+        return false;
+    }
+    return true;
 }
 }  // namespace Wifi
 }  // namespace OHOS

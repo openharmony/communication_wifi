@@ -29,6 +29,7 @@
 
 static ModuleInfo *g_halModuleList = NULL;
 
+#define STOP_MODULE_TRY_TIMES 3
 #define MAX_WPA_MAIN_ARGC_NUM 20
 #define MAX_WPA_MAIN_ARGV_LEN 64
 
@@ -134,7 +135,7 @@ int StartModuleInternal(const char *moduleName, const char *startCmd, pid_t *pPr
         pthread_join(tid, NULL);
         exit(0);
     } else {
-        LOGE("Create wpa process id is [%d]", pid);
+        LOGE("Create wpa process id is [%{public}d]", pid);
         sleep(1);
         *pProcessId = pid;
     }
@@ -146,20 +147,28 @@ int StopModuleInternal(const char *moduleName, pid_t processId)
     if (moduleName == NULL) {
         return 0;
     }
-    if (kill(processId, SIGTERM) == -1) {
-        if (ESRCH == errno) {
-            LOGI("kill [%d] success, pid no exist", processId);
+    int tryTimes = STOP_MODULE_TRY_TIMES;
+    while (tryTimes-- >= 0) {
+        if (kill(processId, SIGTERM) == -1) {
+            if (ESRCH == errno) {
+                LOGI("kill [%{public}d] success, pid no exist", processId);
+                return 0;
+            }
+            LOGE("kill [%{public}d] failed", processId);
+            return -1;
+        }
+        sleep(1);
+        int ret = waitpid(processId, NULL, WNOHANG);
+        if (ret <= 0) {
+            LOGI("Waitpid %{public}d return %{public}d, and retry", processId, ret);
+            continue;
+        } else {
+            LOGD("waitpid [%{public}d] success", processId);
             return 0;
         }
-        LOGE("kill [%d] failed", processId);
-        return -1;
     }
-    LOGD("waitpid [%d] start, reclaiming process resources", processId);
-    if (waitpid(processId, NULL, 0) == -1) {
-        LOGE("waitpid [%d] failed", processId);
-        return -1;
-    }
-    return 0;
+    LOGE("stop [%{public}d] failed, cannot send SIGTERM signal to stop process", processId);
+    return -1;
 }
 
 ModuleInfo *FindModule(const char *moduleName)

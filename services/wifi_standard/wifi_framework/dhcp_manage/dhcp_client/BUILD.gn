@@ -12,42 +12,46 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
+import("//foundation/appexecfwk/standard/appexecfwk.gni")
+
+################################################################################
 
 ohos_executable("dhcp_client_service") {
-   install_enable = true
-   sources = [
-      "//foundation/communication/wifi/services/wifi_standard/wifi_framework/dhcp_manage/dhcp_client/src/dhcp_main.c",
-      "//foundation/communication/wifi/services/wifi_standard/wifi_framework/dhcp_manage/dhcp_client/src/dhcp_client.c",
-      "//foundation/communication/wifi/services/wifi_standard/wifi_framework/dhcp_manage/dhcp_client/src/dhcp_ipv4.c",
-      "//foundation/communication/wifi/services/wifi_standard/wifi_framework/dhcp_manage/dhcp_client/src/dhcp_function.c",
-      "//foundation/communication/wifi/services/wifi_standard/wifi_framework/dhcp_manage/dhcp_client/src/dhcp_socket.c",
-      "//foundation/communication/wifi/services/wifi_standard/wifi_framework/dhcp_manage/dhcp_client/src/dhcp_options.c"
-   ]
+  install_enable = true
+  sources = [
+    "//foundation/communication/wifi/services/wifi_standard/wifi_framework/dhcp_manage/dhcp_client/src/dhcp_api.cpp",
+    "//foundation/communication/wifi/services/wifi_standard/wifi_framework/dhcp_manage/dhcp_client/src/dhcp_client.c",
+    "//foundation/communication/wifi/services/wifi_standard/wifi_framework/dhcp_manage/dhcp_client/src/dhcp_function.c",
+    "//foundation/communication/wifi/services/wifi_standard/wifi_framework/dhcp_manage/dhcp_client/src/dhcp_ipv4.c",
+    "//foundation/communication/wifi/services/wifi_standard/wifi_framework/dhcp_manage/dhcp_client/src/dhcp_main.c",
+    "//foundation/communication/wifi/services/wifi_standard/wifi_framework/dhcp_manage/dhcp_client/src/dhcp_options.c",
+    "//foundation/communication/wifi/services/wifi_standard/wifi_framework/dhcp_manage/dhcp_client/src/dhcp_socket.c",
+  ]
 
-   include_dirs = [
-      "//foundation/communication/wifi/services/wifi_standard/wifi_framework/common/log",
-      "//foundation/communication/wifi/services/wifi_standard/wifi_framework/dhcp_manage/dhcp_client/include",
-      "//utils/native/base/include"
-   ]
+  include_dirs = [
+    "//foundation/communication/wifi/services/wifi_standard/wifi_framework/common/log",
+    "//foundation/communication/wifi/services/wifi_standard/wifi_framework/dhcp_manage/dhcp_client/include",
+    "//utils/native/base/include",
+    "//foundation/appexecfwk/standard/interfaces/innerkits/libeventhandler/include",
+    "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
+    "//third_party/openssl/include",
+  ]
 
-   deps = [
-      "//utils/native/base:utils"
-   ]
+  deps = [
+    "${aafwk_path}/interfaces/innerkits/base:base",
+    "${aafwk_path}/interfaces/innerkits/want:want",
+    "//third_party/openssl:libcrypto_static",
+    "//utils/native/base:utils",
+  ]
 
-   cflags_cc = [
-      "-fno-rtti",
-   ]
+  cflags_cc = [ "-fno-rtti" ]
 
-   external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
-   defines = [
-   ]
+  external_deps = [
+    "ces_standard:cesfwk_innerkits",
+    "hiviewdfx_hilog_native:libhilog",
+  ]
+  defines = []
 
-   part_name = "wifi_standard"
-   subsystem_name = "communication"
-}
-
-group("dhcp_client"){
-   deps = [
-      ":dhcp_client_service"
-   ]
+  part_name = "wifi_standard"
+  subsystem_name = "communication"
 }

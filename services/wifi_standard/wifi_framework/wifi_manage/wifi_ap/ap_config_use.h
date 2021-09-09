@@ -24,7 +24,6 @@
 
 namespace OHOS {
 namespace Wifi {
-constexpr int AP_CHANNEL_DEFAULT = 6;
 constexpr int FREP_2G_MIN = 2412;
 constexpr int FREP_2G_MAX = 2472;
 constexpr int FREP_5G_MIN = 5170;

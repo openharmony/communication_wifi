@@ -14,7 +14,7 @@
  */
 #include "wifi_service_manager.h"
 #include <dlfcn.h>
-#include "wifi_log.h"
+#include "wifi_logger.h"
 #include "define.h"
 #include "wifi_settings.h"
 
@@ -68,6 +68,78 @@ int WifiServiceManager::CheckPreLoadService(void)
     return 0;
 }
 
+int WifiServiceManager::LoadStaService(const std::string &dlname, bool bCreate)
+{
+    if (mStaServiceHandle.handle != nullptr) {
+        return 0;
+    }
+    mStaServiceHandle.handle = dlopen(dlname.c_str(), RTLD_LAZY);
+    if (mStaServiceHandle.handle == nullptr) {
+        WIFI_LOGE("dlopen %{public}s failed: %{public}s!", dlname.c_str(), dlerror());
+        return -1;
+    }
+    mStaServiceHandle.create = (IStaService *(*)()) dlsym(mStaServiceHandle.handle, "Create");
+    mStaServiceHandle.destroy = (void *(*)(IStaService *))dlsym(mStaServiceHandle.handle, "Destroy");
+    if (mStaServiceHandle.create == nullptr || mStaServiceHandle.destroy == nullptr) {
+        WIFI_LOGE("%{public}s dlsym Create or Destory failed!", dlname.c_str());
+        dlclose(mStaServiceHandle.handle);
+        mStaServiceHandle.Clear();
+        return -1;
+    }
+    if (bCreate) {
+        mStaServiceHandle.pService = mStaServiceHandle.create();
+    }
+    return 0;
+}
+
+int WifiServiceManager::LoadScanService(const std::string &dlname, bool bCreate)
+{
+    if (mScanServiceHandle.handle != nullptr) {
+        return 0;
+    }
+    mScanServiceHandle.handle = dlopen(dlname.c_str(), RTLD_LAZY);
+    if (mScanServiceHandle.handle == nullptr) {
+        WIFI_LOGE("dlopen %{public}s failed: %{public}s!", dlname.c_str(), dlerror());
+        return -1;
+    }
+    mScanServiceHandle.create = (IScanService *(*)()) dlsym(mScanServiceHandle.handle, "Create");
+    mScanServiceHandle.destroy = (void *(*)(IScanService *))dlsym(mScanServiceHandle.handle, "Destroy");
+    if (mScanServiceHandle.create == nullptr || mScanServiceHandle.destroy == nullptr) {
+        WIFI_LOGE("%{public}s dlsym Create or Destory failed!", dlname.c_str());
+        dlclose(mScanServiceHandle.handle);
+        mScanServiceHandle.Clear();
+        return -1;
+    }
+    if (bCreate) {
+        mScanServiceHandle.pService = mScanServiceHandle.create();
+    }
+    return 0;
+}
+
+int WifiServiceManager::LoadApService(const std::string &dlname, bool bCreate)
+{
+    if (mApServiceHandle.handle != nullptr) {
+        return 0;
+    }
+    mApServiceHandle.handle = dlopen(dlname.c_str(), RTLD_LAZY);
+    if (mApServiceHandle.handle == nullptr) {
+        WIFI_LOGE("dlopen %{public}s failed: %{public}s!", dlname.c_str(), dlerror());
+        return -1;
+    }
+    mApServiceHandle.create = (IApService *(*)()) dlsym(mApServiceHandle.handle, "Create");
+    mApServiceHandle.destroy = (void *(*)(IApService *))dlsym(mApServiceHandle.handle, "Destroy");
+    if (mApServiceHandle.create == nullptr || mApServiceHandle.destroy == nullptr) {
+        WIFI_LOGE("%{public}s dlsym Create or Destory failed!", dlname.c_str());
+        dlclose(mApServiceHandle.handle);
+        mApServiceHandle.Clear();
+        return -1;
+    }
+    if (bCreate) {
+        mApServiceHandle.pService = mApServiceHandle.create();
+    }
+    return 0;
+}
+
 int WifiServiceManager::CheckAndEnforceService(const std::string &name, bool bCreate)
 {
     WIFI_LOGD("WifiServiceManager::CheckAndEnforceService name: %{public}s", name.c_str());
@@ -78,47 +150,106 @@ int WifiServiceManager::CheckAndEnforceService(const std::string &name, bool bCr
     }
     WIFI_LOGD("WifiServiceManager::CheckAndEnforceService get dllname: %{public}s", dlname.c_str());
     std::unique_lock<std::mutex> lock(mMutex);
-    if (mServiceHandleMap.find(name) == mServiceHandleMap.end()) {
-        ServiceHandle tmp;
-        tmp.handle = dlopen(dlname.c_str(), RTLD_LAZY);
-        if (tmp.handle == nullptr) {
-            WIFI_LOGE("dlopen %{public}s failed: %{public}s!", dlname.c_str(), dlerror());
-            return -1;
+    if (name == WIFI_SERVICE_STA) {
+        return LoadStaService(dlname, bCreate);
+    }
+    if (name == WIFI_SERVICE_SCAN) {
+        return LoadScanService(dlname, bCreate);
+    }
+    if (name == WIFI_SERVICE_AP) {
+        return LoadApService(dlname, bCreate);
+    }
+    return -1;
+}
+
+IStaService *WifiServiceManager::GetStaServiceInst()
+{
+    if (mStaServiceHandle.handle == nullptr) {
+        return nullptr;
+    }
+    if (mStaServiceHandle.pService == nullptr) {
+        std::unique_lock<std::mutex> lock(mMutex);
+        if (mStaServiceHandle.pService == nullptr) {
+            mStaServiceHandle.pService = mStaServiceHandle.create();
         }
-        tmp.create = (BaseService* (*)()) dlsym(tmp.handle, "Create");
-        tmp.destroy = (void *(*)(BaseService*))dlsym(tmp.handle, "Destroy");
-        if (tmp.create == nullptr || tmp.destroy == nullptr) {
-            WIFI_LOGE("%{public}s dlsym Create or Destroy failed!", dlname.c_str());
-            dlclose(tmp.handle);
-            return -1;
+    }
+    return mStaServiceHandle.pService;
+}
+
+IScanService *WifiServiceManager::GetScanServiceInst()
+{
+    if (mScanServiceHandle.handle == nullptr) {
+        return nullptr;
+    }
+    if (mScanServiceHandle.pService == nullptr) {
+        std::unique_lock<std::mutex> lock(mMutex);
+        if (mScanServiceHandle.pService == nullptr) {
+            mScanServiceHandle.pService = mScanServiceHandle.create();
         }
-        if (bCreate) {
-            tmp.bs = tmp.create();
-            if (tmp.bs == nullptr) {
-                WIFI_LOGE("create feature service is nullptr");
-            }
+    }
+    return mScanServiceHandle.pService;
+}
+
+IApService *WifiServiceManager::GetApServiceInst()
+{
+    if (mApServiceHandle.handle == nullptr) {
+        return nullptr;
+    }
+    if (mApServiceHandle.pService == nullptr) {
+        std::unique_lock<std::mutex> lock(mMutex);
+        if (mApServiceHandle.pService == nullptr) {
+            mApServiceHandle.pService = mApServiceHandle.create();
         }
-        mServiceHandleMap.emplace(std::make_pair(name, tmp));
+    }
+    return mApServiceHandle.pService;
+}
+
+int WifiServiceManager::UnloadStaService(bool bPreLoad)
+{
+    if (mStaServiceHandle.handle == nullptr) {
+        return 0;
+    }
+    if (mStaServiceHandle.pService != nullptr) {
+        mStaServiceHandle.destroy(mStaServiceHandle.pService);
+        mStaServiceHandle.pService = nullptr;
+    }
+    if (!bPreLoad) {
+        dlclose(mStaServiceHandle.handle);
+        mStaServiceHandle.Clear();
     }
     return 0;
 }
 
-BaseService *WifiServiceManager::GetServiceInst(const std::string &name)
+int WifiServiceManager::UnloadScanService(bool bPreLoad)
 {
-    WIFI_LOGD("WifiServiceManager::GetServiceInst name: %{public}s", name.c_str());
-    std::unique_lock<std::mutex> lock(mMutex);
-    auto iter = mServiceHandleMap.find(name);
-    if (iter != mServiceHandleMap.end()) {
-        if (iter->second.bs == nullptr) {
-            WIFI_LOGD("WifiServiceManager::GetServiceInst start create feature service");
-            iter->second.bs = iter->second.create();
-        }
-        if (iter->second.bs == nullptr) {
-            WIFI_LOGE("WifiServiceManager::GetServiceInst feature service is nullptr");
-        }
-        return iter->second.bs;
+    if (mScanServiceHandle.handle == nullptr) {
+        return 0;
     }
-    return nullptr;
+    if (mScanServiceHandle.pService != nullptr) {
+        mScanServiceHandle.destroy(mScanServiceHandle.pService);
+        mScanServiceHandle.pService = nullptr;
+    }
+    if (!bPreLoad) {
+        dlclose(mScanServiceHandle.handle);
+        mScanServiceHandle.Clear();
+    }
+    return 0;
+}
+
+int WifiServiceManager::UnloadApService(bool bPreLoad)
+{
+    if (mApServiceHandle.handle == nullptr) {
+        return 0;
+    }
+    if (mApServiceHandle.pService != nullptr) {
+        mApServiceHandle.destroy(mApServiceHandle.pService);
+        mApServiceHandle.pService = nullptr;
+    }
+    if (!bPreLoad) {
+        dlclose(mApServiceHandle.handle);
+        mApServiceHandle.Clear();
+    }
+    return 0;
 }
 
 int WifiServiceManager::UnloadService(const std::string &name)
@@ -126,30 +257,24 @@ int WifiServiceManager::UnloadService(const std::string &name)
     bool bPreLoad = WifiSettings::GetInstance().IsModulePreLoad(name);
     WIFI_LOGD("WifiServiceManager::UnloadService name: %{public}s", name.c_str());
     std::unique_lock<std::mutex> lock(mMutex);
-    auto iter = mServiceHandleMap.find(name);
-    if (iter != mServiceHandleMap.end()) {
-        ServiceHandle &tmp = iter->second;
-        tmp.destroy(tmp.bs);
-        if (!bPreLoad) {
-            dlclose(tmp.handle);
-            mServiceHandleMap.erase(iter);
-        } else {
-            tmp.bs = nullptr;
-        }
+    if (name == WIFI_SERVICE_STA) {
+        return UnloadStaService(bPreLoad);
     }
-    return 0;
+    if (name == WIFI_SERVICE_SCAN) {
+        return UnloadScanService(bPreLoad);
+    }
+    if (name == WIFI_SERVICE_AP) {
+        return UnloadApService(bPreLoad);
+    }
+    return -1;
 }
 
 void WifiServiceManager::UninstallAllService()
 {
     WIFI_LOGD("WifiServiceManager::UninstallAllService");
-    std::unique_lock<std::mutex> lock(mMutex);
-    for (auto iter = mServiceHandleMap.begin(); iter != mServiceHandleMap.end(); ++iter) {
-        ServiceHandle &tmp = iter->second;
-        tmp.destroy(tmp.bs);
-        dlclose(tmp.handle);
-    }
-    mServiceHandleMap.clear();
+    UnloadStaService(false);
+    UnloadScanService(false);
+    UnloadApService(false);
     return;
 }
 } // namespace Wifi

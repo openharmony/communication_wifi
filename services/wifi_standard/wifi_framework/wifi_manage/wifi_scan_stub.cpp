@@ -126,7 +126,7 @@ int WifiScanStub::OnSetScanControlInfo(uint32_t code, MessageParcel &data, Messa
         info.scanIntervalList.push_back(scanIntervalMode);
     }
 
-    int ret = SetScanControlInfo(info);
+    ErrCode ret = SetScanControlInfo(info);
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
 
@@ -136,7 +136,7 @@ int WifiScanStub::OnSetScanControlInfo(uint32_t code, MessageParcel &data, Messa
 int WifiScanStub::OnScan(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
     WIFI_LOGD("run OnScan code %{public}u, datasize %zu", code, data.GetRawDataSize());
-    int ret = Scan();
+    ErrCode ret = Scan();
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
 
@@ -156,7 +156,7 @@ int WifiScanStub::OnScanByParams(uint32_t code, MessageParcel &data, MessageParc
     }
     params.band = data.ReadInt32();
 
-    int ret = AdvanceScan(params);
+    ErrCode ret = AdvanceScan(params);
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
 
@@ -167,7 +167,7 @@ int WifiScanStub::OnIsWifiClosedScan(uint32_t code, MessageParcel &data, Message
 {
     WIFI_LOGD("run OnIsWifiClosedScan code %{public}u, datasize %zu", code, data.GetRawDataSize());
     bool bOpen = false;
-    int ret = IsWifiClosedScan(bOpen);
+    ErrCode ret = IsWifiClosedScan(bOpen);
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
     if (ret == WIFI_OPT_SUCCESS) {
@@ -180,33 +180,34 @@ int WifiScanStub::OnGetScanInfoList(uint32_t code, MessageParcel &data, MessageP
 {
     WIFI_LOGD("run OnGetScanInfoList code %{public}u, datasize %zu", code, data.GetRawDataSize());
     std::vector<WifiScanInfo> result;
-    int ret = GetScanInfoList(result);
+    ErrCode ret = GetScanInfoList(result);
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
+    if (ret != WIFI_OPT_SUCCESS) {
+        return ret;
+    }
 
-    if (ret == WIFI_OPT_SUCCESS) {
-        unsigned int size = result.size();
-        reply.WriteInt32(size);
-        for (unsigned int i = 0; i < size; ++i) {
-            reply.WriteCString(result[i].bssid.c_str());
-            reply.WriteCString(result[i].ssid.c_str());
-            reply.WriteCString(result[i].capabilities.c_str());
-            reply.WriteInt32(result[i].frequency);
-            reply.WriteInt32(result[i].rssi);
-            reply.WriteInt64(result[i].timestamp);
-            reply.WriteInt32(result[i].band);
-            reply.WriteInt32(static_cast<int>(result[i].securityType));
-            reply.WriteInt32(static_cast<int>(result[i].channelWidth));
-            reply.WriteInt32(result[i].centerFrequency0);
-            reply.WriteInt32(result[i].centerFrequency1);
-            reply.WriteInt64(result[i].features);
-            reply.WriteInt32(result[i].infoElems.size());
-            for (unsigned int m = 0; m < result[i].infoElems.size(); ++m) {
-                reply.WriteInt32(result[i].infoElems[m].id);
-                reply.WriteInt32(result[i].infoElems[m].content.size());
-                for (unsigned int n = 0; n < result[i].infoElems[m].content.size(); ++n) {
-                    reply.WriteInt8(result[i].infoElems[m].content[n]);
-                }
+    unsigned int size = result.size();
+    reply.WriteInt32(size);
+    for (unsigned int i = 0; i < size; ++i) {
+        reply.WriteCString(result[i].bssid.c_str());
+        reply.WriteCString(result[i].ssid.c_str());
+        reply.WriteCString(result[i].capabilities.c_str());
+        reply.WriteInt32(result[i].frequency);
+        reply.WriteInt32(result[i].rssi);
+        reply.WriteInt64(result[i].timestamp);
+        reply.WriteInt32(result[i].band);
+        reply.WriteInt32(static_cast<int>(result[i].securityType));
+        reply.WriteInt32(static_cast<int>(result[i].channelWidth));
+        reply.WriteInt32(result[i].centerFrequency0);
+        reply.WriteInt32(result[i].centerFrequency1);
+        reply.WriteInt64(result[i].features);
+        reply.WriteInt32(result[i].infoElems.size());
+        for (unsigned int m = 0; m < result[i].infoElems.size(); ++m) {
+            reply.WriteInt32(result[i].infoElems[m].id);
+            reply.WriteInt32(result[i].infoElems[m].content.size());
+            for (unsigned int n = 0; n < result[i].infoElems[m].content.size(); ++n) {
+                reply.WriteInt8(result[i].infoElems[m].content[n]);
             }
         }
     }
@@ -216,7 +217,7 @@ int WifiScanStub::OnGetScanInfoList(uint32_t code, MessageParcel &data, MessageP
 int WifiScanStub::OnRegisterCallBack(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
     WIFI_LOGD("run %{public}s code %{public}u, datasize %zu", __func__, code, data.GetRawDataSize());
-    int ret = WIFI_OPT_FAILED;
+    ErrCode ret = WIFI_OPT_FAILED;
     do {
         sptr<IRemoteObject> remote = data.ReadRemoteObject();
         if (remote == nullptr) {
@@ -226,7 +227,7 @@ int WifiScanStub::OnRegisterCallBack(uint32_t code, MessageParcel &data, Message
 
         callback_ = iface_cast<IWifiScanCallback>(remote);
         if (callback_ == nullptr) {
-            callback_ = new WifiScanCallbackProxy(remote);
+            callback_ = new (std::nothrow) WifiScanCallbackProxy(remote);
             WIFI_LOGD("create new `WifiScanCallbackProxy`!");
         }
 
@@ -234,7 +235,7 @@ int WifiScanStub::OnRegisterCallBack(uint32_t code, MessageParcel &data, Message
             ret = RegisterCallBack(callback_);
         } else {
             if (deathRecipient_ == nullptr) {
-                deathRecipient_ = new WifiScanDeathRecipient();
+                deathRecipient_ = new (std::nothrow) WifiScanDeathRecipient();
             }
             if ((remote->IsProxyObject()) && (!remote->AddDeathRecipient(deathRecipient_))) {
                 WIFI_LOGD("AddDeathRecipient!");

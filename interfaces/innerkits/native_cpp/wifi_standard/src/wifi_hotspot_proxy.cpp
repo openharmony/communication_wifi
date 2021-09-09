@@ -56,14 +56,13 @@ ErrCode WifiHotspotProxy::IsHotspotActive(bool &bActive)
     int exception = reply.ReadInt32();
     if (exception) {
         return WIFI_OPT_FAILED;
-    } else {
-        int ret = reply.ReadInt32();
-        if (ErrCode(ret) != WIFI_OPT_SUCCESS) {
-            return ErrCode(ret);
-        }
-        bActive = ((reply.ReadInt32() == 1) ? true : false);
-        return WIFI_OPT_SUCCESS;
     }
+    int ret = reply.ReadInt32();
+    if (ErrCode(ret) != WIFI_OPT_SUCCESS) {
+        return ErrCode(ret);
+    }
+    bActive = ((reply.ReadInt32() == 1) ? true : false);
+    return WIFI_OPT_SUCCESS;
 }
 
 ErrCode WifiHotspotProxy::GetHotspotState(int &state)
@@ -85,14 +84,13 @@ ErrCode WifiHotspotProxy::GetHotspotState(int &state)
     int exception = reply.ReadInt32();
     if (exception) {
         return WIFI_OPT_FAILED;
-    } else {
-        int ret = reply.ReadInt32();
-        if (ErrCode(ret) != WIFI_OPT_SUCCESS) {
-            return ErrCode(ret);
-        }
-        state = reply.ReadInt32();
-        return WIFI_OPT_SUCCESS;
     }
+    int ret = reply.ReadInt32();
+    if (ErrCode(ret) != WIFI_OPT_SUCCESS) {
+        return ErrCode(ret);
+    }
+    state = reply.ReadInt32();
+    return WIFI_OPT_SUCCESS;
 }
 
 ErrCode WifiHotspotProxy::GetHotspotConfig(HotspotConfig &result)
@@ -114,21 +112,20 @@ ErrCode WifiHotspotProxy::GetHotspotConfig(HotspotConfig &result)
     int exception = reply.ReadInt32();
     if (exception) {
         return WIFI_OPT_FAILED;
-    } else {
-        int ret = reply.ReadInt32();
-        if (ErrCode(ret) != WIFI_OPT_SUCCESS) {
-            return ErrCode(ret);
-        }
-
-        result.SetSsid(reply.ReadCString());
-        result.SetSecurityType(static_cast<KeyMgmt>(reply.ReadInt32()));
-        result.SetBand(static_cast<BandType>(reply.ReadInt32()));
-        result.SetChannel(reply.ReadInt32());
-        result.SetPreSharedKey(reply.ReadCString());
-        result.SetMaxConn(reply.ReadInt32());
-
-        return WIFI_OPT_SUCCESS;
     }
+    int ret = reply.ReadInt32();
+    if (ErrCode(ret) != WIFI_OPT_SUCCESS) {
+        return ErrCode(ret);
+    }
+
+    result.SetSsid(reply.ReadCString());
+    result.SetSecurityType(static_cast<KeyMgmt>(reply.ReadInt32()));
+    result.SetBand(static_cast<BandType>(reply.ReadInt32()));
+    result.SetChannel(reply.ReadInt32());
+    result.SetPreSharedKey(reply.ReadCString());
+    result.SetMaxConn(reply.ReadInt32());
+
+    return WIFI_OPT_SUCCESS;
 }
 
 ErrCode WifiHotspotProxy::SetHotspotConfig(const HotspotConfig &config)
@@ -156,38 +153,8 @@ ErrCode WifiHotspotProxy::SetHotspotConfig(const HotspotConfig &config)
     int exception = reply.ReadInt32();
     if (exception) {
         return WIFI_OPT_FAILED;
-    } else {
-        return ErrCode(reply.ReadInt32());
     }
-}
-
-ErrCode WifiHotspotProxy::GetDeviceMacAddress(std::string &result)
-{
-    if (mRemoteDied) {
-        WIFI_LOGD("failed to `%{public}s`,remote service is died!", __func__);
-        return WIFI_OPT_FAILED;
-    }
-    MessageOption option;
-    MessageParcel data;
-    MessageParcel reply;
-    data.WriteInt32(0);
-    int error = Remote()->SendRequest(WIFI_SVR_CMD_GET_DERVICE_MAC_ADD, data, reply, option);
-    if (error != ERR_NONE) {
-        WIFI_LOGE("Set Attr(%{public}d) failed", WIFI_SVR_CMD_GET_DERVICE_MAC_ADD);
-        return WIFI_OPT_FAILED;
-    }
-
-    int exception = reply.ReadInt32();
-    if (exception) {
-        return WIFI_OPT_FAILED;
-    } else {
-        int ret = reply.ReadInt32();
-        if (ErrCode(ret) != WIFI_OPT_SUCCESS) {
-            return ErrCode(ret);
-        }
-        result = reply.ReadCString();
-        return WIFI_OPT_SUCCESS;
-    }
+    return ErrCode(reply.ReadInt32());
 }
 
 ErrCode WifiHotspotProxy::GetStationList(std::vector<StationInfo> &result)
@@ -209,22 +176,21 @@ ErrCode WifiHotspotProxy::GetStationList(std::vector<StationInfo> &result)
     int exception = reply.ReadInt32();
     if (exception) {
         return WIFI_OPT_FAILED;
-    } else {
-        int ret = reply.ReadInt32();
-        if (ErrCode(ret) != WIFI_OPT_SUCCESS) {
-            return ErrCode(ret);
-        }
-        int size = reply.ReadInt32();
-        for (int i = 0; i < size; i++) {
-            StationInfo info;
-            info.deviceName = reply.ReadCString();
-            info.bssid = reply.ReadCString();
-            info.ipAddr = reply.ReadCString();
-            result.emplace_back(info);
-        }
-
-        return WIFI_OPT_SUCCESS;
     }
+    int ret = reply.ReadInt32();
+    if (ErrCode(ret) != WIFI_OPT_SUCCESS) {
+        return ErrCode(ret);
+    }
+    int size = reply.ReadInt32();
+    for (int i = 0; i < size; i++) {
+        StationInfo info;
+        info.deviceName = reply.ReadCString();
+        info.bssid = reply.ReadCString();
+        info.ipAddr = reply.ReadCString();
+        result.emplace_back(info);
+    }
+
+    return WIFI_OPT_SUCCESS;
 }
 
 ErrCode WifiHotspotProxy::DisassociateSta(const StationInfo &info)
@@ -249,9 +215,8 @@ ErrCode WifiHotspotProxy::DisassociateSta(const StationInfo &info)
     int exception = reply.ReadInt32();
     if (exception) {
         return ErrCode(exception);
-    } else {
-        return ErrCode(reply.ReadInt32());
     }
+    return ErrCode(reply.ReadInt32());
 }
 
 ErrCode WifiHotspotProxy::EnableHotspot(void)
@@ -269,9 +234,8 @@ ErrCode WifiHotspotProxy::EnableHotspot(void)
     int exception = reply.ReadInt32();
     if (exception) {
         return WIFI_OPT_FAILED;
-    } else {
-        return ErrCode(reply.ReadInt32());
     }
+    return ErrCode(reply.ReadInt32());
 }
 
 ErrCode WifiHotspotProxy::DisableHotspot(void)
@@ -293,9 +257,8 @@ ErrCode WifiHotspotProxy::DisableHotspot(void)
     int exception = reply.ReadInt32();
     if (exception) {
         return WIFI_OPT_FAILED;
-    } else {
-        return ErrCode(reply.ReadInt32());
     }
+    return ErrCode(reply.ReadInt32());
 }
 
 ErrCode WifiHotspotProxy::GetBlockLists(std::vector<StationInfo> &infos)
@@ -355,9 +318,8 @@ ErrCode WifiHotspotProxy::AddBlockList(const StationInfo &info)
     int exception = reply.ReadInt32();
     if (exception) {
         return WIFI_OPT_FAILED;
-    } else {
-        return ErrCode(reply.ReadInt32());
     }
+    return ErrCode(reply.ReadInt32());
 }
 
 ErrCode WifiHotspotProxy::DelBlockList(const StationInfo &info)
@@ -382,9 +344,8 @@ ErrCode WifiHotspotProxy::DelBlockList(const StationInfo &info)
     int exception = reply.ReadInt32();
     if (exception) {
         return WIFI_OPT_FAILED;
-    } else {
-        return ErrCode(reply.ReadInt32());
     }
+    return ErrCode(reply.ReadInt32());
 }
 
 ErrCode WifiHotspotProxy::GetValidBands(std::vector<BandType> &bands)
@@ -476,11 +437,7 @@ ErrCode WifiHotspotProxy::RegisterCallBack(const sptr<IWifiHotspotCallback> &cal
         return WIFI_OPT_FAILED;
     }
     int ret = reply.ReadInt32();
-    if (ret != WIFI_OPT_SUCCESS) {
-        return ErrCode(ret);
-    }
-
-    return WIFI_OPT_SUCCESS;
+    return ErrCode(ret);
 }
 
 ErrCode WifiHotspotProxy::GetSupportedFeatures(long &features)

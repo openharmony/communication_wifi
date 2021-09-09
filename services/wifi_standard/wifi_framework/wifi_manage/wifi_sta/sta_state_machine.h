@@ -30,6 +30,7 @@
 #include "sta_network_check.h"
 #include "dhcp_service.h"
 #include "i_dhcp_result_notify.h"
+#include "sta_service_callback.h"
 #include "sta_define.h"
 
 namespace OHOS {
@@ -49,6 +50,8 @@ static const int STA_NETWORK_SPEED_DELAY = 1 * 1000;
 static const int CMD_NETWORK_CONNECT_TIMEOUT = 0X08;
 static const int STA_NETWORK_CONNECTTING_DELAY = 60 * 1000;
 static const int PIN_CODE_LEN = 8; /* pincode length */
+
+static const int DHCP_TIME = 15;
 
 /*
  * During the WPS PIN connection, the WPA_SUPPLICANT blocklist is cleared every 10 seconds
@@ -304,18 +307,6 @@ public:
      */
     ErrCode InitStaStateMachine();
     /**
-     * @Description  Sets response queue with input queue
-     *
-     * @param pMsgQueueUp - response message information queue(in)
-     */
-    void SetResponseQueue(WifiMessageQueue<WifiResponseMsgInfo> *pMsgQueueUp);
-    /**
-     * @Description  Notify operating result to InterfaceService.
-     *
-     * @param msgCode - operating results code.(in)
-     */
-    void NotifyResult(int msgCode, int stateCode = 0);
-    /**
      * @Description  Start roaming connection.
      *
      * @param bssid - the mac address of network(in)
@@ -328,17 +319,26 @@ public:
      * @param bssid - bssid - the mac address of wifi(in)
      */
     void OnNetworkConnectionEvent(int networkId, std::string bssid);
+
+    /**
+     * @Description Register sta callback function
+     *
+     * @param callbacks - Callback function pointer storage structure
+     */
+    void RegisterStaServiceCallback(const StaServiceCallback &callbacks);
     /**
      * @Description  Synchronize the linked information
      *
      * @param scanInfos - the results obtaining by scanning(in)
      */
-    void SyncLinkInfo(const std::vector<WifiScanInfo> &scanInfos);
+    void SyncLinkInfo(const std::vector<InterScanInfo> &scanInfos);
     /**
-     * @Description  Set country code
+     * @Description  Convert the deviceConfig structure and set it to wpa_supplicant
      *
+     * @param config -The Network info(in)
+     * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
      */
-    void SetCountryCode();
+    ErrCode ConvertDeviceCfg(const WifiDeviceConfig &config) const;
 
 private:
     /**
@@ -593,6 +593,7 @@ private:
 
 private:
     StaSmHandleFuncMap staSmHandleFuncMap;
+    StaServiceCallback staCallback;
 
     int statusId;
     int lastNetworkId;
@@ -608,13 +609,13 @@ private:
     IsWpsConnected isWpsConnect;
     int getIpSucNum;
     int getIpFailNum;
+    bool isRoam;
     WifiLinkedInfo linkedInfo;
     WifiLinkedInfo lastLinkedInfo;
     IDhcpService *pDhcpService;
     DhcpResultNotify *pDhcpResultNotify;
     StaNetWorkSpeed *pNetSpeed;
     StaNetworkCheck *pNetcheck;
-    WifiMessageQueue<WifiResponseMsgInfo> *msgQueueUp; /* Uplink message queue. */
 
     RootState *pRootState;
     InitState *pInitState;

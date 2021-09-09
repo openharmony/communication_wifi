@@ -1,4 +1,18 @@
 /*
+ * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+/*
  * Copyright (C) 2021 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,7 +49,6 @@ namespace Wifi {
 #define WIFI_SVR_CMD_STA_STARTWPS 0x200C
 #define WIFI_SVR_CMD_STA_CANCELWPS 0x200D
 #define WIFI_SVR_COM_STA_START_ROAM 0x200E
-#define WIFI_SVR_COM_STA_SET_COUNTRY_CODE 0x200F
 
 #define WIFI_SVR_CMD_STA_ERROR 0x3001
 #define WIFI_SVR_CMD_STA_SUP_CONNECTION_EVENT 0x3002

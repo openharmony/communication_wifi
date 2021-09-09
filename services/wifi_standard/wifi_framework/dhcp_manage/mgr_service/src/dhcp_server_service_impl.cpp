@@ -30,7 +30,7 @@ pid_t DhcpServerServiceImpl::mPidDhcpServer = 0;
 
 DhcpServerServiceImpl::DhcpServerServiceImpl()
 {
-    WIFI_LOGI("DhcpServerServiceImpl::DhcpServerServiceImpl()...\n");
+    WIFI_LOGI("DhcpServerServiceImpl::DhcpServerServiceImpl()...");
     m_setInterfaces.clear();
     m_mapTagDhcpRange.clear();
     m_mapInfDhcpRange.clear();
@@ -43,13 +43,13 @@ DhcpServerServiceImpl::DhcpServerServiceImpl()
 
 DhcpServerServiceImpl::~DhcpServerServiceImpl()
 {
-    WIFI_LOGI("DhcpServerServiceImpl::~DhcpServerServiceImpl()...\n");
+    WIFI_LOGI("DhcpServerServiceImpl::~DhcpServerServiceImpl()...");
     auto iterInterfaces = m_setInterfaces.begin();
     while (iterInterfaces != m_setInterfaces.end()) {
         if (StopDhcpServer(*iterInterfaces) != DHCP_OPT_SUCCESS) {
-            WIFI_LOGE("~StartDhcpServer() StopDhcpServer ifname:%{public}s failed!\n", (*iterInterfaces).c_str());
+            WIFI_LOGE("~StartDhcpServer() StopDhcpServer ifname:%{public}s failed!", (*iterInterfaces).c_str());
         } else {
-            WIFI_LOGW("~StartDhcpServer() StopDhcpServer ifname:%{public}s success.\n", (*iterInterfaces).c_str());
+            WIFI_LOGW("~StartDhcpServer() StopDhcpServer ifname:%{public}s success.", (*iterInterfaces).c_str());
         }
         m_setInterfaces.erase(iterInterfaces++);
     }
@@ -60,21 +60,21 @@ DhcpServerServiceImpl::~DhcpServerServiceImpl()
 int DhcpServerServiceImpl::StartDhcpServer(const std::string &ifname)
 {
     if (ifname.empty()) {
-        WIFI_LOGE("DhcpServerServiceImpl::StartDhcpServer() error, ifname is empty!\n");
+        WIFI_LOGE("DhcpServerServiceImpl::StartDhcpServer() error, ifname is empty!");
         return DHCP_OPT_FAILED;
     }
 
-    WIFI_LOGI("enter DhcpServerServiceImpl::StartDhcpServer()...ifname:%{public}s.\n", ifname.c_str());
+    WIFI_LOGI("enter DhcpServerServiceImpl::StartDhcpServer()...ifname:%{public}s.", ifname.c_str());
 
     /* check and update interface config file */
     if (CheckAndUpdateConf(ifname) != DHCP_OPT_SUCCESS) {
-        WIFI_LOGE("StartDhcpServer() CheckAndUpdateConf failed, ifname:%{public}s.\n", ifname.c_str());
+        WIFI_LOGE("StartDhcpServer() CheckAndUpdateConf failed, ifname:%{public}s.", ifname.c_str());
         return DHCP_OPT_FAILED;
     }
 
     /* Add the specified interface. */
     if (AddSpecifiedInterface(ifname) != DHCP_OPT_SUCCESS) {
-        WIFI_LOGE("StartDhcpServer() AddSpecifiedInterface failed, ifname:%{public}s.\n", ifname.c_str());
+        WIFI_LOGE("StartDhcpServer() AddSpecifiedInterface failed, ifname:%{public}s.", ifname.c_str());
         return DHCP_OPT_FAILED;
     }
 
@@ -91,7 +91,7 @@ int DhcpServerServiceImpl::StartDhcpServer(const std::string &ifname)
     /* start dhcp server process */
     pid_t pid_server;
     if ((pid_server = vfork()) < 0) {
-        WIFI_LOGE("StartDhcpServer() vfork() failed, pid_server:%{public}d!\n", pid_server);
+        WIFI_LOGE("StartDhcpServer() vfork() failed, pid_server:%{public}d!", pid_server);
         return DHCP_OPT_FAILED;
     }
     if (pid_server == 0) {
@@ -111,11 +111,11 @@ int DhcpServerServiceImpl::StartDhcpServer(const std::string &ifname)
 int DhcpServerServiceImpl::StopDhcpServer(const std::string &ifname)
 {
     if (ifname.empty()) {
-        WIFI_LOGE("StopDhcpServer() error, ifname is empty!\n");
+        WIFI_LOGE("StopDhcpServer() error, ifname is empty!");
         return DHCP_OPT_FAILED;
     }
     if (mPidDhcpServer == 0) {
-        WIFI_LOGI("StopDhcpServer() %{public}s, %{public}s already stop.\n", ifname.c_str(), DHCP_SERVER_FILE.c_str());
+        WIFI_LOGI("StopDhcpServer() %{public}s, %{public}s already stop.", ifname.c_str(), DHCP_SERVER_FILE.c_str());
         return DHCP_OPT_SUCCESS;
     }
     bool bStopDhcpServer = false;
@@ -127,12 +127,12 @@ int DhcpServerServiceImpl::StopDhcpServer(const std::string &ifname)
         if (iterRangeMap != m_mapInfDhcpRange.end()) {
             std::string strInfFile = DHCP_SERVER_CONFIG_DIR + ifname + ".conf";
             if (DeleteInfConf(strInfFile) != DHCP_OPT_SUCCESS) {
-                WIFI_LOGE("StopDhcpServer() DeleteInfConf failed, ifname:%{public}s.\n", ifname.c_str());
+                WIFI_LOGE("StopDhcpServer() DeleteInfConf failed, ifname:%{public}s.", ifname.c_str());
                 return DHCP_OPT_FAILED;
             }
 
             if (m_mapInfDhcpRange.size() == 1) {
-                WIFI_LOGI("StopDhcpServer() ifname:%{public}s, only the if service, now StopServer.\n", ifname.c_str());
+                WIFI_LOGI("StopDhcpServer() ifname:%{public}s, only the if service, now StopServer.", ifname.c_str());
                 bStopDhcpServer = true;
             } else {
                 bReloadServerCfg = true;
@@ -151,7 +151,7 @@ int DhcpServerServiceImpl::StopDhcpServer(const std::string &ifname)
     } else {
         /* reload dhcp server config */
         if (bReloadServerCfg && (ReConf() != DHCP_OPT_SUCCESS)) {
-            WIFI_LOGE("StopDhcpServer() ReConf failed, ifname:%{public}s.\n", ifname.c_str());
+            WIFI_LOGE("StopDhcpServer() ReConf failed, ifname:%{public}s.", ifname.c_str());
             return DHCP_OPT_FAILED;
         }
     }
@@ -166,22 +166,22 @@ int DhcpServerServiceImpl::StopDhcpServer(const std::string &ifname)
 int DhcpServerServiceImpl::GetServerStatus()
 {
     if (mPidDhcpServer == 0) {
-        WIFI_LOGI("GetServerStatus() pro:%{public}s not start.\n", DHCP_SERVER_FILE.c_str());
+        WIFI_LOGI("GetServerStatus() pro:%{public}s not start.", DHCP_SERVER_FILE.c_str());
         return 0;
     }
-    WIFI_LOGI("GetServerStatus() pro:%{public}s normal started.\n", DHCP_SERVER_FILE.c_str());
+    WIFI_LOGI("GetServerStatus() pro:%{public}s normal started.", DHCP_SERVER_FILE.c_str());
     return 1;
 }
 
 int DhcpServerServiceImpl::PutDhcpRange(const std::string &tagName, const DhcpRange &range)
 {
     if (tagName.empty()) {
-        WIFI_LOGE("DhcpServerServiceImpl::PutDhcpRange() error, tagName is empty!\n");
+        WIFI_LOGE("DhcpServerServiceImpl::PutDhcpRange() error, tagName is empty!");
         return DHCP_OPT_FAILED;
     }
     if ((range.iptype == -1) || range.strStartip.empty() || range.strEndip.empty()) {
         WIFI_LOGE("PutDhcpRange() tagName:%{public}s failed, range.iptype:%{public}d or strStartip:%{private}s or "
-                  "strEndip:%{private}s error!\n",
+                  "strEndip:%{private}s error!",
             tagName.c_str(),
             range.iptype,
             range.strStartip.c_str(),
@@ -189,11 +189,11 @@ int DhcpServerServiceImpl::PutDhcpRange(const std::string &tagName, const DhcpRa
         return DHCP_OPT_FAILED;
     }
 
-    WIFI_LOGI("enter PutDhcpRange() tagName:%{public}s.\n", tagName.c_str());
+    WIFI_LOGI("enter PutDhcpRange() tagName:%{public}s.", tagName.c_str());
 
     /* check invalid and already exist in dhcp range */
     if (!CheckIpAddrRange(range)) {
-        WIFI_LOGE("PutDhcpRange() CheckIpAddrRange failed, tagName:%{public}s!\n", tagName.c_str());
+        WIFI_LOGE("PutDhcpRange() CheckIpAddrRange failed, tagName:%{public}s!", tagName.c_str());
         return DHCP_OPT_FAILED;
     }
 
@@ -204,7 +204,7 @@ int DhcpServerServiceImpl::PutDhcpRange(const std::string &tagName, const DhcpRa
             if ((iterRange.iptype == range.iptype) && (iterRange.strStartip == range.strStartip) &&
                 (iterRange.strEndip == range.strEndip)) {
                 WIFI_LOGE("PutDhcpRange() tagName:%{public}s failed, "
-                          "range.iptype:%{public}d,strStartip:%{private}s,strEndip:%{private}s already exist!\n",
+                          "range.iptype:%{public}d,strStartip:%{private}s,strEndip:%{private}s already exist!",
                     tagName.c_str(),
                     range.iptype,
                     range.strStartip.c_str(),
@@ -213,12 +213,12 @@ int DhcpServerServiceImpl::PutDhcpRange(const std::string &tagName, const DhcpRa
             }
         }
         iterRangeMap->second.push_back(range);
-        WIFI_LOGI("PutDhcpRange() m_mapTagDhcpRange find tagName:%{public}s, need push_back.\n", tagName.c_str());
+        WIFI_LOGI("PutDhcpRange() m_mapTagDhcpRange find tagName:%{public}s, need push_back.", tagName.c_str());
     } else {
         std::list<DhcpRange> listDhcpRange;
         listDhcpRange.push_back(range);
         m_mapTagDhcpRange.emplace(std::make_pair(tagName, listDhcpRange));
-        WIFI_LOGI("PutDhcpRange() m_mapTagDhcpRange no find tagName:%{public}s, need emplace.\n", tagName.c_str());
+        WIFI_LOGI("PutDhcpRange() m_mapTagDhcpRange no find tagName:%{public}s, need emplace.", tagName.c_str());
     }
 
     return DHCP_OPT_SUCCESS;
@@ -227,12 +227,12 @@ int DhcpServerServiceImpl::PutDhcpRange(const std::string &tagName, const DhcpRa
 int DhcpServerServiceImpl::RemoveDhcpRange(const std::string &tagName, const DhcpRange &range)
 {
     if (tagName.empty()) {
-        WIFI_LOGE("DhcpServerServiceImpl::RemoveDhcpRange() error, tagName is empty!\n");
+        WIFI_LOGE("DhcpServerServiceImpl::RemoveDhcpRange() error, tagName is empty!");
         return DHCP_OPT_FAILED;
     }
     if ((range.iptype == -1) || range.strStartip.empty() || range.strEndip.empty()) {
         WIFI_LOGE("RemoveDhcpRange() tagName:%{public}s failed, range.iptype:%{public}d or strStartip:%{private}s or "
-                  "strEndip:%{private}s error!\n",
+                  "strEndip:%{private}s error!",
             tagName.c_str(),
             range.iptype,
             range.strStartip.c_str(),
@@ -249,7 +249,7 @@ int DhcpServerServiceImpl::RemoveDhcpRange(const std::string &tagName, const Dhc
                 (iterRange->strEndip == range.strEndip)) {
                 m_mapTagDhcpRange[tagName].erase(iterRange++);
                 WIFI_LOGI("RemoveDhcpRange() find tagName:%{public}s, "
-                          "range.iptype:%{public}d,strStartip:%{private}s,strEndip:%{private}s, erase.\n",
+                          "range.iptype:%{public}d,strStartip:%{private}s,strEndip:%{private}s, erase.",
                     tagName.c_str(),
                     range.iptype,
                     range.strStartip.c_str(),
@@ -258,9 +258,9 @@ int DhcpServerServiceImpl::RemoveDhcpRange(const std::string &tagName, const Dhc
             }
             iterRange++;
         }
-        WIFI_LOGE("RemoveDhcpRange() find tagName:%{public}s, second no find range, erase failed!\n", tagName.c_str());
+        WIFI_LOGE("RemoveDhcpRange() find tagName:%{public}s, second no find range, erase failed!", tagName.c_str());
     } else {
-        WIFI_LOGE("RemoveDhcpRange no find tagName:%{public}s, erase failed!\n", tagName.c_str());
+        WIFI_LOGE("RemoveDhcpRange no find tagName:%{public}s, erase failed!", tagName.c_str());
     }
 
     return DHCP_OPT_FAILED;
@@ -269,7 +269,7 @@ int DhcpServerServiceImpl::RemoveDhcpRange(const std::string &tagName, const Dhc
 int DhcpServerServiceImpl::RemoveAllDhcpRange(const std::string &tagName)
 {
     if (tagName.empty()) {
-        WIFI_LOGE("DhcpServerServiceImpl::RemoveAllDhcpRange() error, tagName is empty!\n");
+        WIFI_LOGE("DhcpServerServiceImpl::RemoveAllDhcpRange() error, tagName is empty!");
         return DHCP_OPT_FAILED;
     }
 
@@ -277,9 +277,9 @@ int DhcpServerServiceImpl::RemoveAllDhcpRange(const std::string &tagName)
     auto iterRangeMap = m_mapTagDhcpRange.find(tagName);
     if (iterRangeMap != m_mapTagDhcpRange.end()) {
         m_mapTagDhcpRange.erase(iterRangeMap);
-        WIFI_LOGI("RemoveAllDhcpRange() find tagName:%{public}s, erase success.\n", tagName.c_str());
+        WIFI_LOGI("RemoveAllDhcpRange() find tagName:%{public}s, erase success.", tagName.c_str());
     } else {
-        WIFI_LOGI("RemoveAllDhcpRange() no find tagName:%{public}s, not need erase!\n", tagName.c_str());
+        WIFI_LOGI("RemoveAllDhcpRange() no find tagName:%{public}s, not need erase!", tagName.c_str());
     }
 
     return DHCP_OPT_SUCCESS;
@@ -288,12 +288,12 @@ int DhcpServerServiceImpl::RemoveAllDhcpRange(const std::string &tagName)
 int DhcpServerServiceImpl::SetDhcpRange(const std::string &ifname, const DhcpRange &range)
 {
     if (ifname.empty()) {
-        WIFI_LOGE("DhcpServerServiceImpl::SetDhcpRange() error, ifname is empty!\n");
+        WIFI_LOGE("DhcpServerServiceImpl::SetDhcpRange() error, ifname is empty!");
         return DHCP_OPT_FAILED;
     }
     if ((range.iptype == -1) || range.strStartip.empty() || range.strEndip.empty()) {
         WIFI_LOGE("SetDhcpRange() ifname:%{public}s failed, range.iptype:%{public}d or strStartip:%{private}s or "
-                  "strEndip:%{private}s error!\n",
+                  "strEndip:%{private}s error!",
             ifname.c_str(), range.iptype, range.strStartip.c_str(), range.strEndip.c_str());
         return DHCP_OPT_FAILED;
     }
@@ -301,13 +301,13 @@ int DhcpServerServiceImpl::SetDhcpRange(const std::string &ifname, const DhcpRan
     /* check dhcp server service status */
     int nStatus = GetServerStatus();
     if (nStatus != 1) {
-        WIFI_LOGE("SetDhcpRange() ifname:%{public}s failed, dhcp status:%{public}d error!\n", ifname.c_str(), nStatus);
+        WIFI_LOGE("SetDhcpRange() ifname:%{public}s failed, dhcp status:%{public}d error!", ifname.c_str(), nStatus);
         return DHCP_OPT_FAILED;
     }
 
     /* put dhcp range */
     if (PutDhcpRange(ifname, range) != DHCP_OPT_SUCCESS) {
-        WIFI_LOGE("SetDhcpRange() PutDhcpRange failed, ifname:%{public}s.\n", ifname.c_str());
+        WIFI_LOGE("SetDhcpRange() PutDhcpRange failed, ifname:%{public}s.", ifname.c_str());
         return DHCP_OPT_FAILED;
     }
 
@@ -318,23 +318,23 @@ int DhcpServerServiceImpl::SetDhcpRange(const std::string &ifname, const DhcpRan
             if ((iterRange.iptype == range.iptype) && (iterRange.strStartip == range.strStartip) &&
                 (iterRange.strEndip == range.strEndip)) {
                 WIFI_LOGE("SetDhcpRange() ifname:%{public}s failed, "
-                          "range.iptype:%{public}d,strStartip:%{private}s,strEndip:%{private}s already exist!\n",
+                          "range.iptype:%{public}d,strStartip:%{private}s,strEndip:%{private}s already exist!",
                     ifname.c_str(), range.iptype, range.strStartip.c_str(), range.strEndip.c_str());
                 return DHCP_OPT_FAILED;
             }
         }
         iterRangeMap->second.push_back(range);
-        WIFI_LOGI("SetDhcpRange() m_mapInfDhcpRange find ifname:%{public}s, second need push_back.\n", ifname.c_str());
+        WIFI_LOGI("SetDhcpRange() m_mapInfDhcpRange find ifname:%{public}s, second need push_back.", ifname.c_str());
     } else {
         std::list<DhcpRange> listDhcpRange;
         listDhcpRange.push_back(range);
         m_mapInfDhcpRange.emplace(std::make_pair(ifname, listDhcpRange));
-        WIFI_LOGI("SetDhcpRange() m_mapInfDhcpRange no find ifname:%{public}s, need emplace.\n", ifname.c_str());
+        WIFI_LOGI("SetDhcpRange() m_mapInfDhcpRange no find ifname:%{public}s, need emplace.", ifname.c_str());
     }
 
     /* update or reload interface config file */
     if (CheckAndUpdateConf(ifname) != DHCP_OPT_SUCCESS) {
-        WIFI_LOGE("SetDhcpRange() CheckAndUpdateConf failed, ifname:%{public}s.\n", ifname.c_str());
+        WIFI_LOGE("SetDhcpRange() CheckAndUpdateConf failed, ifname:%{public}s.", ifname.c_str());
         return DHCP_OPT_FAILED;
     }
 
@@ -345,23 +345,23 @@ int DhcpServerServiceImpl::SetDhcpRange(const std::string &ifname, const DhcpRan
 int DhcpServerServiceImpl::SetDhcpRange(const std::string &ifname, const std::string &tagName)
 {
     if (ifname.empty() || tagName.empty()) {
-        WIFI_LOGE("SetDhcpRange() failed, ifname or tagName is empty!\n");
+        WIFI_LOGE("SetDhcpRange() failed, ifname or tagName is empty!");
         return DHCP_OPT_FAILED;
     }
     auto iterTag = m_mapTagDhcpRange.find(tagName);
     if (iterTag == m_mapTagDhcpRange.end()) {
-        WIFI_LOGE("SetDhcpRange() failed, m_mapTagDhcpRange no find tagName:%{public}s.\n", tagName.c_str());
+        WIFI_LOGE("SetDhcpRange() failed, m_mapTagDhcpRange no find tagName:%{public}s.", tagName.c_str());
         return DHCP_OPT_FAILED;
     }
     if ((iterTag->second).empty()) {
-        WIFI_LOGE("SetDhcpRange() failed, m_mapTagDhcpRange second is empty, tagName:%{public}s.\n", tagName.c_str());
+        WIFI_LOGE("SetDhcpRange() failed, m_mapTagDhcpRange second is empty, tagName:%{public}s.", tagName.c_str());
         return DHCP_OPT_FAILED;
     }
 
     /* check dhcp server service status */
     int nStatus = GetServerStatus();
     if (nStatus != 1) {
-        WIFI_LOGE("SetDhcpRange() ifname:%{public}s,tagName:%{public}s failed,dhcp status:%{public}d!\n",
+        WIFI_LOGE("SetDhcpRange() ifname:%{public}s,tagName:%{public}s failed,dhcp status:%{public}d!",
             ifname.c_str(), tagName.c_str(), nStatus);
         return DHCP_OPT_FAILED;
     }
@@ -371,25 +371,25 @@ int DhcpServerServiceImpl::SetDhcpRange(const std::string &ifname, const std::st
     if (iterRangeMap != m_mapInfDhcpRange.end()) {
         /* check dhcp range is already exist */
         if (CheckTagDhcpRange(iterTag->second, iterRangeMap->second)) {
-            WIFI_LOGE("SetDhcpRange() ifname:%{public}s,tagName:%{public}s failed, dhcp range is same!\n",
+            WIFI_LOGE("SetDhcpRange() ifname:%{public}s,tagName:%{public}s failed, dhcp range is same!",
                 ifname.c_str(), tagName.c_str());
             return DHCP_OPT_FAILED;
         }
 
         for (auto iterTagValue : iterTag->second) {
             iterRangeMap->second.push_back(iterTagValue);
-            WIFI_LOGI("SetDhcpRange() find ifname:%{public}s, second need push tagName:%{public}s.\n",
+            WIFI_LOGI("SetDhcpRange() find ifname:%{public}s, second need push tagName:%{public}s.",
                 ifname.c_str(), tagName.c_str());
         }
     } else {
         m_mapInfDhcpRange.emplace(std::make_pair(ifname, iterTag->second));
-        WIFI_LOGI("SetDhcpRange() no find ifname:%{public}s,tagName:%{public}s, need emplace.\n",
+        WIFI_LOGI("SetDhcpRange() no find ifname:%{public}s,tagName:%{public}s, need emplace.",
             ifname.c_str(), tagName.c_str());
     }
 
     /* update or reload interface config file */
     if (CheckAndUpdateConf(ifname) != DHCP_OPT_SUCCESS) {
-        WIFI_LOGE("SetDhcpRange() CheckAndUpdateConf failed, ifname:%{public}s,tagName:%{public}s!\n",
+        WIFI_LOGE("SetDhcpRange() CheckAndUpdateConf failed, ifname:%{public}s,tagName:%{public}s!",
             ifname.c_str(), tagName.c_str());
         return DHCP_OPT_FAILED;
     }
@@ -401,7 +401,7 @@ int DhcpServerServiceImpl::SetDhcpRange(const std::string &ifname, const std::st
 int DhcpServerServiceImpl::GetLeases(std::vector<std::string> &leases)
 {
     if (!DhcpFunc::IsExistFile(DHCP_SERVER_LEASES_FILE)) {
-        WIFI_LOGE("GetLeases() failed, dhcp leasefile:%{public}s no exist!\n", DHCP_SERVER_LEASES_FILE.c_str());
+        WIFI_LOGE("GetLeases() failed, dhcp leasefile:%{public}s no exist!", DHCP_SERVER_LEASES_FILE.c_str());
         return DHCP_OPT_FAILED;
     }
 
@@ -417,37 +417,37 @@ int DhcpServerServiceImpl::GetLeases(std::vector<std::string> &leases)
     }
     inFile.close();
 
-    WIFI_LOGI("GetLeases() leases.size:%{public}d.\n", (int)leases.size());
+    WIFI_LOGI("GetLeases() leases.size:%{public}d.", (int)leases.size());
     return DHCP_OPT_SUCCESS;
 }
 
 int DhcpServerServiceImpl::GetDhcpSerProExit(const std::string &ifname, IDhcpResultNotify *pResultNotify)
 {
     if (ifname.empty()) {
-        WIFI_LOGE("DhcpServerServiceImpl::GetDhcpSerProExit() error, ifname is empty!\n");
+        WIFI_LOGE("DhcpServerServiceImpl::GetDhcpSerProExit() error, ifname is empty!");
         return DHCP_OPT_FAILED;
     }
 
     if (pResultNotify == nullptr) {
-        WIFI_LOGE("DhcpServerServiceImpl::GetDhcpSerProExit() error, pResultNotify = nullptr!\n");
+        WIFI_LOGE("DhcpServerServiceImpl::GetDhcpSerProExit() error, pResultNotify = nullptr!");
         return DHCP_OPT_FAILED;
     }
 
     auto iterExitNotify = m_mapDhcpSerExitNotify.find(ifname);
     if (iterExitNotify == m_mapDhcpSerExitNotify.end()) {
-        WIFI_LOGI("GetDhcpSerProExit() SerExitNotify no find ifname:%{public}s, need emplace.\n", ifname.c_str());
+        WIFI_LOGI("GetDhcpSerProExit() SerExitNotify no find ifname:%{public}s, need emplace.", ifname.c_str());
         m_mapDhcpSerExitNotify.emplace(std::make_pair(ifname, pResultNotify));
     } else {
-        WIFI_LOGW("GetDhcpSerProExit() SerExitNotify find ifname:%{public}s, not need emplace!\n", ifname.c_str());
+        WIFI_LOGW("GetDhcpSerProExit() SerExitNotify find ifname:%{public}s, not need emplace!", ifname.c_str());
     }
 
     if (pDhcpSerProExitThread == nullptr) {
         pDhcpSerProExitThread = new std::thread(&DhcpServerServiceImpl::RunDhcpSerProExitThreadFunc, this);
         if (pDhcpSerProExitThread == nullptr) {
-            WIFI_LOGE("DhcpServerServiceImpl::GetDhcpSerProExit() init pDhcpSerProExitThread failed!\n");
+            WIFI_LOGE("DhcpServerServiceImpl::GetDhcpSerProExit() init pDhcpSerProExitThread failed!");
             return DHCP_OPT_FAILED;
         }
-        WIFI_LOGI("DhcpServerServiceImpl::GetDhcpSerProExit() init pDhcpSerProExitThread success.\n");
+        WIFI_LOGI("DhcpServerServiceImpl::GetDhcpSerProExit() init pDhcpSerProExitThread success.");
     }
 
     return DHCP_OPT_SUCCESS;
@@ -456,26 +456,26 @@ int DhcpServerServiceImpl::GetDhcpSerProExit(const std::string &ifname, IDhcpRes
 int DhcpServerServiceImpl::ReConf()
 {
     if (mPidDhcpServer == 0) {
-        WIFI_LOGE("ReConf() failed, %{public}s not start, config can not reload!\n", DHCP_SERVER_FILE.c_str());
+        WIFI_LOGE("ReConf() failed, %{public}s not start, config can not reload!", DHCP_SERVER_FILE.c_str());
         return DHCP_OPT_FAILED;
     }
 
-    WIFI_LOGI("enter ReConf(), now restart server:[ %{public}s ], mPidDhcpServer:%{public}d.\n",
+    WIFI_LOGI("enter ReConf(), now restart server:[ %{public}s ], mPidDhcpServer:%{public}d.",
         DHCP_SERVER_FILE.c_str(), mPidDhcpServer);
 
     /* stop dhcp server process */
     if (StopServer(mPidDhcpServer) != DHCP_OPT_SUCCESS) {
-        WIFI_LOGE("ReConf() failed, StopServer mPidDhcpServer:%{public}d error!\n", mPidDhcpServer);
+        WIFI_LOGE("ReConf() failed, StopServer mPidDhcpServer:%{public}d error!", mPidDhcpServer);
         return DHCP_OPT_FAILED;
     }
     mPidDhcpServer = 0;
 
-    sleep(DHCP_NUMBER_ONE);
+    sleep(DHCP_NUM_ONE);
 
     /* restart dhcp server process for load config */
     pid_t pid_server;
     if ((pid_server = vfork()) < 0) {
-        WIFI_LOGE("ReConf() failed, vfork() pid_server:%{public}d error!\n", pid_server);
+        WIFI_LOGE("ReConf() failed, vfork() pid_server:%{public}d error!", pid_server);
         return DHCP_OPT_FAILED;
     }
     if (pid_server == 0) {
@@ -494,7 +494,7 @@ int DhcpServerServiceImpl::ReConf()
 
 int DhcpServerServiceImpl::ForkParentProcess()
 {
-    WIFI_LOGI("enter ForkParentProcess() server:[ %{public}s ], mPidDhcpServer:%{public}d.\n",
+    WIFI_LOGI("enter ForkParentProcess() server:[ %{public}s ], mPidDhcpServer:%{public}d.",
         DHCP_SERVER_FILE.c_str(), mPidDhcpServer);
     RegisterSignal();
     return DHCP_OPT_SUCCESS;
@@ -502,7 +502,7 @@ int DhcpServerServiceImpl::ForkParentProcess()
 
 int DhcpServerServiceImpl::ForkExecProcess(const std::string &ifname)
 {
-    WIFI_LOGI("enter ForkExecProcess() server:[ %{public}s ], ifname:%{public}s.\n",
+    WIFI_LOGI("enter ForkExecProcess() server:[ %{public}s ], ifname:%{public}s.",
         DHCP_SERVER_FILE.c_str(), ifname.c_str());
     const char *args[DHCP_SER_ARGSNUM] = {
         DHCP_SERVER_FILE.c_str(),
@@ -513,10 +513,10 @@ int DhcpServerServiceImpl::ForkExecProcess(const std::string &ifname)
         nullptr
     };
     if (execv(args[0], const_cast<char *const *>(args)) == -1) {
-        WIFI_LOGE("execv start failed,errno:%{public}d,strerror(errno):%{public}s,ifname:%{public}s!\n",
+        WIFI_LOGE("execv start failed,errno:%{public}d,strerror(errno):%{public}s,ifname:%{public}s!",
             errno, strerror(errno), ifname.c_str());
     } else {
-        WIFI_LOGI("execv start success, ifname:%{public}s!\n", ifname.c_str());
+        WIFI_LOGI("execv start success, ifname:%{public}s!", ifname.c_str());
     }
     _exit(-1);
 
@@ -530,33 +530,33 @@ int DhcpServerServiceImpl::StopServer(const pid_t &server_pid)
     if (kill(server_pid, SIGTERM) == -1) {
         if (ESRCH == errno) {
             /* Normal. The subprocess is dead. The SIGCHLD signal triggers the stop hotspot. */
-            WIFI_LOGI("StopServer() kill [%{public}d] success, pro pid no exist, pro:%{public}s.\n",
+            WIFI_LOGI("StopServer() kill [%{public}d] success, pro pid no exist, pro:%{public}s.",
                 server_pid, DHCP_SERVER_FILE.c_str());
             return DHCP_OPT_SUCCESS;
         }
-        WIFI_LOGE("StopServer() kill [%{public}d] failed, strerror(errno):%{public}s!\n", server_pid, strerror(errno));
+        WIFI_LOGE("StopServer() kill [%{public}d] failed, strerror(errno):%{public}s!", server_pid, strerror(errno));
         return DHCP_OPT_FAILED;
     }
     if (waitpid(server_pid, nullptr, 0) == -1) {
-        WIFI_LOGE("StopServer() waitpid [%{public}d] failed, strerror(errno):%{public}s!\n",
+        WIFI_LOGE("StopServer() waitpid [%{public}d] failed, strerror(errno):%{public}s!",
             server_pid, strerror(errno));
         return DHCP_OPT_FAILED;
     }
-    WIFI_LOGI("StopServer() waitpid [%{public}d] success, pro:%{public}s!\n", server_pid, DHCP_SERVER_FILE.c_str());
+    WIFI_LOGI("StopServer() waitpid [%{public}d] success, pro:%{public}s!", server_pid, DHCP_SERVER_FILE.c_str());
     return DHCP_OPT_SUCCESS;
 }
 
 int DhcpServerServiceImpl::CheckAndUpdateConf(const std::string &ifname)
 {
     if (ifname.empty()) {
-        WIFI_LOGE("DhcpServerServiceImpl::CheckAndUpdateConf() error, ifname is empty!\n");
+        WIFI_LOGE("DhcpServerServiceImpl::CheckAndUpdateConf() error, ifname is empty!");
         return DHCP_OPT_FAILED;
     }
 
     /* delete temp interface config */
     std::string strInfFile = DHCP_SERVER_CONFIG_DIR + ifname + ".conf";
     if (DeleteInfConf(strInfFile) != DHCP_OPT_SUCCESS) {
-        WIFI_LOGE("CheckAndUpdateConf() DeleteInfConf failed, ifname:%{public}s!\n", ifname.c_str());
+        WIFI_LOGE("CheckAndUpdateConf() DeleteInfConf failed, ifname:%{public}s!", ifname.c_str());
         return DHCP_OPT_FAILED;
     }
 
@@ -567,7 +567,7 @@ int DhcpServerServiceImpl::CheckAndUpdateConf(const std::string &ifname)
 
     std::string strMac = "";
     if (DhcpFunc::GetLocalMac(ifname.c_str(), strMac) != 0) {
-        WIFI_LOGE("CheckAndUpdateConf() ifname:%{public}s failed, GetLocalMac error!\n", ifname.c_str());
+        WIFI_LOGE("CheckAndUpdateConf() ifname:%{public}s failed, GetLocalMac error!", ifname.c_str());
         return DHCP_OPT_FAILED;
     }
 
@@ -578,7 +578,7 @@ int DhcpServerServiceImpl::CheckAndUpdateConf(const std::string &ifname)
         if (((iterRange.iptype != 0) && (iterRange.iptype != 1)) || (iterRange.leaseHours <= 0) ||
             (iterRange.strStartip.size() == 0) || (iterRange.strEndip.size() == 0)) {
             WIFI_LOGE("CheckAndUpdateConf() failed, "
-                      "iptype:%{public}d,leaseHours:%{public}d,strStartip:%{private}s,strEndip:%{private}s error!\n",
+                      "iptype:%{public}d,leaseHours:%{public}d,strStartip:%{private}s,strEndip:%{private}s error!",
                 iterRange.iptype, iterRange.leaseHours, iterRange.strStartip.c_str(), iterRange.strEndip.c_str());
             continue;
         }
@@ -610,20 +610,20 @@ int DhcpServerServiceImpl::CheckAndUpdateConf(const std::string &ifname)
 int DhcpServerServiceImpl::DeleteInfConf(const std::string &if_filename)
 {
     if (if_filename.empty()) {
-        WIFI_LOGE("DhcpServerServiceImpl::DeleteInfConf() error, if_filename is empty!\n");
+        WIFI_LOGE("DhcpServerServiceImpl::DeleteInfConf() error, if_filename is empty!");
         return DHCP_OPT_FAILED;
     }
     if (DhcpFunc::IsExistFile(if_filename)) {
         return DhcpFunc::RemoveFile(if_filename) ? DHCP_OPT_SUCCESS : DHCP_OPT_FAILED;
     }
-    WIFI_LOGI("DeleteInfConf() if_filename:%{public}s no exist, not need delete.\n", if_filename.c_str());
+    WIFI_LOGI("DeleteInfConf() if_filename:%{public}s no exist, not need delete.", if_filename.c_str());
     return DHCP_OPT_SUCCESS;
 }
 
 bool DhcpServerServiceImpl::CheckIpAddrRange(const DhcpRange &range)
 {
     if (((range.iptype != 0) && (range.iptype != 1)) || range.strStartip.empty() || range.strEndip.empty()) {
-        WIFI_LOGE("CheckIpAddrRange() range.iptype:%{public}d,strStartip:%{private}s,strEndip:%{private}s error!\n",
+        WIFI_LOGE("CheckIpAddrRange() range.iptype:%{public}d,strStartip:%{private}s,strEndip:%{private}s error!",
             range.iptype, range.strStartip.c_str(), range.strEndip.c_str());
         return false;
     }
@@ -631,20 +631,19 @@ bool DhcpServerServiceImpl::CheckIpAddrRange(const DhcpRange &range)
     if (range.iptype == 0) {
         uint32_t uStartIp = 0;
         if (!DhcpFunc::Ip4StrConToInt(range.strStartip, uStartIp)) {
-            WIFI_LOGE("CheckIpAddrRange() Ip4StrConToInt failed, range.iptype:%{public}d,strStartip:%{private}s!\n",
+            WIFI_LOGE("CheckIpAddrRange() Ip4StrConToInt failed, range.iptype:%{public}d,strStartip:%{private}s!",
                 range.iptype, range.strStartip.c_str());
             return false;
         }
         uint32_t uEndIp = 0;
         if (!DhcpFunc::Ip4StrConToInt(range.strEndip, uEndIp)) {
-            WIFI_LOGE("CheckIpAddrRange() Ip4StrConToInt failed, range.iptype:%{public}d,strEndip:%{private}s!\n",
+            WIFI_LOGE("CheckIpAddrRange() Ip4StrConToInt failed, range.iptype:%{public}d,strEndip:%{private}s!",
                 range.iptype, range.strEndip.c_str());
             return false;
         }
         /* check ip4 start and end ip */
         if (uStartIp >= uEndIp) {
-            WIFI_LOGE(
-                "CheckIpAddrRange() failed, uStartIp:%{private}u not less uEndIp:%{private}u!\n", uStartIp, uEndIp);
+            WIFI_LOGE("CheckIpAddrRange() failed, start:%{private}u not less end:%{private}u!", uStartIp, uEndIp);
             return false;
         }
     } else {
@@ -667,7 +666,7 @@ bool DhcpServerServiceImpl::CheckIpAddrRange(const DhcpRange &range)
             }
 
             if (CheckDhcpRangeConflict(dhcpRange, range)) {
-                WIFI_LOGE("CheckIpAddrRange() Conflict yes, type:%{public}d,Start:%{private}s,End:%{private}s error!\n",
+                WIFI_LOGE("CheckIpAddrRange() Conflict yes, type:%{public}d,Start:%{private}s,End:%{private}s error!",
                     range.iptype, range.strStartip.c_str(), range.strEndip.c_str());
                 return false;
             }
@@ -680,7 +679,7 @@ bool DhcpServerServiceImpl::CheckIpAddrRange(const DhcpRange &range)
 bool DhcpServerServiceImpl::CheckDhcpRangeConflict(const DhcpRange &srcRange, const DhcpRange &addRange)
 {
     if (srcRange.iptype != addRange.iptype) {
-        WIFI_LOGI("CheckDhcpRangeConflict() no, src:%{public}d,add:%{public}d.\n", srcRange.iptype, addRange.iptype);
+        WIFI_LOGI("CheckDhcpRangeConflict() no, src:%{public}d,add:%{public}d.", srcRange.iptype, addRange.iptype);
         return false;
     }
 
@@ -695,36 +694,36 @@ bool DhcpServerServiceImpl::CheckDhcpRangeConflict(const DhcpRange &srcRange, co
             return false;
         }
         if (uSrcStartIp >= uSrcEndIp) {
-            WIFI_LOGE("CheckDhcpRangeConflict() Start:%{private}u not less End:%{private}u!\n", uSrcStartIp, uSrcEndIp);
+            WIFI_LOGE("CheckDhcpRangeConflict() Start:%{private}u not less End:%{private}u!", uSrcStartIp, uSrcEndIp);
             return false;
         }
 
         uint32_t uAddStartIp = 0;
         if (!DhcpFunc::Ip4StrConToInt(addRange.strStartip, uAddStartIp)) {
-            WIFI_LOGE("CheckDhcpRangeConflict() Ip4StrConToInt failed, iptype:%{public}d,strStartip:%{private}s!\n",
+            WIFI_LOGE("CheckDhcpRangeConflict() Ip4StrConToInt failed, iptype:%{public}d,strStartip:%{private}s!",
                 addRange.iptype, addRange.strStartip.c_str());
             return false;
         }
         uint32_t uAddEndIp = 0;
         if (!DhcpFunc::Ip4StrConToInt(addRange.strEndip, uAddEndIp)) {
-            WIFI_LOGE("CheckDhcpRangeConflict() Ip4StrConToInt failed, iptype:%{public}d,strEndip:%{private}s!\n",
+            WIFI_LOGE("CheckDhcpRangeConflict() Ip4StrConToInt failed, iptype:%{public}d,strEndip:%{private}s!",
                 addRange.iptype, addRange.strEndip.c_str());
             return false;
         }
         if (uAddStartIp >= uAddEndIp) {
-            WIFI_LOGE("CheckDhcpRangeConflict() Start:%{private}u not less End:%{private}u!\n", uAddStartIp, uAddEndIp);
+            WIFI_LOGE("CheckDhcpRangeConflict() Start:%{private}u not less End:%{private}u!", uAddStartIp, uAddEndIp);
             return false;
         }
 
         if (!((uAddStartIp > uSrcEndIp) || (uAddEndIp < uSrcStartIp))) {
             WIFI_LOGI("CheckDhcpRangeConflict yes,srcRange.iptype:%{public}d, "
                 "strStartip:%{private}s-uSrcStartIp:%{private}u, strEndip:%{private}s-uSrcEndIp:%{private}u, "
-                "addRange.strStartip:%{private}s->%{private}u, strEndip:%{private}s->%{private}u.\n",
+                "addRange.strStartip:%{private}s->%{private}u, strEndip:%{private}s->%{private}u.",
                 srcRange.iptype, srcRange.strStartip.c_str(), uSrcStartIp, srcRange.strEndip.c_str(),
                 uSrcEndIp, addRange.strStartip.c_str(), uAddStartIp, addRange.strEndip.c_str(), uAddEndIp);
             return true;
         }
-        WIFI_LOGI("CheckDhcpRangeConflict() no, srcRange.iptype:%{public}d.\n", srcRange.iptype);
+        WIFI_LOGI("CheckDhcpRangeConflict() no, srcRange.iptype:%{public}d.", srcRange.iptype);
     } else {
         /* check ip6 */
     }
@@ -739,7 +738,7 @@ bool DhcpServerServiceImpl::CheckTagDhcpRange(std::list<DhcpRange> &tagRange, st
             if ((iterInfValue.iptype == iterTagValue.iptype) && (iterInfValue.strStartip == iterTagValue.strStartip) &&
                 (iterInfValue.strEndip == iterTagValue.strEndip)) {
                 WIFI_LOGE("CheckTagDhcpRange() failed, iterTagValue.iptype:%{public}d, strStartip:%{private}s, "
-                          "strEndip:%{private}s already exist!\n",
+                          "strEndip:%{private}s already exist!",
                     iterTagValue.iptype,
                     iterTagValue.strStartip.c_str(),
                     iterTagValue.strEndip.c_str());
@@ -754,11 +753,11 @@ void DhcpServerServiceImpl::RunDhcpSerProExitThreadFunc()
 {
     for (;;) {
         if (bDhcpSerProExitThread) {
-            WIFI_LOGI("RunDhcpSerProExitThreadFunc() bDhcpSerProExitThread:true, break!\n");
+            WIFI_LOGI("RunDhcpSerProExitThreadFunc() bDhcpSerProExitThread:true, break!");
             break;
         }
         if (m_mapDhcpSerExitNotify.empty()) {
-            sleep(DHCP_NUMBER_ONE);
+            sleep(DHCP_NUM_ONE);
             continue;
         }
         if (!mProExitSig || mStopServer) {
@@ -767,28 +766,28 @@ void DhcpServerServiceImpl::RunDhcpSerProExitThreadFunc()
         }
 
         /* If the dhcp server process exits abnormally, notify other modules. */
-        WIFI_LOGI("RunDhcpSerProExitThreadFunc() other modules have notify reqs, now begin notify...\n");
+        WIFI_LOGI("RunDhcpSerProExitThreadFunc() other modules have notify reqs, now begin notify...");
         auto iterNotify = m_mapDhcpSerExitNotify.begin();
         while (iterNotify != m_mapDhcpSerExitNotify.end()) {
             std::string ifname = iterNotify->first;
             if (iterNotify->second == nullptr) {
-                WIFI_LOGE("RunDhcpSerProExitThreadFunc() ifname:%{public}s error, ptr is nullptr!\n", ifname.c_str());
+                WIFI_LOGE("RunDhcpSerProExitThreadFunc() ifname:%{public}s error, ptr is nullptr!", ifname.c_str());
                 iterNotify = m_mapDhcpSerExitNotify.erase(iterNotify);
                 continue;
             }
 
             /* notify other modules */
-            WIFI_LOGI("RunDhcpSerProExitThreadFunc() notify other modules.\n");
+            WIFI_LOGI("RunDhcpSerProExitThreadFunc() notify other modules.");
             iterNotify->second->OnSerExitNotify(ifname);
             iterNotify = m_mapDhcpSerExitNotify.erase(iterNotify);
         }
 
-        WIFI_LOGI("RunDhcpSerProExitThreadFunc() dhcp ser pro exit notify finished.\n");
-        sleep(DHCP_NUMBER_ONE);
+        WIFI_LOGI("RunDhcpSerProExitThreadFunc() dhcp ser pro exit notify finished.");
+        sleep(DHCP_NUM_ONE);
         continue;
     }
 
-    WIFI_LOGI("DhcpServerServiceImpl::RunDhcpSerProExitThreadFunc() end!\n");
+    WIFI_LOGI("DhcpServerServiceImpl::RunDhcpSerProExitThreadFunc() end!");
 }
 
 void DhcpServerServiceImpl::ExitDhcpMgrThreadFunc()
@@ -846,15 +845,15 @@ void DhcpServerServiceImpl::UnregisterSignal() const
 int DhcpServerServiceImpl::AddSpecifiedInterface(const std::string& ifname)
 {
     if (ifname.empty()) {
-        WIFI_LOGE("AddSpecifiedInterface() error, ifname is empty!\n");
+        WIFI_LOGE("AddSpecifiedInterface() error, ifname is empty!");
         return DHCP_OPT_FAILED;
     }
 
     if (m_setInterfaces.find(ifname) == m_setInterfaces.end()) {
         m_setInterfaces.insert(ifname);
-        WIFI_LOGI("AddSpecifiedInterface() m_setInterfaces add ifname:%{public}s success.\n", ifname.c_str());
+        WIFI_LOGI("AddSpecifiedInterface() m_setInterfaces add ifname:%{public}s success.", ifname.c_str());
     } else {
-        WIFI_LOGI("AddSpecifiedInterface() m_setInterfaces already exists ifname:%{public}s.\n", ifname.c_str());
+        WIFI_LOGI("AddSpecifiedInterface() m_setInterfaces already exists ifname:%{public}s.", ifname.c_str());
     }
 
     return DHCP_OPT_SUCCESS;
@@ -863,16 +862,16 @@ int DhcpServerServiceImpl::AddSpecifiedInterface(const std::string& ifname)
 int DhcpServerServiceImpl::DelSpecifiedInterface(const std::string& ifname)
 {
     if (ifname.empty()) {
-        WIFI_LOGE("DelSpecifiedInterface() error, ifname is empty!\n");
+        WIFI_LOGE("DelSpecifiedInterface() error, ifname is empty!");
         return DHCP_OPT_FAILED;
     }
 
     auto iterInterfaces = m_setInterfaces.find(ifname);
     if (iterInterfaces != m_setInterfaces.end()) {
         m_setInterfaces.erase(iterInterfaces);
-        WIFI_LOGI("DelSpecifiedInterface() m_setInterfaces del ifname:%{public}s success.\n", ifname.c_str());
+        WIFI_LOGI("DelSpecifiedInterface() m_setInterfaces del ifname:%{public}s success.", ifname.c_str());
     } else {
-        WIFI_LOGI("DelSpecifiedInterface() m_setInterfaces not exists ifname:%{public}s.\n", ifname.c_str());
+        WIFI_LOGI("DelSpecifiedInterface() m_setInterfaces not exists ifname:%{public}s.", ifname.c_str());
     }
 
     return DHCP_OPT_SUCCESS;

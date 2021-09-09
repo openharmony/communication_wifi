@@ -22,8 +22,8 @@
 extern "C" {
 #endif
 
-typedef struct FdEvent FdEvent;
-struct FdEvent {
+typedef struct FdMask FdMask;
+struct FdMask {
     int fd;
     unsigned int mask;
 };
@@ -32,10 +32,10 @@ typedef struct EventLoop EventLoop;
 struct EventLoop {
     int maxFd;
     int setSize;
-    FdEvent *events;
+    FdMask *fdMasks;
     int stop;
     int epfd;
-    struct epoll_event *epoll_events;
+    struct epoll_event *epEvents;
 };
 
 /**

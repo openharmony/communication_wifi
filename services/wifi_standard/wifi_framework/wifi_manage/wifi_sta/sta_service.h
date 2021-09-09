@@ -30,32 +30,25 @@ public:
     /**
      * @Description  Initialize StaService module.
      *
-     * @param pMsgQueueUp - the uplink Message queue used to return results.(in)
-     * @Return success: WIFI_OPT_SUCCESS  failed: WIFI_OPT_FAILED
+     * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
      */
-    ErrCode InitStaService(WifiMessageQueue<WifiResponseMsgInfo> *pMsgQueueUp);
-    /**
-     * @Description  Notify the results code to Interface Service.
-     *
-     * @param msgCode - operating results code.(in)
-     */
-    void NotifyResult(int msgCode) const;
+    ErrCode InitStaService(const StaServiceCallback &callbacks);
     /**
      * @Description  Enable wifi
      *
      * @Output: Return operating results to Interface Service after enable wifi
-               successfully through NotifyResult function instead of returning
+               successfully through callback function instead of returning
                result immediately.
-     * @Return success: WIFI_OPT_SUCCESS  failed: WIFI_OPT_FAILED
+     * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
      */
     ErrCode EnableWifi() const;
     /**
      * @Description  Disable wifi
      *
      * @Output: Return operating results to Interface Service after enable wifi
-                successfully through NotifyResult function instead of returning
+                successfully through callback function instead of returning
                 result immediately.
-     * @Return success: WIFI_OPT_SUCCESS  failed: WIFI_OPT_FAILED
+     * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
      */
     ErrCode DisableWifi() const;
     /**
@@ -63,9 +56,9 @@ public:
      *
      * @param config - the configuration of network which is going to connect.(in)
      * @Output: Return operating results to Interface Service after enable wifi
-                successfully through NotifyResult function instead of returning
+                successfully through callback function instead of returning
                 result immediately.
-     * @Return success: WIFI_OPT_SUCCESS  failed: WIFI_OPT_FAILED
+     * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
      */
     ErrCode ConnectToDevice(const WifiDeviceConfig &config) const;
     /**
@@ -73,84 +66,113 @@ public:
      *
      * @param networkId - interior saved network index.(in)
      * @Output: Return operating results to Interface Service after enable wifi
-                successfully through NotifyResult function instead of returning
+                successfully through callback function instead of returning
                 result immediately.
-     * @Return success: WIFI_OPT_SUCCESS  failed: WIFI_OPT_FAILED
+     * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
      */
     ErrCode ConnectToNetwork(int networkId) const;
-    /**
-     * @Description  Reconnect to currently active network.
-     *
-     * @Return success: WIFI_OPT_SUCCESS  failed: WIFI_OPT_FAILED
-     */
-    ErrCode ReConnect() const;
-    /**
-     * @Description  ReAssociate network
-     *
-     * @Return success: WIFI_OPT_SUCCESS  failed: WIFI_OPT_FAILED
-     */
-    ErrCode ReAssociate() const;
-    /**
-     * @Description  Remove network
-     *
-     * @param networkId -The NetworkId is going to be removed.(in)
-     * @Return success: WIFI_OPT_SUCCESS  failed: WIFI_OPT_FAILED
-     */
-    ErrCode RemoveDevice(int networkId) const;
-    /**
-     * @Description  Remove all network
-     *
-     * @Return success: WIFI_OPT_SUCCESS  failed: WIFI_OPT_FAILED
-     */
-    ErrCode RemoveAllDevice() const;
     /**
      * @Description  Disconnect to the network
      *
      * @Output: Return operating results to Interface Service after enable wifi
-                successfully through NotifyResult function instead of returning
+                successfully through callback function instead of returning
                 result immediately.
-     * @Return success: WIFI_OPT_SUCCESS  failed: WIFI_OPT_FAILED
+     * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
      */
     ErrCode Disconnect() const;
+    /**
+     * @Description  ReAssociate network
+     *
+     * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
+     */
+    ErrCode ReAssociate() const;
+
+    /**
+     * @Description  Update a network to config
+     *
+     * @param config -The Network info(in)
+     * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
+     */
+    int AddDeviceConfig(const WifiDeviceConfig &config) const;
+    /**
+     * @Description Update a network to config.
+     *
+     * @param config -The Network info(in)
+     * @Return success: networkId  fail: -1
+     */
+    int UpdateDeviceConfig(const WifiDeviceConfig &config) const;
+    /**
+     * @Description  Remove network config.
+     *
+     * @param networkId -The NetworkId is going to be removed.(in)
+     * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
+     */
+    ErrCode RemoveDevice(int networkId) const;
+    /**
+     * @Description  Remove all network configs.
+     *
+     * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
+     */
+    ErrCode RemoveAllDevice() const;
+    /**
+     * @Description  Enable WI-FI device Configuration.
+     *
+     * @param networkId - The NetworkId (in)
+     * @param networkId - if set true, disable other device config (in)
+     * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
+     */
+    ErrCode EnableDeviceConfig(int networkId, bool attemptEnable) const;
+    /**
+     * @Description Disable WI-FI device Configuration.
+     *
+     * @param networkId - device Configuration's network id
+     * @return ErrCode - success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
+     */
+    ErrCode DisableDeviceConfig(int networkId) const;
     /**
      * @Description  Start WPS Connection
      *
      * @Output: Return operating results to Interface Service after enable wifi
-                successfully through NotifyResult function instead of returning
+                successfully through callback function instead of returning
                 result immediately.
-     * @Return success: WIFI_OPT_SUCCESS  failed: WIFI_OPT_FAILED
+     * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
      */
     ErrCode StartWps(const WpsConfig &config) const;
     /**
      * @Description  Close WPS Connection
      *
      * @Output: Return operating results to Interface Service after enable wifi
-                successfully through NotifyResult function instead of returning
+                successfully through callback function instead of returning
                 result immediately.
-     * @Return success: WIFI_OPT_SUCCESS  failed: WIFI_OPT_FAILED
+     * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
      */
     ErrCode CancelWps() const;
     /**
      * @Description  Set country code
      *
-     * @Return success: WIFI_OPT_SUCCESS  failed: WIFI_OPT_FAILED
+     * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
      */
-    ErrCode SetCountryCode() const;
+    ErrCode SetCountryCode(const std::string &countryCode) const;
     /**
-     * @Description StaAutoConnectService process scan results.
+     * @Description  ConnectivityManager process scan results.
      *
      * @Output: Return operating results to Interface Service after enable wifi
-                successfully through NotifyResult function instead of returning
+                successfully through callback function instead of returning
                 result immediately.
-     * @Return success: WIFI_OPT_SUCCESS  failed: WIFI_OPT_FAILED
+     * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
      */
-    ErrCode AutoConnectService(const std::vector<WifiScanInfo> &scanInfos);
-    ErrCode SyncLinkInfo(const std::vector<WifiScanInfo> &scanInfos);
+    ErrCode AutoConnectService(const std::vector<InterScanInfo> &scanInfos);
+    /**
+     * @Description Register sta callback function
+     *
+     * @param callbacks - Callback function pointer storage structure
+     */
+    void RegisterStaServiceCallback(const StaServiceCallback &callbacks) const;
+
 
 private:
     StaStateMachine *pStaStateMachine;
     StaMonitor *pStaMonitor;
-    WifiMessageQueue<WifiResponseMsgInfo> *msgQueueUp;
     StaAutoConnectService *pStaAutoConnectService;
 };
 }  // namespace Wifi

@@ -16,23 +16,68 @@
 #ifndef OHOS_WIFI_SERVICE_MANAGER_H
 #define OHOS_WIFI_SERVICE_MANAGER_H
 
-#include <memory>
 #include <mutex>
 #include <string>
 #include <unordered_map>
 
-#include "base_service.h"
-#include "wifi_logger.h"
+#include "ista_service.h"
+#include "iscan_service.h"
+#include "i_ap_service.h"
 
 namespace OHOS {
 namespace Wifi {
-struct ServiceHandle {
-    void *handle;                    /* Loads the SO handle. */
-    BaseService *(*create)();        /* Address of the Create function in the SO. */
-    void *(*destroy)(BaseService *); /* Address of the Destroy function in the SO */
-    BaseService *bs;                 /* Feature Service Object */
-    ServiceHandle() : handle(nullptr), create(nullptr), destroy(nullptr), bs(nullptr)
+struct StaServiceHandle {
+    void *handle;
+    IStaService *(*create)();
+    void *(*destroy)(IStaService *);
+    IStaService *pService;
+    StaServiceHandle() : handle(nullptr), create(nullptr), destroy(nullptr), pService(nullptr)
     {}
+    ~StaServiceHandle()
+    {}
+    void Clear()
+    {
+        handle = nullptr;
+        create = nullptr;
+        destroy = nullptr;
+        pService = nullptr;
+    }
+};
+
+struct ScanServiceHandle {
+    void *handle;
+    IScanService *(*create)();
+    void *(*destroy)(IScanService *);
+    IScanService *pService;
+    ScanServiceHandle() : handle(nullptr), create(nullptr), destroy(nullptr), pService(nullptr)
+    {}
+    ~ScanServiceHandle()
+    {}
+    void Clear()
+    {
+        handle = nullptr;
+        create = nullptr;
+        destroy = nullptr;
+        pService = nullptr;
+    }
+};
+
+struct ApServiceHandle {
+    void *handle;
+    IApService *(*create)();
+    void *(*destroy)(IApService *);
+    IApService *pService;
+    ApServiceHandle() : handle(nullptr), create(nullptr), destroy(nullptr), pService(nullptr)
+    {}
+    ~ApServiceHandle()
+    {}
+    void Clear()
+    {
+        handle = nullptr;
+        create = nullptr;
+        destroy = nullptr;
+        pService = nullptr;
+    }
 };
 
 class WifiServiceManager {
@@ -64,12 +109,25 @@ public:
     int CheckAndEnforceService(const std::string &name, bool bCreate = true);
 
     /**
-     * @Description Obtaining Loaded Feature Service Objects
+     * @Description Get the Sta Service Inst object
      *
-     * @param name - feature service name
-     * @return BaseService* - service pointer, if no feature service is loaded, nullptr is returned
+     * @return IStaService* - sta service pointer, if sta not supported, nullptr is returned
      */
-    BaseService *GetServiceInst(const std::string &name);
+    IStaService *GetStaServiceInst(void);
+
+    /**
+     * @Description Get the Scan Service Inst object
+     *
+     * @return IScanService* - scan service pointer, if scan not supported, nullptr is returned
+     */
+    IScanService *GetScanServiceInst(void);
+
+    /**
+     * @Description Get the Ap Service Inst object
+     *
+     * @return IApService* - ap service pointer, if ap not supported, nullptr is returned
+     */
+    IApService *GetApServiceInst(void);
 
     /**
      * @Description unload a feature service
@@ -88,10 +146,19 @@ public:
 
 private:
     int GetServiceDll(const std::string &name, std::string &dlname);
+    int LoadStaService(const std::string &dlname, bool bCreate);
+    int UnloadStaService(bool bPreLoad);
+    int LoadScanService(const std::string &dlname, bool bCreate);
+    int UnloadScanService(bool bPreLoad);
+    int LoadApService(const std::string &dlname, bool bCreate);
+    int UnloadApService(bool bPreLoad);
+
 private:
     std::mutex mMutex;
-    std::unordered_map<std::string, ServiceHandle> mServiceHandleMap;
     std::unordered_map<std::string, std::string> mServiceDllMap;
+    StaServiceHandle mStaServiceHandle;
+    ScanServiceHandle mScanServiceHandle;
+    ApServiceHandle mApServiceHandle;
 };
 } // namespace Wifi
 } // namespace OHOS

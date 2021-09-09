@@ -781,14 +781,6 @@ WifiErrorNo WifiIdlClient::GetStationList(std::vector<std::string> &result)
     return WIFI_IDL_OPT_OK;
 }
 
-WifiErrorNo WifiIdlClient::SetHotspotConfig(int channel, const std::string &mscb)
-{
-    if (pRpcClient == nullptr) {
-        return WIFI_IDL_OPT_FAILED;
-    }
-    return ConfigHotspot(channel, mscb.c_str());
-}
-
 WifiErrorNo WifiIdlClient::AddBlockByMac(const std::string &mac)
 {
     if (pRpcClient == nullptr) {

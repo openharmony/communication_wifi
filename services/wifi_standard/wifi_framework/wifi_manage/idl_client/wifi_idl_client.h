@@ -353,16 +353,6 @@ public:
     WifiErrorNo GetStationList(std::vector<std::string> &result);
 
     /**
-     * @Description Configuring the Wi-Fi hotspot channel and maximum number of connections.
-     *
-     * @param channel
-     * @param mscb
-     * @return WifiErrorNo
-     */
-
-    WifiErrorNo SetHotspotConfig(int channel, const std::string &mscb);
-
-    /**
      * @Description To set the blocklist filtering in AP mode to prohibit the MAC
      *              address connection.
      *

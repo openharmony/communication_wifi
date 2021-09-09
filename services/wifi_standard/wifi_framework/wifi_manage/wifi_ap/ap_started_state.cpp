@@ -174,7 +174,7 @@ bool ApStartedState::StopAp() const
 
 void ApStartedState::OnApStateChange(const ApState &state) const
 {
-    ApService::GetInstance().OnApStateChange(state);
+    ApStateMachine::GetInstance().OnApStateChange(state);
 }
 
 void ApStartedState::StartMonitor() const

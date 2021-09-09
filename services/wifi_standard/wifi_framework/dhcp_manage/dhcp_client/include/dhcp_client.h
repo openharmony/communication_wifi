@@ -15,6 +15,8 @@
 #ifndef OHOS_DHCPC_H
 #define OHOS_DHCPC_H
 
+#include <pthread.h>
+
 #include "dhcp_define.h"
 
 #ifdef __cplusplus
@@ -26,6 +28,7 @@ extern "C" {
 #define DHCPC_CONF              "dhcp_client_service.conf"
 #define DHCPC_PID               "dhcp_client_service.pid"
 #define DHCPC_VERSION           "1.0"
+#define DHCPC_LEASE             "dhcp_client_service-%s.lease"
 
 enum DHCP_IP_TYPE {
     DHCP_IP_TYPE_NONE =  0,
@@ -46,6 +49,9 @@ struct DhcpClientCfg {
     unsigned char ifaceMac[MAC_ADDR_LEN];   /* Mac addr of the network interface used by the current process. */
     unsigned char *pOptClientId;            /* DHCP packet options field clientid. */
     bool timeoutExit;                       /* DHCP packet sending times out and exits automatically. */
+    char leaseFile[DIR_MAX_LEN];
+    char result6File[DIR_MAX_LEN];
+    pthread_t thrId;
 };
 
 int StartProcess(void);

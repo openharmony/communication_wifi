@@ -15,13 +15,14 @@
 #include "sta_service.h"
 #include "wifi_logger.h"
 #include "sta_define.h"
+#include "sta_service_callback.h"
 
 DEFINE_WIFILOG_LABEL("StaService");
 
 namespace OHOS {
 namespace Wifi {
 StaService::StaService()
-    : pStaStateMachine(nullptr), pStaMonitor(nullptr), msgQueueUp(nullptr), pStaAutoConnectService(nullptr)
+    : pStaStateMachine(nullptr), pStaMonitor(nullptr), pStaAutoConnectService(nullptr)
 {}
 
 StaService::~StaService()
@@ -44,17 +45,9 @@ StaService::~StaService()
     }
 }
 
-ErrCode StaService::InitStaService(WifiMessageQueue<WifiResponseMsgInfo> *pMsgQueueUp)
+ErrCode StaService::InitStaService(const StaServiceCallback &callbacks)
 {
     WIFI_LOGI("Enter StaService::InitStaService.\n");
-
-    msgQueueUp = pMsgQueueUp;
-
-    if (msgQueueUp == nullptr) {
-        WIFI_LOGE("msgQueueUp is null.\n");
-        return WIFI_OPT_FAILED;
-    }
-
     pStaStateMachine = new (std::nothrow) StaStateMachine();
     if (pStaStateMachine == nullptr) {
         WIFI_LOGE("Alloc pStaStateMachine failed.\n");
@@ -66,7 +59,8 @@ ErrCode StaService::InitStaService(WifiMessageQueue<WifiResponseMsgInfo> *pMsgQu
         return WIFI_OPT_FAILED;
     }
 
-    pStaStateMachine->SetResponseQueue(msgQueueUp);
+    RegisterStaServiceCallback(callbacks);
+
     pStaMonitor = new (std::nothrow) StaMonitor();
     if (pStaMonitor == nullptr) {
         WIFI_LOGE("Alloc pStaMonitor failed.\n");
@@ -94,15 +88,6 @@ ErrCode StaService::InitStaService(WifiMessageQueue<WifiResponseMsgInfo> *pMsgQu
     return WIFI_OPT_SUCCESS;
 }
 
-void StaService::NotifyResult(int msgCode) const
-{
-    WIFI_LOGI("Enter StaService::NotifyResult.\n");
-    WifiResponseMsgInfo notifyMsg;
-    notifyMsg.msgCode = msgCode;
-    msgQueueUp->Push(notifyMsg);
-    return;
-}
-
 ErrCode StaService::EnableWifi() const
 {
     WIFI_LOGI("Enter StaService::EnableWifi.\n");
@@ -117,78 +102,66 @@ ErrCode StaService::DisableWifi() const
     return WIFI_OPT_SUCCESS;
 }
 
-ErrCode StaService::ConnectToDevice(const WifiDeviceConfig &config) const
+int StaService::AddDeviceConfig(const WifiDeviceConfig &config) const
 {
-    WIFI_LOGI("Enter StaService::ConnectToDevice.\n");
-    int networkId = -1;
+    LOGI("Enter StaService::AddDeviceConfig.\n");
+    int netWorkId = INVALID_NETWORK_ID;
     WifiDeviceConfig tempDeviceConfig;
-    if (WifiSettings::GetInstance().GetDeviceConfig(config.ssid, DEVICE_CONFIG_INDEX_SSID, tempDeviceConfig) == 0) {
-        WIFI_LOGD("A network with the same name already exists in the configuration center!\n");
-        networkId = tempDeviceConfig.networkId;
-        tempDeviceConfig = config;
-        tempDeviceConfig.networkId = networkId;
+    if (WifiSettings::GetInstance().GetDeviceConfig(config.ssid, config.keyMgmt, tempDeviceConfig) == 0) {
+        LOGD("A network with the same name already exists in the configuration center!\n");
+        netWorkId = tempDeviceConfig.networkId;
         pStaAutoConnectService->EnableOrDisableBssid(config.bssid, true, 0);
     } else {
-        WIFI_LOGD("Connect to a new network\n");
-        if (WifiStaHalInterface::GetInstance().GetNextNetworkId(networkId) != WIFI_IDL_OPT_OK) {
-            WIFI_LOGE("StaService::ConnectToDevice GetNextNetworkId failed!");
-            return WIFI_OPT_FAILED;
+        if (WifiStaHalInterface::GetInstance().GetNextNetworkId(netWorkId) != WIFI_IDL_OPT_OK) {
+            LOGE("StaService::AddDeviceConfig GetNextNetworkId failed!");
+            return netWorkId;
         }
-        WIFI_LOGI("StaService::ConnectToDevice GetNextNetworkId succeed!");
-        tempDeviceConfig = config;
-        tempDeviceConfig.networkId = networkId;
+        LOGD("StaService::AddDeviceConfig Add a new network and GetNextNetworkId() succeed!");
+    }
+    tempDeviceConfig = config;
+    tempDeviceConfig.networkId = netWorkId;
+
+    /* Setting the network to wpa */
+    if(pStaStateMachine->ConvertDeviceCfg(tempDeviceConfig) != WIFI_OPT_SUCCESS) {
+        LOGE("StaService::AddDeviceConfig ConvertDeviceCfg failed!");
+        return INVALID_NETWORK_ID;
     }
 
     /* Add the new network to WifiSettings. */
     WifiSettings::GetInstance().AddDeviceConfig(tempDeviceConfig);
     WifiSettings::GetInstance().SyncDeviceConfig();
-    WIFI_LOGI("keyMgmt is %s", config.keyMgmt.c_str());
-    /* Setting the network to wpa */
-    WifiIdlDeviceConfig idlConfig;
-    idlConfig.networkId = networkId;
-    idlConfig.ssid = config.ssid;
-    idlConfig.bssid = config.bssid;
-    idlConfig.psk = config.preSharedKey;
-    idlConfig.keyMgmt = config.keyMgmt;
-    idlConfig.priority = config.priority;
-    idlConfig.scanSsid = config.hiddenSSID ? 1 : 0;
-    idlConfig.eap = config.wifiEapConfig.eap;
-    idlConfig.identity = config.wifiEapConfig.identity;
-    idlConfig.password = config.wifiEapConfig.password;
-    idlConfig.wepKeyIdx = config.wepTxKeyIndex;
-    for (int i = 0; i < MAX_WEPKEYS_SIZE; i++) {
-        idlConfig.wepKeys[i] = config.wepKeys[i];
-    }
+    return netWorkId;
+}
 
-    if (WifiStaHalInterface::GetInstance().SetDeviceConfig(networkId, idlConfig) != WIFI_IDL_OPT_OK) {
-        WIFI_LOGE("StaService::ConnectToDevice SetDeviceConfig failed!");
+int StaService::UpdateDeviceConfig(const WifiDeviceConfig &config) const
+{
+    return AddDeviceConfig(config);
+}
+
+ErrCode StaService::ConnectToDevice(const WifiDeviceConfig &config) const
+{
+    LOGI("Enter StaService::ConnectToDevice.\n");
+    int netWorkId = AddDeviceConfig(config);
+    if(netWorkId == INVALID_NETWORK_ID) {
+        LOGD("StaService::ConnectTo  AddDeviceConfig failed!");
         return WIFI_OPT_FAILED;
     }
-    WIFI_LOGI("StaService::ConnectToDevice  SetDeviceConfig succeed!");
-    pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_CONNECT_NETWORK, networkId, NETWORK_SELECTED_BY_THE_USER);
+    LOGD("StaService::ConnectTo  AddDeviceConfig succeed!");
+    pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_CONNECT_NETWORK, netWorkId, NETWORK_SELECTED_BY_THE_USER);
     return WIFI_OPT_SUCCESS;
 }
 
 ErrCode StaService::ConnectToNetwork(int networkId) const
 {
-    WIFI_LOGI("Enter StaService::ConnectToNetwork, networkId is %{public}d.\n", networkId);
-
+    LOGI("Enter StaService::ConnectToNetwork, networkId is %d.\n", networkId);
     WifiDeviceConfig config;
-    int ret = WifiSettings::GetInstance().GetDeviceConfig(networkId, config);
-    if (ret != 0) {
-        WIFI_LOGE("WifiDeviceConfig is null!");
+    if (WifiSettings::GetInstance().GetDeviceConfig(networkId, config) != 0) {
+        LOGE("WifiDeviceConfig is null!");
         return WIFI_OPT_FAILED;
     }
 
     pStaAutoConnectService->EnableOrDisableBssid(config.bssid, true, 0);
     pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_CONNECT_SAVED_NETWORK, networkId, NETWORK_SELECTED_BY_THE_USER);
-
-    return WIFI_OPT_SUCCESS;
-}
-
-ErrCode StaService::ReConnect() const
-{
-    WIFI_LOGI("Enter StaService::ReConnect.\n");
     return WIFI_OPT_SUCCESS;
 }
 
@@ -201,8 +174,24 @@ ErrCode StaService::ReAssociate() const
 
 ErrCode StaService::RemoveDevice(int networkId) const
 {
-    WIFI_LOGI("Enter StaService::RemoveDevice.\n");
-    pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_REMOVE_DEVICE_CONFIG, networkId);
+    LOGD("Enter StaService::RemoveDeviceConfigProcess.\n");
+    /* Remove network configuration. */
+    if (WifiStaHalInterface::GetInstance().RemoveDevice(networkId) != WIFI_IDL_OPT_OK) {
+        LOGE("RemoveDeviceConfig() failed!");
+        return WIFI_OPT_FAILED;
+    }
+    if (WifiStaHalInterface::GetInstance().SaveDeviceConfig() != WIFI_IDL_OPT_OK) {
+        LOGW("RemoveDeviceConfig-SaveDeviceConfig() failed!");
+    } else {
+        LOGD("RemoveDeviceConfig-SaveDeviceConfig() succeed!");
+    }
+    WifiDeviceConfig config;
+    if (WifiSettings::GetInstance().GetDeviceConfig(networkId, config) == 0) {
+        pStaAutoConnectService->EnableOrDisableBssid(config.bssid, true, 0);
+    }
+    /* Remove network configuration directly without notification to InterfaceService. */
+    WifiSettings::GetInstance().RemoveDevice(networkId);
+    WifiSettings::GetInstance().SyncDeviceConfig();
     return WIFI_OPT_SUCCESS;
 }
 
@@ -210,6 +199,30 @@ ErrCode StaService::RemoveAllDevice() const
 {
     WIFI_LOGI("Enter StaService::RemoveAllDevice.\n");
     pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_REMOVE_All_DEVICE_CONFIG);
+    return WIFI_OPT_SUCCESS;
+}
+
+ErrCode StaService::EnableDeviceConfig(int networkId, bool attemptEnable) const
+{
+    WIFI_LOGD("Enter StaService::EnableDeviceConfig! networkid is %{public}d", networkId);
+
+    /* Update wifi status. */
+    if (WifiSettings::GetInstance().SetDeviceState(networkId, (int)WifiDeviceConfigStatus::ENABLED, attemptEnable) <
+        0) {
+        WIFI_LOGE("Enable device config failed!");
+        return WIFI_OPT_FAILED;
+    }
+    return WIFI_OPT_SUCCESS;
+}
+
+ErrCode StaService::DisableDeviceConfig(int networkId) const
+{
+    WIFI_LOGD("Enter StaService::DisableDeviceConfig.networkid is %{public}d", networkId);
+
+    if (WifiSettings::GetInstance().SetDeviceState(networkId, (int)WifiDeviceConfigStatus::DISABLED) < 0) {
+        WIFI_LOGE("Disable device config failed!");
+        return WIFI_OPT_FAILED;
+    }
     return WIFI_OPT_SUCCESS;
 }
 
@@ -244,25 +257,35 @@ ErrCode StaService::CancelWps() const
     return WIFI_OPT_SUCCESS;
 }
 
-ErrCode StaService::SetCountryCode() const
+ErrCode StaService::SetCountryCode(const std::string &countryCode) const
 {
-    WIFI_LOGI("Enter StaService::SetCountryCode.\n");
-    pStaStateMachine->SetCountryCode();
+    LOGI("Enter StaService::SetCountryCode, countryCode=[%s]!", countryCode.c_str());
+    if (WifiSupplicantHalInterface::GetInstance().WpaSetCountryCode(countryCode) != WIFI_IDL_OPT_OK) {
+        LOGE("WpaSetCountryCode() failed!");
+        return WIFI_OPT_FAILED;
+    }
+    LOGI("WpaSetCountryCode() succeed!");
+    WifiSettings::GetInstance().SetCountryCode(countryCode);
     return WIFI_OPT_SUCCESS;
 }
 
-ErrCode StaService::AutoConnectService(const std::vector<WifiScanInfo> &scanInfos)
+ErrCode StaService::AutoConnectService(const std::vector<InterScanInfo> &scanInfos)
 {
     WIFI_LOGI("Enter StaService::AutoConnectService.\n");
     pStaAutoConnectService->OnScanInfosReadyHandler(scanInfos);
-    return WIFI_OPT_SUCCESS;
-}
-
-ErrCode StaService::SyncLinkInfo(const std::vector<WifiScanInfo> &scanInfos)
-{
-    WIFI_LOGI("Enter StaService::SyncLinkInfo.\n");
     pStaStateMachine->SyncLinkInfo(scanInfos);
     return WIFI_OPT_SUCCESS;
 }
+
+void StaService::RegisterStaServiceCallback(const StaServiceCallback &callbacks) const
+{
+    LOGI("Enter StaService::RegisterStaServiceCallback.");
+    if (pStaStateMachine == nullptr) {
+        LOGE("pStaStateMachine is null.\n");
+        return;
+    }
+    pStaStateMachine->RegisterStaServiceCallback(callbacks);
+}
+
 }  // namespace Wifi
 }  // namespace OHOS

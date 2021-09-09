@@ -35,13 +35,18 @@ const int ETH_MAC_ADDR_CHAR_NUM = 3;
 const int IP_SIZE               = 18;
 const int LEASETIME_DEFAULT     = 12;
 const int RECEIVER_TIMEOUT      = 6;
-const int DHCP_RESULT_NUM       = 11;
-const int DHCP_NUMBER_ONE       = 1;
-const int DHCP_NUMBER_TWO       = 2;
-const int DHCP_NUMBER_THREE     = 3;
-const int DHCP_NUMBER_FOUR      = 4;
-const int DHCP_NUMBER_FIVE      = 5;
-const int DHCP_NUMBER_EIGHT     = 8;
+const int EVENT_DATA_NUM        = 11;
+const int DHCP_NUM_ZERO         = 0;
+const int DHCP_NUM_ONE          = 1;
+const int DHCP_NUM_TWO          = 2;
+const int DHCP_NUM_THREE        = 3;
+const int DHCP_NUM_FOUR         = 4;
+const int DHCP_NUM_FIVE         = 5;
+const int DHCP_NUM_SIX          = 6;
+const int DHCP_NUM_SEVEN        = 7;
+const int DHCP_NUM_EIGHT        = 8;
+const int DHCP_NUM_NINE         = 9;
+const int DHCP_NUM_TEN          = 10;
 const int DHCP_FILE_MAX_BYTES   = 128;
 const int FILE_LINE_MAX_SIZE    = 1024;
 const int DHCP_SER_ARGSNUM      = 6;
@@ -54,6 +59,10 @@ const int DIR_MAX_LEN           = 256;
 const int DIR_DEFAULT_MODE      = S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH;
 const std::string IP4_SEPARATOR(".");
 const std::string IP6_SEPARATOR(":");
+const std::string INVALID_STRING("*");
+const std::string EVENT_DATA_DELIMITER(",");
+const std::string EVENT_DATA_IPV4("ipv4");
+const std::string EVENT_DATA_IPV6("ipv6");
 const std::string DHCP_WORK_DIR("/data/dhcp/");
 const std::string DHCP_CLIENT_PID_FILETYPE(".pid");
 const std::string DHCP_RESULT_FILETYPE(".result");
@@ -64,6 +73,7 @@ const std::string DHCP_SERVER_CONFIG_DIR("/data/dhcp/dhcpd.d/");
 const std::string DHCP_SERVER_LEASES_FILE("/data/dhcp/dhcpd.leases");
 const std::string DHCP_SERVER_CFG_IPV4("#ipv4");
 const std::string DHCP_SERVER_CFG_IPV6("#ipv6");
+const std::string COMMON_EVENT_DHCP_GET_IPV4 = "usual.event.wifi.dhcp.GET_IPV4";
 
 typedef enum enumErrCode {
     /* success */
@@ -77,6 +87,14 @@ typedef enum enumErrCode {
     /* error */
     DHCP_OPT_ERROR,
 } DhcpErrCode;
+
+/* publish event code */
+typedef enum enumPublishEventCode {
+    /* success */
+    PUBLISH_CODE_SUCCESS = 0,
+    /* failed */
+    PUBLISH_CODE_FAILED = -1
+} DhcpEventCode;
 
 
 struct DhcpResult {

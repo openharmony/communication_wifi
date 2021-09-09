@@ -37,7 +37,7 @@ sptr<WifiDeviceServiceImpl> WifiDeviceServiceImpl::GetInstance()
     if (g_instance == nullptr) {
         std::lock_guard<std::mutex> autoLock(g_instanceLock);
         if (g_instance == nullptr) {
-            auto service = new WifiDeviceServiceImpl;
+            auto service = new (std::nothrow) WifiDeviceServiceImpl;
             g_instance = service;
         }
     }
@@ -109,32 +109,37 @@ ErrCode WifiDeviceServiceImpl::EnableWifi()
         return WIFI_OPT_OPEN_SUCC_WHEN_OPENED;
     }
 
-    bool bflag = false;
+    errCode = WIFI_OPT_FAILED;
     do {
         if (WifiServiceManager::GetInstance().CheckAndEnforceService(WIFI_SERVICE_STA) < 0) {
-            WIFI_LOGE("Load wifi device service failed!");
+            WIFI_LOGE("Load %{public}s service failed!", WIFI_SERVICE_STA);
             break;
         }
-        WifiMessageQueue<WifiResponseMsgInfo> *mqUp = WifiManager::GetInstance().GetMessageQueue();
-        auto srvInst = WifiServiceManager::GetInstance().GetServiceInst(WIFI_SERVICE_STA);
-        if (srvInst == nullptr) {
-            WIFI_LOGE("Failed to get service instance!");
+        IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst();
+        if (pService == nullptr) {
+            WIFI_LOGE("Create %{public}s service failed!", WIFI_SERVICE_STA);
             break;
         }
-        int ret = srvInst->Init(mqUp);
-        if (ret < 0) {
-            WIFI_LOGE("Init wifi device service failed!");
-            WifiServiceManager::GetInstance().UnloadService(WIFI_SERVICE_STA);
+
+        errCode = pService->RegisterStaServiceCallback(WifiManager::GetInstance().GetStaCallback());
+        if (errCode != WIFI_OPT_SUCCESS) {
+            WIFI_LOGE("Register sta service callback failed!");
             break;
         }
-        bflag = true;
+
+        errCode = pService->EnableWifi();
+        if (errCode != WIFI_OPT_SUCCESS) {
+            WIFI_LOGE("service enable sta failed, ret %{public}d!", static_cast<int>(errCode));
+            break;
+        }
     } while (false);
-    if (!bflag) {
+    if (errCode != WIFI_OPT_SUCCESS) {
         WifiConfigCenter::GetInstance().SetWifiMidState(WifiOprMidState::OPENING, WifiOprMidState::CLOSED);
-        return WIFI_OPT_FAILED;
-    } else {
-        return WIFI_OPT_SUCCESS;
+        WifiServiceManager::GetInstance().UnloadService(WIFI_SERVICE_STA);
+        return errCode;
     }
+
+    return WIFI_OPT_SUCCESS;
 }
 
 ErrCode WifiDeviceServiceImpl::DisableWifi()
@@ -157,18 +162,19 @@ ErrCode WifiDeviceServiceImpl::DisableWifi()
         WIFI_LOGI("set wifi mid state opening failed! may be other activity has been operated");
         return WIFI_OPT_CLOSE_SUCC_WHEN_CLOSED;
     }
-    auto srvInst = WifiServiceManager::GetInstance().GetServiceInst(WIFI_SERVICE_STA);
-    if (srvInst == nullptr) {
-        WIFI_LOGE("Failed to get service instance!");
-        return WIFI_OPT_FAILED;
+    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst();
+    if (pService == nullptr) {
+        WifiConfigCenter::GetInstance().SetWifiMidState(WifiOprMidState::CLOSED);
+        WifiServiceManager::GetInstance().UnloadService(WIFI_SERVICE_STA);
+        return WIFI_OPT_SUCCESS;
     }
-    int ret = srvInst->UnInit();
-    if (ret < 0) {
-        WIFI_LOGE("UnInit wifi device service failed!");
+    ErrCode ret = pService->DisableWifi();
+    if (ret != WIFI_OPT_SUCCESS) {
         WifiConfigCenter::GetInstance().SetWifiMidState(WifiOprMidState::CLOSING, WifiOprMidState::RUNNING);
-        return WIFI_OPT_FAILED;
+    } else {
+        WifiConfigCenter::GetInstance().SetStaLastRunState(false);
     }
-    return WIFI_OPT_SUCCESS;
+    return ret;
 }
 
 ErrCode WifiDeviceServiceImpl::AddDeviceConfig(const WifiDeviceConfig &config, int &result)
@@ -178,11 +184,19 @@ ErrCode WifiDeviceServiceImpl::AddDeviceConfig(const WifiDeviceConfig &config, i
         return WIFI_OPT_PERMISSION_DENIED;
     }
 
-    int ret = WifiManager::GetInstance().AddDeviceConfig(config, result);
-    if (ret < 0) {
-        WIFI_LOGE("Add wifi device config failed!");
+    if (!IsStaServiceRunning()) {
+        return WIFI_OPT_STA_NOT_OPENED;
+    }
+
+    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst();
+    if (pService == nullptr) {
+        return WIFI_OPT_STA_NOT_OPENED;
+    }
+    int retNetworkId = pService->AddDeviceConfig(config);
+    if (retNetworkId < 0) {
         return WIFI_OPT_FAILED;
     }
+    result = retNetworkId;
     return WIFI_OPT_SUCCESS;
 }
 
@@ -197,14 +211,11 @@ ErrCode WifiDeviceServiceImpl::RemoveDevice(int networkId)
         return WIFI_OPT_STA_NOT_OPENED;
     }
 
-    WifiRequestMsgInfo msg;
-    msg.msgCode = WifiInternalMsgCode::STA_REMOVE_DEVICE_REQ;
-    msg.params.argInt = networkId;
-    if (WifiManager::GetInstance().PushMsg(WIFI_SERVICE_STA, msg) < 0) {
-        WIFI_LOGE("send remove device config msg failed!");
-        return WIFI_OPT_FAILED;
+    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst();
+    if (pService == nullptr) {
+        return WIFI_OPT_STA_NOT_OPENED;
     }
-    return WIFI_OPT_SUCCESS;
+    return pService->RemoveDevice(networkId);
 }
 
 ErrCode WifiDeviceServiceImpl::RemoveAllDevice()
@@ -218,13 +229,11 @@ ErrCode WifiDeviceServiceImpl::RemoveAllDevice()
         return WIFI_OPT_STA_NOT_OPENED;
     }
 
-    WifiRequestMsgInfo msg;
-    msg.msgCode = WifiInternalMsgCode::STA_REMOVE_ALL_DEVICE_REQ;
-    if (WifiManager::GetInstance().PushMsg(WIFI_SERVICE_STA, msg) < 0) {
-        WIFI_LOGE("send remove device config msg failed!");
-        return WIFI_OPT_FAILED;
+    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst();
+    if (pService == nullptr) {
+        return WIFI_OPT_STA_NOT_OPENED;
     }
-    return WIFI_OPT_SUCCESS;
+    return pService->RemoveAllDevice();
 }
 
 ErrCode WifiDeviceServiceImpl::GetDeviceConfigs(std::vector<WifiDeviceConfig> &result)
@@ -245,13 +254,15 @@ ErrCode WifiDeviceServiceImpl::EnableDeviceConfig(int networkId, bool attemptEna
         return WIFI_OPT_PERMISSION_DENIED;
     }
 
-    int ret =
-        WifiConfigCenter::GetInstance().SetDeviceState(networkId, (int)WifiDeviceConfigStatus::ENABLED, attemptEnable);
-    if (ret < 0) {
-        WIFI_LOGE("Enable device config failed! networkid is %{public}d", networkId);
-        return WIFI_OPT_FAILED;
+    if (!IsStaServiceRunning()) {
+        return WIFI_OPT_STA_NOT_OPENED;
     }
-    return WIFI_OPT_SUCCESS;
+
+    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst();
+    if (pService == nullptr) {
+        return WIFI_OPT_STA_NOT_OPENED;
+    }
+    return pService->EnableDeviceConfig(networkId, attemptEnable);
 }
 
 ErrCode WifiDeviceServiceImpl::DisableDeviceConfig(int networkId)
@@ -261,12 +272,15 @@ ErrCode WifiDeviceServiceImpl::DisableDeviceConfig(int networkId)
         return WIFI_OPT_PERMISSION_DENIED;
     }
 
-    int ret = WifiConfigCenter::GetInstance().SetDeviceState(networkId, (int)WifiDeviceConfigStatus::DISABLED);
-    if (ret < 0) {
-        WIFI_LOGE("Disable Wi-Fi device configuration. failed! networkid is %{public}d", networkId);
-        return WIFI_OPT_FAILED;
+    if (!IsStaServiceRunning()) {
+        return WIFI_OPT_STA_NOT_OPENED;
     }
-    return WIFI_OPT_SUCCESS;
+
+    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst();
+    if (pService == nullptr) {
+        return WIFI_OPT_STA_NOT_OPENED;
+    }
+    return pService->DisableDeviceConfig(networkId);
 }
 
 ErrCode WifiDeviceServiceImpl::ConnectToNetwork(int networkId)
@@ -280,14 +294,11 @@ ErrCode WifiDeviceServiceImpl::ConnectToNetwork(int networkId)
         return WIFI_OPT_STA_NOT_OPENED;
     }
 
-    WifiRequestMsgInfo msg;
-    msg.msgCode = WifiInternalMsgCode::STA_CONNECT_REQ;
-    msg.params.argInt = networkId;
-    if (WifiManager::GetInstance().PushMsg(WIFI_SERVICE_STA, msg) < 0) {
-        WIFI_LOGE("send connect network msg failed!");
-        return WIFI_OPT_FAILED;
+    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst();
+    if (pService == nullptr) {
+        return WIFI_OPT_STA_NOT_OPENED;
     }
-    return WIFI_OPT_SUCCESS;
+    return pService->ConnectToNetwork(networkId);
 }
 
 ErrCode WifiDeviceServiceImpl::ConnectToDevice(const WifiDeviceConfig &config)
@@ -301,14 +312,11 @@ ErrCode WifiDeviceServiceImpl::ConnectToDevice(const WifiDeviceConfig &config)
         return WIFI_OPT_STA_NOT_OPENED;
     }
 
-    WifiRequestMsgInfo msg;
-    msg.msgCode = WifiInternalMsgCode::STA_CONNECT_REQ;
-    msg.params.deviceConfig = config;
-    if (WifiManager::GetInstance().PushMsg(WIFI_SERVICE_STA, msg) < 0) {
-        WIFI_LOGE("send connect with device config msg failed!");
-        return WIFI_OPT_FAILED;
+    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst();
+    if (pService == nullptr) {
+        return WIFI_OPT_STA_NOT_OPENED;
     }
-    return WIFI_OPT_SUCCESS;
+    return pService->ConnectToDevice(config);
 }
 
 ErrCode WifiDeviceServiceImpl::ReConnect()
@@ -326,13 +334,11 @@ ErrCode WifiDeviceServiceImpl::ReConnect()
         return WIFI_OPT_SCAN_NOT_OPENED;
     }
 
-    WifiRequestMsgInfo msg;
-    msg.msgCode = WifiInternalMsgCode::SCAN_RECONNECT_REQ;
-    if (WifiManager::GetInstance().PushMsg(WIFI_SERVICE_SCAN, msg) < 0) {
-        WIFI_LOGE("send scan msg failed!");
-        return WIFI_OPT_FAILED;
+    IScanService *pService = WifiServiceManager::GetInstance().GetScanServiceInst();
+    if (pService == nullptr) {
+        return WIFI_OPT_SCAN_NOT_OPENED;
     }
-    return WIFI_OPT_SUCCESS;
+    return pService->Scan(false);
 }
 
 ErrCode WifiDeviceServiceImpl::ReAssociate(void)
@@ -346,13 +352,11 @@ ErrCode WifiDeviceServiceImpl::ReAssociate(void)
         return WIFI_OPT_STA_NOT_OPENED;
     }
 
-    WifiRequestMsgInfo msg;
-    msg.msgCode = WifiInternalMsgCode::STA_REASSOCIATE_REQ;
-    if (WifiManager::GetInstance().PushMsg(WIFI_SERVICE_STA, msg) < 0) {
-        WIFI_LOGE("send disconnect msg failed!");
-        return WIFI_OPT_FAILED;
+    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst();
+    if (pService == nullptr) {
+        return WIFI_OPT_STA_NOT_OPENED;
     }
-    return WIFI_OPT_SUCCESS;
+    return pService->ReAssociate();
 }
 
 ErrCode WifiDeviceServiceImpl::Disconnect(void)
@@ -366,13 +370,11 @@ ErrCode WifiDeviceServiceImpl::Disconnect(void)
         return WIFI_OPT_STA_NOT_OPENED;
     }
 
-    WifiRequestMsgInfo msg;
-    msg.msgCode = WifiInternalMsgCode::STA_DISCONNECT_REQ;
-    if (WifiManager::GetInstance().PushMsg(WIFI_SERVICE_STA, msg) < 0) {
-        WIFI_LOGE("send disconnect msg failed!");
-        return WIFI_OPT_FAILED;
+    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst();
+    if (pService == nullptr) {
+        return WIFI_OPT_STA_NOT_OPENED;
     }
-    return WIFI_OPT_SUCCESS;
+    return pService->Disconnect();
 }
 
 ErrCode WifiDeviceServiceImpl::StartWps(const WpsConfig &config)
@@ -386,14 +388,11 @@ ErrCode WifiDeviceServiceImpl::StartWps(const WpsConfig &config)
         return WIFI_OPT_STA_NOT_OPENED;
     }
 
-    WifiRequestMsgInfo msg;
-    msg.msgCode = WifiInternalMsgCode::STA_START_WPS_REQ;
-    msg.params.wpsConfig = config;
-    if (WifiManager::GetInstance().PushMsg(WIFI_SERVICE_STA, msg) < 0) {
-        WIFI_LOGE("send start wps msg failed!");
-        return WIFI_OPT_FAILED;
+    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst();
+    if (pService == nullptr) {
+        return WIFI_OPT_STA_NOT_OPENED;
     }
-    return WIFI_OPT_SUCCESS;
+    return pService->StartWps(config);
 }
 
 ErrCode WifiDeviceServiceImpl::CancelWps(void)
@@ -407,19 +406,16 @@ ErrCode WifiDeviceServiceImpl::CancelWps(void)
         return WIFI_OPT_STA_NOT_OPENED;
     }
 
-    WifiRequestMsgInfo msg;
-    msg.msgCode = WifiInternalMsgCode::STA_CANCEL_WPS_REQ;
-    if (WifiManager::GetInstance().PushMsg(WIFI_SERVICE_STA, msg) < 0) {
-        WIFI_LOGE("send cancel wps msg failed!");
-        return WIFI_OPT_FAILED;
+    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst();
+    if (pService == nullptr) {
+        return WIFI_OPT_STA_NOT_OPENED;
     }
-    return WIFI_OPT_SUCCESS;
+    return pService->CancelWps();
 }
 
 ErrCode WifiDeviceServiceImpl::IsWifiActive(bool &bActive)
 {
-    WifiOprMidState curState = WifiConfigCenter::GetInstance().GetWifiMidState();
-    bActive = (curState == WifiOprMidState::RUNNING);
+    bActive = IsStaServiceRunning();
     return WIFI_OPT_SUCCESS;
 }
 
@@ -468,22 +464,23 @@ ErrCode WifiDeviceServiceImpl::GetIpInfo(IpInfo &info)
 
 ErrCode WifiDeviceServiceImpl::SetCountryCode(const std::string &countryCode)
 {
+    if (countryCode.length() != WIFI_COUNTRY_CODE_LEN) {
+        return WIFI_OPT_INVALID_PARAM;
+    }
     if (WifiPermissionUtils::VerifyWifiConnectionPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("SetCountryCode:VerifyWifiConnectionPermission() PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
 
-    WifiConfigCenter::GetInstance().SetCountryCode(countryCode);
-
-    if (IsStaServiceRunning()) {
-        WifiRequestMsgInfo msg;
-        msg.msgCode = WifiInternalMsgCode::STA_SET_COUNTRY_CODE;
-        if (WifiManager::GetInstance().PushMsg(WIFI_SERVICE_STA, msg) < 0) {
-            WIFI_LOGE("send set country code msg failed!");
-            return WIFI_OPT_FAILED;
-        }
+    if (!IsStaServiceRunning()) {
+        return WIFI_OPT_STA_NOT_OPENED;
     }
-    return WIFI_OPT_SUCCESS;
+
+    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst();
+    if (pService == nullptr) {
+        return WIFI_OPT_STA_NOT_OPENED;
+    }
+    return pService->SetCountryCode(countryCode);
 }
 
 ErrCode WifiDeviceServiceImpl::GetCountryCode(std::string &countryCode)
@@ -498,10 +495,9 @@ ErrCode WifiDeviceServiceImpl::GetCountryCode(std::string &countryCode)
     return WIFI_OPT_SUCCESS;
 }
 
-ErrCode WifiDeviceServiceImpl::RegisterCallBackClient(
-    const std::string &name, const sptr<IWifiDeviceCallBack> &callback)
+ErrCode WifiDeviceServiceImpl::RegisterCallBack(const sptr<IWifiDeviceCallBack> &callback)
 {
-    WIFI_LOGI("RegisterCallBackClient");
+    WIFI_LOGI("RegisterCallBack");
     if (callback == nullptr) {
         WIFI_LOGE("Get call back client failed!");
         return WIFI_OPT_FAILED;
@@ -541,6 +537,23 @@ ErrCode WifiDeviceServiceImpl::GetSupportedFeatures(long &features)
     return WIFI_OPT_SUCCESS;
 }
 
+ErrCode WifiDeviceServiceImpl::GetDeviceMacAddress(std::string &result)
+{
+    WIFI_LOGI("GetDeviceMacAddress");
+    if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("GetDeviceMacAddress:VerifyGetWifiInfoPermission PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+
+    if (WifiPermissionUtils::VerifyGetWifiLocalMacPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("GetDeviceMacAddress:VerifyGetWifiLocalMacPermission PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+
+    WifiConfigCenter::GetInstance().GetMacAddress(result);
+    return WIFI_OPT_SUCCESS;
+}
+
 ErrCode WifiDeviceServiceImpl::CheckCanEnableWifi(void)
 {
     if (WifiPermissionUtils::VerifySetWifiInfoPermission() == PERMISSION_DENIED) {
@@ -551,7 +564,8 @@ ErrCode WifiDeviceServiceImpl::CheckCanEnableWifi(void)
      * when airplane mode opened, if the config "can_use_sta_when_airplanemode"
      * opened, then can open sta; other, return forbid.
      */
-    if (WifiConfigCenter::GetInstance().GetAirplaneModeState() == 1 &&
+    if (!WifiConfigCenter::GetInstance().GetCanOpenStaWhenAirplaneMode() &&
+        WifiConfigCenter::GetInstance().GetAirplaneModeState() == 1 &&
         !WifiConfigCenter::GetInstance().GetCanUseStaWhenAirplaneMode()) {
         WIFI_LOGI("current airplane mode and can not use sta, open failed!");
         return WIFI_OPT_FORBID_AIRPLANE;
@@ -568,8 +582,7 @@ ErrCode WifiDeviceServiceImpl::CheckCanEnableWifi(void)
     double interval = WifiConfigCenter::GetInstance().GetWifiStaInterval();
     if (interval <= REOPEN_STA_INTERVAL) {
         int waitMils = REOPEN_STA_INTERVAL - int(interval) + 1;
-        WIFI_LOGI("open wifi too frequent, interval since last close is %lf, and wait "
-                  "%{public}d ms",
+        WIFI_LOGI("open wifi too frequent, interval since last close is %{public}lf, and wait %{public}d ms",
             interval,
             waitMils);
         usleep(waitMils * MSEC);

@@ -15,6 +15,7 @@ import("//build/ohos.gni")
 import("//build/ohos/sa_profile/sa_profile.gni")
 import("//build/ohos_var.gni")
 import("//foundation/appexecfwk/standard/appexecfwk.gni")
+
 ################################################################################
 
 config("wifi_manager_service_header") {
@@ -35,6 +36,9 @@ config("wifi_manager_service_header") {
     "//foundation/communication/wifi/services/wifi_standard/wifi_framework/wifi_manage/common",
     "//foundation/communication/wifi/services/wifi_standard/wifi_framework/wifi_manage/idl_client",
     "//foundation/communication/wifi/services/wifi_standard/wifi_framework/wifi_manage/idl_client/idl_interface",
+    "//foundation/communication/wifi/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta",
+    "//foundation/communication/wifi/services/wifi_standard/wifi_framework/wifi_manage/wifi_scan",
+    "//foundation/communication/wifi/services/wifi_standard/wifi_framework/wifi_manage/wifi_ap",
     "${aafwk_path}/interfaces/innerkits/want/include",
     "${aafwk_path}/interfaces/innerkits/want/include/ohos/aafwk/content",
     "//foundation/distributedschedule/dmsfwk/services/dtbschedmgr/include",
@@ -113,10 +117,10 @@ ohos_shared_library("wifi_manager_service") {
     "//foundation/communication/wifi/services/wifi_standard/wifi_framework/common/net_helper/ipv6_address.cpp",
     "//foundation/communication/wifi/services/wifi_standard/wifi_framework/common/net_helper/mac_address.cpp",
     "//foundation/communication/wifi/services/wifi_standard/wifi_framework/common/net_helper/network_interface.cpp",
+    "//foundation/communication/wifi/services/wifi_standard/wifi_framework/common/utils/wifi_common_event_helper.cpp",
     "//foundation/communication/wifi/services/wifi_standard/wifi_framework/common/utils/wifi_global_func.cpp",
     "//foundation/communication/wifi/services/wifi_standard/wifi_framework/wifi_manage/common/wifi_permission_helper.cpp",
     "//foundation/communication/wifi/services/wifi_standard/wifi_framework/wifi_manage/common/wifi_permission_utils.cpp",
-    "//foundation/communication/wifi/services/wifi_standard/wifi_framework/common/utils/wifi_common_event_helper.cpp",
     "wifi_auth_center.cpp",
     "wifi_config_center.cpp",
     "wifi_internal_event_dispatcher.cpp",
@@ -125,13 +129,13 @@ ohos_shared_library("wifi_manager_service") {
   ]
 
   deps = [
+    "${aafwk_path}/interfaces/innerkits/base:base",
+    "${aafwk_path}/interfaces/innerkits/want:want",
     "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog",
     "//foundation/communication/wifi/services/wifi_standard/etc/init:etc",
     "//foundation/communication/wifi/services/wifi_standard/wifi_framework/wifi_manage/idl_client:wifi_idl_client",
     "//foundation/distributedschedule/safwk/interfaces/innerkits/safwk:system_ability_fwk",
     "//utils/native/base:utils",
-    "${aafwk_path}/interfaces/innerkits/base:base",
-    "${aafwk_path}/interfaces/innerkits/want:want",
   ]
 
   defines = [
@@ -143,7 +147,7 @@ ohos_shared_library("wifi_manager_service") {
 
   external_deps = [
     "ces_standard:cesfwk_innerkits",
-    "ipc:ipc_core",  
+    "ipc:ipc_core",
   ]
 
   part_name = "wifi_standard"

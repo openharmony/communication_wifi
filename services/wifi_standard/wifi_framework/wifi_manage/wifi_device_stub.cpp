@@ -56,9 +56,10 @@ void WifiDeviceStub::InitHandleMap()
     handleFuncMap[WIFI_SVR_CMD_GET_DHCP_INFO] = &WifiDeviceStub::OnGetIpInfo;
     handleFuncMap[WIFI_SVR_CMD_SET_COUNTRY_CODE] = &WifiDeviceStub::OnSetCountryCode;
     handleFuncMap[WIFI_SVR_CMD_GET_COUNTRY_CODE] = &WifiDeviceStub::OnGetCountryCode;
-    handleFuncMap[WIFI_SVR_CMD_REGISTER_CALLBACK_CLIENT] = &WifiDeviceStub::OnRegisterCallBackClient;
+    handleFuncMap[WIFI_SVR_CMD_REGISTER_CALLBACK_CLIENT] = &WifiDeviceStub::OnRegisterCallBack;
     handleFuncMap[WIFI_SVR_CMD_GET_SIGNAL_LEVEL] = &WifiDeviceStub::OnGetSignalLevel;
     handleFuncMap[WIFI_SVR_CMD_GET_SUPPORTED_FEATURES] = &WifiDeviceStub::OnGetSupportedFeatures;
+    handleFuncMap[WIFI_SVR_CMD_GET_DERVICE_MAC_ADD] = &WifiDeviceStub::OnGetDeviceMacAdd;
     return;
 }
 
@@ -84,7 +85,7 @@ int WifiDeviceStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageP
 void WifiDeviceStub::OnEnableWifi(uint32_t code, MessageParcel &data, MessageParcel &reply)
 {
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
-    int ret = EnableWifi();
+    ErrCode ret = EnableWifi();
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
 
@@ -94,7 +95,7 @@ void WifiDeviceStub::OnEnableWifi(uint32_t code, MessageParcel &data, MessagePar
 void WifiDeviceStub::OnDisableWifi(uint32_t code, MessageParcel &data, MessageParcel &reply)
 {
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
-    int ret = DisableWifi();
+    ErrCode ret = DisableWifi();
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
     return;
@@ -107,7 +108,7 @@ void WifiDeviceStub::OnAddDeviceConfig(uint32_t code, MessageParcel &data, Messa
     ReadWifiDeviceConfig(data, config);
 
     int result = 0;
-    int ret = AddDeviceConfig(config, result);
+    ErrCode ret = AddDeviceConfig(config, result);
 
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
@@ -229,7 +230,7 @@ void WifiDeviceStub::OnRemoveDevice(uint32_t code, MessageParcel &data, MessageP
 {
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
     int networkId = data.ReadInt32();
-    int ret = RemoveDevice(networkId);
+    ErrCode ret = RemoveDevice(networkId);
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
 
@@ -239,7 +240,7 @@ void WifiDeviceStub::OnRemoveDevice(uint32_t code, MessageParcel &data, MessageP
 void WifiDeviceStub::OnRemoveAllDevice(uint32_t code, MessageParcel &data, MessageParcel &reply)
 {
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
-    int ret = RemoveAllDevice();
+    ErrCode ret = RemoveAllDevice();
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
 
@@ -250,7 +251,7 @@ void WifiDeviceStub::OnGetDeviceConfigs(uint32_t code, MessageParcel &data, Mess
 {
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
     std::vector<WifiDeviceConfig> result;
-    int ret = GetDeviceConfigs(result);
+    ErrCode ret = GetDeviceConfigs(result);
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
 
@@ -269,7 +270,7 @@ void WifiDeviceStub::OnEnableDeviceConfig(uint32_t code, MessageParcel &data, Me
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
     int networkId = data.ReadInt32();
     bool attemptEnable = data.ReadBool();
-    int ret = EnableDeviceConfig(networkId, attemptEnable);
+    ErrCode ret = EnableDeviceConfig(networkId, attemptEnable);
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
 
@@ -280,7 +281,7 @@ void WifiDeviceStub::OnDisableDeviceConfig(uint32_t code, MessageParcel &data, M
 {
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
     int networkId = data.ReadInt32();
-    int ret = DisableDeviceConfig(networkId);
+    ErrCode ret = DisableDeviceConfig(networkId);
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
 
@@ -291,7 +292,7 @@ void WifiDeviceStub::OnConnectTo(uint32_t code, MessageParcel &data, MessageParc
 {
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
     int networkId = data.ReadInt32();
-    int ret = ConnectToNetwork(networkId);
+    ErrCode ret = ConnectToNetwork(networkId);
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
 
@@ -303,7 +304,7 @@ void WifiDeviceStub::OnConnect2To(uint32_t code, MessageParcel &data, MessagePar
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
     WifiDeviceConfig config;
     ReadWifiDeviceConfig(data, config);
-    int ret = ConnectToDevice(config);
+    ErrCode ret = ConnectToDevice(config);
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
 
@@ -313,7 +314,7 @@ void WifiDeviceStub::OnConnect2To(uint32_t code, MessageParcel &data, MessagePar
 void WifiDeviceStub::OnReConnect(uint32_t code, MessageParcel &data, MessageParcel &reply)
 {
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
-    int ret = ReConnect();
+    ErrCode ret = ReConnect();
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
 
@@ -323,7 +324,7 @@ void WifiDeviceStub::OnReConnect(uint32_t code, MessageParcel &data, MessageParc
 void WifiDeviceStub::OnReAssociate(uint32_t code, MessageParcel &data, MessageParcel &reply)
 {
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
-    int ret = ReAssociate();
+    ErrCode ret = ReAssociate();
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
 
@@ -333,7 +334,7 @@ void WifiDeviceStub::OnReAssociate(uint32_t code, MessageParcel &data, MessagePa
 void WifiDeviceStub::OnDisconnect(uint32_t code, MessageParcel &data, MessageParcel &reply)
 {
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
-    int ret = Disconnect();
+    ErrCode ret = Disconnect();
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
 
@@ -348,7 +349,7 @@ void WifiDeviceStub::OnStartWps(uint32_t code, MessageParcel &data, MessageParce
     config.pin = data.ReadCString();
     config.bssid = data.ReadCString();
 
-    int ret = StartWps(config);
+    ErrCode ret = StartWps(config);
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
 
@@ -358,7 +359,7 @@ void WifiDeviceStub::OnStartWps(uint32_t code, MessageParcel &data, MessageParce
 void WifiDeviceStub::OnCancelWps(uint32_t code, MessageParcel &data, MessageParcel &reply)
 {
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
-    int ret = CancelWps();
+    ErrCode ret = CancelWps();
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
 
@@ -369,7 +370,7 @@ void WifiDeviceStub::OnIsWifiActive(uint32_t code, MessageParcel &data, MessageP
 {
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
     bool bActive = false;
-    int ret = IsWifiActive(bActive);
+    ErrCode ret = IsWifiActive(bActive);
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
     if (ret == WIFI_OPT_SUCCESS) {
@@ -382,7 +383,7 @@ void WifiDeviceStub::OnGetWifiState(uint32_t code, MessageParcel &data, MessageP
 {
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
     int state = 0;
-    int ret = GetWifiState(state);
+    ErrCode ret = GetWifiState(state);
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
     if (ret == WIFI_OPT_SUCCESS) {
@@ -395,7 +396,7 @@ void WifiDeviceStub::OnGetLinkedInfo(uint32_t code, MessageParcel &data, Message
 {
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
     WifiLinkedInfo wifiInfo;
-    int ret = GetLinkedInfo(wifiInfo);
+    ErrCode ret = GetLinkedInfo(wifiInfo);
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
 
@@ -426,7 +427,7 @@ void WifiDeviceStub::OnGetIpInfo(uint32_t code, MessageParcel &data, MessageParc
 {
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
     IpInfo info;
-    int ret = GetIpInfo(info);
+    ErrCode ret = GetIpInfo(info);
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
 
@@ -447,7 +448,7 @@ void WifiDeviceStub::OnSetCountryCode(uint32_t code, MessageParcel &data, Messag
 {
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
     std::string countrycode = data.ReadCString();
-    int ret = SetCountryCode(countrycode);
+    ErrCode ret = SetCountryCode(countrycode);
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
 
@@ -458,7 +459,7 @@ void WifiDeviceStub::OnGetCountryCode(uint32_t code, MessageParcel &data, Messag
 {
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
     std::string countryCode;
-    int ret = GetCountryCode(countryCode);
+    ErrCode ret = GetCountryCode(countryCode);
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
 
@@ -469,12 +470,11 @@ void WifiDeviceStub::OnGetCountryCode(uint32_t code, MessageParcel &data, Messag
     return;
 }
 
-void WifiDeviceStub::OnRegisterCallBackClient(uint32_t code, MessageParcel &data, MessageParcel &reply)
+void WifiDeviceStub::OnRegisterCallBack(uint32_t code, MessageParcel &data, MessageParcel &reply)
 {
     WIFI_LOGD("run %{public}s code %{public}u, datasize %zu", __func__, code, data.GetRawDataSize());
-    int ret = WIFI_OPT_FAILED;
+    ErrCode ret = WIFI_OPT_FAILED;
     do {
-        std::string name = data.ReadCString();
         sptr<IRemoteObject> remote = data.ReadRemoteObject();
         if (remote == nullptr) {
             WIFI_LOGD("Failed to ReadRemoteObject!");
@@ -482,15 +482,15 @@ void WifiDeviceStub::OnRegisterCallBackClient(uint32_t code, MessageParcel &data
         }
         callback_ = iface_cast<IWifiDeviceCallBack>(remote);
         if (callback_ == nullptr) {
-            callback_ = new WifiDeviceCallBackProxy(remote);
+            callback_ = new (std::nothrow) WifiDeviceCallBackProxy(remote);
             WIFI_LOGD("create new WifiDeviceCallBackProxy!");
         }
 
         if (mSingleCallback) {
-            ret = RegisterCallBackClient(name, callback_);
+            ret = RegisterCallBack(callback_);
         } else {
             if (deathRecipient_ == nullptr) {
-                deathRecipient_ = new WifiDeviceDeathRecipient();
+                deathRecipient_ = new (std::nothrow) WifiDeviceDeathRecipient();
             }
             if ((remote->IsProxyObject()) && (!remote->AddDeathRecipient(deathRecipient_))) {
                 WIFI_LOGD("AddDeathRecipient!");
@@ -512,7 +512,7 @@ void WifiDeviceStub::OnGetSignalLevel(uint32_t code, MessageParcel &data, Messag
     int rssi = data.ReadInt32();
     int band = data.ReadInt32();
     int level = 0;
-    int ret = GetSignalLevel(rssi, band, level);
+    ErrCode ret = GetSignalLevel(rssi, band, level);
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
     if (ret == WIFI_OPT_SUCCESS) {
@@ -531,6 +531,20 @@ void WifiDeviceStub::OnGetSupportedFeatures(uint32_t code, MessageParcel &data, 
 
     if (ret == WIFI_OPT_SUCCESS) {
         reply.WriteInt64(features);
+    }
+
+    return;
+}
+
+void WifiDeviceStub::OnGetDeviceMacAdd(uint32_t code, MessageParcel &data, MessageParcel &reply)
+{
+    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+    std::string strMacAddr;
+    ErrCode ret = GetDeviceMacAddress(strMacAddr);
+    reply.WriteInt32(0);
+    reply.WriteInt32(ret);
+    if (ret == WIFI_OPT_SUCCESS) {
+        reply.WriteCString(strMacAddr.c_str());
     }
 
     return;

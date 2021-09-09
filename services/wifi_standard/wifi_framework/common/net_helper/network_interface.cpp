@@ -140,7 +140,7 @@ bool NetworkInterface::IsExistAddressForInterface(const std::string &interfaceNa
         return true;
     }
 
-    for (const auto iter : vecIPv6) {
+    for (const auto &iter : vecIPv6) {
         if (iter == address) {
             return true;
         }

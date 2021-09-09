@@ -214,7 +214,7 @@ void StateMachine::MessageExecutedLater(InternalMessage *msg, int64_t delayTimeM
 
 void StateMachine::StartTimer(int timerName, int64_t interval)
 {
-    LOGD("Enter StateMachine::StartTimer, timerName is %{public}d, interval is %" PRIu64 "", timerName, interval);
+    LOGD("Enter StateMachine::StartTimer, timerName is %{public}d, interval is %" PRIu64 ".", timerName, interval);
     MessageExecutedLater(timerName, interval);
     return;
 }

@@ -137,29 +137,6 @@ WifiErrorNo GetStaInfos(char *infos, int32_t *size)
     return result;
 }
 
-WifiErrorNo ConfigHotspot(uint32_t chan, const char *mscb)
-{
-    RpcClient *client = GetApRpcClient();
-    LockRpcClient(client);
-    Context *context = client->context;
-    WriteBegin(context, 0);
-    WriteFunc(context, "ConfigHotspot");
-    WriteInt(context, chan);
-    WriteStr(context, mscb);
-    WriteEnd(context);
-    int ret = RemoteCall(client);
-    if (ret < 0) {
-        LOGE("remote call failed!");
-        UnlockRpcClient(client);
-        return WIFI_IDL_OPT_FAILED;
-    }
-    int result = WIFI_IDL_OPT_FAILED;
-    ReadInt(context, &result);
-    ReadClientEnd(client);
-    UnlockRpcClient(client);
-    return result;
-}
-
 WifiErrorNo SetMacFilter(unsigned char *mac, int lenMac)
 {
     RpcClient *client = GetApRpcClient();

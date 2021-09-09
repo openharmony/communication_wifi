@@ -17,7 +17,7 @@
 #include "log.h"
 
 #undef LOG_TAG
-#define LOG_TAG "OHWIFI_RPC_HASHTABLE"
+#define LOG_TAG "WifiRpcHashTable"
 
 const int START_PRIME_NUM = 3;
 const int START_CALC_PRIME_NUM = 2;

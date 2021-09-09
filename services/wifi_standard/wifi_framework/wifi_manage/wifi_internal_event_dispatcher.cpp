@@ -16,6 +16,7 @@
 #include "wifi_internal_event_dispatcher.h"
 #include "wifi_logger.h"
 #include "wifi_permission_helper.h"
+#include "wifi_errcode.h"
 #include "wifi_common_event_helper.h"
 
 DEFINE_WIFILOG_LABEL("WifiInternalEventDispatcher");
@@ -28,11 +29,8 @@ WifiInternalEventDispatcher &WifiInternalEventDispatcher::GetInstance()
     return gWifiInternalEventDispatcher;
 }
 
-WifiInternalEventDispatcher::WifiInternalEventDispatcher():mTid(0)
-{
-    mSystemNotifyInit = false;
-    mRunFlag = true;
-}
+WifiInternalEventDispatcher::WifiInternalEventDispatcher() : mRunFlag(true)
+{}
 
 WifiInternalEventDispatcher::~WifiInternalEventDispatcher()
 {}
@@ -41,11 +39,7 @@ int WifiInternalEventDispatcher::Init()
 {
     /* first init system notify service client here ! */
 
-    int ret = pthread_create(&mTid, nullptr, Run, this);
-    if (ret != 0) {
-        WIFI_LOGE("Init WifiInternalEventDispatcher notify message callback thread failed!");
-        return -1;
-    }
+    mBroadcastThread = std::thread(WifiInternalEventDispatcher::Run, std::ref(*this));
     return 0;
 }
 
@@ -211,15 +205,18 @@ int WifiInternalEventDispatcher::AddBroadCastMsg(const WifiEventCallbackMsg &msg
 
 void WifiInternalEventDispatcher::Exit()
 {
-    if (mRunFlag) {
-        mRunFlag = false;
-        mCondition.notify_one();
-        pthread_join(mTid, nullptr);
+    if (!mRunFlag) {
+        return;
+    }
+    mRunFlag = false;
+    mCondition.notify_one();
+    if (mBroadcastThread.joinable()) {
+        mBroadcastThread.join();
     }
 }
 
 void WifiInternalEventDispatcher::DealStaCallbackMsg(
-    WifiInternalEventDispatcher *pInstance, const WifiEventCallbackMsg &msg)
+    WifiInternalEventDispatcher &instance, const WifiEventCallbackMsg &msg)
 {
     switch (msg.msgCode) {
         case WIFI_CBK_MSG_STATE_CHANGE:
@@ -229,6 +226,7 @@ void WifiInternalEventDispatcher::DealStaCallbackMsg(
             WifiInternalEventDispatcher::PublishConnectionStateChangedEvent(msg.msgData, msg.linkInfo);
             break;
         case WIFI_CBK_MSG_RSSI_CHANGE:
+            WifiInternalEventDispatcher::PublishRssiValueChangedEvent(msg.msgData);
             break;
         case WIFI_CBK_MSG_STREAM_DIRECTION:
             break;
@@ -238,7 +236,7 @@ void WifiInternalEventDispatcher::DealStaCallbackMsg(
             break;
     }
 
-    auto callback = pInstance->GetSingleStaCallback();
+    auto callback = instance.GetSingleStaCallback();
     if (callback != nullptr) {
         switch (msg.msgCode) {
             case WIFI_CBK_MSG_STATE_CHANGE:
@@ -261,7 +259,135 @@ void WifiInternalEventDispatcher::DealStaCallbackMsg(
                 break;
         }
     }
-    pInstance->InvokeDeviceCallbacks(msg);
+    instance.InvokeDeviceCallbacks(msg);
+    return;
+}
+
+void WifiInternalEventDispatcher::DealScanCallbackMsg(
+    WifiInternalEventDispatcher &instance, const WifiEventCallbackMsg &msg)
+{
+    switch (msg.msgCode) {
+        case WIFI_CBK_MSG_SCAN_STATE_CHANGE:
+            WifiCommonEventHelper::PublishScanStateChangedEvent(msg.msgData, "OnScanStateChanged");
+            break;
+        default:
+            WIFI_LOGI("UnKnown msgcode %{public}d", msg.msgCode);
+            break;
+    }
+
+    auto callback = instance.GetSingleScanCallback();
+    if (callback != nullptr) {
+        switch (msg.msgCode) {
+            case WIFI_CBK_MSG_SCAN_STATE_CHANGE:
+                callback->OnWifiScanStateChanged(msg.msgData);
+                break;
+            default:
+                break;
+        }
+    }
+    instance.InvokeScanCallbacks(msg);
+    return;
+}
+
+void WifiInternalEventDispatcher::InvokeScanCallbacks(const WifiEventCallbackMsg &msg)
+{
+    ScanCallbackMapType callbacks = mScanCallbacks;
+    ScanCallbackMapType::iterator itr;
+    for (itr = callbacks.begin(); itr != callbacks.end(); itr++) {
+        auto callback = itr->second;
+        if (callback == nullptr) {
+            continue;
+        }
+        switch (msg.msgCode) {
+            case WIFI_CBK_MSG_SCAN_STATE_CHANGE:
+                callback->OnWifiScanStateChanged(msg.msgData);
+                break;
+            default:
+                WIFI_LOGI("UnKnown msgcode %{public}d", msg.msgCode);
+                break;
+        }
+    }
+}
+
+void WifiInternalEventDispatcher::InvokeDeviceCallbacks(const WifiEventCallbackMsg &msg)
+{
+    StaCallbackMapType callbacks = mStaCallbacks;
+    StaCallbackMapType::iterator itr;
+    for (itr = callbacks.begin(); itr != callbacks.end(); itr++) {
+        auto callback = itr->second;
+        if (callback == nullptr) {
+            continue;
+        }
+        switch (msg.msgCode) {
+            case WIFI_CBK_MSG_STATE_CHANGE:
+                callback->OnWifiStateChanged(msg.msgData);
+                break;
+            case WIFI_CBK_MSG_CONNECTION_CHANGE:
+                callback->OnWifiConnectionChanged(msg.msgData, msg.linkInfo);
+                break;
+            case WIFI_CBK_MSG_RSSI_CHANGE:
+                callback->OnWifiRssiChanged(msg.msgData);
+                break;
+            case WIFI_CBK_MSG_STREAM_DIRECTION:
+                callback->OnStreamChanged(msg.msgData);
+                break;
+            case WIFI_CBK_MSG_WPS_STATE_CHANGE:
+                callback->OnWifiWpsStateChanged(msg.msgData, msg.pinCode);
+                break;
+            default:
+                WIFI_LOGI("UnKnown msgcode %{public}d", msg.msgCode);
+                break;
+        }
+    }
+}
+
+void WifiInternalEventDispatcher::InvokeHotspotCallbacks(const WifiEventCallbackMsg &msg)
+{
+    HotspotCallbackMapType callbacks = mHotspotCallbacks;
+    HotspotCallbackMapType::iterator itr;
+    for (itr = callbacks.begin(); itr != callbacks.end(); itr++) {
+        auto callback = itr->second;
+        if (callback == nullptr) {
+            continue;
+        }
+        switch (msg.msgCode) {
+            case WIFI_CBK_MSG_HOTSPOT_STATE_CHANGE:
+                callback->OnHotspotStateChanged(msg.msgData);
+                break;
+            case WIFI_CBK_MSG_HOTSPOT_STATE_JOIN:
+                callback->OnHotspotStaJoin(msg.staInfo);
+                break;
+            case WIFI_CBK_MSG_HOTSPOT_STATE_LEAVE:
+                callback->OnHotspotStaLeave(msg.staInfo);
+                break;
+            default:
+                WIFI_LOGI("UnKnown msgcode %{public}d", msg.msgCode);
+                break;
+        }
+    }
+}
+
+void WifiInternalEventDispatcher::DealHotspotCallbackMsg(
+    WifiInternalEventDispatcher &instance, const WifiEventCallbackMsg &msg)
+{
+    auto callback = instance.GetSingleHotspotCallback();
+    if (callback != nullptr) {
+        switch (msg.msgCode) {
+            case WIFI_CBK_MSG_HOTSPOT_STATE_CHANGE:
+                callback->OnHotspotStateChanged(msg.msgData);
+                break;
+            case WIFI_CBK_MSG_HOTSPOT_STATE_JOIN:
+                callback->OnHotspotStaJoin(msg.staInfo);
+                break;
+            case WIFI_CBK_MSG_HOTSPOT_STATE_LEAVE:
+                callback->OnHotspotStaLeave(msg.staInfo);
+                break;
+            default:
+                WIFI_LOGI("UnKnown msgcode %{public}d", msg.msgCode);
+                break;
+        }
+    }
+    instance.InvokeHotspotCallbacks(msg);
     return;
 }
 
@@ -272,10 +398,7 @@ void WifiInternalEventDispatcher::PublishConnectionStateChangedEvent(int state, 
         case int(OHOS::Wifi::ConnectionState::CONNECT_CONNECTING):
             eventData = "Connecting";
             break;
-        case int(OHOS::Wifi::ConnectionState::CONNECT_OBTAINING_IP):
-            eventData = "OBtaingIp";
-            break;
-        case int(OHOS::Wifi::ConnectionState::CONNECT_OBTAINING_IP_FAIL):
+        case int(OHOS::Wifi::ConnectionState::CONNECT_OBTAINING_IP_FAILED):
             eventData = "OBtaingIpFail";
             break;
         case int(OHOS::Wifi::ConnectionState::CONNECT_AP_CONNECTED):
@@ -314,6 +437,15 @@ void WifiInternalEventDispatcher::PublishConnectionStateChangedEvent(int state, 
     WIFI_LOGD("publish connection state changed event.");
 }
 
+void WifiInternalEventDispatcher::PublishRssiValueChangedEvent(int state)
+{
+    if (!WifiCommonEventHelper::PublishRssiValueChangedEvent(state, "OnRssiValueChanged")) {
+        WIFI_LOGE("failed to publish rssi value changed event!");
+        return;
+    }
+    WIFI_LOGD("publish rssi value changed event.");
+}
+
 void WifiInternalEventDispatcher::PublishWifiStateChangedEvent(int state)
 {
     if (!WifiCommonEventHelper::PublishPowerStateChangeEvent(state, "OnWifiPowerStateChanged")) {
@@ -323,148 +455,32 @@ void WifiInternalEventDispatcher::PublishWifiStateChangedEvent(int state)
     WIFI_LOGD("publish wifi state changed event.");
 }
 
-void WifiInternalEventDispatcher::DealScanCallbackMsg(
-    WifiInternalEventDispatcher *pInstance, const WifiEventCallbackMsg &msg)
+void WifiInternalEventDispatcher::Run(WifiInternalEventDispatcher &instance)
 {
-    auto callback = pInstance->GetSingleScanCallback();
-    if (callback != nullptr) {
-        switch (msg.msgCode) {
-            case WIFI_CBK_MSG_SCAN_STATE_CHANGE:
-                callback->OnWifiScanStateChanged(msg.msgData);
-                break;
-            default:
-                WIFI_LOGI("UnKnown msgcode %{public}d", msg.msgCode);
-                break;
+    while (instance.mRunFlag) {
+        std::unique_lock<std::mutex> lock(instance.mMutex);
+        while (instance.mEventQue.empty() && instance.mRunFlag) {
+            instance.mCondition.wait(lock);
         }
-    }
-    pInstance->InvokeScanCallbacks(msg);
-    return;
-}
-
-void WifiInternalEventDispatcher::InvokeScanCallbacks(const WifiEventCallbackMsg &msg)
-{
-    ScanCallbackMapType callbacks = mScanCallbacks;
-    ScanCallbackMapType::iterator itr;
-    for (itr = callbacks.begin(); itr != callbacks.end(); itr++) {
-        auto callback = itr->second;
-        if (callback != nullptr) {
-            switch (msg.msgCode) {
-                case WIFI_CBK_MSG_SCAN_STATE_CHANGE:
-                    callback->OnWifiScanStateChanged(msg.msgData);
-                    break;
-                default:
-                    WIFI_LOGI("UnKnown msgcode %{public}d", msg.msgCode);
-                    break;
-            }
-        }
-    }
-}
-
-void WifiInternalEventDispatcher::InvokeDeviceCallbacks(const WifiEventCallbackMsg &msg)
-{
-    StaCallbackMapType callbacks = mStaCallbacks;
-    StaCallbackMapType::iterator itr;
-    for (itr = callbacks.begin(); itr != callbacks.end(); itr++) {
-        auto callback = itr->second;
-        if (callback != nullptr) {
-            switch (msg.msgCode) {
-                case WIFI_CBK_MSG_STATE_CHANGE:
-                    callback->OnWifiStateChanged(msg.msgData);
-                    break;
-                case WIFI_CBK_MSG_CONNECTION_CHANGE:
-                    callback->OnWifiConnectionChanged(msg.msgData, msg.linkInfo);
-                    break;
-                case WIFI_CBK_MSG_RSSI_CHANGE:
-                    callback->OnWifiRssiChanged(msg.msgData);
-                    break;
-                case WIFI_CBK_MSG_STREAM_DIRECTION:
-                    callback->OnStreamChanged(msg.msgData);
-                    break;
-                case WIFI_CBK_MSG_WPS_STATE_CHANGE:
-                    callback->OnWifiWpsStateChanged(msg.msgData, msg.pinCode);
-                    break;
-                default:
-                    WIFI_LOGI("UnKnown msgcode %{public}d", msg.msgCode);
-                    break;
-            }
-        }
-    }
-}
-
-void WifiInternalEventDispatcher::InvokeHotspotCallbacks(const WifiEventCallbackMsg &msg)
-{
-    HotspotCallbackMapType callbacks = mHotspotCallbacks;
-    HotspotCallbackMapType::iterator itr;
-    for (itr = callbacks.begin(); itr != callbacks.end(); itr++) {
-        auto callback = itr->second;
-        if (callback != nullptr) {
-            switch (msg.msgCode) {
-                case WIFI_CBK_MSG_HOTSPOT_STATE_CHANGE:
-                    callback->OnHotspotStateChanged(msg.msgData);
-                    break;
-                case WIFI_CBK_MSG_HOTSPOT_STATE_JOIN:
-                    callback->OnHotspotStaJoin(msg.staInfo);
-                    break;
-                case WIFI_CBK_MSG_HOTSPOT_STATE_LEAVE:
-                    callback->OnHotspotStaLeave(msg.staInfo);
-                    break;
-                default:
-                    WIFI_LOGI("UnKnown msgcode %{public}d", msg.msgCode);
-                    break;
-            }
-        }
-    }
-}
-
-void WifiInternalEventDispatcher::DealHotspotCallbackMsg(
-    WifiInternalEventDispatcher *pInstance, const WifiEventCallbackMsg &msg)
-{
-    auto callback = pInstance->GetSingleHotspotCallback();
-    if (callback != nullptr) {
-        switch (msg.msgCode) {
-            case WIFI_CBK_MSG_HOTSPOT_STATE_CHANGE:
-                callback->OnHotspotStateChanged(msg.msgData);
-                break;
-            case WIFI_CBK_MSG_HOTSPOT_STATE_JOIN:
-                callback->OnHotspotStaJoin(msg.staInfo);
-                break;
-            case WIFI_CBK_MSG_HOTSPOT_STATE_LEAVE:
-                callback->OnHotspotStaLeave(msg.staInfo);
-                break;
-            default:
-                WIFI_LOGI("UnKnown msgcode %{public}d", msg.msgCode);
-                break;
-        }
-    }
-    pInstance->InvokeHotspotCallbacks(msg);
-    return;
-}
-
-void *WifiInternalEventDispatcher::Run(void *p)
-{
-    WifiInternalEventDispatcher *pInstance = (WifiInternalEventDispatcher *)p;
-    while (pInstance->mRunFlag) {
-        std::unique_lock<std::mutex> lock(pInstance->mMutex);
-        while (pInstance->mEventQue.empty() && pInstance->mRunFlag) {
-            pInstance->mCondition.wait(lock);
-        }
-        if (!pInstance->mRunFlag) {
+        if (!instance.mRunFlag) {
             break;
         }
-        WifiEventCallbackMsg msg = pInstance->mEventQue.front();
-        pInstance->mEventQue.pop_front();
+        WifiEventCallbackMsg msg = instance.mEventQue.front();
+        instance.mEventQue.pop_front();
         lock.unlock();
         WIFI_LOGD("WifiInternalEventDispatcher::Run broad cast a msg %{public}d", msg.msgCode);
         if (msg.msgCode >= WIFI_CBK_MSG_STATE_CHANGE && msg.msgCode <= WIFI_CBK_MSG_WPS_STATE_CHANGE) {
-            DealStaCallbackMsg(pInstance, msg);
+            DealStaCallbackMsg(instance, msg);
         } else if (msg.msgCode == WIFI_CBK_MSG_SCAN_STATE_CHANGE) {
-            DealScanCallbackMsg(pInstance, msg);
+            DealScanCallbackMsg(instance, msg);
         } else if (msg.msgCode >= WIFI_CBK_MSG_HOTSPOT_STATE_CHANGE &&
                    msg.msgCode <= WIFI_CBK_MSG_HOTSPOT_STATE_LEAVE) {
-            DealHotspotCallbackMsg(pInstance, msg);
+            DealHotspotCallbackMsg(instance, msg);
+        } else {
+            WIFI_LOGI("UnKnown msgcode %{public}d", msg.msgCode);
         }
     }
-    return nullptr;
+    return;
 }
 }  // namespace Wifi
 }  // namespace OHOS

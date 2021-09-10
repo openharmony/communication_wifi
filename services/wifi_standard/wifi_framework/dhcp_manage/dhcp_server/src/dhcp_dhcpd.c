@@ -33,7 +33,6 @@
 #include "hash_table.h"
 #include "address_utils.h"
 #include "securec.h"
-#include "common_util.h"
 #include "dhcp_config.h"
 
 #undef LOG_TAG
@@ -102,7 +101,7 @@ typedef struct DhcpOptionField {
 
 } DhcpOptionField;
 
-static int InitArguments()
+static int InitArguments(void)
 {
     if (CreateHashTable(&g_argumentsTable, ARGUMENT_NAME_SIZE, sizeof(ArgumentInfo), INIT_ARGS_SIZE) != HASH_SUCCESS) {
         return RET_FAILED;
@@ -110,7 +109,7 @@ static int InitArguments()
     return RET_SUCCESS;
 }
 
-static void FreeArguments()
+static void FreeArguments(void)
 {
     if (!Initialized(&g_argumentsTable)) {
         return;
@@ -235,6 +234,9 @@ static int PutPoolArgument(const char *argument, const char *val)
 
 static int ShowVersion(const char *argument, const char *val)
 {
+    if (argument && PutArgument(argument, val) != RET_SUCCESS) {
+        LOGD("failed to put argument 'version'.");
+    }
     printf("version:%s\n", DHCPD_VERSION);
     return RET_BREAK;
 }
@@ -294,7 +296,7 @@ void ShowUsage(const DhcpUsage *usage)
     }
 }
 
-void PrintRequiredArguments()
+void PrintRequiredArguments(void)
 {
     size_t argc = sizeof(usages) / sizeof(DhcpUsage);
     printf("required parameters:");
@@ -319,7 +321,7 @@ void PrintRequiredArguments()
     printf("     dhcp_server --help \n\n");
 }
 
-void PrintUsage()
+void PrintUsage(void)
 {
     printf("Usage: dhcp_server [options] \n\n");
 
@@ -334,7 +336,7 @@ void PrintUsage()
     printf("\n");
 }
 
-void ShowHelp(int argc, char *argv[])
+void ShowHelp(int argc)
 {
     if (argc == NUM_TWO) {
         PrintUsage();
@@ -644,22 +646,6 @@ static int RegisterSignalHandle(void)
     return RET_SUCCESS;
 }
 
-int ValidateArguments()
-{
-    size_t argc = sizeof(usages) / sizeof(DhcpUsage);
-    for (size_t i = 0; i < argc; i++) {
-        DhcpUsage usage = usages[i];
-        if (!usage.opt) {
-            break;
-        }
-        if (usage.required && !HasArgument(usage.opt->name)) {
-            printf("missing required parameter '%s' \n", usage.opt->name);
-            return 0;
-        }
-    }
-    return 1;
-}
-
 static int InitializeDhcpConfig(const char *ifname, DhcpConfig *config)
 {
     if (!config) {
@@ -693,12 +679,12 @@ static int InitializeDhcpConfig(const char *ifname, DhcpConfig *config)
     return RET_SUCCESS;
 }
 
-static void FreeLocalConfig()
+static void FreeLocalConfig(void)
 {
     FreeOptionList(&g_dhcpConfig.options);
 }
 
-void FreeSeverResources()
+void FreeSeverResources(void)
 {
     FreeArguments();
     FreeLocalConfig();
@@ -711,7 +697,7 @@ int main(int argc, char *argv[])
         return 1;
     }
     if (strcmp("-h", argv[argc - 1]) == 0 || strcmp("--help", argv[argc - 1]) == 0) {
-        ShowHelp(argc, argv);
+        ShowHelp(argc);
         return 0;
     }
     if (InitArguments() != RET_SUCCESS) {

@@ -38,7 +38,7 @@
 #define LOG_TAG "DhcpServerCommon"
 
 typedef struct tm *ptm;
-void LogTime()
+void LogTime(void)
 {
     time_t curr;
     time(&curr);
@@ -53,14 +53,14 @@ void LogTime()
         tt->tm_sec);
 }
 
-uint64_t Tmspusec()
+uint64_t Tmspusec(void)
 {
     struct timeval t;
     gettimeofday(&t, 0);
     return (uint64_t)((long long)t.tv_sec * TIME_SEC_TO_USEC + t.tv_usec);
 }
 
-uint64_t Tmspsec()
+uint64_t Tmspsec(void)
 {
     struct timeval t;
     gettimeofday(&t, 0);

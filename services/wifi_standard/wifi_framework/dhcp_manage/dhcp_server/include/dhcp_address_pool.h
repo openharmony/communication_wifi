@@ -75,7 +75,7 @@ AddressBinding *GetBindingByMac(HashTable *bindTable, uint8_t macAddr[DHCP_HWADD
 AddressBinding *GetBindingByIp(HashTable *bindTable, uint32_t ipAddress);
 AddressBinding *QueryBinding(uint8_t macAddr[DHCP_HWADDR_LENGTH], PDhcpOptionList cliOptins);
 void SetDistributeMode(int mode);
-int GetDistributeMode();
+int GetDistributeMode(void);
 
 #ifdef __cplusplus
 }

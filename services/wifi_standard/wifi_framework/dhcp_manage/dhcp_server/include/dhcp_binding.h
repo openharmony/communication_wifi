@@ -59,7 +59,7 @@ typedef struct AddressBindingList *PAddressBindingList;
 
 uint64_t NextPendingInterval(uint64_t pendingInterval);
 int IsExpire(AddressBinding *binding);
-int WriteAddressBinding(AddressBinding *binding, char *out, uint32_t size);
+int WriteAddressBinding(const AddressBinding *binding, char *out, uint32_t size);
 int ParseAddressBinding(AddressBinding *binding, const char *buf);
 
 #ifdef __cplusplus

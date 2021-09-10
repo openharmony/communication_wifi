@@ -14,11 +14,12 @@
  */
 
 #include "dhcp_binding.h"
-#include <securec.h>
+#include <stdint.h>
 #include <stdlib.h>
 #include "dhcp_logger.h"
 #include "address_utils.h"
 #include "common_util.h"
+#include "securec.h"
 
 #undef LOG_TAG
 #define LOG_TAG "DhcpServerBinding"
@@ -52,11 +53,15 @@ int IsExpire(AddressBinding *binding)
         LOGE("binding is null.");
         return DHCP_FALSE;
     }
+    uint64_t leaseTime = binding->leaseTime;
+    if (!leaseTime) {
+        leaseTime = DHCP_LEASE_TIME;
+    }
     uint64_t expireIn = binding->expireIn;
     if (binding->bindingStatus == BIND_PENDING) {
-        expireIn = binding->pendingTime + binding->leaseTime;
+        expireIn = binding->pendingTime + leaseTime;
     } else if (binding->bindingStatus == BIND_ASSOCIATED) {
-        expireIn = binding->bindingTime + binding->leaseTime;
+        expireIn = binding->bindingTime + leaseTime;
     }
     uint64_t curr = Tmspsec();
     if (curr > expireIn) {
@@ -76,9 +81,12 @@ int IsExpire(AddressBinding *binding)
 #define BINDING_BINDING_STATUS_POS 7
 #define BINDING_STRING_SIZE 8
 
-int WriteAddressBinding(AddressBinding *binding, char *out, uint32_t size)
+int WriteAddressBinding(const AddressBinding *binding, char *out, uint32_t size)
 {
-    const char *mac = ParseStrMac(binding->chaddr);
+    if (!binding || !out) {
+        return RET_FAILED;
+    }
+    const char *mac = ParseStrMac(binding->chaddr, sizeof(binding->chaddr));
     const char *ip = ParseStrIp(binding->ipAddress);
     if (mac == NULL || ip == NULL) {
         return RET_FAILED;

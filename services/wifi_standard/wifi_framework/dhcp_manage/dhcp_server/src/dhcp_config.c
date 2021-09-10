@@ -189,7 +189,7 @@ static int SetIfnameInfo(DhcpConfig *dhcpConfig, const char *pValue)
     if (memset_s(dhcpConfig->ifname, IFACE_NAME_SIZE, '\0', IFACE_NAME_SIZE) != EOK) {
         return 0;
     }
-    if (memcpy_s(dhcpConfig->ifname, IFACE_NAME_SIZE, pValue, strlen(pValue)) != EOK) {
+    if (strncpy_s(dhcpConfig->ifname, IFACE_NAME_SIZE, pValue, strlen(pValue)) != EOK) {
         return 0;
     }
     return 1;

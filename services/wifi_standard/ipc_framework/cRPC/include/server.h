@@ -119,7 +119,7 @@ int OnTransact(RpcServer *server, Context *context);
  * @param context - Message context
  * @return int - 0 success; -1 failed
  */
-int OnCallbackTransact(RpcServer *server, int event, Context *context);
+int OnCallbackTransact(const RpcServer *server, int event, Context *context);
 
 /**
  * @Description End processing callback events, This function must be implemented by users
@@ -129,7 +129,7 @@ int OnCallbackTransact(RpcServer *server, int event, Context *context);
  * @param event - Event type
  * @return int - 0 Success; -1 Failed
  */
-int EndCallbackTransact(RpcServer *server, int event);
+int EndCallbackTransact(const RpcServer *server, int event);
 
 #ifdef __cplusplus
 }

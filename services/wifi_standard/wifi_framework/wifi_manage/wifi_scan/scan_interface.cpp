@@ -31,206 +31,117 @@ ScanInterface::~ScanInterface()
     }
 }
 
-int ScanInterface::Init(WifiMessageQueue<WifiResponseMsgInfo> *mqUp)
+extern "C" IScanService *Create(void)
 {
-    WIFI_LOGI("Enter ScanInterface::Init.");
+    return new ScanInterface();
+}
+extern "C" void Destroy(ScanInterface *scanInterface)
+{
+    delete scanInterface;
+}
 
-    if (mqUp == nullptr) {
-        WIFI_LOGE("mqUp is null.");
-        return -1;
-    }
+ErrCode ScanInterface::Init()
+{
+    WIFI_LOGI("Enter ScanInterface::Init.\n");
 
-    pScanService = new (std::nothrow) ScanService();
+    pScanService = new (std::nothrow)ScanService();
     if (pScanService == nullptr) {
-        WIFI_LOGE("New ScanService failed.");
-        return -1;
+        WIFI_LOGE("New ScanService failed.\n");
+        return WIFI_OPT_INVALID_PARAM;
     }
 
-    if (!(pScanService->InitScanService(mqUp))) {
-        WIFI_LOGE("InitScanService failed.");
+    if (!(pScanService->InitScanService(mScanSerivceCallbacks))) {
+        WIFI_LOGE("InitScanService failed.\n");
         delete pScanService;
         pScanService = nullptr;
-        return -1;
+        return WIFI_OPT_INVALID_PARAM;
     }
 
-    return 0;
+    return WIFI_OPT_SUCCESS;
 }
 
-int ScanInterface::UnInit()
+ErrCode ScanInterface::UnInit()
 {
-    WIFI_LOGI("Enter ScanInterface::UnInit.");
-    if (pScanService != nullptr) {
-        pScanService->UnInitScanService();
-    }
-    return 0;
+    WIFI_LOGI("Enter ScanInterface::UnInit.\n");
+
+    pScanService->UnInitScanService();
+
+    return WIFI_OPT_SUCCESS;
 }
 
-int ScanInterface::PushMsg(WifiRequestMsgInfo *requestMsg)
+ErrCode ScanInterface::Scan(bool externFlag)
 {
-    WIFI_LOGI("Enter ScanInterface::PushMsg");
+    WIFI_LOGI("Enter ScanInterface::Scan\n");
 
-    if (requestMsg == nullptr) {
-        WIFI_LOGE("requestMsg is null.");
-        return -1;
-    }
-
-    HandleRequestMsg(requestMsg);
-    return 0;
+    return pScanService->Scan(externFlag);
 }
 
-void ScanInterface::HandleRequestMsg(const WifiRequestMsgInfo *requestMsg)
+ErrCode ScanInterface::ScanWithParam(const WifiScanParams &wifiScanParams)
 {
-    WIFI_LOGI("Enter ScanInterface::HandleRequestMsg");
-    if (requestMsg == nullptr) {
-        WIFI_LOGE("requestMsg is null.");
-        return;
-    }
+    WIFI_LOGI("Enter ScanInterface::ScanWithParam\n");
 
-    switch (requestMsg->msgCode) {
-        case SCAN_REQ:
-            DealScanMsg();
-            break;
-
-        case SCAN_PARAM_REQ:
-            DealScanParamMsg(requestMsg);
-            break;
-
-        case SCAN_RECONNECT_REQ:
-            DealScanReconnectMsg();
-            break;
-
-        case SCREEN_CHANGE_NOTICE:
-            DealScreenChangeMsg(requestMsg);
-            break;
-
-        case SCAN_NOTIFY_STA_CONN_REQ:
-            DealStaNotifyScanMsg(requestMsg);
-            break;
-
-        case FRONT_BACK_STATUS_CHANGE_NOTICE:
-            DealAppModeChangeMsg(requestMsg);
-            break;
-
-        case CUSTOM_STATUS_CHANGE_NOTICE:
-            DealCustomSceneChangeMsg(requestMsg);
-            break;
-
-        case SCAN_CONTROL_REQ:
-            pScanService->ClearScanControlValue();
-            pScanService->SystemScanProcess(true);
-            break;
-
-        default:
-            WIFI_LOGE("requestMsg->msgCode is error.");
-            break;
-    }
+    return pScanService->ScanWithParam(wifiScanParams);
 }
 
-void ScanInterface::DealScanMsg()
+ErrCode ScanInterface::OnScreenStateChanged(int screenState)
 {
-    WIFI_LOGI("Enter ScanInterface::DealScanMsg");
+    WIFI_LOGI("Enter ScanInterface::OnScreenStateChanged\n");
 
-    if (!(pScanService->Scan(true))) {
-        WIFI_LOGE("pScanService->Scan failed.");
-    }
-    return;
-}
-
-void ScanInterface::DealScanParamMsg(const WifiRequestMsgInfo *requestMsg)
-{
-    WIFI_LOGI("Enter ScanInterface::DealScanParamMsg");
-    if (requestMsg == nullptr) {
-        WIFI_LOGE("requestMsg is null.");
-        return;
-    }
-
-    if (!(pScanService->Scan(requestMsg->params.wifiScanParams))) {
-        WIFI_LOGE("pScanService->Scan failed.");
-    }
-    return;
-}
-
-void ScanInterface::DealScanReconnectMsg()
-{
-    WIFI_LOGI("Enter ScanInterface::DealScanReconnectMsg");
-
-    if (!(pScanService->Scan(false))) {
-        WIFI_LOGE("pScanService->Scan failed.");
-    }
-    return;
-}
-
-void ScanInterface::DealScreenChangeMsg(const WifiRequestMsgInfo *requestMsg)
-{
-    WIFI_LOGI("Enter ScanInterface::DealScreenChangeMsg");
-    if (requestMsg == nullptr) {
-        WIFI_LOGE("requestMsg is invalid.");
-        return;
-    }
-
-    if (requestMsg->params.wifiMockState.type != MODE_STATE_SCREEN) {
-        WIFI_LOGE("requestMsg->params->wifiMockState is invalid.");
-        return;
+    if (screenState != STATE_OPEN && screenState != STATE_CLOSE) {
+        WIFI_LOGE("screenState param is error");
+        return WIFI_OPT_INVALID_PARAM;
     }
     bool screenOn = true;
-    if (requestMsg->params.wifiMockState.state == STATE_CLOSE) {
+    if (screenState == STATE_CLOSE) {
         screenOn = false;
     }
     pScanService->HandleScreenStatusChanged(screenOn);
-    return;
+    return WIFI_OPT_SUCCESS;
 }
 
-void ScanInterface::DealStaNotifyScanMsg(const WifiRequestMsgInfo *requestMsg)
+ErrCode ScanInterface::OnClientModeStatusChanged(int staStatus)
 {
-    WIFI_LOGI("Enter ScanInterface::DealStaNotifyScanMsg");
-    if (requestMsg == nullptr) {
-        WIFI_LOGE("requestMsg is null.");
-        return;
-    }
+    WIFI_LOGI("Enter ScanInterface::OnClientModeStatusChanged\n");
 
-    pScanService->HandleStaStatusChanged(requestMsg->params.argInt);
+    pScanService->HandleStaStatusChanged(staStatus);
     pScanService->SetStaCurrentTime();
-    return;
+    return WIFI_OPT_SUCCESS;
 }
 
-void ScanInterface::DealAppModeChangeMsg(const WifiRequestMsgInfo *requestMsg)
+ErrCode ScanInterface::OnAppRunningModeChanged(int appMode)
 {
-    WIFI_LOGI("Enter ScanInterface::DealAppModeChangeMsg");
-    if (requestMsg == nullptr) {
-        WIFI_LOGE("requestMsg is null.");
-        return;
-    }
+    WIFI_LOGI("Enter ScanInterface::OnAppRunningModeChanged\n");
 
-    if (requestMsg->params.wifiMockState.type != MODE_STATE_APP_RUN) {
-        WIFI_LOGE("requestMsg->params->wifiMockState is invalid.");
-        return;
-    }
-    pScanService->SetOperateAppMode(requestMsg->params.wifiMockState.state);
-    return;
+    pScanService->SetOperateAppMode(appMode);
+    return WIFI_OPT_SUCCESS;
 }
 
-void ScanInterface::DealCustomSceneChangeMsg(const WifiRequestMsgInfo *requestMsg)
+ErrCode ScanInterface::OnCustomControlStateChanged(int customScene, int customSceneStatus)
 {
-    WIFI_LOGI("Enter ScanInterface::DealCustomSceneChangeMsg");
-    if (requestMsg == nullptr) {
-        WIFI_LOGE("requestMsg is null.");
-        return;
-    }
+    WIFI_LOGI("Enter ScanInterface::OnCustomControlStateChanged\n");
 
-    if (requestMsg->params.wifiMockState.type < MODE_STATE_POWER_SAVING) {
-        WIFI_LOGE("requestMsg->params->wifiMockState is invalid.");
-        return;
+    if (customSceneStatus != STATE_OPEN && customSceneStatus != STATE_CLOSE) {
+        WIFI_LOGE("screenState param is error");
+        return WIFI_OPT_INVALID_PARAM;
     }
-    time_t now = time(0);
-    if (requestMsg->params.wifiMockState.state == STATE_OPEN) {
-        pScanService->SetCustomScene(requestMsg->params.wifiMockState.type, now);
-    }
-    if (requestMsg->params.wifiMockState.state == STATE_CLOSE) {
-        pScanService->SystemScanProcess(true);
-    }
-    return;
+    pScanService->HandleCustomStatusChanged(customScene, customSceneStatus);
+    return WIFI_OPT_SUCCESS;
 }
 
-DECLARE_INIT_SERVICE(ScanInterface);
+ErrCode ScanInterface::OnControlStrategyChanged()
+{
+    WIFI_LOGI("Enter ScanInterface::OnControlStrategyChanged\n");
+
+    pScanService->ClearScanControlValue();
+    pScanService->GetScanControlInfo();
+    pScanService->SystemScanProcess(true);
+    return WIFI_OPT_SUCCESS;
+}
+
+ErrCode ScanInterface::RegisterScanCallbacks(const IScanSerivceCallbacks &scanSerivceCallbacks)
+{
+    mScanSerivceCallbacks = scanSerivceCallbacks;
+    return WIFI_OPT_SUCCESS;
+}
 }  // namespace Wifi
 }  // namespace OHOS

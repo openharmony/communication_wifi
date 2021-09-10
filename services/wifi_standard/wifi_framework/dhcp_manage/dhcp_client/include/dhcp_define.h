@@ -17,8 +17,10 @@
 
 
 #include <stdint.h>
+#include <stdbool.h>
 #include <netinet/udp.h>
 #include <netinet/ip.h>
+#include <sys/types.h>
 
 #include "wifi_log.h"
 
@@ -32,8 +34,8 @@ extern "C" {
 #define NUMBER_FOUR             4
 #define NUMBER_FIVE             5
 
-#define T1                      0.5
-#define T2                      0.875
+#define RENEWAL_SEC_MULTIPLE    0.5
+#define REBIND_SEC_MULTIPLE     0.875
 #define TIME_INTERVAL_MAX       1
 #define TIMEOUT_TIMES_MAX       6
 #define TIMEOUT_WAIT_SEC        1
@@ -56,6 +58,11 @@ extern "C" {
 #define DEFAULT_UMASK           027
 #define DIR_MAX_LEN             256
 #define INFNAME_SIZE            16    /* Length of interface name */
+#define RWMODE                  0600
+#define MAX_MSG_SIZE            1500
+
+#define STRING_MAX_LEN          1024
+#define EVENT_GET_IPV4          "usual.event.wifi.dhcp.GET_IPV4"
 
 /* UDP port numbers for BOOTP */
 #define BOOTP_SERVER            67
@@ -84,8 +91,10 @@ enum EnumDhcpStateCode {
     DHCP_STATE_BOUND,
     DHCP_STATE_RENEWING,
     DHCP_STATE_REBINDING,
+    DHCP_STATE_INITREBOOT,
     DHCP_STATE_RELEASED,
     DHCP_STATE_RENEWED,
+    DHCP_STATE_DECLINE
 };
 
 /* dhcp return code */
@@ -175,6 +184,14 @@ enum DHCP_OPTION_DATA_TYPE {
     DHCP_OPTION_DATA_IP_PAIR,
     DHCP_OPTION_DATA_IP_LIST,
     DHCP_OPTION_DATA_IP_STRING
+};
+
+/* publish event code */
+enum EnumPublishEventCode {
+    /* success */
+    PUBLISH_CODE_SUCCESS = 0,
+    /* failed */
+    PUBLISH_CODE_FAILED = -1
 };
 
 /* Sizes for DhcpPacket Fields */

@@ -16,11 +16,11 @@
 #define OHOS_AP_INTERFACE_H
 
 #include "ap_define.h"
-#include "base_service.h"
+#include "ap_service.h"
 
 namespace OHOS {
 namespace Wifi {
-class ApInterface : public BaseService {
+class ApInterface : public IApService {
 public:
     /**
      * @Description  construction method
@@ -35,24 +35,81 @@ public:
      */
     ~ApInterface();
 
+public:
     /**
-     * @Description  This command is invoked after the AP dynamic library file is loaded.
-     * @param mqUp - MO message
-     * @return success: 0    failed: -1
-     */
-    virtual int Init(WifiMessageQueue<WifiResponseMsgInfo> *mqUp);
-    /**
-     * @Description  This interface is invoked when an MO message is sent to the AP.
-     * @param msg - delivered message
-     * @return success: 0    failed: -1
-     */
-    virtual int PushMsg(WifiRequestMsgInfo *msg);
-    /**
-     * @Description  This command is invoked before the AP dynamic library file is uninstalled.
+     * @Description  Enable hotspot.
      * @param None
-     * @return None
+     * @return ErrCode - success: WIFI_OPT_SUCCESS    failed: ERROR_CODE
      */
-    virtual int UnInit(void);
+    virtual ErrCode EnableHotspot() override;
+
+    /**
+     * @Description  Disable hotspot.
+     * @param None
+     * @return ErrCode - success: WIFI_OPT_SUCCESS    failed: ERROR_CODE
+     */
+    virtual ErrCode DisableHotspot() override;
+
+    /**
+     * @Description  Add block list from station information.
+     * @param stationInfo - station information.
+     * @return ErrCode - success: WIFI_OPT_SUCCESS    failed: ERROR_CODE
+     */
+    virtual ErrCode AddBlockList(const StationInfo &stationInfo) override;
+
+    /**
+     * @Description  Del block list from station information.
+     * @param stationInfo - station information.
+     * @return ErrCode - success: WIFI_OPT_SUCCESS    failed: ERROR_CODE
+     */
+    virtual ErrCode DelBlockList(const StationInfo &stationInfo) override;
+
+    /**
+     * @Description  Set hotspot configure.
+     * @param hotspotConfig - hotspot configure.
+     * @return ErrCode - success: WIFI_OPT_SUCCESS    failed: ERROR_CODE
+     */
+    virtual ErrCode SetHotspotConfig(const HotspotConfig &hotspotConfig) override;
+
+    /**
+     * @Description  Disconnet Station connect from station information.
+     * @param stationInfo - station information.
+     * @return ErrCode - success: WIFI_OPT_SUCCESS    failed: ERROR_CODE
+     */
+    virtual ErrCode DisconnetStation(const StationInfo &stationInfo) override;
+
+    /**
+     * @Description Get the Station List object.
+     * 
+     * @param result - current connected station info
+     * @return ErrCode - success: WIFI_OPT_SUCCESS    failed: ERROR_CODE
+     */
+    virtual ErrCode GetStationList(std::vector<StationInfo> &result) override;
+
+    /**
+     * @Description  Sets the callback function for the state machine.
+     * @param callbacks - callbacks list.
+     * @return ErrCode - success: WIFI_OPT_SUCCESS    failed: ERROR_CODE
+     */
+    virtual ErrCode RegisterApServiceCallbacks(const IApServiceCallbacks &callbacks) override;
+
+    /**
+     * @Description Get valid bands.
+     *
+     * @param bands - return valid bands
+     * @return ErrCode - success: WIFI_OPT_SUCCESS    failed: ERROR_CODE
+     */
+    virtual ErrCode GetValidBands(std::vector<BandType> &bands) override;
+
+    /**
+     * @Description Get valid channels.
+     *
+     * @param band - input band
+     * @param validchannel - band's valid channel
+     * @return ErrCode - success: WIFI_OPT_SUCCESS    failed: ERROR_CODE
+     */
+    virtual ErrCode GetValidChannels(BandType band, std::vector<int32_t> &validchannel) override;
+
 }; /* ApInterface */
 }  // namespace Wifi
 }  // namespace OHOS

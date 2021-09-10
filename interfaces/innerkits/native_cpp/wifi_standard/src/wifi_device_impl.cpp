@@ -193,10 +193,10 @@ ErrCode WifiDeviceImpl::GetSignalLevel(const int &rssi, const int &band, int &le
     return client_->GetSignalLevel(rssi, band, level);
 }
 
-ErrCode WifiDeviceImpl::RegisterCallBackClient(const std::string &name, const sptr<IWifiDeviceCallBack> &callback)
+ErrCode WifiDeviceImpl::RegisterCallBack(const sptr<IWifiDeviceCallBack> &callback)
 {
     RETURN_IF_FAIL(client_);
-    return client_->RegisterCallBackClient(name, callback);
+    return client_->RegisterCallBack(callback);
 }
 
 ErrCode WifiDeviceImpl::GetSupportedFeatures(long &features)
@@ -213,6 +213,12 @@ bool WifiDeviceImpl::IsFeatureSupported(long feature)
         return false;
     }
     return ((tmpFeatures & feature) == feature);
+}
+
+ErrCode WifiDeviceImpl::GetDeviceMacAddress(std::string &result)
+{
+    RETURN_IF_FAIL(client_);
+    return client_->GetDeviceMacAddress(result);
 }
 }  // namespace Wifi
 }  // namespace OHOS

@@ -16,7 +16,7 @@
 #include "wifi_hotspot_death_recipient.h"
 #include "wifi_logger.h"
 #include "wifi_internal_event_dispatcher.h"
-DEFINE_WIFILOG_HOTSPOT_LABEL("WifiScanDeathRecipient");
+DEFINE_WIFILOG_HOTSPOT_LABEL("WifiHotspotDeathRecipient");
 namespace OHOS {
 namespace Wifi {
 void WifiHotspotDeathRecipient::OnRemoteDied(const wptr<IRemoteObject>& remoteObject)

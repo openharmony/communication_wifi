@@ -33,7 +33,7 @@ public:
     {}
 
     virtual ErrCode DeviceAppraisals(
-        WifiDeviceConfig &electedDevice, std::vector<WifiScanInfo> &scanInfos, WifiLinkedInfo &info) = 0;
+        WifiDeviceConfig &electedDevice, std::vector<InterScanInfo> &scanInfos, WifiLinkedInfo &info) = 0;
 };
 }  // namespace Wifi
 }  // namespace OHOS

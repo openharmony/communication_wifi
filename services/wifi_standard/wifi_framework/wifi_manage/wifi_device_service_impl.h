@@ -82,11 +82,13 @@ public:
 
     ErrCode GetCountryCode(std::string &countryCode) override;
 
-    ErrCode RegisterCallBackClient(const std::string &name, const sptr<IWifiDeviceCallBack> &callback) override;
+    ErrCode RegisterCallBack(const sptr<IWifiDeviceCallBack> &callback) override;
 
     ErrCode GetSignalLevel(const int &rssi, const int &band, int &level) override;
 
     ErrCode GetSupportedFeatures(long &features) override;
+
+    ErrCode GetDeviceMacAddress(std::string &result) override;
 
 private:
     bool Init();

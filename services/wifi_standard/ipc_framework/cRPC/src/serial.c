@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+#include <inttypes.h>
 #include "serial.h"
 
 const int TMP_CHAR_LEN = 64;
@@ -89,7 +89,7 @@ int WriteInt64(Context *context, int64_t iData)
     }
 
     char szTmp[TMP_CHAR_LEN] = {0};
-    if (snprintf_s(szTmp, sizeof(szTmp), sizeof(szTmp) - 1, "%lld%c", iData, context->cSplit) < 0) {
+    if (snprintf_s(szTmp, sizeof(szTmp), sizeof(szTmp) - 1, "%" PRIu64 "%c", iData, context->cSplit) < 0) {
         return -1;
     }
     return ContextAppendWrite(context, szTmp, strlen(szTmp));

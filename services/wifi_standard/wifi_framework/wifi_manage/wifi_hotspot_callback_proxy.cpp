@@ -53,9 +53,9 @@ void WifiHotspotCallbackProxy::OnHotspotStaJoin(const StationInfo &info)
     MessageParcel data;
     MessageParcel reply;
     data.WriteInt32(0);
-    data.WriteString16(Str8ToStr16(info.deviceName));
-    data.WriteString16(Str8ToStr16(info.bssid));
-    data.WriteString16(Str8ToStr16(info.ipAddr));
+    data.WriteCString(info.deviceName.c_str());
+    data.WriteCString(info.bssid.c_str());
+    data.WriteCString(info.ipAddr.c_str());
     int error = Remote()->SendRequest(WIFI_CBK_CMD_HOTSPOT_STATE_JOIN, data, reply, option);
     if (error != ERR_NONE) {
         WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d", WIFI_CBK_CMD_HOTSPOT_STATE_JOIN, error);
@@ -76,9 +76,9 @@ void WifiHotspotCallbackProxy::OnHotspotStaLeave(const StationInfo &info)
     MessageParcel data;
     MessageParcel reply;
     data.WriteInt32(0);
-    data.WriteString16(Str8ToStr16(info.deviceName));
-    data.WriteString16(Str8ToStr16(info.bssid));
-    data.WriteString16(Str8ToStr16(info.ipAddr));
+    data.WriteCString(info.deviceName.c_str());
+    data.WriteCString(info.bssid.c_str());
+    data.WriteCString(info.ipAddr.c_str());
     int error = Remote()->SendRequest(WIFI_CBK_CMD_HOTSPOT_STATE_LEAVE, data, reply, option);
     if (error != ERR_NONE) {
         WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d", WIFI_CBK_CMD_HOTSPOT_STATE_LEAVE, error);

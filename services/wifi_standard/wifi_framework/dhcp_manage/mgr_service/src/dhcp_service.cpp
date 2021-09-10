@@ -22,12 +22,16 @@ namespace OHOS {
 namespace Wifi {
 DhcpService::DhcpService() : m_pClientService(nullptr), m_pServerService(nullptr)
 {
-    WIFI_LOGI("DhcpService::DhcpService()...\n");
+    WIFI_LOGI("DhcpService::DhcpService()...");
+    DhcpClientServiceImpl::m_mapDhcpResult.clear();
+    DhcpClientServiceImpl::m_mapDhcpInfo.clear();
 }
 
 DhcpService::~DhcpService()
 {
-    WIFI_LOGI("DhcpService::~DhcpService()...\n");
+    WIFI_LOGI("DhcpService::~DhcpService()...");
+    DhcpClientServiceImpl::m_mapDhcpResult.clear();
+    DhcpClientServiceImpl::m_mapDhcpInfo.clear();
 }
 
 int DhcpService::StartDhcpClient(const std::string& ifname, bool bIpv6)
@@ -35,7 +39,7 @@ int DhcpService::StartDhcpClient(const std::string& ifname, bool bIpv6)
     if (m_pClientService == nullptr) {
         m_pClientService = std::make_unique<DhcpClientServiceImpl>();
         if (m_pClientService == nullptr) {
-            WIFI_LOGE("DhcpService::StartDhcpClient() std::make_unique<DhcpClientServiceImpl>() failed!\n");
+            WIFI_LOGE("DhcpService::StartDhcpClient() std::make_unique<DhcpClientServiceImpl>() failed!");
             return DHCP_OPT_FAILED;
         }
     }
@@ -48,7 +52,7 @@ int DhcpService::StopDhcpClient(const std::string& ifname, bool bIpv6)
     if (m_pClientService == nullptr) {
         m_pClientService = std::make_unique<DhcpClientServiceImpl>();
         if (m_pClientService == nullptr) {
-            WIFI_LOGE("DhcpService::StopDhcpClient() std::make_unique<DhcpClientServiceImpl>() failed!\n");
+            WIFI_LOGE("DhcpService::StopDhcpClient() std::make_unique<DhcpClientServiceImpl>() failed!");
             return DHCP_OPT_FAILED;
         }
     }
@@ -59,7 +63,7 @@ int DhcpService::StopDhcpClient(const std::string& ifname, bool bIpv6)
 int DhcpService::GetDhcpResult(const std::string& ifname, IDhcpResultNotify *pResultNotify, int timeouts)
 {
     if (m_pClientService == nullptr) {
-        WIFI_LOGE("DhcpService::GetDhcpResult() error, m_pClientService = nullptr!\n");
+        WIFI_LOGE("DhcpService::GetDhcpResult() error, m_pClientService = nullptr!");
         return DHCP_OPT_FAILED;
     }
 
@@ -69,7 +73,7 @@ int DhcpService::GetDhcpResult(const std::string& ifname, IDhcpResultNotify *pRe
 int DhcpService::GetDhcpInfo(const std::string& ifname, DhcpServiceInfo& dhcp)
 {
     if (m_pClientService == nullptr) {
-        WIFI_LOGE("DhcpService::GetDhcpInfo() error, m_pClientService = nullptr!\n");
+        WIFI_LOGE("DhcpService::GetDhcpInfo() error, m_pClientService = nullptr!");
         return DHCP_OPT_FAILED;
     }
 
@@ -79,7 +83,7 @@ int DhcpService::GetDhcpInfo(const std::string& ifname, DhcpServiceInfo& dhcp)
 int DhcpService::RenewDhcpClient(const std::string& ifname)
 {
     if (m_pClientService == nullptr) {
-        WIFI_LOGE("DhcpService::RenewDhcpClient() error, m_pClientService = nullptr!\n");
+        WIFI_LOGE("DhcpService::RenewDhcpClient() error, m_pClientService = nullptr!");
         return DHCP_OPT_FAILED;
     }
 
@@ -89,7 +93,7 @@ int DhcpService::RenewDhcpClient(const std::string& ifname)
 int DhcpService::ReleaseDhcpClient(const std::string& ifname)
 {
     if (m_pClientService == nullptr) {
-        WIFI_LOGE("DhcpService::ReleaseDhcpClient() error, m_pClientService = nullptr!\n");
+        WIFI_LOGE("DhcpService::ReleaseDhcpClient() error, m_pClientService = nullptr!");
         return DHCP_OPT_FAILED;
     }
 
@@ -101,7 +105,7 @@ int DhcpService::StartDhcpServer(const std::string& ifname)
     if (m_pServerService == nullptr) {
         m_pServerService = std::make_unique<DhcpServerServiceImpl>();
         if (m_pServerService == nullptr) {
-            WIFI_LOGE("DhcpService::StartDhcpServer() std::make_unique<DhcpServerServiceImpl>() failed!\n");
+            WIFI_LOGE("DhcpService::StartDhcpServer() std::make_unique<DhcpServerServiceImpl>() failed!");
             return DHCP_OPT_FAILED;
         }
     }
@@ -114,7 +118,7 @@ int DhcpService::StopDhcpServer(const std::string& ifname)
     if (m_pServerService == nullptr) {
         m_pServerService = std::make_unique<DhcpServerServiceImpl>();
         if (m_pServerService == nullptr) {
-            WIFI_LOGE("DhcpService::StopDhcpServer() std::make_unique<DhcpServerServiceImpl>() failed!\n");
+            WIFI_LOGE("DhcpService::StopDhcpServer() std::make_unique<DhcpServerServiceImpl>() failed!");
             return DHCP_OPT_FAILED;
         }
     }
@@ -125,7 +129,7 @@ int DhcpService::StopDhcpServer(const std::string& ifname)
 int DhcpService::GetServerStatus()
 {
     if (m_pServerService == nullptr) {
-        WIFI_LOGE("DhcpService::GetServerStatus() error, m_pServerService = nullptr!\n");
+        WIFI_LOGE("DhcpService::GetServerStatus() error, m_pServerService = nullptr!");
         return DHCP_OPT_FAILED;
     }
 
@@ -135,7 +139,7 @@ int DhcpService::GetServerStatus()
 int DhcpService::PutDhcpRange(const std::string& tagName, const DhcpRange& range)
 {
     if (m_pServerService == nullptr) {
-        WIFI_LOGE("DhcpService::PutDhcpRange() error, m_pServerService = nullptr!\n");
+        WIFI_LOGE("DhcpService::PutDhcpRange() error, m_pServerService = nullptr!");
         return DHCP_OPT_FAILED;
     }
 
@@ -145,7 +149,7 @@ int DhcpService::PutDhcpRange(const std::string& tagName, const DhcpRange& range
 int DhcpService::RemoveDhcpRange(const std::string& tagName, const DhcpRange& range)
 {
     if (m_pServerService == nullptr) {
-        WIFI_LOGE("DhcpService::RemoveDhcpRange() error, m_pServerService = nullptr!\n");
+        WIFI_LOGE("DhcpService::RemoveDhcpRange() error, m_pServerService = nullptr!");
         return DHCP_OPT_FAILED;
     }
 
@@ -155,7 +159,7 @@ int DhcpService::RemoveDhcpRange(const std::string& tagName, const DhcpRange& ra
 int DhcpService::RemoveAllDhcpRange(const std::string& tagName)
 {
     if (m_pServerService == nullptr) {
-        WIFI_LOGE("DhcpService::RemoveAllDhcpRange() error, m_pServerService = nullptr!\n");
+        WIFI_LOGE("DhcpService::RemoveAllDhcpRange() error, m_pServerService = nullptr!");
         return DHCP_OPT_FAILED;
     }
 
@@ -165,7 +169,7 @@ int DhcpService::RemoveAllDhcpRange(const std::string& tagName)
 int DhcpService::SetDhcpRange(const std::string& ifname, const DhcpRange& range)
 {
     if (m_pServerService == nullptr) {
-        WIFI_LOGE("DhcpService::SetDhcpRange() error, m_pServerService = nullptr!\n");
+        WIFI_LOGE("DhcpService::SetDhcpRange() error, m_pServerService = nullptr!");
         return DHCP_OPT_FAILED;
     }
 
@@ -175,7 +179,7 @@ int DhcpService::SetDhcpRange(const std::string& ifname, const DhcpRange& range)
 int DhcpService::SetDhcpRange(const std::string& ifname, const std::string& tagName)
 {
     if (m_pServerService == nullptr) {
-        WIFI_LOGE("DhcpService::SetDhcpRange() error, m_pServerService = nullptr!\n");
+        WIFI_LOGE("DhcpService::SetDhcpRange() error, m_pServerService = nullptr!");
         return DHCP_OPT_FAILED;
     }
 
@@ -185,7 +189,7 @@ int DhcpService::SetDhcpRange(const std::string& ifname, const std::string& tagN
 int DhcpService::GetLeases(std::vector<std::string>& leases)
 {
     if (m_pServerService == nullptr) {
-        WIFI_LOGE("DhcpService::GetLeases() error, m_pServerService = nullptr!\n");
+        WIFI_LOGE("DhcpService::GetLeases() error, m_pServerService = nullptr!");
         return DHCP_OPT_FAILED;
     }
 
@@ -195,7 +199,7 @@ int DhcpService::GetLeases(std::vector<std::string>& leases)
 int DhcpService::GetDhcpSerProExit(const std::string& ifname, IDhcpResultNotify *pResultNotify)
 {
     if (m_pServerService == nullptr) {
-        WIFI_LOGE("DhcpService::GetDhcpSerProExit() error, m_pServerService = nullptr!\n");
+        WIFI_LOGE("DhcpService::GetDhcpSerProExit() error, m_pServerService = nullptr!");
         return DHCP_OPT_FAILED;
     }
 

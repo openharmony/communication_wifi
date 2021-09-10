@@ -30,7 +30,7 @@
 #define LOG_TAG "WifiDhcpClient"
 
 /* Default options. */
-static struct DhcpClientCfg g_clientCfg = {"", "", "", "", "", 0, 0, DHCP_IP_TYPE_NONE, {'\0'}, NULL, false};
+static struct DhcpClientCfg g_clientCfg = {"", "", "", "", "", 0, 0, DHCP_IP_TYPE_NONE, {'\0'}, NULL, false, "", "", 0};
 
 struct DhcpClientCfg *GetDhcpClientCfg(void)
 {
@@ -39,13 +39,9 @@ struct DhcpClientCfg *GetDhcpClientCfg(void)
 
 int StartProcess(void)
 {
-    LOGI("StartProcess() begin.\n");
+    LOGI("StartProcess() begin.");
     if (InitSignalHandle() != DHCP_OPT_SUCCESS) {
         return DHCP_OPT_FAILED;
-    }
-
-    if ((g_clientCfg.getMode == DHCP_IP_TYPE_ALL) || (g_clientCfg.getMode == DHCP_IP_TYPE_V6)) {
-        /* Handle dhcp v6. */
     }
 
     if ((g_clientCfg.getMode == DHCP_IP_TYPE_ALL) || (g_clientCfg.getMode == DHCP_IP_TYPE_V4)) {
@@ -57,21 +53,21 @@ int StartProcess(void)
 
 int StopProcess(const char *pidFile)
 {
-    LOGI("StopProcess() begin, pidFile:%{public}s.\n", pidFile);
+    LOGI("StopProcess() begin, pidFile:%{public}s.", pidFile);
     pid_t pid = GetPID(pidFile);
     if (pid <= 0) {
-        LOGW("StopProcess() GetPID pidFile:%{public}s, pid == -1!\n", pidFile);
+        LOGW("StopProcess() GetPID pidFile:%{public}s, pid == -1!", pidFile);
         return DHCP_OPT_SUCCESS;
     }
 
-    LOGI("StopProcess() sending signal SIGTERM to process:%{public}d.\n", pid);
+    LOGI("StopProcess() sending signal SIGTERM to process:%{public}d.", pid);
     if (-1 == kill(pid, SIGTERM)) {
         if (ESRCH == errno) {
-            LOGW("StopProcess() pidFile:%{public}s,pid:%{public}d is not exist.\n", pidFile, pid);
+            LOGW("StopProcess() pidFile:%{public}s,pid:%{public}d is not exist.", pidFile, pid);
             unlink(pidFile);
             return DHCP_OPT_SUCCESS;
         }
-        LOGE("StopProcess() cmd: [kill %{public}d] failed, kill error:%{public}s!\n", pid, strerror(errno));
+        LOGE("StopProcess() cmd: [kill %{public}d] failed, kill error:%{public}s!", pid, strerror(errno));
         return DHCP_OPT_FAILED;
     }
 
@@ -83,9 +79,9 @@ int GetProStatus(const char *pidFile)
 {
     pid_t pid = GetPID(pidFile);
     if (pid <= 0) {
-        LOGI("GetProStatus() %{public}s pid:%{public}d, %{public}s is not running.\n", pidFile, pid, DHCPC_NAME);
+        LOGI("GetProStatus() %{public}s pid:%{public}d, %{public}s is not running.", pidFile, pid, DHCPC_NAME);
         return 0;
     }
-    LOGI("GetProStatus() %{public}s pid:%{public}d, %{public}s is running.\n", pidFile, pid, DHCPC_NAME);
+    LOGI("GetProStatus() %{public}s pid:%{public}d, %{public}s is running.", pidFile, pid, DHCPC_NAME);
     return 1;
 }

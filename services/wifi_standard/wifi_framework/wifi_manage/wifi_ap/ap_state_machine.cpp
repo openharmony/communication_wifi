@@ -128,6 +128,45 @@ void ApStateMachine::DisconnetStation(const StationInfo &staInfo)
     SendMessage(msg);
 }
 
+void ApStateMachine::OnApStateChange(ApState state)
+{
+    if (WifiSettings::GetInstance().SetHotspotState(static_cast<int>(state))) {
+        WIFI_LOGE("WifiSetting change state fail.");
+    }
+
+    if (m_Callbacks.OnApStateChangedEvent != nullptr &&
+        (state == ApState::AP_STATE_IDLE || state == ApState::AP_STATE_STARTED || state == ApState::AP_STATE_STARTING ||
+            state == ApState::AP_STATE_CLOSING)) {
+        m_Callbacks.OnApStateChangedEvent(state);
+    }
+    return;
+}
+
+ErrCode ApStateMachine::RegisterApServiceCallbacks(const IApServiceCallbacks &callbacks)
+{
+    m_Callbacks = callbacks;
+    return ErrCode::WIFI_OPT_SUCCESS;
+}
+
+void ApStateMachine::BroadCastStationChange(const StationInfo &staInfo, ApStatemachineEvent act)
+{
+    switch (act) {
+        case ApStatemachineEvent::CMD_STATION_JOIN:
+            if (m_Callbacks.OnHotspotStaJoinEvent) {
+                m_Callbacks.OnHotspotStaJoinEvent(staInfo);
+            }
+            break;
+        case ApStatemachineEvent::CMD_STATION_LEAVE:
+            if (m_Callbacks.OnHotspotStaLeaveEvent) {
+                m_Callbacks.OnHotspotStaLeaveEvent(staInfo);
+            }
+            break;
+        default:
+            WIFI_LOGW("error BroadCastStation msg %{public}d.", act);
+            break;
+    }
+}
+
 void ApStateMachine::UpdateHotspotConfigResult(const bool result)
 {
     SendMessage(static_cast<int>(ApStatemachineEvent::CMD_UPDATE_HOTSPOTCONFIG_RESULT), result ? 1 : 0);

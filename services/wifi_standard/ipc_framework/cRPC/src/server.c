@@ -16,7 +16,7 @@
 #include "log.h"
 
 #undef LOG_TAG
-#define LOG_TAG "OHWIFI_RPC_SERVER"
+#define LOG_TAG "WifiRpcServer"
 
 const int DEFAULT_LISTEN_QUEUE_SIZE = 10;
 const int MAX_SUPPORT_CLIENT_FD_SIZE = 256; /* support max clients online */
@@ -40,6 +40,7 @@ static int OnAccept(RpcServer *server, unsigned int mask)
         return -1;
     }
     SetNonBlock(fd, 1);
+    fcntl(fd, F_SETFD, FD_CLOEXEC);
     Context *context = CreateContext(CONTEXT_BUFFER_MIN_SIZE);
     if (context != NULL) {
         context->fd = fd;
@@ -93,19 +94,19 @@ RpcServer *CreateRpcServer(const char *path)
 static int DealReadMessage(RpcServer *server, Context *client)
 {
     if ((server == NULL) || (client == NULL)) {
-        return -1;
+        return 0;
     }
     char *buf = ContextGetReadRecord(client);
-    if (buf != NULL) {
-        client->oneProcess = buf;
-        client->nPos = SERIAL_DATA_HEAD_SIZE; /* N| */
-        client->nSize = strlen(buf);
-        OnTransact(server, client);
-        free(buf);
-        AddFdEvent(server->loop, client->fd, WRIT_EVENT);
-        return 1;
+    if (buf == NULL) {
+        return 0;
     }
-    return 0;
+    client->oneProcess = buf;
+    client->nPos = SERIAL_DATA_HEAD_SIZE; /* N| */
+    client->nSize = strlen(buf);
+    OnTransact(server, client);
+    free(buf);
+    AddFdEvent(server->loop, client->fd, WRIT_EVENT);
+    return 1;
 }
 
 static unsigned int CheckEventMask(const struct epoll_event *e)
@@ -132,7 +133,6 @@ static void DealFdReadEvent(RpcServer *server, Context *client, unsigned int mas
     if ((server == NULL) || (client == NULL)) {
         return;
     }
-
     DealReadMessage(server, client);
     int ret = ContextReadNet(client);
     if ((ret == SOCK_ERR) || ((ret == SOCK_CLOSE) && (mask & EXCP_EVENT))) {
@@ -172,7 +172,7 @@ static void DealFdEvents(RpcServer *server, int fd, unsigned int mask)
     }
     Context *client = FindContext(server->clients, fd);
     if (client == NULL) {
-        LOGD("not find %d clients!", fd);
+        LOGD("not find %{public}d clients!", fd);
         return;
     }
     if (mask & READ_EVENT) {
@@ -181,7 +181,7 @@ static void DealFdEvents(RpcServer *server, int fd, unsigned int mask)
     if (mask & WRIT_EVENT) {
         DealFdWriteEvent(server, client);
     }
-    if (server->loop->events[fd].mask == NONE_EVENT) {
+    if (server->loop->fdMasks[fd].mask == NONE_EVENT) {
         close(fd);
         DeleteHashTable(server->clients, client);
         RemoveCallback(server, client);
@@ -199,9 +199,9 @@ int RunRpcLoop(RpcServer *server)
     EventLoop *loop = server->loop;
     while (!loop->stop) {
         BeforeLoop(server);
-        int retval = epoll_wait(loop->epfd, loop->epoll_events, loop->setSize, 1); /* wait 1ms */
+        int retval = epoll_wait(loop->epfd, loop->epEvents, loop->setSize, 1); /* wait 1ms */
         for (int i = 0; i < retval; ++i) {
-            struct epoll_event *e = loop->epoll_events + i;
+            struct epoll_event *e = loop->epEvents + i;
             int fd = e->data.fd;
             unsigned int mask = CheckEventMask(e);
             if (fd == server->listenFd) {
@@ -237,8 +237,8 @@ static int BeforeLoop(RpcServer *server)
         return -1;
     }
     pthread_mutex_lock(&server->mutex);
-    for (int i = server->nEvents; i > 0; --i) {
-        int event = server->events[i - 1];
+    for (int i = 0; i < server->nEvents; ++i) {
+        int event = server->events[i];
         int num = sizeof(server->eventNode) / sizeof(server->eventNode[0]);
         int pos = event % num;
         struct Node *p = server->eventNode[pos].head;

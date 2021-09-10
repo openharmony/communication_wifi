@@ -26,6 +26,11 @@
 
 #include "dhcp_define.h"
 
+#include "common_event_subscriber.h"
+#include "common_event.h"
+#include "common_event_data.h"
+#include "common_event_manager.h"
+
 
 namespace OHOS {
 namespace Wifi {
@@ -51,10 +56,20 @@ public:
     static bool DelFileLineData(const std::string& filename, const std::string& linedata);
     static bool ModifyFileLineData(const std::string& filename, const std::string& srcdata, const std::string& dstdata);
     static int FormatString(struct DhcpPacketResult &result);
-    static int GetDhcpPacketResult(const std::string& filename, struct DhcpPacketResult &result);
     static int InitPidfile(const std::string& piddir, const std::string& pidfile);
     static pid_t GetPID(const std::string& pidfile);
     static int CreateDirs(const std::string dirs, int mode = DIR_DEFAULT_MODE);
+    static bool SplitString(
+        const std::string src, const std::string delim, const int count, std::vector<std::string> &splits);
+
+    static bool SubscribeDhcpCommonEvent(
+        const std::shared_ptr<OHOS::EventFwk::CommonEventSubscriber> &subscriber);
+    static int SubscribeDhcpEvent(const std::string action, int timeouts = RECEIVER_TIMEOUT);
+    static bool UnsubscribeDhcpCommonEvent(
+        const std::shared_ptr<OHOS::EventFwk::CommonEventSubscriber> &subscriber);
+    static int UnsubscribeDhcpEvent(const std::string action, int timeouts = RECEIVER_TIMEOUT);
+
+    static bool PublishDhcpEvent(const std::string action, const int code, const std::string data);
 };
 }  // namespace Wifi
 }  // namespace OHOS

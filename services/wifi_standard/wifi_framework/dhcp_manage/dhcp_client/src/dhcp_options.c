@@ -27,13 +27,13 @@
 static bool CheckOptSoverloaded(const struct DhcpPacket *packet, int code, int maxLen, int *over, int *index)
 {
     if (packet == NULL) {
-        LOGE("CheckOptSoverloaded failed, packet == NULL!\n");
+        LOGE("CheckOptSoverloaded failed, packet == NULL!");
         return false;
     }
 
     const uint8_t *pOption = packet->options;
     if (*index + DHCP_OPT_LEN_INDEX + pOption[*index + DHCP_OPT_LEN_INDEX] >= maxLen) {
-        LOGW("CheckOptSoverloaded code:%{public}d,*index:%{public}d more than max bytes:%{public}d!\n",
+        LOGW("CheckOptSoverloaded code:%{public}d,*index:%{public}d more than max bytes:%{public}d!",
             code, *index, maxLen);
         return false;
     }
@@ -46,12 +46,12 @@ static bool CheckOptSoverloaded(const struct DhcpPacket *packet, int code, int m
 static int CheckOptionsData(const struct DhcpPacket *packet, int code, int index, int maxLen)
 {
     if (packet == NULL) {
-        LOGE("CheckOptionsData failed, packet == NULL!\n");
+        LOGE("CheckOptionsData failed, packet == NULL!");
         return DHCP_OPT_FAILED;
     }
 
     if (index >= maxLen) {
-        LOGW("CheckOptionsData code:%{public}d,index:%{public}d more than max bytes:%{public}d!\n",
+        LOGW("CheckOptionsData code:%{public}d,index:%{public}d more than max bytes:%{public}d!",
             code, index, maxLen);
         return DHCP_OPT_FAILED;
     }
@@ -62,7 +62,7 @@ static int CheckOptionsData(const struct DhcpPacket *packet, int code, int index
     }
 
     if (index + DHCP_OPT_LEN_INDEX + pOption[index + DHCP_OPT_LEN_INDEX] >= maxLen) {
-        LOGW("CheckOptionsData failed, options data too long, code:%{public}d,index:%{public}d!\n", code, index);
+        LOGW("CheckOptionsData failed, options data too long, code:%{public}d,index:%{public}d!", code, index);
         return DHCP_OPT_FAILED;
     }
 
@@ -73,16 +73,18 @@ static int CheckOptionsData(const struct DhcpPacket *packet, int code, int index
 static uint8_t GetDhcpOptionCodeType(const uint8_t code)
 {
     if ((code <= DHO_PAD) || (code >= DHO_END)) {
-        LOGE("GetDhcpOptionCodeType error, code:%{public}d is error!\n", code);
+        LOGE("GetDhcpOptionCodeType error, code:%{public}d is error!", code);
         return DHCP_OPTION_DATA_INVALID;
     }
 
     uint8_t nDataType = DHCP_OPTION_DATA_INVALID;
     switch (code) {
         case DHO_MESSAGETYPE:
+        case DHO_FORCERENEW_NONCE:
             nDataType = DHCP_OPTION_DATA_U8;
             break;
         case DHO_MTU:
+        case DHO_MAXMESSAGESIZE:
             nDataType = DHCP_OPTION_DATA_U16;
             break;
         case DHO_LEASETIME:
@@ -105,7 +107,7 @@ static uint8_t GetDhcpOptionCodeType(const uint8_t code)
             nDataType = DHCP_OPTION_DATA_IP_STRING;
             break;
         default:
-            LOGE("GetDhcpOptionCodeType failed, code:%{public}d is invalid!\n", code);
+            LOGE("GetDhcpOptionCodeType failed, code:%{public}d is invalid!", code);
             break;
     }
 
@@ -117,7 +119,7 @@ uint8_t GetDhcpOptionDataLen(const uint8_t code)
 {
     uint8_t nDataType = GetDhcpOptionCodeType(code);
     if (nDataType == DHCP_OPTION_DATA_INVALID) {
-        LOGE("GetDhcpOptionDataLen code:%{public}d error, GetDhcpOptionCodeType invalid!\n", code);
+        LOGE("GetDhcpOptionDataLen code:%{public}d error, GetDhcpOptionCodeType invalid!", code);
         return 0;
     }
 
@@ -139,7 +141,7 @@ uint8_t GetDhcpOptionDataLen(const uint8_t code)
             nDataLen = DHCP_UINT32_DOUBLE_BYTES;
             break;
         default:
-            LOGE("GetDhcpOptionDataLen code:%{public}d failed, nDataType:%{public}d is invalid!\n",
+            LOGE("GetDhcpOptionDataLen code:%{public}d failed, nDataType:%{public}d is invalid!",
                 code, nDataType);
             break;
     }
@@ -152,7 +154,7 @@ const uint8_t *GetDhcpOption(const struct DhcpPacket *packet, int code, size_t *
 {
     *length = 0;
     if (packet == NULL) {
-        LOGE("GetDhcpOption failed, packet == NULL!\n");
+        LOGE("GetDhcpOption failed, packet == NULL!");
         return NULL;
     }
 
@@ -196,7 +198,7 @@ const uint8_t *GetDhcpOption(const struct DhcpPacket *packet, int code, size_t *
                 break;
         }
     }
-    LOGW("GetDhcpOption options no find code:%{public}d, nIndex:%{public}d!\n", code, nIndex);
+    LOGW("GetDhcpOption options no find code:%{public}d, nIndex:%{public}d!", code, nIndex);
     return NULL;
 }
 
@@ -206,15 +208,15 @@ bool GetDhcpOptionUint8(const struct DhcpPacket *packet, int code, uint8_t *data
     size_t len = 0;
     const uint8_t *p = GetDhcpOption(packet, code, &len);
     if (p == NULL) {
-        LOGW("GetDhcpOptionUint8 GetDhcpOption NULL, code:%{public}d!\n", code);
+        LOGW("GetDhcpOptionUint8 GetDhcpOption NULL, code:%{public}d!", code);
         return false;
     }
     if (len < (ssize_t)sizeof(uint8_t)) {
-        LOGE("GetDhcpOptionUint8 failed, len:%{public}zu less data:%{public}zu, code:%{public}d!\n",
+        LOGE("GetDhcpOptionUint8 failed, len:%{public}zu less data:%{public}zu, code:%{public}d!",
             len, sizeof(uint8_t), code);
         return false;
     }
-    if (memcpy_s(data, sizeof(data), p, sizeof(uint8_t)) != EOK) {
+    if (memcpy_s(data, sizeof(uint8_t), p, sizeof(uint8_t)) != EOK) {
         return false;
     }
     return true;
@@ -226,12 +228,12 @@ bool GetDhcpOptionUint32(const struct DhcpPacket *packet, int code, uint32_t *da
     size_t len = 0;
     const uint8_t *p = GetDhcpOption(packet, code, &len);
     if (p == NULL) {
-        LOGW("GetDhcpOptionUint32 GetDhcpOption NULL, code:%{public}d!\n", code);
+        LOGW("GetDhcpOptionUint32 GetDhcpOption NULL, code:%{public}d!", code);
         return false;
     }
     uint32_t uData = 0;
     if (len < (ssize_t)sizeof(uData)) {
-        LOGE("GetDhcpOptionUint32 failed, len:%{public}zu less uData:%{public}zu, code:%{public}d!\n",
+        LOGE("GetDhcpOptionUint32 failed, len:%{public}zu less uData:%{public}zu, code:%{public}d!",
             len, sizeof(uData), code);
         return false;
     }
@@ -250,12 +252,12 @@ bool GetDhcpOptionUint32n(const struct DhcpPacket *packet, int code, uint32_t *d
     size_t len = 0;
     const uint8_t *p = GetDhcpOption(packet, code, &len);
     if (p == NULL) {
-        LOGW("GetDhcpOptionUint32n GetDhcpOption NULL, code:%{public}d!\n", code);
+        LOGW("GetDhcpOptionUint32n GetDhcpOption NULL, code:%{public}d!", code);
         return false;
     }
     uint32_t uData = 0;
     if ((len < (ssize_t)sizeof(uData)) || (len % (ssize_t)sizeof(uData) != 0)) {
-        LOGE("GetDhcpOptionUint32n failed, len:%{public}zu is not %{public}zu * n, code:%{public}d!\n",
+        LOGE("GetDhcpOptionUint32n failed, len:%{public}zu is not %{public}zu * n, code:%{public}d!",
             len, sizeof(uData), code);
         return false;
     }
@@ -284,11 +286,11 @@ char *GetDhcpOptionString(const struct DhcpPacket *packet, int code)
     size_t len;
     const uint8_t *p = GetDhcpOption(packet, code, &len);
     if ((p == NULL) || (*p == '\0')) {
-        LOGW("GetDhcpOptionString GetDhcpOption NULL, code:%{public}d!\n", code);
+        LOGW("GetDhcpOptionString GetDhcpOption NULL, code:%{public}d!", code);
         return NULL;
     }
     if (len < (ssize_t)sizeof(uint8_t)) {
-        LOGE("GetDhcpOptionString failed, len:%{public}zu less data:%{public}zu, code:%{public}d!\n",
+        LOGE("GetDhcpOptionString failed, len:%{public}zu less data:%{public}zu, code:%{public}d!",
             len, sizeof(uint8_t), code);
         return NULL;
     }
@@ -323,18 +325,18 @@ int AddOptStrToOpts(uint8_t *pOpts, uint8_t *pOpt, int nOptLen)
 {
     int optStrLen = DHCP_OPT_CODE_BYTES + DHCP_OPT_LEN_BYTES + pOpt[DHCP_OPT_LEN_INDEX];
     if (nOptLen != optStrLen) {
-        LOGE("AddOptStrToOpts() code:%{public}u nOptLen:%{public}d no equal optStrLen:%{public}d!\n",
+        LOGE("AddOptStrToOpts() code:%{public}u nOptLen:%{public}d no equal optStrLen:%{public}d!",
             pOpt[DHCP_OPT_CODE_INDEX], nOptLen, optStrLen);
         return 0;
     }
 
     int nEndIndex = GetEndOptionIndex(pOpts);
     if ((nEndIndex + nOptLen + 1) >= DHCP_OPT_MAX_BYTES) {
-        LOGE("AddOptStrToOpts() code:%{public}u did not fit into the packet!\n", pOpt[DHCP_OPT_CODE_INDEX]);
+        LOGE("AddOptStrToOpts() code:%{public}u did not fit into the packet!", pOpt[DHCP_OPT_CODE_INDEX]);
         return 0;
     }
 
-    LOGI("AddOptStrToOpts() adding option code %{public}u.\n", pOpt[DHCP_OPT_CODE_INDEX]);
+    LOGI("AddOptStrToOpts() adding option code %{public}u.", pOpt[DHCP_OPT_CODE_INDEX]);
     if (memcpy_s(pOpts + nEndIndex, nOptLen + 1, pOpt, nOptLen) != EOK) {
         return 0;
     }
@@ -347,7 +349,7 @@ int AddOptValueToOpts(uint8_t *pOpts, uint8_t code, uint32_t value)
 {
     uint8_t uLen = GetDhcpOptionDataLen(code);
     if (uLen == 0) {
-        LOGE("AddOptValueToOpts() code:%{public}d failed, GetDhcpOptionDataLen uLen:0!\n", code);
+        LOGE("AddOptValueToOpts() code:%{public}d failed, GetDhcpOptionDataLen uLen:0!", code);
         return 0;
     }
 
@@ -366,7 +368,7 @@ int AddOptValueToOpts(uint8_t *pOpts, uint8_t code, uint32_t value)
             *pUint32 = value;
             break;
         default:
-            LOGE("AddOptValueToOpts() uLen:%{public}u error, break!\n", uLen);
+            LOGE("AddOptValueToOpts() uLen:%{public}u error, break!", uLen);
             break;
     }
 

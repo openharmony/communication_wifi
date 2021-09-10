@@ -441,6 +441,7 @@ void ClearTClass<WifiConfig>(WifiConfig &item)
 {
     item.scanAlwaysSwitch = false;
     item.staAirplaneMode = false;
+    item.canOpenStaWhenAirplane = false;
     item.staLastState = false;
     item.savedDeviceAppraisalPriority = PRIORITY_1;
     item.scoretacticsScoreSlope = SCORE_SLOPE;
@@ -478,6 +479,8 @@ static int SetWifiConfigValueFirst(WifiConfig &item, const std::string &key, con
         item.scanAlwaysSwitch = (std::stoi(value) != 0); /* 0 -> false 1 -> true */
     } else if (key == "staAirplaneMode") {
         item.staAirplaneMode = (std::stoi(value) != 0); /* 0 -> false 1 -> true */
+    } else if (key == "canOpenStaWhenAirplane") {
+        item.canOpenStaWhenAirplane = (std::stoi(value) != 0);
     } else if (key == "staLastState") {
         item.staLastState = (std::stoi(value) != 0);
     } else if (key == "savedDeviceAppraisalPriority") {
@@ -562,6 +565,7 @@ std::string OutTClassString<WifiConfig>(WifiConfig &item)
     std::ostringstream ss;
     ss << "scanAlwaysSwitch=" << item.scanAlwaysSwitch << std::endl; /* bool false->0 true->1 */
     ss << "staAirplaneMode=" << item.staAirplaneMode << std::endl;
+    ss << "canOpenStaWhenAirplane=" << item.canOpenStaWhenAirplane << std::endl;
     ss << "staLastState=" << item.staLastState << std::endl;
     ss << "savedDeviceAppraisalPriority=" << item.savedDeviceAppraisalPriority << std::endl;
     ss << "scoretacticsScoreSlope=" << item.scoretacticsScoreSlope << std::endl;

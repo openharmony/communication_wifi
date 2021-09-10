@@ -14,7 +14,6 @@
  */
 #include "sta_interface.h"
 #include "wifi_log.h"
-#include "define.h"
 #include "wifi_logger.h"
 
 DEFINE_WIFILOG_LABEL("StaInterface");
@@ -32,174 +31,180 @@ StaInterface::~StaInterface()
     }
 }
 
-int StaInterface::Init(WifiMessageQueue<WifiResponseMsgInfo> *mqUp)
+extern "C" IStaService *Create(void)
 {
-    WIFI_LOGD("Enter StaInterface::Init.\n");
-    if (mqUp == nullptr) {
-        WIFI_LOGE("mqUp is null.\n");
-        return -1;
-    }
+    return new (std::nothrow)StaInterface();
+}
 
+extern "C" void Destroy(IStaService *pservice)
+{
+    delete pservice;
+}
+
+ErrCode StaInterface::EnableWifi()
+{
+    WIFI_LOGD("Enter StaInterface::EnableWifi.\n");
     pStaService = new (std::nothrow) StaService();
     if (pStaService == nullptr) {
         WIFI_LOGE("New StaService failed.\n");
-        return -1;
+        return WIFI_OPT_FAILED;
     }
 
-    if (pStaService->InitStaService(mqUp) != WIFI_OPT_SUCCESS) {
+    if (pStaService->InitStaService(staCallback) != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("InitStaService failed.\n");
         delete pStaService;
         pStaService = nullptr;
-        return -1;
+        return WIFI_OPT_FAILED;
     }
 
     if (pStaService->EnableWifi() != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("EnableWifi failed.\n");
-        UnInit();
-        return -1;
+        DisableWifi();
+        return WIFI_OPT_FAILED;
     }
-    InitStaHandleMap();
-    return 0;
+    return WIFI_OPT_SUCCESS;
 }
 
-int StaInterface::InitStaHandleMap()
+ErrCode StaInterface::DisableWifi()
 {
-    staHandleFuncMap[WifiInternalMsgCode::STA_CONNECT_REQ] = &StaInterface::WifiStaCmdConnectReq;
-    staHandleFuncMap[WIFI_SVR_CMD_RECONNECT] = &StaInterface::WifiStaCmdReconnectReq;
-    staHandleFuncMap[WifiInternalMsgCode::STA_REASSOCIATE_REQ] = &StaInterface::WifiStaCmdReassociateReq;
-    staHandleFuncMap[WifiInternalMsgCode::STA_DISCONNECT_REQ] = &StaInterface::WifiStaCmdDisconnectReq;
-    staHandleFuncMap[WifiInternalMsgCode::STA_REMOVE_DEVICE_REQ] = &StaInterface::WifiStaCmdRemoveDeviceReq;
-    staHandleFuncMap[WifiInternalMsgCode::STA_REMOVE_ALL_DEVICE_REQ] = &StaInterface::WifiStaCmdRemoveAllDeviceReq;
-    staHandleFuncMap[WifiInternalMsgCode::STA_START_WPS_REQ] = &StaInterface::WifiStaCmdStartWpsReq;
-    staHandleFuncMap[WifiInternalMsgCode::STA_CANCEL_WPS_REQ] = &StaInterface::WifiStaCmdCancelWpsReq;
-    staHandleFuncMap[WifiInternalMsgCode::STA_CONNECT_MANAGE_REQ] = &StaInterface::WifiStaCmdConnectManagerReq;
-    staHandleFuncMap[WifiInternalMsgCode::STA_SET_COUNTRY_CODE] = &StaInterface::WifiStaCmdSetCountryCodeReq;
-    return 0;
-}
-
-int StaInterface::UnInit()
-{
-    WIFI_LOGD("Enter StaInterface::UnInit.\n");
-    int ret = 0;
+    LOGD("Enter StaInterface::DisableWifi.\n");
     if (pStaService->DisableWifi() != WIFI_OPT_SUCCESS) {
-        WIFI_LOGD("DisableWifi failed.\n");
-        return -1;
+        LOGD("DisableWifi failed.\n");
+        return WIFI_OPT_FAILED;
     }
-
-    return ret;
+    return WIFI_OPT_SUCCESS;
 }
 
-int StaInterface::PushMsg(WifiRequestMsgInfo *requestMsg)
+ErrCode StaInterface::ConnectToNetwork(int networkId)
 {
-    WIFI_LOGD("Enter StaInterface::PushMsg\n");
-    if (requestMsg == nullptr) {
-        WIFI_LOGE("requestMsg is null.\n");
-        return -1;
+    LOGD("Enter StaInterface::Connect.\n");
+    if (pStaService->ConnectToNetwork(networkId) != WIFI_OPT_SUCCESS) {
+        LOGD("ConnectTo failed.\n");
+        return WIFI_OPT_FAILED;
     }
-
-    for (auto iter = staHandleFuncMap.begin(); iter != staHandleFuncMap.end(); ++iter) {
-        if (iter->first == requestMsg->msgCode) {
-            (this->*(iter->second))(requestMsg);
-            break;
-        }
-    }
-
-    return 0;
+    return WIFI_OPT_SUCCESS;
 }
 
-void StaInterface::WifiStaCmdConnectReq(const WifiRequestMsgInfo *requestMsg)
+ErrCode StaInterface::ConnectToDevice(const WifiDeviceConfig &config)
 {
-    WIFI_LOGD("Enter StaInterface::WifiStaCmdConnectReq.\n");
-
-    if (requestMsg->params.argInt >= 0) {
-        pStaService->ConnectToNetwork(requestMsg->params.argInt);
-    } else {
-        pStaService->ConnectToDevice(requestMsg->params.deviceConfig);
+    LOGD("Enter StaInterface::Connect.\n");
+    if (pStaService->ConnectToDevice(config) != WIFI_OPT_SUCCESS) {
+        LOGD("ConnectTo failed.\n");
+        return WIFI_OPT_FAILED;
     }
+    return WIFI_OPT_SUCCESS;
 }
 
-void StaInterface::WifiStaCmdReconnectReq(const WifiRequestMsgInfo *requestMsg)
+ErrCode StaInterface::ReAssociate()
 {
-    if (requestMsg == nullptr) {
-        WIFI_LOGE("requestMsg is null\n");
+    LOGD("Enter StaInterface::ReAssociate.\n");
+    if (pStaService->ReAssociate() != WIFI_OPT_SUCCESS) {
+        LOGD("ReAssociate failed.\n");
+        return WIFI_OPT_FAILED;
     }
-    WIFI_LOGD("Enter StaInterface::WifiStaCmdReconnectReq.\n");
-    pStaService->ReConnect();
+    return WIFI_OPT_SUCCESS;
 }
 
-void StaInterface::WifiStaCmdReassociateReq(const WifiRequestMsgInfo *requestMsg)
+ErrCode StaInterface::Disconnect()
 {
-    if (requestMsg == nullptr) {
-        WIFI_LOGE("requestMsg is null\n");
+    LOGD("Enter StaInterface::Disconnect.\n");
+    if (pStaService->Disconnect() != WIFI_OPT_SUCCESS) {
+        LOGD("Disconnect failed.\n");
+        return WIFI_OPT_FAILED;
     }
-    WIFI_LOGD("Enter StaInterface::WifiStaCmdReassociateReq.\n");
-    pStaService->ReAssociate();
+    return WIFI_OPT_SUCCESS;
 }
 
-void StaInterface::WifiStaCmdDisconnectReq(const WifiRequestMsgInfo *requestMsg)
+int StaInterface::AddDeviceConfig(const WifiDeviceConfig &config)
 {
-    if (requestMsg == nullptr) {
-        WIFI_LOGE("requestMsg is null\n");
+    LOGD("Enter StaInterface::AddDeviceConfig.\n");
+    return pStaService->AddDeviceConfig(config);
+}
+
+int StaInterface::UpdateDeviceConfig(const WifiDeviceConfig &config)
+{
+    LOGD("Enter StaInterface::UpdateDeviceConfig.\n");
+    return pStaService->UpdateDeviceConfig(config);
+}
+
+ErrCode StaInterface::RemoveDevice(int networkId)
+{
+    LOGD("Enter StaInterface::RemoveDeviceConfig.\n");
+    if (pStaService->RemoveDevice(networkId) != WIFI_OPT_SUCCESS) {
+        LOGD("RemoveDeviceConfig failed.\n");
+        return WIFI_OPT_FAILED;
     }
-    WIFI_LOGD("Enter StaInterface::WifiStaCmdDisconnectReq.\n");
-    pStaService->Disconnect();
+    return WIFI_OPT_SUCCESS;
 }
 
-void StaInterface::WifiStaCmdRemoveDeviceReq(const WifiRequestMsgInfo *requestMsg)
+ErrCode StaInterface::RemoveAllDevice()
 {
-    if (requestMsg == nullptr) {
-        WIFI_LOGE("requestMsg is null\n");
-        return;
+    WIFI_LOGD("Enter StaInterface::RemoveAllDevice.\n");
+
+    if (pStaService->RemoveAllDevice() != WIFI_OPT_SUCCESS) {
+        WIFI_LOGD("RemoveAllDevice failed.\n");
+        return WIFI_OPT_FAILED;
     }
-    WIFI_LOGD("Enter StaInterface::WifiStaCmdRemoveDeviceReq.\n");
-    pStaService->RemoveDevice(requestMsg->params.argInt);
+    return WIFI_OPT_SUCCESS;
+}
+ErrCode StaInterface::EnableDeviceConfig(int networkId, bool attemptEnable)
+{
+    LOGD("Enter StaInterface::EnableDeviceConfig.\n");
+    return pStaService->EnableDeviceConfig(networkId, attemptEnable);
 }
 
-void StaInterface::WifiStaCmdRemoveAllDeviceReq(const WifiRequestMsgInfo *requestMsg)
+ErrCode StaInterface::DisableDeviceConfig(int networkId)
 {
-    if (requestMsg == nullptr) {
-        WIFI_LOGE("requestMsg is null\n");
-        return;
+    LOGD("Enter StaInterface::DisableDeviceConfig.\n");
+    return pStaService->DisableDeviceConfig(networkId);
+}
+
+ErrCode StaInterface::StartWps(const WpsConfig &config)
+{
+    LOGD("Enter StaInterface::StartWps.\n");
+    if (pStaService->StartWps(config) != WIFI_OPT_SUCCESS) {
+        LOGD("StartWps failed.\n");
+        return WIFI_OPT_FAILED;
     }
-    WIFI_LOGD("Enter StaInterface::WifiStaCmdRemoveAllDeviceReq.\n");
-    pStaService->RemoveAllDevice();
+    return WIFI_OPT_SUCCESS;
 }
 
-void StaInterface::WifiStaCmdStartWpsReq(const WifiRequestMsgInfo *requestMsg)
+ErrCode StaInterface::CancelWps()
 {
-    if (requestMsg == nullptr) {
-        WIFI_LOGE("requestMsg is null\n");
-        return;
+    LOGD("Enter StaInterface::CancelWps.\n");
+    if (pStaService->CancelWps() != WIFI_OPT_SUCCESS) {
+        LOGD("CancelWps failed.\n");
+        return WIFI_OPT_FAILED;
     }
-    WIFI_LOGD("Enter StaInterface::WifiStaCmdStartWpsReq.\n");
-    pStaService->StartWps(requestMsg->params.wpsConfig);
+    return WIFI_OPT_SUCCESS;
 }
 
-void StaInterface::WifiStaCmdCancelWpsReq(const WifiRequestMsgInfo *requestMsg)
+ErrCode StaInterface::ConnectivityManager(const std::vector<InterScanInfo> &scanInfos)
 {
-    if (requestMsg == nullptr) {
-        WIFI_LOGE("requestMsg is null\n");
+    LOGI("Enter Connection management.\n");
+    if (pStaService->AutoConnectService(scanInfos) != WIFI_OPT_SUCCESS) {
+        LOGD("ConnectivityManager failed.\n");
+        return WIFI_OPT_FAILED;
     }
-    WIFI_LOGD("Enter StaInterface::WifiStaCmdCancelWpsReq.\n");
-    pStaService->CancelWps();
+    return WIFI_OPT_SUCCESS;
 }
 
-void StaInterface::WifiStaCmdConnectManagerReq(const WifiRequestMsgInfo *requestMsg)
+ErrCode StaInterface::SetCountryCode(const std::string &countryCode)
 {
-    WIFI_LOGI("Connection management information transferred successfully.\n");
-    pStaService->SyncLinkInfo(requestMsg->params.scanInfos);
-    pStaService->AutoConnectService(requestMsg->params.scanInfos);
-}
-
-void StaInterface::WifiStaCmdSetCountryCodeReq(const WifiRequestMsgInfo *requestMsg)
-{
-    if (requestMsg == nullptr) {
-        WIFI_LOGE("requestMsg is null\n");
+    LOGD("Enter StaInterface::SetCountryCode.\n");
+    if (pStaService->SetCountryCode(countryCode) != WIFI_OPT_SUCCESS) {
+        LOGD("SetCountryCode failed.\n");
+        return WIFI_OPT_FAILED;
     }
-    WIFI_LOGD("Enter StaInterface::WifiStaCmdSetCountryCodeReq.\n");
-    pStaService->SetCountryCode();
+    return WIFI_OPT_SUCCESS;
 }
 
-DECLARE_INIT_SERVICE(StaInterface);
+ErrCode StaInterface::RegisterStaServiceCallback(const StaServiceCallback &callbacks)
+{
+    LOGD("Enter StaInterface::RegisterStaServiceCallback.\n");
+    staCallback = callbacks;
+    return WIFI_OPT_SUCCESS;
+}
+
 }  // namespace Wifi
 }  // namespace OHOS

@@ -56,18 +56,18 @@ void WifiDeviceCallBackProxy::OnWifiConnectionChanged(int state, const WifiLinke
     data.WriteInt32(0);
     data.WriteInt32(state);
     data.WriteInt32(info.networkId);
-    data.WriteString16(Str8ToStr16(info.ssid));
-    data.WriteString16(Str8ToStr16(info.bssid));
+    data.WriteCString(info.ssid.c_str());
+    data.WriteCString(info.bssid.c_str());
     data.WriteInt32(info.rssi);
     data.WriteInt32(info.band);
     data.WriteInt32(info.frequency);
     data.WriteInt32(info.linkSpeed);
-    data.WriteString16(Str8ToStr16(info.macAddress));
+    data.WriteCString(info.macAddress.c_str());
     data.WriteInt32(info.ipAddress);
     data.WriteInt32((int)info.connState);
     data.WriteBool(info.ifHiddenSSID);
-    data.WriteString16(Str8ToStr16(info.rxLinkSpeed));
-    data.WriteString16(Str8ToStr16(info.txLinkSpeed));
+    data.WriteCString(info.rxLinkSpeed.c_str());
+    data.WriteCString(info.txLinkSpeed.c_str());
     data.WriteInt32(info.chload);
     data.WriteInt32(info.snr);
     data.WriteInt32((int)info.supplicantState);
@@ -80,7 +80,7 @@ void WifiDeviceCallBackProxy::OnWifiConnectionChanged(int state, const WifiLinke
     }
     int exception = reply.ReadInt32();
     if (exception) {
-        WIFI_LOGE("notify wifi state change failed!");
+        WIFI_LOGE("notify wifi connection change failed!");
     }
     return;
 }
@@ -113,7 +113,7 @@ void WifiDeviceCallBackProxy::OnWifiWpsStateChanged(int state, const std::string
     MessageParcel reply;
     data.WriteInt32(0);
     data.WriteInt32(state);
-    data.WriteString16(Str8ToStr16(pinCode));
+    data.WriteCString(pinCode.c_str());
     int error = Remote()->SendRequest(WIFI_CBK_CMD_WPS_STATE_CHANGE, data, reply, option);
     if (error != ERR_NONE) {
         WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d", WIFI_CBK_CMD_WPS_STATE_CHANGE, error);

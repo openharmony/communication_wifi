@@ -17,8 +17,6 @@
 #define OHOS_WIFI_INTERNAL_MSG_H
 
 #include "wifi_msg.h"
-#include "wifi_message_queue.h"
-#include "refbase.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -43,77 +41,31 @@ namespace Wifi {
 #define RSSI_LEVEL_3_5G (-72)
 #define RSSI_LEVEL_4_5G (-65)
 
-enum WifiInternalMsgCode {
-    MAIN_EXIT_CODE = -9999, /* special code, using when program exits. */
-
-    /* STA SERVICE MESSAGE CODE DEFINE, START WITH 1000 AND MUST LESS THEN 2000 */
-    STA_START_MSG_CODE = 1000, /* IDENTIFY: START MSGCODE FOR STA SERVICE. PLEASE ADD NEW CODE FOR STA AFTER THIS ! */
-    STA_OPEN_RES,
-    STA_CLOSE_RES,
-    STA_CONNECT_REQ,
-    STA_CONNECT_RES,
-    STA_RECONNECT_REQ,
-    STA_RECONNECT_RES,
-    STA_REASSOCIATE_REQ,
-    STA_REASSOCIATE_RES,
-    STA_DISCONNECT_REQ,
-    STA_DISCONNECT_RES,
-    STA_START_WPS_REQ,
-    STA_START_WPS_RES,
-    STA_CANCEL_WPS_REQ,
-    STA_CANCEL_WPS_RES,
-    STA_REMOVE_DEVICE_REQ,
-    STA_REMOVE_ALL_DEVICE_REQ,
-    STA_CONNECT_MANAGE_REQ,
-    STA_SET_COUNTRY_CODE,
-    STA_END_MSG_CODE, /* IDENTIFY: MAX MSGCODE FOR STA SERVICE . PLEASE ADD NEW CODE FOR STA BEFORE THIS ! */
-
-    /* AP SERVICE MESSAGE CODE DEFINE, START WITH 2000 AND MUST LESS THEN 3000 */
-    AP_START_MSG_CODE = 2000, /* IDENTIFY: START MSGCODE FOR AP SERVICE . PLEASE ADD NEW CODE FOR AP AFTER THIS ! */
-    AP_OPEN_RES,
-    AP_CLOSE_RES,
-    AP_JOIN_RES,
-    AP_LEAVE_RES,
-    AP_SET_HOTSPOT_CONFIG_REQ,
-    AP_ADD_BLOCK_LIST_REQ,
-    AP_DEL_BLOCK_LIST_REQ,
-    AP_DISCCONECT_STA_BY_MAC_REQ,
-    AP_END_MSG_CODE, /* IDENTIFY: MAX MSGCODE FOR AP SERVICE . PLEASE ADD NEW CODE FOR AP BEFORE THIS ! */
-
-    /* SCAN SERVICE MESSAGE CODE DEFINE, START WITH 3000 AND MUST LESS THEN 4000 */
-    SCAN_START_MSG_CODE =
-        3000, /* IDENTIFY: START MSGCODE FOR SCAN SERVICE. PLEASE ADD NEW CODE FOR SCAN AFTER THIS ! */
-    SCAN_START_RES,
-    SCAN_STOP_RES,
-    SCAN_REQ,
-    SCAN_RES,
-    SCAN_PARAM_REQ,
-    SCAN_PARAM_RES,
-    SCAN_RECONNECT_REQ,
-    SCAN_RESULT_RES,
-    SCAN_NOTIFY_STA_CONN_REQ,
-    SCAN_END_MSG_CODE, /* IDENTIFY: MAX MSGCODE FOR SCAN SERVICE . PLEASE ADD NEW CODE FOR SCAN BEFORE THIS ! */
-    SCAN_CONTROL_REQ,
-
-    /* MOCK SYSTEM STATUS CHANGED MESSAGE CODE DEFINE, START WITH 4000 AND MUST LESS THEN 5000 */
-    SCREEN_CHANGE_NOTICE = 4000,            /* notify screen state */
-    AIRPLANE_MODE_CHANGE_NOTICE = 4001,     /* notify airplane state */
-    APP_RUNNING_MODE_CHANGE_NOTICE = 4002,  /* notify App running state */
-    POWER_SAVING_MODE_CHANGE_NOTICE = 4003, /* notify power saving state */
-    FRONT_BACK_STATUS_CHANGE_NOTICE = 4004, /* notify front/backend state */
-    CUSTOM_STATUS_CHANGE_NOTICE = 4005,     /* notify other custom state */
-};
-
 enum class WifiOprMidState { CLOSED = 0, OPENING = 1, RUNNING = 2, CLOSING = 3, UNKNOWN };
 
+enum class WifiFeatures {
+    WIFI_FEATURE_INFRA = 0x0001,             // The feature id indicates support basic infrastructure mode
+    WIFI_FEATURE_INFRA_5G = 0x0002,          // The feature id indicates support 5 GHz Band
+    WIFI_FEATURE_PASSPOINT = 0x0004,         // The feature id indicates support GAS/ANQP
+    WIFI_FEATURE_P2P = 0x0008,               // The feature id indicates support Wifi-Direct
+    WIFI_FEATURE_MOBILE_HOTSPOT = 0x0010,    // The feature id indicates support Soft AP
+    WIFI_FEATURE_AWARE = 0x0040,             // The feature id indicates support Wi-Fi AWare networking
+    WIFI_FEATURE_AP_STA = 0x8000,            // The feature id indicates support AP STA Concurrency
+    WIFI_FEATURE_WPA3_SAE = 0x8000000,       // The feature id indicates support WPA3-Personal SAE
+    WIFI_FEATURE_WPA3_SUITE_B = 0x10000000,  // The feature id indicates support WPA3-Enterprise Suite-B
+    WIFI_FEATURE_OWE = 0x20000000,           // The feature id indicates support Enhanced Open
+};
+
 enum class OperateResState {
-    OPEN_WIFI_SUCCEED = 0,             /* open wifi succeed */
+    OPEN_WIFI_OPENING = 0,             /* open wifi opening */
+    OPEN_WIFI_SUCCEED,                 /* open wifi succeed */
     OPEN_WIFI_FAILED,                  /* open wifi failed */
     OPEN_WIFI_OVERRIDE_OPEN_FAILED,    /* enable wifi repeatedly */
     OPEN_WIFI_DISABLED,                /* open wifi failed, set wifi disabled */
     OPEN_WIFI_SUPPLICANT_INIT_FAILED,  /* wpa_supplicant not inited or init failed */
     OPEN_WIFI_OPEN_SUPPLICANT_FAILED,  /* wpa_supplicant start failed */
     OPEN_WIFI_CONN_SUPPLICANT_FAILED,  /* connect wpa_supplicant failed */
+    CLOSE_WIFI_CLOSING,                /* close wifi closing */
     CLOSE_WIFI_SUCCEED,                /* close wifi succeed */
     CLOSE_WIFI_FAILED,                 /* close wifi failed */
     CONNECT_CONNECTING,                /* connecting */
@@ -131,82 +83,96 @@ enum class OperateResState {
     DISCONNECT_DISCONNECTED,           /* disconnect succeed */
     CONNECT_PASSWORD_WRONG,            /* wrong password */
     CONNECT_OBTAINING_IP,              /* obtain ip */
-    CONNECT_OBTAINING_IP_FAIL
+    CONNECT_OBTAINING_IP_FAILED,       /* obtain ip FAILED*/
+    CONNECT_ASSOCIATING,
+    CONNECT_ASSOCIATED,
 };
 
-enum class WifiFeatures {
-    WIFI_FEATURE_INFRA = 0x0001,             // The feature id indicates support basic infrastructure mode
-    WIFI_FEATURE_INFRA_5G = 0x0002,          // The feature id indicates support 5 GHz Band
-    WIFI_FEATURE_PASSPOINT = 0x0004,         // The feature id indicates support GAS/ANQP
-    WIFI_FEATURE_P2P = 0x0008,               // The feature id indicates support Wifi-Direct
-    WIFI_FEATURE_MOBILE_HOTSPOT = 0x0010,    // The feature id indicates support Soft AP
-    WIFI_FEATURE_AWARE = 0x0040,             // The feature id indicates support Wi-Fi AWare networking
-    WIFI_FEATURE_AP_STA = 0x8000,            // The feature id indicates support AP STA Concurrency
-    WIFI_FEATURE_WPA3_SAE = 0x8000000,       // The feature id indicates support WPA3-Personal SAE
-    WIFI_FEATURE_WPA3_SUITE_B = 0x10000000,  // The feature id indicates support WPA3-Enterprise Suite-B
-    WIFI_FEATURE_OWE = 0x20000000,           // The feature id indicates support Enhanced Open
+/* is wps connected to a network */
+enum class IsWpsConnected {
+    WPS_CONNECTED = 0,
+    WPS_INVALID = -1,
 };
 
-struct WifiRequestParams {
-    WifiScanParams wifiScanParams;
-    WpsConfig wpsConfig;
-    HotspotConfig hotspotConfig;
-    WifiDeviceConfig deviceConfig;
-    StationInfo stationInfo;
-    std::vector<WifiScanInfo> scanInfos;
-    WifiMockState wifiMockState;
-    int argInt;
+enum class Ant {
+    NETWORK_PRIVATE = 0,
+    NETWORK_PRIVATEWITHGUEST = 1,
+    NETWORK_CHARGEABLEPUBLIC = 2,
+    NETWORK_FREEPUBLIC = 3,
+    NETWORK_PERSONAL = 4,
+    NETWORK_EMERGENCYONLY = 5,
+    NETWORK_RESVD6 = 6,
+    NETWORK_RESVD7 = 7,
+    NETWORK_RESVD8 = 8,
+    NETWORK_RESVD9 = 9,
+    NETWORK_RESVD10 = 10,
+    NETWORK_RESVD11 = 11,
+    NETWORK_RESVD12 = 12,
+    NETWORK_RESVD13 = 13,
+    NETWORK_TESTOREXPERIMENTAL = 14,
+    NETWORK_WILDCARD = 15,
+    NETWORK_ANT_INVALID = 16
+};
 
-    WifiRequestParams() : argInt(-1)
+struct InterScanInfo {
+    std::string bssid;
+    std::string ssid;
+    /**
+     * Network performance, including authentication,
+     * key management, and encryption mechanisms
+     * supported by the access point
+     */
+    std::string capabilities;
+    int frequency;
+    int band;  /* ap band, 1: 2.4G, 2: 5G */
+    WifiChannelWidth channelWidth;
+    int centerFrequency0;
+    int centerFrequency1;
+    int rssi; /* signal level */
+    WifiSecurity securityType;
+    std::vector<WifiInfoElem> infoElems;
+    int64_t features;
+    int64_t timestamp;
+    Ant ant;
+
+    InterScanInfo()
+        : frequency(0),
+          band(0),
+          channelWidth(WifiChannelWidth::WIDTH_INVALID),
+          centerFrequency0(0),
+          centerFrequency1(0),
+          rssi(0),
+          securityType(WifiSecurity::INVALID),
+          features(0),
+          timestamp(0),
+          ant(Ant::NETWORK_ANT_INVALID)
     {}
 
-    WifiRequestParams(const WifiRequestParams &) = delete;
-    WifiRequestParams &operator=(const WifiRequestParams &) = delete;
-};
-
-struct WifiResponseParams {
-    int result;
-    int argInt;
-    WifiLinkedInfo linkedInfo;
-    StationInfo staInfo;
-    std::vector<WifiScanInfo> scanInfos;
-    WifiResponseParams() : result(0), argInt(0)
-    {}
-};
-
-struct WifiRequestMsgInfo {
-    int msgCode;
-
-    WifiRequestParams params;
-
-    WifiRequestMsgInfo() : msgCode(0)
+    ~InterScanInfo()
     {}
 
-    WifiRequestMsgInfo(const WifiRequestMsgInfo &) = delete;
-    WifiRequestMsgInfo &operator=(const WifiRequestMsgInfo &) = delete;
-};
-
-struct WifiResponseMsgInfo {
-    int msgCode;
-    WifiResponseParams params;
-
-    WifiResponseMsgInfo() : msgCode(0)
-    {}
-};
-
-struct WifiEventCallbackMsg {
-    int msgCode;
-    int msgData;
-    std::string pinCode; /* wps pin mode code */
-    WifiLinkedInfo linkInfo;
-    StationInfo staInfo;
-
-    WifiEventCallbackMsg()
+    void GetDeviceMgmt(std::string &mgmt)
     {
-        msgCode = 0;
-        msgData = 0;
+        switch (securityType) {
+            case WifiSecurity::PSK:
+                mgmt = "WPA-PSK";
+                break;
+            case WifiSecurity::EAP:
+                mgmt = "WPA-EAP";
+                break;
+            case WifiSecurity::SAE:
+                mgmt = "SAE";
+                break;
+            case WifiSecurity::OWE:
+                mgmt = "OWE";
+                break;
+            default:
+                mgmt = "NONE";
+                break;
+        }
     }
 };
+
 
 struct SingleAppForbid {
     int appID;
@@ -229,6 +195,20 @@ struct SingleAppForbid {
     }
 };
 
+struct WifiEventCallbackMsg {
+    int msgCode;
+    int msgData;
+    std::string pinCode; /* wps pin mode code */
+    WifiLinkedInfo linkInfo;
+    StationInfo staInfo;
+
+    WifiEventCallbackMsg()
+    {
+        msgCode = 0;
+        msgData = 0;
+    }
+};
+
 enum class DhcpIpType { /* dhcp IP type: ipv4 ipv6 mix */
     DHCP_IPTYPE_IPV4,
     DHCP_IPTYPE_IPV6,
@@ -237,10 +217,9 @@ enum class DhcpIpType { /* dhcp IP type: ipv4 ipv6 mix */
 
 /* wifi config store */
 struct WifiConfig {
-    /* scan always switch */
-    bool scanAlwaysSwitch;
-    /* airplane mode can use sta switch */
-    bool staAirplaneMode;
+    bool scanAlwaysSwitch; /* scan always switch */
+    bool staAirplaneMode; /* when open airplane mode, whether close sta */
+    bool canOpenStaWhenAirplane; /* if airplane is opened, whether can open sta */
     /**
      * last sta service state, when service started, power
      * saving off, airplane mode off we use this saved state to
@@ -260,7 +239,6 @@ struct WifiConfig {
     bool whetherToAllowNetworkSwitchover;
     int dhcpIpType;
     std::string defaultWifiInterface;
-    /* pre load sta/scan/ap/p2p/aware so switch */
     bool preLoadSta;
     bool preLoadScan;
     bool preLoadAp;
@@ -282,6 +260,7 @@ struct WifiConfig {
     {
         scanAlwaysSwitch = false;
         staAirplaneMode = false;
+        canOpenStaWhenAirplane = false;
         staLastState = false;
         savedDeviceAppraisalPriority = PRIORITY_1;
         scoretacticsScoreSlope = SCORE_SLOPE;

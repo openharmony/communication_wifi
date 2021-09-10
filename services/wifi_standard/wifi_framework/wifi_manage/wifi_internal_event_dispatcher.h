@@ -22,10 +22,10 @@
 #include <deque>
 #include <memory>
 #include <mutex>
-#include <pthread.h>
+#include <thread>
 #include <string>
 #include <map>
-#include <unordered_map>
+
 #include "wifi_internal_msg.h"
 #include "parcel.h"
 #include "iremote_object.h"
@@ -83,7 +83,7 @@ public:
      * @param p WifiInternalEventDispatcher this Object
      * @return void* - nullptr, not care this now
      */
-    static void *Run(void *p);
+    static void Run(WifiInternalEventDispatcher &instance);
 
     static WifiInternalEventDispatcher &GetInstance();
     int AddStaCallback(const sptr<IRemoteObject> &remote, const sptr<IWifiDeviceCallBack> &callback);
@@ -106,19 +106,15 @@ public:
     void InvokeDeviceCallbacks(const WifiEventCallbackMsg &msg);
     void InvokeHotspotCallbacks(const WifiEventCallbackMsg &msg);
 private:
-    static void DealStaCallbackMsg(WifiInternalEventDispatcher *pInstance, const WifiEventCallbackMsg &msg);
-    static void DealScanCallbackMsg(WifiInternalEventDispatcher *pInstance, const WifiEventCallbackMsg &msg);
-    static void DealHotspotCallbackMsg(WifiInternalEventDispatcher *pInstance, const WifiEventCallbackMsg &msg);
+    static void DealStaCallbackMsg(WifiInternalEventDispatcher &pInstance, const WifiEventCallbackMsg &msg);
+    static void DealScanCallbackMsg(WifiInternalEventDispatcher &pInstance, const WifiEventCallbackMsg &msg);
+    static void DealHotspotCallbackMsg(WifiInternalEventDispatcher &pInstance, const WifiEventCallbackMsg &msg);
 
     static void PublishConnectionStateChangedEvent(int state, const WifiLinkedInfo &info);
-
     static void PublishWifiStateChangedEvent(int state);
-
+    static void PublishRssiValueChangedEvent(int state);
 private:
-    bool mSystemNotifyInit;
-    /* system notify service client */
-
-    pthread_t mTid;
+    std::thread mBroadcastThread;
     std::atomic<bool> mRunFlag;
     std::mutex mMutex;
     std::condition_variable mCondition;

@@ -65,15 +65,7 @@ public:
     virtual ErrCode SetHotspotConfig(const HotspotConfig &config) = 0;
 
     /**
-     * @Description  Get the device MAC address
-     *
-     * @param result - Get device mac String
-     * @return ErrCode - operation result
-     */
-    virtual ErrCode GetDeviceMacAddress(std::string &result) = 0;
-
-    /**
-     * @Description Get the Station List object
+     * @Description Get the Station List object.
      *
      * @param result - Get result vector of connect Station Info
      * @return ErrCode - operation result

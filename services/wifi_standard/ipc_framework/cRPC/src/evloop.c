@@ -17,7 +17,7 @@
 #include "log.h"
 
 #undef LOG_TAG
-#define LOG_TAG "OHOS_WIFI_RPC_EVLOOP"
+#define LOG_TAG "WifiRpcEventLoop"
 
 const int ELOOP_MAX_FD_SIZE = 1024;
 
@@ -38,9 +38,9 @@ EventLoop *CreateEventLoop(int size)
             free(evLoop);
             return NULL;
         }
-        evLoop->events = (FdEvent *)calloc(size, sizeof(FdEvent));
-        evLoop->epoll_events = (struct epoll_event *)calloc(size, sizeof(struct epoll_event));
-        if (evLoop->events == NULL || evLoop->epoll_events == NULL) {
+        evLoop->fdMasks = (FdMask *)calloc(size, sizeof(FdMask));
+        evLoop->epEvents = (struct epoll_event *)calloc(size, sizeof(struct epoll_event));
+        if (evLoop->fdMasks == NULL || evLoop->epEvents == NULL) {
             flag = 1; /* fail */
             LOGE("Failed to calloc events or epoll_event struct!");
             break;
@@ -55,11 +55,11 @@ EventLoop *CreateEventLoop(int size)
     if (flag == 0) {
         return evLoop;
     }
-    if (evLoop->events != NULL) {
-        free(evLoop->events);
+    if (evLoop->fdMasks != NULL) {
+        free(evLoop->fdMasks);
     }
-    if (evLoop->epoll_events != NULL) {
-        free(evLoop->epoll_events);
+    if (evLoop->epEvents != NULL) {
+        free(evLoop->epEvents);
     }
     free(evLoop);
     return NULL;
@@ -74,11 +74,11 @@ void DestroyEventLoop(EventLoop *loop)
     if (loop->epfd != -1) {
         close(loop->epfd);
     }
-    if (loop->events != NULL) {
-        free(loop->events);
+    if (loop->fdMasks != NULL) {
+        free(loop->fdMasks);
     }
-    if (loop->epoll_events != NULL) {
-        free(loop->epoll_events);
+    if (loop->epEvents != NULL) {
+        free(loop->epEvents);
     }
     free(loop);
     return;
@@ -103,11 +103,11 @@ int AddFdEvent(EventLoop *loop, int fd, unsigned int addMask)
     if (fd >= loop->setSize) {
         return -1;
     }
-    if (loop->events[fd].mask & addMask) {
+    if (loop->fdMasks[fd].mask & addMask) {
         return 0;
     }
-    int op = (loop->events[fd].mask == NONE_EVENT) ? EPOLL_CTL_ADD : EPOLL_CTL_MOD;
-    addMask |= loop->events[fd].mask;
+    int op = (loop->fdMasks[fd].mask == NONE_EVENT) ? EPOLL_CTL_ADD : EPOLL_CTL_MOD;
+    addMask |= loop->fdMasks[fd].mask;
     struct epoll_event pollEvent = {0};
     if (addMask & READ_EVENT) {
         pollEvent.events |= EPOLLIN;
@@ -119,8 +119,8 @@ int AddFdEvent(EventLoop *loop, int fd, unsigned int addMask)
     if (epoll_ctl(loop->epfd, op, fd, &pollEvent) == -1) {
         return -1;
     }
-    loop->events[fd].fd = fd;
-    loop->events[fd].mask |= addMask;
+    loop->fdMasks[fd].fd = fd;
+    loop->fdMasks[fd].mask |= addMask;
     if (fd > loop->maxFd) {
         loop->maxFd = fd;
     }
@@ -136,13 +136,13 @@ int DelFdEvent(EventLoop *loop, int fd, unsigned int delMask)
     if (fd >= loop->setSize) {
         return 0;
     }
-    if (loop->events[fd].mask == NONE_EVENT) {
+    if (loop->fdMasks[fd].mask == NONE_EVENT) {
         return 0;
     }
-    if ((loop->events[fd].mask & delMask) == 0) {
+    if ((loop->fdMasks[fd].mask & delMask) == 0) {
         return 0;
     }
-    unsigned int mask = loop->events[fd].mask & (~delMask);
+    unsigned int mask = loop->fdMasks[fd].mask & (~delMask);
     struct epoll_event pollEvent = {0};
     pollEvent.events = 0;
     if (mask & READ_EVENT) {
@@ -156,11 +156,11 @@ int DelFdEvent(EventLoop *loop, int fd, unsigned int delMask)
     if (epoll_ctl(loop->epfd, op, fd, &pollEvent) == -1) {
         return -1;
     }
-    loop->events[fd].mask &= ~delMask;
-    if (fd == loop->maxFd && loop->events[fd].mask == NONE_EVENT) {
+    loop->fdMasks[fd].mask &= ~delMask;
+    if (fd == loop->maxFd && loop->fdMasks[fd].mask == NONE_EVENT) {
         int j = loop->maxFd - 1;
         for (; j >= 0; --j) {
-            if (loop->events[j].mask != NONE_EVENT) {
+            if (loop->fdMasks[j].mask != NONE_EVENT) {
                 break;
             }
         }

@@ -42,21 +42,63 @@ ApInterface::~ApInterface()
     ApService::DeleteInstance();
 }
 
-int ApInterface::Init(WifiMessageQueue<WifiResponseMsgInfo> *mqUp)
+extern "C" IApService *Create(void)
 {
-    return ApService::GetInstance().Init(mqUp);
+    return new ApInterface();
 }
 
-int ApInterface::PushMsg(WifiRequestMsgInfo *msg)
+extern "C" void Destroy(IApService *pservice)
 {
-    return ApService::GetInstance().PushMsg(msg);
+    delete pservice;
+}
+ErrCode ApInterface::EnableHotspot()
+{
+    return ApService::GetInstance().EnableHotspot();
 }
 
-int ApInterface::UnInit(void)
+ErrCode ApInterface::DisableHotspot()
 {
-    return ApService::GetInstance().UnInit();
+    return ApService::GetInstance().DisableHotspot();
 }
 
-DECLARE_INIT_SERVICE(ApInterface);
+ErrCode ApInterface::AddBlockList(const StationInfo &stationInfo)
+{
+    return ApService::GetInstance().AddBlockList(stationInfo);
+}
+
+ErrCode ApInterface::DelBlockList(const StationInfo &stationInfo)
+{
+    return ApService::GetInstance().DelBlockList(stationInfo);
+}
+
+ErrCode ApInterface::SetHotspotConfig(const HotspotConfig &hotspotConfig)
+{
+    return ApService::GetInstance().SetHotspotConfig(hotspotConfig);
+}
+
+ErrCode ApInterface::DisconnetStation(const StationInfo &stationInfo)
+{
+    return ApService::GetInstance().DisconnetStation(stationInfo);
+}
+
+ErrCode ApInterface::GetStationList(std::vector<StationInfo> &result)
+{
+    return ErrCode::WIFI_OPT_FAILED;
+}
+
+ErrCode ApInterface::GetValidBands(std::vector<BandType> &bands)
+{
+    return ErrCode::WIFI_OPT_FAILED;
+}
+
+ErrCode ApInterface::GetValidChannels(BandType band, std::vector<int32_t> &validchannel)
+{
+    return ErrCode::WIFI_OPT_FAILED;
+}
+
+ErrCode ApInterface::RegisterApServiceCallbacks(const IApServiceCallbacks &callbacks)
+{
+    return ApService::GetInstance().RegisterApServiceCallbacks(callbacks);
+}
 }  // namespace Wifi
 }  // namespace OHOS

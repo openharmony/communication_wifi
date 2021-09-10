@@ -50,19 +50,14 @@ ErrCode WifiDeviceProxy::EnableWifi()
     int error = Remote()->SendRequest(WIFI_SVR_CMD_ENABLE_WIFI, data, reply, option);
     if (error != ERR_NONE) {
         WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d", WIFI_SVR_CMD_ENABLE_WIFI, error);
-        return ErrCode(error);
+        return WIFI_OPT_FAILED;
     }
 
     int exception = reply.ReadInt32();
     if (exception) {
         return WIFI_OPT_FAILED;
     }
-    int ret = reply.ReadInt32();
-    if (ret != WIFI_OPT_SUCCESS) {
-        return ErrCode(ret);
-    }
-
-    return WIFI_OPT_SUCCESS;
+    return ErrCode(reply.ReadInt32());
 }
 
 ErrCode WifiDeviceProxy::DisableWifi()
@@ -78,18 +73,13 @@ ErrCode WifiDeviceProxy::DisableWifi()
     int error = Remote()->SendRequest(WIFI_SVR_CMD_DISABLE_WIFI, data, reply, option);
     if (error != ERR_NONE) {
         WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d", WIFI_SVR_CMD_DISABLE_WIFI, error);
-        return ErrCode(error);
+        return WIFI_OPT_FAILED;
     }
     int exception = reply.ReadInt32();
     if (exception) {
         return WIFI_OPT_FAILED;
     }
-    int ret = reply.ReadInt32();
-    if (ret != WIFI_OPT_SUCCESS) {
-        return ErrCode(ret);
-    }
-
-    return WIFI_OPT_SUCCESS;
+    return ErrCode(reply.ReadInt32());
 }
 
 void WifiDeviceProxy::WriteIpAddress(MessageParcel &data, const WifiIpAddress &address)
@@ -158,7 +148,7 @@ ErrCode WifiDeviceProxy::AddDeviceConfig(const WifiDeviceConfig &config, int &re
     int error = Remote()->SendRequest(WIFI_SVR_CMD_ADD_DEVICE_CONFIG, data, reply, option);
     if (error != ERR_NONE) {
         WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d", WIFI_SVR_CMD_ADD_DEVICE_CONFIG, error);
-        return ErrCode(error);
+        return WIFI_OPT_FAILED;
     }
     int exception = reply.ReadInt32();
     if (exception) {
@@ -187,18 +177,13 @@ ErrCode WifiDeviceProxy::RemoveDevice(int networkId)
     int error = Remote()->SendRequest(WIFI_SVR_CMD_REMOVE_DEVICE_CONFIG, data, reply, option);
     if (error != ERR_NONE) {
         WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d", WIFI_SVR_CMD_REMOVE_DEVICE_CONFIG, error);
-        return ErrCode(error);
+        return WIFI_OPT_FAILED;
     }
     int exception = reply.ReadInt32();
     if (exception) {
         return WIFI_OPT_FAILED;
     }
-    int ret = reply.ReadInt32();
-    if (ret != WIFI_OPT_SUCCESS) {
-        return ErrCode(ret);
-    }
-
-    return WIFI_OPT_SUCCESS;
+    return ErrCode(reply.ReadInt32());
 }
 
 ErrCode WifiDeviceProxy::RemoveAllDevice()
@@ -215,19 +200,14 @@ ErrCode WifiDeviceProxy::RemoveAllDevice()
     int error = Remote()->SendRequest(WIFI_SVR_CMD_REMOVE_ALL_DEVICE_CONFIG, data, reply, option);
     if (error != ERR_NONE) {
         WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d", WIFI_SVR_CMD_REMOVE_ALL_DEVICE_CONFIG, error);
-        return ErrCode(error);
+        return WIFI_OPT_FAILED;
     }
 
     int exception = reply.ReadInt32();
     if (exception) {
         return WIFI_OPT_FAILED;
     }
-    int ret = reply.ReadInt32();
-    if (ret != WIFI_OPT_SUCCESS) {
-        return ErrCode(ret);
-    }
-
-    return WIFI_OPT_SUCCESS;
+    return ErrCode(reply.ReadInt32());
 }
 
 void WifiDeviceProxy::ReadIpAddress(MessageParcel &reply, WifiIpAddress &address)
@@ -302,7 +282,7 @@ ErrCode WifiDeviceProxy::GetDeviceConfigs(std::vector<WifiDeviceConfig> &result)
     int error = Remote()->SendRequest(WIFI_SVR_CMD_GET_DEVICE_CONFIGS, data, reply, option);
     if (error != ERR_NONE) {
         WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d", WIFI_SVR_CMD_GET_DEVICE_CONFIGS, error);
-        return ErrCode(error);
+        return WIFI_OPT_FAILED;
     }
     int exception = reply.ReadInt32();
     if (exception) {
@@ -332,18 +312,13 @@ ErrCode WifiDeviceProxy::EnableDeviceConfig(int networkId, bool attemptEnable)
     int error = Remote()->SendRequest(WIFI_SVR_CMD_ENABLE_DEVICE, data, reply, option);
     if (error != ERR_NONE) {
         WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d", WIFI_SVR_CMD_ENABLE_DEVICE, error);
-        return ErrCode(error);
+        return WIFI_OPT_FAILED;
     }
     int exception = reply.ReadInt32();
     if (exception) {
         return WIFI_OPT_FAILED;
     }
-    int ret = reply.ReadInt32();
-    if (ret != WIFI_OPT_SUCCESS) {
-        return ErrCode(ret);
-    }
-
-    return WIFI_OPT_SUCCESS;
+    return ErrCode(reply.ReadInt32());
 }
 
 ErrCode WifiDeviceProxy::DisableDeviceConfig(int networkId)
@@ -360,18 +335,13 @@ ErrCode WifiDeviceProxy::DisableDeviceConfig(int networkId)
     int error = Remote()->SendRequest(WIFI_SVR_CMD_DISABLE_DEVICE, data, reply, option);
     if (error != ERR_NONE) {
         WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d", WIFI_SVR_CMD_DISABLE_DEVICE, error);
-        return ErrCode(error);
+        return WIFI_OPT_FAILED;
     }
     int exception = reply.ReadInt32();
     if (exception) {
         return WIFI_OPT_FAILED;
     }
-    int ret = reply.ReadInt32();
-    if (ret != WIFI_OPT_SUCCESS) {
-        return ErrCode(ret);
-    }
-
-    return WIFI_OPT_SUCCESS;
+    return ErrCode(reply.ReadInt32());
 }
 
 ErrCode WifiDeviceProxy::ConnectToNetwork(int networkId)
@@ -388,18 +358,13 @@ ErrCode WifiDeviceProxy::ConnectToNetwork(int networkId)
     int error = Remote()->SendRequest(WIFI_SVR_CMD_CONNECT_TO, data, reply, option);
     if (error != ERR_NONE) {
         WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d", WIFI_SVR_CMD_CONNECT_TO, error);
-        return ErrCode(error);
+        return WIFI_OPT_FAILED;
     }
     int exception = reply.ReadInt32();
     if (exception) {
         return WIFI_OPT_FAILED;
     }
-    int ret = reply.ReadInt32();
-    if (ret != WIFI_OPT_SUCCESS) {
-        return ErrCode(ret);
-    }
-
-    return WIFI_OPT_SUCCESS;
+    return ErrCode(reply.ReadInt32());
 }
 
 ErrCode WifiDeviceProxy::ConnectToDevice(const WifiDeviceConfig &config)
@@ -416,18 +381,13 @@ ErrCode WifiDeviceProxy::ConnectToDevice(const WifiDeviceConfig &config)
     int error = Remote()->SendRequest(WIFI_SVR_CMD_CONNECT2_TO, data, reply, option);
     if (error != ERR_NONE) {
         WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d", WIFI_SVR_CMD_CONNECT2_TO, error);
-        return ErrCode(error);
+        return WIFI_OPT_FAILED;
     }
     int exception = reply.ReadInt32();
     if (exception) {
         return WIFI_OPT_FAILED;
     }
-    int ret = reply.ReadInt32();
-    if (ret != WIFI_OPT_SUCCESS) {
-        return ErrCode(ret);
-    }
-
-    return WIFI_OPT_SUCCESS;
+    return ErrCode(reply.ReadInt32());
 }
 
 ErrCode WifiDeviceProxy::ReConnect()
@@ -443,18 +403,13 @@ ErrCode WifiDeviceProxy::ReConnect()
     int error = Remote()->SendRequest(WIFI_SVR_CMD_RECONNECT, data, reply, option);
     if (error != ERR_NONE) {
         WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d", WIFI_SVR_CMD_RECONNECT, error);
-        return ErrCode(error);
+        return WIFI_OPT_FAILED;
     }
     int exception = reply.ReadInt32();
     if (exception) {
         return WIFI_OPT_FAILED;
     }
-    int ret = reply.ReadInt32();
-    if (ret != WIFI_OPT_SUCCESS) {
-        return ErrCode(ret);
-    }
-
-    return WIFI_OPT_SUCCESS;
+    return ErrCode(reply.ReadInt32());
 }
 
 ErrCode WifiDeviceProxy::ReAssociate(void)
@@ -470,18 +425,13 @@ ErrCode WifiDeviceProxy::ReAssociate(void)
     int error = Remote()->SendRequest(WIFI_SVR_CMD_REASSOCIATE, data, reply, option);
     if (error != ERR_NONE) {
         WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d", WIFI_SVR_CMD_REASSOCIATE, error);
-        return ErrCode(error);
+        return WIFI_OPT_FAILED;
     }
     int exception = reply.ReadInt32();
     if (exception) {
         return WIFI_OPT_FAILED;
     }
-    int ret = reply.ReadInt32();
-    if (ret != WIFI_OPT_SUCCESS) {
-        return ErrCode(ret);
-    }
-
-    return WIFI_OPT_SUCCESS;
+    return ErrCode(reply.ReadInt32());
 }
 
 ErrCode WifiDeviceProxy::Disconnect(void)
@@ -497,18 +447,13 @@ ErrCode WifiDeviceProxy::Disconnect(void)
     int error = Remote()->SendRequest(WIFI_SVR_CMD_DISCONNECT, data, reply, option);
     if (error != ERR_NONE) {
         WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d", WIFI_SVR_CMD_DISCONNECT, error);
-        return ErrCode(error);
+        return WIFI_OPT_FAILED;
     }
     int exception = reply.ReadInt32();
     if (exception) {
         return WIFI_OPT_FAILED;
     }
-    int ret = reply.ReadInt32();
-    if (ret != WIFI_OPT_SUCCESS) {
-        return ErrCode(ret);
-    }
-
-    return WIFI_OPT_SUCCESS;
+    return ErrCode(reply.ReadInt32());
 }
 
 ErrCode WifiDeviceProxy::StartWps(const WpsConfig &config)
@@ -527,18 +472,13 @@ ErrCode WifiDeviceProxy::StartWps(const WpsConfig &config)
     int error = Remote()->SendRequest(WIFI_SVR_CMD_START_WPS, data, reply, option);
     if (error != ERR_NONE) {
         WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d", WIFI_SVR_CMD_START_WPS, error);
-        return ErrCode(error);
+        return WIFI_OPT_FAILED;
     }
     int exception = reply.ReadInt32();
     if (exception) {
         return WIFI_OPT_FAILED;
     }
-    int ret = reply.ReadInt32();
-    if (ret != WIFI_OPT_SUCCESS) {
-        return ErrCode(ret);
-    }
-
-    return WIFI_OPT_SUCCESS;
+    return ErrCode(reply.ReadInt32());
 }
 
 ErrCode WifiDeviceProxy::CancelWps(void)
@@ -554,18 +494,13 @@ ErrCode WifiDeviceProxy::CancelWps(void)
     int error = Remote()->SendRequest(WIFI_SVR_CMD_CANCEL_WPS, data, reply, option);
     if (error != ERR_NONE) {
         WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d", WIFI_SVR_CMD_CANCEL_WPS, error);
-        return ErrCode(error);
+        return WIFI_OPT_FAILED;
     }
     int exception = reply.ReadInt32();
     if (exception) {
         return WIFI_OPT_FAILED;
     }
-    int ret = reply.ReadInt32();
-    if (ret != WIFI_OPT_SUCCESS) {
-        return ErrCode(ret);
-    }
-
-    return WIFI_OPT_SUCCESS;
+    return ErrCode(reply.ReadInt32());
 }
 
 ErrCode WifiDeviceProxy::IsWifiActive(bool &bActive)
@@ -581,7 +516,7 @@ ErrCode WifiDeviceProxy::IsWifiActive(bool &bActive)
     int error = Remote()->SendRequest(WIFI_SVR_CMD_IS_WIFI_ACTIVE, data, reply, option);
     if (error != ERR_NONE) {
         WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d", WIFI_SVR_CMD_IS_WIFI_ACTIVE, error);
-        return ErrCode(error);
+        return WIFI_OPT_FAILED;
     }
     int exception = reply.ReadInt32();
     if (exception) {
@@ -609,7 +544,7 @@ ErrCode WifiDeviceProxy::GetWifiState(int &state)
     int error = Remote()->SendRequest(WIFI_SVR_CMD_GET_WIFI_STATE, data, reply, option);
     if (error != ERR_NONE) {
         WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d", WIFI_SVR_CMD_GET_WIFI_STATE, error);
-        return ErrCode(error);
+        return WIFI_OPT_FAILED;
     }
     int exception = reply.ReadInt32();
     if (exception) {
@@ -675,7 +610,7 @@ ErrCode WifiDeviceProxy::GetLinkedInfo(WifiLinkedInfo &info)
     int error = Remote()->SendRequest(WIFI_SVR_CMD_GET_LINKED_INFO, data, reply, option);
     if (error != ERR_NONE) {
         WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d", WIFI_SVR_CMD_GET_LINKED_INFO, error);
-        return ErrCode(error);
+        return WIFI_OPT_FAILED;
     }
 
     int exception = reply.ReadInt32();
@@ -704,7 +639,7 @@ ErrCode WifiDeviceProxy::GetIpInfo(IpInfo &info)
     int error = Remote()->SendRequest(WIFI_SVR_CMD_GET_DHCP_INFO, data, reply, option);
     if (error != ERR_NONE) {
         WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d", WIFI_SVR_CMD_GET_DHCP_INFO, error);
-        return ErrCode(error);
+        return WIFI_OPT_FAILED;
     }
     int exception = reply.ReadInt32();
     if (exception) {
@@ -739,18 +674,13 @@ ErrCode WifiDeviceProxy::SetCountryCode(const std::string &countryCode)
     int error = Remote()->SendRequest(WIFI_SVR_CMD_SET_COUNTRY_CODE, data, reply, option);
     if (error != ERR_NONE) {
         WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d", WIFI_SVR_CMD_SET_COUNTRY_CODE, error);
-        return ErrCode(error);
+        return WIFI_OPT_FAILED;
     }
     int exception = reply.ReadInt32();
     if (exception) {
         return WIFI_OPT_FAILED;
     }
-    int ret = reply.ReadInt32();
-    if (ret != WIFI_OPT_SUCCESS) {
-        return ErrCode(ret);
-    }
-
-    return WIFI_OPT_SUCCESS;
+    return ErrCode(reply.ReadInt32());
 }
 
 ErrCode WifiDeviceProxy::GetCountryCode(std::string &countryCode)
@@ -765,7 +695,7 @@ ErrCode WifiDeviceProxy::GetCountryCode(std::string &countryCode)
     int error = Remote()->SendRequest(WIFI_SVR_CMD_GET_COUNTRY_CODE, data, reply, option);
     if (error != ERR_NONE) {
         WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d", WIFI_SVR_CMD_GET_COUNTRY_CODE, error);
-        return ErrCode(error);
+        return WIFI_OPT_FAILED;
     }
     int exception = reply.ReadInt32();
     if (exception) {
@@ -780,7 +710,7 @@ ErrCode WifiDeviceProxy::GetCountryCode(std::string &countryCode)
     return WIFI_OPT_SUCCESS;
 }
 
-ErrCode WifiDeviceProxy::RegisterCallBackClient(const std::string &name, const sptr<IWifiDeviceCallBack> &callback)
+ErrCode WifiDeviceProxy::RegisterCallBack(const sptr<IWifiDeviceCallBack> &callback)
 {
     if (mRemoteDied) {
         WIFI_LOGD("failed to `%{public}s`,remote service is died!", __func__);
@@ -789,7 +719,6 @@ ErrCode WifiDeviceProxy::RegisterCallBackClient(const std::string &name, const s
     MessageParcel data, reply;
     MessageOption option(MessageOption::TF_ASYNC);
     data.WriteInt32(0);
-    data.WriteCString(name.c_str());
 
     g_deviceCallBackStub->RegisterUserCallBack(callback);
 
@@ -801,18 +730,13 @@ ErrCode WifiDeviceProxy::RegisterCallBackClient(const std::string &name, const s
     int error = Remote()->SendRequest(WIFI_SVR_CMD_REGISTER_CALLBACK_CLIENT, data, reply, option);
     if (error != ERR_NONE) {
         WIFI_LOGE("Set Attr(%{public}d) failed, code is %{public}d", WIFI_SVR_CMD_REGISTER_CALLBACK_CLIENT, error);
-        return ErrCode(error);
+        return WIFI_OPT_FAILED;
     }
     int exception = reply.ReadInt32();
     if (exception) {
         return WIFI_OPT_FAILED;
     }
-    int ret = reply.ReadInt32();
-    if (ret != WIFI_OPT_SUCCESS) {
-        return ErrCode(ret);
-    }
-
-    return WIFI_OPT_SUCCESS;
+    return ErrCode(reply.ReadInt32());
 }
 
 ErrCode WifiDeviceProxy::GetSignalLevel(const int &rssi, const int &band, int &level)
@@ -830,7 +754,7 @@ ErrCode WifiDeviceProxy::GetSignalLevel(const int &rssi, const int &band, int &l
     int error = Remote()->SendRequest(WIFI_SVR_CMD_GET_SIGNAL_LEVEL, data, reply, option);
     if (error != ERR_NONE) {
         WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d", WIFI_SVR_CMD_GET_SIGNAL_LEVEL, error);
-        return ErrCode(error);
+        return WIFI_OPT_FAILED;
     }
     int exception = reply.ReadInt32();
     if (exception) {
@@ -857,7 +781,7 @@ ErrCode WifiDeviceProxy::GetSupportedFeatures(long &features)
     int error = Remote()->SendRequest(WIFI_SVR_CMD_GET_SUPPORTED_FEATURES, data, reply, option);
     if (error != ERR_NONE) {
         WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d", WIFI_SVR_CMD_GET_SUPPORTED_FEATURES, error);
-        return ErrCode(error);
+        return WIFI_OPT_FAILED;
     }
     int exception = reply.ReadInt32();
     if (exception) {
@@ -872,7 +796,36 @@ ErrCode WifiDeviceProxy::GetSupportedFeatures(long &features)
     return WIFI_OPT_SUCCESS;
 }
 
-void WifiDeviceProxy::OnRemoteDied(const wptr<IRemoteObject>& remoteObject)
+ErrCode WifiDeviceProxy::GetDeviceMacAddress(std::string &result)
+{
+    if (mRemoteDied) {
+        WIFI_LOGD("failed to `%{public}s`,remote service is died!", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    MessageOption option;
+    MessageParcel data;
+    MessageParcel reply;
+    data.WriteInt32(0);
+
+    int error = Remote()->SendRequest(WIFI_SVR_CMD_GET_DERVICE_MAC_ADD, data, reply, option);
+    if (error != ERR_NONE) {
+        WIFI_LOGE("Set Attr(%{public}d) failed", WIFI_SVR_CMD_GET_DERVICE_MAC_ADD);
+        return WIFI_OPT_FAILED;
+    }
+
+    int exception = reply.ReadInt32();
+    if (exception) {
+        return WIFI_OPT_FAILED;
+    }
+    int ret = reply.ReadInt32();
+    if (ErrCode(ret) != WIFI_OPT_SUCCESS) {
+        return ErrCode(ret);
+    }
+    result = reply.ReadCString();
+    return WIFI_OPT_SUCCESS;
+}
+
+void WifiDeviceProxy::OnRemoteDied(const wptr<IRemoteObject> &remoteObject)
 {
     WIFI_LOGD("Remote service is died!");
     mRemoteDied = true;

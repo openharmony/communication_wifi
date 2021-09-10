@@ -42,12 +42,12 @@ constexpr int MODE_ADD = 0;
 constexpr int MODE_DEL = 1;
 constexpr int MODE_UPDATE = 2;
 /* Obtain the scanning result that is valid within 180s. */
-constexpr int WIFI_GET_SCAN_RESULT_VALID_TIMESTAMP = 180;
+constexpr int WIFI_GET_SCAN_INFO_VALID_TIMESTAMP = 180;
 
-constexpr char DEVICE_CONFIG_FILE_PATH[] = "./device_config.conf";
-constexpr char HOTSPOT_CONFIG_FILE_PATH[] = "./hotspot_config.conf";
-constexpr char BLOCK_LIST_FILE_PATH[] = "./block_list.conf";
-constexpr char WIFI_CONFIG_FILE_PATH[] = "./wifi_config.conf";
+constexpr char DEVICE_CONFIG_FILE_PATH[] = "/data/misc/wifi/device_config.conf";
+constexpr char HOTSPOT_CONFIG_FILE_PATH[] = "/data/misc/wifi/hotspot_config.conf";
+constexpr char BLOCK_LIST_FILE_PATH[] = "/data/misc/wifi/block_list.conf";
+constexpr char WIFI_CONFIG_FILE_PATH[] = "/data/misc/wifi/wifi_config.conf";
 
 namespace OHOS {
 namespace Wifi {
@@ -191,6 +191,16 @@ public:
      */
     int GetDeviceConfig(const std::string &index, const int &indexType, WifiDeviceConfig &config);
 
+    /**
+     * @Description Get the specify wifi device config which ssid is equal to input ssid and keymgmt is equal to input
+     * keymgmt
+     *
+     * @param ssid - ssid string
+     * @param keymgmt - keymgmt string
+     * @param config - output WifiDeviceConfig struct
+     * @return int - 0 success; -1 not find the device config
+     */
+    int GetDeviceConfig(const std::string &ssid, const std::string &keymgmt, WifiDeviceConfig &config);
     /**
      * @Description Get the wifi device configs which hiddenSSID is true
      *
@@ -483,6 +493,14 @@ public:
      * @return int - 0 success
      */
     int SetCanUseStaWhenAirplaneMode(bool bCan);
+
+    /**
+     * @Description Get the config whether can open sta when airplane mode opened
+     * 
+     * @return true - can open
+     * @return false - can't open
+     */
+    bool GetCanOpenStaWhenAirplaneMode();
 
     /**
      * @Description Get the STA service last running state

@@ -191,13 +191,12 @@ public:
     ErrCode GetCountryCode(std::string &countryCode) override;
 
     /**
-     * @Description Client register callback event
+     * @Description Register callback function.
      *
-     * @param name - client's name, which is a unique identifier
-     * @param callback - client object
+     * @param callback - IWifiDeviceCallBack object
      * @return ErrCode - operation result
      */
-    ErrCode RegisterCallBackClient(const std::string &name, const sptr<IWifiDeviceCallBack> &callback) override;
+    ErrCode RegisterCallBack(const sptr<IWifiDeviceCallBack> &callback) override;
 
     /**
      * @Description Get the Signal Level object
@@ -216,6 +215,14 @@ public:
      * @return ErrCode - operation result
      */
     ErrCode GetSupportedFeatures(long &features) override;
+
+    /**
+     * @Description  Get the device MAC address
+     *
+     * @param result - Get device mac String
+     * @return ErrCode - operation result
+     */
+    ErrCode GetDeviceMacAddress(std::string &result) override;
 
     void OnRemoteDied(const wptr<IRemoteObject> &remoteObject) override;
 

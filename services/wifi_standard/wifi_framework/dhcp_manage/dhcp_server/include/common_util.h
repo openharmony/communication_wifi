@@ -22,9 +22,9 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-void LogTime();
-uint64_t Tmspsec();
-uint64_t Tmspusec();
+void LogTime(void);
+uint64_t Tmspsec(void);
+uint64_t Tmspusec(void);
 void LeftTrim(char *buf);
 void RightTrim(char *buf);
 void TrimString(char *buf);

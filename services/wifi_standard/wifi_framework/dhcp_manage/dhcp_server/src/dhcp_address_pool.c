@@ -193,9 +193,9 @@ uint32_t AddressDistribute(DhcpAddressPool *pool, uint8_t macAddr[DHCP_HWADDR_LE
     }
     int total = HostTotal(pool->netmask);
     uint32_t distIp = pool->distribution;
-    if (distIp < pool->addressRange.beginAddress) {
+    if (!distIp || distIp < pool->addressRange.beginAddress) {
         distIp = pool->addressRange.beginAddress;
-        pool->distribution = distIp;
+        //pool->distribution = distIp;
     }
     int distSucess = 0;
     int outOfRange = 0;
@@ -205,7 +205,8 @@ uint32_t AddressDistribute(DhcpAddressPool *pool, uint8_t macAddr[DHCP_HWADDR_LE
             offset = NextIpOffset(pool->netmask);
         }
         distIp = NextIpAddress(distIp, pool->netmask, offset);
-        if (!CheckIpAvailability(pool, macAddr, pool->distribution)) {
+        LOGD("===>distIp:%s", ParseStrIp(distIp));
+        if (!CheckIpAvailability(pool, macAddr, distIp)) {
             continue;
         }
         int ret = CheckRangeAvailability(pool, macAddr, distIp, &outOfRange);
@@ -229,17 +230,22 @@ int InitAddressPool(DhcpAddressPool *pool, const char *ifname, PDhcpOptionList o
         LOGD("address pool pointer is null.");
         return RET_ERROR;
     }
-
     if (memset_s(pool, sizeof(DhcpAddressPool), 0, sizeof(DhcpAddressPool)) != EOK) {
         LOGD("failed to init dhcp pool.");
         return RET_ERROR;
     }
-
+    if (memset_s(pool->ifname, IFACE_NAME_SIZE, '\0', IFACE_NAME_SIZE) != EOK) {
+        LOGD("failed to reset interface name.");
+        return RET_ERROR;
+    }
+    if (strncpy_s(pool->ifname, IFACE_NAME_SIZE, ifname, strlen(ifname)) != EOK) {
+        LOGD("failed to set interface name.");
+        return RET_ERROR;
+    }
     if (InitOptionList(&pool->fixedOptions) != RET_SUCCESS) {
         LOGD("failed to init options field for dhcp pool.");
         return RET_FAILED;
     }
-
     if (CreateHashTable(&pool->leaseTable, sizeof(uint32_t), sizeof(AddressBinding), DHCP_POOL_INIT_SIZE) !=
         HASH_SUCCESS) {
         LOGD("failed to create lease table.");
@@ -487,12 +493,11 @@ AddressBinding *GetLease(DhcpAddressPool *pool, uint32_t ipAddress)
     if (!ipAddress) {
         return NULL;
     }
-
     if (!pool) {
         return NULL;
     }
-
-    if (ContainsKey(&pool->leaseTable, (uintptr_t)&ipAddress)) {
+    int ipAddr = ipAddress;
+    if (ContainsKey(&pool->leaseTable, (uintptr_t)&ipAddr)) {
         AddressBinding *lease = GetBindingByIp(&pool->leaseTable, ipAddress);
         if (!lease) {
             LOGE("failed to update lease recoder.");
@@ -593,7 +598,8 @@ int SaveBindingRecoders(const DhcpAddressPool *pool, int force)
     for (size_t index = 0; index < pool->leaseTable.capacity; ++index) {
         HashNode *node = pool->leaseTable.nodes[index];
         while (node != NULL) {
-            if (WriteAddressBinding((AddressBinding *)node->value, line, sizeof(line)) != RET_SUCCESS) {
+            AddressBinding *binding = (AddressBinding *)node->value;
+            if (WriteAddressBinding(binding, line, sizeof(line)) != RET_SUCCESS) {
                 LOGW("Failed to convert binding info to string");
             } else {
                 fprintf(fp, "%s\n", line);
@@ -610,7 +616,7 @@ void SetDistributeMode(int mode)
 {
     g_distributeMode = mode;
 }
-int GetDistributeMode()
+int GetDistributeMode(void)
 {
     return g_distributeMode;
 }

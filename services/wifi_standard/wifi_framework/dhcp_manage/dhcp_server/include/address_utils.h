@@ -17,7 +17,7 @@
 #define OHOS_ADDRESS_UTILS_H
 
 #include <stdint.h>
-#include <stdint.h>
+#include <stddef.h>
 #include <dhcp_define.h>
 
 #define MAC_ADDR_LENGTH 6

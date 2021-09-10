@@ -32,7 +32,6 @@
 #include "securec.h"
 #include "dhcp_logger.h"
 #include "address_utils.h"
-#include "common_util.h"
 #include "dhcp_address_pool.h"
 #include "dhcp_config.h"
 
@@ -104,7 +103,7 @@ static int SendDhcpNak(PDhcpServerContext ctx, PDhcpMsgInfo reply);
 static int ParseMessageOptions(PDhcpMsgInfo msg);
 
 static int ParseReplyOptions(PDhcpMsgInfo reply);
-struct sockaddr_in *BroadcastAddrIn();
+struct sockaddr_in *BroadcastAddrIn(void);
 
 static struct ServerContext *GetServerInstance(const DhcpServerContext *ctx)
 {
@@ -113,7 +112,7 @@ static struct ServerContext *GetServerInstance(const DhcpServerContext *ctx)
     }
     return (struct ServerContext *)ctx->instance;
 }
-void OnUpdateServerConfig();
+
 int HasFixSocket(int fd)
 {
     int flags;
@@ -137,12 +136,13 @@ int BindNetInterface(int fd, const char *ifname)
     }
     if (ifname) {
         ssize_t ifnameSize = strlen(ifname);
-        if (ifnameSize < IFNAMSIZ) {
-            strncpy_s(iface.ifr_ifrn.ifrn_name, IFNAMSIZ, ifname, ifnameSize);
-        } else {
+        if (ifnameSize > IFNAMSIZ) {
             LOGE("network interface name too long.");
             return RET_FAILED;
         }
+        if (strncpy_s(iface.ifr_ifrn.ifrn_name, IFNAMSIZ, ifname, ifnameSize) != EOK) {
+            return RET_FAILED;
+        };
         if (setsockopt(fd, SOL_SOCKET, SO_BINDTODEVICE, (char *)&iface, sizeof(iface)) == -1) {
             LOGE("failed to bind network device interface[%s].", ifname);
             return RET_FAILED;
@@ -191,7 +191,7 @@ int InitServer(const char *ifname)
     }
     return fd;
 }
-struct sockaddr_in *BroadcastAddrIn()
+struct sockaddr_in *BroadcastAddrIn(void)
 {
     static struct sockaddr_in broadcastAddrIn = {0};
     if (broadcastAddrIn.sin_port == 0) {
@@ -202,7 +202,7 @@ struct sockaddr_in *BroadcastAddrIn()
     return &broadcastAddrIn;
 }
 
-struct sockaddr_in *SourceAddrIn()
+struct sockaddr_in *SourceAddrIn(void)
 {
     static struct sockaddr_in sourceAddrIn = {0};
     sourceAddrIn.sin_port = htons(DHCP_CLIENT_PORT);
@@ -211,7 +211,7 @@ struct sockaddr_in *SourceAddrIn()
     return &sourceAddrIn;
 }
 
-struct sockaddr_in *ResetSourceAddr()
+struct sockaddr_in *ResetSourceAddr(void)
 {
     struct sockaddr_in *srcAddr = SourceAddrIn();
     srcAddr->sin_port = htons(DHCP_CLIENT_PORT);
@@ -220,12 +220,12 @@ struct sockaddr_in *ResetSourceAddr()
     return srcAddr;
 }
 
-uint32_t SourceIpAddress()
+uint32_t SourceIpAddress(void)
 {
     uint32_t srcIp = SourceAddrIn()->sin_addr.s_addr;
     return srcIp;
 }
-struct sockaddr_in *DestinationAddrIn()
+struct sockaddr_in *DestinationAddrIn(void)
 {
     static struct sockaddr_in destAddrIn = {0};
     if (destAddrIn.sin_port == 0) {
@@ -825,7 +825,8 @@ static void AddAddressOption(PDhcpMsgInfo reply, uint8_t code, int32_t address)
         LOGE("reply message pointer is null.");
         return;
     }
-    DhcpOption optAddress = {code, 0, {0}};
+    DhcpOption optAddress = {0, 0, {0}};
+    optAddress.code = code;
     if (AppendAddressOption(&optAddress, address) != RET_SUCCESS) {
         LOGE("failed to append address option.");
         return;
@@ -1031,7 +1032,8 @@ static int NotBindingRequest(DhcpAddressPool *pool, PDhcpMsgInfo received, PDhcp
     return REPLY_ACK;
 }
 
-static int ValidateRequestMessage(const PDhcpServerContext ctx, const PDhcpMsgInfo received, PDhcpMsgInfo reply, uint32_t *yourIp)
+static int ValidateRequestMessage(const PDhcpServerContext ctx, const PDhcpMsgInfo received,
+    PDhcpMsgInfo reply, uint32_t *yourIp)
 {
     if (!received || !reply) {
         LOGE("receive or reply message pointer is null.");
@@ -1061,6 +1063,7 @@ static int ValidateRequestMessage(const PDhcpServerContext ctx, const PDhcpMsgIn
     } else {
         LOGW("request message not specified server identifier option.");
     }
+    *yourIp = yourIpAddr;
     return REPLY_ACK;
 }
 

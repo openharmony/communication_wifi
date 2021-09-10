@@ -42,7 +42,7 @@ int HostTotal(uint32_t netmask);
 uint32_t ParseIp(const uint8_t *ipAddr);
 const char *ParseStrIp(uint32_t ipAddr);
 int IsEmptyHWAddr(uint8_t macAddr[DHCP_HWADDR_LENGTH]);
-char *ParseStrMac(uint8_t macAddr[DHCP_HWADDR_LENGTH]);
+char *ParseStrMac(const uint8_t *macAddr, size_t addrSize);
 int ParseMacAddress(const char *strMac, uint8_t macAddr[DHCP_HWADDR_LENGTH]);
 
 uint32_t HostToNetwork(uint32_t host);

@@ -199,10 +199,10 @@ const char *ParseStrIp(uint32_t ipAddr)
     return inet_ntoa(inAddr);
 }
 
-char *ParseStrMac(uint8_t macAddr[DHCP_HWADDR_LENGTH])
+char *ParseStrMac(const uint8_t *macAddr, size_t addrSize)
 {
     static char strMacAddr[MAD_ADDR_BUF_SIZE] = {0};
-    if (!macAddr) {
+    if (!macAddr || addrSize < MAC_ADDR_LENGTH) {
         return 0;
     }
     if (memset_s(strMacAddr, MAD_ADDR_BUF_SIZE, '\0', sizeof(strMacAddr)) != EOK ||

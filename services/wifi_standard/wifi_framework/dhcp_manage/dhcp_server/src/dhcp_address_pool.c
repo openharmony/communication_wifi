@@ -205,7 +205,6 @@ uint32_t AddressDistribute(DhcpAddressPool *pool, uint8_t macAddr[DHCP_HWADDR_LE
             offset = NextIpOffset(pool->netmask);
         }
         distIp = NextIpAddress(distIp, pool->netmask, offset);
-        LOGD("===>distIp:%s", ParseStrIp(distIp));
         if (!CheckIpAvailability(pool, macAddr, distIp)) {
             continue;
         }

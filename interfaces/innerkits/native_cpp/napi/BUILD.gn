@@ -42,7 +42,7 @@ ohos_shared_library("wifi_native_js") {
     "//base/notification/ces_standard/frameworks/native:cesfwk_innerkits",
     "//foundation/aafwk/standard/interfaces/innerkits/want:want",
     "//foundation/ace/napi:ace_napi",
-    "//foundation/communication/wifi/interfaces/innerkits/native_cpp/wifi_standard/src:wifi_sdk",
+    "//foundation/communication/wifi/interfaces/innerkits/native_cpp/wifi_standard:wifi_sdk",
     "//utils/native/base:utils",
   ]
 

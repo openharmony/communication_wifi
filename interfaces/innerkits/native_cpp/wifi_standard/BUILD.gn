@@ -28,17 +28,10 @@ config("wifi_sdk_header") {
     "//foundation/communication/wifi/services/wifi_standard/wifi_framework/common/net_helper",
     "//foundation/communication/wifi/services/wifi_standard/wifi_framework/common/log/",
     "//foundation/distributedschedule/samgr/adapter/interfaces/innerkits/include",
-    "//foundation/communication/wifi/services/wifi_standard/wifi_framework/common/net_helper",
     "//foundation/communication/wifi/services/wifi_standard/wifi_framework/common/include",
-    "//foundation/communication/wifi/services/wifi_standard/wifi_framework/common/log",
-
-    #      "//foundation/communication/wifi/services/wifi_standard/wifi_framework/common/net_helper",
-    #      "//foundation/communication/wifi/services/wifi_standard/wifi_framework/common/utils",
-    #      "//foundation/communication/wifi/services/wifi_standard/wifi_framework/common/config",
-    #      "//foundation/communication/wifi/services/wifi_standard/wifi_framework/wifi_manage",
-    #      "//foundation/communication/wifi/services/wifi_standard/wifi_framework/wifi_manage/common",
   ]
 }
+
 config("wifi_sdk_config") {
   visibility = [ "//:*" ]
   include_dirs = [ ":wifi_fw_common_header" ]
@@ -55,8 +48,8 @@ config("wifi_sdk_config") {
 
 ohos_source_set("wifi_device_proxy_impl") {
   sources = [
-    "wifi_device_impl.cpp",
-    "wifi_device_proxy.cpp",
+    "src/wifi_device_impl.cpp",
+    "src/wifi_device_proxy.cpp",
   ]
 
   configs = [
@@ -69,8 +62,8 @@ ohos_source_set("wifi_device_proxy_impl") {
 
 ohos_source_set("wifi_hotspot_proxy_impl") {
   sources = [
-    "wifi_hotspot_impl.cpp",
-    "wifi_hotspot_proxy.cpp",
+    "src/wifi_hotspot_impl.cpp",
+    "src/wifi_hotspot_proxy.cpp",
   ]
 
   configs = [
@@ -83,8 +76,8 @@ ohos_source_set("wifi_hotspot_proxy_impl") {
 
 ohos_source_set("wifi_scan_proxy_impl") {
   sources = [
-    "wifi_scan_impl.cpp",
-    "wifi_scan_proxy.cpp",
+    "src/wifi_scan_impl.cpp",
+    "src/wifi_scan_proxy.cpp",
   ]
 
   configs = [
@@ -97,13 +90,20 @@ ohos_source_set("wifi_scan_proxy_impl") {
 
 ohos_shared_library("wifi_sdk") {
   install_enable = true
+
+  include_dirs = [ "//foundation/communication/wifi/interfaces/innerkits" ]
+
   sources = [
-    "wifi_device.cpp",
-    "wifi_device_callback_stub.cpp",
-    "wifi_hotspot.cpp",
-    "wifi_hotspot_callback_stub.cpp",
-    "wifi_scan.cpp",
-    "wifi_scan_callback_stub.cpp",
+    "c_adapter/wifi_c_device.cpp",
+    "c_adapter/wifi_c_event.cpp",
+    "c_adapter/wifi_c_hotspot.cpp",
+    "c_adapter/wifi_c_utils.cpp",
+    "src/wifi_device.cpp",
+    "src/wifi_device_callback_stub.cpp",
+    "src/wifi_hotspot.cpp",
+    "src/wifi_hotspot_callback_stub.cpp",
+    "src/wifi_scan.cpp",
+    "src/wifi_scan_callback_stub.cpp",
   ]
 
   deps = [
@@ -111,7 +111,12 @@ ohos_shared_library("wifi_sdk") {
     ":wifi_hotspot_proxy_impl",
     ":wifi_scan_proxy_impl",
     "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog",
+    "//base/notification/ces_standard/frameworks/core:cesfwk_core",
+    "//base/notification/ces_standard/frameworks/native:cesfwk_innerkits",
+    "//foundation/aafwk/standard/interfaces/innerkits/want:want",
+    "//foundation/communication/wifi/services/wifi_standard/wifi_framework/wifi_manage:wifi_manager_service",
     "//foundation/distributedschedule/samgr/interfaces/innerkits/samgr_proxy:samgr_proxy",
+    "//third_party/bounds_checking_function:libsec_static",
     "//utils/native/base:utils",
   ]
 

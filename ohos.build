@@ -3,7 +3,7 @@
   "parts": {
       "wifi_standard": {
           "module_list": [
-              "//foundation/communication/wifi/interfaces/innerkits/native_cpp/wifi_standard/src:wifi_sdk",
+              "//foundation/communication/wifi/interfaces/innerkits/native_cpp/wifi_standard:wifi_sdk",
               "//foundation/communication/wifi/services/wifi_standard/wifi_framework:wifi_manage",
               "//foundation/communication/wifi/services/wifi_standard/wifi_framework:dhcp_manage",
               "//foundation/communication/wifi/services/wifi_standard/wifi_hal:wifi_hal_service",

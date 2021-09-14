@@ -15,11 +15,13 @@
 #ifndef OHOS_AP_ROOT_STATE_H
 #define OHOS_AP_ROOT_STATE_H
 
+#include "ap_macro.h"
 #include "state.h"
 
 namespace OHOS {
 namespace Wifi {
 class ApRootState : public State {
+    FRIEND_GTEST(ApRootState);
 public:
     /**
      * @Description  construction method
@@ -51,7 +53,7 @@ public:
      * @Description  realize pure base class method: Messages that cannot be
                      processed in the sub-state are recorded in the root state.
      * @param msg - message to be processed
-     * @return EXECUTED：Processed successfully
+     * @return HANDLED：Processed successfully
      */
     virtual bool ExecuteStateMsg(InternalMessage *msg) override;
 };

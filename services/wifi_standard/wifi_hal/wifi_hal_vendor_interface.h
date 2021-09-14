@@ -48,6 +48,7 @@ typedef struct {
     HalVendorError (*wifiConfigComboModes)(int32_t mode);
     HalVendorError (*wifiGetComboModes)(int32_t *id);
     HalVendorError (*wifiRequestFirmwareDebugDump)(unsigned char *bytes, int32_t *size);
+    HalVendorError (*wifiSetMiracastMode)(int32_t mode);
 } WifiHalVendorFunc;
 
 typedef HalVendorError (*pInitHalVendorFunc)(WifiHalVendorFunc *func);

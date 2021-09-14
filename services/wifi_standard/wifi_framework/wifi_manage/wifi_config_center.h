@@ -336,6 +336,37 @@ public:
     int GetSignalLevel(const int &rssi, const int &band);
 
     /**
+     * @Description Get current p2p middle state
+     *
+     * @return WifiOprMidState
+     */
+    WifiOprMidState GetP2pMidState();
+
+    /**
+     * @Description Set current hotspot middle state.
+     *
+     * @param expState - expect the original state
+     * @param state - want to set state
+     * @return true - set the state success
+     * @return false - set state failed, current mid sate is not equal to the expState
+     */
+    bool SetP2pMidState(WifiOprMidState expState, WifiOprMidState state);
+
+    /**
+     * @Description Force to set current hotspot middle state
+     *
+     * @param state - want to set state
+     */
+    void SetP2pMidState(WifiOprMidState state);
+
+    /**
+     * @Description Get current p2p state
+     *
+     * @return int - the p2p state,NONE/IDLE/STARTING/STARTED/CLOSING/CLOSED
+     */
+    int GetP2pState();
+
+    /**
      * @Description Get the config whether permit to use wifi when airplane mode opened
      *
      * @return true - can use
@@ -446,9 +477,18 @@ public:
      */
     int GetPowerSavingModeState();
 
+    /**
+     * @Description set the device name
+     *
+     * @param deviceName - device name
+     * @return int - 0 success
+     */
+    int SetP2pDeviceName(const std::string &deviceName);
+
 private:
     std::atomic<WifiOprMidState> mStaMidState;
     std::atomic<WifiOprMidState> mApMidState;
+    std::atomic<WifiOprMidState> mP2pMidState;
     std::atomic<WifiOprMidState> mScanMidState;
     /* Time interval for disabling and re-enabling the STA */
     std::chrono::steady_clock::time_point mWifiCloseTime;

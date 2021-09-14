@@ -20,13 +20,14 @@
 #include "wifi_hal_ap_interface.h"
 #include "wifi_hal_crpc_server.h"
 #include "wifi_hal_sta_interface.h"
+#include "wifi_hal_p2p_interface.h"
 
 #undef LOG_TAG
 #define LOG_TAG "WifiHalService"
 
 static void SignalExit(int sig)
 {
-    LOGD("Caught signal %{public}d", sig);
+    LOGI("Caught signal %{public}d", sig);
     RpcServer *server = GetRpcServer();
     if (server != NULL) {
         StopEventLoop(server->loop);
@@ -42,12 +43,12 @@ int main(void)
         unlink(rpcSockPath);
     }
     if (InitRpcFunc() < 0) {
-        LOGD("Init Rpc Function failed!");
+        LOGE("Init Rpc Function failed!");
         return -1;
     }
     RpcServer *server = CreateRpcServer(rpcSockPath);
     if (server == NULL) {
-        LOGD("Create RPC Server by %s failed!", rpcSockPath);
+        LOGE("Create RPC Server by %{public}s failed!", rpcSockPath);
         return -1;
     }
     SetRpcServerInited(server);
@@ -60,11 +61,12 @@ int main(void)
     /* stop wpa_supplicant, hostapd, and other resources */
     ForceStop();
     StopSoftAp();
+    P2pForceStop();
     ReleaseWifiHalVendorInterface();
     /* clear RPC Server */
     SetRpcServerInited(NULL);
     ReleaseRpcServer(server);
     ReleaseRpcFunc();
-    LOGD("hal service exists!");
+    LOGI("hal service exists!");
     return 0;
 }

@@ -23,4 +23,5 @@
     TypeName(const TypeName &) = delete;   \
     TypeName &operator=(const TypeName &) = delete;
 
+#define FRIEND_GTEST(test_typename) friend class test_typename##_test
 #endif

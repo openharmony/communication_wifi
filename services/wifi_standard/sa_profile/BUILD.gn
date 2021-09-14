@@ -18,6 +18,7 @@ ohos_sa_profile("wifi_standard_sa_profile") {
     "1125.xml",
     "1126.xml",
     "1127.xml",
+    "1128.xml",
   ]
   part_name = "wifi_standard"
 }

@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_WIFICHIPEVENTCALLBACK_H
-#define OHOS_WIFICHIPEVENTCALLBACK_H
+#ifndef OHOS_WIFI_CHIP_EVENT_CALLBACK_H
+#define OHOS_WIFI_CHIP_EVENT_CALLBACK_H
 
 namespace OHOS {
 namespace Wifi {
@@ -27,6 +27,9 @@ struct WifiChipEventCallback {
         onIfaceAdded = nullptr;
         onIfaceRemoved = nullptr;
     }
+
+    ~WifiChipEventCallback()
+    {}
 };
 }  // namespace Wifi
 }  // namespace OHOS

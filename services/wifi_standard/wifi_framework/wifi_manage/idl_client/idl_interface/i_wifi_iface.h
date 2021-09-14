@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_IDL_IWIFIIFACE_H
-#define OHOS_IDL_IWIFIIFACE_H
+#ifndef OHOS_IDL_IWIFI_IFACE_H
+#define OHOS_IDL_IWIFI_IFACE_H
 
 #include <stdint.h>
 #include "wifi_error_no.h"

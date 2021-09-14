@@ -18,10 +18,10 @@
 #include "wifi_log.h"
 #include "wifi_idl_define.h"
 #include "wifi_idl_inner_interface.h"
-
+#include "i_wifi_public_func.h"
 
 #undef LOG_TAG
-#define LOG_TAG "OHWIFI_IDLCLIENT_I_WIFI_CHIP"
+#define LOG_TAG "WifiIdlWifiChip"
 
 /* Defines the global wifichipeventcallback variable. */
 static IWifiChipEventCallback g_wifiChipEventCallback = {0};
@@ -43,10 +43,7 @@ WifiErrorNo GetChipId(int32_t *id)
     WriteBegin(context, 0);
     WriteFunc(context, "GetChipId");
     WriteEnd(context);
-    int ret = RemoteCall(client);
-    if (ret < 0) {
-        LOGE("remote call failed!");
-        UnlockRpcClient(client);
+    if (RpcClientCall(client, "GetChipId") != WIFI_IDL_OPT_OK) {
         return WIFI_IDL_OPT_FAILED;
     }
     int result = WIFI_IDL_OPT_FAILED;
@@ -70,10 +67,7 @@ WifiErrorNo CreateIface(int32_t type, IWifiIface *iface)
     WriteFunc(context, "CreateIface");
     WriteInt(context, type);
     WriteEnd(context);
-    int ret = RemoteCall(client);
-    if (ret < 0) {
-        LOGE("remote call failed!");
-        UnlockRpcClient(client);
+    if (RpcClientCall(client, "CreateIface") != WIFI_IDL_OPT_OK) {
         return WIFI_IDL_OPT_FAILED;
     }
     int result = WIFI_IDL_OPT_FAILED;
@@ -101,10 +95,7 @@ WifiErrorNo GetIface(const char *ifname, IWifiIface *iface)
     WriteFunc(context, "GetIface");
     WriteStr(context, ifname);
     WriteEnd(context);
-    int ret = RemoteCall(client);
-    if (ret < 0) {
-        LOGE("remote call failed!");
-        UnlockRpcClient(client);
+    if (RpcClientCall(client, "GetIface") != WIFI_IDL_OPT_OK) {
         return WIFI_IDL_OPT_FAILED;
     }
     int result = WIFI_IDL_OPT_FAILED;
@@ -133,10 +124,7 @@ WifiErrorNo GetIfaceNames(int32_t type, char *ifaces, int32_t size)
     WriteInt(context, type);
     WriteInt(context, size);
     WriteEnd(context);
-    int ret = RemoteCall(client);
-    if (ret < 0) {
-        LOGE("remote call failed!");
-        UnlockRpcClient(client);
+    if (RpcClientCall(client, "GetIfaceNames") != WIFI_IDL_OPT_OK) {
         return WIFI_IDL_OPT_FAILED;
     }
     int result = WIFI_IDL_OPT_FAILED;
@@ -160,10 +148,7 @@ WifiErrorNo RemoveIface(const char *ifname)
     WriteFunc(context, "RemoveIface");
     WriteStr(context, ifname);
     WriteEnd(context);
-    int ret = RemoteCall(client);
-    if (ret < 0) {
-        LOGE("remote call failed!");
-        UnlockRpcClient(client);
+    if (RpcClientCall(client, "RemoveIface") != WIFI_IDL_OPT_OK) {
         return WIFI_IDL_OPT_FAILED;
     }
     int result = WIFI_IDL_OPT_FAILED;
@@ -181,10 +166,7 @@ WifiErrorNo GetCapabilities(uint32_t *capabilities)
     WriteBegin(context, 0);
     WriteFunc(context, "GetCapabilities");
     WriteEnd(context);
-    int ret = RemoteCall(client);
-    if (ret < 0) {
-        LOGE("remote call failed!");
-        UnlockRpcClient(client);
+    if (RpcClientCall(client, "GetCapabilities") != WIFI_IDL_OPT_OK) {
         return WIFI_IDL_OPT_FAILED;
     }
     int result = WIFI_IDL_OPT_FAILED;
@@ -208,10 +190,7 @@ WifiErrorNo GetSupportedComboModes(int32_t *modes, int32_t *size)
     WriteFunc(context, "GetSupportedComboModes");
     WriteInt(context, *size);
     WriteEnd(context);
-    int ret = RemoteCall(client);
-    if (ret < 0) {
-        LOGE("remote call failed!");
-        UnlockRpcClient(client);
+    if (RpcClientCall(client, "GetSupportedComboModes") != WIFI_IDL_OPT_OK) {
         return WIFI_IDL_OPT_FAILED;
     }
     int result = WIFI_IDL_OPT_FAILED;
@@ -238,10 +217,7 @@ WifiErrorNo ConfigComboModes(int32_t mode)
     WriteFunc(context, "ConfigComboModes");
     WriteInt(context, mode);
     WriteEnd(context);
-    int ret = RemoteCall(client);
-    if (ret < 0) {
-        LOGE("remote call failed!");
-        UnlockRpcClient(client);
+    if (RpcClientCall(client, "ConfigComboModes") != WIFI_IDL_OPT_OK) {
         return WIFI_IDL_OPT_FAILED;
     }
     int result = WIFI_IDL_OPT_FAILED;
@@ -259,10 +235,7 @@ WifiErrorNo GetComboModes(int32_t *id)
     WriteBegin(context, 0);
     WriteFunc(context, "GetComboModes");
     WriteEnd(context);
-    int ret = RemoteCall(client);
-    if (ret < 0) {
-        LOGE("remote call failed!");
-        UnlockRpcClient(client);
+    if (RpcClientCall(client, "GetComboModes") != WIFI_IDL_OPT_OK) {
         return WIFI_IDL_OPT_FAILED;
     }
     int result = WIFI_IDL_OPT_FAILED;
@@ -306,15 +279,15 @@ WifiErrorNo RegisterEventCallback(IWifiChipEventCallback callback)
         }
     }
     WriteEnd(context);
-    int ret = RemoteCall(client);
-    if (ret < 0) {
-        LOGE("remote call failed!");
-        UnlockRpcClient(client);
+    if (RpcClientCall(client, "RegisterEventCallback") != WIFI_IDL_OPT_OK) {
+        if (num == 0) {
+            SetWifiChipEventCallback(callback);
+        }
         return WIFI_IDL_OPT_FAILED;
     }
     int result = WIFI_IDL_OPT_FAILED;
     ReadInt(context, &result);
-    if (result == WIFI_IDL_OPT_OK) {
+    if (result == WIFI_IDL_OPT_OK || num == 0) {
         SetWifiChipEventCallback(callback);
     }
     ReadClientEnd(client);
@@ -331,10 +304,7 @@ WifiErrorNo RequestFirmwareDebugDump(unsigned char *bytes, int32_t *size)
     WriteFunc(context, "RequestFirmwareDebugDump");
     WriteInt(context, *size);
     WriteEnd(context);
-    int ret = RemoteCall(client);
-    if (ret < 0) {
-        LOGE("remote call failed!");
-        UnlockRpcClient(client);
+    if (RpcClientCall(client, "RequestFirmwareDebugDump") != WIFI_IDL_OPT_OK) {
         return WIFI_IDL_OPT_FAILED;
     }
     int result = WIFI_IDL_OPT_FAILED;
@@ -359,10 +329,7 @@ WifiErrorNo SetPowerMode(uint8_t mode)
     WriteFunc(context, "SetPowerMode");
     WriteInt(context, mode);
     WriteEnd(context);
-    int ret = RemoteCall(client);
-    if (ret < 0) {
-        LOGE("SetPowerMode:remote call failed!");
-        UnlockRpcClient(client);
+    if (RpcClientCall(client, "SetPowerMode") != WIFI_IDL_OPT_OK) {
         return WIFI_IDL_OPT_FAILED;
     }
     int result = WIFI_IDL_OPT_FAILED;

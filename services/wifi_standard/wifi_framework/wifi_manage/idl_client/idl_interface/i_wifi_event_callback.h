@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_IDL_IWIFIEVENTCALLBACK_H
-#define OHOS_IDL_IWIFIEVENTCALLBACK_H
+#ifndef OHOS_IDL_IWIFI_EVENT_CALLBACK_H
+#define OHOS_IDL_IWIFI_EVENT_CALLBACK_H
 
 #include "wifi_error_no.h"
 
@@ -23,16 +23,14 @@ extern "C" {
 #endif
 
 typedef struct IWifiEventCallback {
-    void *pInstance;
-    void (*onStarted)(void);                /* The driver has been loaded */
-    void (*onStopped)(void);                /* The Wi-Fi driver has been uninstalled. */
-    void (*onFailure)(WifiErrorNo errCode); /* Driver loading/unloading failure */
-    void (*onConnectChanged)(
-        int status, int networkId, char *bssid, void *pInstance); /* Wi-Fi connection event notification */
-    void (*onWpaStateChanged)(int status, void *pInstance);       /* WPA status event notification */
-    void (*onSsidWrongkey)(int status, void *pInstance);          /* SSID password error notification */
-    void (*onWpsOverlap)(int status, void *pInstance);            /* The PBC of the WPS is duplicate. */
-    void (*onWpsTimeOut)(int status, void *pInstance);            /* WPS connect time out */
+    void (*onStarted)(void);
+    void (*onStopped)(void);
+    void (*onFailure)(WifiErrorNo errCode);
+    void (*onConnectChanged)(int status, int networkId, const char *bssid);
+    void (*onWpaStateChanged)(int status);
+    void (*onSsidWrongkey)(int status);
+    void (*onWpsOverlap)(int status);
+    void (*onWpsTimeOut)(int status);
 } IWifiEventCallback;
 
 #ifdef __cplusplus

@@ -18,6 +18,10 @@
 
 #include "server.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @Description Parse the context to obtain data. Call the corresponding function
  *              GetWifiChip and assemble the function to obtain data.
@@ -147,4 +151,8 @@ int RpcRequestFirmwareDebugDump(RpcServer *server, Context *context);
  * @return int - 0 Success, -1 Failed.
  */
 int RpcSetPowerMode(RpcServer *server, Context *context);
+
+#ifdef __cplusplus
+}
+#endif
 #endif

@@ -16,6 +16,7 @@
 #define OHOS_STA_MONITOR_H
 
 #include "wifi_supplicant_hal_interface.h"
+#include "wifi_sta_hal_interface.h"
 #include "sta_state_machine.h"
 
 namespace OHOS {
@@ -61,7 +62,7 @@ public:
      * @param bssid - bssid of the network [in]
      * @param pInstance - handles [in]
      */
-    static void OnConnectChangedCallBack(int status, int networkId, char *bssid, void *pInstance);
+    void OnConnectChangedCallBack(int status, int networkId,const std::string &bssid);
 
     /**
      * @Description : Callback of the wpa state change event.
@@ -69,7 +70,7 @@ public:
      * @param status - status codes [in]
      * @param pInstance - handles [in]
      */
-    static void OnWpaStateChangedCallBack(int status, void *pInstance);
+    void OnWpaStateChangedCallBack(int status);
 
     /**
      * @Description : Callback of the Wpa ssid wrong key event.
@@ -77,7 +78,7 @@ public:
      * @param status - status codes [in]
      * @param pInstance - handles [in]
      */
-    static void OnWpaSsidWrongKeyCallBack(int status, void *pInstance);
+    void OnWpaSsidWrongKeyCallBack(int status);
 
     /**
      * @Description : Callback of the WPS_OVERLAP event.
@@ -85,7 +86,7 @@ public:
      * @param status - status codes [in]
      * @param pInstance - handles [in]
      */
-    static void OnWpsPbcOverlapCallBack(int status, void *pInstance);
+    void OnWpsPbcOverlapCallBack(int status);
 
     /**
      * @Description : Callback of the WPS_TIMEOUT event.
@@ -93,7 +94,7 @@ public:
      * @param status - status codes [in]
      * @param pInstance - handles [in]
      */
-    static void OnWPsTimeOutCallBack(int status, void *pInstance);
+    void OnWpsTimeOutCallBack(int status);
 
 private:
     StaStateMachine *pStaStateMachine;

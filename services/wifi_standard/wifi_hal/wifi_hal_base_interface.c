@@ -19,26 +19,9 @@
 #undef LOG_TAG
 #define LOG_TAG "WifiHalBaseInterface"
 
-WifiErrorNo LoadDriver(const int *events, int size)
-{
-    LOGI("LoadDriver()");
-    if (events != NULL) {
-        for (int i = 0; i < size; ++i) {
-            LOGD("LoadDriver register event %{public}d", events[i]);
-        }
-    }
-    return WIFI_HAL_SUCCESS;
-}
-
-WifiErrorNo UnloadDriver(void)
-{
-    LOGI("UnloadDriver()");
-    return WIFI_HAL_SUCCESS;
-}
-
 WifiErrorNo GetName(char *ifname, int32_t size)
 {
-    LOGI("GetName() size: %{public}d", size);
+    LOGD("GetName() size: %{public}d", size);
     if (ifname != NULL) {
         *ifname = '\0'; /* fixed compile error, -Werror,-Wunused-parameter */
     }
@@ -47,7 +30,7 @@ WifiErrorNo GetName(char *ifname, int32_t size)
 
 WifiErrorNo GetType(int32_t *type)
 {
-    LOGI("GetType()");
+    LOGD("GetType()");
     if (type != NULL) {
         *type = 0; /* fixed compile error, -Werror,-Wunused-parameter */
     }

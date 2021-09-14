@@ -34,6 +34,7 @@
 #include "address_utils.h"
 #include "dhcp_address_pool.h"
 #include "dhcp_config.h"
+#include "common_util.h"
 
 #undef LOG_TAG
 #define LOG_TAG "DhcpServer"
@@ -598,7 +599,7 @@ void InitBindingRecoders(DhcpAddressPool *pool)
             node = next;
         }
     }
-    LOGD("lease recoder total: %zu", realLeaseTotal);
+    LOGD("lease recoder total: %u", realLeaseTotal);
 }
 
 void InitLeaseFile(DhcpAddressPool *pool)
@@ -1464,7 +1465,7 @@ static int ParseMessageOptions(PDhcpMsgInfo msg)
     }
 
     if (current < end && current->code == END_OPTION) {
-        LOGD("option list size:%d xid:%u", msg->options.size, msg->packet.xid);
+        LOGD("option list size:%zu xid:%u", msg->options.size, msg->packet.xid);
         return RET_SUCCESS;
     }
 

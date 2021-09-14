@@ -14,11 +14,10 @@
  */
 
 #include "wifi_config_center.h"
-#include "wifi_global_func.h"
 #include "wifi_ap_hal_interface.h"
-#include "wifi_log.h"
-#undef LOG_TAG
-#define LOG_TAG "WifiConfigCenter"
+#include "wifi_logger.h"
+
+DEFINE_WIFILOG_LABEL("WifiConfigCenter");
 
 namespace OHOS {
 namespace Wifi {
@@ -32,6 +31,7 @@ WifiConfigCenter::WifiConfigCenter()
 {
     mStaMidState = WifiOprMidState::CLOSED;
     mApMidState = WifiOprMidState::CLOSED;
+    mP2pMidState = WifiOprMidState::CLOSED;
     mScanMidState = WifiOprMidState::CLOSED;
     mWifiOpenedWhenAirplane = false;
 }
@@ -42,7 +42,7 @@ WifiConfigCenter::~WifiConfigCenter()
 int WifiConfigCenter::Init()
 {
     if (WifiSettings::GetInstance().Init() < 0) {
-        LOGE("Init wifi settings failed!");
+        WIFI_LOGE("Init wifi settings failed!");
         return -1;
     }
     return 0;
@@ -215,10 +215,10 @@ bool WifiConfigCenter::GetSupportedBandChannel()
     std::vector<int> allowed5GFreq, allowed2GFreq;
     std::vector<int> allowed5GChan, allowed2GChan;
     if (WifiApHalInterface::GetInstance().GetFrequenciesByBand(static_cast<int>(BandType::BAND_2GHZ), allowed2GFreq)) {
-        LOGW("fail to get 2.4G channel");
+        WIFI_LOGW("fail to get 2.4G channel");
     }
     if (WifiApHalInterface::GetInstance().GetFrequenciesByBand(static_cast<int>(BandType::BAND_5GHZ), allowed5GFreq)) {
-        LOGW("fail to get 5G channel");
+        WIFI_LOGW("fail to get 5G channel");
     }
 
     TransformFrequencyIntoChannel(allowed5GFreq, allowed5GChan);
@@ -229,7 +229,7 @@ bool WifiConfigCenter::GetSupportedBandChannel()
     ChanTbs[BandType::BAND_5GHZ] = allowed5GChan;
 
     if (WifiSettings::GetInstance().SetValidChannels(ChanTbs)) {
-        LOGE("fail to SetValidChannels");
+        WIFI_LOGE("fail to SetValidChannels");
         return false;
     }
     return true;
@@ -253,6 +253,26 @@ void WifiConfigCenter::SetScanMidState(WifiOprMidState state)
 int WifiConfigCenter::GetSignalLevel(const int &rssi, const int &band)
 {
     return WifiSettings::GetInstance().GetSignalLevel(rssi, band);
+}
+
+WifiOprMidState WifiConfigCenter::GetP2pMidState()
+{
+    return mP2pMidState.load();
+}
+
+bool WifiConfigCenter::SetP2pMidState(WifiOprMidState expState, WifiOprMidState state)
+{
+    return mP2pMidState.compare_exchange_strong(expState, state);
+}
+
+void WifiConfigCenter::SetP2pMidState(WifiOprMidState state)
+{
+    mP2pMidState = state;
+}
+
+int WifiConfigCenter::GetP2pState()
+{
+    return WifiSettings::GetInstance().GetP2pState();
 }
 
 bool WifiConfigCenter::GetCanUseStaWhenAirplaneMode()
@@ -324,5 +344,10 @@ int WifiConfigCenter::GetPowerSavingModeState()
 {
     return WifiSettings::GetInstance().GetPowerSavingModeState();
 }
-} // namespace Wifi
-} // namespace OHOS
+
+int WifiConfigCenter::SetP2pDeviceName(const std::string &deviceName)
+{
+    return WifiSettings::GetInstance().SetP2pDeviceName(deviceName);
+}
+}  // namespace Wifi
+}  // namespace OHOS

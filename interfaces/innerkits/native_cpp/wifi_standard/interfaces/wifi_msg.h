@@ -12,9 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-#ifndef OHOS_WIFIMSG_H
-#define OHOS_WIFIMSG_H
+#ifndef OHOS_WIFI_MSG_H
+#define OHOS_WIFI_MSG_H
 
 #include <algorithm>
 #include <cstring>
@@ -26,20 +25,16 @@
 #include "ip_tools.h"
 #include "wifi_ap_msg.h"
 #include "wifi_scan_msg.h"
+#include "wifi_p2p_msg.h"
 
 namespace OHOS {
 namespace Wifi {
 #define WIFI_COUNTRY_CODE_LEN 2
 #define WEPKEYS_SIZE 4
 #define INVALID_NETWORK_ID (-1)
-#define REOPEN_STA_INTERVAL 500
-#define BAND_2_G 1
-#define BAND_5_G 2
 #define IPV4_ADDRESS_TYPE 0
 #define IPV6_ADDRESS_TYPE 1
-
-#define DEVICE_CONFIG_INDEX_SSID 0
-#define DEVICE_CONFIG_INDEX_BSSID 1
+#define DEVICE_NAME_LENGTH 32
 
 enum class SupplicantState {
     DISCONNECTED = 0,
@@ -425,31 +420,6 @@ struct IpInfo {
         secondDns = 0;
         serverIp = 0;
         leaseDuration = 0;
-    }
-};
-
-struct WifiEvent {
-    void (*OnWifiStateChanged)(int state);
-    void (*OnWifiConnectionChanged)(int state, const WifiLinkedInfo &info);
-    void (*OnWifiScanStateChanged)(int state);
-    void (*OnWifiRssiChanged)(int rssi);
-    void (*OnWifiWpsStateChanged)(int state, std::string pinCode);
-    void (*OnHotspotStateChanged)(int state);
-    void (*OnHotspotStaJoin)(const StationInfo &info);
-    void (*OnHotspotStaLeave)(const StationInfo &info);
-    void (*OnStreamChanged)(int direction);
-
-    WifiEvent()
-    {
-        OnWifiStateChanged = nullptr;
-        OnWifiConnectionChanged = nullptr;
-        OnWifiScanStateChanged = nullptr;
-        OnWifiRssiChanged = nullptr;
-        OnWifiWpsStateChanged = nullptr;
-        OnHotspotStateChanged = nullptr;
-        OnHotspotStaJoin = nullptr;
-        OnHotspotStaLeave = nullptr;
-        OnStreamChanged = nullptr;
     }
 };
 }  // namespace Wifi

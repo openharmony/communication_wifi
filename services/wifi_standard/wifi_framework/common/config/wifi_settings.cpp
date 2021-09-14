@@ -29,10 +29,11 @@ WifiSettings::WifiSettings()
     : mWifiStaCapabilities(0),
       mWifiState(0),
       mScanAlwaysActive(false),
-      mHotspotState(0),
-      mApMaxConnNum(0),
-      mLastSelectedNetworkId(INVALID_NETWORK_ID),
-      mLastSelectedTimeVal(0),
+      mHotspotState(static_cast<int>(ApState::AP_STATE_CLOSED)),
+      mP2pState(static_cast<int>(P2pState::P2P_STATE_CLOSED)),
+      mP2pDiscoverState(0),
+      mP2pConnectState(0),
+
       mScreenState(1),
       mAirplaneModeState(MODE_STATE_CLOSE),
       mAppRunningModeState(1),
@@ -45,6 +46,64 @@ WifiSettings::~WifiSettings()
     SyncHotspotConfig();
     SyncBlockList();
     SyncWifiConfig();
+    SyncWifiP2pGroupInfoConfig();
+    SyncP2pVendorConfig();
+}
+
+void WifiSettings::InitWifiConfig()
+{
+    if (mSavedWifiConfig.LoadConfig() < 0) {
+        return;
+    }
+    std::vector<WifiConfig> tmp;
+    mSavedWifiConfig.GetValue(tmp);
+    if (tmp.size() > 0) {
+        mWifiConfig = tmp[0];
+        mScanAlwaysActive = mWifiConfig.scanAlwaysSwitch;
+    }
+    return;
+}
+
+void WifiSettings::InitHotspotConfig()
+{
+    /* init hotspot config */
+    if (mSavedHotspotConfig.LoadConfig() >= 0) {
+        std::vector<HotspotConfig> tmp;
+        mSavedHotspotConfig.GetValue(tmp);
+        if (tmp.size() > 0) {
+            mHotspotConfig = tmp[0];
+        } else {
+            InitDefaultHotspotConfig();
+        }
+    } else {
+        InitDefaultHotspotConfig();
+    }
+    /* init block list info */
+    if (mSavedBlockInfo.LoadConfig() >= 0) {
+        std::vector<StationInfo> tmp;
+        mSavedBlockInfo.GetValue(tmp);
+        for (std::size_t i = 0; i < tmp.size(); ++i) {
+            StationInfo &item = tmp[i];
+            mBlockListInfo.emplace(item.bssid, item);
+        }
+    }
+    return;
+}
+
+void WifiSettings::InitP2pVendorConfig()
+{
+    if (mSavedWifiP2pVendorConfig.LoadConfig() >= 0) {
+        std::vector<P2pVendorConfig> tmp;
+        mSavedWifiP2pVendorConfig.GetValue(tmp);
+        if (tmp.size() > 0) {
+            mP2pVendorConfig = tmp[0];
+        } else {
+            InitDefaultP2pVendorConfig();
+        }
+    } else {
+        InitDefaultP2pVendorConfig();
+    }
+    return;
 }
 
 int WifiSettings::Init()
@@ -57,35 +116,14 @@ int WifiSettings::Init()
     mSavedHotspotConfig.SetConfigFilePath(HOTSPOT_CONFIG_FILE_PATH);
     mSavedBlockInfo.SetConfigFilePath(BLOCK_LIST_FILE_PATH);
     mSavedWifiConfig.SetConfigFilePath(WIFI_CONFIG_FILE_PATH);
-    if (mSavedWifiConfig.LoadConfig() >= 0) {
-        std::vector<WifiConfig> tmp;
-        mSavedWifiConfig.GetValue(tmp);
-        if (tmp.size() > 0) {
-            mWifiConfig = tmp[0];
-            mScanAlwaysActive = mWifiConfig.scanAlwaysSwitch;
-        }
-    }
+    mSavedWifiP2pGroupInfo.SetConfigFilePath(WIFI_P2P_GROUP_INFO_FILE_PATH);
+    mSavedWifiP2pVendorConfig.SetConfigFilePath(WIFI_P2P_VENDOR_CONFIG_FILE_PATH);
+    InitWifiConfig();
     ReloadDeviceConfig();
-    if (mSavedHotspotConfig.LoadConfig() >= 0) {
-        std::vector<HotspotConfig> tmp;
-        mSavedHotspotConfig.GetValue(tmp);
-        if (tmp.size() > 0) {
-            mHotspotConfig = tmp[0];
-        } else {
-            InitDefaultHotspotConfig();
-        }
-    } else {
-        InitDefaultHotspotConfig();
-    }
-    if (mSavedBlockInfo.LoadConfig() >= 0) {
-        std::vector<StationInfo> tmp;
-        mSavedBlockInfo.GetValue(tmp);
-        for (std::size_t i = 0; i < tmp.size(); ++i) {
-            StationInfo &item = tmp[i];
-            mBlockListInfo.emplace(item.bssid, item);
-        }
-    }
+    InitHotspotConfig();
     InitScanControlInfo();
+    InitP2pVendorConfig();
+    ReloadWifiP2pGroupInfoConfig();
     return 0;
 }
 
@@ -149,6 +187,20 @@ int WifiSettings::GetScanControlInfo(ScanControlInfo &info)
 {
     std::unique_lock<std::mutex> lock(mInfoMutex);
     info = mScanControlInfo;
+    return 0;
+}
+
+int WifiSettings::GetP2pInfo(WifiP2pInfo &connInfo)
+{
+    std::unique_lock<std::mutex> lock(mInfoMutex);
+    connInfo = mWifiP2pInfo;
+    return 0;
+}
+
+int WifiSettings::SaveP2pInfo(WifiP2pInfo &connInfo)
+{
+    std::unique_lock<std::mutex> lock(mInfoMutex);
+    mWifiP2pInfo = connInfo;
     return 0;
 }
 
@@ -271,6 +323,44 @@ int WifiSettings::SetDeviceState(int networkId, int state, bool bSetOther)
             }
         }
     }
+    return 0;
+}
+
+int WifiSettings::SyncWifiP2pGroupInfoConfig()
+{
+    std::unique_lock<std::mutex> lock(mP2pMutex);
+    mSavedWifiP2pGroupInfo.SetValue(mGroupInfoList);
+    return mSavedWifiP2pGroupInfo.SaveConfig();
+}
+
+int WifiSettings::ReloadWifiP2pGroupInfoConfig()
+{
+    std::unique_lock<std::mutex> lock(mP2pMutex);
+    if (mSavedWifiP2pGroupInfo.LoadConfig()) {
+        return -1;
+    }
+    mSavedWifiP2pGroupInfo.GetValue(mGroupInfoList);
+    return 0;
+}
+
+int WifiSettings::SetWifiP2pGroupInfo(const std::vector<WifiP2pGroupInfo> &groups)
+{
+    std::unique_lock<std::mutex> lock(mP2pMutex);
+    mGroupInfoList = groups;
+    return 0;
+}
+
+int WifiSettings::RemoveWifiP2pGroupInfo()
+{
+    std::unique_lock<std::mutex> lock(mP2pMutex);
+    mGroupInfoList.clear();
+    return 0;
+}
+
+int WifiSettings::GetWifiP2pGroupInfo(std::vector<WifiP2pGroupInfo> &groups)
+{
+    std::unique_lock<std::mutex> lock(mP2pMutex);
+    groups = mGroupInfoList;
     return 0;
 }
 
@@ -424,6 +514,29 @@ int WifiSettings::SyncHotspotConfig()
     return mSavedHotspotConfig.SaveConfig();
 }
 
+int WifiSettings::SetP2pVendorConfig(const P2pVendorConfig &config)
+{
+    std::unique_lock<std::mutex> lock(mP2pMutex);
+    mP2pVendorConfig = config;
+    return 0;
+}
+
+int WifiSettings::GetP2pVendorConfig(P2pVendorConfig &config)
+{
+    std::unique_lock<std::mutex> lock(mP2pMutex);
+    config = mP2pVendorConfig;
+    return 0;
+}
+
+int WifiSettings::SyncP2pVendorConfig()
+{
+    std::unique_lock<std::mutex> lock(mP2pMutex);
+    std::vector<P2pVendorConfig> tmp;
+    tmp.push_back(mP2pVendorConfig);
+    mSavedWifiP2pVendorConfig.SetValue(tmp);
+    return mSavedWifiP2pVendorConfig.SaveConfig();
+}
+
 int WifiSettings::GetStationList(std::vector<StationInfo> &results)
 {
     std::unique_lock<std::mutex> lock(mInfoMutex);
@@ -548,6 +661,39 @@ int WifiSettings::ClearValidChannels()
     return 0;
 }
 
+int WifiSettings::SetP2pState(int state)
+{
+    mP2pState = state;
+    return 0;
+}
+
+int WifiSettings::GetP2pState()
+{
+    return mP2pState.load();
+}
+
+int WifiSettings::SetP2pDiscoverState(int state)
+{
+    mP2pDiscoverState = state;
+    return 0;
+}
+
+int WifiSettings::GetP2pDiscoverState()
+{
+    return mP2pDiscoverState.load();
+}
+
+int WifiSettings::SetP2pConnectedState(int state)
+{
+    mP2pConnectState = state;
+    return 0;
+}
+
+int WifiSettings::GetP2pConnectedState()
+{
+    return mP2pConnectState.load();
+}
+
 int WifiSettings::GetSignalLevel(const int &rssi, const int &band)
 {
     int level = 0;
@@ -607,13 +753,22 @@ void WifiSettings::InitDefaultHotspotConfig()
     mHotspotConfig.SetPreSharedKey("12345678");
 }
 
+void WifiSettings::InitDefaultP2pVendorConfig()
+{
+    mP2pVendorConfig.SetRandomMacSupport(false);
+    mP2pVendorConfig.SetIsAutoListen(true);
+    mP2pVendorConfig.SetDeviceName("");
+    mP2pVendorConfig.SetPrimaryDeviceType("");
+    mP2pVendorConfig.SetSecondaryDeviceType("");
+}
+
 void WifiSettings::InitGetApMaxConnNum()
 {
     /* query drivers capability, support max connection num. */
     mApMaxConnNum = MAX_AP_CONN;
 }
 
-void WifiSettings::InitScanControlInfo()
+void WifiSettings::InitScanControlForbidList(void)
 {
     /* Disable external scanning during scanning. */
     std::vector<ScanForbidMode> forbidModeList;
@@ -640,7 +795,11 @@ void WifiSettings::InitScanControlInfo()
     forbidMode.scanMode = ScanMode::PNO_SCAN;
     forbidModeList.push_back(forbidMode);
     mScanControlInfo.scanForbidMap[SCAN_SCENE_CONNECTED] = forbidModeList;
+    return;
+}
 
+void WifiSettings::InitScanControlIntervalList(void)
+{
     /* Foreground app: 4 times in 2 minutes for a single application */
     ScanIntervalMode scanIntervalMode;
     scanIntervalMode.scanScene = SCAN_SCENE_ALL;
@@ -680,6 +839,13 @@ void WifiSettings::InitScanControlInfo()
     scanIntervalMode.interval = SYSTEM_TIMER_SCAN_CONTROL_INTERVAL;
     scanIntervalMode.count = SYSTEM_TIMER_SCAN_CONTROL_TIMES;
     mScanControlInfo.scanIntervalList.push_back(scanIntervalMode);
+    return;
+}
+
+void WifiSettings::InitScanControlInfo()
+{
+    InitScanControlForbidList();
+    InitScanControlIntervalList();
 }
 
 bool WifiSettings::EnableNetwork(int networkId, bool disableOthers)
@@ -926,6 +1092,13 @@ int WifiSettings::GetMinRssi2Dot4Ghz()
 int WifiSettings::GetMinRssi5Ghz()
 {
     return mWifiConfig.minRssi5Ghz;
+}
+
+int WifiSettings::SetP2pDeviceName(const std::string &deviceName)
+{
+    std::unique_lock<std::mutex> lock(mP2pMutex);
+    mP2pVendorConfig.SetDeviceName(deviceName);
+    return mSavedWifiP2pVendorConfig.SaveConfig();
 }
 }  // namespace Wifi
 }  // namespace OHOS

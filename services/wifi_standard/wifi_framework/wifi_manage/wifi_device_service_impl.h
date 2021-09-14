@@ -29,7 +29,7 @@ enum ServiceRunningState {
     STATE_NOT_START,
     STATE_RUNNING
 };
-class WifiDeviceServiceImpl : public SystemAbility, public WifiDeviceStub { 
+class WifiDeviceServiceImpl : public SystemAbility, public WifiDeviceStub {
 DECLARE_SYSTEM_ABILITY(WifiDeviceServiceImpl);
 public:
     WifiDeviceServiceImpl();

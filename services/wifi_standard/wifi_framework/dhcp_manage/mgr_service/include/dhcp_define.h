@@ -54,6 +54,7 @@ const int DHCP_CLI_ARGSNUM      = 5;
 const int SLEEP_TIME_200_MS     = 200 * 1000;
 const int SLEEP_TIME_500_MS     = 500 * 1000;
 const int PID_MAX_LEN           = 16;
+const int PARAM_MAX_SIZE        = 40;
 const int DEFAULT_UMASK         = 027;
 const int DIR_MAX_LEN           = 256;
 const int DIR_DEFAULT_MODE      = S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH;
@@ -67,15 +68,15 @@ const std::string DHCP_WORK_DIR("/data/dhcp/");
 const std::string DHCP_CLIENT_PID_FILETYPE(".pid");
 const std::string DHCP_RESULT_FILETYPE(".result");
 const std::string DHCP_CLIENT_FILE("/system/bin/dhcp_client_service");
-const std::string DHCP_SERVER_FILE("/system/bin/dhcpd");
-const std::string DHCP_SERVER_CONFIG_FILE("/data/dhcp/dhcpd.conf");
+const std::string DHCP_SERVER_FILE("/system/bin/dhcp_server");
+const std::string DHCP_SERVER_CONFIG_FILE("/data/dhcp/etc/dhcpd.conf");
 const std::string DHCP_SERVER_CONFIG_DIR("/data/dhcp/dhcpd.d/");
 const std::string DHCP_SERVER_LEASES_FILE("/data/dhcp/dhcpd.leases");
 const std::string DHCP_SERVER_CFG_IPV4("#ipv4");
 const std::string DHCP_SERVER_CFG_IPV6("#ipv6");
 const std::string COMMON_EVENT_DHCP_GET_IPV4 = "usual.event.wifi.dhcp.GET_IPV4";
 
-typedef enum enumErrCode {
+typedef enum EnumErrCode {
     /* success */
     DHCP_OPT_SUCCESS = 0,
     /* failed */
@@ -89,13 +90,18 @@ typedef enum enumErrCode {
 } DhcpErrCode;
 
 /* publish event code */
-typedef enum enumPublishEventCode {
+typedef enum EnumPublishEventCode {
     /* success */
     PUBLISH_CODE_SUCCESS = 0,
     /* failed */
     PUBLISH_CODE_FAILED = -1
 } DhcpEventCode;
 
+typedef enum EnumServiceStatus {
+    SERVICE_STATUS_INVALID  = 0,
+    SERVICE_STATUS_START    = 1,
+    SERVICE_STATUS_STOP     = 2
+} DhcpmServiceStatus;
 
 struct DhcpResult {
     int iptype;             /* 0-ipv4,1-ipv6 */
@@ -155,6 +161,19 @@ struct DhcpServiceInfo {
         clientRunStatus = -1;
         clientProPid = 0;
         serverIp = "";
+    }
+};
+
+struct DhcpServerInfo {
+    pid_t proPid;           /* dhcp server process id */
+    bool normalExit;        /* dhcp server process normal exit */
+    bool exitSig;           /* dhcp server process exit signal */
+
+    DhcpServerInfo()
+    {
+        proPid = 0;
+        normalExit = false;
+        exitSig = false;
     }
 };
 

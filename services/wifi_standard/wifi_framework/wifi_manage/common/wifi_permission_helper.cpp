@@ -33,6 +33,7 @@ static PermissionDef g_wifiPermissions[] = {
     {"ohos.permission.MANAGE_ENHANCER_WIFI", USER_GRANT, NOT_RESTRICTED},
     {"ohos.permission.GET_WIFI_LOCAL_MAC", USER_GRANT, NOT_RESTRICTED},
     {"ohos.permission.LOCATION", USER_GRANT, NOT_RESTRICTED},
+    {"ohos.permission.GET_P2P_DEVICE_LOCATION", USER_GRANT, NOT_RESTRICTED},
 };
 
 static int g_wifiPermissionSize = sizeof(g_wifiPermissions) / sizeof(PermissionDef);
@@ -203,6 +204,14 @@ int WifiPermissionHelper::VerifyGetWifiLocalMacPermission(const int &pid, const 
 int WifiPermissionHelper::VerifyWifiConnectionPermission(const int &pid, const int &uid)
 {
     if (VerifyPermission("ohos.permission.MANAGE_WIFI_CONNECTION", pid, uid) == PERMISSION_DENIED) {
+        return PERMISSION_DENIED;
+    }
+    return PERMISSION_GRANTED;
+}
+
+int WifiPermissionHelper::VerifyGetWifiDirectDevicePermission(const int &pid, const int &uid)
+{
+    if (VerifyPermission("ohos.permission.GET_P2P_DEVICE_LOCATION", pid, uid) == PERMISSION_DENIED) {
         return PERMISSION_DENIED;
     }
     return PERMISSION_GRANTED;

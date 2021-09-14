@@ -49,7 +49,7 @@
  */
 typedef struct {
     /** Network name of the station */
-    char name[DEVICE_NAME_LEN];
+    char *name;
     /** MAC address. For its length, see {@link WIFI_MAC_LEN}. */
     unsigned char macAddress[WIFI_MAC_LEN];
     /** IP address of the station */

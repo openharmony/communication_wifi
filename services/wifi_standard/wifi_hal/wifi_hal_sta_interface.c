@@ -17,6 +17,7 @@
 #include "wifi_hal_adapter.h"
 #include "wifi_hal_module_manage.h"
 #include "wifi_log.h"
+#include "wifi_wpa_hal.h"
 #include "wifi_supplicant_hal.h"
 
 #undef LOG_TAG
@@ -26,7 +27,7 @@
 #define WPA_TRY_CONNECT_SLEEP_TIME (100 * 1000) /* 100ms */
 
 static const char *g_serviceName = "wpa_supplicant";
-static const char *g_startCmd = "wpa_supplicant -iwlan0 -c/data/misc/wifi/wpa_supplicant/wpa_supplicant.conf";
+static const char *g_startCmd = "wpa_supplicant -iglan0 -g/data/misc/wifi/sockets";
 
 static int ExcuteStaCmd(const char *szCmd)
 {
@@ -47,20 +48,87 @@ static int ExcuteStaCmd(const char *szCmd)
     return -1;
 }
 
+
+static WifiErrorNo AddWpaIface(int staNo)
+{
+    WifiWpaInterface *pWpaInterface = GetWifiWapGlobalInterface();
+    if (pWpaInterface == NULL) {
+        LOGE("Get wpa interface failed!");
+        return WIFI_HAL_FAILED;
+    }
+    if (pWpaInterface->wpaCliConnect(pWpaInterface) < 0) {
+        LOGE("Failed to connect to wpa!");
+        return WIFI_HAL_FAILED;
+    }
+    AddInterfaceArgv argv;
+    if (staNo == 0) {
+        if (strcpy_s(argv.name, sizeof(argv.name), "wlan0") != EOK || strcpy_s(argv.confName, sizeof(argv.confName),
+            "/data/misc/wifi/wpa_supplicant/wpa_supplicant.conf") != EOK) {
+            return WIFI_HAL_FAILED;
+        }
+    } else {
+        if (strcpy_s(argv.name, sizeof(argv.name), "wlan2") != EOK || strcpy_s(argv.confName, sizeof(argv.confName),
+            "/data/misc/wifi/wpa_supplicant/wpa_supplicant.conf") != EOK) {
+            return WIFI_HAL_FAILED;
+        }
+    }
+    if (pWpaInterface->wpaCliAddIface(pWpaInterface, &argv) < 0) {
+        LOGE("Failed to add wpa iface!");
+        return WIFI_HAL_FAILED;
+    }
+    return WIFI_HAL_SUCCESS;
+}
+
+static WifiErrorNo RemoveWpaIface(int staNo)
+{
+    WifiWpaInterface *pWpaInterface = GetWifiWapGlobalInterface();
+    if (pWpaInterface == NULL) {
+        LOGE("Get wpa interface failed!");
+        return WIFI_HAL_FAILED;
+    }
+    if (staNo == 0) {
+        pWpaInterface->wpaCliRemoveIface(pWpaInterface, "wlan0");
+    } else {
+        pWpaInterface->wpaCliRemoveIface(pWpaInterface, "wlan2");
+    }
+    return WIFI_HAL_SUCCESS;
+}
+
+static WifiErrorNo StopWpaAndWpaHal(int staNo)
+{
+    if (DisconnectSupplicant() != WIFI_HAL_SUCCESS) {
+        LOGE("wpa_s hal already stop!");
+    }
+    RemoveWpaIface(staNo);
+
+    if (StopSupplicant() != WIFI_HAL_SUCCESS) {
+        LOGE("wpa_supplicant stop failed!");
+        return WIFI_HAL_FAILED;
+    }
+    LOGD("wpa_supplicant stop successfully");
+    ReleaseWifiStaInterface(staNo);
+    return WIFI_HAL_SUCCESS;
+}
+
+
 WifiErrorNo Start(void)
 {
     LOGD("Ready to start wifi");
-    int ret = StartSupplicant();
-    if (ret != WIFI_HAL_SUCCESS) {
+    if (StartSupplicant() != WIFI_HAL_SUCCESS) {
         LOGE("wpa_supplicant start failed!");
         return WIFI_HAL_OPEN_SUPPLICANT_FAILED;
     }
     LOGD("wpa_supplicant start successfully!");
 
-    ret = ConnectSupplicant();
-    if (ret != WIFI_HAL_SUCCESS) {
+    if (AddWpaIface(0) != WIFI_HAL_SUCCESS) {
+        LOGE("Failed to add wpa interface!");
+        StopWpaAndWpaHal(0);
+        return WIFI_HAL_CONN_SUPPLICANT_FAILED;
+    }
+
+    if (ConnectSupplicant() != WIFI_HAL_SUCCESS) {
         LOGE("SupplicantHal connect wpa_supplicant failed!");
-        StopSupplicant();
+        StopWpaAndWpaHal(0);
         return WIFI_HAL_CONN_SUPPLICANT_FAILED;
     }
     LOGD("SupplicantHal connect wpa_supplicant successfully!");
@@ -68,48 +136,25 @@ WifiErrorNo Start(void)
     return WIFI_HAL_SUCCESS;
 }
 
-static WifiErrorNo StopWpaAndWpaHal(void)
-{
-    int ret = DisconnectSupplicant();
-    if (ret != WIFI_HAL_SUCCESS) {
-        LOGE("wpa_s hal already stop!");
-    }
-
-    ret = StopSupplicant();
-    if (ret != WIFI_HAL_SUCCESS) {
-        LOGE("wpa_supplicant stop failed!");
-        return WIFI_HAL_FAILED;
-    }
-    LOGD("wpa_supplicant stop successfully");
-    ReleaseWpaHalDev();
-    return WIFI_HAL_SUCCESS;
-}
-
 WifiErrorNo Stop(void)
 {
     LOGD("Ready to Stop wifi");
-    ModuleManageRetCode ret = StopModule(g_serviceName);
-    if (ret == MM_FAILED) {
-        LOGE("Stop wpa_supplicant failed!");
+    WifiErrorNo err = StopWpaAndWpaHal(0);
+    if (err == WIFI_HAL_FAILED) {
+        LOGD("Wifi stop failed!");
         return WIFI_HAL_FAILED;
     }
-    if (ret == MM_SUCCESS) {
-        WifiErrorNo err = StopWpaAndWpaHal();
-        if (err == WIFI_HAL_FAILED) {
-            return WIFI_HAL_FAILED;
-        }
-        LOGD("Wifi stop successfully!");
-    }
-    LOGD("Stop wifi success");
+    LOGD("Wifi stop successfully!");
     return WIFI_HAL_SUCCESS;
 }
 
 WifiErrorNo ForceStop(void)
 {
     LOGD("Ready force Stop wifi");
-    WifiErrorNo ret = StopWpaAndWpaHal();
-    if (ret == WIFI_HAL_FAILED) {
-        return WIFI_HAL_FAILED;
+    WifiWpaStaInterface *p = TraversalWifiStaInterface();
+    while (p != NULL) {
+        StopWpaAndWpaHal(p->staNo);
+        p = TraversalWifiStaInterface();
     }
     return WIFI_HAL_SUCCESS;
 }
@@ -118,85 +163,78 @@ WifiErrorNo StartSupplicant(void)
 {
     const char *wpaConf = "/data/misc/wifi/wpa_supplicant/wpa_supplicant.conf";
     if ((access(wpaConf, F_OK)) != -1) {
-        printf("wpa configure file %s is exist.\n", wpaConf);
+        LOGD("wpa configure file %{private}s is exist.", wpaConf);
     } else {
         char szcpCmd[BUFF_SIZE] = {0};
         const char *cpWpaConfCmd = "cp /system/etc/wifi/wpa_supplicant.conf /data/misc/wifi/wpa_supplicant";
         int iRet = snprintf_s(szcpCmd, sizeof(szcpCmd), sizeof(szcpCmd) - 1, "%s", cpWpaConfCmd);
         if (iRet < 0) {
-            return -1;
+            return WIFI_HAL_FAILED;
         }
 
         ExcuteStaCmd(szcpCmd);
     }
 
     ModuleManageRetCode ret = StartModule(g_serviceName, g_startCmd);
-    if (ret == MM_SUCCESS) {
-        return WIFI_HAL_SUCCESS;
+    if (ret != MM_SUCCESS) {
+        LOGE("start wpa_supplicant failed!");
+        return WIFI_HAL_FAILED;
     }
-    LOGE("start wpa_supplicant failed!");
-    return WIFI_HAL_FAILED;
+    return WIFI_HAL_SUCCESS;
 }
 
 WifiErrorNo StopSupplicant(void)
 {
-    ModuleManageRetCode ret = MM_FAILED;
-    do {
-        ret = StopModule(g_serviceName);
-        if (ret == MM_FAILED) {
-            LOGE("stop wpa_supplicant failed!");
-            return WIFI_HAL_FAILED;
-        }
-    } while (ret == MM_REDUCE_REFERENCE);
+    ModuleManageRetCode ret = StopModule(g_serviceName);
+    if (ret == MM_FAILED) {
+        LOGE("stop wpa_supplicant failed!");
+        return WIFI_HAL_FAILED;
+    }
+    if (ret == MM_SUCCESS) {
+        ReleaseWpaGlobalInterface();
+    }
     return WIFI_HAL_SUCCESS;
 }
 
 WifiErrorNo ConnectSupplicant(void)
 {
     LOGD("Ready to connect wpa_supplicant.");
-    WifiHalDevice *wpaHalDevice = GetWifiHalDev();
-    if (wpaHalDevice == NULL) {
+    WifiWpaStaInterface *pStaIfc = GetWifiStaInterface(0);
+    if (pStaIfc == NULL) {
         return WIFI_HAL_SUPPLICANT_NOT_INIT;
     }
-    int count = 20; /* wait at most 2 seconds for completion */
-    while (count-- > 0) {
-        int ret = wpaHalDevice->WifiWpaCliConnectWpa();
-        if (ret == 0) {
-            LOGD("ConnectSupplicant successfully!");
-            return WIFI_HAL_SUCCESS;
-        }
-        usleep(WPA_TRY_CONNECT_SLEEP_TIME); /* wait 100ms */
-    }
-    LOGE("ConnectSupplicant failed!");
-    return WIFI_HAL_FAILED;
+    return WIFI_HAL_SUCCESS;
 }
 
 WifiErrorNo DisconnectSupplicant(void)
 {
     LOGD("Ready to disconnect wpa_supplicant.");
-    WifiHalDevice *wpaHalDevice = GetWifiHalDev();
-    if (wpaHalDevice == NULL) {
+    WifiWpaStaInterface *pStaIfc = GetWifiStaInterface(0);
+    if (pStaIfc == NULL) {
         return WIFI_HAL_SUPPLICANT_NOT_INIT;
     }
-    wpaHalDevice->WifiWpaCliWpaCtrlClose();
     LOGD("Disconnect wpa_supplicant finish!");
     return WIFI_HAL_SUCCESS;
 }
 
 WifiErrorNo RequestToSupplicant(const unsigned char *buf, int32_t bufSize)
 {
-    LOGD("RequestToSupplicant:buf:%s, buf_size:%{public}d", buf, bufSize);
+    if (buf == NULL) {
+        LOGE("RequestToSupplicant buf id NULL");
+        return WIFI_HAL_FAILED;
+    }
+    LOGD("RequestToSupplicant:buf:%{private}s, buf_size:%{public}d", buf, bufSize);
     return WIFI_HAL_SUCCESS;
 }
 
 WifiErrorNo StartScan(const ScanSettings *settings)
 {
     LOGD("Ready to start scan with param.");
-    WifiHalDevice *wpaHalDevice = GetWifiHalDev();
-    if (wpaHalDevice == NULL) {
+    WifiWpaStaInterface *pStaIfc = GetWifiStaInterface(0);
+    if (pStaIfc == NULL) {
         return WIFI_HAL_SUPPLICANT_NOT_INIT;
     }
-    int ret = wpaHalDevice->WpaCliCmdScan(settings);
+    int ret = pStaIfc->wpaCliCmdScan(pStaIfc, settings);
     if (ret < 0) {
         LOGE("StartScan failed! ret=%{public}d", ret);
         return WIFI_HAL_FAILED;
@@ -209,36 +247,36 @@ WifiErrorNo StartScan(const ScanSettings *settings)
     return WIFI_HAL_SUCCESS;
 }
 
-WifiErrorNo GetScanResults(ScanResult *results, int *size)
+WifiErrorNo GetScanInfos(ScanInfo *results, int *size)
 {
     LOGD("Ready to get scan result.");
     if (results == NULL || size == NULL || *size == 0) {
         return WIFI_HAL_SUCCESS;
     }
-    WifiHalDevice *wpaHalDevice = GetWifiHalDev();
-    if (wpaHalDevice == NULL) {
+    WifiWpaStaInterface *pStaIfc = GetWifiStaInterface(0);
+    if (pStaIfc == NULL) {
         return WIFI_HAL_SUPPLICANT_NOT_INIT;
     }
-    int ret = wpaHalDevice->WpaCliCmdScanResult(results, size);
+    int ret = pStaIfc->wpaCliCmdScanInfo(pStaIfc, results, size);
     if (ret < 0) {
-        LOGE("GetScanResults failed! ret=%{public}d", ret);
+        LOGE("GetScanInfos failed! ret=%{public}d", ret);
         return WIFI_HAL_FAILED;
     }
     LOGD("Get scan result successfully!");
     return WIFI_HAL_SUCCESS;
 }
 
-WifiErrorNo GetNetworkList(NetworkList *networkList, int *size)
+WifiErrorNo GetNetworkList(HidlNetworkInfo *infos, int *size)
 {
     LOGD("GetNetworkList()");
-    WifiHalDevice *wpaHalDevice = GetWifiHalDev();
-    if (wpaHalDevice == NULL) {
-        return WIFI_HAL_SUPPLICANT_NOT_INIT;
-    }
-    if (networkList == NULL || size == NULL || *size == 0) {
+    if (infos == NULL || size == NULL || *size == 0) {
         return WIFI_HAL_FAILED;
     }
-    int ret = wpaHalDevice->WpaCliCmdListNetworks(networkList, size);
+    WifiWpaStaInterface *pStaIfc = GetWifiStaInterface(0);
+    if (pStaIfc == NULL) {
+        return WIFI_HAL_SUPPLICANT_NOT_INIT;
+    }
+    int ret = pStaIfc->wpaCliCmdListNetworks(pStaIfc, infos, size);
     if (ret < 0) {
         LOGE("WpaCliCmdSelectNetwork failed! ret=%{public}d", ret);
         return WIFI_HAL_FAILED;
@@ -261,11 +299,11 @@ WifiErrorNo StopPnoScan(void)
 WifiErrorNo Connect(int networkId)
 {
     LOGD("Connect() networkid %{public}d", networkId);
-    WifiHalDevice *wpaHalDevice = GetWifiHalDev();
-    if (wpaHalDevice == NULL) {
+    WifiWpaStaInterface *pStaIfc = GetWifiStaInterface(0);
+    if (pStaIfc == NULL) {
         return WIFI_HAL_SUPPLICANT_NOT_INIT;
     }
-    int ret = wpaHalDevice->WpaCliCmdSelectNetwork(networkId);
+    int ret = pStaIfc->wpaCliCmdSelectNetwork(pStaIfc, networkId);
     if (ret < 0) {
         LOGE("WpaCliCmdSelectNetwork failed! ret=%{public}d", ret);
         return WIFI_HAL_FAILED;
@@ -276,11 +314,11 @@ WifiErrorNo Connect(int networkId)
 WifiErrorNo WpaAutoConnect(int enable)
 {
     LOGD("WpaAutoConnect() enable= %{public}d", enable);
-    WifiHalDevice *wpaHalDevice = GetWifiHalDev();
-    if (wpaHalDevice == NULL) {
+    WifiWpaStaInterface *pStaIfc = GetWifiStaInterface(0);
+    if (pStaIfc == NULL) {
         return WIFI_HAL_SUPPLICANT_NOT_INIT;
     }
-    int ret = wpaHalDevice->WpaCliCmdSetAutoConnect(enable);
+    int ret = pStaIfc->wpaCliCmdSetAutoConnect(pStaIfc, enable);
     if (ret < 0) {
         LOGE("WpaCliCmdSetAutoConnect failed! ret=%{public}d", ret);
         return WIFI_HAL_FAILED;
@@ -292,11 +330,11 @@ WifiErrorNo WpaAutoConnect(int enable)
 WifiErrorNo Reconnect(void)
 {
     LOGD("Reconnect()");
-    WifiHalDevice *wpaHalDevice = GetWifiHalDev();
-    if (wpaHalDevice == NULL) {
+    WifiWpaStaInterface *pStaIfc = GetWifiStaInterface(0);
+    if (pStaIfc == NULL) {
         return WIFI_HAL_SUPPLICANT_NOT_INIT;
     }
-    int ret = wpaHalDevice->WpaCliCmdReconnect();
+    int ret = pStaIfc->wpaCliCmdReconnect(pStaIfc);
     if (ret < 0) {
         LOGE("WpaCliCmdReconnect failed!");
         return WIFI_HAL_FAILED;
@@ -307,11 +345,11 @@ WifiErrorNo Reconnect(void)
 WifiErrorNo Reassociate(void)
 {
     LOGD("Reassociate()");
-    WifiHalDevice *wpaHalDevice = GetWifiHalDev();
-    if (wpaHalDevice == NULL) {
+    WifiWpaStaInterface *pStaIfc = GetWifiStaInterface(0);
+    if (pStaIfc == NULL) {
         return WIFI_HAL_SUPPLICANT_NOT_INIT;
     }
-    int ret = wpaHalDevice->WpaCliCmdReassociate();
+    int ret = pStaIfc->wpaCliCmdReassociate(pStaIfc);
     if (ret < 0) {
         LOGE("WpaCliCmdReassociate failed!");
         return WIFI_HAL_FAILED;
@@ -322,11 +360,11 @@ WifiErrorNo Reassociate(void)
 WifiErrorNo Disconnect(void)
 {
     LOGD("Disconnect()");
-    WifiHalDevice *wpaHalDevice = GetWifiHalDev();
-    if (wpaHalDevice == NULL) {
+    WifiWpaStaInterface *pStaIfc = GetWifiStaInterface(0);
+    if (pStaIfc == NULL) {
         return WIFI_HAL_SUPPLICANT_NOT_INIT;
     }
-    int ret = wpaHalDevice->WpaCliCmdDisconnect();
+    int ret = pStaIfc->wpaCliCmdDisconnect(pStaIfc);
     if (ret < 0) {
         LOGE("WpaCliCmdDisconnect failed!");
         return WIFI_HAL_FAILED;
@@ -334,14 +372,14 @@ WifiErrorNo Disconnect(void)
     return WIFI_HAL_SUCCESS;
 }
 
-WifiErrorNo SetPowerSave(BOOL enable)
+WifiErrorNo SetPowerSave(int enable)
 {
     LOGD("SetPowerSave() %{public}d", enable);
-    WifiHalDevice *wpaHalDevice = GetWifiHalDev();
-    if (wpaHalDevice == NULL) {
+    WifiWpaStaInterface *pStaIfc = GetWifiStaInterface(0);
+    if (pStaIfc == NULL) {
         return WIFI_HAL_SUPPLICANT_NOT_INIT;
     }
-    int ret = wpaHalDevice->WpaCliCmdPowerSave(enable);
+    int ret = pStaIfc->wpaCliCmdPowerSave(pStaIfc, enable);
     if (ret < 0) {
         LOGE("WpaCliCmdPowerSave failed!");
         return WIFI_HAL_FAILED;
@@ -351,7 +389,10 @@ WifiErrorNo SetPowerSave(BOOL enable)
 
 WifiErrorNo GetStaCapabilities(int32_t *capabilities)
 {
-    LOGD("GetStaCapabilities: This function is not supported currently.");
+    if (capabilities == NULL) {
+        LOGE("input param is NULL");
+        return WIFI_HAL_FAILED;
+    }
     WifiHalVendorInterface *pInterface = GetWifiHalVendorInterface();
     if (pInterface == NULL) {
         return WIFI_HAL_GET_VENDOR_HAL_FAILED;
@@ -370,18 +411,19 @@ WifiErrorNo GetDeviceMacAddress(unsigned char *mac, int *lenMac)
 {
     /* wificond need iface name, temporary use wpa_supplicant get mac address */
     if (mac == NULL || lenMac == NULL) {
+        LOGE("GetDeviceMacAddress mac or lenMac is NULL");
         return WIFI_HAL_FAILED;
     }
     LOGD("GetDeviceMacAddress lenMac %{public}d", *lenMac);
-    WifiHalDevice *wpaHalDevice = GetWifiHalDev();
-    if (wpaHalDevice == NULL) {
+    WifiWpaStaInterface *pStaIfc = GetWifiStaInterface(0);
+    if (pStaIfc == NULL) {
         return WIFI_HAL_SUPPLICANT_NOT_INIT;
     }
     struct WpaHalCmdStatus status;
     if (memset_s(&status, sizeof(status), 0, sizeof(status)) != EOK) {
         return WIFI_HAL_FAILED;
     }
-    int ret = wpaHalDevice->WpaCliCmdStatus(&status);
+    int ret = pStaIfc->wpaCliCmdStatus(pStaIfc, &status);
     if (ret < 0) {
         LOGE("WpaCliCmdStatus failed!");
         return WIFI_HAL_FAILED;
@@ -400,18 +442,30 @@ WifiErrorNo GetDeviceMacAddress(unsigned char *mac, int *lenMac)
 
 WifiErrorNo GetFrequencies(int32_t band, int *frequencies, int32_t *size)
 {
+    if (frequencies == NULL || size == NULL) {
+        LOGE("GetFrequencies frequencies or size is NULL");
+        return WIFI_HAL_FAILED;
+    }
     LOGD("GetFrequencies");
     return WIFI_HAL_NOT_SUPPORT;
 }
 
 WifiErrorNo SetAssocMacAddr(const unsigned char *mac, int lenMac)
 {
+    if (mac == NULL) {
+        LOGE("SetAssocMacAddr() mac is NULL");
+        return WIFI_HAL_FAILED;
+    }
     LOGD("SetAssocMacAddr() mac length %{public}d", lenMac);
     return WIFI_HAL_NOT_SUPPORT;
 }
 
 WifiErrorNo SetScanningMacAddress(const unsigned char *mac, int lenMac)
 {
+    if (mac == NULL) {
+        LOGE("SetScanningMacAddress() mac is NULL");
+        return WIFI_HAL_FAILED;
+    }
     LOGD("SetScanningMacAddress mac length: %{public}d", lenMac);
     WifiHalVendorInterface *pInterface = GetWifiHalVendorInterface();
     if (pInterface == NULL) {
@@ -423,6 +477,10 @@ WifiErrorNo SetScanningMacAddress(const unsigned char *mac, int lenMac)
 
 WifiErrorNo DeauthLastRoamingBssid(const unsigned char *mac, int lenMac)
 {
+    if (mac == NULL) {
+        LOGE("DeauthLastRoamingBssid() mac is NULL");
+        return WIFI_HAL_FAILED;
+    }
     LOGD("DeauthLastRoamingBssid() mac length: %{public}d", lenMac);
     WifiHalVendorInterface *pInterface = GetWifiHalVendorInterface();
     if (pInterface == NULL) {
@@ -434,6 +492,10 @@ WifiErrorNo DeauthLastRoamingBssid(const unsigned char *mac, int lenMac)
 
 WifiErrorNo GetSupportFeature(long *feature)
 {
+    if (feature == NULL) {
+        LOGE("GetSupportFeature() feature is NULL");
+        return WIFI_HAL_FAILED;
+    }
     LOGD("GetFeatureSupport()");
     WifiHalVendorInterface *pInterface = GetWifiHalVendorInterface();
     if (pInterface == NULL) {
@@ -445,7 +507,11 @@ WifiErrorNo GetSupportFeature(long *feature)
 
 WifiErrorNo RunCmd(const char *ifname, int32_t cmdid, const unsigned char *buf, int32_t bufSize)
 {
-    LOGD("ifname: %s, cmdid: %{public}d, buf: %s", ifname, cmdid, buf);
+    if (ifname == NULL|| buf == NULL) {
+        LOGE("RunCmd() ifname or buf is NULL");
+        return WIFI_HAL_FAILED;
+    }
+    LOGD("ifname: %{public}s, cmdid: %{public}d, buf: %{public}s", ifname, cmdid, buf);
     return WIFI_HAL_SUCCESS;
 }
 
@@ -463,11 +529,11 @@ WifiErrorNo SetWifiTxPower(int32_t power)
 WifiErrorNo RemoveNetwork(int networkId)
 {
     LOGD("RemoveNetwork() networkid: %{public}d", networkId);
-    WifiHalDevice *wpaHalDevice = GetWifiHalDev();
-    if (wpaHalDevice == NULL) {
+    WifiWpaStaInterface *pStaIfc = GetWifiStaInterface(0);
+    if (pStaIfc == NULL) {
         return WIFI_HAL_SUPPLICANT_NOT_INIT;
     }
-    int ret = wpaHalDevice->WpaCliCmdRemoveNetwork(networkId);
+    int ret = pStaIfc->wpaCliCmdRemoveNetwork(pStaIfc, networkId);
     if (ret != WIFI_HAL_SUCCESS) {
         LOGE("WpaCliCmdRemoveNetwork remove network failed! ret = %{public}d", ret);
         return WIFI_HAL_FAILED;
@@ -477,15 +543,16 @@ WifiErrorNo RemoveNetwork(int networkId)
 
 WifiErrorNo AddNetwork(int *networkId)
 {
-    LOGD("AddNetwork()");
-    WifiHalDevice *wpaHalDevice = GetWifiHalDev();
-    if (wpaHalDevice == NULL) {
-        return WIFI_HAL_SUPPLICANT_NOT_INIT;
-    }
     if (networkId == NULL) {
+        LOGE("AddNetwork() networkId is NULL");
         return WIFI_HAL_FAILED;
     }
-    int ret = wpaHalDevice->WpaCliCmdAddNetworks();
+    LOGD("AddNetwork()");
+    WifiWpaStaInterface *pStaIfc = GetWifiStaInterface(0);
+    if (pStaIfc == NULL) {
+        return WIFI_HAL_SUPPLICANT_NOT_INIT;
+    }
+    int ret = pStaIfc->wpaCliCmdAddNetworks(pStaIfc);
     if (ret < 0) {
         LOGE("WpaCliCmdAddNetworks failed! ret=%{public}d", ret);
         return WIFI_HAL_FAILED;
@@ -497,11 +564,11 @@ WifiErrorNo AddNetwork(int *networkId)
 WifiErrorNo EnableNetwork(int networkId)
 {
     LOGD("EnableNetwork() networkid [%{public}d]", networkId);
-    WifiHalDevice *wpaHalDevice = GetWifiHalDev();
-    if (wpaHalDevice == NULL) {
+    WifiWpaStaInterface *pStaIfc = GetWifiStaInterface(0);
+    if (pStaIfc == NULL) {
         return WIFI_HAL_SUPPLICANT_NOT_INIT;
     }
-    int ret = wpaHalDevice->WpaCliCmdEnableNetwork(networkId);
+    int ret = pStaIfc->wpaCliCmdEnableNetwork(pStaIfc, networkId);
     if (ret < 0) {
         LOGE("WpaCliCmdEnableNetwork failed! ret=%{public}d", ret);
         return WIFI_HAL_FAILED;
@@ -512,11 +579,11 @@ WifiErrorNo EnableNetwork(int networkId)
 WifiErrorNo DisableNetwork(int networkId)
 {
     LOGD("DisableNetwork() networkid [%{public}d]", networkId);
-    WifiHalDevice *wpaHalDevice = GetWifiHalDev();
-    if (wpaHalDevice == NULL) {
+    WifiWpaStaInterface *pStaIfc = GetWifiStaInterface(0);
+    if (pStaIfc == NULL) {
         return WIFI_HAL_SUPPLICANT_NOT_INIT;
     }
-    int ret = wpaHalDevice->WpaCliCmdDisableNetwork(networkId);
+    int ret = pStaIfc->wpaCliCmdDisableNetwork(pStaIfc, networkId);
     if (ret < 0) {
         LOGE("WpaCliCmdDisableNetwork failed! ret=%{public}d", ret);
         return WIFI_HAL_FAILED;
@@ -524,24 +591,28 @@ WifiErrorNo DisableNetwork(int networkId)
     return WIFI_HAL_SUCCESS;
 }
 
-WifiErrorNo SetNetwork(int networkId, const NetWorkConfig *confs, int size)
+WifiErrorNo SetNetwork(int networkId, const HidlSetNetworkConfig *confs, int size)
 {
+    if (confs == NULL) {
+        LOGE("SetNetwork() confs is NULL");
+        return WIFI_HAL_FAILED;
+    }
     LOGD("SetNetwork()");
-    WifiHalDevice *wpaHalDevice = GetWifiHalDev();
-    if (wpaHalDevice == NULL) {
+    WifiWpaStaInterface *pStaIfc = GetWifiStaInterface(0);
+    if (pStaIfc == NULL) {
         return WIFI_HAL_SUPPLICANT_NOT_INIT;
     }
     struct WpaSetNetworkArgv conf;
-    if (memset_s(&conf, sizeof(conf), 0, sizeof(conf)) != EOK) {
-        return WIFI_HAL_FAILED;
-    }
     for (int i = 0; i < size; ++i) {
+        if (memset_s(&conf, sizeof(conf), 0, sizeof(conf)) != EOK) {
+            return WIFI_HAL_FAILED;
+        }
         conf.id = networkId;
         conf.param = confs[i].cfgParam;
         if (strncpy_s(conf.value, sizeof(conf.value), confs[i].cfgValue, strlen(confs[i].cfgValue)) != EOK) {
             return WIFI_HAL_FAILED;
         }
-        int ret = wpaHalDevice->WpaCliCmdSetNetwork(&conf);
+        int ret = pStaIfc->wpaCliCmdSetNetwork(pStaIfc, &conf);
         if (ret < 0) {
             return WIFI_HAL_FAILED;
         }
@@ -552,11 +623,11 @@ WifiErrorNo SetNetwork(int networkId, const NetWorkConfig *confs, int size)
 WifiErrorNo SaveNetworkConfig(void)
 {
     LOGD("SaveNetworkConfig()");
-    WifiHalDevice *wpaHalDevice = GetWifiHalDev();
-    if (wpaHalDevice == NULL) {
+    WifiWpaStaInterface *pStaIfc = GetWifiStaInterface(0);
+    if (pStaIfc == NULL) {
         return WIFI_HAL_SUPPLICANT_NOT_INIT;
     }
-    int ret = wpaHalDevice->WpaCliCmdSaveConfig();
+    int ret = pStaIfc->wpaCliCmdSaveConfig(pStaIfc);
     if (ret < 0) {
         LOGE("WpaCliCmdSaveConfig failed! ret=%{public}d", ret);
         return WIFI_HAL_FAILED;
@@ -567,21 +638,21 @@ WifiErrorNo SaveNetworkConfig(void)
 WifiErrorNo StartWpsPbcMode(const WifiWpsParam *param)
 {
     LOGD("StartWpsPbcMode()");
-    WifiHalDevice *wpaHalDevice = GetWifiHalDev();
-    if (wpaHalDevice == NULL) {
+    WifiWpaStaInterface *pStaIfc = GetWifiStaInterface(0);
+    if (pStaIfc == NULL) {
         return WIFI_HAL_SUPPLICANT_NOT_INIT;
     }
     int ret;
     if (param == NULL || (param->anyFlag < 0 && param->multiAp <= 0 && strlen(param->bssid) == 0)) {
-        ret = wpaHalDevice->WpaCliCmdWpsPbc(NULL);
+        ret = pStaIfc->wpaCliCmdWpsPbc(pStaIfc, NULL);
     } else {
         struct WpaWpsPbcArgv config = {0};
-        config.anyflag = param->anyFlag;
-        config.multi_ap = param->multiAp;
+        config.anyFlag = param->anyFlag;
+        config.multiAp = param->multiAp;
         if (strncpy_s(config.bssid, sizeof(config.bssid), param->bssid, strlen(param->bssid)) != EOK) {
             return WIFI_HAL_FAILED;
         }
-        ret = wpaHalDevice->WpaCliCmdWpsPbc(&config);
+        ret = pStaIfc->wpaCliCmdWpsPbc(pStaIfc, &config);
     }
     if (ret < 0) {
         LOGE("StartWpsPbcMode failed! ret=%{public}d", ret);
@@ -596,18 +667,18 @@ WifiErrorNo StartWpsPbcMode(const WifiWpsParam *param)
 WifiErrorNo StartWpsPinMode(const WifiWpsParam *param, int *pinCode)
 {
     LOGD("StartWpsPinMode()");
-    WifiHalDevice *wpaHalDevice = GetWifiHalDev();
-    if (wpaHalDevice == NULL) {
+    WifiWpaStaInterface *pStaIfc = GetWifiStaInterface(0);
+    if (pStaIfc == NULL) {
         return WIFI_HAL_SUPPLICANT_NOT_INIT;
     }
     if (param == NULL || pinCode == NULL) {
         return WIFI_HAL_FAILED;
     }
-    struct WpaWpsPinArgv config = {0};
+    struct WpaWpsPinArgv config = {{0}, {0}};
     if (strncpy_s(config.bssid, sizeof(config.bssid), param->bssid, strlen(param->bssid)) != EOK) {
         return WIFI_HAL_FAILED;
     }
-    int ret = wpaHalDevice->WpaCliCmdWpsPin(&config, pinCode);
+    int ret = pStaIfc->wpaCliCmdWpsPin(pStaIfc, &config, pinCode);
     if (ret < 0) {
         LOGE("StartWpsPinMode failed! ret=%{public}d", ret);
         return WIFI_HAL_FAILED;
@@ -618,11 +689,11 @@ WifiErrorNo StartWpsPinMode(const WifiWpsParam *param, int *pinCode)
 WifiErrorNo StopWps(void)
 {
     LOGD("StopWps()");
-    WifiHalDevice *wpaHalDevice = GetWifiHalDev();
-    if (wpaHalDevice == NULL) {
+    WifiWpaStaInterface *pStaIfc = GetWifiStaInterface(0);
+    if (pStaIfc == NULL) {
         return WIFI_HAL_SUPPLICANT_NOT_INIT;
     }
-    int ret = wpaHalDevice->WpaCliCmdWpsCancel();
+    int ret = pStaIfc->wpaCliCmdWpsCancel(pStaIfc);
     if (ret < 0) {
         LOGE("StopWps failed! ret=%{public}d", ret);
         return WIFI_HAL_FAILED;
@@ -639,9 +710,9 @@ WifiErrorNo GetRoamingCapabilities(WifiRoamCapability *capability)
     return WIFI_HAL_SUCCESS;
 }
 
-WifiErrorNo SetRoamConfig(char **blocklist, int blocksize, char **trustlist, int size)
+WifiErrorNo SetRoamConfig(char **blocklist, int blocksize, char **trustlist, int trustsize)
 {
-    LOGD("SetRoamConfig block size %{public}d, size %{public}d", blocksize, size);
+    LOGD("SetRoamConfig block size %{public}d, trust size %{public}d", blocksize, trustsize);
     if (blocklist == NULL || trustlist == NULL) {
         return WIFI_HAL_SUCCESS;
     }
@@ -650,12 +721,16 @@ WifiErrorNo SetRoamConfig(char **blocklist, int blocksize, char **trustlist, int
 
 WifiErrorNo WpaSetCountryCode(const char *countryCode)
 {
+    if (countryCode == NULL) {
+        LOGE("WpaSetCountryCode countryCode is NULL");
+        return WIFI_HAL_FAILED;
+    }
     LOGD("WpaSetCountryCode ");
-    WifiHalDevice *wpaHalDevice = GetWifiHalDev();
-    if (wpaHalDevice == NULL) {
+    WifiWpaStaInterface *pStaIfc = GetWifiStaInterface(0);
+    if (pStaIfc == NULL) {
         return WIFI_HAL_SUPPLICANT_NOT_INIT;
     }
-    int ret = wpaHalDevice->WpaCliCmdSetCountryCode(countryCode);
+    int ret = pStaIfc->wpaCliCmdSetCountryCode(pStaIfc, countryCode);
     if (ret < 0) {
         LOGE("WpaSetCountryCode failed! ret=%{public}d", ret);
         return WIFI_HAL_FAILED;
@@ -664,47 +739,41 @@ WifiErrorNo WpaSetCountryCode(const char *countryCode)
 }
 WifiErrorNo WpaGetCountryCode(char *countryCode, int codeSize)
 {
+    if (countryCode == NULL) {
+        LOGE("WpaGetCountryCode countryCode is NULL");
+        return WIFI_HAL_FAILED;
+    }
     LOGD("WpaGetCountryCode ");
-    WifiHalDevice *wpaHalDevice = GetWifiHalDev();
-    if (wpaHalDevice == NULL) {
+    WifiWpaStaInterface *pStaIfc = GetWifiStaInterface(0);
+    if (pStaIfc == NULL) {
         return WIFI_HAL_SUPPLICANT_NOT_INIT;
     }
-    int ret = wpaHalDevice->WpaCliCmdGetCountryCode(countryCode, codeSize);
+    int ret = pStaIfc->wpaCliCmdGetCountryCode(pStaIfc, countryCode, codeSize);
     if (ret < 0) {
         LOGE("WpaSetCountryCode failed! ret=%{public}d", ret);
         return WIFI_HAL_FAILED;
     }
     return WIFI_HAL_SUCCESS;
 }
-WifiErrorNo WpaGetNetWork(GetNetWorkConfig *conf)
+WifiErrorNo WpaGetNetWork(HidlGetNetworkConfig *conf)
 {
+    if (conf == NULL) {
+        LOGE("WpaGetNetWork conf is NULL");
+        return WIFI_HAL_FAILED;
+    }
     LOGD("WpaGetNetWork()");
-    WifiHalDevice *wpaHalDevice = GetWifiHalDev();
-    if (wpaHalDevice == NULL) {
+    WifiWpaStaInterface *pStaIfc = GetWifiStaInterface(0);
+    if (pStaIfc == NULL) {
         return WIFI_HAL_SUPPLICANT_NOT_INIT;
     }
     struct WpaGetNetworkArgv argv = {0};
     argv.id = conf->networkId;
-    if (strncpy_s(argv.parame, sizeof(argv.parame), conf->param, strlen(conf->param)) != EOK) {
+    if (strncpy_s(argv.param, sizeof(argv.param), conf->param, strlen(conf->param)) != EOK) {
         return WIFI_HAL_FAILED;
     }
-    int ret = wpaHalDevice->WpaCliCmdGetNetwork(&argv, conf->value, sizeof(conf->value));
+    int ret = pStaIfc->wpaCliCmdGetNetwork(pStaIfc, &argv, conf->value, sizeof(conf->value));
     if (ret < 0) {
         LOGE("WpaGetNetWork failed! ret=%{public}d", ret);
-        return WIFI_HAL_FAILED;
-    }
-    return WIFI_HAL_SUCCESS;
-}
-WifiErrorNo WpaReconfigure(void)
-{
-    LOGD("WpaReconfigure()");
-    WifiHalDevice *wpaHalDevice = GetWifiHalDev();
-    if (wpaHalDevice == NULL) {
-        return WIFI_HAL_SUPPLICANT_NOT_INIT;
-    }
-    int ret = wpaHalDevice->WpaCliCmdReconfigure();
-    if (ret < 0) {
-        LOGE("WpaReconfigure failed! ret=%{public}d", ret);
         return WIFI_HAL_FAILED;
     }
     return WIFI_HAL_SUCCESS;
@@ -713,13 +782,32 @@ WifiErrorNo WpaReconfigure(void)
 WifiErrorNo WpaBlocklistClear(void)
 {
     LOGD("WpaBlocklistClear()");
-    WifiHalDevice *wpaHalDevice = GetWifiHalDev();
-    if (wpaHalDevice == NULL) {
+    WifiWpaStaInterface *pStaIfc = GetWifiStaInterface(0);
+    if (pStaIfc == NULL) {
         return WIFI_HAL_SUPPLICANT_NOT_INIT;
     }
-    int ret = wpaHalDevice->WpaCliCmdWpaBlockListClear();
+    int ret = pStaIfc->wpaCliCmdWpaBlockListClear(pStaIfc);
     if (ret < 0) {
         LOGE("WpaBlocklistClear failed! ret=%{public}d", ret);
+        return WIFI_HAL_FAILED;
+    }
+    return WIFI_HAL_SUCCESS;
+}
+
+WifiErrorNo GetConnectSignalInfo(const char *endBssid, HidlWpaSignalInfo *info)
+{
+    if (endBssid == NULL || info == NULL) {
+        LOGE("GetConnectSignalInfo endBssid or info is NULL");
+        return WIFI_HAL_FAILED;
+    }
+    LOGD("GetConnectSignalInfo()");
+    WifiWpaStaInterface *pStaIfc = GetWifiStaInterface(0);
+    if (pStaIfc == NULL) {
+        return WIFI_HAL_SUPPLICANT_NOT_INIT;
+    }
+    int ret = pStaIfc->wpaCliCmdGetSignalInfo(pStaIfc, info);
+    if (ret < 0) {
+        LOGE("WpaCliCmdGetSignalInfo failed! ret=%{public}d", ret);
         return WIFI_HAL_FAILED;
     }
     return WIFI_HAL_SUCCESS;

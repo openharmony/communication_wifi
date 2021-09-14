@@ -15,63 +15,87 @@
 #ifndef OHOS_AP_MONITOR_H
 #define OHOS_AP_MONITOR_H
 
-#include "wifi_ap_hal_interface.h"
+#include <set>
+
 #include "ap_define.h"
-#include "ap_stations_manager.h"
-#include "wifi_ap_dhcp_interface.h"
-#include "wifi_idl_define.h"
+#include "wifi_idl_struct.h"
 
 namespace OHOS {
 namespace Wifi {
 class ApMonitor {
-public:
-    /**
-     * @Description  Obtains the single g_instance
-     * @param None
-     * @return The reference of singleton objects
-     */
-    static ApMonitor &GetInstance();
-    /**
-     * @Description  Delete the single g_instance
-     * @param None
-     * @return None
-     */
-    static void DeleteInstance();
+    FRIEND_GTEST(ApMonitor);
 
+public:
+    ApMonitor();
+    virtual ~ApMonitor();
     /**
      * @Description  IDL called this interface when STA connected or
                      disconnected, report to state machine.
-     * @param staInfo - structure stored STA infos, only MAC
+     * @param cbInfo - structure stored STA infos, only MAC and action.
+     * @return None
+     */
+    virtual void OnStaJoinOrLeave(const WifiApConnectionNofify &cbInfo);
+
+    /* @Description  IDL called this interface when STA connected or
+                     disconnected, report to state machine.
+     * @param staInfo - station information
      * @param event - event STA connected or disconnected.
      * @return None
      */
-    void StationChangeEvent(StationInfo &staInfo, const int event) const;
+    virtual void DealStaJoinOrLeave(const StationInfo &info, ApStatemachineEvent event);
     /**
      * @Description  Asynchronously notifies the hostapd of the enable and disable status.
      * @param state - hostapd status
      * @return None
      */
-    void OnHotspotStateEvent(int state) const;
+    virtual void OnHotspotStateEvent(int state) const;
     /**
-     * @Description  start monitor
+     * @Description  start monitor.
      * @param None
      * @return None
      */
-    void StartMonitor();
+    virtual void StartMonitor();
     /**
-     * @Description  close monitor
+     * @Description  close monitor.
      * @param None
      * @return None
      */
-    void StopMonitor();
+    virtual void StopMonitor();
+
+    /**
+     * @Description  Register monitor callback handler.
+     * @param iface - use interface
+     * @param handler - handler callback list
+     * @return None
+     */
+    virtual void RegisterHandler(const std::string &iface, const std::function<HandlerMethod> &handler);
+
+    /**
+     * @Description  Unregister monitor callback handler.
+     * @param iface - use interface
+     * @return None
+     */
+    virtual void UnregisterHandler(const std::string &iface);
+
+    /**
+     * @Description  SendMessage to the state machine.
+     * @param iface - use interface
+     * @param msgName - state machine event
+     * @param param1 - Parameter
+     * @param param2 - Parameter
+     * @param messageObj - Any message object
+     * @return None
+     */
+    virtual void SendMessage(const std::string &iface, ApStatemachineEvent msgName, int param1, int param2,
+        const std::any &messageObj) const;
 
 private:
-    ApMonitor();
-    ~ApMonitor();
     DISALLOW_COPY_AND_ASSIGN(ApMonitor)
 
 private:
-    IWifiApEventCallback wifiApEventCallback;
+    std::map<std::string, std::function<HandlerMethod>> m_mapHandler;
+    std::string m_selectIfacName;
+    std::set<std::string> m_setMonitorIface;
 };
 }  // namespace Wifi
 }  // namespace OHOS

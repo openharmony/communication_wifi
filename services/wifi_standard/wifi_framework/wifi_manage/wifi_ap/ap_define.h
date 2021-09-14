@@ -16,13 +16,15 @@
 #define OHOS_AP_DEFINE_H
 
 #include <cstdint>
+#include <any>
+
 #include "ap_macro.h"
 #include "wifi_msg.h"
 
 namespace OHOS {
 namespace Wifi {
-const std::string ININTERFACE = "wlan1";
-const std::string OUTINTERFACE = "wlan0";
+const std::string IN_INTERFACE = "wlan0";
+const std::string OUT_INTERFACE = "wlan0";
 const int MAX_SSID_LENGTH = 32;
 const int MAX_PSK_LENGTH = 63;
 const int MAC_LENGTH = 17;
@@ -49,6 +51,8 @@ enum class ApStatemachineEvent {
     CMD_UPDATE_HOTSPOTCONFIG_RESULT, /* Update hotspot configuration result */
                                      /* (asynchronous result) */
 };
-}  // namespace Wifi
-}  // namespace OHOS
-#endif
+
+using HandlerMethod = void(ApStatemachineEvent, int, int, const std::any &);
+}
+} // namespace OHOS
+#endif /* OHOS_AP_DEFINE_H */

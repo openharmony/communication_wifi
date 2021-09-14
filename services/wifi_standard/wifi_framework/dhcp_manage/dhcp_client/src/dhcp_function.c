@@ -343,12 +343,12 @@ int InitPidfile(const char *pidDir, const char *pidFile, pid_t pid)
     }
     ssize_t bytes;
     if ((bytes = write(fd, buf, strlen(buf))) <= 0) {
-        LOGE("InitPidfile() failed, write pidFile:%{public}s error:%{public}s, bytes:%{public}zu!",
+        LOGE("InitPidfile() failed, write pidFile:%{public}s error:%{public}s, bytes:%{public}zd!",
             pidFile, strerror(errno), bytes);
         close(fd);
         return DHCP_OPT_FAILED;
     }
-    LOGI("InitPidfile() buf:%{public}s write pidFile:%{public}s, bytes:%{public}zu!", buf, pidFile, bytes);
+    LOGI("InitPidfile() buf:%{public}s write pidFile:%{public}s, bytes:%{public}zd!", buf, pidFile, bytes);
     close(fd);
 
     if (chdir(pidDir) != 0) {
@@ -386,11 +386,11 @@ pid_t GetPID(const char *pidFile)
     char buf[PID_MAX_LEN] = {0};
     ssize_t bytes;
     if ((bytes = read(fd, buf, sb.st_size)) < 0) {
-        LOGE("GetPID() failed, read pidFile:%{public}s error, bytes:%{public}zu!", pidFile, bytes);
+        LOGE("GetPID() failed, read pidFile:%{public}s error, bytes:%{public}zd!", pidFile, bytes);
         close(fd);
         return -1;
     }
-    LOGI("GetPID() read pidFile:%{public}s, buf:%{public}s, bytes:%{public}zu.", pidFile, buf, bytes);
+    LOGI("GetPID() read pidFile:%{public}s, buf:%{public}s, bytes:%{public}zd.", pidFile, buf, bytes);
     close(fd);
 
     return atoi(buf);

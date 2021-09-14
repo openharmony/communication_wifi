@@ -26,7 +26,7 @@ namespace Wifi {
 bool WifiCommonEventHelper::PublishEvent(const std::string &eventAction, const int &code, const std::string &data,
     const std::vector<std::string> &permissions)
 {
-    WIFI_LOGD("publish event[%{public}s], code:%{public}d",eventAction.c_str(),code);
+    WIFI_LOGD("publish event[%{public}s], code:%{public}d", eventAction.c_str(), code);
     Want want;
     want.SetAction(eventAction);
     CommonEventData commonData;
@@ -36,14 +36,14 @@ bool WifiCommonEventHelper::PublishEvent(const std::string &eventAction, const i
     if (permissions.size() > 0) {
         CommonEventPublishInfo publishInfo;
         publishInfo.SetSubscriberPermissions(permissions);
-        if (!CommonEventManager::PublishCommonEvent(commonData,publishInfo)) {
-            WIFI_LOGE("failed to publish event[%s], code:%d",eventAction.c_str(),code);
+        if (!CommonEventManager::PublishCommonEvent(commonData, publishInfo)) {
+            WIFI_LOGE("failed to publish event[%s], code:%d", eventAction.c_str(), code);
             return false;
         }
         return true;
     }
     if (!CommonEventManager::PublishCommonEvent(commonData)) {
-        WIFI_LOGE("failed to publish event[%{public}s], code:%{public}d",eventAction.c_str(),code);
+        WIFI_LOGE("failed to publish event[%{public}s], code:%{public}d", eventAction.c_str(), code);
         return false;
     }
     return true;
@@ -51,7 +51,7 @@ bool WifiCommonEventHelper::PublishEvent(const std::string &eventAction, const i
 
 bool WifiCommonEventHelper::PublishEvent(const std::string &eventAction, const int &code, const std::string &data)
 {
-    WIFI_LOGD("publish event[%{public}s], code:%{public}d",eventAction.c_str(),code);
+    WIFI_LOGD("publish event[%{public}s], code:%{public}d", eventAction.c_str(), code);
     Want want;
     want.SetAction(eventAction);
     CommonEventData commonData;
@@ -59,7 +59,7 @@ bool WifiCommonEventHelper::PublishEvent(const std::string &eventAction, const i
     commonData.SetCode(code);
     commonData.SetData(data);
     if (!CommonEventManager::PublishCommonEvent(commonData)) {
-        WIFI_LOGE("failed to publish event[%{public}s], code:%{public}d",eventAction.c_str(),code);
+        WIFI_LOGE("failed to publish event[%{public}s], code:%{public}d", eventAction.c_str(), code);
         return false;
     }
     return true;

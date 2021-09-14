@@ -15,22 +15,15 @@
 #include "ap_service.h"
 #include <unistd.h>
 #include "ap_state_machine.h"
-#include "log_helper.h"
+#include "wifi_log.h"
+#include "wifi_settings.h"
+
 #include "wifi_logger.h"
 
-DEFINE_WIFILOG_HOTSPOT_LABEL("ApService");
+DEFINE_WIFILOG_HOTSPOT_LABEL("WifiApService");
 namespace OHOS {
 namespace Wifi {
-ApService &ApService::GetInstance()
-{
-    static ApService instance_;
-    return instance_;
-}
-
-void ApService::DeleteInstance()
-{}
-
-ApService::ApService()
+ApService::ApService(ApStateMachine &apStateMachine) : m_ApStateMachine(apStateMachine)
 {}
 
 ApService::~ApService()
@@ -38,44 +31,128 @@ ApService::~ApService()
 
 ErrCode ApService::EnableHotspot() const
 {
-    ApStateMachine::GetInstance().SendMessage(static_cast<int>(ApStatemachineEvent::CMD_START_HOTSPOT));
+    m_ApStateMachine.SendMessage(static_cast<int>(ApStatemachineEvent::CMD_START_HOTSPOT));
     return ErrCode::WIFI_OPT_SUCCESS;
 }
 
 ErrCode ApService::DisableHotspot() const
 {
-    ApStateMachine::GetInstance().SendMessage(static_cast<int>(ApStatemachineEvent::CMD_STOP_HOTSPOT));
+    m_ApStateMachine.SendMessage(static_cast<int>(ApStatemachineEvent::CMD_STOP_HOTSPOT));
     return ErrCode::WIFI_OPT_SUCCESS;
 }
 
 ErrCode ApService::SetHotspotConfig(const HotspotConfig &cfg) const
 {
-    ApStateMachine::GetInstance().SetHotspotConfig(cfg);
+    InternalMessage *msg = m_ApStateMachine.CreateMessage();
+    if (msg == nullptr) {
+        return ErrCode::WIFI_OPT_FAILED;
+    }
+    msg->SetMessageName(static_cast<int>(ApStatemachineEvent::CMD_SET_HOTSPOT_CONFIG));
+    msg->AddStringMessageBody(cfg.GetSsid());
+    msg->AddStringMessageBody(cfg.GetPreSharedKey());
+    msg->AddIntMessageBody(static_cast<int>(cfg.GetSecurityType()));
+    msg->AddIntMessageBody(static_cast<int>(cfg.GetBand()));
+    msg->AddIntMessageBody(cfg.GetChannel());
+    msg->AddIntMessageBody(cfg.GetMaxConn());
+    m_ApStateMachine.SendMessage(msg);
     return ErrCode::WIFI_OPT_SUCCESS;
 }
 
 ErrCode ApService::AddBlockList(const StationInfo &stationInfo) const
 {
-    ApStateMachine::GetInstance().AddBlockList(stationInfo);
+    InternalMessage *msg = m_ApStateMachine.CreateMessage();
+    if (msg == nullptr) {
+        return ErrCode::WIFI_OPT_FAILED;
+    }
+    msg->SetMessageName(static_cast<int>(ApStatemachineEvent::CMD_ADD_BLOCK_LIST));
+    msg->AddStringMessageBody(stationInfo.deviceName);
+    msg->AddStringMessageBody(stationInfo.bssid);
+    msg->AddStringMessageBody(stationInfo.ipAddr);
+    m_ApStateMachine.SendMessage(msg);
     return ErrCode::WIFI_OPT_SUCCESS;
 }
 
 ErrCode ApService::DelBlockList(const StationInfo &stationInfo) const
 {
-    ApStateMachine::GetInstance().DelBlockList(stationInfo);
+    InternalMessage *msg = m_ApStateMachine.CreateMessage();
+    if (msg == nullptr) {
+        return ErrCode::WIFI_OPT_FAILED;
+    }
+    msg->SetMessageName(static_cast<int>(ApStatemachineEvent::CMD_DEL_BLOCK_LIST));
+    msg->AddStringMessageBody(stationInfo.deviceName);
+    msg->AddStringMessageBody(stationInfo.bssid);
+    msg->AddStringMessageBody(stationInfo.ipAddr);
+    m_ApStateMachine.SendMessage(msg);
     return ErrCode::WIFI_OPT_SUCCESS;
 }
 
 ErrCode ApService::DisconnetStation(const StationInfo &stationInfo) const
 {
-    ApStateMachine::GetInstance().DisconnetStation(stationInfo);
+    InternalMessage *msg = m_ApStateMachine.CreateMessage();
+    if (msg == nullptr) {
+        return ErrCode::WIFI_OPT_FAILED;
+    }
+    msg->SetMessageName(static_cast<int>(ApStatemachineEvent::CMD_DISCONNECT_STATION));
+    msg->AddStringMessageBody(stationInfo.deviceName);
+    msg->AddStringMessageBody(stationInfo.bssid);
+    msg->AddStringMessageBody(stationInfo.ipAddr);
+    m_ApStateMachine.SendMessage(msg);
+    return ErrCode::WIFI_OPT_SUCCESS;
+}
+
+ErrCode ApService::GetStationList(std::vector<StationInfo> &result) const
+{
+    WifiSettings::GetInstance().GetStationList(result);
+    if (result.empty()) {
+        WIFI_LOGD("GetStationList is empty.");
+        return ErrCode::WIFI_OPT_SUCCESS;
+    }
+    // get dhcp lease info, return full connected station info
+    std::map<std::string, StationInfo> tmp;
+    if (!m_ApStateMachine.GetConnectedStationInfo(tmp)) {
+        WIFI_LOGD("Get connected station info failed!");
+        return ErrCode::WIFI_OPT_FAILED;
+    }
+    for (auto iter = result.begin(); iter != result.end(); ++iter) {
+        auto itMap = tmp.find(iter->bssid);
+        if (itMap == tmp.end()) {
+            continue;
+        }
+        iter->deviceName = itMap->second.deviceName;
+        iter->ipAddr = itMap->second.ipAddr;
+    }
+    return ErrCode::WIFI_OPT_SUCCESS;
+}
+
+ErrCode ApService::GetValidBands(std::vector<BandType> &bands)
+{
+    if (WifiSettings::GetInstance().GetValidBands(bands) < 0) {
+        WIFI_LOGE("Delete block list failed!");
+        return ErrCode::WIFI_OPT_FAILED;
+    }
+    return ErrCode::WIFI_OPT_SUCCESS;
+}
+
+ErrCode ApService::GetValidChannels(BandType band, std::vector<int32_t> &validchannel)
+{
+    ChannelsTable channelsInfo;
+    if (WifiSettings::GetInstance().GetValidChannels(channelsInfo)) {
+        WIFI_LOGE("Failed to obtain data from the WifiSettings.");
+        return ErrCode::WIFI_OPT_FAILED;
+    }
+    auto it = channelsInfo.find(band);
+    if (it == channelsInfo.end()) {
+        WIFI_LOGE("The value of band is invalid.");
+        return ErrCode::WIFI_OPT_INVALID_PARAM;
+    }
+    validchannel = channelsInfo[band];
     return ErrCode::WIFI_OPT_SUCCESS;
 }
 
 ErrCode ApService::RegisterApServiceCallbacks(const IApServiceCallbacks &callbacks)
 {
     WIFI_LOGI("RegisterApServiceCallbacks.");
-     ApStateMachine::GetInstance().RegisterApServiceCallbacks(callbacks);
+    m_ApStateMachine.RegisterApServiceCallbacks(callbacks);
     return ErrCode::WIFI_OPT_SUCCESS;
 }
 

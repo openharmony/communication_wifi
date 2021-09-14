@@ -26,41 +26,14 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#define BSSID_LENG 20
-#define SSID_LENG 128
 #define KEY_MGMT_LENG 20
-#define FLAGS_LENG 128
-#define NUM_LENG 32
-
-#define REPLY_BUF_LENGTH 4096
-#define REPLY_BUF_SMALL_LENGTH 32
-#define CMD_RTUEN_TIMEOUT (-2)
-#define CMD_RETURN_FAIL (-1)
-#define CMD_RETURN_OK_LENGTH 2
-#define CMD_RESULT_MAX_NUM 100
-
-/* Register event callback, event type */
-#define WPA_CB_EVENT_SCAN_NOTIFY 1    /* Scan end event */
-#define WPA_CB_EVENT_CONNECT_NOTIFY 2 /* Connection status event */
-#define WPA_CB_EVENT_WPA_STATUS 3     /* WPA status change event */
-#define WPA_CB_EVENT_WRONG_KEY 4      /* incorrect password */
-#define WPA_CB_EVENT_WPS_OVERLAP 5    /* wps_pbc_overlap */
-#define WPA_CB_EVENT_WPS_TIME_OUT 6   /* wps connect time out */
-
-#define WPA_CB_SCAN_FAILED 1
-#define WPA_CB_SCAN_OVER_OK 2
-#define WPA_CB_CONNECTED 1
-#define WPA_CB_DISCONNECTED 2
-
-/* ******************** wpa_cli struct*************** */
 struct WpaHalCmdStatus {
-    char bssid[BSSID_LENG];
+    char bssid[WIFI_BSSID_LENGTH];
     int freq;
-    char ssid[SSID_LENG];
+    char ssid[WIFI_SSID_LENGTH];
     int id;
-    char key_mgmt[KEY_MGMT_LENG];
-    char address[BSSID_LENG];
+    char keyMgmt[KEY_MGMT_LENG];
+    char address[WIFI_BSSID_LENGTH];
 };
 
 struct WpaSetNetworkArgv {
@@ -76,72 +49,68 @@ typedef struct WpaSsidField {
 } WpaSsidField;
 
 struct WpaGetNetworkArgv {
-    int id;                  /* network id. */
-    char parame[FLAGS_LENG]; /* parameter */
+    int id; /* network id. */
+    char param[WIFI_NETWORK_CONFIG_VALUE_LENGTH]; /* parameter */
 };
 
 struct WpaWpsPbcArgv {
-    int anyflag;
-    int multi_ap;
-    char bssid[SSID_LENG];
+    int anyFlag;
+    int multiAp;
+    char bssid[WIFI_BSSID_LENGTH];
 };
 
 struct WpaWpsPinArgv {
-    char bssid[SSID_LENG];
+    char bssid[WIFI_BSSID_LENGTH];
+    char pinCode[WIFI_PIN_CODE_LENGTH + 1];
 };
 
-/* ***************** wpa_cli struct end*********************** */
+typedef struct WifiWpaStaInterface WifiWpaStaInterface;
+struct WifiWpaStaInterface {
+    int staNo;
+    char ifname[WIFI_IFACE_NAME_MAXLEN];
+    WifiWpaStaInterface *next;
 
-/* Defines the HAL device structure. */
-typedef struct WifiHalDevice {
-    struct wpa_ctrl *ctrlConn; /* Deliver messages to wpa_supplicant. */
-    struct wpa_ctrl *monConn;  /* Receives messages reported by wpa_supplicant. */
-    pthread_t tid;
-    int threadRunFlag;
+    int (*wpaCliCmdStatus)(WifiWpaStaInterface *p, struct WpaHalCmdStatus *pcmd);
+    int (*wpaCliCmdAddNetworks)(WifiWpaStaInterface *p);
+    int (*wpaCliCmdReconnect)(WifiWpaStaInterface *p);
+    int (*wpaCliCmdReassociate)(WifiWpaStaInterface *p);
+    int (*wpaCliCmdDisconnect)(WifiWpaStaInterface *p);
+    int (*wpaCliCmdSaveConfig)(WifiWpaStaInterface *p);
+    int (*wpaCliCmdSetNetwork)(WifiWpaStaInterface *p, const struct WpaSetNetworkArgv *argv);
+    int (*wpaCliCmdEnableNetwork)(WifiWpaStaInterface *p, int networkId);
+    int (*wpaCliCmdSelectNetwork)(WifiWpaStaInterface *p, int networkId);
+    int (*wpaCliCmdDisableNetwork)(WifiWpaStaInterface *p, int networkId);
+    int (*wpaCliCmdRemoveNetwork)(WifiWpaStaInterface *p, int networkId);
+    int (*wpaCliCmdGetNetwork)(WifiWpaStaInterface *p, const struct WpaGetNetworkArgv *argv, char *pcmd, unsigned size);
+    int (*wpaCliCmdWpsPbc)(WifiWpaStaInterface *p, const struct WpaWpsPbcArgv *wpspbc);
+    int (*wpaCliCmdWpsPin)(WifiWpaStaInterface *p, const struct WpaWpsPinArgv *wpspin, int *pincode);
+    int (*wpaCliCmdWpsCancel)(WifiWpaStaInterface *p);
+    int (*wpaCliCmdPowerSave)(WifiWpaStaInterface *p, int enable);
+    int (*wpaCliCmdSetCountryCode)(WifiWpaStaInterface *p, const char *countryCode);
+    int (*wpaCliCmdGetCountryCode)(WifiWpaStaInterface *p, char *countryCode, int codeSize);
+    int (*wpaCliCmdSetAutoConnect)(WifiWpaStaInterface *p, int enable);
+    int (*wpaCliCmdWpaBlockListClear)(WifiWpaStaInterface *p);
+    int (*wpaCliCmdListNetworks)(WifiWpaStaInterface *p, HidlNetworkInfo *pcmd, int *size);
+    int (*wpaCliCmdScan)(WifiWpaStaInterface *p, const ScanSettings *settings);
+    int (*wpaCliCmdScanInfo)(WifiWpaStaInterface *p, ScanInfo *pcmd, int *size);
+    int (*wpaCliCmdGetSignalInfo)(WifiWpaStaInterface *p, HidlWpaSignalInfo *info);
+};
 
-    /* ******************** wpa_cli Function Interface********************** */
-    int (*WifiWpaCliConnectWpa)();
-    void (*WifiWpaCliWpaCtrlClose)();
-    int (*WpaCliCmdStatus)(struct WpaHalCmdStatus *pcmd);
-    int (*WpaCliCmdAddNetworks)();
-    int (*WpaCliCmdReconnect)();
-    int (*WpaCliCmdReassociate)();
-    int (*WpaCliCmdDisconnect)();
-    int (*WpaCliCmdSaveConfig)();
-    int (*WpaCliCmdSetNetwork)(const struct WpaSetNetworkArgv *argv);
-    int (*WpaCliCmdEnableNetwork)(int networkId);
-    int (*WpaCliCmdSelectNetwork)(int networkId);
-    int (*WpaCliCmdDisableNetwork)(int networkId);
-    int (*WpaCliCmdRemoveNetwork)(int networkId);
-    int (*WpaCliCmdGetNetwork)(const struct WpaGetNetworkArgv *argv, char *pcmd, unsigned size);
-    int (*WpaCliCmdWpsPbc)(const struct WpaWpsPbcArgv *wpspbc);
-    int (*WpaCliCmdWpsPin)(const struct WpaWpsPinArgv *wpspin, int *pincode);
-    int (*WpaCliCmdWpsCancel)();
-    int (*WpaCliCmdPowerSave)(BOOL enable);
-    int (*WpaCliCmdSetCountryCode)(const char *countryCode);
-    int (*WpaCliCmdGetCountryCode)(char *countryCode, int codeSize);
-    int (*WpaCliCmdSetAutoConnect)(int enable);
-    int (*WpaCliCmdReconfigure)();
-    int (*WpaCliCmdWpaBlockListClear)();
-    int (*WpaCliCmdListNetworks)(NetworkList *pcmd, int *size);
-    int (*WpaCliCmdScan)(const ScanSettings *settings);
-    int (*WpaCliCmdScanResult)(ScanResult *pcmd, int *size);
-
-    /* ******************************* wpa_cli end******************************** */
-} WifiHalDevice;
-
-/* This interface is used to open a device for external invocation. */
 /**
- * @Description Get the Wifi Hal Dev object.
+ * @Description Get wpa interface about sta.
  *
- * @return WifiHalDevice*.
+ * @return WifiWpaStaInterface*.
  */
-WifiHalDevice *GetWifiHalDev(void);
+WifiWpaStaInterface *GetWifiStaInterface(int staNo);
+
 /**
- * @Description Get the Wifi Hal Dev object.
+ * @Description Release sta interface
  *
  */
-void ReleaseWpaHalDev(void);
+void ReleaseWifiStaInterface(int staNo);
+
+WifiWpaStaInterface *TraversalWifiStaInterface(void);
+int GetStaInterfaceNo(const char *ifName);
 
 #ifdef __cplusplus
 }

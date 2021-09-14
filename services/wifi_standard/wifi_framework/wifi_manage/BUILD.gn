@@ -39,6 +39,9 @@ config("wifi_manager_service_header") {
     "//foundation/communication/wifi/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta",
     "//foundation/communication/wifi/services/wifi_standard/wifi_framework/wifi_manage/wifi_scan",
     "//foundation/communication/wifi/services/wifi_standard/wifi_framework/wifi_manage/wifi_ap",
+    "//foundation/communication/wifi/services/wifi_standard/wifi_framework/wifi_manage/wifi_p2p",
+    "//foundation/communication/wifi/services/wifi_standard/wifi_framework/dhcp_manage/mgr_service/include",
+    "//foundation/communication/wifi/services/wifi_standard/wifi_framework/dhcp_manage/mgr_service/interfaces",
     "${aafwk_path}/interfaces/innerkits/want/include",
     "${aafwk_path}/interfaces/innerkits/want/include/ohos/aafwk/content",
     "//foundation/distributedschedule/dmsfwk/services/dtbschedmgr/include",
@@ -97,6 +100,21 @@ ohos_source_set("wifi_hotspot_service_impl") {
     "wifi_hotspot_death_recipient.cpp",
     "wifi_hotspot_service_impl.cpp",
     "wifi_hotspot_stub.cpp",
+  ]
+  configs = [
+    ":wifi_manager_service_config",
+    ":wifi_manager_service_header",
+  ]
+
+  external_deps = [ "ipc:ipc_core" ]
+}
+ohos_source_set("wifi_p2p_service_impl") {
+  sources = [
+    "//foundation/communication/wifi/interfaces/innerkits/native_cpp/wifi_standard/src/wifi_p2p_msg.cpp",
+    "wifi_p2p_callback_proxy.cpp",
+    "wifi_p2p_death_recipient.cpp",
+    "wifi_p2p_service_impl.cpp",
+    "wifi_p2p_stub.cpp",
   ]
   configs = [
     ":wifi_manager_service_config",
@@ -186,6 +204,20 @@ ohos_shared_library("wifi_hotspot_ability") {
   deps = [
     ":wifi_hotspot_service_impl",
     ":wifi_manager_service",
+    "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog",
+    "//foundation/distributedschedule/safwk/interfaces/innerkits/safwk:system_ability_fwk",
+    "//utils/native/base:utils",
+  ]
+
+  external_deps = [ "ipc:ipc_core" ]
+  part_name = "wifi_standard"
+  subsystem_name = "communication"
+}
+ohos_shared_library("wifi_p2p_ability") {
+  install_enable = true
+  deps = [
+    ":wifi_manager_service",
+    ":wifi_p2p_service_impl",
     "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog",
     "//foundation/distributedschedule/safwk/interfaces/innerkits/safwk:system_ability_fwk",
     "//utils/native/base:utils",

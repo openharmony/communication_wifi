@@ -13,34 +13,23 @@
  * limitations under the License.
  */
 #include "ap_interface.h"
-#include "ap_config_use.h"
-#include "ap_monitor.h"
-#include "ap_service.h"
-#include "ap_state_machine.h"
 #include "wifi_ap_nat_manager.h"
-#include "wifi_logger.h"
 
 namespace OHOS {
 namespace Wifi {
 ApInterface::ApInterface()
-{
-    ApService::GetInstance();
-    ApMonitor::GetInstance();
-    ApStateMachine::GetInstance();
-    WifiApDhcpInterface::GetInstance();
-    WifiApNatManager::GetInstance();
-    ApConfigUse::GetInstance();
-}
+    : m_ApRootState(),
+      m_ApStartedState(m_ApStateMachine, m_ApConfigUse, m_ApMonitor),
+      m_ApIdleState(m_ApStateMachine),
+      m_ApMonitor(),
+      m_ApStateMachine(m_ApStationsManager, m_ApRootState, m_ApIdleState, m_ApStartedState, m_ApMonitor),
+      m_ApService(m_ApStateMachine),
+      m_ApStationsManager(),
+      m_ApConfigUse()
+{}
 
 ApInterface::~ApInterface()
-{
-    ApConfigUse::DeleteInstance();
-    WifiApNatManager::DeleteInstance();
-    WifiApDhcpInterface::DeleteInstance();
-    ApStateMachine::DeleteInstance();
-    ApMonitor::DeleteInstance();
-    ApService::DeleteInstance();
-}
+{}
 
 extern "C" IApService *Create(void)
 {
@@ -53,52 +42,52 @@ extern "C" void Destroy(IApService *pservice)
 }
 ErrCode ApInterface::EnableHotspot()
 {
-    return ApService::GetInstance().EnableHotspot();
+    return m_ApService.EnableHotspot();
 }
 
 ErrCode ApInterface::DisableHotspot()
 {
-    return ApService::GetInstance().DisableHotspot();
+    return m_ApService.DisableHotspot();
 }
 
 ErrCode ApInterface::AddBlockList(const StationInfo &stationInfo)
 {
-    return ApService::GetInstance().AddBlockList(stationInfo);
+    return m_ApService.AddBlockList(stationInfo);
 }
 
 ErrCode ApInterface::DelBlockList(const StationInfo &stationInfo)
 {
-    return ApService::GetInstance().DelBlockList(stationInfo);
+    return m_ApService.DelBlockList(stationInfo);
 }
 
 ErrCode ApInterface::SetHotspotConfig(const HotspotConfig &hotspotConfig)
 {
-    return ApService::GetInstance().SetHotspotConfig(hotspotConfig);
+    return m_ApService.SetHotspotConfig(hotspotConfig);
 }
 
 ErrCode ApInterface::DisconnetStation(const StationInfo &stationInfo)
 {
-    return ApService::GetInstance().DisconnetStation(stationInfo);
+    return m_ApService.DisconnetStation(stationInfo);
 }
 
 ErrCode ApInterface::GetStationList(std::vector<StationInfo> &result)
 {
-    return ErrCode::WIFI_OPT_FAILED;
+    return m_ApService.GetStationList(result);
 }
 
 ErrCode ApInterface::GetValidBands(std::vector<BandType> &bands)
 {
-    return ErrCode::WIFI_OPT_FAILED;
+    return m_ApService.GetValidBands(bands);
 }
 
 ErrCode ApInterface::GetValidChannels(BandType band, std::vector<int32_t> &validchannel)
 {
-    return ErrCode::WIFI_OPT_FAILED;
+    return m_ApService.GetValidChannels(band, validchannel);
 }
 
 ErrCode ApInterface::RegisterApServiceCallbacks(const IApServiceCallbacks &callbacks)
 {
-    return ApService::GetInstance().RegisterApServiceCallbacks(callbacks);
+    return m_ApService.RegisterApServiceCallbacks(callbacks);
 }
 }  // namespace Wifi
 }  // namespace OHOS

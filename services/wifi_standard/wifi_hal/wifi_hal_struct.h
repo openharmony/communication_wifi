@@ -21,7 +21,6 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
 typedef struct WifiChip {
     int chip;
 } WifiChip;
@@ -48,21 +47,54 @@ typedef struct ScanSettings {
     ScanStyle scanStyle;
 } ScanSettings;
 
-typedef struct ScanResult {
+typedef struct ScanInfoElem {
+    unsigned int id;
+    char *content;
+    int size;
+} ScanInfoElem;
+
+typedef enum AntEnum {
+    NETWORK_PRIVATE = 0,
+    NETWORK_PRIVATEWITHGUEST = 1,
+    NETWORK_CHARGEABLEPUBLIC = 2,
+    NETWORK_FREEPUBLIC = 3,
+    NETWORK_PERSONAL = 4,
+    NETWORK_EMERGENCYONLY = 5,
+    NETWORK_RESVD6 = 6,
+    NETWORK_RESVD7 = 7,
+    NETWORK_RESVD8 = 8,
+    NETWORK_RESVD9 = 9,
+    NETWORK_RESVD10 = 10,
+    NETWORK_RESVD11 = 11,
+    NETWORK_RESVD12 = 12,
+    NETWORK_RESVD13 = 13,
+    NETWORK_TESTOREXPERIMENTAL = 14,
+    NETWORK_WILDCARD = 15,
+    NETWORK_ANT_INVALID = 16
+} Ant;
+
+typedef struct ScanInfo {
+    char ssid[WIFI_SSID_LENGTH];
     char bssid[WIFI_BSSID_LENGTH];
     int freq;
+    int channelWidth;
+    int centerFrequency0;
+    int centerFrequency1;
+    ScanInfoElem *infoElems;
+    int ieSize;
+    int64_t features;
     int siglv;
-    char flags[WIFI_SCAN_RESULT_CAPABILITY_LENGTH];
-    char ssid[WIFI_SSID_LENGTH];
-    uint64_t timestamp;
-} ScanResult;
+    char flags[WIFI_SCAN_INFO_CAPABILITY_LENGTH];
+    int64_t timestamp;
+    Ant ant;
+} ScanInfo;
 
-typedef struct NetworkList {
+typedef struct HidlNetworkInfo {
     int id;
     char ssid[WIFI_SSID_LENGTH];
     char bssid[WIFI_BSSID_LENGTH];
-    char flags[WIFI_BSSID_LENGTH];
-} NetworkList;
+    char flags[WIFI_NETWORK_FLAGS_LENGTH];
+} HidlNetworkInfo;
 
 typedef struct PnoScanSettings {
     int scanInterval;
@@ -76,43 +108,33 @@ typedef struct PnoScanSettings {
     char **savedSsid;
 } PnoScanSettings;
 
-typedef struct HostsapdConfig {
+typedef struct HostapdConfig {
     char ssid[WIFI_SSID_LENGTH];
-    int32_t ssid_len;
+    int32_t ssidLen;
     char preSharedKey[WIFI_AP_PASSWORD_LENGTH];
-    int32_t preSharedKey_len;
+    int32_t preSharedKeyLen;
     int32_t securityType;
     int32_t band;
     int32_t channel;
     int32_t maxConn;
-} HostsapdConfig;
+} HostapdConfig;
 
-typedef struct NetWorkConfig {
+typedef struct HidlSetNetworkConfig {
     DeviceConfigType cfgParam;                       /* Setting parameters. */
     char cfgValue[WIFI_NETWORK_CONFIG_VALUE_LENGTH];  /* Parameter value. */
-} NetWorkConfig;
+} HidlSetNetworkConfig;
 
-typedef struct GetNetWorkConfig {
+typedef struct HidlGetNetworkConfig {
     int networkId;
-    char param[WIFI_NETWORK_CONFIG_VALUE_LENGTH];
+    char param[WIFI_NETWORK_CONFIG_NAME_LENGTH];
     char value[WIFI_NETWORK_CONFIG_VALUE_LENGTH];
-} GetNetWorkConfig;
-/**
- * Generic structure to return the status of an operation.
- */
-typedef struct WifiStatus {
-    WifiStatusCode code;
-    /**
-     * A vendor specific error message from the vendor to provide more
-     * information beyond the reason code.
-     */
-    char description[WIFI_STATUS_ERROR_MSG_LENGTH];
-} WifiStatus;
+} HidlGetNetworkConfig;
 
 typedef struct WifiWpsParam {
     int anyFlag;
     int multiAp;
     char bssid[WIFI_BSSID_LENGTH];
+    char pinCode[WIFI_PIN_CODE_LENGTH + 1];
 } WifiWpsParam;
 
 typedef struct WifiRoamCapability {
@@ -120,6 +142,13 @@ typedef struct WifiRoamCapability {
     int maxTrustlistSize;
 } WifiRoamCapability;
 
+typedef struct HidlWpaSignalInfo {
+    int signal; /* RSSI */
+    int txrate;
+    int rxrate;
+    int noise;
+    int frequency;
+} HidlWpaSignalInfo;
 #ifdef __cplusplus
 }
 #endif

@@ -43,29 +43,59 @@
 #define WIFI_SVR_CMD_GET_COUNTRY_CODE 0x101A          /* get country code */
 #define WIFI_SVR_CMD_REGISTER_CALLBACK_CLIENT 0x101B  /* api register callback event */
 #define WIFI_SVR_CMD_GET_SIGNAL_LEVEL 0x101C          /* get signal level */
-#define WIFI_SVR_CMD_SET_SCAN_CONTROL_INFO 0x1022     /* set scan control policy */
-#define WIFI_SVR_CMD_REGISTER_SCAN_CALLBACK 0x1023    /* register scan callback */
-#define WIFI_SVR_CMD_REMOVE_ALL_DEVICE_CONFIG 0x1024  /* remove all network configs */
-#define WIFI_SVR_CMD_GET_SUPPORTED_FEATURES 0x1025
+#define WIFI_SVR_CMD_SET_SCAN_CONTROL_INFO 0x101D     /* set scan control policy */
+#define WIFI_SVR_CMD_REGISTER_SCAN_CALLBACK 0x101E    /* register scan callback */
+#define WIFI_SVR_CMD_UPDATE_DEVICE_CONFIG 0x101F      /* update a network config */
+#define WIFI_SVR_CMD_REMOVE_ALL_DEVICE_CONFIG 0x1020  /* remove all network configs */
+#define WIFI_SVR_CMD_GET_SUPPORTED_FEATURES 0x1021    /* get supported features */
+#define WIFI_SVR_CMD_GET_DERVICE_MAC_ADD 0x1022       /* get mac address */
 
 /* -------------ap module message define----------------- */
-#define WIFI_SVR_CMD_ENABLE_WIFI_AP 0x1100      /* open ap */
-#define WIFI_SVR_CMD_DISABLE_WIFI_AP 0x1101     /* close ap */
-#define WIFI_SVR_CMD_GETAPSTATE_WIFI 0x1102     /* get current ap state */
-#define WIFI_SVR_CMD_SETAPCONFIG_WIFI 0x1103    /* set ap config */
-#define WIFI_SVR_CMD_GET_HOTSPOT_CONFIG 0x1104  /* get ap config */
-#define WIFI_SVR_CMD_IS_HOTSPOT_ACTIVE 0x1105   /* whether current ap active */
-#define WIFI_SVR_CMD_GET_STATION_LIST 0x1106    /* get ap's connected sta infos */
-#define WIFI_SVR_CMD_GET_DERVICE_MAC_ADD 0x1107 /* get mac address */
-#define WIFI_SVR_CMD_SETBAND_AP 0X1108          /* set band */
-#define WIFI_SVR_CMD_GETBAND_AP 0X1109          /* get band */
-#define WIFI_SVR_CMD_ADD_BLOCK_LIST 0X110A      /* add a block */
-#define WIFI_SVR_CMD_DEL_BLOCK_LIST 0X110B      /* remove a block */
-#define WIFI_SVR_CMD_GET_BLOCK_LISTS 0X110C     /* get total block list */
-#define WIFI_SVR_CMD_DISCONNECT_STA 0X110D      /* disconnect a sta connection */
-#define WIFI_SVR_CMD_GET_VALID_BANDS 0X110E     /* get current valid frequency according band */
-#define WIFI_SVR_CMD_GET_VALID_CHANNELS 0X110F  /* get current valid channels associated with the band */
-#define WIFI_SVR_CMD_REGISTER_HOTSPOT_CALLBACK 0X1110    /* register scan callback */
+#define WIFI_SVR_CMD_ENABLE_WIFI_AP 0x1100            /* open ap */
+#define WIFI_SVR_CMD_DISABLE_WIFI_AP 0x1101           /* close ap */
+#define WIFI_SVR_CMD_GETAPSTATE_WIFI 0x1102           /* get current ap state */
+#define WIFI_SVR_CMD_SETAPCONFIG_WIFI 0x1103          /* set ap config */
+#define WIFI_SVR_CMD_GET_HOTSPOT_CONFIG 0x1104        /* get ap config */
+#define WIFI_SVR_CMD_IS_HOTSPOT_ACTIVE 0x1105         /* whether current ap active */
+#define WIFI_SVR_CMD_GET_STATION_LIST 0x1106          /* get ap's connected sta infos */
+#define WIFI_SVR_CMD_SETBAND_AP 0X1108                /* set band */
+#define WIFI_SVR_CMD_GETBAND_AP 0X1109                /* get band */
+#define WIFI_SVR_CMD_ADD_BLOCK_LIST 0X110A            /* add a block */
+#define WIFI_SVR_CMD_DEL_BLOCK_LIST 0X110B            /* remove a block */
+#define WIFI_SVR_CMD_GET_BLOCK_LISTS 0X110C           /* get total block list */
+#define WIFI_SVR_CMD_DISCONNECT_STA 0X110D            /* disconnect a sta connection */
+#define WIFI_SVR_CMD_GET_VALID_BANDS 0X110E           /* get current valid frequency according band */
+#define WIFI_SVR_CMD_GET_VALID_CHANNELS 0X110F        /* get current valid channels associated with the band */
+#define WIFI_SVR_CMD_REGISTER_HOTSPOT_CALLBACK 0X1110 /* register scan callback */
+
+/* -------------p2p module message define----------------- */
+#define WIFI_SVR_CMD_P2P_ENABLE 0x2000                 /* open p2p */
+#define WIFI_SVR_CMD_P2P_DISABLE 0x2001                /* close p2p */
+#define WIFI_SVR_CMD_P2P_DISCOVER_DEVICES 0x2002       /* start Wi-Fi P2P device search */
+#define WIFI_SVR_CMD_P2P_STOP_DISCOVER_DEVICES 0x2003  /* stop Wi-Fi P2P device search */
+#define WIFI_SVR_CMD_P2P_DISCOVER_SERVICES 0x2004      /* start Wi-Fi P2P service search */
+#define WIFI_SVR_CMD_P2P_STOP_DISCOVER_SERVICES 0x2005 /* stop Wi-Fi P2P service search */
+#define WIFI_SVR_CMD_P2P_REQUEST_SERVICES 0x2006       /* request the P2P service */
+#define WIFI_SVR_CMD_P2P_PUT_LOCAL_SERVICES 0x2007     /* add local P2P service */
+#define WIFI_SVR_CMD_P2P_DELETE_LOCAL_SERVICES 0x2008  /* remove local P2P service */
+#define WIFI_SVR_CMD_P2P_START_LISTEN 0x2009           /* enable Wi-Fi P2P listening */
+#define WIFI_SVR_CMD_P2P_STOP_LISTEN 0x200A            /* disable Wi-Fi P2P listening */
+#define WIFI_SVR_CMD_P2P_FORM_GROUP 0x200B             /* creating a P2P Group */
+#define WIFI_SVR_CMD_P2P_REMOVE_GROUP 0x200C           /* remove a P2P Group */
+#define WIFI_SVR_CMD_P2P_DELETE_GROUP 0x200D           /* delete a P2P Group */
+#define WIFI_SVR_CMD_P2P_CONNECT 0x200E                /* p2p connect */
+#define WIFI_SVR_CMD_P2P_DISCONNECT 0x200F             /* p2p disconnect */
+#define WIFI_SVR_CMD_P2P_QUERY_INFO 0x2010             /* querying Wi-Fi P2P Connection Information */
+#define WIFI_SVR_CMD_P2P_GET_CURRENT_GROUP 0x2011      /* get the P2P current group */
+#define WIFI_SVR_CMD_P2P_GET_ENABLE_STATUS 0x2012      /* obtains the P2P switch status */
+#define WIFI_SVR_CMD_P2P_GET_DISCOVER_STATUS 0x2013    /* obtains the P2P discovery status */
+#define WIFI_SVR_CMD_P2P_GET_CONNECTED_STATUS 0x2014   /* obtains the P2P connected status */
+#define WIFI_SVR_CMD_P2P_QUERY_DEVICES 0x2015          /* query the information about the found devices */
+#define WIFI_SVR_CMD_P2P_QUERY_GROUPS 0x2016           /* query the information about the found groups */
+#define WIFI_SVR_CMD_P2P_QUERY_SERVICES 0x2017         /* query the information about the found services */
+#define WIFI_SVR_CMD_P2P_REGISTER_CALLBACK 0x2018
+#define WIFI_SVR_CMD_P2P_SET_DEVICE_NAME 0x2019        /* set device name */
+#define WIFI_SVR_CMD_P2P_SET_WFD_INFO 0x201A           /* set p2p wifi display info */
 
 /* -----------register event type and message define-------------- */
 #define WIFI_CBK_CMD_STATE_CHANGE 0x1001         /* STA state change event */
@@ -78,6 +108,15 @@
 #define WIFI_CBK_CMD_STREAM_DIRECTION 0x1008     /* traffic up/down state event */
 #define WIFI_CBK_CMD_WPS_STATE_CHANGE 0x1009     /* wps state change event */
 
+#define WIFI_CBK_CMD_P2P_STATE_CHANGE 0x1010         /* p2p state change event */
+#define WIFI_CBK_CMD_PERSISTENT_GROUPS_CHANGE 0x1011 /* Persistent Group Updated */
+#define WIFI_CBK_CMD_THIS_DEVICE_CHANGE 0x1012       /* The current device information has been updated */
+#define WIFI_CBK_CMD_PEER_CHANGE 0x1013
+#define WIFI_CBK_CMD_SERVICE_CHANGE 0x1014
+#define WIFI_CBK_CMD_CONNECT_CHANGE 0x1015
+#define WIFI_CBK_CMD_DISCOVERY_CHANGE 0x1016
+#define WIFI_CBK_CMD_P2P_ACTION_RESULT 0x1017
+
 #define WIFI_CBK_MSG_STATE_CHANGE 0x1001
 #define WIFI_CBK_MSG_CONNECTION_CHANGE 0x1002
 #define WIFI_CBK_MSG_RSSI_CHANGE 0x1003
@@ -87,10 +126,14 @@
 #define WIFI_CBK_MSG_HOTSPOT_STATE_CHANGE 0x1007
 #define WIFI_CBK_MSG_HOTSPOT_STATE_JOIN 0x1008
 #define WIFI_CBK_MSG_HOTSPOT_STATE_LEAVE 0x1009
-
-/* --------------moc test message define--------------- */
-#define WIFI_SVR_CMD_MOCK_CHANGE_STATE 0X1201      /* change outer state message */
-#define WIFI_SVR_CMD_MOCK_CHANGE_PERMISSION 0X1202 /* change permission value message */
+#define WIFI_CBK_MSG_P2P_STATE_CHANGE 0x1010
+#define WIFI_CBK_MSG_PERSISTENT_GROUPS_CHANGE 0x1011 /* Persistent Group Updated */
+#define WIFI_CBK_MSG_THIS_DEVICE_CHANGE 0x1012
+#define WIFI_CBK_MSG_PEER_CHANGE 0x1013
+#define WIFI_CBK_MSG_SERVICE_CHANGE 0x1014
+#define WIFI_CBK_MSG_CONNECT_CHANGE 0x1015
+#define WIFI_CBK_MSG_DISCOVERY_CHANGE 0x1016
+#define WIFI_CBK_MSG_P2P_ACTION_RESULT 0x1017
 
 /* -----------Feature service name-------------- */
 #define WIFI_SERVICE_STA "StaService"     /* STA */
@@ -99,18 +142,10 @@
 #define WIFI_SERVICE_SCAN "ScanService"   /* SCAN */
 #define WIFI_SERVICE_AWARE "AwareService" /* AWARE */
 
-#define MODE_STATE_SCREEN (1)
-#define MODE_STATE_AIR_PLANE (2)
-#define MODE_STATE_APP_RUN (3)
-#define MODE_STATE_POWER_SAVING (4)
-#define MODE_STATE_CUSTOM_SCENE (5)
-
-#define STATE_OPEN (1)
-#define STATE_CLOSE (2)
-
 /* ---------Feature service ability id */
-#define WIFI_DEVICE_ABILITY_ID (1125)
-#define WIFI_SCAN_ABILITY_ID (1126)
-#define WIFI_HOTSPOT_ABILITY_ID (1127)
+#define WIFI_DEVICE_ABILITY_ID 1125
+#define WIFI_SCAN_ABILITY_ID 1126
+#define WIFI_HOTSPOT_ABILITY_ID 1127
+#define WIFI_P2P_ABILITY_ID 1128
 
 #endif

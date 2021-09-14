@@ -74,7 +74,7 @@ int RpcStartScan(RpcServer *server, Context *context)
         }
         setting.scanStyle = (ScanStyle)temp;
 
-        ret = 0;
+        ret += 1; /* deal success, set ret = 0 */
         WifiErrorNo err = StartScan(&setting);
         WriteBegin(context, 0);
         WriteInt(context, err);
@@ -92,7 +92,7 @@ int RpcStartScan(RpcServer *server, Context *context)
     return ret;
 }
 
-int RpcGetScanResults(RpcServer *server, Context *context)
+int RpcGetScanInfos(RpcServer *server, Context *context)
 {
     if (server == NULL || context == NULL) {
         return -1;
@@ -101,14 +101,14 @@ int RpcGetScanResults(RpcServer *server, Context *context)
     if (ReadInt(context, &maxSize) < 0) {
         return -1;
     }
-    ScanResult *results = NULL;
+    ScanInfo *results = NULL;
     if (maxSize > 0) {
-        results = (ScanResult *)calloc(maxSize, sizeof(ScanResult));
+        results = (ScanInfo *)calloc(maxSize, sizeof(ScanInfo));
     }
     if (results == NULL) {
         return -1;
     }
-    WifiErrorNo err = GetScanResults(results, &maxSize);
+    WifiErrorNo err = GetScanInfos(results, &maxSize);
     WriteBegin(context, 0);
     WriteInt(context, err);
     struct timespec clockTime = {0, 0};
@@ -133,16 +133,8 @@ int RpcGetScanResults(RpcServer *server, Context *context)
 
 static int ReadPnoScanSettings(Context *context, PnoScanSettings *pSetting)
 {
-    if (ReadInt(context, &pSetting->scanInterval) < 0) {
-        return -1;
-    }
-    if (ReadInt(context, &pSetting->minRssi2Dot4Ghz) < 0) {
-        return -1;
-    }
-    if (ReadInt(context, &pSetting->minRssi5Ghz) < 0) {
-        return -1;
-    }
-    if (ReadInt(context, &pSetting->hiddenSsidSize) < 0) {
+    if (ReadInt(context, &pSetting->scanInterval) < 0 || ReadInt(context, &pSetting->minRssi2Dot4Ghz) < 0 ||
+        ReadInt(context, &pSetting->minRssi5Ghz) < 0 || ReadInt(context, &pSetting->hiddenSsidSize) < 0) {
         return -1;
     }
     if (pSetting->hiddenSsidSize > 0) {
@@ -290,7 +282,7 @@ int RpcGetDeviceMacAddress(RpcServer *server, Context *context)
         return -1;
     }
     int maxSize = 0;
-    if (ReadInt(context, &maxSize) < 0) {
+    if (ReadInt(context, &maxSize) < 0 || maxSize <= 0) {
         return -1;
     }
     unsigned char *mac = NULL;
@@ -318,17 +310,11 @@ int RpcGetFrequencies(RpcServer *server, Context *context)
         return -1;
     }
     int band = 0;
-    if (ReadInt(context, &band) < 0) {
-        return -1;
-    }
     int maxSize = 0;
-    if (ReadInt(context, &maxSize) < 0) {
+    if (ReadInt(context, &band) < 0 || ReadInt(context, &maxSize) < 0 || maxSize <= 0) {
         return -1;
     }
-    int *frequencies = NULL;
-    if (maxSize > 0) {
-        frequencies = (int *)calloc(maxSize, sizeof(int));
-    }
+    int *frequencies = (int *)calloc(maxSize, sizeof(int));
     if (frequencies == NULL) {
         return -1;
     }
@@ -378,7 +364,7 @@ int RpcSetScanningMacAddress(RpcServer *server, Context *context)
         return -1;
     }
     int maxSize = 0;
-    if (ReadInt(context, &maxSize) < 0) {
+    if (ReadInt(context, &maxSize) < 0 || maxSize < 0) {
         return -1;
     }
     int len = maxSize + 1;
@@ -404,7 +390,7 @@ int RpcDeauthLastRoamingBssid(RpcServer *server, Context *context)
         return -1;
     }
     int maxSize = 0;
-    if (ReadInt(context, &maxSize) < 0) {
+    if (ReadInt(context, &maxSize) < 0 || maxSize < 0) {
         return -1;
     }
     int len = maxSize + 1;
@@ -459,12 +445,8 @@ int RpcRunCmd(RpcServer *server, Context *context)
         ReadStr(context, pIfName, len);
     }
     int cmdid = 0;
-    if (ReadInt(context, &cmdid) < 0) {
-        free(pIfName);
-        return -1;
-    }
     int bufsize = 0;
-    if (ReadInt(context, &bufsize) < 0) {
+    if (ReadInt(context, &cmdid) < 0 || ReadInt(context, &bufsize) < 0 || bufsize < 0) {
         free(pIfName);
         return -1;
     }
@@ -585,18 +567,15 @@ int RpcSetNetwork(RpcServer *server, Context *context)
         return -1;
     }
 
-    NetWorkConfig *confs = (NetWorkConfig *)calloc(size, sizeof(NetWorkConfig));
+    HidlSetNetworkConfig *confs = (HidlSetNetworkConfig *)calloc(size, sizeof(HidlSetNetworkConfig));
     if (confs == NULL) {
         return -1;
     }
 
     int flag = 0;
     for (int i = 0; i < size; ++i) {
-        if (ReadInt(context, (int *)&(confs[i].cfgParam)) < 0) {
-            flag = 1;
-            break;
-        }
-        if (ReadStr(context, confs[i].cfgValue, WIFI_NETWORK_CONFIG_VALUE_LENGTH) != 0) {
+        if (ReadInt(context, (int *)&(confs[i].cfgParam)) < 0 ||
+            ReadStr(context, confs[i].cfgValue, sizeof(confs[i].cfgValue)) != 0) {
             flag = 1;
             break;
         }
@@ -766,7 +745,7 @@ int RpcSetRoamConfig(RpcServer *server, Context *context)
                 break;
             }
         }
-        ret = 0;
+        ret += 1; /* deal success, set ret = 0 */
         WifiErrorNo err = SetRoamConfig(blocklist, blocksize, trustlist, size);
         WriteBegin(context, 0);
         WriteInt(context, err);
@@ -792,11 +771,8 @@ int RpcWpaGetNetwork(RpcServer *server, Context *context)
     if (server == NULL || context == NULL) {
         return -1;
     }
-    GetNetWorkConfig conf = {0};
-    if (ReadInt(context, &(conf.networkId)) < 0) {
-        return -1;
-    }
-    if (ReadStr(context, conf.param, WIFI_NETWORK_CONFIG_VALUE_LENGTH)) {
+    HidlGetNetworkConfig conf = {0};
+    if (ReadInt(context, &(conf.networkId)) < 0 || ReadStr(context, conf.param, sizeof(conf.param)) != 0) {
         return -1;
     }
     WifiErrorNo err = WpaGetNetWork(&conf);
@@ -819,18 +795,6 @@ int RpcWpaAutoConnect(RpcServer *server, Context *context)
         return -1;
     }
     WifiErrorNo err = WpaAutoConnect(enable);
-    WriteBegin(context, 0);
-    WriteInt(context, err);
-    WriteEnd(context);
-    return 0;
-}
-
-int RpcWpaReconfigure(RpcServer *server, Context *context)
-{
-    if (server == NULL || context == NULL) {
-        return -1;
-    }
-    WifiErrorNo err = WpaReconfigure();
     WriteBegin(context, 0);
     WriteInt(context, err);
     WriteEnd(context);
@@ -862,24 +826,48 @@ int RpcGetNetworkList(RpcServer *server, Context *context)
         return -1;
     }
 
-    NetworkList *networkList = (NetworkList *)calloc(maxSize, sizeof(NetworkList));
-    if (networkList == NULL) {
+    HidlNetworkInfo *infos = (HidlNetworkInfo *)calloc(maxSize, sizeof(HidlNetworkInfo));
+    if (infos == NULL) {
         return -1;
     }
 
-    WifiErrorNo err = GetNetworkList(networkList, &maxSize);
+    WifiErrorNo err = GetNetworkList(infos, &maxSize);
     WriteBegin(context, 0);
     WriteInt(context, err);
     if (err == WIFI_HAL_SUCCESS) {
         WriteInt(context, maxSize);
         for (int i = 0; i < maxSize; ++i) {
-            WriteInt(context, networkList[i].id);
-            WriteStr(context, networkList[i].ssid);
-            WriteStr(context, networkList[i].bssid);
-            WriteStr(context, networkList[i].flags);
+            WriteInt(context, infos[i].id);
+            WriteStr(context, infos[i].ssid);
+            WriteStr(context, infos[i].bssid);
+            WriteStr(context, infos[i].flags);
         }
     }
     WriteEnd(context);
-    free(networkList);
+    free(infos);
+    return 0;
+}
+
+int RpcGetConnectSignalInfo(RpcServer *server, Context *context)
+{
+    if (server == NULL || context == NULL) {
+        return -1;
+    }
+    char endBssid[WIFI_BSSID_LENGTH] = {0};
+    if (ReadStr(context, endBssid, sizeof(endBssid)) != 0) {
+        return -1;
+    }
+    HidlWpaSignalInfo info = {0};
+    WifiErrorNo err = GetConnectSignalInfo(endBssid, &info);
+    WriteBegin(context, 0);
+    WriteInt(context, err);
+    if (err == WIFI_HAL_SUCCESS) {
+        WriteInt(context, info.signal);
+        WriteInt(context, info.txrate);
+        WriteInt(context, info.rxrate);
+        WriteInt(context, info.noise);
+        WriteInt(context, info.frequency);
+    }
+    WriteEnd(context);
     return 0;
 }

@@ -16,14 +16,14 @@
 #define OHOS_STATIONS_MANAGER_H
 
 #include "ap_define.h"
-#include "wifi_settings.h"
-#include "wifi_ap_hal_interface.h"
 #include "wifi_error_no.h"
 
 namespace OHOS {
 namespace Wifi {
+class ApStateMachine;
 class ApStationsManager {
 public:
+    FRIEND_GTEST(ApStationsManager);
     /**
      * @Description  construction
      * @param None
@@ -87,6 +87,12 @@ public:
      */
     std::vector<std::string> GetAllConnectedStations() const;
 
+    /**
+     * @Description  Register callback list reporting msg to state machine.
+     * @param callbacks - callback function
+     * @return None
+     */
+    void RegisterEventHandler(std::function<void(const StationInfo &, ApStatemachineEvent)> callbacks);
 private:
     /**
      * @Description  When a new STA is connected, the new STA is
@@ -105,6 +111,8 @@ private:
                false: Failed to delete the association.
      */
     bool DelAssociationStation(const StationInfo &staInfo) const;
+
+    std::function<void(const StationInfo &, ApStatemachineEvent)> m_stationChangeCallback;
 };
 }  // namespace Wifi
 }  // namespace OHOS

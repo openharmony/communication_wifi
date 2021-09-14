@@ -18,6 +18,10 @@
 
 #include "server.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @Description Read int array
  *
@@ -38,26 +42,6 @@ char **ReadCharArray(Context *context, int size);
 
 /**
  * @Description Parse the context to obtain data. Call the corresponding function
- *              LoadDriver and assemble the function to obtain data.
- *
- * @param server - Pointer to the global structure of the communication server.
- * @param context - Pointer to the global communication context structure of the server.
- * @return int - 0 Success, -1 Failed.
- */
-int RpcLoadDriver(RpcServer *server, Context *context);
-
-/**
- * @Description Parse the context to obtain data. Call the corresponding function
- *              UnloadDriver and assemble the function to obtain data.
- *
- * @param server - Pointer to the global structure of the communication server.
- * @param context - Pointer to the global communication context structure of the server.
- * @return int - 0 Success, -1 Failed.
- */
-int RpcUnloadDriver(RpcServer *server, Context *context);
-
-/**
- * @Description Parse the context to obtain data. Call the corresponding function
  *              GetName and assemble the function to obtain data.
  *
  * @param server - Pointer to the global structure of the communication server.
@@ -75,4 +59,8 @@ int RpcGetName(RpcServer *server, Context *context);
  * @return int - 0 Success, -1 Failed.
  */
 int RpcGetType(RpcServer *server, Context *context);
+
+#ifdef __cplusplus
+}
+#endif
 #endif

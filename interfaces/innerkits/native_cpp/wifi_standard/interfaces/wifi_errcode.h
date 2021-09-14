@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_WIFIERRCODE_H
-#define OHOS_WIFIERRCODE_H
+#ifndef OHOS_WIFI_ERRCODE_H
+#define OHOS_WIFI_ERRCODE_H
 
 namespace OHOS {
 namespace Wifi {
@@ -35,6 +35,11 @@ enum ErrCode {
     WIFI_OPT_SCAN_NOT_OPENED,         /* scan service not opened */
     WIFI_OPT_AP_NOT_OPENED,           /* ap service not opened */
     WIFI_OPT_INVALID_CONFIG,          /* invalid config */
+    WIFI_OPT_P2P_NOT_OPENED,          /* p2p service not opened */
+    WIFI_OPT_P2P_MAC_NOT_FOUND,
+    WIFI_OPT_P2P_ERR_MAC_FORMAT,
+    WIFI_OPT_P2P_ERR_INTENT,
+    WIFI_OPT_P2P_ERR_SIZE_NW_NAME,
 };
 }  // namespace Wifi
 }  // namespace OHOS

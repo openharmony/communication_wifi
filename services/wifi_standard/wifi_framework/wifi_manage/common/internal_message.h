@@ -21,6 +21,7 @@
 #include <memory>
 #include <mutex>
 #include <string>
+#include <any>
 
 namespace OHOS {
 namespace Wifi {
@@ -110,20 +111,6 @@ public:
     int GetParam2() const;
 
     /**
-     * @Description : Obtains the message object.
-     *
-     * @return char*
-     */
-    const char *GetMessageObj() const;
-
-    /**
-     * @Description : Obtains the object size.
-     *
-     * @return int
-     */
-    int GetObjSize() const;
-
-    /**
      * @Description : Obtains Integer data from message.
      *
      * @return int
@@ -187,6 +174,41 @@ public:
     void SetParam2(int param2);
 
     /**
+     * @DescriptionSet the Message Obj object - brief
+     * @tparam  - T Custom type to be set
+     * @param  messageObj - User-defined data to be set
+     */
+    template<typename T>
+    void SetMessageObj(const T &messageObj)
+    {
+        mMessageObj = messageObj;
+    }
+
+    /**
+     * @DescriptionSet the Message Obj object - brief
+     * @tparam  - T Custom type to be set
+     * @param  messageObj - User-defined data to be set
+     */
+    template<typename T>
+    void SetMessageObj(T &&messageObj)
+    {
+        mMessageObj = T(messageObj);
+    }
+
+    /**
+     * @DescriptionGet the Message Obj object
+     * @tparam  - T Custom type to be set
+     * @param  messageObj - Gets data of an actual specific object.
+     * @return - bool true:success   false:failed  
+     */
+    template<typename T>
+    bool GetMessageObj(T &messageObj) const
+    {
+        messageObj = std::any_cast<const T &>(mMessageObj);
+        return true;
+    }
+
+    /**
      * @Description : Release Message Object.
      *
      */
@@ -232,12 +254,10 @@ public:
     int mParam1;
     /* Parameter 2 */
     int mParam2;
-    /* Message body, which can be empty and can be directly copied. */
-    char *pMessageObj;
+    /* any message obj. */
+    std::any mMessageObj;
     /* Message bodies that cannot be directly copied */
     MessageBody mMessageBody;
-    /* Message body length */
-    int mObjSize;
     /* Next message in the resource pool or message queue */
     InternalMessage *pNextMsg;
     /* Message execution time */
@@ -276,6 +296,15 @@ public:
     InternalMessage *CreateMessage(int messageName);
 
     /**
+     * @Description :Obtaining Message Information.
+     *
+     * @param messageName - Message name.[in]
+     * @param messageObj - Message pointer.[in]
+     * @return InternalMessage*
+     */
+    InternalMessage *CreateMessage(int messageName, const std::any &messageObj);
+
+    /**
      * @Description : Obtaining Message Information.
      *
      * @param messageName - Message name.[in]
@@ -284,6 +313,17 @@ public:
      * @return InternalMessage*
      */
     InternalMessage *CreateMessage(int messageName, int param1, int param2);
+
+    /**
+     * @Description : Obtaining Message Information.
+     *
+     * @param messageName - Message name.[in]
+     * @param param1 - param1.[in]
+     * @param param2 - param2.[in]
+     * @param messageObj - Message pointer.[in]
+     * @return InternalMessage*
+     */
+    InternalMessage *CreateMessage(int messageName, int param1, int param2, const std::any &messageObj);
 
     /**
      * @Description :Recycle message.

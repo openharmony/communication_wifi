@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_IDL_IWIFIHOTSPOTIFACE_H
-#define OHOS_IDL_IWIFIHOTSPOTIFACE_H
+#ifndef OHOS_IDL_IWIFI_HOTSPOT_IFACE_H
+#define OHOS_IDL_IWIFI_HOTSPOT_IFACE_H
 
 #include <stdint.h>
 #include "wifi_error_no.h"
@@ -23,9 +23,6 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#define EVENTS_STA_JOIN_LEAVE_NUM 2
-#define EVENTS_AP_DISABLE_ENABLE_NUM 2
 
 /**
  * @Description Sets the AP event callback function.
@@ -61,7 +58,7 @@ WifiErrorNo StopSoftAp(void);
  * @param config - HostapdConfig object's point.
  * @return WifiErrorNo
  */
-WifiErrorNo SetHostapdConfig(HostsapdConfig *config);
+WifiErrorNo SetHostapdConfig(HostapdConfig *config);
 
 /**
  * @Description Obtains information about all connected STAs.

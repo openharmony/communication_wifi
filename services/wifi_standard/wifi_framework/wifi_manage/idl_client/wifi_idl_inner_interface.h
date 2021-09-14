@@ -17,6 +17,7 @@
 #define OHOS_WIFI_IDL_INNER_INTERFACE_H
 
 #include "client.h"
+#include "i_wifi_struct.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -28,18 +29,30 @@ extern "C" {
  * @return RpcClient*
  */
 RpcClient *GetApRpcClient(void);
+
+void OnApStaJoinOrLeave(const CStationInfo *info);
+void OnApEnableOrDisable(int satus);
+
 /**
  * @Description Get the Chip Rpc Client object.
  *
  * @return RpcClient*
  */
 RpcClient *GetChipRpcClient(void);
+
 /**
  * @Description Get the Sta Rpc Client object.
  *
  * @return RpcClient*
  */
 RpcClient *GetStaRpcClient(void);
+
+void OnConnectChanged(int status, int networkId, const char *mac);
+void OnWpaStateChanged(int status);
+void OnWpaSsidWrongKey(int status);
+void OnWpsOverlap(int status);
+void OnWpsTimeOut(int status);
+
 /**
  * @Description Get the Supplicant Rpc Client object.
  *
@@ -47,6 +60,39 @@ RpcClient *GetStaRpcClient(void);
  */
 RpcClient *GetSupplicantRpcClient(void);
 
+void OnScanNotify(int status);
+
+/**
+ * @Description Get the P2p Rpc Client object.
+ *
+ * @return RpcClient*
+ */
+RpcClient *GetP2pRpcClient(void);
+
+void OnP2pConnectSupplicant(int state);
+void OnP2pDeviceFound(const HidlP2pDeviceInfo *info);
+void OnP2pDeviceLost(const char *p2pDeviceAddress);
+void OnP2pGoNegotiationRequest(const char *srcAddress, short passwordId);
+void OnP2pGoNegotiationSuccess(void);
+void OnP2pGoNegotiationFailure(int status);
+void OnP2pInvitationResult(const char *bssid, int status);
+void OnP2pInvitationReceived(const HidlP2pInvitationInfo *info);
+void OnP2pGroupFormationSuccess(void);
+void OnP2pGroupFormationFailure(const char *failureReason);
+void OnP2pGroupStarted(const HidlP2pGroupInfo *group);
+void OnP2pGroupRemoved(const char *groupIfName, int isGo);
+void OnP2pProvisionDiscoveryPbcRequest(const char *p2pDeviceAddress);
+void OnP2pProvisionDiscoveryPbcResponse(const char *p2pDeviceAddress);
+void OnP2pProvisionDiscoveryEnterPin(const char *p2pDeviceAddress);
+void OnP2pProvisionDiscoveryShowPin(const char *p2pDeviceAddress, const char *generatedPin);
+void OnP2pProvisionDiscoveryFailure(void);
+void OnP2pFindStopped(void);
+void OnP2pServiceDiscoveryResponse(
+    const char *srcAddress, short updateIndicator, const unsigned char *tlvs, size_t tlvsLength);
+void OnP2pStaDeauthorized(const char *p2pDeviceAddress);
+void OnP2pStaAuthorized(const char *p2pDeviceAddress);
+void OnP2pConnectSupplicantFailed(void);
+void OnP2pServDiscReq(const HidlP2pServDiscReqInfo *info);
 #ifdef __cplusplus
 }
 #endif

@@ -88,6 +88,19 @@ ohos_source_set("wifi_scan_proxy_impl") {
   external_deps = [ "ipc:ipc_core" ]
 }
 
+ohos_source_set("wifi_p2p_proxy_impl") {
+  sources = [
+    "src/wifi_p2p_impl.cpp",
+    "src/wifi_p2p_proxy.cpp",
+  ]
+
+  configs = [
+    ":wifi_sdk_config",
+    ":wifi_sdk_header",
+  ]
+
+  external_deps = [ "ipc:ipc_core" ]
+}
 ohos_shared_library("wifi_sdk") {
   install_enable = true
 
@@ -102,6 +115,9 @@ ohos_shared_library("wifi_sdk") {
     "src/wifi_device_callback_stub.cpp",
     "src/wifi_hotspot.cpp",
     "src/wifi_hotspot_callback_stub.cpp",
+    "src/wifi_p2p.cpp",
+    "src/wifi_p2p_callback_stub.cpp",
+    "src/wifi_p2p_msg.cpp",
     "src/wifi_scan.cpp",
     "src/wifi_scan_callback_stub.cpp",
   ]
@@ -109,6 +125,7 @@ ohos_shared_library("wifi_sdk") {
   deps = [
     ":wifi_device_proxy_impl",
     ":wifi_hotspot_proxy_impl",
+    ":wifi_p2p_proxy_impl",
     ":wifi_scan_proxy_impl",
     "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog",
     "//base/notification/ces_standard/frameworks/core:cesfwk_core",

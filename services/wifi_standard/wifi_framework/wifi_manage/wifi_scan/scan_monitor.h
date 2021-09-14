@@ -19,7 +19,6 @@
 #include "wifi_log.h"
 #include "wifi_error_no.h"
 #include "wifi_idl_define.h"
-#include "wifi_supplicant_hal_interface.h"
 #include "scan_common.h"
 #include "scan_state_machine.h"
 
@@ -45,9 +44,8 @@ public:
      * @Description  Receive an event notification.
      *
      * @param result - Received events[in]
-     * @param pInstance - function pointer[in]
      */
-    static void ReceiveScanEventFromIdl(int result, void *pInstance);
+    void ReceiveScanEventFromIdl(int result);
 
 private:
     ScanStateMachine *pScanStateMachine;

@@ -18,6 +18,10 @@
 
 #include "server.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @Description Parse the context to obtain data. Call the corresponding function
  *              Start and assemble the function to obtain data.
@@ -50,13 +54,13 @@ int RpcStartScan(RpcServer *server, Context *context);
 
 /**
  * @Description Parse the context to obtain data. Call the corresponding function
- *              GetScanResults and assemble the function to obtain data.
+ *              GetScanInfos and assemble the function to obtain data.
  *
  * @param server - Pointer to the global structure of the communication server.
  * @param context - Pointer to the global communication context structure of the server.
  * @return int - 0 Success, -1 Failed.
  */
-int RpcGetScanResults(RpcServer *server, Context *context);
+int RpcGetScanInfos(RpcServer *server, Context *context);
 
 /**
  * @Description Parse the context to obtain data. Call the corresponding function
@@ -340,16 +344,6 @@ int RpcWpaAutoConnect(RpcServer *server, Context *context);
 
 /**
  * @Description Parse the context to obtain data. Call the corresponding function
- *              WpaReconfigure and assemble the function to obtain data.
- *
- * @param server - Pointer to the global structure of the communication server.
- * @param context - Pointer to the global communication context structure of the server.
- * @return int - 0 Success, -1 Failed.
- */
-int RpcWpaReconfigure(RpcServer *server, Context *context);
-
-/**
- * @Description Parse the context to obtain data. Call the corresponding function
  *              WpaBlocklistClear and assemble the function to obtain data.
  *
  * @param server - Pointer to the global structure of the communication server.
@@ -367,4 +361,18 @@ int RpcWpaBlocklistClear(RpcServer *server, Context *context);
  * @return int - 0 Success, -1 Failed.
  */
 int RpcGetNetworkList(RpcServer *server, Context *context);
+
+/**
+ * @Description Parse the context to obtain data. Call the corresponding function
+ *              GetConnectSignalInfo and assemble the function to obtain data.
+ *
+ * @param server - Pointer to the global structure of the communication server.
+ * @param context - Pointer to the global communication context structure of the server.
+ * @return int - 0 Success, -1 Failed.
+ */
+int RpcGetConnectSignalInfo(RpcServer *server, Context *context);
+
+#ifdef __cplusplus
+}
+#endif
 #endif

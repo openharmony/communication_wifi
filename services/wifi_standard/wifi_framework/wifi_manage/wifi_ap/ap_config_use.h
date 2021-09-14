@@ -18,9 +18,7 @@
 #include <vector>
 #include "ap_define.h"
 #include "ap_macro.h"
-#include "wifi_ap_hal_interface.h"
 #include "wifi_msg.h"
-#include "wifi_settings.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -34,60 +32,45 @@ constexpr int CENTER_FREP_DIFF = 5;
 constexpr int CHANNEL_2G_MIN = 1;
 constexpr int CHANNEL_5G_MIN = 34;
 
+using ChannelsTable = std::map<BandType, std::vector<int32_t>>;
 class ApConfigUse {
+    FRIEND_GTEST(ApIdleState);
+
 public:
-    /**
-     * @Description  Obtains the single instance
-     * @param None
-     * @return The reference of singleton objects
-     */
-    static ApConfigUse &GetInstance();
-    /**
-     * @Description  Delete the single instance
-     * @param None
-     * @return None
-     */
-    static void DeleteInstance();
     /**
      * @Description  Convert the frequency in the container into a channel.
      * @param freqVector - frequency vector input
      * @param chanVector - Channel vector output
      * @return None
      */
-    void TransformFrequencyIntoChannel(std::vector<int> &freqVector, std::vector<int> &chanVector) const;
+    virtual void TransformFrequencyIntoChannel(const std::vector<int> &freqVector, std::vector<int> &chanVector) const;
     /**
-     * @Description  Check whether the channel or frequency band of the configuration
-                     item is available and configure the configuration item.
+     * @Description  Printf the hostapd cfg to log display.
      * @param apConfig - configuration input
-     * @return true: success    false: failed
+     * @return None
      */
-    bool SetConfig(HotspotConfig &apConfig) const;
+    virtual void LogConfig(HotspotConfig &apConfig) const;
     /**
      * @Description  Check is a valid 2.4G frequency.
      * @param freq - Frequency input
      * @return true: is valid    false: bad frequency
      */
-    bool IsValid24GHz(const int &freq) const;
+    virtual bool IsValid24GHz(int freq) const;
     /**
      * @Description  Check is a valid 5G frequency.
      * @param freq - Frequency input
      * @return true: is valid    false: bad frequency
      */
-    bool IsValid5GHz(const int &freq) const;
-    /**
-     * @Description  Obtain and report available channel information.
-     * @param None
-     * @return true: success    false: failed
-     */
-    bool ObtainValidChannels() const;
-    /**
-     * @Description  Obtain and report available channel information.
-     * @param None
-     * @return true: success    false: failed
-     */
-    void CheckBandChannel(HotspotConfig &apConfig) const;
+    virtual bool IsValid5GHz(int freq) const;
 
-private:
+    /**
+     * @Description  Obtain and report available channel information.
+     * @param apConfig - configuration input
+     * @param validChanTable - Valid channel tables.
+     * @return None
+     */
+    virtual void CheckBandChannel(HotspotConfig &apConfig, const ChannelsTable &validChanTable) const;
+
     /**
      * @Description  construction method
      * @param None
@@ -99,17 +82,16 @@ private:
      * @param None
      * @return None
      */
-    ~ApConfigUse();
+    virtual ~ApConfigUse();
     /**
      * @Description  Convert frequency to channel number
      * @param freq - frequency to convert
      * @return success: channel num    failed: -1
      */
-    int TransformFrequencyIntoChannel(const int freq) const;
+    virtual int TransformFrequencyIntoChannel(const int freq) const;
 
 private:
     DISALLOW_COPY_AND_ASSIGN(ApConfigUse)
-    static ApConfigUse *g_instance;
 };
 }  // namespace Wifi
 }  // namespace OHOS

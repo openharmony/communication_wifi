@@ -39,15 +39,15 @@ public:
     DhcpFunc() {}
     ~DhcpFunc() {}
 
-    static std::string IpToDot(unsigned int nIp);
-    static unsigned int IPtoInt(const std::string& strIp);
-    static bool Ip4StrConToInt(const std::string& strIp, uint32_t& uIp);
-    static std::string Ip4IntConToStr(uint32_t uIp);
+    static bool Ip4StrConToInt(const std::string& strIp, uint32_t& uIp, bool bHost = true);
+    static std::string Ip4IntConToStr(uint32_t uIp, bool bHost = true);
     static bool Ip6StrConToChar(const std::string& strIp, uint8_t chIp[], size_t uSize);
     static std::string Ip6CharConToStr(uint8_t chIp[], int size);
     static bool CheckIpStr(const std::string& strIp);
-    static int GetLocalIp(const std::string ethInf, std::string& localIp);
+    static int GetLocalIp(const std::string strInf, std::string& strIp, std::string& strMask);
     static int GetLocalMac(const std::string ethInf, std::string& ethMac);
+    static int CheckRangeNetwork(const std::string strInf, const std::string strBegin, const std::string strEnd);
+    static bool CheckSameNetwork(const uint32_t srcIp, const uint32_t dstIp, const uint32_t maskIp);
 
     static bool IsExistFile(const std::string& filename);
     static bool CreateFile(const std::string& filename, const std::string& filedata);

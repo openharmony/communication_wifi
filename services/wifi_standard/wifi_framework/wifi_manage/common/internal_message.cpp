@@ -77,20 +77,12 @@ InternalMessage::InternalMessage()
     : mMsgName(0),
       mParam1(0),
       mParam2(0),
-      pMessageObj(nullptr),
-      mObjSize(0),
       pNextMsg(nullptr),
       mHandleTime(0)
 {}
 
 InternalMessage::~InternalMessage()
 {
-    if (pMessageObj != nullptr) {
-        delete[] pMessageObj;
-        pMessageObj = nullptr;
-    }
-
-    return;
 }
 
 int InternalMessage::GetMessageName() const
@@ -106,16 +98,6 @@ int InternalMessage::GetParam1() const
 int InternalMessage::GetParam2() const
 {
     return mParam2;
-}
-
-const char *InternalMessage::GetMessageObj() const
-{
-    return pMessageObj;
-}
-
-int InternalMessage::GetObjSize() const
-{
-    return mObjSize;
 }
 
 int InternalMessage::GetIntFromMessage()
@@ -169,11 +151,7 @@ void InternalMessage::SetParam2(int param2)
 
 void InternalMessage::ReleaseMessageObj()
 {
-    if (pMessageObj != nullptr) {
-        delete[] pMessageObj;
-        pMessageObj = nullptr;
-        mObjSize = 0;
-    }
+    mMessageObj.reset();
     return;
 }
 
@@ -239,7 +217,7 @@ InternalMessage *MessageManage::CreateMessage()
         }
     }
 
-    auto pMessage = new InternalMessage();
+    auto pMessage = new (std::nothrow) InternalMessage();
     return pMessage;
 }
 
@@ -253,6 +231,7 @@ InternalMessage *MessageManage::CreateMessage(const InternalMessage *orig)
     m->SetMessageName(orig->GetMessageName());
     m->SetParam1(orig->GetParam1());
     m->SetParam2(orig->GetParam2());
+    m->mMessageObj = orig->mMessageObj;
     m->CopyMessageBody(orig->GetMessageBody());
 
     return m;
@@ -269,6 +248,19 @@ InternalMessage *MessageManage::CreateMessage(int messageName)
     return m;
 }
 
+InternalMessage *MessageManage::CreateMessage(int messageName, const std::any &messageObj)
+{
+    InternalMessage *m = CreateMessage();
+    if (m == nullptr) {
+        return nullptr;
+    }
+
+    m->SetMessageName(messageName);
+
+    m->mMessageObj = messageObj;
+    return m;
+}
+
 InternalMessage *MessageManage::CreateMessage(int messageName, int param1, int param2)
 {
     InternalMessage *m = CreateMessage();
@@ -279,6 +271,20 @@ InternalMessage *MessageManage::CreateMessage(int messageName, int param1, int p
     m->SetMessageName(messageName);
     m->SetParam1(param1);
     m->SetParam2(param2);
+    return m;
+}
+
+InternalMessage *MessageManage::CreateMessage(int messageName, int param1, int param2, const std::any &messageObj)
+{
+    InternalMessage *m = CreateMessage();
+    if (m == nullptr) {
+        return nullptr;
+    }
+
+    m->SetMessageName(messageName);
+    m->SetParam1(param1);
+    m->SetParam2(param2);
+    m->mMessageObj = messageObj;
     return m;
 }
 

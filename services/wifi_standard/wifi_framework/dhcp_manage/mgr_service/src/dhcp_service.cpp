@@ -22,14 +22,14 @@ namespace OHOS {
 namespace Wifi {
 DhcpService::DhcpService() : m_pClientService(nullptr), m_pServerService(nullptr)
 {
-    WIFI_LOGI("DhcpService::DhcpService()...");
+    WIFI_LOGI("DhcpService constructor...");
     DhcpClientServiceImpl::m_mapDhcpResult.clear();
     DhcpClientServiceImpl::m_mapDhcpInfo.clear();
 }
 
 DhcpService::~DhcpService()
 {
-    WIFI_LOGI("DhcpService::~DhcpService()...");
+    WIFI_LOGI("DhcpService destructor...");
     DhcpClientServiceImpl::m_mapDhcpResult.clear();
     DhcpClientServiceImpl::m_mapDhcpInfo.clear();
 }
@@ -102,12 +102,9 @@ int DhcpService::ReleaseDhcpClient(const std::string& ifname)
 
 int DhcpService::StartDhcpServer(const std::string& ifname)
 {
-    if (m_pServerService == nullptr) {
-        m_pServerService = std::make_unique<DhcpServerServiceImpl>();
-        if (m_pServerService == nullptr) {
-            WIFI_LOGE("DhcpService::StartDhcpServer() std::make_unique<DhcpServerServiceImpl>() failed!");
-            return DHCP_OPT_FAILED;
-        }
+    if (InitServerService() != DHCP_OPT_SUCCESS) {
+        WIFI_LOGE("DhcpService::StartDhcpServer() InitServerService failed!");
+        return DHCP_OPT_FAILED;
     }
 
     return m_pServerService->StartDhcpServer(ifname);
@@ -115,12 +112,9 @@ int DhcpService::StartDhcpServer(const std::string& ifname)
 
 int DhcpService::StopDhcpServer(const std::string& ifname)
 {
-    if (m_pServerService == nullptr) {
-        m_pServerService = std::make_unique<DhcpServerServiceImpl>();
-        if (m_pServerService == nullptr) {
-            WIFI_LOGE("DhcpService::StopDhcpServer() std::make_unique<DhcpServerServiceImpl>() failed!");
-            return DHCP_OPT_FAILED;
-        }
+    if (InitServerService() != DHCP_OPT_SUCCESS) {
+        WIFI_LOGE("DhcpService::StopDhcpServer() InitServerService failed!");
+        return DHCP_OPT_FAILED;
     }
 
     return m_pServerService->StopDhcpServer(ifname);
@@ -128,8 +122,8 @@ int DhcpService::StopDhcpServer(const std::string& ifname)
 
 int DhcpService::GetServerStatus()
 {
-    if (m_pServerService == nullptr) {
-        WIFI_LOGE("DhcpService::GetServerStatus() error, m_pServerService = nullptr!");
+    if (InitServerService() != DHCP_OPT_SUCCESS) {
+        WIFI_LOGE("DhcpService::GetServerStatus() InitServerService failed!");
         return DHCP_OPT_FAILED;
     }
 
@@ -138,8 +132,8 @@ int DhcpService::GetServerStatus()
 
 int DhcpService::PutDhcpRange(const std::string& tagName, const DhcpRange& range)
 {
-    if (m_pServerService == nullptr) {
-        WIFI_LOGE("DhcpService::PutDhcpRange() error, m_pServerService = nullptr!");
+    if (InitServerService() != DHCP_OPT_SUCCESS) {
+        WIFI_LOGE("DhcpService::PutDhcpRange() InitServerService failed!");
         return DHCP_OPT_FAILED;
     }
 
@@ -148,8 +142,8 @@ int DhcpService::PutDhcpRange(const std::string& tagName, const DhcpRange& range
 
 int DhcpService::RemoveDhcpRange(const std::string& tagName, const DhcpRange& range)
 {
-    if (m_pServerService == nullptr) {
-        WIFI_LOGE("DhcpService::RemoveDhcpRange() error, m_pServerService = nullptr!");
+    if (InitServerService() != DHCP_OPT_SUCCESS) {
+        WIFI_LOGE("DhcpService::RemoveDhcpRange() InitServerService failed!");
         return DHCP_OPT_FAILED;
     }
 
@@ -158,8 +152,8 @@ int DhcpService::RemoveDhcpRange(const std::string& tagName, const DhcpRange& ra
 
 int DhcpService::RemoveAllDhcpRange(const std::string& tagName)
 {
-    if (m_pServerService == nullptr) {
-        WIFI_LOGE("DhcpService::RemoveAllDhcpRange() error, m_pServerService = nullptr!");
+    if (InitServerService() != DHCP_OPT_SUCCESS) {
+        WIFI_LOGE("DhcpService::RemoveAllDhcpRange() InitServerService failed!");
         return DHCP_OPT_FAILED;
     }
 
@@ -168,8 +162,8 @@ int DhcpService::RemoveAllDhcpRange(const std::string& tagName)
 
 int DhcpService::SetDhcpRange(const std::string& ifname, const DhcpRange& range)
 {
-    if (m_pServerService == nullptr) {
-        WIFI_LOGE("DhcpService::SetDhcpRange() error, m_pServerService = nullptr!");
+    if (InitServerService() != DHCP_OPT_SUCCESS) {
+        WIFI_LOGE("DhcpService::SetDhcpRange() InitServerService failed!");
         return DHCP_OPT_FAILED;
     }
 
@@ -178,8 +172,8 @@ int DhcpService::SetDhcpRange(const std::string& ifname, const DhcpRange& range)
 
 int DhcpService::SetDhcpRange(const std::string& ifname, const std::string& tagName)
 {
-    if (m_pServerService == nullptr) {
-        WIFI_LOGE("DhcpService::SetDhcpRange() error, m_pServerService = nullptr!");
+    if (InitServerService() != DHCP_OPT_SUCCESS) {
+        WIFI_LOGE("DhcpService::SetDhcpRange() tag InitServerService failed!");
         return DHCP_OPT_FAILED;
     }
 
@@ -188,8 +182,8 @@ int DhcpService::SetDhcpRange(const std::string& ifname, const std::string& tagN
 
 int DhcpService::GetLeases(std::vector<std::string>& leases)
 {
-    if (m_pServerService == nullptr) {
-        WIFI_LOGE("DhcpService::GetLeases() error, m_pServerService = nullptr!");
+    if (InitServerService() != DHCP_OPT_SUCCESS) {
+        WIFI_LOGE("DhcpService::GetLeases() InitServerService failed!");
         return DHCP_OPT_FAILED;
     }
 
@@ -198,12 +192,24 @@ int DhcpService::GetLeases(std::vector<std::string>& leases)
 
 int DhcpService::GetDhcpSerProExit(const std::string& ifname, IDhcpResultNotify *pResultNotify)
 {
-    if (m_pServerService == nullptr) {
-        WIFI_LOGE("DhcpService::GetDhcpSerProExit() error, m_pServerService = nullptr!");
+    if (InitServerService() != DHCP_OPT_SUCCESS) {
+        WIFI_LOGE("DhcpService::GetDhcpSerProExit() InitServerService failed!");
         return DHCP_OPT_FAILED;
     }
 
     return m_pServerService->GetDhcpSerProExit(ifname, pResultNotify);
+}
+
+int DhcpService::InitServerService()
+{
+    if (m_pServerService == nullptr) {
+        m_pServerService = std::make_unique<DhcpServerService>();
+        if (m_pServerService == nullptr) {
+            WIFI_LOGE("DhcpService::InitServerService() std::make_unique<DhcpServerService>() failed!");
+            return DHCP_OPT_FAILED;
+        }
+    }
+    return DHCP_OPT_SUCCESS;
 }
 }  // namespace Wifi
 }  // namespace OHOS

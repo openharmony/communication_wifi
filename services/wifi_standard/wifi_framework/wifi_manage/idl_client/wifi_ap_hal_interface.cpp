@@ -16,15 +16,9 @@
 #include <mutex>
 #include "wifi_log.h"
 #include "wifi_error_no.h"
-#include "wifi_idl_inner_interface.h"
 
 #undef LOG_TAG
-#define LOG_TAG "OHWIFI_IDLCLIENT_WIFI_AP_HAL_INTERFACE"
-
-RpcClient *GetApRpcClient(void)
-{
-    return OHOS::Wifi::WifiApHalInterface::GetInstance().mIdlClient->pRpcClient;
-}
+#define LOG_TAG "WifiApHalInterface"
 
 namespace OHOS {
 namespace Wifi {
@@ -83,9 +77,13 @@ WifiErrorNo WifiApHalInterface::GetFrequenciesByBand(int band, std::vector<int> 
     return mIdlClient->GetFrequenciesByBand(band, frequencies);
 }
 
-WifiErrorNo WifiApHalInterface::RegisterApEvent(IWifiApEventCallback callback)
+WifiErrorNo WifiApHalInterface::RegisterApEvent(IWifiApMonitorEventCallback callback)
 {
-    return mIdlClient->RegisterApEvent(callback);
+    WifiErrorNo err = mIdlClient->RegisterApEvent(callback);
+    if (err == WIFI_IDL_OPT_OK || callback.onStaJoinOrLeave == nullptr) {
+        mApCallback = callback;
+    }
+    return err;
 }
 
 WifiErrorNo WifiApHalInterface::SetWifiCountryCode(const std::string &code)
@@ -96,6 +94,11 @@ WifiErrorNo WifiApHalInterface::SetWifiCountryCode(const std::string &code)
 WifiErrorNo WifiApHalInterface::DisconnectStaByMac(const std::string &mac)
 {
     return mIdlClient->ReqDisconnectStaByMac(mac);
+}
+
+const IWifiApMonitorEventCallback &WifiApHalInterface::GetApCallbackInst(void) const
+{
+    return mApCallback;
 }
 }  // namespace Wifi
 }  // namespace OHOS

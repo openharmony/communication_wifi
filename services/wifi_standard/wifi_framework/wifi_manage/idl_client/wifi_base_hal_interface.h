@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_WIFIBASEHALINTERFACE_H
-#define OHOS_WIFIBASEHALINTERFACE_H
+#ifndef OHOS_WIFI_BASE_HAL_INTERFACE_H
+#define OHOS_WIFI_BASE_HAL_INTERFACE_H
 
 #include "wifi_idl_client.h"
 

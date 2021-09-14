@@ -18,10 +18,11 @@
 #include "ap_state_machine.h"
 #include "wifi_logger.h"
 
-DEFINE_WIFILOG_HOTSPOT_LABEL("ApIdleState");
+DEFINE_WIFILOG_HOTSPOT_LABEL("WifiApIdleState");
 namespace OHOS {
 namespace Wifi {
-ApIdleState::ApIdleState() : State("ApIdleState")
+ApIdleState::ApIdleState(ApStateMachine &apStateMachine)
+    : State("ApIdleState"), m_ApStateMachine(apStateMachine)
 {}
 
 ApIdleState::~ApIdleState()
@@ -29,12 +30,12 @@ ApIdleState::~ApIdleState()
 
 void ApIdleState::GoInState()
 {
-    WIFI_LOGI("%{public}s  Enter", GetStateName().c_str());
+    WIFI_LOGI("%{public}s  GoInState.", GetStateName().c_str());
 }
 
 void ApIdleState::GoOutState()
 {
-    WIFI_LOGI("%{public}s  Exit", GetStateName().c_str());
+    WIFI_LOGI("%{public}s  GoOutState.", GetStateName().c_str());
 }
 
 bool ApIdleState::ExecuteStateMsg(InternalMessage *msg)
@@ -48,7 +49,7 @@ bool ApIdleState::ExecuteStateMsg(InternalMessage *msg)
 
     switch (static_cast<ApStatemachineEvent>(msgName)) {
         case ApStatemachineEvent::CMD_START_HOTSPOT: {
-            ApStateMachine::GetInstance().SwitchState(&ApStateMachine::GetInstance().mApStartedState);
+            m_ApStateMachine.SwitchState(&m_ApStateMachine.m_ApStartedState);
             break;
         }
         case ApStatemachineEvent::CMD_UPDATE_HOTSPOTCONFIG_RESULT: {

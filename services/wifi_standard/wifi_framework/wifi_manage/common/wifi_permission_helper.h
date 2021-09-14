@@ -124,6 +124,15 @@ public:
      * @return int
      */
     static int VerifySetWifiConfigPermission(const int &pid, const int &uid);
+
+    /**
+     * @Description : Verify location information about nearby P2P devices Permission.
+     *
+     * @param pid - Process ID.[in]
+     * @param uid - User ID.[in]
+     * @return int
+     */
+    static int VerifyGetWifiDirectDevicePermission(const int &pid, const int &uid);
 };
 }  // namespace Wifi
 }  // namespace OHOS

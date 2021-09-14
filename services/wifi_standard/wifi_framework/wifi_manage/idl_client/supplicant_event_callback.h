@@ -13,22 +13,16 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_SUPPLICANTEVENTCALLBACK_H
-#define OHOS_SUPPLICANTEVENTCALLBACK_H
+#ifndef OHOS_SUPPLICANT_EVENT_CALLBACK_H
+#define OHOS_SUPPLICANT_EVENT_CALLBACK_H
+
+#include <functional>
 
 namespace OHOS {
 namespace Wifi {
 struct SupplicantEventCallback {
-    void *pInstance;
-    void (*onScanNotify)(int result, void *pInstance); /* Scan result notification */
-
-    SupplicantEventCallback()
-    {
-        pInstance = nullptr;
-        onScanNotify = nullptr;
-    }
+    std::function<void(int)> onScanNotify;
 };
 }  // namespace Wifi
 }  // namespace OHOS
-
 #endif

@@ -18,6 +18,7 @@ group("wifi_system_ability") {
     "//foundation/communication/wifi/services/wifi_standard/sa_profile:wifi_standard_sa_profile",
     "//foundation/communication/wifi/services/wifi_standard/wifi_framework/wifi_manage:wifi_device_ability",
     "//foundation/communication/wifi/services/wifi_standard/wifi_framework/wifi_manage:wifi_hotspot_ability",
+    "//foundation/communication/wifi/services/wifi_standard/wifi_framework/wifi_manage:wifi_p2p_ability",
     "//foundation/communication/wifi/services/wifi_standard/wifi_framework/wifi_manage:wifi_scan_ability",
   ]
 }
@@ -27,6 +28,7 @@ group("wifi_manage") {
     "//foundation/communication/wifi/services/wifi_standard/wifi_framework/wifi_manage:wifi_manager_service",
     "//foundation/communication/wifi/services/wifi_standard/wifi_framework/wifi_manage/idl_client:wifi_idl_client",
     "//foundation/communication/wifi/services/wifi_standard/wifi_framework/wifi_manage/wifi_ap:wifi_ap_service",
+    "//foundation/communication/wifi/services/wifi_standard/wifi_framework/wifi_manage/wifi_p2p:wifi_p2p_service",
     "//foundation/communication/wifi/services/wifi_standard/wifi_framework/wifi_manage/wifi_scan:wifi_scan_service",
     "//foundation/communication/wifi/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta:wifi_sta_service",
   ]
@@ -34,7 +36,8 @@ group("wifi_manage") {
 
 group("dhcp_manage") {
   deps = [
+    "//foundation/communication/wifi/services/wifi_standard/wifi_framework/dhcp_manage/dhcp_client:dhcp_client_service",
+    "//foundation/communication/wifi/services/wifi_standard/wifi_framework/dhcp_manage/dhcp_server:dhcp_server",
     "//foundation/communication/wifi/services/wifi_standard/wifi_framework/dhcp_manage/mgr_service:dhcp_manager_service",
-    "//foundation/communication/wifi/services/wifi_standard/wifi_framework/dhcp_manage/dhcp_client:dhcp_client_service"
   ]
 }

@@ -69,52 +69,16 @@ char **ReadCharArray(Context *context, int size)
     return pArray;
 }
 
-int RpcLoadDriver(RpcServer *server, Context *context)
-{
-    if (server == NULL || context == NULL) {
-        return -1;
-    }
-    int size = 0;
-    if (ReadInt(context, &size) < 0) {
-        return -1;
-    }
-    int *events = ReadIntArray(context, size);
-    if (events == NULL) {
-        return -1;
-    }
-    WifiErrorNo err = LoadDriver(events, size);
-    WriteBegin(context, 0);
-    WriteInt(context, err);
-    WriteEnd(context);
-    free(events);
-    return 0;
-}
-
-int RpcUnloadDriver(RpcServer *server, Context *context)
-{
-    if (server == NULL || context == NULL) {
-        return -1;
-    }
-    WifiErrorNo err = UnloadDriver();
-    WriteBegin(context, 0);
-    WriteInt(context, err);
-    WriteEnd(context);
-    return 0;
-}
-
 int RpcGetName(RpcServer *server, Context *context)
 {
     if (server == NULL || context == NULL) {
         return -1;
     }
     int size = 0;
-    if (ReadInt(context, &size) < 0) {
+    if (ReadInt(context, &size) < 0 || size <= 0) {
         return -1;
     }
-    char *ifname = NULL;
-    if (size > 0) {
-        ifname = (char *)calloc(size, sizeof(char));
-    }
+    char *ifname = (char *)calloc(size, sizeof(char));
     if (ifname == NULL) {
         return -1;
     }

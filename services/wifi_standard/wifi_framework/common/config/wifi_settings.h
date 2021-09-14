@@ -12,7 +12,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 #ifndef OHOS_WIFI_SETTINGS_H
 #define OHOS_WIFI_SETTINGS_H
 
@@ -48,7 +47,8 @@ constexpr char DEVICE_CONFIG_FILE_PATH[] = "/data/misc/wifi/device_config.conf";
 constexpr char HOTSPOT_CONFIG_FILE_PATH[] = "/data/misc/wifi/hotspot_config.conf";
 constexpr char BLOCK_LIST_FILE_PATH[] = "/data/misc/wifi/block_list.conf";
 constexpr char WIFI_CONFIG_FILE_PATH[] = "/data/misc/wifi/wifi_config.conf";
-
+constexpr char WIFI_P2P_GROUP_INFO_FILE_PATH[] = "/data/misc/wifi/p2p_groups.conf";
+constexpr char WIFI_P2P_VENDOR_CONFIG_FILE_PATH[] = "/data/misc/wifi/p2p_vendor_config.conf";
 namespace OHOS {
 namespace Wifi {
 using ChannelsTable = std::map<BandType, std::vector<int32_t>>;
@@ -125,6 +125,22 @@ public:
      * @return int - 0 success
      */
     int GetScanInfoList(std::vector<WifiScanInfo> &results);
+
+    /**
+     * @Description save the p2p connected info
+     *
+     * @param connInfo - WifiP2pInfo object
+     * @return int - 0 success
+     */
+    int SaveP2pInfo(WifiP2pInfo &connInfo);
+
+    /**
+     * @Description Get the p2p connected info
+     *
+     * @param connInfo - output the p2p connected info
+     * @return int - 0 success
+     */
+    int GetP2pInfo(WifiP2pInfo &connInfo);
 
     /**
      * @Description Get the scan control policy info
@@ -236,6 +252,43 @@ public:
     int ReloadDeviceConfig();
 
     /**
+     * @Description Synchronizing saved the wifi WifiP2pGroupInfo config into config file
+     *
+     * @return int - 0 success; -1 save file failed
+     */
+    int SyncWifiP2pGroupInfoConfig();
+
+    /**
+     * @Description Reload wifi WifiP2pGroupInfo config from config file
+     *
+     * @return int - 0 success; -1 read config file failed
+     */
+    int ReloadWifiP2pGroupInfoConfig();
+
+    /**
+     * @Description Save WifiP2pGroupInfo
+     *
+     * @param groups - input wifi p2p groups config results
+     * @return int - 0 success
+     */
+    int SetWifiP2pGroupInfo(const std::vector<WifiP2pGroupInfo> &groups);
+
+    /**
+     * @Description Delete a WifiP2pGroupInfo node
+     *
+     * @return int
+     */
+    int RemoveWifiP2pGroupInfo();
+
+    /**
+     * @Description Get all saved wifi p2p groups config
+     *
+     * @param results - output wifi p2p groups config results
+     * @return int - 0 success
+     */
+    int GetWifiP2pGroupInfo(std::vector<WifiP2pGroupInfo> &groups);
+
+    /**
      * @Description Get the dhcp info
      *
      * @param info - output IpInfo struct
@@ -338,6 +391,29 @@ public:
     int SyncHotspotConfig();
 
     /**
+     * @Description Set the p2p vendor config
+     *
+     * @param config - input P2pVendorConfig struct
+     * @return int - 0 success
+     */
+    int SetP2pVendorConfig(const P2pVendorConfig &config);
+
+    /**
+     * @Description Get the p2p vendor config
+     *
+     * @param config - output P2pVendorConfig struct
+     * @return int - 0 success
+     */
+    int GetP2pVendorConfig(P2pVendorConfig &config);
+
+    /**
+     * @Description Synchronizing saved the P2p Vendor config into config file
+     *
+     * @return int - 0 success; -1 save file failed
+     */
+    int SyncP2pVendorConfig();
+
+    /**
      * @Description Get current hotspot accept linked stations
      *
      * @param results - output StationInfo results
@@ -425,6 +501,51 @@ public:
     int ClearValidChannels();
 
     /**
+     * @Description set the p2p state
+     *
+     * @param state - the p2p state
+     * @return int - 0 success
+     */
+    int SetP2pState(int state);
+
+    /**
+     * @Description Get current p2p state
+     *
+     * @return int - the p2p state, NONE/IDLE/STARTING/STARTED/CLOSING/CLOSED
+     */
+    int GetP2pState();
+
+    /**
+     * @Description set the p2p discover state
+     *
+     * @param state - the p2p discover state
+     * @return int - 0 success
+     */
+    int SetP2pDiscoverState(int state);
+
+    /**
+     * @Description Get current p2p discover state
+     *
+     * @return int -the p2p discover state, P2P_DISCOVER_NONE/P2P_DISCOVER_STARTING/P2P_DISCOVER_CLOSED
+     */
+    int GetP2pDiscoverState();
+
+    /**
+     * @Description set the p2p connected state
+     *
+     * @param state - the p2p connected state
+     * @return int - 0 success
+     */
+    int SetP2pConnectedState(int state);
+
+    /**
+     * @Description Get current p2p connected state
+     *
+     * @return int - the connected state, P2P_CONNECTED_NONE/P2P_CONNECTED_STARTING/P2P_CONNECTED_CLOSED
+     */
+    int GetP2pConnectedState();
+
+    /**
      * @Description Get signal level about given rssi and band
      *
      * @param rssi - rssi info
@@ -496,7 +617,7 @@ public:
 
     /**
      * @Description Get the config whether can open sta when airplane mode opened
-     * 
+     *
      * @return true - can open
      * @return false - can't open
      */
@@ -768,24 +889,24 @@ public:
      */
     int GetMinRssi5Ghz();
 
+    /**
+     * @Description set the device name
+     *
+     * @param deviceName - device name
+     * @return int - result
+     */
+    int SetP2pDeviceName(const std::string &deviceName);
+
 private:
     WifiSettings();
-
-    /**
-     * @Description Initial default Hotspot configuration
-     *
-     */
+    void InitWifiConfig();
     void InitDefaultHotspotConfig();
-
-    /**
-     * @Description Init maximum number of connections
-     *
-     */
+    void InitHotspotConfig();
+    void InitDefaultP2pVendorConfig();
+    void InitP2pVendorConfig();
     void InitGetApMaxConnNum();
-    /**
-     * @Description:Preset Scanning Control Policy
-     *
-     */
+    void InitScanControlForbidList();
+    void InitScanControlIntervalList();
     void InitScanControlInfo();
 
 private:
@@ -793,7 +914,9 @@ private:
     std::atomic<int> mWifiState;         /* Sta service state */
     std::atomic<bool> mScanAlwaysActive; /* if scan always */
     std::vector<WifiScanInfo> mWifiScanInfoList;
+    std::vector<WifiP2pGroupInfo> mGroupInfoList;
     ScanControlInfo mScanControlInfo;
+    WifiP2pInfo mWifiP2pInfo;
     std::map<int, WifiDeviceConfig> mWifiDeviceConfig;
     IpInfo mWifiIpInfo;
     WifiLinkedInfo mWifiLinkedInfo;
@@ -801,9 +924,13 @@ private:
     std::string mCountryCode;
     std::atomic<int> mHotspotState;
     HotspotConfig mHotspotConfig;
+    P2pVendorConfig mP2pVendorConfig;
     std::map<std::string, StationInfo> mConnectStationInfo;
     std::map<std::string, StationInfo> mBlockListInfo;
     ChannelsTable mValidChannels;
+    std::atomic<int> mP2pState;
+    std::atomic<int> mP2pDiscoverState;
+    std::atomic<int> mP2pConnectState;
     int mApMaxConnNum;           /* ap support max sta numbers */
     int mLastSelectedNetworkId;  /* last selected networkid */
     time_t mLastSelectedTimeVal; /* last selected time */
@@ -817,11 +944,14 @@ private:
     std::mutex mApMutex;
     std::mutex mConfigMutex;
     std::mutex mInfoMutex;
+    std::mutex mP2pMutex;
 
     WifiConfigFileImpl<WifiDeviceConfig> mSavedDeviceConfig; /* Persistence device config */
     WifiConfigFileImpl<HotspotConfig> mSavedHotspotConfig;
     WifiConfigFileImpl<StationInfo> mSavedBlockInfo;
     WifiConfigFileImpl<WifiConfig> mSavedWifiConfig;
+    WifiConfigFileImpl<WifiP2pGroupInfo> mSavedWifiP2pGroupInfo;
+    WifiConfigFileImpl<P2pVendorConfig> mSavedWifiP2pVendorConfig;
 };
 }  // namespace Wifi
 }  // namespace OHOS

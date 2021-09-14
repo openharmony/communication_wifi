@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_WIFIAPHALINTERFACE_H
-#define OHOS_WIFIAPHALINTERFACE_H
+#ifndef OHOS_WIFI_AP_HAL_INTERFACE_H
+#define OHOS_WIFI_AP_HAL_INTERFACE_H
 
 #include <string>
 #include <vector>
@@ -107,7 +107,7 @@ public:
      *                   registration events.
      * @return WifiErrorNo
      */
-    WifiErrorNo RegisterApEvent(IWifiApEventCallback callback);
+    WifiErrorNo RegisterApEvent(IWifiApMonitorEventCallback callback);
 
     /**
      * @Description Sets the Wi-Fi country code.
@@ -124,6 +124,16 @@ public:
      * @return WifiErrorNo
      */
     WifiErrorNo DisconnectStaByMac(const std::string &mac);
+
+    /**
+     * @Description Get the Ap Callback Inst object
+     *
+     * @return const IWifiApMonitorEventCallback& - register ap callback objects
+     */
+    const IWifiApMonitorEventCallback &GetApCallbackInst(void) const;
+
+private:
+    IWifiApMonitorEventCallback mApCallback;
 };
 }  // namespace Wifi
 }  // namespace OHOS

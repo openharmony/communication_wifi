@@ -156,17 +156,11 @@ int RpcGetIfaceNames(RpcServer *server, Context *context)
         return -1;
     }
     int type = 0;
-    if (ReadInt(context, &type) < 0) {
-        return -1;
-    }
     int size = 0;
-    if (ReadInt(context, &size) < 0) {
+    if (ReadInt(context, &type) < 0 || ReadInt(context, &size) < 0 || size <= 0) {
         return -1;
     }
-    char *ifname = NULL;
-    if (size > 0) {
-        ifname = (char *)calloc(size, sizeof(char));
-    }
+    char *ifname = (char *)calloc(size, sizeof(char));
     if (ifname == NULL) {
         return -1;
     }
@@ -231,13 +225,10 @@ int RpcGetSupportedComboModes(RpcServer *server, Context *context)
         return -1;
     }
     int maxSize = 0;
-    if (ReadInt(context, &maxSize) < 0) {
+    if (ReadInt(context, &maxSize) < 0 || maxSize <= 0) {
         return -1;
     }
-    int *modes = NULL;
-    if (maxSize > 0) {
-        modes = (int *)calloc(maxSize, sizeof(int));
-    }
+    int *modes = (int *)calloc(maxSize, sizeof(int));
     if (modes == NULL) {
         return -1;
     }
@@ -293,10 +284,7 @@ int RpcRequestFirmwareDebugDump(RpcServer *server, Context *context)
         return -1;
     }
     int maxSize = 0;
-    if (ReadInt(context, &maxSize) < 0) {
-        return -1;
-    }
-    if (maxSize <= 0) {
+    if (ReadInt(context, &maxSize) < 0 || maxSize <= 0) {
         return -1;
     }
 

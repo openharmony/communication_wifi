@@ -18,6 +18,10 @@
 
 #include "server.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @Description Parse the context to obtain data. Call the corresponding function
  *              StartSupplicant and assemble the function to obtain data.
@@ -97,4 +101,8 @@ int RpcWpaSetCountryCode(RpcServer *server, Context *context);
  * @return int - 0 Success, -1 Failed.
  */
 int RpcWpaGetCountryCode(RpcServer *server, Context *context);
+
+#ifdef __cplusplus
+}
+#endif
 #endif

@@ -71,7 +71,7 @@ int RpcRequestToSupplicant(RpcServer *server, Context *context)
         return -1;
     }
     int maxSize = 0;
-    if (ReadInt(context, &maxSize) < 0) {
+    if (ReadInt(context, &maxSize) < 0 || maxSize < 0) {
         return -1;
     }
     int len = maxSize + 1;
@@ -101,9 +101,9 @@ int RpcSetPowerSave(RpcServer *server, Context *context)
         return -1;
     }
 
-    WifiErrorNo statusCode = SetPowerSave(mode);
+    WifiErrorNo err = SetPowerSave(mode);
     WriteBegin(context, 0);
-    WriteInt(context, (int)statusCode);
+    WriteInt(context, err);
     WriteEnd(context);
     return 0;
 }
@@ -113,15 +113,8 @@ int RpcWpaSetCountryCode(RpcServer *server, Context *context)
     if (server == NULL || context == NULL) {
         return -1;
     }
-    char countryCode[WIFI_COUNTRY_CODE_MAXLEN] = {0};
-    int ret = ReadStr(context, countryCode, WIFI_COUNTRY_CODE_MAXLEN);
-    int codeSize = 0;
-    if (ret < 0) {
-        return -1;
-    } else if (ret >= 0) {
-        codeSize = strlen(countryCode);
-    }
-    if (codeSize == 0) {
+    char countryCode[WIFI_COUNTRY_CODE_MAXLEN + 1] = {0};
+    if (ReadStr(context, countryCode, sizeof(countryCode)) != 0) {
         return -1;
     }
     WifiErrorNo err = WpaSetCountryCode(countryCode);
@@ -136,17 +129,13 @@ int RpcWpaGetCountryCode(RpcServer *server, Context *context)
     if (server == NULL || context == NULL) {
         return -1;
     }
-    char *countryCode = (char *)calloc(WIFI_COUNTRY_CODE_MAXLEN, sizeof(char));
-    if (countryCode == NULL) {
-        return -1;
-    }
-    WifiErrorNo err = WpaGetCountryCode(countryCode, WIFI_COUNTRY_CODE_MAXLEN);
+    char countryCode[WIFI_COUNTRY_CODE_MAXLEN + 1] = {0};
+    WifiErrorNo err = WpaGetCountryCode(countryCode, WIFI_COUNTRY_CODE_MAXLEN + 1);
     WriteBegin(context, 0);
     WriteInt(context, err);
-    if (err == 0) {
+    if (err == WIFI_HAL_SUCCESS) {
         WriteStr(context, countryCode);
     }
     WriteEnd(context);
-    free(countryCode);
     return 0;
 }

@@ -22,7 +22,7 @@ ohos_shared_library("dhcp_manager_service") {
     "//foundation/communication/wifi/services/wifi_standard/wifi_framework/dhcp_manage/mgr_service/src/dhcp_client_service_impl.cpp",
     "//foundation/communication/wifi/services/wifi_standard/wifi_framework/dhcp_manage/mgr_service/src/dhcp_event_subscriber.cpp",
     "//foundation/communication/wifi/services/wifi_standard/wifi_framework/dhcp_manage/mgr_service/src/dhcp_func.cpp",
-    "//foundation/communication/wifi/services/wifi_standard/wifi_framework/dhcp_manage/mgr_service/src/dhcp_server_service_impl.cpp",
+    "//foundation/communication/wifi/services/wifi_standard/wifi_framework/dhcp_manage/mgr_service/src/dhcp_server_service.cpp",
     "//foundation/communication/wifi/services/wifi_standard/wifi_framework/dhcp_manage/mgr_service/src/dhcp_service.cpp",
   ]
 

@@ -80,15 +80,6 @@ WifiErrorNo StopHostapdHal(void);
 WifiErrorNo GetStaInfos(char *infos, int32_t *size);
 
 /**
- * @Description Configuring the Wi-Fi hotspot channel and maximum number of connections.
- *
- * @param chan - channel.
- * @param mscb
- * @return WifiErrorNo
- */
-WifiErrorNo ConfigHotspot(uint32_t chan, const char *mscb);
-
-/**
  * @Description Setting the AP Country Code.
  *
  * @param code - Country code.
@@ -102,7 +93,7 @@ WifiErrorNo SetCountryCode(const char *code);
  * @param config - Hostapd startup configuration.
  * @return WifiErrorNo
  */
-WifiErrorNo SetHostapdConfig(HostsapdConfig *config);
+WifiErrorNo SetHostapdConfig(HostapdConfig *config);
 
 /**
  * @Description To set the blocklist filtering in AP mode to prohibit

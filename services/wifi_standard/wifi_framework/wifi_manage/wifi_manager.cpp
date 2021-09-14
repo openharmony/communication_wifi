@@ -79,6 +79,7 @@ int WifiManager::Init()
     InitStaCallback();
     InitScanCallback();
     InitApCallback();
+    InitP2pCallback();
     if (!WifiConfigCenter::GetInstance().GetSupportedBandChannel()) {
         WIFI_LOGE("Failed to get current chip supported band and channel!");
     }
@@ -164,6 +165,19 @@ void WifiManager::CloseScanService(void)
     return;
 }
 
+void WifiManager::CloseP2pService(void)
+{
+    WIFI_LOGD("close p2p service");
+    WifiServiceManager::GetInstance().UnloadService(WIFI_SERVICE_P2P);
+    WifiConfigCenter::GetInstance().SetP2pMidState(WifiOprMidState::CLOSED);
+    WifiSettings::GetInstance().SetP2pState(static_cast<int>(P2pState::P2P_STATE_CLOSED));
+    WifiEventCallbackMsg cbMsg;
+    cbMsg.msgCode = WIFI_CBK_MSG_P2P_STATE_CHANGE;
+    cbMsg.msgData = static_cast<int>(P2pState::P2P_STATE_CLOSED);
+    WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
+    return;
+}
+
 void WifiManager::DealCloseServiceMsg(WifiManager &manager)
 {
     const int waitDealTime = 10 * 1000; /* 10 ms */
@@ -185,6 +199,9 @@ void WifiManager::DealCloseServiceMsg(WifiManager &manager)
                 break;
             case WifiCloseServiceCode::AP_SERVICE_CLOSE:
                 CloseApService();
+                break;
+            case WifiCloseServiceCode::P2P_SERVICE_CLOSE:
+                CloseP2pService();
                 break;
             case WifiCloseServiceCode::SERVICE_THREAD_EXIT:
                 WIFI_LOGD("DealCloseServiceMsg thread exit!");
@@ -494,5 +511,108 @@ void WifiManager::DealApGetStaLeave(const StationInfo &info)
     WifiCommonEventHelper::PublishApStaLeaveEvent(0, "ApStaLeaved");
     return;
 }
-} // namespace Wifi
-} // namespace OHOS
+
+void WifiManager::InitP2pCallback(void)
+{
+    mP2pCallback.OnP2pStateChangedEvent = DealP2pStateChanged;
+    mP2pCallback.OnP2pPeersChangedEvent = DealP2pPeersChanged;
+    mP2pCallback.OnP2pServicesChangedEvent = DealP2pServiceChanged;
+    mP2pCallback.OnP2pConnectionChangedEvent = DealP2pConnectionChanged;
+    mP2pCallback.OnP2pThisDeviceChangedEvent = DealP2pThisDeviceChanged;
+    mP2pCallback.OnP2pDiscoveryChangedEvent = DealP2pDiscoveryChanged;
+    mP2pCallback.OnP2pGroupsChangedEvent = DealP2pGroupsChanged;
+    mP2pCallback.OnP2pActionResultEvent = DealP2pActionResult;
+    return;
+}
+
+IP2pServiceCallbacks WifiManager::GetP2pCallback(void)
+{
+    return mP2pCallback;
+}
+
+void WifiManager::DealP2pStateChanged(P2pState state)
+{
+    WifiEventCallbackMsg cbMsg;
+    cbMsg.msgCode = WIFI_CBK_MSG_P2P_STATE_CHANGE;
+    cbMsg.msgData = static_cast<int>(state);
+    WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
+    if (state == P2pState::P2P_STATE_IDLE) {
+        WifiManager::GetInstance().PushServiceCloseMsg(WifiCloseServiceCode::P2P_SERVICE_CLOSE);
+    }
+    if (state == P2pState::P2P_STATE_STARTED) {
+        WifiConfigCenter::GetInstance().SetP2pMidState(WifiOprMidState::OPENING, WifiOprMidState::RUNNING);
+    }
+    WifiCommonEventHelper::PublishP2pStateChangedEvent((int)state, "OnP2pStateChanged");
+    return;
+}
+
+void WifiManager::DealP2pPeersChanged(const std::vector<WifiP2pDevice> &vPeers)
+{
+    WifiEventCallbackMsg cbMsg;
+    cbMsg.msgCode = WIFI_CBK_MSG_PEER_CHANGE;
+    cbMsg.device = vPeers;
+    WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
+    WifiCommonEventHelper::PublishP2pPeersStateChangedEvent(vPeers.size(), "OnP2pPeersChanged");
+    return;
+}
+
+void WifiManager::DealP2pServiceChanged(const std::vector<WifiP2pServiceInfo> &vServices)
+{
+    WifiEventCallbackMsg cbMsg;
+    cbMsg.msgCode = WIFI_CBK_MSG_SERVICE_CHANGE;
+    cbMsg.serviceInfo = vServices;
+    WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
+    return;
+}
+
+void WifiManager::DealP2pConnectionChanged(const WifiP2pInfo &info)
+{
+    WifiEventCallbackMsg cbMsg;
+    cbMsg.msgCode = WIFI_CBK_MSG_CONNECT_CHANGE;
+    cbMsg.p2pInfo = info;
+    WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
+    WifiCommonEventHelper::PublishP2pConnStateEvent((int)info.GetConnectState(), "OnP2pConnectStateChanged");
+    return;
+}
+
+void WifiManager::DealP2pThisDeviceChanged(const WifiP2pDevice &info)
+{
+    WifiEventCallbackMsg cbMsg;
+    cbMsg.msgCode = WIFI_CBK_MSG_THIS_DEVICE_CHANGE;
+    cbMsg.p2pDevice = info;
+    WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
+    WifiCommonEventHelper::PublishP2pCurrentDeviceStateChangedEvent(
+        (int)info.GetP2pDeviceStatus(), "OnP2pThisDeviceChanged");
+    return;
+}
+
+void WifiManager::DealP2pDiscoveryChanged(bool bState)
+{
+    WifiEventCallbackMsg cbMsg;
+    cbMsg.msgCode = WIFI_CBK_MSG_DISCOVERY_CHANGE;
+    cbMsg.msgData = static_cast<int>(bState);
+    WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
+    return;
+}
+
+void WifiManager::DealP2pGroupsChanged()
+{
+    WifiEventCallbackMsg cbMsg;
+    cbMsg.msgCode = WIFI_CBK_MSG_PERSISTENT_GROUPS_CHANGE;
+    WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
+    WifiCommonEventHelper::PublishP2pGroupStateChangedEvent(0, "OnP2pGroupStateChanged");
+    return;
+}
+
+void WifiManager::DealP2pActionResult(P2pActionCallback action, ErrCode code)
+{
+    WifiEventCallbackMsg cbMsg;
+    cbMsg.msgCode = WIFI_CBK_MSG_P2P_ACTION_RESULT;
+    cbMsg.p2pAction = action;
+    cbMsg.msgData = static_cast<int>(code);
+    WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
+    return;
+}
+
+}  // namespace Wifi
+}  // namespace OHOS

@@ -16,116 +16,72 @@
 #include <typeinfo>
 #include "ipv4_address.h"
 #include "ipv6_address.h"
+#include "ap_stations_manager.h"
+#include "ap_monitor.h"
+#include "wifi_settings.h"
 #include "wifi_logger.h"
 
-DEFINE_WIFILOG_HOTSPOT_LABEL("ApStateMachine");
+DEFINE_WIFILOG_HOTSPOT_LABEL("WifiApStateMachine");
 namespace OHOS {
 namespace Wifi {
-ApStateMachine *ApStateMachine::g_instance = nullptr;
-
-ApStateMachine::ApStateMachine() : StateMachine("ApStateMachine")
-{}
+ApStateMachine::ApStateMachine(ApStationsManager &apStationsManager, ApRootState &apRootState, ApIdleState &apIdleState,
+    ApStartedState &apStartedState, ApMonitor &apMonitor)
+    : StateMachine("ApStateMachine"),
+      m_ApStationsManager(apStationsManager),
+      m_ApRootState(apRootState),
+      m_ApIdleState(apIdleState),
+      m_ApStartedState(apStartedState),
+      m_ApMonitor(apMonitor)
+{
+    Init();
+}
 
 ApStateMachine::~ApStateMachine()
 {
+    StopDhcpServer();
+    if (pDhcpNotify.get() != nullptr) {
+        pDhcpNotify.reset(nullptr);
+    }
     StopHandlerThread();
 }
 
-ApStateMachine &ApStateMachine::GetInstance()
+ApStateMachine::DhcpNotify::DhcpNotify(ApStateMachine &apStateMachine) : m_apStateMachine(apStateMachine)
+{}
+
+ApStateMachine::DhcpNotify::~DhcpNotify()
+{}
+
+void ApStateMachine::DhcpNotify::OnSuccess(int status, const std::string &ifname, DhcpResult &result)
 {
-    if (g_instance == nullptr) {
-        g_instance = new (std::nothrow) ApStateMachine();
-        if (g_instance && g_instance->InitialStateMachine()) {
-            g_instance->Init();
-        } else {
-            WIFI_LOGE("init ApStateMachine error");
-            delete g_instance;
-            g_instance = nullptr;
-        }
-    }
-    return *g_instance;
+    WIFI_LOGI(
+        "Dhcp notify Success. status:%d, ifname:%s, result:%s.", status, ifname.c_str(), result.strYourCli.c_str());
 }
 
-void ApStateMachine::DeleteInstance()
+void ApStateMachine::DhcpNotify::OnFailed(int status, const std::string &ifname, const std::string &reason)
 {
-    if (g_instance != nullptr) {
-        delete g_instance;
-        g_instance = nullptr;
+    WIFI_LOGW("Dhcp notify Failed. status:%d, ifname:%s, reason:%s.", status, ifname.c_str(), reason.c_str());
+}
+
+void ApStateMachine::DhcpNotify::OnSerExitNotify(const std::string &ifname)
+{
+    WIFI_LOGD("Dhcp exit notify.ifname:%s.", ifname.c_str());
+    if (ifname == IN_INTERFACE) {
+        m_apStateMachine.SendMessage(static_cast<int>(ApStatemachineEvent::CMD_FAIL));
     }
 }
 
 void ApStateMachine::Init()
 {
-    WIFI_LOGI("ApStateMachine::Init");
-    StatePlus(&mApRootState, nullptr);
-    StatePlus(&mApIdleState, &mApRootState);
-    StatePlus(&mApStartedState, &mApRootState);
-
-    SetFirstState(&mApIdleState);
+    if (!InitialStateMachine()) {
+        WIFI_LOGE("Ap StateMachine Initialize failed.");
+        return;
+    }
+    StatePlus(&m_ApRootState, nullptr);
+    StatePlus(&m_ApIdleState, &m_ApRootState);
+    StatePlus(&m_ApStartedState, &m_ApRootState);
+    SetFirstState(&m_ApIdleState);
+    m_iface = "wlan0";
     StartStateMachine();
-}
-
-void ApStateMachine::StationJoin(StationInfo &staInfo)
-{
-    InternalMessage *msg = CreateMessage();
-    msg->SetMessageName(static_cast<int>(ApStatemachineEvent::CMD_STATION_JOIN));
-    msg->AddStringMessageBody(staInfo.deviceName);
-    msg->AddStringMessageBody(staInfo.bssid);
-    msg->AddStringMessageBody(staInfo.ipAddr);
-    SendMessage(msg);
-}
-
-void ApStateMachine::StationLeave(StationInfo &staInfo)
-{
-    InternalMessage *msg = CreateMessage();
-    msg->SetMessageName(static_cast<int>(ApStatemachineEvent::CMD_STATION_LEAVE));
-    msg->AddStringMessageBody(staInfo.deviceName);
-    msg->AddStringMessageBody(staInfo.bssid);
-    msg->AddStringMessageBody(staInfo.ipAddr);
-    SendMessage(msg);
-}
-
-void ApStateMachine::SetHotspotConfig(const HotspotConfig &cfg)
-{
-    InternalMessage *msg = CreateMessage();
-    msg->SetMessageName(static_cast<int>(ApStatemachineEvent::CMD_SET_HOTSPOT_CONFIG));
-    msg->AddStringMessageBody(cfg.GetSsid());
-    msg->AddStringMessageBody(cfg.GetPreSharedKey());
-    msg->AddIntMessageBody(static_cast<int>(cfg.GetSecurityType()));
-    msg->AddIntMessageBody(static_cast<int>(cfg.GetBand()));
-    msg->AddIntMessageBody(cfg.GetChannel());
-    msg->AddIntMessageBody(cfg.GetMaxConn());
-    SendMessage(msg);
-}
-
-void ApStateMachine::AddBlockList(const StationInfo &staInfo)
-{
-    InternalMessage *msg = CreateMessage();
-    msg->SetMessageName(static_cast<int>(ApStatemachineEvent::CMD_ADD_BLOCK_LIST));
-    msg->AddStringMessageBody(staInfo.deviceName);
-    msg->AddStringMessageBody(staInfo.bssid);
-    msg->AddStringMessageBody(staInfo.ipAddr);
-    SendMessage(msg);
-}
-
-void ApStateMachine::DelBlockList(const StationInfo &staInfo)
-{
-    InternalMessage *msg = CreateMessage();
-    msg->SetMessageName(static_cast<int>(ApStatemachineEvent::CMD_DEL_BLOCK_LIST));
-    msg->AddStringMessageBody(staInfo.deviceName);
-    msg->AddStringMessageBody(staInfo.bssid);
-    msg->AddStringMessageBody(staInfo.ipAddr);
-    SendMessage(msg);
-}
-
-void ApStateMachine::DisconnetStation(const StationInfo &staInfo)
-{
-    InternalMessage *msg = CreateMessage();
-    msg->SetMessageName(static_cast<int>(ApStatemachineEvent::CMD_DISCONNECT_STATION));
-    msg->AddStringMessageBody(staInfo.deviceName);
-    msg->AddStringMessageBody(staInfo.bssid);
-    msg->AddStringMessageBody(staInfo.ipAddr);
-    SendMessage(msg);
 }
 
 void ApStateMachine::OnApStateChange(ApState state)
@@ -167,9 +123,49 @@ void ApStateMachine::BroadCastStationChange(const StationInfo &staInfo, ApStatem
     }
 }
 
-void ApStateMachine::UpdateHotspotConfigResult(const bool result)
+bool ApStateMachine::StartDhcpServer()
 {
-    SendMessage(static_cast<int>(ApStatemachineEvent::CMD_UPDATE_HOTSPOTCONFIG_RESULT), result ? 1 : 0);
+    WIFI_LOGI("Enter:StartDhcpServer");
+    Ipv4Address ipv4(Ipv4Address::INVALID_INET_ADDRESS);
+    Ipv6Address ipv6(Ipv6Address::INVALID_INET6_ADDRESS);
+    if (!m_DhcpdInterface.StartDhcpServer(IN_INTERFACE, ipv4, ipv6, true)) {
+        WIFI_LOGE("start dhcpd fail.");
+        return false;
+    }
+    if (!m_DhcpdInterface.SetDhcpEventFunc(IN_INTERFACE, pDhcpNotify.get())) {
+        WIFI_LOGW("Set dhcp notify failed.");
+    }
+    return true;
+}
+
+bool ApStateMachine::StopDhcpServer()
+{
+    WIFI_LOGI("Enter:StopDhcpServer");
+    if (!m_DhcpdInterface.StopDhcpServer(IN_INTERFACE)) {
+        WIFI_LOGE("Close dhcpd fail.");
+        return false;
+    }
+    return true;
+}
+
+bool ApStateMachine::GetConnectedStationInfo(std::map<std::string, StationInfo> &result)
+{
+    return m_DhcpdInterface.GetConnectedStationInfo(result);
+}
+
+void ApStateMachine::RegisterEventHandler()
+{
+    using namespace std::placeholders;
+    using type = void (StateMachine::*)(int, int, int, const std::any &);
+
+    auto handler = std::bind(static_cast<type>(&StateMachine::SendMessage), this, _1, _2, _3, _4);
+
+    m_ApMonitor.RegisterHandler(
+        m_iface, [=](ApStatemachineEvent msgName, int param1, int param2, const std::any &messageObj) {
+            handler(static_cast<int>(msgName), param1, param2, messageObj);
+        });
+
+    m_ApStationsManager.RegisterEventHandler(std::bind(&ApStateMachine::BroadCastStationChange, this, _1, _2));
 }
 }  // namespace Wifi
 }  // namespace OHOS

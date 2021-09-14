@@ -399,6 +399,52 @@ std::string OutTClassString<HotspotConfig>(HotspotConfig &item)
 }
 
 template<>
+void ClearTClass<P2pVendorConfig>(P2pVendorConfig &item)
+{
+    item.SetRandomMacSupport(false);
+    item.SetIsAutoListen(true);
+    item.SetDeviceName("");
+    item.SetPrimaryDeviceType("");
+    item.SetSecondaryDeviceType("");
+    return;
+}
+
+template<>
+void SetTClassKeyValue<P2pVendorConfig>(P2pVendorConfig &item, const std::string &key, const std::string &value)
+{
+    if (key == "randomMacSupport") {
+        item.SetRandomMacSupport(std::stoi(value) != 0);
+    } else if (key == "autoListen") {
+        item.SetIsAutoListen(std::stoi(value) != 0);
+    } else if (key == "deviceName") {
+        item.SetDeviceName(value);
+    } else if (key == "primaryDeviceType") {
+        item.SetPrimaryDeviceType(value);
+    } else if (key == "secondaryDeviceType") {
+        item.SetSecondaryDeviceType(value);
+    }
+    return;
+}
+
+template<>
+std::string GetTClassName<P2pVendorConfig>()
+{
+    return "P2pVendorConfig";
+}
+
+template<>
+std::string OutTClassString<P2pVendorConfig>(P2pVendorConfig &item)
+{
+    std::ostringstream ss;
+    ss << "randomMacSupport=" << item.GetRandomMacSupport() << std::endl;
+    ss << "autoListen=" << item.GetIsAutoListen() << std::endl;
+    ss << "deviceName=" << item.GetDeviceName() << std::endl;
+    ss << "primaryDeviceType=" << item.GetPrimaryDeviceType() << std::endl;
+    ss << "secondaryDeviceType=" << item.GetSecondaryDeviceType() << std::endl;
+    return ss.str();
+}
+
+template<>
 void ClearTClass<StationInfo>(StationInfo &item)
 {
     item.deviceName.clear();
@@ -594,6 +640,128 @@ std::string OutTClassString<WifiConfig>(WifiConfig &item)
     ss << "secondRssiLevel5G=" << item.secondRssiLevel5G << std::endl;
     ss << "thirdRssiLevel5G=" << item.thirdRssiLevel5G << std::endl;
     ss << "fourthRssiLevel5G=" << item.fourthRssiLevel5G << std::endl;
+    return ss.str();
+}
+
+template<>
+void ClearTClass<WifiP2pGroupInfo>(WifiP2pGroupInfo &item)
+{
+    item.SetIsGroupOwner(false);
+    WifiP2pDevice device;
+    item.SetOwner(device);
+    item.SetPassphrase("");
+    item.SetInterface("");
+    item.SetGroupName("");
+    item.SetFrequency(0);
+    item.SetIsPersistent(false);
+    item.SetP2pGroupStatus(static_cast<P2pGroupStatus>(0));
+    item.SetNetworkId(0);
+    item.SetGoIpAddress("");
+    item.ClearClientDevices();
+}
+
+static void SetWifiP2pDevicClassKeyValue(WifiP2pDevice &item, const std::string &key, const std::string &value)
+{
+    if (key == "deviceName") {
+        item.SetDeviceName(value);
+    } else if (key == "deviceAddress") {
+        item.SetDeviceAddress(value);
+    } else if (key == "primaryDeviceType") {
+        item.SetPrimaryDeviceType(value);
+    } else if (key == "status") {
+        item.SetP2pDeviceStatus(static_cast<P2pDeviceStatus>(std::stoi(value)));
+    } else if (key == "supportWpsConfigMethods") {
+        item.SetWpsConfigMethod(std::stoi(value));
+    } else if (key == "deviceCapabilitys") {
+        item.SetDeviceCapabilitys(std::stoi(value));
+    } else if (key == "groupCapabilitys") {
+        item.SetGroupCapabilitys(std::stoi(value));
+    }
+}
+
+template<>
+void SetTClassKeyValue<WifiP2pGroupInfo>(WifiP2pGroupInfo &item, const std::string &key, const std::string &value)
+{
+    if (key == "isGroupOwner") {
+        item.SetIsGroupOwner(std::stoi(value) != 0);
+    } else if (key == "passphrase") {
+        item.SetPassphrase(value);
+    } else if (key == "interface") {
+        item.SetInterface(value);
+    } else if (key == "groupName") {
+        item.SetGroupName(value);
+    } else if (key == "networkId") {
+        item.SetNetworkId(std::stoi(value));
+    } else if (key == "frequency") {
+        item.SetFrequency(std::stoi(value));
+    } else if (key == "isPersistent") {
+        item.SetIsPersistent(std::stoi(value) != 0);
+    } else if (key == "groupStatus") {
+        item.SetP2pGroupStatus(static_cast<P2pGroupStatus>(std::stoi(value)));
+    } else if (key == "goIpAddress") {
+        item.SetGoIpAddress(value);
+    } else if (key.compare(0, strlen("ownerDev."), "ownerDev.") == 0) {
+        WifiP2pDevice owner = item.GetOwner();
+        SetWifiP2pDevicClassKeyValue(owner, key.substr(strlen("ownerDev.")), value);
+        item.SetOwner(owner);
+    } else if (key.compare(0, strlen("vecDev_"), "vecDev_") == 0) {
+        std::string::size_type pos = key.find(".");
+        if (pos == std::string::npos) {
+            WifiP2pDevice device;
+            item.AddClientDevice(device);
+        } else {
+            unsigned long index = std::stoi(key.substr(strlen("vecDev_"), pos));
+            if (index < item.GetClientDevices().size()) {
+                std::vector<WifiP2pDevice> clients = item.GetClientDevices();
+                SetWifiP2pDevicClassKeyValue(clients[index], key.substr(pos + 1), value);
+                item.SetClientDevices(clients);
+            }
+        }
+    }
+}
+
+template<>
+std::string GetTClassName<WifiP2pGroupInfo>()
+{
+    return "WifiP2pGroupInfo";
+}
+
+static std::string OutWifiP2pDevicClassString(const WifiP2pDevice &item, std::string prefix = "")
+{
+    std::ostringstream ss;
+
+    ss << prefix << "deviceName=" << item.GetDeviceName() << std::endl;
+    ss << prefix << "deviceAddress=" << item.GetDeviceAddress() << std::endl;
+    ss << prefix << "primaryDeviceType=" << item.GetPrimaryDeviceType() << std::endl;
+    ss << prefix << "status=" << static_cast<int>(item.GetP2pDeviceStatus()) << std::endl;
+    ss << prefix << "supportWpsConfigMethods=" << item.GetWpsConfigMethod() << std::endl;
+    ss << prefix << "deviceCapabilitys=" << item.GetDeviceCapabilitys() << std::endl;
+    ss << prefix << "groupCapabilitys=" << item.GetGroupCapabilitys() << std::endl;
+
+    return ss.str();
+}
+
+template<>
+std::string OutTClassString<WifiP2pGroupInfo>(WifiP2pGroupInfo &item)
+{
+    std::ostringstream ss;
+    ss << "isGroupOwner=" << item.IsGroupOwner() << std::endl;
+    ss << "passphrase=" << item.GetPassphrase() << std::endl;
+    ss << "interface=" << item.GetInterface() << std::endl;
+    ss << "groupName=" << item.GetGroupName() << std::endl;
+    ss << "networkId=" << item.GetNetworkId() << std::endl;
+    ss << "frequency=" << item.GetFrequency() << std::endl;
+    ss << "isPersistent=" << item.IsPersistent() << std::endl;
+    ss << "groupStatus=" << static_cast<int>(item.GetP2pGroupStatus()) << std::endl;
+    ss << "goIpAddress=" << item.GetGoIpAddress() << std::endl;
+    ss << OutWifiP2pDevicClassString(item.GetOwner(), "ownerDev.");
+    int size = item.GetClientDevices().size();
+    for (int i = 0; i < size; i++) {
+        std::string prefix = "vecDev_" + std::to_string(i) + ".";
+        ss << "vecDev_=" << i << std::endl;
+        const WifiP2pDevice &tmp = item.GetClientDevices().at(i);
+        ss << OutWifiP2pDevicClassString(tmp, prefix);
+    }
     return ss.str();
 }
 }  // namespace Wifi

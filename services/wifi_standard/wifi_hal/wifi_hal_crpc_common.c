@@ -17,6 +17,7 @@
 #include "wifi_hal_crpc_base.h"
 #include "wifi_hal_sta_interface.h"
 #include "wifi_hal_ap_interface.h"
+#include "wifi_hal_p2p_interface.h"
 #include "wifi_hal_define.h"
 
 int RpcRegisterEventCallback(RpcServer *server, Context *context)
@@ -72,6 +73,7 @@ int RpcNotifyClear(RpcServer *server, Context *context)
     }
     ForceStop();
     StopSoftAp();
+    P2pForceStop();
     WriteBegin(context, 0);
     WriteInt(context, 0);
     WriteEnd(context);

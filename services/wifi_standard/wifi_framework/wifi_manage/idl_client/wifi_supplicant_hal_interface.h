@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_WIFISUPPLICANTHALINTERFACE_H
-#define OHOS_WIFISUPPLICANTHALINTERFACE_H
+#ifndef OHOS_WIFI_SUPPLICANT_HAL_INTERFACE_H
+#define OHOS_WIFI_SUPPLICANT_HAL_INTERFACE_H
 
 #include <string>
 #include "supplicant_event_callback.h"
@@ -38,28 +38,28 @@ public:
      *
      * @return WifiErrorNo
      */
-    WifiErrorNo StartSupplicant(void);
+    WifiErrorNo StartSupplicant(void) const;
 
     /**
      * @Description Close Supplicant.
      *
      * @return WifiErrorNo
      */
-    WifiErrorNo StopSupplicant(void);
+    WifiErrorNo StopSupplicant(void) const;
 
     /**
      * @Description Connect Supplicant.
      *
      * @return WifiErrorNo
      */
-    WifiErrorNo ConnectSupplicant(void);
+    WifiErrorNo ConnectSupplicant(void) const;
 
     /**
      * @Description Disconnect Supplicant.
      *
      * @return WifiErrorNo
      */
-    WifiErrorNo DisconnectSupplicant(void);
+    WifiErrorNo DisconnectSupplicant(void) const;
 
     /**
      * @Description Request to Supplicant.
@@ -67,7 +67,7 @@ public:
      * @param request
      * @return WifiErrorNo
      */
-    WifiErrorNo RequestToSupplicant(const std::string &request);
+    WifiErrorNo RequestToSupplicant(const std::string &request) const;
 
     /**
      * @Description Registers the supplementary event callback function.
@@ -75,14 +75,14 @@ public:
      * @param callback
      * @return WifiErrorNo
      */
-    WifiErrorNo RigisterSupplicantEventCallback(SupplicantEventCallback &callback);
+    WifiErrorNo RegisterSupplicantEventCallback(SupplicantEventCallback &callback);
 
     /**
      * @Description Deregisters the supplementary event callback function.
      *
      * @return WifiErrorNo
      */
-    WifiErrorNo UnRigisterSupplicantEventCallback(void);
+    WifiErrorNo UnRegisterSupplicantEventCallback(void);
 
     /**
      * @Description Turn on/off power save mode for the interface.
@@ -90,7 +90,7 @@ public:
      * @param enable
      * @return WifiErrorNo
      */
-    WifiErrorNo SetPowerSave(bool enable);
+    WifiErrorNo SetPowerSave(bool enable) const;
 
     /**
      * @Description Setting the country code.
@@ -98,7 +98,7 @@ public:
      * @param countryCode
      * @return WifiErrorNo
      */
-    WifiErrorNo WpaSetCountryCode(const std::string &countryCode);
+    WifiErrorNo WpaSetCountryCode(const std::string &countryCode) const;
 
     /**
      * @Description Obtains the country code.
@@ -106,9 +106,17 @@ public:
      * @param countryCode
      * @return WifiErrorNo
      */
-    WifiErrorNo WpaGetCountryCode(std::string &countryCode);
+    WifiErrorNo WpaGetCountryCode(std::string &countryCode) const;
+
+    /**
+     * @Description Get register callback objects
+     *
+     * @return const SupplicantEventCallback& - register callback objects
+     */
+    const SupplicantEventCallback &GetCallbackInst(void) const;
 
 private:
+    SupplicantEventCallback mCallback;
 };
 }  // namespace Wifi
 }  // namespace OHOS

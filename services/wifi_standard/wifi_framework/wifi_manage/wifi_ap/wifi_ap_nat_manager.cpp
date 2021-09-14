@@ -26,6 +26,9 @@
 
 DEFINE_WIFILOG_HOTSPOT_LABEL("WifiApNatManager");
 
+
+namespace OHOS {
+namespace Wifi {
 const std::string SYSTEM_COMMAND_IP = "/system/bin/ip";
 const std::string SYSTEM_COMMAND_IPTABLES = "/system/bin/iptables";
 const std::string SYSTEM_COMMAND_IP6TABLES = "/system/bin/ip6tables";
@@ -33,30 +36,10 @@ const std::string IP_V4_FORWARDING_CONFIG_FILE = "/proc/sys/net/ipv4/ip_forward"
 const std::string IP_V6_FORWARDING_CONFIG_FILE = "/proc/sys/net/ipv6/conf/all/forwarding";
 const int SYSTEM_NOT_EXECUTED = 127;
 
-namespace OHOS {
-namespace Wifi {
-WifiApNatManager *WifiApNatManager::g_instance = nullptr;
-
-WifiApNatManager &WifiApNatManager::GetInstance()
-{
-    if (g_instance == nullptr) {
-        g_instance = new WifiApNatManager();
-    }
-    return *g_instance;
-}
-
-void WifiApNatManager::DeleteInstance()
-{
-    if (g_instance != nullptr) {
-        delete g_instance;
-        g_instance = nullptr;
-    }
-}
-
 bool WifiApNatManager::EnableInterfaceNat(bool enable, std::string inInterfaceName, std::string outInterfaceName) const
 {
     WIFI_LOGI("EnableInterfaceNat enable [%{public}s], inInterfaceName [%s]  outInterfaceName "
-         "[%s]",
+         "[%s].",
         enable ? "true" : "false",
         inInterfaceName.c_str(),
         outInterfaceName.c_str());
@@ -92,7 +75,7 @@ bool WifiApNatManager::EnableInterfaceNat(bool enable, std::string inInterfaceNa
 
 bool WifiApNatManager::SetForwarding(bool enable) const
 {
-    WIFI_LOGI("SetForwarding enable = %{public}s.", enable ? "true" : "false");
+    WIFI_LOGI("SetForwarding enable = %{public}s.", ((enable) ? "true" : "false"));
 
     bool bResult = true;
     const std::string content = enable ? "1" : "0";
@@ -188,7 +171,7 @@ bool WifiApNatManager::ExecCommand(const std::vector<std::string> &vecCommandArg
 
     int ret = system(command.c_str());
     if (ret == -1 || ret == SYSTEM_NOT_EXECUTED) {
-        WIFI_LOGE("exec failed. cmd: %s, error:%{public}s", command.c_str(), strerror(errno));
+        WIFI_LOGE("exec failed. cmd: %s, error:%{public}s.", command.c_str(), strerror(errno));
         return false;
     }
 

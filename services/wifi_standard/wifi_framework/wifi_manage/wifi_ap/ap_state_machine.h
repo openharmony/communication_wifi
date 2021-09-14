@@ -16,6 +16,7 @@
 #define OHOS_AP_STATE_MACHINE_H
 
 #include "ap_define.h"
+#include "i_ap_service.h"
 #include "ap_idle_state.h"
 #include "ap_root_state.h"
 #include "ap_started_state.h"
@@ -42,6 +43,27 @@ public:
      * @return None
      */
     static void DeleteInstance();
+    /**
+     * @Description  Reporting New State.
+     * @param state - the state.
+     * @return None
+     */
+    void OnApStateChange(ApState state);
+
+    /**
+     * @Description  Reporting station change msg.
+     * @param staInfo - station information
+     * @param act - action event
+     * @return None
+     */
+    void BroadCastStationChange(const StationInfo &staInfo, ApStatemachineEvent act);
+
+    /**
+     * @Description  Register callback list to reporting msg.
+     * @param callbacks - callback list
+     * @return None
+     */
+    ErrCode RegisterApServiceCallbacks(const IApServiceCallbacks &callbacks);
     /**
      * @Description  Wrap and send messages.
      * @param staInfo - joined sta info
@@ -93,6 +115,7 @@ private:
 
 private:
     static ApStateMachine *g_instance;
+    IApServiceCallbacks m_Callbacks;
 
     /* STA Manager */
     ApStationsManager mApStationsManager;

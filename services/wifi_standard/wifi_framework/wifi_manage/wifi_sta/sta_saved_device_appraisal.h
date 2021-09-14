@@ -36,7 +36,7 @@ public:
      * @Return: Configuration of the selected device; Null if no devices are available in this category
      */
     ErrCode DeviceAppraisals(
-        WifiDeviceConfig &electedDevice, std::vector<WifiScanInfo> &scanInfos, WifiLinkedInfo &info) override;
+        WifiDeviceConfig &electedDevice, std::vector<InterScanInfo> &scanInfos, WifiLinkedInfo &info) override;
 
 private:
     static const int MAX_SIGNAL_BAR_NUM = 5;
@@ -57,7 +57,7 @@ private:
      * @param info - Connection information.(in)
      * @param score - score points.(out)
      */
-    void AppraiseDeviceQuality(int &score, WifiScanInfo &scanInfo, WifiDeviceConfig &device, WifiLinkedInfo &info);
+    void AppraiseDeviceQuality(int &score, InterScanInfo &scanInfo, WifiDeviceConfig &device, WifiLinkedInfo &info);
     /**
      * @Description  Signal strength converted to grids.
      *

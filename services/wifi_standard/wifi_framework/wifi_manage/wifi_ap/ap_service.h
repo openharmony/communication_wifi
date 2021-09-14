@@ -17,12 +17,28 @@
 
 #include "ap_define.h"
 #include "wifi_internal_msg.h"
-#include "wifi_message_queue.h"
 #include "wifi_settings.h"
+#include "i_ap_service.h"
+#include "i_ap_service_callbacks.h"
 
 namespace OHOS {
 namespace Wifi {
 class ApService {
+private:
+    /**
+     * @Description  construction method.
+     * @param None
+     * @return None
+     */
+    ApService();
+
+    /**
+     * @Description  destructor method.
+     * @param None
+     * @return None
+     */
+    ~ApService();
+    DISALLOW_COPY_AND_ASSIGN(ApService)
 public:
     /**
      * @Description  Obtains a single g_instance.
@@ -38,102 +54,54 @@ public:
     static void DeleteInstance();
 
     /**
-     * @Description  Called after the AP dynamic library file is loaded.
-     * @param mqUp - message queue to response
-     * @return 0: success    -1: failed
-     */
-    int Init(WifiMessageQueue<WifiResponseMsgInfo> *mqUp);
-    /**
-     * @Description  Called when public module send message to AP
-     * @param msg - delivered message
-     * @return 0: success    -1: failed
-     */
-    int PushMsg(const WifiRequestMsgInfo *msg) const;
-
-    /**
-     * @Description  Called before the AP dynamic library file is uninstalled.
-     * @param None
-     * @return None
-     */
-    int UnInit(void) const;
-
-    /**
-     * @Description  Broadcasting the AP module status change
-     * @param state - current status
-     * @return None
-     */
-    void OnApStateChange(const ApState &state) const;
-
-    /**
-     * @Description  A new STA connection is reported.
-     * @param info - detailed information about the connected STA
-     * @return None
-     */
-    void OnHotspotStaJoin(const StationInfo &info) const;
-
-    /**
-     * @Description  Broadcasting the STA disconnection information.
-     * @param info - detailed information about the disconnected STA
-     * @return None
-     */
-    void OnHotspotStaLeave(const StationInfo &info) const;
-
-private:
-    ApService();
-    ~ApService() = default;
-    DISALLOW_COPY_AND_ASSIGN(ApService)
-
-    /**
-     * @Description  Sending response messages to the Service Management Module
-     * @param upMsg - structure of response messages
-     * @return None
-     */
-    void BroadcastMsg(const WifiResponseMsgInfo &upMsg) const;
-
-    /**
      * @Description  open hotspot
      * @param None
-     * @return None
+     * @return ErrCode - success: WIFI_OPT_SUCCESS    failed: ERROR_CODE
      */
-    void EnableHotspot() const;
+    ErrCode EnableHotspot() const;
 
     /**
      * @Description  close hotspot
      * @param None
-     * @return None
+     * @return ErrCode - success: WIFI_OPT_SUCCESS    failed: ERROR_CODE
      */
-    void DisableHotspot() const;
+    ErrCode DisableHotspot() const;
 
     /**
      * @Description  set ap config
      * @param cfg - ap config
-     * @return None
+     * @return ErrCode - success: WIFI_OPT_SUCCESS    failed: ERROR_CODE
      */
-    void SetHotspotConfig(const HotspotConfig &cfg) const;
+    ErrCode SetHotspotConfig(const HotspotConfig &cfg) const;
 
     /**
      * @Description  add block list
      * @param stationInfo - sta infos
-     * @return None
+     * @return ErrCode - success: WIFI_OPT_SUCCESS    failed: ERROR_CODE
      */
-    void AddBlockList(const StationInfo &stationInfo) const;
+    ErrCode AddBlockList(const StationInfo &stationInfo) const;
 
     /**
      * @Description  delete block list
      * @param stationInfo - sta infos
-     * @return None
+     * @return ErrCode - success: WIFI_OPT_SUCCESS    failed: ERROR_CODE
      */
-    void DelBlockList(const StationInfo &stationInfo) const;
+    ErrCode DelBlockList(const StationInfo &stationInfo) const;
 
     /**
      * @Description  Disconnect a specified STA
      * @param stationInfo - sta infos
-     * @return None
+     * @return ErrCode - success: WIFI_OPT_SUCCESS    failed: ERROR_CODE
      */
-    void DisconnetStation(const StationInfo &stationInfo) const;
+    ErrCode DisconnetStation(const StationInfo &stationInfo) const;
 
-private:
-    WifiMessageQueue<WifiResponseMsgInfo> *mMsgQueueUp;
+    /**
+     * @Description Sets the callback function for the state machine.
+     *
+     * @param callbacks - callbacks list.
+     * @return ErrCode - success: WIFI_OPT_SUCCESS    failed: ERROR_CODE
+     */
+    ErrCode RegisterApServiceCallbacks(const IApServiceCallbacks &callbacks);
 };
 }  // namespace Wifi
 }  // namespace OHOS

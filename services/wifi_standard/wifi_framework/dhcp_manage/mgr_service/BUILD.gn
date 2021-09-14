@@ -12,40 +12,49 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
+import("//foundation/appexecfwk/standard/appexecfwk.gni")
+
+################################################################################
 
 ohos_shared_library("dhcp_manager_service") {
   install_enable = true
   sources = [
-    "//foundation/communication/wifi/services/wifi_standard/wifi_framework/dhcp_manage/mgr_service/src/dhcp_service.cpp",
     "//foundation/communication/wifi/services/wifi_standard/wifi_framework/dhcp_manage/mgr_service/src/dhcp_client_service_impl.cpp",
+    "//foundation/communication/wifi/services/wifi_standard/wifi_framework/dhcp_manage/mgr_service/src/dhcp_event_subscriber.cpp",
+    "//foundation/communication/wifi/services/wifi_standard/wifi_framework/dhcp_manage/mgr_service/src/dhcp_func.cpp",
     "//foundation/communication/wifi/services/wifi_standard/wifi_framework/dhcp_manage/mgr_service/src/dhcp_server_service_impl.cpp",
-    "//foundation/communication/wifi/services/wifi_standard/wifi_framework/dhcp_manage/mgr_service/src/dhcp_func.cpp"
+    "//foundation/communication/wifi/services/wifi_standard/wifi_framework/dhcp_manage/mgr_service/src/dhcp_service.cpp",
   ]
 
   include_dirs = [
     "//foundation/communication/wifi/services/wifi_standard/wifi_framework/common/log",
     "//foundation/communication/wifi/services/wifi_standard/wifi_framework/dhcp_manage/mgr_service/include",
     "//foundation/communication/wifi/services/wifi_standard/wifi_framework/dhcp_manage/mgr_service/interfaces",
-    "//utils/native/base/include"
+    "//utils/native/base/include",
+    "//foundation/appexecfwk/standard/interfaces/innerkits/libeventhandler/include",
+    "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
   ]
 
   deps = [
-    "//utils/native/base:utils"
+    "${aafwk_path}/interfaces/innerkits/base:base",
+    "${aafwk_path}/interfaces/innerkits/want:want",
+    "//utils/native/base:utils",
   ]
 
-  cflags_cc = [ "-std=c++17",
-              "-Wall",
+  cflags_cc = [
+    "-std=c++17",
+    "-Wall",
   ]
 
   external_deps = [
-      "hiviewdfx_hilog_native:libhilog"
+    "ces_standard:cesfwk_innerkits",
+    "hiviewdfx_hilog_native:libhilog",
   ]
   ldflags = [
-      "-fPIC",
-      "-Wl,-E",
+    "-fPIC",
+    "-Wl,-E",
   ]
 
   part_name = "wifi_standard"
   subsystem_name = "communication"
 }
-

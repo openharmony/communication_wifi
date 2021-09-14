@@ -74,9 +74,9 @@ int WifiHotspotCallbackStub::RemoteOnHotspotStaJoin(uint32_t code, MessageParcel
 {
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
     StationInfo info;
-    info.deviceName = Str16ToStr8(data.ReadString16());
-    info.bssid = Str16ToStr8(data.ReadString16());
-    info.ipAddr = Str16ToStr8(data.ReadString16());
+    info.deviceName = data.ReadCString();
+    info.bssid = data.ReadCString();
+    info.ipAddr = data.ReadCString();
     OnHotspotStaJoin(info);
     reply.WriteInt32(0);
     return 0;
@@ -86,9 +86,9 @@ int WifiHotspotCallbackStub::RemoteOnHotspotStaLeave(uint32_t code, MessageParce
 {
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
     StationInfo info;
-    info.deviceName = Str16ToStr8(data.ReadString16());
-    info.bssid = Str16ToStr8(data.ReadString16());
-    info.ipAddr = Str16ToStr8(data.ReadString16());
+    info.deviceName = data.ReadCString();
+    info.bssid = data.ReadCString();
+    info.ipAddr = data.ReadCString();
     OnHotspotStaLeave(info);
     reply.WriteInt32(0);
     return 0;

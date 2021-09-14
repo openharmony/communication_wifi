@@ -59,7 +59,7 @@ ErrCode StaAutoConnectService::InitAutoConnectService()
     return WIFI_OPT_SUCCESS;
 }
 
-void StaAutoConnectService::OnScanInfosReadyHandler(const std::vector<WifiScanInfo> &scanInfos)
+void StaAutoConnectService::OnScanInfosReadyHandler(const std::vector<InterScanInfo> &scanInfos)
 {
     WIFI_LOGI("Enter StaAutoConnectService::OnScanInfosReadyHandler.\n");
     ClearOvertimeBlockedBssid(); /* Refreshing the BSSID Blocklist */
@@ -298,7 +298,7 @@ bool StaAutoConnectService::RegisterDeviceAppraisal(StaDeviceAppraisal *appraisa
 }
 
 ErrCode StaAutoConnectService::AutoSelectDevice(WifiDeviceConfig &electedDevice,
-    const std::vector<WifiScanInfo> &scanInfos, std::vector<std::string> &blockedBssids, WifiLinkedInfo &info)
+    const std::vector<InterScanInfo> &scanInfos, std::vector<std::string> &blockedBssids, WifiLinkedInfo &info)
 {
     WIFI_LOGI("Enter StaAutoConnectService::SelectNetwork.\n");
     if (scanInfos.empty()) {
@@ -315,7 +315,7 @@ ErrCode StaAutoConnectService::AutoSelectDevice(WifiDeviceConfig &electedDevice,
     /* Before initiating network selection, update all configured networks. */
     RefreshConfigDevice();
 
-    std::vector<WifiScanInfo> availableScanInfos;
+    std::vector<InterScanInfo> availableScanInfos;
     /* Filter out unnecessary networks. */
     GetAvailableScanInfos(availableScanInfos, scanInfos, blockedBssids, info);
     if (availableScanInfos.empty()) {
@@ -347,7 +347,7 @@ ErrCode StaAutoConnectService::AutoSelectDevice(WifiDeviceConfig &electedDevice,
 }
 
 bool StaAutoConnectService::RoamingSelection(
-    WifiDeviceConfig &electedDevice, std::vector<WifiScanInfo> &availableScanInfos, WifiLinkedInfo &info)
+    WifiDeviceConfig &electedDevice, std::vector<InterScanInfo> &availableScanInfos, WifiLinkedInfo &info)
 {
     for (auto scanInfo : availableScanInfos) {
         if (info.connState == ConnState::CONNECTED && scanInfo.ssid == info.ssid && scanInfo.bssid != info.bssid) {
@@ -361,7 +361,7 @@ bool StaAutoConnectService::RoamingSelection(
 }
 
 bool StaAutoConnectService::RoamingEncryptionModeCheck(
-    WifiDeviceConfig &electedDevice, WifiScanInfo scanInfo, WifiLinkedInfo &info)
+    WifiDeviceConfig &electedDevice, InterScanInfo scanInfo, WifiLinkedInfo &info)
 {
     WifiDeviceConfig network;
     if (WifiSettings::GetInstance().GetDeviceConfig(scanInfo.ssid, DEVICE_CONFIG_INDEX_SSID, network) == 0) {
@@ -402,7 +402,7 @@ bool StaAutoConnectService::RoamingEncryptionModeCheck(
     return false;
 }
 
-bool StaAutoConnectService::AllowAutoSelectDevice(const std::vector<WifiScanInfo> &scanInfos, WifiLinkedInfo &info)
+bool StaAutoConnectService::AllowAutoSelectDevice(const std::vector<InterScanInfo> &scanInfos, WifiLinkedInfo &info)
 {
     WIFI_LOGI("Enter StaAutoConnectService::AllowAutoSelectDevice.\n");
     if (scanInfos.empty()) {
@@ -459,7 +459,7 @@ bool StaAutoConnectService::AllowAutoSelectDevice(const std::vector<WifiScanInfo
     }
 }
 
-bool StaAutoConnectService::CurrentDeviceGoodEnough(const std::vector<WifiScanInfo> &scanInfos, WifiLinkedInfo &info)
+bool StaAutoConnectService::CurrentDeviceGoodEnough(const std::vector<InterScanInfo> &scanInfos, WifiLinkedInfo &info)
 {
     WIFI_LOGI("Enter StaAutoConnectService::CurrentDeviceGoodEnough.\n");
 
@@ -511,7 +511,7 @@ bool StaAutoConnectService::CurrentDeviceGoodEnough(const std::vector<WifiScanIn
     return true;
 }
 
-bool StaAutoConnectService::WhetherDevice5GAvailable(const std::vector<WifiScanInfo> &scanInfos)
+bool StaAutoConnectService::WhetherDevice5GAvailable(const std::vector<InterScanInfo> &scanInfos)
 {
     WIFI_LOGI("Enter StaAutoConnectService::WhetherDevice5GAvailable.\n");
     for (auto scaninfo : scanInfos) {
@@ -557,8 +557,8 @@ void StaAutoConnectService::RefreshConfigDevice()
     return;
 }
 
-void StaAutoConnectService::GetAvailableScanInfos(std::vector<WifiScanInfo> &availableScanInfos,
-    const std::vector<WifiScanInfo> &scanInfos, std::vector<std::string> &blockedBssids, WifiLinkedInfo &info)
+void StaAutoConnectService::GetAvailableScanInfos(std::vector<InterScanInfo> &availableScanInfos,
+    const std::vector<InterScanInfo> &scanInfos, std::vector<std::string> &blockedBssids, WifiLinkedInfo &info)
 {
     WIFI_LOGI("Enter StaAutoConnectService::GetAvailableScanInfos.\n");
     if (scanInfos.empty()) {

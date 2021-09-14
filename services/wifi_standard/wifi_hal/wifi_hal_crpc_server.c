@@ -272,7 +272,7 @@ int OnTransact(RpcServer *server, Context *context)
 }
 
 /* Callback request */
-int OnCallbackTransact(RpcServer *server, int event, Context *context)
+int OnCallbackTransact(const RpcServer *server, int event, Context *context)
 {
     if (server == NULL || context == NULL) {
         return -1;
@@ -315,7 +315,7 @@ int OnCallbackTransact(RpcServer *server, int event, Context *context)
     return 0;
 }
 
-int EndCallbackTransact(RpcServer *server, int event)
+int EndCallbackTransact(const RpcServer *server, int event)
 {
     if (server == NULL) {
         return -1;

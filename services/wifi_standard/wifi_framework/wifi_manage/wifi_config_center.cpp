@@ -14,9 +14,11 @@
  */
 
 #include "wifi_config_center.h"
+#include "wifi_global_func.h"
+#include "wifi_ap_hal_interface.h"
 #include "wifi_log.h"
 #undef LOG_TAG
-#define LOG_TAG "OHWIFI_MANAGER_CONFIG_CENTER"
+#define LOG_TAG "WifiConfigCenter"
 
 namespace OHOS {
 namespace Wifi {
@@ -31,6 +33,7 @@ WifiConfigCenter::WifiConfigCenter()
     mStaMidState = WifiOprMidState::CLOSED;
     mApMidState = WifiOprMidState::CLOSED;
     mScanMidState = WifiOprMidState::CLOSED;
+    mWifiOpenedWhenAirplane = false;
 }
 
 WifiConfigCenter::~WifiConfigCenter()
@@ -146,6 +149,7 @@ WifiOprMidState WifiConfigCenter::GetApMidState()
 {
     return mApMidState.load();
 }
+
 bool WifiConfigCenter::SetApMidState(WifiOprMidState expState, WifiOprMidState state)
 {
     return mApMidState.compare_exchange_strong(expState, state);
@@ -206,6 +210,31 @@ int WifiConfigCenter::GetValidChannels(ChannelsTable &channelsInfo)
     return WifiSettings::GetInstance().GetValidChannels(channelsInfo);
 }
 
+bool WifiConfigCenter::GetSupportedBandChannel()
+{
+    std::vector<int> allowed5GFreq, allowed2GFreq;
+    std::vector<int> allowed5GChan, allowed2GChan;
+    if (WifiApHalInterface::GetInstance().GetFrequenciesByBand(static_cast<int>(BandType::BAND_2GHZ), allowed2GFreq)) {
+        LOGW("fail to get 2.4G channel");
+    }
+    if (WifiApHalInterface::GetInstance().GetFrequenciesByBand(static_cast<int>(BandType::BAND_5GHZ), allowed5GFreq)) {
+        LOGW("fail to get 5G channel");
+    }
+
+    TransformFrequencyIntoChannel(allowed5GFreq, allowed5GChan);
+    TransformFrequencyIntoChannel(allowed2GFreq, allowed2GChan);
+
+    ChannelsTable ChanTbs;
+    ChanTbs[BandType::BAND_2GHZ] = allowed2GChan;
+    ChanTbs[BandType::BAND_5GHZ] = allowed5GChan;
+
+    if (WifiSettings::GetInstance().SetValidChannels(ChanTbs)) {
+        LOGE("fail to SetValidChannels");
+        return false;
+    }
+    return true;
+}
+
 WifiOprMidState WifiConfigCenter::GetScanMidState()
 {
     return mScanMidState.load();
@@ -231,9 +260,19 @@ bool WifiConfigCenter::GetCanUseStaWhenAirplaneMode()
     return WifiSettings::GetInstance().GetCanUseStaWhenAirplaneMode();
 }
 
-int WifiConfigCenter::SetCanUseStaWhenAirplaneMode(bool bCan)
+bool WifiConfigCenter::GetCanOpenStaWhenAirplaneMode()
 {
-    return WifiSettings::GetInstance().SetCanUseStaWhenAirplaneMode(bCan);
+    return WifiSettings::GetInstance().GetCanOpenStaWhenAirplaneMode();
+}
+
+bool WifiConfigCenter::GetWifiStateWhenAirplaneMode()
+{
+    return mWifiOpenedWhenAirplane;
+}
+
+void WifiConfigCenter::SetWifiStateWhenAirplaneMode(bool bState)
+{
+    mWifiOpenedWhenAirplane = bState;
 }
 
 bool WifiConfigCenter::GetStaLastRunState()

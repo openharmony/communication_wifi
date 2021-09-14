@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef WIFI_DEVICE_H
-#define WIFI_DEVICE_H
+#ifndef OHOS_WIFI_DEVICE_H
+#define OHOS_WIFI_DEVICE_H
 
 #include "i_wifi_device_callback.h"
 #include "wifi_errcode.h"
@@ -139,13 +139,12 @@ public:
     virtual ErrCode GetCountryCode(std::string &countryCode) = 0;
 
     /**
-     * @Description Client register callback event.
+     * @Description Register callback function.
      *
-     * @param name - client's name, which is a unique identifier
-     * @param callback - client object
+     * @param callback - IWifiDeviceCallBack object
      * @return ErrCode - operation result
      */
-    virtual ErrCode RegisterCallBackClient(const std::string &name, const sptr<IWifiDeviceCallBack> &callback) = 0;
+    virtual ErrCode RegisterCallBack(const sptr<IWifiDeviceCallBack> &callback) = 0;
 
     /**
      * @Description Get the signal level object.
@@ -173,6 +172,14 @@ public:
      * @return false - unsupported
      */
     virtual bool IsFeatureSupported(long feature) = 0;
+
+    /**
+     * @Description  Get the device MAC address.
+     *
+     * @param result - Get device mac String
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode GetDeviceMacAddress(std::string &result) = 0;
 };
 }  // namespace Wifi
 }  // namespace OHOS

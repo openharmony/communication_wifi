@@ -20,7 +20,6 @@
 #include "i_wifi_device.h"
 #include "i_wifi_device_callback.h"
 
-
 namespace OHOS {
 namespace Wifi {
 class WifiDeviceStub : public IRemoteStub<IWifiDevice> {
@@ -36,7 +35,6 @@ public:
 
 private:
     void InitHandleMap();
-    void InitStaHandleMap();
     void OnEnableWifi(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnDisableWifi(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnAddDeviceConfig(uint32_t code, MessageParcel &data, MessageParcel &reply);
@@ -58,9 +56,10 @@ private:
     void OnGetIpInfo(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnSetCountryCode(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnGetCountryCode(uint32_t code, MessageParcel &data, MessageParcel &reply);
-    void OnRegisterCallBackClient(uint32_t code, MessageParcel &data, MessageParcel &reply);
+    void OnRegisterCallBack(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnGetSignalLevel(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnGetSupportedFeatures(uint32_t code, MessageParcel &data, MessageParcel &reply);
+    void OnGetDeviceMacAdd(uint32_t code, MessageParcel &data, MessageParcel &reply);
 
 private:
     void ReadWifiDeviceConfig(MessageParcel &data, WifiDeviceConfig &config);

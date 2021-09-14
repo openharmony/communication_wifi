@@ -73,15 +73,6 @@ WifiErrorNo SetHostapdConfig(HostsapdConfig *config);
 WifiErrorNo GetStaInfos(char *infos, int32_t *size);
 
 /**
- * @Description Configuring the Wi-Fi hotspot channel and maximum number of connections.
- *
- * @param chan
- * @param mscb
- * @return WifiErrorNo
- */
-WifiErrorNo ConfigHotspot(uint32_t chan, const char *mscb);
-
-/**
  * @Description To set the blocklist filtering in AP mode to prohibit the MAC
  *              address connection.
  *
@@ -111,8 +102,7 @@ WifiErrorNo DelMacFilter(unsigned char *mac, int lenMac);
 WifiErrorNo DisassociateSta(unsigned char *mac, int lenMac);
 
 /**
- * @Description Obtains the hotspot frequency supported by a specified
- *              frequency band.
+ * @Description Obtains the hotspot frequency supported by a specified frequency band.
  *
  * @param band - Band type.
  * @param frequencies - Numeric group pointer of the int type.

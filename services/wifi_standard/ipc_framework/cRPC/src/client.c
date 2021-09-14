@@ -18,15 +18,13 @@
 #include "log.h"
 
 #undef LOG_TAG
-#define LOG_TAG "OHOS_WIFI_RPC_CLIENT"
+#define LOG_TAG "WifiRpcClient"
 
 const int FD_CHECK_TIMEOUT = 1000; /* poll wait time, units: ms */
-const int REMOTE_CALL_TIMEOUT = 5; /* remote call timeout, units: second */
 const int CLIENT_STATE_IDLE = 0;
 const int CLIENT_STATE_DEAL_REPLY = 1;
-const int CLIENT_STATE_DEAL_CALLBACK = 2;
+const int CLIENT_STATE_EXIT = 2;
 const int TMP_BUFF_SIZE = 16;
-const int US_1000 = 1000;
 
 static void *RpcClientThreadDeal(void *arg);
 
@@ -48,6 +46,7 @@ static char *RpcClientReadMsg(RpcClient *client)
         }
         ret = ContextReadNet(client->context);
         if (ret < 0) {
+            LOGE("read server reply message failed!");
             client->threadRunFlag = 0;
             return NULL;
         }
@@ -74,31 +73,23 @@ static void RpcClientDealReadMsg(RpcClient *client, char *buff)
     }
     if (strncmp(buff, szTmp, strlen(szTmp)) == 0) { /* deal reply message */
         pthread_mutex_lock(&client->mutex);
-        while (client->waitReply) {
-            pthread_cond_wait(&client->condW, &client->mutex);
-        }
         client->waitReply = CLIENT_STATE_DEAL_REPLY;
         client->context->oneProcess = buff;
         client->context->nPos = strlen(szTmp);
         client->context->nSize = strlen(buff);
-        pthread_cond_signal(&client->condN);
+        pthread_cond_signal(&client->condW);
         pthread_mutex_unlock(&client->mutex);
     } else { /* deal callback message */
         pthread_mutex_lock(&client->mutex);
-        while (client->waitReply) {
+        while (client->waitReply == CLIENT_STATE_DEAL_REPLY) {
             pthread_cond_wait(&client->condW, &client->mutex);
         }
-        client->waitReply = CLIENT_STATE_DEAL_CALLBACK;
+        pthread_mutex_unlock(&client->mutex);
         client->context->oneProcess = buff;
         client->context->nPos = strlen(szTmp);
         client->context->nSize = strlen(buff);
-        pthread_mutex_unlock(&client->mutex);
         OnTransact(client->context);
-        pthread_mutex_lock(&client->mutex);
         free(buff);
-        client->waitReply = CLIENT_STATE_IDLE;
-        pthread_cond_signal(&client->condW);
-        pthread_mutex_unlock(&client->mutex);
     }
     return;
 }
@@ -117,6 +108,11 @@ static void *RpcClientThreadDeal(void *arg)
         }
         RpcClientDealReadMsg(client, buff);
     }
+    pthread_mutex_lock(&client->mutex);
+    client->waitReply = CLIENT_STATE_EXIT;
+    pthread_cond_signal(&client->condW);
+    pthread_mutex_unlock(&client->mutex);
+    LOGI("Client read message thread exiting!");
     return NULL;
 }
 
@@ -144,13 +140,11 @@ RpcClient *CreateRpcClient(const char *path)
     client->waitReply = CLIENT_STATE_IDLE;
     client->callLockFlag = 0;
     pthread_mutex_init(&client->mutex, NULL);
-    pthread_cond_init(&client->condN, NULL);
     pthread_cond_init(&client->condW, NULL);
     pthread_mutex_init(&client->lockMutex, NULL);
     pthread_cond_init(&client->lockCond, NULL);
     int ret = pthread_create(&client->threadId, NULL, RpcClientThreadDeal, client);
     if (ret) {
-        pthread_cond_destroy(&client->condN);
         pthread_cond_destroy(&client->condW);
         pthread_mutex_destroy(&client->mutex);
         pthread_cond_destroy(&client->lockCond);
@@ -171,7 +165,6 @@ void ReleaseRpcClient(RpcClient *client)
             client->threadRunFlag = 0;
             pthread_join(client->threadId, NULL);
         }
-        pthread_cond_destroy(&client->condN);
         pthread_cond_destroy(&client->condW);
         pthread_mutex_destroy(&client->mutex);
         pthread_cond_destroy(&client->lockCond);
@@ -188,7 +181,9 @@ int RemoteCall(RpcClient *client)
     if (client == NULL) {
         return -1;
     }
-
+    if (client->waitReply == CLIENT_STATE_EXIT) {
+        return -1;
+    }
     int ret = 0;
     Context *context = client->context;
     while (context->wBegin != context->wEnd && ret >= 0) {
@@ -199,19 +194,14 @@ int RemoteCall(RpcClient *client)
     }
     ret = 0; /* reset ret value */
     pthread_mutex_lock(&client->mutex);
-    struct timeval now;
-    struct timespec outtime;
-    gettimeofday(&now, NULL);
-    outtime.tv_sec = now.tv_sec + REMOTE_CALL_TIMEOUT;
-    outtime.tv_nsec = now.tv_usec * US_1000;
-    while (client->waitReply != CLIENT_STATE_DEAL_REPLY) {
-        ret = pthread_cond_timedwait(&client->condN, &client->mutex, &outtime);
-        if (ret != 0) {
-            break;
-        }
+    while (client->waitReply != CLIENT_STATE_DEAL_REPLY && client->waitReply != CLIENT_STATE_EXIT) {
+        pthread_cond_wait(&client->condW, &client->mutex);
+    }
+    if (client->waitReply == CLIENT_STATE_EXIT) {
+        ret = -1;
     }
     pthread_mutex_unlock(&client->mutex);
-    return ((ret == 0) ? 0 : -1);
+    return ret;
 }
 
 void ReadClientEnd(RpcClient *client)
@@ -223,7 +213,9 @@ void ReadClientEnd(RpcClient *client)
     pthread_mutex_lock(&client->mutex);
     free(client->context->oneProcess);
     client->context->oneProcess = NULL;
-    client->waitReply = CLIENT_STATE_IDLE;
+    if (client->waitReply == CLIENT_STATE_DEAL_REPLY) {
+        client->waitReply = CLIENT_STATE_IDLE;
+    }
     pthread_cond_signal(&client->condW);
     pthread_mutex_unlock(&client->mutex);
     return;

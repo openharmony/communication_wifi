@@ -112,16 +112,7 @@ public:
      * @param ifname - interface name, eg:wlan0 [in]
      * @Return : success - DHCP_OPT_SUCCESS, failed - others.
      */
-    int ReleaseDhcpClient(const std::string& ifname) override;
-
-    /**
-     * @Description : Handle dhcp packet info.
-     *
-     * @param ifname - interface name, eg:wlan0 [in]
-     * @param packetResult - dhcp packet result [in]
-     * @param success - get success is true, get failed is false [in]
-     */
-    void DhcpPacketInfoHandle(const std::string& ifname, struct DhcpPacketResult &packetResult, bool success = true);
+    int ReleaseDhcpClient(const std::string &ifname) override;
 
     /**
      * @Description : Handle dhcp result.
@@ -136,7 +127,37 @@ public:
      * @param ifname - interface name, eg:wlan0 [in]
      * @Return : The dhcp client process pid.
      */
-    pid_t GetDhcpClientProPid(const std::string& ifname);
+    pid_t GetDhcpClientProPid(const std::string &ifname);
+
+    /**
+     * @Description : Get dhcp event success ipv4 result.
+     *
+     * @param splits - dhcp event result vector [in]
+     * @Return : success - DHCP_OPT_SUCCESS, failed - others.
+     */
+    static int GetSuccessIpv4Result(const std::vector<std::string> &splits);
+
+    /**
+     * @Description : Get dhcp event ipv4 result.
+     *
+     * @param code - dhcp event result code [in]
+     * @param splits - dhcp event result vector [in]
+     * @Return : success - DHCP_OPT_SUCCESS, failed - others.
+     */
+    static int GetDhcpEventIpv4Result(const int code, const std::vector<std::string> &splits);
+
+    /**
+     * @Description : Handle dhcp event result string.
+     *
+     * @param code - dhcp event result code [in]
+     * @param data - dhcp event result string [in]
+     * @Return : success - DHCP_OPT_SUCCESS, failed - others.
+     */
+    static int DhcpEventResultHandle(const int code, const std::string &data);
+
+public:
+    static std::map<std::string, DhcpResult> m_mapDhcpResult;
+    static std::map<std::string, DhcpServiceInfo> m_mapDhcpInfo;
 
 private:
     /**
@@ -161,12 +182,6 @@ private:
      */
     void RunDhcpResultHandleThreadFunc();
     /**
-     * @Description : Dhcp recv msg threads execution function.
-     *
-     * @param ifname - interface name, eg:wlan0 [in]
-     */
-    void RunDhcpRecvMsgThreadFunc(const std::string& ifname);
-    /**
      * @Description : Fork child process function for start or stop dhcp process.
      *
      * @param ifname - interface name, eg:wlan0 [in]
@@ -185,13 +200,9 @@ private:
 
 private:
     std::mutex mResultNotifyMutex;
-    std::mutex mRecvMsgThreadMutex;
     bool isExitDhcpResultHandleThread;
     std::thread *pDhcpResultHandleThread;
-    std::map<std::string, std::thread *> m_mapDhcpRecvMsgThread;
 
-    std::map<std::string, DhcpServiceInfo> m_mapDhcpInfo;
-    std::map<std::string, DhcpResult> m_mapDhcpResult;
     std::map<std::string, std::list<DhcpResultReq*>> m_mapDhcpResultNotify;
 };
 }  // namespace Wifi

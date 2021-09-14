@@ -16,7 +16,6 @@
 #ifndef OHOS_WIFI_GLOBAL_FUNC_H
 #define OHOS_WIFI_GLOBAL_FUNC_H
 
-
 #include <vector>
 #include <random>
 #include <string>
@@ -70,14 +69,6 @@ ErrCode CfgCheckBand(const HotspotConfig &cfg, std::vector<BandType> &bandsFromC
 ErrCode CfgCheckChannel(const HotspotConfig &cfg, ChannelsTable &channInfoFromCenter);
 
 /**
- * @Description Check valid connect number config
- *
- * @param cfg - HotspotConfig
- * @return ErrCode - WIFI_OPT_SUCCESS or others
- */
-ErrCode CfgCheckMaxconnum(const HotspotConfig &cfg);
-
-/**
  * @Description Check valid hotspot config
  *
  * @param cfg - HotspotConfig
@@ -124,12 +115,46 @@ int CheckMacIsValid(const std::string &macStr);
 
 /**
  * @Description Split string to vector accord split
- * 
+ *
  * @param str - input string
  * @param split - split string
  * @param vec - return string vector
  */
 void SplitString(const std::string &str, const std::string &split, std::vector<std::string> &vec);
+
+/**
+ * @Description Check is a valid 5G frequency.
+ *
+ * @param freq - Frequency input
+ * @return true - valid
+ * @return false - invalid
+ */
+bool IsValid5GHz(int freq);
+
+/**
+ * @Description Check is a valid 2.4G frequency.
+ *
+ * @param freq - Frequency input
+ * @return true - valid
+ * @return false - invalid
+ */
+bool IsValid24GHz(int freq);
+
+/**
+ * @Description Obtain and report available channel information.
+ *
+ * @param apConfig - configuration input
+ * @param validChanTable - Valid channel tables.
+ */
+void CheckBandChannel(HotspotConfig &apConfig, const std::map<BandType, std::vector<int32_t>> &validChanTable);
+
+/**
+ * @Description Convert the frequency in the container into a channel.
+ *
+ * @param freqVector - frequency vector input
+ * @param chanVector - Channel vector output
+ */
+void TransformFrequencyIntoChannel(const std::vector<int> &freqVector, std::vector<int> &chanVector);
 }  // namespace Wifi
 }  // namespace OHOS
 #endif

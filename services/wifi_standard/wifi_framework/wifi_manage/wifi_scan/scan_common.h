@@ -19,6 +19,7 @@
 #include <string>
 #include <vector>
 #include "wifi_scan_msg.h"
+#include "wifi_internal_msg.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -168,31 +169,6 @@ enum ScanStatus {
     PNO_SCAN_FAILED = 5,      /* Failed to start the PNO scanning */
     SCAN_INNER_EVENT = 6,     /* Report internal events */
     SCAN_STATUS_INVALID       /* Invalid value */
-};
-
-/* Scan Info */
-struct InterScanInfo {
-    std::string bssid;        /* Access point address */
-    std::string ssid;         /* Network Name */
-    std::string capabilities; /*
-                               * Network performance, including authentication,
-                               * key management, and encryption mechanisms
-                               * supported by the access point
-                               */
-    int frequency;            /* Access point frequency */
-    int band;                 /* ap band, 1: 2.4G, 2: 5G */
-    int rssi;                 /* signal strength */
-    WifiSecurity securityType;
-    int64_t timestamp;        /* Timestamp of scanning */
-
-    InterScanInfo()
-    {
-          frequency = 0;
-          band = 0;
-          rssi = 0;
-          securityType = WifiSecurity::INVALID;
-          timestamp = 0;
-    }
 };
 
 struct ScanStatusReport {

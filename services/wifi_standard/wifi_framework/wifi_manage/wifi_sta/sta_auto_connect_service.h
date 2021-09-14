@@ -59,7 +59,7 @@ public:
      *
      * @param scanInfos - The list of scanning results(in)
      */
-    void OnScanInfosReadyHandler(const std::vector<WifiScanInfo> &scanInfos);
+    void OnScanInfosReadyHandler(const std::vector<InterScanInfo> &scanInfos);
     /**
      * @Description  Whether tracking should enable or disable scanned BSSIDs
      *
@@ -78,7 +78,7 @@ public:
      * @param electedDevice - Elected Device(out)
      * @Return success : WIFI_OPT_SUCCESS  failed : WIFI_OPT_FAILED
      */
-    ErrCode AutoSelectDevice(WifiDeviceConfig &electedDevice, const std::vector<WifiScanInfo> &scanInfos,
+    ErrCode AutoSelectDevice(WifiDeviceConfig &electedDevice, const std::vector<InterScanInfo> &scanInfos,
         std::vector<std::string> &blockedBssids, WifiLinkedInfo &info);
     /**
      * @Description  Registering the Device Appraisal
@@ -165,8 +165,8 @@ private:
      * @param info - Current Connected Device(in)
      * @param availableScanInfos - Available Scan Info(out)
      */
-    void GetAvailableScanInfos(std::vector<WifiScanInfo> &availableScanInfos,
-        const std::vector<WifiScanInfo> &scanInfos, std::vector<std::string> &blockedBssids, WifiLinkedInfo &info);
+    void GetAvailableScanInfos(std::vector<InterScanInfo> &availableScanInfos,
+        const std::vector<InterScanInfo> &scanInfos, std::vector<std::string> &blockedBssids, WifiLinkedInfo &info);
     /**
      * @Description  Whether the device needs to be switched.
      *
@@ -174,7 +174,7 @@ private:
      * @param info - Current Connected Device(in)
      * @Return success : true  failed : false
      */
-    bool AllowAutoSelectDevice(const std::vector<WifiScanInfo> &scanInfos, WifiLinkedInfo &info);
+    bool AllowAutoSelectDevice(const std::vector<InterScanInfo> &scanInfos, WifiLinkedInfo &info);
     /**
      * @Description  Whether the device strength is sufficient.
      *
@@ -182,14 +182,14 @@ private:
      * @param info - Current Connected Device(in)
      * @Return success : true  failed : false
      */
-    bool CurrentDeviceGoodEnough(const std::vector<WifiScanInfo> &scanInfos, WifiLinkedInfo &info);
+    bool CurrentDeviceGoodEnough(const std::vector<InterScanInfo> &scanInfos, WifiLinkedInfo &info);
     /**
      * @Description  Whether 5G devices are available.
      *
      * @param scanInfos - WifiScanInfo list of all APs in the range(in)
      * @Return success : true  failed : false
      */
-    bool WhetherDevice5GAvailable(const std::vector<WifiScanInfo> &scanInfos);
+    bool WhetherDevice5GAvailable(const std::vector<InterScanInfo> &scanInfos);
     /**
      * @Description  Select Roaming Device.
      *
@@ -200,7 +200,7 @@ private:
      * @Return success : true  failed : false
      */
     bool RoamingSelection(
-        WifiDeviceConfig &electedDevice, std::vector<WifiScanInfo> &availableScanInfos, WifiLinkedInfo &info);
+        WifiDeviceConfig &electedDevice, std::vector<InterScanInfo> &availableScanInfos, WifiLinkedInfo &info);
     /**
      * @Description  Select Roaming Device.
      *
@@ -209,7 +209,7 @@ private:
      * @param electedDevice - Elected Device(out)
      * @Return success : true  failed : false
      */
-    bool RoamingEncryptionModeCheck(WifiDeviceConfig &electedDevice, WifiScanInfo scanInfo, WifiLinkedInfo &info);
+    bool RoamingEncryptionModeCheck(WifiDeviceConfig &electedDevice, InterScanInfo scanInfo, WifiLinkedInfo &info);
     /**
      * @Description  Updating the Configuration Center Device.
      *

@@ -38,7 +38,7 @@ sptr<WifiHotspotServiceImpl> WifiHotspotServiceImpl::GetInstance()
     if (g_instance == nullptr) {
         std::lock_guard<std::mutex> autoLock(g_instanceLock);
         if (g_instance == nullptr) {
-            auto service = new WifiHotspotServiceImpl;
+            auto service = new (std::nothrow) WifiHotspotServiceImpl;
             g_instance = service;
         }
     }
@@ -91,8 +91,7 @@ bool WifiHotspotServiceImpl::Init()
 ErrCode WifiHotspotServiceImpl::IsHotspotActive(bool &bActive)
 {
     WIFI_LOGI("IsHotspotActive");
-    WifiOprMidState curState = WifiConfigCenter::GetInstance().GetApMidState();
-    bActive = (curState == WifiOprMidState::RUNNING);
+    bActive = IsApServiceRunning();
     return WIFI_OPT_SUCCESS;
 }
 
@@ -154,35 +153,22 @@ ErrCode WifiHotspotServiceImpl::SetHotspotConfig(const HotspotConfig &config)
         return validRetval;
     }
 
+    WifiLinkedInfo linkInfo;
+    WifiConfigCenter::GetInstance().GetLinkedInfo(linkInfo);
+    if (!linkInfo.ssid.empty() && linkInfo.ssid == config.GetSsid()) {
+        WIFI_LOGD("set ssid equal current linked ap ssid, no premission!");
+        return WIFI_OPT_INVALID_PARAM;
+    }
+
     if (!IsApServiceRunning()) {
         WifiConfigCenter::GetInstance().SetHotspotConfig(config);
     } else {
-        WifiRequestMsgInfo msg;
-        msg.msgCode = WifiInternalMsgCode::AP_SET_HOTSPOT_CONFIG_REQ;
-        msg.params.hotspotConfig = config;
-        if (WifiManager::GetInstance().PushMsg(WIFI_SERVICE_AP, msg) < 0) {
-            WIFI_LOGE("send set hotspot config msg failed!");
-            return WIFI_OPT_FAILED;
+        IApService *pService = WifiServiceManager::GetInstance().GetApServiceInst();
+        if (pService == nullptr) {
+            return WIFI_OPT_AP_NOT_OPENED;
         }
+        return pService->SetHotspotConfig(config);
     }
-    return WIFI_OPT_SUCCESS;
-}
-
-ErrCode WifiHotspotServiceImpl::GetDeviceMacAddress(std::string &result)
-{
-    WIFI_LOGI("GetDeviceMacAddress");
-    if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
-        WIFI_LOGE("GetDeviceMacAddress:VerifyGetWifiInfoPermission PERMISSION_DENIED!");
-        return WIFI_OPT_PERMISSION_DENIED;
-    }
-
-    if (WifiPermissionUtils::VerifyGetWifiLocalMacPermission() == PERMISSION_DENIED) {
-        WIFI_LOGE("GetDeviceMacAddress:VerifyGetWifiLocalMacPermission "
-                  "PERMISSION_DENIED!");
-        return WIFI_OPT_PERMISSION_DENIED;
-    }
-
-    WifiConfigCenter::GetInstance().GetMacAddress(result);
     return WIFI_OPT_SUCCESS;
 }
 
@@ -204,13 +190,20 @@ ErrCode WifiHotspotServiceImpl::GetStationList(std::vector<StationInfo> &result)
         return WIFI_OPT_PERMISSION_DENIED;
     }
 
-    WifiConfigCenter::GetInstance().GetStationList(result);
-    return WIFI_OPT_SUCCESS;
+    if (!IsApServiceRunning()) {
+        return WIFI_OPT_AP_NOT_OPENED;
+    }
+
+    IApService *pService = WifiServiceManager::GetInstance().GetApServiceInst();
+    if (pService == nullptr) {
+        return WIFI_OPT_AP_NOT_OPENED;
+    }
+    return pService->GetStationList(result);
 }
 
 ErrCode WifiHotspotServiceImpl::DisassociateSta(const StationInfo &info)
 {
-    WIFI_LOGI("DisassociateSta device name [%s]", info.deviceName.c_str());
+    WIFI_LOGI("DisassociateSta device name [%{private}s]", info.deviceName.c_str());
     if (WifiPermissionUtils::VerifySetWifiInfoPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("DisassociateSta:VerifySetWifiInfoPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
@@ -222,14 +215,11 @@ ErrCode WifiHotspotServiceImpl::DisassociateSta(const StationInfo &info)
         return WIFI_OPT_AP_NOT_OPENED;
     }
 
-    WifiRequestMsgInfo msg;
-    msg.msgCode = WifiInternalMsgCode::AP_DISCCONECT_STA_BY_MAC_REQ;
-    msg.params.stationInfo = info;
-    if (WifiManager::GetInstance().PushMsg(WIFI_SERVICE_AP, msg) < 0) {
-        WIFI_LOGE("send disconnect sta msg failed!");
-        return WIFI_OPT_FAILED;
+    IApService *pService = WifiServiceManager::GetInstance().GetApServiceInst();
+    if (pService == nullptr) {
+        return WIFI_OPT_AP_NOT_OPENED;
     }
-    return WIFI_OPT_SUCCESS;
+    return pService->DisconnetStation(info);
 }
 
 ErrCode WifiHotspotServiceImpl::CheckCanEnableHotspot(void)
@@ -268,36 +258,36 @@ ErrCode WifiHotspotServiceImpl::EnableHotspot(void)
         }
     }
     if (!WifiConfigCenter::GetInstance().SetApMidState(curState, WifiOprMidState::OPENING)) {
-        WIFI_LOGI("set ap mid state opening failed! may be other activity has been "
-                  "operated");
+        WIFI_LOGI("set ap mid state opening failed! may be other activity has been operated");
         return WIFI_OPT_OPEN_SUCC_WHEN_OPENED;
     }
-    bool bflag = false;
+    errCode = WIFI_OPT_FAILED;
     do {
         if (WifiServiceManager::GetInstance().CheckAndEnforceService(WIFI_SERVICE_AP) < 0) {
             WIFI_LOGE("Load %{public}s service failed!", WIFI_SERVICE_AP);
             break;
         }
-        WifiMessageQueue<WifiResponseMsgInfo> *mqUp = WifiManager::GetInstance().GetMessageQueue();
-        auto srvInst = WifiServiceManager::GetInstance().GetServiceInst(WIFI_SERVICE_AP);
-        if (srvInst == nullptr) {
-            WIFI_LOGE("Failed to get service instance!");
-            return WIFI_OPT_FAILED;
-        }
-        int ret = srvInst->Init(mqUp);
-        if (ret < 0) {
-            WIFI_LOGE("Init %{public}s service failed!", WIFI_SERVICE_AP);
-            WifiServiceManager::GetInstance().UnloadService(WIFI_SERVICE_AP);
+        IApService *pService = WifiServiceManager::GetInstance().GetApServiceInst();
+        if (pService == nullptr) {
+            WIFI_LOGE("Create %{public}s service failed!", WIFI_SERVICE_AP);
             break;
         }
-        bflag = true;
+        errCode = pService->RegisterApServiceCallbacks(WifiManager::GetInstance().GetApCallback());
+        if (errCode != WIFI_OPT_SUCCESS) {
+            WIFI_LOGE("Register ap service callback failed!");
+            break;
+        }
+        errCode = pService->EnableHotspot();
+        if (errCode != WIFI_OPT_SUCCESS) {
+            WIFI_LOGE("service enable ap failed, ret %{public}d!", static_cast<int>(errCode));
+            break;
+        }
     } while (false);
-    if (!bflag) {
+    if (errCode != WIFI_OPT_SUCCESS) {
         WifiConfigCenter::GetInstance().SetApMidState(WifiOprMidState::OPENING, WifiOprMidState::CLOSED);
-        return WIFI_OPT_FAILED;
-    } else {
-        return WIFI_OPT_SUCCESS;
+        WifiServiceManager::GetInstance().UnloadService(WIFI_SERVICE_AP);
     }
+    return errCode;
 }
 
 ErrCode WifiHotspotServiceImpl::DisableHotspot(void)
@@ -318,27 +308,25 @@ ErrCode WifiHotspotServiceImpl::DisableHotspot(void)
         }
     }
     if (!WifiConfigCenter::GetInstance().SetApMidState(curState, WifiOprMidState::CLOSING)) {
-        WIFI_LOGI("set ap mid state closing failed! may be other activity has been "
-                  "operated");
+        WIFI_LOGI("set ap mid state closing failed! may be other activity has been operated");
         return WIFI_OPT_CLOSE_SUCC_WHEN_CLOSED;
     }
-    auto srvInst = WifiServiceManager::GetInstance().GetServiceInst(WIFI_SERVICE_AP);
-    if (srvInst == nullptr) {
-        WIFI_LOGE("Failed to get service instance!");
-        return WIFI_OPT_FAILED;
-    }
-    int ret = srvInst->UnInit();
-    if (ret < 0) {
-        WifiConfigCenter::GetInstance().SetApMidState(WifiOprMidState::CLOSING, WifiOprMidState::RUNNING);
-        return WIFI_OPT_FAILED;
-    } else {
+    IApService *pService = WifiServiceManager::GetInstance().GetApServiceInst();
+    if (pService == nullptr) {
+        WifiConfigCenter::GetInstance().SetApMidState(WifiOprMidState::CLOSED);
+        WifiServiceManager::GetInstance().UnloadService(WIFI_SERVICE_AP);
         return WIFI_OPT_SUCCESS;
     }
+    ErrCode ret = pService->DisableHotspot();
+    if (ret != WIFI_OPT_SUCCESS) {
+        WifiConfigCenter::GetInstance().SetApMidState(WifiOprMidState::CLOSING, WifiOprMidState::RUNNING);
+    }
+    return ret;
 }
 
 ErrCode WifiHotspotServiceImpl::AddBlockList(const StationInfo &info)
 {
-    WIFI_LOGI("AddBlockList, device name [%s]", info.deviceName.c_str());
+    WIFI_LOGI("AddBlockList, device name [%{private}s]", info.deviceName.c_str());
     if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("AddBlockList:VerifyGetWifiInfoPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
@@ -360,19 +348,16 @@ ErrCode WifiHotspotServiceImpl::AddBlockList(const StationInfo &info)
         WIFI_LOGE("Add block list failed!");
         return WIFI_OPT_FAILED;
     }
-    WifiRequestMsgInfo msg;
-    msg.msgCode = WifiInternalMsgCode::AP_ADD_BLOCK_LIST_REQ;
-    msg.params.stationInfo = info;
-    if (WifiManager::GetInstance().PushMsg(WIFI_SERVICE_AP, msg) < 0) {
-        WIFI_LOGE("send set hotspot blocklist msg failed!");
-        return WIFI_OPT_FAILED;
+    IApService *pService = WifiServiceManager::GetInstance().GetApServiceInst();
+    if (pService == nullptr) {
+        return WIFI_OPT_AP_NOT_OPENED;
     }
-    return WIFI_OPT_SUCCESS;
+    return pService->AddBlockList(info);
 }
 
 ErrCode WifiHotspotServiceImpl::DelBlockList(const StationInfo &info)
 {
-    WIFI_LOGI("DelBlockList, device name [%s]", info.deviceName.c_str());
+    WIFI_LOGI("DelBlockList, device name [%{private}s]", info.deviceName.c_str());
     if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("DelBlockList:VerifyGetWifiInfoPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
@@ -388,11 +373,12 @@ ErrCode WifiHotspotServiceImpl::DelBlockList(const StationInfo &info)
     }
 
     if (IsApServiceRunning()) {
-        WifiRequestMsgInfo msg;
-        msg.msgCode = WifiInternalMsgCode::AP_DEL_BLOCK_LIST_REQ;
-        msg.params.stationInfo = info;
-        if (WifiManager::GetInstance().PushMsg(WIFI_SERVICE_AP, msg) < 0) {
-            WIFI_LOGE("send del hotspot blocklist msg failed!");
+        IApService *pService = WifiServiceManager::GetInstance().GetApServiceInst();
+        if (pService == nullptr) {
+            return WIFI_OPT_AP_NOT_OPENED;
+        }
+        if (pService->DelBlockList(info) != WIFI_OPT_SUCCESS) {
+            WIFI_LOGE("request del hotspot blocklist failed!");
             return WIFI_OPT_FAILED;
         }
     }
@@ -411,13 +397,7 @@ ErrCode WifiHotspotServiceImpl::GetValidBands(std::vector<BandType> &bands)
         return WIFI_OPT_PERMISSION_DENIED;
     }
 
-    if (!IsApServiceRunning()) {
-        WIFI_LOGE("ApService is not running!");
-        return WIFI_OPT_AP_NOT_OPENED;
-    }
-
     if (WifiConfigCenter::GetInstance().GetValidBands(bands) < 0) {
-        WIFI_LOGE("Delete block list failed!");
         return WIFI_OPT_FAILED;
     }
     return WIFI_OPT_SUCCESS;
@@ -431,25 +411,15 @@ ErrCode WifiHotspotServiceImpl::GetValidChannels(BandType band, std::vector<int3
         return WIFI_OPT_PERMISSION_DENIED;
     }
 
-    if (!IsApServiceRunning()) {
-        WIFI_LOGE("ApService is not running!");
-        return WIFI_OPT_AP_NOT_OPENED;
-    }
-
-    ChannelsTable channelsInfo;
-    if (WifiConfigCenter::GetInstance().GetValidChannels(channelsInfo) < 0) {
-        WIFI_LOGE("Failed to obtain data from the configuration center.");
-        return WIFI_OPT_FAILED;
-    }
-
-    auto it = channelsInfo.find(band);
-    if (it == channelsInfo.end()) {
-        WIFI_LOGE("The value of band is invalid.");
+    if (band == BandType::BAND_NONE) {
         return WIFI_OPT_INVALID_PARAM;
     }
-
-    validchannels = channelsInfo[band];
-
+    ChannelsTable channInfoFromCenter;
+    WifiConfigCenter::GetInstance().GetValidChannels(channInfoFromCenter);
+    auto iter = channInfoFromCenter.find(band);
+    if (iter != channInfoFromCenter.end()) {
+        validchannels = iter->second;
+    }
     return WIFI_OPT_SUCCESS;
 }
 

@@ -298,6 +298,11 @@ public:
     int GetValidChannels(ChannelsTable &channelsInfo);
 
     /**
+     * @Description request to chip for initation current vaild bands and channels
+     */
+    bool GetSupportedBandChannel();
+
+    /**
      * @Description Get current scan service middle state
      *
      * @return WifiOprMidState - which can be a CLOSED/CLOSING/OPENING/RUNNING/UNKNOWN
@@ -345,6 +350,29 @@ public:
      * @return int - 0 success
      */
     int SetCanUseStaWhenAirplaneMode(bool bCan);
+
+    /**
+     * @Description Get the config whether can open sta when airplane mode opened
+     *
+     * @return true - can open
+     * @return false - can't open
+     */
+    bool GetCanOpenStaWhenAirplaneMode();
+
+    /**
+     * @Description when last airplane mode, get sta state, open or close
+     *
+     * @return true - when in airplane mode, we open sta
+     * @return false - when in airplane mode, we close sta
+     */
+    bool GetWifiStateWhenAirplaneMode();
+
+    /**
+     * @Description when in airplane mode, set sta state
+     *
+     * @param bState - open or close
+     */
+    void SetWifiStateWhenAirplaneMode(bool bState);
 
     /**
      * @Description Get the STA service last running state
@@ -424,6 +452,7 @@ private:
     std::atomic<WifiOprMidState> mScanMidState;
     /* Time interval for disabling and re-enabling the STA */
     std::chrono::steady_clock::time_point mWifiCloseTime;
+    bool mWifiOpenedWhenAirplane;
 };
 } // namespace Wifi
 } // namespace OHOS

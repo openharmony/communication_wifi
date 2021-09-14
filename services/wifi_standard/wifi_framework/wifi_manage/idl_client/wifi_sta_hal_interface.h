@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_WIFISTAHALINTERFACE_H
-#define OHOS_WIFISTAHALINTERFACE_H
+#ifndef OHOS_WIFI_STA_HAL_INTERFACE_H
+#define OHOS_WIFI_STA_HAL_INTERFACE_H
 
 #include <string>
 #include <vector>
@@ -22,7 +22,7 @@
 #include "wifi_event_callback.h"
 #include "wifi_idl_struct.h"
 #include "wifi_scan_param.h"
-#include "wifi_scan_result.h"
+#include "wifi_idl_define.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -166,7 +166,7 @@ public:
      * @param scanResults
      * @return WifiErrorNo
      */
-    WifiErrorNo QueryScanResults(std::vector<WifiScanResult> &scanResults);
+    WifiErrorNo QueryScanInfos(std::vector<InterScanInfo> &scanInfos);
 
     /**
      * @Description Initiate PNO scanning.
@@ -303,13 +303,6 @@ public:
     WifiErrorNo WpaAutoConnect(int enable);
 
     /**
-     * @Description Force wpa_supplicant to re-read its configuration file.
-     *
-     * @return WifiErrorNo
-     */
-    WifiErrorNo WpaReconfigure(void);
-
-    /**
      * @Description Clearing the wpa Blocklist.
      *
      * @return WifiErrorNo
@@ -322,9 +315,26 @@ public:
      * @param networkList
      * @return WifiErrorNo
      */
-    WifiErrorNo GetNetworkList(std::vector<WifiWpaNetworkList> &networkList);
+    WifiErrorNo GetNetworkList(std::vector<WifiWpaNetworkInfo> &networkList);
+
+    /**
+     * @Description Get current connect signal info, rssi, linkspeed, noise ...
+     *
+     * @param endBssid - peer end bssid, i.e. linked ap's bssid
+     * @param info - signal info
+     * @return WifiErrorNo
+     */
+    WifiErrorNo GetConnectSignalInfo(const std::string &endBssid, WifiWpaSignalInfo &info);
+
+    /**
+     * @Description Get register callback objects
+     *
+     * @return const WifiEventCallback& - register sta callback objects
+     */
+    const WifiEventCallback &GetCallbackInst(void) const;
 
 private:
+    WifiEventCallback mStaCallback;
 };
 }  // namespace Wifi
 }  // namespace OHOS

@@ -14,6 +14,8 @@
  */
 #include "scan_state_machine.h"
 #include "wifi_logger.h"
+#include "wifi_settings.h"
+#include "wifi_sta_hal_interface.h"
 
 DEFINE_WIFILOG_SCAN_LABEL("ScanStateMachine");
 
@@ -1015,72 +1017,53 @@ void ScanStateMachine::CommonScanInfoProcess()
     return;
 }
 
-void ScanStateMachine::ConvertScanInfos(
-    std::vector<WifiScanResult> &wifiScanResults, std::vector<InterScanInfo> &scanInfos)
-{
-    WIFI_LOGI("Enter ScanStateMachine::ConvertScanInfos.\n");
-
-    std::vector<WifiScanResult>::iterator iter = wifiScanResults.begin();
-    for (; iter != wifiScanResults.end(); ++iter) {
-        InterScanInfo singleInfo;
-        singleInfo.bssid = iter->bssid;
-        singleInfo.ssid = iter->ssid;
-        singleInfo.capabilities = iter->capability;
-        singleInfo.frequency = iter->frequency;
-        singleInfo.rssi = iter->signalLevel;
-        singleInfo.timestamp = iter->timestamp;
-        GetSecurityTypeAndBand(singleInfo);
-        scanInfos.push_back(singleInfo);
-    }
-
-    return;
-}
-
-void ScanStateMachine::GetSecurityTypeAndBand(InterScanInfo &scanInfo)
+void ScanStateMachine::GetSecurityTypeAndBand(std::vector<InterScanInfo> &scanInfos)
 {
     WIFI_LOGI("Enter ScanStateMachine::GetSecurityTypeAndBand.\n");
 
-    if (scanInfo.frequency < SCAN_24GHZ_MAX_FREQUENCY) {
-        scanInfo.band = SCAN_24GHZ_BAND;
-    } else if (scanInfo.frequency > SCAN_5GHZ_MIN_FREQUENCY) {
-        scanInfo.band = SCAN_5GHZ_BAND;
-    } else {
-        WIFI_LOGE("invalid frequency value: %{public}d", scanInfo.frequency);
-        scanInfo.band = 0;
-    }
+    for (auto iter = scanInfos.begin(); iter != scanInfos.end(); ++iter) {
+        if (iter->frequency < SCAN_24GHZ_MAX_FREQUENCY) {
+            iter->band = SCAN_24GHZ_BAND;
+        } else if (iter->frequency > SCAN_5GHZ_MIN_FREQUENCY) {
+            iter->band = SCAN_5GHZ_BAND;
+        } else {
+            WIFI_LOGE("invalid frequency value: %{public}d", iter->frequency);
+            iter->band = 0;
+        }
 
-    scanInfo.securityType = WifiSecurity::OPEN;
-    if (scanInfo.capabilities.find("WAPI-PSK") != std::string::npos) {
-        scanInfo.securityType = WifiSecurity::WAPI_PSK;
-        return;
-    }
-    if (scanInfo.capabilities.find("PSK") != std::string::npos) {
-        scanInfo.securityType = WifiSecurity::PSK;
-        return;
-    }
-    if (scanInfo.capabilities.find("WEP") != std::string::npos) {
-        scanInfo.securityType = WifiSecurity::WEP;
-        return;
-    }
-    if (scanInfo.capabilities.find("EAP_SUITE_B_192") != std::string::npos) {
-        scanInfo.securityType = WifiSecurity::EAP_SUITE_B;
-        return;
-    }
-    if (scanInfo.capabilities.find("EAP") != std::string::npos) {
-        scanInfo.securityType = WifiSecurity::EAP;
-        return;
-    }
-    if (scanInfo.capabilities.find("SAE") != std::string::npos) {
-        scanInfo.securityType = WifiSecurity::SAE;
-        return;
-    }
-    if (scanInfo.capabilities.find("OWE") != std::string::npos) {
-        scanInfo.securityType = WifiSecurity::OWE;
-        return;
-    }
-    if (scanInfo.capabilities.find("CERT") != std::string::npos) {
-        scanInfo.securityType = WifiSecurity::WAPI_CERT;
-        return;
+        iter->securityType = WifiSecurity::OPEN;
+        if (iter->capabilities.find("WAPI-PSK") != std::string::npos) {
+            iter->securityType = WifiSecurity::WAPI_PSK;
+            continue;
+        }
+        if (iter->capabilities.find("PSK") != std::string::npos) {
+            iter->securityType = WifiSecurity::PSK;
+            continue;
+        }
+        if (iter->capabilities.find("WEP") != std::string::npos) {
+            iter->securityType = WifiSecurity::WEP;
+            continue;
+        }
+        if (iter->capabilities.find("EAP_SUITE_B_192") != std::string::npos) {
+            iter->securityType = WifiSecurity::EAP_SUITE_B;
+            continue;
+        }
+        if (iter->capabilities.find("EAP") != std::string::npos) {
+            iter->securityType = WifiSecurity::EAP;
+            continue;
+        }
+        if (iter->capabilities.find("SAE") != std::string::npos) {
+            iter->securityType = WifiSecurity::SAE;
+            continue;
+        }
+        if (iter->capabilities.find("OWE") != std::string::npos) {
+            iter->securityType = WifiSecurity::OWE;
+            continue;
+        }
+        if (iter->capabilities.find("CERT") != std::string::npos) {
+            iter->securityType = WifiSecurity::WAPI_CERT;
+            continue;
+        }
     }
     return;
 }
@@ -1543,15 +1526,14 @@ bool ScanStateMachine::GetScanInfos(std::vector<InterScanInfo> &scanInfos)
 {
     WIFI_LOGI("Enter ScanStateMachine::GetScanInfos.\n");
 
-    std::vector<WifiScanResult> wifiScanResults;
-    WIFI_LOGI("Begin: QueryScanResults.");
-    if (WifiStaHalInterface::GetInstance().QueryScanResults(wifiScanResults) != WIFI_IDL_OPT_OK) {
+    WIFI_LOGI("Begin: QueryScanInfos.");
+    if (WifiStaHalInterface::GetInstance().QueryScanInfos(scanInfos) != WIFI_IDL_OPT_OK) {
         WIFI_LOGE("WifiStaHalInterface::GetInstance().QueryScanResults failed.");
         return false;
     }
-    WIFI_LOGI("End: QueryScanResults.");
+    WIFI_LOGI("End: QueryScanInfos.");
+    GetSecurityTypeAndBand(scanInfos);
 
-    ConvertScanInfos(wifiScanResults, scanInfos);
     return true;
 }
 

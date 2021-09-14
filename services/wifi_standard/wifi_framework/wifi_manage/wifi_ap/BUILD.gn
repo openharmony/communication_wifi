@@ -21,6 +21,7 @@ ohos_shared_library("wifi_ap_service") {
     "../common/message_queue.cpp",
     "../common/state.cpp",
     "../common/state_machine.cpp",
+    "//foundation/communication/wifi/services/wifi_standard/wifi_framework/common/net_helper/dhcpd_interface.cpp",
     "ap_config_use.cpp",
     "ap_idle_state.cpp",
     "ap_interface.cpp",
@@ -30,7 +31,6 @@ ohos_shared_library("wifi_ap_service") {
     "ap_started_state.cpp",
     "ap_state_machine.cpp",
     "ap_stations_manager.cpp",
-    "wifi_ap_dhcp_interface.cpp",
     "wifi_ap_nat_manager.cpp",
   ]
 
@@ -44,12 +44,15 @@ ohos_shared_library("wifi_ap_service") {
     "//foundation/communication/wifi/services/wifi_standard/wifi_framework/common/net_helper",
     "//foundation/communication/wifi/services/wifi_standard/wifi_framework/common/config",
     "//foundation/communication/wifi/services/wifi_standard/wifi_framework/common/log",
+    "//foundation/communication/wifi/services/wifi_standard/wifi_framework/common/utils",
     "//foundation/communication/wifi/services/wifi_standard/wifi_framework/wifi_manage/common/include",
     "//foundation/communication/wifi/services/wifi_standard/wifi_framework/wifi_manage/wifi_ap",
     "//foundation/communication/wifi/services/wifi_standard/wifi_framework/wifi_manage",
     "//foundation/communication/wifi/services/wifi_standard/wifi_framework/wifi_manage/common",
     "//foundation/communication/wifi/services/wifi_standard/wifi_framework/wifi_manage/idl_client",
     "//foundation/communication/wifi/services/wifi_standard/wifi_framework/wifi_manage/idl_client/idl_interface",
+    "//foundation/communication/wifi/services/wifi_standard/wifi_framework/dhcp_manage/mgr_service/include",
+    "//foundation/communication/wifi/services/wifi_standard/wifi_framework/dhcp_manage/mgr_service/interfaces",
   ]
 
   cflags_cc = [
@@ -62,11 +65,10 @@ ohos_shared_library("wifi_ap_service") {
     "-Wl,-E",
   ]
 
-  defines = [ "AP_NOT_DIRECT_USE_DHCP" ]
-
   external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
 
   deps = [
+    "//foundation/communication/wifi/services/wifi_standard/wifi_framework/dhcp_manage/mgr_service:dhcp_manager_service",
     "//foundation/communication/wifi/services/wifi_standard/wifi_framework/wifi_manage:wifi_manager_service",
     "//foundation/communication/wifi/services/wifi_standard/wifi_framework/wifi_manage/idl_client:wifi_idl_client",
     "//utils/native/base:utils",

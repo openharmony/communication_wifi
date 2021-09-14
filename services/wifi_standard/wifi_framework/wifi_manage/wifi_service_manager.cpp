@@ -140,6 +140,29 @@ int WifiServiceManager::LoadApService(const std::string &dlname, bool bCreate)
     return 0;
 }
 
+int WifiServiceManager::LoadP2pService(const std::string &dlname, bool bCreate)
+{
+    if (mP2pServiceHandle.handle != nullptr) {
+        return 0;
+    }
+    mP2pServiceHandle.handle = dlopen(dlname.c_str(), RTLD_LAZY);
+    if (mP2pServiceHandle.handle == nullptr) {
+        WIFI_LOGE("dlopen %{public}s failed: %{public}s!", dlname.c_str(), dlerror());
+        return -1;
+    }
+    mP2pServiceHandle.create = (IP2pService *(*)()) dlsym(mP2pServiceHandle.handle, "Create");
+    mP2pServiceHandle.destroy = (void *(*)(IP2pService *))dlsym(mP2pServiceHandle.handle, "Destroy");
+    if (mP2pServiceHandle.create == nullptr || mP2pServiceHandle.destroy == nullptr) {
+        WIFI_LOGE("%{public}s dlsym Create or Destory failed!", dlname.c_str());
+        dlclose(mP2pServiceHandle.handle);
+        mP2pServiceHandle.Clear();
+        return -1;
+    }
+    if (bCreate) {
+        mP2pServiceHandle.pService = mP2pServiceHandle.create();
+    }
+    return 0;
+}
 int WifiServiceManager::CheckAndEnforceService(const std::string &name, bool bCreate)
 {
     WIFI_LOGD("WifiServiceManager::CheckAndEnforceService name: %{public}s", name.c_str());
@@ -158,6 +181,9 @@ int WifiServiceManager::CheckAndEnforceService(const std::string &name, bool bCr
     }
     if (name == WIFI_SERVICE_AP) {
         return LoadApService(dlname, bCreate);
+    }
+    if (name == WIFI_SERVICE_P2P) {
+        return LoadP2pService(dlname, bCreate);
     }
     return -1;
 }
@@ -202,6 +228,20 @@ IApService *WifiServiceManager::GetApServiceInst()
         }
     }
     return mApServiceHandle.pService;
+}
+
+IP2pService *WifiServiceManager::GetP2pServiceInst()
+{
+    if (mP2pServiceHandle.handle == nullptr) {
+        return nullptr;
+    }
+    if (mP2pServiceHandle.pService == nullptr) {
+        std::unique_lock<std::mutex> lock(mMutex);
+        if (mP2pServiceHandle.pService == nullptr) {
+            mP2pServiceHandle.pService = mP2pServiceHandle.create();
+        }
+    }
+    return mP2pServiceHandle.pService;
 }
 
 int WifiServiceManager::UnloadStaService(bool bPreLoad)
@@ -252,6 +292,22 @@ int WifiServiceManager::UnloadApService(bool bPreLoad)
     return 0;
 }
 
+int WifiServiceManager::UnloadP2pService(bool bPreLoad)
+{
+    if (mP2pServiceHandle.handle == nullptr) {
+        return 0;
+    }
+    if (mP2pServiceHandle.pService != nullptr) {
+        mP2pServiceHandle.destroy(mP2pServiceHandle.pService);
+        mP2pServiceHandle.pService = nullptr;
+    }
+    if (!bPreLoad) {
+        dlclose(mP2pServiceHandle.handle);
+        mP2pServiceHandle.Clear();
+    }
+    return 0;
+}
+
 int WifiServiceManager::UnloadService(const std::string &name)
 {
     bool bPreLoad = WifiSettings::GetInstance().IsModulePreLoad(name);
@@ -266,6 +322,9 @@ int WifiServiceManager::UnloadService(const std::string &name)
     if (name == WIFI_SERVICE_AP) {
         return UnloadApService(bPreLoad);
     }
+    if (name == WIFI_SERVICE_P2P) {
+        return UnloadP2pService(bPreLoad);
+    }
     return -1;
 }
 
@@ -275,6 +334,7 @@ void WifiServiceManager::UninstallAllService()
     UnloadStaService(false);
     UnloadScanService(false);
     UnloadApService(false);
+    UnloadP2pService(false);
     return;
 }
 } // namespace Wifi

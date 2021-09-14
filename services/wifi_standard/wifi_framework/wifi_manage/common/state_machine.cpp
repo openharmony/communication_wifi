@@ -65,7 +65,7 @@ void StateMachine::SetHandler(StateMachineHandler *handler)
     pStateMachineHandler = handler;
 }
 
-void StateMachine::NotExecutedMessage(InternalMessage *msg)
+void StateMachine::NotExecutedMessage(const InternalMessage *msg)
 {
     if (msg == nullptr) {
         return;
@@ -113,7 +113,7 @@ void StateMachine::SwitchState(State *targetState)
     pStateMachineHandler->SwitchState(targetState);
 }
 
-void StateMachine::DelayMessage(InternalMessage *msg)
+void StateMachine::DelayMessage(const InternalMessage *msg)
 {
     if (pStateMachineHandler == nullptr) {
         LOGE("Start StateMachine failed, pStateMachineHandler is nullptr!");
@@ -138,7 +138,7 @@ InternalMessage *StateMachine::CreateMessage()
     return MessageManage::GetInstance().CreateMessage();
 }
 
-InternalMessage *StateMachine::CreateMessage(InternalMessage *orig)
+InternalMessage *StateMachine::CreateMessage(const InternalMessage *orig)
 {
     if (orig == nullptr) {
         return nullptr;
@@ -159,6 +159,16 @@ InternalMessage *StateMachine::CreateMessage(int msgName, int param1)
 InternalMessage *StateMachine::CreateMessage(int msgName, int param1, int param2)
 {
     return MessageManage::GetInstance().CreateMessage(msgName, param1, param2);
+}
+
+InternalMessage *StateMachine::CreateMessage(int msgName, const std::any &messageObj)
+{
+    return MessageManage::GetInstance().CreateMessage(msgName, messageObj);
+}
+
+InternalMessage *StateMachine::CreateMessage(int msgName, int param1, int param2, const std::any &messageObj)
+{
+    return MessageManage::GetInstance().CreateMessage(msgName, param1, param2, messageObj);
 }
 
 void StateMachine::SendMessage(int msgName)
@@ -188,6 +198,18 @@ void StateMachine::SendMessage(InternalMessage *msg)
     return;
 }
 
+void StateMachine::SendMessage(int msgName, const std::any &messageObj)
+{
+    pStateMachineHandler->SendMessage(CreateMessage(msgName, messageObj));
+    return;
+}
+
+void StateMachine::SendMessage(int msgName, int param1, int param2, const std::any &messageObj)
+{
+    pStateMachineHandler->SendMessage(CreateMessage(msgName, param1, param2, messageObj));
+    return;
+}
+
 void StateMachine::MessageExecutedLater(int msgName, int64_t delayTimeMs)
 {
     pStateMachineHandler->MessageExecutedLater(CreateMessage(msgName), delayTimeMs);
@@ -209,6 +231,19 @@ void StateMachine::MessageExecutedLater(int msgName, int param1, int param2, int
 void StateMachine::MessageExecutedLater(InternalMessage *msg, int64_t delayTimeMs)
 {
     pStateMachineHandler->MessageExecutedLater(msg, delayTimeMs);
+    return;
+}
+
+void StateMachine::MessageExecutedLater(int msgName, const std::any &messageObj, int64_t delayTimeMs)
+{
+    pStateMachineHandler->MessageExecutedLater(CreateMessage(msgName, messageObj), delayTimeMs);
+    return;
+}
+
+void StateMachine::MessageExecutedLater(
+    int msgName, int param1, int param2, const std::any &messageObj, int64_t delayTimeMs)
+{
+    pStateMachineHandler->MessageExecutedLater(CreateMessage(msgName, param1, param2, messageObj), delayTimeMs);
     return;
 }
 
@@ -557,7 +592,7 @@ void StateMachineHandler::ExecuteMessage(InternalMessage *msg)
     return;
 }
 
-void StateMachineHandler::DelayMessage(InternalMessage *msg)
+void StateMachineHandler::DelayMessage(const InternalMessage *msg)
 {
     LOGD("Enter StateMachineHandler::DelayMessage.");
     if (msg == nullptr) {

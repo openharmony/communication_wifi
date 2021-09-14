@@ -36,6 +36,7 @@ ohos_shared_library("wifi_scan_service") {
     "//foundation/communication/wifi/services/wifi_standard/wifi_framework/common/include",
     "//foundation/communication/wifi/services/wifi_standard/wifi_framework/common/config",
     "//foundation/communication/wifi/services/wifi_standard/wifi_framework/common/log",
+    "//foundation/communication/wifi/services/wifi_standard/wifi_framework/common/utils",
     "//foundation/communication/wifi/services/wifi_standard/wifi_framework/common/net_helper",
     "//foundation/communication/wifi/services/wifi_standard/wifi_framework/wifi_manage/common",
     "//foundation/communication/wifi/services/wifi_standard/wifi_framework/wifi_manage/wifi_scan",

@@ -69,13 +69,13 @@ HalVendorError WifiGetSupportedFeature(long *feature)
 
 HalVendorError WifiSetScanningMacAddress(const char *szMac, int macSize)
 {
-    LOGD("WifiSetScanningMacAddress mac %s, size %{public}d", (szMac == NULL) ? "" : szMac, macSize);
+    LOGD("WifiSetScanningMacAddress mac %{private}s, size %{public}d", (szMac == NULL) ? "" : szMac, macSize);
     return HAL_VENDOR_ERROR_NOT_SUPPORTED;
 }
 
 HalVendorError WifiDeauthLastRoamingBssid(const char *szMac, int macSize)
 {
-    LOGD("WifiDeauthLastRoamingBssid mac %s, size %{public}d", (szMac == NULL) ? "" : szMac, macSize);
+    LOGD("WifiDeauthLastRoamingBssid mac %{private}s, size %{public}d", (szMac == NULL) ? "" : szMac, macSize);
     return HAL_VENDOR_ERROR_NOT_SUPPORTED;
 }
 
@@ -105,13 +105,22 @@ HalVendorError WifiRequestFirmwareDebugDump(unsigned char *bytes, int32_t *size)
     LOGD("WifiRequestFirmwareDebugDump");
     /* fixed compile error, -Werror,-Wunused-parameter */
     if (bytes != NULL && size != NULL) {
-        LOGD("WifiRequestFirmwareDebugDump bytes %s, size %{public}d", bytes, *size);
+        LOGD("WifiRequestFirmwareDebugDump bytes %{private}s, size %{public}d", bytes, *size);
     }
     return HAL_VENDOR_ERROR_NOT_SUPPORTED;
 }
 
+HalVendorError WifiSetMiracastMode(int mode)
+{
+    LOGD("WifiSetMiracastMode mode %{public}d", mode);
+    return HAL_VENDOR_ERROR_NOT_SUPPORTED;
+}
 HalVendorError InitDefaultHalVendorFunc(WifiHalVendorFunc *func)
 {
+    if (func == NULL) {
+        LOGD("InitDefaultHalVendorFunc func is NULL");
+        return HAL_VENDOR_ERROR_UNKNOWN;
+    }
     func->wifiInitialize = WifiInitialize;
     func->wifiCleanUp = WifiCleanUp;
     func->wifiGetSupportedFeature = WifiGetSupportedFeature;
@@ -121,5 +130,6 @@ HalVendorError InitDefaultHalVendorFunc(WifiHalVendorFunc *func)
     func->wifiConfigComboModes = WifiConfigComboModes;
     func->wifiGetComboModes = WifiGetComboModes;
     func->wifiRequestFirmwareDebugDump = WifiRequestFirmwareDebugDump;
+    func->wifiSetMiracastMode = WifiSetMiracastMode;
     return HAL_VENDOR_SUCCESS;
 }

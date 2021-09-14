@@ -13,24 +13,26 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_WIFIDLCLIENT_H
-#define OHOS_WIFIDLCLIENT_H
+#ifndef OHOS_WIFI_IDL_CLIENT_H
+#define OHOS_WIFI_IDL_CLIENT_H
 
 #include <string>
 #include <vector>
 #include "wifi_msg.h"
+#include "wifi_internal_msg.h"
+#include "wifi_error_no.h"
 #include "supplicant_event_callback.h"
 #include "wifi_chip_event_callback.h"
-#include "wifi_error_no.h"
 #include "wifi_event_callback.h"
-#include "wifi_idl_struct.h"
+#include "wifi_ap_event_callback.h"
+#include "wifi_p2p_event_callback.h"
 #include "wifi_scan_param.h"
-#include "wifi_scan_result.h"
 #include "wifi_sta_request.h"
 #include "client.h"
 #include "i_wifi_chip.h"
 #include "i_wifi_hotspot_iface.h"
 #include "i_wifi_struct.h"
+#include "wifi_global_func.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -189,10 +191,10 @@ public:
     /**
      * @Description Obtain the scanning result.
      *
-     * @param scanResults
+     * @param scanInfos
      * @return WifiErrorNo
      */
-    WifiErrorNo QueryScanResults(std::vector<WifiScanResult> &scanResults);
+    WifiErrorNo QueryScanInfos(std::vector<InterScanInfo> &scanInfos);
 
     /**
      * @Description Initiate PNO scanning.
@@ -320,6 +322,15 @@ public:
      */
     WifiErrorNo ReqSetRoamConfig(const WifiIdlRoamConfig &config);
 
+    /**
+     * @Description Get current connect signal info, rssi, linkspeed, noise ...
+     *
+     * @param endBssid - peer end bssid, i.e. linked ap's bssid
+     * @param info - signal info
+     * @return WifiErrorNo
+     */
+    WifiErrorNo ReqGetConnectSignalInfo(const std::string &endBssid, WifiWpaSignalInfo &info) const;
+
     /* -------------------AP Interface-------------------------- */
 
     /**
@@ -394,7 +405,7 @@ public:
      * @param callback
      * @return WifiErrorNo
      */
-    WifiErrorNo RegisterApEvent(IWifiApEventCallback callback);
+    WifiErrorNo RegisterApEvent(IWifiApMonitorEventCallback callback) const;
 
     /**
      * @Description Sets the Wi-Fi country code.
@@ -540,14 +551,14 @@ public:
      * @param callback
      * @return WifiErrorNo
      */
-    WifiErrorNo ReqRigisterSupplicantEventCallback(SupplicantEventCallback &callback);
+    WifiErrorNo ReqRegisterSupplicantEventCallback(SupplicantEventCallback &callback);
 
     /**
      * @Description Deregisters the supplementary event callback function.
      *
      * @return WifiErrorNo
      */
-    WifiErrorNo ReqUnRigisterSupplicantEventCallback(void);
+    WifiErrorNo ReqUnRegisterSupplicantEventCallback(void);
 
     /**
      * @Description Turn on/off power save mode for the interface.
@@ -581,19 +592,13 @@ public:
      */
     WifiErrorNo ReqWpaAutoConnect(int enable);
 
-    /**
-     * @Description Force wpa_supplicant to re-read its configuration file.
-     *
-     * @return WifiErrorNo
-     */
-    WifiErrorNo ReWpaReconfigure(void);
 
     /**
      * @Description Clearing the wpa Blocklist.
      *
      * @return WifiErrorNo
      */
-    WifiErrorNo ReWpaBlocklistClear(void);
+    WifiErrorNo ReqWpaBlocklistClear(void);
 
     /**
      * @Description Obtaining the Network List.
@@ -601,18 +606,405 @@ public:
      * @param networkList
      * @return WifiErrorNo
      */
-    WifiErrorNo ReGetNetworkList(std::vector<WifiWpaNetworkList> &networkList);
+    WifiErrorNo ReqGetNetworkList(std::vector<WifiWpaNetworkInfo> &networkList);
 
+    /* ******************************* P2P interface************************** */
+
+    /**
+     * @Description Open P2p
+     *
+     * @return WifiErrorNo
+     */
+    WifiErrorNo ReqP2pStart(void) const;
+
+    /**
+     * @Description Close p2p
+     *
+     * @return WifiErrorNo
+     */
+    WifiErrorNo ReqP2pStop(void) const;
+
+    /**
+     * @Description P2P hal-layer registration event
+     *
+     * @return WifiErrorNo
+     */
+    WifiErrorNo ReqP2pRegisterCallback(const P2pHalCallback &callbacks) const;
+
+    /**
+     * @Description Send a request for setup wps pbc to the P2P
+     *
+     * @param groupInterface
+     * @param bssid
+     * @return WifiErrorNo
+     */
+    WifiErrorNo ReqP2pSetupWpsPbc(const std::string &groupInterface, const std::string &bssid) const;
+
+    /**
+     * @Description Enable Wps Pin mode
+     *
+     * @param groupInterface - p2p group
+     * @param address
+     * @param pin - pin code
+     * @param result - when pin is empty, represent use pin display mode, this return pin code
+     * @return WifiErrorNo
+     */
+    WifiErrorNo ReqP2pSetupWpsPin(const std::string &groupInterface, const std::string &address, const std::string &pin,
+        std::string &result) const;
+
+    /**
+     * @Description Send a request for remove a p2p network to the P2P
+     *
+     * @param networkId
+     * @return WifiErrorNo
+     */
+    WifiErrorNo ReqP2pRemoveNetwork(int networkId) const;
+
+    /**
+     * @Description Send a request for get p2p network list to the P2P
+     *
+     * @param mapGroups
+     * @return WifiErrorNo
+     */
+    WifiErrorNo ReqP2pListNetworks(std::map<int, WifiP2pGroupInfo> &mapGroups) const;
+
+    /**
+     * @Description Requesting P2P Setting Device Name
+     *
+     * @param name
+     * @return WifiErrorNo
+     */
+    WifiErrorNo ReqP2pSetDeviceName(const std::string &name) const;
+
+    /**
+     * @Description Send a request for setting the WPS primary device type in P2P mode
+     *
+     * @param type
+     * @return WifiErrorNo
+     */
+    WifiErrorNo ReqP2pSetWpsDeviceType(const std::string &type) const;
+
+    /**
+     * @Description Send a request for setting the WPS secondary device type in P2P mode
+     *
+     * @param type
+     * @return WifiErrorNo
+     */
+    WifiErrorNo ReqP2pSetWpsSecondaryDeviceType(const std::string &type) const;
+
+    /**
+     * @Description Send a request for setting the WPS configuration method to the P2P.
+     *
+     * @param config
+     * @return WifiErrorNo
+     */
+    WifiErrorNo ReqP2pSetWpsConfigMethods(const std::string &config) const;
+
+    /**
+     * @Description Send a P2P request for setting the SSID suffix
+     *
+     * @param postfixName
+     * @return WifiErrorNo
+     */
+    WifiErrorNo ReqP2pSetSsidPostfixName(const std::string &postfixName) const;
+
+    /**
+     * @Description Send a request for set group max idle to the P2P
+     *
+     * @param groupInterface
+     * @param time
+     * @return WifiErrorNo
+     */
+    WifiErrorNo ReqP2pSetGroupMaxIdle(const std::string &groupInterface, size_t time) const;
+
+    /**
+     * @Description Send a request for set power save to the P2P
+     *
+     * @param groupInterface
+     * @param enable
+     * @return WifiErrorNo
+     */
+    WifiErrorNo ReqP2pSetPowerSave(const std::string &groupInterface, bool enable) const;
+
+    /**
+     * @Description enable/disable Wi-Fi Display
+     *
+     * @param enable
+     * @return WifiErrorNo
+     */
+    WifiErrorNo ReqP2pSetWfdEnable(bool enable) const;
+
+    /**
+     * @Description Send a request for set Wi-Fi Display config
+     *
+     * @param config
+     * @return WifiErrorNo
+     */
+    WifiErrorNo ReqP2pSetWfdDeviceConfig(const std::string &config) const;
+
+    /**
+     * @Description Send a request for start p2p find to the P2P
+     *
+     * @param timeout
+     * @return WifiErrorNo
+     */
+    WifiErrorNo ReqP2pStartFind(size_t timeout) const;
+
+    /**
+     * @Description Send a request for stop p2p find to the P2P
+     *
+     * @return WifiErrorNo
+     */
+    WifiErrorNo ReqP2pStopFind() const;
+
+    /**
+     * @Description Send a request for set ext listen to the P2P
+     *
+     * @param enable
+     * @param period
+     * @param interval
+     * @return WifiErrorNo
+     */
+    WifiErrorNo ReqP2pSetExtListen(bool enable, size_t period, size_t interval) const;
+
+    /**
+     * @Description Send a request for set listen channel to the P2P
+     *
+     * @param channel
+     * @param regClass
+     * @return WifiErrorNo
+     */
+    WifiErrorNo ReqP2pSetListenChannel(size_t channel, unsigned char regClass) const;
+
+    /**
+     * @Description Send a request for flush to the P2P.
+     *
+     * @return WifiErrorNo
+     */
+    WifiErrorNo ReqP2pFlush() const;
+
+    /**
+     * @Description Send a request for connect to the P2P
+     *
+     * @param config
+     * @param isJoinExistingGroup
+     * @param pin
+     * @return WifiErrorNo
+     */
+    WifiErrorNo ReqP2pConnect(const WifiP2pConfig &config, bool isJoinExistingGroup, std::string &pin) const;
+
+    /**
+     * @Description Send a request for cancel connect to the P2P
+     *
+     * @return WifiErrorNo
+     */
+    WifiErrorNo ReqP2pCancelConnect() const;
+
+    /**
+     * @Description Send a request for Provision Discovery to the P2P
+     *
+     */
+    WifiErrorNo ReqP2pProvisionDiscovery(const WifiP2pConfig &config) const;
+
+    /**
+     * @Description Send a request for add a P2P group to the P2P
+     *
+     * @param isPersistent
+     * @param networkId
+     * @param freq
+     * @return WifiErrorNo
+     */
+    WifiErrorNo ReqP2pAddGroup(bool isPersistent, int networkId, int freq) const;
+
+    /**
+     * @Description Send a request for remove group to the P2P
+     *
+     * @param groupInterface
+     * @return WifiErrorNo
+     */
+    WifiErrorNo ReqP2pRemoveGroup(const std::string &groupInterface) const;
+
+    /**
+     * @Description Send a request for invite to the P2P
+     *
+     * @return WifiErrorNo
+     */
+    WifiErrorNo ReqP2pInvite(const WifiP2pGroupInfo &group, const std::string &deviceAddr) const;
+
+    /**
+     * @Description Send a request for reinvoke to the P2P
+     *
+     * @param networkId
+     * @param deviceAddr
+     * @return WifiErrorNo
+     */
+    WifiErrorNo ReqP2pReinvoke(int networkId, const std::string &deviceAddr) const;
+
+    /**
+     * @Description Send a request for get device address to the P2P.
+     *
+     * @param deviceAddress
+     * @return WifiErrorNo
+     */
+    WifiErrorNo ReqP2pGetDeviceAddress(std::string &deviceAddress) const;
+
+    /**
+     * @Description Send a request for get group capability to the P2P
+     *
+     * @param deviceAddress
+     * @param cap
+     * @return WifiErrorNo
+     */
+    WifiErrorNo ReqP2pGetGroupCapability(const std::string &deviceAddress, uint32_t &cap) const;
+
+    /**
+     * @Description Send a request for add service to the P2P
+     *
+     * @param WifiP2pServiceInfo
+     * @return WifiErrorNo
+     */
+    WifiErrorNo ReqP2pAddService(const WifiP2pServiceInfo &info) const;
+
+    /**
+     * @Description Send a request for remove service to the P2P
+     *
+     * @param RemoveService
+     * @return WifiErrorNo
+     */
+    WifiErrorNo ReqP2pRemoveService(const WifiP2pServiceInfo &info) const;
+
+    /**
+     * @Description Send a request for flush service to the P2P
+     *
+     * @return WifiErrorNo
+     */
+    WifiErrorNo ReqP2pFlushService() const;
+
+    /**
+     * @Description Send a request for save config to the P2P
+     *
+     * @return WifiErrorNo
+     */
+    WifiErrorNo ReqP2pSaveConfig() const;
+
+    /**
+     * @Description Send a request for request service discovery to the P2P
+     *
+     * @param macAddr
+     * @param queryMsg
+     * @return WifiErrorNo
+     */
+    WifiErrorNo ReqP2pReqServiceDiscovery(
+        const std::string &deviceAddress, const std::vector<unsigned char> &tlvs, std::string &reqID) const;
+
+    /**
+     * @Description Send a request for cancel request service discovery to the P2P
+     *
+     * @param id
+     * @return WifiErrorNo
+     */
+    WifiErrorNo ReqP2pCancelServiceDiscovery(const std::string &id) const;
+
+    /**
+     * @Description set enable/disable using random mac address
+     *
+     * @param enable
+     * @return WifiErrorNo
+     */
+    WifiErrorNo ReqP2pSetRandomMac(bool enable) const;
+
+    /**
+     * @Description Send a request for set the miracast type to the P2P
+     *
+     * @param type
+     * @return WifiErrorNo
+     */
+    WifiErrorNo ReqP2pSetMiracastType(int type) const;
+
+    /**
+     * @Description Set the Persistent Reconnect mode.
+     *
+     * @param mode
+     * @return WifiErrorNo
+     */
+    WifiErrorNo ReqSetPersistentReconnect(int mode) const;
+
+    /**
+     * @Description
+     *
+     * @param deviceAddress
+     * @param frequency
+     * @param dialogToken
+     * @param tlvs
+     * @param tlvsLength
+     * @return WifiErrorNo
+     */
+    WifiErrorNo ReqRespServiceDiscovery(
+        const WifiP2pDevice &device, int frequency, int dialogToken, const std::vector<unsigned char> &tlvs) const;
+
+    /**
+     * @Description Set P2p server discovery external.
+     *
+     * @param isExternalProcess
+     * @return WifiErrorNo
+     */
+    WifiErrorNo ReqSetServiceDiscoveryExternal(bool isExternalProcess) const;
+
+     /**
+     * @Description Show information about known P2P peer
+     *
+     * @param deviceAddress
+     * @param device
+     * @return WifiErrorNo
+     */
+    WifiErrorNo ReqGetP2pPeer(const std::string &deviceAddress, WifiP2pDevice &device) const;
+
+    /**
+     * @Description Obtains the P2P frequency supported by a specified frequency band.
+     *
+     * @param band - Frequency band.
+     * @param frequencies - Frequency list.
+     * @return WifiErrorNo
+     */
+    WifiErrorNo ReqP2pGetSupportFrequencies(int band, std::vector<int> &frequencies) const;
+
+    /**
+     * @Description Setting the P2P group config.
+     *
+     * @param networkId
+     * @param config
+     * @return WifiErrorNo
+     */
+    WifiErrorNo ReqP2pSetGroupConfig(int networkId, const IdlP2pGroupConfig &config) const;
+
+    /**
+     * @Description Getting the P2P group config.
+     *
+     * @param networkId
+     * @param config
+     * @return WifiErrorNo
+     */
+    WifiErrorNo ReqP2pGetGroupConfig(int networkId, IdlP2pGroupConfig &config) const;
+
+    /**
+     * @Description Request to obtain the next network ID.
+     *
+     * @param networkId
+     * @return WifiErrorNo
+     */
+    WifiErrorNo ReqP2pAddNetwork(int &networkId) const;
 public:
     RpcClient *pRpcClient;
 
 private:
-    char **ConVectorToCArrayString(const std::vector<std::string> &vec);
-    WifiErrorNo ConvertPnoScanParam(const WifiPnoScanParam &param, PnoScanSettings *pSettings);
-    int PushDeviceConfigString(NetWorkConfig *pConfig, DeviceConfigType type, const std::string &msg);
-    int PushDeviceConfigInt(NetWorkConfig *pConfig, DeviceConfigType type, int i);
-    int PushDeviceConfigAuthAlgorithm(NetWorkConfig *pConfig, DeviceConfigType type, unsigned int alg);
-    WifiErrorNo CheckValidDeviceConfig(const WifiIdlDeviceConfig &config);
+    char **ConVectorToCArrayString(const std::vector<std::string> &vec) const;
+    WifiErrorNo ConvertPnoScanParam(const WifiPnoScanParam &param, PnoScanSettings *pSettings) const;
+    int PushDeviceConfigString(HidlSetNetworkConfig *pConfig, DeviceConfigType type, const std::string &msg) const;
+    int PushDeviceConfigInt(HidlSetNetworkConfig *pConfig, DeviceConfigType type, int i) const;
+    int PushDeviceConfigAuthAlgorithm(HidlSetNetworkConfig *pConfig, DeviceConfigType type, unsigned int alg) const;
+    WifiErrorNo CheckValidDeviceConfig(const WifiIdlDeviceConfig &config) const;
+    int PushP2pGroupConfigString(HidlP2pGroupConfig *pConfig, P2pGroupConfigType type, const std::string &str) const;
+    int PushP2pGroupConfigInt(HidlP2pGroupConfig *pConfig, P2pGroupConfigType type, int i) const;
 };
 }  // namespace Wifi
 }  // namespace OHOS

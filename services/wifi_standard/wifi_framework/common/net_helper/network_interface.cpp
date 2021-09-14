@@ -13,25 +13,37 @@
  * limitations under the License.
  */
 #include "network_interface.h"
-#include <unistd.h>
-#include <netdb.h>
 #include <arpa/inet.h>
+#include <cerrno>
+#include <cstdlib>
+#include <cstring>
+#include <string>
 #include <net/if.h>
+#include <netdb.h>
 #include <sys/ioctl.h>
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <typeinfo>
-#include <cerrno>
-#include <cstdlib>
-#include <cstring>
-#include "securec.h"
-#include "wifi_log.h"
+#include <unistd.h>
+#include <fcntl.h>
 
-#undef LOG_TAG
-#define LOG_TAG "OHWIFI_UTIL_NetworkInterface"
+#include <linux/if.h>
+#include <linux/if_ether.h>
+#include <linux/if_link.h>
+#include <linux/netlink.h>
+#include <linux/rtnetlink.h>
+#include <linux/sockios.h>
+
+#include "securec.h"
+#include "wifi_logger.h"
+
+DEFINE_WIFILOG_LABEL("WifiNetworkInterface");
 
 namespace OHOS {
 namespace Wifi {
+const int INET_IP_V4_ADDR_LEN = 4;
+const int INET_IP_V6_ADDR_LEN = 16;
+const int INT_BIT = 32;
 bool NetworkInterface::IsValidInterfaceName(const std::string &interfaceName)
 {
     size_t len = interfaceName.length();
@@ -53,75 +65,59 @@ bool NetworkInterface::IsValidInterfaceName(const std::string &interfaceName)
     return true;
 }
 
-bool NetworkInterface::IsInterfaceUp(const std::string &interfaceName)
-{
-    struct ifreq ifr;
-    if (strncpy_s(ifr.ifr_name, sizeof(ifr.ifr_name), interfaceName.c_str(), interfaceName.length()) != EOK) {
-        return false;
-    }
-    int fd = socket(AF_INET, SOCK_DGRAM | SOCK_CLOEXEC, 0);
-    if (fd < 0) {
-        return false;
-    }
-    if (ioctl(fd, SIOCGIFFLAGS, &ifr) != 0) {
-        LOGE("Failed to obtain the Interface [%s] status. ", interfaceName.c_str());
-    }
-    close(fd);
-    return (ifr.ifr_flags & IFF_UP) > 0;
-}
 
 void NetworkInterface::Dump(const std::string &interfaceName)
 {
-    LOGI("InterfaceName [%s]", interfaceName.c_str());
+    WIFI_LOGI("InterfaceName  [%s]", interfaceName.c_str());
 
-    Ipv4Address ipv4 = Ipv4Address::INVALID_INET_ADDRESS;
+    std::vector<Ipv4Address> vecIPv4;
     std::vector<Ipv6Address> vecIPv6;
 
-    bool ret = FetchInterfaceConfig(interfaceName, ipv4, vecIPv6);
+    bool ret = FetchInterfaceConfig(interfaceName, vecIPv4, vecIPv6);
     if (!ret) {
-        LOGI("Fetch Interface [%s] failed.", interfaceName.c_str());
+        WIFI_LOGI("Fetch Interface [%s] failed.", interfaceName.c_str());
     }
 
-    ipv4.Dump();
+    WIFI_LOGI("\tIPv4  size   [%zu]", vecIPv4.size());
+    for (const auto &item : vecIPv4) {
+        item.Dump();
+    }
 
-    LOGI("\tIPv6  size   [%zu]", vecIPv6.size());
+    WIFI_LOGI("\tIPv6  size   [%zu]", vecIPv6.size());
     for (const auto &item : vecIPv6) {
         item.Dump();
     }
 }
 
 bool NetworkInterface::FetchInterfaceConfig(
-    const std::string &interfaceName,
-    Ipv4Address &ipv4,
-    std::vector<Ipv6Address> &vecIPv6)
+    const std::string &interfaceName, std::vector<Ipv4Address> &vecIPv4, std::vector<Ipv6Address> &vecIPv6)
 {
-    if (!FetchIpAddress(interfaceName, ipv4, vecIPv6)) {
-        LOGE("interface [%s] Fetch IP address failed.", interfaceName.c_str());
+    if (!FetchIpAddress(interfaceName, vecIPv4, vecIPv6)) {
+        WIFI_LOGE("interface [%{public}s] Fetch IP address failed.", interfaceName.c_str());
         return false;
     }
     return true;
 }
 
-bool NetworkInterface::GetIpv4Address(const std::string &interfaceName, Ipv4Address &ipv4)
+bool NetworkInterface::GetIpv4Address(const std::string &interfaceName, std::vector<Ipv4Address> &vecIPv4)
 {
-    ipv4 = Ipv4Address::INVALID_INET_ADDRESS;
     std::vector<Ipv6Address> vecIPv6;
-    if (!FetchIpAddress(interfaceName, ipv4, vecIPv6)) {
-        LOGE("interface [%s] Fetch IP address failed.", interfaceName.c_str());
+    if (!FetchIpAddress(interfaceName, vecIPv4, vecIPv6)) {
+        WIFI_LOGE("interface [%{public}s] Fetch IP address failed.", interfaceName.c_str());
         return false;
     }
     /*
      * The ipv4 address is not set for the network interface. In this case, the
      * ipv4 address is not updated.
      */
-    return !(ipv4 == Ipv4Address::INVALID_INET_ADDRESS);
+    return !(vecIPv4.empty());
 }
 
 bool NetworkInterface::GetAllIpv6Address(const std::string &interfaceName, std::vector<Ipv6Address> &vecIPv6)
 {
-    Ipv4Address ipv4 = Ipv4Address::INVALID_INET_ADDRESS;
-    if (!FetchIpAddress(interfaceName, ipv4, vecIPv6)) {
-        LOGE("interface [%s] Fetch IP address failed.", interfaceName.c_str());
+    std::vector<Ipv4Address> vecIPv4;
+    if (!FetchIpAddress(interfaceName, vecIPv4, vecIPv6)) {
+        WIFI_LOGE("interface [%{public}s] Fetch IP address failed.", interfaceName.c_str());
         return false;
     }
     return true;
@@ -129,15 +125,17 @@ bool NetworkInterface::GetAllIpv6Address(const std::string &interfaceName, std::
 
 bool NetworkInterface::IsExistAddressForInterface(const std::string &interfaceName, const BaseAddress &address)
 {
-    Ipv4Address ipv4 = Ipv4Address::INVALID_INET_ADDRESS;
+    std::vector<Ipv4Address> vecIPv4;
     std::vector<Ipv6Address> vecIPv6;
-    if (!FetchIpAddress(interfaceName, ipv4, vecIPv6)) {
-        LOGE("interface [%s] Fetch IP address failed.", interfaceName.c_str());
+    if (!FetchIpAddress(interfaceName, vecIPv4, vecIPv6)) {
+        WIFI_LOGE("interface [%{public}s] Fetch IP address failed.", interfaceName.c_str());
         return false;
     }
 
-    if (address == static_cast<const BaseAddress &>(ipv4)) {
-        return true;
+    for (const auto &iter : vecIPv4) {
+        if (iter == address) {
+            return true;
+        }
     }
 
     for (const auto &iter : vecIPv6) {
@@ -152,60 +150,71 @@ bool NetworkInterface::IsExistAddressForInterface(const std::string &interfaceNa
 bool NetworkInterface::AddIpAddress(const std::string &interfaceName, const BaseAddress &ipAddress)
 {
     if (!ipAddress.IsValid()) {
-        LOGE("Add IP address [%s] is not valid.", ipAddress.GetAddressWithString().c_str());
+        WIFI_LOGE("Add IP address [%{public}s] is not valid.", ipAddress.GetAddressWithString().c_str());
         return false;
     }
 
     /* Avoid repeated add. */
     if (IsExistAddressForInterface(interfaceName, ipAddress)) {
-        LOGI("In interface [%s], the address [%s] is exist.",
+        WIFI_LOGI("In interface [%{public}s], the address [%s] is exist.",
             interfaceName.c_str(),
             ipAddress.GetAddressWithString().c_str());
         return true;
     }
 
+    if (!IpAddressChange(interfaceName, ipAddress, true)) {
+        WIFI_LOGE("Interface [%{public}s] add address [%s] failed.",
+            interfaceName.c_str(),
+            ipAddress.GetAddressWithString().c_str());
+        return false;
+    }
     return true;
 }
 
 bool NetworkInterface::DelIpAddress(const std::string &interfaceName, const BaseAddress &ipAddress)
 {
     if (!ipAddress.IsValid()) {
-        LOGE("Del IP address [%s] is not valid.", ipAddress.GetAddressWithString().c_str());
+        WIFI_LOGE("Del IP address [%s] is not valid.", ipAddress.GetAddressWithString().c_str());
         return false;
     }
 
     if (!IsExistAddressForInterface(interfaceName, ipAddress)) {
-        LOGI("In interface [%s], the address [%s] is not exist.",
+        WIFI_LOGI("In interface [%{public}s], the address [%s] is not exist.",
             interfaceName.c_str(),
             ipAddress.GetAddressWithString().c_str());
         return true;
     }
-
+    if (!IpAddressChange(interfaceName, ipAddress, false)) {
+        WIFI_LOGE("Interface [%{public}s] del address [%s] failed.",
+            interfaceName.c_str(),
+            ipAddress.GetAddressWithString().c_str());
+        return false;
+    }
     return true;
 }
 
 bool NetworkInterface::ClearAllIpAddress(const std::string &interfaceName)
 {
-    Ipv4Address ipv4 = Ipv4Address::INVALID_INET_ADDRESS;
+    std::vector<Ipv4Address> vecIPv4;
     std::vector<Ipv6Address> vecIPv6;
     bool ret = true;
-    if (!FetchIpAddress(interfaceName, ipv4, vecIPv6)) {
+    if (!FetchIpAddress(interfaceName, vecIPv4, vecIPv6)) {
         return false;
     }
-    ret = DelIpAddress(interfaceName, ipv4);
+    for (auto ip4 : vecIPv4) {
+        ret &= DelIpAddress(interfaceName, ip4);
+    }
     for (auto ip6 : vecIPv6) {
         ret &= DelIpAddress(interfaceName, ip6);
     }
     if (!ret) {
-        LOGW("Some ip del failed.");
+        WIFI_LOGW("Some ip del failed.");
     }
     return true;
 }
 
 bool NetworkInterface::SaveIpAddress(
-    const struct ifaddrs &ifa,
-    Ipv4Address &ipv4,
-    std::vector<Ipv6Address> &vecIPv6)
+    const struct ifaddrs &ifa, std::vector<Ipv4Address> &vecIPv4, std::vector<Ipv6Address> &vecIPv6)
 {
     int ret = 0;
     char host[NI_MAXHOST] = {0}; /* IP address storage */
@@ -221,7 +230,7 @@ bool NetworkInterface::SaveIpAddress(
             0,
             NI_NUMERICHOST);
         if (ret != 0) {
-            LOGE("getnameinfo() failed: %{public}s\n", gai_strerror(ret));
+            WIFI_LOGE("getnameinfo() failed: %{public}s\n", gai_strerror(ret));
             return false;
         }
         ret = getnameinfo(ifa.ifa_netmask,
@@ -232,7 +241,7 @@ bool NetworkInterface::SaveIpAddress(
             0,
             NI_NUMERICHOST);
         if (ret != 0) {
-            LOGE("getnameinfo() failed: %{public}s\n", gai_strerror(ret));
+            WIFI_LOGE("getnameinfo() failed: %{public}s\n", gai_strerror(ret));
             return false;
         }
         /* For an IPv6 address, the suffix %wlan0 exists. */
@@ -241,7 +250,7 @@ bool NetworkInterface::SaveIpAddress(
             *sepNum = '\0';
         }
         if (family == AF_INET) {
-            ipv4 = Ipv4Address::Create(host, mask);
+            vecIPv4.push_back(Ipv4Address::Create(host, mask));
         } else if (family == AF_INET6) {
             vecIPv6.push_back(Ipv6Address::Create(host, mask));
         }
@@ -250,9 +259,7 @@ bool NetworkInterface::SaveIpAddress(
 }
 
 bool NetworkInterface::FetchIpAddress(
-    const std::string &interfaceName,
-    Ipv4Address &ipv4,
-    std::vector<Ipv6Address> &vecIPv6)
+    const std::string &interfaceName, std::vector<Ipv4Address> &vecipv4, std::vector<Ipv6Address> &vecIPv6)
 {
     struct ifaddrs *ifaddr = nullptr;
     struct ifaddrs *ifa = nullptr;
@@ -260,7 +267,7 @@ bool NetworkInterface::FetchIpAddress(
     int n = 0;
 
     if (getifaddrs(&ifaddr) == -1) {
-        LOGE("getifaddrs: %{public}s", strerror(errno));
+        WIFI_LOGE("getifaddrs: %{public}s", strerror(errno));
         return false;
     }
 
@@ -272,14 +279,146 @@ bool NetworkInterface::FetchIpAddress(
          * Display interface name and family (including symbolic
          * form of the latter for the common families)
          */
-        if (strncmp(interfaceName.c_str(), ifa->ifa_name, IF_NAMESIZE) != 0) {
+        if (strncmp(interfaceName.c_str(), ifa->ifa_name, IF_NAMESIZE) != 0 && !interfaceName.empty()) {
             continue;
         }
-        ret = SaveIpAddress(*ifa, ipv4, vecIPv6);
+        ret |= SaveIpAddress(*ifa, vecipv4, vecIPv6);
     }
 
     freeifaddrs(ifaddr);
     return ret;
 }
+
+/* msg packet */
+struct nlmsg {
+    struct nlmsghdr nlmsg;
+    struct ifaddrmsg ifamsg;
+    char attrbuf[NLMSG_ALIGN(sizeof(struct rtattr)) + NLMSG_ALIGN(INET_IP_V6_ADDR_LEN) +
+                 NLMSG_ALIGN(sizeof(struct rtattr)) + NLMSG_ALIGN(INET_IP_V4_ADDR_LEN)];
+};
+
+static bool SendNetlinkMsg(nlmsg msg)
+{
+    int sockfd = socket(PF_NETLINK, SOCK_RAW | SOCK_CLOEXEC, NETLINK_ROUTE);
+    if (sockfd < 0) {
+        WIFI_LOGE("create socket failed to connet netlink");
+        return false;
+    }
+
+    if (send(sockfd, &msg, msg.nlmsg.nlmsg_len, 0) < 0) {
+        close(sockfd);
+        WIFI_LOGE("socket send failed");
+        return false;
+    }
+
+    char buf[NLMSG_ALIGN(sizeof(struct nlmsgerr)) + sizeof(msg)];
+    int reclen = recv(sockfd, buf, sizeof(buf), 0);
+    close(sockfd);
+    if (reclen < 0) {
+        WIFI_LOGE("failed to get results");
+        return false;
+    }
+
+    struct nlmsghdr *recnlmsg = (struct nlmsghdr *)buf;
+    int errnum = ((struct nlmsgerr *)NLMSG_DATA(recnlmsg))->error;
+    if (!NLMSG_OK(recnlmsg, (unsigned)reclen) || recnlmsg->nlmsg_type != NLMSG_ERROR || errnum != 0) {
+        WIFI_LOGE("Failed to set ip.err:%d", errnum);
+        return false;
+    }
+    return true;
+}
+
+bool NetworkInterface::IpAddressChange(
+    const std::string &interface, const BaseAddress &ipAddress, bool action, bool dad)
+{
+    if (!ipAddress.IsValid()) {
+        WIFI_LOGE("bad input parameter to change ip.");
+        return false;
+    }
+
+    int ifcindex = if_nametoindex(interface.c_str());
+    if (ifcindex < 0) {
+        WIFI_LOGE("bad interface to change ip.");
+        return false;
+    }
+
+    int addrLen;
+    in6_addr addr6;
+    in_addr addr;
+    void *addrSin;
+    if (ipAddress.GetFamilyType() == BaseAddress::FamilyType::FAMILY_INET6) {
+        addrLen = INET_IP_V6_ADDR_LEN;
+        addr6 = static_cast<const Ipv6Address &>(ipAddress).GetIn6Addr();
+        addrSin = &addr6;
+    } else {
+        addrLen = INET_IP_V4_ADDR_LEN;
+        addr = static_cast<const Ipv4Address &>(ipAddress).GetAddressWithInet();
+        addrSin = &addr;
+    }
+    int prelen = ipAddress.GetAddressPrefixLength();
+    nlmsg msg;
+    int ret = memset_s(&msg, sizeof(msg), 0, sizeof(msg));
+    if (ret != 0) {
+        WIFI_LOGE("The msg of memset_s failed.");
+        return false;
+    }
+
+    /* Netlink message header. */
+    msg.nlmsg.nlmsg_len = NLMSG_LENGTH(sizeof(msg.ifamsg));
+    msg.nlmsg.nlmsg_type = action ? RTM_NEWADDR : RTM_DELADDR;
+    msg.nlmsg.nlmsg_flags = NLM_F_REQUEST | NLM_F_ACK;
+    msg.nlmsg.nlmsg_pid = getpid();
+
+    /* Interface address message header. */
+    msg.ifamsg.ifa_family = (addrLen == INET_IP_V6_ADDR_LEN) ? AF_INET6 : AF_INET;
+    msg.ifamsg.ifa_flags = dad ? 0 : IFA_F_NODAD;
+    msg.ifamsg.ifa_prefixlen = prelen;
+    msg.ifamsg.ifa_index = ifcindex;
+
+    /* Routing attribute. */
+    struct rtattr *attr = (struct rtattr *)(((char *)&msg) + NLMSG_ALIGN(msg.nlmsg.nlmsg_len));
+    attr->rta_type = IFA_LOCAL;
+    attr->rta_len = RTA_LENGTH(addrLen);
+    msg.nlmsg.nlmsg_len = NLMSG_ALIGN(msg.nlmsg.nlmsg_len) + RTA_LENGTH(addrLen);
+    ret = memcpy_s(RTA_DATA(attr), sizeof(attr), addrSin, addrLen);
+    if (ret != 0) {
+        WIFI_LOGE("The attr of memcpy_s failed at INET_IP_V6_ADDR_LEN.");
+        return false;
+    }
+
+    if (addrLen == INET_IP_V4_ADDR_LEN && action) { /* For IPV4 IFA_BROADCAST */
+        attr = (struct rtattr *)(((char *)&msg) + NLMSG_ALIGN(msg.nlmsg.nlmsg_len));
+        attr->rta_type = IFA_BROADCAST;
+        attr->rta_len = RTA_LENGTH(addrLen);
+        msg.nlmsg.nlmsg_len = NLMSG_ALIGN(msg.nlmsg.nlmsg_len) + RTA_LENGTH(addrLen);
+        ((struct in_addr *)addrSin)->s_addr |= htonl((1 << (INT_BIT - prelen)) - 1);
+        ret = memcpy_s(RTA_DATA(attr), sizeof(attr), addrSin, addrLen);
+        if (ret != 0) {
+            WIFI_LOGE("The attr of memcpy_s failed at INET_IP_V4_ADDR_LEN.");
+            return false;
+        }
+    }
+    return SendNetlinkMsg(msg);
+}
+
+bool NetworkInterface::WriteDataToFile(const std::string &fileName, const std::string &content)
+{
+    int fd = open(fileName.c_str(), O_WRONLY | O_CLOEXEC);
+    if (fd < 0) {
+        WIFI_LOGE("open %{public}s fail, error: %s", fileName.c_str(), strerror(errno));
+        return false;
+    }
+
+    if (static_cast<size_t>(write(fd, content.c_str(), content.length())) != content.length()) {
+        WIFI_LOGE("write content [%s] to file [%{public}s] failed. error: %s.",
+            content.c_str(),
+            fileName.c_str(),
+            strerror(errno));
+        close(fd);
+        return false;
+    }
+    close(fd);
+    return true;
+}
 }  // namespace Wifi
-}  // namespace OHOS
+} // namespace OHOS

@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_WIFSTAREQUEST_H
-#define OHOS_WIFSTAREQUEST_H
+#ifndef OHOS_WIFI_STA_REQUEST_H
+#define OHOS_WIFI_STA_REQUEST_H
 
 #include <string>
 
@@ -26,6 +26,12 @@ public:
     int cmdId;           /* Command ID */
     std::string content; /* Command content */
     /* This interface needs to be detailed based on specific services. */
+
+    WifiStaRequest() : cmdId(0)
+    {}
+
+    ~WifiStaRequest()
+    {}
 };
 }  // namespace Wifi
 }  // namespace OHOS

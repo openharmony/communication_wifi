@@ -15,15 +15,9 @@
 #include "wifi_supplicant_hal_interface.h"
 #include <mutex>
 #include "wifi_log.h"
-#include "wifi_idl_inner_interface.h"
 
 #undef LOG_TAG
-#define LOG_TAG "OHWIFI_IDLCLIENT_WIFI_SUPPLICANT_HAL_INTERFACE"
-
-RpcClient *GetSupplicantRpcClient(void)
-{
-    return OHOS::Wifi::WifiSupplicantHalInterface::GetInstance().mIdlClient->pRpcClient;
-}
+#define LOG_TAG "WifiSupplicantHalInterface"
 
 namespace OHOS {
 namespace Wifi {
@@ -42,57 +36,65 @@ WifiSupplicantHalInterface &WifiSupplicantHalInterface::GetInstance(void)
     return inst;
 }
 
-WifiErrorNo WifiSupplicantHalInterface::StartSupplicant(void)
+WifiErrorNo WifiSupplicantHalInterface::StartSupplicant(void) const
 {
     return mIdlClient->ReqStartSupplicant();
 }
 
-WifiErrorNo WifiSupplicantHalInterface::StopSupplicant(void)
+WifiErrorNo WifiSupplicantHalInterface::StopSupplicant(void) const
 {
     return mIdlClient->ReqStopSupplicant();
 }
 
-WifiErrorNo WifiSupplicantHalInterface::ConnectSupplicant(void)
+WifiErrorNo WifiSupplicantHalInterface::ConnectSupplicant(void) const
 {
     return mIdlClient->ReqConnectSupplicant();
 }
 
-WifiErrorNo WifiSupplicantHalInterface::DisconnectSupplicant(void)
+WifiErrorNo WifiSupplicantHalInterface::DisconnectSupplicant(void) const
 {
     return mIdlClient->ReqDisconnectSupplicant();
 }
 
-WifiErrorNo WifiSupplicantHalInterface::RequestToSupplicant(const std::string &request)
+WifiErrorNo WifiSupplicantHalInterface::RequestToSupplicant(const std::string &request) const
 {
     return mIdlClient->ReqRequestToSupplicant(request);
 }
 
-WifiErrorNo WifiSupplicantHalInterface::RigisterSupplicantEventCallback(SupplicantEventCallback &callback)
+WifiErrorNo WifiSupplicantHalInterface::RegisterSupplicantEventCallback(SupplicantEventCallback &callback)
 {
-    return mIdlClient->ReqRigisterSupplicantEventCallback(callback);
+    WifiErrorNo err = mIdlClient->ReqRegisterSupplicantEventCallback(callback);
+    if (err == WIFI_IDL_OPT_OK) {
+        mCallback = callback;
+    }
+    return err;
 }
 
-WifiErrorNo WifiSupplicantHalInterface::UnRigisterSupplicantEventCallback(void)
+WifiErrorNo WifiSupplicantHalInterface::UnRegisterSupplicantEventCallback(void)
 {
-    return mIdlClient->ReqUnRigisterSupplicantEventCallback();
+    WifiErrorNo err = mIdlClient->ReqUnRegisterSupplicantEventCallback();
+    mCallback.onScanNotify = nullptr;
+    return err;
 }
 
-WifiErrorNo WifiSupplicantHalInterface::SetPowerSave(bool enable)
+WifiErrorNo WifiSupplicantHalInterface::SetPowerSave(bool enable) const
 {
     return mIdlClient->ReqSetPowerSave(enable);
 }
 
-WifiErrorNo WifiSupplicantHalInterface::WpaSetCountryCode(const std::string &countryCode)
+WifiErrorNo WifiSupplicantHalInterface::WpaSetCountryCode(const std::string &countryCode) const
 {
-    if (countryCode.length() <= 0) {
-        return WIFI_IDL_OPT_FAILED;
-    }
     return mIdlClient->ReqWpaSetCountryCode(countryCode);
 }
 
-WifiErrorNo WifiSupplicantHalInterface::WpaGetCountryCode(std::string &countryCode)
+WifiErrorNo WifiSupplicantHalInterface::WpaGetCountryCode(std::string &countryCode) const
 {
     return mIdlClient->ReqWpaGetCountryCode(countryCode);
+}
+
+const SupplicantEventCallback &WifiSupplicantHalInterface::GetCallbackInst(void) const
+{
+    return mCallback;
 }
 }  // namespace Wifi
 }  // namespace OHOS

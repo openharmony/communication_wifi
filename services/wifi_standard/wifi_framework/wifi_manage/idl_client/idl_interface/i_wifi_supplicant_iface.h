@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_IDL_IWIFISUPPLICANTIFACE_H
-#define OHOS_IDL_IWIFISUPPLICANTIFACE_H
+#ifndef OHOS_IDL_IWIFI_SUPPLICANT_IFACE_H
+#define OHOS_IDL_IWIFI_SUPPLICANT_IFACE_H
 
 #include <stdint.h>
 #include "wifi_error_no.h"
@@ -64,7 +64,7 @@ WifiErrorNo ConnectSupplicant(void);
  *
  * @return WifiErrorNo
  */
-WifiErrorNo DisConnectSupplicant(void);
+WifiErrorNo DisconnectSupplicant(void);
 
 /**
  * @Description Request to Supplicant.
@@ -81,7 +81,7 @@ WifiErrorNo RequestToSupplicant(unsigned char *buf, int32_t bufSize);
  * @param callback
  * @return WifiErrorNo
  */
-WifiErrorNo RigisterSupplicantEventCallback(ISupplicantEventCallback callback);
+WifiErrorNo RegisterSupplicantEventCallback(ISupplicantEventCallback callback);
 
 /**
  * @Description Connect.
@@ -118,7 +118,7 @@ WifiErrorNo Disconnect(void);
  * @param enable
  * @return WifiErrorNo
  */
-WifiErrorNo SetPowerSave(BOOL enable);
+WifiErrorNo SetPowerSave(int enable);
 
 /**
  * @Description Setting the country code.

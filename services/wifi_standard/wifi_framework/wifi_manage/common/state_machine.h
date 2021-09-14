@@ -59,7 +59,7 @@ public:
      *
      * @param msg - Message object.[in]
      */
-    void NotExecutedMessage(InternalMessage *msg);
+    void NotExecutedMessage(const InternalMessage *msg);
 
     /**
      * @Description Stop Handler Thread.
@@ -96,7 +96,7 @@ public:
      * @param orig - Original message.[in]
      * @return InternalMessage* : Pointer to the constructed internal message.
      */
-    InternalMessage *CreateMessage(InternalMessage *orig);
+    InternalMessage *CreateMessage(const InternalMessage *orig);
 
     /**
      * @Description : Construct internal messages.
@@ -124,6 +124,26 @@ public:
      * @return InternalMessage* : Pointer to the constructed internal message.
      */
     InternalMessage *CreateMessage(int msgName, int param1, int param2);
+    
+    /**
+     * @Description : Construct internal messages.
+     *
+     * @param msgName - Message Name.[in]
+     * @param messageObj - User-defined data
+     * @return InternalMessage* : Pointer to the constructed internal message.
+     */
+    InternalMessage *CreateMessage(int msgName, const std::any &messageObj);
+
+    /**
+     * @Description : Constructs internal messages.
+     *
+     * @param msgName - Message name.[in]
+     * @param param1 - First Message parameter.[in]
+     * @param param2 - Second Message parameter.[in]
+     * @param messageObj - User-defined data
+     * @return InternalMessage* : Pointer to the constructed internal message.
+     */
+    InternalMessage *CreateMessage(int msgName, int param1, int param2, const std::any &messageObj);
 
     /**
      * @Description : Constructs internal messages and places the
@@ -158,6 +178,23 @@ public:
      * @param msg - Message to be sent.[in]
      */
     void SendMessage(InternalMessage *msg);
+    /**
+     * @Description : Puts messages into the message queue of the state machine.
+     *
+     * @param msgName - Message Name.[in]
+     * @param messageObj -  User-defined data
+     */
+    void SendMessage(int msgName, const std::any &messageObj);
+
+    /**
+     * @Description : Puts messages into the message queue of the state machine.
+     *
+     * @param msgName - Message Name.[in]
+     * @param param1 - Message parameters.[in]
+     * @param param2 - Message parameters.[in]
+     * @param messageObj - User-defined data
+     */
+    void SendMessage(int msgName, int param1, int param2, const std::any &messageObj);
 
     /**
      * @Description  Constructs internal messages and places them in the
@@ -201,6 +238,30 @@ public:
      * @param delayTimeMs - Delay time, in milliseconds.[in]
      */
     void MessageExecutedLater(InternalMessage *msg, int64_t delayTimeMs);
+
+    /**
+     * @Description : Constructs internal messages and places them in the
+     * message queue of the state machine. The messages are processed
+     * after the specified delay time.
+     *
+     * @param msgName - Message Name.[in]
+     * @param messageObj -User-defined data
+     * @param delayTimeMs - Delay time, in milliseconds.[in]
+     */
+    void MessageExecutedLater(int msgName, const std::any &messageObj, int64_t delayTimeMs);
+
+    /**
+     * @Description : Constructs internal messages and places them in the
+     * message queue of the state machine. The messages are processed
+     * after the specified delay time.
+     *
+     * @param msgName - Message Name.[in]
+     * @param param1 - Message parameters.[in]
+     * @param param2 - Message parameters.[in]
+     * @param messageObj - User-defined data
+     * @param delayTimeMs - Delay time, in milliseconds.[in]
+     */
+    void MessageExecutedLater(int msgName, int param1, int param2, const std::any &messageObj, int64_t delayTimeMs);
 
 protected:
     /**
@@ -250,7 +311,7 @@ protected:
      *
      * @param msg - Message object.[in]
      */
-    void DelayMessage(InternalMessage *msg);
+    void DelayMessage(const InternalMessage *msg);
 
 private:
     StateMachineHandler *pStateMachineHandler;
@@ -324,7 +385,7 @@ public:
      *
      * @param msg - Message body pointer.[in]
      */
-    void DelayMessage(InternalMessage *msg);
+    void DelayMessage(const InternalMessage *msg);
 
     /**
      * @Description : The state machine is constructed.

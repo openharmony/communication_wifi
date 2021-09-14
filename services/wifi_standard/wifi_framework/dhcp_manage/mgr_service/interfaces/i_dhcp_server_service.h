@@ -127,9 +127,10 @@ public:
     /**
      * @Description : Reload dhcp server config.
      *
+     * @param ifname - interface name, eg:wlan0 [in]
      * @Return : success - DHCP_OPT_SUCCESS, failed - others.
      */
-    virtual int ReConf(void) = 0;
+    virtual int ReloadConfig(const std::string& ifname) = 0;
 };
 }  // namespace Wifi
 }  // namespace OHOS

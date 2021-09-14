@@ -18,6 +18,10 @@
 
 #include "server.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @Description Parse the context to obtain data. Call the corresponding function
  *              RegisterEventCallback and assemble the function to obtain data.
@@ -47,4 +51,8 @@ int RpcUnRegisterEventCallback(RpcServer *server, Context *context);
  * @return int - 0 Success, -1 Failed.
  */
 int RpcNotifyClear(RpcServer *server, Context *context);
+
+#ifdef __cplusplus
+}
+#endif
 #endif

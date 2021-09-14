@@ -25,12 +25,6 @@ extern "C" {
 
 #define ERROR_CODE_POS_OVERFLOW (-2)
 
-typedef struct StWifiIfaceArray {
-    int capacity;
-    int pos;
-    WifiIface **ifaces;
-} WifiIfaceArray;
-
 /**
  * @Description Obtains the chip object by ID.
  *

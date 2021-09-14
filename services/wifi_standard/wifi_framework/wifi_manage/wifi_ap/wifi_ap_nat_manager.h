@@ -16,23 +16,12 @@
 #define OHOS_AP_NAT_MANAGER_H
 
 #include <string>
+#include "ap_macro.h"
 
 namespace OHOS {
 namespace Wifi {
 class WifiApNatManager {
-public:
-    /**
-     * @Description  Obtains the single instance
-     * @param None
-     * @return The reference of singleton objects
-     */
-    static WifiApNatManager &GetInstance();
-    /**
-     * @Description  Delete the single instance.
-     * @param None
-     * @return None
-     */
-    static void DeleteInstance();
+    FRIEND_GTEST(WifiApNatManager);
 
 public:
     /**
@@ -67,7 +56,6 @@ private:
      */
     bool SetInterfaceNat(bool enable, const std::string &outInterfaceName) const;
 
-private:
     /**
      * @Description  Write data to a file.
      * @param fileName - file name
@@ -83,9 +71,6 @@ private:
      * @return true: success     false: failed
      */
     bool ExecCommand(const std::vector<std::string> &vecCommandArg) const;
-
-private:
-    static WifiApNatManager *g_instance;
 };
 }  // namespace Wifi
 }  // namespace OHOS

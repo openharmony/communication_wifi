@@ -123,6 +123,108 @@ int CheckMacIsValid(const std::string &macStr);
 void SplitString(const std::string &str, const std::string &split, std::vector<std::string> &vec);
 
 /**
+ * @Description Converts a numeric vector to a character array.
+ *
+ * @param vec - Input numeric vector.[in]
+ * @param pChar - Character array.[out]
+ * @param len - Length of character array.[out]
+ * @param memSize - Character array's memory size.[in]
+ * @return int - 0 Valid; -1 Invalid
+ */
+template <typename T>
+int Vec2Char(const std::vector<T> &vec, T *pChar, int& len, int memSize)
+{
+    if (pChar == nullptr) {
+        len = 0;
+        return -1;
+    }
+
+    const int vecSize = static_cast<int>(vec.size());
+    if (vecSize > memSize) {
+        pChar = nullptr;
+        len = 0;
+        return -1;
+    }
+
+    for (int i = 0; i < vecSize; i++) {
+        pChar[i] = vec[i];
+    }
+    len = vecSize;
+    return 0;
+}
+
+/**
+ * @Description Converts a character array to a numeric vector.
+ *
+ * @param pChar - Character array.[in]
+ * @param len - Length of character array.[in]
+ * @param vec - Input numeric vector.[out]
+ * @return int - 0 Valid; -1 Invalid
+ */
+template <typename T>
+int Char2Vec(const T *pChar, int len, std::vector<T> &vec)
+{
+    vec.clear();
+    if (pChar == nullptr || len < 0) {
+        return -1;
+    }
+
+    for (int i = 0; i < len; i++) {
+        vec.push_back(pChar[i]);
+    }
+
+    return 0;
+}
+
+/**
+ * @Description Converts a char/unsigned char/byte/int8 vector to a hexadecimal character array. A numeric
+ * value is converted to two characters. e.g. 0x3F -> '3' 'F'
+ *
+ * @param vec - Input numeric vector.
+ * @param pHexChar - Character array.
+ * @param memSize - Character array's memory size.
+ * @return int - 0 Valid; -1 Invalid
+ */
+template<typename T>
+int Val2HexChar(const std::vector<T> &vec, char *pHexChar, unsigned memSize)
+{
+    unsigned size = vec.size();
+    unsigned doubleSize = (size << 1);
+    if (doubleSize >= memSize) {
+        return -1;
+    }
+    const std::string hexStr = "0123456789ABCDEF";
+    const unsigned highBit = 4;
+    int pos = 0;
+    for (unsigned i = 0; i < size; ++i) {
+        unsigned char tmp = vec[i];
+        pHexChar[pos] = hexStr[(tmp >> highBit) & 0x0F];
+        ++pos;
+        pHexChar[pos] = hexStr[tmp & 0x0F];
+        ++pos;
+    }
+    pHexChar[pos] = '\0';
+    return 0;
+}
+
+/**
+ * @Description  Output vecChar to stream.
+ * @param prefix  - prefix string[in]
+ * @param vecChar - vector char[in]
+ * @param suffix  - suffix string[in]
+ */
+std::string Vec2Stream(const std::string &prefix, const std::vector<char> &vecChar, const std::string &sufffix = "");
+
+/**
+ * @Description Convert a hex type string to vector.
+ *
+ * @param str - input hex string, eg: 010203...
+ * @param vec - output vector result, eg: [1,2,3,...]
+ * @return int - convert result, 0 success, -1 failed
+ */
+int HexStringToVec(const std::string &str, std::vector<char> &vec);
+
+/**
  * @Description Check is a valid 5G frequency.
  *
  * @param freq - Frequency input

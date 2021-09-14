@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_WIFICHIPHALINTERFACE_H
-#define OHOS_WIFICHIPHALINTERFACE_H
+#ifndef OHOS_WIFI_CHIP_HAL_INTERFACE_H
+#define OHOS_WIFI_CHIP_HAL_INTERFACE_H
 
 #include <string>
 #include <vector>

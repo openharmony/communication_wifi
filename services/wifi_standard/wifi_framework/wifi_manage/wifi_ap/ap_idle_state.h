@@ -21,14 +21,17 @@
 
 namespace OHOS {
 namespace Wifi {
+class ApStateMachine;
 class ApIdleState : public State {
+    FRIEND_GTEST(ApIdleState);
+
 public:
     /**
      * @Description  construction method
      * @param None
      * @return None
      */
-    ApIdleState();
+    explicit ApIdleState(ApStateMachine &);
     /**
      * @Description  destructor method
      * @param None
@@ -52,9 +55,11 @@ public:
     /**
      * @Description  realize pure base class method: process event in idle state.
      * @param msg - message to be processed
-     * @return EXECUTED：Processed successfully    NOT_EXECUTED: Processed failed
+     * @return HANDLED：Processed successfully    NOT_EXECUTED: Processed failed
      */
     virtual bool ExecuteStateMsg(InternalMessage *msg) override;
+private:
+    ApStateMachine &m_ApStateMachine;
 };
 }  // namespace Wifi
 }  // namespace OHOS

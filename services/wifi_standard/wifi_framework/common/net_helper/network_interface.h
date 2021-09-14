@@ -19,8 +19,10 @@
 #include <ifaddrs.h>
 #include <string>
 #include <vector>
-#include "ipv6_address.h"
+#include <ifaddrs.h>
+
 #include "ipv4_address.h"
+#include "ipv6_address.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -42,6 +44,23 @@ bool IsValidInterfaceName(const std::string &interfaceName);
 bool IsInterfaceUp(const std::string &interfaceName);
 
 /**
+ * @Description  Set the interface UP.
+ *
+ * @param interfaceName - Network Interface Name
+ * @param state - 1 up / 0 down.
+ * @return true - yes  false - no
+ */
+bool SetInterfaceState(const std::string &interfaceName, int state);
+
+/**
+ * @Description  Enable ipv6.
+ *
+ * @param interfaceName - Network Interface Name[in]
+ * @return true - yes  false - no
+ */
+bool EnableIpv6(const std::string& interfaceName);
+
+/**
  * @Description  Print all members in an object
  *
  * @param interfaceName - Network Interface Name
@@ -57,18 +76,19 @@ void Dump(const std::string &interfaceName);
  * @param vecIPv6 - the vector of ipv6 addresses of network [output]
  * @return true - fetch success     false - fetch failed
  */
-bool FetchInterfaceConfig(const std::string &interfaceName, Ipv4Address &ipv4, std::vector<Ipv6Address> &vecIPv6);
+bool FetchInterfaceConfig(
+    const std::string &interfaceName, std::vector<Ipv4Address> &vecIPv4, std::vector<Ipv6Address> &vecIPv6);
 
 /**
  * @Description  Obtains the IPv4 address object of the current network interface.
  *
  * @param interfaceName - Network Interface Name [input]
- * @param ipv4 - IPv4 address of the network interface interface. If
+ * @param vecIPv4 - the vector of address of the network interface interface. If
                  the IPv4 address fails to be obtained, an invalid IPv4
-                 address is returned. [output]
+                 ddress is returned. [output]
  * @return true - success   false - failed
  */
-bool GetIpv4Address(const std::string &interfaceName, Ipv4Address &ipv4);
+bool GetIpv4Address(const std::string &interfaceName, std::vector<Ipv4Address> &ipv4);
 
 /**
  * @Description  Obtains all IPv6 addresses of a network interface.
@@ -125,17 +145,36 @@ bool ClearAllIpAddress(const std::string &interfaceName);
  * @param vecIPv6 - IPv6 address. [output]
  * @return true - success    false - failed
  */
-bool FetchIpAddress(const std::string &interfaceName, Ipv4Address &ipv4, std::vector<Ipv6Address> &vecIPv6);
+bool FetchIpAddress(
+    const std::string &interfaceName, std::vector<Ipv4Address> &vecipv4, std::vector<Ipv6Address> &vecIPv6);
 
 /**
  * @Description  Saves the IP address obtained through ifaddrs.
  *
  * @param ifa - Source address. [input]
- * @param ipv4 - IPv4 address. [output]
+ * @param vecIPv4 - IPv4 address. [output]
  * @param vecIPv6 - IPv6 address. [output]
  * @return true - success    false - failed
  */
-bool SaveIpAddress(const struct ifaddrs &ifa, Ipv4Address &ipv4, std::vector<Ipv6Address> &vecIPv6);
+bool SaveIpAddress(const struct ifaddrs &ifa, std::vector<Ipv4Address> &vecIPv4, std::vector<Ipv6Address> &vecIPv6);
+
+/**
+ * @Description  obtain IPv4 and IPv6 address from interfaceName
+ *
+ * @param interfaceName - Network Interface Name. [input]
+ * @param ipAddress - IP address. [input]
+ * @param action - true - add ip   flase - del app [input]
+ * @param dad - duplicate address detection,default disable [input]
+ * @return true - success    false - fail
+ */
+bool IpAddressChange(const std::string &interface, const BaseAddress &ipAddress, bool action, bool dad = false);
+/**
+ * @Description  Write data to a file.
+ * @param fileName - file name
+ * @param content - Character data to be written
+ * @return true: success     false: fail
+ */
+bool WriteDataToFile(const std::string &fileName, const std::string &content);
 }; /* namespace NetworkInterface */
 }  // namespace Wifi
 }  // namespace OHOS

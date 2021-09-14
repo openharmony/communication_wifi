@@ -12,29 +12,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef OHOS_IDL_IWIFISTRUCT_H
-#define OHOS_IDL_IWIFISTRUCT_H
+#ifndef OHOS_IDL_IWIFI_STRUCT_H
+#define OHOS_IDL_IWIFI_STRUCT_H
 
 #include <stdint.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-typedef char BOOL;
-#define TRUE 1
-#define FALSE 0
-
 #define WIFI_SSID_LENGTH 132
-#define WIFI_BSSID_LENGTH 128
-#define WIFI_SCAN_RESULT_ELEMENT_LENGTH 256
-#define WIFI_SCAN_RESULT_CAPABILITIES_LENGTH 256
+#define WIFI_BSSID_LENGTH 18
+#define WIFI_NETWORK_FLAGS_LENGTH 64
+#define WIFI_SCAN_INFO_CAPABILITIES_LENGTH 256
 #define WIFI_NETWORK_CONFIG_NAME_LENGTH 64
-#define WIFI_NETWORK_CONFIG_VALUE_LENGTH 128
-#define WIFI_STATUS_ERROR_MSG_LENGTH 64
+#define WIFI_NETWORK_CONFIG_VALUE_LENGTH 256
 #define WIFI_MAC_ADDR_LENGTH 17
 #define WIFI_AP_PASSWORD_LENGTH 64
 #define WIFI_INTERFACE_NAME_SIZE 32
+#define WIFI_PIN_CODE_LENGTH 8
 
 /* IWifiIface */
 /*
@@ -78,8 +73,7 @@ typedef struct TagIWifiChip {
 } IWifiChip;
 
 typedef struct StSupplicantEventCallback {
-    void *pInstance;
-    void (*onScanNotify)(int32_t result, void *pInstance);
+    void (*onScanNotify)(int32_t result);
 } ISupplicantEventCallback;
 
 typedef struct ScanSettings {
@@ -90,23 +84,35 @@ typedef struct ScanSettings {
     int scanStyle;
 } ScanSettings;
 
-typedef struct ScanResult {
+typedef struct ScanInfoElem {
+    unsigned int id;
+    char* content;
+    int size;
+} ScanInfoElem;
+
+typedef struct ScanInfo {
     char ssid[WIFI_SSID_LENGTH];
     char bssid[WIFI_BSSID_LENGTH];
-    char infoElement[WIFI_SCAN_RESULT_ELEMENT_LENGTH];
     int frequency;
+    int channelWidth;
+    int centerFrequency0;
+    int centerFrequency1;
+    ScanInfoElem* infoElems;
+    int ieSize;
+    int64_t features;
     int signalLevel;
+    char capability[WIFI_SCAN_INFO_CAPABILITIES_LENGTH];
     int64_t timestamp;
-    char capability[WIFI_SCAN_RESULT_CAPABILITIES_LENGTH];
     int associated;
-} ScanResult;
+    int antValue;
+} ScanInfo;
 
-typedef struct NetworkList {
+typedef struct HidlNetworkInfo {
     int id;
     char ssid[WIFI_SSID_LENGTH];
     char bssid[WIFI_BSSID_LENGTH];
-    char flags[WIFI_BSSID_LENGTH];
-} NetworkList;
+    char flags[WIFI_NETWORK_FLAGS_LENGTH];
+} HidlNetworkInfo;
 
 typedef struct PnoScanSettings {
     int scanInterval;
@@ -140,77 +146,22 @@ typedef enum DeviceConfigType {
     DEVICE_CONFIG_END_POS, /* Number of network configuration parameters, which is used as the last parameter. */
 } DeviceConfigType;
 
-typedef struct NetWorkConfig {
+typedef struct HidlSetNetworkConfig {
     DeviceConfigType cfgParam;                       /* param */
     char cfgValue[WIFI_NETWORK_CONFIG_VALUE_LENGTH]; /* param value */
-} NetWorkConfig;
+} HidlSetNetworkConfig;
 
-typedef struct GetWpaNetWorkConfig {
+typedef struct HidlGetNetworkConfig {
     int networkId;
-    char param[WIFI_NETWORK_CONFIG_VALUE_LENGTH];
+    char param[WIFI_NETWORK_CONFIG_NAME_LENGTH];
     char value[WIFI_NETWORK_CONFIG_VALUE_LENGTH];
-} GetWpaNetWorkConfig;
-
-/* Supplicant status code */
-typedef enum SupplicantStatusCode {
-    /* * No errors. */
-    SUPPLICANT_SUCCESS,
-    /* * Unknown failure occurred. */
-    FAILURE_UNKNOWN,
-    /* * One of the incoming args is invalid. */
-    FAILURE_ARGS_INVALID,
-    /* * |ISupplicantIface| HIDL interface object is no longer valid. */
-    FAILURE_IFACE_INVALID,
-    /* * Iface with the provided name does not exist. */
-    FAILURE_IFACE_UNKNOWN,
-    /* * Iface with the provided name already exists. */
-    FAILURE_IFACE_EXISTS,
-    /* * Iface is disabled and cannot be used. */
-    FAILURE_IFACE_DISABLED,
-    /* * Iface is not currently disconnected, so cannot reconnect. */
-    FAILURE_IFACE_NOT_DISCONNECTED,
-    /* * |ISupplicantNetwork| HIDL interface object is no longer valid. */
-    FAILURE_NETWORK_INVALID,
-    /* * Network with the provided id does not exist. */
-    FAILURE_NETWORK_UNKNOWN
-} SupplicantStatusCode;
-
-/**
- * Enum values indicating the status of operation.
- */
-typedef enum WifiStatusCode {
-    /* * No errors. */
-    WIFI_STATUS_SUCCESS,
-    /* * Method invoked on an invalid |IWifiChip| object. */
-    ERROR_WIFI_CHIP_INVALID,
-    /* * Method invoked on an invalid |IWifiIface| object. */
-    ERROR_WIFI_IFACE_INVALID,
-    /* * Method invoked on an invalid |IWifiRttController| object. */
-    ERROR_WIFI_RTT_CONTROLLER_INVALID,
-    ERROR_NOT_SUPPORTED,
-    ERROR_NOT_AVAILABLE,
-    ERROR_NOT_STARTED,
-    ERROR_INVALID_ARGS,
-    ERROR_BUSY,
-    ERROR_UNKNOWN
-} WifiStatusCode;
-
-/**
- * Generic structure to return the status of an operation.
- */
-typedef struct WifiStatus {
-    WifiStatusCode code;
-    /**
-     * A vendor specific error message from the vendor to provide more
-     * information beyond the reason code.
-     */
-    char description[WIFI_STATUS_ERROR_MSG_LENGTH];
-} WifiStatus;
+} HidlGetNetworkConfig;
 
 typedef struct WifiWpsParam {
     int anyFlag;
     int multiAp;
     char bssid[WIFI_BSSID_LENGTH];
+    char pinCode[WIFI_PIN_CODE_LENGTH + 1];
 } WifiWpsParam;
 
 typedef struct WifiRoamCapability {
@@ -218,7 +169,15 @@ typedef struct WifiRoamCapability {
     int maxTrustlistSize;
 } WifiRoamCapability;
 
-typedef struct HostsapdConfig {
+typedef struct HidlWpaSignalInfo {
+    int signal;
+    int txrate;
+    int rxrate;
+    int noise;
+    int frequency;
+} HidlWpaSignalInfo;
+
+typedef struct HostapdConfig {
     char ssid[WIFI_SSID_LENGTH];
     int32_t ssidLen;
     char preSharedKey[WIFI_AP_PASSWORD_LENGTH];
@@ -227,7 +186,7 @@ typedef struct HostsapdConfig {
     int32_t band;
     int32_t channel;
     int32_t maxConn;
-} HostsapdConfig;
+} HostapdConfig;
 
 typedef struct CStationInfo {
     int type;
@@ -239,21 +198,110 @@ typedef struct IWifiApEventCallback {
     void (*onApEnableOrDisable)(int event);
 } IWifiApEventCallback;
 
-typedef enum WpaStates {
-    WPA_DISCONNECTED = 0,
-    WPA_INTERFACE_DISABLED = 1,
-    WPA_INACTIVE = 2,
-    WPA_SCANNING = 3,
-    WPA_AUTHENTICATING = 4,
-    WPA_ASSOCIATING = 5,
-    WPA_ASSOCIATED = 6,
-    WPA_4_WAY_HANDSHAKEEE = 7,
-    WPA_GROUP_HANDSHAKE = 8,
-    WPA_COMPLETED = 9,
-    WPA_UNKNOWN = 10
-} WpaStates;
-
 typedef enum IfaceType { TYPE_STA, TYPE_AP, TYPE_P2P, TYPE_NAN } IfaceType;
+
+/*----------------p2p struct defines begin-------------------------*/
+#define WIFI_P2P_TMP_MSG_LENGTH_128 128
+#define WIFI_P2P_TMP_MSG_LENGTH_64 64
+#define WIFI_P2P_MAX_GROUP_IFACE_NAME_LENGTH 64
+#define WIFI_P2P_DEVICE_TYPE_LENGTH 64
+#define WIFI_P2P_DEVICE_NAME_LENGTH 128
+#define WIFI_P2P_WFD_DEVICE_INFO_LENGTH 32
+#define WIFI_P2P_IDL_SERVER_NAME_LENGTH 256
+#define WIFI_P2P_IDL_SERVER_INFO_LENGTH 256
+#define WIFI_P2P_GROUP_CONFIG_VALUE_LENGTH 256
+
+typedef struct HidlP2pDeviceInfo {
+    char srcAddress[WIFI_MAC_ADDR_LENGTH + 1];
+    char p2pDeviceAddress[WIFI_MAC_ADDR_LENGTH + 1];
+    char primaryDeviceType[WIFI_P2P_DEVICE_TYPE_LENGTH];
+    char deviceName[WIFI_P2P_DEVICE_NAME_LENGTH];
+    int configMethods;
+    int deviceCapabilities;
+    int groupCapabilities;
+    char wfdDeviceInfo[WIFI_P2P_WFD_DEVICE_INFO_LENGTH];
+    unsigned int wfdLength;
+} HidlP2pDeviceInfo;
+
+typedef struct HidlP2pGroupInfo {
+    int isGo;
+    int isPersistent;
+    int frequency;
+    char groupName[WIFI_P2P_MAX_GROUP_IFACE_NAME_LENGTH];
+    char ssid[WIFI_SSID_LENGTH];
+    char psk[WIFI_P2P_TMP_MSG_LENGTH_128];
+    char passphrase[WIFI_P2P_TMP_MSG_LENGTH_128];
+    char goDeviceAddress[WIFI_MAC_ADDR_LENGTH + 1];
+} HidlP2pGroupInfo;
+
+typedef struct HidlP2pInvitationInfo {
+    int type; /* 0:Recived, 1:Accepted */
+    int persistentNetworkId;
+    int operatingFrequency;
+    char srcAddress[WIFI_MAC_ADDR_LENGTH + 1];
+    char goDeviceAddress[WIFI_MAC_ADDR_LENGTH + 1];
+    char bssid[WIFI_MAC_ADDR_LENGTH + 1];
+} HidlP2pInvitationInfo;
+
+typedef struct HidlP2pServDiscReqInfo {
+    int freq;
+    int dialogToken;
+    int updateIndic;
+    int tlvsLength;
+    char mac[WIFI_MAC_ADDR_LENGTH + 1];
+    unsigned char *tlvs;
+} HidlP2pServDiscReqInfo;
+
+typedef struct HidlP2pServiceInfo {
+    int mode; /* 0/1, upnp/bonjour  */
+    int version;
+    char name[WIFI_P2P_IDL_SERVER_NAME_LENGTH];
+    char query[WIFI_P2P_IDL_SERVER_INFO_LENGTH];
+    char resp[WIFI_P2P_IDL_SERVER_INFO_LENGTH];
+} HidlP2pServiceInfo;
+
+typedef struct HidlP2pNetworkInfo {
+    int id;
+    char ssid[WIFI_SSID_LENGTH];
+    char bssid[WIFI_MAC_ADDR_LENGTH + 1];
+    char flags[WIFI_P2P_TMP_MSG_LENGTH_64];
+} HidlP2pNetworkInfo;
+
+typedef struct HidlP2pNetworkList {
+    int infoNum;
+    HidlP2pNetworkInfo *infos;
+} HidlP2pNetworkList;
+
+typedef struct HidlP2pConnectInfo {
+    int persistent; /* |persistent=<network id>] */
+    int mode; /* [join|auth] */
+    int goIntent; /* [go_intent=<0..15>] */
+    int provdisc; /* [provdisc] */
+    char peerDevAddr[WIFI_MAC_ADDR_LENGTH + 1];
+    char pin[WIFI_PIN_CODE_LENGTH + 1]; /* <pbc|pin|PIN#|p2ps> */
+} HidlP2pConnectInfo;
+
+/* Wifi P2P Group Network configuration parameter flag */
+typedef enum P2pGroupConfigType {
+    GROUP_CONFIG_SSID = 0,
+    GROUP_CONFIG_BSSID,
+    GROUP_CONFIG_PSK,
+    GROUP_CONFIG_PROTO,
+    GROUP_CONFIG_KEY_MGMT,
+    GROUP_CONFIG_PAIRWISE,
+    GROUP_CONFIG_AUTH_ALG,
+    GROUP_CONFIG_MODE,
+    GROUP_CONFIG_DISABLED,
+    GROUP_CONFIG_END_POS,
+} P2pGroupConfigType;
+
+typedef struct HidlP2pGroupConfig {
+    P2pGroupConfigType cfgParam;                       /* param */
+    char cfgValue[WIFI_P2P_GROUP_CONFIG_VALUE_LENGTH]; /* param value */
+} HidlP2pGroupConfig;
+
+/* ----------------p2p struct defines end--------------------------- */
+
 
 #ifdef __cplusplus
 }

@@ -234,7 +234,8 @@ std::set<HotspotLeaveCb> EventManager::m_setHotspotLeaveCb;
 
 static EventManager g_eventManager;
 
-WifiErrorCode RegisterWifiEvent(const WifiEvent *event) {
+WifiErrorCode RegisterWifiEvent(WifiEvent *event)
+{
     WIFI_LOGI("Register wifi event");
     if (event == nullptr) {
         return ERROR_WIFI_INVALID_ARGS;
@@ -263,7 +264,8 @@ WifiErrorCode RegisterWifiEvent(const WifiEvent *event) {
     return ERROR_WIFI_INVALID_ARGS;
 }
 
-WifiErrorCode UnRegisterWifiEvent(const WifiEvent *event) {
+WifiErrorCode UnRegisterWifiEvent(const WifiEvent *event)
+{
     WIFI_LOGI("Unregister wifi event");
     if (event == nullptr) {
         return ERROR_WIFI_INVALID_ARGS;

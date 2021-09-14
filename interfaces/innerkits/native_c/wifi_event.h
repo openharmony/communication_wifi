@@ -105,27 +105,5 @@ typedef enum {
     WIFI_STATE_AVALIABLE
 } WifiEventState;
 
-/**
- * @brief Registers a callback for a specified Wi-Fi event.
- *
- * The registered callback will be invoked when the Wi-Fi event defined in {@link WifiEvent} occurs. \n
- *
- * @param event Indicates the event for which the callback is to be registered.
- * @return Returns {@link WIFI_SUCCESS} if the callback is registered successfully; returns an error code defined
- * in {@link WifiErrorCode} otherwise.
- * @since 7
- */
-WifiErrorCode RegisterWifiEvent(const WifiEvent *event);
-
-/**
- * @brief Unregisters a callback previously registered for a specified Wi-Fi event.
- *
- * @param event Indicates the event for which the callback is to be unregistered.
- * @return Returns {@link WIFI_SUCCESS} if the callback is unregistered successfully; returns an error code defined
- * in {@link WifiErrorCode} otherwise.
- * @since 7
- */
-WifiErrorCode UnRegisterWifiEvent(const WifiEvent *event);
-
 #endif // WIFI_EVENT_C_H
 /** @} */

@@ -14,9 +14,11 @@
  */
 #ifndef OHOS_AP_INTERFACE_H
 #define OHOS_AP_INTERFACE_H
-
-#include "ap_define.h"
+#include "ap_config_use.h"
+#include "ap_monitor.h"
+#include "ap_stations_manager.h"
 #include "ap_service.h"
+#include "ap_state_machine.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -80,7 +82,7 @@ public:
 
     /**
      * @Description Get the Station List object.
-     * 
+     *
      * @param result - current connected station info
      * @return ErrCode - success: WIFI_OPT_SUCCESS    failed: ERROR_CODE
      */
@@ -110,7 +112,18 @@ public:
      */
     virtual ErrCode GetValidChannels(BandType band, std::vector<int32_t> &validchannel) override;
 
-}; /* ApInterface */
+private:
+    ApRootState m_ApRootState;
+    ApStartedState m_ApStartedState;
+    ApIdleState m_ApIdleState;
+
+    ApMonitor m_ApMonitor;
+    ApStateMachine m_ApStateMachine;
+    ApService m_ApService;
+
+    ApStationsManager m_ApStationsManager;
+    ApConfigUse m_ApConfigUse;
+};
 }  // namespace Wifi
 }  // namespace OHOS
 

@@ -17,7 +17,7 @@
 #include "wifi_log.h"
 
 #undef LOG_TAG
-#define LOG_TAG "OHWIFI_IDLCLIENT_WIFI_BASE_HAL_INTERFACE"
+#define LOG_TAG "WifiBaseHalInterface"
 
 namespace OHOS {
 namespace Wifi {

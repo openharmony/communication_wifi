@@ -13,12 +13,15 @@
  * limitations under the License.
  */
 #include "ap_stations_manager.h"
+#include <unistd.h>
+#include "ap_service.h"
+#include "wifi_log.h"
+#include "wifi_settings.h"
+#include "wifi_ap_hal_interface.h"
 #include "ap_state_machine.h"
-#include "log_helper.h"
-#include "unistd.h"
 #include "wifi_logger.h"
 
-DEFINE_WIFILOG_HOTSPOT_LABEL("ApStationsManager");
+DEFINE_WIFILOG_HOTSPOT_LABEL("WifiApStationsManager");
 
 namespace OHOS {
 namespace Wifi {
@@ -64,7 +67,7 @@ bool ApStationsManager::EnableAllBlockList() const
 {
     std::vector<StationInfo> results;
     if (WifiSettings::GetInstance().GetBlockList(results)) {
-        WIFI_LOGE("failed to get blocklist");
+        WIFI_LOGE("failed to get blocklist.");
         return false;
     }
     std::string mac;
@@ -80,11 +83,11 @@ bool ApStationsManager::EnableAllBlockList() const
 
 void ApStationsManager::StationLeave(const std::string &mac) const
 {
-    WIFI_LOGI("StationLeave mac:%s", mac.c_str());
+    WIFI_LOGD("StationLeave mac:%s.", mac.c_str());
     StationInfo staInfo;
     std::vector<StationInfo> results;
     if (WifiSettings::GetInstance().GetStationList(results)) {
-        WIFI_LOGE("failed to GetStationList");
+        WIFI_LOGE("failed to GetStationList.");
         return;
     }
     auto it = results.begin();
@@ -92,23 +95,28 @@ void ApStationsManager::StationLeave(const std::string &mac) const
         if (it->bssid == mac) {
             staInfo = *it;
             if (!DelAssociationStation(staInfo)) {
-                WIFI_LOGE("DelAssociationStation failed");
+                WIFI_LOGE("DelAssociationStation failed.");
                 return;
             }
             break;
         }
     }
-    ApStateMachine::GetInstance().BroadCastStationChange(staInfo, ApStatemachineEvent::CMD_STATION_LEAVE);
+    if (m_stationChangeCallback) {
+        m_stationChangeCallback(staInfo, ApStatemachineEvent::CMD_STATION_LEAVE);
+    }
     return;
 }
 
 void ApStationsManager::StationJoin(const StationInfo &staInfo) const
 {
     StationInfo staInfoTemp = staInfo;
-    WIFI_LOGI("enter ApStationManager::StationJoin");
+    WIFI_LOGD("enter ApStationManager::StationJoin Name:%s mac:%s ip:%s.",
+        staInfo.deviceName.c_str(),
+        staInfo.bssid.c_str(),
+        staInfo.ipAddr.c_str());
     std::vector<StationInfo> results;
     if (WifiSettings::GetInstance().GetStationList(results)) {
-        WIFI_LOGE("failed to GetStationList");
+        WIFI_LOGE("failed to GetStationList.");
         return;
     }
     auto it = results.begin();
@@ -122,12 +130,14 @@ void ApStationsManager::StationJoin(const StationInfo &staInfo) const
     }
 
     if (!AddAssociationStation(staInfoTemp)) {
-        WIFI_LOGE("AddAssociationStation failed");
+        WIFI_LOGE("AddAssociationStation failed.");
         return;
     }
 
     if (it == results.end() || it->ipAddr != staInfo.ipAddr) {
-        ApStateMachine::GetInstance().BroadCastStationChange(staInfoTemp, ApStatemachineEvent::CMD_STATION_JOIN);
+        if (m_stationChangeCallback) {
+            m_stationChangeCallback(staInfoTemp, ApStatemachineEvent::CMD_STATION_JOIN);
+        }
     }
     return;
 }
@@ -137,13 +147,13 @@ bool ApStationsManager::DisConnectStation(const StationInfo &staInfo) const
     std::string mac = staInfo.bssid;
     int ret = static_cast<int>(WifiApHalInterface::GetInstance().DisconnectStaByMac(mac));
     if (ret != WifiErrorNo::WIFI_IDL_OPT_OK) {
-        WIFI_LOGE("failed to DisConnectStation staInfo bssid:%s, address:%s, name:%s. failed",
+        WIFI_LOGE("failed to DisConnectStation staInfo bssid:%s, address:%s, name:%s.",
             staInfo.bssid.c_str(),
             staInfo.ipAddr.c_str(),
             staInfo.deviceName.c_str());
         return false;
     }
-    WIFI_LOGI("DisConnectStation staInfo bssid:%s, address:%s, name:%s. ok",
+    WIFI_LOGD("DisConnectStation staInfo bssid:%s, address:%s, name:%s ok.",
         staInfo.bssid.c_str(),
         staInfo.ipAddr.c_str(),
         staInfo.deviceName.c_str());
@@ -155,10 +165,15 @@ std::vector<std::string> ApStationsManager::GetAllConnectedStations() const
     std::vector<std::string> staMacList;
     if (WifiApHalInterface::GetInstance().GetStationList(staMacList) == WifiErrorNo::WIFI_IDL_OPT_OK) {
         for (size_t i = 0; i < staMacList.size(); ++i) {
-            WIFI_LOGI("staMacList[%{public}zu]:%{public}s", i, staMacList[i].c_str());
+            WIFI_LOGD("staMacList[%{public}zu]:%{private}s.", i, staMacList[i].c_str());
         }
     }
     return staMacList;
+}
+
+void ApStationsManager::RegisterEventHandler(std::function<void(const StationInfo &, ApStatemachineEvent)> callback)
+{
+    m_stationChangeCallback = callback;
 }
 }  // namespace Wifi
 }  // namespace OHOS

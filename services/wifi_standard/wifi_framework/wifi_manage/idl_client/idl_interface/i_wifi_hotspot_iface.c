@@ -18,10 +18,12 @@
 #include "wifi_log.h"
 #include "wifi_idl_define.h"
 #include "wifi_idl_inner_interface.h"
-
+#include "i_wifi_public_func.h"
 
 #undef LOG_TAG
-#define LOG_TAG "OHWIFI_IDLCLIENT_I_WIFI_HOTSPOT_IFACE"
+#define LOG_TAG "WifiIdlHotspotIface"
+
+#define AP_EVENT_MAX_NUM 8
 
 static IWifiApEventCallback g_wifiApEventCallback = {0};
 void SetWifiApEventCallback(IWifiApEventCallback callback)
@@ -43,10 +45,7 @@ WifiErrorNo StartSoftAp(void)
     WriteFunc(context, "StartSoftAp");
     WriteEnd(context);
 
-    int ret = RemoteCall(client);
-    if (ret < 0) {
-        LOGE("StartSoftAp:remote call failed!");
-        UnlockRpcClient(client);
+    if (RpcClientCall(client, "StartSoftAp") != WIFI_IDL_OPT_OK) {
         return WIFI_IDL_OPT_FAILED;
     }
 
@@ -66,10 +65,7 @@ WifiErrorNo StopSoftAp(void)
     WriteFunc(context, "StopSoftAp");
     WriteEnd(context);
 
-    int ret = RemoteCall(client);
-    if (ret < 0) {
-        LOGE("StopSoftAp:remote call failed!");
-        UnlockRpcClient(client);
+    if (RpcClientCall(client, "StopSoftAp") != WIFI_IDL_OPT_OK) {
         return WIFI_IDL_OPT_FAILED;
     }
 
@@ -80,7 +76,7 @@ WifiErrorNo StopSoftAp(void)
     return result;
 }
 
-WifiErrorNo SetHostapdConfig(HostsapdConfig *config)
+WifiErrorNo SetHostapdConfig(HostapdConfig *config)
 {
     RpcClient *client = GetApRpcClient();
     LockRpcClient(client);
@@ -96,10 +92,7 @@ WifiErrorNo SetHostapdConfig(HostsapdConfig *config)
     WriteInt(context, config->channel);
     WriteInt(context, config->maxConn);
     WriteEnd(context);
-    int ret = RemoteCall(client);
-    if (ret < 0) {
-        LOGE("remote call failed!");
-        UnlockRpcClient(client);
+    if (RpcClientCall(client, "SetHostapdConfig") != WIFI_IDL_OPT_OK) {
         return WIFI_IDL_OPT_FAILED;
     }
     int result = WIFI_IDL_OPT_FAILED;
@@ -118,10 +111,7 @@ WifiErrorNo GetStaInfos(char *infos, int32_t *size)
     WriteFunc(context, "GetStaInfos");
     WriteInt(context, *size);
     WriteEnd(context);
-    int ret = RemoteCall(client);
-    if (ret < 0) {
-        LOGE("remote call failed!");
-        UnlockRpcClient(client);
+    if (RpcClientCall(client, "GetStaInfos") != WIFI_IDL_OPT_OK) {
         return WIFI_IDL_OPT_FAILED;
     }
     int result = WIFI_IDL_OPT_FAILED;
@@ -147,10 +137,7 @@ WifiErrorNo SetMacFilter(unsigned char *mac, int lenMac)
     WriteInt(context, lenMac);
     WriteUStr(context, mac, lenMac);
     WriteEnd(context);
-    int ret = RemoteCall(client);
-    if (ret < 0) {
-        LOGE("remote call failed!");
-        UnlockRpcClient(client);
+    if (RpcClientCall(client, "SetMacFilter") != WIFI_IDL_OPT_OK) {
         return WIFI_IDL_OPT_FAILED;
     }
     int result = WIFI_IDL_OPT_FAILED;
@@ -170,10 +157,7 @@ WifiErrorNo DelMacFilter(unsigned char *mac, int lenMac)
     WriteInt(context, lenMac);
     WriteUStr(context, mac, lenMac);
     WriteEnd(context);
-    int ret = RemoteCall(client);
-    if (ret < 0) {
-        LOGE("remote call failed!");
-        UnlockRpcClient(client);
+    if (RpcClientCall(client, "DelMacFilter") != WIFI_IDL_OPT_OK) {
         return WIFI_IDL_OPT_FAILED;
     }
     int result = WIFI_IDL_OPT_FAILED;
@@ -193,10 +177,7 @@ WifiErrorNo DisassociateSta(unsigned char *mac, int lenMac)
     WriteInt(context, lenMac);
     WriteUStr(context, mac, lenMac);
     WriteEnd(context);
-    int ret = RemoteCall(client);
-    if (ret < 0) {
-        LOGE("remote call failed!");
-        UnlockRpcClient(client);
+    if (RpcClientCall(client, "DisassociateSta") != WIFI_IDL_OPT_OK) {
         return WIFI_IDL_OPT_FAILED;
     }
     int result = WIFI_IDL_OPT_FAILED;
@@ -216,10 +197,7 @@ WifiErrorNo GetValidFrequenciesForBand(int32_t band, int *frequencies, int32_t *
     WriteInt(context, band);
     WriteInt(context, *size);
     WriteEnd(context);
-    int ret = RemoteCall(client);
-    if (ret < 0) {
-        LOGE("remote call failed!");
-        UnlockRpcClient(client);
+    if (RpcClientCall(client, "GetValidFrequenciesForBand") != WIFI_IDL_OPT_OK) {
         return WIFI_IDL_OPT_FAILED;
     }
     int result = WIFI_IDL_OPT_FAILED;
@@ -246,10 +224,7 @@ WifiErrorNo SetCountryCode(const char *code)
     WriteFunc(context, "SetCountryCode");
     WriteStr(context, code);
     WriteEnd(context);
-    int ret = RemoteCall(client);
-    if (ret < 0) {
-        LOGE("remote call failed!");
-        UnlockRpcClient(client);
+    if (RpcClientCall(client, "SetCountryCode") != WIFI_IDL_OPT_OK) {
         return WIFI_IDL_OPT_FAILED;
     }
     int result = WIFI_IDL_OPT_FAILED;
@@ -259,49 +234,49 @@ WifiErrorNo SetCountryCode(const char *code)
     return result;
 }
 
+static int GetApCallbackEvents(int *events, int size)
+{
+    int apEvents[] = {
+        WIFI_IDL_CBK_CMD_STA_JOIN,
+        WIFI_IDL_CBK_CMD_STA_LEAVE,
+        WIFI_IDL_CBK_CMD_AP_ENABLE,
+        WIFI_IDL_CBK_CMD_AP_DISABLE
+    };
+    int max = sizeof(apEvents) / sizeof(apEvents[0]);
+    int num = 0;
+    for (; num < max && num < size; ++num) {
+        events[num] = apEvents[num];
+    }
+    return num;
+}
+
 WifiErrorNo RegisterAsscociatedEvent(IWifiApEventCallback callback)
 {
-    int num = 0;
-    if (callback.onStaJoinOrLeave != NULL) {
-        num += EVENTS_STA_JOIN_LEAVE_NUM;
-    }
-    if (callback.onApEnableOrDisable != NULL) {
-        num += EVENTS_STA_JOIN_LEAVE_NUM;
-    }
+    int events[AP_EVENT_MAX_NUM];
+    int num = GetApCallbackEvents(events, AP_EVENT_MAX_NUM);
     RpcClient *client = GetApRpcClient();
     LockRpcClient(client);
     Context *context = client->context;
     WriteBegin(context, 0);
-    if (num == 0) {
+    if (callback.onStaJoinOrLeave == NULL) {
         WriteFunc(context, "UnRegisterEventCallback");
-        WriteInt(context, (EVENTS_STA_JOIN_LEAVE_NUM + EVENTS_AP_DISABLE_ENABLE_NUM));
-        WriteInt(context, WIFI_IDL_CBK_CMD_STA_JOIN);
-        WriteInt(context, WIFI_IDL_CBK_CMD_STA_LEAVE);
-        WriteInt(context, WIFI_IDL_CBK_CMD_AP_ENABLE);
-        WriteInt(context, WIFI_IDL_CBK_CMD_AP_DISABLE);
     } else {
         WriteFunc(context, "RegisterEventCallback");
-        WriteInt(context, num);
-        if (callback.onStaJoinOrLeave != NULL) {
-            WriteInt(context, WIFI_IDL_CBK_CMD_STA_JOIN);
-            WriteInt(context, WIFI_IDL_CBK_CMD_STA_LEAVE);
-        }
-        if (callback.onApEnableOrDisable != NULL) {
-            WriteInt(context, WIFI_IDL_CBK_CMD_AP_ENABLE);
-            WriteInt(context, WIFI_IDL_CBK_CMD_AP_DISABLE);
-        }
     }
-
+    WriteInt(context, num);
+    for (int i = 0; i < num; ++i) {
+        WriteInt(context, events[i]);
+    }
     WriteEnd(context);
-    int ret = RemoteCall(client);
-    if (ret < 0) {
-        LOGE("remote call failed!");
-        UnlockRpcClient(client);
+    if (RpcClientCall(client, "RegisterAsscociatedEvent") != WIFI_IDL_OPT_OK) {
+        if (callback.onStaJoinOrLeave == NULL) {
+            SetWifiApEventCallback(callback);
+        }
         return WIFI_IDL_OPT_FAILED;
     }
     int result = WIFI_IDL_OPT_FAILED;
     ReadInt(context, &result);
-    if (result == WIFI_IDL_OPT_OK) {
+    if (result == WIFI_IDL_OPT_OK || callback.onStaJoinOrLeave == NULL) {
         SetWifiApEventCallback(callback);
     }
     ReadClientEnd(client);

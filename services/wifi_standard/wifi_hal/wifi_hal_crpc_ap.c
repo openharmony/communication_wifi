@@ -46,35 +46,16 @@ int RpcSetHostapdConfig(RpcServer *server, Context *context)
     if (server == NULL || context == NULL) {
         return -1;
     }
-    HostsapdConfig config;
+    HostapdConfig config;
     if (memset_s(&config, sizeof(config), 0, sizeof(config)) != EOK) {
         return -1;
     }
 
-    int ret = ReadStr(context, config.ssid, WIFI_SSID_LENGTH);
-    if (ret != 0) {
-        return -1;
-    }
-    if (ReadInt(context, &config.ssid_len) < 0) {
-        return -1;
-    }
-    ret = ReadStr(context, config.preSharedKey, WIFI_AP_PASSWORD_LENGTH);
-    if (ret != 0) {
-        return -1;
-    }
-    if (ReadInt(context, &config.preSharedKey_len) < 0) {
-        return -1;
-    }
-    if (ReadInt(context, &config.securityType) < 0) {
-        return -1;
-    }
-    if (ReadInt(context, &config.band) < 0) {
-        return -1;
-    }
-    if (ReadInt(context, &config.channel) < 0) {
-        return -1;
-    }
-    if (ReadInt(context, &config.maxConn) < 0) {
+    if (ReadStr(context, config.ssid, sizeof(config.ssid)) != 0 || ReadInt(context, &config.ssidLen) < 0 ||
+        ReadStr(context, config.preSharedKey, sizeof(config.preSharedKey)) != 0 ||
+        ReadInt(context, &config.preSharedKeyLen) < 0 || ReadInt(context, &config.securityType) < 0 ||
+        ReadInt(context, &config.band) < 0 || ReadInt(context, &config.channel) < 0 ||
+        ReadInt(context, &config.maxConn) < 0) {
         return -1;
     }
     WifiErrorNo err = SetHostapdConfig(&config);
@@ -90,11 +71,10 @@ int RpcGetStaInfos(RpcServer *server, Context *context)
         return -1;
     }
     int maxSize = 0;
-    if (ReadInt(context, &maxSize) < 0) {
+    if (ReadInt(context, &maxSize) < 0 || maxSize <= 0) {
         return -1;
     }
-    int len = maxSize + 1;
-    char *infos = (char *)calloc(len, sizeof(char));
+    char *infos = (char *)calloc(maxSize, sizeof(char));
     if (infos == NULL) {
         return -1;
     }
@@ -103,46 +83,10 @@ int RpcGetStaInfos(RpcServer *server, Context *context)
     WriteInt(context, err);
     if (err == WIFI_HAL_SUCCESS) {
         WriteInt(context, maxSize);
-        infos[maxSize] = 0;
         WriteStr(context, infos);
     }
     WriteEnd(context);
     free(infos);
-    return 0;
-}
-
-int RpcConfigHotspot(RpcServer *server, Context *context)
-{
-    if (server == NULL || context == NULL) {
-        return -1;
-    }
-    int chan = 0;
-    if (ReadInt(context, &chan) < 0) {
-        return -1;
-    }
-    char mscb[WIFI_COMMON_MAXLEN] = {0};
-    char *pstr = NULL;
-    int ret = ReadStr(context, mscb, WIFI_COMMON_MAXLEN);
-    if (ret < 0) {
-        return -1;
-    } else if (ret > 0) {
-        int len = ret + 1;
-        if (len > 0) {
-            pstr = (char *)calloc(len, sizeof(char));
-        }
-
-        if (pstr == NULL) {
-            return -1;
-        }
-        ReadStr(context, pstr, len);
-    }
-    WifiErrorNo err = ConfigHotspot(chan, (pstr == NULL) ? mscb : pstr);
-    WriteBegin(context, 0);
-    WriteInt(context, err);
-    WriteEnd(context);
-    if (pstr != NULL) {
-        free(pstr);
-    }
     return 0;
 }
 
@@ -151,26 +95,14 @@ int RpcSetCountryCode(RpcServer *server, Context *context)
     if (server == NULL || context == NULL) {
         return -1;
     }
-    char countryCode[WIFI_COUNTRY_CODE_MAXLEN] = {0};
-    char *pstr = NULL;
-    int ret = ReadStr(context, countryCode, WIFI_COUNTRY_CODE_MAXLEN);
-    if (ret < 0) {
+    char countryCode[WIFI_COUNTRY_CODE_MAXLEN + 1] = {0};
+    if (ReadStr(context, countryCode, sizeof(countryCode)) != 0) {
         return -1;
-    } else if (ret > 0) {
-        int len = ret + 1;
-        pstr = (char *)calloc(len, sizeof(char));
-        if (!pstr) {
-            return -1;
-        }
-        ReadStr(context, pstr, len);
     }
-    WifiErrorNo err = SetCountryCode(((pstr == NULL) ? countryCode : pstr));
+    WifiErrorNo err = SetCountryCode(countryCode);
     WriteBegin(context, 0);
     WriteInt(context, err);
     WriteEnd(context);
-    if (pstr != NULL) {
-        free(pstr);
-    }
     return 0;
 }
 
@@ -180,7 +112,7 @@ int RpcSetMacFilter(RpcServer *server, Context *context)
         return -1;
     }
     int lenMac = 0;
-    if (ReadInt(context, &lenMac) < 0) {
+    if (ReadInt(context, &lenMac) < 0 || lenMac <= 0) {
         return -1;
     }
     int len = lenMac + 1;
@@ -206,7 +138,7 @@ int RpcDelMacFilter(RpcServer *server, Context *context)
         return -1;
     }
     int lenMac = 0;
-    if (ReadInt(context, &lenMac) < 0) {
+    if (ReadInt(context, &lenMac) < 0 || lenMac <= 0) {
         return -1;
     }
     int len = lenMac + 1;
@@ -232,14 +164,10 @@ int RpcDisassociateSta(RpcServer *server, Context *context)
         return -1;
     }
     int lenMac = 0;
-    if (ReadInt(context, &lenMac) < 0) {
+    if (ReadInt(context, &lenMac) < 0 || lenMac <= 0) {
         return -1;
     }
     int len = lenMac + 1;
-    if (len <= 0) {
-        return -1;
-    }
-
     unsigned char *mac = (unsigned char *)calloc(len, sizeof(unsigned char));
     if (mac == NULL) {
         return -1;
@@ -263,11 +191,8 @@ int RpcGetValidFrequenciesForBand(RpcServer *server, Context *context)
         return -1;
     }
     int band = 0;
-    if (ReadInt(context, &band) < 0) {
-        return -1;
-    }
     int size = 0;
-    if (ReadInt(context, &size) < 0) {
+    if (ReadInt(context, &band) < 0 || ReadInt(context, &size) < 0) {
         return -1;
     }
     if (size <= 0) {

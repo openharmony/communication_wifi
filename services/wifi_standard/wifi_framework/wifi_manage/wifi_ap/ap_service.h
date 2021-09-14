@@ -17,20 +17,22 @@
 
 #include "ap_define.h"
 #include "wifi_internal_msg.h"
-#include "wifi_settings.h"
 #include "i_ap_service.h"
 #include "i_ap_service_callbacks.h"
 
 namespace OHOS {
 namespace Wifi {
+class ApStateMachine;
 class ApService {
-private:
+    FRIEND_GTEST(ApService);
+
+public:
     /**
      * @Description  construction method.
      * @param None
      * @return None
      */
-    ApService();
+    ApService(ApStateMachine &);
 
     /**
      * @Description  destructor method.
@@ -39,19 +41,6 @@ private:
      */
     ~ApService();
     DISALLOW_COPY_AND_ASSIGN(ApService)
-public:
-    /**
-     * @Description  Obtains a single g_instance.
-     * @param None
-     * @return Reference to singleton objects
-     */
-    static ApService &GetInstance();
-    /**
-     * @Description  Delete a single g_instance.
-     * @param None
-     * @return None
-     */
-    static void DeleteInstance();
 
     /**
      * @Description  open hotspot
@@ -96,12 +85,40 @@ public:
     ErrCode DisconnetStation(const StationInfo &stationInfo) const;
 
     /**
+     * @Description Get the Station List object.
+     *
+     * @param result - current connected station info
+     * @return ErrCode - success: WIFI_OPT_SUCCESS    failed: ERROR_CODE
+     */
+    ErrCode GetStationList(std::vector<StationInfo> &result) const;
+
+    /**
+     * @Description Get valid bands.
+     *
+     * @param bands - return valid bands
+     * @return ErrCode - success: WIFI_OPT_SUCCESS    failed: ERROR_CODE
+     */
+    ErrCode GetValidBands(std::vector<BandType> &bands);
+
+    /**
+     * @Description Get valid channels.
+     *
+     * @param band - input band
+     * @param validchannel - band's valid channel
+     * @return ErrCode - success: WIFI_OPT_SUCCESS    failed: ERROR_CODE
+     */
+    ErrCode GetValidChannels(BandType band, std::vector<int32_t> &validchannel);
+
+    /**
      * @Description Sets the callback function for the state machine.
      *
      * @param callbacks - callbacks list.
      * @return ErrCode - success: WIFI_OPT_SUCCESS    failed: ERROR_CODE
      */
     ErrCode RegisterApServiceCallbacks(const IApServiceCallbacks &callbacks);
+
+private:
+    ApStateMachine &m_ApStateMachine;
 };
 }  // namespace Wifi
 }  // namespace OHOS

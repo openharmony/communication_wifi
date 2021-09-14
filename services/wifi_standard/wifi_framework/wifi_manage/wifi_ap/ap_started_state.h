@@ -17,17 +17,22 @@
 
 #include "ap_define.h"
 #include "state.h"
+#include "wifi_ap_nat_manager.h"
 
 namespace OHOS {
 namespace Wifi {
+class ApStateMachine;
+class ApConfigUse;
+class ApMonitor;
 class ApStartedState : public State {
+    FRIEND_GTEST(ApStartedState);
 public:
     /**
      * @Description  construction method
      * @param None
      * @return None
      */
-    ApStartedState();
+    ApStartedState(ApStateMachine &, ApConfigUse &, ApMonitor &);
     /**
      * @Description  destructor method
      * @param None
@@ -60,7 +65,7 @@ public:
                      when the AP is in the running state (such as updating
                      the blocklist to hostapd)
      * @param msg - processed message
-     * @return EXECUTED：Processed successfully    NOT_EXECUTED: Processed failed
+     * @return HANDLED：Processed successfully    NOT_EXECUTED: Processed failed
      */
     virtual bool ExecuteStateMsg(InternalMessage *msg) override;
 
@@ -83,7 +88,15 @@ private:
 
     /**
      * @Description  Called inside the state，processing function
-                     configured when the AP is turned on
+                     configured.
+     * @param apConfig - Hotspot Configure
+     * @return true: Set successfully    false: Set failed
+     */
+    bool SetConfig(HotspotConfig &apConfig);
+
+    /**
+     * @Description  Called inside the state，processing function
+                     configured when the AP is turned on.
      * @param None
      * @return true: Set successfully    false: Set failed
      */
@@ -109,20 +122,6 @@ private:
      * @return None
      */
     void StopMonitor() const;
-
-    /**
-     * @Description  Start the DHCP server
-     * @param None
-     * @return true: success    false: failed
-     */
-    bool StartDhcpServer() const;
-
-    /**
-     * @Description  Stop the DHCP server
-     * @param None
-     * @return true: success    false: failed
-     */
-    bool StopDhcpServer() const;
 
     /**
      * @Description  start NAT
@@ -216,16 +215,20 @@ private:
     void Init();
 
 private:
-    HotspotConfig hotspotConfig; /*
-                                  * Store the configuration when set to
-                                  * hostapd, hostapd will asynchronously
-                                  * notify the setting result
-                                  */
+    HotspotConfig m_hotspotConfig; /*
+                                    * Store the configuration when set to
+                                    * hostapd, hostapd will asynchronously
+                                    * notify the setting result
+                                    */
+    WifiApNatManager mApNatManager;
     typedef void (ApStartedState::*ProcessFun)(InternalMessage &msg) const;
     std::map<ApStatemachineEvent, ProcessFun> mProcessFunMap; /*
                                                                * Message processing function map
                                                                * of the state machine
                                                                */
+    ApStateMachine &m_ApStateMachine;
+    ApConfigUse &m_ApConfigUse;
+    ApMonitor &m_ApMonitor;
 };
 }  // namespace Wifi
 }  // namespace OHOS

@@ -14,6 +14,7 @@
  */
 #include "scan_monitor.h"
 #include "wifi_logger.h"
+#include "wifi_supplicant_hal_interface.h"
 
 DEFINE_WIFILOG_SCAN_LABEL("ScanMonitor");
 
@@ -24,18 +25,17 @@ ScanMonitor::ScanMonitor() : pScanStateMachine(nullptr)
 
 ScanMonitor::~ScanMonitor()
 {
-    (void)WifiSupplicantHalInterface::GetInstance().UnRigisterSupplicantEventCallback();
+    (void)WifiSupplicantHalInterface::GetInstance().UnRegisterSupplicantEventCallback();
 }
 
 bool ScanMonitor::InitScanMonitor()
 {
-    WIFI_LOGI("Enter ScanMonitor::InitScanMonitor.\n");
+    WIFI_LOGI("Enter ScanMonitor::InitScanMonitor.");
 
     SupplicantEventCallback eventCallback;
-    eventCallback.onScanNotify = &(ScanMonitor::ReceiveScanEventFromIdl);
-    eventCallback.pInstance = (void *)this;
-    if (WifiSupplicantHalInterface::GetInstance().RigisterSupplicantEventCallback(eventCallback) != WIFI_IDL_OPT_OK) {
-        WIFI_LOGE("RigisterSupplicantEventCallback failed.\n");
+    eventCallback.onScanNotify = std::bind(&ScanMonitor::ReceiveScanEventFromIdl, this, std::placeholders::_1);
+    if (WifiSupplicantHalInterface::GetInstance().RegisterSupplicantEventCallback(eventCallback) != WIFI_IDL_OPT_OK) {
+        WIFI_LOGE("RegisterSupplicantEventCallback failed.");
         return false;
     }
 
@@ -48,16 +48,10 @@ void ScanMonitor::SetScanStateMachine(ScanStateMachine *paraScanStateMachine)
     return;
 }
 
-void ScanMonitor::ReceiveScanEventFromIdl(int result, void *pInstance)
+void ScanMonitor::ReceiveScanEventFromIdl(int result)
 {
-    WIFI_LOGI("Enter ScanMonitor::ReceiveScanEventFromIdl, result is %{public}d.\n", result);
-    if (pInstance == nullptr) {
-        WIFI_LOGE("pInstance is null.\n");
-        return;
-    }
-
-    auto pScanMonitor = (ScanMonitor *)pInstance;
-    pScanMonitor->ProcessReceiveScanEvent(result);
+    WIFI_LOGI("Enter ScanMonitor::ReceiveScanEventFromIdl, result is %{public}d.", result);
+    ProcessReceiveScanEvent(result);
     return;
 }
 

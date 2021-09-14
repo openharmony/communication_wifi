@@ -234,6 +234,39 @@ void SplitString(const std::string &str, const std::string &split, std::vector<s
     return;
 }
 
+std::string Vec2Stream(const std::string &prefix, const std::vector<char> &vecChar, const std::string &sufffix)
+{
+    std::ostringstream ss;
+    constexpr int hexCharLen = 2;
+    ss << prefix;
+    int temp = 0;
+    for (std::size_t i = 0; i < vecChar.size(); i++) {
+        temp = (unsigned char)(vecChar[i]);
+        ss << std::setfill('0') << std::setw(hexCharLen) << std::hex << std::uppercase << temp << " ";
+    }
+    ss << sufffix;
+    return ss.str();
+}
+
+int HexStringToVec(const std::string &str, std::vector<char> &vec)
+{
+    unsigned len = str.length();
+    if ((len & 1) != 0) {
+        return -1;
+    }
+    const int hexShiftNum = 4;
+    for (unsigned i = 0; i + 1 < len; ++i) {
+        int8_t high = IsValidHexCharAndConvert(str[i]);
+        int8_t low = IsValidHexCharAndConvert(str[++i]);
+        if (high < 0 || low < 0) {
+            return -1;
+        }
+        char tmp = ((high << hexShiftNum) | (low & 0x0F));
+        vec.push_back(tmp);
+    }
+    return 0;
+}
+
 void TransformFrequencyIntoChannel(const std::vector<int> &freqVector, std::vector<int> &chanVector)
 {
     int channel;

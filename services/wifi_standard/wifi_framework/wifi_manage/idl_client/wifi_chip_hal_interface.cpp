@@ -15,15 +15,9 @@
 #include "wifi_chip_hal_interface.h"
 #include <mutex>
 #include "wifi_log.h"
-#include "wifi_idl_inner_interface.h"
 
 #undef LOG_TAG
-#define LOG_TAG "OHWIFI_IDLCLIENT_WIFI_CHIP_HAL_INTERFACE"
-
-RpcClient *GetChipRpcClient(void)
-{
-    return OHOS::Wifi::WifiChipHalInterface::GetInstance().mIdlClient->pRpcClient;
-}
+#define LOG_TAG "WifiChipHalInterface"
 
 namespace OHOS {
 namespace Wifi {

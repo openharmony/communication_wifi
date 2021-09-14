@@ -53,5 +53,11 @@ int WifiPermissionUtils::VerifySetWifiConfigPermission()
     return WifiAuthCenter::GetInstance().VerifySetWifiConfigPermission(
         IPCSkeleton::GetCallingPid(), IPCSkeleton::GetCallingUid());
 }
+
+int WifiPermissionUtils::VerifyGetWifiDirectDevicePermission()
+{
+    return WifiAuthCenter::GetInstance().VerifyGetWifiDirectDevicePermission(
+        IPCSkeleton::GetCallingPid(), IPCSkeleton::GetCallingUid());
+}
 }  // namespace Wifi
 }  // namespace OHOS

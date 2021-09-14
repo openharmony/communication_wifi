@@ -12,7 +12,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 #ifndef OHOS_WIFIMANAGER_H
 #define OHOS_WIFIMANAGER_H
 
@@ -28,6 +27,7 @@
 #include "sta_service_callback.h"
 #include "iscan_service_callbacks.h"
 #include "i_ap_service_callbacks.h"
+#include "ip2p_service_callbacks.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -46,6 +46,7 @@ enum class WifiCloseServiceCode {
     STA_SERVICE_CLOSE,
     SCAN_SERVICE_CLOSE,
     AP_SERVICE_CLOSE,
+    P2P_SERVICE_CLOSE,
     SERVICE_THREAD_EXIT,
 };
 
@@ -97,6 +98,13 @@ public:
     IApServiceCallbacks GetApCallback(void);
 
     /**
+     * @Description Get the p2p callback object.
+     *
+     * @return IP2pServiceCallbacks - return mP2pCallback
+     */
+    IP2pServiceCallbacks GetP2pCallback(void);
+
+    /**
      * @Description Get supported features
      *
      * @param features - output supported features
@@ -118,11 +126,13 @@ private:
     void InitStaCallback(void);
     void InitScanCallback(void);
     void InitApCallback(void);
+    void InitP2pCallback(void);
     InitStatus GetInitStatus();
     static void DealCloseServiceMsg(WifiManager &manager);
     static void CloseStaService(void);
     static void CloseApService(void);
     static void CloseScanService(void);
+    static void CloseP2pService(void);
     static void DealStaOpenRes(OperateResState state);
     static void DealStaCloseRes(OperateResState state);
     static void DealStaConnChanged(OperateResState state, const WifiLinkedInfo &info);
@@ -138,6 +148,14 @@ private:
     static void DealApStateChanged(ApState bState);
     static void DealApGetStaJoin(const StationInfo &info);
     static void DealApGetStaLeave(const StationInfo &info);
+    static void DealP2pStateChanged(P2pState bState);
+    static void DealP2pPeersChanged(const std::vector<WifiP2pDevice> &vPeers);
+    static void DealP2pServiceChanged(const std::vector<WifiP2pServiceInfo> &vServices);
+    static void DealP2pConnectionChanged(const WifiP2pInfo &info);
+    static void DealP2pThisDeviceChanged(const WifiP2pDevice &info);
+    static void DealP2pDiscoveryChanged(bool bState);
+    static void DealP2pGroupsChanged(void);
+    static void DealP2pActionResult(P2pActionCallback action, ErrCode code);
 
 private:
     std::thread mCloseServiceThread;
@@ -147,6 +165,7 @@ private:
     StaServiceCallback mStaCallback;
     IScanSerivceCallbacks mScanCallback;
     IApServiceCallbacks mApCallback;
+    IP2pServiceCallbacks mP2pCallback;
     InitStatus mInitStatus;
     long mSupportedFeatures;
 };

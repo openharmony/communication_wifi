@@ -15,34 +15,80 @@
 #ifndef OHOS_AP_STATE_MACHINE_H
 #define OHOS_AP_STATE_MACHINE_H
 
-#include "ap_define.h"
-#include "i_ap_service.h"
-#include "ap_idle_state.h"
-#include "ap_root_state.h"
-#include "ap_started_state.h"
-#include "ap_stations_manager.h"
 #include "state_machine.h"
+#include "dhcpd_interface.h"
+#include "i_ap_service.h"
+#include "ap_root_state.h"
+#include "ap_idle_state.h"
+#include "ap_started_state.h"
 
 namespace OHOS {
 namespace Wifi {
+class ApConfigUse;
+class ApStationsManager;
+class ApMonitor;
 class ApStateMachine : public StateMachine {
     friend class ApRootState;
     friend class ApIdleState;
     friend class ApStartedState;
+    FRIEND_GTEST(ApStateMachine);
 
+    class DhcpNotify : public IDhcpResultNotify {
+    public:
+        /**
+         * @Description : Construct a new dhcp result notify object
+         *
+         */
+        explicit DhcpNotify(ApStateMachine &apStateMachine);
+
+        /**
+         * @Description : Destroy the dhcp result notify object
+         *
+         */
+        ~DhcpNotify() override;
+
+        /**
+         * @Description - Asynchronous get dhcp result of specified interface success notify
+         *
+         * @param status - int
+         * @param ifname - interface name,eg:wlan0
+         * @param result - dhcp result
+         */
+        void OnSuccess(int status, const std::string &ifname, DhcpResult &result) override;
+
+        /**
+         * @Description - Asynchronous get dhcp result of specified interface failed notify
+         *
+         * @param status - int
+         * @param ifname - interface name,eg:wlan0
+         * @param reason - failed reason
+         */
+        void OnFailed(int status, const std::string &ifname, const std::string &reason) override;
+
+        /**
+        * @Description - Get the abnormal exit notify of dhcp server process
+        *
+        * @param ifname - interface name,eg:wlan0
+        */
+        void OnSerExitNotify(const std::string& ifname) override;
+    private:
+        ApStateMachine &m_apStateMachine;
+    };
 public:
     /**
-     * @Description  Obtains a single g_instance.
-     * @param None
-     * @return The reference of singleton objects
-     */
-    static ApStateMachine &GetInstance();
-    /**
-     * @Description  Delete the single g_instance.
+     * @Description  construction method.
      * @param None
      * @return None
      */
-    static void DeleteInstance();
+    ApStateMachine(ApStationsManager &, ApRootState &, ApIdleState &, ApStartedState &, ApMonitor &);
+
+    /**
+     * @Description  destructor method.
+     * @param None
+     * @return None
+     */
+    virtual ~ApStateMachine();
+
     /**
      * @Description  Reporting New State.
      * @param state - the state.
@@ -64,67 +110,64 @@ public:
      * @return None
      */
     ErrCode RegisterApServiceCallbacks(const IApServiceCallbacks &callbacks);
+
     /**
-     * @Description  Wrap and send messages.
-     * @param staInfo - joined sta info
+     * @Description  Apmonitor Initialization Function.
+     * @param None
      * @return None
      */
-    void StationJoin(StationInfo &staInfo);
+    void Init();
+
     /**
-     * @Description  Wrap and send messages.
-     * @param staInfo - left sta info
-     * @return None
+     * @Description  Disable dhcp server.
+     * @param None
+     * @return true - success
+     * @return false - fail
      */
-    void StationLeave(StationInfo &staInfo);
+    bool StopDhcpServer();
+
     /**
-     * @Description  Wrap and send messages.
-     * @param cfg - ap config info
-     * @return None
+     * @Description  Enable dhcp server.
+     * @param None
+     * @return true - success
+     * @return false - fail
      */
-    void SetHotspotConfig(const HotspotConfig &cfg);
+    bool StartDhcpServer();
+
     /**
-     * @Description  Wrap and send messages.
-     * @param stationInfo - sta info which added to blocklist
-     * @return None
+     * @Description  Get the Station List object.
+     * @param result - Current connected station info
+     * @return true - success
+     * @return false - fail
      */
-    void AddBlockList(const StationInfo &stationInfo);
-    /**
-     * @Description  Wrap and send messages.
-     * @param stationInfo - sta info which delete from blocklist
-     * @return None
-     */
-    void DelBlockList(const StationInfo &stationInfo);
-    /**
-     * @Description  Wrap and send messages.
-     * @param stationInfo - sta info to be disconnect
-     * @return None
-     */
-    void DisconnetStation(const StationInfo &stationInfo);
-    /**
-     * @Description  Send messages.
-     * @param result - hostapd started or closed
-     * @return None
-     */
-    void UpdateHotspotConfigResult(const bool result);
+    bool GetConnectedStationInfo(std::map<std::string, StationInfo> &result);
 
 private:
-    ApStateMachine();
-    virtual ~ApStateMachine();
-    void Init();
     DISALLOW_COPY_AND_ASSIGN(ApStateMachine);
 
-private:
-    static ApStateMachine *g_instance;
-    IApServiceCallbacks m_Callbacks;
+    /**
+     * @Description  Register event handler to apmonitor.
+     * @param None
+     * @return None
+     */
+    virtual void RegisterEventHandler();
 
+private:
+    std::string m_iface;
+    IApServiceCallbacks m_Callbacks;
     /* STA Manager */
-    ApStationsManager mApStationsManager;
+    ApStationsManager &m_ApStationsManager;
     /* The reference of RootState */
-    ApRootState mApRootState;
+    ApRootState &m_ApRootState;
     /* The reference of IdleState */
-    ApIdleState mApIdleState;
+    ApIdleState &m_ApIdleState;
     /* The reference of StartedState */
-    ApStartedState mApStartedState;
+    ApStartedState &m_ApStartedState;
+    ApMonitor &m_ApMonitor;
+
+    DhcpdInterface m_DhcpdInterface;
+    std::unique_ptr<DhcpNotify> pDhcpNotify;
+
 }; /* ApStateMachine */
 }  // namespace Wifi
 }  // namespace OHOS

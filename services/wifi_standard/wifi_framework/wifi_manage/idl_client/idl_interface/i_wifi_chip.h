@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_IDL_IWIFICHIP_H
-#define OHOS_IDL_IWIFICHIP_H
+#ifndef OHOS_IDL_IWIFI_CHIP_H
+#define OHOS_IDL_IWIFI_CHIP_H
 
 #include "wifi_error_no.h"
 #include "i_wifi_chip_event_callback.h"

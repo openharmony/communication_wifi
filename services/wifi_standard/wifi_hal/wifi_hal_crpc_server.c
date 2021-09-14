@@ -19,6 +19,7 @@
 #include "wifi_hal_crpc_sta.h"
 #include "wifi_hal_crpc_ap.h"
 #include "wifi_hal_crpc_common.h"
+#include "wifi_hal_crpc_p2p.h"
 #include "securec.h"
 #include "wifi_log.h"
 #include "wifi_hal_common_func.h"
@@ -54,22 +55,25 @@ static int GetPos(const char *name)
     return total % RPC_FUNC_NUM;
 }
 
-static int PushRpcFunc(const char *name, RPCFUNC func)
+static int PushRpcFunc(const char *name, Rpcfunc func)
 {
+    if (g_rpcFuncHandle == NULL || name == NULL || func == NULL) {
+        return -1;
+    }
     int pos = GetPos(name);
     if (g_rpcFuncHandle[pos].func == NULL) {
-        MySafeCopy(g_rpcFuncHandle[pos].funcname, sizeof(g_rpcFuncHandle[pos].funcname), name);
+        StrSafeCopy(g_rpcFuncHandle[pos].funcname, sizeof(g_rpcFuncHandle[pos].funcname), name);
         g_rpcFuncHandle[pos].func = func;
     } else {
         WifiHalRpcFunc *p = g_rpcFuncHandle + pos;
-        while (p->next) {
+        while (p->next != NULL) {
             p = p->next;
         }
         WifiHalRpcFunc *q = (WifiHalRpcFunc *)calloc(1, sizeof(WifiHalRpcFunc));
         if (q == NULL) {
             return -1;
         }
-        MySafeCopy(q->funcname, sizeof(q->funcname), name);
+        StrSafeCopy(q->funcname, sizeof(q->funcname), name);
         q->func = func;
         q->next = NULL;
         p->next = q;
@@ -80,8 +84,6 @@ static int PushRpcFunc(const char *name, RPCFUNC func)
 static int InitRpcFuncMapBase(void)
 {
     int ret = 0;
-    ret += PushRpcFunc("LoadDriver", RpcLoadDriver);
-    ret += PushRpcFunc("UnloadDriver", RpcUnloadDriver);
     ret += PushRpcFunc("GetName", RpcGetName);
     ret += PushRpcFunc("GetType", RpcGetType);
     return ret;
@@ -126,7 +128,7 @@ static int InitRpcFuncMapSta(void)
     ret += PushRpcFunc("Start", RpcStart);
     ret += PushRpcFunc("Stop", RpcStop);
     ret += PushRpcFunc("StartScan", RpcStartScan);
-    ret += PushRpcFunc("GetScanResults", RpcGetScanResults);
+    ret += PushRpcFunc("GetScanInfos", RpcGetScanInfos);
     ret += PushRpcFunc("StartPnoScan", RpcStartPnoScan);
     ret += PushRpcFunc("StopPnoScan", RpcStopPnoScan);
     ret += PushRpcFunc("Connect", RpcConnect);
@@ -155,9 +157,9 @@ static int InitRpcFuncMapSta(void)
     ret += PushRpcFunc("SetRoamConfig", RpcSetRoamConfig);
     ret += PushRpcFunc("WpaGetNetwork", RpcWpaGetNetwork);
     ret += PushRpcFunc("WpaAutoConnect", RpcWpaAutoConnect);
-    ret += PushRpcFunc("WpaReconfigure", RpcWpaReconfigure);
     ret += PushRpcFunc("WpaBlocklistClear", RpcWpaBlocklistClear);
     ret += PushRpcFunc("GetNetworkList", RpcGetNetworkList);
+    ret += PushRpcFunc("GetConnectSignalInfo", RpcGetConnectSignalInfo);
     return ret;
 }
 
@@ -168,7 +170,6 @@ static int InitRpcFuncMapAp(void)
     ret += PushRpcFunc("StopSoftAp", RpcStopSoftAp);
     ret += PushRpcFunc("SetHostapdConfig", RpcSetHostapdConfig);
     ret += PushRpcFunc("GetStaInfos", RpcGetStaInfos);
-    ret += PushRpcFunc("ConfigHotspot", RpcConfigHotspot);
     ret += PushRpcFunc("SetCountryCode", RpcSetCountryCode);
     ret += PushRpcFunc("SetMacFilter", RpcSetMacFilter);
     ret += PushRpcFunc("DelMacFilter", RpcDelMacFilter);
@@ -186,8 +187,62 @@ static int InitRpcFuncMapCommon(void)
     return ret;
 }
 
+static int InitRpcFuncMapP2p(void)
+{
+    int ret = 0;
+    ret += PushRpcFunc("P2pStart", RpcP2pStart);
+    ret += PushRpcFunc("P2pStop", RpcP2pStop);
+    ret += PushRpcFunc("P2pSetRandomMac", RpcP2pSetRandomMac);
+    ret += PushRpcFunc("P2pSetDeviceName", RpcP2pSetDeviceName);
+    ret += PushRpcFunc("P2pSetSsidPostfixName", RpcP2pSetSsidPostfixName);
+    ret += PushRpcFunc("P2pSetWpsDeviceType", RpcP2pSetWpsDeviceType);
+    ret += PushRpcFunc("P2pSetWpsSecondaryDeviceType", RpcP2pSetWpsSecondaryDeviceType);
+    ret += PushRpcFunc("P2pSetWpsConfigMethods", RpcP2pSetWpsConfigMethods);
+    ret += PushRpcFunc("P2pGetDeviceAddress", RpcP2pGetDeviceAddress);
+    ret += PushRpcFunc("P2pFlush", RpcP2pFlush);
+    ret += PushRpcFunc("P2pFlushService", RpcP2pFlushService);
+    ret += PushRpcFunc("P2pSaveConfig", RpcP2pSaveConfig);
+    ret += PushRpcFunc("P2pSetupWpsPbc", RpcP2pSetupWpsPbc);
+    ret += PushRpcFunc("P2pSetupWpsPin", RpcP2pSetupWpsPin);
+    ret += PushRpcFunc("P2pRemoveNetwork", RpcP2pRemoveNetwork);
+    ret += PushRpcFunc("P2pListNetworks", RpcP2pListNetworks);
+    ret += PushRpcFunc("P2pSetGroupMaxIdle", RpcP2pSetGroupMaxIdle);
+    ret += PushRpcFunc("P2pSetPowerSave", RpcP2pSetPowerSave);
+    ret += PushRpcFunc("P2pSetWfdEnable", RpcP2pSetWfdEnable);
+    ret += PushRpcFunc("P2pSetWfdDeviceConfig", RpcP2pSetWfdDeviceConfig);
+    ret += PushRpcFunc("P2pStartFind", RpcP2pStartFind);
+    ret += PushRpcFunc("P2pStopFind", RpcP2pStopFind);
+    ret += PushRpcFunc("P2pSetExtListen", RpcP2pSetExtListen);
+    ret += PushRpcFunc("P2pSetListenChannel", RpcP2pSetListenChannel);
+    ret += PushRpcFunc("P2pConnect", RpcP2pConnect);
+    ret += PushRpcFunc("P2pCancelConnect", RpcP2pCancelConnect);
+    ret += PushRpcFunc("P2pProvisionDiscovery", RpcP2pProvisionDiscovery);
+    ret += PushRpcFunc("P2pAddGroup", RpcP2pAddGroup);
+    ret += PushRpcFunc("P2pRemoveGroup", RpcP2pRemoveGroup);
+    ret += PushRpcFunc("P2pInvite", RpcP2pInvite);
+    ret += PushRpcFunc("P2pReinvoke", RpcP2pReinvoke);
+    ret += PushRpcFunc("P2pGetGroupCapability", RpcP2pGetGroupCapability);
+    ret += PushRpcFunc("P2pAddService", RpcP2pAddService);
+    ret += PushRpcFunc("P2pRemoveService", RpcP2pRemoveService);
+    ret += PushRpcFunc("P2pReqServiceDiscovery", RpcP2pReqServiceDiscovery);
+    ret += PushRpcFunc("P2pCancelServiceDiscovery", RpcP2pCancelServiceDiscovery);
+    ret += PushRpcFunc("P2pSetMiracastType", RpcP2pSetMiracastType);
+    ret += PushRpcFunc("P2pRespServerDiscovery", RpcP2pRespServerDiscovery);
+    ret += PushRpcFunc("P2pSetServDiscExternal", RpcP2pSetServDiscExternal);
+    ret += PushRpcFunc("P2pSetPersistentReconnect", RpcP2pSetPersistentReconnect);
+    ret += PushRpcFunc("P2pGetPeer", RpcP2pGetPeer);
+    ret += PushRpcFunc("P2pGetFrequencies", RpcP2pGetFrequencies);
+    ret += PushRpcFunc("P2pSetGroupConfig", RpcP2pSetGroupConfig);
+    ret += PushRpcFunc("P2pGetGroupConfig", RpcP2pGetGroupConfig);
+    ret += PushRpcFunc("P2pAddNetwork", RpcP2pAddNetwork);
+    return ret;
+}
+
 int InitRpcFunc(void)
 {
+    if (g_rpcFuncHandle != NULL) {
+        return 0;
+    }
     g_rpcFuncHandle = (WifiHalRpcFunc *)calloc(RPC_FUNC_NUM, sizeof(WifiHalRpcFunc));
     if (g_rpcFuncHandle == NULL) {
         return -1;
@@ -200,6 +255,7 @@ int InitRpcFunc(void)
     ret += InitRpcFuncMapSta();
     ret += InitRpcFuncMapAp();
     ret += InitRpcFuncMapCommon();
+    ret += InitRpcFuncMapP2p();
     if (ret < 0) {
         return -1;
     }
@@ -214,7 +270,7 @@ void ReleaseRpcFunc(void)
 {
     for (int i = 0; i < RPC_FUNC_NUM; ++i) {
         WifiHalRpcFunc *p = g_rpcFuncHandle[i].next;
-        while (p) {
+        while (p != NULL) {
             WifiHalRpcFunc *q = p->next;
             free(p);
             p = q;
@@ -226,8 +282,11 @@ void ReleaseRpcFunc(void)
     return;
 }
 
-RPCFUNC GetRpcFunc(const char *func)
+Rpcfunc GetRpcFunc(const char *func)
 {
+    if (g_rpcFuncHandle == NULL || func == NULL) {
+        return NULL;
+    }
     int pos = GetPos(func);
     WifiHalRpcFunc *p = g_rpcFuncHandle + pos;
     while (p && strcmp(p->funcname, func) != 0) {
@@ -252,7 +311,7 @@ int OnTransact(RpcServer *server, Context *context)
         return -1;
     }
     LOGI("run %{public}s", func);
-    RPCFUNC pFunc = GetRpcFunc(func);
+    Rpcfunc pFunc = GetRpcFunc(func);
     if (pFunc == NULL) {
         LOGD("unsupport function[%{public}s]", func);
         WriteBegin(context, 0);
@@ -271,63 +330,14 @@ int OnTransact(RpcServer *server, Context *context)
     return 0;
 }
 
-/* Callback request */
-int OnCallbackTransact(const RpcServer *server, int event, Context *context)
-{
-    if (server == NULL || context == NULL) {
-        return -1;
-    }
-    WriteBegin(context, 1);
-    WriteInt(context, event);
-    /* Callback parameters are required based on the message ID. */
-    if (event == WIFI_ADD_IFACE_EVENT) {
-        WifiHalEventCallbackMsg *cbmsg = FrontCallbackMsg(event);
-        if (cbmsg != NULL) {
-            WriteInt(context, cbmsg->msg.ifMsg.type);
-            WriteStr(context, cbmsg->msg.ifMsg.ifname);
-        }
-    } else if (event == WIFI_SCAN_RESULT_NOTIFY_EVENT) {
-        WifiHalEventCallbackMsg *cbmsg = FrontCallbackMsg(event);
-        if (cbmsg != NULL) {
-            WriteInt(context, cbmsg->msg.scanResult);
-        }
-    } else if (event == WIFI_CONNECT_CHANGED_NOTIFY_EVENT) {
-        WifiHalEventCallbackMsg *cbmsg = FrontCallbackMsg(event);
-        if (cbmsg != NULL) {
-            WriteInt(context, cbmsg->msg.connMsg.status);
-            WriteInt(context, cbmsg->msg.connMsg.networkId);
-            WriteStr(context, cbmsg->msg.connMsg.bssid);
-        }
-    } else if (event == WIFI_STA_JOIN_EVENT || event == WIFI_STA_LEAVE_EVENT) {
-        WifiHalEventCallbackMsg *cbmsg = FrontCallbackMsg(event);
-        if (cbmsg != NULL) {
-            WriteInt(context, cbmsg->msg.ifMsg.type);
-            WriteStr(context, cbmsg->msg.ifMsg.ifname);
-        }
-    } else if (event == WIFI_WPA_STATE_EVENT || event == WIFI_SSID_WRONG_KEY || event == WIFI_WPS_OVERLAP ||
-               event == WIFI_WPS_TIME_OUT) {
-        WifiHalEventCallbackMsg *cbmsg = FrontCallbackMsg(event);
-        if (cbmsg != NULL) {
-            WriteInt(context, cbmsg->msg.scanResult);
-        }
-    }
-    WriteEnd(context);
-    return 0;
-}
-
-int EndCallbackTransact(const RpcServer *server, int event)
-{
-    if (server == NULL) {
-        return -1;
-    }
-    return PopFrontCallbackMsg(event);
-}
-
 /* Defines the bidirectional list of global callback event parameters. */
 static WifiHalEventCallback *g_wifiHalEventCallback = NULL;
 
 int InitCallbackMsg(void)
 {
+    if (g_wifiHalEventCallback != NULL) {
+        return 0;
+    }
     g_wifiHalEventCallback = (WifiHalEventCallback *)calloc(1, sizeof(WifiHalEventCallback));
     if (g_wifiHalEventCallback == NULL) {
         return -1;
@@ -342,6 +352,9 @@ int InitCallbackMsg(void)
 
 void ReleaseCallbackMsg(void)
 {
+    if (g_wifiHalEventCallback == NULL) {
+        return;
+    }
     for (int i = 0; i < WIFI_HAL_MAX_EVENT - WIFI_FAILURE_EVENT; ++i) {
         WifiHalEventCallbackMsg *head = g_wifiHalEventCallback->cbmsgs + i;
         WifiHalEventCallbackMsg *p = head->next;
@@ -359,7 +372,7 @@ void ReleaseCallbackMsg(void)
 
 int PushBackCallbackMsg(int event, WifiHalEventCallbackMsg *msg)
 {
-    if (event >= WIFI_HAL_MAX_EVENT || event < WIFI_FAILURE_EVENT) {
+    if (g_wifiHalEventCallback == NULL || event >= WIFI_HAL_MAX_EVENT || event < WIFI_FAILURE_EVENT || msg == NULL) {
         return -1;
     }
     int pos = event - WIFI_FAILURE_EVENT;
@@ -382,7 +395,7 @@ int PushBackCallbackMsg(int event, WifiHalEventCallbackMsg *msg)
 
 int PopBackCallbackMsg(int event)
 {
-    if (event >= WIFI_HAL_MAX_EVENT || event < WIFI_FAILURE_EVENT) {
+    if (g_wifiHalEventCallback == NULL || event >= WIFI_HAL_MAX_EVENT || event < WIFI_FAILURE_EVENT) {
         return -1;
     }
     int pos = event - WIFI_FAILURE_EVENT;
@@ -399,7 +412,7 @@ int PopBackCallbackMsg(int event)
 
 WifiHalEventCallbackMsg *FrontCallbackMsg(int event)
 {
-    if (event >= WIFI_HAL_MAX_EVENT || event < WIFI_FAILURE_EVENT) {
+    if (g_wifiHalEventCallback == NULL || event >= WIFI_HAL_MAX_EVENT || event < WIFI_FAILURE_EVENT) {
         return NULL;
     }
     int pos = event - WIFI_FAILURE_EVENT;
@@ -413,7 +426,7 @@ WifiHalEventCallbackMsg *FrontCallbackMsg(int event)
 
 int PopFrontCallbackMsg(int event)
 {
-    if (event >= WIFI_HAL_MAX_EVENT || event < WIFI_FAILURE_EVENT) {
+    if (g_wifiHalEventCallback == NULL || event >= WIFI_HAL_MAX_EVENT || event < WIFI_FAILURE_EVENT) {
         return -1;
     }
     int pos = event - WIFI_FAILURE_EVENT;
@@ -427,4 +440,267 @@ int PopFrontCallbackMsg(int event)
     }
     pthread_mutex_unlock(&g_wifiHalEventCallback->mutex);
     return 0;
+}
+
+/* Processing callback messages */
+static void DealCommonCbk(int event, Context *context)
+{
+    WifiHalEventCallbackMsg *cbmsg = FrontCallbackMsg(event);
+    if (cbmsg != NULL) {
+        WriteInt(context, cbmsg->msg.scanStatus);
+    }
+    return;
+}
+
+static void DealIfaceCbk(int event, Context *context)
+{
+    WifiHalEventCallbackMsg *cbmsg = FrontCallbackMsg(event);
+    if (cbmsg != NULL) {
+        WriteInt(context, cbmsg->msg.ifMsg.type);
+        WriteStr(context, cbmsg->msg.ifMsg.ifname);
+    }
+    return;
+}
+
+static void DealConnectionChangedCbk(int event, Context *context)
+{
+    WifiHalEventCallbackMsg *cbmsg = FrontCallbackMsg(event);
+    if (cbmsg != NULL) {
+        WriteInt(context, cbmsg->msg.connMsg.status);
+        WriteInt(context, cbmsg->msg.connMsg.networkId);
+        WriteStr(context, cbmsg->msg.connMsg.bssid);
+    }
+    return;
+}
+
+static void DealConnectWpsResultCbk(int event, Context *context)
+{
+    WifiHalEventCallbackMsg *cbmsg = FrontCallbackMsg(event);
+    if (cbmsg != NULL) {
+        WriteInt(context, cbmsg->msg.connMsg.status);
+    }
+    return;
+}
+
+static void DealStaApCallback(int event, Context *context)
+{
+    switch (event) {
+        case WIFI_ADD_IFACE_EVENT:
+        case WIFI_STA_JOIN_EVENT:
+        case WIFI_STA_LEAVE_EVENT:
+            DealIfaceCbk(event, context);
+            break;
+        case WIFI_SCAN_INFO_NOTIFY_EVENT:
+            DealCommonCbk(event, context);
+            break;
+        case WIFI_WPA_STATE_EVENT:
+        case WIFI_SSID_WRONG_KEY:
+        case WIFI_WPS_OVERLAP:
+        case WIFI_WPS_TIME_OUT:
+            DealConnectWpsResultCbk(event, context);
+            break;
+        case WIFI_CONNECT_CHANGED_NOTIFY_EVENT:
+            DealConnectionChangedCbk(event, context);
+            break;
+        default:
+            break;
+    }
+    return;
+}
+
+static void DealP2pDeviceFoundCbk(int event, Context *context)
+{
+    WifiHalEventCallbackMsg *cbmsg = FrontCallbackMsg(event);
+    if (cbmsg != NULL) {
+        WriteInt(context, cbmsg->msg.deviceInfo.configMethods);
+        WriteInt(context, cbmsg->msg.deviceInfo.deviceCapabilities);
+        WriteInt(context, cbmsg->msg.deviceInfo.groupCapabilities);
+        WriteInt(context, cbmsg->msg.deviceInfo.wfdLength);
+        WriteStr(context, cbmsg->msg.deviceInfo.srcAddress);
+        WriteStr(context, cbmsg->msg.deviceInfo.p2pDeviceAddress);
+        WriteStr(context, cbmsg->msg.deviceInfo.primaryDeviceType);
+        WriteStr(context, cbmsg->msg.deviceInfo.deviceName);
+        WriteStr(context, cbmsg->msg.deviceInfo.wfdDeviceInfo);
+    }
+    return;
+}
+
+static void DealP2pNegoriationCbk(int event, Context *context)
+{
+    WifiHalEventCallbackMsg *cbmsg = FrontCallbackMsg(event);
+    if (cbmsg != NULL) {
+        if (event == P2P_DEVICE_LOST_EVENT) {
+            WriteStr(context, cbmsg->msg.connMsg.bssid);
+        }
+        if (event == P2P_GO_NEGOTIATION_REQUEST_EVENT) {
+            WriteInt(context, cbmsg->msg.connMsg.status);
+            WriteStr(context, cbmsg->msg.connMsg.bssid);
+        }
+    }
+    return;
+}
+
+static void DealP2pInviationCbk(int event, Context *context)
+{
+    WifiHalEventCallbackMsg *cbmsg = FrontCallbackMsg(event);
+    if (cbmsg != NULL) {
+        if (event == P2P_INVITATION_RECEIVED_EVENT) {
+            WriteInt(context, cbmsg->msg.invitaInfo.type);
+            WriteInt(context, cbmsg->msg.invitaInfo.persistentNetworkId);
+            WriteInt(context, cbmsg->msg.invitaInfo.operatingFrequency);
+            WriteStr(context, cbmsg->msg.invitaInfo.srcAddress);
+            WriteStr(context, cbmsg->msg.invitaInfo.goDeviceAddress);
+            WriteStr(context, cbmsg->msg.invitaInfo.bssid);
+        }
+        if (event == P2P_INVITATION_RESULT_EVENT) {
+            WriteInt(context, cbmsg->msg.invitaInfo.persistentNetworkId);
+            WriteStr(context, cbmsg->msg.invitaInfo.bssid);
+        }
+        if (event == P2P_GROUP_FORMATION_FAILURE_EVENT) {
+            WriteStr(context, cbmsg->msg.invitaInfo.bssid);
+        }
+    }
+    return;
+}
+
+static void DealP2pGroupInfoCbk(int event, Context *context)
+{
+    WifiHalEventCallbackMsg *cbmsg = FrontCallbackMsg(event);
+    if (cbmsg != NULL) {
+        if (event == P2P_GROUP_STARTED_EVENT) {
+            WriteInt(context, cbmsg->msg.groupInfo.isGo);
+            WriteInt(context, cbmsg->msg.groupInfo.isPersistent);
+            WriteInt(context, cbmsg->msg.groupInfo.frequency);
+            WriteStr(context, cbmsg->msg.groupInfo.groupIfName);
+            WriteStr(context, cbmsg->msg.groupInfo.ssid);
+            WriteStr(context, cbmsg->msg.groupInfo.psk);
+            WriteStr(context, cbmsg->msg.groupInfo.passphrase);
+            WriteStr(context, cbmsg->msg.groupInfo.goDeviceAddress);
+        }
+        if (event == P2P_GROUP_REMOVED_EVENT) {
+            WriteInt(context, cbmsg->msg.groupInfo.isGo);
+            WriteStr(context, cbmsg->msg.groupInfo.groupIfName);
+        }
+    }
+    return;
+}
+
+static void DealP2pDeviceInfoCbk(int event, Context *context)
+{
+    WifiHalEventCallbackMsg *cbmsg = FrontCallbackMsg(event);
+    if (cbmsg != NULL) {
+        if (event == P2P_PROV_DISC_PBC_REQ_EVENT || event == P2P_PROV_DISC_PBC_RSP_EVENT ||
+            event == P2P_PROV_DISC_ENTER_PIN_EVENT) {
+            WriteStr(context, cbmsg->msg.deviceInfo.srcAddress);
+        }
+        if (event == P2P_PROV_DISC_SHOW_PIN_EVENT) {
+            WriteStr(context, cbmsg->msg.deviceInfo.srcAddress);
+            WriteStr(context, cbmsg->msg.deviceInfo.deviceName);
+        }
+        if (event == AP_STA_DISCONNECTED_EVENT || event == AP_STA_CONNECTED_EVENT) {
+            WriteStr(context, cbmsg->msg.deviceInfo.p2pDeviceAddress);
+        }
+    }
+    return;
+}
+
+static void DealP2pServerInfoCbk(int event, Context *context)
+{
+    WifiHalEventCallbackMsg *cbmsg = FrontCallbackMsg(event);
+    if (cbmsg != NULL) {
+        WriteInt(context, cbmsg->msg.serverInfo.updateIndicator);
+        WriteStr(context, cbmsg->msg.serverInfo.srcAddress);
+        if (cbmsg->msg.serverInfo.tlvs != NULL) {
+            WriteInt(context, strlen(cbmsg->msg.serverInfo.tlvs));
+            WriteStr(context, cbmsg->msg.serverInfo.tlvs);
+            free(cbmsg->msg.serverInfo.tlvs);
+        } else {
+            WriteInt(context, 0);
+        }
+    }
+    return;
+}
+
+static void DealP2pServerDiscReqCbk(int event, Context *context)
+{
+    WifiHalEventCallbackMsg *cbmsg = FrontCallbackMsg(event);
+    if (cbmsg != NULL) {
+        WriteInt(context, cbmsg->msg.serDiscReqInfo.freq);
+        WriteInt(context, cbmsg->msg.serDiscReqInfo.dialogToken);
+        WriteInt(context, cbmsg->msg.serDiscReqInfo.updateIndic);
+        WriteStr(context, cbmsg->msg.serDiscReqInfo.mac);
+        if (cbmsg->msg.serDiscReqInfo.tlvs != NULL) {
+            WriteInt(context, strlen(cbmsg->msg.serDiscReqInfo.tlvs));
+            WriteStr(context, cbmsg->msg.serDiscReqInfo.tlvs);
+            free(cbmsg->msg.serDiscReqInfo.tlvs);
+        } else {
+            WriteInt(context, 0);
+        }
+    }
+    return;
+}
+
+static void DealP2pCallback(int event, Context *context)
+{
+    switch (event) {
+        case WIFI_P2P_SUP_CONNECTION_EVENT:
+        case P2P_GO_NEGOTIATION_FAILURE_EVENT:
+            DealCommonCbk(event, context);
+            break;
+        case P2P_DEVICE_FOUND_EVENT:
+            DealP2pDeviceFoundCbk(event, context);
+            break;
+        case P2P_DEVICE_LOST_EVENT:
+        case P2P_GO_NEGOTIATION_REQUEST_EVENT:
+            DealP2pNegoriationCbk(event, context);
+            break;
+        case P2P_INVITATION_RECEIVED_EVENT:
+        case P2P_INVITATION_RESULT_EVENT:
+        case P2P_GROUP_FORMATION_FAILURE_EVENT:
+            DealP2pInviationCbk(event, context);
+            break;
+        case P2P_GROUP_STARTED_EVENT:
+        case P2P_GROUP_REMOVED_EVENT:
+            DealP2pGroupInfoCbk(event, context);
+            break;
+        case P2P_PROV_DISC_PBC_REQ_EVENT:
+        case P2P_PROV_DISC_PBC_RSP_EVENT:
+        case P2P_PROV_DISC_ENTER_PIN_EVENT:
+        case P2P_PROV_DISC_SHOW_PIN_EVENT:
+        case AP_STA_DISCONNECTED_EVENT:
+        case AP_STA_CONNECTED_EVENT:
+            DealP2pDeviceInfoCbk(event, context);
+            break;
+        case P2P_SERV_DISC_RESP_EVENT:
+            DealP2pServerInfoCbk(event, context);
+            break;
+        case P2P_SERV_DISC_REQ_EVENT:
+            DealP2pServerDiscReqCbk(event, context);
+            break;
+        default:
+            break;
+    }
+    return;
+}
+
+/* Callback request */
+int OnCallbackTransact(const RpcServer *server, int event, Context *context)
+{
+    if (server == NULL || context == NULL) {
+        return -1;
+    }
+    WriteBegin(context, 1);
+    WriteInt(context, event);
+    DealStaApCallback(event, context);
+    DealP2pCallback(event, context);
+    WriteEnd(context);
+    return 0;
+}
+
+int EndCallbackTransact(const RpcServer *server, int event)
+{
+    if (server == NULL) {
+        return -1;
+    }
+    return PopFrontCallbackMsg(event);
 }

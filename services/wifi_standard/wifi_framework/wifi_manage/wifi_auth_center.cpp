@@ -96,5 +96,13 @@ int WifiAuthCenter::VerifySetWifiConfigPermission(const int &pid, const int &uid
     }
     return WifiPermissionHelper::VerifySetWifiConfigPermission(pid, uid);
 }
+
+int WifiAuthCenter::VerifyGetWifiDirectDevicePermission(const int &pid, const int &uid)
+{
+    if (g_permissinAlwaysGrant) {
+        return PERMISSION_GRANTED;
+    }
+    return WifiPermissionHelper::VerifyGetWifiDirectDevicePermission(pid, uid);
+}
 } // namespace Wifi
 } // namespace OHOS

@@ -25,13 +25,16 @@
 WifiHalVendorInterface *g_wifiHalVendorInterface = NULL;
 
 #define MODULE_NAME_MAX_LEN 256
-#define MODULE_CONFIG_FILE_PATH "./wifi_hal_vendor.conf"
+#define MODULE_CONFIG_FILE_PATH "/data/misc/wifi/wifi_hal_vendor.conf"
 static int ReadConfigModuleName(char *name, int size)
 {
+    if (name == NULL) {
+        return -1;
+    }
     FILE *fp = fopen(MODULE_CONFIG_FILE_PATH, "r");
     if (fp == NULL) {
         LOGE("open module configuration file failed");
-        return -1;
+        return 0; /* file not exist, use default operators */
     }
     int flag = 0;
     do {
@@ -47,7 +50,7 @@ static int ReadConfigModuleName(char *name, int size)
             LOGE("read file failed!");
             break;
         }
-        flag = 1;
+        flag += 1;
     } while (0);
     fclose(fp);
     return (flag == 0) ? -1 : 0;
@@ -55,19 +58,21 @@ static int ReadConfigModuleName(char *name, int size)
 
 static int OpenHalVendorModule(WifiHalVendorInterface *pInterface)
 {
+    if (pInterface == NULL) {
+        return -1;
+    }
     char name[MODULE_NAME_MAX_LEN] = {0};
-    int ret = ReadConfigModuleName(name, MODULE_NAME_MAX_LEN);
-    if (ret < 0) {
+    if (ReadConfigModuleName(name, MODULE_NAME_MAX_LEN) < 0) {
         return -1;
     }
     if (strlen(name) <= 0) {
-        LOGE("module name is null.");
-        return -1;
+        LOGW("module name is null.");
+        return 0;
     }
 
     void *handle = dlopen(name, RTLD_LAZY);
     if (handle == NULL) {
-        LOGE("open config [%{public}s] so failed!", name);
+        LOGE("open config [%{public}s] so failed![%{public}s]", name, dlerror());
         return -1;
     }
     int flag = 0;
@@ -88,7 +93,7 @@ static int OpenHalVendorModule(WifiHalVendorInterface *pInterface)
             break;
         }
         pInterface->handle = handle;
-        flag = 1;
+        flag += 1;
     } while (0);
     if (flag == 0) {
         dlclose(handle);

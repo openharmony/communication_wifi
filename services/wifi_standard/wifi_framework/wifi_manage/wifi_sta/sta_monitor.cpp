@@ -16,6 +16,7 @@
 #include "wifi_idl_define.h"
 #include "sta_define.h"
 #include "wifi_logger.h"
+#include "wifi_sta_hal_interface.h"
 
 DEFINE_WIFILOG_LABEL("StaMonitor");
 
@@ -32,57 +33,59 @@ StaMonitor::~StaMonitor()
 ErrCode StaMonitor::InitStaMonitor()
 {
     WIFI_LOGI("Enter StaMonitor::InitStaMonitor.\n");
+    using namespace std::placeholders;
+    WifiEventCallback callBack = {
+        std::bind(&StaMonitor::OnConnectChangedCallBack, this, _1, _2, _3),
+        std::bind(&StaMonitor::OnWpaStateChangedCallBack, this, _1),
+        std::bind(&StaMonitor::OnWpaSsidWrongKeyCallBack, this, _1),
+        std::bind(&StaMonitor::OnWpsPbcOverlapCallBack, this, _1),
+        std::bind(&StaMonitor::OnWpsTimeOutCallBack, this, _1)
+    };
 
-    WifiEventCallback callBack;
-    callBack.onConnectChanged = &(StaMonitor::OnConnectChangedCallBack);
-    callBack.onWpaStateChanged = &(StaMonitor::OnWpaStateChangedCallBack);
-    callBack.onWpaSsidWrongKey = &(StaMonitor::OnWpaSsidWrongKeyCallBack);
-    callBack.onWpsOverlap = &(StaMonitor::OnWpsPbcOverlapCallBack);
-    callBack.onWpsTimeOut = &(StaMonitor::OnWPsTimeOutCallBack);
-    callBack.pInstance = static_cast<void *>(this);
     if (WifiStaHalInterface::GetInstance().RegisterStaEventCallback(callBack) != WIFI_IDL_OPT_OK) {
         WIFI_LOGE("StaMonitor::InitStaMonitor RegisterStaEventCallback failed!");
         return WIFI_OPT_FAILED;
     }
     return WIFI_OPT_SUCCESS;
 }
+
 ErrCode StaMonitor::UnInitStaMonitor() const
 {
+    WIFI_LOGI("Enter StaMonitor::UnInitStaMonitor.\n");
     WifiEventCallback callBack;
     if (WifiStaHalInterface::GetInstance().RegisterStaEventCallback(callBack) != WIFI_IDL_OPT_OK) {
         WIFI_LOGE("StaMonitor::~StaMonitor RegisterStaEventCallback failed!");
+        return WIFI_OPT_FAILED;
     }
     return WIFI_OPT_SUCCESS;
 }
 
 void StaMonitor::SetStateMachine(StaStateMachine *paraStaStateMachine)
 {
+    if (paraStaStateMachine == nullptr) {
+        WIFI_LOGE("The statemachine pointer is null.");
+        return;
+    }
     pStaStateMachine = paraStaStateMachine;
     return;
 }
-void StaMonitor::OnConnectChangedCallBack(int status, int networkId, char *bssid, void *pInstance)
+void StaMonitor::OnConnectChangedCallBack(int status, int networkId,const std::string &bssid)
 {
-    WIFI_LOGI("OnConnectChangedCallBack() status:%{public}d,networkId=%{public}d,bssid=%s\n",
+    WIFI_LOGI("OnConnectChangedCallBack() status:%{public}d,networkId=%{public}d,bssid={private}%s",
         status,
         networkId,
-        bssid);
-
-    if (pInstance == nullptr) {
-        WIFI_LOGE("OnConnectChangedCallBack pInstance is null.\n");
-        return;
-    }
-    auto pStaMonitor = static_cast<StaMonitor *>(pInstance);
-    if (pStaMonitor->pStaStateMachine == nullptr) {
-        WIFI_LOGE("OnConnectChangedCallBack pStaMonitor->pStaStateMachine is null.\n");
+        bssid.c_str());
+    if (pStaStateMachine == nullptr) {
+        WIFI_LOGE("The statemachine pointer is null.");
         return;
     }
     switch (status) {
         case WPA_CB_CONNECTED: {
-            pStaMonitor->pStaStateMachine->OnNetworkConnectionEvent(networkId, bssid);
+            pStaStateMachine->OnNetworkConnectionEvent(networkId, bssid);
             break;
         }
         case WPA_CB_DISCONNECTED: {
-            pStaMonitor->pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_NETWORK_DISCONNECTION_EVENT);
+            pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_NETWORK_DISCONNECTION_EVENT);
             break;
         }
         default:
@@ -90,76 +93,52 @@ void StaMonitor::OnConnectChangedCallBack(int status, int networkId, char *bssid
     }
 }
 
-void StaMonitor::OnWpaStateChangedCallBack(int status, void *pInstance)
+void StaMonitor::OnWpaStateChangedCallBack(int status)
 {
     WIFI_LOGI("OnWpaStateChangedCallBack() status:%{public}d\n", status);
-
-    if (pInstance == nullptr) {
-        WIFI_LOGE("OnWpaStateChangedCallBack pInstance is null.\n");
-        return;
-    }
-    auto pStaMonitor = static_cast<StaMonitor *>(pInstance);
-    if (pStaMonitor->pStaStateMachine == nullptr) {
-        WIFI_LOGE("OnWpaStateChangedCallBack pStaMonitor->pStaStateMachine is null.\n");
+    if (pStaStateMachine == nullptr) {
+        WIFI_LOGE("The statemachine pointer is null.");
         return;
     }
     /* Notification state machine wpa state changed event. */
-    pStaMonitor->pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_WPA_STATE_CHANGE_EVENT, status);
+    pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_WPA_STATE_CHANGE_EVENT, status);
 }
 
-void StaMonitor::OnWpaSsidWrongKeyCallBack(int status, void *pInstance)
+void StaMonitor::OnWpaSsidWrongKeyCallBack(int status)
 {
     WIFI_LOGI("OnWpaSsidWrongKeyCallBack() status:%{public}d\n", status);
-
-    if (pInstance == nullptr) {
-        WIFI_LOGE("OnWpaSsidWrongKeyCallBack pInstance is null.\n");
-        return;
-    }
-    auto pStaMonitor = static_cast<StaMonitor *>(pInstance);
-    if (pStaMonitor->pStaStateMachine == nullptr) {
-        WIFI_LOGE("OnWpaSsidWrongKeyCallBack pStaMonitor->pStaStateMachine is null.\n");
+    if (pStaStateMachine == nullptr) {
+        WIFI_LOGE("The statemachine pointer is null.");
         return;
     }
 
     if (status != 1) {
-        WIFI_LOGE("OnWpaSsidWrongKeyCallBack error");
+        WIFI_LOGE("OnWpaSsidWrongKeyCallBack error.");
         return;
     }
     /* Notification state machine wpa password wrong event. */
-    pStaMonitor->pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_WPA_PASSWD_WRONG_EVENT, status);
+    pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_WPA_PASSWD_WRONG_EVENT, status);
 }
-void StaMonitor::OnWpsPbcOverlapCallBack(int status, void *pInstance)
+void StaMonitor::OnWpsPbcOverlapCallBack(int status)
 {
-    WIFI_LOGI("OnWpsPbcOverlapCallBack() statue:%{public}d\n", status);
-
-    if (pInstance == nullptr) {
-        WIFI_LOGE("OnWpsPbcOverlapCallBack pInstance is null.\n");
-        return;
-    }
-    auto pStaMonitor = static_cast<StaMonitor *>(pInstance);
-    if (pStaMonitor->pStaStateMachine == nullptr) {
-        WIFI_LOGE("OnWpsPbcOverlapCallBack pStaMonitor->pStaStateMachine is null.\n");
+    WIFI_LOGI("OnWpsPbcOverlapCallBack() status:%{public}d\n", status);
+    if (pStaStateMachine == nullptr) {
+        WIFI_LOGE("The statemachine pointer is null.");
         return;
     }
     /* Notification state machine WPS overlap event. */
-    pStaMonitor->pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_WPS_OVERLAP_EVENT);
+    pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_WPS_OVERLAP_EVENT);
 }
 
-void StaMonitor::OnWPsTimeOutCallBack(int status, void *pInstance)
+void StaMonitor::OnWpsTimeOutCallBack(int status)
 {
-    WIFI_LOGI("OnWpsTimeOutCallBack() statue:%{public}d\n", status);
-
-    if (pInstance == nullptr) {
-        WIFI_LOGE("OnWpsTimeOutCallBack pInstance is null.\n");
-        return;
-    }
-    auto pStaMonitor = static_cast<StaMonitor *>(pInstance);
-    if (pStaMonitor->pStaStateMachine == nullptr) {
-        WIFI_LOGE("OnWpsTimeOutCallBack pStaMonitor->pStaStateMachine is null.\n");
+    WIFI_LOGI("OnWpsTimeOutCallBack() status:%{public}d\n", status);
+    if (pStaStateMachine == nullptr) {
+        WIFI_LOGE("The statemachine pointer is null.");
         return;
     }
     /* Notification state machine WPS timeout event */
-    pStaMonitor->pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_WPS_TIMEOUT_EVNET);
+    pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_WPS_TIMEOUT_EVNET);
 }
 }  // namespace Wifi
 }  // namespace OHOS

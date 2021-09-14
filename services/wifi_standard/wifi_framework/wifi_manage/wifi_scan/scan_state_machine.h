@@ -23,13 +23,10 @@
 #include "wifi_log.h"
 #include "wifi_error_no.h"
 #include "wifi_scan_param.h"
-#include "wifi_scan_result.h"
-#include "wifi_sta_hal_interface.h"
 #include "scan_common.h"
 #include "state_machine.h"
 #include "wifi_msg.h"
 #include "wifi_errcode.h"
-#include "wifi_settings.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -350,18 +347,11 @@ private:
      */
     void CommonScanInfoProcess();
     /**
-     * @Description  Processing after the ScanMonitor scan success message is received.
-     *
-     * @param wifiScanInfos - Scanning result queried from the bottom layer[in]
-     * @param scanInfos - Scan internal scan results[out]
-     */
-    void ConvertScanInfos(std::vector<WifiScanResult> &wifiScanInfos, std::vector<InterScanInfo> &scanInfos);
-    /**
      * @Description The band and security type are parsed from the scanning result obtained by the IDL.
      * 
      * @param scanInfo - scan result[inout]
      */
-    void GetSecurityTypeAndBand(InterScanInfo &scanInfo);
+    void GetSecurityTypeAndBand(std::vector<InterScanInfo> &scanInfo);
     /**
      * @Description  Reporting Status to ScanService.
      *

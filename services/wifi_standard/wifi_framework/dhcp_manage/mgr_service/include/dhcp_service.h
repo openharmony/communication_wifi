@@ -19,7 +19,7 @@
 #include "i_dhcp_service.h"
 #include "dhcp_define.h"
 #include "dhcp_client_service_impl.h"
-#include "dhcp_server_service_impl.h"
+#include "dhcp_server_service.h"
 
 
 namespace OHOS {
@@ -174,6 +174,9 @@ public:
      * @Return : success - DHCP_OPT_SUCCESS, failed - others.
      */
     int GetDhcpSerProExit(const std::string& ifname, IDhcpResultNotify *pResultNotify) override;
+
+private:
+    int InitServerService(void);
 
 private:
     std::unique_ptr<IDhcpClientService> m_pClientService;

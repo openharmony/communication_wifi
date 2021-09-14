@@ -32,13 +32,14 @@
 #include "i_wifi_device_callback.h"
 #include "i_wifi_scan_callback.h"
 #include "i_wifi_hotspot_callback.h"
-
+#include "i_wifi_p2p_callback.h"
 
 namespace OHOS {
 namespace Wifi {
 using StaCallbackMapType = std::map<sptr<IRemoteObject>, sptr<IWifiDeviceCallBack>>;
 using ScanCallbackMapType = std::map<sptr<IRemoteObject>, sptr<IWifiScanCallback>>;
 using HotspotCallbackMapType = std::map<sptr<IRemoteObject>, sptr<IWifiHotspotCallback>>;
+using P2pCallbackMapType = std::map<sptr<IRemoteObject>, sptr<IWifiP2pCallback>>;
 class WifiInternalEventDispatcher {
 public:
     WifiInternalEventDispatcher();
@@ -101,15 +102,22 @@ public:
     sptr<IWifiHotspotCallback> GetSingleHotspotCallback() const;
     int RemoveHotspotCallback(const sptr<IRemoteObject> &remote);
     bool HasHotspotRemote(const sptr<IRemoteObject> &remote);
+    int AddP2pCallback(const sptr<IRemoteObject> &remote, const sptr<IWifiP2pCallback> &callback);
+    int SetSingleP2pCallback(const sptr<IWifiP2pCallback> &callback);
+    sptr<IWifiP2pCallback> GetSingleP2pCallback() const;
+    int RemoveP2pCallback(const sptr<IRemoteObject> &remote);
+    bool HasP2pRemote(const sptr<IRemoteObject> &remote);
 
     void InvokeScanCallbacks(const WifiEventCallbackMsg &msg);
     void InvokeDeviceCallbacks(const WifiEventCallbackMsg &msg);
     void InvokeHotspotCallbacks(const WifiEventCallbackMsg &msg);
+    void InvokeP2pCallbacks(const WifiEventCallbackMsg &msg);
 private:
     static void DealStaCallbackMsg(WifiInternalEventDispatcher &pInstance, const WifiEventCallbackMsg &msg);
     static void DealScanCallbackMsg(WifiInternalEventDispatcher &pInstance, const WifiEventCallbackMsg &msg);
     static void DealHotspotCallbackMsg(WifiInternalEventDispatcher &pInstance, const WifiEventCallbackMsg &msg);
-
+    static void DealP2pCallbackMsg(WifiInternalEventDispatcher &pInstance, const WifiEventCallbackMsg &msg);
+    static void SendP2pCallbackMsg(sptr<IWifiP2pCallback> &callback, const WifiEventCallbackMsg &msg);
     static void PublishConnectionStateChangedEvent(int state, const WifiLinkedInfo &info);
     static void PublishWifiStateChangedEvent(int state);
     static void PublishRssiValueChangedEvent(int state);
@@ -128,6 +136,9 @@ private:
     std::mutex mHotspotCallbackMutex;
     HotspotCallbackMapType mHotspotCallbacks;
     sptr<IWifiHotspotCallback> mHotspotSingleCallback;
+    std::mutex mP2pCallbackMutex;
+    P2pCallbackMapType mP2pCallbacks;
+    sptr<IWifiP2pCallback> mP2pSingleCallback;
 };
 }  // namespace Wifi
 }  // namespace OHOS

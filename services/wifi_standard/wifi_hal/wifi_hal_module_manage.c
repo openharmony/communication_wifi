@@ -107,7 +107,7 @@ static void *WpaThreadMain(void *p)
         tmpArgv[i] = param.argv[i];
     }
     int ret = func(param.argc, tmpArgv);
-    LOGD("run wpa_main ret:%d.\n", ret);
+    LOGD("run wpa_main ret:%{public}d.\n", ret);
     if (dlclose(handleLibWpa) != 0) {
         LOGE("dlclose libwpa failed.");
         return NULL;
@@ -173,6 +173,9 @@ int StopModuleInternal(const char *moduleName, pid_t processId)
 
 ModuleInfo *FindModule(const char *moduleName)
 {
+    if (moduleName == NULL) {
+        return NULL;
+    }
     ModuleInfo *p = g_halModuleList;
     while (p != NULL) {
         if (strcmp(p->szModuleName, moduleName) == 0) {
@@ -186,6 +189,9 @@ ModuleInfo *FindModule(const char *moduleName)
 
 ModuleManageRetCode StartModule(const char *moduleName, const char *startCmd)
 {
+    if (moduleName == NULL || startCmd == NULL) {
+        return MM_FAILED;
+    }
     ModuleInfo *p = FindModule(moduleName);
     if (p != NULL) {
         p->referenceCount += 1;
@@ -213,6 +219,9 @@ ModuleManageRetCode StartModule(const char *moduleName, const char *startCmd)
 
 ModuleManageRetCode StopModule(const char *moduleName)
 {
+    if (moduleName == NULL) {
+        return MM_FAILED;
+    }
     ModuleInfo *p = FindModule(moduleName);
     if (p == NULL) {
         return MM_SUCCESS;
@@ -231,10 +240,10 @@ ModuleManageRetCode StopModule(const char *moduleName)
         g_halModuleList = p->next;
     } else {
         ModuleInfo *q = g_halModuleList;
-        while (q && q->next != p) {
+        while (q != NULL && q->next != p) {
             q = q->next;
         }
-        if (q) {
+        if (q != NULL) {
             q->next = p->next;
         }
     }

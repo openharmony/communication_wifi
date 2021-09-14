@@ -17,10 +17,10 @@
 #include "serial.h"
 #include "wifi_log.h"
 #include "wifi_idl_inner_interface.h"
-
+#include "i_wifi_public_func.h"
 
 #undef LOG_TAG
-#define LOG_TAG "OHWIFI_IDLCLIENT_I_WIFI_IFACE"
+#define LOG_TAG "WifiIdlIface"
 
 WifiErrorNo GetName(char *ifname, int32_t size)
 {
@@ -31,10 +31,7 @@ WifiErrorNo GetName(char *ifname, int32_t size)
     WriteFunc(context, "GetName");
     WriteInt(context, size);
     WriteEnd(context);
-    int ret = RemoteCall(client);
-    if (ret < 0) {
-        LOGE("remote call failed!");
-        UnlockRpcClient(client);
+    if (RpcClientCall(client, "GetName") != WIFI_IDL_OPT_OK) {
         return WIFI_IDL_OPT_FAILED;
     }
     int result = WIFI_IDL_OPT_FAILED;
@@ -57,10 +54,7 @@ WifiErrorNo GetType(int32_t *type)
     WriteBegin(context, 0);
     WriteFunc(context, "GetType");
     WriteEnd(context);
-    int ret = RemoteCall(client);
-    if (ret < 0) {
-        LOGE("remote call failed!");
-        UnlockRpcClient(client);
+    if (RpcClientCall(client, "GetType") != WIFI_IDL_OPT_OK) {
         return WIFI_IDL_OPT_FAILED;
     }
     int result = WIFI_IDL_OPT_FAILED;

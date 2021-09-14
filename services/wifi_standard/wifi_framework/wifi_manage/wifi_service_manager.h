@@ -23,6 +23,7 @@
 #include "ista_service.h"
 #include "iscan_service.h"
 #include "i_ap_service.h"
+#include "ip2p_service.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -70,6 +71,24 @@ struct ApServiceHandle {
     ApServiceHandle() : handle(nullptr), create(nullptr), destroy(nullptr), pService(nullptr)
     {}
     ~ApServiceHandle()
+    {}
+    void Clear()
+    {
+        handle = nullptr;
+        create = nullptr;
+        destroy = nullptr;
+        pService = nullptr;
+    }
+};
+
+struct P2pServiceHandle {
+    void *handle;
+    IP2pService *(*create)();
+    void *(*destroy)(IP2pService *);
+    IP2pService *pService;
+    P2pServiceHandle() : handle(nullptr), create(nullptr), destroy(nullptr), pService(nullptr)
+    {}
+    ~P2pServiceHandle()
     {}
     void Clear()
     {
@@ -130,6 +149,13 @@ public:
     IApService *GetApServiceInst(void);
 
     /**
+     * @Description Get the P2P Service Inst object
+     *
+     * @return IP2pService* - p2p service pointer, if p2p not supported, nullptr is returned
+     */
+    IP2pService *GetP2pServiceInst(void);
+
+    /**
      * @Description unload a feature service
      *
      * @param name - feature service name
@@ -152,6 +178,8 @@ private:
     int UnloadScanService(bool bPreLoad);
     int LoadApService(const std::string &dlname, bool bCreate);
     int UnloadApService(bool bPreLoad);
+    int LoadP2pService(const std::string &dlname, bool bCreate);
+    int UnloadP2pService(bool bPreLoad);
 
 private:
     std::mutex mMutex;
@@ -159,6 +187,7 @@ private:
     StaServiceHandle mStaServiceHandle;
     ScanServiceHandle mScanServiceHandle;
     ApServiceHandle mApServiceHandle;
+    P2pServiceHandle mP2pServiceHandle;
 };
 } // namespace Wifi
 } // namespace OHOS

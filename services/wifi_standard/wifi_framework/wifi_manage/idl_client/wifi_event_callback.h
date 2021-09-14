@@ -12,28 +12,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#ifndef OHOS_WIFI_EVENT_CALLBACK_H
+#define OHOS_WIFI_EVENT_CALLBACK_H
 
-#ifndef OHOS_WIFIEVENTCALLBACK_H
-#define OHOS_WIFIEVENTCALLBACK_H
+#include <string>
+#include <functional>
 
 namespace OHOS {
 namespace Wifi {
 struct WifiEventCallback {
-    void *pInstance;
-    void (*onConnectChanged)(int status, int networkId, char *bssid, void *pInstance);
-    void (*onWpaStateChanged)(int status, void *pInstance);
-    void (*onWpaSsidWrongKey)(int status, void *pInstance);
-    void (*onWpsOverlap)(int status, void *pInstance);
-    void (*onWpsTimeOut)(int status, void *pInstance);
-    WifiEventCallback()
-    {
-        pInstance = nullptr;
-        onConnectChanged = nullptr;
-        onWpaStateChanged = nullptr;
-        onWpaSsidWrongKey = nullptr;
-        onWpsOverlap = nullptr;
-        onWpsTimeOut = nullptr;
-    }
+    std::function<void(int, int, const std::string &)> onConnectChanged;
+    std::function<void(int)> onWpaStateChanged;
+    std::function<void(int)> onWpaSsidWrongKey;
+    std::function<void(int)> onWpsOverlap;
+    std::function<void(int)> onWpsTimeOut;
 };
 }  // namespace Wifi
 }  // namespace OHOS

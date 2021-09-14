@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_WIFIERRORNO_H
-#define OHOS_WIFIERRORNO_H
+#ifndef OHOS_WIFI_ERROR_NO_H
+#define OHOS_WIFI_ERROR_NO_H
 
 /* Wifi Operation Error Code */
 typedef enum WifiErrorNo {
@@ -43,6 +43,7 @@ typedef enum WifiErrorNo {
     WIFI_IDL_VENDOR_OUT_OF_MEMORY,
     WIFI_IDL_VENDOR_BUSY,
     WIFI_IDL_OPT_INVALID_PARAM,
+    WIFI_IDL_GET_P2P_GROUP_INFACE_FAILED,
 } WifiErrorNo;
 
 #endif

@@ -18,7 +18,7 @@
 #include "ap_state_machine.h"
 #include "wifi_logger.h"
 
-DEFINE_WIFILOG_HOTSPOT_LABEL("ApRootState");
+DEFINE_WIFILOG_HOTSPOT_LABEL("WifiApRootState");
 namespace OHOS {
 namespace Wifi {
 ApRootState::ApRootState() : State("ApRootState")
@@ -29,12 +29,12 @@ ApRootState::~ApRootState()
 
 void ApRootState::GoInState()
 {
-    WIFI_LOGI("%{public}s  Enter", GetStateName().c_str());
+    WIFI_LOGI("%{public}s  GoInState.", GetStateName().c_str());
 }
 
 void ApRootState::GoOutState()
 {
-    WIFI_LOGI("%{public}s  Exit", GetStateName().c_str());
+    WIFI_LOGI("%{public}s  GoOutState.", GetStateName().c_str());
 }
 
 bool ApRootState::ExecuteStateMsg(InternalMessage *msg)
@@ -45,7 +45,7 @@ bool ApRootState::ExecuteStateMsg(InternalMessage *msg)
     }
     int msgName = msg->GetMessageName();
 
-    WIFI_LOGI("msg = [%{public}dpublic}d] is not handled.", msgName);
+    WIFI_LOGI("msg = [%{public}d] is not handled.", msgName);
     return EXECUTED;
 }
 }  // namespace Wifi

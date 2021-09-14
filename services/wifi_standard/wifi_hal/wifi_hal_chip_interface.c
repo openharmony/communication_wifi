@@ -21,99 +21,9 @@
 #undef LOG_TAG
 #define LOG_TAG "WifiHalChipInterface"
 
-WifiIfaceArray *g_wifiIfaceArray = NULL;
-unsigned g_kMaxWlanIfaces = 5;
-
-WifiIfaceArray *CreateWifiIfaceArray(int maxIfaces)
-{
-    if (maxIfaces <= 0) {
-        return NULL;
-    }
-
-    g_wifiIfaceArray = (WifiIfaceArray *)calloc(1, sizeof(WifiIfaceArray));
-    if (g_wifiIfaceArray == NULL) {
-        return NULL;
-    }
-    g_wifiIfaceArray->pos = 0;
-    g_wifiIfaceArray->capacity = maxIfaces;
-    g_wifiIfaceArray->ifaces = (WifiIface **)calloc(maxIfaces, sizeof(WifiIface *));
-    if (g_wifiIfaceArray->ifaces == NULL) {
-        free(g_wifiIfaceArray);
-        g_wifiIfaceArray = NULL;
-        return NULL;
-    }
-    return g_wifiIfaceArray;
-}
-
-void ReleaseWifiIfaceArray(void)
-{
-    if (g_wifiIfaceArray != NULL) {
-        for (int i = 0; i < g_wifiIfaceArray->capacity; ++i) {
-            free(g_wifiIfaceArray->ifaces[i]);
-        }
-        free(g_wifiIfaceArray->ifaces);
-        free(g_wifiIfaceArray);
-        g_wifiIfaceArray = NULL;
-    }
-    return;
-}
-
-int FindWifiIfaceFromArray(const char *ifname)
-{
-    if (g_wifiIfaceArray == NULL) {
-        g_wifiIfaceArray = CreateWifiIfaceArray(g_kMaxWlanIfaces);
-    }
-    if (g_wifiIfaceArray == NULL) {
-        return -1;
-    }
-    for (int i = 0; i < g_wifiIfaceArray->pos; ++i) {
-        if (strcmp(g_wifiIfaceArray->ifaces[i]->name, ifname) == 0) {
-            return i;
-        }
-    }
-    return -1;
-}
-
-int PushWifiIfaceIntoArray(WifiIface *face)
-{
-    if (face == NULL) {
-        return -1;
-    }
-    int pos = FindWifiIfaceFromArray(face->name);
-    if (pos >= 0) {
-        return 0;
-    }
-    if (g_wifiIfaceArray == NULL) {
-        return -1;
-    }
-    if (g_wifiIfaceArray->pos >= g_wifiIfaceArray->capacity) {
-        return ERROR_CODE_POS_OVERFLOW;
-    }
-    if (g_wifiIfaceArray->pos < 0) {
-        return -1;
-    }
-    g_wifiIfaceArray->ifaces[g_wifiIfaceArray->pos] = face;
-    g_wifiIfaceArray->pos += 1;
-    return 0;
-}
-
-int RemoveWifiIfaceFromArray(const char *name)
-{
-    int pos = FindWifiIfaceFromArray(name);
-    if (pos < 0) {
-        return 0;
-    }
-    WifiIface *p = g_wifiIfaceArray->ifaces[pos];
-    g_wifiIfaceArray->ifaces[pos] = g_wifiIfaceArray->ifaces[g_wifiIfaceArray->pos - 1];
-    g_wifiIfaceArray->ifaces[g_wifiIfaceArray->pos - 1] = NULL;
-    g_wifiIfaceArray->pos -= 1;
-    free(p);
-    return 0;
-}
-
 WifiErrorNo GetWifiChip(uint8_t id, WifiChip *chip)
 {
-    LOGI("GetWifiChip() id: %{public}u", id);
+    LOGD("GetWifiChip() id: %{public}u", id);
     if (chip != NULL) {
         chip->chip = 0; /* fixed compile error, -Werror,-Wunused-parameter */
     }
@@ -122,7 +32,7 @@ WifiErrorNo GetWifiChip(uint8_t id, WifiChip *chip)
 
 WifiErrorNo GetWifiChipIds(uint8_t *ids, int32_t *size)
 {
-    LOGI("GetWifiChipIds()");
+    LOGD("GetWifiChipIds()");
     if (ids != NULL && size != NULL) {
         LOGD("input size %{public}d", *size);
     }
@@ -131,7 +41,7 @@ WifiErrorNo GetWifiChipIds(uint8_t *ids, int32_t *size)
 
 WifiErrorNo GetChipId(int32_t *id)
 {
-    LOGI("GetChipId()");
+    LOGD("GetChipId()");
     if (id != NULL) {
         *id = 0; /* fixed compile error, -Werror,-Wunused-parameter */
     }
@@ -140,7 +50,10 @@ WifiErrorNo GetChipId(int32_t *id)
 
 WifiErrorNo CreateIface(int32_t type, WifiIface *iface)
 {
-    LOGI("CreateIface() type: %{public}d", type);
+    LOGD("CreateIface() type: %{public}d", type);
+    if (iface == NULL) {
+        return WIFI_HAL_FAILED;
+    }
     const int bufferSize = 8;
     char name[bufferSize] = {0};
     if (strcpy_s(iface->name, sizeof(iface->name), name) != EOK) {
@@ -153,10 +66,10 @@ WifiErrorNo CreateIface(int32_t type, WifiIface *iface)
 
 WifiErrorNo GetIface(const char *ifname, WifiIface *iface)
 {
-    if ((NULL == ifname) || (NULL == iface)) {
+    if (ifname == NULL || iface == NULL) {
         return WIFI_HAL_FAILED;
     }
-    LOGI("GetIface() ifname: %s", ifname);
+    LOGD("GetIface() ifname: %{public}s", ifname);
 
     WifiIface tmpIface;
     tmpIface.index = 0; /* fixed compile error, -Werror,-Wunused-parameter */
@@ -172,7 +85,7 @@ WifiErrorNo GetIface(const char *ifname, WifiIface *iface)
 
 WifiErrorNo GetIfaceNames(int32_t type, char *ifaces, int32_t size)
 {
-    LOGI("GetIfaceNames() type: %{public}d size: %{public}d", type, size);
+    LOGD("GetIfaceNames() type: %{public}d size: %{public}d", type, size);
     if (ifaces != NULL) {
         ifaces[0] = '\0'; /* fixed compile error, -Werror,-Wunused-parameter */
     }
@@ -181,13 +94,16 @@ WifiErrorNo GetIfaceNames(int32_t type, char *ifaces, int32_t size)
 
 WifiErrorNo RemoveIface(const char *ifname)
 {
-    LOGI("RemoveIface() ifname:%s", ifname);
+    if (ifname == NULL) {
+        return WIFI_HAL_FAILED;
+    }
+    LOGD("RemoveIface() ifname:%{public}s", ifname);
     return WIFI_HAL_SUCCESS;
 }
 
 WifiErrorNo GetCapabilities(uint32_t *capabilities)
 {
-    LOGI("GetCapabilities()");
+    LOGD("GetCapabilities()");
     if (capabilities != NULL) {
         *capabilities = 0; /* fixed compile error, -Werror,-Wunused-parameter */
     }
@@ -196,13 +112,16 @@ WifiErrorNo GetCapabilities(uint32_t *capabilities)
 
 WifiErrorNo GetSupportedComboModes(int32_t *modes, int32_t *size)
 {
-    LOGI("GetSupportedComboModes()");
+    LOGD("GetSupportedComboModes()");
+    if (modes == NULL || size == NULL) {
+        return WIFI_HAL_FAILED;
+    }
     return WIFI_HAL_NOT_SUPPORT;
 }
 
 WifiErrorNo ConfigComboModes(int32_t mode)
 {
-    LOGI("ConfigComboModes() mode: %{public}d", mode);
+    LOGD("ConfigComboModes() mode: %{public}d", mode);
     WifiHalVendorInterface *pInterface = GetWifiHalVendorInterface();
     if (pInterface == NULL) {
         return WIFI_HAL_GET_VENDOR_HAL_FAILED;
@@ -213,7 +132,10 @@ WifiErrorNo ConfigComboModes(int32_t mode)
 
 WifiErrorNo GetComboModes(int32_t *id)
 {
-    LOGI("GetComboModes()");
+    LOGD("GetComboModes()");
+    if (id == NULL) {
+        return WIFI_HAL_FAILED;
+    }
     WifiHalVendorInterface *pInterface = GetWifiHalVendorInterface();
     if (pInterface == NULL) {
         return WIFI_HAL_GET_VENDOR_HAL_FAILED;
@@ -224,7 +146,10 @@ WifiErrorNo GetComboModes(int32_t *id)
 
 WifiErrorNo RequestFirmwareDebugDump(unsigned char *bytes, int32_t *size)
 {
-    LOGI("RequestFirmwareDebugDump()");
+    LOGD("RequestFirmwareDebugDump()");
+    if (bytes == NULL || size == NULL) {
+        return WIFI_HAL_FAILED;
+    }
     WifiHalVendorInterface *pInterface = GetWifiHalVendorInterface();
     if (pInterface == NULL) {
         return WIFI_HAL_GET_VENDOR_HAL_FAILED;
@@ -235,6 +160,6 @@ WifiErrorNo RequestFirmwareDebugDump(unsigned char *bytes, int32_t *size)
 
 WifiErrorNo SetPowerMode(uint8_t mode)
 {
-    LOGI("SetPowerMode() %{public}u", mode);
+    LOGD("SetPowerMode() %{public}u", mode);
     return WIFI_HAL_SUCCESS;
 }

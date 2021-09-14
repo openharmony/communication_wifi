@@ -18,10 +18,10 @@
 #include "wifi_log.h"
 #include "wifi_idl_define.h"
 #include "wifi_idl_inner_interface.h"
-
+#include "i_wifi_public_func.h"
 
 #undef LOG_TAG
-#define LOG_TAG "OHWIFI_IDLCLIENT_I_WIFI_SUPPLICANT_IFACE"
+#define LOG_TAG "WifiIdlSupplicantIface"
 static ISupplicantEventCallback g_wifiSupplicantEventCallback = {0};
 void SetSupplicantEventCallback(ISupplicantEventCallback callback)
 {
@@ -41,10 +41,7 @@ WifiErrorNo StartSupplicant(void)
     WriteBegin(context, 0);
     WriteFunc(context, "StartSupplicant");
     WriteEnd(context);
-    int ret = RemoteCall(client);
-    if (ret < 0) {
-        LOGE("StartSupplicant:remote call failed!");
-        UnlockRpcClient(client);
+    if (RpcClientCall(client, "StartSupplicant") != WIFI_IDL_OPT_OK) {
         return WIFI_IDL_OPT_FAILED;
     }
     int result = WIFI_IDL_OPT_FAILED;
@@ -62,10 +59,7 @@ WifiErrorNo StopSupplicant(void)
     WriteBegin(context, 0);
     WriteFunc(context, "StopSupplicant");
     WriteEnd(context);
-    int ret = RemoteCall(client);
-    if (ret < 0) {
-        LOGE("StopSupplicant:remote call failed!");
-        UnlockRpcClient(client);
+    if (RpcClientCall(client, "StopSupplicant") != WIFI_IDL_OPT_OK) {
         return WIFI_IDL_OPT_FAILED;
     }
     int result = WIFI_IDL_OPT_FAILED;
@@ -83,10 +77,7 @@ WifiErrorNo ConnectSupplicant(void)
     WriteBegin(context, 0);
     WriteFunc(context, "ConnectSupplicant");
     WriteEnd(context);
-    int ret = RemoteCall(client);
-    if (ret < 0) {
-        LOGE("ConnectSupplicant:remote call failed!");
-        UnlockRpcClient(client);
+    if (RpcClientCall(client, "ConnectSupplicant") != WIFI_IDL_OPT_OK) {
         return WIFI_IDL_OPT_FAILED;
     }
     int result = WIFI_IDL_OPT_FAILED;
@@ -96,18 +87,15 @@ WifiErrorNo ConnectSupplicant(void)
     return result;
 }
 
-WifiErrorNo DisConnectSupplicant(void)
+WifiErrorNo DisconnectSupplicant(void)
 {
     RpcClient *client = GetSupplicantRpcClient();
     LockRpcClient(client);
     Context *context = client->context;
     WriteBegin(context, 0);
-    WriteFunc(context, "DisConnectSupplicant");
+    WriteFunc(context, "DisconnectSupplicant");
     WriteEnd(context);
-    int ret = RemoteCall(client);
-    if (ret < 0) {
-        LOGE("DisConnectSupplicant:remote call failed!");
-        UnlockRpcClient(client);
+    if (RpcClientCall(client, "DisconnectSupplicant") != WIFI_IDL_OPT_OK) {
         return WIFI_IDL_OPT_FAILED;
     }
     int result = WIFI_IDL_OPT_FAILED;
@@ -127,10 +115,7 @@ WifiErrorNo RequestToSupplicant(unsigned char *buf, int32_t bufSize)
     WriteInt(context, bufSize);
     WriteUStr(context, buf, bufSize);
     WriteEnd(context);
-    int ret = RemoteCall(client);
-    if (ret < 0) {
-        LOGE("remote call failed!");
-        UnlockRpcClient(client);
+    if (RpcClientCall(client, "RequestToSupplicant") != WIFI_IDL_OPT_OK) {
         return WIFI_IDL_OPT_FAILED;
     }
     int result = WIFI_IDL_OPT_FAILED;
@@ -140,7 +125,7 @@ WifiErrorNo RequestToSupplicant(unsigned char *buf, int32_t bufSize)
     return result;
 }
 
-WifiErrorNo RigisterSupplicantEventCallback(ISupplicantEventCallback callback)
+WifiErrorNo RegisterSupplicantEventCallback(ISupplicantEventCallback callback)
 {
     int num = 0;
     if (callback.onScanNotify != NULL) {
@@ -153,25 +138,25 @@ WifiErrorNo RigisterSupplicantEventCallback(ISupplicantEventCallback callback)
     if (num == 0) { /* UnRegisterEventCallback */
         WriteFunc(context, "UnRegisterEventCallback");
         WriteInt(context, 1); /* ISupplicantEventCallback event num */
-        WriteInt(context, WIFI_IDL_CBK_CMD_SCAN_RESULT_NOTIFY);
+        WriteInt(context, WIFI_IDL_CBK_CMD_SCAN_INFO_NOTIFY);
     } else {
         WriteFunc(context, "RegisterEventCallback");
         WriteInt(context, num);
         if (callback.onScanNotify != NULL) {
-            WriteInt(context, WIFI_IDL_CBK_CMD_SCAN_RESULT_NOTIFY);
+            WriteInt(context, WIFI_IDL_CBK_CMD_SCAN_INFO_NOTIFY);
         }
     }
     WriteEnd(context);
-    int ret = RemoteCall(client);
-    if (ret < 0) {
-        LOGE("RigisterSupplicantEventCallback: remote call failed!");
-        UnlockRpcClient(client);
+    if (RpcClientCall(client, "RegisterSupplicantEventCallback") != WIFI_IDL_OPT_OK) {
+        if (num == 0) {
+            SetSupplicantEventCallback(callback);
+        }
         return WIFI_IDL_OPT_FAILED;
     }
     int result = WIFI_IDL_OPT_FAILED;
     ReadInt(context, &result);
-    if (result == WIFI_IDL_OPT_OK) {
-        g_wifiSupplicantEventCallback = callback;
+    if (result == WIFI_IDL_OPT_OK || num == 0) {
+        SetSupplicantEventCallback(callback);
     }
     ReadClientEnd(client);
     UnlockRpcClient(client);
@@ -187,10 +172,7 @@ WifiErrorNo Connect(int networkId)
     WriteFunc(context, "Connect");
     WriteInt(context, networkId);
     WriteEnd(context);
-    int ret = RemoteCall(client);
-    if (ret < 0) {
-        LOGE("Connect: remote call failed!");
-        UnlockRpcClient(client);
+    if (RpcClientCall(client, "Connect") != WIFI_IDL_OPT_OK) {
         return WIFI_IDL_OPT_FAILED;
     }
     int result = WIFI_IDL_OPT_FAILED;
@@ -208,10 +190,7 @@ WifiErrorNo Reconnect(void)
     WriteBegin(context, 0);
     WriteFunc(context, "Reconnect");
     WriteEnd(context);
-    int ret = RemoteCall(client);
-    if (ret < 0) {
-        LOGE("remote call failed!");
-        UnlockRpcClient(client);
+    if (RpcClientCall(client, "Reconnect") != WIFI_IDL_OPT_OK) {
         return WIFI_IDL_OPT_FAILED;
     }
     int result = WIFI_IDL_OPT_FAILED;
@@ -229,10 +208,7 @@ WifiErrorNo Reassociate(void)
     WriteBegin(context, 0);
     WriteFunc(context, "Reassociate");
     WriteEnd(context);
-    int ret = RemoteCall(client);
-    if (ret < 0) {
-        LOGE("remote call failed!");
-        UnlockRpcClient(client);
+    if (RpcClientCall(client, "Reassociate") != WIFI_IDL_OPT_OK) {
         return WIFI_IDL_OPT_FAILED;
     }
     int result = WIFI_IDL_OPT_FAILED;
@@ -250,10 +226,7 @@ WifiErrorNo Disconnect(void)
     WriteBegin(context, 0);
     WriteFunc(context, "Disconnect");
     WriteEnd(context);
-    int ret = RemoteCall(client);
-    if (ret < 0) {
-        LOGE("remote call failed!");
-        UnlockRpcClient(client);
+    if (RpcClientCall(client, "Disconnect") != WIFI_IDL_OPT_OK) {
         return WIFI_IDL_OPT_FAILED;
     }
     int result = WIFI_IDL_OPT_FAILED;
@@ -262,7 +235,8 @@ WifiErrorNo Disconnect(void)
     UnlockRpcClient(client);
     return result;
 }
-WifiErrorNo SetPowerSave(BOOL enable)
+
+WifiErrorNo SetPowerSave(int enable)
 {
     RpcClient *client = GetSupplicantRpcClient();
     LockRpcClient(client);
@@ -271,10 +245,7 @@ WifiErrorNo SetPowerSave(BOOL enable)
     WriteFunc(context, "SetPowerSave");
     WriteInt(context, (int)enable);
     WriteEnd(context);
-    int ret = RemoteCall(client);
-    if (ret < 0) {
-        LOGE("SetPowerSave:remote call failed!");
-        UnlockRpcClient(client);
+    if (RpcClientCall(client, "SetPowerSave") != WIFI_IDL_OPT_OK) {
         return WIFI_IDL_OPT_FAILED;
     }
     int result = WIFI_IDL_OPT_FAILED;
@@ -293,10 +264,7 @@ WifiErrorNo WpaSetCountryCode(const char *countryCode)
     WriteFunc(context, "WpaSetCountryCode");
     WriteStr(context, countryCode);
     WriteEnd(context);
-    int ret = RemoteCall(client);
-    if (ret < 0) {
-        LOGE("WpaSetCountryCode:remote call failed!");
-        UnlockRpcClient(client);
+    if (RpcClientCall(client, "WpaSetCountryCode") != WIFI_IDL_OPT_OK) {
         return WIFI_IDL_OPT_FAILED;
     }
     int result = WIFI_IDL_OPT_FAILED;
@@ -314,10 +282,7 @@ WifiErrorNo WpaGetCountryCode(char *countryCode, int codeSize)
     WriteBegin(context, 0);
     WriteFunc(context, "WpaGetCountryCode");
     WriteEnd(context);
-    int ret = RemoteCall(client);
-    if (ret < 0) {
-        LOGE("WpaSetCountryCode:remote call failed!");
-        UnlockRpcClient(client);
+    if (RpcClientCall(client, "WpaGetCountryCode") != WIFI_IDL_OPT_OK) {
         return WIFI_IDL_OPT_FAILED;
     }
     int result = WIFI_IDL_OPT_FAILED;

@@ -25,8 +25,8 @@ namespace OHOS {
 namespace Wifi {
 WifiInternalEventDispatcher &WifiInternalEventDispatcher::GetInstance()
 {
-    static WifiInternalEventDispatcher gWifiInternalEventDispatcher;
-    return gWifiInternalEventDispatcher;
+    static WifiInternalEventDispatcher gWifiEventBroadcast;
+    return gWifiEventBroadcast;
 }
 
 WifiInternalEventDispatcher::WifiInternalEventDispatcher() : mRunFlag(true)
@@ -190,6 +190,54 @@ bool WifiInternalEventDispatcher::HasHotspotRemote(const sptr<IRemoteObject> &re
         }
     }
     return false;
+}
+
+int WifiInternalEventDispatcher::SetSingleP2pCallback(const sptr<IWifiP2pCallback> &callback)
+{
+    mP2pSingleCallback = callback;
+    return 0;
+}
+
+sptr<IWifiP2pCallback> WifiInternalEventDispatcher::GetSingleP2pCallback() const
+{
+    return mP2pSingleCallback;
+}
+
+bool WifiInternalEventDispatcher::HasP2pRemote(const sptr<IRemoteObject> &remote)
+{
+    std::unique_lock<std::mutex> lock(mP2pCallbackMutex);
+    if (remote != nullptr) {
+        if (mP2pCallbacks.find(remote) != mP2pCallbacks.end()) {
+            return true;
+        }
+    }
+    return false;
+}
+
+int WifiInternalEventDispatcher::AddP2pCallback(
+    const sptr<IRemoteObject> &remote, const sptr<IWifiP2pCallback> &callback)
+{
+    WIFI_LOGD("WifiInternalEventDispatcher::AddP2pCallback!");
+    if (remote == nullptr || callback == nullptr) {
+        WIFI_LOGE("remote object is null!");
+        return 1;
+    }
+    std::unique_lock<std::mutex> lock(mP2pCallbackMutex);
+    mP2pCallbacks[remote] = callback;
+    return 0;
+}
+
+int WifiInternalEventDispatcher::RemoveP2pCallback(const sptr<IRemoteObject> &remote)
+{
+    if (remote != nullptr) {
+        std::unique_lock<std::mutex> lock(mP2pCallbackMutex);
+        auto iter = mP2pCallbacks.find(remote);
+        if (iter != mP2pCallbacks.end()) {
+            mP2pCallbacks.erase(iter);
+            WIFI_LOGD("WifiInternalEventDispatcher::RemoveP2pCallback!");
+        }
+    }
+    return 0;
 }
 
 int WifiInternalEventDispatcher::AddBroadCastMsg(const WifiEventCallbackMsg &msg)
@@ -391,6 +439,66 @@ void WifiInternalEventDispatcher::DealHotspotCallbackMsg(
     return;
 }
 
+void WifiInternalEventDispatcher::InvokeP2pCallbacks(const WifiEventCallbackMsg &msg)
+{
+    P2pCallbackMapType callbacks = mP2pCallbacks;
+    P2pCallbackMapType::iterator itr;
+    for (itr = callbacks.begin(); itr != callbacks.end(); itr++) {
+        auto callback = itr->second;
+        if (callback != nullptr) {
+            SendP2pCallbackMsg(callback, msg);
+        }
+    }
+}
+
+void WifiInternalEventDispatcher::SendP2pCallbackMsg(sptr<IWifiP2pCallback> &callback, const WifiEventCallbackMsg &msg)
+{
+    if (callback == nullptr) {
+        return;
+    }
+    switch (msg.msgCode) {
+        case WIFI_CBK_MSG_P2P_STATE_CHANGE:
+            callback->OnP2pStateChanged(msg.msgData);
+            break;
+        case WIFI_CBK_MSG_PERSISTENT_GROUPS_CHANGE:
+            callback->OnP2pPersistentGroupsChanged();
+            break;
+        case WIFI_CBK_MSG_THIS_DEVICE_CHANGE:
+            callback->OnP2pThisDeviceChanged(msg.p2pDevice);
+            break;
+        case WIFI_CBK_MSG_PEER_CHANGE:
+            callback->OnP2pPeersChanged(msg.device);
+            break;
+        case WIFI_CBK_MSG_SERVICE_CHANGE:
+            callback->OnP2pServicesChanged(msg.serviceInfo);
+            break;
+        case WIFI_CBK_MSG_CONNECT_CHANGE:
+            callback->OnP2pConnectionChanged(msg.p2pInfo);
+            break;
+        case WIFI_CBK_MSG_DISCOVERY_CHANGE:
+            callback->OnP2pDiscoveryChanged(msg.msgData);
+            break;
+        case WIFI_CBK_MSG_P2P_ACTION_RESULT:
+            callback->OnP2pActionResult(msg.p2pAction, static_cast<ErrCode>(msg.msgData));
+            break;
+        default:
+            WIFI_LOGI("UnKnown msgcode %{public}d", msg.msgCode);
+            break;
+    }
+    return;
+}
+
+void WifiInternalEventDispatcher::DealP2pCallbackMsg(
+    WifiInternalEventDispatcher &instance, const WifiEventCallbackMsg &msg)
+{
+    auto callback = instance.GetSingleP2pCallback();
+    if (callback != nullptr) {
+        SendP2pCallbackMsg(callback, msg);
+    }
+    instance.InvokeP2pCallbacks(msg);
+    return;
+}
+
 void WifiInternalEventDispatcher::PublishConnectionStateChangedEvent(int state, const WifiLinkedInfo &info)
 {
     std::string eventData = "Other";
@@ -476,6 +584,8 @@ void WifiInternalEventDispatcher::Run(WifiInternalEventDispatcher &instance)
         } else if (msg.msgCode >= WIFI_CBK_MSG_HOTSPOT_STATE_CHANGE &&
                    msg.msgCode <= WIFI_CBK_MSG_HOTSPOT_STATE_LEAVE) {
             DealHotspotCallbackMsg(instance, msg);
+        } else if (msg.msgCode >= WIFI_CBK_MSG_P2P_STATE_CHANGE && msg.msgCode <= WIFI_CBK_MSG_P2P_ACTION_RESULT) {
+            DealP2pCallbackMsg(instance, msg);
         } else {
             WIFI_LOGI("UnKnown msgcode %{public}d", msg.msgCode);
         }

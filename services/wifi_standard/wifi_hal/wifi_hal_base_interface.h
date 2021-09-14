@@ -24,23 +24,6 @@ extern "C" {
 #endif
 
 /**
- * @Description Load the Wi-Fi driver. The client converts WifiEventCallback
- *              to the corresponding event array.
- *
- * @param events - Registers the Wi-Fi loading event callback function.
- * @param size - Event callback array size.
- * @return WifiErrorNo
- */
-WifiErrorNo LoadDriver(const int *events, int size);
-
-/**
- * @Description Uninstalling the Wi-Fi Driver.
- *
- * @return WifiErrorNo
- */
-WifiErrorNo UnloadDriver(void);
-
-/**
  * @Description Obtains the name of a Wi-Fi network device.
  *
  * @param ifname - Ifname name.

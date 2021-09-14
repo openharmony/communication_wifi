@@ -16,14 +16,14 @@
 #ifndef OHOS_WIFI_HAL_STA_INTERFACE_H
 #define OHOS_WIFI_HAL_STA_INTERFACE_H
 
-#include "wifi_hal_define.h"
-#include "wifi_hal_struct.h"
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 #include <dirent.h>
 #include <stdio.h>
 #include <sys/types.h>
+#include "wifi_hal_define.h"
+#include "wifi_hal_struct.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -103,7 +103,7 @@ WifiErrorNo StartScan(const ScanSettings *settings);
  *               scan result array.
  * @return WifiErrorNo
  */
-WifiErrorNo GetScanResults(ScanResult *results, int *size);
+WifiErrorNo GetScanInfos(ScanInfo *results, int *size);
 
 /**
  * @Description Start PNO scanning.
@@ -155,7 +155,7 @@ WifiErrorNo Disconnect(void);
  * @param enable
  * @return WifiErrorNo
  */
-WifiErrorNo SetPowerSave(BOOL enable);
+WifiErrorNo SetPowerSave(int enable);
 
 /**
  * @Description Obtaining the STA Support Capability.
@@ -279,7 +279,7 @@ WifiErrorNo DisableNetwork(int networkId);
  * @param size - Size of the network configuration array to be set.
  * @return WifiErrorNo
  */
-WifiErrorNo SetNetwork(int networkId, const NetWorkConfig *confs, int size);
+WifiErrorNo SetNetwork(int networkId, const HidlSetNetworkConfig *confs, int size);
 
 /**
  * @Description Save the network.
@@ -326,10 +326,10 @@ WifiErrorNo GetRoamingCapabilities(WifiRoamCapability *capability);
  * @param blocklist - Ssid list.
  * @param blocksize - Block size.
  * @param trustlist - Ssid list.
- * @param size - Trust size.
+ * @param trustsize - trust size.
  * @return WifiErrorNo
  */
-WifiErrorNo SetRoamConfig(char **blocklist, int blocksize, char **trustlist, int size);
+WifiErrorNo SetRoamConfig(char **blocklist, int blocksize, char **trustlist, int trustsize);
 
 /**
  * @Description Set country code.
@@ -354,7 +354,7 @@ WifiErrorNo WpaGetCountryCode(char *countryCode, int codeSize);
  * @param conf
  * @return WifiErrorNo
  */
-WifiErrorNo WpaGetNetWork(GetNetWorkConfig *conf);
+WifiErrorNo WpaGetNetWork(HidlGetNetworkConfig *conf);
 
 /**
  * @Description Wpa_s disable/enable(0/1) automatic reconnection.
@@ -363,13 +363,6 @@ WifiErrorNo WpaGetNetWork(GetNetWorkConfig *conf);
  * @return WifiErrorNo
  */
 WifiErrorNo WpaAutoConnect(int enable);
-
-/**
- * @Description Force wpa_supplicant to re-read its configuration file.
- *
- * @return WifiErrorNo
- */
-WifiErrorNo WpaReconfigure(void);
 
 /**
  * @Description Clearing the wpa Blocklist.
@@ -381,12 +374,21 @@ WifiErrorNo WpaBlocklistClear(void);
 /**
  * @Description Obtaining the Network List.
  *
- * @param networkList - Array pointer of the NetworkList structure type.
- * @param size - Number of networklists that can be stored in the memory to which
- *               the NetworkList pointer points.
+ * @param HidlNetworkInfo - Array pointer of the network info structure type.
+ * @param size - Number of infos that can be stored in the memory to which
+ *               the network info pointer points.
  * @return WifiErrorNo
  */
-WifiErrorNo GetNetworkList(NetworkList *networkList, int *size);
+WifiErrorNo GetNetworkList(HidlNetworkInfo *infos, int *size);
+
+/**
+ * @Description Get current connect signal info, rssi, linkspeed, noise ...
+ *
+ * @param endBssid - peer end bssid, i.e. linked ap's bssid
+ * @param info - signal info
+ * @return WifiErrorNo
+ */
+WifiErrorNo GetConnectSignalInfo(const char *endBssid, HidlWpaSignalInfo *info);
 #ifdef __cplusplus
 }
 #endif

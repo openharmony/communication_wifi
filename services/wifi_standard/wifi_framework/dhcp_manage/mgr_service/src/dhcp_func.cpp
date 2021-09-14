@@ -29,25 +29,7 @@ DEFINE_WIFILOG_DHCP_LABEL("DhcpFunc");
 
 namespace OHOS {
 namespace Wifi {
-std::string DhcpFunc::IpToDot(unsigned int nIp)
-{
-    in_addr addr;
-    addr.s_addr = htonl(nIp);
-    std::string strip = inet_ntoa(addr);
-    return strip;
-}
-
-unsigned int DhcpFunc::IPtoInt(const std::string& strIp)
-{
-    in_addr addr;
-    unsigned int intIp = 0;
-    if (inet_aton(strIp.c_str(), &addr) == 1) {
-        intIp = ntohl(addr.s_addr);
-    }
-    return intIp;
-}
-
-bool DhcpFunc::Ip4StrConToInt(const std::string& strIp, uint32_t& uIp)
+bool DhcpFunc::Ip4StrConToInt(const std::string& strIp, uint32_t& uIp, bool bHost)
 {
     if (strIp.empty()) {
         WIFI_LOGE("Ip4StrConToInt error, strIp is empty()!");
@@ -66,23 +48,26 @@ bool DhcpFunc::Ip4StrConToInt(const std::string& strIp, uint32_t& uIp)
         return false;
     }
 
-    uIp = ntohl(addr4.s_addr);
-    WIFI_LOGI("Ip4StrConToInt strIp:%{private}s -> uIp:%{private}u.", strIp.c_str(), uIp);
+    if (bHost) {
+        uIp = ntohl(addr4.s_addr);
+    } else {
+        uIp = addr4.s_addr;
+    }
 
     return true;
 }
 
-std::string DhcpFunc::Ip4IntConToStr(uint32_t uIp)
+std::string DhcpFunc::Ip4IntConToStr(uint32_t uIp, bool bHost)
 {
-    if (uIp == 0) {
-        WIFI_LOGE("Ip4IntConToStr uIp is 0!");
-        return "";
+    char bufIp4[INET_ADDRSTRLEN] = {0};
+    struct in_addr addr4;
+    if (bHost) {
+        addr4.s_addr = htonl(uIp);
+    } else {
+        addr4.s_addr = uIp;
     }
 
     std::string strIp = "";
-    char bufIp4[INET_ADDRSTRLEN] = {0};
-    struct in_addr addr4;
-    addr4.s_addr = htonl(uIp);
     if (inet_ntop(AF_INET, &addr4, bufIp4, INET_ADDRSTRLEN) == NULL) {
         WIFI_LOGE("Ip4IntConToStr uIp:%{private}u failed, inet_ntop NULL!", uIp);
     } else {
@@ -184,42 +169,50 @@ bool DhcpFunc::CheckIpStr(const std::string& strIp)
     return true;
 }
 
-int DhcpFunc::GetLocalIp(const std::string ethInf, std::string& localIp)
+int DhcpFunc::GetLocalIp(const std::string strInf, std::string& strIp, std::string& strMask)
 {
-    int sd;
-    struct sockaddr_in sin;
-    struct ifreq ifr;
-
-    sd = socket(AF_INET, SOCK_DGRAM, 0);
-    if (-1 == sd) {
-        WIFI_LOGE("GetLocalIp socket ethInf:%{public}s,strerror:%{public}s!", ethInf.c_str(), strerror(errno));
-        return -1;
+    if (strInf.empty()) {
+        WIFI_LOGE("GetLocalIp param error, strInf is empty!");
+        return DHCP_OPT_ERROR;
     }
 
-    if (strncpy_s(ifr.ifr_name, IFNAMSIZ, ethInf.c_str(), IFNAMSIZ - 1) != EOK) {
-        return -1;
-    }
-    ifr.ifr_name[IFNAMSIZ - 1] = 0;
-
-    // if error: No such device
-    if (ioctl(sd, SIOCGIFADDR, &ifr) < 0) {
-        WIFI_LOGE("GetLocalIp ioctl ethInf:%{public}s,strerror:%{public}s!", ethInf.c_str(), strerror(errno));
-        close(sd);
-        return -1;
+    int fd;
+    if ((fd = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
+        WIFI_LOGE("GetLocalIp strInf:%{public}s failed, socket err:%{public}s!", strInf.c_str(), strerror(errno));
+        return DHCP_OPT_FAILED;
     }
 
-    if (memcpy_s(&sin, sizeof(sin), &ifr.ifr_addr, sizeof(sin)) != EOK) {
-        return -1;
+    struct ifreq iface;
+    if (memset_s(&iface, sizeof(iface), 0, sizeof(iface)) != EOK) {
+        close(fd);
+        return DHCP_OPT_FAILED;
     }
-    char ip[IP_SIZE] = { 0 };
-    if (snprintf_s(ip, IP_SIZE, IP_SIZE - 1, "%s", inet_ntoa(sin.sin_addr)) < 0) {
-        WIFI_LOGE("GetLocalIp snprintf_s ethInf:%{public}s,strerror:%{public}s!", ethInf.c_str(), strerror(errno));
-        close(sd);
-        return -1;
+    if (strncpy_s(iface.ifr_name, IFNAMSIZ, strInf.c_str(), IFNAMSIZ - 1) != EOK) {
+        close(fd);
+        return DHCP_OPT_FAILED;
     }
-    localIp = ip;
-    close(sd);
-    return 0;
+    iface.ifr_name[IFNAMSIZ - 1] = 0;
+
+    /* inet addr */
+    if (ioctl(fd, SIOCGIFADDR, &iface) < 0) {
+        WIFI_LOGE("GetLocalIp() %{public}s failed, SIOCGIFADDR err:%{public}s!", strInf.c_str(), strerror(errno));
+        close(fd);
+        return DHCP_OPT_FAILED;
+    }
+    struct sockaddr_in *pSockIn = (struct sockaddr_in *)&iface.ifr_addr;
+    strIp = inet_ntoa(pSockIn->sin_addr);
+
+    /* netmask addr */
+    if (ioctl(fd, SIOCGIFNETMASK, &iface) < 0) {
+        WIFI_LOGE("GetLocalIp() %{public}s failed, SIOCGIFNETMASK err:%{public}s!", strInf.c_str(), strerror(errno));
+        close(fd);
+        return DHCP_OPT_FAILED;
+    }
+    pSockIn = (struct sockaddr_in *)&iface.ifr_addr;
+    strMask = inet_ntoa(pSockIn->sin_addr);
+
+    close(fd);
+    return DHCP_OPT_SUCCESS;
 }
 
 int DhcpFunc::GetLocalMac(const std::string ethInf, std::string& ethMac)
@@ -262,6 +255,44 @@ int DhcpFunc::GetLocalMac(const std::string ethInf, std::string& ethMac)
     ethMac = mac;
     close(sd);
     return 0;
+}
+
+int DhcpFunc::CheckRangeNetwork(const std::string strInf, const std::string strBegin, const std::string strEnd)
+{
+    if (strInf.empty() || strBegin.empty() || strEnd.empty()) {
+        WIFI_LOGE("CheckRangeNetwork param error, strInf or strBegin or strEnd is empty!");
+        return DHCP_OPT_ERROR;
+    }
+
+    std::string strIp, strMask;
+    if (GetLocalIp(strInf, strIp, strMask) != DHCP_OPT_SUCCESS) {
+        WIFI_LOGE("CheckRangeNetwork get %{public}s local ip failed", strInf.c_str());
+        return DHCP_OPT_FAILED;
+    }
+
+    uint32_t uIp, uMask, uBegin, uEnd;
+    if (!Ip4StrConToInt(strIp, uIp, false) || !Ip4StrConToInt(strMask, uMask, false) ||
+        !Ip4StrConToInt(strBegin, uBegin, false) || !Ip4StrConToInt(strEnd, uEnd, false)) {
+        WIFI_LOGE("CheckRangeNetwork %{public}s Ip4StrConToInt failed", strInf.c_str());
+        return DHCP_OPT_FAILED;
+    }
+
+    if (!CheckSameNetwork(uIp, uBegin, uMask)) {
+        WIFI_LOGE("Check %{public}s %{public}s %{public}s failed", strInf.c_str(), strIp.c_str(), strBegin.c_str());
+        return DHCP_OPT_FAILED;
+    }
+    if (!CheckSameNetwork(uIp, uEnd, uMask)) {
+        WIFI_LOGE("Check end %{public}s %{public}s %{public}s failed", strInf.c_str(), strIp.c_str(), strEnd.c_str());
+        return DHCP_OPT_FAILED;
+    }
+    return DHCP_OPT_SUCCESS;
+}
+
+bool DhcpFunc::CheckSameNetwork(const uint32_t srcIp, const uint32_t dstIp, const uint32_t maskIp)
+{
+    uint32_t srcNet = srcIp & maskIp;
+    uint32_t dstNet = dstIp & maskIp;
+    return (srcNet == dstNet);
 }
 
 bool DhcpFunc::IsExistFile(const std::string& filename)
@@ -460,12 +491,12 @@ int DhcpFunc::InitPidfile(const std::string& piddir, const std::string& pidfile)
     }
     ssize_t bytes;
     if ((bytes = write(fd, buf, strlen(buf))) <= 0) {
-        WIFI_LOGE("InitPidfile() failed, write pidfile:%{public}s error:%{public}s, bytes:%{public}zu!",
+        WIFI_LOGE("InitPidfile() failed, write pidfile:%{public}s error:%{public}s, bytes:%{public}zd!",
             pidfile.c_str(), strerror(errno), bytes);
         close(fd);
         return DHCP_OPT_FAILED;
     }
-    WIFI_LOGI("InitPidfile() pid:%{public}s write %{public}s, bytes:%{public}zu!", buf, pidfile.c_str(), bytes);
+    WIFI_LOGI("InitPidfile() pid:%{public}s write %{public}s, bytes:%{public}zd!", buf, pidfile.c_str(), bytes);
     close(fd);
 
     if (chdir(piddir.c_str()) != 0) {
@@ -503,11 +534,11 @@ pid_t DhcpFunc::GetPID(const std::string& pidfile)
     char buf[PID_MAX_LEN] = {0};
     ssize_t bytes;
     if ((bytes = read(fd, buf, sb.st_size)) < 0) {
-        WIFI_LOGE("GetPID() failed, read pidfile:%{public}s error, bytes:%{public}zu!", pidfile.c_str(), bytes);
+        WIFI_LOGE("GetPID() failed, read pidfile:%{public}s error, bytes:%{public}zd!", pidfile.c_str(), bytes);
         close(fd);
         return -1;
     }
-    WIFI_LOGI("GetPID() read pidfile:%{public}s, buf:%{public}s, bytes:%{public}zu.", pidfile.c_str(), buf, bytes);
+    WIFI_LOGI("GetPID() read pidfile:%{public}s, buf:%{public}s, bytes:%{public}zd.", pidfile.c_str(), buf, bytes);
     close(fd);
 
     return atoi(buf);

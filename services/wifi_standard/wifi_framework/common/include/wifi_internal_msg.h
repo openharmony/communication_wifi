@@ -17,29 +17,35 @@
 #define OHOS_WIFI_INTERNAL_MSG_H
 
 #include "wifi_msg.h"
+#include "wifi_p2p_msg.h"
 
 namespace OHOS {
 namespace Wifi {
-#define PRIORITY_1 1
-#define PRIORITY_2 2
-#define PRIORITY_3 3
-#define SCORE_SLOPE 5
-#define INIT_SCORE 10
-#define SAME_BSSID_SCORE 8
-#define SAME_NETWORK_SCORE 5
-#define FREQUENCY_5_GHZ_SCORE 10
-#define LAST_SELECTION_SCORE 120
-#define SECURITY_SCORE 20
-#define MIN_RSSI_24GHZ (-83)
-#define MIN_RSSI_5GHZ (-80)
-#define RSSI_LEVEL_1_2G (-88)
-#define RSSI_LEVEL_2_2G (-82)
-#define RSSI_LEVEL_3_2G (-75)
-#define RSSI_LEVEL_4_2G (-65)
-#define RSSI_LEVEL_1_5G (-85)
-#define RSSI_LEVEL_2_5G (-79)
-#define RSSI_LEVEL_3_5G (-72)
-#define RSSI_LEVEL_4_5G (-65)
+constexpr int REOPEN_STA_INTERVAL = 500; /* when reopen sta, need over last close sta time then interval */
+constexpr int DEVICE_CONFIG_INDEX_SSID = 0;
+constexpr int DEVICE_CONFIG_INDEX_BSSID = 1;
+constexpr int STATE_OPEN = 1;
+constexpr int STATE_CLOSE = 2;
+constexpr int PRIORITY_1 = 1;
+constexpr int PRIORITY_2 = 2;
+constexpr int PRIORITY_3 = 3;
+constexpr int SCORE_SLOPE = 5;
+constexpr int INIT_SCORE = 10;
+constexpr int SAME_BSSID_SCORE = 8;
+constexpr int SAME_NETWORK_SCORE = 5;
+constexpr int FREQUENCY_5_GHZ_SCORE = 10;
+constexpr int LAST_SELECTION_SCORE = 120;
+constexpr int SECURITY_SCORE = 20;
+constexpr int MIN_RSSI_24GHZ = -80;
+constexpr int MIN_RSSI_5GHZ = -77;
+constexpr int RSSI_LEVEL_1_2G = -88;
+constexpr int RSSI_LEVEL_2_2G = -82;
+constexpr int RSSI_LEVEL_3_2G = -75;
+constexpr int RSSI_LEVEL_4_2G = -65;
+constexpr int RSSI_LEVEL_1_5G = -85;
+constexpr int RSSI_LEVEL_2_5G = -79;
+constexpr int RSSI_LEVEL_3_5G = -72;
+constexpr int RSSI_LEVEL_4_5G = -65;
 
 enum class WifiOprMidState { CLOSED = 0, OPENING = 1, RUNNING = 2, CLOSING = 3, UNKNOWN };
 
@@ -83,7 +89,7 @@ enum class OperateResState {
     DISCONNECT_DISCONNECTED,           /* disconnect succeed */
     CONNECT_PASSWORD_WRONG,            /* wrong password */
     CONNECT_OBTAINING_IP,              /* obtain ip */
-    CONNECT_OBTAINING_IP_FAILED,       /* obtain ip FAILED*/
+    CONNECT_OBTAINING_IP_FAILED,       /* obtain ip FAILED */
     CONNECT_ASSOCIATING,
     CONNECT_ASSOCIATED,
 };
@@ -201,7 +207,11 @@ struct WifiEventCallbackMsg {
     std::string pinCode; /* wps pin mode code */
     WifiLinkedInfo linkInfo;
     StationInfo staInfo;
-
+    std::vector<WifiP2pDevice> device;
+    std::vector<WifiP2pServiceInfo> serviceInfo;
+    WifiP2pInfo p2pInfo;
+    WifiP2pDevice p2pDevice;
+    P2pActionCallback p2pAction;
     WifiEventCallbackMsg()
     {
         msgCode = 0;

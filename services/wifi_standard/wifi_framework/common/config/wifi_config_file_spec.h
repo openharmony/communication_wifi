@@ -20,7 +20,7 @@
 #include <string>
 #include <vector>
 #include "wifi_internal_msg.h"
-
+#include "wifi_p2p_msg.h"
 namespace OHOS {
 namespace Wifi {
 /* ----------------- template function begin ----------------------- */
@@ -170,6 +170,46 @@ template <>
 std::string OutTClassString<HotspotConfig>(HotspotConfig &item);
 
 /**
+ * @Description Clear and init P2pVendorConfig
+ *
+ * @tparam
+ * @param item - P2pVendorConfig &item
+ */
+template<>
+void ClearTClass<P2pVendorConfig>(P2pVendorConfig &item);
+
+/**
+ * @Description Set P2pVendorConfig item data
+ *
+ * @tparam
+ * @param item - P2pVendorConfig &item
+ * @param key - P2pVendorConfig struct member name
+ * @param value - the P2pVendorConfig item member value
+ */
+template<>
+void SetTClassKeyValue<P2pVendorConfig>(P2pVendorConfig &item, const std::string &key, const std::string &value);
+
+/**
+ * @Description Output P2pVendorConfig class name
+ *
+ * @tparam
+ * @param item - P2pVendorConfig &item
+ * @return std::string - Class name
+ */
+template<>
+std::string GetTClassName<P2pVendorConfig>();
+
+/**
+ * @Description Output the P2pVendorConfig item, format: item's member = the member value
+ *
+ * @tparam
+ * @param item - P2pVendorConfig &item
+ * @return std::string - output total member=value string about the P2pVendorConfig item
+ */
+template<>
+std::string OutTClassString<P2pVendorConfig>(P2pVendorConfig &item);
+
+/**
  * @Description Clear and init StationInfo
  *
  * @tparam
@@ -248,6 +288,46 @@ std::string GetTClassName<WifiConfig>();
  */
 template <>
 std::string OutTClassString<WifiConfig>(WifiConfig &item);
+
+/**
+ * @Description Clear and init WifiP2pGroupInfo
+ *
+ * @tparam
+ * @param item - WifiP2pGroupInfo item
+ */
+template<>
+void ClearTClass<WifiP2pGroupInfo>(WifiP2pGroupInfo &item);
+
+/**
+ * @Description Set WifiP2pGroupInfo item data
+ *
+ * @tparam
+ * @param item - WifiP2pGroupInfo &item
+ * @param key - WifiP2pGroupInfo struct member name
+ * @param value - the WifiP2pGroupInfo item member value
+ */
+template<>
+void SetTClassKeyValue<WifiP2pGroupInfo>(WifiP2pGroupInfo &item, const std::string &key, const std::string &value);
+
+/**
+ * @Description Output WifiP2pGroupInfo class name
+ *
+ * @tparam
+ * @param item - WifiP2pGroupInfo &item
+ * @return std::string - Class name
+ */
+template<>
+std::string GetTClassName<WifiP2pGroupInfo>();
+
+/**
+ * @Description Output the WifiP2pGroupInfo item, format: item's member = the member value
+ *
+ * @tparam
+ * @param item - WifiP2pGroupInfo &item
+ * @return std::string - output total member=value string about the WifiP2pGroupInfo item
+ */
+template<>
+std::string OutTClassString<WifiP2pGroupInfo>(WifiP2pGroupInfo &item);
 /* ----------template function specialization declare end----------- */
 }  // namespace Wifi
 }  // namespace OHOS

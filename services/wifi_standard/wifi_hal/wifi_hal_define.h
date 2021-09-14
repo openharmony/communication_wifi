@@ -24,15 +24,17 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-typedef char BOOL;
-#define TRUE 1
-#define FALSE 0
-
-#define WIFI_COMMON_MAXLEN 512
-#define WIFI_COUNTRY_CODE_MAXLEN 32
+#define WIFI_COUNTRY_CODE_MAXLEN 2
 #define WIFI_IFACE_NAME_MAXLEN 32
-#define WIFI_FUTURE_MAXLEN 128
+#define WIFI_P2P_WPS_NAME_LENGTH 128
+#define WIFI_P2P_WPS_METHODS_LENGTH 256
+#define WIFI_P2P_WFD_DEVICE_CONF_LENGTH 256
+#define WIFI_P2P_SERVE_INFO_LENGTH 256
+#define WIFI_P2P_SERVE_DISCOVER_MSG_LENGTH 256
+#define WIFI_P2P_SERVER_DISCOVERY_SEQUENCE_LENGTH 64
+#define WIFI_P2P_GROUP_IFNAME_LENGTH 128
+#define WIFI_P2P_SERVER_NAME_LENGTH 256
+#define WIFI_NETWORK_PSK_MAXLEN 64
 
 typedef enum WifiErrorNo {
     WIFI_HAL_SUCCESS = 0,                /* Success. */
@@ -60,35 +62,62 @@ typedef enum WifiErrorNo {
     WIFI_HAL_VENDOR_OUT_OF_MEMORY,
     WIFI_HAL_VENDOR_BUSY,
     WIFI_HAL_INVALID_PARAM,
+    WIFI_HAL_GET_P2P_GROUP_INFACE_FAILED,
 } WifiErrorNo;
 
 /* ID of the callback event for registering the Hal service. */
 typedef enum WifiHalEvent {
     WIFI_FAILURE_EVENT = 100,                /* Driver loading/unloading failure. */
-    WIFI_START_EVENT = 101,                  /* The driver has been loaded. */
-    WIFI_STOP_EVENT = 102,                   /* Driver uninstalled. */
-    WIFI_ADD_IFACE_EVENT = 103,              /* The network device interface has been added. */
-    WIFI_REMOVE_IFACE_EVENT = 104,           /* The network device interface has been deleted. */
-    WIFI_STA_JOIN_EVENT = 105,               /* STA connection notification in AP mode. */
-    WIFI_STA_LEAVE_EVENT = 106,              /* STA disconnection notification in AP mode. */
-    WIFI_SCAN_RESULT_NOTIFY_EVENT = 107,     /* Scan result notification. */
-    WIFI_CONNECT_CHANGED_NOTIFY_EVENT = 108, /* Connection status change notification. */
-    WIFI_AP_ENABLE_EVENT = 109,              /* AP enabling notification. */
-    WIFI_AP_DISABLE_EVENT = 110,             /* AP closure notification. */
-    WIFI_WPA_STATE_EVENT = 111,              /* WPA status change. */
-    WIFI_SSID_WRONG_KEY = 112,               /* Incorrect password. */
-    WIFI_WPS_OVERLAP = 113,                  /* wps pbc overlap */
-    WIFI_WPS_TIME_OUT = 114,                 /* wps connect time out */
+    WIFI_START_EVENT,                  /* The driver has been loaded. */
+    WIFI_STOP_EVENT,                   /* Driver uninstalled. */
+    WIFI_ADD_IFACE_EVENT,              /* The network device interface has been added. */
+    WIFI_REMOVE_IFACE_EVENT,           /* The network device interface has been deleted. */
+    WIFI_STA_JOIN_EVENT,               /* STA connection notification in AP mode. */
+    WIFI_STA_LEAVE_EVENT,              /* STA disconnection notification in AP mode. */
+    WIFI_SCAN_INFO_NOTIFY_EVENT,       /* Scan info notification. */
+    WIFI_CONNECT_CHANGED_NOTIFY_EVENT, /* Connection status change notification. */
+    WIFI_AP_ENABLE_EVENT,              /* AP enabling notification. */
+    WIFI_AP_DISABLE_EVENT,             /* AP closure notification. */
+    WIFI_WPA_STATE_EVENT,              /* WPA status change. */
+    WIFI_SSID_WRONG_KEY,               /* Incorrect password. */
+    WIFI_WPS_OVERLAP,                  /* wps pbc overlap */
+    WIFI_WPS_TIME_OUT,                 /* wps connect time out */
+    WIFI_P2P_SUP_CONNECTION_EVENT,     /* Connection result of the wpa_supplicant client */
+    SUP_CONN_FAILED_EVENT,               /* Wpa_supplicant client connection failure event */
+    P2P_DEVICE_FOUND_EVENT,              /* Device discovery event */
+    P2P_DEVICE_LOST_EVENT,               /* Device loss event */
+    P2P_GO_NEGOTIATION_REQUEST_EVENT,    /* Event of receiving a GO negotiation request */
+    P2P_GO_NEGOTIATION_SUCCESS_EVENT,    /* The GO negotiation is successful */
+    P2P_GO_NEGOTIATION_FAILURE_EVENT,    /* The GO negotiation fails */
+    P2P_INVITATION_RECEIVED_EVENT,       /* P2P invitation request event */
+    P2P_INVITATION_RESULT_EVENT,         /* P2P invitation result */
+    P2P_GROUP_FORMATION_SUCCESS_EVENT,   /* The group is created successfully */
+    P2P_GROUP_FORMATION_FAILURE_EVENT,   /* The group is created failure */
+    P2P_GROUP_STARTED_EVENT,             /* Group Start Event */
+    P2P_GROUP_REMOVED_EVENT,             /* Group removed event */
+    P2P_PROV_DISC_PBC_REQ_EVENT,         /* Provision Discovery request event */
+    P2P_PROV_DISC_PBC_RSP_EVENT,         /* Provision Discovery Response Event */
+    P2P_PROV_DISC_ENTER_PIN_EVENT,       /* Provision Discovery PIN input event */
+    P2P_PROV_DISC_SHOW_PIN_EVENT,        /* Provision Discovery Display PIN Event */
+    P2P_FIND_STOPPED_EVENT,              /* Device search stop event */
+    P2P_SERV_DISC_RESP_EVENT,            /* Service response event */
+    P2P_PROV_DISC_FAILURE_EVENT,         /* Provision Discovery failure event */
+    AP_STA_DISCONNECTED_EVENT,           /* STA Disconnected from AP */
+    AP_STA_CONNECTED_EVENT,              /* STA and AP connected event */
+    P2P_SERV_DISC_REQ_EVENT,             /* Service discovery request event */
     WIFI_HAL_MAX_EVENT,
 } WifiHalEvent;
 
-#define WIFI_BSSID_LENGTH 128
+#define WIFI_BSSID_LENGTH 18
+#define WIFI_NETWORK_FLAGS_LENGTH 64
 #define WIFI_SSID_LENGTH 132
-#define WIFI_SCAN_RESULT_CAPABILITY_LENGTH 256
-#define WIFI_NETWORK_CONFIG_VALUE_LENGTH 128
+#define WIFI_SCAN_INFO_CAPABILITY_LENGTH 256
+#define WIFI_NETWORK_CONFIG_NAME_LENGTH 64
+#define WIFI_NETWORK_CONFIG_VALUE_LENGTH 256
+#define WIFI_P2P_GROUP_CONFIG_VALUE_LENGTH 256
 #define WIFI_MAC_LENGTH 17
 #define WIFI_AP_PASSWORD_LENGTH 64
-#define WIFI_STATUS_ERROR_MSG_LENGTH 64
+#define WIFI_PIN_CODE_LENGTH 8
 
 /* Wifi network configuration parameter flag. */
 typedef enum DeviceConfigType {
@@ -121,14 +150,27 @@ typedef enum DeviceConfigType {
     DEVICE_CONFIG_END_POS,
 } DeviceConfigType;
 
+typedef enum P2pGroupConfigType {
+    GROUP_CONFIG_SSID = 0,
+    GROUP_CONFIG_BSSID,
+    GROUP_CONFIG_PSK,
+    GROUP_CONFIG_PROTO,
+    GROUP_CONFIG_KEY_MGMT,
+    GROUP_CONFIG_PAIRWISE,
+    GROUP_CONFIG_AUTH_ALG,
+    GROUP_CONFIG_MODE,
+    GROUP_CONFIG_DISABLED,
+    GROUP_CONFIG_END_POS,
+} P2pGroupConfigType;
+
 /* AP Band */
-typedef enum APBand {
+typedef enum ApBand {
     AP_NONE_BAND = 0, /* Unknown Band */
     AP_2GHZ_BAND = 1, /* 2.4GHz Band */
     AP_5GHZ_BAND = 2, /* 5GHz Band */
     AP_ANY_BAND = 3,  /* Dual-mode frequency band */
     AP_DFS_BAND = 4
-} APBand;
+} ApBand;
 
 /*  Encryption Mode */
 typedef enum KeyMgmt {
@@ -152,68 +194,7 @@ typedef enum KeyMgmt {
     OSEN = 5,
     FT_PSK = 6,
     FT_EAP = 7
-} keyMgmt;
-
-/* Supplicant Status Code */
-typedef enum SupplicantStatusCode {
-    /* * No errors. */
-    SUPPLICANT_SUCCESS,
-    /* * Unknown failure occurred. */
-    FAILURE_UNKNOWN,
-    /* * One of the incoming args is invalid. */
-    FAILURE_ARGS_INVALID,
-    /* * |ISupplicantIface| HIDL interface object is no longer valid. */
-    FAILURE_IFACE_INVALID,
-    /* * Iface with the provided name does not exist. */
-    FAILURE_IFACE_UNKNOWN,
-    /* * Iface with the provided name already exists. */
-    FAILURE_IFACE_EXISTS,
-    /* * Iface is disabled and cannot be used. */
-    FAILURE_IFACE_DISABLED,
-    /* * Iface is not currently disconnected, so cannot reconnect. */
-    FAILURE_IFACE_NOT_DISCONNECTED,
-    /* * |ISupplicantNetwork| HIDL interface object is no longer valid. */
-    FAILURE_NETWORK_INVALID,
-    /* * Network with the provided id does not exist. */
-    FAILURE_NETWORK_UNKNOWN
-} SupplicantStatusCode;
-
-/**
- * Enum values indicating the status of operation.
- */
-typedef enum WifiStatusCode {
-    /* * No errors. */
-    WIFI_STATUS_SUCCESS,
-    /* * Method invoked on an invalid |IWifiChip| object. */
-    ERROR_WIFI_CHIP_INVALID,
-    /* * Method invoked on an invalid |IWifiIface| object. */
-    ERROR_WIFI_IFACE_INVALID,
-    /* * Method invoked on an invalid |IWifiRttController| object. */
-    ERROR_WIFI_RTT_CONTROLLER_INVALID,
-    ERROR_NOT_SUPPORTED,
-    ERROR_NOT_AVAILABLE,
-    ERROR_NOT_STARTED,
-    ERROR_INVALID_ARGS,
-    ERROR_BUSY,
-    ERROR_UNKNOWN
-} WifiStatusCode;
-
-typedef enum WpaStates {
-    WPA_DISCONNECTED = 0,
-    WPA_INTERFACE_DISABLED = 1,
-    WPA_INACTIVE = 2,
-    WPA_SCANNING = 3,
-    WPA_AUTHENTICATING = 4,
-    WPA_ASSOCIATING = 5,
-    WPA_ASSOCIATED = 6,
-    WPA_4WAY_HANDSHAKE = 7,
-    WPA_GROUP_HANDSHAKE = 8,
-    WPA_COMPLETED = 9,
-    WPA_UNKNOWN = 10
-} WpaStates;
-
-/* Interface Mode */
-typedef enum WifiInterfaceMode { WIFI_CLIENT_MODE = 1, WIFI_AP_MODE = 2 } WifiInterfaceMode;
+} KeyMgmt;
 
 /* chip supported interface combination mode */
 typedef enum WifiInterfaceCombMode {
@@ -223,6 +204,14 @@ typedef enum WifiInterfaceCombMode {
     STA_NAN_MODE,
     AP_NAN_MODE,
 } WifiInterfaceCombMode;
+
+typedef enum HalWpsMethod {
+    HAL_WPS_METHOD_PBC,
+    HAL_WPS_METHOD_DISPLAY,
+    HAL_WPS_METHOD_KEYPAD,
+    HAL_WPS_METHOD_LABEL,
+    HAL_WPS_METHOD_INVALID
+} HalWpsMethod;
 
 #ifdef __cplusplus
 }

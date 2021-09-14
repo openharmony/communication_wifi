@@ -25,14 +25,14 @@ ohos_shared_library("wifi_sta_service") {
     "//foundation/communication/wifi/services/wifi_standard/wifi_framework/common/log/log_helper.c",
     "//foundation/communication/wifi/services/wifi_standard/wifi_framework/common/net_helper/http_request.cpp",
     "//foundation/communication/wifi/services/wifi_standard/wifi_framework/common/net_helper/ip_tools.cpp",
-    "sta_network_check.cpp",
-    "sta_network_speed.cpp",
+    "sta_auto_connect_service.cpp",
     "sta_interface.cpp",
     "sta_monitor.cpp",
+    "sta_network_check.cpp",
+    "sta_network_speed.cpp",
     "sta_saved_device_appraisal.cpp",
     "sta_service.cpp",
     "sta_state_machine.cpp",
-    "sta_auto_connect_service.cpp",
   ]
   include_dirs = [
     "//foundation/communication/wifi/services/wifi_standard/sdk/include",
@@ -43,6 +43,7 @@ ohos_shared_library("wifi_sta_service") {
     "//foundation/communication/wifi/services/wifi_standard/wifi_framework/common/include",
     "//foundation/communication/wifi/services/wifi_standard/wifi_framework/common/net_helper",
     "//foundation/communication/wifi/services/wifi_standard/wifi_framework/common/log",
+    "//foundation/communication/wifi/services/wifi_standard/wifi_framework/common/utils",
     "//foundation/communication/wifi/services/wifi_standard/wifi_framework/common/config",
     "//foundation/communication/wifi/services/wifi_standard/wifi_framework/wifi_manage/common",
     "//foundation/communication/wifi/services/wifi_standard/wifi_framework/wifi_manage/wifi_scan",
@@ -72,9 +73,9 @@ ohos_shared_library("wifi_sta_service") {
   ]
 
   deps = [
+    "//foundation/communication/wifi/services/wifi_standard/wifi_framework/dhcp_manage/mgr_service:dhcp_manager_service",
     "//foundation/communication/wifi/services/wifi_standard/wifi_framework/wifi_manage:wifi_manager_service",
     "//foundation/communication/wifi/services/wifi_standard/wifi_framework/wifi_manage/idl_client:wifi_idl_client",
-    "//foundation/communication/wifi/services/wifi_standard/wifi_framework/dhcp_manage/mgr_service:dhcp_manager_service",
     "//utils/native/base:utils",
   ]
 

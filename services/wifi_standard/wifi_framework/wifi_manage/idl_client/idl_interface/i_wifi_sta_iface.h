@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_IDL_IWIFISTAIFACE_H
-#define OHOS_IDL_IWIFISTAIFACE_H
+#ifndef OHOS_IDL_IWIFI_STA_IFACE_H
+#define OHOS_IDL_IWIFI_STA_IFACE_H
 
 #include "wifi_error_no.h"
 #include "i_wifi_event_callback.h"
@@ -161,7 +161,7 @@ WifiErrorNo DisableNetwork(int networkId);
  * @param size
  * @return WifiErrorNo
  */
-WifiErrorNo SetNetwork(int networkId, NetWorkConfig *confs, int size);
+WifiErrorNo SetNetwork(int networkId, HidlSetNetworkConfig *confs, int size);
 
 /**
  * @Description WpaGetNetwork Info.
@@ -169,7 +169,7 @@ WifiErrorNo SetNetwork(int networkId, NetWorkConfig *confs, int size);
  * @param confs
  * @return WifiErrorNo
  */
-WifiErrorNo WpaGetNetwork(GetWpaNetWorkConfig *confs);
+WifiErrorNo WpaGetNetwork(HidlGetNetworkConfig *confs);
 
 /**
  * @Description Save the network.
@@ -187,15 +187,6 @@ WifiErrorNo SaveNetworkConfig(void);
 WifiErrorNo StartScan(const ScanSettings *settings);
 
 /**
- * @Description Obtain the scanning result.
- *
- * @param results
- * @param size
- * @return WifiErrorNo
- */
-WifiErrorNo GetScanResults(ScanResult *results, int *size);
-
-/**
  * @Description Obtain the scanning result, the caller needs to release the return
  *              pointer if it is not NULL
  *
@@ -203,7 +194,7 @@ WifiErrorNo GetScanResults(ScanResult *results, int *size);
  * @param size
  * @return ScanResult pointer
  */
-ScanResult* GetScanInfos(int *size);
+ScanInfo* GetScanInfos(int *size);
 
 /**
  * @Description Initiate PNO scanning.
@@ -266,10 +257,10 @@ WifiErrorNo GetRoamingCapabilities(WifiRoamCapability *capability);
  * @param blocklist
  * @param blocksize
  * @param trustlist
- * @param size
+ * @param trustsize
  * @return WifiErrorNo
  */
-WifiErrorNo SetRoamConfig(char **blocklist, int blocksize, char **trustlist, int size);
+WifiErrorNo SetRoamConfig(char **blocklist, int blocksize, char **trustlist, int trustsize);
 
 /**
  * @Description Wpa_s disable/enable(0/1) automatic reconnection.
@@ -278,13 +269,6 @@ WifiErrorNo SetRoamConfig(char **blocklist, int blocksize, char **trustlist, int
  * @return WifiErrorNo
  */
 WifiErrorNo WpaAutoConnect(int enable);
-
-/**
- * @Description Force wpa_supplicant to re-read its configuration file.
- *
- * @return WifiErrorNo
- */
-WifiErrorNo WpaReconfigure(void);
 
 /**
  * @Description Clearing the wpa Blocklist.
@@ -300,7 +284,17 @@ WifiErrorNo WpaBlocklistClear(void);
  * @param size
  * @return WifiErrorNo
  */
-WifiErrorNo GetNetworkList(NetworkList *networkList, int *size);
+WifiErrorNo GetNetworkList(HidlNetworkInfo *infos, int *size);
+
+/**
+ * @Description Get current connect signal info, rssi, linkspeed, noise ...
+ *
+ * @param endBssid - peer end bssid, i.e. linked ap's bssid
+ * @param info - signal info
+ * @return WifiErrorNo
+ */
+WifiErrorNo GetConnectSignalInfo(const char *endBssid, HidlWpaSignalInfo *info);
+
 #ifdef __cplusplus
 }
 #endif

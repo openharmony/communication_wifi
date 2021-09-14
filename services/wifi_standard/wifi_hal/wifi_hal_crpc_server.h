@@ -18,22 +18,23 @@
 
 #include "server.h" /* RPC Server header file */
 #include "wifi_hal_define.h"
+#include "wifi_hal_struct.h"
+#include "wifi_hal_p2p_struct.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-typedef int (*RPCFUNC)(RpcServer *server, Context *context);
+typedef int (*Rpcfunc)(RpcServer *server, Context *context);
 
 typedef struct WifiHalRpcFunc {
     char funcname[128];
-    RPCFUNC func;
+    Rpcfunc func;
     struct WifiHalRpcFunc *next;
 } WifiHalRpcFunc;
 
 #define RPC_FUNC_NUM 10
 #define RPC_FUNCNAME_MAX_LEN 128
-#define CONN_BSSID_LEN 64
 
 /**
  * @Description Initialization the function table.
@@ -50,9 +51,9 @@ void ReleaseRpcFunc(void);
  * @Description Get the Rpc Func object.
  *
  * @param func - Function name string.
- * @return RPCFUNC - Function pointer found.
+ * @return Rpcfunc - Function pointer found.
  */
-RPCFUNC GetRpcFunc(const char *func);
+Rpcfunc GetRpcFunc(const char *func);
 
 /**
  * @Description Set the Rpc Server Inited object.
@@ -76,13 +77,18 @@ typedef struct WifiHalCbIFaceMsg {
 typedef struct WifiHalConnectMsg {
     int status;
     int networkId;
-    char bssid[CONN_BSSID_LEN];
+    char bssid[WIFI_MAC_LENGTH + 1];
 } WifiHalConnectMsg;
 
 typedef union WifiHalCallbackMsg {
-    int scanResult;
+    int scanStatus;
     WifiHalConnectMsg connMsg;
     WifiHalCbIFaceMsg ifMsg;
+    HidlP2pDeviceInfo deviceInfo;
+    HidlP2pGroupInfo groupInfo;
+    HidlP2pInvitationInfo invitaInfo;
+    HidlP2pServDiscRespInfo serverInfo;
+    HidlP2pServDiscReqInfo serDiscReqInfo;
 } WifiHalCallbackMsg;
 
 typedef struct WifiHalEventCallbackMsg {

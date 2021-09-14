@@ -15,15 +15,9 @@
 #include "wifi_sta_hal_interface.h"
 #include <mutex>
 #include "wifi_log.h"
-#include "wifi_idl_inner_interface.h"
 
 #undef LOG_TAG
-#define LOG_TAG "OHWIFI_IDLCLIENT_WIFI_STA_HAL_INTERFACE"
-
-RpcClient *GetStaRpcClient(void)
-{
-    return OHOS::Wifi::WifiStaHalInterface::GetInstance().mIdlClient->pRpcClient;
-}
+#define LOG_TAG "WifiStaHalInterface"
 
 namespace OHOS {
 namespace Wifi {
@@ -122,14 +116,14 @@ WifiErrorNo WifiStaHalInterface::Scan(const WifiScanParam &scanParam)
     return mIdlClient->Scan(scanParam);
 }
 
-WifiErrorNo WifiStaHalInterface::QueryScanResults(std::vector<WifiScanResult> &scanResults)
+WifiErrorNo WifiStaHalInterface::QueryScanInfos(std::vector<InterScanInfo> &scanInfos)
 {
-    return mIdlClient->QueryScanResults(scanResults);
+    return mIdlClient->QueryScanInfos(scanInfos);
 }
 
-WifiErrorNo WifiStaHalInterface::GetNetworkList(std::vector<WifiWpaNetworkList> &networkList)
+WifiErrorNo WifiStaHalInterface::GetNetworkList(std::vector<WifiWpaNetworkInfo> &networkList)
 {
-    return mIdlClient->ReGetNetworkList(networkList);
+    return mIdlClient->ReqGetNetworkList(networkList);
 }
 WifiErrorNo WifiStaHalInterface::StartPnoScan(const WifiPnoScanParam &scanParam)
 {
@@ -183,7 +177,11 @@ WifiErrorNo WifiStaHalInterface::SaveDeviceConfig(void)
 
 WifiErrorNo WifiStaHalInterface::RegisterStaEventCallback(const WifiEventCallback &callback)
 {
-    return mIdlClient->ReqRegisterStaEventCallback(callback);
+    WifiErrorNo err = mIdlClient->ReqRegisterStaEventCallback(callback);
+    if (err == WIFI_IDL_OPT_OK || callback.onConnectChanged == nullptr) {
+        mStaCallback = callback;
+    }
+    return err;
 }
 
 WifiErrorNo WifiStaHalInterface::StartWpsPbcMode(const WifiIdlWpsConfig &config)
@@ -193,6 +191,9 @@ WifiErrorNo WifiStaHalInterface::StartWpsPbcMode(const WifiIdlWpsConfig &config)
 
 WifiErrorNo WifiStaHalInterface::StartWpsPinMode(const WifiIdlWpsConfig &config, int &pinCode)
 {
+    if (!config.pinCode.empty() && config.pinCode.length() != WIFI_IDL_PIN_CODE_LENGTH) {
+        return WIFI_IDL_OPT_INVALID_PARAM;
+    }
     return mIdlClient->ReqStartWpsPinMode(config, pinCode);
 }
 
@@ -216,14 +217,22 @@ WifiErrorNo WifiStaHalInterface::WpaAutoConnect(int enable)
     return mIdlClient->ReqWpaAutoConnect(enable);
 }
 
-WifiErrorNo WifiStaHalInterface::WpaReconfigure()
-{
-    return mIdlClient->ReWpaReconfigure();
-}
-
 WifiErrorNo WifiStaHalInterface::WpaBlocklistClear()
 {
-    return mIdlClient->ReWpaBlocklistClear();
+    return mIdlClient->ReqWpaBlocklistClear();
+}
+
+WifiErrorNo WifiStaHalInterface::GetConnectSignalInfo(const std::string &endBssid, WifiWpaSignalInfo &info)
+{
+    if (endBssid.length() != WIFI_IDL_BSSID_LENGTH) {
+        return WIFI_IDL_OPT_INPUT_MAC_INVALID;
+    }
+    return mIdlClient->ReqGetConnectSignalInfo(endBssid, info);
+}
+
+const WifiEventCallback &WifiStaHalInterface::GetCallbackInst(void) const
+{
+    return mStaCallback;
 }
 }  // namespace Wifi
 }  // namespace OHOS

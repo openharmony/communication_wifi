@@ -26,6 +26,7 @@ extern "C" {
 int SetIpv4State(int state);
 int InitSignalHandle(void);
 
+int PublishDhcpResultEvent(const char *ifname, const int code, struct DhcpResult *result);
 int GetPacketHeaderInfo(struct DhcpPacket *packet, uint8_t type);
 int GetPacketCommonInfo(struct DhcpPacket *packet);
 int DhcpDiscover(uint32_t transid, uint32_t requestip);
@@ -33,6 +34,8 @@ int DhcpRequest(uint32_t transid, uint32_t reqip, uint32_t servip);
 int DhcpRenew(uint32_t transid, uint32_t clientip, uint32_t serverip);
 int DhcpRelease(uint32_t clientip, uint32_t serverip);
 int StartIpv4(void);
+
+int *GetSignalPipeFD(void);
 
 #ifdef __cplusplus
 }

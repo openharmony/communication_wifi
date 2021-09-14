@@ -29,7 +29,7 @@
 
 namespace OHOS {
 namespace Wifi {
-#define MAX_COUNTRY_CODE_LEN 2
+#define WIFI_COUNTRY_CODE_LEN 2
 #define WEPKEYS_SIZE 4
 #define INVALID_NETWORK_ID (-1)
 #define REOPEN_STA_INTERVAL 500
@@ -133,12 +133,6 @@ enum class SetupMethod {
     KEYPAD = 2,
     LABEL = 3,
     INVALID = 4,
-};
-
-/* is wps connected to a network */
-enum class IsWpsConnected {
-    WPS_CONNECTED = 0,
-    WPS_INVALID = -1,
 };
 
 /* WPS config */
@@ -372,17 +366,20 @@ enum class WifiState { DISABLING = 0, DISABLED = 1, ENABLING = 2, ENABLED = 3, U
 
 enum class ConnectionState {
     CONNECT_CONNECTING = 0,
-    CONNECT_OBTAINING_IP = 1,
-    CONNECT_OBTAINING_IP_FAIL = 2,
-    CONNECT_AP_CONNECTED = 3,
-    CONNECT_CHECK_PORTAL = 4,
-    CONNECT_NETWORK_ENABLED = 5,
-    CONNECT_NETWORK_DISABLED = 6,
-    DISCONNECT_DISCONNECTING = 7,
-    DISCONNECT_DISCONNECT_FAILED = 8,
-    DISCONNECT_DISCONNECTED = 9,
-    CONNECT_PASSWORD_WRONG = 10,
-    CONNECT_CONNECTING_TIMEOUT = 11,
+    CONNECT_AP_CONNECTED = 1,
+    CONNECT_CHECK_PORTAL = 2,
+    CONNECT_NETWORK_ENABLED = 3,
+    CONNECT_NETWORK_DISABLED = 4,
+    DISCONNECT_DISCONNECTING = 5,
+    DISCONNECT_DISCONNECT_FAILED = 6,
+    DISCONNECT_DISCONNECTED = 7,
+    CONNECT_PASSWORD_WRONG = 8,
+    CONNECT_CONNECTING_TIMEOUT = 9,
+    CONNECT_OBTAINING_IP = 10,
+    CONNECT_OBTAINING_IP_FAILED = 11,
+    CONNECT_ASSOCIATING = 12,
+    CONNECT_ASSOCIATED = 13,
+
     UNKNOWN,
 };
 
@@ -403,23 +400,10 @@ enum class WpsStartState {
     WPS_TIME_OUT = 12,
 };
 
-/* mock api state */
-struct WifiMockState {
-    /* mock type: 1 screen 2 airplane 3 App run mode 4 power saving 5 Customer-defined scenario */
-    int type;
-    /**
-     * when screen: 1 on 2 off;
-     * airplane: 1 on 2 off;
-     * App run state: 1 front 2 backend;
-     * power saving: 1 on 2 off;
-     * other Customer-defined scene: 1 on 2 off
-     */
-    int state;
-    WifiMockState()
-    {
-        type = 0;
-        state = 0;
-    }
+enum class StreamDirection {
+    STREAM_DIRECTION_UP = 0,
+    STREAM_DIRECTION_DOWN = 1,
+    UNKNOWN,
 };
 
 /* DHCP info */

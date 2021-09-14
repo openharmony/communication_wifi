@@ -18,6 +18,7 @@
 #include <map>
 #include <string>
 #include <ctime>
+#include "iscan_service_callbacks.h"
 #include "wifi_log.h"
 #include "wifi_settings.h"
 #include "wifi_error_no.h"
@@ -56,41 +57,29 @@ public:
     /**
      * @Description  Initializing the Scan Service.
      *
-     * @param messageQueueUp - message queue which is used to return results.[in]
+     * @param scanSerivceCallbacks Callback function registered with the wifiManager[in].
      * @return success: true, failed: false
      */
-    bool InitScanService(WifiMessageQueue<WifiResponseMsgInfo> *messageQueueUp);
+    bool InitScanService(const IScanSerivceCallbacks &scanSerivceCallbacks);
     /**
      * @Description Stopping the Scan Service.
      *
      */
     void UnInitScanService();
     /**
-     * @Description Notification interface service scanning status.
-     *
-     * @param msgCode - Operation Result Code[in]
-     */
-    void NotifyScanServiceStatus(int msgCode);
-    /**
-     * @Description Notification interface service operation result.
-     *
-     * @param msgCode - Operation Result Code[in]
-     * @param result - Indicates whether the operation is successful or failed[in]
-     */
-    void NotifyScanInfo(int msgCode, int result);
-    /**
      * @Description Start a complete Wi-Fi scan.
      *
      * @param externFlag - Externally initiated scanning[in]
+     * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
      */
-    bool Scan(bool externFlag);
+    ErrCode Scan(bool externFlag);
     /**
      * @Description Start Wi-Fi scanning based on specified parameters.
      *
      * @param params - Scan specified parameters[in]
-     * @return success: true, failed: false
+     * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
      */
-    bool Scan(const WifiScanParams &params);
+    ErrCode ScanWithParam(const WifiScanParams &params);
     /**
      * @Description Starting a Single Scan.
      *
@@ -144,6 +133,14 @@ public:
      */
     void HandleStaStatusChanged(int status);
     /**
+     * @Description custom scene status change processing
+     *
+     * @param customScene custom scene[in]
+     * @param customSceneStatus custom scene status[in]
+     */
+    void HandleCustomStatusChanged(int customScene, int customSceneStatus);
+
+    /**
      * @Description Sets the type of the app to be operated.
      *
      * @param appMode - Type of the app to be scanned.
@@ -176,9 +173,9 @@ private:
     using ScanInfoHandlerMap = std::map<std::string, ScanInfoHandler>;
     using PnoScanInfoHandlerMap = std::map<std::string, PnoScanInfoHandler>;
 
+    IScanSerivceCallbacks mScanSerivceCallbacks;
     ScanStateMachine *pScanStateMachine;                    /* Scanning state machine pointer */
     ScanMonitor *pScanMonitor;                              /* Scanning Monitor Pointer */
-    WifiMessageQueue<WifiResponseMsgInfo> *pMessageQueueUp; /* Queue for returning messages */
     bool scanStartedFlag;                                   /* The scanning is started */
     ScanInfoHandlerMap scanInfoHandlerMap;              /* Map of obtaining the scanning result */
     PnoScanInfoHandlerMap pnoScanInfoHandlerMap;        /* Map of obtaining PNO scanning results */
@@ -258,7 +255,7 @@ private:
      *
      * @param scanInfoList - scan result list[in]
      */
-    void ReportScanInfos(const std::vector<InterScanInfo> &interScanList);
+    void ReportScanInfos(std::vector<InterScanInfo> &interScanList);
     /**
      * @Description Convert the scanning result to the format of the interface service.
      *

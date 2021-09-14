@@ -44,7 +44,6 @@ struct RpcClient {
     pthread_t threadId;
     int waitReply;
     pthread_mutex_t mutex;
-    pthread_cond_t condN;
     pthread_cond_t condW;
     int callLockFlag;
     pthread_mutex_t lockMutex;

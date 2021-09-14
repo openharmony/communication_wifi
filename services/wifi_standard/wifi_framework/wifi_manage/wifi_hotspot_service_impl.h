@@ -72,14 +72,6 @@ public:
     ErrCode SetHotspotConfig(const HotspotConfig &config) override;
 
     /**
-     * @Description  Get the device MAC address
-     *
-     * @param result - Get device mac String
-     * @return ErrCode - operation result
-     */
-    ErrCode GetDeviceMacAddress(std::string &result) override;
-
-    /**
      * @Description Get the Station List object
      *
      * @param result - Get result vector of connect Station Info

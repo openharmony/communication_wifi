@@ -137,7 +137,7 @@ int WifiSettings::GetScanInfoList(std::vector<WifiScanInfo> &results)
     int64_t curr = static_cast<int64_t>(clkTime.tv_sec) * MSEC * MSEC + clkTime.tv_nsec / MSEC; /* us */
     std::unique_lock<std::mutex> lock(mInfoMutex);
     for (auto iter = mWifiScanInfoList.begin(); iter != mWifiScanInfoList.end(); ++iter) {
-        if (iter->timestamp + WIFI_GET_SCAN_RESULT_VALID_TIMESTAMP * MSEC * MSEC < curr) {
+        if (iter->timestamp + WIFI_GET_SCAN_INFO_VALID_TIMESTAMP * MSEC * MSEC < curr) {
             continue;
         }
         results.push_back(*iter);
@@ -225,6 +225,18 @@ int WifiSettings::GetDeviceConfig(const std::string &index, const int &indexType
                 config = iter->second;
                 return 0;
             }
+        }
+    }
+    return -1;
+}
+
+int WifiSettings::GetDeviceConfig(const std::string &ssid, const std::string &keymgmt, WifiDeviceConfig &config)
+{
+    std::unique_lock<std::mutex> lock(mConfigMutex);
+    for (auto iter = mWifiDeviceConfig.begin(); iter != mWifiDeviceConfig.end(); iter++) {
+        if ((iter->second.ssid == ssid) && (iter->second.keyMgmt == keymgmt)) {
+            config = iter->second;
+            return 0;
         }
     }
     return -1;
@@ -589,7 +601,7 @@ void WifiSettings::InitDefaultHotspotConfig()
 {
     mHotspotConfig.SetSecurityType(KeyMgmt::WPA_PSK);
     mHotspotConfig.SetBand(BandType::BAND_2GHZ);
-    mHotspotConfig.SetChannel(1); /* AP_CHANNEL_DEFAULT */
+    mHotspotConfig.SetChannel(AP_CHANNEL_DEFAULT);
     mHotspotConfig.SetMaxConn(GetApMaxConnNum());
     mHotspotConfig.SetSsid("OHOS_" + GetRandomStr(RANDOM_STR_LEN));
     mHotspotConfig.SetPreSharedKey("12345678");
@@ -711,6 +723,11 @@ int WifiSettings::SetCanUseStaWhenAirplaneMode(bool bCan)
 {
     mWifiConfig.staAirplaneMode = bCan;
     return 0;
+}
+
+bool WifiSettings::GetCanOpenStaWhenAirplaneMode()
+{
+    return mWifiConfig.canOpenStaWhenAirplane;
 }
 
 bool WifiSettings::GetStaLastRunState()

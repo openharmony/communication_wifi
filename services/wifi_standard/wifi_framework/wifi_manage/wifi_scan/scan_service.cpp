@@ -12,7 +12,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 #include <inttypes.h>
 #include "scan_service.h"
 #include "wifi_logger.h"
@@ -24,7 +23,6 @@ namespace Wifi {
 ScanService::ScanService()
     : pScanStateMachine(nullptr),
       pScanMonitor(nullptr),
-      pMessageQueueUp(nullptr),
       scanStartedFlag(false),
       scanConfigStoreIndex(0),
       pnoScanStartTime(0),
@@ -53,15 +51,11 @@ ScanService::~ScanService()
     }
 }
 
-bool ScanService::InitScanService(WifiMessageQueue<WifiResponseMsgInfo> *messageQueueUp)
+bool ScanService::InitScanService(const IScanSerivceCallbacks &scanSerivceCallbacks)
 {
     WIFI_LOGI("Enter ScanService::InitScanService.\n");
 
-    if (messageQueueUp == nullptr) {
-        WIFI_LOGE("messageQueueUp is null.\n");
-        return false;
-    }
-    pMessageQueueUp = messageQueueUp;
+    mScanSerivceCallbacks = scanSerivceCallbacks;
 
     pScanStateMachine = new (std::nothrow) ScanStateMachine();
     if (pScanStateMachine == nullptr) {
@@ -124,12 +118,12 @@ void ScanService::HandleScanStatusReport(ScanStatusReport &scanStatusReport)
             scanStartedFlag = true;
             /* Pno scan maybe has started, stop it first */
             pScanStateMachine->SendMessage(CMD_STOP_PNO_SCAN);
-            NotifyScanServiceStatus(SCAN_START_RES);
+            mScanSerivceCallbacks.OnScanStartEvent();
             SystemScanProcess(true);
             break;
         }
         case SCAN_FINISHED_STATUS: {
-            NotifyScanServiceStatus(SCAN_STOP_RES);
+            mScanSerivceCallbacks.OnScanStopEvent();
             break;
         }
         case COMMON_SCAN_SUCCESS: {
@@ -186,41 +180,20 @@ void ScanService::HandleInnerEventReport(ScanInnerEventType innerEvent)
     }
 }
 
-void ScanService::NotifyScanServiceStatus(int msgCode)
-{
-    WIFI_LOGI("Enter ScanService::NotifyScanServiceStatus.\n");
-
-    WifiResponseMsgInfo notifyScanMsg;
-    notifyScanMsg.msgCode = msgCode;
-    pMessageQueueUp->Push(notifyScanMsg);
-    return;
-}
-
-void ScanService::NotifyScanInfo(int msgCode, int result)
-{
-    WIFI_LOGI("Enter ScanService::NotifyScanInfo.\n");
-
-    WifiResponseMsgInfo notifyScanMsg;
-    notifyScanMsg.msgCode = msgCode;
-    notifyScanMsg.params.result = result;
-    pMessageQueueUp->Push(notifyScanMsg);
-    return;
-}
-
-bool ScanService::Scan(bool externFlag)
+ErrCode ScanService::Scan(bool externFlag)
 {
     WIFI_LOGI("Enter ScanService::Scan.\n");
 
     if (!scanStartedFlag) {
         WIFI_LOGE("Scan service has not started.\n");
-        return false;
+        return WIFI_OPT_FAILED;
     }
 
     if (externFlag) {
         int appId = 0;
         if (!AllowExternScan(appId)) {
             WIFI_LOGE("AllowExternScan return false.\n");
-            return false;
+            return WIFI_OPT_FAILED;
         }
     }
 
@@ -239,37 +212,37 @@ bool ScanService::Scan(bool externFlag)
     scanConfig.scanStyle = SCAN_TYPE_HIGH_ACCURACY;
     if (!SingleScan(scanConfig)) {
         WIFI_LOGE("SingleScan failed.\n");
-        return false;
+        return WIFI_OPT_FAILED;
     }
 
-    return true;
+    return WIFI_OPT_SUCCESS;
 }
 
-bool ScanService::Scan(const WifiScanParams &params)
+ErrCode ScanService::ScanWithParam(const WifiScanParams &params)
 {
     WIFI_LOGI("Enter ScanService::Scan.\n");
 
     if (!scanStartedFlag) {
         WIFI_LOGE("Scan service has not started.\n");
-        return false;
+        return WIFI_OPT_FAILED;
     }
 
     int appId = 0;
     if (!AllowExternScan(appId)) {
         WIFI_LOGE("AllowExternScan return false.\n");
-        return false;
+        return WIFI_OPT_FAILED;
     }
 
     if ((params.band < static_cast<int>(SCAN_BAND_UNSPECIFIED)) ||
         (params.band > static_cast<int>(SCAN_BAND_BOTH_WITH_DFS))) {
         WIFI_LOGE("params.band is error.\n");
-        return false;
+        return WIFI_OPT_FAILED;
     }
 
     /* When the frequency is specified, the band must be SCAN_BAND_UNSPECIFIED */
     if (params.freqs.empty() && (params.band == static_cast<int>(SCAN_BAND_UNSPECIFIED))) {
         WIFI_LOGE("params is error.\n");
-        return false;
+        return WIFI_OPT_FAILED;
     }
 
     ScanConfig scanConfig;
@@ -298,10 +271,10 @@ bool ScanService::Scan(const WifiScanParams &params)
 
     if (!SingleScan(scanConfig)) {
         WIFI_LOGE("SingleScan failed.\n");
-        return false;
+        return WIFI_OPT_FAILED;
     }
 
-    return true;
+    return WIFI_OPT_SUCCESS;
 }
 
 bool ScanService::SingleScan(ScanConfig &scanConfig)
@@ -487,12 +460,7 @@ void ScanService::HandleCommonScanFailed(std::vector<int> &requestIndexList)
         }
 
         /* Notification of the end of scanning */
-        if (configIter->second.fullScanFlag) {
-            NotifyScanInfo(SCAN_RES, static_cast<int>(ScanHandleNotify::SCAN_FAIL));
-        } else {
-            NotifyScanInfo(SCAN_PARAM_RES, static_cast<int>(ScanHandleNotify::SCAN_FAIL));
-        }
-
+        mScanSerivceCallbacks.OnScanFinishEvent(static_cast<int>(ScanHandleNotify::SCAN_FAIL));
         scanConfigMap.erase(*reqIter);
     }
 
@@ -523,7 +491,7 @@ void ScanService::HandleCommonScanInfo(
 
             if (StoreFullScanInfo(configIter->second, scanInfoList)) {
                 fullScanStored = true;
-                NotifyScanInfo(SCAN_RES, static_cast<int>(ScanHandleNotify::SCAN_OK));
+                mScanSerivceCallbacks.OnScanFinishEvent(static_cast<int>(ScanHandleNotify::SCAN_OK));
             } else {
                 WIFI_LOGE("StoreFullScanInfo failed.\n");
             }
@@ -532,7 +500,7 @@ void ScanService::HandleCommonScanInfo(
             if (!StoreUserScanInfo(configIter->second, scanInfoList)) {
                 WIFI_LOGE("StoreUserScanInfo failed.\n");
             }
-            NotifyScanInfo(SCAN_PARAM_RES, static_cast<int>(ScanHandleNotify::SCAN_OK));
+            mScanSerivceCallbacks.OnScanFinishEvent(static_cast<int>(ScanHandleNotify::SCAN_OK));
         }
 
         scanConfigMap.erase(*reqIter);
@@ -558,7 +526,7 @@ bool ScanService::StoreFullScanInfo(
     WIFI_LOGI("Enter ScanService::StoreFullScanInfo.\n");
 
     /* Filtering result */
-    WIFI_LOGI("scanConfig.scanTime is %" PRIu64 "\n", scanConfig.scanTime);
+    WIFI_LOGI("scanConfig.scanTime is %" PRIu64 ".\n", scanConfig.scanTime);
     WIFI_LOGI("Receive %{public}d scan results.\n", (int)(scanInfoList.size()));
     std::vector<WifiScanInfo> filterScanInfo;
     std::vector<InterScanInfo>::const_iterator iter = scanInfoList.begin();
@@ -638,19 +606,10 @@ bool ScanService::StoreUserScanInfo(
     return true;
 }
 
-void ScanService::ReportScanInfos(const std::vector<InterScanInfo> &interScanList)
+void ScanService::ReportScanInfos(std::vector<InterScanInfo> &interScanList)
 {
     WIFI_LOGI("Enter ScanService::ReportScanInfos.\n");
-
-    /* Filtering result */
-    std::vector<WifiScanInfo> scanInfoList;
-    ConvertScanInfos(interScanList, scanInfoList);
-
-    /* Notification interface service */
-    WifiResponseMsgInfo notifyScanMsg;
-    notifyScanMsg.msgCode = SCAN_RESULT_RES;
-    notifyScanMsg.params.scanInfos = scanInfoList;
-    pMessageQueueUp->Push(notifyScanMsg);
+    mScanSerivceCallbacks.OnScanInfoEvent(interScanList);
     return;
 }
 
@@ -673,7 +632,6 @@ void ScanService::ConvertScanInfos(
         scanInfo.securityType = iter->securityType;
         scanInfoList.push_back(scanInfo);
     }
-
     return;
 }
 
@@ -818,7 +776,7 @@ void ScanService::HandlePnoScanInfo(std::vector<InterScanInfo> &scanInfoList)
             WIFI_LOGI("InterScanInfo.capabilities is %{public}s.\n", iter->capabilities.c_str());
             WIFI_LOGI("InterScanInfo.frequency is %{public}d.\n", iter->frequency);
             WIFI_LOGI("InterScanInfo.rssi is %{public}d.\n", iter->rssi);
-            WIFI_LOGI("InterScanInfo.timestamp is %" PRIu64 "\n", iter->timestamp);
+            WIFI_LOGI("InterScanInfo.timestamp is %" PRIu64 ".\n", iter->timestamp);
         }
     }
 
@@ -877,6 +835,23 @@ void ScanService::HandleStaStatusChanged(int status)
             StopSystemScan();
         }
     }
+
+    return;
+}
+
+void ScanService::HandleCustomStatusChanged(int customScene, int customSceneStatus)
+{
+    LOGI("Enter ScanService::HandleCustomStatusChanged.");
+
+    time_t now = time(nullptr);
+    LOGD("customScene:%d, status:%d", customScene, customSceneStatus);
+    if (customSceneStatus == STATE_OPEN) {
+        customSceneTimeMap.insert(std::pair<int, int>(customScene, now));
+    }
+    if (customSceneStatus == STATE_CLOSE) {
+        customSceneTimeMap.erase(customScene);
+    }
+    SystemScanProcess(false);
 
     return;
 }

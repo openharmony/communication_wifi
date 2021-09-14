@@ -60,7 +60,7 @@ int CreateRawSocket(int *rawFd)
 {
     int sockFd = socket(PF_PACKET, SOCK_DGRAM, htons(ETH_P_IP));
     if (sockFd == -1) {
-        LOGE("CreateRawSocket() failed, socket error:%{public}s.\n", strerror(errno));
+        LOGE("CreateRawSocket() failed, socket error:%{public}s.", strerror(errno));
         return SOCKET_OPT_FAILED;
     }
     *rawFd = sockFd;
@@ -72,7 +72,7 @@ int CreateKernelSocket(int *sockFd)
 {
     int nFd = socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP);
     if (nFd == -1) {
-        LOGE("CreateKernelSocket() failed, socket error:%{public}s.\n", strerror(errno));
+        LOGE("CreateKernelSocket() failed, socket error:%{public}s.", strerror(errno));
         return SOCKET_OPT_FAILED;
     }
     *sockFd = nFd;
@@ -82,13 +82,13 @@ int CreateKernelSocket(int *sockFd)
 int BindRawSocket(const int rawFd, const int ifaceIndex, const uint8_t *ifaceAddr)
 {
     if (rawFd < 0) {
-        LOGE("BindRawSocket() failed, rawFd:%{public}d error!\n", rawFd);
+        LOGE("BindRawSocket() failed, rawFd:%{public}d error!", rawFd);
         return SOCKET_OPT_FAILED;
     }
 
     struct sockaddr_ll rawAddr;
     if (memset_s(&rawAddr, sizeof(rawAddr), 0, sizeof(rawAddr)) != EOK) {
-        LOGE("BindRawSocket() failed, memset_s rawAddr error!\n");
+        LOGE("BindRawSocket() failed, memset_s rawAddr error!");
         close(rawFd);
         return SOCKET_OPT_FAILED;
     }
@@ -98,14 +98,14 @@ int BindRawSocket(const int rawFd, const int ifaceIndex, const uint8_t *ifaceAdd
     if (ifaceAddr != NULL) {
         rawAddr.sll_halen = MAC_ADDR_LEN;
         if (memcpy_s(rawAddr.sll_addr, sizeof(rawAddr.sll_addr), ifaceAddr, MAC_ADDR_LEN) != EOK) {
-            LOGE("BindRawSocket() failed, memcpy_s rawAddr.sll_addr error!\n");
+            LOGE("BindRawSocket() failed, memcpy_s rawAddr.sll_addr error!");
             close(rawFd);
             return SOCKET_OPT_FAILED;
         }
     }
     int nRet = bind(rawFd, (struct sockaddr *)&rawAddr, sizeof(rawAddr));
     if (nRet == -1) {
-        LOGE("BindRawSocket() index:%{public}d failed, bind error:%{public}s.\n", ifaceIndex, strerror(errno));
+        LOGE("BindRawSocket() index:%{public}d failed, bind error:%{public}s.", ifaceIndex, strerror(errno));
         close(rawFd);
         return SOCKET_OPT_FAILED;
     }
@@ -116,19 +116,19 @@ int BindRawSocket(const int rawFd, const int ifaceIndex, const uint8_t *ifaceAdd
 int BindKernelSocket(const int sockFd, const char *ifaceName, const uint32_t sockIp, const int sockPort, bool bCast)
 {
     if (sockFd < 0) {
-        LOGE("BindKernelSocket() failed, sockFd:%{public}d error!\n", sockFd);
+        LOGE("BindKernelSocket() failed, sockFd:%{public}d error!", sockFd);
         return SOCKET_OPT_FAILED;
     }
 
     /* Bind the specified interface. */
     if (ifaceName != NULL) {
         struct ifreq ifaceReq;
-        if (strncpy_s(ifaceReq.ifr_name, sizeof(ifaceReq.ifr_name), ifaceName, IFNAMSIZ) != EOK) {
+        if (strncpy_s(ifaceReq.ifr_name, sizeof(ifaceReq.ifr_name), ifaceName, strlen(ifaceName)) != EOK) {
             close(sockFd);
             return SOCKET_OPT_FAILED;
         }
         if (setsockopt(sockFd, SOL_SOCKET, SO_BINDTODEVICE, (char *)&ifaceReq, sizeof(ifaceReq)) == -1) {
-            LOGE("BindKernelSocket() %{public}s SO_BINDTODEVICE error:%{public}s.\n", ifaceName, strerror(errno));
+            LOGE("BindKernelSocket() %{public}s SO_BINDTODEVICE error:%{public}s.", ifaceName, strerror(errno));
             close(sockFd);
             return SOCKET_OPT_FAILED;
         }
@@ -137,16 +137,16 @@ int BindKernelSocket(const int sockFd, const char *ifaceName, const uint32_t soc
     /* Set the broadcast feature of the data sent by the socket. */
     if (bCast) {
         if (setsockopt(sockFd, SOL_SOCKET, SO_BROADCAST, (const char *)&bCast, sizeof(bool)) == -1) {
-            LOGE("BindKernelSocket() sockFd:%{public}d SO_BROADCAST error:%{public}s.\n", sockFd, strerror(errno));
+            LOGE("BindKernelSocket() sockFd:%{public}d SO_BROADCAST error:%{public}s.", sockFd, strerror(errno));
             close(sockFd);
             return SOCKET_OPT_FAILED;
         }
     }
 
     /* Allow multiple sockets to use the same port number. */
-    bool bReuseaddr = true;
-    if (setsockopt(sockFd, SOL_SOCKET, SO_REUSEADDR, (const char *)&bReuseaddr, sizeof(bool)) == -1) {
-        LOGE("BindKernelSocket() sockFd:%{public}d SO_REUSEADDR error:%{public}s.\n", sockFd, strerror(errno));
+    int bReuseaddr = 1;
+    if (setsockopt(sockFd, SOL_SOCKET, SO_REUSEADDR, (const char *)&bReuseaddr, sizeof(bReuseaddr)) == -1) {
+        LOGE("BindKernelSocket() sockFd:%{public}d SO_REUSEADDR error:%{public}s.", sockFd, strerror(errno));
         close(sockFd);
         return SOCKET_OPT_FAILED;
     }
@@ -161,7 +161,7 @@ int BindKernelSocket(const int sockFd, const char *ifaceName, const uint32_t soc
     kernelAddr.sin_family = AF_INET;
     int nRet = bind(sockFd, (struct sockaddr *)&kernelAddr, sizeof(kernelAddr));
     if (nRet == -1) {
-        LOGE("BindKernelSocket() sockFd:%{public}d failed, bind error:%{public}s.\n", sockFd, strerror(errno));
+        LOGE("BindKernelSocket() sockFd:%{public}d failed, bind error:%{public}s.", sockFd, strerror(errno));
         close(sockFd);
         return SOCKET_OPT_FAILED;
     }
@@ -178,16 +178,16 @@ int SendToDhcpPacket(
     }
 
     struct sockaddr_ll rawAddr;
+    if ((memset_s(&rawAddr, sizeof(rawAddr), 0, sizeof(rawAddr)) != EOK) ||
+        (memcpy_s(rawAddr.sll_addr, sizeof(rawAddr.sll_addr), destHwaddr, MAC_ADDR_LEN) != EOK)) {
+        close(nFd);
+        return SOCKET_OPT_FAILED;
+    }
     rawAddr.sll_ifindex = destIndex;
     rawAddr.sll_protocol = htons(ETH_P_IP);
     rawAddr.sll_family = AF_PACKET;
     rawAddr.sll_halen = MAC_ADDR_LEN;
-    if (memcpy_s(rawAddr.sll_addr, sizeof(rawAddr.sll_addr), destHwaddr, MAC_ADDR_LEN) != EOK) {
-        close(nFd);
-        return SOCKET_OPT_FAILED;
-    }
     if (bind(nFd, (struct sockaddr *)&rawAddr, sizeof(rawAddr)) == -1) {
-        LOGE("SendToDhcpPacket() index:%{public}d failed, bind error:%{public}s.\n", destIndex, strerror(errno));
         close(nFd);
         return SOCKET_OPT_FAILED;
     }
@@ -218,9 +218,9 @@ int SendToDhcpPacket(
 
     ssize_t nBytes = sendto(nFd, &udpPackets, sizeof(udpPackets), 0, (struct sockaddr *)&rawAddr, sizeof(rawAddr));
     if (nBytes <= 0) {
-        LOGE("SendToDhcpPacket() fd:%{public}d failed, sendto error:%{public}s.\n", nFd, strerror(errno));
+        LOGE("SendToDhcpPacket() fd:%{public}d failed, sendto error:%{public}s.", nFd, strerror(errno));
     } else {
-        LOGI("SendToDhcpPacket() fd:%{public}d, index:%{public}d, bytes:%{public}d.\n", nFd, destIndex, (int)nBytes);
+        LOGI("SendToDhcpPacket() fd:%{public}d, index:%{public}d, bytes:%{public}d.", nFd, destIndex, (int)nBytes);
     }
     close(nFd);
     return (nBytes <= 0) ? SOCKET_OPT_FAILED : SOCKET_OPT_SUCCESS;
@@ -231,7 +231,7 @@ int SendDhcpPacket(struct DhcpPacket *sendPacket, uint32_t srcIp, uint32_t destI
     int nFd = -1;
     if ((CreateKernelSocket(&nFd) != SOCKET_OPT_SUCCESS) ||
         (BindKernelSocket(nFd, NULL, srcIp, BOOTP_CLIENT, false) != SOCKET_OPT_SUCCESS)) {
-        LOGE("SendDhcpPacket() fd:%{public}d,srcIp:%{private}u failed!\n", nFd, srcIp);
+        LOGE("SendDhcpPacket() fd:%{public}d,srcIp:%{private}u failed!", nFd, srcIp);
         return SOCKET_OPT_FAILED;
     }
 
@@ -245,16 +245,16 @@ int SendDhcpPacket(struct DhcpPacket *sendPacket, uint32_t srcIp, uint32_t destI
     kernelAddr.sin_family = AF_INET;
     int nRet = connect(nFd, (struct sockaddr *)&kernelAddr, sizeof(kernelAddr));
     if (nRet == -1) {
-        LOGE("SendDhcpPacket() nFd:%{public}d failed, connect error:%{public}s.\n", nFd, strerror(errno));
+        LOGE("SendDhcpPacket() nFd:%{public}d failed, connect error:%{public}s.", nFd, strerror(errno));
         close(nFd);
         return SOCKET_OPT_FAILED;
     }
 
     ssize_t nBytes = write(nFd, sendPacket, sizeof(struct DhcpPacket));
     if (nBytes <= 0) {
-        LOGE("SendDhcpPacket() fd:%{public}d failed, write error:%{public}s.\n", nFd, strerror(errno));
+        LOGE("SendDhcpPacket() fd:%{public}d failed, write error:%{public}s.", nFd, strerror(errno));
     } else {
-        LOGI("SendDhcpPacket() fd:%{public}d, srcIp:%{private}u, bytes:%{public}d.\n", nFd, srcIp, (int)nBytes);
+        LOGI("SendDhcpPacket() fd:%{public}d, srcIp:%{private}u, bytes:%{public}d.", nFd, srcIp, (int)nBytes);
     }
     close(nFd);
     return (nBytes <= 0) ? SOCKET_OPT_FAILED : SOCKET_OPT_SUCCESS;
@@ -263,7 +263,7 @@ int SendDhcpPacket(struct DhcpPacket *sendPacket, uint32_t srcIp, uint32_t destI
 int CheckReadBytes(const int count, const int totLen)
 {
     if (count < 0) {
-        LOGE("CheckReadBytes() couldn't read on raw listening socket, count:%{public}d, error:%{public}s!\n",
+        LOGE("CheckReadBytes() couldn't read on raw listening socket, count:%{public}d, error:%{public}s!",
             count, strerror(errno));
         /* The specified network interface service may be down. */
         sleep(NUMBER_ONE);
@@ -272,55 +272,55 @@ int CheckReadBytes(const int count, const int totLen)
 
     int nCommonSize = sizeof(struct iphdr) + sizeof(struct udphdr);
     if (count < nCommonSize) {
-        LOGE("CheckReadBytes() read size:%{public}d less than common size:%{public}d!\n", count, nCommonSize);
+        LOGE("CheckReadBytes() read size:%{public}d less than common size:%{public}d!", count, nCommonSize);
         return SOCKET_OPT_FAILED;
     }
 
     if (count < totLen) {
-        LOGE("CheckReadBytes() count:%{public}d less than totLen:%{public}d, packet is Truncated!\n", count, totLen);
+        LOGE("CheckReadBytes() count:%{public}d less than totLen:%{public}d, packet is Truncated!", count, totLen);
         return SOCKET_OPT_FAILED;
     }
 
-    LOGI("CheckReadBytes() count:%{public}d, tot:%{public}d, common:%{public}d.\n", count, totLen, nCommonSize);
+    LOGI("CheckReadBytes() count:%{public}d, tot:%{public}d, common:%{public}d.", count, totLen, nCommonSize);
     return SOCKET_OPT_SUCCESS;
 }
 
 int CheckUdpPacket(struct UdpDhcpPacket *pPacket, const int totLen)
 {
     if (pPacket == NULL) {
-        LOGE("CheckUdpPacket() failed, pPacket == NULL!\n");
+        LOGE("CheckUdpPacket() failed, pPacket == NULL!");
         return SOCKET_OPT_FAILED;
     }
 
     if (totLen > (int)sizeof(struct UdpDhcpPacket)) {
-        LOGE("CheckUdpPacket() totLen:%{public}d more than %{public}d!\n", totLen, (int)sizeof(struct UdpDhcpPacket));
+        LOGE("CheckUdpPacket() totLen:%{public}d more than %{public}d!", totLen, (int)sizeof(struct UdpDhcpPacket));
         return SOCKET_OPT_FAILED;
     }
 
     if ((pPacket->ip.protocol != IPPROTO_UDP) || (pPacket->ip.version != IPVERSION)) {
-        LOGE("CheckUdpPacket() failed, pPacket->ip.protocol:%{public}d or version:%{public}u error!\n",
+        LOGE("CheckUdpPacket() failed, pPacket->ip.protocol:%{public}d or version:%{public}u error!",
             pPacket->ip.protocol, pPacket->ip.version);
         return SOCKET_OPT_FAILED;
     }
 
     uint32_t uIhl = (uint32_t)(sizeof(pPacket->ip) >> DHCP_UINT16_BYTES);
     if (pPacket->ip.ihl != uIhl) {
-        LOGE("CheckUdpPacket() failed, pPacket->ip.ihl:%{public}u error, uIhl:%{public}u!\n", pPacket->ip.ihl, uIhl);
+        LOGE("CheckUdpPacket() failed, pPacket->ip.ihl:%{public}u error, uIhl:%{public}u!", pPacket->ip.ihl, uIhl);
         return SOCKET_OPT_FAILED;
     }
 
     if (pPacket->udp.dest != htons(BOOTP_CLIENT)) {
-        LOGE("CheckUdpPacket() failed, pPacket->udp.dest:%{public}d error, htons:%{public}d!\n",
+        LOGE("CheckUdpPacket() failed, pPacket->udp.dest:%{public}d error, htons:%{public}d!",
             pPacket->udp.dest, htons(BOOTP_CLIENT));
         return SOCKET_OPT_FAILED;
     }
 
     uint16_t uLen = (uint16_t)(totLen - (int)sizeof(pPacket->ip));
     if (ntohs(pPacket->udp.len) != uLen) {
-        LOGE("CheckUdpPacket() failed, pPacket->udp.len:%{public}d error, uLen:%{public}d!\n", pPacket->udp.len, uLen);
+        LOGE("CheckUdpPacket() failed, pPacket->udp.len:%{public}d error, uLen:%{public}d!", pPacket->udp.len, uLen);
         return SOCKET_OPT_FAILED;
     }
-    LOGI("CheckUdpPacket() success, totLen:%{public}d.\n", totLen);
+    LOGI("CheckUdpPacket() success, totLen:%{public}d.", totLen);
     return SOCKET_OPT_SUCCESS;
 }
 
@@ -340,17 +340,17 @@ int CheckPacketIpSum(struct UdpDhcpPacket *pPacket, const int bytes)
     pPacket->ip.check = 0;
     uint16_t uCheckSum = GetCheckSum((uint16_t *)&(pPacket->ip), sizeof(pPacket->ip));
     if (uCheck != uCheckSum) {
-        LOGE("CheckPacketIpSum() failed, ip.check:%{public}d, uCheckSum:%{public}d!\n", uCheck, uCheckSum);
+        LOGE("CheckPacketIpSum() failed, ip.check:%{public}d, uCheckSum:%{public}d!", uCheck, uCheckSum);
         return SOCKET_OPT_ERROR;
     }
-    LOGI("CheckPacketIpSum() success, bytes:%{public}d.\n", bytes);
+    LOGI("CheckPacketIpSum() success, bytes:%{public}d.", bytes);
     return SOCKET_OPT_SUCCESS;
 }
 
 int CheckPacketUdpSum(struct UdpDhcpPacket *pPacket, const int bytes)
 {
     if (pPacket == NULL) {
-        LOGE("CheckPacketUdpSum() failed, pPacket == NULL!\n");
+        LOGE("CheckPacketUdpSum() failed, pPacket == NULL!");
         return SOCKET_OPT_FAILED;
     }
 
@@ -360,7 +360,7 @@ int CheckPacketUdpSum(struct UdpDhcpPacket *pPacket, const int bytes)
     u_int32_t source = pPacket->ip.saddr;
     u_int32_t dest = pPacket->ip.daddr;
     if (memset_s(&pPacket->ip, sizeof(pPacket->ip), 0, sizeof(pPacket->ip)) != EOK) {
-        LOGE("CheckPacketUdpSum() failed, memset_s ERROR!\n");
+        LOGE("CheckPacketUdpSum() failed, memset_s ERROR!");
         return SOCKET_OPT_FAILED;
     }
     pPacket->ip.protocol = IPPROTO_UDP;
@@ -369,10 +369,10 @@ int CheckPacketUdpSum(struct UdpDhcpPacket *pPacket, const int bytes)
     pPacket->ip.tot_len = pPacket->udp.len;
     uint16_t uCheckSum = GetCheckSum((uint16_t *)pPacket, bytes);
     if (uCheck && (uCheck != uCheckSum)) {
-        LOGE("CheckPacketUdpSum() failed, udp.check:%{public}d, uCheckSum:%{public}d!\n", uCheck, uCheckSum);
+        LOGE("CheckPacketUdpSum() failed, udp.check:%{public}d, uCheckSum:%{public}d!", uCheck, uCheckSum);
         return SOCKET_OPT_FAILED;
     }
-    LOGI("CheckPacketUdpSum() success, bytes:%{public}d.\n", bytes);
+    LOGI("CheckPacketUdpSum() success, bytes:%{public}d.", bytes);
     return SOCKET_OPT_SUCCESS;
 }
 
@@ -403,11 +403,11 @@ int GetDhcpRawPacket(struct DhcpPacket *getPacket, int rawFd)
 
     int nDhcpPacket = nBytes - (int)(sizeof(udpPackets.ip) + sizeof(udpPackets.udp));
     if (memcpy_s(getPacket, sizeof(struct DhcpPacket), &(udpPackets.data), nDhcpPacket) != EOK) {
-        LOGE("GetDhcpRawPacket() memcpy_s packet.data failed!\n");
+        LOGE("GetDhcpRawPacket() memcpy_s packet.data failed!");
         return SOCKET_OPT_FAILED;
     }
     if (ntohl(getPacket->cookie) != MAGIC_COOKIE) {
-        LOGE("GetDhcpRawPacket() cook:%{public}x error, COOK:%{public}x!\n", ntohl(getPacket->cookie), MAGIC_COOKIE);
+        LOGE("GetDhcpRawPacket() cook:%{public}x error, COOK:%{public}x!", ntohl(getPacket->cookie), MAGIC_COOKIE);
         return SOCKET_OPT_FAILED;
     }
     return nDhcpPacket;
@@ -421,12 +421,12 @@ int GetDhcpKernelPacket(struct DhcpPacket *getPacket, int sockFd)
 
     int nBytes = -1;
     if ((nBytes = read(sockFd, getPacket, sizeof(struct DhcpPacket))) == -1) {
-        LOGE("GetDhcpKernelPacket() couldn't read on kernel listening socket, error:%{public}s!\n", strerror(errno));
+        LOGE("GetDhcpKernelPacket() couldn't read on kernel listening socket, error:%{public}s!", strerror(errno));
         return SOCKET_OPT_ERROR;
     }
 
     if (ntohl(getPacket->cookie) != MAGIC_COOKIE) {
-        LOGE("GetDhcpKernelPacket() cook:%{public}x error, COOK:%{public}x!\n", ntohl(getPacket->cookie), MAGIC_COOKIE);
+        LOGE("GetDhcpKernelPacket() cook:%{public}x error, COOK:%{public}x!", ntohl(getPacket->cookie), MAGIC_COOKIE);
         return SOCKET_OPT_FAILED;
     }
     return nBytes;

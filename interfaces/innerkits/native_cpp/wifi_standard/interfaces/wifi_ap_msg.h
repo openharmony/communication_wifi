@@ -20,6 +20,7 @@
 
 namespace OHOS {
 namespace Wifi {
+#define AP_CHANNEL_DEFAULT 6
 enum class ApState {
     AP_STATE_NONE = 0,
     AP_STATE_IDLE,
@@ -52,9 +53,9 @@ struct HotspotConfig {
     HotspotConfig()
     {
         securityType = KeyMgmt::WPA2_PSK;
-        band = BandType::BAND_NONE;
-        channel = 0;
-        maxConn = 0;
+        band = BandType::BAND_2GHZ;
+        channel = AP_CHANNEL_DEFAULT;
+        maxConn = -1;
     }
 
     inline void SetSsid(const std::string &newSsid)
@@ -115,9 +116,9 @@ private:
     std::string ssid;         /* Hotspot name, The string length range is 1~32 */
     std::string preSharedKey; /* Hotspot password ,The string length range is 8~63 */
     KeyMgmt securityType;     /* Hotspot Encryption type, Optional NONE/WPA_PSK/WPA2_PSK */
-    BandType band;            /* Hotspot band */
-    int32_t channel;          /* Hotspot channel */
-    int32_t maxConn;          /* Hotspot maximum number of connections, The range is 1-32 */
+    BandType band;
+    int32_t channel;
+    int32_t maxConn;
 };
 
 struct StationInfo {

@@ -63,11 +63,6 @@ WifiErrorNo WifiApHalInterface::GetStationList(std::vector<std::string> &result)
     return mIdlClient->GetStationList(result);
 }
 
-WifiErrorNo WifiApHalInterface::SetHotspotConfig(int channel, const std::string &mscb)
-{
-    return mIdlClient->SetHotspotConfig(channel, mscb);
-}
-
 WifiErrorNo WifiApHalInterface::AddBlockByMac(const std::string &mac)
 {
     return mIdlClient->AddBlockByMac(mac);

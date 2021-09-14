@@ -48,6 +48,7 @@ public:
 
 private:
     bool Init();
+    bool IsScanServiceRunning();
 
 private:
     static sptr<WifiScanServiceImpl> g_instance;

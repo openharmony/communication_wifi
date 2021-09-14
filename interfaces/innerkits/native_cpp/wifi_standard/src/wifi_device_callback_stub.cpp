@@ -144,13 +144,13 @@ int WifiDeviceCallBackStub::RemoteOnWifiConnectionChanged(uint32_t code, Message
     int state = data.ReadInt32();
     WifiLinkedInfo info;
     info.networkId = data.ReadInt32();
-    info.ssid = Str16ToStr8(data.ReadString16());
-    info.bssid = Str16ToStr8(data.ReadString16());
+    info.ssid = data.ReadCString();
+    info.bssid = data.ReadCString();
     info.rssi = data.ReadInt32();
     info.band = data.ReadInt32();
     info.frequency = data.ReadInt32();
     info.linkSpeed = data.ReadInt32();
-    info.macAddress = Str16ToStr8(data.ReadString16());
+    info.macAddress = data.ReadCString();
     info.ipAddress = data.ReadInt32();
     int tmpConnState = data.ReadInt32();
     if (tmpConnState >= 0 && tmpConnState <= int(ConnState::FAILED)) {
@@ -159,8 +159,8 @@ int WifiDeviceCallBackStub::RemoteOnWifiConnectionChanged(uint32_t code, Message
         info.connState = ConnState::FAILED;
     }
     info.ifHiddenSSID = data.ReadBool();
-    info.rxLinkSpeed = Str16ToStr8(data.ReadString16());
-    info.txLinkSpeed = Str16ToStr8(data.ReadString16());
+    info.rxLinkSpeed = data.ReadCString();
+    info.txLinkSpeed = data.ReadCString();
     info.chload = data.ReadInt32();
     info.snr = data.ReadInt32();
     int tmpState = data.ReadInt32();
@@ -194,7 +194,7 @@ int WifiDeviceCallBackStub::RemoteOnWifiWpsStateChanged(uint32_t code, MessagePa
 {
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
     int state = data.ReadInt32();
-    std::string pinCode = Str16ToStr8(data.ReadString16());
+    std::string pinCode = data.ReadCString();
     OnWifiWpsStateChanged(state, pinCode);
     reply.WriteInt32(0); /* Reply 0 to indicate that no exception occurs. */
     return 0;

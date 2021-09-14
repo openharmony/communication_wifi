@@ -16,12 +16,12 @@
 #ifndef OHOS_WIFI_SCAN_INTERFACE_H
 #define OHOS_WIFI_SCAN_INTERFACE_H
 
-#include "base_service.h"
+#include "iscan_service.h"
 #include "scan_service.h"
 
 namespace OHOS {
 namespace Wifi {
-class ScanInterface : BaseService {
+class ScanInterface : public IScanService {
 public:
     ScanInterface();
     ~ScanInterface();
@@ -29,76 +29,75 @@ public:
     /**
      * @Description  Scan service initialization function.
      *
-     * @param mqUp - message queue,which is used to return results.[in]
-     * @return success: 0, failed: -1
+     * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
      */
-    int Init(WifiMessageQueue<WifiResponseMsgInfo> *mqUp);
+    ErrCode Init();
     /**
-     * @Description  Receives the function information of the Scan service and
-     *               distributes and processes the information.
-     *
-     * @param requestMsg - request message[in]
-     * @return success: 0, failed: -1
-     */
-    int PushMsg(WifiRequestMsgInfo *msg);
-    /**
-     *
      * @Description  Stopping the Scan Service
-     * @return success: 0, failed: -1
-     */
-    int UnInit();
-
-private:
-    /**
-     * @Description  Receives the function information of the Scan service and
-     *               distributes and processes the information.
      *
-     * @param requestMsg - request message[in]
+     * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
      */
-    void HandleRequestMsg(const WifiRequestMsgInfo *requestMsg);
+    ErrCode UnInit();
     /**
-     * @Description Processes interface service SCAN_REQ messages.
+     * @Description Processes interface service scan request.
      *
+     * @param externFlag it is from an external scan[in]
+     * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
      */
-    void DealScanMsg();
+    ErrCode Scan(bool externFlag);
     /**
-     * @Description Processes interface service SCAN_PARAM_REQ messages.
+     * @Description Processes interface service scan with param request.
      *
-     * @param requestMsg request message[in]
+     * @param wifiScanParams Parameters in the scan request[in]
+     * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
      */
-    void DealScanParamMsg(const WifiRequestMsgInfo *requestMsg);
+    ErrCode ScanWithParam(const WifiScanParams &wifiScanParams);
     /**
-     * @Description Processes interface service SCAN_RECONNECT_REQ messages.
+     * @Description Processes interface service screen change request.
      *
+     * @param screenState screen state[in]
+     * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
      */
-    void DealScanReconnectMsg();
+    ErrCode OnScreenStateChanged(int screenState);
     /**
-     * @Description Processes interface service SCREEN_CHANGE_NOTICE messages.
+     * @Description Processes interface service sta status change request.
      *
-     * @param requestMsg request message[in]
+     * @param staStatus sta status[in]
+     * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
      */
-    void DealScreenChangeMsg(const WifiRequestMsgInfo *requestMsg);
+    ErrCode OnClientModeStatusChanged(int staStatus);
     /**
-     * @Description Processes interface service SCAN_NOTIFY_STA_CONN_REQ messages.
+     * @Description Processes interface service appMode change request.
      *
-     * @param requestMsg request message[in]
+     * @param appMode operate app mode[in]
+     * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
      */
-    void DealStaNotifyScanMsg(const WifiRequestMsgInfo *requestMsg);
+    ErrCode OnAppRunningModeChanged(int appMode);
     /**
-     * @Description Processes interface service FRONT_BACK_STATUS_CHANGE_NOTICE messages.
+     * @Description Processes interface service custom scene change request.
      *
-     * @param requestMsg request message[in]
+     * @param customScene custom scene[in]
+     * @param customSceneStatus Enter or exit the customized scenario[in]
+     * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
      */
-    void DealAppModeChangeMsg(const WifiRequestMsgInfo *requestMsg);
+    ErrCode OnCustomControlStateChanged(int customScene, int customSceneStatus);
     /**
-     * @Description Processes interface service CUSTOM_STATUS_CHANGE_NOTICE messages.
+     * @Description Processes interface service scan control info change request.
      *
-     * @param requestMsg request message[in]
+     * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
      */
-    void DealCustomSceneChangeMsg(const WifiRequestMsgInfo *requestMsg);
+    ErrCode OnControlStrategyChanged();
+    /**
+     * @Description Registers the callback function of the scanning module to the interface service.
+     *
+     * @param scanSerivceCallbacks callback function
+     * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
+     */
+    ErrCode RegisterScanCallbacks(const IScanSerivceCallbacks &scanSerivceCallbacks);
 
 private:
     ScanService *pScanService;
+    IScanSerivceCallbacks mScanSerivceCallbacks;
 };
 }  // namespace Wifi
 }  // namespace OHOS

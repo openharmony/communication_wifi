@@ -193,13 +193,12 @@ public:
     virtual ErrCode GetCountryCode(std::string &countryCode) = 0;
 
     /**
-     * @Description Client register callback event
+     * @Description Register callback function.
      *
-     * @param name - client's name, which is a unique identifier
-     * @param callback - client object
+     * @param callback - IWifiDeviceCallBack object
      * @return ErrCode - operation result
      */
-    virtual ErrCode RegisterCallBackClient(const std::string &name, const sptr<IWifiDeviceCallBack> &callback) = 0;
+    virtual ErrCode RegisterCallBack(const sptr<IWifiDeviceCallBack> &callback) = 0;
 
     /**
      * @Description Get the Signal Level object
@@ -218,6 +217,14 @@ public:
      * @return ErrCode - operation result
      */
     virtual ErrCode GetSupportedFeatures(long &features) = 0;
+
+    /**
+     * @Description  Get the device MAC address.
+     *
+     * @param result - Get device mac String
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode GetDeviceMacAddress(std::string &result) = 0;
 
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.wifi.IWifiDeviceService");

@@ -171,10 +171,12 @@ int GetLocalInterface(const char *ifname, int *ifindex, unsigned char *hwaddr, u
 
     if (memset_s(&iface, sizeof(iface), 0, sizeof(iface)) != EOK) {
         LOGE("GetLocalInterface() ifname:%{public}s failed, memset_s error!", ifname);
+        close(fd);
         return DHCP_OPT_FAILED;
     }
     if (strncpy_s(iface.ifr_name, sizeof(iface.ifr_name), ifname, strlen(ifname)) != EOK) {
         LOGE("GetLocalInterface() ifname:%{public}s failed, strncpy_s error!", ifname);
+        close(fd);
         return DHCP_OPT_FAILED;
     }
 
@@ -192,6 +194,7 @@ int GetLocalInterface(const char *ifname, int *ifindex, unsigned char *hwaddr, u
     }
     if (memcpy_s(hwaddr, MAC_ADDR_LEN, iface.ifr_hwaddr.sa_data, MAC_ADDR_LEN) != EOK) {
         LOGE("GetLocalInterface() ifname:%{public}s failed, memcpy_s error!", ifname);
+        close(fd);
         return DHCP_OPT_FAILED;
     }
 
@@ -294,18 +297,22 @@ int SetLocalInterface(const char *ifname, uint32_t ifaddr4)
     }
 
     if (memset_s(&ifr, sizeof(ifr), 0, sizeof(ifr)) != EOK) {
+        close(fd);
         return DHCP_OPT_FAILED;
     }
     if (strncpy_s(ifr.ifr_name, sizeof(ifr.ifr_name), ifname, strlen(ifname)) != EOK) {
+        close(fd);
         return DHCP_OPT_FAILED;
     }
 
     if (memset_s(&sin, sizeof(sin), 0, sizeof(sin)) != EOK) {
+        close(fd);
         return DHCP_OPT_FAILED;
     }
     sin.sin_family = AF_INET;
     sin.sin_addr.s_addr = htonl(ifaddr4);
     if (memcpy_s(&ifr.ifr_addr, sizeof(ifr.ifr_addr), &sin, sizeof(struct sockaddr)) != EOK) {
+        close(fd);
         return DHCP_OPT_FAILED;
     }
 

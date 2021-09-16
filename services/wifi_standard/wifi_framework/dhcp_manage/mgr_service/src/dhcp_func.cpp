@@ -227,6 +227,7 @@ int DhcpFunc::GetLocalMac(const std::string ethInf, std::string& ethMac)
     }
 
     if (strncpy_s(ifr.ifr_name, IFNAMSIZ, ethInf.c_str(), IFNAMSIZ - 1) != EOK) {
+        close(sd);
         return -1;
     }
 

@@ -33,7 +33,9 @@ WifiSettings::WifiSettings()
       mP2pState(static_cast<int>(P2pState::P2P_STATE_CLOSED)),
       mP2pDiscoverState(0),
       mP2pConnectState(0),
-
+      mApMaxConnNum(0),
+      mLastSelectedNetworkId(-1),
+      mLastSelectedTimeVal(0),
       mScreenState(1),
       mAirplaneModeState(MODE_STATE_CLOSE),
       mAppRunningModeState(1),

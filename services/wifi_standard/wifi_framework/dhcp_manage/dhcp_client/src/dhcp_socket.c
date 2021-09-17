@@ -60,7 +60,7 @@ int CreateRawSocket(int *rawFd)
 {
     int sockFd = socket(PF_PACKET, SOCK_DGRAM, htons(ETH_P_IP));
     if (sockFd == -1) {
-        LOGE("CreateRawSocket() failed, socket error:%{public}s.", strerror(errno));
+        LOGE("CreateRawSocket() failed, socket error:%{public}d.", errno);
         return SOCKET_OPT_FAILED;
     }
     *rawFd = sockFd;
@@ -72,7 +72,7 @@ int CreateKernelSocket(int *sockFd)
 {
     int nFd = socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP);
     if (nFd == -1) {
-        LOGE("CreateKernelSocket() failed, socket error:%{public}s.", strerror(errno));
+        LOGE("CreateKernelSocket() failed, socket error:%{public}d.", errno);
         return SOCKET_OPT_FAILED;
     }
     *sockFd = nFd;
@@ -105,7 +105,7 @@ int BindRawSocket(const int rawFd, const int ifaceIndex, const uint8_t *ifaceAdd
     }
     int nRet = bind(rawFd, (struct sockaddr *)&rawAddr, sizeof(rawAddr));
     if (nRet == -1) {
-        LOGE("BindRawSocket() index:%{public}d failed, bind error:%{public}s.", ifaceIndex, strerror(errno));
+        LOGE("BindRawSocket() index:%{public}d failed, bind error:%{public}d.", ifaceIndex, errno);
         close(rawFd);
         return SOCKET_OPT_FAILED;
     }
@@ -128,7 +128,7 @@ int BindKernelSocket(const int sockFd, const char *ifaceName, const uint32_t soc
             return SOCKET_OPT_FAILED;
         }
         if (setsockopt(sockFd, SOL_SOCKET, SO_BINDTODEVICE, (char *)&ifaceReq, sizeof(ifaceReq)) == -1) {
-            LOGE("BindKernelSocket() %{public}s SO_BINDTODEVICE error:%{public}s.", ifaceName, strerror(errno));
+            LOGE("BindKernelSocket() %{public}s SO_BINDTODEVICE error:%{public}d.", ifaceName, errno);
             close(sockFd);
             return SOCKET_OPT_FAILED;
         }
@@ -137,7 +137,7 @@ int BindKernelSocket(const int sockFd, const char *ifaceName, const uint32_t soc
     /* Set the broadcast feature of the data sent by the socket. */
     if (bCast) {
         if (setsockopt(sockFd, SOL_SOCKET, SO_BROADCAST, (const char *)&bCast, sizeof(bool)) == -1) {
-            LOGE("BindKernelSocket() sockFd:%{public}d SO_BROADCAST error:%{public}s.", sockFd, strerror(errno));
+            LOGE("BindKernelSocket() sockFd:%{public}d SO_BROADCAST error:%{public}d.", sockFd, errno);
             close(sockFd);
             return SOCKET_OPT_FAILED;
         }
@@ -146,7 +146,7 @@ int BindKernelSocket(const int sockFd, const char *ifaceName, const uint32_t soc
     /* Allow multiple sockets to use the same port number. */
     int bReuseaddr = 1;
     if (setsockopt(sockFd, SOL_SOCKET, SO_REUSEADDR, (const char *)&bReuseaddr, sizeof(bReuseaddr)) == -1) {
-        LOGE("BindKernelSocket() sockFd:%{public}d SO_REUSEADDR error:%{public}s.", sockFd, strerror(errno));
+        LOGE("BindKernelSocket() sockFd:%{public}d SO_REUSEADDR error:%{public}d.", sockFd, errno);
         close(sockFd);
         return SOCKET_OPT_FAILED;
     }
@@ -161,7 +161,7 @@ int BindKernelSocket(const int sockFd, const char *ifaceName, const uint32_t soc
     kernelAddr.sin_family = AF_INET;
     int nRet = bind(sockFd, (struct sockaddr *)&kernelAddr, sizeof(kernelAddr));
     if (nRet == -1) {
-        LOGE("BindKernelSocket() sockFd:%{public}d failed, bind error:%{public}s.", sockFd, strerror(errno));
+        LOGE("BindKernelSocket() sockFd:%{public}d failed, bind error:%{public}d.", sockFd, errno);
         close(sockFd);
         return SOCKET_OPT_FAILED;
     }
@@ -218,7 +218,7 @@ int SendToDhcpPacket(
 
     ssize_t nBytes = sendto(nFd, &udpPackets, sizeof(udpPackets), 0, (struct sockaddr *)&rawAddr, sizeof(rawAddr));
     if (nBytes <= 0) {
-        LOGE("SendToDhcpPacket() fd:%{public}d failed, sendto error:%{public}s.", nFd, strerror(errno));
+        LOGE("SendToDhcpPacket() fd:%{public}d failed, sendto error:%{public}d.", nFd, errno);
     } else {
         LOGI("SendToDhcpPacket() fd:%{public}d, index:%{public}d, bytes:%{public}d.", nFd, destIndex, (int)nBytes);
     }
@@ -245,14 +245,14 @@ int SendDhcpPacket(struct DhcpPacket *sendPacket, uint32_t srcIp, uint32_t destI
     kernelAddr.sin_family = AF_INET;
     int nRet = connect(nFd, (struct sockaddr *)&kernelAddr, sizeof(kernelAddr));
     if (nRet == -1) {
-        LOGE("SendDhcpPacket() nFd:%{public}d failed, connect error:%{public}s.", nFd, strerror(errno));
+        LOGE("SendDhcpPacket() nFd:%{public}d failed, connect error:%{public}d.", nFd, errno);
         close(nFd);
         return SOCKET_OPT_FAILED;
     }
 
     ssize_t nBytes = write(nFd, sendPacket, sizeof(struct DhcpPacket));
     if (nBytes <= 0) {
-        LOGE("SendDhcpPacket() fd:%{public}d failed, write error:%{public}s.", nFd, strerror(errno));
+        LOGE("SendDhcpPacket() fd:%{public}d failed, write error:%{public}d.", nFd, errno);
     } else {
         LOGI("SendDhcpPacket() fd:%{public}d, srcIp:%{private}u, bytes:%{public}d.", nFd, srcIp, (int)nBytes);
     }
@@ -263,8 +263,8 @@ int SendDhcpPacket(struct DhcpPacket *sendPacket, uint32_t srcIp, uint32_t destI
 int CheckReadBytes(const int count, const int totLen)
 {
     if (count < 0) {
-        LOGE("CheckReadBytes() couldn't read on raw listening socket, count:%{public}d, error:%{public}s!",
-            count, strerror(errno));
+        LOGE("CheckReadBytes() couldn't read on raw listening socket, count:%{public}d, error:%{public}d!",
+            count, errno);
         /* The specified network interface service may be down. */
         sleep(NUMBER_ONE);
         return SOCKET_OPT_ERROR;
@@ -421,7 +421,7 @@ int GetDhcpKernelPacket(struct DhcpPacket *getPacket, int sockFd)
 
     int nBytes = -1;
     if ((nBytes = read(sockFd, getPacket, sizeof(struct DhcpPacket))) == -1) {
-        LOGE("GetDhcpKernelPacket() couldn't read on kernel listening socket, error:%{public}s!", strerror(errno));
+        LOGE("GetDhcpKernelPacket() couldn't read on kernel listening socket, error:%{public}d!", errno);
         return SOCKET_OPT_ERROR;
     }
 

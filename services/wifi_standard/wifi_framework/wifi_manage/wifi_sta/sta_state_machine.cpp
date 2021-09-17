@@ -524,6 +524,7 @@ void StaStateMachine::StopWifiProcess()
 
     IpInfo ipInfo;
     WifiSettings::GetInstance().SaveIpInfo(ipInfo);
+    IfConfig::GetInstance().FlushIpAddr(IF_NAME, IPTYPE_IPV4);
 
     /* clear connection information. */
     InitWifiLinkedInfo();
@@ -804,6 +805,7 @@ void StaStateMachine::DealDisconnectEvent(InternalMessage *msg)
 
     IpInfo ipInfo;
     WifiSettings::GetInstance().SaveIpInfo(ipInfo);
+    IfConfig::GetInstance().FlushIpAddr(IF_NAME, IPTYPE_IPV4);
     /* Initialize connection informatoin. */
     InitWifiLinkedInfo();
     if (lastLinkedInfo.detailedState == DetailedState::CONNECTING) {

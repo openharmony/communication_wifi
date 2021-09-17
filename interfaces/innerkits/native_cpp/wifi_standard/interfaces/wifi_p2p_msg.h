@@ -53,7 +53,8 @@ enum class P2pActionCallback : unsigned char {
     DeleteGroup,
     P2pConnect,
     P2pDisConnect,
-    P2pSetDeviceName
+    P2pSetDeviceName,
+    UNKNOWN
 };
 
 enum class P2pState {
@@ -355,7 +356,9 @@ class WifiP2pServiceRequest {
 public:
     WifiP2pServiceRequest() : mProtocolType(P2pServicerProtocolType::SERVICE_TYPE_ALL), mTransactionId(0)
     {}
-    WifiP2pServiceRequest(P2pServicerProtocolType protocolType, const std::string &data) : mProtocolType(protocolType)
+    WifiP2pServiceRequest(P2pServicerProtocolType protocolType, const std::string &data)
+        : mProtocolType(protocolType),
+          mTransactionId(0)
     {
         for (unsigned long i = 0; i < data.length(); ++i) {
             mQuery.push_back(data.at(i));
@@ -452,7 +455,7 @@ private:
 
 class P2pVendorConfig {
 public:
-    P2pVendorConfig() : randomMacSupport(false), deviceName(""), primaryDeviceType("10-0050F204-5")
+    P2pVendorConfig() : randomMacSupport(false), isAutoListen(false), primaryDeviceType("10-0050F204-5")
     {}
     ~P2pVendorConfig()
     {}

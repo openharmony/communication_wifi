@@ -69,6 +69,7 @@ public:
      */
     void CopyMessageBody(const MessageBody &origBody);
 
+private:
     /* Integer data. */
     std::list<int> intArray_;
     /* String data. */
@@ -195,6 +196,11 @@ public:
         mMessageObj = T(messageObj);
     }
 
+    void SetMessageObj(const std::any &messageObj)
+    {
+        mMessageObj = messageObj;
+    }
+
     /**
      * @DescriptionGet the Message Obj object
      * @tparam  - T Custom type to be set
@@ -206,6 +212,11 @@ public:
     {
         messageObj = std::any_cast<const T &>(mMessageObj);
         return true;
+    }
+
+    const std::any &GetMessageObj(void) const
+    {
+        return mMessageObj;
     }
 
     /**
@@ -248,6 +259,7 @@ public:
      */
     void SetHandleTime(int64_t time);
 
+private:
     /* Message Name */
     int mMsgName;
     /* Parameter 1 */

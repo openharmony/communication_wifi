@@ -33,15 +33,20 @@ WifiBaseHalInterface::~WifiBaseHalInterface()
     }
 }
 
-void WifiBaseHalInterface::InitIdlClient(void)
+bool WifiBaseHalInterface::InitIdlClient(void)
 {
-    mIdlClient = new (std::nothrow) WifiIdlClient;
-    if (mIdlClient != nullptr) {
-        mIdlClient->InitClient();
-    } else {
-        LOGE("Failed to create idl client");
+    if (mIdlClient == nullptr) {
+        mIdlClient = new (std::nothrow) WifiIdlClient;
     }
-    return;
+    if (mIdlClient == nullptr) {
+        LOGE("Failed to create idl client");
+        return false;
+    }
+    if (mIdlClient->InitClient() != 0) {
+        LOGE("Failed to init idl client");
+        return false;
+    }
+    return true;
 }
 
 void WifiBaseHalInterface::ExitAllIdlClient(void)

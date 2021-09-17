@@ -110,10 +110,11 @@ public:
     /**
      * @Description : Get dhcp server lease info.
      *
+     * @param ifname - interface name, eg:wlan0 [in]
      * @param leases - lease info [out]
      * @Return : success - DHCP_OPT_SUCCESS, failed - others.
      */
-    virtual int GetLeases(std::vector<std::string>& leases) = 0;
+    virtual int GetLeases(const std::string& ifname, std::vector<std::string>& leases) = 0;
 
     /**
      * @Description : Obtain the abnormal exit status of dhcp server process.

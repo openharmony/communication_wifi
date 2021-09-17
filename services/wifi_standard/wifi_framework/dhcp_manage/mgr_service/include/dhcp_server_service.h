@@ -114,10 +114,11 @@ public:
     /**
      * @Description : Get dhcp server lease info.
      *
+     * @param ifname - interface name, eg:wlan0 [in]
      * @param leases - lease info [out]
      * @Return : success - DHCP_OPT_SUCCESS, failed - others.
      */
-    int GetLeases(std::vector<std::string>& leases) override;
+    int GetLeases(const std::string& ifname, std::vector<std::string>& leases) override;
 
     /**
      * @Description : Obtain the abnormal exit status of dhcp server process.
@@ -176,6 +177,14 @@ public:
      * @Return : success - DHCP_OPT_SUCCESS, failed - others.
      */
     int GetUsingIpRange(const std::string ifname, std::string& ipRange);
+
+    /**
+     * @Description : Create default config file.
+     *
+     * @param strFile - config file name [in]
+     * @Return : success - DHCP_OPT_SUCCESS, failed - others.
+     */
+    int CreateDefaultConfigFile(const std::string strFile);
 
 private:
     /**

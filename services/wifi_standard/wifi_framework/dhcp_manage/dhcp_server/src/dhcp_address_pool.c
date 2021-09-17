@@ -34,11 +34,6 @@ static int g_releaseRemoveMode = DHCP_RELEASE_REMOVE_MODE;
 static HashTable g_bindingRecoders;
 static int g_distributeMode = 0;
 
-AddressBinding *QueryBinding(uint8_t macAddr[DHCP_HWADDR_LENGTH], PDhcpOptionList cliOptins)
-{
-    return GetBindingByMac(&g_bindingRecoders, macAddr);
-}
-
 AddressBinding *GetBindingByMac(HashTable *bindTable, uint8_t macAddr[DHCP_HWADDR_LENGTH])
 {
     if (!bindTable) {
@@ -53,6 +48,11 @@ AddressBinding *GetBindingByMac(HashTable *bindTable, uint8_t macAddr[DHCP_HWADD
         return (AddressBinding *)At(bindTable, (uintptr_t)macAddr);
     }
     return NULL;
+}
+
+AddressBinding *QueryBinding(uint8_t macAddr[DHCP_HWADDR_LENGTH], PDhcpOptionList cliOptins)
+{
+    return GetBindingByMac(&g_bindingRecoders, macAddr);
 }
 
 AddressBinding *GetBindingByIp(HashTable *bindTable, uint32_t ipAddress)
@@ -76,7 +76,9 @@ AddressBinding *AddNewBinding(uint8_t macAddr[DHCP_HWADDR_LENGTH], PDhcpOptionLi
     AddressBinding newBind = {0};
     newBind.bindingMode = BIND_MODE_DYNAMIC;
     newBind.bindingStatus = BIND_PENDING;
-    memcpy_s(newBind.chaddr, DHCP_HWADDR_LENGTH, macAddr, DHCP_HWADDR_LENGTH);
+    if (memcpy_s(newBind.chaddr, DHCP_HWADDR_LENGTH, macAddr, DHCP_HWADDR_LENGTH) != EOK) {
+        return NULL;
+    }
     newBind.bindingTime = Tmspsec();
     newBind.pendingTime = Tmspsec();
     newBind.expireIn = newBind.bindingTime + DHCP_LEASE_TIME;
@@ -195,7 +197,6 @@ uint32_t AddressDistribute(DhcpAddressPool *pool, uint8_t macAddr[DHCP_HWADDR_LE
     uint32_t distIp = pool->distribution;
     if (!distIp || distIp < pool->addressRange.beginAddress) {
         distIp = pool->addressRange.beginAddress;
-        //pool->distribution = distIp;
     }
     int distSucess = 0;
     int outOfRange = 0;
@@ -223,6 +224,7 @@ uint32_t AddressDistribute(DhcpAddressPool *pool, uint8_t macAddr[DHCP_HWADDR_LE
     pool->distribution = distIp;
     return pool->distribution;
 }
+
 int InitAddressPool(DhcpAddressPool *pool, const char *ifname, PDhcpOptionList options)
 {
     if (!pool) {
@@ -281,7 +283,7 @@ void FreeAddressPool(DhcpAddressPool *pool)
     }
 
     if (Initialized(&g_bindingRecoders)) {
-        DestroyHashTable(&g_bindingRecoders);
+        ClearAll(&g_bindingRecoders);
     }
 }
 
@@ -449,22 +451,6 @@ int ReleaseBinding(uint8_t macAddr[DHCP_HWADDR_LENGTH])
     return RET_FAILED;
 }
 
-int ReBinding(uint8_t macAddr[DHCP_HWADDR_LENGTH])
-{
-    if (ContainsKey(&g_bindingRecoders, (uintptr_t)macAddr)) {
-        AddressBinding *binding = GetBindingByMac(&g_bindingRecoders, macAddr);
-        if (!binding) {
-            LOGE("failed to query binding.");
-            return RET_ERROR;
-        }
-
-        if (binding->bindingStatus == BIND_ASSOCIATED) {
-        }
-        LOGE("client not binding.");
-    }
-    return RET_FAILED;
-}
-
 int AddLease(DhcpAddressPool *pool, AddressBinding *lease)
 {
     if (!pool) {
@@ -554,7 +540,6 @@ int LoadBindingRecoders(DhcpAddressPool *pool)
         return RET_FAILED;
     }
     FILE *fp = fopen(filePath, "r");
-    LOGD("lease file: %s", filePath);
     if (fp == NULL) {
         return RET_FAILED;
     }

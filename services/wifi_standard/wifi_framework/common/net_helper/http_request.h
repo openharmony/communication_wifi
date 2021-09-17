@@ -36,6 +36,7 @@ constexpr int HTTP_HEADER_LENGTH = 7;
 constexpr int HTTPS_HEADER_LENGTH = 8;
 constexpr int DEFAULT_PORT = 80;
 constexpr int SEND_HTTP_DELAY_TIME = 6;
+constexpr int MAX_IP_STRING_LENGTH = 64;
 
 namespace OHOS {
 namespace Wifi {

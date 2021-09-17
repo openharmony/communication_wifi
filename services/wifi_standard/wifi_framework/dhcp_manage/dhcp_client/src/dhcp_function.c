@@ -165,7 +165,7 @@ int GetLocalInterface(const char *ifname, int *ifindex, unsigned char *hwaddr, u
     struct sockaddr_in *pSockIn = NULL;
 
     if ((fd = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
-        LOGE("GetLocalInterface() ifname:%{public}s failed, socket err:%{public}s!", ifname, strerror(errno));
+        LOGE("GetLocalInterface() ifname:%{public}s failed, socket err:%{public}d!", ifname, errno);
         return DHCP_OPT_FAILED;
     }
 
@@ -181,14 +181,14 @@ int GetLocalInterface(const char *ifname, int *ifindex, unsigned char *hwaddr, u
     }
 
     if (ioctl(fd, SIOCGIFINDEX, &iface) != 0) {
-        LOGE("GetLocalInterface() %{public}s failed, SIOCGIFINDEX err:%{public}s!", ifname, strerror(errno));
+        LOGE("GetLocalInterface() %{public}s failed, SIOCGIFINDEX err:%{public}d!", ifname, errno);
         close(fd);
         return DHCP_OPT_FAILED;
     }
     *ifindex = iface.ifr_ifindex;
 
     if (ioctl(fd, SIOCGIFHWADDR, &iface) != 0) {
-        LOGE("GetLocalInterface() %{public}s failed, SIOCGIFHWADDR err:%{public}s!", ifname, strerror(errno));
+        LOGE("GetLocalInterface() %{public}s failed, SIOCGIFHWADDR err:%{public}d!", ifname, errno);
         close(fd);
         return DHCP_OPT_FAILED;
     }
@@ -200,7 +200,7 @@ int GetLocalInterface(const char *ifname, int *ifindex, unsigned char *hwaddr, u
 
     if (ifaddr4 != NULL) {
         if (ioctl(fd, SIOCGIFADDR, &iface) < 0) {
-            LOGE("GetLocalInterface() %{public}s failed, SIOCGIFADDR err:%{public}s!", ifname, strerror(errno));
+            LOGE("GetLocalInterface() %{public}s failed, SIOCGIFADDR err:%{public}d!", ifname, errno);
             close(fd);
             return DHCP_OPT_FAILED;
         }
@@ -225,7 +225,7 @@ int GetLocalIp(const char *ifname, uint32_t *ifaddr4)
     char strIp[NI_MAXHOST];
 
     if (getifaddrs(&ifaddr) == -1) {
-        LOGE("GetLocalIp() ifname:%{public}s failed, getifaddrs error:%{public}s!", ifname, strerror(errno));
+        LOGE("GetLocalIp() ifname:%{public}s failed, getifaddrs error:%{public}d!", ifname, errno);
         return DHCP_OPT_FAILED;
     }
 
@@ -292,7 +292,7 @@ int SetLocalInterface(const char *ifname, uint32_t ifaddr4)
     struct sockaddr_in sin;
 
     if ((fd = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
-        LOGE("SetLocalInterface() ifname:%{public}s failed, socket error:%{public}s!", ifname, strerror(errno));
+        LOGE("SetLocalInterface() ifname:%{public}s failed, socket error:%{public}d!", ifname, errno);
         return DHCP_OPT_FAILED;
     }
 
@@ -318,7 +318,7 @@ int SetLocalInterface(const char *ifname, uint32_t ifaddr4)
 
     /* Similar to the system command: ifconfig ifname ifaddr4. */
     if (ioctl(fd, SIOCSIFADDR, &ifr) < 0) {
-        LOGE("SetLocalInterface() %{public}s failed, SIOCSIFADDR err:%{public}s!", ifname, strerror(errno));
+        LOGE("SetLocalInterface() %{public}s failed, SIOCSIFADDR err:%{public}d!", ifname, errno);
         close(fd);
         return DHCP_OPT_FAILED;
     }
@@ -338,20 +338,20 @@ int InitPidfile(const char *pidDir, const char *pidFile, pid_t pid)
 
     int fd;
     if ((fd = open(pidFile, O_WRONLY | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH)) < 0) {
-        LOGE("InitPidfile() failed, open pidFile:%{public}s error:%{public}s!", pidFile, strerror(errno));
+        LOGE("InitPidfile() failed, open pidFile:%{public}s error:%{public}d!", pidFile, errno);
         return DHCP_OPT_FAILED;
     }
 
     char buf[PID_MAX_LEN] = {0};
     if (snprintf_s(buf, PID_MAX_LEN, PID_MAX_LEN - 1, "%d", pid) < 0) {
-        LOGE("InitPidfile() pidFile:%{public}s failed, snprintf_s error:%{public}s!", pidFile, strerror(errno));
+        LOGE("InitPidfile() pidFile:%{public}s failed, snprintf_s error:%{public}d!", pidFile, errno);
         close(fd);
         return DHCP_OPT_FAILED;
     }
     ssize_t bytes;
     if ((bytes = write(fd, buf, strlen(buf))) <= 0) {
-        LOGE("InitPidfile() failed, write pidFile:%{public}s error:%{public}s, bytes:%{public}zd!",
-            pidFile, strerror(errno), bytes);
+        LOGE("InitPidfile() failed, write pidFile:%{public}s error:%{public}d, bytes:%{public}zd!",
+            pidFile, errno, bytes);
         close(fd);
         return DHCP_OPT_FAILED;
     }
@@ -359,7 +359,7 @@ int InitPidfile(const char *pidDir, const char *pidFile, pid_t pid)
     close(fd);
 
     if (chdir(pidDir) != 0) {
-        LOGE("InitPidfile() failed, chdir pidDir:%{public}s error:%{public}s!", pidDir, strerror(errno));
+        LOGE("InitPidfile() failed, chdir pidDir:%{public}s error:%{public}d!", pidDir, errno);
         return DHCP_OPT_FAILED;
     }
 
@@ -377,7 +377,7 @@ pid_t GetPID(const char *pidFile)
     /* Check pidFile is or not exists. */
     struct stat sb;
     if (stat(pidFile, &sb) != 0) {
-        LOGW("GetPID() pidFile:%{public}s stat error:%{public}s!", pidFile, strerror(errno));
+        LOGW("GetPID() pidFile:%{public}s stat error:%{public}d!", pidFile, errno);
         return -1;
     }
     LOGI("GetPID() pidFile:%{public}s stat st_size:%{public}d.", pidFile, (int)sb.st_size);
@@ -433,7 +433,7 @@ int CreateDirs(const char *dirs, int mode)
         if (strDir[i] == '/') {
             strDir[i] = 0;
             if ((access(strDir, F_OK) != 0) && (mkdir(strDir, mode) != 0)) {
-                LOGE("CreateDirs() mkdir %{public}s %{public}.4o failed:%{public}s!", strDir, mode, strerror(errno));
+                LOGE("CreateDirs() mkdir %{public}s %{public}.4o failed:%{public}d!", strDir, mode, errno);
                 return DHCP_OPT_FAILED;
             }
             strDir[i] = '/';

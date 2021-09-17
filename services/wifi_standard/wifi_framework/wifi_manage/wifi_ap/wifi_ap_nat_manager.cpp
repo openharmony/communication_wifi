@@ -148,10 +148,8 @@ bool WifiApNatManager::WriteDataToFile(const std::string &fileName, const std::s
 {
     std::ofstream outf(fileName, std::ios::out);
     if (!outf) {
-        WIFI_LOGE("write content [%s] to file [%s] failed. error: %{public}s.",
-            content.c_str(),
-            fileName.c_str(),
-            strerror(errno));
+        WIFI_LOGE("write content [%s] to file [%s] failed. error: %{public}d.",
+            content.c_str(), fileName.c_str(), errno);
         return false;
     }
     outf.write(content.c_str(), content.length());
@@ -171,7 +169,7 @@ bool WifiApNatManager::ExecCommand(const std::vector<std::string> &vecCommandArg
 
     int ret = system(command.c_str());
     if (ret == -1 || ret == SYSTEM_NOT_EXECUTED) {
-        WIFI_LOGE("exec failed. cmd: %s, error:%{public}s.", command.c_str(), strerror(errno));
+        WIFI_LOGE("exec failed. cmd: %s, error:%{public}d.", command.c_str(), errno);
         return false;
     }
 

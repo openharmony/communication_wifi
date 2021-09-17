@@ -22,8 +22,7 @@
 namespace OHOS {
 namespace Wifi {
 /* The callbacks of P2P service provided */
-class IP2pServiceCallbacks {
-public:
+struct IP2pServiceCallbacks {
     /* The event of status change. */
     std::function<void(P2pState)> OnP2pStateChangedEvent;
     /* Report the latest devices discovery information. */
@@ -39,8 +38,7 @@ public:
     /* The event of groups configure has change */
     std::function<void()> OnP2pGroupsChangedEvent;
     /* The result returned by the asynchronous interface */
-    std::function<void(P2pActionCallback, ErrCode)>
-        OnP2pActionResultEvent;
+    std::function<void(P2pActionCallback, ErrCode)> OnP2pActionResultEvent;
 };
 }  // namespace Wifi
 }  // namespace OHOS

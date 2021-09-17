@@ -66,11 +66,12 @@ public:
     /**
      * @Description Get currently connected station info: ip address, device name
      *
+     * @param ifaceName - Network Interface
      * @param result - Connected station info
      * @return true - success
      * @return false - fail
      */
-    bool GetConnectedStationInfo(std::map<std::string, StationInfo> &result);
+    bool GetConnectedStationInfo(const std::string &ifaceName, std::map<std::string, StationInfo> &result);
 
     /**
      * @Description Obtain the abnormal exit status to dhcp manager.
@@ -81,8 +82,8 @@ public:
      * @return false - fail
      */
     bool SetDhcpEventFunc(const std::string &ifaceName, IDhcpResultNotify *pResultNotify);
-private:
 
+private:
     bool SetDhcpIpRange(const std::string &ifaceName);
     bool CompareSubNet(
         const std::vector<Ipv4Address> &vecIpAddr, const struct in_addr &input, const struct in_addr &mask) const;

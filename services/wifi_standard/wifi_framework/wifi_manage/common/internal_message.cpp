@@ -231,7 +231,7 @@ InternalMessage *MessageManage::CreateMessage(const InternalMessage *orig)
     m->SetMessageName(orig->GetMessageName());
     m->SetParam1(orig->GetParam1());
     m->SetParam2(orig->GetParam2());
-    m->mMessageObj = orig->mMessageObj;
+    m->SetMessageObj(orig->GetMessageObj());
     m->CopyMessageBody(orig->GetMessageBody());
 
     return m;
@@ -257,7 +257,7 @@ InternalMessage *MessageManage::CreateMessage(int messageName, const std::any &m
 
     m->SetMessageName(messageName);
 
-    m->mMessageObj = messageObj;
+    m->SetMessageObj(messageObj);
     return m;
 }
 
@@ -284,7 +284,7 @@ InternalMessage *MessageManage::CreateMessage(int messageName, int param1, int p
     m->SetMessageName(messageName);
     m->SetParam1(param1);
     m->SetParam2(param2);
-    m->mMessageObj = messageObj;
+    m->SetMessageObj(messageObj);
     return m;
 }
 

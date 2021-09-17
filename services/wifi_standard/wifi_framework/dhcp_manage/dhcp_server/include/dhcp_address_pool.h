@@ -67,11 +67,8 @@ int AddLease(DhcpAddressPool *pool, AddressBinding *lease);
 AddressBinding *GetLease(DhcpAddressPool *pool, uint32_t ipAddress);
 int UpdateLease(DhcpAddressPool *pool, AddressBinding *lease);
 int RemoveLease(DhcpAddressPool *pool, AddressBinding *lease);
-int ReBinding(uint8_t macAddr[DHCP_HWADDR_LENGTH]);
 int LoadBindingRecoders(DhcpAddressPool *pool);
 int SaveBindingRecoders(const DhcpAddressPool *pool, int force);
-
-AddressBinding *GetBindingByMac(HashTable *bindTable, uint8_t macAddr[DHCP_HWADDR_LENGTH]);
 AddressBinding *GetBindingByIp(HashTable *bindTable, uint32_t ipAddress);
 AddressBinding *QueryBinding(uint8_t macAddr[DHCP_HWADDR_LENGTH], PDhcpOptionList cliOptins);
 void SetDistributeMode(int mode);

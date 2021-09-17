@@ -23,8 +23,7 @@
 namespace OHOS {
 namespace Wifi {
 /* All callbacks provided by the AP service */
-class IApServiceCallbacks {
-public:
+struct IApServiceCallbacks {
     std::function<void(ApState)> OnApStateChangedEvent;
     std::function<void(const StationInfo &)> OnHotspotStaJoinEvent;   // STA device join event.
     std::function<void(const StationInfo &)> OnHotspotStaLeaveEvent;  // STA device leaving event.

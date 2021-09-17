@@ -96,8 +96,7 @@ private:
     int maxBlockedBssidNum;
     int selectDeviceLastTime;
     StaDeviceAppraisal *pAppraisals[MAX_APPRAISAL_NUM];
-    class BlockedBssidInfo {
-    public:
+    struct BlockedBssidInfo {
         int count; /* Number of times the BSSID is rejected. */
         bool blockedFlag;
         int blockedTime;

@@ -63,7 +63,7 @@ bool IfConfig::ExecCommand(const std::vector<std::string> &vecCommandArg)
     LOGI("exec cmd: [%s]", command.c_str());
     int ret = system(command.c_str());
     if (ret == SYSTEM_COMMAND_ERR_1 || ret == SYSTEM_COMMAND_ERR_2) {
-        LOGE("exec failed. cmd: %s, error:%{public}s", command.c_str(), strerror(errno));
+        LOGE("exec failed. cmd: %s, error:%{public}d", command.c_str(), errno);
         return false;
     }
 
@@ -117,48 +117,34 @@ void IfConfig::SetNetDns(const std::string& ifName, const std::string& dns1, con
  */
 void IfConfig::FlushIpAddr(const std::string& ifName, const int& ipType)
 {
-    std::vector<std::string> ipRouteCmd;
-    ipRouteCmd.clear();
-    ipRouteCmd.push_back(SYSTEM_COMMAND_IP);
-    if (ipType == static_cast<int>(StaIpType::IPTYPE_IPV4)) {
-        ipRouteCmd.push_back("-4");
-    } else {
-        ipRouteCmd.push_back("-6");
+    if (ipType != static_cast<int>(StaIpType::IPTYPE_IPV4)) {
+        return;
     }
-    ipRouteCmd.push_back("addr");
-    ipRouteCmd.push_back("flush");
-    ipRouteCmd.push_back("label");
-    ipRouteCmd.push_back(ifName);
-    ExecCommand(ipRouteCmd);
-
-    // clear wlan0 route
-    if (ipType == static_cast<int>(StaIpType::IPTYPE_IPV4)) {
-        ipRouteCmd.clear();
-        ipRouteCmd.push_back(SYSTEM_COMMAND_IP);
-        ipRouteCmd.push_back("route");
-        ipRouteCmd.push_back("flush");
-        ipRouteCmd.push_back("dev");
-        ipRouteCmd.push_back(ifName);
-        ExecCommand(ipRouteCmd);
-    } else {
-        ipRouteCmd.clear();
-        ipRouteCmd.push_back(SYSTEM_COMMAND_IP);
-        ipRouteCmd.push_back("-6");
-        ipRouteCmd.push_back("route");
-        ipRouteCmd.push_back("flush");
-        ipRouteCmd.push_back("dev");
-        ipRouteCmd.push_back(ifName);
-        ExecCommand(ipRouteCmd);
+    struct ifreq ifr;
+    if (memset_s(&ifr, sizeof(ifr), 0, sizeof(ifr)) != EOK ||
+        strcpy_s(ifr.ifr_name, sizeof(ifr.ifr_name), ifName.c_str()) != EOK) {
+        LOGE("Init the ifreq stuct failed!");
+        return;
     }
-
-    // flush route cache
-    ipRouteCmd.clear();
-    ipRouteCmd.push_back(SYSTEM_COMMAND_IP);
-    ipRouteCmd.push_back("route");
-    ipRouteCmd.push_back("flush");
-    ipRouteCmd.push_back("cache");
-    ExecCommand(ipRouteCmd);
-
+    int fd = socket(AF_INET, SOCK_DGRAM, 0);
+    if (fd < 0) {
+        LOGE("AddIpAddr:socket error");
+        return;
+    }
+    struct sockaddr_in *sin = reinterpret_cast<struct sockaddr_in *>(&ifr.ifr_addr);
+    sin->sin_family = AF_INET;
+    /* ipAddr */
+    if (inet_aton("0.0.0.0", &(sin->sin_addr)) < 0) {
+        LOGE("AddIpAddr:inet_aton error");
+        close(fd);
+        return;
+    }
+    if (ioctl(fd, SIOCSIFADDR, &ifr) < 0) {
+        LOGE("AddIpAddr:ioctl SIOCSIFADDR error");
+        close(fd);
+        return;
+    }
+    close(fd);
     return;
 }
 

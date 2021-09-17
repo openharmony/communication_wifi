@@ -150,7 +150,7 @@ bool ApStateMachine::StopDhcpServer()
 
 bool ApStateMachine::GetConnectedStationInfo(std::map<std::string, StationInfo> &result)
 {
-    return m_DhcpdInterface.GetConnectedStationInfo(result);
+    return m_DhcpdInterface.GetConnectedStationInfo(IN_INTERFACE, result);
 }
 
 void ApStateMachine::RegisterEventHandler()

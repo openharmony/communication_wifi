@@ -185,7 +185,7 @@ static int ReadNext(Context *context)
         return -1;
     }
 
-    if (!context->oneProcess || context->nPos >= context->nSize) {
+    if (context->oneProcess == NULL || context->nPos >= context->nSize) {
         return -1;
     }
     char *p = context->oneProcess + context->nPos;

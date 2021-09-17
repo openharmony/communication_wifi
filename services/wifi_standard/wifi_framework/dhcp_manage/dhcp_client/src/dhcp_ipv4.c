@@ -230,7 +230,7 @@ static void InitSocketFd(void)
             }
         }
         if (!bInitSuccess || (g_sockFd < 0)) {
-            LOGE("InitSocketFd() %{public}d err:%{public}s, couldn't listen on socket!", g_sockFd, strerror(errno));
+            LOGE("InitSocketFd() %{public}d err:%{public}d, couldn't listen on socket!", g_sockFd, errno);
             unlink(g_cltCnf->pidFile);
             unlink(g_cltCnf->resultFile);
             exit(EXIT_SUCCESS);
@@ -246,11 +246,11 @@ static uint32_t GetTransId(void)
         unsigned int uSeed = 0;
         int nFd = -1;
         if ((nFd = open("/dev/urandom", 0)) == -1) {
-            LOGE("GetTransId() open /dev/urandom failed, error:%{public}s!", strerror(errno));
+            LOGE("GetTransId() open /dev/urandom failed, error:%{public}d!", errno);
             uSeed = time(NULL);
         } else {
             if (read(nFd, &uSeed, sizeof(uSeed)) == -1) {
-                LOGE("GetTransId() read /dev/urandom failed, error:%{public}s!", strerror(errno));
+                LOGE("GetTransId() read /dev/urandom failed, error:%{public}d!", errno);
                 uSeed = time(NULL);
             }
             LOGI("GetTransId() read /dev/urandom uSeed:%{public}u.", uSeed);
@@ -780,15 +780,13 @@ static int WriteDhcpResult(struct DhcpResult *result)
         result->strYiaddr, result->strOptServerId, result->strOptSubnet, result->uOptLeasetime, curTime);
     FILE *pFile = fopen(g_cltCnf->resultFile, "w+");
     if (pFile == NULL) {
-        LOGE("WriteDhcpResult fopen %{public}s err:%{public}s!", g_cltCnf->resultFile, strerror(errno));
+        LOGE("WriteDhcpResult fopen %{public}s err:%{public}d!", g_cltCnf->resultFile, errno);
         return DHCP_OPT_FAILED;
     }
 
     /* Lock the writing file. */
     if (flock(fileno(pFile), LOCK_EX) != 0) {
-        LOGE("WriteDhcpResult() flock file:%{public}s LOCK_EX failed, error:%{public}s!",
-            g_cltCnf->resultFile,
-            strerror(errno));
+        LOGE("WriteDhcpResult() flock file:%{public}s LOCK_EX failed, error:%{public}d!", g_cltCnf->resultFile, errno);
         fclose(pFile);
         return DHCP_OPT_FAILED;
     }
@@ -799,21 +797,20 @@ static int WriteDhcpResult(struct DhcpResult *result)
         curTime, result->strYiaddr, result->strOptServerId, result->strOptSubnet, result->strOptDns1,
         result->strOptDns2, result->strOptRouter1, result->strOptRouter2, result->strOptVendor, result->uOptLeasetime);
     if (nBytes <= 0) {
-        LOGE("WriteDhcpResult() fprintf %{public}s error:%{public}s!", g_cltCnf->resultFile, strerror(errno));
+        LOGE("WriteDhcpResult() fprintf %{public}s error:%{public}d!", g_cltCnf->resultFile, errno);
         fclose(pFile);
         return DHCP_OPT_FAILED;
     }
 
     /* Unlock the writing file. */
     if (flock(fileno(pFile), LOCK_UN) != 0) {
-        LOGE("WriteDhcpResult() flock file:%{public}s LOCK_UN failed, error:%{public}s!",
-            g_cltCnf->resultFile, strerror(errno));
+        LOGE("WriteDhcpResult() flock file:%{public}s LOCK_UN failed, error:%{public}d!", g_cltCnf->resultFile, errno);
         fclose(pFile);
         return DHCP_OPT_FAILED;
     }
 
     if (fclose(pFile) != 0) {
-        LOGE("WriteDhcpResult() fclose %{public}s error:%{public}s!", g_cltCnf->resultFile, strerror(errno));
+        LOGE("WriteDhcpResult() fclose %{public}s error:%{public}d!", g_cltCnf->resultFile, errno);
         return DHCP_OPT_FAILED;
     }
     LOGI("WriteDhcpResult() fprintf %{public}s success, nBytes:%{public}d.", g_cltCnf->resultFile, nBytes);
@@ -976,7 +973,7 @@ static void DhcpResponseHandle(time_t timestamp)
             /* Reopen g_sockFd. */
             SetSocketMode(g_socketMode);
         }
-        LOGE("DhcpResponseHandle() get packet failed, error:%{public}s!", strerror(errno));
+        LOGE("DhcpResponseHandle() get packet failed, error:%{public}d!", errno);
         return;
     }
     LOGI("DhcpResponseHandle() get packet success, getLen:%{public}d.", getLen);
@@ -1020,8 +1017,7 @@ static void SignalReceiver(void)
 {
     int signum;
     if (read(g_sigSockFds[0], &signum, sizeof(signum)) < 0) {
-        LOGE("SignalReceiver() failed, g_sigSockFds[0]:%{public}d read error:%{public}s!",
-            g_sigSockFds[0], strerror(errno));
+        LOGE("SignalReceiver() failed, g_sigSockFds[0]:%{public}d read error:%{public}d!", g_sigSockFds[0], errno);
         return;
     }
 
@@ -1065,23 +1061,23 @@ int InitSignalHandle(void)
 {
     /* Create signal socket fd. */
     if (socketpair(AF_UNIX, SOCK_STREAM, 0, g_sigSockFds) != 0) {
-        LOGE("InitSignalHandle() failed, socketpair error str:%{public}s!", strerror(errno));
+        LOGE("InitSignalHandle() failed, socketpair error str:%{public}d!", errno);
         return DHCP_OPT_FAILED;
     }
 
     /* Register signal handlers. */
     if (signal(SIGTERM, SignalHandler) == SIG_ERR) {
-        LOGE("InitSignalHandle() failed, signal SIGTERM error str:%{public}s!", strerror(errno));
+        LOGE("InitSignalHandle() failed, signal SIGTERM error str:%{public}d!", errno);
         return DHCP_OPT_FAILED;
     }
 
     if (signal(SIGUSR1, SignalHandler) == SIG_ERR) {
-        LOGE("InitSignalHandle() failed, signal SIGUSR1 error str:%{public}s!", strerror(errno));
+        LOGE("InitSignalHandle() failed, signal SIGUSR1 error str:%{public}d!", errno);
         return DHCP_OPT_FAILED;
     }
 
     if (signal(SIGUSR2, SignalHandler) == SIG_ERR) {
-        LOGE("InitSignalHandle() failed, signal SIGUSR2 error str:%{public}s!", strerror(errno));
+        LOGE("InitSignalHandle() failed, signal SIGUSR2 error str:%{public}d!", errno);
         return DHCP_OPT_FAILED;
     }
 
@@ -1117,7 +1113,7 @@ int PublishDhcpResultEvent(const char *ifname, const int code, struct DhcpResult
             ifname, curTime);
     }
     if (nBytes < 0) {
-        LOGE("PublishDhcpResultEvent() failed, snprintf_s %{public}s error:%{public}s!", ifname, strerror(errno));
+        LOGE("PublishDhcpResultEvent() failed, snprintf_s %{public}s error:%{public}d!", ifname, errno);
         return DHCP_OPT_FAILED;
     }
 
@@ -1291,13 +1287,11 @@ int DhcpRenew(uint32_t transid, uint32_t clientip, uint32_t serverip)
     AddParamaterRequestList(&packet);
 
     /* Begin broadcast or unicast dhcp request packet. */
-    struct in_addr serverAddr;
-    serverAddr.s_addr = serverip;
     if (serverip == 0) {
-        LOGI("DhcpRenew() rebind, begin broadcast req packet, serverip:%{private}s...", inet_ntoa(serverAddr));
+        LOGI("DhcpRenew() rebind, begin broadcast req packet");
         return SendToDhcpPacket(&packet, INADDR_ANY, INADDR_BROADCAST, g_cltCnf->ifaceIndex, (uint8_t *)MAC_BCAST_ADDR);
     }
-    LOGI("DhcpRenew() renew, begin unicast request packet, serverip:%{private}s...", inet_ntoa(serverAddr));
+    LOGI("DhcpRenew() renew, begin unicast request packet");
     return SendDhcpPacket(&packet, clientip, serverip);
 }
 
@@ -1322,12 +1316,8 @@ int DhcpRelease(uint32_t clientip, uint32_t serverip)
     AddOptValueToOpts(packet.options, DHO_IPADDRESS, clientip);
     AddOptValueToOpts(packet.options, DHO_SERVERID, serverip);
 
-    /* Begin unicast dhcp release packet. */
-    struct in_addr requestAddr, serverAddr;
-    requestAddr.s_addr = clientip;
-    serverAddr.s_addr = serverip;
-    LOGI("DhcpRelease() release, begin unicast release packet, clientip:%{private}s,", inet_ntoa(requestAddr));
-    LOGI("serverip:%{private}s...", inet_ntoa(serverAddr));
+    LOGI("DhcpRelease() release, begin unicast release packet, clientip:%{private}u, serverip:%{private}u", clientip,
+        serverip);
     return SendDhcpPacket(&packet, clientip, serverip);
 }
 
@@ -1384,9 +1374,9 @@ int StartIpv4(void)
         }
         if (nRet < 0) {
             if ((nRet == -1) && (errno == EINTR)) {
-                LOGW("StartIpv4() select err:%{public}s, a signal was caught!", strerror(errno));
+                LOGW("StartIpv4() select err:%{public}d, a signal was caught!", errno);
             } else {
-                LOGE("StartIpv4() failed, select maxFds:%{public}d error:%{public}s!", nMaxFds, strerror(errno));
+                LOGE("StartIpv4() failed, select maxFds:%{public}d error:%{public}d!", nMaxFds, errno);
             }
             continue;
         }

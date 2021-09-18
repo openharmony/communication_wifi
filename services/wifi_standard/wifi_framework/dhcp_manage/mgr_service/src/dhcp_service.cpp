@@ -180,14 +180,14 @@ int DhcpService::SetDhcpRange(const std::string& ifname, const std::string& tagN
     return m_pServerService->SetDhcpRange(ifname, tagName);
 }
 
-int DhcpService::GetLeases(std::vector<std::string>& leases)
+int DhcpService::GetLeases(const std::string& ifname, std::vector<std::string>& leases)
 {
     if (InitServerService() != DHCP_OPT_SUCCESS) {
         WIFI_LOGE("DhcpService::GetLeases() InitServerService failed!");
         return DHCP_OPT_FAILED;
     }
 
-    return m_pServerService->GetLeases(leases);
+    return m_pServerService->GetLeases(ifname, leases);
 }
 
 int DhcpService::GetDhcpSerProExit(const std::string& ifname, IDhcpResultNotify *pResultNotify)

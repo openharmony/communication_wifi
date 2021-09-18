@@ -147,13 +147,13 @@ bool DhcpdInterface::SetDhcpIpRange(const std::string &ifaceName)
     return true;
 }
 
-bool DhcpdInterface::GetConnectedStationInfo(std::map<std::string, StationInfo> &result)
+bool DhcpdInterface::GetConnectedStationInfo(const std::string &ifaceName, std::map<std::string, StationInfo> &result)
 {
     if (mDhcpService == nullptr) {
         return false;
     }
     std::vector<std::string> leaseInfo;
-    if (mDhcpService->GetLeases(leaseInfo) != 0) {
+    if (mDhcpService->GetLeases(ifaceName, leaseInfo) != 0) {
         WIFI_LOGE("Get dhcp lease info failed!");
         return false;
     }

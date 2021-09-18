@@ -28,6 +28,7 @@
 #define IP_ADDRESS_LENGTH 4
 #define MAD_ADDR_BUF_SIZE 50
 #define MAC_STRING_SIZE 17
+#define IP_ADDRESS_STRING_LENGTH 64
 
 enum MacAddressIndex {
     MAI_ZERO = 0,
@@ -192,11 +193,16 @@ uint32_t ParseIp(const uint8_t *ipAddr)
 
 const char *ParseStrIp(uint32_t ipAddr)
 {
+    static char strIpAddr[IP_ADDRESS_STRING_LENGTH] = {0};
     struct in_addr inAddr;
-    if (memcpy_s(&inAddr, sizeof(inAddr), &ipAddr, sizeof(ipAddr)) != EOK) {
+    if (memcpy_s(&inAddr, sizeof(inAddr), &ipAddr, sizeof(ipAddr)) != EOK ||
+        memset_s(strIpAddr, sizeof(strIpAddr), 0, sizeof(strIpAddr)) != EOK) {
         return "0.0.0.0";
     }
-    return inet_ntoa(inAddr);
+    if (inet_ntop(AF_INET, &inAddr, strIpAddr, sizeof(strIpAddr)) == NULL) {
+        return "0.0.0.0";
+    }
+    return strIpAddr;
 }
 
 char *ParseStrMac(const uint8_t *macAddr, size_t addrSize)

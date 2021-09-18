@@ -30,8 +30,9 @@ WifiApHalInterface &WifiApHalInterface::GetInstance(void)
     if (initFlag == 0) {
         std::unique_lock<std::mutex> lock(initMutex);
         if (initFlag == 0) {
-            inst.InitIdlClient();
-            initFlag = 1;
+            if (inst.InitIdlClient()) {
+                initFlag = 1;
+            }
         }
     }
     return inst;

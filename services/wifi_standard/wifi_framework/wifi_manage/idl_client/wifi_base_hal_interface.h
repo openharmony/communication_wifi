@@ -36,7 +36,7 @@ public:
      * @Description Init IdlClient.
      *
      */
-    void InitIdlClient(void);
+    bool InitIdlClient(void);
     /**
      * @Description WifiManagerService When exiting, send a message to the HAL layer to
      *              clear the data.

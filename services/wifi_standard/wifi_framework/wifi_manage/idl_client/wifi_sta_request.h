@@ -20,8 +20,7 @@
 
 namespace OHOS {
 namespace Wifi {
-class WifiStaRequest {
-public:
+struct WifiStaRequest {
     std::string ifName;  /* Interface Name */
     int cmdId;           /* Command ID */
     std::string content; /* Command content */

@@ -34,6 +34,8 @@ DhcpServerService::DhcpServerService()
     m_mapDhcpSerExitNotify.clear();
     bDhcpSerProExitThread = false;
     pDhcpSerProExitThread = nullptr;
+
+    DhcpFunc::CreateDirs(DHCP_SERVER_CONFIG_DIR);
 }
 
 DhcpServerService::~DhcpServerService()
@@ -65,6 +67,10 @@ int DhcpServerService::StartDhcpServer(const std::string &ifname)
 
     /* Add the specified interface. */
     if (AddSpecifiedInterface(ifname) != DHCP_OPT_SUCCESS) {
+        return DHCP_OPT_FAILED;
+    }
+
+    if (CreateDefaultConfigFile(DHCP_SERVER_CONFIG_FILE) != DHCP_OPT_SUCCESS) {
         return DHCP_OPT_FAILED;
     }
 
@@ -334,17 +340,23 @@ int DhcpServerService::SetDhcpRange(const std::string &ifname, const std::string
     return DHCP_OPT_SUCCESS;
 }
 
-int DhcpServerService::GetLeases(std::vector<std::string> &leases)
+int DhcpServerService::GetLeases(const std::string& ifname, std::vector<std::string> &leases)
 {
-    if (!DhcpFunc::IsExistFile(DHCP_SERVER_LEASES_FILE)) {
-        WIFI_LOGE("GetLeases() failed, dhcp leasefile:%{public}s no exist!", DHCP_SERVER_LEASES_FILE.c_str());
+    if (ifname.empty()) {
+        WIFI_LOGE("DhcpServerService::GetLeases error, ifname is empty!");
+        return DHCP_OPT_ERROR;
+    }
+
+    std::string strFile = DHCP_SERVER_LEASES_FILE + "." + ifname;
+    if (!DhcpFunc::IsExistFile(strFile)) {
+        WIFI_LOGE("GetLeases() failed, dhcp leasefile:%{public}s no exist!", strFile.c_str());
         return DHCP_OPT_FAILED;
     }
 
     leases.clear();
 
     std::ifstream inFile;
-    inFile.open(DHCP_SERVER_LEASES_FILE);
+    inFile.open(strFile);
     std::string strTemp = "";
     char tmpLineData[FILE_LINE_MAX_SIZE] = {0};
     while (inFile.getline(tmpLineData, sizeof(tmpLineData))) {
@@ -485,7 +497,7 @@ int DhcpServerService::ForkExecProcess(
     }
     args2[argsIndex + 1] = nullptr;
     if (execv(args2[0], args2) == -1) {
-        WIFI_LOGE("failed to execv %{public}s %{public}s, err:%{public}s", args2[0], strerror(errno), ifname.c_str());
+        WIFI_LOGE("failed to execv %{public}s %{public}d, err:%{public}s", args2[0], errno, ifname.c_str());
     }
     _exit(-1);
     return DHCP_OPT_SUCCESS;
@@ -501,12 +513,11 @@ int DhcpServerService::StopServer(const pid_t &server_pid)
                 server_pid, DHCP_SERVER_FILE.c_str());
             return DHCP_OPT_SUCCESS;
         }
-        WIFI_LOGE("StopServer() kill [%{public}d] failed, strerror(errno):%{public}s!", server_pid, strerror(errno));
+        WIFI_LOGE("StopServer() kill [%{public}d] failed, errno:%{public}d!", server_pid, errno);
         return DHCP_OPT_FAILED;
     }
     if (waitpid(server_pid, nullptr, 0) == -1) {
-        WIFI_LOGE("StopServer() waitpid [%{public}d] failed, strerror(errno):%{public}s!",
-            server_pid, strerror(errno));
+        WIFI_LOGE("StopServer() waitpid [%{public}d] failed, errno:%{public}d!", server_pid, errno);
         return DHCP_OPT_FAILED;
     }
     WIFI_LOGI("StopServer() waitpid [%{public}d] success, pro:%{public}s!", server_pid, DHCP_SERVER_FILE.c_str());
@@ -646,6 +657,20 @@ int DhcpServerService::GetUsingIpRange(const std::string ifname, std::string& ip
     return DHCP_OPT_FAILED;
 }
 
+int DhcpServerService::CreateDefaultConfigFile(const std::string strFile)
+{
+    if (strFile.empty()) {
+        WIFI_LOGE("CreateDefaultConfigFile param error, strFile is empty!");
+        return DHCP_OPT_ERROR;
+    }
+
+    if (!DhcpFunc::IsExistFile(strFile)) {
+        std::string strData = "leaseTime=" + std::to_string(LEASETIME_DEFAULT * ONE_HOURS_SEC) + "\n";
+        DhcpFunc::CreateFile(strFile, strData);
+    }
+    return DHCP_OPT_SUCCESS;
+}
+
 void DhcpServerService::RunDhcpSerProExitThreadFunc()
 {
     for (;;) {
@@ -705,11 +730,11 @@ void DhcpServerService::RegisterSignal() const
     struct sigaction newAction {};
 
     if (sigfillset(&newAction.sa_mask) == -1) {
-        WIFI_LOGE("RegisterSignal() failed, sigfillset error:%{public}s!", strerror(errno));
+        WIFI_LOGE("RegisterSignal() failed, sigfillset error:%{public}d!", errno);
     }
 
     if (sigdelset(&newAction.sa_mask, SIGCHLD) == -1) {
-        WIFI_LOGE("RegisterSignal() sigdelset SIGCHLD error:%{public}s!", strerror(errno));
+        WIFI_LOGE("RegisterSignal() sigdelset SIGCHLD error:%{public}d!", errno);
     }
 
     newAction.sa_handler = SigChildHandler;
@@ -717,7 +742,7 @@ void DhcpServerService::RegisterSignal() const
     newAction.sa_restorer = nullptr;
 
     if (sigaction(SIGCHLD, &newAction, nullptr) == -1) {
-        WIFI_LOGE("RegisterSignal() sigaction SIGCHLD error:%{public}s!", strerror(errno));
+        WIFI_LOGE("RegisterSignal() sigaction SIGCHLD error:%{public}d!", errno);
     }
 }
 
@@ -726,7 +751,7 @@ void DhcpServerService::UnregisterSignal() const
     struct sigaction newAction {};
 
     if (sigemptyset(&newAction.sa_mask) == -1) {
-        WIFI_LOGE("UnregisterSignal() failed, sigemptyset error:%{public}s!", strerror(errno));
+        WIFI_LOGE("UnregisterSignal() failed, sigemptyset error:%{public}d!", errno);
     }
 
     newAction.sa_handler = SIG_DFL;
@@ -734,7 +759,7 @@ void DhcpServerService::UnregisterSignal() const
     newAction.sa_restorer = nullptr;
 
     if (sigaction(SIGCHLD, &newAction, nullptr) == -1) {
-        WIFI_LOGE("UnregisterSignal() sigaction SIGCHLD error:%{public}s!", strerror(errno));
+        WIFI_LOGE("UnregisterSignal() sigaction SIGCHLD error:%{public}d!", errno);
     }
 }
 

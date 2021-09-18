@@ -35,37 +35,34 @@ static int SetEnableConfigInfo(DhcpConfig *dhcpConfig, const char *pKey, const c
 {
     if ((dhcpConfig == NULL) || (pKey == NULL) || (pValue == NULL)) {
         LOGE("SetEnableConfigInfo param dhcpConfig or pKey or pValue is NULL!");
-        return 0;
+        return RET_FAILED;
     }
 
     uint32_t uValue = (uint32_t)atoi(pValue);
     if ((uValue != 0) && (uValue != 1)) {
         LOGE("enable:%s error", pValue);
-        return 0;
+        return RET_FAILED;
     }
 
     if (strcmp(pKey, "distribution") == 0) {
         dhcpConfig->distribution = uValue;
     } else if (strcmp(pKey, "broadcast") == 0) {
         dhcpConfig->broadcast = uValue;
-    } else {
-        LOGE("invalid key:%s", pKey);
-        return 0;
     }
-    return 1;
+    return RET_SUCCESS;
 }
 
 static int SetTimeConfigInfo(DhcpConfig *dhcpConfig, const char *pKey, const char *pValue)
 {
     if ((dhcpConfig == NULL) || (pKey == NULL) || (pValue == NULL)) {
         LOGE("SetTimeConfigInfo param dhcpConfig or pKey or pValue is NULL!");
-        return 0;
+        return RET_FAILED;
     }
 
     uint32_t uValue = 0;
     if ((uValue = (uint32_t)atoi(pValue)) == 0) {
         LOGE("atoi failed, time:%s", pValue);
-        return 0;
+        return RET_FAILED;
     }
 
     if (strcmp(pKey, "leaseTime") == 0) {
@@ -74,24 +71,21 @@ static int SetTimeConfigInfo(DhcpConfig *dhcpConfig, const char *pKey, const cha
         dhcpConfig->renewalTime = uValue;
     } else if (strcmp(pKey, "rebindingTime") == 0) {
         dhcpConfig->rebindingTime = uValue;
-    } else {
-        LOGE("invalid key:%s", pKey);
-        return 0;
     }
-    return 1;
+    return RET_SUCCESS;
 }
 
 static int SetNetConfigInfo(DhcpConfig *dhcpConfig, const char *pKey, const char *pValue, int common)
 {
     if ((dhcpConfig == NULL) || (pKey == NULL) || (pValue == NULL)) {
         LOGE("SetNetConfigInfo param dhcpConfig or pKey or pValue is NULL!");
-        return 0;
+        return RET_FAILED;
     }
 
     uint32_t uValue = 0;
     if ((uValue = ParseIpAddr(pValue)) == 0) {
         LOGE("ParseIpAddr failed, ip:%s", pValue);
-        return 0;
+        return RET_FAILED;
     }
 
     if (((strcmp(pKey, "serverId") == 0) && common) || ((strcmp(pKey, "server") == 0) && !common)) {
@@ -100,18 +94,15 @@ static int SetNetConfigInfo(DhcpConfig *dhcpConfig, const char *pKey, const char
         dhcpConfig->gateway = uValue;
     } else if (strcmp(pKey, "netmask") == 0) {
         dhcpConfig->netmask = uValue;
-    } else {
-        LOGE("invalid key:%s", pKey);
-        return 0;
     }
-    return 1;
+    return RET_SUCCESS;
 }
 
 static int SetIpAddressPool(DhcpConfig *dhcpConfig, const char *pValue)
 {
     if ((dhcpConfig == NULL) || (pValue == NULL)) {
         LOGE("SetIpAddressPool param dhcpConfig or pValue is NULL!");
-        return 0;
+        return RET_FAILED;
     }
 
     char *pSrc = (char *)pValue;
@@ -119,33 +110,29 @@ static int SetIpAddressPool(DhcpConfig *dhcpConfig, const char *pValue)
     char *pTok = strtok_r(pSrc, ",", &pSave);
     if (((pTok == NULL) || (strlen(pTok) == 0)) || ((pSave == NULL) || (strlen(pSave) == 0))) {
         LOGE("strtok_r pTok or pSave NULL or len is 0!");
-        return 0;
+        return RET_FAILED;
     }
 
     uint32_t begin;
     if (((begin = ParseIpAddr(pTok)) == 0)) {
         LOGE("ParseIpAddr begin:%s failed!", pTok);
-        return 0;
+        return RET_FAILED;
     }
     dhcpConfig->pool.beginAddress = begin;
     uint32_t end;
     if (((end = ParseIpAddr(pSave)) == 0)) {
         LOGE("ParseIpAddr end:%s failed!", pSave);
-        return 0;
+        return RET_FAILED;
     }
     dhcpConfig->pool.endAddress = end;
-    return 1;
+    return RET_SUCCESS;
 }
 
 static int SetDnsInfo(DhcpConfig *dhcpConfig, const char *pValue)
 {
     if ((dhcpConfig == NULL) || (pValue == NULL)) {
         LOGE("SetDnsInfo param dhcpConfig or pValue is NULL!");
-        return 0;
-    }
-    if (dhcpConfig->options.first == NULL) {
-        LOGE("set dns options.first pointer is null.");
-        return 0;
+        return RET_FAILED;
     }
 
     char *pSrc = (char *)pValue;
@@ -153,7 +140,7 @@ static int SetDnsInfo(DhcpConfig *dhcpConfig, const char *pValue)
     char *pTok = strtok_r(pSrc, ",", &pSave);
     if ((pTok == NULL) || (strlen(pTok) == 0)) {
         LOGE("strtok_r pTok NULL or len is 0!");
-        return 0;
+        return RET_FAILED;
     }
 
     DhcpOption optDns = {DOMAIN_NAME_SERVER_OPTION, 0, {0}};
@@ -165,41 +152,39 @@ static int SetDnsInfo(DhcpConfig *dhcpConfig, const char *pValue)
     while (pTok != NULL) {
         if ((dnsAddress = ParseIpAddr(pTok)) == 0) {
             LOGE("ParseIpAddr %s failed, code:%d", pTok, optDns.code);
-            return 0;
+            return RET_FAILED;
         }
         if (AppendAddressOption(&optDns, dnsAddress) != RET_SUCCESS) {
             LOGW("failed append dns option.");
-        };
+        }
         pTok = strtok_r(NULL, ",", &pSave);
     }
     PushBackOption(&dhcpConfig->options, &optDns);
-    return 1;
+    return RET_SUCCESS;
 }
 
 static int SetIfnameInfo(DhcpConfig *dhcpConfig, const char *pValue)
 {
     if ((dhcpConfig == NULL) || (pValue == NULL)) {
         LOGE("SetIfnameInfo dhcpConfig or pValue is NULL!");
-        return 0;
+        return RET_FAILED;
     }
     if (strlen(pValue) >= IFACE_NAME_SIZE) {
         LOGE("ifname:%s too long!", pValue);
-        return 0;
+        return RET_FAILED;
     }
-    if (memset_s(dhcpConfig->ifname, IFACE_NAME_SIZE, '\0', IFACE_NAME_SIZE) != EOK) {
-        return 0;
+    if (memset_s(dhcpConfig->ifname, IFACE_NAME_SIZE, '\0', IFACE_NAME_SIZE) != EOK ||
+        strncpy_s(dhcpConfig->ifname, IFACE_NAME_SIZE, pValue, strlen(pValue)) != EOK) {
+        return RET_FAILED;
     }
-    if (strncpy_s(dhcpConfig->ifname, IFACE_NAME_SIZE, pValue, strlen(pValue)) != EOK) {
-        return 0;
-    }
-    return 1;
+    return RET_SUCCESS;
 }
 
 static int SetDhcpConfig(DhcpConfig *dhcpConfig, const char *strLine, int common)
 {
     if ((strLine == NULL) || (strlen(strLine) == 0)) {
         LOGE("SetDhcpConfig param strLine is NULL or len = 0!");
-        return 0;
+        return RET_FAILED;
     }
 
     char *pSrc = (char *)strLine;
@@ -207,7 +192,7 @@ static int SetDhcpConfig(DhcpConfig *dhcpConfig, const char *strLine, int common
     char *pTok = strtok_r(pSrc, FILE_LINE_DELIMITER, &pSave);
     if (pTok == NULL) {
         LOGE("strtok_r pTok NULL!");
-        return 0;
+        return RET_FAILED;
     }
     if (strcmp(pTok, "interface") == 0) {
         return SetIfnameInfo(dhcpConfig, pSave);
@@ -224,8 +209,8 @@ static int SetDhcpConfig(DhcpConfig *dhcpConfig, const char *strLine, int common
     } else if ((strcmp(pTok, "distribution") == 0) || (strcmp(pTok, "broadcast") == 0)) {
         return SetEnableConfigInfo(dhcpConfig, pTok, pSave);
     } else {
-        LOGE("invalid key:%s", pTok);
-        return 0;
+        LOGD("invalid key:%s", pTok);
+        return RET_SUCCESS;
     }
 }
 
@@ -238,8 +223,8 @@ static int ParseConfigFile(const char *configFile, const char *ifname, DhcpConfi
 
     FILE *fp = fopen(configFile, "r");
     if (fp == NULL) {
-        LOGE("fopen %s failed, err:%s", configFile, strerror(errno));
-        return 0;
+        LOGE("fopen %s failed, err:%d", configFile, errno);
+        return RET_FAILED;
     }
 
     int bComm = 1;
@@ -263,27 +248,28 @@ static int ParseConfigFile(const char *configFile, const char *ifname, DhcpConfi
                 LOGI("%s %s no find ifname:%s", configFile, strLine, ifname);
             }
         }
-        if (bValid && !SetDhcpConfig(dhcpConfig, strLine, bComm)) {
+        if (bValid && SetDhcpConfig(dhcpConfig, strLine, bComm) != RET_SUCCESS) {
             LOGE("set dhcp config %s %s failed", configFile, strLine);
-            return 0;
+            fclose(fp);
+            return RET_FAILED;
         }
         if (memset_s(strLine, FILE_LINE_LEN_MAX, 0, FILE_LINE_LEN_MAX) != EOK) {
             break;
         }
     }
     fclose(fp);
-    return 1;
+    return RET_SUCCESS;
 }
 
 static int CheckDhcpConfig(DhcpConfig *config)
 {
     if (config == NULL) {
         LOGE("CheckDhcpConfig param config is null");
-        return 0;
+        return DHCP_FALSE;
     }
     if ((strlen(config->ifname) > 0) && ((config->serverId == 0))) {
         LOGE("failed to config serverId or netmask");
-        return 0;
+        return DHCP_FALSE;
     }
 
     if (config->renewalTime == 0) {
@@ -292,7 +278,7 @@ static int CheckDhcpConfig(DhcpConfig *config)
     if (config->rebindingTime == 0) {
         config->rebindingTime = config->leaseTime * DHCP_REBIND_MULTIPLE;
     }
-    return 1;
+    return DHCP_TRUE;
 }
 
 int LoadConfig(const char *configFile, const char *ifname, DhcpConfig *config)
@@ -309,7 +295,7 @@ int LoadConfig(const char *configFile, const char *ifname, DhcpConfig *config)
     config->broadcast = 1;
 
     /* Set file config. */
-    if (!ParseConfigFile(configFile, ifname, config)) {
+    if (ParseConfigFile(configFile, ifname, config) != RET_SUCCESS) {
         LOGE("parse config file %s error!", configFile);
         return RET_FAILED;
     }
@@ -320,7 +306,7 @@ int LoadConfig(const char *configFile, const char *ifname, DhcpConfig *config)
         return RET_FAILED;
     }
 
-    if ((strlen(config->ifname) == 0) && !SetIfnameInfo(config, ifname)) {
+    if ((strlen(config->ifname) == 0) && SetIfnameInfo(config, ifname) != RET_SUCCESS) {
         LOGE("set ifname %s error!", ifname);
         return RET_FAILED;
     }

@@ -27,13 +27,6 @@
 #include <unistd.h>
 #include <fcntl.h>
 
-#include <linux/if.h>
-#include <linux/if_ether.h>
-#include <linux/if_link.h>
-#include <linux/netlink.h>
-#include <linux/rtnetlink.h>
-#include <linux/sockios.h>
-
 #include "securec.h"
 #include "wifi_logger.h"
 
@@ -41,9 +34,6 @@ DEFINE_WIFILOG_LABEL("WifiNetworkInterface");
 
 namespace OHOS {
 namespace Wifi {
-const int INET_IP_V4_ADDR_LEN = 4;
-const int INET_IP_V6_ADDR_LEN = 16;
-const int INT_BIT = 32;
 bool NetworkInterface::IsValidInterfaceName(const std::string &interfaceName)
 {
     size_t len = interfaceName.length();
@@ -267,7 +257,7 @@ bool NetworkInterface::FetchIpAddress(
     int n = 0;
 
     if (getifaddrs(&ifaddr) == -1) {
-        WIFI_LOGE("getifaddrs: %{public}s", strerror(errno));
+        WIFI_LOGE("getifaddrs failed, error is %{public}d", errno);
         return false;
     }
 
@@ -289,131 +279,71 @@ bool NetworkInterface::FetchIpAddress(
     return ret;
 }
 
-/* msg packet */
-struct nlmsg {
-    struct nlmsghdr nlmsg;
-    struct ifaddrmsg ifamsg;
-    char attrbuf[NLMSG_ALIGN(sizeof(struct rtattr)) + NLMSG_ALIGN(INET_IP_V6_ADDR_LEN) +
-                 NLMSG_ALIGN(sizeof(struct rtattr)) + NLMSG_ALIGN(INET_IP_V4_ADDR_LEN)];
-};
-
-static bool SendNetlinkMsg(nlmsg msg)
-{
-    int sockfd = socket(PF_NETLINK, SOCK_RAW | SOCK_CLOEXEC, NETLINK_ROUTE);
-    if (sockfd < 0) {
-        WIFI_LOGE("create socket failed to connet netlink");
-        return false;
-    }
-
-    if (send(sockfd, &msg, msg.nlmsg.nlmsg_len, 0) < 0) {
-        close(sockfd);
-        WIFI_LOGE("socket send failed");
-        return false;
-    }
-
-    char buf[NLMSG_ALIGN(sizeof(struct nlmsgerr)) + sizeof(msg)];
-    int reclen = recv(sockfd, buf, sizeof(buf), 0);
-    close(sockfd);
-    if (reclen < 0) {
-        WIFI_LOGE("failed to get results");
-        return false;
-    }
-
-    struct nlmsghdr *recnlmsg = (struct nlmsghdr *)buf;
-    int errnum = ((struct nlmsgerr *)NLMSG_DATA(recnlmsg))->error;
-    if (!NLMSG_OK(recnlmsg, (unsigned)reclen) || recnlmsg->nlmsg_type != NLMSG_ERROR || errnum != 0) {
-        WIFI_LOGE("Failed to set ip.err:%d", errnum);
-        return false;
-    }
-    return true;
-}
-
 bool NetworkInterface::IpAddressChange(
     const std::string &interface, const BaseAddress &ipAddress, bool action, bool dad)
 {
-    if (!ipAddress.IsValid()) {
-        WIFI_LOGE("bad input parameter to change ip.");
+    if (!ipAddress.IsValid() || ipAddress.GetFamilyType() == BaseAddress::FamilyType::FAMILY_INET6) {
+        WIFI_LOGE("bad input parameter [%{public}s][%s]/[%zu]to change ip.", interface.c_str(),
+            ipAddress.GetAddressWithString().c_str(), ipAddress.GetAddressPrefixLength());
         return false;
     }
-
-    int ifcindex = if_nametoindex(interface.c_str());
-    if (ifcindex < 0) {
-        WIFI_LOGE("bad interface to change ip.");
-        return false;
-    }
-
-    int addrLen;
-    in6_addr addr6;
-    in_addr addr;
-    void *addrSin;
-    if (ipAddress.GetFamilyType() == BaseAddress::FamilyType::FAMILY_INET6) {
-        addrLen = INET_IP_V6_ADDR_LEN;
-        addr6 = static_cast<const Ipv6Address &>(ipAddress).GetIn6Addr();
-        addrSin = &addr6;
+    std::string IpAddr;
+    std::string Mask;
+    if (action) {
+        Ipv4Address ipv4 = Ipv4Address::Create(ipAddress.GetAddressWithString(), ipAddress.GetAddressPrefixLength());
+        IpAddr = ipv4.GetAddressWithString();
+        Mask = ipv4.GetMaskWithString();
     } else {
-        addrLen = INET_IP_V4_ADDR_LEN;
-        addr = static_cast<const Ipv4Address &>(ipAddress).GetAddressWithInet();
-        addrSin = &addr;
+        IpAddr = "0.0.0.0";
+        Mask = "0.0.0.0";
     }
-    int prelen = ipAddress.GetAddressPrefixLength();
-    nlmsg msg;
-    int ret = memset_s(&msg, sizeof(msg), 0, sizeof(msg));
-    if (ret != 0) {
-        WIFI_LOGE("The msg of memset_s failed.");
+
+    struct ifreq ifr;
+    if (memset_s(&ifr, sizeof(ifr), 0, sizeof(ifr)) != EOK ||
+        strncpy_s(ifr.ifr_name, sizeof(ifr.ifr_name), interface.c_str(), interface.length()) != EOK) {
         return false;
     }
 
-    /* Netlink message header. */
-    msg.nlmsg.nlmsg_len = NLMSG_LENGTH(sizeof(msg.ifamsg));
-    msg.nlmsg.nlmsg_type = action ? RTM_NEWADDR : RTM_DELADDR;
-    msg.nlmsg.nlmsg_flags = NLM_F_REQUEST | NLM_F_ACK;
-    msg.nlmsg.nlmsg_pid = getpid();
-
-    /* Interface address message header. */
-    msg.ifamsg.ifa_family = (addrLen == INET_IP_V6_ADDR_LEN) ? AF_INET6 : AF_INET;
-    msg.ifamsg.ifa_flags = dad ? 0 : IFA_F_NODAD;
-    msg.ifamsg.ifa_prefixlen = prelen;
-    msg.ifamsg.ifa_index = ifcindex;
-
-    /* Routing attribute. */
-    struct rtattr *attr = (struct rtattr *)(((char *)&msg) + NLMSG_ALIGN(msg.nlmsg.nlmsg_len));
-    attr->rta_type = IFA_LOCAL;
-    attr->rta_len = RTA_LENGTH(addrLen);
-    msg.nlmsg.nlmsg_len = NLMSG_ALIGN(msg.nlmsg.nlmsg_len) + RTA_LENGTH(addrLen);
-    ret = memcpy_s(RTA_DATA(attr), sizeof(attr), addrSin, addrLen);
-    if (ret != 0) {
-        WIFI_LOGE("The attr of memcpy_s failed at INET_IP_V6_ADDR_LEN.");
+    int fd = socket(AF_INET, SOCK_DGRAM, 0);
+    if (fd < 0) {
         return false;
     }
 
-    if (addrLen == INET_IP_V4_ADDR_LEN && action) { /* For IPV4 IFA_BROADCAST */
-        attr = (struct rtattr *)(((char *)&msg) + NLMSG_ALIGN(msg.nlmsg.nlmsg_len));
-        attr->rta_type = IFA_BROADCAST;
-        attr->rta_len = RTA_LENGTH(addrLen);
-        msg.nlmsg.nlmsg_len = NLMSG_ALIGN(msg.nlmsg.nlmsg_len) + RTA_LENGTH(addrLen);
-        ((struct in_addr *)addrSin)->s_addr |= htonl((1 << (INT_BIT - prelen)) - 1);
-        ret = memcpy_s(RTA_DATA(attr), sizeof(attr), addrSin, addrLen);
-        if (ret != 0) {
-            WIFI_LOGE("The attr of memcpy_s failed at INET_IP_V4_ADDR_LEN.");
-            return false;
-        }
+    struct sockaddr_in *sin = (struct sockaddr_in *)&ifr.ifr_addr;
+    sin->sin_family = AF_INET;
+    if (inet_aton(IpAddr.c_str(), &(sin->sin_addr)) < 0) {
+        close(fd);
+        return false;
     }
-    return SendNetlinkMsg(msg);
+    if (ioctl(fd, SIOCSIFADDR, &ifr) < 0) {
+        close(fd);
+        WIFI_LOGE("ioctl set ip address failed, error is: %d.", errno);
+        return false;
+    }
+    if (inet_aton(Mask.c_str(), &(sin->sin_addr)) < 0) {
+        close(fd);
+        return false;
+    }
+    if (ioctl(fd, SIOCSIFNETMASK, &ifr) < 0) {
+        close(fd);
+        WIFI_LOGE("ioctl set mask address failed, error is: %d.", errno);
+        return false;
+    }
+    close(fd);
+    return true;
 }
 
 bool NetworkInterface::WriteDataToFile(const std::string &fileName, const std::string &content)
 {
     int fd = open(fileName.c_str(), O_WRONLY | O_CLOEXEC);
     if (fd < 0) {
-        WIFI_LOGE("open %{public}s fail, error: %s", fileName.c_str(), strerror(errno));
+        WIFI_LOGE("open %{public}s fail, error: %d", fileName.c_str(), errno);
         return false;
     }
 
     if (static_cast<size_t>(write(fd, content.c_str(), content.length())) != content.length()) {
-        WIFI_LOGE("write content [%s] to file [%{public}s] failed. error: %s.",
-            content.c_str(),
-            fileName.c_str(),
-            strerror(errno));
+        WIFI_LOGE("write content [%s] to file [%{public}s] failed. error: %{public}d.",
+            content.c_str(), fileName.c_str(), errno);
         close(fd);
         return false;
     }

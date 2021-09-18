@@ -188,14 +188,12 @@ int DhcpClientServiceImpl::ForkExecChildProcess(const std::string &ifname, bool 
         if (bStart) {
             const char *args[DHCP_CLI_ARGSNUM] = {DHCP_CLIENT_FILE.c_str(), "start", ifname.c_str(), "-a", nullptr};
             if (execv(args[0], const_cast<char *const *>(args)) == -1) {
-                WIFI_LOGE("execv start v4 v6 failed,strerror(errno):%{public}s,ifname:%{public}s",
-                    strerror(errno), ifname.c_str());
+                WIFI_LOGE("execv start v4 v6 failed,errno:%{public}d,ifname:%{public}s", errno, ifname.c_str());
             }
         } else {
             const char *args[DHCP_CLI_ARGSNUM] = {DHCP_CLIENT_FILE.c_str(), "stop", ifname.c_str(), "-a", nullptr};
             if (execv(args[0], const_cast<char *const *>(args)) == -1) {
-                WIFI_LOGE("execv stop v4 v6 failed,strerror(errno):%{public}s,ifname:%{public}s",
-                    strerror(errno), ifname.c_str());
+                WIFI_LOGE("execv stop v4 v6 failed,errno:%{public}d,ifname:%{public}s", errno, ifname.c_str());
             }
         }
     } else {
@@ -203,14 +201,12 @@ int DhcpClientServiceImpl::ForkExecChildProcess(const std::string &ifname, bool 
         if (bStart) {
             const char *args[DHCP_CLI_ARGSNUM] = {DHCP_CLIENT_FILE.c_str(), "start", ifname.c_str(), "-4", nullptr};
             if (execv(args[0], const_cast<char *const *>(args)) == -1) {
-                WIFI_LOGE("execv start v4 failed,strerror(errno):%{public}s,ifname:%{public}s",
-                    strerror(errno), ifname.c_str());
+                WIFI_LOGE("execv start v4 failed,errno:%{public}d,ifname:%{public}s", errno, ifname.c_str());
             }
         } else {
             const char *args[DHCP_CLI_ARGSNUM] = {DHCP_CLIENT_FILE.c_str(), "stop", ifname.c_str(), "-4", nullptr};
             if (execv(args[0], const_cast<char *const *>(args)) == -1) {
-                WIFI_LOGE("execv stop v4 failed,strerror(errno):%{public}s,ifname:%{public}s",
-                    strerror(errno), ifname.c_str());
+                WIFI_LOGE("execv stop v4 failed,errno:%{public}d,ifname:%{public}s", errno, ifname.c_str());
             }
         }
     }
@@ -622,8 +618,8 @@ int DhcpClientServiceImpl::RenewDhcpClient(const std::string &ifname)
     }
 
     if (kill(pid, SIGUSR2) == -1) {
-        WIFI_LOGE("RenewDhcpClient() kill [%{public}d] failed:%{public}s, ifname:%{public}s!",
-            pid, strerror(errno), ifname.c_str());
+        WIFI_LOGE("RenewDhcpClient() kill [%{public}d] failed:%{public}d, ifname:%{public}s!",
+            pid, errno, ifname.c_str());
         return DHCP_OPT_FAILED;
     }
     WIFI_LOGI("RenewDhcpClient() kill [%{public}d] success, ifname:%{public}s.", pid, ifname.c_str());
@@ -648,8 +644,8 @@ int DhcpClientServiceImpl::ReleaseDhcpClient(const std::string &ifname)
     }
 
     if (kill(pid, SIGUSR1) == -1) {
-        WIFI_LOGE("ReleaseDhcpClient() kill [%{public}d] failed:%{public}s, ifname:%{public}s!",
-            pid, strerror(errno), ifname.c_str());
+        WIFI_LOGE("ReleaseDhcpClient() kill [%{public}d] failed:%{public}d, ifname:%{public}s!",
+            pid, errno, ifname.c_str());
         return DHCP_OPT_FAILED;
     }
     WIFI_LOGI("ReleaseDhcpClient() kill [%{public}d] success, ifname:%{public}s.", pid, ifname.c_str());

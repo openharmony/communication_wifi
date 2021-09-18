@@ -53,7 +53,7 @@ static char *RpcClientReadMsg(RpcClient *client)
         buff = ContextGetReadRecord(client->context);
     }
     if (!client->threadRunFlag) {
-        if (buff) {
+        if (buff != NULL) {
             free(buff);
         }
         return NULL;

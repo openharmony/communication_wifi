@@ -242,7 +242,7 @@ static int BeforeLoop(RpcServer *server)
         int num = sizeof(server->eventNode) / sizeof(server->eventNode[0]);
         int pos = event % num;
         struct Node *p = server->eventNode[pos].head;
-        while (p) {
+        while (p != NULL) {
             Context *context = p->context;
             OnCallbackTransact(server, event, context);
             AddFdEvent(server->loop, context->fd, WRIT_EVENT);
@@ -282,7 +282,7 @@ int RegisterCallback(RpcServer *server, int event, Context *context)
     int pos = event % num;
     server->eventNode[pos].event = event;
     struct Node *p = server->eventNode[pos].head;
-    while (p && p->context->fd != context->fd) {
+    while (p != NULL && p->context->fd != context->fd) {
         p = p->next;
     }
     if (p == NULL) {
@@ -307,11 +307,11 @@ int UnRegisterCallback(RpcServer *server, int event, const Context *context)
     server->eventNode[pos].event = event;
     struct Node *p = server->eventNode[pos].head;
     struct Node *q = p;
-    while (p && p->context->fd != context->fd) {
+    while (p != NULL && p->context->fd != context->fd) {
         q = p;
         p = p->next;
     }
-    if (p) {
+    if (p != NULL) {
         if (p == server->eventNode[pos].head) {
             server->eventNode[pos].head = p->next;
         } else {
@@ -335,11 +335,11 @@ static int RemoveCallback(RpcServer *server, const Context *context)
             continue;
         }
         struct Node *q = p;
-        while (p && p->context->fd != context->fd) {
+        while (p != NULL && p->context->fd != context->fd) {
             q = p;
             p = p->next;
         }
-        if (p) {
+        if (p != NULL) {
             if (p == server->eventNode[i].head) {
                 server->eventNode[i].head = p->next;
             } else {

@@ -427,8 +427,9 @@ static int PareseAddreesRange(DhcpConfig *config)
         int index = 0;
         char *src = arg->value;
         char *delim = ",";
+        char *pSave = NULL;
         char *poolPartArg;
-        poolPartArg = strtok(src, delim);
+        poolPartArg = strtok_r(src, delim, &pSave);
         while (poolPartArg) {
             if (index == 0) {
                 config->pool.beginAddress = ParseIpAddr(poolPartArg);
@@ -438,7 +439,7 @@ static int PareseAddreesRange(DhcpConfig *config)
                 LOGD("address range end of: %s", poolPartArg);
             }
             index++;
-            poolPartArg = strtok(NULL, delim);
+            poolPartArg = strtok_r(NULL, delim, &pSave);
         }
         if (!config->pool.beginAddress || !config->pool.endAddress) {
             LOGE("'pool' argument format error.");
@@ -634,12 +635,12 @@ static void SignalHandler(int signal)
 static int RegisterSignalHandle(void)
 {
     if (signal(SIGTERM, SignalHandler) == SIG_ERR) {
-        LOGE("RegisterSignalHandle() failed, signal SIGTERM err:%s!", strerror(errno));
+        LOGE("RegisterSignalHandle() failed, signal SIGTERM err:%d!", errno);
         return RET_FAILED;
     }
 
     if (signal(SIGUSR1, SignalHandler) == SIG_ERR) {
-        LOGE("RegisterSignalHandle() failed, signal SIGUSR1 err:%s!", strerror(errno));
+        LOGE("RegisterSignalHandle() failed, signal SIGUSR1 err:%d!", errno);
         return RET_FAILED;
     }
 

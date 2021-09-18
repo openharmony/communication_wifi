@@ -23,6 +23,7 @@
 namespace OHOS {
 namespace Wifi {
 const int MAX_IPV4_PREFIX_LENGTH = 32;
+const int MAX_IPV4_STRING_LENGTH = 64;
 const Ipv4Address Ipv4Address::INVALID_INET_ADDRESS = Ipv4Address::Create("255.255.255.255", MAX_IPV4_PREFIX_LENGTH);
 bool Ipv4Address::IsValidIPv4(const std::string &ipv4)
 {
@@ -69,7 +70,11 @@ Ipv4Address Ipv4Address::Create(const in_addr &ipv4, const in_addr &mask)
             ++prefixLength;
         }
     }
-    return Ipv4Address(inet_ntoa(ipv4), prefixLength);
+    char ipStr[MAX_IPV4_STRING_LENGTH] = {0};
+    if (inet_ntop(AF_INET, &ipv4, ipStr, sizeof(ipStr)) == nullptr) {
+        return INVALID_INET_ADDRESS;
+    }
+    return Ipv4Address(ipStr, prefixLength);
 }
 
 Ipv4Address::Ipv4Address(const std::string &ipv4, size_t prefixLength)
@@ -92,7 +97,12 @@ in_addr Ipv4Address::GetAddressWithInet() const
 
 std::string Ipv4Address::GetMaskWithString() const
 {
-    return inet_ntoa(GetMaskWithInet());
+    char ipStr[MAX_IPV4_STRING_LENGTH] = {0};
+    in_addr ipAddr = GetMaskWithInet();
+    if (inet_ntop(AF_INET, &ipAddr, ipStr, sizeof(ipStr)) == nullptr) {
+        return "";
+    }
+    return std::string(ipStr);
 }
 
 in_addr Ipv4Address::GetMaskWithInet() const
@@ -107,7 +117,12 @@ in_addr Ipv4Address::GetMaskWithInet() const
 
 std::string Ipv4Address::GetNetworkAddressWithString() const
 {
-    return inet_ntoa(GetNetworkAddressWithInet());
+    char ipStr[MAX_IPV4_STRING_LENGTH] = {0};
+    in_addr ipAddr = GetNetworkAddressWithInet();
+    if (inet_ntop(AF_INET, &ipAddr, ipStr, sizeof(ipStr)) == nullptr) {
+        return "";
+    }
+    return std::string(ipStr);
 }
 
 in_addr Ipv4Address::GetNetworkAddressWithInet() const
@@ -119,7 +134,12 @@ in_addr Ipv4Address::GetNetworkAddressWithInet() const
 
 std::string Ipv4Address::GetHostAddressWithString() const
 {
-    return inet_ntoa(GetHostAddressWithInet());
+    char ipStr[MAX_IPV4_STRING_LENGTH] = {0};
+    in_addr ipAddr = GetHostAddressWithInet();
+    if (inet_ntop(AF_INET, &ipAddr, ipStr, sizeof(ipStr)) == nullptr) {
+        return "";
+    }
+    return std::string(ipStr);
 }
 
 in_addr Ipv4Address::GetHostAddressWithInet() const

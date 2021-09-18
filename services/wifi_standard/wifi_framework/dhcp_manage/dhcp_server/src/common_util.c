@@ -42,15 +42,16 @@ void LogTime(void)
 {
     time_t curr;
     time(&curr);
-    ptm tt = localtime(&curr);
-    tt->tm_year += TIME_BASE_YEAR;
-    printf("[%04d-%02d-%02d %02d:%02d:%02d",
-        tt->tm_year,
-        tt->tm_mon + 1,
-        tt->tm_mday,
-        tt->tm_hour,
-        tt->tm_min,
-        tt->tm_sec);
+    struct tm nowTime;
+    localtime_r(&curr, &nowTime);
+    ptm tt = &nowTime;
+    if (tt) {
+        tt->tm_year += TIME_BASE_YEAR;
+        printf("[%04d-%02d-%02d %02d:%02d:%02d", tt->tm_year, tt->tm_mon + 1,
+            tt->tm_mday, tt->tm_hour, tt->tm_min, tt->tm_sec);
+    } else {
+        printf("[1970-01-01 08:00:00");
+    }
 }
 
 uint64_t Tmspusec(void)

@@ -76,7 +76,10 @@ void WifiP2pWfdInfo::GetDeviceInfoElement(std::string &subelement)
 {
     char buf[32];
     subelement = DeviceInfoSubelemLenHex;
-    snprintf(buf, sizeof(buf), "%04x%04x%04x",deviceInfo, ctrlPort, maxThroughput);
+    if (snprintf_s(buf, sizeof(buf), sizeof(buf) - 1, "%04x%04x%04x", deviceInfo, ctrlPort, maxThroughput) < 0) {
+        subelement.clear();
+        return;
+    }
     subelement.append(buf);
 }
 

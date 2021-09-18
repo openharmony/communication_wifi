@@ -829,7 +829,7 @@ void WifiDeviceProxy::OnRemoteDied(const wptr<IRemoteObject> &remoteObject)
 {
     WIFI_LOGD("Remote service is died!");
     mRemoteDied = true;
-    if (g_deviceCallBackStub) {
+    if (g_deviceCallBackStub != nullptr) {
         g_deviceCallBackStub->SetRemoteDied(true);
     }
 }

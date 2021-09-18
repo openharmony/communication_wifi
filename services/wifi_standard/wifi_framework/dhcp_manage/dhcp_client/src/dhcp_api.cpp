@@ -52,7 +52,7 @@ bool PublishDhcpIpv4ResultEvent(const int code, const char *data, const char *if
         }
     } else {
         if (snprintf_s(strAction, STRING_MAX_LEN, STRING_MAX_LEN - 1, "%s.%s", EVENT_GET_IPV4, ifname) < 0) {
-            LOGE("PublishDhcpIpv4ResultEvent() snprintf_s %{public}s error:%{public}s!", ifname, strerror(errno));
+            LOGE("PublishDhcpIpv4ResultEvent() snprintf_s %{public}s failed!", ifname);
             return false;
         }
     }

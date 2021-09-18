@@ -48,6 +48,7 @@ public:
      */
     std::string GetStateName();
 
+private:
     std::string mStateName;
 };
 }  // namespace Wifi

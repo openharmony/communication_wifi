@@ -21,8 +21,7 @@
 
 namespace OHOS {
 namespace Wifi {
-class IScanSerivceCallbacks {
-public:
+struct IScanSerivceCallbacks {
     std::function<void()> OnScanStartEvent;
     std::function<void()> OnScanStopEvent;
     std::function<void(int)> OnScanFinishEvent;

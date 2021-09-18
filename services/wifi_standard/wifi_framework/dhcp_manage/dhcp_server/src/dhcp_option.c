@@ -41,9 +41,11 @@ PDhcpOptionNode CreateOptionNode(PDhcpOption opt)
     }
     pNode->option.code = opt->code;
     pNode->option.length = opt->length;
-    memcpy_s(pNode->option.data, opt->length, opt->data, opt->length);
+    if (memcpy_s(pNode->option.data, sizeof(pNode->option.data), opt->data, opt->length) != EOK) {
+        LOGE("create option node failed when memcpy opt data!");
+        return NULL;
+    }
     pNode->previous = pNode->next = 0;
-
     return pNode;
 }
 
@@ -161,6 +163,9 @@ int RemoveOption(PDhcpOptionList pOptions, uint8_t code)
 
 PDhcpOptionNode GetOptionNode(PDhcpOptionList pOptions, uint8_t code)
 {
+    if (pOptions->first == NULL) {
+        return NULL;
+    }
     PDhcpOptionNode pNode = pOptions->first->next;
     while (pNode != NULL && pNode->option.code != code) {
         pNode = pNode->next;
@@ -289,10 +294,9 @@ int AppendAddressOption(PDhcpOption pOption, uint32_t address)
     if ((int)addrLen > 0) {
         pData += addrLen;
     }
-    addrLen = DHCP_ADDRESS_LENGTH;
     if (memcpy_s(pData, spaceSize, &address, DHCP_ADDRESS_LENGTH) != EOK) {
         return RET_ERROR;
     }
-    pOption->length = addrLen;
+    pOption->length += DHCP_ADDRESS_LENGTH;
     return RET_SUCCESS;
 }

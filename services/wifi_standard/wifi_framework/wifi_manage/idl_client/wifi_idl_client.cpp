@@ -1530,8 +1530,7 @@ WifiErrorNo WifiIdlClient::ReqP2pSetGroupConfig(int networkId, const IdlP2pGroup
     num += PushP2pGroupConfigString(conf + num, GROUP_CONFIG_BSSID, config.bssid);
     // If the PSK length is less than 8 or greater than 63, Do not set this psk field.
     if (config.psk.length() >= WIFI_IDL_PSK_MIN_LENGTH && config.psk.length() < WIFI_IDL_PSK_MAX_LENGTH) {
-        char tmp[WIFI_IDL_PSK_MAX_LENGTH + 1] = {0};
-        sprintf(tmp, "\"%s\"", config.psk.c_str());
+        std::string tmp = "\"" + config.psk + "\"";
         num += PushP2pGroupConfigString(conf + num, GROUP_CONFIG_PSK, tmp);
     } else if (config.psk.length() == WIFI_IDL_PSK_MAX_LENGTH) {
         num += PushP2pGroupConfigString(conf + num, GROUP_CONFIG_PSK, config.psk);

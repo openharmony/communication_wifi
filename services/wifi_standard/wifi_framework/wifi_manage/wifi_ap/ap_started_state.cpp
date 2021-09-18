@@ -69,10 +69,6 @@ void ApStartedState::GoInState()
     if (!m_ApStateMachine.m_ApStationsManager.EnableAllBlockList()) {
         WIFI_LOGE("Set Blocklist failed.");
     }
-    if (m_ApStateMachine.StartDhcpServer() == false) {
-        m_ApStateMachine.SwitchState(&m_ApStateMachine.m_ApIdleState);
-        return;
-    }
 
     WIFI_LOGE("Singleton version has not nat and use wlan0.");
     if (0) {
@@ -293,6 +289,8 @@ void ApStartedState::ProcessCmdUpdateConfigResult(InternalMessage &msg) const
         if (WifiSettings::GetInstance().SetHotspotConfig(m_hotspotConfig)) {
             WIFI_LOGE("set apConfig to settings failed.");
         }
+        m_ApStateMachine.StopDhcpServer();
+        m_ApStateMachine.StartDhcpServer();
     } else {
         m_ApStateMachine.SwitchState(&m_ApStateMachine.m_ApIdleState);
     }

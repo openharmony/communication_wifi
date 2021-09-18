@@ -22,8 +22,7 @@
 
 namespace OHOS {
 namespace Wifi {
-class StaServiceCallback {
-public:
+struct StaServiceCallback {
     std::function<void(OperateResState)> OnStaOpenRes;
     std::function<void(OperateResState)> OnStaCloseRes;
     std::function<void(OperateResState, const WifiLinkedInfo &)> OnStaConnChanged;

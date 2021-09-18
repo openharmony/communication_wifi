@@ -79,6 +79,7 @@ int DestroyHashTable(HashTable *table)
         }
     }
     free(table->nodes);
+    table->nodes = NULL;
     return HASH_SUCCESS;
 }
 
@@ -93,11 +94,17 @@ int Insert(HashTable *table, uintptr_t key, uintptr_t value)
     if (HashShouldGrow(table)) {
         HashAdjustCapacity(table);
     }
-
     size_t index = Hash(table, key);
+    int ret = HASH_INSERTED;
     for (HashNode *node = table->nodes[index]; node; node = node->next) {
         if (HashEquals(table, key, node->key)) {
-            memcpy_s((void *)node->value, table->valueSize, (void *)value, table->valueSize);
+            ret = HASH_UPDATED;
+        }
+        if (ret == HASH_UPDATED && memcpy_s((void *)node->value, table->valueSize,
+            (void *)value, table->valueSize) != EOK) {
+            return HASH_ERROR;
+        }
+        if (ret == HASH_UPDATED) {
             return HASH_UPDATED;
         }
     }
@@ -105,7 +112,7 @@ int Insert(HashTable *table, uintptr_t key, uintptr_t value)
         return HASH_ERROR;
     }
     ++table->size;
-    return HASH_INSERTED;
+    return ret;
 }
 
 int ContainsKey(const HashTable *table, uintptr_t key)

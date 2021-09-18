@@ -97,7 +97,7 @@ static void DealP2pFindInfo(char *buf)
     return;
 }
 
-static void DealP2pGoNegRequest(char *buf)
+static void DealP2pGoNegRequest(const char *buf)
 {
     if (buf == NULL) {
         return;
@@ -106,7 +106,7 @@ static void DealP2pGoNegRequest(char *buf)
     if (strncpy_s(macAddr, sizeof(macAddr), buf, WIFI_MAC_LENGTH) != EOK) {
         return;
     }
-    char *passId = strstr(buf, "dev_passwd_id=");
+    const char *passId = strstr(buf, "dev_passwd_id=");
     if (passId == NULL) {
         LOGD("Not find dev_passwd_id");
         return;
@@ -181,6 +181,7 @@ static void DealServiceDiscRespEvent(char *buf)
     while (token != NULL) {
         if (index == P2P_SERVICE_INFO_FIRST_SECTION) {
             if (strncpy_s(info.srcAddress, sizeof(info.srcAddress), token, strlen(token)) != EOK) {
+                free(info.tlvs);
                 return;
             }
         } else if (index == P2P_SERVICE_INFO_SECOND_SECTION) {
@@ -188,6 +189,7 @@ static void DealServiceDiscRespEvent(char *buf)
         } else if (index == P2P_SERVICE_INFO_THIRD_SECTION) {
             unsigned len = strlen(token) + 1;
             if (len == 0) {
+                free(info.tlvs);
                 return;
             }
             info.tlvs = (char *)calloc(len, sizeof(char));
@@ -204,13 +206,13 @@ static void DealServiceDiscRespEvent(char *buf)
     return;
 }
 
-static void DealP2pGroupRemove(char *buf)
+static void DealP2pGroupRemove(const char *buf)
 {
     if (buf == NULL) {
         return;
     }
     char groupIfname[WIFI_P2P_GROUP_IFNAME_LENGTH + 1] = {0};
-    char *pos = strstr(buf, " ");
+    const char *pos = strstr(buf, " ");
     if (pos == NULL || pos - buf > WIFI_P2P_GROUP_IFNAME_LENGTH) {
         LOGD("pos is %{public}s", ((pos == NULL) ? "NULL" : "bigger than ifname length"));
         return;
@@ -227,13 +229,13 @@ static void DealP2pGroupRemove(char *buf)
     return;
 }
 
-static void DealP2pConnectChanged(char *buf, int type)
+static void DealP2pConnectChanged(const char *buf, int type)
 {
     if (buf == NULL) {
         return;
     }
     char devAddr[WIFI_MAC_LENGTH + 1] = {0};
-    char *pos = strstr(buf, "p2p_dev_addr=");
+    const char *pos = strstr(buf, "p2p_dev_addr=");
     if (pos == NULL) {
         return;
     }
@@ -244,12 +246,12 @@ static void DealP2pConnectChanged(char *buf, int type)
     return;
 }
 
-static void DealDeviceLostEvent(char *buf)
+static void DealDeviceLostEvent(const char *buf)
 {
     if (buf == NULL) {
         return;
     }
-    char *peeraddr = strstr(buf, "p2p_dev_addr=");
+    const char *peeraddr = strstr(buf, "p2p_dev_addr=");
     if (peeraddr == NULL) {
         return;
     }
@@ -294,17 +296,17 @@ static void DealInvitationReceived(char *buf, int type)
     return;
 }
 
-static void DealInvitationResultEvent(char *buf)
+static void DealInvitationResultEvent(const char *buf)
 {
     if (buf == NULL) {
         return;
     }
-    char *sta = strstr(buf, "status=");
+    const char *sta = strstr(buf, "status=");
     if (sta == NULL) {
         return;
     }
     int status = atoi(sta + strlen("status="));
-    char *bssidpos = strstr(sta, " ");
+    const char *bssidpos = strstr(sta, " ");
     if (bssidpos == NULL) {
         return;
     }
@@ -316,12 +318,12 @@ static void DealInvitationResultEvent(char *buf)
     return;
 }
 
-static void DealP2pGoNegotiationFailure(char *buf)
+static void DealP2pGoNegotiationFailure(const char *buf)
 {
     if (buf == NULL) {
         return;
     }
-    char *sta = strstr(buf, "status=");
+    const char *sta = strstr(buf, "status=");
     if (sta == NULL) {
         return;
     }
@@ -330,7 +332,7 @@ static void DealP2pGoNegotiationFailure(char *buf)
     return;
 }
 
-static void DealGroupFormationFailureEvent(char *buf)
+static void DealGroupFormationFailureEvent(const char *buf)
 {
     if (buf == NULL) {
         return;
@@ -346,13 +348,13 @@ static void DealGroupFormationFailureEvent(char *buf)
     return;
 }
 
-static void DealProvDiscPbcReqEvent(char *buf, unsigned long length)
+static void DealProvDiscPbcReqEvent(const char *buf, unsigned long length)
 {
     if (buf == NULL || length < strlen(P2P_EVENT_PROV_DISC_PBC_REQ) + WIFI_MAC_LENGTH) {
         return;
     }
     char macAddr[WIFI_MAC_LENGTH + 1] = {0};
-    char *pos = buf + strlen(P2P_EVENT_PROV_DISC_PBC_REQ);
+    const char *pos = buf + strlen(P2P_EVENT_PROV_DISC_PBC_REQ);
     if (strncpy_s(macAddr, sizeof(macAddr), pos, WIFI_MAC_LENGTH) != EOK) {
         return;
     }
@@ -360,13 +362,13 @@ static void DealProvDiscPbcReqEvent(char *buf, unsigned long length)
     return;
 }
 
-static void DealProDiscPbcRespEvent(char *buf, unsigned long length)
+static void DealProDiscPbcRespEvent(const char *buf, unsigned long length)
 {
     if (buf == NULL || length < strlen(P2P_EVENT_PROV_DISC_PBC_RESP) + WIFI_MAC_LENGTH) {
         return;
     }
     char macAddr[WIFI_MAC_LENGTH + 1] = {0};
-    char *pos = buf + strlen(P2P_EVENT_PROV_DISC_PBC_RESP);
+    const char *pos = buf + strlen(P2P_EVENT_PROV_DISC_PBC_RESP);
     if (strncpy_s(macAddr, sizeof(macAddr), pos, WIFI_MAC_LENGTH) != EOK) {
         return;
     }
@@ -374,13 +376,13 @@ static void DealProDiscPbcRespEvent(char *buf, unsigned long length)
     return;
 }
 
-static void DealProDiscEnterPinEvent(char *buf, unsigned long length)
+static void DealProDiscEnterPinEvent(const char *buf, unsigned long length)
 {
     if (buf == NULL || length < strlen(P2P_EVENT_PROV_DISC_ENTER_PIN) + WIFI_MAC_LENGTH) {
         return;
     }
     char macAddr[WIFI_MAC_LENGTH + 1] = {0};
-    char *pos = buf + strlen(P2P_EVENT_PROV_DISC_ENTER_PIN);
+    const char *pos = buf + strlen(P2P_EVENT_PROV_DISC_ENTER_PIN);
     if (strncpy_s(macAddr, sizeof(macAddr), pos, WIFI_MAC_LENGTH) != EOK) {
         return;
     }
@@ -388,12 +390,12 @@ static void DealProDiscEnterPinEvent(char *buf, unsigned long length)
     return;
 }
 
-static void DealProvDiscShowPinEvent(char *buf, unsigned long length)
+static void DealProvDiscShowPinEvent(const char *buf, unsigned long length)
 {
     if (buf == NULL || length < strlen(P2P_EVENT_PROV_DISC_SHOW_PIN) + WIFI_MAC_LENGTH + 1 + WIFI_PIN_CODE_LENGTH) {
         return;
     }
-    char *p = buf + strlen(P2P_EVENT_PROV_DISC_SHOW_PIN);
+    const char *p = buf + strlen(P2P_EVENT_PROV_DISC_SHOW_PIN);
     char macAddr[WIFI_MAC_LENGTH + 1] = {0};
     char pinCode[WIFI_PIN_CODE_LENGTH + 1] = {0};
     if (strncpy_s(macAddr, sizeof(macAddr), p, WIFI_MAC_LENGTH) != EOK) {
@@ -424,6 +426,7 @@ static void DealP2pServDiscReqEvent(char *buf)
             info.freq = atoi(token);
         } else if (index == P2P_SERVICE_DISC_REQ_TWO) {
             if (strncpy_s(info.mac, sizeof(info.mac), token, strlen(token)) != EOK) {
+                free(info.tlvs);
                 return;
             }
         } else if (index == P2P_SERVICE_DISC_REQ_THREE) {
@@ -433,6 +436,7 @@ static void DealP2pServDiscReqEvent(char *buf)
         } else if (index == P2P_SERVICE_DISC_REQ_FIVE) {
             unsigned len = strlen(token) + 1;
             if (len == 0) {
+                free(info.tlvs);
                 return;
             }
             info.tlvs = (char *)calloc(len, sizeof(char));

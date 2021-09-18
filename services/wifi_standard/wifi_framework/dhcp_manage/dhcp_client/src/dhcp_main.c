@@ -98,15 +98,15 @@ static int CreateDaemon(void)
 
     /* A daemon process need close all open files. */
     if (fclose(stdin) != 0) {
-        LOGE("CreateDaemon() fclose stdin error:%{public}s!", strerror(errno));
+        LOGE("CreateDaemon() fclose stdin error:%{public}d!", errno);
         return DHCP_OPT_FAILED;
     }
     if (fclose(stdout) != 0) {
-        LOGE("CreateDaemon() fclose stdout error:%{public}s!", strerror(errno));
+        LOGE("CreateDaemon() fclose stdout error:%{public}d!", errno);
         return DHCP_OPT_FAILED;
     }
     if (fclose(stderr) != 0) {
-        LOGE("CreateDaemon() fclose stderr error:%{public}s!", strerror(errno));
+        LOGE("CreateDaemon() fclose stderr error:%{public}d!", errno);
         return DHCP_OPT_FAILED;
     }
 

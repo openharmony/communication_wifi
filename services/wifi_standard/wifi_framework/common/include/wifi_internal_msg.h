@@ -216,6 +216,7 @@ struct WifiEventCallbackMsg {
     {
         msgCode = 0;
         msgData = 0;
+        p2pAction = P2pActionCallback::UNKNOWN;
     }
 };
 

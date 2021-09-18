@@ -70,10 +70,7 @@ int HttpRequest::HttpRequestExec(
     /* Create socket */
     mISocketFd = socket(AF_INET, SOCK_STREAM, 0);
     if (mISocketFd < 0) {
-        LOGE("HttpRequest::HttpRequestExec socket error! Error code: %{public}d，Error "
-             "message: %{public}s!\n",
-            errno,
-            strerror(errno));
+        LOGE("HttpRequest::HttpRequestExec socket error! Error code: %{public}d.", errno);
         return -1;
     }
 
@@ -108,14 +105,14 @@ int HttpRequest::HttpConnect(std::string &strResponse)
     servaddr.sin_family = AF_INET;
     servaddr.sin_port = htons(iPort);
     if (inet_pton(AF_INET, strIp.c_str(), &servaddr.sin_addr) <= 0) {
-        LOGE("HttpConnect inet_pton error! errno: %{public}d，Error message: %{public}s\n", errno, strerror(errno));
+        LOGE("HttpConnect inet_pton error! errno: %{public}d", errno);
         return -1;
     }
 
     /* Set non-blocking */
     flags = fcntl(mISocketFd, F_GETFL, 0);
     if (fcntl(mISocketFd, F_SETFL, flags | O_NONBLOCK) == -1) {
-        LOGE("HttpConnect fcntl error! Error code: %{public}d，Error message: %{public}s\n", errno, strerror(errno));
+        LOGE("HttpConnect fcntl error! Error code: %{public}d", errno);
         return -1;
     }
 
@@ -131,9 +128,7 @@ int HttpRequest::HttpConnect(std::string &strResponse)
         return 0;
     } else if (iRet < 0) {
         if (errno != EINPROGRESS) {
-            LOGE("HttpDataTransmit connect error! Error code: %{public}d，Error message: %{public}s\n",
-                errno,
-                strerror(errno));
+            LOGE("HttpDataTransmit connect error! Error code: %{public}d", errno);
             return -1;
         }
     }
@@ -186,10 +181,7 @@ int HttpRequest::HttpDataTransmit(const int &iSockFd)
 {
     int ret = send(iSockFd, httpHead.c_str(), httpHead.length() + 1, 0);
     if (ret < 0) {
-        LOGE("HttpRequest::HttpDataTransmit send error! Error code: %{public}d，Error "
-             "message: %{public}s\n",
-            errno,
-            strerror(errno));
+        LOGE("HttpRequest::HttpDataTransmit send error! Error code: %{public}d", errno);
         return -1;
     }
     char *buf = new char[BUFSIZE]();
@@ -200,10 +192,7 @@ int HttpRequest::HttpDataTransmit(const int &iSockFd)
         ret = recv(iSockFd, buf, BUFSIZE, 0);
         if (ret == 0) {
             /* The connection is closed. */
-            LOGE("HttpRequest::HttpDataTransmit recv error! Error code: %{public}d，Error "
-                 "message: %{public}s\n",
-                errno,
-                strerror(errno));
+            LOGE("HttpRequest::HttpDataTransmit recv error! Error code: %{public}d", errno);
             delete[] buf;
             return -1;
         } else if (ret > 0) {
@@ -215,10 +204,7 @@ int HttpRequest::HttpDataTransmit(const int &iSockFd)
             if (errno == EINTR || errno == EWOULDBLOCK || errno == EAGAIN) {
                 continue;
             } else {
-                LOGE("HttpRequest::HttpDataTransmit recv error! Error code: %{public}d，Error "
-                     "message: %{public}s\n",
-                    errno,
-                    strerror(errno));
+                LOGE("HttpRequest::HttpDataTransmit recv error! Error code: %{public}d", errno);
                 delete[] buf;
                 return -1;
             }
@@ -283,7 +269,11 @@ int HttpRequest::GetIPFromUrl()
         } else {
             struct in_addr **addrList = reinterpret_cast<struct in_addr **>(he->h_addr_list);
             for (int i = 0; addrList[i] != nullptr; i++) {
-                strIp = inet_ntoa(*addrList[i]);
+                char ipStr[MAX_IP_STRING_LENGTH] = {0};
+                if (inet_ntop(AF_INET, addrList[i], ipStr, sizeof(ipStr)) == nullptr) {
+                    continue;
+                }
+                strIp = std::string(ipStr);
             }
             return 0;
         }
@@ -326,17 +316,11 @@ int HttpRequest::SocketFdCheck(const int &iSockFd) const
                 /* Indicates the number of prepared descriptors. */
                 return iRet;
             } else {
-                LOGE("HttpRequest::SocketFdCheck getsockopt failed. error "
-                     "code:%{public}d,error message:%{public}s\n",
-                    errno,
-                    strerror(errno));
+                LOGE("HttpRequest::SocketFdCheck getsockopt failed. error code:%{public}d", errno);
                 return -1;
             }
         } else {
-            LOGE("HttpRequest::SocketFdCheck getsockopt failed. error "
-                 "code:%{public}d,error message:%{public}s\n",
-                errno,
-                strerror(errno));
+            LOGE("HttpRequest::SocketFdCheck getsockopt failed. error code:%{public}d", errno);
             return -1;
         }
     } else {

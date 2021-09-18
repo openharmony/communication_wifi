@@ -471,7 +471,7 @@ void WifiHotspotProxy::OnRemoteDied(const wptr<IRemoteObject>& remoteObject)
 {
     WIFI_LOGD("Remote service is died!");
     mRemoteDied = true;
-    if (g_wifiHotspotCallbackStub) {
+    if (g_wifiHotspotCallbackStub != nullptr) {
         g_wifiHotspotCallbackStub->SetRemoteDied(true);
     }
 }

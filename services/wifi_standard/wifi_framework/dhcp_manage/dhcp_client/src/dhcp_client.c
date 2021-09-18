@@ -67,7 +67,7 @@ int StopProcess(const char *pidFile)
             unlink(pidFile);
             return DHCP_OPT_SUCCESS;
         }
-        LOGE("StopProcess() cmd: [kill %{public}d] failed, kill error:%{public}s!", pid, strerror(errno));
+        LOGE("StopProcess() cmd: [kill %{public}d] failed, kill error:%{public}d!", pid, errno);
         return DHCP_OPT_FAILED;
     }
 

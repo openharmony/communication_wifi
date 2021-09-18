@@ -137,11 +137,7 @@ int BindNetInterface(int fd, const char *ifname)
     }
     if (ifname) {
         ssize_t ifnameSize = strlen(ifname);
-        if (ifnameSize > IFNAMSIZ) {
-            LOGE("network interface name too long.");
-            return RET_FAILED;
-        }
-        if (strncpy_s(iface.ifr_ifrn.ifrn_name, IFNAMSIZ, ifname, ifnameSize) != EOK) {
+        if (strncpy_s(iface.ifr_ifrn.ifrn_name, sizeof(iface.ifr_ifrn.ifrn_name), ifname, ifnameSize) != EOK) {
             return RET_FAILED;
         };
         if (setsockopt(fd, SOL_SOCKET, SO_BINDTODEVICE, (char *)&iface, sizeof(iface)) == -1) {
@@ -171,6 +167,7 @@ int InitServer(const char *ifname)
         LOGD("failed to fcntl O_NONBLOCK flag!");
     }
     if (BindNetInterface(fd, ifname) != RET_SUCCESS) {
+        close(fd);
         return -1;
     }
     socklen_t optlen = sizeof(optrval);
@@ -178,20 +175,23 @@ int InitServer(const char *ifname)
         LOGD("failed to receive buffer size.");
     } else {
         LOGD("receive buffer size is %d", optrval);
-    };
+    }
     if (REUSE_ADDRESS_ENABLE && setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, (char *)&optval, sizeof(optval)) == -1) {
         LOGW("failed to setsockopt 'SO_REUSEADDR' for server socket!");
     }
     if (setsockopt(fd, SOL_SOCKET, SO_BROADCAST, &optval, sizeof(optval)) == -1) {
         LOGE("failed to setsockopt 'SO_BROADCAST' for server socket!");
+        close(fd);
         return -1;
     }
     if (bind(fd, (sockaddr *)&srvAddrIn, sizeof(sockaddr)) == -1) {
         LOGE("failed to bind server!");
+        close(fd);
         return -1;
     }
     return fd;
 }
+
 struct sockaddr_in *BroadcastAddrIn(void)
 {
     static struct sockaddr_in broadcastAddrIn = {0};
@@ -254,7 +254,7 @@ int ReceiveDhcpMessage(int sock, PDhcpMsgInfo msgInfo)
     tmt.tv_sec = tms;
     tmt.tv_usec = 0;
     if (select(sock + 1, &recvFd, NULL, NULL, &tmt) < 0) {
-        LOGE("select error, %s", strerror(errno));
+        LOGE("select error, %d", errno);
         return ERR_SELECT;
     }
     if (!FD_ISSET(sock, &recvFd)) {
@@ -266,7 +266,7 @@ int ReceiveDhcpMessage(int sock, PDhcpMsgInfo msgInfo)
     srcAddrIn->sin_addr.s_addr = INADDR_ANY;
     int rsize = recvfrom(sock, recvBuffer, RECV_BUFFER_SIZE, 0, (struct sockaddr *)srcAddrIn, (socklen_t *)&ssize);
     if (!rsize) {
-        LOGE("receive error, %s",  strerror(errno));
+        LOGE("receive error, %d",  errno);
         return RET_FAILED;
     }
     if (rsize > (int)sizeof(DhcpMsgInfo) || rsize < DHCP_MSG_HEADER_SIZE) {
@@ -274,7 +274,9 @@ int ReceiveDhcpMessage(int sock, PDhcpMsgInfo msgInfo)
         return RET_FAILED;
     }
     msgInfo->length = rsize;
-    memcpy_s(&msgInfo->packet, sizeof(DhcpMessage), recvBuffer, rsize);
+    if (memcpy_s(&msgInfo->packet, sizeof(DhcpMessage), recvBuffer, rsize) != EOK) {
+        return RET_FAILED;
+    };
     if (msgInfo->packet.op != BOOTREQUEST) {
         LOGW("dhcp message type error!");
         return RET_FAILED;
@@ -605,6 +607,10 @@ void InitBindingRecoders(DhcpAddressPool *pool)
 void InitLeaseFile(DhcpAddressPool *pool)
 {
     const char *leasePath  = GetFilePath(DHCPD_LEASE_FILE);
+    if (!leasePath || strlen(leasePath) == 0) {
+        LOGE("failed to get lease file path.");
+        return;
+    }
     if (access(leasePath, 0) != 0) {
         LOGD("lease file path does not exist.");
         if (!CreatePath(leasePath)) {
@@ -627,13 +633,13 @@ int StartDhcpServer(PDhcpServerContext ctx)
         LOGE("server context pointer is null.");
         return RET_FAILED;
     }
-    ServerContext *srvIns = GetServerInstance(ctx);
-    if (!ctx) {
-        LOGE("dhcp server context instance pointer is null.");
+    if (strlen(ctx->ifname) == 0) {
+        LOGE("context interface is null or empty.");
         return RET_FAILED;
     }
-    if (strlen(ctx->ifname) == 0 || ctx->ifname[0] == '\0') {
-        LOGE("context interface is null or empty.");
+    ServerContext *srvIns = GetServerInstance(ctx);
+    if (!srvIns) {
+        LOGE("dhcp server context instance pointer is null.");
         return RET_FAILED;
     }
     if (!srvIns->initialized) {
@@ -934,6 +940,9 @@ static int OnReceivedDiscover(PDhcpServerContext ctx, PDhcpMsgInfo received, PDh
         LOGD("add lease recoder.");
         AddLease(&srvIns->addressPool, binding);
         lease = GetLease(&srvIns->addressPool, binding->ipAddress);
+    }
+    if (!lease) {
+        return REPLY_NONE;
     }
     AddReplyMessageTypeOption(reply, DHCPOFFER);
     reply->packet.yiaddr = lease->ipAddress;
@@ -1521,12 +1530,14 @@ static int ParseReplyOptions(PDhcpMsgInfo reply)
     PushBackOption(&reply->options, &endOpt);
     int replyOptsLength = 0;
     uint8_t *current = reply->packet.options, olen = MAGIC_COOKIE_LENGTH;
+    size_t remainingSize = sizeof(reply->packet.options);
     uint32_t cookie = htonl(DHCP_MAGIC_COOKIE);
-    if (memcpy_s(current, olen, &cookie, olen) != EOK) {
+    if (memcpy_s(current, remainingSize, &cookie, olen) != EOK) {
         LOGE("memcpy cookie out of options buffer!");
         return RET_FAILED;
     }
     replyOptsLength += olen;
+    remainingSize -= olen;
     current += olen;
     ret = RET_SUCCESS;
     while (pNode && (uint32_t)pNode->option.length < DHCP_OPTION_SIZE) {
@@ -1535,11 +1546,12 @@ static int ParseReplyOptions(PDhcpMsgInfo reply)
         } else {
             olen = OPT_HEADER_LENGTH + pNode->option.length;
         }
-        if (memcpy_s(current, olen, &pNode->option, olen) != EOK) {
+        if (memcpy_s(current, remainingSize, &pNode->option, olen) != EOK) {
             LOGE("memcpy current option out of options buffer!");
             ret = RET_FAILED;
             break;
         }
+        remainingSize -= olen;
         current += olen;
         replyOptsLength += olen;
         if ((uint32_t)pNode->option.code == END_OPTION) {

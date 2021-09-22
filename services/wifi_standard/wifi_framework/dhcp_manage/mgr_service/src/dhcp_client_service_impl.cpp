@@ -287,6 +287,34 @@ pid_t DhcpClientServiceImpl::GetDhcpClientProPid(const std::string &ifname)
     return DhcpClientServiceImpl::m_mapDhcpInfo[ifname].clientProPid;
 }
 
+int DhcpClientServiceImpl::CheckDhcpClientRunning(const std::string &ifname)
+{
+    if (ifname.empty()) {
+        WIFI_LOGE("CheckDhcpClientRunning param error, ifname is empty!");
+        return DHCP_OPT_ERROR;
+    }
+
+    std::string pidFile = DHCP_WORK_DIR + ifname + DHCP_CLIENT_PID_FILETYPE;
+    pid_t pid = DhcpFunc::GetPID(pidFile);
+    if (pid > 0) {
+        int nRet = DhcpFunc::CheckProRunning(pid, DHCP_CLIENT_FILE);
+        if (nRet == -1) {
+            WIFI_LOGE("CheckDhcpClientRunning %{public}s failed, pid:%{public}d", ifname.c_str(), pid);
+            return DHCP_OPT_FAILED;
+        } else if (nRet == 0) {
+            WIFI_LOGI("CheckDhcpClientRunning %{public}s, %{public}s is not running, need remove %{public}s",
+                ifname.c_str(), DHCP_CLIENT_FILE.c_str(), pidFile.c_str());
+            DhcpFunc::RemoveFile(pidFile);
+        } else {
+            WIFI_LOGI("CheckDhcpClientRunning %{public}s, %{public}s is running, pid:%{public}d",
+                ifname.c_str(), DHCP_CLIENT_FILE.c_str(), pid);
+        }
+    }
+    WIFI_LOGI("CheckDhcpClientRunning %{public}s finished, pid:%{public}d, pro:%{public}s",
+        ifname.c_str(), pid, DHCP_CLIENT_FILE.c_str());
+    return DHCP_OPT_SUCCESS;
+}
+
 int DhcpClientServiceImpl::GetSuccessIpv4Result(const std::vector<std::string> &splits)
 {
     /* Result format - ifname,time,cliIp,lease,servIp,subnet,dns1,dns2,router1,router2,vendor */
@@ -453,6 +481,10 @@ int DhcpClientServiceImpl::StartDhcpClient(const std::string &ifname, bool bIpv6
 
     /* check config */
     /* check dhcp client service running status */
+    if (CheckDhcpClientRunning(ifname) != DHCP_OPT_SUCCESS) {
+        WIFI_LOGE("StartDhcpClient CheckDhcpClientRunning ifname:%{public}s failed.", ifname.c_str());
+        return DHCP_OPT_FAILED;
+    }
     int nStatus = GetDhcpStatus(ifname);
     if (nStatus == 1) {
         WIFI_LOGI("StartDhcpClient() running status:%{public}d, service already started, ifname:%{public}s.",

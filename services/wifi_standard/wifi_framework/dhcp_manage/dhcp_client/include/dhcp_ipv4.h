@@ -16,6 +16,7 @@
 #define OHOS_IP4_H
 
 #include <stdint.h>
+#include <sys/types.h>
 
 #include "dhcp_define.h"
 
@@ -23,8 +24,11 @@
 extern "C" {
 #endif
 
+void SetSocketMode(uint32_t mode);
 int SetIpv4State(int state);
 int InitSignalHandle(void);
+int ExecDhcpRelease(void);
+int ExecDhcpRenew(void);
 
 int PublishDhcpResultEvent(const char *ifname, const int code, struct DhcpResult *result);
 int GetPacketHeaderInfo(struct DhcpPacket *packet, uint8_t type);
@@ -34,8 +38,11 @@ int DhcpRequest(uint32_t transid, uint32_t reqip, uint32_t servip);
 int DhcpRenew(uint32_t transid, uint32_t clientip, uint32_t serverip);
 int DhcpRelease(uint32_t clientip, uint32_t serverip);
 int StartIpv4(void);
+void SendReboot(struct DhcpPacket *p, time_t timestamp);
 
-int *GetSignalPipeFD(void);
+int GetPacketReadSockFd(void);
+int GetSigReadSockFd(void);
+uint32_t GetDhcpTransID(void);
 
 #ifdef __cplusplus
 }

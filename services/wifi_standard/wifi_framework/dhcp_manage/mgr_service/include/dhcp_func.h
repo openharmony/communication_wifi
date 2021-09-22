@@ -58,6 +58,7 @@ public:
     static int FormatString(struct DhcpPacketResult &result);
     static int InitPidfile(const std::string& piddir, const std::string& pidfile);
     static pid_t GetPID(const std::string& pidfile);
+    static int CheckProRunning(const pid_t proPid, const std::string& proName);
     static int CreateDirs(const std::string dirs, int mode = DIR_DEFAULT_MODE);
     static bool SplitString(
         const std::string src, const std::string delim, const int count, std::vector<std::string> &splits);

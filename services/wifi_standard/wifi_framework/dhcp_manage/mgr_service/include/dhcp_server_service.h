@@ -205,10 +205,10 @@ private:
     /**
      * @Description : Stop dhcp server process.
      *
-     * @param server_pid - process id [in]
+     * @param serverPid - process id [in]
      * @Return : success - DHCP_OPT_SUCCESS, failed - others.
      */
-    int StopServer(const pid_t& server_pid);
+    int StopServer(const pid_t& serverPid);
 
     /**
      * @Description : Exit dhcp process exit abnormal notify thread.

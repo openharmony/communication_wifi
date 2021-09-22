@@ -551,6 +551,38 @@ pid_t DhcpFunc::GetPID(const std::string& pidfile)
     return atoi(buf);
 }
 
+int DhcpFunc::CheckProRunning(const pid_t proPid, const std::string& proName)
+{
+    if ((proPid == 0) || proName.empty()) {
+        WIFI_LOGE("CheckProRunning %{public}ld or %{public}s param error!", (long int)proPid, proName.c_str());
+        return -1;
+    }
+    char buf[DIR_MAX_LEN] = {0};
+    if (snprintf_s(buf, DIR_MAX_LEN, DIR_MAX_LEN - 1, "/proc/%ld", (long int)proPid) < 0) {
+        WIFI_LOGE("CheckProRunning %{public}s failed, snprintf_s errno:%{public}d!", proName.c_str(), errno);
+        return -1;
+    }
+    if (access(buf, F_OK) != 0) {
+        WIFI_LOGI("CheckProRunning %{public}s is not exist, %{public}s no running", buf, proName.c_str());
+        return 0;
+    }
+    if (strcat_s(buf, sizeof(buf), "/exe") != EOK) {
+        WIFI_LOGE("CheckProRunning %{public}s failed, strcat_s errno:%{public}d!", proName.c_str(), errno);
+        return -1;
+    }
+    char proBuf[DIR_MAX_LEN] = {0};
+    if (readlink(buf, proBuf, sizeof(proBuf)) < 0) {
+        WIFI_LOGE("CheckProRunning %{public}s failed, readlink errno:%{public}d!", proName.c_str(), errno);
+        return -1;
+    }
+    if (strstr(proBuf, proName.c_str()) == NULL) {
+        WIFI_LOGI("CheckProRunning %{public}s exe -> %{public}s, %{public}s no running", buf, proBuf, proName.c_str());
+        return 0;
+    }
+    WIFI_LOGI("CheckProRunning %{public}s exe -> %{public}s, %{public}s is running", buf, proBuf, proName.c_str());
+    return 1;
+}
+
 int DhcpFunc::CreateDirs(const std::string dirs, int mode)
 {
     if (dirs.empty() || (dirs.size() >= DIR_MAX_LEN)) {

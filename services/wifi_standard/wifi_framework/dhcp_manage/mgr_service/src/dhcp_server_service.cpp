@@ -503,24 +503,24 @@ int DhcpServerService::ForkExecProcess(
     return DHCP_OPT_SUCCESS;
 }
 
-int DhcpServerService::StopServer(const pid_t &server_pid)
+int DhcpServerService::StopServer(const pid_t &serverPid)
 {
     UnregisterSignal();
-    if (kill(server_pid, SIGTERM) == -1) {
+    if (kill(serverPid, SIGTERM) == -1) {
         if (ESRCH == errno) {
             /* Normal. The subprocess is dead. The SIGCHLD signal triggers the stop hotspot. */
             WIFI_LOGI("StopServer() kill [%{public}d] success, pro pid no exist, pro:%{public}s.",
-                server_pid, DHCP_SERVER_FILE.c_str());
+                serverPid, DHCP_SERVER_FILE.c_str());
             return DHCP_OPT_SUCCESS;
         }
-        WIFI_LOGE("StopServer() kill [%{public}d] failed, errno:%{public}d!", server_pid, errno);
+        WIFI_LOGE("StopServer() kill [%{public}d] failed, errno:%{public}d!", serverPid, errno);
         return DHCP_OPT_FAILED;
     }
-    if (waitpid(server_pid, nullptr, 0) == -1) {
-        WIFI_LOGE("StopServer() waitpid [%{public}d] failed, errno:%{public}d!", server_pid, errno);
+    if (waitpid(serverPid, nullptr, 0) == -1) {
+        WIFI_LOGE("StopServer() waitpid [%{public}d] failed, errno:%{public}d!", serverPid, errno);
         return DHCP_OPT_FAILED;
     }
-    WIFI_LOGI("StopServer() waitpid [%{public}d] success, pro:%{public}s!", server_pid, DHCP_SERVER_FILE.c_str());
+    WIFI_LOGI("StopServer() waitpid [%{public}d] success, pro:%{public}s!", serverPid, DHCP_SERVER_FILE.c_str());
     return DHCP_OPT_SUCCESS;
 }
 
@@ -696,6 +696,8 @@ void DhcpServerService::RunDhcpSerProExitThreadFunc()
 
             if (!DhcpServerService::m_mapDhcpServer[ifname].exitSig ||
                 DhcpServerService::m_mapDhcpServer[ifname].normalExit) {
+                WIFI_LOGI("RunDhcpSerProExitThreadFunc() ifname:%{public}s exit status not update", ifname.c_str());
+                ++iterNotify;
                 continue;
             }
 

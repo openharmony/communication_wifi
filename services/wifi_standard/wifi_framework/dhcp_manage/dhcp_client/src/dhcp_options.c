@@ -23,7 +23,7 @@
 #undef LOG_TAG
 #define LOG_TAG "WifiDhcpOptions"
 
-/* Check packet option DHO_OPTSOVERLOADED. */
+/* Check packet option OPTION_OVERLOAD_OPTION. */
 static bool CheckOptSoverloaded(const struct DhcpPacket *packet, int code, int maxLen, int *over, int *index)
 {
     if (packet == NULL) {
@@ -72,38 +72,38 @@ static int CheckOptionsData(const struct DhcpPacket *packet, int code, int index
 /* Obtains the data type based on the code. */
 static uint8_t GetDhcpOptionCodeType(const uint8_t code)
 {
-    if ((code <= DHO_PAD) || (code >= DHO_END)) {
+    if ((code <= PAD_OPTION) || (code >= END_OPTION)) {
         LOGE("GetDhcpOptionCodeType error, code:%{public}d is error!", code);
         return DHCP_OPTION_DATA_INVALID;
     }
 
     uint8_t nDataType = DHCP_OPTION_DATA_INVALID;
     switch (code) {
-        case DHO_MESSAGETYPE:
-        case DHO_FORCERENEW_NONCE:
+        case DHCP_MESSAGE_TYPE_OPTION:
+        case FORCERENEW_NONCE_OPTION:
             nDataType = DHCP_OPTION_DATA_U8;
             break;
-        case DHO_MTU:
-        case DHO_MAXMESSAGESIZE:
+        case INTERFACE_MTU_OPTION:
+        case MAXIMUM_DHCP_MESSAGE_SIZE_OPTION:
             nDataType = DHCP_OPTION_DATA_U16;
             break;
-        case DHO_LEASETIME:
+        case IP_ADDRESS_LEASE_TIME_OPTION:
             nDataType = DHCP_OPTION_DATA_U32;
             break;
-        case DHO_SUBNETMASK:
-        case DHO_BROADCAST:
-        case DHO_IPADDRESS:
-        case DHO_SERVERID:
+        case SUBNET_MASK_OPTION:
+        case BROADCAST_ADDRESS_OPTION:
+        case REQUESTED_IP_ADDRESS_OPTION:
+        case SERVER_IDENTIFIER_OPTION:
             nDataType = DHCP_OPTION_DATA_IP;
             break;
-        case DHO_ROUTER:
-        case DHO_DNSSERVER:
-        case DHO_NTPSERVER:
+        case ROUTER_OPTION:
+        case DOMAIN_NAME_SERVER_OPTION:
+        case NETWORK_TIME_PROTOCOL_SERVERS_OPTION:
             nDataType = DHCP_OPTION_DATA_IP_LIST;
             break;
-        case DHO_HOSTNAME:
-        case DHO_DNSDOMAIN:
-        case DHO_MESSAGE:
+        case HOST_NAME_OPTION:
+        case DOMAIN_NAME_OPTION:
+        case MESSAGE_OPTION:
             nDataType = DHCP_OPTION_DATA_IP_STRING;
             break;
         default:
@@ -159,7 +159,7 @@ const uint8_t *GetDhcpOption(const struct DhcpPacket *packet, int code, size_t *
     }
 
     const uint8_t *pOption = packet->options;
-    int nIndex = 0, maxLen = DHCP_OPT_MAX_BYTES, nOver = 0, nFinished = 0, nFlag = OPTION_FIELD;
+    int nIndex = 0, maxLen = DHCP_OPTIONS_SIZE, nOver = 0, nFinished = 0, nFlag = OPTION_FIELD;
     while (nFinished == 0) {
         int nRet = CheckOptionsData(packet, code, nIndex, maxLen);
         if (nRet == DHCP_OPT_SUCCESS) {
@@ -170,24 +170,24 @@ const uint8_t *GetDhcpOption(const struct DhcpPacket *packet, int code, size_t *
         }
 
         switch (pOption[nIndex + DHCP_OPT_CODE_INDEX]) {
-            case DHO_PAD:
+            case PAD_OPTION:
                 nIndex++;
                 break;
-            case DHO_OPTSOVERLOADED:
+            case OPTION_OVERLOAD_OPTION:
                 if (!CheckOptSoverloaded(packet, code, maxLen, &nOver, &nIndex)) {
                     return NULL;
                 }
                 break;
-            case DHO_END:
+            case END_OPTION:
                 if ((nFlag == OPTION_FIELD) && (nOver & FILE_FIELD)) {
                     pOption = packet->file;
                     nIndex = 0;
-                    maxLen = DHCP_FILE_MAX_BYTES;
+                    maxLen = DHCP_BOOT_FILE_LENGTH;
                     nFlag = FILE_FIELD;
                 } else if ((nFlag == FILE_FIELD) && (nOver & SNAME_FIELD)) {
                     pOption = packet->sname;
                     nIndex = 0;
-                    maxLen = DHCP_SNAME_MAX_BYTES;
+                    maxLen = DHCP_HOST_NAME_LENGTH;
                     nFlag = SNAME_FIELD;
                 } else {
                     nFinished = 1;
@@ -310,8 +310,8 @@ char *GetDhcpOptionString(const struct DhcpPacket *packet, int code)
 int GetEndOptionIndex(uint8_t *pOpts)
 {
     int nIndex = 0;
-    while (pOpts[nIndex] != DHO_END) {
-        if (pOpts[nIndex] != DHO_PAD) {
+    while (pOpts[nIndex] != END_OPTION) {
+        if (pOpts[nIndex] != PAD_OPTION) {
             nIndex += pOpts[nIndex + DHCP_OPT_LEN_INDEX] + DHCP_OPT_CODE_BYTES + DHCP_OPT_LEN_BYTES;
             continue;
         }
@@ -331,7 +331,7 @@ int AddOptStrToOpts(uint8_t *pOpts, uint8_t *pOpt, int nOptLen)
     }
 
     int nEndIndex = GetEndOptionIndex(pOpts);
-    if ((nEndIndex + nOptLen + 1) >= DHCP_OPT_MAX_BYTES) {
+    if ((nEndIndex + nOptLen + 1) >= DHCP_OPTIONS_SIZE) {
         LOGE("AddOptStrToOpts() code:%{public}u did not fit into the packet!", pOpt[DHCP_OPT_CODE_INDEX]);
         return 0;
     }
@@ -340,7 +340,7 @@ int AddOptStrToOpts(uint8_t *pOpts, uint8_t *pOpt, int nOptLen)
     if (memcpy_s(pOpts + nEndIndex, nOptLen + 1, pOpt, nOptLen) != EOK) {
         return 0;
     }
-    pOpts[nEndIndex + nOptLen] = DHO_END;
+    pOpts[nEndIndex + nOptLen] = END_OPTION;
     return nOptLen;
 }
 

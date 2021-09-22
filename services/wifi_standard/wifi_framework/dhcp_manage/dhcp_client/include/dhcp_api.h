@@ -18,8 +18,12 @@
 
 #include "dhcp_define.h"
 
+#ifdef __cplusplus
 extern "C" {
+#endif
 bool PublishDhcpIpv4ResultEvent(const int code, const char *data, const char *ifname);
+#ifdef __cplusplus
 }
+#endif
 
 #endif

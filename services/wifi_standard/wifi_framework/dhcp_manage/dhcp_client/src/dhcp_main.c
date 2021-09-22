@@ -336,7 +336,7 @@ static int GetClientNetworkInfo(void)
             LOGE("GetClientNetworkInfo() g_cltCfg->pOptClientId malloc failed!");
             return DHCP_OPT_FAILED;
         }
-        g_cltCfg->pOptClientId[DHCP_OPT_CODE_INDEX] = DHO_CLIENTID;
+        g_cltCfg->pOptClientId[DHCP_OPT_CODE_INDEX] = CLIENT_IDENTIFIER_OPTION;
         g_cltCfg->pOptClientId[DHCP_OPT_LEN_INDEX] = MAC_ADDR_LEN + 1;
         /* Generate format: 1 + ifaceMac. */
         g_cltCfg->pOptClientId[DHCP_OPT_DATA_INDEX] = NUMBER_ONE;

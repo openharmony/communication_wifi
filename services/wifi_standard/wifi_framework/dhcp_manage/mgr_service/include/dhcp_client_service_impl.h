@@ -130,6 +130,14 @@ public:
     pid_t GetDhcpClientProPid(const std::string &ifname);
 
     /**
+     * @Description : Check the dhcp client process of specified interface is or not running.
+     *
+     * @param ifname - interface name, eg:wlan0 [in]
+     * @Return : success - DHCP_OPT_SUCCESS, failed - others.
+     */
+    int CheckDhcpClientRunning(const std::string &ifname);
+
+    /**
      * @Description : Get dhcp event success ipv4 result.
      *
      * @param splits - dhcp event result vector [in]

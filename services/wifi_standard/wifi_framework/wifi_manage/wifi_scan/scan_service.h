@@ -20,9 +20,7 @@
 #include <ctime>
 #include "iscan_service_callbacks.h"
 #include "wifi_log.h"
-#include "wifi_settings.h"
 #include "wifi_error_no.h"
-#include "wifi_sta_hal_interface.h"
 #include "define.h"
 #include "scan_common.h"
 #include "scan_monitor.h"
@@ -51,35 +49,36 @@ const int SYS_FOREGROUND_SCAN = 2;
 const int SYS_BACKGROUND_SCAN = 3;
 
 class ScanService {
+    FRIEND_GTEST(ScanService);
 public:
     ScanService();
-    ~ScanService();
+    virtual ~ScanService();
     /**
      * @Description  Initializing the Scan Service.
      *
      * @param scanSerivceCallbacks Callback function registered with the wifiManager[in].
      * @return success: true, failed: false
      */
-    bool InitScanService(const IScanSerivceCallbacks &scanSerivceCallbacks);
+    virtual bool InitScanService(const IScanSerivceCallbacks &scanSerivceCallbacks);
     /**
      * @Description Stopping the Scan Service.
      *
      */
-    void UnInitScanService();
+    virtual void UnInitScanService();
     /**
      * @Description Start a complete Wi-Fi scan.
      *
      * @param externFlag - Externally initiated scanning[in]
      * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
      */
-    ErrCode Scan(bool externFlag);
+    virtual ErrCode Scan(bool externFlag);
     /**
      * @Description Start Wi-Fi scanning based on specified parameters.
      *
      * @param params - Scan specified parameters[in]
      * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
      */
-    ErrCode ScanWithParam(const WifiScanParams &params);
+    virtual ErrCode ScanWithParam(const WifiScanParams &params);
     /**
      * @Description Starting a Single Scan.
      *
@@ -107,13 +106,13 @@ public:
      *
      * @param scanAtOnce - Whether to start scanning immediately[in]
      */
-    void SystemScanProcess(bool scanAtOnce);
+    virtual void SystemScanProcess(bool scanAtOnce);
     /**
      * @Description Status reported by the state machine.
      *
      * @param scanStatusReport - Structure of the reported status.[in]
      */
-    void HandleScanStatusReport(ScanStatusReport &scanStatusReport);
+    virtual void HandleScanStatusReport(ScanStatusReport &scanStatusReport);
     /**
      * @Description Internal event reporting and processing.
      *
@@ -125,38 +124,38 @@ public:
      *
      * @param screenOn - screen state[in]
      */
-    void HandleScreenStatusChanged(bool screenOn);
+    virtual void HandleScreenStatusChanged(bool screenOn);
     /**
      * @Description STA status change processing
      *
      * @param state - STA state[in]
      */
-    void HandleStaStatusChanged(int status);
+    virtual void HandleStaStatusChanged(int status);
     /**
      * @Description custom scene status change processing
      *
      * @param customScene custom scene[in]
      * @param customSceneStatus custom scene status[in]
      */
-    void HandleCustomStatusChanged(int customScene, int customSceneStatus);
+    virtual void HandleCustomStatusChanged(int customScene, int customSceneStatus);
 
     /**
      * @Description Sets the type of the app to be operated.
      *
      * @param appMode - Type of the app to be scanned.
      */
-    void SetOperateAppMode(int appMode);
+    virtual void SetOperateAppMode(int appMode);
     /**
      * @Description Query and save the scan control policy.
      *
      */
-    void GetScanControlInfo();
+    virtual void GetScanControlInfo();
     /**
      * @Description Obtain the scenario set by the customer through changeState.
      *
      * @param scene - Scenario value corresponding to the scenario
      */
-    void SetCustomScene(int scene, time_t currentTime);
+    virtual void SetCustomScene(int scene, time_t currentTime);
     /**
      * @Description When scanning control changes, the count data needs to be cleared.
      *
@@ -166,7 +165,7 @@ public:
      * @Description When scanning control changes, the count data needs to be cleared.
      *
      */
-    void SetStaCurrentTime();
+    virtual void SetStaCurrentTime();
 
 private:
     using ScanConfigMap = std::map<int, StoreScanConfig>;

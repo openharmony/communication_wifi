@@ -306,7 +306,6 @@ void InitReply(PDhcpServerContext ctx, PDhcpMsgInfo received, PDhcpMsgInfo reply
     reply->packet.htype = ETHERNET;
     reply->packet.hlen = OPT_MAC_ADDR_LENGTH;
     reply->packet.secs = 0;
-    reply->packet.secs = 0;
     reply->packet.ciaddr = 0;
     if (memset_s(reply->packet.sname, sizeof(reply->packet.sname), '\0', sizeof(reply->packet.sname)) != EOK) {
         LOGE("failed to reset message packet[sname]!");
@@ -721,8 +720,8 @@ static int FillReply(PDhcpServerContext ctx, PDhcpMsgInfo received, PDhcpMsgInfo
             LOGE("failed to reset message packet[chaddr]!");
             return RET_ERROR;
         }
-        if (memcpy_s(reply->packet.chaddr, received->packet.hlen,
-            received->packet.chaddr, received->packet.hlen) != EOK) {
+        if (memcpy_s(reply->packet.chaddr, sizeof(reply->packet.chaddr),
+            received->packet.chaddr, sizeof(received->packet.chaddr)) != EOK) {
             LOGE("failed to copy message packet[chaddr]!");
             return RET_ERROR;
         }
@@ -1456,14 +1455,13 @@ static int ParseMessageOptions(PDhcpMsgInfo msg)
         return RET_FAILED;
     }
     current = (DhcpOption *)(((uint8_t *)current) + MAGIC_COOKIE_LENGTH);
-    int pos = (int)(((uint8_t *)current) + MAGIC_COOKIE_LENGTH);
-
+    uint8_t *pos = (((uint8_t *)current) + MAGIC_COOKIE_LENGTH);
+    uint8_t *maxPos = (((uint8_t *)current) + (DHCP_OPTION_SIZE - MAGIC_COOKIE_LENGTH - OPT_HEADER_LENGTH -1));
     int optTotal = 0;
-    int optionLength = msg->length - DHCP_MSG_HEADER_SIZE;
     while (current < end && current->code != END_OPTION) {
-        pos += OPT_HEADER_LENGTH + current->length;
-        if (pos >= optionLength) {
-            LOGD("out of option max size.");
+        pos += (OPT_HEADER_LENGTH + current->length);
+        if (pos >= maxPos) {
+            LOGD("out of option max pos.");
             return RET_FAILED;
         }
         if (PushBackOption(&msg->options, current) != RET_SUCCESS) {
@@ -1472,7 +1470,6 @@ static int ParseMessageOptions(PDhcpMsgInfo msg)
         current = (DhcpOption *)(((uint8_t *)current) + OPT_HEADER_LENGTH + current->length);
         optTotal++;
     }
-
     if (current < end && current->code == END_OPTION) {
         LOGD("option list size:%zu xid:%u", msg->options.size, msg->packet.xid);
         return RET_SUCCESS;
@@ -1526,7 +1523,7 @@ static int ParseReplyOptions(PDhcpMsgInfo reply)
         return ret;
     }
     PDhcpOptionNode pNode = reply->options.first->next;
-    DhcpOption endOpt = {END_OPTION, 0};
+    DhcpOption endOpt = {END_OPTION, 0, {0}};
     PushBackOption(&reply->options, &endOpt);
     int replyOptsLength = 0;
     uint8_t *current = reply->packet.options, olen = MAGIC_COOKIE_LENGTH;

@@ -17,12 +17,13 @@
 #define OHOS_WIFI_SAVEDDEVICEAPPRAISAL_H
 
 #include "wifi_log.h"
-#include "wifi_settings.h"
 #include "sta_device_appraisal.h"
+#include "wifi_internal_msg.h"
 
 namespace OHOS {
 namespace Wifi {
 class StaSavedDeviceAppraisal : public StaDeviceAppraisal {
+    FRIEND_GTEST(StaSavedDeviceAppraisal);
 public:
     explicit StaSavedDeviceAppraisal(bool supportFmRoamingFlag);
     ~StaSavedDeviceAppraisal() override;

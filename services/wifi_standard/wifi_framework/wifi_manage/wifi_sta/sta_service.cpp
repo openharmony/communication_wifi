@@ -16,6 +16,9 @@
 #include "wifi_logger.h"
 #include "sta_define.h"
 #include "sta_service_callback.h"
+#include "wifi_sta_hal_interface.h"
+#include "wifi_supplicant_hal_interface.h"
+#include "wifi_settings.h"
 
 DEFINE_WIFILOG_LABEL("StaService");
 

@@ -23,6 +23,7 @@
 
 namespace OHOS {
 namespace Wifi {
+#define FRIEND_GTEST(test_typename) friend class test_typename##Test
 static const int MIN_SYSTEM_SCAN_INTERVAL = 20;
 static const int MAX_SYSTEM_SCAN_INTERVAL = 160;
 static const int MAX_SCAN_CONFIG_STORE_INDEX = 10000;

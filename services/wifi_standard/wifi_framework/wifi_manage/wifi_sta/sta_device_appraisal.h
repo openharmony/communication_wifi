@@ -20,6 +20,7 @@
 #include "wifi_msg.h"
 #include "log_helper.h"
 #include "sta_define.h"
+#include "wifi_internal_msg.h"
 
 namespace OHOS {
 namespace Wifi {

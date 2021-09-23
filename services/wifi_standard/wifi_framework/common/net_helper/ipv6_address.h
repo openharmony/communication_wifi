@@ -209,13 +209,6 @@ private:
      * @return string of EUI-64 address
      */
     static std::string MacToEui64addr(MacAddress &mac);
-    /**
-     * @Description  Calculate the prefix length of the mask.
-     *
-     * @param mask - in6_addr structure of the mask [input]
-     * @return int - prefix length
-     */
-    static int CalcPrefixLen(struct in6_addr &mask);
 };
 }  // namespace Wifi
 }  // namespace OHOS

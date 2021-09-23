@@ -21,7 +21,6 @@
 #include <unordered_map>
 #include <vector>
 #include "wifi_log.h"
-#include "wifi_settings.h"
 #include "wifi_errcode.h"
 #include "wifi_msg.h"
 #include "log_helper.h"
@@ -46,20 +45,21 @@ static const int MIN_RSSI_VALUE_5G = -80;
 static const int TIME_FROM_LAST_SELECTION = 60;
 static const int MIN_ROAM_RSSI_DIFF = 6;
 class StaAutoConnectService {
+    FRIEND_GTEST(StaAutoConnectService);
 public:
     explicit StaAutoConnectService(StaStateMachine *staStateMachine);
-    ~StaAutoConnectService();
+    virtual ~StaAutoConnectService();
     /**
      * @Description  Initialize StaAutoConnectService
      *
      */
-    ErrCode InitAutoConnectService();
+    virtual ErrCode InitAutoConnectService();
     /**
      * @Description  Processing scan results
      *
      * @param scanInfos - The list of scanning results(in)
      */
-    void OnScanInfosReadyHandler(const std::vector<InterScanInfo> &scanInfos);
+    virtual void OnScanInfosReadyHandler(const std::vector<InterScanInfo> &scanInfos);
     /**
      * @Description  Whether tracking should enable or disable scanned BSSIDs
      *
@@ -68,7 +68,7 @@ public:
      * @param reason - Enable/Disable reason code.(in)
      * @Return success: true. failed： false.
      */
-    bool EnableOrDisableBssid(std::string bssid, bool enable, int reason);
+    virtual bool EnableOrDisableBssid(std::string bssid, bool enable, int reason);
     /**
      * @Description  Select the best device from the range.
      *
@@ -78,7 +78,7 @@ public:
      * @param electedDevice - Elected Device(out)
      * @Return success : WIFI_OPT_SUCCESS  failed : WIFI_OPT_FAILED
      */
-    ErrCode AutoSelectDevice(WifiDeviceConfig &electedDevice, const std::vector<InterScanInfo> &scanInfos,
+    virtual ErrCode AutoSelectDevice(WifiDeviceConfig &electedDevice, const std::vector<InterScanInfo> &scanInfos,
         std::vector<std::string> &blockedBssids, WifiLinkedInfo &info);
     /**
      * @Description  Registering the Device Appraisal
@@ -87,7 +87,7 @@ public:
      * @param priority - Value between 0 and (SCORER_MIN_PRIORITY – 1)(in)
      * @Return success : true  failed : false
      */
-    bool RegisterDeviceAppraisal(StaDeviceAppraisal *appraisal, int priority);
+    virtual bool RegisterDeviceAppraisal(StaDeviceAppraisal *appraisal, int priority);
 
 private:
     StaStateMachine *pStaStateMachine;

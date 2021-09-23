@@ -74,7 +74,7 @@ bool ApStationsManager::EnableAllBlockList() const
     bool ret = true;
     for (std::vector<StationInfo>::iterator iter = results.begin(); iter != results.end(); iter++) {
         if (WifiApHalInterface::GetInstance().AddBlockByMac(iter->bssid) != WifiErrorNo::WIFI_IDL_OPT_OK) {
-            WIFI_LOGE("error:Failed to add block mac:%s.", iter->bssid.c_str());
+            WIFI_LOGE("error:Failed to add block bssid is:%{private}s.", iter->bssid.c_str());
             ret = false;
         }
     }
@@ -83,7 +83,6 @@ bool ApStationsManager::EnableAllBlockList() const
 
 void ApStationsManager::StationLeave(const std::string &mac) const
 {
-    WIFI_LOGD("StationLeave mac:%s.", mac.c_str());
     StationInfo staInfo;
     std::vector<StationInfo> results;
     if (WifiSettings::GetInstance().GetStationList(results)) {
@@ -110,10 +109,6 @@ void ApStationsManager::StationLeave(const std::string &mac) const
 void ApStationsManager::StationJoin(const StationInfo &staInfo) const
 {
     StationInfo staInfoTemp = staInfo;
-    WIFI_LOGD("enter ApStationManager::StationJoin Name:%s mac:%s ip:%s.",
-        staInfo.deviceName.c_str(),
-        staInfo.bssid.c_str(),
-        staInfo.ipAddr.c_str());
     std::vector<StationInfo> results;
     if (WifiSettings::GetInstance().GetStationList(results)) {
         WIFI_LOGE("failed to GetStationList.");
@@ -147,16 +142,12 @@ bool ApStationsManager::DisConnectStation(const StationInfo &staInfo) const
     std::string mac = staInfo.bssid;
     int ret = static_cast<int>(WifiApHalInterface::GetInstance().DisconnectStaByMac(mac));
     if (ret != WifiErrorNo::WIFI_IDL_OPT_OK) {
-        WIFI_LOGE("failed to DisConnectStation staInfo bssid:%s, address:%s, name:%s.",
+        WIFI_LOGE("failed to DisConnectStation staInfo bssid:%{private}s, address:%{private}s, name:%{private}s.",
             staInfo.bssid.c_str(),
             staInfo.ipAddr.c_str(),
             staInfo.deviceName.c_str());
         return false;
     }
-    WIFI_LOGD("DisConnectStation staInfo bssid:%s, address:%s, name:%s ok.",
-        staInfo.bssid.c_str(),
-        staInfo.ipAddr.c_str(),
-        staInfo.deviceName.c_str());
     return true;
 }
 

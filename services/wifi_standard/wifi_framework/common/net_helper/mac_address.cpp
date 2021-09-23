@@ -29,7 +29,7 @@ constexpr int HEX_BASE = 16;
 
 namespace OHOS {
 namespace Wifi {
-const MacAddress MacAddress::INVALID_MAC_ADDRESS = MacAddress::Create(INVALID_MAC);
+const MacAddress MacAddress::INVALID_MAC_ADDRESS = MacAddress(INVALID_MAC);
 
 bool MacAddress::IsValidMac(const std::string &mac)
 {

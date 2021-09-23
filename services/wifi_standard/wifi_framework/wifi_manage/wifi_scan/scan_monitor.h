@@ -25,6 +25,7 @@
 namespace OHOS {
 namespace Wifi {
 class ScanMonitor {
+    FRIEND_GTEST(ScanMonitor);
 public:
     ScanMonitor();
     ~ScanMonitor();

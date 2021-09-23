@@ -15,13 +15,12 @@
 #ifndef OHOS_STA_MONITOR_H
 #define OHOS_STA_MONITOR_H
 
-#include "wifi_supplicant_hal_interface.h"
-#include "wifi_sta_hal_interface.h"
 #include "sta_state_machine.h"
 
 namespace OHOS {
 namespace Wifi {
 class StaMonitor {
+    FRIEND_GTEST(StaMonitor);
 public:
     /**
      * @Description : Construct a new Sta Monitor object.
@@ -33,7 +32,7 @@ public:
      * @Description Destroy the Sta Monitor object.
      *
      */
-    ~StaMonitor();
+    virtual ~StaMonitor();
 
     /**
      * @Description : Initialize the sta monitor.

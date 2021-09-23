@@ -24,15 +24,16 @@
 namespace OHOS {
 namespace Wifi {
 class StaService {
+    FRIEND_GTEST(StaService);
 public:
     StaService();
-    ~StaService();
+    virtual ~StaService();
     /**
      * @Description  Initialize StaService module.
      *
      * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
      */
-    ErrCode InitStaService(const StaServiceCallback &callbacks);
+    virtual ErrCode InitStaService(const StaServiceCallback &callbacks);
     /**
      * @Description  Enable wifi
      *
@@ -41,7 +42,7 @@ public:
                result immediately.
      * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
      */
-    ErrCode EnableWifi() const;
+    virtual ErrCode EnableWifi() const;
     /**
      * @Description  Disable wifi
      *
@@ -50,7 +51,7 @@ public:
                 result immediately.
      * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
      */
-    ErrCode DisableWifi() const;
+    virtual ErrCode DisableWifi() const;
     /**
      * @Description  Connect to a new network
      *
@@ -60,7 +61,7 @@ public:
                 result immediately.
      * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
      */
-    ErrCode ConnectToDevice(const WifiDeviceConfig &config) const;
+    virtual ErrCode ConnectToDevice(const WifiDeviceConfig &config) const;
     /**
      * @Description  Connecting to a specified network.
      *
@@ -70,7 +71,7 @@ public:
                 result immediately.
      * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
      */
-    ErrCode ConnectToNetwork(int networkId) const;
+    virtual ErrCode ConnectToNetwork(int networkId) const;
     /**
      * @Description  Disconnect to the network
      *
@@ -79,13 +80,13 @@ public:
                 result immediately.
      * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
      */
-    ErrCode Disconnect() const;
+    virtual ErrCode Disconnect() const;
     /**
      * @Description  ReAssociate network
      *
      * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
      */
-    ErrCode ReAssociate() const;
+    virtual ErrCode ReAssociate() const;
 
     /**
      * @Description  Update a network to config
@@ -93,27 +94,27 @@ public:
      * @param config -The Network info(in)
      * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
      */
-    int AddDeviceConfig(const WifiDeviceConfig &config) const;
+    virtual int AddDeviceConfig(const WifiDeviceConfig &config) const;
     /**
      * @Description Update a network to config.
      *
      * @param config -The Network info(in)
      * @Return success: networkId  fail: -1
      */
-    int UpdateDeviceConfig(const WifiDeviceConfig &config) const;
+    virtual int UpdateDeviceConfig(const WifiDeviceConfig &config) const;
     /**
      * @Description  Remove network config.
      *
      * @param networkId -The NetworkId is going to be removed.(in)
      * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
      */
-    ErrCode RemoveDevice(int networkId) const;
+    virtual ErrCode RemoveDevice(int networkId) const;
     /**
      * @Description  Remove all network configs.
      *
      * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
      */
-    ErrCode RemoveAllDevice() const;
+    virtual ErrCode RemoveAllDevice() const;
     /**
      * @Description  Enable WI-FI device Configuration.
      *
@@ -121,14 +122,14 @@ public:
      * @param networkId - if set true, disable other device config (in)
      * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
      */
-    ErrCode EnableDeviceConfig(int networkId, bool attemptEnable) const;
+    virtual ErrCode EnableDeviceConfig(int networkId, bool attemptEnable) const;
     /**
      * @Description Disable WI-FI device Configuration.
      *
      * @param networkId - device Configuration's network id
      * @return ErrCode - success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
      */
-    ErrCode DisableDeviceConfig(int networkId) const;
+    virtual ErrCode DisableDeviceConfig(int networkId) const;
     /**
      * @Description  Start WPS Connection
      *
@@ -137,7 +138,7 @@ public:
                 result immediately.
      * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
      */
-    ErrCode StartWps(const WpsConfig &config) const;
+    virtual ErrCode StartWps(const WpsConfig &config) const;
     /**
      * @Description  Close WPS Connection
      *
@@ -146,13 +147,13 @@ public:
                 result immediately.
      * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
      */
-    ErrCode CancelWps() const;
+    virtual ErrCode CancelWps() const;
     /**
      * @Description  Set country code
      *
      * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
      */
-    ErrCode SetCountryCode(const std::string &countryCode) const;
+    virtual ErrCode SetCountryCode(const std::string &countryCode) const;
     /**
      * @Description  ConnectivityManager process scan results.
      *
@@ -161,13 +162,13 @@ public:
                 result immediately.
      * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
      */
-    ErrCode AutoConnectService(const std::vector<InterScanInfo> &scanInfos);
+    virtual ErrCode AutoConnectService(const std::vector<InterScanInfo> &scanInfos);
     /**
      * @Description Register sta callback function
      *
      * @param callbacks - Callback function pointer storage structure
      */
-    void RegisterStaServiceCallback(const StaServiceCallback &callbacks) const;
+    virtual void RegisterStaServiceCallback(const StaServiceCallback &callbacks) const;
 
 
 private:

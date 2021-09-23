@@ -192,6 +192,10 @@ static void DealServiceDiscRespEvent(char *buf)
                 free(info.tlvs);
                 return;
             }
+            if (info.tlvs != NULL) {
+                free(info.tlvs);
+                info.tlvs = NULL;
+            }
             info.tlvs = (char *)calloc(len, sizeof(char));
             if (info.tlvs == NULL || strncpy_s(info.tlvs, len, token, len - 1) != EOK) {
                 free(info.tlvs);
@@ -438,6 +442,10 @@ static void DealP2pServDiscReqEvent(char *buf)
             if (len == 0) {
                 free(info.tlvs);
                 return;
+            }
+            if (info.tlvs != NULL) {
+                free(info.tlvs);
+                info.tlvs = NULL;
             }
             info.tlvs = (char *)calloc(len, sizeof(char));
             if (info.tlvs == NULL || strncpy_s(info.tlvs, len, token, len - 1) != EOK) {

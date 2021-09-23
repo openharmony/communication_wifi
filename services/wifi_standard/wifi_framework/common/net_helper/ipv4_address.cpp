@@ -24,7 +24,7 @@ namespace OHOS {
 namespace Wifi {
 const int MAX_IPV4_PREFIX_LENGTH = 32;
 const int MAX_IPV4_STRING_LENGTH = 64;
-const Ipv4Address Ipv4Address::INVALID_INET_ADDRESS = Ipv4Address::Create("255.255.255.255", MAX_IPV4_PREFIX_LENGTH);
+const Ipv4Address Ipv4Address::INVALID_INET_ADDRESS("255.255.255.255", MAX_IPV4_PREFIX_LENGTH);
 bool Ipv4Address::IsValidIPv4(const std::string &ipv4)
 {
     struct in_addr ipv4Addr = {INADDR_ANY};

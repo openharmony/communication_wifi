@@ -19,6 +19,7 @@ ohos_executable("dhcp_server") {
     "src/address_utils.c",
     "src/common_util.c",
     "src/dhcp_address_pool.c",
+    "src/dhcp_argument.c",
     "src/dhcp_binding.c",
     "src/dhcp_config.c",
     "src/dhcp_dhcpd.c",

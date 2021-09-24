@@ -41,6 +41,10 @@
 #include "station_info.h"
 #include "wifi_error_code.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @brief Indicates that the Wi-Fi station mode is enabled.
  *
@@ -104,6 +108,10 @@ typedef enum {
     /** Available state */
     WIFI_STATE_AVALIABLE
 } WifiEventState;
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // WIFI_EVENT_C_H
 /** @} */

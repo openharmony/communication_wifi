@@ -790,7 +790,7 @@ static int Repending(DhcpAddressPool *pool, AddressBinding *binding)
     binding->bindingStatus = BIND_PENDING;
     uint32_t srcIp = SourceIpAddress();
     if (srcIp && srcIp != INADDR_BROADCAST && bindingIp != INADDR_BROADCAST && srcIp != bindingIp) {
-        LOGW("source(0x%x) ip address and bound(0x%x) ip address inconsistency.", srcIp, bindingIp);
+        LOGW("source ip address and bound ip address inconsistency.");
         return REPLY_NAK;
     }
     if (srcIp && srcIp == bindingIp) {
@@ -891,9 +891,9 @@ static AddressBinding *GetBinding(DhcpAddressPool *pool, PDhcpMsgInfo received)
             binding->leaseTime = pool->leaseTime;
         }
         binding->ipAddress = pool->distribue(pool, received->packet.chaddr);
-        LOGD("new binding ip:%s", ParseStrIp(binding->ipAddress));
+        LOGD("new binding ip");
     } else {
-        LOGD("rebinding ip:%s", ParseStrIp(binding->ipAddress));
+        LOGD("rebinding ip");
     }
     return binding;
 }
@@ -919,9 +919,7 @@ static int OnReceivedDiscover(PDhcpServerContext ctx, PDhcpMsgInfo received, PDh
     }
     uint32_t srcIp = SourceIpAddress();
     if (!srvIns->broadCastFlagEnable) {
-        if (srcIp) {
-            LOGD(" client repending:%s", ParseStrIp(srcIp));
-        } else {
+        if (!srcIp) {
             srcIp = INADDR_BROADCAST;
         }
         DestinationAddr(srcIp);
@@ -1224,7 +1222,6 @@ static int OnReceivedRelease(PDhcpServerContext ctx, PDhcpMsgInfo received, PDhc
         reqIp = ParseIp(optReqIp->data);
     }
     uint32_t srcIp = SourceIpAddress();
-    LOGD("request ip: %s", ParseStrIp(reqIp));
     if (reqIp && reqIp != srcIp) {
         LOGE("error release message, invalid request ip address.");
         return REPLY_NONE;

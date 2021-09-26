@@ -160,7 +160,7 @@ int CheckRangeAvailability(
         return RET_SUCCESS;
     }
     if (*outOfRange) {
-        LOGD("out of address range, ip: %s", ParseStrIp(distIp));
+        LOGD("address is out of range");
         return RET_FAILED;
     } else {
         distIp = beginIp;

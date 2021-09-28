@@ -41,6 +41,10 @@
 #include "wifi_hotspot_config.h"
 #include "wifi_event.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @brief Defines the default channel of the hotspot mode.
  */
@@ -139,6 +143,10 @@ WifiErrorCode DisassociateSta(unsigned char *mac, int macLen);
  * @since 7
  */
 WifiErrorCode AddTxPowerInfo(int power);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // HARMONY_OS_LITE_WIFI_HOTSPOT_H_
 /** @} */

@@ -43,6 +43,10 @@
 #include "wifi_linked_info.h"
 #include "wifi_device_config.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @brief Enables the station mode.
  *
@@ -260,6 +264,10 @@ WifiErrorCode RegisterWifiEvent(WifiEvent *event);
  * @since 7
  */
 WifiErrorCode UnRegisterWifiEvent(const WifiEvent *event);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // WIFI_DEVICE_C_H
 /** @} */

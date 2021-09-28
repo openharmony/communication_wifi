@@ -18,7 +18,6 @@
 
 namespace OHOS {
 namespace Wifi {
-    // DEFINE_WIFILOG_LABEL("WifiNAPIP2P");
 
 }  // namespace Wifi
 }  // namespace OHOS

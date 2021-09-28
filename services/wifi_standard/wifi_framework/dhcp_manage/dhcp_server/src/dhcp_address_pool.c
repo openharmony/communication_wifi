@@ -141,7 +141,7 @@ int CheckRangeAvailability(
     uint32_t beginIp = pool->addressRange.beginAddress;
     uint32_t endIp = pool->addressRange.endAddress;
     if (IpInRange(distIp, beginIp, endIp, pool->netmask)) {
-        LOGD("distribution IP address is: %s", ParseStrIp(distIp));
+        LOGD("distribution IP address");
         AddressBinding lease = {0};
         lease.pendingTime = Tmspsec();
         lease.leaseTime = pool->leaseTime;

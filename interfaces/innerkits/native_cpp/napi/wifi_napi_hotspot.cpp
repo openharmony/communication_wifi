@@ -18,7 +18,6 @@
 
 namespace OHOS {
 namespace Wifi {
-    // DEFINE_WIFILOG_LABEL("WifiNAPIHotspot");
 
 }  // namespace Wifi
 }  // namespace OHOS

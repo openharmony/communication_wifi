@@ -43,6 +43,7 @@ PDhcpOptionNode CreateOptionNode(PDhcpOption opt)
     pNode->option.length = opt->length;
     if (memcpy_s(pNode->option.data, sizeof(pNode->option.data), opt->data, opt->length) != EOK) {
         LOGE("create option node failed when memcpy opt data!");
+        free(pNode);
         return NULL;
     }
     pNode->previous = pNode->next = 0;

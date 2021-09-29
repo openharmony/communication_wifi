@@ -657,40 +657,10 @@ bool DhcpFunc::SubscribeDhcpCommonEvent(
     return OHOS::EventFwk::CommonEventManager::SubscribeCommonEvent(subscriber);
 }
 
-int DhcpFunc::SubscribeDhcpEvent(const std::string action, int timeouts)
-{
-    EventFwk::MatchingSkills matchingSkills;
-    matchingSkills.AddEvent(action);
-    EventFwk::CommonEventSubscribeInfo subInfo(matchingSkills);
-    std::shared_ptr<OHOS::Wifi::DhcpEventSubscriber> dhcpSubscriber =
-        std::make_shared<OHOS::Wifi::DhcpEventSubscriber>(subInfo);
-    if (!DhcpFunc::SubscribeDhcpCommonEvent(dhcpSubscriber)) {
-        WIFI_LOGE("SubscribeDhcpEvent() SubscribeDhcpCommonEvent %{public}s failed!", action.c_str());
-        return DHCP_OPT_FAILED;
-    }
-    WIFI_LOGI("SubscribeDhcpEvent() SubscribeDhcpCommonEvent %{public}s success.", action.c_str());
-    return DHCP_OPT_SUCCESS;
-}
-
 bool DhcpFunc::UnsubscribeDhcpCommonEvent(
     const std::shared_ptr<OHOS::EventFwk::CommonEventSubscriber> &subscriber)
 {
     return OHOS::EventFwk::CommonEventManager::UnSubscribeCommonEvent(subscriber);
-}
-
-int DhcpFunc::UnsubscribeDhcpEvent(const std::string action, int timeouts)
-{
-    EventFwk::MatchingSkills matchingSkills;
-    matchingSkills.AddEvent(action);
-    EventFwk::CommonEventSubscribeInfo subInfo(matchingSkills);
-    std::shared_ptr<OHOS::Wifi::DhcpEventSubscriber> dhcpSubscriber =
-        std::make_shared<OHOS::Wifi::DhcpEventSubscriber>(subInfo);
-    if (!DhcpFunc::UnsubscribeDhcpCommonEvent(dhcpSubscriber)) {
-        WIFI_LOGE("UnsubscribeDhcpEvent() UnsubscribeDhcpCommonEvent %{public}s failed!", action.c_str());
-        return DHCP_OPT_FAILED;
-    }
-    WIFI_LOGI("UnsubscribeDhcpEvent() UnsubscribeDhcpCommonEvent %{public}s success.", action.c_str());
-    return DHCP_OPT_SUCCESS;
 }
 
 bool DhcpFunc::PublishDhcpEvent(const std::string action, const int code, const std::string data)

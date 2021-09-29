@@ -65,10 +65,8 @@ public:
 
     static bool SubscribeDhcpCommonEvent(
         const std::shared_ptr<OHOS::EventFwk::CommonEventSubscriber> &subscriber);
-    static int SubscribeDhcpEvent(const std::string action, int timeouts = RECEIVER_TIMEOUT);
     static bool UnsubscribeDhcpCommonEvent(
         const std::shared_ptr<OHOS::EventFwk::CommonEventSubscriber> &subscriber);
-    static int UnsubscribeDhcpEvent(const std::string action, int timeouts = RECEIVER_TIMEOUT);
 
     static bool PublishDhcpEvent(const std::string action, const int code, const std::string data);
 };

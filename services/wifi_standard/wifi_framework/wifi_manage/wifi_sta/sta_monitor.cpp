@@ -16,6 +16,7 @@
 #include "wifi_idl_define.h"
 #include "sta_define.h"
 #include "wifi_logger.h"
+#include "wifi_supplicant_hal_interface.h"
 #include "wifi_sta_hal_interface.h"
 
 DEFINE_WIFILOG_LABEL("StaMonitor");

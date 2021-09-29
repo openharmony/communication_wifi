@@ -14,6 +14,8 @@
  */
 #include "sta_auto_connect_service.h"
 #include "wifi_logger.h"
+#include "wifi_sta_hal_interface.h"
+#include "wifi_settings.h"
 
 DEFINE_WIFILOG_LABEL("StaAutoConnectService");
 
@@ -52,7 +54,7 @@ ErrCode StaAutoConnectService::InitAutoConnectService()
         return WIFI_OPT_FAILED;
     }
 
-    int savedPriority = WifiSettings::GetInstance().GetsavedDeviceAppraisalPriority();
+    int savedPriority = WifiSettings::GetInstance().GetSavedDeviceAppraisalPriority();
     if (RegisterDeviceAppraisal(pSavedDeviceAppraisal, savedPriority)) {
         WIFI_LOGI("RegisterSavedDeviceAppraisal succeeded.\n");
     }

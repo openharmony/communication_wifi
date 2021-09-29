@@ -134,6 +134,7 @@ void Handler::MessageExecutedLater(InternalMessage *msg, int64_t delayTimeMs)
     struct timeval curTime = {0, 0};
     if (gettimeofday(&curTime, nullptr) != 0) {
         LOGE("gettimeofday failed.\n");
+        MessageManage::GetInstance().ReclaimMsg(msg);
         return;
     }
     int64_t nowTime = static_cast<int64_t>(curTime.tv_sec) * USEC_1000 + curTime.tv_usec / USEC_1000;
@@ -152,6 +153,7 @@ void Handler::MessageExecutedAtTime(InternalMessage *msg, int64_t execTime)
     LOGD("Handler::MessageExecutedAtTime msg: %{public}d", msg->GetMessageName());
     if (pMyQueue == nullptr) {
         LOGE("pMyQueue is null.\n");
+        MessageManage::GetInstance().ReclaimMsg(msg);
         return;
     }
 
@@ -173,6 +175,7 @@ void Handler::PlaceMessageTopOfQueue(InternalMessage *msg)
     LOGD("Handler::PlaceMessageTopOfQueue msg: %{public}d", msg->GetMessageName());
     if (pMyQueue == nullptr) {
         LOGE("pMyQueue is null.\n");
+        MessageManage::GetInstance().ReclaimMsg(msg);
         return;
     }
 

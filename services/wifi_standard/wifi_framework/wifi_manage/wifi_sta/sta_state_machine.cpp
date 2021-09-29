@@ -14,13 +14,19 @@
  */
 #include "sta_state_machine.h"
 #include <cstdio>
-#include <random>
-#include "http_request.h"
 #include "log_helper.h"
-#include "if_config.h"
 #include "sta_monitor.h"
 #include "wifi_logger.h"
 #include "wifi_sta_hal_interface.h"
+#include "wifi_settings.h"
+#include "if_config.h"
+#include "wifi_supplicant_hal_interface.h"
+
+#ifndef OHOS_WIFI_STA_TEST
+#include "dhcp_service.h"
+#else
+#include "mock_dhcp_service.h"
+#endif
 
 DEFINE_WIFILOG_LABEL("StaStateMachine");
 #define PBC_ANY_BSSID "any"

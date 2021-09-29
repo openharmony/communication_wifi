@@ -73,14 +73,14 @@ public:
      * @param timerName - Timer Name.[in]
      * @param interval - Timer duration, in milliseconds.[in]
      */
-    void StartTimer(int timerName, int64_t interval);
+    virtual void StartTimer(int timerName, int64_t interval);
 
     /**
      * @Description : Stop the timer.
      *
      * @param timerName - Timer Name.[in]
      */
-    void StopTimer(int timerName);
+    virtual void StopTimer(int timerName);
 
     /**
      * @Description : Construct internal messages.
@@ -151,7 +151,7 @@ public:
      *
      * @param msgName - Message name.[in]
      */
-    void SendMessage(int msgName);
+    virtual void SendMessage(int msgName);
 
     /**
      * @Description : Constructs internal messages and places the messages
@@ -160,7 +160,7 @@ public:
      * @param msgName - Message name.[in]
      * @param param1 - Message parameter.[in]
      */
-    void SendMessage(int msgName, int param1);
+    virtual void SendMessage(int msgName, int param1);
 
     /**
      * @Description : Constructs internal messages and places the messages
@@ -170,21 +170,22 @@ public:
      * @param param1 - Message parameter.[in]
      * @param param2 - Message parameter.[in]
      */
-    void SendMessage(int msgName, int param1, int param2);
+    virtual void SendMessage(int msgName, int param1, int param2);
 
     /**
      * @Description : Puts messages into the message queue of the state machine.
      *
      * @param msg - Message to be sent.[in]
      */
-    void SendMessage(InternalMessage *msg);
+    virtual void SendMessage(InternalMessage *msg);
+
     /**
      * @Description : Puts messages into the message queue of the state machine.
      *
      * @param msgName - Message Name.[in]
      * @param messageObj -  User-defined data
      */
-    void SendMessage(int msgName, const std::any &messageObj);
+    virtual void SendMessage(int msgName, const std::any &messageObj);
 
     /**
      * @Description : Puts messages into the message queue of the state machine.
@@ -194,7 +195,7 @@ public:
      * @param param2 - Message parameters.[in]
      * @param messageObj - User-defined data
      */
-    void SendMessage(int msgName, int param1, int param2, const std::any &messageObj);
+    virtual void SendMessage(int msgName, int param1, int param2, const std::any &messageObj);
 
     /**
      * @Description  Constructs internal messages and places them in the

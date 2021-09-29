@@ -21,16 +21,14 @@
 #include <vector>
 #include "wifi_internal_msg.h"
 #include "wifi_log.h"
-#include "wifi_settings.h"
 #include "wifi_errcode.h"
 #include "wifi_msg.h"
 #include "state_machine.h"
-#include "wifi_sta_hal_interface.h"
 #include "sta_network_speed.h"
 #include "sta_network_check.h"
-#include "dhcp_service.h"
 #include "i_dhcp_result_notify.h"
 #include "sta_service_callback.h"
+#include "i_dhcp_service.h"
 #include "sta_define.h"
 
 namespace OHOS {
@@ -64,6 +62,7 @@ static const int MAX_LEVEL = 4;
 const std::string WPA_BSSID_ANY = "any";
 
 class StaStateMachine : public StateMachine {
+    FRIEND_GTEST(StaStateMachine);
 public:
     StaStateMachine();
     ~StaStateMachine();

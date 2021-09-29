@@ -306,7 +306,6 @@ void InitReply(PDhcpServerContext ctx, PDhcpMsgInfo received, PDhcpMsgInfo reply
     reply->packet.htype = ETHERNET;
     reply->packet.hlen = OPT_MAC_ADDR_LENGTH;
     reply->packet.secs = 0;
-    reply->packet.secs = 0;
     reply->packet.ciaddr = 0;
     if (memset_s(reply->packet.sname, sizeof(reply->packet.sname), '\0', sizeof(reply->packet.sname)) != EOK) {
         LOGE("failed to reset message packet[sname]!");
@@ -721,8 +720,8 @@ static int FillReply(PDhcpServerContext ctx, PDhcpMsgInfo received, PDhcpMsgInfo
             LOGE("failed to reset message packet[chaddr]!");
             return RET_ERROR;
         }
-        if (memcpy_s(reply->packet.chaddr, received->packet.hlen,
-            received->packet.chaddr, received->packet.hlen) != EOK) {
+        if (memcpy_s(reply->packet.chaddr, sizeof(reply->packet.chaddr),
+            received->packet.chaddr, sizeof(received->packet.chaddr)) != EOK) {
             LOGE("failed to copy message packet[chaddr]!");
             return RET_ERROR;
         }
@@ -791,7 +790,7 @@ static int Repending(DhcpAddressPool *pool, AddressBinding *binding)
     binding->bindingStatus = BIND_PENDING;
     uint32_t srcIp = SourceIpAddress();
     if (srcIp && srcIp != INADDR_BROADCAST && bindingIp != INADDR_BROADCAST && srcIp != bindingIp) {
-        LOGW("source(0x%x) ip address and bound(0x%x) ip address inconsistency.", srcIp, bindingIp);
+        LOGW("source ip address and bound ip address inconsistency.");
         return REPLY_NAK;
     }
     if (srcIp && srcIp == bindingIp) {
@@ -892,9 +891,9 @@ static AddressBinding *GetBinding(DhcpAddressPool *pool, PDhcpMsgInfo received)
             binding->leaseTime = pool->leaseTime;
         }
         binding->ipAddress = pool->distribue(pool, received->packet.chaddr);
-        LOGD("new binding ip:%s", ParseStrIp(binding->ipAddress));
+        LOGD("new binding ip");
     } else {
-        LOGD("rebinding ip:%s", ParseStrIp(binding->ipAddress));
+        LOGD("rebinding ip");
     }
     return binding;
 }
@@ -920,9 +919,7 @@ static int OnReceivedDiscover(PDhcpServerContext ctx, PDhcpMsgInfo received, PDh
     }
     uint32_t srcIp = SourceIpAddress();
     if (!srvIns->broadCastFlagEnable) {
-        if (srcIp) {
-            LOGD(" client repending:%s", ParseStrIp(srcIp));
-        } else {
+        if (!srcIp) {
             srcIp = INADDR_BROADCAST;
         }
         DestinationAddr(srcIp);
@@ -1225,7 +1222,6 @@ static int OnReceivedRelease(PDhcpServerContext ctx, PDhcpMsgInfo received, PDhc
         reqIp = ParseIp(optReqIp->data);
     }
     uint32_t srcIp = SourceIpAddress();
-    LOGD("request ip: %s", ParseStrIp(reqIp));
     if (reqIp && reqIp != srcIp) {
         LOGE("error release message, invalid request ip address.");
         return REPLY_NONE;
@@ -1456,14 +1452,13 @@ static int ParseMessageOptions(PDhcpMsgInfo msg)
         return RET_FAILED;
     }
     current = (DhcpOption *)(((uint8_t *)current) + MAGIC_COOKIE_LENGTH);
-    int pos = (int)(((uint8_t *)current) + MAGIC_COOKIE_LENGTH);
-
+    uint8_t *pos = (((uint8_t *)current) + MAGIC_COOKIE_LENGTH);
+    uint8_t *maxPos = (((uint8_t *)current) + (DHCP_OPTION_SIZE - MAGIC_COOKIE_LENGTH - OPT_HEADER_LENGTH -1));
     int optTotal = 0;
-    int optionLength = msg->length - DHCP_MSG_HEADER_SIZE;
     while (current < end && current->code != END_OPTION) {
-        pos += OPT_HEADER_LENGTH + current->length;
-        if (pos >= optionLength) {
-            LOGD("out of option max size.");
+        pos += (OPT_HEADER_LENGTH + current->length);
+        if (pos >= maxPos) {
+            LOGD("out of option max pos.");
             return RET_FAILED;
         }
         if (PushBackOption(&msg->options, current) != RET_SUCCESS) {
@@ -1472,7 +1467,6 @@ static int ParseMessageOptions(PDhcpMsgInfo msg)
         current = (DhcpOption *)(((uint8_t *)current) + OPT_HEADER_LENGTH + current->length);
         optTotal++;
     }
-
     if (current < end && current->code == END_OPTION) {
         LOGD("option list size:%zu xid:%u", msg->options.size, msg->packet.xid);
         return RET_SUCCESS;
@@ -1526,7 +1520,7 @@ static int ParseReplyOptions(PDhcpMsgInfo reply)
         return ret;
     }
     PDhcpOptionNode pNode = reply->options.first->next;
-    DhcpOption endOpt = {END_OPTION, 0};
+    DhcpOption endOpt = {END_OPTION, 0, {0}};
     PushBackOption(&reply->options, &endOpt);
     int replyOptsLength = 0;
     uint8_t *current = reply->packet.options, olen = MAGIC_COOKIE_LENGTH;

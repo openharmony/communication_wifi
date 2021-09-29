@@ -36,31 +36,6 @@ namespace NetworkInterface {
 bool IsValidInterfaceName(const std::string &interfaceName);
 
 /**
- * @Description  Check whether the interface is UP.
- *
- * @param interfaceName - Network Interface Name
- * @return true - yes  false - no
- */
-bool IsInterfaceUp(const std::string &interfaceName);
-
-/**
- * @Description  Set the interface UP.
- *
- * @param interfaceName - Network Interface Name
- * @param state - 1 up / 0 down.
- * @return true - yes  false - no
- */
-bool SetInterfaceState(const std::string &interfaceName, int state);
-
-/**
- * @Description  Enable ipv6.
- *
- * @param interfaceName - Network Interface Name[in]
- * @return true - yes  false - no
- */
-bool EnableIpv6(const std::string& interfaceName);
-
-/**
  * @Description  Print all members in an object
  *
  * @param interfaceName - Network Interface Name

@@ -422,7 +422,7 @@ static void Reboot(time_t timestamp)
     }
 
     if (leaseTime != ~0U && stat(g_cltCnf->leaseFile, &st) == 0) {
-        if (timestamp == (time_t)-1 || (time_t)leaseTime < timestamp - st.st_mtime) {
+        if (timestamp == (time_t)-1 || timestamp < st.st_mtime || (time_t)leaseTime < timestamp - st.st_mtime) {
             LOGI("Reboot read lease file leaseTime expire");
             free(pkt);
             return;
@@ -548,6 +548,9 @@ static void DhcpRequestHandle(time_t timestamp)
             break;
         case DHCP_STATE_REBINDING:
             Rebinding(timestamp);
+            break;
+        case DHCP_STATE_INITREBOOT:
+            g_dhcp4State = DHCP_STATE_INIT;
             break;
         case DHCP_STATE_RELEASED:
             /* Ensure that the function select() is always blocked and don't need to receive ip from dhcp server. */
@@ -900,6 +903,10 @@ static void DhcpAckOrNakPacketHandle(uint8_t type, struct DhcpPacket *packet, ti
 {
     if ((type != DHCP_ACK) && (type != DHCP_NAK)) {
         LOGE("DhcpAckOrNakPacketHandle() type:%{public}d error!", type);
+        if (g_dhcp4State == DHCP_STATE_INITREBOOT) {
+            g_dhcp4State = DHCP_STATE_INIT;
+            g_timeoutTimestamp = timestamp;
+        }
         return;
     }
 
@@ -953,6 +960,10 @@ static void DhcpResponseHandle(time_t timestamp)
             SetSocketMode(g_socketMode);
         }
         LOGE("DhcpResponseHandle() get packet failed, error:%{public}d!", errno);
+        if (g_dhcp4State == DHCP_STATE_INITREBOOT) {
+            g_dhcp4State = DHCP_STATE_INIT;
+            g_timeoutTimestamp = timestamp;
+        }
         return;
     }
     LOGI("DhcpResponseHandle() get packet success, getLen:%{public}d.", getLen);

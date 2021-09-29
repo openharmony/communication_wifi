@@ -30,10 +30,6 @@ PDhcpOptionNode CreateOptionNode(PDhcpOption opt)
         LOGE("input parameter is null.");
         return NULL;
     }
-    if ((int)opt->length > DHCP_OPTION_SIZE) {
-        LOGE("input parameter length error. length:%hhu", opt->length);
-        return NULL;
-    }
     DhcpOptionNode *pNode = (DhcpOptionNode *)calloc(1, sizeof(DhcpOptionNode));
     if (pNode == NULL) {
         LOGE("failed to create dhcp option node!");

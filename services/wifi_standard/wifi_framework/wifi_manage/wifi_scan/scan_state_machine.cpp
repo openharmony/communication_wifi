@@ -1528,7 +1528,7 @@ bool ScanStateMachine::GetScanInfos(std::vector<InterScanInfo> &scanInfos)
 
     WIFI_LOGI("Begin: QueryScanInfos.");
     if (WifiStaHalInterface::GetInstance().QueryScanInfos(scanInfos) != WIFI_IDL_OPT_OK) {
-        WIFI_LOGE("WifiStaHalInterface::GetInstance().QueryScanResults failed.");
+        WIFI_LOGE("WifiStaHalInterface::GetInstance().GetScanInfos failed.");
         return false;
     }
     WIFI_LOGI("End: QueryScanInfos.");

@@ -1135,7 +1135,10 @@ WifiErrorNo WifiIdlClient::ReqP2pListNetworks(std::map<int, WifiP2pGroupInfo> &m
     if (ret != WIFI_IDL_OPT_OK) {
         return ret;
     }
-    for (int i = 0; i < infoList.infoNum; i++) {
+    if (infoList.infos == nullptr) {
+        return ret;
+    }
+    for (int i = 0; i < infoList.infoNum; ++i) {
         WifiP2pGroupInfo groupInfo;
         groupInfo.SetNetworkId(infoList.infos[i].id);
         groupInfo.SetGroupName(infoList.infos[i].ssid);

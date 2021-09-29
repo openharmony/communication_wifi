@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 #include "sta_interface.h"
-#include "wifi_log.h"
+#include "sta_service.h"
 #include "wifi_logger.h"
 
 DEFINE_WIFILOG_LABEL("StaInterface");
@@ -44,10 +44,12 @@ extern "C" void Destroy(IStaService *pservice)
 ErrCode StaInterface::EnableWifi()
 {
     WIFI_LOGD("Enter StaInterface::EnableWifi.\n");
-    pStaService = new (std::nothrow) StaService();
-    if (pStaService == nullptr) {
-        WIFI_LOGE("New StaService failed.\n");
-        return WIFI_OPT_FAILED;
+    if(pStaService == nullptr) {
+        pStaService = new (std::nothrow) StaService();
+        if (pStaService == nullptr) {
+            WIFI_LOGE("New StaService failed.\n");
+            return WIFI_OPT_FAILED;
+        }
     }
 
     if (pStaService->InitStaService(staCallback) != WIFI_OPT_SUCCESS) {

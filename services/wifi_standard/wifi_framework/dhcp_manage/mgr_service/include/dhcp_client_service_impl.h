@@ -39,6 +39,7 @@ struct DhcpResultReq {
         pResultNotify = nullptr;
     }
 };
+class DhcpEventSubscriber;
 class DhcpClientServiceImpl : public IDhcpClientService {
 public:
     /**
@@ -206,12 +207,28 @@ private:
      */
     int ForkExecParentProcess(const std::string& ifname, bool bIpv6, bool bStart = false, pid_t pid = 0);
 
+    /**
+     * @Description : Subscribe dhcp event.
+     *
+     * @param strAction - event action [in]
+     * @Return : success - DHCP_OPT_SUCCESS, failed - others.
+     */
+    int SubscribeDhcpEvent(const std::string &strAction);
+    /**
+     * @Description : Unsubscribe dhcp event.
+     *
+     * @param strAction - event action [in]
+     * @Return : success - DHCP_OPT_SUCCESS, failed - others.
+     */
+    int UnsubscribeDhcpEvent(const std::string &strAction);
+
 private:
     std::mutex mResultNotifyMutex;
     bool isExitDhcpResultHandleThread;
     std::thread *pDhcpResultHandleThread;
 
     std::map<std::string, std::list<DhcpResultReq*>> m_mapDhcpResultNotify;
+    std::map<std::string, std::shared_ptr<OHOS::Wifi::DhcpEventSubscriber>> m_mapEventSubscriber;
 };
 }  // namespace Wifi
 }  // namespace OHOS

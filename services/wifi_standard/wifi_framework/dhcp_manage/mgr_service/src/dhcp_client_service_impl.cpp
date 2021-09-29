@@ -22,6 +22,7 @@
 #include "dhcp_func.h"
 #include "securec.h"
 #include "wifi_logger.h"
+#include "dhcp_event_subscriber.h"
 
 DEFINE_WIFILOG_DHCP_LABEL("DhcpClientServiceImpl");
 
@@ -35,6 +36,7 @@ DhcpClientServiceImpl::DhcpClientServiceImpl()
     pDhcpResultHandleThread = nullptr;
 
     m_mapDhcpResultNotify.clear();
+    m_mapEventSubscriber.clear();
 
     InitDhcpMgrThread();
     DhcpFunc::CreateDirs(DHCP_WORK_DIR);
@@ -42,6 +44,19 @@ DhcpClientServiceImpl::DhcpClientServiceImpl()
 
 DhcpClientServiceImpl::~DhcpClientServiceImpl()
 {
+    if (!m_mapEventSubscriber.empty()) {
+        WIFI_LOGE("DhcpClientServiceImpl destructor mapEventSubscriber is not empty!");
+        auto iterSubscriber = m_mapEventSubscriber.begin();
+        while (iterSubscriber != m_mapEventSubscriber.end()) {
+            if (UnsubscribeDhcpEvent(iterSubscriber->first) != DHCP_OPT_SUCCESS) {
+                WIFI_LOGE("DhcpClientServiceImpl destructor %{public}s failed!", (iterSubscriber->first).c_str());
+            } else {
+                WIFI_LOGW("DhcpClientServiceImpl destructor %{public}s success", (iterSubscriber->first).c_str());
+            }
+        }
+        m_mapEventSubscriber.clear();
+    }
+
     ExitDhcpMgrThread();
 }
 
@@ -165,6 +180,57 @@ void DhcpClientServiceImpl::DhcpResultHandle(uint32_t &second)
     second = SLEEP_TIME_500_MS;
 }
 
+int DhcpClientServiceImpl::SubscribeDhcpEvent(const std::string &strAction)
+{
+    if (strAction.empty()) {
+        WIFI_LOGE("SubscribeDhcpEvent error, strAction is empty!");
+        return DHCP_OPT_ERROR;
+    }
+    auto iterSubscriber = m_mapEventSubscriber.find(strAction);
+    if (iterSubscriber == m_mapEventSubscriber.end()) {
+        EventFwk::MatchingSkills matchingSkills;
+        matchingSkills.AddEvent(strAction);
+        EventFwk::CommonEventSubscribeInfo subInfo(matchingSkills);
+        auto dhcpSubscriber = std::make_shared<OHOS::Wifi::DhcpEventSubscriber>(subInfo);
+        m_mapEventSubscriber.emplace(std::make_pair(strAction, dhcpSubscriber));
+    }
+    if (m_mapEventSubscriber[strAction] == nullptr) {
+        WIFI_LOGE("SubscribeDhcpEvent mapEventSubscriber %{public}s nullptr!", strAction.c_str());
+        return DHCP_OPT_FAILED;
+    }
+    if (!DhcpFunc::SubscribeDhcpCommonEvent(m_mapEventSubscriber[strAction])) {
+        WIFI_LOGE("SubscribeDhcpEvent SubscribeDhcpCommonEvent %{public}s failed!", strAction.c_str());
+        return DHCP_OPT_FAILED;
+    }
+    WIFI_LOGI("SubscribeDhcpEvent %{public}s success", strAction.c_str());
+    return DHCP_OPT_SUCCESS;
+}
+
+int DhcpClientServiceImpl::UnsubscribeDhcpEvent(const std::string &strAction)
+{
+    if (strAction.empty()) {
+        WIFI_LOGE("UnsubscribeDhcpEvent error, strAction is empty!");
+        return DHCP_OPT_ERROR;
+    }
+    auto iterSubscriber = m_mapEventSubscriber.find(strAction);
+    if (iterSubscriber == m_mapEventSubscriber.end()) {
+        WIFI_LOGI("UnsubscribeDhcpEvent map no exist %{public}s, no need unsubscriber", strAction.c_str());
+        return DHCP_OPT_SUCCESS;
+    }
+
+    if (m_mapEventSubscriber[strAction] == nullptr) {
+        WIFI_LOGE("UnsubscribeDhcpEvent mapEventSubscriber %{public}s nullptr!", strAction.c_str());
+        return DHCP_OPT_FAILED;
+    }
+    if (!DhcpFunc::UnsubscribeDhcpCommonEvent(m_mapEventSubscriber[strAction])) {
+        WIFI_LOGE("UnsubscribeDhcpEvent UnsubscribeDhcpCommonEvent %{public}s failed!", strAction.c_str());
+        return DHCP_OPT_FAILED;
+    }
+    m_mapEventSubscriber.erase(iterSubscriber);
+    WIFI_LOGI("UnsubscribeDhcpEvent %{public}s success", strAction.c_str());
+    return DHCP_OPT_SUCCESS;
+}
+
 void DhcpClientServiceImpl::RunDhcpResultHandleThreadFunc()
 {
     for (; ;) {
@@ -215,14 +281,8 @@ int DhcpClientServiceImpl::ForkExecChildProcess(const std::string &ifname, bool 
 
 int DhcpClientServiceImpl::ForkExecParentProcess(const std::string &ifname, bool bIpv6, bool bStart, pid_t pid)
 {
+    std::string strAction = OHOS::Wifi::COMMON_EVENT_DHCP_GET_IPV4 + "." + ifname;
     if (bStart) {
-        /* Subscribe dhcp event. */
-        std::string strAction = OHOS::Wifi::COMMON_EVENT_DHCP_GET_IPV4 + "." + ifname;
-        if (DhcpFunc::SubscribeDhcpEvent(strAction) != DHCP_OPT_SUCCESS) {
-            WIFI_LOGE("ForkExecParentProcess() SubscribeDhcpEvent %{public}s failed!", strAction.c_str());
-            return DHCP_OPT_FAILED;
-        }
-
         /* normal started, update dhcp client service running status */
         auto iter = DhcpClientServiceImpl::m_mapDhcpInfo.find(ifname);
         if (iter != DhcpClientServiceImpl::m_mapDhcpInfo.end()) {
@@ -236,14 +296,11 @@ int DhcpClientServiceImpl::ForkExecParentProcess(const std::string &ifname, bool
             dhcpInfo.clientProPid = pid;
             DhcpClientServiceImpl::m_mapDhcpInfo.emplace(std::make_pair(ifname, dhcpInfo));
         }
-    } else {
-        /* Unsubscribe dhcp event. */
-        std::string strAction = OHOS::Wifi::COMMON_EVENT_DHCP_GET_IPV4 + "." + ifname;
-        if (DhcpFunc::UnsubscribeDhcpEvent(strAction) != DHCP_OPT_SUCCESS) {
-            WIFI_LOGE("ForkExecParentProcess() UnsubscribeDhcpEvent %{public}s failed!", strAction.c_str());
+        /* Subscribe dhcp event. */
+        if (SubscribeDhcpEvent(strAction) != DHCP_OPT_SUCCESS) {
             return DHCP_OPT_FAILED;
         }
-
+    } else {
         auto iter = DhcpClientServiceImpl::m_mapDhcpInfo.find(ifname);
         if (iter != DhcpClientServiceImpl::m_mapDhcpInfo.end()) {
             /* not start */
@@ -256,8 +313,11 @@ int DhcpClientServiceImpl::ForkExecParentProcess(const std::string &ifname, bool
                 WIFI_LOGI("ForkExecParentProcess() m_mapDhcpResult erase ifname:%{public}s success.", ifname.c_str());
             }
         }
+        /* Unsubscribe dhcp event. */
+        if (UnsubscribeDhcpEvent(strAction) != DHCP_OPT_SUCCESS) {
+            return DHCP_OPT_FAILED;
+        }
     }
-
     return DHCP_OPT_SUCCESS;
 }
 

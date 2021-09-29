@@ -32,8 +32,8 @@ constexpr int MAX_HEX = 16;
 constexpr int BUFFER_SIZE = 32;
 constexpr int HALF_PREFIX_LENGTH = 64;
 
-const Ipv6Address Ipv6Address::INVALID_INET6_ADDRESS =
-    Ipv6Address::Create(std::string("ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff"), MAX_IPV6_PREFIX_LENGTH);
+const Ipv6Address Ipv6Address::INVALID_INET6_ADDRESS(std::string("ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff"),
+    MAX_IPV6_PREFIX_LENGTH);
 
 bool Ipv6Address::IsValidIPv6(const std::string &ipv6)
 {
@@ -311,22 +311,6 @@ std::string Ipv6Address::HexToBin(const std::string &strHex)
     }
     std::reverse(addrBin.begin(), addrBin.end());
     return addrBin;
-}
-
-int Ipv6Address::CalcPrefixLen(struct in6_addr &mask)
-{
-    int i = 0;
-    int len = 0;
-    int u = 0;
-    for (i = 0; i < MAX_IPV6_PREFIX_LENGTH / CHAR_BIT; i++) {
-        u = mask.s6_addr[i];
-        if (ffs(u) > 0) {
-            len += CHAR_BIT + 1 - ffs(u);
-        } else {
-            break;
-        }
-    }
-    return len;
 }
 
 std::string Ipv6Address::MacToEui64addr(MacAddress &mac)

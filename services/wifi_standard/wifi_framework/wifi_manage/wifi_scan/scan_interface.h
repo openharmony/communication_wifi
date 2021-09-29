@@ -22,6 +22,7 @@
 namespace OHOS {
 namespace Wifi {
 class ScanInterface : public IScanService {
+    FRIEND_GTEST(ScanInterface);
 public:
     ScanInterface();
     ~ScanInterface();

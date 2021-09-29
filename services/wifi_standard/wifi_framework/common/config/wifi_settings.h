@@ -739,14 +739,14 @@ public:
      * @param score - score
      * @return int - 0 success
      */
-    int SetscoretacticsScoreSlope(const int &score);
+    int SetScoretacticsScoreSlope(const int &score);
 
     /**
      * @Description Get the policy score slope
      *
      * @return int - score
      */
-    int GetscoretacticsScoreSlope();
+    int GetScoretacticsScoreSlope();
 
     /**
      * @Description Initial score of the set strategy
@@ -754,14 +754,14 @@ public:
      * @param score - score
      * @return int - 0 success
      */
-    int SetscoretacticsInitScore(const int &score);
+    int SetScoretacticsInitScore(const int &score);
 
     /**
      * @Description Obtain the initial score of the tactic
      *
      * @return int - score
      */
-    int GetscoretacticsInitScore();
+    int GetScoretacticsInitScore();
 
     /**
      * @Description Set the scoring policy to the same BSSID score
@@ -769,14 +769,14 @@ public:
      * @param score - score
      * @return int - 0 success
      */
-    int SetscoretacticsSameBssidScore(const int &score);
+    int SetScoretacticsSameBssidScore(const int &score);
 
     /**
      * @Description Get the scoring policy to the same BSSID score
      *
      * @return int - score
      */
-    int GetscoretacticsSameBssidScore();
+    int GetScoretacticsSameBssidScore();
 
     /**
      * @Description Set the score policy for the same network
@@ -784,14 +784,14 @@ public:
      * @param score - score
      * @return int - 0 success
      */
-    int SetscoretacticsSameNetworkScore(const int &score);
+    int SetScoretacticsSameNetworkScore(const int &score);
 
     /**
      * @Description Get the score policy for the same network
      *
      * @return int - score
      */
-    int GetscoretacticsSameNetworkScore();
+    int GetScoretacticsSameNetworkScore();
 
     /**
      * @Description Set the 5 GHz score of the policy frequency
@@ -799,14 +799,14 @@ public:
      * @param score - score
      * @return int - 0 success
      */
-    int SetscoretacticsFrequency5GHzScore(const int &score);
+    int SetScoretacticsFrequency5GHzScore(const int &score);
 
     /**
      * @Description Get the 5 GHz score of the policy frequency
      *
      * @return int - score
      */
-    int GetscoretacticsFrequency5GHzScore();
+    int GetScoretacticsFrequency5GHzScore();
 
     /**
      * @Description Set the score policy. last select score
@@ -814,14 +814,14 @@ public:
      * @param score - score
      * @return int - 0 success
      */
-    int SetscoretacticsLastSelectionScore(const int &score);
+    int SetScoretacticsLastSelectionScore(const int &score);
 
     /**
      * @Description Get the score policy, last select score
      *
      * @return int - score
      */
-    int GetscoretacticsLastSelectionScore();
+    int GetScoretacticsLastSelectionScore();
 
     /**
      * @Description Setting the Score Policy Security Score
@@ -829,14 +829,14 @@ public:
      * @param score - score
      * @return int - 0 success
      */
-    int SetscoretacticsSecurityScore(const int &score);
+    int SetScoretacticsSecurityScore(const int &score);
 
     /**
      * @Description Get the Score Policy Security Score
      *
      * @return int - priority
      */
-    int GetscoretacticsSecurityScore();
+    int GetScoretacticsSecurityScore();
 
     /**
      * @Description Set the saved device appraisal priority
@@ -844,14 +844,14 @@ public:
      * @param priority - priority
      * @return int - 0 success
      */
-    int SetsavedDeviceAppraisalPriority(const int &priority);
+    int SetSavedDeviceAppraisalPriority(const int &priority);
 
     /**
      * @Description Get the saved device appraisal priority
      *
      * @return int - priority
      */
-    int GetsavedDeviceAppraisalPriority();
+    int GetSavedDeviceAppraisalPriority();
 
     /**
      * @Description Judge the Module need preloaded or not

@@ -141,7 +141,7 @@ int CheckRangeAvailability(
     uint32_t beginIp = pool->addressRange.beginAddress;
     uint32_t endIp = pool->addressRange.endAddress;
     if (IpInRange(distIp, beginIp, endIp, pool->netmask)) {
-        LOGD("distribution IP address is: %s", ParseStrIp(distIp));
+        LOGD("distribution IP address");
         AddressBinding lease = {0};
         lease.pendingTime = Tmspsec();
         lease.leaseTime = pool->leaseTime;
@@ -160,7 +160,7 @@ int CheckRangeAvailability(
         return RET_SUCCESS;
     }
     if (*outOfRange) {
-        LOGD("out of address range, ip: %s", ParseStrIp(distIp));
+        LOGD("address is out of range");
         return RET_FAILED;
     } else {
         distIp = beginIp;

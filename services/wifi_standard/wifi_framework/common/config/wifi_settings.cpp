@@ -976,90 +976,90 @@ bool WifiSettings::GetWhetherToAllowNetworkSwitchover()
     return mWifiConfig.whetherToAllowNetworkSwitchover;
 }
 
-int WifiSettings::SetscoretacticsScoreSlope(const int &score)
+int WifiSettings::SetScoretacticsScoreSlope(const int &score)
 {
     mWifiConfig.scoretacticsScoreSlope = score;
     return 0;
 }
 
-int WifiSettings::GetscoretacticsScoreSlope()
+int WifiSettings::GetScoretacticsScoreSlope()
 {
     return mWifiConfig.scoretacticsScoreSlope;
 }
 
-int WifiSettings::SetscoretacticsInitScore(const int &score)
+int WifiSettings::SetScoretacticsInitScore(const int &score)
 {
     mWifiConfig.scoretacticsInitScore = score;
     return 0;
 }
 
-int WifiSettings::GetscoretacticsInitScore()
+int WifiSettings::GetScoretacticsInitScore()
 {
     return mWifiConfig.scoretacticsInitScore;
 }
 
-int WifiSettings::SetscoretacticsSameBssidScore(const int &score)
+int WifiSettings::SetScoretacticsSameBssidScore(const int &score)
 {
     mWifiConfig.scoretacticsSameBssidScore = score;
     return 0;
 }
 
-int WifiSettings::GetscoretacticsSameBssidScore()
+int WifiSettings::GetScoretacticsSameBssidScore()
 {
     return mWifiConfig.scoretacticsSameBssidScore;
 }
 
-int WifiSettings::SetscoretacticsSameNetworkScore(const int &score)
+int WifiSettings::SetScoretacticsSameNetworkScore(const int &score)
 {
     mWifiConfig.scoretacticsSameNetworkScore = score;
     return 0;
 }
 
-int WifiSettings::GetscoretacticsSameNetworkScore()
+int WifiSettings::GetScoretacticsSameNetworkScore()
 {
     return mWifiConfig.scoretacticsSameNetworkScore;
 }
 
-int WifiSettings::SetscoretacticsFrequency5GHzScore(const int &score)
+int WifiSettings::SetScoretacticsFrequency5GHzScore(const int &score)
 {
     mWifiConfig.scoretacticsFrequency5GHzScore = score;
     return 0;
 }
 
-int WifiSettings::GetscoretacticsFrequency5GHzScore()
+int WifiSettings::GetScoretacticsFrequency5GHzScore()
 {
     return mWifiConfig.scoretacticsFrequency5GHzScore;
 }
 
-int WifiSettings::SetscoretacticsLastSelectionScore(const int &score)
+int WifiSettings::SetScoretacticsLastSelectionScore(const int &score)
 {
     mWifiConfig.scoretacticsLastSelectionScore = score;
     return 0;
 }
 
-int WifiSettings::GetscoretacticsLastSelectionScore()
+int WifiSettings::GetScoretacticsLastSelectionScore()
 {
     return mWifiConfig.scoretacticsLastSelectionScore;
 }
 
-int WifiSettings::SetscoretacticsSecurityScore(const int &score)
+int WifiSettings::SetScoretacticsSecurityScore(const int &score)
 {
     mWifiConfig.scoretacticsSecurityScore = score;
     return 0;
 }
 
-int WifiSettings::GetscoretacticsSecurityScore()
+int WifiSettings::GetScoretacticsSecurityScore()
 {
     return mWifiConfig.scoretacticsSecurityScore;
 }
 
-int WifiSettings::SetsavedDeviceAppraisalPriority(const int &priority)
+int WifiSettings::SetSavedDeviceAppraisalPriority(const int &priority)
 {
     mWifiConfig.savedDeviceAppraisalPriority = priority;
     return 0;
 }
 
-int WifiSettings::GetsavedDeviceAppraisalPriority()
+int WifiSettings::GetSavedDeviceAppraisalPriority()
 {
     return mWifiConfig.savedDeviceAppraisalPriority;
 }

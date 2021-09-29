@@ -124,6 +124,10 @@ int RpcGetScanInfos(RpcServer *server, Context *context)
             WriteStr(context, results[i].ssid);
             int64_t currTime = (int64_t)clockTime.tv_sec * secComplex * secComplex + clockTime.tv_nsec / secComplex;
             WriteInt64(context, currTime);
+            if (results[i].infoElems != NULL) {
+                free(results[i].infoElems);
+                results[i].infoElems = NULL;
+            }
         }
     }
     WriteEnd(context);

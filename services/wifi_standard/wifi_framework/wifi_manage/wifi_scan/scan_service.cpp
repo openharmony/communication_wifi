@@ -15,6 +15,8 @@
 #include <inttypes.h>
 #include "scan_service.h"
 #include "wifi_logger.h"
+#include "wifi_settings.h"
+#include "wifi_sta_hal_interface.h"
 
 DEFINE_WIFILOG_SCAN_LABEL("ScanService");
 

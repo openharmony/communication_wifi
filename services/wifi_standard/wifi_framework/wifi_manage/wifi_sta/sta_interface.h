@@ -16,12 +16,15 @@
 #ifndef OHOS_WIFI_STA_INTERFACE_H
 #define OHOS_WIFI_STA_INTERFACE_H
 
+#include "sta_define.h"
 #include "ista_service.h"
-#include "sta_service.h"
+#include "wifi_errcode.h"
 
 namespace OHOS {
 namespace Wifi {
+class StaService;
 class StaInterface : public IStaService  {
+    FRIEND_GTEST(StaInterface);
 public:
     StaInterface();
     virtual ~StaInterface() override;

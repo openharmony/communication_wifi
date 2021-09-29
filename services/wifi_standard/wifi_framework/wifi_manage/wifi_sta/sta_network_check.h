@@ -33,26 +33,27 @@
 namespace OHOS {
 namespace Wifi {
 class StaNetworkCheck {
+    FRIEND_GTEST(StaNetworkCheck);
 public:
     explicit StaNetworkCheck(NetStateHandler handle);
-    ~StaNetworkCheck();
+    virtual ~StaNetworkCheck();
     /**
      * @Description : Start NetCheck thread
      *
      * @Return success : WIFI_OPT_SUCCESS  failed : WIFI_OPT_FAILED
      */
-    ErrCode InitNetCheckThread();
+    virtual ErrCode InitNetCheckThread();
     /**
      * @Description : wake up the DHCP processing thread.
      *
      * @param ipType - Type of IP to be obtained [in]
      */
-    void SignalNetCheckThread();
+    virtual void SignalNetCheckThread();
     /**
      * @Description : stop the NetCheck processing thread.
      *
      */
-    void StopNetCheckThread();
+    virtual void StopNetCheckThread();
 
 private:
     std::thread *pDealNetCheckThread;

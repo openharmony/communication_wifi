@@ -34,61 +34,22 @@
 #include "address_utils.h"
 #include "securec.h"
 #include "dhcp_config.h"
+#include "dhcp_argument.h"
 
 #undef LOG_TAG
 #define LOG_TAG "DhcpServerMain"
 
-#define NO_ARG 0
-#define REQUIRED_ARG 1
-#define OPTIONAL_ARG 2
-
-#define ARGUMENT_NAME_SIZE 32
-#define ARGUMENT_VALUE_SIZE 256
-#define INIT_ARGS_SIZE 4
-#define USAGE_DESC_MAX_LENGTH 32
 #define DEFAUTL_NET_MASK "255.255.255.0"
 
-static HashTable g_argumentsTable;
 static DhcpConfig g_dhcpConfig;
 
 static PDhcpServerContext g_dhcpServer = 0;
 
-typedef struct DhcpUsage DhcpUsage;
-struct DhcpUsage {
-    struct option *opt;
-    const char *params;
-    const char *desc;
-    const char *example;
-    int required;
-    int (*dealOption)(const char *, const char *);
-};
-
-typedef struct ArgumentInfo ArgumentInfo;
-struct ArgumentInfo {
-    char name[ARGUMENT_NAME_SIZE];
-    char value[ARGUMENT_VALUE_SIZE];
-};
 
 enum SignalEvent {
     EXIT = 0,
     RELOAD,
     RESTART,
-};
-
-static struct option longOptions[] = {
-    {"ifname", REQUIRED_ARG, 0, 'i'},
-    {"conf", REQUIRED_ARG, 0, 'c'},
-    {"dns", REQUIRED_ARG, 0, 'd'},
-    {"gateway", REQUIRED_ARG, 0, 'g'},
-    {"server", REQUIRED_ARG, 0, 's'},
-    {"netmask", REQUIRED_ARG, 0, 'n'},
-    {"pool", REQUIRED_ARG, 0, 'P'},
-    {"lease", REQUIRED_ARG, 0, 0},
-    {"renewal", REQUIRED_ARG, 0, 0},
-    {"rebinding", REQUIRED_ARG, 0, 0},
-    {"version", NO_ARG, 0, 'v'},
-    {"help", NO_ARG, 0, 'h'},
-    {0, 0, 0, 0},
 };
 
 typedef struct DhcpOptionField {
@@ -100,283 +61,6 @@ typedef struct DhcpOptionField {
     int (*parseOption)(DhcpOption *, int, char *);
 
 } DhcpOptionField;
-
-static int InitArguments(void)
-{
-    if (CreateHashTable(&g_argumentsTable, ARGUMENT_NAME_SIZE, sizeof(ArgumentInfo), INIT_ARGS_SIZE) != HASH_SUCCESS) {
-        return RET_FAILED;
-    }
-    return RET_SUCCESS;
-}
-
-static void FreeArguments(void)
-{
-    if (!Initialized(&g_argumentsTable)) {
-        return;
-    }
-    DestroyHashTable(&g_argumentsTable);
-}
-
-static int HasArgument(const char *argument)
-{
-    char name[ARGUMENT_NAME_SIZE] = {'\0', 0};
-    if (!argument) {
-        return 0;
-    }
-    size_t ssize = strlen(argument);
-    if (ssize > ARGUMENT_NAME_SIZE) {
-        ssize = ARGUMENT_NAME_SIZE;
-    }
-    if (memcpy_s(name, ARGUMENT_NAME_SIZE, argument, ssize) != EOK) {
-        LOGE("failed to set argument name.");
-        return 0;
-    }
-    if (ContainsKey(&g_argumentsTable, (uintptr_t)name)) {
-        return 1;
-    }
-    return 0;
-}
-
-static ArgumentInfo *GetArgument(const char *name)
-{
-    char argName[ARGUMENT_NAME_SIZE] = {'\0'};
-    size_t ssize = strlen(name);
-    if (ssize > ARGUMENT_NAME_SIZE) {
-        ssize = ARGUMENT_NAME_SIZE;
-    }
-    if (memcpy_s(argName, ARGUMENT_NAME_SIZE, name, ssize) != EOK) {
-        LOGE("failed to set argument name.");
-        return NULL;
-    }
-    if (ContainsKey(&g_argumentsTable, (uintptr_t)argName)) {
-        ArgumentInfo *arg = (ArgumentInfo *)At(&g_argumentsTable, (uintptr_t)argName);
-        return arg;
-    }
-    return NULL;
-}
-
-static int DefaultArgument(const char *argument, const char *val)
-{
-    LOGD("Input argument is: [%s], value is [%s]", (argument == NULL) ? "" : argument,
-        (val == NULL) ? "" : val);
-    return RET_SUCCESS;
-}
-
-static int PutArgument(const char *argument, const char *val)
-{
-    if (!argument) {
-        return 0;
-    }
-    if (!val) {
-        return RET_FAILED;
-    }
-
-    if (HasArgument(argument)) {
-        return RET_FAILED;
-    }
-
-    ArgumentInfo arg;
-    size_t ssize = strlen(argument);
-    if (ssize >= ARGUMENT_NAME_SIZE) {
-        ssize = ARGUMENT_NAME_SIZE -1;
-    }
-    size_t vlen = strlen(val);
-    if (memset_s(arg.name, ARGUMENT_NAME_SIZE, '\0', ARGUMENT_NAME_SIZE) != EOK) {
-        LOGE("failed to reset argument name.");
-        return RET_ERROR;
-    }
-    if (memcpy_s(arg.name, ARGUMENT_NAME_SIZE, argument, ssize) != EOK) {
-        LOGE("failed to set argument name.");
-        return RET_ERROR;
-    }
-    if (vlen < 0) {
-        return RET_ERROR;
-    }
-    if (vlen >= ARGUMENT_VALUE_SIZE) {
-        LOGE("value string too long.");
-        return RET_ERROR;
-    }
-    if (memset_s(arg.value, ARGUMENT_VALUE_SIZE, '\0', ARGUMENT_NAME_SIZE) != EOK) {
-        LOGE("failed to reset argument value.");
-        return RET_ERROR;
-    }
-    if (memcpy_s(arg.value, ARGUMENT_VALUE_SIZE, val, vlen) != EOK) {
-        LOGE("failed to set argument value.");
-        return RET_ERROR;
-    }
-    int ret = Insert(&g_argumentsTable, (uintptr_t)arg.name, (uintptr_t)&arg);
-    if (ret == HASH_INSERTED) {
-        return RET_SUCCESS;
-    }
-    return RET_FAILED;
-}
-
-static int PutIpArgument(const char *argument, const char *val)
-{
-    if (!ParseIpAddr(val)) {
-        LOGE("%s format error.", argument);
-        return RET_FAILED;
-    }
-    return PutArgument(argument, val);
-}
-
-static int PutPoolArgument(const char *argument, const char *val)
-{
-    if (!val) {
-        return 0;
-    }
-    if (strchr(val, ',') == NULL) {
-        LOGE("too few pool option arguments.");
-        return RET_FAILED;
-    }
-    return PutArgument(argument, val);
-}
-
-static int ShowVersion(const char *argument, const char *val)
-{
-    if (argument && PutArgument(argument, val) != RET_SUCCESS) {
-        LOGD("failed to put argument 'version'.");
-    }
-    printf("version:%s\n", DHCPD_VERSION);
-    return RET_BREAK;
-}
-
-const char *optionString = "i:c:d:g:s:n:P:S:Bp:o:lb:rvhD";
-static DhcpUsage usages[] = {
-    {&longOptions[NUM_ZERO], "<interface>", "network interface name.", "--ifname eth0", 1, PutArgument},
-    {&longOptions[NUM_ONE], "<file>", "configure file name.", "--conf /etc/conf/dhcp_server.conf", 0, PutArgument},
-    {&longOptions[NUM_TWO], "<dns1>[,dns2][,dns3][...]", "domain name server IP address list.", "", 0, PutArgument},
-    {&longOptions[NUM_THREE], "<gateway>", "gateway option.", "", 0, PutIpArgument},
-    {&longOptions[NUM_FOUR], "<server>", "server identifier.", "", 1, PutIpArgument},
-    {&longOptions[NUM_FIVE], "<netmask>", "default subnet mask.", "", 1, PutIpArgument},
-    {&longOptions[NUM_SIX], "<beginip>,<endip>", "pool address range.", "", 0,
-        PutPoolArgument},
-    {&longOptions[NUM_SEVEN], "<leaseTime>", "set lease time value, the value is in units of seconds.", "", 0,
-        PutArgument},
-    {&longOptions[NUM_EIGHT], "<renewalTime>", "set renewal time value, the value is in units of seconds.", "", 0,
-        PutArgument},
-    {&longOptions[NUM_NINE], "<rebindingTime>", "set rebinding time value, the value is in units of seconds.", "", 0,
-        PutArgument},
-    {&longOptions[NUM_TEN], "", "show version information.", "", 0, ShowVersion},
-    {&longOptions[NUM_ELEVEN], "", "show help information.", "", 0, DefaultArgument},
-    {0, "", "", ""},
-};
-
-int findIndex(int c)
-{
-    int size = sizeof(longOptions) / sizeof(longOptions[0]);
-    for (int i = 0; i < size; ++i) {
-        if (longOptions[i].val == c) {
-            return i;
-        }
-    }
-    return -1;
-}
-
-void ShowUsage(const DhcpUsage *usage)
-{
-    if (!usage) {
-        return;
-    }
-    if (usage->opt->val) {
-        printf("-%c,--%s ", usage->opt->val, usage->opt->name);
-    } else {
-        printf("   --%s ", usage->opt->name);
-    }
-    if (usage->params[0] == '\0') {
-        printf("\t%s\n", usage->desc);
-    } else {
-        int plen = strlen(usage->params) + strlen(usage->params);
-        if (plen < USAGE_DESC_MAX_LENGTH) {
-            printf("\t\t%s\t\t%s\n", usage->params, usage->desc);
-        } else {
-            printf("\t\t%s\n", usage->params);
-            printf("\t\t\t%s\n\n", usage->desc);
-        }
-    }
-}
-
-void PrintRequiredArguments(void)
-{
-    size_t argc = sizeof(usages) / sizeof(DhcpUsage);
-    printf("required parameters:");
-    int idx = 0;
-    for (size_t i = 0; i < argc; i++) {
-        DhcpUsage usage = usages[i];
-        if (!usage.opt) {
-            break;
-        }
-        if (usage.required) {
-            if (idx == 0) {
-                printf("\"%s\"", usage.opt->name);
-            } else {
-                printf(", \"%s\"", usage.opt->name);
-            }
-            idx++;
-        }
-    }
-    printf(".\n\n");
-    printf("Usage: dhcp_server [options] \n");
-    printf("e.g: dhcp_server -i eth0 -c /data/dhcp/dhcp_server.conf \n");
-    printf("     dhcp_server --help \n\n");
-}
-
-void PrintUsage(void)
-{
-    printf("Usage: dhcp_server [options] \n\n");
-
-    size_t argc = sizeof(usages) / sizeof(DhcpUsage);
-    for (size_t i = 0; i < argc; i++) {
-        DhcpUsage usage = usages[i];
-        if (!usage.opt) {
-            break;
-        }
-        ShowUsage(&usage);
-    }
-    printf("\n");
-}
-
-void ShowHelp(int argc)
-{
-    if (argc == NUM_TWO) {
-        PrintUsage();
-        return;
-    }
-}
-
-int ParseArguments(int argc, char *argv[])
-{
-    int ret;
-    opterr = 0;
-    size_t optsc = sizeof(usages) / sizeof(DhcpUsage);
-    int index = -1;
-    int rst = RET_SUCCESS;
-
-    while ((ret = getopt_long(argc, argv, optionString, longOptions, &index)) != -1) {
-        if (ret == '?') {
-            LOGW("unknown input arguments! ret = ?");
-            index = -1;
-            continue;
-        }
-        if (index < 0) {
-            index = findIndex(ret);
-        }
-        if (index < 0 || index >= (int)optsc) {
-            LOGD("unknown input arguments! ret = %c, index = %d", ret, index);
-            index = -1;
-            continue;
-        }
-        DhcpUsage *usage = &usages[index];
-        rst = usage->dealOption(usage->opt->name, optarg);
-        if (rst != RET_SUCCESS) {
-            break;
-        }
-        index = -1;
-    }
-
-
-    return rst;
-}
 
 void LoadLocalConfig(DhcpAddressPool *pool)
 {
@@ -691,6 +375,7 @@ void FreeSeverResources(void)
     FreeLocalConfig();
     FreeServerContex(g_dhcpServer);
 }
+
 int main(int argc, char *argv[])
 {
     if (argc == 1) {

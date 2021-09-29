@@ -41,6 +41,7 @@ const int SCAN_24GHZ_BAND = 1;
 const int SCAN_5GHZ_BAND = 2;
 
 class ScanStateMachine : public StateMachine {
+    FRIEND_GTEST(ScanStateMachine);
 public:
     ScanStateMachine();
     ~ScanStateMachine();
@@ -60,6 +61,7 @@ public:
     bool EnrollScanStatusListener(ScanStatusReportHandler handler);
 
     class InitState : public State {
+        FRIEND_GTEST(ScanStateMachine);
     public:
         /**
          * @Description  Initial state of the scanning state machine

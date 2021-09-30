@@ -28,7 +28,7 @@ The WLAN module provides basic WLAN functions, peer-to-peer \(P2P\) connection, 
 /foundation/communication/wifi
 ├── figures             # Figures
 ├── interfaces          # APIs
-│   ├── innerkits       # Java APIs
+│   ├── innerkits       # Inner APIs
 │   └── kits            # WLAN APIs
 └── services            # Services
     └── wifi_standard   # Service implementation

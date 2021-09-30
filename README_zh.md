@@ -26,12 +26,14 @@ WLAN组件子系统为用户提供WLAN基础功能、P2P（peer-to-peer）功能
 
 ```
 /foundation/communication/wifi
-├── figures             # 图片资源目录
-├── interfaces          # 接口适配目录
-│   ├── innerkits       # Java接口适配目录
-│   └── kits            # WLAN组件接口的适配代码存放目录
-└── services            # service适配目录
-    └── wifi_standard   # service实现目录
+├── figures            # 图片资源目录
+├── interfaces         # 接口适配目录
+│   ├── innerkits      # 内部接口适配目录
+│   └── kits           # WLAN组件接口的适配代码存放目录
+├── services           # service适配目录
+│   └── wifi_standard  # service实现目录
+└── tests              # 测试代码目录
+    └── wifi_standard  # service实现模块测试代码
 ```
 
 ## 说明<a name="section1312121216216"></a>

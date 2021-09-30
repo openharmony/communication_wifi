@@ -26,12 +26,14 @@ The WLAN module provides basic WLAN functions, peer-to-peer \(P2P\) connection, 
 
 ```
 /foundation/communication/wifi
-├── figures             # Figures
-├── interfaces          # APIs
-│   ├── innerkits       # Java APIs
-│   └── kits            # WLAN APIs
-└── services            # Services
-    └── wifi_standard   # Service implementation
+├── figures            # Figures
+├── interfaces         # APIs
+│   ├── innerkits      # Inner APIs
+│   └── kits           # WLAN APIs
+├── services           # Services
+│   └── wifi_standard  # Service implementation
+└── tests              # Test code
+    └── wifi_standard  # Test code for the service implementation module
 ```
 
 ## Usage<a name="section1312121216216"></a>

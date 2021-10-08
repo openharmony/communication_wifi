@@ -156,10 +156,7 @@ ohos_shared_library("wifi_manager_service") {
     "//utils/native/base:utils",
   ]
 
-  defines = [
-    "PERMISSION_ALWAYS_GRANT",
-    "CONFIG_NO_CONFIG_WRITE",
-  ]
+  defines = [ "PERMISSION_ALWAYS_GRANT" ]
 
   configs = [ ":wifi_manager_service_header" ]
 

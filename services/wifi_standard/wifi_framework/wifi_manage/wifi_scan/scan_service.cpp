@@ -34,7 +34,7 @@ ScanService::ScanService()
       autoNetworkSelection(false),
       lastSystemScanTime(0),
       pnoScanFailedNum(0),
-      operateAppMode(0),
+      operateAppMode(static_cast<int>(ScanMode::SYS_FOREGROUND_SCAN)),
       customScene(SCAN_SCENE_ALL),
       staCurrentTime(0),
       customCurrentTime(0)

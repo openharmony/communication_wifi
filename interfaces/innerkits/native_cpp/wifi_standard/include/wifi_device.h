@@ -42,6 +42,31 @@ public:
      * @return ErrCode - operation result
      */
     virtual ErrCode DisableWifi() = 0;
+    /**
+     * @Description create the Wi-Fi protect.
+     *
+     * @param protectType - WifiProtectMode object
+     * @param protectName - the protect name
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode InitWifiProtect(const WifiProtectType &protectType, const std::string &protectName) = 0;
+
+    /**
+     * @Description Acquire the Wi-Fi protect mode.
+     *
+     * @param protectMode - WifiProtectMode object
+     * @param protectName - the protect name
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode GetWifiProtectRef(const WifiProtectMode &protectMode, const std::string &protectName) = 0;
+
+    /**
+     * @Description Release the Wi-Fi protect mode.
+     *
+     * @param protectName - the protect name
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode PutWifiProtectRef(const std::string &protectName) = 0;
 
     /**
      * @Description Add a wifi device configuration.

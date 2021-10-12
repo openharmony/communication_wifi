@@ -398,6 +398,21 @@ enum class StreamDirection {
     UNKNOWN,
 };
 
+/* WifiProtectType  */
+enum class WifiProtectType  {
+    WIFI_PROTECT_MULTICAST = 0,
+    WIFI_PROTECT_COMMON = 1
+};
+
+/* WifiProtectMode  */
+enum class WifiProtectMode {
+    WIFI_PROTECT_FULL = 0,
+    WIFI_PROTECT_SCAN_ONLY = 1,
+    WIFI_PROTECT_FULL_HIGH_PERF = 2,
+    WIFI_PROTECT_FULL_LOW_LATENCY = 3,
+    WIFI_PROTECT_NO_HELD = 4
+};
+
 /* DHCP info */
 struct IpInfo {
     int ipAddress;     /* ip address */

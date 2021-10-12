@@ -42,6 +42,32 @@ public:
     ErrCode DisableWifi() override;
 
     /**
+     * @Description create the Wi-Fi protect.
+     *
+     * @param protectType - WifiProtectMode object
+     * @param protectName - the protect name
+     * @return ErrCode - operation result
+     */
+    ErrCode InitWifiProtect(const WifiProtectType &protectType, const std::string &protectName) override;
+
+    /**
+     * @Description Acquire the Wi-Fi protect mode.
+     *
+     * @param protectMode - WifiProtectMode object
+     * @param protectName - the protect name
+     * @return ErrCode - operation result
+     */
+    ErrCode GetWifiProtectRef(const WifiProtectMode &protectMode, const std::string &protectName) override;
+
+    /**
+     * @Description Release the Wi-Fi protect mode.
+     *
+     * @param protectName - the protect name
+     * @return ErrCode - operation result
+     */
+    ErrCode PutWifiProtectRef(const std::string &protectName) override;
+    
+    /**
      * @Description Add a wifi device configuration.
      *
      * @param config - WifiDeviceConfig object

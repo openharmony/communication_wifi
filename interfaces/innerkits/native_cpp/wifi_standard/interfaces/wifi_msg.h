@@ -143,11 +143,8 @@ struct WpsConfig {
 };
 
 enum class WifiDeviceConfigStatus {
-    INVALID = -1, /* invalid */
-    CURRENT = 0,  /* using */
-    DISABLED = 1, /* disabled */
-    ENABLED = 2,  /* enable */
-
+    ENABLED, /* enable */
+    DISABLED, /* disabled */
     UNKNOWN
 };
 
@@ -342,7 +339,7 @@ struct WifiDeviceConfig {
     WifiDeviceConfig()
     {
         networkId = INVALID_NETWORK_ID;
-        status = static_cast<int>(WifiDeviceConfigStatus::INVALID);
+        status = static_cast<int>(WifiDeviceConfigStatus::ENABLED);
         band = 0;
         channel = 0;
         frequency = 0;

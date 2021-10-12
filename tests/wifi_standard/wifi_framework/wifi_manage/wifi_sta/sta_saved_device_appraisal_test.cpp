@@ -66,7 +66,6 @@ public:
     void AppraiseDeviceQualitySuccess1();
     void AppraiseDeviceQualitySuccess2();
     void WhetherSkipDeviceSuccess1();
-    void WhetherSkipDeviceSuccess2();
     void WhetherSkipDeviceFail1();
 
 public:
@@ -225,17 +224,6 @@ void StaSavedDeviceAppraisalTest::WhetherSkipDeviceSuccess1()
     EXPECT_TRUE(pStaSavedDeviceAppraisal->WhetherSkipDevice(deviceConfig) == true);
 }
 
-void StaSavedDeviceAppraisalTest::WhetherSkipDeviceSuccess2()
-{
-    WifiDeviceConfig deviceConfig;
-    GetWifiDeviceConfig(deviceConfig);
-
-    deviceConfig.isPasspoint = false;
-    deviceConfig.isEphemeral = false;
-    deviceConfig.status = static_cast<int>(WifiDeviceConfigStatus::CURRENT);
-    EXPECT_TRUE(pStaSavedDeviceAppraisal->WhetherSkipDevice(deviceConfig) == true);
-}
-
 void StaSavedDeviceAppraisalTest::WhetherSkipDeviceFail1()
 {
     WifiDeviceConfig deviceConfig;
@@ -274,11 +262,6 @@ HWTEST_F(StaSavedDeviceAppraisalTest, AppraiseDeviceQualitySuccess2, TestSize.Le
 HWTEST_F(StaSavedDeviceAppraisalTest, WhetherSkipDeviceSuccess1, TestSize.Level1)
 {
     WhetherSkipDeviceSuccess1();
-}
-
-HWTEST_F(StaSavedDeviceAppraisalTest, WhetherSkipDeviceSuccess2, TestSize.Level1)
-{
-    WhetherSkipDeviceSuccess2();
 }
 
 HWTEST_F(StaSavedDeviceAppraisalTest, WhetherSkipDeviceFail1, TestSize.Level1)

@@ -22,6 +22,7 @@
 #include "wifi_internal_event_dispatcher.h"
 #include "wifi_manager.h"
 #include "wifi_service_manager.h"
+#include "wifi_protect_manager.h"
 #include "wifi_logger.h"
 #include "define.h"
 
@@ -175,6 +176,30 @@ ErrCode WifiDeviceServiceImpl::DisableWifi()
         WifiConfigCenter::GetInstance().SetStaLastRunState(false);
     }
     return ret;
+}
+
+ErrCode WifiDeviceServiceImpl::InitWifiProtect(const WifiProtectType &protectType, const std::string &protectName)
+{
+    if (WifiProtectManager::GetInstance().InitWifiProtect(protectType, protectName)) {
+        return WIFI_OPT_SUCCESS;
+    }
+    return WIFI_OPT_FAILED;
+}
+
+ErrCode WifiDeviceServiceImpl::GetWifiProtectRef(const WifiProtectMode &protectMode, const std::string &protectName)
+{
+    if (WifiProtectManager::GetInstance().GetWifiProtect(protectMode, protectName)) {
+        return WIFI_OPT_SUCCESS;
+    }
+    return WIFI_OPT_FAILED;
+}
+
+ErrCode WifiDeviceServiceImpl::PutWifiProtectRef(const std::string &protectName)
+{
+    if (WifiProtectManager::GetInstance().PutWifiProtect(protectName)) {
+        return WIFI_OPT_SUCCESS;
+    }
+    return WIFI_OPT_FAILED;
 }
 
 ErrCode WifiDeviceServiceImpl::AddDeviceConfig(const WifiDeviceConfig &config, int &result)

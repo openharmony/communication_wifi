@@ -73,6 +73,23 @@ ErrCode WifiDeviceImpl::DisableWifi()
     return client_->DisableWifi();
 }
 
+ErrCode WifiDeviceImpl::InitWifiProtect(const WifiProtectType &protectType, const std::string &protectName)
+{
+    RETURN_IF_FAIL(client_);
+    return client_->InitWifiProtect(protectType, protectName);
+}
+
+ErrCode WifiDeviceImpl::GetWifiProtectRef(const WifiProtectMode &protectMode, const std::string &protectName)
+{
+    RETURN_IF_FAIL(client_);
+    return client_->GetWifiProtectRef(protectMode, protectName);
+}
+
+ErrCode WifiDeviceImpl::PutWifiProtectRef(const std::string &protectName)
+{
+    RETURN_IF_FAIL(client_);
+    return client_->PutWifiProtectRef(protectName);
+}
 ErrCode WifiDeviceImpl::AddDeviceConfig(const WifiDeviceConfig &config, int &result)
 {
     RETURN_IF_FAIL(client_);

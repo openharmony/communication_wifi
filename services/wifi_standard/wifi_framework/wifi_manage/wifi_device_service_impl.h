@@ -44,6 +44,11 @@ public:
 
     ErrCode DisableWifi() override;
 
+    ErrCode InitWifiProtect(const WifiProtectType &protectType, const std::string &protectName) override;
+
+    ErrCode GetWifiProtectRef(const WifiProtectMode &protectMode, const std::string &protectName) override;
+
+    ErrCode PutWifiProtectRef(const std::string &protectName) override;
     ErrCode AddDeviceConfig(const WifiDeviceConfig &config, int &result) override;
 
     ErrCode RemoveDevice(int networkId) override;

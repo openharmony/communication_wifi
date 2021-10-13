@@ -37,6 +37,9 @@ void WifiDeviceStub::InitHandleMap()
 {
     handleFuncMap[WIFI_SVR_CMD_ENABLE_WIFI] = &WifiDeviceStub::OnEnableWifi;
     handleFuncMap[WIFI_SVR_CMD_DISABLE_WIFI] = &WifiDeviceStub::OnDisableWifi;
+    handleFuncMap[WIFI_SVR_CMD_INIT_WIFI_PROTECT] = &WifiDeviceStub::OnInitWifiProtect;
+    handleFuncMap[WIFI_SVR_CMD_GET_WIFI_PROTECT] = &WifiDeviceStub::OnGetWifiProtectRef;
+    handleFuncMap[WIFI_SVR_CMD_PUT_WIFI_PROTECT] = &WifiDeviceStub::OnPutWifiProtectRef;
     handleFuncMap[WIFI_SVR_CMD_ADD_DEVICE_CONFIG] = &WifiDeviceStub::OnAddDeviceConfig;
     handleFuncMap[WIFI_SVR_CMD_REMOVE_DEVICE_CONFIG] = &WifiDeviceStub::OnRemoveDevice;
     handleFuncMap[WIFI_SVR_CMD_REMOVE_ALL_DEVICE_CONFIG] = &WifiDeviceStub::OnRemoveAllDevice;
@@ -101,6 +104,37 @@ void WifiDeviceStub::OnDisableWifi(uint32_t code, MessageParcel &data, MessagePa
     return;
 }
 
+void WifiDeviceStub::OnInitWifiProtect(uint32_t code, MessageParcel &data, MessageParcel &reply)
+{
+    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+    WifiProtectType protectType = (WifiProtectType)data.ReadInt32();
+    std::string protectName = data.ReadCString();
+    ErrCode ret = InitWifiProtect(protectType, protectName);
+    reply.WriteInt32(0);
+    reply.WriteInt32(ret);
+    return;
+}
+
+void WifiDeviceStub::OnGetWifiProtectRef(uint32_t code, MessageParcel &data, MessageParcel &reply)
+{
+    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+    WifiProtectMode protectMode = (WifiProtectMode)data.ReadInt32();
+    std::string protectName = data.ReadCString();
+    ErrCode ret = GetWifiProtectRef(protectMode, protectName);
+    reply.WriteInt32(0);
+    reply.WriteInt32(ret);
+    return;
+}
+
+void WifiDeviceStub::OnPutWifiProtectRef(uint32_t code, MessageParcel &data, MessageParcel &reply)
+{
+    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+    std::string protectName = data.ReadCString();
+    ErrCode ret = PutWifiProtectRef(protectName);
+    reply.WriteInt32(0);
+    reply.WriteInt32(ret);
+    return;
+}
 void WifiDeviceStub::OnAddDeviceConfig(uint32_t code, MessageParcel &data, MessageParcel &reply)
 {
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());

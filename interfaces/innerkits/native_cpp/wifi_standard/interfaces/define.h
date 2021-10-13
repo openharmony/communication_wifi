@@ -49,6 +49,9 @@
 #define WIFI_SVR_CMD_REMOVE_ALL_DEVICE_CONFIG 0x1020  /* remove all network configs */
 #define WIFI_SVR_CMD_GET_SUPPORTED_FEATURES 0x1021    /* get supported features */
 #define WIFI_SVR_CMD_GET_DERVICE_MAC_ADD 0x1022       /* get mac address */
+#define WIFI_SVR_CMD_INIT_WIFI_PROTECT 0x1023        /* init the Wi-Fi protect. */
+#define WIFI_SVR_CMD_GET_WIFI_PROTECT 0x1024         /* get the Wi-Fi protect. */
+#define WIFI_SVR_CMD_PUT_WIFI_PROTECT 0x1025         /* put the Wi-Fi protect. */
 
 /* -------------ap module message define----------------- */
 #define WIFI_SVR_CMD_ENABLE_WIFI_AP 0x1100            /* open ap */

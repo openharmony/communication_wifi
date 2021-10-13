@@ -86,6 +86,8 @@ ohos_source_set("wifi_device_service_impl") {
     "wifi_device_death_recipient.cpp",
     "wifi_device_service_impl.cpp",
     "wifi_device_stub.cpp",
+    "wifi_protect.cpp",
+    "wifi_protect_manager.cpp",
   ]
   configs = [
     ":wifi_manager_service_config",
@@ -174,6 +176,7 @@ ohos_shared_library("wifi_device_ability") {
     ":wifi_device_service_impl",
     ":wifi_manager_service",
     "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog",
+    "//foundation/communication/wifi/services/wifi_standard/wifi_framework/wifi_manage/idl_client:wifi_idl_client",
     "//foundation/distributedschedule/safwk/interfaces/innerkits/safwk:system_ability_fwk",
     "//utils/native/base:utils",
   ]
@@ -188,6 +191,7 @@ ohos_shared_library("wifi_scan_ability") {
     ":wifi_manager_service",
     ":wifi_scan_service_impl",
     "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog",
+    "//foundation/communication/wifi/services/wifi_standard/wifi_framework/wifi_manage/idl_client:wifi_idl_client",
     "//foundation/distributedschedule/safwk/interfaces/innerkits/safwk:system_ability_fwk",
     "//utils/native/base:utils",
   ]

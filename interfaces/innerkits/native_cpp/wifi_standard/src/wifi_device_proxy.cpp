@@ -82,6 +82,92 @@ ErrCode WifiDeviceProxy::DisableWifi()
     return ErrCode(reply.ReadInt32());
 }
 
+ErrCode WifiDeviceProxy::InitWifiProtect(const WifiProtectType &protectType, const std::string &protectName)
+{
+    if (mRemoteDied) {
+        WIFI_LOGD("failed to `%{public}s`,remote service is died!", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    MessageOption option;
+    MessageParcel data, reply;
+    data.WriteInt32(0);
+    data.WriteInt32((int)protectType);
+    data.WriteCString(protectName.c_str());
+
+    int error = Remote()->SendRequest(WIFI_SVR_CMD_INIT_WIFI_PROTECT, data, reply, option);
+    if (error != ERR_NONE) {
+        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d", WIFI_SVR_CMD_INIT_WIFI_PROTECT, error);
+        return ErrCode(error);
+    }
+    int exception = reply.ReadInt32();
+    if (exception) {
+        return WIFI_OPT_FAILED;
+    }
+    int ret = reply.ReadInt32();
+    if (ret != WIFI_OPT_SUCCESS) {
+        return ErrCode(ret);
+    }
+
+    return WIFI_OPT_SUCCESS;
+}
+
+ErrCode WifiDeviceProxy::GetWifiProtectRef(const WifiProtectMode &protectMode, const std::string &protectName)
+{
+    if (mRemoteDied) {
+        WIFI_LOGD("failed to `%{public}s`,remote service is died!", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    MessageOption option;
+    MessageParcel data, reply;
+    data.WriteInt32(0);
+    data.WriteInt32((int)protectMode);
+    data.WriteCString(protectName.c_str());
+
+    int error = Remote()->SendRequest(WIFI_SVR_CMD_GET_WIFI_PROTECT, data, reply, option);
+    if (error != ERR_NONE) {
+        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d", WIFI_SVR_CMD_GET_WIFI_PROTECT, error);
+        return ErrCode(error);
+    }
+    int exception = reply.ReadInt32();
+    if (exception) {
+        return WIFI_OPT_FAILED;
+    }
+    int ret = reply.ReadInt32();
+    if (ret != WIFI_OPT_SUCCESS) {
+        return ErrCode(ret);
+    }
+
+    return WIFI_OPT_SUCCESS;
+}
+
+ErrCode WifiDeviceProxy::PutWifiProtectRef(const std::string &protectName)
+{
+    if (mRemoteDied) {
+        WIFI_LOGD("failed to `%{public}s`,remote service is died!", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    MessageOption option;
+    MessageParcel data, reply;
+    data.WriteInt32(0);
+    data.WriteCString(protectName.c_str());
+
+    int error = Remote()->SendRequest(WIFI_SVR_CMD_PUT_WIFI_PROTECT, data, reply, option);
+    if (error != ERR_NONE) {
+        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d", WIFI_SVR_CMD_PUT_WIFI_PROTECT, error);
+        return ErrCode(error);
+    }
+    int exception = reply.ReadInt32();
+    if (exception) {
+        return WIFI_OPT_FAILED;
+    }
+    int ret = reply.ReadInt32();
+    if (ret != WIFI_OPT_SUCCESS) {
+        return ErrCode(ret);
+    }
+
+    return WIFI_OPT_SUCCESS;
+}
+
 void WifiDeviceProxy::WriteIpAddress(MessageParcel &data, const WifiIpAddress &address)
 {
     data.WriteInt32(address.family);

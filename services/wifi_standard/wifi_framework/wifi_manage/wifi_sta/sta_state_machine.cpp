@@ -704,7 +704,6 @@ void StaStateMachine::DealConnectToUserSelectedNetwork(InternalMessage *msg)
 
     /* Sets network status. */
     WifiSettings::GetInstance().EnableNetwork(networkId, forceReconnect);
-    WifiSettings::GetInstance().SetDeviceState(networkId, (int)WifiDeviceConfigStatus::ENABLED, false);
     StartConnectToNetwork(networkId);
 }
 
@@ -733,6 +732,8 @@ void StaStateMachine::DealConnectionEvent(InternalMessage *msg)
     }
 
     WIFI_LOGD("enter DealConnectionEvent");
+    WifiSettings::GetInstance().SetDeviceState(targetNetworkId, (int)WifiDeviceConfigStatus::ENABLED, false);
+    WifiSettings::GetInstance().SyncDeviceConfig();
     /* Stop clearing the Wpa_blocklist. */
     StopTimer(static_cast<int>(WPA_BLOCK_LIST_CLEAR_EVENT));
     StopTimer(static_cast<int>(CMD_NETWORK_CONNECT_TIMEOUT));
@@ -743,7 +744,7 @@ void StaStateMachine::DealConnectionEvent(InternalMessage *msg)
         wpsState = SetupMethod::INVALID;
     }
     /* Callback result to InterfaceService. */
-    staCallback.OnStaConnChanged(OperateResState::CONNECT_AP_CONNECTED, linkedInfo);
+    staCallback.OnStaConnChanged(OperateResState::CONNECT_OBTAINING_IP, linkedInfo);
 
     /* The current state of StaStateMachine transfers to GetIpState. */
     SwitchState(pGetIpState);
@@ -790,9 +791,11 @@ void StaStateMachine::DealWpaWrongPskEvent(InternalMessage *msg)
     if (msg == nullptr) {
         WIFI_LOGE("msg is null\n");
     }
-    WIFI_LOGD("enter DealStartWpsCmd\n");
+    WIFI_LOGD("enter DealWpaWrongPskEvent\n");
     InitWifiLinkedInfo();
     WifiSettings::GetInstance().SaveLinkedInfo(linkedInfo);
+    WifiSettings::GetInstance().SetDeviceState(targetNetworkId, (int)WifiDeviceConfigStatus::DISABLED);
+    WifiSettings::GetInstance().SyncDeviceConfig();
     staCallback.OnStaConnChanged(OperateResState::CONNECT_PASSWORD_WRONG, linkedInfo);
 }
 

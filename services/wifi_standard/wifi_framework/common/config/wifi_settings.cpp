@@ -906,6 +906,7 @@ bool WifiSettings::GetStaLastRunState()
 int WifiSettings::SetStaLastRunState(bool bRun)
 {
     mWifiConfig.staLastState = bRun;
+    SyncWifiConfig();
     return 0;
 }
 

@@ -339,7 +339,7 @@ struct WifiDeviceConfig {
     WifiDeviceConfig()
     {
         networkId = INVALID_NETWORK_ID;
-        status = static_cast<int>(WifiDeviceConfigStatus::ENABLED);
+        status = static_cast<int>(WifiDeviceConfigStatus::DISABLED);
         band = 0;
         channel = 0;
         frequency = 0;

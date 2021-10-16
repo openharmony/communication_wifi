@@ -139,7 +139,7 @@ ErrCode WifiDeviceServiceImpl::EnableWifi()
         WifiServiceManager::GetInstance().UnloadService(WIFI_SERVICE_STA);
         return errCode;
     }
-
+    WifiSettings::GetInstance().SyncWifiConfig();
     return WIFI_OPT_SUCCESS;
 }
 
@@ -217,6 +217,15 @@ ErrCode WifiDeviceServiceImpl::AddDeviceConfig(const WifiDeviceConfig &config, i
     if (pService == nullptr) {
         return WIFI_OPT_STA_NOT_OPENED;
     }
+
+    if ((config.ssid.length() <= 0) || (config.keyMgmt.length()) <= 0) {
+        return WIFI_OPT_INVALID_PARAM;
+    }
+
+    if (config.keyMgmt != "NONE" && config.preSharedKey.length() <= 0) {
+        return WIFI_OPT_INVALID_PARAM;
+    }
+
     int retNetworkId = pService->AddDeviceConfig(config);
     if (retNetworkId < 0) {
         return WIFI_OPT_FAILED;
@@ -234,6 +243,10 @@ ErrCode WifiDeviceServiceImpl::RemoveDevice(int networkId)
 
     if (!IsStaServiceRunning()) {
         return WIFI_OPT_STA_NOT_OPENED;
+    }
+
+    if (networkId < 0) {
+        return WIFI_OPT_INVALID_PARAM;
     }
 
     IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst();
@@ -283,6 +296,10 @@ ErrCode WifiDeviceServiceImpl::EnableDeviceConfig(int networkId, bool attemptEna
         return WIFI_OPT_STA_NOT_OPENED;
     }
 
+    if (networkId < 0) {
+        return WIFI_OPT_INVALID_PARAM;
+    }
+
     IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst();
     if (pService == nullptr) {
         return WIFI_OPT_STA_NOT_OPENED;
@@ -299,6 +316,10 @@ ErrCode WifiDeviceServiceImpl::DisableDeviceConfig(int networkId)
 
     if (!IsStaServiceRunning()) {
         return WIFI_OPT_STA_NOT_OPENED;
+    }
+
+    if (networkId < 0) {
+        return WIFI_OPT_INVALID_PARAM;
     }
 
     IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst();
@@ -319,6 +340,10 @@ ErrCode WifiDeviceServiceImpl::ConnectToNetwork(int networkId)
         return WIFI_OPT_STA_NOT_OPENED;
     }
 
+    if (networkId < 0) {
+        return WIFI_OPT_INVALID_PARAM;
+    }
+
     IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst();
     if (pService == nullptr) {
         return WIFI_OPT_STA_NOT_OPENED;
@@ -335,6 +360,14 @@ ErrCode WifiDeviceServiceImpl::ConnectToDevice(const WifiDeviceConfig &config)
 
     if (!IsStaServiceRunning()) {
         return WIFI_OPT_STA_NOT_OPENED;
+    }
+
+    if ((config.ssid.length() <= 0) || (config.keyMgmt.length()) <= 0) {
+        return WIFI_OPT_INVALID_PARAM;
+    }
+
+    if (config.keyMgmt != "NONE" && config.preSharedKey.length() <= 0 ) {
+        return WIFI_OPT_INVALID_PARAM;
     }
 
     IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst();

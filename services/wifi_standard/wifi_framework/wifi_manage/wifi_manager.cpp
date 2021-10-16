@@ -51,6 +51,61 @@ WifiManager::WifiManager() : mInitStatus(INIT_UNKNOWN), mSupportedFeatures(0)
 WifiManager::~WifiManager()
 {}
 
+
+void WifiManager::AutoStartStaService(void)
+{
+    WifiOprMidState staState = WifiConfigCenter::GetInstance().GetWifiMidState();
+    if (staState == WifiOprMidState::CLOSED) {
+        if (!WifiConfigCenter::GetInstance().SetWifiMidState(staState, WifiOprMidState::OPENING)) {
+            WIFI_LOGD("set sta mid state opening failed! may be other activity has been operated");
+            return;
+        }
+        ErrCode errCode = WIFI_OPT_FAILED;
+        do {
+            if (WifiServiceManager::GetInstance().CheckAndEnforceService(WIFI_SERVICE_STA) < 0) {
+                WIFI_LOGE("Load %s service failed!", WIFI_SERVICE_STA);
+                break;
+            }
+            IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst();
+            if (pService == nullptr) {
+                WIFI_LOGE("Create %s service failed!", WIFI_SERVICE_STA);
+                break;
+            }
+            errCode = pService->RegisterStaServiceCallback(WifiManager::GetInstance().GetStaCallback());
+            if (errCode != WIFI_OPT_SUCCESS) {
+                WIFI_LOGE("Register sta service callback failed!");
+                break;
+            }
+            errCode = pService->EnableWifi();
+            if (errCode != WIFI_OPT_SUCCESS) {
+                WIFI_LOGE("service enable sta failed, ret %d!", static_cast<int>(errCode));
+                break;
+            }
+        } while (0);
+        if (errCode != WIFI_OPT_SUCCESS) {
+            WifiConfigCenter::GetInstance().SetWifiMidState(WifiOprMidState::OPENING, WifiOprMidState::CLOSED);
+            WifiServiceManager::GetInstance().UnloadService(WIFI_SERVICE_STA);
+        }
+    }
+    return;
+}
+
+void WifiManager::AutoStartScanService(void)
+{
+    if (!WifiConfigCenter::GetInstance().IsScanAlwaysActive()) {
+        WIFI_LOGD("Scan always is not open, not open scan service.");
+        return;
+    }
+    ScanControlInfo info;
+    WifiConfigCenter::GetInstance().GetScanControlInfo(info);
+    if (!IsAllowScanAnyTime(info)) {
+        WIFI_LOGD("Scan control does not support scan always, not open scan service here.");
+        return;
+    }
+    CheckAndStartScanService();
+    return;
+}
+
 int WifiManager::Init()
 {
     if (WifiConfigCenter::GetInstance().Init() < 0) {
@@ -82,6 +137,23 @@ int WifiManager::Init()
     InitP2pCallback();
     if (!WifiConfigCenter::GetInstance().GetSupportedBandChannel()) {
         WIFI_LOGE("Failed to get current chip supported band and channel!");
+    }
+
+    if (WifiServiceManager::GetInstance().CheckPreLoadService() < 0) {
+        WIFI_LOGE("WifiServiceManager check preload feature service failed!");
+        WifiManager::GetInstance().Exit();
+        return -1;
+    }
+    if (WifiConfigCenter::GetInstance().GetStaLastRunState()) { /* Automatic startup upon startup */
+        WIFI_LOGE("AutoStartStaService");
+        AutoStartStaService();
+    } else {
+        /**
+         * The sta service automatically starts upon startup. After the sta
+         * service is started, the scanning is directly started.
+         */
+        WIFI_LOGE("AutoStartScanService");
+        AutoStartScanService();
     }
     return 0;
 }

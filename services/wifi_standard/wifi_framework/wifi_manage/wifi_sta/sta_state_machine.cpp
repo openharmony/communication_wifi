@@ -723,6 +723,7 @@ void StaStateMachine::DealConnectTimeOutCmd(InternalMessage *msg)
     InitWifiLinkedInfo();
     WifiSettings::GetInstance().SaveLinkedInfo(linkedInfo);
     staCallback.OnStaConnChanged(OperateResState::CONNECT_CONNECTING_TIMEOUT, linkedInfo);
+    staCallback.OnStaConnChanged(OperateResState::DISCONNECT_DISCONNECTED, linkedInfo);
 }
 
 void StaStateMachine::DealConnectionEvent(InternalMessage *msg)

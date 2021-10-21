@@ -245,6 +245,9 @@ void WifiSettings::ClearDeviceConfig(void)
 int WifiSettings::GetDeviceConfig(std::vector<WifiDeviceConfig> &results)
 {
     std::unique_lock<std::mutex> lock(mConfigMutex);
+    if (mWifiDeviceConfig.empty()) {
+        ReloadDeviceConfig();
+    }
     for (auto iter = mWifiDeviceConfig.begin(); iter != mWifiDeviceConfig.end(); iter++) {
         results.push_back(iter->second);
     }
@@ -254,6 +257,9 @@ int WifiSettings::GetDeviceConfig(std::vector<WifiDeviceConfig> &results)
 int WifiSettings::GetDeviceConfig(const int &networkId, WifiDeviceConfig &config)
 {
     std::unique_lock<std::mutex> lock(mConfigMutex);
+    if (mWifiDeviceConfig.empty()) {
+        ReloadDeviceConfig();
+    }
     for (auto iter = mWifiDeviceConfig.begin(); iter != mWifiDeviceConfig.end(); iter++) {
         if (iter->second.networkId == networkId) {
             config = iter->second;
@@ -266,6 +272,9 @@ int WifiSettings::GetDeviceConfig(const int &networkId, WifiDeviceConfig &config
 int WifiSettings::GetDeviceConfig(const std::string &index, const int &indexType, WifiDeviceConfig &config)
 {
     std::unique_lock<std::mutex> lock(mConfigMutex);
+    if (mWifiDeviceConfig.empty()) {
+        ReloadDeviceConfig();
+    }
     if (indexType == DEVICE_CONFIG_INDEX_SSID) {
         for (auto iter = mWifiDeviceConfig.begin(); iter != mWifiDeviceConfig.end(); iter++) {
             if (iter->second.ssid == index) {
@@ -287,6 +296,9 @@ int WifiSettings::GetDeviceConfig(const std::string &index, const int &indexType
 int WifiSettings::GetDeviceConfig(const std::string &ssid, const std::string &keymgmt, WifiDeviceConfig &config)
 {
     std::unique_lock<std::mutex> lock(mConfigMutex);
+    if (mWifiDeviceConfig.empty()) {
+        ReloadDeviceConfig();
+    }
     for (auto iter = mWifiDeviceConfig.begin(); iter != mWifiDeviceConfig.end(); iter++) {
         if ((iter->second.ssid == ssid) && (iter->second.keyMgmt == keymgmt)) {
             config = iter->second;
@@ -299,6 +311,9 @@ int WifiSettings::GetDeviceConfig(const std::string &ssid, const std::string &ke
 int WifiSettings::GetHiddenDeviceConfig(std::vector<WifiDeviceConfig> &results)
 {
     std::unique_lock<std::mutex> lock(mConfigMutex);
+    if (mWifiDeviceConfig.empty()) {
+        ReloadDeviceConfig();
+    }
     for (auto iter = mWifiDeviceConfig.begin(); iter != mWifiDeviceConfig.end(); iter++) {
         if (iter->second.hiddenSSID) {
             results.push_back(iter->second);

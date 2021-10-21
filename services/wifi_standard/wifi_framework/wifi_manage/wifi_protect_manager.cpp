@@ -91,7 +91,6 @@ bool WifiProtectManager::InitWifiProtect(const WifiProtectType &protectType, con
 bool WifiProtectManager::GetWifiProtect(const WifiProtectMode &protectMode, const std::string name)
 {
     bool isAlreadyExist = false;
-    WifiProtect *pProtect = nullptr;
 
     std::vector<WifiProtect *>::iterator itor = mWifiProtects.begin();
     while (itor != mWifiProtects.end()) {
@@ -99,8 +98,6 @@ bool WifiProtectManager::GetWifiProtect(const WifiProtectMode &protectMode, cons
             LOGD("old name = %{public}s, and new Name = %{public}s",
                 (*itor)->GetName().c_str(),
                 (*itor)->GetName().c_str());
-                pProtect = (*itor);
-
             isAlreadyExist = true;
             break;
         }
@@ -109,11 +106,15 @@ bool WifiProtectManager::GetWifiProtect(const WifiProtectMode &protectMode, cons
 
     if (isAlreadyExist) {
         LOGD("attempted to add a protect when already holding one");
-        delete pProtect;
-        pProtect = nullptr;
         return false;
     }
 
+    WifiProtect *pProtect = new WifiProtect(name);
+    if (pProtect == nullptr) {
+        LOGE("Wifi protect pointer is null.");
+        return false;
+    }
+    pProtect->SetProtectMode(protectMode);
     return AddProtect(pProtect);
 }
 
@@ -141,6 +142,7 @@ void WifiProtectManager::UpdateWifiClientConnected(bool isConnected)
 
 bool WifiProtectManager::AddProtect(WifiProtect *pProtect)
 {
+    mWifiProtects.push_back(pProtect);
     switch (pProtect->GetProtectMode()) {
         case WifiProtectMode::WIFI_PROTECT_FULL_HIGH_PERF:
             if (mWifiConnected) {

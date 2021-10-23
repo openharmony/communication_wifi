@@ -38,7 +38,7 @@ static void InitEventClass(napi_env& env, napi_value& exports) {
         sizeof(properties) / sizeof(napi_property_descriptor), properties, &eventListenerClass);
     napi_status status = napi_set_named_property(env, exports, "EventListener", eventListenerClass);
     if (status != napi_ok) {
-        WIFI_LOGE("[Napi Entry] Init event class set property error.");
+        WIFI_LOGE("Init event class set property error.");
     }
 }
 
@@ -57,6 +57,24 @@ static napi_value Init(napi_env env, napi_value exports) {
         DECLARE_NAPI_FUNCTION("connectToDevice", ConnectToDevice),
         DECLARE_NAPI_FUNCTION("disconnect", Disconnect),
         DECLARE_NAPI_FUNCTION("getSignalLevel", GetSignalLevel),
+        DECLARE_NAPI_FUNCTION("reconnect", ReConnect),
+        DECLARE_NAPI_FUNCTION("reassociate", ReAssociate),
+        DECLARE_NAPI_FUNCTION("getIpInfo", GetIpInfo),
+        DECLARE_NAPI_FUNCTION("getLinkedInfo", GetLinkedInfo),
+        DECLARE_NAPI_FUNCTION("removeDevice", RemoveDevice),
+        DECLARE_NAPI_FUNCTION("removeAllNetwork", RemoveAllNetwork),
+        DECLARE_NAPI_FUNCTION("disableNetwork", DisableNetwork),
+        DECLARE_NAPI_FUNCTION("getCountryCode", GetCountryCode),
+        DECLARE_NAPI_FUNCTION("getDeviceConfigs", GetDeviceConfigs),
+        DECLARE_NAPI_FUNCTION("getSupportedFeatures", GetSupportedFeatures),
+        DECLARE_NAPI_FUNCTION("isFeatureSupported", IsFeatureSupported),
+        DECLARE_NAPI_FUNCTION("getDeviceMacAddress", GetDeviceMacAddress),
+        DECLARE_NAPI_FUNCTION("isHotspotActive", IsHotspotActive),
+        DECLARE_NAPI_FUNCTION("enableHotspot", EnableHotspot),
+        DECLARE_NAPI_FUNCTION("disableHotspot", DisableHotspot),
+        DECLARE_NAPI_FUNCTION("setHotspotConfig", SetHotspotConfig),
+        DECLARE_NAPI_FUNCTION("getHotspotConfig", GetHotspotConfig),
+        DECLARE_NAPI_FUNCTION("getStations", GetStations),
     };
 
     NAPI_CALL(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(napi_property_descriptor), desc));

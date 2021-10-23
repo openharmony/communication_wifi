@@ -16,6 +16,7 @@
 #include <algorithm>
 #include "define.h"
 #include "wifi_global_func.h"
+#include "wifi_log.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -244,10 +245,11 @@ void WifiSettings::ClearDeviceConfig(void)
 
 int WifiSettings::GetDeviceConfig(std::vector<WifiDeviceConfig> &results)
 {
-    std::unique_lock<std::mutex> lock(mConfigMutex);
-    if (mWifiDeviceConfig.empty()) {
+    if (!deviceConfigLoadFlag.test_and_set()) {
+        LOGE("Reload wifi config");
         ReloadDeviceConfig();
     }
+    std::unique_lock<std::mutex> lock(mConfigMutex);
     for (auto iter = mWifiDeviceConfig.begin(); iter != mWifiDeviceConfig.end(); iter++) {
         results.push_back(iter->second);
     }
@@ -256,10 +258,11 @@ int WifiSettings::GetDeviceConfig(std::vector<WifiDeviceConfig> &results)
 
 int WifiSettings::GetDeviceConfig(const int &networkId, WifiDeviceConfig &config)
 {
-    std::unique_lock<std::mutex> lock(mConfigMutex);
-    if (mWifiDeviceConfig.empty()) {
+    if (!deviceConfigLoadFlag.test_and_set()) {
+        LOGE("Reload wifi config");
         ReloadDeviceConfig();
     }
+    std::unique_lock<std::mutex> lock(mConfigMutex);
     for (auto iter = mWifiDeviceConfig.begin(); iter != mWifiDeviceConfig.end(); iter++) {
         if (iter->second.networkId == networkId) {
             config = iter->second;
@@ -271,10 +274,11 @@ int WifiSettings::GetDeviceConfig(const int &networkId, WifiDeviceConfig &config
 
 int WifiSettings::GetDeviceConfig(const std::string &index, const int &indexType, WifiDeviceConfig &config)
 {
-    std::unique_lock<std::mutex> lock(mConfigMutex);
-    if (mWifiDeviceConfig.empty()) {
+    if (!deviceConfigLoadFlag.test_and_set()) {
+        LOGE("Reload wifi config");
         ReloadDeviceConfig();
     }
+    std::unique_lock<std::mutex> lock(mConfigMutex);
     if (indexType == DEVICE_CONFIG_INDEX_SSID) {
         for (auto iter = mWifiDeviceConfig.begin(); iter != mWifiDeviceConfig.end(); iter++) {
             if (iter->second.ssid == index) {
@@ -295,10 +299,11 @@ int WifiSettings::GetDeviceConfig(const std::string &index, const int &indexType
 
 int WifiSettings::GetDeviceConfig(const std::string &ssid, const std::string &keymgmt, WifiDeviceConfig &config)
 {
-    std::unique_lock<std::mutex> lock(mConfigMutex);
-    if (mWifiDeviceConfig.empty()) {
+    if (!deviceConfigLoadFlag.test_and_set()) {
+        LOGE("Reload wifi config");
         ReloadDeviceConfig();
     }
+    std::unique_lock<std::mutex> lock(mConfigMutex);
     for (auto iter = mWifiDeviceConfig.begin(); iter != mWifiDeviceConfig.end(); iter++) {
         if ((iter->second.ssid == ssid) && (iter->second.keyMgmt == keymgmt)) {
             config = iter->second;
@@ -310,10 +315,11 @@ int WifiSettings::GetDeviceConfig(const std::string &ssid, const std::string &ke
 
 int WifiSettings::GetHiddenDeviceConfig(std::vector<WifiDeviceConfig> &results)
 {
-    std::unique_lock<std::mutex> lock(mConfigMutex);
-    if (mWifiDeviceConfig.empty()) {
+    if (!deviceConfigLoadFlag.test_and_set()) {
+        LOGE("Reload wifi config");
         ReloadDeviceConfig();
     }
+    std::unique_lock<std::mutex> lock(mConfigMutex);
     for (auto iter = mWifiDeviceConfig.begin(); iter != mWifiDeviceConfig.end(); iter++) {
         if (iter->second.hiddenSSID) {
             results.push_back(iter->second);
@@ -401,8 +407,11 @@ int WifiSettings::ReloadDeviceConfig()
 #ifndef CONFIG_NO_CONFIG_WRITE
     int ret = mSavedDeviceConfig.LoadConfig();
     if (ret < 0) {
+        deviceConfigLoadFlag.clear();
+        LOGE("Loading device config failed: %{public}d", ret);
         return -1;
     }
+    deviceConfigLoadFlag.test_and_set();
     std::vector<WifiDeviceConfig> tmp;
     mSavedDeviceConfig.GetValue(tmp);
     std::unique_lock<std::mutex> lock(mConfigMutex);
@@ -424,6 +433,7 @@ int WifiSettings::AddWpsDeviceConfig(const WifiDeviceConfig &config)
 {
     int ret = mSavedDeviceConfig.LoadConfig();
     if (ret < 0) {
+        LOGE("Add Wps config loading config failed: %{public}d", ret);
         return -1;
     }
     std::vector<WifiDeviceConfig> tmp;

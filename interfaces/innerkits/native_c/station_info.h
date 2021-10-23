@@ -48,7 +48,7 @@
  * @since 7
  */
 typedef struct {
-    /** Network name of the station */
+    /** Network name of the station. Notice: please pre-allocate memory for "name" */
     char *name;
     /** MAC address. For its length, see {@link WIFI_MAC_LEN}. */
     unsigned char macAddress[WIFI_MAC_LEN];

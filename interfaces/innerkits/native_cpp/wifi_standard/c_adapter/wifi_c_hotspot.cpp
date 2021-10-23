@@ -135,9 +135,14 @@ WifiErrorCode GetHotspotConfig(HotspotConfig *result)
 static WifiErrorCode GetStaListFromCpp(const std::vector<OHOS::Wifi::StationInfo>& vecStaList, StationInfo *result)
 {
     for (auto& each : vecStaList) {
-        if (memcpy_s(result->name, DEVICE_NAME_LEN, each.deviceName.c_str(), each.deviceName.size() + 1) != EOK) {
-            return ERROR_WIFI_UNKNOWN;
+        if (result->name != nullptr) {
+            if (memcpy_s(result->name, DEVICE_NAME_LEN, each.deviceName.c_str(), each.deviceName.size() + 1) != EOK) {
+                return ERROR_WIFI_UNKNOWN;
+            }
+        } else {
+            WIFI_LOGE("WARN: device name is not pre-allocate memory!");
         }
+
         if (OHOS::Wifi::MacStrToArray(each.bssid, result->macAddress) != EOK) {
             WIFI_LOGE("Get sta list convert bssid error!");
             return ERROR_WIFI_UNKNOWN;

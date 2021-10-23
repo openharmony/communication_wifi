@@ -15,6 +15,7 @@
 #include "wifi_global_func.h"
 #include <algorithm>
 #include "wifi_log.h"
+
 #undef LOG_TAG
 #define LOG_TAG "WifiGlobalFunc"
 
@@ -34,6 +35,7 @@ constexpr int CHANNEL_5G_MIN = 34;
 ErrCode CfgCheckSsid(const HotspotConfig &cfg)
 {
     if (cfg.GetSsid().length() < MIN_SSID_LEN || cfg.GetSsid().length() > MAX_SSID_LEN) {
+        LOGE("Config ssid length is invalid!");
         return ErrCode::WIFI_OPT_INVALID_PARAM;
     }
     return ErrCode::WIFI_OPT_SUCCESS;
@@ -41,7 +43,9 @@ ErrCode CfgCheckSsid(const HotspotConfig &cfg)
 
 ErrCode CfgCheckPsk(const HotspotConfig &cfg)
 {
-    if (cfg.GetPreSharedKey().length() < MIN_PSK_LEN || cfg.GetPreSharedKey().length() > MAX_PSK_LEN) {
+    size_t len = cfg.GetPreSharedKey().length();
+    if (len < MIN_PSK_LEN || len > MAX_PSK_LEN) {
+        LOGE("PreSharedKey length error! invalid len: %{public}zu", len);
         return ErrCode::WIFI_OPT_INVALID_PARAM;
     }
     return ErrCode::WIFI_OPT_SUCCESS;
@@ -54,6 +58,7 @@ ErrCode CfgCheckBand(const HotspotConfig &cfg, std::vector<BandType> &bandsFromC
             return ErrCode::WIFI_OPT_SUCCESS;
         }
     }
+    LOGE("Hotspot config band is invalid!");
     return ErrCode::WIFI_OPT_INVALID_PARAM;
 }
 
@@ -73,6 +78,7 @@ ErrCode IsValidHotspotConfig(const HotspotConfig &cfg, const HotspotConfig &cfgF
 
     if (cfg.GetSecurityType() == KeyMgmt::NONE) {
         if (cfg.GetPreSharedKey().length() > 0) {
+            LOGE("Open hotspot PreSharedKey length is non-zero error!");
             return ErrCode::WIFI_OPT_INVALID_PARAM;
         }
     } else if (cfg.GetSecurityType() == KeyMgmt::WPA_PSK || cfg.GetSecurityType() == KeyMgmt::WPA2_PSK) {
@@ -80,6 +86,7 @@ ErrCode IsValidHotspotConfig(const HotspotConfig &cfg, const HotspotConfig &cfgF
             return ErrCode::WIFI_OPT_INVALID_PARAM;
         }
     } else {
+        LOGE("Hotspot securityType is not supported!");
         return ErrCode::WIFI_OPT_INVALID_PARAM;
     }
 
@@ -89,8 +96,10 @@ ErrCode IsValidHotspotConfig(const HotspotConfig &cfg, const HotspotConfig &cfgF
         }
     }
 
+    LOGD("Config channel is: %{public}d", cfg.GetChannel());
     if (cfg.GetChannel() != cfgFromCenter.GetChannel()) {
         if (CfgCheckChannel(cfg, channInfoFromCenter) == ErrCode::WIFI_OPT_INVALID_PARAM) {
+            LOGE("Config channel is invalid!");
             return ErrCode::WIFI_OPT_INVALID_PARAM;
         }
     }

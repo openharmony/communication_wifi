@@ -150,6 +150,7 @@ ErrCode WifiHotspotServiceImpl::SetHotspotConfig(const HotspotConfig &config)
     WifiConfigCenter::GetInstance().GetHotspotConfig(configFromCenter);
     ErrCode validRetval = IsValidHotspotConfig(config, configFromCenter, bandsFromCenter, channInfoFromCenter);
     if (validRetval != ErrCode::WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("Hotspot config is invalid!");
         return validRetval;
     }
 

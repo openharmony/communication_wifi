@@ -43,8 +43,8 @@
 
 namespace OHOS {
 namespace Wifi {
-const int MIN_NETWORK_NAME_LENGTH = 9;
-const int MAX_NETWORK_NAME_LENGTH = 32;
+const int MIN_GROUP_NAME_LENGTH = 9;
+const int MAX_GROUP_NAME_LENGTH = 32;
 const int DISC_TIMEOUT_S = 120;
 class P2pStateMachine : public StateMachine {
     class DhcpResultNotify : public IDhcpResultNotify {
@@ -163,7 +163,7 @@ private:
      * @return - bool  true:It is a persistent group and the reinvoke succeeds.
                        false:Not a persistent group or reinvoke failure.
      */
-    virtual bool ReawakenPersistentGroup(WifiP2pConfig &config) const;
+    virtual bool ReawakenPersistentGroup(WifiP2pConfigInternal &config) const;
 
     /**
      * @Description - Updates the latest device information based on the device address and returns.
@@ -182,7 +182,7 @@ private:
      */
     virtual void RemoveGroupByNetworkId(int networkId) const;
     /**
-     * @Description Updating the WifiP2pInfo information when a group is formed.
+     * @Description Updating the WifiP2pLinkedInfo information when a group is formed.
      * @param  groupOwnerAddress - address of the group owner
      */
     virtual void SetWifiP2pInfoWhenGroupFormed(const std::string &groupOwnerAddress);
@@ -198,14 +198,14 @@ private:
      * @return true - available
      * @return false - not available
      */
-    virtual bool IsUsableNetworkName(std::string nwName);
+    virtual bool IsUsableGroupName(std::string nwName);
     /**
      * @Description Check whether the specified P2P configuration is unavailable.
      *
      * @param config - specified P2P configuration
      * @return P2pConfigErrCode - error code of WifiP2pConfig
      */
-    virtual P2pConfigErrCode IsConfigUnusable(const WifiP2pConfig &config);
+    virtual P2pConfigErrCode IsConfigUnusable(const WifiP2pConfigInternal &config);
     /**
      * @Description If the P2P is configured with a network name and passphrase, the configuration is valid as a group.
      *
@@ -213,7 +213,7 @@ private:
      * @return true - valid
      * @return false - invalid
      */
-    virtual bool IsConfigUsableAsGroup(WifiP2pConfig config);
+    virtual bool IsConfigUsableAsGroup(WifiP2pConfigInternal config);
     /**
      * @Description Purging service discovery requests in WPAS.
      *
@@ -257,7 +257,7 @@ private:
      * @return true - all settings succeeded
      * @return false - one of settings failed
      */
-    virtual bool SetGroupConfig(const WifiP2pConfig &config, bool newGroup) const;
+    virtual bool SetGroupConfig(const WifiP2pConfigInternal &config, bool newGroup) const;
     /**
      * @Description Processing function of using configuration to create a group.
      *
@@ -266,7 +266,7 @@ private:
      * @return true - created successfully
      * @return false - creation failed
      */
-    virtual bool DealCreateNewGroupWithConfig(const WifiP2pConfig &config, int freq) const;
+    virtual bool DealCreateNewGroupWithConfig(const WifiP2pConfigInternal &config, int freq) const;
     /**
      * @Description Update persistent group's info to wpa.
      *
@@ -311,6 +311,41 @@ private:
      * @param  result - action confirmation result
      */
     virtual void BroadcastActionResult(P2pActionCallback action, ErrCode result) const;
+    /**
+     * @Description Broadcast receive p2p service response result in addition to bonjour and upnp.
+     *
+     * @param serviceType - protocol type
+     * @param respData - service response data
+     * @param srcDevice - source device
+     */
+    virtual void BroadcastServiceResult(P2pServicerProtocolType serviceType,
+        const std::vector<unsigned char> &respData, const WifiP2pDevice &srcDevice) const;
+    /**
+     * @Description Broadcast receive bonjour service response result.
+     *
+     * @param instName - instance name
+     * @param regType - registration type
+     * @param srcDevice - source device
+     */
+    virtual void BroadcastDnsSdServiceResult(
+        const std::string &instName, const std::string &regType, const WifiP2pDevice &srcDevice) const;
+    /**
+     * @Description Broadcast receive the result of bonjour txt record for a service.
+     *
+     * @param wholeDomainName - the whole domain name
+     * @param txtMap - txt record data as a map of key/value pairs
+     * @param srcDevice source device
+     */
+    virtual void BroadcastDnsSdTxtRecordResult(const std::string &wholeDomainName,
+        const std::map<std::string, std::string> &txtMap, const WifiP2pDevice &srcDevice) const;
+    /**
+     * @Description Broadcast receive upnp service response result.
+     *
+     * @param uniqueServiceNames - the list of unique service names
+     * @param srcDevice - source device
+     */
+    virtual void BroadcastUpnpServiceResult(
+        const std::vector<std::string> &uniqueServiceNames, const WifiP2pDevice &srcDevice) const;
 
     /**
      * @Description - Start the dhcp server and save the IP address to be assigned.
@@ -329,12 +364,12 @@ private:
     virtual void NotifyUserInvitationReceivedMessage();
 
 private:
-    virtual void P2pConnectByShowingPin(const WifiP2pConfig &config) const;
+    virtual void P2pConnectByShowingPin(const WifiP2pConfigInternal &config) const;
 
 private:
     IP2pServiceCallbacks p2pServiceCallbacks;  /* state machine -> service callback */
     std::string p2pIface;               /* P2P iface */
-    WifiP2pConfig savedP2pConfig;    /* record P2P config when communicating with the peer device */
+    WifiP2pConfigInternal savedP2pConfig;    /* record P2P config when communicating with the peer device */
     P2pMonitor &p2pMonitor;          /* P2P monitor */
     WifiP2pGroupManager &groupManager;   /* group manager */
     WifiP2pDeviceManager &deviceManager; /* device manager */

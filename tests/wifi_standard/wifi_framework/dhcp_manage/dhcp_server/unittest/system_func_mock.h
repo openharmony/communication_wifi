@@ -20,8 +20,11 @@
 #include <gmock/gmock.h>
 #include <stdint.h>
 #include <dlfcn.h>
-#include <sys/socket.h>
 #include <unistd.h>
+
+#ifdef __OHOS__
+typedef int socklen_t;
+#endif // __OHOS__
 
 using ::testing::_;
 using ::testing::Return;
@@ -35,6 +38,7 @@ public:
     MOCK_METHOD5(select, int(int __nfds, fd_set *__readfds, fd_set *__writefds, fd_set *__exceptfds,
         struct timeval *__timeout));
     MOCK_METHOD3(bind, int(int __fd, struct sockaddr *__addr, socklen_t __len));
+
     MOCK_METHOD6(sendto, ssize_t(int __fd, const void *__buf, size_t __n, int __flags, struct sockaddr *__addr,
         socklen_t __addr_len));
     MOCK_METHOD6(recvfrom, ssize_t(int __fd, void *__buf, size_t __n, int __flags, struct sockaddr *__addr,

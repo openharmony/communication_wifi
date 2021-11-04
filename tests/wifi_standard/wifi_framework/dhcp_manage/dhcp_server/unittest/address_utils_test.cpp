@@ -15,7 +15,6 @@
 
 #include <gtest/gtest.h>
 #include <stdint.h>
-#include "string_ex.h"
 #include "dhcp_define.h"
 #include "address_utils.h"
 
@@ -96,6 +95,20 @@ HWTEST(AddressUtilsTest, LastIpAddressTest, TestSize.Level1)
     uint32_t testNetmask = ParseIp(netmask24);
     EXPECT_TRUE(testNetmask != 0);
     EXPECT_EQ(srcAddr, LastIpAddress(testIp, testNetmask));
+}
+
+HWTEST(AddressUtilsTest, FirstNetIpAddressTest, TestSize.Level1)
+{
+    uint8_t srcData[] = {192, 168, 100, 1};
+    uint32_t srcAddr = ParseIp(srcData);
+    ASSERT_TRUE(srcAddr != 0);
+    uint32_t testIp = ParseIpAddr("192.168.100.100");
+    ASSERT_TRUE(testIp != 0);
+    uint32_t testNetmask = ParseIp(netmask24);
+    EXPECT_TRUE(testNetmask != 0);
+    uint32_t network = NetworkAddress(testIp, testNetmask);
+    ASSERT_TRUE(network != 0);
+    EXPECT_EQ(srcAddr, FirstNetIpAddress(network));
 }
 
 HWTEST(AddressUtilsTest, NextIpAddressTest, TestSize.Level1)

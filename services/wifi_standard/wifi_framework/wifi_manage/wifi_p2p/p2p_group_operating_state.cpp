@@ -21,9 +21,13 @@ DEFINE_WIFILOG_P2P_LABEL("P2pGroupOperatingState");
 
 namespace OHOS {
 namespace Wifi {
-P2pGroupOperatingState::P2pGroupOperatingState(
-    P2pStateMachine &stateMachine, WifiP2pGroupManager &groupMgr, WifiP2pDeviceManager &deviceMgr)
-    : State("P2pGroupOperatingState"), mProcessFunMap(), p2pStateMachine(stateMachine), groupManager(groupMgr), deviceManager(deviceMgr)
+P2pGroupOperatingState::P2pGroupOperatingState(P2pStateMachine &stateMachine, WifiP2pGroupManager &groupMgr,
+    WifiP2pDeviceManager &deviceMgr)
+    : State("P2pGroupOperatingState"),
+      mProcessFunMap(),
+      p2pStateMachine(stateMachine),
+      groupManager(groupMgr),
+      deviceManager(deviceMgr)
 {}
 void P2pGroupOperatingState::GoInState()
 {
@@ -58,7 +62,7 @@ bool P2pGroupOperatingState::ProcessCmdCreateGroup(const InternalMessage &msg) c
 {
     WifiErrorNo ret = WIFI_IDL_OPT_FAILED;
     const int minValidNetworkid = 0;
-    WifiP2pConfig config;
+    WifiP2pConfigInternal config;
     msg.GetMessageObj(config);
     int freq = p2pStateMachine.GetAvailableFreqByBand(config.GetGoBand());
     int netId = config.GetNetId();
@@ -80,9 +84,9 @@ bool P2pGroupOperatingState::ProcessCmdCreateGroup(const InternalMessage &msg) c
          * Create a new persistence group.
          */
         WIFI_LOGE("Create a new %s group.", (netId == PERSISTENT_NET_ID) ? "persistence" : "temporary");
-        if (config.GetPassphrase().empty() && config.GetNetworkName().empty()) {
+        if (config.GetPassphrase().empty() && config.GetGroupName().empty()) {
             ret = WifiP2PHalInterface::GetInstance().GroupAdd((netId == PERSISTENT_NET_ID) ? true : false, netId, freq);
-        } else if (!config.GetPassphrase().empty() && !config.GetNetworkName().empty() &&
+        } else if (!config.GetPassphrase().empty() && !config.GetGroupName().empty() &&
                    config.GetPassphrase().length() >= MIN_PSK_LEN && config.GetPassphrase().length() <= MAX_PSK_LEN) {
             if (p2pStateMachine.DealCreateNewGroupWithConfig(config, freq)) {
                 ret = WIFI_IDL_OPT_OK;
@@ -122,15 +126,23 @@ bool P2pGroupOperatingState::ProcessGroupStartedEvt(const InternalMessage &msg) 
         WIFI_LOGI("the group network id is %{public}d set id is %{public}d",
             group.GetNetworkId(),
             p2pStateMachine.groupManager.GetGroupNetworkId(group.GetOwner(), group.GetGroupName()));
-    }
-    if (group.GetNetworkId() == TEMPORARY_NET_ID) {
-        group.SetIsPersistent(false);
+    } else {
+        group.SetNetworkId(TEMPORARY_NET_ID);
         WIFI_LOGI("This is a temporary group.");
     }
+
+    std::string goAddr = group.GetOwner().GetDeviceAddress();
     if (group.IsGroupOwner()) { /* append setting the device name if this is GO */
-        owner = group.GetOwner();
-        owner.SetDeviceName(deviceManager.GetThisDevice().GetDeviceName());
-        group.SetOwner(owner);
+        WifiP2pDevice thisDevice = deviceManager.GetThisDevice();
+        thisDevice.SetP2pDeviceStatus(P2pDeviceStatus::PDS_CONNECTED);
+        thisDevice.SetDeviceAddress(goAddr);
+        group.SetOwner(thisDevice);
+    } else {
+        WifiP2pDevice dev = deviceManager.GetDevices(goAddr);
+        dev.SetP2pDeviceStatus(P2pDeviceStatus::PDS_CONNECTED);
+        if (dev.IsValid()) {
+            group.SetOwner(dev);
+        }
     }
     group.SetP2pGroupStatus(P2pGroupStatus::GS_STARTED);
     p2pStateMachine.groupManager.SetCurrentGroup(group);

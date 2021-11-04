@@ -50,8 +50,9 @@ bool WifiP2pDnsSdServiceResponse::FetchTxtData(std::istringstream &istream)
         if (t > (istream.str().size() - istream.tellg())) {
             return false;
         }
-        std::unique_ptr<char[]> ptr = std::make_unique<char[]>(t);
+        std::unique_ptr<char[]> ptr = std::make_unique<char[]>(t + 1);
         istream.read(ptr.get(), t);
+        ptr[t] = '\0';
         std::istringstream iss(ptr.get());
         std::string keyVal[2];
         getline(iss, keyVal[0], '=');

@@ -49,6 +49,10 @@ void ProvisionDiscoveryState::Init()
 {
     mProcessFunMap.insert(
         std::make_pair(P2P_STATE_MACHINE_CMD::CMD_DEVICE_DISCOVERS, &ProvisionDiscoveryState::ProcessCmdDiscoverPeer));
+    mProcessFunMap.insert(
+        std::make_pair(P2P_STATE_MACHINE_CMD::CMD_DISCOVER_SERVICES, &ProvisionDiscoveryState::ProcessCmdDiscServices));
+    mProcessFunMap.insert(
+        std::make_pair(P2P_STATE_MACHINE_CMD::CMD_START_LISTEN, &ProvisionDiscoveryState::ProcessCmdStartListen));
     mProcessFunMap.insert(std::make_pair(
         P2P_STATE_MACHINE_CMD::P2P_EVENT_PROV_DISC_PBC_RESP, &ProvisionDiscoveryState::ProcessProvDiscPbcRspEvt));
     mProcessFunMap.insert(std::make_pair(
@@ -57,12 +61,28 @@ void ProvisionDiscoveryState::Init()
         P2P_STATE_MACHINE_CMD::P2P_EVENT_PROV_DISC_SHOW_PIN, &ProvisionDiscoveryState::ProcessProvDiscShowPinEvt));
     mProcessFunMap.insert(std::make_pair(
         P2P_STATE_MACHINE_CMD::P2P_EVENT_PROV_DISC_FAILURE, &ProvisionDiscoveryState::ProcessProvDiscFailEvt));
+    mProcessFunMap.insert(std::make_pair(
+        P2P_STATE_MACHINE_CMD::CMD_CANCEL_CONNECT, &ProvisionDiscoveryState::ProcessCmdCancelConnect));
 }
 
 bool ProvisionDiscoveryState::ProcessCmdDiscoverPeer(InternalMessage &msg) const
 {
-    WIFI_LOGI("recv CMD: %{public}d", msg.GetMessageName());
+    WIFI_LOGI("Discover peer recv CMD: %{public}d", msg.GetMessageName());
     p2pStateMachine.BroadcastActionResult(P2pActionCallback::DiscoverDevices, ErrCode::WIFI_OPT_FAILED);
+    return EXECUTED;
+}
+
+bool ProvisionDiscoveryState::ProcessCmdDiscServices(InternalMessage &msg) const
+{
+    LOGI("Disc service recv CMD: %d", msg.GetMessageName());
+    p2pStateMachine.BroadcastActionResult(P2pActionCallback::DiscoverServices, ErrCode::WIFI_OPT_FAILED);
+    return EXECUTED;
+}
+
+bool ProvisionDiscoveryState::ProcessCmdStartListen(InternalMessage &msg) const
+{
+    LOGI("Start listen recv CMD: %d", msg.GetMessageName());
+    p2pStateMachine.BroadcastActionResult(P2pActionCallback::StartP2pListen, ErrCode::WIFI_OPT_FAILED);
     return EXECUTED;
 }
 
@@ -145,6 +165,16 @@ bool ProvisionDiscoveryState::ProcessProvDiscFailEvt(InternalMessage &msg) const
     WIFI_LOGI("recv event: %{public}d", msg.GetMessageName());
     p2pStateMachine.DealGroupCreationFailed();
     p2pStateMachine.SwitchState(&p2pStateMachine.p2pIdleState);
+    return EXECUTED;
+}
+
+bool ProvisionDiscoveryState::ProcessCmdCancelConnect(InternalMessage &msg) const
+{
+    WIFI_LOGI("recv event: %d", msg.GetMessageName());
+    WifiP2PHalInterface::GetInstance().CancelConnect();
+    p2pStateMachine.DealGroupCreationFailed();
+    p2pStateMachine.SwitchState(&p2pStateMachine.p2pIdleState);
+    p2pStateMachine.BroadcastActionResult(P2pActionCallback::P2pDisConnect, ErrCode::WIFI_OPT_SUCCESS);
     return EXECUTED;
 }
 

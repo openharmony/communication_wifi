@@ -106,6 +106,7 @@ enum class P2P_STATE_MACHINE_CMD {
     CMD_DISCONNECT,
     CMD_SET_DEVICE_NAME,         /* set device name */
     CMD_SET_WFD_INFO,            /* set wifi-display info */
+    CMD_CANCEL_CONNECT,          /* cancel connect */
 
     /* monitor to state machine */
     WPA_CONNECTED_EVENT = 100,  // result of connect
@@ -137,6 +138,7 @@ enum class P2P_STATE_MACHINE_CMD {
     INTERNAL_CONN_USER_CONFIRM,     // the user confirmed
     INTERNAL_CONN_USER_ACCEPT,      // the user chooses to agree
     PEER_CONNECTION_USER_REJECT,    // the user chooses to reject
+    INTERNAL_CONN_USER_TIME_OUT,
     CREATE_GROUP_TIMED_OUT,
     EXCEPTION_TIMED_OUT,             /* P2P exception timeout */
     DISABLE_P2P_TIMED_OUT,
@@ -144,7 +146,7 @@ enum class P2P_STATE_MACHINE_CMD {
 };
 
 using HandlerMethod = void(P2P_STATE_MACHINE_CMD, int, int, const std::any &);
-}; // namespace Wifi
+} // namespace Wifi
 } // namespace OHOS
 
 #endif

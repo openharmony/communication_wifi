@@ -54,9 +54,9 @@ void WifiBroadCastHelper::Show(const WifiP2pDevice &v)
     return;
 }
 
-void WifiBroadCastHelper::Show(const WifiP2pInfo &v)
+void WifiBroadCastHelper::Show(const WifiP2pLinkedInfo &v)
 {
-    WIFI_LOGI("    -WifiP2pInfo:");
+    WIFI_LOGI("    -WifiP2pLinkedInfo:");
 
     if (v.GetConnectState() == P2pConnectedState::P2P_CONNECTED) {
         WIFI_LOGI("      connectState: Connected");
@@ -118,7 +118,7 @@ void WifiBroadCastHelper::Show(const std::vector<WifiP2pDevice> &v)
     return;
 }
 
-void WifiBroadCastHelper::Show(const std::vector<WifiP2pInfo> &v)
+void WifiBroadCastHelper::Show(const std::vector<WifiP2pLinkedInfo> &v)
 {
     WIFI_LOGI("    -WifiP2pDevice Vector size[%{public}zu]:", v.size());
     for (auto i : v) {
@@ -132,6 +132,15 @@ void WifiBroadCastHelper::Show(const std::vector<std::string> &v)
     WIFI_LOGI("    -str Vector size[%{public}zu]:", v.size());
     for (auto i : v) {
         WIFI_LOGI("    -str:%{public}s", i.c_str());
+    }
+    return;
+}
+
+void WifiBroadCastHelper::Show(const std::map<std::string, std::string> &v)
+{
+    WIFI_LOGI("    -str and str Map size[%{public}zu]:", v.size());
+    for (auto i : v) {
+        WIFI_LOGI("    -key str:%{public}s, -value str:%{public}s", i.first.c_str(), i.second.c_str());
     }
     return;
 }

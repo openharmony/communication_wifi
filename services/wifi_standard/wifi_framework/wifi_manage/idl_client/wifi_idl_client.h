@@ -791,7 +791,7 @@ public:
      * @param pin
      * @return WifiErrorNo
      */
-    WifiErrorNo ReqP2pConnect(const WifiP2pConfig &config, bool isJoinExistingGroup, std::string &pin) const;
+    WifiErrorNo ReqP2pConnect(const WifiP2pConfigInternal &config, bool isJoinExistingGroup, std::string &pin) const;
 
     /**
      * @Description Send a request for cancel connect to the P2P
@@ -804,7 +804,7 @@ public:
      * @Description Send a request for Provision Discovery to the P2P
      *
      */
-    WifiErrorNo ReqP2pProvisionDiscovery(const WifiP2pConfig &config) const;
+    WifiErrorNo ReqP2pProvisionDiscovery(const WifiP2pConfigInternal &config) const;
 
     /**
      * @Description Send a request for add a P2P group to the P2P

@@ -37,7 +37,7 @@ public:
 
 public:
     std::unique_ptr<WifiP2pDnsSdServiceInfo> pWifiP2pDnsSdServiceInfo;
-    void WarpCompressDnsName()
+    void WarpTurnDnsNameToStream()
     {
         std::string dnsName = "a.txt";
         EXPECT_EQ("c00c", pWifiP2pDnsSdServiceInfo->TurnDnsNameToStream("_tcp.local."));
@@ -53,7 +53,8 @@ HWTEST_F(WifiP2pDnsSdServiceInfoTest, Create, TestSize.Level1)
     std::string instanceName;
     std::string serviceType;
     std::map<std::string, std::string> txtMap;
-    std::string svrName;
+    txtMap.insert(std::make_pair(std::string("ip"), std::string("TestIp")));
+    std::string svrName("TestSvrName");
     WifiP2pDnsSdServiceInfo::Create(instanceName, serviceType, txtMap, svrName);
 }
 
@@ -68,9 +69,10 @@ HWTEST_F(WifiP2pDnsSdServiceInfoTest, BuildRequest, TestSize.Level1)
     std::map<std::string, std::string> txtMap;
     WifiP2pDnsSdServiceInfo::Create(instanceName, serviceType, txtMap, svrName).BuildRequest(dnsName, dnsType, version);
 }
+
 HWTEST_F(WifiP2pDnsSdServiceInfoTest, TurnDnsNameToStream, TestSize.Level1)
 {
-    WarpCompressDnsName();
+    WarpTurnDnsNameToStream();
 }
 }  // namespace Wifi
 }  // namespace OHOS

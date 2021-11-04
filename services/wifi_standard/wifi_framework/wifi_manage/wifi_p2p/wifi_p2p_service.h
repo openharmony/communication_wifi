@@ -28,7 +28,8 @@ public:
     /**
      * @Description Construct a new WifiP2pService object.
      */
-    explicit WifiP2pService(P2pStateMachine &, WifiP2pDeviceManager &, WifiP2pGroupManager &, WifiP2pServiceManager &);
+    explicit WifiP2pService(P2pStateMachine &p2pStateMachine, WifiP2pDeviceManager &setDeviceMgr,
+        WifiP2pGroupManager &setGroupMgr, WifiP2pServiceManager &setSvrMgr);
     /**
      * @Description Destroy the WifiP2pService object.
      */
@@ -134,10 +135,10 @@ public:
     virtual ErrCode SetP2pDeviceName(const std::string &devName) override;
     /**
      * @Description - Query P2P connection information.
-     * @param  connInfo - object that stores connection information
+     * @param  linkedInfo - object that stores connection information
      * @return - ErrCode
      */
-    virtual ErrCode QueryP2pInfo(WifiP2pInfo &connInfo) override;
+    virtual ErrCode QueryP2pLinkedInfo(WifiP2pLinkedInfo &linkedInfo) override;
     /**
      * @Description - Get the current group information.
      * @param  group - object that stores the current group
@@ -168,6 +169,12 @@ public:
      * @return - ErrCode
      */
     virtual ErrCode QueryP2pDevices(std::vector<WifiP2pDevice> &devices) override;
+    /**
+     * @Description - Query the information about own device.
+     * @param  device - own device
+     * @return - ErrCode
+     */
+    virtual ErrCode QueryP2pLocalDevice(WifiP2pDevice &device) override;
     /**
      * @Description - Obtain information about all groups.
      * @param  groups - list of group information

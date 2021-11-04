@@ -843,10 +843,10 @@ void ScanService::HandleStaStatusChanged(int status)
 
 void ScanService::HandleCustomStatusChanged(int customScene, int customSceneStatus)
 {
-    LOGI("Enter ScanService::HandleCustomStatusChanged.");
+    WIFI_LOGI("Enter ScanService::HandleCustomStatusChanged.");
 
     time_t now = time(nullptr);
-    LOGD("customScene:%d, status:%d", customScene, customSceneStatus);
+    WIFI_LOGD("customScene:%d, status:%d", customScene, customSceneStatus);
     if (customSceneStatus == STATE_OPEN) {
         customSceneTimeMap.insert(std::pair<int, int>(customScene, now));
     }
@@ -927,7 +927,7 @@ void ScanService::StartSystemTimerScan(bool scanAtOnce)
     }
     if (scanAtOnce || (lastSystemScanTime == 0) ||
         (sinceLastScan >= systemScanIntervalMode.scanIntervalMode.interval)) {
-        if (!Scan(false)) {
+        if (Scan(false) != WIFI_OPT_SUCCESS) {
             WIFI_LOGE("Scan failed.");
         }
         lastSystemScanTime = nowTime;
@@ -965,7 +965,7 @@ void ScanService::HandleDisconnectedScanTimeout()
         return;
     }
 
-    if (!Scan(false)) {
+    if (Scan(false) != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("Scan failed.");
     }
     pScanStateMachine->StartTimer(static_cast<int>(DISCONNECTED_SCAN_TIMER), DISCONNECTED_SCAN_INTERVAL);

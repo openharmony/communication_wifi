@@ -297,10 +297,16 @@ public:
           netId(-1),
           passphrase(""),
           groupOwnerIntent(-1),
-          networkName("")
-    {
-        wpsInfo.SetWpsMethod(WpsMethod::WPS_METHOD_PBC);
-    }
+          groupName("")
+    {}
+    WifiP2pConfig(const WifiP2pConfig &config)
+        : mDeviceAddress(config.GetDeviceAddress()),
+          goBand(config.GetGoBand()),
+          netId(config.GetNetId()),
+          passphrase(config.GetPassphrase()),
+          groupOwnerIntent(config.GetGroupOwnerIntent()),
+          groupName(config.GetGroupName())
+    {}
     ~WifiP2pConfig()
     {}
     void SetDeviceAddress(const std::string &deviceAddress);
@@ -311,28 +317,50 @@ public:
     int GetNetId() const;
     void SetPassphrase(const std::string &newPassphrase);
     const std::string &GetPassphrase() const;
-    void SetWpsInfo(const WpsInfo &info);
-    const WpsInfo &GetWpsInfo() const;
     void SetGroupOwnerIntent(int intent);
     int GetGroupOwnerIntent() const;
-    void SetNetworkName(const std::string &setNetworkName);
-    const std::string &GetNetworkName() const;
+    void SetGroupName(const std::string &setGroupName);
+    const std::string &GetGroupName() const;
 
 private:
     std::string mDeviceAddress; /* the device MAC address, the length is 17 characters. */
     GroupOwnerBand goBand;
     int netId; /* network id, when -2 means persistent and -1 means temporary, else need >= 0 */
     std::string passphrase; /* the value ranges from 8 to 63. */
-    WpsInfo wpsInfo;
     int groupOwnerIntent; /* the value is -1.(A value of -1 indicates the system can choose an appropriate value.) */
-    std::string networkName; /* the value ranges from 1 to 32. */
+    std::string groupName; /* the value ranges from 1 to 32. */
 };
 
-class WifiP2pInfo {
+class WifiP2pConfigInternal : public WifiP2pConfig {
 public:
-    WifiP2pInfo() : connectState(P2pConnectedState::P2P_DISCONNECTED), isP2pGroupOwner(false)
+    WifiP2pConfigInternal(): WifiP2pConfig()
+    {
+        wpsInfo.SetWpsMethod(WpsMethod::WPS_METHOD_INVALID);
+    }
+    WifiP2pConfigInternal(WifiP2pConfig config): WifiP2pConfig(config)
+    {
+        wpsInfo.SetWpsMethod(WpsMethod::WPS_METHOD_INVALID);
+    }
+    ~WifiP2pConfigInternal()
     {}
-    ~WifiP2pInfo()
+    inline void SetWpsInfo(const WpsInfo &info)
+    {
+        wpsInfo = info;
+    }
+    inline const WpsInfo &GetWpsInfo() const
+    {
+        return wpsInfo;
+    }
+
+private:
+    WpsInfo wpsInfo;
+};
+
+class WifiP2pLinkedInfo {
+public:
+    WifiP2pLinkedInfo() : connectState(P2pConnectedState::P2P_DISCONNECTED), isP2pGroupOwner(false)
+    {}
+    ~WifiP2pLinkedInfo()
     {}
     void SetConnectState(P2pConnectedState setConnectState);
     P2pConnectedState GetConnectState() const;

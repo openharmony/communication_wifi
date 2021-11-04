@@ -51,14 +51,25 @@ HWTEST_F(WifiP2pUpnpServiceResponseTest, GetVersion, TestSize.Level1)
     EXPECT_EQ(-1, WifiP2pUpnpServiceResponse::Create(status, tranId, data).GetVersion());
 }
 
-HWTEST_F(WifiP2pUpnpServiceResponseTest, ParseData, TestSize.Level1)
+HWTEST_F(WifiP2pUpnpServiceResponseTest, ParseData1, TestSize.Level1)
 {
-    std::vector<unsigned char> data;
+    EXPECT_EQ(false, WifiP2pUpnpServiceResponse::Create(status, tranId, data).ParseData());
+}
+
+HWTEST_F(WifiP2pUpnpServiceResponseTest, ParseData2, TestSize.Level1)
+{
     data.push_back(1);
-    data.push_back(2);
-    data.push_back(3);
-    EXPECT_EQ(true, WifiP2pUpnpServiceResponse::Create(status, tranId, data).ParseData());
-    WifiP2pUpnpServiceResponse::Create(status, tranId, data).SetData(data);
+    data.push_back(0x31);
+    data.push_back(0x32);
+    data.push_back(0x2c);
+    data.push_back(0x33);
+    data.push_back(0x34);
+    data.push_back(0x3b);
+    data.push_back(0x04);
+    data.push_back(0x73);
+    data.push_back(0x76);
+    data.push_back(0x72);
+    data.push_back(0x4e);
     EXPECT_EQ(true, WifiP2pUpnpServiceResponse::Create(status, tranId, data).ParseData());
 }
 }  // namespace Wifi

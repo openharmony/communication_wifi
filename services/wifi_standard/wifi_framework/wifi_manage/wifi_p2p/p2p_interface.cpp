@@ -145,9 +145,9 @@ ErrCode P2pInterface::SetP2pWfdInfo(const WifiP2pWfdInfo &wfdInfo)
     return p2pService.SetP2pWfdInfo(wfdInfo);
 }
 
-ErrCode P2pInterface::QueryP2pInfo(WifiP2pInfo &connInfo)
+ErrCode P2pInterface::QueryP2pLinkedInfo(WifiP2pLinkedInfo &linkedInfo)
 {
-    return p2pService.QueryP2pInfo(connInfo);
+    return p2pService.QueryP2pLinkedInfo(linkedInfo);
 }
 
 ErrCode P2pInterface::GetCurrentGroup(WifiP2pGroupInfo &group)
@@ -173,6 +173,11 @@ ErrCode P2pInterface::GetP2pConnectedStatus(int &status)
 ErrCode P2pInterface::QueryP2pDevices(std::vector<WifiP2pDevice> &devices)
 {
     return p2pService.QueryP2pDevices(devices);
+}
+
+ErrCode P2pInterface::QueryP2pLocalDevice(WifiP2pDevice &device)
+{
+    return p2pService.QueryP2pLocalDevice(device);
 }
 
 ErrCode P2pInterface::QueryP2pGroups(std::vector<WifiP2pGroupInfo> &groups)

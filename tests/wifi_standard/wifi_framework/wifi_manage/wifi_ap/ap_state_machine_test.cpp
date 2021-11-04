@@ -30,12 +30,11 @@ namespace OHOS {
 namespace Wifi {
 class ApStateMachine_test : public testing::Test {
 public:
-    static void SetUpTestCase()
-    {}
-    static void TearDownTestCase()
-    {}
+    static void SetUpTestCase() {}
+    static void TearDownTestCase() {}
     virtual void SetUp()
     {
+        const int SLEEP_TIME = 20;
         pMockPendant = new MockPendant();
         pMockApStationsManager = &(pMockPendant->GetMockApStationsManager());
         pMockApRootState = &(pMockPendant->GetMockApRootState());
@@ -45,18 +44,18 @@ public:
 
         pMockPendant->GetMockApStateMachine().InitialStateMachine();
 
-        pApStateMachine = new ApStateMachine(
-            *pMockApStationsManager, *pMockApRootState, *pMockApIdleState, *pMockApStartedState, *pMockApMonitor);
+        pApStateMachine = new ApStateMachine(*pMockApStationsManager, *pMockApRootState, *pMockApIdleState,
+            *pMockApStartedState, *pMockApMonitor);
 
         pApStateMachine->InitialStateMachine();
         RegisterApServiceCallbacks();
+        EXPECT_CALL(WifiApHalInterface::GetInstance(), RegisterApEvent(_))
+            .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
+        usleep(SLEEP_TIME);
     }
     virtual void TearDown()
     {
-        EXPECT_CALL(WifiApHalInterface::GetInstance(), RegisterApEvent(_))
-            .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
         delete pApStateMachine;
-
         delete pMockPendant;
         pMockPendant = nullptr;
         pApStateMachine = nullptr;

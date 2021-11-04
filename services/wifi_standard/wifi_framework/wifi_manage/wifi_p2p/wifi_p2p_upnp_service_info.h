@@ -35,6 +35,11 @@ namespace Wifi {
          */
         static WifiP2pUpnpServiceInfo Create(const std::string &uuid, const std::string &device,
                                                   const std::vector<std::string> &services, const std::string &svrName);
+        /**
+         * @Description Destroy the WifiP2pUpnpServiceInfo object.
+         *
+         */
+        ~WifiP2pUpnpServiceInfo() = default;
 
     private:
         /**
@@ -53,11 +58,6 @@ namespace Wifi {
          * @param queryList - the character string list used to supplicant command
          */
         explicit WifiP2pUpnpServiceInfo(std::vector<std::string> &queryList);
-        /**
-         * @Description Destroy the WifiP2pUpnpServiceInfo object.
-         *
-         */
-        ~WifiP2pUpnpServiceInfo() = default;
     };
 } // namespace Wifi
 } // namespace OHOS

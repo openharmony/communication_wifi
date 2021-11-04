@@ -61,6 +61,8 @@ HWTEST_F(WifiP2pGroupInfoProxyTest, CompareSuccess, TestSize.Level1)
     EXPECT_EQ(pWifiP2pGroupInfoProxy->GetInterface(), "iface");
     pWifiP2pGroupInfoProxy->SetGroupName("groupName");
     EXPECT_EQ(pWifiP2pGroupInfoProxy->GetGroupName(), "groupName");
+    pWifiP2pGroupInfoProxy->SetGoIpAddress("ip");
+    EXPECT_EQ(pWifiP2pGroupInfoProxy->GetGoIpAddress(), "ip");
     pWifiP2pGroupInfoProxy->SetFrequency(2020);
     EXPECT_EQ(pWifiP2pGroupInfoProxy->GetFrequency(), 2020);
     pWifiP2pGroupInfoProxy->SetIsPersistent(true);
@@ -76,6 +78,7 @@ HWTEST_F(WifiP2pGroupInfoProxyTest, CompareSuccess, TestSize.Level1)
     devices.push_back(device1);
     devices.push_back(device2);
     pWifiP2pGroupInfoProxy->SetClientDevices(devices);
+    std::vector<WifiP2pDevice> clientDevices = pWifiP2pGroupInfoProxy->GetClientDevices();
     EXPECT_FALSE(pWifiP2pGroupInfoProxy->IsClientDevicesEmpty());
     pWifiP2pGroupInfoProxy->ClearClientDevices();
     EXPECT_TRUE(pWifiP2pGroupInfoProxy->IsClientDevicesEmpty());

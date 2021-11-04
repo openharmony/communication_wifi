@@ -74,6 +74,12 @@ HWTEST_F(P2pInvitingStateTest, ExecuteStateMsg, TestSize.Level1)
 
     msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_EVENT_DEVICE_FOUND));
     pP2pInvitingState->ExecuteStateMsg(&msg);
+
+    msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_CANCEL_CONNECT));
+    EXPECT_CALL(WifiP2PHalInterface::GetInstance(), CancelConnect()).WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
+    EXPECT_CALL(pMockP2pPendant->GetP2pStateMachine(), DealGroupCreationFailed()).WillOnce(Return());
+    EXPECT_CALL(pMockP2pPendant->GetP2pStateMachine(), BroadcastActionResult(_, _)).WillOnce(Return());
+    pP2pInvitingState->ExecuteStateMsg(&msg);
 }
 }  // namespace Wifi
 }  // namespace OHOS

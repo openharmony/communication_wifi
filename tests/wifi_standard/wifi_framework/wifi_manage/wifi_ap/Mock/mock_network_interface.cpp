@@ -23,6 +23,11 @@ bool IsValidInterfaceName(const std::string &interfaceName)
     return MockNetworkInterface::GetInstance().IsValidInterfaceName(interfaceName);
 }
 
+bool IsInterfaceUp(const std::string &interfaceName)
+{
+    return MockNetworkInterface::GetInstance().IsInterfaceUp(interfaceName);
+}
+
 void Dump(const std::string &interfaceName)
 {
     MockNetworkInterface::GetInstance().Dump(interfaceName);

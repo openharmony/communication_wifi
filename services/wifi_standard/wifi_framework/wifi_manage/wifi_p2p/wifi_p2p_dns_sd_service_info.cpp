@@ -55,6 +55,7 @@ WifiP2pDnsSdServiceInfo WifiP2pDnsSdServiceInfo::Create(const std::string &insta
 
     WifiP2pDnsSdServiceInfo dnsSdServInfo(queries);
     dnsSdServInfo.SetServiceName(svrName);
+    dnsSdServInfo.SetServicerProtocolType(P2pServicerProtocolType::SERVICE_TYPE_BONJOUR);
     return dnsSdServInfo;
 }
 std::string WifiP2pDnsSdServiceInfo::BuildPtrServiceQuery(
@@ -99,7 +100,9 @@ std::string WifiP2pDnsSdServiceInfo::BuildTxtServiceQuery(const std::string &ins
     }
 
     if (!svrName.empty()) {
-        ret += std::string("00");
+        if (!rawData.empty()) {
+            ret += std::string("00");
+        }
         ret.append(Bin2HexStr(std::string(";")));
         std::vector<unsigned char> buf;
         buf.push_back(static_cast<unsigned char>(svrName.length()));

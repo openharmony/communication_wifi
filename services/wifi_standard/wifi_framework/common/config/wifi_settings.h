@@ -129,18 +129,18 @@ public:
     /**
      * @Description save the p2p connected info
      *
-     * @param connInfo - WifiP2pInfo object
+     * @param linkedInfo - WifiP2pLinkedInfo object
      * @return int - 0 success
      */
-    int SaveP2pInfo(WifiP2pInfo &connInfo);
+    int SaveP2pInfo(WifiP2pLinkedInfo &linkedInfo);
 
     /**
      * @Description Get the p2p connected info
      *
-     * @param connInfo - output the p2p connected info
+     * @param linkedInfo - output the p2p connected info
      * @return int - 0 success
      */
-    int GetP2pInfo(WifiP2pInfo &connInfo);
+    int GetP2pInfo(WifiP2pLinkedInfo &linkedInfo);
 
     /**
      * @Description Get the scan control policy info
@@ -916,7 +916,7 @@ private:
     std::vector<WifiScanInfo> mWifiScanInfoList;
     std::vector<WifiP2pGroupInfo> mGroupInfoList;
     ScanControlInfo mScanControlInfo;
-    WifiP2pInfo mWifiP2pInfo;
+    WifiP2pLinkedInfo mWifiP2pInfo;
     std::map<int, WifiDeviceConfig> mWifiDeviceConfig;
     IpInfo mWifiIpInfo;
     WifiLinkedInfo mWifiLinkedInfo;

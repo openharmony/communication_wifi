@@ -16,7 +16,6 @@
 #include <gtest/gtest.h>
 #include <stdint.h>
 #include <stdbool.h>
-#include "string_ex.h"
 #include "hash_table.h"
 
 using namespace testing::ext;
@@ -163,5 +162,17 @@ HWTEST_F(HashTableTest, ResizeTest, TestSize.Level1)
     EXPECT_TRUE(testTable.capacity == HASH_MINI_CAPACITY);
     EXPECT_EQ(HASH_SUCCESS, Resize(&testTable, HASH_MINI_CAPACITY * 2));
     EXPECT_TRUE(testTable.capacity == HASH_MINI_CAPACITY * 2);
+    EXPECT_EQ(HASH_SUCCESS, DestroyHashTable(&testTable));
+}
+
+extern "C" int CapExtend(HashTable *table, size_t miniCapacity);
+HWTEST_F(HashTableTest, CapExtendTest, TestSize.Level1)
+{
+    HashTable testTable;
+    EXPECT_EQ(HASH_SUCCESS, CreateHashTable(&testTable, sizeof(uint32_t),
+        sizeof(uint32_t), HASH_MINI_CAPACITY));
+    EXPECT_TRUE(testTable.capacity == HASH_MINI_CAPACITY);
+    EXPECT_EQ(HASH_SUCCESS, CapExtend(&testTable, HASH_MINI_CAPACITY * 5));
+    EXPECT_TRUE(testTable.capacity == HASH_MINI_CAPACITY);
     EXPECT_EQ(HASH_SUCCESS, DestroyHashTable(&testTable));
 }

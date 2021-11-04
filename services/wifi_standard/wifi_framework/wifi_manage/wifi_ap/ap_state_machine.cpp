@@ -22,6 +22,7 @@
 #include "wifi_logger.h"
 
 DEFINE_WIFILOG_HOTSPOT_LABEL("WifiApStateMachine");
+
 namespace OHOS {
 namespace Wifi {
 ApStateMachine::ApStateMachine(ApStationsManager &apStationsManager, ApRootState &apRootState, ApIdleState &apIdleState,

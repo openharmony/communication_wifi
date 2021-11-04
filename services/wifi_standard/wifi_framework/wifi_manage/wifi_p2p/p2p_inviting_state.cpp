@@ -14,6 +14,7 @@
  */
 #include "p2p_inviting_state.h"
 #include "p2p_state_machine.h"
+#include "wifi_p2p_hal_interface.h"
 #include "wifi_logger.h"
 
 DEFINE_WIFILOG_P2P_LABEL("P2pInvitingState");
@@ -39,6 +40,21 @@ bool P2pInvitingState::ExecuteStateMsg(InternalMessage *msg)
     switch (static_cast<P2P_STATE_MACHINE_CMD>(msg->GetMessageName())) {
         case P2P_STATE_MACHINE_CMD::CMD_DEVICE_DISCOVERS: {
             p2pStateMachine.BroadcastActionResult(P2pActionCallback::DiscoverDevices, ErrCode::WIFI_OPT_FAILED);
+            break;
+        }
+        case P2P_STATE_MACHINE_CMD::CMD_DISCOVER_SERVICES: {
+            p2pStateMachine.BroadcastActionResult(P2pActionCallback::DiscoverServices, ErrCode::WIFI_OPT_FAILED);
+            break;
+        }
+        case P2P_STATE_MACHINE_CMD::CMD_START_LISTEN: {
+            p2pStateMachine.BroadcastActionResult(P2pActionCallback::StartP2pListen, ErrCode::WIFI_OPT_FAILED);
+            break;
+        }
+        case P2P_STATE_MACHINE_CMD::CMD_CANCEL_CONNECT: {
+            WifiP2PHalInterface::GetInstance().CancelConnect();
+            p2pStateMachine.DealGroupCreationFailed();
+            p2pStateMachine.SwitchState(&p2pStateMachine.p2pIdleState);
+            p2pStateMachine.BroadcastActionResult(P2pActionCallback::P2pDisConnect, ErrCode::WIFI_OPT_SUCCESS);
             break;
         }
         case P2P_STATE_MACHINE_CMD::P2P_EVENT_DEVICE_LOST: {

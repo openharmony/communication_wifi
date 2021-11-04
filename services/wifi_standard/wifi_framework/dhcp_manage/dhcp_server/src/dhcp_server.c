@@ -39,7 +39,7 @@
 #undef LOG_TAG
 #define LOG_TAG "DhcpServer"
 
-#define DHCP_SEL_WAIT_TIMEOUTS 1500
+#define DHCP_SEL_WAIT_TIMEOUTS 1000
 #define OPT_MESSAGE_TYPE_LEGTH 1
 #define OPT_HEADER_LENGTH 2
 #define OPT_TIME_LENGTH 4
@@ -92,7 +92,7 @@ enum LooperState {
     LS_STOPED
 };
 typedef struct sockaddr_in sockaddr_in;
-static int FillReply(PDhcpServerContext ctx, PDhcpMsgInfo received, PDhcpMsgInfo reply);
+int FillReply(PDhcpServerContext ctx, PDhcpMsgInfo received, PDhcpMsgInfo reply);
 static int OnReceivedDiscover(PDhcpServerContext ctx, PDhcpMsgInfo received, PDhcpMsgInfo reply);
 static int OnReceivedRequest(PDhcpServerContext ctx, PDhcpMsgInfo received, PDhcpMsgInfo reply);
 static int OnReceivedDecline(PDhcpServerContext ctx, PDhcpMsgInfo received, PDhcpMsgInfo reply);
@@ -355,12 +355,6 @@ void OnServerStoped(PDhcpServerContext ctx, int code)
         LOGE("dhcp server context pointer is null.");
         return;
     }
-    LOGD("saving lease recoders ....");
-    if (SaveBindingRecoders(&srvIns->addressPool, 1) == RET_SUCCESS) {
-        LOGI("lease seaved. total: %zu", srvIns->addressPool.leaseTable.size);
-    } else {
-        LOGW("failed to save lease.");
-    }
     if (srvIns->callback) {
         srvIns->callback(ST_STOPED, code, ctx->ifname);
     }
@@ -444,7 +438,6 @@ static int MessageProcess(PDhcpServerContext ctx, PDhcpMsgInfo received, PDhcpMs
     return replyType;
 }
 
-
 int SaveLease(PDhcpServerContext ctx)
 {
     ServerContext *srvIns = GetServerInstance(ctx);
@@ -452,7 +445,7 @@ int SaveLease(PDhcpServerContext ctx)
         LOGE("dhcp server context pointer is null.");
         return RET_FAILED;
     }
-    int saveRet = SaveBindingRecoders(&srvIns->addressPool, 0);
+    int saveRet = SaveBindingRecoders(&srvIns->addressPool, 1);
     if (saveRet == RET_FAILED) {
         LOGD("failed to save lease recoders. total: %zu", srvIns->addressPool.leaseTable.size);
     } else if (saveRet == RET_SUCCESS) {
@@ -504,7 +497,6 @@ static int BeginLooper(PDhcpServerContext ctx)
 {
     DhcpMsgInfo from;
     DhcpMsgInfo reply;
-    int saveLease = 0;
     ServerContext *srvIns = GetServerInstance(ctx);
     if (!srvIns) {
         LOGE("dhcp server context pointer is null.");
@@ -524,14 +516,11 @@ static int BeginLooper(PDhcpServerContext ctx)
         }
         ClearOptions(&from.options);
         ClearOptions(&reply.options);
-        if (saveLease && SaveLease(ctx) == RET_SUCCESS) {
-            saveLease = 0;
-        }
         int recvRet = ReceiveDhcpMessage(ctx->instance->serverFd, &from);
+        if (recvRet == RET_ERROR || recvRet == ERR_SELECT) {
+            break;
+        }
         if (ContinueReceive(&from, recvRet)) {
-            if (recvRet == RET_ERROR || recvRet == ERR_SELECT) {
-                break;
-            }
             continue;
         }
         InitReply(ctx, &from, &reply);
@@ -540,14 +529,18 @@ static int BeginLooper(PDhcpServerContext ctx)
         if (replyType && (snedRet = SendDhcpReply(ctx, replyType, &reply)) != RET_SUCCESS) {
             LOGE("failed to send reply message.");
         }
-        if (replyType == REPLY_ACK && snedRet) {
-            saveLease = 1;
+        if (replyType == REPLY_ACK || replyType == REPLY_OFFER) {
+            int saveRet = SaveBindingRecoders(&srvIns->addressPool, 0);
+            if (saveRet != RET_SUCCESS && saveRet != RET_WAIT_SAVE) {
+                LOGW("failed to save lease recoders.");
+            };
         }
     } // while (srvIns->looperState)
     FreeOptionList(&from.options);
     FreeOptionList(&reply.options);
     LOGD("dhcp server message looper stoped.");
     close(ctx->instance->serverFd);
+    ctx->instance->serverFd = -1;
     srvIns->looperState = LS_STOPED;
     return 0;
 }
@@ -625,6 +618,12 @@ void InitLeaseFile(DhcpAddressPool *pool)
     InitBindingRecoders(pool);
 }
 
+static void ExitProcess(void)
+{
+    LOGD("dhcp server stoped.");
+    sleep(1);
+}
+
 int StartDhcpServer(PDhcpServerContext ctx)
 {
     LOGD("dhcp server starting ...");
@@ -641,6 +640,9 @@ int StartDhcpServer(PDhcpServerContext ctx)
         LOGE("dhcp server context instance pointer is null.");
         return RET_FAILED;
     }
+    if (atexit(ExitProcess) != 0) {
+        LOGW("failed to regiester exit process function.");
+    }
     if (!srvIns->initialized) {
         LOGE("dhcp server no initialized.");
         return RET_FAILED;
@@ -653,11 +655,9 @@ int StartDhcpServer(PDhcpServerContext ctx)
     int ret = BeginLooper(ctx);
     if (ret != RET_SUCCESS) {
         LOGD("faild to start dhcp server.");
-        FreeAddressPool(&srvIns->addressPool);
         OnServerStoped(ctx, ret);
         return RET_FAILED;
     }
-    FreeAddressPool(&srvIns->addressPool);
     OnServerStoped(ctx, ret);
     return RET_SUCCESS;
 }
@@ -682,7 +682,7 @@ int GetServerStatus(PDhcpServerContext ctx)
     return srvIns->looperState;
 }
 
-static int FillReply(PDhcpServerContext ctx, PDhcpMsgInfo received, PDhcpMsgInfo reply)
+int FillReply(PDhcpServerContext ctx, PDhcpMsgInfo received, PDhcpMsgInfo reply)
 {
     if (!received || !reply) {
         return RET_ERROR;
@@ -773,7 +773,6 @@ int AppendReplyTimeOptions(PDhcpServerContext ctx, PDhcpOptionList options)
 static int Repending(DhcpAddressPool *pool, AddressBinding *binding)
 {
     if (!pool) {
-        LOGE("address pool pointer is null.");
         return REPLY_NONE;
     }
     uint32_t bindingIp = binding->ipAddress;
@@ -828,7 +827,6 @@ static int Rebinding(DhcpAddressPool *pool, AddressBinding *binding)
 static void AddAddressOption(PDhcpMsgInfo reply, uint8_t code, int32_t address)
 {
     if (!reply) {
-        LOGE("reply message pointer is null.");
         return;
     }
     DhcpOption optAddress = {0, 0, {0}};
@@ -840,7 +838,7 @@ static void AddAddressOption(PDhcpMsgInfo reply, uint8_t code, int32_t address)
     PushBackOption(&reply->options, &optAddress);
 }
 
-static int AddReplyServerIdOption(PDhcpOptionList options, uint32_t serverId)
+int AddReplyServerIdOption(PDhcpOptionList options, uint32_t serverId)
 {
     if (!options) {
         LOGE("option list pointer is null.");
@@ -866,7 +864,6 @@ static int AddReplyServerIdOption(PDhcpOptionList options, uint32_t serverId)
 static void AddReplyMessageTypeOption(PDhcpMsgInfo reply, uint8_t replyMessageType)
 {
     if (!reply) {
-        LOGE("reply message pointer is null.");
         return;
     }
     DhcpOption optMsgType = {DHCP_MESSAGE_TYPE_OPTION, OPT_MESSAGE_TYPE_LEGTH, {replyMessageType, 0}};
@@ -874,14 +871,12 @@ static void AddReplyMessageTypeOption(PDhcpMsgInfo reply, uint8_t replyMessageTy
 }
 
 
-static AddressBinding *GetBinding(DhcpAddressPool *pool, PDhcpMsgInfo received)
+AddressBinding *GetBinding(DhcpAddressPool *pool, PDhcpMsgInfo received)
 {
     if (!pool) {
-        LOGE("address pool pointer is null.");
         return NULL;
     }
     if (!received) {
-        LOGE("received message pointer is null.");
         return NULL;
     }
     AddressBinding *binding = pool->binding(received->packet.chaddr, &received->options);
@@ -901,25 +896,26 @@ static AddressBinding *GetBinding(DhcpAddressPool *pool, PDhcpMsgInfo received)
 static int OnReceivedDiscover(PDhcpServerContext ctx, PDhcpMsgInfo received, PDhcpMsgInfo reply)
 {
     if (!received || !reply) {
-        LOGE("receive or reply message pointer is null.");
         return REPLY_NONE;
     }
     LOGI("received 'Discover' message from: %s", ParseLogMac(received->packet.chaddr));
     ServerContext *srvIns = GetServerInstance(ctx);
     if (!srvIns) {
-        LOGE("dhcp server context pointer is null.");
         return REPLY_NONE;
     }
+    uint32_t reqIp = 0;
     PDhcpOption optReqIp = GetOption(&received->options, REQUESTED_IP_ADDRESS_OPTION);
     if (optReqIp) {
-        uint32_t reqIp = ParseIp(optReqIp->data);
+        reqIp = ParseIp(optReqIp->data);
         if (reqIp) {
             LOGD(" request ip: %s", ParseStrIp(reqIp));
         }
     }
     uint32_t srcIp = SourceIpAddress();
     if (!srvIns->broadCastFlagEnable) {
-        if (!srcIp) {
+        if (srcIp) {
+            LOGD(" client repending:%s", ParseStrIp(srcIp));
+        } else {
             srcIp = INADDR_BROADCAST;
         }
         DestinationAddr(srcIp);
@@ -930,6 +926,10 @@ static int OnReceivedDiscover(PDhcpServerContext ctx, PDhcpMsgInfo received, PDh
     }
     if (!binding->ipAddress) {
         LOGE("no ip address available.");
+        return REPLY_NONE;
+    }
+    if (reqIp != 0 && reqIp != binding->ipAddress) {
+        LOGE("error request message.");
         return REPLY_NONE;
     }
     AddressBinding *lease = GetLease(&srvIns->addressPool, binding->ipAddress);
@@ -1003,7 +1003,7 @@ static int NotBindingRequest(DhcpAddressPool *pool, PDhcpMsgInfo received, PDhcp
     AddressBinding *lease = GetLease(pool, yourIpAddr);
     if (!lease) {
         if (SourceIpAddress()) {
-            return REPLY_NAK;
+            return REPLY_ACK;
         }
         return REPLY_NONE;
     }
@@ -1020,9 +1020,10 @@ static int NotBindingRequest(DhcpAddressPool *pool, PDhcpMsgInfo received, PDhcp
         binding->leaseTime = pool->leaseTime;
     }
     int replyType = Repending(pool, binding);
-    if (replyType != REPLY_ACK) {
+    if (replyType != REPLY_OFFER) {
         return  replyType;
     }
+    lease = GetLease(pool, yourIpAddr);
     if (!lease) {
         LOGD("add new lease recoder.");
         AddLease(pool, binding);
@@ -1043,14 +1044,12 @@ static int ValidateRequestMessage(const PDhcpServerContext ctx, const PDhcpMsgIn
     PDhcpMsgInfo reply, uint32_t *yourIp)
 {
     if (!received || !reply) {
-        LOGE("receive or reply message pointer is null.");
         return REPLY_NONE;
     }
     LOGI("received 'Request' message from: %s.", ParseLogMac(received->packet.chaddr));
     uint32_t yourIpAddr = INADDR_BROADCAST;
     ServerContext *srvIns = GetServerInstance(ctx);
     if (!srvIns) {
-        LOGE("dhcp server context pointer is null.");
         return RET_FAILED;
     }
     if (GetYourIpAddress(received, &yourIpAddr) != RET_SUCCESS) {
@@ -1091,7 +1090,7 @@ static int HasNobindgRequest(PDhcpServerContext ctx, PDhcpMsgInfo received, PDhc
         uint32_t srcIp = SourceIpAddress();
         uint32_t reqIp = GetRequestIpAddress(received);
         LOGD("allow no binding request mode.");
-        if (!reqIp && !srcIp) {
+        if (reqIp == 0 && srcIp == 0) {
             LOGE("error dhcp message.");
             return REPLY_NONE;
         }
@@ -1151,12 +1150,10 @@ static int OnReceivedRequest(PDhcpServerContext ctx, PDhcpMsgInfo received, PDhc
 static int OnReceivedDecline(PDhcpServerContext ctx, PDhcpMsgInfo received, PDhcpMsgInfo reply)
 {
     if (!received || !reply) {
-        LOGE("receive or reply message pointer is null.");
         return REPLY_NONE;
     }
     ServerContext *srvIns = GetServerInstance(ctx);
     if (!srvIns) {
-        LOGE("dhcp server context pointer is null.");
         return REPLY_NONE;
     }
     LOGI("received 'Decline' message from: %s.", ParseLogMac(received->packet.chaddr));
@@ -1194,12 +1191,10 @@ static int OnReceivedDecline(PDhcpServerContext ctx, PDhcpMsgInfo received, PDhc
 static int OnReceivedRelease(PDhcpServerContext ctx, PDhcpMsgInfo received, PDhcpMsgInfo reply)
 {
     if (!received || !reply) {
-        LOGE("receive or reply message pointer is null.");
         return REPLY_NONE;
     }
     LOGI("received 'Release' message from: %s", ParseLogMac(received->packet.chaddr));
     if (!ctx || !ctx->instance) {
-        LOGE("dhcp server context pointer is null.");
         return RET_FAILED;
     }
     PDhcpOption optReqIp = GetOption(&received->options, REQUESTED_IP_ADDRESS_OPTION);
@@ -1222,11 +1217,11 @@ static int OnReceivedRelease(PDhcpServerContext ctx, PDhcpMsgInfo received, PDhc
         reqIp = ParseIp(optReqIp->data);
     }
     uint32_t srcIp = SourceIpAddress();
-    if (reqIp && reqIp != srcIp) {
+    if (srcIp != 0 && reqIp != 0 && reqIp != srcIp) {
         LOGE("error release message, invalid request ip address.");
         return REPLY_NONE;
     }
-    if (reqIp && reqIp != bindIp) {
+    if (bindIp != 0 && reqIp != 0 && reqIp != bindIp) {
         LOGE("error release message, invalid request ip address.");
         return REPLY_NONE;
     }
@@ -1248,7 +1243,6 @@ static int OnReceivedRelease(PDhcpServerContext ctx, PDhcpMsgInfo received, PDhc
 static int OnReceivedInform(PDhcpServerContext ctx, PDhcpMsgInfo received, PDhcpMsgInfo reply)
 {
     if (!received || !reply) {
-        LOGE("receive or reply message pointer is null.");
         return REPLY_NONE;
     }
     ServerContext *srvIns = GetServerInstance(ctx);
@@ -1267,7 +1261,6 @@ static int AppendFixedOptions(PDhcpServerContext ctx, PDhcpMsgInfo reply)
 {
     ServerContext *srvIns = GetServerInstance(ctx);
     if (!srvIns) {
-        LOGE("dhcp server context pointer is null.");
         return RET_FAILED;
     }
     if (!reply) {
@@ -1328,7 +1321,6 @@ static int SendDhcpOffer(PDhcpServerContext ctx, PDhcpMsgInfo reply)
 {
     ServerContext *srvIns = GetServerInstance(ctx);
     if (!srvIns) {
-        LOGE("dhcp server context pointer is null.");
         return RET_FAILED;
     }
     if (AppendReplyTypeOption(reply, REPLY_OFFER) != RET_SUCCESS) {
@@ -1433,13 +1425,6 @@ static int SendDhcpNak(PDhcpServerContext ctx, PDhcpMsgInfo reply)
 
 static int ParseMessageOptions(PDhcpMsgInfo msg)
 {
-    if (msg->packet.hlen < 0) {
-        return RET_FAILED;
-    }
-    if (msg->packet.hlen > DHCP_MESSAGE_FLAG_LENGTH) {
-        return RET_FAILED;
-    }
-
     if (msg->length < (DHCP_MSG_HEADER_SIZE + MAGIC_COOKIE_LENGTH)) {
         return RET_FAILED;
     }
@@ -1612,14 +1597,14 @@ static int InitServerContext(DhcpConfig *config, DhcpServerContext *ctx)
         return RET_FAILED;
     }
     if (!CheckAddressRange(&srvIns->addressPool)) {
+        LOGE("failed to validate address range.");
         return RET_FAILED;
     }
-
     InitLeaseFile(&srvIns->addressPool);
     return RET_SUCCESS;
 }
 
-static int InitServerFixedOptions(DhcpConfig *config, DhcpServerContext *ctx)
+int InitServerFixedOptions(DhcpConfig *config, DhcpServerContext *ctx)
 {
     if (!config) {
         LOGE("server configure pointer is null.");
@@ -1635,7 +1620,9 @@ static int InitServerFixedOptions(DhcpConfig *config, DhcpServerContext *ctx)
         LOGE("dhcp configure has not been initialized.");
         return RET_FAILED;
     }
-
+    if (InitOptionList(&srvIns->addressPool.fixedOptions) != RET_SUCCESS) {
+        return RET_FAILED;
+    }
     if (config->options.first != NULL && config->options.size > 0) {
         DhcpOptionNode *pNode = config->options.first->next;
         for (size_t i = 0; pNode != NULL && i < config->options.size; i++) {
@@ -1669,17 +1656,17 @@ PDhcpServerContext InitializeServer(DhcpConfig *config)
     }
     if ((context->instance = calloc(1, sizeof(ServerContext))) == NULL) {
         LOGE("failed to calloc server instance.");
-        FreeServerContex(context);
+        FreeServerContext(context);
         return NULL;
     }
     if (InitServerContext(config, context) != RET_SUCCESS) {
         LOGE("failed initialize dhcp server context.");
-        FreeServerContex(context);
+        FreeServerContext(context);
         return NULL;
     }
     if (InitServerFixedOptions(config, context) != RET_SUCCESS) {
         LOGE("failed initialize dhcp server fixed options.");
-        FreeServerContex(context);
+        FreeServerContext(context);
         return NULL;
     }
     LOGD("server id: %s", ParseStrIp(config->serverId));
@@ -1693,18 +1680,22 @@ PDhcpServerContext InitializeServer(DhcpConfig *config)
     return context;
 }
 
-int FreeServerContex(PDhcpServerContext ctx)
+int FreeServerContext(PDhcpServerContext ctx)
 {
     if (!ctx) {
         LOGE("dhcp server context pointer is null.");
         return RET_FAILED;
     }
-    if (ctx->instance) {
-        ServerContext *srvIns = GetServerInstance(ctx);
-        FreeAddressPool(&srvIns->addressPool);
+    ServerContext *srvIns = GetServerInstance(ctx);
+    if (!srvIns) {
+        LOGE("dhcp server instance pointer is null.");
+        return RET_FAILED;
+    }
+    FreeAddressPool(&srvIns->addressPool);
+    if (ctx->instance != NULL) {
         free(ctx->instance);
         ctx->instance = NULL;
+        free(ctx);
     }
-    free(ctx);
     return RET_SUCCESS;
 }

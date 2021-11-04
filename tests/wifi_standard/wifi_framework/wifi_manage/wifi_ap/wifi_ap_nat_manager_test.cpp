@@ -24,19 +24,16 @@
 
 using ::testing::_;
 using ::testing::Return;
+using ::testing::ext::TestSize;
 
 namespace OHOS {
 namespace Wifi {
 class WifiApNatManager_test : public testing::Test {
 public:
-    static void SetUpTestCase()
-    {}
-    static void TearDownTestCase()
-    {}
-    virtual void SetUp()
-    {}
-    virtual void TearDown()
-    {}
+    static void SetUpTestCase() {}
+    static void TearDownTestCase() {}
+    virtual void SetUp() {}
+    virtual void TearDown() {}
 
 public:
     bool WrapSetForwarding(bool enable)
@@ -67,7 +64,7 @@ public:
     WifiApNatManager mApNatManager;
 };
 
-TEST_F(WifiApNatManager_test, EnableInterfaceNat_SUCCESS)
+HWTEST_F(WifiApNatManager_test, EnableInterfaceNat_SUCCESS, TestSize.Level1)
 {
     int fd = 10;
     MockSystemInterface::SetMockFlag(true);
@@ -84,7 +81,7 @@ TEST_F(WifiApNatManager_test, EnableInterfaceNat_SUCCESS)
     EXPECT_FALSE(mApNatManager.EnableInterfaceNat(true, std::string(""), ifc1));
 }
 
-TEST_F(WifiApNatManager_test, DisableInterfaceNat_SUCCESS)
+HWTEST_F(WifiApNatManager_test, DisableInterfaceNat_SUCCESS, TestSize.Level1)
 {
     int fd = 10;
     MockSystemInterface::SetMockFlag(true);
@@ -99,43 +96,41 @@ TEST_F(WifiApNatManager_test, DisableInterfaceNat_SUCCESS)
 
     EXPECT_FALSE(mApNatManager.EnableInterfaceNat(false, badifc, ifc1));
     EXPECT_FALSE(mApNatManager.EnableInterfaceNat(false, std::string(""), ifc1));
+    MockSystemInterface::SetMockFlag(false);
 }
 
-TEST_F(WifiApNatManager_test, SetForwarding_SUCCESS)
+HWTEST_F(WifiApNatManager_test, SetForwarding_SUCCESS, TestSize.Level1)
 {
     EXPECT_TRUE(WrapSetForwarding(true));
     EXPECT_TRUE(WrapSetForwarding(false));
 }
 
-TEST_F(WifiApNatManager_test, SetInterfaceRoute_SUCCESS)
+HWTEST_F(WifiApNatManager_test, SetInterfaceRoute_SUCCESS, TestSize.Level1)
 {
     int fd = 10;
     MockSystemInterface::SetMockFlag(true);
     EXPECT_CALL(MockSystemInterface::GetInstance(), system(_)).WillOnce(Return(-1)).WillRepeatedly(Return(fd));
     EXPECT_TRUE(WrapSetInterfaceRoute(true));
     EXPECT_TRUE(WrapSetInterfaceRoute(false));
+    MockSystemInterface::SetMockFlag(false);
 }
 
-TEST_F(WifiApNatManager_test, SetInterfaceNat_SUCCESS)
+HWTEST_F(WifiApNatManager_test, SetInterfaceNat_SUCCESS, TestSize.Level1)
 {
     int fd = 10;
     MockSystemInterface::SetMockFlag(true);
     EXPECT_CALL(MockSystemInterface::GetInstance(), system(_)).WillOnce(Return(-1)).WillRepeatedly(Return(fd));
     EXPECT_TRUE(WrapSetInterfaceNat(true, ifc2));
     EXPECT_TRUE(WrapSetInterfaceNat(false, ifc2));
+    MockSystemInterface::SetMockFlag(false);
 }
 
-TEST_F(WifiApNatManager_test, WriteDataToFile_SUCCESS)
+HWTEST_F(WifiApNatManager_test, WriteDataToFile_SUCCESS, TestSize.Level1)
 {
     std::string filename = "./test.txt";
     std::string context = "1234567890";
 
     MockSystemInterface::SetMockFlag(true);
-
-    /* EXPECT_CALL(MockSystemInterface::GetInstance(), write(_, _, _))
-        .WillOnce(Return(-1))
-        .WillRepeatedly(Return(context.size())); */
-//    EXPECT_CALL(MockSystemInterface::GetInstance(), close(_)).WillRepeatedly(Return(1));
 
     EXPECT_TRUE(WrapWriteDataToFile(filename, context));
     EXPECT_TRUE(WrapWriteDataToFile(filename, context));
@@ -143,8 +138,7 @@ TEST_F(WifiApNatManager_test, WriteDataToFile_SUCCESS)
 
     MockSystemInterface::SetMockFlag(false);
 }
-
-TEST_F(WifiApNatManager_test, ExecCommand_SUCCESS)
+HWTEST_F(WifiApNatManager_test, ExecCommand_SUCCESS, TestSize.Level1)
 {
     MockSystemInterface::SetMockFlag(true);
     std::vector<std::string> str;
@@ -155,5 +149,5 @@ TEST_F(WifiApNatManager_test, ExecCommand_SUCCESS)
 
     MockSystemInterface::SetMockFlag(false);
 }
-}  // namespace Wifi
-}  // namespace OHOS
+} // namespace Wifi
+} // namespace OHOS

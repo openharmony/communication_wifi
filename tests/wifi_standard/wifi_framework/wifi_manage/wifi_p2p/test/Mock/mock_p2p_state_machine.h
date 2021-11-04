@@ -36,7 +36,18 @@ public:
     {}
     ~MockP2pStateMachine() = default;
     MOCK_METHOD0(Initialize, void());
-    MOCK_METHOD1(IsConfigUnusable, P2pConfigErrCode(const WifiP2pConfig &config));
+    MOCK_METHOD1(IsConfigUnusable, P2pConfigErrCode(const WifiP2pConfigInternal &config));
+    MOCK_METHOD0(DealGroupCreationFailed, void());
+    MOCK_CONST_METHOD2(BroadcastActionResult, void(P2pActionCallback action, ErrCode result));
+    MOCK_CONST_METHOD1(BroadcastP2pStatusChanged, void(P2pState state));
+    MOCK_CONST_METHOD1(BroadcastThisDeviceChanaged, void(const WifiP2pDevice &device));
+    MOCK_CONST_METHOD0(UpdateGroupInfoToWpa, void());
+    MOCK_CONST_METHOD0(BroadcastP2pPeersChanged, void());
+    MOCK_CONST_METHOD1(ReawakenPersistentGroup, bool(WifiP2pConfigInternal &config));
+    MOCK_CONST_METHOD0(UpdatePersistentGroups, void());
+    MOCK_METHOD0(StartDhcpServer, bool());
+    MOCK_CONST_METHOD2(SetGroupConfig, bool(const WifiP2pConfigInternal &config, bool newGroup));
+    MOCK_CONST_METHOD2(DealCreateNewGroupWithConfig, bool(const WifiP2pConfigInternal &config, int freq));
 };
 }  // namespace Wifi
 }  // namespace OHOS

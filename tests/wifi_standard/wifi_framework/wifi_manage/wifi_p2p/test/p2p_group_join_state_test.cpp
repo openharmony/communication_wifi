@@ -116,5 +116,12 @@ HWTEST_F(P2pGroupJoinStateTest, ExecuteStateMsg, TestSize.Level1)
     msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::PEER_CONNECTION_USER_REJECT));
     pP2pGroupJoinState->ExecuteStateMsg(&msg);
 }
+
+HWTEST_F(P2pGroupJoinStateTest, ProcessCmdP2pDisable, TestSize.Level1)
+{
+    InternalMessage msg;
+    msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_P2P_DISABLE));
+    pP2pGroupJoinState->ExecuteStateMsg(&msg);
+}
 }  // namespace Wifi
 }  // namespace OHOS

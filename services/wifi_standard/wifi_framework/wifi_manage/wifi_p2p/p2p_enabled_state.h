@@ -33,7 +33,7 @@ public:
      * @param None
      * @return None
      */
-    P2pEnabledState(P2pStateMachine &, WifiP2pGroupManager &, WifiP2pDeviceManager &);
+    P2pEnabledState(P2pStateMachine &stateMachine, WifiP2pGroupManager &groupMgr, WifiP2pDeviceManager &deviceMgr);
 
     /**
      * @Description Destroy the P2pEnabledState object
@@ -222,6 +222,13 @@ private:
      * @return false - not handle
      */
     virtual bool ProcessCmdSetWfdInfo(InternalMessage &msg) const;
+
+    /**
+     * @Description Process the cancel connect command received by the state machine
+     * @param msg - Message body sent by the state machine
+     * @return - bool true:handle   false:not handle
+     */
+    virtual bool ProcessCmdCancelConnect(InternalMessage &msg) const;
 
 private:
     using ProcessFun = bool (P2pEnabledState::*)(InternalMessage &msg) const;

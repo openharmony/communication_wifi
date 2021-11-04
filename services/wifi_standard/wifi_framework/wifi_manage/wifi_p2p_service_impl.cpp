@@ -357,7 +357,7 @@ ErrCode WifiP2pServiceImpl::StopP2pListen()
 
 ErrCode WifiP2pServiceImpl::FormGroup(const WifiP2pConfig &config)
 {
-    WIFI_LOGI("FormGroup, network name is [%{public}s]", config.GetNetworkName().c_str());
+    WIFI_LOGI("FormGroup, network name is [%{public}s]", config.GetGroupName().c_str());
     if (WifiPermissionUtils::VerifyGetWifiDirectDevicePermission() == PERMISSION_DENIED) {
         WIFI_LOGE("FormGroup:VerifyGetWifiDirectDevicePermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
@@ -445,9 +445,9 @@ ErrCode WifiP2pServiceImpl::P2pDisConnect()
     return pService->P2pDisConnect();
 }
 
-ErrCode WifiP2pServiceImpl::QueryP2pInfo(WifiP2pInfo &connInfo)
+ErrCode WifiP2pServiceImpl::QueryP2pLinkedInfo(WifiP2pLinkedInfo &linkedInfo)
 {
-    WIFI_LOGI("QueryP2pInfo group owner address [%{private}s]", connInfo.GetGroupOwnerAddress().c_str());
+    WIFI_LOGI("QueryP2pLinkedInfo group owner address [%{private}s]", linkedInfo.GetGroupOwnerAddress().c_str());
     if (!IsP2pServiceRunning()) {
         WIFI_LOGE("P2pService is not runing!");
         return WIFI_OPT_P2P_NOT_OPENED;
@@ -458,7 +458,7 @@ ErrCode WifiP2pServiceImpl::QueryP2pInfo(WifiP2pInfo &connInfo)
         WIFI_LOGE("Get P2P service failed!");
         return WIFI_OPT_P2P_NOT_OPENED;
     }
-    return pService->QueryP2pInfo(connInfo);
+    return pService->QueryP2pLinkedInfo(linkedInfo);
 }
 
 ErrCode WifiP2pServiceImpl::GetCurrentGroup(WifiP2pGroupInfo &group)

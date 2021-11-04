@@ -467,16 +467,6 @@ const std::string &WifiP2pConfig::GetPassphrase() const
     return passphrase;
 }
 
-void WifiP2pConfig::SetWpsInfo(const WpsInfo &info)
-{
-    wpsInfo = info;
-}
-
-const WpsInfo &WifiP2pConfig::GetWpsInfo() const
-{
-    return wpsInfo;
-}
-
 void WifiP2pConfig::SetGroupOwnerIntent(int intent)
 {
     groupOwnerIntent = intent;
@@ -487,42 +477,42 @@ int WifiP2pConfig::GetGroupOwnerIntent() const
     return groupOwnerIntent;
 }
 
-void WifiP2pConfig::SetNetworkName(const std::string &setNetworkName)
+void WifiP2pConfig::SetGroupName(const std::string &setGroupName)
 {
-    networkName = setNetworkName;
+    groupName = setGroupName;
 }
 
-const std::string &WifiP2pConfig::GetNetworkName() const
+const std::string &WifiP2pConfig::GetGroupName() const
 {
-    return networkName;
+    return groupName;
 }
 
-void WifiP2pInfo::SetConnectState(P2pConnectedState setConnectState)
+void WifiP2pLinkedInfo::SetConnectState(P2pConnectedState setConnectState)
 {
     connectState = setConnectState;
 }
 
-P2pConnectedState WifiP2pInfo::GetConnectState() const
+P2pConnectedState WifiP2pLinkedInfo::GetConnectState() const
 {
     return connectState;
 }
 
-void WifiP2pInfo::SetIsGroupOwner(bool isGroupOwner)
+void WifiP2pLinkedInfo::SetIsGroupOwner(bool isGroupOwner)
 {
     isP2pGroupOwner = isGroupOwner;
 }
 
-const bool &WifiP2pInfo::IsGroupOwner() const
+const bool &WifiP2pLinkedInfo::IsGroupOwner() const
 {
     return isP2pGroupOwner;
 }
 
-void WifiP2pInfo::SetIsGroupOwnerAddress(const std::string &setGroupOwnerAddress)
+void WifiP2pLinkedInfo::SetIsGroupOwnerAddress(const std::string &setGroupOwnerAddress)
 {
     groupOwnerAddress = setGroupOwnerAddress;
 }
 
-const std::string &WifiP2pInfo::GetGroupOwnerAddress() const
+const std::string &WifiP2pLinkedInfo::GetGroupOwnerAddress() const
 {
     return groupOwnerAddress;
 }

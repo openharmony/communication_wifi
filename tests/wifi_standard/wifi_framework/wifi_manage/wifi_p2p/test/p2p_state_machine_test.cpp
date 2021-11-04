@@ -205,6 +205,16 @@ public:
         groupInfo.SetOwner(owner);
         pP2pStateMachine->groupManager.AddGroup(groupInfo);
     }
+    void AddGroupManager3()
+    {
+        WifiP2pGroupInfo groupInfo;
+        groupInfo.SetNetworkId(-1);
+        groupInfo.SetGroupName("AAA");
+        groupInfo.SetIsGroupOwner(true);
+        WifiP2pDevice owner;
+        groupInfo.SetOwner(owner);
+        pP2pStateMachine->groupManager.AddGroup(groupInfo);
+    }
     void WarpHandlerDiscoverPeers()
     {
         pP2pStateMachine->HandlerDiscoverPeers();
@@ -223,7 +233,7 @@ public:
         pP2pStateMachine->UpdatePersistentGroups();
     }
 
-    bool WarpReinvokePersistentGroup(WifiP2pConfig &config) const
+    bool WarpReinvokePersistentGroup(WifiP2pConfigInternal &config) const
     {
         return pP2pStateMachine->ReawakenPersistentGroup(config);
     }
@@ -247,15 +257,15 @@ public:
     {
         pP2pStateMachine->InitializeThisDevice();
     }
-    bool WarpIsUsableNetworkName(std::string nwName)
+    bool WarpIsUsableGroupName(std::string nwName)
     {
-        return pP2pStateMachine->IsUsableNetworkName(nwName);
+        return pP2pStateMachine->IsUsableGroupName(nwName);
     }
-    P2pConfigErrCode WarpIsConfigUnusable(const WifiP2pConfig &config)
+    P2pConfigErrCode WarpIsConfigUnusable(const WifiP2pConfigInternal &config)
     {
         return pP2pStateMachine->IsConfigUnusable(config);
     }
-    bool WarpIsConfigUsableAsGroup(WifiP2pConfig config)
+    bool WarpIsConfigUsableAsGroup(WifiP2pConfigInternal config)
     {
         return pP2pStateMachine->IsConfigUsableAsGroup(config);
     }
@@ -305,7 +315,7 @@ public:
     {
         pP2pStateMachine->NotifyUserProvDiscShowPinRequestMessage(pin, peerAddress);
     }
-    void WarpP2pConnectWithPinDisplay(const WifiP2pConfig &config) const
+    void WarpP2pConnectWithPinDisplay(const WifiP2pConfigInternal &config) const
     {
         pP2pStateMachine->P2pConnectByShowingPin(config);
     }
@@ -327,10 +337,45 @@ public:
         pP2pStateMachine->savedP2pConfig.SetWpsInfo(info);
         pP2pStateMachine->NotifyUserInvitationReceivedMessage();
     }
-
     void WarpClearWifiP2pInfo()
     {
         pP2pStateMachine->ClearWifiP2pInfo();
+    }
+    bool WarpStartDhcpServer()
+    {
+        return pP2pStateMachine->StartDhcpServer();
+    }
+    void WarpDhcpResultNotifyOnSuccess(int status, const std::string &ifname, DhcpResult &result)
+    {
+        pP2pStateMachine->pDhcpResultNotify->OnSuccess(status, ifname, result);
+    }
+    void WarpDhcpResultNotifyOnFailed(int status, const std::string &ifname, const std::string &reason)
+    {
+        pP2pStateMachine->pDhcpResultNotify->OnFailed(status, ifname, reason);
+    }
+    void WarpDhcpResultNotifyOnSerExitNotify(const std::string& ifname)
+    {
+        pP2pStateMachine->pDhcpResultNotify->OnSerExitNotify(ifname);
+    }
+    int WarpGetAvailableFreqByBand(GroupOwnerBand band) const
+    {
+        return pP2pStateMachine->GetAvailableFreqByBand(band);
+    }
+    bool WarpSetGroupConfig(const WifiP2pConfigInternal &config, bool newGroup) const
+    {
+        return pP2pStateMachine->SetGroupConfig(config, newGroup);
+    }
+    bool WarpDealCreateNewGroupWithConfig(const WifiP2pConfigInternal &config, int freq) const
+    {
+        return pP2pStateMachine->DealCreateNewGroupWithConfig(config, freq);
+    }
+    void WarpUpdateGroupInfoToWpa() const
+    {
+        pP2pStateMachine->UpdateGroupInfoToWpa();
+    }
+    void WarpHandleP2pServiceResp(const WifiP2pServiceResponse &resp, const WifiP2pDevice &dev) const
+    {
+        pP2pStateMachine->HandleP2pServiceResp(resp, dev);
     }
 };
 
@@ -365,7 +410,7 @@ HWTEST_F(P2pStateMachineTest, RegisterEventHandler, TestSize.Level1)
     WarpRegisterEventHandler();
 }
 
-HWTEST_F(P2pStateMachineTest, UpdateOwnDevice, TestSize.Level1)
+HWTEST_F(P2pStateMachineTest, UpdateThisDevice, TestSize.Level1)
 {
     WarpUpdateThisDevice();
 }
@@ -392,7 +437,7 @@ HWTEST_F(P2pStateMachineTest, UpdatePersistentGroups_FAILED, TestSize.Level1)
 
 HWTEST_F(P2pStateMachineTest, P2pConnectWithPinDisplay_SUCCESS, TestSize.Level1)
 {
-    WifiP2pConfig conf;
+    WifiP2pConfigInternal conf;
     WarpP2pConnectWithPinDisplay(conf);
 
     conf.SetDeviceAddress("AA:BB:CC:DD:EE:FF");
@@ -417,7 +462,7 @@ HWTEST_F(P2pStateMachineTest, RemoveGroupByNetworkId, TestSize.Level1)
     WarpRemoveGroupByNetworkId(1);
 }
 
-HWTEST_F(P2pStateMachineTest, SetWifiP2pInfoWhenGroupFormed, TestSize.Level1)
+HWTEST_F(P2pStateMachineTest, SetWifiP2pInfoOnGroupFormed, TestSize.Level1)
 {
     WarpSetWifiP2pInfoOnGroupFormed("AA:BB:CC:DD:EE:FF");
 }
@@ -440,40 +485,66 @@ HWTEST_F(P2pStateMachineTest, InitializeThisDevice2, TestSize.Level1)
     WarpInitializeThisDevice();
 }
 
-HWTEST_F(P2pStateMachineTest, IsUsableNetworkName, TestSize.Level1)
+HWTEST_F(P2pStateMachineTest, IsUsableGroupName, TestSize.Level1)
 {
-    EXPECT_FALSE(WarpIsUsableNetworkName(""));
-    EXPECT_TRUE(WarpIsUsableNetworkName("12345678910"));
-    EXPECT_FALSE(WarpIsUsableNetworkName("1"));
+    EXPECT_FALSE(WarpIsUsableGroupName(""));
+    EXPECT_TRUE(WarpIsUsableGroupName("12345678910"));
+    EXPECT_FALSE(WarpIsUsableGroupName("1"));
 }
 
-HWTEST_F(P2pStateMachineTest, IsConfigUnusable, TestSize.Level1)
+HWTEST_F(P2pStateMachineTest, IsConfigUnusable1, TestSize.Level1)
 {
-    WifiP2pConfig config;
+    WifiP2pConfigInternal config;
     config.SetDeviceAddress("");
     EXPECT_TRUE(WarpIsConfigUnusable(config) == P2pConfigErrCode::MAC_EMPTY);
+}
+
+HWTEST_F(P2pStateMachineTest, IsConfigUnusable2, TestSize.Level1)
+{
+    WifiP2pConfigInternal config;
     AddDeviceManager();
     config.SetDeviceAddress("AA:BB:CC:DD:EE:FF");
-    EXPECT_FALSE(WarpIsConfigUnusable(config) == P2pConfigErrCode::SUCCESS);
+    config.SetGroupOwnerIntent(6);
+    EXPECT_TRUE(WarpIsConfigUnusable(config) == P2pConfigErrCode::SUCCESS);
+}
+
+HWTEST_F(P2pStateMachineTest, IsConfigUnusable3, TestSize.Level1)
+{
+    WifiP2pConfigInternal config;
+    AddDeviceManager();
+    config.SetDeviceAddress("AA:BB:CC:DD:EE:FF");
+    config.SetGroupOwnerIntent(6);
+    config.SetGroupName(std::string("abcdefghijklnmopqrstuvwxyz1234567"));
+    EXPECT_TRUE(WarpIsConfigUnusable(config) == P2pConfigErrCode::ERR_SIZE_NW_NAME);
+}
+
+HWTEST_F(P2pStateMachineTest, IsConfigUnusable4, TestSize.Level1)
+{
+    WifiP2pConfigInternal config;
     config.SetDeviceAddress("aa:cc:bb:dd:ee:ff");
     EXPECT_TRUE(WarpIsConfigUnusable(config) == P2pConfigErrCode::MAC_NOT_FOUND);
+}
+
+HWTEST_F(P2pStateMachineTest, IsConfigUnusable5, TestSize.Level1)
+{
+    WifiP2pConfigInternal config;
     config.SetDeviceAddress("aa:cc::bb:dd:ee:ff");
     EXPECT_TRUE(WarpIsConfigUnusable(config) == P2pConfigErrCode::ERR_MAC_FORMAT);
 }
 
 HWTEST_F(P2pStateMachineTest, IsConfigUsableAsGroup, TestSize.Level1)
 {
-    WifiP2pConfig config;
+    WifiP2pConfigInternal config;
     config.SetDeviceAddress("");
     EXPECT_FALSE(WarpIsConfigUsableAsGroup(config));
     config.SetDeviceAddress("1");
     EXPECT_FALSE(WarpIsConfigUsableAsGroup(config));
-    config.SetNetworkName("12345678910");
+    config.SetGroupName("12345678910");
     config.SetPassphrase("12345678910");
     EXPECT_TRUE(WarpIsConfigUsableAsGroup(config));
 }
 
-HWTEST_F(P2pStateMachineTest, CancelSupplicantSrvDiscReq, TestSize.Level1)
+HWTEST_F(P2pStateMachineTest, CleanSupplicantServiceReq, TestSize.Level1)
 {
     WarpCleanSupplicantServiceReq();
     Addsvr();
@@ -512,7 +583,7 @@ HWTEST_F(P2pStateMachineTest, BroadcastP2pServicesChanged, TestSize.Level1)
 HWTEST_F(P2pStateMachineTest, BroadcastP2pConnectionChanged, TestSize.Level1)
 {
     IP2pServiceCallbacks callback;
-    callback.OnP2pConnectionChangedEvent = [](const WifiP2pInfo &) { WIFI_LOGI("lamda"); };
+    callback.OnP2pConnectionChangedEvent = [](const WifiP2pLinkedInfo &) { WIFI_LOGI("lamda"); };
     pP2pStateMachine->RegisterP2pServiceCallbacks(callback);
     WarpBroadcastP2pConnectionChanged();
 }
@@ -557,7 +628,7 @@ HWTEST_F(P2pStateMachineTest, NotifyUserProvDiscShowPinRequestMessage, TestSize.
     WarpNotifyP2pProvDiscShowPinRequest(pin, peerAddress);
 }
 
-HWTEST_F(P2pStateMachineTest, NotifyUserInvitationSentMessage, TestSize.Level1)
+HWTEST_F(P2pStateMachineTest, NotifyInvitationSent, TestSize.Level1)
 {
     std::string pin;
     const std::string peerAddress;
@@ -586,11 +657,11 @@ HWTEST_F(P2pStateMachineTest, ClearWifiP2pInfo, TestSize.Level1)
 
 HWTEST_F(P2pStateMachineTest, ReinvokePersistentGroup1, TestSize.Level1)
 {
-    WifiP2pConfig config;
+    WifiP2pConfigInternal config;
     EXPECT_FALSE(WarpReinvokePersistentGroup(config));
 
     config.SetDeviceAddress("AA:BB:CC:DD:EE:FF");
-    config.SetNetworkName("AAA");
+    config.SetGroupName("AAA");
     AddGroupManager();
     AddDeviceManager();
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), GroupAdd(_, _, _))
@@ -602,9 +673,9 @@ HWTEST_F(P2pStateMachineTest, ReinvokePersistentGroup1, TestSize.Level1)
 
 HWTEST_F(P2pStateMachineTest, ReinvokePersistentGroup2, TestSize.Level1)
 {
-    WifiP2pConfig config;
+    WifiP2pConfigInternal config;
     config.SetDeviceAddress("AA:BB:CC:DD:EE:FF");
-    config.SetNetworkName("AAA");
+    config.SetGroupName("AAA");
     AddGroupManager();
     AddDeviceManagerLimit();
     EXPECT_FALSE(WarpReinvokePersistentGroup(config));
@@ -612,9 +683,9 @@ HWTEST_F(P2pStateMachineTest, ReinvokePersistentGroup2, TestSize.Level1)
 
 HWTEST_F(P2pStateMachineTest, ReinvokePersistentGroup3, TestSize.Level1)
 {
-    WifiP2pConfig config;
+    WifiP2pConfigInternal config;
     config.SetDeviceAddress("AA:BB:CC:DD:EE:FF");
-    config.SetNetworkName("AAA");
+    config.SetGroupName("AAA");
     config.SetNetId(2);
     AddGroupManager();
     AddDeviceManagerInViteable();
@@ -628,13 +699,197 @@ HWTEST_F(P2pStateMachineTest, ReinvokePersistentGroup3, TestSize.Level1)
 
 HWTEST_F(P2pStateMachineTest, ReinvokePersistentGroup4, TestSize.Level1)
 {
-    WifiP2pConfig config;
+    WifiP2pConfigInternal config;
     config.SetDeviceAddress("AA:BB:CC:DD:EE:FF");
-    config.SetNetworkName("AAA");
+    config.SetGroupName("AAA");
     config.SetNetId(3);
     AddGroupManager2();
     AddDeviceManagerInViteable();
     EXPECT_FALSE(WarpReinvokePersistentGroup(config));
+}
+
+HWTEST_F(P2pStateMachineTest, StartDhcpServer, TestSize.Level1)
+{
+    WarpStartDhcpServer();
+}
+
+HWTEST_F(P2pStateMachineTest, DhcpResultNotifyOnSuccess, TestSize.Level1)
+{
+    int status = 1;
+    std::string ifName("ifName");
+    DhcpResult result;
+    WarpDhcpResultNotifyOnSuccess(status, ifName, result);
+}
+
+HWTEST_F(P2pStateMachineTest, DhcpResultNotifyOnFailed, TestSize.Level1)
+{
+    int status = 1;
+    std::string ifName("ifName");
+    std::string reason("reason");
+    EXPECT_CALL(WifiP2PHalInterface::GetInstance(), GroupRemove(_)).WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
+    WarpDhcpResultNotifyOnFailed(status, ifName, reason);
+}
+
+HWTEST_F(P2pStateMachineTest, DhcpResultNotifyOnSerExitNotify, TestSize.Level1)
+{
+    std::string ifName("ifName");
+    WarpDhcpResultNotifyOnSerExitNotify(ifName);
+}
+
+HWTEST_F(P2pStateMachineTest, GetAvailableFreqByBand1, TestSize.Level1)
+{
+    GroupOwnerBand band = GroupOwnerBand::GO_BAND_AUTO;
+    EXPECT_EQ(WarpGetAvailableFreqByBand(band), 0);
+}
+
+HWTEST_F(P2pStateMachineTest, GetAvailableFreqByBand2, TestSize.Level1)
+{
+    GroupOwnerBand band = GroupOwnerBand::GO_BAND_2GHZ;
+    EXPECT_CALL(WifiP2PHalInterface::GetInstance(), P2pGetSupportFrequenciesByBand(_, _))
+        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED));
+    EXPECT_EQ(WarpGetAvailableFreqByBand(band), 0);
+}
+
+HWTEST_F(P2pStateMachineTest, GetAvailableFreqByBand3, TestSize.Level1)
+{
+    GroupOwnerBand band = GroupOwnerBand::GO_BAND_2GHZ;
+    std::vector<int> freqList;
+    freqList.push_back(2412);
+    EXPECT_CALL(WifiP2PHalInterface::GetInstance(), P2pGetSupportFrequenciesByBand(_, _))
+        .WillOnce(DoAll(SetArgReferee<1>(freqList), Return(WifiErrorNo::WIFI_IDL_OPT_OK)));
+    WarpGetAvailableFreqByBand(band);
+}
+
+HWTEST_F(P2pStateMachineTest, SetGroupConfig1, TestSize.Level1)
+{
+    WifiP2pConfigInternal config;
+    EXPECT_CALL(WifiP2PHalInterface::GetInstance(), P2pSetGroupConfig(_, _))
+        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED));
+    EXPECT_FALSE(WarpSetGroupConfig(config, true));
+}
+
+HWTEST_F(P2pStateMachineTest, SetGroupConfig2, TestSize.Level1)
+{
+    WifiP2pConfigInternal config;
+    EXPECT_CALL(WifiP2PHalInterface::GetInstance(), P2pGetGroupConfig(_, _))
+        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
+    EXPECT_CALL(WifiP2PHalInterface::GetInstance(), P2pSetGroupConfig(_, _))
+        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
+    EXPECT_TRUE(WarpSetGroupConfig(config, false));
+}
+
+HWTEST_F(P2pStateMachineTest, SetGroupConfig3, TestSize.Level1)
+{
+    WifiP2pConfigInternal config;
+    config.SetGroupName(std::string("GroupName"));
+    config.SetPassphrase(std::string("12345678"));
+    EXPECT_CALL(WifiP2PHalInterface::GetInstance(), P2pGetGroupConfig(_, _))
+        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED));
+    EXPECT_CALL(WifiP2PHalInterface::GetInstance(), P2pSetGroupConfig(_, _))
+        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
+    EXPECT_TRUE(WarpSetGroupConfig(config, false));
+}
+
+HWTEST_F(P2pStateMachineTest, DealCreateNewGroupWithConfig1, TestSize.Level1)
+{
+    WifiP2pConfigInternal config;
+    config.SetGroupName(std::string("AAA"));
+    int freq = 0;
+    AddGroupManager();
+    EXPECT_FALSE(WarpDealCreateNewGroupWithConfig(config, freq));
+}
+
+HWTEST_F(P2pStateMachineTest, DealCreateNewGroupWithConfig2, TestSize.Level1)
+{
+    WifiP2pConfigInternal config;
+    int freq = 0;
+    EXPECT_CALL(WifiP2PHalInterface::GetInstance(), P2pAddNetwork(_)).WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
+    EXPECT_CALL(WifiP2PHalInterface::GetInstance(), P2pSetGroupConfig(_, _))
+        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED));
+    EXPECT_CALL(WifiP2PHalInterface::GetInstance(), GroupAdd(_, _, _))
+        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED));
+    EXPECT_CALL(WifiP2PHalInterface::GetInstance(), RemoveNetwork(_)).WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
+    EXPECT_FALSE(WarpDealCreateNewGroupWithConfig(config, freq));
+}
+
+HWTEST_F(P2pStateMachineTest, DealCreateNewGroupWithConfig3, TestSize.Level1)
+{
+    WifiP2pConfigInternal config;
+    config.SetNetId(-1);
+    int freq = 0;
+    EXPECT_CALL(WifiP2PHalInterface::GetInstance(), P2pAddNetwork(_)).WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
+    EXPECT_CALL(WifiP2PHalInterface::GetInstance(), P2pSetGroupConfig(_, _))
+        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
+    EXPECT_CALL(WifiP2PHalInterface::GetInstance(), GroupAdd(_, _, _)).WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
+    EXPECT_CALL(WifiP2PHalInterface::GetInstance(), RemoveNetwork(_)).WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
+    EXPECT_TRUE(WarpDealCreateNewGroupWithConfig(config, freq));
+}
+
+HWTEST_F(P2pStateMachineTest, UpdateGroupInfoToWpa1, TestSize.Level1)
+{
+    EXPECT_CALL(WifiP2PHalInterface::GetInstance(), RemoveNetwork(_))
+        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED));
+    WarpUpdateGroupInfoToWpa();
+}
+
+HWTEST_F(P2pStateMachineTest, UpdateGroupInfoToWpa2, TestSize.Level1)
+{
+    AddGroupManager();
+    EXPECT_CALL(WifiP2PHalInterface::GetInstance(), RemoveNetwork(_))
+        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
+    EXPECT_CALL(WifiP2PHalInterface::GetInstance(), P2pAddNetwork(_))
+        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED));
+    WarpUpdateGroupInfoToWpa();
+}
+
+HWTEST_F(P2pStateMachineTest, UpdateGroupInfoToWpa3, TestSize.Level1)
+{
+    AddGroupManager();
+    AddGroupManager3();
+    EXPECT_CALL(WifiP2PHalInterface::GetInstance(), RemoveNetwork(_))
+        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
+    EXPECT_CALL(WifiP2PHalInterface::GetInstance(), P2pAddNetwork(_))
+        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_OK))
+        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
+    EXPECT_CALL(WifiP2PHalInterface::GetInstance(), P2pSetGroupConfig(_, _))
+        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_OK))
+        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
+    WarpUpdateGroupInfoToWpa();
+}
+
+HWTEST_F(P2pStateMachineTest, HandleP2pServiceResp1, TestSize.Level1)
+{
+    WifiP2pServiceResponse resp;
+    resp.SetServiceStatus(P2pServiceStatus::PSRS_SERVICE_PROTOCOL_NOT_AVAILABLE);
+    WifiP2pDevice dev;
+    WarpHandleP2pServiceResp(resp, dev);
+}
+
+HWTEST_F(P2pStateMachineTest, HandleP2pServiceResp2, TestSize.Level1)
+{
+    WifiP2pServiceResponse resp;
+    resp.SetServiceStatus(P2pServiceStatus::PSRS_SUCCESS);
+    resp.SetProtocolType(P2pServicerProtocolType::SERVICE_TYPE_BONJOUR);
+    WifiP2pDevice dev;
+    WarpHandleP2pServiceResp(resp, dev);
+}
+
+HWTEST_F(P2pStateMachineTest, HandleP2pServiceResp3, TestSize.Level1)
+{
+    WifiP2pServiceResponse resp;
+    resp.SetServiceStatus(P2pServiceStatus::PSRS_SUCCESS);
+    resp.SetProtocolType(P2pServicerProtocolType::SERVICE_TYPE_UP_NP);
+    WifiP2pDevice dev;
+    WarpHandleP2pServiceResp(resp, dev);
+}
+
+HWTEST_F(P2pStateMachineTest, HandleP2pServiceResp4, TestSize.Level1)
+{
+    WifiP2pServiceResponse resp;
+    resp.SetServiceStatus(P2pServiceStatus::PSRS_SUCCESS);
+    resp.SetProtocolType(P2pServicerProtocolType::SERVICE_TYPE_VENDOR_SPECIFIC);
+    WifiP2pDevice dev;
+    WarpHandleP2pServiceResp(resp, dev);
 }
 }  // namespace Wifi
 }  // namespace OHOS

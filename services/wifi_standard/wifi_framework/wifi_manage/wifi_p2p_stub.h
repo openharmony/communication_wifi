@@ -59,7 +59,7 @@ private:
     void OnDeleteGroup(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
     void OnP2pConnect(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
     void OnP2pDisConnect(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
-    void OnQueryP2pInfo(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
+    void OnQueryP2pLinkedInfo(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
     void OnGetCurrentGroup(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
     void OnGetP2pEnableStatus(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
     void OnGetP2pDiscoverStatus(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);

@@ -49,7 +49,6 @@ public:
         groupInfo.SetIsPersistent(true);
         groupInfo.SetP2pGroupStatus(P2pGroupStatus::GS_INVALID);
         groupInfo.SetNetworkId(SET_NETWORKID);
-        groupInfo.SetGoIpAddress(std::string("111.111.111.111"));
         groupInfo.AddClientDevice(device);
     }
     virtual void TearDown()
@@ -150,7 +149,7 @@ HWTEST_F(WifiP2pGroupManagerTest, GetOwnerAddr_SUCCESS, TestSize.Level1)
 
 HWTEST_F(WifiP2pGroupManagerTest, Contains_SUCCESS, TestSize.Level1)
 {
-    WifiP2pInfo connInfo;
+    WifiP2pLinkedInfo linkedInfo;
     EXPECT_FALSE(pWifiP2pGroupManager->IsInclude(10));
     pWifiP2pGroupManager->AddGroup(groupInfo);
     EXPECT_TRUE(pWifiP2pGroupManager->IsInclude(10));
@@ -164,8 +163,8 @@ HWTEST_F(WifiP2pGroupManagerTest, RefreshGroupsFromCurrentGroup_SUCCESS, TestSiz
 
 HWTEST_F(WifiP2pGroupManagerTest, SaveP2pInfo_SUCCESS, TestSize.Level1)
 {
-    WifiP2pInfo connInfo;
-    pWifiP2pGroupManager->SaveP2pInfo(connInfo);
+    WifiP2pLinkedInfo linkedInfo;
+    pWifiP2pGroupManager->SaveP2pInfo(linkedInfo);
     pWifiP2pGroupManager->GetP2pInfo();
 }
 

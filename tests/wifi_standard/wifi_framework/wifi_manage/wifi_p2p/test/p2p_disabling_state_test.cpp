@@ -72,7 +72,6 @@ HWTEST_F(P2pDisablingStateTest, ExecuteStateMsg, TestSize.Level1)
 
     msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_P2P_DISABLE));
     pP2pDisablingState->ExecuteStateMsg(&msg);
-    msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::WPA_CONNECTED_EVENT));
 }
 
 HWTEST_F(P2pDisablingStateTest, ExecuteStateMsg2, TestSize.Level1)
@@ -81,7 +80,18 @@ HWTEST_F(P2pDisablingStateTest, ExecuteStateMsg2, TestSize.Level1)
     msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::WPA_CONNECTED_EVENT));
     msg.SetParam1(0);
     EXPECT_CALL(pMockP2pPendant->GetMockP2pMonitor(), MonitorEnds(_)).WillOnce(Return());
+    EXPECT_CALL(pMockP2pPendant->GetP2pStateMachine(), BroadcastP2pStatusChanged(_)).WillOnce(Return());
     pP2pDisablingState->ExecuteStateMsg(&msg);
+}
+
+HWTEST_F(P2pDisablingStateTest, ProcessDisableP2pTimedOut, TestSize.Level1)
+{
+    InternalMessage msg;
+    msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::DISABLE_P2P_TIMED_OUT));
+    msg.SetParam1(0);
+    EXPECT_CALL(pMockP2pPendant->GetMockP2pMonitor(), MonitorEnds(_)).WillOnce(Return());
+    EXPECT_CALL(pMockP2pPendant->GetP2pStateMachine(), BroadcastP2pStatusChanged(_)).WillOnce(Return());
+    EXPECT_TRUE(pP2pDisablingState->ExecuteStateMsg(&msg));
 }
 }  // namespace Wifi
 }  // namespace OHOS

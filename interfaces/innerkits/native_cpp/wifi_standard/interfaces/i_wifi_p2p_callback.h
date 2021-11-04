@@ -65,9 +65,9 @@ public:
     /**
      * @Description Connection status change.
      *
-     * @param info - WifiP2pInfo object
+     * @param info - WifiP2pLinkedInfo object
      */
-    virtual void OnP2pConnectionChanged(const WifiP2pInfo &info) = 0;
+    virtual void OnP2pConnectionChanged(const WifiP2pLinkedInfo &info) = 0;
 
     /**
      * @Description Discover status change.

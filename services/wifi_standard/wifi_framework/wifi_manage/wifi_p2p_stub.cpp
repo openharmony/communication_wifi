@@ -49,7 +49,7 @@ void WifiP2pStub::InitHandleMap()
     handleFuncMap[WIFI_SVR_CMD_P2P_DELETE_GROUP] = &WifiP2pStub::OnDeleteGroup;
     handleFuncMap[WIFI_SVR_CMD_P2P_CONNECT] = &WifiP2pStub::OnP2pConnect;
     handleFuncMap[WIFI_SVR_CMD_P2P_DISCONNECT] = &WifiP2pStub::OnP2pDisConnect;
-    handleFuncMap[WIFI_SVR_CMD_P2P_QUERY_INFO] = &WifiP2pStub::OnQueryP2pInfo;
+    handleFuncMap[WIFI_SVR_CMD_P2P_QUERY_INFO] = &WifiP2pStub::OnQueryP2pLinkedInfo;
     handleFuncMap[WIFI_SVR_CMD_P2P_GET_CURRENT_GROUP] = &WifiP2pStub::OnGetCurrentGroup;
     handleFuncMap[WIFI_SVR_CMD_P2P_GET_ENABLE_STATUS] = &WifiP2pStub::OnGetP2pEnableStatus;
     handleFuncMap[WIFI_SVR_CMD_P2P_GET_DISCOVER_STATUS] = &WifiP2pStub::OnGetP2pDiscoverStatus;
@@ -244,11 +244,11 @@ void WifiP2pStub::OnP2pDisConnect(uint32_t code, MessageParcel &data, MessagePar
     return;
 }
 
-void WifiP2pStub::OnQueryP2pInfo(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
+void WifiP2pStub::OnQueryP2pLinkedInfo(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
-    WifiP2pInfo config;
-    ErrCode ret = QueryP2pInfo(config);
+    WifiP2pLinkedInfo config;
+    ErrCode ret = QueryP2pLinkedInfo(config);
 
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
@@ -493,15 +493,10 @@ void WifiP2pStub::ReadWifiP2pConfigData(MessageParcel &data, WifiP2pConfig &conf
 {
     config.SetDeviceAddress(data.ReadCString());
     config.SetPassphrase(data.ReadCString());
-    config.SetNetworkName(data.ReadCString());
+    config.SetGroupName(data.ReadCString());
     config.SetGoBand(static_cast<GroupOwnerBand>(data.ReadInt32()));
     config.SetNetId(data.ReadInt32());
     config.SetGroupOwnerIntent(data.ReadInt32());
-    WpsInfo wpsInfo;
-    wpsInfo.SetWpsMethod(static_cast<WpsMethod>(data.ReadInt32()));
-    wpsInfo.SetBssid(data.ReadCString());
-    wpsInfo.SetPin(data.ReadCString());
-    config.SetWpsInfo(wpsInfo);
 }
 
 sptr<IWifiP2pCallback> WifiP2pStub::GetCallback() const

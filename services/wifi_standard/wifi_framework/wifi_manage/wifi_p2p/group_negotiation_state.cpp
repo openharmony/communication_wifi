@@ -79,6 +79,7 @@ bool GroupNegotiationState::ProcessGroupStartedEvt(InternalMessage &msg) const
 
     if (groupManager.GetCurrentGroup().IsGroupOwner() &&
         MacAddress::IsValidMac(groupManager.GetCurrentGroup().GetOwner().GetDeviceAddress().c_str())) {
+        deviceManager.GetThisDevice().SetP2pDeviceStatus(P2pDeviceStatus::PDS_CONNECTED);
         group.SetOwner(deviceManager.GetThisDevice());
         groupManager.SetCurrentGroup(group);
     }
@@ -116,7 +117,7 @@ bool GroupNegotiationState::ProcessGroupStartedEvt(InternalMessage &msg) const
         const WifiP2pDevice &owner = groupManager.GetCurrentGroup().GetOwner();
         WifiP2pDevice device = deviceManager.GetDevices(owner.GetDeviceAddress());
         if (device.IsValid()) {
-            device.SetP2pDeviceStatus(owner.GetP2pDeviceStatus());
+            device.SetP2pDeviceStatus(P2pDeviceStatus::PDS_CONNECTED);
             WifiP2pGroupInfo copy = groupManager.GetCurrentGroup();
             copy.SetOwner(device);
             groupManager.SetCurrentGroup(copy);

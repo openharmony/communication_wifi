@@ -212,7 +212,7 @@ public:
      * @param pin - if using pin mode, return pin code
      * @return WifiErrorNo
      */
-    WifiErrorNo Connect(const WifiP2pConfig &config, bool isJoinExistingGroup, std::string &pin) const;
+    WifiErrorNo Connect(const WifiP2pConfigInternal &config, bool isJoinExistingGroup, std::string &pin) const;
 
     /**
      * @Description Sends a request for cancel connect to the P2P
@@ -227,7 +227,7 @@ public:
      * @param config
      * @return WifiErrorNo
      */
-    WifiErrorNo ProvisionDiscovery(const WifiP2pConfig &config) const;
+    WifiErrorNo ProvisionDiscovery(const WifiP2pConfigInternal &config) const;
 
     /**
      * @Description Add Group

@@ -24,13 +24,13 @@ class ApRootState : public State {
     FRIEND_GTEST(ApRootState);
 public:
     /**
-     * @Description  construction method
+     * @Description  construction method.
      * @param None
      * @return None
      */
     ApRootState();
     /**
-     * @Description  destructor method
+     * @Description  destructor method.
      * @param None
      * @return None
      */

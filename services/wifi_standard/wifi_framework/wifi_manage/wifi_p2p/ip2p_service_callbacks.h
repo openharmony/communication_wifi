@@ -30,7 +30,7 @@ struct IP2pServiceCallbacks {
     /* Report the latest services discovery information. */
     std::function<void(const std::vector<WifiP2pServiceInfo> &)> OnP2pServicesChangedEvent;
     /* The event of connection status change. */
-    std::function<void(const WifiP2pInfo &)> OnP2pConnectionChangedEvent;
+    std::function<void(const WifiP2pLinkedInfo &)> OnP2pConnectionChangedEvent;
     /* The event of this device configure has change */
     std::function<void(const WifiP2pDevice &)> OnP2pThisDeviceChangedEvent;
     /* The event of discovery status change */
@@ -39,6 +39,12 @@ struct IP2pServiceCallbacks {
     std::function<void()> OnP2pGroupsChangedEvent;
     /* The result returned by the asynchronous interface */
     std::function<void(P2pActionCallback, ErrCode)> OnP2pActionResultEvent;
+    std::function<void(P2pServicerProtocolType, const std::vector<unsigned char> &, const WifiP2pDevice &)>
+        OnP2pServiceAvailable;
+    std::function<void(const std::string &, const std::string &, const WifiP2pDevice &)> OnP2pDnsSdServiceAvailable;
+    std::function<void(const std::string &, const std::map<std::string, std::string> &, const WifiP2pDevice &)>
+        OnP2pDnsSdTxtRecordAvailable;
+    std::function<void(const std::vector<std::string> &, const WifiP2pDevice &)> OnP2pUpnpServiceAvailable;
 };
 }  // namespace Wifi
 }  // namespace OHOS

@@ -115,7 +115,11 @@ ErrCode WifiP2pService::StopP2pListen()
 ErrCode WifiP2pService::FormGroup(const WifiP2pConfig &config)
 {
     WIFI_LOGI("FormGroup");
-    const std::any info = config;
+    WifiP2pConfigInternal configInternal(config);
+    WpsInfo wps;
+    wps.SetWpsMethod(WpsMethod::WPS_METHOD_PBC);
+    configInternal.SetWpsInfo(wps);
+    const std::any info = configInternal;
     p2pStateMachine.SendMessage(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_FORM_GROUP), info);
     return ErrCode::WIFI_OPT_SUCCESS;
 }
@@ -138,7 +142,11 @@ ErrCode WifiP2pService::DeleteGroup(const WifiP2pGroupInfo &group)
 ErrCode WifiP2pService::P2pConnect(const WifiP2pConfig &config)
 {
     WIFI_LOGI("P2pConnect");
-    const std::any info = config;
+    WifiP2pConfigInternal configInternal(config);
+    WpsInfo wps;
+    wps.SetWpsMethod(WpsMethod::WPS_METHOD_PBC);
+    configInternal.SetWpsInfo(wps);
+    const std::any info = configInternal;
     p2pStateMachine.SendMessage(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_CONNECT), info);
 
     return ErrCode::WIFI_OPT_SUCCESS;
@@ -146,7 +154,9 @@ ErrCode WifiP2pService::P2pConnect(const WifiP2pConfig &config)
 
 ErrCode WifiP2pService::P2pDisConnect()
 {
-    return RemoveGroup();
+    WIFI_LOGI("P2pDisConnect");
+    p2pStateMachine.SendMessage(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_CANCEL_CONNECT));
+    return ErrCode::WIFI_OPT_SUCCESS;
 }
 
 ErrCode WifiP2pService::SetP2pDeviceName(const std::string &devName)
@@ -164,17 +174,17 @@ ErrCode WifiP2pService::SetP2pWfdInfo(const WifiP2pWfdInfo &wfdInfo)
     p2pStateMachine.SendMessage(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_SET_WFD_INFO), wfdInfo);
     return ErrCode::WIFI_OPT_SUCCESS;
 }
-ErrCode WifiP2pService::QueryP2pInfo(WifiP2pInfo &connInfo)
+ErrCode WifiP2pService::QueryP2pLinkedInfo(WifiP2pLinkedInfo &linkedInfo)
 {
-    WIFI_LOGI("QueryP2pInfo");
-    connInfo = groupManager.GetP2pInfo();
+    WIFI_LOGI("QueryP2pLinkedInfo");
+    linkedInfo = groupManager.GetP2pInfo();
     return ErrCode::WIFI_OPT_SUCCESS;
 }
 
 ErrCode WifiP2pService::GetCurrentGroup(WifiP2pGroupInfo &group)
 {
     WIFI_LOGI("GetCurrentGroup");
-    WifiP2pInfo p2pInfo;
+    WifiP2pLinkedInfo p2pInfo;
     WifiSettings::GetInstance().GetP2pInfo(p2pInfo);
     if (p2pInfo.GetConnectState() == P2pConnectedState::P2P_DISCONNECTED) {
         return ErrCode::WIFI_OPT_FAILED;
@@ -201,7 +211,7 @@ ErrCode WifiP2pService::GetP2pDiscoverStatus(int &status)
 ErrCode WifiP2pService::GetP2pConnectedStatus(int &status)
 {
     WIFI_LOGI("GetP2pConnectedStatus");
-    WifiP2pInfo p2pInfo;
+    WifiP2pLinkedInfo p2pInfo;
     WifiSettings::GetInstance().GetP2pInfo(p2pInfo);
     status = static_cast<int>(p2pInfo.GetConnectState());
     return ErrCode::WIFI_OPT_SUCCESS;
@@ -211,6 +221,13 @@ ErrCode WifiP2pService::QueryP2pDevices(std::vector<WifiP2pDevice> &devices)
 {
     WIFI_LOGI("QueryP2pDevices");
     deviceManager.GetDevicesList(devices);
+    return ErrCode::WIFI_OPT_SUCCESS;
+}
+
+ErrCode WifiP2pService::QueryP2pLocalDevice(WifiP2pDevice &device)
+{
+    LOGI("QueryP2pLocalDevice");
+    device = deviceManager.GetThisDevice();
     return ErrCode::WIFI_OPT_SUCCESS;
 }
 

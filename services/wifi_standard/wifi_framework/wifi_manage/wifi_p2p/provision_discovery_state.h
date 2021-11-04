@@ -32,7 +32,8 @@ public:
      * @param None
      * @return None
      */
-    ProvisionDiscoveryState(P2pStateMachine &, WifiP2pGroupManager &, WifiP2pDeviceManager &);
+    ProvisionDiscoveryState(P2pStateMachine &stateMachine, WifiP2pGroupManager &setGroupMgr,
+        WifiP2pDeviceManager &setDeviceMgr);
 
     /**
      * @Description Destroy the Provision Discovery State object
@@ -78,6 +79,20 @@ private:
     virtual bool ProcessCmdDiscoverPeer(InternalMessage &msg) const;
 
     /**
+     * @Description Process the discover services command received by the state machine
+     * @param msg - Message body sent by the state machine
+     * @return - bool true:handle   false:not handle
+     */
+    virtual bool ProcessCmdDiscServices(InternalMessage &msg) const;
+
+    /**
+     * @Description Process the start listen command received by the state machine
+     * @param msg - Message body sent by the state machine
+     * @return - bool true:handle   false:not handle
+     */
+    virtual bool ProcessCmdStartListen(InternalMessage &msg) const;
+
+    /**
      * @Description Process the provision discover pbc response message received by the state machine
      * @param msg - Message body sent by the state machine
      * @return - bool true:handle   false:not handle
@@ -104,6 +119,13 @@ private:
      * @return - bool true:handle   false:not handle
      */
     virtual bool ProcessProvDiscFailEvt(InternalMessage &msg) const;
+
+    /**
+     * @Description Process the cancel connect message received by the state machine
+     * @param msg - Message body sent by the state machine
+     * @return - bool true:handle   false:not handle
+     */
+    virtual bool ProcessCmdCancelConnect(InternalMessage &msg) const;
 
 private:
     using ProcessFun = bool (ProvisionDiscoveryState::*)(InternalMessage &msg) const;

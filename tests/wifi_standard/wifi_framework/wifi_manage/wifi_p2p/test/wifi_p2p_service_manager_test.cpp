@@ -29,7 +29,6 @@ public:
 
     virtual void SetUp()
     {
-        WifiP2pDevice device;
         pWifiP2pServiceManager.reset(new WifiP2pServiceManager());
     }
     virtual void TearDown()
@@ -160,7 +159,6 @@ HWTEST_F(WifiP2pServiceManagerTest, AddServiceResponse_SUCCESS, TestSize.Level1)
     EXPECT_TRUE(pWifiP2pServiceManager->AddServiceResponse(p2pSvrReq1));
 }
 
-
 HWTEST_F(WifiP2pServiceManagerTest, RemoveServiceResponse_SUCCESS, TestSize.Level1)
 {
     WifiP2pDevice device;
@@ -235,6 +233,37 @@ HWTEST_F(WifiP2pServiceManagerTest, RemoveRequestRecord, TestSize.Level1)
 HWTEST_F(WifiP2pServiceManagerTest, ClearAllRequestRecord, TestSize.Level1)
 {
     pWifiP2pServiceManager->ClearAllRequestRecord();
+}
+
+HWTEST_F(WifiP2pServiceManagerTest, UpdateServiceName1, TestSize.Level1)
+{
+    WifiP2pServiceResponse resp;
+    resp.SetServiceStatus(P2pServiceStatus::PSRS_SUCCESS);
+    WifiP2pDevice device;
+    device.SetDeviceAddress(std::string("aa:bb:cc:dd:ee:ff"));
+    EXPECT_FALSE(pWifiP2pServiceManager->UpdateServiceName(std::string("aa:bb:cc:dd:ee:ff"), resp));
+}
+
+HWTEST_F(WifiP2pServiceManagerTest, UpdateServiceName2, TestSize.Level1)
+{
+    WifiP2pServiceResponse resp;
+    resp.SetServiceStatus(P2pServiceStatus::PSRS_SUCCESS);
+    WifiP2pDevice device;
+    device.SetDeviceAddress(std::string("aa:bb:cc:dd:ee:ff"));
+    pWifiP2pServiceManager->AddDeviceService(resp, device);
+    EXPECT_TRUE(pWifiP2pServiceManager->UpdateServiceName(std::string("aa:bb:cc:dd:ee:ff"), resp));
+}
+
+HWTEST_F(WifiP2pServiceManagerTest, UpdateServiceName3, TestSize.Level1)
+{
+    WifiP2pServiceResponse resp;
+    resp.SetServiceStatus(P2pServiceStatus::PSRS_SUCCESS);
+    resp.SetProtocolType(P2pServicerProtocolType::SERVICE_TYPE_BONJOUR);
+    WifiP2pDevice device;
+    device.SetDeviceAddress(std::string("aa:bb:cc:dd:ee:ff"));
+    pWifiP2pServiceManager->AddDeviceService(resp, device);
+    resp.SetProtocolType(P2pServicerProtocolType::SERVICE_TYPE_UP_NP);
+    EXPECT_FALSE(pWifiP2pServiceManager->UpdateServiceName(std::string("aa:bb:cc:dd:ee:ff"), resp));
 }
 }  // namespace Wifi
 }  // namespace OHOS

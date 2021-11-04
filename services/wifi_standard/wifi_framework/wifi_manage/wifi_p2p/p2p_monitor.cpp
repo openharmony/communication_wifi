@@ -164,7 +164,7 @@ void P2pMonitor::Broadcast2SmDeviceLost(const std::string &iface, const WifiP2pD
     MessageToStateMachine(iface, P2P_STATE_MACHINE_CMD::P2P_EVENT_DEVICE_LOST, 0, 0, anyDevice);
 }
 
-void P2pMonitor::Broadcast2SmGoNegRequest(const std::string &iface, const WifiP2pConfig &config) const
+void P2pMonitor::Broadcast2SmGoNegRequest(const std::string &iface, const WifiP2pConfigInternal &config) const
 {
     std::any anyConfig = config;
     MessageToStateMachine(iface, P2P_STATE_MACHINE_CMD::P2P_EVENT_GO_NEG_REQUEST, 0, 0, anyConfig);
@@ -341,7 +341,7 @@ void P2pMonitor::WpaEventDeviceLost(const std::string &p2pDeviceAddress) const
 void P2pMonitor::WpaEventGoNegRequest(const std::string &srcAddress, short passwordId) const
 {
     WIFI_LOGD("WpaEventGoNegRequest srcAddress:%{private}s, passwordId:%{private}hd", srcAddress.c_str(), passwordId);
-    WifiP2pConfig config;
+    WifiP2pConfigInternal config;
     config.SetDeviceAddress(srcAddress);
     if (config.GetDeviceAddress().empty()) {
         WIFI_LOGE("ERROR!");

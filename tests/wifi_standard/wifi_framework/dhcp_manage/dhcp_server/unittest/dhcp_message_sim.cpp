@@ -26,6 +26,7 @@
 #include "dhcp_ipv4.h"
 #include "address_utils.h"
 #include "securec.h"
+#include "common_util.h"
 
 #define OPT_MESSAGE_TYPE_LEGTH 1
 #define OPT_HEADER_LENGTH 2
@@ -75,11 +76,27 @@ int DhcpMsgManager::RecvTotal()
     return total;
 }
 
+bool DhcpMsgManager::FrontSendMsg(DhcpMessage *msg)
+{
+    int retval = false;
+    if (!msg) {
+        return retval;
+    }
+    m_sendQueueLocker.lock();
+    if (!m_sendMessages.empty()) {
+        DhcpMessage fmsg = m_sendMessages.front();
+        if (memcpy_s(msg, sizeof(DhcpMessage), &fmsg, sizeof(DhcpMessage)) == EOK) {
+            retval = true;
+        }
+    }
+    m_sendQueueLocker.unlock();
+    return retval;
+}
 
 void DhcpMsgManager::PopSendMsg()
 {
     m_sendQueueLocker.lock();
-    if (!m_sendMessages.empty()) {
+    if (m_sendMessages.size() > 0) {
         m_sendMessages.pop();
     }
     m_sendQueueLocker.unlock();
@@ -108,6 +125,15 @@ int DhcpMsgManager::PushRecvMsg(const DhcpMessage &msg)
     m_recvMessages.push(msg);
     m_recvQueueLocker.unlock();
     return 1;
+}
+
+void DhcpMsgManager::SetClientIp(uint32_t ipAddr)
+{
+    m_clientIpAddress = ipAddr;
+}
+uint32_t DhcpMsgManager::GetClientIp() const
+{
+    return m_clientIpAddress;
 }
 
 struct DhcpClientContext
@@ -197,11 +223,11 @@ DhcpClientContext *InitialDhcpClient(DhcpClientConfig *config)
     return context;
 }
 
-static int ParseDhcpOptions(PDhcpMsgInfo msg)
+int ParseDhcpOptions(PDhcpMsgInfo msg)
 {
     int ret;
     PDhcpOptionNode pNode = msg->options.first->next;
-    DhcpOption endOpt = {END_OPTION, 0};
+    DhcpOption endOpt = {END_OPTION, 0, {0}};
     PushBackOption(&msg->options, &endOpt);
     int replyOptsLength = 0;
     uint8_t *current = msg->packet.options, olen = MAGIC_COOKIE_LENGTH;
@@ -240,7 +266,6 @@ static int ParseDhcpOptions(PDhcpMsgInfo msg)
     return ret;
 }
 
-
 int SendDhcpMessage(DhcpClientContext *ctx, PDhcpMsgInfo msg)
 {
     if (!ctx || !msg) {
@@ -264,7 +289,7 @@ static uint32_t GetXid(int update)
     return currXid;
 }
 
-static int InitMessage(DhcpClientContext *ctx, PDhcpMsgInfo msg, uint8_t msgType)
+int InitMessage(DhcpClientContext *ctx, PDhcpMsgInfo msg, uint8_t msgType)
 {
     LOGD("init dhcp message...");
     if (!ctx) {
@@ -294,9 +319,21 @@ static int InitMessage(DhcpClientContext *ctx, PDhcpMsgInfo msg, uint8_t msgType
     } else {
         msg->packet.xid = GetXid(DHCP_FALSE);
     }
+
+    if (DhcpMsgManager::GetInstance().GetClientIp() != 0) {
+        DhcpOption optReqIp = {REQUESTED_IP_ADDRESS_OPTION, 0, {0}};
+        AppendAddressOption(&optReqIp, DhcpMsgManager::GetInstance().GetClientIp());
+        PushFrontOption(&msg->options, &optReqIp);
+    }
+
     DhcpOption optMsgType = {DHCP_MESSAGE_TYPE_OPTION, OPT_MESSAGE_TYPE_LEGTH, {msgType, 0}};
     PushFrontOption(&msg->options, &optMsgType);
 
+    PDhcpOption pEndOpt = GetOption(&msg->options, END_OPTION);
+    if (pEndOpt == NULL) {
+        DhcpOption endOpt = {END_OPTION, 0, {0}};
+        PushBackOption(&msg->options, &endOpt);
+    }
     return DHCP_TRUE;
 }
 

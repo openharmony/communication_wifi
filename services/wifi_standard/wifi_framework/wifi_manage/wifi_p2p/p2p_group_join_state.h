@@ -31,7 +31,7 @@ public:
      * @param None
      * @return None
      */
-    P2pGroupJoinState(P2pStateMachine &, WifiP2pGroupManager &, WifiP2pDeviceManager &);
+    P2pGroupJoinState(P2pStateMachine &stateMachine, WifiP2pGroupManager &groupMgr, WifiP2pDeviceManager &deviceMgr);
 
     /**
      * @Description Destroy the P2pGroupJoinState object

@@ -27,12 +27,13 @@ class P2pGroupOperatingState : public State {
     FRIEND_GTEST(P2pGroupOperatingState);
 
 public:
-    /**
+    /* *
      * @Description Construct a new P2pGroupOperatingState object
      * @param None
      * @return None
      */
-    P2pGroupOperatingState(P2pStateMachine &, WifiP2pGroupManager &, WifiP2pDeviceManager &);
+    P2pGroupOperatingState(P2pStateMachine &stateMachine, WifiP2pGroupManager &groupMgr,
+        WifiP2pDeviceManager &deviceMgr);
 
     /**
      * @Description Destroy the P2pGroupOperatingState object

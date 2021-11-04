@@ -208,7 +208,7 @@ void P2pStateMachine::UpdatePersistentGroups() const
     }
 }
 
-bool P2pStateMachine::ReawakenPersistentGroup(WifiP2pConfig &config) const
+bool P2pStateMachine::ReawakenPersistentGroup(WifiP2pConfigInternal &config) const
 {
     const WifiP2pDevice device = FetchNewerDeviceInfo(config.GetDeviceAddress());
     if (!device.IsValid()) {
@@ -217,10 +217,10 @@ bool P2pStateMachine::ReawakenPersistentGroup(WifiP2pConfig &config) const
     }
 
     bool isJoin = device.IsGroupOwner();
-    const std::string networkName = config.GetNetworkName();
+    const std::string groupName = config.GetGroupName();
 
     if (isJoin && !device.IsGroupLimit()) {
-        int networkId = groupManager.GetGroupNetworkId(device, networkName);
+        int networkId = groupManager.GetGroupNetworkId(device, groupName);
         if (networkId >= 0) {
             /**
              * If GO is running on the peer device and the GO has been connected,
@@ -293,7 +293,7 @@ WifiP2pDevice P2pStateMachine::FetchNewerDeviceInfo(const std::string &deviceAdd
 
 void P2pStateMachine::DealGroupCreationFailed()
 {
-    WifiP2pInfo info;
+    WifiP2pLinkedInfo info;
     info.SetConnectState(P2pConnectedState::P2P_DISCONNECTED);
     WifiSettings::GetInstance().SaveP2pInfo(info);
     groupManager.SaveP2pInfo(info);
@@ -316,7 +316,7 @@ void P2pStateMachine::RemoveGroupByNetworkId(int networkId) const
 
 void P2pStateMachine::SetWifiP2pInfoWhenGroupFormed(const std::string &groupOwnerAddress)
 {
-    WifiP2pInfo p2pInfo;
+    WifiP2pLinkedInfo p2pInfo;
     WifiSettings::GetInstance().GetP2pInfo(p2pInfo);
     p2pInfo.SetIsGroupOwner(groupManager.GetCurrentGroup().IsGroupOwner());
     p2pInfo.SetIsGroupOwnerAddress(groupOwnerAddress);
@@ -357,7 +357,7 @@ void P2pStateMachine::BroadcastP2pServicesChanged() const
 
 void P2pStateMachine::BroadcastP2pConnectionChanged() const
 {
-    WifiP2pInfo p2pInfo;
+    WifiP2pLinkedInfo p2pInfo;
     WifiSettings::GetInstance().GetP2pInfo(p2pInfo);
     if (p2pServiceCallbacks.OnP2pConnectionChangedEvent) {
         p2pServiceCallbacks.OnP2pConnectionChangedEvent(p2pInfo);
@@ -399,23 +399,59 @@ void P2pStateMachine::BroadcastActionResult(P2pActionCallback action, ErrCode re
     WifiBroadCastHelper::Send("ActionResult", static_cast<int>(action), static_cast<int>(result));
 }
 
+void P2pStateMachine::BroadcastServiceResult(P2pServicerProtocolType serviceType,
+    const std::vector<unsigned char> &respData, const WifiP2pDevice &srcDevice) const
+{
+    if (p2pServiceCallbacks.OnP2pServiceAvailable) {
+        p2pServiceCallbacks.OnP2pServiceAvailable(serviceType, respData, srcDevice);
+    }
+    WifiBroadCastHelper::Send("ServiceResult", static_cast<int>(serviceType), srcDevice);
+}
+
+void P2pStateMachine::BroadcastDnsSdServiceResult(
+    const std::string &instName, const std::string &regType, const WifiP2pDevice &srcDevice) const
+{
+    if (p2pServiceCallbacks.OnP2pDnsSdServiceAvailable) {
+        p2pServiceCallbacks.OnP2pDnsSdServiceAvailable(instName, regType, srcDevice);
+    }
+    WifiBroadCastHelper::Send("DnsSdServiceResult", instName, regType, srcDevice);
+}
+
+void P2pStateMachine::BroadcastDnsSdTxtRecordResult(const std::string &wholeDomainName,
+    const std::map<std::string, std::string> &txtMap, const WifiP2pDevice &srcDevice) const
+{
+    if (p2pServiceCallbacks.OnP2pDnsSdTxtRecordAvailable) {
+        p2pServiceCallbacks.OnP2pDnsSdTxtRecordAvailable(wholeDomainName, txtMap, srcDevice);
+    }
+    WifiBroadCastHelper::Send("DnsSdTxtRecordResult", wholeDomainName, txtMap, srcDevice);
+}
+
+void P2pStateMachine::BroadcastUpnpServiceResult(
+    const std::vector<std::string> &uniqueServiceNames, const WifiP2pDevice &srcDevice) const
+{
+    if (p2pServiceCallbacks.OnP2pUpnpServiceAvailable) {
+        p2pServiceCallbacks.OnP2pUpnpServiceAvailable(uniqueServiceNames, srcDevice);
+    }
+    WifiBroadCastHelper::Send("UpnpServiceResult", uniqueServiceNames, srcDevice);
+}
+
 void P2pStateMachine::RegisterP2pServiceCallbacks(const IP2pServiceCallbacks &callback)
 {
     p2pServiceCallbacks = callback;
 }
 
-bool P2pStateMachine::IsUsableNetworkName(std::string nwName)
+bool P2pStateMachine::IsUsableGroupName(std::string nwName)
 {
     if (nwName.empty()) {
         return false;
     }
-    if (nwName.length() < MIN_NETWORK_NAME_LENGTH || nwName.length() > MAX_NETWORK_NAME_LENGTH) {
+    if (nwName.length() < MIN_GROUP_NAME_LENGTH || nwName.length() > MAX_GROUP_NAME_LENGTH) {
         return false;
     }
     return true;
 }
 
-P2pConfigErrCode P2pStateMachine::IsConfigUnusable(const WifiP2pConfig &config)
+P2pConfigErrCode P2pStateMachine::IsConfigUnusable(const WifiP2pConfigInternal &config)
 {
     constexpr unsigned NETWORK_NAME_MAX_LENGTH = 32;
     constexpr int GROUP_OWNER_MAX_INTENT = 15;
@@ -432,18 +468,18 @@ P2pConfigErrCode P2pStateMachine::IsConfigUnusable(const WifiP2pConfig &config)
     if (config.GetGroupOwnerIntent() < 0 || config.GetGroupOwnerIntent() > GROUP_OWNER_MAX_INTENT) {
         return P2pConfigErrCode::ERR_INTENT;
     }
-    if (config.GetNetworkName().length() > NETWORK_NAME_MAX_LENGTH || config.GetNetworkName().length() < 1) {
+    if (config.GetGroupName().length() > NETWORK_NAME_MAX_LENGTH) {
         return P2pConfigErrCode::ERR_SIZE_NW_NAME;
     }
     return P2pConfigErrCode::SUCCESS;
 }
 
-bool P2pStateMachine::IsConfigUsableAsGroup(WifiP2pConfig config)
+bool P2pStateMachine::IsConfigUsableAsGroup(WifiP2pConfigInternal config)
 {
     if (config.GetDeviceAddress().empty()) {
         return false;
     }
-    if (IsUsableNetworkName(config.GetNetworkName()) && !config.GetPassphrase().empty()) {
+    if (IsUsableGroupName(config.GetGroupName()) && !config.GetPassphrase().empty()) {
         return true;
     }
     return false;
@@ -545,7 +581,7 @@ void P2pStateMachine::NotifyUserInvitationReceivedMessage()
     AbstractUI::GetInstance().ShowAlerDialog(dialog);
 }
 
-void P2pStateMachine::P2pConnectByShowingPin(const WifiP2pConfig &config) const
+void P2pStateMachine::P2pConnectByShowingPin(const WifiP2pConfigInternal &config) const
 {
     if (config.GetDeviceAddress().empty()) {
         WIFI_LOGE("Invalid address parameter.");
@@ -587,7 +623,7 @@ void P2pStateMachine::HandlerDiscoverPeers()
 
 void P2pStateMachine::ChangeConnectedStatus(P2pConnectedState connectedState)
 {
-    WifiP2pInfo p2pInfo;
+    WifiP2pLinkedInfo p2pInfo;
     WifiSettings::GetInstance().GetP2pInfo(p2pInfo);
     p2pInfo.SetConnectState(connectedState);
     WifiSettings::GetInstance().SaveP2pInfo(p2pInfo);
@@ -610,7 +646,7 @@ void P2pStateMachine::ChangeConnectedStatus(P2pConnectedState connectedState)
 
 void P2pStateMachine::ClearWifiP2pInfo()
 {
-    WifiP2pInfo p2pInfo;
+    WifiP2pLinkedInfo p2pInfo;
     WifiSettings::GetInstance().SaveP2pInfo(p2pInfo);
     groupManager.SaveP2pInfo(p2pInfo);
 }
@@ -648,7 +684,7 @@ P2pStateMachine::DhcpResultNotify::~DhcpResultNotify()
 void P2pStateMachine::DhcpResultNotify::OnSuccess(int status, const std::string &ifname, DhcpResult &result)
 {
     WIFI_LOGI("Enter DhcpResultNotify::OnSuccess, status: %{public}d, ifname: %{public}s", status, ifname.c_str());
-    WifiP2pInfo p2pInfo;
+    WifiP2pLinkedInfo p2pInfo;
     WifiSettings::GetInstance().GetP2pInfo(p2pInfo);
     WIFI_LOGI("Set GO IP: %{private}s", result.strServer.c_str());
     p2pInfo.SetIsGroupOwnerAddress(result.strServer);
@@ -700,6 +736,38 @@ void P2pStateMachine::HandleP2pServiceResp(const WifiP2pServiceResponse &resp, c
         WIFI_LOGD("Service protocol is not available.");
         return;
     }
+    if (resp.GetProtocolType() == P2pServicerProtocolType::SERVICE_TYPE_BONJOUR) {
+        WifiP2pDnsSdServiceResponse dnsSrvResp = WifiP2pDnsSdServiceResponse(resp);
+        if (!dnsSrvResp.ParseData()) {
+            WIFI_LOGE("Parse WifiP2pDnsServiceResponse failed!");
+            return;
+        }
+        serviceManager.UpdateServiceName(dev.GetDeviceAddress(), dynamic_cast<WifiP2pServiceResponse &>(dnsSrvResp));
+        if (dnsSrvResp.GetDnsType() == WifiP2pDnsSdServiceInfo::DNS_PTR_TYPE) {
+            BroadcastDnsSdServiceResult(dnsSrvResp.GetInstanceName(), dnsSrvResp.GetQueryName(), dev);
+            return;
+        }
+        if (dnsSrvResp.GetDnsType() == WifiP2pDnsSdServiceInfo::DNS_TXT_TYPE) {
+            BroadcastDnsSdTxtRecordResult(dnsSrvResp.GetQueryName(), dnsSrvResp.GetTxtRecord(), dev);
+            return;
+        }
+        WIFI_LOGE("Parse WifiP2pDnsSdServiceResponse Dnstype failed!");
+        return;
+    }
+    if (resp.GetProtocolType() == P2pServicerProtocolType::SERVICE_TYPE_UP_NP) {
+        WifiP2pUpnpServiceResponse upnpSrvResp =
+            WifiP2pUpnpServiceResponse::Create(resp.GetServiceStatus(), resp.GetTransactionId(), resp.GetData());
+        if (upnpSrvResp.ParseData()) {
+            serviceManager.UpdateServiceName(
+                dev.GetDeviceAddress(), dynamic_cast<WifiP2pServiceResponse &>(upnpSrvResp));
+            BroadcastUpnpServiceResult(upnpSrvResp.GetUniqueServNames(), dev);
+        } else {
+            WIFI_LOGE("Parse WifiP2pUpnpServiceResponse failed!");
+        }
+        return;
+    }
+
+    BroadcastServiceResult(resp.GetProtocolType(), resp.GetData(), dev);
     return;
 }
 
@@ -721,13 +789,13 @@ int P2pStateMachine::GetAvailableFreqByBand(GroupOwnerBand band) const
     return retFreq;
 }
 
-bool P2pStateMachine::SetGroupConfig(const WifiP2pConfig &config, bool newGroup) const
+bool P2pStateMachine::SetGroupConfig(const WifiP2pConfigInternal &config, bool newGroup) const
 {
     WifiErrorNo ret;
     IdlP2pGroupConfig wpaConfig;
     if (newGroup) {
         WIFI_LOGI("SetGroupConfig, new group");
-        wpaConfig.ssid = config.GetNetworkName();
+        wpaConfig.ssid = config.GetGroupName();
         wpaConfig.psk = config.GetPassphrase();
         wpaConfig.bssid = deviceManager.GetThisDevice().GetDeviceAddress();
         const int p2pDisabled = 2;
@@ -741,8 +809,8 @@ bool P2pStateMachine::SetGroupConfig(const WifiP2pConfig &config, bool newGroup)
         if (ret == WifiErrorNo::WIFI_IDL_OPT_FAILED) {
             WIFI_LOGW("P2pGetGroupConfig failed");
         }
-        if (!config.GetNetworkName().empty()) {
-            wpaConfig.ssid = config.GetNetworkName();
+        if (!config.GetGroupName().empty()) {
+            wpaConfig.ssid = config.GetGroupName();
         } else {
             wpaConfig.ssid = knownConfig.ssid;
         }
@@ -768,15 +836,15 @@ bool P2pStateMachine::SetGroupConfig(const WifiP2pConfig &config, bool newGroup)
     }
 }
 
-bool P2pStateMachine::DealCreateNewGroupWithConfig(const WifiP2pConfig &config, int freq) const
+bool P2pStateMachine::DealCreateNewGroupWithConfig(const WifiP2pConfigInternal &config, int freq) const
 {
-    WifiP2pConfig cfgBuf = config;
+    WifiP2pConfigInternal cfgBuf = config;
     int createdNetId = -1;
     int netId = cfgBuf.GetNetId();
 
     std::vector<WifiP2pGroupInfo> groupInfo = groupManager.GetGroups();
     for (auto iter = groupInfo.begin(); iter != groupInfo.end(); ++iter) {
-        if (iter->GetGroupName() == config.GetNetworkName()) {
+        if (iter->GetGroupName() == config.GetGroupName()) {
             WIFI_LOGE("Cannot use a exist group name!");
             return false;
         }

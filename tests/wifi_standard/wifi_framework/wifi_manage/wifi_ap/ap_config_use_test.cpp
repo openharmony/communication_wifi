@@ -25,6 +25,7 @@ using ::testing::DoAll;
 using ::testing::Eq;
 using ::testing::Return;
 using ::testing::StrEq;
+using ::testing::ext::TestSize;
 
 namespace OHOS {
 namespace Wifi {
@@ -35,12 +36,16 @@ std::map<BandType, std::vector<int32_t>> ChanTbs;
 
 class ApConfigUse_Test : public testing::Test {
 public:
-    static void SetUpTestCase()
-    {}
-    static void TearDownTestCase()
-    {}
+    static void SetUpTestCase() {}
+    static void TearDownTestCase() {}
     virtual void SetUp()
     {
+        allowed5GFreq.clear();
+        allowed2GFreq.clear();
+        allowed2GChan.clear();
+        allowed5GChan.clear();
+        allowedFreqCom.clear();
+        ChanTbs.clear();
         const int testFreq1 = 2412;
         const int testFreq2 = 2417;
         const int testFreq3 = 2472;
@@ -82,12 +87,14 @@ public:
     }
     virtual void TearDown()
     {
-        allowed2GFreq.clear();
         allowed5GFreq.clear();
+        allowed2GFreq.clear();
         allowed2GChan.clear();
         allowed5GChan.clear();
-
+        allowedFreqCom.clear();
+        ChanTbs.clear();
         delete pApConfigUse;
+        pApConfigUse = nullptr;
     }
 
 public:
@@ -95,7 +102,7 @@ public:
 };
 
 /* TransformFrequencyIntoChannel */
-TEST_F(ApConfigUse_Test, TransformFrequencyIntoChannel)
+HWTEST_F(ApConfigUse_Test, TransformFrequencyIntoChannel, TestSize.Level1)
 {
     const int testFreq1 = 2412;
     const int testFreq2 = 2417;
@@ -130,7 +137,7 @@ TEST_F(ApConfigUse_Test, TransformFrequencyIntoChannel)
     EXPECT_EQ(-1, pApConfigUse->TransformFrequencyIntoChannel(testFreq05));
 }
 /* TransformFrequencyIntoChannel_overload */
-TEST_F(ApConfigUse_Test, TransformFrequencyIntoChannel_1)
+HWTEST_F(ApConfigUse_Test, TransformFrequencyIntoChannel_1, TestSize.Level1)
 {
     const int testFreq1 = 2412;
     const int testFreq2 = 2417;
@@ -160,7 +167,7 @@ TEST_F(ApConfigUse_Test, TransformFrequencyIntoChannel_1)
     EXPECT_EQ(FreqVector1, FreqVector);
 }
 /* SetConfig */
-TEST_F(ApConfigUse_Test, LogConfig_SUCCESS)
+HWTEST_F(ApConfigUse_Test, LogConfig_SUCCESS, TestSize.Level1)
 {
     HotspotConfig apConfig;
     apConfig.SetBand(BandType::BAND_2GHZ);
@@ -170,7 +177,7 @@ TEST_F(ApConfigUse_Test, LogConfig_SUCCESS)
 }
 
 /* IsValid24GHz */
-TEST_F(ApConfigUse_Test, IsValid24GHz)
+HWTEST_F(ApConfigUse_Test, IsValid24GHz, TestSize.Level1)
 {
     EXPECT_FALSE(pApConfigUse->IsValid24GHz(2400));
     EXPECT_FALSE(pApConfigUse->IsValid24GHz(2500));
@@ -179,7 +186,7 @@ TEST_F(ApConfigUse_Test, IsValid24GHz)
     EXPECT_FALSE(pApConfigUse->IsValid24GHz(2499));
 }
 /* IsValid5GHz */
-TEST_F(ApConfigUse_Test, IsValid5GHz)
+HWTEST_F(ApConfigUse_Test, IsValid5GHz, TestSize.Level1)
 {
     EXPECT_FALSE(pApConfigUse->IsValid5GHz(4900));
     EXPECT_FALSE(pApConfigUse->IsValid5GHz(5169));
@@ -189,32 +196,32 @@ TEST_F(ApConfigUse_Test, IsValid5GHz)
 }
 
 /* CheckBandChannel */
-TEST_F(ApConfigUse_Test, CheckBandChannel_1)
+HWTEST_F(ApConfigUse_Test, CheckBandChannel_1, TestSize.Level1)
 {
     HotspotConfig apConfig;
     apConfig.SetBand(BandType::BAND_2GHZ);
     apConfig.SetChannel(2);
     HotspotConfig apConfig1 = apConfig;
-    std::vector<int32_t> band_2G_channel = {1, 2, 3, 4, 5, 6, 7};
-    std::vector<int32_t> band_5G_channel = {149, 168, 169};
-    ChannelsTable ChannelsTb = {{BandType::BAND_2GHZ, band_2G_channel}, {BandType::BAND_5GHZ, band_5G_channel}};
+    std::vector<int32_t> band_2G_channel = { 1, 2, 3, 4, 5, 6, 7 };
+    std::vector<int32_t> band_5G_channel = { 149, 168, 169 };
+    ChannelsTable ChannelsTb = { { BandType::BAND_2GHZ, band_2G_channel }, { BandType::BAND_5GHZ, band_5G_channel } };
 
     pApConfigUse->CheckBandChannel(apConfig, ChannelsTb);
     EXPECT_EQ(apConfig1, apConfig);
 }
-TEST_F(ApConfigUse_Test, CheckBandChannel_2)
+HWTEST_F(ApConfigUse_Test, CheckBandChannel_2, TestSize.Level1)
 {
     HotspotConfig apConfig;
     apConfig.SetBand(BandType::BAND_2GHZ);
     apConfig.SetChannel(9);
-    std::vector<int32_t> band_2G_channel = {1, 2, 3, 4, 5, 6, 7};
-    std::vector<int32_t> band_5G_channel = {149, 168, 169};
-    ChannelsTable ChannelsTb = {{BandType::BAND_2GHZ, band_2G_channel}, {BandType::BAND_5GHZ, band_5G_channel}};
+    std::vector<int32_t> band_2G_channel = { 1, 2, 3, 4, 5, 6, 7 };
+    std::vector<int32_t> band_5G_channel = { 149, 168, 169 };
+    ChannelsTable ChannelsTb = { { BandType::BAND_2GHZ, band_2G_channel }, { BandType::BAND_5GHZ, band_5G_channel } };
     pApConfigUse->CheckBandChannel(apConfig, ChannelsTb);
     EXPECT_EQ(apConfig.GetChannel(), 6);
     EXPECT_EQ(apConfig.GetBand(), BandType::BAND_2GHZ);
 }
-TEST_F(ApConfigUse_Test, CheckBandChannel_3)
+HWTEST_F(ApConfigUse_Test, CheckBandChannel_3, TestSize.Level1)
 {
     HotspotConfig apConfig;
     ChannelsTable ChannelsTb;
@@ -222,5 +229,5 @@ TEST_F(ApConfigUse_Test, CheckBandChannel_3)
     EXPECT_EQ(apConfig.GetChannel(), 6);
     EXPECT_EQ(apConfig.GetBand(), BandType::BAND_2GHZ);
 }
-}  // namespace Wifi
-}  // namespace OHOS
+} // namespace Wifi
+} // namespace OHOS

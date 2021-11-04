@@ -157,10 +157,10 @@ ErrCode WifiP2pImpl::P2pDisConnect(void)
     return client_->P2pDisConnect();
 }
 
-ErrCode WifiP2pImpl::QueryP2pInfo(WifiP2pInfo &connInfo)
+ErrCode WifiP2pImpl::QueryP2pLinkedInfo(WifiP2pLinkedInfo &linkedInfo)
 {
     RETURN_IF_FAIL(client_);
-    return client_->QueryP2pInfo(connInfo);
+    return client_->QueryP2pLinkedInfo(linkedInfo);
 }
 
 ErrCode WifiP2pImpl::GetCurrentGroup(WifiP2pGroupInfo &group)

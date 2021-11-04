@@ -85,7 +85,7 @@ bool P2pIdleState::ProcessCmdStopDiscPeer(InternalMessage &msg) const
 
 bool P2pIdleState::ProcessCmdConnect(InternalMessage &msg) const
 {
-    WifiP2pConfig config;
+    WifiP2pConfigInternal config;
     if (!msg.GetMessageObj(config)) {
         WIFI_LOGD("p2p connect Parameter error.");
         p2pStateMachine.BroadcastActionResult(P2pActionCallback::P2pConnect, ErrCode::WIFI_OPT_INVALID_PARAM);
@@ -145,7 +145,7 @@ bool P2pIdleState::ProcessProvDiscEnterPinEvt(InternalMessage &msg) const
 
 bool P2pIdleState::ProcessNegotReqEvt(InternalMessage &msg) const
 {
-    WifiP2pConfig conf;
+    WifiP2pConfigInternal conf;
     if (!msg.GetMessageObj(conf)) {
         WIFI_LOGD("Failed to obtain conf.");
         return EXECUTED;
@@ -162,7 +162,7 @@ bool P2pIdleState::ProcessProvDiscShowPinEvt(InternalMessage &msg) const
         WIFI_LOGD("Failed to obtain provDisc.");
         return EXECUTED;
     }
-    WifiP2pConfig config;
+    WifiP2pConfigInternal config;
     WpsInfo wps;
     wps.SetWpsMethod(WpsMethod::WPS_METHOD_KEYPAD);
     wps.SetPin(provDisc.GetPin());
@@ -301,7 +301,7 @@ bool P2pIdleState::ProcessInvitationReceivedEvt(InternalMessage &msg) const
         wps.SetWpsMethod(WpsMethod::WPS_METHOD_KEYPAD);
     }
 
-    WifiP2pConfig config;
+    WifiP2pConfigInternal config;
     config.SetDeviceAddress(owner.GetDeviceAddress());
     config.SetWpsInfo(wps);
     p2pStateMachine.savedP2pConfig = config;

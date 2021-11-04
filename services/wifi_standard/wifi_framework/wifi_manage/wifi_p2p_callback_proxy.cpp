@@ -157,7 +157,7 @@ void WifiP2pCallbackProxy::OnP2pServicesChanged(const std::vector<WifiP2pService
     return;
 }
 
-void WifiP2pCallbackProxy::OnP2pConnectionChanged(const WifiP2pInfo &info)
+void WifiP2pCallbackProxy::OnP2pConnectionChanged(const WifiP2pLinkedInfo &info)
 {
     WIFI_LOGD("WifiP2pCallbackProxy::OnP2pConnectionChanged");
     MessageOption option;

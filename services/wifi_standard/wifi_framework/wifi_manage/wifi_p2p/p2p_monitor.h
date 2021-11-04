@@ -113,7 +113,7 @@ private:
      * @param iface - network interface for event processing
      * @param config - config of P2P
      */
-    virtual void Broadcast2SmGoNegRequest(const std::string &iface, const WifiP2pConfig &config) const;
+    virtual void Broadcast2SmGoNegRequest(const std::string &iface, const WifiP2pConfigInternal &config) const;
     /**
      * @Description Broadcast GO negotiation success event.
      *

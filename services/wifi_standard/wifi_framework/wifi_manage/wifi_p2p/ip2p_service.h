@@ -141,10 +141,10 @@ public:
     virtual ErrCode SetP2pDeviceName(const std::string &devName) = 0;
     /**
      * @Description - The interface of query p2p information like the group state,device information and ip address.
-     * @param  connInfo - struct WifiP2pInfo.
+     * @param  linkedInfo - struct WifiP2pLinkedInfo.
      * @return - ErrCode
      */
-    virtual ErrCode QueryP2pInfo(WifiP2pInfo &connInfo) = 0;
+    virtual ErrCode QueryP2pLinkedInfo(WifiP2pLinkedInfo &linkedInfo) = 0;
 
     /**
      * @DescriptionGet - The interface of get current group information.
@@ -180,6 +180,13 @@ public:
      * @return - ErrCode
      */
     virtual ErrCode QueryP2pDevices(std::vector<WifiP2pDevice> &devives) = 0;
+
+    /**
+     * @Description - Query the information about own device.
+     * @param  device - own device
+     * @return - ErrCode
+     */
+    virtual ErrCode QueryP2pLocalDevice(WifiP2pDevice &device) = 0;
 
     /**
      * @Description - The interface of query p2p group information.

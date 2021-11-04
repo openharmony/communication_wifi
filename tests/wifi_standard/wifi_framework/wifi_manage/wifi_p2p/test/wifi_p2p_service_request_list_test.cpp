@@ -94,17 +94,45 @@ HWTEST_F(WifiP2pServiceRequestListTest, SetDevice, TestSize.Level1)
     EXPECT_EQ(pWifiP2pServiceRequestList->GetDevice(), device);
 }
 
-HWTEST_F(WifiP2pServiceRequestListTest, GetTlvs, TestSize.Level1)  //
+HWTEST_F(WifiP2pServiceRequestListTest, GetTlvs, TestSize.Level1)
 {
     WifiP2pServiceRequest resp;
     EXPECT_TRUE(pWifiP2pServiceRequestList->AddServiceRequest(resp));
     pWifiP2pServiceRequestList->GetTlvs();
 }
 
-HWTEST_F(WifiP2pServiceRequestListTest, ParseTlvs2ReqList, TestSize.Level1)
+HWTEST_F(WifiP2pServiceRequestListTest, ParseTlvs2ReqList1, TestSize.Level1)
 {
-    const std::vector<unsigned char> tlvList;
-    pWifiP2pServiceRequestList->ParseTlvs2ReqList(tlvList);
+    std::vector<unsigned char> tlvList;
+    tlvList.push_back(0x02);
+    tlvList.push_back(0x00);
+    tlvList.push_back(0x00);
+    tlvList.push_back(0x01);
+    EXPECT_TRUE(pWifiP2pServiceRequestList->ParseTlvs2ReqList(tlvList));
+}
+
+HWTEST_F(WifiP2pServiceRequestListTest, ParseTlvs2ReqList2, TestSize.Level1)
+{
+    std::vector<unsigned char> tlvList;
+    tlvList.push_back(0x01);
+    tlvList.push_back(0x00);
+    tlvList.push_back(0x00);
+    tlvList.push_back(0x01);
+    EXPECT_FALSE(pWifiP2pServiceRequestList->ParseTlvs2ReqList(tlvList));
+}
+
+HWTEST_F(WifiP2pServiceRequestListTest, ParseTlvs2ReqList3, TestSize.Level1)
+{
+    std::vector<unsigned char> tlvList;
+    tlvList.push_back(0x06);
+    tlvList.push_back(0x00);
+    tlvList.push_back(0x00);
+    tlvList.push_back(0x01);
+    tlvList.push_back(0x31);
+    tlvList.push_back(0x32);
+    tlvList.push_back(0x33);
+    tlvList.push_back(0x34);
+    EXPECT_TRUE(pWifiP2pServiceRequestList->ParseTlvs2ReqList(tlvList));
 }
 }  // namespace Wifi
 }  // namespace OHOS

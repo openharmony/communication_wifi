@@ -15,6 +15,7 @@
 
 #include <queue>
 #include <mutex>
+#include "dhcp_define.h"
 #include "dhcp_message.h"
 
 #ifndef OHOS_DHCP_MESSAGE_SIM_H
@@ -40,7 +41,12 @@ public:
     int PushRecvMsg(const DhcpMessage &msg);
 
     void PopSendMsg();
+
+    bool FrontSendMsg(DhcpMessage *msg);
     void PopRecvMsg();
+
+    void SetClientIp(uint32_t ipAddr);
+    uint32_t GetClientIp() const;
 private:
     DhcpMsgManager(){};
     ~DhcpMsgManager(){};
@@ -49,6 +55,7 @@ private:
     std::queue<DhcpMessage> m_recvMessages;
     std::mutex m_sendQueueLocker;
     std::queue<DhcpMessage> m_sendMessages;
+    uint32_t m_clientIpAddress = 0;
 };
 }  // namespace Wifi
 }  // namespace OHOS
@@ -69,7 +76,7 @@ DhcpClientContext *InitialDhcpClient(DhcpClientConfig *config);
 
 int *StatrDhcpClient(DhcpClientContext *config);
 
-int SendDhcpMessage(DhcpClientContext *ctx, PDhcpMsgInfo *msg);
+int SendDhcpMessage(DhcpClientContext *ctx, PDhcpMsgInfo msg);
 
 int DhcpDiscover(DhcpClientContext *ctx);
 
@@ -86,6 +93,9 @@ int StopDhcpClient(DhcpClientContext *ctx);
 int GetDhcpClinetState(DhcpClientContext *ctx);
 
 int FreeDhcpClient(DhcpClientContext *ctx);
+int InitMessage(DhcpClientContext *ctx, PDhcpMsgInfo msg, uint8_t msgType);
 int FillHwAddr(uint8_t *dst, size_t dsize, uint8_t *src, size_t ssize);
+int ParseDhcpOptions(PDhcpMsgInfo msg);
+int ParseReceivedOptions(PDhcpMsgInfo msg);
 
 #endif

@@ -139,8 +139,11 @@ int PushFrontOption(PDhcpOptionList pOptions, PDhcpOption pOption)
 
 int RemoveOption(PDhcpOptionList pOptions, uint8_t code)
 {
-    if (pOptions->size == 0) {
+    if (pOptions == NULL) {
         return RET_ERROR;
+    }
+    if (pOptions->size == 0) {
+        return RET_FAILED;
     }
     DhcpOptionNode *pNode = GetOptionNode(pOptions, code);
     if (pNode == NULL) {
@@ -181,7 +184,7 @@ PDhcpOption GetOption(PDhcpOptionList pOptions, uint8_t code)
 
 void ClearOptions(PDhcpOptionList pOptions)
 {
-    if (pOptions->size == 0) {
+    if (pOptions == NULL || pOptions->size == 0) {
         return;
     }
     DhcpOptionNode *pNode = pOptions->first->next;
@@ -205,7 +208,10 @@ void ClearOptions(PDhcpOptionList pOptions)
 
 void FreeOptionList(PDhcpOptionList pOptions)
 {
-    if (pOptions->size == 0) {
+    if (pOptions == NULL) {
+        return;
+    }
+    if (pOptions->first == NULL) {
         return;
     }
     DhcpOptionNode *pNode = pOptions->first->next;

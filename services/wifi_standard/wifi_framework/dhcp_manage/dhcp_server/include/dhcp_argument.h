@@ -13,14 +13,12 @@
  * limitations under the License.
  */
 
+
 #ifndef OHOS_DHCP_ARGUMENT_H
 #define OHOS_DHCP_ARGUMENT_H
 
 #include "hash_table.h"
 #include "dhcp_define.h"
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 #define ARGUMENT_NAME_SIZE 32
 #define ARGUMENT_VALUE_SIZE 256
@@ -31,6 +29,11 @@ extern "C" {
 #define OPTIONAL_ARG 2
 
 #define USAGE_DESC_MAX_LENGTH 32
+
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 typedef struct DhcpUsage DhcpUsage;
 struct DhcpUsage {

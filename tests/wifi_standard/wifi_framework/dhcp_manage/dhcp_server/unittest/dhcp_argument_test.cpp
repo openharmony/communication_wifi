@@ -23,6 +23,7 @@
 
 using namespace testing::ext;
 
+
 HWTEST(DhcpArgumentTest, InitArgumentsTest, TestSize.Level1)
 {
     EXPECT_TRUE(InitArguments() == RET_SUCCESS);
@@ -30,13 +31,20 @@ HWTEST(DhcpArgumentTest, InitArgumentsTest, TestSize.Level1)
 
 HWTEST(DhcpArgumentTest, ParseArgumentsTest, TestSize.Level1)
 {
+    PrintRequiredArguments();
+    ShowHelp(2);
     char *argv[ARGUMENT_VALUE_SIZE] = {
                                         const_cast<char *>(""), 
                                         const_cast<char *>("--dns=192.168.1.1,192.168.1.2"),
-                                        const_cast<char *>("--ifname=eth0")
+                                        const_cast<char *>("--ifname=eth0"),
+                                        const_cast<char *>("--gateway=192.168.1.1"),
+                                        const_cast<char *>("--pool=192.168.1.100,192.168.1.150"),
+                                        const_cast<char *>("--version"),
+                                        const_cast<char *>("--help"),
+                                        const_cast<char *>("--unknown"),
                                         };
 
-    EXPECT_TRUE(ParseArguments(3, argv) == RET_SUCCESS);
+    EXPECT_TRUE(ParseArguments(8, argv) == RET_SUCCESS);
     ArgumentInfo *arg = GetArgument("dns");
     EXPECT_TRUE(arg);
     EXPECT_EQ(strncmp(arg->name, "dns", strlen("dns")), 0);
@@ -59,6 +67,11 @@ HWTEST(DhcpArgumentTest, PutArgumentTest, TestSize.Level1)
     val = "nothing";
     EXPECT_TRUE(PutArgument(argu, val) == RET_SUCCESS);
     EXPECT_TRUE(PutArgument(argu, val) == RET_FAILED);
+    argu = "longlongvalue";
+    val = "verylongvalueverylongvalueverylongvalueverylongvalueverylongvalueverylongvalueverylongvalueverylongvaluevery"
+    "longvalueverylongvalueverylongvalueverylongvalueverylongvalueverylongvalueverylongvalueverylongvalueverylongvaluev"
+    "erylongvalueverylongvalueverylongvalueverylongvalue";
+    EXPECT_TRUE(PutArgument(argu, val) == RET_ERROR);
 }
 
 HWTEST(DhcpArgumentTest, GetArgumentTest, TestSize.Level1)
@@ -80,4 +93,5 @@ HWTEST(DhcpArgumentTest, HasArgumentTest, TestSize.Level1)
     EXPECT_TRUE(HasArgument(name) == 0);
     name = "lease";
     EXPECT_TRUE(HasArgument(name) == 1);
+    FreeArguments();
 }

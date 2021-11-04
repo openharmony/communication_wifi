@@ -37,88 +37,107 @@ using ::testing::Eq;
 using ::testing::Return;
 using ::testing::SetArgReferee;
 using ::testing::StrEq;
+using ::testing::ext::TestSize;
 
 namespace OHOS {
 namespace Wifi {
-const std::string mac = "AA:BB:CC:DD:EE:FF";
-static StationInfo staInfo = {
-    "test_deviceName",
-    mac.c_str(),
-    "127.0.0.1",
-};
-
-HotspotConfig apcfg;
-ChannelsTable channelTbs;
-const int TEST_AP_CHANNEL = 6;
-const int TEST_MAX_CONN = 10;
-
-std::vector<StationInfo> valueList = {
-    {
-        "test_deviceName",
-        "DA:BB:CC:DD:EE:FF",
-        "127.0.0.3",
-    },
-    {
-        "test_deviceName",
-        "DA:BB:CC:DD:EE:FF",
-        "127.0.0.3",
-    },
-};
-
 class ApStartedState_test : public testing::Test {
 public:
-    static void SetUpTestCase()
-    {}
-    static void TearDownTestCase()
-    {}
+    static void SetUpTestCase() {}
+    static void TearDownTestCase() {}
     virtual void SetUp()
     {
-        WifiSettings::GetInstance();
-        WifiApHalInterface::GetInstance();
-
+        const int SLEEP_TIME = 20;
         pMockPendant = new MockPendant();
-        pMockApMonitor = &(pMockPendant->GetMockApMonitor());
-        pMockApStationsManager = &(pMockPendant->GetMockApStationsManager());
+
         pMockApStateMachine = &(pMockPendant->GetMockApStateMachine());
-        pMockApConfigUse = &(pMockPendant->GetMockApConfigUse());
+
         pMockApStateMachine->InitialStateMachine();
+
+        pMockApMonitor = &(pMockPendant->GetMockApMonitor());
+
+        pMockApStationsManager = &(pMockPendant->GetMockApStationsManager());
+
+        pMockApConfigUse = &(pMockPendant->GetMockApConfigUse());
+
         pMockApNatManager = new MockWifiApNatManager();
 
         pApStartedState = new ApStartedState(*pMockApStateMachine, *pMockApConfigUse, *pMockApMonitor);
 
         msg = new InternalMessage();
-        apcfg.SetSsid(std::string("UnitTestAp"));
-        apcfg.SetPreSharedKey(std::string("123456789"));
-        apcfg.SetSecurityType(KeyMgmt::WPA2_PSK);
-        apcfg.SetBand(BandType::BAND_2GHZ);
-        apcfg.SetChannel(TEST_AP_CHANNEL);
-        apcfg.SetMaxConn(TEST_MAX_CONN);
-        WrapHotspotConfig() = apcfg;
 
-        std::vector<int32_t> band_2G_channel = {1, 2, 3, 4, 5, 6, 7};
-        std::vector<int32_t> band_5G_channel = {149, 168, 169};
-        channelTbs = {{BandType::BAND_2GHZ, band_2G_channel}, {BandType::BAND_5GHZ, band_5G_channel}};
+        apcfg.SetSsid(std::string("UnitTestAp"));
+
+        apcfg.SetPreSharedKey(std::string("123456789"));
+
+        apcfg.SetSecurityType(KeyMgmt::WPA2_PSK);
+
+        apcfg.SetBand(BandType::BAND_2GHZ);
+
+        apcfg.SetChannel(TEST_AP_CHANNEL);
+
+        apcfg.SetMaxConn(TEST_MAX_CONN);
+
+        mac = "AA:BB:CC:DD:EE:FF";
+
+        staInfo = {
+            "test_deviceName",
+            mac.c_str(),
+            "127.0.0.1",
+        };
+
+        TEST_AP_CHANNEL = 6;
+
+        TEST_MAX_CONN = 10;
+
+        valueList = {
+            {
+            "test_deviceName",
+            "DA:BB:CC:DD:EE:FF",
+            "127.0.0.3",
+            },
+            {
+            "test_deviceName",
+            "DA:BB:CC:DD:EE:FF",
+            "127.0.0.3",
+            },
+        };
+
+        std::vector<int32_t> band_2G_channel = { 1, 2, 3, 4, 5, 6, 7 };
+
+        std::vector<int32_t> band_5G_channel = { 149, 168, 169 };
+
+        channelTbs = { { BandType::BAND_2GHZ, band_2G_channel }, { BandType::BAND_5GHZ, band_5G_channel } };
+
+        EXPECT_CALL(WifiApHalInterface::GetInstance(), RegisterApEvent(_))
+            .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
+        usleep(SLEEP_TIME);
     }
     virtual void TearDown()
     {
-        EXPECT_CALL(WifiApHalInterface::GetInstance(), RegisterApEvent(_))
-            .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
         delete pApStartedState;
-
-        delete pMockPendant;
 
         pApStartedState = nullptr;
 
+        delete pMockPendant;
+
         pMockPendant = nullptr;
+
         pMockApStateMachine = nullptr;
+
         pMockApConfigUse = nullptr;
+
         pMockApMonitor = nullptr;
+
         pMockApStationsManager = nullptr;
 
         delete pMockApNatManager;
+
         pMockApNatManager = nullptr;
 
         delete msg;
+
+        msg = nullptr;
     }
 
 public:
@@ -219,12 +238,30 @@ public:
     MockPendant *pMockPendant;
 
     MockApStationsManager *pMockApStationsManager;
+
     MockApStateMachine *pMockApStateMachine;
+
     MockApMonitor *pMockApMonitor;
+
     MockApConfigUse *pMockApConfigUse;
+
     MockWifiApNatManager *pMockApNatManager;
+
+    std::string mac;
+
+    StationInfo staInfo;
+
+    ChannelsTable channelTbs;
+
+    int TEST_AP_CHANNEL;
+
+    int TEST_MAX_CONN;
+
+    std::vector<StationInfo> valueList;
+
+    HotspotConfig apcfg;
 };
-TEST_F(ApStartedState_test, GoInState_SUCCESS)
+HWTEST_F(ApStartedState_test, GoInState_SUCCESS,TestSize.Level1)
 {
     std::vector<StationInfo> results;
     EXPECT_CALL(MockNetworkInterface::GetInstance(), FetchIpAddress(_, _, _)).WillRepeatedly(Return(true));
@@ -256,7 +293,7 @@ TEST_F(ApStartedState_test, GoInState_SUCCESS)
         .WillRepeatedly(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
     pApStartedState->GoInState();
 }
-TEST_F(ApStartedState_test, GoInState_FAILED1)
+HWTEST_F(ApStartedState_test, GoInState_FAILED1,TestSize.Level1)
 {
     std::vector<StationInfo> results;
     EXPECT_CALL(WifiSettings::GetInstance(), SetHotspotState(A<int>())).WillRepeatedly(Return(0));
@@ -314,8 +351,9 @@ TEST_F(ApStartedState_test, GoInState_FAILED1)
     EXPECT_CALL(*pMockApNatManager, EnableInterfaceNat(_, _, _)).WillRepeatedly(Return(false));
     pApStartedState->GoInState();
 }
-TEST_F(ApStartedState_test, GoOutState_SUCCESS)
+HWTEST_F(ApStartedState_test, GoOutState_SUCCESS, TestSize.Level1)
 {
+    pApStartedState->GoOutState();
     EXPECT_CALL(MockSystemInterface::GetInstance(), system(_)).WillRepeatedly(Return(true));
 
     EXPECT_CALL(MockNetworkInterface::GetInstance(), IsValidInterfaceName(_)).WillRepeatedly(Return(true));
@@ -327,10 +365,10 @@ TEST_F(ApStartedState_test, GoOutState_SUCCESS)
     EXPECT_CALL(WifiSettings::GetInstance(), ClearStationList()).WillRepeatedly(Return(0));
     EXPECT_CALL(WifiSettings::GetInstance(), ClearValidChannels()).WillRepeatedly(Return(0));
     EXPECT_CALL(*pMockApMonitor, StopMonitor()).WillRepeatedly(Return());
-    pApStartedState->GoOutState();
 }
-TEST_F(ApStartedState_test, GoOutState_FAILED)
+HWTEST_F(ApStartedState_test, GoOutState_FAILED, TestSize.Level1)
 {
+    pApStartedState->GoOutState();
     EXPECT_CALL(MockSystemInterface::GetInstance(), system(_)).WillRepeatedly(Return(true));
     EXPECT_CALL(WifiSettings::GetInstance(), SetHotspotState(A<int>())).WillRepeatedly(Return(0));
     EXPECT_CALL(*pMockApNatManager, EnableInterfaceNat(Eq(false), _, _)).WillRepeatedly(Return(false));
@@ -339,9 +377,8 @@ TEST_F(ApStartedState_test, GoOutState_FAILED)
     EXPECT_CALL(WifiSettings::GetInstance(), ClearStationList()).WillRepeatedly(Return(0));
     EXPECT_CALL(WifiSettings::GetInstance(), ClearValidChannels()).WillRepeatedly(Return(0));
     EXPECT_CALL(*pMockApMonitor, StopMonitor()).WillRepeatedly(Return());
-    pApStartedState->GoOutState();
 }
-TEST_F(ApStartedState_test, ExecuteStateMsg_SUCCESS)
+HWTEST_F(ApStartedState_test, ExecuteStateMsg_SUCCESS, TestSize.Level1)
 {
     msg->SetMessageName(static_cast<int>(ApStatemachineEvent::CMD_FAIL));
     EXPECT_TRUE(pApStartedState->ExecuteStateMsg(msg));
@@ -395,7 +432,7 @@ TEST_F(ApStartedState_test, ExecuteStateMsg_SUCCESS)
     EXPECT_TRUE(pApStartedState->ExecuteStateMsg(msg));
 }
 
-TEST_F(ApStartedState_test, ExecuteStateMsg_SUCCESS2)
+HWTEST_F(ApStartedState_test, ExecuteStateMsg_SUCCESS2, TestSize.Level1)
 {
     msg->ClearMessageBody();
     msg->SetMessageName(static_cast<int>(ApStatemachineEvent::CMD_UPDATE_HOTSPOTCONFIG_RESULT));
@@ -406,9 +443,7 @@ TEST_F(ApStartedState_test, ExecuteStateMsg_SUCCESS2)
     msg->AddIntMessageBody(apcfg.GetChannel());
     msg->AddIntMessageBody(apcfg.GetMaxConn());
     msg->SetParam1(1);
-    EXPECT_CALL(WifiSettings::GetInstance(), SetHotspotConfig(Eq(apcfg))).WillRepeatedly(Return(1));
     msg->SetMessageName(static_cast<int>(ApStatemachineEvent::CMD_UPDATE_HOTSPOTCONFIG_RESULT));
-
     EXPECT_TRUE(pApStartedState->ExecuteStateMsg(msg));
     msg->SetParam1(0);
     msg->SetMessageName(static_cast<int>(ApStatemachineEvent::CMD_UPDATE_HOTSPOTCONFIG_RESULT));
@@ -450,13 +485,11 @@ TEST_F(ApStartedState_test, ExecuteStateMsg_SUCCESS2)
         .WillRepeatedly(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
     EXPECT_TRUE(pApStartedState->ExecuteStateMsg(msg));
 }
-TEST_F(ApStartedState_test, ExecuteStateMsg_FAILED)
+HWTEST_F(ApStartedState_test, ExecuteStateMsg_FAILED, TestSize.Level1)
 {
     msg->SetMessageName(static_cast<int>(ApStatemachineEvent::CMD_START_HOTSPOT));
     EXPECT_FALSE(pApStartedState->ExecuteStateMsg(msg));
-
-    msg = nullptr;
-    EXPECT_FALSE(pApStartedState->ExecuteStateMsg(msg));
+    EXPECT_FALSE(pApStartedState->ExecuteStateMsg(nullptr));
 }
 } // namespace Wifi
 } // namespace OHOS

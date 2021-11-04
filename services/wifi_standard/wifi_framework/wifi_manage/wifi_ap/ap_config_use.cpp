@@ -61,7 +61,7 @@ void ApConfigUse::TransformFrequencyIntoChannel(const std::vector<int> &freqVect
         printList += std::to_string(chanVector[i]);
         printList += "  ";
     }
-    WIFI_LOGD("TransformFrequencyIntoChannel:size:(%{public}zu) to (%{public}zu).list: %{public}s",
+    WIFI_LOGD("TransformFrequencyIntoChannel:size:(%{public}zu) to (%{public}zu).list: %{public}s.",
         freqVector.size(),
         chanVector.size(),
         printList.c_str());
@@ -79,12 +79,12 @@ void ApConfigUse::LogConfig(HotspotConfig &apConfig) const
 
 bool ApConfigUse::IsValid24GHz(int freq) const
 {
-    return (freq > FREP_2G_MIN) && (freq < FREP_2G_MAX);
+    return (freq >= FREP_2G_MIN) && (freq <= CHANNEL_14_FREP);
 }
 
 bool ApConfigUse::IsValid5GHz(int freq) const
 {
-    return (freq > FREP_5G_MIN) && (freq < FREP_5G_MAX);
+    return (freq >= FREP_5G_MIN) && (freq <= FREP_5G_MAX);
 }
 
 

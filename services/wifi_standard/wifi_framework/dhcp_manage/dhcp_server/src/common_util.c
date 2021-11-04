@@ -112,7 +112,7 @@ const char *GetFilePath(const char *fileName)
         return 0;
     }
     int flen = strlen(fileName);
-    if (!flen) {
+    if (flen == 0) {
         return 0;
     }
     char currName[DHCP_MAX_PATH_LENGTH] = {'\0'};
@@ -135,7 +135,10 @@ const char *GetFilePath(const char *fileName)
 const char *GetLeaseFile(const char *fileName, const char *ifname)
 {
     static char leaseFileName[DHCP_MAX_PATH_LENGTH];
-    if (!fileName || ifname) {
+    if (!fileName || !ifname) {
+        return 0;
+    }
+    if (strlen(fileName) == 0 || strlen(ifname) == 0) {
         return 0;
     }
     if (snprintf_s(leaseFileName, sizeof(leaseFileName), sizeof(leaseFileName) - 1, "%s.%s", fileName, ifname) < 0) {

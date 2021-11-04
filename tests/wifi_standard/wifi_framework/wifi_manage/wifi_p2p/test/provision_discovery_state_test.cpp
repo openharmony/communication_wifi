@@ -164,6 +164,10 @@ HWTEST_F(ProvisionDiscoveryStateTest, ExecuteStateMsg3, TestSize.Level1)
 
     AddSaveP2pConfig3();
     EXPECT_TRUE(pProvisionDiscoveryState->ExecuteStateMsg(&msg));
+
+    provDisc.SetPin(std::string("12345678"));
+    msg.SetMessageObj(provDisc);
+    EXPECT_TRUE(pProvisionDiscoveryState->ExecuteStateMsg(&msg));
 }
 
 HWTEST_F(ProvisionDiscoveryStateTest, ExecuteStateMsg4, TestSize.Level1)
@@ -174,12 +178,29 @@ HWTEST_F(ProvisionDiscoveryStateTest, ExecuteStateMsg4, TestSize.Level1)
     EXPECT_FALSE(pProvisionDiscoveryState->ExecuteStateMsg(nullptr));
 }
 
+HWTEST_F(ProvisionDiscoveryStateTest, ExecuteStateMsgFailed, TestSize.Level1)
+{
+    InternalMessage msg;
+    msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::PEER_CONNECTION_USER_REJECT));
+    EXPECT_FALSE(pProvisionDiscoveryState->ExecuteStateMsg(&msg));
+}
+
 HWTEST_F(ProvisionDiscoveryStateTest, ProcessProvDiscFailEvt, TestSize.Level1)
 {
     InternalMessage msg;
+    msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_EVENT_PROV_DISC_FAILURE));
+    EXPECT_CALL(pMockP2pPendant->GetP2pStateMachine(), DealGroupCreationFailed()).WillOnce(Return());
+    EXPECT_TRUE(pProvisionDiscoveryState->ExecuteStateMsg(&msg));
+}
 
-    msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::PEER_CONNECTION_USER_REJECT));
-    EXPECT_FALSE(pProvisionDiscoveryState->ExecuteStateMsg(&msg));
+HWTEST_F(ProvisionDiscoveryStateTest, ProcessCmdCancelConnect, TestSize.Level1)
+{
+    InternalMessage msg;
+    msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_CANCEL_CONNECT));
+    EXPECT_CALL(WifiP2PHalInterface::GetInstance(), CancelConnect()).WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
+    EXPECT_CALL(pMockP2pPendant->GetP2pStateMachine(), DealGroupCreationFailed()).WillOnce(Return());
+    EXPECT_CALL(pMockP2pPendant->GetP2pStateMachine(), BroadcastActionResult(_, _)).WillOnce(Return());
+    EXPECT_TRUE(pProvisionDiscoveryState->ExecuteStateMsg(&msg));
 }
 }  // namespace Wifi
 }  // namespace OHOS

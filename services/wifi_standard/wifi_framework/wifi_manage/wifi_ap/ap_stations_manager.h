@@ -25,14 +25,14 @@ class ApStationsManager {
 public:
     FRIEND_GTEST(ApStationsManager);
     /**
-     * @Description  construction
+     * @Description  construction.
      * @param None
      * @return None
      */
     ApStationsManager();
 
     /**
-     * @Description  destructor
+     * @Description  destructor.
      * @param None
      * @return None
      */
@@ -40,20 +40,20 @@ public:
 
     /**
      * @Description  Add a blocklist
-     * @param staInfo - Information about station to be added to the blocklist
+     * @param staInfo - Information about station to be added to the blocklist.
      * @return true: Adding succeeded.    false: Failed to add.
      */
     bool AddBlockList(const StationInfo &staInfo) const;
 
     /**
      * @Description  Deleting a blocklist
-     * @param staInfo - Deleting the station information from the blocklist
+     * @param staInfo - Deleting the station information from the blocklist.
      * @return true: Deleted successfully    false: Deletion failed
      */
     bool DelBlockList(const StationInfo &staInfo) const;
 
     /**
-     * @Description  Add all blocklists to the hostapd
+     * @Description  Add all blocklists to the hostapd.
      * @param None
      * @return true: Set successful
                false: Set failed（Obtaining failed，Failed to set one or more blocklists.）
@@ -74,7 +74,7 @@ public:
      */
     void StationJoin(const StationInfo &staInfo) const;
     /**
-     * @Description  Disconnect a specified station.
+     * @Description  Disconnect a specified station..
      * @param mac - address of the newly connected station
      * @return true: Disconnected successfully    false: Disconnected failed
      */

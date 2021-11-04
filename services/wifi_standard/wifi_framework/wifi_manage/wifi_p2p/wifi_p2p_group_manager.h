@@ -125,15 +125,15 @@ public:
     /**
      * @Description Store P2P group connection information.
      *
-     * @param connInfo - group connection information
+     * @param linkedInfo - group connection information
      */
-    virtual void SaveP2pInfo(const WifiP2pInfo &connInfo);
+    virtual void SaveP2pInfo(const WifiP2pLinkedInfo &linkedInfo);
     /**
      * @Description Get P2P group connection information.
      *
-     * @return const WifiP2pInfo& group connection information
+     * @return const WifiP2pLinkedInfo& group connection information
      */
-    virtual const WifiP2pInfo &GetP2pInfo() const;
+    virtual const WifiP2pLinkedInfo &GetP2pInfo() const;
     /**
      * @Description Obtain the group information from the WPA, match and update the network ID.
      *
@@ -173,7 +173,7 @@ private:
     std::vector<WifiP2pGroupInfo> groupsInfo;
     WifiP2pGroupInfoProxy currentGroup;
     std::mutex groupMutex;
-    WifiP2pInfo p2pConnInfo;      /* group connection information */
+    WifiP2pLinkedInfo p2pConnInfo;      /* group connection information */
 };
 }  // namespace Wifi
 }  // namespace OHOS

@@ -33,6 +33,7 @@ WifiP2pUpnpServiceInfo WifiP2pUpnpServiceInfo::Create(const std::string &uuid, c
     }
     WifiP2pUpnpServiceInfo upnpServInfo(upnpInfo);
     upnpServInfo.SetServiceName(svrName);
+    upnpServInfo.SetServicerProtocolType(P2pServicerProtocolType::SERVICE_TYPE_UP_NP);
     return upnpServInfo;
 }
 

@@ -487,13 +487,10 @@ void WifiP2pProxy::WriteWifiP2pConfigData(MessageParcel &data, const WifiP2pConf
 {
     data.WriteCString(config.GetDeviceAddress().c_str());
     data.WriteCString(config.GetPassphrase().c_str());
-    data.WriteCString(config.GetNetworkName().c_str());
+    data.WriteCString(config.GetGroupName().c_str());
     data.WriteInt32(static_cast<int>(config.GetGoBand()));
     data.WriteInt32(config.GetNetId());
     data.WriteInt32(config.GetGroupOwnerIntent());
-    data.WriteInt32(static_cast<int>(config.GetWpsInfo().GetWpsMethod()));
-    data.WriteCString(config.GetWpsInfo().GetBssid().c_str());
-    data.WriteCString(config.GetWpsInfo().GetPin().c_str());
 }
 
 ErrCode WifiP2pProxy::P2pConnect(const WifiP2pConfig &config)
@@ -543,7 +540,7 @@ ErrCode WifiP2pProxy::P2pDisConnect()
     return ErrCode(reply.ReadInt32());
 }
 
-ErrCode WifiP2pProxy::QueryP2pInfo(WifiP2pInfo &connInfo)
+ErrCode WifiP2pProxy::QueryP2pLinkedInfo(WifiP2pLinkedInfo &linkedInfo)
 {
     if (mRemoteDied) {
         WIFI_LOGD("failed to `%{public}s`,remote service is died!", __func__);
@@ -567,9 +564,9 @@ ErrCode WifiP2pProxy::QueryP2pInfo(WifiP2pInfo &connInfo)
     if (ErrCode(ret) != WIFI_OPT_SUCCESS) {
         return ErrCode(ret);
     }
-    connInfo.SetConnectState(static_cast<P2pConnectedState>(reply.ReadInt32()));
-    connInfo.SetIsGroupOwner(reply.ReadBool());
-    connInfo.SetIsGroupOwnerAddress(reply.ReadCString());
+    linkedInfo.SetConnectState(static_cast<P2pConnectedState>(reply.ReadInt32()));
+    linkedInfo.SetIsGroupOwner(reply.ReadBool());
+    linkedInfo.SetIsGroupOwnerAddress(reply.ReadCString());
 
     return WIFI_OPT_SUCCESS;
 }

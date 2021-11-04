@@ -1211,7 +1211,8 @@ WifiErrorNo WifiIdlClient::ReqP2pSetListenChannel(size_t channel, unsigned char 
     return P2pSetListenChannel(channel, regClass);
 }
 
-WifiErrorNo WifiIdlClient::ReqP2pConnect(const WifiP2pConfig &config, bool isJoinExistingGroup, std::string &pin) const
+WifiErrorNo WifiIdlClient::ReqP2pConnect(const WifiP2pConfigInternal &config, bool isJoinExistingGroup,
+    std::string &pin) const
 {
     CHECK_CLIENT_NOT_NULL;
     HidlP2pConnectInfo info = {0};
@@ -1257,7 +1258,7 @@ WifiErrorNo WifiIdlClient::ReqP2pCancelConnect() const
     return P2pCancelConnect();
 }
 
-WifiErrorNo WifiIdlClient::ReqP2pProvisionDiscovery(const WifiP2pConfig &config) const
+WifiErrorNo WifiIdlClient::ReqP2pProvisionDiscovery(const WifiP2pConfigInternal &config) const
 {
     CHECK_CLIENT_NOT_NULL;
     WpsMethod mode = config.GetWpsInfo().GetWpsMethod();

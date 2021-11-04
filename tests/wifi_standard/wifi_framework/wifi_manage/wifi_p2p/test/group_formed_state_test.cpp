@@ -88,10 +88,12 @@ HWTEST_F(GroupFormedStateTest, GoInState, TestSize.Level1)
     AddGroupManager();
     pGroupFormedState->GoInState();
 }
+
 HWTEST_F(GroupFormedStateTest, GoOutState, TestSize.Level1)
 {
     pGroupFormedState->GoOutState();
 }
+
 HWTEST_F(GroupFormedStateTest, ExecuteStateMsg1, TestSize.Level1)
 {
     InternalMessage msg;
@@ -105,6 +107,7 @@ HWTEST_F(GroupFormedStateTest, ExecuteStateMsg1, TestSize.Level1)
         .WillRepeatedly(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED));
     EXPECT_TRUE(pGroupFormedState->ExecuteStateMsg(&msg));
 }
+
 HWTEST_F(GroupFormedStateTest, ExecuteStateMsg1break, TestSize.Level1)
 {
     InternalMessage msg;
@@ -114,6 +117,7 @@ HWTEST_F(GroupFormedStateTest, ExecuteStateMsg1break, TestSize.Level1)
     msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::AP_STA_CONNECTED));
     EXPECT_TRUE(pGroupFormedState->ExecuteStateMsg(&msg));
 }
+
 HWTEST_F(GroupFormedStateTest, ExecuteStateMsg2, TestSize.Level1)
 {
     InternalMessage msg;
@@ -124,6 +128,7 @@ HWTEST_F(GroupFormedStateTest, ExecuteStateMsg2, TestSize.Level1)
     msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::AP_STA_DISCONNECTED));
     EXPECT_TRUE(pGroupFormedState->ExecuteStateMsg(&msg));
 }
+
 HWTEST_F(GroupFormedStateTest, ExecuteStateMsg2break, TestSize.Level1)
 {
     InternalMessage msg;
@@ -134,6 +139,7 @@ HWTEST_F(GroupFormedStateTest, ExecuteStateMsg2break, TestSize.Level1)
     msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::AP_STA_DISCONNECTED));
     EXPECT_TRUE(pGroupFormedState->ExecuteStateMsg(&msg));
 }
+
 HWTEST_F(GroupFormedStateTest, ExecuteStateMsg3, TestSize.Level1)
 {
     InternalMessage msg;
@@ -144,6 +150,7 @@ HWTEST_F(GroupFormedStateTest, ExecuteStateMsg3, TestSize.Level1)
     msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_EVENT_DEVICE_LOST));
     EXPECT_TRUE(pGroupFormedState->ExecuteStateMsg(&msg));
 }
+
 HWTEST_F(GroupFormedStateTest, ExecuteStateMsg3break, TestSize.Level1)
 {
     InternalMessage msg;
@@ -152,23 +159,26 @@ HWTEST_F(GroupFormedStateTest, ExecuteStateMsg3break, TestSize.Level1)
     msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_EVENT_DEVICE_LOST));
     EXPECT_TRUE(pGroupFormedState->ExecuteStateMsg(&msg));
 }
+
 HWTEST_F(GroupFormedStateTest, ExecuteStateMsg4, TestSize.Level1)
 {
     InternalMessage msg;
     msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_P2P_DISABLE));
     EXPECT_TRUE(pGroupFormedState->ExecuteStateMsg(&msg));
 }
-HWTEST_F(GroupFormedStateTest, ExecuteStateMsg5, TestSize.Level1)
+
+HWTEST_F(GroupFormedStateTest, ProcessCmdConnect1, TestSize.Level1)
 {
-    WifiP2pConfig config;
+    WifiP2pConfigInternal config;
     InternalMessage msg;
     msg.SetMessageObj(config);
     msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_CONNECT));
     EXPECT_TRUE(pGroupFormedState->ExecuteStateMsg(&msg));
 }
-HWTEST_F(GroupFormedStateTest, ExecuteStateMsg6, TestSize.Level1)
+
+HWTEST_F(GroupFormedStateTest, ProcessCmdConnect2, TestSize.Level1)
 {
-    WifiP2pConfig config;
+    WifiP2pConfigInternal config;
     AddDeviceManager();
     InternalMessage msg;
     config.SetDeviceAddress("AA:BB:CC:DD:EE:FF");
@@ -178,6 +188,43 @@ HWTEST_F(GroupFormedStateTest, ExecuteStateMsg6, TestSize.Level1)
     AddDeviceStateMachine();
     EXPECT_TRUE(pGroupFormedState->ExecuteStateMsg(&msg));
 }
+
+HWTEST_F(GroupFormedStateTest, ProcessCmdConnect3, TestSize.Level1)
+{
+    WifiP2pConfigInternal config;
+    InternalMessage msg;
+    msg.SetMessageObj(config);
+    msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_CONNECT));
+    EXPECT_CALL(pMockP2pPendant->GetP2pStateMachine(), IsConfigUnusable(_))
+        .WillOnce(Return(P2pConfigErrCode::MAC_EMPTY));
+    EXPECT_CALL(pMockP2pPendant->GetP2pStateMachine(), BroadcastActionResult(_, _)).WillOnce(Return());
+    EXPECT_TRUE(pGroupFormedState->ExecuteStateMsg(&msg));
+}
+
+HWTEST_F(GroupFormedStateTest, ProcessCmdConnect4, TestSize.Level1)
+{
+    WifiP2pConfigInternal config;
+    InternalMessage msg;
+    msg.SetMessageObj(config);
+    msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_CONNECT));
+    EXPECT_CALL(pMockP2pPendant->GetP2pStateMachine(), IsConfigUnusable(_))
+        .WillOnce(Return(P2pConfigErrCode::MAC_NOT_FOUND));
+    EXPECT_CALL(pMockP2pPendant->GetP2pStateMachine(), BroadcastActionResult(_, _)).WillOnce(Return());
+    EXPECT_TRUE(pGroupFormedState->ExecuteStateMsg(&msg));
+}
+
+HWTEST_F(GroupFormedStateTest, ProcessCmdConnect5, TestSize.Level1)
+{
+    WifiP2pConfigInternal config;
+    InternalMessage msg;
+    msg.SetMessageObj(config);
+    msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_CONNECT));
+    EXPECT_CALL(pMockP2pPendant->GetP2pStateMachine(), IsConfigUnusable(_))
+        .WillOnce(Return(P2pConfigErrCode::ERR_MAC_FORMAT));
+    EXPECT_CALL(pMockP2pPendant->GetP2pStateMachine(), BroadcastActionResult(_, _)).WillOnce(Return());
+    EXPECT_TRUE(pGroupFormedState->ExecuteStateMsg(&msg));
+}
+
 HWTEST_F(GroupFormedStateTest, ExecuteStateMsg7, TestSize.Level1)
 {
     WifiP2pTempDiscEvent procDisc;
@@ -189,6 +236,7 @@ HWTEST_F(GroupFormedStateTest, ExecuteStateMsg7, TestSize.Level1)
     msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_EVENT_PROV_DISC_PBC_REQ));
     EXPECT_TRUE(pGroupFormedState->ExecuteStateMsg(&msg));
 }
+
 HWTEST_F(GroupFormedStateTest, ExecuteStateMsg8, TestSize.Level1)
 {
     WifiP2pTempDiscEvent procDisc;
@@ -200,6 +248,7 @@ HWTEST_F(GroupFormedStateTest, ExecuteStateMsg8, TestSize.Level1)
     msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_EVENT_PROV_DISC_ENTER_PIN));
     EXPECT_TRUE(pGroupFormedState->ExecuteStateMsg(&msg));
 }
+
 HWTEST_F(GroupFormedStateTest, ExecuteStateMsg9, TestSize.Level1)
 {
     WifiP2pTempDiscEvent procDisc;
@@ -213,6 +262,7 @@ HWTEST_F(GroupFormedStateTest, ExecuteStateMsg9, TestSize.Level1)
     AddGroupManager();
     EXPECT_TRUE(pGroupFormedState->ExecuteStateMsg(&msg));
 }
+
 HWTEST_F(GroupFormedStateTest, ExecuteStateMsg9break, TestSize.Level1)
 {
     InternalMessage msg;
@@ -221,12 +271,14 @@ HWTEST_F(GroupFormedStateTest, ExecuteStateMsg9break, TestSize.Level1)
     msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_EVENT_PROV_DISC_SHOW_PIN));
     EXPECT_TRUE(pGroupFormedState->ExecuteStateMsg(&msg));
 }
+
 HWTEST_F(GroupFormedStateTest, ExecuteStateMsg10, TestSize.Level1)
 {
     InternalMessage msg;
     msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_EVENT_GROUP_STARTED));
     EXPECT_TRUE(pGroupFormedState->ExecuteStateMsg(&msg));
 }
+
 HWTEST_F(GroupFormedStateTest, ExecuteStateMsg11, TestSize.Level1)
 {
     InternalMessage msg;
@@ -235,18 +287,21 @@ HWTEST_F(GroupFormedStateTest, ExecuteStateMsg11, TestSize.Level1)
     msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_DEVICE_DISCOVERS));
     EXPECT_TRUE(pGroupFormedState->ExecuteStateMsg(&msg));
 }
+
 HWTEST_F(GroupFormedStateTest, ExecuteStateMsg12, TestSize.Level1)
 {
     InternalMessage msg;
     msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_EVENT_GROUP_REMOVED));
     EXPECT_TRUE(pGroupFormedState->ExecuteStateMsg(&msg));
 }
+
 HWTEST_F(GroupFormedStateTest, ProcessCmdRemoveGroup1, TestSize.Level1)
 {
     InternalMessage msg;
     msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_REMOVE_GROUP));
     EXPECT_TRUE(pGroupFormedState->ExecuteStateMsg(&msg));
 }
+
 HWTEST_F(GroupFormedStateTest, ProcessCmdRemoveGroup2, TestSize.Level1)
 {
     InternalMessage msg;
@@ -255,6 +310,14 @@ HWTEST_F(GroupFormedStateTest, ProcessCmdRemoveGroup2, TestSize.Level1)
     msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_DISCONNECT));
     EXPECT_FALSE(pGroupFormedState->ExecuteStateMsg(&msg));
     EXPECT_FALSE(pGroupFormedState->ExecuteStateMsg(nullptr));
+}
+
+HWTEST_F(GroupFormedStateTest, ProcessCmdCancelConnect, TestSize.Level1)
+{
+    InternalMessage msg;
+    EXPECT_CALL(pMockP2pPendant->GetP2pStateMachine(), BroadcastActionResult(_, _)).WillOnce(Return());
+    msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_CANCEL_CONNECT));
+    EXPECT_TRUE(pGroupFormedState->ExecuteStateMsg(&msg));
 }
 }  // namespace Wifi
 }  // namespace OHOS

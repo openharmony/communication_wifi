@@ -14,21 +14,29 @@
  */
 
 #include "system_func_mock.h"
+#include "address_utils.h"
+#include "dhcp_define.h"
+#include "dhcp_ipv4.h"
+#include "dhcp_logger.h"
+#include "dhcp_message.h"
+#include "dhcp_message_sim.h"
+#include "dhcp_option.h"
+#include "securec.h"
 #include <stdint.h>
-#include <unistd.h>
 #include <sys/select.h>
 #include <sys/time.h>
 #include <sys/types.h>
-#include "dhcp_logger.h"
-#include "dhcp_message_sim.h"
+
 
 using namespace OHOS::Wifi;
 
-#undef LOG_TAG
-#define LOG_TAG "DhcpServerSystemFuncMock"
-
+#define MAGIC_COOKIE_LENGTH 4
+#define OPT_HEADER_LENGTH 2
 #define TIME_SEC_TO_USEC (1000 * 1000)
 #define DHCP_SEL_WAIT_TIMEOUTS 1500
+
+#undef LOG_TAG
+#define LOG_TAG "DhcpServerSystemFuncMock"
 
 static bool g_mockTag = false;
 
@@ -38,11 +46,9 @@ SystemFuncMock &SystemFuncMock::GetInstance()
     return gSystemFuncMock;
 };
 
-SystemFuncMock::SystemFuncMock()
-{}
+SystemFuncMock::SystemFuncMock() {}
 
-SystemFuncMock::~SystemFuncMock()
-{}
+SystemFuncMock::~SystemFuncMock() {}
 
 void SystemFuncMock::SetMockFlag(bool flag)
 {
@@ -55,6 +61,17 @@ bool SystemFuncMock::GetMockFlag(void)
 }
 
 extern "C" {
+struct in_addr {
+    uint32_t s_addr;
+};
+
+struct sockaddr_in {
+    short int sin_family;
+    unsigned short int sin_port;
+    struct in_addr sin_addr;
+    unsigned char sin_zero[8];
+};
+
 int __real_socket(int __domain, int __type, int __protocol);
 int __wrap_socket(int __domain, int __type, int __protocol)
 {
@@ -79,17 +96,19 @@ int __wrap_setsockopt(int __fd, int __level, int __optname, const void *__optval
 int __real_select(int __nfds, fd_set *__readfds, fd_set *__writefds, fd_set *__exceptfds, struct timeval *__timeout);
 int __wrap_select(int __nfds, fd_set *__readfds, fd_set *__writefds, fd_set *__exceptfds, struct timeval *__timeout)
 {
+    const unsigned int SLEEP_TIEM = 300000;
     LOGD("==>select.");
     if (g_mockTag) {
         LOGD(" ==>mock enable.");
         LOGD("message queue total: %d.", DhcpMsgManager::GetInstance().SendTotal());
         if (DhcpMsgManager::GetInstance().SendTotal() > 0) {
             FD_CLR(__nfds, __readfds);
+            usleep(SLEEP_TIEM);
             return 1;
         }
         int retval = SystemFuncMock::GetInstance().select(__nfds, __readfds, __writefds, __exceptfds, __timeout);
         if (retval == 0) {
-            if (__timeout) {
+            if (__timeout != nullptr) {
                 usleep(DHCP_SEL_WAIT_TIMEOUTS * 1000);
                 LOGD("select time out.");
             }
@@ -99,8 +118,8 @@ int __wrap_select(int __nfds, fd_set *__readfds, fd_set *__writefds, fd_set *__e
     return __real_select(__nfds, __readfds, __writefds, __exceptfds, __timeout);
 }
 
-int __real_bind(int __fd, struct sockaddr * __addr, socklen_t __len);
-int __wrap_bind(int __fd, struct sockaddr * __addr, socklen_t __len)
+int __real_bind(int __fd, struct sockaddr *__addr, socklen_t __len);
+int __wrap_bind(int __fd, struct sockaddr *__addr, socklen_t __len)
 {
     LOGD("==>bind.");
     if (g_mockTag) {
@@ -121,35 +140,63 @@ int __wrap_close(int _fileno)
     return __real_close(_fileno);
 }
 
-ssize_t __real_sendto(int __fd, const void *__buf, size_t __n, int __flags, struct sockaddr *__addr,
-        socklen_t __addr_len);
-ssize_t __wrap_sendto(int __fd, const void *__buf, size_t __n, int __flags, struct sockaddr *__addr,
-        socklen_t __addr_len)
-{
-    LOGD("==>sendto.");
-    if (g_mockTag) {
-        LOGD(" ==>mock enable.");
-        return SystemFuncMock::GetInstance().sendto(__fd, __buf, __n, __flags, __addr, __addr_len);
-    }
-    return __real_sendto(__fd, __buf, __n, __flags, __addr, __addr_len);
-}
-
-ssize_t __real_recvfrom(int __fd, void *__buf, size_t __n, int __flags, struct sockaddr *__addr,
-        socklen_t *__addr_len);
-
-ssize_t __wrap_recvfrom(int __fd, void *__buf, size_t __n, int __flags, struct sockaddr *__addr,
-        socklen_t *__addr_len)
+ssize_t recvfrom(int __fd, void *__buf, size_t __n, int __flags, struct sockaddr *__addr, socklen_t *__addr_len)
 {
     LOGD("==>recvfrom.");
     if (g_mockTag) {
         LOGD(" ==>mock enable.");
-        if (DhcpMsgManager::GetInstance().SendTotal() > 0) {
+        if (DhcpMsgManager::GetInstance().SendTotal() > 0 && __buf) {
             LOGD("== new message received.");
-            usleep(150 * 1000);
-            DhcpMsgManager::GetInstance().PopSendMsg();
+            DhcpMessage msg = { 0 };
+            if (DhcpMsgManager::GetInstance().FrontSendMsg(&msg)) {
+                memcpy_s(__buf, __n, &msg, sizeof(DhcpMessage));
+                DhcpMsgManager::GetInstance().PopSendMsg();
+                uint32_t srcIp = DhcpMsgManager::GetInstance().GetClientIp();
+                if (__addr != nullptr && srcIp != 0) {
+                    struct sockaddr_in *sAddr = (struct sockaddr_in *)__addr;
+                    sAddr->sin_addr.s_addr = HostToNetwork(srcIp);
+                    DhcpMsgManager::GetInstance().SetClientIp(0);
+                }
+                return sizeof(DhcpMessage);
+            }
         }
-        return SystemFuncMock::GetInstance().recvfrom(__fd, __buf, __n, __flags, __addr, __addr_len);
     }
-    return __real_recvfrom(__fd, __buf, __n, __flags, __addr, __addr_len);
+    return SystemFuncMock::GetInstance().recvfrom(__fd, __buf, __n, __flags, __addr, __addr_len);
+}
+
+int ParseMockOptions(DhcpMessage *packet)
+{
+    if (packet == nullptr) {
+        LOGD("dhcp message pointer is null.");
+        return RET_FAILED;
+    }
+    DhcpMsgInfo reply;
+    if (memset_s(&reply, sizeof(DhcpMsgInfo), 0, sizeof(DhcpMsgInfo)) != EOK) {
+        LOGD("failed to reset dhcp message info.");
+        return RET_FAILED;
+    }
+    int retval = RET_FAILED;
+    if (memcpy_s(&reply.packet, sizeof(reply.packet), packet, sizeof(DhcpMessage)) != EOK) {
+        LOGD("failed to fill dhcp message.");
+        return RET_FAILED;
+    }
+    reply.length = sizeof(DhcpMessage);
+    if (InitOptionList(&reply.options) != RET_SUCCESS) {
+        LOGD("failed to init dhcp option list.");
+        return retval;
+    }
+    FreeOptionList(&reply.options);
+    return retval;
+}
+ssize_t sendto(int __fd, const void *__buf, size_t __n, int __flags, struct sockaddr *__addr, socklen_t __addr_len)
+{
+    LOGD("==>sendto.");
+    if (g_mockTag) {
+        LOGD(" ==>mock enable.");
+        if (__buf == nullptr) {
+            return SystemFuncMock::GetInstance().sendto(__fd, __buf, __n, __flags, __addr, __addr_len);
+        }
+    }
+    return SystemFuncMock::GetInstance().sendto(__fd, __buf, __n, __flags, __addr, __addr_len);
 }
 }

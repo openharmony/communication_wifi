@@ -38,6 +38,7 @@ class WifiP2pDeviceManager {
     friend class P2pIdleState;
     friend class P2pInvitingState;
     friend class ProvisionDiscoveryState;
+    friend class WifiP2pService;
 public:
     /**
      * @Description Destroy the Wifi P2p Device Manager object.

@@ -151,7 +151,7 @@ private:
     static void DealP2pStateChanged(P2pState bState);
     static void DealP2pPeersChanged(const std::vector<WifiP2pDevice> &vPeers);
     static void DealP2pServiceChanged(const std::vector<WifiP2pServiceInfo> &vServices);
-    static void DealP2pConnectionChanged(const WifiP2pInfo &info);
+    static void DealP2pConnectionChanged(const WifiP2pLinkedInfo &info);
     static void DealP2pThisDeviceChanged(const WifiP2pDevice &info);
     static void DealP2pDiscoveryChanged(bool bState);
     static void DealP2pGroupsChanged(void);

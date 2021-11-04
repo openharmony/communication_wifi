@@ -37,9 +37,9 @@ const std::string GETTING_INFO = "Obtaining...";
 
 /* *********************************StateMachine*************************** */
 
-/* Internal communication message of the state machine */
+/* Internal communication message of the state machine. */
 enum class ApStatemachineEvent {
-    CMD_START_HOTSPOT,                       /* start */
+    CMD_START_HOTSPOT,               /* start */
     CMD_STOP_HOTSPOT,                /* stop */
     CMD_FAIL,                        /* failed */
     CMD_STATION_JOIN,                /* new station */

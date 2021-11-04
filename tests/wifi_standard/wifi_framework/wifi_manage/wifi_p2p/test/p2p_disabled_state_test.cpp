@@ -67,7 +67,7 @@ HWTEST_F(P2pDisabledStateTest, GoOutState, TestSize.Level1)
     pP2pDisabledState->GoOutState();
 }
 
-HWTEST_F(P2pDisabledStateTest, ExecuteStateMsg, TestSize.Level1)
+HWTEST_F(P2pDisabledStateTest, ProcessCmdP2pEnable1, TestSize.Level1)
 {
     InternalMessage msg;
     EXPECT_CALL(*pMockMonitor, RegisterIfaceHandler(_, _)).WillOnce(Return());
@@ -76,9 +76,24 @@ HWTEST_F(P2pDisabledStateTest, ExecuteStateMsg, TestSize.Level1)
 
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), SetRandomMacAddr(_)).WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
     msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_P2P_ENABLE));
-    pP2pDisabledState->ExecuteStateMsg(&msg);
+    EXPECT_TRUE(pP2pDisabledState->ExecuteStateMsg(&msg));
+}
+
+HWTEST_F(P2pDisabledStateTest, ProcessCmdP2pEnable2, TestSize.Level1)
+{
+    InternalMessage msg;
+    EXPECT_CALL(*pMockMonitor, RegisterIfaceHandler(_, _)).WillOnce(Return());
+    EXPECT_CALL(*pMockMonitor, MonitorBegins(_)).WillOnce(Return());
+    EXPECT_CALL(WifiP2PHalInterface::GetInstance(), StartP2p()).WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED));
+    msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_P2P_ENABLE));
+    EXPECT_TRUE(pP2pDisabledState->ExecuteStateMsg(&msg));
+}
+
+HWTEST_F(P2pDisabledStateTest, ExecuteStateMsgFailed, TestSize.Level1)
+{
+    InternalMessage msg;
     msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_P2P_DISABLE));
-    pP2pDisabledState->ExecuteStateMsg(&msg);
+    EXPECT_FALSE(pP2pDisabledState->ExecuteStateMsg(&msg));
 }
 }  // namespace Wifi
 }  // namespace OHOS

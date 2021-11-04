@@ -15,9 +15,9 @@ import("//build/ohos.gni")
 
 group("etc") {
   deps = [
+    ":hostapd.conf",
     ":wifi_hal_service.rc",
     ":wpa_supplicant.conf",
-    ":hostapd.conf"
   ]
 }
 

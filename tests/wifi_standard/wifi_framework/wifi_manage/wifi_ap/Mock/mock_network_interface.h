@@ -29,6 +29,7 @@ namespace Wifi {
 class MockNetworkInterface {
 public:
     MOCK_METHOD1(IsValidInterfaceName, bool(const std::string &interfaceName));
+    MOCK_METHOD1(IsInterfaceUp, bool(const std::string &interfaceName));
     MOCK_METHOD1(Dump, void(const std::string &interfaceName));
 
     MOCK_METHOD4(FetchInterfaceConfig,
@@ -47,8 +48,8 @@ public:
     static MockNetworkInterface &GetInstance(void);
 
 private:
-    MockNetworkInterface(){}
-    ~MockNetworkInterface(){}
+    MockNetworkInterface() {}
+    ~MockNetworkInterface() {}
 };
 } // namespace Wifi
 } // namespace OHOS

@@ -24,15 +24,20 @@ DEFINE_WIFILOG_P2P_LABEL("P2pEnabledState");
 
 namespace OHOS {
 namespace Wifi {
-P2pEnabledState::P2pEnabledState(
-    P2pStateMachine &stateMachine, WifiP2pGroupManager &groupMgr, WifiP2pDeviceManager &deviceMgr)
-    : State("P2pEnabledState"), mProcessFunMap(), p2pStateMachine(stateMachine), groupManager(groupMgr), deviceManager(deviceMgr)
+P2pEnabledState::P2pEnabledState(P2pStateMachine &stateMachine, WifiP2pGroupManager &groupMgr,
+    WifiP2pDeviceManager &deviceMgr)
+    : State("P2pEnabledState"),
+      mProcessFunMap(),
+      p2pStateMachine(stateMachine),
+      groupManager(groupMgr),
+      deviceManager(deviceMgr)
 {}
 void P2pEnabledState::GoInState()
 {
     WIFI_LOGI("             GoInState");
     Init();
-    constexpr int defaultListenTime = 500;
+    constexpr int defaultPeriodTime = 500;
+    constexpr int defaultIntervalTime = 1000;
     p2pStateMachine.BroadcastP2pConnectionChanged();
     if (P2pSettingsInitialization()) {
         p2pStateMachine.BroadcastP2pStatusChanged(P2pState::P2P_STATE_STARTED);
@@ -40,7 +45,7 @@ void P2pEnabledState::GoInState()
         WifiSettings::GetInstance().GetP2pVendorConfig(config);
         if (config.GetIsAutoListen()) {
             p2pStateMachine.SendMessage(
-                static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_START_LISTEN), defaultListenTime, defaultListenTime);
+                static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_START_LISTEN), defaultPeriodTime, defaultIntervalTime);
         }
     } else {
         p2pStateMachine.SendMessage(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_P2P_DISABLE));
@@ -91,6 +96,8 @@ void P2pEnabledState::Init()
         std::make_pair(P2P_STATE_MACHINE_CMD::CMD_SET_DEVICE_NAME, &P2pEnabledState::ProcessCmdSetDeviceName));
     mProcessFunMap.insert(
         std::make_pair(P2P_STATE_MACHINE_CMD::CMD_SET_WFD_INFO, &P2pEnabledState::ProcessCmdSetWfdInfo));
+    mProcessFunMap.insert(
+        std::make_pair(P2P_STATE_MACHINE_CMD::CMD_CANCEL_CONNECT, &P2pEnabledState::ProcessCmdCancelConnect));
 }
 bool P2pEnabledState::ProcessCmdDisable(InternalMessage &msg) const
 {
@@ -246,7 +253,6 @@ bool P2pEnabledState::P2pConfigInitialization()
     retCode = WifiP2PHalInterface::GetInstance().SetP2pSsidPostfix(ssidPostfixName);
     if (retCode == WifiErrorNo::WIFI_IDL_OPT_FAILED) {
         WIFI_LOGE("Failed to set the SSID prefix");
-        result = false;
     }
 
     retCode = WifiP2PHalInterface::GetInstance().SetP2pDeviceType(deviceManager.GetThisDevice().GetPrimaryDeviceType());
@@ -260,7 +266,6 @@ bool P2pEnabledState::P2pConfigInitialization()
         retCode = WifiP2PHalInterface::GetInstance().SetP2pSecondaryDeviceType(secDeviceType);
         if (retCode == WifiErrorNo::WIFI_IDL_OPT_FAILED) {
             WIFI_LOGE("Failed to set the secondary device type.");
-            result = false;
         }
     }
 
@@ -273,7 +278,7 @@ bool P2pEnabledState::P2pConfigInitialization()
 
     retCode = WifiP2PHalInterface::GetInstance().SetPersistentReconnect(1);
     if (retCode == WifiErrorNo::WIFI_IDL_OPT_FAILED) {
-        LOGE("Failed to set persistent reconnect.");
+        WIFI_LOGE("Failed to set persistent reconnect.");
         result = false;
     }
 
@@ -526,6 +531,7 @@ bool P2pEnabledState::ProcessCmdSetDeviceName(InternalMessage &msg) const
     } else {
         LOGE("Successfully set the device name.");
         deviceManager.GetThisDevice().SetDeviceName(deviceName);
+        p2pStateMachine.BroadcastThisDeviceChanaged(deviceManager.GetThisDevice());
         p2pStateMachine.BroadcastActionResult(P2pActionCallback::P2pSetDeviceName, WIFI_OPT_SUCCESS);
     }
 
@@ -550,12 +556,19 @@ bool P2pEnabledState::ProcessCmdSetWfdInfo(InternalMessage &msg) const
     subelement = "0 " + subelement;
     if (WifiP2PHalInterface::GetInstance().SetWfdDeviceConfig(subelement) != WifiErrorNo::WIFI_IDL_OPT_OK) {
         LOGE("Failed to set wfd config:%s.", subelement.c_str());
-        return EXECUTED;    
+        return EXECUTED;
     }
     if (WifiP2PHalInterface::GetInstance().SetWfdEnable(wfdInfo.GetWfdEnabled()) != WifiErrorNo::WIFI_IDL_OPT_OK) {
         LOGE("Set wifidisplay enabled failed.");
         return EXECUTED;
     }
+    return EXECUTED;
+}
+
+bool P2pEnabledState::ProcessCmdCancelConnect(InternalMessage &msg) const
+{
+    WIFI_LOGI("recv CMD: %d", msg.GetMessageName());
+    p2pStateMachine.BroadcastActionResult(P2pActionCallback::P2pDisConnect, ErrCode::WIFI_OPT_FAILED);
     return EXECUTED;
 }
 } // namespace Wifi

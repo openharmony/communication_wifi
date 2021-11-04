@@ -73,10 +73,12 @@ HWTEST_F(AuthorizingNegotiationRequestStateTest, GoInState, TestSize.Level1)
     AddSaveP2pConfig();
     pAuthorizingNegotlationRequestState->GoInState();
 }
+
 HWTEST_F(AuthorizingNegotiationRequestStateTest, GoOutState, TestSize.Level1)
 {
     pAuthorizingNegotlationRequestState->GoOutState();
 }
+
 HWTEST_F(AuthorizingNegotiationRequestStateTest, ExecuteStateMsg, TestSize.Level1)
 {
     AddSaveP2pConfig();
@@ -98,12 +100,14 @@ HWTEST_F(AuthorizingNegotiationRequestStateTest, ExecuteStateMsg1, TestSize.Leve
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), P2pStopFind()).WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED));
     pAuthorizingNegotlationRequestState->ExecuteStateMsg(&msg);
 }
+
 HWTEST_F(AuthorizingNegotiationRequestStateTest, ExecuteStateMsg2, TestSize.Level1)
 {
     InternalMessage msg;
     msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::PEER_CONNECTION_USER_REJECT));
     pAuthorizingNegotlationRequestState->ExecuteStateMsg(&msg);
 }
+
 HWTEST_F(AuthorizingNegotiationRequestStateTest, ExecuteStateMsg3, TestSize.Level1)
 {
     InternalMessage msg;
@@ -112,6 +116,7 @@ HWTEST_F(AuthorizingNegotiationRequestStateTest, ExecuteStateMsg3, TestSize.Leve
         .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED));
     pAuthorizingNegotlationRequestState->ExecuteStateMsg(&msg);
 }
+
 HWTEST_F(AuthorizingNegotiationRequestStateTest, ExecuteStateMsg4, TestSize.Level1)
 {
     InternalMessage msg;

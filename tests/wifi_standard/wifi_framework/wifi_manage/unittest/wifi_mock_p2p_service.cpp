@@ -243,11 +243,11 @@ ErrCode WifiMockP2pService::P2pConnect(const WifiP2pConfig &config)
 
     LOGI("config.GetGroupOwnerIntent() = %d\n", config.GetGroupOwnerIntent());
     LOGI("config.GetGroupName() = %s\n", config.GetGroupName().c_str());
-    WifiP2pInfo connInfo;
-    connInfo.SetGroupFormed(true);
-    connInfo.SetIsGroupOwner(true);
-    connInfo.SetIsGroupOwnerAddress("IsGroupOwnerAddress");
-    mCallback.OnP2pConnectionChangedEvent(connInfo);
+    WifiP2pLinkedInfo linkedInfo;
+    linkedInfo.SetGroupFormed(true);
+    linkedInfo.SetIsGroupOwner(true);
+    linkedInfo.SetIsGroupOwnerAddress("IsGroupOwnerAddress");
+    mCallback.OnP2pConnectionChangedEvent(linkedInfo);
     return WIFI_OPT_SUCCESS;
 }
 
@@ -257,12 +257,12 @@ ErrCode WifiMockP2pService::P2pDisConnect()
     return WIFI_OPT_SUCCESS;
 }
 
-ErrCode WifiMockP2pService::QueryP2pInfo(WifiP2pInfo &connInfo)
+ErrCode WifiMockP2pService::QueryP2pLinkedInfo(WifiP2pLinkedInfo &linkedInfo)
 {
-    LOGI("Mock_p2p:QueryP2pInfo");
-    connInfo.SetGroupFormed(true);
-    connInfo.SetIsGroupOwner(true);
-    connInfo.SetIsGroupOwnerAddress("IsGroupOwnerAddress");
+    LOGI("Mock_p2p:QueryP2pLinkedInfo");
+    linkedInfo.SetGroupFormed(true);
+    linkedInfo.SetIsGroupOwner(true);
+    linkedInfo.SetIsGroupOwnerAddress("IsGroupOwnerAddress");
     return WIFI_OPT_SUCCESS;
 }
 

@@ -131,7 +131,7 @@ void WifiP2pCallbackStub::OnP2pServicesChanged(const std::vector<WifiP2pServiceI
     return;
 }
 
-void WifiP2pCallbackStub::OnP2pConnectionChanged(const WifiP2pInfo &info)
+void WifiP2pCallbackStub::OnP2pConnectionChanged(const WifiP2pLinkedInfo &info)
 {
     WIFI_LOGD("WifiP2pCallbackStub::OnP2pConnectionChanged");
     if (userCallback_) {
@@ -245,7 +245,7 @@ void WifiP2pCallbackStub::RemoteOnP2pServicesChanged(uint32_t code, MessageParce
 void WifiP2pCallbackStub::RemoteOnP2pConnectionChanged(uint32_t code, MessageParcel &data, MessageParcel &reply)
 {
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
-    WifiP2pInfo info;
+    WifiP2pLinkedInfo info;
     info.SetConnectState(static_cast<P2pConnectedState>(data.ReadInt32()));
     info.SetIsGroupOwner(data.ReadBool());
     info.SetIsGroupOwnerAddress(data.ReadCString());

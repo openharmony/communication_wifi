@@ -637,7 +637,7 @@ void WifiManager::DealP2pServiceChanged(const std::vector<WifiP2pServiceInfo> &v
     return;
 }
 
-void WifiManager::DealP2pConnectionChanged(const WifiP2pInfo &info)
+void WifiManager::DealP2pConnectionChanged(const WifiP2pLinkedInfo &info)
 {
     WifiEventCallbackMsg cbMsg;
     cbMsg.msgCode = WIFI_CBK_MSG_CONNECT_CHANGE;

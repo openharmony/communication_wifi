@@ -32,7 +32,7 @@ public:
      * @param None
      * @return None
      */
-    P2pInvitingState(P2pStateMachine &, WifiP2pGroupManager &, WifiP2pDeviceManager &);
+    P2pInvitingState(P2pStateMachine &stateMachine, WifiP2pGroupManager &groupMgr, WifiP2pDeviceManager &deviceMgr);
 
     /**
      * @Description Destroy the P2pInvitingState object

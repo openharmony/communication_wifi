@@ -49,9 +49,10 @@ public:
     virtual WifiErrorNo P2pConfigureListen(bool enable, size_t period, size_t interval) const = 0;
     virtual WifiErrorNo SetListenChannel(size_t channel, unsigned char regClass) const = 0;
     virtual WifiErrorNo P2pFlush() const = 0;
-    virtual WifiErrorNo Connect(const WifiP2pConfig &config, bool isJoinExistingGroup, std::string &pin) const = 0;
+    virtual WifiErrorNo Connect(const WifiP2pConfigInternal &config, bool isJoinExistingGroup,
+        std::string &pin) const = 0;
     virtual WifiErrorNo CancelConnect() const = 0;
-    virtual WifiErrorNo ProvisionDiscovery(const WifiP2pConfig &config) const = 0;
+    virtual WifiErrorNo ProvisionDiscovery(const WifiP2pConfigInternal &config) const = 0;
     virtual WifiErrorNo GroupAdd(bool isPersistent, int networkId, int freq) const = 0;
     virtual WifiErrorNo GroupRemove(const std::string &groupInterface) const = 0;
     virtual WifiErrorNo Invite(const WifiP2pGroupInfo &group, const std::string &deviceAddr) const = 0;
@@ -105,9 +106,10 @@ public:
     MOCK_CONST_METHOD3(P2pConfigureListen, WifiErrorNo(bool enable, size_t period, size_t interval));
     MOCK_CONST_METHOD2(SetListenChannel, WifiErrorNo(size_t channel, unsigned char regClass));
     MOCK_CONST_METHOD0(P2pFlush, WifiErrorNo());
-    MOCK_CONST_METHOD3(Connect, WifiErrorNo(const WifiP2pConfig &config, bool isJoinExistingGroup, std::string &pin));
+    MOCK_CONST_METHOD3(Connect,
+        WifiErrorNo(const WifiP2pConfigInternal &config, bool isJoinExistingGroup, std::string &pin));
     MOCK_CONST_METHOD0(CancelConnect, WifiErrorNo());
-    MOCK_CONST_METHOD1(ProvisionDiscovery, WifiErrorNo(const WifiP2pConfig &));
+    MOCK_CONST_METHOD1(ProvisionDiscovery, WifiErrorNo(const WifiP2pConfigInternal &));
     MOCK_CONST_METHOD3(GroupAdd, WifiErrorNo(bool isPersistent, int networkId, int freq));
     MOCK_CONST_METHOD1(GroupRemove, WifiErrorNo(const std::string &groupInterface));
     MOCK_CONST_METHOD2(Invite, WifiErrorNo(const WifiP2pGroupInfo &group, const std::string &deviceAddr));

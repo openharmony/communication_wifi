@@ -43,21 +43,21 @@ public:
     DISALLOW_COPY_AND_ASSIGN(ApService)
 
     /**
-     * @Description  open hotspot
+     * @Description  open hotspot.
      * @param None
      * @return ErrCode - success: WIFI_OPT_SUCCESS    failed: ERROR_CODE
      */
     ErrCode EnableHotspot() const;
 
     /**
-     * @Description  close hotspot
+     * @Description  close hotspot.
      * @param None
      * @return ErrCode - success: WIFI_OPT_SUCCESS    failed: ERROR_CODE
      */
     ErrCode DisableHotspot() const;
 
     /**
-     * @Description  set ap config
+     * @Description  set ap config.
      * @param cfg - ap config
      * @return ErrCode - success: WIFI_OPT_SUCCESS    failed: ERROR_CODE
      */
@@ -71,14 +71,14 @@ public:
     ErrCode AddBlockList(const StationInfo &stationInfo) const;
 
     /**
-     * @Description  delete block list
+     * @Description  delete block list.
      * @param stationInfo - sta infos
      * @return ErrCode - success: WIFI_OPT_SUCCESS    failed: ERROR_CODE
      */
     ErrCode DelBlockList(const StationInfo &stationInfo) const;
 
     /**
-     * @Description  Disconnect a specified STA
+     * @Description  Disconnect a specified STA.
      * @param stationInfo - sta infos
      * @return ErrCode - success: WIFI_OPT_SUCCESS    failed: ERROR_CODE
      */

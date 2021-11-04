@@ -196,7 +196,7 @@ HWTEST_F(WifiManagerServiceTest, P2pConnectionChangeTest, TestSize.Level1)
     IP2pServiceCallbacks cbk = WifiManager::GetInstance().GetP2pCallback();
     ASSERT_TRUE(cbk.OnP2pConnectionChangedEvent != nullptr);
 
-    WifiP2pInfo info;
+    WifiP2pLinkedInfo info;
     cbk.OnP2pConnectionChangedEvent(info);
     sleep(1);
 }

@@ -37,7 +37,8 @@ public:
         std::string uuid;
         std::string device;
         std::vector<std::string> services;
-        std::string svrName;
+        services.push_back(std::string("TestUpnpService"));
+        std::string svrName("TestSvrName");
         WifiP2pUpnpServiceInfo::Create(uuid, device, services, svrName);
     }
     void WarpCreateSupQuery()

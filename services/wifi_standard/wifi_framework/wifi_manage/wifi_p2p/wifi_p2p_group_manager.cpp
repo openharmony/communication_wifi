@@ -209,12 +209,12 @@ void WifiP2pGroupManager::RefreshCurrentGroupFromGroups()
     }
 }
 
-void WifiP2pGroupManager::SaveP2pInfo(const WifiP2pInfo &connInfo)
+void WifiP2pGroupManager::SaveP2pInfo(const WifiP2pLinkedInfo &linkedInfo)
 {
-    p2pConnInfo = connInfo;
+    p2pConnInfo = linkedInfo;
 }
 
-const WifiP2pInfo &WifiP2pGroupManager::GetP2pInfo() const
+const WifiP2pLinkedInfo &WifiP2pGroupManager::GetP2pInfo() const
 {
     return p2pConnInfo;
 }

@@ -33,7 +33,7 @@ public:
      * @param None
      * @return None
      */
-    GroupFormedState(P2pStateMachine &, WifiP2pGroupManager &, WifiP2pDeviceManager &);
+    GroupFormedState(P2pStateMachine &stateMachine, WifiP2pGroupManager &groupMgr, WifiP2pDeviceManager &deviceMgr);
 
     /**
      * @Description Destroy the Group Formed State object
@@ -142,11 +142,32 @@ private:
     virtual bool ProcessCmdDiscoverPeer(const InternalMessage &msg) const;
 
     /**
+     * @Description Process the discover services command received by the state machine
+     * @param msg - Message body sent by the state machine
+     * @return - bool true:handle   false:not handle
+     */
+    virtual bool ProcessCmdDiscServices(const InternalMessage &msg) const;
+
+    /**
      * @Description Process the disable command received by the state machine
      * @param msg - Message body sent by the state machine
      * @return - bool true:handle   false:not handle
      */
     virtual bool ProcessCmdDisable(const InternalMessage &msg) const;
+
+    /**
+     * @Description Process the cancel connect command received by the state machine
+     * @param msg - Message body sent by the state machine
+     * @return - bool true:handle   false:not handle
+     */
+    virtual bool ProcessCmdCancelConnect(const InternalMessage &msg) const;
+
+    /**
+     * @Description Process the start listen command received by the state machine
+     * @param msg - Message body sent by the state machine
+     * @return - bool true:handle   false:not handle
+     */
+    virtual bool ProcessCmdStartListen(const InternalMessage &msg) const;
 
 private:
     P2pStateMachine &p2pStateMachine;

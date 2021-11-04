@@ -90,7 +90,7 @@ HWTEST_F(GroupNegotiationStateTest, ExecuteStateMsg1, TestSize.Level1)
     EXPECT_TRUE(pGroupNegotiationState->ExecuteStateMsg(&msg));
 }
 
-HWTEST_F(GroupNegotiationStateTest, ExecuteStateMsg2, TestSize.Level1)
+HWTEST_F(GroupNegotiationStateTest, ProcessGroupStartedEvt1, TestSize.Level1)
 {
     InternalMessage msg;
     WifiP2pGroupInfo group;
@@ -101,18 +101,18 @@ HWTEST_F(GroupNegotiationStateTest, ExecuteStateMsg2, TestSize.Level1)
     EXPECT_TRUE(pGroupNegotiationState->ExecuteStateMsg(&msg));
 }
 
-HWTEST_F(GroupNegotiationStateTest, ExecuteStateMsg3, TestSize.Level1)
+HWTEST_F(GroupNegotiationStateTest, ProcessGroupStartedEvt2, TestSize.Level1)
 {
     InternalMessage msg;
     WifiP2pGroupInfo group;
     WifiP2pDevice device;
-    group.SetIsGroupOwner(false);
+    group.SetIsGroupOwner(true);
     group.SetIsPersistent(true);
     device.SetDeviceName("device");
     device.SetDeviceAddress("AA:BB:CC:DD:EE:FF");
     group.SetOwner(device);
     msg.SetMessageObj(group);
-    EXPECT_CALL(WifiP2PHalInterface::GetInstance(), ListNetworks(_)).WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED));
+    EXPECT_CALL(pMockP2pPendant->GetP2pStateMachine(), UpdatePersistentGroups()).WillOnce(Return());
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), SetP2pGroupIdle(_, _))
         .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED));
     AddDeviceManager();
@@ -120,7 +120,7 @@ HWTEST_F(GroupNegotiationStateTest, ExecuteStateMsg3, TestSize.Level1)
     EXPECT_TRUE(pGroupNegotiationState->ExecuteStateMsg(&msg));
 }
 
-HWTEST_F(GroupNegotiationStateTest, ExecuteStateMsg4, TestSize.Level1)
+HWTEST_F(GroupNegotiationStateTest, ProcessGroupStartedEvt3, TestSize.Level1)
 {
     InternalMessage msg;
     WifiP2pGroupInfo group;
@@ -129,7 +129,7 @@ HWTEST_F(GroupNegotiationStateTest, ExecuteStateMsg4, TestSize.Level1)
     msg.SetMessageObj(group);
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), SetP2pGroupIdle(_, _))
         .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED));
-    EXPECT_CALL(WifiP2PHalInterface::GetInstance(), ListNetworks(_)).WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED));
+    EXPECT_CALL(pMockP2pPendant->GetP2pStateMachine(), UpdatePersistentGroups()).WillOnce(Return());
     AddDeviceManager();
     msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_EVENT_GROUP_STARTED));
     EXPECT_TRUE(pGroupNegotiationState->ExecuteStateMsg(&msg));
@@ -142,7 +142,7 @@ HWTEST_F(GroupNegotiationStateTest, ExecuteStateMsg5, TestSize.Level1)
     EXPECT_TRUE(pGroupNegotiationState->ExecuteStateMsg(&msg));
 }
 
-HWTEST_F(GroupNegotiationStateTest, ExecuteStateMsg6, TestSize.Level1)
+HWTEST_F(GroupNegotiationStateTest, ProcessInvitationResultEvt1, TestSize.Level1)
 {
     InternalMessage msg;
     msg.SetParam1(1);
@@ -150,7 +150,7 @@ HWTEST_F(GroupNegotiationStateTest, ExecuteStateMsg6, TestSize.Level1)
     EXPECT_TRUE(pGroupNegotiationState->ExecuteStateMsg(&msg));
 }
 
-HWTEST_F(GroupNegotiationStateTest, ExecuteStateMsg7, TestSize.Level1)
+HWTEST_F(GroupNegotiationStateTest, ProcessInvitationResultEvt2, TestSize.Level1)
 {
     InternalMessage msg;
     msg.SetParam1(0);
@@ -158,7 +158,7 @@ HWTEST_F(GroupNegotiationStateTest, ExecuteStateMsg7, TestSize.Level1)
     EXPECT_TRUE(pGroupNegotiationState->ExecuteStateMsg(&msg));
 }
 
-HWTEST_F(GroupNegotiationStateTest, ExecuteStateMsg8, TestSize.Level1)
+HWTEST_F(GroupNegotiationStateTest, ProcessInvitationResultEvt3, TestSize.Level1)
 {
     InternalMessage msg;
     msg.SetParam1(8);
@@ -166,7 +166,7 @@ HWTEST_F(GroupNegotiationStateTest, ExecuteStateMsg8, TestSize.Level1)
     EXPECT_TRUE(pGroupNegotiationState->ExecuteStateMsg(&msg));
 }
 
-HWTEST_F(GroupNegotiationStateTest, ExecuteStateMsg9, TestSize.Level1)
+HWTEST_F(GroupNegotiationStateTest, ProcessInvitationResultEvt4, TestSize.Level1)
 {
     InternalMessage msg;
     msg.SetParam1(1);
@@ -174,11 +174,20 @@ HWTEST_F(GroupNegotiationStateTest, ExecuteStateMsg9, TestSize.Level1)
     EXPECT_TRUE(pGroupNegotiationState->ExecuteStateMsg(&msg));
 }
 
-HWTEST_F(GroupNegotiationStateTest, ExecuteStateMsg10, TestSize.Level1)
+HWTEST_F(GroupNegotiationStateTest, ProcessInvitationResultEvt5, TestSize.Level1)
 {
     InternalMessage msg;
     msg.SetParam1(7);
     msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_EVENT_INVITATION_RESULT));
+    EXPECT_TRUE(pGroupNegotiationState->ExecuteStateMsg(&msg));
+}
+
+HWTEST_F(GroupNegotiationStateTest, ProcessInvitationResultEvt6, TestSize.Level1)
+{
+    InternalMessage msg;
+    msg.SetParam1(3);
+    msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_EVENT_INVITATION_RESULT));
+    EXPECT_CALL(pMockP2pPendant->GetP2pStateMachine(), DealGroupCreationFailed()).WillOnce(Return());
     EXPECT_TRUE(pGroupNegotiationState->ExecuteStateMsg(&msg));
 }
 
@@ -201,6 +210,14 @@ HWTEST_F(GroupNegotiationStateTest, ProcessGroupFormationFailEvt, TestSize.Level
     EXPECT_TRUE(pGroupNegotiationState->ExecuteStateMsg(&msg));
     msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_EVENT_PROV_DISC_PBC_REQ));
     EXPECT_FALSE(pGroupNegotiationState->ExecuteStateMsg(&msg));
+}
+
+HWTEST_F(GroupNegotiationStateTest, ProcessGroupRemovedEvt, TestSize.Level1)
+{
+    InternalMessage msg;
+    msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_EVENT_GROUP_REMOVED));
+    EXPECT_CALL(pMockP2pPendant->GetP2pStateMachine(), DealGroupCreationFailed()).WillOnce(Return());
+    EXPECT_TRUE(pGroupNegotiationState->ExecuteStateMsg(&msg));
 }
 }  // namespace Wifi
 }  // namespace OHOS

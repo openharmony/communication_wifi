@@ -192,17 +192,17 @@ int WifiSettings::GetScanControlInfo(ScanControlInfo &info)
     return 0;
 }
 
-int WifiSettings::GetP2pInfo(WifiP2pInfo &connInfo)
+int WifiSettings::GetP2pInfo(WifiP2pLinkedInfo &linkedInfo)
 {
     std::unique_lock<std::mutex> lock(mInfoMutex);
-    connInfo = mWifiP2pInfo;
+    linkedInfo = mWifiP2pInfo;
     return 0;
 }
 
-int WifiSettings::SaveP2pInfo(WifiP2pInfo &connInfo)
+int WifiSettings::SaveP2pInfo(WifiP2pLinkedInfo &linkedInfo)
 {
     std::unique_lock<std::mutex> lock(mInfoMutex);
-    mWifiP2pInfo = connInfo;
+    mWifiP2pInfo = linkedInfo;
     return 0;
 }
 

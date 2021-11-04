@@ -16,6 +16,7 @@
 
 #include "wifi_p2p_service.h"
 #include "wifi_p2p_msg.h"
+#include "wifi_settings.h"
 #include "mock_p2p_pendant.h"
 #include "mock_wifi_p2p_hal_interface.h"
 
@@ -28,8 +29,8 @@ class WifiP2pServiceTest : public testing::Test {
 public:
     WifiP2pServiceTest() : groupManager(), deviceManager(), svrManager()
     {}
-    static void SetUpTestCase(){}
-    static void TearDownTestCase(){}
+    static void SetUpTestCase() {}
+    static void TearDownTestCase() {}
     virtual void SetUp()
     {
         pMockP2pPendant.reset(new MockP2pPendant());
@@ -50,6 +51,10 @@ public:
     WifiP2pDeviceManager deviceManager;
     WifiP2pServiceManager svrManager;
 };
+HWTEST_F(WifiP2pServiceTest, EnableP2p, TestSize.Level1)
+{
+    EXPECT_EQ(pWifiP2pService->EnableP2p(), ErrCode::WIFI_OPT_SUCCESS);
+}
 
 HWTEST_F(WifiP2pServiceTest, DisableP2p, TestSize.Level1)
 {
@@ -100,6 +105,7 @@ HWTEST_F(WifiP2pServiceTest, StartP2pListen, TestSize.Level1)
     int interval = 0;
     EXPECT_EQ(pWifiP2pService->StartP2pListen(period, interval), ErrCode::WIFI_OPT_SUCCESS);
 }
+
 HWTEST_F(WifiP2pServiceTest, StopP2pListen, TestSize.Level1)
 {
     EXPECT_EQ(pWifiP2pService->StopP2pListen(), ErrCode::WIFI_OPT_SUCCESS);
@@ -129,17 +135,21 @@ HWTEST_F(WifiP2pServiceTest, P2pConnect, TestSize.Level1)
     EXPECT_EQ(pWifiP2pService->P2pDisConnect(), ErrCode::WIFI_OPT_SUCCESS);
 }
 
-HWTEST_F(WifiP2pServiceTest, QueryP2pInfo, TestSize.Level1)
+HWTEST_F(WifiP2pServiceTest, QueryP2pLinkedInfo, TestSize.Level1)
 {
-    WifiP2pInfo connInfo;
-    EXPECT_EQ(pWifiP2pService->QueryP2pInfo(connInfo), ErrCode::WIFI_OPT_SUCCESS);
+    WifiP2pLinkedInfo linkedInfo;
+    EXPECT_EQ(pWifiP2pService->QueryP2pLinkedInfo(linkedInfo), ErrCode::WIFI_OPT_SUCCESS);
 }
 
 HWTEST_F(WifiP2pServiceTest, GetCurrentGroup, TestSize.Level1)
 {
+    WifiP2pLinkedInfo p2pInfo;
+    p2pInfo.SetConnectState(P2pConnectedState::P2P_DISCONNECTED);
+    WifiSettings::GetInstance().SaveP2pInfo(p2pInfo);
     WifiP2pGroupInfo group;
-    EXPECT_EQ(pWifiP2pService->GetCurrentGroup(group), ErrCode::WIFI_OPT_SUCCESS);
+    EXPECT_EQ(pWifiP2pService->GetCurrentGroup(group), ErrCode::WIFI_OPT_FAILED);
 }
+
 HWTEST_F(WifiP2pServiceTest, GetP2pEnableStatus, TestSize.Level1)
 {
     int status;
@@ -174,6 +184,18 @@ HWTEST_F(WifiP2pServiceTest, QueryP2pServices, TestSize.Level1)
 {
     std::vector<WifiP2pServiceInfo> services;
     EXPECT_EQ(pWifiP2pService->QueryP2pServices(services), ErrCode::WIFI_OPT_SUCCESS);
+}
+
+HWTEST_F(WifiP2pServiceTest, SetP2pDeviceName, TestSize.Level1)
+{
+    std::string deviceName("TestName");
+    EXPECT_EQ(pWifiP2pService->SetP2pDeviceName(deviceName), ErrCode::WIFI_OPT_SUCCESS);
+}
+
+HWTEST_F(WifiP2pServiceTest, SetP2pWfdInfo, TestSize.Level1)
+{
+    WifiP2pWfdInfo wfd;
+    EXPECT_EQ(pWifiP2pService->SetP2pWfdInfo(wfd), ErrCode::WIFI_OPT_SUCCESS);
 }
 }  // namespace Wifi
 }  // namespace OHOS

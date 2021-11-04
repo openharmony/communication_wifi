@@ -35,6 +35,7 @@ public:
     MOCK_METHOD1(RegisterApServiceCallbacks, ErrCode(const IApServiceCallbacks &callbacks));
     MOCK_METHOD0(StartDhcpServer, bool());
     MOCK_METHOD0(StopDhcpServer, bool());
+    MOCK_METHOD1(GetConnectedStationInfo, bool(std::map<std::string, StationInfo> &result));
 };
 } // namespace Wifi
 } // namespace OHOS

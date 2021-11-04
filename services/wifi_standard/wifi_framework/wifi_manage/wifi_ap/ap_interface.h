@@ -25,13 +25,13 @@ namespace Wifi {
 class ApInterface : public IApService {
 public:
     /**
-     * @Description  construction method
+     * @Description  construction method.
      * @param None
      * @return None
      */
     ApInterface();
     /**
-     * @Description  destructor method
+     * @Description  destructor method.
      * @param None
      * @return None
      */

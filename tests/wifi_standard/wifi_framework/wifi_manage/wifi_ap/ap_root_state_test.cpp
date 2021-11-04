@@ -21,15 +21,20 @@
 #include "ap_root_state.h"
 
 using namespace OHOS;
+using ::testing::_;
+using ::testing::An;
+using ::testing::DoAll;
+using ::testing::Eq;
+using ::testing::Return;
+using ::testing::TypedEq;
+using ::testing::ext::TestSize;
 
 namespace OHOS {
 namespace Wifi {
 class ApRootState_test : public testing::Test {
 public:
-    static void SetUpTestCase()
-    {}
-    static void TearDownTestCase()
-    {}
+    static void SetUpTestCase() {}
+    static void TearDownTestCase() {}
     virtual void SetUp()
     {
         pApRootState = new ApRootState();
@@ -37,13 +42,14 @@ public:
     virtual void TearDown()
     {
         delete pApRootState;
+        pApRootState = nullptr;
     }
 
 public:
     ApRootState *pApRootState;
 };
 
-TEST_F(ApRootState_test, ExecuteStateMsg_SUCCESS)
+HWTEST_F(ApRootState_test, ExecuteStateMsg_SUCCESS, TestSize.Level1)
 {
     InternalMessage *msg = new InternalMessage();
 
@@ -55,21 +61,20 @@ TEST_F(ApRootState_test, ExecuteStateMsg_SUCCESS)
 
     msg->SetMessageName(static_cast<int>(ApStatemachineEvent::CMD_SET_HOTSPOT_CONFIG));
     EXPECT_TRUE(pApRootState->ExecuteStateMsg(msg));
-
     delete msg;
+    msg = nullptr;
 }
 
-TEST_F(ApRootState_test, ExecuteStateMsg_FAILED)
+HWTEST_F(ApRootState_test, ExecuteStateMsg_FAILED, TestSize.Level1)
 {
-    InternalMessage *msg = nullptr;
-    EXPECT_FALSE(pApRootState->ExecuteStateMsg(msg));
+    EXPECT_FALSE(pApRootState->ExecuteStateMsg(nullptr));
 }
 
-TEST_F(ApRootState_test, GoInState)
+HWTEST_F(ApRootState_test, GoInState, TestSize.Level1)
 {
     pApRootState->GoInState();
 }
-TEST_F(ApRootState_test, GoOutState)
+HWTEST_F(ApRootState_test, GoOutState, TestSize.Level1)
 {
     pApRootState->GoOutState();
 }

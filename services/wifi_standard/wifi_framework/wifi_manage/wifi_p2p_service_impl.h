@@ -161,10 +161,10 @@ public:
     /**
      * @Description Querying Wi-Fi P2P Connection Information
      *
-     * @param connInfo - Get the WifiP2pInfo msg
+     * @param linkedInfo - Get the WifiP2pLinkedInfo msg
      * @return ErrCode - operate result
      */
-    ErrCode QueryP2pInfo(WifiP2pInfo &connInfo) override;
+    ErrCode QueryP2pLinkedInfo(WifiP2pLinkedInfo &linkedInfo) override;
 
     /**
      * @Description Get the Current Group object

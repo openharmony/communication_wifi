@@ -209,7 +209,7 @@ struct WifiEventCallbackMsg {
     StationInfo staInfo;
     std::vector<WifiP2pDevice> device;
     std::vector<WifiP2pServiceInfo> serviceInfo;
-    WifiP2pInfo p2pInfo;
+    WifiP2pLinkedInfo p2pInfo;
     WifiP2pDevice p2pDevice;
     P2pActionCallback p2pAction;
     WifiEventCallbackMsg()

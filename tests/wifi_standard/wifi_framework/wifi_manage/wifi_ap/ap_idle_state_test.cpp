@@ -23,71 +23,83 @@
 using namespace OHOS;
 using ::testing::_;
 using ::testing::Return;
+using ::testing::ext::TestSize;
 
 namespace OHOS {
 namespace Wifi {
 class ApIdleState_test : public testing::Test {
 public:
-    static void SetUpTestCase()
-    {}
-    static void TearDownTestCase()
-    {}
+    static void SetUpTestCase() {}
+    static void TearDownTestCase() {}
     virtual void SetUp()
     {
+        const int SLEEP_TIEM = 20;
         pMockPendant = new MockPendant();
 
         pMockPendant->GetMockApStateMachine().InitialStateMachine();
+
         pApIdleState = new ApIdleState(pMockPendant->GetMockApStateMachine());
+
+        msg = new InternalMessage();
+        usleep(SLEEP_TIEM);
     }
     virtual void TearDown()
     {
-        EXPECT_CALL(WifiApHalInterface::GetInstance(), RegisterApEvent(_))
-            .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
         delete pApIdleState;
+
         pApIdleState = nullptr;
+
         delete pMockPendant;
+
         pMockPendant = nullptr;
+
+        delete msg;
+
+        msg = nullptr;
     }
 
 public:
     MockPendant *pMockPendant;
+
     ApIdleState *pApIdleState;
+
+    InternalMessage *msg;
 };
 
-TEST_F(ApIdleState_test, ExecuteStateMsg_SUCCESS)
-{
-    InternalMessage *msg = new InternalMessage();
-    msg->SetMessageName(static_cast<int>(ApStatemachineEvent::CMD_UPDATE_HOTSPOTCONFIG_RESULT));
-    EXPECT_TRUE(pApIdleState->ExecuteStateMsg(msg));
-
-    msg->SetMessageName(static_cast<int>(ApStatemachineEvent::CMD_START_HOTSPOT));
-    EXPECT_TRUE(pApIdleState->ExecuteStateMsg(msg));
-    delete msg;
-}
-
-TEST_F(ApIdleState_test, ExecuteStateMsg_FAILED)
-{
-    InternalMessage *msg = new InternalMessage();
-
-    msg->SetMessageName(static_cast<int>(ApStatemachineEvent::CMD_SET_HOTSPOT_CONFIG));
-    EXPECT_FALSE(pApIdleState->ExecuteStateMsg(msg));
-
-    msg->SetMessageName(static_cast<int>(ApStatemachineEvent::CMD_DISCONNECT_STATION));
-    EXPECT_FALSE(pApIdleState->ExecuteStateMsg(msg));
-
-    msg = nullptr;
-    EXPECT_FALSE(pApIdleState->ExecuteStateMsg(msg));
-
-    delete msg;
-}
-
-TEST_F(ApIdleState_test, GoInState)
+HWTEST_F(ApIdleState_test, GoInState, TestSize.Level1)
 {
     pApIdleState->GoInState();
 }
-TEST_F(ApIdleState_test, GoOutState)
+HWTEST_F(ApIdleState_test, GoOutState, TestSize.Level1)
 {
     pApIdleState->GoOutState();
 }
-}  // namespace Wifi
-}  // namespace OHOS
+
+HWTEST_F(ApIdleState_test, ExecuteStateMsg_SUCCESS, TestSize.Level1)
+{
+    EXPECT_CALL(WifiApHalInterface::GetInstance(), RegisterApEvent(_))
+        .WillRepeatedly(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
+
+    msg->SetMessageName(static_cast<int>(ApStatemachineEvent::CMD_UPDATE_HOTSPOTCONFIG_RESULT));
+
+    EXPECT_TRUE(pApIdleState->ExecuteStateMsg(msg));
+
+    msg->SetMessageName(static_cast<int>(ApStatemachineEvent::CMD_START_HOTSPOT));
+
+    EXPECT_TRUE(pApIdleState->ExecuteStateMsg(msg));
+}
+
+HWTEST_F(ApIdleState_test, ExecuteStateMsg_FAILED, TestSize.Level1)
+{
+    msg->SetMessageName(static_cast<int>(ApStatemachineEvent::CMD_SET_HOTSPOT_CONFIG));
+
+    EXPECT_FALSE(pApIdleState->ExecuteStateMsg(msg));
+
+    msg->SetMessageName(static_cast<int>(ApStatemachineEvent::CMD_DISCONNECT_STATION));
+
+    EXPECT_FALSE(pApIdleState->ExecuteStateMsg(msg));
+
+    EXPECT_FALSE(pApIdleState->ExecuteStateMsg(nullptr));
+}
+} // namespace Wifi
+} // namespace OHOS

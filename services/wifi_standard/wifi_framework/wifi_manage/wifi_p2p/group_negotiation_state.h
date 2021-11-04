@@ -33,7 +33,8 @@ public:
      * @param None
      * @return None
      */
-    GroupNegotiationState(P2pStateMachine &, WifiP2pGroupManager &, WifiP2pDeviceManager &);
+    GroupNegotiationState(P2pStateMachine &stateMachine, WifiP2pGroupManager &groupMgr,
+        WifiP2pDeviceManager &deviceMgr);
 
     /**
      * @Description Destroy the Group Negotiation State object

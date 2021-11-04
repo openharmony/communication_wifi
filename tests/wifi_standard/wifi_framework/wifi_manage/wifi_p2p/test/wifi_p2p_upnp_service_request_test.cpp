@@ -36,6 +36,7 @@ public:
     {
         WifiP2pUpnpServiceRequest::Create();
         WifiP2pUpnpServiceRequest::Create("searchTarget");
+        WifiP2pUpnpServiceRequest::Create(std::string(""));
     }
 };
 

@@ -84,7 +84,7 @@ public:
      */
     virtual ~ApConfigUse();
     /**
-     * @Description  Convert frequency to channel number
+     * @Description  Convert frequency to channel number.
      * @param freq - frequency to convert
      * @return success: channel num    failed: -1
      */

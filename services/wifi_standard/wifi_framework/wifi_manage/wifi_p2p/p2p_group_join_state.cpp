@@ -27,13 +27,17 @@ P2pGroupJoinState::P2pGroupJoinState(
 {}
 void P2pGroupJoinState::GoInState()
 {
-    WIFI_LOGI("             GoInState");
+    WIFI_LOGI("GoInState");
     p2pStateMachine.NotifyUserInvitationReceivedMessage();
+    const int exceptionTimeOut = 120000;
+    p2pStateMachine.MessageExecutedLater(
+        static_cast<int>(P2P_STATE_MACHINE_CMD::INTERNAL_CONN_USER_TIME_OUT), exceptionTimeOut);
 }
 
 void P2pGroupJoinState::GoOutState()
 {
-    WIFI_LOGI("             GoOutState");
+    WIFI_LOGI("GoOutState");
+    p2pStateMachine.StopTimer(static_cast<int>(P2P_STATE_MACHINE_CMD::INTERNAL_CONN_USER_TIME_OUT));
 }
 
 bool P2pGroupJoinState::ExecuteStateMsg(InternalMessage *msg)
@@ -81,6 +85,10 @@ bool P2pGroupJoinState::ExecuteStateMsg(InternalMessage *msg)
         }
         case P2P_STATE_MACHINE_CMD::CMD_P2P_DISABLE: {
             p2pStateMachine.DelayMessage(msg);
+            p2pStateMachine.SwitchState(&p2pStateMachine.p2pGroupFormedState);
+            break;
+        }
+        case P2P_STATE_MACHINE_CMD::INTERNAL_CONN_USER_TIME_OUT: {
             p2pStateMachine.SwitchState(&p2pStateMachine.p2pGroupFormedState);
             break;
         }

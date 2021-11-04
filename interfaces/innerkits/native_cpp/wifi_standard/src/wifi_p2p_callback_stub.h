@@ -70,9 +70,9 @@ public:
     /**
      * @Description Connection status change
      *
-     * @param info - WifiP2pInfo object
+     * @param info - WifiP2pLinkedInfo object
      */
-    void OnP2pConnectionChanged(const WifiP2pInfo &info) override;
+    void OnP2pConnectionChanged(const WifiP2pLinkedInfo &info) override;
 
     /**
      * @Description Discover status change

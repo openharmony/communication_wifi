@@ -29,9 +29,9 @@ public:
     static void Show(const std::map<std::string, std::string> &v);
     static void Show(const int v);
     static void Show(const WifiP2pDevice &v);
-    static void Show(const WifiP2pInfo &v);
+    static void Show(const WifiP2pLinkedInfo &v);
     static void Show(const std::vector<WifiP2pDevice> &v);
-    static void Show(const std::vector<WifiP2pInfo> &v);
+    static void Show(const std::vector<WifiP2pLinkedInfo> &v);
     static void Show(const WifiP2pServiceInfo &v);
     static void Show(const std::vector<WifiP2pServiceInfo> &v);
 

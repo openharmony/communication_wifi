@@ -148,7 +148,8 @@ WifiErrorNo WifiP2PHalInterface::P2pFlush() const
     return mIdlClient->ReqP2pFlush();
 }
 
-WifiErrorNo WifiP2PHalInterface::Connect(const WifiP2pConfig &config, bool isJoinExistingGroup, std::string &pin) const
+WifiErrorNo WifiP2PHalInterface::Connect(const WifiP2pConfigInternal &config, bool isJoinExistingGroup,
+    std::string &pin) const
 {
     return mIdlClient->ReqP2pConnect(config, isJoinExistingGroup, pin);
 }
@@ -158,7 +159,7 @@ WifiErrorNo WifiP2PHalInterface::CancelConnect() const
     return mIdlClient->ReqP2pCancelConnect();
 }
 
-WifiErrorNo WifiP2PHalInterface::ProvisionDiscovery(const WifiP2pConfig &config) const
+WifiErrorNo WifiP2PHalInterface::ProvisionDiscovery(const WifiP2pConfigInternal &config) const
 {
     return mIdlClient->ReqP2pProvisionDiscovery(config);
 }

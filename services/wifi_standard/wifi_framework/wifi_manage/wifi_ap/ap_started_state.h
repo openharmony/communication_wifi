@@ -28,13 +28,13 @@ class ApStartedState : public State {
     FRIEND_GTEST(ApStartedState);
 public:
     /**
-     * @Description  construction method
+     * @Description  construction method.
      * @param None
      * @return None
      */
     ApStartedState(ApStateMachine &, ApConfigUse &, ApMonitor &);
     /**
-     * @Description  destructor method
+     * @Description  destructor method.
      * @param None
      * @return None
      */
@@ -63,7 +63,7 @@ public:
     /**
      * @Description  Implement pure base class methods:The CMD processed
                      when the AP is in the running state (such as updating
-                     the blocklist to hostapd)
+                     the blocklist to hostapd.)
      * @param msg - processed message
      * @return HANDLED：Processed successfully    NOT_EXECUTED: Processed failed
      */
@@ -72,7 +72,7 @@ public:
 private:
     /**
      * @Description  Called inside the state，The processing function of
-                     the HAL layer when the AP is turned on
+                     the HAL layer when the AP is turned on.
      * @param None
      * @return true: Successfully opened    false: Failed to open
      */
@@ -80,7 +80,7 @@ private:
 
     /**
      * @Description  Called inside the state，The processing function of
-                     the HAL layer when the AP is turned off
+                     the HAL layer when the AP is turned off.
      * @param None
      * @return true: Closed successfully    false: Close failed
      */
@@ -103,21 +103,21 @@ private:
     bool SetConfig();
 
     /**
-     * @Description  Status update notification APSERVICE
+     * @Description  Status update notification APSERVICE.
      * @param state - New state
      * @return None
      */
     void OnApStateChange(const ApState &state) const;
 
     /**
-     * @Description  Start ap monitor
+     * @Description  Start ap monitor.
      * @param None
      * @return None
      */
     void StartMonitor() const;
 
     /**
-     * @Description  Stop ap monitor
+     * @Description  Stop ap monitor.
      * @param None
      * @return None
      */
@@ -131,7 +131,7 @@ private:
     bool EnableInterfaceNat() const;
 
     /**
-     * @Description  stop NAT
+     * @Description  stop NAT.
      * @param None
      * @return true: success    false: failed
      */
@@ -139,21 +139,21 @@ private:
 
 private:
     /**
-     * @Description  Handle hostapd failure events received by the state machine
+     * @Description  Handle hostapd failure events received by the state machine.
      * @param msg - Message body sent by the state machine
      * @return None
      */
     void ProcessCmdFail(InternalMessage &msg) const;
 
     /**
-     * @Description  Process the STA connection message received by the state machine
+     * @Description  Process the STA connection message received by the state machine.
      * @param msg - Message body sent by the state machine
      * @return None
      */
     void ProcessCmdStationJoin(InternalMessage &msg) const;
 
     /**
-     * @Description  Process the STA disconnect message received by the state machine
+     * @Description  Process the STA disconnect message received by the state machine.
      * @param msg - Message body sent by the state machine
      * @return None
      */
@@ -161,7 +161,7 @@ private:
 
     /**
      * @Description  Process the hotspot configuration message of the APP
-                     received by the state machine
+                     received by the state machine.
      * @param msg - Message body sent by the state machine
      * @return None
      */
@@ -169,7 +169,7 @@ private:
 
     /**
      * @Description  Process the hotspot configuration update result
-                     received by the state machine
+                     received by the state machine.
      * @param msg - Message body sent by the state machine
      * @return None
      */
@@ -177,7 +177,7 @@ private:
 
     /**
      * @Description  Process the add blocklist message received by the
-                     state machine
+                     state machine.
      * @param msg - Message body sent by the state machine
      * @return None
      */
@@ -185,7 +185,7 @@ private:
 
     /**
      * @Description  Process the delete blocklist message received by the
-                     state machine
+                     state machine.
      * @param msg - Message body sent by the state machine
      * @return None
      */
@@ -193,7 +193,7 @@ private:
 
     /**
      * @Description  Process the close hotspot message received by the
-                     state machine
+                     state machine.
      * @param msg - Message body sent by the state machine
      * @return None
      */
@@ -201,14 +201,14 @@ private:
 
     /**
      * @Description  Process the disconnected STA message received by the
-                     state machine
+                     state machine.
      * @param msg - Message body sent by the state machine
      * @return None
      */
     void ProcessCmdDisconnectStation(InternalMessage &msg) const;
 
     /**
-     * @Description  Initialization
+     * @Description  Initialization.
      * @param None
      * @return None
      */

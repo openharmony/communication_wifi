@@ -27,13 +27,13 @@ class ApIdleState : public State {
 
 public:
     /**
-     * @Description  construction method
+     * @Description  construction method.
      * @param None
      * @return None
      */
     explicit ApIdleState(ApStateMachine &);
     /**
-     * @Description  destructor method
+     * @Description  destructor method.
      * @param None
      * @return None
      */

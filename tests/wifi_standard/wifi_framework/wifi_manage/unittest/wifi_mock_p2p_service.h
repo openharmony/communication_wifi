@@ -42,7 +42,7 @@ public:
     ErrCode DeleteGroup(const WifiP2pGroupInfo &group);
     ErrCode P2pConnect(const WifiP2pConfig &config);
     ErrCode P2pDisConnect();
-    ErrCode QueryP2pInfo(WifiP2pInfo &connInfo);
+    ErrCode QueryP2pLinkedInfo(WifiP2pLinkedInfo &linkedInfo);
     ErrCode GetCurrentGroup(WifiP2pGroupInfo &group);
     ErrCode GetP2pEnableStatus(int &status);
     ErrCode GetP2pDiscoverStatus(int &status);

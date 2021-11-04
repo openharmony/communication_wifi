@@ -56,7 +56,7 @@ public:
     }
 
 public:
-    void WrapMethodSendMessage(
+    void WrapMethodMessageToStateMachine(
         const std::string &iface, P2P_STATE_MACHINE_CMD msgName, int param1, int param2, const std::any &anyObj) const
     {
         pP2pMonitor->MessageToStateMachine(iface, msgName, param1, param2, anyObj);
@@ -82,7 +82,7 @@ public:
         pP2pMonitor->Broadcast2SmDeviceLost(iface, device);
     }
 
-    void WrapMethodBroadcast2SmGoNegRequest(const std::string &iface, const WifiP2pConfig &config) const
+    void WrapMethodBroadcast2SmGoNegRequest(const std::string &iface, const WifiP2pConfigInternal &config) const
     {
         pP2pMonitor->Broadcast2SmGoNegRequest(iface, config);
     }
@@ -185,107 +185,107 @@ public:
         pP2pMonitor->OnConnectSupplicant(status);
     }
 
-    void WrapMethodOnDeviceFound(IdlP2pDeviceFound deviceInfo)
+    void WrapMethodWpaEventDeviceFound(IdlP2pDeviceFound deviceInfo)
     {
         pP2pMonitor->WpaEventDeviceFound(deviceInfo);
     }
 
-    void WrapMethodOnDeviceLost(const std::string &p2pDeviceAddress)
+    void WrapMethodWpaEventDeviceLost(const std::string &p2pDeviceAddress)
     {
         pP2pMonitor->WpaEventDeviceLost(p2pDeviceAddress);
     }
 
-    void WrapMethodOnGoNegRequest(const std::string &srcAddress, short passwordId)
+    void WrapMethodWpaEventGoNegRequest(const std::string &srcAddress, short passwordId)
     {
         pP2pMonitor->WpaEventGoNegRequest(srcAddress, passwordId);
     }
 
-    void WrapMethodOnGoNegSuccess()
+    void WrapMethodWpaEventGoNegSuccess()
     {
         pP2pMonitor->WpaEventGoNegSuccess();
     }
 
-    void WrapMethodOnGoNegFailure(int status)
+    void WrapMethodWpaEventGoNegFailure(int status)
     {
         pP2pMonitor->WpaEventGoNegFailure(status);
     }
 
-    void WrapMethodOnInvitationReceived(IdlP2pInvitationInfo recvInfo)
+    void WrapMethodWpaEventInvitationReceived(IdlP2pInvitationInfo recvInfo)
     {
         pP2pMonitor->WpaEventInvitationReceived(recvInfo);
     }
 
-    void WrapMethodOnInvitationResult(const std::string &bssid, int status)
+    void WrapMethodWpaEventInvitationResult(const std::string &bssid, int status)
     {
         pP2pMonitor->WpaEventInvitationResult(bssid, status);
     }
 
-    void WrapMethodOnGroupFormationSuccess()
+    void WrapMethodWpaEventGroupFormationSuccess()
     {
         pP2pMonitor->WpaEventGroupFormationSuccess();
     }
 
-    void WrapMethodOnGroupFormationFailure(const std::string &failureReason)
+    void WrapMethodWpaEventGroupFormationFailure(const std::string &failureReason)
     {
         pP2pMonitor->WpaEventGroupFormationFailure(failureReason);
     }
 
-    void WrapMethodOnGroupStarted(IdlP2pGroupInfo groupInfo)
+    void WrapMethodWpaEventGroupStarted(IdlP2pGroupInfo groupInfo)
     {
         pP2pMonitor->WpaEventGroupStarted(groupInfo);
     }
 
-    void WrapMethodOnGroupRemoved(const std::string &groupIfName, bool isGo)
+    void WrapMethodWpaEventGroupRemoved(const std::string &groupIfName, bool isGo)
     {
         pP2pMonitor->WpaEventGroupRemoved(groupIfName, isGo);
     }
 
-    void WrapMethodOnProvDiscPbcReq(const std::string &p2pDeviceAddress)
+    void WrapMethodWpaEventProvDiscPbcReq(const std::string &p2pDeviceAddress)
     {
         pP2pMonitor->WpaEventProvDiscPbcReq(p2pDeviceAddress);
     }
 
-    void WrapMethodOnProvDiscPbcResp(const std::string &p2pDeviceAddress)
+    void WrapMethodWpaEventProvDiscPbcResp(const std::string &p2pDeviceAddress)
     {
         pP2pMonitor->WpaEventProvDiscPbcResp(p2pDeviceAddress);
     }
 
-    void WrapMethodOnProvDiscEnterPin(const std::string &p2pDeviceAddress)
+    void WrapMethodWpaEventProvDiscEnterPin(const std::string &p2pDeviceAddress)
     {
         pP2pMonitor->WpaEventProvDiscEnterPin(p2pDeviceAddress);
     }
 
-    void WrapMethodOnProvDiscShowPin(const std::string &p2pDeviceAddress, const std::string &generatedPin)
+    void WrapMethodWpaEventProvDiscShowPin(const std::string &p2pDeviceAddress, const std::string &generatedPin)
     {
         pP2pMonitor->WpaEventProvDiscShowPin(p2pDeviceAddress, generatedPin);
     }
 
-    void WrapMethodOnProvDiscFailure()
+    void WrapMethodWpaEventProvDiscFailure()
     {
         pP2pMonitor->WpaEventProvDiscFailure();
     }
 
-    void WrapMethodOnFindStopped()
+    void WrapMethodWpaEventFindStopped()
     {
         pP2pMonitor->WpaEventFindStopped();
     }
-    void WrapMethodOnServDiscReq(IdlP2pServDiscReqInfo reqInfo)
+    void WrapMethodWpaEventServDiscReq(IdlP2pServDiscReqInfo reqInfo)
     {
         pP2pMonitor->WpaEventServDiscReq(reqInfo);
     }
 
-    void WrapMethodOnServDiscResp(
+    void WrapMethodWpaEventServDiscResp(
         const std::string &srcAddress, short updateIndicator, const std::vector<unsigned char> &tlvs)
     {
         pP2pMonitor->WpaEventServDiscResp(srcAddress, updateIndicator, tlvs);
     }
 
-    void WrapMethodOnApStaDisconnected(const std::string &p2pDeviceAddress)
+    void WrapMethodWpaEventApStaDisconnected(const std::string &p2pDeviceAddress)
     {
         pP2pMonitor->WpaEventApStaDisconnected(p2pDeviceAddress);
     }
 
-    void WrapMethodOnApStaConnected(const std::string &p2pDeviceAddress)
+    void WrapMethodWpaEventApStaConnected(const std::string &p2pDeviceAddress)
     {
         pP2pMonitor->WpaEventApStaConnected(p2pDeviceAddress);
     }
@@ -328,7 +328,7 @@ HWTEST_F(P2pMonitorTest, WrapMethod_test, TestSize.Level1)
     constexpr int param1 = 0;
     constexpr int param2 = 1;
     const std::any anyObj = std::string("test_any");
-    WrapMethodSendMessage(iface, msgName, param1, param2, anyObj);
+    WrapMethodMessageToStateMachine(iface, msgName, param1, param2, anyObj);
 }
 
 HWTEST_F(P2pMonitorTest, WrapMethod_data, TestSize.Level1)
@@ -377,7 +377,7 @@ HWTEST_F(P2pMonitorTest, Broadcast2SmDeviceLost, TestSize.Level1)
 HWTEST_F(P2pMonitorTest, Broadcast2SmGoNegRequest, TestSize.Level1)
 {
     const std::string iface = g_pIface;
-    WifiP2pConfig testConfig;
+    WifiP2pConfigInternal testConfig;
     WrapMethodBroadcast2SmGoNegRequest(iface, testConfig);
 }
 
@@ -511,12 +511,12 @@ HWTEST_F(P2pMonitorTest, OnConnectSupplicant, TestSize.Level1)
     WrapMethodOnConnectSupplicant(status);
 }
 
-HWTEST_F(P2pMonitorTest, WpaEventDeviceFound, TestSize.Level1)
+HWTEST_F(P2pMonitorTest, WpaEventDeviceFound1, TestSize.Level1)
 {
     IdlP2pDeviceFound deviceInfo;
     deviceInfo.srcAddress = "ff:ff:ff:ff:ff:ff";
     deviceInfo.p2pDeviceAddress = "ff:ff:ff:ff:ff:ff";
-    deviceInfo.primaryDeviceType = "1-111111-1";
+    deviceInfo.primaryDeviceType = "1-11111111-1";
     deviceInfo.deviceName = "P2pUnitTest";
     deviceInfo.configMethods = 10;
     deviceInfo.deviceCapabilities = 8;
@@ -529,32 +529,83 @@ HWTEST_F(P2pMonitorTest, WpaEventDeviceFound, TestSize.Level1)
     deviceInfo.wfdDeviceInfo.push_back('e');
     deviceInfo.wfdDeviceInfo.push_back('8');
     deviceInfo.wfdDeviceInfo.push_back('8');
-    WrapMethodOnDeviceFound(deviceInfo);
+    WrapMethodWpaEventDeviceFound(deviceInfo);
 }
 
-HWTEST_F(P2pMonitorTest, WpaEventDeviceLost, TestSize.Level1)
+HWTEST_F(P2pMonitorTest, WpaEventDeviceFound2, TestSize.Level1)
 {
-    WrapMethodOnDeviceLost("ff:ff:ff:ff:ff:ff");
+    IdlP2pDeviceFound deviceInfo;
+    deviceInfo.srcAddress = "ff:ff:ff:ff:ff:ff";
+    deviceInfo.p2pDeviceAddress = "ff:ff:ff:ff:ff:ff";
+    deviceInfo.primaryDeviceType = "1-11111111-1";
+    deviceInfo.deviceName = "";
+    deviceInfo.configMethods = 10;
+    deviceInfo.deviceCapabilities = 8;
+    deviceInfo.groupCapabilities = 12;
+    deviceInfo.wfdDeviceInfo.push_back('1');
+    deviceInfo.wfdDeviceInfo.push_back('5');
+    deviceInfo.wfdDeviceInfo.push_back('a');
+    deviceInfo.wfdDeviceInfo.push_back('3');
+    deviceInfo.wfdDeviceInfo.push_back('6');
+    deviceInfo.wfdDeviceInfo.push_back('e');
+    deviceInfo.wfdDeviceInfo.push_back('8');
+    deviceInfo.wfdDeviceInfo.push_back('8');
+    WrapMethodWpaEventDeviceFound(deviceInfo);
 }
 
-HWTEST_F(P2pMonitorTest, WpaEventGoNegRequest, TestSize.Level1)
+HWTEST_F(P2pMonitorTest, WpaEventDeviceLost1, TestSize.Level1)
+{
+    std::string p2pDeviceAddress("ff:ff:ff:ff:ff:ff");
+    WrapMethodWpaEventDeviceLost(p2pDeviceAddress);
+}
+
+HWTEST_F(P2pMonitorTest, WpaEventDeviceLost2, TestSize.Level1)
+{
+    std::string p2pDeviceAddress("");
+    WrapMethodWpaEventDeviceLost(p2pDeviceAddress);
+}
+HWTEST_F(P2pMonitorTest, WpaEventGoNegRequest1, TestSize.Level1)
 {
     short testPasswordId = 8;
-    WrapMethodOnGoNegRequest("ff:ff:ff:ff:ff:ff", testPasswordId);
+    WrapMethodWpaEventGoNegRequest("ff:ff:ff:ff:ff:ff", testPasswordId);
 }
 
+HWTEST_F(P2pMonitorTest, WpaEventGoNegRequest2, TestSize.Level1)
+{
+    short testPasswordId = 1;
+    WrapMethodWpaEventGoNegRequest("ff:ff:ff:ff:ff:ff", testPasswordId);
+}
+
+HWTEST_F(P2pMonitorTest, WpaEventGoNegRequest3, TestSize.Level1)
+{
+    short testPasswordId = 4;
+    WrapMethodWpaEventGoNegRequest("ff:ff:ff:ff:ff:ff", testPasswordId);
+}
+
+HWTEST_F(P2pMonitorTest, WpaEventGoNegRequest4, TestSize.Level1)
+{
+    short testPasswordId = 5;
+    WrapMethodWpaEventGoNegRequest("ff:ff:ff:ff:ff:ff", testPasswordId);
+}
+
+HWTEST_F(P2pMonitorTest, WpaEventGoNegRequest5, TestSize.Level1)
+{
+    short testPasswordId = 8;
+    std::string srcAddress("");
+    WrapMethodWpaEventGoNegRequest(srcAddress, testPasswordId);
+}
 HWTEST_F(P2pMonitorTest, WpaEventGoNegSuccess, TestSize.Level1)
 {
-    WrapMethodOnGoNegSuccess();
+    WrapMethodWpaEventGoNegSuccess();
 }
 
 HWTEST_F(P2pMonitorTest, WpaEventGoNegFailure, TestSize.Level1)
 {
     int testStatus = 1;
-    WrapMethodOnGoNegFailure(testStatus);
+    WrapMethodWpaEventGoNegFailure(testStatus);
 }
 
-HWTEST_F(P2pMonitorTest, WpaEventInvitationReceived, TestSize.Level1)
+HWTEST_F(P2pMonitorTest, WpaEventInvitationReceived1, TestSize.Level1)
 {
     IdlP2pInvitationInfo testRecvInfo;
     testRecvInfo.persistentNetworkId = 1;
@@ -562,26 +613,47 @@ HWTEST_F(P2pMonitorTest, WpaEventInvitationReceived, TestSize.Level1)
     testRecvInfo.srcAddress = "ff:ff:ff:ff:ff:ff";
     testRecvInfo.goDeviceAddress = "ff:ff:ff:ff:ff:fe";
     testRecvInfo.bssid = "ff:ff:ff:ff:ff:ef";
-    WrapMethodOnInvitationReceived(testRecvInfo);
+    WrapMethodWpaEventInvitationReceived(testRecvInfo);
+}
+
+HWTEST_F(P2pMonitorTest, WpaEventInvitationReceived2, TestSize.Level1)
+{
+    IdlP2pInvitationInfo testRecvInfo;
+    testRecvInfo.persistentNetworkId = 1;
+    testRecvInfo.operatingFrequency = 6;
+    testRecvInfo.srcAddress = "";
+    testRecvInfo.goDeviceAddress = "ff:ff:ff:ff:ff:fe";
+    testRecvInfo.bssid = "ff:ff:ff:ff:ff:ef";
+    WrapMethodWpaEventInvitationReceived(testRecvInfo);
+}
+
+HWTEST_F(P2pMonitorTest, WpaEventInvitationReceived3, TestSize.Level1)
+{
+    IdlP2pInvitationInfo testRecvInfo;
+    testRecvInfo.persistentNetworkId = 1;
+    testRecvInfo.operatingFrequency = 6;
+    testRecvInfo.srcAddress = "ff:ff:ff:ff:ff:ff";
+    testRecvInfo.bssid = "ff:ff:ff:ff:ff:ef";
+    WrapMethodWpaEventInvitationReceived(testRecvInfo);
 }
 
 HWTEST_F(P2pMonitorTest, WpaEventInvitationResult, TestSize.Level1)
 {
     int testStatus = 1;
-    WrapMethodOnInvitationResult("ff:ff:ff:ff:ff:ff", testStatus);
+    WrapMethodWpaEventInvitationResult("ff:ff:ff:ff:ff:ff", testStatus);
 }
 
 HWTEST_F(P2pMonitorTest, WpaEventGroupFormationSuccess, TestSize.Level1)
 {
-    WrapMethodOnGroupFormationSuccess();
+    WrapMethodWpaEventGroupFormationSuccess();
 }
 
 HWTEST_F(P2pMonitorTest, WpaEventGroupFormationFailure, TestSize.Level1)
 {
-    WrapMethodOnGroupFormationFailure("P2pUnitTestReason");
+    WrapMethodWpaEventGroupFormationFailure("P2pUnitTestReason");
 }
 
-HWTEST_F(P2pMonitorTest, WpaEventGroupStarted, TestSize.Level1)
+HWTEST_F(P2pMonitorTest, WpaEventGroupStarted1, TestSize.Level1)
 {
     IdlP2pGroupInfo testGroupInfo;
     testGroupInfo.isGo = true;
@@ -592,80 +664,116 @@ HWTEST_F(P2pMonitorTest, WpaEventGroupStarted, TestSize.Level1)
     testGroupInfo.psk = "123456789";
     testGroupInfo.passphrase =  "TestPassphrase";
     testGroupInfo.goDeviceAddress = "ff:ff:ff:ff:ff:ff";
-    WrapMethodOnGroupStarted(testGroupInfo);
+    WrapMethodWpaEventGroupStarted(testGroupInfo);
 }
 
-HWTEST_F(P2pMonitorTest, WpaEventGroupRemoved, TestSize.Level1)
+HWTEST_F(P2pMonitorTest, WpaEventGroupStarted2, TestSize.Level1)
+{
+    IdlP2pGroupInfo testGroupInfo;
+    testGroupInfo.isGo = false;
+    testGroupInfo.isPersistent = true;
+    testGroupInfo.frequency = 6;
+    testGroupInfo.groupName =  "P2pUnitTestWlan";
+    testGroupInfo.ssid = "P2pUnitTestGroup";
+    testGroupInfo.psk = "123456789";
+    testGroupInfo.passphrase =  "TestPassphrase";
+    testGroupInfo.goDeviceAddress = "ff:ff:ff:ff:ff:ff";
+    WrapMethodWpaEventGroupStarted(testGroupInfo);
+}
+
+HWTEST_F(P2pMonitorTest, WpaEventGroupStarted3, TestSize.Level1)
+{
+    IdlP2pGroupInfo testGroupInfo;
+    testGroupInfo.isGo = true;
+    testGroupInfo.isPersistent = true;
+    testGroupInfo.frequency = 6;
+    testGroupInfo.ssid = "P2pUnitTestGroup";
+    testGroupInfo.psk = "123456789";
+    testGroupInfo.passphrase =  "TestPassphrase";
+    testGroupInfo.goDeviceAddress = "ff:ff:ff:ff:ff:ff";
+    WrapMethodWpaEventGroupStarted(testGroupInfo);
+}
+
+HWTEST_F(P2pMonitorTest, WpaEventGroupRemoved1, TestSize.Level1)
 {
     bool isGo = true;
-    WrapMethodOnGroupRemoved("P2pUnitTestWlan", isGo);
+    WrapMethodWpaEventGroupRemoved("P2pUnitTestWlan", isGo);
+}
+
+HWTEST_F(P2pMonitorTest, WpaEventGroupRemoved2, TestSize.Level1)
+{
+    bool isGo = true;
+    std::string groupIfName("");
+    WrapMethodWpaEventGroupRemoved(groupIfName, isGo);
 }
 
 HWTEST_F(P2pMonitorTest, WpaEventProvDiscPbcReq, TestSize.Level1)
 {
-    WrapMethodOnProvDiscPbcReq("ff:ff:ff:ff:ff:ff");
+    WrapMethodWpaEventProvDiscPbcReq("ff:ff:ff:ff:ff:ff");
 }
 
 HWTEST_F(P2pMonitorTest, WpaEventProvDiscPbcResp, TestSize.Level1)
 {
-    WrapMethodOnProvDiscPbcResp("ff:ff:ff:ff:ff:ff");
+    WrapMethodWpaEventProvDiscPbcResp("ff:ff:ff:ff:ff:ff");
 }
 
 HWTEST_F(P2pMonitorTest, WpaEventProvDiscEnterPin, TestSize.Level1)
 {
-    WrapMethodOnProvDiscEnterPin("ff:ff:ff:ff:ff:ff");
+    WrapMethodWpaEventProvDiscEnterPin("ff:ff:ff:ff:ff:ff");
 }
 
 HWTEST_F(P2pMonitorTest, WpaEventProvDiscShowPin, TestSize.Level1)
 {
-    WrapMethodOnProvDiscShowPin("ff:ff:ff:ff:ff:ff", "TestGeneratedPin");
+    WrapMethodWpaEventProvDiscShowPin("ff:ff:ff:ff:ff:ff", "TestGeneratedPin");
 }
 
 HWTEST_F(P2pMonitorTest, WpaEventProvDiscFailure, TestSize.Level1)
 {
-    WrapMethodOnProvDiscFailure();
+    WrapMethodWpaEventProvDiscFailure();
 }
 
 HWTEST_F(P2pMonitorTest, WpaEventFindStopped, TestSize.Level1)
 {
-    WrapMethodOnFindStopped();
+    WrapMethodWpaEventFindStopped();
 }
 
 HWTEST_F(P2pMonitorTest, WpaEventServDiscReq, TestSize.Level1)
 {
-    EXPECT_CALL(WifiP2PHalInterface::GetInstance(), RegisterP2pCallback(_));
-    const std::string iface = g_pIface;
-    pP2pMonitor->MonitorBegins(iface);
     IdlP2pServDiscReqInfo info;
     std::vector<unsigned char> tList;
+    tList.push_back(0x02);
+    tList.push_back(0x00);
+    tList.push_back(0x01);
+    tList.push_back(0x00);
     info.tlvList = tList;
-    info.mac = "111";
-    WrapMethodOnServDiscReq(info);
+    WrapMethodWpaEventServDiscReq(info);
 }
 
 HWTEST_F(P2pMonitorTest, WpaEventServDiscResp, TestSize.Level1)
 {
-    EXPECT_CALL(WifiP2PHalInterface::GetInstance(), RegisterP2pCallback(_));
-    const std::string iface = g_pIface;
-    pP2pMonitor->MonitorBegins(iface);
     short testUpdateIndicator = 5;
-    const std::vector<unsigned char> testTlvs;
-    WrapMethodOnServDiscResp("ff:ff:ff:ff:ff:ff", testUpdateIndicator, testTlvs);
+    std::vector<unsigned char> testTlvs;
+    testTlvs.push_back(0x03);
+    testTlvs.push_back(0x00);
+    testTlvs.push_back(0x01);
+    testTlvs.push_back(0x00);
+    testTlvs.push_back(0x00);
+    WrapMethodWpaEventServDiscResp("ff:ff:ff:ff:ff:ff", testUpdateIndicator, testTlvs);
 }
 
 HWTEST_F(P2pMonitorTest, WpaEventApStaDisconnected, TestSize.Level1)
 {
-    WrapMethodOnApStaDisconnected("ff:ff:ff:ff:ff:ff");
+    WrapMethodWpaEventApStaDisconnected("ff:ff:ff:ff:ff:ff");
 }
 
 HWTEST_F(P2pMonitorTest, WpaEventApStaConnected, TestSize.Level1)
 {
-    WrapMethodOnApStaConnected("ff:ff:ff:ff:ff:ff");
+    WrapMethodWpaEventApStaConnected("ff:ff:ff:ff:ff:ff");
 }
 
 HWTEST_F(P2pMonitorTest, OnConnectSupplicantFailed, TestSize.Level1)
 {
     WrapMethodOnConnectSupplicantFailed();
 }
-}  // namespace Wifi
-}  // namespace OHOS
+} // namespace Wifi
+} // namespace OHOS

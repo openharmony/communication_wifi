@@ -946,6 +946,8 @@ private:
     std::mutex mInfoMutex;
     std::mutex mP2pMutex;
 
+    std::atomic_flag deviceConfigLoadFlag = ATOMIC_FLAG_INIT;
+
     WifiConfigFileImpl<WifiDeviceConfig> mSavedDeviceConfig; /* Persistence device config */
     WifiConfigFileImpl<HotspotConfig> mSavedHotspotConfig;
     WifiConfigFileImpl<StationInfo> mSavedBlockInfo;

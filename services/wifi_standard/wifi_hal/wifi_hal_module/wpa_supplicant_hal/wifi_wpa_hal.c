@@ -678,6 +678,8 @@ static int WpaCliConnect(WifiWpaInterface *p)
         if (ret == 0) {
             LOGD("Global wpa interface connect successfully!");
             break;
+        } else {
+            LOGD("Init wpaCtrl failed: %{public}d", ret);
         }
         usleep(WPA_TRY_CONNECT_SLEEP_TIME);
     }

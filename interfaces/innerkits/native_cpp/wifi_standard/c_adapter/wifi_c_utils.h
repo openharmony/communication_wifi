@@ -19,7 +19,6 @@
 #include <string>
 #include "native_c/wifi_device_config.h"
 #include "native_c/wifi_error_code.h"
-#include "securec.h"
 #include "wifi_errcode.h"
 
 namespace OHOS {
@@ -33,9 +32,6 @@ namespace Wifi {
 #endif
 
 WifiErrorCode GetCErrorCode(ErrCode errCode);
-errno_t MacStrToArray(const std::string& strMac, unsigned char mac[WIFI_MAC_LEN]);
-std::string MacArrayToStr(const unsigned char mac[WIFI_MAC_LEN]);
-bool IsMacArrayEmpty(const unsigned char mac[WIFI_MAC_LEN]);
 }  // namespace Wifi
 }  // namespace OHOS
 

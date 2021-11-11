@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 #include "wifi_p2p_service_impl.h"
+#include <file_ex.h>
 #include "wifi_permission_utils.h"
 #include "wifi_auth_center.h"
 #include "wifi_config_center.h"
@@ -21,6 +22,7 @@
 #include "wifi_internal_event_dispatcher.h"
 #include "wifi_logger.h"
 #include "define.h"
+#include "wifi_dumper.h"
 
 DEFINE_WIFILOG_P2P_LABEL("WifiP2pServiceImpl");
 
@@ -624,6 +626,7 @@ ErrCode WifiP2pServiceImpl::SetP2pDeviceName(const std::string &deviceName)
     }
     return pService->SetP2pDeviceName(deviceName);
 }
+
 ErrCode WifiP2pServiceImpl::SetP2pWfdInfo(const WifiP2pWfdInfo &wfdInfo)
 {
     WIFI_LOGI("SetP2pWfdInfo");
@@ -637,6 +640,32 @@ ErrCode WifiP2pServiceImpl::SetP2pWfdInfo(const WifiP2pWfdInfo &wfdInfo)
         return WIFI_OPT_P2P_NOT_OPENED;
     }
     return pService->SetP2pWfdInfo(wfdInfo);
+}
+
+void WifiP2pServiceImpl::SaBasicDump(std::string& result)
+{
+    result.append("P2P enable status: ");
+    int status = WifiConfigCenter::GetInstance().GetP2pState();
+    std::string strStatus = (status == static_cast<int>(P2pState::P2P_STATE_STARTED)) ? "enable" : "disable";
+    result.append(strStatus);
+    result += "\n";
+}
+
+int32_t WifiP2pServiceImpl::Dump(int32_t fd, const std::vector<std::u16string>& args)
+{
+    std::vector<std::string> vecArgs;
+    std::transform(args.begin(), args.end(), std::back_inserter(vecArgs), [](const std::u16string &arg) {
+        return Str16ToStr8(arg);
+    });
+
+    WifiDumper dumper;
+    std::string result;
+    dumper.P2pDump(SaBasicDump, vecArgs, result);
+    if (!SaveStringToFd(fd, result)) {
+        WIFI_LOGE("WiFi P2p save string to fd failed.");
+        return ERR_OK;
+    }
+    return ERR_OK;
 }
 }  // namespace Wifi
 }  // namespace OHOS

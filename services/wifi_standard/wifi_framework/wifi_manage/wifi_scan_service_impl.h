@@ -45,10 +45,12 @@ public:
     ErrCode GetScanInfoList(std::vector<WifiScanInfo> &result) override;
     ErrCode RegisterCallBack(const sptr<IWifiScanCallback> &callback) override;
     ErrCode GetSupportedFeatures(long &features) override;
+    int32_t Dump(int32_t fd, const std::vector<std::u16string>& args) override;
 
 private:
     bool Init();
     bool IsScanServiceRunning();
+    static void SaBasicDump(std::string& result);
 
 private:
     static sptr<WifiScanServiceImpl> g_instance;

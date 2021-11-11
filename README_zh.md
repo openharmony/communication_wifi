@@ -32,8 +32,11 @@ WLAN组件子系统为用户提供WLAN基础功能、P2P（peer-to-peer）功能
 │   └── kits           # WLAN组件接口的适配代码存放目录
 ├── services           # service适配目录
 │   └── wifi_standard  # service实现目录
-└── tests              # 测试代码目录
-    └── wifi_standard  # service实现模块测试代码
+├── tests              # 测试代码目录
+│   └── wifi_standard  # service实现模块测试代码
+└── utils              # 实用函数目录
+    ├── inc            # 实用函数头文件目录
+    └── src            # 实用函数实现目录
 ```
 
 ## 说明<a name="section1312121216216"></a>

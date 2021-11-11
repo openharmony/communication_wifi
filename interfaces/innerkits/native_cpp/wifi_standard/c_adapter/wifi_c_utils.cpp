@@ -15,7 +15,6 @@
 
 #include "wifi_c_utils.h"
 #include <map>
-#include <sstream>
 
 namespace OHOS {
 namespace Wifi {
@@ -41,78 +40,6 @@ WifiErrorCode GetCErrorCode(ErrCode errCode)
 {
     std::map<ErrCode, WifiErrorCode>::const_iterator iter = g_ErrCodeMap.find(errCode);
     return iter == g_ErrCodeMap.end() ? ERROR_WIFI_UNKNOWN : iter->second;
-}
-
-static unsigned char ConvertStrChar(char ch)
-{
-    constexpr int numDiffForHexAlphabet = 10;
-    if (ch >= '0' && ch <= '9') {
-        return (ch - '0');
-    }
-    if (ch >= 'A' && ch <= 'F') {
-        return (ch - 'A' + numDiffForHexAlphabet);
-    }
-    if (ch >= 'a' && ch <= 'f') {
-        return (ch - 'a' + numDiffForHexAlphabet);
-    }
-    return 0;
-}
-
-errno_t MacStrToArray(const std::string& strMac, unsigned char mac[WIFI_MAC_LEN])
-{
-    constexpr int strMacLen = 18;
-    char tempArray[strMacLen] = { 0 };
-    errno_t ret = memcpy_s(tempArray, strMacLen, strMac.c_str(), strMac.size() + 1);
-    if (ret != EOK) {
-        return ret;
-    }
-
-    int idx = 0;
-    constexpr int bitWidth = 4;
-    char *ptr = nullptr;
-    char *p = strtok_s(tempArray, ":", &ptr);
-    while (p != nullptr) {
-        mac[idx++] = (ConvertStrChar(*p) << bitWidth) | ConvertStrChar(*(p + 1));
-        p = strtok_s(nullptr, ":", &ptr);
-    }
-    return EOK;
-}
-
-static char ConvertArrayChar(unsigned char ch)
-{
-    constexpr int maxDecNum = 9;
-    constexpr int numDiffForHexAlphabet = 10;
-    if (ch >= 0 && ch <= maxDecNum) {
-        return '0' + ch;
-    }
-    if (ch >= 0xa && ch <= 0xf) {
-        return ch + 'a' - numDiffForHexAlphabet;
-    }
-    return '0';
-}
-
-std::string MacArrayToStr(const unsigned char mac[WIFI_MAC_LEN])
-{
-    constexpr int bitWidth = 4;
-    constexpr int noColonBit = 5;
-    std::stringstream ss;
-    for (int i = 0; i != WIFI_MAC_LEN; ++i) {
-        ss << ConvertArrayChar(mac[i] >> bitWidth) << ConvertArrayChar(mac[i] & 0xf);
-        if (i != noColonBit) {
-            ss << ":";
-        }
-    }
-    return ss.str();
-}
-
-bool IsMacArrayEmpty(const unsigned char mac[WIFI_MAC_LEN])
-{
-    for (int i = 0; i != WIFI_MAC_LEN; ++i) {
-        if (mac[i] != 0) {
-            return false;
-        }
-    }
-    return true;
 }
 }  // namespace Wifi
 }  // namespace OHOS

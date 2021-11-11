@@ -32,8 +32,11 @@ The WLAN module provides basic WLAN functions, peer-to-peer \(P2P\) connection, 
 │   └── kits           # WLAN APIs
 ├── services           # Services
 │   └── wifi_standard  # Service implementation
-└── tests              # Test code
-    └── wifi_standard  # Test code for the service implementation module
+├── tests              # Test code
+│   └── wifi_standard  # Test code for the service implementation module
+└── utils              # Utility functions
+    ├── inc            # Header directory for utility functions
+    └── src            # Implementation directory for utility functions
 ```
 
 ## Usage<a name="section1312121216216"></a>

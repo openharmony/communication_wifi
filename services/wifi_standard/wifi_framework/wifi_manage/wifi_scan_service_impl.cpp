@@ -14,6 +14,7 @@
  */
 
 #include "wifi_scan_service_impl.h"
+#include <file_ex.h>
 #include "wifi_msg.h"
 #include "permission_def.h"
 #include "wifi_permission_utils.h"
@@ -26,6 +27,7 @@
 #include "wifi_logger.h"
 #include "define.h"
 #include "wifi_scan_callback_proxy.h"
+#include "wifi_dumper.h"
 
 DEFINE_WIFILOG_SCAN_LABEL("WifiScanServiceImpl");
 namespace OHOS {
@@ -204,6 +206,32 @@ bool WifiScanServiceImpl::IsScanServiceRunning()
         return false;
     }
     return true;
+}
+
+void WifiScanServiceImpl::SaBasicDump(std::string& result)
+{
+    WifiScanServiceImpl impl;
+    bool isRunning = impl.IsScanServiceRunning();
+    result.append("Is scan service running: ");
+    std::string strRunning = isRunning ? "true" : "false";
+    result += strRunning + "\n";
+}
+
+int32_t WifiScanServiceImpl::Dump(int32_t fd, const std::vector<std::u16string>& args)
+{
+    std::vector<std::string> vecArgs;
+    std::transform(args.begin(), args.end(), std::back_inserter(vecArgs), [](const std::u16string &arg) {
+        return Str16ToStr8(arg);
+    });
+
+    WifiDumper dumper;
+    std::string result;
+    dumper.ScanDump(SaBasicDump, vecArgs, result);
+    if (!SaveStringToFd(fd, result)) {
+        WIFI_LOGE("WiFi scan save string to fd failed.");
+        return ERR_OK;
+    }
+    return ERR_OK;
 }
 }  // namespace Wifi
 }  // namespace OHOS

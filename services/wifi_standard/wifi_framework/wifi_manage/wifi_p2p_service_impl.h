@@ -254,10 +254,20 @@ public:
      */
     ErrCode SetP2pWfdInfo(const WifiP2pWfdInfo &wfdInfo) override;
 
+    /**
+     * @Description dump p2p information
+     *
+     * @param fd - file descriptor
+     * @param args - dump arguments
+     * @return ErrCode - operate result
+     */
+    int32_t Dump(int32_t fd, const std::vector<std::u16string>& args) override;
+
 private:
     bool Init();
     ErrCode CheckCanEnableP2p(void);
     bool IsP2pServiceRunning();
+    static void SaBasicDump(std::string& result);
 
 private:
     static sptr<WifiP2pServiceImpl> instance;

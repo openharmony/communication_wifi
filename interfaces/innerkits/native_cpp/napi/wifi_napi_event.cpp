@@ -26,9 +26,19 @@ DEFINE_WIFILOG_LABEL("WifiNAPIEvent");
 
 const std::string WIFI_EVENT_TYPE_POWER_STATE = "wifiStateChange";
 const std::string WIFI_EVENT_TYPE_CONN_STATE = "wifiConnectionChange";
+const std::string WIFI_EVENT_TYPE_SCAN_STATE = "wifiScanStateChange";
+const std::string WIFI_EVENT_TYPE_RSSI_STATE = "wifiRssiChange";
+const std::string WIFI_EVENT_TYPE_HOTSPOT_STATE = "hotspotStateChange";
+const std::string WIFI_EVENT_TYPE_AP_STA_JOIN = "hotspotStaJoin";
+const std::string WIFI_EVENT_TYPE_AP_STA_LEAVE = "hotspotStaLeave";
 
 const std::string WIFI_USUAL_EVENT_POWER_STATE = "usual.event.wifi.POWER_STATE";
 const std::string WIFI_USUAL_EVENT_CONN_STATE = "usual.event.wifi.CONN_STATE";
+const std::string WIFI_USUAL_EVENT_SCAN_STATE = "usual.event.wifi.SCAN_STATE";
+const std::string WIFI_USUAL_EVENT_RSSI_STATE = "usual.event.wifi.RSSI_VALUE";
+const std::string WIFI_USUAL_EVENT_HOTSPOT_STATE = "usual.event.wifi.HOTSPOT_STATE";
+const std::string WIFI_USUAL_EVENT_AP_STA_JOIN = "usual.event.wifi.WIFI_HS_STA_JOIN";
+const std::string WIFI_USUAL_EVENT_AP_STA_LEAVE = "usual.event.wifi.WIFI_HS_STA_LEAVE";
 
 std::shared_mutex g_regInfoMutex;
 static std::map<std::string, EventRegisterInfo> g_eventRegisterInfo;
@@ -36,6 +46,9 @@ static std::map<std::string, EventRegisterInfo> g_eventRegisterInfo;
 static std::map<std::string, std::string> g_mapEventTypeToUsualEvent = {
     { WIFI_EVENT_TYPE_POWER_STATE, WIFI_USUAL_EVENT_POWER_STATE },
     { WIFI_EVENT_TYPE_CONN_STATE, WIFI_USUAL_EVENT_CONN_STATE },
+    { WIFI_EVENT_TYPE_SCAN_STATE, WIFI_USUAL_EVENT_SCAN_STATE },
+    { WIFI_EVENT_TYPE_RSSI_STATE, WIFI_USUAL_EVENT_RSSI_STATE },
+    { WIFI_EVENT_TYPE_HOTSPOT_STATE, WIFI_USUAL_EVENT_HOTSPOT_STATE },
 };
 
 static std::map<std::string, UserDefinedEventProcessFunc> g_mapUserDefinedEventProcessFunc = {};
@@ -74,7 +87,7 @@ public:
 private:
     std::set<napi_ref> m_handlersCb;
     std::shared_ptr<WifiEventSubscriber> m_subscriber;
-    EventManager* m_context;
+    EventManager *m_context;
 };
 
 void Event::SetName(std::string& name) {
@@ -121,38 +134,38 @@ static bool IsEventTypeExist(const std::string& type) {
 void WifiEventSubscriber::OnReceiveEvent(const CommonEventData& data) {
     std::string event = data.GetWant().GetAction();
     int code = data.GetCode();
-    WIFI_LOGI("[Napi Event] Received event: %{public}s, value: %{public}d", event.c_str(), code);
+    WIFI_LOGI("Received event: %{public}s, value: %{public}d", event.c_str(), code);
 
     std::string type;
     if (!GetEventTypeByUsualEvent(event, type)) {
-        WIFI_LOGI("[Napi Event] Received event: %{public}s is ignored", event.c_str());
+        WIFI_LOGI("Received event: %{public}s is ignored", event.c_str());
         return;
     }
 
-    EventManager* manager = nullptr;
+    EventManager *manager = nullptr;
     {
         std::shared_lock<std::shared_mutex> guard(g_regInfoMutex);
         std::map<std::string, EventRegisterInfo>::iterator it = g_eventRegisterInfo.find(type);
         if (it == g_eventRegisterInfo.end()) {
-            WIFI_LOGE("[Napi Event] no register info for event: %{public}s", type.c_str());
+            WIFI_LOGE("No register info for event: %{public}s", type.c_str());
             return;
         }
         manager = it->second.GetContext();
         if (manager == nullptr) {
-            WIFI_LOGE("[Napi Event] Context is null");
+            WIFI_LOGE("Context is null");
             return;
         }
     }
 
     std::map<std::string, UserDefinedEventProcessFunc>::iterator iter = g_mapUserDefinedEventProcessFunc.find(type);
     if (iter != g_mapUserDefinedEventProcessFunc.end()) {
-        WIFI_LOGI("[Napi Event] Has user-defined func for event: %{public}s", type.c_str());
+        WIFI_LOGI("Has user-defined func for event: %{public}s", type.c_str());
         iter->second(manager->GetEnv(), type, data);
     } else {
-        WIFI_LOGI("[Napi Event] Use default policy to process event: %{public}s", type.c_str());
+        WIFI_LOGI("Use default policy to process event: %{public}s", type.c_str());
         WifiCommonEvent commonEvent(manager->GetEnv(), type, code);
         if (!manager->Send(commonEvent)) {
-            WIFI_LOGE("[Napi Event] Send event error");
+            WIFI_LOGE("Send event error");
         }
     }
 }
@@ -165,7 +178,7 @@ EventManager::EventManager(napi_env env, napi_value thisVar) : m_env(env) {
 EventManager::~EventManager() {}
 
 bool EventManager::Send(Event& event) {
-    WIFI_LOGI("[Napi Event] Report event: %{public}s", event.GetName().c_str());
+    WIFI_LOGI("Report event: %{public}s", event.GetName().c_str());
 
     napi_handle_scope scope = nullptr;
     napi_open_handle_scope(m_env, &scope);
@@ -173,7 +186,7 @@ bool EventManager::Send(Event& event) {
     std::shared_lock<std::shared_mutex> guard(g_regInfoMutex);
     std::map<std::string, EventRegisterInfo>::iterator it = g_eventRegisterInfo.find(event.GetName());
     if (it == g_eventRegisterInfo.end()) {
-        WIFI_LOGE("[Napi Event] Event receive owner not exits: %{public}s", event.GetName().c_str());
+        WIFI_LOGE("Event receive owner not exits: %{public}s", event.GetName().c_str());
         return false;
     }
 
@@ -187,7 +200,7 @@ bool EventManager::Send(Event& event) {
         napi_get_reference_value(m_env, each, &handler);
         napi_value jsEvent = event.PackResult();
         if (napi_call_function(m_env, thisVar, handler, 1, &jsEvent, &undefine) != napi_ok) {
-            WIFI_LOGE("[Napi Event] Report event failed");
+            WIFI_LOGE("Report event failed");
             result = false;
         }
     }
@@ -200,29 +213,33 @@ bool EventManager::SubscribeServiceEvent(const std::string& event) {
     matchingSkills.AddEvent(event);
     CommonEventSubscribeInfo subscriberInfo(matchingSkills);
     std::shared_ptr<WifiEventSubscriber> subscriber = std::make_shared<WifiEventSubscriber>(subscriberInfo);
-    WIFI_LOGI("[Napi Event] Subscribe event -> %{public}s", event.c_str());
-    bool subscribeResult = CommonEventManager::SubscribeCommonEvent(subscriber);
-    if (subscribeResult) {
+    if (subscriber == nullptr) {
+        WIFI_LOGE("subscriber is null.");
+        return false;
+    }
+    WIFI_LOGI("Subscribe event -> %{public}s", event.c_str());
+    bool result = CommonEventManager::SubscribeCommonEvent(subscriber);
+    if (result) {
         g_eventRegisterInfo[m_eventType].SetSubscriber(subscriber);
     } else {
-        WIFI_LOGE("[Napi Event] Subscribe service event error: %{public}s", event.c_str());
+        WIFI_LOGE("Subscribe service event error: %{public}s", event.c_str());
     }
-    return subscribeResult;
+    return result;
 }
 
 bool EventManager::UnsubscribeServiceEvent(const std::string& event) {
-    bool unsubscribeResult = CommonEventManager::SubscribeCommonEvent(g_eventRegisterInfo[m_eventType].GetSubscriber());
-    if (!unsubscribeResult) {
-        WIFI_LOGE("[Napi Event] Unsubscribe service event error: %{public}s", event.c_str());
+    bool result = CommonEventManager::UnSubscribeCommonEvent(g_eventRegisterInfo[m_eventType].GetSubscriber());
+    if (!result) {
+        WIFI_LOGE("Unsubscribe service event error: %{public}s", event.c_str());
     }
-    return unsubscribeResult;
+    return result;
 }
 
 bool EventManager::SubscribeEvent(const std::string& name, napi_value handler) {
-    WIFI_LOGI("[Napi Event] Subscribe event: %{public}s", name.c_str());
+    WIFI_LOGI("Subscribe event: %{public}s", name.c_str());
 
     if (!IsEventTypeExist(name)) {
-        WIFI_LOGE("[Napi Event] Subscribe event is not a valid event: %{public}s", name.c_str());
+        WIFI_LOGE("Subscribe event is not a valid event: %{public}s", name.c_str());
         return false;
     }
     SetEventType(name);
@@ -233,7 +250,7 @@ bool EventManager::SubscribeEvent(const std::string& name, napi_value handler) {
         GetUsualEventByEventType(name, usualEvent);
         bool result = SubscribeServiceEvent(usualEvent);
         if (!result) {
-            WIFI_LOGE("[Napi Event] Service register event failed: %{public}s", name.c_str());
+            WIFI_LOGE("Service register event failed: %{public}s", name.c_str());
             return false;
         }
 
@@ -242,7 +259,7 @@ bool EventManager::SubscribeEvent(const std::string& name, napi_value handler) {
     }
 
     if (g_eventRegisterInfo[name].GetContext() != this) {
-        WIFI_LOGW("[Napi Event] Subscribe event context changed!");
+        WIFI_LOGW("Subscribe event context changed!");
         g_eventRegisterInfo[name].SetContext(this);
     }
 
@@ -274,10 +291,10 @@ void EventManager::DeleteAllHanderRef(std::set<napi_ref>& setRefs) {
 }
 
 bool EventManager::UnsubscribeEvent(const std::string& name, napi_value handler) {
-    WIFI_LOGI("[Napi Event] Unsubscribe event: %{public}s", name.c_str());
+    WIFI_LOGI("Unsubscribe event: %{public}s", name.c_str());
 
     if (!IsEventTypeExist(name)) {
-        WIFI_LOGE("[Napi Event] Unsubscribe event is not a valid event: %{public}s", name.c_str());
+        WIFI_LOGE("Unsubscribe event is not a valid event: %{public}s", name.c_str());
         return false;
     }
 
@@ -285,13 +302,13 @@ bool EventManager::UnsubscribeEvent(const std::string& name, napi_value handler)
     std::unique_lock<std::shared_mutex> guard(g_regInfoMutex);
     std::map<std::string, EventRegisterInfo>::iterator it = g_eventRegisterInfo.find(name);
     if (it == g_eventRegisterInfo.end()) {
-        WIFI_LOGE("[Napi Event] Unsubscribe event is not subscribe: %{public}s", name.c_str());
+        WIFI_LOGE("Unsubscribe event is not subscribe: %{public}s", name.c_str());
         return false;
     }
     if (handler != nullptr) {
         DeleteHanderRef(it->second.GetHandlersCb(), handler);
     } else {
-        WIFI_LOGW("[Napi Event] All callback is unsubscribe for event: %{public}s", name.c_str());
+        WIFI_LOGW("All callback is unsubscribe for event: %{public}s", name.c_str());
         DeleteAllHanderRef(it->second.GetHandlersCb());
     }
     /* No one subscribes event now */
@@ -306,7 +323,7 @@ bool EventManager::UnsubscribeEvent(const std::string& name, napi_value handler)
         bool result = UnsubscribeServiceEvent(usualEvent);
         g_eventRegisterInfo.erase(name);
         if (!result) {
-            WIFI_LOGE("[Napi Event] Service unregister event failed: %{public}s", name.c_str());
+            WIFI_LOGE("Service unregister event failed: %{public}s", name.c_str());
             return false;
         }
     }
@@ -322,6 +339,7 @@ napi_env EventManager::GetEnv() {
 }
 
 napi_value On(napi_env env, napi_callback_info cbinfo) {
+    TRACE_FUNC_CALL;
     size_t requireArgc = 2;
     size_t argc = 2;
     napi_value argv[2] = {0};
@@ -337,15 +355,15 @@ napi_value On(napi_env env, napi_callback_info cbinfo) {
     napi_typeof(env, argv[1], &handler);
     NAPI_ASSERT(env, handler == napi_function, "type mismatch for parameter 2");
 
-    EventManager* manager = nullptr;
+    EventManager *manager = nullptr;
     napi_status status = napi_unwrap(env, thisVar, (void**)&manager);
-    if (status == napi_ok) {
+    if (status == napi_ok && manager != nullptr) {
         char type[64] = {0};
         size_t typeLen = 0;
         napi_get_value_string_utf8(env, argv[0], type, sizeof(type), &typeLen);
         manager->SubscribeEvent(type, argv[1]);
     } else {
-        WIFI_LOGE("[Napi Event] On unwrap class failed");
+        WIFI_LOGE("On unwrap class failed");
     }
     napi_value result = nullptr;
     napi_get_undefined(env, &result);
@@ -353,6 +371,7 @@ napi_value On(napi_env env, napi_callback_info cbinfo) {
 }
 
 napi_value Off(napi_env env, napi_callback_info cbinfo) {
+    TRACE_FUNC_CALL;
     size_t requireArgc = 1;
     size_t requireArgcWithCb = 2;
     size_t argc = 2;
@@ -371,15 +390,15 @@ napi_value Off(napi_env env, napi_callback_info cbinfo) {
         NAPI_ASSERT(env, handler == napi_function, "type mismatch for parameter 2");
     }
 
-    EventManager* manager = nullptr;
+    EventManager *manager = nullptr;
     napi_status status = napi_unwrap(env, thisVar, (void**)&manager);
-    if (status == napi_ok) {
+    if (status == napi_ok && manager != nullptr) {
         char type[64] = {0};
         size_t typeLen = 0;
         napi_get_value_string_utf8(env, argv[0], type, sizeof(type), &typeLen);
         manager->UnsubscribeEvent(type, argc >= requireArgcWithCb ? argv[1] : nullptr);
     } else {
-        WIFI_LOGE("[Napi Event] Off unwrap class failed");
+        WIFI_LOGE("Off unwrap class failed");
     }
     napi_value result = nullptr;
     napi_get_undefined(env, &result);
@@ -387,18 +406,23 @@ napi_value Off(napi_env env, napi_callback_info cbinfo) {
 }
 
 napi_value EventListenerConstructor(napi_env env, napi_callback_info cbinfo) {
+    WIFI_LOGI("Event listener constructor");
     napi_value thisVar = nullptr;
     void* data = nullptr;
     napi_get_cb_info(env, cbinfo, nullptr, nullptr, &thisVar, &data);
 
-    EventManager* eventManager = new EventManager(env, thisVar);
-    WIFI_LOGI("[Napi Event] Event listener constructor");
+    EventManager *eventManager = new EventManager(env, thisVar);
+    if (eventManager == nullptr) {
+        WIFI_LOGE("Init listener constructor failed");
+        return nullptr;
+    }
     napi_wrap(
         env, thisVar, eventManager,
         [](napi_env env, void* data, void* hint) {
-            WIFI_LOGI("[Napi Event] Event listener destructor");
-            EventManager* eventManager = (EventManager *)data;
+            WIFI_LOGI("Event listener destructor");
+            EventManager *eventManager = (EventManager *)data;
             delete eventManager;
+            eventManager = nullptr;
         },
         nullptr, nullptr);
     return thisVar;

@@ -20,7 +20,12 @@
 
 namespace OHOS {
 namespace Wifi {
-
+napi_value EnableHotspot(napi_env env, napi_callback_info info);
+napi_value DisableHotspot(napi_env env, napi_callback_info info);
+napi_value IsHotspotActive(napi_env env, napi_callback_info info);
+napi_value SetHotspotConfig(napi_env env, napi_callback_info info);
+napi_value GetHotspotConfig(napi_env env, napi_callback_info info);
+napi_value GetStations(napi_env env, napi_callback_info info);
 }  // namespace Wifi
 }  // namespace OHOS
 

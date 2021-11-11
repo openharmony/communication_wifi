@@ -17,6 +17,8 @@
 #define WIFI_NAPI_DEVICE_H_
 
 #include "wifi_napi_utils.h"
+#include "wifi_device.h"
+#include "wifi_scan.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -30,13 +32,68 @@ napi_value ConnectToNetwork(napi_env env, napi_callback_info info);
 napi_value ConnectToDevice(napi_env env, napi_callback_info info);
 napi_value Disconnect(napi_env env, napi_callback_info info);
 napi_value GetSignalLevel(napi_env env, napi_callback_info info);
+napi_value ReConnect(napi_env env, napi_callback_info info);
+napi_value ReAssociate(napi_env env, napi_callback_info info);
+napi_value GetIpInfo(napi_env env, napi_callback_info info);
+napi_value GetLinkedInfo(napi_env env, napi_callback_info info);
+napi_value RemoveDevice(napi_env env, napi_callback_info info);
+napi_value RemoveAllNetwork(napi_env env, napi_callback_info info);
+napi_value DisableNetwork(napi_env env, napi_callback_info info);
+napi_value GetCountryCode(napi_env env, napi_callback_info info);
+napi_value GetDeviceConfigs(napi_env env, napi_callback_info info);
+napi_value GetSupportedFeatures(napi_env env, napi_callback_info info);
+napi_value IsFeatureSupported(napi_env env, napi_callback_info info);
+napi_value GetDeviceMacAddress(napi_env env, napi_callback_info info);
 
-enum class SecTypeJs {
-    SEC_TYPE_INVALID = 0, /* Invalid security type */
-    SEC_TYPE_OPEN = 1, /* Open */
-    SEC_TYPE_WEP = 2, /* Wired Equivalent Privacy (WEP) */
-    SEC_TYPE_PSK = 3, /* Pre-shared key (PSK) */
-    SEC_TYPE_SAE = 4, /* Simultaneous Authentication of Equals (SAE) */
+enum class ConnStateJs {
+    SCANNING, /* The device is searching for an available AP */
+    CONNECTING, /* The Wi-Fi connection is being set up */
+    AUTHENTICATING, /* The Wi-Fi connection is being authenticated */
+    OBTAINING_IPADDR, /* The IP address of the Wi-Fi connection is being obtained */
+    CONNECTED, /* The Wi-Fi connection has been set up */
+    DISCONNECTING, /* The Wi-Fi connection is being torn down */
+    DISCONNECTED, /* The Wi-Fi connection has been torn down */
+    UNKNOWN /* Failed to set up the Wi-Fi connection */
+};
+
+class ScanInfoAsyncContext : public AsyncContext {
+public:
+    std::vector<WifiScanInfo> vecScanInfos;
+
+    ScanInfoAsyncContext(napi_env env, napi_async_work work = nullptr, napi_deferred deferred = nullptr) :
+        AsyncContext(env, work, deferred){}
+
+    ScanInfoAsyncContext() = delete;
+
+    virtual ~ScanInfoAsyncContext(){}
+};
+
+class AddDeviceConfigContext : public AsyncContext {
+public:
+    WifiDeviceConfig *config;
+    int addResult;
+
+    AddDeviceConfigContext(napi_env env, napi_async_work work = nullptr, napi_deferred deferred = nullptr) :
+        AsyncContext(env, work, deferred){
+            config = nullptr;
+            addResult = -1;
+        }
+
+    AddDeviceConfigContext() = delete;
+
+    virtual ~AddDeviceConfigContext(){}
+};
+
+class LinkedInfoAsyncContext : public AsyncContext {
+public:
+    WifiLinkedInfo linkedInfo;
+
+    LinkedInfoAsyncContext(napi_env env, napi_async_work work = nullptr, napi_deferred deferred = nullptr) :
+        AsyncContext(env, work, deferred){}
+
+    LinkedInfoAsyncContext() = delete;
+
+    virtual ~LinkedInfoAsyncContext(){}
 };
 }  // namespace Wifi
 }  // namespace OHOS

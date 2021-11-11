@@ -15,9 +15,8 @@
 
 #include "wifi_napi_device.h"
 #include "wifi_logger.h"
-#include "wifi_device.h"
-#include "wifi_scan.h"
 #include <vector>
+#include <functional>
 
 namespace OHOS {
 namespace Wifi {
@@ -25,15 +24,10 @@ DEFINE_WIFILOG_LABEL("WifiNAPIDevice");
 
 std::unique_ptr<WifiDevice> wifiDevicePtr = WifiDevice::GetInstance(WIFI_DEVICE_ABILITY_ID);
 std::unique_ptr<WifiScan> wifiScanPtr = WifiScan::GetInstance(WIFI_SCAN_ABILITY_ID);
-
 napi_value EnableWifi(napi_env env, napi_callback_info info)
 {
-    size_t argc = 1;
-    napi_value argv[1];
-    napi_value thisVar;
-    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, NULL));
-
-    NAPI_ASSERT(env, wifiDevicePtr != nullptr, "[NAPI] Wifi device instance is null.");
+    TRACE_FUNC_CALL;
+    NAPI_ASSERT(env, wifiDevicePtr != nullptr, "Wifi device instance is null.");
     ErrCode ret = wifiDevicePtr->EnableWifi();
     napi_value result;
     napi_get_boolean(env, ret == WIFI_OPT_SUCCESS, &result);
@@ -42,12 +36,8 @@ napi_value EnableWifi(napi_env env, napi_callback_info info)
 
 napi_value DisableWifi(napi_env env, napi_callback_info info)
 {
-    size_t argc = 1;
-    napi_value argv[1];
-    napi_value thisVar;
-    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, NULL));
-
-    NAPI_ASSERT(env, wifiDevicePtr != nullptr, "[NAPI] Wifi device instance is null.");
+    TRACE_FUNC_CALL;
+    NAPI_ASSERT(env, wifiDevicePtr != nullptr, "Wifi device instance is null.");
     ErrCode ret = wifiDevicePtr->DisableWifi();
     napi_value result;
     napi_get_boolean(env, ret == WIFI_OPT_SUCCESS, &result);
@@ -56,16 +46,11 @@ napi_value DisableWifi(napi_env env, napi_callback_info info)
 
 napi_value IsWifiActive(napi_env env, napi_callback_info info)
 {
-    size_t argc = 1;
-    napi_value argv[1];
-    napi_value thisVar;
-    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, NULL));
-
-    NAPI_ASSERT(env, wifiDevicePtr != nullptr, "[NAPI] Wifi device instance is null.");
-    bool activeStatus = true;
+    NAPI_ASSERT(env, wifiDevicePtr != nullptr, "Wifi device instance is null.");
+    bool activeStatus = false;
     ErrCode ret = wifiDevicePtr->IsWifiActive(activeStatus);
     if (ret != WIFI_OPT_SUCCESS) {
-        WIFI_LOGE("[Napi Device] Get wifi active status fail: %{public}d", ret);
+        WIFI_LOGE("Get wifi active status fail: %{public}d", ret);
     }
 
     napi_value result;
@@ -75,12 +60,8 @@ napi_value IsWifiActive(napi_env env, napi_callback_info info)
 
 napi_value Scan(napi_env env, napi_callback_info info)
 {
-    size_t argc = 1;
-    napi_value argv[1];
-    napi_value thisVar;
-    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, NULL));
-
-    NAPI_ASSERT(env, wifiScanPtr != nullptr, "[NAPI] Wifi scan instance is null.");
+    TRACE_FUNC_CALL;
+    NAPI_ASSERT(env, wifiScanPtr != nullptr, "Wifi scan instance is null.");
     ErrCode ret = wifiScanPtr->Scan();
 
     napi_value result;
@@ -115,8 +96,8 @@ static SecTypeJs SecurityTypeNativeToJs(const WifiSecurity& cppSecurityType)
     return jsSecurityType;
 }
 
-static bool NativeScanInfosToJsObj(const napi_env& env, napi_value& arrayResult,
-    const std::vector<WifiScanInfo>& vecScnIanfos)
+static bool NativeScanInfosToJsObj(const napi_env& env,
+    const std::vector<WifiScanInfo>& vecScnIanfos, napi_value& arrayResult)
 {
     uint32_t idx = 0;
     for (auto& each : vecScnIanfos) {
@@ -133,126 +114,43 @@ static bool NativeScanInfosToJsObj(const napi_env& env, napi_value& arrayResult,
 
         napi_status status = napi_set_element(env, arrayResult, idx++, eachObj);
         if (status != napi_ok) {
-            WIFI_LOGE("[Napi Device] wifi napi set element error: %{public}d, idx: %{public}d", status, idx - 1);
+            WIFI_LOGE("Wifi napi set element error: %{public}d, idx: %{public}d", status, idx - 1);
             return false;
         }
     }
     return true;
 }
 
-static bool GetWifiScanInfoList(const napi_env& env, napi_value& arrayResult)
-{
-    std::vector<WifiScanInfo> vecCppScanInfos;
-    if (wifiScanPtr->GetScanInfoList(vecCppScanInfos) != WIFI_OPT_SUCCESS) {
-        WIFI_LOGE("[Napi Device] Get Scaninf list error");
-        return false;
-    }
-
-    WIFI_LOGI("[Napi Device] GetScanInfoList, size: %{public}zu", vecCppScanInfos.size());
-    napi_create_array_with_length(env, vecCppScanInfos.size(), &arrayResult);
-    return NativeScanInfosToJsObj(env, arrayResult, vecCppScanInfos);
-}
-
-static napi_value ScanInfoToCallBack(const napi_env& env, AsyncCallbackInfo *asCallbackInfo,
-    const size_t argc, const napi_value *argv)
-{
-    napi_value resourceName;
-    napi_create_string_latin1(env, "getScanInfos", NAPI_AUTO_LENGTH, &resourceName);
-
-    for (size_t i = 0; i != argc; ++i) {
-        napi_valuetype valuetype;
-        NAPI_CALL(env, napi_typeof(env, argv[i], &valuetype));
-        NAPI_ASSERT(env, valuetype == napi_function, "Wrong argument type. Function expected.");
-        napi_create_reference(env, argv[i], 1, &asCallbackInfo->callback[i]);
-    }
-
-    napi_create_async_work(
-        env, nullptr, resourceName,
-        [](napi_env env, void* data) {
-        },
-        [](napi_env env, napi_status status, void* data) {
-            napi_value undefine;
-            napi_get_undefined(env, &undefine);
-            napi_value callback;
-            AsyncCallbackInfo* asCallbackInfo = (AsyncCallbackInfo *)data;
-            asCallbackInfo->isSuccess = GetWifiScanInfoList(env, asCallbackInfo->result);
-            if (asCallbackInfo->isSuccess) {
-                napi_get_reference_value(env, asCallbackInfo->callback[0], &callback);
-                napi_call_function(env, nullptr, callback, 1, &asCallbackInfo->result, &undefine);
-            } else {
-                if (asCallbackInfo->callback[1]) {
-                    napi_get_reference_value(env, asCallbackInfo->callback[1], &callback);
-                    napi_call_function(env, nullptr, callback, 1, &asCallbackInfo->result, &undefine);
-                } else {
-                    WIFI_LOGE("[Napi Device] get scan info callback func is null");
-                    napi_throw_error(env, "error", "get scan info callback func is null");
-                }
-            }
-            if (asCallbackInfo->callback[0] != nullptr) {
-                napi_delete_reference(env, asCallbackInfo->callback[0]);
-            }
-            if (asCallbackInfo->callback[1] != nullptr) {
-                napi_delete_reference(env, asCallbackInfo->callback[1]);
-            }
-            napi_delete_async_work(env, asCallbackInfo->asyncWork);
-            delete asCallbackInfo;
-        },
-        (void *)asCallbackInfo,
-        &asCallbackInfo->asyncWork);
-    NAPI_CALL(env, napi_queue_async_work(env, asCallbackInfo->asyncWork));
-    return UndefinedNapiValue(env);
-}
-
-static napi_value ScanInfoToPromise(const napi_env& env, AsyncCallbackInfo *asCallbackInfo, napi_value& promise)
-{
-    napi_value resourceName;
-    napi_create_string_latin1(env, "getScanInfos", NAPI_AUTO_LENGTH, &resourceName);
-
-    napi_deferred deferred;
-    NAPI_CALL(env, napi_create_promise(env, &deferred, &promise));
-    asCallbackInfo->deferred = deferred;
-
-    napi_create_async_work(
-        env,
-        nullptr,
-        resourceName,
-        [](napi_env env, void *data) {
-        },
-        [](napi_env env, napi_status status, void *data) {
-            AsyncCallbackInfo *asCallbackInfo = (AsyncCallbackInfo *)data;
-            asCallbackInfo->isSuccess = GetWifiScanInfoList(env, asCallbackInfo->result);
-            if (asCallbackInfo->isSuccess) {
-                napi_resolve_deferred(asCallbackInfo->env, asCallbackInfo->deferred, asCallbackInfo->result);
-            } else {
-                napi_reject_deferred(asCallbackInfo->env, asCallbackInfo->deferred, asCallbackInfo->result);
-            }
-            napi_delete_async_work(env, asCallbackInfo->asyncWork);
-            delete asCallbackInfo;
-        },
-        (void *)asCallbackInfo,
-        &asCallbackInfo->asyncWork);
-    napi_queue_async_work(env, asCallbackInfo->asyncWork);
-    return UndefinedNapiValue(env);
-}
-
 napi_value GetScanInfos(napi_env env, napi_callback_info info)
 {
+    TRACE_FUNC_CALL;
     size_t argc = 2;
     napi_value argv[argc];
     napi_value thisVar = nullptr;
     void *data = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, &data));
+    NAPI_ASSERT(env, wifiScanPtr != nullptr, "Wifi device instance is null.");
 
-    AsyncCallbackInfo *asCallbackInfo =
-        new AsyncCallbackInfo{.env = env, .asyncWork = nullptr, .deferred = nullptr};
+    ScanInfoAsyncContext *asyncContext = new ScanInfoAsyncContext(env);
+    NAPI_ASSERT(env, asyncContext != nullptr, "asyncContext is null.");
+    napi_create_string_latin1(env, "getScanInfos", NAPI_AUTO_LENGTH, &asyncContext->resourceName);
 
-    if (argc >= 1) {
-        return ScanInfoToCallBack(env, asCallbackInfo, argc, argv);
-    } else {
-        napi_value promise;
-        ScanInfoToPromise(env, asCallbackInfo, promise);
-        return promise;
-    }
+    asyncContext->executeFunc = [&](void* data) -> void {
+        ScanInfoAsyncContext *context = static_cast<ScanInfoAsyncContext *>(data);
+        TRACE_FUNC_CALL_NAME("wifiScanPtr->GetScanInfoList");
+        context->isSuccess = (wifiScanPtr->GetScanInfoList(context->vecScanInfos) == WIFI_OPT_SUCCESS);
+        WIFI_LOGI("GetScanInfoList, size: %{public}zu", context->vecScanInfos.size());
+    };
+
+    asyncContext->completeFunc = [&](void* data) -> void {
+        ScanInfoAsyncContext *context = static_cast<ScanInfoAsyncContext *>(data);
+        napi_create_array_with_length(context->env, context->vecScanInfos.size(), &context->result);
+        context->isSuccess = NativeScanInfosToJsObj(context->env, context->vecScanInfos, context->result);
+        WIFI_LOGI("Push scan info list to client");
+    };
+
+    size_t nonCallbackArgNum = 0;
+    return DoAsyncWork(env, asyncContext, argc, argv, nonCallbackArgNum);
 }
 
 static void ConvertEncryptionMode(const SecTypeJs& securityType, std::string& keyMgmt)
@@ -275,7 +173,7 @@ static void ConvertEncryptionMode(const SecTypeJs& securityType, std::string& ke
             break;
 
         default:
-            keyMgmt = "WPA-PSK";
+            keyMgmt = "NONE";
             break;
     }
 }
@@ -291,143 +189,60 @@ static void JsObjToDeviceConfig(const napi_env& env, const napi_value& object, W
     ConvertEncryptionMode(SecTypeJs(type), cppConfig.keyMgmt);
 }
 
-static napi_value AddDeviceConfigImpl(const napi_env& env, AsyncCallbackInfo *asCallbackInfo)
-{
-    NAPI_ASSERT(env, wifiDevicePtr != nullptr, "[NAPI] Wifi device instance is null.");
-    int addResult = -1;
-    int retValue = 0;
-    ErrCode ret = wifiDevicePtr->AddDeviceConfig(*(WifiDeviceConfig *)asCallbackInfo->obj, addResult);
-    if (addResult < 0 || ret != WIFI_OPT_SUCCESS) {
-        retValue = -1;
-    } else {
-        retValue = addResult;
-    }
-
-    napi_value result;
-    napi_create_int32(env, retValue, &result);
-    asCallbackInfo->isSuccess = (ret == WIFI_OPT_SUCCESS);
-    asCallbackInfo->result = result;
-    return UndefinedNapiValue(env);
-}
-
-static napi_value AddDeviceConfigCallBack(const napi_env& env, AsyncCallbackInfo *asCallbackInfo,
-    size_t argc, napi_value *argv)
-{
-    napi_value resourceName;
-    napi_create_string_latin1(env, "addDeviceConfig", NAPI_AUTO_LENGTH, &resourceName);
-
-    for (size_t i = 1; i != argc; ++i) {
-        napi_valuetype valuetype;
-        NAPI_CALL(env, napi_typeof(env, argv[i], &valuetype));
-        NAPI_ASSERT(env, valuetype == napi_function, "Wrong argument type. Function expected.");
-        napi_create_reference(env, argv[i], 1, &asCallbackInfo->callback[i - 1]);
-    }
-
-    napi_create_async_work(
-        env, nullptr, resourceName,
-        [](napi_env env, void* data) {
-        },
-        [](napi_env env, napi_status status, void* data) {
-            AsyncCallbackInfo* asCallbackInfo = (AsyncCallbackInfo *)data;
-            AddDeviceConfigImpl(env, asCallbackInfo);
-            napi_value callback;
-            napi_value undefine;
-            napi_get_undefined(env, &undefine);
-            if (asCallbackInfo->isSuccess) {
-                napi_get_reference_value(env, asCallbackInfo->callback[0], &callback);
-                napi_call_function(env, nullptr, callback, 1, &asCallbackInfo->result, &undefine);
-            } else {
-                if (asCallbackInfo->callback[1]) {
-                    napi_get_reference_value(env, asCallbackInfo->callback[1], &callback);
-                    napi_call_function(env, nullptr, callback, 1, &asCallbackInfo->result, &undefine);
-                } else {
-                    WIFI_LOGE("[Napi Device] get scan info callback func is null");
-                    napi_throw_error(env, "error", "add wifi config callback func is null");
-                }
-            }
-            if (asCallbackInfo->callback[0] != nullptr) {
-                napi_delete_reference(env, asCallbackInfo->callback[0]);
-            }
-            if (asCallbackInfo->callback[1] != nullptr) {
-                napi_delete_reference(env, asCallbackInfo->callback[1]);
-            }
-            napi_delete_async_work(env, asCallbackInfo->asyncWork);
-            delete (WifiDeviceConfig *)asCallbackInfo->obj;
-            delete asCallbackInfo;
-        },
-        (void *)asCallbackInfo,
-        &asCallbackInfo->asyncWork);
-    NAPI_CALL(env, napi_queue_async_work(env, asCallbackInfo->asyncWork));
-    return UndefinedNapiValue(env);
-}
-
-static napi_value AddDeviceConfigPromise(const napi_env& env, AsyncCallbackInfo *asCallbackInfo, napi_value& promise)
-{
-    napi_value resourceName;
-    napi_create_string_latin1(env, "addDeviceConfig", NAPI_AUTO_LENGTH, &resourceName);
-
-    napi_deferred deferred;
-    NAPI_CALL(env, napi_create_promise(env, &deferred, &promise));
-    asCallbackInfo->deferred = deferred;
-
-    napi_create_async_work(
-        env,
-        nullptr,
-        resourceName,
-        [](napi_env env, void *data) {
-        },
-        [](napi_env env, napi_status status, void *data) {
-            AsyncCallbackInfo *asCallbackInfo = (AsyncCallbackInfo *)data;
-            AddDeviceConfigImpl(env, asCallbackInfo);
-            if (asCallbackInfo->isSuccess) {
-                napi_resolve_deferred(asCallbackInfo->env, asCallbackInfo->deferred, asCallbackInfo->result);
-            } else {
-                napi_reject_deferred(asCallbackInfo->env, asCallbackInfo->deferred, asCallbackInfo->result);
-            }
-            napi_delete_async_work(env, asCallbackInfo->asyncWork);
-            delete (WifiDeviceConfig *)asCallbackInfo->obj;
-            delete asCallbackInfo;
-        },
-        (void *)asCallbackInfo,
-        &asCallbackInfo->asyncWork);
-    napi_queue_async_work(env, asCallbackInfo->asyncWork);
-    return UndefinedNapiValue(env);
-}
-
 napi_value AddDeviceConfig(napi_env env, napi_callback_info info)
 {
+    TRACE_FUNC_CALL;
     size_t argc = 3;
     napi_value argv[argc];
     napi_value thisVar = nullptr;
     void *data = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, &data));
     NAPI_ASSERT(env, argc >= 1, "Wrong number of arguments");
-
+    NAPI_ASSERT(env, wifiDevicePtr != nullptr, "Wifi device instance is null.");
+    
     napi_valuetype valueType;
     napi_typeof(env, argv[0], &valueType);
-    NAPI_ASSERT(env, valueType == napi_object, "Wrong argument type. Object expected for parameter 1.");
+    NAPI_ASSERT(env, valueType == napi_object, "Wrong argument type, object is expected for parameter 1.");
 
-    AsyncCallbackInfo *asCallbackInfo =
-        new AsyncCallbackInfo{.env = env, .asyncWork = nullptr, .deferred = nullptr};
+    AddDeviceConfigContext *asyncContext = new AddDeviceConfigContext(env);
+    NAPI_ASSERT(env, asyncContext != nullptr, "asyncContext is null.");
+    napi_create_string_latin1(env, "addDeviceConfig", NAPI_AUTO_LENGTH, &asyncContext->resourceName);
 
     WifiDeviceConfig *config = new WifiDeviceConfig();
-    if (config == NULL) {
-        delete asCallbackInfo;
+    if (config == nullptr) {
+        delete asyncContext;
         return UndefinedNapiValue(env);
     }
     JsObjToDeviceConfig(env, argv[0], *config);
-    asCallbackInfo->obj = config;
-    if (argc > 1) {
-        return AddDeviceConfigCallBack(env, asCallbackInfo, argc, argv);
-    } else {
-        napi_value promise;
-        AddDeviceConfigPromise(env, asCallbackInfo, promise);
-        return promise;
-    }
+    asyncContext->config = config;
+
+    asyncContext->executeFunc = [&](void* data) -> void {
+        AddDeviceConfigContext *context = static_cast<AddDeviceConfigContext *>(data);
+        TRACE_FUNC_CALL_NAME("wifiDevicePtr->AddDeviceConfig");
+        ErrCode ret = wifiDevicePtr->AddDeviceConfig(*context->config, context->addResult);
+        if (context->addResult < 0 || ret != WIFI_OPT_SUCCESS) {
+            context->addResult = -1;
+        }
+        context->isSuccess = (ret == WIFI_OPT_SUCCESS);
+    };
+
+    asyncContext->completeFunc = [&](void* data) -> void {
+        AddDeviceConfigContext *context = static_cast<AddDeviceConfigContext *>(data);
+        napi_create_int32(context->env, context->addResult, &context->result);
+        if (context->config != nullptr) {
+            delete context->config;
+            context->config = nullptr;
+        }
+        WIFI_LOGI("Push add device config result to client");
+    };
+
+    size_t nonCallbackArgNum = 1;
+    return DoAsyncWork(env, asyncContext, argc, argv, nonCallbackArgNum);
 }
 
 napi_value ConnectToNetwork(napi_env env, napi_callback_info info)
 {
+    TRACE_FUNC_CALL;
     size_t argc = 1;
     napi_value argv[1];
     napi_value thisVar;
@@ -441,7 +256,7 @@ napi_value ConnectToNetwork(napi_env env, napi_callback_info info)
     int networkId = -1;
     napi_get_value_int32(env, argv[0], &networkId);
 
-    NAPI_ASSERT(env, wifiDevicePtr != nullptr, "[NAPI] Wifi device instance is null.");
+    NAPI_ASSERT(env, wifiDevicePtr != nullptr, "Wifi device instance is null.");
     ErrCode ret = wifiDevicePtr->ConnectToNetwork(networkId);
     napi_value result;
     napi_get_boolean(env, ret == WIFI_OPT_SUCCESS, &result);
@@ -450,6 +265,7 @@ napi_value ConnectToNetwork(napi_env env, napi_callback_info info)
 
 napi_value ConnectToDevice(napi_env env, napi_callback_info info)
 {
+    TRACE_FUNC_CALL;
     size_t argc = 1;
     napi_value argv[1];
     napi_value thisVar;
@@ -459,10 +275,13 @@ napi_value ConnectToDevice(napi_env env, napi_callback_info info)
     napi_typeof(env, argv[0], &valueType);
     NAPI_ASSERT(env, valueType == napi_object, "Wrong argument type. Object expected.");
 
-    NAPI_ASSERT(env, wifiDevicePtr != nullptr, "[NAPI] Wifi device instance is null.");
+    NAPI_ASSERT(env, wifiDevicePtr != nullptr, "Wifi device instance is null.");
     WifiDeviceConfig config;
     JsObjToDeviceConfig(env, argv[0], config);
     ErrCode ret = wifiDevicePtr->ConnectToDevice(config);
+    if (ret != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("Connect to device fail: %{public}d", ret);
+    }
 
     napi_value result;
     napi_get_boolean(env, ret == WIFI_OPT_SUCCESS, &result);
@@ -471,12 +290,8 @@ napi_value ConnectToDevice(napi_env env, napi_callback_info info)
 
 napi_value Disconnect(napi_env env, napi_callback_info info)
 {
-    size_t argc = 1;
-    napi_value argv[1];
-    napi_value thisVar;
-    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, NULL));
-
-    NAPI_ASSERT(env, wifiDevicePtr != nullptr, "[NAPI] Wifi device instance is null.");
+    TRACE_FUNC_CALL;
+    NAPI_ASSERT(env, wifiDevicePtr != nullptr, "Wifi device instance is null.");
     ErrCode ret = wifiDevicePtr->Disconnect();
     napi_value result;
     napi_get_boolean(env, ret == WIFI_OPT_SUCCESS, &result);
@@ -498,21 +313,270 @@ napi_value GetSignalLevel(napi_env env, napi_callback_info info)
     napi_typeof(env, argv[1], &type2);
     NAPI_ASSERT(env, type1 == napi_number, "Wrong argument type. napi_number expected.");
     NAPI_ASSERT(env, type2 == napi_number, "Wrong argument type. napi_number expected.");
+    NAPI_ASSERT(env, wifiDevicePtr != nullptr, "Wifi device instance is null.");
 
-    int rssi, band;
+    int level = -1;
+    int rssi = 0;
+    int band = 0;
     napi_get_value_int32(env, argv[0], &rssi);
     napi_get_value_int32(env, argv[1], &band);
-
-    NAPI_ASSERT(env, wifiDevicePtr != nullptr, "[NAPI] Wifi device instance is null.");
-    int level = -1;
     ErrCode ret = wifiDevicePtr->GetSignalLevel(rssi, band, level);
     if (ret != WIFI_OPT_SUCCESS) {
-        WIFI_LOGW("[Napi Device] Get wifi signal level fail: %{public}d", ret);
+        WIFI_LOGE("Get wifi signal level fail: %{public}d", ret);
     }
 
     napi_value result;
     napi_create_uint32(env, level, &result);
     return result;
+}
+
+/* This interface has not been implemented */
+napi_value ReConnect(napi_env env, napi_callback_info info)
+{
+    TRACE_FUNC_CALL;
+    NAPI_ASSERT(env, wifiDevicePtr != nullptr, "Wifi device instance is null.");
+    napi_value result = nullptr;
+    return result;
+}
+
+/* This interface has not been implemented */
+napi_value ReAssociate(napi_env env, napi_callback_info info)
+{
+    TRACE_FUNC_CALL;
+    NAPI_ASSERT(env, wifiDevicePtr != nullptr, "Wifi device instance is null.");
+    napi_value result = nullptr;
+    return result;
+}
+
+/* This interface has not been implemented */
+napi_value GetIpInfo(napi_env env, napi_callback_info info)
+{
+    TRACE_FUNC_CALL;
+    NAPI_ASSERT(env, wifiDevicePtr != nullptr, "Wifi device instance is null.");
+    napi_value result = nullptr;
+    return result;
+}
+
+static void LinkedInfoToJs(const napi_env& env, WifiLinkedInfo& linkedInfo, napi_value& result)
+{
+    SetValueUtf8String(env, "ssid", linkedInfo.ssid.c_str(), result);
+    SetValueUtf8String(env, "bssid", linkedInfo.bssid.c_str(), result);
+    SetValueInt32(env, "networkId", linkedInfo.networkId, result);
+    SetValueInt32(env, "rssi", linkedInfo.rssi, result);
+    SetValueInt32(env, "band", linkedInfo.band, result);
+    SetValueInt32(env, "linkSpeed", linkedInfo.linkSpeed, result);
+    SetValueInt32(env, "frequency", linkedInfo.frequency, result);
+    SetValueBool(env, "isHidden", linkedInfo.ifHiddenSSID, result);
+    /* isRestricted not support now, set as default value */
+    SetValueBool(env, "isRestricted", false, result);
+    SetValueInt32(env, "chload", linkedInfo.chload, result);
+    SetValueInt32(env, "snr", linkedInfo.snr, result);
+    SetValueUtf8String(env, "macAddress", linkedInfo.macAddress.c_str(), result);
+    SetValueInt32(env, "ipAddress", linkedInfo.ipAddress, result);
+    /* Check suppState is consistent with HOS */
+    SetValueInt32(env, "suppState", static_cast<int>(linkedInfo.supplicantState), result);
+    /* Check connState is consistent with HOS */
+    SetValueInt32(env, "connState", static_cast<int>(linkedInfo.connState), result);
+}
+
+/* This interface has not been fully implemented */
+napi_value GetLinkedInfo(napi_env env, napi_callback_info info)
+{
+    TRACE_FUNC_CALL;
+    size_t argc = 2;
+    napi_value argv[argc];
+    napi_value thisVar = nullptr;
+    void *data = nullptr;
+    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, &data));
+    NAPI_ASSERT(env, wifiDevicePtr != nullptr, "Wifi device instance is null.");
+
+    LinkedInfoAsyncContext *asyncContext = new LinkedInfoAsyncContext(env);
+    NAPI_ASSERT(env, asyncContext != nullptr, "asyncContext is null.");
+    napi_create_string_latin1(env, "getLinkedInfo", NAPI_AUTO_LENGTH, &asyncContext->resourceName);
+
+    asyncContext->executeFunc = [&](void* data) -> void {
+        LinkedInfoAsyncContext *context = static_cast<LinkedInfoAsyncContext *>(data);
+        TRACE_FUNC_CALL_NAME("wifiDevicePtr->GetLinkedInfo");
+        context->isSuccess = (wifiDevicePtr->GetLinkedInfo(context->linkedInfo) == WIFI_OPT_SUCCESS);
+    };
+
+    asyncContext->completeFunc = [&](void* data) -> void {
+        LinkedInfoAsyncContext *context = static_cast<LinkedInfoAsyncContext *>(data);
+        napi_create_object(context->env, &context->result);
+        LinkedInfoToJs(context->env, context->linkedInfo, context->result);
+        WIFI_LOGI("Push get linkedInfo result to client");
+    };
+
+    size_t nonCallbackArgNum = 0;
+    return DoAsyncWork(env, asyncContext, argc, argv, nonCallbackArgNum);
+}
+
+napi_value RemoveDevice(napi_env env, napi_callback_info info)
+{
+    TRACE_FUNC_CALL;
+    size_t argc = 1;
+    napi_value argv[1];
+    napi_value thisVar;
+    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, NULL));
+    NAPI_ASSERT(env, argc == 1, "Wrong number of arguments");
+
+    napi_valuetype valueType;
+    napi_typeof(env, argv[0], &valueType);
+    NAPI_ASSERT(env, valueType == napi_number, "Wrong argument type. napi_number expected.");
+
+    int networkId = -1;
+    napi_get_value_int32(env, argv[0], &networkId);
+    NAPI_ASSERT(env, wifiDevicePtr != nullptr, "Wifi device instance is null.");
+
+    napi_value result;
+    napi_get_boolean(env, wifiDevicePtr->RemoveDevice(networkId) == WIFI_OPT_SUCCESS, &result);
+    return result;
+}
+
+napi_value RemoveAllNetwork(napi_env env, napi_callback_info info)
+{
+    TRACE_FUNC_CALL;
+    NAPI_ASSERT(env, wifiDevicePtr != nullptr, "Wifi device instance is null.");
+    napi_value result;
+    napi_get_boolean(env, wifiDevicePtr->RemoveAllDevice() == WIFI_OPT_SUCCESS, &result);
+    return result;
+}
+
+/* This interface has not been implemented */
+napi_value DisableNetwork(napi_env env, napi_callback_info info)
+{
+    TRACE_FUNC_CALL;
+    size_t argc = 1;
+    napi_value argv[1];
+    napi_value thisVar;
+    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, NULL));
+    NAPI_ASSERT(env, argc == 1, "Wrong number of arguments");
+
+    napi_valuetype valueType;
+    napi_typeof(env, argv[0], &valueType);
+    NAPI_ASSERT(env, valueType == napi_number, "Wrong argument type. napi_number expected.");
+    NAPI_ASSERT(env, wifiDevicePtr != nullptr, "Wifi device instance is null.");
+
+    int networkId = -1;
+    napi_get_value_int32(env, argv[0], &networkId);
+    napi_value result = nullptr;
+    return result;
+}
+
+napi_value GetCountryCode(napi_env env, napi_callback_info info)
+{
+    TRACE_FUNC_CALL;
+    NAPI_ASSERT(env, wifiDevicePtr != nullptr, "Wifi device instance is null.");
+    std::string countryCode;
+    ErrCode ret = wifiDevicePtr->GetCountryCode(countryCode);
+    if (ret != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("Get countryCode fail: %{public}d", ret);
+    }
+    napi_value cc;
+    napi_create_string_utf8(env, countryCode.c_str(), NAPI_AUTO_LENGTH, &cc);
+    return cc;
+}
+
+static SecTypeJs ConvertKeyMgmtToSecType(const std::string& keyMgmt)
+{
+    std::map<std::string, SecTypeJs> mapKeyMgmtToSecType = {
+        {"NONE", SecTypeJs::SEC_TYPE_OPEN},
+        {"WEP", SecTypeJs::SEC_TYPE_WEP},
+        {"WPA-PSK", SecTypeJs::SEC_TYPE_PSK},
+        {"SAE", SecTypeJs::SEC_TYPE_SAE},
+    };
+
+    std::map<std::string, SecTypeJs>::iterator iter = mapKeyMgmtToSecType.find(keyMgmt);
+    return iter == mapKeyMgmtToSecType.end() ? SecTypeJs::SEC_TYPE_OPEN : iter->second;
+}
+
+static void DeviceConfigToJsArray(const napi_env& env, const std::vector<WifiDeviceConfig>& vecDeviceConfigs,
+    const int idx, napi_value& arrayResult)
+{
+    napi_value result;
+    napi_create_object(env, &result);
+    SetValueUtf8String(env, "ssid", vecDeviceConfigs[idx].ssid.c_str(), result);
+    SetValueUtf8String(env, "bssid", vecDeviceConfigs[idx].bssid.c_str(), result);
+    SetValueUtf8String(env, "preSharedKey", vecDeviceConfigs[idx].preSharedKey.c_str(), result);
+    SetValueBool(env, "isHiddenSsid", vecDeviceConfigs[idx].hiddenSSID, result);
+    SetValueInt32(env, "securityType",
+        static_cast<int>(ConvertKeyMgmtToSecType(vecDeviceConfigs[idx].keyMgmt)), result);
+
+    napi_status status = napi_set_element(env, arrayResult, idx, result);
+    if (status != napi_ok) {
+        WIFI_LOGE("Wifi napi set element error: %{public}d", status);
+    }
+}
+
+napi_value GetDeviceConfigs(napi_env env, napi_callback_info info)
+{
+    TRACE_FUNC_CALL;
+    NAPI_ASSERT(env, wifiDevicePtr != nullptr, "Wifi device instance is null.");
+    std::vector<WifiDeviceConfig> vecDeviceConfigs;
+    ErrCode ret = wifiDevicePtr->GetDeviceConfigs(vecDeviceConfigs);
+    if (ret != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("Get device configs fail: %{public}d", ret);
+    }
+
+    WIFI_LOGI("Get device configs size: %{public}zu", vecDeviceConfigs.size());
+    napi_value arrayResult;
+    napi_create_array_with_length(env, vecDeviceConfigs.size(), &arrayResult);
+    for (size_t i = 0; i != vecDeviceConfigs.size(); ++i) {
+        DeviceConfigToJsArray(env, vecDeviceConfigs, i, arrayResult);
+    }
+    return arrayResult;
+}
+
+napi_value GetSupportedFeatures(napi_env env, napi_callback_info info)
+{
+    TRACE_FUNC_CALL;
+    NAPI_ASSERT(env, wifiDevicePtr != nullptr, "Wifi device instance is null.");
+    long features = -1;
+    ErrCode ret = wifiDevicePtr->GetSupportedFeatures(features);
+    if (ret != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("Get supported features fail: %{public}d", ret);
+    }
+
+    napi_value result;
+    napi_create_int64(env, features, &result);
+    return result;
+}
+
+napi_value IsFeatureSupported(napi_env env, napi_callback_info info)
+{
+    TRACE_FUNC_CALL;
+    size_t argc = 1;
+    napi_value argv[1];
+    napi_value thisVar;
+    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, NULL));
+    NAPI_ASSERT(env, argc == 1, "Wrong number of arguments");
+
+    napi_valuetype valueType;
+    napi_typeof(env, argv[0], &valueType);
+    NAPI_ASSERT(env, valueType == napi_number, "Wrong argument type. napi_number expected.");
+
+    long feature = -1;
+    napi_get_value_int64(env, argv[0], (int64_t*)&feature);
+    NAPI_ASSERT(env, wifiDevicePtr != nullptr, "Wifi device instance is null.");
+
+    napi_value result;
+    napi_get_boolean(env, wifiDevicePtr->IsFeatureSupported(feature), &result);
+    return result;
+}
+
+napi_value GetDeviceMacAddress(napi_env env, napi_callback_info info)
+{
+    TRACE_FUNC_CALL;
+    NAPI_ASSERT(env, wifiDevicePtr != nullptr, "Wifi device instance is null.");
+    std::string macAddr;
+    ErrCode ret = wifiDevicePtr->GetDeviceMacAddress(macAddr);
+    if (ret != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("Get mac address fail: %{public}d", ret);
+    }
+
+    napi_value addr;
+    napi_create_string_utf8(env, macAddr.c_str(), NAPI_AUTO_LENGTH, &addr);
+    return addr;
 }
 }  // namespace Wifi
 }  // namespace OHOS

@@ -136,7 +136,7 @@ void ScanService::HandleScanStatusReport(ScanStatusReport &scanStatusReport)
             HandleCommonScanFailed(scanStatusReport.requestIndexList);
             break;
         }
-        case PNO_SCAN_RESULT: {
+        case PNO_SCAN_INFO: {
             pnoScanFailedNum = 0;
             HandlePnoScanInfo(scanStatusReport.scanInfoList);
             break;
@@ -474,7 +474,6 @@ void ScanService::HandleCommonScanInfo(
 {
     WIFI_LOGI("Enter ScanService::HandleCommonScanInfo.\n");
 
-    bool fullScanInclude = false;
     bool fullScanStored = false;
     for (std::vector<int>::iterator reqIter = requestIndexList.begin(); reqIter != requestIndexList.end(); ++reqIter) {
         ScanConfigMap::iterator configIter = scanConfigMap.find(*reqIter);
@@ -485,7 +484,6 @@ void ScanService::HandleCommonScanInfo(
 
         /* Full Scan Info */
         if (configIter->second.fullScanFlag) {
-            fullScanInclude = true;
             if (fullScanStored) {
                 scanConfigMap.erase(*reqIter);
                 continue;
@@ -533,8 +531,6 @@ bool ScanService::StoreFullScanInfo(
     std::vector<WifiScanInfo> filterScanInfo;
     std::vector<InterScanInfo>::const_iterator iter = scanInfoList.begin();
     for (; iter != scanInfoList.end(); ++iter) {
-        char tmpBuf[128] = "";
-        EncryptLogMsg(iter->ssid.c_str(), tmpBuf, sizeof(tmpBuf));
         WifiScanInfo scanInfo;
         scanInfo.bssid = iter->bssid;
         scanInfo.ssid = iter->ssid;
@@ -637,10 +633,6 @@ void ScanService::ConvertScanInfos(
     return;
 }
 
-/**
- * @Description  Start PNO scanning
- * @return success: true, failed: false
- */
 bool ScanService::BeginPnoScan()
 {
     WIFI_LOGI("Enter ScanService::BeginPnoScan.\n");
@@ -773,8 +765,8 @@ void ScanService::HandlePnoScanInfo(std::vector<InterScanInfo> &scanInfoList)
     for (; iter != scanInfoList.end(); ++iter) {
         if ((iter->timestamp / SECOND_TO_MILLI_SECOND) > pnoScanStartTime) {
             filterScanInfo.push_back(*iter);
-            WIFI_LOGI("InterScanInfo.bssid is %s.\n", iter->bssid.c_str());
-            WIFI_LOGI("InterScanInfo.ssid is %s.\n", iter->ssid.c_str());
+            WIFI_LOGI("InterScanInfo.bssid is %{private}s.\n", iter->bssid.c_str());
+            WIFI_LOGI("InterScanInfo.ssid is %{public}s.\n", iter->ssid.c_str());
             WIFI_LOGI("InterScanInfo.capabilities is %{public}s.\n", iter->capabilities.c_str());
             WIFI_LOGI("InterScanInfo.frequency is %{public}d.\n", iter->frequency);
             WIFI_LOGI("InterScanInfo.rssi is %{public}d.\n", iter->rssi);
@@ -846,7 +838,7 @@ void ScanService::HandleCustomStatusChanged(int customScene, int customSceneStat
     WIFI_LOGI("Enter ScanService::HandleCustomStatusChanged.");
 
     time_t now = time(nullptr);
-    WIFI_LOGD("customScene:%d, status:%d", customScene, customSceneStatus);
+    WIFI_LOGD("customScene:%{public}d, status:%{public}d", customScene, customSceneStatus);
     if (customSceneStatus == STATE_OPEN) {
         customSceneTimeMap.insert(std::pair<int, int>(customScene, now));
     }
@@ -1552,7 +1544,7 @@ bool ScanService::AllowExternScanByIntervalMode(int appId, int scanScene, ScanMo
             "scanScene:%{public}d,  scanMode:%{public}d", intervalListIter->scanScene, intervalListIter->scanMode);
         /* Determine whether control is required in the current scene and scan mode. */
         if (intervalListIter->scanScene == scanScene && intervalListIter->scanMode == scanMode) {
-            /* If a single application is distinguished */
+            /* If a single application is distinguished. */
             if (intervalListIter->isSingle) {
                 if (!AllowSingleAppScanByInterval(appId, *intervalListIter)) {
                     return false;
@@ -1562,7 +1554,6 @@ bool ScanService::AllowExternScanByIntervalMode(int appId, int scanScene, ScanMo
                     return false;
                 }
             }
-            break;
         }
     }
     return true;
@@ -1662,11 +1653,11 @@ bool ScanService::AllowFullAppScanByInterval(int appId, ScanIntervalMode scanInt
     return true;
 }
 
-bool ScanService::PnoScanByInterval(int &fixedScanCount, time_t &fixedScanTime, int &interval, int &count)
+bool ScanService::PnoScanByInterval(int &fixedScanCount, time_t &fixedScanTime, int interval, int count)
 {
     WIFI_LOGI("Enter ScanService::PnoScanByInterval.\n");
 
-    time_t now = time(0);
+    time_t now = time(nullptr);
     /* First scan */
     if (fixedScanCount == 0) {
         fixedScanCount++;
@@ -1700,7 +1691,7 @@ bool ScanService::SystemScanByInterval(int &expScanCount, int &interval, int &co
     return true;
 }
 
-bool ScanService::ExternScanByInterval(int appID, SingleAppForbid &singleAppForbid)
+bool ScanService::ExternScanByInterval(int appId, SingleAppForbid &singleAppForbid)
 {
     WIFI_LOGI("Enter ScanService::ExternScanByInterval.\n");
 
@@ -1723,7 +1714,8 @@ bool ScanService::ExternScanByInterval(int appID, SingleAppForbid &singleAppForb
                 singleAppForbid.scanIntervalMode.count);
 
         case IntervalMode::INTERVAL_BLOCKLIST:
-            return AllowScanByIntervalBlocklist(appID,
+            WIFI_LOGI("INTERVAL_BLOCKLIST IntervalMode.\n");
+            return AllowScanByIntervalBlocklist(appId,
                 singleAppForbid.blockListScanTime,
                 singleAppForbid.lessThanIntervalNum,
                 singleAppForbid.scanIntervalMode.interval,
@@ -1779,12 +1771,13 @@ bool ScanService::AllowScanByIntervalExp(int &expScanCount, int &interval, int &
 }
 
 bool ScanService::AllowScanByIntervalContinue(
-    time_t &continueScanTime, int &lessThanIntervalNum, int &interval, int &count)
+    time_t &continueScanTime, int &lessThanIntervalCount, int &interval, int &count)
 {
     WIFI_LOGI("Enter ScanService::AllowScanByIntervalContinue.\n");
 
-    WIFI_LOGD("lessThanIntervalNum:%d, interval:%d, count:%d", lessThanIntervalNum, interval, count);
-    time_t now = time(0);
+    WIFI_LOGD("lessThanIntervalCount:%{public}d, interval:%{public}d, count:%{public}d",
+        lessThanIntervalCount, interval, count);
+    time_t now = time(nullptr);
     /* First scan */
     if (continueScanTime == 0) {
         continueScanTime = now;
@@ -1792,27 +1785,27 @@ bool ScanService::AllowScanByIntervalContinue(
     }
     /* If count is less than interval, the subsequent interval must be greater than interval. */
     if (now - continueScanTime < interval) {
-        lessThanIntervalNum++;
-        if (lessThanIntervalNum < count) {
+        lessThanIntervalCount++;
+        if (lessThanIntervalCount < count) {
             continueScanTime = now;
             return true;
         }
         /* If the scanning interval is not exceeded continuously, the counter is cleared. */
-        lessThanIntervalNum = 0;
+        lessThanIntervalCount = 0;
         return false;
     }
     /* If the scanning interval is not exceeded continuously, the counter is cleared. */
-    lessThanIntervalNum = 0;
+    lessThanIntervalCount = 0;
     continueScanTime = now;
     return true;
 }
 
 bool ScanService::AllowScanByIntervalBlocklist(
-    int appId, time_t &blockListScanTime, int &lessThanIntervalNum, int &interval, int &count)
+    int appId, time_t &blockListScanTime, int &lessThanIntervalCount, int &interval, int &count)
 {
     WIFI_LOGI("Enter ScanService::AllowScanByIntervalBlocklist.\n");
 
-    time_t now = time(0);
+    time_t now = time(nullptr);
     if (now - blockListScanTime >= interval) {
         for (auto iter = scanBlocklist.begin(); iter != scanBlocklist.end();) {
             if (*iter == appId) {
@@ -1832,6 +1825,7 @@ bool ScanService::AllowScanByIntervalBlocklist(
     /* First scan */
     if (blockListScanTime == 0) {
         blockListScanTime = now;
+        WIFI_LOGD("blockListScanTime, first scan.");
         return true;
     }
     /**
@@ -1839,9 +1833,10 @@ bool ScanService::AllowScanByIntervalBlocklist(
      * the user is added to the blocklist and cannot be scanned.
      */
     if (now - blockListScanTime < interval) {
-        lessThanIntervalNum++;
-        if (lessThanIntervalNum < count) {
+        lessThanIntervalCount++;
+        if (lessThanIntervalCount < count) {
             blockListScanTime = now;
+            WIFI_LOGD("blockListScanTime, lessThanIntervalCount(%{public}d),return true.", lessThanIntervalCount);
             return true;
         }
         /**
@@ -1849,6 +1844,7 @@ bool ScanService::AllowScanByIntervalBlocklist(
          * is greater than count, the user is blocklisted forbidding scanning.
          */
         scanBlocklist.push_back(appId);
+        WIFI_LOGD("scanBlocklist.push_back(appId), return false.");
         return false;
     }
     blockListScanTime = now;

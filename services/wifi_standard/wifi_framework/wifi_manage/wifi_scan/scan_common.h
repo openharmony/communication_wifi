@@ -166,7 +166,7 @@ enum ScanStatus {
     SCAN_FINISHED_STATUS = 1, /* End processing completed */
     COMMON_SCAN_SUCCESS = 2,  /* Notify the scan result after the common scan is complete */
     COMMON_SCAN_FAILED = 3,   /* Common scan failure */
-    PNO_SCAN_RESULT = 4,      /* The PNO scan is complete and the scanning result is notified */
+    PNO_SCAN_INFO = 4,      /* The PNO scan is complete and the scanning result is notified */
     PNO_SCAN_FAILED = 5,      /* Failed to start the PNO scanning */
     SCAN_INNER_EVENT = 6,     /* Report internal events */
     SCAN_STATUS_INVALID       /* Invalid value */

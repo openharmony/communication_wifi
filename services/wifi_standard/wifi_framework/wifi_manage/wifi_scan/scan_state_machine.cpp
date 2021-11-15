@@ -1440,7 +1440,7 @@ void ScanStateMachine::ReportPnoScanInfos(std::vector<InterScanInfo> &scanInfos)
     WIFI_LOGI("Enter ScanStateMachine::ReportPnoScanInfos.\n");
 
     ScanStatusReport scanStatusReport;
-    scanStatusReport.status = PNO_SCAN_RESULT;
+    scanStatusReport.status = PNO_SCAN_INFO;
     scanStatusReport.scanInfoList.assign(scanInfos.begin(), scanInfos.end());
     if (scanStatusReportHandler) {
         scanStatusReportHandler(scanStatusReport);

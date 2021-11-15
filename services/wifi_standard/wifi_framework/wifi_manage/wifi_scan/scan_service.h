@@ -86,6 +86,10 @@ public:
      * @return success: true, failed: false
      */
     bool SingleScan(ScanConfig &scanConfig);
+    /**
+     * @Description  Start PNO scanning
+     * @return success: true, failed: false
+     */
     bool BeginPnoScan();
     /**
      * @Description Start PNO scanning
@@ -509,16 +513,16 @@ private:
      * @return true - success
      * @return false  - failed
      */
-    bool PnoScanByInterval(int &fixedScanCount, time_t &fixedScanTime, int &interval, int &count);
+    bool PnoScanByInterval(int &fixedScanCount, time_t &fixedScanTime, int interval, int count);
     /**
-     * @Description
+     * @Description Determines whether to allow extern scan based on scanInterval control mode.
      *
-     * @param appID Determines whether to allow extern scan based on scanInterval control mode.
+     * @param appId ID of the app to be scanned[in]
      * @param singleAppForbid Stored External Scan Parameters[in]
      * @return true
      * @return false
      */
-    bool ExternScanByInterval(int appID, SingleAppForbid &singleAppForbid);
+    bool ExternScanByInterval(int appId, SingleAppForbid &singleAppForbid);
     /**
      * @Description Determine whether external scanning of a single application can be distinguished.
      *
@@ -532,7 +536,7 @@ private:
      * @Description Check whether external scanning is allowed regardless of a single application.
      *
      * @param appId ID of the app to be scanned[in]
-     * @param scanIntervalMode scan control policy parameters[in]
+     * @param scanIntervalMode intervalMode scan control policy parameters[in]
      * @return true
      * @return false
      */
@@ -562,26 +566,26 @@ private:
      * @Description Determines whether external scanning is allowed in scanning control in INTERVAL_CONTINUE mode.
      *
      * @param continueScanTime INTERVAL_CONTINUE intervalMode scan time[in]
-     * @param lessThanIntervalNum INTERVAL_CONTINUE intervalMode scan count[in]
+     * @param lessThanIntervalCount INTERVAL_CONTINUE intervalMode scan count[in]
      * @param interval scan interval[in]
      * @param count scan count[in]
      * @return true
      * @return false
      */
-    bool AllowScanByIntervalContinue(time_t &continueScanTime, int &lessThanIntervalNum, int &interval, int &count);
+    bool AllowScanByIntervalContinue(time_t &continueScanTime, int &lessThanIntervalCount, int &interval, int &count);
     /**
      * @Description Determines whether external scanning is allowed in scanning control in INTERVAL_BLOCKLIST mode.
      *
      * @param appId ID of the app to be scanned[in]
      * @param blockListScanTime INTERVAL_BLOCKLIST intervalMode scan time[in]
-     * @param lessThanIntervalNum INTERVAL_BLOCKLIST intervalMode scan count[in]
+     * @param lessThanIntervalCount INTERVAL_BLOCKLIST intervalMode scan count[in]
      * @param interval scan interval[in]
      * @param count scan count[in]
      * @return true
      * @return false
      */
     bool AllowScanByIntervalBlocklist(
-        int appId, time_t &blockListScanTime, int &lessThanIntervalNum, int &interval, int &count);
+        int appId, time_t &blockListScanTime, int &lessThanIntervalCount, int &interval, int &count);
 };
 }  // namespace Wifi
 }  // namespace OHOS

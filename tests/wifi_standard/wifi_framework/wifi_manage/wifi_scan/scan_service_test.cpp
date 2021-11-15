@@ -131,7 +131,7 @@ public:
     {
         EXPECT_CALL(WifiManager::GetInstance(), DealScanInfoNotify(_)).Times(AtLeast(1));
         ScanStatusReport scanStatusReport;
-        scanStatusReport.status = PNO_SCAN_RESULT;
+        scanStatusReport.status = PNO_SCAN_INFO;
         pScanService->HandleScanStatusReport(scanStatusReport);
     }
 

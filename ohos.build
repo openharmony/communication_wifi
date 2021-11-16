@@ -81,7 +81,8 @@
 
       "wifi_native_js": {
           "module_list": [
-              "//foundation/communication/wifi/interfaces/innerkits/native_cpp/napi:wifi_native_js"
+              "//foundation/communication/wifi/interfaces/innerkits/native_cpp/napi:wifi_native_js",
+              "//foundation/communication/wifi/interfaces/innerkits/native_cpp/napi:wifi"
           ]
       }
   }

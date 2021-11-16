@@ -40,11 +40,12 @@ The WLAN module provides basic WLAN functions, peer-to-peer \(P2P\) connection, 
 
 ### Available APIs<a name="section1551164914237"></a>
 
-The following table describes JavaScript APIs in  **@ohos.wifi\_native\_js**  available for basic WLAN functions.
+The following table describes JavaScript APIs in  **@ohos.wifi**  available for basic WLAN functions.
 
 **Table  1**  Major JavaScript APIs available for basic WLAN functions
 
 <a name="t96d5b1a809be46328adc684bff001cf7"></a>
+
 <table><thead align="left"><tr id="r5b6b790b6fe144e79e849b7987637f32"><th class="cellrowborder" valign="top" width="27.642764276427638%" id="mcps1.2.4.1.1"><p id="a4bf77d9c2b5c4b8d950a720edaf949c7"><a name="a4bf77d9c2b5c4b8d950a720edaf949c7"></a><a name="a4bf77d9c2b5c4b8d950a720edaf949c7"></a>API</p>
 </th>
 <th class="cellrowborder" valign="top" width="41.094109410941094%" id="mcps1.2.4.1.2"><p id="a11b93aaf8bfd4305acc4b4549f28d524"><a name="a11b93aaf8bfd4305acc4b4549f28d524"></a><a name="a11b93aaf8bfd4305acc4b4549f28d524"></a>Description</p>
@@ -132,16 +133,16 @@ The following table describes JavaScript APIs in  **@ohos.wifi\_native\_js**  av
 
 Before invoking WLAN JavaScript APIs, you need to import the  **@ohos.wifi\_native\_js**  class.
 
-```
-import wifi_native_js from '@ohos.wifi_native_js'; // Import the @ohos.wifi_native_js class.
+```js
+import wf from '@ohos.wifi'; // Import the @ohos.wifi class.
 ```
 
 -   Obtaining the WLAN state
 
 1.  Call the  **isWifiActive​\(\)**  method to check whether WLAN is enabled.
 
-    ```
-    var isWifiActive = wifi_native_js.isWifiActive(); // Value true indicates that WLAN is enabled, and false indicates the opposite.
+    ```js
+    var isWifiActive = wf.isWifiActive(); // Value true indicates that WLAN is enabled, and false indicates the opposite.
     ```
 
 
@@ -150,14 +151,14 @@ import wifi_native_js from '@ohos.wifi_native_js'; // Import the @ohos.wifi_nati
 1.  Call the  **scan​\(\)**  method to start a scan.
 2.  Call the  **getScanInfoList​\(\)**  method to obtain the scan result.
 
-    ```
+    ```js
     // Start a scan.
-    var isScanSuccess = wifi_native_js.scan(); // true
+    var isScanSuccess = wf.scan(); // true
     
     // Wait for some time.
     
     // Obtain the scan result.
-    wifi_native_js.getScanInfos(result => {
+    wf.getScanInfos(result => {
         var num = Object.keys(result).length;
         console.info("wifi scan result mum: " + num);
         for (var i = 0; i < num; ++i) {
@@ -177,7 +178,7 @@ Set up a WLAN connection.
 
 1.  Call  **addDeviceConfig**  to add a hotspot configuration, and set up a WLAN based on the hotspot configuration ID or by calling  **connectToDevice**  with the hotspot configuration passed.
 
-    ```
+    ```js
     // Configure WLAN information.
     var config = {
         "ssid":"test_wifi",
@@ -188,14 +189,14 @@ Set up a WLAN connection.
     }
     Method 1:
     // Add a hotspot configuration.
-    wifi_native_js.addDeviceConfig(config, (result) => {
+    wf.addDeviceConfig(config, (result) => {
         console.info("config id: " + result);
         // Set up a WLAN based on the hotspot configuration ID.
-        wifi_native_js.connectToNetwork(result);
+        wf.connectToNetwork(result);
     });
     Method 2:
     // Set up a WLAN by calling connectToDevice with the hotspot configuration passed.
-    wifi_native_js.connectToDevice(config);
+    wf.connectToDevice(config);
     ```
 
 

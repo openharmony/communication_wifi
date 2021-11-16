@@ -40,11 +40,12 @@ WLAN组件子系统为用户提供WLAN基础功能、P2P（peer-to-peer）功能
 
 ### 接口说明<a name="section1551164914237"></a>
 
-WLAN基础功能由@ohos.wifi\_native\_js类提供，其接口\(JS接口\)说明如下。
+WLAN基础功能由@ohos.wifi类提供，其接口\(JS接口\)说明如下。
 
 **表 1**  WLAN基础功能的主要接口\(JS接口\)
 
 <a name="t96d5b1a809be46328adc684bff001cf7"></a>
+
 <table><thead align="left"><tr id="r5b6b790b6fe144e79e849b7987637f32"><th class="cellrowborder" valign="top" width="40.864086408640865%" id="mcps1.2.4.1.1"><p id="a4bf77d9c2b5c4b8d950a720edaf949c7"><a name="a4bf77d9c2b5c4b8d950a720edaf949c7"></a><a name="a4bf77d9c2b5c4b8d950a720edaf949c7"></a>接口名</p>
 </th>
 <th class="cellrowborder" valign="top" width="44.704470447044706%" id="mcps1.2.4.1.2"><p id="a11b93aaf8bfd4305acc4b4549f28d524"><a name="a11b93aaf8bfd4305acc4b4549f28d524"></a><a name="a11b93aaf8bfd4305acc4b4549f28d524"></a>描述</p>
@@ -132,16 +133,16 @@ WLAN基础功能由@ohos.wifi\_native\_js类提供，其接口\(JS接口\)说明
 
 在调用WLAN JS接口前需要导入接口类。
 
-```
-import wifi_native_js from '@ohos.wifi_native_js'; // 导入js接口类
+```js
+import wf from '@ohos.wifi'; // 导入js接口类
 ```
 
 （一）获取WLAN状态
 
 1.  调用isWifiActive​\(\)接口查询WLAN是否打开。
 
-    ```
-    var isWifiActive = wifi_native_js.isWifiActive(); // 若WLAN打开，则返回true，否则返回false
+    ```js
+    var isWifiActive = wf.isWifiActive(); // 若WLAN打开，则返回true，否则返回false
     ```
 
 
@@ -150,14 +151,14 @@ import wifi_native_js from '@ohos.wifi_native_js'; // 导入js接口类
 1.  调用scan​\(\)接口发起扫描。
 2.  调用getScanInfoList​\(\)接口获取扫描结果。
 
-    ```
+    ```js
     // 调用WLAN扫描接口
-    var isScanSuccess = wifi_native_js.scan(); // true
+    var isScanSuccess = wf.scan(); // true
     
     // 延迟一定时间
     
     // 获取扫描结果
-    wifi_native_js.getScanInfos(result => {
+    wf.getScanInfos(result => {
         var num = Object.keys(result).length;
         console.info("wifi scan result mum: " + num);
         for (var i = 0; i < num; ++i) {
@@ -177,7 +178,7 @@ import wifi_native_js from '@ohos.wifi_native_js'; // 导入js接口类
 
 1.  调用addDeviceConfig添加配置，然后通过返回的配置id连接WLAN或调用connectToDevice通过配置直接连接WLAN。
 
-    ```
+    ```js
     // WLAN配置信息
     var config = {
         "ssid":"test_wifi",
@@ -188,14 +189,14 @@ import wifi_native_js from '@ohos.wifi_native_js'; // 导入js接口类
     }
     方式一：
     // 添加配置
-    wifi_native_js.addDeviceConfig(config, (result) => {
+    wf.addDeviceConfig(config, (result) => {
         console.info("config id: " + result);
         // 通过配置id连接WLAN
-        wifi_native_js.connectToNetwork(result);
+        wf.connectToNetwork(result);
     });
     方式二：
     // 通过配置信息直接连接WLAN
-    wifi_native_js.connectToDevice(config);
+    wf.connectToDevice(config);
     ```
 
 

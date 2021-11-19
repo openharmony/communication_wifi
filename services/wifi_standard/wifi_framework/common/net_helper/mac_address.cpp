@@ -110,7 +110,7 @@ bool MacAddress::IsValid() const
 
 void MacAddress::Dump() const
 {
-    LOGI("MAC: [%s]", mac_.c_str());
+    LOGI("MAC: [%{private}s]", mac_.c_str());
 }
 
 const std::string &MacAddress::GetMacAddressWifiString() const

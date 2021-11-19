@@ -63,12 +63,12 @@ void WifiManager::AutoStartStaService(void)
         ErrCode errCode = WIFI_OPT_FAILED;
         do {
             if (WifiServiceManager::GetInstance().CheckAndEnforceService(WIFI_SERVICE_STA) < 0) {
-                WIFI_LOGE("Load %s service failed!", WIFI_SERVICE_STA);
+                WIFI_LOGE("Load %{public}s service failed!", WIFI_SERVICE_STA);
                 break;
             }
             IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst();
             if (pService == nullptr) {
-                WIFI_LOGE("Create %s service failed!", WIFI_SERVICE_STA);
+                WIFI_LOGE("Create %{public}s service failed!", WIFI_SERVICE_STA);
                 break;
             }
             errCode = pService->RegisterStaServiceCallback(WifiManager::GetInstance().GetStaCallback());
@@ -78,7 +78,7 @@ void WifiManager::AutoStartStaService(void)
             }
             errCode = pService->EnableWifi();
             if (errCode != WIFI_OPT_SUCCESS) {
-                WIFI_LOGE("service enable sta failed, ret %d!", static_cast<int>(errCode));
+                WIFI_LOGE("service enable sta failed, ret %{public}d!", static_cast<int>(errCode));
                 break;
             }
         } while (0);

@@ -46,25 +46,20 @@ ErrCode WifiScanProxy::SetScanControlInfo(const ScanControlInfo &info)
     MessageParcel data;
     MessageParcel reply;
     data.WriteInt32(0);
-    data.WriteInt32(info.scanForbidMap.size());
-    auto iter = info.scanForbidMap.begin();
-    for (; iter != info.scanForbidMap.end(); iter++) {
-        data.WriteInt32((int)iter->first);
-        data.WriteInt32(iter->second.size());
-        for (std::size_t i = 0; i < iter->second.size(); i++) {
-            data.WriteInt32((int)iter->second[i].scanMode);
-            data.WriteInt32(iter->second[i].forbidTime);
-            data.WriteInt32(iter->second[i].forbidCount);
-        }
+    data.WriteInt32(info.scanForbidList.size());
+    for (auto iter = info.scanForbidList.begin(); iter != info.scanForbidList.end(); iter++) {
+        data.WriteInt32(iter->scanScene);
+        data.WriteInt32(static_cast<int>(iter->scanMode));
+        data.WriteInt32(iter->forbidTime);
+        data.WriteInt32(iter->forbidCount);
     }
 
     data.WriteInt32(info.scanIntervalList.size());
-    auto iter2 = info.scanIntervalList.begin();
-    for (; iter2 != info.scanIntervalList.end(); iter2++) {
+    for (auto iter2 = info.scanIntervalList.begin(); iter2 != info.scanIntervalList.end(); iter2++) {
         data.WriteInt32(iter2->scanScene);
-        data.WriteInt32((int)iter2->scanMode);
-        data.WriteInt32((int)iter2->isSingle);
-        data.WriteInt32((int)iter2->intervalMode);
+        data.WriteInt32(static_cast<int>(iter2->scanMode));
+        data.WriteBool(iter2->isSingle);
+        data.WriteInt32(static_cast<int>(iter2->intervalMode));
         data.WriteInt32(iter2->interval);
         data.WriteInt32(iter2->count);
     }

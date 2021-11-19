@@ -83,7 +83,7 @@ bool P2pGroupOperatingState::ProcessCmdCreateGroup(const InternalMessage &msg) c
         /**
          * Create a new persistence group.
          */
-        WIFI_LOGE("Create a new %s group.", (netId == PERSISTENT_NET_ID) ? "persistence" : "temporary");
+        WIFI_LOGE("Create a new %{public}s group.", (netId == PERSISTENT_NET_ID) ? "persistence" : "temporary");
         if (config.GetPassphrase().empty() && config.GetGroupName().empty()) {
             ret = WifiP2PHalInterface::GetInstance().GroupAdd((netId == PERSISTENT_NET_ID) ? true : false, netId, freq);
         } else if (!config.GetPassphrase().empty() && !config.GetGroupName().empty() &&

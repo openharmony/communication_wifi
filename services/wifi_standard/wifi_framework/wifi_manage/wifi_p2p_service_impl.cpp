@@ -607,7 +607,7 @@ bool WifiP2pServiceImpl::IsP2pServiceRunning()
 
 ErrCode WifiP2pServiceImpl::SetP2pDeviceName(const std::string &deviceName)
 {
-    WIFI_LOGI("SetDeviceName:%s", deviceName.c_str());
+    WIFI_LOGI("SetDeviceName:%{public}s", deviceName.c_str());
     int length = deviceName.length();
     if (length > DEVICE_NAME_LENGTH || length < 0) {
         return WIFI_OPT_INVALID_PARAM;

@@ -195,6 +195,13 @@ public:
     int GetCountryCode(std::string &countryCode);
 
     /**
+     * @Description Obtaining Whether to Load the Configuration of the Standby STA.
+     *
+     * @return bool - Indicates whether to load the configuration of the standby STA.
+     */
+    bool IsLoadStabak();
+
+    /**
      * @Description Get current hotspot middle state
      *
      * @return WifiOprMidState - which can be a CLOSED/CLOSING/OPENING/RUNNING/UNKNOWN
@@ -433,7 +440,7 @@ public:
      *
      * @return int - 1 open; 2 close
      */
-    int GetScreenState();
+    int GetScreenState() const;
 
     /**
      * @Description Set current airplane mode state
@@ -447,21 +454,21 @@ public:
      *
      * @return int - 1 open; 2 close
      */
-    int GetAirplaneModeState();
+    int GetAirplaneModeState() const;
 
     /**
      * @Description Set current app running mode
      *
-     * @param state - 1 front; 2 backend
+     * @param appRunMode - app run mode
      */
-    void SetAppRunningState(const int &state);
+    void SetAppRunningState(ScanMode appRunMode);
 
     /**
      * @Description Get current app running mode
      *
-     * @return int - 1 front; 2 backend
+     * @param ScanMode
      */
-    int GetAppRunningState();
+    ScanMode GetAppRunningState() const;
 
     /**
      * @Description Set current power saving mode
@@ -475,7 +482,49 @@ public:
      *
      * @return int - 1 saving mode; 2 not saving mode
      */
-    int GetPowerSavingModeState();
+    int GetPowerSavingModeState() const;
+
+    /**
+     * @Description Set app package name.
+     *
+     * @param appPackageName - app package name
+     */
+    void SetAppPackageName(const std::string &appPackageName);
+
+    /**
+     * @Description Get app package name.
+     *
+     * @return const std::string& - app package name.
+     */
+    const std::string& GetAppPackageName() const;
+
+    /**
+     * @Description Set freeze mode state.
+     *
+     * @param state - 1 freeze mode; 2 moving mode
+     */
+    void SetFreezeModeState(int state);
+
+    /**
+     * @Description Get freeze mode state.
+     *
+     * @return freeze mode.
+     */
+    int GetFreezeModeState() const;
+    
+    /**
+     * @Description Set no charger plugged in mode.
+     *
+     * @param state - 1 no charger plugged in mode; 2 charger plugged in mode
+     */
+    void SetNoChargerPlugModeState(int state);
+
+    /**
+     * @Description Get no charger plugged in mode.
+     *
+     * @return no charger plugged in mode.
+     */
+    int GetNoChargerPlugModeState() const;
 
     /**
      * @Description set the device name

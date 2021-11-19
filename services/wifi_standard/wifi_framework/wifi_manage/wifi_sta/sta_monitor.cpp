@@ -72,7 +72,7 @@ void StaMonitor::SetStateMachine(StaStateMachine *paraStaStateMachine)
 }
 void StaMonitor::OnConnectChangedCallBack(int status, int networkId,const std::string &bssid)
 {
-    WIFI_LOGI("OnConnectChangedCallBack() status:%{public}d,networkId=%{public}d,bssid={private}%s",
+    WIFI_LOGI("OnConnectChangedCallBack() status:%{public}d,networkId=%{public}d,bssid=%{private}s",
         status,
         networkId,
         bssid.c_str());

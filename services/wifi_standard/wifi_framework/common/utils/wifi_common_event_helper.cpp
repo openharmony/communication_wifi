@@ -37,7 +37,7 @@ bool WifiCommonEventHelper::PublishEvent(const std::string &eventAction, const i
         CommonEventPublishInfo publishInfo;
         publishInfo.SetSubscriberPermissions(permissions);
         if (!CommonEventManager::PublishCommonEvent(commonData, publishInfo)) {
-            WIFI_LOGE("failed to publish event[%s], code:%d", eventAction.c_str(), code);
+            WIFI_LOGE("failed to publish event[%{public}s], code:%{public}d", eventAction.c_str(), code);
             return false;
         }
         return true;

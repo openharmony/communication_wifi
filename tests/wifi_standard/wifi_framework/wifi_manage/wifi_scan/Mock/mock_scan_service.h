@@ -30,10 +30,10 @@ public:
     ErrCode Scan(bool externFlag);
     ErrCode ScanWithParam(const WifiScanParams &params);
     void SystemScanProcess(bool scanAtOnce);
-    void HandleScreenStatusChanged(bool screenOn);
+    void HandleScreenStatusChanged();
     void HandleStaStatusChanged(int status);
     void HandleCustomStatusChanged(int customScene, int customSceneStatus);
-    void SetOperateAppMode(int appMode);
+    void HandleGetCustomSceneState(std::map<int, time_t>& sceneMap) const;
     void GetScanControlInfo();
     void ClearScanControlValue();
     void SetStaCurrentTime();

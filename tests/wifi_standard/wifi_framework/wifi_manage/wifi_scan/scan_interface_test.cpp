@@ -95,13 +95,13 @@ HWTEST_F(ScanInterfaceTest, ScanWithParamSuccess, TestSize.Level1)
 
 HWTEST_F(ScanInterfaceTest, OnScreenStateChangedSuccess1, TestSize.Level1)
 {
-    int screenState = STATE_OPEN;
+    int screenState = MODE_STATE_OPEN;
     EXPECT_EQ(WIFI_OPT_SUCCESS, pScanInterface->OnScreenStateChanged(screenState));
 }
 
 HWTEST_F(ScanInterfaceTest, OnScreenStateChangedSuccess2, TestSize.Level1)
 {
-    int screenState = STATE_CLOSE;
+    int screenState = MODE_STATE_CLOSE;
     EXPECT_EQ(WIFI_OPT_SUCCESS, pScanInterface->OnScreenStateChanged(screenState));
 }
 
@@ -118,12 +118,12 @@ HWTEST_F(ScanInterfaceTest, OnClientModeStatusChangedSuccess, TestSize.Level1)
 
 HWTEST_F(ScanInterfaceTest, OnAppRunningModeChangedSuccess, TestSize.Level1)
 {
-    EXPECT_EQ(WIFI_OPT_SUCCESS, pScanInterface->OnAppRunningModeChanged(0));
+    EXPECT_EQ(WIFI_OPT_SUCCESS, pScanInterface->OnAppRunningModeChanged(ScanMode::APP_FOREGROUND_SCAN));
 }
 
 HWTEST_F(ScanInterfaceTest, OnCustomControlStateChangedSuccess, TestSize.Level1)
 {
-    int customSceneStatus = STATE_OPEN;
+    int customSceneStatus = MODE_STATE_OPEN;
     EXPECT_EQ(WIFI_OPT_SUCCESS, pScanInterface->OnCustomControlStateChanged(0, customSceneStatus));
 }
 

@@ -369,7 +369,7 @@ bool WifiP2pServiceManager::UpdateServiceName(const std::string &devAddr, const 
 {
     auto iter = deviceService.find(devAddr);
     if (iter == deviceService.end()) {
-        WIFI_LOGE("Cannot find %s, update service name failed!", devAddr.c_str());
+        WIFI_LOGE("Cannot find %{public}s, update service name failed!", devAddr.c_str());
         return false;
     }
 

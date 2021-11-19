@@ -43,7 +43,7 @@ public:
         EXPECT_CALL(WifiStaHalInterface::GetInstance(), StopPnoScan()).Times(AtLeast(0));
         pScanService = std::make_unique<ScanService>();
         pScanService->pScanStateMachine = new MockScanStateMachine();
-        pScanService->mScanSerivceCallbacks = WifiManager::GetInstance().GetScanCallback();
+        pScanService->RegisterScanCallbacks(WifiManager::GetInstance().GetScanCallback());
     }
     virtual void TearDown()
     {
@@ -268,7 +268,6 @@ public:
     {
         ScanConfig scanConfig;
         scanConfig.scanBand = SCAN_BAND_24_GHZ;
-        ;
         scanConfig.externFlag = true;
         scanConfig.scanStyle = SCAN_TYPE_HIGH_ACCURACY;
         EXPECT_EQ(true, pScanService->SingleScan(scanConfig));
@@ -554,8 +553,7 @@ public:
 
     void HandleScreenStatusChangedSuccess()
     {
-        pScanService->HandleScreenStatusChanged(false);
-        pScanService->HandleScreenStatusChanged(true);
+        pScanService->HandleScreenStatusChanged();
     }
 
     void HandleStaStatusChangedSuccess1()
@@ -582,7 +580,7 @@ public:
     {
         EXPECT_CALL(WifiSettings::GetInstance(), GetWhetherToAllowNetworkSwitchover()).Times(AtLeast(0));
         int customScene = 0;
-        int customSceneStatus = STATE_CLOSE;
+        int customSceneStatus = MODE_STATE_CLOSE;
         pScanService->HandleCustomStatusChanged(customScene, customSceneStatus);
     }
 
@@ -590,15 +588,15 @@ public:
     {
         EXPECT_CALL(WifiSettings::GetInstance(), GetWhetherToAllowNetworkSwitchover()).Times(AtLeast(0));
         int customScene = 0;
-        int customSceneStatus = STATE_OPEN;
+        int customSceneStatus = MODE_STATE_OPEN;
         pScanService->HandleCustomStatusChanged(customScene, customSceneStatus);
     }
 
     void SystemScanProcessSuccess1()
     {
         EXPECT_CALL(WifiSettings::GetInstance(), GetWhetherToAllowNetworkSwitchover());
-        pScanService->isScreenOn = true;
         ScanIntervalMode mode;
+        mode.scanScene = SCAN_SCENE_ALL;
         mode.scanMode = ScanMode::SYSTEM_TIMER_SCAN;
         mode.isSingle = false;
         pScanService->scanControlInfo.scanIntervalList.push_back(mode);
@@ -610,7 +608,6 @@ public:
         EXPECT_CALL(WifiSettings::GetInstance(), GetWhetherToAllowNetworkSwitchover());
         EXPECT_CALL(WifiSettings::GetInstance(), GetMinRssi2Dot4Ghz()).Times(AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), GetMinRssi5Ghz()).Times(AtLeast(0));
-        pScanService->isScreenOn = false;
         pScanService->SystemScanProcess(true);
     }
 
@@ -660,51 +657,10 @@ public:
         EXPECT_CALL(WifiSettings::GetInstance(), GetScanControlInfo(_)).WillRepeatedly(Return(-1));
         pScanService->GetScanControlInfo();
     }
-
-    void GetScreenStateSuccess()
-    {
-        EXPECT_CALL(WifiSettings::GetInstance(), GetScreenState()).WillRepeatedly(Return(SCREEN_CLOSED));
-        pScanService->GetScreenState();
-    }
-
-    void SetOperateAppModeSuccess()
-    {
-        pScanService->SetOperateAppMode(0);
-    }
-
-    void GetOperateAppModeSuccess1()
-    {
-        pScanService->operateAppMode = APP_FOREGROUND_SCAN;
-        EXPECT_EQ(ScanMode::APP_FOREGROUND_SCAN, pScanService->GetOperateAppMode());
-    }
-
-    void GetOperateAppModeSuccess2()
-    {
-        pScanService->operateAppMode = APP_BACKGROUND_SCAN;
-        EXPECT_EQ(ScanMode::APP_BACKGROUND_SCAN, pScanService->GetOperateAppMode());
-    }
-
-    void GetOperateAppModeSuccess3()
-    {
-        pScanService->operateAppMode = SYS_FOREGROUND_SCAN;
-        EXPECT_EQ(ScanMode::SYS_FOREGROUND_SCAN, pScanService->GetOperateAppMode());
-    }
-
-    void GetOperateAppModeSuccess4()
-    {
-        pScanService->operateAppMode = SYS_BACKGROUND_SCAN;
-        EXPECT_EQ(ScanMode::SYS_BACKGROUND_SCAN, pScanService->GetOperateAppMode());
-    }
-
-    void GetOperateAppModeFail()
-    {
-        pScanService->operateAppMode = MAX_PNO_SCAN_FAILED_NUM;
-        EXPECT_EQ(ScanMode::SYS_FOREGROUND_SCAN, pScanService->GetOperateAppMode());
-    }
-
+    
     void AllowExternScanSuccess()
     {
-        pScanService->AllowExternScan(0);
+        pScanService->AllowExternScan();
     }
 
     void AllowExternScanFail1()
@@ -713,13 +669,21 @@ public:
         StoreScanConfig cfg;
         cfg.externFlag = true;
         pScanService->scanConfigMap.emplace(staScene, cfg);
-        pScanService->AllowExternScan(0);
+
+        ScanMode scanMode = ScanMode::SYS_FOREGROUND_SCAN;
+        ScanForbidMode forbidMode;
+        forbidMode.scanScene = SCAN_SCENE_SCANNING;
+        forbidMode.scanMode = scanMode;
+        pScanService->scanControlInfo.scanForbidList.push_back(forbidMode);
+
+        pScanService->AllowExternScan();
     }
 
     void AllowSystemTimerScanSuccess()
     {
         EXPECT_CALL(WifiSettings::GetInstance(), GetWhetherToAllowNetworkSwitchover());
         ScanIntervalMode mode;
+        mode.scanScene = SCAN_SCENE_ALL;
         mode.scanMode = ScanMode::SYSTEM_TIMER_SCAN;
         mode.isSingle = false;
         pScanService->scanControlInfo.scanIntervalList.push_back(mode);
@@ -729,6 +693,7 @@ public:
     void AllowPnoScanSuccess()
     {
         ScanIntervalMode mode;
+        mode.scanScene = SCAN_SCENE_ALL;
         mode.scanMode = ScanMode::PNO_SCAN;
         mode.isSingle = false;
         pScanService->scanControlInfo.scanIntervalList.push_back(mode);
@@ -741,9 +706,124 @@ public:
         StoreScanConfig cfg;
         cfg.externFlag = true;
         pScanService->scanConfigMap.emplace(staScene, cfg);
-        pScanService->isScreenOn = false;
         ScanMode scanMode = ScanMode::SYS_FOREGROUND_SCAN;
         EXPECT_EQ(pScanService->AllowExternScanByForbid(staScene, scanMode), true);
+    }
+
+    void AllowExternScanByForbidFail1()
+    {
+        int staScene = 0;
+        StoreScanConfig cfg;
+        cfg.externFlag = true;
+        pScanService->scanConfigMap.emplace(staScene, cfg);
+
+        ScanMode scanMode = ScanMode::SYS_FOREGROUND_SCAN;
+        ScanForbidMode forbidMode;
+        forbidMode.scanScene = SCAN_SCENE_SCANNING;
+        forbidMode.scanMode = scanMode;
+        pScanService->scanControlInfo.scanForbidList.push_back(forbidMode);
+
+        EXPECT_EQ(pScanService->AllowExternScanByForbid(staScene, scanMode), false);
+    }
+
+    void AllowExternScanByForbidFail2()
+    {
+        int staScene = 0;
+        StoreScanConfig cfg;
+        cfg.externFlag = true;
+        pScanService->scanConfigMap.emplace(staScene, cfg);
+
+        ScanMode scanMode = ScanMode::SYS_FOREGROUND_SCAN;
+        ScanForbidMode forbidMode;
+        forbidMode.scanScene = SCAN_SCENE_SCANNING;
+        forbidMode.scanMode = ScanMode::ALL_EXTERN_SCAN;
+        pScanService->scanControlInfo.scanForbidList.push_back(forbidMode);
+
+        EXPECT_EQ(pScanService->AllowExternScanByForbid(staScene, scanMode), false);
+    }
+
+    void AllowExternScanByForbidFail3()
+    {
+        int staScene = 0;
+        ScanMode scanMode = ScanMode::SYS_FOREGROUND_SCAN;
+        ScanForbidMode forbidMode;
+        forbidMode.scanScene = SCAN_SCENE_SCREEN_OFF;
+        forbidMode.scanMode = scanMode;
+        pScanService->scanControlInfo.scanForbidList.push_back(forbidMode);
+        EXPECT_EQ(pScanService->AllowExternScanByForbid(staScene, scanMode), false);
+    }
+
+    void AllowExternScanByForbidFail4()
+    {
+        int staScene = 0;
+        ScanMode scanMode = ScanMode::SYS_FOREGROUND_SCAN;
+        ScanForbidMode forbidMode;
+        forbidMode.scanScene = SCAN_SCENE_SCREEN_OFF;
+        forbidMode.scanMode = ScanMode::ALL_EXTERN_SCAN;
+        pScanService->scanControlInfo.scanForbidList.push_back(forbidMode);
+        EXPECT_EQ(pScanService->AllowExternScanByForbid(staScene, scanMode), false);
+    }
+
+    void AllowExternScanByForbidFail5()
+    {
+        int staScene = 0;
+        ScanMode scanMode = ScanMode::SYS_FOREGROUND_SCAN;
+        ScanForbidMode scanForbidMode;
+        scanForbidMode.scanScene = staScene;
+        scanForbidMode.scanMode = scanMode;
+        scanForbidMode.forbidTime = 0;
+        scanForbidMode.forbidCount = 0;
+        pScanService->scanControlInfo.scanForbidList.push_back(scanForbidMode);
+        EXPECT_EQ(pScanService->AllowExternScanByForbid(staScene, scanMode), false);
+    }
+
+    void AllowExternScanByForbidFail6()
+    {
+        int staScene = 0;
+        ScanMode scanMode = ScanMode::SYS_FOREGROUND_SCAN;
+        ScanForbidMode scanForbidMode;
+        scanForbidMode.scanScene = staScene;
+        scanForbidMode.scanMode = ScanMode::ALL_EXTERN_SCAN;
+        scanForbidMode.forbidTime = 0;
+        scanForbidMode.forbidCount = 0;
+        pScanService->scanControlInfo.scanForbidList.push_back(scanForbidMode);
+        EXPECT_EQ(pScanService->AllowExternScanByForbid(staScene, scanMode), false);
+    }
+
+    void AllowExternScanByForbidFail7()
+    {
+        int staScene = 0;
+        ScanMode scanMode = ScanMode::SYS_FOREGROUND_SCAN;
+        time_t now = time(nullptr);
+        if (now < 0) {
+            return;
+        }
+        pScanService->customSceneTimeMap.emplace(staScene, now);
+        ScanForbidMode scanForbidMode;
+        scanForbidMode.scanScene = staScene;
+        scanForbidMode.scanMode = scanMode;
+        scanForbidMode.forbidTime = 0;
+        scanForbidMode.forbidCount = 0;
+        pScanService->scanControlInfo.scanForbidList.push_back(scanForbidMode);
+        EXPECT_EQ(pScanService->AllowExternScanByForbid(staScene, scanMode), false);
+    }
+
+    void AllowExternScanByForbidFail8()
+    {
+        int staScene = 0;
+        ScanMode scanMode = ScanMode::SYS_FOREGROUND_SCAN;
+        time_t now = time(nullptr);
+        if (now < 0) {
+            return;
+        }
+        pScanService->customSceneTimeMap.emplace(staScene, now);
+        ScanForbidMode scanForbidMode;
+        scanForbidMode.scanScene = staScene;
+        scanForbidMode.scanMode = ScanMode::ALL_EXTERN_SCAN;
+        scanForbidMode.forbidTime = 0;
+        scanForbidMode.forbidCount = 0;
+        pScanService->scanControlInfo.scanForbidList.push_back(scanForbidMode);
+        EXPECT_EQ(pScanService->AllowExternScanByForbid(staScene, scanMode), false);
     }
 
     void AllowExternScanByIntervaluccess()
@@ -777,10 +857,14 @@ public:
 
     void GetStaSceneSuccess5()
     {
+        pScanService->staStatus = static_cast<int>(OperateResState::CONNECT_ASSOCIATING);
+        EXPECT_EQ(SCAN_SCENE_ASSOCIATING, pScanService->GetStaScene());
     }
 
     void GetStaSceneSuccess6()
     {
+        pScanService->staStatus = static_cast<int>(OperateResState::CONNECT_ASSOCIATED);
+        EXPECT_EQ(SCAN_SCENE_ASSOCIATED, pScanService->GetStaScene());
     }
 
     void GetStaSceneFail()
@@ -925,26 +1009,157 @@ public:
         EXPECT_EQ(pScanService->AllowScanDuringScanning(scanMode), true);
     }
 
+    void AllowScanDuringScanningFail()
+    {
+        ScanMode scanMode = ScanMode::SYS_FOREGROUND_SCAN;
+        ScanForbidMode forbidMode;
+        forbidMode.scanScene = SCAN_SCENE_SCANNING;
+        forbidMode.scanMode = scanMode;
+        pScanService->scanControlInfo.scanForbidList.push_back(forbidMode);
+        EXPECT_EQ(pScanService->AllowScanDuringScanning(scanMode), false);
+    }
+
     void AllowScanDuringScreenOffSuccess()
     {
         ScanMode scanMode = ScanMode::SYS_FOREGROUND_SCAN;
         EXPECT_EQ(pScanService->AllowScanDuringScreenOff(scanMode), true);
     }
 
+    void AllowScanDuringScreenOffFail1()
+    {
+        ScanMode scanMode = ScanMode::SYS_FOREGROUND_SCAN;
+        ScanForbidMode forbidMode;
+        forbidMode.scanScene = SCAN_SCENE_SCREEN_OFF;
+        forbidMode.scanMode = scanMode;
+        pScanService->scanControlInfo.scanForbidList.push_back(forbidMode);
+
+        EXPECT_EQ(pScanService->AllowScanDuringScreenOff(scanMode), false);
+    }
+
     void AllowScanDuringStaSceneSuccess1()
     {
         const int staScene = 0;
         ScanMode scanMode = ScanMode::SYS_FOREGROUND_SCAN;
+        ScanForbidMode scanForbidMode;
+        scanForbidMode.scanScene = staScene;
+        scanForbidMode.scanMode = scanMode;
+        scanForbidMode.forbidTime = 1;
+        scanForbidMode.forbidCount = 1;
+        pScanService->staSceneForbidCount = 1;
         time_t nowTime = time(nullptr);
         const int timeForTest = 2;
         pScanService->staCurrentTime = nowTime - timeForTest;
+        pScanService->scanControlInfo.scanForbidList.push_back(scanForbidMode);
         EXPECT_EQ(pScanService->AllowScanDuringStaScene(staScene, scanMode), true);
+    }
+
+    void AllowScanDuringStaSceneFail1()
+    {
+        const int staScene = 0;
+        ScanMode scanMode = ScanMode::SYS_FOREGROUND_SCAN;
+        ScanForbidMode scanForbidMode;
+        scanForbidMode.scanScene = staScene;
+        scanForbidMode.scanMode = scanMode;
+        scanForbidMode.forbidTime = 0;
+        scanForbidMode.forbidCount = 0;
+        pScanService->scanControlInfo.scanForbidList.push_back(scanForbidMode);
+        EXPECT_EQ(pScanService->AllowScanDuringStaScene(staScene, scanMode), false);
+    }
+
+    void AllowScanDuringStaSceneFail2()
+    {
+        const int staScene = 0;
+        ScanMode scanMode = ScanMode::SYS_FOREGROUND_SCAN;
+        ScanForbidMode scanForbidMode;
+        scanForbidMode.scanScene = staScene;
+        scanForbidMode.scanMode = scanMode;
+        scanForbidMode.forbidTime = 1;
+        scanForbidMode.forbidCount = 1;
+        pScanService->staSceneForbidCount = 0;
+        pScanService->scanControlInfo.scanForbidList.push_back(scanForbidMode);
+        EXPECT_EQ(pScanService->AllowScanDuringStaScene(staScene, scanMode), false);
+    }
+
+    void AllowScanDuringStaSceneFail3()
+    {
+        const int staScene = 0;
+        ScanMode scanMode = ScanMode::SYS_FOREGROUND_SCAN;
+        ScanForbidMode scanForbidMode;
+        scanForbidMode.scanScene = staScene;
+        scanForbidMode.scanMode = scanMode;
+        scanForbidMode.forbidTime = 1;
+        scanForbidMode.forbidCount = 1;
+        pScanService->staSceneForbidCount = 1;
+        pScanService->staSceneForbidCount = 1;
+        time_t nowTime = time(nullptr);
+        const int timeForTest = 2;
+        pScanService->staCurrentTime = nowTime + timeForTest;
+        pScanService->scanControlInfo.scanForbidList.push_back(scanForbidMode);
+        EXPECT_EQ(pScanService->AllowScanDuringStaScene(staScene, scanMode), false);
     }
 
     void AllowScanDuringCustomSceneSuccess()
     {
         ScanMode scanMode = ScanMode::SYS_FOREGROUND_SCAN;
         EXPECT_EQ(pScanService->AllowScanDuringCustomScene(scanMode), true);
+    }
+
+    void AllowScanDuringCustomSceneFail1()
+    {
+        const int staScene = 0;
+        ScanMode scanMode = ScanMode::SYS_FOREGROUND_SCAN;
+        time_t now = time(nullptr);
+        if (now < 0) {
+            return;
+        }
+        pScanService->customSceneTimeMap.emplace(staScene, now);
+        ScanForbidMode scanForbidMode;
+        scanForbidMode.scanScene = staScene;
+        scanForbidMode.scanMode = scanMode;
+        scanForbidMode.forbidTime = 0;
+        scanForbidMode.forbidCount = 0;
+        pScanService->scanControlInfo.scanForbidList.push_back(scanForbidMode);
+        EXPECT_EQ(pScanService->AllowScanDuringCustomScene(scanMode), false);
+    }
+
+    void AllowScanDuringCustomSceneFail2()
+    {
+        const int staScene = 0;
+        ScanMode scanMode = ScanMode::SYS_FOREGROUND_SCAN;
+        time_t now = time(nullptr);
+        if (now < 0) {
+            return;
+        }
+        pScanService->customSceneTimeMap.emplace(staScene, now);
+        ScanForbidMode scanForbidMode;
+        scanForbidMode.scanScene = staScene;
+        scanForbidMode.scanMode = scanMode;
+        scanForbidMode.forbidTime = 1;
+        scanForbidMode.forbidCount = 1;
+        pScanService->staSceneForbidCount = 0;
+        pScanService->scanControlInfo.scanForbidList.push_back(scanForbidMode);
+        EXPECT_EQ(pScanService->AllowScanDuringCustomScene(scanMode), false);
+    }
+
+    void AllowScanDuringCustomSceneFail3()
+    {
+        const int staScene = 0;
+        ScanMode scanMode = ScanMode::SYS_FOREGROUND_SCAN;
+        time_t now = time(nullptr);
+        if (now < 0) {
+            return;
+        }
+        pScanService->customSceneTimeMap.emplace(staScene, now);
+        ScanForbidMode scanForbidMode;
+        scanForbidMode.scanScene = staScene;
+        scanForbidMode.scanMode = scanMode;
+        scanForbidMode.forbidTime = 1;
+        scanForbidMode.forbidCount = 1;
+        time_t nowTime = time(nullptr);
+        const int timeForTest = 2;
+        pScanService->staCurrentTime = nowTime + timeForTest;
+        pScanService->scanControlInfo.scanForbidList.push_back(scanForbidMode);
+        EXPECT_EQ(pScanService->AllowScanDuringCustomScene(scanMode), false);
     }
 
     void AllowExternScanByIntervalMode()
@@ -1049,6 +1264,7 @@ public:
         int appId = 0;
         SingleAppForbid sAppForbid;
         sAppForbid.appID = appId;
+        sAppForbid.scanIntervalMode.scanScene = SCAN_SCENE_ALL;
         sAppForbid.scanIntervalMode.scanMode = ScanMode::SCAN_MODE_MAX;
         pScanService->appForbidList.push_back(sAppForbid);
         ScanIntervalMode scanIntervalMode = sAppForbid.scanIntervalMode;
@@ -1060,6 +1276,7 @@ public:
         int appId = 0;
         SingleAppForbid sAppForbid;
         sAppForbid.appID = appId;
+        sAppForbid.scanIntervalMode.scanScene = SCAN_SCENE_ALL;
         sAppForbid.scanIntervalMode.scanMode = ScanMode::SCAN_MODE_MAX;
 
         sAppForbid.fixedScanCount = 1;
@@ -1087,6 +1304,7 @@ public:
         int appId = 0;
         SingleAppForbid sAppForbid;
         sAppForbid.appID = appId;
+        sAppForbid.scanIntervalMode.scanScene = SCAN_SCENE_ALL;
         sAppForbid.scanIntervalMode.scanMode = ScanMode::SCAN_MODE_MAX;
         pScanService->fullAppForbidList.push_back(sAppForbid);
         ScanIntervalMode scanIntervalMode = sAppForbid.scanIntervalMode;
@@ -1098,6 +1316,7 @@ public:
         int appId = 0;
         SingleAppForbid sAppForbid;
         sAppForbid.appID = appId;
+        sAppForbid.scanIntervalMode.scanScene = SCAN_SCENE_ALL;
         sAppForbid.scanIntervalMode.scanMode = ScanMode::SCAN_MODE_MAX;
 
         sAppForbid.fixedScanCount = 1;
@@ -1230,9 +1449,8 @@ public:
         int count = 0;
         pScanService->scanBlocklist.push_back(appId);
         pScanService->scanBlocklist.push_back(1);
-        // blockListScanTime now; branch.
-        bool rlt = pScanService->AllowScanByIntervalBlocklist(appId, blockListScanTime, lessThanIntervalCount, interval,
-            count);
+        bool rlt = pScanService->AllowScanByIntervalBlocklist(
+            appId, blockListScanTime, lessThanIntervalCount, interval, count);
         EXPECT_EQ(rlt, true);
     }
 
@@ -1246,9 +1464,8 @@ public:
         int lessThanIntervalCount = 0;
         int interval = time(nullptr) + timeTest;
         int count = 0;
-        // if blockListScanTime 0 branch.
-        bool rlt = pScanService->AllowScanByIntervalBlocklist(appId, blockListScanTime, lessThanIntervalCount, interval,
-            count);
+        bool rlt = pScanService->AllowScanByIntervalBlocklist(
+            appId, blockListScanTime, lessThanIntervalCount, interval, count);
         EXPECT_EQ(rlt, true);
     }
 
@@ -1262,9 +1479,8 @@ public:
         int interval = intervalTest;
         const int countTest = 2;
         int count = countTest;
-        // if lessThanIntervalCount  count branch.
-        bool rlt = pScanService->AllowScanByIntervalBlocklist(appId, blockListScanTime, lessThanIntervalCount, interval,
-            count);
+        bool rlt = pScanService->AllowScanByIntervalBlocklist(
+            appId, blockListScanTime, lessThanIntervalCount, interval, count);
         EXPECT_EQ(rlt, true);
     }
 
@@ -1278,9 +1494,8 @@ public:
         int interval = intervalTest;
         int count = 0;
         pScanService->scanBlocklist.push_back(appId);
-        // if find scanBlocklist.begin() branch.
-        bool rlt = pScanService->AllowScanByIntervalBlocklist(appId, blockListScanTime, lessThanIntervalCount, interval,
-            count);
+        bool rlt = pScanService->AllowScanByIntervalBlocklist(
+            appId, blockListScanTime, lessThanIntervalCount, interval, count);
         EXPECT_EQ(rlt, false);
     }
 
@@ -1293,9 +1508,8 @@ public:
         const int intervalTest = 10;
         int interval = intervalTest;
         int count = 0;
-        // scanBlocklist (appId) branch.
-        bool rlt = pScanService->AllowScanByIntervalBlocklist(appId, blockListScanTime, lessThanIntervalCount, interval,
-            count);
+        bool rlt = pScanService->AllowScanByIntervalBlocklist(
+            appId, blockListScanTime, lessThanIntervalCount, interval, count);
         EXPECT_EQ(rlt, false);
     }
 };
@@ -1665,41 +1879,6 @@ HWTEST_F(ScanServiceTest, GetScanControlInfoFail, TestSize.Level1)
     GetScanControlInfoFail();
 }
 
-HWTEST_F(ScanServiceTest, GetScreenStateSuccess, TestSize.Level1)
-{
-    GetScreenStateSuccess();
-}
-
-HWTEST_F(ScanServiceTest, SetOperateAppModeSuccess, TestSize.Level1)
-{
-    SetOperateAppModeSuccess();
-}
-
-HWTEST_F(ScanServiceTest, GetOperateAppModeSuccess1, TestSize.Level1)
-{
-    GetOperateAppModeSuccess1();
-}
-
-HWTEST_F(ScanServiceTest, GetOperateAppModeSuccess2, TestSize.Level1)
-{
-    GetOperateAppModeSuccess2();
-}
-
-HWTEST_F(ScanServiceTest, GetOperateAppModeSuccess3, TestSize.Level1)
-{
-    GetOperateAppModeSuccess3();
-}
-
-HWTEST_F(ScanServiceTest, GetOperateAppModeSuccess4, TestSize.Level1)
-{
-    GetOperateAppModeSuccess4();
-}
-
-HWTEST_F(ScanServiceTest, GetOperateAppModeFail, TestSize.Level1)
-{
-    GetOperateAppModeFail();
-}
-
 HWTEST_F(ScanServiceTest, AllowExternScanSuccess, TestSize.Level1)
 {
     AllowExternScanSuccess();
@@ -1723,6 +1902,46 @@ HWTEST_F(ScanServiceTest, AllowPnoScanSuccess, TestSize.Level1)
 HWTEST_F(ScanServiceTest, AllowExternScanByForbidSuccess1, TestSize.Level1)
 {
     AllowExternScanByForbidSuccess1();
+}
+
+HWTEST_F(ScanServiceTest, AllowExternScanByForbidFail1, TestSize.Level1)
+{
+    AllowExternScanByForbidFail1();
+}
+
+HWTEST_F(ScanServiceTest, AllowExternScanByForbidFail2, TestSize.Level1)
+{
+    AllowExternScanByForbidFail2();
+}
+
+HWTEST_F(ScanServiceTest, AllowExternScanByForbidFail3, TestSize.Level1)
+{
+    AllowExternScanByForbidFail3();
+}
+
+HWTEST_F(ScanServiceTest, AllowExternScanByForbidFail4, TestSize.Level1)
+{
+    AllowExternScanByForbidFail4();
+}
+
+HWTEST_F(ScanServiceTest, AllowExternScanByForbidFail5, TestSize.Level1)
+{
+    AllowExternScanByForbidFail5();
+}
+
+HWTEST_F(ScanServiceTest, AllowExternScanByForbidFail6, TestSize.Level1)
+{
+    AllowExternScanByForbidFail6();
+}
+
+HWTEST_F(ScanServiceTest, AllowExternScanByForbidFail7, TestSize.Level1)
+{
+    AllowExternScanByForbidFail7();
+}
+
+HWTEST_F(ScanServiceTest, AllowExternScanByForbidFail8, TestSize.Level1)
+{
+    AllowExternScanByForbidFail8();
 }
 
 HWTEST_F(ScanServiceTest, AllowExternScanByIntervaluccess, TestSize.Level1)
@@ -1865,9 +2084,19 @@ HWTEST_F(ScanServiceTest, AllowScanDuringScanningSuccess, TestSize.Level1)
     AllowScanDuringScanningSuccess();
 }
 
+HWTEST_F(ScanServiceTest, AllowScanDuringScanningFail, TestSize.Level1)
+{
+    AllowScanDuringScanningFail();
+}
+
 HWTEST_F(ScanServiceTest, AllowScanDuringScreenOffSuccess, TestSize.Level1)
 {
     AllowScanDuringScreenOffSuccess();
+}
+
+HWTEST_F(ScanServiceTest, AllowScanDuringScreenOffFail1, TestSize.Level1)
+{
+    AllowScanDuringScreenOffFail1();
 }
 
 HWTEST_F(ScanServiceTest, AllowScanDuringStaSceneSuccess, TestSize.Level1)
@@ -1875,9 +2104,39 @@ HWTEST_F(ScanServiceTest, AllowScanDuringStaSceneSuccess, TestSize.Level1)
     AllowScanDuringStaSceneSuccess1();
 }
 
+HWTEST_F(ScanServiceTest, AllowScanDuringStaSceneFail1, TestSize.Level1)
+{
+    AllowScanDuringStaSceneFail1();
+}
+
+HWTEST_F(ScanServiceTest, AllowScanDuringStaSceneFail2, TestSize.Level1)
+{
+    AllowScanDuringStaSceneFail2();
+}
+
+HWTEST_F(ScanServiceTest, AllowScanDuringStaSceneFail3, TestSize.Level1)
+{
+    AllowScanDuringStaSceneFail3();
+}
+
 HWTEST_F(ScanServiceTest, AllowScanDuringCustomSceneSuccess, TestSize.Level1)
 {
     AllowScanDuringCustomSceneSuccess();
+}
+
+HWTEST_F(ScanServiceTest, AllowScanDuringCustomSceneFail1, TestSize.Level1)
+{
+    AllowScanDuringCustomSceneFail1();
+}
+
+HWTEST_F(ScanServiceTest, AllowScanDuringCustomSceneFail2, TestSize.Level1)
+{
+    AllowScanDuringCustomSceneFail2();
+}
+
+HWTEST_F(ScanServiceTest, AllowScanDuringCustomSceneFail3, TestSize.Level1)
+{
+    AllowScanDuringCustomSceneFail3();
 }
 
 HWTEST_F(ScanServiceTest, AllowExternScanByIntervalMode, TestSize.Level1)

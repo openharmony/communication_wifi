@@ -15,7 +15,7 @@
 #include "scan_interface.h"
 #include "wifi_logger.h"
 
-DEFINE_WIFILOG_SCAN_LABEL("ScanStateMachine");
+DEFINE_WIFILOG_SCAN_LABEL("ScanInterface");
 
 namespace OHOS {
 namespace Wifi {
@@ -83,19 +83,22 @@ ErrCode ScanInterface::ScanWithParam(const WifiScanParams &wifiScanParams)
     return pScanService->ScanWithParam(wifiScanParams);
 }
 
+ErrCode ScanInterface::DisableScan(bool disable)
+{
+    WIFI_LOGI("Enter ScanInterface::DisableScan");
+
+    return pScanService->DisableScan(disable);
+}
+
 ErrCode ScanInterface::OnScreenStateChanged(int screenState)
 {
     WIFI_LOGI("Enter ScanInterface::OnScreenStateChanged\n");
 
-    if (screenState != STATE_OPEN && screenState != STATE_CLOSE) {
+    if (screenState != MODE_STATE_OPEN && screenState != MODE_STATE_CLOSE) {
         WIFI_LOGE("screenState param is error");
         return WIFI_OPT_INVALID_PARAM;
     }
-    bool screenOn = true;
-    if (screenState == STATE_CLOSE) {
-        screenOn = false;
-    }
-    pScanService->HandleScreenStatusChanged(screenOn);
+    pScanService->HandleScreenStatusChanged();
     return WIFI_OPT_SUCCESS;
 }
 
@@ -108,11 +111,21 @@ ErrCode ScanInterface::OnClientModeStatusChanged(int staStatus)
     return WIFI_OPT_SUCCESS;
 }
 
-ErrCode ScanInterface::OnAppRunningModeChanged(int appMode)
+ErrCode ScanInterface::OnAppRunningModeChanged(ScanMode appRunMode)
 {
     WIFI_LOGI("Enter ScanInterface::OnAppRunningModeChanged\n");
 
-    pScanService->SetOperateAppMode(appMode);
+    WIFI_LOGD("appRunMode=%{public}d", static_cast<int>(appRunMode));
+
+    return WIFI_OPT_SUCCESS;
+}
+
+ErrCode ScanInterface::OnMovingFreezeStateChange()
+{
+    LOGI("Enter ScanInterface::OnMovingFreezeStateChange");
+
+    pScanService->HandleMovingFreezeChanged();
+
     return WIFI_OPT_SUCCESS;
 }
 
@@ -120,11 +133,19 @@ ErrCode ScanInterface::OnCustomControlStateChanged(int customScene, int customSc
 {
     WIFI_LOGI("Enter ScanInterface::OnCustomControlStateChanged\n");
 
-    if (customSceneStatus != STATE_OPEN && customSceneStatus != STATE_CLOSE) {
+    if (customSceneStatus != MODE_STATE_OPEN && customSceneStatus != MODE_STATE_CLOSE) {
         WIFI_LOGE("screenState param is error");
         return WIFI_OPT_INVALID_PARAM;
     }
     pScanService->HandleCustomStatusChanged(customScene, customSceneStatus);
+    return WIFI_OPT_SUCCESS;
+}
+
+ErrCode ScanInterface::OnGetCustomSceneState(std::map<int, time_t>& sceneMap) const
+{
+    WIFI_LOGI("Enter ScanInterface::OnGetCustomSceneState\n");
+
+    pScanService->HandleGetCustomSceneState(sceneMap);
     return WIFI_OPT_SUCCESS;
 }
 

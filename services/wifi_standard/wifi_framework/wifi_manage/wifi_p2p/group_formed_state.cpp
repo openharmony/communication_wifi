@@ -242,14 +242,15 @@ bool GroupFormedState::ProcessConnectEvt(const InternalMessage &msg) const
 
 bool GroupFormedState::ProcessCmdCancelConnect(const InternalMessage &msg) const
 {
-    WIFI_LOGI("Process cmd cancel connect recv CMD: %d", msg.GetMessageName());
+    WIFI_LOGI("recv CMD: %{public}d", msg.GetMessageName());
     p2pStateMachine.BroadcastActionResult(P2pActionCallback::P2pDisConnect, ErrCode::WIFI_OPT_FAILED);
     return EXECUTED;
 }
 
 bool GroupFormedState::ProcessCmdDiscServices(const InternalMessage &msg) const
 {
-    WIFI_LOGI("Process cmd disc services recv CMD: %d", msg.GetMessageName());
+    WIFI_LOGI("recv CMD: %{public}d", msg.GetMessageName());
+    WIFI_LOGD("p2p_enabled_state recv CMD_DISCOVER_SERVICES");
 
     p2pStateMachine.CancelSupplicantSrvDiscReq();
     std::string reqId;
@@ -270,7 +271,7 @@ bool GroupFormedState::ProcessCmdDiscServices(const InternalMessage &msg) const
 
     retCode = WifiP2PHalInterface::GetInstance().P2pFind(DISC_TIMEOUT_S);
     if (retCode != WifiErrorNo::WIFI_IDL_OPT_OK) {
-        WIFI_LOGE("call P2pFind failed, ErrorCode: %d", static_cast<int>(retCode));
+        WIFI_LOGE("call P2pFind failed, ErrorCode: %{public}d", static_cast<int>(retCode));
         p2pStateMachine.BroadcastActionResult(P2pActionCallback::DiscoverServices, ErrCode::WIFI_OPT_FAILED);
         return EXECUTED;
     }
@@ -290,7 +291,8 @@ bool GroupFormedState::ProcessCmdStartListen(const InternalMessage &msg) const
     constexpr int defaultOpClass = 81;
     constexpr int defaultChannel = 6;
     if (WifiP2PHalInterface::GetInstance().SetListenChannel(defaultChannel, defaultOpClass)) {
-        WIFI_LOGI("p2p set listen channel failed. channel:%d, opclass:%d", defaultChannel, defaultOpClass);
+        WIFI_LOGI("p2p set listen channel failed. channel:%{public}d, opclass:%{public}d", defaultChannel,
+            defaultOpClass);
         p2pStateMachine.BroadcastActionResult(P2pActionCallback::StartP2pListen, WIFI_OPT_FAILED);
         return EXECUTED;
     }

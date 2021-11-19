@@ -169,7 +169,7 @@ ErrCode WifiP2pService::SetP2pDeviceName(const std::string &devName)
 
 ErrCode WifiP2pService::SetP2pWfdInfo(const WifiP2pWfdInfo &wfdInfo)
 {
-    WIFI_LOGD("enable = %d device info = %d port = %d throughput = %d\n",
+    WIFI_LOGD("enable = %{public}d device info = %{public}d port = %{public}d throughput = %{public}d\n",
         wfdInfo.GetWfdEnabled(), wfdInfo.GetDeviceInfo(), wfdInfo.GetCtrlPort(), wfdInfo.GetMaxThroughput());
     p2pStateMachine.SendMessage(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_SET_WFD_INFO), wfdInfo);
     return ErrCode::WIFI_OPT_SUCCESS;

@@ -516,6 +516,8 @@ void ClearTClass<WifiConfig>(WifiConfig &item)
     item.secondRssiLevel5G = RSSI_LEVEL_2_5G;
     item.thirdRssiLevel5G = RSSI_LEVEL_3_5G;
     item.fourthRssiLevel5G = RSSI_LEVEL_4_5G;
+    item.strDnsBak = "8.8.8.8";
+    item.isLoadStabak = true;
     return;
 }
 
@@ -595,6 +597,10 @@ void SetTClassKeyValue<WifiConfig>(WifiConfig &item, const std::string &key, con
         item.thirdRssiLevel5G = std::stoi(value);
     } else if (key == "fourthRssiLevel5G") {
         item.fourthRssiLevel5G = std::stoi(value);
+    } else if (key == "strDnsBak") {
+        item.strDnsBak = value;
+    } else if (key == "isLoadStabak") {
+        item.isLoadStabak = (std::stoi(value) != 0);
     }
     return;
 }
@@ -640,6 +646,8 @@ std::string OutTClassString<WifiConfig>(WifiConfig &item)
     ss << "secondRssiLevel5G=" << item.secondRssiLevel5G << std::endl;
     ss << "thirdRssiLevel5G=" << item.thirdRssiLevel5G << std::endl;
     ss << "fourthRssiLevel5G=" << item.fourthRssiLevel5G << std::endl;
+    ss << "strDnsBak=" << item.strDnsBak << std::endl;
+    ss << "isLoadStabak=" << item.isLoadStabak << std::endl;
     return ss.str();
 }
 
@@ -764,5 +772,71 @@ std::string OutTClassString<WifiP2pGroupInfo>(WifiP2pGroupInfo &item)
     }
     return ss.str();
 }
-}  // namespace Wifi
-}  // namespace OHOS
+
+template <>
+void ClearTClass<TrustListPolicy>(TrustListPolicy &item)
+{
+    item.sceneId = 0;
+    item.sceneName.clear();
+    item.trustList.clear();
+    return;
+}
+
+template <>
+void SetTClassKeyValue<TrustListPolicy>(TrustListPolicy &item, const std::string &key, const std::string &value)
+{
+    if (key == "sceneId") {
+        item.sceneId = std::stoi(value);
+    } else if (key == "sceneName") {
+        item.sceneName = value;
+    } else if (key == "trustList") {
+        item.trustList = value;
+    }
+
+    return;
+}
+
+template <>
+std::string GetTClassName<TrustListPolicy>()
+{
+    return "TrustListPolicy";
+}
+
+template <> std::string OutTClassString<TrustListPolicy>(TrustListPolicy &item)
+{
+    std::ostringstream ss;
+    ss << "sceneId=" << item.sceneId << std::endl;
+    ss << "sceneName=" << item.sceneName << std::endl;
+    ss << "trustList=" << item.trustList << std::endl;
+    return ss.str();
+}
+
+template <> void ClearTClass<MovingFreezePolicy>(MovingFreezePolicy &item)
+{
+    item.trustList.clear();
+    return;
+}
+
+template <>
+void SetTClassKeyValue<MovingFreezePolicy>(MovingFreezePolicy &item, const std::string &key, const std::string &value)
+{
+    if (key == "trustList") {
+        item.trustList = value;
+    }
+
+    return;
+}
+
+template <> std::string GetTClassName<MovingFreezePolicy>()
+{
+    return "MovingFreezePolicy";
+}
+
+template <> std::string OutTClassString<MovingFreezePolicy>(MovingFreezePolicy &item)
+{
+    std::ostringstream ss;
+    ss << "trustList=" << item.trustList << std::endl;
+    return ss.str();
+}
+} // namespace Wifi
+} // namespace OHOS

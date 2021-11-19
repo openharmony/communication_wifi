@@ -1222,6 +1222,7 @@ public:
         EXPECT_CALL(WifiSettings::GetInstance(), GetIpInfo(_))
             .WillRepeatedly(DoAll(SetArgReferee<0>(ipInfo), Return(0)));
         EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_)).Times(AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), GetStrDnsBak()).Times(AtLeast(0));
 
         std::string ifname = "wlan0";
         DhcpResult result;

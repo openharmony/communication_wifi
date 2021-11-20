@@ -805,7 +805,7 @@ void StaStateMachine::DealReassociateCmd(InternalMessage *msg)
     if (msg == nullptr) {
         WIFI_LOGE("msg is null\n");
     }
-    WIFI_LOGD("enter DealStartWpsCmd\n");
+    WIFI_LOGD("enter DealReassociateCmd\n");
     /* Obtains the current system time, assigns the timestamp of the last
      * connection attempt, and prohibits scanning requests within 10 seconds.
      */
@@ -1715,7 +1715,7 @@ void StaStateMachine::ConnectToNetworkProcess(InternalMessage *msg)
             WifiSettings::GetInstance().AddDeviceConfig(deviceConfig);
         }
         WifiSettings::GetInstance().SyncDeviceConfig();
-        WIFI_LOGD("Device ssid = %s", deviceConfig.ssid.c_str());
+        WIFI_LOGD("Device ssid = %{public}s", deviceConfig.ssid.c_str());
     }
 
     linkedInfo.networkId = lastNetworkId;
@@ -1824,6 +1824,8 @@ void StaStateMachine::DhcpResultNotify::OnSuccess(int status, const std::string 
 
             /* Check whether the Internet access is normal by send http. */
             pStaStateMachine->pNetcheck->SignalNetCheckThread();
+        } else {
+            WIFI_LOGE("Dhcp getIpSucNum: %{public}d", pStaStateMachine->getIpSucNum);
         }
         pStaStateMachine->getIpSucNum++;
         return;

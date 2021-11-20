@@ -314,9 +314,6 @@ ErrCode StaAutoConnectService::AutoSelectDevice(WifiDeviceConfig &electedDevice,
         return WIFI_OPT_FAILED;
     }
 
-    /* Before initiating network selection, update all configured networks. */
-    RefreshConfigDevice();
-
     std::vector<InterScanInfo> availableScanInfos;
     /* Filter out unnecessary networks. */
     GetAvailableScanInfos(availableScanInfos, scanInfos, blockedBssids, info);
@@ -542,23 +539,6 @@ bool StaAutoConnectService::Whether5GDevice(int frequency)
     }
 }
 
-void StaAutoConnectService::RefreshConfigDevice()
-{
-    WIFI_LOGI("Enter StaAutoConnectService::RefreshConfigDevice.\n");
-    std::vector<WifiDeviceConfig> configs;
-    WifiSettings::GetInstance().GetDeviceConfig(configs);
-    if (configs.empty()) {
-        WIFI_LOGE("No config networks.\n");
-        return;
-    }
-    for (auto network : configs) {
-        if (network.status == 1) {
-            WIFI_LOGI("The network is disable.networkId is %{public}d.", network.networkId);
-        }
-    }
-    return;
-}
-
 void StaAutoConnectService::GetAvailableScanInfos(std::vector<InterScanInfo> &availableScanInfos,
     const std::vector<InterScanInfo> &scanInfos, std::vector<std::string> &blockedBssids, WifiLinkedInfo &info)
 {
@@ -580,19 +560,21 @@ void StaAutoConnectService::GetAvailableScanInfos(std::vector<InterScanInfo> &av
 
         auto itr = find(blockedBssids.begin(), blockedBssids.end(), scanInfo.bssid);
         if (itr != blockedBssids.end()) { /* Skip Blocklist Network */
-            WIFI_LOGI("Skip blocklistedBssid network %s.\n", scanInfo.ssid.c_str());
+            WIFI_LOGI("Skip blocklistedBssid network, ssid: %{public}s.\n", scanInfo.ssid.c_str());
             continue;
         }
 
         /* Skipping networks with weak signals */
         if (scanInfo.frequency < MIN_5GHZ_BAND_FREQUENCY) {
             if (scanInfo.rssi <= MIN_RSSI_VALUE_24G) {
-                WIFI_LOGI("Skip network %s with low 2.4G signals %{public}d.\n", scanInfo.ssid.c_str(), scanInfo.rssi);
+                WIFI_LOGI("Skip network %{public}s with low 2.4G signals %{public}d.\n",
+                    scanInfo.ssid.c_str(), scanInfo.rssi);
                 continue;
             }
         } else {
             if (scanInfo.rssi <= MIN_RSSI_VALUE_5G) {
-                WIFI_LOGI("Skip network %s with low 5G signals %{public}d.\n", scanInfo.ssid.c_str(), scanInfo.rssi);
+                WIFI_LOGI("Skip network %{public}s with low 5G signals %{public}d.\n",
+                    scanInfo.ssid.c_str(), scanInfo.rssi);
                 continue;
             }
         }

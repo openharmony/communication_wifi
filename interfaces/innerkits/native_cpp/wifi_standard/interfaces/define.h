@@ -52,6 +52,7 @@
 #define WIFI_SVR_CMD_INIT_WIFI_PROTECT 0x1023        /* init the Wi-Fi protect. */
 #define WIFI_SVR_CMD_GET_WIFI_PROTECT 0x1024         /* get the Wi-Fi protect. */
 #define WIFI_SVR_CMD_PUT_WIFI_PROTECT 0x1025         /* put the Wi-Fi protect. */
+#define WIFI_SVR_CMD_IS_WIFI_CONNECTED 0x1026         /* is Wi-Fi connected */
 
 /* -------------ap module message define----------------- */
 #define WIFI_SVR_CMD_ENABLE_WIFI_AP 0x1100            /* open ap */

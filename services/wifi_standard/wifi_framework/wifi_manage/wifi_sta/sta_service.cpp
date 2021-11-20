@@ -109,20 +109,25 @@ int StaService::AddDeviceConfig(const WifiDeviceConfig &config) const
 {
     LOGI("Enter StaService::AddDeviceConfig.\n");
     int netWorkId = INVALID_NETWORK_ID;
+    std::string bssid;
     WifiDeviceConfig tempDeviceConfig;
     if (WifiSettings::GetInstance().GetDeviceConfig(config.ssid, config.keyMgmt, tempDeviceConfig) == 0) {
-        LOGD("A network with the same name already exists in the configuration center!\n");
+        LOGI("A network with the same name already exists in the configuration center!\n");
         netWorkId = tempDeviceConfig.networkId;
-        pStaAutoConnectService->EnableOrDisableBssid(config.bssid, true, 0);
+        bssid = config.bssid.empty() ? tempDeviceConfig.bssid : config.bssid;
+        pStaAutoConnectService->EnableOrDisableBssid(bssid, true, 0);
     } else {
         if (WifiStaHalInterface::GetInstance().GetNextNetworkId(netWorkId) != WIFI_IDL_OPT_OK) {
             LOGE("StaService::AddDeviceConfig GetNextNetworkId failed!");
-            return netWorkId;
+            return INVALID_NETWORK_ID;
         }
-        LOGD("StaService::AddDeviceConfig Add a new network and GetNextNetworkId() succeed!");
+        LOGD("StaService::AddDeviceConfig alloc new id[%{public}d] succeed!", netWorkId);
     }
     tempDeviceConfig = config;
     tempDeviceConfig.networkId = netWorkId;
+    if (!bssid.empty()) {
+        tempDeviceConfig.bssid = bssid;
+    }
 
     /* Setting the network to wpa */
     if(pStaStateMachine->ConvertDeviceCfg(tempDeviceConfig) != WIFI_OPT_SUCCESS) {
@@ -138,6 +143,13 @@ int StaService::AddDeviceConfig(const WifiDeviceConfig &config) const
 
 int StaService::UpdateDeviceConfig(const WifiDeviceConfig &config) const
 {
+    LOGI("Enter StaService::UpdateDeviceConfig.\n");
+    WifiDeviceConfig tempDeviceConfig;
+    if (config.networkId <= INVALID_NETWORK_ID ||
+        WifiSettings::GetInstance().GetDeviceConfig(config.networkId, tempDeviceConfig) != 0) {
+        LOGI("Update not exists network, id: %{public}d\n", config.networkId);
+        return INVALID_NETWORK_ID;
+    }
     return AddDeviceConfig(config);
 }
 
@@ -156,7 +168,7 @@ ErrCode StaService::ConnectToDevice(const WifiDeviceConfig &config) const
 
 ErrCode StaService::ConnectToNetwork(int networkId) const
 {
-    LOGI("Enter StaService::ConnectToNetwork, networkId is %d.\n", networkId);
+    LOGI("Enter StaService::ConnectToNetwork, networkId is %{public}d.\n", networkId);
     WifiDeviceConfig config;
     if (WifiSettings::GetInstance().GetDeviceConfig(networkId, config) != 0) {
         LOGE("WifiDeviceConfig is null!");
@@ -228,6 +240,16 @@ ErrCode StaService::DisableDeviceConfig(int networkId) const
         return WIFI_OPT_FAILED;
     }
     WifiSettings::GetInstance().SyncDeviceConfig();
+    return WIFI_OPT_SUCCESS;
+}
+
+ErrCode StaService::ClearDisabledBssidForReconnect() const
+{
+    WIFI_LOGD("Enter StaService::ClearDisabledBssidForReconnect\n");
+    std::string lastSuccConnectBssid = WifiSettings::GetInstance().GetLastSuccConnectBssid();
+    if (!lastSuccConnectBssid.empty()) {
+        pStaAutoConnectService->EnableOrDisableBssid(lastSuccConnectBssid, true, 0);
+    }
     return WIFI_OPT_SUCCESS;
 }
 

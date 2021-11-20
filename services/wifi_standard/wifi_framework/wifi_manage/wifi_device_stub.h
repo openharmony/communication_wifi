@@ -41,6 +41,7 @@ private:
     void OnGetWifiProtectRef(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnPutWifiProtectRef(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnAddDeviceConfig(uint32_t code, MessageParcel &data, MessageParcel &reply);
+    void OnUpdateDeviceConfig(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnRemoveDevice(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnRemoveAllDevice(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnGetDeviceConfigs(uint32_t code, MessageParcel &data, MessageParcel &reply);
@@ -63,6 +64,7 @@ private:
     void OnGetSignalLevel(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnGetSupportedFeatures(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnGetDeviceMacAdd(uint32_t code, MessageParcel &data, MessageParcel &reply);
+    void OnIsWifiConnected(uint32_t code, MessageParcel &data, MessageParcel &reply);
 
 private:
     void ReadWifiDeviceConfig(MessageParcel &data, WifiDeviceConfig &config);

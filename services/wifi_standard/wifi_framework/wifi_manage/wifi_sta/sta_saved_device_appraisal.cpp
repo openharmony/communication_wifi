@@ -54,7 +54,7 @@ ErrCode StaSavedDeviceAppraisal::DeviceAppraisals(
 
         WifiDeviceConfig device;
         if (WifiSettings::GetInstance().GetDeviceConfig(scanInfo.bssid, DEVICE_CONFIG_INDEX_BSSID, device) == -1) {
-            WIFI_LOGI("Skip unsaved Network %s.", scanInfo.ssid.c_str()); /* Skipping Unsaved Networks */
+            WIFI_LOGI("Skip unsaved Network %{public}s.", scanInfo.ssid.c_str()); /* Skipping Unsaved Networks */
             continue;
         }
 
@@ -64,14 +64,16 @@ ErrCode StaSavedDeviceAppraisal::DeviceAppraisals(
 
         int score = 0;
         AppraiseDeviceQuality(score, scanInfo, device, info);
-        WIFI_LOGI(
-            "The device %s score is %{public}d.rssi is %{public}d.\n", scanInfo.ssid.c_str(), score, scanInfo.rssi);
+        WIFI_LOGI("The device %{public}s score is %{public}d.rssi is %{public}d.\n",
+            scanInfo.ssid.c_str(), score, scanInfo.rssi);
 
         if (score > highestScore || (score == highestScore && scanInfo.rssi > scanInfoElected.rssi)) {
             highestScore = score;
             scanInfoElected.rssi = scanInfo.rssi;
             electedDevice = device;
             sign = 1;
+        } else {
+            WIFI_LOGI("The config %{public}s is ignored!\n", scanInfo.ssid.c_str());
         }
     }
     if (sign == 1) {
@@ -94,11 +96,12 @@ bool StaSavedDeviceAppraisal::WhetherSkipDevice(WifiDeviceConfig &device)
 {
     /* Skip this type of device and evaluate it by other appraisals */
     if (device.isPasspoint || device.isEphemeral) {
-        WIFI_LOGI("Skip isPasspoint or isEphemeral Network %s.", device.ssid.c_str());
+        WIFI_LOGI("Skip isPasspoint or isEphemeral Network %{public}s.", device.ssid.c_str());
         return true;
     }
 
     if (device.status == static_cast<int>(WifiDeviceConfigStatus::DISABLED)) {
+        WIFI_LOGI("Skip disabled Network %{public}s.", device.ssid.c_str());
         return true;
     }
     return false;

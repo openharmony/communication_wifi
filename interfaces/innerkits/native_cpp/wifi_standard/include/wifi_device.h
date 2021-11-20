@@ -78,6 +78,15 @@ public:
     virtual ErrCode AddDeviceConfig(const WifiDeviceConfig &config, int &result) = 0;
 
     /**
+     * @Description Update a wifi device configuration.
+     *
+     * @param config - WifiDeviceConfig object
+     * @param result - the device configuration's network id after updated
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode UpdateDeviceConfig(const WifiDeviceConfig &config, int &result) = 0;
+
+    /**
      * @Description Remove the wifi device config equals to input network id.
      *
      * @param networkId - want to remove device config's network id
@@ -115,6 +124,13 @@ public:
      * @return ErrCode - operation result
      */
     virtual ErrCode ConnectToDevice(const WifiDeviceConfig &config) = 0;
+
+    /**
+     * @Description Check whether Wi-Fi is connected.
+     *
+     * @return bool - true: connected, false: not connected
+     */
+    virtual bool IsConnected() = 0;
 
     /**
      * @Description Disconnect.
@@ -197,6 +213,45 @@ public:
      * @return false - unsupported
      */
     virtual bool IsFeatureSupported(long feature) = 0;
+
+    /**
+     * @Description Enable device config, when set attemptEnable, disable other device config
+     *
+     * @param networkId - need enable device config's network id
+     * @param attemptEnable - if set true, disable other device config
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode EnableDeviceConfig(int networkId, bool attemptEnable) = 0;
+
+    /**
+     * @Description Disable Wi-Fi device configuration.
+     *
+     * @param networkId - device config's network id
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode DisableDeviceConfig(int networkId) = 0;
+
+    /**
+     * @Description Obtaining ip Request Information
+     *
+     * @param info - IpInfo object
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode GetIpInfo(IpInfo &info) = 0;
+
+    /**
+     * @Description Reconnect to the currently active network
+     *
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode ReConnect() = 0;
+
+    /**
+     * @Description ReAssociate network
+     *
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode ReAssociate() = 0;
 
     /**
      * @Description  Get the device MAC address.

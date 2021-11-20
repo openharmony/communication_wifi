@@ -21,9 +21,10 @@
 #include "wifi_internal_event_dispatcher.h"
 #include "wifi_scan_death_recipient.h"
 
+DEFINE_WIFILOG_SCAN_LABEL("WifiScanStub");
+
 namespace OHOS {
 namespace Wifi {
-DEFINE_WIFILOG_SCAN_LABEL("WifiScanStub");
 WifiScanStub::WifiScanStub() : callback_(nullptr), mSingleCallback(false)
 {}
 
@@ -83,45 +84,26 @@ sptr<IWifiScanCallback> WifiScanStub::GetCallback() const
 
 int WifiScanStub::OnSetScanControlInfo(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
-    WIFI_LOGD("run OnSetScanControlInfo code %{public}u, datasize %zu", code, data.GetRawDataSize());
+    WIFI_LOGD("run OnSetScanControlInfo code %{public}u, datasize %{public}zu", code, data.GetRawDataSize());
     ScanControlInfo info;
-    int forbidMapSize = data.ReadInt32();
-    for (int i = 0; i < forbidMapSize; i++) {
-        int tmp = data.ReadInt32();
-        int modeMapSize = data.ReadInt32();
-        std::vector<ScanForbidMode> scanModeList;
-        for (int j = 0; j < modeMapSize; j++) {
-            ScanForbidMode scanForbidMode;
-            int tmpScanMode = data.ReadInt32();
-            if (tmpScanMode < 0 || tmpScanMode >= int(ScanMode::SCAN_MODE_MAX)) {
-                continue;
-            }
-            scanForbidMode.scanMode = ScanMode(tmpScanMode);
-            scanForbidMode.forbidTime = data.ReadInt32();
-            scanForbidMode.forbidCount = data.ReadInt32();
-            scanModeList.push_back(scanForbidMode);
-        }
-        if (tmp < 0 || tmp >= int(SCAN_SCENE_MAX)) {
-            continue;
-        }
-        info.scanForbidMap.insert(std::pair<int, std::vector<ScanForbidMode>>(tmp, scanModeList));
+    int forbidListSize = data.ReadInt32();
+    for (int i = 0; i < forbidListSize; i++) {
+        ScanForbidMode scanForbidMode;
+        scanForbidMode.scanScene = data.ReadInt32();
+        scanForbidMode.scanMode = static_cast<ScanMode>(data.ReadInt32());
+        scanForbidMode.forbidTime = data.ReadInt32();
+        scanForbidMode.forbidCount = data.ReadInt32();
+        info.scanForbidList.push_back(scanForbidMode);
     }
 
     int intervalSize = data.ReadInt32();
     for (int i = 0; i < intervalSize; i++) {
         ScanIntervalMode scanIntervalMode;
         scanIntervalMode.scanScene = data.ReadInt32();
-        int mode = data.ReadInt32();
-        if (mode < 0 || mode >= int(ScanMode::SCAN_MODE_MAX)) {
-            continue;
-        }
-        scanIntervalMode.scanMode = ScanMode(mode);
-        scanIntervalMode.isSingle = data.ReadInt32();
-        scanIntervalMode.intervalMode = (IntervalMode)data.ReadInt32();
+        scanIntervalMode.scanMode = static_cast<ScanMode>(data.ReadInt32());
+        scanIntervalMode.isSingle = data.ReadBool();
+        scanIntervalMode.intervalMode = static_cast<IntervalMode>(data.ReadInt32());
         scanIntervalMode.interval = data.ReadInt32();
-        if (scanIntervalMode.interval < MIN_SCAN_INTERVAL) {
-            continue;
-        }
         scanIntervalMode.count = data.ReadInt32();
         info.scanIntervalList.push_back(scanIntervalMode);
     }
@@ -135,7 +117,7 @@ int WifiScanStub::OnSetScanControlInfo(uint32_t code, MessageParcel &data, Messa
 
 int WifiScanStub::OnScan(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
-    WIFI_LOGD("run OnScan code %{public}u, datasize %zu", code, data.GetRawDataSize());
+    WIFI_LOGD("run OnScan code %{public}u, datasize %{public}zu", code, data.GetRawDataSize());
     ErrCode ret = Scan();
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
@@ -145,7 +127,7 @@ int WifiScanStub::OnScan(uint32_t code, MessageParcel &data, MessageParcel &repl
 
 int WifiScanStub::OnScanByParams(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
-    WIFI_LOGD("run OnScanByParams code %{public}u, datasize %zu", code, data.GetRawDataSize());
+    WIFI_LOGD("run OnScanByParams code %{public}u, datasize %{public}zu", code, data.GetRawDataSize());
     WifiScanParams params;
     params.ssid = data.ReadCString();
     params.bssid = data.ReadCString();
@@ -165,7 +147,7 @@ int WifiScanStub::OnScanByParams(uint32_t code, MessageParcel &data, MessageParc
 
 int WifiScanStub::OnIsWifiClosedScan(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
-    WIFI_LOGD("run OnIsWifiClosedScan code %{public}u, datasize %zu", code, data.GetRawDataSize());
+    WIFI_LOGD("run OnIsWifiClosedScan code %{public}u, datasize %{public}zu", code, data.GetRawDataSize());
     bool bOpen = false;
     ErrCode ret = IsWifiClosedScan(bOpen);
     reply.WriteInt32(0);
@@ -178,7 +160,7 @@ int WifiScanStub::OnIsWifiClosedScan(uint32_t code, MessageParcel &data, Message
 
 int WifiScanStub::OnGetScanInfoList(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
-    WIFI_LOGD("run OnGetScanInfoList code %{public}u, datasize %zu", code, data.GetRawDataSize());
+    WIFI_LOGD("run OnGetScanInfoList code %{public}u, datasize %{public}zu", code, data.GetRawDataSize());
     std::vector<WifiScanInfo> result;
     ErrCode ret = GetScanInfoList(result);
     reply.WriteInt32(0);
@@ -216,7 +198,7 @@ int WifiScanStub::OnGetScanInfoList(uint32_t code, MessageParcel &data, MessageP
 
 int WifiScanStub::OnRegisterCallBack(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
-    WIFI_LOGD("run %{public}s code %{public}u, datasize %zu", __func__, code, data.GetRawDataSize());
+    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
     ErrCode ret = WIFI_OPT_FAILED;
     do {
         sptr<IRemoteObject> remote = data.ReadRemoteObject();

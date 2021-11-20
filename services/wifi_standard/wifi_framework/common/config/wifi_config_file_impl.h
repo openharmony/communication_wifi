@@ -92,6 +92,13 @@ public:
     int GetValue(std::vector<T> &results);
 
     /**
+     * @Description Get config values
+     *
+     * @return config values
+     */
+    const std::vector<T>& GetValue() const;
+
+    /**
      * @Description Set the config value
      *
      * @param values - input config values
@@ -123,7 +130,6 @@ int WifiConfigFileImpl<T>::LoadConfig()
     T item;
     std::string line;
     while (std::getline(fs, line)) {
-        DelComment(line);
         TrimString(line);
         if (line.empty()) {
             continue;
@@ -188,7 +194,13 @@ int WifiConfigFileImpl<T>::GetValue(std::vector<T> &results)
     return 0;
 }
 
-template<typename T>
+template <typename T>
+const std::vector<T>& WifiConfigFileImpl<T>::GetValue() const
+{
+    return mValues;
+}
+
+template <typename T>
 int WifiConfigFileImpl<T>::SetValue(const std::vector<T> &results)
 {
     mValues = results;

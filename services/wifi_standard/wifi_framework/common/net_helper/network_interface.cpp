@@ -58,22 +58,22 @@ bool NetworkInterface::IsValidInterfaceName(const std::string &interfaceName)
 
 void NetworkInterface::Dump(const std::string &interfaceName)
 {
-    WIFI_LOGI("InterfaceName  [%s]", interfaceName.c_str());
+    WIFI_LOGI("InterfaceName  [%{private}s]", interfaceName.c_str());
 
     std::vector<Ipv4Address> vecIPv4;
     std::vector<Ipv6Address> vecIPv6;
 
     bool ret = FetchInterfaceConfig(interfaceName, vecIPv4, vecIPv6);
     if (!ret) {
-        WIFI_LOGI("Fetch Interface [%s] failed.", interfaceName.c_str());
+        WIFI_LOGI("Fetch Interface [%{private}s] failed.", interfaceName.c_str());
     }
 
-    WIFI_LOGI("\tIPv4  size   [%zu]", vecIPv4.size());
+    WIFI_LOGI("\tIPv4  size   [%{private}zu]", vecIPv4.size());
     for (const auto &item : vecIPv4) {
         item.Dump();
     }
 
-    WIFI_LOGI("\tIPv6  size   [%zu]", vecIPv6.size());
+    WIFI_LOGI("\tIPv6  size   [%{private}zu]", vecIPv6.size());
     for (const auto &item : vecIPv6) {
         item.Dump();
     }
@@ -146,14 +146,14 @@ bool NetworkInterface::AddIpAddress(const std::string &interfaceName, const Base
 
     /* Avoid repeated add. */
     if (IsExistAddressForInterface(interfaceName, ipAddress)) {
-        WIFI_LOGI("In interface [%{public}s], the address [%s] is exist.",
+        WIFI_LOGI("In interface [%{public}s], the address [%{private}s] is exist.",
             interfaceName.c_str(),
             ipAddress.GetAddressWithString().c_str());
         return true;
     }
 
     if (!IpAddressChange(interfaceName, ipAddress, true)) {
-        WIFI_LOGE("Interface [%{public}s] add address [%s] failed.",
+        WIFI_LOGE("Interface [%{public}s] add address [%{private}s] failed.",
             interfaceName.c_str(),
             ipAddress.GetAddressWithString().c_str());
         return false;
@@ -164,18 +164,18 @@ bool NetworkInterface::AddIpAddress(const std::string &interfaceName, const Base
 bool NetworkInterface::DelIpAddress(const std::string &interfaceName, const BaseAddress &ipAddress)
 {
     if (!ipAddress.IsValid()) {
-        WIFI_LOGE("Del IP address [%s] is not valid.", ipAddress.GetAddressWithString().c_str());
+        WIFI_LOGE("Del IP address [%{private}s] is not valid.", ipAddress.GetAddressWithString().c_str());
         return false;
     }
 
     if (!IsExistAddressForInterface(interfaceName, ipAddress)) {
-        WIFI_LOGI("In interface [%{public}s], the address [%s] is not exist.",
+        WIFI_LOGI("In interface [%{public}s], the address [%{private}s] is not exist.",
             interfaceName.c_str(),
             ipAddress.GetAddressWithString().c_str());
         return true;
     }
     if (!IpAddressChange(interfaceName, ipAddress, false)) {
-        WIFI_LOGE("Interface [%{public}s] del address [%s] failed.",
+        WIFI_LOGE("Interface [%{public}s] del address [%{private}s] failed.",
             interfaceName.c_str(),
             ipAddress.GetAddressWithString().c_str());
         return false;
@@ -283,7 +283,7 @@ bool NetworkInterface::IpAddressChange(
     const std::string &interface, const BaseAddress &ipAddress, bool action, bool dad)
 {
     if (!ipAddress.IsValid() || ipAddress.GetFamilyType() == BaseAddress::FamilyType::FAMILY_INET6) {
-        WIFI_LOGE("bad input parameter [%{public}s][%s]/[%zu]to change ip.", interface.c_str(),
+        WIFI_LOGE("bad input parameter [%{public}s][%{private}s]/[%{private}zu]to change ip.", interface.c_str(),
             ipAddress.GetAddressWithString().c_str(), ipAddress.GetAddressPrefixLength());
         return false;
     }
@@ -317,7 +317,7 @@ bool NetworkInterface::IpAddressChange(
     }
     if (ioctl(fd, SIOCSIFADDR, &ifr) < 0) {
         close(fd);
-        WIFI_LOGE("ioctl set ip address failed, error is: %d.", errno);
+        WIFI_LOGE("ioctl set ip address failed, error is: %{public}d.", errno);
         return false;
     }
     if (inet_aton(Mask.c_str(), &(sin->sin_addr)) < 0) {
@@ -326,7 +326,7 @@ bool NetworkInterface::IpAddressChange(
     }
     if (ioctl(fd, SIOCSIFNETMASK, &ifr) < 0) {
         close(fd);
-        WIFI_LOGE("ioctl set mask address failed, error is: %d.", errno);
+        WIFI_LOGE("ioctl set mask address failed, error is: %{public}d.", errno);
         return false;
     }
     close(fd);
@@ -337,12 +337,12 @@ bool NetworkInterface::WriteDataToFile(const std::string &fileName, const std::s
 {
     int fd = open(fileName.c_str(), O_WRONLY | O_CLOEXEC);
     if (fd < 0) {
-        WIFI_LOGE("open %{public}s fail, error: %d", fileName.c_str(), errno);
+        WIFI_LOGE("open %{public}s fail, error: %{public}d", fileName.c_str(), errno);
         return false;
     }
 
     if (static_cast<size_t>(write(fd, content.c_str(), content.length())) != content.length()) {
-        WIFI_LOGE("write content [%s] to file [%{public}s] failed. error: %{public}d.",
+        WIFI_LOGE("write content [%{public}s] to file [%{public}s] failed. error: %{public}d.",
             content.c_str(), fileName.c_str(), errno);
         close(fd);
         return false;

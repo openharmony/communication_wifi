@@ -506,7 +506,7 @@ void WifiDeviceStub::OnGetCountryCode(uint32_t code, MessageParcel &data, Messag
 
 void WifiDeviceStub::OnRegisterCallBack(uint32_t code, MessageParcel &data, MessageParcel &reply)
 {
-    WIFI_LOGD("run %{public}s code %{public}u, datasize %zu", __func__, code, data.GetRawDataSize());
+    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
     ErrCode ret = WIFI_OPT_FAILED;
     do {
         sptr<IRemoteObject> remote = data.ReadRemoteObject();

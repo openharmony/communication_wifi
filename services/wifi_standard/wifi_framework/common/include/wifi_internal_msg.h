@@ -24,8 +24,6 @@ namespace Wifi {
 constexpr int REOPEN_STA_INTERVAL = 500; /* when reopen sta, need over last close sta time then interval */
 constexpr int DEVICE_CONFIG_INDEX_SSID = 0;
 constexpr int DEVICE_CONFIG_INDEX_BSSID = 1;
-constexpr int STATE_OPEN = 1;
-constexpr int STATE_CLOSE = 2;
 constexpr int PRIORITY_1 = 1;
 constexpr int PRIORITY_2 = 2;
 constexpr int PRIORITY_3 = 3;
@@ -183,7 +181,7 @@ struct InterScanInfo {
 struct SingleAppForbid {
     int appID;
     ScanIntervalMode scanIntervalMode;
-    int lessThanIntervalNum;
+    int lessThanIntervalCount;
     time_t continueScanTime;
     time_t blockListScanTime;
     int expScanCount;
@@ -192,7 +190,7 @@ struct SingleAppForbid {
     SingleAppForbid()
     {
         appID = 0;
-        lessThanIntervalNum = 0;
+        lessThanIntervalCount = 0;
         continueScanTime = 0;
         blockListScanTime = 0;
         expScanCount = 0;
@@ -266,7 +264,8 @@ struct WifiConfig {
     int secondRssiLevel5G;
     int thirdRssiLevel5G;
     int fourthRssiLevel5G;
-
+    std::string strDnsBak;
+    bool isLoadStabak;
     WifiConfig()
     {
         scanAlwaysSwitch = false;
@@ -300,7 +299,19 @@ struct WifiConfig {
         secondRssiLevel5G = RSSI_LEVEL_2_5G;
         thirdRssiLevel5G = RSSI_LEVEL_3_5G;
         fourthRssiLevel5G = RSSI_LEVEL_4_5G;
+        strDnsBak = "8.8.8.8";
+        isLoadStabak = true;
     }
+};
+
+struct TrustListPolicy {
+    int sceneId = 0;        /* scene id */
+    std::string sceneName;  /* scene name, just to read. */
+    std::string trustList;  /* trust list, eg: for A,B,and C,the format is A|B|C */
+};
+
+struct MovingFreezePolicy {
+    std::string trustList;  /* trust list */
 };
 }  // namespace Wifi
 }  // namespace OHOS

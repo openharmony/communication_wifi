@@ -40,6 +40,7 @@ enum ErrCode {
     WIFI_OPT_P2P_ERR_MAC_FORMAT,
     WIFI_OPT_P2P_ERR_INTENT,
     WIFI_OPT_P2P_ERR_SIZE_NW_NAME,
+    WIFI_OPT_MOVING_FREEZE_CTRL,      /* moving freeze scanning control */
 };
 }  // namespace Wifi
 }  // namespace OHOS

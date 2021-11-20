@@ -51,6 +51,13 @@ public:
      */
     virtual ErrCode ScanWithParam(const WifiScanParams &wifiScanParams) = 0;
     /**
+     * @Description Disable/Restore the scanning operation.
+     *
+     * * @param params - disable or not.
+     * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
+     */
+    virtual ErrCode DisableScan(bool disable) = 0;
+    /**
      * @Description Processes interface service screen change request.
      *
      * @param screenState screen state[in]
@@ -70,7 +77,13 @@ public:
      * @param appMode operate app mode[in]
      * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
      */
-    virtual ErrCode OnAppRunningModeChanged(int appMode) = 0;
+    virtual ErrCode OnAppRunningModeChanged(ScanMode appRunMode) = 0;
+    /**
+     * @Description Updates the MovingFreeze state when the associated state changes.
+     *
+     * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
+     */
+    virtual ErrCode OnMovingFreezeStateChange() = 0;
     /**
      * @Description Processes interface service custom scene change request.
      *
@@ -79,6 +92,13 @@ public:
      * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
      */
     virtual ErrCode OnCustomControlStateChanged(int customScene, int customSceneStatus) = 0;
+    /**
+     * @Description Get custom scene state.
+     *
+     * @param sceneMap custom scene state map[out]
+     * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
+     */
+    virtual ErrCode OnGetCustomSceneState(std::map<int, time_t>& sceneMap) const = 0;
     /**
      * @Description Processes interface service scan control info change request.
      *

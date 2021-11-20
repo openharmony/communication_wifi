@@ -57,9 +57,8 @@ void MockScanService::SystemScanProcess(bool scanAtOnce)
     WIFI_LOGI("Enter MockScanService::SystemScanProcess");
 }
 
-void MockScanService::HandleScreenStatusChanged(bool screenOn)
+void MockScanService::HandleScreenStatusChanged()
 {
-    (void)screenOn;
     WIFI_LOGI("Enter MockScanService::HandleScreenStatusChanged");
 }
 
@@ -76,10 +75,10 @@ void MockScanService::HandleCustomStatusChanged(int customScene, int customScene
     WIFI_LOGI("Enter MockScanService::HandleCustomStatusChanged");
 }
 
-void MockScanService::SetOperateAppMode(int appMode)
+void MockScanService::HandleGetCustomSceneState(std::map<int, time_t>& sceneMap) const
 {
-    (void)appMode;
-    WIFI_LOGI("Enter MockScanService::SetOperateAppMode");
+    (void)sceneMap;
+    WIFI_LOGI("Enter MockScanService::HandleGetCustomSceneState");
 }
 
 void MockScanService::GetScanControlInfo()

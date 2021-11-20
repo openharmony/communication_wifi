@@ -37,10 +37,12 @@ WifiSettings::WifiSettings()
       mApMaxConnNum(0),
       mLastSelectedNetworkId(-1),
       mLastSelectedTimeVal(0),
-      mScreenState(1),
+      mScreenState(MODE_STATE_OPEN),
       mAirplaneModeState(MODE_STATE_CLOSE),
-      mAppRunningModeState(1),
-      mPowerSavingModeState(MODE_STATE_CLOSE)
+      mAppRunningModeState(ScanMode::SYS_FOREGROUND_SCAN),
+      mPowerSavingModeState(MODE_STATE_CLOSE),
+      mFreezeModeState(MODE_STATE_CLOSE),
+      mNoChargerPlugModeState(MODE_STATE_CLOSE)
 {}
 
 WifiSettings::~WifiSettings()
@@ -121,12 +123,17 @@ int WifiSettings::Init()
     mSavedWifiConfig.SetConfigFilePath(WIFI_CONFIG_FILE_PATH);
     mSavedWifiP2pGroupInfo.SetConfigFilePath(WIFI_P2P_GROUP_INFO_FILE_PATH);
     mSavedWifiP2pVendorConfig.SetConfigFilePath(WIFI_P2P_VENDOR_CONFIG_FILE_PATH);
+    mTrustListPolicies.SetConfigFilePath(WIFI_TRUST_LIST_POLICY_FILE_PATH);
+    mMovingFreezePolicy.SetConfigFilePath(WIFI_MOVING_FREEZE_POLICY_FILE_PATH);
     InitWifiConfig();
     ReloadDeviceConfig();
     InitHotspotConfig();
-    InitScanControlInfo();
     InitP2pVendorConfig();
     ReloadWifiP2pGroupInfoConfig();
+    InitScanControlInfo();
+    ReloadTrustListPolicies();
+    ReloadMovingFreezePolicy();
+
     return 0;
 }
 
@@ -798,30 +805,42 @@ void WifiSettings::InitGetApMaxConnNum()
 void WifiSettings::InitScanControlForbidList(void)
 {
     /* Disable external scanning during scanning. */
-    std::vector<ScanForbidMode> forbidModeList;
     ScanForbidMode forbidMode;
     forbidMode.scanMode = ScanMode::ALL_EXTERN_SCAN;
-    forbidModeList.push_back(forbidMode);
-    mScanControlInfo.scanForbidMap[SCAN_SCENE_SCANNING] = forbidModeList;
+    forbidMode.scanScene = SCAN_SCENE_SCANNING;
+    mScanControlInfo.scanForbidList.push_back(forbidMode);
 
     /* Disable external scanning when the screen is shut down. */
-    mScanControlInfo.scanForbidMap[SCAN_SCENE_SCREEN_OFF] = forbidModeList;
+    forbidMode.scanMode = ScanMode::ALL_EXTERN_SCAN;
+    forbidMode.scanScene = SCAN_SCENE_SCREEN_OFF;
+    mScanControlInfo.scanForbidList.push_back(forbidMode);
 
     /* Disable all scans in connection */
+    forbidMode.scanMode = ScanMode::ALL_EXTERN_SCAN;
+    forbidMode.scanScene = SCAN_SCENE_CONNECTING;
+    mScanControlInfo.scanForbidList.push_back(forbidMode);
     forbidMode.scanMode = ScanMode::PNO_SCAN;
-    forbidModeList.push_back(forbidMode);
+    forbidMode.scanScene = SCAN_SCENE_CONNECTING;
+    mScanControlInfo.scanForbidList.push_back(forbidMode);
     forbidMode.scanMode = ScanMode::SYSTEM_TIMER_SCAN;
-    forbidModeList.push_back(forbidMode);
-    mScanControlInfo.scanForbidMap[SCAN_SCENE_CONNECTING] = forbidModeList;
+    forbidMode.scanScene = SCAN_SCENE_CONNECTING;
+    mScanControlInfo.scanForbidList.push_back(forbidMode);
 
     /* Deep sleep disables all scans. */
-    mScanControlInfo.scanForbidMap[SCAN_SCENE_DEEP_SLEEP] = forbidModeList;
+    forbidMode.scanMode = ScanMode::ALL_EXTERN_SCAN;
+    forbidMode.scanScene = SCAN_SCENE_DEEP_SLEEP;
+    mScanControlInfo.scanForbidList.push_back(forbidMode);
+    forbidMode.scanMode = ScanMode::PNO_SCAN;
+    forbidMode.scanScene = SCAN_SCENE_DEEP_SLEEP;
+    mScanControlInfo.scanForbidList.push_back(forbidMode);
+    forbidMode.scanMode = ScanMode::SYSTEM_TIMER_SCAN;
+    forbidMode.scanScene = SCAN_SCENE_DEEP_SLEEP;
+    mScanControlInfo.scanForbidList.push_back(forbidMode);
 
     /* PNO scanning disabled */
-    forbidModeList.clear();
     forbidMode.scanMode = ScanMode::PNO_SCAN;
-    forbidModeList.push_back(forbidMode);
-    mScanControlInfo.scanForbidMap[SCAN_SCENE_CONNECTED] = forbidModeList;
+    forbidMode.scanScene = SCAN_SCENE_CONNECTED;
+    mScanControlInfo.scanForbidList.push_back(forbidMode);
     return;
 }
 
@@ -829,7 +848,7 @@ void WifiSettings::InitScanControlIntervalList(void)
 {
     /* Foreground app: 4 times in 2 minutes for a single application */
     ScanIntervalMode scanIntervalMode;
-    scanIntervalMode.scanScene = SCAN_SCENE_ALL;
+    scanIntervalMode.scanScene = SCAN_SCENE_FREQUENCY_ORIGIN;
     scanIntervalMode.scanMode = ScanMode::APP_FOREGROUND_SCAN;
     scanIntervalMode.isSingle = true;
     scanIntervalMode.intervalMode = IntervalMode::INTERVAL_FIXED;
@@ -838,12 +857,40 @@ void WifiSettings::InitScanControlIntervalList(void)
     mScanControlInfo.scanIntervalList.push_back(scanIntervalMode);
 
     /* Backend apps: once every 30 minutes */
-    scanIntervalMode.scanScene = SCAN_SCENE_ALL;
+    scanIntervalMode.scanScene = SCAN_SCENE_FREQUENCY_ORIGIN;
     scanIntervalMode.scanMode = ScanMode::APP_BACKGROUND_SCAN;
     scanIntervalMode.isSingle = false;
     scanIntervalMode.intervalMode = IntervalMode::INTERVAL_FIXED;
     scanIntervalMode.interval = BACKGROUND_SCAN_CONTROL_INTERVAL;
     scanIntervalMode.count = BACKGROUND_SCAN_CONTROL_TIMES;
+    mScanControlInfo.scanIntervalList.push_back(scanIntervalMode);
+
+    /* no charger plug */
+    /* All app: If the scanning interval is less than 5s for five  */
+    /* consecutive times, the scanning can be performed only after */
+    /* the scanning interval is greater than 5s. */
+    const int frequencyContinueInterval = 5;
+    const int frequencyContinueCount = 5;
+    scanIntervalMode.scanScene = SCAN_SCENE_FREQUENCY_CUSTOM;
+    scanIntervalMode.scanMode = ScanMode::ALL_EXTERN_SCAN;
+    scanIntervalMode.isSingle = false;
+    scanIntervalMode.intervalMode = IntervalMode::INTERVAL_CONTINUE;
+    scanIntervalMode.interval = frequencyContinueInterval;
+    scanIntervalMode.count = frequencyContinueCount;
+    mScanControlInfo.scanIntervalList.push_back(scanIntervalMode);
+
+    /* no charger plug */
+    /* Single app: If all scanning interval in 10 times is less than */
+    /* the threshold (20s), the app is added to the blocklist and  */
+    /* cannot initiate scanning. */
+    const int frequencyBlocklistInterval = 20;
+    const int frequencyBlocklistCount = 10;
+    scanIntervalMode.scanScene = SCAN_SCENE_FREQUENCY_CUSTOM;
+    scanIntervalMode.scanMode = ScanMode::ALL_EXTERN_SCAN;
+    scanIntervalMode.isSingle = true;
+    scanIntervalMode.intervalMode = IntervalMode::INTERVAL_BLOCKLIST;
+    scanIntervalMode.interval = frequencyBlocklistInterval;
+    scanIntervalMode.count = frequencyBlocklistCount;
     mScanControlInfo.scanIntervalList.push_back(scanIntervalMode);
 
     /* PNO scanning every 20 seconds */
@@ -956,7 +1003,7 @@ void WifiSettings::SetScreenState(const int &state)
     mScreenState = state;
 }
 
-int WifiSettings::GetScreenState()
+int WifiSettings::GetScreenState() const
 {
     return mScreenState;
 }
@@ -966,17 +1013,21 @@ void WifiSettings::SetAirplaneModeState(const int &state)
     mAirplaneModeState = state;
 }
 
-int WifiSettings::GetAirplaneModeState()
+int WifiSettings::GetAirplaneModeState() const
 {
     return mAirplaneModeState;
 }
 
-void WifiSettings::SetAppRunningState(const int &state)
+void WifiSettings::SetAppRunningState(ScanMode appRunMode)
 {
-    mAppRunningModeState = state;
+    if (static_cast<int>(appRunMode) < static_cast<int>(ScanMode::APP_FOREGROUND_SCAN) ||
+        static_cast<int>(appRunMode) > static_cast<int>(ScanMode::SYS_BACKGROUND_SCAN)) {
+        return;
+    }
+    mAppRunningModeState = appRunMode;
 }
 
-int WifiSettings::GetAppRunningState()
+ScanMode WifiSettings::GetAppRunningState() const
 {
     return mAppRunningModeState;
 }
@@ -986,9 +1037,39 @@ void WifiSettings::SetPowerSavingModeState(const int &state)
     mPowerSavingModeState = state;
 }
 
-int WifiSettings::GetPowerSavingModeState()
+int WifiSettings::GetPowerSavingModeState() const
 {
     return mPowerSavingModeState;
+}
+
+void WifiSettings::SetAppPackageName(const std::string &appPackageName)
+{
+    mAppPackageName = appPackageName;
+}
+
+const std::string& WifiSettings::GetAppPackageName() const
+{
+    return mAppPackageName;
+}
+
+void WifiSettings::SetFreezeModeState(int state)
+{
+    mFreezeModeState = state;
+}
+
+int WifiSettings::GetFreezeModeState() const
+{
+    return mFreezeModeState;
+}
+
+void WifiSettings::SetNoChargerPlugModeState(int state)
+{
+    mNoChargerPlugModeState = state;
+}
+
+int WifiSettings::GetNoChargerPlugModeState() const
+{
+    return mNoChargerPlugModeState;
 }
 
 int WifiSettings::SetWhetherToAllowNetworkSwitchover(bool bSwitch)
@@ -1122,11 +1203,57 @@ int WifiSettings::GetMinRssi5Ghz()
     return mWifiConfig.minRssi5Ghz;
 }
 
+std::string WifiSettings::GetStrDnsBak() const
+{
+    return mWifiConfig.strDnsBak;
+}
+
+bool WifiSettings::IsLoadStabak() const
+{
+    return mWifiConfig.isLoadStabak;
+}
+
 int WifiSettings::SetP2pDeviceName(const std::string &deviceName)
 {
     std::unique_lock<std::mutex> lock(mP2pMutex);
     mP2pVendorConfig.SetDeviceName(deviceName);
     return mSavedWifiP2pVendorConfig.SaveConfig();
 }
-}  // namespace Wifi
-}  // namespace OHOS
+
+const std::vector<TrustListPolicy>& WifiSettings::ReloadTrustListPolicies()
+{
+    std::unique_lock<std::mutex> lock(mStaMutex);
+    mTrustListPolicies.LoadConfig();
+    if (mTrustListPolicies.GetValue().size() <= 0) {
+        std::vector<TrustListPolicy> policies;
+        TrustListPolicy policy;
+        policies.push_back(policy);
+        mTrustListPolicies.SetValue(policies);
+        mTrustListPolicies.SaveConfig();
+        mTrustListPolicies.LoadConfig();
+    }
+
+    return mTrustListPolicies.GetValue();
+}
+
+const MovingFreezePolicy &WifiSettings::ReloadMovingFreezePolicy()
+{
+    std::unique_lock<std::mutex> lock(mStaMutex);
+    mMovingFreezePolicy.LoadConfig();
+
+    if (mMovingFreezePolicy.GetValue().size() <= 0) {
+        std::vector<MovingFreezePolicy> policies;
+        MovingFreezePolicy policy;
+        policies.push_back(policy);
+        mMovingFreezePolicy.SetValue(policies);
+        mMovingFreezePolicy.SaveConfig();
+        mMovingFreezePolicy.LoadConfig();
+    }
+
+    if (mMovingFreezePolicy.GetValue().size() <= 0) {
+        return mFPolicy;
+    }
+    return mMovingFreezePolicy.GetValue()[0];
+}
+} // namespace Wifi
+} // namespace OHOS

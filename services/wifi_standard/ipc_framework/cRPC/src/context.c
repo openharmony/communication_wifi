@@ -39,7 +39,7 @@ Context *CreateContext(int capacity)
         free(context);
         return NULL;
     }
-    context->cSplit = '|';
+    context->cSplit = '\t';
     context->cMsgEnd = "$$$$$$";
     return context;
 }

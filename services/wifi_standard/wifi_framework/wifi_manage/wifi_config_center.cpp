@@ -145,6 +145,11 @@ int WifiConfigCenter::GetCountryCode(std::string &countryCode)
     return WifiSettings::GetInstance().GetCountryCode(countryCode);
 }
 
+bool WifiConfigCenter::IsLoadStabak()
+{
+    return WifiSettings::GetInstance().IsLoadStabak();
+}
+
 WifiOprMidState WifiConfigCenter::GetApMidState()
 {
     return mApMidState.load();
@@ -310,7 +315,7 @@ void WifiConfigCenter::SetScreenState(const int &state)
     WifiSettings::GetInstance().SetScreenState(state);
 }
 
-int WifiConfigCenter::GetScreenState()
+int WifiConfigCenter::GetScreenState() const
 {
     return WifiSettings::GetInstance().GetScreenState();
 }
@@ -320,17 +325,17 @@ void WifiConfigCenter::SetAirplaneModeState(const int &state)
     WifiSettings::GetInstance().SetAirplaneModeState(state);
 }
 
-int WifiConfigCenter::GetAirplaneModeState()
+int WifiConfigCenter::GetAirplaneModeState() const
 {
     return WifiSettings::GetInstance().GetAirplaneModeState();
 }
 
-void WifiConfigCenter::SetAppRunningState(const int &state)
+void WifiConfigCenter::SetAppRunningState(ScanMode appRunMode)
 {
-    WifiSettings::GetInstance().SetAppRunningState(state);
+    WifiSettings::GetInstance().SetAppRunningState(appRunMode);
 }
 
-int WifiConfigCenter::GetAppRunningState()
+ScanMode WifiConfigCenter::GetAppRunningState() const
 {
     return WifiSettings::GetInstance().GetAppRunningState();
 }
@@ -340,9 +345,39 @@ void WifiConfigCenter::SetPowerSavingModeState(const int &state)
     WifiSettings::GetInstance().SetPowerSavingModeState(state);
 }
 
-int WifiConfigCenter::GetPowerSavingModeState()
+int WifiConfigCenter::GetPowerSavingModeState() const
 {
     return WifiSettings::GetInstance().GetPowerSavingModeState();
+}
+
+void WifiConfigCenter::SetAppPackageName(const std::string &appPackageName)
+{
+    WifiSettings::GetInstance().SetAppPackageName(appPackageName);
+}
+
+const std::string& WifiConfigCenter::GetAppPackageName() const
+{
+    return WifiSettings::GetInstance().GetAppPackageName();
+}
+
+void WifiConfigCenter::SetFreezeModeState(int state)
+{
+    WifiSettings::GetInstance().SetFreezeModeState(state);
+}
+
+int WifiConfigCenter::GetFreezeModeState() const
+{
+    return WifiSettings::GetInstance().GetFreezeModeState();
+}
+
+void WifiConfigCenter::SetNoChargerPlugModeState(int state)
+{
+    WifiSettings::GetInstance().SetNoChargerPlugModeState(state);
+}
+
+int WifiConfigCenter::GetNoChargerPlugModeState() const
+{
+    return WifiSettings::GetInstance().GetNoChargerPlugModeState();
 }
 
 int WifiConfigCenter::SetP2pDeviceName(const std::string &deviceName)

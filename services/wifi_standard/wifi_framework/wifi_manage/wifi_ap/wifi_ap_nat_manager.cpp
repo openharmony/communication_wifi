@@ -38,8 +38,8 @@ const int SYSTEM_NOT_EXECUTED = 127;
 
 bool WifiApNatManager::EnableInterfaceNat(bool enable, std::string inInterfaceName, std::string outInterfaceName) const
 {
-    WIFI_LOGI("EnableInterfaceNat enable [%{public}s], inInterfaceName [%s]  outInterfaceName "
-         "[%s].",
+    WIFI_LOGI("EnableInterfaceNat enable [%{public}s], inInterfaceName [%privates]  outInterfaceName "
+         "[%privates].",
         enable ? "true" : "false",
         inInterfaceName.c_str(),
         outInterfaceName.c_str());
@@ -148,7 +148,7 @@ bool WifiApNatManager::WriteDataToFile(const std::string &fileName, const std::s
 {
     std::ofstream outf(fileName, std::ios::out);
     if (!outf) {
-        WIFI_LOGE("write content [%s] to file [%s] failed. error: %{public}d.",
+        WIFI_LOGE("write content [%publics] to file [%publics] failed. error: %{public}d.",
             content.c_str(), fileName.c_str(), errno);
         return false;
     }
@@ -165,11 +165,11 @@ bool WifiApNatManager::ExecCommand(const std::vector<std::string> &vecCommandArg
         command += " ";
     }
 
-    WIFI_LOGE("exec cmd: [%s]", command.c_str());
+    WIFI_LOGE("exec cmd: [%{private}s]", command.c_str());
 
     int ret = system(command.c_str());
     if (ret == -1 || ret == SYSTEM_NOT_EXECUTED) {
-        WIFI_LOGE("exec failed. cmd: %s, error:%{public}d.", command.c_str(), errno);
+        WIFI_LOGE("exec failed. cmd: %{private}s, error:%{public}d.", command.c_str(), errno);
         return false;
     }
 

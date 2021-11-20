@@ -24,9 +24,6 @@
 #include <algorithm>
 #include "wifi_config_file_impl.h"
 
-constexpr int MODE_STATE_OPEN = 1;
-constexpr int MODE_STATE_CLOSE = 2;
-
 constexpr int RANDOM_STR_LEN = 6;
 constexpr int MSEC = 1000;
 constexpr int FOREGROUND_SCAN_CONTROL_TIMES = 4;
@@ -49,6 +46,9 @@ constexpr char BLOCK_LIST_FILE_PATH[] = "/data/misc/wifi/block_list.conf";
 constexpr char WIFI_CONFIG_FILE_PATH[] = "/data/misc/wifi/wifi_config.conf";
 constexpr char WIFI_P2P_GROUP_INFO_FILE_PATH[] = "/data/misc/wifi/p2p_groups.conf";
 constexpr char WIFI_P2P_VENDOR_CONFIG_FILE_PATH[] = "/data/misc/wifi/p2p_vendor_config.conf";
+const std::string WIFI_TRUST_LIST_POLICY_FILE_PATH = "/data/misc/wifi/trust_list_polices.conf";
+const std::string WIFI_MOVING_FREEZE_POLICY_FILE_PATH = "/data/misc/wifi/moving_freeze_policy.conf";
+
 namespace OHOS {
 namespace Wifi {
 using ChannelsTable = std::map<BandType, std::vector<int32_t>>;
@@ -673,7 +673,7 @@ public:
      *
      * @return int - 1 on; 2 off
      */
-    int GetScreenState();
+    int GetScreenState() const;
 
     /**
      * @Description Set the Airplane Mode State
@@ -687,21 +687,21 @@ public:
      *
      * @return int - 1 open; 2 close
      */
-    int GetAirplaneModeState();
+    int GetAirplaneModeState() const;
 
     /**
      * @Description Set the App Running State
      *
-     * @param state - 1 front; 2 backend
+     * @param appRunMode - app run mode
      */
-    void SetAppRunningState(const int &state);
+    void SetAppRunningState(ScanMode appRunMode);
 
     /**
      * @Description Get the App Running State
      *
-     * @return int - 1 front; 2 backend
+     * @return ScanMode
      */
-    int GetAppRunningState();
+    ScanMode GetAppRunningState() const;
 
     /**
      * @Description Set the Power Saving Mode State
@@ -715,7 +715,49 @@ public:
      *
      * @return int - 1 open; 2 close
      */
-    int GetPowerSavingModeState();
+    int GetPowerSavingModeState() const;
+
+    /**
+     * @Description Set app package name.
+     *
+     * @param appPackageName - app package name
+     */
+    void SetAppPackageName(const std::string &appPackageName);
+
+    /**
+     * @Description Get app package name.
+     *
+     * @return const std::string& - app package name.
+     */
+    const std::string& GetAppPackageName() const;
+
+    /**
+     * @Description Set freeze mode state.
+     *
+     * @param state - 1 freeze mode; 2 moving mode
+     */
+    void SetFreezeModeState(int state);
+
+    /**
+     * @Description Get freeze mode state.
+     *
+     * @return freeze mode.
+     */
+    int GetFreezeModeState() const;
+    
+    /**
+     * @Description Set no charger plugged in mode.
+     *
+     * @param state - 1 no charger plugged in mode; 2 charger plugged in mode
+     */
+    void SetNoChargerPlugModeState(int state);
+
+    /**
+     * @Description Get no charger plugged in mode.
+     *
+     * @return no charger plugged in mode.
+     */
+    int GetNoChargerPlugModeState() const;
 
     /**
      * @Description Set enable/disable Whether to allow network switchover
@@ -890,6 +932,19 @@ public:
     int GetMinRssi5Ghz();
 
     /**
+     * @Description Get the Alternate dns.
+     *
+     * @return string - dns
+     */
+    std::string GetStrDnsBak() const;
+    /**
+     * @Description Obtaining Whether to Load the Configuration of the Standby STA.
+     *
+     * @return bool - Indicates whether to load the configuration of the standby STA.
+     */
+    bool IsLoadStabak() const;
+
+    /**
      * @Description set the device name
      *
      * @param deviceName - device name
@@ -897,6 +952,19 @@ public:
      */
     int SetP2pDeviceName(const std::string &deviceName);
 
+    /**
+     * @Description get trustlist policies.
+     *
+     * @return const std::vector<TrustListPolicy>& - trustlist policies.
+     */
+    const std::vector<TrustListPolicy>& ReloadTrustListPolicies();
+    
+    /**
+     * @Description get moving freeze state trustlist.
+     *
+     * @return const MovingFreezePolicy& - moving freeze policy.
+     */
+    const MovingFreezePolicy& ReloadMovingFreezePolicy();
 private:
     WifiSettings();
     void InitWifiConfig();
@@ -936,8 +1004,11 @@ private:
     time_t mLastSelectedTimeVal; /* last selected time */
     int mScreenState;            /* 1 on 2 off */
     int mAirplaneModeState;      /* 1 on 2 off */
-    int mAppRunningModeState;    /* 1 front 2 backend */
+    ScanMode mAppRunningModeState; /* 0 app for 1 app back 2 sys for 3 sys back */
     int mPowerSavingModeState;   /* 1 on 2 off */
+    std::string mAppPackageName;
+    int mFreezeModeState;        /* 1 on 2 off */
+    int mNoChargerPlugModeState;  /* 1 on 2 off */
     WifiConfig mWifiConfig;
 
     std::mutex mStaMutex;
@@ -954,6 +1025,9 @@ private:
     WifiConfigFileImpl<WifiConfig> mSavedWifiConfig;
     WifiConfigFileImpl<WifiP2pGroupInfo> mSavedWifiP2pGroupInfo;
     WifiConfigFileImpl<P2pVendorConfig> mSavedWifiP2pVendorConfig;
+    WifiConfigFileImpl<TrustListPolicy> mTrustListPolicies;
+    WifiConfigFileImpl<MovingFreezePolicy> mMovingFreezePolicy;
+    MovingFreezePolicy mFPolicy;
 };
 }  // namespace Wifi
 }  // namespace OHOS

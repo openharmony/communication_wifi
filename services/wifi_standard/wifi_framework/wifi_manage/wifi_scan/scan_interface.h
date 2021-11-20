@@ -16,6 +16,8 @@
 #ifndef OHOS_WIFI_SCAN_INTERFACE_H
 #define OHOS_WIFI_SCAN_INTERFACE_H
 
+#include <map>
+#include "define.h"
 #include "iscan_service.h"
 #include "scan_service.h"
 
@@ -54,6 +56,13 @@ public:
      */
     ErrCode ScanWithParam(const WifiScanParams &wifiScanParams);
     /**
+     * @Description Disable/Restore the scanning operation.
+     *
+     * * @param params - disable or not.
+     * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
+     */
+    ErrCode DisableScan(bool disable);
+    /**
      * @Description Processes interface service screen change request.
      *
      * @param screenState screen state[in]
@@ -73,7 +82,13 @@ public:
      * @param appMode operate app mode[in]
      * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
      */
-    ErrCode OnAppRunningModeChanged(int appMode);
+    ErrCode OnAppRunningModeChanged(ScanMode appRunMode);
+    /**
+     * @Description Updates the MovingFreeze state when the associated state changes.
+     *
+     * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
+     */
+    ErrCode OnMovingFreezeStateChange();
     /**
      * @Description Processes interface service custom scene change request.
      *
@@ -82,6 +97,13 @@ public:
      * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
      */
     ErrCode OnCustomControlStateChanged(int customScene, int customSceneStatus);
+    /**
+     * @Description Get custom scene state.
+     *
+     * @param sceneMap custom scene state map[out]
+     * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
+     */
+    ErrCode OnGetCustomSceneState(std::map<int, time_t>& customSceneStateMap) const;
     /**
      * @Description Processes interface service scan control info change request.
      *

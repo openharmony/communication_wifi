@@ -136,12 +136,9 @@ std::string GetRandomStr(int len)
 
 bool IsAllowScanAnyTime(const ScanControlInfo &info)
 {
-    auto forbidIter = info.scanForbidMap.find(SCAN_SCENE_ALL);
-    for (; forbidIter != info.scanForbidMap.end(); forbidIter++) {
-        for (auto iter = forbidIter->second.begin(); iter != forbidIter->second.end(); iter++) {
-            if (iter->scanMode == ScanMode::ANYTIME_SCAN) {
-                return false;
-            }
+    for (auto forbidIter = info.scanForbidList.begin(); forbidIter != info.scanForbidList.end(); forbidIter++) {
+        if (forbidIter->scanMode == ScanMode::ANYTIME_SCAN && forbidIter->scanScene == SCAN_SCENE_ALL) {
+            return false;
         }
     }
     return true;

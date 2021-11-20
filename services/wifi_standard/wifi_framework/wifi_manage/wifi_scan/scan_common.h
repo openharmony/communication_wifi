@@ -52,6 +52,7 @@ struct ScanConfig {
     int backScanPeriod;                         /* Scan interval for background scan */
     bool fullScanFlag;                          /* Flag indicating whether the request is full scan */
     bool externFlag;                            /* Flag indicating whether the request is an external scan */
+    bool scanningWithParamFlag;                 /* Flag Indicating whether scanning with parameter */
     std::string ssid;                           /* The network name */
     std::string bssid;                          /* The address of the access point */
     int scanStyle;                              /* Type of scan to perform */
@@ -62,6 +63,7 @@ struct ScanConfig {
         backScanPeriod = 0;
         fullScanFlag = false;
         externFlag = false;
+        scanningWithParamFlag = false;
         scanStyle = 0xFF;
     }
 };
@@ -101,12 +103,13 @@ struct StoreScanConfig {
     int64_t scanTime;           /* Scan Start Time */
     bool fullScanFlag;          /* Flag of scan without specifying parameters */
     bool externFlag;            /* Flag indicating whether the request is an external scan. */
-
+    bool scanningWithParamFlag; /* Flag Indicating whether scanning with parameter */
     StoreScanConfig()
     {
         scanTime = 0;
         fullScanFlag = false;
         externFlag = false;
+        scanningWithParamFlag = false;
     }
 };
 

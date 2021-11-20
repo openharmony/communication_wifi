@@ -26,18 +26,25 @@ namespace OHOS {
 namespace Wifi {
 #define MIN_SCAN_INTERVAL 20
 #define DEFAULT_MAX_SCAN_INTERVAL 160
-#define SCAN_SCENE_SCREEN_OFF 0
-#define SCAN_SCENE_SCANNING 1
-#define SCAN_SCENE_CONNECTING 2
-#define SCAN_SCENE_DISCONNCTED 3
-#define SCAN_SCENE_CONNECTED 4
-#define SCAN_SCENE_ASSOCIATING 5
-#define SCAN_SCENE_ASSOCIATED 6
-#define SCAN_SCENE_OBTAINING_IP 7
-#define SCAN_SCENE_DEEP_SLEEP 8
-/* 8~253 Custom Scenario */
+#define SCAN_SCENE_SCREEN_OFF 0       // Screen off state
+#define SCAN_SCENE_SCANNING 1         // scanning state
+#define SCAN_SCENE_CONNECTING 2       // connecting state
+#define SCAN_SCENE_DISCONNCTED 3      // disconnected state
+#define SCAN_SCENE_CONNECTED 4        // connected state
+#define SCAN_SCENE_ASSOCIATING 5      // associating state
+#define SCAN_SCENE_ASSOCIATED 6       // associated state
+#define SCAN_SCENE_OBTAINING_IP 7     // Obtaining IP state
+#define SCAN_SCENE_DEEP_SLEEP 8       // Deep sleep state
+#define SCAN_SCENE_FREQUENCY_ORIGIN 9 // Scan frequency, origin.
+                                      // This parameter takes effect when no charger.
+#define SCAN_SCENE_FREQUENCY_CUSTOM 10 // Scan frequency, custom.
+                                       // This parameter takes effect when no charger.
+#define SCAN_SCENE_CUSTOM (SCAN_SCENE_FREQUENCY_CUSTOM + 1)
+
+/* SCAN_SCENE_CUSTOM~253 Custom Scenario */
 #define SCAN_SCENE_ALL 254 /* all Scenario */
 #define SCAN_SCENE_MAX 255 /* invalid value */
+
 /* Scanning mode of the control policy */
 enum class ScanMode {
     APP_FOREGROUND_SCAN = 0, /* Scan initiated by the foreground application */
@@ -141,6 +148,7 @@ struct WifiScanInfo {
 };
 
 typedef struct tagScanForbidMode {
+    int scanScene;     /* current scanned scene */
     int forbidTime;    /*
                         * Specifies the scanning duration.
                         * If the value is 0, all invalid values are restricted.
@@ -156,6 +164,9 @@ typedef struct tagScanForbidMode {
         forbidCount = 0;
         scanMode = ScanMode::SCAN_MODE_MAX;
     }
+
+    ~tagScanForbidMode()
+    {}
 } ScanForbidMode;
 
 enum class IntervalMode {
@@ -214,11 +225,11 @@ typedef struct tagScanIntervalMode {
     }
 } ScanIntervalMode;
 
-typedef std::map<int, std::vector<ScanForbidMode>> ScanForbidMap;
+typedef std::vector<ScanForbidMode> ScanForbidList;
 typedef std::vector<ScanIntervalMode> ScanIntervalList;
 
 typedef struct tagScanControlInfo {
-    ScanForbidMap scanForbidMap;       /* Scanning forbidden list corresponding to the scenario */
+    ScanForbidList scanForbidList;       /* Scanning forbidden list corresponding to the scenario */
     ScanIntervalList scanIntervalList; /*
                                         * Interval for scanning mode.
                                         * The value cannot be set to 2.4 GHz, 5 GHz, or anytime scan.

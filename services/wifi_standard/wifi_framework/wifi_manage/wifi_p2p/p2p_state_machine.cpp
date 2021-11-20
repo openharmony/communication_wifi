@@ -707,7 +707,7 @@ void P2pStateMachine::DhcpResultNotify::OnFailed(int status, const std::string &
 
 void P2pStateMachine::DhcpResultNotify::OnSerExitNotify(const std::string& ifname)
 {
-    WIFI_LOGD("Dhcp exit notify.ifname:%s.", ifname.c_str());
+    WIFI_LOGD("Dhcp exit notify.ifname:%{public}s.", ifname.c_str());
     pP2pStateMachine->SendMessage(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_P2P_DISABLE));
 }
 
@@ -860,7 +860,7 @@ bool P2pStateMachine::DealCreateNewGroupWithConfig(const WifiP2pConfigInternal &
     }
 
     if (ret == WIFI_IDL_OPT_FAILED || netId == TEMPORARY_NET_ID) {
-            WIFI_LOGD("Remove network %d!", createdNetId);
+            WIFI_LOGD("Remove network %{public}d!", createdNetId);
             WifiP2PHalInterface::GetInstance().RemoveNetwork(createdNetId);
     }
     
@@ -897,7 +897,7 @@ void P2pStateMachine::UpdateGroupInfoToWpa() const
             WifiP2PHalInterface::GetInstance().P2pSetGroupConfig(createdNetId, wpaConfig);
             grpInfo.at(i) = grpBuf;
         } else {
-            WIFI_LOGW("AddNetwork failed when add %s group!", grpBuf.GetGroupName().c_str());
+            WIFI_LOGW("AddNetwork failed when add %{public}s group!", grpBuf.GetGroupName().c_str());
         }
     }
     return;

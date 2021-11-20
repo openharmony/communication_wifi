@@ -69,8 +69,8 @@ void ApConfigUse::TransformFrequencyIntoChannel(const std::vector<int> &freqVect
 
 void ApConfigUse::LogConfig(HotspotConfig &apConfig) const
 {
-    WIFI_LOGI("HotspotConfig::SSID         = %s", apConfig.GetSsid().c_str());
-    WIFI_LOGI("HotspotConfig::preSharedKey = %s", apConfig.GetPreSharedKey().c_str());
+    WIFI_LOGI("HotspotConfig::SSID         = %{private}s", apConfig.GetSsid().c_str());
+    WIFI_LOGI("HotspotConfig::preSharedKey = %{private}s", apConfig.GetPreSharedKey().c_str());
     WIFI_LOGI("HotspotConfig::securityType = %{public}d", static_cast<int>(apConfig.GetSecurityType()));
     WIFI_LOGI("HotspotConfig::band         = %{public}d", static_cast<int>(apConfig.GetBand()));
     WIFI_LOGI("HotspotConfig::channel      = %{public}d", apConfig.GetChannel());

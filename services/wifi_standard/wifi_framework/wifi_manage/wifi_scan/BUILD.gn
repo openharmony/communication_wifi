@@ -13,6 +13,9 @@
 
 import("//build/ohos.gni")
 
+#defines = []
+#defines += [ "OHOS_WIFI_SCAN_CONTROL_CLOSE" ]
+
 ohos_shared_library("wifi_scan_service") {
   install_enable = true
   sources = [

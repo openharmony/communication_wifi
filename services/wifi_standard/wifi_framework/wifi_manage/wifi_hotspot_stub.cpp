@@ -72,7 +72,7 @@ int WifiHotspotStub::OnRemoteRequest(uint32_t code, MessageParcel &data, Message
 
 void WifiHotspotStub::OnIsHotspotActive(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
-    WIFI_LOGD("run %{public}s code %{public}u, datasize %zu", __func__, code, data.GetRawDataSize());
+    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
     bool bActive = false;
     ErrCode ret = IsHotspotActive(bActive);
     reply.WriteInt32(0);
@@ -85,7 +85,7 @@ void WifiHotspotStub::OnIsHotspotActive(uint32_t code, MessageParcel &data, Mess
 
 void WifiHotspotStub::OnGetApStateWifi(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
-    WIFI_LOGD("run %{public}s code %{public}u, datasize %zu", __func__, code, data.GetRawDataSize());
+    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
     int state = 0;
     ErrCode ret = GetHotspotState(state);
     reply.WriteInt32(0);
@@ -99,7 +99,7 @@ void WifiHotspotStub::OnGetApStateWifi(uint32_t code, MessageParcel &data, Messa
 void WifiHotspotStub::OnGetHotspotConfig(
     uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
-    WIFI_LOGD("run %{public}s code %{public}u, datasize %zu", __func__, code, data.GetRawDataSize());
+    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
     HotspotConfig hotspotConfig;
 
     ErrCode ret = GetHotspotConfig(hotspotConfig);
@@ -119,7 +119,7 @@ void WifiHotspotStub::OnGetHotspotConfig(
 
 void WifiHotspotStub::OnSetApConfigWifi(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
-    WIFI_LOGD("run %{public}s code %{public}u, datasize %zu", __func__, code, data.GetRawDataSize());
+    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
     HotspotConfig config;
     config.SetSsid(data.ReadCString());
     config.SetSecurityType(static_cast<KeyMgmt>(data.ReadInt32()));
@@ -136,7 +136,7 @@ void WifiHotspotStub::OnSetApConfigWifi(uint32_t code, MessageParcel &data, Mess
 
 void WifiHotspotStub::OnGetStationList(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
-    WIFI_LOGD("run %{public}s code %{public}u, datasize %zu", __func__, code, data.GetRawDataSize());
+    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
     std::vector<StationInfo> result;
     ErrCode ret = GetStationList(result);
 
@@ -157,7 +157,7 @@ void WifiHotspotStub::OnGetStationList(uint32_t code, MessageParcel &data, Messa
 
 void WifiHotspotStub::OnDisassociateSta(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
-    WIFI_LOGD("run %{public}s code %{public}u, datasize %zu", __func__, code, data.GetRawDataSize());
+    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
     StationInfo info;
     info.deviceName = data.ReadCString();
     info.bssid = data.ReadCString();
@@ -170,7 +170,7 @@ void WifiHotspotStub::OnDisassociateSta(uint32_t code, MessageParcel &data, Mess
 
 void WifiHotspotStub::OnGetValidBands(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
-    WIFI_LOGD("run %{public}s code %{public}u, datasize %zu", __func__, code, data.GetRawDataSize());
+    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
     std::vector<BandType> bands;
     ErrCode ret = GetValidBands(bands);
 
@@ -189,7 +189,7 @@ void WifiHotspotStub::OnGetValidBands(uint32_t code, MessageParcel &data, Messag
 void WifiHotspotStub::OnGetValidChannels(
     uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
-    WIFI_LOGD("run %{public}s code %{public}u, datasize %zu", __func__, code, data.GetRawDataSize());
+    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
     std::vector<int32_t> channels;
     int32_t band = data.ReadInt32();
     ErrCode ret = GetValidChannels(static_cast<BandType>(band), channels);
@@ -208,7 +208,7 @@ void WifiHotspotStub::OnGetValidChannels(
 
 void WifiHotspotStub::OnEnableWifiAp(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
-    WIFI_LOGD("run %{public}s code %{public}u, datasize %zu", __func__, code, data.GetRawDataSize());
+    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
     ErrCode ret = EnableHotspot();
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
@@ -218,7 +218,7 @@ void WifiHotspotStub::OnEnableWifiAp(uint32_t code, MessageParcel &data, Message
 
 void WifiHotspotStub::OnDisableWifiAp(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
-    WIFI_LOGD("run %{public}s code %{public}u, datasize %zu", __func__, code, data.GetRawDataSize());
+    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
     ErrCode ret = DisableHotspot();
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
@@ -228,7 +228,7 @@ void WifiHotspotStub::OnDisableWifiAp(uint32_t code, MessageParcel &data, Messag
 
 void WifiHotspotStub::OnAddBlockList(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
-    WIFI_LOGD("run %{public}s code %{public}u, datasize %zu", __func__, code, data.GetRawDataSize());
+    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
     StationInfo info;
     info.deviceName = data.ReadCString();
     info.bssid = data.ReadCString();
@@ -242,7 +242,7 @@ void WifiHotspotStub::OnAddBlockList(uint32_t code, MessageParcel &data, Message
 
 void WifiHotspotStub::OnDelBlockList(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
-    WIFI_LOGD("run %{public}s code %{public}u, datasize %zu", __func__, code, data.GetRawDataSize());
+    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
     StationInfo info;
     info.deviceName = data.ReadCString();
     info.bssid = data.ReadCString();
@@ -256,7 +256,7 @@ void WifiHotspotStub::OnDelBlockList(uint32_t code, MessageParcel &data, Message
 
 void WifiHotspotStub::OnGetBlockLists(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
-    WIFI_LOGD("run %{public}s code %{public}u, datasize %zu", __func__, code, data.GetRawDataSize());
+    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
     std::vector<StationInfo> infos;
     ErrCode ret = GetBlockLists(infos);
     reply.WriteInt32(0);
@@ -277,7 +277,7 @@ void WifiHotspotStub::OnGetBlockLists(uint32_t code, MessageParcel &data, Messag
 void WifiHotspotStub::OnRegisterCallBack(
     uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
-    WIFI_LOGD("run %{public}s code %{public}u, datasize %zu", __func__, code, data.GetRawDataSize());
+    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
     ErrCode ret = WIFI_OPT_FAILED;
     do {
         sptr<IRemoteObject> remote = data.ReadRemoteObject();

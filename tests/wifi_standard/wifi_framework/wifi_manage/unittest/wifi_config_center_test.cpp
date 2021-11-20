@@ -357,7 +357,7 @@ HWTEST_F(WifiConfigCenterTest, SetGetAirplaneModeState_SUCCESS, TestSize.Level1)
 
 HWTEST_F(WifiConfigCenterTest, SetGetAppRunningState_SUCCESS, TestSize.Level1)
 {
-    int mode = 1;
+    ScanMode mode = ScanMode::APP_BACKGROUND_SCAN;
     WifiConfigCenter::GetInstance().SetAppRunningState(mode);
     EXPECT_EQ(mode, WifiConfigCenter::GetInstance().GetAppRunningState());
 }

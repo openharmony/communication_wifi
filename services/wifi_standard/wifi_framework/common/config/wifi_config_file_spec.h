@@ -328,6 +328,86 @@ std::string GetTClassName<WifiP2pGroupInfo>();
  */
 template<>
 std::string OutTClassString<WifiP2pGroupInfo>(WifiP2pGroupInfo &item);
+
+/**
+ * @Description Clear and init TrustListPolicy
+ *
+ * @tparam
+ * @param item - TrustListPolicy &item
+ */
+template <>
+void ClearTClass<TrustListPolicy>(TrustListPolicy &item);
+
+/**
+ * @Description Set TrustListPolicy item data
+ *
+ * @tparam
+ * @param item - TrustListPolicy &item
+ * @param key - TrustListPolicy struct member name
+ * @param value - the TrustListPolicy item member value
+ */
+template <>
+void SetTClassKeyValue<TrustListPolicy>(TrustListPolicy &item, const std::string &key, const std::string &value);
+
+/**
+ * @Description Output TrustListPolicy class name
+ *
+ * @tparam
+ * @param item - TrustListPolicy &item
+ * @return std::string - Class name
+ */
+template <>
+std::string GetTClassName<TrustListPolicy>();
+
+/**
+ * @Description Output the TrustListPolicy item, format: item's member = the member value
+ *
+ * @tparam
+ * @param item - TrustListPolicy &item
+ * @return std::string - output total member=value string about the TrustListPolicy item
+ */
+template <>
+std::string OutTClassString<TrustListPolicy>(TrustListPolicy &item);
+
+/**
+ * @Description Clear and init MovingFreezePolicy
+ *
+ * @tparam
+ * @param item - MovingFreezePolicy &item
+ */
+template <>
+void ClearTClass<MovingFreezePolicy>(MovingFreezePolicy &item);
+
+/**
+ * @Description Set MovingFreezePolicy item data
+ *
+ * @tparam
+ * @param item - MovingFreezePolicy &item
+ * @param key - MovingFreezePolicy struct member name
+ * @param value - the MovingFreezePolicy item member value
+ */
+template <>
+void SetTClassKeyValue<MovingFreezePolicy>(MovingFreezePolicy &item, const std::string &key, const std::string &value);
+
+/**
+ * @Description Output MovingFreezePolicy class name
+ *
+ * @tparam
+ * @param item - MovingFreezePolicy &item
+ * @return std::string - Class name
+ */
+template <>
+std::string GetTClassName<MovingFreezePolicy>();
+
+/**
+ * @Description Output the MovingFreezePolicy item, format: item's member = the member value
+ *
+ * @tparam
+ * @param item - MovingFreezePolicy &item
+ * @return std::string - output total member=value string about the MovingFreezePolicy item
+ */
+template <>
+std::string OutTClassString<MovingFreezePolicy>(MovingFreezePolicy &item);
 /* ----------template function specialization declare end----------- */
 }  // namespace Wifi
 }  // namespace OHOS

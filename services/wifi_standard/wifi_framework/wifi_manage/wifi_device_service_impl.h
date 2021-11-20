@@ -95,11 +95,14 @@ public:
 
     ErrCode GetDeviceMacAddress(std::string &result) override;
 
+    int32_t Dump(int32_t fd, const std::vector<std::u16string>& args) override;
+
 private:
     bool Init();
     ErrCode CheckCanEnableWifi(void);
     bool IsStaServiceRunning();
     bool IsScanServiceRunning();
+    static void SaBasicDump(std::string& result);
 
 private:
     static sptr<WifiDeviceServiceImpl> g_instance;

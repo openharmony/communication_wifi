@@ -20,7 +20,7 @@
 #include "native_c/wifi_device_config.h"
 #include "wifi_logger.h"
 #include "wifi_c_utils.h"
-#include "securec.h"
+#include "wifi_common_util.h"
 
 DEFINE_WIFILOG_LABEL("WifiCDevice");
 

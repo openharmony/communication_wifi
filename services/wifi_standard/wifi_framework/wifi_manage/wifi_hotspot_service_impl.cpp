@@ -14,6 +14,7 @@
  */
 
 #include "wifi_hotspot_service_impl.h"
+#include <file_ex.h>
 #include "wifi_permission_utils.h"
 #include "wifi_global_func.h"
 #include "wifi_auth_center.h"
@@ -24,6 +25,8 @@
 #include "wifi_logger.h"
 #include "define.h"
 #include "wifi_logger.h"
+#include "wifi_dumper.h"
+#include "wifi_common_util.h"
 
 DEFINE_WIFILOG_HOTSPOT_LABEL("WifiHotspotServiceImpl");
 
@@ -433,7 +436,7 @@ ErrCode WifiHotspotServiceImpl::GetBlockLists(std::vector<StationInfo> &infos)
     }
 
     if (WifiConfigCenter::GetInstance().GetBlockLists(infos) < 0) {
-        WIFI_LOGE("Delete block list failed!");
+        WIFI_LOGE("Get block list failed!");
         return WIFI_OPT_FAILED;
     }
     return WIFI_OPT_SUCCESS;
@@ -472,6 +475,120 @@ ErrCode WifiHotspotServiceImpl::GetSupportedFeatures(long &features)
         return WIFI_OPT_FAILED;
     }
     return WIFI_OPT_SUCCESS;
+}
+
+void WifiHotspotServiceImpl::ConfigInfoDump(std::string& result)
+{
+    HotspotConfig config;
+    WifiConfigCenter::GetInstance().GetHotspotConfig(config);
+    std::stringstream ss;
+    ss << "Hotspot config: " << "\n";
+    ss << "  Config.ssid: " << config.GetSsid() << "\n";
+
+    std::map<KeyMgmt, std::string> mapKeyMgmtToStr = {
+        {KeyMgmt::NONE, "Open"}, {KeyMgmt::WPA_PSK, "WPA_PSK"}, {KeyMgmt::WPA_EAP, "WPA_EAP"},
+        {KeyMgmt::IEEE8021X, "IEEE8021X"}, {KeyMgmt::WPA2_PSK, "WPA2_PSK"}, {KeyMgmt::OSEN, "OSEN"},
+        {KeyMgmt::FT_PSK, "FT_PSK"}, {KeyMgmt::FT_EAP, "FT_EAP"}
+    };
+
+    auto funcStrKeyMgmt = [&mapKeyMgmtToStr](KeyMgmt secType) {
+        std::map<KeyMgmt, std::string>::iterator iter = mapKeyMgmtToStr.find(secType);
+        return (iter != mapKeyMgmtToStr.end()) ? iter->second : "Unknow";
+    };
+    ss << "  Config.security_type: " << funcStrKeyMgmt(config.GetSecurityType()) << "\n";
+
+    auto funcStrBand = [](BandType band) {
+        std::string retStr;
+        switch (band) {
+            case BandType::BAND_2GHZ:
+                retStr = "2.4GHz";
+                break;
+            case BandType::BAND_5GHZ:
+                retStr = "5GHz";
+                break;
+            case BandType::BAND_ANY:
+                retStr = "dual-mode frequency band";
+                break;
+            default:
+                retStr = "unknown band";
+        }
+        return retStr;
+    };
+    ss << "  Config.band: " << funcStrBand(config.GetBand()) << "\n";
+    ss << "  Config.channel: " << config.GetChannel() << "\n";
+    ss << "  Config.max_conn: " << config.GetMaxConn() << "\n";
+    result += "\n";
+    result += ss.str();
+    result += "\n";
+}
+
+void WifiHotspotServiceImpl::StationsInfoDump(std::string& result)
+{
+    IApService *pService = WifiServiceManager::GetInstance().GetApServiceInst();
+    if (pService != nullptr) {
+        std::stringstream ss;
+        std::vector<StationInfo> vecStations;
+        pService->GetStationList(vecStations);
+        ss << "Station list size: " << vecStations.size() << "\n";
+        int idx = 0;
+        for (auto& each : vecStations) {
+            ++idx;
+            ss << "  Station[" << idx << "].deviceName: " << each.deviceName << "\n";
+            ss << "  Station[" << idx << "].bssid: " << MacAnonymize(each.bssid) << "\n";
+            ss << "  Station[" << idx << "].ipAddr: " << IpAnonymize(each.ipAddr) << "\n";
+            ss << "\n";
+        }
+        result += ss.str();
+        result += "\n";
+    }
+
+    std::vector<StationInfo> vecBlockStations;
+    WifiConfigCenter::GetInstance().GetBlockLists(vecBlockStations);
+    if (!vecBlockStations.empty()) {
+        std::stringstream ss;
+        ss << "Block station list size: " << vecBlockStations.size() << "\n";
+        int idx = 0;
+        for (auto& each : vecBlockStations) {
+            ++idx;
+            ss << "  BlockStation[" << idx << "].deviceName: " << each.deviceName << "\n";
+            ss << "  BlockStation[" << idx << "].bssid: " << MacAnonymize(each.bssid) << "\n";
+            ss << "  BlockStation[" << idx << "].ipAddr: " << IpAnonymize(each.ipAddr) << "\n";
+            ss << "\n";
+        }
+        result += ss.str();
+        result += "\n";
+    }
+}
+
+void WifiHotspotServiceImpl::SaBasicDump(std::string& result)
+{
+    WifiHotspotServiceImpl impl;
+    bool isActive = impl.IsApServiceRunning();
+    result.append("WiFi hotspot active state: ");
+    std::string strActive = isActive ? "activated" : "inactive";
+    result += strActive + "\n";
+
+    if (isActive) {
+        ConfigInfoDump(result);
+        StationsInfoDump(result);
+    }
+}
+
+int32_t WifiHotspotServiceImpl::Dump(int32_t fd, const std::vector<std::u16string>& args)
+{
+    std::vector<std::string> vecArgs;
+    std::transform(args.begin(), args.end(), std::back_inserter(vecArgs), [](const std::u16string &arg) {
+        return Str16ToStr8(arg);
+    });
+
+    WifiDumper dumper;
+    std::string result;
+    dumper.HotspotDump(SaBasicDump, vecArgs, result);
+    if (!SaveStringToFd(fd, result)) {
+        WIFI_LOGE("WiFi hotspot save string to fd failed.");
+        return ERR_OK;
+    }
+    return ERR_OK;
 }
 }  // namespace Wifi
 }  // namespace OHOS

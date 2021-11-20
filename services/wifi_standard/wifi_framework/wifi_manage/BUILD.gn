@@ -42,6 +42,7 @@ config("wifi_manager_service_header") {
     "//foundation/communication/wifi/services/wifi_standard/wifi_framework/wifi_manage/wifi_p2p",
     "//foundation/communication/wifi/services/wifi_standard/wifi_framework/dhcp_manage/mgr_service/include",
     "//foundation/communication/wifi/services/wifi_standard/wifi_framework/dhcp_manage/mgr_service/interfaces",
+    "//foundation/communication/wifi/utils/inc",
     "${aafwk_path}/interfaces/innerkits/want/include",
     "${aafwk_path}/interfaces/innerkits/want/include/ohos/aafwk/content",
     "//foundation/distributedschedule/dmsfwk/services/dtbschedmgr/include",
@@ -143,6 +144,7 @@ ohos_shared_library("wifi_manager_service") {
     "//foundation/communication/wifi/services/wifi_standard/wifi_framework/wifi_manage/common/wifi_permission_utils.cpp",
     "wifi_auth_center.cpp",
     "wifi_config_center.cpp",
+    "wifi_dumper.cpp",
     "wifi_internal_event_dispatcher.cpp",
     "wifi_manager.cpp",
     "wifi_service_manager.cpp",
@@ -177,6 +179,7 @@ ohos_shared_library("wifi_device_ability") {
     ":wifi_manager_service",
     "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog",
     "//foundation/communication/wifi/services/wifi_standard/wifi_framework/wifi_manage/idl_client:wifi_idl_client",
+    "//foundation/communication/wifi/utils/src:wifi_utils",
     "//foundation/distributedschedule/safwk/interfaces/innerkits/safwk:system_ability_fwk",
     "//utils/native/base:utils",
   ]
@@ -206,6 +209,7 @@ ohos_shared_library("wifi_hotspot_ability") {
     ":wifi_hotspot_service_impl",
     ":wifi_manager_service",
     "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog",
+    "//foundation/communication/wifi/utils/src:wifi_utils",
     "//foundation/distributedschedule/safwk/interfaces/innerkits/safwk:system_ability_fwk",
     "//utils/native/base:utils",
   ]

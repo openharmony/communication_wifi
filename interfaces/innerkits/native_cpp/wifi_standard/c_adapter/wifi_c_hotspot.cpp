@@ -19,8 +19,8 @@
 #include "native_cpp/wifi_standard/include/wifi_hotspot.h"
 #include "wifi_logger.h"
 #include "wifi_c_utils.h"
-#include "securec.h"
 #include "ip_tools.h"
+#include "wifi_common_util.h"
 
 DEFINE_WIFILOG_LABEL("WifiCHotspot");
 

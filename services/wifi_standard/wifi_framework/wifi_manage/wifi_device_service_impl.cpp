@@ -15,6 +15,7 @@
 
 #include "wifi_device_service_impl.h"
 #include <unistd.h>
+#include <file_ex.h>
 #include "wifi_permission_utils.h"
 #include "wifi_internal_msg.h"
 #include "wifi_auth_center.h"
@@ -25,6 +26,8 @@
 #include "wifi_protect_manager.h"
 #include "wifi_logger.h"
 #include "define.h"
+#include "wifi_dumper.h"
+#include "wifi_common_util.h"
 
 DEFINE_WIFILOG_LABEL("WifiDeviceServiceImpl");
 namespace OHOS {
@@ -666,6 +669,79 @@ bool WifiDeviceServiceImpl::IsScanServiceRunning()
         return false;
     }
     return true;
+}
+
+void WifiDeviceServiceImpl::SaBasicDump(std::string& result)
+{
+    WifiDeviceServiceImpl impl;
+    bool isActive = impl.IsStaServiceRunning();
+    result.append("WiFi active state: ");
+    std::string strActive = isActive ? "activated" : "inactive";
+    result += strActive + "\n\n";
+
+    WifiLinkedInfo linkedInfo;
+    WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
+    bool isConnected = linkedInfo.connState == ConnState::CONNECTED;
+    result.append("WiFi connection status: ");
+    std::string strIsConnected = isConnected ? "connected" : "not connected";
+    result += strIsConnected + "\n";
+    if (isConnected) {
+        std::stringstream ss;
+        ss << "  Connection.ssid: " << linkedInfo.ssid << "\n";
+        ss << "  Connection.bssid: " << MacAnonymize(linkedInfo.bssid) << "\n";
+        ss << "  Connection.rssi: " << linkedInfo.rssi << "\n";
+
+        enum {BAND_2GHZ = 1, BAND_5GHZ = 2, BAND_ANY = 3};
+        auto funcStrBand = [](int band) {
+            std::string retStr;
+            switch (band) {
+                case BAND_2GHZ:
+                    retStr = "2.4GHz";
+                    break;
+                case BAND_5GHZ:
+                    retStr = "5GHz";
+                    break;
+                case BAND_ANY:
+                    retStr = "dual-mode frequency band";
+                    break;
+                default:
+                    retStr = "unknown band";
+            }
+            return retStr;
+        };
+        ss << "  Connection.band: " << funcStrBand(linkedInfo.band) << "\n";
+        ss << "  Connection.frequency: " << linkedInfo.frequency << "\n";
+        ss << "  Connection.linkSpeed: " << linkedInfo.linkSpeed << "\n";
+        ss << "  Connection.macAddress: " << MacAnonymize(linkedInfo.macAddress) << "\n";
+        ss << "  Connection.isHiddenSSID: " << (linkedInfo.ifHiddenSSID ? "true" : "false") << "\n";
+
+        int level = WifiConfigCenter::GetInstance().GetSignalLevel(linkedInfo.rssi, linkedInfo.band);
+        ss << "  Connection.signalLevel: " << level << "\n";
+        result += ss.str();
+    }
+    result += "\n";
+
+    std::string cc;
+    WifiConfigCenter::GetInstance().GetCountryCode(cc);
+    result.append("Country Code: ").append(cc);
+    result += "\n";
+}
+
+int32_t WifiDeviceServiceImpl::Dump(int32_t fd, const std::vector<std::u16string>& args)
+{
+    std::vector<std::string> vecArgs;
+    std::transform(args.begin(), args.end(), std::back_inserter(vecArgs), [](const std::u16string &arg) {
+        return Str16ToStr8(arg);
+    });
+
+    WifiDumper dumper;
+    std::string result;
+    dumper.DeviceDump(SaBasicDump, vecArgs, result);
+    if (!SaveStringToFd(fd, result)) {
+        WIFI_LOGE("WiFi device save string to fd failed.");
+        return ERR_OK;
+    }
+    return ERR_OK;
 }
 }  // namespace Wifi
 }  // namespace OHOS

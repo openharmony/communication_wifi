@@ -533,8 +533,6 @@ bool ScanService::StoreFullScanInfo(
     std::vector<WifiScanInfo> filterScanInfo;
     std::vector<InterScanInfo>::const_iterator iter = scanInfoList.begin();
     for (; iter != scanInfoList.end(); ++iter) {
-        char tmpBuf[128] = "";
-        EncryptLogMsg(iter->ssid.c_str(), tmpBuf, sizeof(tmpBuf));
         WifiScanInfo scanInfo;
         scanInfo.bssid = iter->bssid;
         scanInfo.ssid = iter->ssid;

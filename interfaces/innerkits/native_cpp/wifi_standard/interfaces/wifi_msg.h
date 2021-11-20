@@ -415,13 +415,13 @@ enum class WifiProtectMode {
 
 /* DHCP info */
 struct IpInfo {
-    int ipAddress;     /* ip address */
-    int gateway;       /* gate */
-    int netmask;       /* mask */
-    int primaryDns;          /* main dns */
-    int secondDns;          /* backup dns */
-    int serverIp; /* DHCP server's address */
-    int leaseDuration;
+    unsigned int ipAddress;     /* ip address */
+    unsigned int gateway;       /* gate */
+    unsigned int netmask;       /* mask */
+    unsigned int primaryDns;          /* main dns */
+    unsigned int secondDns;          /* backup dns */
+    unsigned int serverIp; /* DHCP server's address */
+    unsigned int leaseDuration;
 
     IpInfo()
     {

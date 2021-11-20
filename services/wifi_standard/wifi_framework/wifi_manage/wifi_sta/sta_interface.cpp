@@ -161,6 +161,12 @@ ErrCode StaInterface::DisableDeviceConfig(int networkId)
     return pStaService->DisableDeviceConfig(networkId);
 }
 
+ErrCode StaInterface::ClearDisabledBssidForReconnect()
+{
+    LOGD("Enter StaInterface::ClearDisabledBssidForReconnect.\n");
+    return pStaService->ClearDisabledBssidForReconnect();
+}
+
 ErrCode StaInterface::StartWps(const WpsConfig &config)
 {
     LOGD("Enter StaInterface::StartWps.\n");

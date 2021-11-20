@@ -41,6 +41,7 @@ void WifiDeviceStub::InitHandleMap()
     handleFuncMap[WIFI_SVR_CMD_GET_WIFI_PROTECT] = &WifiDeviceStub::OnGetWifiProtectRef;
     handleFuncMap[WIFI_SVR_CMD_PUT_WIFI_PROTECT] = &WifiDeviceStub::OnPutWifiProtectRef;
     handleFuncMap[WIFI_SVR_CMD_ADD_DEVICE_CONFIG] = &WifiDeviceStub::OnAddDeviceConfig;
+    handleFuncMap[WIFI_SVR_CMD_UPDATE_DEVICE_CONFIG] = &WifiDeviceStub::OnUpdateDeviceConfig;
     handleFuncMap[WIFI_SVR_CMD_REMOVE_DEVICE_CONFIG] = &WifiDeviceStub::OnRemoveDevice;
     handleFuncMap[WIFI_SVR_CMD_REMOVE_ALL_DEVICE_CONFIG] = &WifiDeviceStub::OnRemoveAllDevice;
     handleFuncMap[WIFI_SVR_CMD_GET_DEVICE_CONFIGS] = &WifiDeviceStub::OnGetDeviceConfigs;
@@ -63,6 +64,7 @@ void WifiDeviceStub::InitHandleMap()
     handleFuncMap[WIFI_SVR_CMD_GET_SIGNAL_LEVEL] = &WifiDeviceStub::OnGetSignalLevel;
     handleFuncMap[WIFI_SVR_CMD_GET_SUPPORTED_FEATURES] = &WifiDeviceStub::OnGetSupportedFeatures;
     handleFuncMap[WIFI_SVR_CMD_GET_DERVICE_MAC_ADD] = &WifiDeviceStub::OnGetDeviceMacAdd;
+    handleFuncMap[WIFI_SVR_CMD_IS_WIFI_CONNECTED] = &WifiDeviceStub::OnIsWifiConnected;
     return;
 }
 
@@ -135,13 +137,14 @@ void WifiDeviceStub::OnPutWifiProtectRef(uint32_t code, MessageParcel &data, Mes
     reply.WriteInt32(ret);
     return;
 }
+
 void WifiDeviceStub::OnAddDeviceConfig(uint32_t code, MessageParcel &data, MessageParcel &reply)
 {
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
     WifiDeviceConfig config;
     ReadWifiDeviceConfig(data, config);
 
-    int result = 0;
+    int result = INVALID_NETWORK_ID;
     ErrCode ret = AddDeviceConfig(config, result);
 
     reply.WriteInt32(0);
@@ -150,6 +153,21 @@ void WifiDeviceStub::OnAddDeviceConfig(uint32_t code, MessageParcel &data, Messa
         reply.WriteInt32(result);
     }
 
+    return;
+}
+
+void WifiDeviceStub::OnUpdateDeviceConfig(uint32_t code, MessageParcel &data, MessageParcel &reply)
+{
+    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+    WifiDeviceConfig config;
+    ReadWifiDeviceConfig(data, config);
+    int result = INVALID_NETWORK_ID;
+    ErrCode ret = UpdateDeviceConfig(config, result);
+    reply.WriteInt32(0);
+    reply.WriteInt32(ret);
+    if (ret == WIFI_OPT_SUCCESS) {
+        reply.WriteInt32(result);
+    }
     return;
 }
 
@@ -342,6 +360,14 @@ void WifiDeviceStub::OnConnect2To(uint32_t code, MessageParcel &data, MessagePar
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
 
+    return;
+}
+
+void WifiDeviceStub::OnIsWifiConnected(uint32_t code, MessageParcel &data, MessageParcel &reply)
+{
+    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+    reply.WriteInt32(0);
+    reply.WriteBool(IsConnected());
     return;
 }
 

@@ -237,6 +237,30 @@ ErrCode WifiDeviceServiceImpl::AddDeviceConfig(const WifiDeviceConfig &config, i
     return WIFI_OPT_SUCCESS;
 }
 
+ErrCode WifiDeviceServiceImpl::UpdateDeviceConfig(const WifiDeviceConfig &config, int &result)
+{
+    if (WifiPermissionUtils::VerifySetWifiInfoPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("UpdateDeviceConfig:VerifySetWifiInfoPermission PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+
+    if (!IsStaServiceRunning()) {
+        return WIFI_OPT_STA_NOT_OPENED;
+    }
+
+    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst();
+    if (pService == nullptr) {
+        return WIFI_OPT_STA_NOT_OPENED;
+    }
+
+    int retNetworkId = pService->UpdateDeviceConfig(config);
+    if (retNetworkId <= INVALID_NETWORK_ID) {
+        return WIFI_OPT_FAILED;
+    }
+    result = retNetworkId;
+    return WIFI_OPT_SUCCESS;
+}
+
 ErrCode WifiDeviceServiceImpl::RemoveDevice(int networkId)
 {
     if (WifiPermissionUtils::VerifySetWifiInfoPermission() == PERMISSION_DENIED) {
@@ -380,6 +404,13 @@ ErrCode WifiDeviceServiceImpl::ConnectToDevice(const WifiDeviceConfig &config)
     return pService->ConnectToDevice(config);
 }
 
+bool WifiDeviceServiceImpl::IsConnected()
+{
+    WifiLinkedInfo linkedInfo;
+    WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
+    return linkedInfo.connState == ConnState::CONNECTED;
+}
+
 ErrCode WifiDeviceServiceImpl::ReConnect()
 {
     if (WifiPermissionUtils::VerifySetWifiInfoPermission() == PERMISSION_DENIED) {
@@ -395,11 +426,18 @@ ErrCode WifiDeviceServiceImpl::ReConnect()
         return WIFI_OPT_SCAN_NOT_OPENED;
     }
 
-    IScanService *pService = WifiServiceManager::GetInstance().GetScanServiceInst();
-    if (pService == nullptr) {
+    IScanService *pScanService = WifiServiceManager::GetInstance().GetScanServiceInst();
+    if (pScanService == nullptr) {
         return WIFI_OPT_SCAN_NOT_OPENED;
     }
-    return pService->Scan(false);
+
+    IStaService *pStaService = WifiServiceManager::GetInstance().GetStaServiceInst();
+    if (pStaService == nullptr) {
+        return WIFI_OPT_STA_NOT_OPENED;
+    }
+
+    pStaService->ClearDisabledBssidForReconnect();
+    return pScanService->Scan(false);
 }
 
 ErrCode WifiDeviceServiceImpl::ReAssociate(void)

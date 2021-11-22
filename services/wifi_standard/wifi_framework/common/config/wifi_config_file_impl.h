@@ -20,6 +20,7 @@
 #include <string>
 #include <vector>
 #include "wifi_config_file_spec.h"
+#include "wifi_log.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -123,6 +124,7 @@ int WifiConfigFileImpl<T>::LoadConfig()
 {
     std::ifstream fs(mFileName.c_str());
     if (!fs.is_open()) {
+        LOGE("Loading config file: %{public}s, fs.is_open() failed!", mFileName.c_str());
         return -1;
     }
     mValues.clear();
@@ -165,6 +167,7 @@ int WifiConfigFileImpl<T>::SaveConfig()
 {
     std::ofstream fs(mFileName.c_str());
     if (!fs.is_open()) {
+        LOGE("Save config file: %{public}s, fs.is_open() failed!", mFileName.c_str());
         return -1;
     }
     std::ostringstream ss;

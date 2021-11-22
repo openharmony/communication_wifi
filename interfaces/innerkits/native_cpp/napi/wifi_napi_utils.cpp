@@ -147,6 +147,21 @@ napi_status SetValueInt32(const napi_env& env, const char* fieldStr, const int i
     return status;
 }
 
+napi_status SetValueUnsignedInt32(const napi_env& env, const char* fieldStr, const int intValue, napi_value& result)
+{
+    napi_value value;
+    napi_status status = napi_create_uint32(env, intValue, &value);
+    if (status != napi_ok) {
+        WIFI_LOGE("Set value create unsigned int32 error! field: %{public}s", fieldStr);
+        return status;
+    }
+    status = napi_set_named_property(env, result, fieldStr, value);
+    if (status != napi_ok) {
+        WIFI_LOGE("Set unsigned int32 named property error! field: %{public}s", fieldStr);
+    }
+    return status;
+}
+
 napi_status SetValueInt64(const napi_env& env, const char* fieldStr, const int64_t intValue, napi_value& result)
 {
     napi_value value;

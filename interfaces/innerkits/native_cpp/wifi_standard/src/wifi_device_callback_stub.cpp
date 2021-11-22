@@ -159,10 +159,12 @@ int WifiDeviceCallBackStub::RemoteOnWifiConnectionChanged(uint32_t code, Message
         info.connState = ConnState::FAILED;
     }
     info.ifHiddenSSID = data.ReadBool();
-    info.rxLinkSpeed = data.ReadCString();
-    info.txLinkSpeed = data.ReadCString();
+    info.rxLinkSpeed = data.ReadInt32();
+    info.txLinkSpeed = data.ReadInt32();
     info.chload = data.ReadInt32();
     info.snr = data.ReadInt32();
+    info.isDataRestricted = data.ReadInt32();
+    info.portalUrl = data.ReadCString();
     int tmpState = data.ReadInt32();
     if (tmpState >= 0 && tmpState <= int(SupplicantState::INVALID)) {
         info.supplicantState = SupplicantState(tmpState);

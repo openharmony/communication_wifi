@@ -719,10 +719,12 @@ void WifiDeviceProxy::ReadLinkedInfo(MessageParcel &reply, WifiLinkedInfo &info)
         info.connState = ConnState::FAILED;
     }
     info.ifHiddenSSID = reply.ReadBool();
-    info.rxLinkSpeed = reply.ReadCString();
-    info.txLinkSpeed = reply.ReadCString();
+    info.rxLinkSpeed = reply.ReadInt32();
+    info.txLinkSpeed = reply.ReadInt32();
     info.chload = reply.ReadInt32();
     info.snr = reply.ReadInt32();
+    info.isDataRestricted = reply.ReadInt32();
+    info.portalUrl = reply.ReadCString();
 
     int tmpState = reply.ReadInt32();
     if ((tmpState >= 0) && (tmpState <= (int)SupplicantState::INVALID)) {

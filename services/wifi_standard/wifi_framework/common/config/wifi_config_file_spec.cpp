@@ -792,7 +792,6 @@ void SetTClassKeyValue<TrustListPolicy>(TrustListPolicy &item, const std::string
     } else if (key == "trustList") {
         item.trustList = value;
     }
-
     return;
 }
 
@@ -838,5 +837,45 @@ template <> std::string OutTClassString<MovingFreezePolicy>(MovingFreezePolicy &
     ss << "trustList=" << item.trustList << std::endl;
     return ss.str();
 }
+
+template <> void ClearTClass<WifiStoreRandomMac>(WifiStoreRandomMac &item)
+{
+    item.ssid.clear();
+    item.keyMgmt.clear();
+    item.peerBssid.clear();
+    item.randomMac.clear();
+    return;
+}
+
+template <>
+void SetTClassKeyValue<WifiStoreRandomMac>(WifiStoreRandomMac &item, const std::string &key, const std::string &value)
+{
+    if (key == "ssid") {
+        item.ssid = value;
+    } else if (key == "keyMgmt") {
+        item.keyMgmt = value;
+    } else if (key == "peerBssid") {
+        item.peerBssid = value;
+    } else if (key == "randomMac") {
+        item.randomMac = value;
+    }
+    return;
+}
+
+template <> std::string GetTClassName<WifiStoreRandomMac>()
+{
+    return "WifiStoreRandomMac";
+}
+
+template <> std::string OutTClassString<WifiStoreRandomMac>(WifiStoreRandomMac &item)
+{
+    std::ostringstream ss;
+    ss << "ssid=" << item.ssid << std::endl;
+    ss << "keyMgmt=" << item.keyMgmt << std::endl;
+    ss << "peerBssid=" << item.peerBssid << std::endl;
+    ss << "randomMac=" << item.randomMac << std::endl;
+    return ss.str();
+}
 } // namespace Wifi
 } // namespace OHOS
+

@@ -66,10 +66,12 @@ void WifiDeviceCallBackProxy::OnWifiConnectionChanged(int state, const WifiLinke
     data.WriteInt32(info.ipAddress);
     data.WriteInt32((int)info.connState);
     data.WriteBool(info.ifHiddenSSID);
-    data.WriteCString(info.rxLinkSpeed.c_str());
-    data.WriteCString(info.txLinkSpeed.c_str());
+    data.WriteInt32(info.rxLinkSpeed);
+    data.WriteInt32(info.txLinkSpeed);
     data.WriteInt32(info.chload);
     data.WriteInt32(info.snr);
+    data.WriteInt32(info.isDataRestricted);
+    data.WriteCString(info.portalUrl.c_str());
     data.WriteInt32((int)info.supplicantState);
     data.WriteInt32((int)info.detailedState);
 

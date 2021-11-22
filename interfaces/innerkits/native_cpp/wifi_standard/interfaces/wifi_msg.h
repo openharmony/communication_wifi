@@ -97,10 +97,12 @@ struct WifiLinkedInfo {
     unsigned int ipAddress;
     ConnState connState;
     bool ifHiddenSSID;
-    std::string rxLinkSpeed; /* Downstream network speed */
-    std::string txLinkSpeed; /* Upstream network speed */
+    int rxLinkSpeed; /* Downstream network speed */
+    int txLinkSpeed; /* Upstream network speed */
     int chload;
     int snr;                         /* Signal-to-Noise Ratio */
+    int isDataRestricted;
+    std::string portalUrl;
     SupplicantState supplicantState; /* wpa_supplicant state */
     DetailedState detailedState;     /* connection state */
 
@@ -116,6 +118,7 @@ struct WifiLinkedInfo {
         ifHiddenSSID = false;
         chload = 0;
         snr = 0;
+        isDataRestricted = 0;
         supplicantState = SupplicantState::INVALID;
         detailedState = DetailedState::INVALID;
     }
@@ -390,6 +393,10 @@ enum class WpsStartState {
     START_PBC_FAILED_OVERLAP = 10,
     START_WPS_FAILED = 11,
     WPS_TIME_OUT = 12,
+    START_AP_PIN_SUCCEED = 13,
+    START_AP_PIN_FAILED = 14,
+    STOP_AP_PIN_SUCCEED = 15,
+    STOP_AP_PIN_FAILED = 16,
 };
 
 enum class StreamDirection {

@@ -153,6 +153,50 @@ int StaService::UpdateDeviceConfig(const WifiDeviceConfig &config) const
     return AddDeviceConfig(config);
 }
 
+ErrCode StaService::RemoveDevice(int networkId) const
+{
+    LOGD("Enter StaService::RemoveDevice.\n");
+    /* Remove network configuration. */
+    if (WifiStaHalInterface::GetInstance().RemoveDevice(networkId) != WIFI_IDL_OPT_OK) {
+        LOGE("RemoveDeviceConfig() failed!");
+        return WIFI_OPT_FAILED;
+    }
+    if (WifiStaHalInterface::GetInstance().SaveDeviceConfig() != WIFI_IDL_OPT_OK) {
+        LOGW("RemoveDevice-SaveDeviceConfig() failed!");
+    } else {
+        LOGD("RemoveDevice-SaveDeviceConfig() succeed!");
+    }
+    WifiDeviceConfig config;
+    if (WifiSettings::GetInstance().GetDeviceConfig(networkId, config) == 0) {
+        pStaAutoConnectService->EnableOrDisableBssid(config.bssid, true, 0);
+    }
+    /* Remove network configuration directly without notification to InterfaceService. */
+    WifiSettings::GetInstance().RemoveDevice(networkId);
+    WifiSettings::GetInstance().SyncDeviceConfig();
+    return WIFI_OPT_SUCCESS;
+}
+
+ErrCode StaService::RemoveAllDevice() const
+{
+    LOGD("Enter StaService::RemoveAllDevice.\n");
+    if (WifiStaHalInterface::GetInstance().ClearDeviceConfig() == WIFI_IDL_OPT_OK) {
+        LOGD("Remove all device config successfully!");
+        if (WifiStaHalInterface::GetInstance().SaveDeviceConfig() != WIFI_IDL_OPT_OK) {
+            LOGE("WifiStaHalInterface:RemoveAllDevice:SaveDeviceConfig failed!");
+        }
+    } else {
+        LOGE("WifiStaHalInterface:RemoveAllDevice failed!");
+        return WIFI_OPT_FAILED;
+    }
+
+    WifiSettings::GetInstance().ClearDeviceConfig();
+    if (WifiSettings::GetInstance().SyncDeviceConfig() != 0) {
+        LOGE("RemoveAllDevice-SyncDeviceConfig() failed!");
+        return WIFI_OPT_FAILED;
+    }
+    return WIFI_OPT_SUCCESS;
+}
+
 ErrCode StaService::ConnectToDevice(const WifiDeviceConfig &config) const
 {
     LOGI("Enter StaService::ConnectToDevice.\n");
@@ -187,35 +231,7 @@ ErrCode StaService::ReAssociate() const
     return WIFI_OPT_SUCCESS;
 }
 
-ErrCode StaService::RemoveDevice(int networkId) const
-{
-    LOGD("Enter StaService::RemoveDeviceConfigProcess.\n");
-    /* Remove network configuration. */
-    if (WifiStaHalInterface::GetInstance().RemoveDevice(networkId) != WIFI_IDL_OPT_OK) {
-        LOGE("RemoveDeviceConfig() failed!");
-        return WIFI_OPT_FAILED;
-    }
-    if (WifiStaHalInterface::GetInstance().SaveDeviceConfig() != WIFI_IDL_OPT_OK) {
-        LOGW("RemoveDeviceConfig-SaveDeviceConfig() failed!");
-    } else {
-        LOGD("RemoveDeviceConfig-SaveDeviceConfig() succeed!");
-    }
-    WifiDeviceConfig config;
-    if (WifiSettings::GetInstance().GetDeviceConfig(networkId, config) == 0) {
-        pStaAutoConnectService->EnableOrDisableBssid(config.bssid, true, 0);
-    }
-    /* Remove network configuration directly without notification to InterfaceService. */
-    WifiSettings::GetInstance().RemoveDevice(networkId);
-    WifiSettings::GetInstance().SyncDeviceConfig();
-    return WIFI_OPT_SUCCESS;
-}
 
-ErrCode StaService::RemoveAllDevice() const
-{
-    WIFI_LOGI("Enter StaService::RemoveAllDevice.\n");
-    pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_REMOVE_All_DEVICE_CONFIG);
-    return WIFI_OPT_SUCCESS;
-}
 
 ErrCode StaService::EnableDeviceConfig(int networkId, bool attemptEnable) const
 {
@@ -300,7 +316,6 @@ ErrCode StaService::AutoConnectService(const std::vector<InterScanInfo> &scanInf
 {
     WIFI_LOGI("Enter StaService::AutoConnectService.\n");
     pStaAutoConnectService->OnScanInfosReadyHandler(scanInfos);
-    pStaStateMachine->SyncLinkInfo(scanInfos);
     return WIFI_OPT_SUCCESS;
 }
 

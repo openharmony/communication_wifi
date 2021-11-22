@@ -64,7 +64,7 @@ private:
      * @Description : Detect Internet ability
      *
      */
-    void HttpDetection();
+    bool HttpDetection();
     /**
      * @Description : NetCheck thread function
      *
@@ -74,12 +74,12 @@ private:
      * @Description : Exit the NetCheck thread.
      *
      */
-
     void ExitNetCheckThread();
 
 private:
     std::mutex mMutex;
     std::condition_variable mCondition;
+    std::condition_variable mCondition_timeout;
     bool isStopNetCheck;
     bool isExitNetCheckThread;
 };

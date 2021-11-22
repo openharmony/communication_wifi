@@ -29,7 +29,6 @@ ohos_shared_library("wifi_sta_service") {
     "sta_interface.cpp",
     "sta_monitor.cpp",
     "sta_network_check.cpp",
-    "sta_network_speed.cpp",
     "sta_saved_device_appraisal.cpp",
     "sta_service.cpp",
     "sta_state_machine.cpp",

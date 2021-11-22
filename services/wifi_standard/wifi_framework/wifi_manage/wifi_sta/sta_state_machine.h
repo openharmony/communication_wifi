@@ -24,7 +24,6 @@
 #include "wifi_errcode.h"
 #include "wifi_msg.h"
 #include "state_machine.h"
-#include "sta_network_speed.h"
 #include "sta_network_check.h"
 #include "i_dhcp_result_notify.h"
 #include "sta_service_callback.h"
@@ -33,32 +32,50 @@
 
 namespace OHOS {
 namespace Wifi {
-static const int STA_CONNECT_MODE = 1;
-static const int STA_SCAN_ONLY_MODE = 2;
-static const int STA_CAN_ONLY_WITH_WIFI_OFF_MODE = 3;
-static const int STA_DISABLED_MODE = 4;
-static const int CMD_START_WIFI_SUCCESS = 0x01;
-static const int CMD_STOP_WIFI_SUCCESS = 0x02;
-static const int CMD_CONNECT_NETWORK = 0x03;
-static const int CMD_DISCONNECT_NETWORK = 0X05;
-static const int CMD_SYNC_LINKINFO = 0X06;
-static const int CMD_GET_NETWORK_SPEED = 0X07;
-static const int STA_NETWORK_SPEED_DELAY = 1 * 1000;
-static const int CMD_NETWORK_CONNECT_TIMEOUT = 0X08;
-static const int STA_NETWORK_CONNECTTING_DELAY = 60 * 1000;
-static const int PIN_CODE_LEN = 8; /* pincode length */
+constexpr int STA_CONNECT_MODE = 1;
+constexpr int STA_SCAN_ONLY_MODE = 2;
+constexpr int STA_CAN_ONLY_WITH_WIFI_OFF_MODE = 3;
+constexpr int STA_DISABLED_MODE = 4;
 
-static const int DHCP_TIME = 15;
+constexpr int CMD_NETWORK_CONNECT_TIMEOUT = 0X01;
+constexpr int STA_NETWORK_CONNECTTING_DELAY = 60 * 1000;
+
+constexpr int CMD_SIGNAL_POLL = 0X02;
+constexpr int STA_SIGNAL_POLL_DELAY = 3 * 1000;
+
+/* pincode length */
+constexpr int PIN_CODE_LEN = 8; 
+
+/* DHCP timeout interval */
+constexpr int DHCP_TIME = 15;
+/* rssi thresholds */
+constexpr int INVALID_RSSI_VALUE = -127;
+constexpr int MAX_RSSI_VALUE = 200;
+constexpr int SIGNAL_INFO = 256;
+
+/* 2.4g and 5g frequency thresholds */
+constexpr int FREQ_2G_MIN = 2412;
+constexpr int FREQ_2G_MAX = 2472;
+constexpr int FREQ_5G_MIN = 5170;
+constexpr int FREQ_5G_MAX = 5825;
+constexpr int CHANNEL_14_FREQ = 2484;
+constexpr int CHANNEL_14 = 14;
+constexpr int CENTER_FREQ_DIFF = 5;
+constexpr int CHANNEL_2G_MIN = 1;
+constexpr int CHANNEL_5G_MIN = 34;
+
+constexpr int MULTI_AP = 0;
 
 /*
  * During the WPS PIN connection, the WPA_SUPPLICANT blocklist is cleared every 10 seconds
  * until the network connection is successful.
  */
-static const int BLOCK_LIST_CLEAR_TIMER = 20 * 1000;
+constexpr int BLOCK_LIST_CLEAR_TIMER = 20 * 1000;
 
 /* Signal levels are classified into: 0 1 2 3 4 ,the max is 4. */
-static const int MAX_LEVEL = 4;
+constexpr int MAX_LEVEL = 4;
 const std::string WPA_BSSID_ANY = "any";
+const std::string IF_NAME = "wlan0";
 
 class StaStateMachine : public StateMachine {
     FRIEND_GTEST(StaStateMachine);
@@ -324,12 +341,7 @@ public:
      * @param callbacks - Callback function pointer storage structure
      */
     void RegisterStaServiceCallback(const StaServiceCallback &callbacks);
-    /**
-     * @Description  Synchronize the linked information
-     *
-     * @param scanInfos - the results obtaining by scanning(in)
-     */
-    void SyncLinkInfo(const std::vector<InterScanInfo> &scanInfos);
+
     /**
      * @Description  Convert the deviceConfig structure and set it to wpa_supplicant
      *
@@ -405,17 +417,6 @@ private:
     void GetBandFromFreQuencies(const int &freQuency);
 
     /**
-     * @Description  Remove network configuration.
-     *
-     * @param msg -Internal message(in)
-     */
-    void RemoveDeviceConfigProcess(const InternalMessage *msg);
-    /**
-     * @Description  Remove all network configuration.
-     * 
-     */
-    void RemoveAllDeviceConfigProcess();
-    /**
      * @Description  Processing after a success response is returned after Wi-Fi
                      is enabled successfully, such as setting the MAC address and
                      saving the connection information.
@@ -445,7 +446,7 @@ private:
      *
      * @param networkId - the networkId of network which is going to be disabled.(in)
      */
-    void DisableNetwork(int networkId);
+    ErrCode DisableNetwork(int networkId);
     /**
      * @Description  Disconnect network
      *
@@ -476,7 +477,7 @@ private:
      *
      * @param netState - the state of connecting network(in)
      */
-    void HandleNetCheckResult(StaNetState netState);
+    void HandleNetCheckResult(StaNetState netState, const std::string portalUrl);
     /**
      * @Description  Remove all device configurations before enabling WPS.
      *
@@ -487,12 +488,22 @@ private:
      *
      */
     void SyncAllDeviceConfigs();
-
     /**
      * @Description  Initialize the connection state processing message map
      *
      */
     int InitStaSMHandleMap();
+    /**
+     * @Description : Deal SignalPoll Result.
+     *
+     * @param  msg - Message body received by the state machine[in]
+     */
+    void DealSignalPollResult(InternalMessage *msg);
+    /**
+     * @Description : Converting frequencies to channels.
+     *
+     */
+    void ConvertFreqToChannel();
     /**
      * @Description  Connect to selected network.
      *
@@ -576,22 +587,26 @@ private:
      *
      */
     void ReassociateProcess();
-    /**
-     * @Description  Synchronous Encryption Mode Aand Band
-     *
-     * @param mgmt - Encryption Mode[in]
-     */
-    void SynchronousEncryptionModeAandBand(std::string mgmt);
-    /**
-     * @Description  Set Wep Encryption Mode Index
-     *
-     * @param config - A Network[in]
-     */
-    void WepEncryptionModeIndex(WifiDeviceConfig &config);
 
-    bool SetRandomMac(const int networkId);
+    /**
+     * @Description  Set a random MAC address.
+     *
+     * @param networkId - network id[in]
+     */
+    bool SetRandomMac(int networkId);
+    /**
+     * @Description  Generate a random MAC address.
+     *
+     * @param strMac - Randomly generated MAC address[out]
+     */
     void MacAddressGenerate(std::string &strMac);
-    int CheckMacFormat(const std::string &mac);
+    /**
+     * @Description  Compare the encryption mode of the current network with that of the network in the scanning result.
+     *
+     * @param scanInfoKeymgmt - Network encryption mode in the scanning result[in]
+     * @param deviceKeymgmt - Encryption mode of the current network[in]
+     */
+    bool ComparedKeymgmt(const std::string scanInfoKeymgmt, const std::string deviceKeymgmt);
 
 private:
     StaSmHandleFuncMap staSmHandleFuncMap;
@@ -602,9 +617,9 @@ private:
     int targetNetworkId;
     int pinCode;
     SetupMethod wpsState;
-    int lastConnectToNetworkTimer; /* Time stamp of the last attempt to connect to
-                                    * the network.
-                                    */
+    /* Time stamp of the last attempt to connect to the network. */
+    int lastConnectToNetworkTimer; 
+    int lastSignalLevel;
     std::string targetRoamBssid;
     int currentTpType;
     IsWpsConnected isWpsConnect;
@@ -615,7 +630,6 @@ private:
     WifiLinkedInfo lastLinkedInfo;
     IDhcpService *pDhcpService;
     DhcpResultNotify *pDhcpResultNotify;
-    StaNetWorkSpeed *pNetSpeed;
     StaNetworkCheck *pNetcheck;
 
     RootState *pRootState;

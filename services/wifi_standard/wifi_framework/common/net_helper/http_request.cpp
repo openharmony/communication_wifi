@@ -14,7 +14,12 @@
  */
 
 #include "http_request.h"
+#include <thread>
+#include <unordered_set>
+#include <sys/time.h>
+#include "securec.h"
 #include "wifi_log.h"
+
 #undef LOG_TAG
 #define LOG_TAG "OHWIFI_UTILS_HTTP_REQ"
 
@@ -78,12 +83,16 @@ int HttpRequest::HttpRequestExec(
     GetPortFromUrl();
     if (iPort < 0) {
         LOGE("HttpRequest::HttpRequestExec get port failed from URL!\n");
+        close(mISocketFd);
+        mISocketFd = INVALID_SOCKET;
         return -1;
     }
 
     iRet = GetIPFromUrl();
     if (iRet != 0) {
         LOGE("HttpRequest::HttpRequestExec get ip failed from URL!\n");
+        close(mISocketFd);
+        mISocketFd = INVALID_SOCKET;
         return -1;
     }
 
@@ -92,8 +101,13 @@ int HttpRequest::HttpRequestExec(
     iRet = HttpConnect(strResponse);
     if (iRet != 0) {
         LOGE("HttpRequest::HttpConnect failed!\n");
+        close(mISocketFd);
+        mISocketFd = INVALID_SOCKET;
         return -1;
     }
+    close(mISocketFd);
+    mISocketFd = INVALID_SOCKET;
+    LOGD("HttpRequest::HttpConnect success!\n");
     return 0;
 }
 
@@ -188,24 +202,49 @@ int HttpRequest::HttpDataTransmit(const int &iSockFd)
     if (buf == nullptr) {
         return -1;
     }
+    constexpr int timeoutMs = 500;
+    constexpr int timeRate = 1000;
+    struct timeval tv;
+    struct timeval tvEnd;
+    gettimeofday(&tv, nullptr);
+    long long tvTime = tv.tv_sec * timeRate + tv.tv_usec / timeRate;
+    long long tvEndTime;
+    bool bDataRec = false;
     while (1) {
+        gettimeofday(&tvEnd, nullptr);
+        tvEndTime = tvEnd.tv_sec * timeRate + tvEnd.tv_usec / timeRate;
+        if (tvEndTime - tvTime > timeoutMs) {
+            LOGE("HttpRequest::HttpDataTransmit recv timeout\n");
+            delete[] buf;
+            buf = nullptr;
+            return -1;
+        }
+        (void)memset_s(buf, BUFSIZE, 0, BUFSIZE);
         ret = recv(iSockFd, buf, BUFSIZE, 0);
         if (ret == 0) {
             /* The connection is closed. */
-            LOGE("HttpRequest::HttpDataTransmit recv error! Error code: %{public}d", errno);
-            delete[] buf;
-            return -1;
+            if (!bDataRec) {
+                LOGE("HttpRequest::HttpDataTransmit recv error! Error code: %{public}d", errno);
+                delete[] buf;
+                buf = nullptr;
+                return -1;
+            } else {
+                LOGD("HttpRequest::HttpDataTransmit recv success\n");
+                delete[] buf;
+                return 0;
+            }
         } else if (ret > 0) {
-            strRes = buf;
-            delete[] buf;
-            return 0;
+            bDataRec = true;
+            strRes += buf;
         } else if (ret < 0) {
             /* Error */
             if (errno == EINTR || errno == EWOULDBLOCK || errno == EAGAIN) {
+                LOGE("HttpRequest::HttpDataTransmit recv not finish!\n");
                 continue;
             } else {
                 LOGE("HttpRequest::HttpDataTransmit recv error! Error code: %{public}d", errno);
                 delete[] buf;
+                buf = nullptr;
                 return -1;
             }
         }
@@ -246,6 +285,43 @@ void HttpRequest::GetPortFromUrl()
     }
 }
 
+std::mutex gMutex;
+std::unordered_set<HostData*> gHostDataSet;
+void GetHostThread(HostData* pThreadData)
+{
+    std::string ipOrDomain;
+    {
+        std::unique_lock<std::mutex> lck(gMutex);
+        if (gHostDataSet.find(pThreadData) == gHostDataSet.end()) {
+            LOGE("GetHostThread Error.");
+            return;
+        }
+        ipOrDomain = pThreadData->strIpOrDomain;
+    }
+    hostent *he = gethostbyname(ipOrDomain.c_str());
+    if (he == nullptr) {
+        {
+            std::unique_lock<std::mutex> lck(gMutex);
+            if (gHostDataSet.find(pThreadData) != gHostDataSet.end()) {
+                LOGD("GetHostThread delete.");
+                gHostDataSet.erase(pThreadData);
+                delete pThreadData;
+                pThreadData = nullptr;
+            }
+        }
+        LOGE("GetIPFromUrl Url is wrong. error message:[%s]\n", hstrerror(h_errno));
+    } else {
+        std::unique_lock<std::mutex> lck(gMutex);
+        in_addr **addr_list = (in_addr **)he->h_addr_list;
+        for (int i = 0; addr_list[i] != nullptr; i++) {
+            pThreadData->strIp = inet_ntoa(*addr_list[i]);
+        }
+        pThreadData->bIp = true;
+        pThreadData->mWait_timeout.notify_one();
+    }
+    return;
+}
+
 int HttpRequest::GetIPFromUrl()
 {
     std::string strIpOrDomain;
@@ -260,23 +336,44 @@ int HttpRequest::GetIPFromUrl()
     }
 
     if (inet_addr(strIpOrDomain.c_str()) == INADDR_NONE) {
-        /* Incorrect IP address format. */
-        LOGI("GetIPFromUrl Url maybe contain Domain\n");
-        struct hostent *he = gethostbyname(strIpOrDomain.c_str());
-        if (he == nullptr) {
-            LOGE("GetIPFromUrl Url is wrong.");
-            return -1;
-        } else {
-            struct in_addr **addrList = reinterpret_cast<struct in_addr **>(he->h_addr_list);
-            for (int i = 0; addrList[i] != nullptr; i++) {
-                char ipStr[MAX_IP_STRING_LENGTH] = {0};
-                if (inet_ntop(AF_INET, addrList[i], ipStr, sizeof(ipStr)) == nullptr) {
-                    continue;
-                }
-                strIp = std::string(ipStr);
-            }
-            return 0;
+        LOGI("GetIPFromUrl Url maybe contain Domain.");
+        HostData* pData = nullptr;
+        {
+            std::unique_lock<std::mutex> lck(gMutex);
+            pData = new HostData;
+            gHostDataSet.emplace(pData);
+            pData->strIpOrDomain = strIpOrDomain;
         }
+
+        int iRlt = -1;
+        std::thread getHost = std::thread(&GetHostThread, pData);
+        getHost.detach();
+
+        bool bTimeOut = false;
+        const int timeoutMs = 150;
+        {
+            std::unique_lock<std::mutex> lck(gMutex);
+            if (pData->mWait_timeout.wait_for(lck, std::chrono::milliseconds(timeoutMs)) == std::cv_status::timeout) {
+                bTimeOut = true;
+            }
+        }
+
+        if (!bTimeOut) {
+            std::unique_lock<std::mutex> lck(gMutex);
+            if (gHostDataSet.find(pData) == gHostDataSet.end()) {
+                LOGD("GetHostThread None.");
+                return -1;
+            }
+            if (pData->bIp) {
+                iRlt = 0;
+                strIp = pData->strIp;
+                gHostDataSet.erase(pData);
+                delete pData;
+                pData = nullptr;
+                LOGD("Get ip ok.");
+            }
+        }
+        return iRlt;
     } else {
         LOGI("GetIPFromUrl Url contain ip\n");
         strIp = strIpOrDomain;

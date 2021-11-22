@@ -446,10 +446,12 @@ void WifiDeviceStub::OnGetLinkedInfo(uint32_t code, MessageParcel &data, Message
         reply.WriteInt32(wifiInfo.ipAddress);
         reply.WriteInt32((int)wifiInfo.connState);
         reply.WriteBool(wifiInfo.ifHiddenSSID);
-        reply.WriteCString(wifiInfo.rxLinkSpeed.c_str());
-        reply.WriteCString(wifiInfo.txLinkSpeed.c_str());
+        reply.WriteInt32(wifiInfo.rxLinkSpeed);
+        reply.WriteInt32(wifiInfo.txLinkSpeed);
         reply.WriteInt32(wifiInfo.chload);
         reply.WriteInt32(wifiInfo.snr);
+        reply.WriteInt32(wifiInfo.isDataRestricted);
+        reply.WriteCString(wifiInfo.portalUrl.c_str());
         reply.WriteInt32((int)wifiInfo.supplicantState);
         reply.WriteInt32((int)wifiInfo.detailedState);
     }

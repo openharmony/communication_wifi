@@ -48,6 +48,7 @@ constexpr char WIFI_P2P_GROUP_INFO_FILE_PATH[] = "/data/misc/wifi/p2p_groups.con
 constexpr char WIFI_P2P_VENDOR_CONFIG_FILE_PATH[] = "/data/misc/wifi/p2p_vendor_config.conf";
 const std::string WIFI_TRUST_LIST_POLICY_FILE_PATH = "/data/misc/wifi/trust_list_polices.conf";
 const std::string WIFI_MOVING_FREEZE_POLICY_FILE_PATH = "/data/misc/wifi/moving_freeze_policy.conf";
+constexpr char WIFI_STA_RANDOM_MAC_FILE_PATH[] = "/data/misc/wifi/sta_randomMac.conf";
 
 namespace OHOS {
 namespace Wifi {
@@ -335,6 +336,21 @@ public:
      * @return int - 0 success
      */
     int GetMacAddress(std::string &macAddress);
+
+    /**
+     * @Description reload mac address
+     *
+     * @return int - 0 success
+     */
+    int ReloadStaRandomMac();
+
+    /**
+     * @Description add random mac address
+     *
+     * @param randomMacInfo - randmon mac address info
+     * @return int - 0 success
+     */
+    bool AddRandomMac(WifiStoreRandomMac &randomMacInfo);
 
     /**
      * @Description Save the country code
@@ -983,6 +999,7 @@ private:
     std::atomic<bool> mScanAlwaysActive; /* if scan always */
     std::vector<WifiScanInfo> mWifiScanInfoList;
     std::vector<WifiP2pGroupInfo> mGroupInfoList;
+    std::vector<WifiStoreRandomMac> mWifiStoreRandomMac;
     ScanControlInfo mScanControlInfo;
     WifiP2pLinkedInfo mWifiP2pInfo;
     std::map<int, WifiDeviceConfig> mWifiDeviceConfig;
@@ -1028,6 +1045,7 @@ private:
     WifiConfigFileImpl<TrustListPolicy> mTrustListPolicies;
     WifiConfigFileImpl<MovingFreezePolicy> mMovingFreezePolicy;
     MovingFreezePolicy mFPolicy;
+    WifiConfigFileImpl<WifiStoreRandomMac> mSavedWifiStoreRandomMac;
 };
 }  // namespace Wifi
 }  // namespace OHOS

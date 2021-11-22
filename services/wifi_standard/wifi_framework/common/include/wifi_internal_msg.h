@@ -266,6 +266,7 @@ struct WifiConfig {
     int fourthRssiLevel5G;
     std::string strDnsBak;
     bool isLoadStabak;
+
     WifiConfig()
     {
         scanAlwaysSwitch = false;
@@ -312,6 +313,14 @@ struct TrustListPolicy {
 
 struct MovingFreezePolicy {
     std::string trustList;  /* trust list */
+};
+
+/* wifi RandomMac store */
+struct WifiStoreRandomMac {
+    std::string ssid;
+    std::string keyMgmt;
+    std::string peerBssid;
+    std::string randomMac;
 };
 }  // namespace Wifi
 }  // namespace OHOS

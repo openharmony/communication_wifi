@@ -21,22 +21,23 @@
 #include <netdb.h>
 #include <arpa/inet.h>
 #include <netinet/in.h>
-#include <sys/socket.h>
-#include <sys/types.h>
 #include <string>
 #include <cerrno>
 #include <cstdio>
 #include <cstdlib>
 #include <cstdarg>
+#include <sys/socket.h>
+#include <sys/types.h>
+#include <condition_variable>
 
-constexpr int BUFSIZE = 41000;
-constexpr int URLSIZE = 1024;
-constexpr int INVALID_SOCKET = -1;
-constexpr int HTTP_HEADER_LENGTH = 7;
-constexpr int HTTPS_HEADER_LENGTH = 8;
-constexpr int DEFAULT_PORT = 80;
-constexpr int SEND_HTTP_DELAY_TIME = 6;
-constexpr int MAX_IP_STRING_LENGTH = 64;
+#define BUFSIZE 1024
+#define URLSIZE 1024
+#define INVALID_SOCKET (-1)
+
+const int HTTP_HEADER_LENGTH = 7;
+const int HTTPS_HEADER_LENGTH = 8;
+const int DEFAULT_PORT = 80;
+const int SEND_HTTP_DELAY_TIME = 1;
 
 namespace OHOS {
 namespace Wifi {
@@ -152,6 +153,12 @@ private:
     std::string strParam;
     std::string httpHead;
 };
-}  // namespace Wifi
-}  // namespace OHOS
+struct HostData {
+    bool bIp = false;
+    std::string strIp;
+    std::string strIpOrDomain;
+    std::condition_variable mWait_timeout;
+};
+}
+} /* namespace OHOS */
 #endif

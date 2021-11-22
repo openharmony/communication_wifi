@@ -408,6 +408,46 @@ std::string GetTClassName<MovingFreezePolicy>();
  */
 template <>
 std::string OutTClassString<MovingFreezePolicy>(MovingFreezePolicy &item);
+
+/**
+ * @Description Clear and init WifiStoreRandomMac
+ *
+ * @tparam
+ * @param item - WifiStoreRandomMac &item
+ */
+template <>
+void ClearTClass<WifiStoreRandomMac>(WifiStoreRandomMac &item);
+
+/**
+ * @Description Set WifiStoreRandomMac item data
+ *
+ * @tparam
+ * @param item - WifiStoreRandomMac &item
+ * @param key - WifiStoreRandomMac struct member name
+ * @param value - the WifiStoreRandomMac item member value
+ */
+template <>
+void SetTClassKeyValue<WifiStoreRandomMac>(WifiStoreRandomMac &item, const std::string &key, const std::string &value);
+
+/**
+ * @Description Output WifiStoreRandomMac class name
+ *
+ * @tparam
+ * @param item - WifiStoreRandomMac &item
+ * @return std::string - Class name
+ */
+template <>
+std::string GetTClassName<WifiStoreRandomMac>();
+
+/**
+ * @Description Output the WifiStoreRandomMac item, format: item's member = the member value
+ *
+ * @tparam
+ * @param item - WifiStoreRandomMac &item
+ * @return std::string - output total member=value string about the WifiStoreRandomMac item
+ */
+template <>
+std::string OutTClassString<WifiStoreRandomMac>(WifiStoreRandomMac &item);
 /* ----------template function specialization declare end----------- */
 }  // namespace Wifi
 }  // namespace OHOS

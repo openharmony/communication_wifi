@@ -125,6 +125,7 @@ int WifiSettings::Init()
     mSavedWifiP2pVendorConfig.SetConfigFilePath(WIFI_P2P_VENDOR_CONFIG_FILE_PATH);
     mTrustListPolicies.SetConfigFilePath(WIFI_TRUST_LIST_POLICY_FILE_PATH);
     mMovingFreezePolicy.SetConfigFilePath(WIFI_MOVING_FREEZE_POLICY_FILE_PATH);
+    mSavedWifiStoreRandomMac.SetConfigFilePath(WIFI_STA_RANDOM_MAC_FILE_PATH);
     InitWifiConfig();
     ReloadDeviceConfig();
     InitHotspotConfig();
@@ -497,6 +498,51 @@ int WifiSettings::GetMacAddress(std::string &macAddress)
     macAddress = mMacAddress;
     return 0;
 }
+
+int WifiSettings::ReloadStaRandomMac()
+{
+    if (mSavedWifiStoreRandomMac.LoadConfig()) {
+        return -1;
+    }
+    std::unique_lock<std::mutex> lock(mStaMutex);
+    mWifiStoreRandomMac.clear();
+    mSavedWifiStoreRandomMac.GetValue(mWifiStoreRandomMac);
+    return 0;
+}
+
+bool WifiSettings::AddRandomMac(WifiStoreRandomMac &randomMacInfo)
+{
+    std::unique_lock<std::mutex> lock(mStaMutex);
+    bool isConnected = false;
+
+    for (auto &ele : mWifiStoreRandomMac) {
+        if ((randomMacInfo.ssid == ele.ssid) && (randomMacInfo.keyMgmt == ele.keyMgmt)) {
+            ele.peerBssid = randomMacInfo.peerBssid;
+            randomMacInfo.randomMac = ele.randomMac;
+            isConnected = true;
+            break;
+        } else if (randomMacInfo.peerBssid == ele.peerBssid && (randomMacInfo.keyMgmt == ele.keyMgmt) &&
+                   (randomMacInfo.keyMgmt == "NONE")) {
+            isConnected = false;
+        } else if (randomMacInfo.peerBssid == ele.peerBssid && (randomMacInfo.keyMgmt == ele.keyMgmt) &&
+                   (randomMacInfo.keyMgmt != "NONE")) {
+            ele.ssid = randomMacInfo.ssid;
+            randomMacInfo.randomMac = ele.randomMac;
+            isConnected = true;
+        } else {
+            isConnected = false;
+        }
+    }
+
+    if (!isConnected) {
+        mWifiStoreRandomMac.push_back(randomMacInfo);
+    }
+
+    mSavedWifiStoreRandomMac.SetValue(mWifiStoreRandomMac);
+    mSavedWifiStoreRandomMac.SaveConfig();
+    return isConnected;
+}
+
 
 int WifiSettings::SetCountryCode(const std::string &countryCode)
 {

@@ -321,6 +321,13 @@ public:
     int SaveLinkedInfo(const WifiLinkedInfo &info);
 
     /**
+     * @Description Obtains the BSSID of the last successful connection.
+     *
+     * @return std::string - bssid
+     */
+    std::string GetLastSuccConnectBssid();
+
+    /**
      * @Description Save mac address
      *
      * @param macAddress - mac address info
@@ -1010,6 +1017,7 @@ private:
     int mFreezeModeState;        /* 1 on 2 off */
     int mNoChargerPlugModeState;  /* 1 on 2 off */
     WifiConfig mWifiConfig;
+    std::string lastSuccConnectBssid;
 
     std::mutex mStaMutex;
     std::mutex mApMutex;

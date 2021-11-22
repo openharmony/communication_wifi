@@ -249,6 +249,40 @@ ErrCode WifiDeviceProxy::AddDeviceConfig(const WifiDeviceConfig &config, int &re
     return WIFI_OPT_SUCCESS;
 }
 
+ErrCode WifiDeviceProxy::UpdateDeviceConfig(const WifiDeviceConfig &config, int &result)
+{
+    if (mRemoteDied) {
+        WIFI_LOGD("failed to `%{public}s`,remote service is died!", __func__);
+        return WIFI_OPT_FAILED;
+    }
+
+    if (config.networkId <= INVALID_NETWORK_ID) {
+        WIFI_LOGE("update device config fail for networkId is invalid: %{public}d", config.networkId);
+        return WIFI_OPT_FAILED;
+    }
+
+    MessageOption option;
+    MessageParcel data, reply;
+    data.WriteInt32(0);
+    WriteDeviceConfig(config, data);
+
+    int error = Remote()->SendRequest(WIFI_SVR_CMD_UPDATE_DEVICE_CONFIG, data, reply, option);
+    if (error != ERR_NONE) {
+        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d", WIFI_SVR_CMD_UPDATE_DEVICE_CONFIG, error);
+        return WIFI_OPT_FAILED;
+    }
+    int exception = reply.ReadInt32();
+    if (exception) {
+        return WIFI_OPT_FAILED;
+    }
+    int ret = reply.ReadInt32();
+    if (ret != WIFI_OPT_SUCCESS) {
+        return ErrCode(ret);
+    }
+    result = reply.ReadInt32();
+    return WIFI_OPT_SUCCESS;
+}
+
 ErrCode WifiDeviceProxy::RemoveDevice(int networkId)
 {
     if (mRemoteDied) {
@@ -474,6 +508,28 @@ ErrCode WifiDeviceProxy::ConnectToDevice(const WifiDeviceConfig &config)
         return WIFI_OPT_FAILED;
     }
     return ErrCode(reply.ReadInt32());
+}
+
+bool WifiDeviceProxy::IsConnected()
+{
+    if (mRemoteDied) {
+        WIFI_LOGD("failed to `%{public}s`,remote service is died!", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    MessageOption option;
+    MessageParcel data, reply;
+    data.WriteInt32(0);
+
+    int error = Remote()->SendRequest(WIFI_SVR_CMD_IS_WIFI_CONNECTED, data, reply, option);
+    if (error != ERR_NONE) {
+        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d", WIFI_SVR_CMD_IS_WIFI_CONNECTED, error);
+        return WIFI_OPT_FAILED;
+    }
+    int exception = reply.ReadInt32();
+    if (exception) {
+        return false;
+    }
+    return reply.ReadBool();
 }
 
 ErrCode WifiDeviceProxy::ReConnect()

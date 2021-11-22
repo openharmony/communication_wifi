@@ -77,6 +77,15 @@ public:
     ErrCode AddDeviceConfig(const WifiDeviceConfig &config, int &result) override;
 
     /**
+     * @Description Update a wifi device configuration.
+     *
+     * @param config - WifiDeviceConfig object
+     * @param result - the device configuration's network id after updated
+     * @return ErrCode - operation result
+     */
+    ErrCode UpdateDeviceConfig(const WifiDeviceConfig &config, int &result) override;
+
+    /**
      * @Description Remove the wifi device config equals to input network id
      *
      * @param networkId - want to remove device config's network id
@@ -114,6 +123,13 @@ public:
      * @return ErrCode - operation result
      */
     ErrCode ConnectToDevice(const WifiDeviceConfig &config) override;
+
+    /**
+     * @Description Check whether Wi-Fi is connected.
+     *
+     * @return bool - true: connected, false: not connected
+     */
+    bool IsConnected() override;
 
     /**
      * @Description Disconnect
@@ -204,7 +220,7 @@ public:
      * @param attemptEnable - if set true, disable other device config
      * @return ErrCode - operation result
      */
-    ErrCode EnableDeviceConfig(int networkId, bool attemptEnable);
+    ErrCode EnableDeviceConfig(int networkId, bool attemptEnable) override;
 
     /**
      * @Description Disable Wi-Fi device configuration.
@@ -212,7 +228,7 @@ public:
      * @param networkId - device config's network id
      * @return ErrCode - operation result
      */
-    ErrCode DisableDeviceConfig(int networkId);
+    ErrCode DisableDeviceConfig(int networkId) override;
 
     /**
      * @Description Obtaining ip Request Information
@@ -220,21 +236,21 @@ public:
      * @param info - IpInfo object
      * @return ErrCode - operation result
      */
-    ErrCode GetIpInfo(IpInfo &info);
+    ErrCode GetIpInfo(IpInfo &info) override;
 
     /**
      * @Description Reconnect to the currently active network
      *
      * @return ErrCode - operation result
      */
-    ErrCode ReConnect();
+    ErrCode ReConnect() override;
 
     /**
      * @Description ReAssociate network
      *
      * @return ErrCode - operation result
      */
-    ErrCode ReAssociate(void);
+    ErrCode ReAssociate() override;
 
     /**
      * @Description Enable WPS connection

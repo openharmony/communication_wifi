@@ -210,11 +210,6 @@ private:
      */
     bool RoamingEncryptionModeCheck(WifiDeviceConfig &electedDevice, InterScanInfo scanInfo, WifiLinkedInfo &info);
     /**
-     * @Description  Updating the Configuration Center Device.
-     *
-     */
-    void RefreshConfigDevice();
-    /**
      * @Description  Whether the device is a 2.4G device.
      *
      * @param frequency(in)

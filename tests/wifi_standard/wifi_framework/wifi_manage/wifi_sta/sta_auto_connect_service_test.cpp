@@ -154,7 +154,6 @@ public:
     void RoamingEncryptionModeCheckFail2();
     void RoamingEncryptionModeCheckFail3();
     void RoamingEncryptionModeCheckFail4();
-    void RefreshConfigDeviceSuccess();
     void RoamingSelectionSuccess1();
     void RoamingSelectionFail1();
     void RoamingSelectionFail2();
@@ -1183,11 +1182,6 @@ void StaAutoConnectServiceTest::RoamingEncryptionModeCheckFail4()
     EXPECT_TRUE(pStaAutoConnectService->RoamingEncryptionModeCheck(deviceConfig, scanInfo, info) == false);
 }
 
-void StaAutoConnectServiceTest::RefreshConfigDeviceSuccess()
-{
-    pStaAutoConnectService->RefreshConfigDevice();
-}
-
 void StaAutoConnectServiceTest::RoamingSelectionSuccess1()
 {
     WifiDeviceConfig deviceConfig;
@@ -1665,11 +1659,6 @@ HWTEST_F(StaAutoConnectServiceTest, RoamingEncryptionModeCheckFail3, TestSize.Le
 HWTEST_F(StaAutoConnectServiceTest, RoamingEncryptionModeCheckFail4, TestSize.Level1)
 {
     RoamingEncryptionModeCheckFail4();
-}
-
-HWTEST_F(StaAutoConnectServiceTest, RefreshConfigDeviceSuccess, TestSize.Level1)
-{
-    RefreshConfigDeviceSuccess();
 }
 
 HWTEST_F(StaAutoConnectServiceTest, RoamingSelectionSuccess1, TestSize.Level1)

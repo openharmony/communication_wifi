@@ -481,7 +481,16 @@ int WifiSettings::SaveLinkedInfo(const WifiLinkedInfo &info)
 {
     std::unique_lock<std::mutex> lock(mInfoMutex);
     mWifiLinkedInfo = info;
+    if (mWifiLinkedInfo.connState == ConnState::CONNECTED) {
+        lastSuccConnectBssid = mWifiLinkedInfo.bssid;
+    }
     return 0;
+}
+
+std::string WifiSettings::GetLastSuccConnectBssid()
+{
+    std::unique_lock<std::mutex> lock(mInfoMutex);
+    return lastSuccConnectBssid;
 }
 
 int WifiSettings::SetMacAddress(const std::string &macAddress)

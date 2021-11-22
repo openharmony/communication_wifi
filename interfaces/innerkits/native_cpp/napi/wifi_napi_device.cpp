@@ -330,30 +330,49 @@ napi_value GetSignalLevel(napi_env env, napi_callback_info info)
     return result;
 }
 
-/* This interface has not been implemented */
 napi_value ReConnect(napi_env env, napi_callback_info info)
 {
     TRACE_FUNC_CALL;
     NAPI_ASSERT(env, wifiDevicePtr != nullptr, "Wifi device instance is null.");
-    napi_value result = nullptr;
+
+    napi_value result;
+    napi_get_boolean(env, wifiDevicePtr->ReConnect(), &result);
     return result;
 }
 
-/* This interface has not been implemented */
 napi_value ReAssociate(napi_env env, napi_callback_info info)
 {
     TRACE_FUNC_CALL;
     NAPI_ASSERT(env, wifiDevicePtr != nullptr, "Wifi device instance is null.");
-    napi_value result = nullptr;
+    napi_value result;
+    napi_get_boolean(env, wifiDevicePtr->ReAssociate(), &result);
     return result;
 }
 
-/* This interface has not been implemented */
+static void IpInfoToJsObj(const napi_env& env, IpInfo& ipInfo, napi_value& result)
+{
+    napi_create_object(env, &result);
+    SetValueUnsignedInt32(env, "ipAddress", ipInfo.ipAddress, result);
+    SetValueUnsignedInt32(env, "gateway", ipInfo.gateway, result);
+    SetValueUnsignedInt32(env, "netmask", ipInfo.netmask, result);
+    SetValueUnsignedInt32(env, "primaryDns", ipInfo.primaryDns, result);
+    SetValueUnsignedInt32(env, "secondDns", ipInfo.secondDns, result);
+    SetValueUnsignedInt32(env, "serverIp", ipInfo.serverIp, result);
+    SetValueUnsignedInt32(env, "leaseDuration", ipInfo.leaseDuration, result);
+}
+
 napi_value GetIpInfo(napi_env env, napi_callback_info info)
 {
     TRACE_FUNC_CALL;
     NAPI_ASSERT(env, wifiDevicePtr != nullptr, "Wifi device instance is null.");
-    napi_value result = nullptr;
+
+    IpInfo ipInfo;
+    napi_value result;
+    ErrCode ret = wifiDevicePtr->GetIpInfo(ipInfo);
+    if (ret != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("Get ip info fail: %{public}d", ret);
+    }
+    IpInfoToJsObj(env, ipInfo, result);
     return result;
 }
 
@@ -442,7 +461,6 @@ napi_value RemoveAllNetwork(napi_env env, napi_callback_info info)
     return result;
 }
 
-/* This interface has not been implemented */
 napi_value DisableNetwork(napi_env env, napi_callback_info info)
 {
     TRACE_FUNC_CALL;
@@ -459,7 +477,8 @@ napi_value DisableNetwork(napi_env env, napi_callback_info info)
 
     int networkId = -1;
     napi_get_value_int32(env, argv[0], &networkId);
-    napi_value result = nullptr;
+    napi_value result;
+    napi_get_boolean(env, wifiDevicePtr->DisableDeviceConfig(networkId) == WIFI_OPT_SUCCESS, &result);
     return result;
 }
 

@@ -77,6 +77,15 @@ public:
     ErrCode AddDeviceConfig(const WifiDeviceConfig &config, int &result) override;
 
     /**
+     * @Description Update a wifi device configuration.
+     *
+     * @param config - WifiDeviceConfig object
+     * @param result - the device configuration's network id after updated
+     * @return ErrCode - operation result
+     */
+    ErrCode UpdateDeviceConfig(const WifiDeviceConfig &config, int &result) override;
+
+    /**
      * @Description Remove the wifi device config equals to input network id
      *
      * @param networkId - want to remove device config's network id
@@ -131,6 +140,13 @@ public:
      * @return ErrCode - operation result
      */
     ErrCode ConnectToDevice(const WifiDeviceConfig &config) override;
+
+    /**
+     * @Description Check whether Wi-Fi is connected.
+     *
+     * @return bool - true: connected, false: not connected
+     */
+    bool IsConnected() override;
 
     /**
      * @Description Reconnect to the currently active network

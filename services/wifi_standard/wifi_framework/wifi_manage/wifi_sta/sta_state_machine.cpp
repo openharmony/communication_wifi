@@ -19,6 +19,7 @@
 #include "wifi_logger.h"
 #include "wifi_sta_hal_interface.h"
 #include "wifi_settings.h"
+#include "mac_address.h"
 #include "if_config.h"
 #include "wifi_supplicant_hal_interface.h"
 
@@ -32,15 +33,6 @@ DEFINE_WIFILOG_LABEL("StaStateMachine");
 #define PBC_ANY_BSSID "any"
 
 const int SLEEPTIME = 3;
-const int BAND_ONE = 1;
-const int BAND_TWO = 2;
-
-#define MAC_LENGTH 12
-#define MAC_STEP 2
-#define RAND_SEED_16 16
-#define RAND_SEED_8 8
-#define BUFFER_SIZE 128
-
 
 namespace OHOS {
 namespace Wifi {
@@ -52,6 +44,7 @@ StaStateMachine::StaStateMachine()
       pinCode(0),
       wpsState(SetupMethod::INVALID),
       lastConnectToNetworkTimer(-1),
+      lastSignalLevel(-1),
       targetRoamBssid(WPA_BSSID_ANY),
       currentTpType(IPTYPE_IPV4),
       isWpsConnect(IsWpsConnected::WPS_INVALID),
@@ -60,7 +53,6 @@ StaStateMachine::StaStateMachine()
       isRoam(false),
       pDhcpService(nullptr),
       pDhcpResultNotify(nullptr),
-      pNetSpeed(nullptr),
       pNetcheck(nullptr),
       pRootState(nullptr),
       pInitState(nullptr),
@@ -94,7 +86,7 @@ StaStateMachine::~StaStateMachine()
     ParsePointer(pGetIpState);
     ParsePointer(pLinkedState);
     ParsePointer(pApRoamingState);
-    ParsePointer(pNetSpeed);
+
     if (pDhcpService != nullptr) {
         if (currentTpType == IPTYPE_IPV4) {
             pDhcpService->StopDhcpClient(IF_NAME, false);
@@ -131,7 +123,8 @@ ErrCode StaStateMachine::InitStaStateMachine()
     }
 
     pNetcheck = new (std::nothrow)
-        StaNetworkCheck(std::bind(&StaStateMachine::HandleNetCheckResult, this, std::placeholders::_1));
+        StaNetworkCheck(std::bind(&StaStateMachine::HandleNetCheckResult, this,
+            std::placeholders::_1, std::placeholders::_2));
     if (pNetcheck == nullptr) {
         WIFI_LOGE("pNetcheck is null\n");
         return WIFI_OPT_FAILED;
@@ -144,35 +137,33 @@ ErrCode StaStateMachine::InitStaStates()
 {
     WIFI_LOGE("Enter InitStaStates\n");
     int tmpErrNumber;
-    pRootState = new RootState();
+    pRootState = new (std::nothrow)RootState();
     tmpErrNumber = JudgmentEmpty(pRootState);
-    pInitState = new InitState(this);
+    pInitState = new (std::nothrow)InitState(this);
     tmpErrNumber += JudgmentEmpty(pInitState);
-    pWpaStartingState = new WpaStartingState(this);
+    pWpaStartingState = new (std::nothrow)WpaStartingState(this);
     tmpErrNumber += JudgmentEmpty(pWpaStartingState);
-    pWpaStartedState = new WpaStartedState(this);
+    pWpaStartedState = new (std::nothrow)WpaStartedState(this);
     tmpErrNumber += JudgmentEmpty(pWpaStartedState);
-    pWpaStoppingState = new WpaStoppingState(this);
+    pWpaStoppingState = new (std::nothrow)WpaStoppingState(this);
     tmpErrNumber += JudgmentEmpty(pWpaStoppingState);
-    pLinkState = new LinkState(this);
+    pLinkState = new (std::nothrow)LinkState(this);
     tmpErrNumber += JudgmentEmpty(pLinkState);
-    pSeparatingState = new SeparatingState();
+    pSeparatingState = new (std::nothrow)SeparatingState();
     tmpErrNumber += JudgmentEmpty(pSeparatingState);
-    pSeparatedState = new SeparatedState(this);
+    pSeparatedState = new (std::nothrow)SeparatedState(this);
     tmpErrNumber += JudgmentEmpty(pSeparatedState);
-    pApLinkedState = new ApLinkedState(this);
+    pApLinkedState = new (std::nothrow)ApLinkedState(this);
     tmpErrNumber += JudgmentEmpty(pApLinkedState);
-    pWpsState = new StaWpsState(this);
+    pWpsState = new (std::nothrow)StaWpsState(this);
     tmpErrNumber += JudgmentEmpty(pWpsState);
-    pGetIpState = new GetIpState(this);
+    pGetIpState = new (std::nothrow)GetIpState(this);
     tmpErrNumber += JudgmentEmpty(pGetIpState);
-    pLinkedState = new LinkedState();
+    pLinkedState = new (std::nothrow)LinkedState();
     tmpErrNumber += JudgmentEmpty(pLinkedState);
-    pApRoamingState = new ApRoamingState(this);
+    pApRoamingState = new (std::nothrow)ApRoamingState(this);
     tmpErrNumber += JudgmentEmpty(pApRoamingState);
-    pNetSpeed = new StaNetWorkSpeed();
-    tmpErrNumber += JudgmentEmpty(pNetSpeed);
-    pDhcpResultNotify = new DhcpResultNotify(this);
+    pDhcpResultNotify = new (std::nothrow)DhcpResultNotify(this);
     tmpErrNumber += JudgmentEmpty(pDhcpResultNotify);
     if (tmpErrNumber != 0) {
         WIFI_LOGE("InitStaStates some one state is null\n");
@@ -187,6 +178,8 @@ void StaStateMachine::InitWifiLinkedInfo()
     linkedInfo.ssid = "";
     linkedInfo.bssid = "";
     linkedInfo.macAddress = "";
+    linkedInfo.rxLinkSpeed = 0;
+    linkedInfo.txLinkSpeed = 0;
     linkedInfo.rssi = 0;
     linkedInfo.band = 0;
     linkedInfo.frequency = 0;
@@ -196,6 +189,8 @@ void StaStateMachine::InitWifiLinkedInfo()
     linkedInfo.ifHiddenSSID = false;
     linkedInfo.chload = 0;
     linkedInfo.snr = 0;
+    linkedInfo.isDataRestricted = 0;
+    linkedInfo.portalUrl = "";
     linkedInfo.detailedState = DetailedState::DISCONNECTED;
 }
 
@@ -205,6 +200,8 @@ void StaStateMachine::InitLastWifiLinkedInfo()
     lastLinkedInfo.ssid = "";
     lastLinkedInfo.bssid = "";
     lastLinkedInfo.macAddress = "";
+    lastLinkedInfo.rxLinkSpeed = 0;
+    lastLinkedInfo.txLinkSpeed = 0;
     lastLinkedInfo.rssi = 0;
     lastLinkedInfo.band = 0;
     lastLinkedInfo.frequency = 0;
@@ -214,6 +211,8 @@ void StaStateMachine::InitLastWifiLinkedInfo()
     lastLinkedInfo.ifHiddenSSID = false;
     lastLinkedInfo.chload = 0;
     lastLinkedInfo.snr = 0;
+    linkedInfo.isDataRestricted = 0;
+    linkedInfo.portalUrl = "";
     lastLinkedInfo.detailedState = DetailedState::DISCONNECTED;
 }
 
@@ -236,7 +235,7 @@ void StaStateMachine::BuildStateTree()
 
 void StaStateMachine::RegisterStaServiceCallback(const StaServiceCallback &callbacks)
 {
-    LOGI("RegisterStaServiceCallback");
+    LOGI("RegisterStaServiceCallback.");
     staCallback = callbacks;
 }
 
@@ -284,7 +283,10 @@ void StaStateMachine::InitState::GoInState()
 }
 
 void StaStateMachine::InitState::GoOutState()
-{}
+{
+    LOGI("InitState GoOutState function.");
+    return;
+}
 
 bool StaStateMachine::InitState::ExecuteStateMsg(InternalMessage *msg)
 {
@@ -294,34 +296,18 @@ bool StaStateMachine::InitState::ExecuteStateMsg(InternalMessage *msg)
 
     bool ret = NOT_EXECUTED;
     switch (msg->GetMessageName()) {
-        case WIFI_SVR_CMD_STA_START_SUPPLICANT: {
-            ret = EXECUTED;
-            pStaStateMachine->StartWifiProcess();
-            break;
-        }
-
         case WIFI_SVR_CMD_STA_ENABLE_WIFI: {
             ret = EXECUTED;
             pStaStateMachine->operationalMode = msg->GetParam1();
-            pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_START_SUPPLICANT);
+            pStaStateMachine->StartWifiProcess();
             break;
         }
 
         case WIFI_SVR_CMD_STA_OPERATIONAL_MODE:
             break;
 
-        case WIFI_SVR_CMD_STA_REMOVE_DEVICE_CONFIG: {
-            ret = EXECUTED;
-            pStaStateMachine->RemoveDeviceConfigProcess(msg);
-            break;
-        }
-
-        case WIFI_SVR_CMD_STA_REMOVE_All_DEVICE_CONFIG: {
-            ret = EXECUTED;
-            pStaStateMachine->RemoveAllDeviceConfigProcess();
-            break;
-        }
         default:
+            LOGI("InitState-msgCode=%d not handled.\n", msg->GetMessageName());
             break;
     }
     return ret;
@@ -413,7 +399,7 @@ void StaStateMachine::StartWifiProcess()
         SwitchState(pSeparatedState);
     } else {
         /* Notify the InterfaceService that wifi is failed to enable wifi. */
-        LOGE("StartWifi failed, and errcode is %d", res);
+        LOGE("StartWifi failed, and errcode is %d.", res);
         WifiSettings::GetInstance().SetWifiState(static_cast<int>(WifiState::DISABLED));
         staCallback.OnStaOpenRes(OperateResState::OPEN_WIFI_FAILED);
         staCallback.OnStaOpenRes(OperateResState::OPEN_WIFI_DISABLED);
@@ -442,6 +428,7 @@ void StaStateMachine::WpaStartingState::GoInState()
 
 void StaStateMachine::WpaStartingState::GoOutState()
 {
+    LOGI("WpaStartingState GoOutState function.");
     return;
 }
 
@@ -484,6 +471,7 @@ void StaStateMachine::WpaStartedState::GoInState()
 }
 void StaStateMachine::WpaStartedState::GoOutState()
 {
+    LOGD("WpaStartedState GoOutState function.");
     return;
 }
 
@@ -495,27 +483,9 @@ bool StaStateMachine::WpaStartedState::ExecuteStateMsg(InternalMessage *msg)
 
     bool ret = NOT_EXECUTED;
     switch (msg->GetMessageName()) {
-        case WIFI_SVR_CMD_STA_STOP_SUPPLICANT: {
-            ret = EXECUTED;
-            pStaStateMachine->StopWifiProcess();
-            break;
-        }
-
         case WIFI_SVR_CMD_STA_DISABLE_WIFI: {
             ret = EXECUTED;
-            pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_STOP_SUPPLICANT);
-            break;
-        }
-
-        case WIFI_SVR_CMD_STA_REMOVE_DEVICE_CONFIG: {
-            ret = EXECUTED;
-            pStaStateMachine->RemoveDeviceConfigProcess(msg);
-            break;
-        }
-
-        case WIFI_SVR_CMD_STA_REMOVE_All_DEVICE_CONFIG: {
-            ret = EXECUTED;
-            pStaStateMachine->RemoveAllDeviceConfigProcess();
+            pStaStateMachine->StopWifiProcess();
             break;
         }
 
@@ -530,6 +500,7 @@ void StaStateMachine::StopWifiProcess()
     WIFI_LOGD("Enter StaStateMachine::StopWifiProcess.\n");
     WifiSettings::GetInstance().SetWifiState(static_cast<int>(WifiState::DISABLING));
     staCallback.OnStaCloseRes(OperateResState::CLOSE_WIFI_CLOSING);
+    StopTimer(static_cast<int>(CMD_SIGNAL_POLL));
     if (currentTpType == IPTYPE_IPV4) {
         pDhcpService->StopDhcpClient(IF_NAME, false);
     } else {
@@ -546,65 +517,18 @@ void StaStateMachine::StopWifiProcess()
     InitWifiLinkedInfo();
     WifiSettings::GetInstance().SaveLinkedInfo(linkedInfo);
 
-    WifiErrorNo errorNo = WifiStaHalInterface::GetInstance().StopWifi();
-    if (errorNo == WIFI_IDL_OPT_OK) {
+    if (WifiStaHalInterface::GetInstance().StopWifi() == WIFI_IDL_OPT_OK) {
+        /* Callback result to InterfaceService. */
         WifiSettings::GetInstance().SetWifiState(static_cast<int>(WifiState::DISABLED));
-        /* Notify result to InterfaceService. */
         staCallback.OnStaCloseRes(OperateResState::CLOSE_WIFI_SUCCEED);
         WIFI_LOGD("Stop WifiProcess successfully!");
 
         /* The current state of StaStateMachine transfers to InitState. */
         SwitchState(pInitState);
     } else {
-        LOGE("StopWifiProcess failed, and errcode is %d", errorNo);
+        LOGE("StopWifiProcess failed.");
         WifiSettings::GetInstance().SetWifiState(static_cast<int>(WifiState::UNKNOWN));
         staCallback.OnStaCloseRes(OperateResState::CLOSE_WIFI_FAILED);
-    }
-}
-
-void StaStateMachine::RemoveDeviceConfigProcess(const InternalMessage *msg)
-{
-    if (msg == nullptr) {
-        return;
-    }
-
-    WIFI_LOGD("Enter StaStateMachine::RemoveDeviceConfigProcess.\n");
-    /* Remove network configuration. */
-    if (WifiStaHalInterface::GetInstance().RemoveDevice(msg->GetParam1()) == WIFI_IDL_OPT_OK) {
-        WIFI_LOGD("Remove device config successfully!");
-
-        if (WifiStaHalInterface::GetInstance().SaveDeviceConfig() != WIFI_IDL_OPT_OK) {
-            WIFI_LOGW("RemoveDeviceConfig:SaveDeviceConfig failed!");
-        } else {
-            WIFI_LOGD("RemoveDeviceConfig-SaveDeviceConfig successfully!");
-        }
-    } else {
-        WIFI_LOGE("RemoveDeviceConfig failed!");
-    }
-
-    /* Remove network configuration directly without notification to InterfaceService. */
-    WifiSettings::GetInstance().RemoveDevice(msg->GetParam1());
-    if (WifiSettings::GetInstance().SyncDeviceConfig() != 0) {
-        WIFI_LOGE("RemoveDeviceConfigProcess-SyncDeviceConfig() failed!");
-    }
-}
-
-void StaStateMachine::RemoveAllDeviceConfigProcess()
-{
-    WIFI_LOGD("Enter StaStateMachine::RemoveAllDeviceConfigProcess.\n");
-    if (WifiStaHalInterface::GetInstance().ClearDeviceConfig() == WIFI_IDL_OPT_OK) {
-        WIFI_LOGD("Remove all device config successfully!");
-
-        if (WifiStaHalInterface::GetInstance().SaveDeviceConfig() != WIFI_IDL_OPT_OK) {
-            WIFI_LOGW("RemoveAllDeviceConfig:SaveDeviceConfig failed!");
-        }
-    } else {
-        WIFI_LOGE("RemoveAllDeviceConfig failed!");
-    }
-
-    WifiSettings::GetInstance().ClearDeviceConfig();
-    if (WifiSettings::GetInstance().SyncDeviceConfig() != 0) {
-        WIFI_LOGE("RemoveAllDeviceConfigProcess-SyncDeviceConfig() failed!");
     }
 }
 
@@ -618,13 +542,16 @@ StaStateMachine::WpaStoppingState::~WpaStoppingState()
 
 void StaStateMachine::WpaStoppingState::GoInState()
 {
-    WIFI_LOGE("WpaStoppingState GoInState function.");
+    LOGI("WpaStoppingState GoInState function.");
     pStaStateMachine->SwitchState(pStaStateMachine->pInitState);
     return;
 }
 
 void StaStateMachine::WpaStoppingState::GoOutState()
-{}
+{
+    LOGI("WpaStoppingState GoOutState function.");
+    return;
+}
 
 bool StaStateMachine::WpaStoppingState::ExecuteStateMsg(InternalMessage *msg)
 {
@@ -633,11 +560,11 @@ bool StaStateMachine::WpaStoppingState::ExecuteStateMsg(InternalMessage *msg)
     }
 
     bool ret = NOT_EXECUTED;
-    WIFI_LOGI("RootState-msgCode=%{public}d not handled.\n", msg->GetMessageName());
+    WIFI_LOGI("WpaStoppingState-msgCode=%{public}d not handled.\n", msg->GetMessageName());
     return ret;
 }
 
-/* --------------------------- state machine Connect State ------------------------------ */
+/* --------------------------- state machine link State ------------------------------ */
 StaStateMachine::LinkState::LinkState(StaStateMachine *staStateMachine)
     : State("LinkState"), pStaStateMachine(staStateMachine)
 {}
@@ -648,19 +575,21 @@ StaStateMachine::LinkState::~LinkState()
 void StaStateMachine::LinkState::GoInState()
 {
     WIFI_LOGI("LinkState GoInState function.");
-
     return;
 }
 
 void StaStateMachine::LinkState::GoOutState()
-{}
+{
+    LOGI("LinkState GoOutState function.");
+    return;
+}
 
 bool StaStateMachine::LinkState::ExecuteStateMsg(InternalMessage *msg)
 {
     if (msg == nullptr) {
         return false;
     }
-
+    LOGI("LinkState ExecuteStateMsg function:msgName=[%{public}d].\n", msg->GetMessageName());
     auto iter = pStaStateMachine->staSmHandleFuncMap.find(msg->GetMessageName());
     if (iter != pStaStateMachine->staSmHandleFuncMap.end()) {
         (pStaStateMachine->*(iter->second))(msg);
@@ -672,6 +601,7 @@ bool StaStateMachine::LinkState::ExecuteStateMsg(InternalMessage *msg)
 /* -- state machine Connect State Message processing function -- */
 int StaStateMachine::InitStaSMHandleMap()
 {
+    staSmHandleFuncMap[CMD_SIGNAL_POLL] = &StaStateMachine::DealSignalPollResult;
     staSmHandleFuncMap[WIFI_SVR_CMD_STA_CONNECT_NETWORK] = &StaStateMachine::DealConnectToUserSelectedNetwork;
     staSmHandleFuncMap[WIFI_SVR_CMD_STA_CONNECT_SAVED_NETWORK] = &StaStateMachine::DealConnectToUserSelectedNetwork;
     staSmHandleFuncMap[WIFI_SVR_CMD_STA_NETWORK_DISCONNECTION_EVENT] = &StaStateMachine::DealDisconnectEvent;
@@ -687,13 +617,112 @@ int StaStateMachine::InitStaSMHandleMap()
     return WIFI_OPT_SUCCESS;
 }
 
-void StaStateMachine::DealConnectToUserSelectedNetwork(InternalMessage *msg)
+int setRssi(int rssi)
 {
-    if (msg == nullptr) {
-        return;
+    if (rssi < INVALID_RSSI_VALUE) {
+        rssi = INVALID_RSSI_VALUE;
     }
 
-    WIFI_LOGI("enter ConnectToUserSelectedNetwork\n");
+    if (rssi > MAX_RSSI_VALUE) {
+        rssi = MAX_RSSI_VALUE;
+    }
+    return rssi;
+}
+
+void StaStateMachine::DealSignalPollResult(InternalMessage *msg)
+{
+    LOGI("enter DealSignalPollResult.\n");
+    if (msg == nullptr) {
+        LOGE("InternalMessage msg is null.");
+        return;
+    }
+    WifiWpaSignalInfo signalInfo;
+    WifiStaHalInterface::GetInstance().GetConnectSignalInfo(linkedInfo.bssid, signalInfo);
+    LOGI("DealSignalPollResult GetConnectSignalInfo rssi = %d, txLinkSpeed = %d, rxLinkSpeed =%d, frequency =%d.\n",
+        signalInfo.signal,
+        signalInfo.txrate,
+        signalInfo.rxrate,
+        signalInfo.frequency);
+    if (signalInfo.signal > INVALID_RSSI_VALUE && signalInfo.signal < MAX_RSSI_VALUE) {
+        if (signalInfo.signal > 0) {
+            linkedInfo.rssi = setRssi((signalInfo.signal - SIGNAL_INFO));
+        } else {
+            linkedInfo.rssi = setRssi(signalInfo.signal);
+        }
+        int currentSignalLevel = WifiSettings::GetInstance().GetSignalLevel(linkedInfo.rssi, linkedInfo.band);
+        LOGI("DealSignalPollResult linkedInfo.rssi = %d, linkedInfo.band = %d.\n", linkedInfo.rssi, linkedInfo.band);
+        LOGI("DealSignalPollResult currentSignalLevel = %d, lastSignalLevel = %d.\n",
+            currentSignalLevel, lastSignalLevel);
+        if (currentSignalLevel != lastSignalLevel) {
+            LOGI("DealSignalPollResult currentSignalLevel = %d, lastSignalLevel = %d.\n",
+                currentSignalLevel, lastSignalLevel);
+            if (staCallback.OnStaRssiLevelChanged != nullptr) {
+                staCallback.OnStaRssiLevelChanged(linkedInfo.rssi);
+            }
+            lastSignalLevel = currentSignalLevel;
+        }
+    } else {
+        linkedInfo.rssi = INVALID_RSSI_VALUE;
+    }
+
+    if (signalInfo.txrate > 0) {
+        linkedInfo.txLinkSpeed = signalInfo.txrate;
+        linkedInfo.linkSpeed = signalInfo.txrate;
+        if (staCallback.OnStaStreamChanged != nullptr) {
+            staCallback.OnStaStreamChanged(StreamDirection::STREAM_DIRECTION_UP);
+        }
+    }
+
+    if (signalInfo.rxrate > 0) {
+        linkedInfo.rxLinkSpeed = signalInfo.rxrate;
+        if (staCallback.OnStaStreamChanged != nullptr) {
+            staCallback.OnStaStreamChanged(StreamDirection::STREAM_DIRECTION_DOWN);
+        }
+    }
+
+    if (signalInfo.frequency > 0) {
+        linkedInfo.frequency = signalInfo.frequency;
+    }
+    WifiSettings::GetInstance().SaveLinkedInfo(linkedInfo);
+    ConvertFreqToChannel();
+    StartTimer(static_cast<int>(CMD_SIGNAL_POLL), STA_SIGNAL_POLL_DELAY);
+}
+
+void StaStateMachine::ConvertFreqToChannel()
+{
+    WifiDeviceConfig config;
+    if (WifiSettings::GetInstance().GetDeviceConfig(linkedInfo.networkId, config) != 0) {
+        LOGE("GetDeviceConfig failed!");
+        return;
+    }
+    if (linkedInfo.frequency >= FREQ_2G_MIN && linkedInfo.frequency <= FREQ_2G_MAX) {
+        config.band = linkedInfo.band = static_cast<int>(BandType::BAND_2GHZ);
+        config.channel = (linkedInfo.frequency - FREQ_2G_MIN) / CENTER_FREQ_DIFF + CHANNEL_2G_MIN;
+    } else if (linkedInfo.frequency == CHANNEL_14_FREQ) {
+        config.channel = CHANNEL_14;
+    } else if (linkedInfo.frequency >= FREQ_5G_MIN && linkedInfo.frequency <= FREQ_5G_MAX) {
+        config.band = linkedInfo.band = static_cast<int>(BandType::BAND_5GHZ);
+        config.channel = (linkedInfo.frequency - FREQ_5G_MIN) / CENTER_FREQ_DIFF + CHANNEL_5G_MIN;
+    }
+
+    WifiSettings::GetInstance().AddDeviceConfig(config);
+    WifiSettings::GetInstance().SyncDeviceConfig();
+    return;
+}
+
+void StaStateMachine::DealConnectToUserSelectedNetwork(InternalMessage *msg)
+{
+    LOGI("enter DealConnectToUserSelectedNetwork.\n");
+    if (msg == nullptr) {
+        LOGE("msg is null.\n");
+        return;
+    }
+    /* Save connection information. */
+    SaveLinkstate(ConnState::CONNECTING, DetailedState::CONNECTING);
+
+    /* Callback result to InterfaceService. */
+    staCallback.OnStaConnChanged(OperateResState::CONNECT_CONNECTING, linkedInfo);
+
     int networkId = msg->GetParam1();
     bool forceReconnect = msg->GetParam2();
 
@@ -704,11 +733,13 @@ void StaStateMachine::DealConnectToUserSelectedNetwork(InternalMessage *msg)
 
     /* Sets network status. */
     WifiSettings::GetInstance().EnableNetwork(networkId, forceReconnect);
+    WifiSettings::GetInstance().SetDeviceState(networkId, (int)WifiDeviceConfigStatus::ENABLED, false);
     StartConnectToNetwork(networkId);
 }
 
 void StaStateMachine::DealConnectTimeOutCmd(InternalMessage *msg)
 {
+    LOGD("enter DealConnectTimeOutCmd.\n");
     if (msg == nullptr) {
         WIFI_LOGE("msg is nul\n");
     }
@@ -718,7 +749,6 @@ void StaStateMachine::DealConnectTimeOutCmd(InternalMessage *msg)
         return;
     }
 
-    WIFI_LOGD("enter DealDisableOneNetCmd\n");
     DisableNetwork(targetNetworkId);
     InitWifiLinkedInfo();
     WifiSettings::GetInstance().SaveLinkedInfo(linkedInfo);
@@ -739,11 +769,13 @@ void StaStateMachine::DealConnectionEvent(InternalMessage *msg)
     StopTimer(static_cast<int>(WPA_BLOCK_LIST_CLEAR_EVENT));
     StopTimer(static_cast<int>(CMD_NETWORK_CONNECT_TIMEOUT));
     ConnectToNetworkProcess(msg);
+    StartTimer(static_cast<int>(CMD_SIGNAL_POLL), 0);
 
     if (wpsState != SetupMethod::INVALID) {
         SyncAllDeviceConfigs();
         wpsState = SetupMethod::INVALID;
     }
+
     /* Callback result to InterfaceService. */
     staCallback.OnStaConnChanged(OperateResState::CONNECT_OBTAINING_IP, linkedInfo);
 
@@ -753,11 +785,14 @@ void StaStateMachine::DealConnectionEvent(InternalMessage *msg)
 
 void StaStateMachine::DealDisconnectEvent(InternalMessage *msg)
 {
+    LOGD("Enter DealDisconnectEvent.\n");
     if (msg == nullptr) {
         WIFI_LOGE("msg is null\n");
     }
-
-    WIFI_LOGD("Enter DealDisconnectEvent.\n");
+    if (wpsState != SetupMethod::INVALID) {
+        return;
+    }
+    StopTimer(static_cast<int>(CMD_SIGNAL_POLL));
     pNetcheck->StopNetCheckThread();
     if (currentTpType == IPTYPE_IPV4) {
         pDhcpService->StopDhcpClient(IF_NAME, false);
@@ -785,6 +820,7 @@ void StaStateMachine::DealDisconnectEvent(InternalMessage *msg)
     /* Callback result to InterfaceService. */
     staCallback.OnStaConnChanged(OperateResState::DISCONNECT_DISCONNECTED, linkedInfo);
     SwitchState(pSeparatedState);
+    return;
 }
 
 void StaStateMachine::DealWpaWrongPskEvent(InternalMessage *msg)
@@ -802,10 +838,11 @@ void StaStateMachine::DealWpaWrongPskEvent(InternalMessage *msg)
 
 void StaStateMachine::DealReassociateCmd(InternalMessage *msg)
 {
+    LOGD("enter DealReassociateCmd.\n");
     if (msg == nullptr) {
         WIFI_LOGE("msg is null\n");
     }
-    WIFI_LOGD("enter DealStartWpsCmd\n");
+
     /* Obtains the current system time, assigns the timestamp of the last
      * connection attempt, and prohibits scanning requests within 10 seconds.
      */
@@ -814,8 +851,10 @@ void StaStateMachine::DealReassociateCmd(InternalMessage *msg)
 
     if (WifiStaHalInterface::GetInstance().Reassociate() == WIFI_IDL_OPT_OK) {
         /* Callback result to InterfaceService */
-        staCallback.OnStaConnChanged(OperateResState::CONNECT_AP_CONNECTED, linkedInfo);
+        staCallback.OnStaConnChanged(OperateResState::CONNECT_ASSOCIATING, linkedInfo);
         WIFI_LOGD("StaStateMachine::LinkState::ExecuteStateMsg  ReAssociate successfully!");
+        StopTimer(static_cast<int>(CMD_NETWORK_CONNECT_TIMEOUT));
+        StartTimer(static_cast<int>(CMD_NETWORK_CONNECT_TIMEOUT), STA_NETWORK_CONNECTTING_DELAY);
     } else {
         WIFI_LOGE("ReAssociate failed!");
     }
@@ -823,15 +862,19 @@ void StaStateMachine::DealReassociateCmd(InternalMessage *msg)
 
 void StaStateMachine::DealStartWpsCmd(InternalMessage *msg)
 {
+    WIFI_LOGD("enter DealStartWpsCmd\n");
     if (msg == nullptr) {
         return;
     }
 
-    WIFI_LOGD("enter DealStartWpsCmd\n");
-    RemoveAllDeviceConfigs();
+    if (WifiStaHalInterface::GetInstance().ClearDeviceConfig() != WIFI_IDL_OPT_OK) {
+        LOGE("ClearDeviceConfig() failed!");
+        return;
+    }
+    
     StartWpsMode(msg);
 
-    if (wpsState == SetupMethod::DISPLAY) {
+    if ((wpsState == SetupMethod::DISPLAY) || (wpsState == SetupMethod::KEYPAD)) {
         WIFI_LOGD("Clear WPA block list every ten second!");
         SendMessage(WPA_BLOCK_LIST_CLEAR_EVENT);
     }
@@ -842,8 +885,12 @@ void StaStateMachine::StartWpsMode(InternalMessage *msg)
     if (msg == nullptr) {
         return;
     }
-
-    constexpr int multiAp = 0;
+    /*
+     * Make judgement to wps configuration information: the function will exit if
+     * the result is fail, then else continue to chose the Wps starting mode. The
+     * current state of StaStateMachine transfers to WpsState after Wps code start
+     * successfully.
+     */
     WifiIdlWpsConfig wpsParam;
     WpsConfig wpsConfig;
     wpsConfig.setup = static_cast<SetupMethod>(msg->GetParam1());
@@ -856,7 +903,7 @@ void StaStateMachine::StartWpsMode(InternalMessage *msg)
         wpsParam.anyFlag = 0;
         wpsParam.bssid = wpsConfig.bssid;
     }
-    wpsParam.multiAp = multiAp;
+    wpsParam.multiAp = MULTI_AP;
     WIFI_LOGI("wpsConfig  setup = %{public}d", wpsConfig.setup);
     WIFI_LOGI("wpsParam.AnyFlag = %{public}d, wpsParam.mulitAp = %{public}d, wpsParam.bssid = %s",
         wpsParam.anyFlag,
@@ -883,20 +930,22 @@ void StaStateMachine::StartWpsMode(InternalMessage *msg)
             SwitchState(pWpsState);
         } else {
             WIFI_LOGE("StartWpsPinMode() failed!");
-                        staCallback.OnWpsChanged(WpsStartState::START_PIN_FAILED, pinCode);
+            staCallback.OnWpsChanged(WpsStartState::START_PIN_FAILED, pinCode);
+        }
+    } else if (wpsConfig.setup == SetupMethod::KEYPAD) {
+        if (WifiStaHalInterface::GetInstance().StartWpsPinMode(wpsParam, pinCode) == WIFI_IDL_OPT_OK) {
+            wpsState = wpsConfig.setup;
+            /* Callback result to InterfaceService. */
+                staCallback.OnWpsChanged(WpsStartState::START_AP_PIN_SUCCEED, pinCode);
+            SwitchState(pWpsState);
+        } else {
+            LOGE("StartWpsPinMode() failed.");
+            staCallback.OnWpsChanged(WpsStartState::START_AP_PIN_FAILED, pinCode);
         }
     } else {
-        WIFI_LOGE("Start Wps failed!");
+        LOGE("Start Wps failed!");
         staCallback.OnWpsChanged(WpsStartState::START_WPS_FAILED, pinCode);
     }
-}
-
-void StaStateMachine::RemoveAllDeviceConfigs()
-{
-    WifiStaHalInterface::GetInstance().ClearDeviceConfig();
-    WifiStaHalInterface::GetInstance().SaveDeviceConfig();
-    WIFI_LOGD("Remove all device configurations completed!");
-    return;
 }
 
 void StaStateMachine::DealWpaBlockListClearEvent(InternalMessage *msg)
@@ -941,6 +990,8 @@ void StaStateMachine::DealCancelWpsCmd(InternalMessage *msg)
             staCallback.OnWpsChanged(WpsStartState::STOP_PBC_SUCCEED, pinCode);
         } else if (wpsState == SetupMethod::DISPLAY) {
             staCallback.OnWpsChanged(WpsStartState::STOP_PIN_SUCCEED, pinCode);
+        } else if (wpsState == SetupMethod::KEYPAD) {
+                staCallback.OnWpsChanged(WpsStartState::STOP_AP_PIN_SUCCEED, pinCode);
         }
         if (wpsState != SetupMethod::INVALID) {
             wpsState = SetupMethod::INVALID;
@@ -963,6 +1014,8 @@ void StaStateMachine::DealCancelWpsCmd(InternalMessage *msg)
             staCallback.OnWpsChanged(WpsStartState::STOP_PBC_FAILED, pinCode);
         } else if (wpsState == SetupMethod::DISPLAY) {
             staCallback.OnWpsChanged(WpsStartState::STOP_PIN_FAILED, pinCode);
+        } else if (wpsState == SetupMethod::KEYPAD) {
+            staCallback.OnWpsChanged(WpsStartState::STOP_AP_PIN_FAILED, pinCode);
         }
     }
     SwitchState(pSeparatedState);
@@ -1008,12 +1061,12 @@ void StaStateMachine::DealStartRoamCmd(InternalMessage *msg)
     linkedInfo.bssid = bssid;
     WifiSettings::GetInstance().SaveLinkedInfo(linkedInfo);
 
-    /* Start roaming */
-    SwitchState(pApRoamingState);
     if (WifiStaHalInterface::GetInstance().Reassociate() != WIFI_IDL_OPT_OK) {
         WIFI_LOGE("START_ROAM-ReAssociate() failed!");
     }
     WIFI_LOGI("START_ROAM-ReAssociate() succeeded!");
+    /* Start roaming */
+    SwitchState(pApRoamingState);
 }
 
 void StaStateMachine::StartConnectToNetwork(int networkId)
@@ -1035,16 +1088,108 @@ void StaStateMachine::StartConnectToNetwork(int networkId)
         LOGE("SaveDeviceConfig() failed!");
     }
 
-    /* Update wifi status. */
-    WifiSettings::GetInstance().SetWifiState(static_cast<int>(WifiState::ENABLING));
-
-    /* Save connection information. */
-    SaveLinkstate(ConnState::CONNECTING, DetailedState::CONNECTING);
-
-    /* Callback result to InterfaceService. */
-    staCallback.OnStaConnChanged(OperateResState::CONNECT_CONNECTING, linkedInfo);
     StopTimer(static_cast<int>(CMD_NETWORK_CONNECT_TIMEOUT));
     StartTimer(static_cast<int>(CMD_NETWORK_CONNECT_TIMEOUT), STA_NETWORK_CONNECTTING_DELAY);
+}
+
+void StaStateMachine::MacAddressGenerate(std::string &strMac)
+{
+    LOGD("enter MacAddressGenerate\n");
+    constexpr int arraySize = 4;
+    constexpr int macBitSize = 12;
+    constexpr int firstBit = 1;
+    constexpr int lastBit = 11;
+    constexpr int two = 2;
+    constexpr int hexBase = 16;
+    constexpr int octBase = 8;
+    char strMacTmp[arraySize] = {0};
+    srand(static_cast<unsigned int>(time(nullptr)));
+    for (int i = 0; i < macBitSize; i++) {
+        if (i != firstBit) {
+            sprintf_s(strMacTmp, arraySize, "%x", rand() % hexBase);
+        } else {
+            sprintf_s(strMacTmp, arraySize, "%x", two * (rand() % octBase));
+        }
+        strMac += strMacTmp;
+        if ((i % two) != 0 && (i != lastBit)) {
+            strMac.append(":");
+        }
+    }
+}
+
+bool StaStateMachine::ComparedKeymgmt(const std::string scanInfoKeymgmt, const std::string deviceKeymgmt)
+{
+    if (deviceKeymgmt == "WPA-PSK") {
+        return scanInfoKeymgmt.find("PSK") != std::string::npos;
+    } else if (deviceKeymgmt == "WPA-EAP") {
+        return scanInfoKeymgmt.find("EAP") != std::string::npos;
+    } else if (deviceKeymgmt == "SAE") {
+        return scanInfoKeymgmt.find("SAE") != std::string::npos;
+    } else if (deviceKeymgmt == "NONE") {
+        return (scanInfoKeymgmt.find("PSK") == std::string::npos) &&
+               (scanInfoKeymgmt.find("EAP") == std::string::npos) && (scanInfoKeymgmt.find("SAE") == std::string::npos);
+    } else {
+        return false;
+    }
+}
+
+bool StaStateMachine::SetRandomMac(int networkId)
+{
+    LOGD("enter SetRandomMac.\n");
+    WifiDeviceConfig deviceConfig;
+    if (WifiSettings::GetInstance().GetDeviceConfig(networkId, deviceConfig) != 0) {
+        LOGE("SetRandomMac : GetDeviceConfig failed!\n");
+        return false;
+    }
+    std::string lastMac;
+    std::string currentMac;
+    if (deviceConfig.wifiPrivacySetting == WifiPrivacyConfig::DEVICEMAC) {
+    } else {
+        WifiStoreRandomMac randomMacInfo;
+        std::vector<WifiScanInfo> scanInfoList;
+        WifiSettings::GetInstance().GetScanInfoList(scanInfoList);
+        for (auto scanInfo : scanInfoList) {
+            if ((deviceConfig.ssid == scanInfo.ssid) &&
+                (ComparedKeymgmt(scanInfo.capabilities, deviceConfig.keyMgmt))) {
+                randomMacInfo.ssid = scanInfo.ssid;
+                randomMacInfo.keyMgmt = deviceConfig.keyMgmt;
+                randomMacInfo.peerBssid = scanInfo.bssid;
+                break;
+            }
+        }
+        if (randomMacInfo.ssid.empty()) {
+            LOGE("scanInfo has no target wifi!\n");
+            return false;
+        }
+
+        /* Sets the MAC address of WifiSettings. */
+        MacAddressGenerate(randomMacInfo.randomMac);
+        WifiSettings::GetInstance().AddRandomMac(randomMacInfo);
+        currentMac = randomMacInfo.randomMac;
+    }
+
+    if ((WifiStaHalInterface::GetInstance().GetStaDeviceMacAddress(lastMac)) != WIFI_IDL_OPT_OK) {
+        LOGE("GetStaDeviceMacAddress failed!");
+        return false;
+    }
+
+    if (MacAddress::IsValidMac(currentMac.c_str())) {
+        LOGI("Check MacAddress successfully.\n");
+        if (lastMac != currentMac) {
+            if (WifiStaHalInterface::GetInstance().SetConnectMacAddr(currentMac) != WIFI_IDL_OPT_OK) {
+                LOGE("set Mac [%s] failed.\n", currentMac.c_str());
+                return false;
+            }
+        }
+        WifiSettings::GetInstance().SetMacAddress(currentMac);
+        deviceConfig.macAddress = currentMac;
+        WifiSettings::GetInstance().AddDeviceConfig(deviceConfig);
+        WifiSettings::GetInstance().SyncDeviceConfig();
+    } else {
+        LOGE("Check MacAddress error.\n");
+        return false;
+    }
+    return true;
 }
 
 void StaStateMachine::StartRoamToNetwork(std::string bssid)
@@ -1072,34 +1217,8 @@ void StaStateMachine::OnNetworkConnectionEvent(int networkId, std::string bssid)
     SendMessage(msg);
 }
 
-void StaStateMachine::SyncLinkInfo(const std::vector<InterScanInfo> &scanInfos)
-{
-    WIFI_LOGI("Enter StaStateMachine::SyncLinkInfo.\n");
-    if (scanInfos.empty()) {
-        return;
-    }
-    for (auto scanInfo : scanInfos) {
-        if ((scanInfo.ssid == linkedInfo.ssid) && (scanInfo.bssid == linkedInfo.bssid)) {
-            InternalMessage *msg = CreateMessage();
-            if (msg == nullptr) {
-                break;
-            }
-            msg->SetMessageName(CMD_SYNC_LINKINFO);
-            msg->SetParam1(scanInfo.rssi);
-            msg->SetParam2(scanInfo.frequency);
-            msg->AddStringMessageBody(scanInfo.capabilities);
-            WIFI_LOGI("scanInfo.rssi == [%{public}d]\n", scanInfo.rssi);
-            WIFI_LOGI("scanInfo.frequency == [%{public}d]\n", scanInfo.frequency);
-            WIFI_LOGI("scanInfo.capabilities ==[%{public}s]\n", scanInfo.capabilities.c_str());
-            SendMessage(msg);
-            return;
-        }
-    }
-}
-
-/* --------------------------- state machine Disconnecting State ------------------------------ */
-StaStateMachine::SeparatingState::SeparatingState()
-    : State("SeparatingState")
+/* --------------------------- state machine Separating State ------------------------------ */
+StaStateMachine::SeparatingState::SeparatingState() : State("SeparatingState")
 {}
 
 StaStateMachine::SeparatingState::~SeparatingState()
@@ -1108,12 +1227,13 @@ StaStateMachine::SeparatingState::~SeparatingState()
 void StaStateMachine::SeparatingState::GoInState()
 {
     WIFI_LOGI("SeparatingState GoInState function.");
-
     return;
 }
 
 void StaStateMachine::SeparatingState::GoOutState()
-{}
+{
+    LOGI("SeparatingState GoOutState function.");
+}
 
 bool StaStateMachine::SeparatingState::ExecuteStateMsg(InternalMessage *msg)
 {
@@ -1122,7 +1242,7 @@ bool StaStateMachine::SeparatingState::ExecuteStateMsg(InternalMessage *msg)
     }
 
     bool ret = NOT_EXECUTED;
-    WIFI_LOGI("RootState-msgCode=%{public}d not handled.\n", msg->GetMessageName());
+    WIFI_LOGI("SeparatingState-msgCode=%{public}d not handled.\n", msg->GetMessageName());
     return ret;
 }
 
@@ -1137,12 +1257,14 @@ StaStateMachine::SeparatedState::~SeparatedState()
 void StaStateMachine::SeparatedState::GoInState()
 {
     WIFI_LOGI("SeparatedState GoInState function.");
-
     return;
 }
 
 void StaStateMachine::SeparatedState::GoOutState()
-{}
+{
+    WIFI_LOGI("SeparatedState GoOutState function.");
+    return;
+}
 
 bool StaStateMachine::SeparatedState::ExecuteStateMsg(InternalMessage *msg)
 {
@@ -1158,7 +1280,7 @@ bool StaStateMachine::SeparatedState::ExecuteStateMsg(InternalMessage *msg)
         case WIFI_SVR_CMD_STA_ENABLE_WIFI: {
             ret = EXECUTED;
             WIFI_LOGE("Wifi has already started! start Wifi failed!");
-                        /* Callback result to InterfaceService. */
+            /* Callback result to InterfaceService. */
             pStaStateMachine->staCallback.OnStaOpenRes(OperateResState::OPEN_WIFI_OVERRIDE_OPEN_FAILED);
             break;
         }
@@ -1185,7 +1307,10 @@ void StaStateMachine::ApLinkedState::GoInState()
 }
 
 void StaStateMachine::ApLinkedState::GoOutState()
-{}
+{
+    WIFI_LOGI("ApLinkedState GoOutState function.");
+    return;
+}
 
 bool StaStateMachine::ApLinkedState::ExecuteStateMsg(InternalMessage *msg)
 {
@@ -1195,22 +1320,12 @@ bool StaStateMachine::ApLinkedState::ExecuteStateMsg(InternalMessage *msg)
 
     bool ret = NOT_EXECUTED;
     switch (msg->GetMessageName()) {
-        /* The current state of StaStateMachine transfers to DisConnectingState when
-         * receive the disconnecting message.
+        /* The current state of StaStateMachine transfers to SeparatingState when
+         * receive the Separating message.
          */
         case WIFI_SVR_CMD_STA_DISCONNECT: {
             ret = EXECUTED;
             pStaStateMachine->DisConnectProcess();
-            break;
-        }
-        case CMD_SYNC_LINKINFO: {
-            ret = EXECUTED;
-            pStaStateMachine->linkedInfo.rssi = msg->GetParam1();
-            pStaStateMachine->linkedInfo.frequency = msg->GetParam2();
-            pStaStateMachine->GetBandFromFreQuencies(pStaStateMachine->linkedInfo.frequency);
-            WifiSettings::GetInstance().SaveLinkedInfo(pStaStateMachine->linkedInfo);
-            std::string mgmt = msg->GetStringFromMessage();
-            pStaStateMachine->SynchronousEncryptionModeAandBand(mgmt);
             break;
         }
         case WIFI_SVR_CMD_STA_NETWORK_CONNECTION_EVENT: {
@@ -1224,55 +1339,15 @@ bool StaStateMachine::ApLinkedState::ExecuteStateMsg(InternalMessage *msg)
 
             break;
         }
-        case CMD_GET_NETWORK_SPEED: {
-            ret = EXECUTED;
-            pStaStateMachine->pNetSpeed->GetNetSpeed(
-                pStaStateMachine->linkedInfo.rxLinkSpeed, pStaStateMachine->linkedInfo.txLinkSpeed); /* Obtains rate */
-            WifiSettings::GetInstance().SaveLinkedInfo(pStaStateMachine->linkedInfo);
-            pStaStateMachine->StartTimer(static_cast<int>(CMD_GET_NETWORK_SPEED), STA_NETWORK_SPEED_DELAY);
-            break;
-        }
         default:
             break;
     }
     return ret;
 }
 
-void StaStateMachine::SynchronousEncryptionModeAandBand(std::string mgmt)
-{
-    WifiDeviceConfig config;
-    if (WifiSettings::GetInstance().GetDeviceConfig(linkedInfo.networkId, config) != 0) {
-        WIFI_LOGE("GetDeviceConfig failed!");
-    }
-    config.band = linkedInfo.band;
-    if (mgmt.find("WPA-PSK") != std::string::npos || mgmt.find("WPA2-PSK") != std::string::npos) {
-        mgmt = "WPA-PSK";
-        config.keyMgmt = mgmt;
-    } else if (mgmt.find("EAP") != std::string::npos) {
-        mgmt = "WPA-EAP";
-        config.keyMgmt = mgmt;
-    } else if (mgmt.find("SAE") != std::string::npos) {
-        mgmt = "SAE";
-        config.keyMgmt = mgmt;
-    } else {
-        if (mgmt.find("WEP") != std::string::npos) {
-            WepEncryptionModeIndex(config);
-        }
-    }
-    WifiSettings::GetInstance().AddDeviceConfig(config);
-    WifiSettings::GetInstance().SyncDeviceConfig();
-}
-
-void StaStateMachine::WepEncryptionModeIndex(WifiDeviceConfig &config)
-{
-    for (int i = 0; i < MAX_WEPKEYS_SIZE; i++) {
-        if (config.wepKeys[i].size() != 0) {
-            config.wepTxKeyIndex = i + 1;
-        }
-    }
-}
 void StaStateMachine::DisConnectProcess()
 {
+    staCallback.OnStaConnChanged(OperateResState::DISCONNECT_DISCONNECTING, linkedInfo);
     if (WifiStaHalInterface::GetInstance().Disconnect() == WIFI_IDL_OPT_OK) {
         WIFI_LOGI("Disconnect() succeed!");
         /* Save connection information to WifiSettings. */
@@ -1280,40 +1355,11 @@ void StaStateMachine::DisConnectProcess()
 
         DisableNetwork(linkedInfo.networkId);
 
-        /* Callback result to InterfaceService. */
-        staCallback.OnStaConnChanged(OperateResState::DISCONNECT_DISCONNECTING, linkedInfo);
-
         /* The current state of StaStateMachine transfers to SeparatedState. */
         SwitchState(pSeparatedState);
     } else {
         staCallback.OnStaConnChanged(OperateResState::DISCONNECT_DISCONNECT_FAILED, linkedInfo);
         WIFI_LOGE("Disconnect() failed!");
-    }
-}
-
-void StaStateMachine::GetBandFromFreQuencies(const int &freQuency)
-{
-    std::vector<int> freqs2G;
-    std::vector<int> freqs5G;
-    if ((WifiStaHalInterface::GetInstance().GetSupportFrequencies(BAND_ONE, freqs2G) == WIFI_IDL_OPT_OK)) {
-        std::vector<int>::iterator it = find(freqs2G.begin(), freqs2G.end(), freQuency);
-        if (it != freqs2G.end()) {
-            linkedInfo.band = BAND_2_G;
-            return;
-        }
-    } else {
-        WIFI_LOGE("GetSupportFrequencies 2.4Gband failed!\n");
-    }
-
-    if ((WifiStaHalInterface::GetInstance().GetSupportFrequencies(BAND_TWO, freqs5G) == WIFI_IDL_OPT_OK)) {
-        std::vector<int>::iterator it = find(freqs5G.begin(), freqs5G.end(), freQuency);
-        if (it != freqs5G.end()) {
-            linkedInfo.band = BAND_5_G;
-        } else {
-            WIFI_LOGE("frequency convert band failed!\n");
-        }
-    } else {
-        WIFI_LOGE("GetSupportFrequencies 5Gband failed!\n");
     }
 }
 
@@ -1355,7 +1401,8 @@ bool StaStateMachine::StaWpsState::ExecuteStateMsg(InternalMessage *msg)
             pStaStateMachine->ConnectToNetworkProcess(msg);
             pStaStateMachine->SyncAllDeviceConfigs();
             /* Callback result to InterfaceService. */
-            pStaStateMachine->staCallback.OnStaConnChanged(OperateResState::CONNECT_AP_CONNECTED, pStaStateMachine->linkedInfo);
+            pStaStateMachine->staCallback.OnStaConnChanged(OperateResState::CONNECT_OBTAINING_IP,
+                                                           pStaStateMachine->linkedInfo);
             pStaStateMachine->SwitchState(pStaStateMachine->pGetIpState);
             break;
         }
@@ -1365,9 +1412,11 @@ bool StaStateMachine::StaWpsState::ExecuteStateMsg(InternalMessage *msg)
             /* Callback InterfaceService that wps has started successfully. */
             WIFI_LOGE("WPS has already started, start wps failed!");
             if (setup == SetupMethod::PBC) {
-                pStaStateMachine->staCallback.OnWpsChanged(WpsStartState::PBC_STARTED_ALREADY, pStaStateMachine->pinCode);
-            } else if (setup == SetupMethod::DISPLAY) {
-                pStaStateMachine->staCallback.OnWpsChanged(WpsStartState::PIN_STARTED_ALREADY, pStaStateMachine->pinCode);
+                pStaStateMachine->staCallback.OnWpsChanged(WpsStartState::PBC_STARTED_ALREADY,
+                                                           pStaStateMachine->pinCode);
+                } else if ((setup == SetupMethod::DISPLAY) || (setup == SetupMethod::KEYPAD)) {
+                pStaStateMachine->staCallback.OnWpsChanged(WpsStartState::PIN_STARTED_ALREADY,
+                                                           pStaStateMachine->pinCode);
             }
             break;
         }
@@ -1375,7 +1424,8 @@ bool StaStateMachine::StaWpsState::ExecuteStateMsg(InternalMessage *msg)
             ret = EXECUTED;
             WIFI_LOGI("Wps PBC Overlap!");
             /* Callback InterfaceService that PBC is conflicting. */
-            pStaStateMachine->staCallback.OnWpsChanged(WpsStartState::START_PBC_FAILED_OVERLAP, pStaStateMachine->pinCode);
+            pStaStateMachine->staCallback.OnWpsChanged(WpsStartState::START_PBC_FAILED_OVERLAP,
+                                                       pStaStateMachine->pinCode);
             pStaStateMachine->SwitchState(pStaStateMachine->pSeparatedState);
             break;
         }
@@ -1449,7 +1499,7 @@ void StaStateMachine::GetIpState::GoInState()
         std::string noProxys = config.wifiProxyconfig.manualProxyConfig.exclusionObjectList;
         std::string port = std::to_string(config.wifiProxyconfig.manualProxyConfig.serverPort);
         if (!hostName.empty()) {
-            IfConfig::GetInstance().SetProxy(false, hostName, port, noProxys, "");
+            IfConfig::GetInstance().SetProxy(true, hostName, port, noProxys, "");
         }
     }
 
@@ -1465,23 +1515,25 @@ void StaStateMachine::GetIpState::GoInState()
         }
     } else {
         LOGD("GetIpState get dhcp result.");
-        if (pStaStateMachine->isRoam && pStaStateMachine->pDhcpService->GetServerStatus()) {
-            pStaStateMachine->pDhcpService->RenewDhcpClient(IF_NAME);
-            pStaStateMachine->pDhcpService->GetDhcpResult(IF_NAME, pStaStateMachine->pDhcpResultNotify, DHCP_TIME);
+        int dhcpRet;
+        DhcpServiceInfo dhcpInfo;
+        pStaStateMachine->pDhcpService->GetDhcpInfo(IF_NAME, dhcpInfo);
+        if (pStaStateMachine->isRoam && dhcpInfo.clientRunStatus == 1) {
+            dhcpRet = pStaStateMachine->pDhcpService->RenewDhcpClient(IF_NAME);
         } else {
             pStaStateMachine->currentTpType = static_cast<int>(WifiSettings::GetInstance().GetDhcpIpType());
             if (pStaStateMachine->currentTpType == IPTYPE_IPV4) {
-                pStaStateMachine->pDhcpService->StartDhcpClient(IF_NAME, false);
+                dhcpRet = pStaStateMachine->pDhcpService->StartDhcpClient(IF_NAME, false);
             } else {
-                pStaStateMachine->pDhcpService->StartDhcpClient(IF_NAME, true);
+                dhcpRet = pStaStateMachine->pDhcpService->StartDhcpClient(IF_NAME, true);
             }
-            if (pStaStateMachine->pDhcpService->GetDhcpResult(
-                    IF_NAME, pStaStateMachine->pDhcpResultNotify, DHCP_TIME) != 0) {
-                LOGE(" Dhcp connection failed.\n");
-                if (pStaStateMachine->staCallback.OnStaConnChanged != nullptr) {
-                    pStaStateMachine->staCallback.OnStaConnChanged(OperateResState::CONNECT_OBTAINING_IP_FAILED,
-                    pStaStateMachine->linkedInfo);
-                }
+        }
+        if ((dhcpRet != 0) || (pStaStateMachine->pDhcpService->GetDhcpResult(
+            IF_NAME, pStaStateMachine->pDhcpResultNotify, DHCP_TIME) != 0)) {
+            LOGE(" Dhcp connection failed.\n");
+            pStaStateMachine->staCallback.OnStaConnChanged(
+                OperateResState::CONNECT_OBTAINING_IP_FAILED, pStaStateMachine->linkedInfo);
+            if (!pStaStateMachine->isRoam) {
                 pStaStateMachine->DisConnectProcess();
             }
         }
@@ -1507,7 +1559,6 @@ bool StaStateMachine::GetIpState::ExecuteStateMsg(InternalMessage *msg)
 bool StaStateMachine::ConfigStaticIpAddress(StaticIpAddress &staticIpAddress)
 {
     WIFI_LOGI("Enter StaStateMachine::SetDhcpResultFromStatic.");
-
     DhcpResult result;
     switch (currentTpType) {
         case IPTYPE_IPV4: {
@@ -1555,7 +1606,7 @@ bool StaStateMachine::ConfigStaticIpAddress(StaticIpAddress &staticIpAddress)
     return true;
 }
 
-void StaStateMachine::HandleNetCheckResult(StaNetState netState)
+void StaStateMachine::HandleNetCheckResult(StaNetState netState, const std::string portalUrl)
 {
     WIFI_LOGI("Enter HandleNetCheckResult");
     if (linkedInfo.connState == ConnState::DISCONNECTED) {
@@ -1570,35 +1621,15 @@ void StaStateMachine::HandleNetCheckResult(StaNetState netState)
         staCallback.OnStaConnChanged(OperateResState::CONNECT_NETWORK_ENABLED, linkedInfo);
         /* The current state of StaStateMachine transfers to LinkedState. */
         SwitchState(pLinkedState);
+    } else if (netState == StaNetState::NETWORK_CHECK_PORTAL) {
+        linkedInfo.portalUrl = portalUrl;
+        SaveLinkstate(ConnState::CONNECTED, DetailedState::CAPTIVE_PORTAL_CHECK);
+        staCallback.OnStaConnChanged(OperateResState::CONNECT_CHECK_PORTAL, linkedInfo);
     } else {
-        WIFI_LOGI("HandleNetCheckResult network state is notworking\n");
+        WIFI_LOGI("HandleNetCheckResult network state is notworking.\n");
         SaveLinkstate(ConnState::CONNECTED, DetailedState::NOTWORKING);
         staCallback.OnStaConnChanged(OperateResState::CONNECT_NETWORK_DISABLED, linkedInfo);
     }
-}
-
-int StaStateMachine::PortalHttpDetection()
-{
-    WIFI_LOGI("EnterPortalHttpDetection");
-
-    /* Detect portal hotspot and send message to InterfaceSeervice if result is yes. */
-    HttpRequest httpRequest;
-    std::string httpReturn;
-    std::string httpMsg(DEFAULT_PORTAL_HTTPS_URL);
-
-    if (httpRequest.HttpGet(httpMsg, httpReturn) == 0) {
-        if (httpReturn.find("204") != std::string::npos) {
-            WIFI_LOGE("This network is not Portal AP!");
-            return WIFI_OPT_FAILED;
-        } else {
-            /* Notify result to InterfaceService. */
-            WIFI_LOGI("This network is portal AP,need certification!");
-            staCallback.OnStaConnChanged(OperateResState::CONNECT_CHECK_PORTAL, linkedInfo);
-            return 0;
-        }
-    }
-    WIFI_LOGE("Portal check failed!");
-    return WIFI_OPT_FAILED;
 }
 
 /* --------------------------- state machine Connected State ------------------------------ */
@@ -1659,6 +1690,9 @@ bool StaStateMachine::ApRoamingState::ExecuteStateMsg(InternalMessage *msg)
         case WIFI_SVR_CMD_STA_NETWORK_CONNECTION_EVENT: {
             ret = EXECUTED;
             pStaStateMachine->isRoam = true;
+            pStaStateMachine->StopTimer(static_cast<int>(CMD_NETWORK_CONNECT_TIMEOUT));
+            pStaStateMachine->staCallback.OnStaConnChanged(
+                OperateResState::CONNECT_ASSOCIATED, pStaStateMachine->linkedInfo);
             pStaStateMachine->ConnectToNetworkProcess(msg);
             /* Notify result to InterfaceService. */
             pStaStateMachine->staCallback.OnStaConnChanged(
@@ -1690,25 +1724,25 @@ void StaStateMachine::ConnectToNetworkProcess(InternalMessage *msg)
     int result = WifiSettings::GetInstance().GetDeviceConfig(lastNetworkId, deviceConfig);
     WIFI_LOGI("Device config networkId = %{public}d", deviceConfig.networkId);
 
-    WIFI_LOGI("Connected to AP[networkid=%{public}d], obtaining ip...", lastNetworkId);
-
-    /* Save connection information. */
-    WifiIdlGetDeviceConfig config;
-    config.networkId = lastNetworkId;
-    config.param = "ssid";
-    if (WifiStaHalInterface::GetInstance().GetDeviceConfig(config) != WIFI_IDL_OPT_OK) {
-        WIFI_LOGE("GetDeviceConfig failed!");
-    }
-
     if (result == 0 && deviceConfig.bssid == bssid) {
-        WIFI_LOGI("Device config already exists.");
+        LOGI("Device Configuration already exists.");
     } else {
-        deviceConfig.networkId = lastNetworkId;
         deviceConfig.bssid = bssid;
-        deviceConfig.ssid = config.value;
-        deviceConfig.ssid.erase(0, 1);
-        deviceConfig.ssid.erase(deviceConfig.ssid.length() - 1, 1);
-        if (wpsState == SetupMethod::DISPLAY || wpsState == SetupMethod::PBC) {
+        if ((wpsState == SetupMethod::DISPLAY) || (wpsState == SetupMethod::PBC) || (wpsState == SetupMethod::KEYPAD)) {
+            /* Save connection information. */
+            WifiIdlGetDeviceConfig config;
+            config.networkId = lastNetworkId;
+            config.param = "ssid";
+            if (WifiStaHalInterface::GetInstance().GetDeviceConfig(config) != WIFI_IDL_OPT_OK) {
+                LOGE("GetDeviceConfig failed!");
+            }
+
+            deviceConfig.networkId = lastNetworkId;
+            deviceConfig.bssid = bssid;
+            deviceConfig.ssid = config.value;
+            /* Remove the double quotation marks at the head and tail. */
+            deviceConfig.ssid.erase(0, 1);
+            deviceConfig.ssid.erase(deviceConfig.ssid.length() - 1, 1);
             WifiSettings::GetInstance().AddWpsDeviceConfig(deviceConfig);
             isWpsConnect = IsWpsConnected::WPS_CONNECTED;
         } else {
@@ -1750,6 +1784,8 @@ void StaStateMachine::SetWifiLinkedInfo(int networkId)
             linkedInfo.txLinkSpeed = lastLinkedInfo.txLinkSpeed;
             linkedInfo.chload = lastLinkedInfo.chload;
             linkedInfo.snr = lastLinkedInfo.snr;
+            linkedInfo.isDataRestricted = lastLinkedInfo.isDataRestricted;
+            linkedInfo.portalUrl = lastLinkedInfo.portalUrl;
             linkedInfo.detailedState = lastLinkedInfo.detailedState;
         } else if (networkId != INVALID_NETWORK_ID) {
             linkedInfo.networkId = networkId;
@@ -1790,18 +1826,24 @@ StaStateMachine::DhcpResultNotify::~DhcpResultNotify()
 
 void StaStateMachine::DhcpResultNotify::OnSuccess(int status, const std::string &ifname, DhcpResult &result)
 {
-    WIFI_LOGI("Enter DhcpResultNotify::OnSuccess");
-    if (ifname.compare("wlan0") == 0) {
-        WIFI_LOGD("iptype=%d, ip=%s, gateway=%s, subnet=%s, serverAddress=%s, leaseDuration=%d",
-            result.iptype,
-            result.strYourCli.c_str(),
-            result.strSubnet.c_str(),
-            result.strRouter1.c_str(),
-            result.strServer.c_str(),
-            result.uLeaseTime);
-
+    LOGI("Enter DhcpResultNotify::OnSuccess. ifname=[%s] status=[%d]\n", ifname.c_str(), status);
+    if ((pStaStateMachine->linkedInfo.detailedState == DetailedState::DISCONNECTING) ||
+        (pStaStateMachine->linkedInfo.detailedState == DetailedState::DISCONNECTED)) {
+        return;
+    }
+    WIFI_LOGD("iptype=%d, ip=%s, gateway=%s, subnet=%s, serverAddress=%s, leaseDuration=%d",
+        result.iptype,
+        result.strYourCli.c_str(),
+        result.strRouter1.c_str(),
+        result.strSubnet.c_str(),
+        result.strServer.c_str(),
+        result.uLeaseTime);
+    IpInfo ipInfo;
+    WifiSettings::GetInstance().GetIpInfo(ipInfo);
+    if (!((IpTools::ConvertIpv4Address(result.strYourCli) == ipInfo.ipAddress) &&
+        (IpTools::ConvertIpv4Address(result.strRouter1) == ipInfo.gateway))) {
+        result.strDns2 = WifiSettings::GetInstance().GetStrDnsBak();
         if (result.iptype == 0) {
-            IpInfo ipInfo;
             ipInfo.ipAddress = IpTools::ConvertIpv4Address(result.strYourCli);
             ipInfo.gateway = IpTools::ConvertIpv4Address(result.strRouter1);
             ipInfo.netmask = IpTools::ConvertIpv4Address(result.strSubnet);
@@ -1811,55 +1853,60 @@ void StaStateMachine::DhcpResultNotify::OnSuccess(int status, const std::string 
             ipInfo.leaseDuration = result.uLeaseTime;
             WifiSettings::GetInstance().SaveIpInfo(ipInfo);
             pStaStateMachine->linkedInfo.ipAddress = IpTools::ConvertIpv4Address(result.strYourCli);
+            pStaStateMachine->linkedInfo.isDataRestricted =
+                (result.strVendor.find("ANDROID_METERED") == std::string::npos) ? 0 : 1;
             WifiSettings::GetInstance().SaveLinkedInfo(pStaStateMachine->linkedInfo);
         }
 
         IfConfig::GetInstance().SetIfAddr(result, result.iptype);
-        if (pStaStateMachine->getIpSucNum == 0) {
-            pStaStateMachine->SaveLinkstate(ConnState::CONNECTED, DetailedState::CONNECTED);
-            pStaStateMachine->staCallback.OnStaConnChanged(
-                OperateResState::CONNECT_AP_CONNECTED, pStaStateMachine->linkedInfo);
-            /* Wait for the network adapter information to take effect. */
-            sleep(SLEEPTIME);
-
-            /* Check whether the Internet access is normal by send http. */
-            pStaStateMachine->pNetcheck->SignalNetCheckThread();
-        }
-        pStaStateMachine->getIpSucNum++;
-        return;
     }
+    if (pStaStateMachine->getIpSucNum == 0 || pStaStateMachine->isRoam) {
+        pStaStateMachine->SaveLinkstate(ConnState::CONNECTED, DetailedState::CONNECTED);
+        pStaStateMachine->staCallback.OnStaConnChanged(
+            OperateResState::CONNECT_AP_CONNECTED, pStaStateMachine->linkedInfo);
+        /* Wait for the network adapter information to take effect. */
+        sleep(SLEEPTIME);
+
+        /* Check whether the Internet access is normal by send http. */
+        pStaStateMachine->pNetcheck->SignalNetCheckThread();
+    }
+    pStaStateMachine->getIpSucNum++;
+    return;
 }
 
 void StaStateMachine::DhcpResultNotify::OnFailed(int status, const std::string &ifname, const std::string &reason)
 {
-    WIFI_LOGI("Enter DhcpResultNotify::OnFailed");
-    if (ifname.compare("wlan0") == 0) {
-        if (pStaStateMachine->currentTpType != IPTYPE_IPV4) {
-            if (pStaStateMachine->getIpSucNum == 0 && pStaStateMachine->getIpFailNum == 1) {
-                pStaStateMachine->staCallback.OnStaConnChanged(OperateResState::CONNECT_OBTAINING_IP_FAILED,
-                    pStaStateMachine->linkedInfo);
-                pStaStateMachine->DisConnectProcess();
-            }
-        } else {
-            pStaStateMachine->staCallback.OnStaConnChanged(
-                OperateResState::CONNECT_OBTAINING_IP_FAILED, pStaStateMachine->linkedInfo); 
-            if (!pStaStateMachine->isRoam) {
-                pStaStateMachine->DisConnectProcess();
-            } else {
-                pStaStateMachine->SaveLinkstate(ConnState::CONNECTED, DetailedState::CONNECTED);
-            }
-        }
-        pStaStateMachine->getIpFailNum++;
+    LOGI("Enter DhcpResultNotify::OnFailed. ifname=[%s] status=[%d], reason = [%s]\n", ifname.c_str(), status,
+        reason.c_str());
+    if ((pStaStateMachine->linkedInfo.detailedState == DetailedState::DISCONNECTING) ||
+        (pStaStateMachine->linkedInfo.detailedState == DetailedState::DISCONNECTED)) {
+        return;
     }
+
+    if (pStaStateMachine->currentTpType != IPTYPE_IPV4) {
+        if (pStaStateMachine->getIpSucNum == 0 && pStaStateMachine->getIpFailNum == 1) {
+            pStaStateMachine->staCallback.OnStaConnChanged(OperateResState::CONNECT_OBTAINING_IP_FAILED,
+            pStaStateMachine->linkedInfo);
+            pStaStateMachine->DisConnectProcess();
+        }
+    } else {
+        pStaStateMachine->staCallback.OnStaConnChanged(
+            OperateResState::CONNECT_OBTAINING_IP_FAILED, pStaStateMachine->linkedInfo); 
+        if (!pStaStateMachine->isRoam) {
+            pStaStateMachine->DisConnectProcess();
+        } else {
+            pStaStateMachine->SaveLinkstate(ConnState::CONNECTED, DetailedState::CONNECTED);
+        }
+    }
+    pStaStateMachine->getIpFailNum++;
 }
 
 void StaStateMachine::DhcpResultNotify::OnSerExitNotify(const std::string &ifname)
 {
-    WIFI_LOGI("Enter DhcpResultNotify::OnSerExitNotify");
+    LOGI("Enter DhcpResultNotify::OnSerExitNotify. ifname = [%s]\n", ifname.c_str());
 }
 
 /* ------------------ state machine Comment function ----------------- */
-
 void StaStateMachine::SaveLinkstate(ConnState state, DetailedState detailState)
 {
     linkedInfo.connState = state;
@@ -1869,104 +1916,25 @@ void StaStateMachine::SaveLinkstate(ConnState state, DetailedState detailState)
     WifiSettings::GetInstance().SaveLinkedInfo(linkedInfo);
 }
 
-void StaStateMachine::DisableNetwork(int networkId)
+ErrCode StaStateMachine::DisableNetwork(int networkId)
 {
-    if (WifiStaHalInterface::GetInstance().DisableNetwork(networkId) == WIFI_IDL_OPT_OK) {
-        WIFI_LOGI("DisableNetwork() succeed, networkId=%{public}d", networkId);
-
-        if (WifiStaHalInterface::GetInstance().SaveDeviceConfig() == WIFI_IDL_OPT_OK) {
-            WIFI_LOGI("DisableNetwork-SaveDeviceConfig() succeed!");
-        } else {
-            WIFI_LOGW("DisableNetwork-SaveDeviceConfig() failed!");
-        }
-    } else {
-        WIFI_LOGE("DisableNetwork() failed, networkId=%{public}d", networkId);
+    if (WifiStaHalInterface::GetInstance().DisableNetwork(networkId) != WIFI_IDL_OPT_OK) {
+        LOGE("DisableNetwork() failed, networkId=%d.", networkId);
+        return WIFI_OPT_FAILED;
     }
+
+    if (WifiStaHalInterface::GetInstance().SaveDeviceConfig() != WIFI_IDL_OPT_OK) {
+        LOGE("DisableNetwork-SaveDeviceConfig() failed!");
+        return WIFI_OPT_FAILED;
+    }
+    LOGI("DisableNetwork-SaveDeviceConfig() succeed!");
+    return WIFI_OPT_SUCCESS;
 }
+
 
 void StaStateMachine::SetOperationalMode(int mode)
 {
     SendMessage(WIFI_SVR_CMD_STA_OPERATIONAL_MODE, mode, 0);
-}
-
-void StaStateMachine::MacAddressGenerate(std::string &strMac)
-{
-    char szMacStr[] = "0123456789abcdef";
-    std::random_device rd;
-    for (int i = 0; i < MAC_LENGTH; i++) {
-        int rndnum = std::abs((int)rd());
-        if (i != 1) {
-            strMac.push_back(szMacStr[rndnum % RAND_SEED_16]);
-        } else {
-            strMac.push_back(szMacStr[MAC_STEP * (rndnum % RAND_SEED_8)]);
-        }
-        if ((i % MAC_STEP) != 0 && (i != MAC_LENGTH-1)) {
-            strMac.push_back(':');
-        }
-    }
-}
-
-bool StaStateMachine::SetRandomMac(const int networkId)
-{
-    std::string strMac;
-    WifiDeviceConfig deviceConfig;
-    if (WifiSettings::GetInstance().GetDeviceConfig(networkId, deviceConfig) == 0) {
-        if (!deviceConfig.macAddress.empty()) {
-            strMac = deviceConfig.macAddress;
-        } else {
-            MacAddressGenerate(strMac);
-            deviceConfig.macAddress = strMac;
-            WifiSettings::GetInstance().AddDeviceConfig(deviceConfig);
-            WifiSettings::GetInstance().SyncDeviceConfig();
-        }
-
-        if (CheckMacFormat(strMac) == 0) {
-            WIFI_LOGI("Check MacAddress successfully.\n");
-            if (WifiStaHalInterface::GetInstance().SetConnectMacAddr(strMac) != WIFI_IDL_OPT_OK) {
-                WIFI_LOGE("wlan0 set Mac [%s] failed.\n", strMac.c_str());
-                return false;
-            }
-            return true;
-        } else {
-            WIFI_LOGE("Check MacAddress error.\n");
-            return false;
-        }
-    } else {
-        WIFI_LOGE("SetRandomMac GetDeviceConfig failed!");
-        return false;
-    }
-}
-
-int StaStateMachine::CheckMacFormat(const std::string &mac)
-{
-    int status;
-    const std::string pattern = "^([A-Fa-f0-9]{2}[-,:]){5}[A-Fa-f0-9]{2}$";
-    const int cflags = REG_EXTENDED | REG_NEWLINE;
-
-    char ebuf[BUFFER_SIZE] = {0};
-    regmatch_t pmatch[1];
-    const size_t nmatch = 1;
-    regex_t reg;
-
-    status = regcomp(&reg, pattern.c_str(), cflags);
-    if (status != 0) {
-        regerror(status, &reg, ebuf, sizeof(ebuf));
-        fprintf(stderr, "regcomp failed: %s , pattern: %s \n", ebuf, pattern.c_str());
-        regfree(&reg);
-        return -1;
-    }
-
-    status = regexec(&reg, mac.c_str(), nmatch, pmatch, 0);
-    if (status != 0) {
-        regerror(status, &reg, ebuf, sizeof(ebuf));
-        WIFI_LOGE("regexec failed.");
-        regfree(&reg);
-        return -1;
-    }
-
-    printf("[%s] match success.\n", __FUNCTION__);
-    regfree(&reg);
-    return 0;
 }
 }  // namespace Wifi
 }  // namespace OHOS

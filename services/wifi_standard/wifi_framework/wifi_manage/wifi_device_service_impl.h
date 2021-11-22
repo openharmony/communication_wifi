@@ -49,7 +49,10 @@ public:
     ErrCode GetWifiProtectRef(const WifiProtectMode &protectMode, const std::string &protectName) override;
 
     ErrCode PutWifiProtectRef(const std::string &protectName) override;
+
     ErrCode AddDeviceConfig(const WifiDeviceConfig &config, int &result) override;
+
+    ErrCode UpdateDeviceConfig(const WifiDeviceConfig &config, int &result) override;
 
     ErrCode RemoveDevice(int networkId) override;
 
@@ -64,6 +67,8 @@ public:
     ErrCode ConnectToNetwork(int networkId) override;
 
     ErrCode ConnectToDevice(const WifiDeviceConfig &config) override;
+
+    bool IsConnected() override;
 
     ErrCode ReConnect() override;
 

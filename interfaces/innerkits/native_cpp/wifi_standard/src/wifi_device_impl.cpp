@@ -90,10 +90,17 @@ ErrCode WifiDeviceImpl::PutWifiProtectRef(const std::string &protectName)
     RETURN_IF_FAIL(client_);
     return client_->PutWifiProtectRef(protectName);
 }
+
 ErrCode WifiDeviceImpl::AddDeviceConfig(const WifiDeviceConfig &config, int &result)
 {
     RETURN_IF_FAIL(client_);
     return client_->AddDeviceConfig(config, result);
+}
+
+ErrCode WifiDeviceImpl::UpdateDeviceConfig(const WifiDeviceConfig &config, int &result)
+{
+    RETURN_IF_FAIL(client_);
+    return client_->UpdateDeviceConfig(config, result);
 }
 
 ErrCode WifiDeviceImpl::RemoveDevice(int networkId)
@@ -136,6 +143,12 @@ ErrCode WifiDeviceImpl::ConnectToDevice(const WifiDeviceConfig &config)
 {
     RETURN_IF_FAIL(client_);
     return client_->ConnectToDevice(config);
+}
+
+bool WifiDeviceImpl::IsConnected()
+{
+    RETURN_IF_FAIL(client_);
+    return client_->IsConnected();
 }
 
 ErrCode WifiDeviceImpl::ReConnect()

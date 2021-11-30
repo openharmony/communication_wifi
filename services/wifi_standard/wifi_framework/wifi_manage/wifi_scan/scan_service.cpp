@@ -14,6 +14,7 @@
  */
 
 #include "scan_service.h"
+#include <cinttypes>
 #include "wifi_logger.h"
 #include "wifi_settings.h"
 #include "wifi_sta_hal_interface.h"
@@ -1984,7 +1985,8 @@ bool ScanService::AllowScanByIntervalFixed(int &fixedScanCount, time_t &fixedSca
     if (fixedScanCount == 0) {
         fixedScanCount++;
         fixedScanTime = now;
-        WIFI_LOGD("first scan, fixedScanTime:%{public}ld, interval:%{public}d count:%{public}d fixed return true.",
+        WIFI_LOGD("first scan, fixedScanTime:%{public}" PRId64 ", interval:%{public}d "
+            "count:%{public}d fixed return true.",
             fixedScanTime, interval, count);
         return true;
     }
@@ -1994,8 +1996,8 @@ bool ScanService::AllowScanByIntervalFixed(int &fixedScanCount, time_t &fixedSca
     if (now - fixedScanTime >= interval) {
         fixedScanCount = 1;
         fixedScanTime = now;
-        WIFI_LOGD("interval>interval,fixedScanTime:%{public}ld,interval:%{public}d "
-            "count:%{public}d,timeExp:%{public}ld,return true.",
+        WIFI_LOGD("interval>interval,fixedScanTime:%{public}" PRId64 ",interval:%{public}d "
+            "count:%{public}d,timeExp:%{public}" PRId64 ",return true.",
             fixedScanTime, interval, count, timeExp);
         return true;
     }
@@ -2004,14 +2006,14 @@ bool ScanService::AllowScanByIntervalFixed(int &fixedScanCount, time_t &fixedSca
      * and the number of scan times exceeds count.
      */
     if (fixedScanCount >= count) {
-        WIFI_LOGD(" fixedScanCount=%{public}d count=%{public}d,timeExp:%{public}ld,return false.", fixedScanCount,
-            count, timeExp);
+        WIFI_LOGD(" fixedScanCount=%{public}d count=%{public}d,timeExp:%{public}" PRId64 ",return false.",
+        fixedScanCount, count, timeExp);
         return false;
     }
     fixedScanCount++;
     WIFI_LOGD("normal "
-        "scan,fixedScanCount:%{public}d,fixedScanTime:%{public}ld,interval:%{public}d,count:%{public}d,timeExp:"
-        "%{public}ld,return true.",
+        "scan,fixedScanCount:%{public}d,fixedScanTime:%{public}" PRId64 ",interval:%{public}d,"
+        "count:%{public}d,timeExp:%{public}" PRId64 ",return true.",
         fixedScanCount, fixedScanTime, interval, count, timeExp);
     return true;
 }

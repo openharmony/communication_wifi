@@ -288,6 +288,15 @@ napi_value ConnectToDevice(napi_env env, napi_callback_info info)
     return result;
 }
 
+napi_value IsConnected(napi_env env, napi_callback_info info)
+{
+    TRACE_FUNC_CALL;
+    NAPI_ASSERT(env, wifiDevicePtr != nullptr, "Wifi device instance is null.");
+    napi_value result;
+    napi_get_boolean(env, wifiDevicePtr->IsConnected(), &result);
+    return result;
+}
+
 napi_value Disconnect(napi_env env, napi_callback_info info)
 {
     TRACE_FUNC_CALL;
@@ -544,6 +553,32 @@ napi_value GetDeviceConfigs(napi_env env, napi_callback_info info)
         DeviceConfigToJsArray(env, vecDeviceConfigs, i, arrayResult);
     }
     return arrayResult;
+}
+
+napi_value UpdateNetwork(napi_env env, napi_callback_info info)
+{
+    TRACE_FUNC_CALL;
+    size_t argc = 1;
+    napi_value argv[1];
+    napi_value thisVar;
+    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, NULL));
+
+    napi_valuetype valueType;
+    napi_typeof(env, argv[0], &valueType);
+    NAPI_ASSERT(env, valueType == napi_object, "Wrong argument type. Object expected.");
+
+    NAPI_ASSERT(env, wifiDevicePtr != nullptr, "Wifi device instance is null.");
+    int updateResult;
+    WifiDeviceConfig config;
+    JsObjToDeviceConfig(env, argv[0], config);
+    ErrCode ret = wifiDevicePtr->UpdateDeviceConfig(config, updateResult);
+    if (ret != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("Update device config fail: %{public}d", ret);
+    }
+
+    napi_value result;
+    napi_create_uint32(env, updateResult, &result);
+    return result;
 }
 
 napi_value GetSupportedFeatures(napi_env env, napi_callback_info info)

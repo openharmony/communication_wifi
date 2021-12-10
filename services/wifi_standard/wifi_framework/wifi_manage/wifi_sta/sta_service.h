@@ -131,12 +131,6 @@ public:
      */
     virtual ErrCode DisableDeviceConfig(int networkId) const;
     /**
-     * @Description Clear disabled bssid before reconnect.
-     *
-     * @return ErrCode - success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
-     */
-    virtual ErrCode ClearDisabledBssidForReconnect() const;
-    /**
      * @Description  Start WPS Connection
      *
      * @Output: Return operating results to Interface Service after enable wifi
@@ -176,6 +170,12 @@ public:
      */
     virtual void RegisterStaServiceCallback(const StaServiceCallback &callbacks) const;
 
+    /**
+     * @Description  Reconnect network
+     *
+     * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
+     */
+    virtual ErrCode ReConnect() const;
 
 private:
     StaStateMachine *pStaStateMachine;

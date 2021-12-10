@@ -144,39 +144,54 @@ bool IsAllowScanAnyTime(const ScanControlInfo &info)
     return true;
 }
 
-ConnectionState ConvertConnStateInternal(OperateResState resState)
+ConnState ConvertConnStateInternal(OperateResState resState, bool &isReport)
 {
     switch (resState) {
         case OperateResState::CONNECT_CONNECTING:
-            return ConnectionState::CONNECT_CONNECTING;
+            isReport = true;
+            return ConnState::CONNECTING;
         case OperateResState::CONNECT_AP_CONNECTED:
-            return ConnectionState::CONNECT_AP_CONNECTED;
-        case OperateResState::CONNECT_CHECK_PORTAL:
-            return ConnectionState::CONNECT_CHECK_PORTAL;
+            isReport = true;
+            return ConnState::CONNECTED;
         case OperateResState::CONNECT_NETWORK_ENABLED:
-            return ConnectionState::CONNECT_NETWORK_ENABLED;
+            isReport = false;
+            return ConnState::UNKNOWN;
         case OperateResState::CONNECT_NETWORK_DISABLED:
-            return ConnectionState::CONNECT_NETWORK_DISABLED;
+            isReport = false;
+            return ConnState::UNKNOWN;
         case OperateResState::DISCONNECT_DISCONNECTING:
-            return ConnectionState::DISCONNECT_DISCONNECTING;
-        case OperateResState::DISCONNECT_DISCONNECT_FAILED:
-            return ConnectionState::DISCONNECT_DISCONNECT_FAILED;
+            isReport = true;
+            return ConnState::DISCONNECTING;
         case OperateResState::DISCONNECT_DISCONNECTED:
-            return ConnectionState::DISCONNECT_DISCONNECTED;
+            isReport = true;
+            return ConnState::DISCONNECTED;
         case OperateResState::CONNECT_PASSWORD_WRONG:
-            return ConnectionState::CONNECT_PASSWORD_WRONG;
+            isReport = false;
+            return ConnState::UNKNOWN;
+        case OperateResState::CONNECT_CONNECTION_FULL:
+            isReport = false;
+            return ConnState::UNKNOWN;
+        case OperateResState::CONNECT_CONNECTION_REJECT:
+            isReport = false;
+            return ConnState::UNKNOWN;
         case OperateResState::CONNECT_CONNECTING_TIMEOUT:
-            return ConnectionState::CONNECT_CONNECTING_TIMEOUT;
+            isReport = false;
+            return ConnState::UNKNOWN;
         case OperateResState::CONNECT_OBTAINING_IP:
-            return ConnectionState::CONNECT_OBTAINING_IP;
+            isReport = true;
+            return ConnState::OBTAINING_IPADDR;
         case OperateResState::CONNECT_OBTAINING_IP_FAILED:
-            return ConnectionState::CONNECT_OBTAINING_IP_FAILED;
+            isReport = false;
+            return ConnState::UNKNOWN;
         case OperateResState::CONNECT_ASSOCIATING:
-            return ConnectionState::CONNECT_ASSOCIATING;
+            isReport = false;
+            return ConnState::UNKNOWN;
         case OperateResState::CONNECT_ASSOCIATED:
-            return ConnectionState::CONNECT_ASSOCIATED;
+            isReport = false;
+            return ConnState::UNKNOWN;
         default:
-            return ConnectionState::UNKNOWN;
+            isReport = true;
+            return ConnState::UNKNOWN;
     }
 }
 

@@ -143,13 +143,6 @@ int StaService::AddDeviceConfig(const WifiDeviceConfig &config) const
 
 int StaService::UpdateDeviceConfig(const WifiDeviceConfig &config) const
 {
-    LOGI("Enter StaService::UpdateDeviceConfig.\n");
-    WifiDeviceConfig tempDeviceConfig;
-    if (config.networkId <= INVALID_NETWORK_ID ||
-        WifiSettings::GetInstance().GetDeviceConfig(config.networkId, tempDeviceConfig) != 0) {
-        LOGI("Update not exists network, id: %{public}d\n", config.networkId);
-        return INVALID_NETWORK_ID;
-    }
     return AddDeviceConfig(config);
 }
 
@@ -231,8 +224,6 @@ ErrCode StaService::ReAssociate() const
     return WIFI_OPT_SUCCESS;
 }
 
-
-
 ErrCode StaService::EnableDeviceConfig(int networkId, bool attemptEnable) const
 {
     WIFI_LOGD("Enter StaService::EnableDeviceConfig! networkid is %{public}d", networkId);
@@ -256,16 +247,6 @@ ErrCode StaService::DisableDeviceConfig(int networkId) const
         return WIFI_OPT_FAILED;
     }
     WifiSettings::GetInstance().SyncDeviceConfig();
-    return WIFI_OPT_SUCCESS;
-}
-
-ErrCode StaService::ClearDisabledBssidForReconnect() const
-{
-    WIFI_LOGD("Enter StaService::ClearDisabledBssidForReconnect\n");
-    std::string lastSuccConnectBssid = WifiSettings::GetInstance().GetLastSuccConnectBssid();
-    if (!lastSuccConnectBssid.empty()) {
-        pStaAutoConnectService->EnableOrDisableBssid(lastSuccConnectBssid, true, 0);
-    }
     return WIFI_OPT_SUCCESS;
 }
 
@@ -329,5 +310,11 @@ void StaService::RegisterStaServiceCallback(const StaServiceCallback &callbacks)
     pStaStateMachine->RegisterStaServiceCallback(callbacks);
 }
 
+ErrCode StaService::ReConnect() const
+{
+    WIFI_LOGI("Enter StaService::ReConnect.\n");
+    pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_RECONNECT_NETWORK);
+    return WIFI_OPT_SUCCESS;
+}
 }  // namespace Wifi
 }  // namespace OHOS

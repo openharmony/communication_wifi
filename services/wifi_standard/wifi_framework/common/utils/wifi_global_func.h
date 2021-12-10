@@ -98,12 +98,13 @@ std::string GetRandomStr(int len);
 bool IsAllowScanAnyTime(const ScanControlInfo &info);
 
 /**
- * @Description Internal transition from OperateResState struct to ConnectionState
+ * @Description Internal transition from OperateResState struct to ConnState
  *
  * @param resState - OperateResState state
- * @return ConnectionState - convert output connection state
+ * @param isReport - true : need report; flase : not report
+ * @return ConnState - convert output connection state
  */
-ConnectionState ConvertConnStateInternal(OperateResState resState);
+ConnState ConvertConnStateInternal(OperateResState resState, bool &isReport);
 
 /**
  * @Description Check whether the MAC address is valid

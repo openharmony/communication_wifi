@@ -497,6 +497,8 @@ static void DealStaApCallback(int event, Context *context)
         case WIFI_SSID_WRONG_KEY:
         case WIFI_WPS_OVERLAP:
         case WIFI_WPS_TIME_OUT:
+        case WIFI_CONNECTION_FULL_EVENT:
+        case WIFI_CONNECTION_REJECT_EVENT:
             DealConnectWpsResultCbk(event, context);
             break;
         case WIFI_CONNECT_CHANGED_NOTIFY_EVENT:

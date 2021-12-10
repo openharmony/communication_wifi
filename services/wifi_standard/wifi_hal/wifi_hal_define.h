@@ -80,6 +80,8 @@ typedef enum WifiHalEvent {
     WIFI_AP_DISABLE_EVENT,             /* AP closure notification. */
     WIFI_WPA_STATE_EVENT,              /* WPA status change. */
     WIFI_SSID_WRONG_KEY,               /* Incorrect password. */
+    WIFI_CONNECTION_FULL_EVENT,        /* connection is full */
+    WIFI_CONNECTION_REJECT_EVENT,      /* connection reject */
     WIFI_WPS_OVERLAP,                  /* wps pbc overlap */
     WIFI_WPS_TIME_OUT,                 /* wps connect time out */
     WIFI_P2P_SUP_CONNECTION_EVENT,     /* Connection result of the wpa_supplicant client */

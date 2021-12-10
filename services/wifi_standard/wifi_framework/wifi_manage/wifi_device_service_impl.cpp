@@ -422,22 +422,11 @@ ErrCode WifiDeviceServiceImpl::ReConnect()
         return WIFI_OPT_STA_NOT_OPENED;
     }
 
-    if (!IsScanServiceRunning()) {
-        return WIFI_OPT_SCAN_NOT_OPENED;
-    }
-
-    IScanService *pScanService = WifiServiceManager::GetInstance().GetScanServiceInst();
-    if (pScanService == nullptr) {
-        return WIFI_OPT_SCAN_NOT_OPENED;
-    }
-
-    IStaService *pStaService = WifiServiceManager::GetInstance().GetStaServiceInst();
-    if (pStaService == nullptr) {
+    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst();
+    if (pService == nullptr) {
         return WIFI_OPT_STA_NOT_OPENED;
     }
-
-    pStaService->ClearDisabledBssidForReconnect();
-    return pScanService->Scan(false);
+    return pService->ReConnect();
 }
 
 ErrCode WifiDeviceServiceImpl::ReAssociate(void)

@@ -36,9 +36,7 @@ namespace Wifi {
 #define SCAN_SCENE_OBTAINING_IP 7     // Obtaining IP state
 #define SCAN_SCENE_DEEP_SLEEP 8       // Deep sleep state
 #define SCAN_SCENE_FREQUENCY_ORIGIN 9 // Scan frequency, origin.
-                                      // This parameter takes effect when no charger.
 #define SCAN_SCENE_FREQUENCY_CUSTOM 10 // Scan frequency, custom.
-                                       // This parameter takes effect when no charger.
 #define SCAN_SCENE_CUSTOM (SCAN_SCENE_FREQUENCY_CUSTOM + 1)
 
 /* SCAN_SCENE_CUSTOM~253 Custom Scenario */

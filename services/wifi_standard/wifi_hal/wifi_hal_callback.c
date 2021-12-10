@@ -103,6 +103,34 @@ void WifiHalCbNotifyWrongKey(int status)
     return;
 }
 
+void WifiHalCbNotifyConnectionFull(int status)
+{
+    LOGD("connection is full, state: %d, and begin push notify message", status);
+    WifiHalEventCallbackMsg *pCbkMsg = (WifiHalEventCallbackMsg *)calloc(1, sizeof(WifiHalEventCallbackMsg));
+    if (pCbkMsg == NULL) {
+        LOGE("create callback message failed!");
+        return;
+    }
+
+    pCbkMsg->msg.connMsg.status = status;
+    EmitEventCallbackMsg(pCbkMsg, WIFI_CONNECTION_FULL_EVENT);
+    return;
+}
+
+void WifiHalCbNotifyConnectionReject(int status)
+{
+    LOGD("connection is eeject, state: %d, and begin push notify message", status);
+    WifiHalEventCallbackMsg *pCbkMsg = (WifiHalEventCallbackMsg *)calloc(1, sizeof(WifiHalEventCallbackMsg));
+    if (pCbkMsg == NULL) {
+        LOGE("create callback message failed!");
+        return;
+    }
+
+    pCbkMsg->msg.connMsg.status = status;
+    EmitEventCallbackMsg(pCbkMsg, WIFI_CONNECTION_REJECT_EVENT);
+    return;
+}
+
 void WifiHalCbNotifyWpsOverlap(int event)
 {
     LOGD("wps overlap, state: %{public}d, and begin push notify message", event);

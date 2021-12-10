@@ -47,7 +47,7 @@ public:
     static bool PublishScanFinishedEvent(const int &code, const std::string &data);
     static bool PublishScanStateChangedEvent(const int &code, const std::string &data);
     static bool PublishRssiValueChangedEvent(const int &code, const std::string &data);
-    static bool PublishConnectionStateChangedEvent(const int &code, const std::string &data);
+    static bool PublishConnStateChangedEvent(const int &code, const std::string &data);
     static bool PublishHotspotStateChangedEvent(const int &code, const std::string &data);
     static bool PublishApStaJoinEvent(const int &code, const std::string &data);
     static bool PublishApStaLeaveEvent(const int &code, const std::string &data);

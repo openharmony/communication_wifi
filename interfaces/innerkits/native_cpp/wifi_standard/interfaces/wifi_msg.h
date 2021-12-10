@@ -68,21 +68,38 @@ enum class DetailedState {
     SCANNING = 12,
     SUSPENDED = 13,
     VERIFYING_POOR_LINK = 14,
-
+    PASSWORD_ERROR = 15,
+    CONNECTION_REJECT = 16,
+    CONNECTION_FULL = 17,
+    CONNECTION_TIMEOUT = 18,
+    OBTAINING_IPADDR_FAIL = 19,
     INVALID = 0xFF,
 };
 
-enum class ConnState {
-    IDLE,
+enum ConnState {
+    /** The device is searching for an available AP. */
     SCANNING,
+
+    /** The Wi-Fi connection is being set up. */
     CONNECTING,
+
+    /** The Wi-Fi connection is being authenticated. */
     AUTHENTICATING,
+
+    /** The IP address of the Wi-Fi connection is being obtained. */
     OBTAINING_IPADDR,
+
+    /** The Wi-Fi connection has been set up. */
     CONNECTED,
-    SUSPENDED,
+
+    /** The Wi-Fi connection is being torn down. */
     DISCONNECTING,
+
+    /** The Wi-Fi connection has been torn down. */
     DISCONNECTED,
-    FAILED
+
+    /** Failed to set up the Wi-Fi connection. */
+    UNKNOWN
 };
 
 struct WifiLinkedInfo {
@@ -114,7 +131,7 @@ struct WifiLinkedInfo {
         frequency = 0;
         linkSpeed = 0;
         ipAddress = 0;
-        connState = ConnState::FAILED;
+        connState = ConnState::UNKNOWN;
         ifHiddenSSID = false;
         chload = 0;
         snr = 0;
@@ -358,25 +375,6 @@ struct WifiDeviceConfig {
 };
 
 enum class WifiState { DISABLING = 0, DISABLED = 1, ENABLING = 2, ENABLED = 3, UNKNOWN = 4 };
-
-enum class ConnectionState {
-    CONNECT_CONNECTING = 0,
-    CONNECT_AP_CONNECTED = 1,
-    CONNECT_CHECK_PORTAL = 2,
-    CONNECT_NETWORK_ENABLED = 3,
-    CONNECT_NETWORK_DISABLED = 4,
-    DISCONNECT_DISCONNECTING = 5,
-    DISCONNECT_DISCONNECT_FAILED = 6,
-    DISCONNECT_DISCONNECTED = 7,
-    CONNECT_PASSWORD_WRONG = 8,
-    CONNECT_CONNECTING_TIMEOUT = 9,
-    CONNECT_OBTAINING_IP = 10,
-    CONNECT_OBTAINING_IP_FAILED = 11,
-    CONNECT_ASSOCIATING = 12,
-    CONNECT_ASSOCIATED = 13,
-
-    UNKNOWN,
-};
 
 /* wps state */
 enum class WpsStartState {

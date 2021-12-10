@@ -525,8 +525,7 @@ static int BeginLooper(PDhcpServerContext ctx)
         }
         InitReply(ctx, &from, &reply);
         int replyType = MessageProcess(ctx, &from, &reply);
-        int snedRet = -1;
-        if (replyType && (snedRet = SendDhcpReply(ctx, replyType, &reply)) != RET_SUCCESS) {
+        if (replyType && SendDhcpReply(ctx, replyType, &reply) != RET_SUCCESS) {
             LOGE("failed to send reply message.");
         }
         if (replyType == REPLY_ACK || replyType == REPLY_OFFER) {
@@ -535,7 +534,7 @@ static int BeginLooper(PDhcpServerContext ctx)
                 LOGW("failed to save lease recoders.");
             };
         }
-    } // while (srvIns->looperState)
+    }
     FreeOptionList(&from.options);
     FreeOptionList(&reply.options);
     LOGD("dhcp server message looper stoped.");

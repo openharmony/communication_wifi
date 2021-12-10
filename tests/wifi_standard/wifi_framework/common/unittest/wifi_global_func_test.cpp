@@ -133,33 +133,15 @@ HWTEST_F(WifiGlobalFuncTest, CheckMacIsValid, TestSize.Level1)
 
 HWTEST_F(WifiGlobalFuncTest, ConvertConnStateInternalTest, TestSize.Level1)
 {
-    EXPECT_TRUE(ConvertConnStateInternal(OperateResState::CONNECT_CONNECTING) == ConnectionState::CONNECT_CONNECTING);
+    bool isReport = true;
+    EXPECT_TRUE(ConvertConnStateInternal(OperateResState::CONNECT_CONNECTING, isReport) == ConnState::CONNECTING);
     EXPECT_TRUE(
-        ConvertConnStateInternal(OperateResState::CONNECT_AP_CONNECTED) == ConnectionState::CONNECT_AP_CONNECTED);
+        ConvertConnStateInternal(OperateResState::CONNECT_AP_CONNECTED, isReport) == ConnState::CONNECTED);
+
+    EXPECT_TRUE(ConvertConnStateInternal(OperateResState::DISCONNECT_DISCONNECTING, isReport) ==
+                ConnState::DISCONNECTING);
     EXPECT_TRUE(
-        ConvertConnStateInternal(OperateResState::CONNECT_CHECK_PORTAL) == ConnectionState::CONNECT_CHECK_PORTAL);
-    EXPECT_TRUE(
-        ConvertConnStateInternal(OperateResState::CONNECT_NETWORK_ENABLED) == ConnectionState::CONNECT_NETWORK_ENABLED);
-    EXPECT_TRUE(ConvertConnStateInternal(OperateResState::CONNECT_NETWORK_DISABLED) ==
-                ConnectionState::CONNECT_NETWORK_DISABLED);
-    EXPECT_TRUE(ConvertConnStateInternal(OperateResState::DISCONNECT_DISCONNECTING) ==
-                ConnectionState::DISCONNECT_DISCONNECTING);
-    EXPECT_TRUE(ConvertConnStateInternal(OperateResState::DISCONNECT_DISCONNECT_FAILED) ==
-                ConnectionState::DISCONNECT_DISCONNECT_FAILED);
-    EXPECT_TRUE(
-        ConvertConnStateInternal(OperateResState::DISCONNECT_DISCONNECTED) == ConnectionState::DISCONNECT_DISCONNECTED);
-    EXPECT_TRUE(
-        ConvertConnStateInternal(OperateResState::CONNECT_PASSWORD_WRONG) == ConnectionState::CONNECT_PASSWORD_WRONG);
-    EXPECT_TRUE(ConvertConnStateInternal(OperateResState::CONNECT_CONNECTING_TIMEOUT) ==
-                ConnectionState::CONNECT_CONNECTING_TIMEOUT);
-    EXPECT_TRUE(ConvertConnStateInternal(OperateResState::CONNECT_OBTAINING_IP_FAILED) ==
-                ConnectionState::CONNECT_OBTAINING_IP_FAILED);
-    EXPECT_TRUE(ConvertConnStateInternal(OperateResState::CONNECT_ASSOCIATING) == ConnectionState::CONNECT_ASSOCIATING);
-    EXPECT_TRUE(ConvertConnStateInternal(OperateResState::CONNECT_ASSOCIATED) == ConnectionState::CONNECT_ASSOCIATED);
-    EXPECT_TRUE(ConvertConnStateInternal(OperateResState::OPEN_WIFI_SUCCEED) == ConnectionState::UNKNOWN);
-    EXPECT_TRUE(
-        ConvertConnStateInternal(OperateResState::CONNECT_OBTAINING_IP) == ConnectionState::CONNECT_OBTAINING_IP);
-    EXPECT_TRUE(ConvertConnStateInternal(OperateResState::CONNECT_SELECT_NETWORK_FAILED) == ConnectionState::UNKNOWN);
+        ConvertConnStateInternal(OperateResState::DISCONNECT_DISCONNECTED, isReport) == ConnState::DISCONNECTED);
 }
 
 HWTEST_F(WifiGlobalFuncTest, SplitStringTest, TestSize.Level1)

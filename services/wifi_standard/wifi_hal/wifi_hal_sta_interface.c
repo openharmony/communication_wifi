@@ -21,7 +21,7 @@
 #include "wifi_supplicant_hal.h"
 
 #undef LOG_TAG
-#define LOG_TAG "WifHalStaInterface"
+#define LOG_TAG "WifiHalStaInterface"
 #define BUFF_SIZE 1024
 #define WPA_CMD_STOP_LENG 64
 #define WPA_TRY_CONNECT_SLEEP_TIME (100 * 1000) /* 100ms */
@@ -47,7 +47,6 @@ static int ExcuteStaCmd(const char *szCmd)
 
     return -1;
 }
-
 
 static WifiErrorNo AddWpaIface(int staNo)
 {

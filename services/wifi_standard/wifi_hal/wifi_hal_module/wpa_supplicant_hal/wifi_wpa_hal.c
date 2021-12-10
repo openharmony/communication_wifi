@@ -46,6 +46,8 @@
 #define WPA_CB_DISCONNECTED 2
 #define WPS_EVENT_PBC_OVERLAP "WPS-OVERLAP-DETECTED PBC session overlap"
 #define REPLY_BUF_LENGTH 4096
+#define CONNECTION_FULL_STATUS 17
+#define CONNECTION_REJECT_STATUS 37
 
 static WifiWpaInterface *g_wpaInterface = NULL;
 
@@ -550,6 +552,17 @@ static void WpaCallBackFuncTwo(const char *p)
         WifiHalCbNotifyWpsOverlap(1);
     } else if (strncmp(p, WPS_EVENT_TIMEOUT, strlen(WPS_EVENT_TIMEOUT)) == 0) {
         WifiHalCbNotifyWpsTimeOut(1);
+    } else if (strncmp(p, WPA_EVENT_AUTH_REJECT, strlen(WPA_EVENT_AUTH_REJECT)) == 0) {
+        char *connectionStatus = strstr(p, "status_code=");
+        if (connectionStatus != NULL) {
+            connectionStatus += strlen("status_code=");
+            int status = atoi(connectionStatus);
+            if (status == CONNECTION_FULL_STATUS) {
+                WifiHalCbNotifyConnectionFull(status);
+            } else if (status == CONNECTION_REJECT_STATUS) {
+                WifiHalCbNotifyConnectionReject(status);
+            }
+        }
     }
     return;
 }

@@ -52,6 +52,8 @@ void OnWpaStateChanged(int status);
 void OnWpaSsidWrongKey(int status);
 void OnWpsOverlap(int status);
 void OnWpsTimeOut(int status);
+void onWpaConnectionFull(int status);
+void onWpaConnectionReject(int status);
 
 /**
  * @Description Get the Supplicant Rpc Client object.

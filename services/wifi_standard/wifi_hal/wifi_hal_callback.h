@@ -48,6 +48,21 @@ void WifiHalCbNotifyWpaStateChange(int status);
  * @param status
  */
 void WifiHalCbNotifyWrongKey(int status);
+
+/**
+ * @Description Wi-Fi Hal callback notification connection full
+ *
+ * @param status
+ */
+void WifiHalCbNotifyConnectionFull(int status);
+
+/**
+ * @Description Wi-Fi Hal callback notification connection reject
+ *
+ * @param status
+ */
+void WifiHalCbNotifyConnectionReject(int status);
+
 /**
  * @Description Wi-Fi Hal callback notification WPS overlaps.
  *

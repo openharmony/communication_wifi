@@ -59,7 +59,6 @@ public:
      * @param status : status codes [in]
      * @param networkId - network id [in]
      * @param bssid - bssid of the network [in]
-     * @param pInstance - handles [in]
      */
     void OnConnectChangedCallBack(int status, int networkId,const std::string &bssid);
 
@@ -67,7 +66,6 @@ public:
      * @Description : Callback of the wpa state change event.
      *
      * @param status - status codes [in]
-     * @param pInstance - handles [in]
      */
     void OnWpaStateChangedCallBack(int status);
 
@@ -75,15 +73,27 @@ public:
      * @Description : Callback of the Wpa ssid wrong key event.
      *
      * @param status - status codes [in]
-     * @param pInstance - handles [in]
      */
     void OnWpaSsidWrongKeyCallBack(int status);
+
+    /**
+     * @Description : Callback of the Connection Full event.
+     *
+     * @param status - status codes [in]
+     */
+    void onWpaConnectionFullCallBack(int status);
+
+    /**
+     * @Description : Callback of the Connection Refused event.
+     *
+     * @param status - status codes [in]
+     */
+    void onWpaConnectionRejectCallBack(int status);
 
     /**
      * @Description : Callback of the WPS_OVERLAP event.
      *
      * @param status - status codes [in]
-     * @param pInstance - handles [in]
      */
     void OnWpsPbcOverlapCallBack(int status);
 
@@ -91,7 +101,6 @@ public:
      * @Description : Callback of the WPS_TIMEOUT event.
      *
      * @param status - status codes [in]
-     * @param pInstance - handles [in]
      */
     void OnWpsTimeOutCallBack(int status);
 

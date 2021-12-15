@@ -153,10 +153,10 @@ int WifiDeviceCallBackStub::RemoteOnWifiConnectionChanged(uint32_t code, Message
     info.macAddress = data.ReadCString();
     info.ipAddress = data.ReadInt32();
     int tmpConnState = data.ReadInt32();
-    if (tmpConnState >= 0 && tmpConnState <= int(ConnState::FAILED)) {
+    if (tmpConnState >= 0 && tmpConnState <= int(ConnState::UNKNOWN)) {
         info.connState = ConnState(tmpConnState);
     } else {
-        info.connState = ConnState::FAILED;
+        info.connState = ConnState::UNKNOWN;
     }
     info.ifHiddenSSID = data.ReadBool();
     info.rxLinkSpeed = data.ReadInt32();

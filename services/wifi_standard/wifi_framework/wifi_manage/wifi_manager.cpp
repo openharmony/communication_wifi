@@ -363,11 +363,15 @@ void WifiManager::DealStaCloseRes(OperateResState state)
 
 void WifiManager::DealStaConnChanged(OperateResState state, const WifiLinkedInfo &info)
 {
-    WifiEventCallbackMsg cbMsg;
-    cbMsg.msgCode = WIFI_CBK_MSG_CONNECTION_CHANGE;
-    cbMsg.msgData = static_cast<int>(ConvertConnStateInternal(state));
-    cbMsg.linkInfo = info;
-    WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
+    bool isReport = true;
+    int reportStateNum = static_cast<int>(ConvertConnStateInternal(state, isReport));
+    if (isReport) {
+        WifiEventCallbackMsg cbMsg;
+        cbMsg.msgCode = WIFI_CBK_MSG_CONNECTION_CHANGE;
+        cbMsg.msgData = reportStateNum;
+        cbMsg.linkInfo = info;
+        WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
+    }
 
     if (state == OperateResState::CONNECT_CONNECTING || state == OperateResState::CONNECT_AP_CONNECTED ||
         state == OperateResState::DISCONNECT_DISCONNECTING || state == OperateResState::DISCONNECT_DISCONNECTED ||

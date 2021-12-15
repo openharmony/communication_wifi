@@ -119,7 +119,7 @@ bool StaNetworkCheck::HttpDetection()
             return true;
         }
     }
-    WIFI_LOGE("This network cant online!");
+    WIFI_LOGE("This network can't online!");
     if ((lastNetState != NETWORK_STATE_NOWORKING) && (isExitNetCheckThread == false) && (isStopNetCheck == false)) {
         netStateHandler(StaNetState::NETWORK_STATE_NOWORKING, "");
     }

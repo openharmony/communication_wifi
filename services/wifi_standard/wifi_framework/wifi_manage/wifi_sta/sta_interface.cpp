@@ -97,6 +97,16 @@ ErrCode StaInterface::ConnectToDevice(const WifiDeviceConfig &config)
     return WIFI_OPT_SUCCESS;
 }
 
+ErrCode StaInterface::ReConnect()
+{
+    LOGD("Enter StaInterface::ReConnect.\n");
+    if (pStaService->ReConnect() != WIFI_OPT_SUCCESS) {
+        LOGD("ReConnect failed.\n");
+        return WIFI_OPT_FAILED;
+    }
+    return WIFI_OPT_SUCCESS;
+}
+
 ErrCode StaInterface::ReAssociate()
 {
     LOGD("Enter StaInterface::ReAssociate.\n");
@@ -159,12 +169,6 @@ ErrCode StaInterface::DisableDeviceConfig(int networkId)
 {
     LOGD("Enter StaInterface::DisableDeviceConfig.\n");
     return pStaService->DisableDeviceConfig(networkId);
-}
-
-ErrCode StaInterface::ClearDisabledBssidForReconnect()
-{
-    LOGD("Enter StaInterface::ClearDisabledBssidForReconnect.\n");
-    return pStaService->ClearDisabledBssidForReconnect();
 }
 
 ErrCode StaInterface::StartWps(const WpsConfig &config)

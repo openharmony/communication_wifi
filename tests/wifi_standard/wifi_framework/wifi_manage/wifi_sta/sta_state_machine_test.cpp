@@ -452,7 +452,7 @@ public:
         EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_)).Times(testing::AtLeast(0));
         EXPECT_CALL(WifiManager::GetInstance(), DealStaConnChanged(_, _)).Times(testing::AtLeast(0));
         InternalMessage msg;
-        pStaStateMachine->DealWpaWrongPskEvent(&msg);
+        pStaStateMachine->DealWpaLinkFailEvent(&msg);
     }
 
     void DealWpaWrongPskEventFail()
@@ -460,7 +460,7 @@ public:
         EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_)).Times(testing::AtLeast(0));
         EXPECT_CALL(WifiManager::GetInstance(), DealStaConnChanged(_, _)).Times(testing::AtLeast(0));
         InternalMessage msg;
-        pStaStateMachine->DealWpaWrongPskEvent(nullptr);
+        pStaStateMachine->DealWpaLinkFailEvent(nullptr);
     }
 
     void DealReassociateCmdSuccess()

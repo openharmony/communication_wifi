@@ -118,7 +118,7 @@ private:
     static void DealHotspotCallbackMsg(WifiInternalEventDispatcher &pInstance, const WifiEventCallbackMsg &msg);
     static void DealP2pCallbackMsg(WifiInternalEventDispatcher &pInstance, const WifiEventCallbackMsg &msg);
     static void SendP2pCallbackMsg(sptr<IWifiP2pCallback> &callback, const WifiEventCallbackMsg &msg);
-    static void PublishConnectionStateChangedEvent(int state, const WifiLinkedInfo &info);
+    static void PublishConnStateChangedEvent(int state, const WifiLinkedInfo &info);
     static void PublishWifiStateChangedEvent(int state);
     static void PublishRssiValueChangedEvent(int state);
 private:

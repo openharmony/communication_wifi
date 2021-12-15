@@ -26,6 +26,8 @@ struct WifiEventCallback {
     std::function<void(int)> onWpaSsidWrongKey;
     std::function<void(int)> onWpsOverlap;
     std::function<void(int)> onWpsTimeOut;
+    std::function<void(int)> onWpaConnectionFull;
+    std::function<void(int)> onWpaConnectionReject;
 };
 }  // namespace Wifi
 }  // namespace OHOS

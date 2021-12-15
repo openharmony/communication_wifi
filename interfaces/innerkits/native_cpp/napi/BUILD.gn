@@ -86,6 +86,8 @@ ohos_shared_library("wifi_native_js") {
     "//utils/native/base:utils",
   ]
 
+  defines = [ "ENABLE_NAPI_COMPATIBLE" ]
+
   external_deps = [ "ipc:ipc_core" ]
 
   relative_install_dir = "module"

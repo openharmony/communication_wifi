@@ -256,11 +256,6 @@ ErrCode WifiDeviceProxy::UpdateDeviceConfig(const WifiDeviceConfig &config, int 
         return WIFI_OPT_FAILED;
     }
 
-    if (config.networkId <= INVALID_NETWORK_ID) {
-        WIFI_LOGE("update device config fail for networkId is invalid: %{public}d", config.networkId);
-        return WIFI_OPT_FAILED;
-    }
-
     MessageOption option;
     MessageParcel data, reply;
     data.WriteInt32(0);
@@ -713,10 +708,10 @@ void WifiDeviceProxy::ReadLinkedInfo(MessageParcel &reply, WifiLinkedInfo &info)
     info.macAddress = reply.ReadCString();
     info.ipAddress = reply.ReadInt32();
     int tmpConnState = reply.ReadInt32();
-    if ((tmpConnState >= 0) && (tmpConnState <= (int)ConnState::FAILED)) {
-        info.connState = (ConnState)tmpConnState;
+    if ((tmpConnState >= 0) && (tmpConnState <= (int)ConnState::UNKNOWN)) {
+        info.connState = ConnState(tmpConnState);
     } else {
-        info.connState = ConnState::FAILED;
+        info.connState = ConnState::UNKNOWN;
     }
     info.ifHiddenSSID = reply.ReadBool();
     info.rxLinkSpeed = reply.ReadInt32();

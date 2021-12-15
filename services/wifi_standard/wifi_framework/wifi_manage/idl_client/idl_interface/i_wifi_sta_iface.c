@@ -557,7 +557,9 @@ static int CheckRegisterEvent(int *events, int size)
         WIFI_IDL_CBK_CMD_WPA_STATE_CHANGEM,
         WIFI_IDL_CBK_CMD_SSID_WRONG_KEY,
         WIFI_IDL_CBK_CMD_WPS_OVERLAP,
-        WIFI_IDL_CBK_CMD_WPS_TIME_OUT
+        WIFI_IDL_CBK_CMD_WPS_TIME_OUT,
+        WIFI_IDL_CBK_CMD_WPS_CONNECTION_FULL,
+        WIFI_IDL_CBK_CMD_WPS_CONNECTION_REJECT
     };
     int max = sizeof(staEvents) / sizeof(staEvents[0]);
     int num = 0;

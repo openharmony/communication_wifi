@@ -86,6 +86,22 @@ void OnWpaSsidWrongKey(int status)
     }
 }
 
+void onWpaConnectionFull(int status)
+{
+    const OHOS::Wifi::WifiEventCallback &cbk = OHOS::Wifi::WifiStaHalInterface::GetInstance().GetCallbackInst();
+    if (cbk.onWpaConnectionFull) {
+        cbk.onWpaConnectionFull(status);
+    }
+}
+
+void onWpaConnectionReject(int status)
+{
+    const OHOS::Wifi::WifiEventCallback &cbk = OHOS::Wifi::WifiStaHalInterface::GetInstance().GetCallbackInst();
+    if (cbk.onWpaConnectionReject) {
+        cbk.onWpaConnectionReject(status);
+    }
+}
+
 void OnWpsOverlap(int status)
 {
     const OHOS::Wifi::WifiEventCallback &cbk = OHOS::Wifi::WifiStaHalInterface::GetInstance().GetCallbackInst();

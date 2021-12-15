@@ -73,6 +73,12 @@ public:
      */
     virtual ErrCode Disconnect() = 0;
     /**
+     * @Description  ReConnect network
+     *
+     * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
+     */
+    virtual ErrCode ReConnect() = 0;
+    /**
      * @Description  ReAssociate network
      *
      * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
@@ -120,12 +126,6 @@ public:
      * @return ErrCode - success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
      */
     virtual ErrCode DisableDeviceConfig(int networkId) = 0;
-    /**
-     * @Description Clear disabled bssid for reconnect
-     *
-     * @return ErrCode - success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
-     */
-    virtual ErrCode ClearDisabledBssidForReconnect() = 0;
     /**
      * @Description  Start WPS Connection
      *

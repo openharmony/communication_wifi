@@ -38,13 +38,13 @@ constexpr int STA_CAN_ONLY_WITH_WIFI_OFF_MODE = 3;
 constexpr int STA_DISABLED_MODE = 4;
 
 constexpr int CMD_NETWORK_CONNECT_TIMEOUT = 0X01;
-constexpr int STA_NETWORK_CONNECTTING_DELAY = 60 * 1000;
+constexpr int STA_NETWORK_CONNECTTING_DELAY = 30 * 1000;
 
 constexpr int CMD_SIGNAL_POLL = 0X02;
 constexpr int STA_SIGNAL_POLL_DELAY = 3 * 1000;
 
 /* pincode length */
-constexpr int PIN_CODE_LEN = 8; 
+constexpr int PIN_CODE_LEN = 8;
 
 /* DHCP timeout interval */
 constexpr int DHCP_TIME = 15;
@@ -559,6 +559,12 @@ private:
      */
     void DealCancelWpsCmd(InternalMessage *msg);
     /**
+     * @Description  Reconnect network
+     *
+     * @param msg - Message body received by the state machine[in]
+     */
+    void DealReConnectCmd(InternalMessage *msg);
+    /**
      * @Description  Operations after the Reassociate lead is issued
      *
      * @param msg - Message body received by the state machine[in]
@@ -575,7 +581,7 @@ private:
      *
      * @param msg - Message body received by the state machine[in]
      */
-    void DealWpaWrongPskEvent(InternalMessage *msg);
+    void DealWpaLinkFailEvent(InternalMessage *msg);
     /**
      * @Description  Wps mode is ON
      *
@@ -617,8 +623,6 @@ private:
     int targetNetworkId;
     int pinCode;
     SetupMethod wpsState;
-    /* Time stamp of the last attempt to connect to the network. */
-    int lastConnectToNetworkTimer; 
     int lastSignalLevel;
     std::string targetRoamBssid;
     int currentTpType;

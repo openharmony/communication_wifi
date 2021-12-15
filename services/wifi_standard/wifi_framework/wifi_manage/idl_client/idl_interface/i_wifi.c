@@ -261,6 +261,12 @@ static void IdlCbkWpaEventDeal(Context *context, int event)
     if (event == WIFI_IDL_CBK_CMD_WPA_STATE_CHANGEM && callback->onWpaStateChanged != NULL) {
         callback->onWpaStateChanged(status);
     }
+    if (event == WIFI_IDL_CBK_CMD_WPS_CONNECTION_FULL && callback->onWpsConnectionFull != NULL) {
+        callback->onWpsConnectionFull(status);
+    }
+    if (event == WIFI_IDL_CBK_CMD_WPS_CONNECTION_REJECT && callback->onWpsConnectionReject != NULL) {
+        callback->onWpsConnectionReject(status);
+    }
     return;
 }
 
@@ -293,6 +299,8 @@ static int IdlDealStaApEvent(Context *context, int event)
         case WIFI_IDL_CBK_CMD_SSID_WRONG_KEY:
         case WIFI_IDL_CBK_CMD_WPS_OVERLAP:
         case WIFI_IDL_CBK_CMD_WPS_TIME_OUT:
+        case WIFI_IDL_CBK_CMD_WPS_CONNECTION_FULL:
+        case WIFI_IDL_CBK_CMD_WPS_CONNECTION_REJECT:
             IdlCbkWpaEventDeal(context, event);
             break;
         default:

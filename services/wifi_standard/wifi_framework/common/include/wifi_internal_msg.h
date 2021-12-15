@@ -86,6 +86,8 @@ enum class OperateResState {
     DISCONNECT_DISCONNECT_FAILED,      /* disconnect failed */
     DISCONNECT_DISCONNECTED,           /* disconnect succeed */
     CONNECT_PASSWORD_WRONG,            /* wrong password */
+    CONNECT_CONNECTION_FULL,           /* connection full */
+    CONNECT_CONNECTION_REJECT,         /* connection reject */
     CONNECT_OBTAINING_IP,              /* obtain ip */
     CONNECT_OBTAINING_IP_FAILED,       /* obtain ip FAILED */
     CONNECT_ASSOCIATING,

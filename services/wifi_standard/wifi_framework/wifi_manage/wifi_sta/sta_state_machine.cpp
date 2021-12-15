@@ -43,7 +43,6 @@ StaStateMachine::StaStateMachine()
       targetNetworkId(INVALID_NETWORK_ID),
       pinCode(0),
       wpsState(SetupMethod::INVALID),
-      lastConnectToNetworkTimer(-1),
       lastSignalLevel(-1),
       targetRoamBssid(WPA_BSSID_ANY),
       currentTpType(IPTYPE_IPV4),
@@ -611,9 +610,12 @@ int StaStateMachine::InitStaSMHandleMap()
     staSmHandleFuncMap[WIFI_SVR_CMD_STA_STARTWPS] = &StaStateMachine::DealStartWpsCmd;
     staSmHandleFuncMap[WIFI_SVR_CMD_STA_WPS_TIMEOUT_EVNET] = &StaStateMachine::DealWpsConnectTimeOutEvent;
     staSmHandleFuncMap[WIFI_SVR_CMD_STA_CANCELWPS] = &StaStateMachine::DealCancelWpsCmd;
+    staSmHandleFuncMap[WIFI_SVR_CMD_STA_RECONNECT_NETWORK] = &StaStateMachine::DealReConnectCmd;
     staSmHandleFuncMap[WIFI_SVR_CMD_STA_REASSOCIATE_NETWORK] = &StaStateMachine::DealReassociateCmd;
     staSmHandleFuncMap[WIFI_SVR_COM_STA_START_ROAM] = &StaStateMachine::DealStartRoamCmd;
-    staSmHandleFuncMap[WIFI_SVR_CMD_STA_WPA_PASSWD_WRONG_EVENT] = &StaStateMachine::DealWpaWrongPskEvent;
+    staSmHandleFuncMap[WIFI_SVR_CMD_STA_WPA_PASSWD_WRONG_EVENT] = &StaStateMachine::DealWpaLinkFailEvent;
+    staSmHandleFuncMap[WIFI_SVR_CMD_STA_WPA_FULL_CONNECT_EVENT] = &StaStateMachine::DealWpaLinkFailEvent;
+    staSmHandleFuncMap[WIFI_SVR_CMD_STA_WPA_ASSOC_REJECT_EVENT] = &StaStateMachine::DealWpaLinkFailEvent;
     return WIFI_OPT_SUCCESS;
 }
 
@@ -751,6 +753,7 @@ void StaStateMachine::DealConnectTimeOutCmd(InternalMessage *msg)
 
     DisableNetwork(targetNetworkId);
     InitWifiLinkedInfo();
+    SaveLinkstate(ConnState::DISCONNECTED, DetailedState::CONNECTION_TIMEOUT);
     WifiSettings::GetInstance().SaveLinkedInfo(linkedInfo);
     staCallback.OnStaConnChanged(OperateResState::CONNECT_CONNECTING_TIMEOUT, linkedInfo);
     staCallback.OnStaConnChanged(OperateResState::DISCONNECT_DISCONNECTED, linkedInfo);
@@ -823,17 +826,52 @@ void StaStateMachine::DealDisconnectEvent(InternalMessage *msg)
     return;
 }
 
-void StaStateMachine::DealWpaWrongPskEvent(InternalMessage *msg)
+void StaStateMachine::DealWpaLinkFailEvent(InternalMessage *msg)
 {
+    LOGD("enter DealWpaLinkFailEvent.\n");
+    if (msg == nullptr) {
+        LOGE("msg is null.\n");
+    }
+    StopTimer(static_cast<int>(CMD_NETWORK_CONNECT_TIMEOUT));
+    InitWifiLinkedInfo();
+    WifiSettings::GetInstance().SaveLinkedInfo(linkedInfo);
+    if (msg->GetMessageName() == WIFI_SVR_CMD_STA_WPA_PASSWD_WRONG_EVENT) {
+        SaveLinkstate(ConnState::DISCONNECTED, DetailedState::PASSWORD_ERROR);
+        staCallback.OnStaConnChanged(OperateResState::CONNECT_PASSWORD_WRONG, linkedInfo);
+    } else if (msg->GetMessageName() == WIFI_SVR_CMD_STA_WPA_FULL_CONNECT_EVENT) {
+        DisableNetwork(targetNetworkId);
+        SaveLinkstate(ConnState::DISCONNECTED, DetailedState::CONNECTION_FULL);
+        staCallback.OnStaConnChanged(OperateResState::CONNECT_CONNECTION_FULL, linkedInfo);
+        staCallback.OnStaConnChanged(OperateResState::DISCONNECT_DISCONNECTED, linkedInfo);
+    } else if (msg->GetMessageName() == WIFI_SVR_CMD_STA_WPA_ASSOC_REJECT_EVENT) {
+        DisableNetwork(targetNetworkId);
+        SaveLinkstate(ConnState::DISCONNECTED, DetailedState::CONNECTION_REJECT);
+        staCallback.OnStaConnChanged(OperateResState::CONNECT_CONNECTION_REJECT, linkedInfo);
+        staCallback.OnStaConnChanged(OperateResState::DISCONNECT_DISCONNECTED, linkedInfo);
+    }
+}
+
+void StaStateMachine::DealReConnectCmd(InternalMessage *msg)
+{
+    LOGD("enter DealReConnectCmd.\n");
     if (msg == nullptr) {
         WIFI_LOGE("msg is null\n");
     }
-    WIFI_LOGD("enter DealWpaWrongPskEvent\n");
-    InitWifiLinkedInfo();
-    WifiSettings::GetInstance().SaveLinkedInfo(linkedInfo);
-    WifiSettings::GetInstance().SetDeviceState(targetNetworkId, (int)WifiDeviceConfigStatus::DISABLED);
-    WifiSettings::GetInstance().SyncDeviceConfig();
-    staCallback.OnStaConnChanged(OperateResState::CONNECT_PASSWORD_WRONG, linkedInfo);
+
+    if (linkedInfo.connState == ConnState::CONNECTED) {
+        WIFI_LOGE("Network is already connected, ignore the re-connect comand!\n");
+        return;
+    }
+
+    if (WifiStaHalInterface::GetInstance().Reconnect() == WIFI_IDL_OPT_OK) {
+        WIFI_LOGD("StaStateMachine ReConnect successfully!");
+        /* Callback result to InterfaceService */
+        staCallback.OnStaConnChanged(OperateResState::CONNECT_CONNECTING, linkedInfo);
+        StopTimer(static_cast<int>(CMD_NETWORK_CONNECT_TIMEOUT));
+        StartTimer(static_cast<int>(CMD_NETWORK_CONNECT_TIMEOUT), STA_NETWORK_CONNECTTING_DELAY);
+    } else {
+        WIFI_LOGE("ReConnect failed!");
+    }
 }
 
 void StaStateMachine::DealReassociateCmd(InternalMessage *msg)
@@ -843,16 +881,10 @@ void StaStateMachine::DealReassociateCmd(InternalMessage *msg)
         WIFI_LOGE("msg is null\n");
     }
 
-    /* Obtains the current system time, assigns the timestamp of the last
-     * connection attempt, and prohibits scanning requests within 10 seconds.
-     */
-    lastConnectToNetworkTimer = static_cast<int>(WifiSettings::GetInstance().GetUserLastSelectedNetworkTimeVal());
-    WIFI_LOGD("the last time connect to network is %{public}d", lastConnectToNetworkTimer);
-
     if (WifiStaHalInterface::GetInstance().Reassociate() == WIFI_IDL_OPT_OK) {
         /* Callback result to InterfaceService */
         staCallback.OnStaConnChanged(OperateResState::CONNECT_ASSOCIATING, linkedInfo);
-        WIFI_LOGD("StaStateMachine::LinkState::ExecuteStateMsg  ReAssociate successfully!");
+        WIFI_LOGD("StaStateMachine ReAssociate successfully!");
         StopTimer(static_cast<int>(CMD_NETWORK_CONNECT_TIMEOUT));
         StartTimer(static_cast<int>(CMD_NETWORK_CONNECT_TIMEOUT), STA_NETWORK_CONNECTTING_DELAY);
     } else {
@@ -1352,12 +1384,12 @@ void StaStateMachine::DisConnectProcess()
         WIFI_LOGI("Disconnect() succeed!");
         /* Save connection information to WifiSettings. */
         SaveLinkstate(ConnState::DISCONNECTED, DetailedState::DISCONNECTED);
-
         DisableNetwork(linkedInfo.networkId);
 
         /* The current state of StaStateMachine transfers to SeparatedState. */
         SwitchState(pSeparatedState);
     } else {
+        SaveLinkstate(ConnState::DISCONNECTING, DetailedState::FAILED);
         staCallback.OnStaConnChanged(OperateResState::DISCONNECT_DISCONNECT_FAILED, linkedInfo);
         WIFI_LOGE("Disconnect() failed!");
     }
@@ -1401,6 +1433,7 @@ bool StaStateMachine::StaWpsState::ExecuteStateMsg(InternalMessage *msg)
             pStaStateMachine->ConnectToNetworkProcess(msg);
             pStaStateMachine->SyncAllDeviceConfigs();
             /* Callback result to InterfaceService. */
+            pStaStateMachine->SaveLinkstate(ConnState::CONNECTING, DetailedState::OBTAINING_IPADDR);
             pStaStateMachine->staCallback.OnStaConnChanged(OperateResState::CONNECT_OBTAINING_IP,
                                                            pStaStateMachine->linkedInfo);
             pStaStateMachine->SwitchState(pStaStateMachine->pGetIpState);
@@ -1531,6 +1564,7 @@ void StaStateMachine::GetIpState::GoInState()
         if ((dhcpRet != 0) || (pStaStateMachine->pDhcpService->GetDhcpResult(
             IF_NAME, pStaStateMachine->pDhcpResultNotify, DHCP_TIME) != 0)) {
             LOGE(" Dhcp connection failed.\n");
+            pStaStateMachine->SaveLinkstate(ConnState::DISCONNECTED, DetailedState::OBTAINING_IPADDR_FAIL);
             pStaStateMachine->staCallback.OnStaConnChanged(
                 OperateResState::CONNECT_OBTAINING_IP_FAILED, pStaStateMachine->linkedInfo);
             if (!pStaStateMachine->isRoam) {
@@ -1761,7 +1795,7 @@ void StaStateMachine::ConnectToNetworkProcess(InternalMessage *msg)
     lastLinkedInfo.macAddress = deviceConfig.macAddress;
     lastLinkedInfo.ifHiddenSSID = deviceConfig.hiddenSSID;
     SetWifiLinkedInfo(lastNetworkId);
-    SaveLinkstate(ConnState::OBTAINING_IPADDR, DetailedState::OBTAINING_IPADDR);
+    SaveLinkstate(ConnState::CONNECTING, DetailedState::OBTAINING_IPADDR);
 }
 
 void StaStateMachine::SetWifiLinkedInfo(int networkId)
@@ -1797,7 +1831,7 @@ void StaStateMachine::SetWifiLinkedInfo(int networkId)
                 linkedInfo.ssid = config.ssid;
                 linkedInfo.bssid = config.bssid;
                 linkedInfo.band = config.band;
-                linkedInfo.connState = ConnState::OBTAINING_IPADDR;
+                linkedInfo.connState = ConnState::CONNECTING;
                 linkedInfo.ifHiddenSSID = config.hiddenSSID;
                 linkedInfo.detailedState = DetailedState::OBTAINING_IPADDR;
 
@@ -1805,7 +1839,7 @@ void StaStateMachine::SetWifiLinkedInfo(int networkId)
                 lastLinkedInfo.ssid = config.ssid;
                 lastLinkedInfo.bssid = config.bssid;
                 lastLinkedInfo.band = config.band;
-                lastLinkedInfo.connState = ConnState::OBTAINING_IPADDR;
+                lastLinkedInfo.connState = ConnState::CONNECTING;
                 lastLinkedInfo.ifHiddenSSID = config.hiddenSSID;
                 lastLinkedInfo.detailedState = DetailedState::OBTAINING_IPADDR;
             }
@@ -1859,16 +1893,16 @@ void StaStateMachine::DhcpResultNotify::OnSuccess(int status, const std::string 
         }
 
         IfConfig::GetInstance().SetIfAddr(result, result.iptype);
-    }
-    if (pStaStateMachine->getIpSucNum == 0 || pStaStateMachine->isRoam) {
-        pStaStateMachine->SaveLinkstate(ConnState::CONNECTED, DetailedState::CONNECTED);
-        pStaStateMachine->staCallback.OnStaConnChanged(
-            OperateResState::CONNECT_AP_CONNECTED, pStaStateMachine->linkedInfo);
-        /* Wait for the network adapter information to take effect. */
-        sleep(SLEEPTIME);
+        if (pStaStateMachine->getIpSucNum == 0 || pStaStateMachine->isRoam) {
+            pStaStateMachine->SaveLinkstate(ConnState::CONNECTED, DetailedState::CONNECTED);
+            pStaStateMachine->staCallback.OnStaConnChanged(
+                OperateResState::CONNECT_AP_CONNECTED, pStaStateMachine->linkedInfo);
+            /* Wait for the network adapter information to take effect. */
+            sleep(SLEEPTIME);
 
         /* Check whether the Internet access is normal by send http. */
         pStaStateMachine->pNetcheck->SignalNetCheckThread();
+        }
     }
     pStaStateMachine->getIpSucNum++;
     return;
@@ -1888,14 +1922,20 @@ void StaStateMachine::DhcpResultNotify::OnFailed(int status, const std::string &
             pStaStateMachine->staCallback.OnStaConnChanged(OperateResState::CONNECT_OBTAINING_IP_FAILED,
             pStaStateMachine->linkedInfo);
             pStaStateMachine->DisConnectProcess();
+            pStaStateMachine->SaveLinkstate(ConnState::DISCONNECTED, DetailedState::OBTAINING_IPADDR_FAIL);
         }
     } else {
         pStaStateMachine->staCallback.OnStaConnChanged(
             OperateResState::CONNECT_OBTAINING_IP_FAILED, pStaStateMachine->linkedInfo); 
         if (!pStaStateMachine->isRoam) {
             pStaStateMachine->DisConnectProcess();
+            pStaStateMachine->SaveLinkstate(ConnState::DISCONNECTED, DetailedState::OBTAINING_IPADDR_FAIL);
         } else {
-            pStaStateMachine->SaveLinkstate(ConnState::CONNECTED, DetailedState::CONNECTED);
+            if (!pStaStateMachine->isRoam) {
+                pStaStateMachine->DisConnectProcess();
+            } else {
+                pStaStateMachine->SaveLinkstate(ConnState::CONNECTED, DetailedState::CONNECTED);
+            }
         }
     }
     pStaStateMachine->getIpFailNum++;

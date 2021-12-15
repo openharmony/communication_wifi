@@ -1195,9 +1195,9 @@ void StaAutoConnectServiceTest::RoamingSelectionSuccess1()
     info.connState = ConnState::CONNECTED;
     scanInfos[0].securityType = WifiSecurity::WEP;
     scanInfos[0].rssi = 8;
-    scanInfos[0].ssid = "huawei";
+    scanInfos[0].ssid = "ohos";
     scanInfos[0].bssid = "2a:76:93:47:e2:8e";
-    info.ssid = "huawei";
+    info.ssid = "ohos";
     info.bssid = "2a:76:93:47:e2:8b";
     info.rssi = 1;
     int indexType = DEVICE_CONFIG_INDEX_SSID;

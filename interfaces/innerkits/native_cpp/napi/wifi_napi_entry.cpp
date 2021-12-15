@@ -21,8 +21,8 @@
 
 namespace OHOS {
 namespace Wifi {
+#ifndef ENABLE_NAPI_COMPATIBLE
 DEFINE_WIFILOG_LABEL("WifiNAPIEntry");
-
 /*
  * Event class initialization function
  */
@@ -55,6 +55,7 @@ static napi_value Init(napi_env env, napi_value exports) {
         DECLARE_NAPI_FUNCTION("addDeviceConfig", AddDeviceConfig),
         DECLARE_NAPI_FUNCTION("connectToNetwork", ConnectToNetwork),
         DECLARE_NAPI_FUNCTION("connectToDevice", ConnectToDevice),
+        DECLARE_NAPI_FUNCTION("isConnected", IsConnected),
         DECLARE_NAPI_FUNCTION("disconnect", Disconnect),
         DECLARE_NAPI_FUNCTION("getSignalLevel", GetSignalLevel),
         DECLARE_NAPI_FUNCTION("reconnect", ReConnect),
@@ -66,6 +67,7 @@ static napi_value Init(napi_env env, napi_value exports) {
         DECLARE_NAPI_FUNCTION("disableNetwork", DisableNetwork),
         DECLARE_NAPI_FUNCTION("getCountryCode", GetCountryCode),
         DECLARE_NAPI_FUNCTION("getDeviceConfigs", GetDeviceConfigs),
+        DECLARE_NAPI_FUNCTION("updateNetwork", UpdateNetwork),
         DECLARE_NAPI_FUNCTION("getSupportedFeatures", GetSupportedFeatures),
         DECLARE_NAPI_FUNCTION("isFeatureSupported", IsFeatureSupported),
         DECLARE_NAPI_FUNCTION("getDeviceMacAddress", GetDeviceMacAddress),
@@ -91,6 +93,8 @@ static napi_module wifiJsModule = {
     .nm_priv = ((void *)0),
     .reserved = { 0 }
 };
+
+#else
 
 /*
  * Module initialization function
@@ -125,10 +129,14 @@ static napi_module wifiJsModuleForCompatible = {
     .nm_priv = ((void *)0),
     .reserved = { 0 }
 };
+#endif
 
 extern "C" __attribute__((constructor)) void RegisterModule(void) {
+#ifndef ENABLE_NAPI_COMPATIBLE
     napi_module_register(&wifiJsModule);
+#else
     napi_module_register(&wifiJsModuleForCompatible);
+#endif
 }
 }  // namespace Wifi
 }  // namespace OHOS

@@ -1,0 +1,59 @@
+{
+    "name": "@ohos/communication_wifi",
+    "version": "",
+    "description": "WLAN 是目前比较主流的接入方式，WLAN本身业务较为复杂，驱动代码量大，技术门槛相对较高，同时对芯片厂家高度依赖。HDF基于WLAN的业务特点，设计组件化的驱动开发框架，建立不同框架体系下一致的WIFI抽象，并以相同的规则来约束和规范鸿蒙生态中不同设备形态下WLAN驱动的开发。",
+    "homePage": "https://gitee.com/openharmony",
+    "license": "Apache V2",
+    "repository": "https://gitee.com/openharmony/communication_wifi",
+    "domain": "os",
+    "language": "",
+    "publishAs": "code-segment",
+    "private": false,
+    "scripts": {},
+    "tags": [
+        "foundation"
+    ],
+    "keywords": [
+        "communication",
+        "wifi"
+    ],
+    "envs": [],
+    "dirs": [],
+    "author": {
+        "name": "",
+        "email": "",
+        "url": ""
+    },
+    "contributors": [
+        {
+            "name": "",
+            "email": "",
+            "url": ""
+        }
+    ],
+    "segment": {
+        "destPath": "foundation/communication/wifi"
+    },
+    "component": {
+        "name": "wifi",
+        "subsystem": "communication",
+        "syscap": [
+            "SystemCapability.Communication.WiFi"
+        ],
+        "features": [],
+        "adapted_system_type": [
+            "standard"
+        ],
+        "rom": "",
+        "ram": "",
+        "deps": {
+            "components": [],
+            "third_party": []
+        },
+        "build": {
+            "sub_component": [],
+            "inner_kits": [],
+            "test": []
+        }
+    }
+}

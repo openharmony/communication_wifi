@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -76,6 +76,7 @@ struct stWifiWpaP2pInterface {
     P2pSupplicantErrCode (*wpaP2pCliCmdSetGroupConfig)(WifiWpaP2pInterface *p, const P2pWpaGroupConfigArgv *argv);
     P2pSupplicantErrCode (*wpaP2pCliCmdGetGroupConfig)(WifiWpaP2pInterface *p, P2pWpaGroupConfigArgv *argv);
     P2pSupplicantErrCode (*wpaP2pCliCmdAddNetwork)(WifiWpaP2pInterface *p, int *networkId);
+    P2pSupplicantErrCode (*wpaP2pCliCmdHid2dConnect)(WifiWpaP2pInterface *p, Hid2dConnectInfo *info);
 };
 
 typedef struct stWifiWpaP2pGroupInterface WifiWpaP2pGroupInterface;

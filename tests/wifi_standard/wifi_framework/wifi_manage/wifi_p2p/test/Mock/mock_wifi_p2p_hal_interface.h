@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -23,6 +23,7 @@
 #include "wifi_error_no.h"
 #include "wifi_idl_struct.h"
 #include "wifi_p2p_event_callback.h"
+#include "wifi_hid2d_msg.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -79,6 +80,7 @@ public:
     virtual WifiErrorNo P2pAddNetwork(int &networkId) const = 0;
     virtual WifiErrorNo SetPersistentReconnect(int mode) const = 0;
     virtual WifiErrorNo SetP2pSecondaryDeviceType(const std::string &type) = 0;
+    virtual WifiErrorNo Hid2dConnect(const Hid2dConnectConfig &config) const = 0;
 };
 
 class WifiP2PHalInterface : public MockWifiP2PHalInterface {
@@ -136,6 +138,7 @@ public:
     MOCK_CONST_METHOD1(P2pAddNetwork, WifiErrorNo(int &networkId));
     MOCK_CONST_METHOD1(SetPersistentReconnect, WifiErrorNo(int mode));
     MOCK_METHOD1(SetP2pSecondaryDeviceType, WifiErrorNo(const std::string &type));
+    MOCK_CONST_METHOD1(Hid2dConnect, WifiErrorNo(const Hid2dConnectConfig &config));
 };
 }  // namespace Wifi
 }  // namespace OHOS

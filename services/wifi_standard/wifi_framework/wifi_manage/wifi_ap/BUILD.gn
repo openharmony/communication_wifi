@@ -22,6 +22,7 @@ ohos_shared_library("wifi_ap_service") {
     "../common/state.cpp",
     "../common/state_machine.cpp",
     "//foundation/communication/wifi/services/wifi_standard/wifi_framework/common/net_helper/dhcpd_interface.cpp",
+    "//foundation/communication/wifi/services/wifi_standard/wifi_framework/common/net_helper/if_config.cpp",
     "ap_config_use.cpp",
     "ap_idle_state.cpp",
     "ap_interface.cpp",

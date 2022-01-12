@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -899,6 +899,354 @@ ErrCode WifiP2pProxy::GetSupportedFeatures(long &features)
 
     features = reply.ReadInt64();
     return WIFI_OPT_SUCCESS;
+}
+
+ErrCode WifiP2pProxy::Hid2dRequestGcIp(const std::string& gcMac, std::string& ipAddr)
+{
+    if (mRemoteDied) {
+        WIFI_LOGD("failed to `%{public}s`,remote service is died!", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    MessageOption option;
+    MessageParcel data;
+    MessageParcel reply;
+    data.WriteInt32(0);
+    data.WriteCString(gcMac.c_str());
+    int error = Remote()->SendRequest(WIFI_SVR_CMD_P2P_HID2D_APPLY_IP, data, reply, option);
+    if (error != ERR_NONE) {
+        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d", WIFI_SVR_CMD_P2P_HID2D_APPLY_IP, error);
+        return WIFI_OPT_FAILED;
+    }
+    int exception = reply.ReadInt32();
+    if (exception) {
+        return WIFI_OPT_FAILED;
+    }
+    int ret = reply.ReadInt32();
+    if (ErrCode(ret) != WIFI_OPT_SUCCESS) {
+        return ErrCode(ret);
+    }
+    ipAddr = reply.ReadCString();
+    return WIFI_OPT_SUCCESS;
+}
+
+ErrCode WifiP2pProxy::Hid2dSharedlinkIncrease()
+{
+    if (mRemoteDied) {
+        WIFI_LOGD("failed to `%{public}s`,remote service is died!", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    MessageOption option;
+    MessageParcel data;
+    MessageParcel reply;
+    data.WriteInt32(0);
+    int error = Remote()->SendRequest(WIFI_SVR_CMD_P2P_HID2D_SHARED_LINK_INCREASE, data, reply, option);
+    if (error != ERR_NONE) {
+        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d",
+            WIFI_SVR_CMD_P2P_HID2D_SHARED_LINK_INCREASE, error);
+        return WIFI_OPT_FAILED;
+    }
+    int exception = reply.ReadInt32();
+    if (exception) {
+        return WIFI_OPT_FAILED;
+    }
+    return ErrCode(reply.ReadInt32());
+}
+
+ErrCode WifiP2pProxy::Hid2dSharedlinkDecrease()
+{
+    if (mRemoteDied) {
+        WIFI_LOGD("failed to `%{public}s`,remote service is died!", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    MessageOption option;
+    MessageParcel data;
+    MessageParcel reply;
+    data.WriteInt32(0);
+    int error = Remote()->SendRequest(WIFI_SVR_CMD_P2P_HID2D_SHARED_LINK_DECREASE, data, reply, option);
+    if (error != ERR_NONE) {
+        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d",
+            WIFI_SVR_CMD_P2P_HID2D_SHARED_LINK_DECREASE, error);
+        return WIFI_OPT_FAILED;
+    }
+    int exception = reply.ReadInt32();
+    if (exception) {
+        return WIFI_OPT_FAILED;
+    }
+    return ErrCode(reply.ReadInt32());
+}
+
+ErrCode WifiP2pProxy::Hid2dCreateGroup(const int frequency, FreqType type)
+{
+    WIFI_LOGI("Request hid2d create group");
+
+    if (mRemoteDied) {
+        WIFI_LOGD("failed to `%{public}s`,remote service is died!", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    MessageOption option;
+    MessageParcel data;
+    MessageParcel reply;
+    data.WriteInt32(0);
+    data.WriteInt32(frequency);
+    data.WriteInt32(static_cast<int>(type));
+    int error = Remote()->SendRequest(WIFI_SVR_CMD_P2P_HID2D_CREATE_GROUP, data, reply, option);
+    if (error != ERR_NONE) {
+        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d",
+            WIFI_SVR_CMD_P2P_HID2D_CREATE_GROUP, error);
+        return WIFI_OPT_FAILED;
+    }
+    int exception = reply.ReadInt32();
+    if (exception) {
+        return WIFI_OPT_FAILED;
+    }
+    return ErrCode(reply.ReadInt32());
+}
+
+ErrCode WifiP2pProxy::Hid2dRemoveGcGroup(const std::string& gcIfName)
+{
+    WIFI_LOGI("Request hid2d remove group");
+
+    if (mRemoteDied) {
+        WIFI_LOGD("failed to `%{public}s`,remote service is died!", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    MessageOption option;
+    MessageParcel data;
+    MessageParcel reply;
+    data.WriteInt32(0);
+    data.WriteCString(gcIfName.c_str());
+    int error = Remote()->SendRequest(WIFI_SVR_CMD_P2P_HID2D_REMOVE_GC_GROUP, data, reply, option);
+    if (error != ERR_NONE) {
+        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d",
+            WIFI_SVR_CMD_P2P_HID2D_REMOVE_GC_GROUP, error);
+        return WIFI_OPT_FAILED;
+    }
+    int exception = reply.ReadInt32();
+    if (exception) {
+        return WIFI_OPT_FAILED;
+    }
+    return ErrCode(reply.ReadInt32());
+}
+
+ErrCode WifiP2pProxy::Hid2dConnect(const Hid2dConnectConfig& config)
+{
+    WIFI_LOGI("Request hid2d connect");
+
+    if (mRemoteDied) {
+        WIFI_LOGD("failed to `%{public}s`,remote service is died!", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    MessageOption option;
+    MessageParcel data;
+    MessageParcel reply;
+    data.WriteInt32(0);
+    data.WriteCString(config.GetSsid().c_str());
+    data.WriteCString(config.GetBssid().c_str());
+    data.WriteCString(config.GetPreSharedKey().c_str());
+    data.WriteInt32(config.GetFrequency());
+    data.WriteInt32(static_cast<int>(config.GetDhcpMode()));
+    int error = Remote()->SendRequest(WIFI_SVR_CMD_P2P_HID2D_CONNECT, data, reply, option);
+    if (error != ERR_NONE) {
+        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d",
+            WIFI_SVR_CMD_P2P_HID2D_CONNECT, error);
+        return WIFI_OPT_FAILED;
+    }
+    int exception = reply.ReadInt32();
+    if (exception) {
+        return WIFI_OPT_FAILED;
+    }
+    return ErrCode(reply.ReadInt32());
+}
+
+ErrCode WifiP2pProxy::Hid2dConfigIPAddr(const std::string& ifName, const IpAddrInfo& ipInfo)
+{
+    if (mRemoteDied) {
+        WIFI_LOGD("failed to `%{public}s`,remote service is died!", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    MessageOption option;
+    MessageParcel data;
+    MessageParcel reply;
+    data.WriteInt32(0);
+    data.WriteCString(ifName.c_str());
+    data.WriteCString(ipInfo.ip.c_str());
+    data.WriteCString(ipInfo.gateway.c_str());
+    data.WriteCString(ipInfo.netmask.c_str());
+    int error = Remote()->SendRequest(WIFI_SVR_CMD_P2P_HID2D_CONFIG_IP, data, reply, option);
+    if (error != ERR_NONE) {
+        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d",
+            WIFI_SVR_CMD_P2P_HID2D_CONFIG_IP, error);
+        return WIFI_OPT_FAILED;
+    }
+    int exception = reply.ReadInt32();
+    if (exception) {
+        return WIFI_OPT_FAILED;
+    }
+    return ErrCode(reply.ReadInt32());
+}
+
+ErrCode WifiP2pProxy::Hid2dReleaseIPAddr(const std::string& ifName)
+{
+    if (mRemoteDied) {
+        WIFI_LOGD("failed to `%{public}s`,remote service is died!", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    MessageOption option;
+    MessageParcel data;
+    MessageParcel reply;
+    data.WriteInt32(0);
+    data.WriteCString(ifName.c_str());
+    int error = Remote()->SendRequest(WIFI_SVR_CMD_P2P_HID2D_RELEASE_IP, data, reply, option);
+    if (error != ERR_NONE) {
+        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d",
+            WIFI_SVR_CMD_P2P_HID2D_RELEASE_IP, error);
+        return WIFI_OPT_FAILED;
+    }
+    int exception = reply.ReadInt32();
+    if (exception) {
+        return WIFI_OPT_FAILED;
+    }
+    return ErrCode(reply.ReadInt32());
+}
+
+ErrCode WifiP2pProxy::Hid2dGetRecommendChannel(const RecommendChannelRequest& request,
+    RecommendChannelResponse& response)
+{
+    if (mRemoteDied) {
+        WIFI_LOGD("failed to `%{public}s`,remote service is died!", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    MessageOption option;
+    MessageParcel data, reply;
+    data.WriteInt32(0);
+    data.WriteCString(request.remoteIfName.c_str());
+    data.WriteInt32(request.remoteIfMode);
+    data.WriteCString(request.localIfName.c_str());
+    data.WriteInt32(request.localIfMode);
+    data.WriteInt32(request.prefBand);
+    data.WriteInt32(static_cast<int>(request.prefBandwidth));
+    int error = Remote()->SendRequest(WIFI_SVR_CMD_GET_P2P_RECOMMENDED_CHANNEL, data, reply, option);
+    if (error != ERR_NONE) {
+        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d",
+            WIFI_SVR_CMD_GET_P2P_RECOMMENDED_CHANNEL, error);
+        return ErrCode(error);
+    }
+    int exception = reply.ReadInt32();
+    if (exception) {
+        return WIFI_OPT_FAILED;
+    }
+    int ret = reply.ReadInt32();
+    if (ErrCode(ret) != WIFI_OPT_SUCCESS) {
+        return ErrCode(ret);
+    }
+    response.status = RecommendStatus(reply.ReadInt32());
+    response.index = reply.ReadInt32();
+    response.centerFreq = reply.ReadInt32();
+    response.centerFreq1 = reply.ReadInt32();
+    response.centerFreq2 = reply.ReadInt32();
+    response.bandwidth = reply.ReadInt32();
+    return WIFI_OPT_SUCCESS;
+}
+
+ErrCode WifiP2pProxy::Hid2dGetChannelListFor5G(std::vector<int>& vecChannelList)
+{
+    if (mRemoteDied) {
+        WIFI_LOGD("failed to `%{public}s`,remote service is died!", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    MessageOption option;
+    MessageParcel data;
+    MessageParcel reply;
+    data.WriteInt32(0);
+    int error = Remote()->SendRequest(WIFI_SVR_CMD_GET_5G_CHANNEL_LIST, data, reply, option);
+    if (error != ERR_NONE) {
+        WIFI_LOGW("Set Attr(%{public}d) failed", WIFI_SVR_CMD_GET_5G_CHANNEL_LIST);
+        return WIFI_OPT_FAILED;
+    }
+    int exception = reply.ReadInt32();
+    if (exception) {
+        return WIFI_OPT_FAILED;
+    }
+    int ret = reply.ReadInt32();
+    if (ErrCode(ret) != WIFI_OPT_SUCCESS) {
+        return ErrCode(ret);
+    }
+    int listSize = reply.ReadInt32();
+    for (int i = 0; i < listSize; ++i) {
+        vecChannelList.emplace_back(reply.ReadInt32());
+    }
+    return WIFI_OPT_SUCCESS;
+}
+
+ErrCode WifiP2pProxy::Hid2dGetSelfWifiCfgInfo(SelfCfgType cfgType,
+    char cfgData[CFG_DATA_MAX_BYTES], int* getDatValidLen)
+{
+    if (mRemoteDied) {
+        WIFI_LOGD("failed to `%{public}s`,remote service is died!", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    MessageOption option;
+    MessageParcel data;
+    MessageParcel reply;
+    data.WriteInt32(0);
+    data.WriteInt32(static_cast<int>(cfgType));
+    int error = Remote()->SendRequest(WIFI_SVR_CMD_GET_SELF_WIFI_CFG, data, reply, option);
+    if (error != ERR_NONE) {
+        WIFI_LOGW("Set Attr(%{public}d) failed", WIFI_SVR_CMD_GET_SELF_WIFI_CFG);
+        return WIFI_OPT_FAILED;
+    }
+    int exception = reply.ReadInt32();
+    if (exception) {
+        return WIFI_OPT_FAILED;
+    }
+    int ret = reply.ReadInt32();
+    if (ErrCode(ret) != WIFI_OPT_SUCCESS) {
+        return WIFI_OPT_FAILED;
+    }
+
+    *getDatValidLen = reply.ReadInt32();
+    if (*getDatValidLen > 0) {
+        const char *dataBuffer = (const char *)reply.ReadBuffer(*getDatValidLen);
+        if (dataBuffer == nullptr) {
+            WIFI_LOGE("`%{public}s` inner communication error!", __func__);
+            return WIFI_OPT_FAILED;
+        }
+        if (memcpy_s(cfgData, CFG_DATA_MAX_BYTES, dataBuffer, *getDatValidLen) != EOK) {
+            WIFI_LOGD("`%{public}s` memcpy_s failed!", __func__);
+            return WIFI_OPT_FAILED;
+        }
+    }
+    return WIFI_OPT_SUCCESS;
+}
+
+ErrCode WifiP2pProxy::Hid2dSetPeerWifiCfgInfo(PeerCfgType cfgType,
+    char cfgData[CFG_DATA_MAX_BYTES], int setDataValidLen)
+{
+    if (setDataValidLen <= 0) {
+        WIFI_LOGE("`%{public}s` parameter is error!", __func__);
+        return WIFI_OPT_INVALID_PARAM;
+    }
+    if (mRemoteDied) {
+        WIFI_LOGD("failed to `%{public}s`,remote service is died!", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    MessageOption option;
+    MessageParcel data;
+    MessageParcel reply;
+    data.WriteInt32(0);
+    data.WriteInt32(static_cast<int>(cfgType));
+    data.WriteInt32(setDataValidLen);
+    data.WriteBuffer(cfgData, setDataValidLen);
+    int error = Remote()->SendRequest(WIFI_SVR_CMD_SET_PEER_WIFI_CFG, data, reply, option);
+    if (error != ERR_NONE) {
+        WIFI_LOGW("Set Attr(%{public}d) failed", WIFI_SVR_CMD_SET_PEER_WIFI_CFG);
+        return WIFI_OPT_FAILED;
+    }
+    int exception = reply.ReadInt32();
+    if (exception) {
+        return WIFI_OPT_FAILED;
+    }
+    return ErrCode(reply.ReadInt32());
 }
 
 void WifiP2pProxy::OnRemoteDied(const wptr<IRemoteObject>& remoteObject)

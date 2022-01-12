@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,12 +12,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include "wifi_hal_ap_interface.h"
 #include <errno.h>
 #include <securec.h>
 #include "wifi_hal_module_manage.h"
 #include "wifi_hal_common_func.h"
 #include "wifi_log.h"
+#include "wifi_wpa_hal.h"
 #include "wifi_hostapd_hal.h"
 
 #undef LOG_TAG
@@ -26,25 +28,6 @@
 #define BUFF_SIZE 1024
 static const char *g_serviceName = "hostapd";
 static const char *g_startCmd = "hostapd /data/misc/wifi/wpa_supplicant/hostapd.conf";
-
-static int ExcuteStaCmd(const char *szCmd)
-{
-    int ret = system(szCmd);
-    if (ret == -1) {
-        LOGE("system cmd %{public}s failed!", szCmd);
-    } else {
-        if (WIFEXITED(ret)) {
-            if (WEXITSTATUS(ret) == 0) {
-                return 0;
-            }
-            LOGE("system cmd %{public}s failed, return status %{public}d", szCmd, WEXITSTATUS(ret));
-        } else {
-            LOGE("system cmd %{public}s failed", szCmd);
-        }
-    }
-
-    return -1;
-}
 
 WifiErrorNo StartSoftAp(void)
 {
@@ -76,13 +59,13 @@ WifiErrorNo StartHostapd(void)
             return -1;
         }
 
-        ExcuteStaCmd(szCmd);
+        ExcuteCmd(szCmd);
     }
     ModuleManageRetCode ret = StartModule(g_serviceName, g_startCmd);
     if (ret == MM_SUCCESS) {
         return WIFI_HAL_SUCCESS;
     }
-    
+
     LOGE("start hostapd failed!");
     return WIFI_HAL_FAILED;
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,6 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include "wifi_p2p_callback_stub.h"
 #include "define.h"
 #include "wifi_p2p_msg.h"
@@ -88,7 +89,7 @@ void WifiP2pCallbackStub::SetRemoteDied(bool val)
 
 void WifiP2pCallbackStub::OnP2pStateChanged(int state)
 {
-    WIFI_LOGD("WifiP2pCallbackStub::OnP2pStateChanged");
+    WIFI_LOGD("WifiP2pCallbackStub::OnP2pStateChanged: %{public}d", state);
     if (userCallback_) {
         userCallback_->OnP2pStateChanged(state);
     }
@@ -133,7 +134,7 @@ void WifiP2pCallbackStub::OnP2pServicesChanged(const std::vector<WifiP2pServiceI
 
 void WifiP2pCallbackStub::OnP2pConnectionChanged(const WifiP2pLinkedInfo &info)
 {
-    WIFI_LOGD("WifiP2pCallbackStub::OnP2pConnectionChanged");
+    WIFI_LOGD("WifiP2pCallbackStub::OnP2pConnectionChanged: %{public}d", static_cast<int>(info.GetConnectState()));
     if (userCallback_) {
         userCallback_->OnP2pConnectionChanged(info);
     }

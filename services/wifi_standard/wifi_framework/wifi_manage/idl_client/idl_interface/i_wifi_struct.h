@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -300,8 +300,13 @@ typedef struct HidlP2pGroupConfig {
     char cfgValue[WIFI_P2P_GROUP_CONFIG_VALUE_LENGTH]; /* param value */
 } HidlP2pGroupConfig;
 
+typedef struct Hid2dConnectInfo {
+    char ssid[WIFI_SSID_LENGTH];
+    char bssid[WIFI_MAC_ADDR_LENGTH + 1];
+    char passphrase[WIFI_P2P_TMP_MSG_LENGTH_128];
+    int frequency;
+} Hid2dConnectInfo;
 /* ----------------p2p struct defines end--------------------------- */
-
 
 #ifdef __cplusplus
 }

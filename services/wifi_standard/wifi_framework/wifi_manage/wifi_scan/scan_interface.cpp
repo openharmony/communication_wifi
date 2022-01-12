@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -63,30 +63,29 @@ ErrCode ScanInterface::Init()
 ErrCode ScanInterface::UnInit()
 {
     WIFI_LOGI("Enter ScanInterface::UnInit.\n");
-
+    CHECK_NULL_AND_RETURN(pScanService, WIFI_OPT_FAILED);
     pScanService->UnInitScanService();
-
     return WIFI_OPT_SUCCESS;
 }
 
 ErrCode ScanInterface::Scan(bool externFlag)
 {
     WIFI_LOGI("Enter ScanInterface::Scan\n");
-
+    CHECK_NULL_AND_RETURN(pScanService, WIFI_OPT_FAILED);
     return pScanService->Scan(externFlag);
 }
 
 ErrCode ScanInterface::ScanWithParam(const WifiScanParams &wifiScanParams)
 {
     WIFI_LOGI("Enter ScanInterface::ScanWithParam\n");
-
+    CHECK_NULL_AND_RETURN(pScanService, WIFI_OPT_FAILED);
     return pScanService->ScanWithParam(wifiScanParams);
 }
 
 ErrCode ScanInterface::DisableScan(bool disable)
 {
     WIFI_LOGI("Enter ScanInterface::DisableScan");
-
+    CHECK_NULL_AND_RETURN(pScanService, WIFI_OPT_FAILED);
     return pScanService->DisableScan(disable);
 }
 
@@ -98,6 +97,7 @@ ErrCode ScanInterface::OnScreenStateChanged(int screenState)
         WIFI_LOGE("screenState param is error");
         return WIFI_OPT_INVALID_PARAM;
     }
+    CHECK_NULL_AND_RETURN(pScanService, WIFI_OPT_FAILED);
     pScanService->HandleScreenStatusChanged();
     return WIFI_OPT_SUCCESS;
 }
@@ -105,7 +105,7 @@ ErrCode ScanInterface::OnScreenStateChanged(int screenState)
 ErrCode ScanInterface::OnClientModeStatusChanged(int staStatus)
 {
     WIFI_LOGI("Enter ScanInterface::OnClientModeStatusChanged\n");
-
+    CHECK_NULL_AND_RETURN(pScanService, WIFI_OPT_FAILED);
     pScanService->HandleStaStatusChanged(staStatus);
     pScanService->SetStaCurrentTime();
     return WIFI_OPT_SUCCESS;
@@ -113,19 +113,15 @@ ErrCode ScanInterface::OnClientModeStatusChanged(int staStatus)
 
 ErrCode ScanInterface::OnAppRunningModeChanged(ScanMode appRunMode)
 {
-    WIFI_LOGI("Enter ScanInterface::OnAppRunningModeChanged\n");
-
-    WIFI_LOGD("appRunMode=%{public}d", static_cast<int>(appRunMode));
-
+    WIFI_LOGI("Enter ScanInterface::OnAppRunningModeChanged, appRunMode=%{public}d\n", static_cast<int>(appRunMode));
     return WIFI_OPT_SUCCESS;
 }
 
 ErrCode ScanInterface::OnMovingFreezeStateChange()
 {
     LOGI("Enter ScanInterface::OnMovingFreezeStateChange");
-
+    CHECK_NULL_AND_RETURN(pScanService, WIFI_OPT_FAILED);
     pScanService->HandleMovingFreezeChanged();
-
     return WIFI_OPT_SUCCESS;
 }
 
@@ -137,6 +133,7 @@ ErrCode ScanInterface::OnCustomControlStateChanged(int customScene, int customSc
         WIFI_LOGE("screenState param is error");
         return WIFI_OPT_INVALID_PARAM;
     }
+    CHECK_NULL_AND_RETURN(pScanService, WIFI_OPT_FAILED);
     pScanService->HandleCustomStatusChanged(customScene, customSceneStatus);
     return WIFI_OPT_SUCCESS;
 }
@@ -144,7 +141,7 @@ ErrCode ScanInterface::OnCustomControlStateChanged(int customScene, int customSc
 ErrCode ScanInterface::OnGetCustomSceneState(std::map<int, time_t>& sceneMap) const
 {
     WIFI_LOGI("Enter ScanInterface::OnGetCustomSceneState\n");
-
+    CHECK_NULL_AND_RETURN(pScanService, WIFI_OPT_FAILED);
     pScanService->HandleGetCustomSceneState(sceneMap);
     return WIFI_OPT_SUCCESS;
 }
@@ -152,7 +149,7 @@ ErrCode ScanInterface::OnGetCustomSceneState(std::map<int, time_t>& sceneMap) co
 ErrCode ScanInterface::OnControlStrategyChanged()
 {
     WIFI_LOGI("Enter ScanInterface::OnControlStrategyChanged\n");
-
+    CHECK_NULL_AND_RETURN(pScanService, WIFI_OPT_FAILED);
     pScanService->ClearScanControlValue();
     pScanService->GetScanControlInfo();
     pScanService->SystemScanProcess(true);

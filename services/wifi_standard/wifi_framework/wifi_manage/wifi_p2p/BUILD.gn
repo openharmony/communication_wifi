@@ -24,6 +24,7 @@ ohos_shared_library("wifi_p2p_service") {
     "//foundation/communication/wifi/services/wifi_standard/wifi_framework/wifi_manage/common/state.cpp",
     "//foundation/communication/wifi/services/wifi_standard/wifi_framework/wifi_manage/common/state_machine.cpp",
     "//foundation/communication/wifi/services/wifi_standard/wifi_framework/wifi_manage/common/wifi_broadcast_helper.cpp",
+    "//foundation/communication/wifi/services/wifi_standard/wifi_framework/wifi_manage/wifi_hid2d_service_utils.cpp",
     "authorizing_negotiation_request_state.cpp",
     "group_formed_state.cpp",
     "group_negotiation_state.cpp",

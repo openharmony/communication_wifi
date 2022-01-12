@@ -1,4 +1,4 @@
-# Copyright (C) 2021 Huawei Device Co., Ltd.
+# Copyright (C) 2021-2022 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -29,6 +29,7 @@ config("wifi_sdk_header") {
     "//foundation/communication/wifi/services/wifi_standard/wifi_framework/common/log/",
     "//foundation/distributedschedule/samgr/adapter/interfaces/innerkits/include",
     "//foundation/communication/wifi/services/wifi_standard/wifi_framework/common/include",
+    "//foundation/communication/wifi/services/wifi_standard/wifi_framework/dhcp_manage/mgr_service/include",
   ]
 }
 
@@ -101,6 +102,7 @@ ohos_source_set("wifi_p2p_proxy_impl") {
 
   external_deps = [ "ipc:ipc_core" ]
 }
+
 ohos_shared_library("wifi_sdk") {
   install_enable = true
 
@@ -112,10 +114,14 @@ ohos_shared_library("wifi_sdk") {
   sources = [
     "c_adapter/wifi_c_device.cpp",
     "c_adapter/wifi_c_event.cpp",
+    "c_adapter/wifi_c_hid2d.cpp",
     "c_adapter/wifi_c_hotspot.cpp",
+    "c_adapter/wifi_c_p2p.cpp",
     "c_adapter/wifi_c_utils.cpp",
     "src/wifi_device.cpp",
     "src/wifi_device_callback_stub.cpp",
+    "src/wifi_hid2d.cpp",
+    "src/wifi_hid2d_msg.cpp",
     "src/wifi_hotspot.cpp",
     "src/wifi_hotspot_callback_stub.cpp",
     "src/wifi_p2p.cpp",

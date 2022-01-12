@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -72,7 +72,8 @@ void StaMonitor::SetStateMachine(StaStateMachine *paraStaStateMachine)
     pStaStateMachine = paraStaStateMachine;
     return;
 }
-void StaMonitor::OnConnectChangedCallBack(int status, int networkId,const std::string &bssid)
+
+void StaMonitor::OnConnectChangedCallBack(int status, int networkId, const std::string &bssid)
 {
     WIFI_LOGI("OnConnectChangedCallBack() status:%{public}d,networkId=%{public}d,bssid=%{private}s",
         status,
@@ -88,6 +89,12 @@ void StaMonitor::OnConnectChangedCallBack(int status, int networkId,const std::s
             break;
         }
         case WPA_CB_DISCONNECTED: {
+            WifiLinkedInfo linkedInfo;
+            pStaStateMachine->GetLinkedInfo(linkedInfo);
+            if ((linkedInfo.connState == ConnState::DISCONNECTED) && (linkedInfo.bssid != bssid)) {
+                WIFI_LOGI("Sta ignored the disconnect event for bssid is mismatch!");
+                break;
+            }
             pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_NETWORK_DISCONNECTION_EVENT);
             break;
         }

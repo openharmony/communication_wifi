@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,6 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #ifndef OHOS_MAC_ADDRESS_H
 #define OHOS_MAC_ADDRESS_H
 
@@ -31,6 +32,10 @@ constexpr int ETH_ALEN = 6;
 
 /* ETH_ALEN   Size of the MAC address binary data */
 constexpr size_t MAC_STRING_LENGTH = ETH_ALEN * 2 + (ETH_ALEN - 1); /* length of the string of mac address */
+
+#ifndef MAC_LEN
+#define MAC_LEN 6
+#endif
 
 namespace OHOS {
 namespace Wifi {
@@ -52,6 +57,7 @@ public:
                Otherwise, the successful object is returned.
      */
     static MacAddress Create(const std::string &mac);
+
     /**
      * @Description  factory method
      *
@@ -61,10 +67,17 @@ public:
      */
     static MacAddress Create(const sockaddr &hwAddr);
 
-public:
+    /**
+     * @Description  Obtaining the MAC address by interface name
+     *
+     * @param ifName - interface name
+     * @param macAddr - Array for storing returned mac data
+     * @return true - success    false - fail
+     */
+    static bool GetMacAddr(const std::string& ifName, unsigned char macAddr[MAC_LEN]);
+
     static const MacAddress INVALID_MAC_ADDRESS; /* Invalid MAC Address Object Constant */
 
-public:
     /**
      * @Description  The == operator is overloaded to determine whether
                      two MAC addresses represent the same MAC address.

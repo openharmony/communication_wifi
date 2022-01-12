@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -63,14 +63,6 @@ private:
      * @return true: success     false: failed
      */
     bool WriteDataToFile(const std::string &fileName, const std::string &content) const;
-
-    /**
-     * @Description  Running System Commands.
-     * @param vecCommandArg - Related Items in Commands,
-                              vecCommandArg[0] is file path.
-     * @return true: success     false: failed
-     */
-    bool ExecCommand(const std::vector<std::string> &vecCommandArg) const;
 };
 }  // namespace Wifi
 }  // namespace OHOS

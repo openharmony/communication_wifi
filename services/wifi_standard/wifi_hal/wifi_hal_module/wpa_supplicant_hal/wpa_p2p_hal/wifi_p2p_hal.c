@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -191,6 +191,7 @@ static P2pSupplicantErrCode WpaP2pCliCmdSetWpsDeviceType(WifiWpaP2pInterface *th
         LOGE("snprintf err");
         return P2P_SUP_ERRCODE_FAILED;
     }
+    LOGI("Set device type CMD: %{public}s", cmd);
     if (WpaCliCmd(cmd, buf, sizeof(buf)) != 0) {
         LOGE("set device_type command failed!");
         return P2P_SUP_ERRCODE_FAILED;
@@ -1226,6 +1227,32 @@ static P2pSupplicantErrCode WpaP2pCliCmdAddNetwork(WifiWpaP2pInterface *this, in
     return P2P_SUP_ERRCODE_SUCCESS;
 }
 
+static P2pSupplicantErrCode WpaP2pHid2dCliCmdConnect(WifiWpaP2pInterface *this, Hid2dConnectInfo *info)
+{
+    if (this == NULL || info == NULL) {
+        return P2P_SUP_ERRCODE_INVALID;
+    }
+
+    char buf[P2P_REPLY_BUF_SMALL_LENGTH] = {0};
+    char cmd[P2P_CMD_BUF_LENGTH] = {0};
+    if (snprintf_s(cmd, sizeof(cmd), sizeof(cmd) - 1, "IFNAME=%s MAGICLINK \"%s\"\n%s\n\"%s\"\n%d", this->ifName,
+        info->ssid, info->bssid, info->passphrase, info->frequency) < 0) {
+        LOGE("hid2d connect snprintf err");
+        return P2P_SUP_ERRCODE_FAILED;
+    }
+
+    LOGI("hid2d_connect, frequency = %{public}d", info->frequency);
+    if (WpaCliCmd(cmd, buf, sizeof(buf)) != 0) {
+        LOGE("hid2d_connect command failed!");
+        return P2P_SUP_ERRCODE_FAILED;
+    }
+    if (strncmp(buf, "FAIL", strlen("FAIL")) == 0) {
+        LOGE("P2p hid2d_connect return %{public}s", buf);
+        return P2P_SUP_ERRCODE_FAILED;
+    }
+    return P2P_SUP_ERRCODE_SUCCESS;
+}
+
 static void InitGlobalWpaP2pFunc(void)
 {
     g_wpaP2pInterface->wpaP2pCliCmdSetWpsName = WpaP2pCliCmdSetWpsName;
@@ -1264,6 +1291,7 @@ static void InitGlobalWpaP2pFunc(void)
     g_wpaP2pInterface->wpaP2pCliCmdSetGroupConfig = WpaP2pCliCmdSetGroupConfig;
     g_wpaP2pInterface->wpaP2pCliCmdGetGroupConfig = WpaP2pCliCmdGetGroupConfig;
     g_wpaP2pInterface->wpaP2pCliCmdAddNetwork = WpaP2pCliCmdAddNetwork;
+    g_wpaP2pInterface->wpaP2pCliCmdHid2dConnect = WpaP2pHid2dCliCmdConnect;
     return;
 }
 

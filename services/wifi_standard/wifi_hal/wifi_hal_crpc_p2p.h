@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -424,6 +424,15 @@ int RpcP2pGetGroupConfig(RpcServer *server, Context *context);
  * @return int - 0 Success, -1 Failed.
  */
 int RpcP2pAddNetwork(RpcServer *server, Context *context);
+
+/**
+ * @Description P2P Connect.
+ *
+ * @param server - Pointer to the global structure of the communication server.
+ * @param context - Pointer to the global communication context structure of the server.
+ * @return int - 0 Success, -1 Failed.
+ */
+int RpcP2pHid2dConnect(RpcServer *server, Context *context);
 
 #ifdef __cplusplus
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,6 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include "wifi_idl_client.h"
 #include <cstdio>
 #include "wifi_global_func.h"
@@ -1584,6 +1585,28 @@ WifiErrorNo WifiIdlClient::ReqP2pAddNetwork(int &networkId) const
 {
     CHECK_CLIENT_NOT_NULL;
     return P2pAddNetwork(&networkId);
+}
+
+WifiErrorNo WifiIdlClient::ReqP2pHid2dConnect(const Hid2dConnectConfig &config) const
+{
+    CHECK_CLIENT_NOT_NULL;
+    Hid2dConnectInfo info;
+    if (memset_s(&info, sizeof(info), 0, sizeof(info)) != EOK) {
+        return WIFI_IDL_OPT_FAILED;
+    }
+    if (strncpy_s(info.ssid, sizeof(info.ssid), config.GetSsid().c_str(), config.GetSsid().length()) != EOK) {
+        return WIFI_IDL_OPT_FAILED;
+    }
+    if (strncpy_s(info.bssid, sizeof(info.bssid), config.GetBssid().c_str(), config.GetBssid().length()) != EOK) {
+        return WIFI_IDL_OPT_FAILED;
+    }
+    if (strncpy_s(info.passphrase, sizeof(info.passphrase),
+        config.GetPreSharedKey().c_str(), config.GetPreSharedKey().length()) != EOK) {
+        return WIFI_IDL_OPT_FAILED;
+    }
+    info.frequency = config.GetFrequency();
+    WifiErrorNo ret = Hid2dConnect(&info);
+    return ret;
 }
 }  // namespace Wifi
 }  // namespace OHOS

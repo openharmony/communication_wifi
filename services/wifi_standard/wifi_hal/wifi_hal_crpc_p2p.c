@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -897,6 +897,29 @@ int RpcP2pAddNetwork(RpcServer *server, Context *context)
     if (err == WIFI_HAL_SUCCESS) {
         WriteInt(context, networkId);
     }
+    WriteEnd(context);
+    return 0;
+}
+
+int RpcP2pHid2dConnect(RpcServer *server, Context *context)
+{
+    if (server == NULL || context == NULL) {
+        return -1;
+    }
+
+    Hid2dConnectInfo info;
+    if (memset_s(&info, sizeof(info), 0, sizeof(info)) != EOK) {
+        return -1;
+    }
+    if (ReadStr(context, info.ssid, sizeof(info.ssid)) != 0 ||
+        ReadStr(context, info.bssid, sizeof(info.bssid)) != 0 ||
+        ReadStr(context, info.passphrase, sizeof(info.passphrase)) != 0 ||
+        ReadInt(context, &info.frequency) < 0) {
+        return -1;
+    }
+    WifiErrorNo err = P2pHid2dConnect(&info);
+    WriteBegin(context, 0);
+    WriteInt(context, err);
     WriteEnd(context);
     return 0;
 }

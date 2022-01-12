@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,6 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #ifndef OHOS_P2P_SERVICE_H
 #define OHOS_P2P_SERVICE_H
 
@@ -201,6 +202,23 @@ public:
      * @return ErrCode - operate result
      */
     virtual ErrCode SetP2pWfdInfo(const WifiP2pWfdInfo &wfdInfo) override;
+
+    /**
+     * @Description Create hid2d group, used on the GO side.
+     *
+     * @param frequency - frequency
+     * @param type - frequency type
+     * @return ErrCode - operate result
+     */
+    virtual ErrCode Hid2dCreateGroup(const int frequency, FreqType type) override;
+
+    /**
+     * @Description Connect to a specified group using hid2d, used on the GC side.
+     *
+     * @param config - connection parameters
+     * @return ErrCode - operate result
+     */
+    virtual ErrCode Hid2dConnect(const Hid2dConnectConfig& config) override;
 
 private:
     /**

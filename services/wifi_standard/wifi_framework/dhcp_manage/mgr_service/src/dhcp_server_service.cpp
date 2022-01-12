@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -40,19 +40,8 @@ DhcpServerService::DhcpServerService()
 
 DhcpServerService::~DhcpServerService()
 {
-    auto iterInterfaces = m_setInterfaces.begin();
-    while (iterInterfaces != m_setInterfaces.end()) {
-        if (GetDhcpServerPid(*iterInterfaces) == 0) {
-            continue;
-        }
-        if (StopDhcpServer(*iterInterfaces) != DHCP_OPT_SUCCESS) {
-            WIFI_LOGE("Destructor stop dhcp server service failed, ifname:%{public}s", (*iterInterfaces).c_str());
-        } else {
-            WIFI_LOGW("Destructor stop dhcp server service success, ifname:%{public}s", (*iterInterfaces).c_str());
-        }
-    }
-    m_setInterfaces.clear();
-
+    WIFI_LOGI("StartDhcpServer: ~DhcpServerService");
+    StopDhcpServerOnExit();
     ExitDhcpMgrThreadFunc();
 }
 
@@ -133,6 +122,35 @@ int DhcpServerService::StopDhcpServer(const std::string &ifname)
         return DHCP_OPT_FAILED;
     }
 
+    return DHCP_OPT_SUCCESS;
+}
+
+int DhcpServerService::StopDhcpServerOnExit()
+{
+    for (auto& each: m_setInterfaces) {
+        if (each.empty()) {
+            WIFI_LOGE("StopDhcpServer() on exit error, ifname is empty!");
+            continue;
+        }
+
+        pid_t pidServer = GetDhcpServerPid(each);
+        if (pidServer == 0) {
+            WIFI_LOGI("StopDhcpServer() on exit %{public}s already stop.", each.c_str());
+            continue;
+        }
+        auto iterRangeMap = m_mapInfDhcpRange.find(each);
+        if (iterRangeMap != m_mapInfDhcpRange.end()) {
+            m_mapInfDhcpRange.erase(iterRangeMap);
+        }
+        if (RemoveAllDhcpRange(each) != DHCP_OPT_SUCCESS) {
+            WIFI_LOGE("StopDhcpServer() on exit, RemoveAllDhcpRange %{public}s error.", each.c_str());
+        }
+        if (StopServer(pidServer) != DHCP_OPT_SUCCESS) {
+            WIFI_LOGE("StopDhcpServer() on exit error, StopServer %{public}s already stop.", each.c_str());
+        }
+        SetDhcpServerInfo(each, SERVICE_STATUS_STOP, 0);
+    }
+    m_setInterfaces.clear();
     return DHCP_OPT_SUCCESS;
 }
 

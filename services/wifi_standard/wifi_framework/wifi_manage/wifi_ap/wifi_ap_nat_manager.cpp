@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -22,6 +22,7 @@
 #include <fstream>
 #include <vector>
 #include "network_interface.h"
+#include "if_config.h"
 #include "wifi_logger.h"
 
 DEFINE_WIFILOG_HOTSPOT_LABEL("WifiApNatManager");
@@ -34,7 +35,6 @@ const std::string SYSTEM_COMMAND_IPTABLES = "/system/bin/iptables";
 const std::string SYSTEM_COMMAND_IP6TABLES = "/system/bin/ip6tables";
 const std::string IP_V4_FORWARDING_CONFIG_FILE = "/proc/sys/net/ipv4/ip_forward";
 const std::string IP_V6_FORWARDING_CONFIG_FILE = "/proc/sys/net/ipv6/conf/all/forwarding";
-const int SYSTEM_NOT_EXECUTED = 127;
 
 bool WifiApNatManager::EnableInterfaceNat(bool enable, std::string inInterfaceName, std::string outInterfaceName) const
 {
@@ -98,7 +98,7 @@ bool WifiApNatManager::SetInterfaceRoute(bool enable) const
     ipRouteCmd.push_back("254");
     ipRouteCmd.push_back("prio");
     ipRouteCmd.push_back("18000");
-    ExecCommand(ipRouteCmd);
+    IfConfig::GetInstance().ExecCommand(ipRouteCmd);
 
     /* Refresh the cache */
     ipRouteCmd.clear();
@@ -106,7 +106,7 @@ bool WifiApNatManager::SetInterfaceRoute(bool enable) const
     ipRouteCmd.push_back("route");
     ipRouteCmd.push_back("flush");
     ipRouteCmd.push_back("cache");
-    ExecCommand(ipRouteCmd);
+    IfConfig::GetInstance().ExecCommand(ipRouteCmd);
 
     return true;
 }
@@ -118,7 +118,7 @@ bool WifiApNatManager::SetInterfaceNat(bool enable, const std::string &outInterf
     /* Clearing the Firewalls */
     iptablesCmd.push_back(SYSTEM_COMMAND_IPTABLES);
     iptablesCmd.push_back("-F");
-    ExecCommand(iptablesCmd);
+    IfConfig::GetInstance().ExecCommand(iptablesCmd);
 
     /* iptable forward ACCEPT */
     iptablesCmd.clear();
@@ -126,7 +126,7 @@ bool WifiApNatManager::SetInterfaceNat(bool enable, const std::string &outInterf
     iptablesCmd.push_back("-P");
     iptablesCmd.push_back("FORWARD");
     iptablesCmd.push_back(enable ? "ACCEPT" : "DROP");
-    ExecCommand(iptablesCmd);
+    IfConfig::GetInstance().ExecCommand(iptablesCmd);
 
     /* Setting NAT Rules */
     iptablesCmd.clear();
@@ -139,7 +139,7 @@ bool WifiApNatManager::SetInterfaceNat(bool enable, const std::string &outInterf
     iptablesCmd.push_back(outInterfaceName);
     iptablesCmd.push_back("-j");
     iptablesCmd.push_back("MASQUERADE");
-    ExecCommand(iptablesCmd);
+    IfConfig::GetInstance().ExecCommand(iptablesCmd);
 
     return true;
 }
@@ -154,25 +154,6 @@ bool WifiApNatManager::WriteDataToFile(const std::string &fileName, const std::s
     }
     outf.write(content.c_str(), content.length());
     outf.close();
-    return true;
-}
-
-bool WifiApNatManager::ExecCommand(const std::vector<std::string> &vecCommandArg) const
-{
-    std::string command;
-    for (auto iter : vecCommandArg) {
-        command += iter;
-        command += " ";
-    }
-
-    WIFI_LOGE("exec cmd: [%{private}s]", command.c_str());
-
-    int ret = system(command.c_str());
-    if (ret == -1 || ret == SYSTEM_NOT_EXECUTED) {
-        WIFI_LOGE("exec failed. cmd: %{private}s, error:%{public}d.", command.c_str(), errno);
-        return false;
-    }
-
     return true;
 }
 }  // namespace Wifi

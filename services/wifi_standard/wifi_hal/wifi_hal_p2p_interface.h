@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -417,6 +417,14 @@ WifiErrorNo P2pGetGroupConfig(int networkId, HidlP2pGroupConfig *pConfig, int si
  * @return WifiErrorNo
  */
 WifiErrorNo P2pAddNetwork(int *networkId);
+
+/**
+ * @Description Connect
+ *
+ * @param info - connection information
+ * @return WifiErrorNo
+ */
+WifiErrorNo P2pHid2dConnect(Hid2dConnectInfo *info);
 
 #ifdef __cplusplus
 }

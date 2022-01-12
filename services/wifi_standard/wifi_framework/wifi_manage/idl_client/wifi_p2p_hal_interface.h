@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,6 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #ifndef OHOS_WIFI_P2P_HAL_INTERFACE_H
 #define OHOS_WIFI_P2P_HAL_INTERFACE_H
 
@@ -426,6 +427,14 @@ public:
      * @return const P2pHalCallback& - register p2p callback objects
      */
     const P2pHalCallback &GetP2pCallbackInst(void) const;
+
+    /**
+     * @Description Sends a request for hid2d connect to the P2P
+     *
+     * @param config hid2d config
+     * @return WifiErrorNo
+     */
+    WifiErrorNo Hid2dConnect(const Hid2dConnectConfig &config) const;
 
 private:
     P2pHalCallback mP2pCallback;

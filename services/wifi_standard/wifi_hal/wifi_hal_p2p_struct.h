@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -144,6 +144,13 @@ typedef struct P2pWpaGroupConfigArgv {
     P2pGroupConfigType param; /* set network param */
     char value[WIFI_P2P_GROUP_CONFIG_VALUE_LENGTH];  /* set network value */
 } P2pWpaGroupConfigArgv;
+
+typedef struct Hid2dConnectInfo {
+    char ssid[WIFI_SSID_LENGTH];
+    char bssid[WIFI_BSSID_LENGTH];
+    char passphrase[WIFI_P2P_PASSWORD_SIZE];
+    int frequency;
+} Hid2dConnectInfo;
 
 #ifdef __cplusplus
 }

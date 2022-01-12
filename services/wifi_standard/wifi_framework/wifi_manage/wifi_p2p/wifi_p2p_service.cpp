@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,6 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include "wifi_p2p_service.h"
 #include "wifi_settings.h"
 #include "wifi_errcode.h"
@@ -70,12 +71,14 @@ ErrCode WifiP2pService::DiscoverServices()
     p2pStateMachine.SendMessage(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_DISCOVER_SERVICES));
     return ErrCode::WIFI_OPT_SUCCESS;
 }
+
 ErrCode WifiP2pService::StopDiscoverServices()
 {
     WIFI_LOGI("StopDiscoverServices");
     p2pStateMachine.SendMessage(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_STOP_DISCOVER_SERVICES));
     return ErrCode::WIFI_OPT_SUCCESS;
 }
+
 ErrCode WifiP2pService::PutLocalP2pService(const WifiP2pServiceInfo &srvInfo)
 {
     WIFI_LOGI("PutLocalP2pService");
@@ -83,6 +86,7 @@ ErrCode WifiP2pService::PutLocalP2pService(const WifiP2pServiceInfo &srvInfo)
     p2pStateMachine.SendMessage(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_PUT_LOCAL_SERVICE), info);
     return ErrCode::WIFI_OPT_SUCCESS;
 }
+
 ErrCode WifiP2pService::DeleteLocalP2pService(const WifiP2pServiceInfo &srvInfo)
 {
     WIFI_LOGI("DeleteLocalP2pService");
@@ -112,6 +116,7 @@ ErrCode WifiP2pService::StopP2pListen()
     p2pStateMachine.SendMessage(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_STOP_LISTEN));
     return ErrCode::WIFI_OPT_SUCCESS;
 }
+
 ErrCode WifiP2pService::FormGroup(const WifiP2pConfig &config)
 {
     WIFI_LOGI("FormGroup");
@@ -146,6 +151,7 @@ ErrCode WifiP2pService::P2pConnect(const WifiP2pConfig &config)
     WpsInfo wps;
     wps.SetWpsMethod(WpsMethod::WPS_METHOD_PBC);
     configInternal.SetWpsInfo(wps);
+    p2pStateMachine.SetIsNeedDhcp(true);
     const std::any info = configInternal;
     p2pStateMachine.SendMessage(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_CONNECT), info);
 
@@ -174,6 +180,7 @@ ErrCode WifiP2pService::SetP2pWfdInfo(const WifiP2pWfdInfo &wfdInfo)
     p2pStateMachine.SendMessage(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_SET_WFD_INFO), wfdInfo);
     return ErrCode::WIFI_OPT_SUCCESS;
 }
+
 ErrCode WifiP2pService::QueryP2pLinkedInfo(WifiP2pLinkedInfo &linkedInfo)
 {
     WIFI_LOGI("QueryP2pLinkedInfo");
@@ -256,6 +263,29 @@ void WifiP2pService::UnRegisterP2pServiceCallbacks()
 {
     IP2pServiceCallbacks callbacks = {};
     RegisterP2pServiceCallbacks(callbacks);
+}
+
+ErrCode WifiP2pService::Hid2dCreateGroup(const int frequency, FreqType type)
+{
+    WIFI_LOGI("Create hid2d group");
+    const std::any info = frequency;
+    p2pStateMachine.SendMessage(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_HID2D_CREATE_GROUP), info);
+    return ErrCode::WIFI_OPT_SUCCESS;
+}
+
+ErrCode WifiP2pService::Hid2dConnect(const Hid2dConnectConfig& config)
+{
+    WIFI_LOGI("Hid2dConnect");
+
+    bool isNeedDhcp = true;
+    if (config.GetDhcpMode() == DhcpMode::CONNECT_GO_NODHCP ||
+        config.GetDhcpMode() == DhcpMode::CONNECT_AP_NODHCP) {
+        isNeedDhcp = false;
+    }
+    p2pStateMachine.SetIsNeedDhcp(isNeedDhcp);
+    const std::any info = config;
+    p2pStateMachine.SendMessage(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_HID2D_CONNECT), info);
+    return ErrCode::WIFI_OPT_SUCCESS;
 }
 }  // namespace Wifi
 }  // namespace OHOS

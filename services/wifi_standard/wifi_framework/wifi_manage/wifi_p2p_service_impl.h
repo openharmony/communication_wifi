@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,6 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #ifndef OHOS_WIFI_P2P_SERVICE_IMPL_H
 #define OHOS_WIFI_P2P_SERVICE_IMPL_H
 
@@ -253,6 +254,111 @@ public:
      * @return ErrCode - operate result
      */
     ErrCode SetP2pWfdInfo(const WifiP2pWfdInfo &wfdInfo) override;
+
+    /**
+     * @Description Request an IP address to the Gc from the IP address pool, used on the GO side.
+     *
+     * @param gcMac - gc mac address
+     * @param ipAddr - applied ip address
+     * @return ErrCode - operate result
+     */
+    ErrCode Hid2dRequestGcIp(const std::string& gcMac, std::string& ipAddr) override;
+
+    /**
+     * @Description Increase(+1) hid2d shared link reference counting
+     *
+     * @return ErrCode - operate result
+     */
+    ErrCode Hid2dSharedlinkIncrease() override;
+
+    /**
+     * @Description Decrease(-1) hid2d shared link reference counting
+     *
+     * @return ErrCode - operate result
+     */
+    ErrCode Hid2dSharedlinkDecrease() override;
+
+    /**
+     * @Description Create hid2d group, used on the GO side.
+     *
+     * @param frequency - frequency
+     * @param type - frequency type
+     * @return ErrCode - operate result
+     */
+    ErrCode Hid2dCreateGroup(const int frequency, FreqType type) override;
+
+    /**
+     * @Description The GC side actively disconnects from the GO, used on the GC side.
+     *
+     * @param gcIfName - network interface name
+     * @return ErrCode - operate result
+     */
+    ErrCode Hid2dRemoveGcGroup(const std::string& gcIfName) override;
+
+    /**
+     * @Description Connect to a specified group using hid2d, used on the GC side.
+     *
+     * @param config - connection parameters
+     * @return ErrCode - operate result
+     */
+    ErrCode Hid2dConnect(const Hid2dConnectConfig& config) override;
+
+    /**
+     * @Description Configuring IP addresses for P2P network interfaces, used on the GC side.
+     *
+     * @param ifName - network interface name
+     * @param ipInfo - IP infos
+     * @return ErrCode - operate result
+     */
+    ErrCode Hid2dConfigIPAddr(const std::string& ifName, const IpAddrInfo& ipInfo) override;
+
+    /**
+     * @Description Clear IP address when the P2P connection is disconnected, used on the GC side.
+     *
+     * @param ifName - network interface name
+     * @return ErrCode - operate result
+     */
+    ErrCode Hid2dReleaseIPAddr(const std::string& ifName) override;
+
+     /**
+     * @Description Obtain the recommended channel and bandwidth for link setup
+     *
+     * @param request - request data
+     * @param response - response result
+     * @return ErrCode - operate result
+     */
+    ErrCode Hid2dGetRecommendChannel(const RecommendChannelRequest& request,
+        RecommendChannelResponse& response) override;
+
+    /**
+     * @Description get 5G channel list
+     *
+     * @param vecChannelList - result for channel list
+     * @return ErrCode - operate result
+     */
+    ErrCode Hid2dGetChannelListFor5G(std::vector<int>& vecChannelList) override;
+
+    /**
+     * @Description get the self wifi configuration information
+     *
+     * @param cfgType - configuration type
+     * @param cfgData - the queried data of wifi configuration
+     * @param getDatValidLen - the valid data length in the array `cfgData`
+     * @return ErrCode - operate result
+     */
+    ErrCode Hid2dGetSelfWifiCfgInfo(SelfCfgType cfgType,
+        char cfgData[CFG_DATA_MAX_BYTES], int* getDatValidLen) override;
+
+    /**
+     * @Description set the peer wifi configuration information
+     *
+     * @param cfgType - configuration type
+     * @param cfgData - the wifi configuration data to be set
+     * @param setDataValidLen - the valid data length in the array `cfgData`
+     * @return ErrCode - operate result
+     */
+    ErrCode Hid2dSetPeerWifiCfgInfo(PeerCfgType cfgType,
+        char cfgData[CFG_DATA_MAX_BYTES], int setDataValidLen) override;
 
     /**
      * @Description dump p2p information

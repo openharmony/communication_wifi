@@ -52,10 +52,6 @@ public:
     {
         return mApNatManager.WriteDataToFile(fileName, content);
     }
-    bool WrapExecCommand(const std::vector<std::string> &vecCommandArg)
-    {
-        return mApNatManager.ExecCommand(vecCommandArg);
-    }
 
 public:
     std::string ifc1 = "wlan1";
@@ -135,17 +131,6 @@ HWTEST_F(WifiApNatManager_test, WriteDataToFile_SUCCESS, TestSize.Level1)
     EXPECT_TRUE(WrapWriteDataToFile(filename, context));
     EXPECT_TRUE(WrapWriteDataToFile(filename, context));
     EXPECT_TRUE(WrapWriteDataToFile(filename, context));
-
-    MockSystemInterface::SetMockFlag(false);
-}
-HWTEST_F(WifiApNatManager_test, ExecCommand_SUCCESS, TestSize.Level1)
-{
-    MockSystemInterface::SetMockFlag(true);
-    std::vector<std::string> str;
-    EXPECT_CALL(MockSystemInterface::GetInstance(), system(_)).WillOnce(Return(true)).WillRepeatedly(Return(-1));
-
-    EXPECT_TRUE(WrapExecCommand(str));
-    EXPECT_FALSE(WrapExecCommand(str));
 
     MockSystemInterface::SetMockFlag(false);
 }

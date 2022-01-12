@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -1079,6 +1079,28 @@ WifiErrorNo P2pAddNetwork(int *networkId)
     } else {
         ReadInt(context, networkId);
     }
+    ReadClientEnd(client);
+    UnlockRpcClient(client);
+    return result;
+}
+
+WifiErrorNo Hid2dConnect(Hid2dConnectInfo *info)
+{
+    RpcClient *client = GetP2pRpcClient();
+    LockRpcClient(client);
+    Context *context = client->context;
+    WriteBegin(context, 0);
+    WriteFunc(context, "P2pHid2dConnect");
+    WriteStr(context, info->ssid);
+    WriteStr(context, info->bssid);
+    WriteStr(context, info->passphrase);
+    WriteInt(context, info->frequency);
+    WriteEnd(context);
+    if (RpcClientCall(client, "P2pHid2dConnect") != WIFI_IDL_OPT_OK) {
+        return WIFI_IDL_OPT_FAILED;
+    }
+    int result = WIFI_IDL_OPT_FAILED;
+    ReadInt(context, &result);
     ReadClientEnd(client);
     UnlockRpcClient(client);
     return result;

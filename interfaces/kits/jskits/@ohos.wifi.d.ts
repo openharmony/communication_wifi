@@ -136,7 +136,7 @@ declare namespace wifi {
      * Obtains information about a Wi-Fi connection.
      *
      * @return Returns the Wi-Fi connection information.
-     * @since 8
+     * @since 7
      */
     function getLinkedInfo(): Promise<WifiLinkedInfo>;
     function getLinkedInfo(callback: AsyncCallback<WifiLinkedInfo>): void;
@@ -145,7 +145,7 @@ declare namespace wifi {
      * Checks whether a Wi-Fi connection has been set up.
      *
      * @return Returns {@code true} if a Wi-Fi connection has been set up; returns {@code false} otherwise.
-     * @since 8
+     * @since 7
      */
     function isConnected(): boolean;
 
@@ -155,7 +155,7 @@ declare namespace wifi {
      * <p>To check whether this device supports a specified feature.
      *
      * @return Returns the features supported by this device.
-     * @since 8
+     * @since 7
      * @systemapi Hide this for inner system use.
      */
     function getSupportedFeatures(): number;
@@ -165,7 +165,7 @@ declare namespace wifi {
      *
      * @param featureId Indicates the ID of the feature.
      * @return Returns {@code true} if this device supports the specified feature; returns {@code false} otherwise.
-     * @since 8
+     * @since 7
      */
     function isFeatureSupported(featureId: number): boolean;
 
@@ -175,7 +175,7 @@ declare namespace wifi {
      * <p>The MAC address is unique and cannot be changed.
      *
      * @return Returns the MAC address of the Wi-Fi device.
-     * @since 8
+     * @since 7
      * @systemapi Hide this for inner system use.
      */
     function getDeviceMacAddress(): string[];
@@ -186,7 +186,7 @@ declare namespace wifi {
      * <p>The IP information includes the host IP address, gateway address, and DNS information.
      *
      * @return Returns the IP information of the Wi-Fi connection.
-     * @since 8
+     * @since 7
      */
     function getIpInfo(): IpInfo;
 
@@ -194,7 +194,7 @@ declare namespace wifi {
      * Obtains the country code of this device.
      *
      * @return Returns the country code of this device.
-     * @since 8
+     * @since 7
      */
     function getCountryCode(): string;
 
@@ -202,7 +202,7 @@ declare namespace wifi {
      * Re-associates to current network.
      *
      * @return {@code true} if the Wi-Fi network is re-associate successfully.
-     * @since 8
+     * @since 7
      * @systemapi Hide this for inner system use.
      */
     function reassociate(): boolean;
@@ -211,7 +211,7 @@ declare namespace wifi {
      * Re-connects to current network.
      *
      * @return {@code true} if the Wi-Fi network is re-connect successfully.
-     * @since 8
+     * @since 7
      * @systemapi Hide this for inner system use.
      */
     function reconnect(): boolean;
@@ -222,7 +222,7 @@ declare namespace wifi {
      * <p>You can obtain only the Wi-Fi configurations you created on your own application.
      *
      * @return Returns the list of all existing Wi-Fi configurations you created on your application.
-     * @since 8
+     * @since 7
      * @systemapi Hide this for inner system use.
      */
     function getDeviceConfigs(): Array<WifiDeviceConfig>;
@@ -234,7 +234,7 @@ declare namespace wifi {
      *
      * @return Returns the network ID in the updated Wi-Fi configuration if the update is successful;
      *     returns {@code -1} if the specified Wi-Fi configuration is not contained in the list.
-     * @since 8
+     * @since 7
      * @systemapi Hide this for inner system use.
      */
     function updateNetwork(config: WifiDeviceConfig): number;
@@ -246,7 +246,7 @@ declare namespace wifi {
      *
      * @param netId Identifies the network to disable.
      * @return Returns {@code true} if the specified network is disabled; returns {@code false} otherwise.
-     * @since 8
+     * @since 7
      * @systemapi Hide this for inner system use.
      */
     function disableNetwork(netId: number): boolean;
@@ -256,7 +256,7 @@ declare namespace wifi {
      *
      * @return Returns {@code true} if all the saved Wi-Fi configurations are removed;
      *     returns {@code false} otherwise.
-     * @since 8
+     * @since 7
      * @systemapi Hide this for inner system use.
      */
     function removeAllNetwork(): boolean;
@@ -271,7 +271,7 @@ declare namespace wifi {
      * @param id Indicates the ID of the Wi-Fi network,
      *     which can be obtained using the {@link #addDeviceConfig} or {@link #getLinkedInfo} method.
      * @return Returns {@code true} if the Wi-Fi network is deleted successfully; returns {@code false} otherwise.
-     * @since 8
+     * @since 7
      * @systemapi Hide this for inner system use.
      */
     function removeDevice(id: number): boolean;
@@ -282,7 +282,7 @@ declare namespace wifi {
      * <p>This method is asynchronous. After the Wi-Fi hotspot is enabled, Wi-Fi may be disabled.
      *
      * @return Returns {@code true} if this method is called successfully; returns {@code false} otherwise.
-     * @since 8
+     * @since 7
      * @systemapi Hide this for inner system use.
      */
     function enableHotspot(): boolean;
@@ -293,7 +293,7 @@ declare namespace wifi {
      * <p>This method is asynchronous. If Wi-Fi is enabled after the Wi-Fi hotspot is disabled, Wi-Fi may be re-enabled.
      *
      * @return Returns {@code true} if this method is called successfully; returns {@code false} otherwise.
-     * @since 8
+     * @since 7
      * @systemapi Hide this for inner system use.
      */
     function disableHotspot(): boolean;
@@ -302,7 +302,7 @@ declare namespace wifi {
      * Checks whether Wi-Fi hotspot is active on a device.
      *
      * @return Returns {@code true} if Wi-Fi hotspot is enabled; returns {@code false} otherwise.
-     * @since 8
+     * @since 7
      * @systemapi Hide this for inner system use.
      */
     function isHotspotActive(): boolean;
@@ -316,7 +316,7 @@ declare namespace wifi {
      *     The SSID and {@code securityType} must be available and correct.
      *     If {@code securityType} is not {@code open}, {@code preSharedKey} must be available and correct.
      * @return Returns {@code true} if the method is called successfully; returns {@code false} otherwise.
-     * @since 8
+     * @since 7
      * @systemapi Hide this for inner system use.
      */
     function setHotspotConfig(config: HotspotConfig): boolean;
@@ -325,7 +325,7 @@ declare namespace wifi {
      * Obtains the Wi-Fi hotspot configuration.
      *
      * @return Returns the configuration of an existing or enabled Wi-Fi hotspot.
-     * @since 8
+     * @since 7
      * @systemapi Hide this for inner system use.
      */
     function getHotspotConfig(): HotspotConfig;
@@ -336,7 +336,7 @@ declare namespace wifi {
      * <p>This method can only be used on a device that serves as a Wi-Fi hotspot.
      *
      * @return Returns the list of clients that are connected to the Wi-Fi hotspot.
-     * @since 8
+     * @since 7
      * @systemapi Hide this for inner system use.
      */
     function getStations(): Array<StationInfo>;
@@ -344,7 +344,7 @@ declare namespace wifi {
     /**
      * Defines the EventListener class and provides functions to subscribe or unsubscribe the Wi-Fi events.
      *
-     * @since 8
+     * @since 7
      * @SysCap SystemCapability.Communication.WiFi
      * @devices phone, tablet, tv, wearable, car
      */
@@ -429,7 +429,7 @@ declare namespace wifi {
          * Subscribe Wi-Fi hotspot state change events.
          *
          * @return Returns 0: inactive, 1: active, 2: activating, 3: deactivating
-         * @since 8
+         * @since 7
          */
          on(type: "hotspotStateChange", callback: Callback<number>): void;
 
@@ -438,7 +438,7 @@ declare namespace wifi {
           *
           * <p>All callback functions will be deregistered If there is no specific callback parameter.</p>
           *
-          * @since 8
+          * @since 7
          */
          off(type: "hotspotStateChange", callback?: Callback<number>): void;
 
@@ -446,7 +446,7 @@ declare namespace wifi {
           * Subscribe Wi-Fi hotspot sta join events.
           *
           * @return Returns StationInfo
-          * @since 8
+          * @since 7
           * @systemapi Hide this for inner system use.
           */
          on(type: "hotspotStaJoin", callback: Callback<StationInfo>): void;
@@ -456,7 +456,7 @@ declare namespace wifi {
           *
           * <p>All callback functions will be deregistered If there is no specific callback parameter.</p>
           *
-          * @since 8
+          * @since 7
           * @systemapi Hide this for inner system use.
           */
          off(type: "hotspotStaJoin", callback?: Callback<StationInfo>): void;
@@ -465,7 +465,7 @@ declare namespace wifi {
           * Subscribe Wi-Fi hotspot sta leave events.
           *
           * @return Returns {@link #StationInfo} object
-          * @since 8
+          * @since 7
           * @systemapi Hide this for inner system use.
           */
          on(type: "hotspotStaLeave", callback: Callback<StationInfo>): void;
@@ -474,7 +474,7 @@ declare namespace wifi {
           * Unsubscribe Wi-Fi hotspot sta leave events.
           *
           * @return Returns {@link #StationInfo} object
-          * @since 8
+          * @since 7
           * @systemapi Hide this for inner system use.
           */
          off(type: "hotspotStaLeave", callback?: Callback<StationInfo>): void;
@@ -547,7 +547,7 @@ declare namespace wifi {
     /**
      * Wi-Fi connection information.
      *
-     * @since 8
+     * @since 7
      */
     interface WifiLinkedInfo {
         /** The SSID of the Wi-Fi hotspot */
@@ -603,7 +603,7 @@ declare namespace wifi {
     /**
      * Wi-Fi IP information.
      *
-     * @since 8
+     * @since 7
      */
     interface IpInfo {
         /** The IP address of the Wi-Fi connection */
@@ -631,7 +631,7 @@ declare namespace wifi {
     /**
      * Wi-Fi hotspot configuration information.
      *
-     * @since 8
+     * @since 7
      * @systemapi
      */
     interface HotspotConfig {
@@ -654,7 +654,7 @@ declare namespace wifi {
     /**
      * Wi-Fi station information.
      *
-     * @since 8
+     * @since 7
      * @systemapi
      */
     interface StationInfo {
@@ -671,7 +671,7 @@ declare namespace wifi {
     /**
      * The state of the supplicant enumeration.
      *
-     * @since 8
+     * @since 7
      * @systemapi
      */
     export enum SuppState {
@@ -715,7 +715,7 @@ declare namespace wifi {
     /**
      * The state of Wi-Fi connection enumeration.
      *
-     * @since 8
+     * @since 7
      */
     export enum ConnState {
         /** The device is searching for an available AP. */

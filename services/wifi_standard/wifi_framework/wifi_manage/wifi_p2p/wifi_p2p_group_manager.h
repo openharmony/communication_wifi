@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,6 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #ifndef OHOS_P2P_GROUP_MANAGER_H
 #define OHOS_P2P_GROUP_MANAGER_H
 
@@ -34,34 +35,40 @@ public:
      * @return None
      */
     WifiP2pGroupManager();
+
     /**
      * @Description  Destroy the WifiP2pGroupManager object.
      * @param None
      * @return None
      */
     virtual ~WifiP2pGroupManager() = default;
+
     /**
      * @Description - Reads the stored group information during initialization.
      * @param None
      * @return None
      */
     virtual void Initialize();
+
     /**
      * @Description - Stores and serializes the current group information.
      */
     virtual void StashGroups();
+
     /**
      * @Description - Adding a P2P group.
      * @param group - P2P group to be added
      * @return true: adding succeeded    false: adding failed
      */
     virtual bool AddGroup(const WifiP2pGroupInfo &group);
+
     /**
      * @Description - Remove a P2P group.
      * @param group - P2P group to be removed
      * @return true: delete successfully    false: delete failed
      */
     virtual bool RemoveGroup(const WifiP2pGroupInfo &group);
+
     /**
      * @Description - Clear all P2P groups.
      * @param None
@@ -83,6 +90,7 @@ public:
      * @return - int number of clients in the group
      */
     virtual int RemoveClientFromGroup(int networkId, const std::string &deviceAddress);
+
     /**
      * @Description - Obtaining all groups.
      * @param None
@@ -96,12 +104,14 @@ public:
      * @return - int -1:not found    >=0：network ID of the corresponding group
      */
     virtual int GetNetworkIdFromClients(const WifiP2pDevice &device);
+
     /**
      * @Description  Get the network id of the group owner profile with the specified p2p device address.
      * @param device - P2P devices to be matched
      * @return int -1: not found    >=0: network ID of the P2P device
      */
     virtual int GetGroupNetworkId(const WifiP2pDevice &device);
+
     /**
      * @Description  Get the network id of the group owner profile with the
                      specified p2p device address and the ssid.
@@ -110,30 +120,35 @@ public:
      * @return int -1: not found    >=0: network ID of the P2P device
      */
     virtual int GetGroupNetworkId(const WifiP2pDevice &device, const std::string &ssid);
+
     /**
      * @Description  Get the group owner mac address with the specified networkId.
      * @param netId - specifies the network ID of the group
      * @return std::string not null: MAC address of the group owner    null: not found
      */
     virtual std::string GetGroupOwnerAddr(int netId);
+
     /**
      * @Description  Specifies whether the group with networkId is included in the group list.
      * @param netId - specifies the network ID of a group
      * @return true:contains    false:not contains
      */
     virtual bool IsInclude(int netId);
+
     /**
      * @Description Store P2P group connection information.
      *
      * @param linkedInfo - group connection information
      */
     virtual void SaveP2pInfo(const WifiP2pLinkedInfo &linkedInfo);
+
     /**
      * @Description Get P2P group connection information.
      *
      * @return const WifiP2pLinkedInfo& group connection information
      */
     virtual const WifiP2pLinkedInfo &GetP2pInfo() const;
+
     /**
      * @Description Obtain the group information from the WPA, match and update the network ID.
      *
@@ -150,20 +165,29 @@ public:
     {
         currentGroup.AddClientDevice(device);
     }
+
+    inline void RemoveCurrGroupClient(const WifiP2pDevice &device)
+    {
+        currentGroup.RemoveClientDevice(device);
+    }
+
     inline void SetCurrentGroup(const WifiP2pGroupInfo &group)
     {
         currentGroup = group;
         RefreshCurrentGroupFromGroups();
     }
+
     inline const WifiP2pGroupInfoProxy &GetCurrentGroup() const
     {
         return currentGroup;
     }
+
 private:
     /**
      * @Description - Synchronize from the current group to all registry groups.
      */
     void RefreshGroupsFromCurrentGroup();
+
     /**
      * @Description - From all record groups, update to the current group in use.
      */

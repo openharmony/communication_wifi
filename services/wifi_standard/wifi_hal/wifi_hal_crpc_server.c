@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,6 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include "wifi_hal_crpc_server.h"
 #include "wifi_hal_crpc_base.h"
 #include "wifi_hal_crpc_chip.h"
@@ -235,6 +236,7 @@ static int InitRpcFuncMapP2p(void)
     ret += PushRpcFunc("P2pSetGroupConfig", RpcP2pSetGroupConfig);
     ret += PushRpcFunc("P2pGetGroupConfig", RpcP2pGetGroupConfig);
     ret += PushRpcFunc("P2pAddNetwork", RpcP2pAddNetwork);
+    ret += PushRpcFunc("P2pHid2dConnect", RpcP2pHid2dConnect);
     return ret;
 }
 

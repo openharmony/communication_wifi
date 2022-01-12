@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,6 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include "sta_state_machine.h"
 #include <cstdio>
 #include "log_helper.h"
@@ -1860,18 +1861,21 @@ StaStateMachine::DhcpResultNotify::~DhcpResultNotify()
 
 void StaStateMachine::DhcpResultNotify::OnSuccess(int status, const std::string &ifname, DhcpResult &result)
 {
-    LOGI("Enter DhcpResultNotify::OnSuccess. ifname=[%s] status=[%d]\n", ifname.c_str(), status);
+    LOGI("Enter Sta DhcpResultNotify::OnSuccess. ifname=[%{public}s] status=[%d]\n", ifname.c_str(), status);
+
     if ((pStaStateMachine->linkedInfo.detailedState == DetailedState::DISCONNECTING) ||
         (pStaStateMachine->linkedInfo.detailedState == DetailedState::DISCONNECTED)) {
         return;
     }
-    WIFI_LOGD("iptype=%d, ip=%s, gateway=%s, subnet=%s, serverAddress=%s, leaseDuration=%d",
+    WIFI_LOGD("iptype=%{public}d, ip=%{private}s, gateway=%{private}s, \
+        subnet=%{private}s, serverAddress=%{private}s, leaseDuration=%d",
         result.iptype,
         result.strYourCli.c_str(),
         result.strRouter1.c_str(),
         result.strSubnet.c_str(),
         result.strServer.c_str(),
         result.uLeaseTime);
+
     IpInfo ipInfo;
     WifiSettings::GetInstance().GetIpInfo(ipInfo);
     if (!((IpTools::ConvertIpv4Address(result.strYourCli) == ipInfo.ipAddress) &&
@@ -1892,16 +1896,15 @@ void StaStateMachine::DhcpResultNotify::OnSuccess(int status, const std::string 
             WifiSettings::GetInstance().SaveLinkedInfo(pStaStateMachine->linkedInfo);
         }
 
-        IfConfig::GetInstance().SetIfAddr(result, result.iptype);
+        IfConfig::GetInstance().SetIfDnsAndRoute(result, result.iptype);
         if (pStaStateMachine->getIpSucNum == 0 || pStaStateMachine->isRoam) {
             pStaStateMachine->SaveLinkstate(ConnState::CONNECTED, DetailedState::CONNECTED);
             pStaStateMachine->staCallback.OnStaConnChanged(
                 OperateResState::CONNECT_AP_CONNECTED, pStaStateMachine->linkedInfo);
             /* Wait for the network adapter information to take effect. */
             sleep(SLEEPTIME);
-
-        /* Check whether the Internet access is normal by send http. */
-        pStaStateMachine->pNetcheck->SignalNetCheckThread();
+            /* Check whether the Internet access is normal by send http. */
+            pStaStateMachine->pNetcheck->SignalNetCheckThread();
         }
     }
     pStaStateMachine->getIpSucNum++;
@@ -1956,6 +1959,11 @@ void StaStateMachine::SaveLinkstate(ConnState state, DetailedState detailState)
     WifiSettings::GetInstance().SaveLinkedInfo(linkedInfo);
 }
 
+int StaStateMachine::GetLinkedInfo(WifiLinkedInfo& linkedInfo)
+{
+    return WifiSettings::GetInstance().GetLinkedInfo(linkedInfo);
+}
+
 ErrCode StaStateMachine::DisableNetwork(int networkId)
 {
     if (WifiStaHalInterface::GetInstance().DisableNetwork(networkId) != WIFI_IDL_OPT_OK) {
@@ -1970,7 +1978,6 @@ ErrCode StaStateMachine::DisableNetwork(int networkId)
     LOGI("DisableNetwork-SaveDeviceConfig() succeed!");
     return WIFI_OPT_SUCCESS;
 }
-
 
 void StaStateMachine::SetOperationalMode(int mode)
 {

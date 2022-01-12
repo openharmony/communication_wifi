@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -400,7 +400,7 @@ static void LinkedInfoToJs(const napi_env& env, WifiLinkedInfo& linkedInfo, napi
     SetValueInt32(env, "chload", linkedInfo.chload, result);
     SetValueInt32(env, "snr", linkedInfo.snr, result);
     SetValueUtf8String(env, "macAddress", linkedInfo.macAddress.c_str(), result);
-    SetValueInt32(env, "ipAddress", linkedInfo.ipAddress, result);
+    SetValueUnsignedInt32(env, "ipAddress", linkedInfo.ipAddress, result);
     /* Check suppState is consistent with HOS */
     SetValueInt32(env, "suppState", static_cast<int>(linkedInfo.supplicantState), result);
     /* Check connState is consistent with HOS */

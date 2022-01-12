@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,6 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include "wifi_hal_sta_interface.h"
 #include "securec.h"
 #include "wifi_hal_adapter.h"
@@ -22,31 +23,12 @@
 
 #undef LOG_TAG
 #define LOG_TAG "WifiHalStaInterface"
-#define BUFF_SIZE 1024
+
 #define WPA_CMD_STOP_LENG 64
 #define WPA_TRY_CONNECT_SLEEP_TIME (100 * 1000) /* 100ms */
 
 static const char *g_serviceName = "wpa_supplicant";
 static const char *g_startCmd = "wpa_supplicant -iglan0 -g/data/misc/wifi/sockets";
-
-static int ExcuteStaCmd(const char *szCmd)
-{
-    int ret = system(szCmd);
-    if (ret == -1) {
-        LOGE("system cmd %{public}s failed!", szCmd);
-    } else {
-        if (WIFEXITED(ret)) {
-            if (WEXITSTATUS(ret) == 0) {
-                return 0;
-            }
-            LOGE("system cmd %{public}s failed, return status %{public}d", szCmd, WEXITSTATUS(ret));
-        } else {
-            LOGE("system cmd %{public}s failed", szCmd);
-        }
-    }
-
-    return -1;
-}
 
 static WifiErrorNo AddWpaIface(int staNo)
 {
@@ -160,9 +142,10 @@ WifiErrorNo ForceStop(void)
 
 WifiErrorNo StartSupplicant(void)
 {
+    LOGD("Start supplicant");
     const char *wpaConf = "/data/misc/wifi/wpa_supplicant/wpa_supplicant.conf";
     if ((access(wpaConf, F_OK)) != -1) {
-        LOGD("wpa configure file %{private}s is exist.", wpaConf);
+        LOGD("wpa configure file %{public}s is exist.", wpaConf);
     } else {
         char szcpCmd[BUFF_SIZE] = {0};
         const char *cpWpaConfCmd = "cp /system/etc/wifi/wpa_supplicant.conf /data/misc/wifi/wpa_supplicant";
@@ -171,7 +154,7 @@ WifiErrorNo StartSupplicant(void)
             return WIFI_HAL_FAILED;
         }
 
-        ExcuteStaCmd(szcpCmd);
+        ExcuteCmd(szcpCmd);
     }
 
     ModuleManageRetCode ret = StartModule(g_serviceName, g_startCmd);
@@ -184,6 +167,7 @@ WifiErrorNo StartSupplicant(void)
 
 WifiErrorNo StopSupplicant(void)
 {
+    LOGD("Stop supplicant");
     ModuleManageRetCode ret = StopModule(g_serviceName);
     if (ret == MM_FAILED) {
         LOGE("stop wpa_supplicant failed!");

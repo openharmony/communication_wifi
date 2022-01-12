@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,6 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include "p2p_idle_state.h"
 #include "wifi_p2p_hal_interface.h"
 #include "p2p_state_machine.h"
@@ -64,6 +65,10 @@ void P2pIdleState::Init()
         std::make_pair(P2P_STATE_MACHINE_CMD::P2P_EVENT_GROUP_STARTED, &P2pIdleState::ProcessGroupStartedEvt));
     mProcessFunMap.insert(std::make_pair(
         P2P_STATE_MACHINE_CMD::P2P_EVENT_INVITATION_RECEIVED, &P2pIdleState::ProcessInvitationReceivedEvt));
+    mProcessFunMap.insert(std::make_pair(P2P_STATE_MACHINE_CMD::CMD_HID2D_CREATE_GROUP,
+        &P2pIdleState::ProcessCmdHid2dCreateGroup));
+    mProcessFunMap.insert(
+        std::make_pair(P2P_STATE_MACHINE_CMD::CMD_HID2D_CONNECT, &P2pIdleState::ProcessCmdHid2dConnect));
 }
 
 bool P2pIdleState::ProcessCmdStopDiscPeer(InternalMessage &msg) const
@@ -128,6 +133,23 @@ bool P2pIdleState::ProcessCmdConnect(InternalMessage &msg) const
         p2pStateMachine.BroadcastActionResult(P2pActionCallback::P2pConnect, ErrCode::WIFI_OPT_SUCCESS);
     }
 
+    return EXECUTED;
+}
+
+bool P2pIdleState::ProcessCmdHid2dConnect(InternalMessage &msg) const
+{
+    WIFI_LOGI("Idle state hid2d connect recv CMD: %{public}d", msg.GetMessageName());
+
+    Hid2dConnectConfig config;
+    if (!msg.GetMessageObj(config)) {
+        WIFI_LOGE("Hid2d connect:Failed to obtain config info.");
+        return EXECUTED;
+    }
+    if (WifiErrorNo::WIFI_IDL_OPT_OK !=
+        WifiP2PHalInterface::GetInstance().Hid2dConnect(config)) {
+        WIFI_LOGE("Hid2d Connection failed.");
+        p2pStateMachine.BroadcastActionResult(P2pActionCallback::Hid2dConnect, ErrCode::WIFI_OPT_FAILED);
+    }
     return EXECUTED;
 }
 
@@ -246,6 +268,7 @@ bool P2pIdleState::ProcessGroupStartedEvt(InternalMessage &msg) const
             return EXECUTED;
         }
     }
+    SharedLinkManager::SetSharedLinkCount(SHARED_LINKE_COUNT_ON_CONNECTED);
     p2pStateMachine.ChangeConnectedStatus(P2pConnectedState::P2P_CONNECTED);
     p2pStateMachine.SwitchState(&p2pStateMachine.p2pGroupFormedState);
     return EXECUTED;
@@ -307,6 +330,13 @@ bool P2pIdleState::ProcessInvitationReceivedEvt(InternalMessage &msg) const
     p2pStateMachine.savedP2pConfig = config;
 
     p2pStateMachine.SwitchState(&p2pStateMachine.p2pInvitationReceivedState);
+    return EXECUTED;
+}
+
+bool P2pIdleState::ProcessCmdHid2dCreateGroup(InternalMessage &msg) const
+{
+    p2pStateMachine.DelayMessage(&msg);
+    p2pStateMachine.SwitchState(&p2pStateMachine.p2pGroupOperatingState);
     return EXECUTED;
 }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -266,6 +266,8 @@ void WifiInternalEventDispatcher::Exit()
 void WifiInternalEventDispatcher::DealStaCallbackMsg(
     WifiInternalEventDispatcher &instance, const WifiEventCallbackMsg &msg)
 {
+    WIFI_LOGI("WifiInternalEventDispatcher:: Deal Sta Event Callback Msg: %{public}d", msg.msgCode);
+
     switch (msg.msgCode) {
         case WIFI_CBK_MSG_STATE_CHANGE:
             WifiInternalEventDispatcher::PublishWifiStateChangedEvent(msg.msgData);
@@ -314,6 +316,8 @@ void WifiInternalEventDispatcher::DealStaCallbackMsg(
 void WifiInternalEventDispatcher::DealScanCallbackMsg(
     WifiInternalEventDispatcher &instance, const WifiEventCallbackMsg &msg)
 {
+    WIFI_LOGI("WifiInternalEventDispatcher:: Deal Scan Event Callback Msg: %{public}d", msg.msgCode);
+
     switch (msg.msgCode) {
         case WIFI_CBK_MSG_SCAN_STATE_CHANGE:
             WifiCommonEventHelper::PublishScanStateChangedEvent(msg.msgData, "OnScanStateChanged");
@@ -418,6 +422,8 @@ void WifiInternalEventDispatcher::InvokeHotspotCallbacks(const WifiEventCallback
 void WifiInternalEventDispatcher::DealHotspotCallbackMsg(
     WifiInternalEventDispatcher &instance, const WifiEventCallbackMsg &msg)
 {
+    WIFI_LOGI("WifiInternalEventDispatcher:: Deal Hotspot Event Callback Msg: %{public}d", msg.msgCode);
+
     auto callback = instance.GetSingleHotspotCallback();
     if (callback != nullptr) {
         switch (msg.msgCode) {
@@ -456,6 +462,7 @@ void WifiInternalEventDispatcher::SendP2pCallbackMsg(sptr<IWifiP2pCallback> &cal
     if (callback == nullptr) {
         return;
     }
+
     switch (msg.msgCode) {
         case WIFI_CBK_MSG_P2P_STATE_CHANGE:
             callback->OnP2pStateChanged(msg.msgData);
@@ -491,6 +498,8 @@ void WifiInternalEventDispatcher::SendP2pCallbackMsg(sptr<IWifiP2pCallback> &cal
 void WifiInternalEventDispatcher::DealP2pCallbackMsg(
     WifiInternalEventDispatcher &instance, const WifiEventCallbackMsg &msg)
 {
+    WIFI_LOGI("WifiInternalEventDispatcher:: Deal P2P Event Callback Msg: %{public}d", msg.msgCode);
+
     auto callback = instance.GetSingleP2pCallback();
     if (callback != nullptr) {
         SendP2pCallbackMsg(callback, msg);

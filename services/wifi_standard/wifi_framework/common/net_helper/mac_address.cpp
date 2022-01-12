@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,9 +12,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include "mac_address.h"
+#include <unistd.h>
 #include <climits>
 #include <algorithm>
+#include <net/if.h>
+#include <sys/ioctl.h>
+#include <netinet/if_ether.h>
 #include "securec.h"
 #include "log_helper.h"
 #include "wifi_log.h"
@@ -128,6 +133,36 @@ struct sockaddr MacAddress::GetMacAddressWifiSockaddr() const
         hwAddr.sa_data[i / INTERVAL] = static_cast<char>(strtol(byte.c_str(), nullptr, HEX_BASE));
     }
     return hwAddr;
+}
+
+bool MacAddress::GetMacAddr(const std::string& ifName, unsigned char macAddr[MAC_LEN])
+{
+    struct ifreq ifr;
+    if (memset_s(&ifr, sizeof(ifr), 0, sizeof(ifr)) != EOK ||
+        strcpy_s(ifr.ifr_name, sizeof(ifr.ifr_name), ifName.c_str()) != EOK) {
+        LOGE("Init the ifreq stuct failed!");
+        return false;
+    }
+    int fd = socket(AF_INET, SOCK_DGRAM, 0);
+    if (fd < 0) {
+        LOGE("get mac addr socket error");
+        return false;
+    }
+
+    ifr.ifr_hwaddr.sa_family = ARPHRD_ETHER;
+    if (ioctl(fd, SIOCGIFHWADDR, &ifr) < 0) {
+        LOGE("get mac addr ioctl SIOCGIFHWADDR error");
+        close(fd);
+        return false;
+    }
+
+    if (memcpy_s(macAddr, ETH_ALEN, ifr.ifr_hwaddr.sa_data, ETH_ALEN) != EOK) {
+        LOGE("get mac addr memcpy_s error");
+        close(fd);
+        return false;
+    }
+    close(fd);
+    return true;
 }
 } // namespace WiFi
 } // namespace OHOS

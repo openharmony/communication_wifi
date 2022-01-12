@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -53,6 +53,7 @@
 #define WIFI_SVR_CMD_GET_WIFI_PROTECT 0x1024         /* get the Wi-Fi protect. */
 #define WIFI_SVR_CMD_PUT_WIFI_PROTECT 0x1025         /* put the Wi-Fi protect. */
 #define WIFI_SVR_CMD_IS_WIFI_CONNECTED 0x1026         /* is Wi-Fi connected */
+#define WIFI_SVR_CMD_SET_LOW_LATENCY_MODE 0x1027    /* set low latency mode */
 
 /* -------------ap module message define----------------- */
 #define WIFI_SVR_CMD_ENABLE_WIFI_AP 0x1100            /* open ap */
@@ -100,6 +101,18 @@
 #define WIFI_SVR_CMD_P2P_REGISTER_CALLBACK 0x2018
 #define WIFI_SVR_CMD_P2P_SET_DEVICE_NAME 0x2019        /* set device name */
 #define WIFI_SVR_CMD_P2P_SET_WFD_INFO 0x201A           /* set p2p wifi display info */
+#define WIFI_SVR_CMD_P2P_HID2D_APPLY_IP 0x201B    /* hid2d apply ip */
+#define WIFI_SVR_CMD_P2P_HID2D_SHARED_LINK_INCREASE 0x201C    /* hid2d shared link increase */
+#define WIFI_SVR_CMD_P2P_HID2D_SHARED_LINK_DECREASE 0x201D    /* hid2d shared link decrease */
+#define WIFI_SVR_CMD_P2P_HID2D_CREATE_GROUP 0x201E    /* hid2d create group */
+#define WIFI_SVR_CMD_P2P_HID2D_REMOVE_GC_GROUP 0x201F    /* hid2d remove GC group */
+#define WIFI_SVR_CMD_P2P_HID2D_CONNECT 0x2020    /* hid2d connect to group */
+#define WIFI_SVR_CMD_P2P_HID2D_CONFIG_IP 0x2021    /* hid2d configure IP address */
+#define WIFI_SVR_CMD_P2P_HID2D_RELEASE_IP 0x2022    /* hid2d release IP address */
+#define WIFI_SVR_CMD_GET_P2P_RECOMMENDED_CHANNEL 0x2023    /* get recommended channel */
+#define WIFI_SVR_CMD_GET_5G_CHANNEL_LIST 0x2024    /* get recommended channel */
+#define WIFI_SVR_CMD_GET_SELF_WIFI_CFG 0x2025    /* get self wifi configuration */
+#define WIFI_SVR_CMD_SET_PEER_WIFI_CFG 0x2026    /* set peer wifi configuration */
 
 /* -----------register event type and message define-------------- */
 #define WIFI_CBK_CMD_STATE_CHANGE 0x1001         /* STA state change event */

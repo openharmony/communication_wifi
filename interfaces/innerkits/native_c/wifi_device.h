@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Huawei Device Co., Ltd.
+ * Copyright (C) 2020-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -242,6 +242,16 @@ WifiErrorCode GetIpInfo(IpInfo *info);
  * @since 7
  */
 int GetSignalLevel(int rssi, int band);
+
+/**
+ * @brief set low latency mode
+ *
+ * @param enabled 0: disable low latency, 1: enable low latency
+ * @return Returns {@link WIFI_SUCCESS} if set success; returns an error code defined
+ * in {@link WifiErrorCode} otherwise.
+ * @since 8
+ */
+WifiErrorCode SetLowLatencyMode(int enabled);
 
 /**
  * @brief Registers a callback for a specified Wi-Fi event.

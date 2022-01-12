@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,6 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include <inttypes.h>
 #include "state_machine.h"
 #include "wifi_log.h"
@@ -619,6 +620,11 @@ State *StateMachineHandler::ExecuteTreeStateMsg(InternalMessage *msg)
     if (curStateInfo == nullptr) {
         LOGE("StateInfo is null.");
         return nullptr;
+    }
+
+    if (curStateInfo->state) {
+        LOGI("State machine: %{public}s execute Cmd:%{public}d",
+            curStateInfo->state->GetStateName().c_str(), msg->GetMessageName());
     }
 
     while (curStateInfo->state && (!curStateInfo->state->ExecuteStateMsg(msg))) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -101,7 +101,7 @@ void P2pMonitor::MessageToStateMachine(
     if (setMonitorIface.count(iface) > 0) {
         auto iter = mapHandler.find(iface);
         if (iter != mapHandler.end()) {
-            WIFI_LOGI("P2p Monitor event: iface [%{private}s], eventID [%{public}d]",
+            WIFI_LOGI("P2p Monitor event: iface [%{public}s], eventID [%{public}d]",
                 iface.c_str(),
                 static_cast<int>(msgName));
             const auto &handler = iter->second;

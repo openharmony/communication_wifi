@@ -1,0 +1,102 @@
+{
+    "name": "@ohos/communication_wifi",
+    "version": "3.1.0",
+    "description": "The WLAN module provides basic WLAN functions, peer-to-peer (P2P) connection, and WLAN notification, enabling your application to communicate with other devices through a WLAN.",
+    "homePage": "https://gitee.com/openharmony",
+    "license": "Apache License 2.0",
+    "repository": "https://gitee.com/openharmony/communication_wifi",
+    "domain": "os",
+    "language": "",
+    "publishAs": "code-segment",
+    "private": false,
+    "scripts": {},
+    "tags": [
+        "foundation"
+    ],
+    "keywords": [
+        "communication",
+        "wifi"
+    ],
+    "envs": [],
+    "dirs": [],
+    "author": {
+        "name": "",
+        "email": "",
+        "url": ""
+    },
+    "contributors": [
+        {
+            "name": "",
+            "email": "",
+            "url": ""
+        }
+    ],
+    "segment": {
+        "destPath": "foundation/communication/wifi"
+    },
+    "component": {
+        "name": "wifi",
+        "subsystem": "communication",
+        "syscap": [
+            "SystemCapability.Communication.WiFi"
+        ],
+        "features": [],
+        "adapted_system_type": [
+            "standard"
+        ],
+        "rom": "",
+        "ram": "",
+        "deps": {
+            "components": [
+                "ipc",
+                "ces_standard",
+                "hiviewdfx_hilog_native"
+            ],
+            "third_party": [
+                "wpa_supplicant",
+                "node",
+                "bounds_checking_function",
+                "googletest",
+                "openssl"
+            ]
+        },
+        "build": {
+            "sub_component": [
+                "//foundation/communication/wifi/interfaces/innerkits/native_cpp/wifi_standard:wifi_sdk",
+                "//foundation/communication/wifi/interfaces/innerkits/native_cpp/napi:wifi"
+            ],
+            "inner_kits": [
+                {
+                    "header" : {
+                        "header_base": [
+                            "//foundation/communication/wifi/interfaces/innerkits/native_c",
+                            "//foundation/communication/wifi/interfaces/innerkits/native_cpp/wifi_standard/include"
+                        ],
+                        "header_files": [
+                            "wifi_device.h",
+                            "wifi_hotspot.h",
+                            "wifi_p2p.h",
+                            "wifi_scan.h",
+                            "wifi_hid2d.h"
+                        ]
+                    },
+                    "name" : "//foundation/communication/wifi/interfaces/innerkits/native_cpp/wifi_standard:wifi_sdk"
+                }
+            ],
+            "test": [
+                "//foundation/communication/wifi/tests/wifi_standard/wifi_framework/wifi_manage/wifi_scan:unittest",
+                "//foundation/communication/wifi/tests/wifi_standard/wifi_framework/wifi_manage/wifi_sta:unittest",
+                "//foundation/communication/wifi/tests/wifi_standard/wifi_framework/wifi_manage/wifi_ap:unittest",
+                "//foundation/communication/wifi/tests/wifi_standard/wifi_framework/dhcp_manage/mgr_service:unittest",
+                "//foundation/communication/wifi/tests/wifi_standard/wifi_framework/dhcp_manage/dhcp_client:unittest",
+                "//foundation/communication/wifi/tests/wifi_standard/wifi_framework/dhcp_manage/dhcp_server/unittest:unittest",
+                "//foundation/communication/wifi/tests/wifi_standard/wifi_framework/wifi_manage/wifi_p2p/test:unittest",
+                "//foundation/communication/wifi/tests/wifi_standard/ipc_framework/cRPC/unittest:unittest",
+                "//foundation/communication/wifi/tests/wifi_standard/wifi_framework/common/unittest:unittest",
+                "//foundation/communication/wifi/tests/wifi_standard/wifi_framework/wifi_manage/unittest:unittest",
+                "//foundation/communication/wifi/tests/wifi_standard/wifi_framework/wifi_manage/idl_client/unittest:unittest",
+                "//foundation/communication/wifi/tests/wifi_standard/wifi_hal/unittest:unittest"
+            ]
+        }
+    }
+}

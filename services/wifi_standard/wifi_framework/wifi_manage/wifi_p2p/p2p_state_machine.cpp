@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,6 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include "p2p_state_machine.h"
 
 #include <map>
@@ -30,6 +31,7 @@ DEFINE_WIFILOG_P2P_LABEL("P2pStateMachine");
 
 namespace OHOS {
 namespace Wifi {
+bool P2pStateMachine::m_isNeedDhcp = true;
 P2pStateMachine::P2pStateMachine(P2pMonitor &monitor, WifiP2pGroupManager &groupMgr,
     WifiP2pDeviceManager &setDeviceMgr,
     WifiP2pServiceManager &setSvrMgr, AuthorizingNegotiationRequestState &authorizingNegotiationRequestState,
@@ -515,6 +517,7 @@ void P2pStateMachine::NotifyUserInvitationSentMessage(const std::string &pin, co
     dialog.SetButton("OK", event, nullptr);
     AbstractUI::GetInstance().ShowAlerDialog(dialog);
 }
+
 void P2pStateMachine::NotifyUserProvDiscShowPinRequestMessage(const std::string &pin, const std::string &peerAddress)
 {
     WIFI_LOGI("P2pStateMachine::NotifyUserProvDiscShowPinRequestMessage  enter");
@@ -534,6 +537,7 @@ void P2pStateMachine::NotifyUserProvDiscShowPinRequestMessage(const std::string 
     dialog.SetButton("accepts", acceptEvent, nullptr);
     AbstractUI::GetInstance().ShowAlerDialog(dialog);
 }
+
 void P2pStateMachine::NotifyUserInvitationReceivedMessage()
 {
     WIFI_LOGI("P2pStateMachine::NotifyUserInvitationReceivedMessage  enter");
@@ -683,7 +687,7 @@ P2pStateMachine::DhcpResultNotify::~DhcpResultNotify()
 
 void P2pStateMachine::DhcpResultNotify::OnSuccess(int status, const std::string &ifname, DhcpResult &result)
 {
-    WIFI_LOGI("Enter DhcpResultNotify::OnSuccess, status: %{public}d, ifname: %{public}s", status, ifname.c_str());
+    WIFI_LOGI("Enter P2P DhcpResultNotify::OnSuccess, status: %{public}d, ifname: %{public}s", status, ifname.c_str());
     WifiP2pLinkedInfo p2pInfo;
     WifiSettings::GetInstance().GetP2pInfo(p2pInfo);
     WIFI_LOGI("Set GO IP: %{private}s", result.strServer.c_str());
@@ -707,12 +711,16 @@ void P2pStateMachine::DhcpResultNotify::OnFailed(int status, const std::string &
 
 void P2pStateMachine::DhcpResultNotify::OnSerExitNotify(const std::string& ifname)
 {
-    WIFI_LOGD("Dhcp exit notify.ifname:%{public}s.", ifname.c_str());
-    pP2pStateMachine->SendMessage(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_P2P_DISABLE));
+    WIFI_LOGI("Dhcp exit notify.ifname:%{public}s!", ifname.c_str());
 }
 
 void P2pStateMachine::StartDhcpClient()
 {
+    if (!GetIsNeedDhcp()) {
+        WIFI_LOGI("The service of this time does not need DHCP.");
+        return;
+    }
+
     if (pDhcpService.get() == nullptr) {
         WIFI_LOGE("pDhcpService is nullptr, cannot start dhcp client.");
         return;
@@ -901,6 +909,18 @@ void P2pStateMachine::UpdateGroupInfoToWpa() const
         }
     }
     return;
+}
+
+bool P2pStateMachine::GetIsNeedDhcp() const
+{
+    WIFI_LOGI("Get need dhcp flag %{public}d", (int)m_isNeedDhcp);
+    return m_isNeedDhcp;
+}
+
+void P2pStateMachine::SetIsNeedDhcp(bool isNeedDhcp)
+{
+    WIFI_LOGI("Set need dhcp flag %{public}d", (int)isNeedDhcp);
+    m_isNeedDhcp = isNeedDhcp;
 }
 } // namespace Wifi
 } // namespace OHOS

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -28,6 +28,7 @@
 #include "define.h"
 #include "wifi_dumper.h"
 #include "wifi_common_util.h"
+#include "wifi_protect_manager.h"
 
 DEFINE_WIFILOG_LABEL("WifiDeviceServiceImpl");
 namespace OHOS {
@@ -640,6 +641,12 @@ ErrCode WifiDeviceServiceImpl::GetDeviceMacAddress(std::string &result)
 
     WifiConfigCenter::GetInstance().GetMacAddress(result);
     return WIFI_OPT_SUCCESS;
+}
+
+bool WifiDeviceServiceImpl::SetLowLatencyMode(bool enabled)
+{
+    WIFI_LOGI("SetLowLatencyMode");
+    return WifiProtectManager::GetInstance().SetLowLatencyMode(enabled);
 }
 
 ErrCode WifiDeviceServiceImpl::CheckCanEnableWifi(void)

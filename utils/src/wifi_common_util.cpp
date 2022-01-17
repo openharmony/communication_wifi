@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -15,6 +15,8 @@
 
 #include "wifi_common_util.h"
 #include <sstream>
+#include <iterator>
+#include <regex>
 
 namespace OHOS {
 namespace Wifi {
@@ -163,6 +165,14 @@ std::string Number2Ip(int intIp)
     ip.push_back('.');
     ip.append(std::to_string(intIp & 0x000000ff));
     return ip;
+}
+
+std::vector<std::string> StrSplit(const std::string& str, const std::string& delim) {
+    std::regex re(delim);
+    std::sregex_token_iterator
+        first{ str.begin(), str.end(), re, -1 },
+        last;
+    return { first, last };
 }
 }  // namespace Wifi
 }  // namespace OHOS

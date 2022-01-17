@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,8 +12,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #ifndef WIFI_WPA_HAL_H
 #define WIFI_WPA_HAL_H
+
 #include <stdlib.h>
 #include <string.h>
 #include <stdint.h>
@@ -26,6 +28,7 @@ extern "C" {
 #endif
 
 #define WIFI_CONF_FILE_PATH_LEN 256
+#define BUFF_SIZE 1024
 
 typedef struct AddInterfaceArgv {
     char name[WIFI_IFACE_NAME_MAXLEN];
@@ -55,6 +58,7 @@ struct stWifiWpaInterface {
 WifiWpaInterface *GetWifiWapGlobalInterface(void);
 void ReleaseWpaGlobalInterface(void);
 WpaCtrl *GetWpaCtrl(void);
+int ExcuteCmd(const char *szCmd);
 
 #ifdef __cplusplus
 }

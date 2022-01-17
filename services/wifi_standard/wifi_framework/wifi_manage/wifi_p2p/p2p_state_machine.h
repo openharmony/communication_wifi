@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -40,6 +40,7 @@
 #include "p2p_inviting_state.h"
 #include "provision_discovery_state.h"
 #include "abstract_ui.h"
+#include "wifi_hid2d_service_utils.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -131,6 +132,12 @@ public:
      * @param  callback - event callback object
      */
     virtual void RegisterP2pServiceCallbacks(const IP2pServiceCallbacks &callback);
+
+    /**
+     * @Description - Set is need dhcp.
+     * @param  isNeedDhcp - true: need, false: not need
+     */
+    void SetIsNeedDhcp(bool isNeedDhcp);
 
 private:
     /**
@@ -273,6 +280,12 @@ private:
      */
     virtual void UpdateGroupInfoToWpa() const;
 
+    /**
+     * @Description Get is need dhcp.
+     *
+     */
+    bool GetIsNeedDhcp() const;
+
 private:
     /**
      * @Description - Broadcast state change event.
@@ -393,6 +406,7 @@ private:
     P2pIdleState &p2pIdleState;
     P2pInvitingState &p2pInvitingState;
     ProvisionDiscoveryState &p2pProvisionDiscoveryState;
+    static bool m_isNeedDhcp;
 };
 }  // namespace Wifi
 }  // namespace OHOS

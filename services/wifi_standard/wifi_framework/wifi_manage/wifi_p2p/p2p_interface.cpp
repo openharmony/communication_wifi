@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,6 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include "p2p_interface.h"
 #include "wifi_internal_msg.h"
 #include "wifi_logger.h"
@@ -193,6 +194,16 @@ ErrCode P2pInterface::QueryP2pServices(std::vector<WifiP2pServiceInfo> &services
 ErrCode P2pInterface::RegisterP2pServiceCallbacks(const IP2pServiceCallbacks &callbacks)
 {
     return p2pService.RegisterP2pServiceCallbacks(callbacks);
+}
+
+ErrCode P2pInterface::Hid2dCreateGroup(const int frequency, FreqType type)
+{
+    return p2pService.Hid2dCreateGroup(frequency, type);
+}
+
+ErrCode P2pInterface::Hid2dConnect(const Hid2dConnectConfig& config)
+{
+    return p2pService.Hid2dConnect(config);
 }
 }  // namespace Wifi
 }  // namespace OHOS

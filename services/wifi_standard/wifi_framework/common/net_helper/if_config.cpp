@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -26,16 +26,18 @@
 #include "securec.h"
 #include "if_config.h"
 #include "ip_tools.h"
+#include <thread>
 
 namespace OHOS {
 namespace Wifi {
 const std::string SYSTEM_COMMAND_IP = "/system/bin/ip";
 const std::string SYSTEM_COMMAND_NDC = "/system/bin/ndc";
 const std::string IFNAME = "wlan0";
-const int SYSTEM_COMMAND_ERR_1 = -1;
-const int SYSTEM_COMMAND_ERR_2 = 127;
+const int SYSTEM_COMMAND_ERR = -1;
+const int SYSTEM_NOT_EXECUTED = 127;
 const int IPV6_SUFFIX_LEN = 3;
 const int MAX_IFNAME_LEN = 13;
+const int RECEIVE_BUFFER_LEN = 64;
 
 IfConfig &IfConfig::GetInstance()
 {
@@ -49,6 +51,38 @@ IfConfig::IfConfig()
 IfConfig::~IfConfig()
 {}
 
+bool IfConfig::SyncExecuteCommand(const std::string& cmd)
+{
+    int ret = system(cmd.c_str());
+    if (ret == SYSTEM_COMMAND_ERR || ret == SYSTEM_NOT_EXECUTED) {
+        LOGE("exec failed. cmd: %s, error:%{public}d", cmd.c_str(), errno);
+        return false;
+    }
+    LOGI("Exec cmd end - sync");
+    return true;
+}
+
+bool IfConfig::AsyncExecuteCommand(const std::string& cmd)
+{
+    std::thread t(
+        [cmd]() {
+            FILE *fp = nullptr;
+            char buffer[RECEIVE_BUFFER_LEN];
+            if ((fp = popen(cmd.c_str(), "r")) != nullptr) {
+                while (fgets(buffer, sizeof(buffer), fp) != nullptr) {
+                    LOGD("exec cmd receive: %{public}s", buffer);
+                }
+                pclose(fp);
+            } else {
+                LOGE("exec cmd popen error!");
+            }
+            LOGI("Exec cmd end - async");
+        }
+    );
+    t.detach();
+    return true;
+}
+
 /**
  * @Description : Execute script commands
  * @Return success:true failed:false
@@ -60,21 +94,15 @@ bool IfConfig::ExecCommand(const std::vector<std::string> &vecCommandArg)
         command += iter;
         command += " ";
     }
-    LOGI("exec cmd: [%s]", command.c_str());
-    int ret = system(command.c_str());
-    if (ret == SYSTEM_COMMAND_ERR_1 || ret == SYSTEM_COMMAND_ERR_2) {
-        LOGE("exec failed. cmd: %s, error:%{public}d", command.c_str(), errno);
-        return false;
-    }
-
-    return true;
+    LOGI("Exec cmd start: [%s]", command.c_str());
+    return AsyncExecuteCommand(command);
 }
 
 /**
- * @Description : Set the network card address, routing, DNS
+ * @Description : Set the network card routing, DNS
  * @Return success:0 failed:-1
  */
-int IfConfig::SetIfAddr(const DhcpResult &dhcpResult, int ipType)
+int IfConfig::SetIfDnsAndRoute(const DhcpResult &dhcpResult, int ipType)
 {
     LOGD("ipType=%d, ip=%s, gateway=%s, subnet=%s, strDns1=%s, strDns2=%s",
         dhcpResult.iptype,
@@ -84,10 +112,8 @@ int IfConfig::SetIfAddr(const DhcpResult &dhcpResult, int ipType)
         dhcpResult.strDns1.c_str(),
         dhcpResult.strDns2.c_str());
     SetNetDns(IFNAME, dhcpResult.strDns1, dhcpResult.strDns2);
-    FlushIpAddr(IFNAME, ipType);
-    AddIpAddr(IFNAME, dhcpResult.strYourCli, dhcpResult.strSubnet, ipType);
     AddIfRoute(IFNAME, dhcpResult.strYourCli, dhcpResult.strSubnet, dhcpResult.strRouter1, ipType);
-    LOGI("set addr succeed!");
+    LOGI("set dns and route finished!");
     return 0;
 }
 
@@ -117,7 +143,7 @@ void IfConfig::SetNetDns(const std::string& ifName, const std::string& dns1, con
  */
 void IfConfig::FlushIpAddr(const std::string& ifName, const int& ipType)
 {
-    if (ipType != static_cast<int>(StaIpType::IPTYPE_IPV4)) {
+    if (ipType != static_cast<int>(IpType::IPTYPE_IPV4)) {
         return;
     }
     struct ifreq ifr;
@@ -155,7 +181,9 @@ void IfConfig::FlushIpAddr(const std::string& ifName, const int& ipType)
 void IfConfig::AddIpAddr(
     const std::string &ifName, const std::string &ipAddr, const std::string &mask, const int &ipType)
 {
-    if (ipType == static_cast<int>(StaIpType::IPTYPE_IPV4)) {
+    LOGI("Add ip address, ifName = %{public}s", ifName.c_str());
+
+    if (ipType == static_cast<int>(IpType::IPTYPE_IPV4)) {
         struct ifreq ifr;
         if (memset_s(&ifr, sizeof(ifr), 0, sizeof(ifr)) != EOK ||
             strcpy_s(ifr.ifr_name, sizeof(ifr.ifr_name), ifName.c_str()) != EOK) {
@@ -220,7 +248,7 @@ void IfConfig::AddIpAddr(
 void IfConfig::AddIfRoute(const std::string &ifName, const std::string &ipAddr, const std::string &mask,
     const std::string &gateWay, const int &ipType)
 {
-    if (ipType == static_cast<int>(StaIpType::IPTYPE_IPV4)) {
+    if (ipType == static_cast<int>(IpType::IPTYPE_IPV4)) {
         AddIpv4Route(ifName, ipAddr, mask, gateWay);
     } else {
         AddIpv6Route(ifName, ipAddr, mask, gateWay);
@@ -235,7 +263,7 @@ void IfConfig::AddIfRoute(const std::string &ifName, const std::string &ipAddr, 
 void IfConfig::AddIpv4Route(
     const std::string &ifName, const std::string &ipAddr, const std::string &mask, const std::string &gateWay)
 {
-    LOGI("Enter AddIpv4Route, ifName is %s, ipAddr is %s, mask is %s, gateWay is %s",
+    LOGI("Enter AddIpv4Route, ifName is %{public}s, ipAddr is %s, mask is %s, gateWay is %s",
         ifName.c_str(),
         ipAddr.c_str(),
         mask.c_str(),
@@ -366,8 +394,31 @@ void IfConfig::SetProxy(
             ExecCommand(ipRouteCmd);
         }
     }
-
     return;
+}
+
+bool IfConfig::GetIpAddr(const std::string& ifName, std::string& ipAddr)
+{
+    struct ifreq ifr;
+    if (memset_s(&ifr, sizeof(ifr), 0, sizeof(ifr)) != EOK ||
+        strcpy_s(ifr.ifr_name, sizeof(ifr.ifr_name), ifName.c_str()) != EOK) {
+        LOGE("set ifr info failed!");
+        return false;
+    }
+    int fd = socket(AF_INET, SOCK_DGRAM, 0);
+    if (fd < 0) {
+        LOGE("socket error\n");
+        return false;
+    }
+    if (ioctl(fd, SIOCGIFADDR, &ifr) < 0) {
+        perror("ioctl error!\n");
+        close(fd);
+        return false;
+    }
+    struct sockaddr_in *sin = reinterpret_cast<struct sockaddr_in *>(&ifr.ifr_addr);
+    ipAddr = inet_ntoa(sin->sin_addr);
+    close(fd);
+    return true;
 }
 }  // namespace Wifi
 }  // namespace OHOS

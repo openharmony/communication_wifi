@@ -35,7 +35,7 @@ std::string IpTools::ConvertIpv4Address(unsigned int addressIpv4)
 unsigned int IpTools::ConvertIpv4Address(const std::string &address)
 {
     std::string tmpAddress = address;
-    int addrInt = 0;
+    unsigned int addrInt = 0;
     unsigned int i = 0;
     for (i = 0; i < IPV4_DOT_NUM; i++) {
         std::string::size_type npos = tmpAddress.find(".");

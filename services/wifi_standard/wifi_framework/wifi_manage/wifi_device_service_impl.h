@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -99,6 +99,8 @@ public:
     ErrCode GetSupportedFeatures(long &features) override;
 
     ErrCode GetDeviceMacAddress(std::string &result) override;
+
+    bool SetLowLatencyMode(bool enabled) override;
 
     int32_t Dump(int32_t fd, const std::vector<std::u16string>& args) override;
 

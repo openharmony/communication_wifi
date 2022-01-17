@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,6 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #ifndef OHOS_P2P_IDLE_STATE_H
 #define OHOS_P2P_IDLE_STATE_H
 
@@ -146,6 +147,20 @@ private:
      * @return - bool true:handle   false:not handle
      */
     virtual bool ProcessInvitationReceivedEvt(InternalMessage &msg) const;
+
+    /**
+     * @Description Process the hid2d create group command received by the state machine
+     * @param msg - Message body sent by the state machine
+     * @return - bool true:handle   false:not handle
+     */
+    virtual bool ProcessCmdHid2dCreateGroup(InternalMessage &msg) const;
+
+    /**
+     * @Description Process the hid2d connect command received by the state machine
+     * @param msg - Message body sent by the state machine
+     * @return - bool true:handle   false:not handle
+     */
+    virtual bool ProcessCmdHid2dConnect(InternalMessage &msg) const;
 
 private:
     using ProcessFun = bool (P2pIdleState::*)(InternalMessage &msg) const;

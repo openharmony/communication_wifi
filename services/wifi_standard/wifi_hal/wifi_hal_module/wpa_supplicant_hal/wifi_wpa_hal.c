@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,6 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include "wifi_wpa_hal.h"
 #include <unistd.h>
 #include <poll.h>
@@ -740,9 +741,11 @@ static int WpaCliAddIface(WifiWpaInterface *p, const AddInterfaceArgv *argv)
     StrSafeCopy(info->name, sizeof(info->name), argv->name);
     char cmd[WPA_CMD_BUF_LEN] = {0};
     char buf[WPA_CMD_REPLY_BUF_SMALL_LEN] = {0};
+    LOGI("WpaCliAddIface CMD: %{public}s", cmd);
     if (snprintf_s(cmd, sizeof(cmd), sizeof(cmd) - 1, "INTERFACE_ADD %s\t%s", argv->name, argv->confName) < 0 ||
         WpaCliCmd(cmd, buf, sizeof(buf)) != 0) {
         free(info);
+        LOGI("WpaCliAddIface buf: %{public}s", buf);
         return -1;
     }
     info->num += 1;
@@ -825,4 +828,23 @@ WpaCtrl *GetWpaCtrl(void)
         return NULL;
     }
     return &g_wpaInterface->wpaCtrl;
+}
+
+int ExcuteCmd(const char *szCmd)
+{
+    int ret = system(szCmd);
+    if (ret == -1) {
+        LOGE("system cmd %{public}s failed!", szCmd);
+    } else {
+        if (WIFEXITED(ret)) {
+            if (WEXITSTATUS(ret) == 0) {
+                return 0;
+            }
+            LOGE("system cmd %{public}s failed, return status %{public}d", szCmd, WEXITSTATUS(ret));
+        } else {
+            LOGE("system cmd %{public}s failed", szCmd);
+        }
+    }
+
+    return -1;
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -71,6 +71,18 @@ private:
     void OnGetSupportedFeatures(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
     void OnSetP2pDeviceName(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
     void OnSetP2pWfdInfo(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
+    void OnHid2dRequestGcIp(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
+    void OnHid2dSharedlinkIncrease(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
+    void OnHid2dSharedlinkDecrease(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
+    void OnHid2dCreateGroup(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
+    void OnHid2dRemoveGcGroup(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
+    void OnHid2dConnect(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
+    void OnHid2dConfigIPAddr(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
+    void OnHid2dReleaseIPAddr(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
+    void OnHid2dGetRecommendChannel(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
+    void OnHid2dGetChannelListFor5G(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
+    void OnHid2dGetSelfWifiCfgInfo(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
+    void OnHid2dSetPeerWifiCfgInfo(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
     void ReadWifiP2pServiceInfo(MessageParcel &data, WifiP2pServiceInfo &info);
     void ReadWifiP2pServiceRequest(MessageParcel &data, WifiP2pDevice &device, WifiP2pServiceRequest &request);
     void WriteWifiP2pServiceInfo(MessageParcel &reply, const WifiP2pServiceInfo &info);

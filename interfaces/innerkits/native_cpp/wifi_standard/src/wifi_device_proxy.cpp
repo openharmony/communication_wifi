@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -962,6 +962,29 @@ ErrCode WifiDeviceProxy::GetDeviceMacAddress(std::string &result)
     }
     result = reply.ReadCString();
     return WIFI_OPT_SUCCESS;
+}
+
+bool WifiDeviceProxy::SetLowLatencyMode(bool enabled)
+{
+    if (mRemoteDied) {
+        WIFI_LOGD("failed to `%{public}s`,remote service is died!", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    MessageOption option;
+    MessageParcel data;
+    MessageParcel reply;
+    data.WriteInt32(0);
+    data.WriteBool(enabled);
+    int error = Remote()->SendRequest(WIFI_SVR_CMD_SET_LOW_LATENCY_MODE, data, reply, option);
+    if (error != ERR_NONE) {
+        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d", WIFI_SVR_CMD_SET_LOW_LATENCY_MODE, error);
+        return WIFI_OPT_FAILED;
+    }
+    int exception = reply.ReadInt32();
+    if (exception) {
+        return WIFI_OPT_FAILED;
+    }
+    return reply.ReadBool();
 }
 
 void WifiDeviceProxy::OnRemoteDied(const wptr<IRemoteObject> &remoteObject)

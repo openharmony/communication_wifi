@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -279,6 +279,11 @@ WifiErrorNo WifiP2PHalInterface::P2pAddNetwork(int &networkId) const
 const P2pHalCallback &WifiP2PHalInterface::GetP2pCallbackInst(void) const
 {
     return mP2pCallback;
+}
+
+WifiErrorNo WifiP2PHalInterface::Hid2dConnect(const Hid2dConnectConfig &config) const
+{
+    return mIdlClient->ReqP2pHid2dConnect(config);
 }
 }  // namespace Wifi
 }  // namespace OHOS

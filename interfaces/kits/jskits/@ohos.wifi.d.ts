@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -342,143 +342,328 @@ declare namespace wifi {
     function getStations(): Array<StationInfo>;
 
     /**
-     * Defines the EventListener class and provides functions to subscribe or unsubscribe the Wi-Fi events.
+     * Obtains information about a P2P connection.
+     *
+     * @return Returns the P2P connection information.
+     * @since 8
+     */
+    function getP2pLinkedInfo(): Promise<WifiP2pLinkedInfo>;
+    function getP2pLinkedInfo(callback: AsyncCallback<WifiP2pLinkedInfo>): void;
+
+    /**
+     * Obtains information about the current group.
+     *
+     * @return Returns the current group information.
+     * @since 8
+     */
+    function getCurrentGroup(): Promise<WifiP2pGroupInfo>;
+    function getCurrentGroup(callback: AsyncCallback<WifiP2pGroupInfo>): void;
+
+    /**
+     * Obtains the information about the found devices.
+     *
+     * @return Returns the found devices list.
+     * @since 8
+     */
+    function getP2pDevices(): Promise<WifiP2pDevice[]>;
+    function getP2pDevices(callback: AsyncCallback<WifiP2pDevice[]>): void;
+
+    /**
+     * Creates a P2P group.
+     *
+     * @return Returns {@code true} if the scanning is successful; returns {@code false} otherwise.
+     * @since 8
+     */
+    function createGroup(config: WifiP2PConfig): boolean;
+
+    /**
+     * Removes a P2P group.
+     *
+     * @return Returns {@code true} if the scanning is successful; returns {@code false} otherwise.
+     * @since 8
+     */
+    function removeGroup(): boolean;
+
+    /**
+     * Initiates a P2P connection to a device with the specified configuration.
+     *
+     * @return Returns {@code true} if the scanning is successful; returns {@code false} otherwise.
+     * @since 8
+     */
+    function p2pConnect(config: WifiP2PConfig): boolean;
+
+    /**
+     * Disconnects a P2P connection.
+     *
+     * @return Returns {@code true} if the scanning is successful; returns {@code false} otherwise.
+     * @since 8
+     */
+    function p2pDisconnect(): boolean;
+
+    /**
+     * Discovers Wi-Fi P2P devices.
+     *
+     * @return Returns {@code true} if the scanning is successful; returns {@code false} otherwise.
+     * @since 8
+     */
+    function startDiscoverDevices(): boolean;
+
+    /**
+     * Stops discovering Wi-Fi P2P devices.
+     *
+     * @return Returns {@code true} if the scanning is successful; returns {@code false} otherwise.
+     * @since 8
+     */
+    function stopDiscoveryDevices(): boolean;
+
+    /**
+     * Enables P2P listening.
+     *
+     * <p>After P2P listening is enabled, your application can listen for and respond to requests from other devices.
+     *
+     * @return Returns {@code true} if the scanning is successful; returns {@code false} otherwise.
+     * @since 8
+     */
+    function startListen(): boolean;
+
+    /**
+     * Disables P2P listening.
+     *
+     * <p>After P2P listening is disabled, your application cannot listen for requests from other devices.
+     *
+     * @return Returns {@code true} if the scanning is successful; returns {@code false} otherwise.
+     * @since 8
+     */
+    function stopListen(): boolean;
+
+    /**
+     * Deletes the persistent P2P group with the specified network ID.
+     *
+     * @return Returns {@code true} if the scanning is successful; returns {@code false} otherwise.
+     * @since 8
+     */
+    function deletePersistentGroup(netId: number): boolean;
+
+    /**
+     * Sets the name of the Wi-Fi P2P device.
+     *
+     * @return Returns {@code true} if the scanning is successful; returns {@code false} otherwise.
+     * @since 8
+     */
+    function setDeviceName(devName: string): boolean;
+
+    /**
+     * Subscribe Wi-Fi status change events.
+     *
+     * @return Returns 0: inactive, 1: active, 2: activating, 3: deactivating
+     * @since 7
+     */
+    function on(type: "wifiStateChange", callback: Callback<number>): void;
+
+    /**
+     * Unsubscribe Wi-Fi status change events.
+     *
+     * <p>All callback functions will be deregistered If there is no specific callback parameter.</p>
      *
      * @since 7
-     * @SysCap SystemCapability.Communication.WiFi
-     * @devices phone, tablet, tv, wearable, car
      */
-    export class EventListener {
-        /**
-         * Subscribe Wi-Fi status change events.
-         *
-         * @return Returns 0: inactive, 1: active, 2: activating, 3: deactivating
-         * @since 7
-         * @permission {@code ohos.permission.GET_WIFI_INFO}
-         */
-         on(type: "wifiStateChange", callback: Callback<number>): void;
+    function off(type: "wifiStateChange", callback?: Callback<number>): void;
 
-         /**
-          * Unsubscribe Wi-Fi status change events.
-          *
-          * <p>All callback functions will be deregistered If there is no specific callback parameter.</p>
-          *
-          * @since 7
-          * @permission {@code ohos.permission.GET_WIFI_INFO}
-          */
-         off(type: "wifiStateChange", callback?: Callback<number>): void;
+    /**
+     * Subscribe Wi-Fi connection change events.
+     *
+     * @return Returns 0: disconnected, 1: connected
+     * @since 7
+     */
+    function on(type: "wifiConnectionChange", callback: Callback<number>): void;
 
-         /**
-          * Subscribe Wi-Fi connection change events.
-          *
-          * @return Returns 0: disconnected, 1: connected
-          * @since 7
-          * @permission {@code ohos.permission.GET_WIFI_INFO}
-          */
-         on(type: "wifiConnectionChange", callback: Callback<number>): void;
+    /**
+     * Unsubscribe Wi-Fi connection change events.
+     *
+     * <p>All callback functions will be deregistered If there is no specific callback parameter.</p>
+     *
+     * @since 7
+     */
+    function off(type: "wifiConnectionChange", callback?: Callback<number>): void;
 
-         /**
-          * Unsubscribe Wi-Fi connection change events.
-          *
-          * <p>All callback functions will be deregistered If there is no specific callback parameter.</p>
-          *
-          * @since 7
-          * @permission {@code ohos.permission.GET_WIFI_INFO}
-          */
-         off(type: "wifiConnectionChange", callback?: Callback<number>): void;
+    /**
+     * Subscribe Wi-Fi scan status change events.
+     *
+     * @return Returns 0: scan fail, 1: scan success
+     * @since 7
+     */
+    function on(type: "wifiScanStateChange", callback: Callback<number>): void;
 
-         /**
-          * Subscribe Wi-Fi scan status change events.
-          *
-          * @return Returns 0: scan fail, 1: scan success
-          * @since 7
-          * @permission {@code ohos.permission.GET_WIFI_INFO}
-          */
-         on(type: "wifiScanStateChange", callback: Callback<number>): void;
+    /**
+     * Unsubscribe Wi-Fi scan status change events.
+     *
+     * <p>All callback functions will be deregistered If there is no specific callback parameter.</p>
+     *
+     * @since 7
+     */
+    function off(type: "wifiScanStateChange", callback?: Callback<number>): void;
 
-         /**
-          * Unsubscribe Wi-Fi scan status change events.
-          *
-          * <p>All callback functions will be deregistered If there is no specific callback parameter.</p>
-          *
-          * @since 7
-          * @permission {@code ohos.permission.GET_WIFI_INFO}
-          */
-         off(type: "wifiScanStateChange", callback?: Callback<number>): void;
+    /**
+     * Subscribe Wi-Fi rssi change events.
+     *
+     * @return Returns RSSI value in dBm
+     * @since 7
+     */
+    function on(type: "wifiRssiChange", callback: Callback<number>): void;
 
-         /**
-          * Subscribe Wi-Fi rssi change events.
-          *
-          * @return Returns RSSI value in dBm
-          * @since 7
-          * @permission {@code ohos.permission.GET_WIFI_INFO}
-          */
-         on(type: "wifiRssiChange", callback: Callback<number>): void;
+    /**
+     * Unsubscribe Wi-Fi rssi change events.
+     *
+     * <p>All callback functions will be deregistered If there is no specific callback parameter.</p>
+     *
+     * @since 7
+     */
+    function off(type: "wifiRssiChange", callback?: Callback<number>): void;
 
-         /**
-          * Unsubscribe Wi-Fi rssi change events.
-          *
-          * <p>All callback functions will be deregistered If there is no specific callback parameter.</p>
-          *
-          * @since 7
-          * @permission {@code ohos.permission.GET_WIFI_INFO}
-          */
-         off(type: "wifiRssiChange", callback?: Callback<number>): void;
+    /**
+     * Subscribe Wi-Fi hotspot state change events.
+     *
+     * @return Returns 0: inactive, 1: active, 2: activating, 3: deactivating
+     * @since 7
+     */
+    function on(type: "hotspotStateChange", callback: Callback<number>): void;
 
-        /**
-         * Subscribe Wi-Fi hotspot state change events.
-         *
-         * @return Returns 0: inactive, 1: active, 2: activating, 3: deactivating
-         * @since 7
-         */
-         on(type: "hotspotStateChange", callback: Callback<number>): void;
+    /**
+     * Unsubscribe Wi-Fi hotspot state change events.
+     *
+     * <p>All callback functions will be deregistered If there is no specific callback parameter.</p>
+     *
+     * @since 7
+     */
+    function off(type: "hotspotStateChange", callback?: Callback<number>): void;
 
-         /**
-          * Unsubscribe Wi-Fi hotspot state change events.
-          *
-          * <p>All callback functions will be deregistered If there is no specific callback parameter.</p>
-          *
-          * @since 7
-         */
-         off(type: "hotspotStateChange", callback?: Callback<number>): void;
+    /**
+     * Subscribe Wi-Fi hotspot sta join events.
+     *
+     * @return Returns StationInfo
+     * @since 7
+     * @systemapi Hide this for inner system use.
+     */
+    function on(type: "hotspotStaJoin", callback: Callback<StationInfo>): void;
 
-         /**
-          * Subscribe Wi-Fi hotspot sta join events.
-          *
-          * @return Returns StationInfo
-          * @since 7
-          * @systemapi Hide this for inner system use.
-          */
-         on(type: "hotspotStaJoin", callback: Callback<StationInfo>): void;
+    /**
+     * Unsubscribe Wi-Fi hotspot sta join events.
+     *
+     * <p>All callback functions will be deregistered If there is no specific callback parameter.</p>
+     *
+     * @since 7
+     * @systemapi Hide this for inner system use.
+     */
+    function off(type: "hotspotStaJoin", callback?: Callback<StationInfo>): void;
 
-         /**
-          * Unsubscribe Wi-Fi hotspot sta join events.
-          *
-          * <p>All callback functions will be deregistered If there is no specific callback parameter.</p>
-          *
-          * @since 7
-          * @systemapi Hide this for inner system use.
-          */
-         off(type: "hotspotStaJoin", callback?: Callback<StationInfo>): void;
+    /**
+     * Subscribe Wi-Fi hotspot sta leave events.
+     *
+     * @return Returns {@link #StationInfo} object
+     * @since 7
+     * @systemapi Hide this for inner system use.
+     */
+    function on(type: "hotspotStaLeave", callback: Callback<StationInfo>): void;
 
-         /**
-          * Subscribe Wi-Fi hotspot sta leave events.
-          *
-          * @return Returns {@link #StationInfo} object
-          * @since 7
-          * @systemapi Hide this for inner system use.
-          */
-         on(type: "hotspotStaLeave", callback: Callback<StationInfo>): void;
+    /**
+     * Unsubscribe Wi-Fi hotspot sta leave events.
+     *
+     * @return Returns {@link #StationInfo} object
+     * @since 7
+     * @systemapi Hide this for inner system use.
+     */
+    function off(type: "hotspotStaLeave", callback?: Callback<StationInfo>): void;
 
-         /**
-          * Unsubscribe Wi-Fi hotspot sta leave events.
-          *
-          * @return Returns {@link #StationInfo} object
-          * @since 7
-          * @systemapi Hide this for inner system use.
-          */
-         off(type: "hotspotStaLeave", callback?: Callback<StationInfo>): void;
-    }
+    /**
+     * Subscribe P2P status change events.
+     *
+     * @return Returns 1: idle, 2: starting, 3:started, 4: closing, 5: closed
+     * @since 8
+     */
+    function on(type: "p2pStateChange", callback: Callback<number>): void;
+
+    /**
+     * Unsubscribe P2P status change events.
+     *
+     * @since 8
+     */
+    function off(type: "p2pStateChange", callback?: Callback<number>): void;
+
+    /**
+     * Subscribe P2P connection change events.
+     *
+     * @return Returns WifiP2pLinkedInfo
+     * @since 8
+     */
+    function on(type: "p2pConnectionChange", callback: AsyncCallback<WifiP2pLinkedInfo>): void;
+
+    /**
+     * Unsubscribe P2P connection change events.
+     *
+     * @since 8
+     */
+    function off(type: "p2pConnectionChange", callback?: AsyncCallback<WifiP2pLinkedInfo>): void;
+
+    /**
+     * Subscribe P2P local device change events.
+     *
+     * @return Returns WifiP2pDevice
+     * @since 8
+     */
+    function on(type: "p2pDeviceChange", callback: AsyncCallback<WifiP2pDevice>): void;
+
+    /**
+     * Unsubscribe P2P local device change events.
+     *
+     * @return Returns WifiP2pDevice
+     * @since 8
+     */
+    function off(type: "p2pDeviceChange", callback?: AsyncCallback<WifiP2pDevice>): void;
+
+    /**
+     * Subscribe P2P peer device change events.
+     *
+     * @return Returns WifiP2pDevice[]
+     * @since 8
+     */
+    function on(type: "p2pPeerDeviceChange", callback: AsyncCallback<WifiP2pDevice[]>): void;
+
+    /**
+     * Unsubscribe P2P peer device change events.
+     *
+     * @since 8
+     */
+    function off(type: "p2pPeerDeviceChange", callback?: AsyncCallback<WifiP2pDevice[]>): void;
+
+    /**
+     * Subscribe P2P persistent group change events.
+     *
+     * @return Returns void
+     * @since 8
+     */
+    function on(type: "p2pPersistentGroupChange", callback: Callback<void>): void;
+
+    /**
+     * Unsubscribe P2P persistent group change events.
+     *
+     * @since 8
+     */
+    function off(type: "p2pPersistentGroupChange", callback?: Callback<void>): void;
+
+    /**
+     * Subscribe P2P discovery events.
+     *
+     * @return Returns 0: initial state, 1: discovery succeeded
+     * @since 8
+     */
+    function on(type: "p2pDiscoveryChange", callback: Callback<number>): void;
+
+    /**
+     * Unsubscribe P2P discovery events.
+     *
+     * @since 8
+     */
+    function off(type: "p2pDiscoveryChange", callback?: Callback<number>): void;
 
     /**
      * Wi-Fi device configuration information.
@@ -537,11 +722,20 @@ declare namespace wifi {
      * @since 6
      */
     enum WifiSecurityType {
-        WIFI_SEC_TYPE_INVALID = 0, /* Invalid security type */
-        WIFI_SEC_TYPE_OPEN = 1, /* Open */
-        WIFI_SEC_TYPE_WEP = 2, /* Wired Equivalent Privacy (WEP) */
-        WIFI_SEC_TYPE_PSK = 3, /* Pre-shared key (PSK) */
-        WIFI_SEC_TYPE_SAE = 4, /* Simultaneous Authentication of Equals (SAE) */
+        /** Invalid security type */
+        WIFI_SEC_TYPE_INVALID = 0,
+
+        /** Open */
+        WIFI_SEC_TYPE_OPEN = 1,
+
+        /** Wired Equivalent Privacy (WEP) */
+        WIFI_SEC_TYPE_WEP = 2,
+
+        /** Pre-shared key (PSK) */
+        WIFI_SEC_TYPE_PSK = 3,
+
+        /** Simultaneous Authentication of Equals (SAE) */
+        WIFI_SEC_TYPE_SAE = 4,
     }
 
     /**
@@ -741,6 +935,137 @@ declare namespace wifi {
 
         /** Failed to set up the Wi-Fi connection. */
         UNKNOWN
+    }
+
+    /**
+     * P2P device information.
+     *
+     * @since 8
+     */
+    interface WifiP2pDevice {
+        /** Device name */
+        deviceName: string;
+
+        /** Device mac address */
+        deviceAddress: string;
+
+        /** Primary device type */
+        primaryDeviceType: number;
+
+        /** Device status */
+        devStatus: P2pDeviceStatus;
+
+        /** Device group capability */
+        groupCapability: number;
+    }
+
+    /**
+     * P2P config.
+     *
+     * @since 8
+     */
+    interface WifiP2PConfig {
+        /** Device mac address */
+        deviceAddress: string;
+
+        /**
+         * Specifies whether the P2P group of this {@code WifiP2pConfig} instance is persistent
+         * -1: temporary, -2: persistent
+         */
+        netId: number;
+
+        /* The passphrase of this {@code WifiP2pConfig} instance */
+        passphrase: string;
+        /** Group name */
+
+        groupName: string;
+
+        /** Group owner band */
+        goBand: GroupOwnerBand;
+    }
+
+    /**
+     * P2P group information.
+     *
+     * @since 8
+     */
+    interface WifiP2pGroupInfo {
+        /** Indicates whether it is group owner */
+        isP2pGo: boolean;
+
+        /** Group owner information */
+        ownerInfo: WifiP2pDevice;
+
+        /** The group passphrase */
+        passphrase: string;
+
+        /** Interface name */
+        interface: string;
+
+        /** Group name */
+        groupName: string;
+
+        /** Network ID */
+        networkId: number;
+
+        /** Frequency */
+        frequency: number;
+
+        /** Client list */
+        clientDevices: WifiP2pDevice[];
+
+        /** Group owner IP address */
+        goIpAddress: string;
+    }
+
+    /**
+     * P2P connection status.
+     *
+     * @since 8
+     */
+    enum P2pConnectState {
+        DISCONNECTED = 0,
+        CONNECTED = 1,
+    }
+
+    /**
+     * P2P linked information.
+     *
+     * @since 8
+     */
+    interface WifiP2pLinkedInfo {
+        /** Connection status */
+        connectState: P2pConnectState;
+
+        /** Indicates whether it is group owner */
+        isGroupOwner: boolean;
+
+        /** Group owner address */
+        groupOwnerAddr: string;
+    }
+
+    /**
+     * P2P device status.
+     *
+     * @since 8
+     */
+    enum P2pDeviceStatus {
+        CONNECTED = 0,
+        INVITED = 1,
+        FAILED = 2,
+        AVAILABLE = 3,
+        UNAVAILABLE = 4,
+    }
+
+    /**
+     * P2P group owner band.
+     *
+     * @since 8
+     */
+    enum GroupOwnerBand {
+        GO_BAND_AUTO = 0,
+        GO_BAND_2GHZ = 1,
+        GO_BAND_5GHZ = 2,
     }
 }
 

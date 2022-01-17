@@ -670,6 +670,10 @@ ErrCode WifiP2pServiceImpl::Hid2dSharedlinkIncrease()
         WIFI_LOGI("Hid2dSharedlinkIncrease get P2P connect status error!");
         return ret;
     }
+    if (status != static_cast<int>(P2pConnectedState::P2P_CONNECTED)) {
+        WIFI_LOGE("Hid2dSharedlinkIncrease P2P not in connected state!");
+        return WIFI_OPT_FAILED;
+    }
     SharedLinkManager::IncreaseSharedLink();
     return WIFI_OPT_SUCCESS;
 }

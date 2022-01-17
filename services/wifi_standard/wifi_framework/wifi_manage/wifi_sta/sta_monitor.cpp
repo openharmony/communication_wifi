@@ -83,18 +83,20 @@ void StaMonitor::OnConnectChangedCallBack(int status, int networkId, const std::
         WIFI_LOGE("The statemachine pointer is null.");
         return;
     }
+
+    WifiLinkedInfo linkedInfo;
+    pStaStateMachine->GetLinkedInfo(linkedInfo);
+    /* P2P affects STA, causing problems or incorrect data updates */
+    if ((linkedInfo.connState == ConnState::CONNECTED) && (linkedInfo.bssid != bssid)) {
+        WIFI_LOGI("Sta ignored the event for bssid is mismatch!");
+        return;
+    }
     switch (status) {
         case WPA_CB_CONNECTED: {
             pStaStateMachine->OnNetworkConnectionEvent(networkId, bssid);
             break;
         }
         case WPA_CB_DISCONNECTED: {
-            WifiLinkedInfo linkedInfo;
-            pStaStateMachine->GetLinkedInfo(linkedInfo);
-            if ((linkedInfo.connState == ConnState::DISCONNECTED) && (linkedInfo.bssid != bssid)) {
-                WIFI_LOGI("Sta ignored the disconnect event for bssid is mismatch!");
-                break;
-            }
             pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_NETWORK_DISCONNECTION_EVENT);
             break;
         }

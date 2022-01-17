@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,6 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include "p2p_group_operating_state.h"
 #include "wifi_p2p_hal_interface.h"
 #include "p2p_state_machine.h"
@@ -29,6 +30,7 @@ P2pGroupOperatingState::P2pGroupOperatingState(P2pStateMachine &stateMachine, Wi
       groupManager(groupMgr),
       deviceManager(deviceMgr)
 {}
+
 void P2pGroupOperatingState::GoInState()
 {
     WIFI_LOGI("             GoInState");
@@ -56,6 +58,8 @@ void P2pGroupOperatingState::Init()
         std::make_pair(P2P_STATE_MACHINE_CMD::CMD_REMOVE_GROUP, &P2pGroupOperatingState::ProcessCmdRemoveGroup));
     mProcessFunMap.insert(
         std::make_pair(P2P_STATE_MACHINE_CMD::CMD_DELETE_GROUP, &P2pGroupOperatingState::ProcessCmdDeleteGroup));
+    mProcessFunMap.insert(std::make_pair(P2P_STATE_MACHINE_CMD::CMD_HID2D_CREATE_GROUP,
+        &P2pGroupOperatingState::ProcessCmdHid2dCreateGroup));
 }
 
 bool P2pGroupOperatingState::ProcessCmdCreateGroup(const InternalMessage &msg) const
@@ -108,6 +112,7 @@ bool P2pGroupOperatingState::ProcessCmdCreateGroup(const InternalMessage &msg) c
     }
     return EXECUTED;
 }
+
 bool P2pGroupOperatingState::ProcessGroupStartedEvt(const InternalMessage &msg) const
 {
     p2pStateMachine.StopTimer(static_cast<int>(P2P_STATE_MACHINE_CMD::CREATE_GROUP_TIMED_OUT));
@@ -155,6 +160,7 @@ bool P2pGroupOperatingState::ProcessGroupStartedEvt(const InternalMessage &msg) 
     } else {
         p2pStateMachine.StartDhcpClient();
     }
+    SharedLinkManager::SetSharedLinkCount(SHARED_LINKE_COUNT_ON_CONNECTED);
     p2pStateMachine.ChangeConnectedStatus(P2pConnectedState::P2P_CONNECTED);
     p2pStateMachine.SwitchState(&p2pStateMachine.p2pGroupFormedState);
     return EXECUTED;
@@ -166,6 +172,7 @@ bool P2pGroupOperatingState::ProcessCreateGroupTimeOut(const InternalMessage &ms
     p2pStateMachine.SwitchState(&p2pStateMachine.p2pIdleState);
     return EXECUTED;
 }
+
 bool P2pGroupOperatingState::ProcessGroupRemovedEvt(const InternalMessage &msg) const
 {
     WIFI_LOGI("recv event: %{public}d", msg.GetMessageName());
@@ -190,10 +197,12 @@ bool P2pGroupOperatingState::ProcessGroupRemovedEvt(const InternalMessage &msg) 
     }
     WifiP2pGroupInfo invalidGroup;
     groupManager.SetCurrentGroup(invalidGroup);
+    SharedLinkManager::SetSharedLinkCount(SHARED_LINKE_COUNT_ON_DISCONNECTED);
     p2pStateMachine.ChangeConnectedStatus(P2pConnectedState::P2P_DISCONNECTED);
     p2pStateMachine.SwitchState(&p2pStateMachine.p2pIdleState);
     return EXECUTED;
 }
+
 bool P2pGroupOperatingState::ProcessCmdDisable(const InternalMessage &msg) const
 {
     /**
@@ -202,6 +211,7 @@ bool P2pGroupOperatingState::ProcessCmdDisable(const InternalMessage &msg) const
     p2pStateMachine.DelayMessage(&msg);
     return ProcessCmdRemoveGroup(msg);
 }
+
 bool P2pGroupOperatingState::ProcessCmdRemoveGroup(const InternalMessage &msg) const
 {
     /**
@@ -248,6 +258,7 @@ bool P2pGroupOperatingState::ProcessCmdRemoveGroup(const InternalMessage &msg) c
     }
     return EXECUTED;
 }
+
 bool P2pGroupOperatingState::ProcessCmdDeleteGroup(const InternalMessage &msg) const
 {
     /**
@@ -281,6 +292,27 @@ bool P2pGroupOperatingState::ProcessCmdDeleteGroup(const InternalMessage &msg) c
         WIFI_LOGI("The P2P group is deleted successfully.");
         p2pStateMachine.UpdatePersistentGroups();
         p2pStateMachine.BroadcastActionResult(P2pActionCallback::DeleteGroup, WIFI_OPT_SUCCESS);
+    }
+    return EXECUTED;
+}
+
+bool P2pGroupOperatingState::ProcessCmdHid2dCreateGroup(const InternalMessage &msg) const
+{
+    WifiErrorNo ret = WIFI_IDL_OPT_FAILED;
+    int freq = 0;
+    msg.GetMessageObj(freq);
+    WIFI_LOGI("Create a hid2d group, frequency: %{public}d.", freq);
+    ret = WifiP2PHalInterface::GetInstance().GroupAdd(true, PERSISTENT_NET_ID, freq);
+    if (WifiErrorNo::WIFI_IDL_OPT_FAILED == ret) {
+        WIFI_LOGE("p2p configure to CreateGroup failed.");
+        p2pStateMachine.BroadcastActionResult(P2pActionCallback::CreateHid2dGroup, WIFI_OPT_FAILED);
+        p2pStateMachine.SwitchState(&p2pStateMachine.p2pIdleState);
+    } else {
+        const int cgTimedOut = 5000;
+        WIFI_LOGI("p2p configure hid2d group successful.");
+        p2pStateMachine.MessageExecutedLater(
+            static_cast<int>(P2P_STATE_MACHINE_CMD::CREATE_GROUP_TIMED_OUT), cgTimedOut);
+        p2pStateMachine.BroadcastActionResult(P2pActionCallback::CreateHid2dGroup, WIFI_OPT_SUCCESS);
     }
     return EXECUTED;
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -24,6 +24,7 @@
 #include "mock_if_config.h"
 #include <gtest/gtest.h>
 #include "internal_message.h"
+#include "mock_if_config.h"
 
 using ::testing::_;
 using ::testing::AtLeast;
@@ -1062,7 +1063,7 @@ public:
         EXPECT_CALL(WifiSettings::GetInstance(), SaveIpInfo(_)).Times(AtLeast(0));
         ;
         EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_)).Times(AtLeast(0));
-        EXPECT_CALL(IfConfig::GetInstance(), SetIfAddr(_, _)).Times(AtLeast(0));
+        EXPECT_CALL(IfConfig::GetInstance(), SetIfDnsAndRoute(_, _)).Times(AtLeast(0));
         EXPECT_CALL(WifiManager::GetInstance(), DealStaConnChanged(_, _)).Times(AtLeast(0));
         EXPECT_TRUE(pStaStateMachine->ConfigStaticIpAddress(staticIpAddress));
     }
@@ -1075,7 +1076,7 @@ public:
         pStaStateMachine->getIpSucNum = 1;
         pStaStateMachine->isRoam = false;
         StaticIpAddress staticIpAddress;
-        EXPECT_CALL(IfConfig::GetInstance(), SetIfAddr(_, _)).Times(AtLeast(0));
+        EXPECT_CALL(IfConfig::GetInstance(), SetIfDnsAndRoute(_, _)).Times(AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), SaveIpInfo(_)).Times(AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_)).Times(AtLeast(0));
         EXPECT_CALL(WifiManager::GetInstance(), DealStaConnChanged(_, _)).Times(AtLeast(0));
@@ -1092,7 +1093,7 @@ public:
         StaticIpAddress staticIpAddress;
         EXPECT_CALL(WifiSettings::GetInstance(), SaveIpInfo(_)).Times(AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_)).Times(AtLeast(0));
-        EXPECT_CALL(IfConfig::GetInstance(), SetIfAddr(_, _)).Times(AtLeast(0));
+        EXPECT_CALL(IfConfig::GetInstance(), SetIfDnsAndRoute(_, _)).Times(AtLeast(0));
         EXPECT_CALL(WifiManager::GetInstance(), DealStaConnChanged(_, _)).Times(AtLeast(0));
         EXPECT_TRUE(pStaStateMachine->ConfigStaticIpAddress(staticIpAddress));
     }
@@ -1105,7 +1106,7 @@ public:
         pStaStateMachine->isRoam = false;
         EXPECT_CALL(WifiSettings::GetInstance(), SaveIpInfo(_)).Times(AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_)).Times(AtLeast(0));
-        EXPECT_CALL(IfConfig::GetInstance(), SetIfAddr(_, _)).Times(AtLeast(0));
+        EXPECT_CALL(IfConfig::GetInstance(), SetIfDnsAndRoute(_, _)).Times(AtLeast(0));
         EXPECT_FALSE(pStaStateMachine->ConfigStaticIpAddress(staticIpAddress));
     }
 

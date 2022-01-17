@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -329,4 +329,11 @@ int GetSignalLevel(int rssi, int band)
         WIFI_LOGW("Get wifi signal level fail: %{public}d", ret);
     }
     return level;
+}
+
+WifiErrorCode SetLowLatencyMode(int enabled)
+{
+    CHECK_PTR_RETURN(wifiDevicePtr, ERROR_WIFI_NOT_AVAILABLE);
+    bool ret = wifiDevicePtr->SetLowLatencyMode(enabled);
+    return ret ? WIFI_SUCCESS : ERROR_WIFI_NOT_AVAILABLE;
 }

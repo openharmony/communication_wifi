@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -267,6 +267,14 @@ public:
      * @return ErrCode - operation result
      */
     virtual ErrCode GetDeviceMacAddress(std::string &result) = 0;
+
+    /**
+     * @Description set low latency mode
+     *
+     * @param enabled - true: enable low latency, false: disable low latency
+     * @return bool - operate result
+     */
+    virtual bool SetLowLatencyMode(bool enabled) = 0;
 
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.wifi.IWifiDeviceService");

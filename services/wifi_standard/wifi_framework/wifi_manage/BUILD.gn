@@ -1,4 +1,4 @@
-# Copyright (C) 2021 Huawei Device Co., Ltd.
+# Copyright (C) 2021-2022 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -113,7 +113,11 @@ ohos_source_set("wifi_hotspot_service_impl") {
 }
 ohos_source_set("wifi_p2p_service_impl") {
   sources = [
+    "//foundation/communication/wifi/interfaces/innerkits/native_cpp/wifi_standard/src/wifi_hid2d_msg.cpp",
     "//foundation/communication/wifi/interfaces/innerkits/native_cpp/wifi_standard/src/wifi_p2p_msg.cpp",
+    "//foundation/communication/wifi/services/wifi_standard/wifi_framework/common/net_helper/if_config.cpp",
+    "wifi_hid2d_cfg.cpp",
+    "wifi_hid2d_service_utils.cpp",
     "wifi_p2p_callback_proxy.cpp",
     "wifi_p2p_death_recipient.cpp",
     "wifi_p2p_service_impl.cpp",
@@ -224,6 +228,7 @@ ohos_shared_library("wifi_p2p_ability") {
     ":wifi_manager_service",
     ":wifi_p2p_service_impl",
     "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog",
+    "//foundation/communication/wifi/utils/src:wifi_utils",
     "//foundation/distributedschedule/safwk/interfaces/innerkits/safwk:system_ability_fwk",
     "//utils/native/base:utils",
   ]

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -18,10 +18,16 @@
 #include <memory>
 #include "wifi_log.h"
 #include "dhcp_define.h"
-#include "sta_define.h"
 
 namespace OHOS {
 namespace Wifi {
+typedef enum IpType {
+    IPTYPE_IPV4,
+    IPTYPE_IPV6,
+    IPTYPE_MIX,
+    IPTYPE_BUTT,
+} IpType;
+
 class IfConfig {
 public:
     IfConfig();
@@ -36,7 +42,7 @@ public:
      * @param ipType - ip type[in]
      * @return int
      */
-    int SetIfAddr(const DhcpResult &dhcpInfo, int ipType);
+    int SetIfDnsAndRoute(const DhcpResult &dhcpInfo, int ipType);
 
     void SetNetDns(const std::string &ifName, const std::string &dns1, const std::string &dns2);
 
@@ -57,6 +63,26 @@ public:
         const std::string &pac);
 
     bool ExecCommand(const std::vector<std::string> &vecCommandArg);
+
+    bool GetIpAddr(const std::string& ifName, std::string& ipAddr);
+
+private:
+    /**
+     * @Description : Use synchronous mode to execute the command, the current thread will be blocked
+     *    until the command execution is complete.
+     *
+     * @param cmd - command
+     * @return bool - true: success, false: failed
+     */
+    bool SyncExecuteCommand(const std::string& cmd);
+
+    /**
+     * @Description : Start a new thread to execute the command, the current thread will not be blocked
+     *
+     * @param cmd - command
+     * @return bool - true: success, false: failed
+     */
+    bool AsyncExecuteCommand(const std::string& cmd);
 };
 }  // namespace Wifi
 }  // namespace OHOS

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,6 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #ifndef OHOS_WIFI_LOGGER_H
 #define OHOS_WIFI_LOGGER_H
 
@@ -45,6 +46,14 @@ const unsigned int LOG_ID_WIFI_DHCP = LOG_ID_WIFI | 0x05;
 #define WIFI_LOGW(...) (void)OHOS::HiviewDFX::HiLog::Warn(WIFI_LOG_LABEL, ##__VA_ARGS__)
 #define WIFI_LOGI(...) (void)OHOS::HiviewDFX::HiLog::Info(WIFI_LOG_LABEL, ##__VA_ARGS__)
 #define WIFI_LOGD(...) (void)OHOS::HiviewDFX::HiLog::Debug(WIFI_LOG_LABEL, ##__VA_ARGS__)
+
+#ifndef CHECK_NULL_AND_RETURN
+#define CHECK_NULL_AND_RETURN(ptr, retValue) \
+if (!(ptr)) { \
+    WIFI_LOGI("Pointer %{public}s in %{public}s is NULL!", #ptr, __func__); \
+    return retValue; \
+}
+#endif
 }  // namespace Wifi
 }  // namespace OHOS
 #endif

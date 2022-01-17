@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -20,7 +20,6 @@
 #include <cstdint>
 #include <netinet/ip.h>
 #include <sys/stat.h>
-
 
 namespace OHOS {
 namespace Wifi {
@@ -76,6 +75,8 @@ const std::string DHCP_SERVER_LEASES_FILE("/data/dhcp/dhcpd_lease.lease");
 const std::string DHCP_SERVER_CFG_IPV4("#ipv4");
 const std::string DHCP_SERVER_CFG_IPV6("#ipv6");
 const std::string COMMON_EVENT_DHCP_GET_IPV4 = "usual.event.wifi.dhcp.GET_IPV4";
+const std::string IP_V4_MASK("255.255.255.0");
+const std::string IP_V4_DEFAULT("192.168.1.2");
 
 typedef enum EnumErrCode {
     /* success */

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -33,6 +33,7 @@
 #include "i_wifi_hotspot_iface.h"
 #include "i_wifi_struct.h"
 #include "wifi_global_func.h"
+#include "wifi_hid2d_msg.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -993,6 +994,15 @@ public:
      * @return WifiErrorNo
      */
     WifiErrorNo ReqP2pAddNetwork(int &networkId) const;
+
+    /**
+     * @Description Send a request for hid2d connect
+     *
+     * @param config
+     * @return WifiErrorNo
+     */
+    WifiErrorNo ReqP2pHid2dConnect(const Hid2dConnectConfig &config) const;
+
 public:
     RpcClient *pRpcClient;
 

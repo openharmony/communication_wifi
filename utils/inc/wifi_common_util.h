@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,6 +17,7 @@
 #define OHOS_WIFI_COMMON_UTIL_H
 
 #include <string>
+#include <vector>
 #include "securec.h"
 
 #ifndef WIFI_MAC_LEN
@@ -85,6 +86,15 @@ int Ip2Number(const std::string& strIp);
  * @return string - string IP address
  */
 std::string Number2Ip(int intIp);
+
+/**
+ * @Description Splitting strings by delimiter
+ *
+ * @param str - Input string
+ * @param delim - Split delimiter
+ * @return std::vector<std::string> - Split result
+ */
+std::vector<std::string> StrSplit(const std::string& str, const std::string& delim);
 }  // namespace Wifi
 }  // namespace OHOS
 #endif

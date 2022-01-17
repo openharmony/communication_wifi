@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -33,6 +33,21 @@ static int g_p2pSupplicantConnectEvent = 0;
 
 static WifiErrorNo P2pStartSupplicant(void)
 {
+    LOGD("Start p2p supplicant");
+    const char *p2pConf = "/data/misc/wifi/wpa_supplicant/p2p_supplicant.conf";
+    if ((access(p2pConf, F_OK)) != -1) {
+        LOGD("p2p configure file %{public}s is exist.", p2pConf);
+    } else {
+        char szcpCmd[BUFF_SIZE] = {0};
+        const char *cpP2pConfCmd = "cp /system/etc/wifi/p2p_supplicant.conf /data/misc/wifi/wpa_supplicant";
+        int iRet = snprintf_s(szcpCmd, sizeof(szcpCmd), sizeof(szcpCmd) - 1, "%s", cpP2pConfCmd);
+        if (iRet < 0) {
+            return WIFI_HAL_FAILED;
+        }
+
+        ExcuteCmd(szcpCmd);
+    }
+
     ModuleManageRetCode ret = StartModule(g_wpaSupplicantP2p, g_systemCmdWpaP2pStart);
     if (ret == MM_SUCCESS) {
         return WIFI_HAL_SUCCESS;
@@ -991,6 +1006,25 @@ WifiErrorNo P2pAddNetwork(int *networkId)
     P2pSupplicantErrCode ret = pMainIfc->wpaP2pCliCmdAddNetwork(pMainIfc, networkId);
     if (ret != P2P_SUP_ERRCODE_SUCCESS) {
         LOGE("WpaP2pCliCmdAddNetwork fail, ret = %{public}d", ret);
+        return ConvertP2pErrCode(ret);
+    }
+    return WIFI_HAL_SUCCESS;
+}
+
+WifiErrorNo P2pHid2dConnect(Hid2dConnectInfo *info)
+{
+    if (info == NULL) {
+        LOGE("P2pHid2dConnect, info is NULL");
+        return WIFI_HAL_FAILED;
+    }
+    LOGD("P2pHid2dConnect");
+    WifiWpaP2pInterface *pMainIfc = GetWifiWapP2pInterface();
+    if (pMainIfc == NULL) {
+        return WIFI_HAL_SUPPLICANT_NOT_INIT;
+    }
+    P2pSupplicantErrCode ret = pMainIfc->wpaP2pCliCmdHid2dConnect(pMainIfc, info);
+    if (ret != P2P_SUP_ERRCODE_SUCCESS) {
+        LOGE("wpaP2pHid2dCliCmdConnect fail, ret = %{public}d", ret);
         return ConvertP2pErrCode(ret);
     }
     return WIFI_HAL_SUCCESS;

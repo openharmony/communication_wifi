@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,6 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include "group_formed_state.h"
 #include "wifi_p2p_hal_interface.h"
 #include "p2p_state_machine.h"
@@ -100,6 +101,7 @@ bool GroupFormedState::ProcessCmdConnect(const InternalMessage &msg) const
     p2pStateMachine.SwitchState(&p2pStateMachine.p2pInvitationRequestState);
     return EXECUTED;
 }
+
 bool GroupFormedState::ProcessProvDiscEvt(const InternalMessage &msg) const
 {
     WifiP2pTempDiscEvent procDisc;
@@ -142,6 +144,7 @@ bool GroupFormedState::ProcessGroupStartedEvt(const InternalMessage &msg) const
     WIFI_LOGI("recv CMD: %{public}d", msg.GetMessageName());
     return EXECUTED;
 }
+
 bool GroupFormedState::ProcessCmdDiscoverPeer(const InternalMessage &msg) const
 {
     WIFI_LOGI("recv CMD: %{public}d", msg.GetMessageName());
@@ -204,12 +207,11 @@ bool GroupFormedState::ProcessDisconnectEvt(const InternalMessage &msg) const
     }
 
     device.SetP2pDeviceStatus(P2pDeviceStatus::PDS_AVAILABLE);
-
-    deviceManager.UpdateDeviceStatus(device);
-    groupManager.UpdateCurrGroupClient(device);
-
+    deviceManager.UpdateDeviceStatus(device); // used for peers change event querying device infos
+    groupManager.RemoveCurrGroupClient(device);
     p2pStateMachine.BroadcastP2pPeersChanged();
     p2pStateMachine.BroadcastP2pConnectionChanged();
+    deviceManager.RemoveDevice(device);
     return EXECUTED;
 }
 

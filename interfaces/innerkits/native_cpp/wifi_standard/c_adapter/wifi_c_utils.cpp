@@ -15,6 +15,7 @@
 
 #include "wifi_c_utils.h"
 #include <map>
+#include "wifi_common_util.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -40,6 +41,28 @@ WifiErrorCode GetCErrorCode(ErrCode errCode)
 {
     std::map<ErrCode, WifiErrorCode>::const_iterator iter = g_ErrCodeMap.find(errCode);
     return iter == g_ErrCodeMap.end() ? ERROR_WIFI_UNKNOWN : iter->second;
+}
+
+WifiErrorCode IpStrToArray(const std::string& str, unsigned int ipAddr[IPV4_ARRAY_LEN]) {
+    std::vector<std::string> vec = StrSplit(str, "\\.");
+    if (vec.size() != IPV4_ARRAY_LEN) {
+        return ERROR_WIFI_INVALID_ARGS;
+    }
+    for (int i = 0; i != IPV4_ARRAY_LEN && i != (int)vec.size(); ++i) {
+        ipAddr[i] = std::stoi(vec[i]);
+    }
+    return WIFI_SUCCESS;
+}
+
+std::string IpArrayToStr(const unsigned int ipAddr[IPV4_ARRAY_LEN]) {
+    std::string str = "";
+    for (int i = 0; i != IPV4_ARRAY_LEN; ++i) {
+        str += std::to_string(ipAddr[i]);
+        if (i != IPV4_ARRAY_LEN - 1) {
+            str += ".";
+        }
+    }
+    return str;
 }
 }  // namespace Wifi
 }  // namespace OHOS

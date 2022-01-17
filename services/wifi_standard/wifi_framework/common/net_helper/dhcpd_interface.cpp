@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -26,8 +26,6 @@ DEFINE_WIFILOG_DHCP_LABEL("WifiDhcpdInterface");
 
 namespace OHOS {
 namespace Wifi {
-const std::string IP_V4_MASK("255.255.255.0");
-const std::string IP_V4_DEFAULT("192.168.1.2");
 const int EU_I64_ADDR_LEN = 64;
 const int GENE_V6_ADDR_LEN = 64; /* Generally, the prefix length cannot exceed 64 characters. */
 const int IP_V6_ADDR_LEN = 128;

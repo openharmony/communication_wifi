@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -35,9 +35,11 @@ DhcpClientServiceImpl::DhcpClientServiceImpl()
     isExitDhcpResultHandleThread = false;
     pDhcpResultHandleThread = nullptr;
 
-    m_mapDhcpResultNotify.clear();
+    if (!m_mapDhcpResultNotify.empty()) {
+        ReleaseResultNotifyMemory();
+        m_mapDhcpResultNotify.clear();
+    }
     m_mapEventSubscriber.clear();
-
     InitDhcpMgrThread();
     DhcpFunc::CreateDirs(DHCP_WORK_DIR);
 }
@@ -46,18 +48,25 @@ DhcpClientServiceImpl::~DhcpClientServiceImpl()
 {
     if (!m_mapEventSubscriber.empty()) {
         WIFI_LOGE("DhcpClientServiceImpl destructor mapEventSubscriber is not empty!");
-        auto iterSubscriber = m_mapEventSubscriber.begin();
-        while (iterSubscriber != m_mapEventSubscriber.end()) {
-            if (UnsubscribeDhcpEvent(iterSubscriber->first) != DHCP_OPT_SUCCESS) {
-                WIFI_LOGE("DhcpClientServiceImpl destructor %{public}s failed!", (iterSubscriber->first).c_str());
-            } else {
-                WIFI_LOGW("DhcpClientServiceImpl destructor %{public}s success", (iterSubscriber->first).c_str());
-            }
+        if (UnsubscribeAllDhcpEvent() != DHCP_OPT_SUCCESS) {
+            WIFI_LOGE("DhcpClientServiceImpl unregister all dhcp event failed!");
         }
-        m_mapEventSubscriber.clear();
     }
 
     ExitDhcpMgrThread();
+}
+
+void DhcpClientServiceImpl::ReleaseResultNotifyMemory()
+{
+    for (auto& item : m_mapDhcpResultNotify) {
+        auto& secondItem = item.second;
+        for (auto& each : secondItem) {
+            if (each != nullptr) {
+                delete each;
+                each = nullptr;
+            }
+        }
+    }
 }
 
 int DhcpClientServiceImpl::InitDhcpMgrThread()
@@ -83,6 +92,7 @@ void DhcpClientServiceImpl::ExitDhcpMgrThread()
 
     if (!m_mapDhcpResultNotify.empty()) {
         WIFI_LOGE("ExitDhcpMgrThread() error, m_mapDhcpResultNotify is not empty!");
+        ReleaseResultNotifyMemory();
         m_mapDhcpResultNotify.clear();
     }
 }
@@ -228,6 +238,21 @@ int DhcpClientServiceImpl::UnsubscribeDhcpEvent(const std::string &strAction)
     }
     m_mapEventSubscriber.erase(iterSubscriber);
     WIFI_LOGI("UnsubscribeDhcpEvent %{public}s success", strAction.c_str());
+    return DHCP_OPT_SUCCESS;
+}
+
+int DhcpClientServiceImpl::UnsubscribeAllDhcpEvent()
+{
+    for (auto& e : m_mapEventSubscriber) {
+        if (e.second != nullptr) {
+            if (!DhcpFunc::UnsubscribeDhcpCommonEvent(e.second)) {
+                WIFI_LOGE("UnsubscribeDhcpEvent UnsubscribeDhcpCommonEvent %{public}s failed!", e.first.c_str());
+                return DHCP_OPT_FAILED;
+            }
+        }
+    }
+    m_mapEventSubscriber.clear();
+    WIFI_LOGI("UnsubscribeDhcpEvent all dhcp event success!");
     return DHCP_OPT_SUCCESS;
 }
 
@@ -656,6 +681,10 @@ int DhcpClientServiceImpl::GetDhcpResult(const std::string &ifname, IDhcpResultN
     }
 
     DhcpResultReq *pResultReq = new DhcpResultReq;
+    if (pResultReq == nullptr) {
+        WIFI_LOGE("GetDhcpResult() new failed! ifname:%{public}s.", ifname.c_str());
+        return DHCP_OPT_FAILED;
+    }
     pResultReq->timeouts = timeouts;
     pResultReq->getTimestamp = (uint32_t)time(NULL);
     pResultReq->pResultNotify = pResultNotify;

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -221,6 +221,20 @@ private:
      * @Return : success - DHCP_OPT_SUCCESS, failed - others.
      */
     int UnsubscribeDhcpEvent(const std::string &strAction);
+
+    /**
+     * @Description : release result notify memory.
+     *
+     */
+    void ReleaseResultNotifyMemory();
+
+    /**
+     * @Description : Unsubscribe all dhcp event.
+     *
+     * @param strAction - event action [in]
+     * @Return : success - DHCP_OPT_SUCCESS, failed - others.
+     */
+    int UnsubscribeAllDhcpEvent();
 
 private:
     std::mutex mResultNotifyMutex;

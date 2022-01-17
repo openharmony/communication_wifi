@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -61,6 +61,18 @@ void WifiP2pStub::InitHandleMap()
     handleFuncMap[WIFI_SVR_CMD_GET_SUPPORTED_FEATURES] = &WifiP2pStub::OnGetSupportedFeatures;
     handleFuncMap[WIFI_SVR_CMD_P2P_SET_DEVICE_NAME] = &WifiP2pStub::OnSetP2pDeviceName;
     handleFuncMap[WIFI_SVR_CMD_P2P_SET_WFD_INFO] = &WifiP2pStub::OnSetP2pWfdInfo;
+    handleFuncMap[WIFI_SVR_CMD_P2P_HID2D_APPLY_IP] = &WifiP2pStub::OnHid2dRequestGcIp;
+    handleFuncMap[WIFI_SVR_CMD_P2P_HID2D_SHARED_LINK_INCREASE] = &WifiP2pStub::OnHid2dSharedlinkIncrease;
+    handleFuncMap[WIFI_SVR_CMD_P2P_HID2D_SHARED_LINK_DECREASE] = &WifiP2pStub::OnHid2dSharedlinkDecrease;
+    handleFuncMap[WIFI_SVR_CMD_P2P_HID2D_CREATE_GROUP] = &WifiP2pStub::OnHid2dCreateGroup;
+    handleFuncMap[WIFI_SVR_CMD_P2P_HID2D_REMOVE_GC_GROUP] = &WifiP2pStub::OnHid2dRemoveGcGroup;
+    handleFuncMap[WIFI_SVR_CMD_P2P_HID2D_CONNECT] = &WifiP2pStub::OnHid2dConnect;
+    handleFuncMap[WIFI_SVR_CMD_P2P_HID2D_CONFIG_IP] = &WifiP2pStub::OnHid2dConfigIPAddr;
+    handleFuncMap[WIFI_SVR_CMD_P2P_HID2D_RELEASE_IP] = &WifiP2pStub::OnHid2dReleaseIPAddr;
+    handleFuncMap[WIFI_SVR_CMD_GET_P2P_RECOMMENDED_CHANNEL] = &WifiP2pStub::OnHid2dGetRecommendChannel;
+    handleFuncMap[WIFI_SVR_CMD_GET_5G_CHANNEL_LIST] = &WifiP2pStub::OnHid2dGetChannelListFor5G;
+    handleFuncMap[WIFI_SVR_CMD_GET_SELF_WIFI_CFG] = &WifiP2pStub::OnHid2dGetSelfWifiCfgInfo;
+    handleFuncMap[WIFI_SVR_CMD_SET_PEER_WIFI_CFG] = &WifiP2pStub::OnHid2dSetPeerWifiCfgInfo;
     return;
 }
 
@@ -557,6 +569,7 @@ void WifiP2pStub::OnGetSupportedFeatures(
 
     return;
 }
+
 void WifiP2pStub::OnSetP2pDeviceName(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
@@ -567,6 +580,7 @@ void WifiP2pStub::OnSetP2pDeviceName(uint32_t code, MessageParcel &data, Message
 
     return;
 }
+
 void WifiP2pStub::OnSetP2pWfdInfo(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
@@ -579,9 +593,194 @@ void WifiP2pStub::OnSetP2pWfdInfo(uint32_t code, MessageParcel &data, MessagePar
     int ret = SetP2pWfdInfo(wfdInfo);
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
-    
     return;
 }
+
+void WifiP2pStub::OnHid2dRequestGcIp(uint32_t code, MessageParcel &data,
+    MessageParcel &reply, MessageOption &option)
+{
+    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+
+    std::string gcMac = data.ReadCString();
+    std::string ipAddr;
+    int ret = Hid2dRequestGcIp(gcMac, ipAddr);
+    reply.WriteInt32(0);
+    reply.WriteInt32(ret);
+    if (ret == WIFI_OPT_SUCCESS) {
+        reply.WriteCString(ipAddr.c_str());
+    }
+}
+
+void WifiP2pStub::OnHid2dSharedlinkIncrease(uint32_t code, MessageParcel &data,
+    MessageParcel &reply, MessageOption &option)
+{
+    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+
+    int ret = Hid2dSharedlinkIncrease();
+    reply.WriteInt32(0);
+    reply.WriteInt32(ret);
+}
+
+void WifiP2pStub::OnHid2dSharedlinkDecrease(uint32_t code, MessageParcel &data,
+    MessageParcel &reply, MessageOption &option)
+{
+    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+    int ret = Hid2dSharedlinkDecrease();
+    reply.WriteInt32(0);
+    reply.WriteInt32(ret);
+}
+
+void WifiP2pStub::OnHid2dCreateGroup(uint32_t code, MessageParcel &data,
+    MessageParcel &reply, MessageOption &option)
+{
+    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+
+    int frequency = data.ReadInt32();
+    int type = data.ReadInt32();
+    int ret = Hid2dCreateGroup(frequency, FreqType(type));
+    reply.WriteInt32(0);
+    reply.WriteInt32(ret);
+}
+
+void WifiP2pStub::OnHid2dRemoveGcGroup(uint32_t code, MessageParcel &data,
+    MessageParcel &reply, MessageOption &option)
+{
+    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+
+    std::string gcIfName = data.ReadCString();
+    int ret = Hid2dRemoveGcGroup(gcIfName);
+    reply.WriteInt32(0);
+    reply.WriteInt32(ret);
+}
+
+void WifiP2pStub::OnHid2dConnect(uint32_t code, MessageParcel &data,
+    MessageParcel &reply, MessageOption &option)
+{
+    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+
+    Hid2dConnectConfig config;
+    config.SetSsid(data.ReadCString());
+    config.SetBssid(data.ReadCString());
+    config.SetPreSharedKey(data.ReadCString());
+    config.SetFrequency(data.ReadInt32());
+    config.SetDhcpMode(DhcpMode(data.ReadInt32()));
+
+    int ret = Hid2dConnect(config);
+    reply.WriteInt32(0);
+    reply.WriteInt32(ret);
+}
+
+void WifiP2pStub::OnHid2dConfigIPAddr(uint32_t code, MessageParcel &data,
+    MessageParcel &reply, MessageOption &option)
+{
+    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+
+    IpAddrInfo ipInfo;
+    std::string ifName = data.ReadCString();
+    ipInfo.ip = data.ReadCString();
+    ipInfo.gateway = data.ReadCString();
+    ipInfo.netmask = data.ReadCString();
+    int ret = Hid2dConfigIPAddr(ifName, ipInfo);
+    reply.WriteInt32(0);
+    reply.WriteInt32(ret);
+}
+
+void WifiP2pStub::OnHid2dReleaseIPAddr(uint32_t code, MessageParcel &data,
+    MessageParcel &reply, MessageOption &option)
+{
+    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+
+    std::string ifName = data.ReadCString();
+    int ret = Hid2dReleaseIPAddr(ifName);
+    reply.WriteInt32(0);
+    reply.WriteInt32(ret);
+}
+
+void WifiP2pStub::OnHid2dGetRecommendChannel(
+    uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
+{
+    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+    RecommendChannelRequest request;
+    RecommendChannelResponse response;
+    request.remoteIfName = data.ReadCString();
+    request.remoteIfMode = data.ReadInt32();
+    request.localIfName = data.ReadCString();
+    request.localIfMode = data.ReadInt32();
+    request.prefBand = data.ReadInt32();
+    request.prefBandwidth = PreferBandwidth(data.ReadInt32());
+    ErrCode ret = Hid2dGetRecommendChannel(request, response);
+    reply.WriteInt32(0);
+    reply.WriteInt32(ret);
+    if (ret == WIFI_OPT_SUCCESS) {
+        reply.WriteInt32(static_cast<int>(response.status));
+        reply.WriteInt32(response.index);
+        reply.WriteInt32(response.centerFreq);
+        reply.WriteInt32(response.centerFreq1);
+        reply.WriteInt32(response.centerFreq2);
+        reply.WriteInt32(response.bandwidth);
+    }
+}
+
+void WifiP2pStub::OnHid2dGetChannelListFor5G(
+    uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
+{
+    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+
+    std::vector<int> vecChannelList;
+    ErrCode ret = Hid2dGetChannelListFor5G(vecChannelList);
+    reply.WriteInt32(0);
+    reply.WriteInt32(ret);
+    if (ret == WIFI_OPT_SUCCESS) {
+        reply.WriteInt32((int)vecChannelList.size());
+        for (auto& channel : vecChannelList) {
+            reply.WriteInt32(channel);
+        }
+    }
+}
+
+void WifiP2pStub::OnHid2dGetSelfWifiCfgInfo(
+    uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
+{
+    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+
+    int cfgType = data.ReadInt32();
+    int len = 0;
+    char cfgData[CFG_DATA_MAX_BYTES];
+    if (memset_s(cfgData, CFG_DATA_MAX_BYTES, 0, CFG_DATA_MAX_BYTES) != EOK) {
+        WIFI_LOGE("`%{public}s` memset_s failed!", __func__);
+    }
+    ErrCode ret = Hid2dGetSelfWifiCfgInfo(SelfCfgType(cfgType), cfgData, &len);
+    reply.WriteInt32(0);
+    reply.WriteInt32(ret);
+    reply.WriteInt32(len);
+    if (ret == WIFI_OPT_SUCCESS && len > 0) {
+        reply.WriteBuffer(cfgData, len);
+    }
+}
+
+void WifiP2pStub::OnHid2dSetPeerWifiCfgInfo(
+    uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
+{
+    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+
+    char cfgData[CFG_DATA_MAX_BYTES];
+    if (memset_s(cfgData, CFG_DATA_MAX_BYTES, 0, CFG_DATA_MAX_BYTES) != EOK) {
+        WIFI_LOGE("`%{public}s` memset_s failed!", __func__);
+    }
+    int cfgType = data.ReadInt32();
+    int len = data.ReadInt32();
+    const char *dataBuffer = (const char *)data.ReadBuffer(len);
+    if (memcpy_s(cfgData, CFG_DATA_MAX_BYTES, dataBuffer, len) != EOK) {
+        WIFI_LOGE("`%{public}s` memcpy_s failed!", __func__);
+        reply.WriteInt32(0);
+        reply.WriteInt32(WIFI_OPT_FAILED);
+        return;
+    }
+    ErrCode ret = Hid2dSetPeerWifiCfgInfo(PeerCfgType(cfgType), cfgData, len);
+    reply.WriteInt32(0);
+    reply.WriteInt32(ret);
+}
+
 bool WifiP2pStub::IsSingleCallback() const
 {
     return mSingleCallback;

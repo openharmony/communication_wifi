@@ -77,6 +77,21 @@ static napi_value Init(napi_env env, napi_value exports) {
         DECLARE_NAPI_FUNCTION("setHotspotConfig", SetHotspotConfig),
         DECLARE_NAPI_FUNCTION("getHotspotConfig", GetHotspotConfig),
         DECLARE_NAPI_FUNCTION("getStations", GetStations),
+        DECLARE_NAPI_FUNCTION("enableP2p", EnableP2p),
+        DECLARE_NAPI_FUNCTION("disableP2p", DisableP2p),
+        DECLARE_NAPI_FUNCTION("getP2pLinkedInfo", GetP2pLinkedInfo),
+        DECLARE_NAPI_FUNCTION("getCurrentGroup", GetCurrentGroup),
+        DECLARE_NAPI_FUNCTION("getP2pDevices", GetP2pDevices),
+        DECLARE_NAPI_FUNCTION("createGroup", CreateGroup),
+        DECLARE_NAPI_FUNCTION("removeGroup", RemoveGroup),
+        DECLARE_NAPI_FUNCTION("p2pConnect", P2pConnect),
+        DECLARE_NAPI_FUNCTION("p2pDisConnect", P2pDisConnect),
+        DECLARE_NAPI_FUNCTION("startDiscoverDevices", StartDiscoverDevices),
+        DECLARE_NAPI_FUNCTION("stopDiscoverDevices", StopDiscoverDevices),
+        DECLARE_NAPI_FUNCTION("startP2pListen", StartP2pListen),
+        DECLARE_NAPI_FUNCTION("stopP2pListen", StopP2pListen),
+        DECLARE_NAPI_FUNCTION("deletePersistentGroup", DeletePersistentGroup),
+        DECLARE_NAPI_FUNCTION("setP2pDeviceName", SetP2pDeviceName)
     };
 
     NAPI_CALL(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(napi_property_descriptor), desc));

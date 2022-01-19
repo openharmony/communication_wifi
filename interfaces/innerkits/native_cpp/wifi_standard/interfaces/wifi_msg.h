@@ -35,6 +35,8 @@ namespace Wifi {
 #define IPV4_ADDRESS_TYPE 0
 #define IPV6_ADDRESS_TYPE 1
 #define DEVICE_NAME_LENGTH 32
+#define WIFI_MAC_LENGTH 17
+#define MAX_PASSPHRASE_LENGTH 63
 
 enum class SupplicantState {
     DISCONNECTED = 0,

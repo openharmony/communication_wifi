@@ -21,7 +21,6 @@
 #include <map>
 #include "napi/native_api.h"
 #include "common_event_manager.h"
-#include "common_event.h"
 
 namespace OHOS {
 namespace Wifi {

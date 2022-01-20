@@ -35,7 +35,7 @@
         "destPath": "foundation/communication/wifi"
     },
     "component": {
-        "name": "wifi",
+        "name": "wifi_standard",
         "subsystem": "communication",
         "syscap": [
             "SystemCapability.Communication.WiFi"
@@ -68,10 +68,19 @@
             "inner_kits": [
                 {
                     "header" : {
-                        "header_base": [
-                            "//foundation/communication/wifi/interfaces/innerkits/native_c",
-                            "//foundation/communication/wifi/interfaces/innerkits/native_cpp/wifi_standard/include"
-                        ],
+                        "header_base": "//foundation/communication/wifi/interfaces/innerkits/native_c",
+                        "header_files": [
+                            "wifi_device.h",
+                            "wifi_hotspot.h",
+                            "wifi_p2p.h",
+                            "wifi_hid2d.h"
+                        ]
+                    },
+                    "name" : "//foundation/communication/wifi/interfaces/innerkits/native_cpp/wifi_standard:wifi_sdk"
+                },
+                {
+                    "header" : {
+                        "header_base": "//foundation/communication/wifi/interfaces/innerkits/native_cpp/wifi_standard/include",
                         "header_files": [
                             "wifi_device.h",
                             "wifi_hotspot.h",

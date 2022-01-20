@@ -18,7 +18,6 @@
 #include "native_c/wifi_scan_info.h"
 #include "wifi_logger.h"
 #include "common_event_manager.h"
-#include "common_event.h"
 #include <set>
 
 DEFINE_WIFILOG_LABEL("WifiCEvent");

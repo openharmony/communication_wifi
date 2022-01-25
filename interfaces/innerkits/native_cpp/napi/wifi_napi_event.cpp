@@ -31,6 +31,12 @@ const std::string WIFI_EVENT_TYPE_RSSI_STATE = "wifiRssiChange";
 const std::string WIFI_EVENT_TYPE_HOTSPOT_STATE = "hotspotStateChange";
 const std::string WIFI_EVENT_TYPE_AP_STA_JOIN = "hotspotStaJoin";
 const std::string WIFI_EVENT_TYPE_AP_STA_LEAVE = "hotspotStaLeave";
+const std::string WIFI_EVENT_TYPE_P2P_DEVICES_STATE = "p2pDevicesChange";
+const std::string WIFI_EVENT_TYPE_P2P_STATE = "p2pStateChange";
+const std::string WIFI_EVENT_TYPE_P2P_CONN_STATE = "p2pConnStateChange";
+const std::string WIFI_EVENT_TYPE_P2P_PEER_DISCOVERY_STATE = "p2pPeerDiscoveryStateChange";
+const std::string WIFI_EVENT_TYPE_P2P_CURRENT_DEVICE_STATE = "p2pCurrentDeviceChange";
+const std::string WIFI_EVENT_TYPE_P2P_GROUP_STATE = "p2pGroupStateChange";
 
 const std::string WIFI_USUAL_EVENT_POWER_STATE = "usual.event.wifi.POWER_STATE";
 const std::string WIFI_USUAL_EVENT_CONN_STATE = "usual.event.wifi.CONN_STATE";
@@ -39,6 +45,12 @@ const std::string WIFI_USUAL_EVENT_RSSI_STATE = "usual.event.wifi.RSSI_VALUE";
 const std::string WIFI_USUAL_EVENT_HOTSPOT_STATE = "usual.event.wifi.HOTSPOT_STATE";
 const std::string WIFI_USUAL_EVENT_AP_STA_JOIN = "usual.event.wifi.WIFI_HS_STA_JOIN";
 const std::string WIFI_USUAL_EVENT_AP_STA_LEAVE = "usual.event.wifi.WIFI_HS_STA_LEAVE";
+const std::string WIFI_USUAL_EVENT_P2P_DEVICES_CHANGE = "usual.event.wifi.p2p.DEVICES_CHANGE";
+const std::string WIFI_USUAL_EVENT_P2P_STATE_CHANGE = "usual.event.wifi.p2p.STATE_CHANGE";
+const std::string WIFI_USUAL_EVENT_P2P_CONN_STATE_CHANGE = "usual.event.wifi.p2p.CONN_STATE_CHANGE";
+const std::string WIFI_USUAL_EVENT_P2P_PEER_DISCOVERY_STATE_CHANG = "usual.event.wifi.p2p.PEER_DISCOVERY_STATE_CHANGE";
+const std::string WIFI_USUAL_EVENT_P2P_CURRENT_DEVICE_STATE_CHANGE = "usual.event.wifi.p2p.CURRENT_DEVICE_CHANGE";
+const std::string WIFI_USUAL_EVENT_P2P_GROUP_STATE_CHANGE = "usual.event.wifi.p2p.GROUP_STATE_CHANGED";
 
 std::shared_mutex g_regInfoMutex;
 static std::map<std::string, EventRegisterInfo> g_eventRegisterInfo;
@@ -49,6 +61,12 @@ static std::map<std::string, std::string> g_mapEventTypeToUsualEvent = {
     { WIFI_EVENT_TYPE_SCAN_STATE, WIFI_USUAL_EVENT_SCAN_STATE },
     { WIFI_EVENT_TYPE_RSSI_STATE, WIFI_USUAL_EVENT_RSSI_STATE },
     { WIFI_EVENT_TYPE_HOTSPOT_STATE, WIFI_USUAL_EVENT_HOTSPOT_STATE },
+    { WIFI_EVENT_TYPE_P2P_DEVICES_STATE, WIFI_USUAL_EVENT_P2P_DEVICES_CHANGE },
+    { WIFI_EVENT_TYPE_P2P_STATE, WIFI_USUAL_EVENT_P2P_STATE_CHANGE },
+    { WIFI_EVENT_TYPE_P2P_CONN_STATE, WIFI_USUAL_EVENT_P2P_CONN_STATE_CHANGE },
+    { WIFI_EVENT_TYPE_P2P_PEER_DISCOVERY_STATE, WIFI_USUAL_EVENT_P2P_PEER_DISCOVERY_STATE_CHANG },
+    { WIFI_EVENT_TYPE_P2P_CURRENT_DEVICE_STATE, WIFI_USUAL_EVENT_P2P_CURRENT_DEVICE_STATE_CHANGE },
+    { WIFI_EVENT_TYPE_P2P_GROUP_STATE, WIFI_USUAL_EVENT_P2P_GROUP_STATE_CHANGE }
 };
 
 static std::map<std::string, UserDefinedEventProcessFunc> g_mapUserDefinedEventProcessFunc = {};

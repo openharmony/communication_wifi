@@ -17,6 +17,7 @@
 #include "wifi_p2p_hal_interface.h"
 #include "p2p_state_machine.h"
 #include "wifi_logger.h"
+#include "if_config.h"
 
 DEFINE_WIFILOG_P2P_LABEL("P2pGroupOperatingState");
 
@@ -175,7 +176,7 @@ bool P2pGroupOperatingState::ProcessCreateGroupTimeOut(const InternalMessage &ms
 
 bool P2pGroupOperatingState::ProcessGroupRemovedEvt(const InternalMessage &msg) const
 {
-    WIFI_LOGI("recv event: %{public}d", msg.GetMessageName());
+    WIFI_LOGI("recv group remove event: %{public}d", msg.GetMessageName());
     if (groupManager.GetCurrentGroup().IsPersistent()) {
         groupManager.StashGroups();
         WifiP2pGroupInfo copy = groupManager.GetCurrentGroup();
@@ -184,6 +185,10 @@ bool P2pGroupOperatingState::ProcessGroupRemovedEvt(const InternalMessage &msg) 
         groupManager.SetCurrentGroup(copy);
         groupManager.StashGroups();
     }
+    p2pStateMachine.ChangeConnectedStatus(P2pConnectedState::P2P_DISCONNECTED);
+    IpPool::ReleaseIpPool();
+    IfConfig::GetInstance().FlushIpAddr(groupManager.GetCurrentGroup().GetInterface(), IpType::IPTYPE_IPV4);
+    SharedLinkManager::SetSharedLinkCount(SHARED_LINKE_COUNT_ON_DISCONNECTED);
     if (groupManager.GetCurrentGroup().IsGroupOwner()) {
         if (!p2pStateMachine.StopDhcpServer()) {
             WIFI_LOGW("failed to stop Dhcp server.");
@@ -197,8 +202,6 @@ bool P2pGroupOperatingState::ProcessGroupRemovedEvt(const InternalMessage &msg) 
     }
     WifiP2pGroupInfo invalidGroup;
     groupManager.SetCurrentGroup(invalidGroup);
-    SharedLinkManager::SetSharedLinkCount(SHARED_LINKE_COUNT_ON_DISCONNECTED);
-    p2pStateMachine.ChangeConnectedStatus(P2pConnectedState::P2P_DISCONNECTED);
     p2pStateMachine.SwitchState(&p2pStateMachine.p2pIdleState);
     return EXECUTED;
 }

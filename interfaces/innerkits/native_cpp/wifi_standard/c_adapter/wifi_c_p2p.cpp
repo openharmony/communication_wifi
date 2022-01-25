@@ -345,8 +345,9 @@ public:
         if (!devices.empty()) {
             devicePtr = new WifiP2pDevice[(int)devices.size()];
         }
+        WifiP2pDevice *p = devicePtr;
         for (auto& each : devices) {
-            if (ConvertP2PDeviceCppToC(each, devicePtr++) != OHOS::Wifi::WIFI_OPT_SUCCESS) {
+            if (ConvertP2PDeviceCppToC(each, p++) != OHOS::Wifi::WIFI_OPT_SUCCESS) {
                 WIFI_LOGE("peers changed convert p2p device failed!");
                 return;
             }

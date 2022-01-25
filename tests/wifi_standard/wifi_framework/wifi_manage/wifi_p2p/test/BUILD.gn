@@ -32,6 +32,7 @@ ohos_unittest("wifi_p2p_test") {
     "//foundation/communication/wifi/services/wifi_standard/wifi_framework/common/log/log_helper.c",
     "//foundation/communication/wifi/services/wifi_standard/wifi_framework/common/net_helper/base_address.cpp",
     "//foundation/communication/wifi/services/wifi_standard/wifi_framework/common/net_helper/dhcpd_interface.cpp",
+    "//foundation/communication/wifi/services/wifi_standard/wifi_framework/common/net_helper/if_config.cpp",
     "//foundation/communication/wifi/services/wifi_standard/wifi_framework/common/net_helper/ip_tools.cpp",
     "//foundation/communication/wifi/services/wifi_standard/wifi_framework/common/net_helper/ipv4_address.cpp",
     "//foundation/communication/wifi/services/wifi_standard/wifi_framework/common/net_helper/ipv6_address.cpp",

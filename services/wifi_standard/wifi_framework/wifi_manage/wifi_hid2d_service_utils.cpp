@@ -31,8 +31,9 @@ std::atomic_int SharedLinkManager::sharedLinkCount(0);
 
 bool IpPool::InitIpPool(const std::string& serverIp)
 {
-    std::unique_lock<std::shared_mutex> guard(g_ipPoolMutex);
+    WIFI_LOGI("Init ip pool");
 
+    std::unique_lock<std::shared_mutex> guard(g_ipPoolMutex);
     if (!ipList.empty()) {
         return true;
     }
@@ -53,8 +54,9 @@ bool IpPool::InitIpPool(const std::string& serverIp)
 
 std::string IpPool::GetIp(const std::string& gcMac)
 {
-    std::unique_lock<std::shared_mutex> guard(g_ipPoolMutex);
+    WIFI_LOGI("Get ip, gcMac: %{public}s", gcMac.c_str());
 
+    std::unique_lock<std::shared_mutex> guard(g_ipPoolMutex);
     std::string ip = "";
     if (ipList.empty()) {
         WIFI_LOGE("Alloc ip failed!");
@@ -68,8 +70,9 @@ std::string IpPool::GetIp(const std::string& gcMac)
 
 void IpPool::ReleaseIp(const std::string& gcMac)
 {
-    std::unique_lock<std::shared_mutex> guard(g_ipPoolMutex);
+    WIFI_LOGI("Release ip, gcMac: %{public}s", gcMac.c_str());
 
+    std::unique_lock<std::shared_mutex> guard(g_ipPoolMutex);
     auto iter = mapGcMacToAllocIp.find(gcMac);
     if (iter == mapGcMacToAllocIp.end()) {
         return;
@@ -82,6 +85,15 @@ void IpPool::ReleaseIp(const std::string& gcMac)
         ipList.emplace_back(iter->second);
         mapGcMacToAllocIp.erase(iter);
     }
+}
+
+void IpPool::ReleaseIpPool()
+{
+    WIFI_LOGI("Release ip pool");
+
+    std::unique_lock<std::shared_mutex> guard(g_ipPoolMutex);
+    mapGcMacToAllocIp.clear();
+    ipList.clear();
 }
 
 bool IpPool::IsValidIp(const std::string& ip)

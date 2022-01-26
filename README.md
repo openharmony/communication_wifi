@@ -157,14 +157,19 @@ import wf from '@ohos.wifi'; // Import the @ohos.wifi class.
     ```js
     // Start a scan.
     var isScanSuccess = wf.scan(); // true
-    
+
     // Wait for some time.
-    
+
     // Obtain the scan result.
-    wf.getScanInfos(result => {
-        var num = Object.keys(result).length;
-        console.info("wifi scan result mum: " + num);
-        for (var i = 0; i < num; ++i) {
+    wf.getScanInfos((err, result) => {
+        if (err) {
+            console.error("get scan info error");
+            return;
+        }
+
+        var len = Object.keys(result).length;
+        console.log("get scan info number: " + len);
+        for (var i = 0; i < len; ++i) {
             console.info("ssid: " + result[i].ssid);
             console.info("bssid: " + result[i].bssid);
             console.info("securityType: " + result[i].securityType);
@@ -173,7 +178,7 @@ import wf from '@ohos.wifi'; // Import the @ohos.wifi class.
             console.info("frequency: " + result[i].frequency);
             console.info("timestamp: " + result[i].timestamp);
         }
-    })
+    });
     ```
 
 
@@ -190,13 +195,19 @@ Set up a WLAN connection.
         "isHiddenSsid":false,
         "securityType":3,
     }
+
     Method 1:
     // Add a hotspot configuration.
-    wf.addDeviceConfig(config, (result) => {
+    wf.addDeviceConfig(config, (err, result) => {
+        if (err) {
+            console.error("add device config error");
+            return;
+        }
         console.info("config id: " + result);
         // Set up a WLAN based on the hotspot configuration ID.
         wf.connectToNetwork(result);
     });
+
     Method 2:
     // Set up a WLAN by calling connectToDevice with the hotspot configuration passed.
     wf.connectToDevice(config);

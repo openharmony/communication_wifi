@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -20,85 +20,102 @@
 #include <set>
 #include <map>
 #include "napi/native_api.h"
-#include "common_event_manager.h"
+#include "wifi_errcode.h"
+#include <shared_mutex>
+#include "wifi_hotspot.h"
 
 namespace OHOS {
 namespace Wifi {
-
-typedef void (*UserDefinedEventProcessFunc)(const napi_env& env, const std::string& type,
-    const OHOS::EventFwk::CommonEventData& data);
-
-class Event {
+class AsyncEventData {
 public:
-    Event(napi_env env, std::string& name) : m_env(env), m_name(name) {
+    napi_env env;
+    napi_ref callbackRef;
+    napi_value jsEvent;
+
+    explicit AsyncEventData(napi_env e, napi_ref r, napi_value v) {
+        env = e;
+        callbackRef = r;
+        jsEvent = v;
     }
 
-    virtual ~Event() {
+    AsyncEventData() = delete;
+
+    virtual ~AsyncEventData() {
     }
-
-    virtual napi_value PackResult() = 0;
-
-    void SetName(std::string& name);
-
-    std::string GetName();
-
-    napi_env GetEnv();
-
-private:
-    napi_env m_env;
-    std::string m_name;
 };
 
-class WifiCommonEvent: public Event {
+class RegObj {
 public:
-    WifiCommonEvent(napi_env env, std::string& name, int value) : Event(env, name), m_value(value) {
+    RegObj() : m_regEnv(0), m_regHanderRef(nullptr) {
+    }
+    explicit RegObj(const napi_env& env, const napi_ref& ref) {
+        m_regEnv = env;
+        m_regHanderRef = ref;
     }
 
-    virtual napi_value PackResult();
+    ~RegObj() {
+    }
 
-private:
-    int m_value;
+    napi_env m_regEnv;
+    napi_ref m_regHanderRef;
 };
 
-class WifiEventSubscriber : public OHOS::EventFwk::CommonEventSubscriber {
+static std::shared_mutex g_regInfoMutex;
+static std::map<std::string, std::vector<RegObj>> g_eventRegisterInfo;
+
+class NapiEvent {
 public:
-    explicit WifiEventSubscriber(const OHOS::EventFwk::CommonEventSubscribeInfo &subscribeInfo) :
-        CommonEventSubscriber(subscribeInfo) {
-    }
+    bool CheckIsRegister(const std::string& type);
+    napi_value CreateResult(const napi_env& env, int value);
+    napi_value CreateResult(const napi_env& env, const StationInfo& info);
+    napi_value CreateResult(const napi_env& env, napi_value placehoders);
+    napi_value CreateResult(const napi_env& env, const WifiP2pDevice& device);
+    napi_value CreateResult(const napi_env& env, const std::vector<WifiP2pDevice>& devices);
+    napi_value CreateResult(const napi_env& env, const WifiP2pLinkedInfo& info);
+    void EventNotify(AsyncEventData *asyncEvent);
 
-    virtual ~WifiEventSubscriber() {
-    }
+    template<typename T>
+    void CheckAndNotify(const std::string& type, const T& obj) {
+        std::shared_lock<std::shared_mutex> guard(g_regInfoMutex);
+        if (!CheckIsRegister(type)) {
+            return;
+        }
 
-    virtual void OnReceiveEvent(const OHOS::EventFwk::CommonEventData &data) override;
+        std::vector<RegObj>& vecObj = g_eventRegisterInfo[type];
+        for (auto& each : vecObj) {
+            napi_value result = CreateResult(each.m_regEnv, obj);
+            AsyncEventData *asyncEvent = new AsyncEventData(each.m_regEnv, each.m_regHanderRef, result);
+            if (asyncEvent == nullptr) {
+                return;
+            }
+            EventNotify(asyncEvent);
+        }
+    }
 };
 
-class EventRegisterInfo;
-class EventManager {
+class EventRegister {
 public:
-    EventManager(napi_env env, napi_value thisVar);
-    virtual ~EventManager();
+    EventRegister() {
+    }
+    ~EventRegister() {
+    }
 
-    bool Send(Event& event);
-    bool SubscribeEvent(const std::string& name, napi_value handler);
-    bool UnsubscribeEvent(const std::string& name, napi_value handler);
-    napi_env GetEnv();
+    static EventRegister& GetInstance();
 
-private:
-    bool SubscribeServiceEvent(const std::string& event);
-    bool UnsubscribeServiceEvent(const std::string& event);
-    void DeleteHanderRef(std::set<napi_ref>& setRefs, napi_value handler);
-    void DeleteAllHanderRef(std::set<napi_ref>& setRefs);
-    void SetEventType(const std::string& type);
+    void Register(const napi_env& env, const std::string& type, napi_value handler);
+    void Unregister(const napi_env& env, const std::string& type, napi_value handler);
 
 private:
-    napi_env m_env;
-    napi_ref m_thisVarRef;
-    std::string m_eventType;
+    ErrCode RegisterWifiEvents();
+    bool IsEventSupport(const std::string& type);
+    void DeleteRegisterObj(std::vector<RegObj>& vecRegObjs, napi_value& handler);
+    void DeleteAllRegisterObj(std::vector<RegObj>& vecRegObjs);
+
+    static bool isEventRegistered;
 };
 
 napi_value On(napi_env env, napi_callback_info cbinfo);
 napi_value Off(napi_env env, napi_callback_info cbinfo);
-napi_value EventListenerConstructor(napi_env env, napi_callback_info cbinfo);
 }  // namespace Wifi
 }  // namespace OHOS
 

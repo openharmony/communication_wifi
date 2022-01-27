@@ -206,6 +206,7 @@ bool GroupFormedState::ProcessDisconnectEvt(const InternalMessage &msg) const
         return EXECUTED;
     }
 
+    IpPool::ReleaseIp(device.GetDeviceAddress());
     device.SetP2pDeviceStatus(P2pDeviceStatus::PDS_AVAILABLE);
     deviceManager.UpdateDeviceStatus(device); // used for peers change event querying device infos
     groupManager.RemoveCurrGroupClient(device);

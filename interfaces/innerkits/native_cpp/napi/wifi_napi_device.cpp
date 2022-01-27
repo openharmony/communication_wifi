@@ -96,7 +96,7 @@ static SecTypeJs SecurityTypeNativeToJs(const WifiSecurity& cppSecurityType)
     return jsSecurityType;
 }
 
-static bool NativeScanInfosToJsObj(const napi_env& env,
+static ErrCode NativeScanInfosToJsObj(const napi_env& env,
     const std::vector<WifiScanInfo>& vecScnIanfos, napi_value& arrayResult)
 {
     uint32_t idx = 0;
@@ -115,10 +115,10 @@ static bool NativeScanInfosToJsObj(const napi_env& env,
         napi_status status = napi_set_element(env, arrayResult, idx++, eachObj);
         if (status != napi_ok) {
             WIFI_LOGE("Wifi napi set element error: %{public}d, idx: %{public}d", status, idx - 1);
-            return false;
+            return WIFI_OPT_FAILED;
         }
     }
-    return true;
+    return WIFI_OPT_SUCCESS;
 }
 
 napi_value GetScanInfos(napi_env env, napi_callback_info info)
@@ -138,14 +138,14 @@ napi_value GetScanInfos(napi_env env, napi_callback_info info)
     asyncContext->executeFunc = [&](void* data) -> void {
         ScanInfoAsyncContext *context = static_cast<ScanInfoAsyncContext *>(data);
         TRACE_FUNC_CALL_NAME("wifiScanPtr->GetScanInfoList");
-        context->isSuccess = (wifiScanPtr->GetScanInfoList(context->vecScanInfos) == WIFI_OPT_SUCCESS);
+        context->errorCode = wifiScanPtr->GetScanInfoList(context->vecScanInfos);
         WIFI_LOGI("GetScanInfoList, size: %{public}zu", context->vecScanInfos.size());
     };
 
     asyncContext->completeFunc = [&](void* data) -> void {
         ScanInfoAsyncContext *context = static_cast<ScanInfoAsyncContext *>(data);
         napi_create_array_with_length(context->env, context->vecScanInfos.size(), &context->result);
-        context->isSuccess = NativeScanInfosToJsObj(context->env, context->vecScanInfos, context->result);
+        context->errorCode = NativeScanInfosToJsObj(context->env, context->vecScanInfos, context->result);
         WIFI_LOGI("Push scan info list to client");
     };
 
@@ -223,7 +223,7 @@ napi_value AddDeviceConfig(napi_env env, napi_callback_info info)
         if (context->addResult < 0 || ret != WIFI_OPT_SUCCESS) {
             context->addResult = -1;
         }
-        context->isSuccess = (ret == WIFI_OPT_SUCCESS);
+        context->errorCode = ret;
     };
 
     asyncContext->completeFunc = [&](void* data) -> void {
@@ -425,7 +425,7 @@ napi_value GetLinkedInfo(napi_env env, napi_callback_info info)
     asyncContext->executeFunc = [&](void* data) -> void {
         LinkedInfoAsyncContext *context = static_cast<LinkedInfoAsyncContext *>(data);
         TRACE_FUNC_CALL_NAME("wifiDevicePtr->GetLinkedInfo");
-        context->isSuccess = (wifiDevicePtr->GetLinkedInfo(context->linkedInfo) == WIFI_OPT_SUCCESS);
+        context->errorCode = wifiDevicePtr->GetLinkedInfo(context->linkedInfo);
     };
 
     asyncContext->completeFunc = [&](void* data) -> void {

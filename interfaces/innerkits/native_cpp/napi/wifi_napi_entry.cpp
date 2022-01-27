@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -22,26 +22,6 @@
 namespace OHOS {
 namespace Wifi {
 #ifndef ENABLE_NAPI_COMPATIBLE
-DEFINE_WIFILOG_LABEL("WifiNAPIEntry");
-/*
- * Event class initialization function
- */
-static void InitEventClass(napi_env& env, napi_value& exports) {
-    const char className[] = "EventListener";
-    napi_property_descriptor properties[] = {
-        DECLARE_NAPI_FUNCTION("on", On),
-        DECLARE_NAPI_FUNCTION("off", Off),
-    };
-
-    napi_value eventListenerClass = nullptr;
-    napi_define_class(env, className, sizeof(className), EventListenerConstructor, nullptr,
-        sizeof(properties) / sizeof(napi_property_descriptor), properties, &eventListenerClass);
-    napi_status status = napi_set_named_property(env, exports, "EventListener", eventListenerClass);
-    if (status != napi_ok) {
-        WIFI_LOGE("Init event class set property error.");
-    }
-}
-
 /*
  * Module initialization function
  */
@@ -91,11 +71,12 @@ static napi_value Init(napi_env env, napi_value exports) {
         DECLARE_NAPI_FUNCTION("startP2pListen", StartP2pListen),
         DECLARE_NAPI_FUNCTION("stopP2pListen", StopP2pListen),
         DECLARE_NAPI_FUNCTION("deletePersistentGroup", DeletePersistentGroup),
-        DECLARE_NAPI_FUNCTION("setP2pDeviceName", SetP2pDeviceName)
+        DECLARE_NAPI_FUNCTION("setP2pDeviceName", SetP2pDeviceName),
+        DECLARE_NAPI_FUNCTION("on", On),
+        DECLARE_NAPI_FUNCTION("off", Off),
     };
 
     NAPI_CALL(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(napi_property_descriptor), desc));
-    InitEventClass(env, exports);
     return exports;
 }
 

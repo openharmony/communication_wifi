@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -236,15 +236,19 @@ static napi_value DoCallBackAsyncWork(const napi_env& env, AsyncContext *asyncCo
             napi_get_undefined(env, &undefine);
             napi_value callback;
             context->completeFunc(data);
-            if (context->isSuccess) {
+            constexpr int ARGS_TWO = 2;
+            napi_value result[ARGS_TWO] = {nullptr};
+            napi_create_uint32(env, context->errorCode, &result[0]);
+            result[1] = context->result;
+            if (context->errorCode == ERR_CODE_SUCCESS) {
                 napi_get_reference_value(env, context->callback[0], &callback);
-                napi_call_function(env, nullptr, callback, 1, &context->result, &undefine);
+                napi_call_function(env, nullptr, callback, ARGS_TWO, result, &undefine);
             } else {
                 if (context->callback[1]) {
                     napi_get_reference_value(env, context->callback[1], &callback);
-                    napi_call_function(env, nullptr, callback, 1, &context->result, &undefine);
+                    napi_call_function(env, nullptr, callback, ARGS_TWO, result, &undefine);
                 } else {
-                    WIFI_LOGE("Get scan info callback func is null");
+                    WIFI_LOGE("Get callback func[1] is null");
                 }
             }
             if (context->callback[0] != nullptr) {
@@ -283,7 +287,7 @@ static napi_value DoPromiseAsyncWork(const napi_env& env, AsyncContext *asyncCon
             }
             AsyncContext *context = (AsyncContext *)data;
             context->completeFunc(data);
-            if (context->isSuccess) {
+            if (context->errorCode == ERR_CODE_SUCCESS) {
                 napi_resolve_deferred(context->env, context->deferred, context->result);
             } else {
                 napi_reject_deferred(context->env, context->deferred, context->result);

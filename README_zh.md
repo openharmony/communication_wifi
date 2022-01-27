@@ -157,14 +157,19 @@ import wf from '@ohos.wifi'; // 导入js接口类
     ```js
     // 调用WLAN扫描接口
     var isScanSuccess = wf.scan(); // true
-    
+
     // 延迟一定时间
-    
+
     // 获取扫描结果
-    wf.getScanInfos(result => {
-        var num = Object.keys(result).length;
-        console.info("wifi scan result mum: " + num);
-        for (var i = 0; i < num; ++i) {
+    wf.getScanInfos((err, result) => {
+        if (err) {
+            console.error("get scan info error");
+            return;
+        }
+
+        var len = Object.keys(result).length;
+        console.log("get scan info number: " + len);
+        for (var i = 0; i < len; ++i) {
             console.info("ssid: " + result[i].ssid);
             console.info("bssid: " + result[i].bssid);
             console.info("securityType: " + result[i].securityType);
@@ -173,7 +178,7 @@ import wf from '@ohos.wifi'; // 导入js接口类
             console.info("frequency: " + result[i].frequency);
             console.info("timestamp: " + result[i].timestamp);
         }
-    })
+    });
     ```
 
 
@@ -190,14 +195,18 @@ import wf from '@ohos.wifi'; // 导入js接口类
         "isHiddenSsid":false,
         "securityType":3,
     }
-    方式一：
+    方式一:
     // 添加配置
-    wf.addDeviceConfig(config, (result) => {
+    wf.addDeviceConfig(config, (err, result) => {
+        if (err) {
+            console.error("add device config error");
+            return;
+        }
         console.info("config id: " + result);
         // 通过配置id连接WLAN
         wf.connectToNetwork(result);
     });
-    方式二：
+    方式二:
     // 通过配置信息直接连接WLAN
     wf.connectToDevice(config);
     ```

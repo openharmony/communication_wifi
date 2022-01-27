@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -25,7 +25,7 @@ std::unique_ptr<WifiP2p> wifiP2pPtr = WifiP2p::GetInstance(WIFI_P2P_ABILITY_ID);
 napi_value EnableP2p(napi_env env, napi_callback_info info)
 {
     TRACE_FUNC_CALL;
-    NAPI_ASSERT(env, wifiP2pPtr != nullptr, "[NAPI] Wifi p2p instance is null.");
+    NAPI_ASSERT(env, wifiP2pPtr != nullptr, "Wifi p2p instance is null.");
 
     ErrCode ret = wifiP2pPtr->EnableP2p();
     napi_value result;
@@ -36,7 +36,7 @@ napi_value EnableP2p(napi_env env, napi_callback_info info)
 napi_value DisableP2p(napi_env env, napi_callback_info info)
 {
     TRACE_FUNC_CALL;
-    NAPI_ASSERT(env, wifiP2pPtr != nullptr, "[NAPI] Wifi p2p instance is null.");
+    NAPI_ASSERT(env, wifiP2pPtr != nullptr, "Wifi p2p instance is null.");
 
     ErrCode ret = wifiP2pPtr->DisableP2p();
     napi_value result;
@@ -64,7 +64,7 @@ static void WfdInfoToJs(const napi_env& env, const WifiP2pWfdInfo& wfdInfo, napi
     SetValueInt32(env, "maxThroughput", wfdInfo.GetMaxThroughput(), result);
 }
 
-static bool DeviceInfosToJs(const napi_env& env,
+static ErrCode DeviceInfosToJs(const napi_env& env,
     const std::vector<WifiP2pDevice>& vecDevices, napi_value& arrayResult)
 {
     uint32_t idx = 0;
@@ -80,13 +80,13 @@ static bool DeviceInfosToJs(const napi_env& env,
         napi_status status = napi_set_element(env, arrayResult, idx++, eachObj);
         if (status != napi_ok) {
             WIFI_LOGE("wifi napi set element error: %{public}d, idx: %{public}d", status, idx - 1);
-            return false;
+            return WIFI_OPT_FAILED;
         }
     }
-    return true;
+    return WIFI_OPT_SUCCESS;
 }
 
-static bool GroupInfosToJs(const napi_env& env, WifiP2pGroupInfo& groupInfo, napi_value& result)
+static ErrCode GroupInfosToJs(const napi_env& env, WifiP2pGroupInfo& groupInfo, napi_value& result)
 {
     SetValueBool(env, "isP2pGroupOwner", groupInfo.IsGroupOwner(), result);
     SetValueUtf8String(env, "passphrase", groupInfo.GetPassphrase().c_str(), result);
@@ -105,22 +105,22 @@ static bool GroupInfosToJs(const napi_env& env, WifiP2pGroupInfo& groupInfo, nap
     napi_status status = napi_set_named_property(env, result, "owner", owner);
     if (status != napi_ok) {
         WIFI_LOGE("napi_set_named_property owner fail");
-        return false;
+        return WIFI_OPT_FAILED;
     }
     if (!groupInfo.IsClientDevicesEmpty()) {
         const std::vector<OHOS::Wifi::WifiP2pDevice>& vecDevices = groupInfo.GetClientDevices();
         napi_value devices;
         napi_create_array_with_length(env, vecDevices.size(), &devices);
-        if (!DeviceInfosToJs(env, vecDevices, devices)) {
-            return false;
+        if (DeviceInfosToJs(env, vecDevices, devices) != WIFI_OPT_SUCCESS) {
+            return WIFI_OPT_FAILED;
         }
         status = napi_set_named_property(env, result, "clientDevices", devices);
         if (status != napi_ok) {
             WIFI_LOGE("napi_set_named_property clientDevices fail");
-            return false;
+            return WIFI_OPT_FAILED;
         }
     }
-    return true;
+    return WIFI_OPT_SUCCESS;
 }
 
 napi_value GetCurrentGroup(napi_env env, napi_callback_info info)
@@ -139,13 +139,13 @@ napi_value GetCurrentGroup(napi_env env, napi_callback_info info)
     asyncContext->executeFunc = [&](void* data) -> void {
         P2pGroupInfoAsyncContext *context = static_cast<P2pGroupInfoAsyncContext *>(data);
         TRACE_FUNC_CALL_NAME("wifiP2pPtr->GetCurrentGroup");
-        context->isSuccess = (wifiP2pPtr->GetCurrentGroup(context->groupInfo) == WIFI_OPT_SUCCESS);
+        context->errorCode = wifiP2pPtr->GetCurrentGroup(context->groupInfo);
     };
 
     asyncContext->completeFunc = [&](void* data) -> void {
         P2pGroupInfoAsyncContext *context = static_cast<P2pGroupInfoAsyncContext *>(data);
         napi_create_object(context->env, &context->result);
-        context->isSuccess = GroupInfosToJs(context->env, context->groupInfo, context->result);
+        context->errorCode = GroupInfosToJs(context->env, context->groupInfo, context->result);
         WIFI_LOGI("Push get current group result to client");
     };
 
@@ -168,7 +168,7 @@ napi_value StartP2pListen(napi_env env, napi_callback_info info)
     NAPI_ASSERT(env, valueType == napi_number, "Wrong argument 1 type. napi_number expected.");
     NAPI_ASSERT(env, value2Type == napi_object, "Wrong argument 2 type. napi_number expected.");
 
-    NAPI_ASSERT(env, wifiP2pPtr != nullptr, "[NAPI] Wifi p2p instance is null.");
+    NAPI_ASSERT(env, wifiP2pPtr != nullptr, "Wifi p2p instance is null.");
     int period;
     int interval;
     napi_get_value_int32(env, argv[0], &period);
@@ -182,7 +182,7 @@ napi_value StartP2pListen(napi_env env, napi_callback_info info)
 napi_value StopP2pListen(napi_env env, napi_callback_info info)
 {
     TRACE_FUNC_CALL;
-    NAPI_ASSERT(env, wifiP2pPtr != nullptr, "[NAPI] Wifi p2p instance is null.");
+    NAPI_ASSERT(env, wifiP2pPtr != nullptr, "Wifi p2p instance is null.");
 
     ErrCode ret = wifiP2pPtr->StopP2pListen();
     napi_value result;
@@ -202,7 +202,7 @@ napi_value DeletePersistentGroup(napi_env env, napi_callback_info info)
     napi_typeof(env, argv[0], &valueType);
     NAPI_ASSERT(env, valueType == napi_number, "Wrong argument type. napi_number expected.");
 
-    NAPI_ASSERT(env, wifiP2pPtr != nullptr, "[NAPI] Wifi p2p instance is null.");
+    NAPI_ASSERT(env, wifiP2pPtr != nullptr, "Wifi p2p instance is null.");
     WifiP2pGroupInfo groupInfo;
     int netId = -999;
     napi_get_value_int32(env, argv[0], &netId);
@@ -216,7 +216,7 @@ napi_value DeletePersistentGroup(napi_env env, napi_callback_info info)
 napi_value StartDiscoverDevices(napi_env env, napi_callback_info info)
 {
     TRACE_FUNC_CALL;
-    NAPI_ASSERT(env, wifiP2pPtr != nullptr, "[NAPI] Wifi p2p instance is null.");
+    NAPI_ASSERT(env, wifiP2pPtr != nullptr, "Wifi p2p instance is null.");
 
     ErrCode ret = wifiP2pPtr->DiscoverDevices();
     napi_value result;
@@ -227,7 +227,7 @@ napi_value StartDiscoverDevices(napi_env env, napi_callback_info info)
 napi_value StopDiscoverDevices(napi_env env, napi_callback_info info)
 {
     TRACE_FUNC_CALL;
-    NAPI_ASSERT(env, wifiP2pPtr != nullptr, "[NAPI] Wifi p2p instance is null.");
+    NAPI_ASSERT(env, wifiP2pPtr != nullptr, "Wifi p2p instance is null.");
 
     ErrCode ret = wifiP2pPtr->StopDiscoverDevices();
     napi_value result;
@@ -250,14 +250,14 @@ napi_value GetP2pDevices(napi_env env, napi_callback_info info)
 
     asyncContext->executeFunc = [&](void* data) -> void {
         QueryP2pDeviceAsyncContext *context = static_cast<QueryP2pDeviceAsyncContext *>(data);
-        context->isSuccess = (wifiP2pPtr->QueryP2pDevices(context->vecP2pDevices) == WIFI_OPT_SUCCESS);
+        context->errorCode = wifiP2pPtr->QueryP2pDevices(context->vecP2pDevices);
         WIFI_LOGI("GetP2pDeviceList, size: %{public}zu", context->vecP2pDevices.size());
     };
 
     asyncContext->completeFunc = [&](void* data) -> void {
         QueryP2pDeviceAsyncContext *context = static_cast<QueryP2pDeviceAsyncContext *>(data);
         napi_create_array_with_length(context->env, context->vecP2pDevices.size(), &context->result);
-        context->isSuccess = DeviceInfosToJs(context->env, context->vecP2pDevices, context->result);
+        context->errorCode = DeviceInfosToJs(context->env, context->vecP2pDevices, context->result);
         WIFI_LOGI("Push P2p Device List to client");
     };
 
@@ -323,7 +323,7 @@ napi_value P2pConnect(napi_env env, napi_callback_info info)
     napi_typeof(env, argv[0], &valueType);
     NAPI_ASSERT(env, valueType == napi_object, "Wrong argument type. Object expected.");
 
-    NAPI_ASSERT(env, wifiP2pPtr != nullptr, "[NAPI] Wifi p2p instance is null.");
+    NAPI_ASSERT(env, wifiP2pPtr != nullptr, "Wifi p2p instance is null.");
     WifiP2pConfig config;
     JsObjToP2pConfig(env, argv[0], config);
     ErrCode ret = wifiP2pPtr->P2pConnect(config);
@@ -338,7 +338,7 @@ napi_value P2pConnect(napi_env env, napi_callback_info info)
 napi_value P2pDisConnect(napi_env env, napi_callback_info info)
 {
     TRACE_FUNC_CALL;
-    NAPI_ASSERT(env, wifiP2pPtr != nullptr, "[NAPI] Wifi p2p instance is null.");
+    NAPI_ASSERT(env, wifiP2pPtr != nullptr, "Wifi p2p instance is null.");
 
     ErrCode ret = wifiP2pPtr->P2pDisConnect();
     napi_value result;
@@ -358,7 +358,7 @@ napi_value CreateGroup(napi_env env, napi_callback_info info)
     napi_typeof(env, argv[0], &valueType);
     NAPI_ASSERT(env, valueType == napi_object, "Wrong argument type. Object expected.");
 
-    NAPI_ASSERT(env, wifiP2pPtr != nullptr, "[NAPI] Wifi p2p instance is null.");
+    NAPI_ASSERT(env, wifiP2pPtr != nullptr, "Wifi p2p instance is null.");
     WifiP2pConfig config;
     JsObjToP2pConfig(env, argv[0], config);
 
@@ -371,7 +371,7 @@ napi_value CreateGroup(napi_env env, napi_callback_info info)
 napi_value RemoveGroup(napi_env env, napi_callback_info info)
 {
     TRACE_FUNC_CALL;
-    NAPI_ASSERT(env, wifiP2pPtr != nullptr, "[NAPI] Wifi p2p instance is null.");
+    NAPI_ASSERT(env, wifiP2pPtr != nullptr, "Wifi p2p instance is null.");
 
     ErrCode ret = wifiP2pPtr->RemoveGroup();
     napi_value result;
@@ -403,7 +403,7 @@ napi_value GetP2pLinkedInfo(napi_env env, napi_callback_info info)
     asyncContext->executeFunc = [&](void* data) -> void {
         P2pLinkedInfoAsyncContext *context = static_cast<P2pLinkedInfoAsyncContext *>(data);
         TRACE_FUNC_CALL_NAME("wifiP2pPtr->QueryP2pLinkedInfo");
-        context->isSuccess = (wifiP2pPtr->QueryP2pLinkedInfo(context->linkedInfo) == WIFI_OPT_SUCCESS);
+        context->errorCode = wifiP2pPtr->QueryP2pLinkedInfo(context->linkedInfo);
     };
 
     asyncContext->completeFunc = [&](void* data) -> void {

@@ -143,6 +143,8 @@ void IfConfig::SetNetDns(const std::string& ifName, const std::string& dns1, con
  */
 void IfConfig::FlushIpAddr(const std::string& ifName, const int& ipType)
 {
+    LOGI("Flush IP, ifName: %{public}s", ifName.c_str());
+
     if (ipType != static_cast<int>(IpType::IPTYPE_IPV4)) {
         return;
     }

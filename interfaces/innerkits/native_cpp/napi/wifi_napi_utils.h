@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -40,6 +40,8 @@ private:
 #define TRACE_FUNC_CALL TraceFuncCall func(__func__)
 #define TRACE_FUNC_CALL_NAME(name) TraceFuncCall funcName(name)
 
+constexpr int ERR_CODE_SUCCESS = 0;
+
 class AsyncContext {
 public:
     napi_env env;
@@ -50,7 +52,7 @@ public:
     std::function<void(void*)> completeFunc;
     napi_value resourceName;
     napi_value result;
-    bool isSuccess;
+    int errorCode;
 
     AsyncContext(napi_env e, napi_async_work w = nullptr, napi_deferred d = nullptr)
     {
@@ -60,7 +62,7 @@ public:
         executeFunc = nullptr;
         completeFunc = nullptr;
         result = nullptr;
-        isSuccess = false;
+        errorCode = ERR_CODE_SUCCESS;
     }
 
     AsyncContext() = delete;

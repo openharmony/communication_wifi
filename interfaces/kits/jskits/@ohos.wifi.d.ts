@@ -393,12 +393,12 @@ declare namespace wifi {
     function p2pConnect(config: WifiP2PConfig): boolean;
 
     /**
-     * Disconnects a P2P connection.
+     * Canceling a P2P connection.
      *
      * @return Returns {@code true} if the scanning is successful; returns {@code false} otherwise.
      * @since 8
      */
-    function p2pDisconnect(): boolean;
+    function p2pCancelConnect(): boolean;
 
     /**
      * Discovers Wi-Fi P2P devices.
@@ -415,26 +415,6 @@ declare namespace wifi {
      * @since 8
      */
     function stopDiscoveryDevices(): boolean;
-
-    /**
-     * Enables P2P listening.
-     *
-     * <p>After P2P listening is enabled, your application can listen for and respond to requests from other devices.
-     *
-     * @return Returns {@code true} if the scanning is successful; returns {@code false} otherwise.
-     * @since 8
-     */
-    function startListen(): boolean;
-
-    /**
-     * Disables P2P listening.
-     *
-     * <p>After P2P listening is disabled, your application cannot listen for requests from other devices.
-     *
-     * @return Returns {@code true} if the scanning is successful; returns {@code false} otherwise.
-     * @since 8
-     */
-    function stopListen(): boolean;
 
     /**
      * Deletes the persistent P2P group with the specified network ID.
@@ -950,7 +930,7 @@ declare namespace wifi {
         deviceAddress: string;
 
         /** Primary device type */
-        primaryDeviceType: number;
+        primaryDeviceType: string;
 
         /** Device status */
         devStatus: P2pDeviceStatus;

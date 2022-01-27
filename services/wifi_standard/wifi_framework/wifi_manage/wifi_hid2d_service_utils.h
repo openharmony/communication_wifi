@@ -28,6 +28,7 @@ public:
     static bool InitIpPool(const std::string& serverIp);
     static std::string GetIp(const std::string& gcMac);
     static void ReleaseIp(const std::string& gcMac);
+    static void ReleaseIpPool();
 
 private:
     static bool IsValidIp(const std::string& ip);

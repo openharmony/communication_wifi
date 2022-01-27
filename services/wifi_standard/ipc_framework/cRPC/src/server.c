@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -199,7 +199,7 @@ int RunRpcLoop(RpcServer *server)
     EventLoop *loop = server->loop;
     while (!loop->stop) {
         BeforeLoop(server);
-        int retval = epoll_wait(loop->epfd, loop->epEvents, loop->setSize, 1); /* wait 1ms */
+        int retval = epoll_wait(loop->epfd, loop->epEvents, loop->setSize, -1);
         for (int i = 0; i < retval; ++i) {
             struct epoll_event *e = loop->epEvents + i;
             int fd = e->data.fd;

@@ -16,7 +16,7 @@
 #define OHOS_WIFI_P2P_H
 
 #include "wifi_errcode.h"
-#include "wifi_p2p_msg.h"
+#include "wifi_msg.h"
 #include "i_wifi_p2p_callback.h"
 
 namespace OHOS {

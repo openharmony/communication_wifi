@@ -18,6 +18,7 @@ import("//foundation/appexecfwk/standard/appexecfwk.gni")
 
 SUBSYSTEM_DIR = "//foundation/communication"
 module_output_path = "wifi_standard/dhcp_manage_test"
+even_path = "//base/notification/ces_standard"
 
 config("module_private_config") {
   visibility = [ ":*" ]

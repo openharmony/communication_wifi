@@ -22,6 +22,7 @@
 #include "napi/native_api.h"
 #include "wifi_errcode.h"
 #include <shared_mutex>
+#include "wifi_p2p.h"
 #include "wifi_hotspot.h"
 
 namespace OHOS {

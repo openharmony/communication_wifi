@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,8 +16,8 @@
 #ifndef OHOS_WIFI_SCAN_H
 #define OHOS_WIFI_SCAN_H
 
-#include "wifi_msg.h"
 #include "wifi_errcode.h"
+#include "wifi_scan_msg.h"
 #include "i_wifi_scan_callback.h"
 
 namespace OHOS {

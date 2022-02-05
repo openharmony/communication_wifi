@@ -17,17 +17,13 @@ group("etc") {
   deps = [
     ":hostapd.conf",
     ":p2p_supplicant.conf",
-    ":wifi_hal_service.rc",
+    ":wifi_hal_service.cfg",
     ":wpa_supplicant.conf",
   ]
 }
 
-ohos_prebuilt_etc("wifi_hal_service.rc") {
-  if (use_musl) {
-    source = "wifi_hal_service.cfg"
-  } else {
-    source = "wifi_hal_service.rc"
-  }
+ohos_prebuilt_etc("wifi_hal_service.cfg") {
+  source = "wifi_hal_service.cfg"
   relative_install_dir = "init"
   part_name = "wifi_standard"
   subsystem_name = "communication"

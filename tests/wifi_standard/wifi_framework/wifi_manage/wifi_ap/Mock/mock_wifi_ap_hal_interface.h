@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -15,7 +15,7 @@
 
 #ifndef OHOS_MOCK_WIFI_AP_HAL_INTERFACE_H
 #define OHOS_MOCK_WIFI_AP_HAL_INTERFACE_H
-#include "wifi_msg.h"
+
 #include <gmock/gmock.h>
 #include <map>
 #include <string>
@@ -23,7 +23,7 @@
 
 #include "i_wifi_struct.h"
 #include "wifi_error_no.h"
-#include "wifi_msg.h"
+#include "wifi_ap_msg.h"
 #include <map>
 #include <string>
 #include <vector>

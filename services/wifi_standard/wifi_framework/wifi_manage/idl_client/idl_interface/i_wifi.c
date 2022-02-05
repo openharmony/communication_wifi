@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -272,6 +272,7 @@ static void IdlCbkWpaEventDeal(Context *context, int event)
 
 static int IdlDealStaApEvent(Context *context, int event)
 {
+    LOGI("OnTransact deal sta/ap event: %{public}d", event);
     switch (event) {
         case WIFI_IDL_CBK_CMD_FAILURE:
         case WIFI_IDL_CBK_CMD_STARTED:
@@ -749,6 +750,7 @@ static int IdlDealP2pEventSecond(Context *context, int event)
 
 static int IdlDealP2pEvent(Context *context, int event)
 {
+    LOGI("OnTransact deal p2p event: %{public}d", event);
     if (IdlDealP2pEventFirst(context, event) == 0 || IdlDealP2pEventSecond(context, event) == 0) {
         return 0;
     }
@@ -759,6 +761,7 @@ int OnTransact(Context *context)
 {
     int event = 0;
     if (ReadInt(context, &event) < 0) {
+        LOGE("OnTransact read event failed!");
         return -1;
     }
     if (IdlDealStaApEvent(context, event) < 0 && IdlDealP2pEvent(context, event) < 0) {

@@ -19,7 +19,7 @@
 #include <map>
 #include <string>
 #include <vector>
-#include "wifi_msg.h"
+#include "wifi_p2p_msg.h"
 #include "wifi_error_no.h"
 #include "wifi_idl_struct.h"
 #include "wifi_p2p_event_callback.h"

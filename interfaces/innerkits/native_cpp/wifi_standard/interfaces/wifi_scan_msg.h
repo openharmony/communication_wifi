@@ -92,8 +92,8 @@ struct WifiInfoElem {
 };
 
 enum class ScanHandleNotify {
-    SCAN_OK = 0,
-    SCAN_FAIL,
+    SCAN_FAIL = 0,
+    SCAN_OK = 1,
 };
 
 struct WifiScanParams {

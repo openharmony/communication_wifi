@@ -297,7 +297,7 @@ static void JsObjToP2pConfig(const napi_env& env, const napi_value& object, Wifi
     int groupOwnerIntent = -1;
     std::string groupName = "";
     int band = static_cast<int>(GroupOwnerBand::GO_BAND_AUTO);
-    JsObjectToString(env, object, "macAddress", WIFI_MAC_LENGTH + 1, address);
+    JsObjectToString(env, object, "macAddress", WIFI_STR_MAC_LENGTH + 1, address);
     JsObjectToInt(env, object, "goBand", band);
     JsObjectToInt(env, object, "netId", netId);
     JsObjectToString(env, object, "passphrase", MAX_PASSPHRASE_LENGTH + 1, passphrase);

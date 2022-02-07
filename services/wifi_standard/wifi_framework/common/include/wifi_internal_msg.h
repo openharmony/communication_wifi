@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,7 +17,9 @@
 #define OHOS_WIFI_INTERNAL_MSG_H
 
 #include "wifi_msg.h"
+#include "wifi_scan_msg.h"
 #include "wifi_p2p_msg.h"
+#include "wifi_ap_msg.h"
 
 namespace OHOS {
 namespace Wifi {

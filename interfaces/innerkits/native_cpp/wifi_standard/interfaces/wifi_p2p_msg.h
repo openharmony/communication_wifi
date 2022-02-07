@@ -12,6 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #ifndef OHOS_WIFI_P2P_MSG_H
 #define OHOS_WIFI_P2P_MSG_H
 
@@ -22,6 +23,10 @@
 
 namespace OHOS {
 namespace Wifi {
+constexpr int WIFI_STR_MAC_LENGTH = 17;
+constexpr int MAX_PASSPHRASE_LENGTH = 63;
+constexpr int DEVICE_NAME_LENGTH = 32;
+
 enum class P2pGroupStatus { GS_CREATING, GS_CREATED, GS_STARTED, GS_REMOVING, GS_INVALID };
 enum class P2pServiceStatus : unsigned char {
     PSRS_SUCCESS,
@@ -289,8 +294,10 @@ private:
     std::string bssid; /* the length is 17 characters. */
     std::string pin; /* the length is 4 or 8 characters. */
 };
-const int MAX_GROUP_OWNER_INTENT = 15;
+
+const int AUTO_GROUP_OWNER_VALUE = -1;
 const int MIN_GROUP_OWNER_INTENT = 0;
+const int MAX_GROUP_OWNER_INTENT = 15;
 class WifiP2pConfig {
 public:
     WifiP2pConfig()
@@ -298,7 +305,7 @@ public:
           goBand(GroupOwnerBand::GO_BAND_AUTO),
           netId(-1),
           passphrase(""),
-          groupOwnerIntent(-1),
+          groupOwnerIntent(AUTO_GROUP_OWNER_VALUE),
           groupName("")
     {}
     WifiP2pConfig(const WifiP2pConfig &config)

@@ -17,6 +17,7 @@
 #include "wifi_hotspot.h"
 #include "wifi_logger.h"
 #include <vector>
+#include <map>
 
 namespace OHOS {
 namespace Wifi {

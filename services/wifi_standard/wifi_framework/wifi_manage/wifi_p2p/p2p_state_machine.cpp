@@ -467,7 +467,8 @@ P2pConfigErrCode P2pStateMachine::IsConfigUnusable(const WifiP2pConfigInternal &
     if (!device.IsValid()) {
         return P2pConfigErrCode::MAC_NOT_FOUND;
     }
-    if (config.GetGroupOwnerIntent() < 0 || config.GetGroupOwnerIntent() > GROUP_OWNER_MAX_INTENT) {
+    if (config.GetGroupOwnerIntent() < AUTO_GROUP_OWNER_VALUE ||
+        config.GetGroupOwnerIntent() > GROUP_OWNER_MAX_INTENT) {
         return P2pConfigErrCode::ERR_INTENT;
     }
     if (config.GetGroupName().length() > NETWORK_NAME_MAX_LENGTH) {

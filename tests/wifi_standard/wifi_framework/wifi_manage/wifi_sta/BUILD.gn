@@ -1,4 +1,4 @@
-# Copyright (C) 2021 Huawei Device Co., Ltd.
+# Copyright (C) 2021-2022 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -38,14 +38,13 @@ ohos_unittest("wifi_sta_unittest") {
     "//foundation/communication/wifi/services/wifi_standard/wifi_framework/wifi_manage/common/state.cpp",
     "//foundation/communication/wifi/services/wifi_standard/wifi_framework/wifi_manage/common/state_machine.cpp",
     "//foundation/communication/wifi/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta/sta_auto_connect_service.cpp",
-
-    #"//foundation/communication/wifi/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta/sta_extern_device_appraisal.cpp",
     "//foundation/communication/wifi/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta/sta_interface.cpp",
     "//foundation/communication/wifi/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta/sta_monitor.cpp",
     "//foundation/communication/wifi/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta/sta_network_check.cpp",
     "//foundation/communication/wifi/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta/sta_saved_device_appraisal.cpp",
     "//foundation/communication/wifi/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta/sta_service.cpp",
     "//foundation/communication/wifi/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta/sta_state_machine.cpp",
+    "//foundation/communication/wifi/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta/wifi_net_agent.cpp",
     "Mock/mock_dhcp_service.cpp",
     "Mock/mock_if_config.cpp",
     "Mock/mock_mac_address.cpp",
@@ -117,7 +116,10 @@ ohos_unittest("wifi_sta_unittest") {
     "//third_party/googletest:gmock_main",
     "//utils/native/base:utils",
   ]
-  external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+  external_deps = [
+    "hiviewdfx_hilog_native:libhilog",
+    "netmanager_base:net_conn_manager_if",
+  ]
   part_name = "wifi_standard"
   subsystem_name = "communication"
 }

@@ -32,6 +32,7 @@ ohos_shared_library("wifi_sta_service") {
     "sta_saved_device_appraisal.cpp",
     "sta_service.cpp",
     "sta_state_machine.cpp",
+    "wifi_net_agent.cpp",
   ]
   include_dirs = [
     "//foundation/communication/wifi/services/wifi_standard/sdk/include",
@@ -59,6 +60,7 @@ ohos_shared_library("wifi_sta_service") {
     "//foundation/communication/wifi/services/wifi_standard/depends/include/system/libbase/include",
     "//foundation/communication/wifi/services/wifi_standard/wifi_framework/dhcp_manage/mgr_service/include",
     "//foundation/communication/wifi/services/wifi_standard/wifi_framework/dhcp_manage/mgr_service/interfaces",
+    "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
   ]
 
   cflags_cc = [
@@ -78,7 +80,10 @@ ohos_shared_library("wifi_sta_service") {
     "//utils/native/base:utils",
   ]
 
-  external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+  external_deps = [
+    "hiviewdfx_hilog_native:libhilog",
+    "netmanager_base:net_conn_manager_if",
+  ]
 
   part_name = "wifi_standard"
   subsystem_name = "communication"

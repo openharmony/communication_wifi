@@ -50,7 +50,8 @@
             "components": [
                 "ipc",
                 "ces_standard",
-                "hiviewdfx_hilog_native"
+                "hiviewdfx_hilog_native",
+                "netmanager_base"
             ],
             "third_party": [
                 "wpa_supplicant",

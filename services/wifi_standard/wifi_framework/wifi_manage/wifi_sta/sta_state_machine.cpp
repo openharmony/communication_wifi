@@ -130,6 +130,7 @@ ErrCode StaStateMachine::InitStaStateMachine()
         return WIFI_OPT_FAILED;
     }
     pNetcheck->InitNetCheckThread();
+    NetSupplierInfo = std::make_unique<NetManagerStandard::NetSupplierInfo>().release();
     return WIFI_OPT_SUCCESS;
 }
 
@@ -387,6 +388,8 @@ void StaStateMachine::StartWifiProcess()
         /* callback the InterfaceService that wifi is enabled successfully. */
         WifiSettings::GetInstance().SetWifiState(static_cast<int>(WifiState::ENABLED));
         staCallback.OnStaOpenRes(OperateResState::OPEN_WIFI_SUCCEED);
+        WifiNetAgent::GetInstance().RegisterNetSupplier();
+        WifiNetAgent::GetInstance().RegisterNetSupplierCallback(staCallback);
         /* Initialize Connection Information. */
         InitWifiLinkedInfo();
         InitLastWifiLinkedInfo();
@@ -498,6 +501,7 @@ bool StaStateMachine::WpaStartedState::ExecuteStateMsg(InternalMessage *msg)
 void StaStateMachine::StopWifiProcess()
 {
     WIFI_LOGD("Enter StaStateMachine::StopWifiProcess.\n");
+    WifiNetAgent::GetInstance().UnregisterNetSupplier();
     WifiSettings::GetInstance().SetWifiState(static_cast<int>(WifiState::DISABLING));
     staCallback.OnStaCloseRes(OperateResState::CLOSE_WIFI_CLOSING);
     StopTimer(static_cast<int>(CMD_SIGNAL_POLL));
@@ -662,6 +666,13 @@ void StaStateMachine::DealSignalPollResult(InternalMessage *msg)
             if (staCallback.OnStaRssiLevelChanged != nullptr) {
                 staCallback.OnStaRssiLevelChanged(linkedInfo.rssi);
             }
+            if (NetSupplierInfo != nullptr) {
+                NetSupplierInfo->isAvailable_ = true;
+                NetSupplierInfo->isRoaming_ = isRoam;
+                NetSupplierInfo->strength_ = linkedInfo.rssi;
+                NetSupplierInfo->frequency_ = linkedInfo.frequency;
+                WifiNetAgent::GetInstance().UpdateNetSupplierInfo(NetSupplierInfo);
+            }
             lastSignalLevel = currentSignalLevel;
         }
     } else {
@@ -778,6 +789,12 @@ void StaStateMachine::DealConnectionEvent(InternalMessage *msg)
     if (wpsState != SetupMethod::INVALID) {
         SyncAllDeviceConfigs();
         wpsState = SetupMethod::INVALID;
+    }
+
+    if (NetSupplierInfo != nullptr) {
+        NetSupplierInfo->isAvailable_ = true;
+        NetSupplierInfo->isRoaming_ = isRoam;
+        WifiNetAgent::GetInstance().UpdateNetSupplierInfo(NetSupplierInfo);
     }
 
     /* Callback result to InterfaceService. */
@@ -1383,6 +1400,10 @@ void StaStateMachine::DisConnectProcess()
     staCallback.OnStaConnChanged(OperateResState::DISCONNECT_DISCONNECTING, linkedInfo);
     if (WifiStaHalInterface::GetInstance().Disconnect() == WIFI_IDL_OPT_OK) {
         WIFI_LOGI("Disconnect() succeed!");
+        if (NetSupplierInfo != nullptr) {
+            NetSupplierInfo->isAvailable_ = false;
+            WifiNetAgent::GetInstance().UpdateNetSupplierInfo(NetSupplierInfo);
+        }
         /* Save connection information to WifiSettings. */
         SaveLinkstate(ConnState::DISCONNECTED, DetailedState::DISCONNECTED);
         DisableNetwork(linkedInfo.networkId);
@@ -1894,6 +1915,8 @@ void StaStateMachine::DhcpResultNotify::OnSuccess(int status, const std::string 
             pStaStateMachine->linkedInfo.isDataRestricted =
                 (result.strVendor.find("ANDROID_METERED") == std::string::npos) ? 0 : 1;
             WifiSettings::GetInstance().SaveLinkedInfo(pStaStateMachine->linkedInfo);
+            WifiNetAgent::GetInstance().UpdateNetLinkInfo(result.strYourCli, result.strSubnet, result.strRouter1,
+                result.strDns1, result.strDns2);
         }
 
         IfConfig::GetInstance().SetIfDnsAndRoute(result, result.iptype);

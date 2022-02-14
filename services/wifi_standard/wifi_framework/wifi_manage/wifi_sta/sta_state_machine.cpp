@@ -388,6 +388,13 @@ void StaStateMachine::StartWifiProcess()
         /* callback the InterfaceService that wifi is enabled successfully. */
         WifiSettings::GetInstance().SetWifiState(static_cast<int>(WifiState::ENABLED));
         staCallback.OnStaOpenRes(OperateResState::OPEN_WIFI_SUCCEED);
+        /* Sets the MAC address of WifiSettings. */
+        std::string mac;
+        if ((WifiStaHalInterface::GetInstance().GetStaDeviceMacAddress(mac)) == WIFI_IDL_OPT_OK) {
+            WifiSettings::GetInstance().SetMacAddress(mac);
+        } else {
+            WIFI_LOGI("GetStaDeviceMacAddress failed!");
+        }
         WifiNetAgent::GetInstance().RegisterNetSupplier();
         WifiNetAgent::GetInstance().RegisterNetSupplierCallback(staCallback);
         /* Initialize Connection Information. */

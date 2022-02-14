@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,13 +12,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include "wifi_scan_callback_stub.h"
+#include "define.h"
+#include "wifi_hisysevent.h"
 #include "wifi_logger.h"
 #include "wifi_msg.h"
-#include "define.h"
 
 DEFINE_WIFILOG_SCAN_LABEL("WifiScanCallbackStub");
-
 namespace OHOS {
 namespace Wifi {
 WifiScanCallbackStub::WifiScanCallbackStub() : userCallback_(nullptr), mRemoteDied(false)
@@ -80,6 +81,7 @@ void WifiScanCallbackStub::OnWifiScanStateChanged(int state)
     if (userCallback_) {
         userCallback_->OnWifiScanStateChanged(state);
     }
+    WriteWifiEventReceivedHiSysEvent(HISYS_STA_SCAN_STATE_CHANGE, state);
 }
 
 int WifiScanCallbackStub::RemoteOnWifiScanStateChanged(uint32_t code, MessageParcel &data, MessageParcel &reply)

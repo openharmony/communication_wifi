@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,10 +13,11 @@
  * limitations under the License.
  */
 #include "wifi_device_callback_stub.h"
+#include "define.h"
+#include "wifi_hisysevent.h"
 #include "wifi_logger.h"
 #include "wifi_msg.h"
 #include "wifi_errcode.h"
-#include "define.h"
 
 DEFINE_WIFILOG_LABEL("WifiDeviceCallBackStub");
 namespace OHOS {
@@ -95,6 +96,7 @@ void WifiDeviceCallBackStub::OnWifiStateChanged(int state)
     if (callback_) {
         callback_->OnWifiStateChanged(state);
     }
+    WriteWifiEventReceivedHiSysEvent(HISYS_STA_POWER_STATE_CHANGE, state);
 }
 
 void WifiDeviceCallBackStub::OnWifiConnectionChanged(int state, const WifiLinkedInfo &info)
@@ -103,6 +105,7 @@ void WifiDeviceCallBackStub::OnWifiConnectionChanged(int state, const WifiLinked
     if (callback_) {
         callback_->OnWifiConnectionChanged(state, info);
     }
+    WriteWifiEventReceivedHiSysEvent(HISYS_STA_CONN_STATE_CHANGE, state);
 }
 
 void WifiDeviceCallBackStub::OnWifiRssiChanged(int rssi)
@@ -111,6 +114,7 @@ void WifiDeviceCallBackStub::OnWifiRssiChanged(int rssi)
     if (callback_) {
         callback_->OnWifiRssiChanged(rssi);
     }
+    WriteWifiEventReceivedHiSysEvent(HISYS_STA_RSSI_STATE_CHANGE, rssi);
 }
 
 void WifiDeviceCallBackStub::OnWifiWpsStateChanged(int state, const std::string &pinCode)

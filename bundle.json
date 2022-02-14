@@ -51,6 +51,7 @@
                 "ipc",
                 "ces_standard",
                 "hiviewdfx_hilog_native",
+                "hisysevent_native",
                 "netmanager_base"
             ],
             "third_party": [
@@ -129,6 +130,9 @@
                 "//foundation/communication/wifi/tests/wifi_standard/wifi_framework/wifi_manage/idl_client/unittest:unittest",
                 "//foundation/communication/wifi/tests/wifi_standard/wifi_hal/unittest:unittest"
             ]
-        }
+        },
+        "hisysevent_config": [
+            "//foundation/communication/wifi/hisysevent.yaml"
+        ]
     }
 }

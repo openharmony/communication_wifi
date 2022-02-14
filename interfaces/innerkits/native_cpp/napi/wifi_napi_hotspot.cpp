@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -38,6 +38,7 @@ napi_value EnableHotspot(napi_env env, napi_callback_info info)
     if (ret != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("Enable hotspot error: %{public}d", ret);
     }
+    WriteWifiStateHiSysEvent(HISYS_SERVICE_TYPE_AP, WifiOperType::ENABLE);
     napi_value result;
     napi_get_boolean(env, ret == WIFI_OPT_SUCCESS, &result);
     return result;
@@ -51,6 +52,7 @@ napi_value DisableHotspot(napi_env env, napi_callback_info info)
     if (ret != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("Disable hotspot error: %{public}d", ret);
     }
+    WriteWifiStateHiSysEvent(HISYS_SERVICE_TYPE_AP, WifiOperType::DISABLE);
     napi_value result;
     napi_get_boolean(env, ret == WIFI_OPT_SUCCESS, &result);
     return result;

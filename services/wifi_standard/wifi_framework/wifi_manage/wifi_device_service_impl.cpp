@@ -110,14 +110,13 @@ ErrCode WifiDeviceServiceImpl::EnableWifi()
     }
 
     if (!WifiConfigCenter::GetInstance().SetWifiMidState(curState, WifiOprMidState::OPENING)) {
-        WIFI_LOGI("set wifi mid state opening failed! may be other activity has been operated");
+        WIFI_LOGI("set wifi mid state opening failed!");
         return WIFI_OPT_OPEN_SUCC_WHEN_OPENED;
     }
 
     errCode = WIFI_OPT_FAILED;
     do {
         if (WifiServiceManager::GetInstance().CheckAndEnforceService(WIFI_SERVICE_STA) < 0) {
-            WIFI_LOGE("Load %{public}s service failed!", WIFI_SERVICE_STA);
             break;
         }
         IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst();
@@ -144,6 +143,12 @@ ErrCode WifiDeviceServiceImpl::EnableWifi()
         return errCode;
     }
     WifiSettings::GetInstance().SyncWifiConfig();
+
+    sptr<WifiP2pServiceImpl> p2pService = WifiP2pServiceImpl::GetInstance();
+    if (p2pService != nullptr && p2pService->EnableP2p() != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("Enable P2p failed, ret %{public}d!", static_cast<int>(errCode));
+        return WIFI_OPT_FAILED;
+    }
     return WIFI_OPT_SUCCESS;
 }
 
@@ -152,6 +157,11 @@ ErrCode WifiDeviceServiceImpl::DisableWifi()
     if (WifiPermissionUtils::VerifySetWifiInfoPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("DisableWifi:VerifySetWifiInfoPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
+    }
+
+    sptr<WifiP2pServiceImpl> p2pService = WifiP2pServiceImpl::GetInstance();
+    if (p2pService != nullptr && p2pService->DisableP2p() != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("Disable P2p failed!");
     }
 
     WifiOprMidState curState = WifiConfigCenter::GetInstance().GetWifiMidState();

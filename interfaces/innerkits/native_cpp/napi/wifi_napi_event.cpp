@@ -36,7 +36,7 @@ const std::string EVENT_P2P_CONN_STATE_CHANGE = "p2pConnectionChange";
 const std::string EVENT_P2P_DEVICE_STATE_CHANGE = "p2pDeviceChange";
 const std::string EVENT_P2P_PERSISTENT_GROUP_CHANGE = "p2pPersistentGroupChange";
 const std::string EVENT_P2P_PEER_DEVICE_CHANGE = "p2pPeerDeviceChange";
-const std::string EVENT_P2P_DISCOVERY_CHANGE = "p2pPeerDeviceChange";
+const std::string EVENT_P2P_DISCOVERY_CHANGE = "p2pDiscoveryChange";
 
 static std::set<std::string> g_supportEventList = {
     EVENT_STA_POWER_STATE_CHANGE,
@@ -180,6 +180,9 @@ public:
 
     void OnWifiConnectionChanged(int state, const WifiLinkedInfo &info) override {
         WIFI_LOGI("sta received connection changed event: %{public}d", state);
+        if (m_connectStateConvertMap.find(state) == m_connectStateConvertMap.end()) {
+            return;
+        }
         CheckAndNotify(EVENT_STA_CONN_STATE_CHANGE, state);
     }
 
@@ -197,6 +200,17 @@ public:
     OHOS::sptr<OHOS::IRemoteObject> AsObject() override {
         return nullptr;
     }
+
+private:
+    enum class JsLayerConnectStatus {
+        DISCONNECTED = 0,
+        CONNECTED = 1,
+    };
+
+    std::map<int, int> m_connectStateConvertMap = {
+        { static_cast<int>(ConnState::CONNECTED), static_cast<int>(JsLayerConnectStatus::CONNECTED) },
+        { static_cast<int>(ConnState::DISCONNECTED), static_cast<int>(JsLayerConnectStatus::DISCONNECTED) },
+    };
 };
 
 class WifiNapiScanEventCallback : public IWifiScanCallback, public NapiEvent {

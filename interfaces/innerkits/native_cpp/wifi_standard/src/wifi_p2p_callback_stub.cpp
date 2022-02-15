@@ -15,12 +15,12 @@
 
 #include "wifi_p2p_callback_stub.h"
 #include "define.h"
-#include "wifi_p2p_msg.h"
 #include "wifi_errcode.h"
+#include "wifi_hisysevent.h"
 #include "wifi_logger.h"
+#include "wifi_p2p_msg.h"
 
 DEFINE_WIFILOG_P2P_LABEL("WifiP2pCallbackStub");
-
 namespace OHOS {
 namespace Wifi {
 WifiP2pCallbackStub::WifiP2pCallbackStub() : userCallback_(nullptr), mRemoteDied(false)
@@ -93,7 +93,7 @@ void WifiP2pCallbackStub::OnP2pStateChanged(int state)
     if (userCallback_) {
         userCallback_->OnP2pStateChanged(state);
     }
-    return;
+    WriteWifiEventReceivedHiSysEvent(HISYS_P2P_STATE_CHANGE, state);
 }
 
 void WifiP2pCallbackStub::OnP2pPersistentGroupsChanged(void)
@@ -102,7 +102,7 @@ void WifiP2pCallbackStub::OnP2pPersistentGroupsChanged(void)
     if (userCallback_) {
         userCallback_->OnP2pPersistentGroupsChanged();
     }
-    return;
+    WriteWifiEventReceivedHiSysEvent(HISYS_P2P_PERSISTENT_GROUP_CHANGE, HISYS_EVENT_DEFAULT_VALUE);
 }
 
 void WifiP2pCallbackStub::OnP2pThisDeviceChanged(const WifiP2pDevice &device)
@@ -111,7 +111,7 @@ void WifiP2pCallbackStub::OnP2pThisDeviceChanged(const WifiP2pDevice &device)
     if (userCallback_) {
         userCallback_->OnP2pThisDeviceChanged(device);
     }
-    return;
+    WriteWifiEventReceivedHiSysEvent(HISYS_P2P_DEVICE_STATE_CHANGE, HISYS_EVENT_DEFAULT_VALUE);
 }
 
 void WifiP2pCallbackStub::OnP2pPeersChanged(const std::vector<WifiP2pDevice> &device)
@@ -120,7 +120,7 @@ void WifiP2pCallbackStub::OnP2pPeersChanged(const std::vector<WifiP2pDevice> &de
     if (userCallback_) {
         userCallback_->OnP2pPeersChanged(device);
     }
-    return;
+    WriteWifiEventReceivedHiSysEvent(HISYS_P2P_PEER_DEVICE_CHANGE, HISYS_EVENT_DEFAULT_VALUE);
 }
 
 void WifiP2pCallbackStub::OnP2pServicesChanged(const std::vector<WifiP2pServiceInfo> &srvInfo)
@@ -129,7 +129,6 @@ void WifiP2pCallbackStub::OnP2pServicesChanged(const std::vector<WifiP2pServiceI
     if (userCallback_) {
         userCallback_->OnP2pServicesChanged(srvInfo);
     }
-    return;
 }
 
 void WifiP2pCallbackStub::OnP2pConnectionChanged(const WifiP2pLinkedInfo &info)
@@ -138,7 +137,7 @@ void WifiP2pCallbackStub::OnP2pConnectionChanged(const WifiP2pLinkedInfo &info)
     if (userCallback_) {
         userCallback_->OnP2pConnectionChanged(info);
     }
-    return;
+    WriteWifiEventReceivedHiSysEvent(HISYS_P2P_CONN_STATE_CHANGE, static_cast<int>(info.GetConnectState()));
 }
 
 void WifiP2pCallbackStub::OnP2pDiscoveryChanged(bool isChange)
@@ -147,7 +146,7 @@ void WifiP2pCallbackStub::OnP2pDiscoveryChanged(bool isChange)
     if (userCallback_) {
         userCallback_->OnP2pDiscoveryChanged(isChange);
     }
-    return;
+    WriteWifiEventReceivedHiSysEvent(HISYS_P2P_DISCOVERY_CHANGE, isChange);
 }
 
 void WifiP2pCallbackStub::OnP2pActionResult(P2pActionCallback action, ErrCode code)
@@ -156,7 +155,6 @@ void WifiP2pCallbackStub::OnP2pActionResult(P2pActionCallback action, ErrCode co
     if (userCallback_) {
         userCallback_->OnP2pActionResult(action, code);
     }
-    return;
 }
 
 void WifiP2pCallbackStub::RemoteOnP2pStateChanged(uint32_t code, MessageParcel &data, MessageParcel &reply)
@@ -165,7 +163,6 @@ void WifiP2pCallbackStub::RemoteOnP2pStateChanged(uint32_t code, MessageParcel &
     int state = data.ReadInt32();
     OnP2pStateChanged(state);
     reply.WriteInt32(0);
-    return;
 }
 
 void WifiP2pCallbackStub::RemoteOnP2pPersistentGroupsChanged(uint32_t code, MessageParcel &data, MessageParcel &reply)
@@ -173,7 +170,6 @@ void WifiP2pCallbackStub::RemoteOnP2pPersistentGroupsChanged(uint32_t code, Mess
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
     OnP2pPersistentGroupsChanged();
     reply.WriteInt32(0);
-    return;
 }
 
 void WifiP2pCallbackStub::ReadWifiP2pDeviceData(MessageParcel &data, WifiP2pDevice &device)
@@ -192,7 +188,6 @@ void WifiP2pCallbackStub::ReadWifiP2pDeviceData(MessageParcel &data, WifiP2pDevi
     device.SetWpsConfigMethod(data.ReadInt32());
     device.SetDeviceCapabilitys(data.ReadInt32());
     device.SetGroupCapabilitys(data.ReadInt32());
-    return;
 }
 
 void WifiP2pCallbackStub::RemoteOnP2pThisDeviceChanged(uint32_t code, MessageParcel &data, MessageParcel &reply)
@@ -202,7 +197,6 @@ void WifiP2pCallbackStub::RemoteOnP2pThisDeviceChanged(uint32_t code, MessagePar
     ReadWifiP2pDeviceData(data, config);
     OnP2pThisDeviceChanged(config);
     reply.WriteInt32(0);
-    return;
 }
 
 void WifiP2pCallbackStub::RemoteOnP2pPeersChanged(uint32_t code, MessageParcel &data, MessageParcel &reply)
@@ -217,7 +211,6 @@ void WifiP2pCallbackStub::RemoteOnP2pPeersChanged(uint32_t code, MessageParcel &
     }
     OnP2pPeersChanged(device);
     reply.WriteInt32(0);
-    return;
 }
 
 void WifiP2pCallbackStub::RemoteOnP2pServicesChanged(uint32_t code, MessageParcel &data, MessageParcel &reply)
@@ -240,7 +233,6 @@ void WifiP2pCallbackStub::RemoteOnP2pServicesChanged(uint32_t code, MessageParce
     }
     OnP2pServicesChanged(srvInfo);
     reply.WriteInt32(0);
-    return;
 }
 
 void WifiP2pCallbackStub::RemoteOnP2pConnectionChanged(uint32_t code, MessageParcel &data, MessageParcel &reply)
@@ -252,7 +244,6 @@ void WifiP2pCallbackStub::RemoteOnP2pConnectionChanged(uint32_t code, MessagePar
     info.SetIsGroupOwnerAddress(data.ReadCString());
     OnP2pConnectionChanged(info);
     reply.WriteInt32(0);
-    return;
 }
 
 void WifiP2pCallbackStub::RemoteOnP2pDiscoveryChanged(uint32_t code, MessageParcel &data, MessageParcel &reply)
@@ -261,7 +252,6 @@ void WifiP2pCallbackStub::RemoteOnP2pDiscoveryChanged(uint32_t code, MessageParc
     bool isChange = data.ReadBool();
     OnP2pDiscoveryChanged(isChange);
     reply.WriteInt32(0);
-    return;
 }
 
 void WifiP2pCallbackStub::RemoteOnP2pActionResult(uint32_t code, MessageParcel &data, MessageParcel &reply)
@@ -271,7 +261,6 @@ void WifiP2pCallbackStub::RemoteOnP2pActionResult(uint32_t code, MessageParcel &
     ErrCode errCode = static_cast<ErrCode>(data.ReadInt32());
     OnP2pActionResult(action, errCode);
     reply.WriteInt32(0);
-    return;
 }
 }  // namespace Wifi
 }  // namespace OHOS

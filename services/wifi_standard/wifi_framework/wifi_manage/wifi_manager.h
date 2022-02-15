@@ -156,8 +156,9 @@ private:
     static void DealP2pDiscoveryChanged(bool bState);
     static void DealP2pGroupsChanged(void);
     static void DealP2pActionResult(P2pActionCallback action, ErrCode code);
-    static void AutoStartStaService();
-    static void AutoStartScanService();
+    static void AutoStartStaService(void);
+    static void AutoStartP2pService(void);
+    static void AutoStartScanService(void);
 
 private:
     std::thread mCloseServiceThread;

@@ -16,6 +16,7 @@
 #include "wifi_napi_utils.h"
 #include "securec.h"
 #include "wifi_logger.h"
+#include "context.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -313,6 +314,16 @@ napi_value DoAsyncWork(const napi_env& env, AsyncContext *asyncContext,
         DoPromiseAsyncWork(env, asyncContext);
         return promise;
     }
+}
+
+std::string JsAbilityGetBundleName()
+{
+    std::shared_ptr<AbilityRuntime::Context> appContext = AbilityRuntime::Context::GetApplicationContext();
+    if (appContext == nullptr) {
+        WIFI_LOGE("Get boundle name context is null");
+        return "";
+    }
+    return appContext->GetBundleName();
 }
 }  // namespace Wifi
 }  // namespace OHOS

@@ -22,13 +22,10 @@
 #include "system_ability.h"
 #include "wifi_device_stub.h"
 #include "iremote_object.h"
+#include "wifi_p2p_service_impl.h"
 
 namespace OHOS {
 namespace Wifi {
-enum ServiceRunningState {
-    STATE_NOT_START,
-    STATE_RUNNING
-};
 class WifiDeviceServiceImpl : public SystemAbility, public WifiDeviceStub {
 DECLARE_SYSTEM_ABILITY(WifiDeviceServiceImpl);
 public:

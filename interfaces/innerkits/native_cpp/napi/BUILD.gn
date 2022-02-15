@@ -24,6 +24,9 @@ ohos_shared_library("wifi") {
     "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
     "//foundation/communication/wifi/interfaces/innerkits/native_cpp/wifi_standard/include",
     "//foundation/communication/wifi/services/wifi_standard/wifi_framework/common/net_helper",
+    "//foundation/aafwk/standard/frameworks/kits/appkit/native/ability_runtime/context",
+    "//foundation/communication/wifi/utils/inc",
+    "//foundation/appexecfwk/standard/interfaces/innerkits/appexecfwk_base/include",
   ]
 
   sources = [
@@ -36,8 +39,10 @@ ohos_shared_library("wifi") {
   ]
   deps = [
     "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog",
+    "//foundation/aafwk/standard/frameworks/kits/appkit:app_context",
     "//foundation/ace/napi:ace_napi",
     "//foundation/communication/wifi/interfaces/innerkits/native_cpp/wifi_standard:wifi_sdk",
+    "//foundation/communication/wifi/utils/src:wifi_utils",
     "//utils/native/base:utils",
   ]
 
@@ -59,6 +64,9 @@ ohos_shared_library("wifi_native_js") {
     "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
     "//foundation/communication/wifi/interfaces/innerkits/native_cpp/wifi_standard/include",
     "//foundation/communication/wifi/services/wifi_standard/wifi_framework/common/net_helper",
+    "//foundation/aafwk/standard/frameworks/kits/appkit/native/ability_runtime/context",
+    "//foundation/communication/wifi/utils/inc",
+    "//foundation/appexecfwk/standard/interfaces/innerkits/appexecfwk_base/include",
   ]
 
   sources = [
@@ -71,8 +79,10 @@ ohos_shared_library("wifi_native_js") {
   ]
   deps = [
     "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog",
+    "//foundation/aafwk/standard/frameworks/kits/appkit:app_context",
     "//foundation/ace/napi:ace_napi",
     "//foundation/communication/wifi/interfaces/innerkits/native_cpp/wifi_standard:wifi_sdk",
+    "//foundation/communication/wifi/utils/src:wifi_utils",
     "//utils/native/base:utils",
   ]
 

@@ -1,4 +1,4 @@
-# Copyright (C) 2021 Huawei Device Co., Ltd.
+# Copyright (C) 2021-2022 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -17,11 +17,21 @@ ohos_shared_library("wifi_utils") {
   install_enable = true
   include_dirs = [
     "//foundation/communication/wifi/utils/inc",
-    "//utils/native/base/include",
+    "//base/hiviewdfx/hisysevent/interfaces/native/innerkits/hisysevent/include",
+    "//foundation/communication/wifi/services/wifi_standard/wifi_framework/common/log",
   ]
 
-  sources = [ "wifi_common_util.cpp" ]
-  deps = [ "//utils/native/base:utils" ]
+  sources = [
+    "wifi_common_util.cpp",
+    "wifi_hisysevent.cpp",
+  ]
+
+  deps = [
+    "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog",
+    "//utils/native/base:utils",
+  ]
+
+  external_deps = [ "hisysevent_native:libhisysevent" ]
 
   cflags_cc = [
     "-std=c++17",

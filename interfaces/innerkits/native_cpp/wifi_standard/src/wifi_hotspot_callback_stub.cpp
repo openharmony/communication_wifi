@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,9 +14,10 @@
  */
 
 #include "wifi_hotspot_callback_stub.h"
+#include "define.h"
+#include "wifi_hisysevent.h"
 #include "wifi_logger.h"
 #include "wifi_msg.h"
-#include "define.h"
 
 DEFINE_WIFILOG_HOTSPOT_LABEL("WifiHotspotCallbackStub");
 namespace OHOS {
@@ -100,7 +101,6 @@ void WifiHotspotCallbackStub::RegisterCallBack(const sptr<IWifiHotspotCallback> 
         WIFI_LOGD("RegisterCallBack:callBack is nullptr!");
     }
     userCallback_ = callBack;
-    return;
 }
 
 void WifiHotspotCallbackStub::OnHotspotStateChanged(int state)
@@ -109,6 +109,7 @@ void WifiHotspotCallbackStub::OnHotspotStateChanged(int state)
     if (userCallback_) {
         userCallback_->OnHotspotStateChanged(state);
     }
+    WriteWifiEventReceivedHiSysEvent(HISYS_HOTSPOT_STATE_CHANGE, state);
 }
 
 void WifiHotspotCallbackStub::OnHotspotStaJoin(const StationInfo &info)
@@ -117,6 +118,7 @@ void WifiHotspotCallbackStub::OnHotspotStaJoin(const StationInfo &info)
     if (userCallback_) {
         userCallback_->OnHotspotStaJoin(info);
     }
+    WriteWifiEventReceivedHiSysEvent(HISYS_HOTSPOT_STA_JOIN, HISYS_EVENT_DEFAULT_VALUE);
 }
 
 void WifiHotspotCallbackStub::OnHotspotStaLeave(const StationInfo &info)
@@ -125,6 +127,7 @@ void WifiHotspotCallbackStub::OnHotspotStaLeave(const StationInfo &info)
     if (userCallback_) {
         userCallback_->OnHotspotStaLeave(info);
     }
+    WriteWifiEventReceivedHiSysEvent(HISYS_HOTSPOT_STA_LEAVE, HISYS_EVENT_DEFAULT_VALUE);
 }
 
 bool WifiHotspotCallbackStub::IsRemoteDied() const

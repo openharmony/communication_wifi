@@ -21,50 +21,16 @@ namespace Wifi {
 DEFINE_WIFILOG_LABEL("WifiNAPIP2p");
 
 std::unique_ptr<WifiP2p> wifiP2pPtr = WifiP2p::GetInstance(WIFI_P2P_ABILITY_ID);
-
-napi_value EnableP2p(napi_env env, napi_callback_info info)
-{
-    TRACE_FUNC_CALL;
-    NAPI_ASSERT(env, wifiP2pPtr != nullptr, "Wifi p2p instance is null.");
-
-    ErrCode ret = wifiP2pPtr->EnableP2p();
-    napi_value result;
-    napi_get_boolean(env, ret == WIFI_OPT_SUCCESS, &result);
-    return result;
-}
-
-napi_value DisableP2p(napi_env env, napi_callback_info info)
-{
-    TRACE_FUNC_CALL;
-    NAPI_ASSERT(env, wifiP2pPtr != nullptr, "Wifi p2p instance is null.");
-
-    ErrCode ret = wifiP2pPtr->DisableP2p();
-    napi_value result;
-    napi_get_boolean(env, ret == WIFI_OPT_SUCCESS, &result);
-    return result;
-}
-
 static void DeviceInfoToJs(const napi_env& env, const WifiP2pDevice& device, napi_value& result)
 {
     SetValueUtf8String(env, "deviceName", device.GetDeviceName().c_str(), result);
-    SetValueUtf8String(env, "macAddress", device.GetDeviceAddress().c_str(), result);
+    SetValueUtf8String(env, "deviceAddress", device.GetDeviceAddress().c_str(), result);
     SetValueUtf8String(env, "primaryDeviceType", device.GetPrimaryDeviceType().c_str(), result);
-    SetValueUtf8String(env, "secondaryDeviceType", device.GetSecondaryDeviceType().c_str(), result);
-    SetValueInt32(env, "status", static_cast<int>(device.GetP2pDeviceStatus()), result);
-    SetValueUnsignedInt32(env, "supportWpsConfigMethods", device.GetWpsConfigMethod(), result);
-    SetValueInt32(env, "deviceCapabilitys", device.GetDeviceCapabilitys(), result);
+    SetValueInt32(env, "deviceStatus", static_cast<int>(device.GetP2pDeviceStatus()), result);
     SetValueInt32(env, "groupCapabilitys", device.GetGroupCapabilitys(), result);
 }
 
-static void WfdInfoToJs(const napi_env& env, const WifiP2pWfdInfo& wfdInfo, napi_value& result)
-{
-    SetValueBool(env, "wfdEnabled", wfdInfo.GetWfdEnabled(), result);
-    SetValueInt32(env, "deviceInfo", wfdInfo.GetDeviceInfo(), result);
-    SetValueInt32(env, "ctrlPort", wfdInfo.GetCtrlPort(), result);
-    SetValueInt32(env, "maxThroughput", wfdInfo.GetMaxThroughput(), result);
-}
-
-static ErrCode DeviceInfosToJs(const napi_env& env,
+static ErrCode DevicesToJsArray(const napi_env& env,
     const std::vector<WifiP2pDevice>& vecDevices, napi_value& arrayResult)
 {
     uint32_t idx = 0;
@@ -72,11 +38,6 @@ static ErrCode DeviceInfosToJs(const napi_env& env,
         napi_value eachObj;
         napi_create_object(env, &eachObj);
         DeviceInfoToJs(env, each, eachObj);
-        WifiP2pWfdInfo info = each.GetWfdInfo();
-        napi_value wfdInfo;
-        napi_create_object(env, &wfdInfo);
-        WfdInfoToJs(env, info, wfdInfo);
-        napi_set_named_property(env, eachObj, "wfdInfo", wfdInfo);
         napi_status status = napi_set_element(env, arrayResult, idx++, eachObj);
         if (status != napi_ok) {
             WIFI_LOGE("wifi napi set element error: %{public}d, idx: %{public}d", status, idx - 1);
@@ -88,30 +49,29 @@ static ErrCode DeviceInfosToJs(const napi_env& env,
 
 static ErrCode GroupInfosToJs(const napi_env& env, WifiP2pGroupInfo& groupInfo, napi_value& result)
 {
-    SetValueBool(env, "isP2pGroupOwner", groupInfo.IsGroupOwner(), result);
-    SetValueUtf8String(env, "passphrase", groupInfo.GetPassphrase().c_str(), result);
-    SetValueUtf8String(env, "interface", groupInfo.GetInterface().c_str(), result);
-    SetValueUtf8String(env, "groupName", groupInfo.GetGroupName().c_str(), result);
-    SetValueInt32(env, "networkId", groupInfo.GetNetworkId(), result);
-    SetValueInt32(env, "frequency", groupInfo.GetFrequency(), result);
-    SetValueBool(env, "isP2pPersistent", groupInfo.IsPersistent(), result);
-    SetValueInt32(env, "groupStatus", static_cast<int>(groupInfo.GetP2pGroupStatus()), result);
-    SetValueUtf8String(env, "goIpAddress", groupInfo.GetGoIpAddress().c_str(), result);
+    SetValueBool(env, "isP2pGo", groupInfo.IsGroupOwner(), result);
 
     WifiP2pDevice ownerDevice = groupInfo.GetOwner();
     napi_value owner;
     napi_create_object(env, &owner);
     DeviceInfoToJs(env, ownerDevice, owner);
-    napi_status status = napi_set_named_property(env, result, "owner", owner);
+    napi_status status = napi_set_named_property(env, result, "ownerInfo", owner);
     if (status != napi_ok) {
-        WIFI_LOGE("napi_set_named_property owner fail");
+        WIFI_LOGE("napi_set_named_property ownerInfo fail");
         return WIFI_OPT_FAILED;
     }
+
+    SetValueUtf8String(env, "passphrase", groupInfo.GetPassphrase().c_str(), result);
+    SetValueUtf8String(env, "interface", groupInfo.GetInterface().c_str(), result);
+    SetValueUtf8String(env, "groupName", groupInfo.GetGroupName().c_str(), result);
+    SetValueInt32(env, "networkId", groupInfo.GetNetworkId(), result);
+    SetValueInt32(env, "frequency", groupInfo.GetFrequency(), result);
+
     if (!groupInfo.IsClientDevicesEmpty()) {
         const std::vector<OHOS::Wifi::WifiP2pDevice>& vecDevices = groupInfo.GetClientDevices();
         napi_value devices;
         napi_create_array_with_length(env, vecDevices.size(), &devices);
-        if (DeviceInfosToJs(env, vecDevices, devices) != WIFI_OPT_SUCCESS) {
+        if (DevicesToJsArray(env, vecDevices, devices) != WIFI_OPT_SUCCESS) {
             return WIFI_OPT_FAILED;
         }
         status = napi_set_named_property(env, result, "clientDevices", devices);
@@ -120,13 +80,14 @@ static ErrCode GroupInfosToJs(const napi_env& env, WifiP2pGroupInfo& groupInfo, 
             return WIFI_OPT_FAILED;
         }
     }
+    SetValueUtf8String(env, "goIpAddress", groupInfo.GetGoIpAddress().c_str(), result);
     return WIFI_OPT_SUCCESS;
 }
 
 napi_value GetCurrentGroup(napi_env env, napi_callback_info info)
 {
     TRACE_FUNC_CALL;
-    size_t argc = 2;
+    size_t argc = 1;
     napi_value argv[argc];
     napi_value thisVar = nullptr;
     void *data = nullptr;
@@ -151,43 +112,6 @@ napi_value GetCurrentGroup(napi_env env, napi_callback_info info)
 
     size_t nonCallbackArgNum = 0;
     return DoAsyncWork(env, asyncContext, argc, argv, nonCallbackArgNum);
-}
-
-napi_value StartP2pListen(napi_env env, napi_callback_info info)
-{
-    TRACE_FUNC_CALL;
-    size_t argc = 2;
-    napi_value argv[argc];
-    napi_value thisVar;
-    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, NULL));
-
-    napi_valuetype valueType;
-    napi_valuetype value2Type;
-    napi_typeof(env, argv[0], &valueType);
-    napi_typeof(env, argv[1], &value2Type);
-    NAPI_ASSERT(env, valueType == napi_number, "Wrong argument 1 type. napi_number expected.");
-    NAPI_ASSERT(env, value2Type == napi_object, "Wrong argument 2 type. napi_number expected.");
-
-    NAPI_ASSERT(env, wifiP2pPtr != nullptr, "Wifi p2p instance is null.");
-    int period;
-    int interval;
-    napi_get_value_int32(env, argv[0], &period);
-    napi_get_value_int32(env, argv[1], &interval);
-    ErrCode ret = wifiP2pPtr->StartP2pListen(period, interval);
-    napi_value result;
-    napi_get_boolean(env, ret == WIFI_OPT_SUCCESS, &result);
-    return result;
-}
-
-napi_value StopP2pListen(napi_env env, napi_callback_info info)
-{
-    TRACE_FUNC_CALL;
-    NAPI_ASSERT(env, wifiP2pPtr != nullptr, "Wifi p2p instance is null.");
-
-    ErrCode ret = wifiP2pPtr->StopP2pListen();
-    napi_value result;
-    napi_get_boolean(env, ret == WIFI_OPT_SUCCESS, &result);
-    return result;
 }
 
 napi_value DeletePersistentGroup(napi_env env, napi_callback_info info)
@@ -237,7 +161,7 @@ napi_value StopDiscoverDevices(napi_env env, napi_callback_info info)
 
 napi_value GetP2pDevices(napi_env env, napi_callback_info info)
 {
-    size_t argc = 2;
+    size_t argc = 1;
     napi_value argv[argc];
     napi_value thisVar = nullptr;
     void *data = nullptr;
@@ -246,7 +170,7 @@ napi_value GetP2pDevices(napi_env env, napi_callback_info info)
 
     QueryP2pDeviceAsyncContext *asyncContext = new QueryP2pDeviceAsyncContext(env);
     NAPI_ASSERT(env, asyncContext != nullptr, "asyncContext is null.");
-    napi_create_string_latin1(env, "queryP2pDevices", NAPI_AUTO_LENGTH, &asyncContext->resourceName);
+    napi_create_string_latin1(env, "GetP2pDevices", NAPI_AUTO_LENGTH, &asyncContext->resourceName);
 
     asyncContext->executeFunc = [&](void* data) -> void {
         QueryP2pDeviceAsyncContext *context = static_cast<QueryP2pDeviceAsyncContext *>(data);
@@ -257,7 +181,7 @@ napi_value GetP2pDevices(napi_env env, napi_callback_info info)
     asyncContext->completeFunc = [&](void* data) -> void {
         QueryP2pDeviceAsyncContext *context = static_cast<QueryP2pDeviceAsyncContext *>(data);
         napi_create_array_with_length(context->env, context->vecP2pDevices.size(), &context->result);
-        context->errorCode = DeviceInfosToJs(context->env, context->vecP2pDevices, context->result);
+        context->errorCode = DevicesToJsArray(context->env, context->vecP2pDevices, context->result);
         WIFI_LOGI("Push P2p Device List to client");
     };
 
@@ -265,7 +189,7 @@ napi_value GetP2pDevices(napi_env env, napi_callback_info info)
     return DoAsyncWork(env, asyncContext, argc, argv, nonCallbackArgNum);
 }
 
-napi_value SetP2pDeviceName(napi_env env, napi_callback_info info)
+napi_value SetDeviceName(napi_env env, napi_callback_info info)
 {
     TRACE_FUNC_CALL;
     size_t argc = 1;
@@ -294,21 +218,18 @@ static void JsObjToP2pConfig(const napi_env& env, const napi_value& object, Wifi
     std::string address = "";
     int netId = -1;
     std::string passphrase = "";
-    int groupOwnerIntent = -1;
     std::string groupName = "";
     int band = static_cast<int>(GroupOwnerBand::GO_BAND_AUTO);
-    JsObjectToString(env, object, "macAddress", WIFI_STR_MAC_LENGTH + 1, address);
-    JsObjectToInt(env, object, "goBand", band);
+    JsObjectToString(env, object, "deviceAddress", WIFI_STR_MAC_LENGTH + 1, address);
     JsObjectToInt(env, object, "netId", netId);
     JsObjectToString(env, object, "passphrase", MAX_PASSPHRASE_LENGTH + 1, passphrase);
-    JsObjectToInt(env, object, "groupOwnerIntent", groupOwnerIntent);
     JsObjectToString(env, object, "groupName", DEVICE_NAME_LENGTH + 1, groupName);
+    JsObjectToInt(env, object, "goBand", band);
     config.SetDeviceAddress(address);
-    config.SetGoBand(static_cast<GroupOwnerBand>(band));
     config.SetNetId(netId);
     config.SetPassphrase(passphrase);
-    config.SetGroupOwnerIntent(groupOwnerIntent);
     config.SetGroupName(groupName);
+    config.SetGoBand(static_cast<GroupOwnerBand>(band));
 }
 
 napi_value P2pConnect(napi_env env, napi_callback_info info)
@@ -335,7 +256,7 @@ napi_value P2pConnect(napi_env env, napi_callback_info info)
     return result;
 }
 
-napi_value P2pDisConnect(napi_env env, napi_callback_info info)
+napi_value P2pCancelConnect(napi_env env, napi_callback_info info)
 {
     TRACE_FUNC_CALL;
     NAPI_ASSERT(env, wifiP2pPtr != nullptr, "Wifi p2p instance is null.");
@@ -361,7 +282,6 @@ napi_value CreateGroup(napi_env env, napi_callback_info info)
     NAPI_ASSERT(env, wifiP2pPtr != nullptr, "Wifi p2p instance is null.");
     WifiP2pConfig config;
     JsObjToP2pConfig(env, argv[0], config);
-
     ErrCode ret = wifiP2pPtr->FormGroup(config);
     napi_value result;
     napi_get_boolean(env, ret == WIFI_OPT_SUCCESS, &result);
@@ -382,14 +302,14 @@ napi_value RemoveGroup(napi_env env, napi_callback_info info)
 static void LinkedInfoToJs(const napi_env& env, WifiP2pLinkedInfo& linkedInfo, napi_value& result)
 {
     SetValueInt32(env, "connectState", static_cast<int>(linkedInfo.GetConnectState()), result);
-    SetValueBool(env, "isP2pGroupOwner", linkedInfo.IsGroupOwner(), result);
-    SetValueUtf8String(env, "groupOwnerAddress", linkedInfo.GetGroupOwnerAddress().c_str(), result);
+    SetValueBool(env, "isGroupOwner", linkedInfo.IsGroupOwner(), result);
+    SetValueUtf8String(env, "groupOwnerAddr", linkedInfo.GetGroupOwnerAddress().c_str(), result);
 }
 
 napi_value GetP2pLinkedInfo(napi_env env, napi_callback_info info)
 {
     TRACE_FUNC_CALL;
-    size_t argc = 2;
+    size_t argc = 1;
     napi_value argv[argc];
     napi_value thisVar = nullptr;
     void *data = nullptr;

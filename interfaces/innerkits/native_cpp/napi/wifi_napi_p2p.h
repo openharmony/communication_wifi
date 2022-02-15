@@ -21,21 +21,17 @@
 
 namespace OHOS {
 namespace Wifi {
-napi_value EnableP2p(napi_env env, napi_callback_info info);
-napi_value DisableP2p(napi_env env, napi_callback_info info);
 napi_value GetP2pLinkedInfo(napi_env env, napi_callback_info info);
 napi_value GetCurrentGroup(napi_env env, napi_callback_info info);
 napi_value GetP2pDevices(napi_env env, napi_callback_info info);
 napi_value CreateGroup(napi_env env, napi_callback_info info);
 napi_value RemoveGroup(napi_env env, napi_callback_info info);
 napi_value P2pConnect(napi_env env, napi_callback_info info);
-napi_value P2pDisConnect(napi_env env, napi_callback_info info);
+napi_value P2pCancelConnect(napi_env env, napi_callback_info info);
 napi_value StartDiscoverDevices(napi_env env, napi_callback_info info);
 napi_value StopDiscoverDevices(napi_env env, napi_callback_info info);
-napi_value StartP2pListen(napi_env env, napi_callback_info info);
-napi_value StopP2pListen(napi_env env, napi_callback_info info);
 napi_value DeletePersistentGroup(napi_env env, napi_callback_info info);
-napi_value SetP2pDeviceName(napi_env env, napi_callback_info info);
+napi_value SetDeviceName(napi_env env, napi_callback_info info);
 
 class QueryP2pDeviceAsyncContext : public AsyncContext {
 public:

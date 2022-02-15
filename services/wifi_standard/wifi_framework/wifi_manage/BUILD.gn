@@ -95,6 +95,7 @@ ohos_source_set("wifi_device_service_impl") {
     ":wifi_manager_service_header",
   ]
 
+  deps = [ ":wifi_p2p_service_impl" ]
   external_deps = [ "ipc:ipc_core" ]
 }
 ohos_source_set("wifi_hotspot_service_impl") {

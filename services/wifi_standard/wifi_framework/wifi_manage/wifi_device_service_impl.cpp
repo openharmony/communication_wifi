@@ -14,6 +14,7 @@
  */
 
 #include "wifi_device_service_impl.h"
+#include <algorithm>
 #include <unistd.h>
 #include <file_ex.h>
 #include "wifi_permission_utils.h"
@@ -109,6 +110,12 @@ ErrCode WifiDeviceServiceImpl::EnableWifi()
         }
     }
 
+    sptr<WifiP2pServiceImpl> p2pService = WifiP2pServiceImpl::GetInstance();
+    if (p2pService != nullptr && p2pService->EnableP2p() != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("Enable P2p failed, ret %{public}d!", static_cast<int>(errCode));
+        return WIFI_OPT_FAILED;
+    }
+
     if (!WifiConfigCenter::GetInstance().SetWifiMidState(curState, WifiOprMidState::OPENING)) {
         WIFI_LOGI("set wifi mid state opening failed!");
         return WIFI_OPT_OPEN_SUCC_WHEN_OPENED;
@@ -143,12 +150,6 @@ ErrCode WifiDeviceServiceImpl::EnableWifi()
         return errCode;
     }
     WifiSettings::GetInstance().SyncWifiConfig();
-
-    sptr<WifiP2pServiceImpl> p2pService = WifiP2pServiceImpl::GetInstance();
-    if (p2pService != nullptr && p2pService->EnableP2p() != WIFI_OPT_SUCCESS) {
-        WIFI_LOGE("Enable P2p failed, ret %{public}d!", static_cast<int>(errCode));
-        return WIFI_OPT_FAILED;
-    }
     return WIFI_OPT_SUCCESS;
 }
 
@@ -158,12 +159,6 @@ ErrCode WifiDeviceServiceImpl::DisableWifi()
         WIFI_LOGE("DisableWifi:VerifySetWifiInfoPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
-
-    sptr<WifiP2pServiceImpl> p2pService = WifiP2pServiceImpl::GetInstance();
-    if (p2pService != nullptr && p2pService->DisableP2p() != WIFI_OPT_SUCCESS) {
-        WIFI_LOGE("Disable P2p failed!");
-    }
-
     WifiOprMidState curState = WifiConfigCenter::GetInstance().GetWifiMidState();
     if (curState != WifiOprMidState::RUNNING) {
         WIFI_LOGI("current wifi state is %{public}d", static_cast<int>(curState));
@@ -173,6 +168,12 @@ ErrCode WifiDeviceServiceImpl::DisableWifi()
             return WIFI_OPT_CLOSE_SUCC_WHEN_CLOSED;
         }
     }
+
+    sptr<WifiP2pServiceImpl> p2pService = WifiP2pServiceImpl::GetInstance();
+    if (p2pService != nullptr && p2pService->DisableP2p() != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("Disable P2p failed!");
+    }
+
     if (!WifiConfigCenter::GetInstance().SetWifiMidState(curState, WifiOprMidState::CLOSING)) {
         WIFI_LOGI("set wifi mid state opening failed! may be other activity has been operated");
         return WIFI_OPT_CLOSE_SUCC_WHEN_CLOSED;
@@ -216,11 +217,57 @@ ErrCode WifiDeviceServiceImpl::PutWifiProtectRef(const std::string &protectName)
     return WIFI_OPT_FAILED;
 }
 
+bool WifiDeviceServiceImpl::CheckConfigPwd(const WifiDeviceConfig &config)
+{
+    if ((config.ssid.length() <= 0) || (config.keyMgmt.length()) <= 0) {
+        return false;
+    }
+
+    if (config.keyMgmt != KEY_MGMT_NONE && config.preSharedKey.empty()) {
+        WIFI_LOGE("CheckConfigPwd: preSharedKey is empty!");
+        return false;
+    }
+
+    int len = config.preSharedKey.length();
+    bool isAllHex = std::all_of(config.preSharedKey.begin(), config.preSharedKey.end(), isxdigit);
+    WIFI_LOGI("CheckConfigPwd, keyMgmt: %{public}s, len: %{public}d", config.keyMgmt.c_str(), len);
+    if (config.keyMgmt == KEY_MGMT_NONE) {
+        for (int i = 0; i != WEPKEYS_SIZE; ++i) {
+            if (!config.wepKeys[i].empty()) { // wep
+                int wepLen = config.wepKeys[i].size();
+                if (wepLen == WEP_KEY_LEN1 || wepLen == WEP_KEY_LEN2 || wepLen == WEP_KEY_LEN3) {
+                    return true;
+                }
+                constexpr int MULTIPLE_HEXT_TO_ASCII = 2;
+                if (wepLen == (WEP_KEY_LEN1 * MULTIPLE_HEXT_TO_ASCII) ||
+                    wepLen == (WEP_KEY_LEN2 * MULTIPLE_HEXT_TO_ASCII) ||
+                    wepLen == (WEP_KEY_LEN3 * MULTIPLE_HEXT_TO_ASCII)) {
+                    return isAllHex;
+                }
+                return false;
+            }
+        }
+        return config.preSharedKey.empty(); // open
+    }
+    int minLen = config.keyMgmt == KEY_MGMT_SAE ? MIN_SAE_LEN : MIN_PSK_LEN;
+    int maxLen = isAllHex ? MAX_HEX_LEN : MAX_PRESHAREDKEY_LEN;
+    if (len < minLen || len > maxLen) {
+        WIFI_LOGE("CheckConfigPwd: preSharedKey length error: %{public}d", len);
+        return false;
+    }
+    return true;
+}
+
 ErrCode WifiDeviceServiceImpl::AddDeviceConfig(const WifiDeviceConfig &config, int &result)
 {
     if (WifiPermissionUtils::VerifySetWifiInfoPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("AddDeviceConfig:VerifySetWifiInfoPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
+    }
+
+    if (!CheckConfigPwd(config)) {
+        WIFI_LOGE("CheckConfigPwd failed!");
+        return WIFI_OPT_INVALID_PARAM;
     }
 
     if (!IsStaServiceRunning()) {
@@ -231,15 +278,6 @@ ErrCode WifiDeviceServiceImpl::AddDeviceConfig(const WifiDeviceConfig &config, i
     if (pService == nullptr) {
         return WIFI_OPT_STA_NOT_OPENED;
     }
-
-    if ((config.ssid.length() <= 0) || (config.keyMgmt.length()) <= 0) {
-        return WIFI_OPT_INVALID_PARAM;
-    }
-
-    if (config.keyMgmt != "NONE" && config.preSharedKey.length() <= 0) {
-        return WIFI_OPT_INVALID_PARAM;
-    }
-
     int retNetworkId = pService->AddDeviceConfig(config);
     if (retNetworkId < 0) {
         return WIFI_OPT_FAILED;
@@ -395,19 +433,13 @@ ErrCode WifiDeviceServiceImpl::ConnectToDevice(const WifiDeviceConfig &config)
         WIFI_LOGE("ConnectToDevice with config:VerifySetWifiInfoPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
-
+    if (!CheckConfigPwd(config)) {
+        WIFI_LOGE("CheckConfigPwd failed!");
+        return WIFI_OPT_INVALID_PARAM;
+    }
     if (!IsStaServiceRunning()) {
         return WIFI_OPT_STA_NOT_OPENED;
     }
-
-    if ((config.ssid.length() <= 0) || (config.keyMgmt.length()) <= 0) {
-        return WIFI_OPT_INVALID_PARAM;
-    }
-
-    if (config.keyMgmt != "NONE" && config.preSharedKey.length() <= 0 ) {
-        return WIFI_OPT_INVALID_PARAM;
-    }
-
     IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst();
     if (pService == nullptr) {
         return WIFI_OPT_STA_NOT_OPENED;

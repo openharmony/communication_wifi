@@ -36,6 +36,7 @@ int WifiDeviceCallBackStub::OnRemoteRequest(
         WIFI_LOGD("Failed to `%{public}s`,Remote service is died!", __func__);
         return -1;
     }
+
     int exception = data.ReadInt32();
     if (exception) {
         WIFI_LOGE("WifiDeviceCallBackStub::OnRemoteRequest, got exception: %{public}d!", exception);

@@ -52,6 +52,7 @@ int WifiP2pCallbackStub::OnRemoteRequest(
         WIFI_LOGD("Failed to `%{public}s`,remote service is died!", __func__);
         return -1;
     }
+
     int exception = data.ReadInt32();
     if (exception) {
         WIFI_LOGD("WifiP2pCallbackStub::OnRemoteRequest exception! %{public}d!", exception);

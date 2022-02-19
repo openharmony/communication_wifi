@@ -836,7 +836,7 @@ void WifiSettings::InitDefaultHotspotConfig()
 void WifiSettings::InitDefaultP2pVendorConfig()
 {
     mP2pVendorConfig.SetRandomMacSupport(false);
-    mP2pVendorConfig.SetIsAutoListen(true);
+    mP2pVendorConfig.SetIsAutoListen(false);
     mP2pVendorConfig.SetDeviceName("");
     mP2pVendorConfig.SetPrimaryDeviceType("");
     mP2pVendorConfig.SetSecondaryDeviceType("");

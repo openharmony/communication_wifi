@@ -37,24 +37,27 @@
 #define REPLY_BUF_SMALL_LENGTH 64
 #define CMD_FREQ_MAX_LEN 8
 
+const int QUOTATION_MARKS_FLAG_YES = 0;
+const int QUOTATION_MARKS_FLAG_NO = 1;
+
 WifiWpaStaInterface *g_wpaStaInterface = NULL;
 
 static WpaSsidField g_wpaSsidFields[] = {
-    {DEVICE_CONFIG_SSID, "ssid", 0},
-    {DEVICE_CONFIG_PSK, "psk", 0},
-    {DEVICE_CONFIG_KEYMGMT, "key_mgmt", 1},
-    {DEVICE_CONFIG_PRIORITY, "priority", 1},
-    {DEVICE_CONFIG_SCAN_SSID, "scan_ssid", 1},
-    {DEVICE_CONFIG_EAP, "eap", 1},
-    {DEVICE_CONFIG_IDENTITY, "identity", 0},
-    {DEVICE_CONFIG_PASSWORD, "password", 0},
-    {DEVICE_CONFIG_BSSID, "bssid", 1},
-    {DEVICE_CONFIG_AUTH_ALGORITHMS, "auth_alg", 1},
-    {DEVICE_CONFIG_WEP_KEY_IDX, "wep_tx_keyidx", 1},
-    {DEVICE_CONFIG_WEP_KEY_0, "wep_key0", 1},
-    {DEVICE_CONFIG_WEP_KEY_1, "wep_key1", 1},
-    {DEVICE_CONFIG_WEP_KEY_2, "wep_key2", 1},
-    {DEVICE_CONFIG_WEP_KEY_3, "wep_key3", 1}
+    {DEVICE_CONFIG_SSID, "ssid", QUOTATION_MARKS_FLAG_YES},
+    {DEVICE_CONFIG_PSK, "psk", QUOTATION_MARKS_FLAG_YES},
+    {DEVICE_CONFIG_KEYMGMT, "key_mgmt", QUOTATION_MARKS_FLAG_NO},
+    {DEVICE_CONFIG_PRIORITY, "priority", QUOTATION_MARKS_FLAG_NO},
+    {DEVICE_CONFIG_SCAN_SSID, "scan_ssid", QUOTATION_MARKS_FLAG_NO},
+    {DEVICE_CONFIG_EAP, "eap", QUOTATION_MARKS_FLAG_NO},
+    {DEVICE_CONFIG_IDENTITY, "identity", QUOTATION_MARKS_FLAG_YES},
+    {DEVICE_CONFIG_PASSWORD, "password", QUOTATION_MARKS_FLAG_YES},
+    {DEVICE_CONFIG_BSSID, "bssid", QUOTATION_MARKS_FLAG_NO},
+    {DEVICE_CONFIG_AUTH_ALGORITHMS, "auth_alg", QUOTATION_MARKS_FLAG_NO},
+    {DEVICE_CONFIG_WEP_KEY_IDX, "wep_tx_keyidx", QUOTATION_MARKS_FLAG_NO},
+    {DEVICE_CONFIG_WEP_KEY_0, "wep_key0", QUOTATION_MARKS_FLAG_NO},
+    {DEVICE_CONFIG_WEP_KEY_1, "wep_key1", QUOTATION_MARKS_FLAG_NO},
+    {DEVICE_CONFIG_WEP_KEY_2, "wep_key2", QUOTATION_MARKS_FLAG_NO},
+    {DEVICE_CONFIG_WEP_KEY_3, "wep_key3", QUOTATION_MARKS_FLAG_NO}
 };
 
 static int WpaCliCmdStatus(WifiWpaStaInterface *this, struct WpaHalCmdStatus *pcmd)
@@ -179,6 +182,30 @@ static int WpaCliCmdSaveConfig(WifiWpaStaInterface *this)
     return WpaCliCmd(cmd, buf, sizeof(buf));
 }
 
+static int CalcQuotationMarksFlag(int pos, const char value[WIFI_NETWORK_CONFIG_VALUE_LENGTH])
+{
+    int flag = g_wpaSsidFields[pos].flag;
+    const int HEX_PSK_MAX_LEN = 64;
+    int len = strlen(value);
+    /* if the psk length is 64, it's hex format and don't need quotation marks */
+    if (pos == DEVICE_CONFIG_PSK && len >= HEX_PSK_MAX_LEN) {
+        flag = QUOTATION_MARKS_FLAG_NO;
+    }
+    if (pos == DEVICE_CONFIG_WEP_KEY_0 ||
+        pos == DEVICE_CONFIG_WEP_KEY_1 ||
+        pos == DEVICE_CONFIG_WEP_KEY_2 ||
+        pos == DEVICE_CONFIG_WEP_KEY_3) {
+        const int WEP_KEY_LEN1 = 5;
+        const int WEP_KEY_LEN2 = 13;
+        const int WEP_KEY_LEN3 = 16;
+        /* For wep key, ASCII format need quotation marks, hex format is not required */
+        if (len == WEP_KEY_LEN1 || len == WEP_KEY_LEN2 || len == WEP_KEY_LEN3) {
+            flag = QUOTATION_MARKS_FLAG_YES;
+        }
+    }
+    return flag;
+}
+
 static int WpaCliCmdSetNetwork(WifiWpaStaInterface *this, const struct WpaSetNetworkArgv *argv)
 {
     if (this == NULL || argv == NULL) {
@@ -198,7 +225,7 @@ static int WpaCliCmdSetNetwork(WifiWpaStaInterface *this, const struct WpaSetNet
     char cmd[CMD_BUFFER_SIZE] = {0};
     char buf[REPLY_BUF_SMALL_LENGTH] = {0};
     int res;
-    if (g_wpaSsidFields[pos].flag == 0) {
+    if (CalcQuotationMarksFlag(pos, argv->value) == QUOTATION_MARKS_FLAG_YES) {
         res = snprintf_s(cmd, sizeof(cmd), sizeof(cmd) - 1, "IFNAME=%s SET_NETWORK %d %s \"%s\"", this->ifname,
             argv->id, g_wpaSsidFields[pos].fieldName, argv->value);
     } else {

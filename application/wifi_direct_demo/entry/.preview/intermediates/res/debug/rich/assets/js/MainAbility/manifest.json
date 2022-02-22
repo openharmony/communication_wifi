@@ -1,0 +1,23 @@
+{
+    "appID": "com.ohos.wifidirectdemo",
+    "appName": "$string:app_name",
+    "versionName": "1.0.0",
+    "versionCode": 1000000,
+    "minPlatformVersion": 6,
+    "pages": [
+        "pages/index",
+        "pages/second"
+    ],
+    "deviceType": [
+        "phone",
+        "tablet"
+    ],
+    "mode": {
+        "syntax": "ets",
+        "type": "pageAbility"
+    },
+    "window": {
+        "autoDesignWidth": false,
+        "designWidth": 720
+    }
+}

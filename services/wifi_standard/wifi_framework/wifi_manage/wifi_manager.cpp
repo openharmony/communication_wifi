@@ -183,8 +183,8 @@ int WifiManager::Init()
     }
     if (WifiConfigCenter::GetInstance().GetStaLastRunState()) { /* Automatic startup upon startup */
         WIFI_LOGE("AutoStartStaApService");
-        AutoStartStaService();
         AutoStartP2pService();
+        AutoStartStaService();
     } else {
         /**
          * The sta service automatically starts upon startup. After the sta

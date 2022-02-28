@@ -18,6 +18,7 @@
 #include "wifi_hisysevent.h"
 #include "wifi_logger.h"
 #include "wifi_msg.h"
+#include "wifi_errcode.h"
 
 DEFINE_WIFILOG_HOTSPOT_LABEL("WifiHotspotCallbackStub");
 namespace OHOS {
@@ -36,6 +37,7 @@ int WifiHotspotCallbackStub::OnRemoteRequest(
         WIFI_LOGD("Failed to `%{public}s`,remote service is died!", __func__);
         return -1;
     }
+
     int exception = data.ReadInt32();
     if (exception) {
         return -1;

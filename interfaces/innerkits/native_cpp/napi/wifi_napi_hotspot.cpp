@@ -66,6 +66,15 @@ napi_value IsHotspotActive(napi_env env, napi_callback_info info)
     return result;
 }
 
+napi_value IsHotspotDualBandSupported(napi_env env, napi_callback_info info)
+{
+    NAPI_ASSERT(env, wifiHotspotPtr != nullptr, "Wifi hotspot instance is null.");
+    napi_value result;
+    /* This interface is not supported currently */
+    napi_get_boolean(env, false, &result);
+    return result;
+}
+
 static KeyMgmt GetKeyMgmtFromJsSecurityType(int secType)
 {
     std::map<SecTypeJs, KeyMgmt>::iterator iter = g_mapSecTypeToKeyMgmt.find(SecTypeJs(secType));

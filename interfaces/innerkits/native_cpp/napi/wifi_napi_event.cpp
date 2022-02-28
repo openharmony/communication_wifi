@@ -37,6 +37,7 @@ const std::string EVENT_P2P_DEVICE_STATE_CHANGE = "p2pDeviceChange";
 const std::string EVENT_P2P_PERSISTENT_GROUP_CHANGE = "p2pPersistentGroupChange";
 const std::string EVENT_P2P_PEER_DEVICE_CHANGE = "p2pPeerDeviceChange";
 const std::string EVENT_P2P_DISCOVERY_CHANGE = "p2pDiscoveryChange";
+const std::string EVENT_STREAM_CHANGE = "streamChange";
 
 static std::set<std::string> g_supportEventList = {
     EVENT_STA_POWER_STATE_CHANGE,
@@ -175,7 +176,10 @@ public:
 public:
     void OnWifiStateChanged(int state) override {
         WIFI_LOGI("sta received state changed event: %{public}d", state);
-        CheckAndNotify(EVENT_STA_POWER_STATE_CHANGE, state);
+        if (m_wifiStateConvertMap.find(state) == m_wifiStateConvertMap.end()) {
+            return;
+        }
+        CheckAndNotify(EVENT_STA_POWER_STATE_CHANGE, m_wifiStateConvertMap[state]);
     }
 
     void OnWifiConnectionChanged(int state, const WifiLinkedInfo &info) override {
@@ -183,7 +187,7 @@ public:
         if (m_connectStateConvertMap.find(state) == m_connectStateConvertMap.end()) {
             return;
         }
-        CheckAndNotify(EVENT_STA_CONN_STATE_CHANGE, state);
+        CheckAndNotify(EVENT_STA_CONN_STATE_CHANGE, m_connectStateConvertMap[state]);
     }
 
     void OnWifiRssiChanged(int rssi) override {
@@ -202,9 +206,23 @@ public:
     }
 
 private:
+    enum class JsLayerWifiState {
+        DISABLED = 0,
+        ENABLED = 1,
+        ENABLING = 2,
+        DISABLING = 3
+    };
+
     enum class JsLayerConnectStatus {
         DISCONNECTED = 0,
         CONNECTED = 1,
+    };
+
+    std::map<int, int> m_wifiStateConvertMap = {
+        { static_cast<int>(WifiState::DISABLING), static_cast<int>(JsLayerWifiState::DISABLING) },
+        { static_cast<int>(WifiState::DISABLED), static_cast<int>(JsLayerWifiState::DISABLED) },
+        { static_cast<int>(WifiState::ENABLING), static_cast<int>(JsLayerWifiState::ENABLING) },
+        { static_cast<int>(WifiState::ENABLED), static_cast<int>(JsLayerWifiState::ENABLED) },
     };
 
     std::map<int, int> m_connectStateConvertMap = {
@@ -243,7 +261,11 @@ public:
 public:
     void OnHotspotStateChanged(int state) override {
         WIFI_LOGI("Hotspot received state changed event: %{public}d", state);
-        CheckAndNotify(EVENT_HOTSPOT_STATE_CHANGE, state);
+        if (m_apStateConvertMap.find(state) == m_apStateConvertMap.end()) {
+            return;
+        }
+
+        CheckAndNotify(EVENT_HOTSPOT_STATE_CHANGE, m_apStateConvertMap[state]);
     }
 
     void OnHotspotStaJoin(const StationInfo &info) override {
@@ -259,6 +281,21 @@ public:
     OHOS::sptr<OHOS::IRemoteObject> AsObject() override {
         return nullptr;
     }
+
+private:
+    enum class JsLayerApState {
+        DISABLED = 0,
+        ENABLED = 1,
+        ENABLING = 2,
+        DISABLING = 3
+    };
+
+    std::map<int, int> m_apStateConvertMap = {
+        { static_cast<int>(ApState::AP_STATE_STARTING), static_cast<int>(JsLayerApState::ENABLING) },
+        { static_cast<int>(ApState::AP_STATE_STARTED), static_cast<int>(JsLayerApState::ENABLED) },
+        { static_cast<int>(ApState::AP_STATE_CLOSING), static_cast<int>(JsLayerApState::DISABLING) },
+        { static_cast<int>(ApState::AP_STATE_CLOSED), static_cast<int>(JsLayerApState::DISABLED) },
+    };
 };
 
 class WifiNapiP2pEventCallback : public IWifiP2pCallback, public NapiEvent {

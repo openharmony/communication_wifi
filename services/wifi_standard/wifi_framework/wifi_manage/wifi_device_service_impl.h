@@ -106,9 +106,18 @@ private:
     ErrCode CheckCanEnableWifi(void);
     bool IsStaServiceRunning();
     bool IsScanServiceRunning();
+    bool CheckConfigPwd(const WifiDeviceConfig &config);
     static void SaBasicDump(std::string& result);
 
 private:
+    static constexpr int MAX_PRESHAREDKEY_LEN = 63;
+    static constexpr int MAX_HEX_LEN = 64;
+    static constexpr int MIN_PSK_LEN = 8;
+    static constexpr int MIN_SAE_LEN = 1;
+    static constexpr int WEP_KEY_LEN1 = 5;
+    static constexpr int WEP_KEY_LEN2 = 13;
+    static constexpr int WEP_KEY_LEN3 = 16;
+
     static sptr<WifiDeviceServiceImpl> g_instance;
     static std::mutex g_instanceLock;
     bool mPublishFlag;

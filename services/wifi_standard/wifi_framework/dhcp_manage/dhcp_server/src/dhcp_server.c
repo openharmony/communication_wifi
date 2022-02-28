@@ -881,6 +881,10 @@ AddressBinding *GetBinding(DhcpAddressPool *pool, PDhcpMsgInfo received)
     AddressBinding *binding = pool->binding(received->packet.chaddr, &received->options);
     if (!binding) {
         binding = pool->newBinding(received->packet.chaddr, &received->options);
+        if (binding == NULL) {
+            LOGE("new binding is null");
+            return NULL;
+        }
         if (pool->leaseTime) {
             binding->leaseTime = pool->leaseTime;
         }
@@ -1014,13 +1018,17 @@ static int NotBindingRequest(DhcpAddressPool *pool, PDhcpMsgInfo received, PDhcp
         RemoveLease(pool, lease);
     }
     AddressBinding *binding = pool->newBinding(received->packet.chaddr, &received->options);
+    if (binding == NULL) {
+        LOGE("Not binding request binding is null.");
+        return REPLY_NONE;
+    }
     binding->ipAddress = yourIpAddr;
     if (pool->leaseTime) {
         binding->leaseTime = pool->leaseTime;
     }
     int replyType = Repending(pool, binding);
     if (replyType != REPLY_OFFER) {
-        return  replyType;
+        return replyType;
     }
     lease = GetLease(pool, yourIpAddr);
     if (!lease) {
@@ -1111,6 +1119,10 @@ static int OnReceivedRequest(PDhcpServerContext ctx, PDhcpMsgInfo received, PDhc
     }
     ServerContext *srvIns = GetServerInstance(ctx);
     AddressBinding *binding = srvIns->addressPool.binding(received->packet.chaddr, &received->options);
+    if (binding == NULL) {
+        LOGE("OnReceivedRequest, binding is null");
+        return REPLY_NONE;
+    }
     if ((ret = HasNobindgRequest(ctx, received, reply)) != REPLY_ACK) {
         return ret;
     }

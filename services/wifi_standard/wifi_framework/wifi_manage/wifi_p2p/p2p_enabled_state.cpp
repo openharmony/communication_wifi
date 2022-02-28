@@ -45,6 +45,7 @@ void P2pEnabledState::GoInState()
         P2pVendorConfig config;
         WifiSettings::GetInstance().GetP2pVendorConfig(config);
         if (config.GetIsAutoListen()) {
+            WIFI_LOGI("Auto start P2P listen!");
             p2pStateMachine.SendMessage(
                 static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_START_LISTEN), defaultPeriodTime, defaultIntervalTime);
         }

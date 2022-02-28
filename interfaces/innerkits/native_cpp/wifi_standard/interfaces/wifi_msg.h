@@ -32,6 +32,11 @@ namespace Wifi {
 #define IPV4_ADDRESS_TYPE 0
 #define IPV6_ADDRESS_TYPE 1
 
+const std::string KEY_MGMT_NONE = "NONE";
+const std::string KEY_MGMT_WEP = "WEP";
+const std::string KEY_MGMT_WPA_PSK = "WPA-PSK";
+const std::string KEY_MGMT_SAE = "SAE";
+
 enum class SupplicantState {
     DISCONNECTED = 0,
     INTERFACE_DISABLED = 1,

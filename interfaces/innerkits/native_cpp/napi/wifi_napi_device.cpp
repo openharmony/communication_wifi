@@ -21,6 +21,7 @@
 namespace OHOS {
 namespace Wifi {
 DEFINE_WIFILOG_LABEL("WifiNAPIDevice");
+static constexpr int DEFAULT_INVALID_VALUE = -1;
 
 std::unique_ptr<WifiDevice> wifiDevicePtr = WifiDevice::GetInstance(WIFI_DEVICE_ABILITY_ID);
 std::unique_ptr<WifiScan> wifiScanPtr = WifiScan::GetInstance(WIFI_SCAN_ABILITY_ID);
@@ -108,10 +109,12 @@ static ErrCode NativeScanInfosToJsObj(const napi_env& env,
 
         SetValueUtf8String(env, "ssid", each.ssid.c_str(), eachObj);
         SetValueUtf8String(env, "bssid", each.bssid.c_str(), eachObj);
+        SetValueUtf8String(env, "capabilities", each.capabilities.c_str(), eachObj);
         SetValueInt32(env, "securityType", static_cast<int>(SecurityTypeNativeToJs(each.securityType)), eachObj);
         SetValueInt32(env, "rssi", each.rssi, eachObj);
         SetValueInt32(env, "band", each.band, eachObj);
         SetValueInt32(env, "frequency", each.frequency, eachObj);
+        SetValueInt32(env, "channelWidth", static_cast<int>(each.channelWidth), eachObj);
         SetValueInt64(env, "timestamp", each.timestamp, eachObj);
 
         napi_status status = napi_set_element(env, arrayResult, idx++, eachObj);
@@ -159,24 +162,30 @@ static void ConvertEncryptionMode(const SecTypeJs& securityType, std::string& ke
 {
     switch (securityType) {
         case SecTypeJs::SEC_TYPE_OPEN:
-            keyMgmt = "NONE";
-            break;
-
         case SecTypeJs::SEC_TYPE_WEP:
-            keyMgmt = "WEP";
+            keyMgmt = KEY_MGMT_NONE;
             break;
 
         case SecTypeJs::SEC_TYPE_PSK:
-            keyMgmt = "WPA-PSK";
+            keyMgmt = KEY_MGMT_WPA_PSK;
             break;
 
         case SecTypeJs::SEC_TYPE_SAE:
-            keyMgmt = "SAE";
+            keyMgmt = KEY_MGMT_SAE;
             break;
 
         default:
-            keyMgmt = "NONE";
+            keyMgmt = KEY_MGMT_NONE;
             break;
+    }
+}
+
+static void ProcessPassphrase(const SecTypeJs& securityType, WifiDeviceConfig& cppConfig)
+{
+    if (securityType == SecTypeJs::SEC_TYPE_WEP) {
+        cppConfig.wepKeys[0] = cppConfig.preSharedKey;
+        cppConfig.wepTxKeyIndex = 0;
+        cppConfig.preSharedKey = "";
     }
 }
 
@@ -189,6 +198,15 @@ static void JsObjToDeviceConfig(const napi_env& env, const napi_value& object, W
     int type = static_cast<int>(SecTypeJs::SEC_TYPE_INVALID);
     JsObjectToInt(env, object, "securityType", type);
     ConvertEncryptionMode(SecTypeJs(type), cppConfig.keyMgmt);
+    ProcessPassphrase(SecTypeJs(type), cppConfig);
+    /* "creatorUid" is not supported currently */
+    /* "disableReason" is not supported currently */
+    JsObjectToInt(env, object, "netId", cppConfig.networkId);
+    /* "randomMacType" is not supported currently */
+    /* "randomMacAddr" is not supported currently */
+    int ipType = static_cast<int>(AssignIpMethod::UNASSIGNED);
+    JsObjectToInt(env, object, "ipType", ipType);
+    /* "staticIp" is not supported currently */
 }
 
 napi_value AddDeviceConfig(napi_env env, napi_callback_info info)
@@ -201,7 +219,7 @@ napi_value AddDeviceConfig(napi_env env, napi_callback_info info)
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, &data));
     NAPI_ASSERT(env, argc >= 1, "Wrong number of arguments");
     NAPI_ASSERT(env, wifiDevicePtr != nullptr, "Wifi device instance is null.");
-    
+
     napi_valuetype valueType;
     napi_typeof(env, argv[0], &valueType);
     NAPI_ASSERT(env, valueType == napi_object, "Wrong argument type, object is expected for parameter 1.");
@@ -236,6 +254,106 @@ napi_value AddDeviceConfig(napi_env env, napi_callback_info info)
             context->config = nullptr;
         }
         WIFI_LOGI("Push add device config result to client");
+    };
+
+    size_t nonCallbackArgNum = 1;
+    return DoAsyncWork(env, asyncContext, argc, argv, nonCallbackArgNum);
+}
+
+napi_value AddUntrustedConfig(napi_env env, napi_callback_info info)
+{
+    TRACE_FUNC_CALL;
+    size_t argc = 2;
+    napi_value argv[argc];
+    napi_value thisVar = nullptr;
+    void *data = nullptr;
+    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, &data));
+    NAPI_ASSERT(env, argc >= 1, "Wrong number of arguments");
+    NAPI_ASSERT(env, wifiDevicePtr != nullptr, "Wifi device instance is null.");
+
+    napi_valuetype valueType;
+    napi_typeof(env, argv[0], &valueType);
+    NAPI_ASSERT(env, valueType == napi_object, "Wrong argument type, object is expected for parameter 1.");
+
+    AddDeviceConfigContext *asyncContext = new AddDeviceConfigContext(env);
+    NAPI_ASSERT(env, asyncContext != nullptr, "asyncContext is null.");
+    napi_create_string_latin1(env, "AddUntrustedConfig", NAPI_AUTO_LENGTH, &asyncContext->resourceName);
+
+    WifiDeviceConfig *config = new WifiDeviceConfig();
+    if (config == nullptr) {
+        delete asyncContext;
+        return UndefinedNapiValue(env);
+    }
+    JsObjToDeviceConfig(env, argv[0], *config);
+    asyncContext->config = config;
+
+    asyncContext->executeFunc = [&](void* data) -> void {
+        AddDeviceConfigContext *context = static_cast<AddDeviceConfigContext *>(data);
+        TRACE_FUNC_CALL_NAME("wifiDevicePtr->AddUntrustedConfig");
+        /* This interface is not supported currently */
+        context->addResult = -1;
+        context->errorCode = WIFI_OPT_NOT_SUPPORTED;
+    };
+
+    asyncContext->completeFunc = [&](void* data) -> void {
+        AddDeviceConfigContext *context = static_cast<AddDeviceConfigContext *>(data);
+        /* This interface is not supported currently */
+        napi_get_boolean(context->env, false, &context->result);
+        if (context->config != nullptr) {
+            delete context->config;
+            context->config = nullptr;
+        }
+        WIFI_LOGI("Push add untrusted device config result to client");
+    };
+
+    size_t nonCallbackArgNum = 1;
+    return DoAsyncWork(env, asyncContext, argc, argv, nonCallbackArgNum);
+}
+
+napi_value RemoveUntrustedConfig(napi_env env, napi_callback_info info)
+{
+    TRACE_FUNC_CALL;
+    size_t argc = 3;
+    napi_value argv[argc];
+    napi_value thisVar = nullptr;
+    void *data = nullptr;
+    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, &data));
+    NAPI_ASSERT(env, argc >= 1, "Wrong number of arguments");
+    NAPI_ASSERT(env, wifiDevicePtr != nullptr, "Wifi device instance is null.");
+
+    napi_valuetype valueType;
+    napi_typeof(env, argv[0], &valueType);
+    NAPI_ASSERT(env, valueType == napi_object, "Wrong argument type, object is expected for parameter 1.");
+
+    AddDeviceConfigContext *asyncContext = new AddDeviceConfigContext(env);
+    NAPI_ASSERT(env, asyncContext != nullptr, "asyncContext is null.");
+    napi_create_string_latin1(env, "RemoveUntrustedConfig", NAPI_AUTO_LENGTH, &asyncContext->resourceName);
+
+    WifiDeviceConfig *config = new WifiDeviceConfig();
+    if (config == nullptr) {
+        delete asyncContext;
+        return UndefinedNapiValue(env);
+    }
+    JsObjToDeviceConfig(env, argv[0], *config);
+    asyncContext->config = config;
+
+    asyncContext->executeFunc = [&](void* data) -> void {
+        AddDeviceConfigContext *context = static_cast<AddDeviceConfigContext *>(data);
+        TRACE_FUNC_CALL_NAME("wifiDevicePtr->RemoveUntrustedConfig");
+        /* This interface is not supported currently */
+        context->addResult = -1;
+        context->errorCode = WIFI_OPT_NOT_SUPPORTED;
+    };
+
+    asyncContext->completeFunc = [&](void* data) -> void {
+        AddDeviceConfigContext *context = static_cast<AddDeviceConfigContext *>(data);
+        /* This interface is not supported currently */
+        napi_get_boolean(context->env, false, &context->result);
+        if (context->config != nullptr) {
+            delete context->config;
+            context->config = nullptr;
+        }
+        WIFI_LOGI("Push remove untrusted device config result to client");
     };
 
     size_t nonCallbackArgNum = 1;
@@ -349,7 +467,7 @@ napi_value ReConnect(napi_env env, napi_callback_info info)
     NAPI_ASSERT(env, wifiDevicePtr != nullptr, "Wifi device instance is null.");
 
     napi_value result;
-    napi_get_boolean(env, wifiDevicePtr->ReConnect(), &result);
+    napi_get_boolean(env, wifiDevicePtr->ReConnect() == WIFI_OPT_SUCCESS, &result);
     WriteWifiConnectionHiSysEvent(WifiConnectionType::CONNECT, JsAbilityGetBundleName());
     return result;
 }
@@ -359,7 +477,7 @@ napi_value ReAssociate(napi_env env, napi_callback_info info)
     TRACE_FUNC_CALL;
     NAPI_ASSERT(env, wifiDevicePtr != nullptr, "Wifi device instance is null.");
     napi_value result;
-    napi_get_boolean(env, wifiDevicePtr->ReAssociate(), &result);
+    napi_get_boolean(env, wifiDevicePtr->ReAssociate() == WIFI_OPT_SUCCESS, &result);
     WriteWifiConnectionHiSysEvent(WifiConnectionType::CONNECT, JsAbilityGetBundleName());
     return result;
 }
@@ -407,9 +525,7 @@ static void LinkedInfoToJs(const napi_env& env, WifiLinkedInfo& linkedInfo, napi
     SetValueInt32(env, "snr", linkedInfo.snr, result);
     SetValueUtf8String(env, "macAddress", linkedInfo.macAddress.c_str(), result);
     SetValueUnsignedInt32(env, "ipAddress", linkedInfo.ipAddress, result);
-    /* Check suppState is consistent with HOS */
     SetValueInt32(env, "suppState", static_cast<int>(linkedInfo.supplicantState), result);
-    /* Check connState is consistent with HOS */
     SetValueInt32(env, "connState", static_cast<int>(linkedInfo.connState), result);
 }
 
@@ -514,19 +630,81 @@ napi_value GetCountryCode(napi_env env, napi_callback_info info)
 static SecTypeJs ConvertKeyMgmtToSecType(const std::string& keyMgmt)
 {
     std::map<std::string, SecTypeJs> mapKeyMgmtToSecType = {
-        {"NONE", SecTypeJs::SEC_TYPE_OPEN},
-        {"WEP", SecTypeJs::SEC_TYPE_WEP},
-        {"WPA-PSK", SecTypeJs::SEC_TYPE_PSK},
-        {"SAE", SecTypeJs::SEC_TYPE_SAE},
+        {KEY_MGMT_NONE, SecTypeJs::SEC_TYPE_OPEN},
+        {KEY_MGMT_WEP, SecTypeJs::SEC_TYPE_WEP},
+        {KEY_MGMT_WPA_PSK, SecTypeJs::SEC_TYPE_PSK},
+        {KEY_MGMT_SAE, SecTypeJs::SEC_TYPE_SAE},
     };
 
     std::map<std::string, SecTypeJs>::iterator iter = mapKeyMgmtToSecType.find(keyMgmt);
     return iter == mapKeyMgmtToSecType.end() ? SecTypeJs::SEC_TYPE_OPEN : iter->second;
 }
 
-static void DeviceConfigToJsArray(const napi_env& env, const std::vector<WifiDeviceConfig>& vecDeviceConfigs,
+static void IpConfigToJs(const napi_env& env, const WifiIpConfig& wifiIpConfig, napi_value& ipCfgObj)
+{
+    SetValueInt32(env, "ipAddress", wifiIpConfig.staticIpAddress.ipAddress.address.addressIpv4, ipCfgObj);
+    SetValueInt32(env, "gateway", wifiIpConfig.staticIpAddress.gateway.addressIpv4, ipCfgObj);
+
+    const int DNS_NUM = 2;
+    napi_value dnsArray;
+    napi_create_array_with_length(env, DNS_NUM, &dnsArray);
+    std::vector<unsigned int> vecDns = {wifiIpConfig.staticIpAddress.dnsServer1.addressIpv4,
+        wifiIpConfig.staticIpAddress.dnsServer2.addressIpv4};
+    for (int i = 0; i != DNS_NUM; ++i) {
+        napi_value value;
+        napi_status status = napi_create_int32(env, vecDns[i], &value);
+        if (status != napi_ok) {
+            WIFI_LOGE("Ip config to js create int32 error!");
+            return;
+        }
+        status = napi_set_element(env, dnsArray, i, value);
+        if (status != napi_ok) {
+            WIFI_LOGE("Ip config to js set element error: %{public}d", status);
+            return;
+        }
+    }
+    if (napi_set_named_property(env, ipCfgObj, "dnsServers", dnsArray) != napi_ok) {
+        WIFI_LOGE("Set dnsServers named property error!");
+    }
+
+    const int DOMAINS_NUM = 1;
+    napi_value domainsArray;
+    napi_create_array_with_length(env, DOMAINS_NUM, &domainsArray);
+    std::vector<std::string> vecDomains = {wifiIpConfig.staticIpAddress.domains};
+    for (int i = 0; i != DOMAINS_NUM; ++i) {
+        napi_value value;
+        napi_status status = napi_create_string_utf8(env, vecDomains[i].c_str(), NAPI_AUTO_LENGTH, &value);
+        if (status != napi_ok) {
+            WIFI_LOGE("Ip config to js create utf8 string error!");
+            return;
+        }
+        status = napi_set_element(env, domainsArray, i, value);
+        if (status != napi_ok) {
+            WIFI_LOGE("Ip config to js set element error: %{public}d", status);
+        }
+    }
+    if (napi_set_named_property(env, ipCfgObj, "domains", domainsArray) != napi_ok) {
+        WIFI_LOGE("Set domains named property error!");
+    }
+}
+
+static void UpdateSecurityTypeAndPreSharedKey(WifiDeviceConfig& cppConfig)
+{
+    if (cppConfig.keyMgmt != KEY_MGMT_NONE) {
+        return;
+    }
+    for (int i = 0; i != WEPKEYS_SIZE; ++i) {
+        if (!cppConfig.wepKeys[i].empty() && cppConfig.wepTxKeyIndex == i) {
+            cppConfig.keyMgmt = KEY_MGMT_WEP;
+            cppConfig.preSharedKey = cppConfig.wepKeys[i];
+        }
+    }
+}
+
+static void DeviceConfigToJsArray(const napi_env& env, std::vector<WifiDeviceConfig>& vecDeviceConfigs,
     const int idx, napi_value& arrayResult)
 {
+    UpdateSecurityTypeAndPreSharedKey(vecDeviceConfigs[idx]);
     napi_value result;
     napi_create_object(env, &result);
     SetValueUtf8String(env, "ssid", vecDeviceConfigs[idx].ssid.c_str(), result);
@@ -535,8 +713,26 @@ static void DeviceConfigToJsArray(const napi_env& env, const std::vector<WifiDev
     SetValueBool(env, "isHiddenSsid", vecDeviceConfigs[idx].hiddenSSID, result);
     SetValueInt32(env, "securityType",
         static_cast<int>(ConvertKeyMgmtToSecType(vecDeviceConfigs[idx].keyMgmt)), result);
+    /* not supported currently */
+    SetValueInt32(env, "creatorUid", DEFAULT_INVALID_VALUE, result);
+    /* not supported currently */
+    SetValueInt32(env, "disableReason", DEFAULT_INVALID_VALUE, result);
+    SetValueInt32(env, "netId", vecDeviceConfigs[idx].networkId, result);
+    /* not supported currently */
+    SetValueInt32(env, "randomMacType", DEFAULT_INVALID_VALUE, result);
+    /* not supported currently */
+    SetValueUtf8String(env, "randomMacAddr", std::string("").c_str(), result);
+    /* not fully supported, set as dhcp now */
+    SetValueInt32(env, "ipType", static_cast<int>(AssignIpMethod::DHCP), result);
 
-    napi_status status = napi_set_element(env, arrayResult, idx, result);
+    napi_value ipCfgObj;
+    napi_create_object(env, &ipCfgObj);
+    IpConfigToJs(env, vecDeviceConfigs[idx].wifiIpConfig, ipCfgObj);
+    napi_status status = napi_set_named_property(env, result, "staticIp", ipCfgObj);
+    if (status != napi_ok) {
+        WIFI_LOGE("Set staticIp field!");
+    }
+    status = napi_set_element(env, arrayResult, idx, result);
     if (status != napi_ok) {
         WIFI_LOGE("Wifi napi set element error: %{public}d", status);
     }

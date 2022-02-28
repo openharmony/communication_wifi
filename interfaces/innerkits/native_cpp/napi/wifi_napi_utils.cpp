@@ -26,7 +26,7 @@ TraceFuncCall::TraceFuncCall(std::string funcName): m_funcName(funcName)
 {
     if (m_isTrace) {
         m_startTime = std::chrono::steady_clock::now();
-        WIFI_LOGD("Call func: %{public}s (start)", m_funcName.c_str());
+        WIFI_LOGD("Call wifi func: %{public}s (start)", m_funcName.c_str());
     }
 }
 

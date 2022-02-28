@@ -1959,7 +1959,7 @@ void StaStateMachine::DhcpResultNotify::OnFailed(int status, const std::string &
         }
     } else {
         pStaStateMachine->staCallback.OnStaConnChanged(
-            OperateResState::CONNECT_OBTAINING_IP_FAILED, pStaStateMachine->linkedInfo); 
+            OperateResState::CONNECT_OBTAINING_IP_FAILED, pStaStateMachine->linkedInfo);
         if (!pStaStateMachine->isRoam) {
             pStaStateMachine->DisConnectProcess();
             pStaStateMachine->SaveLinkstate(ConnState::DISCONNECTED, DetailedState::OBTAINING_IPADDR_FAIL);

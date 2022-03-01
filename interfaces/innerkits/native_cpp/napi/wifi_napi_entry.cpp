@@ -62,7 +62,7 @@ static napi_value Init(napi_env env, napi_value exports) {
         DECLARE_NAPI_FUNCTION("getStations", GetStations),
         DECLARE_NAPI_FUNCTION("getP2pLinkedInfo", GetP2pLinkedInfo),
         DECLARE_NAPI_FUNCTION("getCurrentGroup", GetCurrentGroup),
-        DECLARE_NAPI_FUNCTION("getP2pDevices", GetP2pDevices),
+        DECLARE_NAPI_FUNCTION("getP2pPeerDevices", GetP2pDevices),
         DECLARE_NAPI_FUNCTION("createGroup", CreateGroup),
         DECLARE_NAPI_FUNCTION("removeGroup", RemoveGroup),
         DECLARE_NAPI_FUNCTION("p2pConnect", P2pConnect),

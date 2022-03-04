@@ -33,6 +33,8 @@ ohos_static_library("crpc_server") {
     "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog",
     "//utils/native/base:utils",
   ]
+  subsystem_name = "communication"
+  part_name = "wifi_standard"
 }
 
 ohos_static_library("crpc_client") {
@@ -53,6 +55,8 @@ ohos_static_library("crpc_client") {
     "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog",
     "//utils/native/base:utils",
   ]
+  subsystem_name = "communication"
+  part_name = "wifi_standard"
 }
 
 group("ipc_framework") {

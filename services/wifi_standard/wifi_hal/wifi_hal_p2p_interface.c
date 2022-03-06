@@ -39,7 +39,7 @@ static WifiErrorNo P2pStartSupplicant(void)
         LOGD("p2p configure file %{public}s is exist.", p2pConf);
     } else {
         char szcpCmd[BUFF_SIZE] = {0};
-        const char *cpP2pConfCmd = "cp /system/etc/wifi/p2p_supplicant.conf /data/misc/wifi/wpa_supplicant";
+        const char *cpP2pConfCmd = "cp /system/etc/wifi/p2p_supplicant.conf /data/misc/wifi/wpa_supplicant/";
         int iRet = snprintf_s(szcpCmd, sizeof(szcpCmd), sizeof(szcpCmd) - 1, "%s", cpP2pConfCmd);
         if (iRet < 0) {
             return WIFI_HAL_FAILED;

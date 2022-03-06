@@ -45,6 +45,10 @@ ErrCode WifiP2pProxy::EnableP2p(void)
     MessageOption option;
     MessageParcel data;
     MessageParcel reply;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
     data.WriteInt32(0);
     int error = Remote()->SendRequest(WIFI_SVR_CMD_P2P_ENABLE, data, reply, option);
     if (error != ERR_NONE) {
@@ -67,6 +71,10 @@ ErrCode WifiP2pProxy::DisableP2p(void)
     MessageOption option;
     MessageParcel data;
     MessageParcel reply;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
     data.WriteInt32(0);
     int error = Remote()->SendRequest(WIFI_SVR_CMD_P2P_DISABLE, data, reply, option);
     if (error != ERR_NONE) {
@@ -90,6 +98,10 @@ ErrCode WifiP2pProxy::DiscoverDevices(void)
     MessageOption option;
     MessageParcel data;
     MessageParcel reply;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
     data.WriteInt32(0);
     int error = Remote()->SendRequest(WIFI_SVR_CMD_P2P_DISCOVER_DEVICES, data, reply, option);
     if (error != ERR_NONE) {
@@ -113,6 +125,10 @@ ErrCode WifiP2pProxy::StopDiscoverDevices(void)
     MessageOption option;
     MessageParcel data;
     MessageParcel reply;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
     data.WriteInt32(0);
     int error = Remote()->SendRequest(WIFI_SVR_CMD_P2P_STOP_DISCOVER_DEVICES, data, reply, option);
     if (error != ERR_NONE) {
@@ -137,6 +153,10 @@ ErrCode WifiP2pProxy::DiscoverServices(void)
     MessageOption option;
     MessageParcel data;
     MessageParcel reply;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
     data.WriteInt32(0);
     int error = Remote()->SendRequest(WIFI_SVR_CMD_P2P_DISCOVER_SERVICES, data, reply, option);
     if (error != ERR_NONE) {
@@ -160,6 +180,10 @@ ErrCode WifiP2pProxy::StopDiscoverServices(void)
     MessageOption option;
     MessageParcel data;
     MessageParcel reply;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
     data.WriteInt32(0);
     int error = Remote()->SendRequest(WIFI_SVR_CMD_P2P_STOP_DISCOVER_SERVICES, data, reply, option);
     if (error != ERR_NONE) {
@@ -184,6 +208,10 @@ ErrCode WifiP2pProxy::RequestService(const WifiP2pDevice &device, const WifiP2pS
     MessageOption option;
     MessageParcel data;
     MessageParcel reply;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
     data.WriteInt32(0);
     WriteWifiP2pServiceRequest(data, device, request);
     int error = Remote()->SendRequest(WIFI_SVR_CMD_P2P_REQUEST_SERVICES, data, reply, option);
@@ -208,6 +236,10 @@ ErrCode WifiP2pProxy::PutLocalP2pService(const WifiP2pServiceInfo &srvInfo)
     MessageOption option;
     MessageParcel data;
     MessageParcel reply;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
     data.WriteInt32(0);
     WriteWifiP2pServiceInfo(data, srvInfo);
     int error = Remote()->SendRequest(WIFI_SVR_CMD_P2P_PUT_LOCAL_SERVICES, data, reply, option);
@@ -232,6 +264,10 @@ ErrCode WifiP2pProxy::DeleteLocalP2pService(const WifiP2pServiceInfo &srvInfo)
     MessageOption option;
     MessageParcel data;
     MessageParcel reply;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
     data.WriteInt32(0);
     WriteWifiP2pServiceInfo(data, srvInfo);
     int error = Remote()->SendRequest(WIFI_SVR_CMD_P2P_DELETE_LOCAL_SERVICES, data, reply, option);
@@ -257,6 +293,10 @@ ErrCode WifiP2pProxy::StartP2pListen(int period, int interval)
     MessageOption option;
     MessageParcel data;
     MessageParcel reply;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
     data.WriteInt32(0);
     data.WriteInt32(period);
     data.WriteInt32(interval);
@@ -282,6 +322,10 @@ ErrCode WifiP2pProxy::StopP2pListen(void)
     MessageOption option;
     MessageParcel data;
     MessageParcel reply;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
     data.WriteInt32(0);
     int error = Remote()->SendRequest(WIFI_SVR_CMD_P2P_STOP_LISTEN, data, reply, option);
     if (error != ERR_NONE) {
@@ -305,6 +349,10 @@ ErrCode WifiP2pProxy::FormGroup(const WifiP2pConfig &config)
     MessageOption option;
     MessageParcel data;
     MessageParcel reply;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
     data.WriteInt32(0);
     WriteWifiP2pConfigData(data, config);
     int error = Remote()->SendRequest(WIFI_SVR_CMD_P2P_FORM_GROUP, data, reply, option);
@@ -329,6 +377,10 @@ ErrCode WifiP2pProxy::RemoveGroup()
     MessageOption option;
     MessageParcel data;
     MessageParcel reply;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
     data.WriteInt32(0);
     int error = Remote()->SendRequest(WIFI_SVR_CMD_P2P_REMOVE_GROUP, data, reply, option);
     if (error != ERR_NONE) {
@@ -351,6 +403,10 @@ ErrCode WifiP2pProxy::DeleteGroup(const WifiP2pGroupInfo &group)
     MessageOption option;
     MessageParcel data;
     MessageParcel reply;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
     data.WriteInt32(0);
     WriteWifiP2pGroupData(data, group);
     int error = Remote()->SendRequest(WIFI_SVR_CMD_P2P_DELETE_GROUP, data, reply, option);
@@ -502,6 +558,10 @@ ErrCode WifiP2pProxy::P2pConnect(const WifiP2pConfig &config)
     MessageOption option;
     MessageParcel data;
     MessageParcel reply;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
     data.WriteInt32(0);
     WriteWifiP2pConfigData(data, config);
     int error = Remote()->SendRequest(WIFI_SVR_CMD_P2P_CONNECT, data, reply, option);
@@ -526,6 +586,10 @@ ErrCode WifiP2pProxy::P2pDisConnect()
     MessageOption option;
     MessageParcel data;
     MessageParcel reply;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
     data.WriteInt32(0);
     int error = Remote()->SendRequest(WIFI_SVR_CMD_P2P_DISCONNECT, data, reply, option);
     if (error != ERR_NONE) {
@@ -549,6 +613,10 @@ ErrCode WifiP2pProxy::QueryP2pLinkedInfo(WifiP2pLinkedInfo &linkedInfo)
     MessageOption option;
     MessageParcel data;
     MessageParcel reply;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
     data.WriteInt32(0);
     int error = Remote()->SendRequest(WIFI_SVR_CMD_P2P_QUERY_INFO, data, reply, option);
     if (error != ERR_NONE) {
@@ -580,6 +648,10 @@ ErrCode WifiP2pProxy::GetCurrentGroup(WifiP2pGroupInfo &group)
     MessageOption option;
     MessageParcel data;
     MessageParcel reply;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
     data.WriteInt32(0);
     int error = Remote()->SendRequest(WIFI_SVR_CMD_P2P_GET_CURRENT_GROUP, data, reply, option);
     if (error != ERR_NONE) {
@@ -608,6 +680,10 @@ ErrCode WifiP2pProxy::GetP2pEnableStatus(int &status)
     MessageOption option;
     MessageParcel data;
     MessageParcel reply;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
     data.WriteInt32(0);
     int error = Remote()->SendRequest(WIFI_SVR_CMD_P2P_GET_ENABLE_STATUS, data, reply, option);
     if (error != ERR_NONE) {
@@ -636,6 +712,10 @@ ErrCode WifiP2pProxy::GetP2pDiscoverStatus(int &status)
     MessageOption option;
     MessageParcel data;
     MessageParcel reply;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
     data.WriteInt32(0);
     int error = Remote()->SendRequest(WIFI_SVR_CMD_P2P_GET_DISCOVER_STATUS, data, reply, option);
     if (error != ERR_NONE) {
@@ -664,6 +744,10 @@ ErrCode WifiP2pProxy::GetP2pConnectedStatus(int &status)
     MessageOption option;
     MessageParcel data;
     MessageParcel reply;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
     data.WriteInt32(0);
     int error = Remote()->SendRequest(WIFI_SVR_CMD_P2P_GET_CONNECTED_STATUS, data, reply, option);
     if (error != ERR_NONE) {
@@ -692,6 +776,10 @@ ErrCode WifiP2pProxy::QueryP2pDevices(std::vector<WifiP2pDevice> &devices)
     MessageOption option;
     MessageParcel data;
     MessageParcel reply;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
     data.WriteInt32(0);
     int error = Remote()->SendRequest(WIFI_SVR_CMD_P2P_QUERY_DEVICES, data, reply, option);
     if (error != ERR_NONE) {
@@ -726,6 +814,10 @@ ErrCode WifiP2pProxy::QueryP2pGroups(std::vector<WifiP2pGroupInfo> &groups)
     MessageOption option;
     MessageParcel data;
     MessageParcel reply;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
     data.WriteInt32(0);
     int error = Remote()->SendRequest(WIFI_SVR_CMD_P2P_QUERY_GROUPS, data, reply, option);
     if (error != ERR_NONE) {
@@ -760,6 +852,10 @@ ErrCode WifiP2pProxy::QueryP2pServices(std::vector<WifiP2pServiceInfo> &services
     MessageOption option;
     MessageParcel data;
     MessageParcel reply;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
     data.WriteInt32(0);
     int error = Remote()->SendRequest(WIFI_SVR_CMD_P2P_QUERY_SERVICES, data, reply, option);
     if (error != ERR_NONE) {
@@ -793,6 +889,10 @@ ErrCode WifiP2pProxy::SetP2pDeviceName(const std::string &deviceName)
     MessageOption option;
     MessageParcel data;
     MessageParcel reply;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
     data.WriteInt32(0);
     data.WriteCString(deviceName.c_str());
     int error = Remote()->SendRequest(WIFI_SVR_CMD_P2P_SET_DEVICE_NAME, data, reply, option);
@@ -820,6 +920,10 @@ ErrCode WifiP2pProxy::SetP2pWfdInfo(const WifiP2pWfdInfo &wfdInfo)
     MessageOption option;
     MessageParcel data;
     MessageParcel reply;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
     data.WriteInt32(0);
     data.WriteBool(wfdInfo.GetWfdEnabled());
     data.WriteInt32(wfdInfo.GetDeviceInfo());
@@ -854,6 +958,10 @@ ErrCode WifiP2pProxy::RegisterCallBack(const sptr<IWifiP2pCallback> &callback)
     MessageOption option(MessageOption::TF_ASYNC);
 
     g_wifiP2pCallbackStub.RegisterCallBack(callback);
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
     data.WriteInt32(0);
     if (!data.WriteRemoteObject(g_wifiP2pCallbackStub.AsObject())) {
         WIFI_LOGE("RegisterCallBack WriteRemoteObject failed!");
@@ -882,6 +990,10 @@ ErrCode WifiP2pProxy::GetSupportedFeatures(long &features)
     }
     MessageOption option;
     MessageParcel data, reply;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
     data.WriteInt32(0);
     int error = Remote()->SendRequest(WIFI_SVR_CMD_GET_SUPPORTED_FEATURES, data, reply, option);
     if (error != ERR_NONE) {
@@ -910,6 +1022,10 @@ ErrCode WifiP2pProxy::Hid2dRequestGcIp(const std::string& gcMac, std::string& ip
     MessageOption option;
     MessageParcel data;
     MessageParcel reply;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
     data.WriteInt32(0);
     data.WriteCString(gcMac.c_str());
     int error = Remote()->SendRequest(WIFI_SVR_CMD_P2P_HID2D_APPLY_IP, data, reply, option);
@@ -938,6 +1054,10 @@ ErrCode WifiP2pProxy::Hid2dSharedlinkIncrease()
     MessageOption option;
     MessageParcel data;
     MessageParcel reply;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
     data.WriteInt32(0);
     int error = Remote()->SendRequest(WIFI_SVR_CMD_P2P_HID2D_SHARED_LINK_INCREASE, data, reply, option);
     if (error != ERR_NONE) {
@@ -961,6 +1081,10 @@ ErrCode WifiP2pProxy::Hid2dSharedlinkDecrease()
     MessageOption option;
     MessageParcel data;
     MessageParcel reply;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
     data.WriteInt32(0);
     int error = Remote()->SendRequest(WIFI_SVR_CMD_P2P_HID2D_SHARED_LINK_DECREASE, data, reply, option);
     if (error != ERR_NONE) {
@@ -986,6 +1110,10 @@ ErrCode WifiP2pProxy::Hid2dCreateGroup(const int frequency, FreqType type)
     MessageOption option;
     MessageParcel data;
     MessageParcel reply;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
     data.WriteInt32(0);
     data.WriteInt32(frequency);
     data.WriteInt32(static_cast<int>(type));
@@ -1013,6 +1141,10 @@ ErrCode WifiP2pProxy::Hid2dRemoveGcGroup(const std::string& gcIfName)
     MessageOption option;
     MessageParcel data;
     MessageParcel reply;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
     data.WriteInt32(0);
     data.WriteCString(gcIfName.c_str());
     int error = Remote()->SendRequest(WIFI_SVR_CMD_P2P_HID2D_REMOVE_GC_GROUP, data, reply, option);
@@ -1039,6 +1171,10 @@ ErrCode WifiP2pProxy::Hid2dConnect(const Hid2dConnectConfig& config)
     MessageOption option;
     MessageParcel data;
     MessageParcel reply;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
     data.WriteInt32(0);
     data.WriteCString(config.GetSsid().c_str());
     data.WriteCString(config.GetBssid().c_str());
@@ -1067,6 +1203,10 @@ ErrCode WifiP2pProxy::Hid2dConfigIPAddr(const std::string& ifName, const IpAddrI
     MessageOption option;
     MessageParcel data;
     MessageParcel reply;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
     data.WriteInt32(0);
     data.WriteCString(ifName.c_str());
     data.WriteCString(ipInfo.ip.c_str());
@@ -1094,6 +1234,10 @@ ErrCode WifiP2pProxy::Hid2dReleaseIPAddr(const std::string& ifName)
     MessageOption option;
     MessageParcel data;
     MessageParcel reply;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
     data.WriteInt32(0);
     data.WriteCString(ifName.c_str());
     int error = Remote()->SendRequest(WIFI_SVR_CMD_P2P_HID2D_RELEASE_IP, data, reply, option);
@@ -1118,6 +1262,10 @@ ErrCode WifiP2pProxy::Hid2dGetRecommendChannel(const RecommendChannelRequest& re
     }
     MessageOption option;
     MessageParcel data, reply;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
     data.WriteInt32(0);
     data.WriteCString(request.remoteIfName.c_str());
     data.WriteInt32(request.remoteIfMode);
@@ -1157,6 +1305,10 @@ ErrCode WifiP2pProxy::Hid2dGetChannelListFor5G(std::vector<int>& vecChannelList)
     MessageOption option;
     MessageParcel data;
     MessageParcel reply;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
     data.WriteInt32(0);
     int error = Remote()->SendRequest(WIFI_SVR_CMD_GET_5G_CHANNEL_LIST, data, reply, option);
     if (error != ERR_NONE) {
@@ -1188,6 +1340,10 @@ ErrCode WifiP2pProxy::Hid2dGetSelfWifiCfgInfo(SelfCfgType cfgType,
     MessageOption option;
     MessageParcel data;
     MessageParcel reply;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
     data.WriteInt32(0);
     data.WriteInt32(static_cast<int>(cfgType));
     int error = Remote()->SendRequest(WIFI_SVR_CMD_GET_SELF_WIFI_CFG, data, reply, option);
@@ -1233,6 +1389,10 @@ ErrCode WifiP2pProxy::Hid2dSetPeerWifiCfgInfo(PeerCfgType cfgType,
     MessageOption option;
     MessageParcel data;
     MessageParcel reply;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
     data.WriteInt32(0);
     data.WriteInt32(static_cast<int>(cfgType));
     data.WriteInt32(setDataValidLen);

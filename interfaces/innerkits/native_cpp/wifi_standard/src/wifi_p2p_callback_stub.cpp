@@ -53,6 +53,11 @@ int WifiP2pCallbackStub::OnRemoteRequest(
         return -1;
     }
 
+    if (data.ReadInterfaceToken() != GetDescriptor()) {
+        WIFI_LOGE("P2p callback stub token verification error");
+        return WIFI_OPT_FAILED;
+    }
+
     int exception = data.ReadInt32();
     if (exception) {
         WIFI_LOGD("WifiP2pCallbackStub::OnRemoteRequest exception! %{public}d!", exception);

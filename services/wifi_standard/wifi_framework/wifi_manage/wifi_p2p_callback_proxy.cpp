@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,6 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include "wifi_p2p_callback_proxy.h"
 #include "wifi_logger.h"
 #include "define.h"
@@ -33,6 +34,10 @@ void WifiP2pCallbackProxy::OnP2pStateChanged(int state)
     MessageOption option;
     MessageParcel data;
     MessageParcel reply;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return;
+    }
     data.WriteInt32(0);
     data.WriteInt32(state);
     int error = Remote()->SendRequest(WIFI_CBK_CMD_P2P_STATE_CHANGE, data, reply, option);
@@ -53,6 +58,10 @@ void WifiP2pCallbackProxy::OnP2pPersistentGroupsChanged(void)
     MessageOption option;
     MessageParcel data;
     MessageParcel reply;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return;
+    }
     data.WriteInt32(0);
     int error = Remote()->SendRequest(WIFI_CBK_CMD_PERSISTENT_GROUPS_CHANGE, data, reply, option);
     if (error != ERR_NONE) {
@@ -88,6 +97,10 @@ void WifiP2pCallbackProxy::OnP2pThisDeviceChanged(const WifiP2pDevice &device)
     MessageOption option;
     MessageParcel data;
     MessageParcel reply;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return;
+    }
     data.WriteInt32(0);
     WriteWifiP2pDeviceData(data, device);
     int error = Remote()->SendRequest(WIFI_CBK_CMD_THIS_DEVICE_CHANGE, data, reply, option);
@@ -108,6 +121,10 @@ void WifiP2pCallbackProxy::OnP2pPeersChanged(const std::vector<WifiP2pDevice> &d
     MessageOption option;
     MessageParcel data;
     MessageParcel reply;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return;
+    }
     data.WriteInt32(0);
     int size = devices.size();
     data.WriteInt32(size);
@@ -132,6 +149,10 @@ void WifiP2pCallbackProxy::OnP2pServicesChanged(const std::vector<WifiP2pService
     MessageOption option;
     MessageParcel data;
     MessageParcel reply;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return;
+    }
     data.WriteInt32(0);
     int size = srvInfo.size();
     data.WriteInt32(size);
@@ -163,6 +184,10 @@ void WifiP2pCallbackProxy::OnP2pConnectionChanged(const WifiP2pLinkedInfo &info)
     MessageOption option;
     MessageParcel data;
     MessageParcel reply;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return;
+    }
     data.WriteInt32(0);
     data.WriteInt32(static_cast<int>(info.GetConnectState()));
     data.WriteBool(info.IsGroupOwner());
@@ -185,6 +210,10 @@ void WifiP2pCallbackProxy::OnP2pDiscoveryChanged(bool isChange)
     MessageOption option;
     MessageParcel data;
     MessageParcel reply;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return;
+    }
     data.WriteInt32(0);
     data.WriteBool(isChange);
     int error = Remote()->SendRequest(WIFI_CBK_CMD_DISCOVERY_CHANGE, data, reply, option);
@@ -205,6 +234,10 @@ void WifiP2pCallbackProxy::OnP2pActionResult(P2pActionCallback action, ErrCode c
     MessageOption option;
     MessageParcel data;
     MessageParcel reply;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return;
+    }
     data.WriteInt32(0);
     data.WriteInt32(static_cast<int>(action));
     data.WriteInt32(static_cast<int>(code));

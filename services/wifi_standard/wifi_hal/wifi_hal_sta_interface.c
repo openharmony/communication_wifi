@@ -148,12 +148,11 @@ WifiErrorNo StartSupplicant(void)
         LOGD("wpa configure file %{public}s is exist.", wpaConf);
     } else {
         char szcpCmd[BUFF_SIZE] = {0};
-        const char *cpWpaConfCmd = "cp /system/etc/wifi/wpa_supplicant.conf /data/misc/wifi/wpa_supplicant";
+        const char *cpWpaConfCmd = "cp /system/etc/wifi/wpa_supplicant.conf /data/misc/wifi/wpa_supplicant/";
         int iRet = snprintf_s(szcpCmd, sizeof(szcpCmd), sizeof(szcpCmd) - 1, "%s", cpWpaConfCmd);
         if (iRet < 0) {
             return WIFI_HAL_FAILED;
         }
-
         ExcuteCmd(szcpCmd);
     }
 

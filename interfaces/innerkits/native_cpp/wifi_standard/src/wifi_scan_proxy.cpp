@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -45,6 +45,10 @@ ErrCode WifiScanProxy::SetScanControlInfo(const ScanControlInfo &info)
     MessageOption option;
     MessageParcel data;
     MessageParcel reply;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
     data.WriteInt32(0);
     data.WriteInt32(info.scanForbidList.size());
     for (auto iter = info.scanForbidList.begin(); iter != info.scanForbidList.end(); iter++) {
@@ -90,6 +94,10 @@ ErrCode WifiScanProxy::Scan()
     MessageOption option;
     MessageParcel data;
     MessageParcel reply;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
     data.WriteInt32(0);
     int error = Remote()->SendRequest(WIFI_SVR_CMD_FULL_SCAN, data, reply, option);
     if (error != ERR_NONE) {
@@ -117,6 +125,10 @@ ErrCode WifiScanProxy::AdvanceScan(const WifiScanParams &params)
     MessageOption option;
     MessageParcel data;
     MessageParcel reply;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
     data.WriteInt32(0);
     data.WriteCString(params.ssid.c_str());
     data.WriteCString(params.bssid.c_str());
@@ -152,6 +164,10 @@ ErrCode WifiScanProxy::IsWifiClosedScan(bool &bOpen)
     MessageOption option;
     MessageParcel data;
     MessageParcel reply;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
     data.WriteInt32(0);
     int error = Remote()->SendRequest(WIFI_SVR_CMD_IS_SCAN_ALWAYS_ACTIVE, data, reply, option);
     if (error != ERR_NONE) {
@@ -179,6 +195,10 @@ ErrCode WifiScanProxy::GetScanInfoList(std::vector<WifiScanInfo> &result)
     MessageOption option;
     MessageParcel data;
     MessageParcel reply;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
     data.WriteInt32(0);
     int error = Remote()->SendRequest(WIFI_SVR_CMD_GET_SCAN_INFO_LIST, data, reply, option);
     if (error != ERR_NONE) {
@@ -236,6 +256,10 @@ ErrCode WifiScanProxy::RegisterCallBack(const sptr<IWifiScanCallback> &callback)
     MessageOption option(MessageOption::TF_ASYNC);
 
     g_wifiScanCallbackStub.RegisterCallBack(callback);
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
     data.WriteInt32(0);
     if (!data.WriteRemoteObject(g_wifiScanCallbackStub.AsObject())) {
         WIFI_LOGE("RegisterCallBack WriteRemoteObject failed!");
@@ -260,6 +284,10 @@ ErrCode WifiScanProxy::GetSupportedFeatures(long &features)
     }
     MessageOption option;
     MessageParcel data, reply;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
     data.WriteInt32(0);
     int error = Remote()->SendRequest(WIFI_SVR_CMD_GET_SUPPORTED_FEATURES, data, reply, option);
     if (error != ERR_NONE) {

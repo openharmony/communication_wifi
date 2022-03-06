@@ -327,7 +327,7 @@ Ipv6Address DhcpdInterface::AssignIpAddrV6(const std::vector<Ipv6Address> &vecIp
                 WIFI_LOGI("IpAddr:bad ip:%s and inet_pton error.", address.GetAddressWithString().c_str());
                 continue;
             }
-            if (memcmp(&tmpAddr, &prefix, GENE_V6_ADDR_LEN) == 0) {
+            if (memcmp(&tmpAddr, &prefix, sizeof(in6_addr)) == 0) {
                 bFlag = false;
                 WIFI_LOGI("same IP: %x and %x.", tmpAddr.s6_addr32[0], tmpAddr.s6_addr32[1]);
                 break;

@@ -78,6 +78,11 @@ void WifiP2pStub::InitHandleMap()
 
 int WifiP2pStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
+    if (data.ReadInterfaceToken() != GetDescriptor()) {
+        WIFI_LOGE("P2p stub token verification error");
+        return WIFI_OPT_FAILED;
+    }
+
     int exception = data.ReadInt32();
     if (exception) {
         return WIFI_OPT_FAILED;

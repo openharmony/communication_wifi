@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -47,6 +47,10 @@ ErrCode WifiHotspotProxy::IsHotspotActive(bool &bActive)
     MessageOption option;
     MessageParcel data;
     MessageParcel reply;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
     data.WriteInt32(0);
     int error = Remote()->SendRequest(WIFI_SVR_CMD_IS_HOTSPOT_ACTIVE, data, reply, option);
     if (error != ERR_NONE) {
@@ -74,6 +78,10 @@ ErrCode WifiHotspotProxy::GetHotspotState(int &state)
     MessageOption option;
     MessageParcel data;
     MessageParcel reply;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
     data.WriteInt32(0);
     int error = Remote()->SendRequest(WIFI_SVR_CMD_GETAPSTATE_WIFI, data, reply, option);
     if (error != ERR_NONE) {
@@ -102,6 +110,10 @@ ErrCode WifiHotspotProxy::GetHotspotConfig(HotspotConfig &result)
     MessageOption option;
     MessageParcel data;
     MessageParcel reply;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
     data.WriteInt32(0);
     int error = Remote()->SendRequest(WIFI_SVR_CMD_GET_HOTSPOT_CONFIG, data, reply, option);
     if (error != ERR_NONE) {
@@ -137,6 +149,10 @@ ErrCode WifiHotspotProxy::SetHotspotConfig(const HotspotConfig &config)
     MessageOption option;
     MessageParcel data;
     MessageParcel reply;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
     data.WriteInt32(0);
     data.WriteCString(config.GetSsid().c_str());
     data.WriteInt32(static_cast<int>(config.GetSecurityType()));
@@ -166,6 +182,10 @@ ErrCode WifiHotspotProxy::GetStationList(std::vector<StationInfo> &result)
     MessageOption option;
     MessageParcel data;
     MessageParcel reply;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
     data.WriteInt32(0);
     int error = Remote()->SendRequest(WIFI_SVR_CMD_GET_STATION_LIST, data, reply, option);
     if (error != ERR_NONE) {
@@ -202,6 +222,10 @@ ErrCode WifiHotspotProxy::DisassociateSta(const StationInfo &info)
     MessageOption option;
     MessageParcel data;
     MessageParcel reply;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
     data.WriteInt32(0);
     data.WriteCString(info.deviceName.c_str());
     data.WriteCString(info.bssid.c_str());
@@ -224,6 +248,10 @@ ErrCode WifiHotspotProxy::EnableHotspot(void)
     MessageOption option;
     MessageParcel data;
     MessageParcel reply;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
     data.WriteInt32(0);
     int error = Remote()->SendRequest(WIFI_SVR_CMD_ENABLE_WIFI_AP, data, reply, option);
     if (error != ERR_NONE) {
@@ -247,6 +275,10 @@ ErrCode WifiHotspotProxy::DisableHotspot(void)
     MessageOption option;
     MessageParcel data;
     MessageParcel reply;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
     data.WriteInt32(0);
     int error = Remote()->SendRequest(WIFI_SVR_CMD_DISABLE_WIFI_AP, data, reply, option);
     if (error != ERR_NONE) {
@@ -270,6 +302,10 @@ ErrCode WifiHotspotProxy::GetBlockLists(std::vector<StationInfo> &infos)
     MessageOption option;
     MessageParcel data;
     MessageParcel reply;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
     data.WriteInt32(0);
     int error = Remote()->SendRequest(WIFI_SVR_CMD_GET_BLOCK_LISTS, data, reply, option);
     if (error != ERR_NONE) {
@@ -305,6 +341,10 @@ ErrCode WifiHotspotProxy::AddBlockList(const StationInfo &info)
     MessageOption option;
     MessageParcel data;
     MessageParcel reply;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
     data.WriteInt32(0);
     data.WriteCString(info.deviceName.c_str());
     data.WriteCString(info.bssid.c_str());
@@ -331,6 +371,10 @@ ErrCode WifiHotspotProxy::DelBlockList(const StationInfo &info)
     MessageOption option;
     MessageParcel data;
     MessageParcel reply;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
     data.WriteInt32(0);
     data.WriteCString(info.deviceName.c_str());
     data.WriteCString(info.bssid.c_str());
@@ -357,6 +401,10 @@ ErrCode WifiHotspotProxy::GetValidBands(std::vector<BandType> &bands)
     MessageOption option;
     MessageParcel data;
     MessageParcel reply;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
     data.WriteInt32(0);
     int error = Remote()->SendRequest(WIFI_SVR_CMD_GET_VALID_BANDS, data, reply, option);
     if (error != ERR_NONE) {
@@ -389,6 +437,10 @@ ErrCode WifiHotspotProxy::GetValidChannels(BandType band, std::vector<int32_t> &
     MessageOption option;
     MessageParcel data;
     MessageParcel reply;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
     data.WriteInt32(0);
     data.WriteInt32((int)band);
     int error = Remote()->SendRequest(WIFI_SVR_CMD_GET_VALID_CHANNELS, data, reply, option);
@@ -421,6 +473,10 @@ ErrCode WifiHotspotProxy::RegisterCallBack(const sptr<IWifiHotspotCallback> &cal
     MessageOption option(MessageOption::TF_ASYNC);
 
     g_wifiHotspotCallbackStub->RegisterCallBack(callback);
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
     data.WriteInt32(0);
     if (!data.WriteRemoteObject(g_wifiHotspotCallbackStub->AsObject())) {
         WIFI_LOGE("WifiHotspotProxy::RegisterCallBack WriteDate fail, write callback.");
@@ -448,6 +504,10 @@ ErrCode WifiHotspotProxy::GetSupportedFeatures(long &features)
     }
     MessageOption option;
     MessageParcel data, reply;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
     data.WriteInt32(0);
     int error = Remote()->SendRequest(WIFI_SVR_CMD_GET_SUPPORTED_FEATURES, data, reply, option);
     if (error != ERR_NONE) {

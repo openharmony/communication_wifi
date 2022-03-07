@@ -112,7 +112,7 @@ ErrCode WifiDeviceServiceImpl::EnableWifi()
 
     sptr<WifiP2pServiceImpl> p2pService = WifiP2pServiceImpl::GetInstance();
     if (p2pService != nullptr && p2pService->EnableP2p() != WIFI_OPT_SUCCESS) {
-        WIFI_LOGE("Enable P2p failed, ret %{public}d!", static_cast<int>(errCode));
+        WIFI_LOGE("Enable P2p failed!");
         return WIFI_OPT_FAILED;
     }
 
@@ -172,6 +172,7 @@ ErrCode WifiDeviceServiceImpl::DisableWifi()
     sptr<WifiP2pServiceImpl> p2pService = WifiP2pServiceImpl::GetInstance();
     if (p2pService != nullptr && p2pService->DisableP2p() != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("Disable P2p failed!");
+        return WIFI_OPT_FAILED;
     }
 
     if (!WifiConfigCenter::GetInstance().SetWifiMidState(curState, WifiOprMidState::CLOSING)) {

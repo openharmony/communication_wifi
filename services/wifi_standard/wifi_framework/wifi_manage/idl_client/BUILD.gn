@@ -46,6 +46,7 @@ config("wifi_idl_cxx_config") {
 }
 
 ohos_source_set("wifi_utils") {
+  part_name = "wifi_standard"
   sources = [ "//foundation/communication/wifi/services/wifi_standard/wifi_framework/common/utils/wifi_global_func.cpp" ]
 
   configs = [
@@ -55,6 +56,7 @@ ohos_source_set("wifi_utils") {
 }
 
 ohos_source_set("net_helper") {
+  part_name = "wifi_standard"
   sources = [
     "//foundation/communication/wifi/services/wifi_standard/wifi_framework/common/net_helper/base_address.cpp",
     "//foundation/communication/wifi/services/wifi_standard/wifi_framework/common/net_helper/http_request.cpp",
@@ -72,6 +74,7 @@ ohos_source_set("net_helper") {
 }
 
 ohos_source_set("log_helper") {
+  part_name = "wifi_standard"
   sources = [ "//foundation/communication/wifi/services/wifi_standard/wifi_framework/common/log/log_helper.c" ]
 
   configs = [ ":wifi_fw_common_header" ]

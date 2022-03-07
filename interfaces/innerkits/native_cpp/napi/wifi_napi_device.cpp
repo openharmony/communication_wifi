@@ -14,9 +14,10 @@
  */
 
 #include "wifi_napi_device.h"
-#include "wifi_logger.h"
 #include <vector>
 #include <functional>
+#include "wifi_common_util.h"
+#include "wifi_logger.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -66,7 +67,7 @@ napi_value Scan(napi_env env, napi_callback_info info)
     TRACE_FUNC_CALL;
     NAPI_ASSERT(env, wifiScanPtr != nullptr, "Wifi scan instance is null.");
     ErrCode ret = wifiScanPtr->Scan();
-    WriteWifiScanHiSysEvent(static_cast<int>(ret), JsAbilityGetBundleName());
+    WriteWifiScanHiSysEvent(static_cast<int>(ret), GetBundleName());
     napi_value result;
     napi_get_boolean(env, ret == WIFI_OPT_SUCCESS, &result);
     return result;
@@ -378,7 +379,7 @@ napi_value ConnectToNetwork(napi_env env, napi_callback_info info)
 
     NAPI_ASSERT(env, wifiDevicePtr != nullptr, "Wifi device instance is null.");
     ErrCode ret = wifiDevicePtr->ConnectToNetwork(networkId);
-    WriteWifiConnectionHiSysEvent(WifiConnectionType::CONNECT, JsAbilityGetBundleName());
+    WriteWifiConnectionHiSysEvent(WifiConnectionType::CONNECT, GetBundleName());
     napi_value result;
     napi_get_boolean(env, ret == WIFI_OPT_SUCCESS, &result);
     return result;
@@ -403,7 +404,7 @@ napi_value ConnectToDevice(napi_env env, napi_callback_info info)
     if (ret != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("Connect to device fail: %{public}d", ret);
     }
-    WriteWifiConnectionHiSysEvent(WifiConnectionType::CONNECT, JsAbilityGetBundleName());
+    WriteWifiConnectionHiSysEvent(WifiConnectionType::CONNECT, GetBundleName());
     napi_value result;
     napi_get_boolean(env, ret == WIFI_OPT_SUCCESS, &result);
     return result;
@@ -423,7 +424,7 @@ napi_value Disconnect(napi_env env, napi_callback_info info)
     TRACE_FUNC_CALL;
     NAPI_ASSERT(env, wifiDevicePtr != nullptr, "Wifi device instance is null.");
     ErrCode ret = wifiDevicePtr->Disconnect();
-    WriteWifiConnectionHiSysEvent(WifiConnectionType::DISCONNECT, JsAbilityGetBundleName());
+    WriteWifiConnectionHiSysEvent(WifiConnectionType::DISCONNECT, GetBundleName());
     napi_value result;
     napi_get_boolean(env, ret == WIFI_OPT_SUCCESS, &result);
     return result;
@@ -468,7 +469,7 @@ napi_value ReConnect(napi_env env, napi_callback_info info)
 
     napi_value result;
     napi_get_boolean(env, wifiDevicePtr->ReConnect() == WIFI_OPT_SUCCESS, &result);
-    WriteWifiConnectionHiSysEvent(WifiConnectionType::CONNECT, JsAbilityGetBundleName());
+    WriteWifiConnectionHiSysEvent(WifiConnectionType::CONNECT, GetBundleName());
     return result;
 }
 
@@ -478,7 +479,7 @@ napi_value ReAssociate(napi_env env, napi_callback_info info)
     NAPI_ASSERT(env, wifiDevicePtr != nullptr, "Wifi device instance is null.");
     napi_value result;
     napi_get_boolean(env, wifiDevicePtr->ReAssociate() == WIFI_OPT_SUCCESS, &result);
-    WriteWifiConnectionHiSysEvent(WifiConnectionType::CONNECT, JsAbilityGetBundleName());
+    WriteWifiConnectionHiSysEvent(WifiConnectionType::CONNECT, GetBundleName());
     return result;
 }
 

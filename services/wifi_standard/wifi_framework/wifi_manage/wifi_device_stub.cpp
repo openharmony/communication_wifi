@@ -71,6 +71,11 @@ void WifiDeviceStub::InitHandleMap()
 
 int WifiDeviceStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
+    if (data.ReadInterfaceToken() != GetDescriptor()) {
+        WIFI_LOGE("Sta stub token verification error");
+        return WIFI_OPT_FAILED;
+    }
+
     int exception = data.ReadInt32();
     if (exception) {
         return WIFI_OPT_FAILED;

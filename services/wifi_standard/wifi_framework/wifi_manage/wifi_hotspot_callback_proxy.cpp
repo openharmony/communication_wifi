@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -30,9 +30,12 @@ void WifiHotspotCallbackProxy::OnHotspotStateChanged(int state)
     MessageOption option;
     MessageParcel data;
     MessageParcel reply;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return;
+    }
     data.WriteInt32(0);
     data.WriteInt32(state);
-
     int error = Remote()->SendRequest(WIFI_CBK_CMD_HOTSPOT_STATE_CHANGE, data, reply, option);
     if (error != ERR_NONE) {
         WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d", WIFI_CBK_CMD_HOTSPOT_STATE_CHANGE, error);
@@ -52,6 +55,10 @@ void WifiHotspotCallbackProxy::OnHotspotStaJoin(const StationInfo &info)
     MessageOption option;
     MessageParcel data;
     MessageParcel reply;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return;
+    }
     data.WriteInt32(0);
     data.WriteCString(info.deviceName.c_str());
     data.WriteCString(info.bssid.c_str());
@@ -65,7 +72,6 @@ void WifiHotspotCallbackProxy::OnHotspotStaJoin(const StationInfo &info)
     if (exception) {
         WIFI_LOGE("notify wifi hotspot join failed!");
     }
-
     return;
 }
 
@@ -75,6 +81,10 @@ void WifiHotspotCallbackProxy::OnHotspotStaLeave(const StationInfo &info)
     MessageOption option;
     MessageParcel data;
     MessageParcel reply;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return;
+    }
     data.WriteInt32(0);
     data.WriteCString(info.deviceName.c_str());
     data.WriteCString(info.bssid.c_str());

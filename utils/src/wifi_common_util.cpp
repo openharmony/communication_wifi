@@ -17,9 +17,16 @@
 #include <sstream>
 #include <iterator>
 #include <regex>
+#include "bundle_mgr_interface.h"
+#include "if_system_ability_manager.h"
+#include "ipc_skeleton.h"
+#include "iservice_registry.h"
+#include "system_ability_definition.h"
+#include "wifi_logger.h"
 
 namespace OHOS {
 namespace Wifi {
+DEFINE_WIFILOG_LABEL("WifiCommonUtil");
 static std::string DataAnonymize(const std::string str, const char delim,
     const char hiddenCh, const int startIdx = 0)
 {
@@ -173,6 +180,46 @@ std::vector<std::string> StrSplit(const std::string& str, const std::string& del
         first{ str.begin(), str.end(), re, -1 },
         last;
     return { first, last };
+}
+
+sptr<AppExecFwk::IBundleMgr> GetBundleManager()
+{
+    sptr<ISystemAbilityManager> systemManager = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    if (systemManager == nullptr) {
+        WIFI_LOGE("Get system ability manager failed!");
+        return nullptr;
+    }
+    return iface_cast<AppExecFwk::IBundleMgr>(systemManager->GetSystemAbility(BUNDLE_MGR_SERVICE_SYS_ABILITY_ID));
+}
+
+std::string GetBundleName()
+{
+    sptr<AppExecFwk::IBundleMgr> bundleInstance = GetBundleManager();
+    if (bundleInstance == nullptr) {
+        return "";
+    }
+
+    std::string bundleName;
+    int uid = IPCSkeleton::GetCallingUid();
+    if (!bundleInstance->GetBundleNameForUid(uid, bundleName)) {
+        WIFI_LOGE("Get bundle name failed!");
+    }
+    WIFI_LOGI("Get bundle name uid[%{public}d]: %{public}s", uid, bundleName.c_str());
+    return bundleName;
+}
+
+bool IsSystemApp()
+{
+    sptr<AppExecFwk::IBundleMgr> bundleInstance = GetBundleManager();
+    if (bundleInstance == nullptr) {
+        return false;
+    }
+
+    std::string bundleName;
+    int uid = IPCSkeleton::GetCallingUid();
+    bool isSysApp = bundleInstance->CheckIsSystemAppByUid(uid);
+    WIFI_LOGI("Is system App uid[%{public}d]: %{public}d", uid, isSysApp);
+    return isSysApp;
 }
 }  // namespace Wifi
 }  // namespace OHOS

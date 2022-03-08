@@ -1301,5 +1301,23 @@ const MovingFreezePolicy &WifiSettings::ReloadMovingFreezePolicy()
     }
     return mMovingFreezePolicy.GetValue()[0];
 }
+
+std::string WifiSettings::GetConnectTimeoutBssid()
+{
+    std::unique_lock<std::mutex> lock(mStaMutex);
+    const int timeout = 30; // 30s
+    if (mBssidToTimeoutTime.second - static_cast<int>(time(0)) > timeout) {
+        return "";
+    }
+    return mBssidToTimeoutTime.first;
+}
+
+int WifiSettings::SetConnectTimeoutBssid(std::string &bssid)
+{
+    std::unique_lock<std::mutex> lock(mStaMutex);
+    time_t now = time(0);
+    mBssidToTimeoutTime = std::make_pair(bssid, static_cast<int>(now));
+    return 0;
+}
 } // namespace Wifi
 } // namespace OHOS

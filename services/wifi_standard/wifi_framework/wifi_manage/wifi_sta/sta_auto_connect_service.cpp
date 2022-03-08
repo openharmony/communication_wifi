@@ -403,59 +403,52 @@ bool StaAutoConnectService::RoamingEncryptionModeCheck(
 
 bool StaAutoConnectService::AllowAutoSelectDevice(const std::vector<InterScanInfo> &scanInfos, WifiLinkedInfo &info)
 {
-    WIFI_LOGI("Enter StaAutoConnectService::AllowAutoSelectDevice.\n");
+    WIFI_LOGI("Allow auto select device, detailed status is %{public}d\n", info.detailedState);
     if (scanInfos.empty()) {
         WIFI_LOGE("No network,skip network selection.\n");
         return false;
     }
 
-    /* Connected to the network */
-    if (info.detailedState == DetailedState::WORKING) {
-        WIFI_LOGI("The current connection status is Connected and working.\n");
-
-        /* Configure whether to automatically switch the network. */
-        if (!WifiSettings::GetInstance().GetWhetherToAllowNetworkSwitchover()) {
-            WIFI_LOGE("Automatic network switching is not allowed in user "
-                 "configuration.\n");
-            return false;
-        }
-        /*
-         * Indicates whether the minimum interval is the minimum interval since the
-         * last network selection.
-         */
-        if (selectDeviceLastTime != 0) {
-            int gap = static_cast<int>(time(0)) - selectDeviceLastTime;
-            if (gap < MIN_SELECT_NETWORK_TIME) {
-                WIFI_LOGE("%ds time before we selected the network(30s).\n", gap);
+    switch (info.detailedState) {
+        case DetailedState::WORKING:
+            /* Configure whether to automatically switch the network. */
+            if (!WifiSettings::GetInstance().GetWhetherToAllowNetworkSwitchover()) {
+                WIFI_LOGE("Automatic network switching is not allowed in user configuration.\n");
                 return false;
             }
-        }
+            /* Indicates whether the minimum interval is the minimum interval since the last network selection. */
+            if (selectDeviceLastTime != 0) {
+                int gap = static_cast<int>(time(0)) - selectDeviceLastTime;
+                if (gap < MIN_SELECT_NETWORK_TIME) {
+                    WIFI_LOGE("%ds time before we selected the network(30s).\n", gap);
+                    return false;
+                }
+            }
 
-        if (CurrentDeviceGoodEnough(scanInfos, info)) {
-            WIFI_LOGE("The current network is suffice.\n");
+            if (!CurrentDeviceGoodEnough(scanInfos, info)) {
+                WIFI_LOGI("The current network is insuffice.\n");
+                return true;
+            }
             return false;
-        } else {
-            WIFI_LOGI("The current network is insuffice.\n");
-            return true;
-        }
-    } else if (info.detailedState == DetailedState::DISCONNECTED) {
-        WIFI_LOGI("The current connection status is Disconnected.\n");
-        return true;
-    } else if (info.detailedState == DetailedState::NOTWORKING) {
-        WIFI_LOGI("The current network cannot access the Internet.\n");
 
-        /* Configure whether to automatically switch the network. */
-        if (!WifiSettings::GetInstance().GetWhetherToAllowNetworkSwitchover()) {
-            WIFI_LOGE("Automatic network switching is not allowed in user "
-                 "configuration.\n");
-            return false;
-        } else {
+        case DetailedState::DISCONNECTED:
+        case DetailedState::CONNECTION_TIMEOUT:
+            WIFI_LOGI("The current connection status is disconnected or timeout.\n");
             return true;
-        }
-    } else {
-        WIFI_LOGE("The current connection status is %{public}d.\n", info.detailedState);
-        return false;
+
+        case DetailedState::NOTWORKING:
+            WIFI_LOGI("The current network cannot access the Internet.\n");
+            /* Configure whether to automatically switch the network. */
+            if (!WifiSettings::GetInstance().GetWhetherToAllowNetworkSwitchover()) {
+                WIFI_LOGE("Automatic network switching is not allowed in user configuration.\n");
+                return false;
+            }
+            return true;
+
+        default:
+            return false;
     }
+    return false;
 }
 
 bool StaAutoConnectService::CurrentDeviceGoodEnough(const std::vector<InterScanInfo> &scanInfos, WifiLinkedInfo &info)

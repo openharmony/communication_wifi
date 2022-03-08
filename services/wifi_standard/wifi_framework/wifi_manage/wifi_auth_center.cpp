@@ -97,12 +97,44 @@ int WifiAuthCenter::VerifySetWifiConfigPermission(const int &pid, const int &uid
     return WifiPermissionHelper::VerifySetWifiConfigPermission(pid, uid);
 }
 
+int WifiAuthCenter::VerifyGetWifiConfigPermission(const int &pid, const int &uid)
+{
+    if (g_permissinAlwaysGrant) {
+        return PERMISSION_GRANTED;
+    }
+    return WifiPermissionHelper::VerifyGetWifiConfigPermission(pid, uid);
+}
+
 int WifiAuthCenter::VerifyGetWifiDirectDevicePermission(const int &pid, const int &uid)
 {
     if (g_permissinAlwaysGrant) {
         return PERMISSION_GRANTED;
     }
     return WifiPermissionHelper::VerifyGetWifiDirectDevicePermission(pid, uid);
+}
+
+int WifiAuthCenter::VerifyManageWifiHotspotPermission(const int &pid, const int &uid)
+{
+    if (g_permissinAlwaysGrant) {
+        return PERMISSION_GRANTED;
+    }
+    return WifiPermissionHelper::VerifyManageWifiHotspotPermission(pid, uid);
+}
+
+int WifiAuthCenter::VerifyGetWifiPeersMacPermission(const int &pid, const int &uid)
+{
+    if (g_permissinAlwaysGrant) {
+        return PERMISSION_GRANTED;
+    }
+    return WifiPermissionHelper::VerifyGetWifiPeersMacPermission(pid, uid);
+}
+
+int WifiAuthCenter::VerifyGetWifiInfoInternalPermission(const int &pid, const int &uid)
+{
+    if (g_permissinAlwaysGrant) {
+        return PERMISSION_GRANTED;
+    }
+    return WifiPermissionHelper::VerifyGetWifiInfoInternalPermission(pid, uid);
 }
 } // namespace Wifi
 } // namespace OHOS

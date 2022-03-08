@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -31,9 +31,12 @@ void WifiDeviceCallBackProxy::OnWifiStateChanged(int state)
     MessageOption option;
     MessageParcel data;
     MessageParcel reply;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return;
+    }
     data.WriteInt32(0);
     data.WriteInt32(state);
-
     int error = Remote()->SendRequest(WIFI_CBK_CMD_STATE_CHANGE, data, reply, option);
     if (error != ERR_NONE) {
         WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d", WIFI_CBK_CMD_STATE_CHANGE, error);
@@ -53,6 +56,10 @@ void WifiDeviceCallBackProxy::OnWifiConnectionChanged(int state, const WifiLinke
     MessageOption option;
     MessageParcel data;
     MessageParcel reply;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return;
+    }
     data.WriteInt32(0);
     data.WriteInt32(state);
     data.WriteInt32(info.networkId);
@@ -74,7 +81,6 @@ void WifiDeviceCallBackProxy::OnWifiConnectionChanged(int state, const WifiLinke
     data.WriteCString(info.portalUrl.c_str());
     data.WriteInt32((int)info.supplicantState);
     data.WriteInt32((int)info.detailedState);
-
     int error = Remote()->SendRequest(WIFI_CBK_CMD_CONNECTION_CHANGE, data, reply, option);
     if (error != ERR_NONE) {
         WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d", WIFI_CBK_CMD_CONNECTION_CHANGE, error);
@@ -93,6 +99,10 @@ void WifiDeviceCallBackProxy::OnWifiRssiChanged(int rssi)
     MessageOption option;
     MessageParcel data;
     MessageParcel reply;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return;
+    }
     data.WriteInt32(0);
     data.WriteInt32(rssi);
     int error = Remote()->SendRequest(WIFI_CBK_CMD_RSSI_CHANGE, data, reply, option);
@@ -113,6 +123,10 @@ void WifiDeviceCallBackProxy::OnWifiWpsStateChanged(int state, const std::string
     MessageOption option;
     MessageParcel data;
     MessageParcel reply;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return;
+    }
     data.WriteInt32(0);
     data.WriteInt32(state);
     data.WriteCString(pinCode.c_str());
@@ -134,6 +148,10 @@ void WifiDeviceCallBackProxy::OnStreamChanged(int direction)
     MessageOption option;
     MessageParcel data;
     MessageParcel reply;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return;
+    }
     data.WriteInt32(0);
     data.WriteInt32(direction);
     int error = Remote()->SendRequest(WIFI_CBK_CMD_STREAM_DIRECTION, data, reply, option);

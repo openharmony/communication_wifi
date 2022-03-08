@@ -80,6 +80,7 @@ void NapiEvent::EventNotify(AsyncEventData *asyncEvent)
             WIFI_LOGI("Napi event uv_queue_work, env: %{public}p, status: %{public}d", asyncData->env, status);
             napi_value handler = nullptr;
             napi_handle_scope scope = nullptr;
+            napi_value jsEvent = nullptr;
             napi_open_handle_scope(asyncData->env, &scope);
             if (scope == nullptr) {
                 WIFI_LOGE("scope is nullptr");
@@ -89,8 +90,9 @@ void NapiEvent::EventNotify(AsyncEventData *asyncEvent)
             napi_value undefine;
             napi_get_undefined(asyncData->env, &undefine);
             napi_get_reference_value(asyncData->env, asyncData->callbackRef, &handler);
+            jsEvent = asyncData->packResult();
             WIFI_LOGI("Push event to js, env: %{public}p, ref : %{public}p", asyncData->env, &asyncData->callbackRef);
-            if (napi_call_function(asyncData->env, nullptr, handler, 1, &asyncData->jsEvent, &undefine) != napi_ok) {
+            if (napi_call_function(asyncData->env, nullptr, handler, 1, &jsEvent, &undefine) != napi_ok) {
                 WIFI_LOGE("Report event to Js failed");
             }
             napi_close_handle_scope(asyncData->env, scope);

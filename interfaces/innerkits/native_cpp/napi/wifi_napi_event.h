@@ -31,12 +31,12 @@ class AsyncEventData {
 public:
     napi_env env;
     napi_ref callbackRef;
-    napi_value jsEvent;
+    std::function<napi_value ()> packResult;
 
-    explicit AsyncEventData(napi_env e, napi_ref r, napi_value v) {
+    explicit AsyncEventData(napi_env e, napi_ref r, std::function<napi_value ()> p) {
         env = e;
         callbackRef = r;
-        jsEvent = v;
+        packResult = p;
     }
 
     AsyncEventData() = delete;
@@ -84,8 +84,8 @@ public:
 
         std::vector<RegObj>& vecObj = g_eventRegisterInfo[type];
         for (auto& each : vecObj) {
-            napi_value result = CreateResult(each.m_regEnv, obj);
-            AsyncEventData *asyncEvent = new AsyncEventData(each.m_regEnv, each.m_regHanderRef, result);
+            auto func = [this, env = each.m_regEnv, obj] () -> napi_value { return CreateResult(env, obj); };
+            AsyncEventData *asyncEvent = new AsyncEventData(each.m_regEnv, each.m_regHanderRef, func);
             if (asyncEvent == nullptr) {
                 return;
             }

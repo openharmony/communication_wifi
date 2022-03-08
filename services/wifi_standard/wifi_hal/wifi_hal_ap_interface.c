@@ -53,7 +53,7 @@ WifiErrorNo StartHostapd(void)
         LOGD("wpa configure file %s is exist.", pConf);
     } else {
         char szCmd[BUFF_SIZE] = {0};
-        const char *cpConfCmd = "cp /system/etc/wifi/hostapd.conf /data/misc/wifi/wpa_supplicant";
+        const char *cpConfCmd = "cp /system/etc/wifi/hostapd.conf /data/misc/wifi/wpa_supplicant/";
         int iRet = snprintf_s(szCmd, sizeof(szCmd), sizeof(szCmd) - 1, "%s", cpConfCmd);
         if (iRet < 0) {
             return -1;

@@ -19,6 +19,8 @@ ohos_shared_library("wifi_utils") {
     "//foundation/communication/wifi/utils/inc",
     "//base/hiviewdfx/hisysevent/interfaces/native/innerkits/hisysevent/include",
     "//foundation/communication/wifi/services/wifi_standard/wifi_framework/common/log",
+    "//foundation/appexecfwk/standard/interfaces/innerkits/appexecfwk_core/include/bundlemgr/",
+    "//foundation/appexecfwk/standard/interfaces/innerkits/appexecfwk_core/include/bundlemgr/",
   ]
 
   sources = [
@@ -28,10 +30,16 @@ ohos_shared_library("wifi_utils") {
 
   deps = [
     "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog",
+    "//foundation/aafwk/standard/interfaces/innerkits/want:want",
+    "//foundation/appexecfwk/standard/interfaces/innerkits/appexecfwk_core:appexecfwk_core",
+    "//foundation/distributedschedule/samgr/interfaces/innerkits/samgr_proxy:samgr_proxy",
     "//utils/native/base:utils",
   ]
 
-  external_deps = [ "hisysevent_native:libhisysevent" ]
+  external_deps = [
+    "hisysevent_native:libhisysevent",
+    "ipc:ipc_core",
+  ]
 
   cflags_cc = [
     "-std=c++17",

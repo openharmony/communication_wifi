@@ -95,6 +95,20 @@ std::string Number2Ip(int intIp);
  * @return std::vector<std::string> - Split result
  */
 std::vector<std::string> StrSplit(const std::string& str, const std::string& delim);
+
+/**
+ * @Description get bundle name
+ *
+ * @return bool - bundle name
+ */
+std::string GetBundleName();
+
+/**
+ * @Description Check whether the app is a system app
+ *
+ * @return bool - Returns true for yes, false for no.
+ */
+bool IsSystemApp();
 }  // namespace Wifi
 }  // namespace OHOS
 #endif

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -54,6 +54,11 @@ void WifiHotspotStub::InitHandleMap()
 
 int WifiHotspotStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
+    if (data.ReadInterfaceToken() != GetDescriptor()) {
+        WIFI_LOGE("Hotspot stub token verification error");
+        return WIFI_OPT_FAILED;
+    }
+
     int exception = data.ReadInt32();
     if (exception) {
         return WIFI_OPT_FAILED;

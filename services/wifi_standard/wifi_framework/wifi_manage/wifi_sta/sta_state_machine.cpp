@@ -770,7 +770,7 @@ void StaStateMachine::DealConnectTimeOutCmd(InternalMessage *msg)
         return;
     }
 
-    DisableNetwork(targetNetworkId);
+    WifiSettings::GetInstance().SetConnectTimeoutBssid(linkedInfo.bssid);
     InitWifiLinkedInfo();
     SaveLinkstate(ConnState::DISCONNECTED, DetailedState::CONNECTION_TIMEOUT);
     WifiSettings::GetInstance().SaveLinkedInfo(linkedInfo);
@@ -930,7 +930,6 @@ void StaStateMachine::DealStartWpsCmd(InternalMessage *msg)
     }
     
     StartWpsMode(msg);
-
     if ((wpsState == SetupMethod::DISPLAY) || (wpsState == SetupMethod::KEYPAD)) {
         WIFI_LOGD("Clear WPA block list every ten second!");
         SendMessage(WPA_BLOCK_LIST_CLEAR_EVENT);

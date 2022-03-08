@@ -981,6 +981,21 @@ public:
      * @return const MovingFreezePolicy& - moving freeze policy.
      */
     const MovingFreezePolicy& ReloadMovingFreezePolicy();
+
+    /**
+     * @Description get bssid of connection timeout for last time.
+     *
+     * @return bssid.
+     */
+    std::string GetConnectTimeoutBssid();
+
+    /**
+     * @Description set bssid of connection timeout for last time.
+     *
+     * @return int - result
+     */
+    int SetConnectTimeoutBssid(std::string &bssid);
+
 private:
     WifiSettings();
     void InitWifiConfig();
@@ -1027,6 +1042,7 @@ private:
     int mFreezeModeState;        /* 1 on 2 off */
     int mNoChargerPlugModeState;  /* 1 on 2 off */
     WifiConfig mWifiConfig;
+    std::pair<std::string, int> mBssidToTimeoutTime;
 
     std::mutex mStaMutex;
     std::mutex mApMutex;

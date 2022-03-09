@@ -54,9 +54,33 @@ int WifiPermissionUtils::VerifySetWifiConfigPermission()
         IPCSkeleton::GetCallingPid(), IPCSkeleton::GetCallingUid());
 }
 
+int WifiPermissionUtils::VerifyGetWifiConfigPermission()
+{
+    return WifiAuthCenter::GetInstance().VerifyGetWifiConfigPermission(
+        IPCSkeleton::GetCallingPid(), IPCSkeleton::GetCallingUid());
+}
+
 int WifiPermissionUtils::VerifyGetWifiDirectDevicePermission()
 {
     return WifiAuthCenter::GetInstance().VerifyGetWifiDirectDevicePermission(
+        IPCSkeleton::GetCallingPid(), IPCSkeleton::GetCallingUid());
+}
+
+int WifiPermissionUtils::VerifyManageWifiHotspotPermission()
+{
+    return WifiAuthCenter::GetInstance().VerifyManageWifiHotspotPermission(
+        IPCSkeleton::GetCallingPid(), IPCSkeleton::GetCallingUid());
+}
+
+int WifiPermissionUtils::VerifyGetWifiPeersMacPermission()
+{
+    return WifiAuthCenter::GetInstance().VerifyGetWifiPeersMacPermission(
+        IPCSkeleton::GetCallingPid(), IPCSkeleton::GetCallingUid());
+}
+
+int WifiPermissionUtils::VerifyGetWifiInfoInternalPermission()
+{
+    return WifiAuthCenter::GetInstance().VerifyGetWifiInfoInternalPermission(
         IPCSkeleton::GetCallingPid(), IPCSkeleton::GetCallingUid());
 }
 }  // namespace Wifi

@@ -37,6 +37,7 @@ ohos_shared_library("wifi_utils") {
   ]
 
   external_deps = [
+    "bundle_framework:appexecfwk_base",
     "hisysevent_native:libhisysevent",
     "ipc:ipc_core",
   ]

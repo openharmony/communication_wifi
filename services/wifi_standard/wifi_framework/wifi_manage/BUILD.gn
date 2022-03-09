@@ -51,6 +51,7 @@ config("wifi_manager_service_header") {
     "//foundation/appexecfwk/standard/interfaces/innerkits/libeventhandler/include",
     "//foundation/aafwk/standard/interfaces/innerkits/base/include",
     "//foundation/appexecfwk/standard/interfaces/innerkits/appexecfwk_base/include",
+    "//base/security/access_token/interfaces/innerkits/accesstoken/include",
   ]
 }
 
@@ -165,11 +166,10 @@ ohos_shared_library("wifi_manager_service") {
     "//utils/native/base:utils",
   ]
 
-  defines = [ "PERMISSION_ALWAYS_GRANT" ]
-
   configs = [ ":wifi_manager_service_header" ]
 
   external_deps = [
+    "access_token:libaccesstoken_sdk",
     "ces_standard:cesfwk_innerkits",
     "ipc:ipc_core",
   ]

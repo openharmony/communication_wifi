@@ -78,6 +78,7 @@ ohos_unittest("manager_unittest") {
     "//foundation/appexecfwk/standard/interfaces/innerkits/libeventhandler/include",
     "//foundation/aafwk/standard/interfaces/innerkits/base/include",
     "//foundation/appexecfwk/standard/interfaces/innerkits/appexecfwk_base/include",
+    "//base/security/access_token/interfaces/innerkits/accesstoken/include",
   ]
 
   deps = [
@@ -94,8 +95,10 @@ ohos_unittest("manager_unittest") {
   ]
 
   external_deps = [
+    "access_token:libaccesstoken_sdk",
     "ces_standard:cesfwk_innerkits",
     "hiviewdfx_hilog_native:libhilog",
+    "ipc:ipc_core",
   ]
   configs = [ ":module_private_config" ]
 

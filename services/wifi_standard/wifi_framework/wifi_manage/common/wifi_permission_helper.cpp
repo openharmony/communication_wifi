@@ -17,6 +17,8 @@
 #include <mutex>
 #include <string>
 #include "wifi_log.h"
+#include "ipc_skeleton.h"
+#include "accesstoken_kit.h"
 
 #undef LOG_TAG
 #define LOG_TAG "OHWIFI_MANAGER_PERMISSION_HELPER"
@@ -157,7 +159,14 @@ IsGranted WifiPermissionHelper::MockVerifyPermission(const std::string &permissi
 
 int WifiPermissionHelper::VerifyPermission(const std::string &permissionName, const int &pid, const int &uid)
 {
-    return MockVerifyPermission(permissionName, pid, uid);
+    auto callerToken = IPCSkeleton::GetCallingTokenID();
+    int result = Security::AccessToken::AccessTokenKit::VerifyAccessToken(callerToken, permissionName);
+    if (result == Security::AccessToken::PermissionState::PERMISSION_GRANTED) {
+        return PERMISSION_GRANTED;
+    } else {
+        LOGD("callerToken=0x%{public}x has no permission_name=%{public}s", pid, permissionName.c_str());
+        return PERMISSION_DENIED;
+    }
 }
 
 int WifiPermissionHelper::VerifySetWifiInfoPermission(const int &pid, const int &uid)
@@ -180,6 +189,14 @@ int WifiPermissionHelper::VerifyGetWifiInfoPermission(const int &pid, const int 
 int WifiPermissionHelper::VerifySetWifiConfigPermission(const int &pid, const int &uid)
 {
     if (VerifyPermission("ohos.permission.SET_WIFI_CONFIG", pid, uid) == PERMISSION_DENIED) {
+        return PERMISSION_DENIED;
+    }
+    return PERMISSION_GRANTED;
+}
+
+int WifiPermissionHelper::VerifyGetWifiConfigPermission(const int &pid, const int &uid)
+{
+    if (VerifyPermission("ohos.permission.GET_WIFI_CONFIG", pid, uid) == PERMISSION_DENIED) {
         return PERMISSION_DENIED;
     }
     return PERMISSION_GRANTED;
@@ -212,6 +229,30 @@ int WifiPermissionHelper::VerifyWifiConnectionPermission(const int &pid, const i
 int WifiPermissionHelper::VerifyGetWifiDirectDevicePermission(const int &pid, const int &uid)
 {
     if (VerifyPermission("ohos.permission.GET_P2P_DEVICE_LOCATION", pid, uid) == PERMISSION_DENIED) {
+        return PERMISSION_DENIED;
+    }
+    return PERMISSION_GRANTED;
+}
+
+int WifiPermissionHelper::VerifyManageWifiHotspotPermission(const int &pid, const int &uid)
+{
+    if (VerifyPermission("ohos.permission.MANAGE_WIFI_HOTSPOT", pid, uid) == PERMISSION_DENIED) {
+        return PERMISSION_DENIED;
+    }
+    return PERMISSION_GRANTED;
+}
+
+int WifiPermissionHelper::VerifyGetWifiPeersMacPermission(const int &pid, const int &uid)
+{
+    if (VerifyPermission("ohos.permission.GET_WIFI_PEERS_MAC", pid, uid) == PERMISSION_DENIED) {
+        return PERMISSION_DENIED;
+    }
+    return PERMISSION_GRANTED;
+}
+
+int WifiPermissionHelper::VerifyGetWifiInfoInternalPermission(const int &pid, const int &uid)
+{
+    if (VerifyPermission("ohos.permission.GET_WIFI_INFO_INTERNAL", pid, uid) == PERMISSION_DENIED) {
         return PERMISSION_DENIED;
     }
     return PERMISSION_GRANTED;

@@ -28,7 +28,11 @@ public:
     static int VerifyGetScanInfosPermission();
     static int VerifyGetWifiLocalMacPermission();
     static int VerifySetWifiConfigPermission();
+    static int VerifyGetWifiConfigPermission();
     static int VerifyGetWifiDirectDevicePermission();
+    static int VerifyManageWifiHotspotPermission();
+    static int VerifyGetWifiPeersMacPermission();
+    static int VerifyGetWifiInfoInternalPermission();
 };
 }  // namespace Wifi
 }  // namespace OHOS

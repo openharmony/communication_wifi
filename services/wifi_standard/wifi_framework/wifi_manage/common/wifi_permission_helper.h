@@ -126,6 +126,15 @@ public:
     static int VerifySetWifiConfigPermission(const int &pid, const int &uid);
 
     /**
+     * @Description : Verify Get Wifi Config Permission.
+     *
+     * @param pid - Process ID.[in]
+     * @param uid - User ID.[in]
+     * @return int
+     */
+    static int VerifyGetWifiConfigPermission(const int &pid, const int &uid);
+
+    /**
      * @Description : Verify location information about nearby P2P devices Permission.
      *
      * @param pid - Process ID.[in]
@@ -133,6 +142,33 @@ public:
      * @return int
      */
     static int VerifyGetWifiDirectDevicePermission(const int &pid, const int &uid);
+
+    /**
+     * @Description : Verify manage wifi hotspot Permission.
+     *
+     * @param pid - Process ID.[in]
+     * @param uid - User ID.[in]
+     * @return int
+     */
+    static int VerifyManageWifiHotspotPermission(const int &pid, const int &uid);
+
+    /**
+     * @Description : Verify get wifi peers mac Permission.
+     *
+     * @param pid - Process ID.[in]
+     * @param uid - User ID.[in]
+     * @return int
+     */
+    static int VerifyGetWifiPeersMacPermission(const int &pid, const int &uid);
+
+    /**
+     * @Description : Verify get internal wifi info Permission.
+     *
+     * @param pid - Process ID.[in]
+     * @param uid - User ID.[in]
+     * @return int
+     */
+    static int VerifyGetWifiInfoInternalPermission(const int &pid, const int &uid);
 };
 }  // namespace Wifi
 }  // namespace OHOS

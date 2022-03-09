@@ -548,12 +548,12 @@ static int CheckAddressRange(DhcpAddressPool *pool)
 {
     uint32_t serverNetwork = NetworkAddress(pool->serverId, pool->netmask);
     uint32_t firstNetwork = NetworkAddress(pool->addressRange.beginAddress, pool->netmask);
-    uint32_t sencodNetwork = NetworkAddress(pool->addressRange.endAddress, pool->netmask);
-    if (!serverNetwork || !firstNetwork || !sencodNetwork) {
+    uint32_t secondNetwork = NetworkAddress(pool->addressRange.endAddress, pool->netmask);
+    if (!serverNetwork || !firstNetwork || !secondNetwork) {
         LOGE("network config error.");
         return DHCP_FALSE;
     }
-    if (serverNetwork != firstNetwork || firstNetwork != serverNetwork) {
+    if (serverNetwork != firstNetwork || serverNetwork != secondNetwork) {
         LOGE("server network and address pool network belong to different networks.");
         return DHCP_FALSE;
     }

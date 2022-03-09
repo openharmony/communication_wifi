@@ -98,6 +98,7 @@ ohos_unittest("manager_unittest") {
     "access_token:libaccesstoken_sdk",
     "ces_standard:cesfwk_innerkits",
     "hiviewdfx_hilog_native:libhilog",
+    "ipc:ipc_core",
   ]
   configs = [ ":module_private_config" ]
 

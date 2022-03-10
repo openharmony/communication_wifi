@@ -35,29 +35,9 @@ public:
 
     static IfConfig &GetInstance();
 
-    /**
-     * @Description : Set the If Addr object
-     *
-     * @param dhcpInfo - dhcp information[in]
-     * @param ipType - ip type[in]
-     * @return int
-     */
-    int SetIfDnsAndRoute(const DhcpResult &dhcpInfo, int ipType);
-
-    void SetNetDns(const std::string &ifName, const std::string &dns1, const std::string &dns2);
-
     void FlushIpAddr(const std::string &ifName, const int &ipType);
 
     void AddIpAddr(const std::string &ifName, const std::string &ipAddr, const std::string &mask, const int &ipType);
-
-    void AddIfRoute(const std::string &ifName, const std::string &ipAddr, const std::string &mask,
-        const std::string &gateWay, const int &ipType);
-
-    void AddIpv4Route(
-        const std::string &ifName, const std::string &ipAddr, const std::string &mask, const std::string &gateWay);
-
-    void AddIpv6Route(
-        const std::string &ifName, const std::string &ipAddr, const std::string &mask, const std::string &gateWay);
 
     void SetProxy(bool isAuto, const std::string &proxy, const std::string &port, const std::string &noProxys,
         const std::string &pac);

@@ -21,7 +21,8 @@
     <oatconfig>
         <licensefile></licensefile>
         <policylist>
-            <policy name="projectPolicy" desc="">
+			<policy name="projectPolicy" desc="">
+                <policyitem type="copyright" name="Copyright (c) 2022 Shenzhen Kaihong Digital" path=".*" rule="may" group="defaultGroup" filefilter="copyrightPolicyFilter" desc=""/>
             </policy>
         </policylist>
         <filefilterlist>

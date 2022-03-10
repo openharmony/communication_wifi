@@ -71,6 +71,15 @@ public:
     void UpdateNetLinkInfo(std::string &ip, std::string &mask, std::string &gateWay,
         std::string &strDns, std::string &strBakDns);
 
+    /**
+     * Add route
+     *
+     * @param interface interface name
+     * @param ipAddress IP address
+     * @param prefixLength prefix length
+     */
+    bool AddRoute(const std::string interface, const std::string ipAddress, int prefixLength);
+
 public:
     class NetConnCallback : public NetManagerStandard::NetSupplierCallbackBase {
     public:

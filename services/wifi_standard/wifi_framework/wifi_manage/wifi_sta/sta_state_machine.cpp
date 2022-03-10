@@ -22,6 +22,7 @@
 #include "wifi_settings.h"
 #include "mac_address.h"
 #include "if_config.h"
+#include "wifi_common_util.h"
 #include "wifi_supplicant_hal_interface.h"
 
 #ifndef OHOS_WIFI_STA_TEST
@@ -522,7 +523,6 @@ void StaStateMachine::StopWifiProcess()
 
     IpInfo ipInfo;
     WifiSettings::GetInstance().SaveIpInfo(ipInfo);
-    IfConfig::GetInstance().FlushIpAddr(IF_NAME, IPTYPE_IPV4);
 
     /* clear connection information. */
     InitWifiLinkedInfo();
@@ -820,6 +820,10 @@ void StaStateMachine::DealDisconnectEvent(InternalMessage *msg)
     if (wpsState != SetupMethod::INVALID) {
         return;
     }
+    if (NetSupplierInfo != nullptr) {
+        NetSupplierInfo->isAvailable_ = false;
+        WifiNetAgent::GetInstance().UpdateNetSupplierInfo(NetSupplierInfo);
+    }
     StopTimer(static_cast<int>(CMD_SIGNAL_POLL));
     pNetcheck->StopNetCheckThread();
     if (currentTpType == IPTYPE_IPV4) {
@@ -833,7 +837,6 @@ void StaStateMachine::DealDisconnectEvent(InternalMessage *msg)
 
     IpInfo ipInfo;
     WifiSettings::GetInstance().SaveIpInfo(ipInfo);
-    IfConfig::GetInstance().FlushIpAddr(IF_NAME, IPTYPE_IPV4);
     /* Initialize connection informatoin. */
     InitWifiLinkedInfo();
     if (lastLinkedInfo.detailedState == DetailedState::CONNECTING) {
@@ -928,7 +931,7 @@ void StaStateMachine::DealStartWpsCmd(InternalMessage *msg)
         LOGE("ClearDeviceConfig() failed!");
         return;
     }
-    
+
     StartWpsMode(msg);
     if ((wpsState == SetupMethod::DISPLAY) || (wpsState == SetupMethod::KEYPAD)) {
         WIFI_LOGD("Clear WPA block list every ten second!");
@@ -1903,6 +1906,8 @@ void StaStateMachine::DhcpResultNotify::OnSuccess(int status, const std::string 
         result.strServer.c_str(),
         result.uLeaseTime);
 
+    WIFI_LOGD("strDns1=%{private}s, strDns2=%{private}s", result.strDns1.c_str(), result.strDns2.c_str());
+
     IpInfo ipInfo;
     WifiSettings::GetInstance().GetIpInfo(ipInfo);
     if (!((IpTools::ConvertIpv4Address(result.strYourCli) == ipInfo.ipAddress) &&
@@ -1921,11 +1926,15 @@ void StaStateMachine::DhcpResultNotify::OnSuccess(int status, const std::string 
             pStaStateMachine->linkedInfo.isDataRestricted =
                 (result.strVendor.find("ANDROID_METERED") == std::string::npos) ? 0 : 1;
             WifiSettings::GetInstance().SaveLinkedInfo(pStaStateMachine->linkedInfo);
+            WIFI_LOGI("Update NetLink info, strYourCli=%{public}s, strSubnet=%{public}s, \
+                strRouter1=%{public}s, strDns1=%{public}s, strDns2=%{public}s",
+                IpAnonymize(result.strYourCli).c_str(), IpAnonymize(result.strSubnet).c_str(),
+                IpAnonymize(result.strRouter1).c_str(), IpAnonymize(result.strDns1).c_str(),
+                IpAnonymize(result.strDns2).c_str());
             WifiNetAgent::GetInstance().UpdateNetLinkInfo(result.strYourCli, result.strSubnet, result.strRouter1,
                 result.strDns1, result.strDns2);
         }
 
-        IfConfig::GetInstance().SetIfDnsAndRoute(result, result.iptype);
         if (pStaStateMachine->getIpSucNum == 0 || pStaStateMachine->isRoam) {
             pStaStateMachine->SaveLinkstate(ConnState::CONNECTED, DetailedState::CONNECTED);
             pStaStateMachine->staCallback.OnStaConnChanged(

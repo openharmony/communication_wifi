@@ -974,7 +974,7 @@ public:
      * @return const std::vector<TrustListPolicy>& - trustlist policies.
      */
     const std::vector<TrustListPolicy>& ReloadTrustListPolicies();
-    
+
     /**
      * @Description get moving freeze state trustlist.
      *

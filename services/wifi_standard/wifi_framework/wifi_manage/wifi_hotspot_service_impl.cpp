@@ -94,6 +94,11 @@ bool WifiHotspotServiceImpl::Init()
 ErrCode WifiHotspotServiceImpl::IsHotspotActive(bool &bActive)
 {
     WIFI_LOGI("IsHotspotActive");
+    if (WifiPermissionUtils::VerifyManageWifiHotspotPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("IsHotspotActive:VerifyManageWifiHotspotPermission PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+
     bActive = IsApServiceRunning();
     return WIFI_OPT_SUCCESS;
 }
@@ -123,6 +128,11 @@ ErrCode WifiHotspotServiceImpl::GetHotspotConfig(HotspotConfig &result)
         return WIFI_OPT_PERMISSION_DENIED;
     }
 
+    if (WifiPermissionUtils::VerifyGetWifiConfigPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("GetHotspotConfig:VerifyGetWifiConfigPermission PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+
     WifiConfigCenter::GetInstance().GetHotspotConfig(result);
     return WIFI_OPT_SUCCESS;
 }
@@ -135,12 +145,7 @@ ErrCode WifiHotspotServiceImpl::SetHotspotConfig(const HotspotConfig &config)
         return WIFI_OPT_PERMISSION_DENIED;
     }
 
-    if (WifiPermissionUtils::VerifyWifiConnectionPermission() == PERMISSION_DENIED) {
-        WIFI_LOGE("SetHotspotConfig:VerifyWifiConnectionPermission PERMISSION_DENIED!");
-        return WIFI_OPT_PERMISSION_DENIED;
-    }
-
-    if (WifiPermissionUtils::WifiPermissionUtils::VerifySetWifiConfigPermission() == PERMISSION_DENIED) {
+    if (WifiPermissionUtils::VerifySetWifiConfigPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("SetHotspotConfig:VerifySetWifiConfigPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
@@ -179,19 +184,28 @@ ErrCode WifiHotspotServiceImpl::SetHotspotConfig(const HotspotConfig &config)
 ErrCode WifiHotspotServiceImpl::GetStationList(std::vector<StationInfo> &result)
 {
     WIFI_LOGI("GetStationList");
-    if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
-        WIFI_LOGE("GetStationList:VerifyGetWifiInfoPermission PERMISSION_DENIED!");
-        return WIFI_OPT_PERMISSION_DENIED;
-    }
+    if (WifiPermissionUtils::VerifyGetWifiInfoInternalPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("GetStationList:VerifyGetWifiInfoInternalPermission PERMISSION_DENIED!");
 
-    if (WifiPermissionUtils::VerifyGetWifiLocalMacPermission() == PERMISSION_DENIED) {
-        WIFI_LOGE("GetStationList:VerifyGetWifiLocalMacPermission PERMISSION_DENIED!");
-        return WIFI_OPT_PERMISSION_DENIED;
-    }
+        if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
+            WIFI_LOGE("GetStationList:VerifyGetWifiInfoPermission PERMISSION_DENIED!");
+            return WIFI_OPT_PERMISSION_DENIED;
+        }
 
-    if (WifiPermissionUtils::VerifyGetScanInfosPermission() == PERMISSION_DENIED) {
-        WIFI_LOGE("GetStationList:VerifyGetScanInfosPermission PERMISSION_DENIED!");
-        return WIFI_OPT_PERMISSION_DENIED;
+        if (WifiPermissionUtils::VerifyGetWifiLocalMacPermission() == PERMISSION_DENIED) {
+            WIFI_LOGE("GetStationList:VerifyGetWifiLocalMacPermission PERMISSION_DENIED!");
+            return WIFI_OPT_PERMISSION_DENIED;
+        }
+
+        if (WifiPermissionUtils::VerifyGetScanInfosPermission() == PERMISSION_DENIED) {
+            WIFI_LOGE("GetStationList:VerifyGetScanInfosPermission PERMISSION_DENIED!");
+            return WIFI_OPT_PERMISSION_DENIED;
+        }
+
+        if (WifiPermissionUtils::VerifyManageWifiHotspotPermission() == PERMISSION_DENIED) {
+            WIFI_LOGE("GetStationList:VerifyManageWifiHotspotPermission PERMISSION_DENIED!");
+            return WIFI_OPT_PERMISSION_DENIED;
+        }
     }
 
     if (!IsApServiceRunning()) {
@@ -228,8 +242,8 @@ ErrCode WifiHotspotServiceImpl::DisassociateSta(const StationInfo &info)
 
 ErrCode WifiHotspotServiceImpl::CheckCanEnableHotspot(void)
 {
-    if (WifiPermissionUtils::VerifyWifiConnectionPermission() == PERMISSION_DENIED) {
-        WIFI_LOGE("EnableHotspot:VerifyWifiConnectionPermission PERMISSION_DENIED!");
+    if (WifiPermissionUtils::VerifyManageWifiHotspotPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("EnableHotspot:VerifyManageWifiHotspotPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
 
@@ -297,8 +311,8 @@ ErrCode WifiHotspotServiceImpl::EnableHotspot(void)
 ErrCode WifiHotspotServiceImpl::DisableHotspot(void)
 {
     WIFI_LOGI("DisableHotspot");
-    if (WifiPermissionUtils::VerifyWifiConnectionPermission() == PERMISSION_DENIED) {
-        WIFI_LOGE("DisableHotspot:VerifyWifiConnectionPermission PERMISSION_DENIED!");
+    if (WifiPermissionUtils::VerifyManageWifiHotspotPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("DisableHotspot:VerifyManageWifiHotspotPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
 

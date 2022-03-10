@@ -105,6 +105,15 @@ public:
     int VerifySetWifiConfigPermission(const int &pid, const int &uid);
 
     /**
+     * @Description Verify whether the app has the permission to get hotspot config, hotspot blocklist config
+     *
+     * @param pid - the app's process id
+     * @param uid - the app id
+     * @return int - PERMISSION_DENIED or PERMISSION_GRANTED
+     */
+    int VerifyGetWifiConfigPermission(const int &pid, const int &uid);
+
+    /**
      * @Description : Verify location information about nearby P2P devices Permission.
      *
      * @param pid - Process ID.[in]
@@ -112,6 +121,33 @@ public:
      * @return int - PERMISSION_DENIED or PERMISSION_GRANTED
      */
     int VerifyGetWifiDirectDevicePermission(const int &pid, const int &uid);
+
+    /**
+     * @Description : Verify manage wifi hotspot Permission.
+     *
+     * @param pid - Process ID.[in]
+     * @param uid - User ID.[in]
+     * @return int - PERMISSION_DENIED or PERMISSION_GRANTED
+     */
+    int VerifyManageWifiHotspotPermission(const int &pid, const int &uid);
+
+    /**
+     * @Description : Get wifi peers mac Permission.
+     *
+     * @param pid - Process ID.[in]
+     * @param uid - User ID.[in]
+     * @return int - PERMISSION_DENIED or PERMISSION_GRANTED
+     */
+    int VerifyGetWifiPeersMacPermission(const int &pid, const int &uid);
+
+    /**
+     * @Description : Get wifi internal wifi info Permission.
+     *
+     * @param pid - Process ID.[in]
+     * @param uid - User ID.[in]
+     * @return int - PERMISSION_DENIED or PERMISSION_GRANTED
+     */
+    int VerifyGetWifiInfoInternalPermission(const int &pid, const int &uid);
 
 private:
     /* system auth service client */

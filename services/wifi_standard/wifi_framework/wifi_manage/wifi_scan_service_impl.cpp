@@ -93,8 +93,8 @@ bool WifiScanServiceImpl::Init()
 ErrCode WifiScanServiceImpl::SetScanControlInfo(const ScanControlInfo &info)
 {
     WIFI_LOGI("WifiScanServiceImpl::SetScanControlInfo");
-    if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
-        WIFI_LOGE("SetScanControlInfo:VerifyGetWifiInfoPermission PERMISSION_DENIED!");
+    if (WifiPermissionUtils::VerifySetWifiInfoPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("SetScanControlInfo:VerifySetWifiInfoPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
 
@@ -113,9 +113,18 @@ ErrCode WifiScanServiceImpl::SetScanControlInfo(const ScanControlInfo &info)
 ErrCode WifiScanServiceImpl::Scan()
 {
     WIFI_LOGI("Scan");
-    if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
-        WIFI_LOGE("Scan:VerifyGetWifiInfoPermission PERMISSION_DENIED!");
-        return WIFI_OPT_PERMISSION_DENIED;
+    if (WifiPermissionUtils::VerifyGetWifiInfoInternalPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("Scan:VerifyGetWifiInfoInternalPermission PERMISSION_DENIED!");
+
+        if (WifiPermissionUtils::VerifySetWifiInfoPermission() == PERMISSION_DENIED) {
+            WIFI_LOGE("Scan:VerifySetWifiInfoPermission PERMISSION_DENIED!");
+            return WIFI_OPT_PERMISSION_DENIED;
+        }
+
+        if (WifiPermissionUtils::VerifyGetScanInfosPermission() == PERMISSION_DENIED) {
+            WIFI_LOGE("Scan:VerifyGetScanInfosPermission PERMISSION_DENIED!");
+            return WIFI_OPT_PERMISSION_DENIED;
+        }
     }
 
     if (!IsScanServiceRunning()) {
@@ -132,9 +141,18 @@ ErrCode WifiScanServiceImpl::Scan()
 ErrCode WifiScanServiceImpl::AdvanceScan(const WifiScanParams &params)
 {
     WIFI_LOGI("Scan with WifiScanParams, band %{public}u", params.band);
-    if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
-        WIFI_LOGE("Scan with WifiScanParams:VerifyGetWifiInfoPermission PERMISSION_DENIED!");
-        return WIFI_OPT_PERMISSION_DENIED;
+    if (WifiPermissionUtils::VerifyGetWifiInfoInternalPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("AdvanceScan:VerifyGetWifiInfoInternalPermission PERMISSION_DENIED!");
+
+        if (WifiPermissionUtils::VerifySetWifiInfoPermission() == PERMISSION_DENIED) {
+            WIFI_LOGE("AdvanceScan:VerifySetWifiInfoPermission PERMISSION_DENIED!");
+            return WIFI_OPT_PERMISSION_DENIED;
+        }
+
+        if (WifiPermissionUtils::VerifyGetScanInfosPermission() == PERMISSION_DENIED) {
+            WIFI_LOGE("AdvanceScan:VerifyGetScanInfosPermission PERMISSION_DENIED!");
+            return WIFI_OPT_PERMISSION_DENIED;
+        }
     }
 
     if (!IsScanServiceRunning()) {
@@ -164,15 +182,20 @@ ErrCode WifiScanServiceImpl::GetScanInfoList(std::vector<WifiScanInfo> &result)
 {
     WIFI_LOGI("GetScanInfoList");
 
-    if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
-        WIFI_LOGE("GetScanInfoList:VerifyGetWifiInfoPermission PERMISSION_DENIED!");
-        return WIFI_OPT_PERMISSION_DENIED;
+    if (WifiPermissionUtils::VerifyGetWifiInfoInternalPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("GetScanInfoList:VerifyGetWifiInfoInternalPermission PERMISSION_DENIED!");
+        if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
+            WIFI_LOGE("GetScanInfoList:VerifyGetWifiInfoPermission PERMISSION_DENIED!");
+            return WIFI_OPT_PERMISSION_DENIED;
+        }
+
+        if ((WifiPermissionUtils::VerifyGetScanInfosPermission() == PERMISSION_DENIED) &&
+            (WifiPermissionUtils::VerifyGetWifiPeersMacPermission() == PERMISSION_DENIED)) {
+            WIFI_LOGE("GetScanInfoList:GET_WIFI_PEERS_MAC && LOCATION PERMISSION_DENIED!");
+            return WIFI_OPT_PERMISSION_DENIED;
+        }
     }
 
-    if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
-        WIFI_LOGE("GetScanInfoList:VerifyGetWifiInfoPermission PERMISSION_DENIED!");
-        return WIFI_OPT_PERMISSION_DENIED;
-    }
     WifiConfigCenter::GetInstance().GetScanInfoList(result);
     return WIFI_OPT_SUCCESS;
 }

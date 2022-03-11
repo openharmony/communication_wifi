@@ -26,6 +26,7 @@
 #include "wifi_p2p_dns_sd_service_response.h"
 #include "wifi_p2p_dns_sd_service_info.h"
 #include "wifi_logger.h"
+#include "wifi_net_agent.h"
 
 DEFINE_WIFILOG_P2P_LABEL("P2pStateMachine");
 
@@ -668,8 +669,10 @@ bool P2pStateMachine::StartDhcpServer()
     currGroup.SetGoIpAddress(ipv4.GetAddressWithString());
     groupManager.SetCurrentGroup(currGroup);
     if (!m_DhcpdInterface.SetDhcpEventFunc(groupManager.GetCurrentGroup().GetInterface(), pDhcpResultNotify.get())) {
-        WIFI_LOGW("Set dhcp notify failed.");
+        WIFI_LOGE("Set dhcp notify failed.");
     }
+    WifiNetAgent::GetInstance().AddRoute(groupManager.GetCurrentGroup().GetInterface(),
+        ipv4.GetAddressWithString(), ipv4.GetAddressPrefixLength());
     return true;
 }
 
@@ -699,6 +702,7 @@ void P2pStateMachine::DhcpResultNotify::OnSuccess(int status, const std::string 
     WifiSettings::GetInstance().SaveP2pInfo(p2pInfo);
     groupManager.SaveP2pInfo(p2pInfo);
     pP2pStateMachine->BroadcastP2pConnectionChanged();
+    WifiNetAgent::GetInstance().AddRoute(ifname, result.strYourCli, IpTools::GetMaskLength(result.strSubnet));
 }
 
 void P2pStateMachine::DhcpResultNotify::OnFailed(int status, const std::string &ifname, const std::string &reason)

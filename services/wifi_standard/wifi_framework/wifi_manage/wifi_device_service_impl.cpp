@@ -164,7 +164,7 @@ ErrCode WifiDeviceServiceImpl::DisableWifi()
         WIFI_LOGE("DisableWifi:VerifyWifiConnectionPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
-	
+
     WifiOprMidState curState = WifiConfigCenter::GetInstance().GetWifiMidState();
     if (curState != WifiOprMidState::RUNNING) {
         WIFI_LOGI("current wifi state is %{public}d", static_cast<int>(curState));
@@ -490,10 +490,13 @@ ErrCode WifiDeviceServiceImpl::ConnectToDevice(const WifiDeviceConfig &config)
         return WIFI_OPT_PERMISSION_DENIED;
     }
 
+    if (!CheckConfigPwd(config)) {
+        WIFI_LOGE("CheckConfigPwd failed!");
+        return WIFI_OPT_INVALID_PARAM;
+    }
     if (!IsStaServiceRunning()) {
         return WIFI_OPT_STA_NOT_OPENED;
     }
-
     IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst();
     if (pService == nullptr) {
         return WIFI_OPT_STA_NOT_OPENED;
@@ -504,7 +507,7 @@ ErrCode WifiDeviceServiceImpl::ConnectToDevice(const WifiDeviceConfig &config)
 bool WifiDeviceServiceImpl::IsConnected()
 {
     WifiLinkedInfo linkedInfo;
-	
+
     if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("IsConnected:VerifyGetWifiInfoPermission() PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
@@ -649,7 +652,7 @@ ErrCode WifiDeviceServiceImpl::GetLinkedInfo(WifiLinkedInfo &info)
         /* Clear mac addr */
         info.macAddress = "";
     }
- 
+
     return WIFI_OPT_SUCCESS;
 }
 

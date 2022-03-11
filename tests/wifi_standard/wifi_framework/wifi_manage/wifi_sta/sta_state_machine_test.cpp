@@ -1063,7 +1063,6 @@ public:
         EXPECT_CALL(WifiSettings::GetInstance(), SaveIpInfo(_)).Times(AtLeast(0));
         ;
         EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_)).Times(AtLeast(0));
-        EXPECT_CALL(IfConfig::GetInstance(), SetIfDnsAndRoute(_, _)).Times(AtLeast(0));
         EXPECT_CALL(WifiManager::GetInstance(), DealStaConnChanged(_, _)).Times(AtLeast(0));
         EXPECT_TRUE(pStaStateMachine->ConfigStaticIpAddress(staticIpAddress));
     }
@@ -1076,7 +1075,6 @@ public:
         pStaStateMachine->getIpSucNum = 1;
         pStaStateMachine->isRoam = false;
         StaticIpAddress staticIpAddress;
-        EXPECT_CALL(IfConfig::GetInstance(), SetIfDnsAndRoute(_, _)).Times(AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), SaveIpInfo(_)).Times(AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_)).Times(AtLeast(0));
         EXPECT_CALL(WifiManager::GetInstance(), DealStaConnChanged(_, _)).Times(AtLeast(0));
@@ -1093,7 +1091,6 @@ public:
         StaticIpAddress staticIpAddress;
         EXPECT_CALL(WifiSettings::GetInstance(), SaveIpInfo(_)).Times(AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_)).Times(AtLeast(0));
-        EXPECT_CALL(IfConfig::GetInstance(), SetIfDnsAndRoute(_, _)).Times(AtLeast(0));
         EXPECT_CALL(WifiManager::GetInstance(), DealStaConnChanged(_, _)).Times(AtLeast(0));
         EXPECT_TRUE(pStaStateMachine->ConfigStaticIpAddress(staticIpAddress));
     }
@@ -1106,7 +1103,6 @@ public:
         pStaStateMachine->isRoam = false;
         EXPECT_CALL(WifiSettings::GetInstance(), SaveIpInfo(_)).Times(AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_)).Times(AtLeast(0));
-        EXPECT_CALL(IfConfig::GetInstance(), SetIfDnsAndRoute(_, _)).Times(AtLeast(0));
         EXPECT_FALSE(pStaStateMachine->ConfigStaticIpAddress(staticIpAddress));
     }
 

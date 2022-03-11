@@ -30,7 +30,6 @@ typedef enum IpType {
 class MockIfConfig {
 public:
     virtual ~MockIfConfig() = default;
-    virtual int SetIfDnsAndRoute(const DhcpResult &dhcpInfo, int ipType) = 0;
     virtual void SetProxy(bool isAuto, const std::string &proxy, const std::string &port, const std::string &noProxys,
         const std::string &pac) = 0;
     virtual void FlushIpAddr(const std::string &ifName, const int &ipType) = 0;
@@ -41,7 +40,6 @@ public:
     IfConfig() = default;
     ~IfConfig() = default;
     static IfConfig &GetInstance(void);
-    MOCK_METHOD2(SetIfDnsAndRoute, int(const DhcpResult &dhcpInfo, int ipType));
     MOCK_METHOD5(SetProxy, void(bool isAuto, const std::string &proxy, const std::string &port,
         const std::string &noProxys, const std::string &pac));
     MOCK_METHOD2(FlushIpAddr, void(const std::string &ifName, const int &ipType));

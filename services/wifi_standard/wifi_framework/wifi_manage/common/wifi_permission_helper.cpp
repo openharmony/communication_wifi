@@ -160,13 +160,23 @@ IsGranted WifiPermissionHelper::MockVerifyPermission(const std::string &permissi
 int WifiPermissionHelper::VerifyPermission(const std::string &permissionName, const int &pid, const int &uid)
 {
     auto callerToken = IPCSkeleton::GetCallingTokenID();
-    int result = Security::AccessToken::AccessTokenKit::VerifyAccessToken(callerToken, permissionName);
-    if (result == Security::AccessToken::PermissionState::PERMISSION_GRANTED) {
+    auto tokenType = Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(callerToken);
+    if (tokenType == Security::AccessToken::AtokenTypeEnum::TOKEN_NATIVE) {
         return PERMISSION_GRANTED;
-    } else {
-        LOGD("callerToken=0x%{public}x has no permission_name=%{public}s", pid, permissionName.c_str());
+    }
+
+    if (tokenType == Security::AccessToken::AtokenTypeEnum::TOKEN_HAP) {
+        int result = Security::AccessToken::AccessTokenKit::VerifyAccessToken(callerToken, permissionName);
+        if (result == Security::AccessToken::PermissionState::PERMISSION_GRANTED) {
+            return PERMISSION_GRANTED;
+        }
+ 
+        LOGI("callerToken=0x%{public}x has no permission_name=%{public}s", pid, permissionName.c_str());
         return PERMISSION_DENIED;
     }
+
+    LOGE("callerToken=0x%{public}x has invalid token type=%{public}d", pid, tokenType);
+    return PERMISSION_DENIED;
 }
 
 int WifiPermissionHelper::VerifySetWifiInfoPermission(const int &pid, const int &uid)

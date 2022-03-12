@@ -161,11 +161,11 @@ int WifiPermissionHelper::VerifyPermission(const std::string &permissionName, co
 {
     auto callerToken = IPCSkeleton::GetCallingTokenID();
     auto tokenType = Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(callerToken);
-    if (tokenType == Security::AccessToken::AtokenTypeEnum::TOKEN_NATIVE) {
+    if (tokenType == Security::AccessToken::ATokenTypeEnum::TOKEN_NATIVE) {
         return PERMISSION_GRANTED;
     }
 
-    if (tokenType == Security::AccessToken::AtokenTypeEnum::TOKEN_HAP) {
+    if (tokenType == Security::AccessToken::ATokenTypeEnum::TOKEN_HAP) {
         int result = Security::AccessToken::AccessTokenKit::VerifyAccessToken(callerToken, permissionName);
         if (result == Security::AccessToken::PermissionState::PERMISSION_GRANTED) {
             return PERMISSION_GRANTED;

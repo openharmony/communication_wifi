@@ -137,14 +137,20 @@ ohos_unittest("wifi_p2p_test") {
     "//foundation/communication/wifi/services/wifi_standard/wifi_framework/dhcp_manage/mgr_service/interfaces",
     "//third_party/googletest/googlemock/include",
     "//third_party/googletest/googletest/include",
+    "//foundation/communication/wifi/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta",
   ]
 
   deps = [
     "//foundation/communication/wifi/services/wifi_standard/wifi_framework/dhcp_manage/mgr_service:dhcp_manager_service",
+    "//foundation/communication/wifi/services/wifi_standard/wifi_framework/wifi_manage:wifi_manager_service",
     "//third_party/googletest:gmock_main",
     "//utils/native/base:utils",
   ]
-  external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+  external_deps = [
+    "hiviewdfx_hilog_native:libhilog",
+    "ipc:ipc_core",
+    "netmanager_base:net_conn_manager_if",
+  ]
   part_name = "wifi_standard"
   subsystem_name = "communication"
 }

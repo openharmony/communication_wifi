@@ -14,13 +14,13 @@
  */
 
 #include "wifi_net_agent.h"
-
 #include <cinttypes>
-
-#include "wifi_logger.h"
-
-#include "net_conn_client.h"
 #include "inet_addr.h"
+#include "net_conn_client.h"
+#include "net_manager_native.h"
+#include "route_controller.h"
+#include "wifi_common_util.h"
+#include "wifi_logger.h"
 
 DEFINE_WIFILOG_LABEL("WifiNetAgent");
 
@@ -114,10 +114,12 @@ void WifiNetAgent::UpdateNetLinkInfo(std::string &ip, std::string &mask, std::st
     sptr<NetManagerStandard::NetLinkInfo> netLinkInfo = (std::make_unique<NetManagerStandard::NetLinkInfo>()).release();
     netLinkInfo->ifaceName_ = "wlan0";
 
+    unsigned int prefixLength = IpTools::GetMaskLength(mask);
     sptr<NetManagerStandard::INetAddr> netAddr = (std::make_unique<NetManagerStandard::INetAddr>()).release();
     netAddr->type_ = NetManagerStandard::INetAddr::IPV4;
     netAddr->address_ = ip;
     netAddr->netMask_ = mask;
+    netAddr->prefixlen_ = prefixLength;
     netLinkInfo->netAddrList_.push_back(*netAddr);
 
     sptr<NetManagerStandard::INetAddr> dns = (std::make_unique<NetManagerStandard::INetAddr>()).release();
@@ -130,11 +132,42 @@ void WifiNetAgent::UpdateNetLinkInfo(std::string &ip, std::string &mask, std::st
     sptr<NetManagerStandard::Route> route = (std::make_unique<NetManagerStandard::Route>()).release();
     route->iface_ = "wlan0";
     route->destination_.type_ = NetManagerStandard::INetAddr::IPV4;
-    route->destination_.address_ = gateWay;
+    route->destination_.address_ = "0.0.0.0";
+    route->gateway_.address_ = gateWay;
     netLinkInfo->routeList_.push_back(*route);
+
+    sptr<NetManagerStandard::Route> localRoute = (std::make_unique<NetManagerStandard::Route>()).release();
+    unsigned int ipInt = IpTools::ConvertIpv4Address(ip);
+    unsigned int maskInt = IpTools::ConvertIpv4Address(mask);
+    std::string strLocalRoute = IpTools::ConvertIpv4Address(ipInt & maskInt);
+    localRoute->iface_ = route->iface_;
+    localRoute->destination_.type_ = NetManagerStandard::INetAddr::IPV4;
+    localRoute->destination_.address_ = strLocalRoute;
+    localRoute->destination_.prefixlen_ = prefixLength;
+    localRoute->gateway_.address_ = "0.0.0.0";
+    netLinkInfo->routeList_.push_back(*localRoute);
 
     int32_t result = netManager->UpdateNetLinkInfo(supplierId, netLinkInfo);
     WIFI_LOGI("result:%{public}d", result);
+}
+
+bool WifiNetAgent::AddRoute(const std::string interface, const std::string ipAddress, int prefixLength)
+{
+    LOGI("Net agent addroute");
+    unsigned int ipInt = IpTools::ConvertIpv4Address(ipAddress);
+    std::string mask = IpTools::ConvertIpv4Mask(prefixLength);
+    unsigned int maskInt = IpTools::ConvertIpv4Address(mask);
+    std::string strLocalRoute = IpTools::ConvertIpv4Address(ipInt & maskInt);
+    std::string destAddress = strLocalRoute + "/" + std::to_string(prefixLength);
+    std::unique_ptr<OHOS::nmd::NetManagerNative> netdService = std::make_unique<nmd::NetManagerNative>();
+    if (netdService == nullptr) {
+        LOGE("NetdService is nullptr!");
+        return false;
+    }
+    LOGI("Add route, interface: %{public}s, destAddress: %{public}s, ipAddress: %{public}s, prefixLength: %{public}d",
+        interface.c_str(), IpAnonymize(destAddress).c_str(), IpAnonymize(ipAddress).c_str(), prefixLength);
+    netdService->NetworkAddRoute(OHOS::nmd::LOCAL_NETWORK_NETID, interface, destAddress, ipAddress);
+    return true;
 }
 
 WifiNetAgent::NetConnCallback::NetConnCallback(const StaServiceCallback &callback)

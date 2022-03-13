@@ -97,7 +97,11 @@ static WifiErrorNo StopP2pWpaAndWpaHal(void)
     }
     WifiWpaInterface *pWpaInterface = GetWifiWapGlobalInterface();
     if (pWpaInterface != NULL) {
+#ifdef PRODUCT_RK
+        pWpaInterface->wpaCliRemoveIface(pWpaInterface, "p2p-wlan0-0");
+#else
         pWpaInterface->wpaCliRemoveIface(pWpaInterface, "p2p0");
+#endif
     }
     if (P2pStopSupplicant() != WIFI_HAL_SUCCESS) {
         LOGE("p2p_wpa_supplicant stop failed!");
@@ -120,7 +124,11 @@ static WifiErrorNo AddP2pIface(void)
         return WIFI_HAL_FAILED;
     }
     AddInterfaceArgv argv;
+#ifdef PRODUCT_RK
+    if (strcpy_s(argv.name, sizeof(argv.name), "wlan0") != EOK ||
+#else
     if (strcpy_s(argv.name, sizeof(argv.name), "p2p0") != EOK ||
+#endif
         strcpy_s(argv.confName, sizeof(argv.confName), "/data/misc/wifi/wpa_supplicant/p2p_supplicant.conf") != EOK) {
         return WIFI_HAL_FAILED;
     }

@@ -53,9 +53,6 @@ config("wifi_manager_service_header") {
     "//base/security/access_token/interfaces/innerkits/accesstoken/include",
     "//foundation/communication/netmanager_base/services/netmanagernative/include/netsys",
   ]
-  if (defined(product_name) && product_name == "rk3568") {
-    defines = [ "PRODUCT_RK" ]
-  }
 }
 
 config("wifi_manager_service_config") {

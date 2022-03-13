@@ -27,6 +27,7 @@
 #include "wifi_hid2d_service_utils.h"
 #include "if_config.h"
 #include "wifi_hid2d_cfg.h"
+#include "wifi_net_agent.h"
 
 DEFINE_WIFILOG_P2P_LABEL("WifiP2pServiceImpl");
 
@@ -225,7 +226,6 @@ ErrCode WifiP2pServiceImpl::DiscoverDevices(void)
 ErrCode WifiP2pServiceImpl::StopDiscoverDevices(void)
 {
     WIFI_LOGI("StopDiscoverDevices");
-
     if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("StopDiscoverDevices:VerifyGetWifiInfoPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
@@ -404,7 +404,7 @@ ErrCode WifiP2pServiceImpl::RemoveGroup()
         WIFI_LOGE("RemoveGroup:VerifyGetWifiInfoPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
-	
+
     if (!IsP2pServiceRunning()) {
         WIFI_LOGE("P2pService is not runing!");
         return WIFI_OPT_P2P_NOT_OPENED;
@@ -528,6 +528,7 @@ ErrCode WifiP2pServiceImpl::QueryP2pLinkedInfo(WifiP2pLinkedInfo &linkedInfo)
 ErrCode WifiP2pServiceImpl::GetCurrentGroup(WifiP2pGroupInfo &group)
 {
     WIFI_LOGI("GetCurrentGroup");
+
     if (WifiPermissionUtils::VerifyGetWifiInfoInternalPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("GetCurrentGroup:VerifyGetWifiInfoInternalPermission PERMISSION_DENIED!");
 
@@ -833,6 +834,7 @@ ErrCode WifiP2pServiceImpl::Hid2dConfigIPAddr(const std::string& ifName, const I
 {
     WIFI_LOGI("Hid2dConfigIPAddr, ifName: %{public}s", ifName.c_str());
     IfConfig::GetInstance().AddIpAddr(ifName, ipInfo.ip, ipInfo.netmask, IpType::IPTYPE_IPV4);
+    WifiNetAgent::GetInstance().AddRoute(ifName, ipInfo.ip, IpTools::GetMaskLength(ipInfo.netmask));
     return WIFI_OPT_SUCCESS;
 }
 

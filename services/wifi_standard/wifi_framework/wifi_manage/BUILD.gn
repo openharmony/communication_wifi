@@ -69,6 +69,10 @@ config("wifi_manager_service_config") {
   if (target_cpu == "arm") {
     cflags += [ "-DBINDER_IPC_32BIT" ]
   }
+
+  if (product_name == "rk3568") {
+    defines = [ "PRODUCT_RK" ]
+  }
 }
 
 ohos_source_set("wifi_scan_service_impl") {

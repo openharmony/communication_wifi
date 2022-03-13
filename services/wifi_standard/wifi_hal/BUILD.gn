@@ -67,7 +67,9 @@ ohos_executable("wifi_hal_service") {
 
   cflags_cc = [ "-fno-rtti" ]
 
-  defines = []
+  if (defined(product_name) && product_name == "rk3568") {
+    defines = [ "PRODUCT_RK" ]
+  }
 
   part_name = "wifi_standard"
   subsystem_name = "communication"

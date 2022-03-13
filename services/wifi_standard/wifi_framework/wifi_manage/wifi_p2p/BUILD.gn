@@ -94,6 +94,9 @@ ohos_shared_library("wifi_p2p_service") {
   ]
 
   defines = [ "AP_NOT_DIRECT_USE_DHCP" ]
+  if (product_name == "rk3568") {
+    defines += [ "PRODUCT_RK" ]
+  }
 
   external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
 

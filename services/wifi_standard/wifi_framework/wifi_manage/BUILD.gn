@@ -52,9 +52,6 @@ config("wifi_manager_service_header") {
     "//foundation/appexecfwk/standard/interfaces/innerkits/appexecfwk_base/include",
     "//base/security/access_token/interfaces/innerkits/accesstoken/include",
   ]
-  if (defined(product_name) && product_name == "rk3568") {
-    defines = [ "PRODUCT_RK" ]
-  }
 }
 
 config("wifi_manager_service_config") {
@@ -67,6 +64,10 @@ config("wifi_manager_service_config") {
   ]
   if (target_cpu == "arm") {
     cflags += [ "-DBINDER_IPC_32BIT" ]
+  }
+
+  if (product_name == "rk3568") {
+    defines = [ "PRODUCT_RK" ]
   }
 }
 

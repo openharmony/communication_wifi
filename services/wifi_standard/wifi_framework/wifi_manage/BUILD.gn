@@ -51,6 +51,7 @@ config("wifi_manager_service_header") {
     "//foundation/aafwk/standard/interfaces/innerkits/base/include",
     "//foundation/appexecfwk/standard/interfaces/innerkits/appexecfwk_base/include",
     "//base/security/access_token/interfaces/innerkits/accesstoken/include",
+    "//foundation/communication/netmanager_base/services/netmanagernative/include/netsys",
   ]
 }
 
@@ -133,7 +134,12 @@ ohos_source_set("wifi_p2p_service_impl") {
     ":wifi_manager_service_header",
   ]
 
-  external_deps = [ "ipc:ipc_core" ]
+  deps = [ "//foundation/communication/netmanager_base/services/netmanagernative:netsys_native_manager" ]
+
+  external_deps = [
+    "ipc:ipc_core",
+    "netmanager_base:net_conn_manager_if",
+  ]
 }
 ohos_shared_library("wifi_manager_service") {
   install_enable = true
@@ -156,6 +162,7 @@ ohos_shared_library("wifi_manager_service") {
     "wifi_dumper.cpp",
     "wifi_internal_event_dispatcher.cpp",
     "wifi_manager.cpp",
+    "wifi_net_agent.cpp",
     "wifi_service_manager.cpp",
   ]
 
@@ -163,8 +170,10 @@ ohos_shared_library("wifi_manager_service") {
     "${aafwk_path}/interfaces/innerkits/base:base",
     "${aafwk_path}/interfaces/innerkits/want:want",
     "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog",
+    "//foundation/communication/netmanager_base/services/netmanagernative:netsys_native_manager",
     "//foundation/communication/wifi/services/wifi_standard/etc/init:etc",
     "//foundation/communication/wifi/services/wifi_standard/wifi_framework/wifi_manage/idl_client:wifi_idl_client",
+    "//foundation/communication/wifi/utils/src:wifi_utils",
     "//foundation/distributedschedule/safwk/interfaces/innerkits/safwk:system_ability_fwk",
     "//utils/native/base:utils",
   ]
@@ -175,6 +184,7 @@ ohos_shared_library("wifi_manager_service") {
     "access_token:libaccesstoken_sdk",
     "ces_standard:cesfwk_innerkits",
     "ipc:ipc_core",
+    "netmanager_base:net_conn_manager_if",
   ]
 
   part_name = "wifi_standard"

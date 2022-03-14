@@ -201,7 +201,12 @@ ErrCode WifiHotspotProxy::GetStationList(std::vector<StationInfo> &result)
     if (ErrCode(ret) != WIFI_OPT_SUCCESS) {
         return ErrCode(ret);
     }
+    constexpr int MAX_SIZE = 512;
     int size = reply.ReadInt32();
+    if (size > MAX_SIZE) {
+        WIFI_LOGE("Station list size error: %{public}d", size);
+        return WIFI_OPT_FAILED;
+    }
     for (int i = 0; i < size; i++) {
         StationInfo info;
         info.deviceName = reply.ReadCString();
@@ -321,7 +326,14 @@ ErrCode WifiHotspotProxy::GetBlockLists(std::vector<StationInfo> &infos)
     if (err != WIFI_OPT_SUCCESS) {
         return ErrCode(err);
     }
+
+    constexpr int MAX_SIZE = 512;
     int size = reply.ReadInt32();
+    if (size > MAX_SIZE) {
+        WIFI_LOGE("Get block size error: %{public}d", size);
+        return WIFI_OPT_FAILED;
+    }
+
     for (int i = 0; i < size; i++) {
         StationInfo info;
         info.deviceName = reply.ReadCString();
@@ -420,7 +432,13 @@ ErrCode WifiHotspotProxy::GetValidBands(std::vector<BandType> &bands)
     if (err != WIFI_OPT_SUCCESS) {
         return ErrCode(err);
     }
+
+    constexpr int MAX_BAND_SIZE = 512;
     int count = reply.ReadInt32();
+    if (count > MAX_BAND_SIZE) {
+        WIFI_LOGE("Band size error: %{public}d", count);
+        return WIFI_OPT_FAILED;
+    }
     for (int i = 0; i < count; i++) {
         int val = reply.ReadInt32();
         bands.push_back(BandType(val));
@@ -457,7 +475,13 @@ ErrCode WifiHotspotProxy::GetValidChannels(BandType band, std::vector<int32_t> &
     if (err != WIFI_OPT_SUCCESS) {
         return ErrCode(err);
     }
+
+    constexpr int MAX_CHANNELS_SIZE = 512;
     int count = reply.ReadInt32();
+    if (count > MAX_CHANNELS_SIZE) {
+        WIFI_LOGE("Channel size error: %{public}d", count);
+        return WIFI_OPT_FAILED;
+    }
     for (int i = 0; i < count; i++) {
         int val = reply.ReadInt32();
         validchannels.push_back(val);

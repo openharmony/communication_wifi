@@ -208,8 +208,14 @@ void WifiP2pCallbackStub::RemoteOnP2pThisDeviceChanged(uint32_t code, MessagePar
 void WifiP2pCallbackStub::RemoteOnP2pPeersChanged(uint32_t code, MessageParcel &data, MessageParcel &reply)
 {
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+    constexpr int MAX_DEVICE_SIZE = 512;
     std::vector<WifiP2pDevice> device;
     int size = data.ReadInt32();
+    if (size > MAX_DEVICE_SIZE) {
+        WIFI_LOGE("Peers change list size error: %{public}d", size);
+        reply.WriteInt32(0);
+        return;
+    }
     for (int i = 0; i < size; ++i) {
         WifiP2pDevice config;
         ReadWifiP2pDeviceData(data, config);
@@ -222,8 +228,14 @@ void WifiP2pCallbackStub::RemoteOnP2pPeersChanged(uint32_t code, MessageParcel &
 void WifiP2pCallbackStub::RemoteOnP2pServicesChanged(uint32_t code, MessageParcel &data, MessageParcel &reply)
 {
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+    constexpr int MAX_SIZE = 512;
     std::vector<WifiP2pServiceInfo> srvInfo;
     int size = data.ReadInt32();
+    if (size > MAX_SIZE) {
+        WIFI_LOGE("Service change size error: %{public}d", size);
+        reply.WriteInt32(0);
+        return;
+    }
     for (int i = 0; i < size; ++i) {
         WifiP2pServiceInfo info;
         info.SetServiceName(data.ReadCString());

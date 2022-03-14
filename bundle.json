@@ -38,7 +38,11 @@
         "name": "wifi_standard",
         "subsystem": "communication",
         "syscap": [
-            "SystemCapability.Communication.WiFi"
+            "SystemCapability.Communication.WiFi.STA",
+            "SystemCapability.Communication.WiFi.AP",
+            "SystemCapability.Communication.WiFi.P2P",
+            "SystemCapability.Communication.WiFi.Core",
+            "SystemCapability.Communication.WiFi.HotspotExt"
         ],
         "features": [],
         "adapted_system_type": [
@@ -67,7 +71,7 @@
                 "//foundation/communication/wifi/interfaces/innerkits/native_cpp/wifi_standard:wifi_sdk",
                 "//foundation/communication/wifi/services/wifi_standard/wifi_framework:wifi_manage",
                 "//foundation/communication/wifi/services/wifi_standard/wifi_framework:dhcp_manage",
-                "//foundation/communication/wifi/services/wifi_standard/wifi_hal:wifi_hal_service",
+                "//foundation/communication/wifi/services/wifi_standard/wifi_hal:wifi_hal",
                 "//foundation/communication/wifi/services/wifi_standard/wifi_framework:wifi_system_ability",
                 "//foundation/communication/wifi/services/wifi_standard/sa_profile:wifi_standard_sa_profile",
                 "//foundation/communication/wifi/services/wifi_standard/wifi_framework/wifi_manage:wifi_device_ability",
@@ -80,11 +84,9 @@
                 "//foundation/communication/wifi/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta:wifi_sta_service",
                 "//foundation/communication/wifi/services/wifi_standard/wifi_framework/wifi_manage/wifi_ap:wifi_ap_service",
                 "//foundation/communication/wifi/services/wifi_standard/wifi_framework/wifi_manage/wifi_p2p:wifi_p2p_service",
-                "//foundation/communication/wifi/services/wifi_standard/wifi_framework/wifi_manage/idl_client:wifi_idl_client",
                 "//foundation/communication/wifi/services/wifi_standard/wifi_framework/dhcp_manage/mgr_service:dhcp_manager_service",
                 "//foundation/communication/wifi/services/wifi_standard/wifi_framework/dhcp_manage/dhcp_client:dhcp_client_service",
                 "//foundation/communication/wifi/services/wifi_standard/wifi_framework/dhcp_manage/dhcp_server:dhcp_server",
-                "//foundation/communication/wifi/services/wifi_standard/wifi_hal:wifi_hal_service",
                 "//foundation/communication/wifi/utils/src:wifi_utils",
                 "//foundation/communication/wifi/interfaces/innerkits/native_cpp/napi:wifi_native_js",
                 "//foundation/communication/wifi/interfaces/innerkits/native_cpp/napi:wifi"

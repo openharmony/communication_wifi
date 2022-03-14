@@ -354,19 +354,28 @@ ErrCode WifiDeviceProxy::RemoveAllDevice()
 
 void WifiDeviceProxy::ReadIpAddress(MessageParcel &reply, WifiIpAddress &address)
 {
+    constexpr int MAX_SIZE = 256;
     address.family = reply.ReadInt32();
     address.addressIpv4 = reply.ReadInt32();
     int size = reply.ReadInt32();
+    if (size > MAX_SIZE) {
+        WIFI_LOGE("Read IP address size error: %{public}d", size);
+        return;
+    }
     for (int i = 0; i < size; i++) {
         address.addressIpv6.push_back(reply.ReadInt8());
     }
-
     return;
 }
 
 void WifiDeviceProxy::ParseDeviceConfigs(MessageParcel &reply, std::vector<WifiDeviceConfig> &result)
 {
+    constexpr int MAX_DEVICE_CONFIG_SIZE = 1024;
     int retSize = reply.ReadInt32();
+    if (retSize > MAX_DEVICE_CONFIG_SIZE) {
+        WIFI_LOGE("Parse device config size error: %{public}d", retSize);
+        return;
+    }
     for (int i = 0; i < retSize; ++i) {
         WifiDeviceConfig config;
         config.networkId = reply.ReadInt32();

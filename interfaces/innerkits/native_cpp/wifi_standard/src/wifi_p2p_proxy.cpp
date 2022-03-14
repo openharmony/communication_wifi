@@ -427,7 +427,13 @@ void WifiP2pProxy::ReadWifiP2pServiceInfo(MessageParcel &reply, WifiP2pServiceIn
     info.SetDeviceAddress(reply.ReadCString());
     info.SetServicerProtocolType(static_cast<P2pServicerProtocolType>(reply.ReadInt32()));
     std::vector<std::string> queryList;
+
+    constexpr int MAX_SIZE = 512;
     int size = reply.ReadInt32();
+    if (size > MAX_SIZE) {
+        WIFI_LOGE("P2p service size error: %{public}d", size);
+        return;
+    }
     for (int i = 0; i < size; i++) {
         std::string str = reply.ReadCString();
         queryList.push_back(str);
@@ -531,7 +537,13 @@ void WifiP2pProxy::ReadWifiP2pGroupData(MessageParcel &reply, WifiP2pGroupInfo &
     info.SetP2pGroupStatus(static_cast<P2pGroupStatus>(reply.ReadInt32()));
     info.SetNetworkId(reply.ReadInt32());
     info.SetGoIpAddress(reply.ReadCString());
+
+    constexpr int MAX_SIZE = 512;
     int size = reply.ReadInt32();
+    if (size > MAX_SIZE) {
+        WIFI_LOGE("Group info device size error: %{public}d", size);
+        return;
+    }
     for (auto it = 0; it < size; ++it) {
         WifiP2pDevice cliDev;
         ReadWifiP2pDeviceData(reply, cliDev);
@@ -796,7 +808,12 @@ ErrCode WifiP2pProxy::QueryP2pDevices(std::vector<WifiP2pDevice> &devices)
         return ErrCode(ret);
     }
 
+    constexpr int MAX_SIZE = 512;
     int size = reply.ReadInt32();
+    if (size > MAX_SIZE) {
+        WIFI_LOGE("Get p2p devices size error: %{public}d", size);
+        return WIFI_OPT_FAILED;
+    }
     for (int i = 0; i < size; ++i) {
         WifiP2pDevice config;
         ReadWifiP2pDeviceData(reply, config);
@@ -834,7 +851,12 @@ ErrCode WifiP2pProxy::QueryP2pGroups(std::vector<WifiP2pGroupInfo> &groups)
         return ErrCode(ret);
     }
 
+    constexpr int MAX_SIZE = 512;
     int size = reply.ReadInt32();
+    if (size > MAX_SIZE) {
+        WIFI_LOGE("Get p2p group size error: %{public}d", size);
+        return WIFI_OPT_FAILED;
+    }
     for (int i = 0; i < size; ++i) {
         WifiP2pGroupInfo group;
         ReadWifiP2pGroupData(reply, group);
@@ -871,7 +893,13 @@ ErrCode WifiP2pProxy::QueryP2pServices(std::vector<WifiP2pServiceInfo> &services
     if (ErrCode(ret) != WIFI_OPT_SUCCESS) {
         return ErrCode(ret);
     }
+
+    constexpr int MAX_SIZE = 512;
     int size = reply.ReadInt32();
+    if (size > MAX_SIZE) {
+        WIFI_LOGE("Get p2p service size error: %{public}d", size);
+        return WIFI_OPT_FAILED;
+    }
     for (int i = 0; i < size; ++i) {
         WifiP2pServiceInfo info;
         ReadWifiP2pServiceInfo(reply, info);
@@ -1323,7 +1351,13 @@ ErrCode WifiP2pProxy::Hid2dGetChannelListFor5G(std::vector<int>& vecChannelList)
     if (ErrCode(ret) != WIFI_OPT_SUCCESS) {
         return ErrCode(ret);
     }
+
+    constexpr int MAX_SIZE = 512;
     int listSize = reply.ReadInt32();
+    if (listSize > MAX_SIZE) {
+        WIFI_LOGE("Get channel list for 5G size error: %{public}d", listSize);
+        return WIFI_OPT_FAILED;
+    }
     for (int i = 0; i < listSize; ++i) {
         vecChannelList.emplace_back(reply.ReadInt32());
     }

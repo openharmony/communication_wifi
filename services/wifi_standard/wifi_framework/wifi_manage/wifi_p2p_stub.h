@@ -83,12 +83,12 @@ private:
     void OnHid2dGetChannelListFor5G(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
     void OnHid2dGetSelfWifiCfgInfo(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
     void OnHid2dSetPeerWifiCfgInfo(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
-    void ReadWifiP2pServiceInfo(MessageParcel &data, WifiP2pServiceInfo &info);
-    void ReadWifiP2pServiceRequest(MessageParcel &data, WifiP2pDevice &device, WifiP2pServiceRequest &request);
+    bool ReadWifiP2pServiceInfo(MessageParcel &data, WifiP2pServiceInfo &info);
+    bool ReadWifiP2pServiceRequest(MessageParcel &data, WifiP2pDevice &device, WifiP2pServiceRequest &request);
     void WriteWifiP2pServiceInfo(MessageParcel &reply, const WifiP2pServiceInfo &info);
     void ReadWifiP2pDeviceData(MessageParcel &data, WifiP2pDevice &device);
     void WriteWifiP2pDeviceData(MessageParcel &reply, const WifiP2pDevice &device);
-    void ReadWifiP2pGroupData(MessageParcel &data, WifiP2pGroupInfo &info);
+    bool ReadWifiP2pGroupData(MessageParcel &data, WifiP2pGroupInfo &info);
     void WriteWifiP2pGroupData(MessageParcel &reply, const WifiP2pGroupInfo &info);
     void ReadWifiP2pConfigData(MessageParcel &data, WifiP2pConfig &config);
 

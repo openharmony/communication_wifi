@@ -411,6 +411,7 @@ void StaStateMachine::StartWifiProcess()
         /* Notify the InterfaceService that wifi is failed to enable wifi. */
         LOGE("StartWifi failed, and errcode is %d.", res);
         WifiSettings::GetInstance().SetWifiState(static_cast<int>(WifiState::DISABLED));
+        WifiSettings::GetInstance().SetUserLastSelectedNetworkId(INVALID_NETWORK_ID);
         staCallback.OnStaOpenRes(OperateResState::OPEN_WIFI_FAILED);
         staCallback.OnStaOpenRes(OperateResState::OPEN_WIFI_DISABLED);
     }
@@ -541,6 +542,7 @@ void StaStateMachine::StopWifiProcess()
         WifiSettings::GetInstance().SetWifiState(static_cast<int>(WifiState::UNKNOWN));
         staCallback.OnStaCloseRes(OperateResState::CLOSE_WIFI_FAILED);
     }
+    WifiSettings::GetInstance().SetUserLastSelectedNetworkId(INVALID_NETWORK_ID);
 }
 
 /* --------------------------- state machine WpaStopping State ------------------------------ */
@@ -809,6 +811,7 @@ void StaStateMachine::DealConnectionEvent(InternalMessage *msg)
 
     /* The current state of StaStateMachine transfers to GetIpState. */
     SwitchState(pGetIpState);
+    WifiSettings::GetInstance().SetUserLastSelectedNetworkId(INVALID_NETWORK_ID);
 }
 
 void StaStateMachine::DealDisconnectEvent(InternalMessage *msg)

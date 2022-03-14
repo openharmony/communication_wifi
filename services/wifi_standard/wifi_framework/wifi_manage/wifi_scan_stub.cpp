@@ -90,8 +90,14 @@ sptr<IWifiScanCallback> WifiScanStub::GetCallback() const
 int WifiScanStub::OnSetScanControlInfo(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
     WIFI_LOGD("run OnSetScanControlInfo code %{public}u, datasize %{public}zu", code, data.GetRawDataSize());
+    constexpr int MAX_SIZE = 1024;
     ScanControlInfo info;
     int forbidListSize = data.ReadInt32();
+    if (forbidListSize > MAX_SIZE) {
+        reply.WriteInt32(0);
+        reply.WriteInt32(WIFI_OPT_INVALID_PARAM);
+        return WIFI_OPT_INVALID_PARAM;
+    }
     for (int i = 0; i < forbidListSize; i++) {
         ScanForbidMode scanForbidMode;
         scanForbidMode.scanScene = data.ReadInt32();
@@ -102,6 +108,11 @@ int WifiScanStub::OnSetScanControlInfo(uint32_t code, MessageParcel &data, Messa
     }
 
     int intervalSize = data.ReadInt32();
+    if (intervalSize > MAX_SIZE) {
+        reply.WriteInt32(0);
+        reply.WriteInt32(WIFI_OPT_INVALID_PARAM);
+        return WIFI_OPT_INVALID_PARAM;
+    }
     for (int i = 0; i < intervalSize; i++) {
         ScanIntervalMode scanIntervalMode;
         scanIntervalMode.scanScene = data.ReadInt32();
@@ -133,10 +144,16 @@ int WifiScanStub::OnScan(uint32_t code, MessageParcel &data, MessageParcel &repl
 int WifiScanStub::OnScanByParams(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
     WIFI_LOGD("run OnScanByParams code %{public}u, datasize %{public}zu", code, data.GetRawDataSize());
+    constexpr int MAX_FREQS_SIZE = 512;
     WifiScanParams params;
     params.ssid = data.ReadCString();
     params.bssid = data.ReadCString();
     int size = data.ReadInt32();
+    if (size > MAX_FREQS_SIZE) {
+        reply.WriteInt32(0);
+        reply.WriteInt32(WIFI_OPT_INVALID_PARAM);
+        return WIFI_OPT_INVALID_PARAM;
+    }
     for (int i = 0; i < size; i++) {
         int tmp = data.ReadInt32();
         params.freqs.push_back(tmp);

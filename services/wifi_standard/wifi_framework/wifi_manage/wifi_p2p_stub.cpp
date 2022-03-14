@@ -159,7 +159,11 @@ void WifiP2pStub::OnRequestService(uint32_t code, MessageParcel &data, MessagePa
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
     WifiP2pDevice device;
     WifiP2pServiceRequest request;
-    ReadWifiP2pServiceRequest(data, device, request);
+    if (!ReadWifiP2pServiceRequest(data, device, request)) {
+        reply.WriteInt32(0);
+        reply.WriteInt32(WIFI_OPT_INVALID_PARAM);
+        return;
+    }
     ErrCode ret = RequestService(device, request);
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
@@ -170,7 +174,11 @@ void WifiP2pStub::OnPutLocalP2pService(uint32_t code, MessageParcel &data, Messa
 {
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
     WifiP2pServiceInfo config;
-    ReadWifiP2pServiceInfo(data, config);
+    if (!ReadWifiP2pServiceInfo(data, config)) {
+        reply.WriteInt32(0);
+        reply.WriteInt32(WIFI_OPT_INVALID_PARAM);
+        return;
+    }
     ErrCode ret = PutLocalP2pService(config);
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
@@ -182,7 +190,11 @@ void WifiP2pStub::OnDeleteLocalP2pService(
 {
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
     WifiP2pServiceInfo config;
-    ReadWifiP2pServiceInfo(data, config);
+    if (!ReadWifiP2pServiceInfo(data, config)) {
+        reply.WriteInt32(0);
+        reply.WriteInt32(WIFI_OPT_INVALID_PARAM);
+        return;
+    }
     ErrCode ret = DeleteLocalP2pService(config);
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
@@ -233,7 +245,11 @@ void WifiP2pStub::OnDeleteGroup(uint32_t code, MessageParcel &data, MessageParce
 {
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
     WifiP2pGroupInfo config;
-    ReadWifiP2pGroupData(data, config);
+    if (!ReadWifiP2pGroupData(data, config)) {
+        reply.WriteInt32(0);
+        reply.WriteInt32(WIFI_OPT_INVALID_PARAM);
+        return;
+    }
     ErrCode ret = DeleteGroup(config);
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
@@ -388,34 +404,42 @@ void WifiP2pStub::OnQueryP2pServices(uint32_t code, MessageParcel &data, Message
     return;
 }
 
-void WifiP2pStub::ReadWifiP2pServiceInfo(MessageParcel &data, WifiP2pServiceInfo &info)
+bool WifiP2pStub::ReadWifiP2pServiceInfo(MessageParcel &data, WifiP2pServiceInfo &info)
 {
+    constexpr int MAX_QUERY_SIZE = 256;
     info.SetServiceName(data.ReadCString());
     info.SetDeviceAddress(data.ReadCString());
     info.SetServicerProtocolType(static_cast<P2pServicerProtocolType>(data.ReadInt32()));
     std::vector<std::string> queryList;
     int size = data.ReadInt32();
+    if (size > MAX_QUERY_SIZE) {
+        return false;
+    }
     for (int i = 0; i < size; i++) {
         std::string str = data.ReadCString();
         queryList.push_back(str);
     }
     info.SetQueryList(queryList);
-    return;
+    return true;
 }
 
-void WifiP2pStub::ReadWifiP2pServiceRequest(MessageParcel &data, WifiP2pDevice &device, WifiP2pServiceRequest &request)
+bool WifiP2pStub::ReadWifiP2pServiceRequest(MessageParcel &data, WifiP2pDevice &device, WifiP2pServiceRequest &request)
 {
+    constexpr int MAX_QUERY_SIZE = 256;
     ReadWifiP2pDeviceData(data, device);
     request.SetProtocolType(static_cast<P2pServicerProtocolType>(data.ReadInt32()));
     request.SetTransactionId(data.ReadInt32());
     int size = data.ReadInt32();
+    if (size > MAX_QUERY_SIZE) {
+        return false;
+    }
     std::vector<unsigned char> query;
     for (int i = 0; i < size; i++) {
         unsigned char chr = data.ReadInt8();
         query.push_back(chr);
     }
     request.SetQuery(query);
-    return;
+    return true;
 }
 
 void WifiP2pStub::WriteWifiP2pServiceInfo(MessageParcel &reply, const WifiP2pServiceInfo &info)
@@ -465,8 +489,9 @@ void WifiP2pStub::WriteWifiP2pDeviceData(MessageParcel &reply, const WifiP2pDevi
     reply.WriteInt32(device.GetGroupCapabilitys());
 }
 
-void WifiP2pStub::ReadWifiP2pGroupData(MessageParcel &data, WifiP2pGroupInfo &info)
+bool WifiP2pStub::ReadWifiP2pGroupData(MessageParcel &data, WifiP2pGroupInfo &info)
 {
+    constexpr int MAX_DEV_SIZE = 256;
     info.SetIsGroupOwner(data.ReadBool());
     WifiP2pDevice device;
     ReadWifiP2pDeviceData(data, device);
@@ -480,11 +505,15 @@ void WifiP2pStub::ReadWifiP2pGroupData(MessageParcel &data, WifiP2pGroupInfo &in
     info.SetNetworkId(data.ReadInt32());
     info.SetGoIpAddress(data.ReadCString());
     int size = data.ReadInt32();
+    if (size > MAX_DEV_SIZE) {
+        return false;
+    }
     for (auto it = 0; it < size; ++it) {
         WifiP2pDevice cliDev;
         ReadWifiP2pDeviceData(data, cliDev);
         info.AddClientDevice(cliDev);
     }
+    return true;
 }
 
 void WifiP2pStub::WriteWifiP2pGroupData(MessageParcel &reply, const WifiP2pGroupInfo &info)

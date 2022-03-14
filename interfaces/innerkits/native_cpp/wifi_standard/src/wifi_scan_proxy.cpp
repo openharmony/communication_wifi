@@ -213,7 +213,13 @@ ErrCode WifiScanProxy::GetScanInfoList(std::vector<WifiScanInfo> &result)
     if (ErrCode(ret) != WIFI_OPT_SUCCESS) {
         return ErrCode(ret);
     }
+
+    constexpr int MAX_SIZE = 4096;
     int tmpsize = reply.ReadInt32();
+    if (tmpsize > MAX_SIZE) {
+        WIFI_LOGE("Scan info size exceeds maximum allowed size: %{public}d", tmpsize);
+        return WIFI_OPT_FAILED;
+    }
     for (int i = 0; i < tmpsize; ++i) {
         WifiScanInfo info;
         info.bssid = reply.ReadCString();
@@ -228,7 +234,13 @@ ErrCode WifiScanProxy::GetScanInfoList(std::vector<WifiScanInfo> &result)
         info.centerFrequency0 = reply.ReadInt32();
         info.centerFrequency1 = reply.ReadInt32();
         info.features = reply.ReadInt64();
+
+        constexpr int IE_SIZE_MAX = 256;
         int ieSize = reply.ReadInt32();
+        if (ieSize > IE_SIZE_MAX) {
+            WIFI_LOGE("ie size error: %{public}d", ieSize);
+            return WIFI_OPT_FAILED;
+        }
         for (int m = 0; m < ieSize; ++m) {
             WifiInfoElem tempWifiInfoElem;
             tempWifiInfoElem.id = reply.ReadInt32();

@@ -196,7 +196,8 @@ void StaAutoConnectService::ConnectElectedDevice(WifiDeviceConfig &electedDevice
             pStaStateMachine->StartRoamToNetwork(electedDevice.bssid);
             WIFI_LOGI("connecTo network bssid is %s", electedDevice.bssid.c_str());
         }
-    } else if (currentConnectedNetwork.detailedState == DetailedState::DISCONNECTED) {
+    } else if (currentConnectedNetwork.detailedState == DetailedState::DISCONNECTED ||
+        currentConnectedNetwork.detailedState == DetailedState::CONNECTION_TIMEOUT) {
         WIFI_LOGI("connecTo save network.\n");
         pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_CONNECT_SAVED_NETWORK,
             electedDevice.networkId,

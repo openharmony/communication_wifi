@@ -220,13 +220,17 @@ void WifiDeviceStub::ReadWifiDeviceConfig(MessageParcel &data, WifiDeviceConfig 
 
 void WifiDeviceStub::ReadIpAddress(MessageParcel &data, WifiIpAddress &address)
 {
+    constexpr int MAX_LIMIT_SIZE = 1024;
     address.family = data.ReadInt32();
     address.addressIpv4 = data.ReadInt32();
     int size = data.ReadInt32();
+    if (size > MAX_LIMIT_SIZE) {
+        WIFI_LOGE("Read ip address parameter error: %{public}d", size);
+        return;
+    }
     for (int i = 0; i < size; i++) {
         address.addressIpv6.push_back(data.ReadInt8());
     }
-
     return;
 }
 

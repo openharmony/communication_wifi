@@ -16,6 +16,8 @@
 #include "wifi_hal_ap_interface.h"
 #include <errno.h>
 #include <securec.h>
+#include "wifi_hal.h"
+#include "wifi_hal_ap_feature.h"
 #include "wifi_hal_module_manage.h"
 #include "wifi_hal_common_func.h"
 #include "wifi_log.h"
@@ -25,7 +27,9 @@
 #undef LOG_TAG
 #define LOG_TAG "WifiHalApInterface"
 
+#define NUMS_BAND 2
 #define BUFF_SIZE 1024
+#define DISABLE_AP_WAIT_MS 50000
 static const char *g_serviceName = "hostapd";
 static const char *g_startCmd = "hostapd /data/misc/wifi/wpa_supplicant/hostapd.conf";
 
@@ -82,6 +86,17 @@ WifiErrorNo StartHostapdHal(void)
 
 WifiErrorNo StopSoftAp(void)
 {
+    WifiHostapdHalDevice *hostapdHalDevice = GetWifiHostapdDev();
+    if (hostapdHalDevice != NULL) {
+        int ret = hostapdHalDevice->disableAp();
+        usleep(DISABLE_AP_WAIT_MS);
+        if (ret != 0) {
+            LOGE("disableAp failed! ret=%{public}d", ret);
+        }
+    } else {
+        LOGE("can not get hostapd dev");
+    }
+
     if (StopHostapd() != WIFI_HAL_SUCCESS) {
         LOGE("hostapd stop failed!");
         return WIFI_HAL_FAILED;
@@ -261,12 +276,55 @@ WifiErrorNo DisassociateSta(const unsigned char *mac, int lenMac)
     return WIFI_HAL_SUCCESS;
 }
 
+static int32_t ConvertToNl80211Band(int32_t band)
+{
+    return (band > 0 && band <= NUMS_BAND) ? (band - 1) : band;
+}
+
 WifiErrorNo GetValidFrequenciesForBand(int32_t band, int *frequencies, int32_t *size)
 {
+    int32_t ret;
+    uint32_t count = 0;
+    struct IWiFi *wifi = NULL;
+    struct IWiFiAp *apFeature = NULL;
+
     if (frequencies == NULL || size == NULL) {
         LOGE("GetValidFrequenciesForBand  frequencies or size is NULL");
         return WIFI_HAL_FAILED;
     }
     LOGD("GetValidFrequenciesForBand");
-    return WIFI_HAL_NOT_SUPPORT;
+
+    ret = WifiConstruct(&wifi);
+    if (ret != 0 || wifi == NULL) {
+        LOGE("%{public}s WifiConstruct failed", __func__);
+        return WIFI_HAL_FAILED;
+    }
+
+    ret = wifi->start(wifi);
+    if (ret != 0) {
+        (void)WifiDestruct(&wifi);
+        LOGE("%{public}s start failed", __func__);
+        return WIFI_HAL_FAILED;
+    }
+
+    ret = wifi->createFeature(PROTOCOL_80211_IFTYPE_AP, (struct IWiFiBaseFeature **)&apFeature);
+    if (ret != 0 || apFeature == NULL) {
+        (void)wifi->stop(wifi);
+        (void)WifiDestruct(&wifi);
+        LOGE("%{public}s createFeature failed", __func__);
+        return WIFI_HAL_FAILED;
+    }
+
+    ret = apFeature->baseFeature.getValidFreqsWithBand((struct IWiFiBaseFeature *)apFeature,
+        ConvertToNl80211Band(band), frequencies, *size, &count);
+    *size = count;
+
+    (void)wifi->destroyFeature((struct IWiFiBaseFeature *)apFeature);
+    (void)wifi->stop(wifi);
+    (void)WifiDestruct(&wifi);
+    if (ret != 0) {
+        LOGE("%{public}s failed", __func__);
+    }
+
+    return (ret == 0) ? WIFI_HAL_SUCCESS : WIFI_HAL_FAILED;
 }

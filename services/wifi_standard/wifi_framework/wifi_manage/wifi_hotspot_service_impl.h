@@ -180,6 +180,7 @@ private:
     static std::mutex g_instanceLock;
     bool mPublishFlag;
     ServiceRunningState mState;
+    bool mGetChannels = false;
 };
 }  // namespace Wifi
 }  // namespace OHOS

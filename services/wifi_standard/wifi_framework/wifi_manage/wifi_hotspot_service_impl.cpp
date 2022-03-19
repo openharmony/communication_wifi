@@ -150,6 +150,13 @@ ErrCode WifiHotspotServiceImpl::SetHotspotConfig(const HotspotConfig &config)
         return WIFI_OPT_PERMISSION_DENIED;
     }
 
+    if (!mGetChannels) {
+        if  (!WifiConfigCenter::GetInstance().GetSupportedBandChannel()) {
+            WIFI_LOGE("Failed to get supported band and channel!");
+        } else {
+            mGetChannels = true;
+        }
+    }
     std::vector<BandType> bandsFromCenter;
     WifiConfigCenter::GetInstance().GetValidBands(bandsFromCenter);
     ChannelsTable channInfoFromCenter;

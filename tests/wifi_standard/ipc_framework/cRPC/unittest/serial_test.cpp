@@ -38,7 +38,7 @@ HWTEST_F(SerialTest, SerialTest, TestSize.Level1)
     ctx->oneProcess = ctx->szWrite;
     ctx->nSize = ctx->wEnd;
 
-    EXPECT_TRUE(strncmp(ctx->oneProcess, "N|", 2) == 0);
+    EXPECT_TRUE(strncmp(ctx->oneProcess, "N\t", 2) == 0);
     ctx->nPos = 2;
     char str[1024] = {0};
     ASSERT_EQ(ReadFunc(ctx, str, 1024), 0);

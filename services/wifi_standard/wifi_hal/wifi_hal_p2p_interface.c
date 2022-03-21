@@ -28,7 +28,7 @@
 
 const int P2P_CONNECT_DELAY_TIME = 100000;
 const char *g_wpaSupplicantP2p = "wpa_supplicant";
-const char *g_systemCmdWpaP2pStart = "wpa_supplicant -iglan0 -g/data/misc/wifi/sockets";
+const char *g_systemCmdWpaP2pStart = "wpa_supplicant -iglan0 -g/data/misc/wifi/sockets/wpa";
 static int g_p2pSupplicantConnectEvent = 0;
 
 static WifiErrorNo P2pStartSupplicant(void)

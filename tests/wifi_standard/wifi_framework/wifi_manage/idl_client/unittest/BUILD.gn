@@ -137,6 +137,6 @@ group("unittest") {
   testonly = true
   deps = [
     ":idl_client_unittest",
-    ":mock_wifi_hal_service",
+    #":mock_wifi_hal_service",
   ]
 }

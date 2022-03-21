@@ -28,7 +28,7 @@
 #define WPA_TRY_CONNECT_SLEEP_TIME (100 * 1000) /* 100ms */
 
 static const char *g_serviceName = "wpa_supplicant";
-static const char *g_startCmd = "wpa_supplicant -iglan0 -g/data/misc/wifi/sockets";
+static const char *g_startCmd = "wpa_supplicant -iglan0 -g/data/misc/wifi/sockets/wpa";
 
 static WifiErrorNo AddWpaIface(int staNo)
 {

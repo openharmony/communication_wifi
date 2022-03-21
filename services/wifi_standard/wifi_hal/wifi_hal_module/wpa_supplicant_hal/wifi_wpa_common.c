@@ -110,8 +110,8 @@ int InitWpaCtrl(WpaCtrl *pCtrl, const char *ifname)
     }
     int flag = 0;
     do {
-        pCtrl->pSend = wpa_ctrl_open(ifname);
-        pCtrl->pRecv = wpa_ctrl_open(ifname);
+        pCtrl->pSend = wpa_ctrl_open("global");
+        pCtrl->pRecv = wpa_ctrl_open("global");
         if (pCtrl->pSend == NULL || pCtrl->pRecv == NULL) {
             LOGE("open wpa control interface failed!");
             break;

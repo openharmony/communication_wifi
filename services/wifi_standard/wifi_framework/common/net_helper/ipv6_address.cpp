@@ -74,7 +74,7 @@ Ipv6Address Ipv6Address::Create(std::string ipv6)
 
 Ipv6Address Ipv6Address::Create(const std::string &ipv6Prefix, MacAddress &mac, const size_t prefixLength)
 {
-    if (prefixLength < 0 || prefixLength > HALF_PREFIX_LENGTH || !IsValidIPv6(ipv6Prefix)) {
+    if (prefixLength > HALF_PREFIX_LENGTH || !IsValidIPv6(ipv6Prefix)) {
         return INVALID_INET6_ADDRESS;
     }
     std::string eui64Addr = std::string("::") + MacToEui64addr(mac);
@@ -94,7 +94,7 @@ Ipv6Address Ipv6Address::Create(const std::string &ipv6Prefix, MacAddress &mac, 
 
 Ipv6Address Ipv6Address::Create(const std::string &ipv6Prefix, const size_t prefixLength, unsigned int rndSeed)
 {
-    if (prefixLength < 0 || prefixLength > MAX_IPV6_PREFIX_LENGTH || !IsValidIPv6(ipv6Prefix)) {
+    if (prefixLength > MAX_IPV6_PREFIX_LENGTH || !IsValidIPv6(ipv6Prefix)) {
         return INVALID_INET6_ADDRESS;
     }
     LOGD("Create use rand seed, %{public}u", rndSeed);
@@ -104,7 +104,7 @@ Ipv6Address Ipv6Address::Create(const std::string &ipv6Prefix, const size_t pref
 
 Ipv6Address Ipv6Address::Create(const struct in6_addr &i6Addr, const size_t prefixLength)
 {
-    if ((prefixLength < 0) || (prefixLength > MAX_IPV6_PREFIX_LENGTH)) {
+    if (prefixLength > MAX_IPV6_PREFIX_LENGTH) {
         return INVALID_INET6_ADDRESS;
     }
     char ipv6Buf[INET6_ADDRSTRLEN] = {0};
@@ -116,7 +116,7 @@ Ipv6Address Ipv6Address::Create(const struct in6_addr &i6Addr, const size_t pref
 
 Ipv6Address Ipv6Address::Create(std::string ipv6, const size_t prefixLength)
 {
-    if ((prefixLength < 0) || (prefixLength > MAX_IPV6_PREFIX_LENGTH) || (!IsValidIPv6(ipv6))) {
+    if ((prefixLength > MAX_IPV6_PREFIX_LENGTH) || (!IsValidIPv6(ipv6))) {
         return INVALID_INET6_ADDRESS;
     }
     std::transform(ipv6.begin(), ipv6.end(), ipv6.begin(), ::tolower);
@@ -185,7 +185,7 @@ std::string Ipv6Address::GetPrefix() const
 struct in6_addr Ipv6Address::GetIpv6Prefix(struct in6_addr &ip6Addr, size_t prefixLength)
 {
     struct in6_addr addr = IN6ADDR_ANY_INIT;
-    if (prefixLength < 0 || prefixLength > MAX_IPV6_PREFIX_LENGTH) {
+    if (prefixLength > MAX_IPV6_PREFIX_LENGTH) {
         return addr;
     }
     char buf[INET6_ADDRSTRLEN] = {0};
@@ -208,7 +208,7 @@ struct in6_addr Ipv6Address::GetIpv6Prefix(struct in6_addr &ip6Addr, size_t pref
 struct in6_addr Ipv6Address::GetIpv6Mask(size_t prefixLength)
 {
     struct in6_addr addr = IN6ADDR_ANY_INIT;
-    if (prefixLength < 0 || prefixLength > MAX_IPV6_PREFIX_LENGTH) {
+    if (prefixLength > MAX_IPV6_PREFIX_LENGTH) {
         return addr;
     } else if (prefixLength == MAX_IPV6_PREFIX_LENGTH) {
         for (unsigned int count = 0; count < prefixLength / CHAR_BIT; ++count) {

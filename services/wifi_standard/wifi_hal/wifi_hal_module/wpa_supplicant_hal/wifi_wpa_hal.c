@@ -688,7 +688,7 @@ static int WpaCliConnect(WifiWpaInterface *p)
     }
     int count = WPA_TRY_CONNECT_TIMES;
     while (count-- > 0) {
-        int ret = InitWpaCtrl(&p->wpaCtrl, "127.0.0.1:9878");
+        int ret = InitWpaCtrl(&p->wpaCtrl, "/data/misc/wifi/sockets/wpa");
         if (ret == 0) {
             LOGD("Global wpa interface connect successfully!");
             break;

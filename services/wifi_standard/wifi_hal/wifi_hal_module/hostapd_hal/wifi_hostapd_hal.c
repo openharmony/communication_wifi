@@ -31,7 +31,7 @@
 
 #define CONFIG_PATH_DIR "/data/misc/wifi/wpa_supplicant"
 
-#define CONFIG_CTRL_IFACE_NAME "127.0.0.1:9877"
+#define CONFIG_CTRL_IFACE_NAME "wlan0"
 /**
  * Blocklist configuration file name. This parameter is used by hostapd in an earlier version.
  */

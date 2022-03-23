@@ -341,6 +341,10 @@ int HttpRequest::GetIPFromUrl()
         {
             std::unique_lock<std::mutex> lck(gMutex);
             pData = new HostData;
+            if (pData == nullptr) {
+                LOGE("GetIPFromUrl new HostData error.\n");
+                return -1;
+            }
             gHostDataSet.emplace(pData);
             pData->strIpOrDomain = strIpOrDomain;
         }
@@ -361,6 +365,10 @@ int HttpRequest::GetIPFromUrl()
         if (!bTimeOut) {
             std::unique_lock<std::mutex> lck(gMutex);
             if (gHostDataSet.find(pData) == gHostDataSet.end()) {
+                if (pData != nullptr) {
+                    delete pData;
+                    pData = nullptr;
+                }
                 LOGD("GetHostThread None.");
                 return -1;
             }

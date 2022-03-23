@@ -621,6 +621,7 @@ static void ParseOtherNetworkInfo(const struct DhcpPacket *packet, struct DhcpRe
             LOGI("ParseOtherNetworkInfo() recv DHCP_ACK 6, dns1: %{private}u->%{private}s.", u32Data, pDnsIp);
             if (strncpy_s(result->strOptDns1, INET_ADDRSTRLEN, pDnsIp, INET_ADDRSTRLEN - 1) != EOK) {
                 free(pDnsIp);
+                pDnsIp = NULL;
                 return;
             }
             free(pDnsIp);
@@ -629,12 +630,14 @@ static void ParseOtherNetworkInfo(const struct DhcpPacket *packet, struct DhcpRe
         if ((u32Data2 > 0) && ((pDnsIp = Ip4IntConToStr(u32Data2, true)) != NULL)) {
             LOGI("ParseOtherNetworkInfo() recv DHCP_ACK 6, dns2: %{private}u->%{private}s.", u32Data2, pDnsIp);
             if (strncpy_s(result->strOptDns2, INET_ADDRSTRLEN, pDnsIp, INET_ADDRSTRLEN - 1) != EOK) {
-                free(pDnsIp);
-                return;
+                LOGE("ParseOtherNetworkInfo() strncpy_s Failed.");
             }
             free(pDnsIp);
+            pDnsIp = NULL;
+            return;
         }
     }
+    return;
 }
 
 static void ParseNetworkInfo(const struct DhcpPacket *packet, struct DhcpResult *result)
@@ -648,10 +651,13 @@ static void ParseNetworkInfo(const struct DhcpPacket *packet, struct DhcpResult 
     if (pReqIp != NULL) {
         LOGI("ParseNetworkInfo() recv DHCP_ACK yiaddr: %{private}u->%{private}s.", ntohl(g_requestedIp4), pReqIp);
         if (strncpy_s(result->strYiaddr, INET_ADDRSTRLEN, pReqIp, INET_ADDRSTRLEN - 1) != EOK) {
+            LOGI("ParseNetworkInfo() strncpy_s failed!");
             free(pReqIp);
+            pReqIp = NULL;
             return;
         }
         free(pReqIp);
+        pReqIp = NULL;
     }
 
     uint32_t u32Data = 0;
@@ -661,9 +667,11 @@ static void ParseNetworkInfo(const struct DhcpPacket *packet, struct DhcpResult 
             LOGI("ParseNetworkInfo() recv DHCP_ACK 1, subnetmask: %{private}u->%{private}s.", u32Data, pSubIp);
             if (strncpy_s(result->strOptSubnet, INET_ADDRSTRLEN, pSubIp, INET_ADDRSTRLEN - 1) != EOK) {
                 free(pSubIp);
+                pSubIp = NULL;
                 return;
             }
             free(pSubIp);
+            pSubIp = NULL;
         }
     }
 
@@ -675,6 +683,7 @@ static void ParseNetworkInfo(const struct DhcpPacket *packet, struct DhcpResult 
             LOGI("ParseNetworkInfo() recv DHCP_ACK 3, router1: %{private}u->%{private}s.", u32Data, pRouterIp);
             if (strncpy_s(result->strOptRouter1, INET_ADDRSTRLEN, pRouterIp, INET_ADDRSTRLEN - 1) != EOK) {
                 free(pRouterIp);
+                pRouterIp = NULL;
                 return;
             }
             free(pRouterIp);
@@ -684,9 +693,11 @@ static void ParseNetworkInfo(const struct DhcpPacket *packet, struct DhcpResult 
             LOGI("ParseNetworkInfo() recv DHCP_ACK 3, router2: %{private}u->%{private}s.", u32Data2, pRouterIp);
             if (strncpy_s(result->strOptRouter2, INET_ADDRSTRLEN, pRouterIp, INET_ADDRSTRLEN - 1) != EOK) {
                 free(pRouterIp);
+                pRouterIp = NULL;
                 return;
             }
             free(pRouterIp);
+            pRouterIp = NULL;
         }
     }
 

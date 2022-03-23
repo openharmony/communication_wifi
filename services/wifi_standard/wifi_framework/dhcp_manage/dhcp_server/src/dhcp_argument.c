@@ -241,9 +241,6 @@ int PutArgument(const char *argument, const char *val)
         LOGE("failed to set argument name.");
         return RET_ERROR;
     }
-    if (vlen < 0) {
-        return RET_ERROR;
-    }
     if (vlen >= ARGUMENT_VALUE_SIZE) {
         LOGE("value string too long.");
         return RET_ERROR;

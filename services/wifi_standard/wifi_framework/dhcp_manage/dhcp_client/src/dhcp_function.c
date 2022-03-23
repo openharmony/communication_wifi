@@ -89,6 +89,7 @@ char *Ip4IntConToStr(uint32_t uIp, bool bHost)
     if (strncpy_s(strIp, INET_ADDRSTRLEN, bufIp4, strlen(bufIp4)) != EOK) {
         LOGE("Ip4IntConToStr uIp:%{private}u failed, strIp strncpy_s failed!", uIp);
         free(strIp);
+        strIp = NULL;
         return NULL;
     }
 

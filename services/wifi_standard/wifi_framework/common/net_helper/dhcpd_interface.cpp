@@ -109,7 +109,7 @@ bool DhcpdInterface::SetDhcpIpRange(const std::string &ifaceName)
     std::string ipAddr = mBindIpv4.GetAddressWithString();
     std::string::size_type pos = ipAddr.rfind(".");
     if (pos == std::string::npos) {
-        WIFI_LOGE("invalid ip address[%{public}s]!", ipAddr.c_str());
+        WIFI_LOGE("invalid ip address[%{private}s]!", ipAddr.c_str());
         return false;
     }
     std::string ipHead = ipAddr.substr(0, pos);
@@ -268,7 +268,7 @@ bool DhcpdInterface::CompareSubNet(
     for (auto address : vecIpAddr) {
         struct in_addr tmpAddr = {INADDR_ANY};
         if (inet_aton(address.GetAddressWithString().c_str(), &tmpAddr) == 0) {
-            WIFI_LOGE("convert ipaddress [%s] failed!", address.GetAddressWithString().c_str());
+            WIFI_LOGE("convert ipaddress %{private}s failed!", address.GetAddressWithString().c_str());
             return true;
         }
         if (CALC_SUBNET(tmpAddr.s_addr, mask.s_addr) == input.s_addr) {

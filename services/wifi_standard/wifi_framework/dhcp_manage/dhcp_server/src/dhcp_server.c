@@ -503,7 +503,7 @@ static int BeginLooper(PDhcpServerContext ctx)
         return RET_FAILED;
     }
     ctx->instance->serverFd = InitServer(ctx->ifname);
-    if (!ctx->instance->serverFd) {
+    if (ctx->instance->serverFd < 0) {
         LOGE("failed to initialize server socket.");
         return RET_FAILED;
     }

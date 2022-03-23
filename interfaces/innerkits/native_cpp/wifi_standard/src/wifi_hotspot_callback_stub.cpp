@@ -106,6 +106,7 @@ void WifiHotspotCallbackStub::RegisterCallBack(const sptr<IWifiHotspotCallback> 
 {
     if (callBack == nullptr) {
         WIFI_LOGD("RegisterCallBack:callBack is nullptr!");
+        return;
     }
     userCallback_ = callBack;
 }

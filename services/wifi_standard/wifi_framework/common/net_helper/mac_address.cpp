@@ -140,7 +140,7 @@ bool MacAddress::GetMacAddr(const std::string& ifName, unsigned char macAddr[MAC
     struct ifreq ifr;
     if (memset_s(&ifr, sizeof(ifr), 0, sizeof(ifr)) != EOK ||
         strcpy_s(ifr.ifr_name, sizeof(ifr.ifr_name), ifName.c_str()) != EOK) {
-        LOGE("Init the ifreq stuct failed!");
+        LOGE("Init the ifreq struct failed!");
         return false;
     }
     int fd = socket(AF_INET, SOCK_DGRAM, 0);

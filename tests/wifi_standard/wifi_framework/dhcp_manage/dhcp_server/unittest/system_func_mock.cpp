@@ -149,7 +149,7 @@ ssize_t recvfrom(int __fd, void *__buf, size_t __n, int __flags, struct sockaddr
             LOGD("== new message received.");
             DhcpMessage msg = { 0 };
             if (DhcpMsgManager::GetInstance().FrontSendMsg(&msg)) {
-                memcpy_s(__buf, __n, &msg, sizeof(DhcpMessage));
+                (void)memcpy_s(__buf, __n, &msg, sizeof(DhcpMessage));
                 DhcpMsgManager::GetInstance().PopSendMsg();
                 uint32_t srcIp = DhcpMsgManager::GetInstance().GetClientIp();
                 if (__addr != nullptr && srcIp != 0) {

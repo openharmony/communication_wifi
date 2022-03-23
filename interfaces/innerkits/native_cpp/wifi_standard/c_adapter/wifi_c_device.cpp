@@ -66,8 +66,8 @@ WifiErrorCode Scan()
 WifiErrorCode GetScanInfoList(WifiScanInfo *result, unsigned int *size)
 {
     CHECK_PTR_RETURN(wifiScanPtr, ERROR_WIFI_NOT_AVAILABLE);
-    if (result == nullptr) {
-        WIFI_LOGE("Scan info receive addr is null!");
+    if (result == nullptr || size == nullptr) {
+        WIFI_LOGE("Scan info input parameter is nullptr!");
         return ERROR_WIFI_UNKNOWN;
     }
 

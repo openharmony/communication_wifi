@@ -33,7 +33,7 @@ WifiScanStub::~WifiScanStub()
 
 int WifiScanStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
-    WIFI_LOGD("WifiScanStub::OnRemoteRequest,code:%{public}d", code);
+    WIFI_LOGD("WifiScanStub::OnRemoteRequest,code:%{public}u", code);
 
     if (data.ReadInterfaceToken() != GetDescriptor()) {
         WIFI_LOGE("Scan stub token verification error");

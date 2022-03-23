@@ -275,7 +275,7 @@ int ReadInt(Context *context, int *iData)
 
 int ReadLong(Context *context, long *pLong)
 {
-    if (context == NULL) {
+    if (context == NULL || pLong == NULL) {
         return -1;
     }
 
@@ -307,7 +307,7 @@ int ReadInt64(Context *context, int64_t *pInt64)
 
 int ReadDouble(Context *context, double *dData)
 {
-    if (context == NULL) {
+    if (context == NULL || dData == NULL) {
         return -1;
     }
 
@@ -361,7 +361,7 @@ int ReadStr(Context *context, char *str, int count)
 
 int ReadUStr(Context *context, unsigned char *uStr, int count)
 {
-    if (context == NULL) {
+    if (context == NULL || uStr == NULL) {
         return -1;
     }
 

@@ -368,7 +368,7 @@ int AddOptValueToOpts(uint8_t *pOpts, uint8_t code, uint32_t value)
             *pUint32 = value;
             break;
         default:
-            LOGE("AddOptValueToOpts() uLen:%{public}u error, break!", uLen);
+            LOGE("AddOptValueToOpts() uLen:%{public}d error, break!", uLen);
             break;
     }
 

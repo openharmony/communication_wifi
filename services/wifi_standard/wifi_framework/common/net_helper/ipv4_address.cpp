@@ -38,7 +38,7 @@ bool Ipv4Address::IsValidIPv4(const std::string &ipv4)
 
 Ipv4Address Ipv4Address::Create(const std::string &ipv4, size_t prefixLength)
 {
-    if (!IsValidIPv4(ipv4) || prefixLength < 0 || prefixLength > MAX_IPV4_PREFIX_LENGTH - 1) {
+    if (!IsValidIPv4(ipv4) || prefixLength > MAX_IPV4_PREFIX_LENGTH - 1) {
         return INVALID_INET_ADDRESS;
     }
     return Ipv4Address(ipv4, prefixLength);

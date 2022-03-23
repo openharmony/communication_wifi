@@ -132,60 +132,79 @@ static void *HostapdReceiveCallback(void *arg)
     return NULL;
 }
 
-static struct wpa_ctrl *HostapdCliOpenConnection(const char *ifname)
+void ReleaseHostapdCtrl(void)
 {
-    struct wpa_ctrl *ctrl = NULL;
-    if (ifname == NULL) {
-        return NULL;
+    if (g_hostapdHalDev == NULL) {
+        return;
     }
-    int count = 30;
-    while (count) {
-        ctrl = wpa_ctrl_open(ifname);
-        if (ctrl == NULL) {
-            usleep(SLEEP_TIME_100_MS);
-            count--;
-        } else {
-            break;
-        }
+    if (g_hostapdHalDev->ctrlConn != NULL) {
+        wpa_ctrl_close(g_hostapdHalDev->ctrlConn);
+        g_hostapdHalDev->ctrlConn = NULL;
     }
-    return ctrl;
+    if (g_hostapdHalDev->ctrlRecv != NULL) {
+        wpa_ctrl_close(g_hostapdHalDev->ctrlRecv);
+        g_hostapdHalDev->ctrlRecv = NULL;
+    }
+    return;
 }
 
-static int HostapdCliConnect(void)
+int InitHostapdCtrl(const char *ifname)
 {
-    int retval = 0;
+    if (g_hostapdHalDev == NULL || ifname == NULL) {
+        return -1;
+    }
+    int flag = 0;
     do {
-        g_hostapdHalDev->ctrlConn = HostapdCliOpenConnection(CONFIG_CTRL_IFACE_NAME);
-        g_hostapdHalDev->ctrlRecv = HostapdCliOpenConnection(CONFIG_CTRL_IFACE_NAME);
+        g_hostapdHalDev->ctrlConn = wpa_ctrl_open(ifname);
+        g_hostapdHalDev->ctrlRecv = wpa_ctrl_open(ifname);
         if (g_hostapdHalDev->ctrlConn == NULL || g_hostapdHalDev->ctrlRecv == NULL) {
             LOGE("open hostapd control interface failed!");
             break;
         }
-
         if (wpa_ctrl_attach(g_hostapdHalDev->ctrlRecv) != 0) {
-            LOGE("hostapd attach failed!");
+            LOGE("attach hostapd monitor interface failed!");
             break;
         }
-        g_hostapdHalDev->threadRunFlag = 1;
-        if (pthread_create(&g_hostapdHalDev->tid, NULL, HostapdReceiveCallback, g_hostapdHalDev->ctrlRecv) != 0) {
-            wpa_ctrl_detach(g_hostapdHalDev->ctrlRecv);
-            LOGE("hostapd Create monitor thread failed!");
-            break;
-        }
-        retval += 1;
+        flag += 1;
     } while (0);
-
-    if (retval == 0) {
-        if (g_hostapdHalDev->ctrlConn != NULL) {
-            wpa_ctrl_close(g_hostapdHalDev->ctrlConn);
-            g_hostapdHalDev->ctrlConn = NULL;
-        }
-        if (g_hostapdHalDev->ctrlRecv != NULL) {
-            wpa_ctrl_close(g_hostapdHalDev->ctrlRecv);
-            g_hostapdHalDev->ctrlRecv = NULL;
-        }
+    if (!flag) {
+        ReleaseHostapdCtrl();
+        return -1;
     }
-    return retval;
+    return 0;
+}
+
+static int HostapdCliConnect(void)
+{
+    if (g_hostapdHalDev == NULL) {
+        return -1;
+    }
+    if (g_hostapdHalDev->ctrlConn != NULL) {
+        LOGE("Hostapd already initialized!");
+        return 0;
+    }
+    int retryCount = 20;
+    while (retryCount-- > 0) {
+        int ret = InitHostapdCtrl(CONFIG_CTRL_IFACE_NAME);
+        if (ret == 0) {
+            LOGD("Global hostapd interface connect successfully!");
+            break;
+        } else {
+            LOGD("Init hostapd ctrl failed: %{public}d", ret);
+        }
+        usleep(SLEEP_TIME_100_MS);
+    }
+    if (retryCount <= 0) {
+        return -1;
+    }
+    g_hostapdHalDev->threadRunFlag = 1;
+    if (pthread_create(&g_hostapdHalDev->tid, NULL, HostapdReceiveCallback, g_hostapdHalDev->ctrlRecv) != 0) {
+        g_hostapdHalDev->threadRunFlag = 0;
+        ReleaseHostapdCtrl();
+        LOGE("Create hostapd monitor thread failed!");
+        return -1;
+    }
+    return 0;
 }
 
 static int HostapdCliClose(void)
@@ -635,7 +654,7 @@ static int InitHostapdHal(void)
         return -1;
     }
     g_hostapdHalDev->threadRunFlag = 1;
-    if (HostapdCliConnect() == 0) {
+    if (HostapdCliConnect() != 0) {
         return -1;
     }
     return 0;

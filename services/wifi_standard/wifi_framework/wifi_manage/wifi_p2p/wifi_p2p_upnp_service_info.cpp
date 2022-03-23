@@ -43,7 +43,9 @@ std::string WifiP2pUpnpServiceInfo::BuildWpaQuery(
     std::string query;
     query.append("upnp ");
     char version[4] = {'\0'};
-    snprintf_s(version, sizeof(version), sizeof(version) - 1, "%02x ", VERSION_1_0);
+    if (snprintf_s(version, sizeof(version), sizeof(version) - 1, "%02x ", VERSION_1_0) < 0) {
+        return "";
+    }
     query.append(std::string(version));
     query.append(std::string("uuid:"));
     query.append(uuid);

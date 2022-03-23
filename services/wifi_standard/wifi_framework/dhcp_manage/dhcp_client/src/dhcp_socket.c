@@ -70,6 +70,10 @@ int CreateRawSocket(int *rawFd)
 /* Kernel socket can receive data frames or data packets from the local network interface, ip and port. */
 int CreateKernelSocket(int *sockFd)
 {
+    if (sockFd == NULL) {
+        LOGE("CreateKernelSocket() failed, sockFd is NULL!");
+        return SOCKET_OPT_FAILED;
+    }
     int nFd = socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP);
     if (nFd == -1) {
         LOGE("CreateKernelSocket() failed, socket error:%{public}d.", errno);

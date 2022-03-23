@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,6 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include <gtest/gtest.h>
 #include <sys/stat.h>
 #include <fcntl.h>
@@ -37,88 +38,7 @@ public:
     virtual void TearDown()
     {}
 };
-#if 0
-HWTEST_F(DhcpIpv4Test, StartIpv4_Mock1, TestSize.Level1)
-{
-    MockSystemFunc::SetMockFlag(true);
-    MockCustomFunc::SetMockFlag(true);
 
-    EXPECT_CALL(MockSystemFunc::GetInstance(), socket(_, _, _)).WillRepeatedly(Return(1));
-    EXPECT_CALL(MockSystemFunc::GetInstance(), setsockopt(_, _, _, _, _)).WillRepeatedly(Return(0));
-    EXPECT_CALL(MockSystemFunc::GetInstance(), bind(_, _, _)).WillRepeatedly(Return(0));
-    EXPECT_CALL(MockSystemFunc::GetInstance(), select(_, _, _, _, _))
-        .WillOnce(Return(-1)).WillOnce(Return(1))
-        .WillOnce(Return(0)).WillOnce(Return(1)).WillOnce(Return(1))
-        .WillOnce(Return(0)).WillOnce(Return(1))
-        .WillOnce(Return(0)).WillOnce(Return(1))
-        .WillOnce(Return(3)).WillOnce(Return(1)).WillOnce(Return(2))
-        .WillRepeatedly(Return(0));
-    EXPECT_CALL(MockSystemFunc::GetInstance(), sendto(_, _, _, _, _, _)).WillRepeatedly(Return(1));
-    EXPECT_CALL(MockSystemFunc::GetInstance(), read(_, _, _)).WillRepeatedly(Return(500));
-    EXPECT_CALL(MockSystemFunc::GetInstance(), close(_)).WillRepeatedly(Return(0));
-    EXPECT_CALL(MockSystemFunc::GetInstance(), open(_, _)).WillRepeatedly(Return(1));
-    EXPECT_CALL(MockSystemFunc::GetInstance(), ioctl(_, _, _)).WillRepeatedly(Return(0));
-    EXPECT_CALL(MockSystemFunc::GetInstance(), connect(_, _, _)).WillRepeatedly(Return(0));
-    EXPECT_CALL(MockSystemFunc::GetInstance(), write(_, _, _)).WillRepeatedly(Return(1));
-
-    EXPECT_CALL(MockCustomFunc::GetInstance(), GetDhcpRawPacket(_, _))
-        .WillOnce(Return(SOCKET_OPT_ERROR))
-        .WillOnce(Return(1))
-        .WillOnce(Return(2))
-        .WillRepeatedly(Return(SOCKET_OPT_SUCCESS));
-    EXPECT_CALL(MockCustomFunc::GetInstance(), GetDhcpKernelPacket(_, _))
-        .WillOnce(Return(2))
-        .WillOnce(Return(3))
-        .WillRepeatedly(Return(SOCKET_OPT_SUCCESS));
-
-    struct DhcpClientCfg *pCfg = GetDhcpClientCfg();
-    pCfg->timeoutExit = false;
-    EXPECT_EQ(DHCP_OPT_SUCCESS, StartIpv4());
-
-    MockSystemFunc::SetMockFlag(false);
-    MockCustomFunc::SetMockFlag(false);
-}
-
-HWTEST_F(DhcpIpv4Test, StartIpv4_Mock2, TestSize.Level1)
-{
-    MockSystemFunc::SetMockFlag(true);
-    MockCustomFunc::SetMockFlag(true);
-
-    EXPECT_CALL(MockSystemFunc::GetInstance(), socket(_, _, _)).WillRepeatedly(Return(1));
-    EXPECT_CALL(MockSystemFunc::GetInstance(), setsockopt(_, _, _, _, _)).WillRepeatedly(Return(0));
-    EXPECT_CALL(MockSystemFunc::GetInstance(), bind(_, _, _)).WillRepeatedly(Return(0));
-    EXPECT_CALL(MockSystemFunc::GetInstance(), select(_, _, _, _, _))
-        .WillOnce(Return(0)).WillOnce(Return(1))
-        .WillOnce(Return(0)).WillOnce(Return(1)).WillOnce(Return(1))
-        .WillOnce(Return(0)).WillOnce(Return(1))
-        .WillOnce(Return(0)).WillOnce(Return(1)).WillOnce(Return(0)).WillOnce(Return(0))
-        .WillOnce(Return(2))
-        .WillRepeatedly(Return(0));
-    EXPECT_CALL(MockSystemFunc::GetInstance(), sendto(_, _, _, _, _, _)).WillRepeatedly(Return(1));
-    EXPECT_CALL(MockSystemFunc::GetInstance(), read(_, _, _)).WillRepeatedly(Return(500));
-    EXPECT_CALL(MockSystemFunc::GetInstance(), close(_)).WillRepeatedly(Return(0));
-    EXPECT_CALL(MockSystemFunc::GetInstance(), open(_, _)).WillRepeatedly(Return(1));
-    EXPECT_CALL(MockSystemFunc::GetInstance(), ioctl(_, _, _)).WillRepeatedly(Return(0));
-    EXPECT_CALL(MockSystemFunc::GetInstance(), connect(_, _, _)).WillRepeatedly(Return(0));
-    EXPECT_CALL(MockSystemFunc::GetInstance(), write(_, _, _)).WillRepeatedly(Return(1));
-
-    EXPECT_CALL(MockCustomFunc::GetInstance(), GetDhcpRawPacket(_, _))
-        .WillOnce(Return(3))
-        .WillOnce(Return(1)).WillOnce(Return(4))
-        .WillRepeatedly(Return(SOCKET_OPT_SUCCESS));
-    EXPECT_CALL(MockCustomFunc::GetInstance(), GetDhcpKernelPacket(_, _))
-        .WillOnce(Return(1))
-        .WillOnce(Return(2))
-        .WillRepeatedly(Return(SOCKET_OPT_SUCCESS));
-
-    struct DhcpClientCfg *pCfg = GetDhcpClientCfg();
-    pCfg->timeoutExit = false;
-    EXPECT_EQ(DHCP_OPT_SUCCESS, StartIpv4());
-
-    MockSystemFunc::SetMockFlag(false);
-    MockCustomFunc::SetMockFlag(false);
-}
-#endif
 HWTEST_F(DhcpIpv4Test, ExecDhcpRenew_SUCCESS, TestSize.Level1)
 {
     MockSystemFunc::SetMockFlag(true);

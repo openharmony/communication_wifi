@@ -516,7 +516,7 @@ void P2pHalCbProvisionDiscoveryFailure()
 
 void P2pHalCbFindStopped()
 {
-    LOGD("P2p find stoped event");
+    LOGD("P2p find stopped event");
     RpcServer *server = GetRpcServer();
     if (server == NULL) {
         LOGE("Rpc server not exists!");

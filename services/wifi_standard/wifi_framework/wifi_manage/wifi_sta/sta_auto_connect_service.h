@@ -151,7 +151,7 @@ private:
      */
     bool SetRoamBlockedBssidFirmware(const std::vector<std::string> &blocklistBssids) const;
     /**
-     * @Description  Connect to a elected device
+     * @Description  Connect to an elected device
      *
      * @param electedDevice - Elected Device(in)
      */

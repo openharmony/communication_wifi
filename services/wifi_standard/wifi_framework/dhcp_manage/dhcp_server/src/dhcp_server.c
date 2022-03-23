@@ -586,7 +586,7 @@ void InitBindingRecoders(DhcpAddressPool *pool)
                 LOGE("bad binding recoder.");
                 invalidBindig = 1;
             }
-            if (!invalidBindig && pool->distribution < binding->ipAddress) {
+            if (!invalidBindig && binding && pool->distribution < binding->ipAddress) {
                 pool->distribution = binding->ipAddress;
             }
             node = next;

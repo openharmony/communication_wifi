@@ -488,7 +488,7 @@ public:
     /**
      * @Description Get the Valid Bands object
      *
-     * @param bands - output vector fo BandType
+     * @param bands - output vector for BandType
      * @return int - 0 success
      */
     int GetValidBands(std::vector<BandType> &bands);

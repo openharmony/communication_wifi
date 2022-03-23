@@ -1367,6 +1367,11 @@ ErrCode WifiP2pProxy::Hid2dGetChannelListFor5G(std::vector<int>& vecChannelList)
 ErrCode WifiP2pProxy::Hid2dGetSelfWifiCfgInfo(SelfCfgType cfgType,
     char cfgData[CFG_DATA_MAX_BYTES], int* getDatValidLen)
 {
+    if (getDatValidLen == nullptr) {
+        WIFI_LOGD("getDatValidLen is nullptr!");
+        return WIFI_OPT_FAILED;
+    }
+
     if (mRemoteDied) {
         WIFI_LOGD("failed to `%{public}s`,remote service is died!", __func__);
         return WIFI_OPT_FAILED;

@@ -193,6 +193,10 @@ public:
         matchingSkills.AddEvent(event);
         CommonEventSubscribeInfo subscriberInfo(matchingSkills);
         std::shared_ptr<WifiEventSubscriber> subscriber = std::make_shared<WifiEventSubscriber>(subscriberInfo);
+        if (subscriber == nullptr) {
+            WIFI_LOGE("Create subscriber failed");
+            return false;
+        }
         WIFI_LOGI("Subscribe event: %{public}s", event.c_str());
         bool subscribeResult = CommonEventManager::SubscribeCommonEvent(subscriber);
         if (subscribeResult) {

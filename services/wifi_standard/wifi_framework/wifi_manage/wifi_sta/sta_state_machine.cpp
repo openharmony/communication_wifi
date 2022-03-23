@@ -862,6 +862,7 @@ void StaStateMachine::DealWpaLinkFailEvent(InternalMessage *msg)
     LOGD("enter DealWpaLinkFailEvent.\n");
     if (msg == nullptr) {
         LOGE("msg is null.\n");
+        return;
     }
     StopTimer(static_cast<int>(CMD_NETWORK_CONNECT_TIMEOUT));
     InitWifiLinkedInfo();
@@ -1975,11 +1976,7 @@ void StaStateMachine::DhcpResultNotify::OnFailed(int status, const std::string &
             pStaStateMachine->DisConnectProcess();
             pStaStateMachine->SaveLinkstate(ConnState::DISCONNECTED, DetailedState::OBTAINING_IPADDR_FAIL);
         } else {
-            if (!pStaStateMachine->isRoam) {
-                pStaStateMachine->DisConnectProcess();
-            } else {
-                pStaStateMachine->SaveLinkstate(ConnState::CONNECTED, DetailedState::CONNECTED);
-            }
+            pStaStateMachine->SaveLinkstate(ConnState::CONNECTED, DetailedState::CONNECTED);
         }
     }
     pStaStateMachine->getIpFailNum++;

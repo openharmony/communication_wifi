@@ -82,7 +82,7 @@ static P2pSupplicantErrCode WpaP2pCliCmdWpsPbc(WifiWpaP2pGroupInterface *this, c
         return P2P_SUP_ERRCODE_FAILED;
     }
     if (strncmp(buf, "FAIL-PBC-OVERLAP", strlen("FAIL-PBC-OVERLAP")) == 0) {
-        LOGE("wps_pbc sucess, but result err: buf =%{public}s", buf);
+        LOGE("wps_pbc success, but result err: buf =%{public}s", buf);
         return P2P_SUP_ERRCODE_PBC_OVERLAP;
     }
     return P2P_SUP_ERRCODE_SUCCESS;

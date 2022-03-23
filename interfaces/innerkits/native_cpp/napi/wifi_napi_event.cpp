@@ -69,7 +69,7 @@ void NapiEvent::EventNotify(AsyncEventData *asyncEvent)
         return;
     }
 
-    WIFI_LOGI("Get the event loop, napi_env: %{public}p", asyncEvent->env);
+    WIFI_LOGI("Get the event loop, napi_env: %{private}p", asyncEvent->env);
     work->data = asyncEvent;
     uv_queue_work(
         loop,
@@ -77,7 +77,7 @@ void NapiEvent::EventNotify(AsyncEventData *asyncEvent)
         [](uv_work_t* work) {},
         [](uv_work_t* work, int status) {
             AsyncEventData *asyncData = static_cast<AsyncEventData*>(work->data);
-            WIFI_LOGI("Napi event uv_queue_work, env: %{public}p, status: %{public}d", asyncData->env, status);
+            WIFI_LOGI("Napi event uv_queue_work, env: %{private}p, status: %{public}d", asyncData->env, status);
             napi_value handler = nullptr;
             napi_handle_scope scope = nullptr;
             napi_value jsEvent = nullptr;
@@ -91,7 +91,7 @@ void NapiEvent::EventNotify(AsyncEventData *asyncEvent)
             napi_get_undefined(asyncData->env, &undefine);
             napi_get_reference_value(asyncData->env, asyncData->callbackRef, &handler);
             jsEvent = asyncData->packResult();
-            WIFI_LOGI("Push event to js, env: %{public}p, ref : %{public}p", asyncData->env, &asyncData->callbackRef);
+            WIFI_LOGI("Push event to js, env: %{private}p, ref : %{private}p", asyncData->env, &asyncData->callbackRef);
             if (napi_call_function(asyncData->env, nullptr, handler, 1, &jsEvent, &undefine) != napi_ok) {
                 WIFI_LOGE("Report event to Js failed");
             }
@@ -146,7 +146,7 @@ napi_value NapiEvent::CreateResult(const napi_env& env, const std::vector<WifiP2
     napi_create_array_with_length(env, devices.size(), &arrayResult);
     for (auto& each : devices) {
         if (napi_set_element(env, arrayResult, idx++, CreateResult(env, each)) != napi_ok) {
-            WIFI_LOGE("Array result set element error, idx: %{public}d", idx - 1);
+            WIFI_LOGE("Array result set element error, idx: %{public}u", idx - 1);
         }
     }
     return arrayResult;
@@ -480,7 +480,7 @@ bool EventRegister::IsEventSupport(const std::string& type)
 
 void EventRegister::Register(const napi_env& env, const std::string& type, napi_value handler)
 {
-    WIFI_LOGI("Register event: %{public}s, env: %{public}p", type.c_str(), env);
+    WIFI_LOGI("Register event: %{public}s, env: %{private}p", type.c_str(), env);
 
     if (!IsEventSupport(type)) {
         WIFI_LOGE("Register type error or not support!");
@@ -532,7 +532,7 @@ void EventRegister::DeleteAllRegisterObj(std::vector<RegObj>& vecRegObjs)
 
 void EventRegister::Unregister(const napi_env& env, const std::string& type, napi_value handler)
 {
-    WIFI_LOGI("Unregister event: %{public}s, env: %{public}p", type.c_str(), env);
+    WIFI_LOGI("Unregister event: %{public}s, env: %{private}p", type.c_str(), env);
 
     if (!IsEventSupport(type)) {
         WIFI_LOGE("Unregister type error or not support!");

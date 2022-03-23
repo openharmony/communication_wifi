@@ -202,6 +202,10 @@ int DhcpClientServiceImpl::SubscribeDhcpEvent(const std::string &strAction)
         matchingSkills.AddEvent(strAction);
         EventFwk::CommonEventSubscribeInfo subInfo(matchingSkills);
         auto dhcpSubscriber = std::make_shared<OHOS::Wifi::DhcpEventSubscriber>(subInfo);
+        if (dhcpSubscriber == nullptr) {
+            WIFI_LOGE("SubscribeDhcpEvent error, dhcpSubscriber is nullptr!");
+            return DHCP_OPT_FAILED;
+        }
         m_mapEventSubscriber.emplace(std::make_pair(strAction, dhcpSubscriber));
     }
     if (m_mapEventSubscriber[strAction] == nullptr) {
@@ -423,8 +427,11 @@ int DhcpClientServiceImpl::GetSuccessIpv4Result(const std::vector<std::string> &
             ifname.c_str(), (iter->second).uAddTime, result.uAddTime);
         return DHCP_OPT_SUCCESS;
     }
-    WIFI_LOGI("GetSuccessIpv4Result() DhcpResult %{public}s old %{public}u no equal new %{public}u, need update...",
-        ifname.c_str(), (iter->second).uAddTime, result.uAddTime);
+
+    if (iter != DhcpClientServiceImpl::m_mapDhcpResult.end()) {
+        WIFI_LOGI("GetSuccessIpv4Result() DhcpResult %{public}s old %{public}u no equal new %{public}u, need update...",
+            ifname.c_str(), (iter->second).uAddTime, result.uAddTime);
+    }
 
     /* Reload dhcp packet info. */
     auto iterInfo = DhcpClientServiceImpl::m_mapDhcpInfo.find(ifname);

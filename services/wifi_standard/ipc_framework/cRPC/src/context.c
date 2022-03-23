@@ -118,6 +118,7 @@ static int ExpandWriteCache(Context *context, int len)
             return -1;
         }
         if (context->wCapacity < 0) {
+            free(p);
             return -1;
         }
         if (memmove_s(p, capacity, context->szWrite, context->wCapacity) != EOK) {

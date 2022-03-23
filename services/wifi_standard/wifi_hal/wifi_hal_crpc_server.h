@@ -117,7 +117,7 @@ void ReleaseCallbackMsg(void);
 /**
  * @Description Add an event node to the header of the corresponding event linked list.
  *
- * @param event - Evnet id.
+ * @param event - Event id.
  * @param msg
  * @return int - 0 Success, -1 Failed.
  */

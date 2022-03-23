@@ -61,7 +61,7 @@ uint32_t NextIpAddress(uint32_t currIp, uint32_t netmask, uint32_t offset)
     if (currIp == lastIp || currIp == broadcast) {
         return FirstIpAddress(currIp, netmask);
     }
-    if (next > hostTotal) {
+    if (next > hostTotal && hostTotal > 0) {
         next = next % hostTotal;
     }
     uint32_t nextIp = htonl(currIp) + next + 1;

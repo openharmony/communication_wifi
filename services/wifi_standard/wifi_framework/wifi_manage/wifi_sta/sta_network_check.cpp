@@ -55,7 +55,7 @@ bool StaNetworkCheck::HttpDetection()
     const std::string contStr("Content-Length:");
 
     if (httpRequest.HttpGet(httpMsg, httpReturn) == 0) {
-        int retCode = httpReturn.find("HTTP/");
+        size_t retCode = httpReturn.find("HTTP/");
         int codeNum = 0;
         if (retCode >= 0) {
             constexpr int NET_ERROR_POS = 8;
@@ -63,7 +63,7 @@ bool StaNetworkCheck::HttpDetection()
             codeNum = std::atoi(httpReturn.substr(retCode + NET_ERROR_POS, NET_ERROR_LEN).c_str());
         }
         
-        int contLenStr = httpReturn.find(contStr);
+        size_t contLenStr = httpReturn.find(contStr);
         int contLenNum = 0;
         if (contLenStr > 0) {
             constexpr int NET_CONTENT_LENGTH = 6;
@@ -85,10 +85,10 @@ bool StaNetworkCheck::HttpDetection()
             WIFI_LOGI("This network is portal AP, need certification!");
             std::string urlTmp;
             const std::string locStr("Location: ");
-            int startStr = httpReturn.find(locStr);
+            size_t startStr = httpReturn.find(locStr);
             if (startStr > 0) {
                 startStr += locStr.length();
-                int endstr = httpReturn.find(genStr, startStr);
+                size_t endstr = httpReturn.find(genStr, startStr);
                 if (endstr > 0) {
                     endstr += genStr.length();
                     urlTmp = httpReturn.substr(startStr, endstr-startStr);
@@ -102,9 +102,9 @@ bool StaNetworkCheck::HttpDetection()
             WIFI_LOGI("This network is portal AP, need certification!");
             std::string urlTmp;
             const std::string locStr("http");
-            int startStr = httpReturn.find(locStr);
+            size_t startStr = httpReturn.find(locStr);
             if (startStr > 0) {
-                int endstr = httpReturn.find(genStr, startStr);
+                size_t endstr = httpReturn.find(genStr, startStr);
                 if (endstr > 0) {
                     endstr += genStr.length();
                     urlTmp = httpReturn.substr(startStr, endstr-startStr);

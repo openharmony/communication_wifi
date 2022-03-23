@@ -184,7 +184,9 @@ int FillHwAddr(uint8_t *dst, size_t dsize, uint8_t *src, size_t ssize)
 struct sockaddr_in *SetDestinationAddr(uint32_t ipAddress)
 {
     struct sockaddr_in *destAddr = DestinationAddr();
-    destAddr->sin_addr.s_addr = htons(ipAddress);
+    if (destAddr != nullptr) {
+        destAddr->sin_addr.s_addr = htons(ipAddress);
+    }
     return destAddr;
 }
 

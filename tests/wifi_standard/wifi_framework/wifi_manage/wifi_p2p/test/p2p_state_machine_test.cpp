@@ -105,7 +105,10 @@ public:
     {
         EXPECT_CALL(WifiP2PHalInterface::GetInstance(), RegisterP2pCallback(_));
         pP2pStateMachine.reset();
-        delete pMockP2pPendant;
+        if (pMockP2pPendant != nullptr) {
+            delete pMockP2pPendant;
+            pMockP2pPendant = nullptr;
+        }
         pMockAuthorizingNegotiationRequestState = nullptr;
         pMockGroupFormedState = nullptr;
         pMockGroupNegotiationState = nullptr;

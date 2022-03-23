@@ -77,6 +77,7 @@ ErrCode WifiHotspotImpl::GetHotspotState(int &state)
     RETURN_IF_FAIL(client_);
     return client_->GetHotspotState(state);
 }
+
 ErrCode WifiHotspotImpl::GetHotspotConfig(HotspotConfig &config)
 {
     RETURN_IF_FAIL(client_);

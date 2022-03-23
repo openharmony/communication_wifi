@@ -37,7 +37,6 @@
 #undef LOG_TAG
 #define LOG_TAG "WifiDhcpFunction"
 
-
 bool Ip4StrConToInt(const char *strIp, uint32_t *uIp, bool bHost)
 {
     if ((strIp == NULL) || (strlen(strIp) == 0)) {
@@ -155,8 +154,8 @@ const char *MacChConToMacStr(const unsigned char *pChMac, size_t chLen, char *pS
 
 int GetLocalInterface(const char *ifname, int *ifindex, unsigned char *hwaddr, uint32_t *ifaddr4)
 {
-    if ((ifname == NULL) || (strlen(ifname) == 0)) {
-        LOGE("GetLocalInterface() failed, ifname == NULL or \"\"!");
+    if ((ifname == NULL) || (strlen(ifname) == 0) || hwaddr == NULL) {
+        LOGE("GetLocalInterface() failed, ifname == NULL or hwaddr is NULL");
         return DHCP_OPT_FAILED;
     }
 

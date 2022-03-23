@@ -162,15 +162,16 @@ int HostTotal(uint32_t netmask)
     total--;
     return total;
 }
+
 uint32_t ParseIpAddr(const char *strIp)
 {
     struct in_addr inAddr;
     uint32_t ip = 0;
     int ret = inet_aton(strIp, &inAddr);
     if (ret != 0) {
-        if (memcpy_s(&ip, sizeof(struct in_addr), &inAddr, sizeof(uint32_t)) != EOK) {
+        if (memcpy_s(&ip, sizeof(uint32_t), &inAddr, sizeof(struct in_addr)) != EOK) {
             return 0;
-        };
+        }
         return ip;
     }
     return 0;

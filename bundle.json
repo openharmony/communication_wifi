@@ -119,18 +119,6 @@
                 }
             ],
             "test": [
-                "//foundation/communication/wifi/tests/wifi_standard/wifi_framework/wifi_manage/wifi_scan:unittest",
-                "//foundation/communication/wifi/tests/wifi_standard/wifi_framework/wifi_manage/wifi_sta:unittest",
-                "//foundation/communication/wifi/tests/wifi_standard/wifi_framework/wifi_manage/wifi_ap:unittest",
-                "//foundation/communication/wifi/tests/wifi_standard/wifi_framework/dhcp_manage/mgr_service:unittest",
-                "//foundation/communication/wifi/tests/wifi_standard/wifi_framework/dhcp_manage/dhcp_client:unittest",
-                "//foundation/communication/wifi/tests/wifi_standard/wifi_framework/dhcp_manage/dhcp_server/unittest:unittest",
-                "//foundation/communication/wifi/tests/wifi_standard/wifi_framework/wifi_manage/wifi_p2p/test:unittest",
-                "//foundation/communication/wifi/tests/wifi_standard/ipc_framework/cRPC/unittest:unittest",
-                "//foundation/communication/wifi/tests/wifi_standard/wifi_framework/common/unittest:unittest",
-                "//foundation/communication/wifi/tests/wifi_standard/wifi_framework/wifi_manage/unittest:unittest",
-                "//foundation/communication/wifi/tests/wifi_standard/wifi_framework/wifi_manage/idl_client/unittest:unittest",
-                "//foundation/communication/wifi/tests/wifi_standard/wifi_hal/unittest:unittest"
             ]
         },
         "hisysevent_config": [

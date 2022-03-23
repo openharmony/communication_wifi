@@ -38,8 +38,8 @@ const std::string IP_V6_FORWARDING_CONFIG_FILE = "/proc/sys/net/ipv6/conf/all/fo
 
 bool WifiApNatManager::EnableInterfaceNat(bool enable, std::string inInterfaceName, std::string outInterfaceName) const
 {
-    WIFI_LOGI("EnableInterfaceNat enable [%{public}s], inInterfaceName [%privates]  outInterfaceName "
-         "[%privates].",
+    WIFI_LOGI("EnableInterfaceNat enable [%{public}s], inInterfaceName [%{private}s]  outInterfaceName "
+         "[%{private}s].",
         enable ? "true" : "false",
         inInterfaceName.c_str(),
         outInterfaceName.c_str());

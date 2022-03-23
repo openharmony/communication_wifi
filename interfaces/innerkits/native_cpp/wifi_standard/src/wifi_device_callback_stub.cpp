@@ -81,6 +81,7 @@ void WifiDeviceCallBackStub::RegisterUserCallBack(const sptr<IWifiDeviceCallBack
 {
     if (callBack == nullptr) {
         WIFI_LOGD("RegisterUserCallBack:callBack is nullptr!");
+        return;
     }
     callback_ = callBack;
 }

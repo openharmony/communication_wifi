@@ -26,7 +26,6 @@ class MockCustomFunc {
 public:
     MOCK_METHOD2(GetDhcpRawPacket, int(struct DhcpPacket *getPacket, int rawFd));
     MOCK_METHOD2(GetDhcpKernelPacket, int(struct DhcpPacket *getPacket, int sockFd));
-    // MOCK_METHOD0(GetSelectRet, int(void));
 
     static MockCustomFunc &GetInstance(void);
     static void SetMockFlag(bool flag);
@@ -37,16 +36,5 @@ private:
     ~MockCustomFunc(){}
 };
 }  // namespace OHOS
-
-// #ifdef __cplusplus
-// extern "C" {
-// #endif
-
-// int GetSelectRet(void);
-// int MySelect(int nfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds, struct timeval *timeout);
-
-// #ifdef __cplusplus
-// }
-// #endif
 
 #endif

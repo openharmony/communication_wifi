@@ -140,7 +140,7 @@ bool NetworkInterface::IsExistAddressForInterface(const std::string &interfaceNa
 bool NetworkInterface::AddIpAddress(const std::string &interfaceName, const BaseAddress &ipAddress)
 {
     if (!ipAddress.IsValid()) {
-        WIFI_LOGE("Add IP address [%{public}s] is not valid.", ipAddress.GetAddressWithString().c_str());
+        WIFI_LOGE("Add IP address [%{private}s] is not valid.", ipAddress.GetAddressWithString().c_str());
         return false;
     }
 

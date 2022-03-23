@@ -57,7 +57,6 @@ bool ApIdleState::ExecuteStateMsg(InternalMessage *msg)
         }
         default:
             return NOT_EXECUTED;
-            break;
     }
 
     return EXECUTED;

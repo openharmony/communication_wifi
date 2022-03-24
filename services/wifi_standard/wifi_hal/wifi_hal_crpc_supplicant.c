@@ -81,6 +81,7 @@ int RpcRequestToSupplicant(RpcServer *server, Context *context)
     }
     if (ReadUStr(context, buf, len) != 0) {
         free(buf);
+        buf = NULL;
         return -1;
     }
     WifiErrorNo err = RequestToSupplicant(buf, maxSize);
@@ -88,6 +89,7 @@ int RpcRequestToSupplicant(RpcServer *server, Context *context)
     WriteInt(context, err);
     WriteEnd(context);
     free(buf);
+    buf = NULL;
     return 0;
 }
 

@@ -156,6 +156,7 @@ static void IdlCbkAddRemoveIface(Context *context, int event)
     }
     if (ReadStr(context, iface, len + 1) < 0) {
         free(iface);
+        iface = NULL;
         return;
     }
     IWifiChipEventCallback *callback = GetWifiChipEventCallback();
@@ -167,6 +168,7 @@ static void IdlCbkAddRemoveIface(Context *context, int event)
         }
     }
     free(iface);
+    iface = NULL;
     return;
 }
 
@@ -187,10 +189,12 @@ static void IdlCbkStaJoinLeave(Context *context)
     }
     if (ReadStr(context, reason, len + 1) < 0) {
         free(reason);
+        reason = NULL;
         return;
     }
     if (strncpy_s(info.mac, sizeof(info.mac), reason, sizeof(info.mac) - 1) != EOK) {
         free(reason);
+        reason = NULL;
         return;
     }
     IWifiApEventCallback *callback = GetWifiApEventCallback();
@@ -198,6 +202,7 @@ static void IdlCbkStaJoinLeave(Context *context)
         callback->onStaJoinOrLeave(&info);
     }
     free(reason);
+    reason = NULL;
     return;
 }
 
@@ -592,11 +597,13 @@ static void IdlCbP2pServDiscRespEvent(Context *context)
         }
         if (ReadStr(context, (char *)tlvs, tlvsLength + 1) != 0) {
             free(tlvs);
+            tlvs = NULL;
             return;
         }
         if (NumStrToNumArry(tlvs, &tlvsLength) < 0) {
             LOGE("Failed to convert tlvs hex string to byte list.");
             free(tlvs);
+            tlvs = NULL;
             return;
         }
     }
@@ -605,6 +612,7 @@ static void IdlCbP2pServDiscRespEvent(Context *context)
         callback->onServiceDiscoveryResponse(address, updataIndicator, tlvs, tlvsLength);
     }
     free(tlvs);
+    tlvs = NULL;
     return;
 }
 
@@ -656,6 +664,7 @@ static void IdlCbP2pServDiscReqEvent(Context *context)
         if (NumStrToNumArry(info.tlvs, &info.tlvsLength) < 0) {
             LOGE("Failed to convert tlvs hex string to byte list.");
             free(info.tlvs);
+            info.tlvs = NULL;
             return;
         }
     }
@@ -664,6 +673,7 @@ static void IdlCbP2pServDiscReqEvent(Context *context)
         callback->onP2pServDiscReq(&info);
     }
     free(info.tlvs);
+    info.tlvs = NULL;
     return;
 }
 

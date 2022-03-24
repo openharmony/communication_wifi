@@ -208,11 +208,13 @@ ModuleManageRetCode StartModule(const char *moduleName, const char *startCmd)
     }
     if (strcpy_s(p->szModuleName, sizeof(p->szModuleName), moduleName) != EOK) {
         free(p);
+        p = NULL;
         return MM_FAILED;
     }
     int ret = StartModuleInternal(moduleName, startCmd, &(p->processId));
     if (ret != 0) { /* start module failed! */
         free(p);
+        p = NULL;
         return MM_FAILED;
     }
     p->referenceCount = 1;
@@ -252,5 +254,6 @@ ModuleManageRetCode StopModule(const char *moduleName)
         }
     }
     free(p);
+    p = NULL;
     return MM_SUCCESS;
 }

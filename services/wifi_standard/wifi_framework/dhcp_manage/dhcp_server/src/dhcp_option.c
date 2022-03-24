@@ -40,6 +40,7 @@ PDhcpOptionNode CreateOptionNode(PDhcpOption opt)
     if (memcpy_s(pNode->option.data, sizeof(pNode->option.data), opt->data, opt->length) != EOK) {
         LOGE("create option node failed when memcpy opt data!");
         free(pNode);
+        pNode = NULL;
         return NULL;
     }
     pNode->previous = pNode->next = 0;
@@ -158,6 +159,7 @@ int RemoveOption(PDhcpOptionList pOptions, uint8_t code)
     }
     pOptions->size--;
     free(pNode);
+    pNode = NULL;
     return RET_SUCCESS;
 }
 

@@ -439,6 +439,7 @@ int PopFrontCallbackMsg(int event)
         head->next = p->next;
         p->next->pre = head;
         free(p);
+        p = NULL;
     }
     pthread_mutex_unlock(&g_wifiHalEventCallback->mutex);
     return 0;
@@ -618,6 +619,7 @@ static void DealP2pServerInfoCbk(int event, Context *context)
             WriteInt(context, strlen(cbmsg->msg.serverInfo.tlvs));
             WriteStr(context, cbmsg->msg.serverInfo.tlvs);
             free(cbmsg->msg.serverInfo.tlvs);
+            cbmsg->msg.serverInfo.tlvs = NULL;
         } else {
             WriteInt(context, 0);
         }
@@ -637,6 +639,7 @@ static void DealP2pServerDiscReqCbk(int event, Context *context)
             WriteInt(context, strlen(cbmsg->msg.serDiscReqInfo.tlvs));
             WriteStr(context, cbmsg->msg.serDiscReqInfo.tlvs);
             free(cbmsg->msg.serDiscReqInfo.tlvs);
+            cbmsg->msg.serDiscReqInfo.tlvs = NULL;
         } else {
             WriteInt(context, 0);
         }

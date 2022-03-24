@@ -105,6 +105,7 @@ static int DealReadMessage(RpcServer *server, Context *client)
     client->nSize = strlen(buf);
     OnTransact(server, client);
     free(buf);
+    buf = NULL;
     AddFdEvent(server->loop, client->fd, WRIT_EVENT);
     return 1;
 }
@@ -228,6 +229,7 @@ void ReleaseRpcServer(RpcServer *server)
         }
         pthread_mutex_destroy(&server->mutex);
         free(server);
+        server = NULL;
     }
 }
 
@@ -318,6 +320,7 @@ int UnRegisterCallback(RpcServer *server, int event, const Context *context)
             q->next = p->next;
         }
         free(p);
+        p = NULL;
     }
     return 0;
 }
@@ -346,6 +349,7 @@ static int RemoveCallback(RpcServer *server, const Context *context)
                 q->next = p->next;
             }
             free(p);
+            p = NULL;
         }
     }
     return 0;

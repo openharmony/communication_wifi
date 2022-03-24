@@ -49,10 +49,12 @@ int WriteFunc(Context *context, const char *funcName)
     }
     if (snprintf_s(buf, len + 1, len, "%s%c", funcName, context->cSplit) < 0) {
         free(buf);
+        buf = NULL;
         return -1;
     }
     int ret = ContextAppendWrite(context, buf, len);
     free(buf);
+    buf = NULL;
     return ret;
 }
 
@@ -137,10 +139,12 @@ int WriteStr(Context *context, const char *pStr)
     }
     if (snprintf_s(buf, len + 1, len, "%s%c", pStr, context->cSplit) < 0) {
         free(buf);
+        buf = NULL;
         return -1;
     }
     int ret = ContextAppendWrite(context, buf, len);
     free(buf);
+    buf = NULL;
     return ret;
 }
 
@@ -160,6 +164,7 @@ int WriteUStr(Context *context, const unsigned char *uStr, unsigned int len)
         pos = (i << 1);
         if (snprintf_s(buf + pos, inLen - pos, inLen - pos - 1, "%02x", uStr[i]) < 0) {
             free(buf);
+            buf = NULL;
             return -1;
         }
     }
@@ -167,6 +172,7 @@ int WriteUStr(Context *context, const unsigned char *uStr, unsigned int len)
     buf[inLen] = 0;
     int ret = ContextAppendWrite(context, buf, inLen);
     free(buf);
+    buf = NULL;
     return ret;
 }
 

@@ -29,6 +29,7 @@ StaInterface::~StaInterface()
     WIFI_LOGI("StaInterface::~StaInterface");
     if (pStaService != nullptr) {
         delete pStaService;
+        pStaService = nullptr;
     }
 }
 
@@ -40,6 +41,7 @@ extern "C" IStaService *Create(void)
 extern "C" void Destroy(IStaService *pservice)
 {
     delete pservice;
+    pservice = nullptr;
 }
 
 ErrCode StaInterface::EnableWifi()

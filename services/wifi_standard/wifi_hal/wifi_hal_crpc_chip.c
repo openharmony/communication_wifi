@@ -67,6 +67,7 @@ int RpcGetWifiChipIds(RpcServer *server, Context *context)
     }
     WriteEnd(context);
     free(chipIds);
+    chipIds = NULL;
     return 0;
 }
 
@@ -146,6 +147,7 @@ int RpcGetIface(RpcServer *server, Context *context)
     WriteEnd(context);
     if (pstr != NULL) {
         free(pstr);
+        pstr = NULL;
     }
     return 0;
 }
@@ -172,6 +174,7 @@ int RpcGetIfaceNames(RpcServer *server, Context *context)
     }
     WriteEnd(context);
     free(ifname);
+    ifname = NULL;
     return 0;
 }
 
@@ -199,6 +202,7 @@ int RpcRemoveIface(RpcServer *server, Context *context)
     WriteEnd(context);
     if (pstr != NULL) {
         free(pstr);
+        pstr = NULL;
     }
     return 0;
 }
@@ -243,6 +247,7 @@ int RpcGetSupportedComboModes(RpcServer *server, Context *context)
     }
     WriteEnd(context);
     free(modes);
+    modes = NULL;
     return 0;
 }
 
@@ -302,6 +307,7 @@ int RpcRequestFirmwareDebugDump(RpcServer *server, Context *context)
     }
     WriteEnd(context);
     free(bytes);
+    bytes = NULL;
     return 0;
 }
 

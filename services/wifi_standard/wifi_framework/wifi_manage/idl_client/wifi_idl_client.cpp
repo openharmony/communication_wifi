@@ -234,12 +234,15 @@ WifiErrorNo WifiIdlClient::Scan(const WifiScanParam &scanParam)
     }
     if (settings.freqs != nullptr) {
         free(settings.freqs);
+        settings.freqs = nullptr;
     }
     if (settings.hiddenSsid != nullptr) {
         for (int i = 0; i < settings.hiddenSsidSize; ++i) {
             free(settings.hiddenSsid[i]);
+            settings.hiddenSsid[i] = nullptr;
         }
         free(settings.hiddenSsid);
+        settings.hiddenSsid = nullptr;
     }
     return err;
 }
@@ -286,7 +289,7 @@ WifiErrorNo WifiIdlClient::QueryScanInfos(std::vector<InterScanInfo> &scanInfos)
         scanInfos.emplace_back(tmp);
     }
     free(results);
-    results = NULL;
+    results = nullptr;
     return WIFI_IDL_OPT_OK;
 }
 
@@ -337,18 +340,23 @@ WifiErrorNo WifiIdlClient::ReqStartPnoScan(const WifiPnoScanParam &scanParam)
     }
     if (settings.freqs != nullptr) {
         free(settings.freqs);
+        settings.freqs = nullptr;
     }
     if (settings.hiddenSsid != nullptr) {
         for (int i = 0; i < settings.hiddenSsidSize; ++i) {
             free(settings.hiddenSsid[i]);
+            settings.hiddenSsid[i] = nullptr;
         }
         free(settings.hiddenSsid);
+        settings.hiddenSsid = nullptr;
     }
     if (settings.savedSsid != nullptr) {
         for (int i = 0; i < settings.savedSsidSize; ++i) {
             free(settings.savedSsid[i]);
+            settings.savedSsid[i] = nullptr;
         }
         free(settings.savedSsid);
+        settings.savedSsid = nullptr;
     }
     return err;
 }
@@ -617,6 +625,7 @@ char **WifiIdlClient::ConVectorToCArrayString(const std::vector<std::string> &ve
             free(list[j]);
         }
         free(list);
+        list = nullptr;
         return nullptr;
     } else {
         return list;
@@ -652,14 +661,18 @@ WifiErrorNo WifiIdlClient::ReqSetRoamConfig(const WifiIdlRoamConfig &config)
     if (blocklist != nullptr) {
         for (int i = 0; i < blocksize; ++i) {
             free(blocklist[i]);
+            blocklist[i] = nullptr;
         }
         free(blocklist);
+        blocklist = nullptr;
     }
     if (trustlist != nullptr) {
         for (int i = 0; i < trustsize; ++i) {
             free(trustlist[i]);
+            trustlist[i] = nullptr;
         }
         free(trustlist);
+        trustlist = nullptr;
     }
     return err;
 }
@@ -1154,6 +1167,7 @@ WifiErrorNo WifiIdlClient::ReqP2pListNetworks(std::map<int, WifiP2pGroupInfo> &m
         mapGroups.insert(std::pair<int, WifiP2pGroupInfo>(infoList.infos[i].id, groupInfo));
     }
     free(infoList.infos);
+    infoList.infos = nullptr;
     return ret;
 }
 
@@ -1406,6 +1420,7 @@ WifiErrorNo WifiIdlClient::ReqP2pReqServiceDiscovery(
     char *pTlvs = (char *)calloc(size, sizeof(char));
     if (pTlvs == nullptr || Val2HexChar(tlvs, pTlvs, size) < 0) {
         free(pTlvs);
+        pTlvs = nullptr;
         return WIFI_IDL_OPT_FAILED;
     }
     char retBuf[WIFI_IDL_P2P_TMP_BUFFER_SIZE_128] = {0};
@@ -1414,6 +1429,7 @@ WifiErrorNo WifiIdlClient::ReqP2pReqServiceDiscovery(
         reqID = retBuf;
     }
     free(pTlvs);
+    pTlvs = nullptr;
     return ret;
 }
 
@@ -1452,11 +1468,15 @@ WifiErrorNo WifiIdlClient::ReqRespServiceDiscovery(
     unsigned size = (tlvs.size() << 1) + 1;
     char *pTlvs = (char *)calloc(size, sizeof(char));
     if (pTlvs == nullptr || Val2HexChar(tlvs, pTlvs, size) < 0) {
-        free(pTlvs);
+        if (pTlvs != nullptr) {
+            free(pTlvs);
+            pTlvs = nullptr;
+        }
         return WIFI_IDL_OPT_FAILED;
     }
     WifiErrorNo ret = P2pRespServerDiscovery(device.GetDeviceAddress().c_str(), frequency, dialogToken, pTlvs);
     free(pTlvs);
+    pTlvs = nullptr;
     return ret;
 }
 

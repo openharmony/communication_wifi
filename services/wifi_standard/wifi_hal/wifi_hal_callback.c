@@ -31,15 +31,18 @@ static void EmitEventCallbackMsg(WifiHalEventCallbackMsg *pCbkMsg, WifiHalEvent 
     if (server == NULL) {
         LOGE("Rpc server not exists!");
         free(pCbkMsg);
+        pCbkMsg = NULL;
         return;
     }
     if (PushBackCallbackMsg(event, pCbkMsg) != 0) {
         free(pCbkMsg);
+        pCbkMsg = NULL;
         return;
     }
     if (EmitEvent(server, event) < 0) {
         PopBackCallbackMsg(event);
         free(pCbkMsg);
+        pCbkMsg = NULL;
     }
     return;
 }
@@ -254,6 +257,7 @@ void P2pHalCbDeviceLost(const char *p2pDeviceAddress)
     if (strncpy_s(pCbkMsg->msg.connMsg.bssid, sizeof(pCbkMsg->msg.connMsg.bssid), p2pDeviceAddress,
         sizeof(pCbkMsg->msg.connMsg.bssid) - 1) != EOK) {
         free(pCbkMsg);
+        pCbkMsg = NULL;
         return;
     }
     EmitEventCallbackMsg(pCbkMsg, P2P_DEVICE_LOST_EVENT);
@@ -276,6 +280,7 @@ void P2pHalCbGoNegotiationRequest(const char *srcAddress, short passwordId)
     if (strncpy_s(pCbkMsg->msg.connMsg.bssid, sizeof(pCbkMsg->msg.connMsg.bssid), srcAddress,
         sizeof(pCbkMsg->msg.connMsg.bssid) - 1) != EOK) {
         free(pCbkMsg);
+        pCbkMsg = NULL;
         return;
     }
     EmitEventCallbackMsg(pCbkMsg, P2P_GO_NEGOTIATION_REQUEST_EVENT);
@@ -339,6 +344,7 @@ void P2pHalCbInvitationResult(const char *bssid, int status)
     if (strncpy_s(pCbkMsg->msg.invitaInfo.bssid, sizeof(pCbkMsg->msg.invitaInfo.bssid), bssid,
         sizeof(pCbkMsg->msg.invitaInfo.bssid) - 1) != EOK) {
         free(pCbkMsg);
+        pCbkMsg = NULL;
         return;
     }
     EmitEventCallbackMsg(pCbkMsg, P2P_INVITATION_RESULT_EVENT);
@@ -372,6 +378,7 @@ void P2pHalCbGroupFormationFailure(const char *reason)
     if (strncpy_s(pCbkMsg->msg.invitaInfo.bssid, sizeof(pCbkMsg->msg.invitaInfo.bssid), reason,
         sizeof(pCbkMsg->msg.invitaInfo.bssid) - 1) != EOK) {
         free(pCbkMsg);
+        pCbkMsg = NULL;
         return;
     }
     EmitEventCallbackMsg(pCbkMsg, P2P_GROUP_FORMATION_FAILURE_EVENT);
@@ -410,6 +417,7 @@ void P2pHalCbGroupRemoved(const char *groupIfName, int isGo)
     if (strncpy_s(pCbkMsg->msg.groupInfo.groupIfName, sizeof(pCbkMsg->msg.groupInfo.groupIfName), groupIfName,
         sizeof(pCbkMsg->msg.groupInfo.groupIfName) - 1) != EOK) {
         free(pCbkMsg);
+        pCbkMsg = NULL;
         return;
     }
     EmitEventCallbackMsg(pCbkMsg, P2P_GROUP_REMOVED_EVENT);
@@ -431,6 +439,7 @@ void P2pHalCbProvisionDiscoveryPbcRequest(const char *address)
     if (strncpy_s(pCbkMsg->msg.deviceInfo.srcAddress, sizeof(pCbkMsg->msg.deviceInfo.srcAddress), address,
         sizeof(pCbkMsg->msg.deviceInfo.srcAddress) - 1) != EOK) {
         free(pCbkMsg);
+        pCbkMsg = NULL;
         return;
     }
     EmitEventCallbackMsg(pCbkMsg, P2P_PROV_DISC_PBC_REQ_EVENT);
@@ -452,6 +461,7 @@ void P2pHalCbProvisionDiscoveryPbcResponse(const char *address)
     if (strncpy_s(pCbkMsg->msg.deviceInfo.srcAddress, sizeof(pCbkMsg->msg.deviceInfo.srcAddress), address,
         sizeof(pCbkMsg->msg.deviceInfo.srcAddress) - 1) != EOK) {
         free(pCbkMsg);
+        pCbkMsg = NULL;
         return;
     }
     EmitEventCallbackMsg(pCbkMsg, P2P_PROV_DISC_PBC_RSP_EVENT);
@@ -473,6 +483,7 @@ void P2pHalCbProvisionDiscoveryEnterPin(const char *address)
     if (strncpy_s(pCbkMsg->msg.deviceInfo.srcAddress, sizeof(pCbkMsg->msg.deviceInfo.srcAddress), address,
         sizeof(pCbkMsg->msg.deviceInfo.srcAddress) - 1) != EOK) {
         free(pCbkMsg);
+        pCbkMsg = NULL;
         return;
     }
     EmitEventCallbackMsg(pCbkMsg, P2P_PROV_DISC_ENTER_PIN_EVENT);
@@ -496,6 +507,7 @@ void P2pHalCbProvisionDiscoveryShowPin(const char *address, const char *pin)
         strncpy_s(pCbkMsg->msg.deviceInfo.deviceName, sizeof(pCbkMsg->msg.deviceInfo.deviceName), pin,
         sizeof(pCbkMsg->msg.deviceInfo.deviceName) - 1) != EOK) {
         free(pCbkMsg);
+        pCbkMsg = NULL;
         return;
     }
     EmitEventCallbackMsg(pCbkMsg, P2P_PROV_DISC_SHOW_PIN_EVENT);
@@ -542,6 +554,7 @@ void P2pHalCbServiceDiscoveryResponse(const HidlP2pServDiscRespInfo *info)
         unsigned len = strlen(info->tlvs) + 1;
         if (len == 0) {
             free(pCbkMsg);
+            pCbkMsg = NULL;
             return;
         }
         pCbkMsg->msg.serverInfo.tlvs = (char *)calloc(len, sizeof(char));
@@ -549,6 +562,7 @@ void P2pHalCbServiceDiscoveryResponse(const HidlP2pServDiscRespInfo *info)
             strncpy_s(pCbkMsg->msg.serverInfo.tlvs, len, info->tlvs, len - 1) != EOK) {
             free(pCbkMsg->msg.serverInfo.tlvs);
             free(pCbkMsg);
+            pCbkMsg = NULL;
             return;
         }
     }
@@ -571,6 +585,7 @@ void P2pHalCbStaConnectState(const char *p2pDeviceAddress, int state)
     if (strncpy_s(pCbkMsg->msg.deviceInfo.p2pDeviceAddress, sizeof(pCbkMsg->msg.deviceInfo.p2pDeviceAddress),
         p2pDeviceAddress, sizeof(pCbkMsg->msg.deviceInfo.p2pDeviceAddress) - 1) != EOK) {
         free(pCbkMsg);
+        pCbkMsg = NULL;
         return;
     }
     EmitEventCallbackMsg(pCbkMsg, ((state == 0) ? AP_STA_DISCONNECTED_EVENT : AP_STA_CONNECTED_EVENT));
@@ -605,6 +620,7 @@ void P2pHalCbServDiscReq(const HidlP2pServDiscReqInfo *info)
         unsigned len = strlen(info->tlvs) + 1;
         if (len == 0) {
             free(pCbkMsg);
+            pCbkMsg = NULL;
             return;
         }
         pCbkMsg->msg.serDiscReqInfo.tlvs = (char *)calloc(len, sizeof(char));
@@ -612,6 +628,7 @@ void P2pHalCbServDiscReq(const HidlP2pServDiscReqInfo *info)
             strncpy_s(pCbkMsg->msg.serDiscReqInfo.tlvs, len, info->tlvs, len - 1) != EOK) {
             free(pCbkMsg->msg.serDiscReqInfo.tlvs);
             free(pCbkMsg);
+            pCbkMsg = NULL;
             return;
         }
     }

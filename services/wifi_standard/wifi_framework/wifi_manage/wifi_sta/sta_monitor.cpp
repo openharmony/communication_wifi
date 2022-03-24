@@ -134,7 +134,7 @@ void StaMonitor::OnWpaSsidWrongKeyCallBack(int status)
 
 void StaMonitor::onWpaConnectionFullCallBack(int status)
 {
-    LOGI("OnWpaSsidWrongKeyCallBack() status:%d.\n", status);
+    LOGI("onWpaConnectionFullCallBack() status:%d.\n", status);
     if (pStaStateMachine == nullptr) {
         WIFI_LOGE("The statemachine pointer is null.");
         return;

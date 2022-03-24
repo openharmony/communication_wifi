@@ -128,6 +128,7 @@ static void *HostapdReceiveCallback(void *arg)
         DelCallbackMessage(p);
     }
     free(buf);
+    buf = NULL;
     LOGI("=====================hostapd thread exist=======================");
     return NULL;
 }
@@ -552,6 +553,7 @@ static int GetApStatus(StatusInfo *info)
     if (WpaCtrlCommand(g_hostapdHalDev->ctrlConn, "STATUS", buf, BUFSIZE_RECV) != 0) {
         LOGE("Status WpaCtrlCommand failed");
         free(buf);
+        buf = NULL;
         return -1;
     }
 
@@ -559,6 +561,7 @@ static int GetApStatus(StatusInfo *info)
     if (p == NULL) {
         LOGD("Status not find state result!");
         free(buf);
+        buf = NULL;
         return 0;
     }
     p += strlen("state=");  // skip state=
@@ -569,6 +572,7 @@ static int GetApStatus(StatusInfo *info)
     }
     info->state[pos] = 0;
     free(buf);
+    buf = NULL;
     return 0;
 }
 
@@ -585,6 +589,7 @@ static int ShowConnectedDevList(char *buf, int size)
     if (WpaCtrlCommand(g_hostapdHalDev->ctrlConn, "STA-FIRST", reqBuf, BUFSIZE_REQUEST) != 0) {
         LOGE("HostapdCliCmdListSta Failed");
         free(reqBuf);
+        reqBuf = NULL;
         return -1;
     }
     do {
@@ -598,6 +603,7 @@ static int ShowConnectedDevList(char *buf, int size)
             int staLen = strlen(reqBuf);
             if (bufLen + staLen + 1 >= size) {
                 free(reqBuf);
+                reqBuf = NULL;
                 return 0;
             }
             buf[bufLen++] = ',';
@@ -611,6 +617,7 @@ static int ShowConnectedDevList(char *buf, int size)
         }
     } while (WpaCtrlCommand(g_hostapdHalDev->ctrlConn, cmd, reqBuf, BUFSIZE_REQUEST) == 0);
     free(reqBuf);
+    reqBuf = NULL;
     return 0;
 }
 

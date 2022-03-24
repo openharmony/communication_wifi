@@ -40,6 +40,7 @@ int RpcRegisterEventCallback(RpcServer *server, Context *context)
     WriteInt(context, WIFI_HAL_SUCCESS);
     WriteEnd(context);
     free(events);
+    events = NULL;
     return 0;
 }
 
@@ -63,6 +64,7 @@ int RpcUnRegisterEventCallback(RpcServer *server, Context *context)
     WriteInt(context, WIFI_HAL_SUCCESS);
     WriteEnd(context);
     free(events);
+    events = NULL;
     return 0;
 }
 

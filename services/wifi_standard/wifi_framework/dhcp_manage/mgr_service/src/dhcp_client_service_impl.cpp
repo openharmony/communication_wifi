@@ -123,6 +123,7 @@ void DhcpClientServiceImpl::CheckTimeout()
                     curTime);
                 (*iterReq)->pResultNotify->OnFailed(DHCP_OPT_TIMEOUT, ifname, "get dhcp result timeout!");
                 delete *iterReq;
+                *iterReq = nullptr;
                 iterReq = itemNotify.second.erase(iterReq);
             } else {
                 ++iterReq;
@@ -180,6 +181,7 @@ void DhcpClientServiceImpl::DhcpResultHandle(uint32_t &second)
                 (*iterReq)->pResultNotify->OnFailed(DHCP_OPT_FAILED, ifname, "get dhcp result failed!");
             }
             delete *iterReq;
+            *iterReq = nullptr;
             iterReq = iterNotify->second.erase(iterReq);
         }
 

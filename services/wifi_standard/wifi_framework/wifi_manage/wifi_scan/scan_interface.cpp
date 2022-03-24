@@ -38,6 +38,7 @@ extern "C" IScanService *Create(void)
 extern "C" void Destroy(ScanInterface *scanInterface)
 {
     delete scanInterface;
+    scanInterface = nullptr;
 }
 
 ErrCode ScanInterface::Init()

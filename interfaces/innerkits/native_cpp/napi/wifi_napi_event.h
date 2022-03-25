@@ -109,8 +109,8 @@ public:
 private:
     ErrCode RegisterWifiEvents();
     bool IsEventSupport(const std::string& type);
-    void DeleteRegisterObj(std::vector<RegObj>& vecRegObjs, napi_value& handler);
-    void DeleteAllRegisterObj(std::vector<RegObj>& vecRegObjs);
+    void DeleteRegisterObj(const napi_env& env, std::vector<RegObj>& vecRegObjs, napi_value& handler);
+    void DeleteAllRegisterObj(const napi_env& env, std::vector<RegObj>& vecRegObjs);
 
     static bool isEventRegistered;
 };

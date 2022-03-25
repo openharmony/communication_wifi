@@ -433,6 +433,8 @@ static void Reboot(time_t timestamp)
             rebindTime = leaseTime * REBIND_SEC_MULTIPLE;
             LOGI("Reboot read lease file leaseTime:%{public}u, renewalTime:%{public}u, rebindTime:%{public}u",
                 leaseTime, renewalTime, rebindTime);
+            free(pkt);
+            return;
         }
     } else {
         LOGI("Reboot read lease file leaseTime option not found");

@@ -480,8 +480,7 @@ bool EventRegister::IsEventSupport(const std::string& type)
 
 void EventRegister::Register(const napi_env& env, const std::string& type, napi_value handler)
 {
-    WIFI_LOGI("Register event: %{public}s, env: %{public}p", type.c_str(), env);
-
+    WIFI_LOGI("Register event: %{public}s, env: %{private}p", type.c_str(), env);
     if (!IsEventSupport(type)) {
         WIFI_LOGE("Register type error or not support!");
         return;
@@ -504,41 +503,50 @@ void EventRegister::Register(const napi_env& env, const std::string& type, napi_
     }
 }
 
-void EventRegister::DeleteRegisterObj(std::vector<RegObj>& vecRegObjs, napi_value& handler)
+void EventRegister::DeleteRegisterObj(const napi_env& env, std::vector<RegObj>& vecRegObjs, napi_value& handler)
 {
     auto iter = vecRegObjs.begin();
     for (; iter != vecRegObjs.end();) {
-        napi_value handlerTemp = nullptr;
-        napi_get_reference_value(iter->m_regEnv, iter->m_regHanderRef, &handlerTemp);
-        bool isEqual = false;
-        napi_strict_equals(iter->m_regEnv, handlerTemp, handler, &isEqual);
-        if (isEqual) {
-            napi_delete_reference(iter->m_regEnv, iter->m_regHanderRef);
-            WIFI_LOGI("Delete register object ref.");
-            iter = vecRegObjs.erase(iter);
+        if (env == iter->m_regEnv) {
+            napi_value handlerTemp = nullptr;
+            napi_get_reference_value(iter->m_regEnv, iter->m_regHanderRef, &handlerTemp);
+            bool isEqual = false;
+            napi_strict_equals(iter->m_regEnv, handlerTemp, handler, &isEqual);
+            if (isEqual) {
+                napi_delete_reference(iter->m_regEnv, iter->m_regHanderRef);
+                WIFI_LOGI("Delete register object ref.");
+                iter = vecRegObjs.erase(iter);
+            } else {
+                ++iter;
+            }
         } else {
+            WIFI_LOGI("Unregister event, env is not equal %{private}p, : %{private}p", env, iter->m_regEnv);
             ++iter;
         }
     }
 }
 
-void EventRegister::DeleteAllRegisterObj(std::vector<RegObj>& vecRegObjs)
+void EventRegister::DeleteAllRegisterObj(const napi_env& env, std::vector<RegObj>& vecRegObjs)
 {
-    for (auto& each : vecRegObjs) {
-        napi_delete_reference(each.m_regEnv, each.m_regHanderRef);
+    auto iter = vecRegObjs.begin();
+    for (; iter != vecRegObjs.end();) {
+        if (env == iter->m_regEnv) {
+            napi_delete_reference(iter->m_regEnv, iter->m_regHanderRef);
+            iter = vecRegObjs.erase(iter);
+        } else {
+            WIFI_LOGI("Unregister all event, env is not equal %{private}p, : %{private}p", env, iter->m_regEnv);
+            ++iter;
+        }
     }
-    vecRegObjs.clear();
 }
 
 void EventRegister::Unregister(const napi_env& env, const std::string& type, napi_value handler)
 {
-    WIFI_LOGI("Unregister event: %{public}s, env: %{public}p", type.c_str(), env);
-
+    WIFI_LOGI("Unregister event: %{public}s, env: %{private}p", type.c_str(), env);
     if (!IsEventSupport(type)) {
         WIFI_LOGE("Unregister type error or not support!");
         return;
     }
-
     std::unique_lock<std::shared_mutex> guard(g_regInfoMutex);
     auto iter = g_eventRegisterInfo.find(type);
     if (iter == g_eventRegisterInfo.end()) {
@@ -546,10 +554,10 @@ void EventRegister::Unregister(const napi_env& env, const std::string& type, nap
         return;
     }
     if (handler != nullptr) {
-        DeleteRegisterObj(iter->second, handler);
+        DeleteRegisterObj(env, iter->second, handler);
     } else {
-        WIFI_LOGW("All callback is unsubscribe for event: %{public}s", type.c_str());
-        DeleteAllRegisterObj(iter->second);
+        WIFI_LOGW("Unregister all relevant subscribe for: %{public}s", type.c_str());
+        DeleteAllRegisterObj(env, iter->second);
     }
     if (iter->second.empty()) {
         g_eventRegisterInfo.erase(iter);

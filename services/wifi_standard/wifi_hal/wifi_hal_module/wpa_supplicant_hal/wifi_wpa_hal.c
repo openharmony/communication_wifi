@@ -185,6 +185,7 @@ static void DealServiceDiscRespEvent(char *buf)
         if (index == P2P_SERVICE_INFO_FIRST_SECTION) {
             if (strncpy_s(info.srcAddress, sizeof(info.srcAddress), token, strlen(token)) != EOK) {
                 free(info.tlvs);
+                info.tlvs = NULL;
                 return;
             }
         } else if (index == P2P_SERVICE_INFO_SECOND_SECTION) {
@@ -193,6 +194,7 @@ static void DealServiceDiscRespEvent(char *buf)
             unsigned len = strlen(token) + 1;
             if (len == 0) {
                 free(info.tlvs);
+                info.tlvs = NULL;
                 return;
             }
             if (info.tlvs != NULL) {
@@ -202,6 +204,7 @@ static void DealServiceDiscRespEvent(char *buf)
             info.tlvs = (char *)calloc(len, sizeof(char));
             if (info.tlvs == NULL || strncpy_s(info.tlvs, len, token, len - 1) != EOK) {
                 free(info.tlvs);
+                info.tlvs = NULL;
                 return;
             }
         }
@@ -210,6 +213,7 @@ static void DealServiceDiscRespEvent(char *buf)
     }
     P2pHalCbServiceDiscoveryResponse(&info);
     free(info.tlvs);
+    info.tlvs = NULL;
     return;
 }
 
@@ -434,6 +438,7 @@ static void DealP2pServDiscReqEvent(char *buf)
         } else if (index == P2P_SERVICE_DISC_REQ_TWO) {
             if (strncpy_s(info.mac, sizeof(info.mac), token, strlen(token)) != EOK) {
                 free(info.tlvs);
+                info.tlvs = NULL;
                 return;
             }
         } else if (index == P2P_SERVICE_DISC_REQ_THREE) {
@@ -444,6 +449,7 @@ static void DealP2pServDiscReqEvent(char *buf)
             unsigned len = strlen(token) + 1;
             if (len == 0) {
                 free(info.tlvs);
+                info.tlvs = NULL;
                 return;
             }
             if (info.tlvs != NULL) {
@@ -453,6 +459,7 @@ static void DealP2pServDiscReqEvent(char *buf)
             info.tlvs = (char *)calloc(len, sizeof(char));
             if (info.tlvs == NULL || strncpy_s(info.tlvs, len, token, len - 1) != EOK) {
                 free(info.tlvs);
+                info.tlvs = NULL;
                 return;
             }
         }
@@ -461,6 +468,7 @@ static void DealP2pServDiscReqEvent(char *buf)
     }
     P2pHalCbServDiscReq(&info);
     free(info.tlvs);
+    info.tlvs = NULL;
     return;
 }
 
@@ -674,6 +682,7 @@ static void *WpaReceiveCallback(void *arg)
         WpaCallBackFunc(p);
     }
     free(buf);
+    buf = NULL;
     LOGI("=====================thread exist=======================");
     return NULL;
 }
@@ -745,6 +754,7 @@ static int WpaCliAddIface(WifiWpaInterface *p, const AddInterfaceArgv *argv)
     if (snprintf_s(cmd, sizeof(cmd), sizeof(cmd) - 1, "INTERFACE_ADD %s\t%s", argv->name, argv->confName) < 0 ||
         WpaCliCmd(cmd, buf, sizeof(buf)) != 0) {
         free(info);
+        info = NULL;
         LOGI("WpaCliAddIface buf: %{public}s", buf);
         return -1;
     }
@@ -785,6 +795,7 @@ static int WpaCliRemoveIface(WifiWpaInterface *p, const char *name)
         prev->next = info->next;
     }
     free(info);
+    info = NULL;
     return 0;
 }
 

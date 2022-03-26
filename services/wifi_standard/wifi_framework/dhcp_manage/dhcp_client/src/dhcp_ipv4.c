@@ -302,6 +302,7 @@ static struct DhcpPacket *ReadLease(void)
     close(fd);
     if (rBytes <= 0 || (size_t)rBytes < offsetof(struct DhcpPacket, options)) {
         free(dhcp);
+        dhcp = NULL;
         return NULL;
     }
 
@@ -384,6 +385,7 @@ static int DhcpReboot(uint32_t transid, uint32_t reqip)
     if (pReqIp != NULL) {
         LOGI("DhcpReboot() broadcast req packet, reqip: host %{private}u->%{private}s.", ntohl(reqip), pReqIp);
         free(pReqIp);
+        pReqIp = NULL;
     }
     return SendToDhcpPacket(&packet, INADDR_ANY, INADDR_BROADCAST, g_cltCnf->ifaceIndex, (uint8_t *)MAC_BCAST_ADDR);
 }
@@ -397,6 +399,7 @@ void SendReboot(struct DhcpPacket *p, time_t timestamp)
     g_requestedIp4 = p->yiaddr;
 
     free(p);
+    p = NULL;
 
     g_transID = GetTransId();
     g_dhcp4State = DHCP_STATE_INITREBOOT;
@@ -425,6 +428,7 @@ static void Reboot(time_t timestamp)
         if (timestamp == (time_t)-1 || timestamp < st.st_mtime || (time_t)leaseTime < timestamp - st.st_mtime) {
             LOGI("Reboot read lease file leaseTime expire");
             free(pkt);
+            pkt = NULL;
             return;
         } else {
             interval = timestamp - st.st_mtime;
@@ -440,6 +444,7 @@ static void Reboot(time_t timestamp)
     } else {
         LOGI("Reboot read lease file leaseTime option not found");
         free(pkt);
+        pkt = NULL;
         return;
     }
 
@@ -594,6 +599,7 @@ static void DhcpOfferPacketHandle(uint8_t type, const struct DhcpPacket *packet,
             ntohl(g_requestedIp4),
             pReqIp);
         free(pReqIp);
+        pReqIp = NULL;
     }
     char *pSerIp = Ip4IntConToStr(g_serverIp4, false);
     if (pSerIp != NULL) {
@@ -601,6 +607,7 @@ static void DhcpOfferPacketHandle(uint8_t type, const struct DhcpPacket *packet,
             ntohl(g_serverIp4),
             pSerIp);
         free(pSerIp);
+        pSerIp = NULL;
     }
 
     /* Receive dhcp offer packet finished, next send dhcp request packet. */
@@ -828,9 +835,11 @@ static int SyncDhcpResult(const struct DhcpPacket *packet, struct DhcpResult *re
         if (strncpy_s(result->strOptVendor, DHCP_FILE_MAX_BYTES, pVendor, DHCP_FILE_MAX_BYTES - 1) != EOK) {
             LOGE("SyncDhcpResult() error, strncpy_s pVendor failed!");
             free(pVendor);
+            pVendor = NULL;
             return DHCP_OPT_FAILED;
         }
         free(pVendor);
+        pVendor = NULL;
     }
 
     /* Set the specified client process interface network info. */
@@ -891,9 +900,11 @@ static void ParseDhcpAckPacket(const struct DhcpPacket *packet, time_t timestamp
             LOGI("ParseDhcpAckPacket() recv DHCP_ACK 54, serid: %{private}u->%{private}s.", u32Data, pSerIp);
             if (strncpy_s(dhcpResult.strOptServerId, INET_ADDRSTRLEN, pSerIp, INET_ADDRSTRLEN - 1) != EOK) {
                 free(pSerIp);
+                pSerIp = NULL;
                 return;
             }
             free(pSerIp);
+            pSerIp = NULL;
         }
     }
 
@@ -1255,11 +1266,13 @@ int DhcpRequest(uint32_t transid, uint32_t reqip, uint32_t servip)
     if (pReqIp != NULL) {
         LOGI("DhcpRequest() broadcast req packet, reqip: host %{private}u->%{private}s.", ntohl(reqip), pReqIp);
         free(pReqIp);
+        pReqIp = NULL;
     }
     char *pSerIp = Ip4IntConToStr(servip, false);
     if (pSerIp != NULL) {
         LOGI("DhcpRequest() broadcast req packet, servIp: host %{private}u->%{private}s.", ntohl(servip), pSerIp);
         free(pSerIp);
+        pSerIp = NULL;
     }
     return SendToDhcpPacket(&packet, INADDR_ANY, INADDR_BROADCAST, g_cltCnf->ifaceIndex, (uint8_t *)MAC_BCAST_ADDR);
 }

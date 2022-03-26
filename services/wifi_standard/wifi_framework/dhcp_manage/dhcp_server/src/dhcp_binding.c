@@ -107,9 +107,11 @@ static void ReleaseStrings(char **strs)
     int i = 0;
     while (strs[i] != NULL) {
         free(strs[i]);
+        strs[i] = NULL;
         ++i;
     }
     free(strs);
+    strs = NULL;
     return;
 }
 

@@ -30,6 +30,7 @@ WifiBaseHalInterface::~WifiBaseHalInterface()
 {
     if (mIdlClient != nullptr) {
         delete mIdlClient;
+        mIdlClient = nullptr;
     }
 }
 

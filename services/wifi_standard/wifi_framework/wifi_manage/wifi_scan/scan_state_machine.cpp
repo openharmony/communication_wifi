@@ -52,47 +52,58 @@ ScanStateMachine::~ScanStateMachine()
 
     if (initState != nullptr) {
         delete initState;
+        initState = nullptr;
     }
 
     if (hardwareReadyState != nullptr) {
         delete hardwareReadyState;
+        hardwareReadyState = nullptr;
     }
 
     if (commonScanState != nullptr) {
         delete commonScanState;
+        commonScanState = nullptr;
     }
 
     if (commonScanUnworkedState != nullptr) {
         delete commonScanUnworkedState;
+        commonScanUnworkedState = nullptr;
     }
 
     if (commonScanningState != nullptr) {
         delete commonScanningState;
+        commonScanningState = nullptr;
     }
 
     if (pnoScanState != nullptr) {
         delete pnoScanState;
+        pnoScanState = nullptr;
     }
 
     if (pnoScanHardwareState != nullptr) {
         delete pnoScanHardwareState;
+        pnoScanHardwareState = nullptr;
     }
     StopPnoScanHardware();
 
     if (commonScanAfterPnoState != nullptr) {
         delete commonScanAfterPnoState;
+        commonScanAfterPnoState = nullptr;
     }
 
     if (pnoScanSoftwareState != nullptr) {
         delete pnoScanSoftwareState;
+        pnoScanSoftwareState = nullptr;
     }
 
     if (pnoSwScanFreeState != nullptr) {
         delete pnoSwScanFreeState;
+        pnoSwScanFreeState = nullptr;
     }
 
     if (pnoSwScanningState != nullptr) {
         delete pnoSwScanningState;
+        pnoSwScanningState = nullptr;
     }
 }
 

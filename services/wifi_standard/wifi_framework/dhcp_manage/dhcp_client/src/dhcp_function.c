@@ -286,6 +286,7 @@ int SetLocalInterface(const char *ifname, uint32_t ifaddr4)
     }
     LOGI("SetLocalInterface() %{public}s, ifaddr4:%{private}u -> %{private}s.", ifname, ifaddr4, cIp);
     free(cIp);
+    cIp = NULL;
 
     int fd;
     struct ifreq ifr;

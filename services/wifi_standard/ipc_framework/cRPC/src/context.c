@@ -31,12 +31,14 @@ Context *CreateContext(int capacity)
     context->szRead = (char *)calloc(capacity, sizeof(char));
     if (context->szRead == NULL) {
         free(context);
+        context = NULL;
         return NULL;
     }
     context->szWrite = (char *)calloc(capacity, sizeof(char));
     if (context->szWrite == NULL) {
         free(context->szRead);
         free(context);
+        context = NULL;
         return NULL;
     }
     context->cSplit = '\t';
@@ -54,6 +56,7 @@ void ReleaseContext(Context *context)
         free(context->szRead);
         free(context->szWrite);
         free(context);
+        context = NULL;
     }
 }
 
@@ -81,11 +84,13 @@ static int ExpandReadCache(Context *context, int len)
         }
         if (memmove_s(p, capacity, context->szRead, context->rCapacity) != EOK) {
             free(p);
+            p = NULL;
             return -1;
         }
         if (context->rBegin > context->rEnd &&
             memmove_s(p + context->rCapacity, context->rCapacity, p, context->rEnd) != EOK) {
             free(p);
+            p = NULL;
             return -1;
         }
         char *pFree = context->szRead;
@@ -95,6 +100,7 @@ static int ExpandReadCache(Context *context, int len)
         }
         context->rCapacity = capacity;
         free(pFree);
+        pFree = NULL;
     }
     return 0;
 }
@@ -119,15 +125,18 @@ static int ExpandWriteCache(Context *context, int len)
         }
         if (context->wCapacity < 0) {
             free(p);
+            p = NULL;
             return -1;
         }
         if (memmove_s(p, capacity, context->szWrite, context->wCapacity) != EOK) {
             free(p);
+            p = NULL;
             return -1;
         }
         if (context->wBegin > context->wEnd &&
             memmove_s(p + context->wCapacity, context->wCapacity, p, context->wEnd) != EOK) {
             free(p);
+            p = NULL;
             return -1;
         }
         char *pFree = context->szWrite;
@@ -137,6 +146,7 @@ static int ExpandWriteCache(Context *context, int len)
         }
         context->wCapacity = capacity;
         free(pFree);
+        pFree = NULL;
     }
     return 0;
 }

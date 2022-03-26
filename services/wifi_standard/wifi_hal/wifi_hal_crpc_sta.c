@@ -83,11 +83,14 @@ int RpcStartScan(RpcServer *server, Context *context)
     if (setting.hiddenSsid != NULL) {
         for (int i = 0; i < setting.hiddenSsidSize; ++i) {
             free(setting.hiddenSsid[i]);
+            setting.hiddenSsid[i] = NULL;
         }
         free(setting.hiddenSsid);
+        setting.hiddenSsid = NULL;
     }
     if (setting.freqs != NULL) {
         free(setting.freqs);
+        setting.freqs = NULL;
     }
     return ret;
 }
@@ -132,6 +135,7 @@ int RpcGetScanInfos(RpcServer *server, Context *context)
     }
     WriteEnd(context);
     free(results);
+    results = NULL;
     return 0;
 }
 
@@ -184,17 +188,22 @@ int RpcStartPnoScan(RpcServer *server, Context *context)
     if (setting.hiddenSsid != NULL) {
         for (int i = 0; i < setting.hiddenSsidSize; ++i) {
             free(setting.hiddenSsid[i]);
+            setting.hiddenSsid[i] = NULL;
         }
         free(setting.hiddenSsid);
+        setting.hiddenSsid = NULL;
     }
     if (setting.savedSsid != NULL) {
         for (int i = 0; i < setting.savedSsidSize; ++i) {
             free(setting.savedSsid[i]);
+            setting.savedSsid[i] = NULL;
         }
         free(setting.savedSsid);
+        setting.savedSsid = NULL;
     }
     if (setting.freqs != NULL) {
         free(setting.freqs);
+        setting.freqs = NULL;
     }
 
     return ret;
@@ -305,6 +314,7 @@ int RpcGetDeviceMacAddress(RpcServer *server, Context *context)
     }
     WriteEnd(context);
     free(mac);
+    mac = NULL;
     return 0;
 }
 
@@ -333,6 +343,7 @@ int RpcGetFrequencies(RpcServer *server, Context *context)
     }
     WriteEnd(context);
     free(frequencies);
+    frequencies = NULL;
     return 0;
 }
 
@@ -352,6 +363,7 @@ int RpcSetAssocMacAddr(RpcServer *server, Context *context)
     }
     if (ReadUStr(context, mac, len) != 0) {
         free(mac);
+        mac = NULL;
         return -1;
     }
     WifiErrorNo err = SetAssocMacAddr(mac, maxSize);
@@ -452,17 +464,21 @@ int RpcRunCmd(RpcServer *server, Context *context)
     int bufsize = 0;
     if (ReadInt(context, &cmdid) < 0 || ReadInt(context, &bufsize) < 0 || bufsize < 0) {
         free(pIfName);
+        pIfName = NULL;
         return -1;
     }
     int len = bufsize + 1;
     unsigned char *buf = (unsigned char *)calloc(len, sizeof(unsigned char));
     if (buf == NULL) {
         free(pIfName);
+        pIfName = NULL;
         return -1;
     }
     if (ReadUStr(context, buf, len) != 0) {
         free(pIfName);
         free(buf);
+        pIfName = NULL;
+        buf = NULL;
         return -1;
     }
     WifiErrorNo err = RunCmd((pIfName == NULL) ? ifname : pIfName, cmdid, buf, bufsize);
@@ -471,6 +487,8 @@ int RpcRunCmd(RpcServer *server, Context *context)
     WriteEnd(context);
     free(pIfName);
     free(buf);
+    pIfName = NULL;
+    buf = NULL;
     return 0;
 }
 
@@ -592,6 +610,7 @@ int RpcSetNetwork(RpcServer *server, Context *context)
     WriteInt(context, err);
     WriteEnd(context);
     free(confs);
+    confs = NULL;
     return 0;
 }
 
@@ -710,8 +729,10 @@ static char **ReadRoamBlockList(Context *context, int size)
     if (i < size) {
         for (int j = 0; j <= i; ++j) {
             free(list[j]);
+            list[j] = NULL;
         }
         free(list);
+        list = NULL;
         return NULL;
     } else {
         return list;
@@ -758,14 +779,18 @@ int RpcSetRoamConfig(RpcServer *server, Context *context)
     if (blocklist != NULL) {
         for (int i = 0; i < blocksize; ++i) {
             free(blocklist[i]);
+            blocklist[i] = NULL;
         }
         free(blocklist);
+        blocklist = NULL;
     }
     if (trustlist != NULL) {
         for (int i = 0; i < size; ++i) {
             free(trustlist[i]);
+            trustlist[i] = NULL;
         }
         free(trustlist);
+        trustlist = NULL;
     }
     return ret;
 }
@@ -849,6 +874,7 @@ int RpcGetNetworkList(RpcServer *server, Context *context)
     }
     WriteEnd(context);
     free(infos);
+    infos = NULL;
     return 0;
 }
 

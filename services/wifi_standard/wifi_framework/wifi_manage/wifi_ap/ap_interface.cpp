@@ -39,6 +39,7 @@ extern "C" IApService *Create(void)
 extern "C" void Destroy(IApService *pservice)
 {
     delete pservice;
+    pservice = nullptr;
 }
 ErrCode ApInterface::EnableHotspot()
 {

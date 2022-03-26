@@ -307,6 +307,7 @@ HashNode *HashCreateNode(HashTable *table, uintptr_t key, uintptr_t value, HashN
         free((void *)node->key);
         free((void *)node->value);
         free(node);
+        node = NULL;
         return 0;
     }
     node->next = next;
@@ -327,6 +328,7 @@ void DestroyHashNode(HashNode *node)
     free((void *)node->key);
     free((void *)node->value);
     free(node);
+    node = NULL;
 }
 
 int HashAdjustCapacity(HashTable *table)
@@ -367,6 +369,7 @@ int Resize(HashTable *table, size_t newSize)
     }
     HashRehash(table, old, oldSize);
     free(old);
+    old = NULL;
     return HASH_SUCCESS;
 }
 

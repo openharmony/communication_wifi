@@ -54,10 +54,12 @@ ScanService::~ScanService()
 
     if (pScanMonitor != nullptr) {
         delete pScanMonitor;
+        pScanMonitor = nullptr;
     }
 
     if (pScanStateMachine != nullptr) {
         delete pScanStateMachine;
+        pScanStateMachine = nullptr;
     }
 }
 

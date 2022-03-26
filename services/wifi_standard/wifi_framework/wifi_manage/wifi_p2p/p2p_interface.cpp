@@ -54,6 +54,7 @@ extern "C" IP2pService *Create(void)
 extern "C" void Destroy(IP2pService *pservice)
 {
     delete pservice;
+    pservice = nullptr;
 }
 
 ErrCode P2pInterface::EnableP2p()

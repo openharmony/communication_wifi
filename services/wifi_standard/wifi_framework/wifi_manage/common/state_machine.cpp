@@ -31,6 +31,7 @@ StateMachine::~StateMachine()
     LOGD("StateMachine::~StateMachine");
     if (pStateMachineHandler != nullptr) {
         delete pStateMachineHandler;
+        pStateMachineHandler = nullptr;
     }
 }
 
@@ -474,6 +475,7 @@ void StateMachineHandler::ReleaseDelayedMessages()
         InternalMessage *curMsg = mDelayedMessages[i];
         if (curMsg != nullptr) {
             delete curMsg;
+            curMsg = nullptr;
         }
     }
     mDelayedMessages.clear();

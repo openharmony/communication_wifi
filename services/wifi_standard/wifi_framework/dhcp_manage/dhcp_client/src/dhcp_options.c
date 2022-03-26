@@ -299,6 +299,7 @@ char *GetDhcpOptionString(const struct DhcpPacket *packet, int code)
     if (s) {
         if (memcpy_s(s, len + 1, p, len) != EOK) {
             free(s);
+            s = NULL;
             return NULL;
         }
         s[len] = '\0';

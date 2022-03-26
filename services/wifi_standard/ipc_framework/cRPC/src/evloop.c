@@ -36,6 +36,7 @@ EventLoop *CreateEventLoop(int size)
         evLoop->epfd = -1;
         if (size <= 0) {
             free(evLoop);
+            evLoop = NULL;
             return NULL;
         }
         evLoop->fdMasks = (FdMask *)calloc(size, sizeof(FdMask));
@@ -62,6 +63,7 @@ EventLoop *CreateEventLoop(int size)
         free(evLoop->epEvents);
     }
     free(evLoop);
+    evLoop = NULL;
     return NULL;
 }
 
@@ -81,6 +83,7 @@ void DestroyEventLoop(EventLoop *loop)
         free(loop->epEvents);
     }
     free(loop);
+    loop = NULL;
     return;
 }
 

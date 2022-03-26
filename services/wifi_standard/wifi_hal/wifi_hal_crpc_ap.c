@@ -87,6 +87,7 @@ int RpcGetStaInfos(RpcServer *server, Context *context)
     }
     WriteEnd(context);
     free(infos);
+    infos = NULL;
     return 0;
 }
 
@@ -122,6 +123,7 @@ int RpcSetMacFilter(RpcServer *server, Context *context)
     }
     if (ReadUStr(context, mac, len) != 0) {
         free(mac);
+        mac = NULL;
         return -1;
     }
     WifiErrorNo err = SetMacFilter(mac, lenMac);
@@ -129,6 +131,7 @@ int RpcSetMacFilter(RpcServer *server, Context *context)
     WriteInt(context, err);
     WriteEnd(context);
     free(mac);
+    mac = NULL;
     return 0;
 }
 
@@ -148,6 +151,7 @@ int RpcDelMacFilter(RpcServer *server, Context *context)
     }
     if (ReadUStr(context, mac, len) != 0) {
         free(mac);
+        mac = NULL;
         return -1;
     }
     WifiErrorNo err = DelMacFilter(mac, lenMac);
@@ -155,6 +159,7 @@ int RpcDelMacFilter(RpcServer *server, Context *context)
     WriteInt(context, err);
     WriteEnd(context);
     free(mac);
+    mac = NULL;
     return 0;
 }
 
@@ -175,6 +180,7 @@ int RpcDisassociateSta(RpcServer *server, Context *context)
 
     if (ReadUStr(context, mac, len) != 0) {
         free(mac);
+        mac = NULL;
         return -1;
     }
     WifiErrorNo err = DisassociateSta(mac, lenMac);
@@ -182,6 +188,7 @@ int RpcDisassociateSta(RpcServer *server, Context *context)
     WriteInt(context, err);
     WriteEnd(context);
     free(mac);
+    mac = NULL;
     return 0;
 }
 
@@ -213,5 +220,6 @@ int RpcGetValidFrequenciesForBand(RpcServer *server, Context *context)
     }
     WriteEnd(context);
     free(frequencies);
+    frequencies = NULL;
     return 0;
 }

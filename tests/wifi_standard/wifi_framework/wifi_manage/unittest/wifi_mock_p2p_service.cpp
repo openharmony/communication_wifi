@@ -429,6 +429,7 @@ extern "C" IP2pService *Create(void)
 extern "C" void Destroy(IP2pService *p)
 {
     delete p;
+    p = nullptr;
 }
 }  // namespace Wifi
 }  // namespace OHOS

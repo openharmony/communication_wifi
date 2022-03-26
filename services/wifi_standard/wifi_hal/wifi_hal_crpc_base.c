@@ -30,6 +30,7 @@ int *ReadIntArray(Context *context, int size)
     for (int i = 0; i < size; ++i) {
         if (ReadInt(context, pArray + i) < 0) {
             free(pArray);
+            pArray = NULL;
             return NULL;
         }
     }
@@ -62,8 +63,10 @@ char **ReadCharArray(Context *context, int size)
     if (i < size) {
         for (int j = 0; j < size; ++j) {
             free(pArray[j]);
+            pArray[j] = NULL;
         }
         free(pArray);
+        pArray = NULL;
         return NULL;
     }
     return pArray;
@@ -90,6 +93,7 @@ int RpcGetName(RpcServer *server, Context *context)
     }
     WriteEnd(context);
     free(ifname);
+    ifname = NULL;
     return 0;
 }
 

@@ -79,6 +79,7 @@ void DestroyHashTable(HashTable *p)
     }
     free(p->list);
     free(p);
+    p = NULL;
 }
 
 static int RebuildHashTable(HashTable *p)
@@ -88,6 +89,9 @@ static int RebuildHashTable(HashTable *p)
     }
     int slot = (p->slots << 1); /* double size */
     slot = CalcNextPrime(slot);
+    if (slot <= 0) {
+        return -1;
+    }
     ListNode **new_list = (ListNode **)calloc(slot, sizeof(ListNode *));
     if (new_list == NULL) {
         LOGE("rebuild hash table calloc failed!");
@@ -185,6 +189,7 @@ void DeleteHashTable(HashTable *p, const Context *context)
             q->next = t->next;
         }
         free(t);
+        t = NULL;
         p->size -= 1;
     }
     return;

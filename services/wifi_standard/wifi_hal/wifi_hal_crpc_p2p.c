@@ -159,6 +159,7 @@ int RpcP2pGetDeviceAddress(RpcServer *server, Context *context)
     }
     WriteEnd(context);
     free(address);
+    address = NULL;
     return 0;
 }
 
@@ -243,6 +244,7 @@ int RpcP2pSetupWpsPin(RpcServer *server, Context *context)
     }
     WriteEnd(context);
     free(pResult);
+    pResult = NULL;
     return 0;
 }
 
@@ -285,6 +287,7 @@ int RpcP2pListNetworks(RpcServer *server, Context *context)
     }
     WriteEnd(context);
     free(infoList.infos);
+    infoList.infos = NULL;
     return 0;
 }
 
@@ -647,11 +650,13 @@ int RpcP2pReqServiceDiscovery(RpcServer *server, Context *context)
     int retSize = 0;
     if (ReadInt(context, &retSize) < 0 || retSize <= 0) {
         free(pDiscoverInfo);
+        pDiscoverInfo = NULL;
         return -1;
     }
     char *pRetBuf = (char *)calloc(retSize, sizeof(char));
     if (pRetBuf == NULL) {
         free(pDiscoverInfo); /* free(NULL) is ok, so here no need to judge pDiscoverInfo != NULL */
+        pDiscoverInfo = NULL;
         return -1;
     }
     WifiErrorNo err =
@@ -663,7 +668,9 @@ int RpcP2pReqServiceDiscovery(RpcServer *server, Context *context)
     }
     WriteEnd(context);
     free(pRetBuf);
+    pRetBuf = NULL;
     free(pDiscoverInfo);
+    pDiscoverInfo = NULL;
     return 0;
 }
 
@@ -726,6 +733,7 @@ int RpcP2pRespServerDiscovery(RpcServer *server, Context *context)
     WriteInt(context, err);
     WriteEnd(context);
     free(info.tlvs);
+    info.tlvs = NULL;
     return 0;
 }
 
@@ -812,6 +820,7 @@ int RpcP2pGetFrequencies(RpcServer *server, Context *context)
     }
     WriteEnd(context);
     free(frequencies);
+    frequencies = NULL;
     return 0;
 }
 
@@ -845,6 +854,7 @@ int RpcP2pSetGroupConfig(RpcServer *server, Context *context)
     WriteInt(context, err);
     WriteEnd(context);
     free(confs);
+    confs = NULL;
     return 0;
 }
 
@@ -882,6 +892,7 @@ int RpcP2pGetGroupConfig(RpcServer *server, Context *context)
     }
     WriteEnd(context);
     free(confs);
+    confs = NULL;
     return 0;
 }
 

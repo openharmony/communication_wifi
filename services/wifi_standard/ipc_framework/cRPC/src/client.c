@@ -55,6 +55,7 @@ static char *RpcClientReadMsg(RpcClient *client)
     if (!client->threadRunFlag) {
         if (buff != NULL) {
             free(buff);
+            buff = NULL;
         }
         return NULL;
     }
@@ -90,6 +91,7 @@ static void RpcClientDealReadMsg(RpcClient *client, char *buff)
         client->context->nSize = strlen(buff);
         OnTransact(client->context);
         free(buff);
+        buff = NULL;
     }
     return;
 }
@@ -132,6 +134,7 @@ RpcClient *CreateRpcClient(const char *path)
     if (client->context == NULL) {
         close(fd);
         free(client);
+        client = NULL;
         return NULL;
     }
     client->context->fd = fd;
@@ -152,6 +155,7 @@ RpcClient *CreateRpcClient(const char *path)
         ReleaseContext(client->context);
         close(fd);
         free(client);
+        client = NULL;
         return NULL;
     }
     signal(SIGPIPE, SIG_IGN);
@@ -172,6 +176,7 @@ void ReleaseRpcClient(RpcClient *client)
         close(client->context->fd);
         ReleaseContext(client->context);
         free(client);
+        client = NULL;
     }
     return;
 }

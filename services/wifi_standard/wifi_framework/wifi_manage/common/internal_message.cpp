@@ -311,6 +311,7 @@ void MessageManage::ReclaimMsg(InternalMessage *m)
     }
 
     delete m;
+    m = nullptr;
     return;
 }
 

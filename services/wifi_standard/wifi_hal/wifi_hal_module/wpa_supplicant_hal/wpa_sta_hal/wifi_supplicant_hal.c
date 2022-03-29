@@ -645,11 +645,28 @@ static int ConcatScanSetting(const ScanSettings *settings, char *buff, int len)
     return 0;
 }
 
+static int WpaCliCmdBssFlush(WifiWpaStaInterface *this)
+{
+    if (this == NULL) {
+        return -1;
+    }
+    char buf[REPLY_BUF_SMALL_LENGTH] = {0};
+    char cmd[CMD_BUFFER_SIZE] = {0};
+    if (snprintf_s(cmd, sizeof(cmd), sizeof(cmd) - 1, "IFNAME=%s BSS_FLUSH 0", this->ifname) < 0) {
+        LOGE("snprintf err");
+        return -1;
+    }
+    return WpaCliCmd(cmd, buf, sizeof(buf));
+}
+
 static int WpaCliCmdScan(WifiWpaStaInterface *this, const ScanSettings *settings)
 {
     if (this == NULL) {
         return -1;
     }
+
+    /* Invalidate expired scan results */
+    WpaCliCmdBssFlush(this);
     unsigned len = CMD_BUFFER_SIZE;
     if (settings != NULL) {
         unsigned expectLen = strlen("IFNAME=") + strlen(this->ifname) + 1 + strlen("SCAN");

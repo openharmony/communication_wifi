@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -32,7 +32,7 @@ namespace OHOS {
 namespace Wifi {
 static const int MAX_BSSID_BLOCKLIST_COUNT = 3;
 static const int AP_CANNOT_HANDLE_NEW_STA = 17;
-static const int MAX_BSSID_BLOCKLIST_TIME = 5 * 60;
+static const int MAX_BSSID_BLOCKLIST_TIME = 60; // 60s
 static const int BLOCKLIST_INVALID_SIZE = -1;
 static const int STA_CAP_ROAMING = 0x800000;
 static const int MIN_APPRAISAL_PRIORITY = 6;

@@ -315,15 +315,5 @@ napi_value DoAsyncWork(const napi_env& env, AsyncContext *asyncContext,
         return promise;
     }
 }
-
-std::string JsAbilityGetBundleName()
-{
-    std::shared_ptr<AbilityRuntime::Context> appContext = AbilityRuntime::Context::GetApplicationContext();
-    if (appContext == nullptr) {
-        WIFI_LOGE("Get boundle name context is null");
-        return "";
-    }
-    return appContext->GetBundleName();
-}
 }  // namespace Wifi
 }  // namespace OHOS

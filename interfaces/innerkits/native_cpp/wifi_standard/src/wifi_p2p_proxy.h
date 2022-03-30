@@ -116,7 +116,7 @@ public:
      * @param config - WifiP2pGroupInfo object
      * @return ErrCode - operate result
      */
-    ErrCode FormGroup(const WifiP2pConfig &config) override;
+    ErrCode CreateGroup(const WifiP2pConfig &config) override;
 
     /**
      * @Description Remove a P2P Group
@@ -143,11 +143,11 @@ public:
     ErrCode P2pConnect(const WifiP2pConfig &config) override;
 
     /**
-     * @Description P2P disconnection
+     * @Description Canceling a P2P connection
      *
      * @return ErrCode - operate result
      */
-    ErrCode P2pDisConnect(void) override;
+    ErrCode P2pCancelConnect(void) override;
 
     /**
      * @Description Querying Wi-Fi P2P Connection Information

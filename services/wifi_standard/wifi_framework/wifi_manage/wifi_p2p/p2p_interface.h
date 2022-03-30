@@ -130,7 +130,7 @@ public:
      * @param  config - config for creating group
      * @return - ErrCode
      */
-    virtual ErrCode FormGroup(const WifiP2pConfig &config) override;
+    virtual ErrCode CreateGroup(const WifiP2pConfig &config) override;
 
     /**
      * @Description - Remove the current P2P group.
@@ -153,10 +153,10 @@ public:
     virtual ErrCode P2pConnect(const WifiP2pConfig &config) override;
 
     /**
-     * @Description - Disconnect.
+     * @Description - Canceling a P2P connection.
      * @return - ErrCode
      */
-    virtual ErrCode P2pDisConnect() override;
+    virtual ErrCode P2pCancelConnect() override;
 
     /**
      * @Description - Set this device name.

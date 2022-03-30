@@ -174,9 +174,9 @@ ErrCode WifiMockP2pService::StopP2pListen()
     return WIFI_OPT_SUCCESS;
 }
 
-ErrCode WifiMockP2pService::FormGroup(const WifiP2pConfig &config)
+ErrCode WifiMockP2pService::CreateGroup(const WifiP2pConfig &config)
 {
-    LOGI("Mock_p2p:FormGroup");
+    LOGI("Mock_p2p:CreateGroup");
     LOGI("config.GetDeviceAddress() = %s\n", config.GetDeviceAddress().c_str());
     LOGI("config.GetGoBand() = %d\n", config.GetGoBand());
     LOGI("config.GetNetId() = %d\n", config.GetNetId());
@@ -251,9 +251,9 @@ ErrCode WifiMockP2pService::P2pConnect(const WifiP2pConfig &config)
     return WIFI_OPT_SUCCESS;
 }
 
-ErrCode WifiMockP2pService::P2pDisConnect()
+ErrCode WifiMockP2pService::P2pCancelConnect()
 {
-    LOGI("Mock_p2p:P2pDisConnect");
+    LOGI("Mock_p2p:P2pCancelConnect");
     return WIFI_OPT_SUCCESS;
 }
 

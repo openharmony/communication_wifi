@@ -127,11 +127,11 @@ WifiErrorCode DeleteGroup(const WifiP2pGroupInfo* group);
 WifiErrorCode P2pConnect(const WifiP2pConfig* config);
 
 /**
- * @Description P2P disconnection.
+ * @Description Canceling a P2P connection.
  *
  * @return WifiErrorCode - operate result
  */
-WifiErrorCode P2pDisConnect();
+WifiErrorCode P2pCancelConnect();
 
 /**
  * @Description Get the Current Group object.

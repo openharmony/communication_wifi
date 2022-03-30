@@ -98,7 +98,7 @@ WifiErrorCode CreateGroup(const WifiP2pConfig* config)
     CHECK_PTR_RETURN(wifiP2pPtr, ERROR_WIFI_NOT_AVAILABLE);
     OHOS::Wifi::WifiP2pConfig cppConfig;
     ConvertConfigCToCpp(config, cppConfig);
-    return GetCErrorCode(wifiP2pPtr->FormGroup(cppConfig));
+    return GetCErrorCode(wifiP2pPtr->CreateGroup(cppConfig));
 }
 
 WifiErrorCode RemoveGroup()
@@ -166,10 +166,10 @@ WifiErrorCode P2pConnect(const WifiP2pConfig* config)
     return GetCErrorCode(wifiP2pPtr->P2pConnect(deviceConfig));
 }
 
-WifiErrorCode P2pDisConnect()
+WifiErrorCode P2pCancelConnect()
 {
     CHECK_PTR_RETURN(wifiP2pPtr, ERROR_WIFI_NOT_AVAILABLE);
-    return GetCErrorCode(wifiP2pPtr->P2pDisConnect());
+    return GetCErrorCode(wifiP2pPtr->P2pCancelConnect());
 }
 
 static OHOS::Wifi::ErrCode ConvertP2PDeviceCppToC(const OHOS::Wifi::WifiP2pDevice& cppDevice, WifiP2pDevice* p2pDevice)

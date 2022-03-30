@@ -376,11 +376,11 @@ ErrCode WifiP2pServiceImpl::StopP2pListen()
     return pService->StopP2pListen();
 }
 
-ErrCode WifiP2pServiceImpl::FormGroup(const WifiP2pConfig &config)
+ErrCode WifiP2pServiceImpl::CreateGroup(const WifiP2pConfig &config)
 {
-    WIFI_LOGI("FormGroup, network name is [%{public}s]", config.GetGroupName().c_str());
+    WIFI_LOGI("CreateGroup, network name is [%{public}s]", config.GetGroupName().c_str());
     if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
-        WIFI_LOGE("FormGroup:VerifyGetWifiInfoPermission PERMISSION_DENIED!");
+        WIFI_LOGE("CreateGroup:VerifyGetWifiInfoPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
 
@@ -394,7 +394,7 @@ ErrCode WifiP2pServiceImpl::FormGroup(const WifiP2pConfig &config)
         WIFI_LOGE("Get P2P service failed!");
         return WIFI_OPT_P2P_NOT_OPENED;
     }
-    return pService->FormGroup(config);
+    return pService->CreateGroup(config);
 }
 
 ErrCode WifiP2pServiceImpl::RemoveGroup()
@@ -474,11 +474,11 @@ ErrCode WifiP2pServiceImpl::P2pConnect(const WifiP2pConfig &config)
     return pService->P2pConnect(config);
 }
 
-ErrCode WifiP2pServiceImpl::P2pDisConnect()
+ErrCode WifiP2pServiceImpl::P2pCancelConnect()
 {
-    WIFI_LOGI("P2pDisConnect");
+    WIFI_LOGI("P2pCancelConnect");
     if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
-        WIFI_LOGE("P2pDisConnect:VerifyGetWifiInfoPermission PERMISSION_DENIED!");
+        WIFI_LOGE("P2pCancelConnect:VerifyGetWifiInfoPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
 
@@ -492,7 +492,7 @@ ErrCode WifiP2pServiceImpl::P2pDisConnect()
         WIFI_LOGE("Get P2P service failed!");
         return WIFI_OPT_P2P_NOT_OPENED;
     }
-    return pService->P2pDisConnect();
+    return pService->P2pCancelConnect();
 }
 
 ErrCode WifiP2pServiceImpl::QueryP2pLinkedInfo(WifiP2pLinkedInfo &linkedInfo)
@@ -785,7 +785,7 @@ ErrCode WifiP2pServiceImpl::Hid2dCreateGroup(const int frequency, FreqType type)
 {
     WIFI_LOGI("Hid2dCreateGroup");
     if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
-        WIFI_LOGE("FormGroup:VerifyGetWifiInfoPermission PERMISSION_DENIED!");
+        WIFI_LOGE("CreateGroup:VerifyGetWifiInfoPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
 

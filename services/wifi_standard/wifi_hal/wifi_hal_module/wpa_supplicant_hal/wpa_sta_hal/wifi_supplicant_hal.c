@@ -515,7 +515,7 @@ static int WpaCliCmdWpaBlockListClear(WifiWpaStaInterface *this)
     return WpaCliCmd(cmd, buf, sizeof(buf));
 }
 
-static void ListNetworkProcess(HidlNetworkInfo *pcmd, char *tmpBuf, int bufLeng)
+static void ListNetworkProcess(WifiNetworkInfo *pcmd, char *tmpBuf, int bufLeng)
 {
     int start = 0; /* start pos */
     int end = 0;   /* end pos */
@@ -550,7 +550,7 @@ static void ListNetworkProcess(HidlNetworkInfo *pcmd, char *tmpBuf, int bufLeng)
     return;
 }
 
-static int WpaCliCmdListNetworks(WifiWpaStaInterface *this, HidlNetworkInfo *pcmd, int *size)
+static int WpaCliCmdListNetworks(WifiWpaStaInterface *this, WifiNetworkInfo *pcmd, int *size)
 {
     if (this == NULL || pcmd == NULL || size == NULL || *size <= 0) {
         return -1;
@@ -785,7 +785,7 @@ static int WpaCliCmdScanInfo(WifiWpaStaInterface *this, ScanInfo *pcmd, int *siz
     return 0;
 }
 
-static int WpaCliCmdGetSignalInfo(WifiWpaStaInterface *this, HidlWpaSignalInfo *info)
+static int WpaCliCmdGetSignalInfo(WifiWpaStaInterface *this, WpaSignalInfo *info)
 {
     if (this == NULL || info == NULL) {
         return -1;

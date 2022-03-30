@@ -85,11 +85,11 @@
 #define WIFI_SVR_CMD_P2P_DELETE_LOCAL_SERVICES 0x2008  /* remove local P2P service */
 #define WIFI_SVR_CMD_P2P_START_LISTEN 0x2009           /* enable Wi-Fi P2P listening */
 #define WIFI_SVR_CMD_P2P_STOP_LISTEN 0x200A            /* disable Wi-Fi P2P listening */
-#define WIFI_SVR_CMD_P2P_FORM_GROUP 0x200B             /* creating a P2P Group */
+#define WIFI_SVR_CMD_P2P_CREATE_GROUP 0x200B             /* creating a P2P Group */
 #define WIFI_SVR_CMD_P2P_REMOVE_GROUP 0x200C           /* remove a P2P Group */
 #define WIFI_SVR_CMD_P2P_DELETE_GROUP 0x200D           /* delete a P2P Group */
 #define WIFI_SVR_CMD_P2P_CONNECT 0x200E                /* p2p connect */
-#define WIFI_SVR_CMD_P2P_DISCONNECT 0x200F             /* p2p disconnect */
+#define WIFI_SVR_CMD_P2P_CANCEL_CONNECT 0x200F             /* p2p cancel connect */
 #define WIFI_SVR_CMD_P2P_QUERY_INFO 0x2010             /* querying Wi-Fi P2P Connection Information */
 #define WIFI_SVR_CMD_P2P_GET_CURRENT_GROUP 0x2011      /* get the P2P current group */
 #define WIFI_SVR_CMD_P2P_GET_ENABLE_STATUS 0x2012      /* obtains the P2P switch status */

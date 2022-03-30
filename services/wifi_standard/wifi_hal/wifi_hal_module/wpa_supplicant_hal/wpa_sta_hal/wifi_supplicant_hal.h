@@ -90,10 +90,10 @@ struct WifiWpaStaInterface {
     int (*wpaCliCmdGetCountryCode)(WifiWpaStaInterface *p, char *countryCode, int codeSize);
     int (*wpaCliCmdSetAutoConnect)(WifiWpaStaInterface *p, int enable);
     int (*wpaCliCmdWpaBlockListClear)(WifiWpaStaInterface *p);
-    int (*wpaCliCmdListNetworks)(WifiWpaStaInterface *p, HidlNetworkInfo *pcmd, int *size);
+    int (*wpaCliCmdListNetworks)(WifiWpaStaInterface *p, WifiNetworkInfo *pcmd, int *size);
     int (*wpaCliCmdScan)(WifiWpaStaInterface *p, const ScanSettings *settings);
     int (*wpaCliCmdScanInfo)(WifiWpaStaInterface *p, ScanInfo *pcmd, int *size);
-    int (*wpaCliCmdGetSignalInfo)(WifiWpaStaInterface *p, HidlWpaSignalInfo *info);
+    int (*wpaCliCmdGetSignalInfo)(WifiWpaStaInterface *p, WpaSignalInfo *info);
 };
 
 /**

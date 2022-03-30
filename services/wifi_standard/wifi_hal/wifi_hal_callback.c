@@ -226,7 +226,7 @@ void WifiP2pHalCbNotifyConnectSupplicant(int state)
     return;
 }
 
-void P2pHalCbDeviceFound(const HidlP2pDeviceInfo *device)
+void P2pHalCbDeviceFound(const P2pDeviceInfo *device)
 {
     if (device == NULL) {
         return;
@@ -312,7 +312,7 @@ void P2pHalCbGoNegotiationFailure(int status)
     return;
 }
 
-void P2pHalCbInvitationReceived(const HidlP2pInvitationInfo *info)
+void P2pHalCbInvitationReceived(const P2pInvitationInfo *info)
 {
     if (info == NULL) {
         return;
@@ -385,7 +385,7 @@ void P2pHalCbGroupFormationFailure(const char *reason)
     return;
 }
 
-void P2pHalCbGroupStarted(const HidlP2pGroupInfo *info)
+void P2pHalCbGroupStarted(const P2pGroupInfo *info)
 {
     if (info == NULL) {
         return;
@@ -538,7 +538,7 @@ void P2pHalCbFindStopped()
     return;
 }
 
-void P2pHalCbServiceDiscoveryResponse(const HidlP2pServDiscRespInfo *info)
+void P2pHalCbServiceDiscoveryResponse(const P2pServDiscRespInfo *info)
 {
     if (info == NULL) {
         return;
@@ -604,7 +604,7 @@ void P2pHalCbConnectSupplicantFailed()
     return;
 }
 
-void P2pHalCbServDiscReq(const HidlP2pServDiscReqInfo *info)
+void P2pHalCbServDiscReq(const P2pServDiscReqInfo *info)
 {
     LOGD("P2p service discovery request event");
     if (info == NULL) {

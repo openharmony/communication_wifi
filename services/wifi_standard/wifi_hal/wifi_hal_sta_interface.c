@@ -248,7 +248,7 @@ WifiErrorNo GetScanInfos(ScanInfo *results, int *size)
     return WIFI_HAL_SUCCESS;
 }
 
-WifiErrorNo GetNetworkList(HidlNetworkInfo *infos, int *size)
+WifiErrorNo GetNetworkList(WifiNetworkInfo *infos, int *size)
 {
     LOGD("GetNetworkList()");
     if (infos == NULL || size == NULL || *size == 0) {
@@ -573,7 +573,7 @@ WifiErrorNo DisableNetwork(int networkId)
     return WIFI_HAL_SUCCESS;
 }
 
-WifiErrorNo SetNetwork(int networkId, const HidlSetNetworkConfig *confs, int size)
+WifiErrorNo SetNetwork(int networkId, const SetNetworkConfig *confs, int size)
 {
     if (confs == NULL) {
         LOGE("SetNetwork() confs is NULL");
@@ -737,7 +737,7 @@ WifiErrorNo WpaGetCountryCode(char *countryCode, int codeSize)
     }
     return WIFI_HAL_SUCCESS;
 }
-WifiErrorNo WpaGetNetWork(HidlGetNetworkConfig *conf)
+WifiErrorNo WpaGetNetWork(GetNetworkConfig *conf)
 {
     if (conf == NULL) {
         LOGE("WpaGetNetWork conf is NULL");
@@ -776,7 +776,7 @@ WifiErrorNo WpaBlocklistClear(void)
     return WIFI_HAL_SUCCESS;
 }
 
-WifiErrorNo GetConnectSignalInfo(const char *endBssid, HidlWpaSignalInfo *info)
+WifiErrorNo GetConnectSignalInfo(const char *endBssid, WpaSignalInfo *info)
 {
     if (endBssid == NULL || info == NULL) {
         LOGE("GetConnectSignalInfo endBssid or info is NULL");

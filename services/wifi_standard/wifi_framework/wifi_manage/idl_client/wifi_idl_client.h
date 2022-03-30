@@ -575,7 +575,7 @@ public:
      * @param countCode
      * @return WifiErrorNo
      */
-    WifiErrorNo ReqWpaSetCountryCode(const std::string &countCode);
+    WifiErrorNo ReqWpaSetCountryCode(const std::string &countryCode);
 
     /**
      * @Description Obtains the country code.
@@ -583,7 +583,7 @@ public:
      * @param countCode
      * @return WifiErrorNo
      */
-    WifiErrorNo ReqWpaGetCountryCode(std::string &countCode);
+    WifiErrorNo ReqWpaGetCountryCode(std::string &countryCode);
 
     /**
      * @Description Wpa_s disable/enable(0/1) automatic reconnection.
@@ -1009,12 +1009,12 @@ public:
 private:
     char **ConVectorToCArrayString(const std::vector<std::string> &vec) const;
     WifiErrorNo ConvertPnoScanParam(const WifiPnoScanParam &param, PnoScanSettings *pSettings) const;
-    int PushDeviceConfigString(HidlSetNetworkConfig *pConfig, DeviceConfigType type, const std::string &msg) const;
-    int PushDeviceConfigInt(HidlSetNetworkConfig *pConfig, DeviceConfigType type, int i) const;
-    int PushDeviceConfigAuthAlgorithm(HidlSetNetworkConfig *pConfig, DeviceConfigType type, unsigned int alg) const;
+    int PushDeviceConfigString(SetNetworkConfig *pConfig, DeviceConfigType type, const std::string &msg) const;
+    int PushDeviceConfigInt(SetNetworkConfig *pConfig, DeviceConfigType type, int i) const;
+    int PushDeviceConfigAuthAlgorithm(SetNetworkConfig *pConfig, DeviceConfigType type, unsigned int alg) const;
     WifiErrorNo CheckValidDeviceConfig(const WifiIdlDeviceConfig &config) const;
-    int PushP2pGroupConfigString(HidlP2pGroupConfig *pConfig, P2pGroupConfigType type, const std::string &str) const;
-    int PushP2pGroupConfigInt(HidlP2pGroupConfig *pConfig, P2pGroupConfigType type, int i) const;
+    int PushP2pGroupConfigString(P2pGroupConfig *pConfig, P2pGroupConfigType type, const std::string &str) const;
+    int PushP2pGroupConfigInt(P2pGroupConfig *pConfig, P2pGroupConfigType type, int i) const;
 };
 }  // namespace Wifi
 }  // namespace OHOS

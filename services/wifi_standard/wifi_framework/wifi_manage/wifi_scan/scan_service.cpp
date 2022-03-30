@@ -199,7 +199,6 @@ void ScanService::HandleInnerEventReport(ScanInnerEventType innerEvent)
 ErrCode ScanService::Scan(bool externFlag)
 {
     WIFI_LOGI("Enter ScanService::Scan.\n");
-
     if (!scanStartedFlag) {
         WIFI_LOGE("Scan service has not started.\n");
         return WIFI_OPT_FAILED;

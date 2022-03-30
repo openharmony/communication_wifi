@@ -119,7 +119,7 @@ public:
      * @param config - WifiP2pGroupInfo object
      * @return ErrCode - operate result
      */
-    virtual ErrCode FormGroup(const WifiP2pConfig &config) = 0;
+    virtual ErrCode CreateGroup(const WifiP2pConfig &config) = 0;
 
     /**
      * @Description Remove a P2P Group.
@@ -145,11 +145,11 @@ public:
     virtual ErrCode P2pConnect(const WifiP2pConfig &config) = 0;
 
     /**
-     * @Description P2P disconnection.
+     * @Description Canceling a P2P connection.
      *
      * @return ErrCode - operate result
      */
-    virtual ErrCode P2pDisConnect(void) = 0;
+    virtual ErrCode P2pCancelConnect(void) = 0;
 
     /**
      * @Description Querying Wi-Fi P2P Connection Information.

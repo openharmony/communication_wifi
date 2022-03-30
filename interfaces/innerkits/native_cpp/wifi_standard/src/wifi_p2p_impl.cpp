@@ -129,10 +129,10 @@ ErrCode WifiP2pImpl::StopP2pListen(void)
     return client_->StopP2pListen();
 }
 
-ErrCode WifiP2pImpl::FormGroup(const WifiP2pConfig &config)
+ErrCode WifiP2pImpl::CreateGroup(const WifiP2pConfig &config)
 {
     RETURN_IF_FAIL(client_);
-    return client_->FormGroup(config);
+    return client_->CreateGroup(config);
 }
 
 ErrCode WifiP2pImpl::RemoveGroup(void)
@@ -153,10 +153,10 @@ ErrCode WifiP2pImpl::P2pConnect(const WifiP2pConfig &config)
     return client_->P2pConnect(config);
 }
 
-ErrCode WifiP2pImpl::P2pDisConnect(void)
+ErrCode WifiP2pImpl::P2pCancelConnect(void)
 {
     RETURN_IF_FAIL(client_);
-    return client_->P2pDisConnect();
+    return client_->P2pCancelConnect();
 }
 
 ErrCode WifiP2pImpl::QueryP2pLinkedInfo(WifiP2pLinkedInfo &linkedInfo)

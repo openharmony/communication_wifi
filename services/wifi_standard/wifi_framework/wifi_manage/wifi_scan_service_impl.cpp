@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -15,19 +15,21 @@
 
 #include "wifi_scan_service_impl.h"
 #include <file_ex.h>
-#include "wifi_msg.h"
+#include "define.h"
 #include "permission_def.h"
-#include "wifi_permission_utils.h"
 #include "wifi_auth_center.h"
+#include "wifi_common_util.h"
 #include "wifi_config_center.h"
-#include "wifi_manager.h"
-#include "wifi_service_manager.h"
+#include "wifi_hisysevent.h"
+#include "wifi_dumper.h"
 #include "wifi_internal_event_dispatcher.h"
 #include "wifi_internal_msg.h"
 #include "wifi_logger.h"
-#include "define.h"
+#include "wifi_manager.h"
+#include "wifi_msg.h"
+#include "wifi_permission_utils.h"
 #include "wifi_scan_callback_proxy.h"
-#include "wifi_dumper.h"
+#include "wifi_service_manager.h"
 
 DEFINE_WIFILOG_SCAN_LABEL("WifiScanServiceImpl");
 namespace OHOS {
@@ -135,7 +137,12 @@ ErrCode WifiScanServiceImpl::Scan()
     if (pService == nullptr) {
         return WIFI_OPT_SCAN_NOT_OPENED;
     }
-    return pService->Scan(true);
+    ErrCode ret = pService->Scan(true);
+    if (ret != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("Scan failed: %{public}d!", static_cast<int>(ret));
+    }
+    WriteWifiScanHiSysEvent(static_cast<int>(ret), GetBundleName());
+    return ret;
 }
 
 ErrCode WifiScanServiceImpl::AdvanceScan(const WifiScanParams &params)

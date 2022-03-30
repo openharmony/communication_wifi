@@ -72,16 +72,16 @@ void OnScanNotify(int status);
 RpcClient *GetP2pRpcClient(void);
 
 void OnP2pConnectSupplicant(int state);
-void OnP2pDeviceFound(const HidlP2pDeviceInfo *info);
+void OnP2pDeviceFound(const P2pDeviceInfo *info);
 void OnP2pDeviceLost(const char *p2pDeviceAddress);
 void OnP2pGoNegotiationRequest(const char *srcAddress, short passwordId);
 void OnP2pGoNegotiationSuccess(void);
 void OnP2pGoNegotiationFailure(int status);
 void OnP2pInvitationResult(const char *bssid, int status);
-void OnP2pInvitationReceived(const HidlP2pInvitationInfo *info);
+void OnP2pInvitationReceived(const P2pInvitationInfo *info);
 void OnP2pGroupFormationSuccess(void);
 void OnP2pGroupFormationFailure(const char *failureReason);
-void OnP2pGroupStarted(const HidlP2pGroupInfo *group);
+void OnP2pGroupStarted(const P2pGroupInfo *group);
 void OnP2pGroupRemoved(const char *groupIfName, int isGo);
 void OnP2pProvisionDiscoveryPbcRequest(const char *p2pDeviceAddress);
 void OnP2pProvisionDiscoveryPbcResponse(const char *p2pDeviceAddress);
@@ -94,7 +94,7 @@ void OnP2pServiceDiscoveryResponse(
 void OnP2pStaDeauthorized(const char *p2pDeviceAddress);
 void OnP2pStaAuthorized(const char *p2pDeviceAddress);
 void OnP2pConnectSupplicantFailed(void);
-void OnP2pServDiscReq(const HidlP2pServDiscReqInfo *info);
+void OnP2pServDiscReq(const P2pServDiscReqInfo *info);
 #ifdef __cplusplus
 }
 #endif

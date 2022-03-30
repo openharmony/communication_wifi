@@ -125,7 +125,7 @@ HWTEST_F(WifiHalP2pInterfaceTest, P2pListNetworksTest, TestSize.Level1)
     char replyBuff[] = "network id / ssid / bssid / flags\n"
                        "0\tDIRECT-OHOS\t00:00:00:00:00:00\t[DISABLED][P2P-PERSISTENT]\n";
     MockSetWpaExpectCmdResponse("LIST_NETWORKS", replyBuff);
-    HidlP2pNetworkList info;
+    P2pNetworkList info;
     ASSERT_TRUE(memset_s(&info, sizeof(info), 0, sizeof(info)) == EOK);
     EXPECT_TRUE(P2pListNetworks(&info) == WIFI_HAL_SUCCESS);
 }
@@ -178,7 +178,7 @@ HWTEST_F(WifiHalP2pInterfaceTest, P2pSetListenChannelTest, TestSize.Level1)
 HWTEST_F(WifiHalP2pInterfaceTest, P2pConnectTest, TestSize.Level1)
 {
     EXPECT_TRUE(P2pConnect(NULL) == WIFI_HAL_FAILED);
-    HidlP2pConnectInfo info;
+    P2pConnectInfo info;
     ASSERT_TRUE(memset_s(&info, sizeof(info), 0, sizeof(info)) == EOK);
     EXPECT_TRUE(P2pConnect(&info) == WIFI_HAL_SUCCESS);
 }
@@ -228,7 +228,7 @@ HWTEST_F(WifiHalP2pInterfaceTest, P2pGetGroupCapabilityTest, TestSize.Level1)
 HWTEST_F(WifiHalP2pInterfaceTest, P2pAddServiceTest, TestSize.Level1)
 {
     EXPECT_TRUE(P2pAddService(nullptr) == WIFI_HAL_FAILED);
-    HidlP2pServiceInfo info;
+    P2pServiceInfo info;
     ASSERT_TRUE(memset_s(&info, sizeof(info), 0, sizeof(info)) == EOK);
     EXPECT_TRUE(P2pAddService(&info) == WIFI_HAL_INVALID_PARAM);
     info.mode = 0;
@@ -243,7 +243,7 @@ HWTEST_F(WifiHalP2pInterfaceTest, P2pAddServiceTest, TestSize.Level1)
 HWTEST_F(WifiHalP2pInterfaceTest, P2pRemoveServiceTest, TestSize.Level1)
 {
     EXPECT_TRUE(P2pRemoveService(nullptr) == WIFI_HAL_FAILED);
-    HidlP2pServiceInfo info;
+    P2pServiceInfo info;
     ASSERT_TRUE(memset_s(&info, sizeof(info), 0, sizeof(info)) == EOK);
     EXPECT_TRUE(P2pRemoveService(&info) == WIFI_HAL_INVALID_PARAM);
     info.mode = 0;
@@ -276,7 +276,7 @@ HWTEST_F(WifiHalP2pInterfaceTest, P2pSetMiracastTypeTest, TestSize.Level1)
 HWTEST_F(WifiHalP2pInterfaceTest, P2pRespServerDiscoveryTest, TestSize.Level1)
 {
     EXPECT_TRUE(P2pRespServerDiscovery(nullptr) == WIFI_HAL_FAILED);
-    HidlP2pServDiscReqInfo info;
+    P2pServDiscReqInfo info;
     ASSERT_TRUE(memset_s(&info, sizeof(info), 0, sizeof(info)) == EOK);
     info.tlvs = (char *)calloc(32, sizeof(char));
     EXPECT_TRUE(P2pRespServerDiscovery(&info) == WIFI_HAL_SUCCESS);

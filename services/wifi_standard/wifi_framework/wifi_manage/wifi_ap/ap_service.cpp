@@ -32,7 +32,7 @@ ApService::~ApService()
 ErrCode ApService::EnableHotspot() const
 {
     m_ApStateMachine.SendMessage(static_cast<int>(ApStatemachineEvent::CMD_START_HOTSPOT));
-   WriteWifiStateHiSysEvent(HISYS_SERVICE_TYPE_AP, WifiOperType::ENABLE);
+    WriteWifiStateHiSysEvent(HISYS_SERVICE_TYPE_AP, WifiOperType::ENABLE);
     return ErrCode::WIFI_OPT_SUCCESS;
 }
 

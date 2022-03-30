@@ -339,7 +339,7 @@ static void IdlCbP2pSupConnFailedEvent()
 
 static void IdlCbP2pDeviceFoundEventDeal(Context *context)
 {
-    HidlP2pDeviceInfo info;
+    P2pDeviceInfo info;
     if (memset_s(&info, sizeof(info), 0, sizeof(info)) != EOK) {
         return;
     }
@@ -410,7 +410,7 @@ static void IdlCbP2pGoNegotiationFailureEvent(Context *context)
 
 static void IdlCbP2pInvitationReceivedEvent(Context *context)
 {
-    HidlP2pInvitationInfo info;
+    P2pInvitationInfo info;
     if (memset_s(&info, sizeof(info), 0, sizeof(info)) != EOK) {
         return;
     }
@@ -466,7 +466,7 @@ static void IdlCbP2pGroupFormationFailureEvent(Context *context)
 
 static void IdlCbP2pGroupStartedEvent(Context *context)
 {
-    HidlP2pGroupInfo info;
+    P2pGroupInfo info;
     if (memset_s(&info, sizeof(info), 0, sizeof(info)) != EOK) {
         return;
     }
@@ -646,7 +646,7 @@ static void IdlCbP2pApStaConnectEvent(Context *context, int event)
 
 static void IdlCbP2pServDiscReqEvent(Context *context)
 {
-    HidlP2pServDiscReqInfo info;
+    P2pServDiscReqInfo info;
     if (memset_s(&info, sizeof(info), 0, sizeof(info)) != EOK) {
         return;
     }

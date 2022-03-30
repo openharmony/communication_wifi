@@ -279,7 +279,7 @@ WifiErrorNo DisableNetwork(int networkId);
  * @param size - Size of the network configuration array to be set.
  * @return WifiErrorNo
  */
-WifiErrorNo SetNetwork(int networkId, const HidlSetNetworkConfig *confs, int size);
+WifiErrorNo SetNetwork(int networkId, const SetNetworkConfig *confs, int size);
 
 /**
  * @Description Save the network.
@@ -354,7 +354,7 @@ WifiErrorNo WpaGetCountryCode(char *countryCode, int codeSize);
  * @param conf
  * @return WifiErrorNo
  */
-WifiErrorNo WpaGetNetWork(HidlGetNetworkConfig *conf);
+WifiErrorNo WpaGetNetWork(GetNetworkConfig *conf);
 
 /**
  * @Description Wpa_s disable/enable(0/1) automatic reconnection.
@@ -374,12 +374,12 @@ WifiErrorNo WpaBlocklistClear(void);
 /**
  * @Description Obtaining the Network List.
  *
- * @param HidlNetworkInfo - Array pointer of the network info structure type.
+ * @param WifiNetworkInfo - Array pointer of the network info structure type.
  * @param size - Number of infos that can be stored in the memory to which
  *               the network info pointer points.
  * @return WifiErrorNo
  */
-WifiErrorNo GetNetworkList(HidlNetworkInfo *infos, int *size);
+WifiErrorNo GetNetworkList(WifiNetworkInfo *infos, int *size);
 
 /**
  * @Description Get current connect signal info, rssi, linkspeed, noise ...
@@ -388,7 +388,7 @@ WifiErrorNo GetNetworkList(HidlNetworkInfo *infos, int *size);
  * @param info - signal info
  * @return WifiErrorNo
  */
-WifiErrorNo GetConnectSignalInfo(const char *endBssid, HidlWpaSignalInfo *info);
+WifiErrorNo GetConnectSignalInfo(const char *endBssid, WpaSignalInfo *info);
 #ifdef __cplusplus
 }
 #endif

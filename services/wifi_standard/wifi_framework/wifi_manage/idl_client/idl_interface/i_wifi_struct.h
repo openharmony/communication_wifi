@@ -107,12 +107,12 @@ typedef struct ScanInfo {
     int antValue;
 } ScanInfo;
 
-typedef struct HidlNetworkInfo {
+typedef struct WifiNetworkInfo {
     int id;
     char ssid[WIFI_SSID_LENGTH];
     char bssid[WIFI_BSSID_LENGTH];
     char flags[WIFI_NETWORK_FLAGS_LENGTH];
-} HidlNetworkInfo;
+} WifiNetworkInfo;
 
 typedef struct PnoScanSettings {
     int scanInterval;
@@ -146,16 +146,16 @@ typedef enum DeviceConfigType {
     DEVICE_CONFIG_END_POS, /* Number of network configuration parameters, which is used as the last parameter. */
 } DeviceConfigType;
 
-typedef struct HidlSetNetworkConfig {
+typedef struct SetNetworkConfig {
     DeviceConfigType cfgParam;                       /* param */
     char cfgValue[WIFI_NETWORK_CONFIG_VALUE_LENGTH]; /* param value */
-} HidlSetNetworkConfig;
+} SetNetworkConfig;
 
-typedef struct HidlGetNetworkConfig {
+typedef struct GetNetworkConfig {
     int networkId;
     char param[WIFI_NETWORK_CONFIG_NAME_LENGTH];
     char value[WIFI_NETWORK_CONFIG_VALUE_LENGTH];
-} HidlGetNetworkConfig;
+} GetNetworkConfig;
 
 typedef struct WifiWpsParam {
     int anyFlag;
@@ -169,13 +169,13 @@ typedef struct WifiRoamCapability {
     int maxTrustlistSize;
 } WifiRoamCapability;
 
-typedef struct HidlWpaSignalInfo {
+typedef struct WpaSignalInfo {
     int signal;
     int txrate;
     int rxrate;
     int noise;
     int frequency;
-} HidlWpaSignalInfo;
+} WpaSignalInfo;
 
 typedef struct HostapdConfig {
     char ssid[WIFI_SSID_LENGTH];
@@ -211,7 +211,7 @@ typedef enum IfaceType { TYPE_STA, TYPE_AP, TYPE_P2P, TYPE_NAN } IfaceType;
 #define WIFI_P2P_IDL_SERVER_INFO_LENGTH 256
 #define WIFI_P2P_GROUP_CONFIG_VALUE_LENGTH 256
 
-typedef struct HidlP2pDeviceInfo {
+typedef struct P2pDeviceInfo {
     char srcAddress[WIFI_MAC_ADDR_LENGTH + 1];
     char p2pDeviceAddress[WIFI_MAC_ADDR_LENGTH + 1];
     char primaryDeviceType[WIFI_P2P_DEVICE_TYPE_LENGTH];
@@ -221,9 +221,9 @@ typedef struct HidlP2pDeviceInfo {
     int groupCapabilities;
     char wfdDeviceInfo[WIFI_P2P_WFD_DEVICE_INFO_LENGTH];
     unsigned int wfdLength;
-} HidlP2pDeviceInfo;
+} P2pDeviceInfo;
 
-typedef struct HidlP2pGroupInfo {
+typedef struct P2pGroupInfo {
     int isGo;
     int isPersistent;
     int frequency;
@@ -232,54 +232,54 @@ typedef struct HidlP2pGroupInfo {
     char psk[WIFI_P2P_TMP_MSG_LENGTH_128];
     char passphrase[WIFI_P2P_TMP_MSG_LENGTH_128];
     char goDeviceAddress[WIFI_MAC_ADDR_LENGTH + 1];
-} HidlP2pGroupInfo;
+} P2pGroupInfo;
 
-typedef struct HidlP2pInvitationInfo {
+typedef struct P2pInvitationInfo {
     int type; /* 0:Recived, 1:Accepted */
     int persistentNetworkId;
     int operatingFrequency;
     char srcAddress[WIFI_MAC_ADDR_LENGTH + 1];
     char goDeviceAddress[WIFI_MAC_ADDR_LENGTH + 1];
     char bssid[WIFI_MAC_ADDR_LENGTH + 1];
-} HidlP2pInvitationInfo;
+} P2pInvitationInfo;
 
-typedef struct HidlP2pServDiscReqInfo {
+typedef struct P2pServDiscReqInfo {
     int freq;
     int dialogToken;
     int updateIndic;
     int tlvsLength;
     char mac[WIFI_MAC_ADDR_LENGTH + 1];
     unsigned char *tlvs;
-} HidlP2pServDiscReqInfo;
+} P2pServDiscReqInfo;
 
-typedef struct HidlP2pServiceInfo {
+typedef struct P2pServiceInfo {
     int mode; /* 0/1, upnp/bonjour  */
     int version;
     char name[WIFI_P2P_IDL_SERVER_NAME_LENGTH];
     char query[WIFI_P2P_IDL_SERVER_INFO_LENGTH];
     char resp[WIFI_P2P_IDL_SERVER_INFO_LENGTH];
-} HidlP2pServiceInfo;
+} P2pServiceInfo;
 
-typedef struct HidlP2pNetworkInfo {
+typedef struct P2pNetworkInfo {
     int id;
     char ssid[WIFI_SSID_LENGTH];
     char bssid[WIFI_MAC_ADDR_LENGTH + 1];
     char flags[WIFI_P2P_TMP_MSG_LENGTH_64];
-} HidlP2pNetworkInfo;
+} P2pNetworkInfo;
 
-typedef struct HidlP2pNetworkList {
+typedef struct P2pNetworkList {
     int infoNum;
-    HidlP2pNetworkInfo *infos;
-} HidlP2pNetworkList;
+    P2pNetworkInfo *infos;
+} P2pNetworkList;
 
-typedef struct HidlP2pConnectInfo {
+typedef struct P2pConnectInfo {
     int persistent; /* |persistent=<network id>] */
     int mode; /* [join|auth] */
     int goIntent; /* [go_intent=<0..15>] */
     int provdisc; /* [provdisc] */
     char peerDevAddr[WIFI_MAC_ADDR_LENGTH + 1];
     char pin[WIFI_PIN_CODE_LENGTH + 1]; /* <pbc|pin|PIN#|p2ps> */
-} HidlP2pConnectInfo;
+} P2pConnectInfo;
 
 /* Wifi P2P Group Network configuration parameter flag */
 typedef enum P2pGroupConfigType {
@@ -295,10 +295,10 @@ typedef enum P2pGroupConfigType {
     GROUP_CONFIG_END_POS,
 } P2pGroupConfigType;
 
-typedef struct HidlP2pGroupConfig {
+typedef struct P2pGroupConfig {
     P2pGroupConfigType cfgParam;                       /* param */
     char cfgValue[WIFI_P2P_GROUP_CONFIG_VALUE_LENGTH]; /* param value */
-} HidlP2pGroupConfig;
+} P2pGroupConfig;
 
 typedef struct Hid2dConnectInfo {
     char ssid[WIFI_SSID_LENGTH];

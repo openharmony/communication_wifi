@@ -35,8 +35,8 @@
  * @since 7
  */
 
-#ifndef HARMONY_OS_LITE_WIFI_DEVICE_CONFIG_H
-#define HARMONY_OS_LITE_WIFI_DEVICE_CONFIG_H
+#ifndef WIFI_LITE_WIFI_DEVICE_CONFIG_H
+#define WIFI_LITE_WIFI_DEVICE_CONFIG_H
 
 /**
  * @brief Indicates the maximum number of Wi-Fi station configurations that can be added using {@link AddDeviceConfig}.
@@ -229,5 +229,5 @@ typedef struct {
     unsigned int serverAddress;
     int leaseDuration;
 } IpInfo;
-#endif // HARMONY_OS_LITE_WIFI_DEVICE_CONFIG_H
+#endif // WIFI_LITE_WIFI_DEVICE_CONFIG_H
 /** @} */

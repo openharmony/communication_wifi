@@ -33,8 +33,8 @@
  * @since 7
  */
 
-#ifndef HARMONY_OS_LITE_WIFI_LINKED_INFO_H
-#define HARMONY_OS_LITE_WIFI_LINKED_INFO_H
+#ifndef WIFI_LITE_WIFI_LINKED_INFO_H
+#define WIFI_LITE_WIFI_LINKED_INFO_H
 #include "wifi_device_config.h"
 
 /**
@@ -75,5 +75,5 @@ typedef struct {
     /** IP address of the connected hotspot */
     unsigned int ipAddress;
 } WifiLinkedInfo;
-#endif // HARMONY_OS_LITE_WIFI_LINKED_INFO_H
+#endif // WIFI_LITE_WIFI_LINKED_INFO_H
 /** @} */

@@ -441,7 +441,7 @@ WifiErrorNo P2pRemoveNetwork(int networkId)
     return WIFI_HAL_SUCCESS;
 }
 
-WifiErrorNo P2pListNetworks(HidlP2pNetworkList *infoList)
+WifiErrorNo P2pListNetworks(P2pNetworkList *infoList)
 {
     if (infoList == NULL) {
         LOGE("P2pListNetworks infoList is NULL");
@@ -600,7 +600,7 @@ WifiErrorNo P2pSetListenChannel(int channel, int regClass)
     return WIFI_HAL_SUCCESS;
 }
 
-WifiErrorNo P2pConnect(HidlP2pConnectInfo *info)
+WifiErrorNo P2pConnect(P2pConnectInfo *info)
 {
     if (info == NULL) {
         LOGE("P2pConnect, info is NULL");
@@ -754,7 +754,7 @@ WifiErrorNo P2pGetGroupCapability(const char *bssid, int *cap)
         LOGE("P2pReinvoke, bssid or cap is NULL");
         return WIFI_HAL_FAILED;
     }
-    HidlP2pDeviceInfo info;
+    P2pDeviceInfo info;
     if (memset_s(&info, sizeof(info), 0, sizeof(info)) != EOK) {
         LOGE("Failed to init p2p device info");
         return WIFI_HAL_FAILED;
@@ -772,7 +772,7 @@ WifiErrorNo P2pGetGroupCapability(const char *bssid, int *cap)
     return WIFI_HAL_SUCCESS;
 }
 
-WifiErrorNo P2pAddService(const HidlP2pServiceInfo *info)
+WifiErrorNo P2pAddService(const P2pServiceInfo *info)
 {
     if (info == NULL) {
         LOGE("P2pAddService, input service info is NULL");
@@ -791,7 +791,7 @@ WifiErrorNo P2pAddService(const HidlP2pServiceInfo *info)
     return WIFI_HAL_SUCCESS;
 }
 
-WifiErrorNo P2pRemoveService(const HidlP2pServiceInfo *info)
+WifiErrorNo P2pRemoveService(const P2pServiceInfo *info)
 {
     if (info == NULL) {
         LOGE("P2pRemoveService, input service info is NULL");
@@ -865,7 +865,7 @@ WifiErrorNo P2pSetMiracastType(int type)
     return ConvertErrorCode(err);
 }
 
-WifiErrorNo P2pRespServerDiscovery(HidlP2pServDiscReqInfo *info)
+WifiErrorNo P2pRespServerDiscovery(P2pServDiscReqInfo *info)
 {
     if (info == NULL) {
         LOGE("P2pRespServerDiscovery, info is NULL");
@@ -914,7 +914,7 @@ WifiErrorNo P2pSetPersistentReconnect(int mode)
     return WIFI_HAL_SUCCESS;
 }
 
-WifiErrorNo P2pGetPeer(const char *bssid, HidlP2pDeviceInfo *peerInfo)
+WifiErrorNo P2pGetPeer(const char *bssid, P2pDeviceInfo *peerInfo)
 {
     if (bssid == NULL || peerInfo == NULL) {
         LOGE("P2pGetPeer, bssid, peer info struct have NULL");
@@ -942,7 +942,7 @@ WifiErrorNo P2pGetFrequencies(int band, int *frequencies, int *size)
     return WIFI_HAL_NOT_SUPPORT;
 }
 
-WifiErrorNo P2pSetGroupConfig(int networkId, HidlP2pGroupConfig *pConfig, int size)
+WifiErrorNo P2pSetGroupConfig(int networkId, P2pGroupConfig *pConfig, int size)
 {
     if (pConfig == NULL || size == 0) {
         LOGE("P2pSetGroupConfig() confs is NULL");
@@ -972,7 +972,7 @@ WifiErrorNo P2pSetGroupConfig(int networkId, HidlP2pGroupConfig *pConfig, int si
     return WIFI_HAL_SUCCESS;
 }
 
-WifiErrorNo P2pGetGroupConfig(int networkId, HidlP2pGroupConfig *pConfig, int size)
+WifiErrorNo P2pGetGroupConfig(int networkId, P2pGroupConfig *pConfig, int size)
 {
     if (pConfig == NULL || size == 0) {
         LOGE("P2pGetGroupConfig() confs is NULL");

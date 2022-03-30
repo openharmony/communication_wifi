@@ -589,7 +589,7 @@ int RpcSetNetwork(RpcServer *server, Context *context)
         return -1;
     }
 
-    HidlSetNetworkConfig *confs = (HidlSetNetworkConfig *)calloc(size, sizeof(HidlSetNetworkConfig));
+    SetNetworkConfig *confs = (SetNetworkConfig *)calloc(size, sizeof(SetNetworkConfig));
     if (confs == NULL) {
         return -1;
     }
@@ -800,7 +800,7 @@ int RpcWpaGetNetwork(RpcServer *server, Context *context)
     if (server == NULL || context == NULL) {
         return -1;
     }
-    HidlGetNetworkConfig conf = {0};
+    GetNetworkConfig conf = {0};
     if (ReadInt(context, &(conf.networkId)) < 0 || ReadStr(context, conf.param, sizeof(conf.param)) != 0) {
         return -1;
     }
@@ -855,7 +855,7 @@ int RpcGetNetworkList(RpcServer *server, Context *context)
         return -1;
     }
 
-    HidlNetworkInfo *infos = (HidlNetworkInfo *)calloc(maxSize, sizeof(HidlNetworkInfo));
+    WifiNetworkInfo *infos = (WifiNetworkInfo *)calloc(maxSize, sizeof(WifiNetworkInfo));
     if (infos == NULL) {
         return -1;
     }
@@ -887,7 +887,7 @@ int RpcGetConnectSignalInfo(RpcServer *server, Context *context)
     if (ReadStr(context, endBssid, sizeof(endBssid)) != 0) {
         return -1;
     }
-    HidlWpaSignalInfo info = {0};
+    WpaSignalInfo info = {0};
     WifiErrorNo err = GetConnectSignalInfo(endBssid, &info);
     WriteBegin(context, 0);
     WriteInt(context, err);

@@ -34,8 +34,8 @@
  * @since 7
  */
 
-#ifndef HARMONY_OS_LITE_WIFI_HOTSPOT_H
-#define HARMONY_OS_LITE_WIFI_HOTSPOT_H
+#ifndef WIFI_LITE_WIFI_HOTSPOT_H
+#define WIFI_LITE_WIFI_HOTSPOT_H
 #include "wifi_device.h"
 #include "wifi_error_code.h"
 #include "wifi_hotspot_config.h"
@@ -148,5 +148,5 @@ WifiErrorCode AddTxPowerInfo(int power);
 }
 #endif
 
-#endif // HARMONY_OS_LITE_WIFI_HOTSPOT_H_
+#endif // WIFI_LITE_WIFI_HOTSPOT_H_
 /** @} */

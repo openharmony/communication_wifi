@@ -56,8 +56,8 @@ struct stWifiWpaP2pInterface {
     P2pSupplicantErrCode (*wpaP2pCliCmdCancelConnect)(WifiWpaP2pInterface *p);
     P2pSupplicantErrCode (*wpaP2pCliCmdInvite)(WifiWpaP2pInterface *p, const P2pHalInviteArgv *argv);
     P2pSupplicantErrCode (*wpaP2pCliCmdReInvite)(WifiWpaP2pInterface *p, const P2pHalReInviteArgv *argv);
-    P2pSupplicantErrCode (*wpaP2pCliCmdServiceAdd)(WifiWpaP2pInterface *p, const HidlP2pServiceInfo *argv);
-    P2pSupplicantErrCode (*wpaP2pCliCmdServiceDel)(WifiWpaP2pInterface *p, const HidlP2pServiceInfo *argv);
+    P2pSupplicantErrCode (*wpaP2pCliCmdServiceAdd)(WifiWpaP2pInterface *p, const P2pServiceInfo *argv);
+    P2pSupplicantErrCode (*wpaP2pCliCmdServiceDel)(WifiWpaP2pInterface *p, const P2pServiceInfo *argv);
     P2pSupplicantErrCode (*wpaP2pCliCmdServDiscReq)(
         WifiWpaP2pInterface *p, const char *peerBssid, const char *tlvs, char *retSeq, unsigned size);
     P2pSupplicantErrCode (*wpaP2pCliCmdServDiscCancelReq)(WifiWpaP2pInterface *p, const char *val);
@@ -65,14 +65,14 @@ struct stWifiWpaP2pInterface {
         WifiWpaP2pInterface *p, const P2pProvisionDiscoveryArgv *argv);
     P2pSupplicantErrCode (*wpaP2pCliCmdGroupAdd)(WifiWpaP2pInterface *p, int isPersistent, int networkId, int freq);
     P2pSupplicantErrCode (*wpaP2pCliCmdStoreConfig)(WifiWpaP2pInterface *p);
-    P2pSupplicantErrCode (*wpaP2pCliCmdNetworkList)(WifiWpaP2pInterface *p, HidlP2pNetworkList *infoList);
-    P2pSupplicantErrCode (*wpaP2pCliCmdConnect)(WifiWpaP2pInterface *p, HidlP2pConnectInfo *info);
+    P2pSupplicantErrCode (*wpaP2pCliCmdNetworkList)(WifiWpaP2pInterface *p, P2pNetworkList *infoList);
+    P2pSupplicantErrCode (*wpaP2pCliCmdConnect)(WifiWpaP2pInterface *p, P2pConnectInfo *info);
     P2pSupplicantErrCode (*wpaP2pCliCmdSetPersistentReconnect)(WifiWpaP2pInterface *p, int status);
-    P2pSupplicantErrCode (*wpaP2pCliCmdRespServerDiscovery)(WifiWpaP2pInterface *p, HidlP2pServDiscReqInfo *info);
+    P2pSupplicantErrCode (*wpaP2pCliCmdRespServerDiscovery)(WifiWpaP2pInterface *p, P2pServDiscReqInfo *info);
     P2pSupplicantErrCode (*wpaP2pCliCmdSetServDiscExternal)(WifiWpaP2pInterface *p, int mode);
     P2pSupplicantErrCode (*wpaP2pCliCmdSetRandomMac)(WifiWpaP2pInterface *p, int mode);
     P2pSupplicantErrCode (*wpaP2pCliCmdP2pGetPeer)(
-        WifiWpaP2pInterface *p, const char *bssid, HidlP2pDeviceInfo *peerInfo);
+        WifiWpaP2pInterface *p, const char *bssid, P2pDeviceInfo *peerInfo);
     P2pSupplicantErrCode (*wpaP2pCliCmdSetGroupConfig)(WifiWpaP2pInterface *p, const P2pWpaGroupConfigArgv *argv);
     P2pSupplicantErrCode (*wpaP2pCliCmdGetGroupConfig)(WifiWpaP2pInterface *p, P2pWpaGroupConfigArgv *argv);
     P2pSupplicantErrCode (*wpaP2pCliCmdAddNetwork)(WifiWpaP2pInterface *p, int *networkId);

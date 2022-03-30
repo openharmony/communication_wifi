@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+#include "wifi_scan_service_impl.h"
 #include <file_ex.h>
 #include "define.h"
 #include "permission_def.h"
@@ -28,7 +29,6 @@
 #include "wifi_msg.h"
 #include "wifi_permission_utils.h"
 #include "wifi_scan_callback_proxy.h"
-#include "wifi_scan_service_impl.h"
 #include "wifi_service_manager.h"
 
 DEFINE_WIFILOG_SCAN_LABEL("WifiScanServiceImpl");

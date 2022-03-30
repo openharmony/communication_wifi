@@ -36,8 +36,8 @@
  * @since 7
  */
 
-#ifndef HARMONY_OS_LITE_WIFI_STATION_INFO_H
-#define HARMONY_OS_LITE_WIFI_STATION_INFO_H
+#ifndef WIFI_LITE_WIFI_STATION_INFO_H
+#define WIFI_LITE_WIFI_STATION_INFO_H
 #include "wifi_device_config.h"
 
 /**
@@ -57,5 +57,5 @@ typedef struct {
     unsigned short disconnectedReason;
 } StationInfo;
 
-#endif // HARMONY_OS_LITE_WIFI_STATION_INFO_H
+#endif // WIFI_LITE_WIFI_STATION_INFO_H
 /** @} */

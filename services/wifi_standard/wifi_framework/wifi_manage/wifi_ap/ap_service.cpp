@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,13 +12,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include "ap_service.h"
 #include <unistd.h>
 #include "ap_state_machine.h"
-#include "wifi_log.h"
-#include "wifi_settings.h"
-
+#include "wifi_hisysevent.h"
 #include "wifi_logger.h"
+#include "wifi_settings.h"
 
 DEFINE_WIFILOG_HOTSPOT_LABEL("WifiApService");
 namespace OHOS {
@@ -32,12 +32,14 @@ ApService::~ApService()
 ErrCode ApService::EnableHotspot() const
 {
     m_ApStateMachine.SendMessage(static_cast<int>(ApStatemachineEvent::CMD_START_HOTSPOT));
+   WriteWifiStateHiSysEvent(HISYS_SERVICE_TYPE_AP, WifiOperType::ENABLE);
     return ErrCode::WIFI_OPT_SUCCESS;
 }
 
 ErrCode ApService::DisableHotspot() const
 {
     m_ApStateMachine.SendMessage(static_cast<int>(ApStatemachineEvent::CMD_STOP_HOTSPOT));
+    WriteWifiStateHiSysEvent(HISYS_SERVICE_TYPE_AP, WifiOperType::DISABLE);
     return ErrCode::WIFI_OPT_SUCCESS;
 }
 

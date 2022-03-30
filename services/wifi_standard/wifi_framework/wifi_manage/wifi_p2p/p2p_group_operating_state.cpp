@@ -102,14 +102,14 @@ bool P2pGroupOperatingState::ProcessCmdCreateGroup(const InternalMessage &msg) c
     }
     if (WifiErrorNo::WIFI_IDL_OPT_FAILED == ret) {
         WIFI_LOGE("p2p configure to CreateGroup failed.");
-        p2pStateMachine.BroadcastActionResult(P2pActionCallback::FormGroup, WIFI_OPT_FAILED);
+        p2pStateMachine.BroadcastActionResult(P2pActionCallback::CreateGroup, WIFI_OPT_FAILED);
         p2pStateMachine.SwitchState(&p2pStateMachine.p2pIdleState);
     } else {
         const int cgTimedOut = 5000;
         WIFI_LOGI("p2p configure to CreateGroup successful.");
         p2pStateMachine.MessageExecutedLater(
             static_cast<int>(P2P_STATE_MACHINE_CMD::CREATE_GROUP_TIMED_OUT), cgTimedOut);
-        p2pStateMachine.BroadcastActionResult(P2pActionCallback::FormGroup, WIFI_OPT_SUCCESS);
+        p2pStateMachine.BroadcastActionResult(P2pActionCallback::CreateGroup, WIFI_OPT_SUCCESS);
     }
     return EXECUTED;
 }

@@ -117,9 +117,9 @@ ErrCode WifiP2pService::StopP2pListen()
     return ErrCode::WIFI_OPT_SUCCESS;
 }
 
-ErrCode WifiP2pService::FormGroup(const WifiP2pConfig &config)
+ErrCode WifiP2pService::CreateGroup(const WifiP2pConfig &config)
 {
-    WIFI_LOGI("FormGroup");
+    WIFI_LOGI("CreateGroup");
     WifiP2pConfigInternal configInternal(config);
     WpsInfo wps;
     wps.SetWpsMethod(WpsMethod::WPS_METHOD_PBC);
@@ -158,9 +158,9 @@ ErrCode WifiP2pService::P2pConnect(const WifiP2pConfig &config)
     return ErrCode::WIFI_OPT_SUCCESS;
 }
 
-ErrCode WifiP2pService::P2pDisConnect()
+ErrCode WifiP2pService::P2pCancelConnect()
 {
-    WIFI_LOGI("P2pDisConnect");
+    WIFI_LOGI("P2pCancelConnect");
     p2pStateMachine.SendMessage(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_CANCEL_CONNECT));
     return ErrCode::WIFI_OPT_SUCCESS;
 }

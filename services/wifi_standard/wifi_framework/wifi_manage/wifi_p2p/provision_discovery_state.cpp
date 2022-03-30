@@ -174,7 +174,7 @@ bool ProvisionDiscoveryState::ProcessCmdCancelConnect(InternalMessage &msg) cons
     WifiP2PHalInterface::GetInstance().CancelConnect();
     p2pStateMachine.DealGroupCreationFailed();
     p2pStateMachine.SwitchState(&p2pStateMachine.p2pIdleState);
-    p2pStateMachine.BroadcastActionResult(P2pActionCallback::P2pDisConnect, ErrCode::WIFI_OPT_SUCCESS);
+    p2pStateMachine.BroadcastActionResult(P2pActionCallback::P2pCancelConnect, ErrCode::WIFI_OPT_SUCCESS);
     return EXECUTED;
 }
 

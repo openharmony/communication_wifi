@@ -38,7 +38,6 @@ napi_value EnableHotspot(napi_env env, napi_callback_info info)
     if (ret != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("Enable hotspot error: %{public}d", ret);
     }
-    WriteWifiStateHiSysEvent(HISYS_SERVICE_TYPE_AP, WifiOperType::ENABLE);
     napi_value result;
     napi_get_boolean(env, ret == WIFI_OPT_SUCCESS, &result);
     return result;
@@ -52,7 +51,6 @@ napi_value DisableHotspot(napi_env env, napi_callback_info info)
     if (ret != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("Disable hotspot error: %{public}d", ret);
     }
-    WriteWifiStateHiSysEvent(HISYS_SERVICE_TYPE_AP, WifiOperType::DISABLE);
     napi_value result;
     napi_get_boolean(env, ret == WIFI_OPT_SUCCESS, &result);
     return result;

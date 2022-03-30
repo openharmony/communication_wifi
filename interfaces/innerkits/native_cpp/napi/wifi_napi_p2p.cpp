@@ -261,7 +261,7 @@ napi_value P2pCancelConnect(napi_env env, napi_callback_info info)
     TRACE_FUNC_CALL;
     NAPI_ASSERT(env, wifiP2pPtr != nullptr, "Wifi p2p instance is null.");
 
-    ErrCode ret = wifiP2pPtr->P2pDisConnect();
+    ErrCode ret = wifiP2pPtr->P2pCancelConnect();
     napi_value result;
     napi_get_boolean(env, ret == WIFI_OPT_SUCCESS, &result);
     return result;
@@ -282,7 +282,7 @@ napi_value CreateGroup(napi_env env, napi_callback_info info)
     NAPI_ASSERT(env, wifiP2pPtr != nullptr, "Wifi p2p instance is null.");
     WifiP2pConfig config;
     JsObjToP2pConfig(env, argv[0], config);
-    ErrCode ret = wifiP2pPtr->FormGroup(config);
+    ErrCode ret = wifiP2pPtr->CreateGroup(config);
     napi_value result;
     napi_get_boolean(env, ret == WIFI_OPT_SUCCESS, &result);
     return result;

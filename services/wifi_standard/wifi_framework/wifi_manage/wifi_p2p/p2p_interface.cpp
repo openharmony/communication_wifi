@@ -112,9 +112,9 @@ ErrCode P2pInterface::StopP2pListen()
     return p2pService.StopP2pListen();
 }
 
-ErrCode P2pInterface::FormGroup(const WifiP2pConfig &config)
+ErrCode P2pInterface::CreateGroup(const WifiP2pConfig &config)
 {
-    return p2pService.FormGroup(config);
+    return p2pService.CreateGroup(config);
 }
 
 ErrCode P2pInterface::RemoveGroup()
@@ -132,9 +132,9 @@ ErrCode P2pInterface::P2pConnect(const WifiP2pConfig &config)
     return p2pService.P2pConnect(config);
 }
 
-ErrCode P2pInterface::P2pDisConnect()
+ErrCode P2pInterface::P2pCancelConnect()
 {
-    return p2pService.P2pDisConnect();
+    return p2pService.P2pCancelConnect();
 }
 
 ErrCode P2pInterface::SetP2pDeviceName(const std::string &devName)

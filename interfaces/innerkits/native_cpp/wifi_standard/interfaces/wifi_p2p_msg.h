@@ -53,11 +53,11 @@ enum class P2pActionCallback : unsigned char {
     RequestService,
     StartP2pListen,
     StopP2pListen,
-    FormGroup,
+    CreateGroup,
     RemoveGroup,
     DeleteGroup,
     P2pConnect,
-    P2pDisConnect,
+    P2pCancelConnect,
     P2pSetDeviceName,
     CreateHid2dGroup,
     Hid2dConnect,
@@ -296,8 +296,8 @@ private:
 };
 
 const int AUTO_GROUP_OWNER_VALUE = -1;
-const int MIN_GROUP_OWNER_INTENT = 0;
-const int MAX_GROUP_OWNER_INTENT = 15;
+const int MIN_GROUP_OWNER_VALUE = 0;
+const int MAX_GROUP_OWNER_VALUE = 15;
 class WifiP2pConfig {
 public:
     WifiP2pConfig()

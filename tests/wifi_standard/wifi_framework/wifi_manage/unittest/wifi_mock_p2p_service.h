@@ -37,11 +37,11 @@ public:
     ErrCode DeleteLocalP2pService(const WifiP2pServiceInfo &srvInfo);
     ErrCode StartP2pListen(int period, int interval);
     ErrCode StopP2pListen();
-    ErrCode FormGroup(const WifiP2pConfig &config);
+    ErrCode CreateGroup(const WifiP2pConfig &config);
     ErrCode RemoveGroup();
     ErrCode DeleteGroup(const WifiP2pGroupInfo &group);
     ErrCode P2pConnect(const WifiP2pConfig &config);
-    ErrCode P2pDisConnect();
+    ErrCode P2pCancelConnect();
     ErrCode QueryP2pLinkedInfo(WifiP2pLinkedInfo &linkedInfo);
     ErrCode GetCurrentGroup(WifiP2pGroupInfo &group);
     ErrCode GetP2pEnableStatus(int &status);

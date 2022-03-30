@@ -54,7 +54,7 @@ bool P2pGroupFormationState::ExecuteStateMsg(InternalMessage *msg)
             WifiP2PHalInterface::GetInstance().CancelConnect();
             p2pStateMachine.DealGroupCreationFailed();
             p2pStateMachine.SwitchState(&p2pStateMachine.p2pIdleState);
-            p2pStateMachine.BroadcastActionResult(P2pActionCallback::P2pDisConnect, ErrCode::WIFI_OPT_SUCCESS);
+            p2pStateMachine.BroadcastActionResult(P2pActionCallback::P2pCancelConnect, ErrCode::WIFI_OPT_SUCCESS);
             break;
         }
         case P2P_STATE_MACHINE_CMD::P2P_EVENT_DEVICE_LOST: {

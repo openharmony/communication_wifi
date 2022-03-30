@@ -246,7 +246,7 @@ bool GroupFormedState::ProcessConnectEvt(const InternalMessage &msg) const
 bool GroupFormedState::ProcessCmdCancelConnect(const InternalMessage &msg) const
 {
     WIFI_LOGI("recv CMD: %{public}d", msg.GetMessageName());
-    p2pStateMachine.BroadcastActionResult(P2pActionCallback::P2pDisConnect, ErrCode::WIFI_OPT_FAILED);
+    p2pStateMachine.BroadcastActionResult(P2pActionCallback::P2pCancelConnect, ErrCode::WIFI_OPT_FAILED);
     return EXECUTED;
 }
 

@@ -39,7 +39,7 @@ constexpr int STA_CAN_ONLY_WITH_WIFI_OFF_MODE = 3;
 constexpr int STA_DISABLED_MODE = 4;
 
 constexpr int CMD_NETWORK_CONNECT_TIMEOUT = 0X01;
-constexpr int STA_NETWORK_CONNECTTING_DELAY = 30 * 1000;
+constexpr int STA_NETWORK_CONNECTTING_DELAY = 20 * 1000;
 
 constexpr int CMD_SIGNAL_POLL = 0X02;
 constexpr int STA_SIGNAL_POLL_DELAY = 3 * 1000;

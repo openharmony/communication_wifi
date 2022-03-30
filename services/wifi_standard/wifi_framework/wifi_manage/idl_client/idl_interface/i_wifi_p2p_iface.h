@@ -172,7 +172,7 @@ WifiErrorNo P2pRemoveNetwork(int networkId);
  *
  * @return WifiErrorNo
  */
-WifiErrorNo P2pListNetworks(HidlP2pNetworkList *infoList);
+WifiErrorNo P2pListNetworks(P2pNetworkList *infoList);
 
 /**
  * @Description Send a request for set group max idle to the P2P
@@ -246,7 +246,7 @@ WifiErrorNo P2pSetListenChannel(int channel, int regClass);
  * @Description Send a request for connect to the P2P
  *
  */
-WifiErrorNo P2pConnect(HidlP2pConnectInfo *info);
+WifiErrorNo P2pConnect(P2pConnectInfo *info);
 
 /**
  * @Description Send a request for cancel connect to the P2P
@@ -316,7 +316,7 @@ WifiErrorNo P2pGetGroupCapability(const char *bssid, int *cap);
  * @param info
  * @return WifiErrorNo
  */
-WifiErrorNo P2pAddService(const HidlP2pServiceInfo *info);
+WifiErrorNo P2pAddService(const P2pServiceInfo *info);
 
 /**
  * @Description Send a request for removing a service to the P2P
@@ -324,7 +324,7 @@ WifiErrorNo P2pAddService(const HidlP2pServiceInfo *info);
  * @param info
  * @return WifiErrorNo
  */
-WifiErrorNo P2pRemoveService(const HidlP2pServiceInfo *info);
+WifiErrorNo P2pRemoveService(const P2pServiceInfo *info);
 
 /**
  * @Description Send a request for request service discovery to the P2P
@@ -382,7 +382,7 @@ WifiErrorNo P2pSetServDiscExternal(int mode);
  *
  * @return WifiErrorNo
  */
-WifiErrorNo P2pGetPeer(const char *deviceAddress, HidlP2pDeviceInfo *peerInfo);
+WifiErrorNo P2pGetPeer(const char *deviceAddress, P2pDeviceInfo *peerInfo);
 
 /**
  * @Description Obtains the frequencies supported by a specified frequency band.
@@ -401,7 +401,7 @@ WifiErrorNo P2pGetFrequencies(int32_t band, int *frequencies, int32_t *size);
  * @param config
  * @return WifiErrorNo
  */
-WifiErrorNo P2pSetGroupConfig(int networkId, HidlP2pGroupConfig *pConfig, int size);
+WifiErrorNo P2pSetGroupConfig(int networkId, P2pGroupConfig *pConfig, int size);
 
 /**
  * @Description Getting the P2P group config.
@@ -410,7 +410,7 @@ WifiErrorNo P2pSetGroupConfig(int networkId, HidlP2pGroupConfig *pConfig, int si
  * @param config
  * @return WifiErrorNo
  */
-WifiErrorNo P2pGetGroupConfig(int networkId, HidlP2pGroupConfig *pConfig, int size);
+WifiErrorNo P2pGetGroupConfig(int networkId, P2pGroupConfig *pConfig, int size);
 
 /**
  * @Description Request to obtain the next network ID.

@@ -82,7 +82,7 @@ HWTEST_F(WifiHalStaInterfaceTest, DisableNetworkTest, TestSize.Level1)
 HWTEST_F(WifiHalStaInterfaceTest, SetNetworkTest, TestSize.Level1)
 {
     EXPECT_TRUE(SetNetwork(0, nullptr, 0) == WIFI_HAL_FAILED);
-    HidlSetNetworkConfig conf;
+    SetNetworkConfig conf;
     conf.cfgParam = DEVICE_CONFIG_SSID;
     StrSafeCopy(conf.cfgValue, sizeof(conf.cfgValue), "network_ssid");
     EXPECT_TRUE(SetNetwork(0, &conf, 1) == WIFI_HAL_SUCCESS);
@@ -156,7 +156,7 @@ HWTEST_F(WifiHalStaInterfaceTest, WpaGetCountryCodeTest, TestSize.Level1)
 HWTEST_F(WifiHalStaInterfaceTest, WpaGetNetWorkTest, TestSize.Level1)
 {
     EXPECT_TRUE(WpaGetNetWork(nullptr) == WIFI_HAL_FAILED);
-    HidlGetNetworkConfig conf;
+    GetNetworkConfig conf;
     ASSERT_TRUE(memset_s(&conf, sizeof(conf), 0, sizeof(conf)) == EOK);
     conf.networkId = 0;
     StrSafeCopy(conf.param, sizeof(conf.param), "ssid");
@@ -171,7 +171,7 @@ HWTEST_F(WifiHalStaInterfaceTest, WpaAutoConnectTest, TestSize.Level1)
 HWTEST_F(WifiHalStaInterfaceTest, GetNetworkListTest, TestSize.Level1)
 {
     EXPECT_TRUE(GetNetworkList(nullptr, nullptr) == WIFI_HAL_FAILED);
-    HidlNetworkInfo infos[20];
+    WifiNetworkInfo infos[20];
     ASSERT_TRUE(memset_s(infos, sizeof(infos), 0, sizeof(infos)) == EOK);
     int maxSize = 20;
     EXPECT_TRUE(GetNetworkList(infos, &maxSize) == WIFI_HAL_SUCCESS);
@@ -195,7 +195,7 @@ HWTEST_F(WifiHalStaInterfaceTest, WpaBlocklistClearTest, TestSize.Level1)
 HWTEST_F(WifiHalStaInterfaceTest, GetConnectSignalInfoTest, TestSize.Level1)
 {
     EXPECT_TRUE(GetConnectSignalInfo(nullptr, nullptr) == WIFI_HAL_FAILED);
-    HidlWpaSignalInfo info;
+    WpaSignalInfo info;
     ASSERT_TRUE(memset_s(&info, sizeof(info), 0, sizeof(info)) == EOK);
     WifiErrorNo ret = GetConnectSignalInfo("00:00:00:00:00:00", &info);
     EXPECT_TRUE(ret != WIFI_HAL_SUPPLICANT_NOT_INIT && ret != WIFI_HAL_GET_WIFI_COND_FAILED);

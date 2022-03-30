@@ -250,7 +250,7 @@ WifiErrorNo WifiIdlClient::Scan(const WifiScanParam &scanParam)
 WifiErrorNo WifiIdlClient::ReqGetNetworkList(std::vector<WifiWpaNetworkInfo> &networkList)
 {
     CHECK_CLIENT_NOT_NULL;
-    HidlNetworkInfo infos[WIFI_IDL_GET_MAX_NETWORK_LIST];
+    WifiNetworkInfo infos[WIFI_IDL_GET_MAX_NETWORK_LIST];
     if (memset_s(infos, sizeof(infos), 0, sizeof(infos)) != EOK) {
         return WIFI_IDL_OPT_FAILED;
     }
@@ -403,7 +403,7 @@ WifiErrorNo WifiIdlClient::ReqDisableNetwork(int networkId)
 WifiErrorNo WifiIdlClient::GetDeviceConfig(WifiIdlGetDeviceConfig &config)
 {
     CHECK_CLIENT_NOT_NULL;
-    HidlGetNetworkConfig conf;
+    GetNetworkConfig conf;
     if (memset_s(&conf, sizeof(conf), 0, sizeof(conf)) != EOK) {
         return WIFI_IDL_OPT_FAILED;
     }
@@ -420,7 +420,7 @@ WifiErrorNo WifiIdlClient::GetDeviceConfig(WifiIdlGetDeviceConfig &config)
 }
 
 int WifiIdlClient::PushDeviceConfigString(
-    HidlSetNetworkConfig *pConfig, DeviceConfigType type, const std::string &msg) const
+    SetNetworkConfig *pConfig, DeviceConfigType type, const std::string &msg) const
 {
     if (msg.length() > 0) {
         pConfig->cfgParam = type;
@@ -433,7 +433,7 @@ int WifiIdlClient::PushDeviceConfigString(
     }
 }
 
-int WifiIdlClient::PushDeviceConfigInt(HidlSetNetworkConfig *pConfig, DeviceConfigType type, int i) const
+int WifiIdlClient::PushDeviceConfigInt(SetNetworkConfig *pConfig, DeviceConfigType type, int i) const
 {
     pConfig->cfgParam = type;
     if (snprintf_s(pConfig->cfgValue, sizeof(pConfig->cfgValue), sizeof(pConfig->cfgValue) - 1, "%d", i) < 0) {
@@ -443,7 +443,7 @@ int WifiIdlClient::PushDeviceConfigInt(HidlSetNetworkConfig *pConfig, DeviceConf
 }
 
 int WifiIdlClient::PushDeviceConfigAuthAlgorithm(
-    HidlSetNetworkConfig *pConfig, DeviceConfigType type, unsigned int alg) const
+    SetNetworkConfig *pConfig, DeviceConfigType type, unsigned int alg) const
 {
     pConfig->cfgParam = type;
     if (alg & 0x1) {
@@ -483,7 +483,7 @@ WifiErrorNo WifiIdlClient::SetDeviceConfig(int networkId, const WifiIdlDeviceCon
     if (CheckValidDeviceConfig(config) != WIFI_IDL_OPT_OK) {
         return WIFI_IDL_OPT_FAILED;
     }
-    HidlSetNetworkConfig conf[DEVICE_CONFIG_END_POS];
+    SetNetworkConfig conf[DEVICE_CONFIG_END_POS];
     if (memset_s(conf, sizeof(conf), 0, sizeof(conf)) != EOK) {
         return WIFI_IDL_OPT_FAILED;
     }
@@ -680,7 +680,7 @@ WifiErrorNo WifiIdlClient::ReqSetRoamConfig(const WifiIdlRoamConfig &config)
 WifiErrorNo WifiIdlClient::ReqGetConnectSignalInfo(const std::string &endBssid, WifiWpaSignalInfo &info) const
 {
     CHECK_CLIENT_NOT_NULL;
-    HidlWpaSignalInfo req = {0};
+    WpaSignalInfo req = {0};
     WifiErrorNo err = GetConnectSignalInfo(endBssid.c_str(), &req);
     if (err == WIFI_IDL_OPT_OK) {
         info.signal = req.signal;
@@ -1146,7 +1146,7 @@ WifiErrorNo WifiIdlClient::ReqP2pRemoveNetwork(int networkId) const
 WifiErrorNo WifiIdlClient::ReqP2pListNetworks(std::map<int, WifiP2pGroupInfo> &mapGroups) const
 {
     CHECK_CLIENT_NOT_NULL;
-    HidlP2pNetworkList infoList = {0};
+    P2pNetworkList infoList = {0};
     WifiErrorNo ret = P2pListNetworks(&infoList);
     if (ret != WIFI_IDL_OPT_OK) {
         return ret;
@@ -1232,7 +1232,7 @@ WifiErrorNo WifiIdlClient::ReqP2pConnect(const WifiP2pConfigInternal &config, bo
     std::string &pin) const
 {
     CHECK_CLIENT_NOT_NULL;
-    HidlP2pConnectInfo info = {0};
+    P2pConnectInfo info = {0};
     info.mode = isJoinExistingGroup;
     info.persistent = config.GetNetId();
     if (isJoinExistingGroup) {
@@ -1334,7 +1334,7 @@ WifiErrorNo WifiIdlClient::ReqP2pAddService(const WifiP2pServiceInfo &info) cons
 {
     CHECK_CLIENT_NOT_NULL;
     WifiErrorNo ret = WIFI_IDL_OPT_OK;
-    HidlP2pServiceInfo servInfo = {0};
+    P2pServiceInfo servInfo = {0};
     std::vector<std::string> queryList = info.GetQueryList();
     for (auto iter = queryList.begin(); iter != queryList.end(); iter++) {
         std::vector<std::string> vec;
@@ -1374,7 +1374,7 @@ WifiErrorNo WifiIdlClient::ReqP2pRemoveService(const WifiP2pServiceInfo &info) c
 {
     CHECK_CLIENT_NOT_NULL;
     WifiErrorNo ret = WIFI_IDL_OPT_OK;
-    HidlP2pServiceInfo servInfo = {0};
+    P2pServiceInfo servInfo = {0};
     std::vector<std::string> queryList = info.GetQueryList();
     for (auto iter = queryList.begin(); iter != queryList.end(); iter++) {
         std::vector<std::string> vec;
@@ -1489,7 +1489,7 @@ WifiErrorNo WifiIdlClient::ReqSetServiceDiscoveryExternal(bool isExternalProcess
 WifiErrorNo WifiIdlClient::ReqGetP2pPeer(const std::string &deviceAddress, WifiP2pDevice &device) const
 {
     CHECK_CLIENT_NOT_NULL;
-    HidlP2pDeviceInfo peerInfo;
+    P2pDeviceInfo peerInfo;
     if (memset_s(&peerInfo, sizeof(peerInfo), 0, sizeof(peerInfo)) != EOK) {
         return WIFI_IDL_OPT_FAILED;
     }
@@ -1523,7 +1523,7 @@ WifiErrorNo WifiIdlClient::ReqP2pGetSupportFrequencies(int band, std::vector<int
 }
 
 int WifiIdlClient::PushP2pGroupConfigString(
-    HidlP2pGroupConfig *pConfig, P2pGroupConfigType type, const std::string &str) const
+    P2pGroupConfig *pConfig, P2pGroupConfigType type, const std::string &str) const
 {
     if (str.length() > 0) {
         pConfig->cfgParam = type;
@@ -1536,7 +1536,7 @@ int WifiIdlClient::PushP2pGroupConfigString(
     }
 }
 
-int WifiIdlClient::PushP2pGroupConfigInt(HidlP2pGroupConfig *pConfig, P2pGroupConfigType type, int i) const
+int WifiIdlClient::PushP2pGroupConfigInt(P2pGroupConfig *pConfig, P2pGroupConfigType type, int i) const
 {
     pConfig->cfgParam = type;
     if (snprintf_s(pConfig->cfgValue, sizeof(pConfig->cfgValue), sizeof(pConfig->cfgValue) - 1, "%d", i) < 0) {
@@ -1548,7 +1548,7 @@ int WifiIdlClient::PushP2pGroupConfigInt(HidlP2pGroupConfig *pConfig, P2pGroupCo
 WifiErrorNo WifiIdlClient::ReqP2pSetGroupConfig(int networkId, const IdlP2pGroupConfig &config) const
 {
     CHECK_CLIENT_NOT_NULL;
-    HidlP2pGroupConfig conf[GROUP_CONFIG_END_POS];
+    P2pGroupConfig conf[GROUP_CONFIG_END_POS];
     if (memset_s(conf, sizeof(conf), 0, sizeof(conf)) != EOK) {
         return WIFI_IDL_OPT_FAILED;
     }
@@ -1578,7 +1578,7 @@ WifiErrorNo WifiIdlClient::ReqP2pSetGroupConfig(int networkId, const IdlP2pGroup
 WifiErrorNo WifiIdlClient::ReqP2pGetGroupConfig(int networkId, IdlP2pGroupConfig &config) const
 {
     CHECK_CLIENT_NOT_NULL;
-    HidlP2pGroupConfig confs[GROUP_CONFIG_END_POS];
+    P2pGroupConfig confs[GROUP_CONFIG_END_POS];
     if (memset_s(confs, sizeof(confs), 0, sizeof(confs)) != EOK) {
         return WIFI_IDL_OPT_FAILED;
     }

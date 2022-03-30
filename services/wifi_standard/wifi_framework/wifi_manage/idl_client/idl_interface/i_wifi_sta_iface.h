@@ -161,7 +161,7 @@ WifiErrorNo DisableNetwork(int networkId);
  * @param size
  * @return WifiErrorNo
  */
-WifiErrorNo SetNetwork(int networkId, HidlSetNetworkConfig *confs, int size);
+WifiErrorNo SetNetwork(int networkId, SetNetworkConfig *confs, int size);
 
 /**
  * @Description WpaGetNetwork Info.
@@ -169,7 +169,7 @@ WifiErrorNo SetNetwork(int networkId, HidlSetNetworkConfig *confs, int size);
  * @param confs
  * @return WifiErrorNo
  */
-WifiErrorNo WpaGetNetwork(HidlGetNetworkConfig *confs);
+WifiErrorNo WpaGetNetwork(GetNetworkConfig *confs);
 
 /**
  * @Description Save the network.
@@ -284,7 +284,7 @@ WifiErrorNo WpaBlocklistClear(void);
  * @param size
  * @return WifiErrorNo
  */
-WifiErrorNo GetNetworkList(HidlNetworkInfo *infos, int *size);
+WifiErrorNo GetNetworkList(WifiNetworkInfo *infos, int *size);
 
 /**
  * @Description Get current connect signal info, rssi, linkspeed, noise ...
@@ -293,7 +293,7 @@ WifiErrorNo GetNetworkList(HidlNetworkInfo *infos, int *size);
  * @param info - signal info
  * @return WifiErrorNo
  */
-WifiErrorNo GetConnectSignalInfo(const char *endBssid, HidlWpaSignalInfo *info);
+WifiErrorNo GetConnectSignalInfo(const char *endBssid, WpaSignalInfo *info);
 
 #ifdef __cplusplus
 }

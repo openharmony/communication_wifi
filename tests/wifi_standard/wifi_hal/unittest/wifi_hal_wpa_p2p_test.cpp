@@ -325,7 +325,7 @@ HWTEST_F(WifiHalWpaP2pTest, WpaP2pCliCmdReInviteTest, TestSize.Level1)
 HWTEST_F(WifiHalWpaP2pTest, WpaP2pCliCmdServiceAddTest, TestSize.Level1)
 {
     EXPECT_TRUE(mInterface->wpaP2pCliCmdServiceAdd(nullptr, nullptr) != P2P_SUP_ERRCODE_SUCCESS);
-    HidlP2pServiceInfo info;
+    P2pServiceInfo info;
     ASSERT_TRUE(memset_s(&info, sizeof(info), 0, sizeof(info)) == EOK);
     EXPECT_TRUE(mInterface->wpaP2pCliCmdServiceAdd(mInterface, &info) != P2P_SUP_ERRCODE_SUCCESS);
     StrSafeCopy(info.name, sizeof(info.name), "random_string");
@@ -346,7 +346,7 @@ HWTEST_F(WifiHalWpaP2pTest, WpaP2pCliCmdServiceAddTest, TestSize.Level1)
 HWTEST_F(WifiHalWpaP2pTest, WpaP2pCliCmdServiceDelTest, TestSize.Level1)
 {
     EXPECT_TRUE(mInterface->wpaP2pCliCmdServiceDel(nullptr, nullptr) != P2P_SUP_ERRCODE_SUCCESS);
-    HidlP2pServiceInfo info;
+    P2pServiceInfo info;
     ASSERT_TRUE(memset_s(&info, sizeof(info), 0, sizeof(info)) == EOK);
     EXPECT_TRUE(mInterface->wpaP2pCliCmdServiceDel(mInterface, &info) != P2P_SUP_ERRCODE_SUCCESS);
     StrSafeCopy(info.name, sizeof(info.name), "random_string");
@@ -474,7 +474,7 @@ HWTEST_F(WifiHalWpaP2pTest, WpaP2pCliCmdStoreConfigTest, TestSize.Level1)
 HWTEST_F(WifiHalWpaP2pTest, WpaP2pCliCmdNetworkListTest, TestSize.Level1)
 {
     EXPECT_TRUE(mInterface->wpaP2pCliCmdNetworkList(nullptr, nullptr) != P2P_SUP_ERRCODE_SUCCESS);
-    HidlP2pNetworkList infoList;
+    P2pNetworkList infoList;
     ASSERT_TRUE(memset_s(&infoList, sizeof(infoList), 0, sizeof(infoList)) == EOK);
     MockEraseSupportedCmd("LIST_NETWORKS");
     EXPECT_TRUE(mInterface->wpaP2pCliCmdNetworkList(mInterface, &infoList) != P2P_SUP_ERRCODE_SUCCESS);
@@ -503,7 +503,7 @@ HWTEST_F(WifiHalWpaP2pTest, WpaP2pCliCmdNetworkListTest, TestSize.Level1)
 HWTEST_F(WifiHalWpaP2pTest, WpaP2pCliCmdConnectTest, TestSize.Level1)
 {
     EXPECT_TRUE(mInterface->wpaP2pCliCmdConnect(nullptr, nullptr) != P2P_SUP_ERRCODE_SUCCESS);
-    HidlP2pConnectInfo info;
+    P2pConnectInfo info;
     ASSERT_TRUE(memset_s(&info, sizeof(info), 0, sizeof(info)) == EOK);
     info.mode = 0;
     info.goIntent = 0;
@@ -551,7 +551,7 @@ HWTEST_F(WifiHalWpaP2pTest, WpaP2pCliCmdP2pGetPeerTest, TestSize.Level1)
 {
     EXPECT_TRUE(mInterface->wpaP2pCliCmdP2pGetPeer(nullptr, nullptr, nullptr) != P2P_SUP_ERRCODE_SUCCESS);
     const char *bssid = "00:00:00:00:00:00";
-    HidlP2pDeviceInfo info;
+    P2pDeviceInfo info;
     MockEraseSupportedCmd("P2P_PEER");
     EXPECT_TRUE(mInterface->wpaP2pCliCmdP2pGetPeer(mInterface, nullptr, &info) != P2P_SUP_ERRCODE_SUCCESS);
     MockSetWpaExpectCmdResponse("P2P_PEER", "group_capab=0x0\n");
@@ -574,7 +574,7 @@ HWTEST_F(WifiHalWpaP2pTest, WpaP2pCliCmdSetPersistentReconnectTest, TestSize.Lev
 HWTEST_F(WifiHalWpaP2pTest, WpaP2pCliCmdRespServerDiscoveryTest, TestSize.Level1)
 {
     EXPECT_TRUE(mInterface->wpaP2pCliCmdRespServerDiscovery(nullptr, nullptr) != P2P_SUP_ERRCODE_SUCCESS);
-    HidlP2pServDiscReqInfo info;
+    P2pServDiscReqInfo info;
     ASSERT_TRUE(memset_s(&info, sizeof(info), 0, sizeof(info)) == EOK);
     info.freq = 2412;
     info.dialogToken = 0;

@@ -269,7 +269,7 @@ int RpcP2pListNetworks(RpcServer *server, Context *context)
     if (server == NULL || context == NULL) {
         return -1;
     }
-    HidlP2pNetworkList infoList;
+    P2pNetworkList infoList;
     if (memset_s(&infoList, sizeof(infoList), 0, sizeof(infoList)) != EOK) {
         return -1;
     }
@@ -425,7 +425,7 @@ int RpcP2pConnect(RpcServer *server, Context *context)
     if (server == NULL || context == NULL) {
         return -1;
     }
-    HidlP2pConnectInfo info;
+    P2pConnectInfo info;
     if (memset_s(&info, sizeof(info), 0, sizeof(info)) != EOK) {
         return -1;
     }
@@ -574,7 +574,7 @@ int RpcP2pAddService(RpcServer *server, Context *context)
     if (server == NULL || context == NULL) {
         return -1;
     }
-    HidlP2pServiceInfo argv;
+    P2pServiceInfo argv;
     if (memset_s(&argv, sizeof(argv), 0, sizeof(argv)) != EOK) {
         return -1;
     }
@@ -603,7 +603,7 @@ int RpcP2pRemoveService(RpcServer *server, Context *context)
     if (server == NULL || context == NULL) {
         return -1;
     }
-    HidlP2pServiceInfo argv;
+    P2pServiceInfo argv;
     if (memset_s(&argv, sizeof(argv), 0, sizeof(argv)) != EOK) {
         return -1;
     }
@@ -711,7 +711,7 @@ int RpcP2pRespServerDiscovery(RpcServer *server, Context *context)
     if (server == NULL || context == NULL) {
         return -1;
     }
-    HidlP2pServDiscReqInfo info;
+    P2pServDiscReqInfo info;
     if (memset_s(&info, sizeof(info), 0, sizeof(info)) != EOK) {
         return -1;
     }
@@ -775,7 +775,7 @@ int RpcP2pGetPeer(RpcServer *server, Context *context)
         return -1;
     }
     char bssid[WIFI_BSSID_LENGTH] = {0};
-    HidlP2pDeviceInfo peerInfo;
+    P2pDeviceInfo peerInfo;
     if (memset_s(&peerInfo, sizeof(peerInfo), 0, sizeof(peerInfo)) != EOK ||
         ReadStr(context, bssid, sizeof(bssid)) != 0) {
         return -1;
@@ -834,7 +834,7 @@ int RpcP2pSetGroupConfig(RpcServer *server, Context *context)
     if (ReadInt(context, &networkId) < 0 || ReadInt(context, &size) < 0 || size <= 0) {
         return -1;
     }
-    HidlP2pGroupConfig *confs = (HidlP2pGroupConfig *)calloc(size, sizeof(HidlP2pGroupConfig));
+    P2pGroupConfig *confs = (P2pGroupConfig *)calloc(size, sizeof(P2pGroupConfig));
     if (confs == NULL) {
         return -1;
     }
@@ -868,7 +868,7 @@ int RpcP2pGetGroupConfig(RpcServer *server, Context *context)
     if (ReadInt(context, &networkId) < 0 || ReadInt(context, &size) < 0 || size <= 0) {
         return -1;
     }
-    HidlP2pGroupConfig *confs = (HidlP2pGroupConfig *)calloc(size, sizeof(HidlP2pGroupConfig));
+    P2pGroupConfig *confs = (P2pGroupConfig *)calloc(size, sizeof(P2pGroupConfig));
     if (confs == NULL) {
         return -1;
     }

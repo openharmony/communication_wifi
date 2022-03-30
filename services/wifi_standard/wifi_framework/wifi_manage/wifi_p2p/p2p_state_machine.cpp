@@ -673,6 +673,7 @@ bool P2pStateMachine::StartDhcpServer()
     }
     WifiNetAgent::GetInstance().AddRoute(groupManager.GetCurrentGroup().GetInterface(),
         ipv4.GetAddressWithString(), ipv4.GetAddressPrefixLength());
+    WIFI_LOGI("Start dhcp server for P2p finished.");
     return true;
 }
 

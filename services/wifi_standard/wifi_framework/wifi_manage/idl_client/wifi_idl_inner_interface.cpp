@@ -145,7 +145,7 @@ void OnP2pConnectSupplicant(int state)
     }
 }
 
-void OnP2pDeviceFound(const HidlP2pDeviceInfo *info)
+void OnP2pDeviceFound(const P2pDeviceInfo *info)
 {
     if (info == nullptr) {
         return;
@@ -218,7 +218,7 @@ void OnP2pInvitationResult(const char *bssid, int status)
     }
 }
 
-void OnP2pInvitationReceived(const HidlP2pInvitationInfo *info)
+void OnP2pInvitationReceived(const P2pInvitationInfo *info)
 {
     if (info == nullptr) {
         return;
@@ -255,7 +255,7 @@ void OnP2pGroupFormationFailure(const char *failureReason)
     }
 }
 
-void OnP2pGroupStarted(const HidlP2pGroupInfo *group)
+void OnP2pGroupStarted(const P2pGroupInfo *group)
 {
     if (group == nullptr) {
         return;
@@ -392,7 +392,7 @@ void OnP2pConnectSupplicantFailed(void)
     }
 }
 
-void OnP2pServDiscReq(const HidlP2pServDiscReqInfo *info)
+void OnP2pServDiscReq(const P2pServDiscReqInfo *info)
 {
     if (info == nullptr) {
         return;

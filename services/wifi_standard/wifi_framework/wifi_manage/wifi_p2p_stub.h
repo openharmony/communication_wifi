@@ -54,11 +54,11 @@ private:
     void OnDeleteLocalP2pService(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
     void OnStartP2pListen(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
     void OnStopP2pListen(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
-    void OnFormGroup(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
+    void OnCreateGroup(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
     void OnRemoveGroup(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
     void OnDeleteGroup(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
     void OnP2pConnect(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
-    void OnP2pDisConnect(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
+    void OnP2pCancelConnect(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
     void OnQueryP2pLinkedInfo(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
     void OnGetCurrentGroup(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
     void OnGetP2pEnableStatus(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);

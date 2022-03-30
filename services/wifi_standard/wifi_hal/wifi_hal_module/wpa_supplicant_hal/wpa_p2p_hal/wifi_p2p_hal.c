@@ -575,7 +575,7 @@ static P2pSupplicantErrCode WpaP2pCliCmdReInvite(WifiWpaP2pInterface *this, cons
     return P2P_SUP_ERRCODE_SUCCESS;
 }
 
-static P2pSupplicantErrCode WpaP2pCliCmdServiceAdd(WifiWpaP2pInterface *this, const HidlP2pServiceInfo *argv)
+static P2pSupplicantErrCode WpaP2pCliCmdServiceAdd(WifiWpaP2pInterface *this, const P2pServiceInfo *argv)
 {
     if (this == NULL || argv == NULL) {
         return P2P_SUP_ERRCODE_INVALID;
@@ -620,7 +620,7 @@ static P2pSupplicantErrCode WpaP2pCliCmdServiceAdd(WifiWpaP2pInterface *this, co
     return P2P_SUP_ERRCODE_SUCCESS;
 }
 
-static P2pSupplicantErrCode WpaP2pCliCmdServiceDel(WifiWpaP2pInterface *this, const HidlP2pServiceInfo *argv)
+static P2pSupplicantErrCode WpaP2pCliCmdServiceDel(WifiWpaP2pInterface *this, const P2pServiceInfo *argv)
 {
     if (this == NULL || argv == NULL) {
         return P2P_SUP_ERRCODE_INVALID;
@@ -798,7 +798,7 @@ static P2pSupplicantErrCode WpaP2pCliCmdStoreConfig(WifiWpaP2pInterface *this)
     return P2P_SUP_ERRCODE_SUCCESS;
 }
 
-static void GetHalNetworkInfos(char *buf, HidlP2pNetworkInfo *info)
+static void GetHalNetworkInfos(char *buf, P2pNetworkInfo *info)
 {
     if (buf == NULL || info == NULL) {
         return;
@@ -837,7 +837,7 @@ static void GetHalNetworkInfos(char *buf, HidlP2pNetworkInfo *info)
     return;
 }
 
-static P2pSupplicantErrCode WpaP2pCliCmdNetworkList(WifiWpaP2pInterface *this, HidlP2pNetworkList *infoList)
+static P2pSupplicantErrCode WpaP2pCliCmdNetworkList(WifiWpaP2pInterface *this, P2pNetworkList *infoList)
 {
     if (this == NULL || infoList == NULL) {
         return P2P_SUP_ERRCODE_INVALID;
@@ -870,7 +870,7 @@ static P2pSupplicantErrCode WpaP2pCliCmdNetworkList(WifiWpaP2pInterface *this, H
         free(buf);
         return P2P_SUP_ERRCODE_SUCCESS;
     }
-    infoList->infos = (HidlP2pNetworkInfo *)calloc(infoList->infoNum, sizeof(HidlP2pNetworkInfo));
+    infoList->infos = (P2pNetworkInfo *)calloc(infoList->infoNum, sizeof(P2pNetworkInfo));
     if (infoList->infos == NULL) {
         free(buf);
         return P2P_SUP_ERRCODE_FAILED;
@@ -891,7 +891,7 @@ static P2pSupplicantErrCode WpaP2pCliCmdNetworkList(WifiWpaP2pInterface *this, H
     return P2P_SUP_ERRCODE_SUCCESS;
 }
 
-static P2pSupplicantErrCode WpaP2pCliCmdConnect(WifiWpaP2pInterface *this, HidlP2pConnectInfo *info)
+static P2pSupplicantErrCode WpaP2pCliCmdConnect(WifiWpaP2pInterface *this, P2pConnectInfo *info)
 {
     if (this == NULL || info == NULL) {
         return P2P_SUP_ERRCODE_INVALID;
@@ -962,7 +962,7 @@ static P2pSupplicantErrCode WpaP2pCliCmdSetPersistentReconnect(WifiWpaP2pInterfa
     return P2P_SUP_ERRCODE_SUCCESS;
 }
 
-static P2pSupplicantErrCode WpaP2pCliCmdRespServerDiscovery(WifiWpaP2pInterface *this, HidlP2pServDiscReqInfo *info)
+static P2pSupplicantErrCode WpaP2pCliCmdRespServerDiscovery(WifiWpaP2pInterface *this, P2pServDiscReqInfo *info)
 {
     if (this == NULL || info == NULL || info->tlvs == NULL) {
         return P2P_SUP_ERRCODE_INVALID;
@@ -1084,7 +1084,7 @@ static P2pSupplicantErrCode WpaP2pCliCmdSetRandomMac(WifiWpaP2pInterface *this, 
 }
 
 static P2pSupplicantErrCode WpaP2pCliCmdP2pGetPeer(
-    WifiWpaP2pInterface *this, const char *bssid, HidlP2pDeviceInfo *peerInfo)
+    WifiWpaP2pInterface *this, const char *bssid, P2pDeviceInfo *peerInfo)
 {
     if (this == NULL || bssid == NULL || peerInfo == NULL) {
         return P2P_SUP_ERRCODE_INVALID;

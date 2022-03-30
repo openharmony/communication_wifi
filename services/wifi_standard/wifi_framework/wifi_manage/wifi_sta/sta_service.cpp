@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,16 +12,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include "sta_service.h"
-#include "wifi_logger.h"
 #include "sta_define.h"
 #include "sta_service_callback.h"
+#include "wifi_common_util.h"
+#include "wifi_hisysevent.h"
+#include "wifi_logger.h"
+#include "wifi_settings.h"
 #include "wifi_sta_hal_interface.h"
 #include "wifi_supplicant_hal_interface.h"
-#include "wifi_settings.h"
 
 DEFINE_WIFILOG_LABEL("StaService");
-
 namespace OHOS {
 namespace Wifi {
 StaService::StaService()
@@ -87,7 +89,6 @@ ErrCode StaService::InitStaService(const StaServiceCallback &callbacks)
         return WIFI_OPT_FAILED;
     }
     WIFI_LOGI("Init staservice successfully.\n");
-
     return WIFI_OPT_SUCCESS;
 }
 
@@ -95,6 +96,7 @@ ErrCode StaService::EnableWifi() const
 {
     WIFI_LOGI("Enter StaService::EnableWifi.\n");
     pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_ENABLE_WIFI, STA_CONNECT_MODE);
+    WriteWifiStateHiSysEvent(HISYS_SERVICE_TYPE_STA, WifiOperType::ENABLE);
     return WIFI_OPT_SUCCESS;
 }
 
@@ -102,6 +104,7 @@ ErrCode StaService::DisableWifi() const
 {
     WIFI_LOGI("Enter StaService::DisableWifi.\n");
     pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_DISABLE_WIFI);
+    WriteWifiStateHiSysEvent(HISYS_SERVICE_TYPE_STA, WifiOperType::DISABLE);
     return WIFI_OPT_SUCCESS;
 }
 
@@ -200,6 +203,7 @@ ErrCode StaService::ConnectToDevice(const WifiDeviceConfig &config) const
     }
     LOGD("StaService::ConnectTo  AddDeviceConfig succeed!");
     pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_CONNECT_NETWORK, netWorkId, NETWORK_SELECTED_BY_THE_USER);
+    WriteWifiConnectionHiSysEvent(WifiConnectionType::CONNECT, GetBundleName());
     return WIFI_OPT_SUCCESS;
 }
 
@@ -214,6 +218,7 @@ ErrCode StaService::ConnectToNetwork(int networkId) const
 
     pStaAutoConnectService->EnableOrDisableBssid(config.bssid, true, 0);
     pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_CONNECT_SAVED_NETWORK, networkId, NETWORK_SELECTED_BY_THE_USER);
+    WriteWifiConnectionHiSysEvent(WifiConnectionType::CONNECT, GetBundleName());
     return WIFI_OPT_SUCCESS;
 }
 
@@ -221,6 +226,7 @@ ErrCode StaService::ReAssociate() const
 {
     WIFI_LOGI("Enter StaService::ReAssociate.\n");
     pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_REASSOCIATE_NETWORK);
+    WriteWifiConnectionHiSysEvent(WifiConnectionType::CONNECT, GetBundleName());
     return WIFI_OPT_SUCCESS;
 }
 
@@ -259,6 +265,7 @@ ErrCode StaService::Disconnect() const
         WIFI_LOGI("The blocklist is updated.\n");
     }
     pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_DISCONNECT);
+    WriteWifiConnectionHiSysEvent(WifiConnectionType::DISCONNECT, GetBundleName());
     return WIFI_OPT_SUCCESS;
 }
 
@@ -314,6 +321,7 @@ ErrCode StaService::ReConnect() const
 {
     WIFI_LOGI("Enter StaService::ReConnect.\n");
     pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_RECONNECT_NETWORK);
+    WriteWifiConnectionHiSysEvent(WifiConnectionType::CONNECT, GetBundleName());
     return WIFI_OPT_SUCCESS;
 }
 }  // namespace Wifi

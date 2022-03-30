@@ -333,7 +333,7 @@ HWTEST_F(WifiHalWpaStaTest, WpaCliCmdWpaBlockListClearTest, TestSize.Level1)
 HWTEST_F(WifiHalWpaStaTest, WpaCliCmdListNetworksTest, TestSize.Level1)
 {
     EXPECT_TRUE(mInterface->wpaCliCmdListNetworks(mInterface, nullptr, nullptr) < 0);
-    HidlNetworkInfo a[256];
+    WifiNetworkInfo a[256];
     ASSERT_TRUE(memset_s(a, sizeof(a), 0, sizeof(a)) == EOK);
     int size = 256;
     MockEraseSupportedCmd("LIST_NETWORKS");
@@ -362,7 +362,7 @@ HWTEST_F(WifiHalWpaStaTest, WpaCliCmdListNetworksTest, TestSize.Level1)
 HWTEST_F(WifiHalWpaStaTest, WpaCliCmdGetSignalInfoTest, TestSize.Level1)
 {
     EXPECT_TRUE(mInterface->wpaCliCmdGetSignalInfo(mInterface, nullptr) < 0);
-    HidlWpaSignalInfo info;
+    WpaSignalInfo info;
     ASSERT_TRUE(memset_s(&info, sizeof(info), 0, sizeof(info)) == EOK);
     EXPECT_TRUE(mInterface->wpaCliCmdGetSignalInfo(mInterface, &info) == 0);
     MockEraseSupportedCmd("SIGNAL_POLL");

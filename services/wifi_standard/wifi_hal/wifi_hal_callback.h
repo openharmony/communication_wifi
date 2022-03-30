@@ -92,16 +92,16 @@ void WifiHalCbApState(const char *content);
 /**
  * @Description wpa_supplicant client connection result event
  *
- * @param status - event value
+ * @param state - event value
  */
-void WifiP2pHalCbNotifyConnectSupplicant(int status);
+void WifiP2pHalCbNotifyConnectSupplicant(int state);
 
 /**
  * @Description Indicates that a P2P device has been found
  *
  * @param device
  */
-void P2pHalCbDeviceFound(const HidlP2pDeviceInfo *device);
+void P2pHalCbDeviceFound(const P2pDeviceInfo *device);
 
 /**
  * @Description Indicates that a P2P device is lost
@@ -136,7 +136,7 @@ void P2pHalCbGoNegotiationFailure(int status);
  *
  * @param info
  */
-void P2pHalCbInvitationReceived(const HidlP2pInvitationInfo *info);
+void P2pHalCbInvitationReceived(const P2pInvitationInfo *info);
 
 /**
  * @Description Indicates the result of a P2P invitation request
@@ -164,7 +164,7 @@ void P2pHalCbGroupFormationFailure(const char *reason);
  *
  * @param info
  */
-void P2pHalCbGroupStarted(const HidlP2pGroupInfo *info);
+void P2pHalCbGroupStarted(const P2pGroupInfo *info);
 
 /**
  * @Description Deletes a P2P group
@@ -223,7 +223,7 @@ void P2pHalCbFindStopped();
  * @param tlvs
  * @param tlvsLength
  */
-void P2pHalCbServiceDiscoveryResponse(const HidlP2pServDiscRespInfo *info);
+void P2pHalCbServiceDiscoveryResponse(const P2pServDiscRespInfo *info);
 
 /**
  * @Description Indicates when a STA device is connected/disconnected to this device
@@ -231,7 +231,7 @@ void P2pHalCbServiceDiscoveryResponse(const HidlP2pServDiscRespInfo *info);
  * @param p2pDeviceAddress
  * @param type - 0 disconnect, 1 connected
  */
-void P2pHalCbStaConnectState(const char *p2pDeviceAddress, int type);
+void P2pHalCbStaConnectState(const char *p2pDeviceAddress, int state);
 
 /**
  * @Description Reporting Link Failure Events
@@ -245,7 +245,7 @@ void P2pHalCbConnectSupplicantFailed();
  *
  * @param info
  */
-void P2pHalCbServDiscReq(const HidlP2pServDiscReqInfo *info);
+void P2pHalCbServDiscReq(const P2pServDiscReqInfo *info);
 #ifdef __cplusplus
 }
 #endif

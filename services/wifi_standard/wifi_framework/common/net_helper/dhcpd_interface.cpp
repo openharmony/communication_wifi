@@ -51,10 +51,7 @@ bool DhcpdInterface::SetDhcpEventFunc(const std::string &ifaceName, IDhcpResultN
     if (ifaceName.empty() || pResultNotify == nullptr || mDhcpService == nullptr) {
         return false;
     }
-    if (!mDhcpService->GetDhcpSerProExit(ifaceName, pResultNotify)) {
-        return true;
-    }
-    return false;
+    return (mDhcpService->GetDhcpSerProExit(ifaceName, pResultNotify) == DHCP_OPT_SUCCESS);
 }
 
 bool DhcpdInterface::StartDhcpServer(const std::string &ifaceName, Ipv4Address &ipv4, Ipv6Address &ipv6, bool isIpV4)

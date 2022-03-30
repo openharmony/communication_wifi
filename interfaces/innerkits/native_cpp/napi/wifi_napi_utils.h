@@ -20,7 +20,6 @@
 #include <chrono>
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
-#include "wifi_hisysevent.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -93,8 +92,6 @@ enum class SecTypeJs {
     SEC_TYPE_PSK = 3, /* Pre-shared key (PSK) */
     SEC_TYPE_SAE = 4, /* Simultaneous Authentication of Equals (SAE) */
 };
-
-std::string JsAbilityGetBundleName();
 }  // namespace Wifi
 }  // namespace OHOS
 

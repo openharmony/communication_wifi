@@ -84,11 +84,11 @@ typedef union WifiHalCallbackMsg {
     int scanStatus;
     WifiHalConnectMsg connMsg;
     WifiHalCbIFaceMsg ifMsg;
-    HidlP2pDeviceInfo deviceInfo;
-    HidlP2pGroupInfo groupInfo;
-    HidlP2pInvitationInfo invitaInfo;
-    HidlP2pServDiscRespInfo serverInfo;
-    HidlP2pServDiscReqInfo serDiscReqInfo;
+    P2pDeviceInfo deviceInfo;
+    P2pGroupInfo groupInfo;
+    P2pInvitationInfo invitaInfo;
+    P2pServDiscRespInfo serverInfo;
+    P2pServDiscReqInfo serDiscReqInfo;
 } WifiHalCallbackMsg;
 
 typedef struct WifiHalEventCallbackMsg {

@@ -25,16 +25,16 @@ extern "C" {
 
 typedef struct IWifiEventP2pCallback {
     void (*onP2pSupplicantConnect)(int status);
-    void (*onDeviceFound)(const HidlP2pDeviceInfo *device);
+    void (*onDeviceFound)(const P2pDeviceInfo *device);
     void (*onDeviceLost)(const char *p2pDeviceAddress);
     void (*onGoNegotiationRequest)(const char *srcAddress, short passwordId);
     void (*onGoNegotiationSuccess)(void);
     void (*onGoNegotiationFailure)(int status);
-    void (*onInvitationReceived)(const HidlP2pInvitationInfo *info);
+    void (*onInvitationReceived)(const P2pInvitationInfo *info);
     void (*onInvitationResult)(const char *bssid, int status);
     void (*onGroupFormationSuccess)(void);
     void (*onGroupFormationFailure)(const char *failureReason);
-    void (*onGroupStarted)(const HidlP2pGroupInfo *group);
+    void (*onGroupStarted)(const P2pGroupInfo *group);
     void (*onGroupRemoved)(const char *groupIfName, int isGo);
     void (*onProvisionDiscoveryPbcRequest)(const char *p2pDeviceAddress);
     void (*onProvisionDiscoveryPbcResponse)(const char *p2pDeviceAddress);
@@ -47,7 +47,7 @@ typedef struct IWifiEventP2pCallback {
     void (*onStaDeauthorized)(const char *p2pDeviceAddress);
     void (*onStaAuthorized)(const char *p2pDeviceAddress);
     void (*connectSupplicantFailed)(void);
-    void (*onP2pServDiscReq)(const HidlP2pServDiscReqInfo *info);
+    void (*onP2pServDiscReq)(const P2pServDiscReqInfo *info);
 } IWifiEventP2pCallback;
 
 #ifdef __cplusplus

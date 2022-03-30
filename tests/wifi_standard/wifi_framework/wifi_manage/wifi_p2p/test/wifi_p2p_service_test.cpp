@@ -111,10 +111,10 @@ HWTEST_F(WifiP2pServiceTest, StopP2pListen, TestSize.Level1)
     EXPECT_EQ(pWifiP2pService->StopP2pListen(), ErrCode::WIFI_OPT_SUCCESS);
 }
 
-HWTEST_F(WifiP2pServiceTest, FormGroup, TestSize.Level1)
+HWTEST_F(WifiP2pServiceTest, CreateGroup, TestSize.Level1)
 {
     WifiP2pConfig config;
-    EXPECT_EQ(pWifiP2pService->FormGroup(config), ErrCode::WIFI_OPT_SUCCESS);
+    EXPECT_EQ(pWifiP2pService->CreateGroup(config), ErrCode::WIFI_OPT_SUCCESS);
 }
 
 HWTEST_F(WifiP2pServiceTest, RemoveGroup, TestSize.Level1)
@@ -132,7 +132,7 @@ HWTEST_F(WifiP2pServiceTest, P2pConnect, TestSize.Level1)
 {
     WifiP2pConfig config;
     EXPECT_EQ(pWifiP2pService->P2pConnect(config), ErrCode::WIFI_OPT_SUCCESS);
-    EXPECT_EQ(pWifiP2pService->P2pDisConnect(), ErrCode::WIFI_OPT_SUCCESS);
+    EXPECT_EQ(pWifiP2pService->P2pCancelConnect(), ErrCode::WIFI_OPT_SUCCESS);
 }
 
 HWTEST_F(WifiP2pServiceTest, QueryP2pLinkedInfo, TestSize.Level1)

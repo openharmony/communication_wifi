@@ -57,7 +57,7 @@ static void DealP2pFindInfo(char *buf)
     if (buf == NULL || strlen(buf) < WIFI_MAC_LENGTH) {
         return;
     }
-    HidlP2pDeviceInfo info = {0};
+    P2pDeviceInfo info = {0};
     if (strncpy_s(info.srcAddress, sizeof(info.srcAddress), buf, WIFI_MAC_LENGTH) != EOK) {
         return;
     }
@@ -124,7 +124,7 @@ static void DealGroupStartInfo(char *buf)
     if (buf == NULL) {
         return;
     }
-    HidlP2pGroupInfo conf = {0};
+    P2pGroupInfo conf = {0};
     if (memset_s(&conf, sizeof(conf), 0, sizeof(conf)) != EOK) {
         return;
     }
@@ -174,7 +174,7 @@ static void DealServiceDiscRespEvent(char *buf)
     if (buf == NULL) {
         return;
     }
-    HidlP2pServDiscRespInfo info = {0};
+    P2pServDiscRespInfo info = {0};
     if (memset_s(&info, sizeof(info), 0, sizeof(info)) != EOK) {
         return;
     }
@@ -280,7 +280,7 @@ static void DealInvitationReceived(char *buf, int type)
     if (buf == NULL) {
         return;
     }
-    HidlP2pInvitationInfo info = {0};
+    P2pInvitationInfo info = {0};
     if (memset_s(&info, sizeof(info), 0, sizeof(info)) != EOK) {
         return;
     }
@@ -425,7 +425,7 @@ static void DealP2pServDiscReqEvent(char *buf)
     if (buf == NULL) {
         return;
     }
-    HidlP2pServDiscReqInfo info;
+    P2pServDiscReqInfo info;
     if (memset_s(&info, sizeof(info), 0, sizeof(info)) != EOK) {
         return;
     }

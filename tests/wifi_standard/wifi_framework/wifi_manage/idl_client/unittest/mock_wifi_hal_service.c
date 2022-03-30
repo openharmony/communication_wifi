@@ -220,7 +220,7 @@ WifiErrorNo DisableNetwork(int networkId)
     return WIFI_HAL_SUCCESS;
 }
 
-WifiErrorNo SetNetwork(int networkId, const HidlSetNetworkConfig *confs, int size)
+WifiErrorNo SetNetwork(int networkId, const SetNetworkConfig *confs, int size)
 {
     return WIFI_HAL_SUCCESS;
 }
@@ -274,7 +274,7 @@ WifiErrorNo WpaGetCountryCode(char *countryCode, int codeSize)
     return WIFI_HAL_SUCCESS;
 }
 
-WifiErrorNo WpaGetNetWork(HidlGetNetworkConfig *conf)
+WifiErrorNo WpaGetNetWork(GetNetworkConfig *conf)
 {
     return WIFI_HAL_SUCCESS;
 }
@@ -289,12 +289,12 @@ WifiErrorNo WpaBlocklistClear(void)
     return WIFI_HAL_SUCCESS;
 }
 
-WifiErrorNo GetNetworkList(HidlNetworkInfo *infos, int *size)
+WifiErrorNo GetNetworkList(WifiNetworkInfo *infos, int *size)
 {
     return WIFI_HAL_SUCCESS;
 }
 
-WifiErrorNo GetConnectSignalInfo(const char *endBssid, HidlWpaSignalInfo *info)
+WifiErrorNo GetConnectSignalInfo(const char *endBssid, WpaSignalInfo *info)
 {
     return WIFI_HAL_SUCCESS;
 }
@@ -526,12 +526,12 @@ WifiErrorNo P2pRemoveNetwork(int networkId)
     return WIFI_HAL_SUCCESS;
 }
 
-WifiErrorNo P2pListNetworks(HidlP2pNetworkList *infoList)
+WifiErrorNo P2pListNetworks(P2pNetworkList *infoList)
 {
     if (infoList == NULL) {
         return WIFI_HAL_FAILED;
     }
-    infoList->infos = (HidlP2pNetworkInfo *)calloc(1, sizeof(HidlP2pNetworkInfo));
+    infoList->infos = (P2pNetworkInfo *)calloc(1, sizeof(P2pNetworkInfo));
     if (infoList->infos == NULL) {
         return WIFI_HAL_FAILED;
     }
@@ -569,7 +569,7 @@ WifiErrorNo P2pSetWfdDeviceConfig(const char *config)
 
 WifiErrorNo P2pStartFind(int timeout)
 {
-    HidlP2pDeviceInfo device;
+    P2pDeviceInfo device;
     if (memset_s(&device, sizeof(device), 0, sizeof(device)) != EOK ||
         strcpy_s(device.srcAddress, sizeof(device.srcAddress), "00:00:00:00:00:00") != EOK ||
         strcpy_s(device.p2pDeviceAddress, sizeof(device.p2pDeviceAddress), "01:00:00:00:00:00") != EOK ||
@@ -599,7 +599,7 @@ WifiErrorNo P2pSetListenChannel(int channel, int regClass)
     return WIFI_HAL_SUCCESS;
 }
 
-WifiErrorNo P2pConnect(const HidlP2pConnectInfo *info)
+WifiErrorNo P2pConnect(const P2pConnectInfo *info)
 {
     P2pHalCbStaConnectState("00:00:00:00:00:00", 1);
     return WIFI_HAL_SUCCESS;
@@ -628,7 +628,7 @@ WifiErrorNo P2pAddGroup(int isPersistent, int networkId)
 {
     P2pHalCbGroupFormationSuccess();
     P2pHalCbGroupFormationFailure("unknown");
-    HidlP2pGroupInfo info;
+    P2pGroupInfo info;
     if (memset_s(&info, sizeof(info), 0, sizeof(info)) != EOK ||
         strcpy_s(info.groupIfName, sizeof(info.groupIfName), "p2p-dev-wlan1") != EOK ||
         strcpy_s(info.ssid, sizeof(info.ssid), "p2p_honor_suffix") != EOK ||
@@ -648,7 +648,7 @@ WifiErrorNo P2pRemoveGroup(const char *interface)
 
 WifiErrorNo P2pInvite(int persisitent, const char *peerBssid, const char *goBssid, const char *ifname)
 {
-    HidlP2pInvitationInfo info;
+    P2pInvitationInfo info;
     if (memset_s(&info, sizeof(info), 0, sizeof(info)) != EOK ||
         strcpy_s(info.srcAddress, sizeof(info.srcAddress), "00:00:00:00:00:00") != EOK ||
         strcpy_s(info.goDeviceAddress,
@@ -672,25 +672,25 @@ WifiErrorNo P2pGetGroupCapability(const char *bssid, int *cap)
     return WIFI_HAL_SUCCESS;
 }
 
-WifiErrorNo P2pAddService(const HidlP2pServiceInfo *info)
+WifiErrorNo P2pAddService(const P2pServiceInfo *info)
 {
     return WIFI_HAL_SUCCESS;
 }
 
-WifiErrorNo P2pRemoveService(const HidlP2pServiceInfo *info)
+WifiErrorNo P2pRemoveService(const P2pServiceInfo *info)
 {
     return WIFI_HAL_SUCCESS;
 }
 
 WifiErrorNo P2pReqServiceDiscovery(const char *bssid, const char *msg)
 {
-    HidlP2pServDiscReqInfo reqInfo;
+    P2pServDiscReqInfo reqInfo;
     if (memset_s(&reqInfo, sizeof(reqInfo), 0, sizeof(reqInfo)) != EOK ||
         strcpy_s(reqInfo.mac, sizeof(reqInfo.mac), "00:00:00:00:00:00") != EOK) {
         return WIFI_HAL_FAILED;
     }
     P2pHalCbServDiscReq(&reqInfo);
-    HidlP2pServDiscRespInfo info;
+    P2pServDiscRespInfo info;
     if (memset_s(&info, sizeof(info), 0, sizeof(info)) != EOK ||
         strcpy_s(info.srcAddress, sizeof(info.srcAddress), "00:00:00:00:00:00") != EOK) {
         return WIFI_HAL_FAILED;
@@ -720,7 +720,7 @@ WifiErrorNo P2pSetPersistentReconnect(int mode)
     return WIFI_HAL_SUCCESS;
 }
 
-WifiErrorNo P2pRespServerDiscovery(HidlP2pServDiscReqInfo *info)
+WifiErrorNo P2pRespServerDiscovery(P2pServDiscReqInfo *info)
 {
     return WIFI_HAL_SUCCESS;
 }
@@ -735,7 +735,7 @@ WifiErrorNo P2pSetWpsSecondaryDeviceType(const char *type)
     return WIFI_HAL_SUCCESS;
 }
 
-WifiErrorNo P2pGetPeer(const char *bssid, HidlP2pDeviceInfo *peerInfo)
+WifiErrorNo P2pGetPeer(const char *bssid, P2pDeviceInfo *peerInfo)
 {
     return WIFI_HAL_SUCCESS;
 }
@@ -745,12 +745,12 @@ WifiErrorNo P2pGetFrequencies(int band, int *frequencies, int *size)
     return WIFI_HAL_SUCCESS;
 }
 
-WifiErrorNo P2pSetGroupConfig(int networkId, HidlP2pGroupConfig *pConfig, int size)
+WifiErrorNo P2pSetGroupConfig(int networkId, P2pGroupConfig *pConfig, int size)
 {
     return WIFI_HAL_SUCCESS;
 }
 
-WifiErrorNo P2pGetGroupConfig(int networkId, HidlP2pGroupConfig *pConfig, int size)
+WifiErrorNo P2pGetGroupConfig(int networkId, P2pGroupConfig *pConfig, int size)
 {
     return WIFI_HAL_SUCCESS;
 }

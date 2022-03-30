@@ -80,8 +80,8 @@ public:
      * @Description P2p callback result.
      *
      * @param action - DiscoverDevices/StopDiscoverDevices/DiscoverServices/StopDiscoverServices
-     *                 /PutLocalP2pService/StartP2pListen/StopP2pListen/FormGroup/RemoveGroup
-     *                 /DeleteGroup/P2pConnect/P2pDisConnect
+     *                 /PutLocalP2pService/StartP2pListen/StopP2pListen/CreateGroup/RemoveGroup
+     *                 /DeleteGroup/P2pConnect/P2pCancelConnect
      * @param code   - Return code
      */
     virtual void OnP2pActionResult(P2pActionCallback action, ErrCode code) = 0;

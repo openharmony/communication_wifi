@@ -574,7 +574,7 @@ bool P2pEnabledState::ProcessCmdSetWfdInfo(InternalMessage &msg) const
 bool P2pEnabledState::ProcessCmdCancelConnect(InternalMessage &msg) const
 {
     WIFI_LOGI("P2P ProcessCmdCancelConnect recv CMD: %{public}d", msg.GetMessageName());
-    p2pStateMachine.BroadcastActionResult(P2pActionCallback::P2pDisConnect, ErrCode::WIFI_OPT_FAILED);
+    p2pStateMachine.BroadcastActionResult(P2pActionCallback::P2pCancelConnect, ErrCode::WIFI_OPT_FAILED);
     return EXECUTED;
 }
 } // namespace Wifi

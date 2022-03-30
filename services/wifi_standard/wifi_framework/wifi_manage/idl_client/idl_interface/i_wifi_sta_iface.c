@@ -319,7 +319,7 @@ WifiErrorNo DisableNetwork(int networkId)
     return result;
 }
 
-WifiErrorNo SetNetwork(int networkId, HidlSetNetworkConfig *confs, int size)
+WifiErrorNo SetNetwork(int networkId, SetNetworkConfig *confs, int size)
 {
     RpcClient *client = GetStaRpcClient();
     LockRpcClient(client);
@@ -346,7 +346,7 @@ WifiErrorNo SetNetwork(int networkId, HidlSetNetworkConfig *confs, int size)
     return result;
 }
 
-WifiErrorNo WpaGetNetwork(HidlGetNetworkConfig *confs)
+WifiErrorNo WpaGetNetwork(GetNetworkConfig *confs)
 {
     RpcClient *client = GetStaRpcClient();
     LockRpcClient(client);
@@ -420,7 +420,7 @@ WifiErrorNo StartScan(const ScanSettings *settings)
     return result;
 }
 
-WifiErrorNo GetNetworkList(HidlNetworkInfo *infos, int *size)
+WifiErrorNo GetNetworkList(WifiNetworkInfo *infos, int *size)
 {
     RpcClient *client = GetStaRpcClient();
     LockRpcClient(client);
@@ -772,7 +772,7 @@ WifiErrorNo WpaBlocklistClear(void)
     return result;
 }
 
-WifiErrorNo GetConnectSignalInfo(const char *endBssid, HidlWpaSignalInfo *info)
+WifiErrorNo GetConnectSignalInfo(const char *endBssid, WpaSignalInfo *info)
 {
     RpcClient *client = GetStaRpcClient();
     LockRpcClient(client);

@@ -136,6 +136,7 @@ bool ApStateMachine::StartDhcpServer()
     if (!m_DhcpdInterface.SetDhcpEventFunc(IN_INTERFACE, pDhcpNotify.get())) {
         WIFI_LOGW("Set dhcp notify failed.");
     }
+    WIFI_LOGI("Start dhcp server for AP finished.");
     return true;
 }
 

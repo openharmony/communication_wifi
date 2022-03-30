@@ -44,11 +44,11 @@ void WifiP2pStub::InitHandleMap()
     handleFuncMap[WIFI_SVR_CMD_P2P_DELETE_LOCAL_SERVICES] = &WifiP2pStub::OnDeleteLocalP2pService;
     handleFuncMap[WIFI_SVR_CMD_P2P_START_LISTEN] = &WifiP2pStub::OnStartP2pListen;
     handleFuncMap[WIFI_SVR_CMD_P2P_STOP_LISTEN] = &WifiP2pStub::OnStopP2pListen;
-    handleFuncMap[WIFI_SVR_CMD_P2P_FORM_GROUP] = &WifiP2pStub::OnFormGroup;
+    handleFuncMap[WIFI_SVR_CMD_P2P_CREATE_GROUP] = &WifiP2pStub::OnCreateGroup;
     handleFuncMap[WIFI_SVR_CMD_P2P_REMOVE_GROUP] = &WifiP2pStub::OnRemoveGroup;
     handleFuncMap[WIFI_SVR_CMD_P2P_DELETE_GROUP] = &WifiP2pStub::OnDeleteGroup;
     handleFuncMap[WIFI_SVR_CMD_P2P_CONNECT] = &WifiP2pStub::OnP2pConnect;
-    handleFuncMap[WIFI_SVR_CMD_P2P_DISCONNECT] = &WifiP2pStub::OnP2pDisConnect;
+    handleFuncMap[WIFI_SVR_CMD_P2P_CANCEL_CONNECT] = &WifiP2pStub::OnP2pCancelConnect;
     handleFuncMap[WIFI_SVR_CMD_P2P_QUERY_INFO] = &WifiP2pStub::OnQueryP2pLinkedInfo;
     handleFuncMap[WIFI_SVR_CMD_P2P_GET_CURRENT_GROUP] = &WifiP2pStub::OnGetCurrentGroup;
     handleFuncMap[WIFI_SVR_CMD_P2P_GET_ENABLE_STATUS] = &WifiP2pStub::OnGetP2pEnableStatus;
@@ -221,12 +221,12 @@ void WifiP2pStub::OnStopP2pListen(uint32_t code, MessageParcel &data, MessagePar
     return;
 }
 
-void WifiP2pStub::OnFormGroup(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
+void WifiP2pStub::OnCreateGroup(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
     WifiP2pConfig config;
     ReadWifiP2pConfigData(data, config);
-    ErrCode ret = FormGroup(config);
+    ErrCode ret = CreateGroup(config);
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
     return;
@@ -268,10 +268,10 @@ void WifiP2pStub::OnP2pConnect(uint32_t code, MessageParcel &data, MessageParcel
     return;
 }
 
-void WifiP2pStub::OnP2pDisConnect(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
+void WifiP2pStub::OnP2pCancelConnect(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
-    ErrCode ret = P2pDisConnect();
+    ErrCode ret = P2pCancelConnect();
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
     return;

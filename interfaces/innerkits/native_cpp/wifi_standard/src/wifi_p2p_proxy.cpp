@@ -340,7 +340,7 @@ ErrCode WifiP2pProxy::StopP2pListen(void)
     return ErrCode(reply.ReadInt32());
 }
 
-ErrCode WifiP2pProxy::FormGroup(const WifiP2pConfig &config)
+ErrCode WifiP2pProxy::CreateGroup(const WifiP2pConfig &config)
 {
     if (mRemoteDied) {
         WIFI_LOGD("failed to `%{public}s`,remote service is died!", __func__);
@@ -355,9 +355,9 @@ ErrCode WifiP2pProxy::FormGroup(const WifiP2pConfig &config)
     }
     data.WriteInt32(0);
     WriteWifiP2pConfigData(data, config);
-    int error = Remote()->SendRequest(WIFI_SVR_CMD_P2P_FORM_GROUP, data, reply, option);
+    int error = Remote()->SendRequest(WIFI_SVR_CMD_P2P_CREATE_GROUP, data, reply, option);
     if (error != ERR_NONE) {
-        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d", WIFI_SVR_CMD_P2P_FORM_GROUP, error);
+        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d", WIFI_SVR_CMD_P2P_CREATE_GROUP, error);
         return WIFI_OPT_FAILED;
     }
 
@@ -589,7 +589,7 @@ ErrCode WifiP2pProxy::P2pConnect(const WifiP2pConfig &config)
     return ErrCode(reply.ReadInt32());
 }
 
-ErrCode WifiP2pProxy::P2pDisConnect()
+ErrCode WifiP2pProxy::P2pCancelConnect()
 {
     if (mRemoteDied) {
         WIFI_LOGD("failed to `%{public}s`,remote service is died!", __func__);
@@ -603,9 +603,9 @@ ErrCode WifiP2pProxy::P2pDisConnect()
         return WIFI_OPT_FAILED;
     }
     data.WriteInt32(0);
-    int error = Remote()->SendRequest(WIFI_SVR_CMD_P2P_DISCONNECT, data, reply, option);
+    int error = Remote()->SendRequest(WIFI_SVR_CMD_P2P_CANCEL_CONNECT, data, reply, option);
     if (error != ERR_NONE) {
-        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d", WIFI_SVR_CMD_P2P_DISCONNECT, error);
+        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d", WIFI_SVR_CMD_P2P_CANCEL_CONNECT, error);
         return WIFI_OPT_FAILED;
     }
 

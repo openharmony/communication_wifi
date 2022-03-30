@@ -89,12 +89,12 @@ typedef struct ScanInfo {
     Ant ant;
 } ScanInfo;
 
-typedef struct HidlNetworkInfo {
+typedef struct WifiNetworkInfo {
     int id;
     char ssid[WIFI_SSID_LENGTH];
     char bssid[WIFI_BSSID_LENGTH];
     char flags[WIFI_NETWORK_FLAGS_LENGTH];
-} HidlNetworkInfo;
+} WifiNetworkInfo;
 
 typedef struct PnoScanSettings {
     int scanInterval;
@@ -119,16 +119,16 @@ typedef struct HostapdConfig {
     int32_t maxConn;
 } HostapdConfig;
 
-typedef struct HidlSetNetworkConfig {
+typedef struct SetNetworkConfig {
     DeviceConfigType cfgParam;                       /* Setting parameters. */
     char cfgValue[WIFI_NETWORK_CONFIG_VALUE_LENGTH];  /* Parameter value. */
-} HidlSetNetworkConfig;
+} SetNetworkConfig;
 
-typedef struct HidlGetNetworkConfig {
+typedef struct GetNetworkConfig {
     int networkId;
     char param[WIFI_NETWORK_CONFIG_NAME_LENGTH];
     char value[WIFI_NETWORK_CONFIG_VALUE_LENGTH];
-} HidlGetNetworkConfig;
+} GetNetworkConfig;
 
 typedef struct WifiWpsParam {
     int anyFlag;
@@ -142,13 +142,13 @@ typedef struct WifiRoamCapability {
     int maxTrustlistSize;
 } WifiRoamCapability;
 
-typedef struct HidlWpaSignalInfo {
+typedef struct WpaSignalInfo {
     int signal; /* RSSI */
     int txrate;
     int rxrate;
     int noise;
     int frequency;
-} HidlWpaSignalInfo;
+} WpaSignalInfo;
 #ifdef __cplusplus
 }
 #endif

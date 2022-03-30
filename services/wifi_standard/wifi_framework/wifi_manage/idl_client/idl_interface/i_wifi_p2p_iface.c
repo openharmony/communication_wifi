@@ -400,7 +400,7 @@ WifiErrorNo P2pRemoveNetwork(int networkId)
     return result;
 }
 
-WifiErrorNo P2pListNetworks(HidlP2pNetworkList *infoList)
+WifiErrorNo P2pListNetworks(P2pNetworkList *infoList)
 {
     RpcClient *client = GetP2pRpcClient();
     LockRpcClient(client);
@@ -424,7 +424,7 @@ WifiErrorNo P2pListNetworks(HidlP2pNetworkList *infoList)
         if (infoNum <= 0) {
             break;
         }
-        infoList->infos = (HidlP2pNetworkInfo *)calloc(infoNum, sizeof(HidlP2pNetworkInfo));
+        infoList->infos = (P2pNetworkInfo *)calloc(infoNum, sizeof(P2pNetworkInfo));
         if (infoList->infos == NULL) {
             result = WIFI_IDL_OPT_FAILED;
             break;
@@ -597,7 +597,7 @@ WifiErrorNo P2pSetListenChannel(int channel, int regClass)
     return result;
 }
 
-WifiErrorNo P2pConnect(HidlP2pConnectInfo *info)
+WifiErrorNo P2pConnect(P2pConnectInfo *info)
 {
     RpcClient *client = GetP2pRpcClient();
     LockRpcClient(client);
@@ -773,7 +773,7 @@ WifiErrorNo P2pGetGroupCapability(const char *bssid, int *cap)
     return result;
 }
 
-WifiErrorNo P2pAddService(const HidlP2pServiceInfo *info)
+WifiErrorNo P2pAddService(const P2pServiceInfo *info)
 {
     RpcClient *client = GetP2pRpcClient();
     LockRpcClient(client);
@@ -799,7 +799,7 @@ WifiErrorNo P2pAddService(const HidlP2pServiceInfo *info)
     return result;
 }
 
-WifiErrorNo P2pRemoveService(const HidlP2pServiceInfo *info)
+WifiErrorNo P2pRemoveService(const P2pServiceInfo *info)
 {
     RpcClient *client = GetP2pRpcClient();
     LockRpcClient(client);
@@ -946,7 +946,7 @@ WifiErrorNo P2pSetServDiscExternal(int mode)
     return result;
 }
 
-WifiErrorNo P2pGetPeer(const char *deviceAddress, HidlP2pDeviceInfo *peerInfo)
+WifiErrorNo P2pGetPeer(const char *deviceAddress, P2pDeviceInfo *peerInfo)
 {
     RpcClient *client = GetP2pRpcClient();
     LockRpcClient(client);
@@ -1004,7 +1004,7 @@ WifiErrorNo P2pGetFrequencies(int32_t band, int *frequencies, int32_t *size)
     return result;
 }
 
-WifiErrorNo P2pSetGroupConfig(int networkId, HidlP2pGroupConfig *pConfig, int size)
+WifiErrorNo P2pSetGroupConfig(int networkId, P2pGroupConfig *pConfig, int size)
 {
     RpcClient *client = GetP2pRpcClient();
     LockRpcClient(client);
@@ -1031,7 +1031,7 @@ WifiErrorNo P2pSetGroupConfig(int networkId, HidlP2pGroupConfig *pConfig, int si
     return result;
 }
 
-WifiErrorNo P2pGetGroupConfig(int networkId, HidlP2pGroupConfig *pConfig, int size)
+WifiErrorNo P2pGetGroupConfig(int networkId, P2pGroupConfig *pConfig, int size)
 {
     RpcClient *client = GetP2pRpcClient();
     LockRpcClient(client);

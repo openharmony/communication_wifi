@@ -15,6 +15,7 @@ import("//build/ohos.gni")
 import("//build/ohos/sa_profile/sa_profile.gni")
 import("//build/ohos_var.gni")
 import("//foundation/appexecfwk/standard/appexecfwk.gni")
+import("//foundation/communication/wifi/wifi.gni")
 
 ################################################################################
 
@@ -205,6 +206,10 @@ ohos_shared_library("wifi_device_ability") {
     "//foundation/distributedschedule/safwk/interfaces/innerkits/safwk:system_ability_fwk",
     "//utils/native/base:utils",
   ]
+
+  if (wifi_feature_with_p2p) {
+    defines = [ "WIFI_SUPPORT_P2P" ]
+  }
 
   external_deps = [ "ipc:ipc_core" ]
   part_name = "wifi_standard"

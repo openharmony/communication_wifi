@@ -48,7 +48,12 @@ DhcpdInterface::~DhcpdInterface()
 
 bool DhcpdInterface::SetDhcpEventFunc(const std::string &ifaceName, IDhcpResultNotify* pResultNotify)
 {
-    if (ifaceName.empty() || pResultNotify == nullptr || mDhcpService == nullptr) {
+    if (pResultNotify == nullptr) {
+        WIFI_LOGE("pResultNotify == nullptr, don't register dhcp exit notify event!");
+        return false;
+    }
+    if (ifaceName.empty() || mDhcpService == nullptr) {
+        WIFI_LOGE("SetDhcpEventFunc parameter error!");
         return false;
     }
     return (mDhcpService->GetDhcpSerProExit(ifaceName, pResultNotify) == DHCP_OPT_SUCCESS);
@@ -205,7 +210,7 @@ bool DhcpdInterface::StopDhcpServer(const std::string &ifaceName)
     }
 
     if (mDhcpService->StopDhcpServer(ifaceName) != 0) {
-        WIFI_LOGE("Stop dhcp server failed!");
+        WIFI_LOGE("Dhcp server stop failed or already stopped!");
         return false;
     }
     if (!NetworkInterface::ClearAllIpAddress(ifaceName)) {

@@ -45,7 +45,6 @@ config("wifi_manager_service_header") {
     "//foundation/communication/wifi/utils/inc",
     "${aafwk_path}/interfaces/innerkits/want/include",
     "${aafwk_path}/interfaces/innerkits/want/include/ohos/aafwk/content",
-    "//foundation/aafwk/intent/interfaces/innerkits/base/include",
     "//foundation/appexecfwk/adapter/interfaces/innerkits/appexecfwk_base/include",
     "//foundation/appexecfwk/standard/interfaces/innerkits/libeventhandler/include",
     "//foundation/aafwk/standard/interfaces/innerkits/base/include",

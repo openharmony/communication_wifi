@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -242,14 +242,6 @@ bool IsValid5GHz(int freq);
  * @return false - invalid
  */
 bool IsValid24GHz(int freq);
-
-/**
- * @Description Obtain and report available channel information.
- *
- * @param apConfig - configuration input
- * @param validChanTable - Valid channel tables.
- */
-void CheckBandChannel(HotspotConfig &apConfig, const std::map<BandType, std::vector<int32_t>> &validChanTable);
 
 /**
  * @Description Convert the frequency in the container into a channel.

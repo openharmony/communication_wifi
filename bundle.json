@@ -44,7 +44,9 @@
             "SystemCapability.Communication.WiFi.Core",
             "SystemCapability.Communication.WiFi.HotspotExt"
         ],
-        "features": [],
+        "features": [
+            "wifi_standard_feature_with_ap_intf"
+        ],
         "adapted_system_type": [
             "standard"
         ],

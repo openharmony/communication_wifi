@@ -70,7 +70,7 @@ void ApStartedState::GoInState()
         WIFI_LOGE("Set Blocklist failed.");
     }
 
-    WIFI_LOGE("Singleton version has not nat and use wlan0.");
+    WIFI_LOGE("Singleton version has not nat and use %{public}s.", AP_INTF);
     if (0) {
         if (EnableInterfaceNat() == false) {
             m_ApStateMachine.SwitchState(&m_ApStateMachine.m_ApIdleState);
@@ -139,9 +139,11 @@ bool ApStartedState::SetConfig(HotspotConfig &apConfig)
     std::vector<int> allowed5GChan, allowed2GChan;
     if (WifiApHalInterface::GetInstance().GetFrequenciesByBand(static_cast<int>(BandType::BAND_2GHZ), allowed2GFreq)) {
         WIFI_LOGW("failed to get 2.4G channel.");
+        WifiSettings::GetInstance().SetDefaultFrequenciesByCountryBand(BandType::BAND_2GHZ, allowed2GFreq);
     }
     if (WifiApHalInterface::GetInstance().GetFrequenciesByBand(static_cast<int>(BandType::BAND_5GHZ), allowed5GFreq)) {
         WIFI_LOGW("failed to get 5G channel.");
+        WifiSettings::GetInstance().SetDefaultFrequenciesByCountryBand(BandType::BAND_5GHZ, allowed5GFreq);
     }
 
     m_ApConfigUse.TransformFrequencyIntoChannel(allowed5GFreq, allowed5GChan);

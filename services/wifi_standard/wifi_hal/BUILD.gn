@@ -12,6 +12,7 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
+import("//foundation/communication/wifi/wifi.gni")
 
 ohos_executable("wifi_hal_service") {
   install_enable = true
@@ -69,7 +70,7 @@ ohos_executable("wifi_hal_service") {
   ]
 
   cflags_cc = [ "-fno-rtti" ]
-  defines = []
+  defines = [ "AP_INTF=\"$wifi_standard_feature_with_ap_intf\"" ]
   if (product_name == "rk3568") {
     defines += [ "PRODUCT_RK" ]
   }

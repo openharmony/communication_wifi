@@ -81,7 +81,7 @@ void ApStateMachine::Init()
     StatePlus(&m_ApIdleState, &m_ApRootState);
     StatePlus(&m_ApStartedState, &m_ApRootState);
     SetFirstState(&m_ApIdleState);
-    m_iface = "wlan0";
+    m_iface = AP_INTF;
     StartStateMachine();
 }
 

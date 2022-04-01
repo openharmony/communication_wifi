@@ -221,9 +221,11 @@ bool WifiConfigCenter::GetSupportedBandChannel()
     std::vector<int> allowed5GChan, allowed2GChan;
     if (WifiApHalInterface::GetInstance().GetFrequenciesByBand(static_cast<int>(BandType::BAND_2GHZ), allowed2GFreq)) {
         WIFI_LOGW("fail to get 2.4G channel");
+        WifiSettings::GetInstance().SetDefaultFrequenciesByCountryBand(BandType::BAND_2GHZ, allowed2GFreq);
     }
     if (WifiApHalInterface::GetInstance().GetFrequenciesByBand(static_cast<int>(BandType::BAND_5GHZ), allowed5GFreq)) {
         WIFI_LOGW("fail to get 5G channel");
+        WifiSettings::GetInstance().SetDefaultFrequenciesByCountryBand(BandType::BAND_5GHZ, allowed5GFreq);
     }
 
     TransformFrequencyIntoChannel(allowed5GFreq, allowed5GChan);

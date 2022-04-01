@@ -840,22 +840,3 @@ WpaCtrl *GetWpaCtrl(void)
     }
     return &g_wpaInterface->wpaCtrl;
 }
-
-int ExcuteCmd(const char *szCmd)
-{
-    int ret = system(szCmd);
-    if (ret == -1) {
-        LOGE("system cmd %{public}s failed!", szCmd);
-    } else {
-        if (WIFEXITED(ret)) {
-            if (WEXITSTATUS(ret) == 0) {
-                return 0;
-            }
-            LOGE("system cmd %{public}s failed, return status %{public}d", szCmd, WEXITSTATUS(ret));
-        } else {
-            LOGE("system cmd %{public}s failed", szCmd);
-        }
-    }
-
-    return -1;
-}

@@ -17,6 +17,7 @@
 #include <errno.h>
 #include <securec.h>
 #include "wifi_hal.h"
+#include "wifi_hal_adapter.h"
 #include "wifi_hal_ap_feature.h"
 #include "wifi_hal_module_manage.h"
 #include "wifi_hal_common_func.h"
@@ -28,7 +29,6 @@
 #define LOG_TAG "WifiHalApInterface"
 
 #define NUMS_BAND 2
-#define BUFF_SIZE 1024
 #define DISABLE_AP_WAIT_MS 50000
 static const char *g_serviceName = "hostapd";
 static const char *g_startCmd = "hostapd /data/misc/wifi/wpa_supplicant/hostapd.conf";
@@ -52,18 +52,8 @@ WifiErrorNo StartSoftAp(void)
 
 WifiErrorNo StartHostapd(void)
 {
-    const char *pConf = "/data/misc/wifi/wpa_supplicant/hostapd.conf";
-    if ((access(pConf, F_OK)) != -1) {
-        LOGD("wpa configure file %s is exist.", pConf);
-    } else {
-        char szCmd[BUFF_SIZE] = {0};
-        const char *cpConfCmd = "cp /system/etc/wifi/hostapd.conf /data/misc/wifi/wpa_supplicant/";
-        int iRet = snprintf_s(szCmd, sizeof(szCmd), sizeof(szCmd) - 1, "%s", cpConfCmd);
-        if (iRet < 0) {
-            return -1;
-        }
-
-        ExcuteCmd(szCmd);
+    if (CopyConfigFile("hostapd.conf") != 0) {
+        return WIFI_HAL_FAILED;
     }
     ModuleManageRetCode ret = StartModule(g_serviceName, g_startCmd);
     if (ret == MM_SUCCESS) {

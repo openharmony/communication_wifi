@@ -143,19 +143,9 @@ WifiErrorNo ForceStop(void)
 WifiErrorNo StartSupplicant(void)
 {
     LOGD("Start supplicant");
-    const char *wpaConf = "/data/misc/wifi/wpa_supplicant/wpa_supplicant.conf";
-    if ((access(wpaConf, F_OK)) != -1) {
-        LOGD("wpa configure file %{public}s is exist.", wpaConf);
-    } else {
-        char szcpCmd[BUFF_SIZE] = {0};
-        const char *cpWpaConfCmd = "cp /system/etc/wifi/wpa_supplicant.conf /data/misc/wifi/wpa_supplicant/";
-        int iRet = snprintf_s(szcpCmd, sizeof(szcpCmd), sizeof(szcpCmd) - 1, "%s", cpWpaConfCmd);
-        if (iRet < 0) {
-            return WIFI_HAL_FAILED;
-        }
-        ExcuteCmd(szcpCmd);
+    if (CopyConfigFile("wpa_supplicant.conf") != 0) {
+        return WIFI_HAL_FAILED;
     }
-
     ModuleManageRetCode ret = StartModule(g_serviceName, g_startCmd);
     if (ret != MM_SUCCESS) {
         LOGE("start wpa_supplicant failed!");

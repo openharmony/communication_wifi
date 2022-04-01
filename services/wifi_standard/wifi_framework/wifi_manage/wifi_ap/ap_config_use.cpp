@@ -87,12 +87,33 @@ bool ApConfigUse::IsValid5GHz(int freq) const
     return (freq >= FREP_5G_MIN) && (freq <= FREP_5G_MAX);
 }
 
+void ApConfigUse::ApplyDefaultConfig(HotspotConfig &apConfig, std::vector<int32_t> &vecChannels)
+{
+    if (!vecChannels.empty()) {
+        apConfig.SetChannel(vecChannels.front());
+        return;
+    }
 
-void ApConfigUse::CheckBandChannel(HotspotConfig &apConfig, const ChannelsTable &validChanTable) const
+    if (apConfig.GetBand() == BandType::BAND_2GHZ) {
+        apConfig.SetChannel(AP_CHANNEL_DEFAULT);
+        return;
+    }
+    if (apConfig.GetBand() == BandType::BAND_5GHZ) {
+        apConfig.SetChannel(AP_CHANNEL_5G_DEFAULT);
+        return;
+    }
+    apConfig.SetBand(BandType::BAND_2GHZ);
+    apConfig.SetChannel(AP_CHANNEL_DEFAULT);
+    return;
+}
+
+void ApConfigUse::CheckBandChannel(HotspotConfig &apConfig, const ChannelsTable &validChanTable)
 {
     bool cfgValid = false;
+    std::vector<int32_t> vecChannels;
     auto it = validChanTable.find(apConfig.GetBand());
     if (it != validChanTable.end() && it->second.size() != 0) {
+        vecChannels = it->second;
         for (auto vecIt = it->second.begin(); vecIt != it->second.end(); ++vecIt) {
             if (*vecIt == apConfig.GetChannel()) {
                 cfgValid = true;
@@ -101,9 +122,11 @@ void ApConfigUse::CheckBandChannel(HotspotConfig &apConfig, const ChannelsTable 
         }
     }
     if (!cfgValid) {
-        WIFI_LOGW("Error band or error channels in band, use 2.4G band default channel.");
-        apConfig.SetBand(BandType::BAND_2GHZ);
-        apConfig.SetChannel(AP_CHANNEL_DEFAULT);
+        WIFI_LOGE("Error band or error channels in band: %{public}d, %{public}d",
+            static_cast<int>(apConfig.GetBand()), apConfig.GetChannel());
+        ApplyDefaultConfig(apConfig, vecChannels);
+        WIFI_LOGI("Use default config: %{public}d, %{public}d",
+            static_cast<int>(apConfig.GetBand()), apConfig.GetChannel());
     }
 }
 }  // namespace Wifi

@@ -39,6 +39,9 @@ WifiHalVendorInterface *GetWifiHalVendorInterface(void);
  */
 void ReleaseWifiHalVendorInterface(void);
 
+int ExcuteCmd(const char *szCmd);
+
+int CopyConfigFile(const char* configName);
 #ifdef __cplusplus
 }
 #endif

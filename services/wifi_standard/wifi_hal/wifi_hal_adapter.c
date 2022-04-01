@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,11 +12,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include "wifi_hal_adapter.h"
 #include <dlfcn.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
+#include "securec.h"
 #include "wifi_log.h"
 
 #undef LOG_TAG
@@ -132,4 +135,55 @@ void ReleaseWifiHalVendorInterface(void)
         g_wifiHalVendorInterface = NULL;
     }
     return;
+}
+
+int ExcuteCmd(const char *szCmd)
+{
+    LOGI("Execute cmd: %{public}s", szCmd);
+    int ret = system(szCmd);
+    if (ret == -1) {
+        LOGE("system cmd %{public}s failed!", szCmd);
+    } else {
+        if (WIFEXITED(ret)) {
+            if (WEXITSTATUS(ret) == 0) {
+                return 0;
+            }
+            LOGE("system cmd %{public}s failed, return status %{public}d", szCmd, WEXITSTATUS(ret));
+        } else {
+            LOGE("system cmd %{public}s failed", szCmd);
+        }
+    }
+    return -1;
+}
+
+int CopyConfigFile(const char* configName)
+{
+    const int PATH_NUM = 2;
+    const int BUFF_SIZE = 256;
+    char buf[BUFF_SIZE] = {0};
+    if (snprintf_s(buf, sizeof(buf), sizeof(buf) - 1, "/data/misc/wifi/wpa_supplicant/%s", configName) < 0) {
+        LOGE("snprintf_s dest dir failed.");
+        return -1;
+    }
+    if (access(buf, F_OK) != -1) {
+        LOGI("Configure file %{public}s is exist.", buf);
+        return 0;
+    }
+    char path[PATH_NUM][BUFF_SIZE] = {"/vendor/etc/wifi/", "/system/etc/wifi/"};
+    for (int i = 0; i != PATH_NUM; ++i) {
+        if (strcat_s(path[i], sizeof(path[i]), configName) != EOK) {
+            LOGE("strcat_s failed.");
+            return -1;
+        }
+        if (access(path[i], F_OK) != -1) {
+            char cmd[BUFF_SIZE] = {0};
+            if (snprintf_s(cmd, sizeof(cmd), sizeof(cmd) - 1, "cp %s /data/misc/wifi/wpa_supplicant/", path[i]) < 0) {
+                LOGE("snprintf_s cp cmd failed.");
+                return -1;
+            }
+            return ExcuteCmd(cmd);
+        }
+    }
+    LOGE("Copy config file failed: %{public}s", configName);
+    return -1;
 }

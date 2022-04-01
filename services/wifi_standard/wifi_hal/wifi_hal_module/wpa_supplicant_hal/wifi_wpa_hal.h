@@ -28,7 +28,6 @@ extern "C" {
 #endif
 
 #define WIFI_CONF_FILE_PATH_LEN 256
-#define BUFF_SIZE 1024
 
 typedef struct AddInterfaceArgv {
     char name[WIFI_IFACE_NAME_MAXLEN];
@@ -58,8 +57,6 @@ struct stWifiWpaInterface {
 WifiWpaInterface *GetWifiWapGlobalInterface(void);
 void ReleaseWpaGlobalInterface(void);
 WpaCtrl *GetWpaCtrl(void);
-int ExcuteCmd(const char *szCmd);
-
 #ifdef __cplusplus
 }
 #endif

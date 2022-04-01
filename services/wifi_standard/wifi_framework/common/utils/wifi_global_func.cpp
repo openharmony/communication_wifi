@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -314,25 +314,6 @@ bool IsValid24GHz(int freq)
 bool IsValid5GHz(int freq)
 {
     return freq > 4900 && freq < 5900;
-}
-
-void CheckBandChannel(HotspotConfig &apConfig, const std::map<BandType, std::vector<int32_t>> &validChanTable)
-{
-    bool cfgValid = false;
-    auto it = validChanTable.find(apConfig.GetBand());
-    if (it != validChanTable.end() && it->second.size() != 0) {
-        for (auto vecIt = it->second.begin(); vecIt != it->second.end(); ++vecIt) {
-            if (*vecIt == apConfig.GetChannel()) {
-                cfgValid = true;
-                break;
-            }
-        }
-    }
-    if (!cfgValid) {
-        LOGW("Error band or error channels in band, use 2.4G band default channel.");
-        apConfig.SetBand(BandType::BAND_2GHZ);
-        apConfig.SetChannel(AP_CHANNEL_DEFAULT);
-    }
 }
 }  // namespace Wifi
 }  // namespace OHOS

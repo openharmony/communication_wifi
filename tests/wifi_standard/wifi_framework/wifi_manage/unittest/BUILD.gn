@@ -73,7 +73,6 @@ ohos_unittest("manager_unittest") {
     "//base/notification/ces_standard/cesfwk/kits/native/include",
     "//foundation/aafwk/standard/interfaces/innerkits/want/include/ohos/aafwk/content",
     "//foundation/aafwk/standard/interfaces/innerkits/want/include",
-    "//foundation/aafwk/intent/interfaces/innerkits/base/include",
     "//foundation/appexecfwk/adapter/interfaces/innerkits/appexecfwk_base/include",
     "//foundation/appexecfwk/standard/interfaces/innerkits/libeventhandler/include",
     "//foundation/aafwk/standard/interfaces/innerkits/base/include",

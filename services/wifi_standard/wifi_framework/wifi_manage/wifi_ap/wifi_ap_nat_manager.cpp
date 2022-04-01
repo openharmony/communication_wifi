@@ -51,7 +51,7 @@ bool WifiApNatManager::EnableInterfaceNat(bool enable, std::string inInterfaceNa
     }
 
     if (inInterfaceName == outInterfaceName) {
-        WIFI_LOGE("Duplicate interface name.");
+        WIFI_LOGI("Duplicate interface no need NAT.");
         return false;
     }
 

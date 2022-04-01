@@ -70,7 +70,7 @@ public:
      * @param validChanTable - Valid channel tables.
      * @return None
      */
-    virtual void CheckBandChannel(HotspotConfig &apConfig, const ChannelsTable &validChanTable) const;
+    virtual void CheckBandChannel(HotspotConfig &apConfig, const ChannelsTable &validChanTable);
 
     /**
      * @Description  construction method
@@ -92,6 +92,14 @@ public:
     virtual int TransformFrequencyIntoChannel(const int freq) const;
 
 private:
+    /**
+     * @Description  apply default configuration.
+     * @param apConfig
+     * @param vecChannels
+     * @return None
+     */
+    void ApplyDefaultConfig(HotspotConfig &apConfig, std::vector<int32_t> &vecChannels);
+
     DISALLOW_COPY_AND_ASSIGN(ApConfigUse)
 };
 }  // namespace Wifi

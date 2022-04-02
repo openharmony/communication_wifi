@@ -13,4 +13,5 @@
 
 declare_args() {
   wifi_feature_with_p2p = true
+  wifi_standard_feature_with_ap_intf = "wlan0"
 }

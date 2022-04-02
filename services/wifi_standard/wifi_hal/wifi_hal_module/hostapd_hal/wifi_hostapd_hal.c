@@ -31,7 +31,6 @@
 
 #define CONFIG_PATH_DIR "/data/misc/wifi/wpa_supplicant"
 
-#define CONFIG_CTRL_IFACE_NAME "wlan0"
 /**
  * Blocklist configuration file name. This parameter is used by hostapd in an earlier version.
  */
@@ -186,7 +185,7 @@ static int HostapdCliConnect(void)
     }
     int retryCount = 20;
     while (retryCount-- > 0) {
-        int ret = InitHostapdCtrl(CONFIG_CTRL_IFACE_NAME);
+        int ret = InitHostapdCtrl(AP_INTF);
         if (ret == 0) {
             LOGD("Global hostapd interface connect successfully!");
             break;

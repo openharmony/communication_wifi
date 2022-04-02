@@ -17,6 +17,7 @@
 #include "define.h"
 #include "wifi_global_func.h"
 #include "wifi_log.h"
+#include "wifi_config_country_freqs.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -1318,6 +1319,20 @@ int WifiSettings::SetConnectTimeoutBssid(std::string &bssid)
     time_t now = time(0);
     mBssidToTimeoutTime = std::make_pair(bssid, static_cast<int>(now));
     return 0;
+}
+
+void WifiSettings::SetDefaultFrequenciesByCountryBand(const BandType band, std::vector<int> &frequencies)
+{
+    std::string countryCode;
+    if (GetCountryCode(countryCode)) {
+        return;
+    }
+
+    for (auto& item : g_countryDefaultFreqs) {
+        if (item.countryCode == countryCode && item.band == band) {
+            frequencies = item.freqs;
+        }
+    }
 }
 } // namespace Wifi
 } // namespace OHOS

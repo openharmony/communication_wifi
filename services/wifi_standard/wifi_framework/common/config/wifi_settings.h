@@ -996,6 +996,12 @@ public:
      */
     int SetConnectTimeoutBssid(std::string &bssid);
 
+    /**
+     * @Description set default frequencies for specify country band.
+     *
+     */
+    void SetDefaultFrequenciesByCountryBand(const BandType band, std::vector<int> &frequencies);
+
 private:
     WifiSettings();
     void InitWifiConfig();

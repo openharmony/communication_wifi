@@ -12,6 +12,7 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
+import("//foundation/communication/wifi/wifi.gni")
 
 ohos_shared_library("wifi_ap_service") {
   install_enable = true
@@ -76,6 +77,8 @@ ohos_shared_library("wifi_ap_service") {
     "//foundation/communication/wifi/utils/src:wifi_utils",
     "//utils/native/base:utils",
   ]
+
+  defines = [ "AP_INTF=\"$wifi_standard_feature_with_ap_intf\"" ]
 
   part_name = "wifi_standard"
   subsystem_name = "communication"

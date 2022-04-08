@@ -165,6 +165,8 @@ bool ApStartedState::SetConfig(HotspotConfig &apConfig)
         return false;
     }
 
+    WifiSettings::GetInstance().SetHotspotConfig(apConfig);
+    WifiSettings::GetInstance().SyncHotspotConfig();
     m_ApConfigUse.LogConfig(apConfig);
     WIFI_LOGI("SetConfig OK!.");
     return true;

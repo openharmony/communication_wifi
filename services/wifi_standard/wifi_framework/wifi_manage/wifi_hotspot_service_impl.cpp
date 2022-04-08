@@ -178,6 +178,7 @@ ErrCode WifiHotspotServiceImpl::SetHotspotConfig(const HotspotConfig &config)
 
     if (!IsApServiceRunning()) {
         WifiConfigCenter::GetInstance().SetHotspotConfig(config);
+        WifiSettings::GetInstance().SyncHotspotConfig();
     } else {
         IApService *pService = WifiServiceManager::GetInstance().GetApServiceInst();
         if (pService == nullptr) {

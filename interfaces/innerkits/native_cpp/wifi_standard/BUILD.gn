@@ -30,6 +30,8 @@ config("wifi_sdk_header") {
     "//foundation/distributedschedule/samgr/adapter/interfaces/innerkits/include",
     "//foundation/communication/wifi/services/wifi_standard/wifi_framework/common/include",
     "//foundation/communication/wifi/services/wifi_standard/wifi_framework/dhcp_manage/mgr_service/include",
+    "//foundation/communication/wifi/interfaces/innerkits",
+    "//foundation/communication/wifi/utils/inc",
   ]
 }
 
@@ -109,11 +111,6 @@ ohos_source_set("wifi_p2p_proxy_impl") {
 
 ohos_shared_library("wifi_sdk") {
   install_enable = true
-
-  include_dirs = [
-    "//foundation/communication/wifi/interfaces/innerkits",
-    "//foundation/communication/wifi/utils/inc",
-  ]
 
   sources = [
     "c_adapter/wifi_c_device.cpp",

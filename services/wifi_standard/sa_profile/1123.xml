@@ -16,7 +16,7 @@
 <info>
     <process>wifi_manager_service</process>
     <systemability> <!-- Declare a system ability and its profile -->
-        <name>1128</name> <!-- Declare the id of system ability. Must be same with system_ability_definition.h -->
+        <name>1123</name> <!-- Declare the id of system ability. Must be same with system_ability_definition.h -->
         <libpath>libwifi_p2p_ability.z.so</libpath> <!-- Declare the path of .so file which includes the system ability; Note: 1 .so file can have 1 to N system abilities. -->
         <!--<depend></depend> --> <!-- Declare the name of system abilities which the system ability depends on, using ";" as separator among names. If there are dependencies, it needs to check if all those dependencies are available in service manager before starting the system ability. -->
         <!--<depend-time-out></depend-time-out> --> <!-- Check all dependencies are available before the timeout period ended. The MAX_DEPENDENCY_TIMEOUT is 60s. -->

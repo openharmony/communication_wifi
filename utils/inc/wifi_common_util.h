@@ -97,7 +97,7 @@ std::string Number2Ip(int intIp);
 std::vector<std::string> StrSplit(const std::string& str, const std::string& delim);
 
 /**
- * @Description get bundle name
+ * @Description get bundle name, it can only be obtained at the interfaces layer.
  *
  * @return bool - bundle name
  */

@@ -15,10 +15,10 @@ import("//build/ohos/sa_profile/sa_profile.gni")
 
 ohos_sa_profile("wifi_standard_sa_profile") {
   sources = [
-    "1125.xml",
-    "1126.xml",
-    "1127.xml",
-    "1128.xml",
+    "1120.xml",
+    "1121.xml",
+    "1123.xml",
+    "1124.xml",
   ]
   part_name = "wifi_standard"
 }

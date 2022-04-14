@@ -71,11 +71,10 @@ void ApStartedState::GoInState()
     }
 
     WIFI_LOGE("Singleton version has not nat and use %{public}s.", AP_INTF);
-    if (0) {
-        if (EnableInterfaceNat() == false) {
-            m_ApStateMachine.SwitchState(&m_ApStateMachine.m_ApIdleState);
-            return;
-        }
+
+    if (EnableInterfaceNat() == false) {
+        m_ApStateMachine.SwitchState(&m_ApStateMachine.m_ApIdleState);
+        return;
     }
     m_ApStateMachine.OnApStateChange(ApState::AP_STATE_STARTED);
 }
@@ -225,18 +224,22 @@ void ApStartedState::StopMonitor() const
 
 bool ApStartedState::EnableInterfaceNat() const
 {
+#ifdef SUPPORT_NAT
     if (!mApNatManager.EnableInterfaceNat(true, IN_INTERFACE, OUT_INTERFACE)) {
         WIFI_LOGE("set nat failed.");
         return false;
     }
+#endif
     return true;
 }
 
 bool ApStartedState::DisableInterfaceNat() const
 {
+#ifdef SUPPORT_NAT
     if (!mApNatManager.EnableInterfaceNat(false, IN_INTERFACE, OUT_INTERFACE)) {
         WIFI_LOGE("remove NAT config failed.");
     }
+#endif
     return true;
 }
 

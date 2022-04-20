@@ -196,6 +196,7 @@ std::string GetBundleName()
 {
     sptr<AppExecFwk::IBundleMgr> bundleInstance = GetBundleManager();
     if (bundleInstance == nullptr) {
+        WIFI_LOGE("bundle instance is null!");
         return "";
     }
 

@@ -15,12 +15,12 @@
 
 #include "scan_service.h"
 #include <cinttypes>
+#include "log_helper.h"
+#include "wifi_global_func.h"
+#include "wifi_internal_msg.h"
 #include "wifi_logger.h"
 #include "wifi_settings.h"
 #include "wifi_sta_hal_interface.h"
-#include "wifi_internal_msg.h"
-#include "log_helper.h"
-#include "wifi_global_func.h"
 
 DEFINE_WIFILOG_SCAN_LABEL("ScanService");
 
@@ -198,7 +198,7 @@ void ScanService::HandleInnerEventReport(ScanInnerEventType innerEvent)
 
 ErrCode ScanService::Scan(bool externFlag)
 {
-    WIFI_LOGI("Enter ScanService::Scan.\n");
+    WIFI_LOGI("Enter ScanService::Scan[%{public}d]\n", externFlag);
     if (!scanStartedFlag) {
         WIFI_LOGE("Scan service has not started.\n");
         return WIFI_OPT_FAILED;
@@ -1562,7 +1562,7 @@ void ScanService::Delete24GhzFreqs(std::vector<int> &freqs)
     auto iter = freqs.begin();
     while (iter != freqs.end()) {
         if (*iter < FREQS_24G_MAX_VALUE) {
-            freqs.erase(iter);
+            iter = freqs.erase(iter);
         } else {
             ++iter;
         }
@@ -1578,7 +1578,7 @@ void ScanService::Delete5GhzFreqs(std::vector<int> &freqs)
     auto iter = freqs.begin();
     while (iter != freqs.end()) {
         if (*iter > FREQS_5G_MIN_VALUE) {
-            freqs.erase(iter);
+            iter = freqs.erase(iter);
         } else {
             ++iter;
         }

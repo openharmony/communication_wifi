@@ -280,12 +280,13 @@ WifiErrorNo P2pRemoveGroup(const char *interface);
 /**
  * @Description Inviting a Device to Join a Persistent Group.
  *
+ * @param persistent
  * @param peerBssid
  * @param goBssid
  * @param ifname
  * @return WifiErrorNo
  */
-WifiErrorNo P2pInvite(int persisitent, const char *peerBssid, const char *goBssid, const char *ifname);
+WifiErrorNo P2pInvite(int persistent, const char *peerBssid, const char *goBssid, const char *ifname);
 
 /**
  * @Description persistent group Reinvoke peer

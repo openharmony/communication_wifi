@@ -55,7 +55,6 @@ ohos_shared_library("wifi_ap_service") {
     "//foundation/communication/wifi/services/wifi_standard/wifi_framework/wifi_manage/idl_client/idl_interface",
     "//foundation/communication/wifi/services/wifi_standard/wifi_framework/dhcp_manage/mgr_service/include",
     "//foundation/communication/wifi/services/wifi_standard/wifi_framework/dhcp_manage/mgr_service/interfaces",
-    "//foundation/communication/wifi/utils/inc",
   ]
 
   cflags_cc = [
@@ -74,7 +73,6 @@ ohos_shared_library("wifi_ap_service") {
     "//foundation/communication/wifi/services/wifi_standard/wifi_framework/dhcp_manage/mgr_service:dhcp_manager_service",
     "//foundation/communication/wifi/services/wifi_standard/wifi_framework/wifi_manage:wifi_manager_service",
     "//foundation/communication/wifi/services/wifi_standard/wifi_framework/wifi_manage/idl_client:wifi_idl_client",
-    "//foundation/communication/wifi/utils/src:wifi_utils",
     "//utils/native/base:utils",
   ]
 

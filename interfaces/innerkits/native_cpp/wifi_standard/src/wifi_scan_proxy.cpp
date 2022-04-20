@@ -12,8 +12,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include "wifi_scan_proxy.h"
 #include "define.h"
+#include "wifi_common_util.h"
+#include "wifi_hisysevent.h"
 #include "wifi_logger.h"
 #include "wifi_scan_callback_stub.h"
 
@@ -109,10 +112,11 @@ ErrCode WifiScanProxy::Scan()
         return WIFI_OPT_FAILED;
     }
     int ret = reply.ReadInt32();
+    /* Record sysevent for scan */
+    WriteWifiScanHiSysEvent(static_cast<int>(ret), GetBundleName());
     if (ErrCode(ret) != WIFI_OPT_SUCCESS) {
         return ErrCode(ret);
     }
-
     return WIFI_OPT_SUCCESS;
 }
 
@@ -148,10 +152,11 @@ ErrCode WifiScanProxy::AdvanceScan(const WifiScanParams &params)
         return WIFI_OPT_FAILED;
     }
     int ret = reply.ReadInt32();
+    /* Record sysevent for scan */
+    WriteWifiScanHiSysEvent(static_cast<int>(ret), GetBundleName());
     if (ErrCode(ret) != WIFI_OPT_SUCCESS) {
         return ErrCode(ret);
     }
-
     return WIFI_OPT_SUCCESS;
 }
 

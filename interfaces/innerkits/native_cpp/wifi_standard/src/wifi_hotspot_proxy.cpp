@@ -12,12 +12,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include "wifi_hotspot_proxy.h"
 #include "string_ex.h"
 #include "iservice_registry.h"
 #include "system_ability_definition.h"
-#include "wifi_logger.h"
+#include "wifi_hisysevent.h"
 #include "wifi_hotspot_callback_stub.h"
+#include "wifi_logger.h"
 
 DEFINE_WIFILOG_HOTSPOT_LABEL("WifiHotspotProxy");
 namespace OHOS {
@@ -268,6 +270,7 @@ ErrCode WifiHotspotProxy::EnableHotspot(void)
     if (exception) {
         return WIFI_OPT_FAILED;
     }
+    WriteWifiStateHiSysEvent(HISYS_SERVICE_TYPE_AP, WifiOperType::ENABLE);
     return ErrCode(reply.ReadInt32());
 }
 
@@ -295,6 +298,7 @@ ErrCode WifiHotspotProxy::DisableHotspot(void)
     if (exception) {
         return WIFI_OPT_FAILED;
     }
+    WriteWifiStateHiSysEvent(HISYS_SERVICE_TYPE_AP, WifiOperType::DISABLE);
     return ErrCode(reply.ReadInt32());
 }
 

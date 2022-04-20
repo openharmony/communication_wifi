@@ -16,8 +16,6 @@
 #include "sta_service.h"
 #include "sta_define.h"
 #include "sta_service_callback.h"
-#include "wifi_common_util.h"
-#include "wifi_hisysevent.h"
 #include "wifi_logger.h"
 #include "wifi_settings.h"
 #include "wifi_sta_hal_interface.h"
@@ -96,7 +94,6 @@ ErrCode StaService::EnableWifi() const
 {
     WIFI_LOGI("Enter StaService::EnableWifi.\n");
     pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_ENABLE_WIFI, STA_CONNECT_MODE);
-    WriteWifiStateHiSysEvent(HISYS_SERVICE_TYPE_STA, WifiOperType::ENABLE);
     return WIFI_OPT_SUCCESS;
 }
 
@@ -104,7 +101,6 @@ ErrCode StaService::DisableWifi() const
 {
     WIFI_LOGI("Enter StaService::DisableWifi.\n");
     pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_DISABLE_WIFI);
-    WriteWifiStateHiSysEvent(HISYS_SERVICE_TYPE_STA, WifiOperType::DISABLE);
     return WIFI_OPT_SUCCESS;
 }
 
@@ -203,7 +199,6 @@ ErrCode StaService::ConnectToDevice(const WifiDeviceConfig &config) const
     }
     LOGD("StaService::ConnectTo  AddDeviceConfig succeed!");
     pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_CONNECT_NETWORK, netWorkId, NETWORK_SELECTED_BY_THE_USER);
-    WriteWifiConnectionHiSysEvent(WifiConnectionType::CONNECT, GetBundleName());
     return WIFI_OPT_SUCCESS;
 }
 
@@ -218,7 +213,6 @@ ErrCode StaService::ConnectToNetwork(int networkId) const
 
     pStaAutoConnectService->EnableOrDisableBssid(config.bssid, true, 0);
     pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_CONNECT_SAVED_NETWORK, networkId, NETWORK_SELECTED_BY_THE_USER);
-    WriteWifiConnectionHiSysEvent(WifiConnectionType::CONNECT, GetBundleName());
     return WIFI_OPT_SUCCESS;
 }
 
@@ -226,7 +220,6 @@ ErrCode StaService::ReAssociate() const
 {
     WIFI_LOGI("Enter StaService::ReAssociate.\n");
     pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_REASSOCIATE_NETWORK);
-    WriteWifiConnectionHiSysEvent(WifiConnectionType::CONNECT, GetBundleName());
     return WIFI_OPT_SUCCESS;
 }
 
@@ -265,7 +258,6 @@ ErrCode StaService::Disconnect() const
         WIFI_LOGI("The blocklist is updated.\n");
     }
     pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_DISCONNECT);
-    WriteWifiConnectionHiSysEvent(WifiConnectionType::DISCONNECT, GetBundleName());
     return WIFI_OPT_SUCCESS;
 }
 
@@ -321,7 +313,6 @@ ErrCode StaService::ReConnect() const
 {
     WIFI_LOGI("Enter StaService::ReConnect.\n");
     pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_RECONNECT_NETWORK);
-    WriteWifiConnectionHiSysEvent(WifiConnectionType::CONNECT, GetBundleName());
     return WIFI_OPT_SUCCESS;
 }
 }  // namespace Wifi

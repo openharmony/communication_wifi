@@ -29,6 +29,7 @@ WifiHalVendorInterface *g_wifiHalVendorInterface = NULL;
 
 #define MODULE_NAME_MAX_LEN 256
 #define MODULE_CONFIG_FILE_PATH "/data/misc/wifi/wifi_hal_vendor.conf"
+
 static int ReadConfigModuleName(char *name, int size)
 {
     if (name == NULL) {
@@ -139,20 +140,16 @@ void ReleaseWifiHalVendorInterface(void)
 
 int ExcuteCmd(const char *szCmd)
 {
-    LOGI("Execute cmd: %{public}s", szCmd);
+    LOGI("Execute cmd: %{private}s", szCmd);
     int ret = system(szCmd);
     if (ret == -1) {
-        LOGE("system cmd %{public}s failed!", szCmd);
-    } else {
-        if (WIFEXITED(ret)) {
-            if (WEXITSTATUS(ret) == 0) {
-                return 0;
-            }
-            LOGE("system cmd %{public}s failed, return status %{public}d", szCmd, WEXITSTATUS(ret));
-        } else {
-            LOGE("system cmd %{public}s failed", szCmd);
-        }
+        LOGE("Execute system cmd %{private}s failed!", szCmd);
+        return -1;
     }
+    if (WIFEXITED(ret) && (WEXITSTATUS(ret) == 0)) {
+        return 0;
+    }
+    LOGE("Execute system cmd %{private}s failed: %{private}d", szCmd, WEXITSTATUS(ret));
     return -1;
 }
 

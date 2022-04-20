@@ -1882,7 +1882,6 @@ void StaStateMachine::SetWifiLinkedInfo(int networkId)
     }
 }
 
-
 /* ------------------ state machine dhcp callback function ----------------- */
 
 StaStateMachine::DhcpResultNotify::DhcpResultNotify(StaStateMachine *staStateMachine)
@@ -1955,29 +1954,24 @@ void StaStateMachine::DhcpResultNotify::OnSuccess(int status, const std::string 
 
 void StaStateMachine::DhcpResultNotify::OnFailed(int status, const std::string &ifname, const std::string &reason)
 {
-    LOGI("Enter DhcpResultNotify::OnFailed. ifname=[%s] status=[%d], reason = [%s]\n", ifname.c_str(), status,
-        reason.c_str());
+    LOGI("Enter DhcpResultNotify::OnFailed. ifname=[%s] status=[%d], reason = [%s], detailedState = [%d]\n",
+        ifname.c_str(), status, reason.c_str(), static_cast<int>(pStaStateMachine->linkedInfo.detailedState));
     if ((pStaStateMachine->linkedInfo.detailedState == DetailedState::DISCONNECTING) ||
         (pStaStateMachine->linkedInfo.detailedState == DetailedState::DISCONNECTED)) {
         return;
     }
 
-    if (pStaStateMachine->currentTpType != IPTYPE_IPV4) {
-        if (pStaStateMachine->getIpSucNum == 0 && pStaStateMachine->getIpFailNum == 1) {
-            pStaStateMachine->staCallback.OnStaConnChanged(OperateResState::CONNECT_OBTAINING_IP_FAILED,
+    LOGD("currentTpType: %{public}d, getIpSucNum: %{public}d, getIpFailNum: %{public}d, isRoam: %{public}d",
+        pStaStateMachine->currentTpType, pStaStateMachine->getIpSucNum,
+        pStaStateMachine->getIpFailNum, pStaStateMachine->isRoam);
+
+    if (pStaStateMachine->getIpFailNum == 0) {
+        pStaStateMachine->staCallback.OnStaConnChanged(OperateResState::CONNECT_OBTAINING_IP_FAILED,
             pStaStateMachine->linkedInfo);
-            pStaStateMachine->DisConnectProcess();
-            pStaStateMachine->SaveLinkstate(ConnState::DISCONNECTED, DetailedState::OBTAINING_IPADDR_FAIL);
-        }
-    } else {
-        pStaStateMachine->staCallback.OnStaConnChanged(
-            OperateResState::CONNECT_OBTAINING_IP_FAILED, pStaStateMachine->linkedInfo);
-        if (!pStaStateMachine->isRoam) {
-            pStaStateMachine->DisConnectProcess();
-            pStaStateMachine->SaveLinkstate(ConnState::DISCONNECTED, DetailedState::OBTAINING_IPADDR_FAIL);
-        } else {
-            pStaStateMachine->SaveLinkstate(ConnState::CONNECTED, DetailedState::CONNECTED);
-        }
+        pStaStateMachine->DisConnectProcess();
+        pStaStateMachine->SaveLinkstate(ConnState::DISCONNECTED, DetailedState::OBTAINING_IPADDR_FAIL);
+        pStaStateMachine->staCallback.OnStaConnChanged(OperateResState::DISCONNECT_DISCONNECTED,
+            pStaStateMachine->linkedInfo);
     }
     pStaStateMachine->getIpFailNum++;
 }

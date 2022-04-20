@@ -16,7 +16,6 @@
 #include "ap_service.h"
 #include <unistd.h>
 #include "ap_state_machine.h"
-#include "wifi_hisysevent.h"
 #include "wifi_logger.h"
 #include "wifi_settings.h"
 
@@ -32,14 +31,12 @@ ApService::~ApService()
 ErrCode ApService::EnableHotspot() const
 {
     m_ApStateMachine.SendMessage(static_cast<int>(ApStatemachineEvent::CMD_START_HOTSPOT));
-    WriteWifiStateHiSysEvent(HISYS_SERVICE_TYPE_AP, WifiOperType::ENABLE);
     return ErrCode::WIFI_OPT_SUCCESS;
 }
 
 ErrCode ApService::DisableHotspot() const
 {
     m_ApStateMachine.SendMessage(static_cast<int>(ApStatemachineEvent::CMD_STOP_HOTSPOT));
-    WriteWifiStateHiSysEvent(HISYS_SERVICE_TYPE_AP, WifiOperType::DISABLE);
     return ErrCode::WIFI_OPT_SUCCESS;
 }
 

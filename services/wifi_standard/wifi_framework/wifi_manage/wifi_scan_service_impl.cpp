@@ -18,9 +18,7 @@
 #include "define.h"
 #include "permission_def.h"
 #include "wifi_auth_center.h"
-#include "wifi_common_util.h"
 #include "wifi_config_center.h"
-#include "wifi_hisysevent.h"
 #include "wifi_dumper.h"
 #include "wifi_internal_event_dispatcher.h"
 #include "wifi_internal_msg.h"
@@ -141,7 +139,6 @@ ErrCode WifiScanServiceImpl::Scan()
     if (ret != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("Scan failed: %{public}d!", static_cast<int>(ret));
     }
-    WriteWifiScanHiSysEvent(static_cast<int>(ret), GetBundleName());
     return ret;
 }
 

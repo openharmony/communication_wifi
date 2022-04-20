@@ -12,10 +12,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include "wifi_device_proxy.h"
-#include "wifi_device_callback_stub.h"
-#include "wifi_logger.h"
 #include "define.h"
+#include "wifi_common_util.h"
+#include "wifi_device_callback_stub.h"
+#include "wifi_hisysevent.h"
+#include "wifi_logger.h"
 
 DEFINE_WIFILOG_LABEL("WifiDeviceProxy");
 
@@ -60,6 +63,7 @@ ErrCode WifiDeviceProxy::EnableWifi()
     if (exception) {
         return WIFI_OPT_FAILED;
     }
+    WriteWifiStateHiSysEvent(HISYS_SERVICE_TYPE_STA, WifiOperType::ENABLE);
     return ErrCode(reply.ReadInt32());
 }
 
@@ -85,6 +89,7 @@ ErrCode WifiDeviceProxy::DisableWifi()
     if (exception) {
         return WIFI_OPT_FAILED;
     }
+    WriteWifiStateHiSysEvent(HISYS_SERVICE_TYPE_STA, WifiOperType::DISABLE);
     return ErrCode(reply.ReadInt32());
 }
 
@@ -527,6 +532,7 @@ ErrCode WifiDeviceProxy::ConnectToNetwork(int networkId)
     if (exception) {
         return WIFI_OPT_FAILED;
     }
+    WriteWifiConnectionHiSysEvent(WifiConnectionType::CONNECT, GetBundleName());
     return ErrCode(reply.ReadInt32());
 }
 
@@ -553,6 +559,7 @@ ErrCode WifiDeviceProxy::ConnectToDevice(const WifiDeviceConfig &config)
     if (exception) {
         return WIFI_OPT_FAILED;
     }
+    WriteWifiConnectionHiSysEvent(WifiConnectionType::CONNECT, GetBundleName());
     return ErrCode(reply.ReadInt32());
 }
 
@@ -603,6 +610,7 @@ ErrCode WifiDeviceProxy::ReConnect()
     if (exception) {
         return WIFI_OPT_FAILED;
     }
+    WriteWifiConnectionHiSysEvent(WifiConnectionType::CONNECT, GetBundleName());
     return ErrCode(reply.ReadInt32());
 }
 
@@ -628,6 +636,7 @@ ErrCode WifiDeviceProxy::ReAssociate(void)
     if (exception) {
         return WIFI_OPT_FAILED;
     }
+    WriteWifiConnectionHiSysEvent(WifiConnectionType::CONNECT, GetBundleName());
     return ErrCode(reply.ReadInt32());
 }
 
@@ -653,6 +662,7 @@ ErrCode WifiDeviceProxy::Disconnect(void)
     if (exception) {
         return WIFI_OPT_FAILED;
     }
+    WriteWifiConnectionHiSysEvent(WifiConnectionType::DISCONNECT, GetBundleName());
     return ErrCode(reply.ReadInt32());
 }
 

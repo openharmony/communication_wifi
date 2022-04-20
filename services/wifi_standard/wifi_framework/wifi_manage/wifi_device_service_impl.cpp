@@ -241,7 +241,7 @@ bool WifiDeviceServiceImpl::CheckConfigPwd(const WifiDeviceConfig &config)
 
     int len = config.preSharedKey.length();
     bool isAllHex = std::all_of(config.preSharedKey.begin(), config.preSharedKey.end(), isxdigit);
-    WIFI_LOGI("CheckConfigPwd, keyMgmt: %{public}s, len: %{public}d", config.keyMgmt.c_str(), len);
+    WIFI_LOGI("CheckConfigPwd, keyMgmt: %{private}s, len: %{private}d", config.keyMgmt.c_str(), len);
     if (config.keyMgmt == KEY_MGMT_NONE) {
         for (int i = 0; i != WEPKEYS_SIZE; ++i) {
             if (!config.wepKeys[i].empty()) { // wep

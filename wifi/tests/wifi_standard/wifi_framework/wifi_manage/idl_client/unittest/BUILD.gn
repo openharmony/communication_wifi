@@ -1,0 +1,142 @@
+# Copyright (C) 2021-2022 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build/test.gni")
+import("//foundation/communication/wifi/wifi/wifi.gni")
+module_output_path = "wifi_standard/idl_client_test"
+
+config("module_private_config") {
+  visibility = [ ":*" ]
+  include_dirs = [
+    "//utils/native/base/include",
+    "$WIFI_ROOT_DIR/tests/wifi_standard/wifi_framework/wifi_manage/idl_client/unittest",
+  ]
+}
+
+ohos_unittest("idl_client_unittest") {
+  module_out_path = module_output_path
+  sources = [
+    "$WIFI_ROOT_DIR/interfaces/innerkits/native_cpp/wifi_standard/src/wifi_p2p_msg.cpp",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/common/net_helper/ip_tools.cpp",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/common/utils/wifi_global_func.cpp",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/idl_client/idl_interface/i_wifi.c",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/idl_client/idl_interface/i_wifi_chip.c",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/idl_client/idl_interface/i_wifi_hotspot_iface.c",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/idl_client/idl_interface/i_wifi_iface.c",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/idl_client/idl_interface/i_wifi_p2p_iface.c",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/idl_client/idl_interface/i_wifi_public_func.c",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/idl_client/idl_interface/i_wifi_sta_iface.c",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/idl_client/idl_interface/i_wifi_supplicant_iface.c",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/idl_client/wifi_ap_hal_interface.cpp",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/idl_client/wifi_base_hal_interface.cpp",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/idl_client/wifi_chip_hal_interface.cpp",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/idl_client/wifi_idl_client.cpp",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/idl_client/wifi_idl_inner_interface.cpp",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/idl_client/wifi_p2p_hal_interface.cpp",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/idl_client/wifi_sta_hal_interface.cpp",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/idl_client/wifi_supplicant_hal_interface.cpp",
+    "idl_client_test_main.cpp",
+    "wifi_ap_hal_interface_test.cpp",
+    "wifi_base_hal_interface_test.cpp",
+    "wifi_chip_hal_interface_test.cpp",
+    "wifi_idl_client_test.cpp",
+    "wifi_idl_interface_test.cpp",
+    "wifi_p2p_hal_interface_test.cpp",
+    "wifi_sta_hal_interface_test.cpp",
+    "wifi_supplicant_hal_interface_test.cpp",
+  ]
+
+  include_dirs = [
+    "$WIFI_ROOT_DIR/interfaces/innerkits/native_cpp/wifi_standard/interfaces",
+    "$WIFI_ROOT_DIR/services/wifi_standard/ipc_framework/cRPC/include",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/common/include",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/common/config",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/common/net_helper",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/common/utils",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/common/log",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/idl_client",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/idl_client/idl_interface",
+    "//utils/native/base/include",
+    "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
+    "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
+  ]
+
+  deps = [
+    "$WIFI_ROOT_DIR/services/wifi_standard/ipc_framework/cRPC:crpc_client",
+    "//utils/native/base:utils",
+  ]
+
+  ldflags = [
+    "-fPIC",
+    "--coverage",
+  ]
+
+  external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+  configs = [ ":module_private_config" ]
+
+  part_name = "wifi"
+  subsystem_name = "communication"
+  testonly = true
+}
+
+ohos_unittest("mock_wifi_hal_service") {
+  module_out_path = module_output_path
+  sources = [
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/common/log/log_helper.c",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_hal/common/wifi_hal_common_func.c",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_hal/main.c",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_hal/wifi_hal_adapter.c",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_hal/wifi_hal_callback.c",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_hal/wifi_hal_crpc_ap.c",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_hal/wifi_hal_crpc_base.c",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_hal/wifi_hal_crpc_chip.c",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_hal/wifi_hal_crpc_common.c",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_hal/wifi_hal_crpc_p2p.c",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_hal/wifi_hal_crpc_server.c",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_hal/wifi_hal_crpc_sta.c",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_hal/wifi_hal_crpc_supplicant.c",
+    "mock_wifi_hal_service.c",
+  ]
+
+  include_dirs = [
+    "//utils/native/base/include",
+    "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
+    "$WIFI_ROOT_DIR/interfaces/innerkits/native_cpp/wifi_standard/interfaces",
+    "$WIFI_ROOT_DIR/services/wifi_standard/ipc_framework/cRPC/include",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_hal",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_hal/common",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/common/log",
+  ]
+
+  deps = [
+    "$WIFI_ROOT_DIR/services/wifi_standard/ipc_framework/cRPC:crpc_server",
+    "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog",
+    "//utils/native/base:utils",
+  ]
+
+  cflags_cc = [ "-fno-rtti" ]
+
+  defines = []
+
+  part_name = "wifi"
+  subsystem_name = "communication"
+  testonly = true
+}
+
+group("unittest") {
+  testonly = true
+  deps = [
+    ":idl_client_unittest",
+    #":mock_wifi_hal_service",
+  ]
+}

@@ -87,7 +87,7 @@ ohos_unittest("dhcp_client_unittest") {
   external_deps = [
     "ability_base:want",
     "bundle_framework:appexecfwk_base",
-    "ces_standard:cesfwk_innerkits",
+    "common_event_service:cesfwk_innerkits",
     "eventhandler:libeventhandler",
     "hiviewdfx_hilog_native:libhilog",
   ]

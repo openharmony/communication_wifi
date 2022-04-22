@@ -100,6 +100,24 @@ napi_value JsObjectToInt(const napi_env& env, const napi_value& object, const ch
     return UndefinedNapiValue(env);
 }
 
+napi_value JsObjectToUint(const napi_env& env, const napi_value& object, const char* fieldStr, uint32_t& fieldRef)
+{
+    bool hasProperty = false;
+    NAPI_CALL(env, napi_has_named_property(env, object, fieldStr, &hasProperty));
+    if (hasProperty) {
+        napi_value field;
+        napi_valuetype valueType;
+
+        napi_get_named_property(env, object, fieldStr, &field);
+        NAPI_CALL(env, napi_typeof(env, field, &valueType));
+        NAPI_ASSERT(env, valueType == napi_number, "Wrong argument type. Number expected.");
+        napi_get_value_uint32(env, field, &fieldRef);
+    } else {
+        WIFI_LOGW("Js to int no property: %{public}s", fieldStr);
+    }
+    return UndefinedNapiValue(env);
+}
+
 napi_value JsObjectToBool(const napi_env& env, const napi_value& object, const char* fieldStr, bool& fieldRef)
 {
     bool hasProperty = false;

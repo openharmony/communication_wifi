@@ -187,6 +187,46 @@ static void ProcessPassphrase(const SecTypeJs& securityType, WifiDeviceConfig& c
     }
 }
 
+napi_value ConfigStaticIp(const napi_env& env, const napi_value& object, WifiDeviceConfig& cppConfig)
+{
+    bool hasProperty = false;
+    JsObjectToInt(env, object, "prefixLength", cppConfig.wifiIpConfig.staticIpAddress.ipAddress.prefixLength);
+    NAPI_CALL(env, napi_has_named_property(env, object, "staticIp", &hasProperty));
+    if (!hasProperty) {
+        WIFI_LOGE("Js has no property: staticIp.");
+        return UndefinedNapiValue(env);
+    }
+    napi_value staticIp;
+    napi_value dnsServers;
+    napi_value primaryDns;
+    napi_value secondDns;
+    napi_get_named_property(env, object, "staticIp", &staticIp);
+    JsObjectToUint(env, staticIp, "ipAddress",
+        cppConfig.wifiIpConfig.staticIpAddress.ipAddress.address.addressIpv4);
+    cppConfig.wifiIpConfig.staticIpAddress.ipAddress.address.family = 0;
+    JsObjectToUint(env, staticIp, "gateway", cppConfig.wifiIpConfig.staticIpAddress.gateway.addressIpv4);
+
+    NAPI_CALL(env, napi_has_named_property(env, staticIp, "dnsServers", &hasProperty));
+    if (!hasProperty) {
+        WIFI_LOGE("Js has no property: dnsServers.");
+        return UndefinedNapiValue(env);
+    }
+    uint32_t arrayLength = 0;
+    const int DNS_NUM = 2;
+    napi_get_named_property(env, staticIp, "dnsServers", &dnsServers);
+    napi_get_array_length(env, dnsServers, &arrayLength);
+    if (arrayLength != DNS_NUM) {
+        WIFI_LOGE("It needs two dns servers.");
+        return UndefinedNapiValue(env);
+    }
+    napi_get_element(env, dnsServers, 0, &primaryDns);
+    napi_get_element(env, dnsServers, 1, &secondDns);
+    napi_get_value_uint32(env, primaryDns, &cppConfig.wifiIpConfig.staticIpAddress.dnsServer1.addressIpv4);
+    napi_get_value_uint32(env, secondDns, &cppConfig.wifiIpConfig.staticIpAddress.dnsServer2.addressIpv4);
+
+    return UndefinedNapiValue(env);
+}
+
 static void JsObjToDeviceConfig(const napi_env& env, const napi_value& object, WifiDeviceConfig& cppConfig)
 {
     JsObjectToString(env, object, "ssid", 33, cppConfig.ssid); /* 33: ssid max length is 32 + '\0' */
@@ -204,7 +244,12 @@ static void JsObjToDeviceConfig(const napi_env& env, const napi_value& object, W
     /* "randomMacAddr" is not supported currently */
     int ipType = static_cast<int>(AssignIpMethod::UNASSIGNED);
     JsObjectToInt(env, object, "ipType", ipType);
-    /* "staticIp" is not supported currently */
+    if (AssignIpMethod(ipType) == AssignIpMethod::DHCP) {
+        cppConfig.wifiIpConfig.assignMethod = AssignIpMethod::DHCP;
+    } else if (AssignIpMethod(ipType) == AssignIpMethod::STATIC) {
+        cppConfig.wifiIpConfig.assignMethod = AssignIpMethod::STATIC;
+        ConfigStaticIp(env, object, cppConfig);
+    }
 }
 
 napi_value AddDeviceConfig(napi_env env, napi_callback_info info)

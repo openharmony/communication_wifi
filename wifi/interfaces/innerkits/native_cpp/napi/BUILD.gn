@@ -43,7 +43,7 @@ ohos_shared_library("wifi") {
     "$WIFI_ROOT_DIR/utils/src:wifi_utils",
     "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog",
     "//foundation/aafwk/standard/frameworks/kits/appkit:app_context",
-    "//foundation/ace/napi:ace_napi",
+    "//foundation/arkui/napi:ace_napi",
     "//utils/native/base:utils",
   ]
 
@@ -83,7 +83,7 @@ ohos_shared_library("wifi_native_js") {
     "$WIFI_ROOT_DIR/utils/src:wifi_utils",
     "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog",
     "//foundation/aafwk/standard/frameworks/kits/appkit:app_context",
-    "//foundation/ace/napi:ace_napi",
+    "//foundation/arkui/napi:ace_napi",
     "//utils/native/base:utils",
   ]
 

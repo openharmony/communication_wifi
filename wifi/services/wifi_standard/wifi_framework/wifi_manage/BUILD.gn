@@ -23,8 +23,8 @@ config("wifi_manager_service_header") {
   include_dirs = [
     "//utils/native/base/include",
     "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
-    "//foundation/ace/ace_engine/frameworks/base/utils",
-    "//foundation/ace/ace_engine/frameworks",
+    "//foundation/arkui/ace_engine/frameworks/base/utils",
+    "//foundation/arkui/ace_engine/frameworks",
     "//foundation/distributedschedule/safwk/interfaces/innerkits/safwk/",
     "$WIFI_ROOT_DIR/interfaces/innerkits/native_cpp/wifi_standard/interfaces",
     "$WIFI_ROOT_DIR/services/wifi_standard/ipc_framework/cRPC/include",

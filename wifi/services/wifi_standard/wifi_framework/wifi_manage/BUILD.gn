@@ -14,7 +14,6 @@
 import("//build/ohos.gni")
 import("//build/ohos/sa_profile/sa_profile.gni")
 import("//build/ohos_var.gni")
-import("//foundation/appexecfwk/standard/appexecfwk.gni")
 import("//foundation/communication/wifi/wifi/wifi.gni")
 
 ################################################################################
@@ -45,12 +44,8 @@ config("wifi_manager_service_header") {
     "$DHCP_ROOT_DIR/interfaces/innerkits/native_cpp/include",
     "$DHCP_ROOT_DIR/interfaces/innerkits/native_cpp/interfaces",
     "$WIFI_ROOT_DIR/utils/inc",
-    "${aafwk_path}/interfaces/innerkits/want/include",
-    "${aafwk_path}/interfaces/innerkits/want/include/ohos/aafwk/content",
     "//foundation/appexecfwk/adapter/interfaces/innerkits/appexecfwk_base/include",
-    "//foundation/appexecfwk/standard/interfaces/innerkits/libeventhandler/include",
     "//foundation/aafwk/standard/interfaces/innerkits/base/include",
-    "//foundation/appexecfwk/standard/interfaces/innerkits/appexecfwk_base/include",
     "//base/security/access_token/interfaces/innerkits/accesstoken/include",
     "//foundation/communication/netmanager_base/services/netmanagernative/include/netsys",
   ]
@@ -86,7 +81,12 @@ ohos_source_set("wifi_scan_service_impl") {
     ":wifi_manager_service_header",
   ]
 
-  external_deps = [ "ipc:ipc_core" ]
+  external_deps = [
+    "ability_base:want",
+    "bundle_framework:appexecfwk_base",
+    "eventhandler:libeventhandler",
+    "ipc:ipc_core",
+  ]
 }
 ohos_source_set("wifi_device_service_impl") {
   part_name = "wifi"
@@ -108,7 +108,12 @@ ohos_source_set("wifi_device_service_impl") {
   }
 
   deps = [ ":wifi_p2p_service_impl" ]
-  external_deps = [ "ipc:ipc_core" ]
+  external_deps = [
+    "ability_base:want",
+    "bundle_framework:appexecfwk_base",
+    "eventhandler:libeventhandler",
+    "ipc:ipc_core",
+  ]
 }
 ohos_source_set("wifi_hotspot_service_impl") {
   part_name = "wifi"
@@ -123,7 +128,12 @@ ohos_source_set("wifi_hotspot_service_impl") {
     ":wifi_manager_service_header",
   ]
 
-  external_deps = [ "ipc:ipc_core" ]
+  external_deps = [
+    "ability_base:want",
+    "bundle_framework:appexecfwk_base",
+    "eventhandler:libeventhandler",
+    "ipc:ipc_core",
+  ]
 }
 ohos_source_set("wifi_p2p_service_impl") {
   part_name = "wifi"
@@ -146,6 +156,9 @@ ohos_source_set("wifi_p2p_service_impl") {
   deps = [ "//foundation/communication/netmanager_base/services/netmanagernative:netsys_native_manager" ]
 
   external_deps = [
+    "ability_base:want",
+    "bundle_framework:appexecfwk_base",
+    "eventhandler:libeventhandler",
     "ipc:ipc_core",
     "netmanager_base:net_conn_manager_if",
   ]
@@ -179,8 +192,6 @@ ohos_shared_library("wifi_manager_service") {
     "$WIFI_ROOT_DIR/services/wifi_standard/etc/init:etc",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/idl_client:wifi_idl_client",
     "$WIFI_ROOT_DIR/utils/src:wifi_utils",
-    "${aafwk_path}/interfaces/innerkits/base:base",
-    "${aafwk_path}/interfaces/innerkits/want:want",
     "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog",
     "//foundation/communication/netmanager_base/services/netmanagernative:netsys_native_manager",
     "//foundation/distributedschedule/safwk/interfaces/innerkits/safwk:system_ability_fwk",
@@ -190,8 +201,11 @@ ohos_shared_library("wifi_manager_service") {
   configs = [ ":wifi_manager_service_header" ]
 
   external_deps = [
+    "ability_base:want",
     "access_token:libaccesstoken_sdk",
+    "bundle_framework:appexecfwk_base",
     "ces_standard:cesfwk_innerkits",
+    "eventhandler:libeventhandler",
     "ipc:ipc_core",
     "netmanager_base:net_conn_manager_if",
   ]

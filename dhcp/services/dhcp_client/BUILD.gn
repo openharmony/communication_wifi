@@ -12,7 +12,6 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
-import("//foundation/appexecfwk/standard/appexecfwk.gni")
 import("//foundation/communication/wifi/dhcp/dhcp.gni")
 
 ################################################################################
@@ -33,14 +32,11 @@ ohos_executable("dhcp_client_service") {
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/common/log",
     "$DHCP_ROOT_DIR/services/dhcp_client/include",
     "//utils/native/base/include",
-    "//foundation/appexecfwk/standard/interfaces/innerkits/libeventhandler/include",
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
     "//third_party/openssl/include",
   ]
 
   deps = [
-    "${aafwk_path}/interfaces/innerkits/base:base",
-    "${aafwk_path}/interfaces/innerkits/want:want",
     "//third_party/openssl:libcrypto_static",
     "//utils/native/base:utils",
   ]
@@ -48,7 +44,10 @@ ohos_executable("dhcp_client_service") {
   cflags_cc = [ "-fno-rtti" ]
 
   external_deps = [
+    "ability_base:want",
+    "bundle_framework:appexecfwk_base",
     "ces_standard:cesfwk_innerkits",
+    "eventhandler:libeventhandler",
     "hiviewdfx_hilog_native:libhilog",
   ]
   defines = []

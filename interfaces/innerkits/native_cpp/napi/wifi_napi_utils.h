@@ -76,6 +76,7 @@ napi_value UndefinedNapiValue(const napi_env& env);
 napi_value JsObjectToString(const napi_env& env, const napi_value& object,
     const char* fieldStr, const int bufLen, std::string& fieldRef);
 napi_value JsObjectToInt(const napi_env& env, const napi_value& object, const char* fieldStr, int& fieldRef);
+napi_value JsObjectToUint(const napi_env& env, const napi_value& object, const char* fieldStr, uint32_t& fieldRef);
 napi_value JsObjectToBool(const napi_env& env, const napi_value& object, const char* fieldStr, bool& fieldRef);
 napi_status SetValueUtf8String(const napi_env& env, const char* fieldStr, const char* str, napi_value& result);
 napi_status SetValueInt32(const napi_env& env, const char* fieldStr, const int intValue, napi_value& result);

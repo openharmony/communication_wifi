@@ -27,7 +27,6 @@ ohos_shared_library("wifi") {
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/common/net_helper",
     "//foundation/aafwk/standard/frameworks/kits/appkit/native/ability_runtime/context",
     "$WIFI_ROOT_DIR/utils/inc",
-    "//foundation/appexecfwk/standard/interfaces/innerkits/appexecfwk_base/include",
   ]
 
   sources = [
@@ -47,7 +46,10 @@ ohos_shared_library("wifi") {
     "//utils/native/base:utils",
   ]
 
-  external_deps = [ "ipc:ipc_core" ]
+  external_deps = [
+    "bundle_framework:appexecfwk_base",
+    "ipc:ipc_core",
+  ]
 
   relative_install_dir = "module"
   part_name = "wifi"
@@ -67,7 +69,6 @@ ohos_shared_library("wifi_native_js") {
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/common/net_helper",
     "//foundation/aafwk/standard/frameworks/kits/appkit/native/ability_runtime/context",
     "$WIFI_ROOT_DIR/utils/inc",
-    "//foundation/appexecfwk/standard/interfaces/innerkits/appexecfwk_base/include",
   ]
 
   sources = [
@@ -89,7 +90,10 @@ ohos_shared_library("wifi_native_js") {
 
   defines = [ "ENABLE_NAPI_COMPATIBLE" ]
 
-  external_deps = [ "ipc:ipc_core" ]
+  external_deps = [
+    "bundle_framework:appexecfwk_base",
+    "ipc:ipc_core",
+  ]
 
   relative_install_dir = "module"
   part_name = "wifi"

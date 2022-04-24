@@ -17,7 +17,7 @@ import("//foundation/communication/wifi/dhcp/dhcp.gni")
 ################################################################################
 
 module_output_path = "wifi_standard/dhcp_manage_test"
-even_path = "//base/notification/ces_standard"
+even_path = "//base/notification/common_event_service"
 
 config("module_private_config") {
   visibility = [ ":*" ]
@@ -56,7 +56,7 @@ ohos_unittest("dhcp_manage_unittest") {
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
     "${even_path}/cesfwk/kits/native/include",
     "${even_path}/cesfwk/innerkits/include",
-    "//base/notification/ces_standard/frameworks/core/include",
+    "//base/notification/common_event_service/frameworks/core/include",
   ]
 
   deps = [
@@ -91,7 +91,7 @@ ohos_unittest("dhcp_manage_unittest") {
   external_deps = [
     "ability_base:want",
     "bundle_framework:appexecfwk_base",
-    "ces_standard:cesfwk_innerkits",
+    "common_event_service:cesfwk_innerkits",
     "eventhandler:libeventhandler",
     "hiviewdfx_hilog_native:libhilog",
   ]

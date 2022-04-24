@@ -12,7 +12,6 @@
 # limitations under the License.
 
 import("//build/test.gni")
-import("//foundation/appexecfwk/standard/appexecfwk.gni")
 import("//foundation/communication/wifi/wifi/wifi.gni")
 
 ################################################################################
@@ -74,9 +73,7 @@ ohos_unittest("manager_unittest") {
     "//foundation/aafwk/standard/interfaces/innerkits/want/include/ohos/aafwk/content",
     "//foundation/aafwk/standard/interfaces/innerkits/want/include",
     "//foundation/appexecfwk/adapter/interfaces/innerkits/appexecfwk_base/include",
-    "//foundation/appexecfwk/standard/interfaces/innerkits/libeventhandler/include",
     "//foundation/aafwk/standard/interfaces/innerkits/base/include",
-    "//foundation/appexecfwk/standard/interfaces/innerkits/appexecfwk_base/include",
     "//base/security/access_token/interfaces/innerkits/accesstoken/include",
     "//foundation/communication/netmanager_base/services/netmanagernative/include/netsys",
     "$WIFI_ROOT_DIR/utils/inc",
@@ -86,8 +83,6 @@ ohos_unittest("manager_unittest") {
     "$WIFI_ROOT_DIR/services/wifi_standard/ipc_framework/cRPC:crpc_client",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/idl_client:wifi_idl_client",
     "$WIFI_ROOT_DIR/utils/src:wifi_utils",
-    "${aafwk_path}/interfaces/innerkits/base:base",
-    "${aafwk_path}/interfaces/innerkits/want:want",
     "//utils/native/base:utils",
   ]
 
@@ -97,8 +92,11 @@ ohos_unittest("manager_unittest") {
   ]
 
   external_deps = [
+    "ability_base:want",
     "access_token:libaccesstoken_sdk",
+    "bundle_framework:appexecfwk_base",
     "ces_standard:cesfwk_innerkits",
+    "eventhandler:libeventhandler",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
     "netmanager_base:net_conn_manager_if",

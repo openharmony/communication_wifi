@@ -141,15 +141,16 @@ ohos_shared_library("wifi_sdk") {
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage:wifi_manager_service",
     "$WIFI_ROOT_DIR/utils/src:wifi_utils",
     "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog",
-    "//base/notification/common_event_service/frameworks/core:cesfwk_core",
-    "//base/notification/common_event_service/frameworks/native:cesfwk_innerkits",
     "//foundation/aafwk/standard/interfaces/innerkits/want:want",
     "//foundation/distributedschedule/samgr/interfaces/innerkits/samgr_proxy:samgr_proxy",
     "//third_party/bounds_checking_function:libsec_static",
     "//utils/native/base:utils",
   ]
 
-  external_deps = [ "ipc:ipc_core" ]
+  external_deps = [
+    "common_event_service:cesfwk_innerkits",
+    "ipc:ipc_core",
+  ]
 
   cflags_cc = [
     "-std=c++17",

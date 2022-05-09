@@ -17,8 +17,10 @@
 #include <mutex>
 #include <string>
 #include "wifi_log.h"
+#ifndef OHOS_ARCH_LITE
 #include "ipc_skeleton.h"
 #include "accesstoken_kit.h"
+#endif
 
 #undef LOG_TAG
 #define LOG_TAG "OHWIFI_MANAGER_PERMISSION_HELPER"
@@ -159,6 +161,9 @@ IsGranted WifiPermissionHelper::MockVerifyPermission(const std::string &permissi
 
 int WifiPermissionHelper::VerifyPermission(const std::string &permissionName, const int &pid, const int &uid)
 {
+#ifdef OHOS_ARCH_LITE
+    return PERMISSION_GRANTED;
+#else
     auto callerToken = IPCSkeleton::GetCallingTokenID();
     auto tokenType = Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(callerToken);
     if (tokenType == Security::AccessToken::ATokenTypeEnum::TOKEN_NATIVE) {
@@ -177,6 +182,7 @@ int WifiPermissionHelper::VerifyPermission(const std::string &permissionName, co
 
     LOGE("callerToken=0x%{public}x has invalid token type=%{public}d", pid, tokenType);
     return PERMISSION_DENIED;
+#endif
 }
 
 int WifiPermissionHelper::VerifySetWifiInfoPermission(const int &pid, const int &uid)

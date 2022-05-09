@@ -11,53 +11,103 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build/ohos.gni")
-import("//foundation/communication/wifi/wifi/wifi.gni")
+crpc_server_sources = [
+  "./src/context.c",
+  "./src/evloop.c",
+  "./src/hash_table.c",
+  "./src/net.c",
+  "./src/serial.c",
+  "./src/server.c",
+]
 
-ohos_static_library("crpc_server") {
-  sources = [
-    "./src/context.c",
-    "./src/evloop.c",
-    "./src/hash_table.c",
-    "./src/net.c",
-    "./src/serial.c",
-    "./src/server.c",
-  ]
+crpc_client_sources = [
+  "./src/client.c",
+  "./src/context.c",
+  "./src/net.c",
+  "./src/serial.c",
+]
 
-  include_dirs = [
-    "include",
-    "//utils/native/base/include",
-    "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
-  ]
-  cflags_cc = [ "-fno-rtti" ]
-  deps = [
-    "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog",
-    "//utils/native/base:utils",
-  ]
-  subsystem_name = "communication"
-  part_name = "wifi"
-}
+if (defined(ohos_lite)) {
+  import("//build/lite/config/component/lite_component.gni")
+  import("//foundation/communication/wifi/wifi/wifi_lite.gni")
 
-ohos_static_library("crpc_client") {
-  sources = [
-    "./src/client.c",
-    "./src/context.c",
-    "./src/net.c",
-    "./src/serial.c",
-  ]
-  include_dirs = [
-    "include",
-    "//utils/native/base/include",
-    "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/common/log",
-  ]
-  cflags_cc = [ "-fno-rtti" ]
-  deps = [
-    "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog",
-    "//utils/native/base:utils",
-  ]
-  subsystem_name = "communication"
-  part_name = "wifi"
+  static_library("crpc_server") {
+    sources = crpc_server_sources
+
+    include_dirs = [
+      "include",
+      "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits",
+      "//third_party/bounds_checking_function/include",
+    ]
+
+    deps = [
+      "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
+      "//third_party/bounds_checking_function:libsec_shared",
+    ]
+    cflags_c = [
+      "-fPIC",
+      "-std=c99",
+    ]
+    defines = [ "OHOS_ARCH_LITE" ]
+  }
+
+  static_library("crpc_client") {
+    sources = crpc_client_sources
+    include_dirs = [
+      "include",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/common/log",
+      "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits",
+      "//third_party/bounds_checking_function/include",
+    ]
+
+    deps = [
+      "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
+      "//third_party/bounds_checking_function:libsec_shared",
+    ]
+    configs -= [ "//build/lite/config:language_c" ]
+    cflags_c = [
+      "-fPIC",
+      "-std=c99",
+    ]
+    defines = [ "OHOS_ARCH_LITE" ]
+  }
+} else {
+  import("//build/ohos.gni")
+  import("//foundation/communication/wifi/wifi/wifi.gni")
+
+  ohos_static_library("crpc_server") {
+    sources = crpc_server_sources
+
+    include_dirs = [
+      "include",
+      "//utils/native/base/include",
+      "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
+    ]
+    cflags_cc = [ "-fno-rtti" ]
+    deps = [
+      "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog",
+      "//utils/native/base:utils",
+    ]
+    subsystem_name = "communication"
+    part_name = "wifi"
+  }
+
+  ohos_static_library("crpc_client") {
+    sources = crpc_client_sources
+    include_dirs = [
+      "include",
+      "//utils/native/base/include",
+      "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/common/log",
+    ]
+    cflags_cc = [ "-fno-rtti" ]
+    deps = [
+      "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog",
+      "//utils/native/base:utils",
+    ]
+    subsystem_name = "communication"
+    part_name = "wifi"
+  }
 }
 
 group("ipc_framework") {

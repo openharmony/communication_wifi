@@ -17,11 +17,13 @@
 #include <sstream>
 #include <iterator>
 #include <regex>
+#ifndef OHOS_ARCH_LITE
 #include "bundle_mgr_interface.h"
 #include "if_system_ability_manager.h"
 #include "ipc_skeleton.h"
 #include "iservice_registry.h"
 #include "system_ability_definition.h"
+#endif
 #include "wifi_logger.h"
 
 namespace OHOS {
@@ -182,6 +184,7 @@ std::vector<std::string> StrSplit(const std::string& str, const std::string& del
     return { first, last };
 }
 
+#ifndef OHOS_ARCH_LITE
 sptr<AppExecFwk::IBundleMgr> GetBundleManager()
 {
     sptr<ISystemAbilityManager> systemManager = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
@@ -222,5 +225,6 @@ bool IsSystemApp()
     WIFI_LOGI("Is system App uid[%{public}d]: %{public}d", uid, isSysApp);
     return isSysApp;
 }
+#endif
 }  // namespace Wifi
 }  // namespace OHOS

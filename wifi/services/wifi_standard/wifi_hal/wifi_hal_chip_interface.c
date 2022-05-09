@@ -55,7 +55,8 @@ WifiErrorNo CreateIface(int32_t type, WifiIface *iface)
         return WIFI_HAL_FAILED;
     }
     const int bufferSize = 8;
-    char name[bufferSize] = {0};
+    char name[bufferSize];
+    (void)memset_s(name, bufferSize, 0, bufferSize);
     if (strcpy_s(iface->name, sizeof(iface->name), name) != EOK) {
         return WIFI_HAL_FAILED;
     }

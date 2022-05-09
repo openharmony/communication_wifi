@@ -53,7 +53,11 @@ public:
      */
     virtual ErrCode GetScanInfoList(std::vector<WifiScanInfo> &result) = 0;
 
+#ifdef OHOS_ARCH_LITE
+    virtual ErrCode RegisterCallBack(const std::shared_ptr<IWifiScanCallback> &callback) = 0;
+#else
     virtual ErrCode RegisterCallBack(const sptr<IWifiScanCallback> &callback) = 0;
+#endif
 
     /**
      * @Description Get supported features

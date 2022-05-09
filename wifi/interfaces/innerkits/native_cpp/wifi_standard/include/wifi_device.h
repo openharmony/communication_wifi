@@ -185,7 +185,11 @@ public:
      * @param callback - IWifiDeviceCallBack object
      * @return ErrCode - operation result
      */
+#ifdef OHOS_ARCH_LITE
+    virtual ErrCode RegisterCallBack(const std::shared_ptr<IWifiDeviceCallBack> &callback) = 0;
+#else
     virtual ErrCode RegisterCallBack(const sptr<IWifiDeviceCallBack> &callback) = 0;
+#endif
 
     /**
      * @Description Get the signal level object.

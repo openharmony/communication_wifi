@@ -67,8 +67,13 @@ const std::string EVENT_DATA_IPV6("ipv6");
 const std::string DHCP_WORK_DIR("/data/dhcp/");
 const std::string DHCP_CLIENT_PID_FILETYPE(".pid");
 const std::string DHCP_RESULT_FILETYPE(".result");
+#ifdef OHOS_ARCH_LITE
+const std::string DHCP_CLIENT_FILE("/bin/dhcp_client_service");
+const std::string DHCP_SERVER_FILE("/bin/dhcp_server");
+#else
 const std::string DHCP_CLIENT_FILE("/system/bin/dhcp_client_service");
 const std::string DHCP_SERVER_FILE("/system/bin/dhcp_server");
+#endif
 const std::string DHCP_SERVER_CONFIG_FILE("/data/dhcp/etc/dhcpd.conf");
 const std::string DHCP_SERVER_CONFIG_DIR("/data/dhcp/etc/");
 const std::string DHCP_SERVER_LEASES_FILE("/data/dhcp/dhcpd_lease.lease");

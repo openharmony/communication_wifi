@@ -16,16 +16,27 @@
 #define OHOS_WIFI_DEVICE_CALLBACK_PROXY_H
 
 #include "i_wifi_device_callback.h"
+#ifdef OHOS_ARCH_LITE
+#include "serializer.h"
+#else
 #include "iremote_proxy.h"
+#endif
 #include "wifi_msg.h"
 
 namespace OHOS {
 namespace Wifi {
+#ifdef OHOS_ARCH_LITE
+class WifiDeviceCallBackProxy : public IWifiDeviceCallBack {
+public:
+    explicit WifiDeviceCallBackProxy(SvcIdentity *sid);
+    virtual ~WifiDeviceCallBackProxy();
+#else
 class WifiDeviceCallBackProxy : public IRemoteProxy<IWifiDeviceCallBack> {
 public:
     explicit WifiDeviceCallBackProxy(const sptr<IRemoteObject> &remote);
 
     virtual ~WifiDeviceCallBackProxy() {}
+#endif
 
     /**
      * @Description Deal wifi state change message
@@ -65,7 +76,12 @@ public:
     void OnStreamChanged(int direction) override;
 
 private:
+#ifdef OHOS_ARCH_LITE
+    SvcIdentity *sid_;
+    static const int DEFAULT_IPC_SIZE = 128;
+#else
     static inline BrokerDelegator<WifiDeviceCallBackProxy> g_delegator;
+#endif
 };
 }  // namespace Wifi
 }  // namespace OHOS

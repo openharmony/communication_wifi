@@ -16,20 +16,35 @@
 #define OHOS_I_WIFI_SCAN_CALLBACK_PROXY_H
 
 #include "i_wifi_scan_callback.h"
+#ifdef OHOS_ARCH_LITE
+#include "serializer.h"
+#else
 #include "iremote_proxy.h"
+#endif
 
 namespace OHOS {
 namespace Wifi {
+#ifdef OHOS_ARCH_LITE
+class WifiScanCallbackProxy : public IWifiScanCallback {
+public:
+    explicit WifiScanCallbackProxy(SvcIdentity *sid);
+#else
 class WifiScanCallbackProxy : public IRemoteProxy<IWifiScanCallback> {
 public:
     explicit WifiScanCallbackProxy(const sptr<IRemoteObject> &impl);
+#endif
 
     virtual ~WifiScanCallbackProxy();
 
     void OnWifiScanStateChanged(int state) override;
 
 private:
+#ifdef OHOS_ARCH_LITE
+    SvcIdentity *sid_;
+    static const int DEFAULT_IPC_SIZE = 128;
+#else
     static inline BrokerDelegator<WifiScanCallbackProxy> g_delegator;
+#endif
 };
 }  // namespace Wifi
 }  // namespace OHOS

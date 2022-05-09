@@ -131,7 +131,9 @@ ErrCode StaStateMachine::InitStaStateMachine()
         return WIFI_OPT_FAILED;
     }
     pNetcheck->InitNetCheckThread();
+#ifndef OHOS_ARCH_LITE
     NetSupplierInfo = std::make_unique<NetManagerStandard::NetSupplierInfo>().release();
+#endif
     return WIFI_OPT_SUCCESS;
 }
 
@@ -396,8 +398,10 @@ void StaStateMachine::StartWifiProcess()
         } else {
             WIFI_LOGI("GetStaDeviceMacAddress failed!");
         }
+#ifndef OHOS_ARCH_LITE
         WifiNetAgent::GetInstance().RegisterNetSupplier();
         WifiNetAgent::GetInstance().RegisterNetSupplierCallback(staCallback);
+#endif
         /* Initialize Connection Information. */
         InitWifiLinkedInfo();
         InitLastWifiLinkedInfo();
@@ -510,7 +514,9 @@ bool StaStateMachine::WpaStartedState::ExecuteStateMsg(InternalMessage *msg)
 void StaStateMachine::StopWifiProcess()
 {
     WIFI_LOGD("Enter StaStateMachine::StopWifiProcess.\n");
+#ifndef OHOS_ARCH_LITE
     WifiNetAgent::GetInstance().UnregisterNetSupplier();
+#endif
     WifiSettings::GetInstance().SetWifiState(static_cast<int>(WifiState::DISABLING));
     staCallback.OnStaCloseRes(OperateResState::CLOSE_WIFI_CLOSING);
     StopTimer(static_cast<int>(CMD_SIGNAL_POLL));
@@ -524,6 +530,9 @@ void StaStateMachine::StopWifiProcess()
 
     IpInfo ipInfo;
     WifiSettings::GetInstance().SaveIpInfo(ipInfo);
+#ifdef OHOS_ARCH_LITE
+    IfConfig::GetInstance().FlushIpAddr(IF_NAME, IPTYPE_IPV4);
+#endif
 
     /* clear connection information. */
     InitWifiLinkedInfo();
@@ -675,6 +684,7 @@ void StaStateMachine::DealSignalPollResult(InternalMessage *msg)
             if (staCallback.OnStaRssiLevelChanged != nullptr) {
                 staCallback.OnStaRssiLevelChanged(linkedInfo.rssi);
             }
+#ifndef OHOS_ARCH_LITE
             if (NetSupplierInfo != nullptr) {
                 NetSupplierInfo->isAvailable_ = true;
                 NetSupplierInfo->isRoaming_ = isRoam;
@@ -682,6 +692,7 @@ void StaStateMachine::DealSignalPollResult(InternalMessage *msg)
                 NetSupplierInfo->frequency_ = linkedInfo.frequency;
                 WifiNetAgent::GetInstance().UpdateNetSupplierInfo(NetSupplierInfo);
             }
+#endif
             lastSignalLevel = currentSignalLevel;
         }
     } else {
@@ -799,13 +810,13 @@ void StaStateMachine::DealConnectionEvent(InternalMessage *msg)
         SyncAllDeviceConfigs();
         wpsState = SetupMethod::INVALID;
     }
-
+#ifndef OHOS_ARCH_LITE
     if (NetSupplierInfo != nullptr) {
         NetSupplierInfo->isAvailable_ = true;
         NetSupplierInfo->isRoaming_ = isRoam;
         WifiNetAgent::GetInstance().UpdateNetSupplierInfo(NetSupplierInfo);
     }
-
+#endif
     /* Callback result to InterfaceService. */
     staCallback.OnStaConnChanged(OperateResState::CONNECT_OBTAINING_IP, linkedInfo);
 
@@ -823,10 +834,12 @@ void StaStateMachine::DealDisconnectEvent(InternalMessage *msg)
     if (wpsState != SetupMethod::INVALID) {
         return;
     }
+#ifndef OHOS_ARCH_LITE
     if (NetSupplierInfo != nullptr) {
         NetSupplierInfo->isAvailable_ = false;
         WifiNetAgent::GetInstance().UpdateNetSupplierInfo(NetSupplierInfo);
     }
+#endif
     StopTimer(static_cast<int>(CMD_SIGNAL_POLL));
     pNetcheck->StopNetCheckThread();
     if (currentTpType == IPTYPE_IPV4) {
@@ -840,6 +853,9 @@ void StaStateMachine::DealDisconnectEvent(InternalMessage *msg)
 
     IpInfo ipInfo;
     WifiSettings::GetInstance().SaveIpInfo(ipInfo);
+#ifdef OHOS_ARCH_LITE
+    IfConfig::GetInstance().FlushIpAddr(IF_NAME, IPTYPE_IPV4);
+#endif
     /* Initialize connection informatoin. */
     InitWifiLinkedInfo();
     if (lastLinkedInfo.detailedState == DetailedState::CONNECTING) {
@@ -1413,10 +1429,12 @@ void StaStateMachine::DisConnectProcess()
     staCallback.OnStaConnChanged(OperateResState::DISCONNECT_DISCONNECTING, linkedInfo);
     if (WifiStaHalInterface::GetInstance().Disconnect() == WIFI_IDL_OPT_OK) {
         WIFI_LOGI("Disconnect() succeed!");
+#ifndef OHOS_ARCH_LITE
         if (NetSupplierInfo != nullptr) {
             NetSupplierInfo->isAvailable_ = false;
             WifiNetAgent::GetInstance().UpdateNetSupplierInfo(NetSupplierInfo);
         }
+#endif
         /* Save connection information to WifiSettings. */
         SaveLinkstate(ConnState::DISCONNECTED, DetailedState::DISCONNECTED);
         DisableNetwork(linkedInfo.networkId);
@@ -1929,6 +1947,7 @@ void StaStateMachine::DhcpResultNotify::OnSuccess(int status, const std::string 
             pStaStateMachine->linkedInfo.isDataRestricted =
                 (result.strVendor.find("ANDROID_METERED") == std::string::npos) ? 0 : 1;
             WifiSettings::GetInstance().SaveLinkedInfo(pStaStateMachine->linkedInfo);
+#ifndef OHOS_ARCH_LITE
             WIFI_LOGI("Update NetLink info, strYourCli=%{public}s, strSubnet=%{public}s, \
                 strRouter1=%{public}s, strDns1=%{public}s, strDns2=%{public}s",
                 IpAnonymize(result.strYourCli).c_str(), IpAnonymize(result.strSubnet).c_str(),
@@ -1936,8 +1955,11 @@ void StaStateMachine::DhcpResultNotify::OnSuccess(int status, const std::string 
                 IpAnonymize(result.strDns2).c_str());
             WifiNetAgent::GetInstance().UpdateNetLinkInfo(result.strYourCli, result.strSubnet, result.strRouter1,
                 result.strDns1, result.strDns2);
+#endif
         }
-
+#ifdef OHOS_ARCH_LITE
+        IfConfig::GetInstance().SetIfDnsAndRoute(result, result.iptype);
+#endif
         if (pStaStateMachine->getIpSucNum == 0 || pStaStateMachine->isRoam) {
             pStaStateMachine->SaveLinkstate(ConnState::CONNECTED, DetailedState::CONNECTED);
             pStaStateMachine->staCallback.OnStaConnChanged(

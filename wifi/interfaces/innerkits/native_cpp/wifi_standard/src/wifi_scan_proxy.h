@@ -16,16 +16,28 @@
 #ifndef WIFI_SCAN_PROXY
 #define WIFI_SCAN_PROXY
 
+#ifdef OHOS_ARCH_LITE
+#include "iproxy_client.h"
+#else
 #include <iremote_proxy.h>
+#endif
 #include "i_wifi_scan.h"
 #include "wifi_errcode.h"
 #include "wifi_scan_msg.h"
 
 namespace OHOS {
 namespace Wifi {
+#ifdef OHOS_ARCH_LITE
+class WifiScanProxy : public IWifiScan {
+public:static WifiScanProxy *GetInstance(void);
+    static void ReleaseInstance(void);
+    explicit WifiScanProxy(void);
+    ErrCode Init(void);
+#else
 class WifiScanProxy : public IRemoteProxy<IWifiScan>, public IRemoteObject::DeathRecipient {
 public:
     explicit WifiScanProxy(const sptr<IRemoteObject> &remote);
+#endif
     virtual ~WifiScanProxy();
 
     /**
@@ -67,7 +79,11 @@ public:
      */
     virtual ErrCode GetScanInfoList(std::vector<WifiScanInfo> &result) override;
 
+#ifdef OHOS_ARCH_LITE
+    virtual ErrCode RegisterCallBack(const std::shared_ptr<IWifiScanCallback> &callback) override;
+#else
     virtual ErrCode RegisterCallBack(const sptr<IWifiScanCallback> &callback) override;
+#endif
 
     /**
      * @Description Get supported features
@@ -77,10 +93,19 @@ public:
      */
     ErrCode GetSupportedFeatures(long &features) override;
 
+#ifdef OHOS_ARCH_LITE
+    void OnRemoteDied(void);
+private:
+    static WifiScanProxy *g_instance;
+    IClientProxy *remote_ = nullptr;
+    SvcIdentity svcIdentity_ = { 0 };
+    bool remoteDied_;
+#else
     void OnRemoteDied(const wptr<IRemoteObject>& remoteObject) override;
 private:
     static BrokerDelegator<WifiScanProxy> g_delegator;
     bool mRemoteDied;
+#endif
 };
 }  // namespace Wifi
 }  // namespace OHOS

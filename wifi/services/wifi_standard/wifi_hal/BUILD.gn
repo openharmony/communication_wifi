@@ -11,72 +11,116 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build/ohos.gni")
-import("//foundation/communication/wifi/wifi/wifi.gni")
+if (defined(ohos_lite)) {
+  import("//build/lite/config/component/lite_component.gni")
+  import("//foundation/communication/wifi/wifi/wifi_lite.gni")
+} else {
+  import("//build/ohos.gni")
+  import("//foundation/communication/wifi/wifi/wifi.gni")
+}
 
-ohos_executable("wifi_hal_service") {
-  install_enable = true
-  sources = [
-    "common/wifi_hal_common_func.c",
-    "main.c",
-    "wifi_hal_adapter.c",
-    "wifi_hal_ap_interface.c",
-    "wifi_hal_base_interface.c",
-    "wifi_hal_callback.c",
-    "wifi_hal_chip_interface.c",
-    "wifi_hal_crpc_ap.c",
-    "wifi_hal_crpc_base.c",
-    "wifi_hal_crpc_chip.c",
-    "wifi_hal_crpc_common.c",
-    "wifi_hal_crpc_p2p.c",
-    "wifi_hal_crpc_server.c",
-    "wifi_hal_crpc_sta.c",
-    "wifi_hal_crpc_supplicant.c",
-    "wifi_hal_module/hostapd_hal/wifi_hostapd_hal.c",
-    "wifi_hal_module/wpa_supplicant_hal/wifi_wpa_common.c",
-    "wifi_hal_module/wpa_supplicant_hal/wifi_wpa_hal.c",
-    "wifi_hal_module/wpa_supplicant_hal/wpa_p2p_hal/wifi_p2p_hal.c",
-    "wifi_hal_module/wpa_supplicant_hal/wpa_sta_hal/wifi_supplicant_hal.c",
-    "wifi_hal_module_manage.c",
-    "wifi_hal_p2p_interface.c",
-    "wifi_hal_sta_interface.c",
-    "wifi_hal_vendor_interface.c",
-  ]
+local_base_sources = [
+  "common/wifi_hal_common_func.c",
+  "main.c",
+  "wifi_hal_adapter.c",
+  "wifi_hal_ap_interface.c",
+  "wifi_hal_base_interface.c",
+  "wifi_hal_callback.c",
+  "wifi_hal_chip_interface.c",
+  "wifi_hal_crpc_ap.c",
+  "wifi_hal_crpc_base.c",
+  "wifi_hal_crpc_chip.c",
+  "wifi_hal_crpc_common.c",
+  "wifi_hal_crpc_p2p.c",
+  "wifi_hal_crpc_server.c",
+  "wifi_hal_crpc_sta.c",
+  "wifi_hal_crpc_supplicant.c",
+  "wifi_hal_module/hostapd_hal/wifi_hostapd_hal.c",
+  "wifi_hal_module/wpa_supplicant_hal/wifi_wpa_common.c",
+  "wifi_hal_module/wpa_supplicant_hal/wifi_wpa_hal.c",
+  "wifi_hal_module/wpa_supplicant_hal/wpa_p2p_hal/wifi_p2p_hal.c",
+  "wifi_hal_module/wpa_supplicant_hal/wpa_sta_hal/wifi_supplicant_hal.c",
+  "wifi_hal_module_manage.c",
+  "wifi_hal_p2p_interface.c",
+  "wifi_hal_sta_interface.c",
+  "wifi_hal_vendor_interface.c",
+]
 
-  include_dirs = [
-    "//utils/native/base/include",
-    "$WIFI_ROOT_DIR/interfaces/innerkits/native_cpp/wifi_standard/interfaces",
-    "$WIFI_ROOT_DIR/services/wifi_standard/ipc_framework/cRPC/include",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_hal",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_hal/common",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_hal/wifi_hal_module/hostapd_hal",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_hal/wifi_hal_module/wpa_supplicant_hal",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_hal/wifi_hal_module/wpa_supplicant_hal/wpa_sta_hal",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_hal/wifi_hal_module/wpa_supplicant_hal/wpa_p2p_hal",
-    "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
-    "//third_party/wpa_supplicant/wpa_supplicant-2.9_standard/src/",
-    "//third_party/bounds_checking_function/include/",
-    "//drivers/peripheral/wlan/interfaces/include/",
-    "//drivers/peripheral/wlan/client/include/",
-  ]
+local_base_include_dirs = [
+  "$WIFI_ROOT_DIR/interfaces/innerkits/native_cpp/wifi_standard/interfaces",
+  "$WIFI_ROOT_DIR/services/wifi_standard/ipc_framework/cRPC/include",
+  "$WIFI_ROOT_DIR/services/wifi_standard/wifi_hal",
+  "$WIFI_ROOT_DIR/services/wifi_standard/wifi_hal/common",
+  "$WIFI_ROOT_DIR/services/wifi_standard/wifi_hal/wifi_hal_module/hostapd_hal",
+  "$WIFI_ROOT_DIR/services/wifi_standard/wifi_hal/wifi_hal_module/wpa_supplicant_hal",
+  "$WIFI_ROOT_DIR/services/wifi_standard/wifi_hal/wifi_hal_module/wpa_supplicant_hal/wpa_sta_hal",
+  "$WIFI_ROOT_DIR/services/wifi_standard/wifi_hal/wifi_hal_module/wpa_supplicant_hal/wpa_p2p_hal",
+]
 
-  deps = [
-    "$WIFI_ROOT_DIR/services/wifi_standard/ipc_framework/cRPC:crpc_server",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_hal/etc/init:etc",
-    "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog",
-    "//drivers/peripheral/wlan/hal:wifi_hal",
-    "//third_party/wpa_supplicant/wpa_supplicant-2.9_standard:wpa_client",
-    "//utils/native/base:utils",
-  ]
+if (defined(ohos_lite)) {
+  executable("wifi_hal_service") {
+    sources = local_base_sources
 
-  cflags_cc = [ "-fno-rtti" ]
-  defines = [ "AP_INTF=\"$wifi_feature_with_ap_intf\"" ]
-  if (product_name == "rk3568") {
-    defines += [ "PRODUCT_RK" ]
+    include_dirs = local_base_include_dirs
+    include_dirs += [
+      "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits",
+      "//third_party/bounds_checking_function/include",
+      "//third_party/wpa_supplicant/wpa_supplicant-2.9/src",
+
+      #"//drivers/peripheral/wlan/interfaces/include/",
+      #"//drivers/peripheral/wlan/client/include/",
+    ]
+
+    deps = [
+      "$WIFI_ROOT_DIR/services/wifi_standard/ipc_framework/cRPC:crpc_server",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_hal/etc/init:etc",
+      "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
+
+      #"//drivers/peripheral/wlan/hal:wifi_hal",
+      "//third_party/bounds_checking_function:libsec_shared",
+      "//third_party/wpa_supplicant/wpa_supplicant-2.9:wpa_supplicant",
+    ]
+
+    cflags_cc = [ "-fno-rtti" ]
+    defines = [
+      "OHOS_ARCH_LITE",
+      "AP_INTF=\"$wifi_feature_with_ap_intf\"",
+    ]
+    ldflags = [ "-lwpa_client" ]
   }
+} else {
+  ohos_executable("wifi_hal_service") {
+    install_enable = true
+    sources = local_base_sources
 
-  part_name = "wifi"
-  subsystem_name = "communication"
+    include_dirs = local_base_include_dirs
+    include_dirs += [
+      "//utils/native/base/include",
+      "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
+      "//third_party/wpa_supplicant/wpa_supplicant-2.9_standard/src/",
+      "//third_party/bounds_checking_function/include/",
+      "//drivers/peripheral/wlan/interfaces/include/",
+      "//drivers/peripheral/wlan/client/include/",
+    ]
+
+    deps = [
+      "$WIFI_ROOT_DIR/services/wifi_standard/ipc_framework/cRPC:crpc_server",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_hal/etc/init:etc",
+      "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog",
+      "//drivers/peripheral/wlan/hal:wifi_hal",
+      "//third_party/wpa_supplicant/wpa_supplicant-2.9_standard:wpa_client",
+      "//utils/native/base:utils",
+    ]
+
+    cflags_cc = [ "-fno-rtti" ]
+    defines = [ "AP_INTF=\"$wifi_feature_with_ap_intf\"" ]
+    if (product_name == "rk3568") {
+      defines += [ "PRODUCT_RK" ]
+    }
+
+    part_name = "wifi"
+    subsystem_name = "communication"
+  }
 }
 
 group("wifi_hal") {

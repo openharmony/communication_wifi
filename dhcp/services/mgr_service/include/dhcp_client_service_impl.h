@@ -190,6 +190,23 @@ private:
      *
      */
     void RunDhcpResultHandleThreadFunc();
+#ifdef OHOS_ARCH_LITE
+    /**
+     * @Description : Dhcp recv msg threads execution function.
+     *
+     * @param ifname - interface name, eg:wlan0 [in]
+     */
+    void RunDhcpRecvMsgThreadFunc(const std::string& ifname);
+
+    /**
+     * @Description : Handle dhcp packet info.
+     *
+     * @param ifname - interface name, eg:wlan0 [in]
+     * @param packetResult - dhcp packet result [in]
+     * @param success - get success is true, get failed is false [in]
+     */
+    void DhcpPacketInfoHandle(const std::string& ifname, struct DhcpPacketResult &packetResult, bool success = true);
+#endif
     /**
      * @Description : Fork child process function for start or stop dhcp process.
      *
@@ -240,7 +257,10 @@ private:
     std::mutex mResultNotifyMutex;
     bool isExitDhcpResultHandleThread;
     std::thread *pDhcpResultHandleThread;
-
+#ifdef OHOS_ARCH_LITE
+    std::mutex mRecvMsgThreadMutex;
+    std::map<std::string, std::thread *> m_mapDhcpRecvMsgThread;
+#endif
     std::map<std::string, std::list<DhcpResultReq*>> m_mapDhcpResultNotify;
     std::map<std::string, std::shared_ptr<OHOS::Wifi::DhcpEventSubscriber>> m_mapEventSubscriber;
 };

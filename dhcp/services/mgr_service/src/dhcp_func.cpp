@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -20,6 +20,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <vector>
 
 #include "securec.h"
 #include "wifi_logger.h"
@@ -475,6 +476,55 @@ int DhcpFunc::FormatString(struct DhcpPacketResult &result)
     return 0;
 }
 
+#ifdef OHOS_ARCH_LITE
+int DhcpFunc::GetDhcpPacketResult(const std::string& filename, struct DhcpPacketResult &result)
+{
+    FILE *pFile = fopen(filename.c_str(), "r");
+    if (pFile == nullptr) {
+        WIFI_LOGE("GetDhcpPacketResult() fopen %{public}s fail, err:%{public}s!", filename.c_str(), strerror(errno));
+        return DHCP_OPT_FAILED;
+    }
+
+    char strIpFlag[DHCP_NUM_EIGHT];
+    if (memset_s(strIpFlag, sizeof(strIpFlag), 0, sizeof(strIpFlag)) != EOK) {
+        fclose(pFile);
+        return DHCP_OPT_FAILED;
+    }
+    /* Format: IpFlag AddTime cliIp servIp subnet dns1 dns2 router1 router2 vendor lease */
+    int nRes = fscanf_s(pFile, "%s %u %s %s %s %s %s %s %s %s %u\n", strIpFlag, DHCP_NUM_EIGHT, &result.uAddTime,
+        result.strYiaddr, INET_ADDRSTRLEN, result.strOptServerId, INET_ADDRSTRLEN, result.strOptSubnet, INET_ADDRSTRLEN,
+        result.strOptDns1, INET_ADDRSTRLEN, result.strOptDns2, INET_ADDRSTRLEN, result.strOptRouter1, INET_ADDRSTRLEN,
+        result.strOptRouter2, INET_ADDRSTRLEN, result.strOptVendor, DHCP_FILE_MAX_BYTES, &result.uOptLeasetime);
+    if (nRes == EOF) {
+        WIFI_LOGE("GetDhcpPacketResult() fscanf %{public}s err:%{public}s!", filename.c_str(), strerror(errno));
+        fclose(pFile);
+        return DHCP_OPT_FAILED;
+    } else if (nRes == 0) {
+        WIFI_LOGW("GetDhcpPacketResult() fscanf file:%{public}s nRes:0 NULL!", filename.c_str());
+        fclose(pFile);
+        return DHCP_OPT_NULL;
+    } else if (nRes != EVENT_DATA_NUM) {
+        WIFI_LOGE("GetDhcpPacketResult() fscanf file:%{public}s nRes:%{public}d ERROR!", filename.c_str(), nRes);
+        fclose(pFile);
+        return DHCP_OPT_FAILED;
+    }
+
+    if (fclose(pFile) != 0) {
+        WIFI_LOGE("GetDhcpPacketResult() fclose file:%{public}s failed, error:%{public}s!",
+            filename.c_str(), strerror(errno));
+        return DHCP_OPT_FAILED;
+    }
+
+    /* Format dhcp packet result */
+    if (FormatString(result) != 0) {
+        WIFI_LOGE("GetDhcpPacketResult() file:%{public}s failed, FormatString result error!", filename.c_str());
+        return DHCP_OPT_FAILED;
+    }
+
+    return DHCP_OPT_SUCCESS;
+}
+#endif
+
 int DhcpFunc::InitPidfile(const std::string& piddir, const std::string& pidfile)
 {
     if (piddir.empty() || pidfile.empty()) {
@@ -651,6 +701,7 @@ bool DhcpFunc::SplitString(
     return true;
 }
 
+#ifndef OHOS_ARCH_LITE
 bool DhcpFunc::SubscribeDhcpCommonEvent(
     const std::shared_ptr<OHOS::EventFwk::CommonEventSubscriber> &subscriber)
 {
@@ -680,5 +731,6 @@ bool DhcpFunc::PublishDhcpEvent(const std::string action, const int code, const 
         action.c_str(), code, data.c_str());
     return DHCP_OPT_SUCCESS;
 }
+#endif
 }  // namespace Wifi
 }  // namespace OHOS

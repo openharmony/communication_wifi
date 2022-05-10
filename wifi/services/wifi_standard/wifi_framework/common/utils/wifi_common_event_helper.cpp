@@ -14,12 +14,16 @@
  */
 
 #include "wifi_common_event_helper.h"
+#ifndef OHOS_ARCH_LITE
 #include "common_event_manager.h"
 #include "common_event.h"
 #include "common_event_data.h"
+#endif
 #include "wifi_logger.h"
 
+#ifndef OHOS_ARCH_LITE
 using namespace OHOS::EventFwk;
+#endif
 DEFINE_WIFILOG_LABEL("WifiCommonEventHelper");
 namespace OHOS {
 namespace Wifi {
@@ -27,6 +31,7 @@ bool WifiCommonEventHelper::PublishEvent(const std::string &eventAction, const i
     const std::vector<std::string> &permissions)
 {
     WIFI_LOGD("publish event[%{public}s], code:%{public}d", eventAction.c_str(), code);
+#ifndef OHOS_ARCH_LITE
     Want want;
     want.SetAction(eventAction);
     CommonEventData commonData;
@@ -46,12 +51,14 @@ bool WifiCommonEventHelper::PublishEvent(const std::string &eventAction, const i
         WIFI_LOGE("failed to publish event[%{public}s], code:%{public}d", eventAction.c_str(), code);
         return false;
     }
+#endif
     return true;
 }
 
 bool WifiCommonEventHelper::PublishEvent(const std::string &eventAction, const int &code, const std::string &data)
 {
     WIFI_LOGD("publish event[%{public}s], code:%{public}d", eventAction.c_str(), code);
+#ifndef OHOS_ARCH_LITE
     Want want;
     want.SetAction(eventAction);
     CommonEventData commonData;
@@ -62,6 +69,7 @@ bool WifiCommonEventHelper::PublishEvent(const std::string &eventAction, const i
         WIFI_LOGE("failed to publish event[%{public}s], code:%{public}d", eventAction.c_str(), code);
         return false;
     }
+#endif
     return true;
 }
 

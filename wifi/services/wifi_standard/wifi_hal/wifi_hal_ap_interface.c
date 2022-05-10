@@ -16,9 +16,13 @@
 #include "wifi_hal_ap_interface.h"
 #include <errno.h>
 #include <securec.h>
+#ifdef OHOS_ARCH_LITE
+#include "wifi_hal_adapter.h"
+#else
 #include "wifi_hal.h"
 #include "wifi_hal_adapter.h"
 #include "wifi_hal_ap_feature.h"
+#endif
 #include "wifi_hal_module_manage.h"
 #include "wifi_hal_common_func.h"
 #include "wifi_log.h"
@@ -273,6 +277,9 @@ static int32_t ConvertToNl80211Band(int32_t band)
 
 WifiErrorNo GetValidFrequenciesForBand(int32_t band, int *frequencies, int32_t *size)
 {
+#ifdef OHOS_ARCH_LITE
+    return WIFI_HAL_FAILED;
+#else
     int32_t ret;
     uint32_t count = 0;
     struct IWiFi *wifi = NULL;
@@ -317,4 +324,5 @@ WifiErrorNo GetValidFrequenciesForBand(int32_t band, int *frequencies, int32_t *
     }
 
     return (ret == 0) ? WIFI_HAL_SUCCESS : WIFI_HAL_FAILED;
+#endif
 }

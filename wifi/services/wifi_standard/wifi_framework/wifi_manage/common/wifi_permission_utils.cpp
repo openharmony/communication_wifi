@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,11 +13,69 @@
  * limitations under the License.
  */
 #include "wifi_permission_utils.h"
+#ifndef OHOS_ARCH_LITE
 #include "ipc_skeleton.h"
+#endif
 #include "wifi_auth_center.h"
 
 namespace OHOS {
 namespace Wifi {
+#ifdef OHOS_ARCH_LITE
+int WifiPermissionUtils::VerifySetWifiInfoPermission()
+{
+    return PERMISSION_GRANTED;
+}
+
+int WifiPermissionUtils::VerifyGetWifiInfoPermission()
+{
+    return PERMISSION_GRANTED;
+}
+
+int WifiPermissionUtils::VerifyWifiConnectionPermission()
+{
+    return PERMISSION_GRANTED;
+}
+
+int WifiPermissionUtils::VerifyGetScanInfosPermission()
+{
+    return PERMISSION_GRANTED;
+}
+
+int WifiPermissionUtils::VerifyGetWifiLocalMacPermission()
+{
+    return PERMISSION_GRANTED;
+}
+
+int WifiPermissionUtils::VerifySetWifiConfigPermission()
+{
+    return PERMISSION_GRANTED;
+}
+
+int WifiPermissionUtils::VerifyGetWifiConfigPermission()
+{
+    return PERMISSION_GRANTED;
+}
+
+int WifiPermissionUtils::VerifyGetWifiDirectDevicePermission()
+{
+    return PERMISSION_GRANTED;
+}
+
+int WifiPermissionUtils::VerifyManageWifiHotspotPermission()
+{
+    return PERMISSION_GRANTED;
+}
+
+int WifiPermissionUtils::VerifyGetWifiPeersMacPermission()
+{
+    return PERMISSION_GRANTED;
+}
+
+int WifiPermissionUtils::VerifyGetWifiInfoInternalPermission()
+{
+    return PERMISSION_GRANTED;
+}
+#else
 int WifiPermissionUtils::VerifySetWifiInfoPermission()
 {
     return WifiAuthCenter::GetInstance().VerifySetWifiInfoPermission(
@@ -83,5 +141,6 @@ int WifiPermissionUtils::VerifyGetWifiInfoInternalPermission()
     return WifiAuthCenter::GetInstance().VerifyGetWifiInfoInternalPermission(
         IPCSkeleton::GetCallingPid(), IPCSkeleton::GetCallingUid());
 }
+#endif
 }  // namespace Wifi
 }  // namespace OHOS

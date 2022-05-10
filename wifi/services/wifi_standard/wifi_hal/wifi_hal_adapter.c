@@ -155,8 +155,13 @@ int ExcuteCmd(const char *szCmd)
 
 int CopyConfigFile(const char* configName)
 {
+#ifdef OHOS_ARCH_LITE
+#define PATH_NUM 2
+#define BUFF_SIZE 256
+#else
     const int PATH_NUM = 2;
     const int BUFF_SIZE = 256;
+#endif
     char buf[BUFF_SIZE] = {0};
     if (snprintf_s(buf, sizeof(buf), sizeof(buf) - 1, "/data/misc/wifi/wpa_supplicant/%s", configName) < 0) {
         LOGE("snprintf_s dest dir failed.");

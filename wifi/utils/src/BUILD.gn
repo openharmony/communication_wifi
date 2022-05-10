@@ -11,46 +11,77 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build/ohos.gni")
-import("//foundation/communication/wifi/wifi/wifi.gni")
+if (defined(ohos_lite)) {
+  import("//build/lite/config/component/lite_component.gni")
+  import("//foundation/communication/wifi/wifi/wifi_lite.gni")
 
-ohos_shared_library("wifi_utils") {
-  install_enable = true
-  include_dirs = [
-    "$WIFI_ROOT_DIR/utils/inc",
-    "//base/hiviewdfx/hisysevent/interfaces/native/innerkits/hisysevent/include",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/common/log",
-  ]
+  shared_library("wifi_utils") {
+    include_dirs = [
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/common/log",
+      "$WIFI_ROOT_DIR/utils/inc",
+      "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits",
+      "//third_party/bounds_checking_function/include",
+    ]
 
-  sources = [
-    "wifi_common_util.cpp",
-    "wifi_hisysevent.cpp",
-  ]
+    sources = [ "wifi_common_util.cpp" ]
 
-  deps = [
-    "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog",
-    "//foundation/aafwk/standard/interfaces/innerkits/want:want",
-    "//foundation/distributedschedule/samgr/interfaces/innerkits/samgr_proxy:samgr_proxy",
-    "//utils/native/base:utils",
-  ]
+    deps = [
+      "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
+      "//third_party/bounds_checking_function:libsec_shared",
+    ]
 
-  external_deps = [
-    "bundle_framework:appexecfwk_base",
-    "bundle_framework:appexecfwk_core",
-    "hisysevent_native:libhisysevent",
-    "ipc:ipc_core",
-  ]
+    cflags_cc = [
+      "-std=c++17",
+      "-fno-rtti",
+    ]
+    ldflags = [
+      "-fPIC",
+      "-Wl,-E",
+    ]
+    defines = [ "OHOS_ARCH_LITE" ]
+  }
+} else {
+  import("//build/ohos.gni")
+  import("//foundation/communication/wifi/wifi/wifi.gni")
 
-  cflags_cc = [
-    "-std=c++17",
-    "-fno-rtti",
-  ]
+  ohos_shared_library("wifi_utils") {
+    install_enable = true
+    include_dirs = [
+      "$WIFI_ROOT_DIR/utils/inc",
+      "//base/hiviewdfx/hisysevent/interfaces/native/innerkits/hisysevent/include",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/common/log",
+    ]
 
-  ldflags = [
-    "-fPIC",
-    "-Wl,-E",
-  ]
+    sources = [
+      "wifi_common_util.cpp",
+      "wifi_hisysevent.cpp",
+    ]
 
-  part_name = "wifi"
-  subsystem_name = "communication"
+    deps = [
+      "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog",
+      "//foundation/aafwk/standard/interfaces/innerkits/want:want",
+      "//foundation/distributedschedule/samgr/interfaces/innerkits/samgr_proxy:samgr_proxy",
+      "//utils/native/base:utils",
+    ]
+
+    external_deps = [
+      "bundle_framework:appexecfwk_base",
+      "bundle_framework:appexecfwk_core",
+      "hisysevent_native:libhisysevent",
+      "ipc:ipc_core",
+    ]
+
+    cflags_cc = [
+      "-std=c++17",
+      "-fno-rtti",
+    ]
+
+    ldflags = [
+      "-fPIC",
+      "-Wl,-E",
+    ]
+
+    part_name = "wifi"
+    subsystem_name = "communication"
+  }
 }

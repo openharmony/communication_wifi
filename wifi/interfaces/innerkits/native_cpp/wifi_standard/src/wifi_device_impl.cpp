@@ -13,7 +13,9 @@
  * limitations under the License.
  */
 #include "wifi_device_impl.h"
+#ifndef OHOS_ARCH_LITE
 #include "iservice_registry.h"
+#endif
 #include "wifi_logger.h"
 
 DEFINE_WIFILOG_LABEL("WifiDeviceImpl");
@@ -28,14 +30,31 @@ namespace Wifi {
         }                                             \
     } while (0)
 
-WifiDeviceImpl::WifiDeviceImpl(int systemAbilityId) : systemAbilityId_(systemAbilityId)
+WifiDeviceImpl::WifiDeviceImpl(int systemAbilityId) : systemAbilityId_(systemAbilityId), client_(nullptr)
 {}
 
 WifiDeviceImpl::~WifiDeviceImpl()
-{}
+{
+#ifdef OHOS_ARCH_LITE
+    WifiDeviceProxy::ReleaseInstance();
+#endif
+}
 
 bool WifiDeviceImpl::Init()
 {
+#ifdef OHOS_ARCH_LITE
+    WifiDeviceProxy *deviceProxy = WifiDeviceProxy::GetInstance();
+    if (deviceProxy == nullptr) {
+        WIFI_LOGE("get wifi device proxy failed.");
+        return false;
+    }
+    if (deviceProxy->Init() != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("wifi device proxy init failed.");
+        WifiDeviceProxy::ReleaseInstance();
+        return false;
+    }
+    client_ = deviceProxy;
+#else
     sptr<ISystemAbilityManager> sa_mgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (sa_mgr == nullptr) {
         WIFI_LOGE("failed to get SystemAbilityManager");
@@ -52,12 +71,11 @@ bool WifiDeviceImpl::Init()
     if (client_ == nullptr) {
         client_ = new (std::nothrow) WifiDeviceProxy(object);
     }
-
     if (client_ == nullptr) {
         WIFI_LOGE("wifi device init failed. %{public}d", systemAbilityId_);
         return false;
     }
-
+#endif
     return true;
 }
 
@@ -223,7 +241,11 @@ ErrCode WifiDeviceImpl::GetSignalLevel(const int &rssi, const int &band, int &le
     return client_->GetSignalLevel(rssi, band, level);
 }
 
+#ifdef OHOS_ARCH_LITE
+ErrCode WifiDeviceImpl::RegisterCallBack(const std::shared_ptr<IWifiDeviceCallBack> &callback)
+#else
 ErrCode WifiDeviceImpl::RegisterCallBack(const sptr<IWifiDeviceCallBack> &callback)
+#endif
 {
     RETURN_IF_FAIL(client_);
     return client_->RegisterCallBack(callback);

@@ -26,8 +26,12 @@
 #include "wifi_internal_msg.h"
 #include "sta_service_callback.h"
 #include "iscan_service_callbacks.h"
+#ifdef FEATURE_AP_SUPPORT
 #include "i_ap_service_callbacks.h"
+#endif
+#ifdef FEATURE_P2P_SUPPORT
 #include "ip2p_service_callbacks.h"
+#endif
 
 namespace OHOS {
 namespace Wifi {
@@ -90,19 +94,23 @@ public:
      */
     IScanSerivceCallbacks GetScanCallback(void);
 
+#ifdef FEATURE_AP_SUPPORT
     /**
      * @Description Get the ap callback object.
      *
      * @return IApServiceCallbacks - return mApCallback
      */
     IApServiceCallbacks GetApCallback(void);
+#endif
 
+#ifdef FEATURE_P2P_SUPPORT
     /**
      * @Description Get the p2p callback object.
      *
      * @return IP2pServiceCallbacks - return mP2pCallback
      */
     IP2pServiceCallbacks GetP2pCallback(void);
+#endif
 
     /**
      * @Description Get supported features
@@ -125,14 +133,22 @@ private:
     void PushServiceCloseMsg(WifiCloseServiceCode code);
     void InitStaCallback(void);
     void InitScanCallback(void);
+#ifdef FEATURE_AP_SUPPORT
     void InitApCallback(void);
+#endif
+#ifdef FEATURE_P2P_SUPPORT
     void InitP2pCallback(void);
+#endif
     InitStatus GetInitStatus();
     static void DealCloseServiceMsg(WifiManager &manager);
     static void CloseStaService(void);
+#ifdef FEATURE_AP_SUPPORT
     static void CloseApService(void);
+#endif
     static void CloseScanService(void);
+#ifdef FEATURE_P2P_SUPPORT
     static void CloseP2pService(void);
+#endif
     static void DealStaOpenRes(OperateResState state);
     static void DealStaCloseRes(OperateResState state);
     static void DealStaConnChanged(OperateResState state, const WifiLinkedInfo &info);
@@ -145,9 +161,12 @@ private:
     static void DealScanCloseRes(void);
     static void DealScanFinished(int state);
     static void DealScanInfoNotify(std::vector<InterScanInfo> &results);
+#ifdef FEATURE_AP_SUPPORT
     static void DealApStateChanged(ApState bState);
     static void DealApGetStaJoin(const StationInfo &info);
     static void DealApGetStaLeave(const StationInfo &info);
+#endif
+#ifdef FEATURE_P2P_SUPPORT
     static void DealP2pStateChanged(P2pState bState);
     static void DealP2pPeersChanged(const std::vector<WifiP2pDevice> &vPeers);
     static void DealP2pServiceChanged(const std::vector<WifiP2pServiceInfo> &vServices);
@@ -156,9 +175,15 @@ private:
     static void DealP2pDiscoveryChanged(bool bState);
     static void DealP2pGroupsChanged(void);
     static void DealP2pActionResult(P2pActionCallback action, ErrCode code);
+#endif
     static void AutoStartStaService(void);
+#ifdef FEATURE_P2P_SUPPORT
     static void AutoStartP2pService(void);
+#endif
     static void AutoStartScanService(void);
+#ifdef OHOS_ARCH_LITE
+    static void AutoStartStaServiceThread(void);
+#endif
 
 private:
     std::thread mCloseServiceThread;
@@ -167,8 +192,12 @@ private:
     std::deque<WifiCloseServiceCode> mEventQue;
     StaServiceCallback mStaCallback;
     IScanSerivceCallbacks mScanCallback;
+#ifdef FEATURE_AP_SUPPORT
     IApServiceCallbacks mApCallback;
+#endif
+#ifdef FEATURE_P2P_SUPPORT
     IP2pServiceCallbacks mP2pCallback;
+#endif
     InitStatus mInitStatus;
     long mSupportedFeatures;
 };

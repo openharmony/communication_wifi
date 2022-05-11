@@ -11,84 +11,123 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build/ohos.gni")
-import("//foundation/communication/wifi/wifi/wifi.gni")
+if (defined(ohos_lite)) {
+  import("//build/lite/config/component/lite_component.gni")
+  import("//foundation/communication/wifi/wifi/wifi_lite.gni")
+} else {
+  import("//build/ohos.gni")
+  import("//foundation/communication/wifi/wifi/wifi.gni")
+}
 
-ohos_shared_library("wifi_sta_service") {
-  install_enable = true
-  sources = [
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/common/log/log_helper.c",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/common/net_helper/http_request.cpp",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/common/net_helper/if_config.cpp",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/common/net_helper/ip_tools.cpp",
-    "../common/handler.cpp",
-    "../common/internal_message.cpp",
-    "../common/message_queue.cpp",
-    "../common/state.cpp",
-    "../common/state_machine.cpp",
-    "sta_auto_connect_service.cpp",
-    "sta_interface.cpp",
-    "sta_monitor.cpp",
-    "sta_network_check.cpp",
-    "sta_saved_device_appraisal.cpp",
-    "sta_service.cpp",
-    "sta_state_machine.cpp",
-  ]
-  include_dirs = [
-    "$WIFI_ROOT_DIR/services/wifi_standard/sdk/include",
-    "//utils/native/base/include",
-    "$WIFI_ROOT_DIR/interfaces/innerkits/native_cpp/wifi_standard/interfaces",
-    "$WIFI_ROOT_DIR/services/wifi_standard/ipc_framework/interface",
-    "$WIFI_ROOT_DIR/services/wifi_standard/ipc_framework/cRPC/include",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/common/include",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/common/net_helper",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/common/log",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/common/utils",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/common/config",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/common",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_scan",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/idl_client",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/idl_client/idl_interface",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta/net_conf",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta",
-    "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
-    "$WIFI_ROOT_DIR/services/wifi_standard/depends/include/hardware/libhardware/include",
-    "$WIFI_ROOT_DIR/services/wifi_standard/depends/include/system/core/include",
-    "$WIFI_ROOT_DIR/services/wifi_standard/depends/include/frameworks/native/include",
-    "$WIFI_ROOT_DIR/services/wifi_standard/depends/include/system/core/libutils/include",
-    "$WIFI_ROOT_DIR/services/wifi_standard/depends/include/system/core/base/include",
-    "$WIFI_ROOT_DIR/services/wifi_standard/depends/include/system/libbase/include",
-    "$DHCP_ROOT_DIR/services/mgr_service/include",
-    "$DHCP_ROOT_DIR/interfaces/innerkits/native_cpp/include",
-    "$DHCP_ROOT_DIR/interfaces/innerkits/native_cpp/interfaces",
-    "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
-    "$WIFI_ROOT_DIR/utils/inc",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage",
-  ]
+local_base_sources = [
+  "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/common/log/log_helper.c",
+  "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/common/net_helper/http_request.cpp",
+  "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/common/net_helper/if_config.cpp",
+  "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/common/net_helper/ip_tools.cpp",
+  "../common/handler.cpp",
+  "../common/internal_message.cpp",
+  "../common/message_queue.cpp",
+  "../common/state.cpp",
+  "../common/state_machine.cpp",
+  "sta_auto_connect_service.cpp",
+  "sta_interface.cpp",
+  "sta_monitor.cpp",
+  "sta_network_check.cpp",
+  "sta_saved_device_appraisal.cpp",
+  "sta_service.cpp",
+  "sta_state_machine.cpp",
+]
 
-  cflags_cc = [
-    "-std=c++17",
-    "-fno-rtti",
-  ]
+local_base_include_dirs = [
+  "$WIFI_ROOT_DIR/services/wifi_standard/sdk/include",
+  "$WIFI_ROOT_DIR/interfaces/innerkits/native_cpp/wifi_standard/interfaces",
+  "$WIFI_ROOT_DIR/services/wifi_standard/ipc_framework/interface",
+  "$WIFI_ROOT_DIR/services/wifi_standard/ipc_framework/cRPC/include",
+  "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/common/include",
+  "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/common/net_helper",
+  "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/common/log",
+  "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/common/utils",
+  "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/common/config",
+  "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/common",
+  "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_scan",
+  "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/idl_client",
+  "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/idl_client/idl_interface",
+  "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta/net_conf",
+  "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta",
+  "$DHCP_ROOT_DIR/services/mgr_service/include",
+  "$DHCP_ROOT_DIR/interfaces/innerkits/native_cpp/include",
+  "$DHCP_ROOT_DIR/interfaces/innerkits/native_cpp/interfaces",
+  "$WIFI_ROOT_DIR/utils/inc",
+  "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage",
+]
 
-  ldflags = [
-    "-fPIC",
-    "-Wl,-E",
-  ]
+if (defined(ohos_lite)) {
+  shared_library("wifi_sta_service") {
+    sources = local_base_sources
 
-  deps = [
-    "$DHCP_ROOT_DIR/services/mgr_service:dhcp_manager_service",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage:wifi_manager_service",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/idl_client:wifi_idl_client",
-    "$WIFI_ROOT_DIR/utils/src:wifi_utils",
-    "//utils/native/base:utils",
-  ]
+    include_dirs = local_base_include_dirs
+    include_dirs += [
+      "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits",
+      "//third_party/bounds_checking_function/include",
+    ]
 
-  external_deps = [
-    "hiviewdfx_hilog_native:libhilog",
-    "netmanager_base:net_conn_manager_if",
-  ]
+    deps = [
+      "$DHCP_ROOT_DIR/services/mgr_service:dhcp_manager_service",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage:wifi_service_base",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/idl_client:wifi_idl_client",
+      "$WIFI_ROOT_DIR/utils/src:wifi_utils",
+      "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
+      "//third_party/bounds_checking_function:libsec_shared",
+    ]
 
-  part_name = "wifi"
-  subsystem_name = "communication"
+    configs -= [ "//build/lite/config:language_cpp" ]
+    cflags_cc = [
+      "-std=c++17",
+      "-fno-rtti",
+    ]
+
+    defines = [ "OHOS_ARCH_LITE" ]
+    ldflags = [
+      "-fPIC",
+      "-Wl,-E",
+    ]
+  }
+} else {
+  ohos_shared_library("wifi_sta_service") {
+    install_enable = true
+    sources = local_base_sources
+
+    include_dirs = local_base_include_dirs
+    include_dirs += [
+      "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
+      "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
+      "//utils/native/base/include",
+    ]
+
+    cflags_cc = [
+      "-std=c++17",
+      "-fno-rtti",
+    ]
+
+    ldflags = [
+      "-fPIC",
+      "-Wl,-E",
+    ]
+
+    deps = [
+      "$DHCP_ROOT_DIR/services/mgr_service:dhcp_manager_service",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage:wifi_manager_service",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/idl_client:wifi_idl_client",
+      "$WIFI_ROOT_DIR/utils/src:wifi_utils",
+      "//utils/native/base:utils",
+    ]
+
+    external_deps = [
+      "hiviewdfx_hilog_native:libhilog",
+      "netmanager_base:net_conn_manager_if",
+    ]
+
+    part_name = "wifi"
+    subsystem_name = "communication"
+  }
 }

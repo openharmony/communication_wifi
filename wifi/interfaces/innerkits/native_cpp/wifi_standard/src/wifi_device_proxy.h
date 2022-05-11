@@ -15,16 +15,30 @@
 #ifndef OHOS_WIFI_DEVICE_PROXY_H
 #define OHOS_WIFI_DEVICE_PROXY_H
 
-#include "i_wifi_device.h"
+#ifdef OHOS_ARCH_LITE
+#include "iproxy_client.h"
+#include "serializer.h"
+#else
 #include "iremote_proxy.h"
+#endif
+#include "i_wifi_device.h"
 #include "wifi_errcode.h"
 #include "wifi_msg.h"
 
 namespace OHOS {
 namespace Wifi {
+#ifdef OHOS_ARCH_LITE
+class WifiDeviceProxy : public IWifiDevice {
+public:
+    static WifiDeviceProxy *GetInstance(void);
+    static void ReleaseInstance(void);
+    explicit WifiDeviceProxy();
+    ErrCode Init(void);
+#else
 class WifiDeviceProxy : public IRemoteProxy<IWifiDevice>, public IRemoteObject::DeathRecipient {
 public:
     explicit WifiDeviceProxy(const sptr<IRemoteObject> &impl);
+#endif
     ~WifiDeviceProxy();
 
     /**
@@ -238,7 +252,11 @@ public:
      * @param callback - IWifiDeviceCallBack object
      * @return ErrCode - operation result
      */
+#ifdef OHOS_ARCH_LITE
+    ErrCode RegisterCallBack(const std::shared_ptr<IWifiDeviceCallBack> &callback) override;
+#else
     ErrCode RegisterCallBack(const sptr<IWifiDeviceCallBack> &callback) override;
+#endif
 
     /**
      * @Description Get the Signal Level object
@@ -274,6 +292,19 @@ public:
      */
     bool SetLowLatencyMode(bool enabled) override;
 
+#ifdef OHOS_ARCH_LITE
+    /**
+    * @Description Handle remote object died event.
+    */
+    void OnRemoteDied(void);
+private:
+    static WifiDeviceProxy *g_instance;
+    IClientProxy *remote_ = nullptr;
+    SvcIdentity svcIdentity_ = { 0 };
+    bool remoteDied_;
+    void WriteIpAddress(IpcIo &req, const WifiIpAddress &address);
+    void WriteDeviceConfig(const WifiDeviceConfig &config, IpcIo &req);
+#else
     /**
     * @Description Handle remote object died event.
     * @param remoteObject remote object.
@@ -287,8 +318,8 @@ private:
     void WriteDeviceConfig(const WifiDeviceConfig &config, MessageParcel &data);
     void ParseDeviceConfigs(MessageParcel &reply, std::vector<WifiDeviceConfig> &result);
     static BrokerDelegator<WifiDeviceProxy> g_delegator;
-
     bool mRemoteDied;
+#endif
 };
 }  // namespace Wifi
 }  // namespace OHOS

@@ -15,7 +15,9 @@
 
 #include "wifi_scan_impl.h"
 #include "i_wifi_scan.h"
+#ifndef OHOS_ARCH_LITE
 #include "iservice_registry.h"
+#endif
 #include "wifi_logger.h"
 #include "wifi_scan_proxy.h"
 
@@ -35,10 +37,27 @@ WifiScanImpl::WifiScanImpl(int systemAbilityId) : systemAbilityId_(systemAbility
 {}
 
 WifiScanImpl::~WifiScanImpl()
-{}
+{
+#ifdef OHOS_ARCH_LITE
+    WifiScanProxy::ReleaseInstance();
+#endif
+}
 
 bool WifiScanImpl::Init()
 {
+#ifdef OHOS_ARCH_LITE
+    WifiScanProxy *scanProxy = WifiScanProxy::GetInstance();
+    if (scanProxy == nullptr) {
+        WIFI_LOGE("get wifi scan proxy failed.");
+        return false;
+    }
+    if (scanProxy->Init() != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("wifi scan proxy init failed.");
+        WifiScanProxy::ReleaseInstance();
+        return false;
+    }
+    client_ = scanProxy;
+#else
     sptr<ISystemAbilityManager> sa_mgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (sa_mgr == nullptr) {
         WIFI_LOGE("failed to get SystemAbilityManager");
@@ -57,6 +76,7 @@ bool WifiScanImpl::Init()
         WIFI_LOGE("wifi scan init failed. %{public}d", systemAbilityId_);
         return false;
     }
+#endif
     return true;
 }
 
@@ -90,7 +110,11 @@ ErrCode WifiScanImpl::GetScanInfoList(std::vector<WifiScanInfo> &result)
     return client_->GetScanInfoList(result);
 }
 
+#ifdef OHOS_ARCH_LITE
+ErrCode WifiScanImpl::RegisterCallBack(const std::shared_ptr<IWifiScanCallback> &callback)
+#else
 ErrCode WifiScanImpl::RegisterCallBack(const sptr<IWifiScanCallback> &callback)
+#endif
 {
     RETURN_IF_FAIL(client_);
     return client_->RegisterCallBack(callback);

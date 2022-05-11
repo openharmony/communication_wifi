@@ -297,6 +297,7 @@ if (defined(ohos_lite)) {
     ]
     defines = [ "FEATURE_P2P_SUPPORT" ]
   }
+
   ohos_shared_library("wifi_manager_service") {
     install_enable = true
     sources = [
@@ -346,6 +347,8 @@ if (defined(ohos_lite)) {
     defines = [
       "FEATURE_AP_SUPPORT",
       "FEATURE_P2P_SUPPORT",
+
+      # "PERMISSION_ALWAYS_GRANT",
     ]
 
     part_name = "wifi"

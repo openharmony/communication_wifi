@@ -90,5 +90,20 @@ ErrCode ApInterface::RegisterApServiceCallbacks(const IApServiceCallbacks &callb
 {
     return m_ApService.RegisterApServiceCallbacks(callbacks);
 }
+
+ErrCode ApInterface::GetSupportedPowerModel(std::set<PowerModel>& setPowerModelList)
+{
+    return m_ApService.GetSupportedPowerModel(setPowerModelList);
+}
+
+ErrCode ApInterface::GetPowerModel(PowerModel& model)
+{
+    return m_ApService.GetPowerModel(model);
+}
+
+ErrCode ApInterface::SetPowerModel(const PowerModel& model)
+{
+    return m_ApService.SetPowerModel(model);
+}
 }  // namespace Wifi
 }  // namespace OHOS

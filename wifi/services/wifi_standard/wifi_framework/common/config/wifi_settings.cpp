@@ -544,7 +544,6 @@ bool WifiSettings::AddRandomMac(WifiStoreRandomMac &randomMacInfo)
     return isConnected;
 }
 
-
 int WifiSettings::SetCountryCode(const std::string &countryCode)
 {
     std::unique_lock<std::mutex> lock(mStaMutex);
@@ -739,6 +738,20 @@ int WifiSettings::ClearValidChannels()
 {
     std::unique_lock<std::mutex> lock(mInfoMutex);
     mValidChannels.clear();
+    return 0;
+}
+
+int WifiSettings::SetPowerModel(const PowerModel& model)
+{
+    std::unique_lock<std::mutex> lock(mInfoMutex);
+    powerModel = model;
+    return 0;
+}
+
+int WifiSettings::GetPowerModel(PowerModel& model)
+{
+    std::unique_lock<std::mutex> lock(mInfoMutex);
+    model = powerModel;
     return 0;
 }
 

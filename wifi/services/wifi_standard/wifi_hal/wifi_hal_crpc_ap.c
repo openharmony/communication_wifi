@@ -223,3 +223,35 @@ int RpcGetValidFrequenciesForBand(RpcServer *server, Context *context)
     frequencies = NULL;
     return 0;
 }
+
+int RpcSetPowerModel(RpcServer *server, Context *context)
+{
+    if (server == NULL || context == NULL) {
+        return -1;
+    }
+    int mode = -1;
+    if (ReadInt(context, &mode) < 0) {
+        return -1;
+    }
+    WifiErrorNo err = WifiSetPowerModel(mode);
+    WriteBegin(context, 0);
+    WriteInt(context, err);
+    WriteEnd(context);
+    return 0;
+}
+
+int RpcGetPowerModel(RpcServer *server, Context *context)
+{
+    if (server == NULL || context == NULL) {
+        return -1;
+    }
+    int mode = -1;
+    WifiErrorNo err = WifiGetPowerModel(&mode);
+    WriteBegin(context, 0);
+    WriteInt(context, err);
+    if (err == WIFI_HAL_SUCCESS) {
+        WriteInt(context, mode);
+    }
+    WriteEnd(context);
+    return 0;
+}

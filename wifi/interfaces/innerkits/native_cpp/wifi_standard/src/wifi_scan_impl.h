@@ -50,7 +50,11 @@ public:
      */
     virtual ErrCode GetScanInfoList(std::vector<WifiScanInfo> &result) override;
 
+#ifdef OHOS_ARCH_LITE
+    virtual ErrCode RegisterCallBack(const std::shared_ptr<IWifiScanCallback> &callback) override;
+#else
     virtual ErrCode RegisterCallBack(const sptr<IWifiScanCallback> &callback) override;
+#endif
 
     /**
      * @Description Get supported features
@@ -87,7 +91,11 @@ public:
 
 private:
     int systemAbilityId_;
+#ifdef OHOS_ARCH_LITE
+    IWifiScan *client_;
+#else
     sptr<OHOS::Wifi::IWifiScan> client_;
+#endif
 };
 }  // namespace Wifi
 }  // namespace OHOS

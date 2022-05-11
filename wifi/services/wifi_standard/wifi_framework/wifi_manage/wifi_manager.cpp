@@ -20,7 +20,12 @@
 #include "wifi_chip_hal_interface.h"
 #include "wifi_auth_center.h"
 #include "wifi_config_center.h"
+#ifdef OHOS_ARCH_LITE
+#include <dirent.h>
+#include "wifi_internal_event_dispatcher_lite.h"
+#else
 #include "wifi_internal_event_dispatcher.h"
+#endif
 #include "wifi_service_manager.h"
 #include "wifi_settings.h"
 #include "wifi_common_event_helper.h"
@@ -89,6 +94,40 @@ void WifiManager::AutoStartStaService(void)
     return;
 }
 
+#ifdef OHOS_ARCH_LITE
+void WifiManager::AutoStartStaServiceThread(void)
+{
+    DIR *dir = nullptr;
+    struct dirent *dent = nullptr;
+    int currentWaitTime = 0;
+    const int sleepTime = 1;
+    const int maxWaitTimes = 10;
+
+    dir = opendir("/sys/class/net");
+    if (dir == nullptr) {
+        AutoStartStaService();
+        return;
+    }
+    while (currentWaitTime < maxWaitTimes) {
+        while ((dent = readdir(dir)) != nullptr) {
+            if (dent->d_name[0] == '.') {
+                continue;
+            }
+            if (strncmp(dent->d_name, "wlan", strlen("wlan")) == 0) {
+                closedir(dir);
+                AutoStartStaService();
+                return;
+            }
+        }
+        sleep(sleepTime);
+        currentWaitTime++;
+    }
+    closedir(dir);
+    AutoStartStaService();
+}
+#endif
+
+#ifdef FEATURE_P2P_SUPPORT
 void WifiManager::AutoStartP2pService(void)
 {
     WifiOprMidState p2pState = WifiConfigCenter::GetInstance().GetP2pMidState();
@@ -126,6 +165,7 @@ void WifiManager::AutoStartP2pService(void)
     }
     return;
 }
+#endif
 
 void WifiManager::AutoStartScanService(void)
 {
@@ -170,8 +210,12 @@ int WifiManager::Init()
     mInitStatus = INIT_OK;
     InitStaCallback();
     InitScanCallback();
+#ifdef FEATURE_AP_SUPPORT
     InitApCallback();
+#endif
+#ifdef FEATURE_P2P_SUPPORT
     InitP2pCallback();
+#endif
     if (!WifiConfigCenter::GetInstance().GetSupportedBandChannel()) {
         WIFI_LOGE("Failed to get current chip supported band and channel!");
     }
@@ -183,8 +227,15 @@ int WifiManager::Init()
     }
     if (WifiConfigCenter::GetInstance().GetStaLastRunState()) { /* Automatic startup upon startup */
         WIFI_LOGE("AutoStartStaApService");
+#ifdef FEATURE_P2P_SUPPORT
         AutoStartP2pService();
+#endif
+#ifdef OHOS_ARCH_LITE
+        std::thread startStaSrvThread(WifiManager::AutoStartStaServiceThread);
+        startStaSrvThread.detach();
+#else
         AutoStartStaService();
+#endif
     } else {
         /**
          * The sta service automatically starts upon startup. After the sta
@@ -254,6 +305,7 @@ void WifiManager::CloseStaService(void)
     return;
 }
 
+#ifdef FEATURE_AP_SUPPORT
 void WifiManager::CloseApService(void)
 {
     WIFI_LOGD("close ap service");
@@ -266,6 +318,7 @@ void WifiManager::CloseApService(void)
     WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
     return;
 }
+#endif
 
 void WifiManager::CloseScanService(void)
 {
@@ -275,6 +328,7 @@ void WifiManager::CloseScanService(void)
     return;
 }
 
+#ifdef FEATURE_P2P_SUPPORT
 void WifiManager::CloseP2pService(void)
 {
     WIFI_LOGD("close p2p service");
@@ -287,6 +341,7 @@ void WifiManager::CloseP2pService(void)
     WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
     return;
 }
+#endif
 
 void WifiManager::DealCloseServiceMsg(WifiManager &manager)
 {
@@ -307,12 +362,16 @@ void WifiManager::DealCloseServiceMsg(WifiManager &manager)
             case WifiCloseServiceCode::SCAN_SERVICE_CLOSE:
                 CloseScanService();
                 break;
+#ifdef FEATURE_AP_SUPPORT
             case WifiCloseServiceCode::AP_SERVICE_CLOSE:
                 CloseApService();
                 break;
+#endif
+#ifdef FEATURE_P2P_SUPPORT
             case WifiCloseServiceCode::P2P_SERVICE_CLOSE:
                 CloseP2pService();
                 break;
+#endif
             case WifiCloseServiceCode::SERVICE_THREAD_EXIT:
                 WIFI_LOGD("DealCloseServiceMsg thread exit!");
                 return;
@@ -577,6 +636,7 @@ void WifiManager::DealScanInfoNotify(std::vector<InterScanInfo> &results)
     }
 }
 
+#ifdef FEATURE_AP_SUPPORT
 void WifiManager::InitApCallback(void)
 {
     mApCallback.OnApStateChangedEvent = DealApStateChanged;
@@ -625,7 +685,9 @@ void WifiManager::DealApGetStaLeave(const StationInfo &info)
     WifiCommonEventHelper::PublishApStaLeaveEvent(0, "ApStaLeaved");
     return;
 }
+#endif
 
+#ifdef FEATURE_P2P_SUPPORT
 void WifiManager::InitP2pCallback(void)
 {
     mP2pCallback.OnP2pStateChangedEvent = DealP2pStateChanged;
@@ -727,6 +789,7 @@ void WifiManager::DealP2pActionResult(P2pActionCallback action, ErrCode code)
     WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
     return;
 }
+#endif
 
 }  // namespace Wifi
 }  // namespace OHOS

@@ -11,162 +11,220 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build/ohos.gni")
-import("//foundation/communication/wifi/wifi/wifi.gni")
+if (defined(ohos_lite)) {
+  import("//build/lite/config/component/lite_component.gni")
+  import("//foundation/communication/wifi/wifi/wifi_lite.gni")
 
-################################################################################
+  shared_library("wifi_sdk") {
+    sources = [
+      "c_adapter/wifi_c_device.cpp",
+      "c_adapter/wifi_c_utils.cpp",
+      "src/wifi_device.cpp",
+      "src/wifi_device_callback_stub_lite.cpp",
+      "src/wifi_device_impl.cpp",
+      "src/wifi_device_proxy_lite.cpp",
+      "src/wifi_scan.cpp",
+      "src/wifi_scan_callback_stub_lite.cpp",
+      "src/wifi_scan_impl.cpp",
+      "src/wifi_scan_proxy_lite.cpp",
+    ]
 
-config("wifi_sdk_header") {
-  include_dirs = [
-    "//utils/native/base/include",
-    "//utils/system/safwk/native/include",
-    "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
-    "//foundation/arkui/ace_engine/frameworks/base/utils",
-    "//foundation/arkui/ace_engine/frameworks",
-    "//foundation/distributedschedule/samgr/interfaces/innerkits/samgr_proxy/include",
-    "$WIFI_ROOT_DIR/interfaces/innerkits/native_cpp/wifi_standard/include",
-    "$WIFI_ROOT_DIR/interfaces/innerkits/native_cpp/wifi_standard/interfaces",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/common/net_helper",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/common/log/",
-    "//foundation/distributedschedule/samgr/adapter/interfaces/innerkits/include",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/common/include",
-    "$DHCP_ROOT_DIR/interfaces/innerkits/native_cpp/include",
-    "$DHCP_ROOT_DIR/services/mgr_service/include",
-    "$WIFI_ROOT_DIR/interfaces/innerkits",
-    "$WIFI_ROOT_DIR/utils/inc",
-  ]
-}
+    include_dirs = [
+      "$WIFI_ROOT_DIR/interfaces/innerkits/native_cpp/wifi_standard/include",
+      "$WIFI_ROOT_DIR/interfaces/innerkits/native_cpp/wifi_standard/interfaces",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/common/net_helper",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/common/log/",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/common/include",
+      "$DHCP_ROOT_DIR/interfaces/innerkits/native_cpp/include",
+      "$DHCP_ROOT_DIR/services/mgr_service/include",
+      "$WIFI_ROOT_DIR/interfaces/innerkits",
+      "$WIFI_ROOT_DIR/utils/inc",
+      "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits",
+      "//foundation/communication/ipc_lite/interfaces/kits",
+      "//foundation/distributedschedule/samgr_lite/interfaces/innerkits/registry",
+      "//foundation/distributedschedule/samgr_lite/interfaces/innerkits/samgr",
+      "//third_party/bounds_checking_function/include",
+      "//utils/native/lite/include",
+    ]
 
-config("wifi_sdk_config") {
-  visibility = [ "//:*" ]
-  include_dirs = [ ":wifi_fw_common_header" ]
+    deps = [
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage:wifi_manager_service",
+      "$WIFI_ROOT_DIR/utils/src:wifi_utils",
+      "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
+      "//foundation/communication/ipc_lite:liteipc_adapter",
+      "//foundation/distributedschedule/samgr_lite/samgr:samgr",
+      "//third_party/bounds_checking_function:libsec_shared",
+    ]
 
-  cflags = [
-    "-std=c++17",
-    "-fno-rtti",
-  ]
-
-  if (target_cpu == "arm") {
-    cflags += [ "-DBINDER_IPC_32BIT" ]
+    configs -= [ "//build/lite/config:language_cpp" ]
+    cflags_cc = [
+      "-std=c++17",
+      "-fno-rtti",
+    ]
+    defines = [ "OHOS_ARCH_LITE" ]
+    ldflags = [
+      "-fPIC",
+      "-Wl,-E",
+    ]
   }
-}
+} else {
+  import("//build/ohos.gni")
+  import("//foundation/communication/wifi/wifi/wifi.gni")
 
-ohos_source_set("wifi_device_proxy_impl") {
-  part_name = "wifi"
-  sources = [
-    "src/wifi_device_impl.cpp",
-    "src/wifi_device_proxy.cpp",
-  ]
+  ################################################################################
 
-  configs = [
-    ":wifi_sdk_config",
-    ":wifi_sdk_header",
-  ]
+  config("wifi_sdk_header") {
+    include_dirs = [
+      "//utils/native/base/include",
+      "//utils/system/safwk/native/include",
+      "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
+      "//foundation/arkui/ace_engine/frameworks/base/utils",
+      "//foundation/arkui/ace_engine/frameworks",
+      "//foundation/distributedschedule/samgr/interfaces/innerkits/samgr_proxy/include",
+      "$WIFI_ROOT_DIR/interfaces/innerkits/native_cpp/wifi_standard/include",
+      "$WIFI_ROOT_DIR/interfaces/innerkits/native_cpp/wifi_standard/interfaces",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/common/net_helper",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/common/log/",
+      "//foundation/distributedschedule/samgr/adapter/interfaces/innerkits/include",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/common/include",
+      "$DHCP_ROOT_DIR/interfaces/innerkits/native_cpp/include",
+      "$DHCP_ROOT_DIR/services/mgr_service/include",
+      "$WIFI_ROOT_DIR/interfaces/innerkits",
+      "$WIFI_ROOT_DIR/utils/inc",
+    ]
+  }
 
-  external_deps = [ "ipc:ipc_core" ]
-}
+  config("wifi_sdk_config") {
+    visibility = [ "//:*" ]
+    include_dirs = [ ":wifi_fw_common_header" ]
 
-ohos_source_set("wifi_hotspot_proxy_impl") {
-  part_name = "wifi"
-  sources = [
-    "src/wifi_hotspot_impl.cpp",
-    "src/wifi_hotspot_proxy.cpp",
-  ]
+    cflags = [
+      "-std=c++17",
+      "-fno-rtti",
+    ]
 
-  configs = [
-    ":wifi_sdk_config",
-    ":wifi_sdk_header",
-  ]
+    if (target_cpu == "arm") {
+      cflags += [ "-DBINDER_IPC_32BIT" ]
+    }
+  }
 
-  external_deps = [ "ipc:ipc_core" ]
-}
+  ohos_source_set("wifi_device_proxy_impl") {
+    part_name = "wifi"
+    sources = [
+      "src/wifi_device_impl.cpp",
+      "src/wifi_device_proxy.cpp",
+    ]
 
-ohos_source_set("wifi_scan_proxy_impl") {
-  part_name = "wifi"
-  sources = [
-    "src/wifi_scan_impl.cpp",
-    "src/wifi_scan_proxy.cpp",
-  ]
+    configs = [
+      ":wifi_sdk_config",
+      ":wifi_sdk_header",
+    ]
 
-  configs = [
-    ":wifi_sdk_config",
-    ":wifi_sdk_header",
-  ]
+    external_deps = [ "ipc:ipc_core" ]
+  }
 
-  external_deps = [ "ipc:ipc_core" ]
-}
+  ohos_source_set("wifi_hotspot_proxy_impl") {
+    part_name = "wifi"
+    sources = [
+      "src/wifi_hotspot_impl.cpp",
+      "src/wifi_hotspot_proxy.cpp",
+    ]
 
-ohos_source_set("wifi_p2p_proxy_impl") {
-  part_name = "wifi"
-  sources = [
-    "src/wifi_p2p_impl.cpp",
-    "src/wifi_p2p_proxy.cpp",
-  ]
+    configs = [
+      ":wifi_sdk_config",
+      ":wifi_sdk_header",
+    ]
 
-  configs = [
-    ":wifi_sdk_config",
-    ":wifi_sdk_header",
-  ]
+    external_deps = [ "ipc:ipc_core" ]
+  }
 
-  external_deps = [ "ipc:ipc_core" ]
-}
+  ohos_source_set("wifi_scan_proxy_impl") {
+    part_name = "wifi"
+    sources = [
+      "src/wifi_scan_impl.cpp",
+      "src/wifi_scan_proxy.cpp",
+    ]
 
-ohos_shared_library("wifi_sdk") {
-  install_enable = true
-  sources = [
-    "c_adapter/wifi_c_device.cpp",
-    "c_adapter/wifi_c_event.cpp",
-    "c_adapter/wifi_c_hid2d.cpp",
-    "c_adapter/wifi_c_hotspot.cpp",
-    "c_adapter/wifi_c_p2p.cpp",
-    "c_adapter/wifi_c_utils.cpp",
-    "src/wifi_device.cpp",
-    "src/wifi_device_callback_stub.cpp",
-    "src/wifi_hid2d.cpp",
-    "src/wifi_hid2d_msg.cpp",
-    "src/wifi_hotspot.cpp",
-    "src/wifi_hotspot_callback_stub.cpp",
-    "src/wifi_p2p.cpp",
-    "src/wifi_p2p_callback_stub.cpp",
-    "src/wifi_p2p_msg.cpp",
-    "src/wifi_scan.cpp",
-    "src/wifi_scan_callback_stub.cpp",
-  ]
+    configs = [
+      ":wifi_sdk_config",
+      ":wifi_sdk_header",
+    ]
 
-  deps = [
-    ":wifi_device_proxy_impl",
-    ":wifi_hotspot_proxy_impl",
-    ":wifi_p2p_proxy_impl",
-    ":wifi_scan_proxy_impl",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage:wifi_manager_service",
-    "$WIFI_ROOT_DIR/utils/src:wifi_utils",
-    "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog",
-    "//foundation/aafwk/standard/interfaces/innerkits/want:want",
-    "//foundation/distributedschedule/samgr/interfaces/innerkits/samgr_proxy:samgr_proxy",
-    "//third_party/bounds_checking_function:libsec_static",
-    "//utils/native/base:utils",
-  ]
+    external_deps = [ "ipc:ipc_core" ]
+  }
 
-  external_deps = [
-    "common_event_service:cesfwk_innerkits",
-    "ipc:ipc_core",
-  ]
+  ohos_source_set("wifi_p2p_proxy_impl") {
+    part_name = "wifi"
+    sources = [
+      "src/wifi_p2p_impl.cpp",
+      "src/wifi_p2p_proxy.cpp",
+    ]
 
-  cflags_cc = [
-    "-std=c++17",
-    "-fno-rtti",
-  ]
+    configs = [
+      ":wifi_sdk_config",
+      ":wifi_sdk_header",
+    ]
 
-  ldflags = [
-    "-fPIC",
-    "-Wl,-E",
-  ]
+    external_deps = [ "ipc:ipc_core" ]
+  }
 
-  configs = [
-    ":wifi_sdk_config",
-    ":wifi_sdk_header",
-  ]
+  ohos_shared_library("wifi_sdk") {
+    install_enable = true
+    sources = [
+      "c_adapter/wifi_c_device.cpp",
+      "c_adapter/wifi_c_event.cpp",
+      "c_adapter/wifi_c_hid2d.cpp",
+      "c_adapter/wifi_c_hotspot.cpp",
+      "c_adapter/wifi_c_p2p.cpp",
+      "c_adapter/wifi_c_utils.cpp",
+      "src/wifi_device.cpp",
+      "src/wifi_device_callback_stub.cpp",
+      "src/wifi_hid2d.cpp",
+      "src/wifi_hid2d_msg.cpp",
+      "src/wifi_hotspot.cpp",
+      "src/wifi_hotspot_callback_stub.cpp",
+      "src/wifi_p2p.cpp",
+      "src/wifi_p2p_callback_stub.cpp",
+      "src/wifi_p2p_msg.cpp",
+      "src/wifi_scan.cpp",
+      "src/wifi_scan_callback_stub.cpp",
+    ]
 
-  part_name = "wifi"
-  subsystem_name = "communication"
+    deps = [
+      ":wifi_device_proxy_impl",
+      ":wifi_hotspot_proxy_impl",
+      ":wifi_p2p_proxy_impl",
+      ":wifi_scan_proxy_impl",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage:wifi_manager_service",
+      "$WIFI_ROOT_DIR/utils/src:wifi_utils",
+      "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog",
+      "//foundation/aafwk/standard/interfaces/innerkits/want:want",
+      "//foundation/distributedschedule/samgr/interfaces/innerkits/samgr_proxy:samgr_proxy",
+      "//third_party/bounds_checking_function:libsec_static",
+      "//utils/native/base:utils",
+    ]
+
+    external_deps = [
+      "common_event_service:cesfwk_innerkits",
+      "ipc:ipc_core",
+    ]
+
+    cflags_cc = [
+      "-std=c++17",
+      "-fno-rtti",
+    ]
+
+    ldflags = [
+      "-fPIC",
+      "-Wl,-E",
+    ]
+
+    configs = [
+      ":wifi_sdk_config",
+      ":wifi_sdk_header",
+    ]
+
+    part_name = "wifi"
+    subsystem_name = "communication"
+  }
 }

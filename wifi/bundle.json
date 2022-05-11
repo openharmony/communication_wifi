@@ -71,24 +71,11 @@
         },
         "build": {
             "sub_component": [
-                "//foundation/communication/wifi/wifi/interfaces/innerkits/native_cpp/wifi_standard:wifi_sdk",
+                "//foundation/communication/wifi/wifi/interfaces/innerkits:wifi_kits",
                 "//foundation/communication/wifi/wifi/services/wifi_standard/wifi_framework:wifi_manage",
-                "//foundation/communication/wifi/wifi/services/wifi_standard/wifi_hal:wifi_hal",
                 "//foundation/communication/wifi/wifi/services/wifi_standard/wifi_framework:wifi_system_ability",
-                "//foundation/communication/wifi/wifi/services/wifi_standard/sa_profile:wifi_standard_sa_profile",
-                "//foundation/communication/wifi/wifi/services/wifi_standard/wifi_framework/wifi_manage:wifi_device_ability",
-                "//foundation/communication/wifi/wifi/services/wifi_standard/wifi_framework/wifi_manage:wifi_scan_ability",
-                "//foundation/communication/wifi/wifi/services/wifi_standard/wifi_framework/wifi_manage:wifi_hotspot_ability",
-                "//foundation/communication/wifi/wifi/services/wifi_standard/wifi_framework/wifi_manage:wifi_p2p_ability",
-                "//foundation/communication/wifi/wifi/services/wifi_standard/wifi_framework/wifi_manage:wifi_manager_service",
-                "//foundation/communication/wifi/wifi/services/wifi_standard/wifi_framework/wifi_manage/idl_client:wifi_idl_client",
-                "//foundation/communication/wifi/wifi/services/wifi_standard/wifi_framework/wifi_manage/wifi_scan:wifi_scan_service",
-                "//foundation/communication/wifi/wifi/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta:wifi_sta_service",
-                "//foundation/communication/wifi/wifi/services/wifi_standard/wifi_framework/wifi_manage/wifi_ap:wifi_ap_service",
-                "//foundation/communication/wifi/wifi/services/wifi_standard/wifi_framework/wifi_manage/wifi_p2p:wifi_p2p_service",
-                "//foundation/communication/wifi/wifi/utils/src:wifi_utils",
-                "//foundation/communication/wifi/wifi/interfaces/innerkits/native_cpp/napi:wifi_native_js",
-                "//foundation/communication/wifi/wifi/interfaces/innerkits/native_cpp/napi:wifi"
+                "//foundation/communication/wifi/wifi/services/wifi_standard/wifi_hal:wifi_hal",
+                "//foundation/communication/wifi/wifi/utils/src:wifi_utils"
             ],
             "inner_kits": [
                 {

@@ -16,8 +16,12 @@
 #ifndef OHOS_WIFI_LOGGER_H
 #define OHOS_WIFI_LOGGER_H
 
+#ifdef OHOS_ARCH_LITE
+#include "hilog/log.h"
+#else
 #include "hilog/log_c.h"
 #include "hilog/log_cpp.h"
+#endif
 
 namespace OHOS {
 namespace Wifi {

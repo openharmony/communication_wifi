@@ -72,6 +72,9 @@
 #define WIFI_SVR_CMD_GET_VALID_BANDS 0X110E           /* get current valid frequency according band */
 #define WIFI_SVR_CMD_GET_VALID_CHANNELS 0X110F        /* get current valid channels associated with the band */
 #define WIFI_SVR_CMD_REGISTER_HOTSPOT_CALLBACK 0X1110 /* register scan callback */
+#define WIFI_SVR_CMD_GET_SUPPORTED_POWER_MODEL 0X1111 /* get supported power model */
+#define WIFI_SVR_CMD_GET_POWER_MODEL 0X1112 /* get power model */
+#define WIFI_SVR_CMD_SET_POWER_MODEL 0X1113 /* set power model */
 
 /* -------------p2p module message define----------------- */
 #define WIFI_SVR_CMD_P2P_ENABLE 0x2000                 /* open p2p */

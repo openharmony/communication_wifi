@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,7 +16,9 @@
 #ifndef OHOS_WIFI_AP_MSG_H
 #define OHOS_WIFI_AP_MSG_H
 #include <cstdint>
+#include <set>
 #include <string>
+#include "wifi_common_msg.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -48,6 +50,12 @@ enum class BandType {
     BAND_2GHZ = 1, /* 2.4GHz */
     BAND_5GHZ = 2, /* 5GHz */
     BAND_ANY = 3   /* Dual-mode frequency band */
+};
+
+enum class PowerModel {
+    SLEEPING = 0, /* Sleeping model. */
+    GENERAL = 1, /* General model. */
+    THROUGH_WALL = 2, /* Through wall model. */
 };
 
 struct HotspotConfig {

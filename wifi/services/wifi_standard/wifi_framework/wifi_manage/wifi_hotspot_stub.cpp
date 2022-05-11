@@ -49,6 +49,9 @@ void WifiHotspotStub::InitHandleMap()
     handleFuncMap[WIFI_SVR_CMD_GET_VALID_CHANNELS] = &WifiHotspotStub::OnGetValidChannels;
     handleFuncMap[WIFI_SVR_CMD_REGISTER_HOTSPOT_CALLBACK] = &WifiHotspotStub::OnRegisterCallBack;
     handleFuncMap[WIFI_SVR_CMD_GET_SUPPORTED_FEATURES] = &WifiHotspotStub::OnGetSupportedFeatures;
+    handleFuncMap[WIFI_SVR_CMD_GET_SUPPORTED_POWER_MODEL] = &WifiHotspotStub::OnGetSupportedPowerModel;
+    handleFuncMap[WIFI_SVR_CMD_GET_POWER_MODEL] = &WifiHotspotStub::OnGetPowerModel;
+    handleFuncMap[WIFI_SVR_CMD_SET_POWER_MODEL] = &WifiHotspotStub::OnSetPowerModel;
     return;
 }
 
@@ -214,7 +217,8 @@ void WifiHotspotStub::OnGetValidChannels(
 void WifiHotspotStub::OnEnableWifiAp(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
-    ErrCode ret = EnableHotspot();
+    int32_t serviceType = data.ReadInt32();
+    ErrCode ret = EnableHotspot(ServiceType(serviceType));
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
 
@@ -224,7 +228,8 @@ void WifiHotspotStub::OnEnableWifiAp(uint32_t code, MessageParcel &data, Message
 void WifiHotspotStub::OnDisableWifiAp(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
-    ErrCode ret = DisableHotspot();
+    int32_t serviceType = data.ReadInt32();
+    ErrCode ret = DisableHotspot(ServiceType(serviceType));
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
 
@@ -328,6 +333,45 @@ void WifiHotspotStub::OnGetSupportedFeatures(
         reply.WriteInt64(features);
     }
 
+    return;
+}
+
+void WifiHotspotStub::OnGetSupportedPowerModel(uint32_t code, MessageParcel &data,
+    MessageParcel &reply, MessageOption &option)
+{
+    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+    std::set<PowerModel> setPowerModelList;
+    ErrCode ret = GetSupportedPowerModel(setPowerModelList);
+    reply.WriteInt32(0);
+    reply.WriteInt32(ret);
+    if (ret == WIFI_OPT_SUCCESS) {
+        int size = setPowerModelList.size();
+        reply.WriteInt32(size);
+        for (auto &powerModel : setPowerModelList) {
+            reply.WriteInt32(static_cast<int>(powerModel));
+        }
+    }
+    return;
+}
+
+void WifiHotspotStub::OnGetPowerModel(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
+{
+    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+    PowerModel model;
+    ErrCode ret = GetPowerModel(model);
+    reply.WriteInt32(0);
+    reply.WriteInt32(ret);
+    reply.WriteInt32(static_cast<int>(model));
+    return;
+}
+
+void WifiHotspotStub::OnSetPowerModel(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
+{
+    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+    PowerModel model = PowerModel(data.ReadInt32());
+    ErrCode ret = SetPowerModel(model);
+    reply.WriteInt32(0);
+    reply.WriteInt32(ret);
     return;
 }
 }  // namespace Wifi

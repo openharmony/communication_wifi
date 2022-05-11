@@ -250,7 +250,7 @@ ErrCode WifiHotspotProxy::DisassociateSta(const StationInfo &info)
     return ErrCode(reply.ReadInt32());
 }
 
-ErrCode WifiHotspotProxy::EnableHotspot(void)
+ErrCode WifiHotspotProxy::EnableHotspot(const ServiceType type)
 {
     MessageOption option;
     MessageParcel data;
@@ -260,6 +260,7 @@ ErrCode WifiHotspotProxy::EnableHotspot(void)
         return WIFI_OPT_FAILED;
     }
     data.WriteInt32(0);
+    data.WriteInt32(static_cast<int>(type));
     int error = Remote()->SendRequest(WIFI_SVR_CMD_ENABLE_WIFI_AP, data, reply, option);
     if (error != ERR_NONE) {
         WIFI_LOGE("Set Attr(%{public}d) failed", WIFI_SVR_CMD_ENABLE_WIFI_AP);
@@ -274,7 +275,7 @@ ErrCode WifiHotspotProxy::EnableHotspot(void)
     return ErrCode(reply.ReadInt32());
 }
 
-ErrCode WifiHotspotProxy::DisableHotspot(void)
+ErrCode WifiHotspotProxy::DisableHotspot(const ServiceType type)
 {
     if (mRemoteDied) {
         WIFI_LOGD("failed to `%{public}s`,remote service is died!", __func__);
@@ -288,6 +289,7 @@ ErrCode WifiHotspotProxy::DisableHotspot(void)
         return WIFI_OPT_FAILED;
     }
     data.WriteInt32(0);
+    data.WriteInt32(static_cast<int>(type));
     int error = Remote()->SendRequest(WIFI_SVR_CMD_DISABLE_WIFI_AP, data, reply, option);
     if (error != ERR_NONE) {
         WIFI_LOGE("Set Attr(%{public}d) failed", WIFI_SVR_CMD_DISABLE_WIFI_AP);
@@ -553,6 +555,108 @@ ErrCode WifiHotspotProxy::GetSupportedFeatures(long &features)
 
     features = reply.ReadInt64();
     return WIFI_OPT_SUCCESS;
+}
+
+ErrCode WifiHotspotProxy::GetSupportedPowerModel(std::set<PowerModel>& setPowerModelList)
+{
+    if (mRemoteDied) {
+        WIFI_LOGD("failed to `%{public}s`,remote service is died!", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    MessageOption option;
+    MessageParcel data;
+    MessageParcel reply;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    data.WriteInt32(0);
+    int error = Remote()->SendRequest(WIFI_SVR_CMD_GET_SUPPORTED_POWER_MODEL, data, reply, option);
+    if (error != ERR_NONE) {
+        WIFI_LOGE("Set Attr(%{public}d) failed", WIFI_SVR_CMD_GET_SUPPORTED_POWER_MODEL);
+        return WIFI_OPT_FAILED;
+    }
+
+    int exception = reply.ReadInt32();
+    if (exception) {
+        return WIFI_OPT_FAILED;
+    }
+    int err = reply.ReadInt32();
+    if (err != WIFI_OPT_SUCCESS) {
+        return ErrCode(err);
+    }
+
+    constexpr int MAX_SIZE = 32;
+    int size = reply.ReadInt32();
+    if (size > MAX_SIZE) {
+        WIFI_LOGE("size error: %{public}d", size);
+        return WIFI_OPT_FAILED;
+    }
+    for (int i = 0; i < size; i++) {
+        int val = reply.ReadInt32();
+        setPowerModelList.insert(PowerModel(val));
+    }
+    return WIFI_OPT_SUCCESS;
+}
+
+ErrCode WifiHotspotProxy::GetPowerModel(PowerModel& model)
+{
+    if (mRemoteDied) {
+        WIFI_LOGD("failed to `%{public}s`,remote service is died!", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    MessageOption option;
+    MessageParcel data;
+    MessageParcel reply;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    data.WriteInt32(0);
+    int error = Remote()->SendRequest(WIFI_SVR_CMD_GET_POWER_MODEL, data, reply, option);
+    if (error != ERR_NONE) {
+        WIFI_LOGE("Set Attr(%{public}d) failed", WIFI_SVR_CMD_GET_POWER_MODEL);
+        return WIFI_OPT_FAILED;
+    }
+
+    int exception = reply.ReadInt32();
+    if (exception) {
+        return WIFI_OPT_FAILED;
+    }
+    int err = reply.ReadInt32();
+    if (err != WIFI_OPT_SUCCESS) {
+        return ErrCode(err);
+    }
+    model = PowerModel(reply.ReadInt32());
+    return WIFI_OPT_SUCCESS;
+}
+
+ErrCode WifiHotspotProxy::SetPowerModel(const PowerModel& model)
+{
+    if (mRemoteDied) {
+        WIFI_LOGD("failed to `%{public}s`,remote service is died!", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    MessageOption option;
+    MessageParcel data;
+    MessageParcel reply;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    data.WriteInt32(0);
+    data.WriteInt32(static_cast<int>(model));
+    int error = Remote()->SendRequest(WIFI_SVR_CMD_SET_POWER_MODEL, data, reply, option);
+    if (error != ERR_NONE) {
+        WIFI_LOGE("Set Attr(%{public}d) failed", WIFI_SVR_CMD_SET_POWER_MODEL);
+        return WIFI_OPT_FAILED;
+    }
+
+    int exception = reply.ReadInt32();
+    if (exception) {
+        return WIFI_OPT_FAILED;
+    }
+    return ErrCode(reply.ReadInt32());
 }
 
 void WifiHotspotProxy::OnRemoteDied(const wptr<IRemoteObject>& remoteObject)

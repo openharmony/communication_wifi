@@ -101,7 +101,7 @@ void WifiManager::AutoStartStaServiceThread(void)
     struct dirent *dent = nullptr;
     int currentWaitTime = 0;
     const int sleepTime = 1;
-    const int maxWaitTimes = 10;
+    const int maxWaitTimes = 30;
 
     dir = opendir("/sys/class/net");
     if (dir == nullptr) {

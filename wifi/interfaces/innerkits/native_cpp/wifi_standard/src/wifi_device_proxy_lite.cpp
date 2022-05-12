@@ -1074,7 +1074,7 @@ ErrCode WifiDeviceProxy::RegisterCallBack(const std::shared_ptr<IWifiDeviceCallB
     WIFI_LOGD("RegisterCallBack start!");
     int ret = RegisterIpcCallback(AsyncCallback, ONCE, IPC_WAIT_FOREVER, &svcIdentity_, nullptr);
     if (ret != 0) {
-        WIFI_LOGE("[WifiScanProxy] RegisterIpcCallback failed");
+        WIFI_LOGE("RegisterIpcCallback failed");
         return WIFI_OPT_FAILED;
     }
 

@@ -75,6 +75,11 @@ int WifiPermissionUtils::VerifyGetWifiInfoInternalPermission()
 {
     return PERMISSION_GRANTED;
 }
+
+int WifiPermissionUtils::VerifyManageWifiHotspotExtPermission()
+{
+    return PERMISSION_GRANTED;
+}
 #else
 int WifiPermissionUtils::VerifySetWifiInfoPermission()
 {
@@ -139,6 +144,12 @@ int WifiPermissionUtils::VerifyGetWifiPeersMacPermission()
 int WifiPermissionUtils::VerifyGetWifiInfoInternalPermission()
 {
     return WifiAuthCenter::GetInstance().VerifyGetWifiInfoInternalPermission(
+        IPCSkeleton::GetCallingPid(), IPCSkeleton::GetCallingUid());
+}
+
+int WifiPermissionUtils::VerifyManageWifiHotspotExtPermission()
+{
+    return WifiAuthCenter::GetInstance().VerifyManageWifiHotspotPermission(
         IPCSkeleton::GetCallingPid(), IPCSkeleton::GetCallingUid());
 }
 #endif

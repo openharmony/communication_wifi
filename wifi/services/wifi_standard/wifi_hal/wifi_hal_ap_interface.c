@@ -19,9 +19,9 @@
 #ifdef OHOS_ARCH_LITE
 #include "wifi_hal_adapter.h"
 #else
-#include "wifi_hal.h"
 #include "wifi_hal_adapter.h"
-#include "wifi_hal_ap_feature.h"
+#include "wifi_hdi_ap_instance.h"
+
 #endif
 #include "wifi_hal_module_manage.h"
 #include "wifi_hal_common_func.h"
@@ -280,49 +280,66 @@ WifiErrorNo GetValidFrequenciesForBand(int32_t band, int *frequencies, int32_t *
 #ifdef OHOS_ARCH_LITE
     return WIFI_HAL_FAILED;
 #else
-    int32_t ret;
     uint32_t count = 0;
     struct IWiFi *wifi = NULL;
     struct IWiFiAp *apFeature = NULL;
-
-    if (frequencies == NULL || size == NULL) {
-        LOGE("GetValidFrequenciesForBand  frequencies or size is NULL");
-        return WIFI_HAL_FAILED;
-    }
-    LOGD("GetValidFrequenciesForBand");
-
-    ret = WifiConstruct(&wifi);
-    if (ret != 0 || wifi == NULL) {
-        LOGE("%{public}s WifiConstruct failed", __func__);
-        return WIFI_HAL_FAILED;
-    }
-
-    ret = wifi->start(wifi);
-    if (ret != 0) {
-        (void)WifiDestruct(&wifi);
-        LOGE("%{public}s start failed", __func__);
-        return WIFI_HAL_FAILED;
-    }
-
-    ret = wifi->createFeature(PROTOCOL_80211_IFTYPE_AP, (struct IWiFiBaseFeature **)&apFeature);
-    if (ret != 0 || apFeature == NULL) {
-        (void)wifi->stop(wifi);
-        (void)WifiDestruct(&wifi);
-        LOGE("%{public}s createFeature failed", __func__);
+    WifiErrorNo ret = HdiGetAp(&wifi, &apFeature);
+    if (ret != WIFI_HAL_SUCCESS) {
         return WIFI_HAL_FAILED;
     }
 
     ret = apFeature->baseFeature.getValidFreqsWithBand((struct IWiFiBaseFeature *)apFeature,
         ConvertToNl80211Band(band), frequencies, *size, &count);
     *size = count;
-
-    (void)wifi->destroyFeature((struct IWiFiBaseFeature *)apFeature);
-    (void)wifi->stop(wifi);
-    (void)WifiDestruct(&wifi);
     if (ret != 0) {
         LOGE("%{public}s failed", __func__);
     }
+    HdiReleaseAp(wifi, apFeature);
+    return (ret == 0) ? WIFI_HAL_SUCCESS : WIFI_HAL_FAILED;
+#endif
+}
 
+WifiErrorNo WifiSetPowerModel(const int mode)
+{
+#ifdef OHOS_ARCH_LITE
+    return WIFI_HAL_FAILED;
+#else
+    LOGD("WifiSetPowerModel: %{public}d", mode);
+
+    struct IWiFi *wifi = NULL;
+    struct IWiFiAp *apFeature = NULL;
+    WifiErrorNo ret = HdiGetAp(&wifi, &apFeature);
+    if (ret != WIFI_HAL_SUCCESS) {
+        return WIFI_HAL_FAILED;
+    }
+    ret = wifi->setPowerMode(apFeature->baseFeature.ifName, mode);
+    if (ret != 0) {
+        LOGE("%{public}s failed", __func__);
+    }
+    HdiReleaseAp(wifi, apFeature);
+    return (ret == 0) ? WIFI_HAL_SUCCESS : WIFI_HAL_FAILED;
+#endif
+}
+
+WifiErrorNo WifiGetPowerModel(int* mode)
+{
+#ifdef OHOS_ARCH_LITE
+    return WIFI_HAL_FAILED;
+#else
+    LOGD("WifiGetPowerModel");
+
+    struct IWiFi *wifi = NULL;
+    struct IWiFiAp *apFeature = NULL;
+    WifiErrorNo ret = HdiGetAp(&wifi, &apFeature);
+    if (ret != WIFI_HAL_SUCCESS) {
+        return WIFI_HAL_FAILED;
+    }
+    ret = wifi->getPowerMode(apFeature->baseFeature.ifName, (uint8_t *)mode);
+    if (ret != 0) {
+        LOGE("%{public}s failed", __func__);
+    }
+    LOGD("getPowerModel: %{public}d", *mode);
+    HdiReleaseAp(wifi, apFeature);
     return (ret == 0) ? WIFI_HAL_SUCCESS : WIFI_HAL_FAILED;
 #endif
 }

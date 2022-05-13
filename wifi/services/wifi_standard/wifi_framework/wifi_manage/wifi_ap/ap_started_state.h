@@ -210,6 +210,12 @@ private:
     void ProcessCmdDisconnectStation(InternalMessage &msg) const;
 
     /**
+     * @Description update the power mode.
+     * @return None
+     */
+    void UpdatePowerMode() const;
+
+    /**
      * @Description  Initialization.
      * @param None
      * @return None

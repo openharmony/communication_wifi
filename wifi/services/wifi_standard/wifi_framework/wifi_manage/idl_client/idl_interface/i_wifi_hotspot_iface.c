@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -278,6 +278,46 @@ WifiErrorNo RegisterAsscociatedEvent(IWifiApEventCallback callback)
     ReadInt(context, &result);
     if (result == WIFI_IDL_OPT_OK || callback.onStaJoinOrLeave == NULL) {
         SetWifiApEventCallback(callback);
+    }
+    ReadClientEnd(client);
+    UnlockRpcClient(client);
+    return result;
+}
+
+WifiErrorNo WpaSetPowerModel(const int model)
+{
+    RpcClient *client = GetSupplicantRpcClient();
+    LockRpcClient(client);
+    Context *context = client->context;
+    WriteBegin(context, 0);
+    WriteFunc(context, "WpaSetPowerModel");
+    WriteInt(context, model);
+    WriteEnd(context);
+    if (RpcClientCall(client, "WpaSetPowerModel") != WIFI_IDL_OPT_OK) {
+        return WIFI_IDL_OPT_FAILED;
+    }
+    int result = WIFI_IDL_OPT_FAILED;
+    ReadInt(context, &result);
+    ReadClientEnd(client);
+    UnlockRpcClient(client);
+    return result;
+}
+
+WifiErrorNo WpaGetPowerModel(int* model)
+{
+    RpcClient *client = GetSupplicantRpcClient();
+    LockRpcClient(client);
+    Context *context = client->context;
+    WriteBegin(context, 0);
+    WriteFunc(context, "WpaGetPowerModel");
+    WriteEnd(context);
+    if (RpcClientCall(client, "WpaGetPowerModel") != WIFI_IDL_OPT_OK) {
+        return WIFI_IDL_OPT_FAILED;
+    }
+    int result = WIFI_IDL_OPT_FAILED;
+    ReadInt(context, &result);
+    if (result == WIFI_IDL_OPT_OK) {
+        ReadInt(context, model);
     }
     ReadClientEnd(client);
     UnlockRpcClient(client);

@@ -78,16 +78,18 @@ public:
     /**
      * @Description Enable Hotspot
      *
+     * @param type - service type
      * @return ErrCode - operation result
      */
-    ErrCode EnableHotspot(void) override;
+    ErrCode EnableHotspot(const ServiceType type = ServiceType::DEFAULT) override;
 
     /**
      * @Description Disable Hotspot
      *
+     * @param type - service type
      * @return ErrCode - operation result
      */
-    ErrCode DisableHotspot(void) override;
+    ErrCode DisableHotspot(const ServiceType type = ServiceType::DEFAULT) override;
 
     /**
      * @Description Get the Block Lists object
@@ -154,6 +156,30 @@ public:
      * @return false - unsupported
      */
     bool IsFeatureSupported(long feature) override;
+
+        /**
+     * @Description Get supported power model list
+     *
+     * @param setPowerModelList - supported power model list
+     * @return ErrCode - operation result
+     */
+    ErrCode GetSupportedPowerModel(std::set<PowerModel>& setPowerModelList) override;
+
+    /**
+     * @Description Get power model
+     *
+     * @param model - current power model
+     * @return ErrCode - operation result
+     */
+    ErrCode GetPowerModel(PowerModel& model) override;
+
+    /**
+     * @Description Get supported power model list
+     *
+     * @param model - the model to be set
+     * @return ErrCode - operation result
+     */
+    ErrCode SetPowerModel(const PowerModel& model) override;
 private:
     int systemAbilityId_;
     sptr<IWifiHotspot> client_;

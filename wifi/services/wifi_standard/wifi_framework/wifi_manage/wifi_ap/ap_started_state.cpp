@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -76,6 +76,7 @@ void ApStartedState::GoInState()
         m_ApStateMachine.SwitchState(&m_ApStateMachine.m_ApIdleState);
         return;
     }
+    UpdatePowerMode();
     m_ApStateMachine.OnApStateChange(ApState::AP_STATE_STARTED);
 }
 
@@ -341,6 +342,18 @@ void ApStartedState::ProcessCmdDisconnectStation(InternalMessage &msg) const
     staInfo.bssid = msg.GetStringFromMessage();
     staInfo.ipAddr = msg.GetStringFromMessage();
     m_ApStateMachine.m_ApStationsManager.DisConnectStation(staInfo);
+}
+
+void ApStartedState::UpdatePowerMode() const
+{
+    WIFI_LOGI("UpdatePowerMode.");
+    int model = -1;
+    if (WifiApHalInterface::GetInstance().GetPowerModel(model) != WIFI_IDL_OPT_OK) {
+        LOGE("GetPowerModel() failed!");
+        return;
+    }
+    LOGI("SetPowerModel(): %{public}d.", model);
+    WifiSettings::GetInstance().SetPowerModel(PowerModel(model));
 }
 }  // namespace Wifi
 }  // namespace OHOS

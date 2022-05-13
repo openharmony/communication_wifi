@@ -83,16 +83,18 @@ public:
     /**
      * @Description Enable Hotspot
      *
+     * @param type - service type
      * @return ErrCode - operation result
      */
-    virtual ErrCode EnableHotspot(void) = 0;
+    virtual ErrCode EnableHotspot(const ServiceType type = ServiceType::DEFAULT) = 0;
 
     /**
      * @Description Disable Hotspot
      *
+     * @param type - service type
      * @return ErrCode - operation result
      */
-    virtual ErrCode DisableHotspot(void) = 0;
+    virtual ErrCode DisableHotspot(const ServiceType type = ServiceType::DEFAULT) = 0;
 
     /**
      * @Description Get the Block Lists object
@@ -150,6 +152,30 @@ public:
      * @return ErrCode - operation result
      */
     virtual ErrCode GetSupportedFeatures(long &features) = 0;
+
+    /**
+     * @Description Get supported power model list
+     *
+     * @param setPowerModelList - supported power model list
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode GetSupportedPowerModel(std::set<PowerModel>& setPowerModelList) = 0;
+
+    /**
+     * @Description Get power model
+     *
+     * @param model - current power model
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode GetPowerModel(PowerModel& model) = 0;
+
+    /**
+     * @Description Get supported power model list
+     *
+     * @param model - the model to be set
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode SetPowerModel(const PowerModel& model) = 0;
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.wifi.IWifiHotspotService");
 };

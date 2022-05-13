@@ -424,6 +424,22 @@ public:
      */
     WifiErrorNo ReqDisconnectStaByMac(const std::string &mac);
 
+    /**
+     * @Description Request get the power mode.
+     *
+     * @param mode - The mode of power.
+     * @return WifiErrorNo
+     */
+    WifiErrorNo ReqGetPowerModel(int& model);
+
+    /**
+     * @Description Request set the power mode.
+     *
+     * @param mode - The mode to set.
+     * @return WifiErrorNo
+     */
+    WifiErrorNo ReqSetPowerModel(const int& model);
+
     /* ************************** ChipMode interface **************************** */
 
     /**

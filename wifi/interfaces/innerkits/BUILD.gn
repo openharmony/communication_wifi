@@ -27,6 +27,7 @@ group("wifi_kits") {
     deps += [
       "$WIFI_ROOT_DIR/interfaces/innerkits/native_cpp/napi:wifi",
       "$WIFI_ROOT_DIR/interfaces/innerkits/native_cpp/napi:wifi_native_js",
+      "$WIFI_ROOT_DIR/interfaces/innerkits/native_cpp/napi:wifiext",
     ]
   }
 }

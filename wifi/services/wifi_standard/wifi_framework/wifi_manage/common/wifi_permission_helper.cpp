@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -38,6 +38,7 @@ static PermissionDef g_wifiPermissions[] = {
     {"ohos.permission.GET_WIFI_LOCAL_MAC", USER_GRANT, NOT_RESTRICTED},
     {"ohos.permission.LOCATION", USER_GRANT, NOT_RESTRICTED},
     {"ohos.permission.GET_P2P_DEVICE_LOCATION", USER_GRANT, NOT_RESTRICTED},
+    {"ohos.permission.MANAGE_WIFI_HOTSPOT_EXT", USER_GRANT, NOT_RESTRICTED},
 };
 
 static int g_wifiPermissionSize = sizeof(g_wifiPermissions) / sizeof(PermissionDef);
@@ -269,6 +270,14 @@ int WifiPermissionHelper::VerifyGetWifiPeersMacPermission(const int &pid, const 
 int WifiPermissionHelper::VerifyGetWifiInfoInternalPermission(const int &pid, const int &uid)
 {
     if (VerifyPermission("ohos.permission.GET_WIFI_INFO_INTERNAL", pid, uid) == PERMISSION_DENIED) {
+        return PERMISSION_DENIED;
+    }
+    return PERMISSION_GRANTED;
+}
+
+int WifiPermissionHelper::VerifyManageWifiHotspotExtPermission(const int &pid, const int &uid)
+{
+    if (VerifyPermission("ohos.permission.MANAGE_WIFI_HOTSPOT_EXT", pid, uid) == PERMISSION_DENIED) {
         return PERMISSION_DENIED;
     }
     return PERMISSION_GRANTED;

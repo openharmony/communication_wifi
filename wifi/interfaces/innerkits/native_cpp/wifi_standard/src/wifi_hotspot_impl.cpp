@@ -102,16 +102,16 @@ ErrCode WifiHotspotImpl::DisassociateSta(const StationInfo &info)
     return client_->DisassociateSta(info);
 }
 
-ErrCode WifiHotspotImpl::EnableHotspot(void)
+ErrCode WifiHotspotImpl::EnableHotspot(const ServiceType type)
 {
     RETURN_IF_FAIL(client_);
-    return client_->EnableHotspot();
+    return client_->EnableHotspot(type);
 }
 
-ErrCode WifiHotspotImpl::DisableHotspot(void)
+ErrCode WifiHotspotImpl::DisableHotspot(const ServiceType type)
 {
     RETURN_IF_FAIL(client_);
-    return client_->DisableHotspot();
+    return client_->DisableHotspot(type);
 }
 
 ErrCode WifiHotspotImpl::GetBlockLists(std::vector<StationInfo> &infos)
@@ -164,6 +164,24 @@ bool WifiHotspotImpl::IsFeatureSupported(long feature)
         return false;
     }
     return ((tmpFeatures & feature) == feature);
+}
+
+ErrCode WifiHotspotImpl::GetSupportedPowerModel(std::set<PowerModel>& setPowerModelList)
+{
+    RETURN_IF_FAIL(client_);
+    return client_->GetSupportedPowerModel(setPowerModelList);
+}
+
+ErrCode WifiHotspotImpl::GetPowerModel(PowerModel& model)
+{
+    RETURN_IF_FAIL(client_);
+    return client_->GetPowerModel(model);
+}
+
+ErrCode WifiHotspotImpl::SetPowerModel(const PowerModel& model)
+{
+    RETURN_IF_FAIL(client_);
+    return client_->SetPowerModel(model);
 }
 }  // namespace Wifi
 }  // namespace OHOS

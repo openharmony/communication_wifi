@@ -33,6 +33,7 @@ public:
     static int VerifyManageWifiHotspotPermission();
     static int VerifyGetWifiPeersMacPermission();
     static int VerifyGetWifiInfoInternalPermission();
+    static int VerifyManageWifiHotspotExtPermission();
 };
 }  // namespace Wifi
 }  // namespace OHOS

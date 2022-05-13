@@ -176,6 +176,8 @@ static int InitRpcFuncMapAp(void)
     ret += PushRpcFunc("DelMacFilter", RpcDelMacFilter);
     ret += PushRpcFunc("DisassociateSta", RpcDisassociateSta);
     ret += PushRpcFunc("GetValidFrequenciesForBand", RpcGetValidFrequenciesForBand);
+    ret += PushRpcFunc("WpaSetPowerModel", RpcSetPowerModel);
+    ret += PushRpcFunc("WpaGetPowerModel", RpcGetPowerModel);
     return ret;
 }
 

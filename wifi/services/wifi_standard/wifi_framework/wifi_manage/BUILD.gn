@@ -177,7 +177,7 @@ if (defined(ohos_lite)) {
       "$DHCP_ROOT_DIR/interfaces/innerkits/native_cpp/interfaces",
       "$WIFI_ROOT_DIR/utils/inc",
       "//foundation/appexecfwk/adapter/interfaces/innerkits/appexecfwk_base/include",
-      "//foundation/aafwk/standard/interfaces/innerkits/base/include",
+      "${aainnerkits_path}/base/include",
       "//base/security/access_token/interfaces/innerkits/accesstoken/include",
       "//foundation/communication/netmanager_base/services/netmanagernative/include/netsys",
     ]

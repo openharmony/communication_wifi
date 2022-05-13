@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+#ifndef OHOS_ARCH_LITE
 #include "wifi_hdi_ap_instance.h"
 #include "wifi_hal_define.h"
 #include "wifi_log.h"
@@ -20,7 +21,6 @@
 #undef LOG_TAG
 #define LOG_TAG "WifiHdiInstance"
 
-#ifndef OHOS_ARCH_LITE
 WifiErrorNo HdiGetAp(struct IWiFi **wifi, struct IWiFiAp **apFeature)
 {
     if (wifi == NULL || apFeature == NULL) {

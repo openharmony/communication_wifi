@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -144,7 +144,11 @@ public:
      * @param callback - IWifiDeviceCallBack object
      * @return ErrCode - operation result
      */
+#ifdef OHOS_ARCH_LITE
+    virtual ErrCode RegisterCallBack(const std::shared_ptr<IWifiDeviceCallBack> &callback) = 0;
+#else
     virtual ErrCode RegisterCallBack(const sptr<IWifiDeviceCallBack> &callback) = 0;
+#endif
 
     /**
      * @Description Get the signal level object.

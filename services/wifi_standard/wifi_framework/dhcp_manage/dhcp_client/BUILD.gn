@@ -1,4 +1,4 @@
-# Copyright (C) 2021 Huawei Device Co., Ltd.
+# Copyright (C) 2021-2022 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -11,47 +11,78 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build/ohos.gni")
-import("//foundation/appexecfwk/standard/appexecfwk.gni")
+if (defined(ohos_lite)) {
+  import("//build/lite/config/component/lite_component.gni")
+} else {
+  import("//build/ohos.gni")
+  import("//foundation/appexecfwk/standard/appexecfwk.gni")
+}
 
 ################################################################################
 
-ohos_executable("dhcp_client_service") {
-  install_enable = true
-  sources = [
-    "//foundation/communication/wifi/services/wifi_standard/wifi_framework/dhcp_manage/dhcp_client/src/dhcp_api.cpp",
-    "//foundation/communication/wifi/services/wifi_standard/wifi_framework/dhcp_manage/dhcp_client/src/dhcp_client.c",
-    "//foundation/communication/wifi/services/wifi_standard/wifi_framework/dhcp_manage/dhcp_client/src/dhcp_function.c",
-    "//foundation/communication/wifi/services/wifi_standard/wifi_framework/dhcp_manage/dhcp_client/src/dhcp_ipv4.c",
-    "//foundation/communication/wifi/services/wifi_standard/wifi_framework/dhcp_manage/dhcp_client/src/dhcp_main.c",
-    "//foundation/communication/wifi/services/wifi_standard/wifi_framework/dhcp_manage/dhcp_client/src/dhcp_options.c",
-    "//foundation/communication/wifi/services/wifi_standard/wifi_framework/dhcp_manage/dhcp_client/src/dhcp_socket.c",
-  ]
+local_base_sources = [
+  "//foundation/communication/wifi/services/wifi_standard/wifi_framework/dhcp_manage/dhcp_client/src/dhcp_api.cpp",
+  "//foundation/communication/wifi/services/wifi_standard/wifi_framework/dhcp_manage/dhcp_client/src/dhcp_client.c",
+  "//foundation/communication/wifi/services/wifi_standard/wifi_framework/dhcp_manage/dhcp_client/src/dhcp_function.c",
+  "//foundation/communication/wifi/services/wifi_standard/wifi_framework/dhcp_manage/dhcp_client/src/dhcp_ipv4.c",
+  "//foundation/communication/wifi/services/wifi_standard/wifi_framework/dhcp_manage/dhcp_client/src/dhcp_main.c",
+  "//foundation/communication/wifi/services/wifi_standard/wifi_framework/dhcp_manage/dhcp_client/src/dhcp_options.c",
+  "//foundation/communication/wifi/services/wifi_standard/wifi_framework/dhcp_manage/dhcp_client/src/dhcp_socket.c",
+]
 
-  include_dirs = [
-    "//foundation/communication/wifi/services/wifi_standard/wifi_framework/common/log",
-    "//foundation/communication/wifi/services/wifi_standard/wifi_framework/dhcp_manage/dhcp_client/include",
-    "//utils/native/base/include",
-    "//foundation/appexecfwk/standard/interfaces/innerkits/libeventhandler/include",
-    "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
-    "//third_party/openssl/include",
-  ]
+local_base_include_dirs = [
+  "//foundation/communication/wifi/services/wifi_standard/wifi_framework/common/log",
+  "//foundation/communication/wifi/services/wifi_standard/wifi_framework/dhcp_manage/dhcp_client/include",
+]
 
-  deps = [
-    "${aafwk_path}/interfaces/innerkits/base:base",
-    "${aafwk_path}/interfaces/innerkits/want:want",
-    "//third_party/openssl:libcrypto_static",
-    "//utils/native/base:utils",
-  ]
+if (defined(ohos_lite)) {
+  executable("dhcp_client_service") {
+    sources = local_base_sources
 
-  cflags_cc = [ "-fno-rtti" ]
+    include_dirs = local_base_include_dirs
+    include_dirs += [
+      "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits",
+      "//third_party/bounds_checking_function/include",
+    ]
 
-  external_deps = [
-    "ces_standard:cesfwk_innerkits",
-    "hiviewdfx_hilog_native:libhilog",
-  ]
-  defines = []
+    deps = [
+      "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
+      "//third_party/bounds_checking_function:libsec_shared",
+    ]
+    defines = [
+      "_GNU_SOURCE",
+      "OHOS_ARCH_LITE",
+    ]
+  }
+} else {
+  ohos_executable("dhcp_client_service") {
+    install_enable = true
+    sources = local_base_sources
 
-  part_name = "wifi_standard"
-  subsystem_name = "communication"
+    include_dirs = local_base_include_dirs
+    include_dirs += [
+      "//utils/native/base/include",
+      "//foundation/appexecfwk/standard/interfaces/innerkits/libeventhandler/include",
+      "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
+      "//third_party/openssl/include",
+    ]
+
+    deps = [
+      "${aafwk_path}/interfaces/innerkits/base:base",
+      "${aafwk_path}/interfaces/innerkits/want:want",
+      "//third_party/openssl:libcrypto_static",
+      "//utils/native/base:utils",
+    ]
+
+    cflags_cc = [ "-fno-rtti" ]
+
+    external_deps = [
+      "ces_standard:cesfwk_innerkits",
+      "hiviewdfx_hilog_native:libhilog",
+    ]
+    defines = []
+
+    part_name = "wifi_standard"
+    subsystem_name = "communication"
+  }
 }

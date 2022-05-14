@@ -40,6 +40,7 @@ PDhcpOptionNode CreateOptionNode(PDhcpOption opt)
     if (memcpy_s(pNode->option.data, sizeof(pNode->option.data), opt->data, opt->length) != EOK) {
         LOGE("create option node failed when memcpy opt data!");
         free(pNode);
+        pNode = NULL;
         return NULL;
     }
     pNode->previous = pNode->next = 0;
@@ -139,8 +140,11 @@ int PushFrontOption(PDhcpOptionList pOptions, PDhcpOption pOption)
 
 int RemoveOption(PDhcpOptionList pOptions, uint8_t code)
 {
-    if (pOptions->size == 0) {
+    if (pOptions == NULL) {
         return RET_ERROR;
+    }
+    if (pOptions->size == 0) {
+        return RET_FAILED;
     }
     DhcpOptionNode *pNode = GetOptionNode(pOptions, code);
     if (pNode == NULL) {
@@ -155,6 +159,7 @@ int RemoveOption(PDhcpOptionList pOptions, uint8_t code)
     }
     pOptions->size--;
     free(pNode);
+    pNode = NULL;
     return RET_SUCCESS;
 }
 
@@ -181,7 +186,7 @@ PDhcpOption GetOption(PDhcpOptionList pOptions, uint8_t code)
 
 void ClearOptions(PDhcpOptionList pOptions)
 {
-    if (pOptions->size == 0) {
+    if (pOptions == NULL || pOptions->size == 0) {
         return;
     }
     DhcpOptionNode *pNode = pOptions->first->next;
@@ -205,7 +210,10 @@ void ClearOptions(PDhcpOptionList pOptions)
 
 void FreeOptionList(PDhcpOptionList pOptions)
 {
-    if (pOptions->size == 0) {
+    if (pOptions == NULL) {
+        return;
+    }
+    if (pOptions->first == NULL) {
         return;
     }
     DhcpOptionNode *pNode = pOptions->first->next;

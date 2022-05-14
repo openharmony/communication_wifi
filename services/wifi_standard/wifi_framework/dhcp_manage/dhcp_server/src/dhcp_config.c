@@ -27,7 +27,6 @@
 #undef LOG_TAG
 #define LOG_TAG "DhcpServerConfig"
 
-
 #define FILE_LINE_LEN_MAX       1024
 #define FILE_LINE_DELIMITER     "="
 

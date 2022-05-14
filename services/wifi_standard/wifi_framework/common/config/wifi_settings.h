@@ -230,7 +230,7 @@ public:
      * when the param bSetOther is true and the state is ENABLED, that means we need
      * to set other wifi device DISABLED
      * @param networkId - the wifi device's id
-     * @param state - WifiDeviceConfigStatus INVALID/CURRENT/DISABLED/ENABLED/UNKNOWN
+     * @param state - WifiDeviceConfigStatus DISABLED/ENABLED/UNKNOWN
      * @param bSetOther - whether set other device config disabled
      * @return int - when 0 means success, other means some fails happened,
      *               Input state invalid or not find the wifi device config
@@ -946,6 +946,7 @@ private:
     std::mutex mInfoMutex;
     std::mutex mP2pMutex;
 
+    std::atomic_flag deviceConfigLoadFlag = ATOMIC_FLAG_INIT;
     WifiConfigFileImpl<WifiDeviceConfig> mSavedDeviceConfig; /* Persistence device config */
     WifiConfigFileImpl<HotspotConfig> mSavedHotspotConfig;
     WifiConfigFileImpl<StationInfo> mSavedBlockInfo;

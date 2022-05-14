@@ -118,15 +118,19 @@ static int ExpandWriteCache(Context *context, int len)
             return -1;
         }
         if (context->wCapacity < 0) {
+            free(p);
+            p = NULL;
             return -1;
         }
         if (memmove_s(p, capacity, context->szWrite, context->wCapacity) != EOK) {
             free(p);
+            p = NULL;
             return -1;
         }
         if (context->wBegin > context->wEnd &&
             memmove_s(p + context->wCapacity, context->wCapacity, p, context->wEnd) != EOK) {
             free(p);
+            p = NULL;
             return -1;
         }
         char *pFree = context->szWrite;
@@ -136,6 +140,7 @@ static int ExpandWriteCache(Context *context, int len)
         }
         context->wCapacity = capacity;
         free(pFree);
+        pFree = NULL;
     }
     return 0;
 }

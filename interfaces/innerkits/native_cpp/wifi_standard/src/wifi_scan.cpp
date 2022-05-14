@@ -13,7 +13,9 @@
  * limitations under the License.
  */
 #include "wifi_scan.h"
+#ifndef OHOS_ARCH_LITE
 #include "iremote_broker.h"
+#endif
 #include "wifi_logger.h"
 #include "wifi_scan_impl.h"
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,20 +16,28 @@
 #ifndef I_WIFI_SCAN_H
 #define I_WIFI_SCAN_H
 
+#ifdef OHOS_ARCH_LITE
+#include "iproxy_client.h"
+#else
 #include <string_ex.h>
 #include <iremote_broker.h>
-#include "wifi_errcode.h"
 #include "message_parcel.h"
 #include "message_option.h"
+#endif
 #include "wifi_msg.h"
 #include "wifi_errcode.h"
 #include "i_wifi_scan_callback.h"
 
 namespace OHOS {
 namespace Wifi {
+#ifdef OHOS_ARCH_LITE
+class IWifiScan {
+public:
+#else
 class IWifiScan : public IRemoteBroker {
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.wifi.IWifiScan");
+#endif
     virtual ~IWifiScan()
     {}
 
@@ -72,7 +80,11 @@ public:
      */
     virtual ErrCode GetScanInfoList(std::vector<WifiScanInfo> &result) = 0;
 
+#ifdef OHOS_ARCH_LITE
+    virtual ErrCode RegisterCallBack(const std::shared_ptr<IWifiScanCallback> &callback) = 0;
+#else
     virtual ErrCode RegisterCallBack(const sptr<IWifiScanCallback> &callback) = 0;
+#endif
 
     /**
      * @Description Get supported features

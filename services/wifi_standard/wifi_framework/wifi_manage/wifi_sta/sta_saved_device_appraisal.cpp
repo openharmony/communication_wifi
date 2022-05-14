@@ -58,7 +58,7 @@ ErrCode StaSavedDeviceAppraisal::DeviceAppraisals(
             continue;
         }
 
-        if (!WhetherSkipDevice(device)) {
+        if (WhetherSkipDevice(device)) {
             continue;
         }
 
@@ -95,15 +95,14 @@ bool StaSavedDeviceAppraisal::WhetherSkipDevice(WifiDeviceConfig &device)
     /* Skip this type of device and evaluate it by other appraisals */
     if (device.isPasspoint || device.isEphemeral) {
         WIFI_LOGI("Skip isPasspoint or isEphemeral Network %s.", device.ssid.c_str());
-        return false;
+        return true;
     }
 
-    if ((device.status != static_cast<int>(WifiDeviceConfigStatus::ENABLED)) &&
-        (device.status != static_cast<int>(WifiDeviceConfigStatus::CURRENT))) {
-        WIFI_LOGI("Skip disable Network %s.NetworkId is %{public}d", device.ssid.c_str(), device.networkId);
-        return false;
+    if (device.status == static_cast<int>(WifiDeviceConfigStatus::DISABLED)) {
+        WIFI_LOGI("Skip disabled Network %{public}s.", device.ssid.c_str());
+        return true;
     }
-    return true;
+    return false;
 }
 
 void StaSavedDeviceAppraisal::AppraiseDeviceQuality(

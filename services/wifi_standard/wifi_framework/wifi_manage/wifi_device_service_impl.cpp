@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -19,7 +19,11 @@
 #include "wifi_internal_msg.h"
 #include "wifi_auth_center.h"
 #include "wifi_config_center.h"
+#ifdef OHOS_ARCH_LITE
+#include "wifi_internal_event_dispatcher_lite.h"
+#else
 #include "wifi_internal_event_dispatcher.h"
+#endif
 #include "wifi_manager.h"
 #include "wifi_service_manager.h"
 #include "wifi_logger.h"
@@ -29,15 +33,24 @@ DEFINE_WIFILOG_LABEL("WifiDeviceServiceImpl");
 namespace OHOS {
 namespace Wifi {
 std::mutex WifiDeviceServiceImpl::g_instanceLock;
+#ifdef OHOS_ARCH_LITE
+std::shared_ptr<WifiDeviceServiceImpl> WifiDeviceServiceImpl::g_instance;
+std::shared_ptr<WifiDeviceServiceImpl> WifiDeviceServiceImpl::GetInstance()
+#else
 sptr<WifiDeviceServiceImpl> WifiDeviceServiceImpl::g_instance;
 const bool REGISTER_RESULT = SystemAbility::MakeAndRegisterAbility(WifiDeviceServiceImpl::GetInstance().GetRefPtr());
 
 sptr<WifiDeviceServiceImpl> WifiDeviceServiceImpl::GetInstance()
+#endif
 {
     if (g_instance == nullptr) {
         std::lock_guard<std::mutex> autoLock(g_instanceLock);
         if (g_instance == nullptr) {
+#ifdef OHOS_ARCH_LITE
+            auto service = std::make_shared<WifiDeviceServiceImpl>();
+#else
             auto service = new (std::nothrow) WifiDeviceServiceImpl;
+#endif
             g_instance = service;
         }
     }
@@ -45,7 +58,12 @@ sptr<WifiDeviceServiceImpl> WifiDeviceServiceImpl::GetInstance()
 }
 
 WifiDeviceServiceImpl::WifiDeviceServiceImpl()
+#ifdef OHOS_ARCH_LITE
+    : mPublishFlag(false), mState(ServiceRunningState::STATE_NOT_START)
+
+#else
     : SystemAbility(WIFI_DEVICE_ABILITY_ID, true), mPublishFlag(false), mState(ServiceRunningState::STATE_NOT_START)
+#endif
 {}
 
 WifiDeviceServiceImpl::~WifiDeviceServiceImpl()
@@ -77,7 +95,11 @@ void WifiDeviceServiceImpl::OnStop()
 bool WifiDeviceServiceImpl::Init()
 {
     if (!mPublishFlag) {
+#ifdef OHOS_ARCH_LITE
+        bool ret = true;
+#else
         bool ret = Publish(WifiDeviceServiceImpl::GetInstance());
+#endif
         if (!ret) {
             WIFI_LOGE("Failed to publish sta service!");
             return false;
@@ -138,7 +160,7 @@ ErrCode WifiDeviceServiceImpl::EnableWifi()
         WifiServiceManager::GetInstance().UnloadService(WIFI_SERVICE_STA);
         return errCode;
     }
-
+    WifiSettings::GetInstance().SyncWifiConfig();
     return WIFI_OPT_SUCCESS;
 }
 
@@ -192,6 +214,15 @@ ErrCode WifiDeviceServiceImpl::AddDeviceConfig(const WifiDeviceConfig &config, i
     if (pService == nullptr) {
         return WIFI_OPT_STA_NOT_OPENED;
     }
+
+    if ((config.ssid.length() <= 0) || (config.keyMgmt.length()) <= 0) {
+        return WIFI_OPT_INVALID_PARAM;
+    }
+
+    if (config.keyMgmt != "NONE" && config.preSharedKey.length() <= 0) {
+        return WIFI_OPT_INVALID_PARAM;
+    }
+
     int retNetworkId = pService->AddDeviceConfig(config);
     if (retNetworkId < 0) {
         return WIFI_OPT_FAILED;
@@ -209,6 +240,10 @@ ErrCode WifiDeviceServiceImpl::RemoveDevice(int networkId)
 
     if (!IsStaServiceRunning()) {
         return WIFI_OPT_STA_NOT_OPENED;
+    }
+
+    if (networkId < 0) {
+        return WIFI_OPT_INVALID_PARAM;
     }
 
     IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst();
@@ -258,6 +293,10 @@ ErrCode WifiDeviceServiceImpl::EnableDeviceConfig(int networkId, bool attemptEna
         return WIFI_OPT_STA_NOT_OPENED;
     }
 
+    if (networkId < 0) {
+        return WIFI_OPT_INVALID_PARAM;
+    }
+
     IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst();
     if (pService == nullptr) {
         return WIFI_OPT_STA_NOT_OPENED;
@@ -274,6 +313,10 @@ ErrCode WifiDeviceServiceImpl::DisableDeviceConfig(int networkId)
 
     if (!IsStaServiceRunning()) {
         return WIFI_OPT_STA_NOT_OPENED;
+    }
+
+    if (networkId < 0) {
+        return WIFI_OPT_INVALID_PARAM;
     }
 
     IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst();
@@ -294,6 +337,10 @@ ErrCode WifiDeviceServiceImpl::ConnectToNetwork(int networkId)
         return WIFI_OPT_STA_NOT_OPENED;
     }
 
+    if (networkId < 0) {
+        return WIFI_OPT_INVALID_PARAM;
+    }
+
     IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst();
     if (pService == nullptr) {
         return WIFI_OPT_STA_NOT_OPENED;
@@ -310,6 +357,14 @@ ErrCode WifiDeviceServiceImpl::ConnectToDevice(const WifiDeviceConfig &config)
 
     if (!IsStaServiceRunning()) {
         return WIFI_OPT_STA_NOT_OPENED;
+    }
+
+    if ((config.ssid.length() <= 0) || (config.keyMgmt.length()) <= 0) {
+        return WIFI_OPT_INVALID_PARAM;
+    }
+
+    if (config.keyMgmt != "NONE" && config.preSharedKey.length() <= 0 ) {
+        return WIFI_OPT_INVALID_PARAM;
     }
 
     IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst();
@@ -495,7 +550,11 @@ ErrCode WifiDeviceServiceImpl::GetCountryCode(std::string &countryCode)
     return WIFI_OPT_SUCCESS;
 }
 
+#ifdef OHOS_ARCH_LITE
+ErrCode WifiDeviceServiceImpl::RegisterCallBack(const std::shared_ptr<IWifiDeviceCallBack> &callback)
+#else
 ErrCode WifiDeviceServiceImpl::RegisterCallBack(const sptr<IWifiDeviceCallBack> &callback)
+#endif
 {
     WIFI_LOGI("RegisterCallBack");
     if (callback == nullptr) {

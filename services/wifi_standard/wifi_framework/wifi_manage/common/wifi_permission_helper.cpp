@@ -157,7 +157,11 @@ IsGranted WifiPermissionHelper::MockVerifyPermission(const std::string &permissi
 
 int WifiPermissionHelper::VerifyPermission(const std::string &permissionName, const int &pid, const int &uid)
 {
+#ifdef OHOS_ARCH_LITE
+    return PERMISSION_GRANTED;
+#else
     return MockVerifyPermission(permissionName, pid, uid);
+#endif
 }
 
 int WifiPermissionHelper::VerifySetWifiInfoPermission(const int &pid, const int &uid)

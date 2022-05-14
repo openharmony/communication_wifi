@@ -86,6 +86,7 @@ int MyWrite(int fd, const char *buf, int count)
                 LOGD("write: %{private}s", szTmp);
             }
             free(szTmp);
+            szTmp = NULL;
         }
 #endif
         pos += ret;

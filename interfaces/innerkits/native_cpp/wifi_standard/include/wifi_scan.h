@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -53,7 +53,11 @@ public:
      */
     virtual ErrCode GetScanInfoList(std::vector<WifiScanInfo> &result) = 0;
 
+#ifdef OHOS_ARCH_LITE
+    virtual ErrCode RegisterCallBack(const std::shared_ptr<IWifiScanCallback> &callback) = 0;
+#else
     virtual ErrCode RegisterCallBack(const sptr<IWifiScanCallback> &callback) = 0;
+#endif
 
     /**
      * @Description Get supported features

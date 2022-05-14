@@ -1,4 +1,4 @@
-# Copyright (C) 2021 Huawei Device Co., Ltd.
+# Copyright (C) 2021-2022 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -11,48 +11,97 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build/ohos.gni")
+crpc_server_sources = [
+  "./src/context.c",
+  "./src/evloop.c",
+  "./src/hash_table.c",
+  "./src/net.c",
+  "./src/serial.c",
+  "./src/server.c",
+]
 
-ohos_static_library("crpc_server") {
-  sources = [
-    "./src/context.c",
-    "./src/evloop.c",
-    "./src/hash_table.c",
-    "./src/net.c",
-    "./src/serial.c",
-    "./src/server.c",
-  ]
+crpc_client_sources = [
+  "./src/client.c",
+  "./src/context.c",
+  "./src/net.c",
+  "./src/serial.c",
+]
 
-  include_dirs = [
-    "include",
-    "//utils/native/base/include",
-    "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
-  ]
-  cflags_cc = [ "-fno-rtti" ]
-  deps = [
-    "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog",
-    "//utils/native/base:utils",
-  ]
-}
+if (defined(ohos_lite)) {
+  import("//build/lite/config/component/lite_component.gni")
 
-ohos_static_library("crpc_client") {
-  sources = [
-    "./src/client.c",
-    "./src/context.c",
-    "./src/net.c",
-    "./src/serial.c",
-  ]
-  include_dirs = [
-    "include",
-    "//utils/native/base/include",
-    "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
-    "//foundation/communication/wifi/services/wifi_standard/wifi_framework/common/log",
-  ]
-  cflags_cc = [ "-fno-rtti" ]
-  deps = [
-    "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog",
-    "//utils/native/base:utils",
-  ]
+  static_library("crpc_server") {
+    sources = crpc_server_sources
+
+    include_dirs = [
+      "include",
+      "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits",
+      "//third_party/bounds_checking_function/include",
+    ]
+
+    deps = [
+      "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
+      "//third_party/bounds_checking_function:libsec_shared",
+    ]
+    cflags_c = [
+      "-fPIC",
+      "-std=c99",
+    ]
+    defines = [ "OHOS_ARCH_LITE" ]
+  }
+
+  static_library("crpc_client") {
+    sources = crpc_client_sources
+    include_dirs = [
+      "include",
+      "//foundation/communication/wifi/services/wifi_standard/wifi_framework/common/log",
+      "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits",
+      "//third_party/bounds_checking_function/include",
+    ]
+
+    deps = [
+      "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
+      "//third_party/bounds_checking_function:libsec_shared",
+    ]
+    configs -= [ "//build/lite/config:language_c" ]
+    cflags_c = [
+      "-fPIC",
+      "-std=c99",
+    ]
+    defines = [ "OHOS_ARCH_LITE" ]
+  }
+} else {
+  import("//build/ohos.gni")
+
+  ohos_static_library("crpc_server") {
+    sources = crpc_server_sources
+
+    include_dirs = [
+      "include",
+      "//utils/native/base/include",
+      "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
+    ]
+    cflags_cc = [ "-fno-rtti" ]
+    deps = [
+      "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog",
+      "//utils/native/base:utils",
+    ]
+  }
+
+  ohos_static_library("crpc_client") {
+    sources = crpc_client_sources
+    include_dirs = [
+      "include",
+      "//utils/native/base/include",
+      "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
+      "//foundation/communication/wifi/services/wifi_standard/wifi_framework/common/log",
+    ]
+    cflags_cc = [ "-fno-rtti" ]
+    deps = [
+      "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog",
+      "//utils/native/base:utils",
+    ]
+  }
 }
 
 group("ipc_framework") {

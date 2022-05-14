@@ -275,15 +275,15 @@ void FreeAddressPool(DhcpAddressPool *pool)
     }
 
     if (pool->fixedOptions.size > 0) {
-        FreeOptionList(&pool->fixedOptions);
+        ClearOptions(&pool->fixedOptions);
     }
 
     if (pool && Initialized(&pool->leaseTable)) {
         DestroyHashTable(&pool->leaseTable);
     }
 
-    if (Initialized(&g_bindingRecoders)) {
-        ClearAll(&g_bindingRecoders);
+    if (pool && HasInitialized(&pool->fixedOptions)) {
+        FreeOptionList(&pool->fixedOptions);
     }
 }
 

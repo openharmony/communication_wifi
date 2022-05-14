@@ -293,7 +293,6 @@ int ServerActionCallback(int state, int code, const char *ifname)
         }
         case ST_STOPED: {
             LOGD(" callback[%s] ==> server stoped.", ifname);
-            exit(0);
             break;
         }
         default:
@@ -306,7 +305,7 @@ static void SignalHandler(int signal)
 {
     switch (signal) {
         case SIGTERM: {
-            StopDhcpServer(g_dhcpServer);
+            exit(0);
             break;
         }
         case SIGUSR1:
@@ -373,7 +372,18 @@ void FreeSeverResources(void)
 {
     FreeArguments();
     FreeLocalConfig();
-    FreeServerContex(g_dhcpServer);
+    FreeServerContext(g_dhcpServer);
+}
+
+static void BeforeExit(void)
+{
+    if (g_dhcpServer) {
+        LOGD("saving lease recoder...");
+        if (SaveLease(g_dhcpServer) != RET_SUCCESS) {
+            LOGD("failed to save lease recoder.");
+        }
+    }
+    FreeSeverResources();
 }
 
 int main(int argc, char *argv[])
@@ -414,11 +424,13 @@ int main(int argc, char *argv[])
         FreeSeverResources();
         return 1;
     }
+    if (atexit(BeforeExit) != 0) {
+        LOGW("failed to register exit process function.");
+    }
     RegisterDhcpCallback(g_dhcpServer, ServerActionCallback);
-    if (StartDhcpServer(g_dhcpServer)) {
+    if (StartDhcpServer(g_dhcpServer) != RET_SUCCESS) {
         FreeSeverResources();
         return 1;
     }
-    FreeSeverResources();
     return 0;
 }

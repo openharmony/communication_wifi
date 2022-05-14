@@ -299,6 +299,7 @@ char *GetDhcpOptionString(const struct DhcpPacket *packet, int code)
     if (s) {
         if (memcpy_s(s, len + 1, p, len) != EOK) {
             free(s);
+            s = NULL;
             return NULL;
         }
         s[len] = '\0';
@@ -368,7 +369,7 @@ int AddOptValueToOpts(uint8_t *pOpts, uint8_t code, uint32_t value)
             *pUint32 = value;
             break;
         default:
-            LOGE("AddOptValueToOpts() uLen:%{public}u error, break!", uLen);
+            LOGE("AddOptValueToOpts() uLen:%{public}d error, break!", uLen);
             break;
     }
 

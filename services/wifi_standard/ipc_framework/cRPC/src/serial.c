@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -15,7 +15,11 @@
 #include <inttypes.h>
 #include "serial.h"
 
+#ifdef OHOS_ARCH_LITE
+#define TMP_CHAR_LEN 64
+#else
 const int TMP_CHAR_LEN = 64;
+#endif
 const int HIGH_TWO_BIT = 16;
 const int ALPHA_NUM_MAX = 10;
 
@@ -49,10 +53,12 @@ int WriteFunc(Context *context, const char *funcName)
     }
     if (snprintf_s(buf, len + 1, len, "%s%c", funcName, context->cSplit) < 0) {
         free(buf);
+        buf = NULL;
         return -1;
     }
     int ret = ContextAppendWrite(context, buf, len);
     free(buf);
+    buf = NULL;
     return ret;
 }
 
@@ -137,10 +143,12 @@ int WriteStr(Context *context, const char *pStr)
     }
     if (snprintf_s(buf, len + 1, len, "%s%c", pStr, context->cSplit) < 0) {
         free(buf);
+        buf = NULL;
         return -1;
     }
     int ret = ContextAppendWrite(context, buf, len);
     free(buf);
+    buf = NULL;
     return ret;
 }
 
@@ -160,6 +168,7 @@ int WriteUStr(Context *context, const unsigned char *uStr, unsigned int len)
         pos = (i << 1);
         if (snprintf_s(buf + pos, inLen - pos, inLen - pos - 1, "%02x", uStr[i]) < 0) {
             free(buf);
+            buf = NULL;
             return -1;
         }
     }
@@ -167,6 +176,7 @@ int WriteUStr(Context *context, const unsigned char *uStr, unsigned int len)
     buf[inLen] = 0;
     int ret = ContextAppendWrite(context, buf, inLen);
     free(buf);
+    buf = NULL;
     return ret;
 }
 
@@ -275,7 +285,7 @@ int ReadInt(Context *context, int *iData)
 
 int ReadLong(Context *context, long *pLong)
 {
-    if (context == NULL) {
+    if (context == NULL || pLong == NULL) {
         return -1;
     }
 
@@ -307,7 +317,7 @@ int ReadInt64(Context *context, int64_t *pInt64)
 
 int ReadDouble(Context *context, double *dData)
 {
-    if (context == NULL) {
+    if (context == NULL || dData == NULL) {
         return -1;
     }
 
@@ -361,7 +371,7 @@ int ReadStr(Context *context, char *str, int count)
 
 int ReadUStr(Context *context, unsigned char *uStr, int count)
 {
-    if (context == NULL) {
+    if (context == NULL || uStr == NULL) {
         return -1;
     }
 

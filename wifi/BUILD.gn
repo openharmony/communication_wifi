@@ -17,7 +17,7 @@ if (defined(ohos_lite)) {
 
   lite_component("wifi") {
     deps = [
-      "$WIFI_ROOT_DIR/interfaces/innerkits:wifi_kits",
+      "$WIFI_ROOT_DIR/frameworks/frameworks:wifi_kits",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework:wifi_manage",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework:wifi_system_ability",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_hal:wifi_hal",

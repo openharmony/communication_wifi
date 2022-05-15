@@ -71,7 +71,7 @@
         },
         "build": {
             "sub_component": [
-                "//foundation/communication/wifi/wifi/interfaces/innerkits:wifi_kits",
+                "//foundation/communication/wifi/wifi/frameworks:wifi_kits",
                 "//foundation/communication/wifi/wifi/services/wifi_standard/wifi_framework:wifi_manage",
                 "//foundation/communication/wifi/wifi/services/wifi_standard/wifi_framework:wifi_system_ability",
                 "//foundation/communication/wifi/wifi/services/wifi_standard/wifi_hal:wifi_hal",
@@ -80,7 +80,7 @@
             "inner_kits": [
                 {
                     "header" : {
-                        "header_base": "//foundation/communication/wifi/wifi/interfaces/innerkits/native_c",
+                        "header_base": "//foundation/communication/wifi/wifi/interfaces/kits/c",
                         "header_files": [
                             "wifi_device.h",
                             "wifi_hotspot.h",
@@ -88,11 +88,11 @@
                             "wifi_hid2d.h"
                         ]
                     },
-                    "name" : "//foundation/communication/wifi/wifi/interfaces/innerkits/native_cpp/wifi_standard:wifi_sdk"
+                    "name" : "//foundation/communication/wifi/wifi/frameworks/native:wifi_sdk"
                 },
                 {
                     "header" : {
-                        "header_base": "//foundation/communication/wifi/wifi/interfaces/innerkits/native_cpp/wifi_standard/include",
+                        "header_base": "//foundation/communication/wifi/wifi/frameworks/native/include",
                         "header_files": [
                             "wifi_device.h",
                             "wifi_hotspot.h",
@@ -101,7 +101,7 @@
                             "wifi_hid2d.h"
                         ]
                     },
-                    "name" : "//foundation/communication/wifi/wifi/interfaces/innerkits/native_cpp/wifi_standard:wifi_sdk"
+                    "name" : "//foundation/communication/wifi/wifi/frameworks/native:wifi_sdk"
                 }
             ],
             "test": [

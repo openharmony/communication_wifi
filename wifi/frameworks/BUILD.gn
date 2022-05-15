@@ -21,13 +21,13 @@ if (defined(ohos_lite)) {
 
 group("wifi_kits") {
   deps = [
-    "$WIFI_ROOT_DIR/interfaces/innerkits/native_cpp/wifi_standard:wifi_sdk",
+    "$WIFI_ROOT_DIR/frameworks/native:wifi_sdk",
   ]
   if (!defined(ohos_lite)) {
     deps += [
-      "$WIFI_ROOT_DIR/interfaces/innerkits/native_cpp/napi:wifi",
-      "$WIFI_ROOT_DIR/interfaces/innerkits/native_cpp/napi:wifi_native_js",
-      "$WIFI_ROOT_DIR/interfaces/innerkits/native_cpp/napi:wifiext",
+      "$WIFI_ROOT_DIR/frameworks/js/napi:wifi",
+      "$WIFI_ROOT_DIR/frameworks/js/napi:wifi_native_js",
+      "$WIFI_ROOT_DIR/frameworks/js/napi:wifiext",
     ]
   }
 }

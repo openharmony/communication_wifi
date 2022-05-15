@@ -18,8 +18,8 @@
 
 #include <string>
 #include <vector>
-#include "native_c/wifi_device_config.h"
-#include "native_c/wifi_error_code.h"
+#include "../../../interfaces/kits/c/wifi_device_config.h"
+#include "../../../interfaces/kits/c/wifi_error_code.h"
 #include "wifi_errcode.h"
 
 #ifndef IPV4_ARRAY_LEN

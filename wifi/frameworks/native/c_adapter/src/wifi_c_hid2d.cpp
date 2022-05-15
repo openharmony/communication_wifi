@@ -13,13 +13,13 @@
  * limitations under the License.
  */
 
-#include "native_c/wifi_hid2d.h"
-#include "native_cpp/wifi_standard/include/wifi_hid2d.h"
+#include "../../../interfaces/kits/c/wifi_hid2d.h"
+#include "../../include/wifi_hid2d.h"
 #include "define.h"
 #include "wifi_logger.h"
 #include "wifi_c_utils.h"
 #include "wifi_common_util.h"
-#include "native_c/wifi_device.h"
+#include "../../../interfaces/kits/c/wifi_device.h"
 
 DEFINE_WIFILOG_LABEL("WifiCHid2d");
 

@@ -101,7 +101,6 @@ ohos_unittest("wifi_sta_unittest") {
     "//foundation/arkui/ace_engine/frameworks/base/utils",
     "//foundation/arkui/ace_engine/frameworks",
     "//foundation/distributedschedule/safwk/interfaces/innerkits/safwk/",
-    "${aainnerkits_path}/want/include/ohos/aafwk/content/",
     "//foundation/aafwk/aafwk_lite/interfaces/kits/want_lite/",
     "$WIFI_ROOT_DIR/utils/inc",
   ]
@@ -115,6 +114,7 @@ ohos_unittest("wifi_sta_unittest") {
     "//utils/native/base:utils",
   ]
   external_deps = [
+    "ability_base:want",
     "hiviewdfx_hilog_native:libhilog",
     "netmanager_base:net_conn_manager_if",
   ]

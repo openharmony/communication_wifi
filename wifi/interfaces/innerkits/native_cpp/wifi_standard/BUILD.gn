@@ -197,7 +197,6 @@ if (defined(ohos_lite)) {
       ":wifi_scan_proxy_impl",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage:wifi_manager_service",
       "$WIFI_ROOT_DIR/utils/src:wifi_utils",
-      "${aainnerkits_path}/want:want",
       "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog",
       "//foundation/distributedschedule/samgr/interfaces/innerkits/samgr_proxy:samgr_proxy",
       "//third_party/bounds_checking_function:libsec_static",
@@ -205,6 +204,7 @@ if (defined(ohos_lite)) {
     ]
 
     external_deps = [
+      "ability_base:want",
       "common_event_service:cesfwk_innerkits",
       "ipc:ipc_core",
     ]

@@ -56,8 +56,8 @@ if (defined(ohos_lite)) {
     ]
 
     include_dirs = [
-      "$WIFI_ROOT_DIR/interfaces/innerkits/native_cpp/wifi_standard/include",
-      "$WIFI_ROOT_DIR/interfaces/innerkits/native_cpp/wifi_standard/interfaces",
+      "$WIFI_ROOT_DIR/frameworks/native/include",
+      "$WIFI_ROOT_DIR/frameworks/native/interfaces",
       "$WIFI_ROOT_DIR/services/wifi_standard/ipc_framework/cRPC/include",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/common/include",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/common/log",
@@ -71,8 +71,8 @@ if (defined(ohos_lite)) {
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_scan",
       "$DHCP_ROOT_DIR/services/mgr_service/include",
-      "$DHCP_ROOT_DIR/interfaces/innerkits/native_cpp/include",
-      "$DHCP_ROOT_DIR/interfaces/innerkits/native_cpp/interfaces",
+      "$DHCP_ROOT_DIR/interfaces/inner_api/include",
+      "$DHCP_ROOT_DIR/interfaces/inner_api/interfaces",
       "$WIFI_ROOT_DIR/utils/inc",
       "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits",
       "//foundation/communication/ipc_lite/interfaces/kits",
@@ -107,8 +107,8 @@ if (defined(ohos_lite)) {
     ]
 
     include_dirs = [
-      "$WIFI_ROOT_DIR/interfaces/innerkits/native_cpp/wifi_standard/include",
-      "$WIFI_ROOT_DIR/interfaces/innerkits/native_cpp/wifi_standard/interfaces",
+      "$WIFI_ROOT_DIR/frameworks/native/include",
+      "$WIFI_ROOT_DIR/frameworks/native/interfaces",
       "$WIFI_ROOT_DIR/services/wifi_standard/ipc_framework/cRPC/include",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/common/include",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/common/log",
@@ -122,8 +122,8 @@ if (defined(ohos_lite)) {
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_scan",
       "$DHCP_ROOT_DIR/services/mgr_service/include",
-      "$DHCP_ROOT_DIR/interfaces/innerkits/native_cpp/include",
-      "$DHCP_ROOT_DIR/interfaces/innerkits/native_cpp/interfaces",
+      "$DHCP_ROOT_DIR/interfaces/inner_api/include",
+      "$DHCP_ROOT_DIR/interfaces/inner_api/interfaces",
       "$WIFI_ROOT_DIR/utils/inc",
       "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits",
       "//foundation/communication/ipc_lite/interfaces/kits",
@@ -157,7 +157,7 @@ if (defined(ohos_lite)) {
       "//foundation/arkui/ace_engine/frameworks/base/utils",
       "//foundation/arkui/ace_engine/frameworks",
       "//foundation/distributedschedule/safwk/interfaces/innerkits/safwk/",
-      "$WIFI_ROOT_DIR/interfaces/innerkits/native_cpp/wifi_standard/interfaces",
+      "$WIFI_ROOT_DIR/frameworks/native/interfaces",
       "$WIFI_ROOT_DIR/services/wifi_standard/ipc_framework/cRPC/include",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/common/include",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/common/log",
@@ -173,8 +173,8 @@ if (defined(ohos_lite)) {
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_ap",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_p2p",
       "$DHCP_ROOT_DIR/services/mgr_service/include",
-      "$DHCP_ROOT_DIR/interfaces/innerkits/native_cpp/include",
-      "$DHCP_ROOT_DIR/interfaces/innerkits/native_cpp/interfaces",
+      "$DHCP_ROOT_DIR/interfaces/inner_api/include",
+      "$DHCP_ROOT_DIR/interfaces/inner_api/interfaces",
       "$WIFI_ROOT_DIR/utils/inc",
       "//foundation/appexecfwk/adapter/interfaces/innerkits/appexecfwk_base/include",
       "//base/security/access_token/interfaces/innerkits/accesstoken/include",
@@ -270,8 +270,8 @@ if (defined(ohos_lite)) {
   ohos_source_set("wifi_p2p_service_impl") {
     part_name = "wifi"
     sources = [
-      "$WIFI_ROOT_DIR/interfaces/innerkits/native_cpp/wifi_standard/src/wifi_hid2d_msg.cpp",
-      "$WIFI_ROOT_DIR/interfaces/innerkits/native_cpp/wifi_standard/src/wifi_p2p_msg.cpp",
+      "$WIFI_ROOT_DIR/frameworks/native/src/wifi_hid2d_msg.cpp",
+      "$WIFI_ROOT_DIR/frameworks/native/src/wifi_p2p_msg.cpp",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/common/net_helper/if_config.cpp",
       "wifi_hid2d_cfg.cpp",
       "wifi_hid2d_service_utils.cpp",

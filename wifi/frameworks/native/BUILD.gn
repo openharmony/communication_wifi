@@ -17,8 +17,8 @@ if (defined(ohos_lite)) {
 
   shared_library("wifi_sdk") {
     sources = [
-      "c_adapter/wifi_c_device.cpp",
-      "c_adapter/wifi_c_utils.cpp",
+      "c_adapter/src/wifi_c_device.cpp",
+      "c_adapter/src/wifi_c_utils.cpp",
       "src/wifi_device.cpp",
       "src/wifi_device_callback_stub_lite.cpp",
       "src/wifi_device_impl.cpp",
@@ -30,14 +30,14 @@ if (defined(ohos_lite)) {
     ]
 
     include_dirs = [
-      "$WIFI_ROOT_DIR/interfaces/innerkits/native_cpp/wifi_standard/include",
-      "$WIFI_ROOT_DIR/interfaces/innerkits/native_cpp/wifi_standard/interfaces",
+      "$WIFI_ROOT_DIR/frameworks/native/include",
+      "$WIFI_ROOT_DIR/frameworks/native/interfaces",
+      "$WIFI_ROOT_DIR/frameworks/native/c_adapter/inc",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/common/net_helper",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/common/log/",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/common/include",
-      "$DHCP_ROOT_DIR/interfaces/innerkits/native_cpp/include",
+      "$DHCP_ROOT_DIR/interfaces/inner_api/include",
       "$DHCP_ROOT_DIR/services/mgr_service/include",
-      "$WIFI_ROOT_DIR/interfaces/innerkits",
       "$WIFI_ROOT_DIR/utils/inc",
       "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits",
       "//foundation/communication/ipc_lite/interfaces/kits",
@@ -81,13 +81,14 @@ if (defined(ohos_lite)) {
       "//foundation/arkui/ace_engine/frameworks/base/utils",
       "//foundation/arkui/ace_engine/frameworks",
       "//foundation/distributedschedule/samgr/interfaces/innerkits/samgr_proxy/include",
-      "$WIFI_ROOT_DIR/interfaces/innerkits/native_cpp/wifi_standard/include",
-      "$WIFI_ROOT_DIR/interfaces/innerkits/native_cpp/wifi_standard/interfaces",
+      "$WIFI_ROOT_DIR/frameworks/native/include",
+      "$WIFI_ROOT_DIR/frameworks/native/interfaces",
+      "$WIFI_ROOT_DIR/frameworks/native/c_adapter/inc",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/common/net_helper",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/common/log/",
       "//foundation/distributedschedule/samgr/adapter/interfaces/innerkits/include",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/common/include",
-      "$DHCP_ROOT_DIR/interfaces/innerkits/native_cpp/include",
+      "$DHCP_ROOT_DIR/interfaces/inner_api/include",
       "$DHCP_ROOT_DIR/services/mgr_service/include",
       "$WIFI_ROOT_DIR/interfaces/innerkits",
       "$WIFI_ROOT_DIR/utils/inc",
@@ -171,12 +172,12 @@ if (defined(ohos_lite)) {
   ohos_shared_library("wifi_sdk") {
     install_enable = true
     sources = [
-      "c_adapter/wifi_c_device.cpp",
-      "c_adapter/wifi_c_event.cpp",
-      "c_adapter/wifi_c_hid2d.cpp",
-      "c_adapter/wifi_c_hotspot.cpp",
-      "c_adapter/wifi_c_p2p.cpp",
-      "c_adapter/wifi_c_utils.cpp",
+      "c_adapter/src/wifi_c_device.cpp",
+      "c_adapter/src/wifi_c_event.cpp",
+      "c_adapter/src/wifi_c_hid2d.cpp",
+      "c_adapter/src/wifi_c_hotspot.cpp",
+      "c_adapter/src/wifi_c_p2p.cpp",
+      "c_adapter/src/wifi_c_utils.cpp",
       "src/wifi_device.cpp",
       "src/wifi_device_callback_stub.cpp",
       "src/wifi_hid2d.cpp",

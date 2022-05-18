@@ -13,9 +13,9 @@
  * limitations under the License.
  */
 
-#include "native_c/wifi_p2p.h"
+#include "../../../interfaces/kits/c/wifi_p2p.h"
 #include "wifi_logger.h"
-#include "native_cpp/wifi_standard/include/wifi_p2p.h"
+#include "../../../frameworks/native/include/wifi_p2p.h"
 #include "wifi_c_utils.h"
 #include "wifi_common_util.h"
 

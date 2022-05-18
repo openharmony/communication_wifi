@@ -33,7 +33,7 @@ local_base_sources = [
 ]
 
 local_base_include_dirs = [
-  "$WIFI_ROOT_DIR/interfaces/innerkits/native_cpp/wifi_standard/interfaces",
+  "$WIFI_ROOT_DIR/frameworks/native/interfaces",
   "$WIFI_ROOT_DIR/services/wifi_standard/ipc_framework/interface",
   "$WIFI_ROOT_DIR/services/wifi_standard/ipc_framework/cRPC/include",
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/common/include",

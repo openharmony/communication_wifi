@@ -19,6 +19,7 @@
 #include "wifi_device.h"
 #include "wifi_scan.h"
 #include "wifi_logger.h"
+#include "ipc_skeleton.h"
 
 namespace OHOS {
 namespace Wifi {

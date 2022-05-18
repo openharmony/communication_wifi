@@ -145,8 +145,8 @@ ErrCode WifiHotspotServiceImpl::SetHotspotConfig(const HotspotConfig &config)
         return WIFI_OPT_PERMISSION_DENIED;
     }
 
-    if (WifiPermissionUtils::VerifySetWifiConfigPermission() == PERMISSION_DENIED) {
-        WIFI_LOGE("SetHotspotConfig:VerifySetWifiConfigPermission PERMISSION_DENIED!");
+    if (WifiPermissionUtils::VerifyGetWifiConfigPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("SetHotspotConfig:VerifyGetWifiConfigPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
 

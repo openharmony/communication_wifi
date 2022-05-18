@@ -13,9 +13,9 @@
  * limitations under the License.
  */
 
-#include "native_c/wifi_event.h"
-#include "native_c/wifi_device.h"
-#include "native_c/wifi_scan_info.h"
+#include "../../../interfaces/kits/c/wifi_event.h"
+#include "../../../interfaces/kits/c/wifi_device.h"
+#include "../../../interfaces/kits/c/wifi_scan_info.h"
 #include "wifi_logger.h"
 #include "common_event_manager.h"
 #include <set>

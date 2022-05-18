@@ -40,7 +40,7 @@ local_base_sources = [
 
 local_base_include_dirs = [
   "$WIFI_ROOT_DIR/services/wifi_standard/sdk/include",
-  "$WIFI_ROOT_DIR/interfaces/innerkits/native_cpp/wifi_standard/interfaces",
+  "$WIFI_ROOT_DIR/frameworks/native/interfaces",
   "$WIFI_ROOT_DIR/services/wifi_standard/ipc_framework/interface",
   "$WIFI_ROOT_DIR/services/wifi_standard/ipc_framework/cRPC/include",
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/common/include",
@@ -55,8 +55,8 @@ local_base_include_dirs = [
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta/net_conf",
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta",
   "$DHCP_ROOT_DIR/services/mgr_service/include",
-  "$DHCP_ROOT_DIR/interfaces/innerkits/native_cpp/include",
-  "$DHCP_ROOT_DIR/interfaces/innerkits/native_cpp/interfaces",
+  "$DHCP_ROOT_DIR/interfaces/inner_api/include",
+  "$DHCP_ROOT_DIR/interfaces/inner_api/interfaces",
   "$WIFI_ROOT_DIR/utils/inc",
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage",
 ]

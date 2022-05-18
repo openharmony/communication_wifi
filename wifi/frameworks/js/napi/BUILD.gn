@@ -21,24 +21,26 @@ ohos_shared_library("wifi") {
     "//native_engine",
     "//utils/native/base/include",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/common/log",
-    "$WIFI_ROOT_DIR/interfaces/innerkits/native_cpp/wifi_standard/interfaces",
+    "$WIFI_ROOT_DIR/frameworks/native/interfaces",
     "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
-    "$WIFI_ROOT_DIR/interfaces/innerkits/native_cpp/wifi_standard/include",
+    "//base/security/access_token/interfaces/innerkits/accesstoken/include",
+    "$WIFI_ROOT_DIR/frameworks/native/include",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/common/net_helper",
     "${aakits_path}/appkit/native/ability_runtime/context",
     "$WIFI_ROOT_DIR/utils/inc",
+    "$WIFI_ROOT_DIR/frameworks/js/napi/inc",
   ]
 
   sources = [
-    "wifi_napi_device.cpp",
-    "wifi_napi_entry.cpp",
-    "wifi_napi_event.cpp",
-    "wifi_napi_hotspot.cpp",
-    "wifi_napi_p2p.cpp",
-    "wifi_napi_utils.cpp",
+    "src/wifi_napi_device.cpp",
+    "src/wifi_napi_entry.cpp",
+    "src/wifi_napi_event.cpp",
+    "src/wifi_napi_hotspot.cpp",
+    "src/wifi_napi_p2p.cpp",
+    "src/wifi_napi_utils.cpp",
   ]
   deps = [
-    "$WIFI_ROOT_DIR/interfaces/innerkits/native_cpp/wifi_standard:wifi_sdk",
+    "$WIFI_ROOT_DIR/frameworks/native:wifi_sdk",
     "$WIFI_ROOT_DIR/utils/src:wifi_utils",
     "${aakits_path}/appkit:app_context",
     "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog",
@@ -63,19 +65,20 @@ ohos_shared_library("wifiext") {
     "//native_engine",
     "//utils/native/base/include",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/common/log",
-    "$WIFI_ROOT_DIR/interfaces/innerkits/native_cpp/wifi_standard/interfaces",
     "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
-    "$WIFI_ROOT_DIR/interfaces/innerkits/native_cpp/wifi_standard/include",
+    "$WIFI_ROOT_DIR/frameworks/native/include",
+    "$WIFI_ROOT_DIR/frameworks/native/interfaces",
+    "$WIFI_ROOT_DIR/frameworks/js/napi/inc",
     "//foundation/aafwk/standard/frameworks/kits/appkit/native/ability_runtime/context",
   ]
 
   sources = [
-    "wifi_ext_napi_entry.cpp",
-    "wifi_ext_napi_hotspot.cpp",
-    "wifi_napi_utils.cpp",
+    "src/wifi_ext_napi_entry.cpp",
+    "src/wifi_ext_napi_hotspot.cpp",
+    "src/wifi_napi_utils.cpp",
   ]
   deps = [
-    "$WIFI_ROOT_DIR/interfaces/innerkits/native_cpp/wifi_standard:wifi_sdk",
+    "$WIFI_ROOT_DIR/frameworks/native:wifi_sdk",
     "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog",
     "//foundation/aafwk/standard/frameworks/kits/appkit:app_context",
     "//foundation/arkui/napi:ace_napi",
@@ -84,6 +87,7 @@ ohos_shared_library("wifiext") {
 
   external_deps = [
     "bundle_framework:appexecfwk_base",
+    "access_token:libaccesstoken_sdk",
     "ipc:ipc_core",
   ]
 
@@ -99,24 +103,26 @@ ohos_shared_library("wifi_native_js") {
     "//native_engine",
     "//utils/native/base/include",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/common/log",
-    "$WIFI_ROOT_DIR/interfaces/innerkits/native_cpp/wifi_standard/interfaces",
+    "$WIFI_ROOT_DIR/frameworks/js/napi/inc",
+    "$WIFI_ROOT_DIR/frameworks/native/include",
+    "$WIFI_ROOT_DIR/frameworks/native/interfaces",
     "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
-    "$WIFI_ROOT_DIR/interfaces/innerkits/native_cpp/wifi_standard/include",
+    "//base/security/access_token/interfaces/innerkits/accesstoken/include",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/common/net_helper",
     "${aakits_path}/appkit/native/ability_runtime/context",
     "$WIFI_ROOT_DIR/utils/inc",
   ]
 
   sources = [
-    "wifi_napi_device.cpp",
-    "wifi_napi_entry.cpp",
-    "wifi_napi_event.cpp",
-    "wifi_napi_hotspot.cpp",
-    "wifi_napi_p2p.cpp",
-    "wifi_napi_utils.cpp",
+    "src/wifi_napi_device.cpp",
+    "src/wifi_napi_entry.cpp",
+    "src/wifi_napi_event.cpp",
+    "src/wifi_napi_hotspot.cpp",
+    "src/wifi_napi_p2p.cpp",
+    "src/wifi_napi_utils.cpp",
   ]
   deps = [
-    "$WIFI_ROOT_DIR/interfaces/innerkits/native_cpp/wifi_standard:wifi_sdk",
+    "$WIFI_ROOT_DIR/frameworks/native:wifi_sdk",
     "$WIFI_ROOT_DIR/utils/src:wifi_utils",
     "${aakits_path}/appkit:app_context",
     "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog",
@@ -128,6 +134,7 @@ ohos_shared_library("wifi_native_js") {
 
   external_deps = [
     "bundle_framework:appexecfwk_base",
+    "access_token:libaccesstoken_sdk",
     "ipc:ipc_core",
   ]
 

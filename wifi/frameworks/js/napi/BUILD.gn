@@ -49,7 +49,7 @@ ohos_shared_library("wifi") {
   ]
 
   external_deps = [
-  	"access_token:libaccesstoken_sdk",
+    "access_token:libaccesstoken_sdk",
     "bundle_framework:appexecfwk_base",
     "ipc:ipc_core",
   ]
@@ -133,7 +133,7 @@ ohos_shared_library("wifi_native_js") {
   defines = [ "ENABLE_NAPI_COMPATIBLE" ]
 
   external_deps = [
-  	"access_token:libaccesstoken_sdk",
+    "access_token:libaccesstoken_sdk",
     "bundle_framework:appexecfwk_base",
     "ipc:ipc_core",
   ]

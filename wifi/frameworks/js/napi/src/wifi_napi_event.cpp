@@ -521,7 +521,7 @@ int EventRegister::CheckPermission(const std::string& eventType)
     std::string permissionName;
     int hasPermission = 1;
     std::multimap<std::string, std::string>::iterator it = permissions->find(eventType);
-    for(size_t i = 0; i < count; i++) {
+    for (size_t i = 0; i < count; i++) {
         permissionName = (*(it++)).second;
         int res = Security::AccessToken::AccessTokenKit::VerifyAccessToken(callerToken, permissionName);
         if (permissionName.compare(WIFI_PERMISSION_GET_WIFI_INFO_INTERNAL) == 0) {

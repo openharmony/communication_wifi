@@ -20,6 +20,7 @@
 #include "wifi_scan.h"
 #include "wifi_logger.h"
 #include "ipc_skeleton.h"
+#include "accesstoken_kit.h"
 
 namespace OHOS {
 namespace Wifi {

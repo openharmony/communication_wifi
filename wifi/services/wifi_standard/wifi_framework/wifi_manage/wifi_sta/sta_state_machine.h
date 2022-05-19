@@ -29,7 +29,9 @@
 #include "sta_service_callback.h"
 #include "i_dhcp_service.h"
 #include "sta_define.h"
+#ifndef OHOS_ARCH_LITE
 #include "wifi_net_agent.h"
+#endif
 
 namespace OHOS {
 namespace Wifi {
@@ -626,7 +628,9 @@ private:
 private:
     StaSmHandleFuncMap staSmHandleFuncMap;
     StaServiceCallback staCallback;
+#ifndef OHOS_ARCH_LITE
     sptr<NetManagerStandard::NetSupplierInfo> NetSupplierInfo;
+#endif
 
     int lastNetworkId;
     int operationalMode;

@@ -1,0 +1,111 @@
+# Copyright (C) 2021-2022 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build/test.gni")
+import("//foundation/communication/wifi/wifi/wifi.gni")
+
+################################################################################
+
+module_output_path = "wifi_standard/manager_test"
+
+config("module_private_config") {
+  visibility = [ ":*" ]
+  include_dirs = [
+    "//utils/native/base/include",
+    "$WIFI_ROOT_DIR/tests/wifi_standard/wifi_framework/wifi_manage/unittest",
+  ]
+}
+
+ohos_unittest("manager_unittest") {
+  module_out_path = module_output_path
+  sources = [
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/common/config/wifi_config_file_spec.cpp",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/common/config/wifi_settings.cpp",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/common/utils/wifi_common_event_helper.cpp",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/common/wifi_permission_helper.cpp",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/common/wifi_permission_utils.cpp",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_auth_center.cpp",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_config_center.cpp",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_internal_event_dispatcher.cpp",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_manager.cpp",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_net_agent.cpp",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_service_manager.cpp",
+    "wifi_auth_center_test.cpp",
+    "wifi_config_center_test.cpp",
+    "wifi_internal_event_dispatcher_test.cpp",
+    "wifi_manage_test.cpp",
+    "wifi_manager_service_test.cpp",
+    "wifi_service_manager_test.cpp",
+  ]
+
+  include_dirs = [
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/common",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/common/include",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/common/net_helper",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/common/utils",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/common/log",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/common/config",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_scan",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_ap",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_p2p",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_aware",
+    "$WIFI_ROOT_DIR/interfaces/innerkits/native_cpp/wifi_standard/interfaces",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/idl_client",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/idl_client/idl_interface",
+    "$WIFI_ROOT_DIR/services/wifi_standard/ipc_framework/cRPC/include",
+    "//utils/native/base/include",
+    "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
+    "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
+    "//base/notification/common_event_service/cesfwk/innerkits/include",
+    "//base/notification/common_event_service/cesfwk/kits/native/include",
+    "//foundation/appexecfwk/adapter/interfaces/innerkits/appexecfwk_base/include",
+    "//base/security/access_token/interfaces/innerkits/accesstoken/include",
+    "//foundation/communication/netmanager_base/services/netmanagernative/include/netsys",
+    "$WIFI_ROOT_DIR/utils/inc",
+  ]
+
+  deps = [
+    "$WIFI_ROOT_DIR/services/wifi_standard/ipc_framework/cRPC:crpc_client",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/idl_client:wifi_idl_client",
+    "$WIFI_ROOT_DIR/utils/src:wifi_utils",
+    "//utils/native/base:utils",
+  ]
+
+  ldflags = [
+    "-fPIC",
+    "--coverage",
+  ]
+
+  external_deps = [
+    "ability_base:want",
+    "access_token:libaccesstoken_sdk",
+    "bundle_framework:appexecfwk_base",
+    "common_event_service:cesfwk_innerkits",
+    "eventhandler:libeventhandler",
+    "hiviewdfx_hilog_native:libhilog",
+    "ipc:ipc_core",
+    "netmanager_base:net_conn_manager_if",
+  ]
+  configs = [ ":module_private_config" ]
+
+  part_name = "wifi"
+  subsystem_name = "communication"
+  testonly = true
+}
+
+group("unittest") {
+  testonly = true
+  deps = [ ":manager_unittest" ]
+}

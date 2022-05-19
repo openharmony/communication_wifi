@@ -18,6 +18,7 @@
 #include "ap_state_machine.h"
 #include "wifi_logger.h"
 #include "wifi_settings.h"
+#include "wifi_ap_hal_interface.h"
 
 DEFINE_WIFILOG_HOTSPOT_LABEL("WifiApService");
 namespace OHOS {
@@ -155,5 +156,33 @@ ErrCode ApService::RegisterApServiceCallbacks(const IApServiceCallbacks &callbac
     return ErrCode::WIFI_OPT_SUCCESS;
 }
 
+ErrCode ApService::GetSupportedPowerModel(std::set<PowerModel>& setPowerModelList)
+{
+    LOGI("ApService::GetSupportedPowerModel");
+    /* All modes are currently supported */
+    setPowerModelList.insert(PowerModel::SLEEPING);
+    setPowerModelList.insert(PowerModel::GENERAL);
+    setPowerModelList.insert(PowerModel::THROUGH_WALL);
+    return ErrCode::WIFI_OPT_SUCCESS;
+}
+
+ErrCode ApService::GetPowerModel(PowerModel& model)
+{
+    WifiSettings::GetInstance().GetPowerModel(model);
+    LOGI("ApService::GetPowerModel, model=[%{public}d]", static_cast<int>(model));
+    return ErrCode::WIFI_OPT_SUCCESS;
+}
+
+ErrCode ApService::SetPowerModel(const PowerModel& model)
+{
+    LOGI("Enter ApService::SetPowerModel, model=[%d]", static_cast<int>(model));
+    if (WifiApHalInterface::GetInstance().SetPowerModel(static_cast<int>(model)) != WIFI_IDL_OPT_OK) {
+        LOGE("SetPowerModel() failed!");
+        return WIFI_OPT_FAILED;
+    }
+    LOGI("SetPowerModel() succeed!");
+    WifiSettings::GetInstance().SetPowerModel(model);
+    return ErrCode::WIFI_OPT_SUCCESS;
+}
 }  // namespace Wifi
 }  // namespace OHOS

@@ -36,11 +36,27 @@ WifiServiceManager::~WifiServiceManager()
 
 int WifiServiceManager::Init()
 {
+#ifdef OHOS_ARCH_LITE
+    mServiceDllMap.insert(std::make_pair(WIFI_SERVICE_STA, "libwifi_sta_service.so"));
+    mServiceDllMap.insert(std::make_pair(WIFI_SERVICE_SCAN, "libwifi_scan_service.so"));
+#ifdef FEATURE_AP_SUPPORT
+    mServiceDllMap.insert(std::make_pair(WIFI_SERVICE_AP, "libwifi_ap_service.so"));
+#endif
+#ifdef FEATURE_P2P_SUPPORT
+    mServiceDllMap.insert(std::make_pair(WIFI_SERVICE_P2P, "libwifi_p2p_service.so"));
+#endif
+    mServiceDllMap.insert(std::make_pair(WIFI_SERVICE_AWARE, "libwifi_aware_service.so"));
+#else
     mServiceDllMap.insert(std::make_pair(WIFI_SERVICE_STA, "libwifi_sta_service.z.so"));
     mServiceDllMap.insert(std::make_pair(WIFI_SERVICE_SCAN, "libwifi_scan_service.z.so"));
+#ifdef FEATURE_AP_SUPPORT
     mServiceDllMap.insert(std::make_pair(WIFI_SERVICE_AP, "libwifi_ap_service.z.so"));
+#endif
+#ifdef FEATURE_P2P_SUPPORT
     mServiceDllMap.insert(std::make_pair(WIFI_SERVICE_P2P, "libwifi_p2p_service.z.so"));
+#endif
     mServiceDllMap.insert(std::make_pair(WIFI_SERVICE_AWARE, "libwifi_aware_service.z.so"));
+#endif
     return 0;
 }
 
@@ -116,6 +132,7 @@ int WifiServiceManager::LoadScanService(const std::string &dlname, bool bCreate)
     return 0;
 }
 
+#ifdef FEATURE_AP_SUPPORT
 int WifiServiceManager::LoadApService(const std::string &dlname, bool bCreate)
 {
     if (mApServiceHandle.handle != nullptr) {
@@ -139,7 +156,9 @@ int WifiServiceManager::LoadApService(const std::string &dlname, bool bCreate)
     }
     return 0;
 }
+#endif
 
+#ifdef FEATURE_P2P_SUPPORT
 int WifiServiceManager::LoadP2pService(const std::string &dlname, bool bCreate)
 {
     if (mP2pServiceHandle.handle != nullptr) {
@@ -163,6 +182,8 @@ int WifiServiceManager::LoadP2pService(const std::string &dlname, bool bCreate)
     }
     return 0;
 }
+#endif
+
 int WifiServiceManager::CheckAndEnforceService(const std::string &name, bool bCreate)
 {
     WIFI_LOGD("WifiServiceManager::CheckAndEnforceService name: %{public}s", name.c_str());
@@ -179,12 +200,16 @@ int WifiServiceManager::CheckAndEnforceService(const std::string &name, bool bCr
     if (name == WIFI_SERVICE_SCAN) {
         return LoadScanService(dlname, bCreate);
     }
+#ifdef FEATURE_AP_SUPPORT
     if (name == WIFI_SERVICE_AP) {
         return LoadApService(dlname, bCreate);
     }
+#endif
+#ifdef FEATURE_P2P_SUPPORT
     if (name == WIFI_SERVICE_P2P) {
         return LoadP2pService(dlname, bCreate);
     }
+#endif
     return -1;
 }
 
@@ -216,6 +241,7 @@ IScanService *WifiServiceManager::GetScanServiceInst()
     return mScanServiceHandle.pService;
 }
 
+#ifdef FEATURE_AP_SUPPORT
 IApService *WifiServiceManager::GetApServiceInst()
 {
     if (mApServiceHandle.handle == nullptr) {
@@ -229,7 +255,9 @@ IApService *WifiServiceManager::GetApServiceInst()
     }
     return mApServiceHandle.pService;
 }
+#endif
 
+#ifdef FEATURE_P2P_SUPPORT
 IP2pService *WifiServiceManager::GetP2pServiceInst()
 {
     if (mP2pServiceHandle.handle == nullptr) {
@@ -243,6 +271,7 @@ IP2pService *WifiServiceManager::GetP2pServiceInst()
     }
     return mP2pServiceHandle.pService;
 }
+#endif
 
 int WifiServiceManager::UnloadStaService(bool bPreLoad)
 {
@@ -276,6 +305,7 @@ int WifiServiceManager::UnloadScanService(bool bPreLoad)
     return 0;
 }
 
+#ifdef FEATURE_AP_SUPPORT
 int WifiServiceManager::UnloadApService(bool bPreLoad)
 {
     if (mApServiceHandle.handle == nullptr) {
@@ -291,7 +321,9 @@ int WifiServiceManager::UnloadApService(bool bPreLoad)
     }
     return 0;
 }
+#endif
 
+#ifdef FEATURE_P2P_SUPPORT
 int WifiServiceManager::UnloadP2pService(bool bPreLoad)
 {
     if (mP2pServiceHandle.handle == nullptr) {
@@ -307,6 +339,7 @@ int WifiServiceManager::UnloadP2pService(bool bPreLoad)
     }
     return 0;
 }
+#endif
 
 int WifiServiceManager::UnloadService(const std::string &name)
 {
@@ -319,12 +352,16 @@ int WifiServiceManager::UnloadService(const std::string &name)
     if (name == WIFI_SERVICE_SCAN) {
         return UnloadScanService(bPreLoad);
     }
+#ifdef FEATURE_AP_SUPPORT
     if (name == WIFI_SERVICE_AP) {
         return UnloadApService(bPreLoad);
     }
+#endif
+#ifdef FEATURE_P2P_SUPPORT
     if (name == WIFI_SERVICE_P2P) {
         return UnloadP2pService(bPreLoad);
     }
+#endif
     return -1;
 }
 
@@ -333,8 +370,12 @@ void WifiServiceManager::UninstallAllService()
     WIFI_LOGD("WifiServiceManager::UninstallAllService");
     UnloadStaService(false);
     UnloadScanService(false);
+#ifdef FEATURE_AP_SUPPORT
     UnloadApService(false);
+#endif
+#ifdef FEATURE_P2P_SUPPORT
     UnloadP2pService(false);
+#endif
     return;
 }
 } // namespace Wifi

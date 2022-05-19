@@ -112,6 +112,30 @@ public:
      */
     virtual ErrCode GetValidChannels(BandType band, std::vector<int32_t> &validchannel) override;
 
+    /**
+     * @Description Get supported power model list
+     *
+     * @param setPowerModelList - supported power model list
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode GetSupportedPowerModel(std::set<PowerModel>& setPowerModelList) override;
+
+    /**
+     * @Description Get power model
+     *
+     * @param model - current power model
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode GetPowerModel(PowerModel& model) override;
+
+    /**
+     * @Description Get supported power model list
+     *
+     * @param model - the model to be set
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode SetPowerModel(const PowerModel& model) override;
+
 private:
     ApRootState m_ApRootState;
     ApStartedState m_ApStartedState;

@@ -92,14 +92,14 @@ public:
      *
      * @return ErrCode - operation result
      */
-    ErrCode EnableHotspot(void) override;
+    ErrCode EnableHotspot(const ServiceType type = ServiceType::DEFAULT) override;
 
     /**
      * @Description Disable Hotspot
      *
      * @return ErrCode - operation result
      */
-    ErrCode DisableHotspot(void) override;
+    ErrCode DisableHotspot(const ServiceType type = ServiceType::DEFAULT) override;
 
     /**
      * @Description Get the Block Lists object
@@ -159,6 +159,30 @@ public:
     ErrCode GetSupportedFeatures(long &features) override;
 
     /**
+     * @Description Get supported power model list
+     *
+     * @param setPowerModelList - supported power model list
+     * @return ErrCode - operation result
+     */
+    ErrCode GetSupportedPowerModel(std::set<PowerModel>& setPowerModelList) override;
+
+    /**
+     * @Description Get power model
+     *
+     * @param model - current power model
+     * @return ErrCode - operation result
+     */
+    ErrCode GetPowerModel(PowerModel& model) override;
+
+    /**
+     * @Description Get supported power model list
+     *
+     * @param model - the model to be set
+     * @return ErrCode - operation result
+     */
+    ErrCode SetPowerModel(const PowerModel& model) override;
+
+    /**
      * @Description dump p2p information
      *
      * @param fd - file descriptor
@@ -169,7 +193,8 @@ public:
 
 private:
     bool Init();
-    ErrCode CheckCanEnableHotspot(void);
+    ErrCode CheckCanEnableHotspot(const ServiceType type);
+    int CheckOperHotspotSwitchPermission(const ServiceType type);
     bool IsApServiceRunning();
     static void SaBasicDump(std::string& result);
     static void ConfigInfoDump(std::string& result);

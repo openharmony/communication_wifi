@@ -19,23 +19,43 @@
 #include "wifi_errcode.h"
 #include "wifi_msg.h"
 #include "i_wifi_device_callback.h"
+#ifdef OHOS_ARCH_LITE
+#include "wifi_device_stub_lite.h"
+#else
 #include "system_ability.h"
 #include "wifi_device_stub.h"
 #include "iremote_object.h"
 #include "wifi_p2p_service_impl.h"
+#endif
 
 namespace OHOS {
 namespace Wifi {
+#ifdef OHOS_ARCH_LITE
+enum ServiceRunningState {
+    STATE_NOT_START,
+    STATE_RUNNING
+};
+
+class WifiDeviceServiceImpl : public WifiDeviceStub {
+#else
 class WifiDeviceServiceImpl : public SystemAbility, public WifiDeviceStub {
 DECLARE_SYSTEM_ABILITY(WifiDeviceServiceImpl);
+#endif
 public:
     WifiDeviceServiceImpl();
     virtual ~WifiDeviceServiceImpl();
 
+#ifdef OHOS_ARCH_LITE
+    static std::shared_ptr<WifiDeviceServiceImpl> GetInstance();
+
+    void OnStart();
+    void OnStop();
+#else
     static sptr<WifiDeviceServiceImpl> GetInstance();
 
     void OnStart() override;
     void OnStop() override;
+#endif
 
     ErrCode EnableWifi() override;
 
@@ -89,7 +109,11 @@ public:
 
     ErrCode GetCountryCode(std::string &countryCode) override;
 
+#ifdef OHOS_ARCH_LITE
+    ErrCode RegisterCallBack(const std::shared_ptr<IWifiDeviceCallBack> &callback) override;
+#else
     ErrCode RegisterCallBack(const sptr<IWifiDeviceCallBack> &callback) override;
+#endif
 
     ErrCode GetSignalLevel(const int &rssi, const int &band, int &level) override;
 
@@ -99,7 +123,9 @@ public:
 
     bool SetLowLatencyMode(bool enabled) override;
 
+#ifndef OHOS_ARCH_LITE
     int32_t Dump(int32_t fd, const std::vector<std::u16string>& args) override;
+#endif
 
 private:
     bool Init();
@@ -118,7 +144,11 @@ private:
     static constexpr int WEP_KEY_LEN2 = 13;
     static constexpr int WEP_KEY_LEN3 = 16;
 
+#ifdef OHOS_ARCH_LITE
+    static std::shared_ptr<WifiDeviceServiceImpl> g_instance;
+#else
     static sptr<WifiDeviceServiceImpl> g_instance;
+#endif
     static std::mutex g_instanceLock;
     bool mPublishFlag;
     ServiceRunningState mState;

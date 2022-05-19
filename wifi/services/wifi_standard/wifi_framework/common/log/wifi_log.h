@@ -16,7 +16,11 @@
 #ifndef OHOS_WIFI_LOG_H
 #define OHOS_WIFI_LOG_H
 
+#ifdef OHOS_ARCH_LITE
+#include "hilog/log.h"
+#else
 #include "hilog/log_c.h"
+#endif
 
 #undef LOG_TAG
 #define LOG_TAG "WifiFrameWork"

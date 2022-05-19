@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -24,7 +24,11 @@ const int FD_CHECK_TIMEOUT = 1000; /* poll wait time, units: ms */
 const int CLIENT_STATE_IDLE = 0;
 const int CLIENT_STATE_DEAL_REPLY = 1;
 const int CLIENT_STATE_EXIT = 2;
+#ifdef OHOS_ARCH_LITE
+#define TMP_BUFF_SIZE 16
+#else
 const int TMP_BUFF_SIZE = 16;
+#endif
 
 static void *RpcClientThreadDeal(void *arg);
 

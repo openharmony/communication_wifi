@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,8 +17,10 @@
 #include <mutex>
 #include <string>
 #include "wifi_log.h"
+#ifndef OHOS_ARCH_LITE
 #include "ipc_skeleton.h"
 #include "accesstoken_kit.h"
+#endif
 
 #undef LOG_TAG
 #define LOG_TAG "OHWIFI_MANAGER_PERMISSION_HELPER"
@@ -36,6 +38,7 @@ static PermissionDef g_wifiPermissions[] = {
     {"ohos.permission.GET_WIFI_LOCAL_MAC", USER_GRANT, NOT_RESTRICTED},
     {"ohos.permission.LOCATION", USER_GRANT, NOT_RESTRICTED},
     {"ohos.permission.GET_P2P_DEVICE_LOCATION", USER_GRANT, NOT_RESTRICTED},
+    {"ohos.permission.MANAGE_WIFI_HOTSPOT_EXT", USER_GRANT, NOT_RESTRICTED},
 };
 
 static int g_wifiPermissionSize = sizeof(g_wifiPermissions) / sizeof(PermissionDef);
@@ -159,6 +162,9 @@ IsGranted WifiPermissionHelper::MockVerifyPermission(const std::string &permissi
 
 int WifiPermissionHelper::VerifyPermission(const std::string &permissionName, const int &pid, const int &uid)
 {
+#ifdef OHOS_ARCH_LITE
+    return PERMISSION_GRANTED;
+#else
     auto callerToken = IPCSkeleton::GetCallingTokenID();
     auto tokenType = Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(callerToken);
     if (tokenType == Security::AccessToken::ATokenTypeEnum::TOKEN_NATIVE) {
@@ -177,6 +183,7 @@ int WifiPermissionHelper::VerifyPermission(const std::string &permissionName, co
 
     LOGE("callerToken=0x%{public}x has invalid token type=%{public}d", pid, tokenType);
     return PERMISSION_DENIED;
+#endif
 }
 
 int WifiPermissionHelper::VerifySetWifiInfoPermission(const int &pid, const int &uid)
@@ -263,6 +270,14 @@ int WifiPermissionHelper::VerifyGetWifiPeersMacPermission(const int &pid, const 
 int WifiPermissionHelper::VerifyGetWifiInfoInternalPermission(const int &pid, const int &uid)
 {
     if (VerifyPermission("ohos.permission.GET_WIFI_INFO_INTERNAL", pid, uid) == PERMISSION_DENIED) {
+        return PERMISSION_DENIED;
+    }
+    return PERMISSION_GRANTED;
+}
+
+int WifiPermissionHelper::VerifyManageWifiHotspotExtPermission(const int &pid, const int &uid)
+{
+    if (VerifyPermission("ohos.permission.MANAGE_WIFI_HOTSPOT_EXT", pid, uid) == PERMISSION_DENIED) {
         return PERMISSION_DENIED;
     }
     return PERMISSION_GRANTED;

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,6 +14,17 @@
  */
 #include "dhcp_api.h"
 
+#ifdef OHOS_ARCH_LITE
+static bool PublishDhcpEvent(const char *action, const int code, const char *data)
+{
+    return true;
+}
+
+bool PublishDhcpIpv4ResultEvent(const int code, const char *data, const char *ifname)
+{
+    return true;
+}
+#else
 #include "securec.h"
 #include "common_event.h"
 #include "common_event_data.h"
@@ -58,3 +69,4 @@ bool PublishDhcpIpv4ResultEvent(const int code, const char *data, const char *if
     }
     return PublishDhcpEvent(strAction, code, data);
 }
+#endif

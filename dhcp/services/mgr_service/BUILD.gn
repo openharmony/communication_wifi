@@ -11,50 +11,93 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build/ohos.gni")
-import("//foundation/communication/wifi/dhcp/dhcp.gni")
+if (defined(ohos_lite)) {
+  import("//build/lite/config/component/lite_component.gni")
+  import("//foundation/communication/wifi/dhcp/dhcp_lite.gni")
+} else {
+  import("//build/ohos.gni")
+  import("//foundation/communication/wifi/dhcp/dhcp.gni")
+}
 
 ################################################################################
 
-ohos_shared_library("dhcp_manager_service") {
-  install_enable = true
-  sources = [
-    "$DHCP_ROOT_DIR/services/mgr_service/src/dhcp_client_service_impl.cpp",
-    "$DHCP_ROOT_DIR/services/mgr_service/src/dhcp_event_subscriber.cpp",
-    "$DHCP_ROOT_DIR/services/mgr_service/src/dhcp_func.cpp",
-    "$DHCP_ROOT_DIR/services/mgr_service/src/dhcp_server_service.cpp",
-    "$DHCP_ROOT_DIR/services/mgr_service/src/dhcp_service.cpp",
-    "$DHCP_ROOT_DIR/services/mgr_service/src/dhcp_service_api.cpp",
-  ]
+local_base_sources = [
+  "$DHCP_ROOT_DIR/services/mgr_service/src/dhcp_client_service_impl.cpp",
+  "$DHCP_ROOT_DIR/services/mgr_service/src/dhcp_event_subscriber.cpp",
+  "$DHCP_ROOT_DIR/services/mgr_service/src/dhcp_func.cpp",
+  "$DHCP_ROOT_DIR/services/mgr_service/src/dhcp_server_service.cpp",
+  "$DHCP_ROOT_DIR/services/mgr_service/src/dhcp_service.cpp",
+  "$DHCP_ROOT_DIR/services/mgr_service/src/dhcp_service_api.cpp",
+]
 
-  include_dirs = [
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/common/log",
-    "$DHCP_ROOT_DIR/services/mgr_service/include",
-    "$DHCP_ROOT_DIR/interfaces/innerkits/native_cpp/interfaces",
-    "$DHCP_ROOT_DIR/interfaces/innerkits/native_cpp/include",
-    "//utils/native/base/include",
-    "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
-  ]
+local_base_include_dirs = [
+  "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/common/log",
+  "$DHCP_ROOT_DIR/services/mgr_service/include",
+  "$DHCP_ROOT_DIR/interfaces/inner_api/interfaces",
+  "$DHCP_ROOT_DIR/interfaces/inner_api/include",
+]
 
-  deps = [ "//utils/native/base:utils" ]
+if (defined(ohos_lite)) {
+  shared_library("dhcp_manager_service") {
+    sources = local_base_sources
 
-  cflags_cc = [
-    "-std=c++17",
-    "-Wall",
-  ]
+    include_dirs = local_base_include_dirs
+    include_dirs += [
+      "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits",
+      "//third_party/bounds_checking_function/include",
+    ]
 
-  external_deps = [
-    "ability_base:want",
-    "bundle_framework:appexecfwk_base",
-    "common_event_service:cesfwk_innerkits",
-    "eventhandler:libeventhandler",
-    "hiviewdfx_hilog_native:libhilog",
-  ]
-  ldflags = [
-    "-fPIC",
-    "-Wl,-E",
-  ]
+    deps = [
+      "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
+      "//third_party/bounds_checking_function:libsec_shared",
+    ]
 
-  part_name = "dhcp"
-  subsystem_name = "communication"
+    defines = [
+      "_GNU_SOURCE",
+      "OHOS_ARCH_LITE",
+    ]
+    configs -= [ "//build/lite/config:language_cpp" ]
+    cflags_cc = [
+      "-fPIC",
+      "-std=c++17",
+      "-Wall",
+    ]
+    ldflags = [
+      "-fPIC",
+      "-Wl,-E",
+    ]
+  }
+} else {
+  ohos_shared_library("dhcp_manager_service") {
+    install_enable = true
+    sources = local_base_sources
+
+    include_dirs = local_base_include_dirs
+    include_dirs += [
+      "//utils/native/base/include",
+      "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
+    ]
+
+    deps = [ "//utils/native/base:utils" ]
+
+    cflags_cc = [
+      "-std=c++17",
+      "-Wall",
+    ]
+
+    external_deps = [
+      "ability_base:want",
+      "bundle_framework:appexecfwk_base",
+      "common_event_service:cesfwk_innerkits",
+      "eventhandler:libeventhandler",
+      "hiviewdfx_hilog_native:libhilog",
+    ]
+    ldflags = [
+      "-fPIC",
+      "-Wl,-E",
+    ]
+
+    part_name = "dhcp"
+    subsystem_name = "communication"
+  }
 }

@@ -46,6 +46,28 @@ public:
 
     bool GetIpAddr(const std::string& ifName, std::string& ipAddr);
 
+#ifdef OHOS_ARCH_LITE
+    /**
+     * @Description : Set the If Addr object
+     *
+     * @param dhcpInfo - dhcp information[in]
+     * @param ipType - ip type[in]
+     * @return int
+     */
+    int SetIfDnsAndRoute(const DhcpResult &dhcpInfo, int ipType);
+
+    void SetNetDns(const std::string &ifName, const std::string &dns1, const std::string &dns2);
+
+    void AddIfRoute(const std::string &ifName, const std::string &ipAddr, const std::string &mask,
+        const std::string &gateWay, const int &ipType);
+
+    void AddIpv4Route(
+        const std::string &ifName, const std::string &ipAddr, const std::string &mask, const std::string &gateWay);
+
+    void AddIpv6Route(
+        const std::string &ifName, const std::string &ipAddr, const std::string &mask, const std::string &gateWay);
+#endif
+
 private:
     /**
      * @Description : Use synchronous mode to execute the command, the current thread will be blocked

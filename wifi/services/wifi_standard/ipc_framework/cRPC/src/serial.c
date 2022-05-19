@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -15,7 +15,11 @@
 #include <inttypes.h>
 #include "serial.h"
 
+#ifdef OHOS_ARCH_LITE
+#define TMP_CHAR_LEN 64
+#else
 const int TMP_CHAR_LEN = 64;
+#endif
 const int HIGH_TWO_BIT = 16;
 const int ALPHA_NUM_MAX = 10;
 

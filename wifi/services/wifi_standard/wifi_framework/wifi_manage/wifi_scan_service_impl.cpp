@@ -14,13 +14,19 @@
  */
 
 #include "wifi_scan_service_impl.h"
+#ifndef OHOS_ARCH_LITE
 #include <file_ex.h>
+#endif
 #include "define.h"
 #include "permission_def.h"
 #include "wifi_auth_center.h"
 #include "wifi_config_center.h"
 #include "wifi_dumper.h"
+#ifdef OHOS_ARCH_LITE
+#include "wifi_internal_event_dispatcher_lite.h"
+#else
 #include "wifi_internal_event_dispatcher.h"
+#endif
 #include "wifi_internal_msg.h"
 #include "wifi_logger.h"
 #include "wifi_manager.h"
@@ -33,14 +39,23 @@ DEFINE_WIFILOG_SCAN_LABEL("WifiScanServiceImpl");
 namespace OHOS {
 namespace Wifi {
 std::mutex WifiScanServiceImpl::g_instanceLock;
+#ifdef OHOS_ARCH_LITE
+std::shared_ptr<WifiScanServiceImpl> WifiScanServiceImpl::g_instance;
+std::shared_ptr<WifiScanServiceImpl> WifiScanServiceImpl::GetInstance()
+#else
 sptr<WifiScanServiceImpl> WifiScanServiceImpl::g_instance;
 const bool REGISTER_RESULT = SystemAbility::MakeAndRegisterAbility(WifiScanServiceImpl::GetInstance().GetRefPtr());
 sptr<WifiScanServiceImpl> WifiScanServiceImpl::GetInstance()
+#endif
 {
     if (g_instance == nullptr) {
         std::lock_guard<std::mutex> autoLock(g_instanceLock);
         if (g_instance == nullptr) {
+#ifdef OHOS_ARCH_LITE
+            auto service = std::make_shared<WifiScanServiceImpl>();
+#else
             auto service = new (std::nothrow) WifiScanServiceImpl;
+#endif
             g_instance = service;
         }
     }
@@ -48,7 +63,11 @@ sptr<WifiScanServiceImpl> WifiScanServiceImpl::GetInstance()
 }
 
 WifiScanServiceImpl::WifiScanServiceImpl()
+#ifdef OHOS_ARCH_LITE
+    : mPublishFlag(false), mState(ServiceRunningState::STATE_NOT_START)
+#else
     : SystemAbility(WIFI_SCAN_ABILITY_ID, true), mPublishFlag(false), mState(ServiceRunningState::STATE_NOT_START)
+#endif
 {}
 
 WifiScanServiceImpl::~WifiScanServiceImpl()
@@ -80,7 +99,11 @@ void WifiScanServiceImpl::OnStop()
 bool WifiScanServiceImpl::Init()
 {
     if (!mPublishFlag) {
+#ifdef OHOS_ARCH_LITE
+        bool ret = true;
+#else
         bool ret = Publish(WifiScanServiceImpl::GetInstance());
+#endif
         if (!ret) {
             WIFI_LOGE("Failed to publish scan service!");
             return false;
@@ -204,7 +227,11 @@ ErrCode WifiScanServiceImpl::GetScanInfoList(std::vector<WifiScanInfo> &result)
     return WIFI_OPT_SUCCESS;
 }
 
+#ifdef OHOS_ARCH_LITE
+ErrCode WifiScanServiceImpl::RegisterCallBack(const std::shared_ptr<IWifiScanCallback> &callback)
+#else
 ErrCode WifiScanServiceImpl::RegisterCallBack(const sptr<IWifiScanCallback> &callback)
+#endif
 {
     WIFI_LOGI("WifiScanServiceImpl::RegisterCallBack!");
     WifiInternalEventDispatcher::GetInstance().SetSingleScanCallback(callback);
@@ -244,6 +271,7 @@ void WifiScanServiceImpl::SaBasicDump(std::string& result)
     result += strRunning + "\n";
 }
 
+#ifndef OHOS_ARCH_LITE
 int32_t WifiScanServiceImpl::Dump(int32_t fd, const std::vector<std::u16string>& args)
 {
     std::vector<std::string> vecArgs;
@@ -260,5 +288,6 @@ int32_t WifiScanServiceImpl::Dump(int32_t fd, const std::vector<std::u16string>&
     }
     return ERR_OK;
 }
+#endif
 }  // namespace Wifi
 }  // namespace OHOS

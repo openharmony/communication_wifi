@@ -84,7 +84,7 @@ static int IpcCallback(void *owner, int code, IpcIo *reply)
     struct IpcOwner *data = (struct IpcOwner *)owner;
     data->exception = IpcIoPopInt32(reply);
     data->retCode = IpcIoPopInt32(reply);
-    if (data->exception != 0 || data->retCode != WIFI_OPT_SUCCESS) {
+    if (data->exception != 0 || data->retCode != WIFI_OPT_SUCCESS || data->variable == nullptr) {
         return LITEIPC_OK;
     }
 
@@ -187,7 +187,7 @@ ErrCode WifiScanProxy::Init(void)
 ErrCode WifiScanProxy::SetScanControlInfo(const ScanControlInfo &info)
 {
     if (remoteDied_ || remote_ == nullptr) {
-        WIFI_LOGD("failed to %{public}s, remoteDied_: %{public}d, remote_: %{public}d",
+        WIFI_LOGE("failed to %{public}s, remoteDied_: %{public}d, remote_: %{public}d",
             __func__, remoteDied_, remote_ == nullptr);
         return WIFI_OPT_FAILED;
     }
@@ -232,7 +232,7 @@ ErrCode WifiScanProxy::SetScanControlInfo(const ScanControlInfo &info)
 ErrCode WifiScanProxy::Scan()
 {
     if (remoteDied_ || remote_ == nullptr) {
-        WIFI_LOGD("failed to %{public}s, remoteDied_: %{public}d, remote_: %{public}d",
+        WIFI_LOGE("failed to %{public}s, remoteDied_: %{public}d, remote_: %{public}d",
             __func__, remoteDied_, remote_ == nullptr);
         return WIFI_OPT_FAILED;
     }
@@ -260,7 +260,7 @@ ErrCode WifiScanProxy::Scan()
 ErrCode WifiScanProxy::AdvanceScan(const WifiScanParams &params)
 {
     if (remoteDied_ || remote_ == nullptr) {
-        WIFI_LOGD("failed to %{public}s, remoteDied_: %{public}d, remote_: %{public}d",
+        WIFI_LOGE("failed to %{public}s, remoteDied_: %{public}d, remote_: %{public}d",
             __func__, remoteDied_, remote_ == nullptr);
         return WIFI_OPT_FAILED;
     }
@@ -296,7 +296,7 @@ ErrCode WifiScanProxy::AdvanceScan(const WifiScanParams &params)
 ErrCode WifiScanProxy::IsWifiClosedScan(bool &bOpen)
 {
     if (remoteDied_ || remote_ == nullptr) {
-        WIFI_LOGD("failed to %{public}s, remoteDied_: %{public}d, remote_: %{public}d",
+        WIFI_LOGE("failed to %{public}s, remoteDied_: %{public}d, remote_: %{public}d",
             __func__, remoteDied_, remote_ == nullptr);
         return WIFI_OPT_FAILED;
     }
@@ -324,7 +324,7 @@ ErrCode WifiScanProxy::IsWifiClosedScan(bool &bOpen)
 ErrCode WifiScanProxy::GetScanInfoList(std::vector<WifiScanInfo> &result)
 {
     if (remoteDied_ || remote_ == nullptr) {
-        WIFI_LOGD("failed to %{public}s, remoteDied_: %{public}d, remote_: %{public}d",
+        WIFI_LOGE("failed to %{public}s, remoteDied_: %{public}d, remote_: %{public}d",
             __func__, remoteDied_, remote_ == nullptr);
         return WIFI_OPT_FAILED;
     }
@@ -352,7 +352,7 @@ ErrCode WifiScanProxy::GetScanInfoList(std::vector<WifiScanInfo> &result)
 ErrCode WifiScanProxy::RegisterCallBack(const std::shared_ptr<IWifiScanCallback> &callback)
 {
     if (remoteDied_ || remote_ == nullptr) {
-        WIFI_LOGD("failed to %{public}s, remoteDied_: %{public}d, remote_: %{public}d",
+        WIFI_LOGE("failed to %{public}s, remoteDied_: %{public}d, remote_: %{public}d",
             __func__, remoteDied_, remote_ == nullptr);
         return WIFI_OPT_FAILED;
     }
@@ -385,7 +385,7 @@ ErrCode WifiScanProxy::RegisterCallBack(const std::shared_ptr<IWifiScanCallback>
 ErrCode WifiScanProxy::GetSupportedFeatures(long &features)
 {
     if (remoteDied_ || remote_ == nullptr) {
-        WIFI_LOGD("failed to %{public}s, remoteDied_: %{public}d, remote_: %{public}d",
+        WIFI_LOGE("failed to %{public}s, remoteDied_: %{public}d, remote_: %{public}d",
             __func__, remoteDied_, remote_ == nullptr);
         return WIFI_OPT_FAILED;
     }

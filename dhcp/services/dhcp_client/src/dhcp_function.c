@@ -277,19 +277,23 @@ int SetIpOrMask(const char *ifname, int fd, uint32_t netAddr, unsigned long cmd)
     struct ifreq ifr;
     struct sockaddr_in sin;
     if (memset_s(&ifr, sizeof(struct ifreq), 0, sizeof(struct ifreq)) != EOK) {
+        LOGE("SetIpOrMask() failed, memset_s ifr error!");
         return DHCP_OPT_FAILED;
     }
 
     if (strncpy_s(ifr.ifr_name, sizeof(ifr.ifr_name), ifname, strlen(ifname)) != EOK) {
+        LOGE("SetIpOrMask() %{public}s failed, , strncpy_s ifr.ifr_name error!", ifname);
         return DHCP_OPT_FAILED;
     }
 
     if (memset_s(&sin, sizeof(struct sockaddr_in), 0, sizeof(struct sockaddr_in)) != EOK) {
+        LOGE("SetIpOrMask() failed, memset_s sin error!");
         return DHCP_OPT_FAILED;
     }
     sin.sin_family = AF_INET;
     sin.sin_addr.s_addr = netAddr;
     if (memcpy_s(&ifr.ifr_addr, sizeof(ifr.ifr_addr), &sin, sizeof(struct sockaddr)) != EOK) {
+        LOGE("SetIpOrMask() failed, memcpy_s ifr.ifr_addr error!");
         return DHCP_OPT_FAILED;
     }
 
@@ -308,8 +312,8 @@ int SetLocalInterface(const char *ifname, uint32_t ipAddr, uint32_t netMask)
     }
     LOGI("SetLocalInterface() %{public}s, ipAddr:%{private}u mask %{private}u.", ifname, ipAddr, netMask);
 
-    int fd;
-    if ((fd = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
+    int fd = socket(AF_INET, SOCK_DGRAM, 0);
+    if (fd < 0) {
         LOGE("SetLocalInterface() ifname:%{public}s failed, socket error:%{public}d!", ifname, errno);
         return DHCP_OPT_FAILED;
     }

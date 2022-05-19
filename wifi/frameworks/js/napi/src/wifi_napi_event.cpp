@@ -517,10 +517,6 @@ bool EventRegister::IsEventSupport(const std::string& type)
 
 int EventRegister::CheckPermission(const std::string& eventType)
 {
-#ifdef OHOS_ARCH_LITE
-    /* NO permission check for L1 */
-    return WIFI_NAPI_PERMISSION_GRANTED;
-#else
     auto callerToken = IPCSkeleton::GetCallingTokenID();
     auto tokenType = Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(callerToken);
     WIFI_LOGD("Enter CheckPermission, callerToken=%{public}x, tokenType=%{public}x, eventType=%{public}s!",
@@ -565,7 +561,6 @@ int EventRegister::CheckPermission(const std::string& eventType)
     }
 
     return ((hasPermission == 1) ? WIFI_NAPI_PERMISSION_GRANTED : WIFI_NAPI_PERMISSION_DENIED);
-#endif
 }
 
 void EventRegister::Register(const napi_env& env, const std::string& type, napi_value handler)

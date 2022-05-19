@@ -96,6 +96,7 @@ std::string Number2Ip(int intIp);
  */
 std::vector<std::string> StrSplit(const std::string& str, const std::string& delim);
 
+#ifndef OHOS_ARCH_LITE
 /**
  * @Description get bundle name, it can only be obtained at the interfaces layer.
  *
@@ -109,6 +110,7 @@ std::string GetBundleName();
  * @return bool - Returns true for yes, false for no.
  */
 bool IsSystemApp();
+#endif
 }  // namespace Wifi
 }  // namespace OHOS
 #endif

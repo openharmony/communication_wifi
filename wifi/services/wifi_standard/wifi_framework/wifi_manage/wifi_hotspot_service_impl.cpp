@@ -248,9 +248,15 @@ ErrCode WifiHotspotServiceImpl::DisassociateSta(const StationInfo &info)
     return pService->DisconnetStation(info);
 }
 
-ErrCode WifiHotspotServiceImpl::CheckCanEnableHotspot(void)
+int WifiHotspotServiceImpl::CheckOperHotspotSwitchPermission(const ServiceType type)
 {
-    if (WifiPermissionUtils::VerifyManageWifiHotspotPermission() == PERMISSION_DENIED) {
+    return (type == ServiceType::WIFI_EXT) ? PERMISSION_GRANTED :
+        WifiPermissionUtils::VerifyManageWifiHotspotPermission();
+}
+
+ErrCode WifiHotspotServiceImpl::CheckCanEnableHotspot(const ServiceType type)
+{
+    if (CheckOperHotspotSwitchPermission(type) == PERMISSION_DENIED) {
         WIFI_LOGE("EnableHotspot:VerifyManageWifiHotspotPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
@@ -266,10 +272,10 @@ ErrCode WifiHotspotServiceImpl::CheckCanEnableHotspot(void)
     return WIFI_OPT_SUCCESS;
 }
 
-ErrCode WifiHotspotServiceImpl::EnableHotspot(void)
+ErrCode WifiHotspotServiceImpl::EnableHotspot(const ServiceType type)
 {
     WIFI_LOGI("EnableHotspot");
-    ErrCode errCode = CheckCanEnableHotspot();
+    ErrCode errCode = CheckCanEnableHotspot(type);
     if (errCode != WIFI_OPT_SUCCESS) {
         return errCode;
     }
@@ -316,11 +322,11 @@ ErrCode WifiHotspotServiceImpl::EnableHotspot(void)
     return errCode;
 }
 
-ErrCode WifiHotspotServiceImpl::DisableHotspot(void)
+ErrCode WifiHotspotServiceImpl::DisableHotspot(const ServiceType type)
 {
     WIFI_LOGI("DisableHotspot");
-    if (WifiPermissionUtils::VerifyManageWifiHotspotPermission() == PERMISSION_DENIED) {
-        WIFI_LOGE("DisableHotspot:VerifyManageWifiHotspotPermission PERMISSION_DENIED!");
+    if (CheckOperHotspotSwitchPermission(type) == PERMISSION_DENIED) {
+        WIFI_LOGE("EnableHotspot:VerifyManageWifiHotspotPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
 
@@ -496,6 +502,55 @@ ErrCode WifiHotspotServiceImpl::GetSupportedFeatures(long &features)
         WIFI_LOGE("Failed to get supported features!");
         return WIFI_OPT_FAILED;
     }
+    return WIFI_OPT_SUCCESS;
+}
+
+ErrCode WifiHotspotServiceImpl::GetSupportedPowerModel(std::set<PowerModel>& setPowerModelList)
+{
+    if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("GetSupportedPowerModel:VerifyGetWifiInfoPermission() PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+
+    if (!IsApServiceRunning()) {
+        return WIFI_OPT_AP_NOT_OPENED;
+    }
+    IApService *pService = WifiServiceManager::GetInstance().GetApServiceInst();
+    if (pService == nullptr) {
+        return WIFI_OPT_AP_NOT_OPENED;
+    }
+    pService->GetSupportedPowerModel(setPowerModelList);
+    return WIFI_OPT_SUCCESS;
+}
+
+ErrCode WifiHotspotServiceImpl::GetPowerModel(PowerModel& model)
+{
+    if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("GetPowerModel:VerifyGetWifiInfoPermission() PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+
+    if (!IsApServiceRunning()) {
+        return WIFI_OPT_AP_NOT_OPENED;
+    }
+    IApService *pService = WifiServiceManager::GetInstance().GetApServiceInst();
+    if (pService == nullptr) {
+        return WIFI_OPT_AP_NOT_OPENED;
+    }
+    pService->GetPowerModel(model);
+    return WIFI_OPT_SUCCESS;
+}
+
+ErrCode WifiHotspotServiceImpl::SetPowerModel(const PowerModel& model)
+{
+    if (!IsApServiceRunning()) {
+        return WIFI_OPT_AP_NOT_OPENED;
+    }
+    IApService *pService = WifiServiceManager::GetInstance().GetApServiceInst();
+    if (pService == nullptr) {
+        return WIFI_OPT_AP_NOT_OPENED;
+    }
+    pService->SetPowerModel(model);
     return WIFI_OPT_SUCCESS;
 }
 

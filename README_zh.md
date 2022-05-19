@@ -214,7 +214,7 @@ import wf from '@ohos.wifi'; // 导入js接口类
 
 ## 相关仓<a name="section1371113476307"></a>
 
-分布式软总线子系统
+[分布式软总线子系统](https://gitee.com/openharmony/docs/blob/master/zh-cn/readme/%E5%88%86%E5%B8%83%E5%BC%8F%E8%BD%AF%E6%80%BB%E7%BA%BF%E5%AD%90%E7%B3%BB%E7%BB%9F.md)
 
-communication\_wifi
+**communication\_wifi**
 

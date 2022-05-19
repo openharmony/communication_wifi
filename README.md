@@ -216,5 +216,7 @@ Set up a WLAN connection.
 
 ## Repositories Involved<a name="section1371113476307"></a>
 
-communication\_wifi
+[DSoftBus](https://gitee.com/openharmony/docs/blob/master/en/readme/dsoftbus.md)
+
+**communication\_wifi**
 

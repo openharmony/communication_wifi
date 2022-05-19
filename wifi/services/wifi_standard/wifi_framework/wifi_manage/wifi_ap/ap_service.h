@@ -117,6 +117,30 @@ public:
      */
     ErrCode RegisterApServiceCallbacks(const IApServiceCallbacks &callbacks);
 
+    /**
+     * @Description Get supported power model list
+     *
+     * @param setPowerModelList - supported power model list
+     * @return ErrCode - operation result
+     */
+    ErrCode GetSupportedPowerModel(std::set<PowerModel>& setPowerModelList);
+
+    /**
+     * @Description Get power model
+     *
+     * @param model - current power model
+     * @return ErrCode - operation result
+     */
+    ErrCode GetPowerModel(PowerModel& model);
+
+    /**
+     * @Description Get supported power model list
+     *
+     * @param model - the model to be set
+     * @return ErrCode - operation result
+     */
+    ErrCode SetPowerModel(const PowerModel& model);
+
 private:
     ApStateMachine &m_ApStateMachine;
 };

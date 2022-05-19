@@ -517,6 +517,22 @@ public:
     int ClearValidChannels();
 
     /**
+     * @Description Get supported power model list
+     *
+     * @param model - the model to be set
+     * @return ErrCode - operation result
+     */
+    int SetPowerModel(const PowerModel& model);
+
+    /**
+     * @Description Get power model
+     *
+     * @param model - current power model
+     * @return ErrCode - operation result
+     */
+    int GetPowerModel(PowerModel& model);
+
+    /**
      * @Description set the p2p state
      *
      * @param state - the p2p state
@@ -1049,6 +1065,7 @@ private:
     int mNoChargerPlugModeState;  /* 1 on 2 off */
     WifiConfig mWifiConfig;
     std::pair<std::string, int> mBssidToTimeoutTime;
+    PowerModel powerModel = PowerModel::GENERAL;
 
     std::mutex mStaMutex;
     std::mutex mApMutex;

@@ -133,6 +133,21 @@ WifiErrorNo DisconnectStaByMac(const char *mac);
  */
 WifiErrorNo RegisterAsscociatedEvent(IWifiApEventCallback callback);
 
+/**
+ * @Description Get supported power model list
+ *
+ * @param model - the model to be set
+ * @return ErrCode - operation result
+ */
+WifiErrorNo WpaSetPowerModel(const int model);
+
+/**
+ * @Description Get power model
+ *
+ * @param model - current power model
+ * @return ErrCode - operation result
+ */
+WifiErrorNo WpaGetPowerModel(int* model);
 #ifdef __cplusplus
 }
 #endif

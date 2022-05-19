@@ -132,6 +132,22 @@ public:
      */
     const IWifiApMonitorEventCallback &GetApCallbackInst(void) const;
 
+    /**
+     * @Description Get power mode.
+     *
+     * @param model
+     * @return WifiErrorNo
+     */
+    WifiErrorNo GetPowerModel(int& model) const;
+
+    /**
+     * @Description Set power mode.
+     *
+     * @param model
+     * @return WifiErrorNo
+     */
+    WifiErrorNo SetPowerModel(const int& model) const;
+
 private:
     IWifiApMonitorEventCallback mApCallback;
 };

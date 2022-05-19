@@ -28,7 +28,7 @@ const std::string P2P_INTERFACE("wlan0");
 const std::string P2P_INTERFACE("p2p0");
 #endif
 /* The timeout interval of enable p2p */
-constexpr long ENABLE_P2P_TIMED_OUT__INTERVAL = 5000;
+constexpr long ENABLE_P2P_TIMED_OUT__INTERVAL = 15000;
 /* The time of clears service requests processed in records. */
 constexpr long REMOVE_SERVICE_REQUEST_RECORD = 3000;
 

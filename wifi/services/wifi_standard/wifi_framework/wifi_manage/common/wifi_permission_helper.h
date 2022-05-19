@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -169,6 +169,15 @@ public:
      * @return int
      */
     static int VerifyGetWifiInfoInternalPermission(const int &pid, const int &uid);
+
+    /**
+     * @Description : Verify manage wifi hotspot extend permission.
+     *
+     * @param pid - Process ID.[in]
+     * @param uid - User ID.[in]
+     * @return int
+     */
+    static int VerifyManageWifiHotspotExtPermission(const int &pid, const int &uid);
 };
 }  // namespace Wifi
 }  // namespace OHOS

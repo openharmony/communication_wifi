@@ -40,7 +40,7 @@ ohos_shared_library("wifi_ap_service") {
     "$WIFI_ROOT_DIR/services/wifi_standard/ipc_framework/interface",
     "//utils/native/base/include",
     "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
-    "$WIFI_ROOT_DIR/interfaces/innerkits/native_cpp/wifi_standard/interfaces",
+    "$WIFI_ROOT_DIR/frameworks/native/interfaces",
     "$WIFI_ROOT_DIR/services/wifi_standard/ipc_framework/cRPC/include",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/common/include",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/common/net_helper",
@@ -54,8 +54,8 @@ ohos_shared_library("wifi_ap_service") {
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/idl_client",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/idl_client/idl_interface",
     "$DHCP_ROOT_DIR/services/mgr_service/include",
-    "$DHCP_ROOT_DIR/interfaces/innerkits/native_cpp/include",
-    "$DHCP_ROOT_DIR/interfaces/innerkits/native_cpp/interfaces",
+    "$DHCP_ROOT_DIR/interfaces/inner_api/include",
+    "$DHCP_ROOT_DIR/interfaces/inner_api/interfaces",
     "$WIFI_ROOT_DIR/utils/inc",
   ]
 

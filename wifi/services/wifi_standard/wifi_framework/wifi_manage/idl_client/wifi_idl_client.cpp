@@ -827,6 +827,18 @@ WifiErrorNo WifiIdlClient::ReqDisconnectStaByMac(const std::string &mac)
     return DisassociateSta((unsigned char *)mac.c_str(), strlen(mac.c_str()));
 }
 
+WifiErrorNo WifiIdlClient::ReqGetPowerModel(int& model)
+{
+    CHECK_CLIENT_NOT_NULL;
+    return WpaGetPowerModel(&model);
+}
+
+WifiErrorNo WifiIdlClient::ReqSetPowerModel(const int& model)
+{
+    CHECK_CLIENT_NOT_NULL;
+    return WpaSetPowerModel(model);
+}
+
 WifiErrorNo WifiIdlClient::GetWifiChipObject(int id, IWifiChip &chip)
 {
     CHECK_CLIENT_NOT_NULL;

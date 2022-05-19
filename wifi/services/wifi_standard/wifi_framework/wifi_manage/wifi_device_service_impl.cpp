@@ -16,12 +16,18 @@
 #include "wifi_device_service_impl.h"
 #include <algorithm>
 #include <unistd.h>
+#ifndef OHOS_ARCH_LITE
 #include <file_ex.h>
+#endif
 #include "wifi_permission_utils.h"
 #include "wifi_internal_msg.h"
 #include "wifi_auth_center.h"
 #include "wifi_config_center.h"
+#ifdef OHOS_ARCH_LITE
+#include "wifi_internal_event_dispatcher_lite.h"
+#else
 #include "wifi_internal_event_dispatcher.h"
+#endif
 #include "wifi_manager.h"
 #include "wifi_service_manager.h"
 #include "wifi_protect_manager.h"
@@ -35,15 +41,24 @@ DEFINE_WIFILOG_LABEL("WifiDeviceServiceImpl");
 namespace OHOS {
 namespace Wifi {
 std::mutex WifiDeviceServiceImpl::g_instanceLock;
+#ifdef OHOS_ARCH_LITE
+std::shared_ptr<WifiDeviceServiceImpl> WifiDeviceServiceImpl::g_instance;
+std::shared_ptr<WifiDeviceServiceImpl> WifiDeviceServiceImpl::GetInstance()
+#else
 sptr<WifiDeviceServiceImpl> WifiDeviceServiceImpl::g_instance;
 const bool REGISTER_RESULT = SystemAbility::MakeAndRegisterAbility(WifiDeviceServiceImpl::GetInstance().GetRefPtr());
 
 sptr<WifiDeviceServiceImpl> WifiDeviceServiceImpl::GetInstance()
+#endif
 {
     if (g_instance == nullptr) {
         std::lock_guard<std::mutex> autoLock(g_instanceLock);
         if (g_instance == nullptr) {
+#ifdef OHOS_ARCH_LITE
+            auto service = std::make_shared<WifiDeviceServiceImpl>();
+#else
             auto service = new (std::nothrow) WifiDeviceServiceImpl;
+#endif
             g_instance = service;
         }
     }
@@ -51,7 +66,12 @@ sptr<WifiDeviceServiceImpl> WifiDeviceServiceImpl::GetInstance()
 }
 
 WifiDeviceServiceImpl::WifiDeviceServiceImpl()
+#ifdef OHOS_ARCH_LITE
+    : mPublishFlag(false), mState(ServiceRunningState::STATE_NOT_START)
+
+#else
     : SystemAbility(WIFI_DEVICE_ABILITY_ID, true), mPublishFlag(false), mState(ServiceRunningState::STATE_NOT_START)
+#endif
 {}
 
 WifiDeviceServiceImpl::~WifiDeviceServiceImpl()
@@ -83,7 +103,11 @@ void WifiDeviceServiceImpl::OnStop()
 bool WifiDeviceServiceImpl::Init()
 {
     if (!mPublishFlag) {
+#ifdef OHOS_ARCH_LITE
+        bool ret = true;
+#else
         bool ret = Publish(WifiDeviceServiceImpl::GetInstance());
+#endif
         if (!ret) {
             WIFI_LOGE("Failed to publish sta service!");
             return false;
@@ -110,7 +134,7 @@ ErrCode WifiDeviceServiceImpl::EnableWifi()
         }
     }
 
-#ifdef WIFI_SUPPORT_P2P
+#ifdef FEATURE_P2P_SUPPORT
     sptr<WifiP2pServiceImpl> p2pService = WifiP2pServiceImpl::GetInstance();
     if (p2pService != nullptr && p2pService->EnableP2p() != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("Enable P2p failed!");
@@ -177,7 +201,7 @@ ErrCode WifiDeviceServiceImpl::DisableWifi()
         }
     }
 
-#ifdef WIFI_SUPPORT_P2P
+#ifdef FEATURE_P2P_SUPPORT
     sptr<WifiP2pServiceImpl> p2pService = WifiP2pServiceImpl::GetInstance();
     if (p2pService != nullptr && p2pService->DisableP2p() != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("Disable P2p failed!");
@@ -704,7 +728,11 @@ ErrCode WifiDeviceServiceImpl::GetCountryCode(std::string &countryCode)
     return WIFI_OPT_SUCCESS;
 }
 
+#ifdef OHOS_ARCH_LITE
+ErrCode WifiDeviceServiceImpl::RegisterCallBack(const std::shared_ptr<IWifiDeviceCallBack> &callback)
+#else
 ErrCode WifiDeviceServiceImpl::RegisterCallBack(const sptr<IWifiDeviceCallBack> &callback)
+#endif
 {
     WIFI_LOGI("RegisterCallBack");
     if (callback == nullptr) {
@@ -887,6 +915,7 @@ void WifiDeviceServiceImpl::SaBasicDump(std::string& result)
     result += "\n";
 }
 
+#ifndef OHOS_ARCH_LITE
 int32_t WifiDeviceServiceImpl::Dump(int32_t fd, const std::vector<std::u16string>& args)
 {
     std::vector<std::string> vecArgs;
@@ -903,5 +932,6 @@ int32_t WifiDeviceServiceImpl::Dump(int32_t fd, const std::vector<std::u16string
     }
     return ERR_OK;
 }
+#endif
 }  // namespace Wifi
 }  // namespace OHOS

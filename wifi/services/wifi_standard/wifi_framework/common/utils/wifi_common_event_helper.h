@@ -17,7 +17,9 @@
 #define OHOS_WIFI_COMMON_EVENT_HELPER_H
 
 #include <string>
+#ifndef OHOS_ARCH_LITE
 #include "common_event_subscriber.h"
+#endif
 
 namespace OHOS {
 namespace Wifi {

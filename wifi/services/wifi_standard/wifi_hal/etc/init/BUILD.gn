@@ -11,44 +11,57 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build/ohos.gni")
+if (defined(ohos_lite)) {
+  import("//build/lite/config/component/lite_component.gni")
+} else {
+  import("//build/ohos.gni")
+}
 
 group("etc") {
-  deps = [
-    ":hostapd.conf",
-    ":p2p_supplicant.conf",
-    ":wifi_hal_service.cfg",
-    ":wpa_supplicant.conf",
-  ]
-}
-
-ohos_prebuilt_etc("wifi_hal_service.cfg") {
-  source = "wifi_hal_service.cfg"
-  relative_install_dir = "init"
-  part_name = "wifi"
-  subsystem_name = "communication"
-}
-
-ohos_prebuilt_etc("wpa_supplicant.conf") {
-  source = "wpa_supplicant.conf"
-  relative_install_dir = "wifi"
-  part_name = "wifi"
-  subsystem_name = "communication"
-}
-
-ohos_prebuilt_etc("hostapd.conf") {
-  source = "hostapd.conf"
-  if (product_name == "rk3568") {
-    source = "default_conf/hostapd.conf"
+  deps = [ ":wpa_supplicant.conf" ]
+  if (!defined(ohos_lite)) {
+    deps += [
+      ":hostapd.conf",
+      ":p2p_supplicant.conf",
+      ":wifi_hal_service.cfg",
+    ]
   }
-  relative_install_dir = "wifi"
-  part_name = "wifi"
-  subsystem_name = "communication"
 }
 
-ohos_prebuilt_etc("p2p_supplicant.conf") {
-  source = "p2p_supplicant.conf"
-  relative_install_dir = "wifi"
-  part_name = "wifi"
-  subsystem_name = "communication"
+if (defined(ohos_lite)) {
+  copy("wpa_supplicant.conf") {
+    sources = [ "wpa_supplicant.conf" ]
+    outputs = [ "$root_out_dir/system/etc/wifi/wpa_supplicant.conf" ]
+  }
+} else {
+  ohos_prebuilt_etc("wifi_hal_service.cfg") {
+    source = "wifi_hal_service.cfg"
+    relative_install_dir = "init"
+    part_name = "wifi"
+    subsystem_name = "communication"
+  }
+
+  ohos_prebuilt_etc("wpa_supplicant.conf") {
+    source = "wpa_supplicant.conf"
+    relative_install_dir = "wifi"
+    part_name = "wifi"
+    subsystem_name = "communication"
+  }
+
+  ohos_prebuilt_etc("hostapd.conf") {
+    source = "hostapd.conf"
+    if (product_name == "rk3568") {
+      source = "default_conf/hostapd.conf"
+    }
+    relative_install_dir = "wifi"
+    part_name = "wifi"
+    subsystem_name = "communication"
+  }
+
+  ohos_prebuilt_etc("p2p_supplicant.conf") {
+    source = "p2p_supplicant.conf"
+    relative_install_dir = "wifi"
+    part_name = "wifi"
+    subsystem_name = "communication"
+  }
 }

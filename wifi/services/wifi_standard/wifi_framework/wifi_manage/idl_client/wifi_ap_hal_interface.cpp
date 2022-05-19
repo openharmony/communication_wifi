@@ -101,5 +101,15 @@ const IWifiApMonitorEventCallback &WifiApHalInterface::GetApCallbackInst(void) c
 {
     return mApCallback;
 }
+
+WifiErrorNo WifiApHalInterface::GetPowerModel(int& model) const
+{
+    return mIdlClient->ReqGetPowerModel(model);
+}
+
+WifiErrorNo WifiApHalInterface::SetPowerModel(const int& model) const
+{
+    return mIdlClient->ReqSetPowerModel(model);
+}
 }  // namespace Wifi
 }  // namespace OHOS

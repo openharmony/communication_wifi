@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -26,11 +26,12 @@
 
 #include "dhcp_define.h"
 
+#ifndef OHOS_ARCH_LITE
 #include "common_event_subscriber.h"
 #include "common_event.h"
 #include "common_event_data.h"
 #include "common_event_manager.h"
-
+#endif
 
 namespace OHOS {
 namespace Wifi {
@@ -62,13 +63,16 @@ public:
     static int CreateDirs(const std::string dirs, int mode = DIR_DEFAULT_MODE);
     static bool SplitString(
         const std::string src, const std::string delim, const int count, std::vector<std::string> &splits);
-
+#ifdef OHOS_ARCH_LITE
+    static int GetDhcpPacketResult(const std::string& filename, struct DhcpPacketResult &result);
+#else
     static bool SubscribeDhcpCommonEvent(
         const std::shared_ptr<OHOS::EventFwk::CommonEventSubscriber> &subscriber);
     static bool UnsubscribeDhcpCommonEvent(
         const std::shared_ptr<OHOS::EventFwk::CommonEventSubscriber> &subscriber);
 
     static bool PublishDhcpEvent(const std::string action, const int code, const std::string data);
+#endif
 };
 }  // namespace Wifi
 }  // namespace OHOS

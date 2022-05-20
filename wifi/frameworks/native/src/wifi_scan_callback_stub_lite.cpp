@@ -30,19 +30,19 @@ WifiScanCallbackStub::~WifiScanCallbackStub()
 
 int WifiScanCallbackStub::OnRemoteRequest(uint32_t code, IpcIo *data)
 {
+    int ret = WIFI_OPT_FAILED;
     WIFI_LOGD("OnRemoteRequest code:%{public}u!", code);
     if (mRemoteDied || data == nullptr) {
         WIFI_LOGD("Failed to %{public}s,mRemoteDied:%{public}d data:%{public}d!",
             __func__, mRemoteDied, data == nullptr);
-        return -1;
+        return ret;
     }
 
     int exception = IpcIoPopInt32(data);
     if (exception) {
         WIFI_LOGD("OnRemoteRequest exception! %{public}d!", exception);
-        return WIFI_OPT_FAILED;
+        return ret;
     }
-    int ret;
     switch (code) {
         case WIFI_CBK_CMD_SCAN_STATE_CHANGE: {
             WIFI_LOGD("OnRemoteRequest code:%{public}u", code);
@@ -50,7 +50,7 @@ int WifiScanCallbackStub::OnRemoteRequest(uint32_t code, IpcIo *data)
             break;
         }
         default: {
-            ret = -1;
+            ret = WIFI_OPT_FAILED;
         }
     }
     return ret;

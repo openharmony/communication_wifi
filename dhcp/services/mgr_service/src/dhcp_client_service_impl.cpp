@@ -396,8 +396,8 @@ void DhcpClientServiceImpl::DhcpPacketInfoHandle(
     } else {
         m_mapDhcpResult.emplace(std::make_pair(ifname, result));
     }
-    WIFI_LOGI("DhcpPacketInfoHandle %{public}s, type:%{public}d, opt:%{public}d, cli:%{public}s, server:%{public}s, "
-        "strSubnet:%{public}s, strDns1:%{public}s, strDns2:%{public}s, strRouter1:%{public}s, strRouter2:%{public}s, "
+    WIFI_LOGI("DhcpPacketInfoHandle %{public}s, type:%{public}d, opt:%{public}d, cli:%{private}s, server:%{private}s, "
+        "strSubnet:%{private}s, Dns1:%{private}s, Dns2:%{private}s, strRouter1:%{private}s, strRouter2:%{private}s, "
         "strVendor:%{public}s, uLeaseTime:%{public}u, uAddTime:%{public}u, uGetTime:%{public}u.",
         ifname.c_str(), result.iptype, result.isOptSuc, result.strYourCli.c_str(), result.strServer.c_str(),
         result.strSubnet.c_str(), result.strDns1.c_str(), result.strDns2.c_str(), result.strRouter1.c_str(),

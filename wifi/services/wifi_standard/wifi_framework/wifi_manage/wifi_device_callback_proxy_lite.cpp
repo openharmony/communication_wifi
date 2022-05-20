@@ -54,8 +54,9 @@ void WifiDeviceCallBackProxy::OnWifiConnectionChanged(int state, const WifiLinke
 {
     WIFI_LOGD("WifiDeviceCallBackProxy::OnWifiConnectionChanged");
     IpcIo data;
-    uint8_t buff[DEFAULT_IPC_SIZE];
-    IpcIoInit(&data, buff, DEFAULT_IPC_SIZE, 0);
+    constexpr int IPC_DATA_SIZE = 1024;
+    uint8_t buff[IPC_DATA_SIZE];
+    IpcIoInit(&data, buff, IPC_DATA_SIZE, 0);
     IpcIoPushInt32(&data, 0);
     IpcIoPushInt32(&data, state);
     IpcIoPushInt32(&data, info.networkId);

@@ -510,8 +510,7 @@ int DhcpFunc::GetDhcpPacketResult(const std::string& filename, struct DhcpPacket
     }
 
     if (fclose(pFile) != 0) {
-        WIFI_LOGE("GetDhcpPacketResult() fclose file:%{public}s failed, error:%{public}s!",
-            filename.c_str(), strerror(errno));
+        WIFI_LOGE("GetDhcpPacketResult() fclose file:%{public}s failed!", filename.c_str());
         return DHCP_OPT_FAILED;
     }
 

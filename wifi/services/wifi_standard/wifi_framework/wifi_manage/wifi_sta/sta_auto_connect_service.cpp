@@ -166,7 +166,8 @@ void StaAutoConnectService::ClearOvertimeBlockedBssid()
         BlockedBssidInfo status = iter->second;
         time_t now = time(0);
         int currentTimeStap = (int)now;
-        WIFI_LOGI("blockedFlag:%{public}d, currentTimeStap:%{public}d, blockedTime:%{public}d.\n");
+        WIFI_LOGI("blockedFlag:%{public}d, currentTimeStap:%{public}d, blockedTime:%{public}d.\n",
+            status.blockedFlag, currentTimeStap, status.blockedTime);
         if (status.blockedFlag && ((currentTimeStap - status.blockedTime) >= MAX_BSSID_BLOCKLIST_TIME)) {
             blockedBssidMap.erase(iter++);
             updated = true;

@@ -33,7 +33,7 @@ public:
     PowerModel powerModel;
 
     PowerModelAsyncContext(napi_env env, napi_async_work work = nullptr, napi_deferred deferred = nullptr)
-        : AsyncContext(env, work, deferred) {}
+        : AsyncContext(env, work, deferred), powerModel(PowerModel::GENERAL) {}
 
     PowerModelAsyncContext() = delete;
     ~PowerModelAsyncContext() override {}

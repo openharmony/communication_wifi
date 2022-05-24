@@ -345,7 +345,7 @@ void WifiHotspotStub::OnGetSupportedPowerModel(uint32_t code, MessageParcel &dat
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
     if (ret == WIFI_OPT_SUCCESS) {
-        int size = setPowerModelList.size();
+        int size = (int)setPowerModelList.size();
         reply.WriteInt32(size);
         for (auto &powerModel : setPowerModelList) {
             reply.WriteInt32(static_cast<int>(powerModel));

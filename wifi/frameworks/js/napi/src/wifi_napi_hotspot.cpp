@@ -110,7 +110,7 @@ static bool GetHotspotconfigFromJs(const napi_env& env, const napi_value& object
     value = 0;
     JsObjectToInt(env, object, "band", value);
     config.SetBand(BandType(value)); // 1: 2.4G, 2: 5G
-    if (config.GetBand() == BAND_5GHZ) {
+    if (config.GetBand() == BandType::BAND_5GHZ) {
         config.SetChannel(AP_CHANNEL_5G_DEFAULT);
     }
     value = 0;

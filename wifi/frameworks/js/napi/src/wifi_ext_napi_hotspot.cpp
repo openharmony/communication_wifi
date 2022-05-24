@@ -78,7 +78,7 @@ napi_value GetSupportedPowerModel(napi_env env, napi_callback_info info)
     void *data = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, &data));
 
-    PowerModelListAsyncContext *asyncContext = new PowerModelListAsyncContext(env);
+    PowerModelListAsyncContext *asyncContext = new (std::nothrow) PowerModelListAsyncContext(env);
     NAPI_ASSERT(env, asyncContext != nullptr, "asyncContext is null.");
     napi_create_string_latin1(env, "getSupportedPowerModel", NAPI_AUTO_LENGTH, &asyncContext->resourceName);
 
@@ -113,7 +113,7 @@ napi_value GetPowerModel(napi_env env, napi_callback_info info)
     void *data = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, &data));
 
-    PowerModelAsyncContext *asyncContext = new PowerModelAsyncContext(env);
+    PowerModelAsyncContext *asyncContext = new (std::nothrow) PowerModelAsyncContext(env);
     NAPI_ASSERT(env, asyncContext != nullptr, "asyncContext is null.");
     napi_create_string_latin1(env, "getPowerModel", NAPI_AUTO_LENGTH, &asyncContext->resourceName);
 

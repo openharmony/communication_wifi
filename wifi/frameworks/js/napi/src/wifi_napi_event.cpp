@@ -19,6 +19,8 @@
 #include "wifi_device.h"
 #include "wifi_scan.h"
 #include "wifi_logger.h"
+#include "ipc_skeleton.h"
+#include "accesstoken_kit.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -53,6 +55,41 @@ static std::set<std::string> g_supportEventList = {
     EVENT_P2P_PERSISTENT_GROUP_CHANGE,
     EVENT_P2P_PEER_DEVICE_CHANGE,
     EVENT_P2P_DISCOVERY_CHANGE,
+};
+
+const std::string WIFI_PERMISSION_NULL = "ohos.permission.NULL";
+const std::string WIFI_PERMISSION_GET_WIFI_INFO = "ohos.permission.GET_WIFI_INFO";
+const std::string WIFI_PERMISSION_SET_WIFI_INFO = "ohos.permission.SET_WIFI_INFO";
+const std::string WIFI_PERMISSION_GET_WIFI_CONFIG = "ohos.permission.GET_WIFI_CONFIG";
+const std::string WIFI_PERMISSION_MANAGE_WIFI_CONNECTION = "ohos.permission.MANAGE_WIFI_CONNECTION";
+const std::string WIFI_PERMISSION_MANAGE_WIFI_HOTSPOT = "ohos.permission.MANAGE_WIFI_HOTSPOT";
+const std::string WIFI_PERMISSION_MANAGE_ENHANCER_WIFI = "ohos.permission.MANAGE_ENHANCER_WIFI";
+const std::string WIFI_PERMISSION_GET_WIFI_LOCAL_MAC = "ohos.permission.GET_WIFI_LOCAL_MAC";
+const std::string WIFI_PERMISSION_LOCATION = "ohos.permission.LOCATION";
+const std::string WIFI_PERMISSION_GET_P2P_DEVICE_LOCATION = "ohos.permission.GET_P2P_DEVICE_LOCATION";
+const std::string WIFI_PERMISSION_GET_WIFI_INFO_INTERNAL = "ohos.permission.GET_WIFI_INFO_INTERNAL";
+const int WIFI_NAPI_PERMISSION_DENIED = 0;
+const int WIFI_NAPI_PERMISSION_GRANTED = 1;
+
+std::multimap<std::string, std::string> g_EventPermissionMap = {
+    { EVENT_STA_POWER_STATE_CHANGE, WIFI_PERMISSION_GET_WIFI_INFO },
+    { EVENT_STA_CONN_STATE_CHANGE, WIFI_PERMISSION_GET_WIFI_INFO },
+    { EVENT_STA_SCAN_STATE_CHANGE, WIFI_PERMISSION_GET_WIFI_INFO },
+    { EVENT_STA_RSSI_STATE_CHANGE, WIFI_PERMISSION_GET_WIFI_INFO },
+    { EVENT_HOTSPOT_STATE_CHANGE, WIFI_PERMISSION_GET_WIFI_INFO },
+    { EVENT_HOTSPOT_STA_JOIN, WIFI_PERMISSION_MANAGE_WIFI_HOTSPOT },
+    { EVENT_HOTSPOT_STA_LEAVE, WIFI_PERMISSION_MANAGE_WIFI_HOTSPOT },
+    { EVENT_P2P_STATE_CHANGE, WIFI_PERMISSION_GET_WIFI_INFO },
+    { EVENT_P2P_CONN_STATE_CHANGE, WIFI_PERMISSION_GET_WIFI_INFO },
+    { EVENT_P2P_DEVICE_STATE_CHANGE, WIFI_PERMISSION_GET_WIFI_INFO },
+    { EVENT_P2P_DEVICE_STATE_CHANGE, WIFI_PERMISSION_LOCATION },
+    { EVENT_P2P_DEVICE_STATE_CHANGE, WIFI_PERMISSION_GET_WIFI_INFO_INTERNAL },
+    { EVENT_P2P_PERSISTENT_GROUP_CHANGE, WIFI_PERMISSION_GET_WIFI_INFO },
+    { EVENT_P2P_PEER_DEVICE_CHANGE, WIFI_PERMISSION_GET_WIFI_INFO },
+    { EVENT_P2P_PEER_DEVICE_CHANGE, WIFI_PERMISSION_LOCATION },
+    { EVENT_P2P_PEER_DEVICE_CHANGE, WIFI_PERMISSION_GET_WIFI_INFO_INTERNAL },
+    { EVENT_P2P_DISCOVERY_CHANGE, WIFI_PERMISSION_GET_WIFI_INFO },
+    { EVENT_STREAM_CHANGE, WIFI_PERMISSION_MANAGE_WIFI_CONNECTION },
 };
 
 void NapiEvent::EventNotify(AsyncEventData *asyncEvent)
@@ -478,11 +515,63 @@ bool EventRegister::IsEventSupport(const std::string& type)
     return g_supportEventList.find(type) != g_supportEventList.end();
 }
 
+int EventRegister::CheckPermission(const std::string& eventType)
+{
+    auto callerToken = IPCSkeleton::GetCallingTokenID();
+    auto tokenType = Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(callerToken);
+    WIFI_LOGD("Enter CheckPermission, callerToken=%{public}x, tokenType=%{public}x, eventType=%{public}s!",
+        callerToken, tokenType, eventType.c_str());
+    if (tokenType == Security::AccessToken::ATokenTypeEnum::TOKEN_NATIVE) {
+        return WIFI_NAPI_PERMISSION_GRANTED;
+    }
+
+    if (tokenType != Security::AccessToken::ATokenTypeEnum::TOKEN_HAP) {
+        WIFI_LOGE("Invalid tokenType=%{public}x, permission denied!", tokenType);
+        return WIFI_NAPI_PERMISSION_DENIED;
+    }
+
+    std::multimap<std::string, std::string> *permissions = &g_EventPermissionMap;
+    size_t count = permissions->count(eventType);
+    if (count <= 0) {
+        WIFI_LOGE("NO permission defined for tokenType=%{public}x !", tokenType);
+        return WIFI_NAPI_PERMISSION_DENIED;
+    }
+
+    std::string permissionName;
+    int hasPermission = 1;
+    std::multimap<std::string, std::string>::iterator it = permissions->find(eventType);
+    for (size_t i = 0; i < count; i++) {
+        permissionName = (*(it++)).second;
+        int res = Security::AccessToken::AccessTokenKit::VerifyAccessToken(callerToken, permissionName);
+        if (permissionName.compare(WIFI_PERMISSION_GET_WIFI_INFO_INTERNAL) == 0) {
+            if (res == Security::AccessToken::PermissionState::PERMISSION_GRANTED) {
+                return WIFI_NAPI_PERMISSION_GRANTED;
+            }
+            /* NO permission */
+            WIFI_LOGE("callerToken=0x%{public}x has no permission=%{public}s",
+                callerToken, permissionName.c_str());
+            return WIFI_NAPI_PERMISSION_DENIED;
+        }
+
+        if (res != Security::AccessToken::PermissionState::PERMISSION_GRANTED) {
+            WIFI_LOGW("callerToken=0x%{public}x has no permission=%{public}s",
+                callerToken, permissionName.c_str());
+            hasPermission = 0;
+        }
+    }
+
+    return ((hasPermission == 1) ? WIFI_NAPI_PERMISSION_GRANTED : WIFI_NAPI_PERMISSION_DENIED);
+}
+
 void EventRegister::Register(const napi_env& env, const std::string& type, napi_value handler)
 {
     WIFI_LOGI("Register event: %{public}s, env: %{private}p", type.c_str(), env);
     if (!IsEventSupport(type)) {
         WIFI_LOGE("Register type error or not support!");
+        return;
+    }
+    if (CheckPermission(type) != WIFI_NAPI_PERMISSION_GRANTED) {
+        WIFI_LOGE("Register fail for NO permission!");
         return;
     }
     std::unique_lock<std::shared_mutex> guard(g_regInfoMutex);
@@ -545,6 +634,10 @@ void EventRegister::Unregister(const napi_env& env, const std::string& type, nap
     WIFI_LOGI("Unregister event: %{public}s, env: %{private}p", type.c_str(), env);
     if (!IsEventSupport(type)) {
         WIFI_LOGE("Unregister type error or not support!");
+        return;
+    }
+    if (CheckPermission(type) != WIFI_NAPI_PERMISSION_GRANTED) {
+        WIFI_LOGE("Unregister fail for NO permission!");
         return;
     }
     std::unique_lock<std::shared_mutex> guard(g_regInfoMutex);

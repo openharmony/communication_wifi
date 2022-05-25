@@ -20,9 +20,7 @@ if (defined(ohos_lite)) {
 }
 
 group("wifi_kits") {
-  deps = [
-    "$WIFI_ROOT_DIR/frameworks/native:wifi_sdk",
-  ]
+  deps = [ "$WIFI_ROOT_DIR/frameworks/native:wifi_sdk" ]
   if (!defined(ohos_lite)) {
     deps += [
       "$WIFI_ROOT_DIR/frameworks/js/napi:wifi",

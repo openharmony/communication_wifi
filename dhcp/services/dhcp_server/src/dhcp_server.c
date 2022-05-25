@@ -495,8 +495,8 @@ static int ContinueReceive(PDhcpMsgInfo from, int recvRet)
 
 static int BeginLooper(PDhcpServerContext ctx)
 {
-    DhcpMsgInfo from;
-    DhcpMsgInfo reply;
+    DhcpMsgInfo from = { 0 };
+    DhcpMsgInfo reply = { 0 };
     ServerContext *srvIns = GetServerInstance(ctx);
     if (!srvIns) {
         LOGE("dhcp server context pointer is null.");

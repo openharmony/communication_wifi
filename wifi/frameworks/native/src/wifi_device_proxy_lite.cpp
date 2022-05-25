@@ -158,7 +158,7 @@ static int IpcCallback(void *owner, int code, IpcIo *reply)
     struct IpcOwner *data = (struct IpcOwner *)owner;
     data->exception = IpcIoPopInt32(reply);
     data->retCode = IpcIoPopInt32(reply);
-    if (data->exception != 0 || data->retCode != WIFI_OPT_SUCCESS) {
+    if (data->exception != 0 || data->retCode != WIFI_OPT_SUCCESS || data->variable == nullptr) {
         return LITEIPC_OK;
     }
 
@@ -285,7 +285,7 @@ ErrCode WifiDeviceProxy::Init()
 ErrCode WifiDeviceProxy::EnableWifi()
 {
     if (remoteDied_ || remote_ == nullptr) {
-        WIFI_LOGD("failed to %{public}s, remoteDied_: %{public}d, remote_: %{public}d",
+        WIFI_LOGE("failed to %{public}s, remoteDied_: %{public}d, remote_: %{public}d",
             __func__, remoteDied_, remote_ == nullptr);
         return WIFI_OPT_FAILED;
     }
@@ -312,7 +312,7 @@ ErrCode WifiDeviceProxy::EnableWifi()
 ErrCode WifiDeviceProxy::DisableWifi()
 {
     if (remoteDied_ || remote_ == nullptr) {
-        WIFI_LOGD("failed to %{public}s, remoteDied_: %{public}d, remote_: %{public}d",
+        WIFI_LOGE("failed to %{public}s, remoteDied_: %{public}d, remote_: %{public}d",
             __func__, remoteDied_, remote_ == nullptr);
         return WIFI_OPT_FAILED;
     }
@@ -339,7 +339,7 @@ ErrCode WifiDeviceProxy::DisableWifi()
 ErrCode WifiDeviceProxy::InitWifiProtect(const WifiProtectType &protectType, const std::string &protectName)
 {
     if (remoteDied_ || remote_ == nullptr) {
-        WIFI_LOGD("failed to %{public}s, remoteDied_: %{public}d, remote_: %{public}d",
+        WIFI_LOGE("failed to %{public}s, remoteDied_: %{public}d, remote_: %{public}d",
             __func__, remoteDied_, remote_ == nullptr);
         return WIFI_OPT_FAILED;
     }
@@ -368,7 +368,7 @@ ErrCode WifiDeviceProxy::InitWifiProtect(const WifiProtectType &protectType, con
 ErrCode WifiDeviceProxy::GetWifiProtectRef(const WifiProtectMode &protectMode, const std::string &protectName)
 {
     if (remoteDied_ || remote_ == nullptr) {
-        WIFI_LOGD("failed to %{public}s, remoteDied_: %{public}d, remote_: %{public}d",
+        WIFI_LOGE("failed to %{public}s, remoteDied_: %{public}d, remote_: %{public}d",
             __func__, remoteDied_, remote_ == nullptr);
         return WIFI_OPT_FAILED;
     }
@@ -397,7 +397,7 @@ ErrCode WifiDeviceProxy::GetWifiProtectRef(const WifiProtectMode &protectMode, c
 ErrCode WifiDeviceProxy::PutWifiProtectRef(const std::string &protectName)
 {
     if (remoteDied_ || remote_ == nullptr) {
-        WIFI_LOGD("failed to %{public}s, remoteDied_: %{public}d, remote_: %{public}d",
+        WIFI_LOGE("failed to %{public}s, remoteDied_: %{public}d, remote_: %{public}d",
             __func__, remoteDied_, remote_ == nullptr);
         return WIFI_OPT_FAILED;
     }
@@ -477,7 +477,7 @@ void WifiDeviceProxy::WriteDeviceConfig(const WifiDeviceConfig &config, IpcIo &r
 ErrCode WifiDeviceProxy::AddDeviceConfig(const WifiDeviceConfig &config, int &result)
 {
     if (remoteDied_ || remote_ == nullptr) {
-        WIFI_LOGD("failed to %{public}s, remoteDied_: %{public}d, remote_: %{public}d",
+        WIFI_LOGE("failed to %{public}s, remoteDied_: %{public}d, remote_: %{public}d",
             __func__, remoteDied_, remote_ == nullptr);
         return WIFI_OPT_FAILED;
     }
@@ -506,7 +506,7 @@ ErrCode WifiDeviceProxy::AddDeviceConfig(const WifiDeviceConfig &config, int &re
 ErrCode WifiDeviceProxy::UpdateDeviceConfig(const WifiDeviceConfig &config, int &result)
 {
     if (remoteDied_ || remote_ == nullptr) {
-        WIFI_LOGD("failed to %{public}s, remoteDied_: %{public}d, remote_: %{public}d",
+        WIFI_LOGE("failed to %{public}s, remoteDied_: %{public}d, remote_: %{public}d",
             __func__, remoteDied_, remote_ == nullptr);
         return WIFI_OPT_FAILED;
     }
@@ -535,7 +535,7 @@ ErrCode WifiDeviceProxy::UpdateDeviceConfig(const WifiDeviceConfig &config, int 
 ErrCode WifiDeviceProxy::RemoveDevice(int networkId)
 {
     if (remoteDied_ || remote_ == nullptr) {
-        WIFI_LOGD("failed to %{public}s, remoteDied_: %{public}d, remote_: %{public}d",
+        WIFI_LOGE("failed to %{public}s, remoteDied_: %{public}d, remote_: %{public}d",
             __func__, remoteDied_, remote_ == nullptr);
         return WIFI_OPT_FAILED;
     }
@@ -563,7 +563,7 @@ ErrCode WifiDeviceProxy::RemoveDevice(int networkId)
 ErrCode WifiDeviceProxy::RemoveAllDevice()
 {
     if (remoteDied_ || remote_ == nullptr) {
-        WIFI_LOGD("failed to %{public}s, remoteDied_: %{public}d, remote_: %{public}d",
+        WIFI_LOGE("failed to %{public}s, remoteDied_: %{public}d, remote_: %{public}d",
             __func__, remoteDied_, remote_ == nullptr);
         return WIFI_OPT_FAILED;
     }
@@ -590,7 +590,7 @@ ErrCode WifiDeviceProxy::RemoveAllDevice()
 ErrCode WifiDeviceProxy::GetDeviceConfigs(std::vector<WifiDeviceConfig> &result)
 {
     if (remoteDied_ || remote_ == nullptr) {
-        WIFI_LOGD("failed to %{public}s, remoteDied_: %{public}d, remote_: %{public}d",
+        WIFI_LOGE("failed to %{public}s, remoteDied_: %{public}d, remote_: %{public}d",
             __func__, remoteDied_, remote_ == nullptr);
         return WIFI_OPT_FAILED;
     }
@@ -619,7 +619,7 @@ ErrCode WifiDeviceProxy::GetDeviceConfigs(std::vector<WifiDeviceConfig> &result)
 ErrCode WifiDeviceProxy::EnableDeviceConfig(int networkId, bool attemptEnable)
 {
     if (remoteDied_ || remote_ == nullptr) {
-        WIFI_LOGD("failed to %{public}s, remoteDied_: %{public}d, remote_: %{public}d",
+        WIFI_LOGE("failed to %{public}s, remoteDied_: %{public}d, remote_: %{public}d",
             __func__, remoteDied_, remote_ == nullptr);
         return WIFI_OPT_FAILED;
     }
@@ -648,7 +648,7 @@ ErrCode WifiDeviceProxy::EnableDeviceConfig(int networkId, bool attemptEnable)
 ErrCode WifiDeviceProxy::DisableDeviceConfig(int networkId)
 {
     if (remoteDied_ || remote_ == nullptr) {
-        WIFI_LOGD("failed to %{public}s, remoteDied_: %{public}d, remote_: %{public}d",
+        WIFI_LOGE("failed to %{public}s, remoteDied_: %{public}d, remote_: %{public}d",
             __func__, remoteDied_, remote_ == nullptr);
         return WIFI_OPT_FAILED;
     }
@@ -676,7 +676,7 @@ ErrCode WifiDeviceProxy::DisableDeviceConfig(int networkId)
 ErrCode WifiDeviceProxy::ConnectToNetwork(int networkId)
 {
     if (remoteDied_ || remote_ == nullptr) {
-        WIFI_LOGD("failed to %{public}s, remoteDied_: %{public}d, remote_: %{public}d",
+        WIFI_LOGE("failed to %{public}s, remoteDied_: %{public}d, remote_: %{public}d",
             __func__, remoteDied_, remote_ == nullptr);
         return WIFI_OPT_FAILED;
     }
@@ -704,7 +704,7 @@ ErrCode WifiDeviceProxy::ConnectToNetwork(int networkId)
 ErrCode WifiDeviceProxy::ConnectToDevice(const WifiDeviceConfig &config)
 {
     if (remoteDied_ || remote_ == nullptr) {
-        WIFI_LOGD("failed to %{public}s, remoteDied_: %{public}d, remote_: %{public}d",
+        WIFI_LOGE("failed to %{public}s, remoteDied_: %{public}d, remote_: %{public}d",
             __func__, remoteDied_, remote_ == nullptr);
         return WIFI_OPT_FAILED;
     }
@@ -732,7 +732,7 @@ ErrCode WifiDeviceProxy::ConnectToDevice(const WifiDeviceConfig &config)
 bool WifiDeviceProxy::IsConnected()
 {
     if (remoteDied_ || remote_ == nullptr) {
-        WIFI_LOGD("failed to %{public}s, remoteDied_: %{public}d, remote_: %{public}d",
+        WIFI_LOGE("failed to %{public}s, remoteDied_: %{public}d, remote_: %{public}d",
             __func__, remoteDied_, remote_ == nullptr);
         return WIFI_OPT_FAILED;
     }
@@ -761,7 +761,7 @@ bool WifiDeviceProxy::IsConnected()
 ErrCode WifiDeviceProxy::ReConnect()
 {
     if (remoteDied_ || remote_ == nullptr) {
-        WIFI_LOGD("failed to %{public}s, remoteDied_: %{public}d, remote_: %{public}d",
+        WIFI_LOGE("failed to %{public}s, remoteDied_: %{public}d, remote_: %{public}d",
             __func__, remoteDied_, remote_ == nullptr);
         return WIFI_OPT_FAILED;
     }
@@ -788,7 +788,7 @@ ErrCode WifiDeviceProxy::ReConnect()
 ErrCode WifiDeviceProxy::ReAssociate(void)
 {
     if (remoteDied_ || remote_ == nullptr) {
-        WIFI_LOGD("failed to %{public}s, remoteDied_: %{public}d, remote_: %{public}d",
+        WIFI_LOGE("failed to %{public}s, remoteDied_: %{public}d, remote_: %{public}d",
             __func__, remoteDied_, remote_ == nullptr);
         return WIFI_OPT_FAILED;
     }
@@ -815,7 +815,7 @@ ErrCode WifiDeviceProxy::ReAssociate(void)
 ErrCode WifiDeviceProxy::Disconnect(void)
 {
     if (remoteDied_ || remote_ == nullptr) {
-        WIFI_LOGD("failed to %{public}s, remoteDied_: %{public}d, remote_: %{public}d",
+        WIFI_LOGE("failed to %{public}s, remoteDied_: %{public}d, remote_: %{public}d",
             __func__, remoteDied_, remote_ == nullptr);
         return WIFI_OPT_FAILED;
     }
@@ -842,7 +842,7 @@ ErrCode WifiDeviceProxy::Disconnect(void)
 ErrCode WifiDeviceProxy::StartWps(const WpsConfig &config)
 {
     if (remoteDied_ || remote_ == nullptr) {
-        WIFI_LOGD("failed to %{public}s, remoteDied_: %{public}d, remote_: %{public}d",
+        WIFI_LOGE("failed to %{public}s, remoteDied_: %{public}d, remote_: %{public}d",
             __func__, remoteDied_, remote_ == nullptr);
         return WIFI_OPT_FAILED;
     }
@@ -872,7 +872,7 @@ ErrCode WifiDeviceProxy::StartWps(const WpsConfig &config)
 ErrCode WifiDeviceProxy::CancelWps(void)
 {
     if (remoteDied_ || remote_ == nullptr) {
-        WIFI_LOGD("failed to %{public}s, remoteDied_: %{public}d, remote_: %{public}d",
+        WIFI_LOGE("failed to %{public}s, remoteDied_: %{public}d, remote_: %{public}d",
             __func__, remoteDied_, remote_ == nullptr);
         return WIFI_OPT_FAILED;
     }
@@ -899,7 +899,7 @@ ErrCode WifiDeviceProxy::CancelWps(void)
 ErrCode WifiDeviceProxy::IsWifiActive(bool &bActive)
 {
     if (remoteDied_ || remote_ == nullptr) {
-        WIFI_LOGD("failed to %{public}s, remoteDied_: %{public}d, remote_: %{public}d",
+        WIFI_LOGE("failed to %{public}s, remoteDied_: %{public}d, remote_: %{public}d",
             __func__, remoteDied_, remote_ == nullptr);
         return WIFI_OPT_FAILED;
     }
@@ -927,7 +927,7 @@ ErrCode WifiDeviceProxy::IsWifiActive(bool &bActive)
 ErrCode WifiDeviceProxy::GetWifiState(int &state)
 {
     if (remoteDied_ || remote_ == nullptr) {
-        WIFI_LOGD("failed to %{public}s, remoteDied_: %{public}d, remote_: %{public}d",
+        WIFI_LOGE("failed to %{public}s, remoteDied_: %{public}d, remote_: %{public}d",
             __func__, remoteDied_, remote_ == nullptr);
         return WIFI_OPT_FAILED;
     }
@@ -955,7 +955,7 @@ ErrCode WifiDeviceProxy::GetWifiState(int &state)
 ErrCode WifiDeviceProxy::GetLinkedInfo(WifiLinkedInfo &info)
 {
     if (remoteDied_ || remote_ == nullptr) {
-        WIFI_LOGD("failed to %{public}s, remoteDied_: %{public}d, remote_: %{public}d",
+        WIFI_LOGE("failed to %{public}s, remoteDied_: %{public}d, remote_: %{public}d",
             __func__, remoteDied_, remote_ == nullptr);
         return WIFI_OPT_FAILED;
     }
@@ -983,7 +983,7 @@ ErrCode WifiDeviceProxy::GetLinkedInfo(WifiLinkedInfo &info)
 ErrCode WifiDeviceProxy::GetIpInfo(IpInfo &info)
 {
     if (remoteDied_ || remote_ == nullptr) {
-        WIFI_LOGD("failed to %{public}s, remoteDied_: %{public}d, remote_: %{public}d",
+        WIFI_LOGE("failed to %{public}s, remoteDied_: %{public}d, remote_: %{public}d",
             __func__, remoteDied_, remote_ == nullptr);
         return WIFI_OPT_FAILED;
     }
@@ -1011,7 +1011,7 @@ ErrCode WifiDeviceProxy::GetIpInfo(IpInfo &info)
 ErrCode WifiDeviceProxy::SetCountryCode(const std::string &countryCode)
 {
     if (remoteDied_ || remote_ == nullptr) {
-        WIFI_LOGD("failed to %{public}s, remoteDied_: %{public}d, remote_: %{public}d",
+        WIFI_LOGE("failed to %{public}s, remoteDied_: %{public}d, remote_: %{public}d",
             __func__, remoteDied_, remote_ == nullptr);
         return WIFI_OPT_FAILED;
     }
@@ -1039,7 +1039,7 @@ ErrCode WifiDeviceProxy::SetCountryCode(const std::string &countryCode)
 ErrCode WifiDeviceProxy::GetCountryCode(std::string &countryCode)
 {
     if (remoteDied_ || remote_ == nullptr) {
-        WIFI_LOGD("failed to %{public}s, remoteDied_: %{public}d, remote_: %{public}d",
+        WIFI_LOGE("failed to %{public}s, remoteDied_: %{public}d, remote_: %{public}d",
             __func__, remoteDied_, remote_ == nullptr);
         return WIFI_OPT_FAILED;
     }
@@ -1067,7 +1067,7 @@ ErrCode WifiDeviceProxy::GetCountryCode(std::string &countryCode)
 ErrCode WifiDeviceProxy::RegisterCallBack(const std::shared_ptr<IWifiDeviceCallBack> &callback)
 {
     if (remoteDied_ || remote_ == nullptr) {
-        WIFI_LOGD("failed to %{public}s, remoteDied_: %{public}d, remote_: %{public}d",
+        WIFI_LOGE("failed to %{public}s, remoteDied_: %{public}d, remote_: %{public}d",
             __func__, remoteDied_, remote_ == nullptr);
         return WIFI_OPT_FAILED;
     }
@@ -1103,7 +1103,7 @@ ErrCode WifiDeviceProxy::RegisterCallBack(const std::shared_ptr<IWifiDeviceCallB
 ErrCode WifiDeviceProxy::GetSignalLevel(const int &rssi, const int &band, int &level)
 {
     if (remoteDied_ || remote_ == nullptr) {
-        WIFI_LOGD("failed to %{public}s, remoteDied_: %{public}d, remote_: %{public}d",
+        WIFI_LOGE("failed to %{public}s, remoteDied_: %{public}d, remote_: %{public}d",
             __func__, remoteDied_, remote_ == nullptr);
         return WIFI_OPT_FAILED;
     }
@@ -1133,7 +1133,7 @@ ErrCode WifiDeviceProxy::GetSignalLevel(const int &rssi, const int &band, int &l
 ErrCode WifiDeviceProxy::GetSupportedFeatures(long &features)
 {
     if (remoteDied_ || remote_ == nullptr) {
-        WIFI_LOGD("failed to %{public}s, remoteDied_: %{public}d, remote_: %{public}d",
+        WIFI_LOGE("failed to %{public}s, remoteDied_: %{public}d, remote_: %{public}d",
             __func__, remoteDied_, remote_ == nullptr);
         return WIFI_OPT_FAILED;
     }
@@ -1161,7 +1161,7 @@ ErrCode WifiDeviceProxy::GetSupportedFeatures(long &features)
 ErrCode WifiDeviceProxy::GetDeviceMacAddress(std::string &result)
 {
     if (remoteDied_ || remote_ == nullptr) {
-        WIFI_LOGD("failed to %{public}s, remoteDied_: %{public}d, remote_: %{public}d",
+        WIFI_LOGE("failed to %{public}s, remoteDied_: %{public}d, remote_: %{public}d",
             __func__, remoteDied_, remote_ == nullptr);
         return WIFI_OPT_FAILED;
     }
@@ -1189,7 +1189,7 @@ ErrCode WifiDeviceProxy::GetDeviceMacAddress(std::string &result)
 bool WifiDeviceProxy::SetLowLatencyMode(bool enabled)
 {
     if (remoteDied_ || remote_ == nullptr) {
-        WIFI_LOGD("failed to %{public}s, remoteDied_: %{public}d, remote_: %{public}d",
+        WIFI_LOGE("failed to %{public}s, remoteDied_: %{public}d, remote_: %{public}d",
             __func__, remoteDied_, remote_ == nullptr);
         return WIFI_OPT_FAILED;
     }

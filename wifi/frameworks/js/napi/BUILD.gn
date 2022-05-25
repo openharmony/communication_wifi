@@ -49,6 +49,7 @@ ohos_shared_library("wifi") {
   ]
 
   external_deps = [
+    "access_token:libaccesstoken_sdk",
     "bundle_framework:appexecfwk_base",
     "ipc:ipc_core",
   ]
@@ -86,7 +87,6 @@ ohos_shared_library("wifiext") {
   ]
 
   external_deps = [
-    "access_token:libaccesstoken_sdk",
     "bundle_framework:appexecfwk_base",
     "ipc:ipc_core",
   ]

@@ -208,6 +208,10 @@ static int GetClientOption(int argc, char *argv[])
 
 static int InitSpecifiedClientCfg(int argc, char *argv[])
 {
+    if (argc < NUMBER_TWO + 1) {
+        LOGE("parameter error!");
+        return DHCP_OPT_FAILED;
+    }
     g_cltCfg = GetDhcpClientCfg();
     if ((strncpy_s(g_cltCfg->workDir, sizeof(g_cltCfg->workDir), WORKDIR, DIR_MAX_LEN - 1) != EOK) ||
         (strncpy_s(g_cltCfg->ifaceName, sizeof(g_cltCfg->ifaceName), argv[NUMBER_TWO], INFNAME_SIZE - 1) != EOK)) {
@@ -367,6 +371,10 @@ int main(int argc, char *argv[])
     }
 
     /* Exec the specified client process ACTION. */
+    if (argc < NUMBER_ONE + 1) {
+        LOGE("parameter number is error!");
+        return EXIT_FAILURE;
+    }
     const char *cmdParam = argv[NUMBER_ONE];
     int nExec = ExecClientProAction(cmdParam);
     if (nExec != 0) {

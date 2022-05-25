@@ -29,19 +29,19 @@ WifiDeviceCallBackStub::~WifiDeviceCallBackStub()
 
 int WifiDeviceCallBackStub::OnRemoteRequest(uint32_t code, IpcIo *data)
 {
+    int ret = WIFI_OPT_FAILED;
     WIFI_LOGD("OnRemoteRequest code:%{public}u!", code);
     if (mRemoteDied || data == nullptr) {
-        WIFI_LOGD("Failed to %{public}s,mRemoteDied:%{public}d data:%{public}d!",
+        WIFI_LOGE("Failed to %{public}s,mRemoteDied:%{public}d data:%{public}d!",
             __func__, mRemoteDied, data == nullptr);
-        return -1;
+        return ret;
     }
 
     int exception = IpcIoPopInt32(data);
     if (exception) {
         WIFI_LOGE("WifiDeviceCallBackStub::OnRemoteRequest, got exception: %{public}d!", exception);
-        return WIFI_OPT_FAILED;
+        return ret;
     }
-    int ret = -1;
     switch (code) {
         case WIFI_CBK_CMD_STATE_CHANGE: {
             ret = RemoteOnWifiStateChanged(code, data);
@@ -64,8 +64,7 @@ int WifiDeviceCallBackStub::OnRemoteRequest(uint32_t code, IpcIo *data)
             break;
         }
         default: {
-            ret = -1;
-            break;
+            ret = WIFI_OPT_FAILED;
         }
     }
     return ret;

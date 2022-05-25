@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -268,6 +268,10 @@ std::string Ipv6Address::GetRandomAddr(const std::string &ipv6Prefix, int prefix
     inet_pton(AF_INET6, resHex.c_str(), &rndAddr);
     struct in6_addr ipv6Addr = IN6ADDR_ANY_INIT;
     inet_pton(AF_INET6, ipv6Prefix.c_str(), &ipv6Addr);
+    if (prefixLength < 0 || (prefixLength / CHAR_BIT) >= sizeof(rndAddr.s6_addr)) {
+        LOGE("Get random address error: prefix");
+        return "";
+    }
     ipv6Addr.s6_addr[prefixLength / CHAR_BIT] |= rndAddr.s6_addr[prefixLength / CHAR_BIT];
     for (int n = prefixLength / CHAR_BIT + 1; n < MAX_IPV6_PREFIX_LENGTH / CHAR_BIT; ++n) {
         ipv6Addr.s6_addr[n] = rndAddr.s6_addr[n];

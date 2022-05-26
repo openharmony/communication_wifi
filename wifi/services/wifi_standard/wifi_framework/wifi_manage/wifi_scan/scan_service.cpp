@@ -594,12 +594,16 @@ bool ScanService::StoreFullScanInfo(
         WIFI_LOGW("GetScanInfoList return error. \n");
     }
     for (auto iter = results.begin(); iter != results.end(); ++iter) {
+        bool find = false;
         for (auto storedIter = storeInfoList.begin(); storedIter != storeInfoList.end(); ++storedIter) {
             if (iter->bssid == storedIter->bssid) {
+		find = true;
                 break;
             }
         }
-        storeInfoList.push_back(*iter);
+        if (!find) {
+            storeInfoList.push_back(*iter);
+        }
     }
 
     if (WifiSettings::GetInstance().SaveScanInfoList(storeInfoList) != 0) {

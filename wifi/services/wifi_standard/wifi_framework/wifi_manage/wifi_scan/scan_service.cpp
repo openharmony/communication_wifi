@@ -565,7 +565,10 @@ bool ScanService::StoreFullScanInfo(
     /* Filtering result. */
     WIFI_LOGI("scanConfig.scanTime is %" PRIu64 ".\n", scanConfig.scanTime);
     WIFI_LOGI("Receive %{public}d scan results.\n", (int)(scanInfoList.size()));
-
+    if (scanInfoList.size() == 0) {
+        /* Don't overwrite ScanInfoList */
+        return true;
+    }
     std::vector<WifiScanInfo> storeInfoList;
     for (auto iter = scanInfoList.begin(); iter != scanInfoList.end(); ++iter) {
         WifiScanInfo scanInfo;
@@ -583,6 +586,23 @@ bool ScanService::StoreFullScanInfo(
         scanInfo.timestamp = iter->timestamp;
         scanInfo.band = iter->band;
         storeInfoList.push_back(scanInfo);
+    }
+    std::vector<WifiScanInfo> results;
+    int ret = WifiSettings::GetInstance().GetScanInfoList(results);
+    if (ret != 0) {
+        WIFI_LOGW("GetScanInfoList return error. \n");
+    }
+    for (auto iter = results.begin(); iter != results.end(); ++iter) {
+        bool find = false;
+        for (auto storedIter = storeInfoList.begin(); storedIter != storeInfoList.end(); ++storedIter) {
+            if (iter->bssid == storedIter->bssid) {
+                find = true;
+                break;
+            }
+        }
+        if (!find) {
+            storeInfoList.push_back(*iter);
+        }
     }
 
     if (WifiSettings::GetInstance().SaveScanInfoList(storeInfoList) != 0) {

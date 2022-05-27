@@ -1642,7 +1642,7 @@ bool ScanService::GetHiddenNetworkSsidList(std::vector<std::string> &hiddenNetwo
         }
     }
 
-    WIFI_LOGI("Find %{public}lu hidden NetworkSsid.\n", hiddenNetworkSsid.size());
+    WIFI_LOGI("Find %{public}u hidden NetworkSsid.\n", hiddenNetworkSsid.size());
     return true;
 }
 

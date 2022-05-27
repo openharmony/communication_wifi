@@ -94,7 +94,7 @@ static int IpcCallback(void *owner, int code, IpcIo *reply)
             break;
         }
         case WIFI_SVR_CMD_GET_SUPPORTED_FEATURES: {
-            *((int64_t *)data->variable) = IpcIoPopInt64(reply);
+            *((long *)data->variable) = IpcIoPopInt64(reply);
             break;
         }
         case WIFI_SVR_CMD_GET_SCAN_INFO_LIST: {

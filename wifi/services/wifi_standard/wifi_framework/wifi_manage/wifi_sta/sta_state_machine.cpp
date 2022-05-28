@@ -744,6 +744,14 @@ void StaStateMachine::ConvertFreqToChannel()
     return;
 }
 
+void StaStateMachine::OnConnectFailed(int networkId)
+{
+    WIFI_LOGE("Connect to network failed: %{public}d.\n", networkId);
+    SaveLinkstate(ConnState::DISCONNECTED, DetailedState::FAILED);
+    staCallback.OnStaConnChanged(OperateResState::CONNECT_ENABLE_NETWORK_FAILED, linkedInfo);
+    staCallback.OnStaConnChanged(OperateResState::DISCONNECT_DISCONNECTED, linkedInfo);
+}
+
 void StaStateMachine::DealConnectToUserSelectedNetwork(InternalMessage *msg)
 {
     LOGI("enter DealConnectToUserSelectedNetwork.\n");
@@ -751,24 +759,25 @@ void StaStateMachine::DealConnectToUserSelectedNetwork(InternalMessage *msg)
         LOGE("msg is null.\n");
         return;
     }
-    /* Save connection information. */
-    SaveLinkstate(ConnState::CONNECTING, DetailedState::CONNECTING);
-
-    /* Callback result to InterfaceService. */
-    staCallback.OnStaConnChanged(OperateResState::CONNECT_CONNECTING, linkedInfo);
 
     int networkId = msg->GetParam1();
     bool forceReconnect = msg->GetParam2();
-
     if (linkedInfo.connState == ConnState::CONNECTED && networkId == linkedInfo.networkId) {
         WIFI_LOGE("This network is in use and does not need to be reconnected.\n");
         return;
     }
 
+    /* Save connection information. */
+    SaveLinkstate(ConnState::CONNECTING, DetailedState::CONNECTING);
+    /* Callback result to InterfaceService. */
+    staCallback.OnStaConnChanged(OperateResState::CONNECT_CONNECTING, linkedInfo);
+    if (StartConnectToNetwork(networkId) != WIFI_OPT_SUCCESS) {
+        OnConnectFailed(networkId);
+        return;
+    }
     /* Sets network status. */
     WifiSettings::GetInstance().EnableNetwork(networkId, forceReconnect);
     WifiSettings::GetInstance().SetDeviceState(networkId, (int)WifiDeviceConfigStatus::ENABLED, false);
-    StartConnectToNetwork(networkId);
 }
 
 void StaStateMachine::DealConnectTimeOutCmd(InternalMessage *msg)
@@ -1148,27 +1157,29 @@ void StaStateMachine::DealStartRoamCmd(InternalMessage *msg)
     SwitchState(pApRoamingState);
 }
 
-void StaStateMachine::StartConnectToNetwork(int networkId)
+ErrCode StaStateMachine::StartConnectToNetwork(int networkId)
 {
     targetNetworkId = networkId;
     SetRandomMac(targetNetworkId);
     if (WifiStaHalInterface::GetInstance().EnableNetwork(targetNetworkId) != WIFI_IDL_OPT_OK) {
         LOGE("EnableNetwork() failed!");
-        return;
+        return WIFI_OPT_FAILED;
     }
 
     if (WifiStaHalInterface::GetInstance().Connect(targetNetworkId) != WIFI_IDL_OPT_OK) {
         LOGE("Connect failed!");
         staCallback.OnStaConnChanged(OperateResState::CONNECT_SELECT_NETWORK_FAILED, linkedInfo);
-        return;
+        return WIFI_OPT_FAILED;
     }
 
     if (WifiStaHalInterface::GetInstance().SaveDeviceConfig() != WIFI_IDL_OPT_OK) {
+        /* OHOS's wpa don't support save command, so don't judge as failure */
         LOGE("SaveDeviceConfig() failed!");
     }
 
     StopTimer(static_cast<int>(CMD_NETWORK_CONNECT_TIMEOUT));
     StartTimer(static_cast<int>(CMD_NETWORK_CONNECT_TIMEOUT), STA_NETWORK_CONNECTTING_DELAY);
+    return WIFI_OPT_SUCCESS;
 }
 
 void StaStateMachine::MacAddressGenerate(std::string &strMac)

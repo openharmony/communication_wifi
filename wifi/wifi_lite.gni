@@ -11,8 +11,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-aaservices_path = "//foundation/aafwk/standard/services"
-aainnerkits_path = "//foundation/aafwk/standard/interfaces/innerkits"
+aaservices_path = "//foundation/ability/ability_runtime/services"
+aainnerkits_path = "//foundation/ability/ability_runtime/interfaces/innerkits"
 
 SUBSYSTEM_DIR = "//foundation/communication"
 WIFI_ROOT_DIR = "$SUBSYSTEM_DIR/wifi/wifi"

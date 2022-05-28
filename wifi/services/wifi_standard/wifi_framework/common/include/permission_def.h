@@ -29,7 +29,6 @@ enum IsRestricted { RESTRICTED = 0, NOT_RESTRICTED = 1 };
 enum IsGranted {
     PERMISSION_DENIED = 0,  /* Not granted */
     PERMISSION_GRANTED = 1, /* Granted */
-    PERMISSION_FAILED = 2   /* Failed to judge permission */
 };
 
 typedef struct {

@@ -24,11 +24,8 @@ const int FD_CHECK_TIMEOUT = 1000; /* poll wait time, units: ms */
 const int CLIENT_STATE_IDLE = 0;
 const int CLIENT_STATE_DEAL_REPLY = 1;
 const int CLIENT_STATE_EXIT = 2;
-#ifdef OHOS_ARCH_LITE
+
 #define TMP_BUFF_SIZE 16
-#else
-const int TMP_BUFF_SIZE = 16;
-#endif
 
 static void *RpcClientThreadDeal(void *arg);
 

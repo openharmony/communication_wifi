@@ -205,19 +205,16 @@ void StaAutoConnectService::ConnectElectedDevice(WifiDeviceConfig &electedDevice
         currentConnectedNetwork.ssid == electedDevice.ssid && currentConnectedNetwork.bssid != electedDevice.bssid) {
         /* Frameworks start roaming only when firmware is not supported */
         if (!firmwareRoamFlag) {
-            WIFI_LOGI("Roaming connectTo.\n");
+            WIFI_LOGI("Roaming connectTo, networkId: %{public}d.\n", electedDevice.networkId);
             pStaStateMachine->StartRoamToNetwork(electedDevice.bssid);
-            WIFI_LOGI("connecTo network bssid is %s", electedDevice.bssid.c_str());
         }
     } else if (currentConnectedNetwork.detailedState == DetailedState::DISCONNECTED ||
         currentConnectedNetwork.detailedState == DetailedState::CONNECTION_TIMEOUT) {
-        WIFI_LOGI("connecTo save network.\n");
         pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_CONNECT_SAVED_NETWORK,
             electedDevice.networkId,
             NETWORK_SELECTED_FOR_CONNECTION_MANAGEMENT);
-        WIFI_LOGI("connecTo networkId is %{public}d", electedDevice.networkId);
-        WIFI_LOGI("connecTo bssid is %s", electedDevice.bssid.c_str());
-        WIFI_LOGI("connecTo preShareKey is %s", electedDevice.preSharedKey.c_str());
+        WIFI_LOGI("connecTo save networkId: %{public}d, preShareKey len: %{public}d.\n",
+            electedDevice.networkId, electedDevice.preSharedKey.length());
     } else {
         WIFI_LOGE("The current connection status is %{public}d.\n", currentConnectedNetwork.detailedState);
     }

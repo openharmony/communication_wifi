@@ -76,6 +76,9 @@ void StaAutoConnectService::OnScanInfosReadyHandler(const std::vector<InterScanI
         return;
     }
 
+    if (info.connState == ConnState::CONNECTED) {
+        ClearAllBlockedBssids();
+    }
     std::vector<std::string> blockedBssids;
     GetBlockedBssids(blockedBssids);
 
@@ -150,6 +153,13 @@ void StaAutoConnectService::GetBlockedBssids(std::vector<std::string> &blockedBs
     for (auto iter = blockedBssidMap.begin(); iter != blockedBssidMap.end(); ++iter) {
         blockedBssids.push_back(iter->first);
     }
+    return;
+}
+
+void StaAutoConnectService::ClearAllBlockedBssids()
+{
+    WIFI_LOGI("Enter StaAutoConnectService::ClearAllBlockedBssids.\n");
+    blockedBssidMap.clear();
     return;
 }
 

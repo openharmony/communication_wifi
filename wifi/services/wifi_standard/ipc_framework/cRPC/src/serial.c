@@ -15,11 +15,8 @@
 #include <inttypes.h>
 #include "serial.h"
 
-#ifdef OHOS_ARCH_LITE
 #define TMP_CHAR_LEN 64
-#else
-const int TMP_CHAR_LEN = 64;
-#endif
+
 const int HIGH_TWO_BIT = 16;
 const int ALPHA_NUM_MAX = 10;
 

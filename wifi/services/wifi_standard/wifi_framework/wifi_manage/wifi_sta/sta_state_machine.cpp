@@ -1600,7 +1600,7 @@ void StaStateMachine::GetIpState::GoInState()
         }
     } else {
         LOGI("GetIpState get dhcp result.");
-        int dhcpRet;
+        int dhcpRet = 0;
         DhcpServiceInfo dhcpInfo;
         pStaStateMachine->pDhcpService->GetDhcpInfo(IF_NAME, dhcpInfo);
         if (pStaStateMachine->isRoam && dhcpInfo.clientRunStatus == 1) {

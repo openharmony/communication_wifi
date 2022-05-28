@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -23,15 +23,15 @@
 int RpcRegisterEventCallback(RpcServer *server, Context *context)
 {
     if (server == NULL || context == NULL) {
-        return -1;
+        return HAL_FAILURE;
     }
     int num = 0;
     if (ReadInt(context, &num) < 0) {
-        return -1;
+        return HAL_FAILURE;
     }
     int *events = ReadIntArray(context, num);
     if (events == NULL) {
-        return -1;
+        return HAL_FAILURE;
     }
     for (int i = 0; i < num; ++i) {
         RegisterCallback(server, events[i], context);
@@ -41,21 +41,21 @@ int RpcRegisterEventCallback(RpcServer *server, Context *context)
     WriteEnd(context);
     free(events);
     events = NULL;
-    return 0;
+    return HAL_SUCCESS;
 }
 
 int RpcUnRegisterEventCallback(RpcServer *server, Context *context)
 {
     if (server == NULL || context == NULL) {
-        return -1;
+        return HAL_FAILURE;
     }
     int num = 0;
     if (ReadInt(context, &num) < 0) {
-        return -1;
+        return HAL_FAILURE;
     }
     int *events = ReadIntArray(context, num);
     if (events == NULL) {
-        return -1;
+        return HAL_FAILURE;
     }
     for (int i = 0; i < num; ++i) {
         UnRegisterCallback(server, events[i], context);
@@ -65,13 +65,13 @@ int RpcUnRegisterEventCallback(RpcServer *server, Context *context)
     WriteEnd(context);
     free(events);
     events = NULL;
-    return 0;
+    return HAL_SUCCESS;
 }
 
 int RpcNotifyClear(RpcServer *server, Context *context)
 {
     if (server == NULL || context == NULL) {
-        return -1;
+        return HAL_FAILURE;
     }
     ForceStop();
     StopSoftAp();
@@ -79,5 +79,5 @@ int RpcNotifyClear(RpcServer *server, Context *context)
     WriteBegin(context, 0);
     WriteInt(context, 0);
     WriteEnd(context);
-    return 0;
+    return HAL_SUCCESS;
 }

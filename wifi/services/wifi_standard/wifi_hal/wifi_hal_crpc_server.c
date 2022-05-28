@@ -59,7 +59,7 @@ static int GetPos(const char *name)
 static int PushRpcFunc(const char *name, Rpcfunc func)
 {
     if (g_rpcFuncHandle == NULL || name == NULL || func == NULL) {
-        return -1;
+        return HAL_FAILURE;
     }
     int pos = GetPos(name);
     if (g_rpcFuncHandle[pos].func == NULL) {
@@ -72,14 +72,14 @@ static int PushRpcFunc(const char *name, Rpcfunc func)
         }
         WifiHalRpcFunc *q = (WifiHalRpcFunc *)calloc(1, sizeof(WifiHalRpcFunc));
         if (q == NULL) {
-            return -1;
+            return HAL_FAILURE;
         }
         StrSafeCopy(q->funcname, sizeof(q->funcname), name);
         q->func = func;
         q->next = NULL;
         p->next = q;
     }
-    return 0;
+    return HAL_SUCCESS;
 }
 
 static int InitRpcFuncMapBase(void)
@@ -245,11 +245,11 @@ static int InitRpcFuncMapP2p(void)
 int InitRpcFunc(void)
 {
     if (g_rpcFuncHandle != NULL) {
-        return 0;
+        return HAL_SUCCESS;
     }
     g_rpcFuncHandle = (WifiHalRpcFunc *)calloc(RPC_FUNC_NUM, sizeof(WifiHalRpcFunc));
     if (g_rpcFuncHandle == NULL) {
-        return -1;
+        return HAL_FAILURE;
     }
 
     int ret = 0;
@@ -261,13 +261,13 @@ int InitRpcFunc(void)
     ret += InitRpcFuncMapCommon();
     ret += InitRpcFuncMapP2p();
     if (ret < 0) {
-        return -1;
+        return HAL_FAILURE;
     }
 
     if (InitCallbackMsg() < 0) {
-        return -1;
+        return HAL_FAILURE;
     }
-    return 0;
+    return HAL_SUCCESS;
 }
 
 void ReleaseRpcFunc(void)
@@ -306,13 +306,13 @@ Rpcfunc GetRpcFunc(const char *func)
 int OnTransact(RpcServer *server, Context *context)
 {
     if ((server == NULL) || (context == NULL)) {
-        return -1;
+        return HAL_FAILURE;
     }
 
     char func[RPC_FUNCNAME_MAX_LEN] = {0};
     int ret = ReadFunc(context, func, RPC_FUNCNAME_MAX_LEN);
     if (ret < 0) {
-        return -1;
+        return HAL_FAILURE;
     }
     LOGI("run %{public}s", func);
     Rpcfunc pFunc = GetRpcFunc(func);
@@ -331,7 +331,7 @@ int OnTransact(RpcServer *server, Context *context)
             WriteEnd(context);
         }
     }
-    return 0;
+    return HAL_SUCCESS;
 }
 
 /* Defines the bidirectional list of global callback event parameters. */
@@ -340,18 +340,18 @@ static WifiHalEventCallback *g_wifiHalEventCallback = NULL;
 int InitCallbackMsg(void)
 {
     if (g_wifiHalEventCallback != NULL) {
-        return 0;
+        return HAL_SUCCESS;
     }
     g_wifiHalEventCallback = (WifiHalEventCallback *)calloc(1, sizeof(WifiHalEventCallback));
     if (g_wifiHalEventCallback == NULL) {
-        return -1;
+        return HAL_FAILURE;
     }
     pthread_mutex_init(&g_wifiHalEventCallback->mutex, NULL);
     for (int i = 0; i < WIFI_HAL_MAX_EVENT - WIFI_FAILURE_EVENT; ++i) {
         g_wifiHalEventCallback->cbmsgs[i].pre = g_wifiHalEventCallback->cbmsgs + i;
         g_wifiHalEventCallback->cbmsgs[i].next = g_wifiHalEventCallback->cbmsgs + i;
     }
-    return 0;
+    return HAL_SUCCESS;
 }
 
 void ReleaseCallbackMsg(void)
@@ -377,7 +377,7 @@ void ReleaseCallbackMsg(void)
 int PushBackCallbackMsg(int event, WifiHalEventCallbackMsg *msg)
 {
     if (g_wifiHalEventCallback == NULL || event >= WIFI_HAL_MAX_EVENT || event < WIFI_FAILURE_EVENT || msg == NULL) {
-        return -1;
+        return HAL_FAILURE;
     }
     int pos = event - WIFI_FAILURE_EVENT;
     pthread_mutex_lock(&g_wifiHalEventCallback->mutex);
@@ -394,13 +394,13 @@ int PushBackCallbackMsg(int event, WifiHalEventCallbackMsg *msg)
         head->pre = msg;
     }
     pthread_mutex_unlock(&g_wifiHalEventCallback->mutex);
-    return 0;
+    return HAL_SUCCESS;
 }
 
 int PopBackCallbackMsg(int event)
 {
     if (g_wifiHalEventCallback == NULL || event >= WIFI_HAL_MAX_EVENT || event < WIFI_FAILURE_EVENT) {
-        return -1;
+        return HAL_FAILURE;
     }
     int pos = event - WIFI_FAILURE_EVENT;
     pthread_mutex_lock(&g_wifiHalEventCallback->mutex);
@@ -411,7 +411,7 @@ int PopBackCallbackMsg(int event)
         tail->pre->next = head;
     }
     pthread_mutex_unlock(&g_wifiHalEventCallback->mutex);
-    return 0;
+    return HAL_SUCCESS;
 }
 
 WifiHalEventCallbackMsg *FrontCallbackMsg(int event)
@@ -431,7 +431,7 @@ WifiHalEventCallbackMsg *FrontCallbackMsg(int event)
 int PopFrontCallbackMsg(int event)
 {
     if (g_wifiHalEventCallback == NULL || event >= WIFI_HAL_MAX_EVENT || event < WIFI_FAILURE_EVENT) {
-        return -1;
+        return HAL_FAILURE;
     }
     int pos = event - WIFI_FAILURE_EVENT;
     pthread_mutex_lock(&g_wifiHalEventCallback->mutex);
@@ -444,7 +444,7 @@ int PopFrontCallbackMsg(int event)
         p = NULL;
     }
     pthread_mutex_unlock(&g_wifiHalEventCallback->mutex);
-    return 0;
+    return HAL_SUCCESS;
 }
 
 /* Processing callback messages */
@@ -696,20 +696,20 @@ static void DealP2pCallback(int event, Context *context)
 int OnCallbackTransact(const RpcServer *server, int event, Context *context)
 {
     if (server == NULL || context == NULL) {
-        return -1;
+        return HAL_FAILURE;
     }
     WriteBegin(context, 1);
     WriteInt(context, event);
     DealStaApCallback(event, context);
     DealP2pCallback(event, context);
     WriteEnd(context);
-    return 0;
+    return HAL_SUCCESS;
 }
 
 int EndCallbackTransact(const RpcServer *server, int event)
 {
     if (server == NULL) {
-        return -1;
+        return HAL_FAILURE;
     }
     return PopFrontCallbackMsg(event);
 }

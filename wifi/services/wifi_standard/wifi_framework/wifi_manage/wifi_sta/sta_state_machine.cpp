@@ -773,7 +773,7 @@ void StaStateMachine::DealConnectToUserSelectedNetwork(InternalMessage *msg)
 
 void StaStateMachine::DealConnectTimeOutCmd(InternalMessage *msg)
 {
-    LOGD("enter DealConnectTimeOutCmd.\n");
+    LOGW("enter DealConnectTimeOutCmd.\n");
     if (msg == nullptr) {
         WIFI_LOGE("msg is nul\n");
     }
@@ -794,10 +794,11 @@ void StaStateMachine::DealConnectTimeOutCmd(InternalMessage *msg)
 void StaStateMachine::DealConnectionEvent(InternalMessage *msg)
 {
     if (msg == nullptr) {
+        WIFI_LOGE("DealConnectionEvent, msg is nullptr.\n");
         return;
     }
 
-    WIFI_LOGD("enter DealConnectionEvent");
+    WIFI_LOGI("enter DealConnectionEvent");
     WifiSettings::GetInstance().SetDeviceState(targetNetworkId, (int)WifiDeviceConfigStatus::ENABLED, false);
     WifiSettings::GetInstance().SyncDeviceConfig();
     /* Stop clearing the Wpa_blocklist. */

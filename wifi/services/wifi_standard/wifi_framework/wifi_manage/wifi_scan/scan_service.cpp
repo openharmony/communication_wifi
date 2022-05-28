@@ -198,7 +198,7 @@ void ScanService::HandleInnerEventReport(ScanInnerEventType innerEvent)
 
 ErrCode ScanService::Scan(bool externFlag)
 {
-    WIFI_LOGI("Enter ScanService::Scan[%{public}d]\n", externFlag);
+    WIFI_LOGI("Enter ScanService::Scan, externFlag:%{public}d.\n", externFlag);
     if (!scanStartedFlag) {
         WIFI_LOGE("Scan service has not started.\n");
         return WIFI_OPT_FAILED;
@@ -1072,28 +1072,28 @@ ErrCode ScanService::AllowExternScan()
     WIFI_LOGI("Enter ScanService::AllowExternScan.\n");
     int staScene = GetStaScene();
     ScanMode scanMode = WifiSettings::GetInstance().GetAppRunningState();
-    WIFI_LOGD("staScene is %{public}d, scanMode is %{public}d", staScene, (int)scanMode);
+    WIFI_LOGI("staScene is %{public}d, scanMode is %{public}d", staScene, (int)scanMode);
 
     if (!AllowExternScanByForbid(staScene, scanMode)) {
-        WIFI_LOGD("extern scan not allow by forbid mode");
+        WIFI_LOGW("extern scan not allow by forbid mode");
         return WIFI_OPT_FAILED;
     }
     int appId = 0;
     if (!AllowExternScanByInterval(appId, staScene, scanMode)) {
-        WIFI_LOGD("extern scan not allow by interval mode");
+        WIFI_LOGW("extern scan not allow by interval mode");
         return WIFI_OPT_FAILED;
     }
     if (!AllowScanByMovingFreeze()) {
-        WIFI_LOGD("extern scan not allow by moving freeze mode");
+        WIFI_LOGW("extern scan not allow by moving freeze mode");
         return WIFI_OPT_MOVING_FREEZE_CTRL;
     }
 
     if (!AllowScanByDisableScanCtrl()) {
-        WIFI_LOGD("extern scan not allow by disable scan control.");
+        WIFI_LOGW("extern scan not allow by disable scan control.");
         return WIFI_OPT_FAILED;
     }
 
-    WIFI_LOGD("extern scan has allowed");
+    WIFI_LOGI("extern scan has allowed");
     return WIFI_OPT_SUCCESS;
 }
 
@@ -1225,7 +1225,7 @@ ErrCode ScanService::AllowScanByType(ScanType scanType)
             break;
     }
 
-    WIFI_LOGD("AllowScanByType ErrCode=%{public}d.", static_cast<int>(allScanResult));
+    WIFI_LOGW("AllowScanByType ErrCode=%{public}d.", static_cast<int>(allScanResult));
     return allScanResult;
 }
 
@@ -1304,9 +1304,7 @@ ErrCode ScanService::ApplyTrustListPolicy(ScanType scanType)
         WIFI_LOGD("AllowScanByType failed.");
     }
     ResetToNonTrustMode();
-    WIFI_LOGD("ResetToNonTrustMode");
-    
-    WIFI_LOGD("apply trust list policy, ErrCode=%{public}d", static_cast<int>(policyResult));
+    WIFI_LOGI("apply trust list policy, ErrCode=%{public}d", static_cast<int>(policyResult));
 
     return policyResult;
 }
@@ -1321,7 +1319,7 @@ ErrCode ScanService::ApplyScanPolices(ScanType type)
     ErrCode rlt = WIFI_OPT_SUCCESS;
     if (appPackageName.empty()) {
         rlt = AllowScanByType(type);
-        WIFI_LOGD("appPackageName empty, apply scan polices ErrCode=%{public}d.", static_cast<int>(rlt));
+        WIFI_LOGW("appPackageName empty, apply scan polices ErrCode=%{public}d.", static_cast<int>(rlt));
         if (scanResultBackup != -1 && rlt == WIFI_OPT_MOVING_FREEZE_CTRL) {
             mScanSerivceCallbacks.OnScanFinishEvent(scanResultBackup);
         }
@@ -1644,6 +1642,7 @@ bool ScanService::GetHiddenNetworkSsidList(std::vector<std::string> &hiddenNetwo
         }
     }
 
+    WIFI_LOGI("Find %{public}d hidden NetworkSsid.\n", (int)hiddenNetworkSsid.size());
     return true;
 }
 
@@ -1717,6 +1716,7 @@ bool ScanService::AllowScanDuringStaScene(int staScene, ScanMode scanMode)
 
     time_t now = time(nullptr);
     if (now < 0) {
+        WIFI_LOGW("time return invalid!\n.");
         return false;
     }
     std::unique_lock<std::mutex> lock(scanControlInfoMutex);
@@ -1727,18 +1727,18 @@ bool ScanService::AllowScanDuringStaScene(int staScene, ScanMode scanMode)
         if (iter->scanScene == staScene && iter->scanMode == scanMode) {
             /* forbidCount=0 and forbidTime=0, directly forbid scan. */
             if ((iter->forbidTime == 0) && (iter->forbidCount == 0)) {
-                WIFI_LOGD("Scan is forbidden by staScene.");
+                WIFI_LOGW("Scan is forbidden by staScene.");
                 return false;
             }
             /* Unconditional scan control for forbidCount times */
             if ((iter->forbidCount > 0) && (iter->forbidCount - staSceneForbidCount > 0)) {
-                WIFI_LOGD("Scan is forbidden in forbidCount.");
+                WIFI_LOGW("Scan is forbidden in forbidCount.");
                 staSceneForbidCount++;
                 return false;
             }
             /* Scan interval less than forbidTime, forbid scan. */
             if ((iter->forbidTime > 0) && (now - staCurrentTime <= iter->forbidTime)) {
-                WIFI_LOGD("Scan is forbidden in forbidTime.");
+                WIFI_LOGW("Scan is forbidden in forbidTime.");
                 return false;
             }
         }

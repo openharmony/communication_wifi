@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -21,6 +21,7 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include "wifi_hal_define.h"
 #include "wifi_log.h"
 #include "securec.h"
 
@@ -126,19 +127,19 @@ static void *WpaThreadMain(void *p)
 int StartModuleInternal(const char *moduleName, const char *startCmd, pid_t *pProcessId)
 {
     if (moduleName == NULL || startCmd == NULL || pProcessId == NULL) {
-        return -1;
+        return HAL_FAILURE;
     }
     pid_t pid = fork();
     if (pid < 0) {
         LOGE("Create wpa process failed!");
-        return -1;
+        return HAL_FAILURE;
     }
     if (pid == 0) { /* sub process */
         pthread_t tid;
         int ret = pthread_create(&tid, NULL, WpaThreadMain, (void *)startCmd);
         if (ret != 0) {
             LOGE("Create wpa thread failed!");
-            return -1;
+            return HAL_FAILURE;
         }
         pthread_join(tid, NULL);
         exit(0);
@@ -147,23 +148,23 @@ int StartModuleInternal(const char *moduleName, const char *startCmd, pid_t *pPr
         sleep(1);
         *pProcessId = pid;
     }
-    return 0;
+    return HAL_SUCCESS;
 }
 
 int StopModuleInternal(const char *moduleName, pid_t processId)
 {
     if (moduleName == NULL) {
-        return 0;
+        return HAL_SUCCESS;
     }
     int tryTimes = STOP_MODULE_TRY_TIMES;
     while (tryTimes-- >= 0) {
         if (kill(processId, SIGTERM) == -1) {
             if (ESRCH == errno) {
                 LOGI("kill [%{public}d] success, pid no exist", processId);
-                return 0;
+                return HAL_SUCCESS;
             }
             LOGE("kill [%{public}d] failed", processId);
-            return -1;
+            return HAL_FAILURE;
         }
         sleep(1);
         int ret = waitpid(processId, NULL, WNOHANG);
@@ -172,11 +173,11 @@ int StopModuleInternal(const char *moduleName, pid_t processId)
             continue;
         } else {
             LOGD("waitpid [%{public}d] success", processId);
-            return 0;
+            return HAL_SUCCESS;
         }
     }
     LOGE("stop [%{public}d] failed, cannot send SIGTERM signal to stop process", processId);
-    return -1;
+    return HAL_FAILURE;
 }
 
 ModuleInfo *FindModule(const char *moduleName)

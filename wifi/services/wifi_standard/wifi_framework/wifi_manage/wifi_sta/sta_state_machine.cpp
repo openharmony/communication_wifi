@@ -477,7 +477,7 @@ StaStateMachine::WpaStartedState::~WpaStartedState()
 
 void StaStateMachine::WpaStartedState::GoInState()
 {
-    WIFI_LOGD("WpaStartedState GoInState function.");
+    WIFI_LOGI("WpaStartedState GoInState function.");
     if (pStaStateMachine->operationalMode == STA_CONNECT_MODE) {
         pStaStateMachine->SwitchState(pStaStateMachine->pSeparatedState);
     } else if (pStaStateMachine->operationalMode == STA_DISABLED_MODE) {
@@ -487,7 +487,7 @@ void StaStateMachine::WpaStartedState::GoInState()
 }
 void StaStateMachine::WpaStartedState::GoOutState()
 {
-    LOGD("WpaStartedState GoOutState function.");
+    LOGI("WpaStartedState GoOutState function.");
     return;
 }
 
@@ -513,7 +513,7 @@ bool StaStateMachine::WpaStartedState::ExecuteStateMsg(InternalMessage *msg)
 
 void StaStateMachine::StopWifiProcess()
 {
-    WIFI_LOGD("Enter StaStateMachine::StopWifiProcess.\n");
+    WIFI_LOGI("Enter StaStateMachine::StopWifiProcess.\n");
 #ifndef OHOS_ARCH_LITE
     WifiNetAgent::GetInstance().UnregisterNetSupplier();
 #endif
@@ -663,7 +663,7 @@ void StaStateMachine::DealSignalPollResult(InternalMessage *msg)
     }
     WifiWpaSignalInfo signalInfo;
     WifiStaHalInterface::GetInstance().GetConnectSignalInfo(linkedInfo.bssid, signalInfo);
-    LOGI("DealSignalPollResult GetConnectSignalInfo rssi = %d, txLinkSpeed = %d, rxLinkSpeed =%d, frequency =%d.\n",
+    LOGI("DealSignalPollResult, rssi:%{public}d, txLinkSpeed:%{public}d, rxLinkSpeed:%{public}d, freq:%{public}d.\n",
         signalInfo.signal,
         signalInfo.txrate,
         signalInfo.rxrate,
@@ -675,12 +675,10 @@ void StaStateMachine::DealSignalPollResult(InternalMessage *msg)
             linkedInfo.rssi = setRssi(signalInfo.signal);
         }
         int currentSignalLevel = WifiSettings::GetInstance().GetSignalLevel(linkedInfo.rssi, linkedInfo.band);
-        LOGI("DealSignalPollResult linkedInfo.rssi = %d, linkedInfo.band = %d.\n", linkedInfo.rssi, linkedInfo.band);
-        LOGI("DealSignalPollResult currentSignalLevel = %d, lastSignalLevel = %d.\n",
+        LOGI("DealSignalPollResult linkedInfo.rssi:%{public}d, linkedInfo.band:%{public}d.\n", linkedInfo.rssi, linkedInfo.band);
+        LOGI("DealSignalPollResult currentSignalLevel:%{public}d, lastSignalLevel:%{public}d.\n",
             currentSignalLevel, lastSignalLevel);
         if (currentSignalLevel != lastSignalLevel) {
-            LOGI("DealSignalPollResult currentSignalLevel = %d, lastSignalLevel = %d.\n",
-                currentSignalLevel, lastSignalLevel);
             if (staCallback.OnStaRssiLevelChanged != nullptr) {
                 staCallback.OnStaRssiLevelChanged(linkedInfo.rssi);
             }
@@ -876,7 +874,7 @@ void StaStateMachine::DealDisconnectEvent(InternalMessage *msg)
 
 void StaStateMachine::DealWpaLinkFailEvent(InternalMessage *msg)
 {
-    LOGD("enter DealWpaLinkFailEvent.\n");
+    LOGW("enter DealWpaLinkFailEvent.\n");
     if (msg == nullptr) {
         LOGE("msg is null.\n");
         return;
@@ -902,7 +900,7 @@ void StaStateMachine::DealWpaLinkFailEvent(InternalMessage *msg)
 
 void StaStateMachine::DealReConnectCmd(InternalMessage *msg)
 {
-    LOGD("enter DealReConnectCmd.\n");
+    LOGI("enter DealReConnectCmd.\n");
     if (msg == nullptr) {
         WIFI_LOGE("msg is null\n");
     }
@@ -925,7 +923,7 @@ void StaStateMachine::DealReConnectCmd(InternalMessage *msg)
 
 void StaStateMachine::DealReassociateCmd(InternalMessage *msg)
 {
-    LOGD("enter DealReassociateCmd.\n");
+    LOGI("enter DealReassociateCmd.\n");
     if (msg == nullptr) {
         WIFI_LOGE("msg is null\n");
     }
@@ -943,7 +941,7 @@ void StaStateMachine::DealReassociateCmd(InternalMessage *msg)
 
 void StaStateMachine::DealStartWpsCmd(InternalMessage *msg)
 {
-    WIFI_LOGD("enter DealStartWpsCmd\n");
+    WIFI_LOGI("enter DealStartWpsCmd\n");
     if (msg == nullptr) {
         return;
     }
@@ -1031,23 +1029,23 @@ void StaStateMachine::StartWpsMode(InternalMessage *msg)
 void StaStateMachine::DealWpaBlockListClearEvent(InternalMessage *msg)
 {
     if (msg != nullptr) {
-        WIFI_LOGD("enter DealWpaBlockListClearEvent\n");
+        WIFI_LOGE("enter DealWpaBlockListClearEvent\n");
     }
     if (WifiStaHalInterface::GetInstance().WpaBlocklistClear() != WIFI_IDL_OPT_OK) {
         WIFI_LOGE("Clearing the Wpa_blocklist failed\n");
     }
     StartTimer(static_cast<int>(WPA_BLOCK_LIST_CLEAR_EVENT), BLOCK_LIST_CLEAR_TIMER);
-    WIFI_LOGD("Clearing the Wpa_blocklist.\n");
+    WIFI_LOGI("Clearing the Wpa_blocklist.\n");
 }
 
 void StaStateMachine::DealWpsConnectTimeOutEvent(InternalMessage *msg)
 {
+    WIFI_LOGW("enter DealWpsConnectTimeOutEvent\n");
     if (msg == nullptr) {
+        WIFI_LOGE("msg is nullptr!\n");
         return;
     }
 
-    WIFI_LOGD("enter DealWpsConnectTimeOutEvent\n");
-    WIFI_LOGD("Wps Time out!");
     DealCancelWpsCmd(msg);
 
     /* Callback InterfaceService that WPS time out. */
@@ -1107,7 +1105,7 @@ void StaStateMachine::DealStartRoamCmd(InternalMessage *msg)
         return;
     }
 
-    WIFI_LOGD("enter DealStartRoamCmd\n");
+    WIFI_LOGI("enter DealStartRoamCmd\n");
     std::string bssid = msg->GetStringFromMessage();
     /* GetDeviceConfig from Configuration center. */
     WifiDeviceConfig network;
@@ -1174,7 +1172,7 @@ void StaStateMachine::StartConnectToNetwork(int networkId)
 
 void StaStateMachine::MacAddressGenerate(std::string &strMac)
 {
-    LOGD("enter MacAddressGenerate\n");
+    LOGI("enter MacAddressGenerate\n");
     constexpr int arraySize = 4;
     constexpr int macBitSize = 12;
     constexpr int firstBit = 1;
@@ -1215,7 +1213,7 @@ bool StaStateMachine::ComparedKeymgmt(const std::string scanInfoKeymgmt, const s
 
 bool StaStateMachine::SetRandomMac(int networkId)
 {
-    LOGD("enter SetRandomMac.\n");
+    LOGI("enter SetRandomMac.\n");
     WifiDeviceConfig deviceConfig;
     if (WifiSettings::GetInstance().GetDeviceConfig(networkId, deviceConfig) != 0) {
         LOGE("SetRandomMac : GetDeviceConfig failed!\n");
@@ -1601,7 +1599,7 @@ void StaStateMachine::GetIpState::GoInState()
             LOGE("ConfigstaticIpAddress failed!\n");
         }
     } else {
-        LOGD("GetIpState get dhcp result.");
+        LOGI("GetIpState get dhcp result.");
         int dhcpRet;
         DhcpServiceInfo dhcpInfo;
         pStaStateMachine->pDhcpService->GetDhcpInfo(IF_NAME, dhcpInfo);

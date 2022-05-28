@@ -447,11 +447,19 @@ private:
     void ConnectToNetworkProcess(InternalMessage *msg);
 
     /**
-     * @Description  Start to connect to network.
+     * @Description On connect fail.
      *
      * @param networkId - the networkId of network which is going to be connected.(in)
      */
-    void StartConnectToNetwork(int networkId);
+    void OnConnectFailed(int networkId);
+
+    /**
+     * @Description  Start to connect to network.
+     *
+     * @param networkId - the networkId of network which is going to be connected.(in)
+     * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
+     */
+    ErrCode StartConnectToNetwork(int networkId);
     /**
      * @Description  Disable network
      *

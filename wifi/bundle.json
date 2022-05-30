@@ -105,6 +105,7 @@
                 }
             ],
             "test": [
+                "//foundation/communication/wifi/wifi/test/fuzztest/wifi_sta:fuzztest"
             ]
         },
         "hisysevent_config": [

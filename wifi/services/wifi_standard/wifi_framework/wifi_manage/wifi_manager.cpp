@@ -441,7 +441,7 @@ void WifiManager::DealStaCloseRes(OperateResState state)
         return;
     }
     if (state == OperateResState::CLOSE_WIFI_FAILED) {
-        WIFI_LOGD("DealStaCloseRes:upload wifi close failed event!");
+        WIFI_LOGI("DealStaCloseRes:upload wifi close failed event!");
         cbMsg.msgData = static_cast<int>(WifiState::UNKNOWN);
         WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
     }
@@ -460,6 +460,7 @@ void WifiManager::DealStaCloseRes(OperateResState state)
 
 void WifiManager::DealStaConnChanged(OperateResState state, const WifiLinkedInfo &info)
 {
+    WIFI_LOGI("Enter, DealStaConnChanged, state: %{public}d!\n", static_cast<int>(state));
     bool isReport = true;
     int reportStateNum = static_cast<int>(ConvertConnStateInternal(state, isReport));
     if (isReport) {

@@ -110,6 +110,11 @@ private:
     };
     std::unordered_map<std::string, BlockedBssidInfo> blockedBssidMap;
     /**
+     * @Description  Clear all BSSIDs in BSSID Blocklist
+     *
+     */
+    void ClearAllBlockedBssids();
+    /**
      * @Description  Refreshing the BSSID Blocklist
      *
      */

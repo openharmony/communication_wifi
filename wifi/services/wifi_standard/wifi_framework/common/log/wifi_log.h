@@ -41,7 +41,7 @@
 #ifndef CHECK_NULL_AND_RETURN
 #define CHECK_NULL_AND_RETURN(ptr, retValue) \
 if (!(ptr)) { \
-    WIFI_LOGI("Pointer %{public}s in %{public}s is NULL!", #ptr, __func__); \
+    LOGI("Pointer %{public}s in %{public}s is NULL!", #ptr, __func__); \
     return retValue; \
 }
 #endif

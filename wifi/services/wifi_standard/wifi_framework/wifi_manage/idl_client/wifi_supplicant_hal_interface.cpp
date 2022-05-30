@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -39,31 +39,37 @@ WifiSupplicantHalInterface &WifiSupplicantHalInterface::GetInstance(void)
 
 WifiErrorNo WifiSupplicantHalInterface::StartSupplicant(void) const
 {
+    CHECK_NULL_AND_RETURN(mIdlClient, WIFI_IDL_OPT_FAILED);
     return mIdlClient->ReqStartSupplicant();
 }
 
 WifiErrorNo WifiSupplicantHalInterface::StopSupplicant(void) const
 {
+    CHECK_NULL_AND_RETURN(mIdlClient, WIFI_IDL_OPT_FAILED);
     return mIdlClient->ReqStopSupplicant();
 }
 
 WifiErrorNo WifiSupplicantHalInterface::ConnectSupplicant(void) const
 {
+    CHECK_NULL_AND_RETURN(mIdlClient, WIFI_IDL_OPT_FAILED);
     return mIdlClient->ReqConnectSupplicant();
 }
 
 WifiErrorNo WifiSupplicantHalInterface::DisconnectSupplicant(void) const
 {
+    CHECK_NULL_AND_RETURN(mIdlClient, WIFI_IDL_OPT_FAILED);
     return mIdlClient->ReqDisconnectSupplicant();
 }
 
 WifiErrorNo WifiSupplicantHalInterface::RequestToSupplicant(const std::string &request) const
 {
+    CHECK_NULL_AND_RETURN(mIdlClient, WIFI_IDL_OPT_FAILED);
     return mIdlClient->ReqRequestToSupplicant(request);
 }
 
 WifiErrorNo WifiSupplicantHalInterface::RegisterSupplicantEventCallback(SupplicantEventCallback &callback)
 {
+    CHECK_NULL_AND_RETURN(mIdlClient, WIFI_IDL_OPT_FAILED);
     WifiErrorNo err = mIdlClient->ReqRegisterSupplicantEventCallback(callback);
     if (err == WIFI_IDL_OPT_OK) {
         mCallback = callback;
@@ -73,6 +79,7 @@ WifiErrorNo WifiSupplicantHalInterface::RegisterSupplicantEventCallback(Supplica
 
 WifiErrorNo WifiSupplicantHalInterface::UnRegisterSupplicantEventCallback(void)
 {
+    CHECK_NULL_AND_RETURN(mIdlClient, WIFI_IDL_OPT_FAILED);
     WifiErrorNo err = mIdlClient->ReqUnRegisterSupplicantEventCallback();
     mCallback.onScanNotify = nullptr;
     return err;
@@ -80,16 +87,19 @@ WifiErrorNo WifiSupplicantHalInterface::UnRegisterSupplicantEventCallback(void)
 
 WifiErrorNo WifiSupplicantHalInterface::SetPowerSave(bool enable) const
 {
+    CHECK_NULL_AND_RETURN(mIdlClient, WIFI_IDL_OPT_FAILED);
     return mIdlClient->ReqSetPowerSave(enable);
 }
 
 WifiErrorNo WifiSupplicantHalInterface::WpaSetCountryCode(const std::string &countryCode) const
 {
+    CHECK_NULL_AND_RETURN(mIdlClient, WIFI_IDL_OPT_FAILED);
     return mIdlClient->ReqWpaSetCountryCode(countryCode);
 }
 
 WifiErrorNo WifiSupplicantHalInterface::WpaGetCountryCode(std::string &countryCode) const
 {
+    CHECK_NULL_AND_RETURN(mIdlClient, WIFI_IDL_OPT_FAILED);
     return mIdlClient->ReqWpaGetCountryCode(countryCode);
 }
 

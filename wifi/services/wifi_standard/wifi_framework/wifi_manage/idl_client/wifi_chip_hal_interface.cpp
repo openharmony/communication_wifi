@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -39,51 +39,61 @@ WifiChipHalInterface &WifiChipHalInterface::GetInstance(void)
 
 WifiErrorNo WifiChipHalInterface::GetWifiChipObject(int id, IWifiChip &chip)
 {
+    CHECK_NULL_AND_RETURN(mIdlClient, WIFI_IDL_OPT_FAILED);
     return mIdlClient->GetWifiChipObject(id, chip);
 }
 
 WifiErrorNo WifiChipHalInterface::GetChipIds(std::vector<int> &ids)
 {
+    CHECK_NULL_AND_RETURN(mIdlClient, WIFI_IDL_OPT_FAILED);
     return mIdlClient->GetChipIds(ids);
 }
 
 WifiErrorNo WifiChipHalInterface::GetUsedChipId(int &id)
 {
+    CHECK_NULL_AND_RETURN(mIdlClient, WIFI_IDL_OPT_FAILED);
     return mIdlClient->GetUsedChipId(id);
 }
 
 WifiErrorNo WifiChipHalInterface::GetChipCapabilities(int &capabilities)
 {
+    CHECK_NULL_AND_RETURN(mIdlClient, WIFI_IDL_OPT_FAILED);
     return mIdlClient->GetChipCapabilities(capabilities);
 }
 
 WifiErrorNo WifiChipHalInterface::GetSupportedModes(std::vector<int> &modes)
 {
+    CHECK_NULL_AND_RETURN(mIdlClient, WIFI_IDL_OPT_FAILED);
     return mIdlClient->GetSupportedModes(modes);
 }
 
 WifiErrorNo WifiChipHalInterface::ConfigRunModes(int mode)
 {
+    CHECK_NULL_AND_RETURN(mIdlClient, WIFI_IDL_OPT_FAILED);
     return mIdlClient->ConfigRunModes(mode);
 }
 
 WifiErrorNo WifiChipHalInterface::GetCurrentMode(int &mode)
 {
+    CHECK_NULL_AND_RETURN(mIdlClient, WIFI_IDL_OPT_FAILED);
     return mIdlClient->GetCurrentMode(mode);
 }
 
 WifiErrorNo WifiChipHalInterface::RegisterChipEventCallback(WifiChipEventCallback &callback)
 {
+    CHECK_NULL_AND_RETURN(mIdlClient, WIFI_IDL_OPT_FAILED);
     return mIdlClient->RegisterChipEventCallback(callback);
 }
 
 WifiErrorNo WifiChipHalInterface::RequestFirmwareDebugInfo(std::string &debugInfo)
 {
+    CHECK_NULL_AND_RETURN(mIdlClient, WIFI_IDL_OPT_FAILED);
     return mIdlClient->RequestFirmwareDebugInfo(debugInfo);
 }
 
 WifiErrorNo WifiChipHalInterface::SetWifiPowerMode(int mode)
 {
+    CHECK_NULL_AND_RETURN(mIdlClient, WIFI_IDL_OPT_FAILED);
     return mIdlClient->SetWifiPowerMode(mode);
 }
 }  // namespace Wifi

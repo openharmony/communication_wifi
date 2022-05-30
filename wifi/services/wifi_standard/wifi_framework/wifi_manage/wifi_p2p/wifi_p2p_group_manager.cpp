@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -21,7 +21,6 @@
 
 namespace OHOS {
 namespace Wifi {
-
 WifiP2pGroupManager::WifiP2pGroupManager() : groupsInfo(), currentGroup(), groupMutex(), p2pConnInfo()
 {}
 
@@ -87,7 +86,6 @@ void WifiP2pGroupManager::UpdateWpaGroup(const WifiP2pGroupInfo &group)
 
 int WifiP2pGroupManager::RemoveClientFromGroup(int networkId, const std::string &deviceAddress)
 {
-    bool isRemoveSucceed = false;
     WifiP2pDevice device;
     device.SetDeviceAddress(deviceAddress);
 
@@ -97,7 +95,6 @@ int WifiP2pGroupManager::RemoveClientFromGroup(int networkId, const std::string 
         if (networkId == it->GetNetworkId()) {
             if (it->IsContainsDevice(device)) {
                 it->RemoveClientDevice(device);
-                isRemoveSucceed = true;
             }
             break;
         }

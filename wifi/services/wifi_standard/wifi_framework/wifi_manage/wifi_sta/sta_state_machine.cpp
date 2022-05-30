@@ -1745,9 +1745,8 @@ bool StaStateMachine::LinkedState::ExecuteStateMsg(InternalMessage *msg)
         return false;
     }
 
-    bool ret = NOT_EXECUTED;
     WIFI_LOGI("LinkedState-msgCode=%{public}d not handled.\n", msg->GetMessageName());
-    return ret;
+    return NOT_EXECUTED;
 }
 
 /* --------------------------- state machine Roaming State ------------------------------ */

@@ -519,8 +519,6 @@ int EventRegister::CheckPermission(const std::string& eventType)
 {
     auto callerToken = IPCSkeleton::GetCallingTokenID();
     auto tokenType = Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(callerToken);
-    WIFI_LOGD("Enter CheckPermission, callerToken=%{public}x, tokenType=%{public}x, eventType=%{public}s!",
-        callerToken, tokenType, eventType.c_str());
     if (tokenType == Security::AccessToken::ATokenTypeEnum::TOKEN_NATIVE) {
         return WIFI_NAPI_PERMISSION_GRANTED;
     }

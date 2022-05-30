@@ -1500,7 +1500,6 @@ static int ValidateReplyOptions(PDhcpMsgInfo reply)
     if (!pNode) {
         return RET_ERROR;
     }
-    pNode = pNode->next;
     PDhcpOption pOptMsgType = GetOption(&reply->options, DHCP_MESSAGE_TYPE_OPTION);
     if (!pOptMsgType) {
         LOGE("unkown reply message type.");

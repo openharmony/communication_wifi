@@ -35,12 +35,12 @@ WifiHalVendorInterface *g_wifiHalVendorInterface = NULL;
 static int ReadConfigModuleName(char *name, int size)
 {
     if (name == NULL) {
-        return -1;
+        return HAL_FAILURE;
     }
     FILE *fp = fopen(MODULE_CONFIG_FILE_PATH, "r");
     if (fp == NULL) {
         LOGE("open module configuration file failed");
-        return 0; /* file not exist, use default operators */
+        return HAL_SUCCESS; /* file not exist, use default operators */
     }
     int flag = 0;
     do {
@@ -65,21 +65,21 @@ static int ReadConfigModuleName(char *name, int size)
 static int OpenHalVendorModule(WifiHalVendorInterface *pInterface)
 {
     if (pInterface == NULL) {
-        return -1;
+        return HAL_FAILURE;
     }
     char name[MODULE_NAME_MAX_LEN] = {0};
     if (ReadConfigModuleName(name, MODULE_NAME_MAX_LEN) < 0) {
-        return -1;
+        return HAL_FAILURE;
     }
     if (strlen(name) <= 0) {
         LOGW("module name is null.");
-        return 0;
+        return HAL_SUCCESS;
     }
 
     void *handle = dlopen(name, RTLD_LAZY);
     if (handle == NULL) {
         LOGE("open config [%{public}s] so failed![%{public}s]", name, dlerror());
-        return -1;
+        return HAL_FAILURE;
     }
     int flag = 0;
     do {
@@ -103,9 +103,9 @@ static int OpenHalVendorModule(WifiHalVendorInterface *pInterface)
     } while (0);
     if (flag == 0) {
         dlclose(handle);
-        return -1;
+        return HAL_FAILURE;
     }
-    return 0;
+    return HAL_SUCCESS;
 }
 
 WifiHalVendorInterface *GetWifiHalVendorInterface(void)
@@ -146,13 +146,13 @@ int ExcuteCmd(const char *szCmd)
     int ret = system(szCmd);
     if (ret == -1) {
         LOGE("Execute system cmd %{private}s failed!", szCmd);
-        return -1;
+        return HAL_FAILURE;
     }
     if (WIFEXITED(ret) && (WEXITSTATUS(ret) == 0)) {
-        return 0;
+        return HAL_SUCCESS;
     }
     LOGE("Execute system cmd %{private}s failed: %{private}d", szCmd, WEXITSTATUS(ret));
-    return -1;
+    return HAL_FAILURE;
 }
 
 int CopyConfigFile(const char* configName)
@@ -160,27 +160,27 @@ int CopyConfigFile(const char* configName)
     char buf[BUFF_SIZE] = {0};
     if (snprintf_s(buf, sizeof(buf), sizeof(buf) - 1, "/data/misc/wifi/wpa_supplicant/%s", configName) < 0) {
         LOGE("snprintf_s dest dir failed.");
-        return -1;
+        return HAL_FAILURE;
     }
     if (access(buf, F_OK) != -1) {
         LOGI("Configure file %{public}s is exist.", buf);
-        return 0;
+        return HAL_SUCCESS;
     }
     char path[PATH_NUM][BUFF_SIZE] = {"/vendor/etc/wifi/", "/system/etc/wifi/"};
     for (int i = 0; i != PATH_NUM; ++i) {
         if (strcat_s(path[i], sizeof(path[i]), configName) != EOK) {
             LOGE("strcat_s failed.");
-            return -1;
+            return HAL_FAILURE;
         }
         if (access(path[i], F_OK) != -1) {
             char cmd[BUFF_SIZE] = {0};
             if (snprintf_s(cmd, sizeof(cmd), sizeof(cmd) - 1, "cp %s /data/misc/wifi/wpa_supplicant/", path[i]) < 0) {
                 LOGE("snprintf_s cp cmd failed.");
-                return -1;
+                return HAL_FAILURE;
             }
             return ExcuteCmd(cmd);
         }
     }
     LOGE("Copy config file failed: %{public}s", configName);
-    return -1;
+    return HAL_FAILURE;
 }

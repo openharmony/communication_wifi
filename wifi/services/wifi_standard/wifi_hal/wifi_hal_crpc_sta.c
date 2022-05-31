@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -21,31 +21,31 @@
 int RpcStart(RpcServer *server, Context *context)
 {
     if (server == NULL || context == NULL) {
-        return -1;
+        return HAL_FAILURE;
     }
     WifiErrorNo err = Start();
     WriteBegin(context, 0);
     WriteInt(context, err);
     WriteEnd(context);
-    return 0;
+    return HAL_SUCCESS;
 }
 
 int RpcStop(RpcServer *server, Context *context)
 {
     if (server == NULL || context == NULL) {
-        return -1;
+        return HAL_FAILURE;
     }
     WifiErrorNo err = Stop();
     WriteBegin(context, 0);
     WriteInt(context, err);
     WriteEnd(context);
-    return 0;
+    return HAL_SUCCESS;
 }
 
 int RpcStartScan(RpcServer *server, Context *context)
 {
     if (server == NULL || context == NULL) {
-        return -1;
+        return HAL_FAILURE;
     }
     ScanSettings setting = {0};
     int ret = -1;
@@ -98,18 +98,18 @@ int RpcStartScan(RpcServer *server, Context *context)
 int RpcGetScanInfos(RpcServer *server, Context *context)
 {
     if (server == NULL || context == NULL) {
-        return -1;
+        return HAL_FAILURE;
     }
     int maxSize = 0;
     if (ReadInt(context, &maxSize) < 0) {
-        return -1;
+        return HAL_FAILURE;
     }
     ScanInfo *results = NULL;
     if (maxSize > 0) {
         results = (ScanInfo *)calloc(maxSize, sizeof(ScanInfo));
     }
     if (results == NULL) {
-        return -1;
+        return HAL_FAILURE;
     }
     WifiErrorNo err = GetScanInfos(results, &maxSize);
     WriteBegin(context, 0);
@@ -136,46 +136,46 @@ int RpcGetScanInfos(RpcServer *server, Context *context)
     WriteEnd(context);
     free(results);
     results = NULL;
-    return 0;
+    return HAL_SUCCESS;
 }
 
 static int ReadPnoScanSettings(Context *context, PnoScanSettings *pSetting)
 {
     if (ReadInt(context, &pSetting->scanInterval) < 0 || ReadInt(context, &pSetting->minRssi2Dot4Ghz) < 0 ||
         ReadInt(context, &pSetting->minRssi5Ghz) < 0 || ReadInt(context, &pSetting->hiddenSsidSize) < 0) {
-        return -1;
+        return HAL_FAILURE;
     }
     if (pSetting->hiddenSsidSize > 0) {
         pSetting->hiddenSsid = ReadCharArray(context, pSetting->hiddenSsidSize);
         if (pSetting->hiddenSsid == NULL) {
-            return -1;
+            return HAL_FAILURE;
         }
     }
     if (ReadInt(context, &pSetting->savedSsidSize) < 0) {
-        return -1;
+        return HAL_FAILURE;
     }
     if (pSetting->savedSsidSize > 0) {
         pSetting->savedSsid = ReadCharArray(context, pSetting->savedSsidSize);
         if (pSetting->savedSsid == NULL) {
-            return -1;
+            return HAL_FAILURE;
         }
     }
     if (ReadInt(context, &pSetting->freqSize) < 0) {
-        return -1;
+        return HAL_FAILURE;
     }
     if (pSetting->freqSize > 0) {
         pSetting->freqs = ReadIntArray(context, pSetting->freqSize);
         if (pSetting->freqs == NULL) {
-            return -1;
+            return HAL_FAILURE;
         }
     }
-    return 0;
+    return HAL_SUCCESS;
 }
 
 int RpcStartPnoScan(RpcServer *server, Context *context)
 {
     if (server == NULL || context == NULL) {
-        return -1;
+        return HAL_FAILURE;
     }
     PnoScanSettings setting = {0};
     int ret = ReadPnoScanSettings(context, &setting);
@@ -212,71 +212,71 @@ int RpcStartPnoScan(RpcServer *server, Context *context)
 int RpcStopPnoScan(RpcServer *server, Context *context)
 {
     if (server == NULL || context == NULL) {
-        return -1;
+        return HAL_FAILURE;
     }
     WifiErrorNo err = StopPnoScan();
     WriteBegin(context, 0);
     WriteInt(context, err);
     WriteEnd(context);
-    return 0;
+    return HAL_SUCCESS;
 }
 
 int RpcConnect(RpcServer *server, Context *context)
 {
     if (server == NULL || context == NULL) {
-        return -1;
+        return HAL_FAILURE;
     }
     int networkId = 0;
     if (ReadInt(context, &networkId) < 0) {
-        return -1;
+        return HAL_FAILURE;
     }
     WifiErrorNo err = Connect(networkId);
     WriteBegin(context, 0);
     WriteInt(context, err);
     WriteEnd(context);
-    return 0;
+    return HAL_SUCCESS;
 }
 
 int RpcReconnect(RpcServer *server, Context *context)
 {
     if (server == NULL || context == NULL) {
-        return -1;
+        return HAL_FAILURE;
     }
     WifiErrorNo err = Reconnect();
     WriteBegin(context, 0);
     WriteInt(context, err);
     WriteEnd(context);
-    return 0;
+    return HAL_SUCCESS;
 }
 
 int RpcReassociate(RpcServer *server, Context *context)
 {
     if (server == NULL || context == NULL) {
-        return -1;
+        return HAL_FAILURE;
     }
     WifiErrorNo err = Reassociate();
     WriteBegin(context, 0);
     WriteInt(context, err);
     WriteEnd(context);
-    return 0;
+    return HAL_SUCCESS;
 }
 
 int RpcDisconnect(RpcServer *server, Context *context)
 {
     if (server == NULL || context == NULL) {
-        return -1;
+        return HAL_FAILURE;
     }
     WifiErrorNo err = Disconnect();
     WriteBegin(context, 0);
     WriteInt(context, err);
     WriteEnd(context);
-    return 0;
+    return HAL_SUCCESS;
 }
 
 int RpcGetStaCapabilities(RpcServer *server, Context *context)
 {
     if (server == NULL || context == NULL) {
-        return -1;
+        return HAL_FAILURE;
     }
     int32_t capabilities = 0;
     WifiErrorNo err = GetStaCapabilities(&capabilities);
@@ -286,24 +286,24 @@ int RpcGetStaCapabilities(RpcServer *server, Context *context)
         WriteInt(context, capabilities);
     }
     WriteEnd(context);
-    return 0;
+    return HAL_SUCCESS;
 }
 
 int RpcGetDeviceMacAddress(RpcServer *server, Context *context)
 {
     if (server == NULL || context == NULL) {
-        return -1;
+        return HAL_FAILURE;
     }
     int maxSize = 0;
     if (ReadInt(context, &maxSize) < 0 || maxSize <= 0) {
-        return -1;
+        return HAL_FAILURE;
     }
     unsigned char *mac = NULL;
     if (maxSize > 0) {
         mac = (unsigned char *)calloc(maxSize + 1, sizeof(unsigned char));
     }
     if (mac == NULL) {
-        return -1;
+        return HAL_FAILURE;
     }
     WifiErrorNo err = GetDeviceMacAddress(mac, &maxSize);
     WriteBegin(context, 0);
@@ -315,22 +315,22 @@ int RpcGetDeviceMacAddress(RpcServer *server, Context *context)
     WriteEnd(context);
     free(mac);
     mac = NULL;
-    return 0;
+    return HAL_SUCCESS;
 }
 
 int RpcGetFrequencies(RpcServer *server, Context *context)
 {
     if (server == NULL || context == NULL) {
-        return -1;
+        return HAL_FAILURE;
     }
     int band = 0;
     int maxSize = 0;
     if (ReadInt(context, &band) < 0 || ReadInt(context, &maxSize) < 0 || maxSize <= 0) {
-        return -1;
+        return HAL_FAILURE;
     }
     int *frequencies = (int *)calloc(maxSize, sizeof(int));
     if (frequencies == NULL) {
-        return -1;
+        return HAL_FAILURE;
     }
     WifiErrorNo err = GetFrequencies(band, frequencies, &maxSize);
     WriteBegin(context, 0);
@@ -344,92 +344,92 @@ int RpcGetFrequencies(RpcServer *server, Context *context)
     WriteEnd(context);
     free(frequencies);
     frequencies = NULL;
-    return 0;
+    return HAL_SUCCESS;
 }
 
 int RpcSetAssocMacAddr(RpcServer *server, Context *context)
 {
     if (server == NULL || context == NULL) {
-        return -1;
+        return HAL_FAILURE;
     }
     int maxSize = 0;
     if (ReadInt(context, &maxSize) < 0) {
-        return -1;
+        return HAL_FAILURE;
     }
     int len = maxSize + 1;
     unsigned char *mac = (unsigned char *)calloc(len, sizeof(unsigned char));
     if (mac == NULL) {
-        return -1;
+        return HAL_FAILURE;
     }
     if (ReadUStr(context, mac, len) != 0) {
         free(mac);
         mac = NULL;
-        return -1;
+        return HAL_FAILURE;
     }
     WifiErrorNo err = SetAssocMacAddr(mac, maxSize);
     WriteBegin(context, 0);
     WriteInt(context, err);
     WriteEnd(context);
     free(mac);
-    return 0;
+    return HAL_SUCCESS;
 }
 
 int RpcSetScanningMacAddress(RpcServer *server, Context *context)
 {
     if (server == NULL || context == NULL) {
-        return -1;
+        return HAL_FAILURE;
     }
     int maxSize = 0;
     if (ReadInt(context, &maxSize) < 0 || maxSize < 0) {
-        return -1;
+        return HAL_FAILURE;
     }
     int len = maxSize + 1;
     unsigned char *mac = (unsigned char *)calloc(len, sizeof(unsigned char));
     if (mac == NULL) {
-        return -1;
+        return HAL_FAILURE;
     }
     if (ReadUStr(context, mac, len) != 0) {
         free(mac);
-        return -1;
+        return HAL_FAILURE;
     }
     WifiErrorNo err = SetScanningMacAddress(mac, maxSize);
     WriteBegin(context, 0);
     WriteInt(context, err);
     WriteEnd(context);
     free(mac);
-    return 0;
+    return HAL_SUCCESS;
 }
 
 int RpcDeauthLastRoamingBssid(RpcServer *server, Context *context)
 {
     if (server == NULL || context == NULL) {
-        return -1;
+        return HAL_FAILURE;
     }
     int maxSize = 0;
     if (ReadInt(context, &maxSize) < 0 || maxSize < 0) {
-        return -1;
+        return HAL_FAILURE;
     }
     int len = maxSize + 1;
     unsigned char *mac = (unsigned char *)calloc(len, sizeof(unsigned char));
     if (mac == NULL) {
-        return -1;
+        return HAL_FAILURE;
     }
     if (ReadUStr(context, mac, len) != 0) {
         free(mac);
-        return -1;
+        return HAL_FAILURE;
     }
     WifiErrorNo err = DeauthLastRoamingBssid(mac, maxSize);
     WriteBegin(context, 0);
     WriteInt(context, err);
     WriteEnd(context);
     free(mac);
-    return 0;
+    return HAL_SUCCESS;
 }
 
 int RpcGetSupportFeature(RpcServer *server, Context *context)
 {
     if (server == NULL || context == NULL) {
-        return -1;
+        return HAL_FAILURE;
     }
     long feature = 0;
     WifiErrorNo err = GetSupportFeature(&feature);
@@ -439,24 +439,24 @@ int RpcGetSupportFeature(RpcServer *server, Context *context)
         WriteLong(context, feature);
     }
     WriteEnd(context);
-    return 0;
+    return HAL_SUCCESS;
 }
 
 int RpcRunCmd(RpcServer *server, Context *context)
 {
     if (server == NULL || context == NULL) {
-        return -1;
+        return HAL_FAILURE;
     }
     char ifname[WIFI_IFACE_NAME_MAXLEN] = {0};
     char *pIfName = NULL;
     int ret = ReadStr(context, ifname, WIFI_IFACE_NAME_MAXLEN);
     if (ret < 0) {
-        return -1;
+        return HAL_FAILURE;
     } else if (ret > 0) {
         int len = ret + 1;
         pIfName = (char *)calloc(len, sizeof(char));
         if (pIfName == NULL) {
-            return -1;
+            return HAL_FAILURE;
         }
         ReadStr(context, pIfName, len);
     }
@@ -465,21 +465,21 @@ int RpcRunCmd(RpcServer *server, Context *context)
     if (ReadInt(context, &cmdid) < 0 || ReadInt(context, &bufsize) < 0 || bufsize < 0) {
         free(pIfName);
         pIfName = NULL;
-        return -1;
+        return HAL_FAILURE;
     }
     int len = bufsize + 1;
     unsigned char *buf = (unsigned char *)calloc(len, sizeof(unsigned char));
     if (buf == NULL) {
         free(pIfName);
         pIfName = NULL;
-        return -1;
+        return HAL_FAILURE;
     }
     if (ReadUStr(context, buf, len) != 0) {
         free(pIfName);
         free(buf);
         pIfName = NULL;
         buf = NULL;
-        return -1;
+        return HAL_FAILURE;
     }
     WifiErrorNo err = RunCmd((pIfName == NULL) ? ifname : pIfName, cmdid, buf, bufsize);
     WriteBegin(context, 0);
@@ -489,45 +489,45 @@ int RpcRunCmd(RpcServer *server, Context *context)
     free(buf);
     pIfName = NULL;
     buf = NULL;
-    return 0;
+    return HAL_SUCCESS;
 }
 
 int RpcSetWifiTxPower(RpcServer *server, Context *context)
 {
     if (server == NULL || context == NULL) {
-        return -1;
+        return HAL_FAILURE;
     }
     int32_t power = 0;
     if (ReadInt(context, &power) < 0) {
-        return -1;
+        return HAL_FAILURE;
     }
     WifiErrorNo err = SetWifiTxPower(power);
     WriteBegin(context, 0);
     WriteInt(context, err);
     WriteEnd(context);
-    return 0;
+    return HAL_SUCCESS;
 }
 
 int RpcRemoveNetwork(RpcServer *server, Context *context)
 {
     if (server == NULL || context == NULL) {
-        return -1;
+        return HAL_FAILURE;
     }
     int32_t networkId = 0;
     if (ReadInt(context, &networkId) < 0) {
-        return -1;
+        return HAL_FAILURE;
     }
     WifiErrorNo err = RemoveNetwork(networkId);
     WriteBegin(context, 0);
     WriteInt(context, err);
     WriteEnd(context);
-    return 0;
+    return HAL_SUCCESS;
 }
 
 int RpcAddNetwork(RpcServer *server, Context *context)
 {
     if (server == NULL || context == NULL) {
-        return -1;
+        return HAL_FAILURE;
     }
     int networkId = 0;
     WifiErrorNo err = AddNetwork(&networkId);
@@ -537,61 +537,61 @@ int RpcAddNetwork(RpcServer *server, Context *context)
         WriteInt(context, networkId);
     }
     WriteEnd(context);
-    return 0;
+    return HAL_SUCCESS;
 }
 
 int RpcEnableNetwork(RpcServer *server, Context *context)
 {
     if (server == NULL || context == NULL) {
-        return -1;
+        return HAL_FAILURE;
     }
     int networkId = 0;
     if (ReadInt(context, &networkId) < 0) {
-        return -1;
+        return HAL_FAILURE;
     }
     WifiErrorNo err = EnableNetwork(networkId);
     WriteBegin(context, 0);
     WriteInt(context, err);
     WriteEnd(context);
-    return 0;
+    return HAL_SUCCESS;
 }
 
 int RpcDisableNetwork(RpcServer *server, Context *context)
 {
     if (server == NULL || context == NULL) {
-        return -1;
+        return HAL_FAILURE;
     }
     int networkId = 0;
     if (ReadInt(context, &networkId) < 0) {
-        return -1;
+        return HAL_FAILURE;
     }
     WifiErrorNo err = DisableNetwork(networkId);
     WriteBegin(context, 0);
     WriteInt(context, err);
     WriteEnd(context);
-    return 0;
+    return HAL_SUCCESS;
 }
 
 int RpcSetNetwork(RpcServer *server, Context *context)
 {
     if (server == NULL || context == NULL) {
-        return -1;
+        return HAL_FAILURE;
     }
     int networkId = 0;
     if (ReadInt(context, &networkId) < 0) {
-        return -1;
+        return HAL_FAILURE;
     }
     int size = 0;
     if (ReadInt(context, &size) < 0) {
-        return -1;
+        return HAL_FAILURE;
     }
     if (size <= 0) {
-        return -1;
+        return HAL_FAILURE;
     }
 
     SetNetworkConfig *confs = (SetNetworkConfig *)calloc(size, sizeof(SetNetworkConfig));
     if (confs == NULL) {
-        return -1;
+        return HAL_FAILURE;
     }
 
     int flag = 0;
@@ -611,57 +611,57 @@ int RpcSetNetwork(RpcServer *server, Context *context)
     WriteEnd(context);
     free(confs);
     confs = NULL;
-    return 0;
+    return HAL_SUCCESS;
 }
 
 int RpcSaveNetworkConfig(RpcServer *server, Context *context)
 {
     if (server == NULL || context == NULL) {
-        return -1;
+        return HAL_FAILURE;
     }
     WifiErrorNo err = SaveNetworkConfig();
     WriteBegin(context, 0);
     WriteInt(context, err);
     WriteEnd(context);
-    return 0;
+    return HAL_SUCCESS;
 }
 
 int RpcStartWpsPbcMode(RpcServer *server, Context *context)
 {
     if (server == NULL || context == NULL) {
-        return -1;
+        return HAL_FAILURE;
     }
     WifiWpsParam param = {0};
     if (ReadInt(context, &param.anyFlag) < 0) {
-        return -1;
+        return HAL_FAILURE;
     }
     if (ReadInt(context, &param.multiAp) < 0) {
-        return -1;
+        return HAL_FAILURE;
     }
     if (ReadStr(context, param.bssid, sizeof(param.bssid)) != 0) {
-        return -1;
+        return HAL_FAILURE;
     }
     WifiErrorNo err = StartWpsPbcMode(&param);
     WriteBegin(context, 0);
     WriteInt(context, err);
     WriteEnd(context);
-    return 0;
+    return HAL_SUCCESS;
 }
 
 int RpcStartWpsPinMode(RpcServer *server, Context *context)
 {
     if (server == NULL || context == NULL) {
-        return -1;
+        return HAL_FAILURE;
     }
     WifiWpsParam param = {0};
     if (ReadInt(context, &param.anyFlag) < 0) {
-        return -1;
+        return HAL_FAILURE;
     }
     if (ReadInt(context, &param.multiAp) < 0) {
-        return -1;
+        return HAL_FAILURE;
     }
     if (ReadStr(context, param.bssid, sizeof(param.bssid)) != 0) {
-        return -1;
+        return HAL_FAILURE;
     }
     int pinCode = 0;
     WifiErrorNo err = StartWpsPinMode(&param, &pinCode);
@@ -671,25 +671,25 @@ int RpcStartWpsPinMode(RpcServer *server, Context *context)
         WriteInt(context, pinCode);
     }
     WriteEnd(context);
-    return 0;
+    return HAL_SUCCESS;
 }
 
 int RpcStopWps(RpcServer *server, Context *context)
 {
     if (server == NULL || context == NULL) {
-        return -1;
+        return HAL_FAILURE;
     }
     WifiErrorNo err = StopWps();
     WriteBegin(context, 0);
     WriteInt(context, err);
     WriteEnd(context);
-    return 0;
+    return HAL_SUCCESS;
 }
 
 int RpcGetRoamingCapabilities(RpcServer *server, Context *context)
 {
     if (server == NULL || context == NULL) {
-        return -1;
+        return HAL_FAILURE;
     }
     WifiRoamCapability capability = {0};
     WifiErrorNo err = GetRoamingCapabilities(&capability);
@@ -700,7 +700,7 @@ int RpcGetRoamingCapabilities(RpcServer *server, Context *context)
         WriteInt(context, capability.maxTrustlistSize);
     }
     WriteEnd(context);
-    return 0;
+    return HAL_SUCCESS;
 }
 
 static char **ReadRoamBlockList(Context *context, int size)
@@ -742,7 +742,7 @@ static char **ReadRoamBlockList(Context *context, int size)
 int RpcSetRoamConfig(RpcServer *server, Context *context)
 {
     if (server == NULL || context == NULL) {
-        return -1;
+        return HAL_FAILURE;
     }
     int blocksize = 0;
     char **blocklist = NULL;
@@ -798,11 +798,11 @@ int RpcSetRoamConfig(RpcServer *server, Context *context)
 int RpcWpaGetNetwork(RpcServer *server, Context *context)
 {
     if (server == NULL || context == NULL) {
-        return -1;
+        return HAL_FAILURE;
     }
     GetNetworkConfig conf = {0};
     if (ReadInt(context, &(conf.networkId)) < 0 || ReadStr(context, conf.param, sizeof(conf.param)) != 0) {
-        return -1;
+        return HAL_FAILURE;
     }
     WifiErrorNo err = WpaGetNetWork(&conf);
     WriteBegin(context, 0);
@@ -811,53 +811,53 @@ int RpcWpaGetNetwork(RpcServer *server, Context *context)
         WriteStr(context, conf.value);
     }
     WriteEnd(context);
-    return 0;
+    return HAL_SUCCESS;
 }
 
 int RpcWpaAutoConnect(RpcServer *server, Context *context)
 {
     if (server == NULL || context == NULL) {
-        return -1;
+        return HAL_FAILURE;
     }
     int enable = 0;
     if (ReadInt(context, &enable) < 0) {
-        return -1;
+        return HAL_FAILURE;
     }
     WifiErrorNo err = WpaAutoConnect(enable);
     WriteBegin(context, 0);
     WriteInt(context, err);
     WriteEnd(context);
-    return 0;
+    return HAL_SUCCESS;
 }
 
 int RpcWpaBlocklistClear(RpcServer *server, Context *context)
 {
     if (server == NULL || context == NULL) {
-        return -1;
+        return HAL_FAILURE;
     }
     WifiErrorNo err = WpaBlocklistClear();
     WriteBegin(context, 0);
     WriteInt(context, err);
     WriteEnd(context);
-    return 0;
+    return HAL_SUCCESS;
 }
 
 int RpcGetNetworkList(RpcServer *server, Context *context)
 {
     if (server == NULL || context == NULL) {
-        return -1;
+        return HAL_FAILURE;
     }
     int maxSize = 0;
     if (ReadInt(context, &maxSize) < 0) {
-        return -1;
+        return HAL_FAILURE;
     }
     if (maxSize <= 0) {
-        return -1;
+        return HAL_FAILURE;
     }
 
     WifiNetworkInfo *infos = (WifiNetworkInfo *)calloc(maxSize, sizeof(WifiNetworkInfo));
     if (infos == NULL) {
-        return -1;
+        return HAL_FAILURE;
     }
 
     WifiErrorNo err = GetNetworkList(infos, &maxSize);
@@ -875,17 +875,17 @@ int RpcGetNetworkList(RpcServer *server, Context *context)
     WriteEnd(context);
     free(infos);
     infos = NULL;
-    return 0;
+    return HAL_SUCCESS;
 }
 
 int RpcGetConnectSignalInfo(RpcServer *server, Context *context)
 {
     if (server == NULL || context == NULL) {
-        return -1;
+        return HAL_FAILURE;
     }
     char endBssid[WIFI_BSSID_LENGTH] = {0};
     if (ReadStr(context, endBssid, sizeof(endBssid)) != 0) {
-        return -1;
+        return HAL_FAILURE;
     }
     WpaSignalInfo info = {0};
     WifiErrorNo err = GetConnectSignalInfo(endBssid, &info);
@@ -899,5 +899,5 @@ int RpcGetConnectSignalInfo(RpcServer *server, Context *context)
         WriteInt(context, info.frequency);
     }
     WriteEnd(context);
-    return 0;
+    return HAL_SUCCESS;
 }

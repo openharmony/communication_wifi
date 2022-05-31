@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -20,69 +20,69 @@
 int RpcStartSupplicant(RpcServer *server, Context *context)
 {
     if (server == NULL || context == NULL) {
-        return -1;
+        return HAL_FAILURE;
     }
     WifiErrorNo err = StartSupplicant();
     WriteBegin(context, 0);
     WriteInt(context, err);
     WriteEnd(context);
-    return 0;
+    return HAL_SUCCESS;
 }
 
 int RpcStopSupplicant(RpcServer *server, Context *context)
 {
     if (server == NULL || context == NULL) {
-        return -1;
+        return HAL_FAILURE;
     }
     WifiErrorNo err = StopSupplicant();
     WriteBegin(context, 0);
     WriteInt(context, err);
     WriteEnd(context);
-    return 0;
+    return HAL_SUCCESS;
 }
 
 int RpcConnectSupplicant(RpcServer *server, Context *context)
 {
     if (server == NULL || context == NULL) {
-        return -1;
+        return HAL_FAILURE;
     }
     WifiErrorNo err = ConnectSupplicant();
     WriteBegin(context, 0);
     WriteInt(context, err);
     WriteEnd(context);
-    return 0;
+    return HAL_SUCCESS;
 }
 
 int RpcDisconnectSupplicant(RpcServer *server, Context *context)
 {
     if (server == NULL || context == NULL) {
-        return -1;
+        return HAL_FAILURE;
     }
     WifiErrorNo err = DisconnectSupplicant();
     WriteBegin(context, 0);
     WriteInt(context, err);
     WriteEnd(context);
-    return 0;
+    return HAL_SUCCESS;
 }
 
 int RpcRequestToSupplicant(RpcServer *server, Context *context)
 {
     if (server == NULL || context == NULL) {
-        return -1;
+        return HAL_FAILURE;
     }
     int maxSize = 0;
     if (ReadInt(context, &maxSize) < 0 || maxSize < 0) {
-        return -1;
+        return HAL_FAILURE;
     }
     int len = maxSize + 1;
     unsigned char *buf = (unsigned char *)calloc(len, sizeof(unsigned char));
     if (buf == NULL) {
-        return -1;
+        return HAL_FAILURE;
     }
     if (ReadUStr(context, buf, len) != 0) {
         free(buf);
         buf = NULL;
-        return -1;
+        return HAL_FAILURE;
     }
     WifiErrorNo err = RequestToSupplicant(buf, maxSize);
     WriteBegin(context, 0);
@@ -90,46 +90,46 @@ int RpcRequestToSupplicant(RpcServer *server, Context *context)
     WriteEnd(context);
     free(buf);
     buf = NULL;
-    return 0;
+    return HAL_SUCCESS;
 }
 
 int RpcSetPowerSave(RpcServer *server, Context *context)
 {
     if (server == NULL || context == NULL) {
-        return -1;
+        return HAL_FAILURE;
     }
     int mode = 0;
     if (ReadInt(context, &mode) < 0) {
-        return -1;
+        return HAL_FAILURE;
     }
 
     WifiErrorNo err = SetPowerSave(mode);
     WriteBegin(context, 0);
     WriteInt(context, err);
     WriteEnd(context);
-    return 0;
+    return HAL_SUCCESS;
 }
 
 int RpcWpaSetCountryCode(RpcServer *server, Context *context)
 {
     if (server == NULL || context == NULL) {
-        return -1;
+        return HAL_FAILURE;
     }
     char countryCode[WIFI_COUNTRY_CODE_MAXLEN + 1] = {0};
     if (ReadStr(context, countryCode, sizeof(countryCode)) != 0) {
-        return -1;
+        return HAL_FAILURE;
     }
     WifiErrorNo err = WpaSetCountryCode(countryCode);
     WriteBegin(context, 0);
     WriteInt(context, err);
     WriteEnd(context);
-    return 0;
+    return HAL_SUCCESS;
 }
 
 int RpcWpaGetCountryCode(RpcServer *server, Context *context)
 {
     if (server == NULL || context == NULL) {
-        return -1;
+        return HAL_FAILURE;
     }
     char countryCode[WIFI_COUNTRY_CODE_MAXLEN + 1] = {0};
     WifiErrorNo err = WpaGetCountryCode(countryCode, WIFI_COUNTRY_CODE_MAXLEN + 1);
@@ -139,5 +139,5 @@ int RpcWpaGetCountryCode(RpcServer *server, Context *context)
         WriteStr(context, countryCode);
     }
     WriteEnd(context);
-    return 0;
+    return HAL_SUCCESS;
 }

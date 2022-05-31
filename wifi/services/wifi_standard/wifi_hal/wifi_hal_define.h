@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -35,6 +35,9 @@ extern "C" {
 #define WIFI_P2P_GROUP_IFNAME_LENGTH 128
 #define WIFI_P2P_SERVER_NAME_LENGTH 256
 #define WIFI_NETWORK_PSK_MAXLEN 64
+
+#define HAL_SUCCESS 0
+#define HAL_FAILURE (-1)
 
 typedef enum WifiErrorNo {
     WIFI_HAL_SUCCESS = 0,                /* Success. */

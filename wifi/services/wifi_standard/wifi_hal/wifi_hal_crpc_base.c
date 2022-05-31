@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -75,15 +75,15 @@ char **ReadCharArray(Context *context, int size)
 int RpcGetName(RpcServer *server, Context *context)
 {
     if (server == NULL || context == NULL) {
-        return -1;
+        return HAL_FAILURE;
     }
     int size = 0;
     if (ReadInt(context, &size) < 0 || size <= 0) {
-        return -1;
+        return HAL_FAILURE;
     }
     char *ifname = (char *)calloc(size, sizeof(char));
     if (ifname == NULL) {
-        return -1;
+        return HAL_FAILURE;
     }
     WifiErrorNo err = GetName(ifname, size);
     WriteBegin(context, 0);
@@ -94,13 +94,13 @@ int RpcGetName(RpcServer *server, Context *context)
     WriteEnd(context);
     free(ifname);
     ifname = NULL;
-    return 0;
+    return HAL_SUCCESS;
 }
 
 int RpcGetType(RpcServer *server, Context *context)
 {
     if (server == NULL || context == NULL) {
-        return -1;
+        return HAL_FAILURE;
     }
     int type = 0;
     WifiErrorNo err = GetType(&type);
@@ -110,5 +110,5 @@ int RpcGetType(RpcServer *server, Context *context)
         WriteInt(context, type);
     }
     WriteEnd(context);
-    return 0;
+    return HAL_SUCCESS;
 }

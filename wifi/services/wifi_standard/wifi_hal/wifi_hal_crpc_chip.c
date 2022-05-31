@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -20,15 +20,15 @@
 int RpcGetWifiChip(RpcServer *server, Context *context)
 {
     if (server == NULL || context == NULL) {
-        return -1;
+        return HAL_FAILURE;
     }
     int chipId = 0;
     if (ReadInt(context, &chipId) < 0) {
-        return -1;
+        return HAL_FAILURE;
     }
     WifiChip wifiChip;
     if (memset_s(&wifiChip, sizeof(wifiChip), 0, sizeof(wifiChip)) != EOK) {
-        return -1;
+        return HAL_FAILURE;
     }
     WifiErrorNo err = GetWifiChip(chipId, &wifiChip);
     WriteBegin(context, 0);
@@ -37,24 +37,24 @@ int RpcGetWifiChip(RpcServer *server, Context *context)
         WriteInt(context, wifiChip.chip);
     }
     WriteEnd(context);
-    return 0;
+    return HAL_SUCCESS;
 }
 
 int RpcGetWifiChipIds(RpcServer *server, Context *context)
 {
     if (server == NULL || context == NULL) {
-        return -1;
+        return HAL_FAILURE;
     }
     int maxSize = 0;
     if (ReadInt(context, &maxSize) < 0) {
-        return -1;
+        return HAL_FAILURE;
     }
     if (maxSize <= 0) {
-        return -1;
+        return HAL_FAILURE;
     }
     uint8_t *chipIds = (uint8_t *)calloc(maxSize, sizeof(int));
     if (chipIds == NULL) {
-        return -1;
+        return HAL_FAILURE;
     }
     WifiErrorNo err = GetWifiChipIds(chipIds, &maxSize);
     WriteBegin(context, 0);
@@ -68,13 +68,13 @@ int RpcGetWifiChipIds(RpcServer *server, Context *context)
     WriteEnd(context);
     free(chipIds);
     chipIds = NULL;
-    return 0;
+    return HAL_SUCCESS;
 }
 
 int RpcGetChipId(RpcServer *server, Context *context)
 {
     if (server == NULL || context == NULL) {
-        return -1;
+        return HAL_FAILURE;
     }
     int chipId = 0;
     WifiErrorNo err = GetChipId(&chipId);
@@ -84,21 +84,21 @@ int RpcGetChipId(RpcServer *server, Context *context)
         WriteInt(context, chipId);
     }
     WriteEnd(context);
-    return 0;
+    return HAL_SUCCESS;
 }
 
 int RpcCreateIface(RpcServer *server, Context *context)
 {
     if (server == NULL || context == NULL) {
-        return -1;
+        return HAL_FAILURE;
     }
     int type = 0;
     if (ReadInt(context, &type) < 0) {
-        return -1;
+        return HAL_FAILURE;
     }
     WifiIface wifiIface;
     if (memset_s(&wifiIface, sizeof(wifiIface), 0, sizeof(wifiIface)) != EOK) {
-        return -1;
+        return HAL_FAILURE;
     }
     WifiErrorNo err = CreateIface(type, &wifiIface);
     WriteBegin(context, 0);
@@ -110,28 +110,28 @@ int RpcCreateIface(RpcServer *server, Context *context)
         WriteStr(context, wifiIface.macAddr);
     }
     WriteEnd(context);
-    return 0;
+    return HAL_SUCCESS;
 }
 
 int RpcGetIface(RpcServer *server, Context *context)
 {
     if (server == NULL || context == NULL) {
-        return -1;
+        return HAL_FAILURE;
     }
     WifiIface wifiIface;
     if (memset_s(&wifiIface, sizeof(wifiIface), 0, sizeof(wifiIface)) != EOK) {
-        return -1;
+        return HAL_FAILURE;
     }
     char ifname[WIFI_IFACE_NAME_MAXLEN] = {0};
     char *pstr = NULL;
     int ret = ReadStr(context, ifname, WIFI_IFACE_NAME_MAXLEN);
     if (ret < 0) {
-        return -1;
+        return HAL_FAILURE;
     } else if (ret > 0) {
         int len = ret + 1;
         pstr = (char *)calloc(len, sizeof(char));
         if (pstr == NULL) {
-            return -1;
+            return HAL_FAILURE;
         }
         ReadStr(context, pstr, len);
     }
@@ -149,22 +149,22 @@ int RpcGetIface(RpcServer *server, Context *context)
         free(pstr);
         pstr = NULL;
     }
-    return 0;
+    return HAL_SUCCESS;
 }
 
 int RpcGetIfaceNames(RpcServer *server, Context *context)
 {
     if (server == NULL || context == NULL) {
-        return -1;
+        return HAL_FAILURE;
     }
     int type = 0;
     int size = 0;
     if (ReadInt(context, &type) < 0 || ReadInt(context, &size) < 0 || size <= 0) {
-        return -1;
+        return HAL_FAILURE;
     }
     char *ifname = (char *)calloc(size, sizeof(char));
     if (ifname == NULL) {
-        return -1;
+        return HAL_FAILURE;
     }
     WifiErrorNo err = GetIfaceNames(type, ifname, size);
     WriteBegin(context, 0);
@@ -175,24 +175,24 @@ int RpcGetIfaceNames(RpcServer *server, Context *context)
     WriteEnd(context);
     free(ifname);
     ifname = NULL;
-    return 0;
+    return HAL_SUCCESS;
 }
 
 int RpcRemoveIface(RpcServer *server, Context *context)
 {
     if (server == NULL || context == NULL) {
-        return -1;
+        return HAL_FAILURE;
     }
     char ifname[WIFI_IFACE_NAME_MAXLEN] = {0};
     char *pstr = NULL;
     int ret = ReadStr(context, ifname, WIFI_IFACE_NAME_MAXLEN);
     if (ret < 0) {
-        return -1;
+        return HAL_FAILURE;
     } else if (ret > 0) {
         int len = ret + 1;
         pstr = (char *)calloc(len, sizeof(char));
         if (pstr == NULL) {
-            return -1;
+            return HAL_FAILURE;
         }
         ReadStr(context, pstr, len);
     }
@@ -204,13 +204,13 @@ int RpcRemoveIface(RpcServer *server, Context *context)
         free(pstr);
         pstr = NULL;
     }
-    return 0;
+    return HAL_SUCCESS;
 }
 
 int RpcGetCapabilities(RpcServer *server, Context *context)
 {
     if (server == NULL || context == NULL) {
-        return -1;
+        return HAL_FAILURE;
     }
     uint32_t capabilities = 0;
     WifiErrorNo err = GetCapabilities(&capabilities);
@@ -220,21 +220,21 @@ int RpcGetCapabilities(RpcServer *server, Context *context)
         WriteInt(context, capabilities);
     }
     WriteEnd(context);
-    return 0;
+    return HAL_SUCCESS;
 }
 
 int RpcGetSupportedComboModes(RpcServer *server, Context *context)
 {
     if (server == NULL || context == NULL) {
-        return -1;
+        return HAL_FAILURE;
     }
     int maxSize = 0;
     if (ReadInt(context, &maxSize) < 0 || maxSize <= 0) {
-        return -1;
+        return HAL_FAILURE;
     }
     int *modes = (int *)calloc(maxSize, sizeof(int));
     if (modes == NULL) {
-        return -1;
+        return HAL_FAILURE;
     }
     WifiErrorNo err = GetSupportedComboModes(modes, &maxSize);
     WriteBegin(context, 0);
@@ -248,29 +248,29 @@ int RpcGetSupportedComboModes(RpcServer *server, Context *context)
     WriteEnd(context);
     free(modes);
     modes = NULL;
-    return 0;
+    return HAL_SUCCESS;
 }
 
 int RpcConfigComboModes(RpcServer *server, Context *context)
 {
     if (server == NULL || context == NULL) {
-        return -1;
+        return HAL_FAILURE;
     }
     int mode = 0;
     if (ReadInt(context, &mode) < 0) {
-        return -1;
+        return HAL_FAILURE;
     }
     WifiErrorNo err = ConfigComboModes(mode);
     WriteBegin(context, 0);
     WriteInt(context, err);
     WriteEnd(context);
-    return 0;
+    return HAL_SUCCESS;
 }
 
 int RpcGetComboModes(RpcServer *server, Context *context)
 {
     if (server == NULL || context == NULL) {
-        return -1;
+        return HAL_FAILURE;
     }
     int mode = 0;
     WifiErrorNo err = GetComboModes(&mode);
@@ -280,22 +280,22 @@ int RpcGetComboModes(RpcServer *server, Context *context)
         WriteInt(context, mode);
     }
     WriteEnd(context);
-    return 0;
+    return HAL_SUCCESS;
 }
 
 int RpcRequestFirmwareDebugDump(RpcServer *server, Context *context)
 {
     if (server == NULL || context == NULL) {
-        return -1;
+        return HAL_FAILURE;
     }
     int maxSize = 0;
     if (ReadInt(context, &maxSize) < 0 || maxSize <= 0) {
-        return -1;
+        return HAL_FAILURE;
     }
 
     unsigned char *bytes = (unsigned char *)calloc(maxSize + 1, sizeof(unsigned char));
     if (bytes == NULL) {
-        return -1;
+        return HAL_FAILURE;
     }
 
     WifiErrorNo err = RequestFirmwareDebugDump(bytes, &maxSize);
@@ -308,21 +308,21 @@ int RpcRequestFirmwareDebugDump(RpcServer *server, Context *context)
     WriteEnd(context);
     free(bytes);
     bytes = NULL;
-    return 0;
+    return HAL_SUCCESS;
 }
 
 int RpcSetPowerMode(RpcServer *server, Context *context)
 {
     if (server == NULL || context == NULL) {
-        return -1;
+        return HAL_FAILURE;
     }
     int mode = 0;
     if (ReadInt(context, &mode) < 0) {
-        return -1;
+        return HAL_FAILURE;
     }
     WifiErrorNo err = SetPowerMode(mode);
     WriteBegin(context, 0);
     WriteInt(context, err);
     WriteEnd(context);
-    return 0;
+    return HAL_SUCCESS;
 }

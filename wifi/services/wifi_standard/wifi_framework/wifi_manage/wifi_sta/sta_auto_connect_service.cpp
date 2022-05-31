@@ -209,7 +209,8 @@ void StaAutoConnectService::ConnectElectedDevice(WifiDeviceConfig &electedDevice
             pStaStateMachine->StartRoamToNetwork(electedDevice.bssid);
         }
     } else if (currentConnectedNetwork.detailedState == DetailedState::DISCONNECTED ||
-        currentConnectedNetwork.detailedState == DetailedState::CONNECTION_TIMEOUT) {
+        currentConnectedNetwork.detailedState == DetailedState::CONNECTION_TIMEOUT ||
+        currentConnectedNetwork.detailedState == DetailedState::FAILED) {
         pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_CONNECT_SAVED_NETWORK,
             electedDevice.networkId,
             NETWORK_SELECTED_FOR_CONNECTION_MANAGEMENT);
@@ -444,7 +445,8 @@ bool StaAutoConnectService::AllowAutoSelectDevice(const std::vector<InterScanInf
 
         case DetailedState::DISCONNECTED:
         case DetailedState::CONNECTION_TIMEOUT:
-            WIFI_LOGI("The current connection status is disconnected or timeout.\n");
+        case DetailedState::FAILED:
+            WIFI_LOGI("The current status is in can connect status: %{public}d\n", info.detailedState);
             return true;
 
         case DetailedState::NOTWORKING:

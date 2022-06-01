@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -18,6 +18,7 @@
 #include <fstream>
 #include <sstream>
 #include <string>
+#include <unistd.h>
 #include <vector>
 #include "wifi_config_file_spec.h"
 #include "wifi_log.h"
@@ -165,9 +166,9 @@ int WifiConfigFileImpl<T>::LoadConfig()
 template<typename T>
 int WifiConfigFileImpl<T>::SaveConfig()
 {
-    std::ofstream fs(mFileName.c_str());
-    if (!fs.is_open()) {
-        LOGE("Save config file: %{public}s, fs.is_open() failed!", mFileName.c_str());
+    FILE* fp = fopen(mFileName.c_str(), "w");
+    if (!fp) {
+        LOGE("Save config file: %{public}s, fopen() failed!", mFileName.c_str());
         return -1;
     }
     std::ostringstream ss;
@@ -181,8 +182,13 @@ int WifiConfigFileImpl<T>::SaveConfig()
         ss << OutTClassString(item) << std::endl;
     }
     std::string content = ss.str();
-    fs.write(content.c_str(), content.length());
-    fs.close();
+    int ret = fwrite(content.c_str(), 1, content.length(), fp);
+    if (ret != (int)content.length()) {
+        LOGE("Save config file: %{public}s, fwrite() failed!", mFileName.c_str());
+    }
+    (void)fflush(fp);
+    (void)fsync(fileno(fp));
+    (void)fclose(fp);
     mValues.clear(); /* clear values */
     return 0;
 }

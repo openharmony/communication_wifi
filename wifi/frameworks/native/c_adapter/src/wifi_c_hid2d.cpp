@@ -109,6 +109,7 @@ static void ConvertRecommendChannelRequest(const RecommendChannelRequest *reques
 static void ConvertRecommendChannelResponse(const OHOS::Wifi::RecommendChannelResponse& rsp,
     RecommendChannelResponse* response)
 {
+    CHECK_PTR_RETURN_VOID(config);
     response->status = RecommendStatus(static_cast<int>(rsp.status));
     response->index = rsp.index;
     response->centerFreq = rsp.centerFreq;

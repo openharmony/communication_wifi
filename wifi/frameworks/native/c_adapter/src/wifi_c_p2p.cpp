@@ -179,7 +179,7 @@ WifiErrorCode P2pCancelConnect()
 
 static OHOS::Wifi::ErrCode ConvertP2PDeviceCppToC(const OHOS::Wifi::WifiP2pDevice& cppDevice, WifiP2pDevice* p2pDevice)
 {
-    CHECK_PTR_RETURN(p2pDevice, ERROR_WIFI_INVALID_ARGS);
+    CHECK_PTR_RETURN(p2pDevice, OHOS::Wifi::WIFI_OPT_INVALID_PARAM);
     if (memcpy_s(p2pDevice->deviceName, P2P_NAME_LENGTH,
         cppDevice.GetDeviceName().c_str(), cppDevice.GetDeviceName().size() + 1) != EOK) {
         WIFI_LOGE("memcpy_s device name failed!");
@@ -213,7 +213,7 @@ static OHOS::Wifi::ErrCode ConvertP2PDeviceCppToC(const OHOS::Wifi::WifiP2pDevic
 
 static OHOS::Wifi::ErrCode ConvertGroupInfoCppToC(const OHOS::Wifi::WifiP2pGroupInfo& cppGroup, WifiP2pGroupInfo* group)
 {
-    CHECK_PTR_RETURN(group, ERROR_WIFI_INVALID_ARGS);
+    CHECK_PTR_RETURN(group, OHOS::Wifi::WIFI_OPT_INVALID_PARAM);
     if (ConvertP2PDeviceCppToC(cppGroup.GetOwner(), &group->owner) != OHOS::Wifi::WIFI_OPT_SUCCESS) {
         return OHOS::Wifi::WIFI_OPT_FAILED;
     }

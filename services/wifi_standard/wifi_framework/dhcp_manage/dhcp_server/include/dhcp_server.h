@@ -36,7 +36,8 @@ int StartDhcpServer(PDhcpServerContext ctx);
 int StopDhcpServer(PDhcpServerContext ctx);
 int GetServerStatus(PDhcpServerContext ctx);
 void RegisterDhcpCallback(PDhcpServerContext ctx, DhcpServerCallback callback);
-int FreeServerContex(PDhcpServerContext ctx);
+int FreeServerContext(PDhcpServerContext ctx);
+int SaveLease(PDhcpServerContext ctx);
 
 #ifdef __cplusplus
 }

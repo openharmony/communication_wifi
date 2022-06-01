@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -142,7 +142,11 @@ public:
      * @param callback - IWifiDeviceCallBack object
      * @return ErrCode - operation result
      */
+#ifdef OHOS_ARCH_LITE
+    ErrCode RegisterCallBack(const std::shared_ptr<IWifiDeviceCallBack> &callback) override;
+#else
     ErrCode RegisterCallBack(const sptr<IWifiDeviceCallBack> &callback) override;
+#endif
 
     /**
      * @Description Get the Signal Level object
@@ -235,7 +239,11 @@ public:
 
 private:
     int systemAbilityId_;
+#ifdef OHOS_ARCH_LITE
+    IWifiDevice *client_;
+#else
     sptr<IWifiDevice> client_;
+#endif
 };
 }  // namespace Wifi
 }  // namespace OHOS

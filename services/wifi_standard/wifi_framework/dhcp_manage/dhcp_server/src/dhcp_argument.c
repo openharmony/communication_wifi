@@ -48,11 +48,8 @@ static int PutPoolArgument(const char *argument, const char *val)
 
 static int ShowVersion(const char *argument, const char *val)
 {
-    if (argument && PutArgument(argument, val) != RET_SUCCESS) {
-        LOGD("failed to put argument 'version'.");
-    }
     printf("version:%s\n", DHCPD_VERSION);
-    return RET_BREAK;
+    return RET_SUCCESS;
 }
 
 static int DefaultArgument(const char *argument, const char *val)
@@ -131,7 +128,7 @@ static void ShowUsage(const DhcpUsage *usage)
         printf("   --%s ", usage->opt->name);
     }
     if (usage->params[0] == '\0') {
-        printf("\t%s\n", usage->desc);
+        printf("\t\t%s\n", usage->desc);
     } else {
         int plen = strlen(usage->params) + strlen(usage->params);
         if (plen < USAGE_DESC_MAX_LENGTH) {
@@ -244,9 +241,6 @@ int PutArgument(const char *argument, const char *val)
         LOGE("failed to set argument name.");
         return RET_ERROR;
     }
-    if (vlen < 0) {
-        return RET_ERROR;
-    }
     if (vlen >= ARGUMENT_VALUE_SIZE) {
         LOGE("value string too long.");
         return RET_ERROR;
@@ -266,7 +260,7 @@ int PutArgument(const char *argument, const char *val)
     return RET_FAILED;
 }
 
-static int findIndex(int c)
+int findIndex(int c)
 {
     int size = sizeof(longOptions) / sizeof(longOptions[0]);
     for (int i = 0; i < size; ++i) {

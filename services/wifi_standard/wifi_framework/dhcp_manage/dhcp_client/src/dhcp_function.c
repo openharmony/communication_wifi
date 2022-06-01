@@ -37,7 +37,6 @@
 #undef LOG_TAG
 #define LOG_TAG "WifiDhcpFunction"
 
-
 bool Ip4StrConToInt(const char *strIp, uint32_t *uIp, bool bHost)
 {
     if ((strIp == NULL) || (strlen(strIp) == 0)) {
@@ -89,6 +88,7 @@ char *Ip4IntConToStr(uint32_t uIp, bool bHost)
     if (strncpy_s(strIp, INET_ADDRSTRLEN, bufIp4, strlen(bufIp4)) != EOK) {
         LOGE("Ip4IntConToStr uIp:%{private}u failed, strIp strncpy_s failed!", uIp);
         free(strIp);
+        strIp = NULL;
         return NULL;
     }
 
@@ -155,8 +155,8 @@ const char *MacChConToMacStr(const unsigned char *pChMac, size_t chLen, char *pS
 
 int GetLocalInterface(const char *ifname, int *ifindex, unsigned char *hwaddr, uint32_t *ifaddr4)
 {
-    if ((ifname == NULL) || (strlen(ifname) == 0)) {
-        LOGE("GetLocalInterface() failed, ifname == NULL or \"\"!");
+    if ((ifname == NULL) || (strlen(ifname) == 0) || hwaddr == NULL) {
+        LOGE("GetLocalInterface() failed, ifname == NULL or hwaddr is NULL");
         return DHCP_OPT_FAILED;
     }
 
@@ -286,6 +286,7 @@ int SetLocalInterface(const char *ifname, uint32_t ifaddr4)
     }
     LOGI("SetLocalInterface() %{public}s, ifaddr4:%{private}u -> %{private}s.", ifname, ifaddr4, cIp);
     free(cIp);
+    cIp = NULL;
 
     int fd;
     struct ifreq ifr;

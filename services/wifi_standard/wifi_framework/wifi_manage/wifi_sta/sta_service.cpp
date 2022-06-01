@@ -215,6 +215,7 @@ ErrCode StaService::EnableDeviceConfig(int networkId, bool attemptEnable) const
         WIFI_LOGE("Enable device config failed!");
         return WIFI_OPT_FAILED;
     }
+    WifiSettings::GetInstance().SyncDeviceConfig();
     return WIFI_OPT_SUCCESS;
 }
 
@@ -226,6 +227,7 @@ ErrCode StaService::DisableDeviceConfig(int networkId) const
         WIFI_LOGE("Disable device config failed!");
         return WIFI_OPT_FAILED;
     }
+    WifiSettings::GetInstance().SyncDeviceConfig();
     return WIFI_OPT_SUCCESS;
 }
 

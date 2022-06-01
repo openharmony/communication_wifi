@@ -328,6 +328,7 @@ static int GetClientNetworkInfo(void)
     LOGI("GetClientNetworkInfo() GetLocalIp ifaceName:%{public}s -> ifaceIpv4:%{private}u - %{private}s.",
         g_cltCfg->ifaceName, g_cltCfg->ifaceIpv4, cIp);
     free(cIp);
+    cIp = NULL;
 
     /* Generate clientid for the specified client process interface. */
     if (g_cltCfg->pOptClientId == NULL) {

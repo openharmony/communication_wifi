@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,15 +16,21 @@
 #define OHOS_I_WIFI_DEVICE_H
 
 #include "wifi_errcode.h"
+#ifndef OHOS_ARCH_LITE
 #include "iremote_broker.h"
 #include "message_parcel.h"
 #include "message_option.h"
+#endif
 #include "i_wifi_device_callback.h"
 #include "wifi_errcode.h"
 
 namespace OHOS {
 namespace Wifi {
+#ifdef OHOS_ARCH_LITE
+class IWifiDevice {
+#else
 class IWifiDevice : public IRemoteBroker {
+#endif
 public:
     virtual ~IWifiDevice()
     {}
@@ -198,7 +204,11 @@ public:
      * @param callback - IWifiDeviceCallBack object
      * @return ErrCode - operation result
      */
+#ifdef OHOS_ARCH_LITE
+    virtual ErrCode RegisterCallBack(const std::shared_ptr<IWifiDeviceCallBack> &callback) = 0;
+#else
     virtual ErrCode RegisterCallBack(const sptr<IWifiDeviceCallBack> &callback) = 0;
+#endif
 
     /**
      * @Description Get the Signal Level object
@@ -226,8 +236,10 @@ public:
      */
     virtual ErrCode GetDeviceMacAddress(std::string &result) = 0;
 
+#ifndef OHOS_ARCH_LITE
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.wifi.IWifiDeviceService");
+#endif
 };
 }  // namespace Wifi
 }  // namespace OHOS

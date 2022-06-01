@@ -16,17 +16,23 @@
 #define OHOS_I_WIFI_DEVICE_CALLBACK_H
 
 #include <string>
+#ifndef OHOS_ARCH_LITE
 #include <string_ex.h>
 #include <iremote_stub.h>
 #include "message_parcel.h"
 #include "message_option.h"
+#endif
 #include "wifi_msg.h"
 #include "define.h"
 
 
 namespace OHOS {
 namespace Wifi {
+#ifdef OHOS_ARCH_LITE
+class IWifiDeviceCallBack {
+#else
 class IWifiDeviceCallBack : public IRemoteBroker {
+#endif
 public:
     /**
      * @Description Deal wifi state change message
@@ -65,8 +71,10 @@ public:
      */
     virtual void OnStreamChanged(int direction) = 0;
 
+#ifndef OHOS_ARCH_LITE
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.wifi.IWifiDeviceCallBack");
+#endif
 };
 }  // namespace Wifi
 }  // namespace OHOS

@@ -166,7 +166,7 @@ static void ConvertDeviceConfigFromC(const WifiDeviceConfig *config, OHOS::Wifi:
 static OHOS::Wifi::ErrCode ConvertDeviceConfigFromCpp(const OHOS::Wifi::WifiDeviceConfig& deviceConfig,
     WifiDeviceConfig *result)
 {
-    CHECK_PTR_RETURN(result, ERROR_WIFI_INVALID_ARGS);
+    CHECK_PTR_RETURN(result, OHOS::Wifi::WIFI_OPT_INVALID_PARAM);
     if (memcpy_s(result->ssid, WIFI_MAX_SSID_LEN, deviceConfig.ssid.c_str(), deviceConfig.ssid.size() + 1) != EOK) {
         return OHOS::Wifi::WIFI_OPT_FAILED;
     }
@@ -267,7 +267,7 @@ WifiErrorCode Disconnect()
 
 static OHOS::Wifi::ErrCode GetLinkedInfoFromCpp(const OHOS::Wifi::WifiLinkedInfo& linkedInfo, WifiLinkedInfo *result)
 {
-    CHECK_PTR_RETURN(result, ERROR_WIFI_INVALID_ARGS);
+    CHECK_PTR_RETURN(result, OHOS::Wifi::WIFI_OPT_INVALID_PARAM);
     if (memcpy_s(result->ssid, WIFI_MAX_SSID_LEN, linkedInfo.ssid.c_str(), linkedInfo.ssid.size() + 1) != EOK) {
         return OHOS::Wifi::WIFI_OPT_FAILED;
     }

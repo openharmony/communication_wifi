@@ -40,7 +40,6 @@ static const int STA_DISABLED_MODE = 4;
 static const int CMD_START_WIFI_SUCCESS = 0x01;
 static const int CMD_STOP_WIFI_SUCCESS = 0x02;
 static const int CMD_CONNECT_NETWORK = 0x03;
-static const int CMD_START_CONNECT_SELECTED_NETWORK = 0x04;
 static const int CMD_DISCONNECT_NETWORK = 0X05;
 static const int CMD_SYNC_LINKINFO = 0X06;
 static const int CMD_GET_NETWORK_SPEED = 0X07;
@@ -424,6 +423,10 @@ private:
      */
     void StartWifiProcess();
     /**
+     * @Description  Synchronize the deviceConfig structure to wpa_supplicant
+     */
+    void SyncDeviceConfigToWpa() const;
+    /**
      * @Description  Update wifi status and save connection information.
      *
      * @param networkId - the networkId of selected network which is going to be connected(in)
@@ -594,7 +597,6 @@ private:
     StaSmHandleFuncMap staSmHandleFuncMap;
     StaServiceCallback staCallback;
 
-    int statusId;
     int lastNetworkId;
     int operationalMode;
     int targetNetworkId;

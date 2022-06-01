@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -20,7 +20,12 @@
 #include "wifi_chip_hal_interface.h"
 #include "wifi_auth_center.h"
 #include "wifi_config_center.h"
+#ifdef OHOS_ARCH_LITE
+#include <dirent.h>
+#include "wifi_internal_event_dispatcher_lite.h"
+#else
 #include "wifi_internal_event_dispatcher.h"
+#endif
 #include "wifi_service_manager.h"
 #include "wifi_settings.h"
 #include "wifi_common_event_helper.h"
@@ -51,6 +56,77 @@ WifiManager::WifiManager() : mInitStatus(INIT_UNKNOWN), mSupportedFeatures(0)
 WifiManager::~WifiManager()
 {}
 
+void WifiManager::AutoStartStaService(void)
+{
+    WifiOprMidState staState = WifiConfigCenter::GetInstance().GetWifiMidState();
+    if (staState == WifiOprMidState::CLOSED) {
+        if (!WifiConfigCenter::GetInstance().SetWifiMidState(staState, WifiOprMidState::OPENING)) {
+            WIFI_LOGD("set sta mid state opening failed! may be other activity has been operated");
+            return;
+        }
+        ErrCode errCode = WIFI_OPT_FAILED;
+        do {
+            if (WifiServiceManager::GetInstance().CheckAndEnforceService(WIFI_SERVICE_STA) < 0) {
+                WIFI_LOGE("Load %{public}s service failed!", WIFI_SERVICE_STA);
+                break;
+            }
+            IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst();
+            if (pService == nullptr) {
+                WIFI_LOGE("Create %{public}s service failed!", WIFI_SERVICE_STA);
+                break;
+            }
+            errCode = pService->RegisterStaServiceCallback(WifiManager::GetInstance().GetStaCallback());
+            if (errCode != WIFI_OPT_SUCCESS) {
+                WIFI_LOGE("Register sta service callback failed!");
+                break;
+            }
+            errCode = pService->EnableWifi();
+            if (errCode != WIFI_OPT_SUCCESS) {
+                WIFI_LOGE("service enable sta failed, ret %{public}d!", static_cast<int>(errCode));
+                break;
+            }
+        } while (0);
+        if (errCode != WIFI_OPT_SUCCESS) {
+            WifiConfigCenter::GetInstance().SetWifiMidState(WifiOprMidState::OPENING, WifiOprMidState::CLOSED);
+            WifiServiceManager::GetInstance().UnloadService(WIFI_SERVICE_STA);
+        }
+    }
+    return;
+}
+
+#ifdef OHOS_ARCH_LITE
+void WifiManager::AutoStartStaServiceThread(void)
+{
+    DIR *dir = nullptr;
+    struct dirent *dent = nullptr;
+    int currentWaitTime = 0;
+    const int sleepTime = 1;
+    const int maxWaitTimes = 30;
+
+    dir = opendir("/sys/class/net");
+    if (dir == nullptr) {
+        AutoStartStaService();
+        return;
+    }
+    while (currentWaitTime < maxWaitTimes) {
+        while ((dent = readdir(dir)) != nullptr) {
+            if (dent->d_name[0] == '.') {
+                continue;
+            }
+            if (strncmp(dent->d_name, "wlan", strlen("wlan")) == 0) {
+                closedir(dir);
+                AutoStartStaService();
+                return;
+            }
+        }
+        sleep(sleepTime);
+        currentWaitTime++;
+    }
+    closedir(dir);
+    AutoStartStaService();
+}
+#endif
+
 int WifiManager::Init()
 {
     if (WifiConfigCenter::GetInstance().Init() < 0) {
@@ -78,10 +154,29 @@ int WifiManager::Init()
     mInitStatus = INIT_OK;
     InitStaCallback();
     InitScanCallback();
+#ifdef FEATURE_AP_SUPPORT
     InitApCallback();
+#endif
+#ifdef FEATURE_P2P_SUPPORT
     InitP2pCallback();
+#endif
     if (!WifiConfigCenter::GetInstance().GetSupportedBandChannel()) {
         WIFI_LOGE("Failed to get current chip supported band and channel!");
+    }
+
+    if (WifiServiceManager::GetInstance().CheckPreLoadService() < 0) {
+        WIFI_LOGE("WifiServiceManager check preload feature service failed!");
+        WifiManager::GetInstance().Exit();
+        return -1;
+    }
+    if (WifiConfigCenter::GetInstance().GetStaLastRunState()) { /* Automatic startup upon startup */
+        WIFI_LOGE("AutoStartStaApService");
+#ifdef OHOS_ARCH_LITE
+        std::thread startStaSrvThread(WifiManager::AutoStartStaServiceThread);
+        startStaSrvThread.detach();
+#else
+        AutoStartStaService();
+#endif
     }
     return 0;
 }
@@ -144,6 +239,7 @@ void WifiManager::CloseStaService(void)
     return;
 }
 
+#ifdef FEATURE_AP_SUPPORT
 void WifiManager::CloseApService(void)
 {
     WIFI_LOGD("close ap service");
@@ -156,6 +252,7 @@ void WifiManager::CloseApService(void)
     WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
     return;
 }
+#endif
 
 void WifiManager::CloseScanService(void)
 {
@@ -165,6 +262,7 @@ void WifiManager::CloseScanService(void)
     return;
 }
 
+#ifdef FEATURE_P2P_SUPPORT
 void WifiManager::CloseP2pService(void)
 {
     WIFI_LOGD("close p2p service");
@@ -177,6 +275,7 @@ void WifiManager::CloseP2pService(void)
     WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
     return;
 }
+#endif
 
 void WifiManager::DealCloseServiceMsg(WifiManager &manager)
 {
@@ -197,12 +296,16 @@ void WifiManager::DealCloseServiceMsg(WifiManager &manager)
             case WifiCloseServiceCode::SCAN_SERVICE_CLOSE:
                 CloseScanService();
                 break;
+#ifdef FEATURE_AP_SUPPORT
             case WifiCloseServiceCode::AP_SERVICE_CLOSE:
                 CloseApService();
                 break;
+#endif
+#ifdef FEATURE_P2P_SUPPORT
             case WifiCloseServiceCode::P2P_SERVICE_CLOSE:
                 CloseP2pService();
                 break;
+#endif
             case WifiCloseServiceCode::SERVICE_THREAD_EXIT:
                 WIFI_LOGD("DealCloseServiceMsg thread exit!");
                 return;
@@ -463,6 +566,7 @@ void WifiManager::DealScanInfoNotify(std::vector<InterScanInfo> &results)
     }
 }
 
+#ifdef FEATURE_AP_SUPPORT
 void WifiManager::InitApCallback(void)
 {
     mApCallback.OnApStateChangedEvent = DealApStateChanged;
@@ -511,7 +615,9 @@ void WifiManager::DealApGetStaLeave(const StationInfo &info)
     WifiCommonEventHelper::PublishApStaLeaveEvent(0, "ApStaLeaved");
     return;
 }
+#endif
 
+#ifdef FEATURE_P2P_SUPPORT
 void WifiManager::InitP2pCallback(void)
 {
     mP2pCallback.OnP2pStateChangedEvent = DealP2pStateChanged;
@@ -613,6 +719,7 @@ void WifiManager::DealP2pActionResult(P2pActionCallback action, ErrCode code)
     WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
     return;
 }
+#endif
 
 }  // namespace Wifi
 }  // namespace OHOS

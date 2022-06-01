@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -22,8 +22,12 @@
 
 #include "ista_service.h"
 #include "iscan_service.h"
+#ifdef FEATURE_AP_SUPPORT
 #include "i_ap_service.h"
+#endif
+#ifdef FEATURE_P2P_SUPPORT
 #include "ip2p_service.h"
+#endif
 
 namespace OHOS {
 namespace Wifi {
@@ -63,6 +67,7 @@ struct ScanServiceHandle {
     }
 };
 
+#ifdef FEATURE_AP_SUPPORT
 struct ApServiceHandle {
     void *handle;
     IApService *(*create)();
@@ -80,7 +85,9 @@ struct ApServiceHandle {
         pService = nullptr;
     }
 };
+#endif
 
+#ifdef FEATURE_P2P_SUPPORT
 struct P2pServiceHandle {
     void *handle;
     IP2pService *(*create)();
@@ -98,6 +105,7 @@ struct P2pServiceHandle {
         pService = nullptr;
     }
 };
+#endif
 
 class WifiServiceManager {
 public:
@@ -141,19 +149,23 @@ public:
      */
     IScanService *GetScanServiceInst(void);
 
+#ifdef FEATURE_AP_SUPPORT
     /**
      * @Description Get the Ap Service Inst object
      *
      * @return IApService* - ap service pointer, if ap not supported, nullptr is returned
      */
     IApService *GetApServiceInst(void);
+#endif
 
+#ifdef FEATURE_P2P_SUPPORT
     /**
      * @Description Get the P2P Service Inst object
      *
      * @return IP2pService* - p2p service pointer, if p2p not supported, nullptr is returned
      */
     IP2pService *GetP2pServiceInst(void);
+#endif
 
     /**
      * @Description unload a feature service
@@ -176,18 +188,26 @@ private:
     int UnloadStaService(bool bPreLoad);
     int LoadScanService(const std::string &dlname, bool bCreate);
     int UnloadScanService(bool bPreLoad);
+#ifdef FEATURE_AP_SUPPORT
     int LoadApService(const std::string &dlname, bool bCreate);
     int UnloadApService(bool bPreLoad);
+#endif
+#ifdef FEATURE_P2P_SUPPORT
     int LoadP2pService(const std::string &dlname, bool bCreate);
     int UnloadP2pService(bool bPreLoad);
+#endif
 
 private:
     std::mutex mMutex;
     std::unordered_map<std::string, std::string> mServiceDllMap;
     StaServiceHandle mStaServiceHandle;
     ScanServiceHandle mScanServiceHandle;
+#ifdef FEATURE_AP_SUPPORT
     ApServiceHandle mApServiceHandle;
+#endif
+#ifdef FEATURE_P2P_SUPPORT
     P2pServiceHandle mP2pServiceHandle;
+#endif
 };
 } // namespace Wifi
 } // namespace OHOS

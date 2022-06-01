@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -105,6 +105,7 @@ static int DealReadMessage(RpcServer *server, Context *client)
     client->nSize = strlen(buf);
     OnTransact(server, client);
     free(buf);
+    buf = NULL;
     AddFdEvent(server->loop, client->fd, WRIT_EVENT);
     return 1;
 }
@@ -199,7 +200,7 @@ int RunRpcLoop(RpcServer *server)
     EventLoop *loop = server->loop;
     while (!loop->stop) {
         BeforeLoop(server);
-        int retval = epoll_wait(loop->epfd, loop->epEvents, loop->setSize, 1); /* wait 1ms */
+        int retval = epoll_wait(loop->epfd, loop->epEvents, loop->setSize, 5);
         for (int i = 0; i < retval; ++i) {
             struct epoll_event *e = loop->epEvents + i;
             int fd = e->data.fd;
@@ -228,6 +229,7 @@ void ReleaseRpcServer(RpcServer *server)
         }
         pthread_mutex_destroy(&server->mutex);
         free(server);
+        server = NULL;
     }
 }
 
@@ -318,6 +320,7 @@ int UnRegisterCallback(RpcServer *server, int event, const Context *context)
             q->next = p->next;
         }
         free(p);
+        p = NULL;
     }
     return 0;
 }
@@ -346,6 +349,7 @@ static int RemoveCallback(RpcServer *server, const Context *context)
                 q->next = p->next;
             }
             free(p);
+            p = NULL;
         }
     }
     return 0;

@@ -38,7 +38,8 @@ int WifiScanCallbackStub::OnRemoteRequest(uint32_t code, IpcIo *data)
         return ret;
     }
 
-    int exception = IpcIoPopInt32(data);
+    int exception = WIFI_OPT_FAILED;
+    (void)ReadInt32(data, &exception);
     if (exception) {
         WIFI_LOGD("OnRemoteRequest exception! %{public}d!", exception);
         return ret;
@@ -87,7 +88,8 @@ void WifiScanCallbackStub::OnWifiScanStateChanged(int state)
 int WifiScanCallbackStub::RemoteOnWifiScanStateChanged(uint32_t code, IpcIo *data)
 {
     WIFI_LOGD("run %{public}s code %{public}u", __func__, code);
-    int stateCode = IpcIoPopInt32(data);
+    int stateCode = 0;
+    (void)ReadInt32(data, &stateCode);
     OnWifiScanStateChanged(stateCode);
     return 0;
 }

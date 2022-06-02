@@ -15,7 +15,8 @@
 
 #include "wifi_scan_proxy.h"
 #include "define.h"
-#include "liteipc_adapter.h"
+#include "ipc_skeleton.h"
+#include "rpc_errno.h"
 #include "serializer.h"
 #include "samgr_lite.h"
 #include "wifi_ipc_lite_adapter.h"
@@ -25,12 +26,15 @@
 DEFINE_WIFILOG_SCAN_LABEL("WifiScanProxyLite");
 namespace OHOS {
 namespace Wifi {
+static SvcIdentity g_sid;
+static IpcObjectStub g_objStub;
 static WifiScanCallbackStub g_wifiScanCallbackStub;
 
 static ErrCode ParseScanInfos(IpcIo *reply, std::vector<WifiScanInfo> &infos)
 {
     constexpr int MAX_SIZE = 4096;
-    int tmpsize = IpcIoPopInt32(reply);
+    int tmpsize = 0;
+    (void)ReadInt32(reply, &tmpsize);
     if (tmpsize > MAX_SIZE) {
         WIFI_LOGE("Scan info size exceeds maximum allowed size: %{public}d", tmpsize);
         return WIFI_OPT_FAILED;
@@ -39,31 +43,43 @@ static ErrCode ParseScanInfos(IpcIo *reply, std::vector<WifiScanInfo> &infos)
     unsigned int readLen;
     for (int i = 0; i < tmpsize; ++i) {
         WifiScanInfo info;
-        info.bssid = (char *)IpcIoPopString(reply, &readLen);
-        info.ssid = (char *)IpcIoPopString(reply, &readLen);
-        info.capabilities = (char *)IpcIoPopString(reply, &readLen);
-        info.frequency = IpcIoPopInt32(reply);
-        info.rssi = IpcIoPopInt32(reply);
-        info.timestamp = IpcIoPopInt64(reply);
-        info.band = IpcIoPopInt32(reply);
-        info.securityType = static_cast<WifiSecurity>(IpcIoPopInt32(reply));
-        info.channelWidth = static_cast<WifiChannelWidth>(IpcIoPopInt32(reply));
-        info.centerFrequency0 = IpcIoPopInt32(reply);
-        info.centerFrequency1 = IpcIoPopInt32(reply);
-        info.features = IpcIoPopInt64(reply);
+        info.bssid = (char *)ReadString(reply, &readLen);
+        info.ssid = (char *)ReadString(reply, &readLen);
+        info.capabilities = (char *)ReadString(reply, &readLen);
+        (void)ReadInt32(reply, &info.frequency);
+        (void)ReadInt32(reply, &info.rssi);
+        int64_t timestamp = 0;
+        (void)ReadInt64(reply, &timestamp);
+        info.timestamp = timestamp;
+        (void)ReadInt32(reply, &info.band);
+        int securityType = 0;
+        (void)ReadInt32(reply, &securityType);
+        info.securityType = static_cast<WifiSecurity>(securityType);
+        int channelWidth = 0;
+        (void)ReadInt32(reply, &channelWidth);
+        info.channelWidth = static_cast<WifiChannelWidth>(channelWidth);
+        (void)ReadInt32(reply, &info.centerFrequency0);
+        (void)ReadInt32(reply, &info.centerFrequency1);
+        int64_t features = 0;
+        (void)ReadInt64(reply, &features);
+        info.features = features;
 
         constexpr int IE_SIZE_MAX = 256;
-        int ieSize = IpcIoPopInt32(reply);
+        int ieSize = 0;
+        (void)ReadInt32(reply, &ieSize);
         if (ieSize > IE_SIZE_MAX) {
             WIFI_LOGE("ie size error: %{public}d", ieSize);
             return WIFI_OPT_FAILED;
         }
         for (int m = 0; m < ieSize; ++m) {
             WifiInfoElem tempWifiInfoElem;
-            tempWifiInfoElem.id = IpcIoPopInt32(reply);
-            int contentSize = IpcIoPopInt32(reply);
+            (void)ReadUint32(reply, &tempWifiInfoElem.id);
+            int contentSize = 0;
+            (void)ReadInt32(reply, &contentSize);
+            int8_t tmpInt8 = 0;
             for (int n = 0; n < contentSize; n++) {
-                char tempChar = static_cast<char>(IpcIoPopInt8(reply));
+                (void)ReadInt8(reply, &tmpInt8);
+                char tempChar = static_cast<char>(tmpInt8);
                 tempWifiInfoElem.content.emplace_back(tempChar);
             }
             info.infoElems.emplace_back(tempWifiInfoElem);
@@ -78,23 +94,25 @@ static int IpcCallback(void *owner, int code, IpcIo *reply)
     if (code != 0 || owner == nullptr || reply == nullptr) {
         WIFI_LOGE("Callback error, code:%{public}d, owner:%{public}d, reply:%{public}d",
             code, owner == nullptr, reply == nullptr);
-        return LITEIPC_EINVAL;
+        return ERR_FAILED;
     }
 
     struct IpcOwner *data = (struct IpcOwner *)owner;
-    data->exception = IpcIoPopInt32(reply);
-    data->retCode = IpcIoPopInt32(reply);
+    (void)ReadInt32(reply, &data->exception);
+    (void)ReadInt32(reply, &data->retCode);
     if (data->exception != 0 || data->retCode != WIFI_OPT_SUCCESS || data->variable == nullptr) {
-        return LITEIPC_OK;
+        return ERR_NONE;
     }
 
     switch (data->funcId) {
         case WIFI_SVR_CMD_IS_SCAN_ALWAYS_ACTIVE: {
-            *((bool *)data->variable) = IpcIoPopBool(reply);
+            (void)ReadBool(reply, (bool *)data->variable);
             break;
         }
         case WIFI_SVR_CMD_GET_SUPPORTED_FEATURES: {
-            *((long *)data->variable) = IpcIoPopInt64(reply);
+            int64_t features = 0;
+            (void)ReadInt64(reply, &features);
+            *((long *)data->variable) = features;
             break;
         }
         case WIFI_SVR_CMD_GET_SCAN_INFO_LIST: {
@@ -104,33 +122,26 @@ static int IpcCallback(void *owner, int code, IpcIo *reply)
         default:
             break;
     }
-    return LITEIPC_OK;
+    return ERR_NONE;
 }
 
-static int AsyncCallback(const IpcContext *ipcContext, void *ipcMsg, IpcIo *data, void *arg)
+static int AsyncCallback(uint32_t code, IpcIo *data, IpcIo *reply, MessageOption option)
 {
-    if (ipcMsg == nullptr || data == nullptr) {
-        WIFI_LOGE("AsyncCallback error, msg:%{public}d, data:%{public}d",
-            ipcMsg == nullptr, data == nullptr);
-        return LITEIPC_EINVAL;
+    if (data == nullptr) {
+        WIFI_LOGE("AsyncCallback error, data is null");
+        return ERR_FAILED;
     }
-
-    uint32_t code;
-    int codeRet = GetCode(ipcMsg, &code);
-    if (codeRet == LITEIPC_OK) {
-        return g_wifiScanCallbackStub.OnRemoteRequest(code, data);
-    }
-    return LITEIPC_EINVAL;
+    return g_wifiScanCallbackStub.OnRemoteRequest(code, data);
 }
 
-static int OnRemoteSrvDied(const IpcContext *context, void *ipcMsg, IpcIo *data, void *arg)
+static void OnRemoteSrvDied(void *arg)
 {
     WIFI_LOGE("%{public}s called.", __func__);
     WifiScanProxy *client = WifiScanProxy::GetInstance();
     if (client != nullptr) {
         client->OnRemoteDied();
     }
-    return LITEIPC_OK;
+    return;
 }
 
 WifiScanProxy *WifiScanProxy::g_instance = nullptr;
@@ -177,7 +188,7 @@ ErrCode WifiScanProxy::Init(void)
     // Register SA Death Callback
     uint32_t deadId = 0;
     svcIdentity_ = SAMGR_GetRemoteIdentity(WIFI_SERVICE_LITE, WIFI_FEATRUE_SCAN);
-    result = RegisterDeathCallback(nullptr, svcIdentity_, OnRemoteSrvDied, nullptr, &deadId);
+    result = AddDeathRecipient(svcIdentity_, OnRemoteSrvDied, nullptr, &deadId);
     if (result != 0) {
         WIFI_LOGE("Register SA Death Callback failed, errorCode[%d]", result);
     }
@@ -197,23 +208,23 @@ ErrCode WifiScanProxy::SetScanControlInfo(const ScanControlInfo &info)
     struct IpcOwner owner = {.exception = -1, .retCode = 0, .variable = nullptr};
 
     IpcIoInit(&request, data, IPC_DATA_SIZE_BIG, MAX_IPC_OBJ_COUNT);
-    IpcIoPushInt32(&request, 0);
-    IpcIoPushInt32(&request, info.scanForbidList.size());
+    (void)WriteInt32(&request, 0);
+    (void)WriteInt32(&request, info.scanForbidList.size());
     for (auto iter = info.scanForbidList.begin(); iter != info.scanForbidList.end(); iter++) {
-        IpcIoPushInt32(&request, iter->scanScene);
-        IpcIoPushInt32(&request, static_cast<int>(iter->scanMode));
-        IpcIoPushInt32(&request, iter->forbidTime);
-        IpcIoPushInt32(&request, iter->forbidCount);
+        (void)WriteInt32(&request, iter->scanScene);
+        (void)WriteInt32(&request, static_cast<int>(iter->scanMode));
+        (void)WriteInt32(&request, iter->forbidTime);
+        (void)WriteInt32(&request, iter->forbidCount);
     }
 
-    IpcIoPushInt32(&request, info.scanIntervalList.size());
+    (void)WriteInt32(&request, info.scanIntervalList.size());
     for (auto iter2 = info.scanIntervalList.begin(); iter2 != info.scanIntervalList.end(); iter2++) {
-        IpcIoPushInt32(&request, iter2->scanScene);
-        IpcIoPushInt32(&request, static_cast<int>(iter2->scanMode));
-        IpcIoPushBool(&request, iter2->isSingle);
-        IpcIoPushInt32(&request, static_cast<int>(iter2->intervalMode));
-        IpcIoPushInt32(&request, iter2->interval);
-        IpcIoPushInt32(&request, iter2->count);
+        (void)WriteInt32(&request, iter2->scanScene);
+        (void)WriteInt32(&request, static_cast<int>(iter2->scanMode));
+        (void)WriteBool(&request, iter2->isSingle);
+        (void)WriteInt32(&request, static_cast<int>(iter2->intervalMode));
+        (void)WriteInt32(&request, iter2->interval);
+        (void)WriteInt32(&request, iter2->count);
     }
 
     owner.funcId = WIFI_SVR_CMD_SET_SCAN_CONTROL_INFO;
@@ -242,7 +253,7 @@ ErrCode WifiScanProxy::Scan()
     struct IpcOwner owner = {.exception = -1, .retCode = 0, .variable = nullptr};
 
     IpcIoInit(&request, data, IPC_DATA_SIZE_SMALL, MAX_IPC_OBJ_COUNT);
-    IpcIoPushInt32(&request, 0);
+    (void)WriteInt32(&request, 0);
 
     owner.funcId = WIFI_SVR_CMD_FULL_SCAN;
     int error = remote_->Invoke(remote_, WIFI_SVR_CMD_FULL_SCAN, &request, &owner, IpcCallback);
@@ -270,14 +281,14 @@ ErrCode WifiScanProxy::AdvanceScan(const WifiScanParams &params)
     struct IpcOwner owner = {.exception = -1, .retCode = 0, .variable = nullptr};
 
     IpcIoInit(&request, data, IPC_DATA_SIZE_MID, MAX_IPC_OBJ_COUNT);
-    IpcIoPushInt32(&request, 0);
-    IpcIoPushString(&request, params.ssid.c_str());
-    IpcIoPushString(&request, params.bssid.c_str());
-    IpcIoPushInt32(&request, params.freqs.size());
+    (void)WriteInt32(&request, 0);
+    (void)WriteString(&request, params.ssid.c_str());
+    (void)WriteString(&request, params.bssid.c_str());
+    (void)WriteInt32(&request, params.freqs.size());
     for (std::size_t i = 0; i < params.freqs.size(); i++) {
-        IpcIoPushInt32(&request, params.freqs[i]);
+        (void)WriteInt32(&request, params.freqs[i]);
     }
-    IpcIoPushInt32(&request, params.band);
+    (void)WriteUint32(&request, params.band);
 
     owner.funcId = WIFI_SVR_CMD_SPECIFIED_PARAMS_SCAN;
     int error = remote_->Invoke(remote_, WIFI_SVR_CMD_SPECIFIED_PARAMS_SCAN, &request, &owner, IpcCallback);
@@ -306,7 +317,7 @@ ErrCode WifiScanProxy::IsWifiClosedScan(bool &bOpen)
     struct IpcOwner owner = {.exception = -1, .retCode = 0, .variable = nullptr};
 
     IpcIoInit(&request, data, IPC_DATA_SIZE_SMALL, MAX_IPC_OBJ_COUNT);
-    IpcIoPushInt32(&request, 0);
+    (void)WriteInt32(&request, 0);
     owner.variable = &bOpen;
     owner.funcId = WIFI_SVR_CMD_IS_SCAN_ALWAYS_ACTIVE;
     int error = remote_->Invoke(remote_, WIFI_SVR_CMD_IS_SCAN_ALWAYS_ACTIVE, &request, &owner, IpcCallback);
@@ -334,7 +345,7 @@ ErrCode WifiScanProxy::GetScanInfoList(std::vector<WifiScanInfo> &result)
     struct IpcOwner owner = {.exception = -1, .retCode = 0, .variable = nullptr};
 
     IpcIoInit(&request, data, IPC_DATA_SIZE_SMALL, MAX_IPC_OBJ_COUNT);
-    IpcIoPushInt32(&request, 0);
+    (void)WriteInt32(&request, 0);
     owner.variable = &result;
     owner.funcId = WIFI_SVR_CMD_GET_SCAN_INFO_LIST;
     int error = remote_->Invoke(remote_, WIFI_SVR_CMD_GET_SCAN_INFO_LIST, &request, &owner, IpcCallback);
@@ -357,18 +368,21 @@ ErrCode WifiScanProxy::RegisterCallBack(const std::shared_ptr<IWifiScanCallback>
         return WIFI_OPT_FAILED;
     }
     WIFI_LOGD("RegisterCallBack start!");
-    int ret = RegisterIpcCallback(AsyncCallback, ONCE, IPC_WAIT_FOREVER, &svcIdentity_, nullptr);
-    if (ret != 0) {
-        WIFI_LOGE("[WifiScanProxy] RegisterIpcCallback failed");
-        return WIFI_OPT_FAILED;
-    }
+    g_objStub.func = AsyncCallback;
+    g_objStub.args = nullptr;
+    g_objStub.isRemote = false;
+
+    g_sid.handle = IPC_INVALID_HANDLE;
+    g_sid.token = SERVICE_TYPE_ANONYMOUS;
+    g_sid.cookie = (uintptr_t)&g_objStub;
+
     IpcIo request;
     char data[IPC_DATA_SIZE_SMALL];
     struct IpcOwner owner = {.exception = -1, .retCode = 0, .variable = nullptr};
 
     IpcIoInit(&request, data, IPC_DATA_SIZE_SMALL, MAX_IPC_OBJ_COUNT);
-    IpcIoPushInt32(&request, 0);
-    IpcIoPushSvc(&request, &svcIdentity_);
+    (void)WriteInt32(&request, 0);
+    (void)WriteRemoteObject(&request, &g_sid);
 
     owner.funcId = WIFI_SVR_CMD_REGISTER_SCAN_CALLBACK;
     int error = remote_->Invoke(remote_, WIFI_SVR_CMD_REGISTER_SCAN_CALLBACK, &request, &owner, IpcCallback);
@@ -376,9 +390,11 @@ ErrCode WifiScanProxy::RegisterCallBack(const std::shared_ptr<IWifiScanCallback>
         WIFI_LOGE("RegisterCallBack failed, error code is %{public}d", error);
         return WIFI_OPT_FAILED;
     }
+    WIFI_LOGD("RegisterCallBack is finished: result=%{public}d", owner.exception);
+    if (owner.exception) {
+        return WIFI_OPT_FAILED;
+    }
     g_wifiScanCallbackStub.RegisterCallBack(callback);
-    ret = owner.exception;
-    WIFI_LOGD("RegisterCallBack is finished: result=%{public}d", ret);
     return WIFI_OPT_SUCCESS;
 }
 
@@ -395,7 +411,7 @@ ErrCode WifiScanProxy::GetSupportedFeatures(long &features)
     struct IpcOwner owner = {.exception = -1, .retCode = 0, .variable = nullptr};
 
     IpcIoInit(&request, data, IPC_DATA_SIZE_SMALL, MAX_IPC_OBJ_COUNT);
-    IpcIoPushInt32(&request, 0);
+    (void)WriteInt32(&request, 0);
     owner.variable = &features;
     owner.funcId = WIFI_SVR_CMD_GET_SUPPORTED_FEATURES;
     int error = remote_->Invoke(remote_, WIFI_SVR_CMD_GET_SUPPORTED_FEATURES, &request, &owner, IpcCallback);

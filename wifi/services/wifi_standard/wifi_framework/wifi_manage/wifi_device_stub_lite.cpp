@@ -15,7 +15,8 @@
 
 #include "wifi_device_stub_lite.h"
 #include "define.h"
-#include "liteipc_adapter.h"
+#include "ipc_skeleton.h"
+#include "rpc_errno.h"
 #include "wifi_device_callback_proxy.h"
 #include "wifi_errcode.h"
 #include "wifi_logger.h"
@@ -36,156 +37,167 @@ WifiDeviceStub::~WifiDeviceStub()
 void WifiDeviceStub::ReadIpAddress(IpcIo *req, WifiIpAddress &address)
 {
     constexpr int MAX_LIMIT_SIZE = 1024;
-    address.family = IpcIoPopInt32(req);
-    address.addressIpv4 = IpcIoPopInt32(req);
-    int size = IpcIoPopInt32(req);
+    (void)ReadInt32(req, &address.family);
+    (void)ReadUint32(req, &address.addressIpv4);
+    int size = 0;
+    (void)ReadInt32(req, &size);
     if (size > MAX_LIMIT_SIZE) {
         WIFI_LOGE("Read ip address parameter error: %{public}d", size);
         return;
     }
+    int8_t tmpInt8;
     for (int i = 0; i < size; i++) {
-        address.addressIpv6.push_back(IpcIoPopInt8(req));
+        (void)ReadInt8(req, &tmpInt8);
+        address.addressIpv6.push_back(tmpInt8);
     }
 }
 
 void WifiDeviceStub::ReadWifiDeviceConfig(IpcIo *req, WifiDeviceConfig &config)
 {
+    int tmpInt;
     size_t size;
-    config.networkId = IpcIoPopInt32(req);
-    config.status = IpcIoPopInt32(req);
-    config.bssid = (char *)IpcIoPopString(req, &size);
-    config.ssid = (char *)IpcIoPopString(req, &size);
-    config.band = IpcIoPopInt32(req);
-    config.channel = IpcIoPopInt32(req);
-    config.frequency = IpcIoPopInt32(req);
-    config.level = IpcIoPopInt32(req);
-    config.isPasspoint = IpcIoPopBool(req);
-    config.isEphemeral = IpcIoPopBool(req);
-    config.preSharedKey = (char *)IpcIoPopString(req, &size);
-    config.keyMgmt = (char *)IpcIoPopString(req, &size);
+    (void)ReadInt32(req, &config.networkId);
+    (void)ReadInt32(req, &config.status);
+    config.bssid = (char *)ReadString(req, &size);
+    config.ssid = (char *)ReadString(req, &size);
+    (void)ReadInt32(req, &config.band);
+    (void)ReadInt32(req, &config.channel);
+    (void)ReadInt32(req, &config.frequency);
+    (void)ReadInt32(req, &config.level);
+    (void)ReadBool(req, &config.isPasspoint);
+    (void)ReadBool(req, &config.isEphemeral);
+    config.preSharedKey = (char *)ReadString(req, &size);
+    config.keyMgmt = (char *)ReadString(req, &size);
     for (int i = 0; i < WEPKEYS_SIZE; i++) {
-        config.wepKeys[i] = (char *)IpcIoPopString(req, &size);
+        config.wepKeys[i] = (char *)ReadString(req, &size);
     }
-    config.wepTxKeyIndex = IpcIoPopInt32(req);
-    config.priority = IpcIoPopInt32(req);
-    config.hiddenSSID = IpcIoPopBool(req);
-    config.wifiIpConfig.assignMethod = AssignIpMethod(IpcIoPopInt32(req));
+    (void)ReadInt32(req, &config.wepTxKeyIndex);
+    (void)ReadInt32(req, &config.priority);
+    (void)ReadBool(req, &config.hiddenSSID);
+    (void)ReadInt32(req, &tmpInt);
+    config.wifiIpConfig.assignMethod = AssignIpMethod(tmpInt);
     ReadIpAddress(req, config.wifiIpConfig.staticIpAddress.ipAddress.address);
-    config.wifiIpConfig.staticIpAddress.ipAddress.prefixLength = IpcIoPopInt32(req);
-    config.wifiIpConfig.staticIpAddress.ipAddress.flags = IpcIoPopInt32(req);
-    config.wifiIpConfig.staticIpAddress.ipAddress.scope = IpcIoPopInt32(req);
+    (void)ReadInt32(req, &config.wifiIpConfig.staticIpAddress.ipAddress.prefixLength);
+    (void)ReadInt32(req, &config.wifiIpConfig.staticIpAddress.ipAddress.flags);
+    (void)ReadInt32(req, &config.wifiIpConfig.staticIpAddress.ipAddress.scope);
     ReadIpAddress(req, config.wifiIpConfig.staticIpAddress.gateway);
     ReadIpAddress(req, config.wifiIpConfig.staticIpAddress.dnsServer1);
     ReadIpAddress(req, config.wifiIpConfig.staticIpAddress.dnsServer2);
-    config.wifiIpConfig.staticIpAddress.domains = (char *)IpcIoPopString(req, &size);
-    config.wifiEapConfig.eap = (char *)IpcIoPopString(req, &size);
-    config.wifiEapConfig.identity = (char *)IpcIoPopString(req, &size);
-    config.wifiEapConfig.password = (char *)IpcIoPopString(req, &size);
-    config.wifiProxyconfig.configureMethod = ConfigureProxyMethod(IpcIoPopInt32(req));
-    config.wifiProxyconfig.autoProxyConfig.pacWebAddress = (char *)IpcIoPopString(req, &size);
-    config.wifiProxyconfig.manualProxyConfig.serverHostName = (char *)IpcIoPopString(req, &size);
-    config.wifiProxyconfig.manualProxyConfig.serverPort = IpcIoPopInt32(req);
-    config.wifiProxyconfig.manualProxyConfig.exclusionObjectList = (char *)IpcIoPopString(req, &size);
-    config.wifiPrivacySetting = WifiPrivacyConfig(IpcIoPopInt32(req));
+    config.wifiIpConfig.staticIpAddress.domains = (char *)ReadString(req, &size);
+    config.wifiEapConfig.eap = (char *)ReadString(req, &size);
+    config.wifiEapConfig.identity = (char *)ReadString(req, &size);
+    config.wifiEapConfig.password = (char *)ReadString(req, &size);
+    (void)ReadInt32(req, &tmpInt);
+    config.wifiProxyconfig.configureMethod = ConfigureProxyMethod(tmpInt);
+    config.wifiProxyconfig.autoProxyConfig.pacWebAddress = (char *)ReadString(req, &size);
+    config.wifiProxyconfig.manualProxyConfig.serverHostName = (char *)ReadString(req, &size);
+    (void)ReadInt32(req, &config.wifiProxyconfig.manualProxyConfig.serverPort);
+    config.wifiProxyconfig.manualProxyConfig.exclusionObjectList = (char *)ReadString(req, &size);
+    (void)ReadInt32(req, &tmpInt);
+    config.wifiPrivacySetting = WifiPrivacyConfig(tmpInt);
 }
 
 void WifiDeviceStub::WriteIpAddress(IpcIo *reply, const WifiIpAddress &address)
 {
-    IpcIoPushInt32(reply, address.family);
-    IpcIoPushInt32(reply, address.addressIpv4);
+    (void)WriteInt32(reply, address.family);
+    (void)WriteUint32(reply, address.addressIpv4);
     int size = address.addressIpv6.size();
-    IpcIoPushInt32(reply, size);
+    (void)WriteInt32(reply, size);
     for (int i = 0; i < size; i++) {
-        IpcIoPushInt8(reply, address.addressIpv6[i]);
+        (void)WriteInt8(reply, address.addressIpv6[i]);
     }
 }
 
 void WifiDeviceStub::WriteWifiDeviceConfig(IpcIo *reply, const WifiDeviceConfig &config)
 {
-    IpcIoPushInt32(reply, config.networkId);
-    IpcIoPushInt32(reply, config.status);
-    IpcIoPushString(reply, config.bssid.c_str());
-    IpcIoPushString(reply, config.ssid.c_str());
-    IpcIoPushInt32(reply, config.band);
-    IpcIoPushInt32(reply, config.channel);
-    IpcIoPushInt32(reply, config.frequency);
-    IpcIoPushInt32(reply, config.level);
-    IpcIoPushBool(reply, config.isPasspoint);
-    IpcIoPushBool(reply, config.isEphemeral);
-    IpcIoPushString(reply, config.preSharedKey.c_str());
-    IpcIoPushString(reply, config.keyMgmt.c_str());
+    (void)WriteInt32(reply, config.networkId);
+    (void)WriteInt32(reply, config.status);
+    (void)WriteString(reply, config.bssid.c_str());
+    (void)WriteString(reply, config.ssid.c_str());
+    (void)WriteInt32(reply, config.band);
+    (void)WriteInt32(reply, config.channel);
+    (void)WriteInt32(reply, config.frequency);
+    (void)WriteInt32(reply, config.level);
+    (void)WriteBool(reply, config.isPasspoint);
+    (void)WriteBool(reply, config.isEphemeral);
+    (void)WriteString(reply, config.preSharedKey.c_str());
+    (void)WriteString(reply, config.keyMgmt.c_str());
     for (int j = 0; j < WEPKEYS_SIZE; j++) {
-        IpcIoPushString(reply, config.wepKeys[j].c_str());
+        (void)WriteString(reply, config.wepKeys[j].c_str());
     }
-    IpcIoPushInt32(reply, config.wepTxKeyIndex);
-    IpcIoPushInt32(reply, config.priority);
-    IpcIoPushBool(reply, config.hiddenSSID);
-    IpcIoPushInt32(reply, (int)config.wifiIpConfig.assignMethod);
+    (void)WriteInt32(reply, config.wepTxKeyIndex);
+    (void)WriteInt32(reply, config.priority);
+    (void)WriteBool(reply, config.hiddenSSID);
+    (void)WriteInt32(reply, (int)config.wifiIpConfig.assignMethod);
     WriteIpAddress(reply, config.wifiIpConfig.staticIpAddress.ipAddress.address);
-    IpcIoPushInt32(reply, config.wifiIpConfig.staticIpAddress.ipAddress.prefixLength);
-    IpcIoPushInt32(reply, config.wifiIpConfig.staticIpAddress.ipAddress.flags);
-    IpcIoPushInt32(reply, config.wifiIpConfig.staticIpAddress.ipAddress.scope);
+    (void)WriteInt32(reply, config.wifiIpConfig.staticIpAddress.ipAddress.prefixLength);
+    (void)WriteInt32(reply, config.wifiIpConfig.staticIpAddress.ipAddress.flags);
+    (void)WriteInt32(reply, config.wifiIpConfig.staticIpAddress.ipAddress.scope);
     WriteIpAddress(reply, config.wifiIpConfig.staticIpAddress.gateway);
     WriteIpAddress(reply, config.wifiIpConfig.staticIpAddress.dnsServer1);
     WriteIpAddress(reply, config.wifiIpConfig.staticIpAddress.dnsServer2);
-    IpcIoPushString(reply, config.wifiIpConfig.staticIpAddress.domains.c_str());
-    IpcIoPushString(reply, config.wifiEapConfig.eap.c_str());
-    IpcIoPushString(reply, config.wifiEapConfig.identity.c_str());
-    IpcIoPushString(reply, config.wifiEapConfig.password.c_str());
-    IpcIoPushInt32(reply, (int)config.wifiProxyconfig.configureMethod);
-    IpcIoPushString(reply, config.wifiProxyconfig.autoProxyConfig.pacWebAddress.c_str());
-    IpcIoPushString(reply, config.wifiProxyconfig.manualProxyConfig.serverHostName.c_str());
-    IpcIoPushInt32(reply, config.wifiProxyconfig.manualProxyConfig.serverPort);
-    IpcIoPushString(reply, config.wifiProxyconfig.manualProxyConfig.exclusionObjectList.c_str());
-    IpcIoPushInt32(reply, (int)config.wifiPrivacySetting);
+    (void)WriteString(reply, config.wifiIpConfig.staticIpAddress.domains.c_str());
+    (void)WriteString(reply, config.wifiEapConfig.eap.c_str());
+    (void)WriteString(reply, config.wifiEapConfig.identity.c_str());
+    (void)WriteString(reply, config.wifiEapConfig.password.c_str());
+    (void)WriteInt32(reply, (int)config.wifiProxyconfig.configureMethod);
+    (void)WriteString(reply, config.wifiProxyconfig.autoProxyConfig.pacWebAddress.c_str());
+    (void)WriteString(reply, config.wifiProxyconfig.manualProxyConfig.serverHostName.c_str());
+    (void)WriteInt32(reply, config.wifiProxyconfig.manualProxyConfig.serverPort);
+    (void)WriteString(reply, config.wifiProxyconfig.manualProxyConfig.exclusionObjectList.c_str());
+    (void)WriteInt32(reply, (int)config.wifiPrivacySetting);
 }
 
 void WifiDeviceStub::OnEnableWifi(uint32_t code, IpcIo *req, IpcIo *reply)
 {
     WIFI_LOGD("run %{public}s code %{public}u", __func__, code);
     ErrCode ret = EnableWifi();
-    IpcIoPushInt32(reply, 0);
-    IpcIoPushInt32(reply, ret);
+    (void)WriteInt32(reply, 0);
+    (void)WriteInt32(reply, ret);
 }
 
 void WifiDeviceStub::OnDisableWifi(uint32_t code, IpcIo *req, IpcIo *reply)
 {
     WIFI_LOGD("run %{public}s code %{public}u", __func__, code);
     ErrCode ret = DisableWifi();
-    IpcIoPushInt32(reply, 0);
-    IpcIoPushInt32(reply, ret);
+    (void)WriteInt32(reply, 0);
+    (void)WriteInt32(reply, ret);
 }
 
 void WifiDeviceStub::OnInitWifiProtect(uint32_t code, IpcIo *req, IpcIo *reply)
 {
     WIFI_LOGD("run %{public}s code %{public}u", __func__, code);
     size_t size;
-    WifiProtectType protectType = (WifiProtectType)IpcIoPopInt32(req);
-    std::string protectName = (char *)IpcIoPopString(req, &size);
+    int type = 0;
+    (void)ReadInt32(req, &type);
+    WifiProtectType protectType = (WifiProtectType)type;
+    std::string protectName = (char *)ReadString(req, &size);
     ErrCode ret = InitWifiProtect(protectType, protectName);
-    IpcIoPushInt32(reply, 0);
-    IpcIoPushInt32(reply, ret);
+    (void)WriteInt32(reply, 0);
+    (void)WriteInt32(reply, ret);
 }
 
 void WifiDeviceStub::OnGetWifiProtectRef(uint32_t code, IpcIo *req, IpcIo *reply)
 {
     WIFI_LOGD("run %{public}s code %{public}u", __func__, code);
     size_t size;
-    WifiProtectMode protectMode = (WifiProtectMode)IpcIoPopInt32(req);
-    std::string protectName = (char *)IpcIoPopString(req, &size);
+    int mode = 0;
+    (void)ReadInt32(req, &mode);
+    WifiProtectMode protectMode = (WifiProtectMode)mode;
+    std::string protectName = (char *)ReadString(req, &size);
     ErrCode ret = GetWifiProtectRef(protectMode, protectName);
-    IpcIoPushInt32(reply, 0);
-    IpcIoPushInt32(reply, ret);
+    (void)WriteInt32(reply, 0);
+    (void)WriteInt32(reply, ret);
 }
 
 void WifiDeviceStub::OnPutWifiProtectRef(uint32_t code, IpcIo *req, IpcIo *reply)
 {
     WIFI_LOGD("run %{public}s code %{public}u", __func__, code);
     size_t size;
-    std::string protectName = (char *)IpcIoPopString(req, &size);
+    std::string protectName = (char *)ReadString(req, &size);
     ErrCode ret = PutWifiProtectRef(protectName);
-    IpcIoPushInt32(reply, 0);
-    IpcIoPushInt32(reply, ret);
+    (void)WriteInt32(reply, 0);
+    (void)WriteInt32(reply, ret);
 }
 
 void WifiDeviceStub::OnAddDeviceConfig(uint32_t code, IpcIo *req, IpcIo *reply)
@@ -197,10 +209,10 @@ void WifiDeviceStub::OnAddDeviceConfig(uint32_t code, IpcIo *req, IpcIo *reply)
     int result = INVALID_NETWORK_ID;
     ErrCode ret = AddDeviceConfig(config, result);
 
-    IpcIoPushInt32(reply, 0);
-    IpcIoPushInt32(reply, ret);
+    (void)WriteInt32(reply, 0);
+    (void)WriteInt32(reply, ret);
     if (ret == WIFI_OPT_SUCCESS) {
-        IpcIoPushInt32(reply, result);
+        (void)WriteInt32(reply, result);
     }
 }
 
@@ -211,28 +223,29 @@ void WifiDeviceStub::OnUpdateDeviceConfig(uint32_t code, IpcIo *req, IpcIo *repl
     ReadWifiDeviceConfig(req, config);
     int result = INVALID_NETWORK_ID;
     ErrCode ret = UpdateDeviceConfig(config, result);
-    IpcIoPushInt32(reply, 0);
-    IpcIoPushInt32(reply, ret);
+    (void)WriteInt32(reply, 0);
+    (void)WriteInt32(reply, ret);
     if (ret == WIFI_OPT_SUCCESS) {
-        IpcIoPushInt32(reply, result);
+        (void)WriteInt32(reply, result);
     }
 }
 
 void WifiDeviceStub::OnRemoveDevice(uint32_t code, IpcIo *req, IpcIo *reply)
 {
     WIFI_LOGD("run %{public}s code %{public}u", __func__, code);
-    int networkId = IpcIoPopInt32(req);
+    int networkId = 0;
+    (void)ReadInt32(req, &networkId);
     ErrCode ret = RemoveDevice(networkId);
-    IpcIoPushInt32(reply, 0);
-    IpcIoPushInt32(reply, ret);
+    (void)WriteInt32(reply, 0);
+    (void)WriteInt32(reply, ret);
 }
 
 void WifiDeviceStub::OnRemoveAllDevice(uint32_t code, IpcIo *req, IpcIo *reply)
 {
     WIFI_LOGD("run %{public}s code %{public}u", __func__, code);
     ErrCode ret = RemoveAllDevice();
-    IpcIoPushInt32(reply, 0);
-    IpcIoPushInt32(reply, ret);
+    (void)WriteInt32(reply, 0);
+    (void)WriteInt32(reply, ret);
 }
 
 void WifiDeviceStub::OnGetDeviceConfigs(uint32_t code, IpcIo *req, IpcIo *reply)
@@ -240,12 +253,12 @@ void WifiDeviceStub::OnGetDeviceConfigs(uint32_t code, IpcIo *req, IpcIo *reply)
     WIFI_LOGD("run %{public}s code %{public}u", __func__, code);
     std::vector<WifiDeviceConfig> result;
     ErrCode ret = GetDeviceConfigs(result);
-    IpcIoPushInt32(reply, 0);
-    IpcIoPushInt32(reply, ret);
+    (void)WriteInt32(reply, 0);
+    (void)WriteInt32(reply, ret);
 
     if (ret == WIFI_OPT_SUCCESS) {
         unsigned int size = result.size();
-        IpcIoPushInt32(reply, size);
+        (void)WriteInt32(reply, size);
         for (unsigned int i = 0; i < size; ++i) {
             WriteWifiDeviceConfig(reply, result[i]);
         }
@@ -255,29 +268,33 @@ void WifiDeviceStub::OnGetDeviceConfigs(uint32_t code, IpcIo *req, IpcIo *reply)
 void WifiDeviceStub::OnEnableDeviceConfig(uint32_t code, IpcIo *req, IpcIo *reply)
 {
     WIFI_LOGD("run %{public}s code %{public}u", __func__, code);
-    int networkId = IpcIoPopInt32(req);
-    bool attemptEnable = IpcIoPopBool(req);
+    int networkId = 0;
+    (void)ReadInt32(req, &networkId);
+    bool attemptEnable;
+    (void)ReadBool(req, &attemptEnable);
     ErrCode ret = EnableDeviceConfig(networkId, attemptEnable);
-    IpcIoPushInt32(reply, 0);
-    IpcIoPushInt32(reply, ret);
+    (void)WriteInt32(reply, 0);
+    (void)WriteInt32(reply, ret);
 }
 
 void WifiDeviceStub::OnDisableDeviceConfig(uint32_t code, IpcIo *req, IpcIo *reply)
 {
     WIFI_LOGD("run %{public}s code %{public}u", __func__, code);
-    int networkId = IpcIoPopInt32(req);
+    int networkId = 0;
+    (void)ReadInt32(req, &networkId);
     ErrCode ret = DisableDeviceConfig(networkId);
-    IpcIoPushInt32(reply, 0);
-    IpcIoPushInt32(reply, ret);
+    (void)WriteInt32(reply, 0);
+    (void)WriteInt32(reply, ret);
 }
 
 void WifiDeviceStub::OnConnectTo(uint32_t code, IpcIo *req, IpcIo *reply)
 {
     WIFI_LOGD("run %{public}s code %{public}u", __func__, code);
-    int networkId = IpcIoPopInt32(req);
+    int networkId = 0;
+    (void)ReadInt32(req, &networkId);
     ErrCode ret = ConnectToNetwork(networkId);
-    IpcIoPushInt32(reply, 0);
-    IpcIoPushInt32(reply, ret);
+    (void)WriteInt32(reply, 0);
+    (void)WriteInt32(reply, ret);
 }
 
 void WifiDeviceStub::OnConnect2To(uint32_t code, IpcIo *req, IpcIo *reply)
@@ -286,40 +303,40 @@ void WifiDeviceStub::OnConnect2To(uint32_t code, IpcIo *req, IpcIo *reply)
     WifiDeviceConfig config;
     ReadWifiDeviceConfig(req, config);
     ErrCode ret = ConnectToDevice(config);
-    IpcIoPushInt32(reply, 0);
-    IpcIoPushInt32(reply, ret);
+    (void)WriteInt32(reply, 0);
+    (void)WriteInt32(reply, ret);
 }
 
 void WifiDeviceStub::OnIsWifiConnected(uint32_t code, IpcIo *req, IpcIo *reply)
 {
     WIFI_LOGD("run %{public}s code %{public}u", __func__, code);
-    IpcIoPushInt32(reply, 0);
-    IpcIoPushInt32(reply, WIFI_OPT_SUCCESS);
-    IpcIoPushBool(reply, IsConnected());
+    (void)WriteInt32(reply, 0);
+    (void)WriteInt32(reply, WIFI_OPT_SUCCESS);
+    (void)WriteBool(reply, IsConnected());
 }
 
 void WifiDeviceStub::OnReConnect(uint32_t code, IpcIo *req, IpcIo *reply)
 {
     WIFI_LOGD("run %{public}s code %{public}u", __func__, code);
     ErrCode ret = ReConnect();
-    IpcIoPushInt32(reply, 0);
-    IpcIoPushInt32(reply, ret);
+    (void)WriteInt32(reply, 0);
+    (void)WriteInt32(reply, ret);
 }
 
 void WifiDeviceStub::OnReAssociate(uint32_t code, IpcIo *req, IpcIo *reply)
 {
     WIFI_LOGD("run %{public}s code %{public}u", __func__, code);
     ErrCode ret = ReAssociate();
-    IpcIoPushInt32(reply, 0);
-    IpcIoPushInt32(reply, ret);
+    (void)WriteInt32(reply, 0);
+    (void)WriteInt32(reply, ret);
 }
 
 void WifiDeviceStub::OnDisconnect(uint32_t code, IpcIo *req, IpcIo *reply)
 {
     WIFI_LOGD("run %{public}s code %{public}u", __func__, code);
     ErrCode ret = Disconnect();
-    IpcIoPushInt32(reply, 0);
-    IpcIoPushInt32(reply, ret);
+    (void)WriteInt32(reply, 0);
+    (void)WriteInt32(reply, ret);
 }
 
 void WifiDeviceStub::OnStartWps(uint32_t code, IpcIo *req, IpcIo *reply)
@@ -327,21 +344,23 @@ void WifiDeviceStub::OnStartWps(uint32_t code, IpcIo *req, IpcIo *reply)
     WIFI_LOGD("run %{public}s code %{public}u", __func__, code);
     size_t size;
     WpsConfig config;
-    config.setup = SetupMethod(IpcIoPopInt32(req));
-    config.pin = (char *)IpcIoPopString(req, &size);
-    config.bssid = (char *)IpcIoPopString(req, &size);
+    int setup;
+    (void)ReadInt32(req, &setup);
+    config.setup = SetupMethod(setup);
+    config.pin = (char *)ReadString(req, &size);
+    config.bssid = (char *)ReadString(req, &size);
 
     ErrCode ret = StartWps(config);
-    IpcIoPushInt32(reply, 0);
-    IpcIoPushInt32(reply, ret);
+    (void)WriteInt32(reply, 0);
+    (void)WriteInt32(reply, ret);
 }
 
 void WifiDeviceStub::OnCancelWps(uint32_t code, IpcIo *req, IpcIo *reply)
 {
     WIFI_LOGD("run %{public}s code %{public}u", __func__, code);
     ErrCode ret = CancelWps();
-    IpcIoPushInt32(reply, 0);
-    IpcIoPushInt32(reply, ret);
+    (void)WriteInt32(reply, 0);
+    (void)WriteInt32(reply, ret);
 }
 
 void WifiDeviceStub::OnIsWifiActive(uint32_t code, IpcIo *req, IpcIo *reply)
@@ -349,10 +368,10 @@ void WifiDeviceStub::OnIsWifiActive(uint32_t code, IpcIo *req, IpcIo *reply)
     WIFI_LOGD("run %{public}s code %{public}u", __func__, code);
     bool bActive = false;
     ErrCode ret = IsWifiActive(bActive);
-    IpcIoPushInt32(reply, 0);
-    IpcIoPushInt32(reply, ret);
+    (void)WriteInt32(reply, 0);
+    (void)WriteInt32(reply, ret);
     if (ret == WIFI_OPT_SUCCESS) {
-        IpcIoPushBool(reply, bActive);
+        (void)WriteBool(reply, bActive);
     }
 }
 
@@ -361,10 +380,10 @@ void WifiDeviceStub::OnGetWifiState(uint32_t code, IpcIo *req, IpcIo *reply)
     WIFI_LOGD("run %{public}s code %{public}u", __func__, code);
     int state = 0;
     ErrCode ret = GetWifiState(state);
-    IpcIoPushInt32(reply, 0);
-    IpcIoPushInt32(reply, ret);
+    (void)WriteInt32(reply, 0);
+    (void)WriteInt32(reply, ret);
     if (ret == WIFI_OPT_SUCCESS) {
-        IpcIoPushInt32(reply, state);
+        (void)WriteInt32(reply, state);
     }
 }
 
@@ -373,29 +392,29 @@ void WifiDeviceStub::OnGetLinkedInfo(uint32_t code, IpcIo *req, IpcIo *reply)
     WIFI_LOGD("run %{public}s code %{public}u", __func__, code);
     WifiLinkedInfo wifiInfo;
     ErrCode ret = GetLinkedInfo(wifiInfo);
-    IpcIoPushInt32(reply, 0);
-    IpcIoPushInt32(reply, ret);
+    (void)WriteInt32(reply, 0);
+    (void)WriteInt32(reply, ret);
 
     if (ret == WIFI_OPT_SUCCESS) {
-        IpcIoPushInt32(reply, wifiInfo.networkId);
-        IpcIoPushString(reply, wifiInfo.ssid.c_str());
-        IpcIoPushString(reply, wifiInfo.bssid.c_str());
-        IpcIoPushInt32(reply, wifiInfo.rssi);
-        IpcIoPushInt32(reply, wifiInfo.band);
-        IpcIoPushInt32(reply, wifiInfo.frequency);
-        IpcIoPushInt32(reply, wifiInfo.linkSpeed);
-        IpcIoPushString(reply, wifiInfo.macAddress.c_str());
-        IpcIoPushInt32(reply, wifiInfo.ipAddress);
-        IpcIoPushInt32(reply, (int)wifiInfo.connState);
-        IpcIoPushBool(reply, wifiInfo.ifHiddenSSID);
-        IpcIoPushInt32(reply, wifiInfo.rxLinkSpeed);
-        IpcIoPushInt32(reply, wifiInfo.txLinkSpeed);
-        IpcIoPushInt32(reply, wifiInfo.chload);
-        IpcIoPushInt32(reply, wifiInfo.snr);
-        IpcIoPushInt32(reply, wifiInfo.isDataRestricted);
-        IpcIoPushString(reply, wifiInfo.portalUrl.c_str());
-        IpcIoPushInt32(reply, (int)wifiInfo.supplicantState);
-        IpcIoPushInt32(reply, (int)wifiInfo.detailedState);
+        (void)WriteInt32(reply, wifiInfo.networkId);
+        (void)WriteString(reply, wifiInfo.ssid.c_str());
+        (void)WriteString(reply, wifiInfo.bssid.c_str());
+        (void)WriteInt32(reply, wifiInfo.rssi);
+        (void)WriteInt32(reply, wifiInfo.band);
+        (void)WriteInt32(reply, wifiInfo.frequency);
+        (void)WriteInt32(reply, wifiInfo.linkSpeed);
+        (void)WriteString(reply, wifiInfo.macAddress.c_str());
+        (void)WriteUint32(reply, wifiInfo.ipAddress);
+        (void)WriteInt32(reply, (int)wifiInfo.connState);
+        (void)WriteBool(reply, wifiInfo.ifHiddenSSID);
+        (void)WriteInt32(reply, wifiInfo.rxLinkSpeed);
+        (void)WriteInt32(reply, wifiInfo.txLinkSpeed);
+        (void)WriteInt32(reply, wifiInfo.chload);
+        (void)WriteInt32(reply, wifiInfo.snr);
+        (void)WriteInt32(reply, wifiInfo.isDataRestricted);
+        (void)WriteString(reply, wifiInfo.portalUrl.c_str());
+        (void)WriteInt32(reply, (int)wifiInfo.supplicantState);
+        (void)WriteInt32(reply, (int)wifiInfo.detailedState);
     }
 }
 
@@ -404,17 +423,17 @@ void WifiDeviceStub::OnGetIpInfo(uint32_t code, IpcIo *req, IpcIo *reply)
     WIFI_LOGD("run %{public}s code %{public}u", __func__, code);
     IpInfo info;
     ErrCode ret = GetIpInfo(info);
-    IpcIoPushInt32(reply, 0);
-    IpcIoPushInt32(reply, ret);
+    (void)WriteInt32(reply, 0);
+    (void)WriteInt32(reply, ret);
 
     if (ret == WIFI_OPT_SUCCESS) {
-        IpcIoPushInt32(reply, info.ipAddress);
-        IpcIoPushInt32(reply, info.gateway);
-        IpcIoPushInt32(reply, info.netmask);
-        IpcIoPushInt32(reply, info.primaryDns);
-        IpcIoPushInt32(reply, info.secondDns);
-        IpcIoPushInt32(reply, info.serverIp);
-        IpcIoPushInt32(reply, info.leaseDuration);
+        (void)WriteUint32(reply, info.ipAddress);
+        (void)WriteUint32(reply, info.gateway);
+        (void)WriteUint32(reply, info.netmask);
+        (void)WriteUint32(reply, info.primaryDns);
+        (void)WriteUint32(reply, info.secondDns);
+        (void)WriteUint32(reply, info.serverIp);
+        (void)WriteUint32(reply, info.leaseDuration);
     }
 }
 
@@ -422,10 +441,10 @@ void WifiDeviceStub::OnSetCountryCode(uint32_t code, IpcIo *req, IpcIo *reply)
 {
     WIFI_LOGD("run %{public}s code %{public}u", __func__, code);
     size_t size;
-    std::string countrycode = (char *)IpcIoPopString(req, &size);
+    std::string countrycode = (char *)ReadString(req, &size);
     ErrCode ret = SetCountryCode(countrycode);
-    IpcIoPushInt32(reply, 0);
-    IpcIoPushInt32(reply, ret);
+    (void)WriteInt32(reply, 0);
+    (void)WriteInt32(reply, ret);
 }
 
 void WifiDeviceStub::OnGetCountryCode(uint32_t code, IpcIo *req, IpcIo *reply)
@@ -433,11 +452,11 @@ void WifiDeviceStub::OnGetCountryCode(uint32_t code, IpcIo *req, IpcIo *reply)
     WIFI_LOGD("run %{public}s code %{public}u", __func__, code);
     std::string countryCode;
     ErrCode ret = GetCountryCode(countryCode);
-    IpcIoPushInt32(reply, 0);
-    IpcIoPushInt32(reply, ret);
+    (void)WriteInt32(reply, 0);
+    (void)WriteInt32(reply, ret);
 
     if (ret == WIFI_OPT_SUCCESS) {
-        IpcIoPushString(reply, countryCode.c_str());
+        (void)WriteString(reply, countryCode.c_str());
     }
 }
 
@@ -445,36 +464,36 @@ void WifiDeviceStub::OnRegisterCallBack(uint32_t code, IpcIo *req, IpcIo *reply)
 {
     WIFI_LOGD("run %{public}s code %{public}u", __func__, code);
     ErrCode ret = WIFI_OPT_FAILED;
-    SvcIdentity *sid = IpcIoPopSvc(req);
-    if (sid == nullptr) {
-        WIFI_LOGE("sid is null");
-        IpcIoPushInt32(reply, 0);
-        IpcIoPushInt32(reply, ret);
+    SvcIdentity sid;
+    bool readSid = ReadRemoteObject(req, &sid);
+    if (!readSid) {
+        WIFI_LOGE("read SvcIdentity failed");
+        (void)WriteInt32(reply, 0);
+        (void)WriteInt32(reply, ret);
         return;
     }
-#ifdef __LINUX__
-    BinderAcquire(sid->ipcContext, sid->handle);
-#endif
 
-    callback_ = std::make_shared<WifiDeviceCallBackProxy>(sid);
+    callback_ = std::make_shared<WifiDeviceCallBackProxy>(&sid);
     WIFI_LOGD("create new WifiDeviceCallbackProxy!");
     ret = RegisterCallBack(callback_);
 
-    IpcIoPushInt32(reply, 0);
-    IpcIoPushInt32(reply, ret);
+    (void)WriteInt32(reply, 0);
+    (void)WriteInt32(reply, ret);
 }
 
 void WifiDeviceStub::OnGetSignalLevel(uint32_t code, IpcIo *req, IpcIo *reply)
 {
     WIFI_LOGD("run %{public}s code %{public}u", __func__, code);
-    int rssi = IpcIoPopInt32(req);
-    int band = IpcIoPopInt32(req);
+    int rssi = 0;
+    int band = 0;
     int level = 0;
+    (void)ReadInt32(req, &rssi);
+    (void)ReadInt32(req, &band);
     ErrCode ret = GetSignalLevel(rssi, band, level);
-    IpcIoPushInt32(reply, 0);
-    IpcIoPushInt32(reply, ret);
+    (void)WriteInt32(reply, 0);
+    (void)WriteInt32(reply, ret);
     if (ret == WIFI_OPT_SUCCESS) {
-        IpcIoPushInt32(reply, level);
+        (void)WriteInt32(reply, level);
     }
 }
 
@@ -483,11 +502,11 @@ void WifiDeviceStub::OnGetSupportedFeatures(uint32_t code, IpcIo *req, IpcIo *re
     WIFI_LOGD("run %{public}s code %{public}u", __func__, code);
     long features = 0;
     int ret = GetSupportedFeatures(features);
-    IpcIoPushInt32(reply, 0);
-    IpcIoPushInt32(reply, ret);
+    (void)WriteInt32(reply, 0);
+    (void)WriteInt32(reply, ret);
 
     if (ret == WIFI_OPT_SUCCESS) {
-        IpcIoPushInt64(reply, features);
+        (void)WriteUint64(reply, features);
     }
 }
 
@@ -496,10 +515,10 @@ void WifiDeviceStub::OnGetDeviceMacAdd(uint32_t code, IpcIo *req, IpcIo *reply)
     WIFI_LOGD("run %{public}s code %{public}u", __func__, code);
     std::string strMacAddr;
     ErrCode ret = GetDeviceMacAddress(strMacAddr);
-    IpcIoPushInt32(reply, 0);
-    IpcIoPushInt32(reply, ret);
+    (void)WriteInt32(reply, 0);
+    (void)WriteInt32(reply, ret);
     if (ret == WIFI_OPT_SUCCESS) {
-        IpcIoPushString(reply, strMacAddr.c_str());
+        (void)WriteString(reply, strMacAddr.c_str());
     }
 }
 
@@ -507,10 +526,11 @@ void WifiDeviceStub::OnSetLowLatencyMode(uint32_t code, IpcIo *req, IpcIo *reply
 {
     WIFI_LOGD("run %{public}s code %{public}u", __func__, code);
 
-    bool enabled = IpcIoPopBool(req);
-    IpcIoPushInt32(reply, 0);
-    IpcIoPushInt32(reply, WIFI_OPT_SUCCESS);
-    IpcIoPushBool(reply, SetLowLatencyMode(enabled));
+    bool enabled;
+    (void)ReadBool(req, &enabled);
+    (void)WriteInt32(reply, 0);
+    (void)WriteInt32(reply, WIFI_OPT_SUCCESS);
+    (void)WriteBool(reply, SetLowLatencyMode(enabled));
 }
 
 void WifiDeviceStub::InitHandleMap()
@@ -553,20 +573,21 @@ int WifiDeviceStub::OnRemoteRequest(uint32_t code, IpcIo *req, IpcIo *reply)
     WIFI_LOGD("run: %{public}s code: %{public}u", __func__, code);
     if (req == nullptr || reply == nullptr) {
         WIFI_LOGD("req:%{public}d, reply:%{public}d", req == nullptr, reply == nullptr);
-        return LITEIPC_EINVAL;
+        return ERR_FAILED;
     }
-    int exception = IpcIoPopInt32(req);
+    int exception = 0;
+    (void)ReadInt32(req, &exception);
     if (exception) {
-        IpcIoPushInt32(reply, 0);
-        IpcIoPushInt32(reply, WIFI_OPT_NOT_SUPPORTED);
+        (void)WriteInt32(reply, 0);
+        (void)WriteInt32(reply, WIFI_OPT_NOT_SUPPORTED);
         return WIFI_OPT_FAILED;
     }
 
     HandleFuncMap::iterator iter = handleFuncMap_.find(code);
     if (iter == handleFuncMap_.end()) {
         WIFI_LOGI("not find function to deal, code %{public}u", code);
-        IpcIoPushInt32(reply, 0);
-        IpcIoPushInt32(reply, WIFI_OPT_NOT_SUPPORTED);
+        (void)WriteInt32(reply, 0);
+        (void)WriteInt32(reply, WIFI_OPT_NOT_SUPPORTED);
     } else {
         (this->*(iter->second))(code, req, reply);
     }

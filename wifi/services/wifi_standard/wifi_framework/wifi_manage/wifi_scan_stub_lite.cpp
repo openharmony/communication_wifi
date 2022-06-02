@@ -15,7 +15,8 @@
 
 #include "wifi_scan_stub_lite.h"
 #include "define.h"
-#include "liteipc_adapter.h"
+#include "ipc_skeleton.h"
+#include "rpc_errno.h"
 #include "wifi_logger.h"
 #include "wifi_msg.h"
 #include "wifi_scan_callback_proxy.h"
@@ -35,10 +36,11 @@ int WifiScanStub::OnRemoteRequest(uint32_t code, IpcIo *req, IpcIo *reply)
     WIFI_LOGD("WifiScanStub::OnRemoteRequest,code:%{public}u", code);
     if (req == nullptr || reply == nullptr) {
         WIFI_LOGD("req:%{public}d, reply:%{public}d", req == nullptr, reply == nullptr);
-        return LITEIPC_EINVAL;
+        return ERR_FAILED;
     }
 
-    int exception = IpcIoPopInt32(req);
+    int exception = ERR_FAILED;
+    (void)ReadInt32(req, &exception);
     if (exception) {
         return WIFI_OPT_FAILED;
     }
@@ -88,43 +90,49 @@ std::shared_ptr<IWifiScanCallback> WifiScanStub::GetCallback() const
 int WifiScanStub::OnSetScanControlInfo(uint32_t code, IpcIo *req, IpcIo *reply)
 {
     WIFI_LOGD("WifiScanStub run %{public}s code %{public}u", __func__, code);
+    int tmpInt;
     constexpr int MAX_SIZE = 1024;
     ScanControlInfo info;
-    int forbidListSize = IpcIoPopInt32(req);
+    int forbidListSize = 0;
+    (void)ReadInt32(req, &forbidListSize);
     if (forbidListSize > MAX_SIZE) {
-        IpcIoPushInt32(reply, 0);
-        IpcIoPushInt32(reply, WIFI_OPT_INVALID_PARAM);
+        (void)WriteInt32(reply, 0);
+        (void)WriteInt32(reply, WIFI_OPT_INVALID_PARAM);
         return WIFI_OPT_INVALID_PARAM;
     }
     for (int i = 0; i < forbidListSize; i++) {
         ScanForbidMode scanForbidMode;
-        scanForbidMode.scanScene = IpcIoPopInt32(req);
-        scanForbidMode.scanMode = static_cast<ScanMode>(IpcIoPopInt32(req));
-        scanForbidMode.forbidTime = IpcIoPopInt32(req);
-        scanForbidMode.forbidCount = IpcIoPopInt32(req);
+        (void)ReadInt32(req, &scanForbidMode.scanScene);
+        (void)ReadInt32(req, &tmpInt);
+        scanForbidMode.scanMode = static_cast<ScanMode>(tmpInt);
+        (void)ReadInt32(req, &scanForbidMode.forbidTime);
+        (void)ReadInt32(req, &scanForbidMode.forbidCount);
         info.scanForbidList.push_back(scanForbidMode);
     }
 
-    int intervalSize = IpcIoPopInt32(req);
+    int intervalSize = 0;
+    (void)ReadInt32(req, &intervalSize);
     if (intervalSize > MAX_SIZE) {
-        IpcIoPushInt32(reply, 0);
-        IpcIoPushInt32(reply, WIFI_OPT_INVALID_PARAM);
+        (void)WriteInt32(reply, 0);
+        (void)WriteInt32(reply, WIFI_OPT_INVALID_PARAM);
         return WIFI_OPT_INVALID_PARAM;
     }
     for (int i = 0; i < intervalSize; i++) {
         ScanIntervalMode scanIntervalMode;
-        scanIntervalMode.scanScene = IpcIoPopInt32(req);
-        scanIntervalMode.scanMode = static_cast<ScanMode>(IpcIoPopInt32(req));
-        scanIntervalMode.isSingle = IpcIoPopBool(req);
-        scanIntervalMode.intervalMode = static_cast<IntervalMode>(IpcIoPopInt32(req));
-        scanIntervalMode.interval = IpcIoPopInt32(req);
-        scanIntervalMode.count = IpcIoPopInt32(req);
+        (void)ReadInt32(req, &scanIntervalMode.scanScene);
+        (void)ReadInt32(req, &tmpInt);
+        scanIntervalMode.scanMode = static_cast<ScanMode>(tmpInt);
+        (void)ReadBool(req, &scanIntervalMode.isSingle);
+        (void)ReadInt32(req, &tmpInt);
+        scanIntervalMode.intervalMode = static_cast<IntervalMode>(tmpInt);
+        (void)ReadInt32(req, &scanIntervalMode.interval);
+        (void)ReadInt32(req, &scanIntervalMode.count);
         info.scanIntervalList.push_back(scanIntervalMode);
     }
 
     ErrCode ret = SetScanControlInfo(info);
-    IpcIoPushInt32(reply, 0);
-    IpcIoPushInt32(reply, ret);
+    (void)WriteInt32(reply, 0);
+    (void)WriteInt32(reply, ret);
 
     return ret;
 }
@@ -133,8 +141,8 @@ int WifiScanStub::OnScan(uint32_t code, IpcIo *req, IpcIo *reply)
 {
     WIFI_LOGD("WifiScanStub run %{public}s code %{public}u", __func__, code);
     ErrCode ret = Scan();
-    IpcIoPushInt32(reply, 0);
-    IpcIoPushInt32(reply, ret);
+    (void)WriteInt32(reply, 0);
+    (void)WriteInt32(reply, ret);
 
     return ret;
 }
@@ -145,23 +153,25 @@ int WifiScanStub::OnScanByParams(uint32_t code, IpcIo *req, IpcIo *reply)
     size_t readLen;
     constexpr int MAX_FREQS_SIZE = 512;
     WifiScanParams params;
-    params.ssid = (char *)IpcIoPopString(req, &readLen);
-    params.bssid = (char *)IpcIoPopString(req, &readLen);
-    int size = IpcIoPopInt32(req);
+    params.ssid = (char *)ReadString(req, &readLen);
+    params.bssid = (char *)ReadString(req, &readLen);
+    int size = 0;
+    (void)ReadInt32(req, &size);
     if (size > MAX_FREQS_SIZE) {
-        IpcIoPushInt32(reply, 0);
-        IpcIoPushInt32(reply, WIFI_OPT_INVALID_PARAM);
+        (void)WriteInt32(reply, 0);
+        (void)WriteInt32(reply, WIFI_OPT_INVALID_PARAM);
         return WIFI_OPT_INVALID_PARAM;
     }
+    int tmp;
     for (int i = 0; i < size; i++) {
-        int tmp = IpcIoPopInt32(req);
+        (void)ReadInt32(req, &tmp);
         params.freqs.push_back(tmp);
     }
-    params.band = IpcIoPopInt32(req);
+    (void)ReadUint32(req, &params.band);
 
     ErrCode ret = AdvanceScan(params);
-    IpcIoPushInt32(reply, 0);
-    IpcIoPushInt32(reply, ret);
+    (void)WriteInt32(reply, 0);
+    (void)WriteInt32(reply, ret);
 
     return ret;
 }
@@ -171,10 +181,10 @@ int WifiScanStub::OnIsWifiClosedScan(uint32_t code, IpcIo *req, IpcIo *reply)
     WIFI_LOGD("WifiScanStub run %{public}s code %{public}u", __func__, code);
     bool bOpen = false;
     ErrCode ret = IsWifiClosedScan(bOpen);
-    IpcIoPushInt32(reply, 0);
-    IpcIoPushInt32(reply, ret);
+    (void)WriteInt32(reply, 0);
+    (void)WriteInt32(reply, ret);
     if (ret == WIFI_OPT_SUCCESS) {
-        IpcIoPushBool(reply, bOpen);
+        (void)WriteBool(reply, bOpen);
     }
     return ret;
 }
@@ -184,33 +194,33 @@ int WifiScanStub::OnGetScanInfoList(uint32_t code, IpcIo *req, IpcIo *reply)
     WIFI_LOGD("WifiScanStub run %{public}s code %{public}u", __func__, code);
     std::vector<WifiScanInfo> result;
     ErrCode ret = GetScanInfoList(result);
-    IpcIoPushInt32(reply, 0);
-    IpcIoPushInt32(reply, ret);
+    (void)WriteInt32(reply, 0);
+    (void)WriteInt32(reply, ret);
     if (ret != WIFI_OPT_SUCCESS) {
         return ret;
     }
 
     unsigned int size = result.size();
-    IpcIoPushInt32(reply, size);
+    (void)WriteInt32(reply, size);
     for (unsigned int i = 0; i < size; ++i) {
-        IpcIoPushString(reply, result[i].bssid.c_str());
-        IpcIoPushString(reply, result[i].ssid.c_str());
-        IpcIoPushString(reply, result[i].capabilities.c_str());
-        IpcIoPushInt32(reply, result[i].frequency);
-        IpcIoPushInt32(reply, result[i].rssi);
-        IpcIoPushInt64(reply, result[i].timestamp);
-        IpcIoPushInt32(reply, result[i].band);
-        IpcIoPushInt32(reply, static_cast<int>(result[i].securityType));
-        IpcIoPushInt32(reply, static_cast<int>(result[i].channelWidth));
-        IpcIoPushInt32(reply, result[i].centerFrequency0);
-        IpcIoPushInt32(reply, result[i].centerFrequency1);
-        IpcIoPushInt64(reply, result[i].features);
-        IpcIoPushInt32(reply, result[i].infoElems.size());
+        (void)WriteString(reply, result[i].bssid.c_str());
+        (void)WriteString(reply, result[i].ssid.c_str());
+        (void)WriteString(reply, result[i].capabilities.c_str());
+        (void)WriteInt32(reply, result[i].frequency);
+        (void)WriteInt32(reply, result[i].rssi);
+        (void)WriteUint64(reply, result[i].timestamp);
+        (void)WriteInt32(reply, result[i].band);
+        (void)WriteInt32(reply, static_cast<int>(result[i].securityType));
+        (void)WriteInt32(reply, static_cast<int>(result[i].channelWidth));
+        (void)WriteInt32(reply, result[i].centerFrequency0);
+        (void)WriteInt32(reply, result[i].centerFrequency1);
+        (void)WriteUint64(reply, result[i].features);
+        (void)WriteInt32(reply, result[i].infoElems.size());
         for (unsigned int m = 0; m < result[i].infoElems.size(); ++m) {
-            IpcIoPushInt32(reply, result[i].infoElems[m].id);
-            IpcIoPushInt32(reply, result[i].infoElems[m].content.size());
+            (void)WriteUint32(reply, result[i].infoElems[m].id);
+            (void)WriteInt32(reply, result[i].infoElems[m].content.size());
             for (unsigned int n = 0; n < result[i].infoElems[m].content.size(); ++n) {
-                IpcIoPushInt8(reply, result[i].infoElems[m].content[n]);
+                (void)WriteInt8(reply, result[i].infoElems[m].content[n]);
             }
         }
     }
@@ -221,23 +231,21 @@ int WifiScanStub::OnRegisterCallBack(uint32_t code, IpcIo *req, IpcIo *reply)
 {
     WIFI_LOGD("run %{public}s code %{public}u", __func__, code);
     ErrCode ret = WIFI_OPT_FAILED;
-    SvcIdentity *sid = IpcIoPopSvc(req);
-    if (sid == nullptr) {
-        WIFI_LOGE("sid is null");
-        IpcIoPushInt32(reply, 0);
-        IpcIoPushInt32(reply, ret);
+    SvcIdentity sid;
+    bool readSid = ReadRemoteObject(req, &sid);
+    if (!readSid) {
+        WIFI_LOGE("read SvcIdentity failed");
+        (void)WriteInt32(reply, 0);
+        (void)WriteInt32(reply, ret);
         return ret;
     }
-#ifdef __LINUX__
-    BinderAcquire(sid->ipcContext, sid->handle);
-#endif
 
-    callback_ = std::make_shared<WifiScanCallbackProxy>(sid);
+    callback_ = std::make_shared<WifiScanCallbackProxy>(&sid);
     WIFI_LOGD("create new WifiScanCallbackProxy!");
     ret = RegisterCallBack(callback_);
 
-    IpcIoPushInt32(reply, 0);
-    IpcIoPushInt32(reply, ret);
+    (void)WriteInt32(reply, 0);
+    (void)WriteInt32(reply, ret);
     return 0;
 }
 
@@ -246,11 +254,11 @@ int WifiScanStub::OnGetSupportedFeatures(uint32_t code, IpcIo *req, IpcIo *reply
     WIFI_LOGD("WifiScanStub run %{public}s code %{public}u", __func__, code);
     long features = 0;
     int ret = GetSupportedFeatures(features);
-    IpcIoPushInt32(reply, 0);
-    IpcIoPushInt32(reply, ret);
+    (void)WriteInt32(reply, 0);
+    (void)WriteInt32(reply, ret);
 
     if (ret == WIFI_OPT_SUCCESS) {
-        IpcIoPushInt64(reply, features);
+        (void)WriteUint64(reply, features);
     }
 
     return ret;

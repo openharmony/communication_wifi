@@ -37,7 +37,8 @@ int WifiDeviceCallBackStub::OnRemoteRequest(uint32_t code, IpcIo *data)
         return ret;
     }
 
-    int exception = IpcIoPopInt32(data);
+    int exception = WIFI_OPT_FAILED;
+    (void)ReadInt32(data, &exception);
     if (exception) {
         WIFI_LOGE("WifiDeviceCallBackStub::OnRemoteRequest, got exception: %{public}d!", exception);
         return ret;
@@ -133,7 +134,8 @@ void WifiDeviceCallBackStub::OnStreamChanged(int direction)
 int WifiDeviceCallBackStub::RemoteOnWifiStateChanged(uint32_t code, IpcIo *data)
 {
     WIFI_LOGD("run %{public}s code %{public}u", __func__, code);
-    int state = IpcIoPopInt32(data);
+    int state = 0;
+    (void)ReadInt32(data, &state);
     OnWifiStateChanged(state);
     return 0;
 }
@@ -142,38 +144,42 @@ int WifiDeviceCallBackStub::RemoteOnWifiConnectionChanged(uint32_t code, IpcIo *
 {
     WIFI_LOGD("run %{public}s code %{public}u", __func__, code);
     size_t readLen;
-    int state = IpcIoPopInt32(data);
+    int state = 0;
+    (void)ReadInt32(data, &state);
     WifiLinkedInfo info;
-    info.networkId = IpcIoPopInt32(data);
-    info.ssid = (char *)IpcIoPopString(data, &readLen);
-    info.bssid = (char *)IpcIoPopString(data, &readLen);
-    info.rssi = IpcIoPopInt32(data);
-    info.band = IpcIoPopInt32(data);
-    info.frequency = IpcIoPopInt32(data);
-    info.linkSpeed = IpcIoPopInt32(data);
-    info.macAddress = (char *)IpcIoPopString(data, &readLen);
-    info.ipAddress = IpcIoPopInt32(data);
-    int tmpConnState = IpcIoPopInt32(data);
+    (void)ReadInt32(data, &info.networkId);
+    info.ssid = (char *)ReadString(data, &readLen);
+    info.bssid = (char *)ReadString(data, &readLen);
+    (void)ReadInt32(data, &info.rssi);
+    (void)ReadInt32(data, &info.band);
+    (void)ReadInt32(data, &info.frequency);
+    (void)ReadInt32(data, &info.linkSpeed);
+    info.macAddress = (char *)ReadString(data, &readLen);
+    (void)ReadUint32(data, &info.ipAddress);
+    int tmpConnState = 0;
+    (void)ReadInt32(data, &tmpConnState);
     if (tmpConnState >= 0 && tmpConnState <= int(ConnState::UNKNOWN)) {
         info.connState = ConnState(tmpConnState);
     } else {
         info.connState = ConnState::UNKNOWN;
     }
-    info.ifHiddenSSID = IpcIoPopBool(data);
-    info.rxLinkSpeed = IpcIoPopInt32(data);
-    info.txLinkSpeed = IpcIoPopInt32(data);
-    info.chload = IpcIoPopInt32(data);
-    info.snr = IpcIoPopInt32(data);
-    info.isDataRestricted = IpcIoPopInt32(data);
-    info.portalUrl = (char *)IpcIoPopString(data, &readLen);
-    int tmpState = IpcIoPopInt32(data);
+    (void)ReadBool(data, &info.ifHiddenSSID);
+    (void)ReadInt32(data, &info.rxLinkSpeed);
+    (void)ReadInt32(data, &info.txLinkSpeed);
+    (void)ReadInt32(data, &info.chload);
+    (void)ReadInt32(data, &info.snr);
+    (void)ReadInt32(data, &info.isDataRestricted);
+    info.portalUrl = (char *)ReadString(data, &readLen);
+    int tmpState = 0;
+    (void)ReadInt32(data, &tmpState);
     if (tmpState >= 0 && tmpState <= int(SupplicantState::INVALID)) {
         info.supplicantState = SupplicantState(tmpState);
     } else {
         info.supplicantState = SupplicantState::INVALID;
     }
 
-    int tmpDetailState = IpcIoPopInt32(data);
+    int tmpDetailState = 0;
+    (void)ReadInt32(data, &tmpDetailState);
     if (tmpDetailState >= 0 && tmpDetailState <= int(DetailedState::INVALID)) {
         info.detailedState = DetailedState(tmpDetailState);
     } else {
@@ -186,7 +192,8 @@ int WifiDeviceCallBackStub::RemoteOnWifiConnectionChanged(uint32_t code, IpcIo *
 int WifiDeviceCallBackStub::RemoteOnWifiRssiChanged(uint32_t code, IpcIo *data)
 {
     WIFI_LOGD("run %{public}s code %{public}u", __func__, code);
-    int rssi = IpcIoPopInt32(data);
+    int rssi = 0;
+    (void)ReadInt32(data, &rssi);
     OnWifiRssiChanged(rssi);
     return 0;
 }
@@ -195,8 +202,9 @@ int WifiDeviceCallBackStub::RemoteOnWifiWpsStateChanged(uint32_t code, IpcIo *da
 {
     WIFI_LOGD("run %{public}s code %{public}u", __func__, code);
     size_t readLen;
-    int state = IpcIoPopInt32(data);
-    std::string pinCode = (char *)IpcIoPopString(data, &readLen);
+    int state = 0;
+    (void)ReadInt32(data, &state);
+    std::string pinCode = (char *)ReadString(data, &readLen);
     OnWifiWpsStateChanged(state, pinCode);
     return 0;
 }
@@ -204,7 +212,8 @@ int WifiDeviceCallBackStub::RemoteOnWifiWpsStateChanged(uint32_t code, IpcIo *da
 int WifiDeviceCallBackStub::RemoteOnStreamChanged(uint32_t code, IpcIo *data)
 {
     WIFI_LOGD("run %{public}s code %{public}u", __func__, code);
-    int direction = IpcIoPopInt32(data);
+    int direction = 0;
+    (void)ReadInt32(data, &direction);
     OnStreamChanged(direction);
     return 0;
 }

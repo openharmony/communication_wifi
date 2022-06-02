@@ -40,7 +40,7 @@ public:
 
 private:
 #ifdef OHOS_ARCH_LITE
-    SvcIdentity *sid_;
+    SvcIdentity sid_;
     static const int DEFAULT_IPC_SIZE = 256;
 #else
     static inline BrokerDelegator<WifiScanCallbackProxy> g_delegator;

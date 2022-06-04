@@ -70,7 +70,7 @@ ohos_shared_library("wifiext") {
     "$WIFI_ROOT_DIR/frameworks/native/include",
     "$WIFI_ROOT_DIR/frameworks/native/interfaces",
     "$WIFI_ROOT_DIR/frameworks/js/napi/inc",
-    "//foundation/aafwk/standard/frameworks/kits/appkit/native/ability_runtime/context",
+    "//foundation/ability/ability_runtime/frameworks/kits/appkit/native/ability_runtime/context",
   ]
 
   sources = [
@@ -81,7 +81,7 @@ ohos_shared_library("wifiext") {
   deps = [
     "$WIFI_ROOT_DIR/frameworks/native:wifi_sdk",
     "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog",
-    "//foundation/aafwk/standard/frameworks/kits/appkit:app_context",
+    "//foundation/ability/ability_runtime/frameworks/kits/appkit:app_context",
     "//foundation/arkui/napi:ace_napi",
     "//utils/native/base:utils",
   ]

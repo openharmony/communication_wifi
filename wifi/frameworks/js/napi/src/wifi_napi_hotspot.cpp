@@ -98,7 +98,7 @@ static bool GetHotspotconfigFromJs(const napi_env& env, const napi_value& object
 {
     std::string str = "";
     int value = 0;
-    JsObjectToString(env, object, "ssid", 33, str); // 33: ssid max length is 32 + '\0'
+    JsObjectToString(env, object, "ssid", NAPI_MAX_STR_LENT, str); // 33: ssid max length is 32 + '\0'
     config.SetSsid(str);
     str = "";
     JsObjectToInt(env, object, "securityType", value);
@@ -114,7 +114,7 @@ static bool GetHotspotconfigFromJs(const napi_env& env, const napi_value& object
         config.SetChannel(AP_CHANNEL_5G_DEFAULT);
     }
     value = 0;
-    JsObjectToString(env, object, "preSharedKey", 64, str); // 64: max length
+    JsObjectToString(env, object, "preSharedKey", NAPI_MAX_STR_LENT, str); // 64: max length
     config.SetPreSharedKey(str);
     JsObjectToInt(env, object, "maxConn", value);
     config.SetMaxConn(value);

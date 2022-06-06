@@ -140,6 +140,7 @@ static void GetStaticIpFromCpp(const OHOS::Wifi::StaticIpAddress& staticIp, IpCo
 
 static void ConvertDeviceConfigFromC(const WifiDeviceConfig *config, OHOS::Wifi::WifiDeviceConfig& deviceConfig)
 {
+    CHECK_PTR_RETURN_VOID(config);
     deviceConfig.ssid = config->ssid;
     if (OHOS::Wifi::IsMacArrayEmpty(config->bssid)) {
         deviceConfig.bssid = "";
@@ -165,6 +166,7 @@ static void ConvertDeviceConfigFromC(const WifiDeviceConfig *config, OHOS::Wifi:
 static OHOS::Wifi::ErrCode ConvertDeviceConfigFromCpp(const OHOS::Wifi::WifiDeviceConfig& deviceConfig,
     WifiDeviceConfig *result)
 {
+    CHECK_PTR_RETURN(result, OHOS::Wifi::WIFI_OPT_INVALID_PARAM);
     if (memcpy_s(result->ssid, WIFI_MAX_SSID_LEN, deviceConfig.ssid.c_str(), deviceConfig.ssid.size() + 1) != EOK) {
         return OHOS::Wifi::WIFI_OPT_FAILED;
     }
@@ -194,6 +196,8 @@ static OHOS::Wifi::ErrCode ConvertDeviceConfigFromCpp(const OHOS::Wifi::WifiDevi
 WifiErrorCode AddDeviceConfig(const WifiDeviceConfig *config, int *result)
 {
     CHECK_PTR_RETURN(wifiDevicePtr, ERROR_WIFI_NOT_AVAILABLE);
+    CHECK_PTR_RETURN(config, ERROR_WIFI_INVALID_ARGS);
+    CHECK_PTR_RETURN(result, ERROR_WIFI_INVALID_ARGS);
     OHOS::Wifi::WifiDeviceConfig deviceConfig;
     ConvertDeviceConfigFromC(config, deviceConfig);
     int addResult = -1;
@@ -205,11 +209,8 @@ WifiErrorCode AddDeviceConfig(const WifiDeviceConfig *config, int *result)
 WifiErrorCode GetDeviceConfigs(WifiDeviceConfig *result, unsigned int *size)
 {
     CHECK_PTR_RETURN(wifiDevicePtr, ERROR_WIFI_NOT_AVAILABLE);
-    if (result == nullptr) {
-        WIFI_LOGE("Get device configs result array is null!");
-        return ERROR_WIFI_UNKNOWN;
-    }
-
+    CHECK_PTR_RETURN(result, ERROR_WIFI_INVALID_ARGS);
+    CHECK_PTR_RETURN(size, ERROR_WIFI_INVALID_ARGS);
     std::vector<OHOS::Wifi::WifiDeviceConfig> vecDeviceConfigs;
     OHOS::Wifi::ErrCode ret = wifiDevicePtr->GetDeviceConfigs(vecDeviceConfigs);
     if (ret != OHOS::Wifi::WIFI_OPT_SUCCESS) {
@@ -252,6 +253,7 @@ WifiErrorCode ConnectTo(int networkId)
 WifiErrorCode ConnectToDevice(const WifiDeviceConfig *config)
 {
     CHECK_PTR_RETURN(wifiDevicePtr, ERROR_WIFI_NOT_AVAILABLE);
+    CHECK_PTR_RETURN(config, ERROR_WIFI_INVALID_ARGS);
     OHOS::Wifi::WifiDeviceConfig deviceConfig;
     ConvertDeviceConfigFromC(config, deviceConfig);
     return GetCErrorCode(wifiDevicePtr->ConnectToDevice(deviceConfig));
@@ -265,6 +267,7 @@ WifiErrorCode Disconnect()
 
 static OHOS::Wifi::ErrCode GetLinkedInfoFromCpp(const OHOS::Wifi::WifiLinkedInfo& linkedInfo, WifiLinkedInfo *result)
 {
+    CHECK_PTR_RETURN(result, OHOS::Wifi::WIFI_OPT_INVALID_PARAM);
     if (memcpy_s(result->ssid, WIFI_MAX_SSID_LEN, linkedInfo.ssid.c_str(), linkedInfo.ssid.size() + 1) != EOK) {
         return OHOS::Wifi::WIFI_OPT_FAILED;
     }
@@ -284,6 +287,7 @@ static OHOS::Wifi::ErrCode GetLinkedInfoFromCpp(const OHOS::Wifi::WifiLinkedInfo
 WifiErrorCode GetLinkedInfo(WifiLinkedInfo *result)
 {
     CHECK_PTR_RETURN(wifiDevicePtr, ERROR_WIFI_NOT_AVAILABLE);
+    CHECK_PTR_RETURN(result, ERROR_WIFI_INVALID_ARGS);
     OHOS::Wifi::WifiLinkedInfo linkedInfo;
     OHOS::Wifi::ErrCode ret = wifiDevicePtr->GetLinkedInfo(linkedInfo);
     if (ret == OHOS::Wifi::WIFI_OPT_SUCCESS) {
@@ -299,6 +303,7 @@ WifiErrorCode GetLinkedInfo(WifiLinkedInfo *result)
 WifiErrorCode GetDeviceMacAddress(unsigned char *result)
 {
     CHECK_PTR_RETURN(wifiDevicePtr, ERROR_WIFI_NOT_AVAILABLE);
+    CHECK_PTR_RETURN(result, ERROR_WIFI_INVALID_ARGS);
     std::string mac;
     OHOS::Wifi::ErrCode ret = wifiDevicePtr->GetDeviceMacAddress(mac);
     if (ret == OHOS::Wifi::WIFI_OPT_SUCCESS) {
@@ -312,11 +317,13 @@ WifiErrorCode GetDeviceMacAddress(unsigned char *result)
 
 WifiErrorCode AdvanceScan(WifiScanParams *params)
 {
+    CHECK_PTR_RETURN(params, ERROR_WIFI_INVALID_ARGS);
     return GetCErrorCode(OHOS::Wifi::WIFI_OPT_NOT_SUPPORTED);
 }
 
 WifiErrorCode GetIpInfo(IpInfo *info)
 {
+    CHECK_PTR_RETURN(info, ERROR_WIFI_INVALID_ARGS);
     return GetCErrorCode(OHOS::Wifi::WIFI_OPT_NOT_SUPPORTED);
 }
 

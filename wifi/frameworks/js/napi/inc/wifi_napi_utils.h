@@ -23,6 +23,7 @@
 
 namespace OHOS {
 namespace Wifi {
+static constexpr int NAPI_MAX_STR_LENT = 128;
 class TraceFuncCall final {
 public:
     TraceFuncCall(std::string funcName);

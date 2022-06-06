@@ -569,8 +569,8 @@ static int WpaCliCmdListNetworks(WifiWpaStaInterface *this, WifiNetworkInfo *pcm
         return -1;
     }
     char *savedPtr = NULL;
-    char *token = strtok_r(buf, "\n", &savedPtr); /* skip first line */
-    token = strtok_r(NULL, "\n", &savedPtr);
+    strtok_r(buf, "\n", &savedPtr); /* skip first line */
+    char *token = strtok_r(NULL, "\n", &savedPtr);
     int j = 0;
 
     while (token != NULL) {
@@ -776,8 +776,8 @@ static int WpaCliCmdScanInfo(WifiWpaStaInterface *this, ScanInfo *pcmd, int *siz
         return -1;
     }
     char *savedPtr = NULL;
-    char *token = strtok_r(buf, "\n", &savedPtr); /* skip first line */
-    token = strtok_r(NULL, "\n", &savedPtr);
+    strtok_r(buf, "\n", &savedPtr); /* skip first line */
+    char *token = strtok_r(NULL, "\n", &savedPtr);
     int j = 0;
     while (token != NULL) {
         if (j >= *size) {
@@ -836,7 +836,7 @@ static int WpaCliCmdGetSignalInfo(WifiWpaStaInterface *this, WpaSignalInfo *info
             token = strtok_r(NULL, "\n", &savedPtr);
             info->frequency = atoi(token);
         } else {
-            token = strtok_r(NULL, "\n", &savedPtr);
+            strtok_r(NULL, "\n", &savedPtr);
         }
         token = strtok_r(NULL, "=", &savedPtr);
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -71,16 +71,7 @@ WifiErrorNo GetIface(const char *ifname, WifiIface *iface)
         return WIFI_HAL_FAILED;
     }
     LOGD("GetIface() ifname: %{public}s", ifname);
-
-    WifiIface tmpIface;
-    tmpIface.index = 0; /* fixed compile error, -Werror,-Wunused-parameter */
-    tmpIface.type = 0;
-    tmpIface.name[0] = '\0';
-    if (strcpy_s(tmpIface.macAddr, sizeof(tmpIface.macAddr), "00:00:00:00:00:00") != EOK) {
-        return WIFI_HAL_FAILED;
-    }
-
-    iface = &tmpIface;
+    /* Currently not supported */
     return WIFI_HAL_SUCCESS;
 }
 

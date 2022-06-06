@@ -345,13 +345,17 @@ public:
         WIFI_LOGI("received peers changed event: %{public}d", (int)devices.size());
         WifiP2pDevice *devicePtr = nullptr;
         if (!devices.empty()) {
-            devicePtr = new WifiP2pDevice[(int)devices.size()];
-        }
-        WifiP2pDevice *p = devicePtr;
-        for (auto& each : devices) {
-            if (ConvertP2PDeviceCppToC(each, p++) != OHOS::Wifi::WIFI_OPT_SUCCESS) {
-                WIFI_LOGE("peers changed convert p2p device failed!");
+            devicePtr = new (std::nothrow) WifiP2pDevice[(int)devices.size()];
+            if (devicePtr == nullptr) {
+                WIFI_LOGE("new WifiP2pDevice failed!");
                 return;
+            }
+            WifiP2pDevice *p = devicePtr;
+            for (auto& each : devices) {
+                if (ConvertP2PDeviceCppToC(each, p++) != OHOS::Wifi::WIFI_OPT_SUCCESS) {
+                    WIFI_LOGE("peers changed convert p2p device failed!");
+                    return;
+                }
             }
         }
         if (peersChangeCb != nullptr) {

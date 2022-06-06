@@ -174,6 +174,10 @@ WifiErrorCode P2pCancelConnect()
 
 static OHOS::Wifi::ErrCode ConvertP2PDeviceCppToC(const OHOS::Wifi::WifiP2pDevice& cppDevice, WifiP2pDevice* p2pDevice)
 {
+    if (p2pDevice == nullptr) {
+        WIFI_LOGE("p2pDevice is nullptr");
+        return OHOS::Wifi::WIFI_OPT_FAILED;
+    }
     if (memcpy_s(p2pDevice->deviceName, P2P_NAME_LENGTH,
         cppDevice.GetDeviceName().c_str(), cppDevice.GetDeviceName().size() + 1) != EOK) {
         WIFI_LOGE("memcpy_s device name failed!");
@@ -343,13 +347,17 @@ public:
         WIFI_LOGI("received peers changed event: %{public}d", (int)devices.size());
         WifiP2pDevice *devicePtr = nullptr;
         if (!devices.empty()) {
-            devicePtr = new WifiP2pDevice[(int)devices.size()];
-        }
-        WifiP2pDevice *p = devicePtr;
-        for (auto& each : devices) {
-            if (ConvertP2PDeviceCppToC(each, p++) != OHOS::Wifi::WIFI_OPT_SUCCESS) {
-                WIFI_LOGE("peers changed convert p2p device failed!");
+            devicePtr = new (std::nothrow) WifiP2pDevice[(int)devices.size()];
+            if (devicePtr == nullptr) {
+                WIFI_LOGE("new WifiP2pDevice failed!");
                 return;
+            }
+            WifiP2pDevice *p = devicePtr;
+            for (auto& each : devices) {
+                if (ConvertP2PDeviceCppToC(each, p++) != OHOS::Wifi::WIFI_OPT_SUCCESS) {
+                    WIFI_LOGE("peers changed convert p2p device failed!");
+                    return;
+                }
             }
         }
         if (peersChangeCb != nullptr) {

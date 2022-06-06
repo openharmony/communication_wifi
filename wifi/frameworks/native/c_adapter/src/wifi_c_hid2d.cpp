@@ -98,6 +98,7 @@ WifiErrorCode Hid2dReleaseIPAddr(const char ifName[IF_NAME_LEN])
 static void ConvertRecommendChannelRequest(const RecommendChannelRequest *request,
     OHOS::Wifi::RecommendChannelRequest& req)
 {
+    CHECK_PTR_RETURN_VOID(request);
     req.remoteIfName = request->remoteIfName;
     req.remoteIfMode = request->remoteIfMode;
     req.localIfName = request->localIfName;
@@ -109,6 +110,7 @@ static void ConvertRecommendChannelRequest(const RecommendChannelRequest *reques
 static void ConvertRecommendChannelResponse(const OHOS::Wifi::RecommendChannelResponse& rsp,
     RecommendChannelResponse* response)
 {
+    CHECK_PTR_RETURN_VOID(response);
     response->status = RecommendStatus(static_cast<int>(rsp.status));
     response->index = rsp.index;
     response->centerFreq = rsp.centerFreq;

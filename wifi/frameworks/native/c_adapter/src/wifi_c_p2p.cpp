@@ -85,6 +85,7 @@ WifiErrorCode StopP2pListen()
 
 static void ConvertConfigCToCpp(const WifiP2pConfig* config, OHOS::Wifi::WifiP2pConfig& cppConfig)
 {
+    CHECK_PTR_RETURN_VOID(config);
     cppConfig.SetDeviceAddress(OHOS::Wifi::MacArrayToStr(config->devAddr));
     cppConfig.SetGoBand(OHOS::Wifi::GroupOwnerBand(static_cast<int>(config->goBand)));
     cppConfig.SetNetId(config->netId);
@@ -96,6 +97,7 @@ static void ConvertConfigCToCpp(const WifiP2pConfig* config, OHOS::Wifi::WifiP2p
 WifiErrorCode CreateGroup(const WifiP2pConfig* config)
 {
     CHECK_PTR_RETURN(wifiP2pPtr, ERROR_WIFI_NOT_AVAILABLE);
+    CHECK_PTR_RETURN(config, ERROR_WIFI_INVALID_ARGS);
     OHOS::Wifi::WifiP2pConfig cppConfig;
     ConvertConfigCToCpp(config, cppConfig);
     return GetCErrorCode(wifiP2pPtr->CreateGroup(cppConfig));
@@ -129,6 +131,7 @@ static void ConvertP2PDeviceCToCpp(const WifiP2pDevice& p2pDevice, OHOS::Wifi::W
 
 static void ConvertGroupInfoCToCpp(const WifiP2pGroupInfo* group, OHOS::Wifi::WifiP2pGroupInfo& cppGroup)
 {
+    CHECK_PTR_RETURN_VOID(group);
     OHOS::Wifi::WifiP2pDevice owner;
     ConvertP2PDeviceCToCpp(group->owner, owner);
     cppGroup.SetOwner(owner);
@@ -153,6 +156,7 @@ static void ConvertGroupInfoCToCpp(const WifiP2pGroupInfo* group, OHOS::Wifi::Wi
 WifiErrorCode DeleteGroup(const WifiP2pGroupInfo* group)
 {
     CHECK_PTR_RETURN(wifiP2pPtr, ERROR_WIFI_NOT_AVAILABLE);
+    CHECK_PTR_RETURN(group, ERROR_WIFI_INVALID_ARGS);
     OHOS::Wifi::WifiP2pGroupInfo groupInfo;
     ConvertGroupInfoCToCpp(group, groupInfo);
     return GetCErrorCode(wifiP2pPtr->DeleteGroup(groupInfo));
@@ -161,6 +165,7 @@ WifiErrorCode DeleteGroup(const WifiP2pGroupInfo* group)
 WifiErrorCode P2pConnect(const WifiP2pConfig* config)
 {
     CHECK_PTR_RETURN(wifiP2pPtr, ERROR_WIFI_NOT_AVAILABLE);
+    CHECK_PTR_RETURN(config, ERROR_WIFI_INVALID_ARGS);
     OHOS::Wifi::WifiP2pConfig deviceConfig;
     ConvertConfigCToCpp(config, deviceConfig);
     return GetCErrorCode(wifiP2pPtr->P2pConnect(deviceConfig));
@@ -174,6 +179,7 @@ WifiErrorCode P2pCancelConnect()
 
 static OHOS::Wifi::ErrCode ConvertP2PDeviceCppToC(const OHOS::Wifi::WifiP2pDevice& cppDevice, WifiP2pDevice* p2pDevice)
 {
+    CHECK_PTR_RETURN(p2pDevice, OHOS::Wifi::WIFI_OPT_INVALID_PARAM);
     if (memcpy_s(p2pDevice->deviceName, P2P_NAME_LENGTH,
         cppDevice.GetDeviceName().c_str(), cppDevice.GetDeviceName().size() + 1) != EOK) {
         WIFI_LOGE("memcpy_s device name failed!");
@@ -207,6 +213,7 @@ static OHOS::Wifi::ErrCode ConvertP2PDeviceCppToC(const OHOS::Wifi::WifiP2pDevic
 
 static OHOS::Wifi::ErrCode ConvertGroupInfoCppToC(const OHOS::Wifi::WifiP2pGroupInfo& cppGroup, WifiP2pGroupInfo* group)
 {
+    CHECK_PTR_RETURN(group, OHOS::Wifi::WIFI_OPT_INVALID_PARAM);
     if (ConvertP2PDeviceCppToC(cppGroup.GetOwner(), &group->owner) != OHOS::Wifi::WIFI_OPT_SUCCESS) {
         return OHOS::Wifi::WIFI_OPT_FAILED;
     }
@@ -248,12 +255,8 @@ static OHOS::Wifi::ErrCode ConvertGroupInfoCppToC(const OHOS::Wifi::WifiP2pGroup
 
 WifiErrorCode GetCurrentGroup(WifiP2pGroupInfo* groupInfo)
 {
-    if (groupInfo == nullptr) {
-        WIFI_LOGE("get current group input args is null!");
-        return ERROR_WIFI_INVALID_ARGS;
-    }
-
     CHECK_PTR_RETURN(wifiP2pPtr, ERROR_WIFI_NOT_AVAILABLE);
+    CHECK_PTR_RETURN(groupInfo, ERROR_WIFI_INVALID_ARGS);
     OHOS::Wifi::WifiP2pGroupInfo cppGroupInfo;
     OHOS::Wifi::ErrCode ret = wifiP2pPtr->GetCurrentGroup(cppGroupInfo);
     if (ret != OHOS::Wifi::WIFI_OPT_SUCCESS) {
@@ -265,12 +268,8 @@ WifiErrorCode GetCurrentGroup(WifiP2pGroupInfo* groupInfo)
 
 WifiErrorCode GetP2pConnectedStatus(int* status)
 {
-    if (status == nullptr) {
-        WIFI_LOGE("input args is null!");
-        return ERROR_WIFI_INVALID_ARGS;
-    }
-
     CHECK_PTR_RETURN(wifiP2pPtr, ERROR_WIFI_NOT_AVAILABLE);
+    CHECK_PTR_RETURN(status, ERROR_WIFI_INVALID_ARGS);
     int p2pStatus = -1;
     OHOS::Wifi::ErrCode ret = wifiP2pPtr->GetP2pConnectedStatus(p2pStatus);
     if (ret != OHOS::Wifi::WIFI_OPT_SUCCESS) {
@@ -283,6 +282,8 @@ WifiErrorCode GetP2pConnectedStatus(int* status)
 WifiErrorCode QueryP2pDevices(WifiP2pDevice* clientDevices, int size, int* retSize)
 {
     CHECK_PTR_RETURN(wifiP2pPtr, ERROR_WIFI_NOT_AVAILABLE);
+    CHECK_PTR_RETURN(clientDevices, ERROR_WIFI_INVALID_ARGS);
+    CHECK_PTR_RETURN(retSize, ERROR_WIFI_INVALID_ARGS);
     std::vector<OHOS::Wifi::WifiP2pDevice> vecDevices;
     OHOS::Wifi::ErrCode ret = wifiP2pPtr->QueryP2pDevices(vecDevices);
     if (ret != OHOS::Wifi::WIFI_OPT_SUCCESS) {
@@ -303,6 +304,7 @@ WifiErrorCode QueryP2pDevices(WifiP2pDevice* clientDevices, int size, int* retSi
 WifiErrorCode QueryP2pGroups(WifiP2pGroupInfo* groupInfo, int size)
 {
     CHECK_PTR_RETURN(wifiP2pPtr, ERROR_WIFI_NOT_AVAILABLE);
+    CHECK_PTR_RETURN(groupInfo, ERROR_WIFI_INVALID_ARGS);
     std::vector<OHOS::Wifi::WifiP2pGroupInfo> groups;
     OHOS::Wifi::ErrCode ret = wifiP2pPtr->QueryP2pGroups(groups);
     if (ret != OHOS::Wifi::WIFI_OPT_SUCCESS) {

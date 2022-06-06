@@ -78,6 +78,7 @@ static bool IsSecurityTypeSupported(int secType)
 
 static WifiErrorCode GetHotspotConfigFromC(const HotspotConfig *config, OHOS::Wifi::HotspotConfig& hotspotConfig)
 {
+    CHECK_PTR_RETURN(config, ERROR_WIFI_INVALID_ARGS);
     hotspotConfig.SetSsid(config->ssid);
     if (!IsSecurityTypeSupported(config->securityType)) {
         WIFI_LOGE("Ap security is not supported!");
@@ -92,6 +93,7 @@ static WifiErrorCode GetHotspotConfigFromC(const HotspotConfig *config, OHOS::Wi
 
 static WifiErrorCode GetHotspotConfigFromCpp(const OHOS::Wifi::HotspotConfig& hotspotConfig, HotspotConfig *result)
 {
+    CHECK_PTR_RETURN(result, ERROR_WIFI_INVALID_ARGS);
     if (memcpy_s(result->ssid, WIFI_MAX_SSID_LEN,
         hotspotConfig.GetSsid().c_str(), hotspotConfig.GetSsid().size() + 1) != EOK) {
         return ERROR_WIFI_UNKNOWN;
@@ -108,6 +110,7 @@ static WifiErrorCode GetHotspotConfigFromCpp(const OHOS::Wifi::HotspotConfig& ho
 
 WifiErrorCode SetHotspotConfig(const HotspotConfig *config)
 {
+    CHECK_PTR_RETURN(config, ERROR_WIFI_INVALID_ARGS);
     CHECK_PTR_RETURN(hotspotPtr, ERROR_WIFI_NOT_AVAILABLE);
     OHOS::Wifi::HotspotConfig hotspotConfig;
     WifiErrorCode ret = GetHotspotConfigFromC(config, hotspotConfig);
@@ -120,6 +123,7 @@ WifiErrorCode SetHotspotConfig(const HotspotConfig *config)
 WifiErrorCode GetHotspotConfig(HotspotConfig *result)
 {
     CHECK_PTR_RETURN(hotspotPtr, ERROR_WIFI_NOT_AVAILABLE);
+    CHECK_PTR_RETURN(result, ERROR_WIFI_INVALID_ARGS);
     OHOS::Wifi::HotspotConfig hotspotConfig;
     OHOS::Wifi::ErrCode ret = hotspotPtr->GetHotspotConfig(hotspotConfig);
     if (ret == OHOS::Wifi::WIFI_OPT_SUCCESS) {
@@ -134,6 +138,7 @@ WifiErrorCode GetHotspotConfig(HotspotConfig *result)
 
 static WifiErrorCode GetStaListFromCpp(const std::vector<OHOS::Wifi::StationInfo>& vecStaList, StationInfo *result)
 {
+    CHECK_PTR_RETURN(result, ERROR_WIFI_INVALID_ARGS);
     for (auto& each : vecStaList) {
         if (result->name != nullptr) {
             if (memcpy_s(result->name, DEVICE_NAME_LEN, each.deviceName.c_str(), each.deviceName.size() + 1) != EOK) {
@@ -154,12 +159,9 @@ static WifiErrorCode GetStaListFromCpp(const std::vector<OHOS::Wifi::StationInfo
 
 WifiErrorCode GetStationList(StationInfo *result, unsigned int *size)
 {
-    if (result == nullptr) {
-        WIFI_LOGE("Station info list receive addr is null!");
-        return ERROR_WIFI_UNKNOWN;
-    }
     CHECK_PTR_RETURN(hotspotPtr, ERROR_WIFI_NOT_AVAILABLE);
-
+    CHECK_PTR_RETURN(result, ERROR_WIFI_INVALID_ARGS);
+    CHECK_PTR_RETURN(size, ERROR_WIFI_INVALID_ARGS);
     std::vector<OHOS::Wifi::StationInfo> vecStaList;
     OHOS::Wifi::ErrCode ret = hotspotPtr->GetStationList(vecStaList);
     *size = (int)vecStaList.size();
@@ -175,6 +177,7 @@ WifiErrorCode GetStationList(StationInfo *result, unsigned int *size)
 
 WifiErrorCode DisassociateSta(unsigned char *mac, int macLen)
 {
+    CHECK_PTR_RETURN(mac, ERROR_WIFI_INVALID_ARGS);
     return GetCErrorCode(OHOS::Wifi::WIFI_OPT_NOT_SUPPORTED);
 }
 

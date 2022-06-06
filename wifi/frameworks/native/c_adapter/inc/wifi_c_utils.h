@@ -36,6 +36,14 @@ namespace Wifi {
     }
 #endif
 
+#ifndef CHECK_PTR_RETURN_VOID
+#define CHECK_PTR_RETURN_VOID(ptr)             \
+    if ((ptr) == nullptr) {                         \
+        WIFI_LOGE("Error: the ptr is null!");       \
+        return;                            \
+    }
+#endif
+
 /**
  * @Description Convert c++ error code to c error code.
  *

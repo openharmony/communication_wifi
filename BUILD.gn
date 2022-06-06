@@ -25,6 +25,7 @@ if (defined(ohos_lite)) {
       "//foundation/communication/wifi/services/wifi_standard/wifi_framework/wifi_manage/wifi_scan:wifi_scan_service",
       "//foundation/communication/wifi/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta:wifi_sta_service",
       "//foundation/communication/wifi/services/wifi_standard/wifi_hal:wifi_hal",
+      "//foundation/communication/wifi/test/wifi_client:wifi_client",
     ]
     features = []
   }

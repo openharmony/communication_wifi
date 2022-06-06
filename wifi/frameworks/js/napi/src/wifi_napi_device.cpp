@@ -229,9 +229,9 @@ napi_value ConfigStaticIp(const napi_env& env, const napi_value& object, WifiDev
 
 static void JsObjToDeviceConfig(const napi_env& env, const napi_value& object, WifiDeviceConfig& cppConfig)
 {
-    JsObjectToString(env, object, "ssid", 33, cppConfig.ssid); /* 33: ssid max length is 32 + '\0' */
-    JsObjectToString(env, object, "bssid", 18, cppConfig.bssid); /* 18: max bssid length for string type */
-    JsObjectToString(env, object, "preSharedKey", 256, cppConfig.preSharedKey); /* 256: max length */
+    JsObjectToString(env, object, "ssid", NAPI_MAX_STR_LENT, cppConfig.ssid); /* ssid max length is 32 + '\0' */
+    JsObjectToString(env, object, "bssid", NAPI_MAX_STR_LENT, cppConfig.bssid); /* max bssid length: 18 */
+    JsObjectToString(env, object, "preSharedKey", NAPI_MAX_STR_LENT, cppConfig.preSharedKey);
     JsObjectToBool(env, object, "isHiddenSsid", cppConfig.hiddenSSID);
     int type = static_cast<int>(SecTypeJs::SEC_TYPE_INVALID);
     JsObjectToInt(env, object, "securityType", type);
@@ -333,15 +333,16 @@ napi_value AddUntrustedConfig(napi_env env, napi_callback_info info)
     asyncContext->executeFunc = [&](void* data) -> void {
         AddDeviceConfigContext *context = static_cast<AddDeviceConfigContext *>(data);
         TRACE_FUNC_CALL_NAME("wifiDevicePtr->AddUntrustedConfig");
-        /* This interface is not supported currently */
-        context->addResult = -1;
-        context->errorCode = WIFI_OPT_NOT_SUPPORTED;
+        ErrCode ret = wifiDevicePtr->AddDeviceConfig(*context->config, context->addResult);
+        if (context->addResult < 0 || ret != WIFI_OPT_SUCCESS) {
+            context->addResult = -1;
+        }
+        context->errorCode = ret;
     };
 
     asyncContext->completeFunc = [&](void* data) -> void {
         AddDeviceConfigContext *context = static_cast<AddDeviceConfigContext *>(data);
-        /* This interface is not supported currently */
-        napi_get_boolean(context->env, false, &context->result);
+        napi_get_boolean(context->env, (context->addResult > 0), &context->result);
         if (context->config != nullptr) {
             delete context->config;
             context->config = nullptr;
@@ -351,6 +352,21 @@ napi_value AddUntrustedConfig(napi_env env, napi_callback_info info)
 
     size_t nonCallbackArgNum = 1;
     return DoAsyncWork(env, asyncContext, argc, argv, nonCallbackArgNum);
+}
+
+static int GetDeviceConfigId(WifiDeviceConfig *config)
+{
+    std::vector<WifiDeviceConfig> vecConfigs;
+    ErrCode ret = wifiDevicePtr->GetDeviceConfigs(vecConfigs);
+    if (ret != WIFI_OPT_SUCCESS) {
+        return INVALID_NETWORK_ID;
+    }
+    for (auto& each : vecConfigs) {
+        if (each.ssid == config->ssid) {
+            return each.networkId;
+        }
+    }
+    return INVALID_NETWORK_ID;
 }
 
 napi_value RemoveUntrustedConfig(napi_env env, napi_callback_info info)
@@ -382,16 +398,26 @@ napi_value RemoveUntrustedConfig(napi_env env, napi_callback_info info)
 
     asyncContext->executeFunc = [&](void* data) -> void {
         AddDeviceConfigContext *context = static_cast<AddDeviceConfigContext *>(data);
+        if (context->config == nullptr) {
+            return;
+        }
         TRACE_FUNC_CALL_NAME("wifiDevicePtr->RemoveUntrustedConfig");
-        /* This interface is not supported currently */
-        context->addResult = -1;
-        context->errorCode = WIFI_OPT_NOT_SUPPORTED;
+        int networkId = context->config->networkId;
+        if (networkId < 0) {
+            networkId = GetDeviceConfigId(context->config);
+        }
+        if (networkId < 0) {
+            WIFI_LOGE("RemoveUntrustedConfig parameter is invalid.");
+            context->errorCode = WIFI_OPT_INVALID_PARAM;
+            return;
+        }
+        WIFI_LOGI("RemoveUntrustedConfig: %{public}d", networkId);
+        context->errorCode = wifiDevicePtr->RemoveDevice(networkId);
     };
 
     asyncContext->completeFunc = [&](void* data) -> void {
         AddDeviceConfigContext *context = static_cast<AddDeviceConfigContext *>(data);
-        /* This interface is not supported currently */
-        napi_get_boolean(context->env, false, &context->result);
+        napi_get_boolean(context->env, context->errorCode == WIFI_OPT_SUCCESS, &context->result);
         if (context->config != nullptr) {
             delete context->config;
             context->config = nullptr;

@@ -12,7 +12,7 @@
 # limitations under the License.
 
 aaservices_path = "//foundation/ability/ability_runtime/services"
-aainnerkits_path = "//foundation/ability/ability_runtime/interfaces/innerkits"
+aainnerkits_path = "//foundation/ability/ability_runtime/interfaces/inner_api"
 
 SUBSYSTEM_DIR = "//foundation/communication"
 WIFI_ROOT_DIR = "$SUBSYSTEM_DIR/wifi/wifi"

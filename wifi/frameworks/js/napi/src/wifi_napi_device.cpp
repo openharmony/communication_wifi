@@ -342,7 +342,7 @@ napi_value AddUntrustedConfig(napi_env env, napi_callback_info info)
 
     asyncContext->completeFunc = [&](void* data) -> void {
         AddDeviceConfigContext *context = static_cast<AddDeviceConfigContext *>(data);
-        napi_get_boolean(context->env, (context->addResult > 0), &context->result);
+        napi_get_boolean(context->env, (context->addResult >= 0), &context->result);
         if (context->config != nullptr) {
             delete context->config;
             context->config = nullptr;

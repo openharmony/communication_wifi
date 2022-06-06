@@ -737,6 +737,13 @@ static int DelScanInfoLine(ScanInfo *pcmd, char *srcBuf, int length)
                 break;
             }
             start = end + 1;
+            char *res = strchr(srcBuf + start, '\t');
+            if (res == NULL) {
+                /* after ssid, maybe some IEs are reported */
+                LOGW("more IEs are reported, skip it for not support.");
+            } else {
+                *res = '\0';
+            }
             if (strcpy_s(pcmd->ssid, sizeof(pcmd->ssid), srcBuf + start) != EOK) {
                 fail = 1;
                 break;

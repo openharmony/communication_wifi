@@ -198,7 +198,7 @@ ErrCode StaService::ConnectToDevice(const WifiDeviceConfig &config) const
         LOGD("StaService::ConnectTo  AddDeviceConfig failed!");
         return WIFI_OPT_FAILED;
     }
-    LOGD("StaService::ConnectTo  AddDeviceConfig succeed!");
+    LOGD("StaService::ConnectTo: %{public}d", netWorkId);
     pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_CONNECT_NETWORK, netWorkId, NETWORK_SELECTED_BY_THE_USER);
     return WIFI_OPT_SUCCESS;
 }

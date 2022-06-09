@@ -91,7 +91,15 @@ if (defined(ohos_lite)) {
       "//third_party/bounds_checking_function:libsec_shared",
     ]
 
-    defines = [ "OHOS_ARCH_LITE" ]
+    defines = [
+      "OHOS_ARCH_LITE",
+      "AP_INSTANCE_MAX_NUM=$wifi_feature_with_ap_num",
+    ]
+
+    if (wifi_feature_with_auth_disable) {
+      defines += [ "PERMISSION_ALWAYS_GRANT" ]
+    }
+
     cflags_cc = [
       "-std=c++17",
       "-fno-rtti",
@@ -251,6 +259,8 @@ if (defined(ohos_lite)) {
     sources = [
       "wifi_hotspot_callback_proxy.cpp",
       "wifi_hotspot_death_recipient.cpp",
+      "wifi_hotspot_mgr_service_impl.cpp",
+      "wifi_hotspot_mgr_stub.cpp",
       "wifi_hotspot_service_impl.cpp",
       "wifi_hotspot_stub.cpp",
     ]
@@ -265,7 +275,10 @@ if (defined(ohos_lite)) {
       "eventhandler:libeventhandler",
       "ipc:ipc_core",
     ]
-    defines = [ "FEATURE_AP_SUPPORT" ]
+    defines = [
+      "FEATURE_AP_SUPPORT",
+      "AP_INSTANCE_MAX_NUM=$wifi_feature_with_ap_num",
+    ]
   }
   ohos_source_set("wifi_p2p_service_impl") {
     part_name = "wifi"
@@ -346,9 +359,12 @@ if (defined(ohos_lite)) {
     defines = [
       "FEATURE_AP_SUPPORT",
       "FEATURE_P2P_SUPPORT",
-
-      # "PERMISSION_ALWAYS_GRANT",
+      "AP_INSTANCE_MAX_NUM=$wifi_feature_with_ap_num",
     ]
+
+    if (wifi_feature_with_auth_disable) {
+      defines += [ "PERMISSION_ALWAYS_GRANT" ]
+    }
 
     part_name = "wifi"
     subsystem_name = "communication"

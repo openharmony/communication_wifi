@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,20 +13,29 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_IAP_SERVICE_CALLBACK_H
-#define OHOS_IAP_SERVICE_CALLBACK_H
+#ifndef OHOS_I_WIFI_HOTSPOT_MGR_H
+#define OHOS_I_WIFI_HOTSPOT_MGR_H
 
-#include <functional>
-#include "wifi_errcode.h"
-#include "wifi_msg.h"
+#include "iremote_broker.h"
 
 namespace OHOS {
 namespace Wifi {
-/* All callbacks provided by the AP service */
-struct IApServiceCallbacks {
-    std::function<void(ApState, int)> OnApStateChangedEvent;
-    std::function<void(const StationInfo &, int)> OnHotspotStaJoinEvent;   // STA device join event.
-    std::function<void(const StationInfo &, int)> OnHotspotStaLeaveEvent;  // STA device leaving event.
+class IWifiHotspotMgr : public IRemoteBroker {
+public:
+    IWifiHotspotMgr() {}
+    virtual ~IWifiHotspotMgr() {}
+    /**
+     * @Description get remote ap obj.
+     *
+     * @param id - obj id
+     * @return IRemoteObject - ap obj
+     */
+    virtual sptr<IRemoteObject> GetWifiRemote(int id) = 0;
+public:
+    DECLARE_INTERFACE_DESCRIPTOR(u"ohos.wifi.IWifiHotspotMgr");
+    enum Code {
+        WIFI_MGR_GET_HOTSPOT_SERVICE = 0,
+    };
 };
 }  // namespace Wifi
 }  // namespace OHOS

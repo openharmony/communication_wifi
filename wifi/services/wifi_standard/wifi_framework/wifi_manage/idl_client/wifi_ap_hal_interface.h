@@ -38,14 +38,14 @@ public:
      *
      * @return WifiErrorNo
      */
-    virtual WifiErrorNo StartAp(void);
+    virtual WifiErrorNo StartAp(int id = 0);
 
     /**
      * @Description Close Ap.
      *
      * @return WifiErrorNo
      */
-    virtual WifiErrorNo StopAp(void);
+    virtual WifiErrorNo StopAp(int id = 0);
 
     /**
      * @Description Setting SoftAP Configurations.
@@ -53,7 +53,7 @@ public:
      * @param config
      * @return WifiErrorNo
      */
-    WifiErrorNo SetSoftApConfig(const HotspotConfig &config);
+    WifiErrorNo SetSoftApConfig(const HotspotConfig &config, int id = 0);
 
     /**
      * @Description Obtains information about all connected STAs.
@@ -61,7 +61,7 @@ public:
      * @param result - Returns the obtained STA information list.
      * @return WifiErrorNo
      */
-    WifiErrorNo GetStationList(std::vector<std::string> &result);
+    WifiErrorNo GetStationList(std::vector<std::string> &result, int id = 0);
 
     /**
      * @Description To set the blocklist filtering in AP mode to prohibit
@@ -70,7 +70,7 @@ public:
      * @param mac - Blocklisted address.
      * @return WifiErrorNo
      */
-    WifiErrorNo AddBlockByMac(const std::string &mac);
+    WifiErrorNo AddBlockByMac(const std::string &mac, int id = 0);
 
     /**
      * @Description To set blocklist filtering in AP mode and delete a
@@ -79,7 +79,7 @@ public:
      * @param mac - Blocklisted address.
      * @return WifiErrorNo
      */
-    WifiErrorNo DelBlockByMac(const std::string &mac);
+    WifiErrorNo DelBlockByMac(const std::string &mac, int id = 0);
 
     /**
      * @Description Disconnect the STA with a specified MAC address.
@@ -87,7 +87,7 @@ public:
      * @param mac - Address information.
      * @return WifiErrorNo
      */
-    WifiErrorNo RemoveStation(const std::string &mac);
+    WifiErrorNo RemoveStation(const std::string &mac, int id = 0);
 
     /**
      * @Description Obtains the hotspot frequency supported by a
@@ -97,7 +97,7 @@ public:
      * @param frequencies - Frequency list.
      * @return WifiErrorNo
      */
-    WifiErrorNo GetFrequenciesByBand(int band, std::vector<int> &frequencies);
+    WifiErrorNo GetFrequenciesByBand(int band, std::vector<int> &frequencies, int id = 0);
 
     /**
      * @Description Listening to Wi-Fi disconnection or connection events
@@ -107,7 +107,7 @@ public:
      *                   registration events.
      * @return WifiErrorNo
      */
-    WifiErrorNo RegisterApEvent(IWifiApMonitorEventCallback callback);
+    WifiErrorNo RegisterApEvent(IWifiApMonitorEventCallback callback, int id = 0);
 
     /**
      * @Description Sets the Wi-Fi country code.
@@ -115,7 +115,7 @@ public:
      * @param code
      * @return WifiErrorNo
      */
-    WifiErrorNo SetWifiCountryCode(const std::string &code);
+    WifiErrorNo SetWifiCountryCode(const std::string &code, int id = 0);
 
     /**
      * @Description Disconnect STAs based on MAC addresses.
@@ -123,14 +123,14 @@ public:
      * @param mac
      * @return WifiErrorNo
      */
-    WifiErrorNo DisconnectStaByMac(const std::string &mac);
+    WifiErrorNo DisconnectStaByMac(const std::string &mac, int id = 0);
 
     /**
      * @Description Get the Ap Callback Inst object
      *
      * @return const IWifiApMonitorEventCallback& - register ap callback objects
      */
-    const IWifiApMonitorEventCallback &GetApCallbackInst(void) const;
+    const IWifiApMonitorEventCallback &GetApCallbackInst(int id = 0) const;
 
     /**
      * @Description Get power mode.
@@ -138,7 +138,7 @@ public:
      * @param model
      * @return WifiErrorNo
      */
-    WifiErrorNo GetPowerModel(int& model) const;
+    WifiErrorNo GetPowerModel(int& model, int id = 0) const;
 
     /**
      * @Description Set power mode.
@@ -146,10 +146,10 @@ public:
      * @param model
      * @return WifiErrorNo
      */
-    WifiErrorNo SetPowerModel(const int& model) const;
+    WifiErrorNo SetPowerModel(const int& model, int id = 0) const;
 
 private:
-    IWifiApMonitorEventCallback mApCallback;
+    std::map<int, IWifiApMonitorEventCallback> mApCallback;
 };
 }  // namespace Wifi
 }  // namespace OHOS

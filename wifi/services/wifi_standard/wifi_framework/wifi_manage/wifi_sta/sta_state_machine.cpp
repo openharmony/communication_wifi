@@ -1583,6 +1583,12 @@ StaStateMachine::GetIpState::~GetIpState()
 
 void StaStateMachine::GetIpState::GoInState()
 {
+#ifdef WIFI_DHCP_DISABLED
+    SaveLinkstate(ConnState::CONNECTED, DetailedState::WORKING);
+    staCallback.OnStaConnChanged(OperateResState::CONNECT_NETWORK_ENABLED, linkedInfo);
+    SwitchState(pLinkedState);
+    return;
+#endif
     WIFI_LOGI("GetIpState GoInState function.");
     WifiDeviceConfig config;
     AssignIpMethod assignMethod = AssignIpMethod::DHCP;

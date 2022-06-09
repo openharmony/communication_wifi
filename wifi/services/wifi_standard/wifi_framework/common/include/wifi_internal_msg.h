@@ -206,6 +206,7 @@ struct SingleAppForbid {
 struct WifiEventCallbackMsg {
     int msgCode;
     int msgData;
+    int id;
     std::string pinCode; /* wps pin mode code */
     WifiLinkedInfo linkInfo;
     StationInfo staInfo;
@@ -218,6 +219,7 @@ struct WifiEventCallbackMsg {
     {
         msgCode = 0;
         msgData = 0;
+        id = 0;
         p2pAction = P2pActionCallback::UNKNOWN;
     }
 };

@@ -33,12 +33,13 @@
 DEFINE_WIFILOG_HOTSPOT_LABEL("WifiApStartedState");
 namespace OHOS {
 namespace Wifi {
-ApStartedState::ApStartedState(ApStateMachine &apStateMachine, ApConfigUse &apConfigUse, ApMonitor &apMonitor)
+ApStartedState::ApStartedState(ApStateMachine &apStateMachine, ApConfigUse &apConfigUse, ApMonitor &apMonitor, int id)
     : State("ApStartedState"),
       m_hotspotConfig(HotspotConfig()),
       m_ApStateMachine(apStateMachine),
       m_ApConfigUse(apConfigUse),
-      m_ApMonitor(apMonitor)
+      m_ApMonitor(apMonitor),
+      m_id(id)
 {
     Init();
 }
@@ -48,8 +49,9 @@ ApStartedState::~ApStartedState()
 
 void ApStartedState::GoInState()
 {
+    WIFI_LOGI("Instance %{public}d %{public}s", m_id, __func__);
     m_ApStateMachine.OnApStateChange(ApState::AP_STATE_STARTING);
-    WIFI_LOGI("%{public}s  GoInState", GetStateName().c_str());
+    WIFI_LOGI("Instance %{public}d %{public}s  GoInState", m_id, GetStateName().c_str());
     m_ApStateMachine.RegisterEventHandler();
     StartMonitor();
 
@@ -82,7 +84,7 @@ void ApStartedState::GoInState()
 
 void ApStartedState::GoOutState()
 {
-    WIFI_LOGI("%{public}s  GoOutState.", GetStateName().c_str());
+    WIFI_LOGI("Instance %{public}d %{public}s", m_id, __func__);
     m_ApStateMachine.OnApStateChange(ApState::AP_STATE_CLOSING);
     DisableInterfaceNat();
     m_ApStateMachine.StopDhcpServer();
@@ -122,7 +124,7 @@ bool ApStartedState::ExecuteStateMsg(InternalMessage *msg)
         return false;
     }
     int msgName = msg->GetMessageName();
-    WIFI_LOGI("ApStartedState Process msgName:%{public}d.", msgName);
+    WIFI_LOGI("Instance %{public}d ApStartedState Process msgName:%{public}d.", m_id, msgName);
 
     auto iter = mProcessFunMap.find(static_cast<ApStatemachineEvent>(msgName));
     if (iter == mProcessFunMap.end()) {
@@ -135,6 +137,7 @@ bool ApStartedState::ExecuteStateMsg(InternalMessage *msg)
 
 bool ApStartedState::SetConfig(HotspotConfig &apConfig)
 {
+    WIFI_LOGI("Instance %{public}d %{public}s", m_id, __func__);
     std::vector<int> allowed5GFreq, allowed2GFreq;
     std::vector<int> allowed5GChan, allowed2GChan;
     if (WifiApHalInterface::GetInstance().GetFrequenciesByBand(static_cast<int>(BandType::BAND_2GHZ), allowed2GFreq)) {
@@ -160,12 +163,12 @@ bool ApStartedState::SetConfig(HotspotConfig &apConfig)
 
     m_ApConfigUse.CheckBandChannel(apConfig, channelTbs);
 
-    if (WifiApHalInterface::GetInstance().SetSoftApConfig(apConfig) != WifiErrorNo::WIFI_IDL_OPT_OK) {
+    if (WifiApHalInterface::GetInstance().SetSoftApConfig(apConfig, m_id) != WifiErrorNo::WIFI_IDL_OPT_OK) {
         WIFI_LOGE("set hostapd config failed.");
         return false;
     }
 
-    WifiSettings::GetInstance().SetHotspotConfig(apConfig);
+    WifiSettings::GetInstance().SetHotspotConfig(apConfig, m_id);
     WifiSettings::GetInstance().SyncHotspotConfig();
     m_ApConfigUse.LogConfig(apConfig);
     WIFI_LOGI("SetConfig OK!.");
@@ -174,18 +177,19 @@ bool ApStartedState::SetConfig(HotspotConfig &apConfig)
 
 bool ApStartedState::SetConfig()
 {
+    WIFI_LOGI("Instance %{public}d %{public}s", m_id, __func__);
     std::string countryCode;
     if (WifiSettings::GetInstance().GetCountryCode(countryCode)) {
         WIFI_LOGE("get countryCode failed.");
         return false;
     }
-    if (WifiApHalInterface::GetInstance().SetWifiCountryCode(countryCode) != WifiErrorNo::WIFI_IDL_OPT_OK) {
+    if (WifiApHalInterface::GetInstance().SetWifiCountryCode(countryCode, m_id) != WifiErrorNo::WIFI_IDL_OPT_OK) {
         WIFI_LOGE("set countryCode:%{public}s failed.", countryCode.c_str());
         return false;
     }
     WIFI_LOGI("HotspotConfig  CountryCode  = %{public}s.", countryCode.c_str());
 
-    if (WifiSettings::GetInstance().GetHotspotConfig(m_hotspotConfig)) {
+    if (WifiSettings::GetInstance().GetHotspotConfig(m_hotspotConfig, m_id)) {
         WIFI_LOGE("GetConfig failed!!!.");
         return false;
     }
@@ -195,8 +199,8 @@ bool ApStartedState::SetConfig()
 
 bool ApStartedState::StartAp() const
 {
-    WIFI_LOGI("enter startAp.");
-    WifiErrorNo retCode = WifiApHalInterface::GetInstance().StartAp();
+    WIFI_LOGI("Instance %{public}d %{public}s", m_id, __func__);
+    WifiErrorNo retCode = WifiApHalInterface::GetInstance().StartAp(m_id);
     if (retCode != WifiErrorNo::WIFI_IDL_OPT_OK) {
         WIFI_LOGE("startAp is failed!");
         return false;
@@ -206,7 +210,8 @@ bool ApStartedState::StartAp() const
 
 bool ApStartedState::StopAp() const
 {
-    WifiErrorNo retCode = WifiApHalInterface::GetInstance().StopAp();
+    WIFI_LOGI("Instance %{public}d %{public}s", m_id, __func__);
+    WifiErrorNo retCode = WifiApHalInterface::GetInstance().StopAp(m_id);
     if (retCode != WifiErrorNo::WIFI_IDL_OPT_OK) {
         return false;
     }
@@ -215,11 +220,13 @@ bool ApStartedState::StopAp() const
 
 void ApStartedState::StartMonitor() const
 {
+    WIFI_LOGI("Instance %{public}d %{public}s", m_id, __func__);
     m_ApMonitor.StartMonitor();
 }
 
 void ApStartedState::StopMonitor() const
 {
+    WIFI_LOGI("Instance %{public}d %{public}s", m_id, __func__);
     m_ApMonitor.StopMonitor();
 }
 
@@ -246,13 +253,13 @@ bool ApStartedState::DisableInterfaceNat() const
 
 void ApStartedState::ProcessCmdFail(InternalMessage &msg) const
 {
-    WIFI_LOGI("State Machine message: %{public}d.", msg.GetMessageName());
+    WIFI_LOGI("Instance %{public}d State Machine message: %{public}d.", m_id, msg.GetMessageName());
     m_ApStateMachine.SwitchState(&m_ApStateMachine.m_ApIdleState);
 }
 
 void ApStartedState::ProcessCmdStationJoin(InternalMessage &msg) const
 {
-    WIFI_LOGI("New station join.");
+    WIFI_LOGI("Instance %{public}d %{public}s", m_id, __func__);
     StationInfo staInfo;
     if (msg.GetMessageObj(staInfo)) {
         m_ApStateMachine.m_ApStationsManager.StationJoin(staInfo);
@@ -263,7 +270,7 @@ void ApStartedState::ProcessCmdStationJoin(InternalMessage &msg) const
 
 void ApStartedState::ProcessCmdStationLeave(InternalMessage &msg) const
 {
-    WIFI_LOGI("Old station leave.");
+    WIFI_LOGI("Instance %{public}d %{public}s", m_id, __func__);
     StationInfo staInfo;
     if (msg.GetMessageObj(staInfo)) {
         m_ApStateMachine.m_ApStationsManager.StationLeave(staInfo.bssid);
@@ -274,8 +281,7 @@ void ApStartedState::ProcessCmdStationLeave(InternalMessage &msg) const
 
 void ApStartedState::ProcessCmdSetHotspotConfig(InternalMessage &msg)
 {
-    WIFI_LOGI("Set HotspotConfig.");
-
+    WIFI_LOGI("Instance %{public}d %{public}s", m_id, __func__);
     m_hotspotConfig.SetSsid(msg.GetStringFromMessage());
     m_hotspotConfig.SetPreSharedKey(msg.GetStringFromMessage());
     m_hotspotConfig.SetSecurityType(static_cast<KeyMgmt>(msg.GetIntFromMessage()));
@@ -292,13 +298,16 @@ void ApStartedState::ProcessCmdSetHotspotConfig(InternalMessage &msg)
 
 void ApStartedState::ProcessCmdUpdateConfigResult(InternalMessage &msg) const
 {
+    WIFI_LOGI("Instance %{public}d %{public}s", m_id, __func__);
     if (msg.GetParam1() == 1) {
         WIFI_LOGI("Hot update HotspotConfig succeeded.");
-        if (WifiSettings::GetInstance().SetHotspotConfig(m_hotspotConfig)) {
+        if (WifiSettings::GetInstance().SetHotspotConfig(m_hotspotConfig, m_id)) {
             WIFI_LOGE("set apConfig to settings failed.");
         }
+#ifndef WIFI_DHCP_DISABLED
         m_ApStateMachine.StopDhcpServer();
         m_ApStateMachine.StartDhcpServer();
+#endif
     } else {
         m_ApStateMachine.SwitchState(&m_ApStateMachine.m_ApIdleState);
     }
@@ -306,7 +315,7 @@ void ApStartedState::ProcessCmdUpdateConfigResult(InternalMessage &msg) const
 
 void ApStartedState::ProcessCmdAddBlockList(InternalMessage &msg) const
 {
-    WIFI_LOGI("Add block list.");
+    WIFI_LOGI("Instance %{public}d %{public}s", m_id, __func__);
     StationInfo staInfo;
     staInfo.deviceName = msg.GetStringFromMessage();
     staInfo.bssid = msg.GetStringFromMessage();
@@ -318,7 +327,7 @@ void ApStartedState::ProcessCmdAddBlockList(InternalMessage &msg) const
 
 void ApStartedState::ProcessCmdDelBlockList(InternalMessage &msg) const
 {
-    WIFI_LOGI("Delete block list.");
+    WIFI_LOGI("Instance %{public}d %{public}s", m_id, __func__);
     StationInfo staInfo;
     staInfo.deviceName = msg.GetStringFromMessage();
     staInfo.bssid = msg.GetStringFromMessage();
@@ -330,13 +339,13 @@ void ApStartedState::ProcessCmdDelBlockList(InternalMessage &msg) const
 
 void ApStartedState::ProcessCmdStopHotspot(InternalMessage &msg) const
 {
-    WIFI_LOGI("Disable hotspot: %{public}d.", msg.GetMessageName());
+    WIFI_LOGI("Instance %{public}d Disable hotspot: %{public}d.", m_id, msg.GetMessageName());
     m_ApStateMachine.SwitchState(&m_ApStateMachine.m_ApIdleState);
 }
 
 void ApStartedState::ProcessCmdDisconnectStation(InternalMessage &msg) const
 {
-    WIFI_LOGI("Disconnect station.");
+    WIFI_LOGI("Instance %{public}d %{public}s", m_id, __func__);
     StationInfo staInfo;
     staInfo.deviceName = msg.GetStringFromMessage();
     staInfo.bssid = msg.GetStringFromMessage();

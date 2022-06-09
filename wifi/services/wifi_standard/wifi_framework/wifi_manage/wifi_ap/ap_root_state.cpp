@@ -21,7 +21,7 @@
 DEFINE_WIFILOG_HOTSPOT_LABEL("WifiApRootState");
 namespace OHOS {
 namespace Wifi {
-ApRootState::ApRootState() : State("ApRootState")
+ApRootState::ApRootState(int id) : State("ApRootState"), m_id(id)
 {}
 
 ApRootState::~ApRootState()
@@ -29,12 +29,12 @@ ApRootState::~ApRootState()
 
 void ApRootState::GoInState()
 {
-    WIFI_LOGI("%{public}s  GoInState.", GetStateName().c_str());
+    WIFI_LOGI("Instance %{public}d %{public}s  GoInState.", m_id, GetStateName().c_str());
 }
 
 void ApRootState::GoOutState()
 {
-    WIFI_LOGI("%{public}s  GoOutState.", GetStateName().c_str());
+    WIFI_LOGI("Instance %{public}d %{public}s  GoOutState.", m_id, GetStateName().c_str());
 }
 
 bool ApRootState::ExecuteStateMsg(InternalMessage *msg)

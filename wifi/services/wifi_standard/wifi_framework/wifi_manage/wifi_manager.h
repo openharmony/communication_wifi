@@ -143,7 +143,7 @@ private:
     static void DealCloseServiceMsg(WifiManager &manager);
     static void CloseStaService(void);
 #ifdef FEATURE_AP_SUPPORT
-    static void CloseApService(void);
+    static void CloseApService(int id = 0);
 #endif
     static void CloseScanService(void);
 #ifdef FEATURE_P2P_SUPPORT
@@ -162,9 +162,9 @@ private:
     static void DealScanFinished(int state);
     static void DealScanInfoNotify(std::vector<InterScanInfo> &results);
 #ifdef FEATURE_AP_SUPPORT
-    static void DealApStateChanged(ApState bState);
-    static void DealApGetStaJoin(const StationInfo &info);
-    static void DealApGetStaLeave(const StationInfo &info);
+    static void DealApStateChanged(ApState bState, int id = 0);
+    static void DealApGetStaJoin(const StationInfo &info, int id = 0);
+    static void DealApGetStaLeave(const StationInfo &info, int id = 0);
 #endif
 #ifdef FEATURE_P2P_SUPPORT
     static void DealP2pStateChanged(P2pState bState);
@@ -200,6 +200,7 @@ private:
 #endif
     InitStatus mInitStatus;
     long mSupportedFeatures;
+    static int mCloseApIndex;
 };
 } // namespace Wifi
 } // namespace OHOS

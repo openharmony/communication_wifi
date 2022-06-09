@@ -34,7 +34,7 @@ public:
      * @param None
      * @return None
      */
-    ApStartedState(ApStateMachine &, ApConfigUse &, ApMonitor &);
+    ApStartedState(ApStateMachine &, ApConfigUse &, ApMonitor &, int id = 0);
     /**
      * @Description  destructor method.
      * @param None
@@ -237,6 +237,7 @@ private:
     ApStateMachine &m_ApStateMachine;
     ApConfigUse &m_ApConfigUse;
     ApMonitor &m_ApMonitor;
+    int m_id;
 };
 }  // namespace Wifi
 }  // namespace OHOS

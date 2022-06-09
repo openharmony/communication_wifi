@@ -128,6 +128,7 @@ if (defined(ohos_lite)) {
     part_name = "wifi"
     sources = [
       "src/wifi_hotspot_impl.cpp",
+      "src/wifi_hotspot_mgr_proxy.cpp",
       "src/wifi_hotspot_proxy.cpp",
     ]
 
@@ -209,6 +210,8 @@ if (defined(ohos_lite)) {
       "common_event_service:cesfwk_innerkits",
       "ipc:ipc_core",
     ]
+
+    defines = [ "AP_INSTANCE_MAX_NUM=$wifi_feature_with_ap_num" ]
 
     cflags_cc = [
       "-std=c++17",

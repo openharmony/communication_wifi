@@ -90,6 +90,7 @@ ohos_unittest("wifi_scan_unittest") {
     "//third_party/googletest:gmock_main",
     "//utils/native/base:utils",
   ]
+  defines = [ "AP_INSTANCE_MAX_NUM=$wifi_feature_with_ap_num" ]
   external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
   part_name = "wifi"
   subsystem_name = "communication"

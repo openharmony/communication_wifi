@@ -23,7 +23,8 @@
 DEFINE_WIFILOG_HOTSPOT_LABEL("WifiApService");
 namespace OHOS {
 namespace Wifi {
-ApService::ApService(ApStateMachine &apStateMachine) : m_ApStateMachine(apStateMachine)
+ApService::ApService(ApStateMachine &apStateMachine, int id)
+    : m_ApStateMachine(apStateMachine), m_id(id)
 {}
 
 ApService::~ApService()
@@ -31,18 +32,21 @@ ApService::~ApService()
 
 ErrCode ApService::EnableHotspot() const
 {
+    WIFI_LOGI("Instance %{public}d %{public}s", m_id, __func__);
     m_ApStateMachine.SendMessage(static_cast<int>(ApStatemachineEvent::CMD_START_HOTSPOT));
     return ErrCode::WIFI_OPT_SUCCESS;
 }
 
 ErrCode ApService::DisableHotspot() const
 {
+    WIFI_LOGI("Instance %{public}d %{public}s", m_id, __func__);
     m_ApStateMachine.SendMessage(static_cast<int>(ApStatemachineEvent::CMD_STOP_HOTSPOT));
     return ErrCode::WIFI_OPT_SUCCESS;
 }
 
 ErrCode ApService::SetHotspotConfig(const HotspotConfig &cfg) const
 {
+    WIFI_LOGI("Instance %{public}d %{public}s", m_id, __func__);
     InternalMessage *msg = m_ApStateMachine.CreateMessage();
     if (msg == nullptr) {
         return ErrCode::WIFI_OPT_FAILED;
@@ -60,6 +64,7 @@ ErrCode ApService::SetHotspotConfig(const HotspotConfig &cfg) const
 
 ErrCode ApService::AddBlockList(const StationInfo &stationInfo) const
 {
+    WIFI_LOGI("Instance %{public}d %{public}s", m_id, __func__);
     InternalMessage *msg = m_ApStateMachine.CreateMessage();
     if (msg == nullptr) {
         return ErrCode::WIFI_OPT_FAILED;
@@ -74,6 +79,7 @@ ErrCode ApService::AddBlockList(const StationInfo &stationInfo) const
 
 ErrCode ApService::DelBlockList(const StationInfo &stationInfo) const
 {
+    WIFI_LOGI("Instance %{public}d %{public}s", m_id, __func__);
     InternalMessage *msg = m_ApStateMachine.CreateMessage();
     if (msg == nullptr) {
         return ErrCode::WIFI_OPT_FAILED;
@@ -88,6 +94,7 @@ ErrCode ApService::DelBlockList(const StationInfo &stationInfo) const
 
 ErrCode ApService::DisconnetStation(const StationInfo &stationInfo) const
 {
+    WIFI_LOGI("Instance %{public}d %{public}s", m_id, __func__);
     InternalMessage *msg = m_ApStateMachine.CreateMessage();
     if (msg == nullptr) {
         return ErrCode::WIFI_OPT_FAILED;
@@ -102,6 +109,7 @@ ErrCode ApService::DisconnetStation(const StationInfo &stationInfo) const
 
 ErrCode ApService::GetStationList(std::vector<StationInfo> &result) const
 {
+    WIFI_LOGI("Instance %{public}d %{public}s", m_id, __func__);
     WifiSettings::GetInstance().GetStationList(result);
     if (result.empty()) {
         WIFI_LOGD("GetStationList is empty.");
@@ -126,6 +134,7 @@ ErrCode ApService::GetStationList(std::vector<StationInfo> &result) const
 
 ErrCode ApService::GetValidBands(std::vector<BandType> &bands)
 {
+    WIFI_LOGI("Instance %{public}d %{public}s", m_id, __func__);
     if (WifiSettings::GetInstance().GetValidBands(bands) < 0) {
         WIFI_LOGE("Delete block list failed!");
         return ErrCode::WIFI_OPT_FAILED;
@@ -135,6 +144,7 @@ ErrCode ApService::GetValidBands(std::vector<BandType> &bands)
 
 ErrCode ApService::GetValidChannels(BandType band, std::vector<int32_t> &validchannel)
 {
+    WIFI_LOGI("Instance %{public}d %{public}s", m_id, __func__);
     ChannelsTable channelsInfo;
     if (WifiSettings::GetInstance().GetValidChannels(channelsInfo)) {
         WIFI_LOGE("Failed to obtain data from the WifiSettings.");
@@ -151,6 +161,7 @@ ErrCode ApService::GetValidChannels(BandType band, std::vector<int32_t> &validch
 
 ErrCode ApService::RegisterApServiceCallbacks(const IApServiceCallbacks &callbacks)
 {
+    WIFI_LOGI("Instance %{public}d %{public}s", m_id, __func__);
     WIFI_LOGI("RegisterApServiceCallbacks.");
     m_ApStateMachine.RegisterApServiceCallbacks(callbacks);
     return ErrCode::WIFI_OPT_SUCCESS;
@@ -158,7 +169,7 @@ ErrCode ApService::RegisterApServiceCallbacks(const IApServiceCallbacks &callbac
 
 ErrCode ApService::GetSupportedPowerModel(std::set<PowerModel>& setPowerModelList)
 {
-    LOGI("ApService::GetSupportedPowerModel");
+    WIFI_LOGI("Instance %{public}d %{public}s", m_id, __func__);
     /* All modes are currently supported */
     setPowerModelList.insert(PowerModel::SLEEPING);
     setPowerModelList.insert(PowerModel::GENERAL);
@@ -168,15 +179,17 @@ ErrCode ApService::GetSupportedPowerModel(std::set<PowerModel>& setPowerModelLis
 
 ErrCode ApService::GetPowerModel(PowerModel& model)
 {
-    WifiSettings::GetInstance().GetPowerModel(model);
+    WIFI_LOGI("Instance %{public}d %{public}s", m_id, __func__);
+    WifiSettings::GetInstance().GetPowerModel(model, m_id);
     LOGI("ApService::GetPowerModel, model=[%{public}d]", static_cast<int>(model));
     return ErrCode::WIFI_OPT_SUCCESS;
 }
 
 ErrCode ApService::SetPowerModel(const PowerModel& model)
 {
+    WIFI_LOGI("Instance %{public}d %{public}s", m_id, __func__);
     LOGI("Enter ApService::SetPowerModel, model=[%d]", static_cast<int>(model));
-    if (WifiApHalInterface::GetInstance().SetPowerModel(static_cast<int>(model)) != WIFI_IDL_OPT_OK) {
+    if (WifiApHalInterface::GetInstance().SetPowerModel(static_cast<int>(model), m_id) != WIFI_IDL_OPT_OK) {
         LOGE("SetPowerModel() failed!");
         return WIFI_OPT_FAILED;
     }

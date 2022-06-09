@@ -339,14 +339,14 @@ public:
      *
      * @return WifiErrorNo
      */
-    WifiErrorNo StartAp(void);
+    WifiErrorNo StartAp(int id = 0);
 
     /**
      * @Description Close Ap.
      *
      * @return WifiErrorNo
      */
-    WifiErrorNo StopAp(void);
+    WifiErrorNo StopAp(int id = 0);
 
     /**
      * @Description Setting SoftAP Configurations.
@@ -354,7 +354,7 @@ public:
      * @param config
      * @return WifiErrorNo
      */
-    WifiErrorNo SetSoftApConfig(const HotspotConfig &config);
+    WifiErrorNo SetSoftApConfig(const HotspotConfig &config, int id = 0);
 
     /**
      * @Description Obtains information about all connected STAs.
@@ -362,7 +362,7 @@ public:
      * @param result
      * @return WifiErrorNo
      */
-    WifiErrorNo GetStationList(std::vector<std::string> &result);
+    WifiErrorNo GetStationList(std::vector<std::string> &result, int id = 0);
 
     /**
      * @Description To set the blocklist filtering in AP mode to prohibit the MAC
@@ -371,7 +371,7 @@ public:
      * @param mac - Blocklisted address.
      * @return WifiErrorNo
      */
-    WifiErrorNo AddBlockByMac(const std::string &mac);
+    WifiErrorNo AddBlockByMac(const std::string &mac, int id = 0);
 
     /**
      * @Description To set blocklist filtering in AP mode and delete a specified MAC
@@ -380,7 +380,7 @@ public:
      * @param mac - Blocklisted address.
      * @return WifiErrorNo
      */
-    WifiErrorNo DelBlockByMac(const std::string &mac);
+    WifiErrorNo DelBlockByMac(const std::string &mac, int id = 0);
 
     /**
      * @Description Disconnect the STA with a specified MAC address.
@@ -388,7 +388,7 @@ public:
      * @param mac
      * @return WifiErrorNo
      */
-    WifiErrorNo RemoveStation(const std::string &mac);
+    WifiErrorNo RemoveStation(const std::string &mac, int id = 0);
 
     /**
      * @Description Obtains the hotspot frequency supported by a specified frequency band.
@@ -397,7 +397,7 @@ public:
      * @param frequencies
      * @return WifiErrorNo
      */
-    WifiErrorNo GetFrequenciesByBand(int band, std::vector<int> &frequencies);
+    WifiErrorNo GetFrequenciesByBand(int band, std::vector<int> &frequencies, int id = 0);
 
     /**
      * @Description Listening to Wi-Fi disconnection or connection events
@@ -406,7 +406,7 @@ public:
      * @param callback
      * @return WifiErrorNo
      */
-    WifiErrorNo RegisterApEvent(IWifiApMonitorEventCallback callback) const;
+    WifiErrorNo RegisterApEvent(IWifiApMonitorEventCallback callback, int id = 0) const;
 
     /**
      * @Description Sets the Wi-Fi country code.
@@ -414,7 +414,7 @@ public:
      * @param code
      * @return WifiErrorNo
      */
-    WifiErrorNo SetWifiCountryCode(const std::string &code);
+    WifiErrorNo SetWifiCountryCode(const std::string &code, int id = 0);
 
     /**
      * @Description Disconnect the STA connection based on the MAC address.
@@ -422,7 +422,7 @@ public:
      * @param mac
      * @return WifiErrorNo
      */
-    WifiErrorNo ReqDisconnectStaByMac(const std::string &mac);
+    WifiErrorNo ReqDisconnectStaByMac(const std::string &mac, int id = 0);
 
     /**
      * @Description Request get the power mode.
@@ -430,7 +430,7 @@ public:
      * @param mode - The mode of power.
      * @return WifiErrorNo
      */
-    WifiErrorNo ReqGetPowerModel(int& model);
+    WifiErrorNo ReqGetPowerModel(int& model, int id = 0);
 
     /**
      * @Description Request set the power mode.
@@ -438,7 +438,7 @@ public:
      * @param mode - The mode to set.
      * @return WifiErrorNo
      */
-    WifiErrorNo ReqSetPowerModel(const int& model);
+    WifiErrorNo ReqSetPowerModel(const int& model, int id = 0);
 
     /* ************************** ChipMode interface **************************** */
 

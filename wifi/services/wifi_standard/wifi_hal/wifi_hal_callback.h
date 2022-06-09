@@ -79,20 +79,22 @@ void WifiHalCbNotifyWpsTimeOut(int event);
  * @Description Wi-Fi Hal calls back the STA to join the AP.
  *
  * @param content
+ * @param id - ap id
  */
-void WifiHalCbStaJoin(const char *content);
+void WifiHalCbStaJoin(const char *content, int id);
 
 /**
  * @Description Wi-Fi Hal callback AP status.
  *
  * @param content
  */
-void WifiHalCbApState(const char *content);
+void WifiHalCbApState(const char *content, int id);
 
 /**
  * @Description wpa_supplicant client connection result event
  *
  * @param state - event value
+ * @param id - ap id
  */
 void WifiP2pHalCbNotifyConnectSupplicant(int state);
 

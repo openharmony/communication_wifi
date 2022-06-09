@@ -31,7 +31,7 @@ public:
      * @param None
      * @return None
      */
-    explicit ApIdleState(ApStateMachine &);
+    explicit ApIdleState(ApStateMachine &, int id = 0);
     /**
      * @Description  destructor method.
      * @param None
@@ -60,6 +60,7 @@ public:
     virtual bool ExecuteStateMsg(InternalMessage *msg) override;
 private:
     ApStateMachine &m_ApStateMachine;
+    int m_id;
 };
 }  // namespace Wifi
 }  // namespace OHOS

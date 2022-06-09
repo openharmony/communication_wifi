@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 #include "wifi_hotspot_impl.h"
+#include "wifi_hotspot_mgr_proxy.h"
 #include "iservice_registry.h"
 #include "wifi_logger.h"
 
@@ -34,7 +35,7 @@ WifiHotspotImpl::WifiHotspotImpl(int systemAbilityId) : systemAbilityId_(systemA
 WifiHotspotImpl::~WifiHotspotImpl()
 {}
 
-bool WifiHotspotImpl::Init()
+bool WifiHotspotImpl::Init(int id)
 {
     sptr<ISystemAbilityManager> sa_mgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (sa_mgr == nullptr) {
@@ -44,17 +45,27 @@ bool WifiHotspotImpl::Init()
 
     sptr<IRemoteObject> object = sa_mgr->GetSystemAbility(systemAbilityId_);
     if (object == nullptr) {
-        WIFI_LOGE("failed to get HOTSPOT_SERVICE");
+        WIFI_LOGE("failed to get hotspot mgr");
         return false;
     }
 
-    client_ = iface_cast<IWifiHotspot>(object);
-    if (client_ == nullptr) {
-        client_ = new (std::nothrow) WifiHotspotProxy(object);
+    sptr<IWifiHotspotMgr> hotspotMgr = iface_cast<IWifiHotspotMgr>(object);
+    if (hotspotMgr == nullptr) {
+        hotspotMgr = new (std::nothrow) WifiHotspotMgrProxy(object);
+    }
+    if (hotspotMgr == nullptr) {
+        WIFI_LOGE("wifi hotspot init failed, %{public}d", systemAbilityId_);
+        return false;
     }
 
+    sptr<IRemoteObject> service = hotspotMgr->GetWifiRemote(id);
+    if (service == nullptr) {
+        WIFI_LOGE("wifi device remote obj is null, %{public}d", id);
+        return false;
+    }
+    client_ = new (std::nothrow) WifiHotspotProxy(service);
     if (client_ == nullptr) {
-        WIFI_LOGE("wifi device init failed. %{public}d", systemAbilityId_);
+        WIFI_LOGE("wifi device id init failed., %{public}d", systemAbilityId_);
         return false;
     }
 

@@ -98,7 +98,13 @@ ohos_unittest("manager_unittest") {
     "ipc:ipc_core",
     "netmanager_base:net_conn_manager_if",
   ]
+
+  defines = [ "AP_INSTANCE_MAX_NUM=$wifi_feature_with_ap_num" ]
   configs = [ ":module_private_config" ]
+
+  if (wifi_feature_with_auth_disable) {
+    defines += [ "PERMISSION_ALWAYS_GRANT" ]
+  }
 
   part_name = "wifi"
   subsystem_name = "communication"

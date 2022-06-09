@@ -692,19 +692,19 @@ WifiErrorNo WifiIdlClient::ReqGetConnectSignalInfo(const std::string &endBssid, 
     return err;
 }
 
-WifiErrorNo WifiIdlClient::StartAp(void)
+WifiErrorNo WifiIdlClient::StartAp(int id)
 {
     CHECK_CLIENT_NOT_NULL;
-    return StartSoftAp();
+    return StartSoftAp(id);
 }
 
-WifiErrorNo WifiIdlClient::StopAp(void)
+WifiErrorNo WifiIdlClient::StopAp(int id)
 {
     CHECK_CLIENT_NOT_NULL;
-    return StopSoftAp();
+    return StopSoftAp(id);
 }
 
-WifiErrorNo WifiIdlClient::SetSoftApConfig(const HotspotConfig &config)
+WifiErrorNo WifiIdlClient::SetSoftApConfig(const HotspotConfig &config, int id)
 {
     CHECK_CLIENT_NOT_NULL;
     HostapdConfig tmp;
@@ -724,10 +724,10 @@ WifiErrorNo WifiIdlClient::SetSoftApConfig(const HotspotConfig &config)
     tmp.band = static_cast<int>(config.GetBand());
     tmp.channel = config.GetChannel();
     tmp.maxConn = config.GetMaxConn();
-    return SetHostapdConfig(&tmp);
+    return SetHostapdConfig(&tmp, id);
 }
 
-WifiErrorNo WifiIdlClient::GetStationList(std::vector<std::string> &result)
+WifiErrorNo WifiIdlClient::GetStationList(std::vector<std::string> &result, int id)
 {
     CHECK_CLIENT_NOT_NULL;
 
@@ -736,7 +736,7 @@ WifiErrorNo WifiIdlClient::GetStationList(std::vector<std::string> &result)
         return WIFI_IDL_OPT_FAILED;
     }
     int32_t size = BUFFER_SIZE;
-    WifiErrorNo err = GetStaInfos(staInfos, &size);
+    WifiErrorNo err = GetStaInfos(staInfos, &size, id);
     if (err != WIFI_IDL_OPT_OK) {
         delete[] staInfos;
         return WIFI_IDL_OPT_FAILED;
@@ -747,43 +747,43 @@ WifiErrorNo WifiIdlClient::GetStationList(std::vector<std::string> &result)
     return WIFI_IDL_OPT_OK;
 }
 
-WifiErrorNo WifiIdlClient::AddBlockByMac(const std::string &mac)
+WifiErrorNo WifiIdlClient::AddBlockByMac(const std::string &mac, int id)
 {
     CHECK_CLIENT_NOT_NULL;
     if (CheckMacIsValid(mac) != 0) {
         return WIFI_IDL_OPT_INPUT_MAC_INVALID;
     }
     int len = mac.length();
-    return SetMacFilter((unsigned char *)mac.c_str(), len);
+    return SetMacFilter((unsigned char *)mac.c_str(), len, id);
 }
 
-WifiErrorNo WifiIdlClient::DelBlockByMac(const std::string &mac)
+WifiErrorNo WifiIdlClient::DelBlockByMac(const std::string &mac, int id)
 {
     CHECK_CLIENT_NOT_NULL;
     if (CheckMacIsValid(mac) != 0) {
         return WIFI_IDL_OPT_INPUT_MAC_INVALID;
     }
     int len = mac.length();
-    return DelMacFilter((unsigned char *)mac.c_str(), len);
+    return DelMacFilter((unsigned char *)mac.c_str(), len, id);
 }
 
-WifiErrorNo WifiIdlClient::RemoveStation(const std::string &mac)
+WifiErrorNo WifiIdlClient::RemoveStation(const std::string &mac, int id)
 {
     CHECK_CLIENT_NOT_NULL;
     if (CheckMacIsValid(mac) != 0) {
         return WIFI_IDL_OPT_INPUT_MAC_INVALID;
     }
     int len = mac.length();
-    return DisassociateSta((unsigned char *)mac.c_str(), len);
+    return DisassociateSta((unsigned char *)mac.c_str(), len, id);
 }
 
-WifiErrorNo WifiIdlClient::GetFrequenciesByBand(int32_t band, std::vector<int> &frequencies)
+WifiErrorNo WifiIdlClient::GetFrequenciesByBand(int32_t band, std::vector<int> &frequencies, int id)
 {
     CHECK_CLIENT_NOT_NULL;
 
     int values[WIFI_IDL_GET_MAX_BANDS] = {0};
     int size = WIFI_IDL_GET_MAX_BANDS;
-    if (GetValidFrequenciesForBand(band, values, &size) != 0) {
+    if (GetValidFrequenciesForBand(band, values, &size, id) != 0) {
         return WIFI_IDL_OPT_FAILED;
     }
 
@@ -794,7 +794,7 @@ WifiErrorNo WifiIdlClient::GetFrequenciesByBand(int32_t band, std::vector<int> &
     return WIFI_IDL_OPT_OK;
 }
 
-WifiErrorNo WifiIdlClient::RegisterApEvent(IWifiApMonitorEventCallback callback) const
+WifiErrorNo WifiIdlClient::RegisterApEvent(IWifiApMonitorEventCallback callback, int id) const
 {
     CHECK_CLIENT_NOT_NULL;
     IWifiApEventCallback cEventCallback;
@@ -806,37 +806,37 @@ WifiErrorNo WifiIdlClient::RegisterApEvent(IWifiApMonitorEventCallback callback)
         cEventCallback.onApEnableOrDisable = OnApEnableOrDisable;
     }
 
-    return RegisterAsscociatedEvent(cEventCallback);
+    return RegisterAsscociatedEvent(cEventCallback, id);
 }
 
-WifiErrorNo WifiIdlClient::SetWifiCountryCode(const std::string &code)
+WifiErrorNo WifiIdlClient::SetWifiCountryCode(const std::string &code, int id)
 {
     CHECK_CLIENT_NOT_NULL;
     if (code.length() != WIFI_IDL_COUNTRY_CODE_LENGTH) {
         return WIFI_IDL_OPT_INVALID_PARAM;
     }
-    return SetCountryCode(code.c_str());
+    return SetCountryCode(code.c_str(), id);
 }
 
-WifiErrorNo WifiIdlClient::ReqDisconnectStaByMac(const std::string &mac)
+WifiErrorNo WifiIdlClient::ReqDisconnectStaByMac(const std::string &mac, int id)
 {
     CHECK_CLIENT_NOT_NULL;
     if (CheckMacIsValid(mac) != 0) {
         return WIFI_IDL_OPT_INPUT_MAC_INVALID;
     }
-    return DisassociateSta((unsigned char *)mac.c_str(), strlen(mac.c_str()));
+    return DisassociateSta((unsigned char *)mac.c_str(), strlen(mac.c_str()), id);
 }
 
-WifiErrorNo WifiIdlClient::ReqGetPowerModel(int& model)
+WifiErrorNo WifiIdlClient::ReqGetPowerModel(int& model, int id)
 {
     CHECK_CLIENT_NOT_NULL;
-    return WpaGetPowerModel(&model);
+    return WpaGetPowerModel(&model, id);
 }
 
-WifiErrorNo WifiIdlClient::ReqSetPowerModel(const int& model)
+WifiErrorNo WifiIdlClient::ReqSetPowerModel(const int& model, int id)
 {
     CHECK_CLIENT_NOT_NULL;
-    return WpaSetPowerModel(model);
+    return WpaSetPowerModel(model, id);
 }
 
 WifiErrorNo WifiIdlClient::GetWifiChipObject(int id, IWifiChip &chip)

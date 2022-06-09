@@ -882,11 +882,15 @@ bool P2pStateMachine::DealCreateNewGroupWithConfig(const WifiP2pConfigInternal &
 
 void P2pStateMachine::UpdateGroupInfoToWpa() const
 {
+#ifdef PRODUCT_RK
+    WifiErrorNo ret;
+#else
     WifiErrorNo ret = WifiP2PHalInterface::GetInstance().RemoveNetwork(-1);
     if (ret != WIFI_IDL_OPT_OK) {
         WIFI_LOGE("Failed to delete all group info before update group info to wpa! Stop update!");
         return;
     }
+#endif
     std::vector<WifiP2pGroupInfo> grpInfo = groupManager.GetGroups();
     int createdNetId = -1;
     WifiP2pGroupInfo grpBuf;

@@ -16,9 +16,10 @@
 #include "wifi_net_agent.h"
 #include <cinttypes>
 #include "inet_addr.h"
+#include "iservice_registry.h"
+#include "netsys_native_service_proxy.h"
 #include "net_conn_client.h"
-#include "net_manager_native.h"
-#include "route_controller.h"
+#include "system_ability_definition.h"
 #include "wifi_common_util.h"
 #include "wifi_logger.h"
 
@@ -159,14 +160,25 @@ bool WifiNetAgent::AddRoute(const std::string interface, const std::string ipAdd
     unsigned int maskInt = IpTools::ConvertIpv4Address(mask);
     std::string strLocalRoute = IpTools::ConvertIpv4Address(ipInt & maskInt);
     std::string destAddress = strLocalRoute + "/" + std::to_string(prefixLength);
-    std::unique_ptr<OHOS::nmd::NetManagerNative> netdService = std::make_unique<nmd::NetManagerNative>();
-    if (netdService == nullptr) {
+
+    auto samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    if (samgr == nullptr) {
+        LOGE("GetSystemAbilityManager failed!");
+        return false;
+    }
+    auto remote = samgr->GetSystemAbility(COMM_NETSYS_NATIVE_SYS_ABILITY_ID);
+    if (remote == nullptr) {
+        LOGE("GetSystemAbility failed!");
+        return false;
+    }
+    OHOS::sptr<OHOS::NetsysNative::INetsysService> netsysService = iface_cast<NetsysNative::INetsysService>(remote);
+    if (netsysService == nullptr) {
         LOGE("NetdService is nullptr!");
         return false;
     }
     LOGI("Add route, interface: %{public}s, destAddress: %{public}s, ipAddress: %{public}s, prefixLength: %{public}d",
         interface.c_str(), IpAnonymize(destAddress).c_str(), IpAnonymize(ipAddress).c_str(), prefixLength);
-    netdService->NetworkAddRoute(OHOS::nmd::LOCAL_NETWORK_NETID, interface, destAddress, ipAddress);
+    netsysService->NetworkAddRoute(OHOS::nmd::LOCAL_NETWORK_NETID, interface, destAddress, ipAddress);
     return true;
 }
 

@@ -199,6 +199,14 @@ public:
     ErrCode QueryP2pDevices(std::vector<WifiP2pDevice> &devives) override;
 
     /**
+     * @Description Query the information about the local device
+     *
+     * @param devives - Get result of WifiP2pDevice
+     * @return ErrCode - operate result
+     */
+    ErrCode QueryP2pLocalDevice(WifiP2pDevice &devive) override;
+
+    /**
      * @Description Query the information about the found groups
      *
      * @param groups - Get result vector of WifiP2pGroupInfo

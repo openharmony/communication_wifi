@@ -84,6 +84,23 @@ static ErrCode GroupInfosToJs(const napi_env& env, WifiP2pGroupInfo& groupInfo, 
     return WIFI_OPT_SUCCESS;
 }
 
+static ErrCode GroupsToJsArray(const napi_env& env,
+    const std::vector<WifiP2pGroupInfo>& vecGroups, napi_value& arrayResult)
+{
+    uint32_t idx = 0;
+    for (auto& each : vecGroups) {
+        napi_value eachObj;
+        napi_create_object(env, &eachObj);
+        GroupInfosToJs(env, each, eachObj);
+        napi_status status = napi_set_element(env, arrayResult, idx++, eachObj);
+        if (status != napi_ok) {
+            WIFI_LOGE("wifi napi set element error: %{public}d, idx: %{public}d", status, idx - 1);
+            return WIFI_OPT_FAILED;
+        }
+    }
+    return WIFI_OPT_SUCCESS;
+}
+
 napi_value GetCurrentGroup(napi_env env, napi_callback_info info)
 {
     TRACE_FUNC_CALL;
@@ -113,6 +130,37 @@ napi_value GetCurrentGroup(napi_env env, napi_callback_info info)
     size_t nonCallbackArgNum = 0;
     return DoAsyncWork(env, asyncContext, argc, argv, nonCallbackArgNum);
 }
+
+napi_value GetP2pGroups(napi_env env, napi_callback_info info)
+{
+    TRACE_FUNC_CALL;
+    size_t argc = 1;
+    napi_value argv[argc];
+    napi_value thisVar = nullptr;
+    void *data = nullptr;
+    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, &data));
+
+    P2pGroupInfoListAsyncContext *asyncContext = new P2pGroupInfoListAsyncContext(env);
+    NAPI_ASSERT(env, asyncContext != nullptr, "asyncContext is null.");
+    napi_create_string_latin1(env, "GetP2pGroups", NAPI_AUTO_LENGTH, &asyncContext->resourceName);
+
+    asyncContext->executeFunc = [&](void* data) -> void {
+        P2pGroupInfoListAsyncContext *context = static_cast<P2pGroupInfoListAsyncContext *>(data);
+        TRACE_FUNC_CALL_NAME("wifiP2pPtr->QueryP2pGroups");
+        context->errorCode = wifiP2pPtr->QueryP2pGroups(context->vecGroupInfoList);
+    };
+
+    asyncContext->completeFunc = [&](void* data) -> void {
+        P2pGroupInfoListAsyncContext *context = static_cast<P2pGroupInfoListAsyncContext *>(data);
+        napi_create_object(context->env, &context->result);
+        context->errorCode = GroupsToJsArray(context->env, context->vecGroupInfoList, context->result);
+        WIFI_LOGI("Push get group info list to client");
+    };
+
+    size_t nonCallbackArgNum = 0;
+    return DoAsyncWork(env, asyncContext, argc, argv, nonCallbackArgNum);
+}
+
 
 napi_value DeletePersistentGroup(napi_env env, napi_callback_info info)
 {
@@ -183,6 +231,36 @@ napi_value GetP2pDevices(napi_env env, napi_callback_info info)
         napi_create_array_with_length(context->env, context->vecP2pDevices.size(), &context->result);
         context->errorCode = DevicesToJsArray(context->env, context->vecP2pDevices, context->result);
         WIFI_LOGI("Push P2p Device List to client");
+    };
+
+    size_t nonCallbackArgNum = 0;
+    return DoAsyncWork(env, asyncContext, argc, argv, nonCallbackArgNum);
+}
+
+napi_value GetP2pLocalDevice(napi_env env, napi_callback_info info)
+{
+    TRACE_FUNC_CALL;
+    size_t argc = 1;
+    napi_value argv[argc];
+    napi_value thisVar = nullptr;
+    void *data = nullptr;
+    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, &data));
+
+    P2pLocalDeviceAsyncContext *asyncContext = new P2pLocalDeviceAsyncContext(env);
+    NAPI_ASSERT(env, asyncContext != nullptr, "asyncContext is null.");
+    napi_create_string_latin1(env, "GetP2pLocalDevice", NAPI_AUTO_LENGTH, &asyncContext->resourceName);
+
+    asyncContext->executeFunc = [&](void* data) -> void {
+        P2pLocalDeviceAsyncContext *context = static_cast<P2pLocalDeviceAsyncContext *>(data);
+        TRACE_FUNC_CALL_NAME("wifiP2pPtr->QueryP2pLocalDevice");
+        context->errorCode = wifiP2pPtr->QueryP2pLocalDevice(context->deviceInfo);
+    };
+
+    asyncContext->completeFunc = [&](void* data) -> void {
+        P2pLocalDeviceAsyncContext *context = static_cast<P2pLocalDeviceAsyncContext *>(data);
+        napi_create_object(context->env, &context->result);
+        context->errorCode = DeviceInfoToJs(context->env, context->deviceInfo, context->result);
+        WIFI_LOGI("Push get p2p local device result to client");
     };
 
     size_t nonCallbackArgNum = 0;

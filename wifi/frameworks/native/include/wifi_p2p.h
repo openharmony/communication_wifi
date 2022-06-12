@@ -191,6 +191,14 @@ public:
     virtual ErrCode GetP2pConnectedStatus(int &status) = 0;
 
     /**
+     * @Description Query the local device infor.
+     *
+     * @param devives - Get result of WifiP2pDevice
+     * @return ErrCode - operate result
+     */
+    virtual ErrCode QueryP2pLocalDevice(WifiP2pDevice &device);
+
+    /**
      * @Description Query the information about the found devices.
      *
      * @param devives - Get result vector of WifiP2pDevice

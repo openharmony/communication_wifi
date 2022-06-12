@@ -156,6 +156,13 @@ public:
     virtual ErrCode GetCurrentGroup(WifiP2pGroupInfo &group) = 0;
 
     /**
+     * @DescriptionGet - The interface of get all existed groups.
+     * @param  group - struct WifiP2pGroupInfo.
+     * @return - ErrCode
+     */
+    virtual ErrCode GetP2pGroups(WifiP2pGroupInfo &group) = 0;
+
+    /**
      * @Description - The interface of get p2p running status.
      * @param  status - information of status.
      * @return - ErrCode

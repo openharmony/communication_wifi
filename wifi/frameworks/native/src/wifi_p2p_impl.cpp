@@ -195,6 +195,12 @@ ErrCode WifiP2pImpl::QueryP2pDevices(std::vector<WifiP2pDevice> &devives)
     return client_->QueryP2pDevices(devives);
 }
 
+ErrCode WifiP2pImpl::QueryP2pLocalDevice(WifiP2pDevice &devives)
+{
+    RETURN_IF_FAIL(client_);
+    return client_->QueryP2pLocalDevice(devives);
+}
+
 ErrCode WifiP2pImpl::QueryP2pGroups(std::vector<WifiP2pGroupInfo> &groups)
 {
     RETURN_IF_FAIL(client_);

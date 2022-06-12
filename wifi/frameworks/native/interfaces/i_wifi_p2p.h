@@ -200,6 +200,13 @@ public:
     virtual ErrCode QueryP2pDevices(std::vector<WifiP2pDevice> &devives) = 0;
 
     /**
+     * @Description - Query the information about own device.
+     * @param  device - own device
+     * @return - ErrCode
+     */
+    virtual ErrCode QueryP2pLocalDevice(WifiP2pDevice &device) = 0;
+
+    /**
      * @Description Query the information about the found groups.
      *
      * @param groups - Get result vector of WifiP2pGroupInfo

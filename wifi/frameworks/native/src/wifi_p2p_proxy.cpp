@@ -822,6 +822,38 @@ ErrCode WifiP2pProxy::QueryP2pDevices(std::vector<WifiP2pDevice> &devices)
     return WIFI_OPT_SUCCESS;
 }
 
+ErrCode WifiP2pProxy::QueryP2pLocalDevice(WifiP2pDevice &device)
+{
+    if (mRemoteDied) {
+        WIFI_LOGD("failed to `%{public}s`,remote service is died!", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    MessageOption option;
+    MessageParcel data;
+    MessageParcel reply;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    data.WriteInt32(0);
+    int error = Remote()->SendRequest(WIFI_SVR_CMD_P2P_QUERY_LOCAL_DEVICE, data, reply, option);
+    if (error != ERR_NONE) {
+        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d", WIFI_SVR_CMD_P2P_QUERY_LOCAL_DEVICE, error);
+        return WIFI_OPT_FAILED;
+    }
+
+    int exception = reply.ReadInt32();
+    if (exception) {
+        return WIFI_OPT_FAILED;
+    }
+    int ret = reply.ReadInt32();
+    if (ErrCode(ret) != WIFI_OPT_SUCCESS) {
+        return ErrCode(ret);
+    }
+    ReadWifiP2pDeviceData(reply, device);
+    return WIFI_OPT_SUCCESS;
+}
+
 ErrCode WifiP2pProxy::QueryP2pGroups(std::vector<WifiP2pGroupInfo> &groups)
 {
     if (mRemoteDied) {
@@ -1450,7 +1482,7 @@ ErrCode WifiP2pProxy::Hid2dSetPeerWifiCfgInfo(PeerCfgType cfgType,
 
 void WifiP2pProxy::OnRemoteDied(const wptr<IRemoteObject>& remoteObject)
 {
-    WIFI_LOGD("Remote service is died!");
+    WIFI_LOGE("Remote service is died!");
     mRemoteDied = true;
     g_wifiP2pCallbackStub.SetRemoteDied(true);
 }

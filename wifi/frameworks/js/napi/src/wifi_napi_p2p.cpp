@@ -47,7 +47,7 @@ static ErrCode DevicesToJsArray(const napi_env& env,
     return WIFI_OPT_SUCCESS;
 }
 
-static ErrCode GroupInfosToJs(const napi_env& env, WifiP2pGroupInfo& groupInfo, napi_value& result)
+static ErrCode GroupInfosToJs(const napi_env& env, const WifiP2pGroupInfo& groupInfo, napi_value& result)
 {
     SetValueBool(env, "isP2pGo", groupInfo.IsGroupOwner(), result);
 
@@ -91,8 +91,8 @@ static ErrCode GroupsToJsArray(const napi_env& env,
     for (auto& each : vecGroups) {
         napi_value eachObj;
         napi_create_object(env, &eachObj);
-        int errorCode = GroupInfosToJs(env, each, eachObj);
-        if (errorCode != WIFI_OPT_SUCCESS) {
+        int ret = GroupInfosToJs(env, each, eachObj);
+        if (ret != WIFI_OPT_SUCCESS) {
             return WIFI_OPT_FAILED;
         }
         napi_status status = napi_set_element(env, arrayResult, idx++, eachObj);

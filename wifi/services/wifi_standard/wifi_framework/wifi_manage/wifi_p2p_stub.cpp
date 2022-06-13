@@ -370,12 +370,12 @@ void WifiP2pStub::OnQueryP2pDevices(uint32_t code, MessageParcel &data, MessageP
 void WifiP2pStub::OnQueryP2pLocalDevice(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
     WIFI_LOGI("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
-    WifiP2pDevice devive;
-    ErrCode ret = QueryP2pLocalDevice(devive);
+    WifiP2pDevice device;
+    ErrCode ret = QueryP2pLocalDevice(device);
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
     if (ret == WIFI_OPT_SUCCESS) {
-        WriteWifiP2pDeviceData(reply, devive);
+        WriteWifiP2pDeviceData(reply, device);
     }
     return;
 }

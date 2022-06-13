@@ -323,7 +323,7 @@ ErrCode WifiMockP2pService::GetP2pConnectedStatus(int &status)
     return WIFI_OPT_SUCCESS;
 }
 
-ErrCode WifiMockP2pService::QueryP2pDevices(std::vector<WifiP2pDevice> &devives)
+ErrCode WifiMockP2pService::QueryP2pDevices(std::vector<WifiP2pDevice> &devices)
 {
     LOGI("Mock_p2p:QueryP2pDevices");
     WifiP2pDevice device1;

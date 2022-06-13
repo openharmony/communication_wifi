@@ -91,7 +91,8 @@ static ErrCode GroupsToJsArray(const napi_env& env,
     for (auto& each : vecGroups) {
         napi_value eachObj;
         napi_create_object(env, &eachObj);
-        if (GroupInfosToJs(env, each, eachObj) != WIFI_OPT_SUCCESS) {
+        int errorCode = GroupInfosToJs(env, each, eachObj);
+        if (errorCode != WIFI_OPT_SUCCESS) {
             return WIFI_OPT_FAILED;
         }
         napi_status status = napi_set_element(env, arrayResult, idx++, eachObj);

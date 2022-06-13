@@ -595,7 +595,7 @@ ErrCode WifiP2pServiceImpl::GetP2pConnectedStatus(int &status)
     return pService->GetP2pConnectedStatus(status);
 }
 
-ErrCode WifiP2pServiceImpl::QueryP2pDevices(std::vector<WifiP2pDevice> &devives)
+ErrCode WifiP2pServiceImpl::QueryP2pDevices(std::vector<WifiP2pDevice> &devices)
 {
     WIFI_LOGI("QueryP2pDevices");
     if (WifiPermissionUtils::VerifyGetWifiInfoInternalPermission() == PERMISSION_DENIED) {
@@ -622,7 +622,7 @@ ErrCode WifiP2pServiceImpl::QueryP2pDevices(std::vector<WifiP2pDevice> &devives)
         WIFI_LOGE("Get P2P service failed!");
         return WIFI_OPT_P2P_NOT_OPENED;
     }
-    return pService->QueryP2pDevices(devives);
+    return pService->QueryP2pDevices(devices);
 }
 
 ErrCode WifiP2pServiceImpl::QueryP2pLocalDevice(WifiP2pDevice &device)

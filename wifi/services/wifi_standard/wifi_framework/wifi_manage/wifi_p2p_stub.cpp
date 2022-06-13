@@ -352,17 +352,16 @@ void WifiP2pStub::OnGetP2pConnectedStatus(
 void WifiP2pStub::OnQueryP2pDevices(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
-    std::vector<WifiP2pDevice> devives;
-    ErrCode ret = QueryP2pDevices(devives);
+    std::vector<WifiP2pDevice> devices;
+    ErrCode ret = QueryP2pDevices(devices);
 
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
-
     if (ret == WIFI_OPT_SUCCESS) {
-        int size = devives.size();
+        int size = devices.size();
         reply.WriteInt32(size);
         for (int i = 0; i < size; ++i) {
-            WriteWifiP2pDeviceData(reply, devives[i]);
+            WriteWifiP2pDeviceData(reply, devices[i]);
         }
     }
     return;

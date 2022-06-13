@@ -261,7 +261,8 @@ napi_value GetP2pLocalDevice(napi_env env, napi_callback_info info)
     asyncContext->completeFunc = [&](void* data) -> void {
         P2pLocalDeviceAsyncContext *context = static_cast<P2pLocalDeviceAsyncContext *>(data);
         napi_create_object(context->env, &context->result);
-        context->errorCode = DeviceInfoToJs(context->env, context->deviceInfo, context->result);
+        context->errorCode = WIFI_OPT_SUCCESS;
+        DeviceInfoToJs(context->env, context->deviceInfo, context->result);
         WIFI_LOGI("Push get p2p local device result to client");
     };
 

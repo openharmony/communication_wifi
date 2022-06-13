@@ -24,6 +24,7 @@ namespace Wifi {
 napi_value GetP2pLinkedInfo(napi_env env, napi_callback_info info);
 napi_value GetCurrentGroup(napi_env env, napi_callback_info info);
 napi_value GetP2pDevices(napi_env env, napi_callback_info info);
+napi_value GetP2pLocalDevice(napi_env env, napi_callback_info info);
 napi_value CreateGroup(napi_env env, napi_callback_info info);
 napi_value RemoveGroup(napi_env env, napi_callback_info info);
 napi_value P2pConnect(napi_env env, napi_callback_info info);

@@ -203,7 +203,7 @@ public:
      * @param devices - Get result of WifiP2pDevice
      * @return ErrCode - operate result
      */
-    ErrCode QueryP2pLocalDevice(WifiP2pDevice &device);
+    ErrCode QueryP2pLocalDevice(WifiP2pDevice &device) override;
 
     /**
      * @Description Query the information about the found groups

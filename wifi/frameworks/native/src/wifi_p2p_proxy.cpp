@@ -825,7 +825,7 @@ ErrCode WifiP2pProxy::QueryP2pDevices(std::vector<WifiP2pDevice> &devices)
 ErrCode WifiP2pProxy::QueryP2pLocalDevice(WifiP2pDevice &device)
 {
     if (mRemoteDied) {
-        WIFI_LOGD("failed to `%{public}s`,remote service is died!", __func__);
+        WIFI_LOGE("failed to `%{public}s`,remote service is died!", __func__);
         return WIFI_OPT_FAILED;
     }
     MessageOption option;

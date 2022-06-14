@@ -232,6 +232,8 @@ void WifiDeviceProxy::WriteDeviceConfig(const WifiDeviceConfig &config, MessageP
     data.WriteCString(config.wifiEapConfig.eap.c_str());
     data.WriteCString(config.wifiEapConfig.identity.c_str());
     data.WriteCString(config.wifiEapConfig.password.c_str());
+    data.WriteCString(config.wifiEapConfig.clientCert.c_str());
+    data.WriteCString(config.wifiEapConfig.privateKey.c_str());
     data.WriteInt32((int)config.wifiProxyconfig.configureMethod);
     data.WriteCString(config.wifiProxyconfig.autoProxyConfig.pacWebAddress.c_str());
     data.WriteCString(config.wifiProxyconfig.manualProxyConfig.serverHostName.c_str());
@@ -413,6 +415,8 @@ void WifiDeviceProxy::ParseDeviceConfigs(MessageParcel &reply, std::vector<WifiD
         config.wifiEapConfig.eap = reply.ReadCString();
         config.wifiEapConfig.identity = reply.ReadCString();
         config.wifiEapConfig.password = reply.ReadCString();
+        config.wifiEapConfig.clientCert = reply.ReadCString();
+        config.wifiEapConfig.privateKey = reply.ReadCString();
         config.wifiProxyconfig.configureMethod = ConfigureProxyMethod(reply.ReadInt32());
         config.wifiProxyconfig.autoProxyConfig.pacWebAddress = reply.ReadCString();
         config.wifiProxyconfig.manualProxyConfig.serverHostName = reply.ReadCString();

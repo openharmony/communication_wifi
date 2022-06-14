@@ -331,6 +331,8 @@ ErrCode StaStateMachine::ConvertDeviceCfg(const WifiDeviceConfig &config) const
     idlConfig.eap = config.wifiEapConfig.eap;
     idlConfig.identity = config.wifiEapConfig.identity;
     idlConfig.password = config.wifiEapConfig.password;
+    idlConfig.clientCert = config.wifiEapConfig.clientCert;
+    idlConfig.privateKey = config.wifiEapConfig.privateKey;
     idlConfig.wepKeyIdx = config.wepTxKeyIndex;
     for (int i = 0; i < MAX_WEPKEYS_SIZE; i++) {
         idlConfig.wepKeys[i] = config.wepKeys[i];
@@ -1133,6 +1135,8 @@ void StaStateMachine::DealStartRoamCmd(InternalMessage *msg)
     idlConfig.eap = network.wifiEapConfig.eap;
     idlConfig.identity = network.wifiEapConfig.identity;
     idlConfig.password = network.wifiEapConfig.password;
+    idlConfig.clientCert = network.wifiEapConfig.clientCert;
+    idlConfig.privateKey = network.wifiEapConfig.privateKey;
 
     if (WifiStaHalInterface::GetInstance().SetDeviceConfig(linkedInfo.networkId, idlConfig) != WIFI_IDL_OPT_OK) {
         WIFI_LOGE("DealStartRoamCmd SetDeviceConfig() failed!");
@@ -1557,6 +1561,8 @@ void StaStateMachine::SyncAllDeviceConfigs()
                 idlConfig.eap = it->wifiEapConfig.eap;
                 idlConfig.identity = it->wifiEapConfig.identity;
                 idlConfig.password = it->wifiEapConfig.password;
+                idlConfig.clientCert = it->wifiEapConfig.clientCert;
+                idlConfig.privateKey = it->wifiEapConfig.privateKey;
                 if (WifiStaHalInterface::GetInstance().SetDeviceConfig(it->networkId, idlConfig) != WIFI_IDL_OPT_OK) {
                     WIFI_LOGE("SetDeviceConfig failed!");
                 }

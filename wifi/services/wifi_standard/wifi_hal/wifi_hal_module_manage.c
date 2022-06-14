@@ -12,6 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include "wifi_hal_module_manage.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -19,6 +20,7 @@
 #include <dirent.h>
 #include <dlfcn.h>
 #include <unistd.h>
+#include <sys/prctl.h>
 #include <sys/types.h>
 #include <sys/wait.h>
 #include "wifi_hal_define.h"
@@ -135,6 +137,8 @@ int StartModuleInternal(const char *moduleName, const char *startCmd, pid_t *pPr
         return HAL_FAILURE;
     }
     if (pid == 0) { /* sub process */
+        // The child process will receive the exit signal when the parent process exits.
+        prctl(PR_SET_PDEATHSIG, SIGKILL);
         pthread_t tid;
         int ret = pthread_create(&tid, NULL, WpaThreadMain, (void *)startCmd);
         if (ret != 0) {

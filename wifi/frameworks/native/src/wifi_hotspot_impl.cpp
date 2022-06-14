@@ -72,6 +72,14 @@ bool WifiHotspotImpl::IsHotspotActive(void)
     return bActive;
 }
 
+bool WifiHotspotImpl::IsHotspotDualBandSupported(void)
+{
+    RETURN_IF_FAIL(client_);
+    bool isSupported = false;
+    client_->IsHotspotDualBandSupported(isSupported);
+    return isSupported;
+}
+
 ErrCode WifiHotspotImpl::GetHotspotState(int &state)
 {
     RETURN_IF_FAIL(client_);

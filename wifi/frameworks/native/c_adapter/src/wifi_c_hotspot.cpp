@@ -40,10 +40,14 @@ WifiErrorCode DisableHotspot()
 
 int IsHotspotActive(void)
 {
-    if (hotspotPtr == nullptr) {
-        return false;
-    }
+    CHECK_PTR_RETURN(hotspotPtr, ERROR_WIFI_NOT_AVAILABLE);
     return hotspotPtr->IsHotspotActive();
+}
+
+int IsHotspotDualBandSupported(void)
+{
+    CHECK_PTR_RETURN(hotspotPtr, ERROR_WIFI_NOT_AVAILABLE);
+    return hotspotPtr->IsHotspotDualBandSupported();
 }
 
 /* Others type is not support for AP */

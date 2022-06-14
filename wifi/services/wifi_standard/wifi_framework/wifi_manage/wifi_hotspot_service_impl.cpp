@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -15,6 +15,7 @@
 
 #include "wifi_hotspot_service_impl.h"
 #include <file_ex.h>
+#include <csignal>
 #include "wifi_permission_utils.h"
 #include "wifi_global_func.h"
 #include "wifi_auth_center.h"
@@ -55,12 +56,38 @@ WifiHotspotServiceImpl::WifiHotspotServiceImpl()
 WifiHotspotServiceImpl::~WifiHotspotServiceImpl()
 {}
 
+bool WifiHotspotServiceImpl::IsProcessNeedToRestart()
+{
+    return (WifiConfigCenter::GetInstance().GetApMidState() == WifiOprMidState::RUNNING);
+}
+
+void WifiHotspotServiceImpl::SigHandler(int sig)
+{
+    WIFI_LOGI("[Ap] Recv SIG: %{public}d\n", sig);
+    switch (sig) {
+        case SIGUSR2:
+            if (IsProcessNeedToRestart()) {
+                IApServiceCallbacks cb = WifiManager::GetInstance().GetApCallback();
+                if (cb.OnApStateChangedEvent != nullptr) {
+                    cb.OnApStateChangedEvent(ApState::AP_STATE_IDLE);
+                }
+                WIFI_LOGE("[AP] --------------Abort process to restart!!!--------------\n");
+                abort();
+            }
+            break;
+
+        default:
+            break;
+    }
+}
+
 void WifiHotspotServiceImpl::OnStart()
 {
     if (mState == ServiceRunningState::STATE_RUNNING) {
         WIFI_LOGD("Service has already started.");
         return;
     }
+    (void)signal(SIGUSR2, SigHandler);
     if (!Init()) {
         WIFI_LOGE("Failed to init service");
         OnStop();

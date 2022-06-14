@@ -199,6 +199,8 @@ private:
     static void SaBasicDump(std::string& result);
     static void ConfigInfoDump(std::string& result);
     static void StationsInfoDump(std::string& result);
+    static void SigHandler(int sig);
+    static bool IsProcessNeedToRestart();
 
 private:
     static sptr<WifiHotspotServiceImpl> g_instance;

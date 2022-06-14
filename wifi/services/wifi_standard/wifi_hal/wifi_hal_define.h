@@ -148,6 +148,8 @@ typedef enum DeviceConfigType {
     DEVICE_CONFIG_WEP_KEY_1 = 12,
     DEVICE_CONFIG_WEP_KEY_2 = 13,
     DEVICE_CONFIG_WEP_KEY_3 = 14,
+    DEVICE_CONFIG_EAP_CLIENT_CERT = 15,
+    DEVICE_CONFIG_EAP_PRIVATE_KEY = 16,
     /**
      * Number of network configuration parameters, which is used as the last
      * parameter.

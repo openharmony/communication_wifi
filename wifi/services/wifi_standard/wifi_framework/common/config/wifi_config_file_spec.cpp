@@ -67,6 +67,8 @@ static void ClearWifiDeviceConfigEap(WifiDeviceConfig &item)
     item.wifiEapConfig.eap.clear();
     item.wifiEapConfig.identity.clear();
     item.wifiEapConfig.password.clear();
+    item.wifiEapConfig.clientCert.clear();
+    item.wifiEapConfig.privateKey.clear();
     return;
 }
 
@@ -197,6 +199,10 @@ static void SetWifiDeviceConfigEap(WifiDeviceConfig &item, const std::string &ke
         item.wifiEapConfig.identity = value;
     } else if (key == "wifiEapConfig.password") {
         item.wifiEapConfig.password = value;
+    } else if (key == "wifiEapConfig.clientCert") {
+        item.wifiEapConfig.clientCert = value;
+    } else if (key == "wifiEapConfig.privateKey") {
+        item.wifiEapConfig.privateKey = value;
     }
     return;
 }
@@ -314,6 +320,8 @@ static std::string OutPutWifiDeviceConfigEap(WifiDeviceConfig &item)
     ss << "wifiEapConfig.eap=" << item.wifiEapConfig.eap << std::endl;
     ss << "wifiEapConfig.identity=" << item.wifiEapConfig.identity << std::endl;
     ss << "wifiEapConfig.password=" << item.wifiEapConfig.password << std::endl;
+    ss << "wifiEapConfig.clientCert=" << item.wifiEapConfig.clientCert << std::endl;
+    ss << "wifiEapConfig.privateKey=" << item.wifiEapConfig.privateKey << std::endl;
     return ss.str();
 }
 

@@ -85,7 +85,7 @@ public:
         std::vector<RegObj>& vecObj = g_eventRegisterInfo[type];
         for (auto& each : vecObj) {
             auto func = [this, env = each.m_regEnv, obj] () -> napi_value { return CreateResult(env, obj); };
-            AsyncEventData *asyncEvent = new AsyncEventData(each.m_regEnv, each.m_regHanderRef, func);
+            AsyncEventData *asyncEvent = new (std::nothrow)AsyncEventData(each.m_regEnv, each.m_regHanderRef, func);
             if (asyncEvent == nullptr) {
                 return;
             }

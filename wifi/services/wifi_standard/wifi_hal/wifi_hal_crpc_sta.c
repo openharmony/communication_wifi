@@ -127,6 +127,16 @@ int RpcGetScanInfos(RpcServer *server, Context *context)
             WriteStr(context, results[i].ssid);
             int64_t currTime = (int64_t)clockTime.tv_sec * secComplex * secComplex + clockTime.tv_nsec / secComplex;
             WriteInt64(context, currTime);
+            WriteInt(context, results[i].channelWidth);
+            WriteInt(context, results[i].centerFrequency0);
+            WriteInt(context, results[i].centerFrequency1);
+            WriteInt(context, results[i].ieSize);
+            for (int j = 0; j < results[i].ieSize; ++j) {
+                WriteInt(context, results[i].infoElems[j].id);
+                WriteInt(context, results[i].infoElems[j].size);
+                WriteUStr(context, (unsigned char *)results[i].infoElems[j].content, results[i].infoElems[j].size);
+                free(results[i].infoElems[j].content);
+            }
             if (results[i].infoElems != NULL) {
                 free(results[i].infoElems);
                 results[i].infoElems = NULL;

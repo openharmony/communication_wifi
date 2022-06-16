@@ -286,6 +286,24 @@ WifiErrorNo WifiIdlClient::QueryScanInfos(std::vector<InterScanInfo> &scanInfos)
         tmp.rssi = results[i].signalLevel;
         tmp.timestamp = results[i].timestamp;
         tmp.capabilities = results[i].capability;
+        tmp.channelWidth = (WifiChannelWidth)results[i].channelWidth;
+        tmp.centerFrequency0 = results[i].centerFrequency0;
+        tmp.centerFrequency1 = results[i].centerFrequency1;
+        for (int j = 0; j < results[i].ieSize; ++j) {
+            WifiInfoElem infoElemTmp;
+            int infoElemSize = results[i].infoElems[j].size;
+            infoElemTmp.id = results[i].infoElems[j].id;
+            for (int k = 0; k < infoElemSize; ++k) {
+                infoElemTmp.content.emplace_back(results[i].infoElems[j].content[k]);
+            }
+            if (results[i].infoElems[j].content) {
+                free(results[i].infoElems[j].content);
+            }
+            tmp.infoElems.emplace_back(infoElemTmp);
+        }
+        if (results[i].infoElems) {
+            free(results[i].infoElems);
+        }
         scanInfos.emplace_back(tmp);
     }
     free(results);

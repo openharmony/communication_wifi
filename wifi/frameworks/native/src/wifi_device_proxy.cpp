@@ -791,6 +791,7 @@ void WifiDeviceProxy::ReadLinkedInfo(MessageParcel &reply, WifiLinkedInfo &info)
     info.frequency = reply.ReadInt32();
     info.linkSpeed = reply.ReadInt32();
     info.macAddress = reply.ReadCString();
+    info.macType = reply.ReadInt32();
     info.ipAddress = reply.ReadInt32();
     int tmpConnState = reply.ReadInt32();
     if ((tmpConnState >= 0) && (tmpConnState <= (int)ConnState::UNKNOWN)) {

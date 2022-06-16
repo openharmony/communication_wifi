@@ -479,6 +479,7 @@ void WifiDeviceStub::OnGetLinkedInfo(uint32_t code, MessageParcel &data, Message
         reply.WriteInt32(wifiInfo.frequency);
         reply.WriteInt32(wifiInfo.linkSpeed);
         reply.WriteCString(wifiInfo.macAddress.c_str());
+        reply.WriteInt32(wifiInfo.macType);
         reply.WriteInt32(wifiInfo.ipAddress);
         reply.WriteInt32((int)wifiInfo.connState);
         reply.WriteBool(wifiInfo.ifHiddenSSID);

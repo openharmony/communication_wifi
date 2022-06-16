@@ -64,6 +64,12 @@ struct WpaWpsPinArgv {
     char pinCode[WIFI_PIN_CODE_LENGTH + 1];
 };
 
+struct NeedParseIe {
+    ScanInfoElem* ieExtern;
+    ScanInfoElem* ieVhtOper;
+    ScanInfoElem* ieHtOper;
+};
+
 typedef struct WifiWpaStaInterface WifiWpaStaInterface;
 struct WifiWpaStaInterface {
     int staNo;

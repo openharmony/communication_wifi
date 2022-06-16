@@ -138,7 +138,7 @@ WifiErrorNo RequestFirmwareDebugDump(unsigned char *bytes, int32_t *size);
  * @param mode - Low-latency mode.
  * @return WifiErrorNo
  */
-WifiErrorNo SetPowerMode(uint8_t mode);
+WifiErrorNo WifiServiceSetPowerMode(uint8_t mode);
 
 #ifdef __cplusplus
 }

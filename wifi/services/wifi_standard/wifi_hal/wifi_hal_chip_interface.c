@@ -150,8 +150,8 @@ WifiErrorNo RequestFirmwareDebugDump(unsigned char *bytes, int32_t *size)
     return ConvertErrorCode(err);
 }
 
-WifiErrorNo SetPowerMode(uint8_t mode)
+WifiErrorNo WifiServiceSetPowerMode(uint8_t mode)
 {
-    LOGD("SetPowerMode() %{public}u", mode);
+    LOGD("WifiServiceSetPowerMode() %{public}u", mode);
     return WIFI_HAL_SUCCESS;
 }

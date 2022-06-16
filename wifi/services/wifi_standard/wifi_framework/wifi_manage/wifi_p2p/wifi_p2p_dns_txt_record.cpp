@@ -39,8 +39,8 @@ void WifiP2PDnsTxtRecord::InsertData(
         insertIndex += (data[insertIndex] + mapLengthSize) & 0xff;
     }
 
-    int addLength = keyBytes.size() + valBytes.size() + ((valBytes.size() == 0) ? 0 : mapLengthSize);
-    int newDataLength = addLength + mapLengthSize + oldData.size();
+    int addLength = (int)keyBytes.size() + (int)valBytes.size() + ((valBytes.size() == 0) ? 0 : mapLengthSize);
+    int newDataLength = addLength + mapLengthSize + (int)oldData.size();
 
     data.clear();
 

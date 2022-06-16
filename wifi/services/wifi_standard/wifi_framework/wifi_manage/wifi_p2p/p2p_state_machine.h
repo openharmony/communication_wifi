@@ -286,6 +286,12 @@ private:
      */
     bool GetIsNeedDhcp() const;
 
+    /**
+     * @Description Is interface reuse.
+     *
+     */
+    bool IsInterfaceReuse() const;
+
 private:
     /**
      * @Description - Broadcast state change event.

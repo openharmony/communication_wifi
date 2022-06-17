@@ -1854,10 +1854,10 @@ void StaStateMachine::ConnectToNetworkProcess(InternalMessage *msg)
     linkedInfo.networkId = lastNetworkId;
     linkedInfo.bssid = bssid;
     linkedInfo.ssid = deviceConfig.ssid;
-    linkedInfo.macAddress = deviceConfig.macAddress;
+    linkedInfo.macAddress = macAddr;
     linkedInfo.ifHiddenSSID = deviceConfig.hiddenSSID;
     lastLinkedInfo.bssid = bssid;
-    lastLinkedInfo.macAddress = macAddr;
+    lastLinkedInfo.macAddress = deviceConfig.macAddress;
     lastLinkedInfo.ifHiddenSSID = deviceConfig.hiddenSSID;
     SetWifiLinkedInfo(lastNetworkId);
     SaveLinkstate(ConnState::CONNECTING, DetailedState::OBTAINING_IPADDR);

@@ -1849,10 +1849,12 @@ void StaStateMachine::ConnectToNetworkProcess(InternalMessage *msg)
         WIFI_LOGD("Device ssid = %s", deviceConfig.ssid.c_str());
     }
 
+    std::string macAddr;
+    WifiSettings::GetInstance().GetMacAddress(macAddr);
     linkedInfo.networkId = lastNetworkId;
     linkedInfo.bssid = bssid;
     linkedInfo.ssid = deviceConfig.ssid;
-    linkedInfo.macAddress = deviceConfig.macAddress;
+    linkedInfo.macAddress = macAddr;
     linkedInfo.ifHiddenSSID = deviceConfig.hiddenSSID;
     lastLinkedInfo.bssid = bssid;
     lastLinkedInfo.macAddress = deviceConfig.macAddress;

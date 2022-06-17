@@ -49,7 +49,7 @@ static void EmitEventCallbackMsg(WifiHalEventCallbackMsg *pCbkMsg, WifiHalEvent 
 
 void WifiHalCbNotifyScanEnd(int status)
 {
-    LOGD("Get Scan status: %{public}d, and begin push notify message", status);
+    LOGI("Get Scan status: %{public}d, and begin push notify message", status);
     WifiHalEventCallbackMsg *pCbkMsg = (WifiHalEventCallbackMsg *)calloc(1, sizeof(WifiHalEventCallbackMsg));
     if (pCbkMsg == NULL) {
         LOGE("create callback message failed!");
@@ -66,7 +66,7 @@ void WifiHalCbNotifyConnectChanged(int status, int networkId, const char *pos)
         LOGI("Get connect state changed, pos is NULL");
         return;
     }
-    LOGD("Get connect state changed, state: %{public}d, networkid = %{public}d", status, networkId);
+    LOGI("Get connect state changed, state: %{public}d, networkid = %{public}d", status, networkId);
     WifiHalEventCallbackMsg *pCbkMsg = (WifiHalEventCallbackMsg *)calloc(1, sizeof(WifiHalEventCallbackMsg));
     if (pCbkMsg == NULL) {
         LOGE("create callback message failed!");
@@ -81,7 +81,7 @@ void WifiHalCbNotifyConnectChanged(int status, int networkId, const char *pos)
 
 void WifiHalCbNotifyWpaStateChange(int status)
 {
-    LOGD("wpa state changed, state: %{public}d, and begin push notify message", status);
+    LOGI("wpa state changed, state: %{public}d, and begin push notify message", status);
     WifiHalEventCallbackMsg *pCbkMsg = (WifiHalEventCallbackMsg *)calloc(1, sizeof(WifiHalEventCallbackMsg));
     if (pCbkMsg == NULL) {
         LOGE("create callback message failed!");
@@ -94,7 +94,7 @@ void WifiHalCbNotifyWpaStateChange(int status)
 
 void WifiHalCbNotifyWrongKey(int status)
 {
-    LOGD("wrong key, state: %{public}d, and begin push notify message", status);
+    LOGI("wrong key, state: %{public}d, and begin push notify message", status);
     WifiHalEventCallbackMsg *pCbkMsg = (WifiHalEventCallbackMsg *)calloc(1, sizeof(WifiHalEventCallbackMsg));
     if (pCbkMsg == NULL) {
         LOGE("create callback message failed!");
@@ -107,7 +107,7 @@ void WifiHalCbNotifyWrongKey(int status)
 
 void WifiHalCbNotifyConnectionFull(int status)
 {
-    LOGD("connection is full, state: %d, and begin push notify message", status);
+    LOGI("connection is full, state: %{public}d, and begin push notify message", status);
     WifiHalEventCallbackMsg *pCbkMsg = (WifiHalEventCallbackMsg *)calloc(1, sizeof(WifiHalEventCallbackMsg));
     if (pCbkMsg == NULL) {
         LOGE("create callback message failed!");
@@ -121,7 +121,7 @@ void WifiHalCbNotifyConnectionFull(int status)
 
 void WifiHalCbNotifyConnectionReject(int status)
 {
-    LOGD("connection is eeject, state: %d, and begin push notify message", status);
+    LOGI("connection is eeject, state: %{public}d, and begin push notify message", status);
     WifiHalEventCallbackMsg *pCbkMsg = (WifiHalEventCallbackMsg *)calloc(1, sizeof(WifiHalEventCallbackMsg));
     if (pCbkMsg == NULL) {
         LOGE("create callback message failed!");
@@ -135,7 +135,7 @@ void WifiHalCbNotifyConnectionReject(int status)
 
 void WifiHalCbNotifyWpsOverlap(int event)
 {
-    LOGD("wps overlap, state: %{public}d, and begin push notify message", event);
+    LOGI("wps overlap, state: %{public}d, and begin push notify message", event);
     WifiHalEventCallbackMsg *pCbkMsg = (WifiHalEventCallbackMsg *)calloc(1, sizeof(WifiHalEventCallbackMsg));
     if (pCbkMsg == NULL) {
         LOGE("create callback message failed!");
@@ -148,7 +148,7 @@ void WifiHalCbNotifyWpsOverlap(int event)
 
 void WifiHalCbNotifyWpsTimeOut(int event)
 {
-    LOGD("wps time out, state: %{public}d, and begin push notify message", event);
+    LOGI("wps time out, state: %{public}d, and begin push notify message", event);
     WifiHalEventCallbackMsg *pCbkMsg = (WifiHalEventCallbackMsg *)calloc(1, sizeof(WifiHalEventCallbackMsg));
     if (pCbkMsg == NULL) {
         LOGE("create callback message failed!");
@@ -165,7 +165,7 @@ void WifiHalCbStaJoin(const char *content)
         LOGD("Get hostapd Sta join content is NULL");
         return;
     }
-    LOGD("Get hostapd Sta join");
+    LOGI("Get hostapd Sta join");
     WifiHalEvent event;
     char tmpBuf[WIFI_BSSID_LENGTH] = {0};
     if (strncmp("AP-STA-CONNECTED", content, strlen("AP-STA-CONNECTED")) == 0) {
@@ -194,7 +194,7 @@ void WifiHalCbApState(const char *content)
         LOGD("Get hostapd status changed content is NULL");
         return;
     }
-    LOGD("Get hostapd status changed");
+    LOGI("Get hostapd status changed");
     WifiHalEvent event;
     if (strncmp(content, "AP-ENABLED", strlen("AP-ENABLED")) == 0) {
         event = WIFI_AP_ENABLE_EVENT;
@@ -215,7 +215,7 @@ void WifiHalCbApState(const char *content)
 
 void WifiP2pHalCbNotifyConnectSupplicant(int state)
 {
-    LOGD("P2p supplicant connect even : %{public}d", state);
+    LOGI("P2p supplicant connect even : %{public}d", state);
     WifiHalEventCallbackMsg *pCbkMsg = (WifiHalEventCallbackMsg *)calloc(1, sizeof(WifiHalEventCallbackMsg));
     if (pCbkMsg == NULL) {
         LOGE("create callback message failed!");
@@ -231,7 +231,7 @@ void P2pHalCbDeviceFound(const P2pDeviceInfo *device)
     if (device == NULL) {
         return;
     }
-    LOGD("P2p device found event deviceName: %{public}s", device->deviceName);
+    LOGI("P2p device found event deviceName: %{public}s", device->deviceName);
     WifiHalEventCallbackMsg *pCbkMsg = (WifiHalEventCallbackMsg *)calloc(1, sizeof(WifiHalEventCallbackMsg));
     if (pCbkMsg == NULL) {
         LOGE("create callback message failed!");
@@ -248,7 +248,7 @@ void P2pHalCbDeviceLost(const char *p2pDeviceAddress)
         LOGI("P2p device lost event p2pDeviceAddress is NULL");
         return;
     }
-    LOGD("P2p device lost event p2pDeviceAddress: %{private}s", p2pDeviceAddress);
+    LOGI("P2p device lost event p2pDeviceAddress: %{private}s", p2pDeviceAddress);
     WifiHalEventCallbackMsg *pCbkMsg = (WifiHalEventCallbackMsg *)calloc(1, sizeof(WifiHalEventCallbackMsg));
     if (pCbkMsg == NULL) {
         LOGE("create callback message failed!");
@@ -270,7 +270,7 @@ void P2pHalCbGoNegotiationRequest(const char *srcAddress, short passwordId)
         LOGI("P2p go negotiation request event srcAddress is NULL");
         return;
     }
-    LOGD("P2p go negotiation request event srcAddress: %{private}s, passwordId: %{private}d", srcAddress, passwordId);
+    LOGI("P2p go negotiation request event srcAddress: %{private}s, passwordId: %{private}d", srcAddress, passwordId);
     WifiHalEventCallbackMsg *pCbkMsg = (WifiHalEventCallbackMsg *)calloc(1, sizeof(WifiHalEventCallbackMsg));
     if (pCbkMsg == NULL) {
         LOGE("create callback message failed!");
@@ -289,7 +289,7 @@ void P2pHalCbGoNegotiationRequest(const char *srcAddress, short passwordId)
 
 void P2pHalCbGoNegotiationSuccess()
 {
-    LOGD("P2p go negotiation success event");
+    LOGI("P2p go negotiation success event");
     RpcServer *server = GetRpcServer();
     if (server == NULL) {
         LOGE("Rpc server not exists!");
@@ -301,7 +301,7 @@ void P2pHalCbGoNegotiationSuccess()
 
 void P2pHalCbGoNegotiationFailure(int status)
 {
-    LOGD("P2p go negotiation failure event status: %{public}d", status);
+    LOGI("P2p go negotiation failure event status: %{public}d", status);
     WifiHalEventCallbackMsg *pCbkMsg = (WifiHalEventCallbackMsg *)calloc(1, sizeof(WifiHalEventCallbackMsg));
     if (pCbkMsg == NULL) {
         LOGE("create callback message failed!");
@@ -317,7 +317,7 @@ void P2pHalCbInvitationReceived(const P2pInvitationInfo *info)
     if (info == NULL) {
         return;
     }
-    LOGD("P2p invitation received event srcAddress: %{private}s", info->srcAddress);
+    LOGI("P2p invitation received event srcAddress: %{private}s", info->srcAddress);
     WifiHalEventCallbackMsg *pCbkMsg = (WifiHalEventCallbackMsg *)calloc(1, sizeof(WifiHalEventCallbackMsg));
     if (pCbkMsg == NULL) {
         LOGE("create callback message failed!");
@@ -334,7 +334,7 @@ void P2pHalCbInvitationResult(const char *bssid, int status)
         LOGI("P2p invitation result event bssid is NULL");
         return;
     }
-    LOGD("P2p invitation result event bssid: %{private}s, status: %{public}d", bssid, status);
+    LOGI("P2p invitation result event bssid: %{private}s, status: %{public}d", bssid, status);
     WifiHalEventCallbackMsg *pCbkMsg = (WifiHalEventCallbackMsg *)calloc(1, sizeof(WifiHalEventCallbackMsg));
     if (pCbkMsg == NULL) {
         LOGE("create callback message failed!");
@@ -353,7 +353,7 @@ void P2pHalCbInvitationResult(const char *bssid, int status)
 
 void P2pHalCbGroupFormationSuccess()
 {
-    LOGD("P2p group formation success event");
+    LOGI("P2p group formation success event");
     RpcServer *server = GetRpcServer();
     if (server == NULL) {
         LOGE("Rpc server not exists!");
@@ -369,7 +369,7 @@ void P2pHalCbGroupFormationFailure(const char *reason)
         LOGI("P2p group formation failure event reason is NULL");
         return;
     }
-    LOGD("P2p group formation failure event reason: %{public}s", reason);
+    LOGW("P2p group formation failure event reason: %{public}s", reason);
     WifiHalEventCallbackMsg *pCbkMsg = (WifiHalEventCallbackMsg *)calloc(1, sizeof(WifiHalEventCallbackMsg));
     if (pCbkMsg == NULL) {
         LOGE("create callback message failed!");
@@ -390,7 +390,7 @@ void P2pHalCbGroupStarted(const P2pGroupInfo *info)
     if (info == NULL) {
         return;
     }
-    LOGD("P2p group started event groupIfName: %{public}s", info->groupIfName);
+    LOGI("P2p group started event groupIfName: %{public}s", info->groupIfName);
     WifiHalEventCallbackMsg *pCbkMsg = (WifiHalEventCallbackMsg *)calloc(1, sizeof(WifiHalEventCallbackMsg));
     if (pCbkMsg == NULL) {
         LOGE("create callback message failed!");
@@ -407,7 +407,7 @@ void P2pHalCbGroupRemoved(const char *groupIfName, int isGo)
         LOGI("P2p group removed event groupIfName is NULL");
         return;
     }
-    LOGD("P2p group removed event groupIfName: %{public}s, isGo: %{public}d", groupIfName, isGo);
+    LOGW("P2p group removed event groupIfName: %{public}s, isGo: %{public}d", groupIfName, isGo);
     WifiHalEventCallbackMsg *pCbkMsg = (WifiHalEventCallbackMsg *)calloc(1, sizeof(WifiHalEventCallbackMsg));
     if (pCbkMsg == NULL) {
         LOGE("create callback message failed!");
@@ -430,7 +430,7 @@ void P2pHalCbProvisionDiscoveryPbcRequest(const char *address)
         LOGI("P2p provision discovery pbc request event address is NULL");
         return;
     }
-    LOGD("P2p provision discovery pbc request event address: %{private}s", address);
+    LOGI("P2p provision discovery pbc request event address: %{private}s", address);
     WifiHalEventCallbackMsg *pCbkMsg = (WifiHalEventCallbackMsg *)calloc(1, sizeof(WifiHalEventCallbackMsg));
     if (pCbkMsg == NULL) {
         LOGE("create callback message failed!");
@@ -452,7 +452,7 @@ void P2pHalCbProvisionDiscoveryPbcResponse(const char *address)
         LOGI("P2p provision discovery pbc response event address is NULL");
         return;
     }
-    LOGD("P2p provision discovery pbc response event address: %{private}s", address);
+    LOGI("P2p provision discovery pbc response event address: %{private}s", address);
     WifiHalEventCallbackMsg *pCbkMsg = (WifiHalEventCallbackMsg *)calloc(1, sizeof(WifiHalEventCallbackMsg));
     if (pCbkMsg == NULL) {
         LOGE("create callback message failed!");
@@ -474,7 +474,7 @@ void P2pHalCbProvisionDiscoveryEnterPin(const char *address)
         LOGI("P2p provision discovery enter pin event address is NULL");
         return;
     }
-    LOGD("P2p provision discovery enter pin event address: %{private}s", address);
+    LOGI("P2p provision discovery enter pin event address: %{private}s", address);
     WifiHalEventCallbackMsg *pCbkMsg = (WifiHalEventCallbackMsg *)calloc(1, sizeof(WifiHalEventCallbackMsg));
     if (pCbkMsg == NULL) {
         LOGE("create callback message failed!");
@@ -496,7 +496,7 @@ void P2pHalCbProvisionDiscoveryShowPin(const char *address, const char *pin)
         LOGI("P2p provision discovery show pin event address or pin is NULL");
         return;
     }
-    LOGD("P2p provision discovery show pin event address: %{private}s, pin: %{private}s", address, pin);
+    LOGI("P2p provision discovery show pin event address: %{private}s, pin: %{private}s", address, pin);
     WifiHalEventCallbackMsg *pCbkMsg = (WifiHalEventCallbackMsg *)calloc(1, sizeof(WifiHalEventCallbackMsg));
     if (pCbkMsg == NULL) {
         LOGE("create callback message failed!");
@@ -516,7 +516,7 @@ void P2pHalCbProvisionDiscoveryShowPin(const char *address, const char *pin)
 
 void P2pHalCbProvisionDiscoveryFailure()
 {
-    LOGD("P2p provision discovery failure event");
+    LOGW("P2p provision discovery failure event");
     RpcServer *server = GetRpcServer();
     if (server == NULL) {
         LOGE("Rpc server not exists!");
@@ -528,7 +528,7 @@ void P2pHalCbProvisionDiscoveryFailure()
 
 void P2pHalCbFindStopped()
 {
-    LOGD("P2p find stopped event");
+    LOGW("P2p find stopped event");
     RpcServer *server = GetRpcServer();
     if (server == NULL) {
         LOGE("Rpc server not exists!");
@@ -543,7 +543,7 @@ void P2pHalCbServiceDiscoveryResponse(const P2pServDiscRespInfo *info)
     if (info == NULL) {
         return;
     }
-    LOGD("P2p service discovery response event srcAddress: %{private}s", info->srcAddress);
+    LOGI("P2p service discovery response event srcAddress: %{private}s", info->srcAddress);
     WifiHalEventCallbackMsg *pCbkMsg = (WifiHalEventCallbackMsg *)calloc(1, sizeof(WifiHalEventCallbackMsg));
     if (pCbkMsg == NULL) {
         LOGE("create callback message failed!");
@@ -576,7 +576,7 @@ void P2pHalCbStaConnectState(const char *p2pDeviceAddress, int state)
         LOGI("P2p sta authorized/deauthorized event devAddress is NULL");
         return;
     }
-    LOGD("P2p sta authorized/deauthorized event devAddress: %{private}s", p2pDeviceAddress);
+    LOGI("P2p sta authorized/deauthorized event devAddress: %{private}s", p2pDeviceAddress);
     WifiHalEventCallbackMsg *pCbkMsg = (WifiHalEventCallbackMsg *)calloc(1, sizeof(WifiHalEventCallbackMsg));
     if (pCbkMsg == NULL) {
         LOGE("create callback message failed!");
@@ -594,7 +594,7 @@ void P2pHalCbStaConnectState(const char *p2pDeviceAddress, int state)
 
 void P2pHalCbConnectSupplicantFailed()
 {
-    LOGD("P2p supplicant connect Failed event");
+    LOGW("P2p supplicant connect Failed event");
     RpcServer *server = GetRpcServer();
     if (server == NULL) {
         LOGE("Rpc server not exists!");
@@ -606,7 +606,7 @@ void P2pHalCbConnectSupplicantFailed()
 
 void P2pHalCbServDiscReq(const P2pServDiscReqInfo *info)
 {
-    LOGD("P2p service discovery request event");
+    LOGI("P2p service discovery request event");
     if (info == NULL) {
         return;
     }

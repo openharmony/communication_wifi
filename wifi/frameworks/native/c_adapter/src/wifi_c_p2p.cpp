@@ -354,6 +354,7 @@ public:
             for (auto& each : devices) {
                 if (ConvertP2PDeviceCppToC(each, p++) != OHOS::Wifi::WIFI_OPT_SUCCESS) {
                     WIFI_LOGE("peers changed convert p2p device failed!");
+                    delete[] devicePtr;
                     return;
                 }
             }

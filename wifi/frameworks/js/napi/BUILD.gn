@@ -26,7 +26,7 @@ ohos_shared_library("wifi") {
     "//base/security/access_token/interfaces/innerkits/accesstoken/include",
     "$WIFI_ROOT_DIR/frameworks/native/include",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/common/net_helper",
-    "${aafwk_kits_path}/appkit/native/ability_runtime/context",
+    "${aafwk_path}/interfaces/kits/native/appkit/ability_runtime/context",
     "$WIFI_ROOT_DIR/utils/inc",
     "$WIFI_ROOT_DIR/frameworks/js/napi/inc",
   ]
@@ -42,7 +42,7 @@ ohos_shared_library("wifi") {
   deps = [
     "$WIFI_ROOT_DIR/frameworks/native:wifi_sdk",
     "$WIFI_ROOT_DIR/utils/src:wifi_utils",
-    "${aafwk_kits_path}/appkit:app_context",
+    "${aafwk_path}/frameworks/native/appkit:app_context",
     "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog",
     "//foundation/arkui/napi:ace_napi",
     "//utils/native/base:utils",
@@ -70,7 +70,7 @@ ohos_shared_library("wifiext") {
     "$WIFI_ROOT_DIR/frameworks/native/include",
     "$WIFI_ROOT_DIR/frameworks/native/interfaces",
     "$WIFI_ROOT_DIR/frameworks/js/napi/inc",
-    "//foundation/ability/ability_runtime/frameworks/kits/appkit/native/ability_runtime/context",
+    "//foundation/ability/ability_runtime/interfaces/kits/native/appkit/ability_runtime/context",
   ]
 
   sources = [
@@ -81,7 +81,7 @@ ohos_shared_library("wifiext") {
   deps = [
     "$WIFI_ROOT_DIR/frameworks/native:wifi_sdk",
     "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog",
-    "//foundation/ability/ability_runtime/frameworks/kits/appkit:app_context",
+    "//foundation/ability/ability_runtime/frameworks/native/appkit:app_context",
     "//foundation/arkui/napi:ace_napi",
     "//utils/native/base:utils",
   ]
@@ -109,7 +109,7 @@ ohos_shared_library("wifi_native_js") {
     "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
     "//base/security/access_token/interfaces/innerkits/accesstoken/include",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/common/net_helper",
-    "${aafwk_kits_path}/appkit/native/ability_runtime/context",
+    "${aafwk_path}/interfaces/kits/native/appkit/ability_runtime/context",
     "$WIFI_ROOT_DIR/utils/inc",
   ]
 
@@ -124,7 +124,7 @@ ohos_shared_library("wifi_native_js") {
   deps = [
     "$WIFI_ROOT_DIR/frameworks/native:wifi_sdk",
     "$WIFI_ROOT_DIR/utils/src:wifi_utils",
-    "${aafwk_kits_path}/appkit:app_context",
+    "${aafwk_path}/frameworks/native/appkit:app_context",
     "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog",
     "//foundation/arkui/napi:ace_napi",
     "//utils/native/base:utils",

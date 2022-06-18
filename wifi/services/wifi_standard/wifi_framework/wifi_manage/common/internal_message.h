@@ -119,7 +119,7 @@ public:
     int GetIntFromMessage();
 
     /**
-     * @Description : Obtains Sting data from message.
+     * @Description : Obtains String data from message.
      *
      * @return std::string
      */

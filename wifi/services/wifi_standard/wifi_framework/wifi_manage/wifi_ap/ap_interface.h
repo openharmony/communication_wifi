@@ -74,7 +74,7 @@ public:
     virtual ErrCode SetHotspotConfig(const HotspotConfig &hotspotConfig) override;
 
     /**
-     * @Description  Disconnet Station connect from station information.
+     * @Description  Disconnect Station connect from station information.
      * @param stationInfo - station information.
      * @return ErrCode - success: WIFI_OPT_SUCCESS    failed: ERROR_CODE
      */

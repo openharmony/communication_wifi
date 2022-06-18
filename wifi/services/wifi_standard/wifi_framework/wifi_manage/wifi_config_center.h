@@ -55,7 +55,7 @@ public:
      * @param expState - expect the original state
      * @param state - want to set state
      * @return true - set the state success
-     * @return false - set state failed, current mid sate is not equal to the expState
+     * @return false - set state failed, current mid state is not equal to the expState
      */
     bool SetWifiMidState(WifiOprMidState expState, WifiOprMidState state);
 
@@ -214,7 +214,7 @@ public:
      * @param expState - expect the original state
      * @param state - want to set state
      * @return true - set the state success
-     * @return false - set state failed, current mid sate is not equal to the expState
+     * @return false - set state failed, current mid state is not equal to the expState
      */
     bool SetApMidState(WifiOprMidState expState, WifiOprMidState state);
 
@@ -305,7 +305,7 @@ public:
     int GetValidChannels(ChannelsTable &channelsInfo);
 
     /**
-     * @Description request to chip for initation current vaild bands and channels
+     * @Description request to chip for initiation current valid bands and channels
      */
     bool GetSupportedBandChannel();
 
@@ -322,7 +322,7 @@ public:
      * @param expState - expect the original state
      * @param state - want to set state
      * @return true - set the state success
-     * @return false - set state failed, current mid sate is not equal to the expState
+     * @return false - set state failed, current mid state is not equal to the expState
      */
     bool SetScanMidState(WifiOprMidState expState, WifiOprMidState state);
 
@@ -355,7 +355,7 @@ public:
      * @param expState - expect the original state
      * @param state - want to set state
      * @return true - set the state success
-     * @return false - set state failed, current mid sate is not equal to the expState
+     * @return false - set state failed, current mid state is not equal to the expState
      */
     bool SetP2pMidState(WifiOprMidState expState, WifiOprMidState state);
 

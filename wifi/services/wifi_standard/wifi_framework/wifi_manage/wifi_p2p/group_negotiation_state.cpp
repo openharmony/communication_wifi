@@ -57,7 +57,7 @@ void GroupNegotiationState::Init()
 
 bool GroupNegotiationState::ProcessNegotSucessEvt(InternalMessage &msg) const
 {
-    WIFI_LOGI("Negotation success: %{public}d", msg.GetMessageName());
+    WIFI_LOGI("Negotiation success: %{public}d", msg.GetMessageName());
     return EXECUTED;
 }
 
@@ -145,7 +145,7 @@ bool GroupNegotiationState::ProcessGroupFormationFailEvt(InternalMessage &msg) c
 bool GroupNegotiationState::ProcessNegotFailEvt(InternalMessage &msg) const
 {
     int status = msg.GetParam1();
-    WIFI_LOGD("Negotation failure. Error code: %{public}d", status);
+    WIFI_LOGD("Negotiation failure. Error code: %{public}d", status);
     p2pStateMachine.SwitchState(&p2pStateMachine.p2pIdleState);
     return EXECUTED;
 }

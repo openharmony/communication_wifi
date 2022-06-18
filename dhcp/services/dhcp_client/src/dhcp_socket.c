@@ -140,7 +140,8 @@ int BindKernelSocket(const int sockFd, const char *ifaceName, const uint32_t soc
 
     /* Set the broadcast feature of the data sent by the socket. */
     if (bCast) {
-        if (setsockopt(sockFd, SOL_SOCKET, SO_BROADCAST, (const char *)&bCast, sizeof(bool)) == -1) {
+        int broadcast = 1;
+        if (setsockopt(sockFd, SOL_SOCKET, SO_BROADCAST, (const char *)&broadcast, sizeof(int)) == -1) {
             LOGE("BindKernelSocket() sockFd:%{public}d SO_BROADCAST error:%{public}d.", sockFd, errno);
             close(sockFd);
             return SOCKET_OPT_FAILED;

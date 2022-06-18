@@ -225,6 +225,21 @@ bool IsSystemApp()
     WIFI_LOGI("Is system App uid[%{public}d]: %{public}d", uid, isSysApp);
     return isSysApp;
 }
+
+TimeStats::TimeStats(const std::string desc): m_desc(desc)
+{
+    m_startTime = std::chrono::steady_clock::now();
+    WIFI_LOGI("[Time stats][start] %{public}s.", m_desc.c_str());
+}
+
+TimeStats::~TimeStats()
+{
+    auto us = std::chrono::duration_cast<std::chrono::microseconds>
+        (std::chrono::steady_clock::now() - m_startTime).count();
+    constexpr int TIME_BASE = 1000;
+    WIFI_LOGI("[Time stats][end] %{public}s, time cost:%{public}lldus, %{public}lldms, %{public}llds",
+        m_desc.c_str(), us, us / TIME_BASE, us / TIME_BASE / TIME_BASE);
+}
 #endif
 }  // namespace Wifi
 }  // namespace OHOS

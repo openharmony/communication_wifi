@@ -671,6 +671,7 @@ bool P2pStateMachine::StartDhcpServer()
     if (!m_DhcpdInterface.SetDhcpEventFunc(groupManager.GetCurrentGroup().GetInterface(), pDhcpResultNotify.get())) {
         WIFI_LOGE("Set dhcp notify failed.");
     }
+    WIFI_LOGI("Start add route");
     WifiNetAgent::GetInstance().AddRoute(groupManager.GetCurrentGroup().GetInterface(),
         ipv4.GetAddressWithString(), ipv4.GetAddressPrefixLength());
     WIFI_LOGI("Start dhcp server for P2p finished.");
@@ -703,7 +704,9 @@ void P2pStateMachine::DhcpResultNotify::OnSuccess(int status, const std::string 
     WifiSettings::GetInstance().SaveP2pInfo(p2pInfo);
     groupManager.SaveP2pInfo(p2pInfo);
     pP2pStateMachine->BroadcastP2pConnectionChanged();
+    WIFI_LOGI("Start add route on dhcp success");
     WifiNetAgent::GetInstance().AddRoute(ifname, result.strYourCli, IpTools::GetMaskLength(result.strSubnet));
+    WIFI_LOGI("DhcpResultNotify::OnSuccess end");
 }
 
 void P2pStateMachine::DhcpResultNotify::OnFailed(int status, const std::string &ifname, const std::string &reason)

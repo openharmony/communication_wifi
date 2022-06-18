@@ -32,7 +32,7 @@
 
 static ModuleInfo *g_halModuleList = NULL;
 
-#define STOP_MODULE_TRY_TIMES 3
+#define STOP_MODULE_TRY_TIMES 30
 #define MAX_WPA_MAIN_ARGC_NUM 20
 #define MAX_WPA_MAIN_ARGV_LEN 64
 
@@ -149,7 +149,6 @@ int StartModuleInternal(const char *moduleName, const char *startCmd, pid_t *pPr
         exit(0);
     } else {
         LOGE("Create wpa process id is [%{public}d]", pid);
-        sleep(1);
         *pProcessId = pid;
     }
     return HAL_SUCCESS;
@@ -160,7 +159,9 @@ int StopModuleInternal(const char *moduleName, pid_t processId)
     if (moduleName == NULL) {
         return HAL_SUCCESS;
     }
+    LOGI("Start stop module internal");
     int tryTimes = STOP_MODULE_TRY_TIMES;
+    const int SLEEP_TIME_US = 1000 * 100; // 100ms
     while (tryTimes-- >= 0) {
         if (kill(processId, SIGTERM) == -1) {
             if (ESRCH == errno) {
@@ -170,13 +171,13 @@ int StopModuleInternal(const char *moduleName, pid_t processId)
             LOGE("kill [%{public}d] failed", processId);
             return HAL_FAILURE;
         }
-        sleep(1);
+        usleep(SLEEP_TIME_US);
         int ret = waitpid(processId, NULL, WNOHANG);
         if (ret <= 0) {
-            LOGI("Waitpid %{public}d return %{public}d, and retry", processId, ret);
+            LOGI("Waitpid %{public}d return %{public}d, tryTimes value %{public}d and retry", processId, ret, tryTimes);
             continue;
         } else {
-            LOGD("waitpid [%{public}d] success", processId);
+            LOGI("waitpid [%{public}d] success", processId);
             return HAL_SUCCESS;
         }
     }

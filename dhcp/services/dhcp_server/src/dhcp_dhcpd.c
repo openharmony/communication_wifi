@@ -292,7 +292,7 @@ int ServerActionCallback(int state, int code, const char *ifname)
             break;
         }
         case ST_STOPED: {
-            LOGD(" callback[%s] ==> server stoped.", ifname);
+            LOGD(" callback[%s] ==> server stopped.", ifname);
             break;
         }
         default:
@@ -352,11 +352,11 @@ static int InitializeDhcpConfig(const char *ifname, DhcpConfig *config)
     }
     LOGD("load local config file:%s", configFile);
     if (LoadConfig(configFile, ifname, config) != RET_SUCCESS) {
-        LOGE("faile to load configure file.");
+        LOGE("failed to load configure file.");
         return RET_FAILED;
     }
     if (InitConfigByArguments(config) != RET_SUCCESS) {
-        LOGE("faile to parse arguments.");
+        LOGE("failed to parse arguments.");
         return RET_FAILED;
     }
 

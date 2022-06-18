@@ -135,7 +135,7 @@ WifiErrorCode GetDeviceConfigs(WifiDeviceConfig *result, unsigned int *size);
 WifiErrorCode RemoveDevice(int networkId);
 
 /**
- * @brief Disable a hotspot configuration matching a specified <b>networkId</b>. If the config is diabled, it will
+ * @brief Disable a hotspot configuration matching a specified <b>networkId</b>. If the config is disabled, it will
  * not be auto connected.
  *
  * @param networkId Indicates the <b>networkId</b> matching the hotspot configuration to disable.

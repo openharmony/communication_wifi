@@ -455,7 +455,7 @@ private:
     void PerformSwitchState(State *msgProcessedState, InternalMessage *msg);
 
     /**
-     * @Description : Process messages. If the current state doesnot process it,
+     * @Description : Process messages. If the current state does not process it,
      * the upper state processing is called, and so on. If all upper states
      * are not processed, invoke the NotExecutedMessage method of the state machine.
      *

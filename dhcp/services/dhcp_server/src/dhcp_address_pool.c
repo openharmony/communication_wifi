@@ -41,7 +41,7 @@ AddressBinding *GetBindingByMac(HashTable *bindTable, uint8_t macAddr[DHCP_HWADD
         return NULL;
     }
     if (!Initialized(bindTable)) {
-        LOGE("binding recoders table dosn't initialized");
+        LOGE("binding recoders table doesn't initialized");
         return NULL;
     }
     if (ContainsKey(&g_bindingRecoders, (uintptr_t)macAddr)) {
@@ -62,7 +62,7 @@ AddressBinding *GetBindingByIp(HashTable *bindTable, uint32_t ipAddress)
         return NULL;
     }
     if (!Initialized(bindTable)) {
-        LOGE("binding recoders table dosn't initialized");
+        LOGE("binding recoders table doesn't initialized");
         return NULL;
     }
     if (ContainsKey(bindTable, (uintptr_t)&ipAddress)) {
@@ -315,7 +315,7 @@ AddressBinding *FindBindingByIp(uint32_t ipAddress)
 int IsReserved(uint8_t macAddr[DHCP_HWADDR_LENGTH])
 {
     if (!Initialized(&g_bindingRecoders)) {
-        LOGD("binding recoders table dosn't initialized");
+        LOGD("binding recoders table doesn't initialized");
         return DHCP_FALSE;
     }
     if (ContainsKey(&g_bindingRecoders, (uintptr_t)macAddr)) {

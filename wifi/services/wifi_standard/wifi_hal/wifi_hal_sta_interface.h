@@ -224,7 +224,7 @@ WifiErrorNo GetSupportFeature(long *feature);
  * @Description Send instructions to the Wi-Fi driver or chip.
  *
  * @param ifname
- * @param cmdid - Commond ID.
+ * @param cmdid - Command ID.
  * @param buf
  * @param bufSize
  * @return WifiErrorNo

@@ -43,7 +43,7 @@ void WifiScanCallbackProxy::OnWifiScanStateChanged(int state)
     int error = Remote()->SendRequest(WIFI_CBK_CMD_SCAN_STATE_CHANGE, data, reply, option);
     switch (error) {
         case NO_ERROR:
-            WIFI_LOGD("OnWifiScanStateChanged callback sucessed!");
+            WIFI_LOGD("OnWifiScanStateChanged callback succeeded!");
             break;
         case DEAD_OBJECT: {
             WIFI_LOGE("Failed to SendRequest, remote object has dead!");

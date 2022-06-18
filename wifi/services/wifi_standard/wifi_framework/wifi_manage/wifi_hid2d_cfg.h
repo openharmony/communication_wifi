@@ -232,7 +232,7 @@ private:
      * find the value of index in byte array
      *
      * @param data byte array
-     * @param value intput the value to find index
+     * @param value input the value to find index
      * @return index in byte array
      */
     int FindIndexFromByteArray(char* data, int dataLen, int value);

@@ -66,7 +66,7 @@ public:
 
 private:
     /**
-     * @Description Process the negotation success message received by the state machine
+     * @Description Process the negotiation success message received by the state machine
      * @param msg - Message body sent by the state machine
      * @return - bool true:handle   false:not handle
      */
@@ -94,7 +94,7 @@ private:
     virtual bool ProcessGroupFormationFailEvt(InternalMessage &msg) const;
 
     /**
-     * @Description Process the negotation fail message received by the state machine
+     * @Description Process the negotiation fail message received by the state machine
      * @param msg - Message body sent by the state machine
      * @return - bool true:handle   false:not handle
      */

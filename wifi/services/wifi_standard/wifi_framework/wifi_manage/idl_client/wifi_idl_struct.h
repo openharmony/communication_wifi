@@ -142,7 +142,7 @@ struct IdlP2pDeviceFound {
 };
 
 struct IdlP2pInvitationInfo {
-    int type; /* 0:Recived, 1:Accepted */
+    int type; /* 0:Received, 1:Accepted */
     int persistentNetworkId;
     int operatingFrequency;
     std::string srcAddress;

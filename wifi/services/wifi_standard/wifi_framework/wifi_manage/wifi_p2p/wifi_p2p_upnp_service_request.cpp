@@ -39,7 +39,7 @@ WifiP2pUpnpServiceRequest WifiP2pUpnpServiceRequest::Create(std::string searchTa
     std::string query;
     char version[4] = {'\0'};
     if (searchTarget.empty()) {
-        WIFI_LOGE("failed, search target cann't be nullptr, something wrong may happen.");
+        WIFI_LOGE("failed, search target can't be nullptr, something wrong may happen.");
     }
     if (snprintf_s(version, sizeof(version), sizeof(version) - 1, "%02x ", WifiP2pUpnpServiceInfo::VERSION_1_0) < 0) {
         WIFI_LOGE("ifiP2pUpnpServiceRequest::Create snprintf_s failed.");

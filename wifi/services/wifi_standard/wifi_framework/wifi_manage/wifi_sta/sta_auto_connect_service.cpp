@@ -214,7 +214,7 @@ void StaAutoConnectService::ConnectElectedDevice(WifiDeviceConfig &electedDevice
         pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_CONNECT_SAVED_NETWORK,
             electedDevice.networkId,
             NETWORK_SELECTED_FOR_CONNECTION_MANAGEMENT);
-        WIFI_LOGI("connecTo save networkId: %{public}d, preShareKey len: %{public}d.\n",
+        WIFI_LOGI("connectTo save networkId: %{public}d, preShareKey len: %{public}d.\n",
             electedDevice.networkId, (int)electedDevice.preSharedKey.length());
     } else {
         WIFI_LOGE("The current connection status is %{public}d.\n", currentConnectedNetwork.detailedState);

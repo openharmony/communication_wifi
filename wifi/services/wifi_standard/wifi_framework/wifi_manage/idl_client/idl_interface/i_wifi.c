@@ -775,7 +775,7 @@ int OnTransact(Context *context)
         return -1;
     }
     if (IdlDealStaApEvent(context, event) < 0 && IdlDealP2pEvent(context, event) < 0) {
-        LOGI("unsupport call back events: %{public}d", event);
+        LOGI("unsupported call back events: %{public}d", event);
     }
     return 0;
 }

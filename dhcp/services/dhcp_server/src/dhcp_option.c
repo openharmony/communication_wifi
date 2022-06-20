@@ -97,7 +97,7 @@ int PushBackOption(PDhcpOptionList pOptions, PDhcpOption pOption)
     }
     DhcpOptionNode *pNode = CreateOptionNode(pOption);
     if (!pNode) {
-        LOGE("failed to crate option node.");
+        LOGE("failed to create option node.");
         return 1;
     }
     pNode->previous = pOptions->last;

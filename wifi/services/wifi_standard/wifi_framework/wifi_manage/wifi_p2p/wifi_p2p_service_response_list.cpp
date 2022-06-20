@@ -76,7 +76,7 @@ WifiP2pServiceResponseList WifiP2pServiceResponseList::ReverseFilterSerivceRespo
 bool WifiP2pServiceResponseList::MergerAndDeduplicate(const WifiP2pServiceResponseList &respList)
 {
     if (p2pDevice.GetDeviceAddress() != respList.GetDevice().GetDeviceAddress()) {
-        WIFI_LOGE("Diffrent device!");
+        WIFI_LOGE("Different device!");
         return false;
     }
 

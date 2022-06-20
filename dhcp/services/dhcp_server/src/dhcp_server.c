@@ -299,7 +299,7 @@ int ReceiveDhcpMessage(int sock, PDhcpMsgInfo msgInfo)
 void InitReply(PDhcpServerContext ctx, PDhcpMsgInfo received, PDhcpMsgInfo reply)
 {
     if (!reply) {
-        LOGE("reply messsage pointer is null!");
+        LOGE("reply message pointer is null!");
         return;
     }
     reply->packet.op = BOOTREPLY;
@@ -336,7 +336,7 @@ void OnUpdateServerConfig(PDhcpServerContext ctx)
 
 static void OnServerStoping(PDhcpServerContext ctx)
 {
-    LOGD("server stoping ...");
+    LOGD("server stopping ...");
     ServerContext *srvIns = GetServerInstance(ctx);
     if (!srvIns) {
         LOGE("dhcp server context pointer is null.");
@@ -537,7 +537,7 @@ static int BeginLooper(PDhcpServerContext ctx)
     }
     FreeOptionList(&from.options);
     FreeOptionList(&reply.options);
-    LOGD("dhcp server message looper stoped.");
+    LOGD("dhcp server message looper stopped.");
     close(ctx->instance->serverFd);
     ctx->instance->serverFd = -1;
     srvIns->looperState = LS_STOPED;
@@ -619,7 +619,7 @@ void InitLeaseFile(DhcpAddressPool *pool)
 
 static void ExitProcess(void)
 {
-    LOGD("dhcp server stoped.");
+    LOGD("dhcp server stopped.");
     sleep(1);
 }
 
@@ -653,7 +653,7 @@ int StartDhcpServer(PDhcpServerContext ctx)
     }
     int ret = BeginLooper(ctx);
     if (ret != RET_SUCCESS) {
-        LOGD("faild to start dhcp server.");
+        LOGD("failed to start dhcp server.");
         OnServerStoped(ctx, ret);
         return RET_FAILED;
     }
@@ -734,7 +734,7 @@ int FillReply(PDhcpServerContext ctx, PDhcpMsgInfo received, PDhcpMsgInfo reply)
 int AppendReplyTimeOptions(PDhcpServerContext ctx, PDhcpOptionList options)
 {
     if (!ctx || !options) {
-        LOGE("server context or options poninter is null.");
+        LOGE("server context or options pointer is null.");
         return RET_FAILED;
     }
     ServerContext *srvIns = GetServerInstance(ctx);
@@ -1458,7 +1458,7 @@ static int ParseMessageOptions(PDhcpMsgInfo msg)
             return RET_FAILED;
         }
         if (PushBackOption(&msg->options, current) != RET_SUCCESS) {
-            LOGD("faild to PushOption.");
+            LOGD("failed to PushOption.");
         }
         current = (DhcpOption *)(((uint8_t *)current) + OPT_HEADER_LENGTH + current->length);
         optTotal++;
@@ -1502,7 +1502,7 @@ static int ValidateReplyOptions(PDhcpMsgInfo reply)
     }
     PDhcpOption pOptMsgType = GetOption(&reply->options, DHCP_MESSAGE_TYPE_OPTION);
     if (!pOptMsgType) {
-        LOGE("unkown reply message type.");
+        LOGE("unknown reply message type.");
         return ret;
     }
     return RET_SUCCESS;

@@ -108,7 +108,7 @@ bool WifiP2PDnsTxtRecord::SetRecord(const std::string &key, const std::string &v
     }
     for (unsigned long index = 0; index < key.length(); ++index) {
         if (key[index] == '=') {
-            WIFI_LOGE("= is invaild in keys!");
+            WIFI_LOGE("= is invalid in keys!");
             return false;
         }
         keyBytes.push_back(static_cast<unsigned char>(*(key.c_str() + index)));

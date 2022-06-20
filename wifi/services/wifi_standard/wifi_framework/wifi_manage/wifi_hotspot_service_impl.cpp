@@ -237,7 +237,7 @@ ErrCode WifiHotspotServiceImpl::SetHotspotConfig(const HotspotConfig &config)
     WifiLinkedInfo linkInfo;
     WifiConfigCenter::GetInstance().GetLinkedInfo(linkInfo);
     if (!linkInfo.ssid.empty() && linkInfo.ssid == config.GetSsid()) {
-        WIFI_LOGD("set ssid equal current linked ap ssid, no premission!");
+        WIFI_LOGD("set ssid equal current linked ap ssid, no permission!");
         return WIFI_OPT_INVALID_PARAM;
     }
 
@@ -635,7 +635,7 @@ void WifiHotspotServiceImpl::ConfigInfoDump(std::string& result)
 
     auto funcStrKeyMgmt = [&mapKeyMgmtToStr](KeyMgmt secType) {
         std::map<KeyMgmt, std::string>::iterator iter = mapKeyMgmtToStr.find(secType);
-        return (iter != mapKeyMgmtToStr.end()) ? iter->second : "Unknow";
+        return (iter != mapKeyMgmtToStr.end()) ? iter->second : "Unknown";
     };
     ss << "  Config.security_type: " << funcStrKeyMgmt(config.GetSecurityType()) << "\n";
 

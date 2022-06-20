@@ -357,7 +357,7 @@ void StaStateMachine::SyncDeviceConfigToWpa() const
     if (WifiStaHalInterface::GetInstance().ClearDeviceConfig() != WIFI_IDL_OPT_OK) {
         WIFI_LOGE("ClearDeviceConfig() failed!");
     } else {
-        WIFI_LOGD("ClearDeviceConfig() successed!");
+        WIFI_LOGD("ClearDeviceConfig() succeeded!");
         std::vector<WifiDeviceConfig> results;
         WifiSettings::GetInstance().GetDeviceConfig(results);
         for(WifiDeviceConfig result : results) {
@@ -865,7 +865,7 @@ void StaStateMachine::DealDisconnectEvent(InternalMessage *msg)
 #ifdef OHOS_ARCH_LITE
     IfConfig::GetInstance().FlushIpAddr(IF_NAME, IPTYPE_IPV4);
 #endif
-    /* Initialize connection informatoin. */
+    /* Initialize connection information. */
     InitWifiLinkedInfo();
     if (lastLinkedInfo.detailedState == DetailedState::CONNECTING) {
         linkedInfo.networkId = lastLinkedInfo.networkId;
@@ -916,7 +916,7 @@ void StaStateMachine::DealReConnectCmd(InternalMessage *msg)
     }
 
     if (linkedInfo.connState == ConnState::CONNECTED) {
-        WIFI_LOGE("Network is already connected, ignore the re-connect comand!\n");
+        WIFI_LOGE("Network is already connected, ignore the re-connect command!\n");
         return;
     }
 

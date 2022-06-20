@@ -739,7 +739,7 @@ void P2pStateMachine::StartDhcpClient()
     } else {
         WIFI_LOGE("pDhcpService or pDhcpResultNotify is nullptr, cannot get dhcp result.");
     }
-    WIFI_LOGI("Start Dhcp Cilent");
+    WIFI_LOGI("Start Dhcp Client");
 }
 
 void P2pStateMachine::HandleP2pServiceResp(const WifiP2pServiceResponse &resp, const WifiP2pDevice &dev) const

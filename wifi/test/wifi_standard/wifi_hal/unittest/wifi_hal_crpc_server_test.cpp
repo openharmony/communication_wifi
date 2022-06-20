@@ -104,7 +104,7 @@ HWTEST_F(WifiHalCRpcServerTest, OnTransactTest, TestSize.Level1)
     mContext->nPos = 2;
     mContext->nSize = strlen(buff2);
     EXPECT_TRUE(OnTransact(mServer, mContext) == 0);
-    EXPECT_TRUE(strstr(mContext->szWrite, "unsupport function") != nullptr);
+    EXPECT_TRUE(strstr(mContext->szWrite, "unsupported function") != nullptr);
     char buff3[] = "N|SetCountryCode|";
     mContext->oneProcess = buff3;
     mContext->nPos = 2;

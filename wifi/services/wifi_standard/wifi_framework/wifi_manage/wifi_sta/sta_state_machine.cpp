@@ -1611,11 +1611,11 @@ void StaStateMachine::GetIpState::GoInState()
             LOGE("ConfigstaticIpAddress failed!\n");
         }
     } else {
-        LOGI("GetIpState get dhcp result, isRoam=%{public}d, clientRunStatus=%{public}d.",
-            pStaStateMachine->isRoam, dhcpInfo.clientRunStatus);
         int dhcpRet = 0;
         DhcpServiceInfo dhcpInfo;
         pStaStateMachine->pDhcpService->GetDhcpInfo(IF_NAME, dhcpInfo);
+        LOGI("GetIpState get dhcp result, isRoam=%{public}d, clientRunStatus=%{public}d.",
+            pStaStateMachine->isRoam, dhcpInfo.clientRunStatus);
         pStaStateMachine->currentTpType = static_cast<int>(WifiSettings::GetInstance().GetDhcpIpType());
         if (pStaStateMachine->currentTpType == IPTYPE_IPV6) {
             dhcpRet = pStaStateMachine->pDhcpService->StartDhcpClient(IF_NAME, true);

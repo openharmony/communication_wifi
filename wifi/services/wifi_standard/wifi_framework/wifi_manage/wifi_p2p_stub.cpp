@@ -73,7 +73,7 @@ void WifiP2pStub::InitHandleMap()
     handleFuncMap[WIFI_SVR_CMD_GET_5G_CHANNEL_LIST] = &WifiP2pStub::OnHid2dGetChannelListFor5G;
     handleFuncMap[WIFI_SVR_CMD_GET_SELF_WIFI_CFG] = &WifiP2pStub::OnHid2dGetSelfWifiCfgInfo;
     handleFuncMap[WIFI_SVR_CMD_SET_PEER_WIFI_CFG] = &WifiP2pStub::OnHid2dSetPeerWifiCfgInfo;
-    handleFuncMap[WIFI_SVR_CMD_P2P_QUERY_LOCAL_DEVICE] = &WifiP2pStub::OnHid2dSetPeerWifiCfgInfo;
+    handleFuncMap[WIFI_SVR_CMD_P2P_QUERY_LOCAL_DEVICE] = &WifiP2pStub::OnQueryP2pLocalDevice;
     return;
 }
 

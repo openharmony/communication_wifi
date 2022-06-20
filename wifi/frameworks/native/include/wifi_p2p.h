@@ -191,12 +191,20 @@ public:
     virtual ErrCode GetP2pConnectedStatus(int &status) = 0;
 
     /**
-     * @Description Query the information about the found devices.
+     * @Description Query the local device information.
      *
-     * @param devives - Get result vector of WifiP2pDevice
+     * @param devives - Get result of WifiP2pDevice
      * @return ErrCode - operate result
      */
-    virtual ErrCode QueryP2pDevices(std::vector<WifiP2pDevice> &devives) = 0;
+    virtual ErrCode QueryP2pLocalDevice(WifiP2pDevice &device) = 0;
+
+    /**
+     * @Description Query the information about the found devices.
+     *
+     * @param devices - Get result vector of WifiP2pDevice
+     * @return ErrCode - operate result
+     */
+    virtual ErrCode QueryP2pDevices(std::vector<WifiP2pDevice> &devices) = 0;
 
     /**
      * @Description Query the information about the found groups.

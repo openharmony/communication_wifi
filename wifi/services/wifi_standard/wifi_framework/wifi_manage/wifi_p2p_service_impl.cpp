@@ -595,7 +595,7 @@ ErrCode WifiP2pServiceImpl::GetP2pConnectedStatus(int &status)
     return pService->GetP2pConnectedStatus(status);
 }
 
-ErrCode WifiP2pServiceImpl::QueryP2pDevices(std::vector<WifiP2pDevice> &devives)
+ErrCode WifiP2pServiceImpl::QueryP2pDevices(std::vector<WifiP2pDevice> &devices)
 {
     WIFI_LOGI("QueryP2pDevices");
     if (WifiPermissionUtils::VerifyGetWifiInfoInternalPermission() == PERMISSION_DENIED) {
@@ -622,15 +622,55 @@ ErrCode WifiP2pServiceImpl::QueryP2pDevices(std::vector<WifiP2pDevice> &devives)
         WIFI_LOGE("Get P2P service failed!");
         return WIFI_OPT_P2P_NOT_OPENED;
     }
-    return pService->QueryP2pDevices(devives);
+    return pService->QueryP2pDevices(devices);
+}
+
+ErrCode WifiP2pServiceImpl::QueryP2pLocalDevice(WifiP2pDevice &device)
+{
+    WIFI_LOGI("QueryP2pLocalDevice");
+    if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("QueryP2pLocalDevice:VerifyGetWifiInfoPermission PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+
+    if (WifiPermissionUtils::VerifyGetWifiConfigPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("QueryP2pLocalDevice:VerifyGetWifiConfigPermission PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+
+    if (!IsP2pServiceRunning()) {
+        WIFI_LOGE("P2pService is not runing!");
+        return WIFI_OPT_P2P_NOT_OPENED;
+    }
+
+    IP2pService *pService = WifiServiceManager::GetInstance().GetP2pServiceInst();
+    if (pService == nullptr) {
+        WIFI_LOGE("Get P2P service failed!");
+        return WIFI_OPT_P2P_NOT_OPENED;
+    }
+
+    ErrCode ret = pService->QueryP2pLocalDevice(device);
+    if (WifiPermissionUtils::VerifyGetWifiLocalMacPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("QueryP2pLocalDevice:VerifyGetWifiLocalMacPermission PERMISSION_DENIED!");
+        device.SetDeviceAddress("00:00:00:00:00:00");
+    }
+    return ret;
 }
 
 ErrCode WifiP2pServiceImpl::QueryP2pGroups(std::vector<WifiP2pGroupInfo> &groups)
 {
     WIFI_LOGI("QueryP2pGroups");
-    if (WifiPermissionUtils::VerifyGetWifiDirectDevicePermission() == PERMISSION_DENIED) {
-        WIFI_LOGE("QueryP2pGroups:VerifyGetWifiDirectDevicePermission PERMISSION_DENIED!");
-        return WIFI_OPT_PERMISSION_DENIED;
+    if (WifiPermissionUtils::VerifyGetWifiInfoInternalPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("QueryP2pGroups:VerifyGetWifiInfoInternalPermission PERMISSION_DENIED!");
+        if (WifiPermissionUtils::VerifyGetWifiDirectDevicePermission() == PERMISSION_DENIED) {
+            WIFI_LOGE("QueryP2pGroups:VerifyGetWifiDirectDevicePermission PERMISSION_DENIED!");
+            return WIFI_OPT_PERMISSION_DENIED;
+        }
+
+        if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
+            WIFI_LOGE("QueryP2pGroups:VerifyGetWifiInfoPermission PERMISSION_DENIED!");
+            return WIFI_OPT_PERMISSION_DENIED;
+        }
     }
 
     if (!IsP2pServiceRunning()) {

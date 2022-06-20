@@ -189,10 +189,16 @@ ErrCode WifiP2pImpl::GetP2pConnectedStatus(int &status)
     return client_->GetP2pConnectedStatus(status);
 }
 
-ErrCode WifiP2pImpl::QueryP2pDevices(std::vector<WifiP2pDevice> &devives)
+ErrCode WifiP2pImpl::QueryP2pDevices(std::vector<WifiP2pDevice> &devices)
 {
     RETURN_IF_FAIL(client_);
-    return client_->QueryP2pDevices(devives);
+    return client_->QueryP2pDevices(devices);
+}
+
+ErrCode WifiP2pImpl::QueryP2pLocalDevice(WifiP2pDevice &devices)
+{
+    RETURN_IF_FAIL(client_);
+    return client_->QueryP2pLocalDevice(devices);
 }
 
 ErrCode WifiP2pImpl::QueryP2pGroups(std::vector<WifiP2pGroupInfo> &groups)

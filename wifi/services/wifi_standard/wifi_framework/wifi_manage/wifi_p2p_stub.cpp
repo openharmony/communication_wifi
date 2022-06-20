@@ -73,6 +73,7 @@ void WifiP2pStub::InitHandleMap()
     handleFuncMap[WIFI_SVR_CMD_GET_5G_CHANNEL_LIST] = &WifiP2pStub::OnHid2dGetChannelListFor5G;
     handleFuncMap[WIFI_SVR_CMD_GET_SELF_WIFI_CFG] = &WifiP2pStub::OnHid2dGetSelfWifiCfgInfo;
     handleFuncMap[WIFI_SVR_CMD_SET_PEER_WIFI_CFG] = &WifiP2pStub::OnHid2dSetPeerWifiCfgInfo;
+    handleFuncMap[WIFI_SVR_CMD_P2P_QUERY_LOCAL_DEVICE] = &WifiP2pStub::OnQueryP2pLocalDevice;
     return;
 }
 
@@ -351,18 +352,30 @@ void WifiP2pStub::OnGetP2pConnectedStatus(
 void WifiP2pStub::OnQueryP2pDevices(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
-    std::vector<WifiP2pDevice> devives;
-    ErrCode ret = QueryP2pDevices(devives);
+    std::vector<WifiP2pDevice> devices;
+    ErrCode ret = QueryP2pDevices(devices);
 
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
-
     if (ret == WIFI_OPT_SUCCESS) {
-        int size = devives.size();
+        int size = devices.size();
         reply.WriteInt32(size);
         for (int i = 0; i < size; ++i) {
-            WriteWifiP2pDeviceData(reply, devives[i]);
+            WriteWifiP2pDeviceData(reply, devices[i]);
         }
+    }
+    return;
+}
+
+void WifiP2pStub::OnQueryP2pLocalDevice(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
+{
+    WIFI_LOGI("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+    WifiP2pDevice device;
+    ErrCode ret = QueryP2pLocalDevice(device);
+    reply.WriteInt32(0);
+    reply.WriteInt32(ret);
+    if (ret == WIFI_OPT_SUCCESS) {
+        WriteWifiP2pDeviceData(reply, device);
     }
     return;
 }

@@ -178,10 +178,10 @@ public:
 
     /**
      * @Description - The interface of query p2p devices information.
-     * @param  devives - information of devices.
+     * @param  devices - information of devices.
      * @return - ErrCode
      */
-    virtual ErrCode QueryP2pDevices(std::vector<WifiP2pDevice> &devives) = 0;
+    virtual ErrCode QueryP2pDevices(std::vector<WifiP2pDevice> &devices) = 0;
 
     /**
      * @Description - Query the information about own device.

@@ -279,6 +279,18 @@ WifiErrorCode GetP2pConnectedStatus(int* status)
     return GetCErrorCode(ret);
 }
 
+WifiErrorCode QueryP2pLocalDevice(WifiP2pDevice* deviceInfo)
+{
+    CHECK_PTR_RETURN(wifiP2pPtr, ERROR_WIFI_NOT_AVAILABLE);
+    CHECK_PTR_RETURN(deviceInfo, ERROR_WIFI_INVALID_ARGS);
+    OHOS::Wifi::WifiP2pDevice cppDeviceInfo;
+    OHOS::Wifi::ErrCode ret = wifiP2pPtr->QueryP2pLocalDevice(cppDeviceInfo);
+    if (ret != OHOS::Wifi::WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("QueryP2pLocalDevice return failed!");
+    }
+    return GetCErrorCode(ConvertP2PDeviceCppToC(cppDeviceInfo, deviceInfo));
+}
+
 WifiErrorCode QueryP2pDevices(WifiP2pDevice* clientDevices, int size, int* retSize)
 {
     CHECK_PTR_RETURN(wifiP2pPtr, ERROR_WIFI_NOT_AVAILABLE);

@@ -104,13 +104,14 @@ static ErrCode NativeInfoElemsToJsObj(const napi_env& env,
     napi_create_array(env, &arr);
     uint8_t idx_ie = 0;
     napi_status status;
+    int valueStep = 2;
     for (int i = 0; i < infoElems.size(); i++) {
         napi_value ieObj;
         napi_create_object(env, &ieObj);
         SetValueInt32(env, "eid", infoElems[i].id, ieObj);
         const char *uStr = &infoElems[i].content[0];
         int len = infoElems[i].content.size();
-        int inLen = (infoElems[i].content.size())*2 + 1;
+        int inLen = (infoElems[i].content.size()) * valueStep + 1;
         char *buf = (char *)calloc(inLen + 1, sizeof(char));
         if (buf == NULL) {
             return WIFI_OPT_FAILED;
@@ -124,10 +125,12 @@ static ErrCode NativeInfoElemsToJsObj(const napi_env& env,
                 return WIFI_OPT_FAILED;
             }
         }
-        SetValueUtf8String(env, "content", (const char *)buf, inLen - 1, ieObj);
+        SetValueUtf8String(env, "content", (const char *)buf, ieObj, inLen - 1);
         status = napi_set_element(env, arr, idx_ie++, ieObj);
         if (status != napi_ok) {
             WIFI_LOGE("set content error");
+            free(buf);
+            buf = NULL;
             return WIFI_OPT_FAILED;
         }
         free(buf);

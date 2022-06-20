@@ -467,7 +467,7 @@ static void GetScanInfoElems(Context *context, ScanInfo* scanInfo)
             return;
         }
         ReadUStr(context, (unsigned char *)scanInfo->infoElems[i].content,
-            scanInfo->infoElems[i].size+1);
+            scanInfo->infoElems[i].size + 1);
     }
 }
 

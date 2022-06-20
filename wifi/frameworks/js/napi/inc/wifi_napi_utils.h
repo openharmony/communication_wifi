@@ -80,8 +80,7 @@ napi_value JsObjectToInt(const napi_env& env, const napi_value& object, const ch
 napi_value JsObjectToUint(const napi_env& env, const napi_value& object, const char* fieldStr, uint32_t& fieldRef);
 napi_value JsObjectToBool(const napi_env& env, const napi_value& object, const char* fieldStr, bool& fieldRef);
 napi_status SetValueUtf8String(const napi_env& env, const char* fieldStr, const char* str,
-    size_t strLen, napi_value& result);
-napi_status SetValueUtf8String(const napi_env& env, const char* fieldStr, const char* str, napi_value& result);
+    napi_value& result, size_t strLen = NAPI_AUTO_LENGTH);
 napi_status SetValueInt32(const napi_env& env, const char* fieldStr, const int intValue, napi_value& result);
 napi_status SetValueUnsignedInt32(const napi_env& env, const char* fieldStr, const int intValue, napi_value& result);
 napi_status SetValueInt64(const napi_env& env, const char* fieldStr, const int64_t intValue, napi_value& result);

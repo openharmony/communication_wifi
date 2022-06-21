@@ -41,6 +41,13 @@ public:
     bool IsHotspotActive(void) override;
 
     /**
+     * @Description Check whether the hotspot supports dual band.
+     *
+     * @return bool - operation result
+     */
+    bool IsHotspotDualBandSupported(void) override;
+
+    /**
      * @Description Get the Hotspot Config object
      *
      * @param state - Result of obtaining the hotspot status

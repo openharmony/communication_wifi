@@ -167,7 +167,7 @@ int ExecDhcpRenew(void)
     return DHCP_OPT_SUCCESS;
 }
 
-/* Add dhcp option paramater request list. */
+/* Add dhcp option parameter request list. */
 static void AddParamaterRequestList(struct DhcpPacket *packet)
 {
     int end = GetEndOptionIndex(packet->options);
@@ -849,7 +849,7 @@ static int SyncDhcpResult(const struct DhcpPacket *packet, struct DhcpResult *re
         return DHCP_OPT_FAILED;
     }
 
-    /* Wirte to the file. */
+    /* Write to the file. */
     if (WriteDhcpResult(result) != DHCP_OPT_SUCCESS) {
         LOGE("SyncDhcpResult() error, WriteDhcpResult result failed!");
         return DHCP_OPT_FAILED;

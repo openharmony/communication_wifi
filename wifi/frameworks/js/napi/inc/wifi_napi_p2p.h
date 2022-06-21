@@ -24,6 +24,8 @@ namespace Wifi {
 napi_value GetP2pLinkedInfo(napi_env env, napi_callback_info info);
 napi_value GetCurrentGroup(napi_env env, napi_callback_info info);
 napi_value GetP2pDevices(napi_env env, napi_callback_info info);
+napi_value GetP2pLocalDevice(napi_env env, napi_callback_info info);
+napi_value GetP2pGroups(napi_env env, napi_callback_info info);
 napi_value CreateGroup(napi_env env, napi_callback_info info);
 napi_value RemoveGroup(napi_env env, napi_callback_info info);
 napi_value P2pConnect(napi_env env, napi_callback_info info);
@@ -32,6 +34,18 @@ napi_value StartDiscoverDevices(napi_env env, napi_callback_info info);
 napi_value StopDiscoverDevices(napi_env env, napi_callback_info info);
 napi_value DeletePersistentGroup(napi_env env, napi_callback_info info);
 napi_value SetDeviceName(napi_env env, napi_callback_info info);
+
+class P2pLocalDeviceAsyncContext : public AsyncContext {
+public:
+    WifiP2pDevice deviceInfo;
+
+    P2pLocalDeviceAsyncContext(napi_env env, napi_async_work work = nullptr, napi_deferred deferred = nullptr)
+        : AsyncContext(env, work, deferred) {}
+
+    P2pLocalDeviceAsyncContext() = delete;
+
+    ~P2pLocalDeviceAsyncContext() override {}
+};
 
 class QueryP2pDeviceAsyncContext : public AsyncContext {
 public:
@@ -67,6 +81,19 @@ public:
     P2pGroupInfoAsyncContext() = delete;
 
     ~P2pGroupInfoAsyncContext() override {}
+};
+
+class P2pGroupInfoListAsyncContext : public AsyncContext {
+public:
+    std::vector<WifiP2pGroupInfo> vecGroupInfoList;
+
+    P2pGroupInfoListAsyncContext(napi_env env, napi_async_work work = nullptr,
+        napi_deferred deferred = nullptr)
+        : AsyncContext(env, work, deferred) {}
+
+    P2pGroupInfoListAsyncContext() = delete;
+
+    ~P2pGroupInfoListAsyncContext() override {}
 };
 }  // namespace Wifi
 }  // namespace OHOS

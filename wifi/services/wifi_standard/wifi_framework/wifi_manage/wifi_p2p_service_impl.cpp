@@ -211,7 +211,7 @@ ErrCode WifiP2pServiceImpl::DiscoverDevices(void)
     }
 
     if (!IsP2pServiceRunning()) {
-        WIFI_LOGE("P2pService is not runing!");
+        WIFI_LOGE("P2pService is not running!");
         return WIFI_OPT_P2P_NOT_OPENED;
     }
 
@@ -232,7 +232,7 @@ ErrCode WifiP2pServiceImpl::StopDiscoverDevices(void)
     }
 
     if (!IsP2pServiceRunning()) {
-        WIFI_LOGE("P2pService is not runing!");
+        WIFI_LOGE("P2pService is not running!");
         return WIFI_OPT_P2P_NOT_OPENED;
     }
 
@@ -253,7 +253,7 @@ ErrCode WifiP2pServiceImpl::DiscoverServices(void)
     }
 
     if (!IsP2pServiceRunning()) {
-        WIFI_LOGE("P2pService is not runing!");
+        WIFI_LOGE("P2pService is not running!");
         return WIFI_OPT_P2P_NOT_OPENED;
     }
 
@@ -269,7 +269,7 @@ ErrCode WifiP2pServiceImpl::StopDiscoverServices(void)
 {
     WIFI_LOGI("StopDiscoverServices");
     if (!IsP2pServiceRunning()) {
-        WIFI_LOGE("P2pService is not runing!");
+        WIFI_LOGE("P2pService is not running!");
         return WIFI_OPT_P2P_NOT_OPENED;
     }
 
@@ -290,7 +290,7 @@ ErrCode WifiP2pServiceImpl::RequestService(const WifiP2pDevice &device, const Wi
     }
 
     if (!IsP2pServiceRunning()) {
-        WIFI_LOGE("P2pService is not runing!");
+        WIFI_LOGE("P2pService is not running!");
         return WIFI_OPT_P2P_NOT_OPENED;
     }
 
@@ -306,7 +306,7 @@ ErrCode WifiP2pServiceImpl::PutLocalP2pService(const WifiP2pServiceInfo &srvInfo
 {
     WIFI_LOGI("PutLocalP2pService, service name is [%{public}s]", srvInfo.GetServiceName().c_str());
     if (!IsP2pServiceRunning()) {
-        WIFI_LOGE("P2pService is not runing!");
+        WIFI_LOGE("P2pService is not running!");
         return WIFI_OPT_P2P_NOT_OPENED;
     }
 
@@ -322,7 +322,7 @@ ErrCode WifiP2pServiceImpl::DeleteLocalP2pService(const WifiP2pServiceInfo &srvI
 {
     WIFI_LOGI("DeleteLocalP2pService, service name is [%{public}s]", srvInfo.GetServiceName().c_str());
     if (!IsP2pServiceRunning()) {
-        WIFI_LOGE("P2pService is not runing!");
+        WIFI_LOGE("P2pService is not running!");
         return WIFI_OPT_P2P_NOT_OPENED;
     }
 
@@ -343,7 +343,7 @@ ErrCode WifiP2pServiceImpl::StartP2pListen(int period, int interval)
     }
 
     if (!IsP2pServiceRunning()) {
-        WIFI_LOGE("P2pService is not runing!");
+        WIFI_LOGE("P2pService is not running!");
         return WIFI_OPT_P2P_NOT_OPENED;
     }
 
@@ -364,7 +364,7 @@ ErrCode WifiP2pServiceImpl::StopP2pListen()
     }
 
     if (!IsP2pServiceRunning()) {
-        WIFI_LOGE("P2pService is not runing!");
+        WIFI_LOGE("P2pService is not running!");
         return WIFI_OPT_P2P_NOT_OPENED;
     }
 
@@ -385,7 +385,7 @@ ErrCode WifiP2pServiceImpl::CreateGroup(const WifiP2pConfig &config)
     }
 
     if (!IsP2pServiceRunning()) {
-        WIFI_LOGE("P2pService is not runing!");
+        WIFI_LOGE("P2pService is not running!");
         return WIFI_OPT_P2P_NOT_OPENED;
     }
 
@@ -406,7 +406,7 @@ ErrCode WifiP2pServiceImpl::RemoveGroup()
     }
 
     if (!IsP2pServiceRunning()) {
-        WIFI_LOGE("P2pService is not runing!");
+        WIFI_LOGE("P2pService is not running!");
         return WIFI_OPT_P2P_NOT_OPENED;
     }
 
@@ -432,7 +432,7 @@ ErrCode WifiP2pServiceImpl::DeleteGroup(const WifiP2pGroupInfo &group)
     }
 
     if (!IsP2pServiceRunning()) {
-        WIFI_LOGE("P2pService is not runing!");
+        WIFI_LOGE("P2pService is not running!");
         return WIFI_OPT_P2P_NOT_OPENED;
     }
 
@@ -462,7 +462,7 @@ ErrCode WifiP2pServiceImpl::P2pConnect(const WifiP2pConfig &config)
     }
 
     if (!IsP2pServiceRunning()) {
-        WIFI_LOGE("P2pService is not runing!");
+        WIFI_LOGE("P2pService is not running!");
         return WIFI_OPT_P2P_NOT_OPENED;
     }
 
@@ -483,7 +483,7 @@ ErrCode WifiP2pServiceImpl::P2pCancelConnect()
     }
 
     if (!IsP2pServiceRunning()) {
-        WIFI_LOGE("P2pService is not runing!");
+        WIFI_LOGE("P2pService is not running!");
         return WIFI_OPT_P2P_NOT_OPENED;
     }
 
@@ -504,7 +504,7 @@ ErrCode WifiP2pServiceImpl::QueryP2pLinkedInfo(WifiP2pLinkedInfo &linkedInfo)
     }
 
     if (!IsP2pServiceRunning()) {
-        WIFI_LOGE("P2pService is not runing!");
+        WIFI_LOGE("P2pService is not running!");
         return WIFI_OPT_P2P_NOT_OPENED;
     }
 
@@ -544,7 +544,7 @@ ErrCode WifiP2pServiceImpl::GetCurrentGroup(WifiP2pGroupInfo &group)
     }
 
     if (!IsP2pServiceRunning()) {
-        WIFI_LOGE("P2pService is not runing!");
+        WIFI_LOGE("P2pService is not running!");
         return WIFI_OPT_P2P_NOT_OPENED;
     }
 
@@ -567,7 +567,7 @@ ErrCode WifiP2pServiceImpl::GetP2pDiscoverStatus(int &status)
 {
     WIFI_LOGI("GetP2pDiscoverStatus");
     if (!IsP2pServiceRunning()) {
-        WIFI_LOGE("P2pService is not runing!");
+        WIFI_LOGE("P2pService is not running!");
         return WIFI_OPT_P2P_NOT_OPENED;
     }
 
@@ -583,7 +583,7 @@ ErrCode WifiP2pServiceImpl::GetP2pConnectedStatus(int &status)
 {
     WIFI_LOGI("GetP2pConnectedStatus");
     if (!IsP2pServiceRunning()) {
-        WIFI_LOGE("P2pService is not runing!");
+        WIFI_LOGE("P2pService is not running!");
         return WIFI_OPT_P2P_NOT_OPENED;
     }
 
@@ -595,7 +595,7 @@ ErrCode WifiP2pServiceImpl::GetP2pConnectedStatus(int &status)
     return pService->GetP2pConnectedStatus(status);
 }
 
-ErrCode WifiP2pServiceImpl::QueryP2pDevices(std::vector<WifiP2pDevice> &devives)
+ErrCode WifiP2pServiceImpl::QueryP2pDevices(std::vector<WifiP2pDevice> &devices)
 {
     WIFI_LOGI("QueryP2pDevices");
     if (WifiPermissionUtils::VerifyGetWifiInfoInternalPermission() == PERMISSION_DENIED) {
@@ -613,6 +613,32 @@ ErrCode WifiP2pServiceImpl::QueryP2pDevices(std::vector<WifiP2pDevice> &devives)
     }
 
     if (!IsP2pServiceRunning()) {
+        WIFI_LOGE("P2pService is not running!");
+        return WIFI_OPT_P2P_NOT_OPENED;
+    }
+
+    IP2pService *pService = WifiServiceManager::GetInstance().GetP2pServiceInst();
+    if (pService == nullptr) {
+        WIFI_LOGE("Get P2P service failed!");
+        return WIFI_OPT_P2P_NOT_OPENED;
+    }
+    return pService->QueryP2pDevices(devices);
+}
+
+ErrCode WifiP2pServiceImpl::QueryP2pLocalDevice(WifiP2pDevice &device)
+{
+    WIFI_LOGI("QueryP2pLocalDevice");
+    if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("QueryP2pLocalDevice:VerifyGetWifiInfoPermission PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+
+    if (WifiPermissionUtils::VerifyGetWifiConfigPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("QueryP2pLocalDevice:VerifyGetWifiConfigPermission PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+
+    if (!IsP2pServiceRunning()) {
         WIFI_LOGE("P2pService is not runing!");
         return WIFI_OPT_P2P_NOT_OPENED;
     }
@@ -622,19 +648,33 @@ ErrCode WifiP2pServiceImpl::QueryP2pDevices(std::vector<WifiP2pDevice> &devives)
         WIFI_LOGE("Get P2P service failed!");
         return WIFI_OPT_P2P_NOT_OPENED;
     }
-    return pService->QueryP2pDevices(devives);
+
+    ErrCode ret = pService->QueryP2pLocalDevice(device);
+    if (WifiPermissionUtils::VerifyGetWifiLocalMacPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("QueryP2pLocalDevice:VerifyGetWifiLocalMacPermission PERMISSION_DENIED!");
+        device.SetDeviceAddress("00:00:00:00:00:00");
+    }
+    return ret;
 }
 
 ErrCode WifiP2pServiceImpl::QueryP2pGroups(std::vector<WifiP2pGroupInfo> &groups)
 {
     WIFI_LOGI("QueryP2pGroups");
-    if (WifiPermissionUtils::VerifyGetWifiDirectDevicePermission() == PERMISSION_DENIED) {
-        WIFI_LOGE("QueryP2pGroups:VerifyGetWifiDirectDevicePermission PERMISSION_DENIED!");
-        return WIFI_OPT_PERMISSION_DENIED;
+    if (WifiPermissionUtils::VerifyGetWifiInfoInternalPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("QueryP2pGroups:VerifyGetWifiInfoInternalPermission PERMISSION_DENIED!");
+        if (WifiPermissionUtils::VerifyGetWifiDirectDevicePermission() == PERMISSION_DENIED) {
+            WIFI_LOGE("QueryP2pGroups:VerifyGetWifiDirectDevicePermission PERMISSION_DENIED!");
+            return WIFI_OPT_PERMISSION_DENIED;
+        }
+
+        if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
+            WIFI_LOGE("QueryP2pGroups:VerifyGetWifiInfoPermission PERMISSION_DENIED!");
+            return WIFI_OPT_PERMISSION_DENIED;
+        }
     }
 
     if (!IsP2pServiceRunning()) {
-        WIFI_LOGE("P2pService is not runing!");
+        WIFI_LOGE("P2pService is not running!");
         return WIFI_OPT_P2P_NOT_OPENED;
     }
 
@@ -650,7 +690,7 @@ ErrCode WifiP2pServiceImpl::QueryP2pServices(std::vector<WifiP2pServiceInfo> &se
 {
     WIFI_LOGI("QueryP2pServices");
     if (!IsP2pServiceRunning()) {
-        WIFI_LOGE("P2pService is not runing!");
+        WIFI_LOGE("P2pService is not running!");
         return WIFI_OPT_P2P_NOT_OPENED;
     }
 
@@ -712,7 +752,7 @@ ErrCode WifiP2pServiceImpl::SetP2pDeviceName(const std::string &deviceName)
     }
     WifiConfigCenter::GetInstance().SetP2pDeviceName(deviceName);
     if (!IsP2pServiceRunning()) {
-        WIFI_LOGE("P2pService is not runing!");
+        WIFI_LOGE("P2pService is not running!");
         return WIFI_OPT_SUCCESS;
     }
     IP2pService *pService = WifiServiceManager::GetInstance().GetP2pServiceInst();
@@ -727,7 +767,7 @@ ErrCode WifiP2pServiceImpl::SetP2pWfdInfo(const WifiP2pWfdInfo &wfdInfo)
 {
     WIFI_LOGI("SetP2pWfdInfo");
     if (!IsP2pServiceRunning()) {
-        WIFI_LOGE("P2pService is not runing!");
+        WIFI_LOGE("P2pService is not running!");
         return WIFI_OPT_P2P_NOT_OPENED;
     }
     IP2pService *pService = WifiServiceManager::GetInstance().GetP2pServiceInst();
@@ -790,7 +830,7 @@ ErrCode WifiP2pServiceImpl::Hid2dCreateGroup(const int frequency, FreqType type)
     }
 
     if (!IsP2pServiceRunning()) {
-        WIFI_LOGE("P2pService is not runing!");
+        WIFI_LOGE("P2pService is not running!");
         return WIFI_OPT_P2P_NOT_OPENED;
     }
 
@@ -818,7 +858,7 @@ ErrCode WifiP2pServiceImpl::Hid2dConnect(const Hid2dConnectConfig& config)
     }
 
     if (!IsP2pServiceRunning()) {
-        WIFI_LOGE("P2pService is not runing!");
+        WIFI_LOGE("P2pService is not running!");
         return WIFI_OPT_P2P_NOT_OPENED;
     }
 

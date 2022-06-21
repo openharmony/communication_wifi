@@ -142,17 +142,17 @@ import wf from '@ohos.wifi'; // Import the @ohos.wifi class.
 
 -   Obtaining the WLAN state
 
-1.  Call the  **isWifiActive​\(\)**  method to check whether WLAN is enabled.
+1.  Call the  **isWifiActive​\(\)**  method to check whether the WLAN is active.
 
     ```js
     var isWifiActive = wf.isWifiActive(); // Value true indicates that WLAN is enabled, and false indicates the opposite.
     ```
 
 
--   Starting a scan and obtaining the scan result
+-   Starting a scan and obtaining the scan results.
 
 1.  Call the  **scan​\(\)**  method to start a scan.
-2.  Call the  **getScanInfoList​\(\)**  method to obtain the scan result.
+2.  Call the  **getScanInfoList​\(\)**  method to obtain the scan results.
 
     ```js
     // Start a scan.
@@ -160,7 +160,7 @@ import wf from '@ohos.wifi'; // Import the @ohos.wifi class.
 
     // Wait for some time.
 
-    // Obtain the scan result.
+    // Obtain the scan results.
     wf.getScanInfos((err, result) => {
         if (err) {
             console.error("get scan info error");
@@ -184,7 +184,7 @@ import wf from '@ohos.wifi'; // Import the @ohos.wifi class.
 
 Set up a WLAN connection.
 
-1.  Call  **addDeviceConfig**  to add a hotspot configuration, and set up a WLAN based on the hotspot configuration ID or by calling  **connectToDevice**  with the hotspot configuration passed.
+1.  To set up a WLAN, you can call **addDeviceConfig**  to add a hotspot configuration first, and then use the returned hotspot configuration ID to coonect to a WLAN. Or you can set up a WLAN by calling  **connectToDevice**  through the hotspot configuration directly.
 
     ```js
     // Configure WLAN information.
@@ -204,12 +204,12 @@ Set up a WLAN connection.
             return;
         }
         console.info("config id: " + result);
-        // Set up a WLAN based on the hotspot configuration ID.
+        // Set up a WLAN based on the returned hotspot configuration ID.
         wf.connectToNetwork(result);
     });
 
     Method 2:
-    // Set up a WLAN by calling connectToDevice with the hotspot configuration passed.
+    // Set up a WLAN by calling connectToDevice with the hotspot configuration directly.
     wf.connectToDevice(config);
     ```
 

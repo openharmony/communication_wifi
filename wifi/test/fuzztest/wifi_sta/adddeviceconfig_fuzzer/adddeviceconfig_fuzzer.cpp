@@ -18,9 +18,9 @@
 
 namespace OHOS {
 namespace Wifi {
+    std::unique_ptr<WifiDevice> devicePtr = WifiDevice::GetInstance(WIFI_DEVICE_ABILITY_ID);
     bool AddDeviceConfigFuzzerTest(const uint8_t* data, size_t size)
     {
-        std::unique_ptr<WifiDevice> devicePtr = WifiDevice::GetInstance(WIFI_DEVICE_ABILITY_ID);
         if (devicePtr == nullptr) {
             return false;
         }

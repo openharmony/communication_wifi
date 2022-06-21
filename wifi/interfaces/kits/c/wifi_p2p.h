@@ -160,6 +160,14 @@ WifiErrorCode GetP2pConnectedStatus(int* status);
 WifiErrorCode QueryP2pDevices(WifiP2pDevice* clientDevices, int size, int* retSize);
 
 /**
+ * @Description Query the information about the local device info.
+ *
+ * @param deviceInfo - the WifiP2pDevice object
+ * @return ErrCode - operate result
+ */
+WifiErrorCode QueryP2pLocalDevice(WifiP2pDevice* deviceInfo);
+
+/**
  * @Description Query the information about the found groups.
  *
  * @param groupInfo - pre-allocate memory for group size

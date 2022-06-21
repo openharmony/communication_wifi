@@ -357,7 +357,7 @@ void StaStateMachine::SyncDeviceConfigToWpa() const
     if (WifiStaHalInterface::GetInstance().ClearDeviceConfig() != WIFI_IDL_OPT_OK) {
         WIFI_LOGE("ClearDeviceConfig() failed!");
     } else {
-        WIFI_LOGD("ClearDeviceConfig() successed!");
+        WIFI_LOGD("ClearDeviceConfig() succeeded!");
         std::vector<WifiDeviceConfig> results;
         WifiSettings::GetInstance().GetDeviceConfig(results);
         for(WifiDeviceConfig result : results) {
@@ -865,7 +865,7 @@ void StaStateMachine::DealDisconnectEvent(InternalMessage *msg)
 #ifdef OHOS_ARCH_LITE
     IfConfig::GetInstance().FlushIpAddr(IF_NAME, IPTYPE_IPV4);
 #endif
-    /* Initialize connection informatoin. */
+    /* Initialize connection information. */
     InitWifiLinkedInfo();
     if (lastLinkedInfo.detailedState == DetailedState::CONNECTING) {
         linkedInfo.networkId = lastLinkedInfo.networkId;
@@ -916,7 +916,7 @@ void StaStateMachine::DealReConnectCmd(InternalMessage *msg)
     }
 
     if (linkedInfo.connState == ConnState::CONNECTED) {
-        WIFI_LOGE("Network is already connected, ignore the re-connect comand!\n");
+        WIFI_LOGE("Network is already connected, ignore the re-connect command!\n");
         return;
     }
 
@@ -1617,19 +1617,16 @@ void StaStateMachine::GetIpState::GoInState()
             LOGE("ConfigstaticIpAddress failed!\n");
         }
     } else {
-        LOGI("GetIpState get dhcp result.");
         int dhcpRet = 0;
         DhcpServiceInfo dhcpInfo;
         pStaStateMachine->pDhcpService->GetDhcpInfo(IF_NAME, dhcpInfo);
-        if (pStaStateMachine->isRoam && dhcpInfo.clientRunStatus == 1) {
-            dhcpRet = pStaStateMachine->pDhcpService->RenewDhcpClient(IF_NAME);
+        LOGI("GetIpState get dhcp result, isRoam=%{public}d, clientRunStatus=%{public}d.",
+            pStaStateMachine->isRoam, dhcpInfo.clientRunStatus);
+        pStaStateMachine->currentTpType = static_cast<int>(WifiSettings::GetInstance().GetDhcpIpType());
+        if (pStaStateMachine->currentTpType == IPTYPE_IPV6) {
+            dhcpRet = pStaStateMachine->pDhcpService->StartDhcpClient(IF_NAME, true);
         } else {
-            pStaStateMachine->currentTpType = static_cast<int>(WifiSettings::GetInstance().GetDhcpIpType());
-            if (pStaStateMachine->currentTpType == IPTYPE_IPV4) {
-                dhcpRet = pStaStateMachine->pDhcpService->StartDhcpClient(IF_NAME, false);
-            } else {
-                dhcpRet = pStaStateMachine->pDhcpService->StartDhcpClient(IF_NAME, true);
-            }
+            dhcpRet = pStaStateMachine->pDhcpService->StartDhcpClient(IF_NAME, false);
         }
         if ((dhcpRet != 0) || (pStaStateMachine->pDhcpService->GetDhcpResult(
             IF_NAME, pStaStateMachine->pDhcpResultNotify, DHCP_TIME) != 0)) {
@@ -1855,10 +1852,12 @@ void StaStateMachine::ConnectToNetworkProcess(InternalMessage *msg)
         WIFI_LOGD("Device ssid = %s", deviceConfig.ssid.c_str());
     }
 
+    std::string macAddr;
+    WifiSettings::GetInstance().GetMacAddress(macAddr);
     linkedInfo.networkId = lastNetworkId;
     linkedInfo.bssid = bssid;
     linkedInfo.ssid = deviceConfig.ssid;
-    linkedInfo.macAddress = deviceConfig.macAddress;
+    linkedInfo.macAddress = macAddr;
     linkedInfo.ifHiddenSSID = deviceConfig.hiddenSSID;
     lastLinkedInfo.bssid = bssid;
     lastLinkedInfo.macAddress = deviceConfig.macAddress;
@@ -1928,7 +1927,8 @@ StaStateMachine::DhcpResultNotify::~DhcpResultNotify()
 
 void StaStateMachine::DhcpResultNotify::OnSuccess(int status, const std::string &ifname, DhcpResult &result)
 {
-    LOGI("Enter Sta DhcpResultNotify::OnSuccess. ifname=[%{public}s] status=[%d]\n", ifname.c_str(), status);
+    LOGI("Enter Sta DhcpResultNotify::OnSuccess. ifname=[%{public}s] status=[%{public}d]\n",
+        ifname.c_str(), status);
 
     if ((pStaStateMachine->linkedInfo.detailedState == DetailedState::DISCONNECTING) ||
         (pStaStateMachine->linkedInfo.detailedState == DetailedState::DISCONNECTED)) {
@@ -1976,15 +1976,18 @@ void StaStateMachine::DhcpResultNotify::OnSuccess(int status, const std::string 
 #ifdef OHOS_ARCH_LITE
         IfConfig::GetInstance().SetIfDnsAndRoute(result, result.iptype);
 #endif
-        if (pStaStateMachine->getIpSucNum == 0 || pStaStateMachine->isRoam) {
-            pStaStateMachine->SaveLinkstate(ConnState::CONNECTED, DetailedState::CONNECTED);
-            pStaStateMachine->staCallback.OnStaConnChanged(
-                OperateResState::CONNECT_AP_CONNECTED, pStaStateMachine->linkedInfo);
-            /* Wait for the network adapter information to take effect. */
-            sleep(SLEEPTIME);
-            /* Check whether the Internet access is normal by send http. */
-            pStaStateMachine->pNetcheck->SignalNetCheckThread();
-        }
+    }
+
+    WIFI_LOGI("DhcpResultNotify::OnSuccess, getIpSucNum=%{public}d, isRoam=%{public}d",
+        pStaStateMachine->getIpSucNum, pStaStateMachine->isRoam);
+    if (pStaStateMachine->getIpSucNum == 0 || pStaStateMachine->isRoam) {
+        pStaStateMachine->SaveLinkstate(ConnState::CONNECTED, DetailedState::CONNECTED);
+        pStaStateMachine->staCallback.OnStaConnChanged(
+            OperateResState::CONNECT_AP_CONNECTED, pStaStateMachine->linkedInfo);
+        /* Wait for the network adapter information to take effect. */
+        sleep(SLEEPTIME);
+        /* Check whether the Internet access is normal by send http. */
+        pStaStateMachine->pNetcheck->SignalNetCheckThread();
     }
     pStaStateMachine->getIpSucNum++;
     return;

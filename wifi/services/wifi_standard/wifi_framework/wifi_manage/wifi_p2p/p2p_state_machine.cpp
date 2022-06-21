@@ -739,7 +739,7 @@ void P2pStateMachine::StartDhcpClient()
     } else {
         WIFI_LOGE("pDhcpService or pDhcpResultNotify is nullptr, cannot get dhcp result.");
     }
-    WIFI_LOGI("Start Dhcp Cilent");
+    WIFI_LOGI("Start Dhcp Client");
 }
 
 void P2pStateMachine::HandleP2pServiceResp(const WifiP2pServiceResponse &resp, const WifiP2pDevice &dev) const
@@ -881,12 +881,20 @@ bool P2pStateMachine::DealCreateNewGroupWithConfig(const WifiP2pConfigInternal &
     return (ret == WIFI_IDL_OPT_FAILED) ? false : true ;
 }
 
+bool P2pStateMachine::IsInterfaceReuse() const
+{
+    return P2P_INTERFACE == "wlan0";
+}
+
 void P2pStateMachine::UpdateGroupInfoToWpa() const
 {
-    WifiErrorNo ret = WifiP2PHalInterface::GetInstance().RemoveNetwork(-1);
-    if (ret != WIFI_IDL_OPT_OK) {
-        WIFI_LOGE("Failed to delete all group info before update group info to wpa! Stop update!");
-        return;
+    WIFI_LOGI("Start update group info to wpa");
+    /* In the scenario of interface reuse, the configuration of sta may be deleted */
+    if (!IsInterfaceReuse()) {
+        if (WifiP2PHalInterface::GetInstance().RemoveNetwork(-1) != WIFI_IDL_OPT_OK) {
+            WIFI_LOGE("Failed to delete all group info before update group info to wpa! Stop update!");
+            return;
+        }
     }
     std::vector<WifiP2pGroupInfo> grpInfo = groupManager.GetGroups();
     int createdNetId = -1;
@@ -894,7 +902,7 @@ void P2pStateMachine::UpdateGroupInfoToWpa() const
     IdlP2pGroupConfig wpaConfig;
     for (unsigned int i = 0; i < grpInfo.size(); ++i) {
         grpBuf = grpInfo.at(i);
-        ret = WifiP2PHalInterface::GetInstance().P2pAddNetwork(createdNetId);
+        WifiErrorNo ret = WifiP2PHalInterface::GetInstance().P2pAddNetwork(createdNetId);
         if (ret == WIFI_IDL_OPT_OK) {
             grpBuf.SetNetworkId(createdNetId);
             wpaConfig.ssid = grpBuf.GetGroupName();

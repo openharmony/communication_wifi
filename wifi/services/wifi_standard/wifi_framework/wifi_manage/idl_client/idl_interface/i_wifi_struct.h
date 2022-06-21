@@ -235,7 +235,7 @@ typedef struct P2pGroupInfo {
 } P2pGroupInfo;
 
 typedef struct P2pInvitationInfo {
-    int type; /* 0:Recived, 1:Accepted */
+    int type; /* 0:Received, 1:Accepted */
     int persistentNetworkId;
     int operatingFrequency;
     char srcAddress[WIFI_MAC_ADDR_LENGTH + 1];

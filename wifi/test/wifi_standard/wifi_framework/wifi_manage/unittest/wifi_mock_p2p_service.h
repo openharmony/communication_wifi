@@ -47,7 +47,7 @@ public:
     ErrCode GetP2pEnableStatus(int &status);
     ErrCode GetP2pDiscoverStatus(int &status);
     ErrCode GetP2pConnectedStatus(int &status);
-    ErrCode QueryP2pDevices(std::vector<WifiP2pDevice> &devives);
+    ErrCode QueryP2pDevices(std::vector<WifiP2pDevice> &devices);
     ErrCode QueryP2pGroups(std::vector<WifiP2pGroupInfo> &groups);
     ErrCode QueryP2pServices(std::vector<WifiP2pServiceInfo> &services);
     ErrCode RegisterP2pServiceCallbacks(const IP2pServiceCallbacks &callbacks);

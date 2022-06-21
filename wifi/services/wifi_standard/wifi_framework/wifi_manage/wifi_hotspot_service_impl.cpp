@@ -103,6 +103,44 @@ ErrCode WifiHotspotServiceImpl::IsHotspotActive(bool &bActive)
     return WIFI_OPT_SUCCESS;
 }
 
+ErrCode WifiHotspotServiceImpl::IsHotspotDualBandSupported(bool &isSupported)
+{
+    WIFI_LOGI("IsHotspotDualBandSupported");
+    if (WifiPermissionUtils::VerifyGetWifiInfoInternalPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("IsHotspotDualBandSupported:VerifyGetWifiInfoInternalPermission PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+
+    if (WifiPermissionUtils::VerifyManageWifiHotspotPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("IsHotspotDualBandSupported:VerifyManageWifiHotspotPermission PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+
+    std::vector<BandType> bands;
+    if (WifiConfigCenter::GetInstance().GetValidBands(bands) < 0) {
+        WIFI_LOGE("IsHotspotDualBandSupported:GetValidBands return failed!");
+        return WIFI_OPT_FAILED;
+    }
+
+    bool is2GSupported = false;
+    bool is5GSupported = false;
+    isSupported = false;
+    for (size_t i = 0; i < bands.size(); i++) {
+        if (bands[i] == BandType::BAND_2GHZ) {
+            is2GSupported = true;
+        } else if (bands[i] == BandType::BAND_5GHZ) {
+            is5GSupported = true;
+        }
+        if (is2GSupported && is5GSupported) {
+            isSupported = true;
+            break;
+        }
+    }
+
+    WIFI_LOGI("2.4G band supported: %{public}d, 5G band supported: %{public}d", is2GSupported, is5GSupported);
+    return WIFI_OPT_SUCCESS;
+}
+
 ErrCode WifiHotspotServiceImpl::GetHotspotState(int &state)
 {
     WIFI_LOGI("GetHotspotState");

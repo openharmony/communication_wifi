@@ -41,6 +41,13 @@ public:
     virtual bool IsHotspotActive(void) = 0;
 
     /**
+     * @Description Check whether the hotspot supports dual band.
+     *
+     * @return bool - operation result
+     */
+    virtual bool IsHotspotDualBandSupported(void) = 0;
+
+    /**
      * @Description Get the Hotspot Config object
      *
      * @param state - Result of obtaining the hotspot status

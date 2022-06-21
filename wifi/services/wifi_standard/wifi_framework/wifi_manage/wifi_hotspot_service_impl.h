@@ -48,6 +48,14 @@ public:
     ErrCode IsHotspotActive(bool &bActive) override;
 
     /**
+     * @Description Check whether the hotspot supports dual band.
+     *
+     * @param isSpuported - Supported / NOT supported
+     * @return ErrCode - operation result
+     */
+    ErrCode IsHotspotDualBandSupported(bool &isSpuported) override;
+
+    /**
      * @Description Get the Hotspot Config object
      *
      * @param state - Result of obtaining the hotspot status

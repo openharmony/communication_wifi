@@ -43,7 +43,7 @@ WifiHotspotProxy::~WifiHotspotProxy()
 ErrCode WifiHotspotProxy::IsHotspotActive(bool &bActive)
 {
     if (mRemoteDied) {
-        WIFI_LOGD("failed to `%{public}s`,remote service is died!", __func__);
+        WIFI_LOGE("failed to `%{public}s`,remote service is died!", __func__);
         return WIFI_OPT_FAILED;
     }
     MessageOption option;
@@ -68,6 +68,38 @@ ErrCode WifiHotspotProxy::IsHotspotActive(bool &bActive)
         return ErrCode(ret);
     }
     bActive = ((reply.ReadInt32() == 1) ? true : false);
+    return WIFI_OPT_SUCCESS;
+}
+
+ErrCode WifiHotspotProxy::IsHotspotDualBandSupported(bool &isSupported)
+{
+    if (mRemoteDied) {
+        WIFI_LOGE("failed to `%{public}s`,remote service is died!", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    MessageOption option;
+    MessageParcel data;
+    MessageParcel reply;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    data.WriteInt32(0);
+    int error = Remote()->SendRequest(WIFI_SVR_CMD_IS_HOTSPOT_DUAL_BAND_SUPPORTED, data, reply, option);
+    if (error != ERR_NONE) {
+        WIFI_LOGE("Set Attr(%{public}d) failed", WIFI_SVR_CMD_IS_HOTSPOT_DUAL_BAND_SUPPORTED);
+        return WIFI_OPT_FAILED;
+    }
+    int exception = reply.ReadInt32();
+    if (exception) {
+        return WIFI_OPT_FAILED;
+    }
+    int ret = reply.ReadInt32();
+    if (ErrCode(ret) != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("reply failed: %d", ret);
+        return ErrCode(ret);
+    }
+    isSupported = ((reply.ReadInt32() == 1) ? true : false);
     return WIFI_OPT_SUCCESS;
 }
 

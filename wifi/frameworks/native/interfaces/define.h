@@ -75,6 +75,7 @@
 #define WIFI_SVR_CMD_GET_SUPPORTED_POWER_MODEL 0X1111 /* get supported power model */
 #define WIFI_SVR_CMD_GET_POWER_MODEL 0X1112 /* get power model */
 #define WIFI_SVR_CMD_SET_POWER_MODEL 0X1113 /* set power model */
+#define WIFI_SVR_CMD_IS_HOTSPOT_DUAL_BAND_SUPPORTED 0X1114 /* whether dual band is supported */
 
 /* -------------p2p module message define----------------- */
 #define WIFI_SVR_CMD_P2P_ENABLE 0x2000                 /* open p2p */

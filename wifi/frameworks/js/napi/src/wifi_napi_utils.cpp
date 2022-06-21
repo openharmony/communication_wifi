@@ -136,10 +136,12 @@ napi_value JsObjectToBool(const napi_env& env, const napi_value& object, const c
     return UndefinedNapiValue(env);
 }
 
-napi_status SetValueUtf8String(const napi_env& env, const char* fieldStr, const char* str, napi_value& result)
+napi_status SetValueUtf8String(const napi_env& env, const char* fieldStr, const char* str,
+    napi_value& result, size_t strLen)
 {
     napi_value value;
-    napi_status status = napi_create_string_utf8(env, str, NAPI_AUTO_LENGTH, &value);
+    size_t len = strLen;
+    napi_status status = napi_create_string_utf8(env, str, len, &value);
     if (status != napi_ok) {
         WIFI_LOGE("Set value create utf8 string error! field: %{public}s", fieldStr);
         return status;

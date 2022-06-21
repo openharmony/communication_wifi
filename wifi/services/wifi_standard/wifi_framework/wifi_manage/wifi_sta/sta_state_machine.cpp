@@ -183,6 +183,7 @@ void StaStateMachine::InitWifiLinkedInfo()
     linkedInfo.ssid = "";
     linkedInfo.bssid = "";
     linkedInfo.macAddress = "";
+    linkedInfo.macType = 0;
     linkedInfo.rxLinkSpeed = 0;
     linkedInfo.txLinkSpeed = 0;
     linkedInfo.rssi = 0;
@@ -205,6 +206,7 @@ void StaStateMachine::InitLastWifiLinkedInfo()
     lastLinkedInfo.ssid = "";
     lastLinkedInfo.bssid = "";
     lastLinkedInfo.macAddress = "";
+    linkedInfo.macType = 0;
     lastLinkedInfo.rxLinkSpeed = 0;
     lastLinkedInfo.txLinkSpeed = 0;
     lastLinkedInfo.rssi = 0;

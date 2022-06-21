@@ -450,6 +450,27 @@ WifiErrorNo GetNetworkList(WifiNetworkInfo *infos, int *size)
     return result;
 }
 
+static void GetScanInfoElems(Context *context, ScanInfo* scanInfo)
+{
+    ReadInt(context, &scanInfo->ieSize);
+    /* This pointer will be released in its client */
+    scanInfo->infoElems = (ScanInfoElem *)calloc(scanInfo->ieSize, sizeof(ScanInfoElem));
+    if (scanInfo->infoElems == NULL) {
+        return;
+    }
+    for (int i = 0; i < scanInfo->ieSize; ++i) {
+        ReadInt(context, (int *)&scanInfo->infoElems[i].id);
+        ReadInt(context, &scanInfo->infoElems[i].size);
+        /* This pointer will be released in its client */
+        scanInfo->infoElems[i].content = calloc(scanInfo->infoElems[i].size + 1, sizeof(char));
+        if (scanInfo->infoElems[i].content == NULL) {
+            return;
+        }
+        ReadUStr(context, (unsigned char *)scanInfo->infoElems[i].content,
+            scanInfo->infoElems[i].size + 1);
+    }
+}
+
 ScanInfo* GetScanInfos(int *size)
 {
     RpcClient *client = GetStaRpcClient();
@@ -480,6 +501,10 @@ ScanInfo* GetScanInfos(int *size)
                     ReadStr(context, scanInfos[i].capability, WIFI_SCAN_INFO_CAPABILITIES_LENGTH);
                     ReadStr(context, scanInfos[i].ssid, WIFI_SSID_LENGTH);
                     ReadInt64(context, &scanInfos[i].timestamp);
+                    ReadInt(context, &scanInfos[i].channelWidth);
+                    ReadInt(context, &scanInfos[i].centerFrequency0);
+                    ReadInt(context, &scanInfos[i].centerFrequency1);
+                    GetScanInfoElems(context, &scanInfos[i]);
                 }
             } else {
                 LOGE("GetScanInfos alloc mem failed!");

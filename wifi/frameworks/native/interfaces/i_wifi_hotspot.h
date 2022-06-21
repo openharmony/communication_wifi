@@ -41,6 +41,14 @@ public:
     virtual ErrCode IsHotspotActive(bool &bActive) = 0;
 
     /**
+     * @Description Check whether the hotspot supports dual band.
+     *
+     * @param isSupported - Supported / NOT supported
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode IsHotspotDualBandSupported(bool &isSupported) = 0;
+
+    /**
      * @Description Get the Hotspot Config object
      *
      * @param config - HotapotConfig object

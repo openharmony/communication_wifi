@@ -68,8 +68,7 @@ napi_value IsHotspotDualBandSupported(napi_env env, napi_callback_info info)
 {
     NAPI_ASSERT(env, wifiHotspotPtr != nullptr, "Wifi hotspot instance is null.");
     napi_value result;
-    /* This interface is not supported currently */
-    napi_get_boolean(env, false, &result);
+    napi_get_boolean(env, wifiHotspotPtr->IsHotspotDualBandSupported(), &result);
     return result;
 }
 

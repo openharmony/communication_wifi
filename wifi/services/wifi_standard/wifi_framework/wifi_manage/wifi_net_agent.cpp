@@ -34,6 +34,7 @@ WifiNetAgent::~WifiNetAgent() = default;
 
 bool WifiNetAgent::RegisterNetSupplier()
 {
+    TimeStats timeStats(__func__);
     WIFI_LOGI("Enter RegisterNetSupplier.");
     auto netManager = DelayedSingleton<NetConnClient>::GetInstance();
     if (netManager == nullptr) {
@@ -55,6 +56,7 @@ bool WifiNetAgent::RegisterNetSupplier()
 
 bool WifiNetAgent::RegisterNetSupplierCallback(const StaServiceCallback &callback)
 {
+    TimeStats timeStats(__func__);
     WIFI_LOGI("Enter RegisterNetSupplierCallback.");
     auto netManager = DelayedSingleton<NetConnClient>::GetInstance();
     if (netManager == nullptr) {
@@ -79,6 +81,7 @@ bool WifiNetAgent::RegisterNetSupplierCallback(const StaServiceCallback &callbac
 
 void WifiNetAgent::UnregisterNetSupplier()
 {
+    TimeStats timeStats(__func__);
     WIFI_LOGI("Enter UnregisterNetSupplier.");
     auto netManager = DelayedSingleton<NetConnClient>::GetInstance();
     if (netManager == nullptr) {
@@ -91,6 +94,7 @@ void WifiNetAgent::UnregisterNetSupplier()
 
 void WifiNetAgent::UpdateNetSupplierInfo(sptr<NetManagerStandard::NetSupplierInfo> &netSupplierInfo)
 {
+    TimeStats timeStats(__func__);
     WIFI_LOGI("Enter UpdateNetSupplierInfo.");
     auto netManager = DelayedSingleton<NetConnClient>::GetInstance();
     if (netManager == nullptr) {
@@ -102,9 +106,10 @@ void WifiNetAgent::UpdateNetSupplierInfo(sptr<NetManagerStandard::NetSupplierInf
     WIFI_LOGI("Update network result:%{public}d", result);
 }
 
-void WifiNetAgent::UpdateNetLinkInfo(std::string &ip, std::string &mask, std::string &gateWay,
-    std::string &strDns, std::string &strBakDns)
+void WifiNetAgent::UpdateNetLinkInfo(const std::string &ip, const std::string &mask, const std::string &gateWay,
+    const std::string &strDns, const std::string &strBakDns)
 {
+    TimeStats timeStats(__func__);
     WIFI_LOGI("Enter UpdateNetLinkInfo.");
     auto netManager = DelayedSingleton<NetConnClient>::GetInstance();
     if (netManager == nullptr) {
@@ -149,12 +154,13 @@ void WifiNetAgent::UpdateNetLinkInfo(std::string &ip, std::string &mask, std::st
     netLinkInfo->routeList_.push_back(*localRoute);
 
     int32_t result = netManager->UpdateNetLinkInfo(supplierId, netLinkInfo);
-    WIFI_LOGI("result:%{public}d", result);
+    WIFI_LOGI("UpdateNetLinkInfo result:%{public}d", result);
 }
 
 bool WifiNetAgent::AddRoute(const std::string interface, const std::string ipAddress, int prefixLength)
 {
-    LOGI("Net agent addroute");
+    TimeStats timeStats(__func__);
+    LOGI("NetAgent add route");
     unsigned int ipInt = IpTools::ConvertIpv4Address(ipAddress);
     std::string mask = IpTools::ConvertIpv4Mask(prefixLength);
     unsigned int maskInt = IpTools::ConvertIpv4Address(mask);
@@ -179,6 +185,7 @@ bool WifiNetAgent::AddRoute(const std::string interface, const std::string ipAdd
     LOGI("Add route, interface: %{public}s, destAddress: %{public}s, ipAddress: %{public}s, prefixLength: %{public}d",
         interface.c_str(), IpAnonymize(destAddress).c_str(), IpAnonymize(ipAddress).c_str(), prefixLength);
     netsysService->NetworkAddRoute(OHOS::nmd::LOCAL_NETWORK_NETID, interface, destAddress, ipAddress);
+    LOGI("NetAgent add route finish");
     return true;
 }
 

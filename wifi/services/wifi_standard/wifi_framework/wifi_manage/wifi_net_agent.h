@@ -68,8 +68,8 @@ public:
      * @param supplierId network unique identity id returned after network registration
      * @param netLinkInfo network link data information
      */
-    void UpdateNetLinkInfo(std::string &ip, std::string &mask, std::string &gateWay,
-        std::string &strDns, std::string &strBakDns);
+    void UpdateNetLinkInfo(const std::string &ip, const std::string &mask, const std::string &gateWay,
+        const std::string &strDns, const std::string &strBakDns);
 
     /**
      * Add route

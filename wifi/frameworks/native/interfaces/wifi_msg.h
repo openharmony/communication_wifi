@@ -112,6 +112,7 @@ struct WifiLinkedInfo {
     int frequency;
     int linkSpeed; /* units: Mbps */
     std::string macAddress;
+    int macType;
     unsigned int ipAddress;
     ConnState connState;
     bool ifHiddenSSID;

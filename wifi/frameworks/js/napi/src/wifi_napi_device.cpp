@@ -97,6 +97,53 @@ static SecTypeJs SecurityTypeNativeToJs(const WifiSecurity& cppSecurityType)
     return jsSecurityType;
 }
 
+static ErrCode NativeInfoElemsToJsObj(const napi_env& env,
+    const std::vector<WifiInfoElem>& infoElems, napi_value& eachObj)
+{
+    napi_value arr;
+    napi_create_array(env, &arr);
+    uint8_t idx_ie = 0;
+    napi_status status;
+    int valueStep = 2;
+    for (int i = 0; i < infoElems.size(); i++) {
+        napi_value ieObj;
+        napi_create_object(env, &ieObj);
+        SetValueInt32(env, "eid", infoElems[i].id, ieObj);
+        const char *uStr = &infoElems[i].content[0];
+        int len = infoElems[i].content.size();
+        int inLen = (infoElems[i].content.size()) * valueStep + 1;
+        char *buf = (char *)calloc(inLen + 1, sizeof(char));
+        if (buf == NULL) {
+            return WIFI_OPT_FAILED;
+        }
+        int pos = 0;
+        for (unsigned int i = 0; i < len; ++i) {
+            pos = (i << 1);
+            if (snprintf_s(buf + pos, inLen - pos, inLen - pos - 1, "%02x", uStr[i]) < 0) {
+                free(buf);
+                buf = NULL;
+                return WIFI_OPT_FAILED;
+            }
+        }
+        SetValueUtf8String(env, "content", (const char *)buf, ieObj, inLen - 1);
+        status = napi_set_element(env, arr, idx_ie++, ieObj);
+        if (status != napi_ok) {
+            WIFI_LOGE("set content error");
+            free(buf);
+            buf = NULL;
+            return WIFI_OPT_FAILED;
+        }
+        free(buf);
+        buf = NULL;
+    }
+    status = napi_set_named_property(env, eachObj, "infoElems", arr);
+    if (status != napi_ok) {
+        WIFI_LOGE("set infoElems error");
+        return WIFI_OPT_FAILED;
+    }
+    return WIFI_OPT_SUCCESS;
+}
+
 static ErrCode NativeScanInfosToJsObj(const napi_env& env,
     const std::vector<WifiScanInfo>& vecScnIanfos, napi_value& arrayResult)
 {
@@ -104,7 +151,6 @@ static ErrCode NativeScanInfosToJsObj(const napi_env& env,
     for (auto& each : vecScnIanfos) {
         napi_value eachObj;
         napi_create_object(env, &eachObj);
-
         SetValueUtf8String(env, "ssid", each.ssid.c_str(), eachObj);
         SetValueUtf8String(env, "bssid", each.bssid.c_str(), eachObj);
         SetValueUtf8String(env, "capabilities", each.capabilities.c_str(), eachObj);
@@ -113,8 +159,10 @@ static ErrCode NativeScanInfosToJsObj(const napi_env& env,
         SetValueInt32(env, "band", each.band, eachObj);
         SetValueInt32(env, "frequency", each.frequency, eachObj);
         SetValueInt32(env, "channelWidth", static_cast<int>(each.channelWidth), eachObj);
+        SetValueInt32(env, "centerFrequency0", each.centerFrequency0, eachObj);
+        SetValueInt32(env, "centerFrequency1", each.centerFrequency1, eachObj);
+        NativeInfoElemsToJsObj(env, each.infoElems, eachObj);
         SetValueInt64(env, "timestamp", each.timestamp, eachObj);
-
         napi_status status = napi_set_element(env, arrayResult, idx++, eachObj);
         if (status != napi_ok) {
             WIFI_LOGE("Wifi napi set element error: %{public}d, idx: %{public}d", status, idx - 1);
@@ -588,6 +636,7 @@ static void LinkedInfoToJs(const napi_env& env, WifiLinkedInfo& linkedInfo, napi
     SetValueInt32(env, "chload", linkedInfo.chload, result);
     SetValueInt32(env, "snr", linkedInfo.snr, result);
     SetValueUtf8String(env, "macAddress", linkedInfo.macAddress.c_str(), result);
+    SetValueInt32(env, "macType", linkedInfo.macType, result);
     SetValueUnsignedInt32(env, "ipAddress", linkedInfo.ipAddress, result);
     SetValueInt32(env, "suppState", static_cast<int>(linkedInfo.supplicantState), result);
     SetValueInt32(env, "connState", static_cast<int>(linkedInfo.connState), result);

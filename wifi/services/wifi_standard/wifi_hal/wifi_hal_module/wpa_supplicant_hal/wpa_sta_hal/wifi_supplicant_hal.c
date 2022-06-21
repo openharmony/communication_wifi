@@ -16,6 +16,7 @@
 #include "wifi_supplicant_hal.h"
 #include <poll.h>
 #include <pthread.h>
+#include <stdbool.h>
 #include "wifi_hal_callback.h"
 #include "securec.h"
 #include "wifi_log.h"
@@ -31,6 +32,8 @@
 #define SCAN_INFO_ONE 1
 #define SCAN_INFO_TWO 2
 #define SCAN_INFO_THREE 3
+#define SCAN_INFO_FOUR 4
+#define SCAN_INFO_FIVE 5
 #define FAIL_PBC_OVERLAP_RETUEN 3
 #define CMD_BUFFER_SIZE 1024
 #define REPLY_BUF_LENGTH (4096 * 10)
@@ -39,6 +42,30 @@
 
 const int QUOTATION_MARKS_FLAG_YES = 0;
 const int QUOTATION_MARKS_FLAG_NO = 1;
+
+const unsigned int HT_OPER_EID = 61;
+const unsigned int VHT_OPER_EID = 192;
+const unsigned int EXT_EXIST_EID = 255;
+const unsigned int EXT_HE_OPER_EID = 36;
+const unsigned int HE_OPER_BASIC_LEN = 6;
+const unsigned int VHT_OPER_INFO_EXTST_MASK = 0x40;
+const unsigned int GHZ_HE_INFO_EXIST_MASK_6 = 0x02;
+const unsigned int GHZ_HE_WIDTH_MASK_6 = 0x03;
+const unsigned int BSS_EXIST_MASK = 0x80;
+const unsigned int VHT_OPER_INFO_BEGIN_INDEX = 6;
+const unsigned int VHT_INFO_SIZE = 3;
+const unsigned int HT_INFO_SIZE = 3;
+const unsigned int UINT8_MASK = 0xFF;
+const unsigned int UNSPECIFIED = -1;
+const unsigned int MAX_INFO_ELEMS_SIZE = 256;
+
+const unsigned int BAND_5_GHZ = 2;
+const unsigned int BAND_6_GHZ = 8;
+const unsigned int CHAN_WIDTH_20MHZ = 0;
+const unsigned int CHAN_WIDTH_40MHZ = 1;
+const unsigned int CHAN_WIDTH_80MHZ = 2;
+const unsigned int CHAN_WIDTH_160MHZ = 3;
+const unsigned int CHAN_WIDTH_80MHZ_MHZ = 4;
 
 WifiWpaStaInterface *g_wpaStaInterface = NULL;
 
@@ -710,6 +737,331 @@ static int WpaCliCmdScan(WifiWpaStaInterface *this, const ScanSettings *settings
     return 0;
 }
 
+static int ConvertChanToFreqMhz(int channel, int band)
+{
+    int BAND_FIRST_CH_NUM_24 = 1;
+    int BAND_LAST_CH_NUM_24 = 14;
+    int BAND_START_FREQ_MHZ_24 = 2412;
+    int BAND_FIRST_CH_NUM_5 = 32;
+    int BAND_LAST_CH_NUM_5 = 173;
+    int BAND_START_FREQ_MHZ_5 = 5160;
+    int BAND_FIRST_CH_NUM_6 = 1;
+    int BAND_LAST_CH_NUM_6 = 233;
+    int BAND_START_FREQ_MHZ_6 = 5955;
+    int BAND_CLA_2_FREQ_136_CH_MHZ_6 = 5935;
+    int BAND_24_GHZ = 1;
+    int BAND_SPECIAL = 2484;
+    int CHANNEL_SPECIAL = 14;
+    int CHANNEL_TIMES = 5;
+    int CHANNEL_TYPE = 2;
+
+    if (band == BAND_24_GHZ) {
+        if (channel == CHANNEL_SPECIAL) {
+            return BAND_SPECIAL;
+        } else if (channel >= BAND_FIRST_CH_NUM_24 && channel <= BAND_LAST_CH_NUM_24) {
+            return ((channel - BAND_FIRST_CH_NUM_24) * CHANNEL_TIMES) + BAND_START_FREQ_MHZ_24;
+        } else {
+            return UNSPECIFIED;
+        }
+    }
+    if (band == BAND_5_GHZ) {
+        if (channel >= BAND_FIRST_CH_NUM_5 && channel <= BAND_LAST_CH_NUM_5) {
+            return ((channel - BAND_FIRST_CH_NUM_5) * CHANNEL_TIMES) + BAND_START_FREQ_MHZ_5;
+        } else {
+            return UNSPECIFIED;
+        }
+    }
+    if (band == BAND_6_GHZ) {
+        if (channel >= BAND_FIRST_CH_NUM_6 && channel <= BAND_LAST_CH_NUM_6) {
+            if (channel == CHANNEL_TYPE) {
+                return BAND_CLA_2_FREQ_136_CH_MHZ_6;
+            }
+            return ((channel - BAND_FIRST_CH_NUM_6) * CHANNEL_TIMES) + BAND_START_FREQ_MHZ_6;
+            } else {
+                return UNSPECIFIED;
+            }
+    }
+    return UNSPECIFIED;
+}
+
+static int GetHeChanWidth(int heChannelWidth, int centerSegFreq0, int centerSegFreq1)
+{
+    int CHANNEL_WIDTH = 2;
+    int SEG_FREQ_VALUE = 8;
+    if (heChannelWidth == 0) {
+        return CHAN_WIDTH_20MHZ;
+    } else if (heChannelWidth == 1) {
+        return CHAN_WIDTH_40MHZ;
+    } else if (heChannelWidth == CHANNEL_WIDTH) {
+        return CHAN_WIDTH_80MHZ;
+    } else if (abs(centerSegFreq1 - centerSegFreq0) == SEG_FREQ_VALUE) {
+        return CHAN_WIDTH_160MHZ;
+    } else {
+        return CHAN_WIDTH_80MHZ_MHZ;
+    }
+}
+
+static int GetHeCentFreq(int centerSegFreq)
+{
+    if (centerSegFreq == 0) {
+        return 0;
+    }
+    return ConvertChanToFreqMhz(centerSegFreq, BAND_6_GHZ);
+}
+
+static int GetHtChanWidth(int secondOffsetChannel)
+{
+    if (secondOffsetChannel != 0) {
+        return CHAN_WIDTH_40MHZ;
+    } else {
+        return CHAN_WIDTH_20MHZ;
+    }
+}
+
+static int GetHtCentFreq0(int primaryFrequency, int secondOffsetChannel)
+{
+    int freqValue = 10;
+    int offsetChannle = 3;
+    if (secondOffsetChannel != 0) {
+        if (secondOffsetChannel == 1) {
+            return primaryFrequency + freqValue;
+        } else if (secondOffsetChannel == offsetChannle) {
+            return primaryFrequency - freqValue;
+        } else {
+            LOGE("error on get centFreq0");
+            return 0;
+        }
+    } else {
+        return primaryFrequency;
+    }
+}
+
+static int GetVhtChanWidth(int channelType, int centerFrequencyIndex1, int centerFrequencyIndex2)
+{
+    int FREQ_VALUE = 8;
+    if (channelType == 0) {
+        return UNSPECIFIED;
+    } else if (centerFrequencyIndex2 == 0) {
+        return CHAN_WIDTH_80MHZ;
+    } else if (abs(centerFrequencyIndex1 - centerFrequencyIndex2) == FREQ_VALUE) {
+        return CHAN_WIDTH_160MHZ;
+    } else {
+        return CHAN_WIDTH_80MHZ_MHZ;
+    }
+}
+
+static int GetVhtCentFreq(int channelType, int centerFrequencyIndex)
+{
+    if (centerFrequencyIndex == 0 || channelType == 0) {
+        return 0;
+    } else {
+        return ConvertChanToFreqMhz(centerFrequencyIndex, BAND_5_GHZ);
+    }
+}
+
+static int8_t IsValidHexCharAndConvert(char c)
+{
+    if (c >= '0' && c <= '9') {
+        return c - '0';
+    }
+    if (c >= 'a' && c <= 'f') {
+        return c - 'a' + ('9' - '0' + 1);
+    }
+    if (c >= 'A' && c <= 'F') {
+        return c - 'A' + ('9' - '0' + 1);
+    }
+    return -1;
+}
+
+static int HexStringToString(const char *str, char *out)
+{
+    unsigned len = strlen(str);
+    if ((len & 1) != 0) {
+        return -1;
+    }
+    const int hexShiftNum = 4;
+    for (unsigned i = 0, j = 0; i + 1 < len; ++i) {
+        int8_t high = IsValidHexCharAndConvert(str[i]);
+        int8_t low = IsValidHexCharAndConvert(str[++i]);
+        if (high < 0 || low < 0) {
+            return -1;
+        }
+        char tmp = ((high << hexShiftNum) | (low & 0x0F));
+        out[j] = tmp;
+        ++j;
+    }
+    return 0;
+}
+
+static bool GetChanWidthCenterFreqVht(ScanInfo *pcmd, ScanInfoElem* infoElem)
+{
+    if ((pcmd == NULL) || (infoElem == NULL)) {
+        LOGE("pcmd or infoElem is NULL.");
+        return false;
+    }
+    if ((infoElem->content == NULL) || ((unsigned int)infoElem->size < VHT_INFO_SIZE)) {
+        return false;
+    }
+    int channelType = infoElem->content[SCAN_INFO_NONE] & UINT8_MASK;
+    int centerFrequencyIndex1 = infoElem->content[SCAN_INFO_ONE] & UINT8_MASK;
+    int centerFrequencyIndex2 = infoElem->content[SCAN_INFO_TWO] & UINT8_MASK;
+    pcmd->channelWidth = GetVhtChanWidth(channelType, centerFrequencyIndex1, centerFrequencyIndex2);
+    if ((unsigned int)pcmd->channelWidth == UNSPECIFIED) {
+        return false;
+    }
+    pcmd->centerFrequency0 = GetVhtCentFreq(channelType, centerFrequencyIndex1);
+    pcmd->centerFrequency1 = GetVhtCentFreq(channelType, centerFrequencyIndex2);
+    return true;
+}
+
+static bool GetChanWidthCenterFreqHe(ScanInfo *pcmd, ScanInfoElem* infoElem)
+{
+    if ((pcmd == NULL) || (infoElem == NULL)) {
+        LOGE("pcmd or iesNeedParse is NULL.");
+        return false;
+    }
+    if ((infoElem->content == NULL) || ((unsigned int)infoElem->size < (HE_OPER_BASIC_LEN + 1))) {
+        return false;
+    }
+    if (infoElem->content[0] != EXT_HE_OPER_EID) {
+        return false;
+    }
+    char* content = infoElem->content + 1;
+    bool isVhtInfoExist = (content[SCAN_INFO_ONE] & VHT_OPER_INFO_EXTST_MASK) != 0;
+    bool is6GhzInfoExist = (content[SCAN_INFO_TWO] & GHZ_HE_INFO_EXIST_MASK_6) != 0;
+    bool coHostedBssPresent = (content[SCAN_INFO_ONE] & BSS_EXIST_MASK) != 0;
+    int expectedLen = HE_OPER_BASIC_LEN + (isVhtInfoExist ? SCAN_INFO_THREE : 0)
+        + (coHostedBssPresent ? 1 : 0) + (is6GhzInfoExist ? SCAN_INFO_FIVE: 0);
+    if (infoElem->size < expectedLen) {
+        return false;
+    }
+    if (is6GhzInfoExist) {
+        int startIndx = VHT_OPER_INFO_BEGIN_INDEX + (isVhtInfoExist ? SCAN_INFO_THREE : 0)
+            + (coHostedBssPresent ? 1 : 0);
+        int heChannelWidth = content[startIndx + 1] & GHZ_HE_WIDTH_MASK_6;
+        int centerSegFreq0 = content[startIndx + SCAN_INFO_TWO] & UINT8_MASK;
+        int centerSegFreq1 = content[startIndx + SCAN_INFO_THREE] & UINT8_MASK;
+        pcmd->channelWidth = GetHeChanWidth(heChannelWidth, centerSegFreq0, centerSegFreq1);
+        pcmd->centerFrequency0 = GetHeCentFreq(centerSegFreq0);
+        pcmd->centerFrequency1 = GetHeCentFreq(centerSegFreq1);
+        return true;
+    }
+    if (isVhtInfoExist) {
+        struct ScanInfoElem vhtInformation = {0};
+        vhtInformation.id = VHT_OPER_EID;
+        vhtInformation.size = VHT_INFO_SIZE;
+        vhtInformation.content = content + VHT_OPER_INFO_BEGIN_INDEX;
+        return GetChanWidthCenterFreqVht(pcmd, &vhtInformation);
+    }
+    return false;
+}
+
+static bool GetChanWidthCenterFreqHt(ScanInfo *pcmd, ScanInfoElem* infoElem)
+{
+    const int offsetBit = 0x3;
+    if ((pcmd == NULL) || (infoElem == NULL)) {
+        LOGE("pcmd or infoElem is NULL.");
+        return false;
+    }
+    if ((infoElem->content == NULL) || ((unsigned int)infoElem->size < HT_INFO_SIZE)) {
+        return false;
+    }
+    int secondOffsetChannel = infoElem->content[1] & offsetBit;
+    pcmd->channelWidth = GetHtChanWidth(secondOffsetChannel);
+    pcmd->centerFrequency0 = GetHtCentFreq0(pcmd->freq, secondOffsetChannel);
+    return true;
+}
+
+static void GetChanWidthCenterFreq(ScanInfo *pcmd, struct NeedParseIe* iesNeedParse)
+{
+    if ((pcmd == NULL) || (iesNeedParse == NULL)) {
+        LOGE("pcmd or iesNeedParse is NULL.");
+        return;
+    }
+
+    if ((iesNeedParse->ieExtern != NULL) && GetChanWidthCenterFreqHe(pcmd, iesNeedParse->ieExtern)) {
+        return;
+    }
+    if ((iesNeedParse->ieVhtOper != NULL) && GetChanWidthCenterFreqVht(pcmd, iesNeedParse->ieVhtOper)) {
+        return;
+    }
+    if ((iesNeedParse->ieHtOper != NULL) && GetChanWidthCenterFreqHt(pcmd, iesNeedParse->ieHtOper)) {
+        return;
+    }
+
+    LOGE("GetChanWidthCenterFreq fail.");
+    return;
+}
+
+static void RecordIeNeedParse(unsigned int id, ScanInfoElem* ie, struct NeedParseIe* iesNeedParse)
+{
+    if (iesNeedParse == NULL) {
+        return;
+    }
+    switch (id) {
+        case EXT_EXIST_EID:
+            iesNeedParse->ieExtern = ie;
+            break;
+        case VHT_OPER_EID:
+            iesNeedParse->ieVhtOper = ie;
+            break;
+        case HT_OPER_EID:
+            iesNeedParse->ieHtOper = ie;
+            break;
+        default:
+            break;
+    }
+}
+
+static void GetInfoElems(int length, int end, char *srcBuf, ScanInfo *pcmd)
+{
+    int len;
+    int start = end + 1;
+    int last = end + 1;
+    int lenValue = 2;
+    int lastLength = 3;
+    int remainingLength = length - start;
+    int infoElemsSize = 0;
+    struct NeedParseIe iesNeedParse = {NULL};
+    ScanInfoElem* infoElemsTemp = (ScanInfoElem *)calloc(MAX_INFO_ELEMS_SIZE, sizeof(ScanInfoElem));
+    if (infoElemsTemp == NULL) {
+        return;
+    }
+    while (remainingLength > 1) {
+        if (srcBuf[start] == '[') {
+            ++start;
+            infoElemsTemp[infoElemsSize].id = atoi(srcBuf + start);
+        }
+        if (srcBuf[start] != ' ') {
+            ++start;
+        }
+        if (srcBuf[last] != ']') {
+            ++last;
+            continue;
+        }
+        len = last - start - 1;
+        infoElemsTemp[infoElemsSize].size = len/lenValue;
+        infoElemsTemp[infoElemsSize].content = (char *)calloc(len/lenValue+1, sizeof(char));
+        if (infoElemsTemp[infoElemsSize].content == NULL) {
+            break;
+        }
+        ++start;
+        srcBuf[last] = '\0';
+        HexStringToString(srcBuf + start, infoElemsTemp[infoElemsSize].content);
+        if ((length - last) > lastLength) { // make sure there is no useless character
+            last = last + 1;
+        }
+        start = last;
+        remainingLength = length - last;
+        RecordIeNeedParse(infoElemsTemp[infoElemsSize].id, &infoElemsTemp[infoElemsSize], &iesNeedParse);
+        ++infoElemsSize;
+    }
+    GetChanWidthCenterFreq(pcmd, &iesNeedParse);
+    pcmd->infoElems = infoElemsTemp;
+    pcmd->ieSize = infoElemsSize;
+    return;
+}
+
 static int DelScanInfoLine(ScanInfo *pcmd, char *srcBuf, int length)
 {
     int i = 0;
@@ -736,19 +1088,13 @@ static int DelScanInfoLine(ScanInfo *pcmd, char *srcBuf, int length)
                 fail = 1;
                 break;
             }
-            start = end + 1;
-            char *res = strchr(srcBuf + start, '\t');
-            if (res == NULL) {
-                /* after ssid, maybe some IEs are reported */
-                LOGW("more IEs are reported, skip it for not support.");
-            } else {
-                *res = '\0';
-            }
+        } else if (i == SCAN_INFO_FOUR) {
             if (strcpy_s(pcmd->ssid, sizeof(pcmd->ssid), srcBuf + start) != EOK) {
                 fail = 1;
                 break;
             }
             printf_decode((u8 *)pcmd->ssid, sizeof(pcmd->ssid), pcmd->ssid);
+            GetInfoElems(length, end, srcBuf, pcmd);
             start = length;
             break;
         }

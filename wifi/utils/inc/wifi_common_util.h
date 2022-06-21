@@ -110,6 +110,21 @@ std::string GetBundleName();
  * @return bool - Returns true for yes, false for no.
  */
 bool IsSystemApp();
+
+/**
+ * @Description Time consuming statistics
+ *
+ */
+class TimeStats final {
+public:
+    TimeStats(const std::string desc);
+    TimeStats() = delete;
+    ~TimeStats();
+
+private:
+    std::string m_desc;
+    std::chrono::steady_clock::time_point m_startTime;
+};
 #endif
 }  // namespace Wifi
 }  // namespace OHOS

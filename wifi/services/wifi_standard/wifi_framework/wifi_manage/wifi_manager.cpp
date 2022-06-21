@@ -322,7 +322,7 @@ void WifiManager::CloseApService(void)
 
 void WifiManager::CloseScanService(void)
 {
-    WIFI_LOGD("close scan service");
+    WIFI_LOGI("close scan service");
     WifiServiceManager::GetInstance().UnloadService(WIFI_SERVICE_SCAN);
     WifiConfigCenter::GetInstance().SetScanMidState(WifiOprMidState::CLOSED);
     return;
@@ -433,6 +433,7 @@ void WifiManager::DealStaOpenRes(OperateResState state)
 
 void WifiManager::DealStaCloseRes(OperateResState state)
 {
+    WIFI_LOGI("Enter DealStaCloseRes");
     WifiEventCallbackMsg cbMsg;
     cbMsg.msgCode = WIFI_CBK_MSG_STATE_CHANGE;
     if (state == OperateResState::CLOSE_WIFI_CLOSING) {
@@ -520,6 +521,7 @@ void WifiManager::DealRssiChanged(int rssi)
 void WifiManager::CheckAndStartScanService(void)
 {
     WifiOprMidState scanState = WifiConfigCenter::GetInstance().GetScanMidState();
+    WIFI_LOGI("CheckAndStartScanService scanState: %{public}d", static_cast<int>(scanState));
     if (scanState != WifiOprMidState::CLOSED) {
         /* If the scanning function is enabled when the STA is not enabled, you need to start the scheduled
              scanning function immediately when the STA is enabled. */

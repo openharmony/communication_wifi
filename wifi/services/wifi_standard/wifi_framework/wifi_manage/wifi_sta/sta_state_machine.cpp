@@ -15,6 +15,7 @@
 
 #include "sta_state_machine.h"
 #include <cstdio>
+#include <thread>
 #include "log_helper.h"
 #include "sta_monitor.h"
 #include "wifi_logger.h"
@@ -349,6 +350,7 @@ ErrCode StaStateMachine::ConvertDeviceCfg(const WifiDeviceConfig &config) const
 
 void StaStateMachine::SyncDeviceConfigToWpa() const
 {
+    WIFI_LOGI("SyncDeviceConfigToWpa");
     /* Reload wifi Configurations. */
     if (WifiSettings::GetInstance().ReloadDeviceConfig() != 0) {
         WIFI_LOGE("ReloadDeviceConfig is failed!");
@@ -399,8 +401,11 @@ void StaStateMachine::StartWifiProcess()
             WIFI_LOGI("GetStaDeviceMacAddress failed!");
         }
 #ifndef OHOS_ARCH_LITE
-        WifiNetAgent::GetInstance().RegisterNetSupplier();
-        WifiNetAgent::GetInstance().RegisterNetSupplierCallback(staCallback);
+        WIFI_LOGI("Register netsupplier");
+        std::thread([this]() {
+            WifiNetAgent::GetInstance().RegisterNetSupplier();
+            WifiNetAgent::GetInstance().RegisterNetSupplierCallback(staCallback);
+        }).detach();
 #endif
         /* Initialize Connection Information. */
         InitWifiLinkedInfo();
@@ -515,8 +520,11 @@ void StaStateMachine::StopWifiProcess()
 {
     WIFI_LOGI("Enter StaStateMachine::StopWifiProcess.\n");
 #ifndef OHOS_ARCH_LITE
-    WifiNetAgent::GetInstance().UnregisterNetSupplier();
+    std::thread([this]() {
+        WifiNetAgent::GetInstance().UnregisterNetSupplier();
+    }).detach();
 #endif
+    WIFI_LOGI("Stop wifi is in process...\n");
     WifiSettings::GetInstance().SetWifiState(static_cast<int>(WifiState::DISABLING));
     staCallback.OnStaCloseRes(OperateResState::CLOSE_WIFI_CLOSING);
     StopTimer(static_cast<int>(CMD_SIGNAL_POLL));
@@ -685,6 +693,7 @@ void StaStateMachine::DealSignalPollResult(InternalMessage *msg)
             }
 #ifndef OHOS_ARCH_LITE
             if (NetSupplierInfo != nullptr) {
+                TimeStats timeStats("Call UpdateNetSupplierInfo");
                 NetSupplierInfo->isAvailable_ = true;
                 NetSupplierInfo->isRoaming_ = isRoam;
                 NetSupplierInfo->strength_ = linkedInfo.rssi;
@@ -823,7 +832,10 @@ void StaStateMachine::DealConnectionEvent(InternalMessage *msg)
     if (NetSupplierInfo != nullptr) {
         NetSupplierInfo->isAvailable_ = true;
         NetSupplierInfo->isRoaming_ = isRoam;
-        WifiNetAgent::GetInstance().UpdateNetSupplierInfo(NetSupplierInfo);
+        std::thread([this]() {
+            WIFI_LOGI("On connect update net supplier info\n");
+            WifiNetAgent::GetInstance().UpdateNetSupplierInfo(NetSupplierInfo);
+        }).detach();
     }
 #endif
     /* Callback result to InterfaceService. */
@@ -846,7 +858,10 @@ void StaStateMachine::DealDisconnectEvent(InternalMessage *msg)
 #ifndef OHOS_ARCH_LITE
     if (NetSupplierInfo != nullptr) {
         NetSupplierInfo->isAvailable_ = false;
-        WifiNetAgent::GetInstance().UpdateNetSupplierInfo(NetSupplierInfo);
+        std::thread([this]() {
+            WIFI_LOGI("On disconnect update net supplier info\n");
+            WifiNetAgent::GetInstance().UpdateNetSupplierInfo(NetSupplierInfo);
+        }).detach();
     }
 #endif
     StopTimer(static_cast<int>(CMD_SIGNAL_POLL));
@@ -1443,9 +1458,13 @@ void StaStateMachine::DisConnectProcess()
 #ifndef OHOS_ARCH_LITE
         if (NetSupplierInfo != nullptr) {
             NetSupplierInfo->isAvailable_ = false;
-            WifiNetAgent::GetInstance().UpdateNetSupplierInfo(NetSupplierInfo);
+            std::thread([this]() {
+                WIFI_LOGI("Disconnect process update netsupplierinfo");
+                WifiNetAgent::GetInstance().UpdateNetSupplierInfo(NetSupplierInfo);
+            }).detach();
         }
 #endif
+        WIFI_LOGI("Disconnect update wifi status");
         /* Save connection information to WifiSettings. */
         SaveLinkstate(ConnState::DISCONNECTED, DetailedState::DISCONNECTED);
         DisableNetwork(linkedInfo.networkId);
@@ -1963,8 +1982,11 @@ void StaStateMachine::DhcpResultNotify::OnSuccess(int status, const std::string 
                 IpAnonymize(result.strYourCli).c_str(), IpAnonymize(result.strSubnet).c_str(),
                 IpAnonymize(result.strRouter1).c_str(), IpAnonymize(result.strDns1).c_str(),
                 IpAnonymize(result.strDns2).c_str());
-            WifiNetAgent::GetInstance().UpdateNetLinkInfo(result.strYourCli, result.strSubnet, result.strRouter1,
-                result.strDns1, result.strDns2);
+            std::thread([result]() {
+                WIFI_LOGI("On dhcp success update net linke info");
+                WifiNetAgent::GetInstance().UpdateNetLinkInfo(result.strYourCli, result.strSubnet, result.strRouter1,
+                    result.strDns1, result.strDns2);
+            }).detach();
 #endif
         }
 #ifdef OHOS_ARCH_LITE

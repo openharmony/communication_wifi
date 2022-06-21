@@ -16,6 +16,7 @@
 #ifndef OHOS_WIFI_COMMON_UTIL_H
 #define OHOS_WIFI_COMMON_UTIL_H
 
+#include <chrono>
 #include <string>
 #include <vector>
 #include "securec.h"

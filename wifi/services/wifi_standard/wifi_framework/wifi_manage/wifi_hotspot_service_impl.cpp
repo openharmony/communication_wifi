@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -15,6 +15,7 @@
 
 #include "wifi_hotspot_service_impl.h"
 #include <file_ex.h>
+#include <csignal>
 #include "wifi_permission_utils.h"
 #include "wifi_global_func.h"
 #include "wifi_auth_center.h"
@@ -50,6 +51,44 @@ ErrCode WifiHotspotServiceImpl::IsHotspotActive(bool &bActive)
     }
 
     bActive = IsApServiceRunning();
+    return WIFI_OPT_SUCCESS;
+}
+
+ErrCode WifiHotspotServiceImpl::IsHotspotDualBandSupported(bool &isSupported)
+{
+    WIFI_LOGI("IsHotspotDualBandSupported");
+    if (WifiPermissionUtils::VerifyGetWifiInfoInternalPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("IsHotspotDualBandSupported:VerifyGetWifiInfoInternalPermission PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+
+    if (WifiPermissionUtils::VerifyManageWifiHotspotPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("IsHotspotDualBandSupported:VerifyManageWifiHotspotPermission PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+
+    std::vector<BandType> bands;
+    if (WifiConfigCenter::GetInstance().GetValidBands(bands) < 0) {
+        WIFI_LOGE("IsHotspotDualBandSupported:GetValidBands return failed!");
+        return WIFI_OPT_FAILED;
+    }
+
+    bool is2GSupported = false;
+    bool is5GSupported = false;
+    isSupported = false;
+    for (size_t i = 0; i < bands.size(); i++) {
+        if (bands[i] == BandType::BAND_2GHZ) {
+            is2GSupported = true;
+        } else if (bands[i] == BandType::BAND_5GHZ) {
+            is5GSupported = true;
+        }
+        if (is2GSupported && is5GSupported) {
+            isSupported = true;
+            break;
+        }
+    }
+
+    WIFI_LOGI("2.4G band supported: %{public}d, 5G band supported: %{public}d", is2GSupported, is5GSupported);
     return WIFI_OPT_SUCCESS;
 }
 
@@ -124,7 +163,7 @@ ErrCode WifiHotspotServiceImpl::SetHotspotConfig(const HotspotConfig &config)
     WifiConfigCenter::GetInstance().GetLinkedInfo(linkInfo);
 
     if (!linkInfo.ssid.empty() && linkInfo.ssid == config.GetSsid()) {
-        WIFI_LOGD("set ssid equal current linked ap ssid, no premission!");
+        WIFI_LOGD("set ssid equal current linked ap ssid, no permission!");
         return WIFI_OPT_INVALID_PARAM;
     }
 
@@ -543,7 +582,7 @@ void WifiHotspotServiceImpl::ConfigInfoDump(std::string& result)
 
     auto funcStrKeyMgmt = [&mapKeyMgmtToStr](KeyMgmt secType) {
         std::map<KeyMgmt, std::string>::iterator iter = mapKeyMgmtToStr.find(secType);
-        return (iter != mapKeyMgmtToStr.end()) ? iter->second : "Unknow";
+        return (iter != mapKeyMgmtToStr.end()) ? iter->second : "Unknown";
     };
     ss << "  Config.security_type: " << funcStrKeyMgmt(config.GetSecurityType()) << "\n";
 

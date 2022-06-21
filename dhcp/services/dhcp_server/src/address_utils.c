@@ -138,9 +138,9 @@ int NetworkBits(uint32_t netmask)
     return bits;
 }
 
-int HostBits(uint32_t netmask)
+uint32_t HostBits(uint32_t netmask)
 {
-    int bits = 0;
+    uint32_t bits = 0;
     uint32_t net = htonl(netmask);
     for (int i = IPV4_ADDRESS_BITS; i > 0; --i) {
         bits++;
@@ -152,10 +152,10 @@ int HostBits(uint32_t netmask)
     return bits;
 }
 
-int HostTotal(uint32_t netmask)
+uint32_t HostTotal(uint32_t netmask)
 {
-    int hostBits = HostBits(netmask);
-    int total = 1;
+    uint32_t hostBits = HostBits(netmask);
+    uint32_t total = 1;
     for (size_t i = 0; i < (size_t)hostBits; i++) {
         total *= BIT_MAX_VALUE;
     }

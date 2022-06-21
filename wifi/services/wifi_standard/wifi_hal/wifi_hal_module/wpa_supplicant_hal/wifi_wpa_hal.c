@@ -79,7 +79,7 @@ static void DealP2pFindInfo(char *buf)
             info.groupCapabilities = Hex2Dec(retMsg.value);
         } else if (strncmp(retMsg.key, "wfd_dev_info", strlen("wfd_dev_info")) == 0) {
             if (strlen(retMsg.value) != strlen("0x000000000000")) {
-                LOGD("Unexpect wfd device info, it's return 6 uint8 array convert to hex string!");
+                LOGD("Unexpected wfd device info, it's return 6 uint8 array convert to hex string!");
             } else {
                 StrSafeCopy(info.wfdDeviceInfo, sizeof(info.wfdDeviceInfo), retMsg.value);
                 info.wfdLength = strlen(info.wfdDeviceInfo);

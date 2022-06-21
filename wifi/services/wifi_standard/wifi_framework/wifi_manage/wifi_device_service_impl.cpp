@@ -15,6 +15,7 @@
 
 #include "wifi_device_service_impl.h"
 #include <algorithm>
+#include <csignal>
 #include <unistd.h>
 #ifndef OHOS_ARCH_LITE
 #include <file_ex.h>
@@ -77,12 +78,38 @@ WifiDeviceServiceImpl::WifiDeviceServiceImpl()
 WifiDeviceServiceImpl::~WifiDeviceServiceImpl()
 {}
 
+bool WifiDeviceServiceImpl::IsProcessNeedToRestart()
+{
+    return (WifiConfigCenter::GetInstance().GetWifiMidState() == WifiOprMidState::RUNNING);
+}
+
+void WifiDeviceServiceImpl::SigHandler(int sig)
+{
+    WIFI_LOGI("[Sta] Recv SIG: %{public}d\n", sig);
+    switch (sig) {
+        case SIGUSR1:
+            if (IsProcessNeedToRestart()) {
+                StaServiceCallback cb = WifiManager::GetInstance().GetStaCallback();
+                if (cb.OnStaCloseRes != nullptr) {
+                    cb.OnStaCloseRes(OperateResState::CLOSE_WIFI_SUCCEED);
+                }
+                WIFI_LOGE("[Sta] --------------Abort process to restart!!!--------------\n");
+                abort();
+            }
+            break;
+
+        default:
+            break;
+    }
+}
+
 void WifiDeviceServiceImpl::OnStart()
 {
     if (mState == ServiceRunningState::STATE_RUNNING) {
         WIFI_LOGD("Service has already started.");
         return;
     }
+    (void)signal(SIGUSR1, SigHandler);
     if (!Init()) {
         WIFI_LOGE("Failed to init service");
         OnStop();

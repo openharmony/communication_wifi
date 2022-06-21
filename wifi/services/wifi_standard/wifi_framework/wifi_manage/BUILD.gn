@@ -186,7 +186,8 @@ if (defined(ohos_lite)) {
       "$WIFI_ROOT_DIR/utils/inc",
       "//foundation/appexecfwk/adapter/interfaces/innerkits/appexecfwk_base/include",
       "//base/security/access_token/interfaces/innerkits/accesstoken/include",
-      "//foundation/communication/netmanager_base/services/netmanagernative/include/netsys",
+      "//foundation/communication/netmanager_base/frameworks/native/netmanagernative",
+      "//foundation/communication/netmanager_base/interfaces/innerkits/netmanagernative/include",
     ]
   }
 
@@ -355,6 +356,8 @@ if (defined(ohos_lite)) {
       "eventhandler:libeventhandler",
       "ipc:ipc_core",
       "netmanager_base:net_conn_manager_if",
+      "safwk:system_ability_fwk",
+      "samgr_standard:samgr_proxy",
     ]
     defines = [
       "FEATURE_AP_SUPPORT",

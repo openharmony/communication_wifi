@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,6 +14,8 @@
  */
 
 #include <signal.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include "server.h"
 #include "wifi_log.h"
 #include "wifi_hal_adapter.h"
@@ -26,6 +28,10 @@
 #undef LOG_TAG
 #define LOG_TAG "WifiHalService"
 
+#define BUF_LEN 32
+#define INVALID_PID (-1)
+#define WIFI_SERVICE_NAME "wifi_manager_se"
+
 static void SignalExit(int sig)
 {
     LOGI("Caught signal %{public}d", sig);
@@ -36,10 +42,45 @@ static void SignalExit(int sig)
     return;
 }
 
+int GetWifiServicePid(void)
+{
+    char cmd[BUF_LEN];
+    if (snprintf_s(cmd, sizeof(cmd), sizeof(cmd) - 1, "pidof -s %s", WIFI_SERVICE_NAME) < 0) {
+        return INVALID_PID;
+    }
+
+    FILE *p = popen(cmd, "r");
+    if (!p) {
+        return INVALID_PID;
+    }
+    const int base = 10;
+    char buf[BUF_LEN];
+    fgets(buf, BUF_LEN, p);
+    pclose(p);
+    return strtoul(buf, NULL, base);
+}
+
+static void SendStartNotify(void)
+{
+    int pid = GetWifiServicePid();
+    if (pid <= 0) {
+        return;
+    }
+    LOGI("Send SIGUSR1/2 SIG to pid %{public}d", pid);
+    int ret = kill(pid, SIGUSR1);
+    if (ret != 0) {
+        LOGE("Send SIGUSR1 SIG to pid %{public}d failed: %{public}d", pid, ret);
+    }
+    ret = kill(pid, SIGUSR2);
+    if (ret != 0) {
+        LOGE("Send SIGUSR2 SIG to pid %{public}d failed: %{public}d", pid, ret);
+    }
+}
+
 int main(void)
 {
+    LOGI("Wifi hal service starting...");
     char rpcSockPath[] = "/data/misc/wifi/unix_sock.sock";
-
     if (access(rpcSockPath, 0) == 0) {
         unlink(rpcSockPath);
     }
@@ -58,6 +99,7 @@ int main(void)
     signal(SIGTERM, SignalExit);
     signal(SIGPIPE, SIG_IGN);
 
+    SendStartNotify();
     RunRpcLoop(server);
     /* stop wpa_supplicant, hostapd, and other resources */
     ForceStop();

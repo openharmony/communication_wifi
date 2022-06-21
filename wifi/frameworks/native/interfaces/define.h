@@ -75,6 +75,7 @@
 #define WIFI_SVR_CMD_GET_SUPPORTED_POWER_MODEL 0X1111 /* get supported power model */
 #define WIFI_SVR_CMD_GET_POWER_MODEL 0X1112 /* get power model */
 #define WIFI_SVR_CMD_SET_POWER_MODEL 0X1113 /* set power model */
+#define WIFI_SVR_CMD_IS_HOTSPOT_DUAL_BAND_SUPPORTED 0X1114 /* whether dual band is supported */
 
 /* -------------p2p module message define----------------- */
 #define WIFI_SVR_CMD_P2P_ENABLE 0x2000                 /* open p2p */
@@ -116,6 +117,7 @@
 #define WIFI_SVR_CMD_GET_5G_CHANNEL_LIST 0x2024    /* get recommended channel */
 #define WIFI_SVR_CMD_GET_SELF_WIFI_CFG 0x2025    /* get self wifi configuration */
 #define WIFI_SVR_CMD_SET_PEER_WIFI_CFG 0x2026    /* set peer wifi configuration */
+#define WIFI_SVR_CMD_P2P_QUERY_LOCAL_DEVICE 0x2027 /* query the information about the local device */
 
 /* -----------register event type and message define-------------- */
 #define WIFI_CBK_CMD_STATE_CHANGE 0x1001         /* STA state change event */

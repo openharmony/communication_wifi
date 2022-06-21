@@ -213,7 +213,7 @@ static int TestServerCallback(int state, int code, const char *ifname)
             break;
         }
         case ST_STOPED: {
-            LOGD(" callback[%s] ==> server stoped.", ifname);
+            LOGD(" callback[%s] ==> server stopped.", ifname);
             break;
         }
         default:
@@ -293,7 +293,7 @@ bool DhcpServerTest::StartServerTest()
     if (InitDhcpClient() != RET_SUCCESS) {
         retval = false;
     }
-    LOGD("wait for test complated...");
+    LOGD("wait for test completed...");
     retval = ServerRun();
     return retval;
 }
@@ -303,7 +303,7 @@ void DhcpServerTest::DelayStopServer()
     const int SLEEP_TIME = 3;
     const int SLEEP_TIME1 = 1;
     const int SLEEP_TIME2 = 1;
-    LOGD("wait for dhcp server stoped...");
+    LOGD("wait for dhcp server stopped...");
     LOGD("wait %d seconds...\n", SERVER_RUNING_TIME);
     SystemFuncMock::GetInstance().SetMockFlag(true);
     EXPECT_CALL(SystemFuncMock::GetInstance(), close(_)).WillRepeatedly(Return(0));
@@ -320,7 +320,7 @@ void DhcpServerTest::DelayStopServer()
     int waitSesc = 0;
     while (waitSesc < SERVER_RUNING_TIME) {
         if (GetServerStatus(m_pServerCtx) == ST_STOPED) {
-            LOGD("dhcp server stoped.");
+            LOGD("dhcp server stopped.");
             break;
         } else {
             std::this_thread::sleep_for(std::chrono::seconds(SLEEP_TIME1));

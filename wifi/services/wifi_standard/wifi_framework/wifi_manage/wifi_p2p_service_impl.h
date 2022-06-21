@@ -202,10 +202,18 @@ public:
     /**
      * @Description Query the information about the found devices
      *
-     * @param devives - Get result vector of WifiP2pDevice
+     * @param devices - Get result vector of WifiP2pDevice
      * @return ErrCode - operate result
      */
-    ErrCode QueryP2pDevices(std::vector<WifiP2pDevice> &devives) override;
+    ErrCode QueryP2pDevices(std::vector<WifiP2pDevice> &devices) override;
+
+    /**
+     * @Description Query the information about the local device
+     *
+     * @param devives - Get result of WifiP2pDevice
+     * @return ErrCode - operate result
+     */
+    ErrCode QueryP2pLocalDevice(WifiP2pDevice &device) override;
 
     /**
      * @Description Query the information about the found groups

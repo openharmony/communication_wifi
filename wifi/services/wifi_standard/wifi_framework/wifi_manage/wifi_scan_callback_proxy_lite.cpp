@@ -46,7 +46,7 @@ void WifiScanCallbackProxy::OnWifiScanStateChanged(int state)
     int ret = SendRequest(sid_, WIFI_CBK_CMD_SCAN_STATE_CHANGE, &data, &reply, option, nullptr);
     switch (ret) {
         case ERR_NONE:
-            WIFI_LOGD("OnWifiScanStateChanged callback sucessed!");
+            WIFI_LOGD("OnWifiScanStateChanged callback succeeded!");
             break;
         default: {
             WIFI_LOGE("OnWifiScanStateChanged,connect done failed, error: %{public}d!", ret);

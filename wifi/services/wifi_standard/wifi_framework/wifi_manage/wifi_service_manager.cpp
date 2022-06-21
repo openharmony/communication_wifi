@@ -97,7 +97,7 @@ int WifiServiceManager::LoadStaService(const std::string &dlname, bool bCreate)
     mStaServiceHandle.create = (IStaService *(*)()) dlsym(mStaServiceHandle.handle, "Create");
     mStaServiceHandle.destroy = (void *(*)(IStaService *))dlsym(mStaServiceHandle.handle, "Destroy");
     if (mStaServiceHandle.create == nullptr || mStaServiceHandle.destroy == nullptr) {
-        WIFI_LOGE("%{public}s dlsym Create or Destory failed!", dlname.c_str());
+        WIFI_LOGE("%{public}s dlsym Create or Destroy failed!", dlname.c_str());
         dlclose(mStaServiceHandle.handle);
         mStaServiceHandle.Clear();
         return -1;
@@ -121,7 +121,7 @@ int WifiServiceManager::LoadScanService(const std::string &dlname, bool bCreate)
     mScanServiceHandle.create = (IScanService *(*)()) dlsym(mScanServiceHandle.handle, "Create");
     mScanServiceHandle.destroy = (void *(*)(IScanService *))dlsym(mScanServiceHandle.handle, "Destroy");
     if (mScanServiceHandle.create == nullptr || mScanServiceHandle.destroy == nullptr) {
-        WIFI_LOGE("%{public}s dlsym Create or Destory failed!", dlname.c_str());
+        WIFI_LOGE("%{public}s dlsym Create or Destroy failed!", dlname.c_str());
         dlclose(mScanServiceHandle.handle);
         mScanServiceHandle.Clear();
         return -1;
@@ -146,7 +146,7 @@ int WifiServiceManager::LoadApService(const std::string &dlname, bool bCreate)
     mApServiceHandle.create = (IApService *(*)(int)) dlsym(mApServiceHandle.handle, "Create");
     mApServiceHandle.destroy = (void *(*)(IApService *))dlsym(mApServiceHandle.handle, "Destroy");
     if (mApServiceHandle.create == nullptr || mApServiceHandle.destroy == nullptr) {
-        WIFI_LOGE("%{public}s dlsym Create or Destory failed!", dlname.c_str());
+        WIFI_LOGE("%{public}s dlsym Create or Destroy failed!", dlname.c_str());
         dlclose(mApServiceHandle.handle);
         mApServiceHandle.Clear();
         return -1;
@@ -176,7 +176,7 @@ int WifiServiceManager::LoadP2pService(const std::string &dlname, bool bCreate)
     mP2pServiceHandle.create = (IP2pService *(*)()) dlsym(mP2pServiceHandle.handle, "Create");
     mP2pServiceHandle.destroy = (void *(*)(IP2pService *))dlsym(mP2pServiceHandle.handle, "Destroy");
     if (mP2pServiceHandle.create == nullptr || mP2pServiceHandle.destroy == nullptr) {
-        WIFI_LOGE("%{public}s dlsym Create or Destory failed!", dlname.c_str());
+        WIFI_LOGE("%{public}s dlsym Create or Destroy failed!", dlname.c_str());
         dlclose(mP2pServiceHandle.handle);
         mP2pServiceHandle.Clear();
         return -1;

@@ -317,10 +317,10 @@ int OnTransact(RpcServer *server, Context *context)
     LOGI("run %{public}s", func);
     Rpcfunc pFunc = GetRpcFunc(func);
     if (pFunc == NULL) {
-        LOGD("unsupport function[%{public}s]", func);
+        LOGD("unsupported function[%{public}s]", func);
         WriteBegin(context, 0);
         WriteInt(context, WIFI_HAL_FAILED);
-        WriteStr(context, "unsupport function");
+        WriteStr(context, "unsupported function");
         WriteEnd(context);
     } else {
         ret = pFunc(server, context);

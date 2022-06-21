@@ -57,6 +57,7 @@ void WifiHotspotStub::InitHandleMap()
     handleFuncMap[WIFI_SVR_CMD_GET_SUPPORTED_POWER_MODEL] = &WifiHotspotStub::OnGetSupportedPowerModel;
     handleFuncMap[WIFI_SVR_CMD_GET_POWER_MODEL] = &WifiHotspotStub::OnGetPowerModel;
     handleFuncMap[WIFI_SVR_CMD_SET_POWER_MODEL] = &WifiHotspotStub::OnSetPowerModel;
+    handleFuncMap[WIFI_SVR_CMD_IS_HOTSPOT_DUAL_BAND_SUPPORTED] = &WifiHotspotStub::OnIsHotspotDualBandSupported;
     return;
 }
 
@@ -85,13 +86,27 @@ int WifiHotspotStub::OnRemoteRequest(uint32_t code, MessageParcel &data, Message
 
 void WifiHotspotStub::OnIsHotspotActive(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
-    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+    WIFI_LOGI("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
     bool bActive = false;
     ErrCode ret = IsHotspotActive(bActive);
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
     if (ret == WIFI_OPT_SUCCESS) {
         reply.WriteInt32(bActive ? 1 : 0);
+    }
+    return;
+}
+
+void WifiHotspotStub::OnIsHotspotDualBandSupported(uint32_t code, MessageParcel &data,
+    MessageParcel &reply, MessageOption &option)
+{
+    WIFI_LOGI("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+    bool isSupported = false;
+    ErrCode ret = IsHotspotDualBandSupported(isSupported);
+    reply.WriteInt32(0);
+    reply.WriteInt32(ret);
+    if (ret == WIFI_OPT_SUCCESS) {
+        reply.WriteInt32(isSupported ? 1 : 0);
     }
     return;
 }

@@ -134,6 +134,8 @@ private:
     bool IsScanServiceRunning();
     bool CheckConfigPwd(const WifiDeviceConfig &config);
     static void SaBasicDump(std::string& result);
+    static void SigHandler(int sig);
+    static bool IsProcessNeedToRestart();
 
 private:
     static constexpr int MAX_PRESHAREDKEY_LEN = 63;

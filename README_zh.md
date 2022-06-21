@@ -110,7 +110,7 @@ WLAN基础功能由@ohos.wifi类提供，其接口\(JS接口\)说明如下。
 </tr>
 <tr id="row176661944152919"><td class="cellrowborder" valign="top" width="40.864086408640865%" headers="mcps1.2.4.1.1 "><p id="p66661144122919"><a name="p66661144122919"></a><a name="p66661144122919"></a>function connectToDevice(config: WifiDeviceConfig): boolean</p>
 </td>
-<td class="cellrowborder" valign="top" width="44.704470447044706%" headers="mcps1.2.4.1.2 "><p id="p4666104410298"><a name="p4666104410298"></a><a name="p4666104410298"></a>连接到WLAN网络。</p>
+<td class="cellrowborder" valign="top" width="44.704470447044706%" headers="mcps1.2.4.1.2 "><p id="p4666104410298"><a name="p4666104410298"></a><a name="p4666104410298"></a>通过配置信息连接到WLAN网络。</p>
 </td>
 <td class="cellrowborder" valign="top" width="14.431443144314432%" headers="mcps1.2.4.1.3 "><p id="p766644420298"><a name="p766644420298"></a><a name="p766644420298"></a>NA</p>
 </td>
@@ -134,7 +134,7 @@ WLAN基础功能由@ohos.wifi类提供，其接口\(JS接口\)说明如下。
 
 ### 使用说明<a name="section129654513264"></a>
 
-在调用WLAN JS接口前需要导入接口类。
+在使用WLAN JS接口前需导入接口类@ohos.wifi。
 
 ```js
 import wf from '@ohos.wifi'; // 导入js接口类
@@ -145,7 +145,7 @@ import wf from '@ohos.wifi'; // 导入js接口类
 1.  调用isWifiActive​\(\)接口查询WLAN是否打开。
 
     ```js
-    var isWifiActive = wf.isWifiActive(); // 若WLAN打开，则返回true，否则返回false
+    var isWifiActive = wf.isWifiActive(); // 若WLAN打开，返回true，否则false
     ```
 
 
@@ -157,10 +157,9 @@ import wf from '@ohos.wifi'; // 导入js接口类
     ```js
     // 调用WLAN扫描接口
     var isScanSuccess = wf.scan(); // true
-
-    // 延迟一定时间
-
+    // 延迟一段时间
     // 获取扫描结果
+
     wf.getScanInfos((err, result) => {
         if (err) {
             console.error("get scan info error");

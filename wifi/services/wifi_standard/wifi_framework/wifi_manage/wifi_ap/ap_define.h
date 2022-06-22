@@ -22,8 +22,8 @@
 
 namespace OHOS {
 namespace Wifi {
-const std::string IN_INTERFACE = "wlan0";
-const std::string OUT_INTERFACE = AP_INTF;
+const std::string IN_INTERFACE = AP_INTF;
+const std::string OUT_INTERFACE = "wlan0";
 const int MAX_SSID_LENGTH = 32;
 const int MAX_PSK_LENGTH = 63;
 const int MAC_LENGTH = 17;

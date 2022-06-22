@@ -18,27 +18,15 @@
 
 #include "wifi_ap_msg.h"
 #include "wifi_errcode.h"
-#include "system_ability.h"
 #include "wifi_hotspot_stub.h"
-#include "iremote_object.h"
 
 namespace OHOS {
 namespace Wifi {
-enum ServiceRunningState {
-    STATE_NOT_START,
-    STATE_RUNNING
-};
-class WifiHotspotServiceImpl : public SystemAbility, public WifiHotspotStub {
-DECLARE_SYSTEM_ABILITY(WifiHotspotServiceImpl);
+class WifiHotspotServiceImpl : public WifiHotspotStub {
 public:
     WifiHotspotServiceImpl();
+    explicit WifiHotspotServiceImpl(int id);
     virtual ~WifiHotspotServiceImpl();
-
-    static sptr<WifiHotspotServiceImpl> GetInstance();
-
-    void OnStart() override;
-    void OnStop() override;
-
     /**
      * @Description Check whether the hotspot is active.
      * 
@@ -200,7 +188,6 @@ public:
     int32_t Dump(int32_t fd, const std::vector<std::u16string>& args) override;
 
 private:
-    bool Init();
     ErrCode CheckCanEnableHotspot(const ServiceType type);
     int CheckOperHotspotSwitchPermission(const ServiceType type);
     bool IsApServiceRunning();
@@ -211,10 +198,6 @@ private:
     static bool IsProcessNeedToRestart();
 
 private:
-    static sptr<WifiHotspotServiceImpl> g_instance;
-    static std::mutex g_instanceLock;
-    bool mPublishFlag;
-    ServiceRunningState mState;
     bool mGetChannels = false;
 };
 }  // namespace Wifi

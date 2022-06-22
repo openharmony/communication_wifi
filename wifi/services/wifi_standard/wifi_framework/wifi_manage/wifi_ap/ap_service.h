@@ -32,7 +32,7 @@ public:
      * @param None
      * @return None
      */
-    ApService(ApStateMachine &);
+    ApService(ApStateMachine &, int id = 0);
 
     /**
      * @Description  destructor method.
@@ -143,6 +143,7 @@ public:
 
 private:
     ApStateMachine &m_ApStateMachine;
+    int m_id;
 };
 }  // namespace Wifi
 }  // namespace OHOS

@@ -461,6 +461,7 @@ static void DealIfaceCbk(int event, Context *context)
 {
     WifiHalEventCallbackMsg *cbmsg = FrontCallbackMsg(event);
     if (cbmsg != NULL) {
+        WriteInt(context, cbmsg->msg.ifMsg.id);
         WriteInt(context, cbmsg->msg.ifMsg.type);
         WriteStr(context, cbmsg->msg.ifMsg.ifname);
     }
@@ -493,6 +494,8 @@ static void DealStaApCallback(int event, Context *context)
         case WIFI_ADD_IFACE_EVENT:
         case WIFI_STA_JOIN_EVENT:
         case WIFI_STA_LEAVE_EVENT:
+        case WIFI_AP_ENABLE_EVENT:
+        case WIFI_AP_DISABLE_EVENT:
             DealIfaceCbk(event, context);
             break;
         case WIFI_SCAN_INFO_NOTIFY_EVENT:

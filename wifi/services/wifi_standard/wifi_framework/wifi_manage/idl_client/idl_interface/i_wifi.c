@@ -174,8 +174,12 @@ static void IdlCbkAddRemoveIface(Context *context, int event)
 
 static void IdlCbkStaJoinLeave(Context *context)
 {
+    int id;
     CStationInfo info = {0};
     char *reason = NULL;
+    if (ReadInt(context, &id) < 0) {
+        return;
+    }
     if (ReadInt(context, &info.type) < 0) {
         return;
     }
@@ -197,9 +201,9 @@ static void IdlCbkStaJoinLeave(Context *context)
         reason = NULL;
         return;
     }
-    IWifiApEventCallback *callback = GetWifiApEventCallback();
+    IWifiApEventCallback *callback = GetWifiApEventCallback(id);
     if (callback != NULL && callback->onStaJoinOrLeave != NULL) {
-        callback->onStaJoinOrLeave(&info);
+        callback->onStaJoinOrLeave(&info, id);
     }
     free(reason);
     reason = NULL;
@@ -235,11 +239,15 @@ static void IdlCbkConnectChanged(Context *context)
     return;
 }
 
-static void IdlCbkApStateChange(int event)
+static void IdlCbkApStateChange(Context *context, int event)
 {
-    IWifiApEventCallback *callback = GetWifiApEventCallback();
+    int id = 0;
+    if (ReadInt(context, &id) < 0) {
+        return;
+    }
+    IWifiApEventCallback *callback = GetWifiApEventCallback(id);
     if (callback != NULL && callback->onApEnableOrDisable != NULL) {
-        callback->onApEnableOrDisable(event);
+        callback->onApEnableOrDisable(event, id);
     }
     return;
 }
@@ -299,7 +307,7 @@ static int IdlDealStaApEvent(Context *context, int event)
             break;
         case WIFI_IDL_CBK_CMD_AP_ENABLE:
         case WIFI_IDL_CBK_CMD_AP_DISABLE:
-            IdlCbkApStateChange(event);
+            IdlCbkApStateChange(context, event);
             break;
         case WIFI_IDL_CBK_CMD_WPA_STATE_CHANGEM:
         case WIFI_IDL_CBK_CMD_SSID_WRONG_KEY:

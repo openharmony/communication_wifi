@@ -30,8 +30,8 @@ extern "C" {
  */
 RpcClient *GetApRpcClient(void);
 
-void OnApStaJoinOrLeave(const CStationInfo *info);
-void OnApEnableOrDisable(int satus);
+void OnApStaJoinOrLeave(const CStationInfo *info, int id);
+void OnApEnableOrDisable(int status, int id);
 
 /**
  * @Description Get the Chip Rpc Client object.

@@ -22,6 +22,7 @@
 
 namespace OHOS {
 namespace Wifi {
+static IWifiApMonitorEventCallback g_cb = {nullptr, nullptr};
 WifiApHalInterface &WifiApHalInterface::GetInstance(void)
 {
     static WifiApHalInterface inst;
@@ -38,91 +39,95 @@ WifiApHalInterface &WifiApHalInterface::GetInstance(void)
     return inst;
 }
 
-WifiErrorNo WifiApHalInterface::StartAp(void)
+WifiErrorNo WifiApHalInterface::StartAp(int id)
 {
     CHECK_NULL_AND_RETURN(mIdlClient, WIFI_IDL_OPT_FAILED);
-    return mIdlClient->StartAp();
+    return mIdlClient->StartAp(id);
 }
 
-WifiErrorNo WifiApHalInterface::StopAp(void)
+WifiErrorNo WifiApHalInterface::StopAp(int id)
 {
     CHECK_NULL_AND_RETURN(mIdlClient, WIFI_IDL_OPT_FAILED);
-    return mIdlClient->StopAp();
+    return mIdlClient->StopAp(id);
 }
 
-WifiErrorNo WifiApHalInterface::SetSoftApConfig(const HotspotConfig &config)
+WifiErrorNo WifiApHalInterface::SetSoftApConfig(const HotspotConfig &config, int id)
 {
     CHECK_NULL_AND_RETURN(mIdlClient, WIFI_IDL_OPT_FAILED);
-    return mIdlClient->SetSoftApConfig(config);
+    return mIdlClient->SetSoftApConfig(config, id);
 }
 
-WifiErrorNo WifiApHalInterface::GetStationList(std::vector<std::string> &result)
+WifiErrorNo WifiApHalInterface::GetStationList(std::vector<std::string> &result, int id)
 {
     CHECK_NULL_AND_RETURN(mIdlClient, WIFI_IDL_OPT_FAILED);
-    return mIdlClient->GetStationList(result);
+    return mIdlClient->GetStationList(result, id);
 }
 
-WifiErrorNo WifiApHalInterface::AddBlockByMac(const std::string &mac)
+WifiErrorNo WifiApHalInterface::AddBlockByMac(const std::string &mac, int id)
 {
     CHECK_NULL_AND_RETURN(mIdlClient, WIFI_IDL_OPT_FAILED);
-    return mIdlClient->AddBlockByMac(mac);
+    return mIdlClient->AddBlockByMac(mac, id);
 }
 
-WifiErrorNo WifiApHalInterface::DelBlockByMac(const std::string &mac)
+WifiErrorNo WifiApHalInterface::DelBlockByMac(const std::string &mac, int id)
 {
     CHECK_NULL_AND_RETURN(mIdlClient, WIFI_IDL_OPT_FAILED);
-    return mIdlClient->DelBlockByMac(mac);
+    return mIdlClient->DelBlockByMac(mac, id);
 }
 
-WifiErrorNo WifiApHalInterface::RemoveStation(const std::string &mac)
+WifiErrorNo WifiApHalInterface::RemoveStation(const std::string &mac, int id)
 {
     CHECK_NULL_AND_RETURN(mIdlClient, WIFI_IDL_OPT_FAILED);
-    return mIdlClient->RemoveStation(mac);
+    return mIdlClient->RemoveStation(mac, id);
 }
 
-WifiErrorNo WifiApHalInterface::GetFrequenciesByBand(int band, std::vector<int> &frequencies)
+WifiErrorNo WifiApHalInterface::GetFrequenciesByBand(int band, std::vector<int> &frequencies, int id)
 {
     CHECK_NULL_AND_RETURN(mIdlClient, WIFI_IDL_OPT_FAILED);
-    return mIdlClient->GetFrequenciesByBand(band, frequencies);
+    return mIdlClient->GetFrequenciesByBand(band, frequencies, id);
 }
 
-WifiErrorNo WifiApHalInterface::RegisterApEvent(IWifiApMonitorEventCallback callback)
+WifiErrorNo WifiApHalInterface::RegisterApEvent(IWifiApMonitorEventCallback callback, int id)
 {
     CHECK_NULL_AND_RETURN(mIdlClient, WIFI_IDL_OPT_FAILED);
-    WifiErrorNo err = mIdlClient->RegisterApEvent(callback);
+    WifiErrorNo err = mIdlClient->RegisterApEvent(callback, id);
     if (err == WIFI_IDL_OPT_OK || callback.onStaJoinOrLeave == nullptr) {
-        mApCallback = callback;
+        mApCallback[id] = callback;
     }
     return err;
 }
 
-WifiErrorNo WifiApHalInterface::SetWifiCountryCode(const std::string &code)
+WifiErrorNo WifiApHalInterface::SetWifiCountryCode(const std::string &code, int id)
 {
     CHECK_NULL_AND_RETURN(mIdlClient, WIFI_IDL_OPT_FAILED);
-    return mIdlClient->SetWifiCountryCode(code);
+    return mIdlClient->SetWifiCountryCode(code, id);
 }
 
-WifiErrorNo WifiApHalInterface::DisconnectStaByMac(const std::string &mac)
+WifiErrorNo WifiApHalInterface::DisconnectStaByMac(const std::string &mac, int id)
 {
     CHECK_NULL_AND_RETURN(mIdlClient, WIFI_IDL_OPT_FAILED);
-    return mIdlClient->ReqDisconnectStaByMac(mac);
+    return mIdlClient->ReqDisconnectStaByMac(mac, id);
 }
 
-const IWifiApMonitorEventCallback &WifiApHalInterface::GetApCallbackInst(void) const
+const IWifiApMonitorEventCallback &WifiApHalInterface::GetApCallbackInst(int id) const
 {
-    return mApCallback;
+    auto iter = mApCallback.find(id);
+    if (iter != mApCallback.end()) {
+        return iter->second;
+    }
+    return g_cb;
 }
 
-WifiErrorNo WifiApHalInterface::GetPowerModel(int& model) const
-{
-    CHECK_NULL_AND_RETURN(mIdlClient, WIFI_IDL_OPT_FAILED);
-    return mIdlClient->ReqGetPowerModel(model);
-}
-
-WifiErrorNo WifiApHalInterface::SetPowerModel(const int& model) const
+WifiErrorNo WifiApHalInterface::GetPowerModel(int& model, int id) const
 {
     CHECK_NULL_AND_RETURN(mIdlClient, WIFI_IDL_OPT_FAILED);
-    return mIdlClient->ReqSetPowerModel(model);
+    return mIdlClient->ReqGetPowerModel(model, id);
+}
+
+WifiErrorNo WifiApHalInterface::SetPowerModel(const int& model, int id) const
+{
+    CHECK_NULL_AND_RETURN(mIdlClient, WIFI_IDL_OPT_FAILED);
+    return mIdlClient->ReqSetPowerModel(model, id);
 }
 }  // namespace Wifi
 }  // namespace OHOS

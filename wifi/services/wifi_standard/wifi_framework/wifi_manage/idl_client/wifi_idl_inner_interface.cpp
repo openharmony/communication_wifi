@@ -30,13 +30,13 @@ RpcClient *GetApRpcClient(void)
     return OHOS::Wifi::WifiApHalInterface::GetInstance().mIdlClient->pRpcClient;
 }
 
-void OnApStaJoinOrLeave(const CStationInfo *info)
+void OnApStaJoinOrLeave(const CStationInfo *info, int id)
 {
     if (info == nullptr) {
         return;
     }
     const OHOS::Wifi::IWifiApMonitorEventCallback &cbk =
-        OHOS::Wifi::WifiApHalInterface::GetInstance().GetApCallbackInst();
+        OHOS::Wifi::WifiApHalInterface::GetInstance().GetApCallbackInst(id);
     if (cbk.onStaJoinOrLeave) {
         OHOS::Wifi::WifiApConnectionNofify cbInfo;
         cbInfo.type = info->type;
@@ -45,12 +45,12 @@ void OnApStaJoinOrLeave(const CStationInfo *info)
     }
 }
 
-void OnApEnableOrDisable(int satus)
+void OnApEnableOrDisable(int status, int id)
 {
     const OHOS::Wifi::IWifiApMonitorEventCallback &cbk =
-        OHOS::Wifi::WifiApHalInterface::GetInstance().GetApCallbackInst();
+        OHOS::Wifi::WifiApHalInterface::GetInstance().GetApCallbackInst(id);
     if (cbk.onApEnableOrDisable) {
-        cbk.onApEnableOrDisable(satus);
+        cbk.onApEnableOrDisable(status);
     }
 }
 

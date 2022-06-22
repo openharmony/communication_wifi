@@ -19,9 +19,9 @@
 #ifdef OHOS_ARCH_LITE
 #include "wifi_hal_adapter.h"
 #else
+#include "wifi_hal.h"
 #include "wifi_hal_adapter.h"
 #include "wifi_hdi_ap_instance.h"
-
 #endif
 #include "wifi_hal_module_manage.h"
 #include "wifi_hal_common_func.h"
@@ -34,10 +34,11 @@
 
 #define NUMS_BAND 2
 #define DISABLE_AP_WAIT_MS 50000
+#define ABLE_AP_WAIT_MS 50000
+#define WIFI_MULTI_CMD_MAX_LEN 1024
 static const char *g_serviceName = "hostapd";
-static const char *g_startCmd = "hostapd /data/misc/wifi/wpa_supplicant/hostapd.conf";
 
-WifiErrorNo StartSoftAp(void)
+WifiErrorNo StartSoftAp(int id)
 {
     LOGD("Ready to start hostapd");
     if (StartHostapd() != WIFI_HAL_SUCCESS) {
@@ -45,9 +46,20 @@ WifiErrorNo StartSoftAp(void)
         return WIFI_HAL_OPEN_HOSTAPD_FAILED;
     }
 
-    if (StartHostapdHal() != WIFI_HAL_SUCCESS) {
+    if (StartHostapdHal(id) != WIFI_HAL_SUCCESS) {
         LOGE("hostapd init failed!");
         return WIFI_HAL_HOSTAPD_NOT_INIT;
+    }
+
+    WifiHostapdHalDevice *hostapdHalDevice = GetWifiHostapdDev(id);
+    if (hostapdHalDevice != NULL) {
+        int ret = hostapdHalDevice->enableAp(id);
+        usleep(ABLE_AP_WAIT_MS);
+        if (ret != 0) {
+            LOGE("ableAp failed! ret=%{public}d", ret);
+        }
+    } else {
+        LOGE("cant not get hostapd dev");
     }
 
     LOGD("AP start successfully!");
@@ -56,10 +68,35 @@ WifiErrorNo StartSoftAp(void)
 
 WifiErrorNo StartHostapd(void)
 {
-    if (CopyConfigFile("hostapd.conf") != 0) {
+    char startCmd[WIFI_MULTI_CMD_MAX_LEN] = {0};
+    char *p = startCmd;
+    int onceMove = 0;
+    int sumMove = 0;
+    onceMove = snprintf_s(p, WIFI_MULTI_CMD_MAX_LEN - sumMove,
+        WIFI_MULTI_CMD_MAX_LEN - sumMove -1, "%s", g_serviceName);
+    if (onceMove < 0) {
         return WIFI_HAL_FAILED;
     }
-    ModuleManageRetCode ret = StartModule(g_serviceName, g_startCmd);
+    p = p + onceMove;
+    sumMove = sumMove + onceMove;
+    int num;
+    WifiHostapdHalDeviceInfo *cfg = GetWifiCfg(&num);
+    if (cfg == NULL) {
+        return WIFI_HAL_FAILED;
+    }
+    for (int i = 0; i < num; i++) {
+        if (CopyConfigFile(cfg[i].cfgName) != 0) {
+            return WIFI_HAL_FAILED;
+        }
+        onceMove = snprintf_s(p, WIFI_MULTI_CMD_MAX_LEN - sumMove,
+            WIFI_MULTI_CMD_MAX_LEN - sumMove -1, " %s", cfg[i].config);
+        if (onceMove < 0) {
+            return WIFI_HAL_FAILED;
+        }
+        p = p + onceMove;
+        sumMove = sumMove + onceMove;
+    }
+    ModuleManageRetCode ret = StartModule(g_serviceName, startCmd);
     if (ret == MM_SUCCESS) {
         return WIFI_HAL_SUCCESS;
     }
@@ -68,21 +105,21 @@ WifiErrorNo StartHostapd(void)
     return WIFI_HAL_FAILED;
 }
 
-WifiErrorNo StartHostapdHal(void)
+WifiErrorNo StartHostapdHal(int id)
 {
     LOGD("Ready to init hostapd");
-    WifiHostapdHalDevice *hostapdHalDevice = GetWifiHostapdDev();
+    WifiHostapdHalDevice *hostapdHalDevice = GetWifiHostapdDev(id);
     if (hostapdHalDevice == NULL) {
         return WIFI_HAL_FAILED;
     }
     return WIFI_HAL_SUCCESS;
 }
 
-WifiErrorNo StopSoftAp(void)
+WifiErrorNo StopSoftAp(int id)
 {
-    WifiHostapdHalDevice *hostapdHalDevice = GetWifiHostapdDev();
+    WifiHostapdHalDevice *hostapdHalDevice = GetWifiHostapdDev(id);
     if (hostapdHalDevice != NULL) {
-        int ret = hostapdHalDevice->disableAp();
+        int ret = hostapdHalDevice->disableAp(id);
         usleep(DISABLE_AP_WAIT_MS);
         if (ret != 0) {
             LOGE("disableAp failed! ret=%{public}d", ret);
@@ -96,7 +133,7 @@ WifiErrorNo StopSoftAp(void)
         return WIFI_HAL_FAILED;
     }
 
-    if (StopHostapdHal() != WIFI_HAL_SUCCESS) {
+    if (StopHostapdHal(id) != WIFI_HAL_SUCCESS) {
         LOGE("hostapd_hal stop failed!");
         return WIFI_HAL_FAILED;
     }
@@ -108,85 +145,83 @@ WifiErrorNo StopSoftAp(void)
 WifiErrorNo StopHostapd(void)
 {
     ModuleManageRetCode ret;
-    do {
-        ret = StopModule(g_serviceName);
-        if (ret == MM_FAILED) {
-            LOGE("stop hostapd failed!");
-            return WIFI_HAL_FAILED;
-        }
-    } while (ret == MM_REDUCE_REFERENCE);
+    ret = StopModule(g_serviceName);
+    if (ret == MM_FAILED) {
+        LOGE("stop hostapd failed!");
+        return WIFI_HAL_FAILED;
+    }
     return WIFI_HAL_SUCCESS;
 }
 
-WifiErrorNo StopHostapdHal(void)
+WifiErrorNo StopHostapdHal(int id)
 {
-    ReleaseHostapdDev();
+    ReleaseHostapdDev(id);
     return WIFI_HAL_SUCCESS;
 }
 
-WifiErrorNo GetStaInfos(char *infos, int32_t *size)
+WifiErrorNo GetStaInfos(char *infos, int32_t *size, int id)
 {
     if (infos == NULL || size == NULL) {
         LOGE("GetStaInfos infos or size is NULL");
         return WIFI_HAL_FAILED;
     }
     LOGD("GetStaInfos:Start");
-    WifiHostapdHalDevice *hostapdHalDevice = GetWifiHostapdDev();
+    WifiHostapdHalDevice *hostapdHalDevice = GetWifiHostapdDev(id);
     if (hostapdHalDevice == NULL) {
         return WIFI_HAL_HOSTAPD_NOT_INIT;
     }
-    if (hostapdHalDevice->showConnectedDevList(infos, *size) != 0) {
+    if (hostapdHalDevice->showConnectedDevList(infos, *size, id) != 0) {
         LOGE("ShowConnectedDevList failed!");
         return WIFI_HAL_FAILED;
     }
     return WIFI_HAL_SUCCESS;
 }
 
-WifiErrorNo SetCountryCode(const char *code)
+WifiErrorNo SetCountryCode(const char *code, int id)
 {
     if (code == NULL || strlen(code) != WIFI_COUNTRY_CODE_MAXLEN) {
         LOGE("SetCountryCode code is invalid");
         return WIFI_HAL_INVALID_PARAM;
     }
     LOGD("SetCountryCode() code: %{public}s", code);
-    WifiHostapdHalDevice *hostapdHalDevice = GetWifiHostapdDev();
+    WifiHostapdHalDevice *hostapdHalDevice = GetWifiHostapdDev(id);
     if (hostapdHalDevice == NULL) {
         return WIFI_HAL_HOSTAPD_NOT_INIT;
     }
-    if (hostapdHalDevice->setCountryCode(code) != 0) {
+    if (hostapdHalDevice->setCountryCode(code, id) != 0) {
         LOGE("SetCountryCode failed!");
         return WIFI_HAL_FAILED;
     }
     return WIFI_HAL_SUCCESS;
 }
 
-WifiErrorNo SetHostapdConfig(HostapdConfig *config)
+WifiErrorNo SetHostapdConfig(HostapdConfig *config, int id)
 {
     if (config == NULL) {
         LOGE("SetHostapdConfig config is NULL");
         return WIFI_HAL_FAILED;
     }
     LOGD("SetHostapdConfig()");
-    WifiHostapdHalDevice *hostapdHalDevice = GetWifiHostapdDev();
+    WifiHostapdHalDevice *hostapdHalDevice = GetWifiHostapdDev(id);
     if (hostapdHalDevice == NULL) {
         return WIFI_HAL_HOSTAPD_NOT_INIT;
     }
-    int ret = hostapdHalDevice->setApInfo(config);
+    int ret = hostapdHalDevice->setApInfo(config, id);
     if (ret != 0) {
         LOGE("SetApInfo failed!");
         return WIFI_HAL_FAILED;
     }
-    ret = hostapdHalDevice->reloadApConfigInfo();
+    ret = hostapdHalDevice->reloadApConfigInfo(id);
     if (ret != 0) {
         LOGE("ReloadApConfigInfo failed!");
         return WIFI_HAL_FAILED;
     }
-    ret = hostapdHalDevice->disableAp();
+    ret = hostapdHalDevice->disableAp(id);
     if (ret != 0) {
         LOGE("DisableAp failed!");
         return WIFI_HAL_FAILED;
     }
-    ret = hostapdHalDevice->enableAp();
+    ret = hostapdHalDevice->enableAp(id);
     if (ret != 0) {
         LOGE("EnableAp failed!");
         return WIFI_HAL_FAILED;
@@ -195,7 +230,7 @@ WifiErrorNo SetHostapdConfig(HostapdConfig *config)
     return WIFI_HAL_SUCCESS;
 }
 
-WifiErrorNo SetMacFilter(const unsigned char *mac, int lenMac)
+WifiErrorNo SetMacFilter(const unsigned char *mac, int lenMac, int id)
 {
     if (mac == NULL) {
         LOGE("SetMacFilter is NULL");
@@ -209,18 +244,18 @@ WifiErrorNo SetMacFilter(const unsigned char *mac, int lenMac)
     if (CheckMacIsValid((const char *)mac) != 0) {
         return WIFI_HAL_INPUT_MAC_INVALID;
     }
-    WifiHostapdHalDevice *hostapdHalDevice = GetWifiHostapdDev();
+    WifiHostapdHalDevice *hostapdHalDevice = GetWifiHostapdDev(id);
     if (hostapdHalDevice == NULL) {
         return WIFI_HAL_HOSTAPD_NOT_INIT;
     }
-    if (hostapdHalDevice->addBlocklist((const char *)mac) != 0) {
+    if (hostapdHalDevice->addBlocklist((const char *)mac, id) != 0) {
         LOGE("AddBlocklist failed!");
         return WIFI_HAL_FAILED;
     }
     return WIFI_HAL_SUCCESS;
 }
 
-WifiErrorNo DelMacFilter(const unsigned char *mac, int lenMac)
+WifiErrorNo DelMacFilter(const unsigned char *mac, int lenMac, int id)
 {
     if (mac == NULL) {
         LOGE("DelMacFilter is NULL");
@@ -234,18 +269,18 @@ WifiErrorNo DelMacFilter(const unsigned char *mac, int lenMac)
     if (CheckMacIsValid((const char *)mac) != 0) {
         return WIFI_HAL_INPUT_MAC_INVALID;
     }
-    WifiHostapdHalDevice *hostapdHalDevice = GetWifiHostapdDev();
+    WifiHostapdHalDevice *hostapdHalDevice = GetWifiHostapdDev(id);
     if (hostapdHalDevice == NULL) {
         return WIFI_HAL_HOSTAPD_NOT_INIT;
     }
-    if (hostapdHalDevice->delBlocklist((const char *)mac) != 0) {
+    if (hostapdHalDevice->delBlocklist((const char *)mac, id) != 0) {
         LOGE("DelBlocklist failed!");
         return WIFI_HAL_FAILED;
     }
     return WIFI_HAL_SUCCESS;
 }
 
-WifiErrorNo DisassociateSta(const unsigned char *mac, int lenMac)
+WifiErrorNo DisassociateSta(const unsigned char *mac, int lenMac, int id)
 {
     if (mac == NULL) {
         LOGE("DisassociateSta is NULL");
@@ -259,11 +294,11 @@ WifiErrorNo DisassociateSta(const unsigned char *mac, int lenMac)
     if (CheckMacIsValid((const char *)mac) != 0) {
         return WIFI_HAL_INPUT_MAC_INVALID;
     }
-    WifiHostapdHalDevice *hostapdHalDevice = GetWifiHostapdDev();
+    WifiHostapdHalDevice *hostapdHalDevice = GetWifiHostapdDev(id);
     if (hostapdHalDevice == NULL) {
         return WIFI_HAL_HOSTAPD_NOT_INIT;
     }
-    if (hostapdHalDevice->disConnectedDev((const char *)mac) != 0) {
+    if (hostapdHalDevice->disConnectedDev((const char *)mac, id) != 0) {
         LOGE("DisConnectedDev failed!");
         return WIFI_HAL_FAILED;
     }
@@ -275,7 +310,7 @@ static int32_t ConvertToNl80211Band(int32_t band)
     return (band > 0 && band <= NUMS_BAND) ? (band - 1) : band;
 }
 
-WifiErrorNo GetValidFrequenciesForBand(int32_t band, int *frequencies, int32_t *size)
+WifiErrorNo GetValidFrequenciesForBand(int32_t band, int *frequencies, int32_t *size, int id)
 {
 #ifdef OHOS_ARCH_LITE
     return WIFI_HAL_FAILED;
@@ -299,12 +334,12 @@ WifiErrorNo GetValidFrequenciesForBand(int32_t band, int *frequencies, int32_t *
 #endif
 }
 
-WifiErrorNo WifiSetPowerModel(const int mode)
+WifiErrorNo WifiSetPowerModel(const int mode, int id)
 {
 #ifdef OHOS_ARCH_LITE
     return WIFI_HAL_FAILED;
 #else
-    LOGD("WifiSetPowerModel: %{public}d", mode);
+    LOGD("Instance %{public}d WifiSetPowerModel: %{public}d", id, mode);
 
     struct IWiFi *wifi = NULL;
     struct IWiFiAp *apFeature = NULL;
@@ -321,12 +356,12 @@ WifiErrorNo WifiSetPowerModel(const int mode)
 #endif
 }
 
-WifiErrorNo WifiGetPowerModel(int* mode)
+WifiErrorNo WifiGetPowerModel(int* mode, int id)
 {
 #ifdef OHOS_ARCH_LITE
     return WIFI_HAL_FAILED;
 #else
-    LOGD("WifiGetPowerModel");
+    LOGD("Instance %{public}d WifiGetPowerModel", id);
 
     struct IWiFi *wifi = NULL;
     struct IWiFiAp *apFeature = NULL;

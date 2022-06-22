@@ -81,6 +81,10 @@ ohos_shared_library("wifi_ap_service") {
 
   defines = [ "AP_INTF=\"$wifi_feature_with_ap_intf\"" ]
 
+  if (wifi_feature_with_dhcp_disable) {
+    defines += [ "WIFI_DHCP_DISABLED" ]
+  }
+
   part_name = "wifi"
   subsystem_name = "communication"
 }

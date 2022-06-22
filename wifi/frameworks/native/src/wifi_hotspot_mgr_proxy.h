@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,20 +13,25 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_IAP_SERVICE_CALLBACK_H
-#define OHOS_IAP_SERVICE_CALLBACK_H
+#ifndef OHOS_WIFI_HOTSPOT_MGR_PROXY_H
+#define OHOS_WIFI_HOTSPOT_MGR_PROXY_H
 
-#include <functional>
+#include "iremote_proxy.h"
+#include "i_wifi_hotspot_mgr.h"
 #include "wifi_errcode.h"
-#include "wifi_msg.h"
 
 namespace OHOS {
 namespace Wifi {
-/* All callbacks provided by the AP service */
-struct IApServiceCallbacks {
-    std::function<void(ApState, int)> OnApStateChangedEvent;
-    std::function<void(const StationInfo &, int)> OnHotspotStaJoinEvent;   // STA device join event.
-    std::function<void(const StationInfo &, int)> OnHotspotStaLeaveEvent;  // STA device leaving event.
+class WifiHotspotMgrProxy : public IRemoteProxy<IWifiHotspotMgr> {
+public:
+    explicit WifiHotspotMgrProxy(const sptr<IRemoteObject>& remote)
+        : IRemoteProxy<IWifiHotspotMgr>(remote)
+    {}
+    virtual ~WifiHotspotMgrProxy()
+    {}
+    sptr<IRemoteObject> GetWifiRemote(int id) override;
+private:
+    static BrokerDelegator<WifiHotspotMgrProxy> g_delegator;
 };
 }  // namespace Wifi
 }  // namespace OHOS

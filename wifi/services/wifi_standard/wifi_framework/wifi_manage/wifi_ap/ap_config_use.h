@@ -77,7 +77,7 @@ public:
      * @param None
      * @return None
      */
-    ApConfigUse();
+    explicit ApConfigUse(int id = 0);
     /**
      * @Description  destructor method
      * @param None
@@ -99,6 +99,7 @@ private:
      * @return None
      */
     void ApplyDefaultConfig(HotspotConfig &apConfig, std::vector<int32_t> &vecChannels);
+    int m_id;
 
     DISALLOW_COPY_AND_ASSIGN(ApConfigUse)
 };

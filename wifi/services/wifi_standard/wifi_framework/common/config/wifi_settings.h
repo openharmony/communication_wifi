@@ -373,7 +373,7 @@ public:
      *
      * @return int - the hotspot state, IDLE/STARTING/STARTED/CLOSING/CLOSED
      */
-    int GetHotspotState();
+    int GetHotspotState(int id = 0);
 
     /**
      * @Description Save current hotspot state
@@ -381,7 +381,7 @@ public:
      * @param state - hotspot state
      * @return int - 0 success
      */
-    int SetHotspotState(int state);
+    int SetHotspotState(int state, int id = 0);
 
     /**
      * @Description Set the hotspot config
@@ -389,7 +389,7 @@ public:
      * @param config - input HotspotConfig struct
      * @return int - 0 success
      */
-    int SetHotspotConfig(const HotspotConfig &config);
+    int SetHotspotConfig(const HotspotConfig &config, int id = 0);
 
     /**
      * @Description Get the hotspot config
@@ -397,7 +397,7 @@ public:
      * @param config - output HotspotConfig struct
      * @return int - 0 success
      */
-    int GetHotspotConfig(HotspotConfig &config);
+    int GetHotspotConfig(HotspotConfig &config, int id = 0);
 
     /**
      * @Description Synchronizing saved the Hotspot config into config file
@@ -435,7 +435,7 @@ public:
      * @param results - output StationInfo results
      * @return int - 0 success
      */
-    int GetStationList(std::vector<StationInfo> &results);
+    int GetStationList(std::vector<StationInfo> &results, int id = 0);
 
     /**
      * @Description Management (add/update/delete) connected station list
@@ -444,14 +444,14 @@ public:
      * @param mode - mode of MODE_ADD MODE_UPDATE MODE_DEL
      * @return int - 0 success; -1 mode not correct
      */
-    int ManageStation(const StationInfo &info, int mode); /* add / update / remove */
+    int ManageStation(const StationInfo &info, int mode, int id = 0); /* add / update / remove */
 
     /**
      * @Description Clear connected station list
      *
      * @return int - 0 success
      */
-    int ClearStationList();
+    int ClearStationList(int id = 0);
 
     /**
      * @Description Get the block list
@@ -459,7 +459,7 @@ public:
      * @param results - output StationInfo results
      * @return int - 0 success
      */
-    int GetBlockList(std::vector<StationInfo> &results);
+    int GetBlockList(std::vector<StationInfo> &results, int id = 0);
 
     /**
      * @Description Manager (add/update/delete) station connect Blocklist
@@ -468,7 +468,7 @@ public:
      * @param mode - mode of MODE_ADD MODE_DEL MODE_UPDATE
      * @return int - 0 success; -1 mode not correct
      */
-    int ManageBlockList(const StationInfo &info, int mode); /* add / remove */
+    int ManageBlockList(const StationInfo &info, int mode, int id = 0); /* add / remove */
 
     /**
      * @Description Judge whether the station is in current linked station list
@@ -476,7 +476,7 @@ public:
      * @param info - input StationInfo struct
      * @return int - 0 find the station, exist; -1 not find, not exist
      */
-    int FindConnStation(const StationInfo &info);
+    int FindConnStation(const StationInfo &info, int id = 0);
 
     /**
      * @Description Synchronizing saved the block list config into config file
@@ -522,7 +522,7 @@ public:
      * @param model - the model to be set
      * @return ErrCode - operation result
      */
-    int SetPowerModel(const PowerModel& model);
+    int SetPowerModel(const PowerModel& model, int id = 0);
 
     /**
      * @Description Get power model
@@ -530,7 +530,7 @@ public:
      * @param model - current power model
      * @return ErrCode - operation result
      */
-    int GetPowerModel(PowerModel& model);
+    int GetPowerModel(PowerModel& model, int id = 0);
 
     /**
      * @Description set the p2p state
@@ -1044,8 +1044,8 @@ private:
     WifiLinkedInfo mWifiLinkedInfo;
     std::string mMacAddress;
     std::string mCountryCode;
-    std::atomic<int> mHotspotState;
-    HotspotConfig mHotspotConfig;
+    std::map <int, std::atomic<int>> mHotspotState;
+    std::map <int, HotspotConfig> mHotspotConfig;
     P2pVendorConfig mP2pVendorConfig;
     std::map<std::string, StationInfo> mConnectStationInfo;
     std::map<std::string, StationInfo> mBlockListInfo;
@@ -1065,7 +1065,7 @@ private:
     int mNoChargerPlugModeState;  /* 1 on 2 off */
     WifiConfig mWifiConfig;
     std::pair<std::string, int> mBssidToTimeoutTime;
-    PowerModel powerModel = PowerModel::GENERAL;
+    std::map<int, PowerModel> powerModel;
 
     std::mutex mStaMutex;
     std::mutex mApMutex;

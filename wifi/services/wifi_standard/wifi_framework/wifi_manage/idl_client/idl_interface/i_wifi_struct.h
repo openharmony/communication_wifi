@@ -194,8 +194,8 @@ typedef struct CStationInfo {
 } CStationInfo;
 
 typedef struct IWifiApEventCallback {
-    void (*onStaJoinOrLeave)(const CStationInfo *info);
-    void (*onApEnableOrDisable)(int event);
+    void (*onStaJoinOrLeave)(const CStationInfo *info, int id);
+    void (*onApEnableOrDisable)(int event, int id);
 } IWifiApEventCallback;
 
 typedef enum IfaceType { TYPE_STA, TYPE_AP, TYPE_P2P, TYPE_NAN } IfaceType;

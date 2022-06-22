@@ -70,6 +70,7 @@ void SetRpcServerInited(RpcServer *server);
 RpcServer *GetRpcServer(void);
 
 typedef struct WifiHalCbIFaceMsg {
+    int id;
     int type;
     char ifname[WIFI_IFACE_NAME_MAXLEN];
 } WifiHalCbIFaceMsg;

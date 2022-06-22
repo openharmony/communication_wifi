@@ -206,7 +206,7 @@ public:
      *
      * @return WifiOprMidState - which can be a CLOSED/CLOSING/OPENING/RUNNING/UNKNOWN
      */
-    WifiOprMidState GetApMidState();
+    WifiOprMidState GetApMidState(int id = 0);
 
     /**
      * @Description Set current hotspot middle state
@@ -216,21 +216,21 @@ public:
      * @return true - set the state success
      * @return false - set state failed, current mid state is not equal to the expState
      */
-    bool SetApMidState(WifiOprMidState expState, WifiOprMidState state);
+    bool SetApMidState(WifiOprMidState expState, WifiOprMidState state, int id = 0);
 
     /**
      * @Description Force to set current hotspot middle state
      *
      * @param state - want to set state
      */
-    void SetApMidState(WifiOprMidState state);
+    void SetApMidState(WifiOprMidState state, int id = 0);
 
     /**
      * @Description Get current hotspot state
      *
      * @return int - the hotspot state, IDLE/STARTING/STARTED/CLOSING/CLOSED
      */
-    int GetHotspotState();
+    int GetHotspotState(int id = 0);
 
     /**
      * @Description Set the hotspot config
@@ -238,7 +238,7 @@ public:
      * @param config - input HotspotConfig struct
      * @return int - 0 success
      */
-    int SetHotspotConfig(const HotspotConfig &config);
+    int SetHotspotConfig(const HotspotConfig &config, int id = 0);
 
     /**
      * @Description Get the hotspot config
@@ -246,7 +246,7 @@ public:
      * @param config - output HotspotConfig struct
      * @return int - 0 success
      */
-    int GetHotspotConfig(HotspotConfig &config);
+    int GetHotspotConfig(HotspotConfig &config, int id = 0);
 
     /**
      * @Description Get current hotspot accept linked stations
@@ -254,7 +254,7 @@ public:
      * @param results - output StationInfo results
      * @return int - 0 success
      */
-    int GetStationList(std::vector<StationInfo> &results);
+    int GetStationList(std::vector<StationInfo> &results, int id = 0);
 
     /**
      * @Description Judge whether the station is in current linked station list
@@ -262,7 +262,7 @@ public:
      * @param info - input StationInfo struct
      * @return int - 0 find the station, exist; -1 not find, not exist
      */
-    int FindConnStation(const StationInfo &info);
+    int FindConnStation(const StationInfo &info, int id = 0);
 
     /**
      * @Description Get the block list
@@ -270,7 +270,7 @@ public:
      * @param infos - output StationInfo results
      * @return int - 0 success
      */
-    int GetBlockLists(std::vector<StationInfo> &infos);
+    int GetBlockLists(std::vector<StationInfo> &infos, int id = 0);
 
     /**
      * @Description Add the station info into the block list
@@ -278,7 +278,7 @@ public:
      * @param info - input StationInfo struct
      * @return int - 0 success
      */
-    int AddBlockList(const StationInfo &info);
+    int AddBlockList(const StationInfo &info, int id = 0);
 
     /**
      * @Description Remove the station info from the block list
@@ -286,7 +286,7 @@ public:
      * @param info - input StationInfo struct
      * @return int - 0 success
      */
-    int DelBlockList(const StationInfo &info);
+    int DelBlockList(const StationInfo &info, int id = 0);
 
     /**
      * @Description Get the valid bands info
@@ -536,7 +536,7 @@ public:
 
 private:
     std::atomic<WifiOprMidState> mStaMidState;
-    std::atomic<WifiOprMidState> mApMidState;
+    std::map<int, std::atomic<WifiOprMidState>> mApMidState;
     std::atomic<WifiOprMidState> mP2pMidState;
     std::atomic<WifiOprMidState> mScanMidState;
     /* Time interval for disabling and re-enabling the STA */

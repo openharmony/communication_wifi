@@ -30,7 +30,7 @@ WifiConfigCenter &WifiConfigCenter::GetInstance()
 WifiConfigCenter::WifiConfigCenter()
 {
     mStaMidState = WifiOprMidState::CLOSED;
-    mApMidState = WifiOprMidState::CLOSED;
+    mApMidState.emplace(0, WifiOprMidState::CLOSED);
     mP2pMidState = WifiOprMidState::CLOSED;
     mScanMidState = WifiOprMidState::CLOSED;
     mWifiOpenedWhenAirplane = false;
@@ -150,59 +150,75 @@ bool WifiConfigCenter::IsLoadStabak()
     return WifiSettings::GetInstance().IsLoadStabak();
 }
 
-WifiOprMidState WifiConfigCenter::GetApMidState()
+WifiOprMidState WifiConfigCenter::GetApMidState(int id)
 {
-    return mApMidState.load();
+    auto iter = mApMidState.find(id);
+    if (iter != mApMidState.end()) {
+        return iter->second.load();
+    } else {
+        mApMidState.emplace(id, WifiOprMidState::CLOSED);
+        return mApMidState[id].load();
+    }
 }
 
-bool WifiConfigCenter::SetApMidState(WifiOprMidState expState, WifiOprMidState state)
+bool WifiConfigCenter::SetApMidState(WifiOprMidState expState, WifiOprMidState state, int id)
 {
-    return mApMidState.compare_exchange_strong(expState, state);
+    auto iter = mApMidState.find(id);
+    if (iter != mApMidState.end()) {
+        return iter->second.compare_exchange_strong(expState, state);
+    } else {
+        mApMidState.emplace(id, state);
+        return true;
+    }
+    return false;
 }
 
-void WifiConfigCenter::SetApMidState(WifiOprMidState state)
+void WifiConfigCenter::SetApMidState(WifiOprMidState state, int id)
 {
-    mApMidState = state;
+    auto ret = mApMidState.emplace(id, state);
+    if (!ret.second) {
+        mApMidState[id] = state;
+    }
 }
 
-int WifiConfigCenter::GetHotspotState()
+int WifiConfigCenter::GetHotspotState(int id)
 {
-    return WifiSettings::GetInstance().GetHotspotState();
+    return WifiSettings::GetInstance().GetHotspotState(id);
 }
 
-int WifiConfigCenter::SetHotspotConfig(const HotspotConfig &config)
+int WifiConfigCenter::SetHotspotConfig(const HotspotConfig &config, int id)
 {
-    return WifiSettings::GetInstance().SetHotspotConfig(config);
+    return WifiSettings::GetInstance().SetHotspotConfig(config, id);
 }
 
-int WifiConfigCenter::GetHotspotConfig(HotspotConfig &config)
+int WifiConfigCenter::GetHotspotConfig(HotspotConfig &config, int id)
 {
-    return WifiSettings::GetInstance().GetHotspotConfig(config);
+    return WifiSettings::GetInstance().GetHotspotConfig(config, id);
 }
 
-int WifiConfigCenter::GetStationList(std::vector<StationInfo> &results)
+int WifiConfigCenter::GetStationList(std::vector<StationInfo> &results, int id)
 {
-    return WifiSettings::GetInstance().GetStationList(results);
+    return WifiSettings::GetInstance().GetStationList(results, id);
 }
 
-int WifiConfigCenter::FindConnStation(const StationInfo &info)
+int WifiConfigCenter::FindConnStation(const StationInfo &info, int id)
 {
-    return WifiSettings::GetInstance().FindConnStation(info);
+    return WifiSettings::GetInstance().FindConnStation(info, id);
 }
 
-int WifiConfigCenter::GetBlockLists(std::vector<StationInfo> &infos)
+int WifiConfigCenter::GetBlockLists(std::vector<StationInfo> &infos, int id)
 {
-    return WifiSettings::GetInstance().GetBlockList(infos);
+    return WifiSettings::GetInstance().GetBlockList(infos, id);
 }
 
-int WifiConfigCenter::AddBlockList(const StationInfo &info)
+int WifiConfigCenter::AddBlockList(const StationInfo &info, int id)
 {
-    return WifiSettings::GetInstance().ManageBlockList(info, MODE_ADD);
+    return WifiSettings::GetInstance().ManageBlockList(info, MODE_ADD, id);
 }
 
-int WifiConfigCenter::DelBlockList(const StationInfo &info)
+int WifiConfigCenter::DelBlockList(const StationInfo &info, int id)
 {
-    return WifiSettings::GetInstance().ManageBlockList(info, MODE_DEL);
+    return WifiSettings::GetInstance().ManageBlockList(info, MODE_DEL, id);
 }
 
 int WifiConfigCenter::GetValidBands(std::vector<BandType> &bands)

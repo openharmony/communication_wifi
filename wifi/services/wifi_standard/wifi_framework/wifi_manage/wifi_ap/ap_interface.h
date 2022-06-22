@@ -29,7 +29,7 @@ public:
      * @param None
      * @return None
      */
-    ApInterface();
+    explicit ApInterface(int id = 0);
     /**
      * @Description  destructor method.
      * @param None

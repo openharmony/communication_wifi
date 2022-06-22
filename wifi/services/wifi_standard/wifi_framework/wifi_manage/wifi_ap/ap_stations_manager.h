@@ -30,7 +30,7 @@ public:
      * @param None
      * @return None
      */
-    ApStationsManager();
+    explicit ApStationsManager(int id = 0);
 
     /**
      * @Description  destructor.
@@ -114,6 +114,7 @@ private:
     bool DelAssociationStation(const StationInfo &staInfo) const;
 
     std::function<void(const StationInfo &, ApStatemachineEvent)> m_stationChangeCallback;
+    int m_id;
 };
 }  // namespace Wifi
 }  // namespace OHOS

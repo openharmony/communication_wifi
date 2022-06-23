@@ -11,7 +11,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-aafwk_kits_path = "//foundation/ability/ability_runtime/frameworks/kits"
+ability_runtime_kits_path = "//foundation/ability/ability_runtime/frameworks/kits"
 
 SUBSYSTEM_DIR = "//foundation/communication"
 WIFI_ROOT_DIR = "$SUBSYSTEM_DIR/wifi/wifi"

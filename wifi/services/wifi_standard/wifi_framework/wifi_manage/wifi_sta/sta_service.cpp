@@ -104,6 +104,72 @@ ErrCode StaService::DisableWifi() const
     return WIFI_OPT_SUCCESS;
 }
 
+int StaService::AddCandidateConfig(const int uid, const WifiDeviceConfig &config) const
+{
+    LOGI("Enter StaService::AddCandidateConfig.\n");
+    constexpr int UID_UNTRUSTED_CONFIG_LEN = 16;
+    std::vector<WifiDeviceConfig> tempConfigs;
+    WifiSettings::GetInstance().GetAllCandidateConfig(uid, tempConfigs);
+    if (tempConfigs.size() >= UID_UNTRUSTED_CONFIG_LEN) {
+        LOGE("StaService::AddCandidateConfig failed, max num is 16!");
+        return INVALID_NETWORK_ID;
+    }
+
+    if (config.keyMgmt == KEY_MGMT_NONE) {
+        LOGE("StaService::AddCandidateConfig unsupport open or wep key!");
+        return WIFI_OPT_NOT_SUPPORTED;
+    }
+
+    WifiDeviceConfig tempDeviceConfig = config;
+    tempDeviceConfig.uid = uid;
+    return AddDeviceConfig(tempDeviceConfig);
+}
+
+ErrCode StaService::RemoveCandidateConfig(const int uid, const int networkId) const
+{
+    LOGD("Enter StaService::RemoveCandidateConfig.\n");
+    WifiDeviceConfig config;
+    if (WifiSettings::GetInstance().GetCandidateConfig(uid, networkId, config) == INVALID_NETWORK_ID) {
+        LOGE("RemoveCandidateConfig-GetCandidateConfig no foud failed!");
+        return WIFI_OPT_FAILED;
+    }
+
+    /* Remove network configuration. */
+    return RemoveDevice(config.networkId);
+}
+
+ErrCode StaService::RemoveAllCandidateConfig(const int uid) const
+{
+    LOGD("Enter StaService::RemoveAllCandidateConfig.\n");
+    std::vector<WifiDeviceConfig> tempConfigs;
+    WifiSettings::GetInstance().GetAllCandidateConfig(uid, tempConfigs);
+    for (const auto &config : tempConfigs) {
+        if (RemoveDevice(config.networkId) != WIFI_OPT_SUCCESS) {
+            LOGE("RemoveAllCandidateConfig-RemoveDevice() failed!");
+        }
+    }
+    return WIFI_OPT_SUCCESS;
+}
+
+ErrCode StaService::ConnectToCandidateConfig(const int uid, const int networkId) const
+{
+    LOGI("Enter StaService::ConnectToCandidateConfig.\n");
+    WifiDeviceConfig config;
+    if (WifiSettings::GetInstance().GetCandidateConfig(uid, networkId, config) == INVALID_NETWORK_ID) {
+        LOGE("StaService::ConnectToCandidateConfig:GetCandidateConfig is null!");
+        return WIFI_OPT_FAILED;
+    }
+
+    if (config.keyMgmt == KEY_MGMT_NONE) {
+        LOGE("StaService::ConnectToCandidateConfig unsupport open or wep key!");
+        return WIFI_OPT_NOT_SUPPORTED;
+    }
+
+    pStaAutoConnectService->EnableOrDisableBssid(config.bssid, true, 0);
+    pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_CONNECT_SAVED_NETWORK, networkId, NETWORK_SELECTED_BY_THE_USER);
+    return WIFI_OPT_SUCCESS;
+}
+
 int StaService::AddDeviceConfig(const WifiDeviceConfig &config) const
 {
     LOGI("Enter StaService::AddDeviceConfig.\n");

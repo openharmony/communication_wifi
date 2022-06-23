@@ -136,6 +136,46 @@ ErrCode StaInterface::Disconnect()
     return WIFI_OPT_SUCCESS;
 }
 
+int StaInterface::AddCandidateConfig(const int uid, const WifiDeviceConfig &config)
+{
+    LOGD("Enter StaInterface::AddCandidateConfig.\n");
+    CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
+    return pStaService->AddCandidateConfig(uid, config);
+}
+
+ErrCode StaInterface::ConnectToCandidateConfig(const int uid, const int networkId)
+{
+    LOGD("Enter StaInterface::ConnectToCandidateConfig.\n");
+    CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
+    if (pStaService->ConnectToCandidateConfig(uid, networkId) != WIFI_OPT_SUCCESS) {
+        LOGE("ConnectToCandidateConfig failed.\n");
+        return WIFI_OPT_FAILED;
+    }
+    return WIFI_OPT_SUCCESS;
+}
+
+ErrCode StaInterface::RemoveCandidateConfig(const int uid, const int networkId)
+{
+    LOGD("Enter StaInterface::RemoveCandidateConfig.\n");
+    CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
+    if (pStaService->RemoveCandidateConfig(uid, networkId) != WIFI_OPT_SUCCESS) {
+        LOGE("RemoveCandidateConfig failed.\n");
+        return WIFI_OPT_FAILED;
+    }
+    return WIFI_OPT_SUCCESS;
+}
+
+ErrCode StaInterface::RemoveAllCandidateConfig(const int uid)
+{
+    LOGD("Enter StaInterface::RemoveAllCandidateConfig.\n");
+    CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
+    if (pStaService->RemoveAllCandidateConfig(uid) != WIFI_OPT_SUCCESS) {
+        LOGE("RemoveAllCandidateConfig failed.\n");
+        return WIFI_OPT_FAILED;
+    }
+    return WIFI_OPT_SUCCESS;
+}
+
 int StaInterface::AddDeviceConfig(const WifiDeviceConfig &config)
 {
     LOGD("Enter StaInterface::AddDeviceConfig.\n");

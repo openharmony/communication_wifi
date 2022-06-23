@@ -66,6 +66,10 @@ void WifiDeviceStub::InitHandleMap()
     handleFuncMap[WIFI_SVR_CMD_GET_DERVICE_MAC_ADD] = &WifiDeviceStub::OnGetDeviceMacAdd;
     handleFuncMap[WIFI_SVR_CMD_IS_WIFI_CONNECTED] = &WifiDeviceStub::OnIsWifiConnected;
     handleFuncMap[WIFI_SVR_CMD_SET_LOW_LATENCY_MODE] = &WifiDeviceStub::OnSetLowLatencyMode;
+    handleFuncMap[WIFI_SVR_CMD_ADD_CANDIDATE_DEVICE_CONFIG] = &WifiDeviceStub::OnAddCandidateConfig;
+    handleFuncMap[WIFI_SVR_CMD_CONNECT_TO_CANDIDATE_CONFIG] = &WifiDeviceStub::OnConnectToCandidateConfig;
+    handleFuncMap[WIFI_SVR_CMD_REMOVE_CANDIDATE_CONFIG] = &WifiDeviceStub::OnRemoveCandidateConfig;
+    handleFuncMap[WIFI_SVR_CMD_GET_CANDIDATE_CONFIGS] = &WifiDeviceStub::OnGetCandidateConfigs;
     return;
 }
 
@@ -272,6 +276,7 @@ void WifiDeviceStub::WriteWifiDeviceConfig(MessageParcel &reply, const WifiDevic
     reply.WriteInt32(config.wifiProxyconfig.manualProxyConfig.serverPort);
     reply.WriteCString(config.wifiProxyconfig.manualProxyConfig.exclusionObjectList.c_str());
     reply.WriteInt32((int)config.wifiPrivacySetting);
+    reply.WriteInt32(config.uid);
     return;
 }
 
@@ -630,6 +635,63 @@ void WifiDeviceStub::OnSetLowLatencyMode(uint32_t code, MessageParcel &data, Mes
     bool enabled = data.ReadBool();
     reply.WriteInt32(0);
     reply.WriteBool(SetLowLatencyMode(enabled));
+}
+
+void WifiDeviceStub::OnAddCandidateConfig(uint32_t code, MessageParcel &data, MessageParcel &reply)
+{
+    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+    WifiDeviceConfig config;
+    ReadWifiDeviceConfig(data, config);
+
+    int networkId = INVALID_NETWORK_ID;
+    ErrCode ret = AddCandidateConfig(config, networkId);
+
+    reply.WriteInt32(0);
+    reply.WriteInt32(ret);
+    if (ret == WIFI_OPT_SUCCESS) {
+        reply.WriteInt32(networkId);
+    }
+    return;
+}
+
+void WifiDeviceStub::OnConnectToCandidateConfig(uint32_t code, MessageParcel &data, MessageParcel &reply)
+{
+    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+    int networkId = data.ReadInt32();
+    ErrCode ret = ConnectToCandidateConfig(networkId);
+
+    reply.WriteInt32(0);
+    reply.WriteInt32(ret);
+    return;
+}
+
+void WifiDeviceStub::OnRemoveCandidateConfig(uint32_t code, MessageParcel &data, MessageParcel &reply)
+{
+    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+    int networkId = data.ReadInt32();
+    ErrCode ret = RemoveCandidateConfig(networkId);
+
+    reply.WriteInt32(0);
+    reply.WriteInt32(ret);
+    return;
+}
+
+void WifiDeviceStub::OnGetCandidateConfigs(uint32_t code, MessageParcel &data, MessageParcel &reply)
+{
+    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+    std::vector<WifiDeviceConfig> result;
+    ErrCode ret = GetCandidateConfigs(result);
+    reply.WriteInt32(0);
+    reply.WriteInt32(ret);
+
+    if (ret == WIFI_OPT_SUCCESS) {
+        unsigned int size = result.size();
+        reply.WriteInt32(size);
+        for (unsigned int i = 0; i < size; ++i) {
+            WriteWifiDeviceConfig(reply, result[i]);
+        }
+    }
+    return;
 }
 }  // namespace Wifi
 }  // namespace OHOS

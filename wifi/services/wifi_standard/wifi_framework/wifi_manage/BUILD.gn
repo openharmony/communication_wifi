@@ -247,10 +247,14 @@ if (defined(ohos_lite)) {
       defines = [ "FEATURE_P2P_SUPPORT" ]
     }
 
-    deps = [ ":wifi_p2p_service_impl" ]
+    deps = [
+      ":wifi_p2p_service_impl",
+      "//utils/native/base:utils",
+    ]
     external_deps = [
       "ability_base:want",
       "bundle_framework:appexecfwk_base",
+      "common_event_service:cesfwk_innerkits",
       "eventhandler:libeventhandler",
       "ipc:ipc_core",
     ]

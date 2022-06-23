@@ -362,6 +362,40 @@ int WifiSettings::SetDeviceState(int networkId, int state, bool bSetOther)
     return 0;
 }
 
+int WifiSettings::GetCandidateConfig(const int uid, const int &networkId, WifiDeviceConfig &config)
+{
+    std::vector<WifiDeviceConfig> configs;
+    if (GetAllCandidateConfig(uid, configs) != 0) {
+        return -1;
+    }
+
+    for (const auto &it : configs) {
+        if (it.networkId == networkId) {
+            config = it;
+            return it.networkId;
+        }
+    }
+    return -1;
+}
+
+int WifiSettings::GetAllCandidateConfig(const int uid, std::vector<WifiDeviceConfig> &configs)
+{
+    if (!deviceConfigLoadFlag.test_and_set()) {
+        LOGE("Reload wifi config");
+        ReloadDeviceConfig();
+    }
+
+    std::unique_lock<std::mutex> lock(mConfigMutex);
+    bool found = false;
+    for (auto iter = mWifiDeviceConfig.begin(); iter != mWifiDeviceConfig.end(); iter++) {
+        if (iter->second.uid == uid) {
+            configs.push_back(iter->second);
+            found = true;
+        }
+    }
+    return found ? 0 : -1;
+}
+
 int WifiSettings::SyncWifiP2pGroupInfoConfig()
 {
     std::unique_lock<std::mutex> lock(mP2pMutex);
@@ -1252,6 +1286,17 @@ int WifiSettings::SetScoretacticsSecurityScore(const int &score)
 int WifiSettings::GetScoretacticsSecurityScore()
 {
     return mWifiConfig.scoretacticsSecurityScore;
+}
+
+int WifiSettings::SetScoretacticsNormalScore(const int &score)
+{
+    mWifiConfig.scoretacticsNormalScore = score;
+    return 0;
+}
+
+int WifiSettings::GetScoretacticsNormalScore()
+{
+    return mWifiConfig.scoretacticsNormalScore;
 }
 
 int WifiSettings::SetSavedDeviceAppraisalPriority(const int &priority)

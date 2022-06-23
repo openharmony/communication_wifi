@@ -315,7 +315,7 @@ napi_value AddDeviceConfig(napi_env env, napi_callback_info info)
     napi_typeof(env, argv[0], &valueType);
     NAPI_ASSERT(env, valueType == napi_object, "Wrong argument type, object is expected for parameter 1.");
 
-    AddDeviceConfigContext *asyncContext = new AddDeviceConfigContext(env);
+    DeviceConfigContext *asyncContext = new DeviceConfigContext(env);
     NAPI_ASSERT(env, asyncContext != nullptr, "asyncContext is null.");
     napi_create_string_latin1(env, "addDeviceConfig", NAPI_AUTO_LENGTH, &asyncContext->resourceName);
 
@@ -328,18 +328,18 @@ napi_value AddDeviceConfig(napi_env env, napi_callback_info info)
     asyncContext->config = config;
 
     asyncContext->executeFunc = [&](void* data) -> void {
-        AddDeviceConfigContext *context = static_cast<AddDeviceConfigContext *>(data);
+        DeviceConfigContext *context = static_cast<DeviceConfigContext *>(data);
         TRACE_FUNC_CALL_NAME("wifiDevicePtr->AddDeviceConfig");
-        ErrCode ret = wifiDevicePtr->AddDeviceConfig(*context->config, context->addResult);
-        if (context->addResult < 0 || ret != WIFI_OPT_SUCCESS) {
-            context->addResult = -1;
+        ErrCode ret = wifiDevicePtr->AddDeviceConfig(*context->config, context->networkId);
+        if (context->networkId < 0 || ret != WIFI_OPT_SUCCESS) {
+            context->networkId = -1;
         }
         context->errorCode = ret;
     };
 
     asyncContext->completeFunc = [&](void* data) -> void {
-        AddDeviceConfigContext *context = static_cast<AddDeviceConfigContext *>(data);
-        napi_create_int32(context->env, context->addResult, &context->result);
+        DeviceConfigContext *context = static_cast<DeviceConfigContext *>(data);
+        napi_create_int32(context->env, context->networkId, &context->result);
         if (context->config != nullptr) {
             delete context->config;
             context->config = nullptr;
@@ -366,7 +366,7 @@ napi_value AddUntrustedConfig(napi_env env, napi_callback_info info)
     napi_typeof(env, argv[0], &valueType);
     NAPI_ASSERT(env, valueType == napi_object, "Wrong argument type, object is expected for parameter 1.");
 
-    AddDeviceConfigContext *asyncContext = new AddDeviceConfigContext(env);
+    DeviceConfigContext *asyncContext = new DeviceConfigContext(env);
     NAPI_ASSERT(env, asyncContext != nullptr, "asyncContext is null.");
     napi_create_string_latin1(env, "AddUntrustedConfig", NAPI_AUTO_LENGTH, &asyncContext->resourceName);
 
@@ -379,18 +379,18 @@ napi_value AddUntrustedConfig(napi_env env, napi_callback_info info)
     asyncContext->config = config;
 
     asyncContext->executeFunc = [&](void* data) -> void {
-        AddDeviceConfigContext *context = static_cast<AddDeviceConfigContext *>(data);
+        DeviceConfigContext *context = static_cast<DeviceConfigContext *>(data);
         TRACE_FUNC_CALL_NAME("wifiDevicePtr->AddUntrustedConfig");
-        ErrCode ret = wifiDevicePtr->AddDeviceConfig(*context->config, context->addResult);
-        if (context->addResult < 0 || ret != WIFI_OPT_SUCCESS) {
-            context->addResult = -1;
+        ErrCode ret = wifiDevicePtr->AddDeviceConfig(*context->config, context->networkId);
+        if (context->networkId < 0 || ret != WIFI_OPT_SUCCESS) {
+            context->networkId = -1;
         }
         context->errorCode = ret;
     };
 
     asyncContext->completeFunc = [&](void* data) -> void {
-        AddDeviceConfigContext *context = static_cast<AddDeviceConfigContext *>(data);
-        napi_get_boolean(context->env, (context->addResult >= 0), &context->result);
+        DeviceConfigContext *context = static_cast<DeviceConfigContext *>(data);
+        napi_get_boolean(context->env, (context->networkId >= 0), &context->result);
         if (context->config != nullptr) {
             delete context->config;
             context->config = nullptr;
@@ -432,7 +432,7 @@ napi_value RemoveUntrustedConfig(napi_env env, napi_callback_info info)
     napi_typeof(env, argv[0], &valueType);
     NAPI_ASSERT(env, valueType == napi_object, "Wrong argument type, object is expected for parameter 1.");
 
-    AddDeviceConfigContext *asyncContext = new AddDeviceConfigContext(env);
+    DeviceConfigContext *asyncContext = new DeviceConfigContext(env);
     NAPI_ASSERT(env, asyncContext != nullptr, "asyncContext is null.");
     napi_create_string_latin1(env, "RemoveUntrustedConfig", NAPI_AUTO_LENGTH, &asyncContext->resourceName);
 
@@ -445,7 +445,7 @@ napi_value RemoveUntrustedConfig(napi_env env, napi_callback_info info)
     asyncContext->config = config;
 
     asyncContext->executeFunc = [&](void* data) -> void {
-        AddDeviceConfigContext *context = static_cast<AddDeviceConfigContext *>(data);
+        DeviceConfigContext *context = static_cast<DeviceConfigContext *>(data);
         if (context->config == nullptr) {
             return;
         }
@@ -464,7 +464,7 @@ napi_value RemoveUntrustedConfig(napi_env env, napi_callback_info info)
     };
 
     asyncContext->completeFunc = [&](void* data) -> void {
-        AddDeviceConfigContext *context = static_cast<AddDeviceConfigContext *>(data);
+        DeviceConfigContext *context = static_cast<DeviceConfigContext *>(data);
         napi_get_boolean(context->env, context->errorCode == WIFI_OPT_SUCCESS, &context->result);
         if (context->config != nullptr) {
             delete context->config;
@@ -475,6 +475,119 @@ napi_value RemoveUntrustedConfig(napi_env env, napi_callback_info info)
 
     size_t nonCallbackArgNum = 1;
     return DoAsyncWork(env, asyncContext, argc, argv, nonCallbackArgNum);
+}
+
+napi_value AddCandidateConfig(napi_env env, napi_callback_info info)
+{
+    TRACE_FUNC_CALL;
+    size_t argc = 2;
+    napi_value argv[argc];
+    napi_value thisVar = nullptr;
+    void *data = nullptr;
+    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, &data));
+    NAPI_ASSERT(env, argc >= 1, "Wrong number of arguments");
+    NAPI_ASSERT(env, wifiDevicePtr != nullptr, "Wifi device instance is null.");
+
+    napi_valuetype valueType;
+    napi_typeof(env, argv[0], &valueType);
+    NAPI_ASSERT(env, valueType == napi_object, "Wrong argument type, object is expected for parameter 1.");
+
+    DeviceConfigContext *asyncContext = new DeviceConfigContext(env);
+    NAPI_ASSERT(env, asyncContext != nullptr, "asyncContext is null.");
+    napi_create_string_latin1(env, "AddCandidateConfig", NAPI_AUTO_LENGTH, &asyncContext->resourceName);
+
+    WifiDeviceConfig *config = new WifiDeviceConfig();
+    if (config == nullptr) {
+        delete asyncContext;
+        return UndefinedNapiValue(env);
+    }
+    JsObjToDeviceConfig(env, argv[0], *config);
+    asyncContext->config = config;
+
+    asyncContext->executeFunc = [&](void* data) -> void {
+        DeviceConfigContext *context = static_cast<DeviceConfigContext *>(data);
+        TRACE_FUNC_CALL_NAME("wifiDevicePtr->AddCandidateConfig");
+        ErrCode ret = wifiDevicePtr->AddCandidateConfig(*context->config, context->networkId);
+        if (context->networkId < 0 || ret != WIFI_OPT_SUCCESS) {
+            context->networkId = -1;
+        }
+        context->errorCode = ret;
+    };
+
+    asyncContext->completeFunc = [&](void* data) -> void {
+        DeviceConfigContext *context = static_cast<DeviceConfigContext *>(data);
+        napi_create_int32(context->env, context->networkId, &context->result);
+        if (context->config != nullptr) {
+            delete context->config;
+            context->config = nullptr;
+        }
+        WIFI_LOGI("Push add untrusted device config result to client");
+    };
+
+    size_t nonCallbackArgNum = 1;
+    return DoAsyncWork(env, asyncContext, argc, argv, nonCallbackArgNum);
+}
+
+napi_value RemoveCandidateConfig(napi_env env, napi_callback_info info)
+{
+    TRACE_FUNC_CALL;
+    size_t argc = 3;
+    napi_value argv[argc];
+    napi_value thisVar = nullptr;
+    void *data = nullptr;
+    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, &data));
+    NAPI_ASSERT(env, argc >= 1, "Wrong number of arguments");
+    NAPI_ASSERT(env, wifiDevicePtr != nullptr, "Wifi device instance is null.");
+
+    napi_valuetype valueType;
+    napi_typeof(env, argv[0], &valueType);
+    NAPI_ASSERT(env, valueType == napi_number, "Wrong argument type, object is expected for parameter 1.");
+
+    DeviceConfigContext *asyncContext = new DeviceConfigContext(env);
+    NAPI_ASSERT(env, asyncContext != nullptr, "asyncContext is null.");
+    napi_create_string_latin1(env, "RemoveCandidateConfig", NAPI_AUTO_LENGTH, &asyncContext->resourceName);
+
+    napi_get_value_int32(env, argv[0], &asyncContext->networkId);
+    asyncContext->executeFunc = [&](void* data) -> void {
+        DeviceConfigContext *context = static_cast<DeviceConfigContext *>(data);
+        context->errorCode = wifiDevicePtr->RemoveCandidateConfig(context->networkId);
+    };
+
+    asyncContext->completeFunc = [&](void* data) -> void {
+        DeviceConfigContext *context = static_cast<DeviceConfigContext *>(data);
+        napi_get_boolean(context->env, (context->errorCode == WIFI_OPT_SUCCESS), &context->result);
+        if (context->config != nullptr) {
+            delete context->config;
+            context->config = nullptr;
+        }
+        WIFI_LOGI("Push remove untrusted device config result to client");
+    };
+
+    size_t nonCallbackArgNum = 1;
+    return DoAsyncWork(env, asyncContext, argc, argv, nonCallbackArgNum);
+}
+
+napi_value ConnectToCandidateConfig(napi_env env, napi_callback_info info)
+{
+    TRACE_FUNC_CALL;
+    size_t argc = 1;
+    napi_value argv[1];
+    napi_value thisVar;
+    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, NULL));
+    NAPI_ASSERT(env, argc == 1, "Wrong number of arguments");
+
+    napi_valuetype valueType;
+    napi_typeof(env, argv[0], &valueType);
+    NAPI_ASSERT(env, valueType == napi_number, "Wrong argument type. napi_number expected.");
+
+    int networkId = -1;
+    napi_get_value_int32(env, argv[0], &networkId);
+
+    NAPI_ASSERT(env, wifiDevicePtr != nullptr, "Wifi device instance is null.");
+    ErrCode ret = wifiDevicePtr->ConnectToCandidateConfig(networkId);
+    napi_value result;
+    napi_get_boolean(env, ret == WIFI_OPT_SUCCESS, &result);
+    return result;
 }
 
 napi_value ConnectToNetwork(napi_env env, napi_callback_info info)
@@ -826,8 +939,7 @@ static void DeviceConfigToJsArray(const napi_env& env, std::vector<WifiDeviceCon
     SetValueBool(env, "isHiddenSsid", vecDeviceConfigs[idx].hiddenSSID, result);
     SetValueInt32(env, "securityType",
         static_cast<int>(ConvertKeyMgmtToSecType(vecDeviceConfigs[idx].keyMgmt)), result);
-    /* not supported currently */
-    SetValueInt32(env, "creatorUid", DEFAULT_INVALID_VALUE, result);
+    SetValueInt32(env, "creatorUid", vecDeviceConfigs[idx].uid, result);
     /* not supported currently */
     SetValueInt32(env, "disableReason", DEFAULT_INVALID_VALUE, result);
     SetValueInt32(env, "netId", vecDeviceConfigs[idx].networkId, result);
@@ -862,6 +974,25 @@ napi_value GetDeviceConfigs(napi_env env, napi_callback_info info)
     }
 
     WIFI_LOGI("Get device configs size: %{public}zu", vecDeviceConfigs.size());
+    napi_value arrayResult;
+    napi_create_array_with_length(env, vecDeviceConfigs.size(), &arrayResult);
+    for (size_t i = 0; i != vecDeviceConfigs.size(); ++i) {
+        DeviceConfigToJsArray(env, vecDeviceConfigs, i, arrayResult);
+    }
+    return arrayResult;
+}
+
+napi_value GetCandidateConfigs(napi_env env, napi_callback_info info)
+{
+    TRACE_FUNC_CALL;
+    NAPI_ASSERT(env, wifiDevicePtr != nullptr, "Wifi device instance is null.");
+    std::vector<WifiDeviceConfig> vecDeviceConfigs;
+    ErrCode ret = wifiDevicePtr->GetCandidateConfigs(vecDeviceConfigs);
+    if (ret != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("Get candidate device configs fail: %{public}d", ret);
+    }
+
+    WIFI_LOGI("Get candidate device configs size: %{public}zu", vecDeviceConfigs.size());
     napi_value arrayResult;
     napi_create_array_with_length(env, vecDeviceConfigs.size(), &arrayResult);
     for (size_t i = 0; i != vecDeviceConfigs.size(); ++i) {

@@ -30,6 +30,10 @@ napi_value GetScanInfos(napi_env env, napi_callback_info info);
 napi_value AddDeviceConfig(napi_env env, napi_callback_info info);
 napi_value AddUntrustedConfig(napi_env env, napi_callback_info info);
 napi_value RemoveUntrustedConfig(napi_env env, napi_callback_info info);
+napi_value AddCandidateConfig(napi_env env, napi_callback_info info);
+napi_value RemoveCandidateConfig(napi_env env, napi_callback_info info);
+napi_value ConnectToCandidateConfig(napi_env env, napi_callback_info info);
+napi_value GetCandidateConfigs(napi_env env, napi_callback_info info);
 napi_value ConnectToNetwork(napi_env env, napi_callback_info info);
 napi_value ConnectToDevice(napi_env env, napi_callback_info info);
 napi_value IsConnected(napi_env env, napi_callback_info info);
@@ -72,20 +76,20 @@ public:
     virtual ~ScanInfoAsyncContext(){}
 };
 
-class AddDeviceConfigContext : public AsyncContext {
+class DeviceConfigContext : public AsyncContext {
 public:
     WifiDeviceConfig *config;
-    int addResult;
+    int networkId;
 
-    AddDeviceConfigContext(napi_env env, napi_async_work work = nullptr, napi_deferred deferred = nullptr) :
-        AsyncContext(env, work, deferred){
+    DeviceConfigContext(napi_env env, napi_async_work work = nullptr, napi_deferred deferred = nullptr) :
+        AsyncContext(env, work, deferred) {
             config = nullptr;
-            addResult = -1;
+            networkId = -1;
         }
 
-    AddDeviceConfigContext() = delete;
+    DeviceConfigContext() = delete;
 
-    virtual ~AddDeviceConfigContext(){}
+    virtual ~DeviceConfigContext() {}
 };
 
 class LinkedInfoAsyncContext : public AsyncContext {

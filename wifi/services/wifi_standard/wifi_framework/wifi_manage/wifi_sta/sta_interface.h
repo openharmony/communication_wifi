@@ -89,6 +89,37 @@ public:
      */
     virtual ErrCode ReAssociate() override;
     /**
+     * @Description Add a specified candidate hotspot configuration.
+     *
+     * @param uid - call app uid
+     * @param config - WifiDeviceConfig object
+     * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
+     */
+    int AddCandidateConfig(const int uid, const WifiDeviceConfig &config) override;
+    /**
+     * @Description Connecting to a candidate specified network.
+     *
+     * @param uid - call app uid
+     * @param networkId - the candidate device network id
+     * @Return ErrCode - operation result
+     */
+    ErrCode ConnectToCandidateConfig(const int uid, const int networkId) override;
+    /**
+     * @Description Remove the wifi candidate device config equals to input network id
+     *
+     * @param uid - call app uid
+     * @param networkId - the candidate device network id
+     * @return ErrCode - operation result
+     */
+    ErrCode RemoveCandidateConfig(const int uid, const int networkId) override;
+    /**
+     * @Description Remove all the wifi candidate device config equals to input uid
+     *
+     * @param uid - call app uid
+     * @return ErrCode - operation result
+     */
+    ErrCode RemoveAllCandidateConfig(const int uid) override;
+    /**
      * @Description  Add a network to config
      *
      * @param config -The Network info(in)

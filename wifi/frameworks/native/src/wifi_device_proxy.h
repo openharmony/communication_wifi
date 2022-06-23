@@ -80,7 +80,40 @@ public:
      * @return ErrCode - operation result
      */
     ErrCode PutWifiProtectRef(const std::string &protectName) override;
-    
+
+    /**
+     * @Description Adds a specified untrusted hotspot configuration.
+     *
+     * @param config - WifiDeviceConfig object
+     * @param networkId - the device configuration's network id
+     * @return ErrCode - operation result
+     */
+    ErrCode AddCandidateConfig(const WifiDeviceConfig &config, int &networkId) override;
+
+    /**
+     * @Description Remove the wifi Untrusted device config equals to input network id
+     *
+     * @param networkId - the untrusted device network id
+     * @return ErrCode - operation result
+     */
+    ErrCode RemoveCandidateConfig(int networkId) override;
+
+    /**
+     * @Description Connect to a untrusted specified network.
+     *
+     * @param networkId - the untrusted device network id
+     * @return ErrCode - operation result
+     */
+    ErrCode ConnectToCandidateConfig(int networkId) override;
+
+    /**
+     * @Description Get all candidate device configs
+     *
+     * @param result - Get result vector of WifiDeviceConfig
+     * @return ErrCode - operation result
+     */
+    ErrCode GetCandidateConfigs(std::vector<WifiDeviceConfig> &result) override;
+
     /**
      * @Description Add a wifi device configuration.
      *

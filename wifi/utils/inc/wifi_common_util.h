@@ -113,6 +113,21 @@ std::string GetBundleName();
 bool IsSystemApp();
 
 /**
+ * @Description get calling uid
+ *
+ * @return int - calling uid
+ */
+int GetCallingUid();
+
+/**
+ * @Description Check uid the app is a foregroud app
+ *
+ * @param uid - Input uid
+ * @return bool - Returns true for yes, false for no.
+ */
+bool IsForegroundApp(const int uid);
+
+/**
  * @Description Time consuming statistics
  *
  */

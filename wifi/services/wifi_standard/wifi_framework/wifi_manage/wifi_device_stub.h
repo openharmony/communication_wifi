@@ -67,6 +67,10 @@ private:
     void OnGetDeviceMacAdd(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnIsWifiConnected(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnSetLowLatencyMode(uint32_t code, MessageParcel &data, MessageParcel &reply);
+    void OnAddCandidateConfig(uint32_t code, MessageParcel &data, MessageParcel &reply);
+    void OnConnectToCandidateConfig(uint32_t code, MessageParcel &data, MessageParcel &reply);
+    void OnRemoveCandidateConfig(uint32_t code, MessageParcel &data, MessageParcel &reply);
+    void OnGetCandidateConfigs(uint32_t code, MessageParcel &data, MessageParcel &reply);
 
 private:
     void ReadWifiDeviceConfig(MessageParcel &data, WifiDeviceConfig &config);

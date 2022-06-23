@@ -46,6 +46,8 @@ std::mutex WifiDeviceServiceImpl::g_instanceLock;
 std::shared_ptr<WifiDeviceServiceImpl> WifiDeviceServiceImpl::g_instance;
 std::shared_ptr<WifiDeviceServiceImpl> WifiDeviceServiceImpl::GetInstance()
 #else
+const uint32_t TIMEOUT_APP_EVENT = 3000;
+using TimeOutCallback = std::function<void()>;
 sptr<WifiDeviceServiceImpl> WifiDeviceServiceImpl::g_instance;
 const bool REGISTER_RESULT = SystemAbility::MakeAndRegisterAbility(WifiDeviceServiceImpl::GetInstance().GetRefPtr());
 
@@ -118,12 +120,29 @@ void WifiDeviceServiceImpl::OnStart()
     mState = ServiceRunningState::STATE_RUNNING;
     WIFI_LOGI("Start sta service!");
     WifiManager::GetInstance();
+#ifndef OHOS_ARCH_LITE
+    if (eventSubscriber_ == nullptr) {
+        lpTimer_ = std::make_unique<Utils::Timer>("WifiDeviceServiceImpl");
+        TimeOutCallback timeOutcallback = std::bind(&WifiDeviceServiceImpl::RegisterAppRemoved, this);
+        lpTimer_->Setup();
+        lpTimer_->Register(timeOutcallback, TIMEOUT_APP_EVENT, true);
+    }
+#endif
 }
 
 void WifiDeviceServiceImpl::OnStop()
 {
     mState = ServiceRunningState::STATE_NOT_START;
     mPublishFlag = false;
+#ifndef OHOS_ARCH_LITE
+    if (eventSubscriber_ != nullptr) {
+        UnRegisterAppRemoved();
+    }
+    if (lpTimer_ != nullptr) {
+        lpTimer_->Shutdown(false);
+        lpTimer_ = nullptr;
+    }
+#endif
     WIFI_LOGI("Stop sta service!");
 }
 
@@ -318,6 +337,142 @@ bool WifiDeviceServiceImpl::CheckConfigPwd(const WifiDeviceConfig &config)
         return false;
     }
     return true;
+}
+
+ErrCode WifiDeviceServiceImpl::CheckCallingUid(int &uid)
+{
+#ifndef OHOS_ARCH_LITE
+    uid = GetCallingUid();
+    if (!IsForegroundApp(uid)) {
+        return WIFI_OPT_INVALID_PARAM;
+    }
+    return WIFI_OPT_SUCCESS;
+#else
+    return WIFI_OPT_NOT_SUPPORTED;
+#endif
+}
+
+ErrCode WifiDeviceServiceImpl::AddCandidateConfig(const WifiDeviceConfig &config, int &networkId)
+{
+    if (WifiPermissionUtils::VerifySetWifiInfoPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("AddCandidateConfig:VerifySetWifiInfoPermission PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+
+    if (!CheckConfigPwd(config)) {
+        WIFI_LOGE("CheckConfigPwd failed!");
+        return WIFI_OPT_INVALID_PARAM;
+    }
+
+    int uid = 0;
+    if (CheckCallingUid(uid) != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("CheckCallingUid failed!");
+        return WIFI_OPT_INVALID_PARAM;
+    }
+
+    if (!IsStaServiceRunning()) {
+        return WIFI_OPT_STA_NOT_OPENED;
+    }
+
+    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst();
+    if (pService == nullptr) {
+        return WIFI_OPT_STA_NOT_OPENED;
+    }
+    int retNetworkId = pService->AddCandidateConfig(uid, config);
+    if (retNetworkId < 0) {
+        return WIFI_OPT_FAILED;
+    }
+    networkId = retNetworkId;
+    return WIFI_OPT_SUCCESS;
+}
+
+ErrCode WifiDeviceServiceImpl::ConnectToCandidateConfig(int networkId)
+{
+    if (WifiPermissionUtils::VerifySetWifiInfoPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("ConnectToCandidateConfig:VerifySetWifiInfoPermission PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+
+    if (networkId < 0) {
+        WIFI_LOGE("ConnectToCandidateConfig networkId invalid param!");
+        return WIFI_OPT_INVALID_PARAM;
+    }
+
+    if (!IsStaServiceRunning()) {
+        WIFI_LOGE("ConnectToCandidateConfig:IsStaServiceRunning not running!");
+        return WIFI_OPT_STA_NOT_OPENED;
+    }
+
+    int uid = 0;
+    if (CheckCallingUid(uid) != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("CheckCallingUid failed!");
+        return WIFI_OPT_INVALID_PARAM;
+    }
+
+    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst();
+    if (pService == nullptr) {
+        return WIFI_OPT_STA_NOT_OPENED;
+    }
+    return pService->ConnectToCandidateConfig(uid, networkId);
+}
+
+ErrCode WifiDeviceServiceImpl::RemoveCandidateConfig(int networkId)
+{
+    if (WifiPermissionUtils::VerifySetWifiInfoPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("RemoveCandidateConfig:VerifySetWifiInfoPermission PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+
+    if (networkId < INVALID_NETWORK_ID) {
+        WIFI_LOGE("RemoveCandidateConfig networkId invalid param!");
+        return WIFI_OPT_INVALID_PARAM;
+    }
+
+    if (!IsStaServiceRunning()) {
+        WIFI_LOGE("RemoveCandidateConfig:IsStaServiceRunning not running!");
+        return WIFI_OPT_STA_NOT_OPENED;
+    }
+
+    int uid = 0;
+    if (CheckCallingUid(uid) != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("CheckCallingUid failed!");
+        return WIFI_OPT_INVALID_PARAM;
+    }
+
+    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst();
+    if (pService == nullptr) {
+        return WIFI_OPT_STA_NOT_OPENED;
+    }
+
+    if (networkId == INVALID_NETWORK_ID) {
+        return pService->RemoveAllCandidateConfig(uid);
+    } else {
+        return pService->RemoveCandidateConfig(uid, networkId);
+    }
+}
+
+ErrCode WifiDeviceServiceImpl::GetCandidateConfigs(std::vector<WifiDeviceConfig> &result)
+{
+    if (WifiPermissionUtils::VerifyGetWifiInfoInternalPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("GetCandidateConfigs:VerifyGetWifiInfoPermission() PERMISSION_DENIED!");
+
+        if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
+            WIFI_LOGE("GetCandidateConfigs:VerifyGetWifiInfoPermission() PERMISSION_DENIED!");
+            return WIFI_OPT_PERMISSION_DENIED;
+        }
+
+        if (WifiPermissionUtils::VerifyGetScanInfosPermission() == PERMISSION_DENIED) {
+            WIFI_LOGE("GetCandidateConfigs:VerifyGetWifiInfoPermission() PERMISSION_DENIED!");
+            return WIFI_OPT_PERMISSION_DENIED;
+        }
+    }
+    int uid = 0;
+    if (CheckCallingUid(uid) != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("CheckCallingUid failed!");
+        return WIFI_OPT_INVALID_PARAM;
+    }
+    WifiConfigCenter::GetInstance().GetCandidateConfigs(uid, result);
+    return WIFI_OPT_SUCCESS;
 }
 
 ErrCode WifiDeviceServiceImpl::AddDeviceConfig(const WifiDeviceConfig &config, int &result)
@@ -958,6 +1113,57 @@ int32_t WifiDeviceServiceImpl::Dump(int32_t fd, const std::vector<std::u16string
         return ERR_OK;
     }
     return ERR_OK;
+}
+
+
+void AppEventSubscriber::OnReceiveEvent(const OHOS::EventFwk::CommonEventData &data)
+{
+    std::string action = data.GetWant().GetAction();
+    WIFI_LOGI("AppEventSubscriber::OnReceiveEvent : %{public}s.", action.c_str());
+    if (action == OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_PACKAGE_REMOVED) {
+        auto wantTemp = data.GetWant();
+        auto uid = wantTemp.GetIntParam(AppExecFwk::Constants::UID, -1);
+        IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst();
+        if (pService == nullptr) {
+            std::vector<WifiDeviceConfig> tempConfigs;
+            WifiSettings::GetInstance().GetAllCandidateConfig(uid, tempConfigs);
+            for (const auto &config : tempConfigs) {
+                if (WifiSettings::GetInstance().RemoveDevice(config.networkId) != WIFI_OPT_SUCCESS) {
+                    WIFI_LOGE("RemoveAllCandidateConfig-RemoveDevice() failed!");
+                }
+            }
+            WifiSettings::GetInstance().SyncDeviceConfig();
+            return;
+        }
+        if (pService->RemoveAllCandidateConfig(uid) != WIFI_OPT_SUCCESS) {
+            WIFI_LOGE("RemoveAllCandidateConfig failed");
+        }
+    }
+}
+
+void WifiDeviceServiceImpl::RegisterAppRemoved()
+{
+    WIFI_LOGI("RegisterAppRemoved");
+    OHOS::EventFwk::MatchingSkills matchingSkills;
+    matchingSkills.AddEvent(OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_PACKAGE_REMOVED);
+    EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
+    eventSubscriber_ = std::make_shared<AppEventSubscriber>(subscriberInfo);
+    if (!EventFwk::CommonEventManager::SubscribeCommonEvent(eventSubscriber_)) {
+        WIFI_LOGE("SubscribeCommonEvent() failed");
+    } else {
+        WIFI_LOGE("SubscribeCommonEvent() OK");
+    }
+}
+
+void WifiDeviceServiceImpl::UnRegisterAppRemoved()
+{
+    WIFI_LOGI("UnRegisterAppRemoved");
+    if (!EventFwk::CommonEventManager::UnSubscribeCommonEvent(eventSubscriber_)) {
+        WIFI_LOGE("UnSubscribeCommonEvent() failed");
+    } else {
+        WIFI_LOGE("UnSubscribeCommonEvent() OK");
+    }
+    eventSubscriber_ = nullptr;
 }
 #endif
 }  // namespace Wifi

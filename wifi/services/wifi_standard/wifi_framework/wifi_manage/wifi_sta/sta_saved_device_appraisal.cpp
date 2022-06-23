@@ -31,6 +31,7 @@ StaSavedDeviceAppraisal::StaSavedDeviceAppraisal(bool supportFmRoamingFlag)
       frequency5GHzScore(WifiSettings::GetInstance().GetScoretacticsFrequency5GHzScore()),
       userSelectedDeviceScore(WifiSettings::GetInstance().GetScoretacticsLastSelectionScore()),
       safetyDeviceScore(WifiSettings::GetInstance().GetScoretacticsSecurityScore()),
+      normalDeviceScore(WifiSettings::GetInstance().GetScoretacticsNormalScore()),
       firmwareRoamFlag(supportFmRoamingFlag)
 {}
 StaSavedDeviceAppraisal::~StaSavedDeviceAppraisal()
@@ -127,6 +128,12 @@ void StaSavedDeviceAppraisal::AppraiseDeviceQuality(
     if (Whether5GDevice(scanInfo.frequency)) {
         score += frequency5GHzScore;
         WIFI_LOGI("5G score is %{public}d.\n", frequency5GHzScore);
+    }
+
+    /* normal device config: bonus point */
+    if (device.uid == WIFI_INVALID_UID) {
+        score += normalDeviceScore;
+        WIFI_LOGI("normal score is %{public}d.\n", normalDeviceScore);
     }
 
     /* Bonus points for last user selection */

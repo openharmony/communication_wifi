@@ -104,9 +104,9 @@ typedef struct {
  */
 typedef enum {
     /** Unavailable state */
-    WIFI_STATE_NOT_AVALIABLE = 0,
+    WIFI_STATE_NOT_AVAILABLE = 0,
     /** Available state */
-    WIFI_STATE_AVALIABLE
+    WIFI_STATE_AVAILABLE
 } WifiEventState;
 
 #ifdef __cplusplus

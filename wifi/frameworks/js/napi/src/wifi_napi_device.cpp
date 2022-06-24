@@ -151,6 +151,23 @@ static ErrCode NativeScanInfosToJsObj(const napi_env& env,
     for (auto& each : vecScnIanfos) {
         napi_value eachObj;
         napi_create_object(env, &eachObj);
+
+        NativeEngine *engine = reinterpret_cast<NativeEngine *>(env);
+        std::vector<std:string> int32key = {"securityType", "rssi", "band", "frequency", "channelWidth", "timestamp"};
+        std::vector<int32_t> int32Val = {static_cast<int>(SecurityTypeNativeToJs(each.securityType)),
+            each.rssi, each.band, each.frequency, static_cast<int>(each.channelWidth), each.timestamp};
+
+        std::vector<std:string> strKey = {"ssid", "bssid", "capabilities"};
+        std::vector<std:string> strVal = {each.ssid.c_str(), each.bssid.c_str(), each.capabilities.c_str()};
+
+        std::vector<std:string> int64key = {"timestamp"};
+        std::vector<int64_t> int64Val = {each.timestamp};
+
+        NativePropertyMessage mes(int32key, int32Val, int64key, int64Val, strKey, strVal);
+        NativeValue *obj = engine->CreateObjectFromProperties(mes);
+
+        napi_value eachObj = reinterpret_cast<napi_value>(mes);
+
         SetValueUtf8String(env, "ssid", each.ssid.c_str(), eachObj);
         SetValueUtf8String(env, "bssid", each.bssid.c_str(), eachObj);
         SetValueUtf8String(env, "capabilities", each.capabilities.c_str(), eachObj);

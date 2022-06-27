@@ -221,6 +221,21 @@ napi_value GetScanInfos(napi_env env, napi_callback_info info)
     return DoAsyncWork(env, asyncContext, argc, argv, nonCallbackArgNum);
 }
 
+napi_value GetScanResults(napi_env env, napi_callback_info info)
+{
+    TRACE_FUNC_CALL;
+    NAPI_ASSERT(env, wifiScanPtr != nullptr, "Wifi scan instance is null.");
+    std::vector<WifiScanInfo> scanInfos;
+    ErrCode ret = wifiScanPtr->GetScanInfoList(scanInfos);
+    if (ret != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("GetScanInfoList return fail: %{public}d", ret);
+    }
+
+    WIFI_LOGI("GetScanInfoList, size: %{public}zu", scanInfos.size());
+    NativeScanInfosToJsObj(env, scanInfos, ret);
+    return ret;
+}
+
 static void ConvertEncryptionMode(const SecTypeJs& securityType, std::string& keyMgmt)
 {
     switch (securityType) {

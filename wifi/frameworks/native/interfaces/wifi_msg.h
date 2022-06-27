@@ -36,6 +36,12 @@ const std::string KEY_MGMT_NONE = "NONE";
 const std::string KEY_MGMT_WEP = "WEP";
 const std::string KEY_MGMT_WPA_PSK = "WPA-PSK";
 const std::string KEY_MGMT_SAE = "SAE";
+const std::string KEY_MGMT_EAP = "WPA-EAP";
+
+const std::string EAP_METHOD_TLS = "TLS";
+const std::string EAP_METHOD_TTLS = "TTLS";
+const std::string EAP_METHOD_SIM = "SIM";
+const std::string EAP_METHOD_PEAP = "PEAP";
 
 enum class SupplicantState {
     DISCONNECTED = 0,
@@ -267,6 +273,8 @@ public:
     std::string eap;      /* EAP mode Encryption Mode: PEAP/TLS/TTLS/PWD/SIM/AKA/AKA */
     std::string identity; /* EAP mode identity */
     std::string password; /* EAP mode password */
+    std::string clientCert; /* EAP mode client certificate */
+    std::string privateKey; /* EAP mode client private key */
 };
 
 enum class ConfigureProxyMethod { AUTOCONFIGUE, MANUALCONFIGUE, CLOSED };

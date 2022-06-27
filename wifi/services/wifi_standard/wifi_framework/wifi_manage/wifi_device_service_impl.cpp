@@ -285,6 +285,21 @@ bool WifiDeviceServiceImpl::CheckConfigPwd(const WifiDeviceConfig &config)
         return false;
     }
 
+    if (config.keyMgmt == KEY_MGMT_EAP) {
+        if (config.wifiEapConfig.eap == EAP_METHOD_TLS) {
+            if (config.wifiEapConfig.identity.empty() ||
+                config.wifiEapConfig.clientCert.empty() ||
+                config.wifiEapConfig.privateKey.empty()) {
+                WIFI_LOGE("CheckConfigPwd: with invalid TLS params!");
+                return false;
+            } else {
+                return true;
+            }
+        } else {
+            WIFI_LOGE("EAP:%{public}s unsupported!", config.wifiEapConfig.eap.c_str());
+        }
+    }
+
     if (config.keyMgmt != KEY_MGMT_NONE && config.preSharedKey.empty()) {
         WIFI_LOGE("CheckConfigPwd: preSharedKey is empty!");
         return false;

@@ -47,6 +47,8 @@ struct WifiIdlDeviceConfig {
     std::string eap;
     std::string identity;
     std::string password;
+    std::string clientCert;
+    std::string privateKey;
     std::string bssid;
 
     WifiIdlDeviceConfig() : networkId(-1), priority(-1), scanSsid(-1), authAlgorithms(-1), wepKeyIdx(-1)

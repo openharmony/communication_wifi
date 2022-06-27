@@ -512,6 +512,8 @@ WifiErrorNo WifiIdlClient::SetDeviceConfig(int networkId, const WifiIdlDeviceCon
     num += PushDeviceConfigString(conf + num, DEVICE_CONFIG_EAP, config.eap);
     num += PushDeviceConfigString(conf + num, DEVICE_CONFIG_IDENTITY, config.identity);
     num += PushDeviceConfigString(conf + num, DEVICE_CONFIG_PASSWORD, config.password);
+    num += PushDeviceConfigString(conf + num, DEVICE_CONFIG_EAP_CLIENT_CERT, config.clientCert);
+    num += PushDeviceConfigString(conf + num, DEVICE_CONFIG_EAP_PRIVATE_KEY, config.privateKey);
     num += PushDeviceConfigString(conf + num, DEVICE_CONFIG_BSSID, config.bssid);
     int i = 0;
     num += PushDeviceConfigString(conf + num, DEVICE_CONFIG_WEP_KEY_0, config.wepKeys[i++]);

@@ -165,6 +165,7 @@ class WifiP2pDevice {
 public:
     WifiP2pDevice()
         : deviceName(""),
+          networkName(""),
           mDeviceAddress(""),
           primaryDeviceType(""),
           secondaryDeviceType(""),
@@ -177,6 +178,8 @@ public:
     {}
     void SetDeviceName(const std::string &setDeviceName);
     const std::string &GetDeviceName() const;
+    void SetNetworkName(const std::string &name);
+    const std::string &GetNetworkName() const;
     void SetDeviceAddress(const std::string &deviceAddress);
     const std::string &GetDeviceAddress() const;
     void SetPrimaryDeviceType(const std::string &setPrimaryDeviceType);
@@ -207,6 +210,7 @@ public:
 
 private:
     std::string deviceName; /* the value range is 0 to 32 characters. */
+    std::string networkName; /* oper_ssid of peer device */
     std::string mDeviceAddress; /* the device MAC address, the length is 17 characters. */
     std::string primaryDeviceType;
     std::string secondaryDeviceType;

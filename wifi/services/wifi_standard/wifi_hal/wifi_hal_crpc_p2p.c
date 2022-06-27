@@ -790,6 +790,7 @@ int RpcP2pGetPeer(RpcServer *server, Context *context)
         WriteInt(context, peerInfo.configMethods);
         WriteInt(context, peerInfo.deviceCapabilities);
         WriteInt(context, peerInfo.groupCapabilities);
+        WriteStr(context, peerInfo.operSsid);
     }
     WriteEnd(context);
     return HAL_SUCCESS;

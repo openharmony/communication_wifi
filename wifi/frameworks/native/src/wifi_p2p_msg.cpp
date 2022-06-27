@@ -93,6 +93,16 @@ const std::string &WifiP2pDevice::GetDeviceName() const
     return deviceName;
 }
 
+void WifiP2pDevice::SetNetworkName(const std::string &name)
+{
+    networkName = name;
+}
+
+const std::string &WifiP2pDevice::GetNetworkName() const
+{
+    return networkName;
+}
+
 void WifiP2pDevice::SetDeviceAddress(const std::string &deviceAddress)
 {
     mDeviceAddress = deviceAddress;

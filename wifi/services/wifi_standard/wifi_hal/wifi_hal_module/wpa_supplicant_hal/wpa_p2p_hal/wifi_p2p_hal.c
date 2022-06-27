@@ -1122,6 +1122,8 @@ static P2pSupplicantErrCode WpaP2pCliCmdP2pGetPeer(
             peerInfo->deviceCapabilities = Hex2Dec(retMsg.value);
         } else if (strncmp(retMsg.key, "group_capab", strlen("group_capab")) == 0) {
             peerInfo->groupCapabilities = Hex2Dec(retMsg.value);
+        } else if (strncmp(retMsg.key, "oper_ssid", strlen("oper_ssid")) == 0) {
+            StrSafeCopy(peerInfo->operSsid, sizeof(peerInfo->operSsid), retMsg.value);
         }
 
         token = strtok_r(NULL, "\n", &savedPtr);

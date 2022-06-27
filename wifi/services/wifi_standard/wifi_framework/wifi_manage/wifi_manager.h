@@ -116,7 +116,7 @@ public:
      * @Description Get supported features
      *
      * @param features - output supported features
-     * @return int - operate result
+     * @return int - operation result
      */
     int GetSupportedFeatures(long &features);
 

@@ -69,7 +69,7 @@ public:
      * @Description : Obtain the dhcp result of specified interface asynchronously.
      *
      * @param ifname - interface name, eg:wlan0 [in]
-     * @param dhcp - dhcp result notify [in]
+     * @param pResultNotify - dhcp result notify [in]
      * @param timeouts - timeout interval [in]
      * @Return : success - DHCP_OPT_SUCCESS, failed - others.
      */

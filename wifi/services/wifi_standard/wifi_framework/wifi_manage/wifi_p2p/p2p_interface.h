@@ -55,51 +55,51 @@ public:
 public:
     /**
      * @Description - Enable the P2P mode.
-     * @return - ErrCode
+     * @return ErrCode - operation result
      */
     virtual ErrCode EnableP2p() override;
 
     /**
      * @Description - Disable the P2P mode.
-     * @return - ErrCode
+     * @return ErrCode - operation result
      */
     virtual ErrCode DisableP2p() override;
 
     /**
      * @Description - Start P2P device discovery.
-     * @return - ErrCode
+     * @return ErrCode - operation result
      */
     virtual ErrCode DiscoverDevices() override;
 
     /**
      * @Description - Stop P2P device discovery.
-     * @return - ErrCode
+     * @return ErrCode - operation result
      */
     virtual ErrCode StopDiscoverDevices() override;
 
     /**
      * @Description - Start P2P services discovery.
-     * @return - ErrCode
+     * @return ErrCode - operation result
      */
     virtual ErrCode DiscoverServices() override;
 
     /**
      * @Description - Stop P2P services discovery.
-     * @return - ErrCode
+     * @return ErrCode - operation result
      */
     virtual ErrCode StopDiscoverServices() override;
 
     /**
      * @Description - Register local P2P service.
      * @param  srvInfo - local service information
-     * @return - ErrCode
+     * @return ErrCode - operation result
      */
     virtual ErrCode PutLocalP2pService(const WifiP2pServiceInfo &srvInfo) override;
 
     /**
      * @Description - Delete local P2P service.
      * @param  srvInfo - local service information
-     * @return - ErrCode
+     * @return ErrCode - operation result
      */
     virtual ErrCode DeleteLocalP2pService(const WifiP2pServiceInfo &srvInfo) override;
 
@@ -107,7 +107,7 @@ public:
      * @Description - Request specified services.
      * @param  device - requested target device
      * @param  request - initiated service request data
-     * @return - ErrCode
+     * @return ErrCode - operation result
      */
     virtual ErrCode RequestService(const WifiP2pDevice &device, const WifiP2pServiceRequest &request) override;
 
@@ -115,46 +115,46 @@ public:
      * @Description - Start the P2P listening. Unit: millisecond.
      * @param  period - listening period
      * @param  interval - listening interval
-     * @return - ErrCode
+     * @return ErrCode - operation result
      */
     virtual ErrCode StartP2pListen(int period, int interval) override;
 
     /**
      * @Description - Stop the P2P listening.
-     * @return - ErrCode
+     * @return ErrCode - operation result
      */
     virtual ErrCode StopP2pListen() override;
 
     /**
      * @Description - Create a P2P group.
      * @param  config - config for creating group
-     * @return - ErrCode
+     * @return ErrCode - operation result
      */
     virtual ErrCode CreateGroup(const WifiP2pConfig &config) override;
 
     /**
      * @Description - Remove the current P2P group.
-     * @return - ErrCode
+     * @return ErrCode - operation result
      */
     virtual ErrCode RemoveGroup() override;
 
     /**
      * @Description - Delete a persistent group.
      * @param  group - specified group
-     * @return - ErrCode
+     * @return ErrCode - operation result
      */
     virtual ErrCode DeleteGroup(const WifiP2pGroupInfo &group) override;
 
     /**
      * @Description - Connect to a P2P device.
      * @param  config - config for connection
-     * @return - ErrCode
+     * @return ErrCode - operation result
      */
     virtual ErrCode P2pConnect(const WifiP2pConfig &config) override;
 
     /**
      * @Description - Canceling a P2P connection.
-     * @return - ErrCode
+     * @return ErrCode - operation result
      */
     virtual ErrCode P2pCancelConnect() override;
 
@@ -169,77 +169,77 @@ public:
     /**
      * @Description - Query P2P connection information.
      * @param  linkedInfo - object that stores connection information
-     * @return - ErrCode
+     * @return ErrCode - operation result
      */
     virtual ErrCode QueryP2pLinkedInfo(WifiP2pLinkedInfo &linkedInfo) override;
 
     /**
      * @Description set p2p wifi display info
      * @param wfdInfo - wifi display info
-     * @return ErrCode - operate result
+     * @return ErrCode - operation result
      */
     virtual ErrCode SetP2pWfdInfo(const WifiP2pWfdInfo &wfdInfo) override;
 
     /**
      * @Description - Get the current group information.
      * @param  group - object that stores the current group
-     * @return - ErrCode
+     * @return ErrCode - operation result
      */
     virtual ErrCode GetCurrentGroup(WifiP2pGroupInfo &group) override;
 
     /**
      * @Description - Obtain the P2P status.
      * @param  status - object that stores P2P status
-     * @return - ErrCode
+     * @return ErrCode - operation result
      */
     virtual ErrCode GetP2pEnableStatus(int &status) override;
 
     /**
      * @Description - Obtain the P2P discovery status.
      * @param  status - object that stores discovery status
-     * @return - ErrCode
+     * @return ErrCode - operation result
      */
     virtual ErrCode GetP2pDiscoverStatus(int &status) override;
 
     /**
      * @Description - Obtain the P2P connection status.
      * @param  status - object that stores connection status
-     * @return - ErrCode
+     * @return ErrCode - operation result
      */
     virtual ErrCode GetP2pConnectedStatus(int &status) override;
 
     /**
      * @Description - Query the information about the found devices.
      * @param  devices - list of queryed device
-     * @return - ErrCode
+     * @return ErrCode - operation result
      */
     virtual ErrCode QueryP2pDevices(std::vector<WifiP2pDevice> &devices) override;
 
     /**
      * @Description - Query the information about own device.
      * @param  device - own device
-     * @return - ErrCode
+     * @return ErrCode - operation result
      */
     virtual ErrCode QueryP2pLocalDevice(WifiP2pDevice &device) override;
 
     /**
      * @Description - Obtain information about all groups.
      * @param  groups - list of group information
-     * @return - ErrCode
+     * @return ErrCode - operation result
      */
     virtual ErrCode QueryP2pGroups(std::vector<WifiP2pGroupInfo> &groups) override;
 
     /**
      * @Description - Query the information about the found services.
      * @param  services - list of service information
-     * @return - ErrCode
+     * @return ErrCode - operation result
      */
     virtual ErrCode QueryP2pServices(std::vector<WifiP2pServiceInfo> &services) override;
 
     /**
      * @Description - Register all callbacks provided by the P2P.
      * @param  callbacks - all callbacks added
-     * @return - ErrCode
+     * @return ErrCode - operation result
      */
     virtual ErrCode RegisterP2pServiceCallbacks(const IP2pServiceCallbacks &callbacks) override;
 
@@ -248,7 +248,7 @@ public:
      *
      * @param frequency - frequency
      * @param type - frequency type
-     * @return ErrCode - operate result
+     * @return ErrCode - operation result
      */
     virtual ErrCode Hid2dCreateGroup(const int frequency, FreqType type) override;
 
@@ -256,7 +256,7 @@ public:
      * @Description Connect to a specified group using hid2d, used on the GC side.
      *
      * @param config - connection parameters
-     * @return ErrCode - operate result
+     * @return ErrCode - operation result
      */
     virtual ErrCode Hid2dConnect(const Hid2dConnectConfig& config) override;
 

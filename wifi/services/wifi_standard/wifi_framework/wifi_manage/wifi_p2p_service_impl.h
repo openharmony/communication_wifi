@@ -40,42 +40,42 @@ public:
     /**
      * @Description Enabling the P2P Mode
      *
-     * @return ErrCode - operate result
+     * @return ErrCode - operation result
      */
     ErrCode EnableP2p(void) override;
 
     /**
      * @Description Disable the P2P mode
      *
-     * @return ErrCode - operate result
+     * @return ErrCode - operation result
      */
     ErrCode DisableP2p(void) override;
 
     /**
      * @Description Start Wi-Fi P2P device search
      *
-     * @return ErrCode - operate result
+     * @return ErrCode - operation result
      */
     ErrCode DiscoverDevices(void) override;
 
     /**
      * @Description Stop Wi-Fi P2P device search
      *
-     * @return ErrCode - operate result
+     * @return ErrCode - operation result
      */
     ErrCode StopDiscoverDevices(void) override;
 
     /**
      * @Description Start the search for the Wi-Fi P2P service
      *
-     * @return ErrCode - operate result
+     * @return ErrCode - operation result
      */
     ErrCode DiscoverServices(void) override;
 
     /**
      * @Description Stop the search for the Wi-Fi P2P service
      *
-     * @return ErrCode - operate result
+     * @return ErrCode - operation result
      */
     ErrCode StopDiscoverServices(void) override;
 
@@ -84,7 +84,7 @@ public:
      *
      * @param device - WifiP2pDevice object
      * @param request - WifiP2pServiceRequest object
-     * @return ErrCode - operate result
+     * @return ErrCode - operation result
      */
     ErrCode RequestService(const WifiP2pDevice &device, const WifiP2pServiceRequest &request) override;
 
@@ -92,7 +92,7 @@ public:
      * @Description Register the local P2P service
      *
      * @param srvInfo - WifiP2pServiceInfo object
-     * @return ErrCode - operate result
+     * @return ErrCode - operation result
      */
     ErrCode PutLocalP2pService(const WifiP2pServiceInfo &srvInfo) override;
 
@@ -100,7 +100,7 @@ public:
      * @Description Delete the local P2P service
      *
      * @param srvInfo - WifiP2pServiceInfo object
-     * @return ErrCode - operate result
+     * @return ErrCode - operation result
      */
     ErrCode DeleteLocalP2pService(const WifiP2pServiceInfo &srvInfo) override;
 
@@ -109,14 +109,14 @@ public:
      *
      * @param period - period
      * @param interval - interval
-     * @return ErrCode - operate result
+     * @return ErrCode - operation result
      */
     ErrCode StartP2pListen(int period, int interval) override;
 
     /**
      * @Description Disable Wi-Fi P2P listening
      *
-     * @return ErrCode - operate result
+     * @return ErrCode - operation result
      */
     ErrCode StopP2pListen(void) override;
 
@@ -124,7 +124,7 @@ public:
      * @Description Creating a P2P Group
      *
      * @param config - WifiP2pGroupInfo object
-     * @return ErrCode - operate result
+     * @return ErrCode - operation result
      */
     ErrCode CreateGroup(const WifiP2pConfig &config) override;
 
@@ -132,7 +132,7 @@ public:
      * @Description Remove a P2P Group
      *
      *
-     * @return ErrCode - operate result
+     * @return ErrCode - operation result
      */
     ErrCode RemoveGroup(void) override;
 
@@ -140,7 +140,7 @@ public:
      * @Description Delete a p2p Group
      *
      * @param group - WifiP2pGroupInfo object
-     * @return ErrCode - operate result
+     * @return ErrCode - operation result
      */
     ErrCode DeleteGroup(const WifiP2pGroupInfo &group) override;
 
@@ -148,14 +148,14 @@ public:
      * @Description P2P connection
      *
      * @param config - WifiP2pConfig object
-     * @return ErrCode - operate result
+     * @return ErrCode - operation result
      */
     ErrCode P2pConnect(const WifiP2pConfig &config) override;
 
     /**
      * @Description Canceling a P2P connection
      *
-     * @return ErrCode - operate result
+     * @return ErrCode - operation result
      */
     ErrCode P2pCancelConnect(void) override;
 
@@ -163,7 +163,7 @@ public:
      * @Description Querying Wi-Fi P2P Connection Information
      *
      * @param linkedInfo - Get the WifiP2pLinkedInfo msg
-     * @return ErrCode - operate result
+     * @return ErrCode - operation result
      */
     ErrCode QueryP2pLinkedInfo(WifiP2pLinkedInfo &linkedInfo) override;
 
@@ -171,7 +171,7 @@ public:
      * @Description Get the Current Group object
      *
      * @param group - the WifiP2pGroupInfo object
-     * @return ErrCode - operate result
+     * @return ErrCode - operation result
      */
     ErrCode GetCurrentGroup(WifiP2pGroupInfo &group) override;
 
@@ -179,7 +179,7 @@ public:
      * @Description Obtains the P2P switch status
      *
      * @param status - the P2P switch status
-     * @return ErrCode - operate result
+     * @return ErrCode - operation result
      */
     ErrCode GetP2pEnableStatus(int &status) override;
 
@@ -195,7 +195,7 @@ public:
      * @Description Obtains the P2P connection status
      *
      * @param status - the P2P connection status
-     * @return ErrCode - operate result
+     * @return ErrCode - operation result
      */
     ErrCode GetP2pConnectedStatus(int &status) override;
 
@@ -203,7 +203,7 @@ public:
      * @Description Query the information about the found devices
      *
      * @param devices - Get result vector of WifiP2pDevice
-     * @return ErrCode - operate result
+     * @return ErrCode - operation result
      */
     ErrCode QueryP2pDevices(std::vector<WifiP2pDevice> &devices) override;
 
@@ -211,7 +211,7 @@ public:
      * @Description Query the information about the local device
      *
      * @param devives - Get result of WifiP2pDevice
-     * @return ErrCode - operate result
+     * @return ErrCode - operation result
      */
     ErrCode QueryP2pLocalDevice(WifiP2pDevice &device) override;
 
@@ -219,7 +219,7 @@ public:
      * @Description Query the information about the found groups
      *
      * @param groups - Get result vector of WifiP2pGroupInfo
-     * @return ErrCode - operate result
+     * @return ErrCode - operation result
      */
     ErrCode QueryP2pGroups(std::vector<WifiP2pGroupInfo> &groups) override;
 
@@ -227,7 +227,7 @@ public:
      * @Description Query the service information
      *
      * @param services - Get result vector of Device
-     * @return ErrCode - operate result
+     * @return ErrCode - operation result
      */
     ErrCode QueryP2pServices(std::vector<WifiP2pServiceInfo> &services) override;
 
@@ -235,7 +235,7 @@ public:
      * @Description Register callback function
      *
      * @param callback - IWifiP2pCallback object
-     * @return ErrCode - operate result
+     * @return ErrCode - operation result
      */
     ErrCode RegisterCallBack(const sptr<IWifiP2pCallback> &callback) override;
 
@@ -251,7 +251,7 @@ public:
      * @Description set the device name
      *
      * @param deviceName - device name
-     * @return ErrCode - operate result
+     * @return ErrCode - operation result
      */
     ErrCode SetP2pDeviceName(const std::string &deviceName) override;
 
@@ -259,7 +259,7 @@ public:
      * @Description set p2p wifi display info
      *
      * @param wfdInfo - wifi display info
-     * @return ErrCode - operate result
+     * @return ErrCode - operation result
      */
     ErrCode SetP2pWfdInfo(const WifiP2pWfdInfo &wfdInfo) override;
 
@@ -268,21 +268,21 @@ public:
      *
      * @param gcMac - gc mac address
      * @param ipAddr - applied ip address
-     * @return ErrCode - operate result
+     * @return ErrCode - operation result
      */
     ErrCode Hid2dRequestGcIp(const std::string& gcMac, std::string& ipAddr) override;
 
     /**
      * @Description Increase(+1) hid2d shared link reference counting
      *
-     * @return ErrCode - operate result
+     * @return ErrCode - operation result
      */
     ErrCode Hid2dSharedlinkIncrease() override;
 
     /**
      * @Description Decrease(-1) hid2d shared link reference counting
      *
-     * @return ErrCode - operate result
+     * @return ErrCode - operation result
      */
     ErrCode Hid2dSharedlinkDecrease() override;
 
@@ -291,7 +291,7 @@ public:
      *
      * @param frequency - frequency
      * @param type - frequency type
-     * @return ErrCode - operate result
+     * @return ErrCode - operation result
      */
     ErrCode Hid2dCreateGroup(const int frequency, FreqType type) override;
 
@@ -299,7 +299,7 @@ public:
      * @Description The GC side actively disconnects from the GO, used on the GC side.
      *
      * @param gcIfName - network interface name
-     * @return ErrCode - operate result
+     * @return ErrCode - operation result
      */
     ErrCode Hid2dRemoveGcGroup(const std::string& gcIfName) override;
 
@@ -307,7 +307,7 @@ public:
      * @Description Connect to a specified group using hid2d, used on the GC side.
      *
      * @param config - connection parameters
-     * @return ErrCode - operate result
+     * @return ErrCode - operation result
      */
     ErrCode Hid2dConnect(const Hid2dConnectConfig& config) override;
 
@@ -316,7 +316,7 @@ public:
      *
      * @param ifName - network interface name
      * @param ipInfo - IP infos
-     * @return ErrCode - operate result
+     * @return ErrCode - operation result
      */
     ErrCode Hid2dConfigIPAddr(const std::string& ifName, const IpAddrInfo& ipInfo) override;
 
@@ -324,7 +324,7 @@ public:
      * @Description Clear IP address when the P2P connection is disconnected, used on the GC side.
      *
      * @param ifName - network interface name
-     * @return ErrCode - operate result
+     * @return ErrCode - operation result
      */
     ErrCode Hid2dReleaseIPAddr(const std::string& ifName) override;
 
@@ -333,7 +333,7 @@ public:
      *
      * @param request - request data
      * @param response - response result
-     * @return ErrCode - operate result
+     * @return ErrCode - operation result
      */
     ErrCode Hid2dGetRecommendChannel(const RecommendChannelRequest& request,
         RecommendChannelResponse& response) override;
@@ -342,7 +342,7 @@ public:
      * @Description get 5G channel list
      *
      * @param vecChannelList - result for channel list
-     * @return ErrCode - operate result
+     * @return ErrCode - operation result
      */
     ErrCode Hid2dGetChannelListFor5G(std::vector<int>& vecChannelList) override;
 
@@ -352,7 +352,7 @@ public:
      * @param cfgType - configuration type
      * @param cfgData - the queried data of wifi configuration
      * @param getDatValidLen - the valid data length in the array `cfgData`
-     * @return ErrCode - operate result
+     * @return ErrCode - operation result
      */
     ErrCode Hid2dGetSelfWifiCfgInfo(SelfCfgType cfgType,
         char cfgData[CFG_DATA_MAX_BYTES], int* getDatValidLen) override;
@@ -363,7 +363,7 @@ public:
      * @param cfgType - configuration type
      * @param cfgData - the wifi configuration data to be set
      * @param setDataValidLen - the valid data length in the array `cfgData`
-     * @return ErrCode - operate result
+     * @return ErrCode - operation result
      */
     ErrCode Hid2dSetPeerWifiCfgInfo(PeerCfgType cfgType,
         char cfgData[CFG_DATA_MAX_BYTES], int setDataValidLen) override;
@@ -373,7 +373,7 @@ public:
      *
      * @param fd - file descriptor
      * @param args - dump arguments
-     * @return ErrCode - operate result
+     * @return ErrCode - operation result
      */
     int32_t Dump(int32_t fd, const std::vector<std::u16string>& args) override;
 

@@ -105,21 +105,21 @@ static ErrCode NativeInfoElemsToJsObj(const napi_env& env,
     uint8_t idx_ie = 0;
     napi_status status;
     int valueStep = 2;
-    for (int i = 0; i < infoElems.size(); i++) {
+    for (size_t i = 0; i < infoElems.size(); i++) {
         napi_value ieObj;
         napi_create_object(env, &ieObj);
         SetValueInt32(env, "eid", infoElems[i].id, ieObj);
         const char *uStr = &infoElems[i].content[0];
-        int len = infoElems[i].content.size();
-        int inLen = (infoElems[i].content.size()) * valueStep + 1;
+        size_t len = infoElems[i].content.size();
+        size_t inLen = (infoElems[i].content.size()) * valueStep + 1;
         char *buf = (char *)calloc(inLen + 1, sizeof(char));
         if (buf == NULL) {
             return WIFI_OPT_FAILED;
         }
         int pos = 0;
-        for (unsigned int i = 0; i < len; ++i) {
-            pos = (i << 1);
-            if (snprintf_s(buf + pos, inLen - pos, inLen - pos - 1, "%02x", uStr[i]) < 0) {
+        for (size_t k = 0; k < len; ++k) {
+            pos = (k << 1);
+            if (snprintf_s(buf + pos, inLen - pos, inLen - pos - 1, "%02x", uStr[k]) < 0) {
                 free(buf);
                 buf = NULL;
                 return WIFI_OPT_FAILED;
@@ -215,7 +215,11 @@ napi_value GetScanResults(napi_env env, napi_callback_info info)
     }
 
     WIFI_LOGI("GetScanInfoList, size: %{public}zu", scanInfos.size());
-    NativeScanInfosToJsObj(env, scanInfos, ret);
+    napi_value result;
+    ret = NativeScanInfosToJsObj(env, scanInfos, result);
+    if (ret != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("NativeScanInfosToJsObj return fail: %{public}d", ret);
+    }
     return ret;
 }
 

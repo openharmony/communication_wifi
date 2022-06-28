@@ -220,9 +220,16 @@ bool P2pStateMachine::ReawakenPersistentGroup(WifiP2pConfigInternal &config) con
     }
 
     bool isJoin = device.IsGroupOwner();
-    const std::string groupName = config.GetGroupName();
+    std::string groupName = config.GetGroupName();
 
     if (isJoin && !device.IsGroupLimit()) {
+        if (groupName.empty()) {
+            WifiP2pDevice peerInfo;
+            if (WifiP2PHalInterface::GetInstance().GetP2pPeer(config.GetDeviceAddress(), peerInfo) ==
+                WifiErrorNo::WIFI_IDL_OPT_OK) {
+                groupName = peerInfo.GetNetworkName();
+            }
+        }
         int networkId = groupManager.GetGroupNetworkId(device, groupName);
         if (networkId >= 0) {
             /**
@@ -250,9 +257,9 @@ bool P2pStateMachine::ReawakenPersistentGroup(WifiP2pConfigInternal &config) con
         if (config.GetNetId() >= 0) {
             if (config.GetDeviceAddress() == groupManager.GetGroupOwnerAddr(config.GetNetId())) {
                 networkId = config.GetNetId();
-            } else {
-                networkId = groupManager.GetGroupNetworkId(device);
             }
+        } else {
+            networkId = groupManager.GetGroupNetworkId(device);
         }
         if (networkId < 0) {
             /**
@@ -880,7 +887,8 @@ bool P2pStateMachine::DealCreateNewGroupWithConfig(const WifiP2pConfigInternal &
             WIFI_LOGD("Remove network %{public}d!", createdNetId);
             WifiP2PHalInterface::GetInstance().RemoveNetwork(createdNetId);
     }
-    
+
+    (void)WifiP2PHalInterface::GetInstance().SaveConfig();
     return (ret == WIFI_IDL_OPT_FAILED) ? false : true ;
 }
 
@@ -892,14 +900,17 @@ bool P2pStateMachine::IsInterfaceReuse() const
 void P2pStateMachine::UpdateGroupInfoToWpa() const
 {
     WIFI_LOGI("Start update group info to wpa");
-    /* In the scenario of interface reuse, the configuration of sta may be deleted */
-    if (!IsInterfaceReuse()) {
+    std::vector<WifiP2pGroupInfo> grpInfo = groupManager.GetGroups();
+    /* 1) In the scenario of interface reuse, the configuration of sta may be deleted
+     * 2) Dont remove p2p networks of wpa_s in initial phase after device reboot
+     */
+    if (!IsInterfaceReuse() && grpInfo.size() > 0) {
         if (WifiP2PHalInterface::GetInstance().RemoveNetwork(-1) != WIFI_IDL_OPT_OK) {
             WIFI_LOGE("Failed to delete all group info before update group info to wpa! Stop update!");
             return;
         }
     }
-    std::vector<WifiP2pGroupInfo> grpInfo = groupManager.GetGroups();
+
     int createdNetId = -1;
     WifiP2pGroupInfo grpBuf;
     IdlP2pGroupConfig wpaConfig;

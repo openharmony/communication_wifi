@@ -171,6 +171,11 @@ public:
         currentGroup.RemoveClientDevice(device);
     }
 
+    inline bool IsCurrGroupClientEmpty(void)
+    {
+        return currentGroup.IsClientDevicesEmpty();
+    }
+
     inline void SetCurrentGroup(const WifiP2pGroupInfo &group)
     {
         currentGroup = group;

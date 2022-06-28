@@ -83,6 +83,7 @@ bool P2pGroupOperatingState::ProcessCmdCreateGroup(const InternalMessage &msg) c
                 WIFI_LOGW("Some configuration settings failed!");
             }
             ret = WifiP2PHalInterface::GetInstance().GroupAdd(true, netId, freq);
+            (void)WifiP2PHalInterface::GetInstance().SaveConfig();
         }
     } else if (netId == PERSISTENT_NET_ID || netId == TEMPORARY_NET_ID) {
         /**
@@ -287,6 +288,7 @@ bool P2pGroupOperatingState::ProcessCmdDeleteGroup(const InternalMessage &msg) c
     }
 
     ret = WifiP2PHalInterface::GetInstance().RemoveNetwork(networkId);
+    (void)WifiP2PHalInterface::GetInstance().SaveConfig();
     groupManager.RemoveGroup(group);
     if (ret) {
         WIFI_LOGE("P2P group deletion failed.");

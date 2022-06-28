@@ -46,6 +46,7 @@ typedef struct P2pDeviceInfo {
     char primaryDeviceType[WIFI_P2P_DEVICE_TYPE_LENGTH];
     char deviceName[WIFI_P2P_DEVICE_NAME_LENGTH];
     char wfdDeviceInfo[WIFI_P2P_WFD_DEVICE_INFO_LENGTH];
+    char operSsid[WIFI_P2P_DEVICE_NAME_LENGTH];
 } P2pDeviceInfo;
 
 typedef struct P2pGroupInfo {

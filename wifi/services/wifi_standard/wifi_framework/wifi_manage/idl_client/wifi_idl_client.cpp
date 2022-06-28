@@ -1533,6 +1533,7 @@ WifiErrorNo WifiIdlClient::ReqGetP2pPeer(const std::string &deviceAddress, WifiP
         device.SetWpsConfigMethod(peerInfo.configMethods);
         device.SetDeviceCapabilitys(peerInfo.deviceCapabilities);
         device.SetGroupCapabilitys(peerInfo.groupCapabilities);
+        device.SetNetworkName(peerInfo.operSsid);
     }
     return ret;
 }

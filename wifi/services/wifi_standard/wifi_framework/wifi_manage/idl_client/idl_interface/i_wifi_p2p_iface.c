@@ -969,6 +969,7 @@ WifiErrorNo P2pGetPeer(const char *deviceAddress, P2pDeviceInfo *peerInfo)
         ReadInt(context, &peerInfo->configMethods);
         ReadInt(context, &peerInfo->deviceCapabilities);
         ReadInt(context, &peerInfo->groupCapabilities);
+        ReadStr(context, peerInfo->operSsid, sizeof(peerInfo->operSsid));
     }
     ReadClientEnd(client);
     UnlockRpcClient(client);

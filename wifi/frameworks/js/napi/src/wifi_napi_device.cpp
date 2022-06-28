@@ -16,6 +16,7 @@
 #include "wifi_napi_device.h"
 #include <vector>
 #include <functional>
+#include "native_engine.h"
 #include "wifi_common_util.h"
 #include "wifi_logger.h"
 
@@ -101,20 +102,25 @@ static ErrCode NativeScanInfosToJsObj(const napi_env& env,
     const std::vector<WifiScanInfo>& vecScnIanfos, napi_value& arrayResult)
 {
     uint32_t idx = 0;
+    NativeEngine* engine = reinterpret_cast<NativeEngine*>(env);
+    const char *str[12] = {"securityType", "rssi", "band", "frequency", "channelWidth",
+                           "timestamp", "ssid", "bssid", "capabilities"};
+    int64_t num[9] = {};
+    num[0] = 5; // 5 : INT32_T NUMBERS
+    num[1] = 1; // 1 : INT64_T NUMBERS
+    num[2] = 3; // 3 : STR NUMBERS
     for (auto& each : vecScnIanfos) {
-        napi_value eachObj;
-        napi_create_object(env, &eachObj);
-
-        SetValueUtf8String(env, "ssid", each.ssid.c_str(), eachObj);
-        SetValueUtf8String(env, "bssid", each.bssid.c_str(), eachObj);
-        SetValueUtf8String(env, "capabilities", each.capabilities.c_str(), eachObj);
-        SetValueInt32(env, "securityType", static_cast<int>(SecurityTypeNativeToJs(each.securityType)), eachObj);
-        SetValueInt32(env, "rssi", each.rssi, eachObj);
-        SetValueInt32(env, "band", each.band, eachObj);
-        SetValueInt32(env, "frequency", each.frequency, eachObj);
-        SetValueInt32(env, "channelWidth", static_cast<int>(each.channelWidth), eachObj);
-        SetValueInt64(env, "timestamp", each.timestamp, eachObj);
-
+        str[9] = each.ssid.c_str();  // 9 : "ssid" - value
+        str[10] = each.bssid.c_str();  // 10 : "bssid" - value
+        str[11] = each.capabilities.c_str();  // 11 : "capabilities" - value
+        num[3] = static_cast<int>(SecurityTypeNativeToJs(each.securityType)); // 3 : "securityType" - value
+        num[4] = each.rssi;  // 4 : "rssi" - value
+        num[5] = each.band;  // 5 : "band" - value
+        num[6] = each.frequency;  // 6 : "frequency" - value
+        num[7] = static_cast<int>(each.channelWidth);  // 7 : "channelWidth" - value
+        num[8] = each.timestamp;  // 8 : "timestamp" - value
+        NativeValue* obj = engine->CreateObjectFromProperties(str, num);
+        napi_value eachObj = reinterpret_cast<napi_value>(obj);
         napi_status status = napi_set_element(env, arrayResult, idx++, eachObj);
         if (status != napi_ok) {
             WIFI_LOGE("Wifi napi set element error: %{public}d, idx: %{public}d", status, idx - 1);

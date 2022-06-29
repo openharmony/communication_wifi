@@ -22,7 +22,9 @@
 DEFINE_WIFILOG_HOTSPOT_LABEL("WifiHotspotProxy");
 namespace OHOS {
 namespace Wifi {
-static WifiHotspotCallbackStub *g_wifiHotspotCallbackStub = new WifiHotspotCallbackStub;
+static sptr<WifiHotspotCallbackStub> g_wifiHotspotCallbackStub =
+    sptr<WifiHotspotCallbackStub>(new (std::nothrow) WifiHotspotCallbackStub());
+
 WifiHotspotProxy::WifiHotspotProxy(const sptr<IRemoteObject> &impl)
     : IRemoteProxy<IWifiHotspot>(impl), mRemoteDied(false)
 {

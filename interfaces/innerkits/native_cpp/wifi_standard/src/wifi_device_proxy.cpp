@@ -21,7 +21,9 @@ DEFINE_WIFILOG_LABEL("WifiDeviceProxy");
 
 namespace OHOS {
 namespace Wifi {
-static WifiDeviceCallBackStub* g_deviceCallBackStub = new WifiDeviceCallBackStub;
+static sptr<WifiDeviceCallBackStub> g_deviceCallBackStub =
+    sptr<WifiDeviceCallBackStub>(new (std::nothrow) WifiDeviceCallBackStub());
+
 WifiDeviceProxy::WifiDeviceProxy(const sptr<IRemoteObject> &impl) : IRemoteProxy<IWifiDevice>(impl), mRemoteDied(false)
 {
     if (impl) {
@@ -951,6 +953,10 @@ ErrCode WifiDeviceProxy::RegisterCallBack(const sptr<IWifiDeviceCallBack> &callb
     }
     data.WriteInt32(0);
 
+    if (g_deviceCallBackStub == nullptr) {
+        WIFI_LOGE("g_deviceCallBackStub is nullptr");
+        return WIFI_OPT_FAILED;
+    }
     g_deviceCallBackStub->RegisterUserCallBack(callback);
 
     if (!data.WriteRemoteObject(g_deviceCallBackStub->AsObject())) {
@@ -1097,6 +1103,10 @@ void WifiDeviceProxy::OnRemoteDied(const wptr<IRemoteObject> &remoteObject)
 {
     WIFI_LOGD("Remote service is died!");
     mRemoteDied = true;
+    if (g_deviceCallBackStub == nullptr) {
+        WIFI_LOGE("g_deviceCallBackStub is nullptr");
+        return;
+    }
     if (g_deviceCallBackStub != nullptr) {
         g_deviceCallBackStub->SetRemoteDied(true);
     }

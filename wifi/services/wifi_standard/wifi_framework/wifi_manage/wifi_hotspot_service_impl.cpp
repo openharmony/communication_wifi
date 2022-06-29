@@ -265,6 +265,13 @@ ErrCode WifiHotspotServiceImpl::CheckCanEnableHotspot(const ServiceType type)
         WIFI_LOGI("current power saving mode and can not use ap, open failed!");
         return WIFI_OPT_FORBID_POWSAVING;
     }
+
+    WifiOprMidState curState = WifiConfigCenter::GetInstance().GetWifiMidState();
+    if (curState != WifiOprMidState::CLOSED) {
+        WIFI_LOGI("current wifi state is %{public}d, please close sta first!",
+            static_cast<int>(curState));
+        return WIFI_OPT_NOT_SUPPORTED;
+    }
     return WIFI_OPT_SUCCESS;
 }
 

@@ -21,7 +21,8 @@ namespace OHOS {
 namespace Wifi {
 DEFINE_WIFILOG_P2P_LABEL("WifiP2pProxy");
 
-static WifiP2pCallbackStub g_wifiP2pCallbackStub;
+static sptr<WifiP2pCallbackStub> g_wifiP2pCallbackStub =
+    sptr<WifiP2pCallbackStub>(new (std::nothrow) WifiP2pCallbackStub());
 WifiP2pProxy::WifiP2pProxy(const sptr<IRemoteObject> &impl) : IRemoteProxy<IWifiP2p>(impl), mRemoteDied(false)
 {
     if (impl) {
@@ -1017,13 +1018,17 @@ ErrCode WifiP2pProxy::RegisterCallBack(const sptr<IWifiP2pCallback> &callback)
     MessageParcel reply;
     MessageOption option(MessageOption::TF_ASYNC);
 
-    g_wifiP2pCallbackStub.RegisterCallBack(callback);
+    if (g_wifiP2pCallbackStub == nullptr) {
+        WIFI_LOGE("g_wifiP2pCallbackStub is nullptr");
+        return WIFI_OPT_FAILED;
+    }
+    g_wifiP2pCallbackStub->RegisterCallBack(callback);
     if (!data.WriteInterfaceToken(GetDescriptor())) {
         WIFI_LOGE("Write interface token error: %{public}s", __func__);
         return WIFI_OPT_FAILED;
     }
     data.WriteInt32(0);
-    if (!data.WriteRemoteObject(g_wifiP2pCallbackStub.AsObject())) {
+    if (!data.WriteRemoteObject(g_wifiP2pCallbackStub->AsObject())) {
         WIFI_LOGE("RegisterCallBack WriteRemoteObject failed!");
         return WIFI_OPT_FAILED;
     }
@@ -1484,7 +1489,11 @@ void WifiP2pProxy::OnRemoteDied(const wptr<IRemoteObject>& remoteObject)
 {
     WIFI_LOGE("Remote service is died!");
     mRemoteDied = true;
-    g_wifiP2pCallbackStub.SetRemoteDied(true);
+    if (g_wifiP2pCallbackStub == nullptr) {
+        WIFI_LOGE("g_wifiP2pCallbackStub is nullptr");
+        return;
+    }
+    g_wifiP2pCallbackStub->SetRemoteDied(true);
 }
 }  // namespace Wifi
 }  // namespace OHOS

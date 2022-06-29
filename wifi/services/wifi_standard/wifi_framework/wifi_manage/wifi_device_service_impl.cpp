@@ -161,6 +161,15 @@ ErrCode WifiDeviceServiceImpl::EnableWifi()
         }
     }
 
+#ifdef FEATURE_AP_SUPPORT
+    WifiOprMidState curState = WifiConfigCenter::GetInstance().GetApMidState(0);
+    if (curState != WifiOprMidState::CLOSED) {
+        WIFI_LOGW("current ap state is %{public}d, please close SoftAp first!",
+            static_cast<int>(curState));
+        return WIFI_OPT_NOT_SUPPORTED;
+    }
+#endif
+
 #ifdef FEATURE_P2P_SUPPORT
     sptr<WifiP2pServiceImpl> p2pService = WifiP2pServiceImpl::GetInstance();
     if (p2pService != nullptr && p2pService->EnableP2p() != WIFI_OPT_SUCCESS) {

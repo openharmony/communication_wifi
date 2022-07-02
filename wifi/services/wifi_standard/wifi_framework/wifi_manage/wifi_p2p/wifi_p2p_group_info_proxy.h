@@ -80,6 +80,7 @@ public:
     std::vector<WifiP2pDevice> GetClientDevices() const;
     void SetClientDevices(const std::vector<WifiP2pDevice> &devices);
     void ClearClientDevices();
+    bool IsExplicitGroup() const;
 
 public:
     ~WifiP2pGroupInfoProxy() = default;

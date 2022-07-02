@@ -1381,5 +1381,15 @@ void WifiSettings::SetDefaultFrequenciesByCountryBand(const BandType band, std::
         }
     }
 }
+
+void WifiSettings::SetExplicitGroup(bool isExplicit)
+{
+    explicitGroup = isExplicit;
+}
+
+bool WifiSettings::IsExplicitGroup(void)
+{
+    return explicitGroup;
+}
 } // namespace Wifi
 } // namespace OHOS

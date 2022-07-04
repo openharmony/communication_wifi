@@ -23,7 +23,8 @@
 namespace OHOS {
 DEFINE_WIFILOG_SCAN_LABEL("WifiScanProxy");
 namespace Wifi {
-static WifiScanCallbackStub g_wifiScanCallbackStub;
+static sptr<WifiScanCallbackStub> g_wifiScanCallbackStub =
+    sptr<WifiScanCallbackStub>(new (std::nothrow) WifiScanCallbackStub());
 
 WifiScanProxy::WifiScanProxy(const sptr<IRemoteObject> &remote) : IRemoteProxy<IWifiScan>(remote), mRemoteDied(false)
 {
@@ -272,13 +273,17 @@ ErrCode WifiScanProxy::RegisterCallBack(const sptr<IWifiScanCallback> &callback)
     MessageParcel reply;
     MessageOption option(MessageOption::TF_ASYNC);
 
-    g_wifiScanCallbackStub.RegisterCallBack(callback);
+    if (g_wifiScanCallbackStub == nullptr) {
+        WIFI_LOGE("g_wifiScanCallbackStub is nullptr!");
+        return WIFI_OPT_FAILED;
+    }
+    g_wifiScanCallbackStub->RegisterCallBack(callback);
     if (!data.WriteInterfaceToken(GetDescriptor())) {
         WIFI_LOGE("Write interface token error: %{public}s", __func__);
         return WIFI_OPT_FAILED;
     }
     data.WriteInt32(0);
-    if (!data.WriteRemoteObject(g_wifiScanCallbackStub.AsObject())) {
+    if (!data.WriteRemoteObject(g_wifiScanCallbackStub->AsObject())) {
         WIFI_LOGE("RegisterCallBack WriteRemoteObject failed!");
         return WIFI_OPT_FAILED;
     }
@@ -328,7 +333,11 @@ void WifiScanProxy::OnRemoteDied(const wptr<IRemoteObject>& remoteObject)
 {
     WIFI_LOGD("Remote service is died!");
     mRemoteDied = true;
-    g_wifiScanCallbackStub.SetRemoteDied(true);
+    if (g_wifiScanCallbackStub == nullptr) {
+        WIFI_LOGE("g_wifiScanCallbackStub is nullptr!");
+        return;
+    }
+    g_wifiScanCallbackStub->SetRemoteDied(true);
 }
 }  // namespace Wifi
 }  // namespace OHOS

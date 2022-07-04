@@ -183,7 +183,7 @@ public:
      *
      * @param fd - file descriptor
      * @param args - dump arguments
-     * @return ErrCode - operate result
+     * @return ErrCode - operation result
      */
     int32_t Dump(int32_t fd, const std::vector<std::u16string>& args) override;
 

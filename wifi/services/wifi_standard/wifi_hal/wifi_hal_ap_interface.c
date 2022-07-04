@@ -125,7 +125,7 @@ WifiErrorNo StopSoftAp(int id)
             LOGE("disableAp failed! ret=%{public}d", ret);
         }
     } else {
-        LOGE("can not get hostapd dev");
+        LOGE("cant not get hostapd dev");
     }
 
     if (StopHostapd() != WIFI_HAL_SUCCESS) {

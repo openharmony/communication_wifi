@@ -143,21 +143,21 @@ typedef struct RecommendChannelResponse {
  * @param gcMac - gc mac address
  * @param ipAddr - Indicates the applied IP address, which is a 4-bit int array.
  *    example: 127.0.0.1 -> ipAddr[ 127, 0, 0, 1 ]
- * @return WifiErrorCode - operate result
+ * @return WifiErrorCode - operation result
  */
 WifiErrorCode Hid2dRequestGcIp(const unsigned char gcMac[MAC_LEN], unsigned int ipAddr[IPV4_ARRAY_LEN]);
 
 /**
  * @Description Increase(+1) shared link reference counting
  *
- * @return WifiErrorCode - operate result
+ * @return WifiErrorCode - operation result
  */
 WifiErrorCode Hid2dSharedlinkIncrease();
 
 /**
  * @Description Decrease(-1) shared link reference counting
  *
- * @return WifiErrorCode - operate result
+ * @return WifiErrorCode - operation result
  */
 WifiErrorCode Hid2dSharedlinkDecrease();
 
@@ -166,7 +166,7 @@ WifiErrorCode Hid2dSharedlinkDecrease();
  *
  * @param frequency - frequency
  * @param type - frequency type
- * @return WifiErrorCode - operate result
+ * @return WifiErrorCode - operation result
  */
 WifiErrorCode Hid2dCreateGroup(const int frequency, FreqType type);
 
@@ -174,7 +174,7 @@ WifiErrorCode Hid2dCreateGroup(const int frequency, FreqType type);
  * @Description The GC side actively disconnects from the GO, used on the GC side.
  *
  * @param gcIfName - network interface name
- * @return WifiErrorCode - operate result
+ * @return WifiErrorCode - operation result
  */
 WifiErrorCode Hid2dRemoveGcGroup(const char gcIfName[IF_NAME_LEN]);
 
@@ -182,7 +182,7 @@ WifiErrorCode Hid2dRemoveGcGroup(const char gcIfName[IF_NAME_LEN]);
  * @Description Connect to a specified group using hid2d, used on the GC side.
  *
  * @param config - connection parameters
- * @return WifiErrorCode - operate result
+ * @return WifiErrorCode - operation result
  */
 WifiErrorCode Hid2dConnect(const Hid2dConnectConfig *config);
 
@@ -190,8 +190,8 @@ WifiErrorCode Hid2dConnect(const Hid2dConnectConfig *config);
  * @Description Configuring IP addresses for P2P network interfaces, used on the GC side.
  *
  * @param ifName - network interface name
- * @param IpInfo - IP infos
- * @return WifiErrorCode - operate result
+ * @param ipInfo - IP infos
+ * @return WifiErrorCode - operation result
  */
 WifiErrorCode Hid2dConfigIPAddr(const char ifName[IF_NAME_LEN], const IpAddrInfo *ipInfo);
 
@@ -199,7 +199,7 @@ WifiErrorCode Hid2dConfigIPAddr(const char ifName[IF_NAME_LEN], const IpAddrInfo
  * @Description Clear IP address when the P2P connection is disconnected, used on the GC side.
  *
  * @param ifName - network interface name
- * @return WifiErrorCode - operate result
+ * @return WifiErrorCode - operation result
  */
 WifiErrorCode Hid2dReleaseIPAddr(const char ifName[IF_NAME_LEN]);
 
@@ -209,7 +209,7 @@ WifiErrorCode Hid2dReleaseIPAddr(const char ifName[IF_NAME_LEN]);
  * @param request - request data
  * @param response - response result
  *
- * @return WifiErrorCode - operate result
+ * @return WifiErrorCode - operation result
  */
 WifiErrorCode Hid2dGetRecommendChannel(const RecommendChannelRequest *request, RecommendChannelResponse *response);
 
@@ -220,7 +220,7 @@ WifiErrorCode Hid2dGetRecommendChannel(const RecommendChannelRequest *request, R
  * Use the '0' to indicates the end of valid data in the "chanList" array.
  *
  * @param len - the length of the pre-alloc "chanList"
- * @return WifiErrorCode - operate result
+ * @return WifiErrorCode - operation result
  */
 WifiErrorCode Hid2dGetChannelListFor5G(int *chanList, int len);
 
@@ -230,7 +230,7 @@ WifiErrorCode Hid2dGetChannelListFor5G(int *chanList, int len);
  * @param cfgType - configuration type
  * @param cfgData - the queried data of wifi configuration
  * @param getDatValidLen - the valid data length in the array `cfgData`
- * @return WifiErrorCode - operate result
+ * @return WifiErrorCode - operation result
  */
 WifiErrorCode Hid2dGetSelfWifiCfgInfo(SelfCfgType cfgType, char cfgData[CFG_DATA_MAX_BYTES], int *getDatValidLen);
 
@@ -240,7 +240,7 @@ WifiErrorCode Hid2dGetSelfWifiCfgInfo(SelfCfgType cfgType, char cfgData[CFG_DATA
  * @param cfgType - configuration type
  * @param cfgData - the wifi configuration data to be set
  * @param setDataValidLen - the valid data length in the array `cfgData`
- * @return WifiErrorCode - operate result
+ * @return WifiErrorCode - operation result
  */
 WifiErrorCode Hid2dSetPeerWifiCfgInfo(PeerCfgType cfgType, char cfgData[CFG_DATA_MAX_BYTES], int setDataValidLen);
 

@@ -30,7 +30,7 @@ public:
     virtual ~IDhcpResultNotify() {}
 
     /**
-     * @Description : Get success the dhcp result of specified interface.
+     * @Description : Get the success dhcp result of specified interface.
      *
      * @param status - success : DHCP_OPT_SUCCESS, failed : DHCP_OPT_FAILED, timeout : DHCP_OPT_TIMEOUT [in]
      * @param ifname - interface name, eg:wlan0 [in]
@@ -39,7 +39,7 @@ public:
     virtual void OnSuccess(int status, const std::string& ifname, DhcpResult& result) = 0;
 
     /**
-     * @Description : Get failed the dhcp result of specified interface.
+     * @Description : Get the failed dhcp result of specified interface.
      *
      * @param status - success : DHCP_OPT_SUCCESS, failed : DHCP_OPT_FAILED, timeout : DHCP_OPT_TIMEOUT [in]
      * @param ifname - interface name, eg:wlan0 [in]

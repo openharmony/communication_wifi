@@ -231,7 +231,8 @@ public:
           networkId(INVALID_NET_ID),
           frequency(0),
           isP2pPersistent(0),
-          groupStatus(P2pGroupStatus::GS_INVALID)
+          groupStatus(P2pGroupStatus::GS_INVALID),
+          explicitGroup(false)
     {}
     ~WifiP2pGroupInfo()
     {}
@@ -264,6 +265,8 @@ public:
     const std::vector<WifiP2pDevice> &GetClientDevices() const;
     void SetClientDevices(const std::vector<WifiP2pDevice> &devices);
     void ClearClientDevices();
+    bool IsExplicitGroup(void) const;
+    void SetExplicitGroup(bool isExplicit);
 
 private:
     WifiP2pDevice owner;
@@ -277,6 +280,7 @@ private:
     P2pGroupStatus groupStatus;
     std::vector<WifiP2pDevice> clientDevices;
     std::string goIpAddress;
+    bool explicitGroup;
 };
 
 class WpsInfo {

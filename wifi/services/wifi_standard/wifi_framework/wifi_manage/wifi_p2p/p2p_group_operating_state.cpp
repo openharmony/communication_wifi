@@ -35,12 +35,14 @@ P2pGroupOperatingState::P2pGroupOperatingState(P2pStateMachine &stateMachine, Wi
 void P2pGroupOperatingState::GoInState()
 {
     WIFI_LOGI("             GoInState");
+    WifiSettings::GetInstance().SetExplicitGroup(false);
     Init();
 }
 
 void P2pGroupOperatingState::GoOutState()
 {
     WIFI_LOGI("             GoOutState");
+    WifiSettings::GetInstance().SetExplicitGroup(false);
 }
 
 void P2pGroupOperatingState::Init()
@@ -91,9 +93,12 @@ bool P2pGroupOperatingState::ProcessCmdCreateGroup(const InternalMessage &msg) c
          */
         WIFI_LOGE("Create a new %{public}s group.", (netId == PERSISTENT_NET_ID) ? "persistence" : "temporary");
         if (config.GetPassphrase().empty() && config.GetGroupName().empty()) {
+            WifiSettings::GetInstance().SetExplicitGroup(true);
             ret = WifiP2PHalInterface::GetInstance().GroupAdd((netId == PERSISTENT_NET_ID) ? true : false, netId, freq);
+            (void)WifiP2PHalInterface::GetInstance().SaveConfig();
         } else if (!config.GetPassphrase().empty() && !config.GetGroupName().empty() &&
                    config.GetPassphrase().length() >= MIN_PSK_LEN && config.GetPassphrase().length() <= MAX_PSK_LEN) {
+            WifiSettings::GetInstance().SetExplicitGroup(true);
             if (p2pStateMachine.DealCreateNewGroupWithConfig(config, freq)) {
                 ret = WIFI_IDL_OPT_OK;
             }
@@ -144,6 +149,7 @@ bool P2pGroupOperatingState::ProcessGroupStartedEvt(const InternalMessage &msg) 
         thisDevice.SetP2pDeviceStatus(P2pDeviceStatus::PDS_CONNECTED);
         thisDevice.SetDeviceAddress(goAddr);
         group.SetOwner(thisDevice);
+        group.SetExplicitGroup(WifiSettings::GetInstance().IsExplicitGroup());
     } else {
         WifiP2pDevice dev = deviceManager.GetDevices(goAddr);
         dev.SetP2pDeviceStatus(P2pDeviceStatus::PDS_CONNECTED);

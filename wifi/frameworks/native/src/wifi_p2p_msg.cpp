@@ -392,6 +392,16 @@ bool WifiP2pGroupInfo::IsClientDevicesEmpty() const
     return clientDevices.empty();
 }
 
+bool WifiP2pGroupInfo::IsExplicitGroup(void) const
+{
+    return explicitGroup;
+}
+
+void WifiP2pGroupInfo::SetExplicitGroup(bool isExplicit)
+{
+    explicitGroup = isExplicit;
+}
+
 const std::vector<WifiP2pDevice> &WifiP2pGroupInfo::GetClientDevices() const
 {
     return clientDevices;

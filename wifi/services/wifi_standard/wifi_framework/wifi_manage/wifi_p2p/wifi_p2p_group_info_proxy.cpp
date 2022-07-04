@@ -189,6 +189,11 @@ void WifiP2pGroupInfoProxy::ClearClientDevices()
     groupsInfo.ClearClientDevices();
 }
 
+bool WifiP2pGroupInfoProxy::IsExplicitGroup() const
+{
+    return groupsInfo.IsExplicitGroup();
+}
+
 WifiP2pGroupInfoProxy &WifiP2pGroupInfoProxy::operator=(const WifiP2pGroupInfo &group)
 {
     std::unique_lock<std::mutex> lock(proxyMutex);

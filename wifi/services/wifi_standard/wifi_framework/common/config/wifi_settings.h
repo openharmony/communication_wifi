@@ -1018,6 +1018,20 @@ public:
      */
     void SetDefaultFrequenciesByCountryBand(const BandType band, std::vector<int> &frequencies);
 
+    /**
+     * @Description set type of GO group
+     *
+     * @param isExplicit true: created by user; false: created by auto negotiation
+     */
+    void SetExplicitGroup(bool isExplicit);
+
+    /**
+     * @Description get type of Go group
+     *
+     * @return true: created by user; false: created by auto negotiation
+     */
+    bool IsExplicitGroup(void);
+
 private:
     WifiSettings();
     void InitWifiConfig();
@@ -1085,6 +1099,7 @@ private:
     WifiConfigFileImpl<MovingFreezePolicy> mMovingFreezePolicy;
     MovingFreezePolicy mFPolicy;
     WifiConfigFileImpl<WifiStoreRandomMac> mSavedWifiStoreRandomMac;
+    bool explicitGroup;
 };
 }  // namespace Wifi
 }  // namespace OHOS

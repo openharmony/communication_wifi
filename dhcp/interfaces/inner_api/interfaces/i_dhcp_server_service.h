@@ -90,7 +90,7 @@ public:
     virtual int RemoveAllDhcpRange(const std::string& tagName) = 0;
 
     /**
-     * @Description : Set dhcp ip address pool of specified interface.
+     * @Description : Set dhcp ip address range of specified interface.
      *
      * @param ifname - interface name, eg:wlan0 [in]
      * @param range - ip address range [in]

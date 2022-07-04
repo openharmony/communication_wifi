@@ -213,8 +213,7 @@ public:
      * @Description Check if supported input feature
      *
      * @param feature - input feature
-     * @return true - supported
-     * @return false - unsupported
+     * @return bool - true if supported, false if unsupported
      */
     virtual bool IsFeatureSupported(long feature) = 0;
 
@@ -269,7 +268,7 @@ public:
      * @Description set low latency mode
      *
      * @param enabled - true: enable low latency, false: disable low latency
-     * @return bool - operate result
+     * @return bool - operation result
      */
     virtual bool SetLowLatencyMode(bool enabled) = 0;
 };

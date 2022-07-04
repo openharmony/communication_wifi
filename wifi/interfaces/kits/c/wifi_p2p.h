@@ -31,14 +31,14 @@ typedef void (*P2pPeersChangedCallback)(WifiP2pDevice* devices, int len);
 /**
  * @Description Enabling the P2P Mode.
  *
- * @return WifiErrorCode - operate result
+ * @return WifiErrorCode - operation result
  */
 WifiErrorCode EnableP2p();
 
 /**
  * @Description Disable the P2P mode.
  *
- * @return WifiErrorCode - operate result
+ * @return WifiErrorCode - operation result
  */
 WifiErrorCode DisableP2p();
 
@@ -46,35 +46,35 @@ WifiErrorCode DisableP2p();
  * @Description Get p2p enable status
  *
  * @param state - enable status
- * @return WifiErrorCode - operate result
+ * @return WifiErrorCode - operation result
  */
 WifiErrorCode GetP2pEnableStatus(P2pState* state);
 
 /**
  * @Description Start Wi-Fi P2P device search.
  *
- * @return WifiErrorCode - operate result
+ * @return WifiErrorCode - operation result
  */
 WifiErrorCode DiscoverDevices();
 
 /**
  * @Description Stop Wi-Fi P2P device search.
  *
- * @return WifiErrorCode - operate result
+ * @return WifiErrorCode - operation result
  */
 WifiErrorCode StopDiscoverDevices();
 
 /**
  * @Description Start the search for the Wi-Fi P2P service.
  *
- * @return WifiErrorCode - operate result
+ * @return WifiErrorCode - operation result
  */
 WifiErrorCode DiscoverServices();
 
 /**
  * @Description Stop the search for the Wi-Fi P2P service.
  *
- * @return WifiErrorCode - operate result
+ * @return WifiErrorCode - operation result
  */
 WifiErrorCode StopDiscoverServices();
 
@@ -83,14 +83,14 @@ WifiErrorCode StopDiscoverServices();
  *
  * @param period - period
  * @param interval - interval
- * @return WifiErrorCode - operate result
+ * @return WifiErrorCode - operation result
  */
 WifiErrorCode StartP2pListen(int period, int interval);
 
 /**
  * @Description Disable Wi-Fi P2P listening.
  *
- * @return ErrCode - operate result
+ * @return ErrCode - operation result
  */
 WifiErrorCode StopP2pListen();
 
@@ -98,15 +98,14 @@ WifiErrorCode StopP2pListen();
  * @Description Creating a P2P Group.
  *
  * @param config - WifiP2pConfig object
- * @return WifiErrorCode - operate result
+ * @return WifiErrorCode - operation result
  */
 WifiErrorCode CreateGroup(const WifiP2pConfig* config);
 
 /**
  * @Description Remove a P2P Group.
  *
- * @param config - WifiP2pConfig object
- * @return WifiErrorCode - operate result
+ * @return WifiErrorCode - operation result
  */
 WifiErrorCode RemoveGroup();
 
@@ -114,7 +113,7 @@ WifiErrorCode RemoveGroup();
  * @Description Delete a p2p Group.
  *
  * @param group - WifiP2pGroupInfo object
- * @return ErrCode - operate result
+ * @return ErrCode - operation result
  */
 WifiErrorCode DeleteGroup(const WifiP2pGroupInfo* group);
 
@@ -122,14 +121,14 @@ WifiErrorCode DeleteGroup(const WifiP2pGroupInfo* group);
  * @Description P2P connection.
  *
  * @param config - WifiP2pConfig object
- * @return WifiErrorCode - operate result
+ * @return WifiErrorCode - operation result
  */
 WifiErrorCode P2pConnect(const WifiP2pConfig* config);
 
 /**
- * @Description Canceling a P2P connection.
+ * @Description Cancel a P2P connection.
  *
- * @return WifiErrorCode - operate result
+ * @return WifiErrorCode - operation result
  */
 WifiErrorCode P2pCancelConnect();
 
@@ -137,7 +136,7 @@ WifiErrorCode P2pCancelConnect();
  * @Description Get the Current Group object.
  *
  * @param groupInfo - the WifiP2pGroupInfo object
- * @return WifiErrorCode - operate result
+ * @return WifiErrorCode - operation result
  */
 WifiErrorCode GetCurrentGroup(WifiP2pGroupInfo* groupInfo);
 
@@ -145,7 +144,7 @@ WifiErrorCode GetCurrentGroup(WifiP2pGroupInfo* groupInfo);
  * @Description Obtains the P2P connection status.
  *
  * @param status - the P2P connection status
- * @return WifiErrorCode - operate result
+ * @return WifiErrorCode - operation result
  */
 WifiErrorCode GetP2pConnectedStatus(int* status);
 
@@ -155,7 +154,7 @@ WifiErrorCode GetP2pConnectedStatus(int* status);
  * @param clientDevices - pre-allocate memory for client devices
  * @param size - the allocate size for clientDevices
  * @param retSize - the queryed size of the client devices, used for return.
- * @return WifiErrorCode - operate result
+ * @return WifiErrorCode - operation result
  */
 WifiErrorCode QueryP2pDevices(WifiP2pDevice* clientDevices, int size, int* retSize);
 
@@ -163,7 +162,7 @@ WifiErrorCode QueryP2pDevices(WifiP2pDevice* clientDevices, int size, int* retSi
  * @Description Query the information about the local device info.
  *
  * @param deviceInfo - the WifiP2pDevice object
- * @return ErrCode - operate result
+ * @return ErrCode - operation result
  */
 WifiErrorCode QueryP2pLocalDevice(WifiP2pDevice* deviceInfo);
 
@@ -172,7 +171,7 @@ WifiErrorCode QueryP2pLocalDevice(WifiP2pDevice* deviceInfo);
  *
  * @param groupInfo - pre-allocate memory for group size
  * @param size - the allocate size for groupInfo
- * @return ErrCode - operate result
+ * @return ErrCode - operation result
  */
 WifiErrorCode QueryP2pGroups(WifiP2pGroupInfo* groupInfo, int size);
 
@@ -180,7 +179,7 @@ WifiErrorCode QueryP2pGroups(WifiP2pGroupInfo* groupInfo, int size);
  * @Description register p2p state changed event
  *
  * @param callback - callback function
- * @return ErrCode - operate result
+ * @return ErrCode - operation result
  */
 WifiErrorCode RegisterP2pStateChangedCallback(const P2pStateChangedCallback callback);
 
@@ -188,7 +187,7 @@ WifiErrorCode RegisterP2pStateChangedCallback(const P2pStateChangedCallback call
  * @Description register p2p persistent group change event
  *
  * @param callback - callback function
- * @return ErrCode - operate result
+ * @return ErrCode - operation result
  */
 WifiErrorCode RegisterP2pPersistentGroupsChangedCallback(const P2pPersistentGroupsChangedCallback callback);
 
@@ -196,7 +195,7 @@ WifiErrorCode RegisterP2pPersistentGroupsChangedCallback(const P2pPersistentGrou
  * @Description register p2p connection change event
  *
  * @param callback - callback function
- * @return ErrCode - operate result
+ * @return ErrCode - operation result
  */
 WifiErrorCode RegisterP2pConnectionChangedCallback(const P2pConnectionChangedCallback callback);
 
@@ -204,7 +203,7 @@ WifiErrorCode RegisterP2pConnectionChangedCallback(const P2pConnectionChangedCal
  * @Description register p2p peers change event
  *
  * @param callback - callback function
- * @return ErrCode - operate result
+ * @return ErrCode - operation result
  */
 WifiErrorCode RegisterP2pPeersChangedCallback(const P2pPeersChangedCallback callback);
 

@@ -57,7 +57,7 @@ WifiErrorCode GetCErrorCode(ErrCode errCode);
  *
  * @param str - IP address of string type
  * @param ipAddr - Convert result which is a 4-bit int array, example: 127.0.0.1 -> ipAddr[ 127, 0, 0, 1 ]
- * @return WifiErrorCode - operate result
+ * @return WifiErrorCode - operation result
  */
 WifiErrorCode IpStrToArray(const std::string& str, unsigned int ipAddr[IPV4_ARRAY_LEN]);
 

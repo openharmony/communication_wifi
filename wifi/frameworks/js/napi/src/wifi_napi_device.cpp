@@ -220,7 +220,7 @@ napi_value GetScanResults(napi_env env, napi_callback_info info)
     if (ret != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("NativeScanInfosToJsObj return fail: %{public}d", ret);
     }
-    return ret;
+    return result;
 }
 
 static void ConvertEncryptionMode(const SecTypeJs& securityType, std::string& keyMgmt)

@@ -48,6 +48,7 @@ private:
     int frequency5GHzScore;
     int userSelectedDeviceScore;
     int safetyDeviceScore;
+    int normalDeviceScore;
     bool firmwareRoamFlag;
 
     /**

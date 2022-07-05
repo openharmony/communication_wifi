@@ -103,6 +103,7 @@ static void ParseDeviceConfigs(IpcIo *reply, std::vector<WifiDeviceConfig> &resu
         int privacyConfig = 0;
         (void)ReadInt32(reply, &privacyConfig);
         config.wifiPrivacySetting = WifiPrivacyConfig(privacyConfig);
+        (void)ReadInt32(reply, &config.uid);
 
         result.emplace_back(config);
     }
@@ -431,6 +432,31 @@ ErrCode WifiDeviceProxy::PutWifiProtectRef(const std::string &protectName)
         return WIFI_OPT_FAILED;
     }
     return ErrCode(owner.retCode);
+}
+
+ErrCode WifiDeviceProxy::AddCandidateConfig(const WifiDeviceConfig &config, int &networkId)
+{
+    (void)config;
+    (void)networkId;
+    return WIFI_OPT_NOT_SUPPORTED;
+}
+
+ErrCode WifiDeviceProxy::RemoveCandidateConfig(int networkId)
+{
+    (void)networkId;
+    return WIFI_OPT_NOT_SUPPORTED;
+}
+
+ErrCode WifiDeviceProxy::ConnectToCandidateConfig(int networkId)
+{
+    (void)networkId;
+    return WIFI_OPT_NOT_SUPPORTED;
+}
+
+ErrCode WifiDeviceProxy::GetCandidateConfigs(std::vector<WifiDeviceConfig> &result)
+{
+    (void)result;
+    return WIFI_OPT_NOT_SUPPORTED;
 }
 
 void WifiDeviceProxy::WriteIpAddress(IpcIo &req, const WifiIpAddress &address)

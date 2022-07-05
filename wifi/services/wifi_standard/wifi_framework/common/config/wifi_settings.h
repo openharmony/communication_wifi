@@ -239,6 +239,25 @@ public:
     int SetDeviceState(int networkId, int state, bool bSetOther = false);
 
     /**
+     * @Description Get the candidate device configuration
+     *
+     * @param uid - call app uid
+     * @param networkId - a networkId that is to be get
+     * @param config - WifiDeviceConfig object
+     * @return int - network id
+     */
+    int GetCandidateConfig(const int uid, const int &networkId, WifiDeviceConfig &config);
+
+    /**
+     * @Description  Get all the Candidate Device Configurations set key uuid
+     *
+     * @param uid - call app uid
+     * @param configs - WifiDeviceConfig objects
+     * @return int - 0 success
+     */
+    int GetAllCandidateConfig(const int uid, std::vector<WifiDeviceConfig> &configs);
+
+    /**
      * @Description Synchronizing saved the wifi device config into config file
      *
      * @return int - 0 success; -1 save file failed
@@ -911,6 +930,21 @@ public:
      * @return int - priority
      */
     int GetScoretacticsSecurityScore();
+
+    /**
+     * @Description Setting the Score Policy Candidate Score
+     *
+     * @param score - score
+     * @return int - 0 success
+     */
+    int SetScoretacticsNormalScore(const int &score);
+
+    /**
+     * @Description Get the Score Policy Candidate Score
+     *
+     * @return int - priority
+     */
+    int GetScoretacticsNormalScore();
 
     /**
      * @Description Set the saved device appraisal priority

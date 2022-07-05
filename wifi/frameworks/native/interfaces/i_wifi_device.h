@@ -76,6 +76,39 @@ public:
     virtual ErrCode PutWifiProtectRef(const std::string &protectName) = 0;
 
     /**
+     * @Description Add a specified candidate hotspot configuration.
+     *
+     * @param config - WifiDeviceConfig object
+     * @param networkId - the device configuration's network id
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode AddCandidateConfig(const WifiDeviceConfig &config, int &networkId) = 0;
+
+    /**
+     * @Description Remove the wifi candidate device config equals to input network id
+     *
+     * @param networkId - the candidate device network id
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode RemoveCandidateConfig(int networkId) = 0;
+
+    /**
+     * @Description Connect to a candidate specified network.
+     *
+     * @param networkId - the candidate device network id
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode ConnectToCandidateConfig(int networkId) = 0;
+
+    /**
+     * @Description Get all candidate device configs
+     *
+     * @param result - Get result vector of WifiDeviceConfig
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode GetCandidateConfigs(std::vector<WifiDeviceConfig> &result) = 0;
+
+    /**
      * @Description Add a wifi device configuration.
      *
      * @param config - WifiDeviceConfig object

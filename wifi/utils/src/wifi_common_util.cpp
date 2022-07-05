@@ -18,6 +18,7 @@
 #include <iterator>
 #include <regex>
 #ifndef OHOS_ARCH_LITE
+#include "app_mgr_client.h"
 #include "bundle_mgr_interface.h"
 #include "if_system_ability_manager.h"
 #include "ipc_skeleton.h"
@@ -224,6 +225,40 @@ bool IsSystemApp()
     bool isSysApp = bundleInstance->CheckIsSystemAppByUid(uid);
     WIFI_LOGI("Is system App uid[%{public}d]: %{public}d", uid, isSysApp);
     return isSysApp;
+}
+
+int GetCallingUid()
+{
+    return IPCSkeleton::GetCallingUid();
+}
+
+bool IsForegroundApp(const int uid)
+{
+    using namespace OHOS::AppExecFwk;
+    using namespace OHOS::AppExecFwk::Constants;
+    constexpr int32_t UID_CALLINGUID_TRANSFORM_DIVISOR = 200000;
+    int32_t userId = static_cast<int32_t>(uid / UID_CALLINGUID_TRANSFORM_DIVISOR);
+
+    auto appMgrClient = std::make_unique<AppMgrClient>();
+    if (appMgrClient == nullptr) {
+        return false;
+    }
+    appMgrClient->ConnectAppMgrService();
+    AppMgrResultCode ret;
+    std::vector<RunningProcessInfo> infos;
+    ret = appMgrClient->GetProcessRunningInfosByUserId(infos, userId);
+    if (ret != AppMgrResultCode::RESULT_OK) {
+        WIFI_LOGE("GetProcessRunningInfosByUserId fail, ret = [%{public}d]", ret);
+        return false;
+    }
+
+    auto iter = std::find_if(infos.begin(), infos.end(), [&uid](const RunningProcessInfo &rhs) {
+        return ((rhs.uid_ == uid) && (rhs.state_ == AppProcessState::APP_STATE_FOREGROUND));
+    });
+    if (iter != infos.end()) {
+        return true;
+    }
+    return false;
 }
 
 TimeStats::TimeStats(const std::string desc): m_desc(desc)

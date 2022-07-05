@@ -26,10 +26,23 @@
 #include "wifi_device_stub.h"
 #include "iremote_object.h"
 #include "wifi_p2p_service_impl.h"
+#include "common_event_manager.h"
+#include "common_event_support.h"
+#include "bundle_constants.h"
+#include "timer.h"
 #endif
 
 namespace OHOS {
 namespace Wifi {
+#ifndef OHOS_ARCH_LITE
+class AppEventSubscriber : public OHOS::EventFwk::CommonEventSubscriber {
+public:
+    explicit AppEventSubscriber(const OHOS::EventFwk::CommonEventSubscribeInfo &subscriberInfo)
+        : CommonEventSubscriber(subscriberInfo) {}
+    virtual ~AppEventSubscriber() {};
+    virtual void OnReceiveEvent(const OHOS::EventFwk::CommonEventData &data) override;
+};
+#endif
 #ifdef OHOS_ARCH_LITE
 enum ServiceRunningState {
     STATE_NOT_START,
@@ -38,6 +51,7 @@ enum ServiceRunningState {
 
 class WifiDeviceServiceImpl : public WifiDeviceStub {
 #else
+
 class WifiDeviceServiceImpl : public SystemAbility, public WifiDeviceStub {
 DECLARE_SYSTEM_ABILITY(WifiDeviceServiceImpl);
 #endif
@@ -123,6 +137,14 @@ public:
 
     bool SetLowLatencyMode(bool enabled) override;
 
+    ErrCode AddCandidateConfig(const WifiDeviceConfig &config, int &networkId) override;
+
+    ErrCode ConnectToCandidateConfig(int networkId) override;
+
+    ErrCode RemoveCandidateConfig(int networkId) override;
+
+    ErrCode GetCandidateConfigs(std::vector<WifiDeviceConfig> &result) override;
+
 #ifndef OHOS_ARCH_LITE
     int32_t Dump(int32_t fd, const std::vector<std::u16string>& args) override;
 #endif
@@ -133,9 +155,14 @@ private:
     bool IsStaServiceRunning();
     bool IsScanServiceRunning();
     bool CheckConfigPwd(const WifiDeviceConfig &config);
+    ErrCode CheckCallingUid(int &uid);
     static void SaBasicDump(std::string& result);
     static void SigHandler(int sig);
     static bool IsProcessNeedToRestart();
+#ifndef OHOS_ARCH_LITE
+    void RegisterAppRemoved();
+    void UnRegisterAppRemoved();
+#endif
 
 private:
     static constexpr int MAX_PRESHAREDKEY_LEN = 63;
@@ -150,6 +177,8 @@ private:
     static std::shared_ptr<WifiDeviceServiceImpl> g_instance;
 #else
     static sptr<WifiDeviceServiceImpl> g_instance;
+    std::shared_ptr<AppEventSubscriber> eventSubscriber_ = nullptr;
+    std::unique_ptr<Utils::Timer> lpTimer_ = nullptr;
 #endif
     static std::mutex g_instanceLock;
     bool mPublishFlag;

@@ -36,6 +36,7 @@ constexpr int SAME_NETWORK_SCORE = 5;
 constexpr int FREQUENCY_5_GHZ_SCORE = 10;
 constexpr int LAST_SELECTION_SCORE = 120;
 constexpr int SECURITY_SCORE = 20;
+constexpr int NORMAL_SCORE = 10;
 constexpr int MIN_RSSI_24GHZ = -80;
 constexpr int MIN_RSSI_5GHZ = -77;
 constexpr int RSSI_LEVEL_1_2G = -88;
@@ -251,6 +252,7 @@ struct WifiConfig {
     int scoretacticsFrequency5GHzScore;
     int scoretacticsLastSelectionScore;
     int scoretacticsSecurityScore;
+    int scoretacticsNormalScore;
     bool whetherToAllowNetworkSwitchover;
     int dhcpIpType;
     std::string defaultWifiInterface;
@@ -287,6 +289,7 @@ struct WifiConfig {
         scoretacticsFrequency5GHzScore = FREQUENCY_5_GHZ_SCORE;
         scoretacticsLastSelectionScore = LAST_SELECTION_SCORE;
         scoretacticsSecurityScore = SECURITY_SCORE;
+        scoretacticsNormalScore = NORMAL_SCORE;
         whetherToAllowNetworkSwitchover = true;
         dhcpIpType = static_cast<int>(DhcpIpType::DHCP_IPTYPE_MIX);
         defaultWifiInterface = "wlan0";

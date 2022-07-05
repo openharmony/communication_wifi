@@ -129,6 +129,8 @@ static int SetWifiDeviceConfigFirst(WifiDeviceConfig &item, const std::string &k
         item.wepTxKeyIndex = std::stoi(value);
     } else if (key == "priority") {
         item.priority = std::stoi(value);
+    } else if (key == "uid") {
+        item.uid = std::stoi(value);
     } else {
         return -1;
     }
@@ -256,6 +258,7 @@ std::string GetTClassName<WifiDeviceConfig>()
 static std::string OutPutWifiDeviceConfig(WifiDeviceConfig &item)
 {
     std::ostringstream ss;
+    ss << "uid=" << item.uid << std::endl;
     ss << "status=" << item.status << std::endl;
     ss << "bssid=" << item.bssid << std::endl;
     ss << "ssid=" << item.ssid << std::endl;
@@ -505,6 +508,7 @@ void ClearTClass<WifiConfig>(WifiConfig &item)
     item.scoretacticsFrequency5GHzScore = FREQUENCY_5_GHZ_SCORE;
     item.scoretacticsLastSelectionScore = LAST_SELECTION_SCORE;
     item.scoretacticsSecurityScore = SECURITY_SCORE;
+    item.scoretacticsNormalScore = NORMAL_SCORE;
     item.whetherToAllowNetworkSwitchover = true;
     item.dhcpIpType = static_cast<int>(DhcpIpType::DHCP_IPTYPE_MIX);
     item.defaultWifiInterface = "wlan0";
@@ -555,6 +559,8 @@ static int SetWifiConfigValueFirst(WifiConfig &item, const std::string &key, con
         item.scoretacticsLastSelectionScore = std::stoi(value);
     } else if (key == "scoretacticsSecurityScore") {
         item.scoretacticsSecurityScore = std::stoi(value);
+    } else if (key == "scoretacticsNormalScore") {
+        item.scoretacticsNormalScore = std::stoi(value);
     } else if (key == "whetherToAllowNetworkSwitchover") {
         item.whetherToAllowNetworkSwitchover = (std::stoi(value) != 0);
     } else if (key == "dhcpIpType") {
@@ -635,6 +641,7 @@ std::string OutTClassString<WifiConfig>(WifiConfig &item)
     ss << "scoretacticsFrequency5GHzScore=" << item.scoretacticsFrequency5GHzScore << std::endl;
     ss << "scoretacticsLastSelectionScore=" << item.scoretacticsLastSelectionScore << std::endl;
     ss << "scoretacticsSecurityScore=" << item.scoretacticsSecurityScore << std::endl;
+    ss << "scoretacticsNormalScore=" << item.scoretacticsNormalScore << std::endl;
     ss << "whetherToAllowNetworkSwitchover=" << item.whetherToAllowNetworkSwitchover << std::endl;
     ss << "dhcpIpType=" << item.dhcpIpType << std::endl;
     ss << "defaultWifiInterface=" << item.defaultWifiInterface << std::endl;

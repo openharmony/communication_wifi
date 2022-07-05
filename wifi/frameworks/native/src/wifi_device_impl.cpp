@@ -109,6 +109,30 @@ ErrCode WifiDeviceImpl::PutWifiProtectRef(const std::string &protectName)
     return client_->PutWifiProtectRef(protectName);
 }
 
+ErrCode WifiDeviceImpl::AddCandidateConfig(const WifiDeviceConfig &config, int &networkId)
+{
+    RETURN_IF_FAIL(client_);
+    return client_->AddCandidateConfig(config, networkId);
+}
+
+ErrCode WifiDeviceImpl::RemoveCandidateConfig(int networkId)
+{
+    RETURN_IF_FAIL(client_);
+    return client_->RemoveCandidateConfig(networkId);
+}
+
+ErrCode WifiDeviceImpl::ConnectToCandidateConfig(int networkId)
+{
+    RETURN_IF_FAIL(client_);
+    return client_->ConnectToCandidateConfig(networkId);
+}
+
+ErrCode WifiDeviceImpl::GetCandidateConfigs(std::vector<WifiDeviceConfig> &result)
+{
+    RETURN_IF_FAIL(client_);
+    return client_->GetCandidateConfigs(result);
+}
+
 ErrCode WifiDeviceImpl::AddDeviceConfig(const WifiDeviceConfig &config, int &result)
 {
     RETURN_IF_FAIL(client_);

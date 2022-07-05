@@ -65,6 +65,7 @@ if (defined(ohos_lite)) {
 
     external_deps = [
       "ability_base:want",
+      "ability_runtime:app_manager",
       "bundle_framework:appexecfwk_base",
       "bundle_framework:appexecfwk_core",
       "hisysevent_native:libhisysevent",

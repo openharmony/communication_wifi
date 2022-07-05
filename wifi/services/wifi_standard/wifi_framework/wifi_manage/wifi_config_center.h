@@ -143,6 +143,14 @@ public:
     int GetDeviceConfig(std::vector<WifiDeviceConfig> &results);
 
     /**
+     * @Description Get all candidate wifi device config
+     *
+     * @param results - output wifi device config results
+     * @return int - 0 success
+     */
+    int GetCandidateConfigs(const int uid, std::vector<WifiDeviceConfig> &results);
+
+    /**
      * @Description Set a wifi device's state who's networkId equals input networkId;
      * when the param bSetOther is true and the state is ENABLED, that means we need
      * to set other wifi device DISABLED

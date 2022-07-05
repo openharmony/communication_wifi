@@ -115,6 +115,11 @@ int WifiConfigCenter::GetDeviceConfig(std::vector<WifiDeviceConfig> &results)
     return WifiSettings::GetInstance().GetDeviceConfig(results);
 }
 
+int WifiConfigCenter::GetCandidateConfigs(const int uid, std::vector<WifiDeviceConfig> &results)
+{
+    return WifiSettings::GetInstance().GetAllCandidateConfig(uid, results);
+}
+
 int WifiConfigCenter::SetDeviceState(int networkId, int state, bool bSetOther)
 {
     return WifiSettings::GetInstance().SetDeviceState(networkId, state, bSetOther);

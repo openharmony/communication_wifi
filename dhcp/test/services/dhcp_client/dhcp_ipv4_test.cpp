@@ -25,8 +25,8 @@
 #include "dhcp_function.h"
 
 using namespace testing::ext;
+using namespace OHOS::Wifi;
 
-namespace OHOS {
 class DhcpIpv4Test : public testing::Test {
 public:
     static void SetUpTestCase()
@@ -89,12 +89,12 @@ HWTEST_F(DhcpIpv4Test, TEST_SUCCESS, TestSize.Level1)
 
     EXPECT_CALL(MockSystemFunc::GetInstance(), socket(_, _, _)).WillRepeatedly(Return(1));
     EXPECT_CALL(MockSystemFunc::GetInstance(), bind(_, _, _)).WillRepeatedly(Return(0));
-    EXPECT_CALL(MockSystemFunc::GetInstance(), sendto(_, _, _, _, _, _)).WillRepeatedly(Return(1));
+    EXPECT_CALL(MockSystemFunc::GetInstance(), sendto(_, _, _, _, _, _))
+        .WillRepeatedly(Return(1));
     EXPECT_CALL(MockSystemFunc::GetInstance(), close(_)).WillRepeatedly(Return(0));
 
-    EXPECT_EQ(DHCP_OPT_SUCCESS, DhcpDiscover(0, 1));
-    EXPECT_EQ(DHCP_OPT_SUCCESS, DhcpRenew(0, 0, 0));
+    EXPECT_EQ(-1, DhcpDiscover(0, 1));
+    EXPECT_EQ(-1, DhcpRenew(0, 0, 0));
 
     MockSystemFunc::SetMockFlag(false);
 }
-}  // namespace OHOS

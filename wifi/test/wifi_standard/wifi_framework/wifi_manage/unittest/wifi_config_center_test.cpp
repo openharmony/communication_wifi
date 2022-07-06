@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -92,8 +92,6 @@ HWTEST_F(WifiConfigCenterTest, GetScanInfoList_SUCCESS, TestSize.Level1)
     info2.bssid = "adsgds";
     setInfo.push_back(info1);
     setInfo.push_back(info2);
-    getInfo.push_back(info1);
-    getInfo.push_back(info2);
     WifiSettings::GetInstance().SaveScanInfoList(setInfo);
     WifiConfigCenter::GetInstance().GetScanInfoList(getInfo);
     EXPECT_EQ(setInfo.size(), getInfo.size());
@@ -109,7 +107,6 @@ HWTEST_F(WifiConfigCenterTest, GetScanInfoList_FAILED, TestSize.Level1)
     info1.bssid = "asdfg";
     info2.bssid = "adsgds";
     setInfo.push_back(info1);
-    getInfo.push_back(info2);
     WifiSettings::GetInstance().SaveScanInfoList(setInfo);
     WifiConfigCenter::GetInstance().GetScanInfoList(getInfo);
     EXPECT_EQ(setInfo.size(), getInfo.size());

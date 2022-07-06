@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -94,18 +94,18 @@ HWTEST_F(WifiHalCRpcServerTest, GetRpcFuncTest, TestSize.Level1)
 
 HWTEST_F(WifiHalCRpcServerTest, OnTransactTest, TestSize.Level1)
 {
-    char buff[] = "N|IncorrectTypeInputMessage";
+    char buff[] = "N\tIncorrectTypeInputMessage";
     mContext->oneProcess = buff;
     mContext->nPos = 2;
     mContext->nSize = strlen(buff);
     EXPECT_TRUE(OnTransact(mServer, mContext) < 0);
-    char buff2[] = "N|UnsupportedCmd|";
+    char buff2[] = "N\tUnsupportedCmd\t";
     mContext->oneProcess = buff2;
     mContext->nPos = 2;
     mContext->nSize = strlen(buff2);
     EXPECT_TRUE(OnTransact(mServer, mContext) == 0);
     EXPECT_TRUE(strstr(mContext->szWrite, "unsupported function") != nullptr);
-    char buff3[] = "N|SetCountryCode|";
+    char buff3[] = "N\tSetCountryCode\t";
     mContext->oneProcess = buff3;
     mContext->nPos = 2;
     mContext->nSize = strlen(buff3);
@@ -161,18 +161,19 @@ HWTEST_F(WifiHalCRpcServerTest, DealCommonCbkTest, TestSize.Level1)
     cbmsg->msg.scanStatus = 100;
     EXPECT_TRUE(PushBackCallbackMsg(WIFI_SCAN_INFO_NOTIFY_EVENT, cbmsg) == 0);
     EXPECT_TRUE(OnCallbackTransact(mServer, WIFI_SCAN_INFO_NOTIFY_EVENT, mContext) == 0);
-    EXPECT_TRUE(StrcmpMathRight(mContext->szWrite, "C|107|100|$$$$$$") == 0);
+    EXPECT_TRUE(StrcmpMathRight(mContext->szWrite, "C\t107\t100\t$$$$$$") == 0);
     EXPECT_TRUE(EndCallbackTransact(mServer, WIFI_SCAN_INFO_NOTIFY_EVENT) == 0);
 }
 
 HWTEST_F(WifiHalCRpcServerTest, DealIfaceCbkTest, TestSize.Level1)
 {
     WifiHalEventCallbackMsg *cbmsg = (WifiHalEventCallbackMsg *)calloc(1, sizeof(WifiHalEventCallbackMsg));
+    cbmsg->msg.ifMsg.id = 0;
     cbmsg->msg.ifMsg.type = 100;
     StrSafeCopy(cbmsg->msg.ifMsg.ifname, sizeof(cbmsg->msg.ifMsg.ifname), "wlan0");
     EXPECT_TRUE(PushBackCallbackMsg(WIFI_ADD_IFACE_EVENT, cbmsg) == 0);
     EXPECT_TRUE(OnCallbackTransact(mServer, WIFI_ADD_IFACE_EVENT, mContext) == 0);
-    EXPECT_TRUE(StrcmpMathRight(mContext->szWrite, "C|103|100|wlan0|$$$$$$") == 0);
+    EXPECT_TRUE(StrcmpMathRight(mContext->szWrite, "C\t103\t0\t100\twlan0\t$$$$$$") == 0);
     EXPECT_TRUE(EndCallbackTransact(mServer, WIFI_ADD_IFACE_EVENT) == 0);
 }
 
@@ -184,7 +185,7 @@ HWTEST_F(WifiHalCRpcServerTest, DealConnectionChangedCbkTest, TestSize.Level1)
     StrSafeCopy(cbmsg->msg.connMsg.bssid, sizeof(cbmsg->msg.connMsg.bssid), "00:00:00:00:00:00");
     EXPECT_TRUE(PushBackCallbackMsg(WIFI_CONNECT_CHANGED_NOTIFY_EVENT, cbmsg) == 0);
     EXPECT_TRUE(OnCallbackTransact(mServer, WIFI_CONNECT_CHANGED_NOTIFY_EVENT, mContext) == 0);
-    EXPECT_TRUE(StrcmpMathRight(mContext->szWrite, "C|108|100|1|00:00:00:00:00:00|$$$$$$") == 0);
+    EXPECT_TRUE(StrcmpMathRight(mContext->szWrite, "C\t108\t100\t1\t00:00:00:00:00:00\t$$$$$$") == 0);
     EXPECT_TRUE(EndCallbackTransact(mServer, WIFI_CONNECT_CHANGED_NOTIFY_EVENT) == 0);
 }
 
@@ -194,7 +195,7 @@ HWTEST_F(WifiHalCRpcServerTest, DealP2pDeviceFoundCbkTest, TestSize.Level1)
     StrSafeCopy(cbmsg->msg.deviceInfo.srcAddress, sizeof(cbmsg->msg.deviceInfo.srcAddress), "00:00:00:00:00:00");
     EXPECT_TRUE(PushBackCallbackMsg(P2P_DEVICE_FOUND_EVENT, cbmsg) == 0);
     EXPECT_TRUE(OnCallbackTransact(mServer, P2P_DEVICE_FOUND_EVENT, mContext) == 0);
-    EXPECT_TRUE(StrcmpMathRight(mContext->szWrite, "C|117|0|0|0|0|00:00:00:00:00:00|||||$$$$$$") == 0);
+    EXPECT_TRUE(StrcmpMathRight(mContext->szWrite, "C\t119\t0\t0\t0\t0\t00:00:00:00:00:00\t\t\t\t\t$$$$$$") == 0);
     EXPECT_TRUE(EndCallbackTransact(mServer, P2P_DEVICE_FOUND_EVENT) == 0);
 }
 
@@ -204,7 +205,7 @@ HWTEST_F(WifiHalCRpcServerTest, DealP2pNegoriationCbkLostTest, TestSize.Level1)
     StrSafeCopy(cbmsg->msg.connMsg.bssid, sizeof(cbmsg->msg.connMsg.bssid), "00:00:00:00:00:00");
     EXPECT_TRUE(PushBackCallbackMsg(P2P_DEVICE_LOST_EVENT, cbmsg) == 0);
     EXPECT_TRUE(OnCallbackTransact(mServer, P2P_DEVICE_LOST_EVENT, mContext) == 0);
-    EXPECT_TRUE(StrcmpMathRight(mContext->szWrite, "C|118|00:00:00:00:00:00|$$$$$$") == 0);
+    EXPECT_TRUE(StrcmpMathRight(mContext->szWrite, "C\t120\t00:00:00:00:00:00\t$$$$$$") == 0);
     EXPECT_TRUE(EndCallbackTransact(mServer, P2P_DEVICE_LOST_EVENT) == 0);
 }
 
@@ -214,7 +215,7 @@ HWTEST_F(WifiHalCRpcServerTest, DealP2pNegoriationCbkTest, TestSize.Level1)
     StrSafeCopy(cbmsg->msg.connMsg.bssid, sizeof(cbmsg->msg.connMsg.bssid), "00:00:00:00:00:00");
     EXPECT_TRUE(PushBackCallbackMsg(P2P_GO_NEGOTIATION_REQUEST_EVENT, cbmsg) == 0);
     EXPECT_TRUE(OnCallbackTransact(mServer, P2P_GO_NEGOTIATION_REQUEST_EVENT, mContext) == 0);
-    EXPECT_TRUE(StrcmpMathRight(mContext->szWrite, "C|119|0|00:00:00:00:00:00|$$$$$$") == 0);
+    EXPECT_TRUE(StrcmpMathRight(mContext->szWrite, "C\t121\t0\t00:00:00:00:00:00\t$$$$$$") == 0);
     EXPECT_TRUE(EndCallbackTransact(mServer, P2P_GO_NEGOTIATION_REQUEST_EVENT) == 0);
 }
 
@@ -225,7 +226,8 @@ HWTEST_F(WifiHalCRpcServerTest, DealP2pInviationCbkReceiveTest, TestSize.Level1)
     StrSafeCopy(cbmsg->msg.invitaInfo.bssid, sizeof(cbmsg->msg.invitaInfo.bssid), "00:00:00:00:00:00");
     EXPECT_TRUE(PushBackCallbackMsg(P2P_INVITATION_RECEIVED_EVENT, cbmsg) == 0);
     EXPECT_TRUE(OnCallbackTransact(mServer, P2P_INVITATION_RECEIVED_EVENT, mContext) == 0);
-    EXPECT_TRUE(StrcmpMathRight(mContext->szWrite, "C|122|0|0|0|00:00:00:00:00:00||00:00:00:00:00:00|$$$$$$") == 0);
+    EXPECT_TRUE(StrcmpMathRight(mContext->szWrite,
+        "C\t124\t0\t0\t0\t00:00:00:00:00:00\t\t00:00:00:00:00:00\t$$$$$$") == 0);
     EXPECT_TRUE(EndCallbackTransact(mServer, P2P_INVITATION_RECEIVED_EVENT) == 0);
 }
 
@@ -235,7 +237,7 @@ HWTEST_F(WifiHalCRpcServerTest, DealP2pInviationCbkResultTest, TestSize.Level1)
     StrSafeCopy(cbmsg->msg.invitaInfo.bssid, sizeof(cbmsg->msg.invitaInfo.bssid), "00:00:00:00:00:00");
     EXPECT_TRUE(PushBackCallbackMsg(P2P_INVITATION_RESULT_EVENT, cbmsg) == 0);
     EXPECT_TRUE(OnCallbackTransact(mServer, P2P_INVITATION_RESULT_EVENT, mContext) == 0);
-    EXPECT_TRUE(StrcmpMathRight(mContext->szWrite, "C|123|0|00:00:00:00:00:00|$$$$$$") == 0);
+    EXPECT_TRUE(StrcmpMathRight(mContext->szWrite, "C\t125\t0\t00:00:00:00:00:00\t$$$$$$") == 0);
     EXPECT_TRUE(EndCallbackTransact(mServer, P2P_INVITATION_RESULT_EVENT) == 0);
 }
 
@@ -245,7 +247,7 @@ HWTEST_F(WifiHalCRpcServerTest, DealP2pInviationCbkFailureTest, TestSize.Level1)
     StrSafeCopy(cbmsg->msg.invitaInfo.bssid, sizeof(cbmsg->msg.invitaInfo.bssid), "00:00:00:00:00:00");
     EXPECT_TRUE(PushBackCallbackMsg(P2P_GROUP_FORMATION_FAILURE_EVENT, cbmsg) == 0);
     EXPECT_TRUE(OnCallbackTransact(mServer, P2P_GROUP_FORMATION_FAILURE_EVENT, mContext) == 0);
-    EXPECT_TRUE(StrcmpMathRight(mContext->szWrite, "C|125|00:00:00:00:00:00|$$$$$$") == 0);
+    EXPECT_TRUE(StrcmpMathRight(mContext->szWrite, "C\t127\t00:00:00:00:00:00\t$$$$$$") == 0);
     EXPECT_TRUE(EndCallbackTransact(mServer, P2P_GROUP_FORMATION_FAILURE_EVENT) == 0);
 }
 
@@ -258,8 +260,8 @@ HWTEST_F(WifiHalCRpcServerTest, DealP2pGroupInfoCbkStartTest, TestSize.Level1)
         cbmsg->msg.groupInfo.goDeviceAddress, sizeof(cbmsg->msg.groupInfo.goDeviceAddress), "00:00:00:00:00:00");
     EXPECT_TRUE(PushBackCallbackMsg(P2P_GROUP_STARTED_EVENT, cbmsg) == 0);
     EXPECT_TRUE(OnCallbackTransact(mServer, P2P_GROUP_STARTED_EVENT, mContext) == 0);
-    EXPECT_TRUE(
-        StrcmpMathRight(mContext->szWrite, "C|126|0|0|0|p2p-dev-wlan0|test_p2p|||00:00:00:00:00:00|$$$$$$") == 0);
+    EXPECT_TRUE(StrcmpMathRight(mContext->szWrite,
+        "C\t128\t0\t0\t0\tp2p-dev-wlan0\ttest_p2p\t\t\t00:00:00:00:00:00\t$$$$$$") == 0);
     EXPECT_TRUE(EndCallbackTransact(mServer, P2P_GROUP_STARTED_EVENT) == 0);
 }
 
@@ -269,7 +271,7 @@ HWTEST_F(WifiHalCRpcServerTest, DealP2pGroupInfoCbkRemoveTest, TestSize.Level1)
     StrSafeCopy(cbmsg->msg.groupInfo.groupIfName, sizeof(cbmsg->msg.groupInfo.groupIfName), "p2p-dev-wlan0");
     EXPECT_TRUE(PushBackCallbackMsg(P2P_GROUP_REMOVED_EVENT, cbmsg) == 0);
     EXPECT_TRUE(OnCallbackTransact(mServer, P2P_GROUP_REMOVED_EVENT, mContext) == 0);
-    EXPECT_TRUE(StrcmpMathRight(mContext->szWrite, "C|127|0|p2p-dev-wlan0|$$$$$$") == 0);
+    EXPECT_TRUE(StrcmpMathRight(mContext->szWrite, "C\t129\t0\tp2p-dev-wlan0\t$$$$$$") == 0);
     EXPECT_TRUE(EndCallbackTransact(mServer, P2P_GROUP_REMOVED_EVENT) == 0);
 }
 
@@ -279,7 +281,7 @@ HWTEST_F(WifiHalCRpcServerTest, DealP2pDeviceInfoCbkPbcTest, TestSize.Level1)
     StrSafeCopy(cbmsg->msg.deviceInfo.srcAddress, sizeof(cbmsg->msg.deviceInfo.srcAddress), "00:00:00:00:00:00");
     EXPECT_TRUE(PushBackCallbackMsg(P2P_PROV_DISC_PBC_REQ_EVENT, cbmsg) == 0);
     EXPECT_TRUE(OnCallbackTransact(mServer, P2P_PROV_DISC_PBC_REQ_EVENT, mContext) == 0);
-    EXPECT_TRUE(StrcmpMathRight(mContext->szWrite, "C|128|00:00:00:00:00:00|$$$$$$") == 0);
+    EXPECT_TRUE(StrcmpMathRight(mContext->szWrite, "C\t130\t00:00:00:00:00:00\t$$$$$$") == 0);
     EXPECT_TRUE(EndCallbackTransact(mServer, P2P_PROV_DISC_PBC_REQ_EVENT) == 0);
 }
 
@@ -290,7 +292,7 @@ HWTEST_F(WifiHalCRpcServerTest, DealP2pDeviceInfoCbkPinTest, TestSize.Level1)
     StrSafeCopy(cbmsg->msg.deviceInfo.deviceName, sizeof(cbmsg->msg.deviceInfo.deviceName), "test_p2p");
     EXPECT_TRUE(PushBackCallbackMsg(P2P_PROV_DISC_SHOW_PIN_EVENT, cbmsg) == 0);
     EXPECT_TRUE(OnCallbackTransact(mServer, P2P_PROV_DISC_SHOW_PIN_EVENT, mContext) == 0);
-    EXPECT_TRUE(StrcmpMathRight(mContext->szWrite, "C|131|00:00:00:00:00:00|test_p2p|$$$$$$") == 0);
+    EXPECT_TRUE(StrcmpMathRight(mContext->szWrite, "C\t133\t00:00:00:00:00:00\ttest_p2p\t$$$$$$") == 0);
     EXPECT_TRUE(EndCallbackTransact(mServer, P2P_PROV_DISC_SHOW_PIN_EVENT) == 0);
 }
 
@@ -301,7 +303,7 @@ HWTEST_F(WifiHalCRpcServerTest, DealP2pDeviceInfoCbkConnectionTest, TestSize.Lev
         cbmsg->msg.deviceInfo.p2pDeviceAddress, sizeof(cbmsg->msg.deviceInfo.p2pDeviceAddress), "00:00:00:00:00:00");
     EXPECT_TRUE(PushBackCallbackMsg(AP_STA_DISCONNECTED_EVENT, cbmsg) == 0);
     EXPECT_TRUE(OnCallbackTransact(mServer, AP_STA_DISCONNECTED_EVENT, mContext) == 0);
-    EXPECT_TRUE(StrcmpMathRight(mContext->szWrite, "C|135|00:00:00:00:00:00|$$$$$$") == 0);
+    EXPECT_TRUE(StrcmpMathRight(mContext->szWrite, "C\t137\t00:00:00:00:00:00\t$$$$$$") == 0);
     EXPECT_TRUE(EndCallbackTransact(mServer, AP_STA_DISCONNECTED_EVENT) == 0);
 }
 
@@ -311,7 +313,7 @@ HWTEST_F(WifiHalCRpcServerTest, DealP2pServerInfoCbkTest, TestSize.Level1)
     StrSafeCopy(cbmsg->msg.serverInfo.srcAddress, sizeof(cbmsg->msg.serverInfo.srcAddress), "00:00:00:00:00:00");
     EXPECT_TRUE(PushBackCallbackMsg(P2P_SERV_DISC_RESP_EVENT, cbmsg) == 0);
     EXPECT_TRUE(OnCallbackTransact(mServer, P2P_SERV_DISC_RESP_EVENT, mContext) == 0);
-    EXPECT_TRUE(StrcmpMathRight(mContext->szWrite, "C|133|0|00:00:00:00:00:00|0|$$$$$$") == 0);
+    EXPECT_TRUE(StrcmpMathRight(mContext->szWrite, "C\t135\t0\t00:00:00:00:00:00\t0\t$$$$$$") == 0);
     EXPECT_TRUE(EndCallbackTransact(mServer, P2P_SERV_DISC_RESP_EVENT) == 0);
 }
 
@@ -321,21 +323,21 @@ HWTEST_F(WifiHalCRpcServerTest, DealP2pServerDiscReqCbkTest, TestSize.Level1)
     StrSafeCopy(cbmsg->msg.serDiscReqInfo.mac, sizeof(cbmsg->msg.serDiscReqInfo.mac), "00:00:00:00:00:00");
     EXPECT_TRUE(PushBackCallbackMsg(P2P_SERV_DISC_REQ_EVENT, cbmsg) == 0);
     EXPECT_TRUE(OnCallbackTransact(mServer, P2P_SERV_DISC_REQ_EVENT, mContext) == 0);
-    EXPECT_TRUE(StrcmpMathRight(mContext->szWrite, "C|137|0|0|0|00:00:00:00:00:00|0|$$$$$$") == 0);
+    EXPECT_TRUE(StrcmpMathRight(mContext->szWrite, "C\t139\t0\t0\t0\t00:00:00:00:00:00\t0\t$$$$$$") == 0);
     EXPECT_TRUE(EndCallbackTransact(mServer, P2P_SERV_DISC_REQ_EVENT) == 0);
 }
 
 HWTEST_F(WifiHalCRpcServerTest, RpcGetNameTest, TestSize.Level1)
 {
     EXPECT_TRUE(RpcGetName(nullptr, nullptr) < 0);
-    char buff[] = "N|GetName|x|";
+    char buff[] = "N\tGetName\tx\t";
     mContext->oneProcess = buff;
-    mContext->nPos = strlen("N|GetName|");
+    mContext->nPos = strlen("N\tGetName\t");
     mContext->nSize = strlen(buff);
     EXPECT_TRUE(RpcGetName(mServer, mContext) < 0);
-    char buff2[] = "N|GetName|128|";
+    char buff2[] = "N\tGetName\t128\t";
     mContext->oneProcess = buff2;
-    mContext->nPos = strlen("N|GetName|");
+    mContext->nPos = strlen("N\tGetName\t");
     mContext->nSize = strlen(buff2);
     EXPECT_TRUE(RpcGetName(mServer, mContext) == 0);
 }
@@ -349,19 +351,19 @@ HWTEST_F(WifiHalCRpcServerTest, RpcGetTypeTest, TestSize.Level1)
 HWTEST_F(WifiHalCRpcServerTest, RpcRegisterEventCallbackTest, TestSize.Level1)
 {
     EXPECT_TRUE(RpcRegisterEventCallback(nullptr, nullptr) < 0);
-    char buff[] = "N|RegisterEventCallback|asdgfd|";
+    char buff[] = "N\tRegisterEventCallback\tasdgfd\t";
     mContext->oneProcess = buff;
-    mContext->nPos = strlen("N|RegisterEventCallback|");
+    mContext->nPos = strlen("N\tRegisterEventCallback\t");
     mContext->nSize = strlen(buff);
     EXPECT_TRUE(RpcRegisterEventCallback(mServer, mContext) < 0);
-    char buff2[] = "N|RegisterEventCallback|2|101|asdf|";
+    char buff2[] = "N\tRegisterEventCallback\t2\t101\tasdf\t";
     mContext->oneProcess = buff2;
-    mContext->nPos = strlen("N|RegisterEventCallback|");
+    mContext->nPos = strlen("N\tRegisterEventCallback\t");
     mContext->nSize = strlen(buff2);
     EXPECT_TRUE(RpcRegisterEventCallback(mServer, mContext) < 0);
-    char buff3[] = "N|RegisterEventCallback|2|101|108|";
+    char buff3[] = "N\tRegisterEventCallback\t2\t101\t108\t";
     mContext->oneProcess = buff3;
-    mContext->nPos = strlen("N|RegisterEventCallback|");
+    mContext->nPos = strlen("N\tRegisterEventCallback\t");
     mContext->nSize = strlen(buff3);
     EXPECT_TRUE(RpcRegisterEventCallback(mServer, mContext) == 0);
 }
@@ -369,19 +371,19 @@ HWTEST_F(WifiHalCRpcServerTest, RpcRegisterEventCallbackTest, TestSize.Level1)
 HWTEST_F(WifiHalCRpcServerTest, RpcUnRegisterEventCallbackTest, TestSize.Level1)
 {
     EXPECT_TRUE(RpcUnRegisterEventCallback(nullptr, nullptr) < 0);
-    char buff[] = "N|UnRegisterEventCallback|asdgfd|";
+    char buff[] = "N\tUnRegisterEventCallback\tasdgfd\t";
     mContext->oneProcess = buff;
-    mContext->nPos = strlen("N|UnRegisterEventCallback|");
+    mContext->nPos = strlen("N\tUnRegisterEventCallback\t");
     mContext->nSize = strlen(buff);
     EXPECT_TRUE(RpcUnRegisterEventCallback(mServer, mContext) < 0);
-    char buff2[] = "N|UnRegisterEventCallback|2|101|asdf|";
+    char buff2[] = "N\tUnRegisterEventCallback\t2\t101\tasdf\t";
     mContext->oneProcess = buff2;
-    mContext->nPos = strlen("N|UnRegisterEventCallback|");
+    mContext->nPos = strlen("N\tUnRegisterEventCallback\t");
     mContext->nSize = strlen(buff2);
     EXPECT_TRUE(RpcUnRegisterEventCallback(mServer, mContext) < 0);
-    char buff3[] = "N|UnRegisterEventCallback|2|101|108|";
+    char buff3[] = "N\tUnRegisterEventCallback\t2\t101\t108\t";
     mContext->oneProcess = buff3;
-    mContext->nPos = strlen("N|UnRegisterEventCallback|");
+    mContext->nPos = strlen("N\tUnRegisterEventCallback\t");
     mContext->nSize = strlen(buff3);
     EXPECT_TRUE(RpcUnRegisterEventCallback(mServer, mContext) == 0);
 }
@@ -395,14 +397,14 @@ HWTEST_F(WifiHalCRpcServerTest, RpcNotifyClearTest, TestSize.Level1)
 HWTEST_F(WifiHalCRpcServerTest, RpcGetWifiChipTest, TestSize.Level1)
 {
     EXPECT_TRUE(RpcGetWifiChip(nullptr, nullptr) < 0);
-    char buff[] = "N|GetWifiChip|adsgfsd|";
+    char buff[] = "N\tGetWifiChip\tadsgfsd\t";
     mContext->oneProcess = buff;
-    mContext->nPos = strlen("N|GetWifiChip|");
+    mContext->nPos = strlen("N\tGetWifiChip\t");
     mContext->nSize = strlen(buff);
     EXPECT_TRUE(RpcGetWifiChip(mServer, mContext) < 0);
-    char buff1[] = "N|GetWifiChip|8|";
+    char buff1[] = "N\tGetWifiChip\t8\t";
     mContext->oneProcess = buff1;
-    mContext->nPos = strlen("N|GetWifiChip|");
+    mContext->nPos = strlen("N\tGetWifiChip\t");
     mContext->nSize = strlen(buff1);
     EXPECT_TRUE(RpcGetWifiChip(mServer, mContext) == 0);
 }
@@ -410,14 +412,14 @@ HWTEST_F(WifiHalCRpcServerTest, RpcGetWifiChipTest, TestSize.Level1)
 HWTEST_F(WifiHalCRpcServerTest, RpcGetWifiChipIdsTest, TestSize.Level1)
 {
     EXPECT_TRUE(RpcGetWifiChipIds(nullptr, nullptr) < 0);
-    char buff[] = "N|GetWifiChipIds|x|";
+    char buff[] = "N\tGetWifiChipIds\tx\t";
     mContext->oneProcess = buff;
-    mContext->nPos = strlen("N|GetWifiChipIds|");
+    mContext->nPos = strlen("N\tGetWifiChipIds\t");
     mContext->nSize = strlen(buff);
     EXPECT_TRUE(RpcGetWifiChipIds(mServer, mContext) < 0);
-    char buff1[] = "N|GetWifiChipIds|8|";
+    char buff1[] = "N\tGetWifiChipIds\t8\t";
     mContext->oneProcess = buff1;
-    mContext->nPos = strlen("N|GetWifiChipIds|");
+    mContext->nPos = strlen("N\tGetWifiChipIds\t");
     mContext->nSize = strlen(buff1);
     EXPECT_TRUE(RpcGetWifiChipIds(mServer, mContext) == 0);
 }
@@ -431,14 +433,14 @@ HWTEST_F(WifiHalCRpcServerTest, RpcGetChipIdTest, TestSize.Level1)
 HWTEST_F(WifiHalCRpcServerTest, RpcCreateIfaceTest, TestSize.Level1)
 {
     EXPECT_TRUE(RpcCreateIface(nullptr, nullptr) < 0);
-    char buff[] = "N|CreateIface|fdshajkdsghk|";
+    char buff[] = "N\tCreateIface\tfdshajkdsghk\t";
     mContext->oneProcess = buff;
-    mContext->nPos = strlen("N|CreateIface|");
+    mContext->nPos = strlen("N\tCreateIface\t");
     mContext->nSize = strlen(buff);
     EXPECT_TRUE(RpcCreateIface(mServer, mContext) < 0);
-    char buff1[] = "N|CreateIface|8|";
+    char buff1[] = "N\tCreateIface\t8\t";
     mContext->oneProcess = buff1;
-    mContext->nPos = strlen("N|CreateIface|");
+    mContext->nPos = strlen("N\tCreateIface\t");
     mContext->nSize = strlen(buff1);
     EXPECT_TRUE(RpcCreateIface(mServer, mContext) == 0);
 }
@@ -446,19 +448,19 @@ HWTEST_F(WifiHalCRpcServerTest, RpcCreateIfaceTest, TestSize.Level1)
 HWTEST_F(WifiHalCRpcServerTest, RpcGetIfaceTest, TestSize.Level1)
 {
     EXPECT_TRUE(RpcGetIface(nullptr, nullptr) < 0);
-    char buff[] = "N|GetIface|wlan0";
+    char buff[] = "N\tGetIface\twlan0";
     mContext->oneProcess = buff;
-    mContext->nPos = strlen("N|GetIface|");
+    mContext->nPos = strlen("N\tGetIface\t");
     mContext->nSize = strlen(buff);
     EXPECT_TRUE(RpcGetIface(mServer, mContext) < 0);
-    char buff1[] = "N|GetIface|wlan0|";
+    char buff1[] = "N\tGetIface\twlan0\t";
     mContext->oneProcess = buff1;
-    mContext->nPos = strlen("N|GetIface|");
+    mContext->nPos = strlen("N\tGetIface\t");
     mContext->nSize = strlen(buff1);
     EXPECT_TRUE(RpcGetIface(mServer, mContext) == 0);
-    char buff2[] = "N|GetIface|01234567890123456789012345678901|";
+    char buff2[] = "N\tGetIface\t01234567890123456789012345678901\t";
     mContext->oneProcess = buff2;
-    mContext->nPos = strlen("N|GetIface|");
+    mContext->nPos = strlen("N\tGetIface\t");
     mContext->nSize = strlen(buff2);
     EXPECT_TRUE(RpcGetIface(mServer, mContext) == 0);
 }
@@ -466,19 +468,19 @@ HWTEST_F(WifiHalCRpcServerTest, RpcGetIfaceTest, TestSize.Level1)
 HWTEST_F(WifiHalCRpcServerTest, RpcGetIfaceNamesTest, TestSize.Level1)
 {
     EXPECT_TRUE(RpcGetIfaceNames(nullptr, nullptr) < 0);
-    char buff[] = "N|GetIfaceNames|asdgf|asdgf|";
+    char buff[] = "N\tGetIfaceNames\tasdgf\tasdgf\t";
     mContext->oneProcess = buff;
-    mContext->nPos = strlen("N|GetIfaceNames|");
+    mContext->nPos = strlen("N\tGetIfaceNames\t");
     mContext->nSize = strlen(buff);
     EXPECT_TRUE(RpcGetIfaceNames(mServer, mContext) < 0);
-    char buff1[] = "N|GetIfaceNames|12|asdgf|";
+    char buff1[] = "N\tGetIfaceNames\t12\tasdgf\t";
     mContext->oneProcess = buff1;
-    mContext->nPos = strlen("N|GetIfaceNames|");
+    mContext->nPos = strlen("N\tGetIfaceNames\t");
     mContext->nSize = strlen(buff1);
     EXPECT_TRUE(RpcGetIfaceNames(mServer, mContext) < 0);
-    char buff2[] = "N|GetIfaceNames|12|128|";
+    char buff2[] = "N\tGetIfaceNames\t12\t128\t";
     mContext->oneProcess = buff2;
-    mContext->nPos = strlen("N|GetIfaceNames|");
+    mContext->nPos = strlen("N\tGetIfaceNames\t");
     mContext->nSize = strlen(buff2);
     EXPECT_TRUE(RpcGetIfaceNames(mServer, mContext) == 0);
 }
@@ -486,19 +488,19 @@ HWTEST_F(WifiHalCRpcServerTest, RpcGetIfaceNamesTest, TestSize.Level1)
 HWTEST_F(WifiHalCRpcServerTest, RpcRemoveIfaceTest, TestSize.Level1)
 {
     EXPECT_TRUE(RpcRemoveIface(nullptr, nullptr) < 0);
-    char buff[] = "N|RemoveIface|wlan0";
+    char buff[] = "N\tRemoveIface\twlan0";
     mContext->oneProcess = buff;
-    mContext->nPos = strlen("N|RemoveIface|");
+    mContext->nPos = strlen("N\tRemoveIface\t");
     mContext->nSize = strlen(buff);
     EXPECT_TRUE(RpcRemoveIface(mServer, mContext) < 0);
-    char buff1[] = "N|RemoveIface|wlan0|";
+    char buff1[] = "N\tRemoveIface\twlan0\t";
     mContext->oneProcess = buff1;
-    mContext->nPos = strlen("N|RemoveIface|");
+    mContext->nPos = strlen("N\tRemoveIface\t");
     mContext->nSize = strlen(buff1);
     EXPECT_TRUE(RpcRemoveIface(mServer, mContext) == 0);
-    char buff2[] = "N|RemoveIface|01234567890123456789012345678901|";
+    char buff2[] = "N\tRemoveIface\t01234567890123456789012345678901\t";
     mContext->oneProcess = buff2;
-    mContext->nPos = strlen("N|RemoveIface|");
+    mContext->nPos = strlen("N\tRemoveIface\t");
     mContext->nSize = strlen(buff2);
     EXPECT_TRUE(RpcRemoveIface(mServer, mContext) == 0);
 }
@@ -512,14 +514,14 @@ HWTEST_F(WifiHalCRpcServerTest, RpcGetCapabilitiesTest, TestSize.Level1)
 HWTEST_F(WifiHalCRpcServerTest, RpcGetSupportedComboModesTest, TestSize.Level1)
 {
     EXPECT_TRUE(RpcGetSupportedComboModes(nullptr, nullptr) < 0);
-    char buff[] = "N|GetSupportedComboModes|asdgds|";
+    char buff[] = "N\tGetSupportedComboModes\tasdgds\t";
     mContext->oneProcess = buff;
-    mContext->nPos = strlen("N|GetSupportedComboModes|");
+    mContext->nPos = strlen("N\tGetSupportedComboModes\t");
     mContext->nSize = strlen(buff);
     EXPECT_TRUE(RpcGetSupportedComboModes(mServer, mContext) < 0);
-    char buff1[] = "N|GetSupportedComboModes|134|";
+    char buff1[] = "N\tGetSupportedComboModes\t134\t";
     mContext->oneProcess = buff1;
-    mContext->nPos = strlen("N|GetSupportedComboModes|");
+    mContext->nPos = strlen("N\tGetSupportedComboModes\t");
     mContext->nSize = strlen(buff1);
     EXPECT_TRUE(RpcGetSupportedComboModes(mServer, mContext) == 0);
 }
@@ -527,14 +529,14 @@ HWTEST_F(WifiHalCRpcServerTest, RpcGetSupportedComboModesTest, TestSize.Level1)
 HWTEST_F(WifiHalCRpcServerTest, RpcConfigComboModesTest, TestSize.Level1)
 {
     EXPECT_TRUE(RpcConfigComboModes(nullptr, nullptr) < 0);
-    char buff[] = "N|ConfigComboModes|asdgds|";
+    char buff[] = "N\tConfigComboModes\tasdgds\t";
     mContext->oneProcess = buff;
-    mContext->nPos = strlen("N|ConfigComboModes|");
+    mContext->nPos = strlen("N\tConfigComboModes\t");
     mContext->nSize = strlen(buff);
     EXPECT_TRUE(RpcConfigComboModes(mServer, mContext) < 0);
-    char buff1[] = "N|ConfigComboModes|134|";
+    char buff1[] = "N\tConfigComboModes\t134\t";
     mContext->oneProcess = buff1;
-    mContext->nPos = strlen("N|ConfigComboModes|");
+    mContext->nPos = strlen("N\tConfigComboModes\t");
     mContext->nSize = strlen(buff1);
     EXPECT_TRUE(RpcConfigComboModes(mServer, mContext) == 0);
 }
@@ -548,14 +550,14 @@ HWTEST_F(WifiHalCRpcServerTest, RpcGetComboModesTest, TestSize.Level1)
 HWTEST_F(WifiHalCRpcServerTest, RpcRequestFirmwareDebugDumpTest, TestSize.Level1)
 {
     EXPECT_TRUE(RpcRequestFirmwareDebugDump(nullptr, nullptr) < 0);
-    char buff[] = "N|RequestFirmwareDebugDump|asdgds|";
+    char buff[] = "N\tRequestFirmwareDebugDump\tasdgds\t";
     mContext->oneProcess = buff;
-    mContext->nPos = strlen("N|RequestFirmwareDebugDump|");
+    mContext->nPos = strlen("N\tRequestFirmwareDebugDump\t");
     mContext->nSize = strlen(buff);
     EXPECT_TRUE(RpcRequestFirmwareDebugDump(mServer, mContext) < 0);
-    char buff1[] = "N|RequestFirmwareDebugDump|134|";
+    char buff1[] = "N\tRequestFirmwareDebugDump\t134\t";
     mContext->oneProcess = buff1;
-    mContext->nPos = strlen("N|RequestFirmwareDebugDump|");
+    mContext->nPos = strlen("N\tRequestFirmwareDebugDump\t");
     mContext->nSize = strlen(buff1);
     EXPECT_TRUE(RpcRequestFirmwareDebugDump(mServer, mContext) == 0);
 }
@@ -563,14 +565,14 @@ HWTEST_F(WifiHalCRpcServerTest, RpcRequestFirmwareDebugDumpTest, TestSize.Level1
 HWTEST_F(WifiHalCRpcServerTest, RpcSetPowerModeTest, TestSize.Level1)
 {
     EXPECT_TRUE(RpcSetPowerMode(nullptr, nullptr) < 0);
-    char buff[] = "N|SetPowerMode|asdgds|";
+    char buff[] = "N\tSetPowerMode\tasdgds\t";
     mContext->oneProcess = buff;
-    mContext->nPos = strlen("N|SetPowerMode|");
+    mContext->nPos = strlen("N\tSetPowerMode\t");
     mContext->nSize = strlen(buff);
     EXPECT_TRUE(RpcSetPowerMode(mServer, mContext) < 0);
-    char buff1[] = "N|SetPowerMode|1|";
+    char buff1[] = "N\tSetPowerMode\t1\t";
     mContext->oneProcess = buff1;
-    mContext->nPos = strlen("N|SetPowerMode|");
+    mContext->nPos = strlen("N\tSetPowerMode\t");
     mContext->nSize = strlen(buff1);
     EXPECT_TRUE(RpcSetPowerMode(mServer, mContext) == 0);
 }
@@ -614,19 +616,19 @@ HWTEST_F(WifiHalCRpcServerTest, RpcDisconnectSupplicantTest, TestSize.Level1)
 HWTEST_F(WifiHalCRpcServerTest, RpcRequestToSupplicantTest, TestSize.Level1)
 {
     EXPECT_TRUE(RpcRequestToSupplicant(nullptr, nullptr) < 0);
-    char buff[] = "N|RequestToSupplicant|asdf|";
+    char buff[] = "N\tRequestToSupplicant\tasdf\t";
     mContext->oneProcess = buff;
-    mContext->nPos = strlen("N|RequestToSupplicant|");
+    mContext->nPos = strlen("N\tRequestToSupplicant\t");
     mContext->nSize = strlen(buff);
     EXPECT_TRUE(RpcRequestToSupplicant(mServer, mContext) < 0);
-    char buff1[] = "N|RequestToSupplicant|4|8c677c8d5a|";
+    char buff1[] = "N\tRequestToSupplicant\t4\t8c677c8d5a\t";
     mContext->oneProcess = buff1;
-    mContext->nPos = strlen("N|RequestToSupplicant|");
+    mContext->nPos = strlen("N\tRequestToSupplicant\t");
     mContext->nSize = strlen(buff1);
     EXPECT_TRUE(RpcRequestToSupplicant(mServer, mContext) < 0);
-    char buff2[] = "N|RequestToSupplicant|4|8c677c8a|";
+    char buff2[] = "N\tRequestToSupplicant\t4\t8c677c8a\t";
     mContext->oneProcess = buff2;
-    mContext->nPos = strlen("N|RequestToSupplicant|");
+    mContext->nPos = strlen("N\tRequestToSupplicant\t");
     mContext->nSize = strlen(buff2);
     EXPECT_TRUE(RpcRequestToSupplicant(mServer, mContext) == 0);
 }
@@ -634,14 +636,14 @@ HWTEST_F(WifiHalCRpcServerTest, RpcRequestToSupplicantTest, TestSize.Level1)
 HWTEST_F(WifiHalCRpcServerTest, RpcSetPowerSaveTest, TestSize.Level1)
 {
     EXPECT_TRUE(RpcSetPowerSave(nullptr, nullptr) < 0);
-    char buff[] = "N|SetPowerSave|fds|";
+    char buff[] = "N\tSetPowerSave\tfds\t";
     mContext->oneProcess = buff;
-    mContext->nPos = strlen("N|SetPowerSave|");
+    mContext->nPos = strlen("N\tSetPowerSave\t");
     mContext->nSize = strlen(buff);
     EXPECT_TRUE(RpcSetPowerSave(mServer, mContext) < 0);
-    char buff1[] = "N|SetPowerSave|1|";
+    char buff1[] = "N\tSetPowerSave\t1\t";
     mContext->oneProcess = buff1;
-    mContext->nPos = strlen("N|SetPowerSave|");
+    mContext->nPos = strlen("N\tSetPowerSave\t");
     mContext->nSize = strlen(buff1);
     EXPECT_TRUE(RpcSetPowerSave(mServer, mContext) == 0);
 }
@@ -649,14 +651,14 @@ HWTEST_F(WifiHalCRpcServerTest, RpcSetPowerSaveTest, TestSize.Level1)
 HWTEST_F(WifiHalCRpcServerTest, RpcWpaSetCountryCodeTest, TestSize.Level1)
 {
     EXPECT_TRUE(RpcWpaSetCountryCode(nullptr, nullptr) < 0);
-    char buff[] = "N|WpaSetCountryCode|CHINA|";
+    char buff[] = "N\tWpaSetCountryCode\tCHINA\t";
     mContext->oneProcess = buff;
-    mContext->nPos = strlen("N|WpaSetCountryCode|");
+    mContext->nPos = strlen("N\tWpaSetCountryCode\t");
     mContext->nSize = strlen(buff);
     EXPECT_TRUE(RpcWpaSetCountryCode(mServer, mContext) < 0);
-    char buff1[] = "N|WpaSetCountryCode|CN|";
+    char buff1[] = "N\tWpaSetCountryCode\tCN\t";
     mContext->oneProcess = buff1;
-    mContext->nPos = strlen("N|WpaSetCountryCode|");
+    mContext->nPos = strlen("N\tWpaSetCountryCode\t");
     mContext->nSize = strlen(buff1);
     EXPECT_TRUE(RpcWpaSetCountryCode(mServer, mContext) == 0);
 }
@@ -670,34 +672,34 @@ HWTEST_F(WifiHalCRpcServerTest, RpcWpaGetCountryCodeTest, TestSize.Level1)
 HWTEST_F(WifiHalCRpcServerTest, RpcStartScanTest, TestSize.Level1)
 {
     EXPECT_TRUE(RpcStartScan(nullptr, nullptr) < 0);
-    char buff[] = "N|StartScan|x|10|scan_ssid1|10|scan_ssid2|2|2427|2442|2|";
+    char buff[] = "N\tStartScan\tx\t10\tscan_ssid1\t10\tscan_ssid2\t2\t2427\t2442\t2\t";
     mContext->oneProcess = buff;
-    mContext->nPos = strlen("N|StartScan|");
+    mContext->nPos = strlen("N\tStartScan\t");
     mContext->nSize = strlen(buff);
     EXPECT_TRUE(RpcStartScan(mServer, mContext) < 0);
-    char buff1[] = "N|StartScan|2|10|scan_ssid1|10|scan_ssid2";
+    char buff1[] = "N\tStartScan\t2\t10\tscan_ssid1\t10\tscan_ssid2";
     mContext->oneProcess = buff1;
-    mContext->nPos = strlen("N|StartScan|");
+    mContext->nPos = strlen("N\tStartScan\t");
     mContext->nSize = strlen(buff1);
     EXPECT_TRUE(RpcStartScan(mServer, mContext) < 0);
-    char buff2[] = "N|StartScan|2|10|scan_ssid1|10|scan_ssid2|x|";
+    char buff2[] = "N\tStartScan\t2\t10\tscan_ssid1\t10\tscan_ssid2\tx\t";
     mContext->oneProcess = buff2;
-    mContext->nPos = strlen("N|StartScan|");
+    mContext->nPos = strlen("N\tStartScan\t");
     mContext->nSize = strlen(buff2);
     EXPECT_TRUE(RpcStartScan(mServer, mContext) < 0);
-    char buff3[] = "N|StartScan|2|10|scan_ssid1|10|scan_ssid2|2|2427|x|x|";
+    char buff3[] = "N\tStartScan\t2\t10\tscan_ssid1\t10\tscan_ssid2\t2\t2427\tx\tx\t";
     mContext->oneProcess = buff3;
-    mContext->nPos = strlen("N|StartScan|");
+    mContext->nPos = strlen("N\tStartScan\t");
     mContext->nSize = strlen(buff3);
     EXPECT_TRUE(RpcStartScan(mServer, mContext) < 0);
-    char buff4[] = "N|StartScan|2|10|scan_ssid1|10|scan_ssid2|2|2427|2442|x|";
+    char buff4[] = "N\tStartScan\t2\t10\tscan_ssid1\t10\tscan_ssid2\t2\t2427\t2442\tx\t";
     mContext->oneProcess = buff4;
-    mContext->nPos = strlen("N|StartScan|");
+    mContext->nPos = strlen("N\tStartScan\t");
     mContext->nSize = strlen(buff4);
     EXPECT_TRUE(RpcStartScan(mServer, mContext) < 0);
-    char buff5[] = "N|StartScan|2|10|scan_ssid1|10|scan_ssid2|2|2427|2442|2|";
+    char buff5[] = "N\tStartScan\t2\t10\tscan_ssid1\t10\tscan_ssid2\t2\t2427\t2442\t2\t";
     mContext->oneProcess = buff5;
-    mContext->nPos = strlen("N|StartScan|");
+    mContext->nPos = strlen("N\tStartScan\t");
     mContext->nSize = strlen(buff5);
     EXPECT_TRUE(RpcStartScan(mServer, mContext) == 0);
 }
@@ -705,14 +707,14 @@ HWTEST_F(WifiHalCRpcServerTest, RpcStartScanTest, TestSize.Level1)
 HWTEST_F(WifiHalCRpcServerTest, RpcGetScanInfosTest, TestSize.Level1)
 {
     EXPECT_TRUE(RpcGetScanInfos(nullptr, nullptr) < 0);
-    char buff[] = "N|GetScanInfos|x|";
+    char buff[] = "N\tGetScanInfos\tx\t";
     mContext->oneProcess = buff;
-    mContext->nPos = strlen("N|GetScanInfos|");
+    mContext->nPos = strlen("N\tGetScanInfos\t");
     mContext->nSize = strlen(buff);
     EXPECT_TRUE(RpcGetScanInfos(mServer, mContext) < 0);
-    char buff1[] = "N|GetScanInfos|12|";
+    char buff1[] = "N\tGetScanInfos\t12\t";
     mContext->oneProcess = buff1;
-    mContext->nPos = strlen("N|GetScanInfos|");
+    mContext->nPos = strlen("N\tGetScanInfos\t");
     mContext->nSize = strlen(buff1);
     EXPECT_TRUE(RpcGetScanInfos(mServer, mContext) == 0);
 }
@@ -720,14 +722,14 @@ HWTEST_F(WifiHalCRpcServerTest, RpcGetScanInfosTest, TestSize.Level1)
 HWTEST_F(WifiHalCRpcServerTest, RpcGetNetworkListTest, TestSize.Level1)
 {
     EXPECT_TRUE(RpcGetNetworkList(nullptr, nullptr) < 0);
-    char buff[] = "N|GetNetworkList|x|";
+    char buff[] = "N\tGetNetworkList\tx\t";
     mContext->oneProcess = buff;
-    mContext->nPos = strlen("N|GetNetworkList|");
+    mContext->nPos = strlen("N\tGetNetworkList\t");
     mContext->nSize = strlen(buff);
     EXPECT_TRUE(RpcGetNetworkList(mServer, mContext) < 0);
-    char buff1[] = "N|GetNetworkList|12|";
+    char buff1[] = "N\tGetNetworkList\t12\t";
     mContext->oneProcess = buff1;
-    mContext->nPos = strlen("N|GetNetworkList|");
+    mContext->nPos = strlen("N\tGetNetworkList\t");
     mContext->nSize = strlen(buff1);
     EXPECT_TRUE(RpcGetNetworkList(mServer, mContext) == 0);
 }
@@ -735,39 +737,42 @@ HWTEST_F(WifiHalCRpcServerTest, RpcGetNetworkListTest, TestSize.Level1)
 HWTEST_F(WifiHalCRpcServerTest, RpcStartPnoScanTest, TestSize.Level1)
 {
     EXPECT_TRUE(RpcStartPnoScan(nullptr, nullptr) < 0);
-    char buff[] = "N|StartPnoScan|1|x|1|2|3|asd|4|asdf|1|5|asdfg|2|5040|5080|";
+    char buff[] = "N\tStartPnoScan\t1\tx\t1\t2\t3\tasd\t4\tasdf\t1\t5\tasdfg\t2\t5040\t5080\t";
     mContext->oneProcess = buff;
-    mContext->nPos = strlen("N|StartPnoScan|");
+    mContext->nPos = strlen("N\tStartPnoScan\t");
     mContext->nSize = strlen(buff);
     EXPECT_TRUE(RpcStartPnoScan(mServer, mContext) < 0);
-    char buff1[] = "N|StartPnoScan|1|2|1|2|10|scan_ssid1|10|scan_ssid2";
+    char buff1[] = "N\tStartPnoScan\t1\t2\t1\t2\t10\tscan_ssid1\t10\tscan_ssid2";
     mContext->oneProcess = buff1;
-    mContext->nPos = strlen("N|StartPnoScan|");
+    mContext->nPos = strlen("N\tStartPnoScan\t");
     mContext->nSize = strlen(buff1);
     EXPECT_TRUE(RpcStartPnoScan(mServer, mContext) < 0);
-    char buff2[] = "N|StartPnoScan|1|2|1|2|10|scan_ssid1|10|scan_ssid2|x|";
+    char buff2[] = "N\tStartPnoScan\t1\t2\t1\t2\t10\tscan_ssid1\t10\tscan_ssid2\tx\t";
     mContext->oneProcess = buff2;
-    mContext->nPos = strlen("N|StartPnoScan|");
+    mContext->nPos = strlen("N\tStartPnoScan\t");
     mContext->nSize = strlen(buff2);
     EXPECT_TRUE(RpcStartPnoScan(mServer, mContext) < 0);
-    char buff3[] = "N|StartPnoScan|1|2|1|2|10|scan_ssid1|10|scan_ssid2|2|10|save_ssid1|10|save_ssid2";
+    char buff3[] = "N\tStartPnoScan\t1\t2\t1\t2\t10\tscan_ssid1\t10\tscan_ssid2\t2\t10\tsave_ssid1\t10\tsave_ssid2";
     mContext->oneProcess = buff3;
-    mContext->nPos = strlen("N|StartPnoScan|");
+    mContext->nPos = strlen("N\tStartPnoScan\t");
     mContext->nSize = strlen(buff3);
     EXPECT_TRUE(RpcStartPnoScan(mServer, mContext) < 0);
-    char buff4[] = "N|StartPnoScan|1|2|1|2|10|scan_ssid1|10|scan_ssid2|2|10|save_ssid1|10|save_ssid2|x|";
+    char buff4[] =
+        "N\tStartPnoScan\t1\t2\t1\t2\t10\tscan_ssid1\t10\tscan_ssid2\t2\t10\tsave_ssid1\t10\tsave_ssid2\tx\t";
     mContext->oneProcess = buff4;
-    mContext->nPos = strlen("N|StartPnoScan|");
+    mContext->nPos = strlen("N\tStartPnoScan\t");
     mContext->nSize = strlen(buff4);
     EXPECT_TRUE(RpcStartPnoScan(mServer, mContext) < 0);
-    char buff5[] = "N|StartPnoScan|1|2|1|2|10|scan_ssid1|10|scan_ssid2|2|10|save_ssid1|10|save_ssid2|2|5040|x|";
+    char buff5[] =
+        "N\tStartPnoScan\t1\t2\t1\t2\t10\tscan_ssid1\t10\tscan_ssid2\t2\t10\tsave_ssid1\t10\tsave_ssid2\t2\t5040\tx\t";
     mContext->oneProcess = buff5;
-    mContext->nPos = strlen("N|StartPnoScan|");
+    mContext->nPos = strlen("N\tStartPnoScan\t");
     mContext->nSize = strlen(buff5);
     EXPECT_TRUE(RpcStartPnoScan(mServer, mContext) < 0);
-    char buff6[] = "N|StartPnoScan|1|2|1|2|10|scan_ssid1|10|scan_ssid2|2|10|save_ssid1|10|save_ssid2|2|5040|5080|";
+    char buff6[] =
+    "N\tStartPnoScan\t1\t2\t1\t2\t10\tscan_ssid1\t10\tscan_ssid2\t2\t10\tsave_ssid1\t10\tsave_ssid2\t2\t5040\t5080\t";
     mContext->oneProcess = buff6;
-    mContext->nPos = strlen("N|StartPnoScan|");
+    mContext->nPos = strlen("N\tStartPnoScan\t");
     mContext->nSize = strlen(buff6);
     EXPECT_TRUE(RpcStartPnoScan(mServer, mContext) == 0);
 }
@@ -781,14 +786,14 @@ HWTEST_F(WifiHalCRpcServerTest, RpcStopPnoScanTest, TestSize.Level1)
 HWTEST_F(WifiHalCRpcServerTest, RpcConnectTest, TestSize.Level1)
 {
     EXPECT_TRUE(RpcConnect(nullptr, nullptr) < 0);
-    char buff[] = "N|Connect|x|";
+    char buff[] = "N\tConnect\tx\t";
     mContext->oneProcess = buff;
-    mContext->nPos = strlen("N|Connect|");
+    mContext->nPos = strlen("N\tConnect\t");
     mContext->nSize = strlen(buff);
     EXPECT_TRUE(RpcConnect(mServer, mContext) < 0);
-    char buff1[] = "N|Connect|1|";
+    char buff1[] = "N\tConnect\t1\t";
     mContext->oneProcess = buff1;
-    mContext->nPos = strlen("N|Connect|");
+    mContext->nPos = strlen("N\tConnect\t");
     mContext->nSize = strlen(buff1);
     EXPECT_TRUE(RpcConnect(mServer, mContext) == 0);
 }
@@ -796,14 +801,14 @@ HWTEST_F(WifiHalCRpcServerTest, RpcConnectTest, TestSize.Level1)
 HWTEST_F(WifiHalCRpcServerTest, RpcWpaAutoConnectTest, TestSize.Level1)
 {
     EXPECT_TRUE(RpcWpaAutoConnect(nullptr, nullptr) < 0);
-    char buff[] = "N|WpaAutoConnect|0ad|";
+    char buff[] = "N\tWpaAutoConnect\t0ad\t";
     mContext->oneProcess = buff;
-    mContext->nPos = strlen("N|WpaAutoConnect|");
+    mContext->nPos = strlen("N\tWpaAutoConnect\t");
     mContext->nSize = strlen(buff);
     EXPECT_TRUE(RpcWpaAutoConnect(mServer, mContext) < 0);
-    char buff1[] = "N|WpaAutoConnect|1|";
+    char buff1[] = "N\tWpaAutoConnect\t1\t";
     mContext->oneProcess = buff1;
-    mContext->nPos = strlen("N|WpaAutoConnect|");
+    mContext->nPos = strlen("N\tWpaAutoConnect\t");
     mContext->nSize = strlen(buff1);
     EXPECT_TRUE(RpcWpaAutoConnect(mServer, mContext) == 0);
 }
@@ -835,14 +840,14 @@ HWTEST_F(WifiHalCRpcServerTest, RpcGetStaCapabilitiesTest, TestSize.Level1)
 HWTEST_F(WifiHalCRpcServerTest, RpcGetDeviceMacAddressTest, TestSize.Level1)
 {
     EXPECT_TRUE(RpcGetDeviceMacAddress(nullptr, nullptr) < 0);
-    char buff[] = "N|GetDeviceMacAddress|x|";
+    char buff[] = "N\tGetDeviceMacAddress\tx\t";
     mContext->oneProcess = buff;
-    mContext->nPos = strlen("N|GetDeviceMacAddress|");
+    mContext->nPos = strlen("N\tGetDeviceMacAddress\t");
     mContext->nSize = strlen(buff);
     EXPECT_TRUE(RpcGetDeviceMacAddress(mServer, mContext) < 0);
-    char buff1[] = "N|GetDeviceMacAddress|17|";
+    char buff1[] = "N\tGetDeviceMacAddress\t17\t";
     mContext->oneProcess = buff1;
-    mContext->nPos = strlen("N|GetDeviceMacAddress|");
+    mContext->nPos = strlen("N\tGetDeviceMacAddress\t");
     mContext->nSize = strlen(buff1);
     EXPECT_TRUE(RpcGetDeviceMacAddress(mServer, mContext) == 0);
 }
@@ -850,14 +855,14 @@ HWTEST_F(WifiHalCRpcServerTest, RpcGetDeviceMacAddressTest, TestSize.Level1)
 HWTEST_F(WifiHalCRpcServerTest, RpcGetFrequenciesTest, TestSize.Level1)
 {
     EXPECT_TRUE(RpcGetFrequencies(nullptr, nullptr) < 0);
-    char buff[] = "N|GetFrequencies|1|";
+    char buff[] = "N\tGetFrequencies\t1\t";
     mContext->oneProcess = buff;
-    mContext->nPos = strlen("N|GetFrequencies|");
+    mContext->nPos = strlen("N\tGetFrequencies\t");
     mContext->nSize = strlen(buff);
     EXPECT_TRUE(RpcGetFrequencies(mServer, mContext) < 0);
-    char buff1[] = "N|GetFrequencies|1|128|";
+    char buff1[] = "N\tGetFrequencies\t1\t128\t";
     mContext->oneProcess = buff1;
-    mContext->nPos = strlen("N|GetFrequencies|");
+    mContext->nPos = strlen("N\tGetFrequencies\t");
     mContext->nSize = strlen(buff1);
     EXPECT_TRUE(RpcGetFrequencies(mServer, mContext) == 0);
 }
@@ -865,19 +870,19 @@ HWTEST_F(WifiHalCRpcServerTest, RpcGetFrequenciesTest, TestSize.Level1)
 HWTEST_F(WifiHalCRpcServerTest, RpcSetAssocMacAddrTest, TestSize.Level1)
 {
     EXPECT_TRUE(RpcSetAssocMacAddr(nullptr, nullptr) < 0);
-    char buff[] = "N|SetAssocMacAddr|x|7d9c039dfeba46|";
+    char buff[] = "N\tSetAssocMacAddr\tx\t7d9c039dfeba46\t";
     mContext->oneProcess = buff;
-    mContext->nPos = strlen("N|SetAssocMacAddr|");
+    mContext->nPos = strlen("N\tSetAssocMacAddr\t");
     mContext->nSize = strlen(buff);
     EXPECT_TRUE(RpcSetAssocMacAddr(mServer, mContext) < 0);
-    char buff1[] = "N|SetAssocMacAddr|6|7d9c039dfeba46|";
+    char buff1[] = "N\tSetAssocMacAddr\t6\t7d9c039dfeba46\t";
     mContext->oneProcess = buff1;
-    mContext->nPos = strlen("N|SetAssocMacAddr|");
+    mContext->nPos = strlen("N\tSetAssocMacAddr\t");
     mContext->nSize = strlen(buff1);
     EXPECT_TRUE(RpcSetAssocMacAddr(mServer, mContext) < 0);
-    char buff2[] = "N|SetAssocMacAddr|7|7d9c039dfeba46|";
+    char buff2[] = "N\tSetAssocMacAddr\t7\t7d9c039dfeba46\t";
     mContext->oneProcess = buff2;
-    mContext->nPos = strlen("N|SetAssocMacAddr|");
+    mContext->nPos = strlen("N\tSetAssocMacAddr\t");
     mContext->nSize = strlen(buff2);
     EXPECT_TRUE(RpcSetAssocMacAddr(mServer, mContext) == 0);
 }
@@ -885,19 +890,19 @@ HWTEST_F(WifiHalCRpcServerTest, RpcSetAssocMacAddrTest, TestSize.Level1)
 HWTEST_F(WifiHalCRpcServerTest, RpcSetScanningMacAddressTest, TestSize.Level1)
 {
     EXPECT_TRUE(RpcSetScanningMacAddress(nullptr, nullptr) < 0);
-    char buff[] = "N|SetScanningMacAddress|x|7d9c039dfeba46|";
+    char buff[] = "N\tSetScanningMacAddress\tx\t7d9c039dfeba46\t";
     mContext->oneProcess = buff;
-    mContext->nPos = strlen("N|SetScanningMacAddress|");
+    mContext->nPos = strlen("N\tSetScanningMacAddress\t");
     mContext->nSize = strlen(buff);
     EXPECT_TRUE(RpcSetScanningMacAddress(mServer, mContext) < 0);
-    char buff1[] = "N|SetScanningMacAddress|6|7d9c039dfeba46|";
+    char buff1[] = "N\tSetScanningMacAddress\t6\t7d9c039dfeba46\t";
     mContext->oneProcess = buff1;
-    mContext->nPos = strlen("N|SetScanningMacAddress|");
+    mContext->nPos = strlen("N\tSetScanningMacAddress\t");
     mContext->nSize = strlen(buff1);
     EXPECT_TRUE(RpcSetScanningMacAddress(mServer, mContext) < 0);
-    char buff2[] = "N|SetScanningMacAddress|7|7d9c039dfeba46|";
+    char buff2[] = "N\tSetScanningMacAddress\t7\t7d9c039dfeba46\t";
     mContext->oneProcess = buff2;
-    mContext->nPos = strlen("N|SetScanningMacAddress|");
+    mContext->nPos = strlen("N\tSetScanningMacAddress\t");
     mContext->nSize = strlen(buff2);
     EXPECT_TRUE(RpcSetScanningMacAddress(mServer, mContext) == 0);
 }
@@ -905,19 +910,19 @@ HWTEST_F(WifiHalCRpcServerTest, RpcSetScanningMacAddressTest, TestSize.Level1)
 HWTEST_F(WifiHalCRpcServerTest, RpcDeauthLastRoamingBssidTest, TestSize.Level1)
 {
     EXPECT_TRUE(RpcDeauthLastRoamingBssid(nullptr, nullptr) < 0);
-    char buff[] = "N|DeauthLastRoamingBssid|x|7d9c039dfeba46|";
+    char buff[] = "N\tDeauthLastRoamingBssid\tx\t7d9c039dfeba46\t";
     mContext->oneProcess = buff;
-    mContext->nPos = strlen("N|DeauthLastRoamingBssid|");
+    mContext->nPos = strlen("N\tDeauthLastRoamingBssid\t");
     mContext->nSize = strlen(buff);
     EXPECT_TRUE(RpcDeauthLastRoamingBssid(mServer, mContext) < 0);
-    char buff1[] = "N|DeauthLastRoamingBssid|6|7d9c039dfeba46|";
+    char buff1[] = "N\tDeauthLastRoamingBssid\t6\t7d9c039dfeba46\t";
     mContext->oneProcess = buff1;
-    mContext->nPos = strlen("N|DeauthLastRoamingBssid|");
+    mContext->nPos = strlen("N\tDeauthLastRoamingBssid\t");
     mContext->nSize = strlen(buff1);
     EXPECT_TRUE(RpcDeauthLastRoamingBssid(mServer, mContext) < 0);
-    char buff2[] = "N|DeauthLastRoamingBssid|7|7d9c039dfeba46|";
+    char buff2[] = "N\tDeauthLastRoamingBssid\t7\t7d9c039dfeba46\t";
     mContext->oneProcess = buff2;
-    mContext->nPos = strlen("N|DeauthLastRoamingBssid|");
+    mContext->nPos = strlen("N\tDeauthLastRoamingBssid\t");
     mContext->nSize = strlen(buff2);
     EXPECT_TRUE(RpcDeauthLastRoamingBssid(mServer, mContext) == 0);
 }
@@ -931,34 +936,34 @@ HWTEST_F(WifiHalCRpcServerTest, RpcGetSupportFeatureTest, TestSize.Level1)
 HWTEST_F(WifiHalCRpcServerTest, RpcRunCmdTest, TestSize.Level1)
 {
     EXPECT_TRUE(RpcRunCmd(nullptr, nullptr) < 0);
-    char buff[] = "N|RunCmd|wlan0";
+    char buff[] = "N\tRunCmd\twlan0";
     mContext->oneProcess = buff;
-    mContext->nPos = strlen("N|RunCmd|");
+    mContext->nPos = strlen("N\tRunCmd\t");
     mContext->nSize = strlen(buff);
     EXPECT_TRUE(RpcRunCmd(mServer, mContext) < 0);
-    char buff1[] = "N|RunCmd|wlan0|x|";
+    char buff1[] = "N\tRunCmd\twlan0\tx\t";
     mContext->oneProcess = buff1;
-    mContext->nPos = strlen("N|RunCmd|");
+    mContext->nPos = strlen("N\tRunCmd\t");
     mContext->nSize = strlen(buff1);
     EXPECT_TRUE(RpcRunCmd(mServer, mContext) < 0);
-    char buff2[] = "N|RunCmd|wlan0|1|x|";
+    char buff2[] = "N\tRunCmd\twlan0\t1\tx\t";
     mContext->oneProcess = buff2;
-    mContext->nPos = strlen("N|RunCmd|");
+    mContext->nPos = strlen("N\tRunCmd\t");
     mContext->nSize = strlen(buff2);
     EXPECT_TRUE(RpcRunCmd(mServer, mContext) < 0);
-    char buff3[] = "N|RunCmd|wlan0|1|6|7d9c039dfeba46|";
+    char buff3[] = "N\tRunCmd\twlan0\t1\t6\t7d9c039dfeba46\t";
     mContext->oneProcess = buff3;
-    mContext->nPos = strlen("N|RunCmd|");
+    mContext->nPos = strlen("N\tRunCmd\t");
     mContext->nSize = strlen(buff3);
     EXPECT_TRUE(RpcRunCmd(mServer, mContext) < 0);
-    char buff4[] = "N|RunCmd|wlan0|1|7|7d9c039dfeba46|";
+    char buff4[] = "N\tRunCmd\twlan0\t1\t7\t7d9c039dfeba46\t";
     mContext->oneProcess = buff4;
-    mContext->nPos = strlen("N|RunCmd|");
+    mContext->nPos = strlen("N\tRunCmd\t");
     mContext->nSize = strlen(buff4);
     EXPECT_TRUE(RpcRunCmd(mServer, mContext) == 0);
-    char buff5[] = "N|RunCmd|0123456789012345678901|1|7|7d9c039dfeba46|";
+    char buff5[] = "N\tRunCmd\t0123456789012345678901\t1\t7\t7d9c039dfeba46\t";
     mContext->oneProcess = buff5;
-    mContext->nPos = strlen("N|RunCmd|");
+    mContext->nPos = strlen("N\tRunCmd\t");
     mContext->nSize = strlen(buff5);
     EXPECT_TRUE(RpcRunCmd(mServer, mContext) == 0);
 }
@@ -966,14 +971,14 @@ HWTEST_F(WifiHalCRpcServerTest, RpcRunCmdTest, TestSize.Level1)
 HWTEST_F(WifiHalCRpcServerTest, RpcSetWifiTxPowerTest, TestSize.Level1)
 {
     EXPECT_TRUE(RpcSetWifiTxPower(nullptr, nullptr) < 0);
-    char buff[] = "N|SetWifiTxPower|12";
+    char buff[] = "N\tSetWifiTxPower\t12";
     mContext->oneProcess = buff;
-    mContext->nPos = strlen("N|SetWifiTxPower|");
+    mContext->nPos = strlen("N\tSetWifiTxPower\t");
     mContext->nSize = strlen(buff);
     EXPECT_TRUE(RpcSetWifiTxPower(mServer, mContext) < 0);
-    char buff1[] = "N|SetWifiTxPower|12|";
+    char buff1[] = "N\tSetWifiTxPower\t12\t";
     mContext->oneProcess = buff1;
-    mContext->nPos = strlen("N|SetWifiTxPower|");
+    mContext->nPos = strlen("N\tSetWifiTxPower\t");
     mContext->nSize = strlen(buff1);
     EXPECT_TRUE(RpcSetWifiTxPower(mServer, mContext) == 0);
 }
@@ -981,14 +986,14 @@ HWTEST_F(WifiHalCRpcServerTest, RpcSetWifiTxPowerTest, TestSize.Level1)
 HWTEST_F(WifiHalCRpcServerTest, RpcRemoveNetworkTest, TestSize.Level1)
 {
     EXPECT_TRUE(RpcRemoveNetwork(nullptr, nullptr) < 0);
-    char buff[] = "N|RemoveNetwork|12";
+    char buff[] = "N\tRemoveNetwork\t12";
     mContext->oneProcess = buff;
-    mContext->nPos = strlen("N|RemoveNetwork|");
+    mContext->nPos = strlen("N\tRemoveNetwork\t");
     mContext->nSize = strlen(buff);
     EXPECT_TRUE(RpcRemoveNetwork(mServer, mContext) < 0);
-    char buff1[] = "N|RemoveNetwork|12|";
+    char buff1[] = "N\tRemoveNetwork\t12\t";
     mContext->oneProcess = buff1;
-    mContext->nPos = strlen("N|RemoveNetwork|");
+    mContext->nPos = strlen("N\tRemoveNetwork\t");
     mContext->nSize = strlen(buff1);
     EXPECT_TRUE(RpcRemoveNetwork(mServer, mContext) == 0);
 }
@@ -1002,14 +1007,14 @@ HWTEST_F(WifiHalCRpcServerTest, RpcAddNetworkTest, TestSize.Level1)
 HWTEST_F(WifiHalCRpcServerTest, RpcEnableNetworkTest, TestSize.Level1)
 {
     EXPECT_TRUE(RpcEnableNetwork(nullptr, nullptr) < 0);
-    char buff[] = "N|EnableNetwork|12";
+    char buff[] = "N\tEnableNetwork\t12";
     mContext->oneProcess = buff;
-    mContext->nPos = strlen("N|EnableNetwork|");
+    mContext->nPos = strlen("N\tEnableNetwork\t");
     mContext->nSize = strlen(buff);
     EXPECT_TRUE(RpcEnableNetwork(mServer, mContext) < 0);
-    char buff1[] = "N|EnableNetwork|12|";
+    char buff1[] = "N\tEnableNetwork\t12\t";
     mContext->oneProcess = buff1;
-    mContext->nPos = strlen("N|EnableNetwork|");
+    mContext->nPos = strlen("N\tEnableNetwork\t");
     mContext->nSize = strlen(buff1);
     EXPECT_TRUE(RpcEnableNetwork(mServer, mContext) == 0);
 }
@@ -1017,14 +1022,14 @@ HWTEST_F(WifiHalCRpcServerTest, RpcEnableNetworkTest, TestSize.Level1)
 HWTEST_F(WifiHalCRpcServerTest, RpcDisableNetworkTest, TestSize.Level1)
 {
     EXPECT_TRUE(RpcDisableNetwork(nullptr, nullptr) < 0);
-    char buff[] = "N|DisableNetwork|12";
+    char buff[] = "N\tDisableNetwork\t12";
     mContext->oneProcess = buff;
-    mContext->nPos = strlen("N|DisableNetwork|");
+    mContext->nPos = strlen("N\tDisableNetwork\t");
     mContext->nSize = strlen(buff);
     EXPECT_TRUE(RpcDisableNetwork(mServer, mContext) < 0);
-    char buff1[] = "N|DisableNetwork|12|";
+    char buff1[] = "N\tDisableNetwork\t12\t";
     mContext->oneProcess = buff1;
-    mContext->nPos = strlen("N|DisableNetwork|");
+    mContext->nPos = strlen("N\tDisableNetwork\t");
     mContext->nSize = strlen(buff1);
     EXPECT_TRUE(RpcDisableNetwork(mServer, mContext) == 0);
 }
@@ -1032,19 +1037,19 @@ HWTEST_F(WifiHalCRpcServerTest, RpcDisableNetworkTest, TestSize.Level1)
 HWTEST_F(WifiHalCRpcServerTest, RpcSetNetworkTest, TestSize.Level1)
 {
     EXPECT_TRUE(RpcSetNetwork(nullptr, nullptr) < 0);
-    char buff[] = "N|SetNetwork|0|1";
+    char buff[] = "N\tSetNetwork\t0\t1";
     mContext->oneProcess = buff;
-    mContext->nPos = strlen("N|SetNetwork|");
+    mContext->nPos = strlen("N\tSetNetwork\t");
     mContext->nSize = strlen(buff);
     EXPECT_TRUE(RpcSetNetwork(mServer, mContext) < 0);
-    char buff1[] = "N|SetNetwork|0|1|12|afsdgljsd";
+    char buff1[] = "N\tSetNetwork\t0\t1\t12\tafsdgljsd";
     mContext->oneProcess = buff1;
-    mContext->nPos = strlen("N|SetNetwork|");
+    mContext->nPos = strlen("N\tSetNetwork\t");
     mContext->nSize = strlen(buff1);
     EXPECT_TRUE(RpcSetNetwork(mServer, mContext) == 0);
-    char buff2[] = "N|SetNetwork|0|1|12|afsdgljsd|";
+    char buff2[] = "N\tSetNetwork\t0\t1\t12\tafsdgljsd\t";
     mContext->oneProcess = buff2;
-    mContext->nPos = strlen("N|SetNetwork|");
+    mContext->nPos = strlen("N\tSetNetwork\t");
     mContext->nSize = strlen(buff2);
     EXPECT_TRUE(RpcSetNetwork(mServer, mContext) == 0);
 }
@@ -1052,14 +1057,14 @@ HWTEST_F(WifiHalCRpcServerTest, RpcSetNetworkTest, TestSize.Level1)
 HWTEST_F(WifiHalCRpcServerTest, RpcWpaGetNetworkTest, TestSize.Level1)
 {
     EXPECT_TRUE(RpcWpaGetNetwork(nullptr, nullptr) < 0);
-    char buff[] = "N|WpaGetNetwork|2|ssid";
+    char buff[] = "N\tWpaGetNetwork\t2\tssid";
     mContext->oneProcess = buff;
-    mContext->nPos = strlen("N|WpaGetNetwork|");
+    mContext->nPos = strlen("N\tWpaGetNetwork\t");
     mContext->nSize = strlen(buff);
     EXPECT_TRUE(RpcWpaGetNetwork(mServer, mContext) < 0);
-    char buff1[] = "N|WpaGetNetwork|2|ssid|";
+    char buff1[] = "N\tWpaGetNetwork\t2\tssid\t";
     mContext->oneProcess = buff1;
-    mContext->nPos = strlen("N|WpaGetNetwork|");
+    mContext->nPos = strlen("N\tWpaGetNetwork\t");
     mContext->nSize = strlen(buff1);
     EXPECT_TRUE(RpcWpaGetNetwork(mServer, mContext) == 0);
 }
@@ -1073,14 +1078,14 @@ HWTEST_F(WifiHalCRpcServerTest, RpcSaveNetworkConfigTest, TestSize.Level1)
 HWTEST_F(WifiHalCRpcServerTest, RpcStartWpsPbcModeTest, TestSize.Level1)
 {
     EXPECT_TRUE(RpcStartWpsPbcMode(nullptr, nullptr) < 0);
-    char buff[] = "N|StartWpsPbcMode|1|2|adsgfkdsj";
+    char buff[] = "N\tStartWpsPbcMode\t1\t2\tadsgfkdsj";
     mContext->oneProcess = buff;
-    mContext->nPos = strlen("N|StartWpsPbcMode|");
+    mContext->nPos = strlen("N\tStartWpsPbcMode\t");
     mContext->nSize = strlen(buff);
     EXPECT_TRUE(RpcStartWpsPbcMode(mServer, mContext) < 0);
-    char buff1[] = "N|StartWpsPbcMode|1|2|adsgfkdsj|";
+    char buff1[] = "N\tStartWpsPbcMode\t1\t2\tadsgfkdsj\t";
     mContext->oneProcess = buff1;
-    mContext->nPos = strlen("N|StartWpsPbcMode|");
+    mContext->nPos = strlen("N\tStartWpsPbcMode\t");
     mContext->nSize = strlen(buff1);
     EXPECT_TRUE(RpcStartWpsPbcMode(mServer, mContext) == 0);
 }
@@ -1088,14 +1093,14 @@ HWTEST_F(WifiHalCRpcServerTest, RpcStartWpsPbcModeTest, TestSize.Level1)
 HWTEST_F(WifiHalCRpcServerTest, RpcStartWpsPinModeTest, TestSize.Level1)
 {
     EXPECT_TRUE(RpcStartWpsPinMode(nullptr, nullptr) < 0);
-    char buff[] = "N|StartWpsPinMode|1|2|adsgfkdsj";
+    char buff[] = "N\tStartWpsPinMode\t1\t2\tadsgfkdsj";
     mContext->oneProcess = buff;
-    mContext->nPos = strlen("N|StartWpsPinMode|");
+    mContext->nPos = strlen("N\tStartWpsPinMode\t");
     mContext->nSize = strlen(buff);
     EXPECT_TRUE(RpcStartWpsPinMode(mServer, mContext) < 0);
-    char buff1[] = "N|StartWpsPinMode|1|2|adsgfkdsj|";
+    char buff1[] = "N\tStartWpsPinMode\t1\t2\tadsgfkdsj\t";
     mContext->oneProcess = buff1;
-    mContext->nPos = strlen("N|StartWpsPinMode|");
+    mContext->nPos = strlen("N\tStartWpsPinMode\t");
     mContext->nSize = strlen(buff1);
     EXPECT_TRUE(RpcStartWpsPinMode(mServer, mContext) == 0);
 }
@@ -1121,29 +1126,29 @@ HWTEST_F(WifiHalCRpcServerTest, RpcGetRoamingCapabilitiesTest, TestSize.Level1)
 HWTEST_F(WifiHalCRpcServerTest, RpcSetRoamConfigTest, TestSize.Level1)
 {
     EXPECT_TRUE(RpcSetRoamConfig(nullptr, nullptr) < 0);
-    char buff[] = "N|SetRoamConfig|x|fdsagdsa|safdgfds|1|vcxzcbvx|";
+    char buff[] = "N\tSetRoamConfig\tx\tfdsagdsa\tsafdgfds\t1\tvcxzcbvx\t";
     mContext->oneProcess = buff;
-    mContext->nPos = strlen("N|SetRoamConfig|");
+    mContext->nPos = strlen("N\tSetRoamConfig\t");
     mContext->nSize = strlen(buff);
     EXPECT_TRUE(RpcSetRoamConfig(mServer, mContext) < 0);
-    char buff1[] = "N|SetRoamConfig|2|fdsagdsa|safdgfds";
+    char buff1[] = "N\tSetRoamConfig\t2\tfdsagdsa\tsafdgfds";
     mContext->oneProcess = buff1;
-    mContext->nPos = strlen("N|SetRoamConfig|");
+    mContext->nPos = strlen("N\tSetRoamConfig\t");
     mContext->nSize = strlen(buff1);
     EXPECT_TRUE(RpcSetRoamConfig(mServer, mContext) < 0);
-    char buff2[] = "N|SetRoamConfig|2|fdsagdsa|safdgfds|x|vcxzcbvx|";
+    char buff2[] = "N\tSetRoamConfig\t2\tfdsagdsa\tsafdgfds\tx\tvcxzcbvx\t";
     mContext->oneProcess = buff2;
-    mContext->nPos = strlen("N|SetRoamConfig|");
+    mContext->nPos = strlen("N\tSetRoamConfig\t");
     mContext->nSize = strlen(buff2);
     EXPECT_TRUE(RpcSetRoamConfig(mServer, mContext) < 0);
-    char buff3[] = "N|SetRoamConfig|2|fdsagdsa|safdgfds|1|vcxzcbvx";
+    char buff3[] = "N\tSetRoamConfig\t2\tfdsagdsa\tsafdgfds\t1\tvcxzcbvx";
     mContext->oneProcess = buff3;
-    mContext->nPos = strlen("N|SetRoamConfig|");
+    mContext->nPos = strlen("N\tSetRoamConfig\t");
     mContext->nSize = strlen(buff3);
     EXPECT_TRUE(RpcSetRoamConfig(mServer, mContext) < 0);
-    char buff4[] = "N|SetRoamConfig|2|fdsagdsa|safdgfds|1|vcxzcbvx|";
+    char buff4[] = "N\tSetRoamConfig\t2\tfdsagdsa\tsafdgfds\t1\tvcxzcbvx\t";
     mContext->oneProcess = buff4;
-    mContext->nPos = strlen("N|SetRoamConfig|");
+    mContext->nPos = strlen("N\tSetRoamConfig\t");
     mContext->nSize = strlen(buff4);
     EXPECT_TRUE(RpcSetRoamConfig(mServer, mContext) == 0);
 }
@@ -1151,14 +1156,14 @@ HWTEST_F(WifiHalCRpcServerTest, RpcSetRoamConfigTest, TestSize.Level1)
 HWTEST_F(WifiHalCRpcServerTest, RpcGetConnectSignalInfoTest, TestSize.Level1)
 {
     EXPECT_TRUE(RpcGetConnectSignalInfo(nullptr, nullptr) < 0);
-    char buff[] = "N|GetConnectSignalInfo|ssid";
+    char buff[] = "N\tGetConnectSignalInfo\tssid";
     mContext->oneProcess = buff;
-    mContext->nPos = strlen("N|GetConnectSignalInfo|");
+    mContext->nPos = strlen("N\tGetConnectSignalInfo\t");
     mContext->nSize = strlen(buff);
     EXPECT_TRUE(RpcGetConnectSignalInfo(mServer, mContext) < 0);
-    char buff1[] = "N|GetConnectSignalInfo|00:00:00:00:00:00|";
+    char buff1[] = "N\tGetConnectSignalInfo\t00:00:00:00:00:00\t";
     mContext->oneProcess = buff1;
-    mContext->nPos = strlen("N|GetConnectSignalInfo|");
+    mContext->nPos = strlen("N\tGetConnectSignalInfo\t");
     mContext->nSize = strlen(buff1);
     EXPECT_TRUE(RpcGetConnectSignalInfo(mServer, mContext) == 0);
 }
@@ -1166,26 +1171,34 @@ HWTEST_F(WifiHalCRpcServerTest, RpcGetConnectSignalInfoTest, TestSize.Level1)
 HWTEST_F(WifiHalCRpcServerTest, RpcStartSoftApTest, TestSize.Level1)
 {
     EXPECT_TRUE(RpcStartSoftAp(nullptr, nullptr) < 0);
+    char buff[] = "N\tStartSoftAp\t0\t";
+    mContext->oneProcess = buff;
+    mContext->nPos = strlen("N\tStartSoftAp\t");
+    mContext->nSize = strlen(buff);
     EXPECT_TRUE(RpcStartSoftAp(mServer, mContext) == 0);
 }
 
 HWTEST_F(WifiHalCRpcServerTest, RpcStopSoftApTest, TestSize.Level1)
 {
     EXPECT_TRUE(RpcStopSoftAp(nullptr, nullptr) < 0);
+    char buff[] = "N\tStopSoftAp\t0\t";
+    mContext->oneProcess = buff;
+    mContext->nPos = strlen("N\tStopSoftAp\t");
+    mContext->nSize = strlen(buff);
     EXPECT_TRUE(RpcStopSoftAp(mServer, mContext) == 0);
 }
 
 HWTEST_F(WifiHalCRpcServerTest, RpcSetHostapdConfigTest, TestSize.Level1)
 {
     EXPECT_TRUE(RpcSetHostapdConfig(nullptr, nullptr) < 0);
-    char buff[] = "N|SetHostapdConfig|tests|5|adc123456|9|1|0|6|20|";
+    char buff[] = "N\tSetHostapdConfig\ttests\t5\tadc123456\t9\t1\t0\t6\t20\t0\t";
     mContext->oneProcess = buff;
-    mContext->nPos = strlen("N|SetHostapdConfig|");
+    mContext->nPos = strlen("N\tSetHostapdConfig\t");
     mContext->nSize = strlen(buff);
     EXPECT_TRUE(RpcSetHostapdConfig(mServer, mContext) == 0);
-    char buff1[] = "N|SetHostapdConfig|tests|5|adc123456|9|1|0|6|20";
+    char buff1[] = "N\tSetHostapdConfig\ttests\t5\tadc123456\t9\t1\t0\t6\t20";
     mContext->oneProcess = buff1;
-    mContext->nPos = strlen("N|SetHostapdConfig|");
+    mContext->nPos = strlen("N\tSetHostapdConfig\t");
     mContext->nSize = strlen(buff1);
     EXPECT_TRUE(RpcSetHostapdConfig(mServer, mContext) < 0);
 }
@@ -1193,14 +1206,14 @@ HWTEST_F(WifiHalCRpcServerTest, RpcSetHostapdConfigTest, TestSize.Level1)
 HWTEST_F(WifiHalCRpcServerTest, RpcGetStaInfosTest, TestSize.Level1)
 {
     EXPECT_TRUE(RpcGetStaInfos(nullptr, nullptr) < 0);
-    char buff[] = "N|GetStaInfos|128";
+    char buff[] = "N\tGetStaInfos\t128";
     mContext->oneProcess = buff;
-    mContext->nPos = strlen("N|GetStaInfos|");
+    mContext->nPos = strlen("N\tGetStaInfos\t");
     mContext->nSize = strlen(buff);
     EXPECT_TRUE(RpcGetStaInfos(mServer, mContext) < 0);
-    char buff1[] = "N|GetStaInfos|128|";
+    char buff1[] = "N\tGetStaInfos\t128\t0\t";
     mContext->oneProcess = buff1;
-    mContext->nPos = strlen("N|GetStaInfos|");
+    mContext->nPos = strlen("N\tGetStaInfos\t");
     mContext->nSize = strlen(buff1);
     EXPECT_TRUE(RpcGetStaInfos(mServer, mContext) == 0);
 }
@@ -1208,14 +1221,14 @@ HWTEST_F(WifiHalCRpcServerTest, RpcGetStaInfosTest, TestSize.Level1)
 HWTEST_F(WifiHalCRpcServerTest, RpcSetCountryCodeTest, TestSize.Level1)
 {
     EXPECT_TRUE(RpcSetCountryCode(nullptr, nullptr) < 0);
-    char buff[] = "N|SetCountryCode|CN";
+    char buff[] = "N\tSetCountryCode\tCN";
     mContext->oneProcess = buff;
-    mContext->nPos = strlen("N|SetCountryCode|");
+    mContext->nPos = strlen("N\tSetCountryCode\t");
     mContext->nSize = strlen(buff);
     EXPECT_TRUE(RpcSetCountryCode(mServer, mContext) < 0);
-    char buff1[] = "N|SetCountryCode|CN|";
+    char buff1[] = "N\tSetCountryCode\tCN\t0\t";
     mContext->oneProcess = buff1;
-    mContext->nPos = strlen("N|SetCountryCode|");
+    mContext->nPos = strlen("N\tSetCountryCode\t");
     mContext->nSize = strlen(buff1);
     EXPECT_TRUE(RpcSetCountryCode(mServer, mContext) == 0);
 }
@@ -1223,19 +1236,19 @@ HWTEST_F(WifiHalCRpcServerTest, RpcSetCountryCodeTest, TestSize.Level1)
 HWTEST_F(WifiHalCRpcServerTest, RpcSetMacFilterTest, TestSize.Level1)
 {
     EXPECT_TRUE(RpcSetMacFilter(nullptr, nullptr) < 0);
-    char buff[] = "N|SetMacFilter|x|345697dbf921d3|";
+    char buff[] = "N\tSetMacFilter\tx\t345697dbf921d3\t";
     mContext->oneProcess = buff;
-    mContext->nPos = strlen("N|SetMacFilter|");
+    mContext->nPos = strlen("N\tSetMacFilter\t");
     mContext->nSize = strlen(buff);
     EXPECT_TRUE(RpcSetMacFilter(mServer, mContext) < 0);
-    char buff1[] = "N|SetMacFilter|6|345697dbf921d3|";
+    char buff1[] = "N\tSetMacFilter\t6\t345697dbf921d3\t";
     mContext->oneProcess = buff1;
-    mContext->nPos = strlen("N|SetMacFilter|");
+    mContext->nPos = strlen("N\tSetMacFilter\t");
     mContext->nSize = strlen(buff1);
     EXPECT_TRUE(RpcSetMacFilter(mServer, mContext) < 0);
-    char buff2[] = "N|SetMacFilter|7|345697dbf921d3|";
+    char buff2[] = "N\tSetMacFilter\t7\t345697dbf921d3\t0\t";
     mContext->oneProcess = buff2;
-    mContext->nPos = strlen("N|SetMacFilter|");
+    mContext->nPos = strlen("N\tSetMacFilter\t");
     mContext->nSize = strlen(buff2);
     EXPECT_TRUE(RpcSetMacFilter(mServer, mContext) == 0);
 }
@@ -1243,19 +1256,19 @@ HWTEST_F(WifiHalCRpcServerTest, RpcSetMacFilterTest, TestSize.Level1)
 HWTEST_F(WifiHalCRpcServerTest, RpcDelMacFilterTest, TestSize.Level1)
 {
     EXPECT_TRUE(RpcDelMacFilter(nullptr, nullptr) < 0);
-    char buff[] = "N|DelMacFilter|x|345697dbf921d3|";
+    char buff[] = "N\tDelMacFilter\tx\t345697dbf921d3\t";
     mContext->oneProcess = buff;
-    mContext->nPos = strlen("N|DelMacFilter|");
+    mContext->nPos = strlen("N\tDelMacFilter\t");
     mContext->nSize = strlen(buff);
     EXPECT_TRUE(RpcDelMacFilter(mServer, mContext) < 0);
-    char buff1[] = "N|DelMacFilter|6|345697dbf921d3|";
+    char buff1[] = "N\tDelMacFilter\t6\t345697dbf921d3\t";
     mContext->oneProcess = buff1;
-    mContext->nPos = strlen("N|DelMacFilter|");
+    mContext->nPos = strlen("N\tDelMacFilter\t");
     mContext->nSize = strlen(buff1);
     EXPECT_TRUE(RpcDelMacFilter(mServer, mContext) < 0);
-    char buff2[] = "N|DelMacFilter|7|345697dbf921d3|";
+    char buff2[] = "N\tDelMacFilter\t7\t345697dbf921d3\t0\t";
     mContext->oneProcess = buff2;
-    mContext->nPos = strlen("N|DelMacFilter|");
+    mContext->nPos = strlen("N\tDelMacFilter\t");
     mContext->nSize = strlen(buff2);
     EXPECT_TRUE(RpcDelMacFilter(mServer, mContext) == 0);
 }
@@ -1263,19 +1276,19 @@ HWTEST_F(WifiHalCRpcServerTest, RpcDelMacFilterTest, TestSize.Level1)
 HWTEST_F(WifiHalCRpcServerTest, RpcDisassociateStaTest, TestSize.Level1)
 {
     EXPECT_TRUE(RpcDisassociateSta(nullptr, nullptr) < 0);
-    char buff[] = "N|DisassociateSta|x|345697dbf921d3|";
+    char buff[] = "N\tDisassociateSta\tx\t345697dbf921d3\t";
     mContext->oneProcess = buff;
-    mContext->nPos = strlen("N|DisassociateSta|");
+    mContext->nPos = strlen("N\tDisassociateSta\t");
     mContext->nSize = strlen(buff);
     EXPECT_TRUE(RpcDisassociateSta(mServer, mContext) < 0);
-    char buff1[] = "N|DisassociateSta|6|345697dbf921d3|";
+    char buff1[] = "N\tDisassociateSta\t6\t345697dbf921d3\t";
     mContext->oneProcess = buff1;
-    mContext->nPos = strlen("N|DisassociateSta|");
+    mContext->nPos = strlen("N\tDisassociateSta\t");
     mContext->nSize = strlen(buff1);
     EXPECT_TRUE(RpcDisassociateSta(mServer, mContext) < 0);
-    char buff2[] = "N|DisassociateSta|7|345697dbf921d3|";
+    char buff2[] = "N\tDisassociateSta\t7\t345697dbf921d3\t0\t";
     mContext->oneProcess = buff2;
-    mContext->nPos = strlen("N|DisassociateSta|");
+    mContext->nPos = strlen("N\tDisassociateSta\t");
     mContext->nSize = strlen(buff2);
     EXPECT_TRUE(RpcDisassociateSta(mServer, mContext) == 0);
 }
@@ -1283,14 +1296,14 @@ HWTEST_F(WifiHalCRpcServerTest, RpcDisassociateStaTest, TestSize.Level1)
 HWTEST_F(WifiHalCRpcServerTest, RpcGetValidFrequenciesForBandTest, TestSize.Level1)
 {
     EXPECT_TRUE(RpcGetValidFrequenciesForBand(nullptr, nullptr) < 0);
-    char buff[] = "N|GetValidFrequenciesForBand|1|128";
+    char buff[] = "N\tGetValidFrequenciesForBand\t1\t128";
     mContext->oneProcess = buff;
-    mContext->nPos = strlen("N|GetValidFrequenciesForBand|");
+    mContext->nPos = strlen("N\tGetValidFrequenciesForBand\t");
     mContext->nSize = strlen(buff);
     EXPECT_TRUE(RpcGetValidFrequenciesForBand(mServer, mContext) < 0);
-    char buff1[] = "N|GetValidFrequenciesForBand|1|128|";
+    char buff1[] = "N\tGetValidFrequenciesForBand\t1\t128\t0\t";
     mContext->oneProcess = buff1;
-    mContext->nPos = strlen("N|GetValidFrequenciesForBand|");
+    mContext->nPos = strlen("N\tGetValidFrequenciesForBand\t");
     mContext->nSize = strlen(buff1);
     EXPECT_TRUE(RpcGetValidFrequenciesForBand(mServer, mContext) == 0);
 }

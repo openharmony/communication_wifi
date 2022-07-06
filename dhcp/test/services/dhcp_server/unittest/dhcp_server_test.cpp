@@ -228,15 +228,13 @@ bool DhcpServerTest::ServerRun(void)
     int retval = true;
     SystemFuncMock::GetInstance().SetMockFlag(true);
     EXPECT_CALL(SystemFuncMock::GetInstance(), socket(_, _, _)).WillRepeatedly(Return(1));
-    EXPECT_CALL(SystemFuncMock::GetInstance(), setsockopt(_, _, _, _, _))
-        .WillOnce(Return(-1))
-        .WillRepeatedly(Return(0));
+    EXPECT_CALL(SystemFuncMock::GetInstance(), setsockopt(_, _, _, _, _)).WillRepeatedly(Return(0));
     EXPECT_CALL(SystemFuncMock::GetInstance(), select(_, _, _, _, _)).WillRepeatedly(Return(0));
     EXPECT_CALL(SystemFuncMock::GetInstance(), bind(_, _, _)).WillRepeatedly(Return(0));
     EXPECT_CALL(SystemFuncMock::GetInstance(), sendto(_, _, _, _, _, _)).WillRepeatedly(Return(sizeof(DhcpMessage)));
     EXPECT_CALL(SystemFuncMock::GetInstance(), recvfrom(_, _, _, _, _, _)).WillRepeatedly(Return(0));
     EXPECT_CALL(SystemFuncMock::GetInstance(), close(_)).WillRepeatedly(Return(0));
-    
+
     m_pServerCtx = InitializeServer(&m_serverConfg);
     if (!m_pServerCtx) {
         LOGE("failed to initialized dhcp server context.");

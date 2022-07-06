@@ -36,23 +36,27 @@ public:
     virtual ~MockWifiSettings() = default;
     virtual int SetCountryCode(const std::string &countryCode) = 0;
     virtual int GetCountryCode(std::string &countryCode) = 0;
-    virtual int GetHotspotState() = 0;
-    virtual int SetHotspotState(int state) = 0;
-    virtual int SetHotspotConfig(const HotspotConfig &config) = 0;
-    virtual int GetHotspotConfig(HotspotConfig &config) = 0;
-    virtual int GetStationList(std::vector<StationInfo> &results) = 0;
-    virtual int ManageStation(const StationInfo &info, int mode) = 0; /* add / update / remove */
-    virtual int ClearStationList() = 0;
-    virtual int GetBlockList(std::vector<StationInfo> &results) = 0;
-    virtual int ManageBlockList(const StationInfo &info, int mode) = 0; /* add / remove */
-    virtual int FindConnStation(const StationInfo &info) = 0;
+    virtual int GetHotspotState(int id = 0) = 0;
+    virtual int SetHotspotState(int state, int id = 0) = 0;
+    virtual int SetHotspotConfig(const HotspotConfig &config, int id = 0) = 0;
+    virtual int GetHotspotConfig(HotspotConfig &config, int id = 0) = 0;
+    virtual int GetStationList(std::vector<StationInfo> &results, int id = 0) = 0;
+    virtual int ManageStation(const StationInfo &info, int mode, int id = 0) = 0; /* add / update / remove */
+    virtual int ClearStationList(int id = 0) = 0;
+    virtual int GetBlockList(std::vector<StationInfo> &results, int id = 0) = 0;
+    virtual int ManageBlockList(const StationInfo &info, int mode, int id = 0) = 0; /* add / remove */
+    virtual int FindConnStation(const StationInfo &info, int id = 0) = 0;
     virtual int GetValidBands(std::vector<BandType> &bands) = 0;
     virtual int SetValidChannels(const ChannelsTable &channelsInfo) = 0;
     virtual int GetValidChannels(ChannelsTable &channelsInfo) = 0;
     virtual int ClearValidChannels() = 0;
     virtual int GetApMaxConnNum() = 0;
+    virtual void SetDefaultFrequenciesByCountryBand(const BandType band, std::vector<int> &frequencies) = 0;
+    virtual std::string GetConnectTimeoutBssid() = 0;
+    virtual int SetConnectTimeoutBssid(std::string &bssid) = 0;
     virtual int SyncHotspotConfig() = 0;
-    virtual int SetDefaultFrequenciesByCountryBand(const BandType band, std::vector<int> &frequencies) = 0;
+    virtual int SetPowerModel(const PowerModel& model, int id = 0) = 0;
+    virtual int GetPowerModel(PowerModel& model, int id = 0) = 0;
 };
 
 class WifiSettings : public MockWifiSettings {
@@ -60,26 +64,29 @@ public:
     WifiSettings() = default;
     ~WifiSettings() = default;
     static WifiSettings &GetInstance(void);
-
     MOCK_METHOD1(SetCountryCode, int(const std::string &countryCode));
     MOCK_METHOD1(GetCountryCode, int(std::string &countryCode));
-    MOCK_METHOD0(GetHotspotState, int());
-    MOCK_METHOD1(SetHotspotState, int(int));
-    MOCK_METHOD1(SetHotspotConfig, int(const HotspotConfig &config));
-    MOCK_METHOD1(GetHotspotConfig, int(HotspotConfig &config));
-    MOCK_METHOD1(GetStationList, int(std::vector<StationInfo> &results));
-    MOCK_METHOD2(ManageStation, int(const StationInfo &info, int mode));
-    MOCK_METHOD0(ClearStationList, int());
-    MOCK_METHOD1(GetBlockList, int(std::vector<StationInfo> &results));
-    MOCK_METHOD2(ManageBlockList, int(const StationInfo &info, int mode));
-    MOCK_METHOD1(FindConnStation, int(const StationInfo &info));
+    MOCK_METHOD1(GetHotspotState, int(int id));
+    MOCK_METHOD2(SetHotspotState, int(int state, int id));
+    MOCK_METHOD2(SetHotspotConfig, int(const HotspotConfig &config, int id));
+    MOCK_METHOD2(GetHotspotConfig, int(HotspotConfig &config, int id));
+    MOCK_METHOD2(GetStationList, int(std::vector<StationInfo> &results, int id));
+    MOCK_METHOD3(ManageStation, int(const StationInfo &info, int mode, int id));
+    MOCK_METHOD1(ClearStationList, int(int id));
+    MOCK_METHOD2(GetBlockList, int(std::vector<StationInfo> &results, int id));
+    MOCK_METHOD3(ManageBlockList, int(const StationInfo &info, int mode, int id));
+    MOCK_METHOD2(FindConnStation, int(const StationInfo &info, int id));
     MOCK_METHOD1(GetValidBands, int(std::vector<BandType> &bands));
     MOCK_METHOD1(SetValidChannels, int(const ChannelsTable &channelsInfo));
     MOCK_METHOD1(GetValidChannels, int(ChannelsTable &channelsInfo));
     MOCK_METHOD0(ClearValidChannels, int());
     MOCK_METHOD0(GetApMaxConnNum, int());
+    MOCK_METHOD2(SetDefaultFrequenciesByCountryBand, void(const BandType band, std::vector<int> &frequencies));
+    MOCK_METHOD0(GetConnectTimeoutBssid, std::string());
+    MOCK_METHOD1(SetConnectTimeoutBssid, int(std::string &bssid));
     MOCK_METHOD0(SyncHotspotConfig, int());
-    MOCK_METHOD2(SetDefaultFrequenciesByCountryBand, int(const BandType band, std::vector<int> &frequencies));
+    MOCK_METHOD2(SetPowerModel, int(const PowerModel& model, int id));
+    MOCK_METHOD2(GetPowerModel, int(PowerModel& model, int id));
 };
 } /* namespace Wifi */
 } /* namespace OHOS */

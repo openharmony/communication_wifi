@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -49,7 +49,7 @@ public:
 
         pApStateMachine->InitialStateMachine();
         RegisterApServiceCallbacks();
-        EXPECT_CALL(WifiApHalInterface::GetInstance(), RegisterApEvent(_))
+        EXPECT_CALL(WifiApHalInterface::GetInstance(), RegisterApEvent(_, 0))
             .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
         usleep(SLEEP_TIME);
     }
@@ -69,9 +69,11 @@ public:
 public:
     ErrCode RegisterApServiceCallbacks()
     {
-        std::function<void(const StationInfo &)> OnStationEvent = [&](const StationInfo &sta) { m_sta = sta; };
+        std::function<void(const StationInfo &, int)> OnStationEvent =
+            [&](const StationInfo &sta, int id) { m_sta = sta; };
 
-        IApServiceCallbacks callbacks = {[&](ApState state) { mBState = state; }, OnStationEvent, OnStationEvent};
+        IApServiceCallbacks callbacks = {[&](ApState state, int id) { mBState = state; },
+            OnStationEvent, OnStationEvent};
         return pApStateMachine->RegisterApServiceCallbacks(callbacks);
     }
     ErrCode UnRegisterApServiceCallbacks()
@@ -83,12 +85,12 @@ public:
 public:
     void WrapOnApStateChange(ApState state)
     {
-        EXPECT_CALL(WifiSettings::GetInstance(), SetHotspotState(Eq(static_cast<int>(state)))).WillOnce(Return(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), SetHotspotState(Eq(static_cast<int>(state)), 0)).WillOnce(Return(0));
         pApStateMachine->OnApStateChange(state);
     }
     void WrapOnApStateChangeFail(ApState state)
     {
-        EXPECT_CALL(WifiSettings::GetInstance(), SetHotspotState(Eq(static_cast<int>(state)))).WillOnce(Return(1));
+        EXPECT_CALL(WifiSettings::GetInstance(), SetHotspotState(Eq(static_cast<int>(state)), 0)).WillOnce(Return(1));
         pApStateMachine->OnApStateChange(state);
     }
 

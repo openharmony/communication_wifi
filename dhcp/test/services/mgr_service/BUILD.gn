@@ -16,7 +16,7 @@ import("//foundation/communication/wifi/dhcp/dhcp.gni")
 
 ################################################################################
 
-module_output_path = "wifi_standard/dhcp_manage_test"
+module_output_path = "dhcp/dhcp_manage_test"
 even_path = "//base/notification/common_event_service"
 
 config("module_private_config") {
@@ -49,8 +49,8 @@ ohos_unittest("dhcp_manage_unittest") {
     "//third_party/googletest/googlemock/include",
     "$DHCP_ROOT_DIR/services/mgr_service/test",
     "$DHCP_ROOT_DIR/services/mgr_service/include",
-    "$DHCP_ROOT_DIR/interfaces/innerkits/native_cpp/include",
-    "$DHCP_ROOT_DIR/interfaces/innerkits/native_cpp/interfaces",
+    "$DHCP_ROOT_DIR/interfaces/inner_api/include",
+    "$DHCP_ROOT_DIR/interfaces/inner_api/interfaces",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/common/log",
     "//utils/native/base/include",
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",

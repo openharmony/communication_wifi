@@ -70,7 +70,7 @@ public:
      * @param validChanTable - Valid channel tables.
      * @return None
      */
-    virtual void CheckBandChannel(HotspotConfig &apConfig, const ChannelsTable &validChanTable);
+    virtual void CheckBandChannel(HotspotConfig &apConfig, const ChannelsTable &validChanTable) const;;
 
     /**
      * @Description  construction method
@@ -98,7 +98,7 @@ private:
      * @param vecChannels
      * @return None
      */
-    void ApplyDefaultConfig(HotspotConfig &apConfig, std::vector<int32_t> &vecChannels);
+    void ApplyDefaultConfig(HotspotConfig &apConfig, std::vector<int32_t> &vecChannels) const;;
     int m_id;
 
     DISALLOW_COPY_AND_ASSIGN(ApConfigUse)

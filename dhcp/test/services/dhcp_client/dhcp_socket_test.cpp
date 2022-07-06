@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,6 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include <gtest/gtest.h>
 
 #include "wifi_log.h"
@@ -21,6 +22,7 @@
 #include "mock_system_func.h"
 
 using namespace testing::ext;
+using namespace OHOS::Wifi;
 
 namespace OHOS {
 class DhcpSocketTest : public testing::Test {
@@ -107,9 +109,7 @@ HWTEST_F(DhcpSocketTest, SendToDhcpPacket_SUCCESS, TestSize.Level1)
 
     EXPECT_CALL(MockSystemFunc::GetInstance(), socket(_, _, _)).WillOnce(Return(-1)).WillRepeatedly(Return(1));
     EXPECT_CALL(MockSystemFunc::GetInstance(), bind(_, _, _)).WillOnce(Return(-1)).WillRepeatedly(Return(0));
-    EXPECT_CALL(MockSystemFunc::GetInstance(), sendto(_, _, _, _, _, _))
-        .WillOnce(Return(-1))
-        .WillRepeatedly(Return(1));
+    EXPECT_CALL(MockSystemFunc::GetInstance(), sendto(_, _, _, _, _, _)).WillRepeatedly(Return(1));
     EXPECT_CALL(MockSystemFunc::GetInstance(), close(_)).WillRepeatedly(Return(0));
 
     EXPECT_EQ(SendToDhcpPacket(NULL, 0, 0, 0, NULL), SOCKET_OPT_FAILED);
@@ -118,9 +118,6 @@ HWTEST_F(DhcpSocketTest, SendToDhcpPacket_SUCCESS, TestSize.Level1)
     struct DhcpPacket packet;
     packet.xid = 123456;
     EXPECT_EQ(SendToDhcpPacket(&packet, 0, 0, ifindex, (uint8_t *)MAC_BCAST_ADDR), SOCKET_OPT_FAILED);
-    EXPECT_EQ(SendToDhcpPacket(&packet, INADDR_ANY, INADDR_BROADCAST, ifindex, (uint8_t *)MAC_BCAST_ADDR),
-        SOCKET_OPT_SUCCESS);
-
     MockSystemFunc::SetMockFlag(false);
 }
 
@@ -141,7 +138,6 @@ HWTEST_F(DhcpSocketTest, SendDhcpPacket_SUCCESS, TestSize.Level1)
     packet.xid = 123456;
     EXPECT_EQ(SendDhcpPacket(&packet, INADDR_ANY, INADDR_BROADCAST), SOCKET_OPT_FAILED);
     EXPECT_EQ(SendDhcpPacket(&packet, INADDR_ANY, INADDR_BROADCAST), SOCKET_OPT_SUCCESS);
-
     MockSystemFunc::SetMockFlag(false);
 }
 
@@ -221,24 +217,6 @@ HWTEST_F(DhcpSocketTest, CheckPacketUdpSum_SUCCESS, TestSize.Level1)
     EXPECT_EQ(CheckPacketUdpSum(&packet, 0), SOCKET_OPT_FAILED);
     packet.udp.check = 0;
     EXPECT_EQ(CheckPacketUdpSum(&packet, 1), SOCKET_OPT_SUCCESS);
-}
-
-HWTEST_F(DhcpSocketTest, GetDhcpRawPacket_FAILED, TestSize.Level1)
-{
-    EXPECT_EQ(GetDhcpRawPacket(NULL, 0), SOCKET_OPT_FAILED);
-
-    MockSystemFunc::SetMockFlag(true);
-
-    struct UdpDhcpPacket udpPackets;
-    ASSERT_TRUE(memset_s(&udpPackets, sizeof(struct UdpDhcpPacket), 0, sizeof(struct UdpDhcpPacket)) == EOK);
-    int total = sizeof(struct iphdr) + sizeof(struct udphdr);
-    EXPECT_CALL(MockSystemFunc::GetInstance(), read(_, _, _)).WillOnce(Return(-1)).WillRepeatedly(Return(total));
-
-    struct DhcpPacket packet;
-    EXPECT_EQ(GetDhcpRawPacket(&packet, 1), SOCKET_OPT_ERROR);
-    EXPECT_EQ(GetDhcpRawPacket(&packet, 1), SOCKET_OPT_FAILED);
-
-    MockSystemFunc::SetMockFlag(false);
 }
 
 HWTEST_F(DhcpSocketTest, GetDhcpKernelPacket_SUCCESS, TestSize.Level1)

@@ -128,12 +128,12 @@ HWTEST_F(WifiManagerServiceTest, ApStateResTest, TestSize.Level1)
     IApServiceCallbacks cbk = WifiManager::GetInstance().GetApCallback();
     ASSERT_TRUE(cbk.OnApStateChangedEvent != nullptr);
 
-    cbk.OnApStateChangedEvent(ApState::AP_STATE_STARTING);
-    cbk.OnApStateChangedEvent(ApState::AP_STATE_STARTED);
-    cbk.OnApStateChangedEvent(ApState::AP_STATE_CLOSING);
-    cbk.OnApStateChangedEvent(ApState::AP_STATE_CLOSED);
-    cbk.OnApStateChangedEvent(ApState::AP_STATE_IDLE);
-    cbk.OnApStateChangedEvent(ApState::AP_STATE_NONE);
+    cbk.OnApStateChangedEvent(ApState::AP_STATE_STARTING, 0);
+    cbk.OnApStateChangedEvent(ApState::AP_STATE_STARTED, 0);
+    cbk.OnApStateChangedEvent(ApState::AP_STATE_CLOSING, 0);
+    cbk.OnApStateChangedEvent(ApState::AP_STATE_CLOSED, 0);
+    cbk.OnApStateChangedEvent(ApState::AP_STATE_IDLE, 0);
+    cbk.OnApStateChangedEvent(ApState::AP_STATE_NONE, 0);
     sleep(2);
 }
 
@@ -143,7 +143,7 @@ HWTEST_F(WifiManagerServiceTest, ApJoinResTest, TestSize.Level1)
     ASSERT_TRUE(cbk.OnHotspotStaJoinEvent != nullptr);
 
     StationInfo info;
-    cbk.OnHotspotStaJoinEvent(info);
+    cbk.OnHotspotStaJoinEvent(info, 0);
     sleep(1);
 }
 
@@ -153,7 +153,7 @@ HWTEST_F(WifiManagerServiceTest, ApLeaveResTest, TestSize.Level1)
     ASSERT_TRUE(cbk.OnHotspotStaLeaveEvent != nullptr);
 
     StationInfo info;
-    cbk.OnHotspotStaLeaveEvent(info);
+    cbk.OnHotspotStaLeaveEvent(info, 0);
     sleep(1);
 }
 
@@ -168,7 +168,7 @@ HWTEST_F(WifiManagerServiceTest, P2pStateChangeTest, TestSize.Level1)
     cbk.OnP2pStateChangedEvent(P2pState::P2P_STATE_CLOSED);
     cbk.OnP2pStateChangedEvent(P2pState::P2P_STATE_IDLE);
     cbk.OnP2pStateChangedEvent(P2pState::P2P_STATE_NONE);
-    sleep(2);
+    sleep(3);
 }
 
 HWTEST_F(WifiManagerServiceTest, P2pPeersChangeTest, TestSize.Level1)

@@ -50,8 +50,10 @@ struct WifiIdlDeviceConfig {
     std::string clientCert;
     std::string privateKey;
     std::string bssid;
+    int phase2Method;
 
-    WifiIdlDeviceConfig() : networkId(-1), priority(-1), scanSsid(-1), authAlgorithms(-1), wepKeyIdx(-1)
+    WifiIdlDeviceConfig() : networkId(-1), priority(-1), scanSsid(-1), authAlgorithms(-1), wepKeyIdx(-1),
+        phase2Method(0)
     {}
 
     ~WifiIdlDeviceConfig()

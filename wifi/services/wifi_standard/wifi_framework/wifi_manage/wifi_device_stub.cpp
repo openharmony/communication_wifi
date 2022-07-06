@@ -215,6 +215,7 @@ void WifiDeviceStub::ReadWifiDeviceConfig(MessageParcel &data, WifiDeviceConfig 
     config.wifiEapConfig.password = data.ReadCString();
     config.wifiEapConfig.clientCert = data.ReadCString();
     config.wifiEapConfig.privateKey = data.ReadCString();
+    config.wifiEapConfig.phase2Method = Phase2Method(data.ReadInt32());
     config.wifiProxyconfig.configureMethod = ConfigureProxyMethod(data.ReadInt32());
     config.wifiProxyconfig.autoProxyConfig.pacWebAddress = data.ReadCString();
     config.wifiProxyconfig.manualProxyConfig.serverHostName = data.ReadCString();
@@ -274,6 +275,7 @@ void WifiDeviceStub::WriteWifiDeviceConfig(MessageParcel &reply, const WifiDevic
     reply.WriteCString(config.wifiEapConfig.password.c_str());
     reply.WriteCString(config.wifiEapConfig.clientCert.c_str());
     reply.WriteCString(config.wifiEapConfig.privateKey.c_str());
+    reply.WriteInt32(static_cast<int>(config.wifiEapConfig.phase2Method));
     reply.WriteInt32((int)config.wifiProxyconfig.configureMethod);
     reply.WriteCString(config.wifiProxyconfig.autoProxyConfig.pacWebAddress.c_str());
     reply.WriteCString(config.wifiProxyconfig.manualProxyConfig.serverHostName.c_str());

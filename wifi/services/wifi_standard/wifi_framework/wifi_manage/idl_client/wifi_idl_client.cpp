@@ -532,6 +532,10 @@ WifiErrorNo WifiIdlClient::SetDeviceConfig(int networkId, const WifiIdlDeviceCon
     if (config.authAlgorithms > 0) {
         num += PushDeviceConfigAuthAlgorithm(conf + num, DEVICE_CONFIG_AUTH_ALGORITHMS, config.authAlgorithms);
     }
+    if (config.phase2Method != static_cast<int>(Phase2Method::NONE)) {
+        std::string strPhase2Method = WifiEapConfig::Phase2MethodToStr(config.eap, config.phase2Method);
+        num += PushDeviceConfigString(conf + num, DEVICE_CONFIG_EAP_PHASE2METHOD, strPhase2Method);
+    }
     if (num == 0) {
         return WIFI_IDL_OPT_OK;
     }

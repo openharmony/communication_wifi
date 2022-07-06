@@ -154,6 +154,7 @@ private:
     ErrCode CheckCanEnableWifi(void);
     bool IsStaServiceRunning();
     bool IsScanServiceRunning();
+    bool CheckConfigEap(const WifiDeviceConfig &config);
     bool CheckConfigPwd(const WifiDeviceConfig &config);
     ErrCode CheckCallingUid(int &uid);
     static void SaBasicDump(std::string& result);

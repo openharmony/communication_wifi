@@ -22,10 +22,10 @@ config("module_private_config") {
 }
 
 ohos_unittest("wifi_p2p_test") {
-  module_out_path = "wifi_standard/p2p_test"
+  module_out_path = "wifi/p2p_test"
   sources = [
-    "$WIFI_ROOT_DIR/interfaces/innerkits/native_cpp/wifi_standard/src/wifi_hid2d_msg.cpp",
-    "$WIFI_ROOT_DIR/interfaces/innerkits/native_cpp/wifi_standard/src/wifi_p2p_msg.cpp",
+    "$WIFI_ROOT_DIR/frameworks/native/src/wifi_hid2d_msg.cpp",
+    "$WIFI_ROOT_DIR/frameworks/native/src/wifi_p2p_msg.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/common/config/wifi_config_file_spec.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/common/config/wifi_settings.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/common/log/log_helper.c",
@@ -120,7 +120,7 @@ ohos_unittest("wifi_p2p_test") {
     "./Mock",
     "//utils/native/base/include",
     "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
-    "$WIFI_ROOT_DIR/interfaces/innerkits/native_cpp/wifi_standard/interfaces",
+    "$WIFI_ROOT_DIR/frameworks/native/interfaces",
     "$WIFI_ROOT_DIR/services/wifi_standard/ipc_framework/cRPC/include",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/common/include",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/common/net_helper",
@@ -134,8 +134,8 @@ ohos_unittest("wifi_p2p_test") {
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/idl_client",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/idl_client/idl_interface",
     "$DHCP_ROOT_DIR/services/mgr_service/include",
-    "$DHCP_ROOT_DIR/interfaces/innerkits/native_cpp/include",
-    "$DHCP_ROOT_DIR/interfaces/innerkits/native_cpp/interfaces",
+    "$DHCP_ROOT_DIR/interfaces/inner_api/include",
+    "$DHCP_ROOT_DIR/interfaces/inner_api/interfaces",
     "//third_party/googletest/googlemock/include",
     "//third_party/googletest/googletest/include",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta",

@@ -64,8 +64,8 @@ public:
     MOCK_METHOD0(GetMinRssi5Ghz, int());
     MOCK_METHOD0(GetWhetherToAllowNetworkSwitchover, bool());
     MOCK_METHOD1(GetDeviceConfig, int(std::vector<WifiDeviceConfig> &results));
-    MOCK_METHOD0(ReloadTrustListPolicies,  const std::vector<TrustListPolicy>&());
-    MOCK_METHOD0(ReloadMovingFreezePolicy,  const MovingFreezePolicy&());
+    MOCK_METHOD0(ReloadTrustListPolicies, const std::vector<TrustListPolicy>&());
+    MOCK_METHOD0(ReloadMovingFreezePolicy, const MovingFreezePolicy&());
 };
 }  // namespace Wifi
 }  // namespace OHOS

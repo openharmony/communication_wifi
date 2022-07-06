@@ -57,7 +57,7 @@ ohos_unittest("dhcp_server_unittest") {
     "$DHCP_ROOT_DIR/services/dhcp_server/include",
   ]
 
-  defines = [ "__OHOS__" ]
+  defines = []
 
   cflags = []
 

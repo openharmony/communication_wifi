@@ -39,6 +39,7 @@ void WifiManager::InitScanCallback(void)
     mScanCallback.OnScanStopEvent = std::bind(&WifiManager::DealScanCloseRes, this);
     mScanCallback.OnScanFinishEvent = std::bind(&WifiManager::DealScanFinished, this, _1);
     mScanCallback.OnScanInfoEvent = std::bind(&WifiManager::DealScanInfoNotify, this, _1);
+    mScanCallback.OnStoreScanInfoEvent = std::bind(&WifiManager::DealStoreScanInfoEvent, this, _1);
     return;
 }
 } // namespace Wifi

@@ -37,37 +37,39 @@ typedef struct IWifiApMonitorEventCallback {
 class MockWifiApHalInterface {
 public:
     virtual ~MockWifiApHalInterface() = default;
-    virtual WifiErrorNo StartAp(void) = 0;
-    virtual WifiErrorNo StopAp(void) = 0;
-    virtual WifiErrorNo StopAp1(void) = 0;
-    virtual WifiErrorNo SetSoftApConfig(const HotspotConfig &config) = 0;
-    virtual WifiErrorNo GetStationList(std::vector<std::string> &result) = 0;
-    virtual WifiErrorNo SetHotspotConfig(const int &channel, const std::string &mscb) = 0;
-    virtual WifiErrorNo AddBlockByMac(const std::string &mac) = 0;
-    virtual WifiErrorNo DelBlockByMac(const std::string &mac) = 0;
-    virtual WifiErrorNo RemoveStation(const std::string &mac) = 0;
-    virtual WifiErrorNo GetFrequenciesByBand(int band, std::vector<int> &frequencies) = 0;
-    virtual WifiErrorNo RegisterApEvent(IWifiApMonitorEventCallback callback) = 0;
-    virtual WifiErrorNo SetWifiCountryCode(const std::string &code) = 0;
-    virtual WifiErrorNo DisconnectStaByMac(const std::string &mac) = 0;
+    virtual WifiErrorNo StartAp(int id = 0) = 0;
+    virtual WifiErrorNo StopAp(int id = 0) = 0;
+    virtual WifiErrorNo SetSoftApConfig(const HotspotConfig &config, int id = 0) = 0;
+    virtual WifiErrorNo GetStationList(std::vector<std::string> &result, int id = 0) = 0;
+    virtual WifiErrorNo AddBlockByMac(const std::string &mac, int id = 0) = 0;
+    virtual WifiErrorNo DelBlockByMac(const std::string &mac, int id = 0) = 0;
+    virtual WifiErrorNo RemoveStation(const std::string &mac, int id = 0) = 0;
+    virtual WifiErrorNo GetFrequenciesByBand(int band, std::vector<int> &frequencies, int id = 0) = 0;
+    virtual WifiErrorNo RegisterApEvent(IWifiApMonitorEventCallback callback, int id = 0) = 0;
+    virtual WifiErrorNo SetWifiCountryCode(const std::string &code, int id = 0) = 0;
+    virtual WifiErrorNo DisconnectStaByMac(const std::string &mac, int id = 0) = 0;
+    virtual const IWifiApMonitorEventCallback &GetApCallbackInst(int id = 0) const = 0;
+    virtual WifiErrorNo GetPowerModel(int& model, int id = 0) const = 0;
+    virtual WifiErrorNo SetPowerModel(const int& model, int id = 0) const = 0;
 };
 
 class WifiApHalInterface : public MockWifiApHalInterface {
 public:
     static WifiApHalInterface &GetInstance(void);
-    MOCK_METHOD0(StartAp, WifiErrorNo(void));
-    MOCK_METHOD0(StopAp1, WifiErrorNo(void));
-    MOCK_METHOD0(StopAp, WifiErrorNo(void));
-    MOCK_METHOD1(SetSoftApConfig, WifiErrorNo(const HotspotConfig &config));
-    MOCK_METHOD1(GetStationList, WifiErrorNo(std::vector<std::string> &result));
-    MOCK_METHOD2(SetHotspotConfig, WifiErrorNo(const int &channel, const std::string &mscb));
-    MOCK_METHOD1(AddBlockByMac, WifiErrorNo(const std::string &mac));
-    MOCK_METHOD1(DelBlockByMac, WifiErrorNo(const std::string &mac));
-    MOCK_METHOD1(RemoveStation, WifiErrorNo(const std::string &mac));
-    MOCK_METHOD2(GetFrequenciesByBand, WifiErrorNo(int band, std::vector<int> &frequencies));
-    MOCK_METHOD1(RegisterApEvent, WifiErrorNo(IWifiApMonitorEventCallback callback));
-    MOCK_METHOD1(SetWifiCountryCode, WifiErrorNo(const std::string &code));
-    MOCK_METHOD1(DisconnectStaByMac, WifiErrorNo(const std::string &mac));
+    MOCK_METHOD1(StartAp, WifiErrorNo(int id));
+    MOCK_METHOD1(StopAp, WifiErrorNo(int id));
+    MOCK_METHOD2(SetSoftApConfig, WifiErrorNo(const HotspotConfig &config, int id));
+    MOCK_METHOD2(GetStationList, WifiErrorNo(std::vector<std::string> &result, int id));
+    MOCK_METHOD2(AddBlockByMac, WifiErrorNo(const std::string &mac, int id));
+    MOCK_METHOD2(DelBlockByMac, WifiErrorNo(const std::string &mac, int id));
+    MOCK_METHOD2(RemoveStation, WifiErrorNo(const std::string &mac, int id));
+    MOCK_METHOD3(GetFrequenciesByBand, WifiErrorNo(int band, std::vector<int> &frequencies, int id));
+    MOCK_METHOD2(RegisterApEvent, WifiErrorNo(IWifiApMonitorEventCallback callback, int id));
+    MOCK_METHOD2(SetWifiCountryCode, WifiErrorNo(const std::string &code, int id));
+    MOCK_METHOD2(DisconnectStaByMac, WifiErrorNo(const std::string &mac, int id));
+    MOCK_CONST_METHOD1(GetApCallbackInst, IWifiApMonitorEventCallback &(int id));
+    MOCK_CONST_METHOD2(GetPowerModel, WifiErrorNo(int& model, int id));
+    MOCK_CONST_METHOD2(SetPowerModel, WifiErrorNo(const int& model, int id));
 };
 } // namespace Wifi
 } // namespace OHOS

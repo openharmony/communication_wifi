@@ -605,6 +605,7 @@ void WifiManager::InitScanCallback(void)
     mScanCallback.OnScanStopEvent = DealScanCloseRes;
     mScanCallback.OnScanFinishEvent = DealScanFinished;
     mScanCallback.OnScanInfoEvent = DealScanInfoNotify;
+    mScanCallback.OnStoreScanInfoEvent = DealStoreScanInfoEvent;
 }
 
 IScanSerivceCallbacks WifiManager::GetScanCallback()
@@ -639,6 +640,10 @@ void WifiManager::DealScanInfoNotify(std::vector<InterScanInfo> &results)
             pService->ConnectivityManager(results);
         }
     }
+}
+
+void WifiManager::DealStoreScanInfoEvent(std::vector<InterScanInfo> &results)
+{
 }
 
 #ifdef FEATURE_AP_SUPPORT

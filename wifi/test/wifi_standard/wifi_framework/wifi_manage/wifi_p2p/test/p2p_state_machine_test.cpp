@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -692,10 +692,12 @@ HWTEST_F(P2pStateMachineTest, ReinvokePersistentGroup3, TestSize.Level1)
     config.SetNetId(2);
     AddGroupManager();
     AddDeviceManagerInViteable();
-    EXPECT_CALL(WifiP2PHalInterface::GetInstance(), Reinvoke(_, _))
-        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_OK))
-        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED));
-    EXPECT_CALL(WifiP2PHalInterface::GetInstance(), ListNetworks(_)).WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED));
+
+    ON_CALL(WifiP2PHalInterface::GetInstance(), Reinvoke(_, _))
+        .WillByDefault(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
+
+    ON_CALL(WifiP2PHalInterface::GetInstance(), ListNetworks(_))
+        .WillByDefault(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
     EXPECT_TRUE(WarpReinvokePersistentGroup(config));
     EXPECT_FALSE(WarpReinvokePersistentGroup(config));
 }
@@ -824,7 +826,8 @@ HWTEST_F(P2pStateMachineTest, DealCreateNewGroupWithConfig3, TestSize.Level1)
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), P2pSetGroupConfig(_, _))
         .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), GroupAdd(_, _, _)).WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
-    EXPECT_CALL(WifiP2PHalInterface::GetInstance(), RemoveNetwork(_)).WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
+    ON_CALL(WifiP2PHalInterface::GetInstance(), RemoveNetwork(_))
+        .WillByDefault(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
     EXPECT_TRUE(WarpDealCreateNewGroupWithConfig(config, freq));
 }
 

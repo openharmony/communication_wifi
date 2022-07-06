@@ -315,10 +315,22 @@ struct TrustListPolicy {
     int sceneId = 0;        /* scene id */
     std::string sceneName;  /* scene name, just to read. */
     std::string trustList;  /* trust list, eg: for A,B,and C,the format is A|B|C */
+
+    TrustListPolicy()
+    {
+        sceneId = 0;
+        sceneName = "";
+        trustList = "";
+    }
 };
 
 struct MovingFreezePolicy {
     std::string trustList;  /* trust list */
+
+    MovingFreezePolicy()
+    {
+        trustList = "";
+    }
 };
 
 /* wifi RandomMac store */

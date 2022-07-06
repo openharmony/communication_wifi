@@ -123,6 +123,10 @@ int WifiConfigFileImpl<T>::SetConfigFilePath(const std::string &fileName)
 template<typename T>
 int WifiConfigFileImpl<T>::LoadConfig()
 {
+    if (mFileName.empty()) {
+        LOGE("File name is empty.");
+        return -1;
+    }
     std::ifstream fs(mFileName.c_str());
     if (!fs.is_open()) {
         LOGE("Loading config file: %{public}s, fs.is_open() failed!", mFileName.c_str());
@@ -166,6 +170,10 @@ int WifiConfigFileImpl<T>::LoadConfig()
 template<typename T>
 int WifiConfigFileImpl<T>::SaveConfig()
 {
+    if (mFileName.empty()) {
+        LOGE("File name is empty.");
+        return -1;
+    }
     FILE* fp = fopen(mFileName.c_str(), "w");
     if (!fp) {
         LOGE("Save config file: %{public}s, fopen() failed!", mFileName.c_str());

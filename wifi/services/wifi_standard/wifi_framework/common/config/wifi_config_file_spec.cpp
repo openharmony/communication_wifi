@@ -69,6 +69,7 @@ static void ClearWifiDeviceConfigEap(WifiDeviceConfig &item)
     item.wifiEapConfig.password.clear();
     item.wifiEapConfig.clientCert.clear();
     item.wifiEapConfig.privateKey.clear();
+    item.wifiEapConfig.phase2Method = Phase2Method::NONE;
     return;
 }
 
@@ -203,6 +204,8 @@ static void SetWifiDeviceConfigEap(WifiDeviceConfig &item, const std::string &ke
         item.wifiEapConfig.clientCert = value;
     } else if (key == "wifiEapConfig.privateKey") {
         item.wifiEapConfig.privateKey = value;
+    } else if (key == "wifiEapConfig.phase2method") {
+        item.wifiEapConfig.phase2Method = Phase2Method(std::stoi(value));
     }
     return;
 }
@@ -322,6 +325,7 @@ static std::string OutPutWifiDeviceConfigEap(WifiDeviceConfig &item)
     ss << "wifiEapConfig.password=" << item.wifiEapConfig.password << std::endl;
     ss << "wifiEapConfig.clientCert=" << item.wifiEapConfig.clientCert << std::endl;
     ss << "wifiEapConfig.privateKey=" << item.wifiEapConfig.privateKey << std::endl;
+    ss << "wifiEapConfig.phase2method=" << static_cast<int>(item.wifiEapConfig.phase2Method) << std::endl;
     return ss.str();
 }
 

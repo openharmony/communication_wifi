@@ -288,6 +288,32 @@ ErrCode WifiDeviceServiceImpl::PutWifiProtectRef(const std::string &protectName)
     return WIFI_OPT_FAILED;
 }
 
+bool WifiDeviceServiceImpl::CheckConfigEap(const WifiDeviceConfig &config)
+{
+    if (config.keyMgmt != KEY_MGMT_EAP) {
+        WIFI_LOGE("CheckConfigEap: keyMgmt is not EAP!");
+        return false;
+    }
+    if (config.wifiEapConfig.eap == EAP_METHOD_TLS) {
+        if (config.wifiEapConfig.identity.empty() ||
+            config.wifiEapConfig.clientCert.empty() ||
+            config.wifiEapConfig.privateKey.empty()) {
+            WIFI_LOGE("CheckConfigEap: with invalid TLS params!");
+            return false;
+        }
+        return true;
+    } else if (config.wifiEapConfig.eap == EAP_METHOD_PEAP) {
+        if (config.wifiEapConfig.identity.empty() || config.wifiEapConfig.password.empty()) {
+            WIFI_LOGE("CheckConfigEap: with invalid PEAP params!");
+            return false;
+        }
+        return true;
+    } else {
+        WIFI_LOGE("EAP:%{public}s unsupported!", config.wifiEapConfig.eap.c_str());
+    }
+    return false;
+}
+
 bool WifiDeviceServiceImpl::CheckConfigPwd(const WifiDeviceConfig &config)
 {
     if ((config.ssid.length() <= 0) || (config.keyMgmt.length()) <= 0) {
@@ -295,18 +321,7 @@ bool WifiDeviceServiceImpl::CheckConfigPwd(const WifiDeviceConfig &config)
     }
 
     if (config.keyMgmt == KEY_MGMT_EAP) {
-        if (config.wifiEapConfig.eap == EAP_METHOD_TLS) {
-            if (config.wifiEapConfig.identity.empty() ||
-                config.wifiEapConfig.clientCert.empty() ||
-                config.wifiEapConfig.privateKey.empty()) {
-                WIFI_LOGE("CheckConfigPwd: with invalid TLS params!");
-                return false;
-            } else {
-                return true;
-            }
-        } else {
-            WIFI_LOGE("EAP:%{public}s unsupported!", config.wifiEapConfig.eap.c_str());
-        }
+        return CheckConfigEap(config);
     }
 
     if (config.keyMgmt != KEY_MGMT_NONE && config.preSharedKey.empty()) {

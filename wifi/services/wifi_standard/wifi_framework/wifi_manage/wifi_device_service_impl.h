@@ -132,6 +132,7 @@ private:
     ErrCode CheckCanEnableWifi(void);
     bool IsStaServiceRunning();
     bool IsScanServiceRunning();
+    bool CheckConfigEap(const WifiDeviceConfig &config);
     bool CheckConfigPwd(const WifiDeviceConfig &config);
     static void SaBasicDump(std::string& result);
     static void SigHandler(int sig);

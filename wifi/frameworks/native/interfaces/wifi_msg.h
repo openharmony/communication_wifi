@@ -268,6 +268,8 @@ public:
     {}
 };
 
+enum class Phase2Method { NONE, PAP, MSCHAP, MSCHAPV2, GTC, SIM, AKA, AKA_PRIME };
+
 class WifiEapConfig {
 public:
     std::string eap;      /* EAP mode Encryption Mode: PEAP/TLS/TTLS/PWD/SIM/AKA/AKA */
@@ -275,6 +277,24 @@ public:
     std::string password; /* EAP mode password */
     std::string clientCert; /* EAP mode client certificate */
     std::string privateKey; /* EAP mode client private key */
+    Phase2Method phase2Method;
+
+    /**
+     * @Description convert Phase2Method to string
+     *
+     * @param eap - eap method
+     * @param method - phase2method
+     * @return string
+     */
+    static std::string Phase2MethodToStr(const std::string& eap, const int& method);
+
+    /**
+     * @Description convert string to Phase2Method
+     *
+     * @param str - phase2method string
+     * @return Phase2Method
+     */
+    static Phase2Method Phase2MethodFromStr(const std::string& str);
 };
 
 enum class ConfigureProxyMethod { AUTOCONFIGUE, MANUALCONFIGUE, CLOSED };

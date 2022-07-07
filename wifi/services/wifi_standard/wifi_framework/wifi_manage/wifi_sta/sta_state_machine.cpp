@@ -1477,6 +1477,7 @@ void StaStateMachine::DisConnectProcess()
         SaveLinkstate(ConnState::DISCONNECTED, DetailedState::DISCONNECTED);
         DisableNetwork(linkedInfo.networkId);
 
+        getIpSucNum = 0;
         /* The current state of StaStateMachine transfers to SeparatedState. */
         SwitchState(pSeparatedState);
     } else {

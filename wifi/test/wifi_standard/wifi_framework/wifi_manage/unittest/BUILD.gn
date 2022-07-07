@@ -16,13 +16,13 @@ import("//foundation/communication/wifi/wifi/wifi.gni")
 
 ################################################################################
 
-module_output_path = "wifi_standard/manager_test"
+module_output_path = "wifi/manager_test"
 
 config("module_private_config") {
   visibility = [ ":*" ]
   include_dirs = [
     "//utils/native/base/include",
-    "$WIFI_ROOT_DIR/tests/wifi_standard/wifi_framework/wifi_manage/unittest",
+    "$WIFI_ROOT_DIR/test/wifi_standard/wifi_framework/wifi_manage/unittest",
   ]
 }
 
@@ -61,7 +61,7 @@ ohos_unittest("manager_unittest") {
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_ap",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_p2p",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_aware",
-    "$WIFI_ROOT_DIR/interfaces/innerkits/native_cpp/wifi_standard/interfaces",
+    "$WIFI_ROOT_DIR/frameworks/native/interfaces",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/idl_client",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/idl_client/idl_interface",
     "$WIFI_ROOT_DIR/services/wifi_standard/ipc_framework/cRPC/include",
@@ -74,12 +74,16 @@ ohos_unittest("manager_unittest") {
     "//base/security/access_token/interfaces/innerkits/accesstoken/include",
     "//foundation/communication/netmanager_base/services/netmanagernative/include/netsys",
     "$WIFI_ROOT_DIR/utils/inc",
+    "//foundation/distributedschedule/samgr/interfaces/innerkits/samgr_proxy/include",
+    "//foundation/communication/netmanager_base/frameworks/native/netmanagernative",
+    "//foundation/communication/netmanager_base/interfaces/innerkits/netmanagernative/include",
   ]
 
   deps = [
     "$WIFI_ROOT_DIR/services/wifi_standard/ipc_framework/cRPC:crpc_client",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/idl_client:wifi_idl_client",
     "$WIFI_ROOT_DIR/utils/src:wifi_utils",
+    "//foundation/communication/netmanager_base/services/netmanagernative:netsys_native_manager",
     "//utils/native/base:utils",
   ]
 
@@ -99,7 +103,15 @@ ohos_unittest("manager_unittest") {
     "netmanager_base:net_conn_manager_if",
   ]
 
-  defines = [ "AP_INSTANCE_MAX_NUM=$wifi_feature_with_ap_num" ]
+  defines = []
+  if (wifi_feature_with_p2p) {
+    defines += [ "FEATURE_P2P_SUPPORT" ]
+  }
+
+  defines += [
+    "FEATURE_AP_SUPPORT",
+    "AP_INSTANCE_MAX_NUM=$wifi_feature_with_ap_num",
+  ]
   configs = [ ":module_private_config" ]
 
   if (wifi_feature_with_auth_disable) {

@@ -70,6 +70,9 @@
             "inner_kits": [
             ],
             "test": [
+                "//foundation/communication/wifi/dhcp/test/services/mgr_service:unittest",
+                "//foundation/communication/wifi/dhcp/test/services/dhcp_client:unittest",
+                "//foundation/communication/wifi/dhcp/test/services/dhcp_server/unittest:unittest"
             ]
         },
         "hisysevent_config": [

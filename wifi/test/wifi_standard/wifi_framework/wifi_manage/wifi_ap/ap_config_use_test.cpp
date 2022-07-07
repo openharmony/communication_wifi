@@ -218,7 +218,7 @@ HWTEST_F(ApConfigUse_Test, CheckBandChannel_2, TestSize.Level1)
     std::vector<int32_t> band_5G_channel = { 149, 168, 169 };
     ChannelsTable ChannelsTb = { { BandType::BAND_2GHZ, band_2G_channel }, { BandType::BAND_5GHZ, band_5G_channel } };
     pApConfigUse->CheckBandChannel(apConfig, ChannelsTb);
-    EXPECT_EQ(apConfig.GetChannel(), 6);
+    EXPECT_EQ(apConfig.GetChannel(), 1);
     EXPECT_EQ(apConfig.GetBand(), BandType::BAND_2GHZ);
 }
 HWTEST_F(ApConfigUse_Test, CheckBandChannel_3, TestSize.Level1)

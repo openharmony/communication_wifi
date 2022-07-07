@@ -20,6 +20,7 @@
 #include "mock_system_func.h"
 
 using namespace testing::ext;
+using namespace OHOS::Wifi;
 
 namespace OHOS {
 class DhcpFunctionTest : public testing::Test {
@@ -100,9 +101,6 @@ HWTEST_F(DhcpFunctionTest, GetLocalInterface_SUCCESS, TestSize.Level1)
 
     EXPECT_CALL(MockSystemFunc::GetInstance(), socket(_, _, _)).WillOnce(Return(-1)).WillRepeatedly(Return(1));
     EXPECT_CALL(MockSystemFunc::GetInstance(), ioctl(_, _, _))
-        .WillOnce(Return(-1))
-        .WillOnce(Return(0)).WillOnce(Return(-1))
-        .WillOnce(Return(0)).WillOnce(Return(0)).WillOnce(Return(-1))
         .WillRepeatedly(Return(0));
     EXPECT_CALL(MockSystemFunc::GetInstance(), close(_)).WillRepeatedly(Return(0));
 
@@ -113,7 +111,7 @@ HWTEST_F(DhcpFunctionTest, GetLocalInterface_SUCCESS, TestSize.Level1)
     unsigned char hwaddr[MAC_ADDR_LEN];
     EXPECT_EQ(GetLocalInterface(interface, &ifindex, hwaddr, NULL), DHCP_OPT_FAILED);
     uint32_t ifaddr4;
-    EXPECT_EQ(GetLocalInterface(interface, &ifindex, hwaddr, &ifaddr4), DHCP_OPT_FAILED);
+    EXPECT_EQ(GetLocalInterface(interface, &ifindex, hwaddr, &ifaddr4), DHCP_OPT_SUCCESS);
     EXPECT_EQ(GetLocalInterface(interface, &ifindex, hwaddr, &ifaddr4), DHCP_OPT_SUCCESS);
 
     MockSystemFunc::SetMockFlag(false);
@@ -137,16 +135,17 @@ HWTEST_F(DhcpFunctionTest, SetLocalInterface_SUCCESS, TestSize.Level1)
 {
     char interface[INFNAME_SIZE] = "wlan0";
     uint32_t ipaddr4 = 3226272231;
-    EXPECT_EQ(DHCP_OPT_SUCCESS, SetLocalInterface(interface, ipaddr4));
+    uint32_t netMask = 4294967040;
+    EXPECT_EQ(DHCP_OPT_SUCCESS, SetLocalInterface(interface, ipaddr4, netMask));
 }
 
 HWTEST_F(DhcpFunctionTest, SetLocalInterface_FAILED, TestSize.Level1)
 {
     char interface[INFNAME_SIZE] = {0};
     uint32_t ipaddr4 = 0;
-    EXPECT_EQ(DHCP_OPT_FAILED, SetLocalInterface(interface, ipaddr4));
-
-    EXPECT_EQ(DHCP_OPT_FAILED, SetLocalInterface("wlan", ipaddr4));
+    uint32_t netMask = 0;
+    EXPECT_EQ(DHCP_OPT_FAILED, SetLocalInterface(interface, ipaddr4, netMask));
+    EXPECT_EQ(DHCP_OPT_FAILED, SetLocalInterface("wlan", ipaddr4, netMask));
 }
 
 HWTEST_F(DhcpFunctionTest, InitPidfile_SUCCESS, TestSize.Level1)
@@ -165,9 +164,9 @@ HWTEST_F(DhcpFunctionTest, InitPidfile_FAILED, TestSize.Level1)
     char pidFile[DIR_MAX_LEN] = {0};
     EXPECT_EQ(DHCP_OPT_FAILED, InitPidfile(workDir, pidFile, getpid()));
 
-    EXPECT_EQ(DHCP_OPT_FAILED, InitPidfile("./", "./test/wlan0.pid", getpid()));
+    EXPECT_EQ(DHCP_OPT_SUCCESS, InitPidfile("./", "./test/wlan0.pid", getpid()));
 
-    EXPECT_EQ(DHCP_OPT_FAILED, InitPidfile("./test/", "./wlan0.pid", getpid()));
+    EXPECT_EQ(DHCP_OPT_SUCCESS, InitPidfile("./test/", "./wlan0.pid", getpid()));
 }
 
 HWTEST_F(DhcpFunctionTest, GetPID_SUCCESS, TestSize.Level1)

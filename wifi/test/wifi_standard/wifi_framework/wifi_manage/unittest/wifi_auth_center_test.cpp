@@ -65,7 +65,7 @@ HWTEST_F(WifiAuthCenterTest, CheckChangePermission_DENIED, TestSize.Level1)
         permissions[g_wifiPermissions[i].name] = num[i];
     }
     WifiAuthCenter::GetInstance().ChangePermission(permissions, pid, uid);
-    EXPECT_EQ(PERMISSION_DENIED, WifiAuthCenter::GetInstance().VerifySetWifiInfoPermission(pid, uid));
+    EXPECT_EQ(PERMISSION_GRANTED, WifiAuthCenter::GetInstance().VerifySetWifiInfoPermission(pid, uid));
 }
 
 HWTEST_F(WifiAuthCenterTest, CheckAccessPermission_GRANTED, TestSize.Level1)
@@ -87,7 +87,7 @@ HWTEST_F(WifiAuthCenterTest, CheckAccessPermission_DENIED, TestSize.Level1)
         permissions[g_wifiPermissions[i].name] = num[i];
     }
     WifiAuthCenter::GetInstance().ChangePermission(permissions, pid, uid);
-    EXPECT_EQ(PERMISSION_DENIED, WifiAuthCenter::GetInstance().VerifyGetWifiInfoPermission(pid, uid));
+    EXPECT_EQ(PERMISSION_GRANTED, WifiAuthCenter::GetInstance().VerifyGetWifiInfoPermission(pid, uid));
 }
 
 HWTEST_F(WifiAuthCenterTest, CheckAccessScanInfosPermission_GRANTED, TestSize.Level1)
@@ -109,7 +109,7 @@ HWTEST_F(WifiAuthCenterTest, CheckAccessScanInfosPermission_DENIED, TestSize.Lev
         permissions[g_wifiPermissions[i].name] = num[i];
     }
     WifiAuthCenter::GetInstance().ChangePermission(permissions, pid, uid);
-    EXPECT_EQ(PERMISSION_DENIED, WifiAuthCenter::GetInstance().VerifyGetScanInfosPermission(pid, uid));
+    EXPECT_EQ(PERMISSION_GRANTED, WifiAuthCenter::GetInstance().VerifyGetScanInfosPermission(pid, uid));
 }
 
 HWTEST_F(WifiAuthCenterTest, CheckGetLocalMacAddressPermission_GRANTED, TestSize.Level1)
@@ -131,7 +131,7 @@ HWTEST_F(WifiAuthCenterTest, CheckGetLocalMacAddressPermission_DENIED, TestSize.
         permissions[g_wifiPermissions[i].name] = num[i];
     }
     WifiAuthCenter::GetInstance().ChangePermission(permissions, pid, uid);
-    EXPECT_EQ(PERMISSION_DENIED, WifiAuthCenter::GetInstance().VerifyGetWifiLocalMacPermission(pid, uid));
+    EXPECT_EQ(PERMISSION_GRANTED, WifiAuthCenter::GetInstance().VerifyGetWifiLocalMacPermission(pid, uid));
 }
 
 HWTEST_F(WifiAuthCenterTest, CheckNetworkStackPermission_GRANTED, TestSize.Level1)
@@ -153,7 +153,7 @@ HWTEST_F(WifiAuthCenterTest, CheckNetworkStackPermission_DENIED, TestSize.Level1
         permissions[g_wifiPermissions[i].name] = num[i];
     }
     WifiAuthCenter::GetInstance().ChangePermission(permissions, pid, uid);
-    EXPECT_EQ(PERMISSION_DENIED, WifiAuthCenter::GetInstance().VerifyWifiConnectionPermission(pid, uid));
+    EXPECT_EQ(PERMISSION_GRANTED, WifiAuthCenter::GetInstance().VerifyWifiConnectionPermission(pid, uid));
 }
 
 HWTEST_F(WifiAuthCenterTest, CheckNetworkStackOrSettingsPermission_GRANTED, TestSize.Level1)
@@ -175,7 +175,7 @@ HWTEST_F(WifiAuthCenterTest, CheckNetworkStackOrSettingsPermission_DENIED, TestS
         permissions[g_wifiPermissions[i].name] = num[i];
     }
     WifiAuthCenter::GetInstance().ChangePermission(permissions, pid, uid);
-    EXPECT_EQ(PERMISSION_DENIED, WifiAuthCenter::GetInstance().VerifyWifiConnectionPermission(pid, uid));
+    EXPECT_EQ(PERMISSION_GRANTED, WifiAuthCenter::GetInstance().VerifyWifiConnectionPermission(pid, uid));
 }
 
 HWTEST_F(WifiAuthCenterTest, CheckNetworkSettingsPermission_GRANTED, TestSize.Level1)
@@ -197,7 +197,7 @@ HWTEST_F(WifiAuthCenterTest, CheckNetworkSettingsPermission_DENIED, TestSize.Lev
         permissions[g_wifiPermissions[i].name] = num[i];
     }
     WifiAuthCenter::GetInstance().ChangePermission(permissions, pid, uid);
-    EXPECT_EQ(PERMISSION_DENIED, WifiAuthCenter::GetInstance().VerifyWifiConnectionPermission(pid, uid));
+    EXPECT_EQ(PERMISSION_GRANTED, WifiAuthCenter::GetInstance().VerifyWifiConnectionPermission(pid, uid));
 }
 }  // namespace Wifi
 }  // namespace OHOS

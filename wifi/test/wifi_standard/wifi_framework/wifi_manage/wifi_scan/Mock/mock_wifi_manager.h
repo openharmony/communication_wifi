@@ -27,6 +27,7 @@ public:
     virtual void DealScanCloseRes() = 0;
     virtual void DealScanFinished(int state) = 0;
     virtual void DealScanInfoNotify(std::vector<InterScanInfo> &results) = 0;
+    virtual void DealStoreScanInfoEvent(std::vector<InterScanInfo> &results) = 0;
 };
 
 class WifiManager : public MockWifiManager {
@@ -40,6 +41,7 @@ public:
     MOCK_METHOD0(DealScanCloseRes, void());
     MOCK_METHOD1(DealScanFinished, void(int state));
     MOCK_METHOD1(DealScanInfoNotify, void(std::vector<InterScanInfo> &results));
+    MOCK_METHOD1(DealStoreScanInfoEvent, void(std::vector<InterScanInfo> &results));
 
 private:
     IScanSerivceCallbacks mScanCallback;

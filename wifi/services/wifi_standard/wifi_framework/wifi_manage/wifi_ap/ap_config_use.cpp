@@ -88,7 +88,7 @@ bool ApConfigUse::IsValid5GHz(int freq) const
     return (freq >= FREP_5G_MIN) && (freq <= FREP_5G_MAX);
 }
 
-void ApConfigUse::ApplyDefaultConfig(HotspotConfig &apConfig, std::vector<int32_t> &vecChannels)
+void ApConfigUse::ApplyDefaultConfig(HotspotConfig &apConfig, std::vector<int32_t> &vecChannels) const
 {
     if (!vecChannels.empty()) {
         apConfig.SetChannel(vecChannels.front());
@@ -108,7 +108,7 @@ void ApConfigUse::ApplyDefaultConfig(HotspotConfig &apConfig, std::vector<int32_
     return;
 }
 
-void ApConfigUse::CheckBandChannel(HotspotConfig &apConfig, const ChannelsTable &validChanTable)
+void ApConfigUse::CheckBandChannel(HotspotConfig &apConfig, const ChannelsTable &validChanTable) const
 {
     bool cfgValid = false;
     std::vector<int32_t> vecChannels;

@@ -67,7 +67,7 @@ public:
 
 HWTEST_F(ApMonitor_Test, StationChangeEvent_JOIN, TestSize.Level1)
 {
-    EXPECT_CALL(WifiApHalInterface::GetInstance(), RegisterApEvent(_))
+    EXPECT_CALL(WifiApHalInterface::GetInstance(), RegisterApEvent(_, 0))
         .WillRepeatedly(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
     const int type = 105;
     pApMonitor->StartMonitor();
@@ -78,7 +78,7 @@ HWTEST_F(ApMonitor_Test, StationChangeEvent_JOIN, TestSize.Level1)
 }
 HWTEST_F(ApMonitor_Test, StationChangeEvent_LEAVE, TestSize.Level1)
 {
-    EXPECT_CALL(WifiApHalInterface::GetInstance(), RegisterApEvent(_))
+    EXPECT_CALL(WifiApHalInterface::GetInstance(), RegisterApEvent(_, 0))
         .WillRepeatedly(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
     const int type = 106;
     pApMonitor->StartMonitor();
@@ -89,7 +89,7 @@ HWTEST_F(ApMonitor_Test, StationChangeEvent_LEAVE, TestSize.Level1)
 }
 HWTEST_F(ApMonitor_Test, StationChangeEvent_NULL, TestSize.Level1)
 {
-    EXPECT_CALL(WifiApHalInterface::GetInstance(), RegisterApEvent(_))
+    EXPECT_CALL(WifiApHalInterface::GetInstance(), RegisterApEvent(_, 0))
         .WillRepeatedly(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
     pApMonitor->StartMonitor();
     WifiApConnectionNofify cInfo;
@@ -98,7 +98,7 @@ HWTEST_F(ApMonitor_Test, StationChangeEvent_NULL, TestSize.Level1)
 /* OnHotspotStateEvent */
 HWTEST_F(ApMonitor_Test, OnHotspotStateEvent_ENABLE, TestSize.Level1)
 {
-    EXPECT_CALL(WifiApHalInterface::GetInstance(), RegisterApEvent(_))
+    EXPECT_CALL(WifiApHalInterface::GetInstance(), RegisterApEvent(_, 0))
         .WillRepeatedly(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
     pApMonitor->StartMonitor();
     pApMonitor->OnHotspotStateEvent(AP_ENABLE);
@@ -106,14 +106,14 @@ HWTEST_F(ApMonitor_Test, OnHotspotStateEvent_ENABLE, TestSize.Level1)
 
 HWTEST_F(ApMonitor_Test, OnHotspotStateEvent_DISABLE, TestSize.Level1)
 {
-    EXPECT_CALL(WifiApHalInterface::GetInstance(), RegisterApEvent(_))
+    EXPECT_CALL(WifiApHalInterface::GetInstance(), RegisterApEvent(_, 0))
         .WillRepeatedly(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
     pApMonitor->StartMonitor();
     pApMonitor->OnHotspotStateEvent(AP_DISABLE);
 }
 HWTEST_F(ApMonitor_Test, OnHotspotStateEvent_FAILED, TestSize.Level1)
 {
-    EXPECT_CALL(WifiApHalInterface::GetInstance(), RegisterApEvent(_))
+    EXPECT_CALL(WifiApHalInterface::GetInstance(), RegisterApEvent(_, 0))
         .WillRepeatedly(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
     pApMonitor->StartMonitor();
     pApMonitor->OnHotspotStateEvent(AP_FAILED);
@@ -122,7 +122,7 @@ HWTEST_F(ApMonitor_Test, OnHotspotStateEvent_FAILED, TestSize.Level1)
 /* StartMonitor */
 HWTEST_F(ApMonitor_Test, StartMonitor_SUCCESS, TestSize.Level1)
 {
-    EXPECT_CALL(WifiApHalInterface::GetInstance(), RegisterApEvent(_))
+    EXPECT_CALL(WifiApHalInterface::GetInstance(), RegisterApEvent(_, 0))
         .WillRepeatedly(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
     pApMonitor->StartMonitor();
 }
@@ -130,14 +130,14 @@ HWTEST_F(ApMonitor_Test, StartMonitor_SUCCESS, TestSize.Level1)
 /* StopMonitor */
 HWTEST_F(ApMonitor_Test, StopMonitor_SUCCESS, TestSize.Level1)
 {
-    EXPECT_CALL(WifiApHalInterface::GetInstance(), RegisterApEvent(_))
+    EXPECT_CALL(WifiApHalInterface::GetInstance(), RegisterApEvent(_, 0))
         .WillRepeatedly(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
     pApMonitor->StopMonitor();
 }
 /* UnregisterHandler */
 HWTEST_F(ApMonitor_Test, UnregisterHandler_SUCCESS, TestSize.Level1)
 {
-    EXPECT_CALL(WifiApHalInterface::GetInstance(), RegisterApEvent(_))
+    EXPECT_CALL(WifiApHalInterface::GetInstance(), RegisterApEvent(_, 0))
         .WillRepeatedly(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
     WraUnregisterHandler("wlan1");
 }

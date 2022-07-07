@@ -40,13 +40,13 @@ void WifiHalHostapdTest::SetUpTestCase()
     InitCallbackMsg();
     SetRpcServerInited(mServer);
     MockInitApSupportedCmd();
-    mInterface = GetWifiHostapdDev();
+    mInterface = GetWifiHostapdDev(0);
 }
 
 void WifiHalHostapdTest::TearDownTestCase()
 {
     sleep(1);
-    ReleaseHostapdDev();
+    ReleaseHostapdDev(0);
     if (mServer != nullptr) {
         ReleaseRpcServer(mServer);
         mServer = nullptr;
@@ -58,129 +58,129 @@ void WifiHalHostapdTest::TearDownTestCase()
 HWTEST_F(WifiHalHostapdTest, EnableApTest, TestSize.Level1)
 {
     MockEraseSupportedCmd("ENABLE");
-    int ret = mInterface->enableAp();
+    int ret = mInterface->enableAp(0);
     EXPECT_TRUE(ret != 0);
     MockSetWpaExpectCmdResponse("ENABLE", "OK");
-    ret = mInterface->enableAp();
+    ret = mInterface->enableAp(0);
     EXPECT_TRUE(ret == 0);
     MockWpaCallback(mInterface->ctrlConn, "<3>AP-ENABLED \n");
 }
 
 HWTEST_F(WifiHalHostapdTest, SetApInfoTest, TestSize.Level1)
 {
-    EXPECT_TRUE(mInterface->setApInfo(nullptr) < 0);
+    EXPECT_TRUE(mInterface->setApInfo(nullptr, 0) < 0);
     HostapdConfig conf;
     ASSERT_TRUE(memset_s(&conf, sizeof(conf), 0, sizeof(conf)) == EOK);
     conf.securityType = WPA_PSK;
-    EXPECT_TRUE(mInterface->setApInfo(&conf) < 0);
+    EXPECT_TRUE(mInterface->setApInfo(&conf, 0) < 0);
     StrSafeCopy(conf.preSharedKey, sizeof(conf.preSharedKey), "1234567");
-    EXPECT_TRUE(mInterface->setApInfo(&conf) < 0);
+    EXPECT_TRUE(mInterface->setApInfo(&conf, 0) < 0);
     StrSafeCopy(conf.preSharedKey, sizeof(conf.preSharedKey), "12345678");
     conf.preSharedKeyLen = strlen(conf.preSharedKey);
-    EXPECT_TRUE(mInterface->setApInfo(&conf) == 0);
+    EXPECT_TRUE(mInterface->setApInfo(&conf, 0) == 0);
     conf.securityType = WPA2_PSK;
-    EXPECT_TRUE(mInterface->setApInfo(&conf) == 0);
+    EXPECT_TRUE(mInterface->setApInfo(&conf, 0) == 0);
     conf.securityType = NONE;
-    EXPECT_TRUE(mInterface->setApInfo(&conf) == 0);
+    EXPECT_TRUE(mInterface->setApInfo(&conf, 0) == 0);
     conf.securityType = IEEE8021X;
-    EXPECT_TRUE(mInterface->setApInfo(&conf) < 0);
+    EXPECT_TRUE(mInterface->setApInfo(&conf, 0) < 0);
     conf.securityType = NONE;
     conf.band = AP_2GHZ_BAND;
-    EXPECT_TRUE(mInterface->setApInfo(&conf) == 0);
+    EXPECT_TRUE(mInterface->setApInfo(&conf, 0) == 0);
     conf.band = AP_5GHZ_BAND;
-    EXPECT_TRUE(mInterface->setApInfo(&conf) == 0);
+    EXPECT_TRUE(mInterface->setApInfo(&conf, 0) == 0);
     conf.band = -1;
-    EXPECT_TRUE(mInterface->setApInfo(&conf) < 0);
+    EXPECT_TRUE(mInterface->setApInfo(&conf, 0) < 0);
     conf.band = AP_DFS_BAND;
-    EXPECT_TRUE(mInterface->setApInfo(&conf) < 0);
+    EXPECT_TRUE(mInterface->setApInfo(&conf, 0) < 0);
 }
 
 HWTEST_F(WifiHalHostapdTest, DisableApTest, TestSize.Level1)
 {
     MockEraseSupportedCmd("DISABLE");
-    int ret = mInterface->disableAp();
+    int ret = mInterface->disableAp(0);
     EXPECT_TRUE(ret != 0);
     MockSetWpaExpectCmdResponse("DISABLE", "OK");
-    ret = mInterface->disableAp();
+    ret = mInterface->disableAp(0);
     EXPECT_TRUE(ret == 0);
     MockWpaCallback(mInterface->ctrlConn, "<3>AP-DISABLED \n");
 }
 
 HWTEST_F(WifiHalHostapdTest, AddBlockListTest, TestSize.Level1)
 {
-    EXPECT_TRUE(mInterface->addBlocklist(nullptr) < 0);
-    EXPECT_TRUE(mInterface->addBlocklist("00:00:00:00:00:00") == 0);
+    EXPECT_TRUE(mInterface->addBlocklist(nullptr, 0) < 0);
+    EXPECT_TRUE(mInterface->addBlocklist("00:00:00:00:00:00", 0) == 0);
     MockSetWpaExpectCmdResponse("DENY_ACL", "UNKNOWN COMMAND");
-    EXPECT_TRUE(mInterface->addBlocklist("00:00:00:00:00:00") == 0);
+    EXPECT_TRUE(mInterface->addBlocklist("00:00:00:00:00:00", 0) == 0);
     MockSetWpaExpectCmdResponse("DENY_ACL", "OK");
 }
 
 HWTEST_F(WifiHalHostapdTest, DelBlockListTest, TestSize.Level1)
 {
-    EXPECT_TRUE(mInterface->delBlocklist(nullptr) < 0);
-    EXPECT_TRUE(mInterface->delBlocklist("00:00:00:00:00:00") == 0);
+    EXPECT_TRUE(mInterface->delBlocklist(nullptr, 0) < 0);
+    EXPECT_TRUE(mInterface->delBlocklist("00:00:00:00:00:00", 0) == 0);
     MockSetWpaExpectCmdResponse("DENY_ACL", "UNKNOWN COMMAND");
-    EXPECT_TRUE(mInterface->delBlocklist("00:00:00:00:00:00") == 0);
+    EXPECT_TRUE(mInterface->delBlocklist("00:00:00:00:00:00", 0) == 0);
     MockSetWpaExpectCmdResponse("DENY_ACL", "OK");
 }
 
 HWTEST_F(WifiHalHostapdTest, GetApStatusTest, TestSize.Level1)
 {
-    EXPECT_TRUE(mInterface->status(nullptr) < 0);
+    EXPECT_TRUE(mInterface->status(nullptr, 0) < 0);
     StatusInfo info;
     ASSERT_TRUE(memset_s(&info, sizeof(info), 0, sizeof(info)) == EOK);
-    EXPECT_TRUE(mInterface->status(&info) == 0);
+    EXPECT_TRUE(mInterface->status(&info, 0) == 0);
     char buf[BUFSIZE_REQUEST] = "test1=adsgdjks\nteset2=gflsdfis\ntest3="
                                 "gfdklse\nstate=disable\ngfdsd=gdhjs\n";
     MockSetWpaExpectCmdResponse("STATUS", buf);
-    EXPECT_TRUE(mInterface->status(&info) == 0);
+    EXPECT_TRUE(mInterface->status(&info, 0) == 0);
     EXPECT_TRUE(strcmp(info.state, "disable") == 0);
 }
 
 HWTEST_F(WifiHalHostapdTest, HostapdCliCmdListStaTest, TestSize.Level1)
 {
-    EXPECT_TRUE(mInterface->showConnectedDevList(nullptr, 0) < 0);
+    EXPECT_TRUE(mInterface->showConnectedDevList(nullptr, 0, 0) < 0);
     char buff[256] = {0};
     int size = 256;
     MockEraseSupportedCmd("STA-FIRST");
-    EXPECT_TRUE(mInterface->showConnectedDevList(buff, size) < 0);
+    EXPECT_TRUE(mInterface->showConnectedDevList(buff, size, 0) < 0);
     MockSetWpaExpectCmdResponse("STA-FIRST", "00:00:00:00:00:00");
     MockSetWpaExpectCmdResponse("STA-NEXT", "FAIL");
-    EXPECT_TRUE(mInterface->showConnectedDevList(buff, size) == 0);
+    EXPECT_TRUE(mInterface->showConnectedDevList(buff, size, 0) == 0);
     EXPECT_TRUE(strcmp(buff, ",00:00:00:00:00:00") == 0);
 }
 
 HWTEST_F(WifiHalHostapdTest, ReloadApConfigInfoTest, TestSize.Level1)
 {
     MockEraseSupportedCmd("RELOAD");
-    int ret = mInterface->reloadApConfigInfo();
+    int ret = mInterface->reloadApConfigInfo(0);
     EXPECT_TRUE(ret != 0);
     MockSetWpaExpectCmdResponse("RELOAD", "OK");
-    ret = mInterface->reloadApConfigInfo();
+    ret = mInterface->reloadApConfigInfo(0);
     EXPECT_TRUE(ret == 0);
 }
 
 HWTEST_F(WifiHalHostapdTest, DisConnectedDevTest, TestSize.Level1)
 {
     MockWpaCallback(mInterface->ctrlConn, "<3>AP-STA-CONNECTED 00:00:00:00:00:00\n");
-    EXPECT_TRUE(mInterface->disConnectedDev(nullptr) < 0);
+    EXPECT_TRUE(mInterface->disConnectedDev(nullptr, 0) < 0);
     MockEraseSupportedCmd("DISASSOCIATE");
-    int ret = mInterface->disConnectedDev("00:00:00:00:00:00");
+    int ret = mInterface->disConnectedDev("00:00:00:00:00:00", 0);
     EXPECT_TRUE(ret != 0);
     MockSetWpaExpectCmdResponse("DISASSOCIATE", "OK");
-    ret = mInterface->disConnectedDev("00:00:00:00:00:00");
+    ret = mInterface->disConnectedDev("00:00:00:00:00:00", 0);
     EXPECT_TRUE(ret == 0);
     MockWpaCallback(mInterface->ctrlConn, "<3>AP-STA-DISCONNECTED 00:00:00:00:00:00\n");
 }
 
 HWTEST_F(WifiHalHostapdTest, SetCountryCodeTest, TestSize.Level1)
 {
-    EXPECT_TRUE(mInterface->setCountryCode(nullptr) < 0);
+    EXPECT_TRUE(mInterface->setCountryCode(nullptr, 0) < 0);
     MockEraseSupportedCmd("SET");
-    int ret = mInterface->setCountryCode("CN");
+    int ret = mInterface->setCountryCode("CN", 0);
     EXPECT_TRUE(ret != 0);
     MockSetWpaExpectCmdResponse("SET", "OK");
-    ret = mInterface->setCountryCode("CN");
+    ret = mInterface->setCountryCode("CN", 0);
     EXPECT_TRUE(ret == 0);
 }
 }  // namespace Wifi

@@ -13,13 +13,13 @@
 
 import("//build/test.gni")
 import("//foundation/communication/wifi/wifi/wifi.gni")
-module_output_path = "wifi_standard/crpc_test"
+module_output_path = "wifi/crpc_test"
 
 config("module_private_config") {
   visibility = [ ":*" ]
   include_dirs = [
     "//utils/native/base/include",
-    "$WIFI_ROOT_DIR/tests/wifi_standard/ipc_framework/cRPC/unittest",
+    "$WIFI_ROOT_DIR/test/wifi_standard/ipc_framework/cRPC/unittest",
   ]
 }
 

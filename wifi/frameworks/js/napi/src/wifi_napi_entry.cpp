@@ -32,6 +32,7 @@ static napi_value Init(napi_env env, napi_value exports) {
         DECLARE_NAPI_FUNCTION("isWifiActive", IsWifiActive),
         DECLARE_NAPI_FUNCTION("scan", Scan),
         DECLARE_NAPI_FUNCTION("getScanInfos", GetScanInfos),
+        DECLARE_NAPI_FUNCTION("getScanInfosSync", GetScanResults),
         DECLARE_NAPI_FUNCTION("addDeviceConfig", AddDeviceConfig),
         DECLARE_NAPI_FUNCTION("addUntrustedConfig", AddUntrustedConfig),
         DECLARE_NAPI_FUNCTION("removeUntrustedConfig", RemoveUntrustedConfig),

@@ -27,6 +27,7 @@ napi_value DisableWifi(napi_env env, napi_callback_info info);
 napi_value IsWifiActive(napi_env env, napi_callback_info info);
 napi_value Scan(napi_env env, napi_callback_info info);
 napi_value GetScanInfos(napi_env env, napi_callback_info info);
+napi_value GetScanResults(napi_env env, napi_callback_info info);
 napi_value AddDeviceConfig(napi_env env, napi_callback_info info);
 napi_value AddUntrustedConfig(napi_env env, napi_callback_info info);
 napi_value RemoveUntrustedConfig(napi_env env, napi_callback_info info);

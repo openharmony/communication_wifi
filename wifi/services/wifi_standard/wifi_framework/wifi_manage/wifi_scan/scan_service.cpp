@@ -131,6 +131,10 @@ void ScanService::HandleScanStatusReport(ScanStatusReport &scanStatusReport)
 
     switch (scanStatusReport.status) {
         case SCAN_STARTED_STATUS: {
+            if (pScanStateMachine == nullptr) {
+                WIFI_LOGE("HandleScanStatusReport-SCAN_STARTED_STATUS pScanStateMachine is null\n");
+                return;
+            }
             scanStartedFlag = true;
             /* Pno scan maybe has started, stop it first. */
             pScanStateMachine->SendMessage(CMD_STOP_PNO_SCAN);
@@ -156,6 +160,10 @@ void ScanService::HandleScanStatusReport(ScanStatusReport &scanStatusReport)
             break;
         }
         case PNO_SCAN_FAILED: {
+            if (pScanStateMachine == nullptr) {
+                WIFI_LOGE("HandleScanStatusReport-PNO_SCAN_FAILED pScanStateMachine is null\n");
+                return;
+            }
             /* Start the timer and restart the PNO scanning after a delay. */
             pScanStateMachine->StartTimer(static_cast<int>(RESTART_PNO_SCAN_TIMER), RESTART_PNO_SCAN_TIME);
             EndPnoScan();
@@ -337,6 +345,10 @@ bool ScanService::SingleScan(ScanConfig &scanConfig)
     }
 
     std::unique_lock<std::mutex> lock(scanConfigMapMutex);
+    if (pScanStateMachine == nullptr) {
+        WIFI_LOGE("pScanStateMachine is null.\n");
+        return false;
+    }
     /* Construct a message. */
     InternalMessage *interMessage =
         pScanStateMachine->CreateMessage(static_cast<int>(CMD_START_COMMON_SCAN), requestIndex);
@@ -726,7 +738,10 @@ bool ScanService::BeginPnoScan()
 bool ScanService::PnoScan(const PnoScanConfig &pnoScanConfig, const InterScanConfig &interScanConfig)
 {
     WIFI_LOGI("Enter ScanService::PnoScan.\n");
-
+    if (pScanStateMachine == nullptr) {
+        WIFI_LOGE("pScanStateMachine is null.\n");
+        return false;
+    }
     /* Construct a message. */
     InternalMessage *interMessage = pScanStateMachine->CreateMessage(CMD_START_PNO_SCAN);
     if (interMessage == nullptr) {
@@ -831,7 +846,10 @@ void ScanService::EndPnoScan()
     if (!isPnoScanBegined) {
         return;
     }
-
+    if (pScanStateMachine == nullptr) {
+        WIFI_LOGE("pScanStateMachine is null.\n");
+        return;
+    }
     pScanStateMachine->SendMessage(CMD_STOP_PNO_SCAN);
     isPnoScanBegined = false;
     return;
@@ -956,7 +974,10 @@ void ScanService::SystemScanProcess(bool scanAtOnce)
 void ScanService::StopSystemScan()
 {
     WIFI_LOGI("Enter ScanService::StopSystemScan.");
-
+    if (pScanStateMachine == nullptr) {
+        WIFI_LOGE("pScanStateMachine is null.\n");
+        return;
+    }
     pScanStateMachine->StopTimer(static_cast<int>(SYSTEM_SCAN_TIMER));
     EndPnoScan();
     pnoScanFailedNum = 0;
@@ -1018,7 +1039,10 @@ void ScanService::HandleSystemScanTimeout()
 void ScanService::DisconnectedTimerScan()
 {
     WIFI_LOGI("Enter ScanService::DisconnectedTimerScan.\n");
-
+    if (pScanStateMachine == nullptr) {
+        WIFI_LOGE("pScanStateMachine is null.\n");
+        return;
+    }
     pScanStateMachine->StartTimer(static_cast<int>(DISCONNECTED_SCAN_TIMER), DISCONNECTED_SCAN_INTERVAL);
     return;
 }
@@ -1030,7 +1054,10 @@ void ScanService::HandleDisconnectedScanTimeout()
     if (staStatus != static_cast<int>(OperateResState::DISCONNECT_DISCONNECTED)) {
         return;
     }
-
+    if (pScanStateMachine == nullptr) {
+        WIFI_LOGE("pScanStateMachine is null.\n");
+        return;
+    }
     if (Scan(false) != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("Scan failed.");
     }

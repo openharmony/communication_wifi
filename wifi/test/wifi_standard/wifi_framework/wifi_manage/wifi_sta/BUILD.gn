@@ -13,7 +13,7 @@
 
 import("//build/test.gni")
 import("//foundation/communication/wifi/wifi/wifi.gni")
-module_output_path = "wifi_standard/sta_test"
+module_output_path = "wifi/sta_test"
 
 defines = []
 defines += [ "OHOS_WIFI_STA_TEST" ]
@@ -22,7 +22,7 @@ config("module_private_config") {
   visibility = [ ":*" ]
   include_dirs = [
     "//utils/native/base/include",
-    "$WIFI_ROOT_DIR/tests/wifi_standard/wifi_framework/wifi_manage/wifi_sta",
+    "$WIFI_ROOT_DIR/test/wifi_standard/wifi_framework/wifi_manage/wifi_sta",
   ]
 }
 
@@ -70,8 +70,8 @@ ohos_unittest("wifi_sta_unittest") {
     "./",
     "./Mock",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta/net_conf",
-    "$WIFI_ROOT_DIR/interfaces/innerkits/native_cpp/wifi_standard/include",
-    "$WIFI_ROOT_DIR/interfaces/innerkits/native_cpp/wifi_standard/interfaces",
+    "$WIFI_ROOT_DIR/frameworks/native/include",
+    "$WIFI_ROOT_DIR/frameworks/native/interfaces",
     "$WIFI_ROOT_DIR/services/wifi_standard/interface",
     "$WIFI_ROOT_DIR/services/wifi_standard/ipc_framework/cRPC/include",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/common/include",
@@ -90,8 +90,8 @@ ohos_unittest("wifi_sta_unittest") {
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta",
     "$WIFI_ROOT_DIR/services/wifi_standard/ipc_framework/cRPC/include",
     "$DHCP_ROOT_DIR/services/mgr_service/include",
-    "$DHCP_ROOT_DIR/interfaces/innerkits/native_cpp/include",
-    "$DHCP_ROOT_DIR/interfaces/innerkits/native_cpp/interfaces",
+    "$DHCP_ROOT_DIR/interfaces/inner_api/include",
+    "$DHCP_ROOT_DIR/interfaces/inner_api/interfaces",
     "//third_party/googletest/googlemock/include",
     "//third_party/googletest/googletest/include",
     "//base/notification/ces_standard/cesfwk/kits/native/include",
@@ -118,7 +118,7 @@ ohos_unittest("wifi_sta_unittest") {
     "hiviewdfx_hilog_native:libhilog",
     "netmanager_base:net_conn_manager_if",
   ]
-  defines = [ "AP_INSTANCE_MAX_NUM=$wifi_feature_with_ap_num" ]
+  defines += [ "AP_INSTANCE_MAX_NUM=$wifi_feature_with_ap_num" ]
   part_name = "wifi"
   subsystem_name = "communication"
 }

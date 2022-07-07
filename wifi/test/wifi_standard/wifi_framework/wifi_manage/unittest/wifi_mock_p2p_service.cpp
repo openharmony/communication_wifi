@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -341,7 +341,7 @@ ErrCode WifiMockP2pService::QueryP2pDevices(std::vector<WifiP2pDevice> &devices)
     device1.SetWpsConfigMethod(TEST_ONE_THOUSAND);
     device1.SetDeviceCapabilitys(TEST_ONE_THOUSAND);
     device1.SetGroupCapabilitys(TEST_ONE_THOUSAND);
-    devives.push_back(device1);
+    devices.push_back(device1);
     WifiP2pDevice device2;
     device2.SetDeviceName("DeviceName2");
     device2.SetDeviceAddress("DeviceAddress2");
@@ -357,7 +357,7 @@ ErrCode WifiMockP2pService::QueryP2pDevices(std::vector<WifiP2pDevice> &devices)
     device2.SetWpsConfigMethod(TEST_TWO_THOUSAND);
     device2.SetDeviceCapabilitys(TEST_TWO_THOUSAND);
     device2.SetGroupCapabilitys(TEST_TWO_THOUSAND);
-    devives.push_back(device2);
+    devices.push_back(device2);
     return WIFI_OPT_SUCCESS;
 }
 

@@ -25,6 +25,7 @@ using ::testing::AtLeast;
 using ::testing::DoAll;
 using ::testing::Eq;
 using ::testing::Return;
+using ::testing::ReturnRef;
 using ::testing::SetArgReferee;
 using ::testing::StrEq;
 using ::testing::TypedEq;
@@ -52,6 +53,8 @@ public:
 
 public:
     std::unique_ptr<ScanService> pScanService;
+    std::vector<TrustListPolicy> refVecTrustList;
+    MovingFreezePolicy defaultValue;
 
     void InitScanServiceSuccess1()
     {
@@ -59,11 +62,12 @@ public:
         EXPECT_CALL(WifiSupplicantHalInterface::GetInstance(), RegisterSupplicantEventCallback(_)).Times(AtLeast(1));
         EXPECT_CALL(WifiStaHalInterface::GetInstance(), GetSupportFrequencies(_, _)).Times(AtLeast(1));
         EXPECT_CALL(WifiSettings::GetInstance(), GetScanControlInfo(_)).Times(AtLeast(1));
-        EXPECT_CALL(WifiSettings::GetInstance(), GetScreenState()).Times(AtLeast(1));
         EXPECT_CALL(WifiManager::GetInstance(), DealScanOpenRes()).Times(AtLeast(0));
         EXPECT_CALL(WifiSupplicantHalInterface::GetInstance(), UnRegisterSupplicantEventCallback()).Times(AtLeast(1));
         EXPECT_CALL(WifiSettings::GetInstance(), GetWhetherToAllowNetworkSwitchover()).Times(AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_)).Times(AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), ReloadMovingFreezePolicy())
+            .WillRepeatedly(ReturnRef(defaultValue));
         EXPECT_EQ(pScanService->InitScanService(WifiManager::GetInstance().GetScanCallback()), true);
     }
 
@@ -79,6 +83,8 @@ public:
         EXPECT_CALL(WifiSupplicantHalInterface::GetInstance(), UnRegisterSupplicantEventCallback()).Times(AtLeast(1));
         EXPECT_CALL(WifiSettings::GetInstance(), GetWhetherToAllowNetworkSwitchover()).Times(AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_)).Times(AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), ReloadTrustListPolicies())
+            .WillRepeatedly(ReturnRef(refVecTrustList));
         EXPECT_EQ(pScanService->InitScanService(WifiManager::GetInstance().GetScanCallback()), true);
     }
 
@@ -90,9 +96,8 @@ public:
 
     void HandleScanStatusReportSuccess1()
     {
-        EXPECT_CALL(WifiSettings::GetInstance(), GetWhetherToAllowNetworkSwitchover())
-            .Times(AtLeast(1))
-            .WillRepeatedly(Return(true));
+        ON_CALL(WifiSettings::GetInstance(), GetWhetherToAllowNetworkSwitchover())
+            .WillByDefault(Return(true));
         EXPECT_CALL(WifiManager::GetInstance(), DealScanOpenRes()).Times(AtLeast(1));
         EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_)).Times(AtLeast(0));
         EXPECT_CALL(WifiStaHalInterface::GetInstance(), StopPnoScan()).Times(AtLeast(0));
@@ -404,7 +409,7 @@ public:
 
     void HandleCommonScanInfoSuccess2()
     {
-        EXPECT_CALL(WifiSettings::GetInstance(), SaveScanInfoList(_)).Times(AtLeast(1));
+        ON_CALL(WifiSettings::GetInstance(), SaveScanInfoList(_)).WillByDefault(Return(0));
         StoreScanConfig storeScanConfig0;
         storeScanConfig0.fullScanFlag = true;
         StoreScanConfig storeScanConfig1;
@@ -558,14 +563,12 @@ public:
 
     void HandleStaStatusChangedSuccess1()
     {
-        EXPECT_CALL(WifiSettings::GetInstance(), GetWhetherToAllowNetworkSwitchover());
         int status = static_cast<int>(OperateResState::DISCONNECT_DISCONNECTED);
         pScanService->HandleStaStatusChanged(status);
     }
 
     void HandleStaStatusChangedSuccess2()
     {
-        EXPECT_CALL(WifiSettings::GetInstance(), GetWhetherToAllowNetworkSwitchover());
         int status = static_cast<int>(OperateResState::CONNECT_AP_CONNECTED);
         pScanService->HandleStaStatusChanged(status);
     }
@@ -594,7 +597,6 @@ public:
 
     void SystemScanProcessSuccess1()
     {
-        EXPECT_CALL(WifiSettings::GetInstance(), GetWhetherToAllowNetworkSwitchover());
         ScanIntervalMode mode;
         mode.scanScene = SCAN_SCENE_ALL;
         mode.scanMode = ScanMode::SYSTEM_TIMER_SCAN;
@@ -1434,7 +1436,6 @@ public:
         int lessThanIntervalCount = 0;
         const int countTest = 1;
         int count = countTest;
-        // lessThanIntervalCount = 0 branch.
         bool rlt = pScanService->AllowScanByIntervalContinue(continueScanTime, lessThanIntervalCount, interval, count);
         EXPECT_EQ(rlt, false);
     }

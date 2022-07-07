@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,7 +16,8 @@
 #include "mock_system_func.h"
 #include "dhcp_ipv4.h"
 #include "dhcp_client.h"
-using namespace OHOS;
+
+using namespace OHOS::Wifi;
 
 static bool g_mockTag = false;
 
@@ -39,9 +40,7 @@ bool MockSystemFunc::GetMockFlag(void)
     return g_mockTag;
 }
 
-#ifdef __cplusplus
 extern "C" {
-#endif
 int __real_open(const char *__file, int __oflag);
 int __wrap_open(const char *__file, int __oflag)
 {
@@ -177,6 +176,4 @@ ssize_t __wrap_sendto(int fd, const void *buf, size_t count, int flags, const st
         return __real_sendto(fd, buf, count, flags, addr, len);
     }
 }
-#ifdef __cplusplus
 }
-#endif

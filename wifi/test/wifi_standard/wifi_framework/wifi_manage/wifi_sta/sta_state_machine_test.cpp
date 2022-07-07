@@ -87,7 +87,7 @@ public:
 
     void DealConnectTimeOutCmd()
     {
-        EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_));
+        EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_)).WillRepeatedly(Return(0));
         EXPECT_CALL(WifiStaHalInterface::GetInstance(), DisableNetwork(_)).WillRepeatedly(Return(WIFI_IDL_OPT_FAILED));
         EXPECT_CALL(WifiManager::GetInstance(), DealStaConnChanged(_, _)).Times(testing::AtLeast(1));
         InternalMessage msg;
@@ -466,7 +466,6 @@ public:
 
     void DealReassociateCmdSuccess()
     {
-        EXPECT_CALL(WifiSettings::GetInstance(), GetUserLastSelectedNetworkTimeVal());
         EXPECT_CALL(WifiStaHalInterface::GetInstance(), Reassociate()).WillRepeatedly(Return(WIFI_IDL_OPT_OK));
         EXPECT_CALL(WifiManager::GetInstance(), DealStaConnChanged(_, _)).Times(testing::AtLeast(0));
         InternalMessage msg;
@@ -475,7 +474,6 @@ public:
 
     void DealReassociateCmdFail1()
     {
-        EXPECT_CALL(WifiSettings::GetInstance(), GetUserLastSelectedNetworkTimeVal());
         EXPECT_CALL(WifiStaHalInterface::GetInstance(), Reassociate()).WillRepeatedly(Return(WIFI_IDL_OPT_FAILED));
         EXPECT_CALL(WifiManager::GetInstance(), DealStaConnChanged(_, _)).Times(testing::AtLeast(0));
         pStaStateMachine->DealReassociateCmd(nullptr);
@@ -483,7 +481,6 @@ public:
 
     void DealReassociateCmdFail2()
     {
-        EXPECT_CALL(WifiSettings::GetInstance(), GetUserLastSelectedNetworkTimeVal());
         EXPECT_CALL(WifiStaHalInterface::GetInstance(), Reassociate()).WillRepeatedly(Return(WIFI_IDL_OPT_FAILED));
         pStaStateMachine->DealReassociateCmd(nullptr);
     }
@@ -918,7 +915,7 @@ public:
     void WpsStateExeMsgSuccess1()
     {
         EXPECT_CALL(WifiSettings::GetInstance(), SetWifiState(_)).Times(AtLeast(0));
-        EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_));
+        EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_)).Times(AtLeast(0)).WillRepeatedly(Return(0));
         EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_)).Times(AtLeast(0)).WillRepeatedly(Return(0));
         EXPECT_CALL(WifiSettings::GetInstance(), AddDeviceConfig(_)).Times(AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), SyncDeviceConfig()).Times(AtLeast(0));

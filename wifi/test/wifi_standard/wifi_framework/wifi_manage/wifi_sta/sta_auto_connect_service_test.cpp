@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -439,7 +439,6 @@ void StaAutoConnectServiceTest::OnScanResultsReadyHandlerFail6()
     EXPECT_CALL(WifiSettings::GetInstance(), GetWhetherToAllowNetworkSwitchover())
         .Times(AtLeast(1))
         .WillOnce(Return(true));
-    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_)).Times(AtLeast(1));
     EXPECT_CALL(*(pMockDeviceAppraisal), DeviceAppraisals(_, _, _)).WillOnce(Return(WIFI_OPT_FAILED));
 
     pStaAutoConnectService->OnScanInfosReadyHandler(scanInfos);
@@ -842,8 +841,10 @@ void StaAutoConnectServiceTest::ConnectElectedDeviceFail1()
     GetWifiLinkedInfo(info);
     GetWifiDeviceConfig(deviceConfig);
     info.detailedState = DetailedState::INVALID;
-
-    EXPECT_CALL(WifiSettings::GetInstance(), GetLinkedInfo(_)).WillOnce(DoAll(SetArgReferee<0>(info), Return(0)));
+    EXPECT_CALL(WifiSettings::GetInstance(), GetLinkedInfo(_))
+        .Times(AtLeast(0))
+        .WillOnce(DoAll(SetArgReferee<0>(info), Return(0)))
+        .WillRepeatedly(DoAll(SetArgReferee<0>(info), Return(0)));
     pStaAutoConnectService->ConnectElectedDevice(deviceConfig);
 }
 

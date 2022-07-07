@@ -161,6 +161,7 @@ private:
     static void DealScanCloseRes(void);
     static void DealScanFinished(int state);
     static void DealScanInfoNotify(std::vector<InterScanInfo> &results);
+    static void DealStoreScanInfoEvent(std::vector<InterScanInfo> &results);
 #ifdef FEATURE_AP_SUPPORT
     static void DealApStateChanged(ApState bState, int id = 0);
     static void DealApGetStaJoin(const StationInfo &info, int id = 0);

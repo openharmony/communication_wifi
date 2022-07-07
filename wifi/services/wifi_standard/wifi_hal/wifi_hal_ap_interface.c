@@ -312,6 +312,10 @@ static int32_t ConvertToNl80211Band(int32_t band)
 
 WifiErrorNo GetValidFrequenciesForBand(int32_t band, int *frequencies, int32_t *size, int id)
 {
+    if (frequencies == NULL || size == NULL) {
+        LOGE("%{public}s frequencies or size is null.", __func__);
+        return WIFI_HAL_FAILED;
+    }
 #ifdef OHOS_ARCH_LITE
     return WIFI_HAL_FAILED;
 #else
@@ -322,7 +326,6 @@ WifiErrorNo GetValidFrequenciesForBand(int32_t band, int *frequencies, int32_t *
     if (ret != WIFI_HAL_SUCCESS) {
         return WIFI_HAL_FAILED;
     }
-
     ret = apFeature->baseFeature.getValidFreqsWithBand((struct IWiFiBaseFeature *)apFeature,
         ConvertToNl80211Band(band), frequencies, *size, &count);
     *size = count;

@@ -13,13 +13,13 @@
 
 import("//build/test.gni")
 import("//foundation/communication/wifi/wifi/wifi.gni")
-module_output_path = "wifi_standard/wifi_hal_test"
+module_output_path = "wifi/wifi_hal_test"
 
 config("module_private_config") {
   visibility = [ ":*" ]
   include_dirs = [
     "//utils/native/base/include",
-    "$WIFI_ROOT_DIR/tests/wifi_standard/wifi_hal/unittest",
+    "$WIFI_ROOT_DIR/test/wifi_standard/wifi_hal/unittest",
   ]
 }
 
@@ -27,6 +27,7 @@ ohos_unittest("wifi_hal_unittest") {
   module_out_path = module_output_path
   sources = [
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_hal/common/wifi_hal_common_func.c",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_hal/hdi/wifi_hdi_ap_instance.c",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_hal/wifi_hal_adapter.c",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_hal/wifi_hal_ap_interface.c",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_hal/wifi_hal_base_interface.c",
@@ -77,6 +78,7 @@ ohos_unittest("wifi_hal_unittest") {
     "//third_party/bounds_checking_function/include/",
     "//drivers/peripheral/wlan/interfaces/include/",
     "//drivers/peripheral/wlan/client/include/",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_hal/hdi",
   ]
 
   deps = [

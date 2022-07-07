@@ -16,7 +16,7 @@ import("//foundation/communication/wifi/dhcp/dhcp.gni")
 
 ################################################################################
 
-module_output_path = "wifi_standard/dhcp_client_test"
+module_output_path = "dhcp/dhcp_client_test"
 
 config("module_private_config") {
   visibility = [ ":*" ]

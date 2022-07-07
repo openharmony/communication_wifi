@@ -98,9 +98,9 @@ HWTEST_F(WifiHalChipInterfaceTest, RequestFirmwareDebugDumpTest, TestSize.Level1
     EXPECT_TRUE(RequestFirmwareDebugDump(bytes, &size) == WIFI_HAL_NOT_SUPPORT);
 }
 
-HWTEST_F(WifiHalChipInterfaceTest, SetPowerModeTest, TestSize.Level1)
+HWTEST_F(WifiHalChipInterfaceTest, WifiServiceSetPowerModeTest, TestSize.Level1)
 {
-    EXPECT_TRUE(SetPowerMode(0) == WIFI_HAL_SUCCESS);
+    EXPECT_TRUE(WifiServiceSetPowerMode(0) == WIFI_HAL_SUCCESS);
 }
 }  // namespace Wifi
 }  // namespace OHOS

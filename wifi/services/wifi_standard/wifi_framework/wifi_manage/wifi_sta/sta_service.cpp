@@ -93,6 +93,7 @@ ErrCode StaService::InitStaService(const StaServiceCallback &callbacks)
 ErrCode StaService::EnableWifi() const
 {
     WIFI_LOGI("Enter StaService::EnableWifi.\n");
+    CHECK_NULL_AND_RETURN(pStaStateMachine, WIFI_OPT_FAILED);
     pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_ENABLE_WIFI, STA_CONNECT_MODE);
     return WIFI_OPT_SUCCESS;
 }
@@ -100,6 +101,7 @@ ErrCode StaService::EnableWifi() const
 ErrCode StaService::DisableWifi() const
 {
     WIFI_LOGI("Enter StaService::DisableWifi.\n");
+    CHECK_NULL_AND_RETURN(pStaStateMachine, WIFI_OPT_FAILED);
     pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_DISABLE_WIFI);
     return WIFI_OPT_SUCCESS;
 }
@@ -173,12 +175,14 @@ ErrCode StaService::ConnectToCandidateConfig(const int uid, const int networkId)
 int StaService::AddDeviceConfig(const WifiDeviceConfig &config) const
 {
     LOGI("Enter StaService::AddDeviceConfig.\n");
+    CHECK_NULL_AND_RETURN(pStaStateMachine, WIFI_OPT_FAILED);
     int netWorkId = INVALID_NETWORK_ID;
     std::string bssid;
     WifiDeviceConfig tempDeviceConfig;
     if (WifiSettings::GetInstance().GetDeviceConfig(config.ssid, config.keyMgmt, tempDeviceConfig) == 0) {
         LOGI("A network with the same name already exists in the configuration center!\n");
         netWorkId = tempDeviceConfig.networkId;
+        CHECK_NULL_AND_RETURN(pStaAutoConnectService, WIFI_OPT_FAILED);
         bssid = config.bssid.empty() ? tempDeviceConfig.bssid : config.bssid;
         pStaAutoConnectService->EnableOrDisableBssid(bssid, true, 0);
     } else {
@@ -226,6 +230,7 @@ ErrCode StaService::RemoveDevice(int networkId) const
     }
     WifiDeviceConfig config;
     if (WifiSettings::GetInstance().GetDeviceConfig(networkId, config) == 0) {
+        CHECK_NULL_AND_RETURN(pStaAutoConnectService, WIFI_OPT_FAILED);
         pStaAutoConnectService->EnableOrDisableBssid(config.bssid, true, 0);
     }
     /* Remove network configuration directly without notification to InterfaceService. */
@@ -258,6 +263,7 @@ ErrCode StaService::RemoveAllDevice() const
 ErrCode StaService::ConnectToDevice(const WifiDeviceConfig &config) const
 {
     LOGI("Enter StaService::ConnectToDevice.\n");
+    CHECK_NULL_AND_RETURN(pStaStateMachine, WIFI_OPT_FAILED);
     int netWorkId = AddDeviceConfig(config);
     if(netWorkId == INVALID_NETWORK_ID) {
         LOGD("StaService::ConnectTo  AddDeviceConfig failed!");
@@ -276,7 +282,8 @@ ErrCode StaService::ConnectToNetwork(int networkId) const
         LOGE("WifiDeviceConfig is null!");
         return WIFI_OPT_FAILED;
     }
-
+    CHECK_NULL_AND_RETURN(pStaAutoConnectService, WIFI_OPT_FAILED);
+    CHECK_NULL_AND_RETURN(pStaStateMachine, WIFI_OPT_FAILED);
     pStaAutoConnectService->EnableOrDisableBssid(config.bssid, true, 0);
     pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_CONNECT_SAVED_NETWORK, networkId, NETWORK_SELECTED_BY_THE_USER);
     return WIFI_OPT_SUCCESS;
@@ -285,6 +292,7 @@ ErrCode StaService::ConnectToNetwork(int networkId) const
 ErrCode StaService::ReAssociate() const
 {
     WIFI_LOGI("Enter StaService::ReAssociate.\n");
+    CHECK_NULL_AND_RETURN(pStaStateMachine, WIFI_OPT_FAILED);
     pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_REASSOCIATE_NETWORK);
     return WIFI_OPT_SUCCESS;
 }
@@ -318,6 +326,8 @@ ErrCode StaService::DisableDeviceConfig(int networkId) const
 ErrCode StaService::Disconnect() const
 {
     WIFI_LOGI("Enter StaService::Disconnect.\n");
+    CHECK_NULL_AND_RETURN(pStaAutoConnectService, WIFI_OPT_FAILED);
+    CHECK_NULL_AND_RETURN(pStaStateMachine, WIFI_OPT_FAILED);
     WifiLinkedInfo linkedInfo;
     WifiSettings::GetInstance().GetLinkedInfo(linkedInfo);
     if (pStaAutoConnectService->EnableOrDisableBssid(linkedInfo.bssid, false, AP_CANNOT_HANDLE_NEW_STA)) {
@@ -330,6 +340,7 @@ ErrCode StaService::Disconnect() const
 ErrCode StaService::StartWps(const WpsConfig &config) const
 {
     WIFI_LOGI("Enter StaService::StartWps.\n");
+    CHECK_NULL_AND_RETURN(pStaStateMachine, WIFI_OPT_FAILED);
     InternalMessage *msg = pStaStateMachine->CreateMessage();
     msg->SetMessageName(WIFI_SVR_CMD_STA_STARTWPS);
     msg->SetParam1(static_cast<int>(config.setup));
@@ -342,6 +353,7 @@ ErrCode StaService::StartWps(const WpsConfig &config) const
 ErrCode StaService::CancelWps() const
 {
     WIFI_LOGI("Enter StaService::CanceltWps.\n");
+    CHECK_NULL_AND_RETURN(pStaStateMachine, WIFI_OPT_FAILED);
     pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_CANCELWPS);
     return WIFI_OPT_SUCCESS;
 }
@@ -361,6 +373,7 @@ ErrCode StaService::SetCountryCode(const std::string &countryCode) const
 ErrCode StaService::AutoConnectService(const std::vector<InterScanInfo> &scanInfos)
 {
     WIFI_LOGI("Enter StaService::AutoConnectService.\n");
+    CHECK_NULL_AND_RETURN(pStaAutoConnectService, WIFI_OPT_FAILED);
     pStaAutoConnectService->OnScanInfosReadyHandler(scanInfos);
     return WIFI_OPT_SUCCESS;
 }
@@ -378,6 +391,7 @@ void StaService::RegisterStaServiceCallback(const StaServiceCallback &callbacks)
 ErrCode StaService::ReConnect() const
 {
     WIFI_LOGI("Enter StaService::ReConnect.\n");
+    CHECK_NULL_AND_RETURN(pStaStateMachine, WIFI_OPT_FAILED);
     pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_RECONNECT_NETWORK);
     return WIFI_OPT_SUCCESS;
 }

@@ -28,6 +28,7 @@ using ::testing::AtLeast;
 using ::testing::DoAll;
 using ::testing::Eq;
 using ::testing::Return;
+using ::testing::ReturnRef;
 using ::testing::SetArgReferee;
 using ::testing::StrEq;
 using ::testing::TypedEq;
@@ -129,6 +130,10 @@ void StaSavedDeviceAppraisalTest::SaveNetworkEvaluatorSuccess1()
         .WillOnce(DoAll(SetArgReferee<2>(deviceConfig), Return(0)));
     EXPECT_CALL(WifiSettings::GetInstance(), GetSignalLevel(_, _)).Times(AtLeast(0));
     EXPECT_CALL(WifiSettings::GetInstance(), GetUserLastSelectedNetworkId()).Times(AtLeast(1)).WillOnce(Return(0));
+    EXPECT_CALL(WifiSettings::GetInstance(), GetConnectTimeoutBssid())
+        .Times(AtLeast(1))
+        .WillOnce(Return(""))
+        .WillRepeatedly(Return(""));
 
     EXPECT_TRUE(pStaSavedDeviceAppraisal->DeviceAppraisals(deviceConfig, scanInfos, info) == WIFI_OPT_SUCCESS);
 }
@@ -221,7 +226,7 @@ void StaSavedDeviceAppraisalTest::WhetherSkipDeviceSuccess1()
     deviceConfig.isEphemeral = false;
     deviceConfig.status = static_cast<int>(WifiDeviceConfigStatus::ENABLED);
 
-    EXPECT_TRUE(pStaSavedDeviceAppraisal->WhetherSkipDevice(deviceConfig) == true);
+    EXPECT_TRUE(pStaSavedDeviceAppraisal->WhetherSkipDevice(deviceConfig) == false);
 }
 
 void StaSavedDeviceAppraisalTest::WhetherSkipDeviceFail1()
@@ -231,7 +236,7 @@ void StaSavedDeviceAppraisalTest::WhetherSkipDeviceFail1()
     deviceConfig.isPasspoint = true;
     deviceConfig.isEphemeral = true;
     deviceConfig.status = static_cast<int>(WifiDeviceConfigStatus::ENABLED);
-    EXPECT_TRUE(pStaSavedDeviceAppraisal->WhetherSkipDevice(deviceConfig) == false);
+    EXPECT_TRUE(pStaSavedDeviceAppraisal->WhetherSkipDevice(deviceConfig) == true);
 }
 
 HWTEST_F(StaSavedDeviceAppraisalTest, SaveNetworkEvaluatorSuccess1, TestSize.Level1)

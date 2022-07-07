@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -29,6 +29,7 @@ using ::testing::SetArgReferee;
 using ::testing::StrEq;
 using ::testing::TypedEq;
 using ::testing::ext::TestSize;
+using ::testing::ReturnRef;
 
 namespace OHOS {
 namespace Wifi {
@@ -55,6 +56,9 @@ public:
 
 extern "C" IScanService *Create(void);
 extern "C" void Destroy(IScanService *pservice);
+
+std::vector<TrustListPolicy> refVecTrustList;
+MovingFreezePolicy defaultValue;
 HWTEST_F(ScanInterfaceTest, GCreateDestroy, TestSize.Level1)
 {
     auto p = Create();
@@ -67,11 +71,15 @@ HWTEST_F(ScanInterfaceTest, InitTest, TestSize.Level1)
     EXPECT_CALL(WifiSupplicantHalInterface::GetInstance(), RegisterSupplicantEventCallback(_)).Times(AtLeast(1));
     EXPECT_CALL(WifiStaHalInterface::GetInstance(), GetSupportFrequencies(_, _)).Times(AtLeast(1));
     EXPECT_CALL(WifiSettings::GetInstance(), GetScanControlInfo(_)).Times(AtLeast(1));
-    EXPECT_CALL(WifiSettings::GetInstance(), GetScreenState()).Times(AtLeast(1));
     EXPECT_CALL(WifiManager::GetInstance(), DealScanOpenRes()).Times(AtLeast(0));
     EXPECT_CALL(WifiSupplicantHalInterface::GetInstance(), UnRegisterSupplicantEventCallback()).Times(AtLeast(1));
     EXPECT_CALL(WifiSettings::GetInstance(), GetWhetherToAllowNetworkSwitchover()).Times(AtLeast(0));
     EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_)).Times(AtLeast(0));
+    EXPECT_CALL(WifiSettings::GetInstance(), GetAppPackageName()).WillRepeatedly(ReturnRef(""));
+    EXPECT_CALL(WifiSettings::GetInstance(), ReloadTrustListPolicies())
+        .WillRepeatedly(ReturnRef(refVecTrustList));
+    EXPECT_CALL(WifiSettings::GetInstance(), ReloadMovingFreezePolicy())
+        .WillRepeatedly(ReturnRef(defaultValue));
     pScanInterface->Init();
 }
 

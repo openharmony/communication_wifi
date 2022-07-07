@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -221,13 +221,12 @@ HWTEST_F(DhcpFuncTest, InitPidfile_TEST, TestSize.Level1)
     MockSystemFunc::SetMockFlag(true);
 
     EXPECT_CALL(MockSystemFunc::GetInstance(), open(_, _)).WillOnce(Return(-1)).WillRepeatedly(Return(1));
-    EXPECT_CALL(MockSystemFunc::GetInstance(), write(_, _, _)).WillOnce(Return(-1)).WillRepeatedly(Return(1));
     EXPECT_CALL(MockSystemFunc::GetInstance(), close(_)).WillRepeatedly(Return(0));
 
     pidDir = "./";
     pidFile = "./wlan.pid";
     EXPECT_EQ(DHCP_OPT_FAILED, DhcpFunc::InitPidfile(pidDir, pidFile));
-    EXPECT_EQ(DHCP_OPT_FAILED, DhcpFunc::InitPidfile(pidDir, pidFile));
+    EXPECT_EQ(DHCP_OPT_SUCCESS, DhcpFunc::InitPidfile(pidDir, pidFile));
     EXPECT_EQ(DHCP_OPT_SUCCESS, DhcpFunc::InitPidfile(pidDir, pidFile));
 
     MockSystemFunc::SetMockFlag(false);

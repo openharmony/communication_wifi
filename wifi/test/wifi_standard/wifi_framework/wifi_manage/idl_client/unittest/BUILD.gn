@@ -13,20 +13,20 @@
 
 import("//build/test.gni")
 import("//foundation/communication/wifi/wifi/wifi.gni")
-module_output_path = "wifi_standard/idl_client_test"
+module_output_path = "wifi/idl_client_test"
 
 config("module_private_config") {
   visibility = [ ":*" ]
   include_dirs = [
     "//utils/native/base/include",
-    "$WIFI_ROOT_DIR/tests/wifi_standard/wifi_framework/wifi_manage/idl_client/unittest",
+    "$WIFI_ROOT_DIR/test/wifi_standard/wifi_framework/wifi_manage/idl_client/unittest",
   ]
 }
 
 ohos_unittest("idl_client_unittest") {
   module_out_path = module_output_path
   sources = [
-    "$WIFI_ROOT_DIR/interfaces/innerkits/native_cpp/wifi_standard/src/wifi_p2p_msg.cpp",
+    "$WIFI_ROOT_DIR/frameworks/native/src/wifi_p2p_msg.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/common/net_helper/ip_tools.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/common/utils/wifi_global_func.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/idl_client/idl_interface/i_wifi.c",
@@ -57,7 +57,7 @@ ohos_unittest("idl_client_unittest") {
   ]
 
   include_dirs = [
-    "$WIFI_ROOT_DIR/interfaces/innerkits/native_cpp/wifi_standard/interfaces",
+    "$WIFI_ROOT_DIR/frameworks/native/interfaces",
     "$WIFI_ROOT_DIR/services/wifi_standard/ipc_framework/cRPC/include",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/common/include",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/common/config",
@@ -111,7 +111,7 @@ ohos_unittest("mock_wifi_hal_service") {
   include_dirs = [
     "//utils/native/base/include",
     "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
-    "$WIFI_ROOT_DIR/interfaces/innerkits/native_cpp/wifi_standard/interfaces",
+    "$WIFI_ROOT_DIR/frameworks/native/interfaces",
     "$WIFI_ROOT_DIR/services/wifi_standard/ipc_framework/cRPC/include",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_hal",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_hal/common",
@@ -136,7 +136,7 @@ ohos_unittest("mock_wifi_hal_service") {
 group("unittest") {
   testonly = true
   deps = [
-    ":idl_client_unittest",
-    #":mock_wifi_hal_service",
+    # ":idl_client_unittest",
+    # ":mock_wifi_hal_service",
   ]
 }

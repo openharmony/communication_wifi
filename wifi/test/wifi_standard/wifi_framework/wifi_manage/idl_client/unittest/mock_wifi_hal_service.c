@@ -373,12 +373,6 @@ WifiErrorNo DisassociateSta(const unsigned char *mac, int lenMac)
     WifiHalCbStaJoin(buff);
     return WIFI_HAL_SUCCESS;
 }
-
-WifiErrorNo GetValidFrequenciesForBand(int32_t band, int *frequencies, int32_t *size)
-{
-    return WIFI_HAL_SUCCESS;
-}
-
 /* --------- wifi_hal_ap_interface.h   end -------------*/
 
 /* --------- wifi_hal_chip_interface.h   begin -------------*/

@@ -120,7 +120,7 @@ public:
      */
     class WpaStartingState : public State {
     public:
-        explicit WpaStartingState(StaStateMachine *pStaStateMachine);
+        explicit WpaStartingState(StaStateMachine *staStateMachine);
         ~WpaStartingState() override;
         void InitWpsSettings();
         void GoInState() override;
@@ -136,7 +136,7 @@ public:
      */
     class WpaStartedState : public State {
     public:
-        explicit WpaStartedState(StaStateMachine *pStaStateMachine);
+        explicit WpaStartedState(StaStateMachine *staStateMachine);
         ~WpaStartedState() override;
         void GoInState() override;
         void GoOutState() override;
@@ -151,7 +151,7 @@ public:
      */
     class WpaStoppingState : public State {
     public:
-        explicit WpaStoppingState(StaStateMachine *pStaStateMachine);
+        explicit WpaStoppingState(StaStateMachine *staStateMachine);
         ~WpaStoppingState() override;
         void GoInState() override;
         void GoOutState() override;
@@ -166,7 +166,7 @@ public:
      */
     class LinkState : public State {
     public:
-        explicit LinkState(StaStateMachine *pStaStateMachine);
+        explicit LinkState(StaStateMachine *staStateMachine);
         ~LinkState() override;
         void GoInState() override;
         void GoOutState() override;
@@ -193,7 +193,7 @@ public:
      */
     class SeparatedState : public State {
     public:
-        explicit SeparatedState(StaStateMachine *pStaStateMachine);
+        explicit SeparatedState(StaStateMachine *staStateMachine);
         ~SeparatedState() override;
         void GoInState() override;
         void GoOutState() override;
@@ -208,7 +208,7 @@ public:
      */
     class ApLinkedState : public State {
     public:
-        explicit ApLinkedState(StaStateMachine *pStaStateMachine);
+        explicit ApLinkedState(StaStateMachine *staStateMachine);
         ~ApLinkedState() override;
         void GoInState() override;
         void GoOutState() override;
@@ -223,7 +223,7 @@ public:
      */
     class StaWpsState : public State {
     public:
-        explicit StaWpsState(StaStateMachine *pStaStateMachine);
+        explicit StaWpsState(StaStateMachine *staStateMachine);
         ~StaWpsState() override;
         void GoInState() override;
         void GoOutState() override;
@@ -238,7 +238,7 @@ public:
      */
     class GetIpState : public State {
     public:
-        explicit GetIpState(StaStateMachine *pStaStateMachine);
+        explicit GetIpState(StaStateMachine *staStateMachine);
         ~GetIpState() override;
         void GoInState() override;
         void GoOutState() override;
@@ -265,7 +265,7 @@ public:
      */
     class ApRoamingState : public State {
     public:
-        explicit ApRoamingState(StaStateMachine *pStaStateMachine);
+        explicit ApRoamingState(StaStateMachine *staStateMachine);
         ~ApRoamingState() override;
         void GoInState() override;
         void GoOutState() override;
@@ -281,7 +281,7 @@ public:
          * @Description : Construct a new dhcp result notify object
          *
          */
-        explicit DhcpResultNotify(StaStateMachine *pStaStateMachine);
+        explicit DhcpResultNotify(StaStateMachine *staStateMachine);
 
         /**
          * @Description : Destroy the dhcp result notify object

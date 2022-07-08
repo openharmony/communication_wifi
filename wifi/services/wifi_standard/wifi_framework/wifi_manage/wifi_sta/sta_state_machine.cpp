@@ -676,11 +676,10 @@ void StaStateMachine::DealSignalPollResult(InternalMessage *msg)
     }
     WifiWpaSignalInfo signalInfo;
     WifiStaHalInterface::GetInstance().GetConnectSignalInfo(linkedInfo.bssid, signalInfo);
-    LOGI("DealSignalPollResult, rssi:%{public}d, txLinkSpeed:%{public}d, rxLinkSpeed:%{public}d, freq:%{public}d.\n",
-        signalInfo.signal,
-        signalInfo.txrate,
-        signalInfo.rxrate,
-        signalInfo.frequency);
+    LOGI("DealSignalPollResult, rssi:%{public}d, txLinkSpeed:%{public}d, rxLinkSpeed:%{public}d, "
+        "freq:%{public}d, noise:%{public}d.\n",
+        signalInfo.signal, signalInfo.txrate, signalInfo.rxrate, signalInfo.frequency,
+        signalInfo.noise);
     if (signalInfo.signal > INVALID_RSSI_VALUE && signalInfo.signal < MAX_RSSI_VALUE) {
         if (signalInfo.signal > 0) {
             linkedInfo.rssi = setRssi((signalInfo.signal - SIGNAL_INFO));
@@ -688,8 +687,9 @@ void StaStateMachine::DealSignalPollResult(InternalMessage *msg)
             linkedInfo.rssi = setRssi(signalInfo.signal);
         }
         int currentSignalLevel = WifiSettings::GetInstance().GetSignalLevel(linkedInfo.rssi, linkedInfo.band);
-        LOGI("DealSignalPollResult linkedInfo.rssi:%{public}d, linkedInfo.band:%{public}d.\n",
-            linkedInfo.rssi, linkedInfo.band);
+        LOGI("DealSignalPollResult, rssi:%{public}d, band:%{public}d, "
+            "connState:%{public}d, detailedState:%{public}d.\n",
+            linkedInfo.rssi, linkedInfo.band, linkedInfo.connState, linkedInfo.detailedState);
         LOGI("DealSignalPollResult currentSignalLevel:%{public}d, lastSignalLevel:%{public}d.\n",
             currentSignalLevel, lastSignalLevel);
         if (currentSignalLevel != lastSignalLevel) {

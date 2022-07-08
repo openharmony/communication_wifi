@@ -415,7 +415,8 @@ bool StaAutoConnectService::RoamingEncryptionModeCheck(
 
 bool StaAutoConnectService::AllowAutoSelectDevice(const std::vector<InterScanInfo> &scanInfos, WifiLinkedInfo &info)
 {
-    WIFI_LOGI("Allow auto select device, detailed status is %{public}d\n", info.detailedState);
+    WIFI_LOGI("Allow auto select device, connState=%{public}d, detailedState=%{public}d\n",
+        info.connState, info.detailedState);
     if (scanInfos.empty()) {
         WIFI_LOGE("No network,skip network selection.\n");
         return false;
@@ -446,6 +447,7 @@ bool StaAutoConnectService::AllowAutoSelectDevice(const std::vector<InterScanInf
         case DetailedState::DISCONNECTED:
         case DetailedState::CONNECTION_TIMEOUT:
         case DetailedState::FAILED:
+        case DetailedState::PASSWORD_ERROR:
             WIFI_LOGI("The current status is in can connect status: %{public}d\n", info.detailedState);
             return true;
 
@@ -459,6 +461,7 @@ bool StaAutoConnectService::AllowAutoSelectDevice(const std::vector<InterScanInf
             return true;
 
         default:
+            WIFI_LOGE("not allowed auto select!\n");
             return false;
     }
     return false;

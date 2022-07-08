@@ -68,6 +68,13 @@ enum class RecommendStatus {
     RS_FAILURE
 };
 
+#define CFG_CALLBACK_BYTE 4
+
+enum class CfgType {
+    CFG_INVALID = -1,
+    GET_SELF_CONFIG = 1,
+};
+
 class Hid2dConnectConfig {
 public:
     Hid2dConnectConfig() : m_ssid(""), m_bssid(""), m_preSharedKey(""),
@@ -145,6 +152,18 @@ public:
     int centerFreq2;
     /* band width */
     int bandwidth;
+};
+
+class Hid2dUpperScene {
+public:
+    /* The mac address of the device */
+    std::string mac;
+    /* The scene of upper layer, hexadecimal digit, currently bit 0-2 is valid, 0: video, 1: audio, 2: file */
+    unsigned int scene;
+    /* Frame rate, -1/30/60 is valid */
+    int fps;
+    /* band width, valid only in video scenes, the default value is 0 */
+    unsigned int bw;
 };
 }  // namespace Wifi
 }  // namespace OHOS

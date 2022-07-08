@@ -15,12 +15,12 @@
 
 #include "wifi_napi_event.h"
 #include <uv.h>
-#include "wifi_napi_utils.h"
-#include "wifi_device.h"
-#include "wifi_scan.h"
-#include "wifi_logger.h"
-#include "ipc_skeleton.h"
 #include "accesstoken_kit.h"
+#include "ipc_skeleton.h"
+#include "wifi_device.h"
+#include "wifi_logger.h"
+#include "wifi_napi_utils.h"
+#include "wifi_scan.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -380,6 +380,9 @@ public:
     }
 
     void OnP2pActionResult(P2pActionCallback action, ErrCode code) override {
+    }
+
+    void OnConfigChanged(CfgType type, char* data, int dataLen) override {
     }
 
     OHOS::sptr<OHOS::IRemoteObject> AsObject() override {

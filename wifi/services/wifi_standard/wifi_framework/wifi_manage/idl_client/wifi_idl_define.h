@@ -64,6 +64,8 @@ typedef enum WifiIdlEvent {
     WIFI_IDL_CBK_CMD_P2P_SERV_DISC_REQ_EVENT,           /* Service discovery request event */
 } WifiIdlEvent;
 
+#define WIFI_IDL_FALSE 0
+#define WIFI_IDL_TRUE 1
 #define SINGLE_SCAN_FAILED 1  /* Scan failure notification */
 #define SINGLE_SCAN_OVER_OK 2 /* Scan success notification */
 #define PNO_SCAN_OVER_OK 3    /* PNO Scan success notification */
@@ -87,5 +89,4 @@ typedef enum WifiIdlEvent {
 #define WIFI_IDL_P2P_TMP_BUFFER_SIZE_128 128
 #define WIFI_IDL_P2P_SERVICE_TYPE_MIN_SIZE 3
 #define WIFI_IDL_P2P_SERVICE_TYPE_2_POS 2
-
 #endif

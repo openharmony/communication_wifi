@@ -21,6 +21,7 @@
 #include <deque>
 #include <mutex>
 #include <condition_variable>
+#include <functional>
 
 #include "define.h"
 #include "wifi_internal_msg.h"
@@ -52,6 +53,10 @@ enum class WifiCloseServiceCode {
     AP_SERVICE_CLOSE,
     P2P_SERVICE_CLOSE,
     SERVICE_THREAD_EXIT,
+};
+
+struct WifiCfgMonitorEventCallback {
+    std::function<void(int)> onStaConnectionChange = nullptr;
 };
 
 class WifiManager {
@@ -129,6 +134,8 @@ public:
 
     static WifiManager &GetInstance();
 
+    void RegisterCfgMonitorCallback(WifiCfgMonitorEventCallback callback);
+
 private:
     void PushServiceCloseMsg(WifiCloseServiceCode code);
     void InitStaCallback(void);
@@ -176,6 +183,7 @@ private:
     static void DealP2pDiscoveryChanged(bool bState);
     static void DealP2pGroupsChanged(void);
     static void DealP2pActionResult(P2pActionCallback action, ErrCode code);
+    static void DealConfigChanged(CfgType type, char* data, int dataLen);
 #endif
     static void AutoStartStaService(void);
 #ifdef FEATURE_P2P_SUPPORT
@@ -198,6 +206,7 @@ private:
 #endif
 #ifdef FEATURE_P2P_SUPPORT
     IP2pServiceCallbacks mP2pCallback;
+    static WifiCfgMonitorEventCallback cfgMonitorCallback;
 #endif
     InitStatus mInitStatus;
     long mSupportedFeatures;

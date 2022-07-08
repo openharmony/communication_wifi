@@ -38,6 +38,9 @@ public:
 
     bool IsSingleCallback() const;
     void SetSingleCallback(const bool isSingleCallback);
+
+    virtual ErrCode MonitorCfgChange(void) = 0;
+
 protected:
     sptr<IWifiP2pCallback> GetCallback() const;
 
@@ -83,6 +86,7 @@ private:
     void OnHid2dGetChannelListFor5G(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
     void OnHid2dGetSelfWifiCfgInfo(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
     void OnHid2dSetPeerWifiCfgInfo(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
+    void OnHid2dSetUpperScene(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
     bool ReadWifiP2pServiceInfo(MessageParcel &data, WifiP2pServiceInfo &info);
     bool ReadWifiP2pServiceRequest(MessageParcel &data, WifiP2pDevice &device, WifiP2pServiceRequest &request);
     void WriteWifiP2pServiceInfo(MessageParcel &reply, const WifiP2pServiceInfo &info);

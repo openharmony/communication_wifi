@@ -19,9 +19,9 @@
 #include "dhcp_define.h"
 #include "wifi_logger.h"
 
-DEFINE_WIFILOG_P2P_LABEL("Hid2dIpPool");
 namespace OHOS {
 namespace Wifi {
+DEFINE_WIFILOG_P2P_LABEL("Hid2dIpPool");
 std::list<std::string> IpPool::ipList;
 std::map<std::string, std::string> IpPool::mapGcMacToAllocIp;
 const std::string PATTERN_IP = "^(([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.){3}([01]?\\d\\d?|2[0-4]\\d|25[0-5])$";

@@ -938,11 +938,34 @@ WifiErrorNo WifiIdlClient::RequestFirmwareDebugInfo(std::string &debugInfo)
     return WIFI_IDL_OPT_OK;
 }
 
-WifiErrorNo WifiIdlClient::SetWifiPowerMode(int mode)
+WifiErrorNo WifiIdlClient::ReqIsSupportDbdc(bool &isSupport) const
 {
     CHECK_CLIENT_NOT_NULL;
-    LOGD("start SetWifiPowerMode mode %{public}d", mode);
-    return WIFI_IDL_OPT_OK;
+    return IsChipSupportDbdc(&isSupport);
+}
+
+WifiErrorNo WifiIdlClient::ReqIsSupportCsa(bool &isSupport) const
+{
+    CHECK_CLIENT_NOT_NULL;
+    return IsChipSupportCsa(&isSupport);
+}
+
+WifiErrorNo WifiIdlClient::ReqIsSupportRadarDetect(bool &isSupport) const
+{
+    CHECK_CLIENT_NOT_NULL;
+    return IsChipSupportRadarDetect(&isSupport);
+}
+
+WifiErrorNo WifiIdlClient::ReqIsSupportDfsChannel(bool &isSupport) const
+{
+    CHECK_CLIENT_NOT_NULL;
+    return IsChipSupportDfsChannel(&isSupport);
+}
+
+WifiErrorNo WifiIdlClient::ReqIsSupportIndoorChannel(bool &isSupport) const
+{
+    CHECK_CLIENT_NOT_NULL;
+    return IsChipSupportIndoorChannel(&isSupport);
 }
 
 WifiErrorNo WifiIdlClient::ReqStartSupplicant(void)

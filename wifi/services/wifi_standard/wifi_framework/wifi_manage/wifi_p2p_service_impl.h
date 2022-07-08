@@ -369,6 +369,22 @@ public:
         char cfgData[CFG_DATA_MAX_BYTES], int setDataValidLen) override;
 
     /**
+     * @Description Set the scene of upper layer
+     *
+     * @param ifName - interface name
+     * @param scene - scene
+     * @return ErrCode - operate result
+     */
+    ErrCode Hid2dSetUpperScene(const std::string& ifName, const Hid2dUpperScene& scene) override;
+
+    /**
+     * @Description Monitor the wifi configuration change
+     *
+     * @return ErrCode - operate result
+     */
+    ErrCode MonitorCfgChange(void) override;
+
+    /**
      * @Description dump p2p information
      *
      * @param fd - file descriptor

@@ -115,7 +115,6 @@ typedef struct WifiP2pLinkedInfo {
     int isP2pGroupOwner;
     unsigned char groupOwnerAddress[COMMON_MAC_LEN];
 } WifiP2pLinkedInfo;
-
 #ifdef __cplusplus
 }
 #endif

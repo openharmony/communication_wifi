@@ -17,6 +17,7 @@
 #include <file_ex.h>
 #include "wifi_permission_utils.h"
 #include "wifi_auth_center.h"
+#include "wifi_common_util.h"
 #include "wifi_config_center.h"
 #include "wifi_manager.h"
 #include "wifi_service_manager.h"
@@ -26,7 +27,6 @@
 #include "wifi_dumper.h"
 #include "wifi_hid2d_service_utils.h"
 #include "if_config.h"
-#include "wifi_hid2d_cfg.h"
 #include "wifi_net_agent.h"
 
 DEFINE_WIFILOG_P2P_LABEL("WifiP2pServiceImpl");
@@ -781,16 +781,16 @@ ErrCode WifiP2pServiceImpl::SetP2pWfdInfo(const WifiP2pWfdInfo &wfdInfo)
 ErrCode WifiP2pServiceImpl::Hid2dRequestGcIp(const std::string& gcMac, std::string& ipAddr)
 {
     WIFI_LOGI("Hid2dRequestGcIp");
-
-    WifiP2pGroupInfo group;
-    ErrCode ret = GetCurrentGroup(group);
-    if (ret != WIFI_OPT_SUCCESS) {
-        WIFI_LOGI("Apply IP get current group failed!");
+    if (!IsP2pServiceRunning()) {
+        WIFI_LOGE("P2pService is not runing!");
+        return WIFI_OPT_P2P_NOT_OPENED;
     }
-
-    IpPool::InitIpPool(group.GetGoIpAddress());
-    ipAddr = IpPool::GetIp(gcMac);
-    return WIFI_OPT_SUCCESS;
+    IP2pService *pService = WifiServiceManager::GetInstance().GetP2pServiceInst();
+    if (pService == nullptr) {
+        WIFI_LOGE("Get P2P service failed!");
+        return WIFI_OPT_P2P_NOT_OPENED;
+    }
+    return pService->Hid2dRequestGcIp(gcMac, ipAddr);
 }
 
 ErrCode WifiP2pServiceImpl::Hid2dSharedlinkIncrease()
@@ -806,15 +806,29 @@ ErrCode WifiP2pServiceImpl::Hid2dSharedlinkIncrease()
         WIFI_LOGE("Hid2dSharedlinkIncrease P2P not in connected state!");
         return WIFI_OPT_FAILED;
     }
-    SharedLinkManager::IncreaseSharedLink();
+    IP2pService *pService = WifiServiceManager::GetInstance().GetP2pServiceInst();
+    if (pService == nullptr) {
+        WIFI_LOGE("Get P2P service failed!");
+        return WIFI_OPT_FAILED;
+    }
+    pService->IncreaseSharedLink();
     return WIFI_OPT_SUCCESS;
 }
 
 ErrCode WifiP2pServiceImpl::Hid2dSharedlinkDecrease()
 {
     WIFI_LOGI("Hid2dSharedlinkDecrease");
-    SharedLinkManager::DecreaseSharedLink();
-    if (SharedLinkManager::GetSharedLinkCount() == 0) {
+    if (!IsP2pServiceRunning()) {
+        WIFI_LOGE("P2pService is not runing!");
+        return WIFI_OPT_P2P_NOT_OPENED;
+    }
+    IP2pService *pService = WifiServiceManager::GetInstance().GetP2pServiceInst();
+    if (pService == nullptr) {
+        WIFI_LOGE("Get P2P service failed!");
+        return WIFI_OPT_P2P_NOT_OPENED;
+    }
+    pService->DecreaseSharedLink();
+    if (pService->GetSharedLinkCount() == 0) {
         WIFI_LOGI("Shared link count == 0, remove group!");
         RemoveGroup();
     }
@@ -889,24 +903,38 @@ ErrCode WifiP2pServiceImpl::Hid2dGetRecommendChannel(const RecommendChannelReque
     RecommendChannelResponse& response)
 {
     WIFI_LOGI("Hid2dGetRecommendChannel");
-
-    /*
-     * channel: 36, 40, 44, 48, 52, 56, 60, 64, 149, 153, 157, 161, 165
-     * center frequency: 5180, 5200, 5220, 5240, 5260, 5280, 5300, 5320, 5745, 5765, 5785, 5805, 5825
-    */
-    constexpr int defaultRecommendFrequency = 5180;
+    if (!IsP2pServiceRunning()) {
+        WIFI_LOGE("P2pService is not runing!");
+        return WIFI_OPT_P2P_NOT_OPENED;
+    }
+    IP2pService *pService = WifiServiceManager::GetInstance().GetP2pServiceInst();
+    if (pService == nullptr) {
+        WIFI_LOGE("Get P2P service failed!");
+        return WIFI_OPT_P2P_NOT_OPENED;
+    }
+    int channel = pService->GetP2pRecommendChannel();
+    int freq = ChannelToFrequency(channel);
+    WIFI_LOGI("Get recommended channel: %{public}d, freq: %{public}d", channel, freq);
+    response.centerFreq = freq;
     response.status = RecommendStatus::RS_SUCCESS;
-    response.centerFreq2 = defaultRecommendFrequency;
     return WIFI_OPT_SUCCESS;
 }
 
 ErrCode WifiP2pServiceImpl::Hid2dGetChannelListFor5G(std::vector<int>& vecChannelList)
 {
     WIFI_LOGI("Hid2dGetChannelListFor5G");
+    ChannelsTable channels;
+    WifiSettings::GetInstance().GetValidChannels(channels);
+    if (channels.find(BandType::BAND_5GHZ) != channels.end()) {
+        vecChannelList = channels[BandType::BAND_5GHZ];
+    }
 
-    std::vector<int> temp5Glist = {36, 40, 44, 48, 52, 56, 60, 64, 149, 153, 157, 161, 165};
-    vecChannelList.clear();
-    std::swap(temp5Glist, vecChannelList);
+    std::string strChannel;
+    for (auto channel : vecChannelList) {
+        strChannel += std::to_string(channel) + ",";
+    }
+    WIFI_LOGI("5G channel list[%{public}d]: %{public}s",
+        (int)vecChannelList.size(), strChannel.c_str());
     return WIFI_OPT_SUCCESS;
 }
 
@@ -914,20 +942,66 @@ ErrCode WifiP2pServiceImpl::Hid2dGetSelfWifiCfgInfo(SelfCfgType cfgType,
     char cfgData[CFG_DATA_MAX_BYTES], int* getDatValidLen)
 {
     WIFI_LOGI("Hid2dGetSelfWifiCfgInfo");
-    WifiHid2dCfg::GetInstance().GetSelfDeviceCfg(cfgType, cfgData, *getDatValidLen);
-    return (*getDatValidLen == 0) ? WIFI_OPT_FAILED : WIFI_OPT_SUCCESS;
+    if (!IsP2pServiceRunning()) {
+        WIFI_LOGE("P2pService is not runing!");
+        return WIFI_OPT_P2P_NOT_OPENED;
+    }
+
+    IP2pService *pService = WifiServiceManager::GetInstance().GetP2pServiceInst();
+    if (pService == nullptr) {
+        WIFI_LOGE("Get P2P service failed!");
+        return WIFI_OPT_P2P_NOT_OPENED;
+    }
+    return pService->Hid2dGetSelfWifiCfgInfo(cfgType, cfgData, getDatValidLen);
 }
 
 ErrCode WifiP2pServiceImpl::Hid2dSetPeerWifiCfgInfo(PeerCfgType cfgType,
     char cfgData[CFG_DATA_MAX_BYTES], int setDataValidLen)
 {
     WIFI_LOGI("Hid2dSetPeerWifiCfgInfo");
-    int ret = WifiHid2dCfg::GetInstance().Hid2dSetPeerWifiCfgInfo(cfgType, cfgData, setDataValidLen);
-    if (ret != 0) {
-        WIFI_LOGE("set peer wifi cfg info failed: %{public}d", ret);
-        return WIFI_OPT_FAILED;
+    if (!IsP2pServiceRunning()) {
+        WIFI_LOGE("P2pService is not runing!");
+        return WIFI_OPT_P2P_NOT_OPENED;
     }
-    return WIFI_OPT_SUCCESS;
+
+    IP2pService *pService = WifiServiceManager::GetInstance().GetP2pServiceInst();
+    if (pService == nullptr) {
+        WIFI_LOGE("Get P2P service failed!");
+        return WIFI_OPT_P2P_NOT_OPENED;
+    }
+    return pService->Hid2dSetPeerWifiCfgInfo(cfgType, cfgData, setDataValidLen);
+}
+
+ErrCode WifiP2pServiceImpl::Hid2dSetUpperScene(const std::string& ifName, const Hid2dUpperScene& scene)
+{
+    WIFI_LOGI("Hid2dSetUpperScene");
+    if (!IsP2pServiceRunning()) {
+        WIFI_LOGE("P2pService is not runing!");
+        return WIFI_OPT_P2P_NOT_OPENED;
+    }
+
+    IP2pService *pService = WifiServiceManager::GetInstance().GetP2pServiceInst();
+    if (pService == nullptr) {
+        WIFI_LOGE("Get P2P service failed!");
+        return WIFI_OPT_P2P_NOT_OPENED;
+    }
+    return pService->Hid2dSetUpperScene(ifName, scene);
+}
+
+ErrCode WifiP2pServiceImpl::MonitorCfgChange(void)
+{
+    WIFI_LOGI("MonitorCfgChange");
+    if (!IsP2pServiceRunning()) {
+        WIFI_LOGE("P2pService is not runing!");
+        return WIFI_OPT_P2P_NOT_OPENED;
+    }
+
+    IP2pService *pService = WifiServiceManager::GetInstance().GetP2pServiceInst();
+    if (pService == nullptr) {
+        WIFI_LOGE("Get P2P service failed!");
+        return WIFI_OPT_P2P_NOT_OPENED;
+    }
+    return pService->MonitorCfgChange();
 }
 
 void WifiP2pServiceImpl::SaBasicDump(std::string& result)

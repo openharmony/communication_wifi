@@ -1485,6 +1485,37 @@ ErrCode WifiP2pProxy::Hid2dSetPeerWifiCfgInfo(PeerCfgType cfgType,
     return ErrCode(reply.ReadInt32());
 }
 
+ErrCode WifiP2pProxy::Hid2dSetUpperScene(const std::string& ifName, const Hid2dUpperScene& scene)
+{
+    if (mRemoteDied) {
+        WIFI_LOGD("failed to `%{public}s`,remote service is died!", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    MessageOption option;
+    MessageParcel data;
+    MessageParcel reply;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    data.WriteInt32(0);
+    data.WriteCString(ifName.c_str());
+    data.WriteCString(scene.mac.c_str());
+    data.WriteUint32(scene.scene);
+    data.WriteInt32(scene.fps);
+    data.WriteUint32(scene.bw);
+    int error = Remote()->SendRequest(WIFI_SVR_CMD_SET_UPPER_SCENE, data, reply, option);
+    if (error != ERR_NONE) {
+        WIFI_LOGW("Set Attr(%{public}d) failed", WIFI_SVR_CMD_SET_UPPER_SCENE);
+        return WIFI_OPT_FAILED;
+    }
+    int exception = reply.ReadInt32();
+    if (exception) {
+        return WIFI_OPT_FAILED;
+    }
+    return ErrCode(reply.ReadInt32());
+}
+
 void WifiP2pProxy::OnRemoteDied(const wptr<IRemoteObject>& remoteObject)
 {
     WIFI_LOGE("Remote service is died!");

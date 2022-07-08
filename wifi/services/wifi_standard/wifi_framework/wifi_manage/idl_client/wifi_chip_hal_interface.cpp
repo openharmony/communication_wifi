@@ -91,10 +91,34 @@ WifiErrorNo WifiChipHalInterface::RequestFirmwareDebugInfo(std::string &debugInf
     return mIdlClient->RequestFirmwareDebugInfo(debugInfo);
 }
 
-WifiErrorNo WifiChipHalInterface::SetWifiPowerMode(int mode)
+WifiErrorNo WifiChipHalInterface::IsSupportDbdc(bool &isSupport) const
 {
     CHECK_NULL_AND_RETURN(mIdlClient, WIFI_IDL_OPT_FAILED);
-    return mIdlClient->SetWifiPowerMode(mode);
+    return mIdlClient->ReqIsSupportDbdc(isSupport);
+}
+
+WifiErrorNo WifiChipHalInterface::IsSupportCsa(bool &isSupport) const
+{
+    CHECK_NULL_AND_RETURN(mIdlClient, WIFI_IDL_OPT_FAILED);
+    return mIdlClient->ReqIsSupportCsa(isSupport);
+}
+
+WifiErrorNo WifiChipHalInterface::IsSupportRadarDetect(bool &isSupport) const
+{
+    CHECK_NULL_AND_RETURN(mIdlClient, WIFI_IDL_OPT_FAILED);
+    return mIdlClient->ReqIsSupportRadarDetect(isSupport);
+}
+
+WifiErrorNo WifiChipHalInterface::IsSupportDfsChannel(bool &isSupport) const
+{
+    CHECK_NULL_AND_RETURN(mIdlClient, WIFI_IDL_OPT_FAILED);
+    return mIdlClient->ReqIsSupportDfsChannel(isSupport);
+}
+
+WifiErrorNo WifiChipHalInterface::IsSupportIndoorChannel(bool &isSupport) const
+{
+    CHECK_NULL_AND_RETURN(mIdlClient, WIFI_IDL_OPT_FAILED);
+    return mIdlClient->ReqIsSupportIndoorChannel(isSupport);
 }
 }  // namespace Wifi
 }  // namespace OHOS

@@ -235,6 +235,79 @@ public:
      * @return ErrCode - operation result
      */
     virtual ErrCode Hid2dConnect(const Hid2dConnectConfig& config) = 0;
+
+    /**
+     * @Description Get self config info
+     *
+     * @param cfgType - config type
+     * @param cfgData - config data
+     * @param getDatValidLen - data length
+     * @return ErrCode - operate result
+     */
+    virtual ErrCode Hid2dGetSelfWifiCfgInfo(SelfCfgType cfgType,
+        char cfgData[CFG_DATA_MAX_BYTES], int* getDatValidLen) = 0;
+
+    /**
+     * @Description Set self config info
+     *
+     * @param cfgType - config type
+     * @param cfgData - config data
+     * @param setDataValidLen - data length
+     * @return ErrCode - operate result
+     */
+    virtual ErrCode Hid2dSetPeerWifiCfgInfo(PeerCfgType cfgType,
+        char cfgData[CFG_DATA_MAX_BYTES], int setDataValidLen) = 0;
+
+    /**
+     * @Description Set self config info
+     *
+     * @param gcMac - gc mac address
+     * @param ipAddr - allocated ip address
+     * @return ErrCode - operate result
+     */
+    virtual ErrCode Hid2dRequestGcIp(const std::string& gcMac, std::string& ipAddr) = 0;
+
+    /**
+     * @Description Increase the reference count of the hid2d service.
+     *
+     */
+    virtual void IncreaseSharedLink(void) = 0;
+
+    /**
+     * @Description Decrease the reference count of the hid2d service.
+     *
+     */
+    virtual void DecreaseSharedLink(void) = 0;
+
+    /**
+     * @Description Get the reference count of the hid2d service.
+     *
+     * @return int - reference count
+     */
+    virtual int GetSharedLinkCount(void) = 0;
+
+    /**
+     * @Description - Get P2P recommended channel.
+     *
+     * @return - int - Recommended channel
+     */
+    virtual int GetP2pRecommendChannel(void) = 0;
+
+    /**
+     * @Description Set the scene of upper layer
+     *
+     * @param ifName - interface name
+     * @param scene - scene
+     * @return ErrCode - operate result
+     */
+    virtual ErrCode Hid2dSetUpperScene(const std::string& ifName, const Hid2dUpperScene& scene) = 0;
+
+    /**
+     * @Description Monitor the wifi configuration change
+     *
+     * @return ErrCode - operate result
+     */
+    virtual ErrCode MonitorCfgChange(void) = 0;
 };
 } // namespace Wifi
 } // namespace OHOS

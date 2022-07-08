@@ -84,6 +84,15 @@ public:
      */
     void OnP2pActionResult(P2pActionCallback action, ErrCode code) override;
 
+    /**
+     * @Description Config changed callback.
+     *
+     * @param type - Config type
+     * @param cfgData - Config data
+     * @param dataLen  - Config data length
+     */
+    void OnConfigChanged(CfgType type, char* cfgData, int dataLen) override;
+
 private:
     void WriteWifiP2pDeviceData(MessageParcel &data, const WifiP2pDevice &device);
 

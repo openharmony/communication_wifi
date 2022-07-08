@@ -320,20 +320,116 @@ WifiErrorNo RequestFirmwareDebugDump(unsigned char *bytes, int32_t *size)
     return result;
 }
 
-WifiErrorNo SetPowerMode(uint8_t mode)
+WifiErrorNo IsChipSupportDbdc(bool *isSupport)
 {
     RpcClient *client = GetChipRpcClient();
     LockRpcClient(client);
     Context *context = client->context;
     WriteBegin(context, 0);
-    WriteFunc(context, "SetPowerMode");
-    WriteInt(context, mode);
+    WriteFunc(context, "IsChipSupportDbdc");
     WriteEnd(context);
-    if (RpcClientCall(client, "SetPowerMode") != WIFI_IDL_OPT_OK) {
-        return WIFI_IDL_OPT_FAILED;
+    if (RpcClientCall(client, "IsChipSupportDbdc") != WIFI_IDL_OPT_OK) {
+        return false;
     }
     int result = WIFI_IDL_OPT_FAILED;
     ReadInt(context, &result);
+    int retValue = WIFI_IDL_FALSE;
+    if (result == WIFI_IDL_OPT_OK) {
+        ReadInt(context, &retValue);
+        *isSupport = (retValue == WIFI_IDL_TRUE);
+    }
+    ReadClientEnd(client);
+    UnlockRpcClient(client);
+    return result;
+}
+
+WifiErrorNo IsChipSupportCsa(bool *isSupport)
+{
+    RpcClient *client = GetChipRpcClient();
+    LockRpcClient(client);
+    Context *context = client->context;
+    WriteBegin(context, 0);
+    WriteFunc(context, "IsChipSupportCsa");
+    WriteEnd(context);
+    if (RpcClientCall(client, "IsChipSupportCsa") != WIFI_IDL_OPT_OK) {
+        return false;
+    }
+    int result = WIFI_IDL_OPT_FAILED;
+    ReadInt(context, &result);
+    int retValue = WIFI_IDL_FALSE;
+    if (result == WIFI_IDL_OPT_OK) {
+        ReadInt(context, &retValue);
+        *isSupport = (retValue == WIFI_IDL_TRUE);
+    }
+    ReadClientEnd(client);
+    UnlockRpcClient(client);
+    return result;
+}
+
+WifiErrorNo IsChipSupportRadarDetect(bool *isSupport)
+{
+    RpcClient *client = GetChipRpcClient();
+    LockRpcClient(client);
+    Context *context = client->context;
+    WriteBegin(context, 0);
+    WriteFunc(context, "IsChipSupportRadarDetect");
+    WriteEnd(context);
+    if (RpcClientCall(client, "IsChipSupportRadarDetect") != WIFI_IDL_OPT_OK) {
+        return false;
+    }
+    int result = WIFI_IDL_OPT_FAILED;
+    ReadInt(context, &result);
+    int retValue = WIFI_IDL_FALSE;
+    if (result == WIFI_IDL_OPT_OK) {
+        ReadInt(context, &retValue);
+        *isSupport = (retValue == WIFI_IDL_TRUE);
+    }
+    ReadClientEnd(client);
+    UnlockRpcClient(client);
+    return result;
+}
+
+WifiErrorNo IsChipSupportDfsChannel(bool *isSupport)
+{
+    RpcClient *client = GetChipRpcClient();
+    LockRpcClient(client);
+    Context *context = client->context;
+    WriteBegin(context, 0);
+    WriteFunc(context, "IsChipSupportDfsChannel");
+    WriteEnd(context);
+    if (RpcClientCall(client, "IsChipSupportDfsChannel") != WIFI_IDL_OPT_OK) {
+        return false;
+    }
+    int result = WIFI_IDL_OPT_FAILED;
+    ReadInt(context, &result);
+    int retValue = WIFI_IDL_FALSE;
+    if (result == WIFI_IDL_OPT_OK) {
+        ReadInt(context, &retValue);
+        *isSupport = (retValue == WIFI_IDL_TRUE);
+    }
+    ReadClientEnd(client);
+    UnlockRpcClient(client);
+    return result;
+}
+
+WifiErrorNo IsChipSupportIndoorChannel(bool *isSupport)
+{
+    RpcClient *client = GetChipRpcClient();
+    LockRpcClient(client);
+    Context *context = client->context;
+    WriteBegin(context, 0);
+    WriteFunc(context, "IsChipSupportIndoorChannel");
+    WriteEnd(context);
+    if (RpcClientCall(client, "IsChipSupportIndoorChannel") != WIFI_IDL_OPT_OK) {
+        return false;
+    }
+    int result = WIFI_IDL_OPT_FAILED;
+    ReadInt(context, &result);
+    int retValue = WIFI_IDL_FALSE;
+    if (result == WIFI_IDL_OPT_OK) {
+        ReadInt(context, &retValue);
+        *isSupport = (retValue == WIFI_IDL_TRUE);
+    }
     ReadClientEnd(client);
     UnlockRpcClient(client);
     return result;

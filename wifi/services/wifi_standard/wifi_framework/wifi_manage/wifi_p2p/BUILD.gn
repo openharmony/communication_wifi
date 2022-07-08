@@ -26,7 +26,7 @@ ohos_shared_library("wifi_p2p_service") {
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/common/state.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/common/state_machine.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/common/wifi_broadcast_helper.cpp",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_hid2d_service_utils.cpp",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_p2p/hid2d/wifi_hid2d_service_utils.cpp",
     "authorizing_negotiation_request_state.cpp",
     "group_formed_state.cpp",
     "group_negotiation_state.cpp",
@@ -84,6 +84,10 @@ ohos_shared_library("wifi_p2p_service") {
     "$DHCP_ROOT_DIR/interfaces/inner_api/include",
     "$DHCP_ROOT_DIR/interfaces/inner_api/interfaces",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_scan",
+    "$WIFI_ROOT_DIR/utils/inc",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_p2p/hid2d",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common",
   ]
 
   cflags_cc = [
@@ -111,6 +115,8 @@ ohos_shared_library("wifi_p2p_service") {
     "$DHCP_ROOT_DIR/services/mgr_service:dhcp_manager_service",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage:wifi_manager_service",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/idl_client:wifi_idl_client",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common:wifi_common_service",
+    "$WIFI_ROOT_DIR/utils/src:wifi_utils",
     "//utils/native/base:utils",
   ]
 

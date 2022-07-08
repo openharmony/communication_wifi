@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,8 +17,9 @@
 #define OHOS_MOCK_AP_STARTED_STATE_H
 
 #include <gmock/gmock.h>
-#include "wifi_msg.h"
 #include "ap_started_state.h"
+#include "wifi_chip_capability.h"
+#include "wifi_msg.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -31,7 +32,6 @@ public:
     MOCK_METHOD0(GoOutState, void());
     MOCK_METHOD1(ExecuteStateMsg, bool(InternalMessage *msg));
 };
-
 } // namespace OHOS
 } // namespace OHOS
 #endif

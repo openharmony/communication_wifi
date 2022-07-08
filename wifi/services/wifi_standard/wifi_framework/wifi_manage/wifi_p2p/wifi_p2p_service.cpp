@@ -14,11 +14,12 @@
  */
 
 #include "wifi_p2p_service.h"
-#include "wifi_settings.h"
-#include "wifi_errcode.h"
-#include "p2p_define.h"
 #include "abstract_ui.h"
+#include "p2p_define.h"
+#include "wifi_common_util.h"
+#include "wifi_errcode.h"
 #include "wifi_logger.h"
+#include "wifi_settings.h"
 
 DEFINE_WIFILOG_P2P_LABEL("WifiP2pService");
 
@@ -286,6 +287,105 @@ ErrCode WifiP2pService::Hid2dConnect(const Hid2dConnectConfig& config)
     const std::any info = config;
     p2pStateMachine.SendMessage(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_HID2D_CONNECT), info);
     return ErrCode::WIFI_OPT_SUCCESS;
+}
+
+ErrCode WifiP2pService::Hid2dGetSelfWifiCfgInfo(SelfCfgType cfgType,
+    char cfgData[CFG_DATA_MAX_BYTES], int* getDatValidLen)
+{
+    WIFI_LOGI("Hid2dGetSelfWifiCfgInfo");
+    *getDatValidLen = 0;
+    return WIFI_OPT_SUCCESS;
+}
+
+ErrCode WifiP2pService::Hid2dSetPeerWifiCfgInfo(PeerCfgType cfgType,
+    char cfgData[CFG_DATA_MAX_BYTES], int setDataValidLen)
+{
+    WIFI_LOGI("Hid2dSetPeerWifiCfgInfo");
+    return WIFI_OPT_SUCCESS;
+}
+
+ErrCode WifiP2pService::Hid2dRequestGcIp(const std::string& gcMac, std::string& ipAddr)
+{
+    WIFI_LOGI("Hid2dRequestGcIp");
+
+    WifiP2pGroupInfo group;
+    ErrCode ret = GetCurrentGroup(group);
+    if (ret != WIFI_OPT_SUCCESS) {
+        WIFI_LOGI("Apply IP get current group failed!");
+    }
+    IpPool::InitIpPool(group.GetGoIpAddress());
+    ipAddr = IpPool::GetIp(gcMac);
+    return WIFI_OPT_SUCCESS;
+}
+
+void WifiP2pService::IncreaseSharedLink(void)
+{
+    WIFI_LOGI("IncreaseSharedLink");
+    SharedLinkManager::IncreaseSharedLink();
+}
+
+void WifiP2pService::DecreaseSharedLink(void)
+{
+    WIFI_LOGI("DecreaseSharedLink");
+    SharedLinkManager::DecreaseSharedLink();
+}
+
+int WifiP2pService::GetSharedLinkCount(void)
+{
+    WIFI_LOGI("GetSharedLinkCount");
+    return SharedLinkManager::GetSharedLinkCount();
+}
+
+int WifiP2pService::GetP2pRecommendChannel(void)
+{
+    WIFI_LOGI("GetP2pRecommendChannel");
+
+    int channel = 0; // 0 is invalid channel
+    
+    WifiLinkedInfo linkedInfo;
+    WifiSettings::GetInstance().GetLinkedInfo(linkedInfo);
+    if (linkedInfo.connState == CONNECTED) {
+        channel = FrequencyToChannel(linkedInfo.frequency);
+        WIFI_LOGI("Recommend linked channel: %{public}d", channel);
+        return channel;
+    }
+
+    ChannelsTable channels;
+    std::vector<int32_t> vec5GChannels;
+    WifiSettings::GetInstance().GetValidChannels(channels);
+    if (channels.find(BandType::BAND_5GHZ) != channels.end()) {
+        vec5GChannels = channels[BandType::BAND_5GHZ];
+    }
+
+    const int COMMON_USING_5G_CHANNEL = 149;
+    const int COMMON_USING_2G_CHANNEL = 6;
+    if (!vec5GChannels.empty()) {
+        auto it = std::find(vec5GChannels.begin(), vec5GChannels.end(), COMMON_USING_5G_CHANNEL);
+        if (it != vec5GChannels.end()) {
+            channel = COMMON_USING_5G_CHANNEL;
+        } else {
+            channel = vec5GChannels[0];
+        }
+        WIFI_LOGI("Recommend 5G channel: %{public}d", channel);
+        return channel;
+    }
+    WIFI_LOGI("Recommend 2G channel: %{public}d", COMMON_USING_2G_CHANNEL);
+    return COMMON_USING_2G_CHANNEL;
+}
+
+ErrCode WifiP2pService::Hid2dSetUpperScene(const std::string& ifName, const Hid2dUpperScene& scene)
+{
+    WIFI_LOGI("Hid2dSetUpperScene");
+    /* Not support currently */
+    WIFI_LOGI("Set upper scene, ifName=%{public}s, scene=%{public}u, fps=%{public}d, bw=%{public}u",
+        ifName.c_str(), scene.scene, scene.fps, scene.bw);
+    return WIFI_OPT_SUCCESS;
+}
+
+ErrCode WifiP2pService::MonitorCfgChange(void)
+{
+    WIFI_LOGI("MonitorCfgChange");
+    return WIFI_OPT_SUCCESS;
 }
 }  // namespace Wifi
 }  // namespace OHOS

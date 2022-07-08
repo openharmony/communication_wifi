@@ -17,11 +17,12 @@
 
 #include <string>
 #include <iremote_stub.h>
-#include "message_parcel.h"
-#include "message_option.h"
-#include "wifi_p2p_msg.h"
 #include "define.h"
+#include "message_option.h"
+#include "message_parcel.h"
 #include "wifi_errcode.h"
+#include "wifi_hid2d_msg.h"
+#include "wifi_p2p_msg.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -85,6 +86,15 @@ public:
      * @param code   - Return code
      */
     virtual void OnP2pActionResult(P2pActionCallback action, ErrCode code) = 0;
+
+    /**
+     * @Description Config changed callback.
+     *
+     * @param type - Config type
+     * @param data - Config data
+     * @param len  - Config data length
+     */
+    virtual void OnConfigChanged(CfgType type, char* data, int dataLen) = 0;
 
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.wifi.IWifiP2pCallback");

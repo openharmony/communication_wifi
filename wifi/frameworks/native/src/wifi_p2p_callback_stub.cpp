@@ -41,6 +41,7 @@ void WifiP2pCallbackStub::InitHandleMap()
     handleFuncMap[WIFI_CBK_CMD_CONNECT_CHANGE] = &WifiP2pCallbackStub::RemoteOnP2pConnectionChanged;
     handleFuncMap[WIFI_CBK_CMD_DISCOVERY_CHANGE] = &WifiP2pCallbackStub::RemoteOnP2pDiscoveryChanged;
     handleFuncMap[WIFI_CBK_CMD_P2P_ACTION_RESULT] = &WifiP2pCallbackStub::RemoteOnP2pActionResult;
+    handleFuncMap[WIFI_CBK_CMD_CFG_CHANGE] = &WifiP2pCallbackStub::RemoteOnConfigChanged;
     return;
 }
 
@@ -163,6 +164,14 @@ void WifiP2pCallbackStub::OnP2pActionResult(P2pActionCallback action, ErrCode co
     }
 }
 
+void WifiP2pCallbackStub::OnConfigChanged(CfgType type, char* data, int dataLen)
+{
+    WIFI_LOGD("WifiP2pCallbackStub::OnConfigChanged");
+    if (userCallback_) {
+        userCallback_->OnConfigChanged(type, data, dataLen);
+    }
+}
+
 void WifiP2pCallbackStub::RemoteOnP2pStateChanged(uint32_t code, MessageParcel &data, MessageParcel &reply)
 {
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
@@ -278,6 +287,41 @@ void WifiP2pCallbackStub::RemoteOnP2pActionResult(uint32_t code, MessageParcel &
     P2pActionCallback action = static_cast<P2pActionCallback>(data.ReadInt32());
     ErrCode errCode = static_cast<ErrCode>(data.ReadInt32());
     OnP2pActionResult(action, errCode);
+    reply.WriteInt32(0);
+}
+
+void WifiP2pCallbackStub::RemoteOnConfigChanged(uint32_t code, MessageParcel &data, MessageParcel &reply)
+{
+    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+
+    CfgType cfgType = static_cast<CfgType>(data.ReadInt32());
+    int cfgLen = data.ReadInt32();
+    if (cfgLen <= 0) {
+        WIFI_LOGE("Config change size error: %{public}d", cfgLen);
+        reply.WriteInt32(static_cast<int>(WIFI_OPT_INVALID_PARAM));
+        return;
+    }
+
+    const char *dataBuffer = (const char *)reply.ReadBuffer(cfgLen);
+    if (dataBuffer == nullptr) {
+        WIFI_LOGE("read buffer error!");
+        reply.WriteInt32(static_cast<int>(WIFI_OPT_FAILED));
+        return;
+    }
+
+    char* cfgData = new (std::nothrow) char[cfgLen];
+    if (cfgData == nullptr) {
+        WIFI_LOGE("new buffer error!");
+        reply.WriteInt32(static_cast<int>(WIFI_OPT_FAILED));
+        return;
+    }
+    if (memcpy_s(cfgData, cfgLen, dataBuffer, cfgLen) != EOK) {
+        WIFI_LOGE("memcpy_s failed!");
+        reply.WriteInt32(static_cast<int>(WIFI_OPT_FAILED));
+        return;
+    }
+    OnConfigChanged(cfgType, cfgData, cfgLen);
+    delete[] cfgData;
     reply.WriteInt32(0);
 }
 }  // namespace Wifi

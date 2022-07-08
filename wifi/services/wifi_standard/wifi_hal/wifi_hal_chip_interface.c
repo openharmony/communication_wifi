@@ -150,8 +150,52 @@ WifiErrorNo RequestFirmwareDebugDump(unsigned char *bytes, int32_t *size)
     return ConvertErrorCode(err);
 }
 
-WifiErrorNo WifiServiceSetPowerMode(uint8_t mode)
+WifiErrorNo GetIsChipSupportDbdc(int *support)
 {
-    LOGD("WifiServiceSetPowerMode() %{public}u", mode);
+    LOGD("GetIsChipSupportDbdc");
+    if (support == NULL) {
+        return WIFI_HAL_FAILED;
+    }
+    *support = WIFI_HAL_TRUE;
+    return WIFI_HAL_SUCCESS;
+}
+
+WifiErrorNo GetIsChipSupportCsa(int *support)
+{
+    LOGD("GetIsChipSupportCsa");
+    if (support == NULL) {
+        return WIFI_HAL_FAILED;
+    }
+    *support = WIFI_HAL_FALSE;
+    return WIFI_HAL_SUCCESS;
+}
+
+WifiErrorNo GetIsChipSupportRadarDetect(int *support)
+{
+    LOGD("GetIsChipSupportRadarDetect");
+    if (support == NULL) {
+        return WIFI_HAL_FAILED;
+    }
+    *support = WIFI_HAL_TRUE;
+    return WIFI_HAL_SUCCESS;
+}
+
+WifiErrorNo GetIsChipSupportDfsChannel(int *support)
+{
+    LOGD("GetIsChipSupportDfsChannel");
+    if (support == NULL) {
+        return WIFI_HAL_FAILED;
+    }
+    *support = WIFI_HAL_TRUE;
+    return WIFI_HAL_SUCCESS;
+}
+
+WifiErrorNo GetIsChipSupportIndoorChannel(int *support)
+{
+    LOGD("GetIsChipSupportIndoorChannel");
+    if (support == NULL) {
+        return WIFI_HAL_FAILED;
+    }
+    *support = WIFI_HAL_TRUE;
     return WIFI_HAL_SUCCESS;
 }

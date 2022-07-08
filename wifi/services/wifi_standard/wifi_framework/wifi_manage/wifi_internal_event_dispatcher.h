@@ -121,6 +121,7 @@ private:
     static void PublishConnStateChangedEvent(int state, const WifiLinkedInfo &info);
     static void PublishWifiStateChangedEvent(int state);
     static void PublishRssiValueChangedEvent(int state);
+    static void SendConfigChangeEvent(sptr<IWifiP2pCallback> &callback,  CfgInfo* cfgInfo);
 private:
     std::thread mBroadcastThread;
     std::atomic<bool> mRunFlag;

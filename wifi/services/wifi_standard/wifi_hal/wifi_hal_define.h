@@ -38,6 +38,8 @@ extern "C" {
 
 #define HAL_SUCCESS 0
 #define HAL_FAILURE (-1)
+#define WIFI_HAL_FALSE 0
+#define WIFI_HAL_TRUE 1
 
 typedef enum WifiErrorNo {
     WIFI_HAL_SUCCESS = 0,                /* Success. */

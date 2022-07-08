@@ -12,6 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include "ap_started_state.h"
 #include <cstring>
 #include <string>
@@ -23,10 +24,11 @@
 #include "ap_monitor.h"
 #include "ap_service.h"
 #include "ap_state_machine.h"
+#include "ap_stations_manager.h"
 #include "dhcpd_interface.h"
 #include "wifi_ap_hal_interface.h"
 #include "wifi_ap_nat_manager.h"
-#include "ap_stations_manager.h"
+#include "wifi_chip_capability.h"
 #include "wifi_settings.h"
 #include "wifi_logger.h"
 
@@ -80,6 +82,7 @@ void ApStartedState::GoInState()
     }
     UpdatePowerMode();
     m_ApStateMachine.OnApStateChange(ApState::AP_STATE_STARTED);
+    ChipCapability::GetInstance().InitializeChipCapability();
 }
 
 void ApStartedState::GoOutState()

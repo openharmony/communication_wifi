@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -133,13 +133,44 @@ WifiErrorNo GetComboModes(int32_t *id);
 WifiErrorNo RequestFirmwareDebugDump(unsigned char *bytes, int32_t *size);
 
 /**
- * @Description Setting the Low Latency Mode.
+ * @Description Get is chip support DBDC.
  *
- * @param mode - Low-latency mode.
+ * @param support - Is support or not supported.
  * @return WifiErrorNo
  */
-WifiErrorNo WifiServiceSetPowerMode(uint8_t mode);
+WifiErrorNo GetIsChipSupportDbdc(int *support);
 
+/**
+ * @Description Get is chip support CSA.
+ *
+ * @param support - Is support or not supported.
+ * @return WifiErrorNo
+ */
+WifiErrorNo GetIsChipSupportCsa(int *support);
+
+/**
+ * @Description Get is chip support radar detection.
+ *
+ * @param support - Is support or not supported.
+ * @return WifiErrorNo
+ */
+WifiErrorNo GetIsChipSupportRadarDetect(int *support);
+
+/**
+ * @Description Get is chip support Dfs channel
+ *
+ * @param support - Is support or not supported.
+ * @return WifiErrorNo
+ */
+WifiErrorNo GetIsChipSupportDfsChannel(int *support);
+
+/**
+ * @Description Get is chip support indoor channel.
+ *
+ * @param support - Is support or not supported.
+ * @return WifiErrorNo
+ */
+WifiErrorNo GetIsChipSupportIndoorChannel(int *support);
 #ifdef __cplusplus
 }
 #endif

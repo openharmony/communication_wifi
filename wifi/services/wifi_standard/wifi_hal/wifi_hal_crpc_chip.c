@@ -311,18 +311,82 @@ int RpcRequestFirmwareDebugDump(RpcServer *server, Context *context)
     return HAL_SUCCESS;
 }
 
-int RpcSetPowerMode(RpcServer *server, Context *context)
+int RpcIsChipSupportDbdc(RpcServer *server, Context *context)
 {
     if (server == NULL || context == NULL) {
         return HAL_FAILURE;
     }
-    int mode = 0;
-    if (ReadInt(context, &mode) < 0) {
-        return HAL_FAILURE;
-    }
-    WifiErrorNo err = WifiServiceSetPowerMode(mode);
+    int support = 0;
+    WifiErrorNo err = GetIsChipSupportDbdc(&support);
     WriteBegin(context, 0);
     WriteInt(context, err);
+    if (err == WIFI_HAL_SUCCESS) {
+        WriteInt(context, support);
+    }
+    WriteEnd(context);
+    return HAL_SUCCESS;
+}
+
+int RpcIsChipSupportCsa(RpcServer *server, Context *context)
+{
+    if (server == NULL || context == NULL) {
+        return HAL_FAILURE;
+    }
+    int support = 0;
+    WifiErrorNo err = GetIsChipSupportCsa(&support);
+    WriteBegin(context, 0);
+    WriteInt(context, err);
+    if (err == WIFI_HAL_SUCCESS) {
+        WriteInt(context, support);
+    }
+    WriteEnd(context);
+    return HAL_SUCCESS;
+}
+
+int RpcIsChipSupportRadarDetect(RpcServer *server, Context *context)
+{
+    if (server == NULL || context == NULL) {
+        return HAL_FAILURE;
+    }
+    int support = 0;
+    WifiErrorNo err = GetIsChipSupportRadarDetect(&support);
+    WriteBegin(context, 0);
+    WriteInt(context, err);
+    if (err == WIFI_HAL_SUCCESS) {
+        WriteInt(context, support);
+    }
+    WriteEnd(context);
+    return HAL_SUCCESS;
+}
+
+int RpcIsChipSupportDfsChannel(RpcServer *server, Context *context)
+{
+    if (server == NULL || context == NULL) {
+        return HAL_FAILURE;
+    }
+    int support = 0;
+    WifiErrorNo err = GetIsChipSupportDfsChannel(&support);
+    WriteBegin(context, 0);
+    WriteInt(context, err);
+    if (err == WIFI_HAL_SUCCESS) {
+        WriteInt(context, support);
+    }
+    WriteEnd(context);
+    return HAL_SUCCESS;
+}
+
+int RpcIsChipSupportIndoorChannel(RpcServer *server, Context *context)
+{
+    if (server == NULL || context == NULL) {
+        return HAL_FAILURE;
+    }
+    int support = 0;
+    WifiErrorNo err = GetIsChipSupportIndoorChannel(&support);
+    WriteBegin(context, 0);
+    WriteInt(context, err);
+    if (err == WIFI_HAL_SUCCESS) {
+        WriteInt(context, support);
+    }
     WriteEnd(context);
     return HAL_SUCCESS;
 }

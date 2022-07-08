@@ -562,21 +562,6 @@ HWTEST_F(WifiHalCRpcServerTest, RpcRequestFirmwareDebugDumpTest, TestSize.Level1
     EXPECT_TRUE(RpcRequestFirmwareDebugDump(mServer, mContext) == 0);
 }
 
-HWTEST_F(WifiHalCRpcServerTest, RpcSetPowerModeTest, TestSize.Level1)
-{
-    EXPECT_TRUE(RpcSetPowerMode(nullptr, nullptr) < 0);
-    char buff[] = "N\tSetPowerMode\tasdgds\t";
-    mContext->oneProcess = buff;
-    mContext->nPos = strlen("N\tSetPowerMode\t");
-    mContext->nSize = strlen(buff);
-    EXPECT_TRUE(RpcSetPowerMode(mServer, mContext) < 0);
-    char buff1[] = "N\tSetPowerMode\t1\t";
-    mContext->oneProcess = buff1;
-    mContext->nPos = strlen("N\tSetPowerMode\t");
-    mContext->nSize = strlen(buff1);
-    EXPECT_TRUE(RpcSetPowerMode(mServer, mContext) == 0);
-}
-
 HWTEST_F(WifiHalCRpcServerTest, RpcStartTest, TestSize.Level1)
 {
     EXPECT_TRUE(RpcStart(nullptr, nullptr) < 0);

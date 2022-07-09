@@ -451,7 +451,7 @@ bool StaAutoConnectService::AllowAutoSelectDevice(const std::vector<InterScanInf
             WIFI_LOGI("Auto Select is allowed, detailedState: %{public}d\n", info.detailedState);
             return true;
         case DetailedState::PASSWORD_ERROR:
-            WIFI_LOGI("Password error, clear blocked bssids, auto connect to ap quickly.\n", info.detailedState);
+            WIFI_LOGI("Password error, clear blocked bssids, auto connect to ap quickly.\n");
             ClearAllBlockedBssids();
             return true;
 

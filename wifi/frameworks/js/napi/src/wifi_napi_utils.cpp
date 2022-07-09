@@ -26,7 +26,7 @@ TraceFuncCall::TraceFuncCall(std::string funcName): m_funcName(funcName)
 {
     if (m_isTrace) {
         m_startTime = std::chrono::steady_clock::now();
-        WIFI_LOGD("Call wifi func: %{public}s (start)", m_funcName.c_str());
+        WIFI_LOGI("Call wifi func: %{public}s (start)", m_funcName.c_str());
     }
 }
 
@@ -36,7 +36,7 @@ TraceFuncCall::~TraceFuncCall()
         auto us = std::chrono::duration_cast<std::chrono::microseconds>
             (std::chrono::steady_clock::now() - m_startTime).count();
         constexpr int usForPerMs = 1000;
-        WIFI_LOGD("Call wifi func: %{public}s (end), time cost:%{public}lldus, %{public}lldms",
+        WIFI_LOGI("Call wifi func: %{public}s (end), time cost:%{public}lldus, %{public}lldms",
             m_funcName.c_str(), us, us / usForPerMs);
     }
 }

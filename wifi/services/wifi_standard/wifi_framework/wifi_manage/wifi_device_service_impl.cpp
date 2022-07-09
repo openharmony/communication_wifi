@@ -181,7 +181,7 @@ ErrCode WifiDeviceServiceImpl::EnableWifi()
     }
 
 #ifdef FEATURE_AP_SUPPORT
-    WifiOprMidState curState = WifiConfigCenter::GetInstance().GetApMidState(0);
+    curState = WifiConfigCenter::GetInstance().GetApMidState(0);
     if (curState != WifiOprMidState::CLOSED) {
         WIFI_LOGW("current ap state is %{public}d, please close SoftAp first!",
             static_cast<int>(curState));

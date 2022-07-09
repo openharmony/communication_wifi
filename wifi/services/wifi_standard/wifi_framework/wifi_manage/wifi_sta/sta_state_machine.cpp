@@ -689,7 +689,7 @@ void StaStateMachine::DealSignalPollResult(InternalMessage *msg)
         int currentSignalLevel = WifiSettings::GetInstance().GetSignalLevel(linkedInfo.rssi, linkedInfo.band);
         LOGI("DealSignalPollResult, networkId:%{public}d, ssid:%{private}s, rssi:%{public}d, band:%{public}d, "
             "connState:%{public}d, detailedState:%{public}d.\n",
-            linkedInfo.networkId, linkedInfo.ssid.c_str() linkedInfo.rssi, linkedInfo.band,
+            linkedInfo.networkId, linkedInfo.ssid.c_str(), linkedInfo.rssi, linkedInfo.band,
             linkedInfo.connState, linkedInfo.detailedState);
         LOGI("DealSignalPollResult currentSignalLevel:%{public}d, lastSignalLevel:%{public}d.\n",
             currentSignalLevel, lastSignalLevel);

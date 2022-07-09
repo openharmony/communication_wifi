@@ -1828,10 +1828,10 @@ bool StaStateMachine::ApRoamingState::ExecuteStateMsg(InternalMessage *msg)
                 OperateResState::CONNECT_ASSOCIATED, pStaStateMachine->linkedInfo);
             pStaStateMachine->ConnectToNetworkProcess(msg);
             /* Notify result to InterfaceService. */
-            pStaStateMachine->staCallback.OnStaConnChanged(
-                    OperateResState::CONNECT_ASSOCIATED, pStaStateMachine->linkedInfo);
-            pStaStateMachine->staCallback.OnStaConnChanged(
-                    OperateResState::CONNECT_OBTAINING_IP, pStaStateMachine->linkedInfo);
+            pStaStateMachine->staCallback.OnStaConnChanged(OperateResState::CONNECT_ASSOCIATED,
+                pStaStateMachine->linkedInfo);
+            pStaStateMachine->staCallback.OnStaConnChanged(OperateResState::CONNECT_OBTAINING_IP,
+                pStaStateMachine->linkedInfo);
 
             /* The current state of StaStateMachine transfers to GetIpState. */
             pStaStateMachine->SwitchState(pStaStateMachine->pGetIpState);

@@ -210,7 +210,8 @@ void StaAutoConnectService::ConnectElectedDevice(WifiDeviceConfig &electedDevice
         }
     } else if (currentConnectedNetwork.detailedState == DetailedState::DISCONNECTED ||
         currentConnectedNetwork.detailedState == DetailedState::CONNECTION_TIMEOUT ||
-        currentConnectedNetwork.detailedState == DetailedState::FAILED) {
+        currentConnectedNetwork.detailedState == DetailedState::FAILED ||
+        currentConnectedNetwork.detailedState == DetailedState::PASSWORD_ERROR) {
         pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_CONNECT_SAVED_NETWORK,
             electedDevice.networkId,
             NETWORK_SELECTED_FOR_CONNECTION_MANAGEMENT);
@@ -447,8 +448,11 @@ bool StaAutoConnectService::AllowAutoSelectDevice(const std::vector<InterScanInf
         case DetailedState::DISCONNECTED:
         case DetailedState::CONNECTION_TIMEOUT:
         case DetailedState::FAILED:
+            WIFI_LOGI("Auto Select is allowed, detailedState: %{public}d\n", info.detailedState);
+            return true;
         case DetailedState::PASSWORD_ERROR:
-            WIFI_LOGI("The current status is in can connect status: %{public}d\n", info.detailedState);
+            WIFI_LOGI("Password error, clear blocked bssids, auto connect to ap quickly.\n", info.detailedState);
+            ClearAllBlockedBssids();
             return true;
 
         case DetailedState::NOTWORKING:

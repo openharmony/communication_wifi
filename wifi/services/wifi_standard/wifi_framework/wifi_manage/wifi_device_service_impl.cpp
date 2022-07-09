@@ -350,7 +350,7 @@ bool WifiDeviceServiceImpl::CheckConfigPwd(const WifiDeviceConfig &config)
 
     int len = config.preSharedKey.length();
     bool isAllHex = std::all_of(config.preSharedKey.begin(), config.preSharedKey.end(), isxdigit);
-    WIFI_LOGI("CheckConfigPwd, keyMgmt: %{private}s, len: %{private}d", config.keyMgmt.c_str(), len);
+    WIFI_LOGI("CheckConfigPwd, keyMgmt: %{public}s, len: %{public}d", config.keyMgmt.c_str(), len);
     if (config.keyMgmt == KEY_MGMT_NONE) {
         for (int i = 0; i != WEPKEYS_SIZE; ++i) {
             if (!config.wepKeys[i].empty()) { // wep
@@ -902,8 +902,8 @@ ErrCode WifiDeviceServiceImpl::GetLinkedInfo(WifiLinkedInfo &info)
         info.macAddress = "";
     }
 
-    WIFI_LOGI("GetLinkedInfo, networkId=%{public}d, rssi=%{public}d, frequency=%{public}d",
-        info.networkId, info.rssi, info.frequency);
+    WIFI_LOGI("GetLinkedInfo, networkId=%{public}d, ssid=%{private}s, rssi=%{public}d, frequency=%{public}d",
+        info.networkId, info.ssid.c_str(), info.rssi, info.frequency);
     WIFI_LOGI("GetLinkedInfo, connState=%{public}d, supplicantState=%{public}d, detailedState=%{public}d",
         info.connState, info.supplicantState, info.detailedState);
     return WIFI_OPT_SUCCESS;

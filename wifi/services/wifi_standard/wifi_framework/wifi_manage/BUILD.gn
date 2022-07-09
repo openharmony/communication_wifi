@@ -247,6 +247,10 @@ if (defined(ohos_lite)) {
       defines = [ "FEATURE_P2P_SUPPORT" ]
     }
 
+    if (wifi_feature_with_ap_num > 0) {
+      defines += [ "FEATURE_AP_SUPPORT" ]
+    }
+
     deps = [
       ":wifi_p2p_service_impl",
       "//utils/native/base:utils",

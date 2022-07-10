@@ -40,7 +40,7 @@ static const char *g_serviceName = "hostapd";
 
 WifiErrorNo StartSoftAp(int id)
 {
-    LOGD("Ready to start hostapd");
+    LOGI("Ready to start hostapd: %{public}d!", id);
     if (StartHostapd() != WIFI_HAL_SUCCESS) {
         LOGE("hostapd start failed!");
         return WIFI_HAL_OPEN_HOSTAPD_FAILED;
@@ -52,17 +52,19 @@ WifiErrorNo StartSoftAp(int id)
     }
 
     WifiHostapdHalDevice *hostapdHalDevice = GetWifiHostapdDev(id);
-    if (hostapdHalDevice != NULL) {
-        int ret = hostapdHalDevice->enableAp(id);
-        usleep(ABLE_AP_WAIT_MS);
-        if (ret != 0) {
-            LOGE("ableAp failed! ret=%{public}d", ret);
-        }
-    } else {
-        LOGE("cant not get hostapd dev");
+    if (hostapdHalDevice == NULL) {
+        LOGE("hostapdHalDevice is NULL!");
+        return WIFI_HAL_HOSTAPD_NOT_INIT;
     }
 
-    LOGD("AP start successfully!");
+    int ret = hostapdHalDevice->enableAp(id);
+    usleep(ABLE_AP_WAIT_MS);
+    if (ret != 0) {
+        LOGE("enableAp failed! ret=%{public}d", ret);
+        return WIFI_HAL_FAILED;
+    }
+
+    LOGI("AP start successfully, id:%{public}d!", id);
     return WIFI_HAL_SUCCESS;
 }
 

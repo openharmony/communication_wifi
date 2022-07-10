@@ -142,7 +142,7 @@ WifiErrorNo ForceStop(void)
 
 WifiErrorNo StartSupplicant(void)
 {
-    LOGD("Start supplicant");
+    LOGI("Start supplicant");
     if (CopyConfigFile("wpa_supplicant.conf") != 0) {
         return WIFI_HAL_FAILED;
     }
@@ -156,7 +156,17 @@ WifiErrorNo StartSupplicant(void)
 
 WifiErrorNo StopSupplicant(void)
 {
-    LOGD("Stop supplicant");
+    LOGI("Stop supplicant");
+    WifiWpaStaInterface *pStaIfc = GetWifiStaInterface(0);
+    if (pStaIfc == NULL) {
+        LOGE("Supplicant is NOT inited!");
+        return WIFI_HAL_SUPPLICANT_NOT_INIT;
+    }
+    int res = pStaIfc->wpaCliCmdWpaTerminate(pStaIfc);
+    if (res < 0) {
+        LOGE("wpaCliCmdWpaTerminate failed! ret=%{public}d", res);
+        return WIFI_HAL_FAILED;
+    }
     ModuleManageRetCode ret = StopModule(g_serviceName);
     if (ret == MM_FAILED) {
         LOGE("stop wpa_supplicant failed!");

@@ -131,6 +131,7 @@ enum class P2pGroupCapability {
 };
 
 enum class GroupOwnerBand { GO_BAND_AUTO, GO_BAND_2GHZ, GO_BAND_5GHZ };
+
 const int MAX_WFD_SUBELEMS = 12;
 const char DeviceInfoSubelemLenHex[] = {"0006"};
 class WifiP2pWfdInfo {

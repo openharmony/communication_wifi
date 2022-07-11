@@ -18,6 +18,7 @@
 #include <functional>
 #include "wifi_errcode.h"
 #include "wifi_p2p_msg.h"
+#include "wifi_hid2d_msg.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -39,6 +40,8 @@ struct IP2pServiceCallbacks {
     std::function<void()> OnP2pGroupsChangedEvent;
     /* The result returned by the asynchronous interface */
     std::function<void(P2pActionCallback, ErrCode)> OnP2pActionResultEvent;
+    /* The event of config change */
+    std::function<void(CfgType, char*, int)> OnConfigChangedEvent;
     std::function<void(P2pServicerProtocolType, const std::vector<unsigned char> &, const WifiP2pDevice &)>
         OnP2pServiceAvailable;
     std::function<void(const std::string &, const std::string &, const WifiP2pDevice &)> OnP2pDnsSdServiceAvailable;

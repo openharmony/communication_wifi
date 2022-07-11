@@ -91,6 +91,15 @@ public:
      */
     void OnP2pActionResult(P2pActionCallback action, ErrCode code) override;
 
+    /**
+     * @Description Config changed callback.
+     *
+     * @param type - Config type
+     * @param data - Config data
+     * @param len  - Config data length
+     */
+    void OnConfigChanged(CfgType type, char* data, int dataLen) override;
+
     void RegisterCallBack(const sptr<IWifiP2pCallback> &userCallback);
     bool IsRemoteDied() const;
     void SetRemoteDied(bool val);
@@ -106,6 +115,7 @@ private:
     void RemoteOnP2pConnectionChanged(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void RemoteOnP2pDiscoveryChanged(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void RemoteOnP2pActionResult(uint32_t code, MessageParcel &data, MessageParcel &reply);
+    void RemoteOnConfigChanged(uint32_t code, MessageParcel &data, MessageParcel &reply);
 
 private:
     HandleFuncMap handleFuncMap;

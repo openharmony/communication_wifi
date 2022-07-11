@@ -30,6 +30,24 @@
 namespace OHOS {
 namespace Wifi {
 DEFINE_WIFILOG_LABEL("WifiCommonUtil");
+
+constexpr int INVALID_FREQ_OR_CHANNEL = -1;
+constexpr int FREQ_2G_MIN = 2412;
+constexpr int FREQ_2G_MAX = 2472;
+constexpr int FREQ_5G_MIN = 5170;
+constexpr int FREQ_5G_MAX = 5825;
+constexpr int CHANNEL_14_FREQ = 2484;
+constexpr int CHANNEL_14 = 14;
+constexpr int CENTER_FREQ_DIFF = 5;
+constexpr int CHANNEL_2G_MIN = 1;
+constexpr int CHANNEL_5G_MIN = 34;
+constexpr int MIN_24G_CHANNEL = 1;
+constexpr int MAX_24G_CHANNEL = 13;
+constexpr int MIN_5G_CHANNEL = 36;
+constexpr int MAX_5G_CHANNEL = 165;
+constexpr int FREQ_CHANNEL_1 = 2412;
+constexpr int FREQ_CHANNEL_36 = 5180;
+
 static std::string DataAnonymize(const std::string str, const char delim,
     const char hiddenCh, const int startIdx = 0)
 {
@@ -259,6 +277,32 @@ bool IsForegroundApp(const int uid)
         return true;
     }
     return false;
+}
+
+int FrequencyToChannel(int freq)
+{
+    WIFI_LOGI("FrequencyToChannel: %{public}d", freq);
+    int channel = INVALID_FREQ_OR_CHANNEL;
+    if (freq >= FREQ_2G_MIN && freq <= FREQ_2G_MAX) {
+        channel = (freq - FREQ_2G_MIN) / CENTER_FREQ_DIFF + CHANNEL_2G_MIN;
+    } else if (freq == CHANNEL_14_FREQ) {
+        channel = CHANNEL_14;
+    } else if (freq >= FREQ_5G_MIN && freq <= FREQ_5G_MAX) {
+        channel = (freq - FREQ_5G_MIN) / CENTER_FREQ_DIFF + CHANNEL_5G_MIN;
+    }
+    return channel;
+}
+
+int ChannelToFrequency(int channel)
+{
+    WIFI_LOGI("ChannelToFrequency: %{public}d", channel);
+    if (channel >= MIN_24G_CHANNEL && channel <= MAX_24G_CHANNEL) {
+        return ((channel - MIN_24G_CHANNEL) * CENTER_FREQ_DIFF + FREQ_CHANNEL_1);
+    }
+    if (MIN_5G_CHANNEL <= channel && channel <= MAX_5G_CHANNEL) {
+        return ((channel - MIN_5G_CHANNEL) * CENTER_FREQ_DIFF + FREQ_CHANNEL_36);
+    }
+    return INVALID_FREQ_OR_CHANNEL;
 }
 
 TimeStats::TimeStats(const std::string desc): m_desc(desc)

@@ -260,6 +260,79 @@ public:
      */
     virtual ErrCode Hid2dConnect(const Hid2dConnectConfig& config) override;
 
+    /**
+     * @Description Get self config info
+     *
+     * @param cfgType - config type
+     * @param cfgData - config data
+     * @param getDatValidLen - data length
+     * @return ErrCode - operate result
+     */
+    virtual ErrCode Hid2dGetSelfWifiCfgInfo(SelfCfgType cfgType,
+        char cfgData[CFG_DATA_MAX_BYTES], int* getDatValidLen) override;
+
+    /**
+     * @Description Set self config info
+     *
+     * @param cfgType - config type
+     * @param cfgData - config data
+     * @param setDataValidLen - data length
+     * @return ErrCode - operate result
+     */
+    virtual ErrCode Hid2dSetPeerWifiCfgInfo(PeerCfgType cfgType,
+        char cfgData[CFG_DATA_MAX_BYTES], int setDataValidLen) override;
+
+    /**
+     * @Description Set self config info
+     *
+     * @param gcMac - gc mac address
+     * @param ipAddr - allocated ip address
+     * @return ErrCode - operate result
+     */
+    virtual ErrCode Hid2dRequestGcIp(const std::string& gcMac, std::string& ipAddr) override;
+
+    /**
+     * @Description Increase the reference count of the hid2d service.
+     *
+     */
+    virtual void IncreaseSharedLink(void) override;
+
+    /**
+     * @Description Decrease the reference count of the hid2d service.
+     *
+     */
+    virtual void DecreaseSharedLink(void) override;
+
+    /**
+     * @Description Get the reference count of the hid2d service.
+     *
+     * @return int - reference count
+     */
+    virtual int GetSharedLinkCount(void) override;
+
+    /**
+     * @Description - Get P2P recommended channel.
+     *
+     * @return - int - Recommended channel
+     */
+    virtual int GetP2pRecommendChannel(void) override;
+
+    /**
+     * @Description Set the scene of upper layer
+     *
+     * @param ifName - interface name
+     * @param scene - scene
+     * @return ErrCode - operate result
+     */
+    virtual ErrCode Hid2dSetUpperScene(const std::string& ifName, const Hid2dUpperScene& scene) override;
+
+    /**
+     * @Description Monitor the wifi configuration change
+     *
+     * @return ErrCode - operate result
+     */
+    virtual ErrCode MonitorCfgChange(void)  override;
+
 private:
     WifiP2pGroupManager groupManager;    /* group manager */
     WifiP2pDeviceManager deviceMgr;  /* device manager */

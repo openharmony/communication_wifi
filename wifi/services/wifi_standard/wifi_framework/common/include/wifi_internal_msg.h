@@ -16,10 +16,11 @@
 #ifndef OHOS_WIFI_INTERNAL_MSG_H
 #define OHOS_WIFI_INTERNAL_MSG_H
 
-#include "wifi_msg.h"
-#include "wifi_scan_msg.h"
-#include "wifi_p2p_msg.h"
 #include "wifi_ap_msg.h"
+#include "wifi_hid2d_msg.h"
+#include "wifi_msg.h"
+#include "wifi_p2p_msg.h"
+#include "wifi_scan_msg.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -204,6 +205,18 @@ struct SingleAppForbid {
     }
 };
 
+struct CfgInfo {
+    CfgType type;
+    char* data;
+    int dataLen;
+    CfgInfo()
+    {
+        type = CfgType::CFG_INVALID;
+        data = nullptr;
+        dataLen = 0;
+    }
+};
+
 struct WifiEventCallbackMsg {
     int msgCode;
     int msgData;
@@ -216,12 +229,14 @@ struct WifiEventCallbackMsg {
     WifiP2pLinkedInfo p2pInfo;
     WifiP2pDevice p2pDevice;
     P2pActionCallback p2pAction;
+    CfgInfo* cfgInfo;
     WifiEventCallbackMsg()
     {
         msgCode = 0;
         msgData = 0;
         id = 0;
         p2pAction = P2pActionCallback::UNKNOWN;
+        cfgInfo = nullptr;
     }
 };
 

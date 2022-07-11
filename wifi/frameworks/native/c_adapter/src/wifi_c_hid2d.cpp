@@ -39,13 +39,13 @@ WifiErrorCode Hid2dRequestGcIp(const unsigned char gcMac[MAC_LEN], unsigned int 
     return OHOS::Wifi::IpStrToArray(strIpAddr, ipAddr);
 }
 
-WifiErrorCode Hid2dSharedlinkIncrease()
+WifiErrorCode Hid2dSharedlinkIncrease(void)
 {
     CHECK_PTR_RETURN(wifiHid2dPtr, ERROR_WIFI_NOT_AVAILABLE);
     return GetCErrorCode(wifiHid2dPtr->Hid2dSharedlinkIncrease());
 }
 
-WifiErrorCode Hid2dSharedlinkDecrease()
+WifiErrorCode Hid2dSharedlinkDecrease(void)
 {
     CHECK_PTR_RETURN(wifiHid2dPtr, ERROR_WIFI_NOT_AVAILABLE);
     return GetCErrorCode(wifiHid2dPtr->Hid2dSharedlinkDecrease());
@@ -124,27 +124,6 @@ WifiErrorCode Hid2dGetRecommendChannel(const RecommendChannelRequest *request, R
     CHECK_PTR_RETURN(wifiHid2dPtr, ERROR_WIFI_NOT_AVAILABLE);
     CHECK_PTR_RETURN(request, ERROR_WIFI_INVALID_ARGS);
     CHECK_PTR_RETURN(response, ERROR_WIFI_INVALID_ARGS);
-
-    WifiLinkedInfo linkedInfo;
-    WifiErrorCode ret = GetLinkedInfo(&linkedInfo);
-    if (ret == WIFI_SUCCESS && linkedInfo.connState == WIFI_CONNECTED) {
-        response->status = RS_SUCCESS;
-        response->index = 0;
-
-        constexpr int FREQ_2G_MAX = 2472;
-        constexpr int CHANNEL_14_FREQ = 2484;
-        if (linkedInfo.frequency <= FREQ_2G_MAX || linkedInfo.frequency == CHANNEL_14_FREQ) {
-            response->centerFreq = linkedInfo.frequency;
-            response->centerFreq1 = 0;
-        } else {
-            response->centerFreq = 0;
-            response->centerFreq1 = linkedInfo.frequency;
-        }
-        response->centerFreq2 = 0;
-        response->bandwidth = linkedInfo.band;
-        return WIFI_SUCCESS;
-    }
-
     OHOS::Wifi::RecommendChannelRequest req;
     OHOS::Wifi::RecommendChannelResponse rsp;
     ConvertRecommendChannelRequest(request, req);
@@ -192,8 +171,20 @@ WifiErrorCode Hid2dSetPeerWifiCfgInfo(PeerCfgType cfgType, char cfgData[CFG_DATA
         OHOS::Wifi::PeerCfgType(static_cast<int>(cfgType)), cfgData, setDataValidLen));
 }
 
-int Hid2dIsWideBandwidthSupported()
+int Hid2dIsWideBandwidthSupported(void)
 {
     constexpr int NOT_SUPPORT = 0; // false
     return NOT_SUPPORT;
+}
+
+WifiErrorCode Hid2dSetUpperScene(const char ifName[IF_NAME_LEN], const Hid2dUpperScene *scene)
+{
+    CHECK_PTR_RETURN(wifiHid2dPtr, ERROR_WIFI_NOT_AVAILABLE);
+    CHECK_PTR_RETURN(scene, ERROR_WIFI_INVALID_ARGS);
+    OHOS::Wifi::Hid2dUpperScene upperScene;
+    upperScene.mac = OHOS::Wifi::MacArrayToStr(scene->mac);
+    upperScene.scene = scene->scene;
+    upperScene.fps = scene->fps;
+    upperScene.bw = scene->bw;
+    return GetCErrorCode(wifiHid2dPtr->Hid2dSetUpperScene(ifName, upperScene));
 }

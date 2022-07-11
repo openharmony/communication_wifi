@@ -105,7 +105,11 @@ static int InitRpcFuncMapChip(void)
     ret += PushRpcFunc("ConfigComboModes", RpcConfigComboModes);
     ret += PushRpcFunc("GetComboModes", RpcGetComboModes);
     ret += PushRpcFunc("RequestFirmwareDebugDump", RpcRequestFirmwareDebugDump);
-    ret += PushRpcFunc("SetPowerMode", RpcSetPowerMode);
+    ret += PushRpcFunc("IsChipSupportDbdc", RpcIsChipSupportDbdc);
+    ret += PushRpcFunc("IsChipSupportCsa", RpcIsChipSupportCsa);
+    ret += PushRpcFunc("IsChipSupportRadarDetect", RpcIsChipSupportRadarDetect);
+    ret += PushRpcFunc("IsChipSupportDfsChannel", RpcIsChipSupportDfsChannel);
+    ret += PushRpcFunc("IsChipSupportIndoorChannel", RpcIsChipSupportIndoorChannel);
     return ret;
 }
 

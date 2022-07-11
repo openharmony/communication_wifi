@@ -16,6 +16,7 @@
 #ifndef OHOS_IDL_IWIFI_CHIP_H
 #define OHOS_IDL_IWIFI_CHIP_H
 
+#include <stdbool.h>
 #include "wifi_error_no.h"
 #include "i_wifi_chip_event_callback.h"
 #include "i_wifi_struct.h"
@@ -138,13 +139,44 @@ WifiErrorNo RegisterEventCallback(IWifiChipEventCallback callback);
 WifiErrorNo RequestFirmwareDebugDump(unsigned char *bytes, int32_t *size);
 
 /**
- * @Description Setting the Low Latency Mode.
+ * @Description is support DBDC
  *
- * @param mode
+ * @param isSupport - is support or not
  * @return WifiErrorNo
  */
-WifiErrorNo SetPowerMode(uint8_t mode);
+WifiErrorNo IsChipSupportDbdc(bool *isSupport);
 
+/**
+ * @Description is support CSA
+ *
+ * @param isSupport - is support or not
+ * @return WifiErrorNo
+ */
+WifiErrorNo IsChipSupportCsa(bool *isSupport);
+
+/**
+ * @Description is support radar detection
+ *
+ * @param isSupport - is support or not
+ * @return WifiErrorNo
+ */
+WifiErrorNo IsChipSupportRadarDetect(bool *isSupport);
+
+/**
+ * @Description is support DFS channel
+ *
+ * @param isSupport - is support or not
+ * @return WifiErrorNo
+ */
+WifiErrorNo IsChipSupportDfsChannel(bool *isSupport);
+
+/**
+ * @Description is support indoor channel
+ *
+ * @param isSupport - is support or not
+ * @return WifiErrorNo
+ */
+WifiErrorNo IsChipSupportIndoorChannel(bool *isSupport);
 #ifdef __cplusplus
 }
 #endif

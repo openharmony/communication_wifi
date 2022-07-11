@@ -476,6 +476,21 @@ void WifiInternalEventDispatcher::InvokeP2pCallbacks(const WifiEventCallbackMsg 
     }
 }
 
+void WifiInternalEventDispatcher::SendConfigChangeEvent(sptr<IWifiP2pCallback> &callback,  CfgInfo* cfgInfo)
+{
+    if (cfgInfo == nullptr) {
+        WIFI_LOGE("cfgInfo is nullptr");
+        return;
+    }
+    callback->OnConfigChanged(cfgInfo->type, cfgInfo->data, cfgInfo->dataLen);
+    if (cfgInfo->data != nullptr) {
+        delete[] cfgInfo->data;
+        cfgInfo->data = nullptr;
+    }
+    delete cfgInfo;
+    cfgInfo = nullptr;
+}
+
 void WifiInternalEventDispatcher::SendP2pCallbackMsg(sptr<IWifiP2pCallback> &callback, const WifiEventCallbackMsg &msg)
 {
     if (callback == nullptr) {
@@ -506,6 +521,9 @@ void WifiInternalEventDispatcher::SendP2pCallbackMsg(sptr<IWifiP2pCallback> &cal
             break;
         case WIFI_CBK_MSG_P2P_ACTION_RESULT:
             callback->OnP2pActionResult(msg.p2pAction, static_cast<ErrCode>(msg.msgData));
+            break;
+        case WIFI_CBK_CMD_CFG_CHANGE:
+            SendConfigChangeEvent(callback, msg.cfgInfo);
             break;
         default:
             WIFI_LOGI("UnKnown msgcode %{public}d", msg.msgCode);

@@ -144,14 +144,53 @@ int RpcRequestFirmwareDebugDump(RpcServer *server, Context *context);
 
 /**
  * @Description Parse the context to obtain data. Call the corresponding function
- *              SetPowerMode and assemble the function to obtain data.
+ *              RpcIsChipSupportDbdc and assemble the function to obtain data.
  *
  * @param server - Pointer to the global structure of the communication server.
  * @param context - Pointer to the global communication context structure of the server.
  * @return int - 0 Success, -1 Failed.
  */
-int RpcSetPowerMode(RpcServer *server, Context *context);
+int RpcIsChipSupportDbdc(RpcServer *server, Context *context);
 
+/**
+ * @Description Parse the context to obtain data. Call the corresponding function
+ *              RpcIsChipSupportCsa and assemble the function to obtain data.
+ *
+ * @param server - Pointer to the global structure of the communication server.
+ * @param context - Pointer to the global communication context structure of the server.
+ * @return int - 0 Success, -1 Failed.
+ */
+int RpcIsChipSupportCsa(RpcServer *server, Context *context);
+
+/**
+ * @Description Parse the context to obtain data. Call the corresponding function
+ *              RpcIsChipSupportRadarDetect and assemble the function to obtain data.
+ *
+ * @param server - Pointer to the global structure of the communication server.
+ * @param context - Pointer to the global communication context structure of the server.
+ * @return int - 0 Success, -1 Failed.
+ */
+int RpcIsChipSupportRadarDetect(RpcServer *server, Context *context);
+
+/**
+ * @Description Parse the context to obtain data. Call the corresponding function
+ *              RpcIsChipSupportDfsChannel and assemble the function to obtain data.
+ *
+ * @param server - Pointer to the global structure of the communication server.
+ * @param context - Pointer to the global communication context structure of the server.
+ * @return int - 0 Success, -1 Failed.
+ */
+int RpcIsChipSupportDfsChannel(RpcServer *server, Context *context);
+
+/**
+ * @Description Parse the context to obtain data. Call the corresponding function
+ *              RpcIsChipSupportIndoorChannel and assemble the function to obtain data.
+ *
+ * @param server - Pointer to the global structure of the communication server.
+ * @param context - Pointer to the global communication context structure of the server.
+ * @return int - 0 Success, -1 Failed.
+ */
+int RpcIsChipSupportIndoorChannel(RpcServer *server, Context *context);
 #ifdef __cplusplus
 }
 #endif

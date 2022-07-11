@@ -37,6 +37,15 @@ extern "C" {
 
 #define CFG_DATA_MAX_BYTES 255
 
+#define CFG_CALLBACK_BYTE 4
+
+typedef enum CfgType {
+    CFG_INVALID = -1,
+    GET_SELF_CONFIG = 0,
+} CfgType;
+
+typedef void (*WifiCfgChangCallback)(CfgType, char* data, int dataLen);
+
 typedef enum DhcpMode {
     CONNECT_GO_NODHCP = 0,
     CONNECT_AP_DHCP = 1,
@@ -137,6 +146,17 @@ typedef struct RecommendChannelResponse {
     int bandwidth;
 } RecommendChannelResponse;
 
+typedef struct Hid2dUpperScene {
+    /* The mac address of the device */
+    unsigned char mac[MAC_LEN];
+    /* The scene of upper layer, hexadecimal digit, currently bit 0-2 is valid, 0: video, 1: audio, 2: file */
+    unsigned int scene;
+    /* Frame rate, -1/30/60 is valid */
+    int fps;
+    /* band width, valid only in video scenes, the default value is 0 */
+    unsigned int bw;
+} Hid2dUpperScene;
+
 /**
  * @Description Request an IP address to the Gc from the IP address pool, used on the GO side.
  *
@@ -152,14 +172,14 @@ WifiErrorCode Hid2dRequestGcIp(const unsigned char gcMac[MAC_LEN], unsigned int 
  *
  * @return WifiErrorCode - operation result
  */
-WifiErrorCode Hid2dSharedlinkIncrease();
+WifiErrorCode Hid2dSharedlinkIncrease(void);
 
 /**
  * @Description Decrease(-1) shared link reference counting
  *
  * @return WifiErrorCode - operation result
  */
-WifiErrorCode Hid2dSharedlinkDecrease();
+WifiErrorCode Hid2dSharedlinkDecrease(void);
 
 /**
  * @Description Create hid2d group, used on the GO side.
@@ -249,7 +269,31 @@ WifiErrorCode Hid2dSetPeerWifiCfgInfo(PeerCfgType cfgType, char cfgData[CFG_DATA
  *
  * @return int - 0: not supported, 1: supported
  */
-int Hid2dIsWideBandwidthSupported();
+int Hid2dIsWideBandwidthSupported(void);
+
+/**
+ * @Description Set the scene of upper layer
+ *
+ * @param ifName - interface name
+ * @param scene - scene
+ * @return WifiErrorCode - operate result
+ */
+WifiErrorCode Hid2dSetUpperScene(const char ifName[IF_NAME_LEN], const Hid2dUpperScene *scene);
+
+/**
+ * @Description Register config change callback
+ *
+ * @param callback - callback
+ * @return WifiErrorCode - operate result
+ */
+WifiErrorCode RegisterCfgChangCallback(const WifiCfgChangCallback callback);
+
+/**
+ * @Description Unregister config change callback
+ *
+ * @return WifiErrorCode - operate result
+ */
+WifiErrorCode UnregisterCfgChangCallback(void);
 #ifdef __cplusplus
 }
 #endif

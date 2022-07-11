@@ -252,5 +252,31 @@ void WifiP2pCallbackProxy::OnP2pActionResult(P2pActionCallback action, ErrCode c
     }
     return;
 }
+
+void WifiP2pCallbackProxy::OnConfigChanged(CfgType type, char* cfgData, int dataLen)
+{
+    WIFI_LOGD("WifiP2pCallbackProxy::OnConfigChanged");
+    MessageOption option;
+    MessageParcel data;
+    MessageParcel reply;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return;
+    }
+    data.WriteInt32(0);
+    data.WriteInt32(static_cast<int>(type));
+    data.WriteInt32(dataLen);
+    data.WriteBuffer(cfgData, dataLen);
+    int error = Remote()->SendRequest(WIFI_CBK_CMD_CFG_CHANGE, data, reply, option);
+    if (error != ERR_NONE) {
+        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d", WIFI_CBK_CMD_CFG_CHANGE, error);
+        return;
+    }
+    int exception = reply.ReadInt32();
+    if (exception) {
+        WIFI_LOGI("notify wifi p2p action callback result failed!");
+    }
+    return;
+}
 }  // namespace Wifi
 }  // namespace OHOS

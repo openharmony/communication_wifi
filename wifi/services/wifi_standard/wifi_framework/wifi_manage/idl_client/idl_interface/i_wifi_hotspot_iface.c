@@ -25,7 +25,7 @@
 
 #define AP_EVENT_MAX_NUM 8
 
-static IWifiApEventCallback g_wifiApEventCallback[AP_INSTANCE_MAX_NUM] = {0};
+static IWifiApEventCallback g_wifiApEventCallback[AP_INSTANCE_MAX_NUM];
 void SetWifiApEventCallback(IWifiApEventCallback callback, int id)
 {
     g_wifiApEventCallback[id] = callback;

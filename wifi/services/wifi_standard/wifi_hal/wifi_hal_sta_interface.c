@@ -25,7 +25,7 @@
 #define LOG_TAG "WifiHalStaInterface"
 
 #define WPA_CMD_STOP_LENG 64
-#define WPA_TRY_CONNECT_SLEEP_TIME (100 * 1000) /* 100ms */
+#define WPA_TERMINATE_SLEEP_TIME (50 * 1000) /* 50ms */
 
 static const char *g_serviceName = "wpa_supplicant";
 static const char *g_startCmd = "wpa_supplicant -iglan0 -g/data/misc/wifi/sockets/wpa";
@@ -167,6 +167,7 @@ WifiErrorNo StopSupplicant(void)
         LOGE("wpaCliCmdWpaTerminate failed! ret=%{public}d", res);
         return WIFI_HAL_FAILED;
     }
+    usleep(WPA_TERMINATE_SLEEP_TIME);
     ModuleManageRetCode ret = StopModule(g_serviceName);
     if (ret == MM_FAILED) {
         LOGE("stop wpa_supplicant failed!");

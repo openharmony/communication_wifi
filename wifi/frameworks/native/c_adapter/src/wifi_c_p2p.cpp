@@ -14,6 +14,7 @@
  */
 
 #include "../../../interfaces/kits/c/wifi_p2p.h"
+#include "../../../interfaces/kits/c/wifi_hid2d.h"
 #include "wifi_logger.h"
 #include "../../../frameworks/native/include/wifi_p2p.h"
 #include "wifi_c_utils.h"
@@ -334,7 +335,8 @@ WifiErrorCode QueryP2pGroups(WifiP2pGroupInfo* groupInfo, int size)
     return WIFI_SUCCESS;
 }
 
-class WifiP2pCEventCallback : public OHOS::Wifi::IWifiP2pCallback {
+class WifiP2pCEventCallback : public OHOS::Wifi::IWifiP2pCallback
+{
 public:
     void OnP2pStateChanged(int state) override {
         WIFI_LOGI("received state changed event: %{public}d", state);
@@ -396,6 +398,13 @@ public:
     void OnP2pActionResult(OHOS::Wifi::P2pActionCallback action, OHOS::Wifi::ErrCode code) override {
     }
 
+    void OnConfigChanged(OHOS::Wifi::CfgType type, char* data, int dataLen) override {
+        WIFI_LOGI("received config change event: %{public}d", static_cast<int>(type));
+        if (cfgChangeCallback != nullptr) {
+            cfgChangeCallback(CfgType(type), data, dataLen);
+        }
+    }
+
     OHOS::sptr<OHOS::IRemoteObject> AsObject() override {
         return nullptr;
     }
@@ -406,6 +415,7 @@ public:
         groupChangeCb = nullptr;
         connectionChangeCb = nullptr;
         peersChangeCb = nullptr;
+        cfgChangeCallback = nullptr;
     }
 
     virtual ~WifiP2pCEventCallback() {
@@ -416,6 +426,7 @@ public:
     P2pPersistentGroupsChangedCallback groupChangeCb;
     P2pConnectionChangedCallback connectionChangeCb;
     P2pPeersChangedCallback peersChangeCb;
+    WifiCfgChangCallback cfgChangeCallback;
 
 private:
     WifiP2pLinkedInfo ConvertP2pLinkedInfo(const OHOS::Wifi::WifiP2pLinkedInfo& linkedInfo) {
@@ -434,6 +445,7 @@ WifiErrorCode RegisterP2pStateChangedCallback(const P2pStateChangedCallback call
 {
     CHECK_PTR_RETURN(callback, ERROR_WIFI_INVALID_ARGS);
     CHECK_PTR_RETURN(wifiP2pPtr, ERROR_WIFI_NOT_AVAILABLE);
+    CHECK_PTR_RETURN(sptrCallback, ERROR_WIFI_NOT_AVAILABLE);
     sptrCallback->stateChangeCb = callback;
     wifiP2pPtr->RegisterCallBack(sptrCallback);
     return WIFI_SUCCESS;
@@ -443,6 +455,7 @@ WifiErrorCode RegisterP2pPersistentGroupsChangedCallback(const P2pPersistentGrou
 {
     CHECK_PTR_RETURN(callback, ERROR_WIFI_INVALID_ARGS);
     CHECK_PTR_RETURN(wifiP2pPtr, ERROR_WIFI_NOT_AVAILABLE);
+    CHECK_PTR_RETURN(sptrCallback, ERROR_WIFI_NOT_AVAILABLE);
     sptrCallback->groupChangeCb = callback;
     wifiP2pPtr->RegisterCallBack(sptrCallback);
     return WIFI_SUCCESS;
@@ -452,6 +465,7 @@ WifiErrorCode RegisterP2pConnectionChangedCallback(const P2pConnectionChangedCal
 {
     CHECK_PTR_RETURN(callback, ERROR_WIFI_INVALID_ARGS);
     CHECK_PTR_RETURN(wifiP2pPtr, ERROR_WIFI_NOT_AVAILABLE);
+    CHECK_PTR_RETURN(sptrCallback, ERROR_WIFI_NOT_AVAILABLE);
     sptrCallback->connectionChangeCb = callback;
     wifiP2pPtr->RegisterCallBack(sptrCallback);
     return WIFI_SUCCESS;
@@ -461,7 +475,25 @@ WifiErrorCode RegisterP2pPeersChangedCallback(const P2pPeersChangedCallback call
 {
     CHECK_PTR_RETURN(callback, ERROR_WIFI_INVALID_ARGS);
     CHECK_PTR_RETURN(wifiP2pPtr, ERROR_WIFI_NOT_AVAILABLE);
+    CHECK_PTR_RETURN(sptrCallback, ERROR_WIFI_NOT_AVAILABLE);
     sptrCallback->peersChangeCb = callback;
     wifiP2pPtr->RegisterCallBack(sptrCallback);
+    return WIFI_SUCCESS;
+}
+
+WifiErrorCode RegisterCfgChangCallback(const WifiCfgChangCallback callback)
+{
+    CHECK_PTR_RETURN(callback, ERROR_WIFI_INVALID_ARGS);
+    CHECK_PTR_RETURN(wifiP2pPtr, ERROR_WIFI_NOT_AVAILABLE);
+    CHECK_PTR_RETURN(sptrCallback, ERROR_WIFI_NOT_AVAILABLE);
+    sptrCallback->cfgChangeCallback = callback;
+    wifiP2pPtr->RegisterCallBack(sptrCallback);
+    return WIFI_SUCCESS;
+}
+
+WifiErrorCode UnregisterCfgChangCallback(void)
+{
+    CHECK_PTR_RETURN(sptrCallback, ERROR_WIFI_NOT_AVAILABLE);
+    sptrCallback->cfgChangeCallback = nullptr;
     return WIFI_SUCCESS;
 }

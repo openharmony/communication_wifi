@@ -133,6 +133,15 @@ public:
      */
     virtual ErrCode Hid2dSetPeerWifiCfgInfo(PeerCfgType cfgType,
         char cfgData[CFG_DATA_MAX_BYTES], int setDataValidLen) = 0;
+
+    /**
+     * @Description Set the scene of upper layer
+     *
+     * @param ifName - interface name
+     * @param scene - scene
+     * @return ErrCode - operate result
+     */
+    virtual ErrCode Hid2dSetUpperScene(const std::string& ifName, const Hid2dUpperScene& scene) = 0;
 };
 }  // namespace Wifi
 }  // namespace OHOS

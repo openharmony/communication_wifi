@@ -74,6 +74,7 @@ void WifiP2pStub::InitHandleMap()
     handleFuncMap[WIFI_SVR_CMD_GET_SELF_WIFI_CFG] = &WifiP2pStub::OnHid2dGetSelfWifiCfgInfo;
     handleFuncMap[WIFI_SVR_CMD_SET_PEER_WIFI_CFG] = &WifiP2pStub::OnHid2dSetPeerWifiCfgInfo;
     handleFuncMap[WIFI_SVR_CMD_P2P_QUERY_LOCAL_DEVICE] = &WifiP2pStub::OnQueryP2pLocalDevice;
+    handleFuncMap[WIFI_SVR_CMD_SET_UPPER_SCENE] = &WifiP2pStub::OnHid2dSetUpperScene;
     return;
 }
 
@@ -594,6 +595,7 @@ void WifiP2pStub::OnRegisterCallBack(uint32_t code, MessageParcel &data, Message
             }
             ret = WIFI_OPT_SUCCESS;
         }
+        MonitorCfgChange();
     } while (0);
 
     reply.WriteInt32(0);
@@ -824,6 +826,22 @@ void WifiP2pStub::OnHid2dSetPeerWifiCfgInfo(
         return;
     }
     ErrCode ret = Hid2dSetPeerWifiCfgInfo(PeerCfgType(cfgType), cfgData, len);
+    reply.WriteInt32(0);
+    reply.WriteInt32(ret);
+}
+
+void WifiP2pStub::OnHid2dSetUpperScene(
+    uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
+{
+    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+
+    std::string ifName = data.ReadCString();
+    Hid2dUpperScene scene;
+    scene.mac = data.ReadCString();
+    scene.scene = data.ReadUint32();
+    scene.fps = data.ReadInt32();
+    scene.bw = data.ReadUint32();
+    ErrCode ret = Hid2dSetUpperScene(ifName, scene);
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
 }

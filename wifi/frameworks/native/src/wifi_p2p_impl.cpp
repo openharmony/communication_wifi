@@ -319,5 +319,11 @@ ErrCode WifiP2pImpl::Hid2dSetPeerWifiCfgInfo(PeerCfgType cfgType, char cfgData[C
     RETURN_IF_FAIL(client_);
     return client_->Hid2dSetPeerWifiCfgInfo(cfgType, cfgData, setDataValidLen);
 }
+
+ErrCode WifiP2pImpl::Hid2dSetUpperScene(const std::string& ifName, const Hid2dUpperScene& scene)
+{
+    RETURN_IF_FAIL(client_);
+    return client_->Hid2dSetUpperScene(ifName, scene);
+}
 }  // namespace Wifi
 }  // namespace OHOS

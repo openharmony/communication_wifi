@@ -129,6 +129,10 @@ void WifiManager::AutoStartStaServiceThread(void)
 #endif
 
 #ifdef FEATURE_P2P_SUPPORT
+WifiCfgMonitorEventCallback WifiManager::cfgMonitorCallback = {
+    nullptr,
+};
+
 void WifiManager::AutoStartP2pService(void)
 {
     WifiOprMidState p2pState = WifiConfigCenter::GetInstance().GetP2pMidState();
@@ -485,6 +489,11 @@ void WifiManager::DealStaConnChanged(OperateResState state, const WifiLinkedInfo
             }
         }
     }
+#ifdef FEATURE_P2P_SUPPORT
+    if (cfgMonitorCallback.onStaConnectionChange != nullptr) {
+        cfgMonitorCallback.onStaConnectionChange(static_cast<int>(state));
+    }
+#endif
     return;
 }
 
@@ -716,6 +725,7 @@ void WifiManager::InitP2pCallback(void)
     mP2pCallback.OnP2pDiscoveryChangedEvent = DealP2pDiscoveryChanged;
     mP2pCallback.OnP2pGroupsChangedEvent = DealP2pGroupsChanged;
     mP2pCallback.OnP2pActionResultEvent = DealP2pActionResult;
+    mP2pCallback.OnConfigChangedEvent = DealConfigChanged;
     return;
 }
 
@@ -807,7 +817,43 @@ void WifiManager::DealP2pActionResult(P2pActionCallback action, ErrCode code)
     WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
     return;
 }
-#endif
 
+void WifiManager::DealConfigChanged(CfgType type, char* data, int dataLen)
+{
+    if (data == nullptr || dataLen <= 0) {
+        return;
+    }
+    WifiEventCallbackMsg cbMsg;
+    cbMsg.msgCode = WIFI_CBK_CMD_CFG_CHANGE;
+    CfgInfo* cfgInfoPtr = new (std::nothrow) CfgInfo();
+    if (cfgInfoPtr == nullptr) {
+        WIFI_LOGE("DealConfigChanged: new CfgInfo failed");
+        return;
+    }
+    cfgInfoPtr->type = type;
+    char* cfgData = new (std::nothrow) char[dataLen];
+    if (cfgData == nullptr) {
+        WIFI_LOGE("DealConfigChanged: new data failed");
+        delete cfgInfoPtr;
+        return;
+    }
+    if (memcpy_s(cfgData, dataLen, data, dataLen) != EOK) {
+        WIFI_LOGE("DealConfigChanged: memcpy_s failed");
+        delete cfgInfoPtr;
+        delete[] cfgData;
+        return;
+    }
+    cfgInfoPtr->data = cfgData;
+    cfgInfoPtr->dataLen = dataLen;
+    cbMsg.cfgInfo = cfgInfoPtr;
+    WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
+    return;
+}
+
+void WifiManager::RegisterCfgMonitorCallback(WifiCfgMonitorEventCallback callback)
+{
+    cfgMonitorCallback = callback;
+}
+#endif
 }  // namespace Wifi
 }  // namespace OHOS

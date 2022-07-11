@@ -44,10 +44,10 @@ ohos_unittest("wifi_p2p_test") {
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/common/state.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/common/state_machine.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/common/wifi_broadcast_helper.cpp",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_hid2d_service_utils.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_p2p/authorizing_negotiation_request_state.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_p2p/group_formed_state.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_p2p/group_negotiation_state.cpp",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_p2p/hid2d/wifi_hid2d_service_utils.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_p2p/invitation_received_state.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_p2p/invitation_request_state.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_p2p/p2p_default_state.cpp",
@@ -139,11 +139,15 @@ ohos_unittest("wifi_p2p_test") {
     "//third_party/googletest/googlemock/include",
     "//third_party/googletest/googletest/include",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_p2p/hid2d",
+    "$WIFI_ROOT_DIR/utils/inc",
   ]
 
   deps = [
     "$DHCP_ROOT_DIR/services/mgr_service:dhcp_manager_service",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage:wifi_manager_service",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common:wifi_common_service",
+    "$WIFI_ROOT_DIR/utils/src:wifi_utils",
     "//third_party/googletest:gmock_main",
     "//utils/native/base:utils",
   ]

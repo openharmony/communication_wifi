@@ -155,8 +155,8 @@ void P2pStateMachine::UpdateOwnDevice(P2pDeviceStatus status)
 
 void P2pStateMachine::InitializeThisDevice()
 {
-    constexpr size_t randomLen = 4;
     std::string deviceName;
+    constexpr size_t randomLen = 4;
     P2pVendorConfig p2pVendorCfg;
     int ret = WifiSettings::GetInstance().GetP2pVendorConfig(p2pVendorCfg);
     if (ret < 0) {

@@ -109,12 +109,44 @@ public:
     WifiErrorNo RequestFirmwareDebugInfo(std::string &debugInfo);
 
     /**
-     * @Description Setting the Power Mode.
+     * @Description is support DBDC
      *
-     * @param mode
+     * @param isSupport
      * @return WifiErrorNo
      */
-    WifiErrorNo SetWifiPowerMode(int mode);
+    WifiErrorNo IsSupportDbdc(bool &isSupport) const;
+
+    /**
+     * @Description is support CSA
+     *
+     * @param isSupport
+     * @return WifiErrorNo
+     */
+    WifiErrorNo IsSupportCsa(bool &isSupport) const;
+
+    /**
+     * @Description is support radar detection
+     *
+     * @param isSupport
+     * @return WifiErrorNo
+     */
+    WifiErrorNo IsSupportRadarDetect(bool &isSupport) const;
+
+    /**
+     * @Description is support DFS channel
+     *
+     * @param isSupport
+     * @return WifiErrorNo
+     */
+    WifiErrorNo IsSupportDfsChannel(bool &isSupport) const;
+
+    /**
+     * @Description is support indoor channel
+     *
+     * @param isSupport
+     * @return WifiErrorNo
+     */
+    WifiErrorNo IsSupportIndoorChannel(bool &isSupport) const;
 };
 }  // namespace Wifi
 }  // namespace OHOS

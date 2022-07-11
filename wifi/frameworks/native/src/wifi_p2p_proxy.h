@@ -359,6 +359,15 @@ public:
         char cfgData[CFG_DATA_MAX_BYTES], int setDataValidLen) override;
 
     /**
+     * @Description Set the scene of upper layer
+     *
+     * @param ifName - interface name
+     * @param scene - scene
+     * @return ErrCode - operate result
+     */
+    ErrCode Hid2dSetUpperScene(const std::string& ifName, const Hid2dUpperScene& scene) override;
+
+    /**
     * @Description Handle remote object died event.
     * @param remoteObject remote object.
     */

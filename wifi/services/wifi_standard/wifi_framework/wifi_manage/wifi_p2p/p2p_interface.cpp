@@ -206,5 +206,52 @@ ErrCode P2pInterface::Hid2dConnect(const Hid2dConnectConfig& config)
 {
     return p2pService.Hid2dConnect(config);
 }
+
+ErrCode P2pInterface::Hid2dGetSelfWifiCfgInfo(SelfCfgType cfgType,
+    char cfgData[CFG_DATA_MAX_BYTES], int* getDatValidLen)
+{
+    return p2pService.Hid2dGetSelfWifiCfgInfo(cfgType, cfgData, getDatValidLen);
+}
+
+ErrCode P2pInterface::Hid2dSetPeerWifiCfgInfo(PeerCfgType cfgType,
+    char cfgData[CFG_DATA_MAX_BYTES], int setDataValidLen)
+{
+    return p2pService.Hid2dSetPeerWifiCfgInfo(cfgType, cfgData, setDataValidLen);
+}
+
+ErrCode P2pInterface::Hid2dRequestGcIp(const std::string& gcMac, std::string& ipAddr)
+{
+    return p2pService.Hid2dRequestGcIp(gcMac, ipAddr);
+}
+
+void P2pInterface::IncreaseSharedLink(void)
+{
+    p2pService.IncreaseSharedLink();
+}
+
+void P2pInterface::DecreaseSharedLink(void)
+{
+    p2pService.DecreaseSharedLink();
+}
+
+int P2pInterface::GetSharedLinkCount(void)
+{
+    return p2pService.GetSharedLinkCount();
+}
+
+int P2pInterface::GetP2pRecommendChannel(void)
+{
+    return p2pService.GetP2pRecommendChannel();
+}
+
+ErrCode P2pInterface::Hid2dSetUpperScene(const std::string& ifName, const Hid2dUpperScene& scene)
+{
+    return p2pService.Hid2dSetUpperScene(ifName, scene);
+}
+
+ErrCode P2pInterface::MonitorCfgChange(void)
+{
+    return p2pService.MonitorCfgChange();
+}
 }  // namespace Wifi
 }  // namespace OHOS

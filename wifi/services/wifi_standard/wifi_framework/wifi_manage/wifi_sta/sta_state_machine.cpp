@@ -24,6 +24,7 @@
 #include "mac_address.h"
 #include "if_config.h"
 #include "wifi_common_util.h"
+#include "wifi_chip_capability.h"
 #include "wifi_supplicant_hal_interface.h"
 
 #ifndef OHOS_WIFI_STA_TEST
@@ -417,7 +418,7 @@ void StaStateMachine::StartWifiProcess()
         InitLastWifiLinkedInfo();
         WifiSettings::GetInstance().SaveLinkedInfo(linkedInfo);
         SyncDeviceConfigToWpa();
-
+        ChipCapability::GetInstance().InitializeChipCapability();
         /* The current state of StaStateMachine transfers to SeparatedState after
          * enable supplicant.
          */

@@ -121,6 +121,7 @@
 #define WIFI_SVR_CMD_GET_SELF_WIFI_CFG 0x2025    /* get self wifi configuration */
 #define WIFI_SVR_CMD_SET_PEER_WIFI_CFG 0x2026    /* set peer wifi configuration */
 #define WIFI_SVR_CMD_P2P_QUERY_LOCAL_DEVICE 0x2027 /* query the information about the local device */
+#define WIFI_SVR_CMD_SET_UPPER_SCENE 0x2028    /* set the scene of upper layer */
 
 /* -----------register event type and message define-------------- */
 #define WIFI_CBK_CMD_STATE_CHANGE 0x1001         /* STA state change event */
@@ -141,7 +142,9 @@
 #define WIFI_CBK_CMD_CONNECT_CHANGE 0x1015
 #define WIFI_CBK_CMD_DISCOVERY_CHANGE 0x1016
 #define WIFI_CBK_CMD_P2P_ACTION_RESULT 0x1017
+#define WIFI_CBK_CMD_CFG_CHANGE 0x1018
 
+/* Duplicate message code, to be optimized */
 #define WIFI_CBK_MSG_STATE_CHANGE 0x1001
 #define WIFI_CBK_MSG_CONNECTION_CHANGE 0x1002
 #define WIFI_CBK_MSG_RSSI_CHANGE 0x1003

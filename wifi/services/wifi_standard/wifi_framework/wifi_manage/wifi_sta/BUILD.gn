@@ -59,6 +59,7 @@ local_base_include_dirs = [
   "$DHCP_ROOT_DIR/interfaces/inner_api/interfaces",
   "$WIFI_ROOT_DIR/utils/inc",
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage",
+  "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common",
 ]
 
 if (defined(ohos_lite)) {
@@ -118,6 +119,7 @@ if (defined(ohos_lite)) {
       "$DHCP_ROOT_DIR/services/mgr_service:dhcp_manager_service",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage:wifi_manager_service",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/idl_client:wifi_idl_client",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common:wifi_common_service",
       "$WIFI_ROOT_DIR/utils/src:wifi_utils",
       "//utils/native/base:utils",
     ]

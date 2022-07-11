@@ -368,6 +368,15 @@ public:
     ErrCode Hid2dSetPeerWifiCfgInfo(PeerCfgType cfgType,
         char cfgData[CFG_DATA_MAX_BYTES], int setDataValidLen) override;
 
+    /**
+     * @Description Set the scene of upper layer
+     *
+     * @param ifName - interface name
+     * @param scene - scene
+     * @return ErrCode - operate result
+     */
+    ErrCode Hid2dSetUpperScene(const std::string& ifName, const Hid2dUpperScene& scene) override;
+
 private:
     int systemAbilityId_;
     sptr<IWifiP2p> client_;

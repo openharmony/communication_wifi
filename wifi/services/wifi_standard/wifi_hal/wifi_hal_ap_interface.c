@@ -58,7 +58,6 @@ WifiErrorNo StartSoftAp(int id)
     }
 
     int ret = hostapdHalDevice->enableAp(id);
-    usleep(ABLE_AP_WAIT_MS);
     if (ret != 0) {
         LOGE("enableAp failed! ret=%{public}d", ret);
         return WIFI_HAL_FAILED;
@@ -122,7 +121,6 @@ WifiErrorNo StopSoftAp(int id)
     WifiHostapdHalDevice *hostapdHalDevice = GetWifiHostapdDev(id);
     if (hostapdHalDevice != NULL) {
         int ret = hostapdHalDevice->disableAp(id);
-        usleep(DISABLE_AP_WAIT_MS);
         if (ret != 0) {
             LOGE("disableAp failed! ret=%{public}d", ret);
         }

@@ -25,7 +25,7 @@
 #define LOG_TAG "WifiHalStaInterface"
 
 #define WPA_CMD_STOP_LENG 64
-#define WPA_TRY_CONNECT_SLEEP_TIME (100 * 1000) /* 100ms */
+#define WPA_TERMINATE_SLEEP_TIME (50 * 1000) /* 50ms */
 
 static const char *g_serviceName = "wpa_supplicant";
 static const char *g_startCmd = "wpa_supplicant -iglan0 -g/data/misc/wifi/sockets/wpa";
@@ -142,7 +142,7 @@ WifiErrorNo ForceStop(void)
 
 WifiErrorNo StartSupplicant(void)
 {
-    LOGD("Start supplicant");
+    LOGI("Start supplicant");
     if (CopyConfigFile("wpa_supplicant.conf") != 0) {
         return WIFI_HAL_FAILED;
     }
@@ -156,7 +156,18 @@ WifiErrorNo StartSupplicant(void)
 
 WifiErrorNo StopSupplicant(void)
 {
-    LOGD("Stop supplicant");
+    LOGI("Stop supplicant");
+    WifiWpaStaInterface *pStaIfc = GetWifiStaInterface(0);
+    if (pStaIfc == NULL) {
+        LOGE("Supplicant is NOT inited!");
+        return WIFI_HAL_SUPPLICANT_NOT_INIT;
+    }
+    int res = pStaIfc->wpaCliCmdWpaTerminate(pStaIfc);
+    if (res < 0) {
+        LOGE("wpaCliCmdWpaTerminate failed! ret=%{public}d", res);
+        return WIFI_HAL_FAILED;
+    }
+    usleep(WPA_TERMINATE_SLEEP_TIME);
     ModuleManageRetCode ret = StopModule(g_serviceName);
     if (ret == MM_FAILED) {
         LOGE("stop wpa_supplicant failed!");

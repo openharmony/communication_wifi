@@ -39,6 +39,19 @@ extern "C" {
 #define BUFFER_SIZE_32 32
 #define BUFFER_SIZE_16 16
 
+#if (AP_NUM > 1)
+typedef enum EnApInstance {
+    AP_5G_MAIN_INSTANCE,
+    AP_2G_MAIN_INSTANCE,
+    AP_MAX_INSTANCE
+} ApInstance;
+#else
+typedef enum EnApInstance {
+    AP_2G_MAIN_INSTANCE,
+    AP_MAX_INSTANCE
+} ApInstance;
+#endif
+
 typedef struct StStatusInfo {
     char state[BUFFER_SIZE_16];
     char phy[BUFFER_SIZE_16];
@@ -57,30 +70,45 @@ typedef struct StWifiHostapdHalDevice {
     pthread_t tid;
     int threadRunFlag;
     int execDisable;
-    int (*setApInfo)(HostapdConfig *info);
-    int (*enableAp)(void);
-    int (*disableAp)(void);
-    int (*addBlocklist)(const char *mac);
-    int (*delBlocklist)(const char *mac);
-    int (*status)(StatusInfo *info);
-    int (*showConnectedDevList)(char *info, int size);
-    int (*reloadApConfigInfo)(void);
-    int (*disConnectedDev)(const char *mac);
-    int (*setCountryCode)(const char *code);
+    int (*setApInfo)(HostapdConfig *info, int id);
+    int (*enableAp)(int id);
+    int (*disableAp)(int id);
+    int (*addBlocklist)(const char *mac, int id);
+    int (*delBlocklist)(const char *mac, int id);
+    int (*status)(StatusInfo *info, int id);
+    int (*showConnectedDevList)(char *info, int size, int id);
+    int (*reloadApConfigInfo)(int id);
+    int (*disConnectedDev)(const char *mac, int id);
+    int (*setCountryCode)(const char *code, int id);
 } WifiHostapdHalDevice;
 
+typedef struct StWifiHostapdHalDeviceInfo {
+    int id;
+    WifiHostapdHalDevice *hostapdHalDev;
+    char *cfgName;
+    char *config;
+    char *udpPort;
+} WifiHostapdHalDeviceInfo;
+
+WifiHostapdHalDeviceInfo *GetWifiCfg(int *len);
 /**
  * @Description Get the Wifi Hostapd Dev object.
  *
  * @return WifiHostapdHalDevice*
  */
-WifiHostapdHalDevice *GetWifiHostapdDev(void);
+WifiHostapdHalDevice *GetWifiHostapdDev(int id);
 
 /**
  * @Description Release the Wifi Hostapd Dev object.
  *
  */
-void ReleaseHostapdDev(void);
+void ReleaseHostapdDev(int id);
+
+/**
+ * @Description Hostpad string concatenation.
+ *
+ */
+void GetDestPort(char *destPort, size_t len, int id);
 
 #ifdef __cplusplus
 }

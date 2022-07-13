@@ -29,6 +29,11 @@ WifiHotspotStub::WifiHotspotStub():mSingleCallback(false)
     InitHandleMap();
 }
 
+WifiHotspotStub::WifiHotspotStub(int id):mSingleCallback(false), m_id(id)
+{
+    InitHandleMap();
+}
+
 WifiHotspotStub::~WifiHotspotStub()
 {}
 
@@ -326,7 +331,7 @@ void WifiHotspotStub::OnRegisterCallBack(
                 WIFI_LOGD("AddDeathRecipient!");
             }
             if (callback_ != nullptr) {
-                WifiInternalEventDispatcher::GetInstance().AddHotspotCallback(remote, callback_);
+                WifiInternalEventDispatcher::GetInstance().AddHotspotCallback(remote, callback_, m_id);
             }
         }
     } while (0);

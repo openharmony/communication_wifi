@@ -30,13 +30,15 @@ extern "C" {
 /**
  * @Description Start Ap.
  *
+ * @param id - ap id
  * @return WifiErrorNo
  */
-WifiErrorNo StartSoftAp(void);
+WifiErrorNo StartSoftAp(int id);
 
 /**
  * @Description Start Hostapd.
  *
+ * @param id - ap id
  * @return WifiErrorNo
  */
 WifiErrorNo StartHostapd(void);
@@ -44,16 +46,17 @@ WifiErrorNo StartHostapd(void);
 /**
  * @Description Init hostapd hal module.
  *
+ * @param id - ap id
  * @return WifiErrorNo
  */
-WifiErrorNo StartHostapdHal(void);
+WifiErrorNo StartHostapdHal(int id);
 
 /**
  * @Description Stop Ap.
  *
  * @return WifiErrorNo
  */
-WifiErrorNo StopSoftAp(void);
+WifiErrorNo StopSoftAp(int id);
 
 /**
  * @Description Stop hostapd.
@@ -65,9 +68,10 @@ WifiErrorNo StopHostapd(void);
 /**
  * @Description Release hostapd hal.
  *
+ * @param id - ap id
  * @return WifiErrorNo
  */
-WifiErrorNo StopHostapdHal(void);
+WifiErrorNo StopHostapdHal(int id);
 
 /**
  * @Description Obtains information about all connected STAs.
@@ -75,25 +79,28 @@ WifiErrorNo StopHostapdHal(void);
  * @param infos - Connected STA information array.
  * @param size - Obtains the size of all sta information arrays and Size of the
  *               obtained sta information array.
+ * @param id - ap id
  * @return WifiErrorNo
  */
-WifiErrorNo GetStaInfos(char *infos, int32_t *size);
+WifiErrorNo GetStaInfos(char *infos, int32_t *size, int id);
 
 /**
  * @Description Setting the AP Country Code.
  *
  * @param code - Country code.
+ * @param id - ap id
  * @return WifiErrorNo
  */
-WifiErrorNo SetCountryCode(const char *code);
+WifiErrorNo SetCountryCode(const char *code, int id);
 
 /**
  * @Description Setting the startup configuration items of the hostapd.
  *
  * @param config - Hostapd startup configuration.
+ * @param id - ap id
  * @return WifiErrorNo
  */
-WifiErrorNo SetHostapdConfig(HostapdConfig *config);
+WifiErrorNo SetHostapdConfig(HostapdConfig *config, int id);
 
 /**
  * @Description To set the blocklist filtering in AP mode to prohibit
@@ -101,9 +108,10 @@ WifiErrorNo SetHostapdConfig(HostapdConfig *config);
  *
  * @param mac - Blocklisted MAC address.
  * @param lenMac - Blocklist MAC address length.
+ * @param id - ap id
  * @return WifiErrorNo
  */
-WifiErrorNo SetMacFilter(const unsigned char *mac, int lenMac);
+WifiErrorNo SetMacFilter(const unsigned char *mac, int lenMac, int id);
 
 /**
  * @Description To set blocklist filtering in AP mode and delete a specified MAC
@@ -111,18 +119,20 @@ WifiErrorNo SetMacFilter(const unsigned char *mac, int lenMac);
  *
  * @param mac - Blocklisted MAC address.
  * @param lenMac - Blocklist MAC address length.
+ * @param id - ap id
  * @return WifiErrorNo
  */
-WifiErrorNo DelMacFilter(const unsigned char *mac, int lenMac);
+WifiErrorNo DelMacFilter(const unsigned char *mac, int lenMac, int id);
 
 /**
  * @Description Disconnect the STA with a specified MAC address.
  *
  * @param mac - Blocklisted MAC address.
  * @param lenMac - Blocklist MAC address length.
+ * @param id - ap id
  * @return WifiErrorNo
  */
-WifiErrorNo DisassociateSta(const unsigned char *mac, int lenMac);
+WifiErrorNo DisassociateSta(const unsigned char *mac, int lenMac, int id);
 
 /**
  * @Description Obtains the hotspot frequency supported by a specified
@@ -131,25 +141,28 @@ WifiErrorNo DisassociateSta(const unsigned char *mac, int lenMac);
  * @param band - Specified frequency band.
  * @param frequencies - Frequency array.
  * @param size - Frequency array memory size and Returns the size of the frequency array.
+ * @param id - ap id
  * @return WifiErrorNo
  */
-WifiErrorNo GetValidFrequenciesForBand(int32_t band, int *frequencies, int32_t *size);
+WifiErrorNo GetValidFrequenciesForBand(int32_t band, int *frequencies, int32_t *size, int id);
 
 /**
  * @Description Set the power mode.
  *
  * @param mode - power mode.
+ * @param id - ap id
  * @return WifiErrorNo
  */
-WifiErrorNo WifiSetPowerModel(const int mode);
+WifiErrorNo WifiSetPowerModel(const int mode, int id);
 
 /**
  * @Description Get the power mode.
  *
  * @param mode - power mode.
+ * @param id - ap id
  * @return WifiErrorNo
  */
-WifiErrorNo WifiGetPowerModel(int* mode);
+WifiErrorNo WifiGetPowerModel(int* mode, int id);
 #ifdef __cplusplus
 }
 #endif

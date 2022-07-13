@@ -25,7 +25,7 @@ DEFINE_WIFILOG_HOTSPOT_LABEL("WifiApConfigUse");
 
 namespace OHOS {
 namespace Wifi {
-ApConfigUse::ApConfigUse()
+ApConfigUse::ApConfigUse(int id) : m_id(id)
 {}
 
 ApConfigUse::~ApConfigUse()
@@ -69,6 +69,7 @@ void ApConfigUse::TransformFrequencyIntoChannel(const std::vector<int> &freqVect
 
 void ApConfigUse::LogConfig(HotspotConfig &apConfig) const
 {
+    WIFI_LOGI("current instance is %{public}d", m_id);
     WIFI_LOGI("HotspotConfig::SSID         = %{private}s", apConfig.GetSsid().c_str());
     WIFI_LOGI("HotspotConfig::preSharedKey = %{private}s", apConfig.GetPreSharedKey().c_str());
     WIFI_LOGI("HotspotConfig::securityType = %{public}d", static_cast<int>(apConfig.GetSecurityType()));

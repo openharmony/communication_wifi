@@ -80,7 +80,7 @@ public:
      * @param None
      * @return None
      */
-    ApStateMachine(ApStationsManager &, ApRootState &, ApIdleState &, ApStartedState &, ApMonitor &);
+    ApStateMachine(ApStationsManager &, ApRootState &, ApIdleState &, ApStartedState &, ApMonitor &, int id = 0);
 
     /**
      * @Description  destructor method.
@@ -167,7 +167,7 @@ private:
 
     DhcpdInterface m_DhcpdInterface;
     std::unique_ptr<DhcpNotify> pDhcpNotify;
-
+    int m_id;
 }; /* ApStateMachine */
 }  // namespace Wifi
 }  // namespace OHOS

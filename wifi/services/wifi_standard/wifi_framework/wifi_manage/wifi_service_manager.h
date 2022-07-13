@@ -68,12 +68,13 @@ struct ScanServiceHandle {
 };
 
 #ifdef FEATURE_AP_SUPPORT
+#define ALL_AP_ID 0xffff
 struct ApServiceHandle {
     void *handle;
-    IApService *(*create)();
+    IApService *(*create)(int id);
     void *(*destroy)(IApService *);
-    IApService *pService;
-    ApServiceHandle() : handle(nullptr), create(nullptr), destroy(nullptr), pService(nullptr)
+    std::map<int, IApService *> pService;
+    ApServiceHandle() : handle(nullptr), create(nullptr), destroy(nullptr)
     {}
     ~ApServiceHandle()
     {}
@@ -82,7 +83,7 @@ struct ApServiceHandle {
         handle = nullptr;
         create = nullptr;
         destroy = nullptr;
-        pService = nullptr;
+        pService.clear();
     }
 };
 #endif
@@ -155,7 +156,7 @@ public:
      *
      * @return IApService* - ap service pointer, if ap not supported, nullptr is returned
      */
-    IApService *GetApServiceInst(void);
+    IApService *GetApServiceInst(int id = 0);
 #endif
 
 #ifdef FEATURE_P2P_SUPPORT
@@ -173,7 +174,7 @@ public:
      * @param name - feature service name
      * @return int - 0 success
      */
-    int UnloadService(const std::string &name);
+    int UnloadService(const std::string &name, int id = 0);
 
     /**
      * @Description Uninstall all loaded feature services
@@ -190,7 +191,7 @@ private:
     int UnloadScanService(bool bPreLoad);
 #ifdef FEATURE_AP_SUPPORT
     int LoadApService(const std::string &dlname, bool bCreate);
-    int UnloadApService(bool bPreLoad);
+    int UnloadApService(bool bPreLoad, int id = 0);
 #endif
 #ifdef FEATURE_P2P_SUPPORT
     int LoadP2pService(const std::string &dlname, bool bCreate);

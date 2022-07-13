@@ -145,48 +145,65 @@ bool WifiInternalEventDispatcher::HasScanRemote(const sptr<IRemoteObject> &remot
 }
 
 int WifiInternalEventDispatcher::AddHotspotCallback(
-    const sptr<IRemoteObject> &remote, const sptr<IWifiHotspotCallback> &callback)
+    const sptr<IRemoteObject> &remote, const sptr<IWifiHotspotCallback> &callback, int id)
 {
-    WIFI_LOGD("WifiInternalEventDispatcher::AddHotspotCallback!");
+    WIFI_LOGD("WifiInternalEventDispatcher::AddHotspotCallback, id:%{public}d", id);
     if (remote == nullptr || callback == nullptr) {
         WIFI_LOGE("remote object is null!");
         return 1;
     }
     std::unique_lock<std::mutex> lock(mHotspotCallbackMutex);
-    mHotspotCallbacks[remote] = callback;
+    auto iter = mHotspotCallbacks.find(id);
+    if (iter != mHotspotCallbacks.end()) {
+        (iter->second)[remote] = callback;
+        return 0;
+    }
+    HotspotCallbackMapType hotspotCallback;
+    hotspotCallback[remote] = callback;
+    mHotspotCallbacks[id] = hotspotCallback;
     return 0;
 }
 
-int WifiInternalEventDispatcher::RemoveHotspotCallback(const sptr<IRemoteObject> &remote)
+int WifiInternalEventDispatcher::RemoveHotspotCallback(const sptr<IRemoteObject> &remote, int id)
 {
     if (remote != nullptr) {
-        std::unique_lock<std::mutex> lock(mHotspotCallbackMutex);
-        auto iter = mHotspotCallbacks.find(remote);
+        auto iter = mHotspotCallbacks.find(id);
         if (iter != mHotspotCallbacks.end()) {
-            mHotspotCallbacks.erase(iter);
-            WIFI_LOGD("WifiInternalEventDispatcher::RemoveHotspotCallback!");
+            std::unique_lock<std::mutex> lock(mHotspotCallbackMutex);
+            auto item = iter->second.find(remote);
+            if (item != iter->second.end()) {
+                iter->second.erase(item);
+                WIFI_LOGD("hotspot is is %{public}d WifiInternalEventDispatcher::RemoveHotspotCallback!", id);
+            }
         }
     }
     return 0;
 }
 
-int WifiInternalEventDispatcher::SetSingleHotspotCallback(const sptr<IWifiHotspotCallback> &callback)
+int WifiInternalEventDispatcher::SetSingleHotspotCallback(const sptr<IWifiHotspotCallback> &callback, int id)
 {
-    mHotspotSingleCallback = callback;
+    mHotspotSingleCallback[id] = callback;
     return 0;
 }
 
-sptr<IWifiHotspotCallback> WifiInternalEventDispatcher::GetSingleHotspotCallback() const
+sptr<IWifiHotspotCallback> WifiInternalEventDispatcher::GetSingleHotspotCallback(int id) const
 {
-    return mHotspotSingleCallback;
+    auto iter = mHotspotSingleCallback.find(id);
+    if (iter != mHotspotSingleCallback.end()) {
+        return iter->second;
+    }
+    return nullptr;
 }
 
-bool WifiInternalEventDispatcher::HasHotspotRemote(const sptr<IRemoteObject> &remote)
+bool WifiInternalEventDispatcher::HasHotspotRemote(const sptr<IRemoteObject> &remote, int id)
 {
-    std::unique_lock<std::mutex> lock(mHotspotCallbackMutex);
     if (remote != nullptr) {
-        if (mHotspotCallbacks.find(remote) != mHotspotCallbacks.end()) {
-            return true;
+        auto iter = mHotspotCallbacks.find(id);
+        if (iter != mHotspotCallbacks.end()) {
+            std::unique_lock<std::mutex> lock(mHotspotCallbackMutex);
+            if (iter->second.find(remote) != iter->second.end()) {
+                return true;
+            }
         }
     }
     return false;
@@ -395,26 +412,29 @@ void WifiInternalEventDispatcher::InvokeDeviceCallbacks(const WifiEventCallbackM
 
 void WifiInternalEventDispatcher::InvokeHotspotCallbacks(const WifiEventCallbackMsg &msg)
 {
-    HotspotCallbackMapType callbacks = mHotspotCallbacks;
-    HotspotCallbackMapType::iterator itr;
-    for (itr = callbacks.begin(); itr != callbacks.end(); itr++) {
-        auto callback = itr->second;
-        if (callback == nullptr) {
-            continue;
-        }
-        switch (msg.msgCode) {
-            case WIFI_CBK_MSG_HOTSPOT_STATE_CHANGE:
-                callback->OnHotspotStateChanged(msg.msgData);
-                break;
-            case WIFI_CBK_MSG_HOTSPOT_STATE_JOIN:
-                callback->OnHotspotStaJoin(msg.staInfo);
-                break;
-            case WIFI_CBK_MSG_HOTSPOT_STATE_LEAVE:
-                callback->OnHotspotStaLeave(msg.staInfo);
-                break;
-            default:
-                WIFI_LOGI("UnKnown msgcode %{public}d", msg.msgCode);
-                break;
+    auto iter = mHotspotCallbacks.find(msg.id);
+    if (iter != mHotspotCallbacks.end()) {
+        HotspotCallbackMapType callbacks = iter->second;
+        HotspotCallbackMapType::iterator itr;
+        for (itr = callbacks.begin(); itr != callbacks.end(); itr++) {
+            auto callback = itr->second;
+            if (callback == nullptr) {
+                continue;
+            }
+            switch (msg.msgCode) {
+                case WIFI_CBK_MSG_HOTSPOT_STATE_CHANGE:
+                    callback->OnHotspotStateChanged(msg.msgData);
+                    break;
+                case WIFI_CBK_MSG_HOTSPOT_STATE_JOIN:
+                    callback->OnHotspotStaJoin(msg.staInfo);
+                    break;
+                case WIFI_CBK_MSG_HOTSPOT_STATE_LEAVE:
+                    callback->OnHotspotStaLeave(msg.staInfo);
+                    break;
+                default:
+                    WIFI_LOGI("UnKnown msgcode %{public}d", msg.msgCode);
+                    break;
+            }
         }
     }
 }
@@ -423,8 +443,7 @@ void WifiInternalEventDispatcher::DealHotspotCallbackMsg(
     WifiInternalEventDispatcher &instance, const WifiEventCallbackMsg &msg)
 {
     WIFI_LOGI("WifiInternalEventDispatcher:: Deal Hotspot Event Callback Msg: %{public}d", msg.msgCode);
-
-    auto callback = instance.GetSingleHotspotCallback();
+    auto callback = instance.GetSingleHotspotCallback(msg.id);
     if (callback != nullptr) {
         switch (msg.msgCode) {
             case WIFI_CBK_MSG_HOTSPOT_STATE_CHANGE:

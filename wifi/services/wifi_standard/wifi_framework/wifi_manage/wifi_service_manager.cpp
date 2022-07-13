@@ -143,7 +143,7 @@ int WifiServiceManager::LoadApService(const std::string &dlname, bool bCreate)
         WIFI_LOGE("dlopen %{public}s failed: %{public}s!", dlname.c_str(), dlerror());
         return -1;
     }
-    mApServiceHandle.create = (IApService *(*)()) dlsym(mApServiceHandle.handle, "Create");
+    mApServiceHandle.create = (IApService *(*)(int)) dlsym(mApServiceHandle.handle, "Create");
     mApServiceHandle.destroy = (void *(*)(IApService *))dlsym(mApServiceHandle.handle, "Destroy");
     if (mApServiceHandle.create == nullptr || mApServiceHandle.destroy == nullptr) {
         WIFI_LOGE("%{public}s dlsym Create or Destory failed!", dlname.c_str());
@@ -152,7 +152,11 @@ int WifiServiceManager::LoadApService(const std::string &dlname, bool bCreate)
         return -1;
     }
     if (bCreate) {
-        mApServiceHandle.pService = mApServiceHandle.create();
+        IApService *service = mApServiceHandle.create(0);
+        auto ret = mApServiceHandle.pService.emplace(0, service);
+        if (!ret.second) {
+            mApServiceHandle.pService[0] = service;
+        }
     }
     return 0;
 }
@@ -242,18 +246,27 @@ IScanService *WifiServiceManager::GetScanServiceInst()
 }
 
 #ifdef FEATURE_AP_SUPPORT
-IApService *WifiServiceManager::GetApServiceInst()
+IApService *WifiServiceManager::GetApServiceInst(int id)
 {
     if (mApServiceHandle.handle == nullptr) {
         return nullptr;
     }
-    if (mApServiceHandle.pService == nullptr) {
-        std::unique_lock<std::mutex> lock(mMutex);
-        if (mApServiceHandle.pService == nullptr) {
-            mApServiceHandle.pService = mApServiceHandle.create();
+
+    IApService *service = nullptr;
+    auto iter = mApServiceHandle.pService.find(id);
+    if (iter != mApServiceHandle.pService.end()) {
+        service = iter->second;
+    }
+
+    if (service == nullptr) {
+        service = mApServiceHandle.create(id);
+        auto ret = mApServiceHandle.pService.emplace(id, service);
+        if (!ret.second) {
+            mApServiceHandle.pService[id] = service;
         }
     }
-    return mApServiceHandle.pService;
+
+    return service;
 }
 #endif
 
@@ -306,18 +319,26 @@ int WifiServiceManager::UnloadScanService(bool bPreLoad)
 }
 
 #ifdef FEATURE_AP_SUPPORT
-int WifiServiceManager::UnloadApService(bool bPreLoad)
+int WifiServiceManager::UnloadApService(bool bPreLoad, int id)
 {
     if (mApServiceHandle.handle == nullptr) {
         return 0;
     }
-    if (mApServiceHandle.pService != nullptr) {
-        mApServiceHandle.destroy(mApServiceHandle.pService);
-        mApServiceHandle.pService = nullptr;
-    }
-    if (!bPreLoad) {
-        dlclose(mApServiceHandle.handle);
-        mApServiceHandle.Clear();
+
+    /* Unload all ap service */
+    if (id == ALL_AP_ID) {
+        for (int i = 0; i < AP_INSTANCE_MAX_NUM; i++) {
+            UnloadApService(bPreLoad, i);
+        }
+    } else {
+        auto iter = mApServiceHandle.pService.find(id);
+        if (iter != mApServiceHandle.pService.end()) {
+            if (iter->second != nullptr) {
+                mApServiceHandle.destroy(iter->second);
+                iter->second = nullptr;
+            }
+            mApServiceHandle.pService.erase(id);
+        }
     }
     return 0;
 }
@@ -341,7 +362,7 @@ int WifiServiceManager::UnloadP2pService(bool bPreLoad)
 }
 #endif
 
-int WifiServiceManager::UnloadService(const std::string &name)
+int WifiServiceManager::UnloadService(const std::string &name, int id)
 {
     bool bPreLoad = WifiSettings::GetInstance().IsModulePreLoad(name);
     WIFI_LOGD("WifiServiceManager::UnloadService name: %{public}s", name.c_str());
@@ -354,7 +375,7 @@ int WifiServiceManager::UnloadService(const std::string &name)
     }
 #ifdef FEATURE_AP_SUPPORT
     if (name == WIFI_SERVICE_AP) {
-        return UnloadApService(bPreLoad);
+        return UnloadApService(bPreLoad, id);
     }
 #endif
 #ifdef FEATURE_P2P_SUPPORT
@@ -371,7 +392,7 @@ void WifiServiceManager::UninstallAllService()
     UnloadStaService(false);
     UnloadScanService(false);
 #ifdef FEATURE_AP_SUPPORT
-    UnloadApService(false);
+    UnloadApService(false, ALL_AP_ID); /* all ap services */
 #endif
 #ifdef FEATURE_P2P_SUPPORT
     UnloadP2pService(false);

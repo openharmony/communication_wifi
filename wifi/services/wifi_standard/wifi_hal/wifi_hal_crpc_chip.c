@@ -320,7 +320,7 @@ int RpcSetPowerMode(RpcServer *server, Context *context)
     if (ReadInt(context, &mode) < 0) {
         return HAL_FAILURE;
     }
-    WifiErrorNo err = SetPowerMode(mode);
+    WifiErrorNo err = WifiServiceSetPowerMode(mode);
     WriteBegin(context, 0);
     WriteInt(context, err);
     WriteEnd(context);

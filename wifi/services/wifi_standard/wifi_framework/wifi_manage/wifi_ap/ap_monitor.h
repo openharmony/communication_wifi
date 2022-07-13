@@ -29,7 +29,7 @@ class ApMonitor {
     FRIEND_GTEST(ApMonitor);
 
 public:
-    ApMonitor();
+    explicit ApMonitor(int id = 0);
     virtual ~ApMonitor();
     /**
      * @Description  IDL called this interface when STA connected or
@@ -99,6 +99,7 @@ private:
     std::map<std::string, std::function<HandlerMethod>> m_mapHandler;
     std::string m_selectIfacName;
     std::set<std::string> m_setMonitorIface;
+    int m_id;
 };
 }  // namespace Wifi
 }  // namespace OHOS

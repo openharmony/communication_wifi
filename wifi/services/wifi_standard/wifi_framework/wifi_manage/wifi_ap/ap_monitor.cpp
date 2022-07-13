@@ -29,7 +29,7 @@ DEFINE_WIFILOG_HOTSPOT_LABEL("WifiApMonitor");
 
 namespace OHOS {
 namespace Wifi {
-ApMonitor::ApMonitor()
+ApMonitor::ApMonitor(int id) : m_id(id)
 {}
 
 ApMonitor::~ApMonitor()
@@ -82,9 +82,9 @@ void ApMonitor::StartMonitor()
         std::bind(&ApMonitor::OnStaJoinOrLeave, this, _1),
         std::bind(&ApMonitor::OnHotspotStateEvent, this, _1),
     };
-    WifiApHalInterface::GetInstance().RegisterApEvent(wifiApEventCallback);
+    WifiApHalInterface::GetInstance().RegisterApEvent(wifiApEventCallback, m_id);
 
-    std::string iface = AP_INTF;
+    std::string iface = std::string(AP_INTF) + std::to_string(m_id);
     m_selectIfacName = iface;
     m_setMonitorIface.insert(iface);
 }
@@ -111,7 +111,7 @@ void ApMonitor::SendMessage(
 void ApMonitor::StopMonitor()
 {
     IWifiApMonitorEventCallback wifiApEventCallback = {};
-    WifiApHalInterface::GetInstance().RegisterApEvent(wifiApEventCallback);
+    WifiApHalInterface::GetInstance().RegisterApEvent(wifiApEventCallback, m_id);
 }
 
 void ApMonitor::RegisterHandler(const std::string &iface, const std::function<HandlerMethod> &handler)

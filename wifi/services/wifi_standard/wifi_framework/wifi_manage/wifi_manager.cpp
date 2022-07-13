@@ -34,6 +34,7 @@ DEFINE_WIFILOG_LABEL("WifiManager");
 
 namespace OHOS {
 namespace Wifi {
+int WifiManager::mCloseApIndex = 0;
 WifiManager &WifiManager::GetInstance()
 {
     static WifiManager gWifiManager;
@@ -306,15 +307,16 @@ void WifiManager::CloseStaService(void)
 }
 
 #ifdef FEATURE_AP_SUPPORT
-void WifiManager::CloseApService(void)
+void WifiManager::CloseApService(int id)
 {
-    WIFI_LOGD("close ap service");
-    WifiServiceManager::GetInstance().UnloadService(WIFI_SERVICE_AP);
-    WifiConfigCenter::GetInstance().SetApMidState(WifiOprMidState::CLOSED);
-    WifiSettings::GetInstance().SetHotspotState(static_cast<int>(ApState::AP_STATE_CLOSED));
+    WIFI_LOGD("close %{public}d ap service", id);
+    WifiServiceManager::GetInstance().UnloadService(WIFI_SERVICE_AP, id);
+    WifiConfigCenter::GetInstance().SetApMidState(WifiOprMidState::CLOSED, id);
+    WifiSettings::GetInstance().SetHotspotState(static_cast<int>(ApState::AP_STATE_CLOSED), id);
     WifiEventCallbackMsg cbMsg;
     cbMsg.msgCode = WIFI_CBK_MSG_HOTSPOT_STATE_CHANGE;
     cbMsg.msgData = static_cast<int>(ApState::AP_STATE_CLOSED);
+    cbMsg.id = id;
     WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
     return;
 }
@@ -364,7 +366,7 @@ void WifiManager::DealCloseServiceMsg(WifiManager &manager)
                 break;
 #ifdef FEATURE_AP_SUPPORT
             case WifiCloseServiceCode::AP_SERVICE_CLOSE:
-                CloseApService();
+                CloseApService(mCloseApIndex);
                 break;
 #endif
 #ifdef FEATURE_P2P_SUPPORT
@@ -651,39 +653,47 @@ IApServiceCallbacks WifiManager::GetApCallback()
     return mApCallback;
 }
 
-void WifiManager::DealApStateChanged(ApState state)
+void WifiManager::DealApStateChanged(ApState state, int id)
 {
     WifiEventCallbackMsg cbMsg;
     cbMsg.msgCode = WIFI_CBK_MSG_HOTSPOT_STATE_CHANGE;
     cbMsg.msgData = static_cast<int>(state);
+    cbMsg.id = id;
     WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
     if (state == ApState::AP_STATE_IDLE) {
+        mCloseApIndex = id;
         WifiManager::GetInstance().PushServiceCloseMsg(WifiCloseServiceCode::AP_SERVICE_CLOSE);
     }
     if (state == ApState::AP_STATE_STARTED) {
-        WifiConfigCenter::GetInstance().SetApMidState(WifiOprMidState::OPENING, WifiOprMidState::RUNNING);
+        WifiConfigCenter::GetInstance().SetApMidState(WifiOprMidState::OPENING, WifiOprMidState::RUNNING, id);
     }
-    WifiCommonEventHelper::PublishHotspotStateChangedEvent((int)state, "OnHotspotStateChanged");
+
+    std::string msg = std::string("OnHotspotStateChanged") + std::string("id = ") + std::to_string(id);
+    WifiCommonEventHelper::PublishHotspotStateChangedEvent((int)state, msg);
     return;
 }
 
-void WifiManager::DealApGetStaJoin(const StationInfo &info)
+void WifiManager::DealApGetStaJoin(const StationInfo &info, int id)
 {
     WifiEventCallbackMsg cbMsg;
     cbMsg.msgCode = WIFI_CBK_MSG_HOTSPOT_STATE_JOIN;
     cbMsg.staInfo = info;
+    cbMsg.id = id;
     WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
-    WifiCommonEventHelper::PublishApStaJoinEvent(0, "ApStaJoined");
+    std::string msg = std::string("ApStaJoined") + std::string("id = ") + std::to_string(id);
+    WifiCommonEventHelper::PublishApStaJoinEvent(0, msg);
     return;
 }
 
-void WifiManager::DealApGetStaLeave(const StationInfo &info)
+void WifiManager::DealApGetStaLeave(const StationInfo &info, int id)
 {
     WifiEventCallbackMsg cbMsg;
     cbMsg.msgCode = WIFI_CBK_MSG_HOTSPOT_STATE_LEAVE;
     cbMsg.staInfo = info;
+    cbMsg.id = id;
     WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
-    WifiCommonEventHelper::PublishApStaLeaveEvent(0, "ApStaLeaved");
+    std::string msg = std::string("ApStaLeaved") + std::string("id = ") + std::to_string(id);
+    WifiCommonEventHelper::PublishApStaLeaveEvent(0, msg);
     return;
 }
 #endif

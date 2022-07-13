@@ -31,7 +31,6 @@ WifiSettings::WifiSettings()
     : mWifiStaCapabilities(0),
       mWifiState(0),
       mScanAlwaysActive(false),
-      mHotspotState(static_cast<int>(ApState::AP_STATE_CLOSED)),
       mP2pState(static_cast<int>(P2pState::P2P_STATE_CLOSED)),
       mP2pDiscoverState(0),
       mP2pConnectState(0),
@@ -44,7 +43,10 @@ WifiSettings::WifiSettings()
       mPowerSavingModeState(MODE_STATE_CLOSE),
       mFreezeModeState(MODE_STATE_CLOSE),
       mNoChargerPlugModeState(MODE_STATE_CLOSE)
-{}
+{
+    mHotspotState[0] = static_cast<int>(ApState::AP_STATE_CLOSED);
+    powerModel[0] = PowerModel::GENERAL;
+}
 
 WifiSettings::~WifiSettings()
 {
@@ -77,7 +79,9 @@ void WifiSettings::InitHotspotConfig()
         std::vector<HotspotConfig> tmp;
         mSavedHotspotConfig.GetValue(tmp);
         if (tmp.size() > 0) {
-            mHotspotConfig = tmp[0];
+            for (size_t i = 0; i < tmp.size(); i++) {
+                mHotspotConfig[i] = tmp[i];
+            }
         } else {
             InitDefaultHotspotConfig();
         }
@@ -560,28 +564,36 @@ int WifiSettings::GetCountryCode(std::string &countryCode)
     return 0;
 }
 
-int WifiSettings::GetHotspotState()
+int WifiSettings::GetHotspotState(int id)
 {
-    return mHotspotState.load();
+    auto iter = mHotspotState.find(id);
+    if (iter != mHotspotState.end()) {
+        return iter->second.load();
+    }
+    mHotspotState[id] = static_cast<int>(ApState::AP_STATE_CLOSED);
+    return mHotspotState[id].load();
 }
 
-int WifiSettings::SetHotspotState(int state)
+int WifiSettings::SetHotspotState(int state, int id)
 {
-    mHotspotState = state;
+    mHotspotState[id] = state;
     return 0;
 }
 
-int WifiSettings::SetHotspotConfig(const HotspotConfig &config)
+int WifiSettings::SetHotspotConfig(const HotspotConfig &config, int id)
 {
     std::unique_lock<std::mutex> lock(mApMutex);
-    mHotspotConfig = config;
+    mHotspotConfig[id] = config;
     return 0;
 }
 
-int WifiSettings::GetHotspotConfig(HotspotConfig &config)
+int WifiSettings::GetHotspotConfig(HotspotConfig &config, int id)
 {
     std::unique_lock<std::mutex> lock(mApMutex);
-    config = mHotspotConfig;
+    auto iter = mHotspotConfig.find(id);
+    if (iter != mHotspotConfig.end()) {
+        config = iter->second;
+    }
     return 0;
 }
 
@@ -589,9 +601,17 @@ int WifiSettings::SyncHotspotConfig()
 {
     std::unique_lock<std::mutex> lock(mApMutex);
     std::vector<HotspotConfig> tmp;
-    tmp.push_back(mHotspotConfig);
+
+    for (int i = 0; i < AP_INSTANCE_MAX_NUM; i++) {
+        auto iter = mHotspotConfig.find(i);
+        if (iter != mHotspotConfig.end()) {
+            tmp.push_back(iter->second);
+        }
+    }
     mSavedHotspotConfig.SetValue(tmp);
-    return mSavedHotspotConfig.SaveConfig();
+    mSavedHotspotConfig.SaveConfig();
+
+    return 0;
 }
 
 int WifiSettings::SetP2pVendorConfig(const P2pVendorConfig &config)
@@ -617,7 +637,7 @@ int WifiSettings::SyncP2pVendorConfig()
     return mSavedWifiP2pVendorConfig.SaveConfig();
 }
 
-int WifiSettings::GetStationList(std::vector<StationInfo> &results)
+int WifiSettings::GetStationList(std::vector<StationInfo> &results, int id)
 {
     std::unique_lock<std::mutex> lock(mInfoMutex);
     for (auto iter = mConnectStationInfo.begin(); iter != mConnectStationInfo.end(); iter++) {
@@ -626,7 +646,7 @@ int WifiSettings::GetStationList(std::vector<StationInfo> &results)
     return 0;
 }
 
-int WifiSettings::ManageStation(const StationInfo &info, int mode)
+int WifiSettings::ManageStation(const StationInfo &info, int mode, int id)
 {
     std::unique_lock<std::mutex> lock(mInfoMutex);
     auto iter = mConnectStationInfo.find(info.bssid);
@@ -646,7 +666,7 @@ int WifiSettings::ManageStation(const StationInfo &info, int mode)
     return 0;
 }
 
-int WifiSettings::FindConnStation(const StationInfo &info)
+int WifiSettings::FindConnStation(const StationInfo &info, int id)
 {
     std::unique_lock<std::mutex> lock(mInfoMutex);
     auto iter = mConnectStationInfo.find(info.bssid);
@@ -656,14 +676,14 @@ int WifiSettings::FindConnStation(const StationInfo &info)
     return 0;
 }
 
-int WifiSettings::ClearStationList()
+int WifiSettings::ClearStationList(int id)
 {
     std::unique_lock<std::mutex> lock(mInfoMutex);
     mConnectStationInfo.clear();
     return 0;
 }
 
-int WifiSettings::GetBlockList(std::vector<StationInfo> &results)
+int WifiSettings::GetBlockList(std::vector<StationInfo> &results, int id)
 {
     std::unique_lock<std::mutex> lock(mInfoMutex);
     for (auto iter = mBlockListInfo.begin(); iter != mBlockListInfo.end(); iter++) {
@@ -672,7 +692,7 @@ int WifiSettings::GetBlockList(std::vector<StationInfo> &results)
     return 0;
 }
 
-int WifiSettings::ManageBlockList(const StationInfo &info, int mode)
+int WifiSettings::ManageBlockList(const StationInfo &info, int mode, int id)
 {
     std::unique_lock<std::mutex> lock(mInfoMutex);
     auto iter = mBlockListInfo.find(info.bssid);
@@ -741,17 +761,26 @@ int WifiSettings::ClearValidChannels()
     return 0;
 }
 
-int WifiSettings::SetPowerModel(const PowerModel& model)
+int WifiSettings::SetPowerModel(const PowerModel& model, int id)
 {
     std::unique_lock<std::mutex> lock(mInfoMutex);
-    powerModel = model;
+    auto ret = powerModel.emplace(id, model);
+    if (!ret.second) {
+        powerModel[id] = model;
+    }
     return 0;
 }
 
-int WifiSettings::GetPowerModel(PowerModel& model)
+int WifiSettings::GetPowerModel(PowerModel& model, int id)
 {
     std::unique_lock<std::mutex> lock(mInfoMutex);
-    model = powerModel;
+    auto iter = powerModel.find(id);
+    if (iter != powerModel.end()) {
+        model = iter->second;
+    } else {
+        powerModel[id] = PowerModel::GENERAL;
+        model = powerModel[id];
+    }
     return 0;
 }
 
@@ -839,12 +868,17 @@ int WifiSettings::GetApMaxConnNum()
 
 void WifiSettings::InitDefaultHotspotConfig()
 {
-    mHotspotConfig.SetSecurityType(KeyMgmt::WPA_PSK);
-    mHotspotConfig.SetBand(BandType::BAND_2GHZ);
-    mHotspotConfig.SetChannel(AP_CHANNEL_DEFAULT);
-    mHotspotConfig.SetMaxConn(GetApMaxConnNum());
-    mHotspotConfig.SetSsid("OHOS_" + GetRandomStr(RANDOM_STR_LEN));
-    mHotspotConfig.SetPreSharedKey("12345678");
+    HotspotConfig cfg;
+    cfg.SetSecurityType(KeyMgmt::WPA_PSK);
+    cfg.SetBand(BandType::BAND_2GHZ);
+    cfg.SetChannel(AP_CHANNEL_DEFAULT);
+    cfg.SetMaxConn(GetApMaxConnNum());
+    cfg.SetSsid("OHOS_" + GetRandomStr(RANDOM_STR_LEN));
+    cfg.SetPreSharedKey("12345678");
+    auto ret = mHotspotConfig.emplace(0, cfg);
+    if (!ret.second) {
+        mHotspotConfig[0] = cfg;
+    }
 }
 
 void WifiSettings::InitDefaultP2pVendorConfig()

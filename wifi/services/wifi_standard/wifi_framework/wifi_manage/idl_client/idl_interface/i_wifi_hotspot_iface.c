@@ -25,24 +25,25 @@
 
 #define AP_EVENT_MAX_NUM 8
 
-static IWifiApEventCallback g_wifiApEventCallback = {0};
-void SetWifiApEventCallback(IWifiApEventCallback callback)
+static IWifiApEventCallback g_wifiApEventCallback[AP_INSTANCE_MAX_NUM] = {0};
+void SetWifiApEventCallback(IWifiApEventCallback callback, int id)
 {
-    g_wifiApEventCallback = callback;
+    g_wifiApEventCallback[id] = callback;
 }
 
-IWifiApEventCallback *GetWifiApEventCallback(void)
+IWifiApEventCallback *GetWifiApEventCallback(int id)
 {
-    return &g_wifiApEventCallback;
+    return &g_wifiApEventCallback[id];
 }
 
-WifiErrorNo StartSoftAp(void)
+WifiErrorNo StartSoftAp(int id)
 {
     RpcClient *client = GetApRpcClient();
     LockRpcClient(client);
     Context *context = client->context;
     WriteBegin(context, 0);
     WriteFunc(context, "StartSoftAp");
+    WriteInt(context, id);
     WriteEnd(context);
 
     if (RpcClientCall(client, "StartSoftAp") != WIFI_IDL_OPT_OK) {
@@ -56,13 +57,14 @@ WifiErrorNo StartSoftAp(void)
     return result;
 }
 
-WifiErrorNo StopSoftAp(void)
+WifiErrorNo StopSoftAp(int id)
 {
     RpcClient *client = GetApRpcClient();
     LockRpcClient(client);
     Context *context = client->context;
     WriteBegin(context, 0);
     WriteFunc(context, "StopSoftAp");
+    WriteInt(context, id);
     WriteEnd(context);
 
     if (RpcClientCall(client, "StopSoftAp") != WIFI_IDL_OPT_OK) {
@@ -76,7 +78,7 @@ WifiErrorNo StopSoftAp(void)
     return result;
 }
 
-WifiErrorNo SetHostapdConfig(HostapdConfig *config)
+WifiErrorNo SetHostapdConfig(HostapdConfig *config, int id)
 {
     RpcClient *client = GetApRpcClient();
     LockRpcClient(client);
@@ -91,6 +93,7 @@ WifiErrorNo SetHostapdConfig(HostapdConfig *config)
     WriteInt(context, config->band);
     WriteInt(context, config->channel);
     WriteInt(context, config->maxConn);
+    WriteInt(context, id);
     WriteEnd(context);
     if (RpcClientCall(client, "SetHostapdConfig") != WIFI_IDL_OPT_OK) {
         return WIFI_IDL_OPT_FAILED;
@@ -102,7 +105,7 @@ WifiErrorNo SetHostapdConfig(HostapdConfig *config)
     return result;
 }
 
-WifiErrorNo GetStaInfos(char *infos, int32_t *size)
+WifiErrorNo GetStaInfos(char *infos, int32_t *size, int id)
 {
     RpcClient *client = GetApRpcClient();
     LockRpcClient(client);
@@ -110,6 +113,7 @@ WifiErrorNo GetStaInfos(char *infos, int32_t *size)
     WriteBegin(context, 0);
     WriteFunc(context, "GetStaInfos");
     WriteInt(context, *size);
+    WriteInt(context, id);
     WriteEnd(context);
     if (RpcClientCall(client, "GetStaInfos") != WIFI_IDL_OPT_OK) {
         return WIFI_IDL_OPT_FAILED;
@@ -127,7 +131,7 @@ WifiErrorNo GetStaInfos(char *infos, int32_t *size)
     return result;
 }
 
-WifiErrorNo SetMacFilter(unsigned char *mac, int lenMac)
+WifiErrorNo SetMacFilter(unsigned char *mac, int lenMac, int id)
 {
     RpcClient *client = GetApRpcClient();
     LockRpcClient(client);
@@ -136,6 +140,7 @@ WifiErrorNo SetMacFilter(unsigned char *mac, int lenMac)
     WriteFunc(context, "SetMacFilter");
     WriteInt(context, lenMac);
     WriteUStr(context, mac, lenMac);
+    WriteInt(context, id);
     WriteEnd(context);
     if (RpcClientCall(client, "SetMacFilter") != WIFI_IDL_OPT_OK) {
         return WIFI_IDL_OPT_FAILED;
@@ -147,7 +152,7 @@ WifiErrorNo SetMacFilter(unsigned char *mac, int lenMac)
     return result;
 }
 
-WifiErrorNo DelMacFilter(unsigned char *mac, int lenMac)
+WifiErrorNo DelMacFilter(unsigned char *mac, int lenMac, int id)
 {
     RpcClient *client = GetApRpcClient();
     LockRpcClient(client);
@@ -156,6 +161,7 @@ WifiErrorNo DelMacFilter(unsigned char *mac, int lenMac)
     WriteFunc(context, "DelMacFilter");
     WriteInt(context, lenMac);
     WriteUStr(context, mac, lenMac);
+    WriteInt(context, id);
     WriteEnd(context);
     if (RpcClientCall(client, "DelMacFilter") != WIFI_IDL_OPT_OK) {
         return WIFI_IDL_OPT_FAILED;
@@ -167,7 +173,7 @@ WifiErrorNo DelMacFilter(unsigned char *mac, int lenMac)
     return result;
 }
 
-WifiErrorNo DisassociateSta(unsigned char *mac, int lenMac)
+WifiErrorNo DisassociateSta(unsigned char *mac, int lenMac, int id)
 {
     RpcClient *client = GetApRpcClient();
     LockRpcClient(client);
@@ -176,6 +182,7 @@ WifiErrorNo DisassociateSta(unsigned char *mac, int lenMac)
     WriteFunc(context, "DisassociateSta");
     WriteInt(context, lenMac);
     WriteUStr(context, mac, lenMac);
+    WriteInt(context, id);
     WriteEnd(context);
     if (RpcClientCall(client, "DisassociateSta") != WIFI_IDL_OPT_OK) {
         return WIFI_IDL_OPT_FAILED;
@@ -187,7 +194,7 @@ WifiErrorNo DisassociateSta(unsigned char *mac, int lenMac)
     return result;
 }
 
-WifiErrorNo GetValidFrequenciesForBand(int32_t band, int *frequencies, int32_t *size)
+WifiErrorNo GetValidFrequenciesForBand(int32_t band, int *frequencies, int32_t *size, int id)
 {
     RpcClient *client = GetApRpcClient();
     LockRpcClient(client);
@@ -196,6 +203,7 @@ WifiErrorNo GetValidFrequenciesForBand(int32_t band, int *frequencies, int32_t *
     WriteFunc(context, "GetValidFrequenciesForBand");
     WriteInt(context, band);
     WriteInt(context, *size);
+    WriteInt(context, id);
     WriteEnd(context);
     if (RpcClientCall(client, "GetValidFrequenciesForBand") != WIFI_IDL_OPT_OK) {
         return WIFI_IDL_OPT_FAILED;
@@ -215,7 +223,7 @@ WifiErrorNo GetValidFrequenciesForBand(int32_t band, int *frequencies, int32_t *
     return result;
 }
 
-WifiErrorNo SetCountryCode(const char *code)
+WifiErrorNo SetCountryCode(const char *code, int id)
 {
     RpcClient *client = GetApRpcClient();
     LockRpcClient(client);
@@ -223,6 +231,7 @@ WifiErrorNo SetCountryCode(const char *code)
     WriteBegin(context, 0);
     WriteFunc(context, "SetCountryCode");
     WriteStr(context, code);
+    WriteInt(context, id);
     WriteEnd(context);
     if (RpcClientCall(client, "SetCountryCode") != WIFI_IDL_OPT_OK) {
         return WIFI_IDL_OPT_FAILED;
@@ -250,7 +259,7 @@ static int GetApCallbackEvents(int *events, int size)
     return num;
 }
 
-WifiErrorNo RegisterAsscociatedEvent(IWifiApEventCallback callback)
+WifiErrorNo RegisterAsscociatedEvent(IWifiApEventCallback callback, int id)
 {
     int events[AP_EVENT_MAX_NUM];
     int num = GetApCallbackEvents(events, AP_EVENT_MAX_NUM);
@@ -270,21 +279,21 @@ WifiErrorNo RegisterAsscociatedEvent(IWifiApEventCallback callback)
     WriteEnd(context);
     if (RpcClientCall(client, "RegisterAsscociatedEvent") != WIFI_IDL_OPT_OK) {
         if (callback.onStaJoinOrLeave == NULL) {
-            SetWifiApEventCallback(callback);
+            SetWifiApEventCallback(callback, id);
         }
         return WIFI_IDL_OPT_FAILED;
     }
     int result = WIFI_IDL_OPT_FAILED;
     ReadInt(context, &result);
     if (result == WIFI_IDL_OPT_OK || callback.onStaJoinOrLeave == NULL) {
-        SetWifiApEventCallback(callback);
+        SetWifiApEventCallback(callback, id);
     }
     ReadClientEnd(client);
     UnlockRpcClient(client);
     return result;
 }
 
-WifiErrorNo WpaSetPowerModel(const int model)
+WifiErrorNo WpaSetPowerModel(const int model, int id)
 {
     RpcClient *client = GetSupplicantRpcClient();
     LockRpcClient(client);
@@ -292,6 +301,7 @@ WifiErrorNo WpaSetPowerModel(const int model)
     WriteBegin(context, 0);
     WriteFunc(context, "WpaSetPowerModel");
     WriteInt(context, model);
+    WriteInt(context, id);
     WriteEnd(context);
     if (RpcClientCall(client, "WpaSetPowerModel") != WIFI_IDL_OPT_OK) {
         return WIFI_IDL_OPT_FAILED;
@@ -303,13 +313,14 @@ WifiErrorNo WpaSetPowerModel(const int model)
     return result;
 }
 
-WifiErrorNo WpaGetPowerModel(int* model)
+WifiErrorNo WpaGetPowerModel(int* model, int id)
 {
     RpcClient *client = GetSupplicantRpcClient();
     LockRpcClient(client);
     Context *context = client->context;
     WriteBegin(context, 0);
     WriteFunc(context, "WpaGetPowerModel");
+    WriteInt(context, id);
     WriteEnd(context);
     if (RpcClientCall(client, "WpaGetPowerModel") != WIFI_IDL_OPT_OK) {
         return WIFI_IDL_OPT_FAILED;

@@ -26,7 +26,12 @@ public:
     explicit WifiHotspotImpl(int systemAbilityId);
     ~WifiHotspotImpl();
 
-    bool Init();
+    /**
+     * @Description init ap client.
+     *
+     * @return bool - operation result
+     */
+    bool Init(int id);
 
     /**
      * @Description Check whether the hotspot is active.

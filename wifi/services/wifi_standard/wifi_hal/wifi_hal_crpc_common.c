@@ -19,6 +19,7 @@
 #include "wifi_hal_ap_interface.h"
 #include "wifi_hal_p2p_interface.h"
 #include "wifi_hal_define.h"
+#include "wifi_hostapd_hal.h"
 
 int RpcRegisterEventCallback(RpcServer *server, Context *context)
 {
@@ -74,7 +75,9 @@ int RpcNotifyClear(RpcServer *server, Context *context)
         return HAL_FAILURE;
     }
     ForceStop();
-    StopSoftAp();
+    for (int id = 0; id < AP_MAX_INSTANCE; id++) {
+        StopSoftAp(id);
+    }
     P2pForceStop();
     WriteBegin(context, 0);
     WriteInt(context, 0);

@@ -97,11 +97,11 @@ public:
     sptr<IWifiScanCallback> GetSingleScanCallback() const;
     int RemoveScanCallback(const sptr<IRemoteObject> &remote);
     bool HasScanRemote(const sptr<IRemoteObject> &remote);
-    int AddHotspotCallback(const sptr<IRemoteObject> &remote, const sptr<IWifiHotspotCallback> &callback);
-    int SetSingleHotspotCallback(const sptr<IWifiHotspotCallback> &callback);
-    sptr<IWifiHotspotCallback> GetSingleHotspotCallback() const;
-    int RemoveHotspotCallback(const sptr<IRemoteObject> &remote);
-    bool HasHotspotRemote(const sptr<IRemoteObject> &remote);
+    int AddHotspotCallback(const sptr<IRemoteObject> &remote, const sptr<IWifiHotspotCallback> &callback, int id = 0);
+    int SetSingleHotspotCallback(const sptr<IWifiHotspotCallback> &callback, int id = 0);
+    sptr<IWifiHotspotCallback> GetSingleHotspotCallback(int id) const;
+    int RemoveHotspotCallback(const sptr<IRemoteObject> &remote, int id = 0);
+    bool HasHotspotRemote(const sptr<IRemoteObject> &remote, int id = 0);
     int AddP2pCallback(const sptr<IRemoteObject> &remote, const sptr<IWifiP2pCallback> &callback);
     int SetSingleP2pCallback(const sptr<IWifiP2pCallback> &callback);
     sptr<IWifiP2pCallback> GetSingleP2pCallback() const;
@@ -134,8 +134,8 @@ private:
     ScanCallbackMapType mScanCallbacks;
     sptr<IWifiScanCallback> mScanSingleCallback;
     std::mutex mHotspotCallbackMutex;
-    HotspotCallbackMapType mHotspotCallbacks;
-    sptr<IWifiHotspotCallback> mHotspotSingleCallback;
+    std::map<int, HotspotCallbackMapType> mHotspotCallbacks;
+    std::map<int, sptr<IWifiHotspotCallback>> mHotspotSingleCallback;
     std::mutex mP2pCallbackMutex;
     P2pCallbackMapType mP2pCallbacks;
     sptr<IWifiP2pCallback> mP2pSingleCallback;

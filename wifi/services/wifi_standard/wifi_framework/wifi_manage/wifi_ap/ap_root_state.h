@@ -28,7 +28,7 @@ public:
      * @param None
      * @return None
      */
-    ApRootState();
+    explicit ApRootState(int id = 0);
     /**
      * @Description  destructor method.
      * @param None
@@ -56,6 +56,9 @@ public:
      * @return HANDLED：Processed successfully
      */
     virtual bool ExecuteStateMsg(InternalMessage *msg) override;
+
+private:
+    int m_id;
 };
 }  // namespace Wifi
 }  // namespace OHOS

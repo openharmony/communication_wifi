@@ -25,7 +25,7 @@ DEFINE_WIFILOG_HOTSPOT_LABEL("WifiApStationsManager");
 
 namespace OHOS {
 namespace Wifi {
-ApStationsManager::ApStationsManager()
+ApStationsManager::ApStationsManager(int id) : m_id(id)
 {}
 
 ApStationsManager::~ApStationsManager()
@@ -33,7 +33,8 @@ ApStationsManager::~ApStationsManager()
 
 bool ApStationsManager::AddBlockList(const StationInfo &staInfo) const
 {
-    if (WifiApHalInterface::GetInstance().AddBlockByMac(staInfo.bssid) != WifiErrorNo::WIFI_IDL_OPT_OK) {
+    if (WifiApHalInterface::GetInstance().AddBlockByMac(staInfo.bssid, m_id) != WifiErrorNo::WIFI_IDL_OPT_OK) {
+        WIFI_LOGE("Instance is %{public}d failed to add block.", m_id);
         return false;
     }
     return true;
@@ -41,7 +42,8 @@ bool ApStationsManager::AddBlockList(const StationInfo &staInfo) const
 
 bool ApStationsManager::DelBlockList(const StationInfo &staInfo) const
 {
-    if (WifiApHalInterface::GetInstance().DelBlockByMac(staInfo.bssid) != WifiErrorNo::WIFI_IDL_OPT_OK) {
+    if (WifiApHalInterface::GetInstance().DelBlockByMac(staInfo.bssid, m_id) != WifiErrorNo::WIFI_IDL_OPT_OK) {
+        WIFI_LOGE("Instance is %{public}d failed to del block.", m_id);
         return false;
     }
     return true;
@@ -49,7 +51,8 @@ bool ApStationsManager::DelBlockList(const StationInfo &staInfo) const
 
 bool ApStationsManager::AddAssociationStation(const StationInfo &staInfo) const
 {
-    if (WifiSettings::GetInstance().ManageStation(staInfo, MODE_ADD)) {
+    if (WifiSettings::GetInstance().ManageStation(staInfo, MODE_ADD, m_id)) {
+        WIFI_LOGE("Instance is %{public}d failed add station.", m_id);
         return false;
     }
     return true;
@@ -57,7 +60,8 @@ bool ApStationsManager::AddAssociationStation(const StationInfo &staInfo) const
 
 bool ApStationsManager::DelAssociationStation(const StationInfo &staInfo) const
 {
-    if (WifiSettings::GetInstance().ManageStation(staInfo, MODE_DEL)) {
+    if (WifiSettings::GetInstance().ManageStation(staInfo, MODE_DEL, m_id)) {
+        WIFI_LOGE("Instance is %{public}d failed to del station.", m_id);
         return false;
     }
     return true;
@@ -66,15 +70,15 @@ bool ApStationsManager::DelAssociationStation(const StationInfo &staInfo) const
 bool ApStationsManager::EnableAllBlockList() const
 {
     std::vector<StationInfo> results;
-    if (WifiSettings::GetInstance().GetBlockList(results)) {
-        WIFI_LOGE("failed to get blocklist.");
+    if (WifiSettings::GetInstance().GetBlockList(results, m_id)) {
+        WIFI_LOGE("Instance is %{public}d failed to get blocklist.", m_id);
         return false;
     }
     std::string mac;
     bool ret = true;
     for (std::vector<StationInfo>::iterator iter = results.begin(); iter != results.end(); iter++) {
-        if (WifiApHalInterface::GetInstance().AddBlockByMac(iter->bssid) != WifiErrorNo::WIFI_IDL_OPT_OK) {
-            WIFI_LOGE("error:Failed to add block bssid is:%{private}s.", iter->bssid.c_str());
+        if (WifiApHalInterface::GetInstance().AddBlockByMac(iter->bssid, m_id) != WifiErrorNo::WIFI_IDL_OPT_OK) {
+            WIFI_LOGE("Instance is %{public}d failed to add block bssid is:%{private}s.", m_id, iter->bssid.c_str());
             ret = false;
         }
     }
@@ -85,8 +89,8 @@ void ApStationsManager::StationLeave(const std::string &mac) const
 {
     StationInfo staInfo;
     std::vector<StationInfo> results;
-    if (WifiSettings::GetInstance().GetStationList(results)) {
-        WIFI_LOGE("failed to GetStationList.");
+    if (WifiSettings::GetInstance().GetStationList(results, m_id)) {
+        WIFI_LOGE("Instance is %{public}d failed to GetStationList.", m_id);
         return;
     }
     auto it = results.begin();
@@ -94,7 +98,7 @@ void ApStationsManager::StationLeave(const std::string &mac) const
         if (it->bssid == mac) {
             staInfo = *it;
             if (!DelAssociationStation(staInfo)) {
-                WIFI_LOGE("DelAssociationStation failed.");
+                WIFI_LOGE("Instance is %{public}d del AssociationStation failed.", m_id);
                 return;
             }
             break;
@@ -110,8 +114,8 @@ void ApStationsManager::StationJoin(const StationInfo &staInfo) const
 {
     StationInfo staInfoTemp = staInfo;
     std::vector<StationInfo> results;
-    if (WifiSettings::GetInstance().GetStationList(results)) {
-        WIFI_LOGE("failed to GetStationList.");
+    if (WifiSettings::GetInstance().GetStationList(results, m_id)) {
+        WIFI_LOGE("Instance is %{public}d failed to GetStationList.", m_id);
         return;
     }
     auto it = results.begin();
@@ -125,7 +129,7 @@ void ApStationsManager::StationJoin(const StationInfo &staInfo) const
     }
 
     if (!AddAssociationStation(staInfoTemp)) {
-        WIFI_LOGE("AddAssociationStation failed.");
+        WIFI_LOGE("Instance is %{public}d addAssociationStation failed.", m_id);
         return;
     }
 
@@ -140,9 +144,10 @@ void ApStationsManager::StationJoin(const StationInfo &staInfo) const
 bool ApStationsManager::DisConnectStation(const StationInfo &staInfo) const
 {
     std::string mac = staInfo.bssid;
-    int ret = static_cast<int>(WifiApHalInterface::GetInstance().DisconnectStaByMac(mac));
+    int ret = static_cast<int>(WifiApHalInterface::GetInstance().DisconnectStaByMac(mac, m_id));
     if (ret != WifiErrorNo::WIFI_IDL_OPT_OK) {
-        WIFI_LOGE("failed to DisConnectStation staInfo bssid:%{private}s, address:%{private}s, name:%{private}s.",
+        WIFI_LOGE("Instance is %{public}d failed to DisConnectStation staInfo bssid:%{private}s,address:%{private}s, name:%{private}s.",
+            m_id,
             staInfo.bssid.c_str(),
             staInfo.ipAddr.c_str(),
             staInfo.deviceName.c_str());
@@ -154,9 +159,9 @@ bool ApStationsManager::DisConnectStation(const StationInfo &staInfo) const
 std::vector<std::string> ApStationsManager::GetAllConnectedStations() const
 {
     std::vector<std::string> staMacList;
-    if (WifiApHalInterface::GetInstance().GetStationList(staMacList) == WifiErrorNo::WIFI_IDL_OPT_OK) {
+    if (WifiApHalInterface::GetInstance().GetStationList(staMacList, m_id) == WifiErrorNo::WIFI_IDL_OPT_OK) {
         for (size_t i = 0; i < staMacList.size(); ++i) {
-            WIFI_LOGD("staMacList[%{public}zu]:%{private}s.", i, staMacList[i].c_str());
+            WIFI_LOGD("Instance is %{public}d staMacList[%{public}zu]:%{private}s.", m_id, i, staMacList[i].c_str());
         }
     }
     return staMacList;

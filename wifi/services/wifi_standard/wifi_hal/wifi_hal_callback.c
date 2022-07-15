@@ -159,13 +159,13 @@ void WifiHalCbNotifyWpsTimeOut(int event)
     return;
 }
 
-void WifiHalCbStaJoin(const char *content)
+void WifiHalCbStaJoin(const char *content, int id)
 {
     if (content == NULL) {
         LOGD("Get hostapd Sta join content is NULL");
         return;
     }
-    LOGD("Get hostapd Sta join");
+    LOGD("Get hostapd Sta join, instance id:%{public}d", id);
     WifiHalEvent event;
     char tmpBuf[WIFI_BSSID_LENGTH] = {0};
     if (strncmp("AP-STA-CONNECTED", content, strlen("AP-STA-CONNECTED")) == 0) {
@@ -182,19 +182,20 @@ void WifiHalCbStaJoin(const char *content)
         LOGE("hostapd create callback message failed!");
         return;
     }
+    pCbkMsg->msg.ifMsg.id = id;
     pCbkMsg->msg.ifMsg.type = event;
     StrSafeCopy(pCbkMsg->msg.ifMsg.ifname, sizeof(pCbkMsg->msg.ifMsg.ifname), tmpBuf);
     EmitEventCallbackMsg(pCbkMsg, event);
     return;
 }
 
-void WifiHalCbApState(const char *content)
+void WifiHalCbApState(const char *content, int id)
 {
     if (content == NULL) {
         LOGD("Get hostapd status changed content is NULL");
         return;
     }
-    LOGD("Get hostapd status changed");
+    LOGD("Get hostapd status changed, instance id:%{public}d", id);
     WifiHalEvent event;
     if (strncmp(content, "AP-ENABLED", strlen("AP-ENABLED")) == 0) {
         event = WIFI_AP_ENABLE_EVENT;
@@ -204,12 +205,15 @@ void WifiHalCbApState(const char *content)
     } else {
         return;
     }
-    RpcServer *server = GetRpcServer();
-    if (server == NULL) {
-        LOGE("Rpc server not exists!");
+    
+    WifiHalEventCallbackMsg *pCbkMsg = (WifiHalEventCallbackMsg *)calloc(1, sizeof(WifiHalEventCallbackMsg));
+    if (pCbkMsg == NULL) {
+        LOGE("hostapd create callback message failed!");
         return;
     }
-    EmitEvent(server, event);
+    pCbkMsg->msg.ifMsg.type = event;
+    pCbkMsg->msg.ifMsg.id = id;
+    EmitEventCallbackMsg(pCbkMsg, event);
     return;
 }
 

@@ -26,24 +26,27 @@ DEFINE_WIFILOG_HOTSPOT_LABEL("WifiApStateMachine");
 namespace OHOS {
 namespace Wifi {
 ApStateMachine::ApStateMachine(ApStationsManager &apStationsManager, ApRootState &apRootState, ApIdleState &apIdleState,
-    ApStartedState &apStartedState, ApMonitor &apMonitor)
+    ApStartedState &apStartedState, ApMonitor &apMonitor, int id)
     : StateMachine("ApStateMachine"),
       m_ApStationsManager(apStationsManager),
       m_ApRootState(apRootState),
       m_ApIdleState(apIdleState),
       m_ApStartedState(apStartedState),
-      m_ApMonitor(apMonitor)
+      m_ApMonitor(apMonitor),
+      m_id(id)
 {
     Init();
 }
 
 ApStateMachine::~ApStateMachine()
 {
+#ifndef WIFI_DHCP_DISABLED
     StopDhcpServer();
     if (pDhcpNotify.get() != nullptr) {
         pDhcpNotify.reset(nullptr);
     }
     StopHandlerThread();
+#endif
 }
 
 ApStateMachine::DhcpNotify::DhcpNotify(ApStateMachine &apStateMachine) : m_apStateMachine(apStateMachine)
@@ -81,20 +84,20 @@ void ApStateMachine::Init()
     StatePlus(&m_ApIdleState, &m_ApRootState);
     StatePlus(&m_ApStartedState, &m_ApRootState);
     SetFirstState(&m_ApIdleState);
-    m_iface = AP_INTF;
+    m_iface = std::string(AP_INTF) + std::to_string(m_id);
     StartStateMachine();
 }
 
 void ApStateMachine::OnApStateChange(ApState state)
 {
-    if (WifiSettings::GetInstance().SetHotspotState(static_cast<int>(state))) {
+    if (WifiSettings::GetInstance().SetHotspotState(static_cast<int>(state), m_id)) {
         WIFI_LOGE("WifiSetting change state fail.");
     }
 
     if (m_Callbacks.OnApStateChangedEvent != nullptr &&
         (state == ApState::AP_STATE_IDLE || state == ApState::AP_STATE_STARTED || state == ApState::AP_STATE_STARTING ||
             state == ApState::AP_STATE_CLOSING)) {
-        m_Callbacks.OnApStateChangedEvent(state);
+        m_Callbacks.OnApStateChangedEvent(state, m_id);
     }
     return;
 }
@@ -110,12 +113,12 @@ void ApStateMachine::BroadCastStationChange(const StationInfo &staInfo, ApStatem
     switch (act) {
         case ApStatemachineEvent::CMD_STATION_JOIN:
             if (m_Callbacks.OnHotspotStaJoinEvent) {
-                m_Callbacks.OnHotspotStaJoinEvent(staInfo);
+                m_Callbacks.OnHotspotStaJoinEvent(staInfo, m_id);
             }
             break;
         case ApStatemachineEvent::CMD_STATION_LEAVE:
             if (m_Callbacks.OnHotspotStaLeaveEvent) {
-                m_Callbacks.OnHotspotStaLeaveEvent(staInfo);
+                m_Callbacks.OnHotspotStaLeaveEvent(staInfo, m_id);
             }
             break;
         default:
@@ -127,6 +130,7 @@ void ApStateMachine::BroadCastStationChange(const StationInfo &staInfo, ApStatem
 bool ApStateMachine::StartDhcpServer()
 {
     WIFI_LOGI("Enter:StartDhcpServer");
+#ifndef WIFI_DHCP_DISABLED
     Ipv4Address ipv4(Ipv4Address::INVALID_INET_ADDRESS);
     Ipv6Address ipv6(Ipv6Address::INVALID_INET6_ADDRESS);
     if (!m_DhcpdInterface.StartDhcpServer(IN_INTERFACE, ipv4, ipv6, true)) {
@@ -138,21 +142,32 @@ bool ApStateMachine::StartDhcpServer()
     }
     WIFI_LOGI("Start dhcp server for AP finished.");
     return true;
+#else
+    return true;
+#endif
 }
 
 bool ApStateMachine::StopDhcpServer()
 {
+#ifndef WIFI_DHCP_DISABLED
     WIFI_LOGI("Enter:StopDhcpServer");
     if (!m_DhcpdInterface.StopDhcpServer(IN_INTERFACE)) {
         WIFI_LOGE("Close dhcpd fail.");
         return false;
     }
     return true;
+#else
+    return true;
+#endif
 }
 
 bool ApStateMachine::GetConnectedStationInfo(std::map<std::string, StationInfo> &result)
 {
+#ifndef WIFI_DHCP_DISABLED
     return m_DhcpdInterface.GetConnectedStationInfo(IN_INTERFACE, result);
+#else
+    return true;
+#endif
 }
 
 void ApStateMachine::RegisterEventHandler()

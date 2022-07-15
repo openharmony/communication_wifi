@@ -111,7 +111,10 @@ if (defined(ohos_lite)) {
       "//third_party/bounds_checking_function:libsec_shared",
     ]
 
-    defines = [ "OHOS_ARCH_LITE" ]
+    defines = [
+      "OHOS_ARCH_LITE",
+      "AP_INSTANCE_MAX_NUM=$wifi_feature_with_ap_num",
+    ]
     configs -= [
       "//build/lite/config:language_cpp",
       "//build/lite/config:language_c",
@@ -161,6 +164,8 @@ if (defined(ohos_lite)) {
   ohos_shared_library("wifi_idl_client") {
     install_enable = true
     sources = idl_client_sources
+
+    defines = [ "AP_INSTANCE_MAX_NUM=$wifi_feature_with_ap_num" ]
 
     configs = [ ":wifi_fw_common_header" ]
 

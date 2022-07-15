@@ -31,6 +31,7 @@ public:
     using HandleFuncMap = std::map<int, handleFunc>;
 
     WifiHotspotStub();
+    explicit WifiHotspotStub(int id);
 
     virtual ~WifiHotspotStub();
 
@@ -63,6 +64,8 @@ private:
     HandleFuncMap handleFuncMap;
     sptr<IRemoteObject::DeathRecipient> deathRecipient_;
     bool mSingleCallback;
+protected:
+    int m_id;
 };
 }  // namespace Wifi
 }  // namespace OHOS

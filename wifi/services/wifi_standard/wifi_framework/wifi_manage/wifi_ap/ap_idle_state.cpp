@@ -21,8 +21,8 @@
 DEFINE_WIFILOG_HOTSPOT_LABEL("WifiApIdleState");
 namespace OHOS {
 namespace Wifi {
-ApIdleState::ApIdleState(ApStateMachine &apStateMachine)
-    : State("ApIdleState"), m_ApStateMachine(apStateMachine)
+ApIdleState::ApIdleState(ApStateMachine &apStateMachine, int id)
+    : State("ApIdleState"), m_ApStateMachine(apStateMachine), m_id(id)
 {}
 
 ApIdleState::~ApIdleState()
@@ -30,12 +30,12 @@ ApIdleState::~ApIdleState()
 
 void ApIdleState::GoInState()
 {
-    WIFI_LOGI("%{public}s  GoInState.", GetStateName().c_str());
+    WIFI_LOGI("Instance %{public}d %{public}s  GoInState.", m_id, GetStateName().c_str());
 }
 
 void ApIdleState::GoOutState()
 {
-    WIFI_LOGI("%{public}s  GoOutState.", GetStateName().c_str());
+    WIFI_LOGI("Instance %{public}d %{public}s  GoOutState.", m_id, GetStateName().c_str());
 }
 
 bool ApIdleState::ExecuteStateMsg(InternalMessage *msg)

@@ -29,16 +29,38 @@
 #undef LOG_TAG
 #define LOG_TAG "WifiHostapdHal"
 
-#define CONFIG_PATH_DIR "/data/misc/wifi/wpa_supplicant"
-
 /**
  * Blocklist configuration file name. This parameter is used by hostapd in an earlier version.
  */
 #define CONFIG_DENY_MAC_FILE_NAME "deny_mac.conf"
 #define SLEEP_TIME_100_MS (100 * 1000)
+#define CONFIG_PATH_DIR "/data/misc/wifi/wpa_supplicant"
+#if (AP_NUM > 1)
+#define WIFI_5G_CFG "hostapd_0.conf"
+#define WIFI_2G_CFG "hostapd_1.conf"
+#define HOSTAPD_5G_CFG "/data/misc/wifi/wpa_supplicant/"WIFI_5G_CFG
+#define HOSTAPD_2G_CFG "/data/misc/wifi/wpa_supplicant/"WIFI_2G_CFG
+#define HOSTAPD_5G_UDPPORT "127.0.0.1:9866"
+#define HOSTAPD_2G_UDPPORT "127.0.0.1:9877"
 
-WifiHostapdHalDevice *g_hostapdHalDev = NULL; /* Global Variable */
+WifiHostapdHalDeviceInfo g_hostapdHalDevInfo[] = {
+    {AP_5G_MAIN_INSTANCE, NULL, WIFI_5G_CFG, HOSTAPD_5G_CFG, HOSTAPD_5G_UDPPORT},
+    {AP_2G_MAIN_INSTANCE, NULL, WIFI_2G_CFG, HOSTAPD_2G_CFG, HOSTAPD_2G_UDPPORT},
+};
+#else
+#define WIFI_DEFAULT_CFG "hostapd.conf"
+#define HOSTAPD_DEFAULT_CFG "/data/misc/wifi/wpa_supplicant/"WIFI_DEFAULT_CFG
+#define HOSTAPD_DEFAULT_UDPPORT "127.0.0.1:9877"
+WifiHostapdHalDeviceInfo g_hostapdHalDevInfo[] = {
+    {AP_2G_MAIN_INSTANCE, NULL, WIFI_DEFAULT_CFG, HOSTAPD_DEFAULT_CFG, HOSTAPD_DEFAULT_UDPPORT}
+};
+#endif
 
+WifiHostapdHalDeviceInfo *GetWifiCfg(int *len)
+{
+    *len = sizeof(g_hostapdHalDevInfo) / sizeof(WifiHostapdHalDeviceInfo);
+    return g_hostapdHalDevInfo;
+}
 /*
  * The wpa_ctrl_pending interface provided by the WPA does not wait for the response.
  * As a result, the CPU usage is high. Reconstructed
@@ -65,24 +87,25 @@ static int MyWpaCtrlPending(struct wpa_ctrl *ctrl)
     }
 }
 
-static void DelCallbackMessage(const char *msg)
+static void DelCallbackMessage(const char *msg, int id)
 {
     if (msg == NULL) {
         return;
     }
     if (strncmp(msg, AP_STA_CONNECTED, strlen(AP_STA_CONNECTED)) == 0 ||
         strncmp(msg, AP_STA_DISCONNECTED, strlen(AP_STA_DISCONNECTED)) == 0) {
-        WifiHalCbStaJoin(msg);
+        WifiHalCbStaJoin(msg, id);
     } else if (strncmp(msg, AP_EVENT_ENABLED, strlen(AP_EVENT_ENABLED)) == 0 ||
                strncmp(msg, AP_EVENT_DISABLED, strlen(AP_EVENT_DISABLED)) == 0 ||
                strncmp(msg, WPA_EVENT_TERMINATING, strlen(WPA_EVENT_TERMINATING)) == 0) {
-        if (strncmp(msg, AP_EVENT_DISABLED, strlen(AP_EVENT_DISABLED)) == 0 && g_hostapdHalDev->execDisable == 1) {
-            g_hostapdHalDev->execDisable = 0;
+        if (strncmp(msg, AP_EVENT_DISABLED, strlen(AP_EVENT_DISABLED)) == 0 &&
+            g_hostapdHalDevInfo[id].hostapdHalDev->execDisable == 1) {
+            g_hostapdHalDevInfo[id].hostapdHalDev->execDisable = 0;
             return;
         }
-        WifiHalCbApState(msg);
+        WifiHalCbApState(msg, id);
         if (strncmp(msg, WPA_EVENT_TERMINATING, strlen(WPA_EVENT_TERMINATING)) == 0) {
-            g_hostapdHalDev->threadRunFlag = 0;
+            g_hostapdHalDevInfo[id].hostapdHalDev->threadRunFlag = 0;
         }
     }
 }
@@ -92,13 +115,19 @@ static void *HostapdReceiveCallback(void *arg)
     if (arg == NULL) {
         return NULL;
     }
-    struct wpa_ctrl *ctrl = arg;
+    WifiHostapdHalDeviceInfo *halDeviceInfo = arg;
+    int id = halDeviceInfo->id;
+    if (halDeviceInfo->hostapdHalDev == NULL ||
+        halDeviceInfo->hostapdHalDev->ctrlRecv) {
+        return NULL;
+    }
+    struct wpa_ctrl *ctrl = halDeviceInfo->hostapdHalDev->ctrlRecv;
     char *buf = (char *)calloc(BUFSIZE_RECV, sizeof(char));
     if (buf == NULL) {
         LOGE("In hostapd deal receive message thread, failed to calloc buff!");
         return NULL;
     }
-    while (g_hostapdHalDev->threadRunFlag) {
+    while (g_hostapdHalDevInfo[id].hostapdHalDev->threadRunFlag) {
         int ret = MyWpaCtrlPending(ctrl);
         if (ret < 0) {
             LOGE("hostapd thread get event message failed!");
@@ -124,7 +153,7 @@ static void *HostapdReceiveCallback(void *arg)
             p = strchr(p, '>');
             (p == NULL) ? (p = buf) : (p++);
         }
-        DelCallbackMessage(p);
+        DelCallbackMessage(p, id);
     }
     free(buf);
     buf = NULL;
@@ -132,60 +161,68 @@ static void *HostapdReceiveCallback(void *arg)
     return NULL;
 }
 
-void ReleaseHostapdCtrl(void)
+void ReleaseHostapdCtrl(int id)
 {
-    if (g_hostapdHalDev == NULL) {
+    if (g_hostapdHalDevInfo[id].hostapdHalDev == NULL) {
         return;
     }
-    if (g_hostapdHalDev->ctrlConn != NULL) {
-        wpa_ctrl_close(g_hostapdHalDev->ctrlConn);
-        g_hostapdHalDev->ctrlConn = NULL;
+    if (g_hostapdHalDevInfo[id].hostapdHalDev->ctrlConn != NULL) {
+        wpa_ctrl_close(g_hostapdHalDevInfo[id].hostapdHalDev->ctrlConn);
+        g_hostapdHalDevInfo[id].hostapdHalDev->ctrlConn = NULL;
     }
-    if (g_hostapdHalDev->ctrlRecv != NULL) {
-        wpa_ctrl_close(g_hostapdHalDev->ctrlRecv);
-        g_hostapdHalDev->ctrlRecv = NULL;
+    if (g_hostapdHalDevInfo[id].hostapdHalDev->ctrlRecv != NULL) {
+        wpa_ctrl_close(g_hostapdHalDevInfo[id].hostapdHalDev->ctrlRecv);
+        g_hostapdHalDevInfo[id].hostapdHalDev->ctrlRecv = NULL;
     }
     return;
 }
 
-int InitHostapdCtrl(const char *ifname)
+int InitHostapdCtrl(const char *ifname, int id)
 {
-    if (g_hostapdHalDev == NULL || ifname == NULL) {
+    if (g_hostapdHalDevInfo[id].hostapdHalDev == NULL || ifname == NULL) {
         return -1;
     }
     int flag = 0;
     do {
-        g_hostapdHalDev->ctrlConn = wpa_ctrl_open(ifname);
-        g_hostapdHalDev->ctrlRecv = wpa_ctrl_open(ifname);
-        if (g_hostapdHalDev->ctrlConn == NULL || g_hostapdHalDev->ctrlRecv == NULL) {
+        g_hostapdHalDevInfo[id].hostapdHalDev->ctrlConn = wpa_ctrl_open(ifname);
+        g_hostapdHalDevInfo[id].hostapdHalDev->ctrlRecv = wpa_ctrl_open(ifname);
+        if (g_hostapdHalDevInfo[id].hostapdHalDev->ctrlConn == NULL ||
+            g_hostapdHalDevInfo[id].hostapdHalDev->ctrlRecv == NULL) {
             LOGE("open hostapd control interface failed!");
             break;
         }
-        if (wpa_ctrl_attach(g_hostapdHalDev->ctrlRecv) != 0) {
+        if (wpa_ctrl_attach(g_hostapdHalDevInfo[id].hostapdHalDev->ctrlRecv) != 0) {
             LOGE("attach hostapd monitor interface failed!");
             break;
         }
         flag += 1;
     } while (0);
     if (!flag) {
-        ReleaseHostapdCtrl();
+        ReleaseHostapdCtrl(id);
         return -1;
     }
     return 0;
 }
 
-static int HostapdCliConnect(void)
+void GetDestPort(char *destPort, size_t len, int id)
 {
-    if (g_hostapdHalDev == NULL) {
+    strcpy_s(destPort, len, g_hostapdHalDevInfo[id].udpPort);
+}
+
+static int HostapdCliConnect(int id)
+{
+    if (g_hostapdHalDevInfo[id].hostapdHalDev == NULL) {
         return -1;
     }
-    if (g_hostapdHalDev->ctrlConn != NULL) {
+    if (g_hostapdHalDevInfo[id].hostapdHalDev->ctrlConn != NULL) {
         LOGE("Hostapd already initialized!");
         return 0;
     }
     int retryCount = 20;
+    char ifname[BUFFER_SIZE_64] = {0};
+    GetDestPort(ifname, sizeof(ifname), id);
     while (retryCount-- > 0) {
-        int ret = InitHostapdCtrl(AP_INTF);
+        int ret = InitHostapdCtrl(ifname, id);
         if (ret == 0) {
             LOGD("Global hostapd interface connect successfully!");
             break;
@@ -197,29 +234,30 @@ static int HostapdCliConnect(void)
     if (retryCount <= 0) {
         return -1;
     }
-    g_hostapdHalDev->threadRunFlag = 1;
-    if (pthread_create(&g_hostapdHalDev->tid, NULL, HostapdReceiveCallback, g_hostapdHalDev->ctrlRecv) != 0) {
-        g_hostapdHalDev->threadRunFlag = 0;
-        ReleaseHostapdCtrl();
+    g_hostapdHalDevInfo[id].hostapdHalDev->threadRunFlag = 1;
+    if (pthread_create(&g_hostapdHalDevInfo[id].hostapdHalDev->tid, NULL,
+        HostapdReceiveCallback, &g_hostapdHalDevInfo[id]) != 0) {
+        g_hostapdHalDevInfo[id].hostapdHalDev->threadRunFlag = 0;
+        ReleaseHostapdCtrl(id);
         LOGE("Create hostapd monitor thread failed!");
         return -1;
     }
     return 0;
 }
 
-static int HostapdCliClose(void)
+static int HostapdCliClose(int id)
 {
-    if (g_hostapdHalDev == NULL) {
+    if (g_hostapdHalDevInfo[id].hostapdHalDev == NULL) {
         return 0;
     }
-    if (g_hostapdHalDev->ctrlConn != NULL) {
-        g_hostapdHalDev->threadRunFlag = 0;
-        pthread_join(g_hostapdHalDev->tid, NULL);
-        g_hostapdHalDev->tid = 0;
-        wpa_ctrl_close(g_hostapdHalDev->ctrlRecv);
-        g_hostapdHalDev->ctrlRecv = NULL;
-        wpa_ctrl_close(g_hostapdHalDev->ctrlConn);
-        g_hostapdHalDev->ctrlConn = NULL;
+    if (g_hostapdHalDevInfo[id].hostapdHalDev->ctrlConn != NULL) {
+        g_hostapdHalDevInfo[id].hostapdHalDev->threadRunFlag = 0;
+        pthread_join(g_hostapdHalDevInfo[id].hostapdHalDev->tid, NULL);
+        g_hostapdHalDevInfo[id].hostapdHalDev->tid = 0;
+        wpa_ctrl_close(g_hostapdHalDevInfo[id].hostapdHalDev->ctrlRecv);
+        g_hostapdHalDevInfo[id].hostapdHalDev->ctrlRecv = NULL;
+        wpa_ctrl_close(g_hostapdHalDevInfo[id].hostapdHalDev->ctrlConn);
+        g_hostapdHalDevInfo[id].hostapdHalDev->ctrlConn = NULL;
     }
     return 0;
 }
@@ -248,13 +286,13 @@ static int WpaCtrlCommand(struct wpa_ctrl *ctrl, const char *cmd, char *buf, siz
     return 0;
 }
 
-static int EnableAp(void)
+static int EnableAp(int id)
 {
     char buf[BUFSIZE_REQUEST_SMALL] = {0};
-    return WpaCtrlCommand(g_hostapdHalDev->ctrlConn, "ENABLE", buf, sizeof(buf));
+    return WpaCtrlCommand(g_hostapdHalDevInfo[id].hostapdHalDev->ctrlConn, "ENABLE", buf, sizeof(buf));
 }
 
-static int SetApName(const char *name)
+static int SetApName(const char *name, int id)
 {
     if (name == NULL) {
         return -1;
@@ -265,10 +303,10 @@ static int SetApName(const char *name)
     if (sprintf_s(cmd, sizeof(cmd), "SET ssid %s", name) < 0) {
         return -1;
     }
-    return WpaCtrlCommand(g_hostapdHalDev->ctrlConn, cmd, buf, sizeof(buf));
+    return WpaCtrlCommand(g_hostapdHalDevInfo[id].hostapdHalDev->ctrlConn, cmd, buf, sizeof(buf));
 }
 
-static int SetApRsnPairwise(const char *type)
+static int SetApRsnPairwise(const char *type, int id)
 {
     if (type == NULL) {
         return -1;
@@ -280,10 +318,10 @@ static int SetApRsnPairwise(const char *type)
     if (sprintf_s(cmd, sizeof(cmd), "SET rsn_pairwise %s", type) < 0) {
         return -1;
     }
-    return WpaCtrlCommand(g_hostapdHalDev->ctrlConn, cmd, buf, sizeof(buf));
+    return WpaCtrlCommand(g_hostapdHalDevInfo[id].hostapdHalDev->ctrlConn, cmd, buf, sizeof(buf));
 }
 
-static int SetApWpaPairwise(const char *type)
+static int SetApWpaPairwise(const char *type, int id)
 {
     if (type == NULL) {
         return -1;
@@ -294,10 +332,10 @@ static int SetApWpaPairwise(const char *type)
     if (sprintf_s(cmd, sizeof(cmd), "SET wpa_pairwise %s", type) < 0) {
         return -1;
     }
-    return WpaCtrlCommand(g_hostapdHalDev->ctrlConn, cmd, buf, sizeof(buf));
+    return WpaCtrlCommand(g_hostapdHalDevInfo[id].hostapdHalDev->ctrlConn, cmd, buf, sizeof(buf));
 }
 
-static int SetApWpaKeyMgmt(const char *type)
+static int SetApWpaKeyMgmt(const char *type, int id)
 {
     if (type == NULL) {
         return -1;
@@ -308,10 +346,10 @@ static int SetApWpaKeyMgmt(const char *type)
     if (sprintf_s(cmd, sizeof(cmd), "SET wpa_key_mgmt %s", type) < 0) {
         return -1;
     }
-    return WpaCtrlCommand(g_hostapdHalDev->ctrlConn, cmd, buf, sizeof(buf));
+    return WpaCtrlCommand(g_hostapdHalDevInfo[id].hostapdHalDev->ctrlConn, cmd, buf, sizeof(buf));
 }
 
-static int SetApWpaValue(int securityType)
+static int SetApWpaValue(int securityType, int id)
 {
     int retval = -1;
     char cmd[BUFSIZE_CMD] = {0};
@@ -335,25 +373,25 @@ static int SetApWpaValue(int securityType)
         return -1;
     }
 
-    retval = WpaCtrlCommand(g_hostapdHalDev->ctrlConn, cmd, buf, sizeof(buf));
+    retval = WpaCtrlCommand(g_hostapdHalDevInfo[id].hostapdHalDev->ctrlConn, cmd, buf, sizeof(buf));
     if (retval == 0 && securityType != NONE) {
         /*
          * If the value of wpa is switched between 0, 1, and 2, the wpa_key_mgmt,
          * wpa_pairwise, and rsn_pairwise attributes must be set. Otherwise, the
          * enable or STA cannot be connected.
          */
-        retval = SetApWpaKeyMgmt("WPA-PSK");
+        retval = SetApWpaKeyMgmt("WPA-PSK", id);
     }
     if (retval == 0 && securityType == WPA_PSK) {
-        retval = SetApWpaPairwise("CCMP");
+        retval = SetApWpaPairwise("CCMP", id);
     }
     if (retval == 0 && securityType == WPA2_PSK) {
-        retval = SetApRsnPairwise("CCMP");
+        retval = SetApRsnPairwise("CCMP", id);
     }
     return retval;
 }
 
-static int SetApPasswd(const char *pass)
+static int SetApPasswd(const char *pass, int id)
 {
     if (pass == NULL) {
         return -1;
@@ -364,10 +402,10 @@ static int SetApPasswd(const char *pass)
     if (sprintf_s(cmd, sizeof(cmd), "SET wpa_passphrase %s", pass) < 0) {
         return -1;
     }
-    return WpaCtrlCommand(g_hostapdHalDev->ctrlConn, cmd, buf, sizeof(buf));
+    return WpaCtrlCommand(g_hostapdHalDevInfo[id].hostapdHalDev->ctrlConn, cmd, buf, sizeof(buf));
 }
 
-static int SetApChannel(int channel)
+static int SetApChannel(int channel, int id)
 {
     char cmd[BUFSIZE_CMD] = {0};
     char buf[BUFSIZE_REQUEST_SMALL] = {0};
@@ -375,10 +413,10 @@ static int SetApChannel(int channel)
     if (sprintf_s(cmd, sizeof(cmd), "SET channel %d", channel) < 0) {
         return -1;
     }
-    return WpaCtrlCommand(g_hostapdHalDev->ctrlConn, cmd, buf, sizeof(buf));
+    return WpaCtrlCommand(g_hostapdHalDevInfo[id].hostapdHalDev->ctrlConn, cmd, buf, sizeof(buf));
 }
 
-static int SetApBand(int band)
+static int SetApBand(int band, int id)
 {
     char cmd[BUFSIZE_CMD] = {0};
     char buf[BUFSIZE_REQUEST_SMALL] = {0};
@@ -402,10 +440,10 @@ static int SetApBand(int band)
     if (sprintf_s(cmd, sizeof(cmd), "SET hw_mode %s", hwMode) < 0) {
         return -1;
     }
-    return WpaCtrlCommand(g_hostapdHalDev->ctrlConn, cmd, buf, sizeof(buf));
+    return WpaCtrlCommand(g_hostapdHalDevInfo[id].hostapdHalDev->ctrlConn, cmd, buf, sizeof(buf));
 }
 
-static int SetApMaxConn(int maxConn)
+static int SetApMaxConn(int maxConn, int id)
 {
     char cmd[BUFSIZE_CMD] = {0};
     char buf[BUFSIZE_REQUEST_SMALL] = {0};
@@ -413,10 +451,10 @@ static int SetApMaxConn(int maxConn)
     if (sprintf_s(cmd, sizeof(cmd), "SET max_num_sta %d", maxConn) < 0) {
         return -1;
     }
-    return WpaCtrlCommand(g_hostapdHalDev->ctrlConn, cmd, buf, sizeof(buf));
+    return WpaCtrlCommand(g_hostapdHalDevInfo[id].hostapdHalDev->ctrlConn, cmd, buf, sizeof(buf));
 }
 
-static int SetApInfo(HostapdConfig *info)
+static int SetApInfo(HostapdConfig *info, int id)
 {
     if (info == NULL) {
         return -1;
@@ -428,42 +466,42 @@ static int SetApInfo(HostapdConfig *info)
             LOGE("password is invalid!");
             return retval;
         }
-        if ((retval = SetApPasswd((char *)info->preSharedKey)) != 0) {
+        if ((retval = SetApPasswd((char *)info->preSharedKey, id)) != 0) {
             LOGE("SetApPasswd failed. retval %{public}d", retval);
             return retval;
         }
     }
-    if ((retval = SetApName((char *)info->ssid)) != 0) {
+    if ((retval = SetApName((char *)info->ssid, id)) != 0) {
         LOGE("SetApName failed. retval %{public}d", retval);
         return retval;
     }
-    if ((retval = SetApWpaValue(info->securityType)) != 0) {
+    if ((retval = SetApWpaValue(info->securityType, id)) != 0) {
         LOGE("SetApWpaValue failed. retval %{public}d", retval);
         return retval;
     }
-    if ((retval = SetApBand(info->band)) != 0) {
+    if ((retval = SetApBand(info->band, id)) != 0) {
         LOGE("SetApBand failed. retval %{public}d", retval);
         return retval;
     }
-    if ((retval = SetApChannel(info->channel)) != 0) {
+    if ((retval = SetApChannel(info->channel, id)) != 0) {
         LOGE("SetApChannel failed. retval %{public}d", retval);
         return retval;
     }
-    if (info->maxConn >= 0 && (retval = SetApMaxConn(info->maxConn)) != 0) {
+    if (info->maxConn >= 0 && (retval = SetApMaxConn(info->maxConn, id)) != 0) {
         LOGE("SetApMaxConn failed. retval %{public}d", retval);
         return retval;
     }
     return 0;
 }
 
-static int DisableAp(void)
+static int DisableAp(int id)
 {
     char buf[BUFSIZE_REQUEST_SMALL] = {0};
-    g_hostapdHalDev->execDisable = 1;
-    return WpaCtrlCommand(g_hostapdHalDev->ctrlConn, "DISABLE", buf, sizeof(buf));
+    g_hostapdHalDevInfo[id].hostapdHalDev->execDisable = 1;
+    return WpaCtrlCommand(g_hostapdHalDevInfo[id].hostapdHalDev->ctrlConn, "DISABLE", buf, sizeof(buf));
 }
 
-static int ModBlockList(const char *mac)
+static int ModBlockList(const char *mac, int id)
 {
     if (mac == NULL) {
         return -1;
@@ -486,10 +524,10 @@ static int ModBlockList(const char *mac)
     if (sprintf_s(cmd, sizeof(cmd), "SET deny_mac_file %s/%s", CONFIG_PATH_DIR, CONFIG_DENY_MAC_FILE_NAME) < 0) {
         return -1;
     }
-    return WpaCtrlCommand(g_hostapdHalDev->ctrlConn, cmd, buf, sizeof(buf));
+    return WpaCtrlCommand(g_hostapdHalDevInfo[id].hostapdHalDev->ctrlConn, cmd, buf, sizeof(buf));
 }
 
-static int AddBlocklist(const char *mac)
+static int AddBlocklist(const char *mac, int id)
 {
     if (mac == NULL) {
         return -1;
@@ -500,7 +538,7 @@ static int AddBlocklist(const char *mac)
     if (snprintf_s(cmd, sizeof(cmd), sizeof(cmd) - 1, "DENY_ACL ADD_MAC %s", mac) < 0) {
         return -1;
     }
-    if (WpaCtrlCommand(g_hostapdHalDev->ctrlConn, cmd, buf, sizeof(buf)) != 0) {
+    if (WpaCtrlCommand(g_hostapdHalDevInfo[id].hostapdHalDev->ctrlConn, cmd, buf, sizeof(buf)) != 0) {
         LOGE("AddBlocklist Failed");
         return -1;
     }
@@ -509,12 +547,12 @@ static int AddBlocklist(const char *mac)
         /**
          * The hostapd of an earlier version does not support the DENY_ACL command and uses the configuration file.
          */
-        return ModBlockList(mac);
+        return ModBlockList(mac, id);
     }
     return 0;
 }
 
-static int DelBlocklist(const char *mac)
+static int DelBlocklist(const char *mac, int id)
 {
     if (mac == NULL) {
         return -1;
@@ -525,7 +563,7 @@ static int DelBlocklist(const char *mac)
     if (sprintf_s(cmd, sizeof(cmd), "DENY_ACL DEL_MAC %s", mac) < 0) {
         return -1;
     }
-    if (WpaCtrlCommand(g_hostapdHalDev->ctrlConn, cmd, buf, sizeof(buf)) != 0) {
+    if (WpaCtrlCommand(g_hostapdHalDevInfo[id].hostapdHalDev->ctrlConn, cmd, buf, sizeof(buf)) != 0) {
         LOGE("DelBlocklist Failed");
         return -1;
     }
@@ -534,12 +572,12 @@ static int DelBlocklist(const char *mac)
         if (sprintf_s(cmd, sizeof(cmd), "-%s", mac) < 0) {
             return -1;
         }
-        return ModBlockList(cmd);
+        return ModBlockList(cmd, id);
     }
     return 0;
 }
 
-static int GetApStatus(StatusInfo *info)
+static int GetApStatus(StatusInfo *info, int id)
 {
     if (info == NULL) {
         return -1;
@@ -549,7 +587,7 @@ static int GetApStatus(StatusInfo *info)
         return -1;
     }
 
-    if (WpaCtrlCommand(g_hostapdHalDev->ctrlConn, "STATUS", buf, BUFSIZE_RECV) != 0) {
+    if (WpaCtrlCommand(g_hostapdHalDevInfo[id].hostapdHalDev->ctrlConn, "STATUS", buf, BUFSIZE_RECV) != 0) {
         LOGE("Status WpaCtrlCommand failed");
         free(buf);
         buf = NULL;
@@ -575,7 +613,7 @@ static int GetApStatus(StatusInfo *info)
     return 0;
 }
 
-static int ShowConnectedDevList(char *buf, int size)
+static int ShowConnectedDevList(char *buf, int size, int id)
 {
     if (buf == NULL) {
         return -1;
@@ -585,7 +623,8 @@ static int ShowConnectedDevList(char *buf, int size)
     if (reqBuf == NULL) {
         return -1;
     }
-    if (WpaCtrlCommand(g_hostapdHalDev->ctrlConn, "STA-FIRST", reqBuf, BUFSIZE_REQUEST) != 0) {
+    if (WpaCtrlCommand(g_hostapdHalDevInfo[id].hostapdHalDev->ctrlConn, "STA-FIRST",
+        reqBuf, BUFSIZE_REQUEST) != 0) {
         LOGE("HostapdCliCmdListSta Failed");
         free(reqBuf);
         reqBuf = NULL;
@@ -614,19 +653,19 @@ static int ShowConnectedDevList(char *buf, int size)
         if (snprintf_s(cmd, sizeof(cmd), sizeof(cmd) - 1, "STA-NEXT %s", reqBuf) < 0) {
             break;
         }
-    } while (WpaCtrlCommand(g_hostapdHalDev->ctrlConn, cmd, reqBuf, BUFSIZE_REQUEST) == 0);
+    } while (WpaCtrlCommand(g_hostapdHalDevInfo[id].hostapdHalDev->ctrlConn, cmd, reqBuf, BUFSIZE_REQUEST) == 0);
     free(reqBuf);
     reqBuf = NULL;
     return 0;
 }
 
-static int ReloadApConfigInfo(void)
+static int ReloadApConfigInfo(int id)
 {
     char buf[BUFSIZE_REQUEST_SMALL] = {0};
-    return WpaCtrlCommand(g_hostapdHalDev->ctrlConn, "RELOAD", buf, sizeof(buf));
+    return WpaCtrlCommand(g_hostapdHalDevInfo[id].hostapdHalDev->ctrlConn, "RELOAD", buf, sizeof(buf));
 }
 
-static int DisConnectedDev(const char *mac)
+static int DisConnectedDev(const char *mac, int id)
 {
     if (mac == NULL) {
         return -1;
@@ -637,10 +676,10 @@ static int DisConnectedDev(const char *mac)
     if (sprintf_s(cmd, sizeof(cmd), "DISASSOCIATE %s", mac) < 0) {
         return -1;
     }
-    return WpaCtrlCommand(g_hostapdHalDev->ctrlConn, cmd, buf, sizeof(buf));
+    return WpaCtrlCommand(g_hostapdHalDevInfo[id].hostapdHalDev->ctrlConn, cmd, buf, sizeof(buf));
 }
 
-static int SetCountryCode(const char *code)
+static int SetCountryCode(const char *code, int id)
 {
     if (code == NULL) {
         return -1;
@@ -651,55 +690,61 @@ static int SetCountryCode(const char *code)
     if (sprintf_s(cmd, sizeof(cmd), "SET country_code %s", code) < 0) {
         return -1;
     }
-    return WpaCtrlCommand(g_hostapdHalDev->ctrlConn, cmd, buf, sizeof(buf));
+    return WpaCtrlCommand(g_hostapdHalDevInfo[id].hostapdHalDev->ctrlConn, cmd, buf, sizeof(buf));
 }
 
-static int InitHostapdHal(void)
+static int InitHostapdHal(int id)
 {
-    if (g_hostapdHalDev == NULL) {
+    if (g_hostapdHalDevInfo[id].hostapdHalDev == NULL) {
         return -1;
     }
-    g_hostapdHalDev->threadRunFlag = 1;
-    if (HostapdCliConnect() != 0) {
+    g_hostapdHalDevInfo[id].hostapdHalDev->threadRunFlag = 1;
+    if (HostapdCliConnect(id) != 0) {
         return -1;
     }
     return 0;
 }
 
-WifiHostapdHalDevice *GetWifiHostapdDev(void)
+WifiHostapdHalDevice *GetWifiHostapdDev(int id)
 {
-    if (g_hostapdHalDev != NULL) {
-        return g_hostapdHalDev;
-    }
-    g_hostapdHalDev = (WifiHostapdHalDevice *)calloc(1, sizeof(WifiHostapdHalDevice));
-    if (g_hostapdHalDev == NULL) {
-        LOGE("NULL device on open");
+    if (id < 0 || id >= AP_MAX_INSTANCE) {
         return NULL;
     }
+
+    if (g_hostapdHalDevInfo[id].hostapdHalDev != NULL) {
+        return g_hostapdHalDevInfo[id].hostapdHalDev;
+    }
+
+    g_hostapdHalDevInfo[id].hostapdHalDev = (WifiHostapdHalDevice *)calloc(1, sizeof(WifiHostapdHalDevice));
+    if (g_hostapdHalDevInfo[id].hostapdHalDev == NULL) {
+        return NULL;
+    }
+
     /* ************ Register hostapd_cli Interface ************************* */
-    g_hostapdHalDev->enableAp = EnableAp;
-    g_hostapdHalDev->disableAp = DisableAp;
-    g_hostapdHalDev->setApInfo = SetApInfo;
-    g_hostapdHalDev->addBlocklist = AddBlocklist;
-    g_hostapdHalDev->delBlocklist = DelBlocklist;
-    g_hostapdHalDev->status = GetApStatus;
-    g_hostapdHalDev->showConnectedDevList = ShowConnectedDevList;
-    g_hostapdHalDev->reloadApConfigInfo = ReloadApConfigInfo;
-    g_hostapdHalDev->disConnectedDev = DisConnectedDev;
-    g_hostapdHalDev->setCountryCode = SetCountryCode;
-    if (InitHostapdHal() != 0) {
-        free(g_hostapdHalDev);
-        g_hostapdHalDev = NULL;
+    g_hostapdHalDevInfo[id].hostapdHalDev->enableAp = EnableAp;
+    g_hostapdHalDevInfo[id].hostapdHalDev->disableAp = DisableAp;
+    g_hostapdHalDevInfo[id].hostapdHalDev->setApInfo = SetApInfo;
+    g_hostapdHalDevInfo[id].hostapdHalDev->addBlocklist = AddBlocklist;
+    g_hostapdHalDevInfo[id].hostapdHalDev->delBlocklist = DelBlocklist;
+    g_hostapdHalDevInfo[id].hostapdHalDev->status = GetApStatus;
+    g_hostapdHalDevInfo[id].hostapdHalDev->showConnectedDevList = ShowConnectedDevList;
+    g_hostapdHalDevInfo[id].hostapdHalDev->reloadApConfigInfo = ReloadApConfigInfo;
+    g_hostapdHalDevInfo[id].hostapdHalDev->disConnectedDev = DisConnectedDev;
+    g_hostapdHalDevInfo[id].hostapdHalDev->setCountryCode = SetCountryCode;
+
+    if (InitHostapdHal(id) != 0) {
+        free(g_hostapdHalDevInfo[id].hostapdHalDev);
+        g_hostapdHalDevInfo[id].hostapdHalDev = NULL;
         return NULL;
     }
-    return g_hostapdHalDev;
+    return g_hostapdHalDevInfo[id].hostapdHalDev;
 }
 
-void ReleaseHostapdDev(void)
+void ReleaseHostapdDev(int id)
 {
-    if (g_hostapdHalDev != NULL) {
-        HostapdCliClose();
-        free(g_hostapdHalDev);
-        g_hostapdHalDev = NULL;
+    if (g_hostapdHalDevInfo[id].hostapdHalDev != NULL) {
+        HostapdCliClose(id);
+        free(g_hostapdHalDevInfo[id].hostapdHalDev);
+        g_hostapdHalDevInfo[id].hostapdHalDev = NULL;
     }
 }

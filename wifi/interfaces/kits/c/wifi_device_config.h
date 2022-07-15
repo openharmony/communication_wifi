@@ -98,13 +98,23 @@ typedef enum {
     /** Invalid security type */
     WIFI_SEC_TYPE_INVALID = -1,
     /** Open */
-    WIFI_SEC_TYPE_OPEN,
+    WIFI_SEC_TYPE_OPEN = 0,
     /** Wired Equivalent Privacy (WEP) */
-    WIFI_SEC_TYPE_WEP,
+    WIFI_SEC_TYPE_WEP = 1,
     /** Pre-shared key (PSK) */
-    WIFI_SEC_TYPE_PSK,
+    WIFI_SEC_TYPE_PSK = 2,
+    /** Ethernet Automatic Protection (EAP) */
+    WIFI_SEC_TYPE_EAP = 3,
     /** Simultaneous Authentication of Equals (SAE) */
-    WIFI_SEC_TYPE_SAE,
+    WIFI_SEC_TYPE_SAE = 4,
+    /** EAP suite B */
+    WIFI_SEC_TYPE_EAP_SUITE_B = 5,
+    /** Opportunistic Wireless Encryption (OWE) */
+    WIFI_SEC_TYPE_OWE = 6,
+    /** WAPI cert */
+    WIFI_SEC_TYPE_WAPI_CERT = 7,
+    /** WAPI PSK */
+    WIFI_SEC_TYPE_WAPI_PSK = 8,
 } WifiSecurityType;
 
 /**

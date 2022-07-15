@@ -86,6 +86,10 @@ WifiErrorCode GetScanInfoList(WifiScanInfo *result, unsigned int *size)
         result->rssi = each.rssi;
         result->band = each.band;
         result->frequency = each.frequency;
+        result->channelWidth = WifiChannelWidth(static_cast<int>(each.channelWidth));
+        result->centerFrequency0 = each.centerFrequency0;
+        result->centerFrequency1 = each.centerFrequency1;
+        result->timestamp = each.timestamp;
         ++result;
     }
     return GetCErrorCode(ret);

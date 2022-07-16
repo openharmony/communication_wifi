@@ -63,6 +63,14 @@ public:
     void OnConnectChangedCallBack(int status, int networkId,const std::string &bssid);
 
     /**
+     * @Description : Callback of the connection state change event.
+     *
+     * @param reason : reason for bssid change [in]
+     * @param bssid: bssid of the network [in]
+     */
+    void OnBssidChangedCallBack(const std::string &reason, const std::string &bssid);
+
+    /**
      * @Description : Callback of the wpa state change event.
      *
      * @param status - status codes [in]

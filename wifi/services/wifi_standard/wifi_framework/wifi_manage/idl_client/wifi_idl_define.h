@@ -30,6 +30,7 @@ typedef enum WifiIdlEvent {
     /* SupplicantEventCallback */
     WIFI_IDL_CBK_CMD_SCAN_INFO_NOTIFY, /* SCAN Scan Result Notification */
     WIFI_IDL_CBK_CMD_CONNECT_CHANGED,    /* Connection status change notification */
+    WIFI_IDL_CBK_CMD_BSSID_CHANGED,      /* bssid change notification */
     WIFI_IDL_CBK_CMD_AP_ENABLE,          /* AP enabling notification */
     WIFI_IDL_CBK_CMD_AP_DISABLE,         /* AP closure notification */
     WIFI_IDL_CBK_CMD_WPA_STATE_CHANGEM,  /* WPA status change notification */

@@ -27,7 +27,6 @@ extern "C" {
  * @param status
  */
 void WifiHalCbNotifyScanEnd(int status);
-
 /**
  * @Description Wi-Fi Hal callback notification of the connection change.
  *
@@ -37,11 +36,18 @@ void WifiHalCbNotifyScanEnd(int status);
  */
 void WifiHalCbNotifyConnectChanged(int status, int networkId, const char *pos);
 /**
- * @Description The Wi-Fi Hal module notifies the WPA module of the status change.
+ * @Description Wi-Fi Hal module notifies the WPA module of the status change.
  *
  * @param status
  */
 void WifiHalCbNotifyWpaStateChange(int status);
+/**
+ * @Description Wi-Fi Hal module notifies the bssid change.
+ *
+ * @param reasonPos: reason in the return string
+ * @param bssidPos: bssid in the return string
+ */
+void WifiHalCbNotifyBssidChanged(const char *reasonPos, const char *bssidPos);
 /**
  * @Description Wi-Fi Hal callback notification error key.
  *

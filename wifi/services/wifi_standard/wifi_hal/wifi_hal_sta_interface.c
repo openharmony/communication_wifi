@@ -686,7 +686,7 @@ WifiErrorNo StopWps(void)
 
 WifiErrorNo GetRoamingCapabilities(WifiRoamCapability *capability)
 {
-    LOGD("GetRoamingCapabilities");
+    LOGI("GetRoamingCapabilities");
     if (capability == NULL) {
         return WIFI_HAL_FAILED;
     }
@@ -695,8 +695,22 @@ WifiErrorNo GetRoamingCapabilities(WifiRoamCapability *capability)
 
 WifiErrorNo SetRoamConfig(char **blocklist, int blocksize, char **trustlist, int trustsize)
 {
-    LOGD("SetRoamConfig block size %{public}d, trust size %{public}d", blocksize, trustsize);
-    if (blocklist == NULL || trustlist == NULL) {
+    LOGI("SetRoamConfig block size %{public}d, trust size %{public}d", blocksize, trustsize);.
+    if (trustlist != NULL && trustsize > 0) {
+        WifiWpaStaInterface *pStaIfc = GetWifiStaInterface(0);
+        if (pStaIfc == NULL) {
+            return WIFI_HAL_SUPPLICANT_NOT_INIT;
+        }
+        for (int i = 0; i < trustsize; i++) {
+            int ret = pStaIfc->wpaCliCmdSetRoamConfig(pStaIfc, trustlist[i]);
+            if (ret < 0) {
+                LOGE("wpaCliCmdSetRoamConfig failed! ret=%{public}d", ret);
+                return WIFI_HAL_FAILED;
+            }
+        }
+    }
+
+    if (blocklist == NULL || blocksize <= 0) {
         return WIFI_HAL_SUCCESS;
     }
     return WIFI_HAL_SUCCESS;

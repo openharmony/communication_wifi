@@ -606,6 +606,22 @@ static void WpaCallBackFunc(const char *p)
         }
         pBssid += strlen("bssid=");
         WifiHalCbNotifyConnectChanged(WPA_CB_DISCONNECTED, -1, pBssid);
+    /* bssid changed event */
+    } else if (strncmp(p, WPA_EVENT_BSSID_CHANGED, strlen(WPA_EVENT_BSSID_CHANGED)) == 0) {
+        LOGI("Reveive WPA_EVENT_BSSID_CHANGED notify event");
+        char *pBssid = strstr(p, "BSSID=");
+        if (pBssid == NULL) {
+            LOGE("NO bssid find!");
+            return;
+        }
+        pBssid += strlen("BSSID=");
+        char *pReason = strstr(p, "REASON=");
+        if (pReason == NULL) {
+            LOGE("NO reason find!");
+            return;
+        }
+        pReason += strlen("REASON=");
+        WifiHalCbNotifyBssidChanged(pReason, pBssid);
     } else {
         WpaCallBackFuncTwo(p);
     }

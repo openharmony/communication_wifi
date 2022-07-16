@@ -79,6 +79,31 @@ void WifiHalCbNotifyConnectChanged(int status, int networkId, const char *pos)
     return;
 }
 
+void WifiHalCbNotifyBssidChanged(const char *reasonPos, const char *bssidPos)
+{
+    char reason[WIFI_REASON_LENGTH] = {0};
+    if (reasonPos == NULL || bssidPos == NULL) {
+        LOGE("reasonPos or bssidPos is NULL");
+        return;
+    }
+    char *reasonEnd = strchar(reasonPos, ' ');
+    if (reasonEnd != NULL) {
+        int reasonLen = reasonEnd - reasonPos;
+        reasonLen = reasonLen > WIFI_REASON_LENGTH ? WIFI_REASON_LENGTH : reasonLen;
+        (void)memcpy_s(reason, sizeof(reason), reasonPos, reasonLen);
+    }
+
+    LOGI("bssid changed event, reason: %{public}s, bssid = %{private}s", reason, bssidPos);
+    WifiHalEventCallbackMsg *pCbkMsg = (WifiHalEventCallbackMsg *)calloc(1, sizeof(WifiHalEventCallbackMsg));
+    if (pCbkMsg == NULL) {
+        LOGE("create callback message failed!");
+        return;
+    }
+    (void)memcpy_s(pCbkMsg->msg.bssidChangedMsg.reason, WIFI_REASON_LENGTH, reason, WIFI_REASON_LENGTH);
+    (void)memcpy_s(pCbkMsg->msg.bssidChangedMsg.bssid, WIFI_MAC_LENGTH + 1, bssidPos, WIFI_MAC_LENGTH + 1);
+    EmitEventCallbackMsg(pCbkMsg, WIFI_BSSID_CHANGED_NOTIFY_EVENT);
+}
+
 void WifiHalCbNotifyWpaStateChange(int status)
 {
     LOGI("wpa state changed, state: %{public}d, and begin push notify message", status);

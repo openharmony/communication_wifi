@@ -116,7 +116,7 @@ void StaMonitor::OnBssidChangedCallBack(const std::string &reason, const std::st
         return;
     }
 
-    WifiLinkedInfo linkedInfo = {0};
+    WifiLinkedInfo linkedInfo;
     pStaStateMachine->GetLinkedInfo(linkedInfo);
     if (linkedInfo.connState != ConnState::CONNECTED) {
         WIFI_LOGW("Sta ignored the event for NOT in connected status!, connState: %d",
@@ -127,7 +127,7 @@ void StaMonitor::OnBssidChangedCallBack(const std::string &reason, const std::st
         WIFI_LOGW("Sta ignored the event for bssid is the same.");
         return;
     }
-    pStaStateMachine->OnNetworkConnectionEvent(linkedInfo->networkId, bssid);
+    pStaStateMachine->OnNetworkConnectionEvent(linkedInfo.networkId, bssid);
 }
 
 void StaMonitor::OnWpaStateChangedCallBack(int status)

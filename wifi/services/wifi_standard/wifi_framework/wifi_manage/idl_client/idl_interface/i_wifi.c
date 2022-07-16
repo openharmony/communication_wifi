@@ -241,7 +241,7 @@ static void IdlCbkConnectChanged(Context *context)
 
 static void IdlCbkBssidChanged(Context *context)
 {
-    int reason[WIFI_REASON_LENGTH] = {0};
+    char reason[WIFI_REASON_LENGTH] = {0};
     char bssid[WIFI_BSSID_LENGTH] = {0};
     if (ReadStr(context, reason, sizeof(reason)) != 0 ||
         ReadStr(context, bssid, sizeof(bssid)) != 0) {

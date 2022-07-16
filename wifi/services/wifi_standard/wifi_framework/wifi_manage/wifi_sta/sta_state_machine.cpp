@@ -1831,9 +1831,6 @@ bool StaStateMachine::LinkedState::ExecuteStateMsg(InternalMessage *msg)
             }
             pStaStateMachine->isRoam = true;
             pStaStateMachine->StopTimer(static_cast<int>(CMD_NETWORK_CONNECT_TIMEOUT));
-            pStaStateMachine->staCallback.OnStaConnChanged(
-                OperateResState::CONNECT_ASSOCIATED, pStaStateMachine->linkedInfo);
-            pStaStateMachine->ConnectToNetworkProcess(msg);
             /* Notify result to InterfaceService. */
             pStaStateMachine->staCallback.OnStaConnChanged(OperateResState::CONNECT_ASSOCIATED,
                 pStaStateMachine->linkedInfo);

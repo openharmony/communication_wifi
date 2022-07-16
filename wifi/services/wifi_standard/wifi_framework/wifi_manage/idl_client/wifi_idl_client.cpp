@@ -470,7 +470,7 @@ int WifiIdlClient::PushDeviceConfigAuthAlgorithm(
         }
     }
     if (alg & 0x2) {
-        if (strcat_s(pConfig->cfgValue, sizeof(pConfig->cfgValue), "SHARED ") != EOK) {
+        if (strcat_s(pConfig->cfgValue, sizeof(pConfig->cfgValue), "OPEN SHARED ") != EOK) {
             return 0;
         }
     }
@@ -557,6 +557,7 @@ WifiErrorNo WifiIdlClient::ReqRegisterStaEventCallback(const WifiEventCallback &
     }
     if (callback.onConnectChanged != nullptr) {
         cEventCallback.onConnectChanged = OnConnectChanged;
+        cEventCallback.onBssidChanged = OnBssidChanged;
         cEventCallback.onWpaStateChanged = OnWpaStateChanged;
         cEventCallback.onSsidWrongkey = OnWpaSsidWrongKey;
         cEventCallback.onWpsOverlap = OnWpsOverlap;

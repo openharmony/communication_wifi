@@ -253,11 +253,14 @@ public:
      */
     class LinkedState : public State {
     public:
-        explicit LinkedState();
+        explicit LinkedState(StaStateMachine *staStateMachine);
         ~LinkedState() override;
         void GoInState() override;
         void GoOutState() override;
         bool ExecuteStateMsg(InternalMessage *msg) override;
+
+    private:
+        StaStateMachine *pStaStateMachine;
     };
     /**
      * @Description  Definition of member function of ApRoamingState class in StaStateMachine.

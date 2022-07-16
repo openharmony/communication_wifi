@@ -483,6 +483,16 @@ static void DealConnectionChangedCbk(int event, Context *context)
     return;
 }
 
+static void DealBssidChangedCbk(int event, Context *context)
+{
+    WifiHalEventCallbackMsg *cbmsg = FrontCallbackMsg(event);
+    if (cbmsg != NULL) {
+        WriteStr(context, cbmsg->msg.bssidChangedMsg.reason);
+        WriteStr(context, cbmsg->msg.bssidChangedMsg.bssid);
+    }
+    return;
+}
+
 static void DealConnectWpsResultCbk(int event, Context *context)
 {
     WifiHalEventCallbackMsg *cbmsg = FrontCallbackMsg(event);
@@ -516,7 +526,11 @@ static void DealStaApCallback(int event, Context *context)
         case WIFI_CONNECT_CHANGED_NOTIFY_EVENT:
             DealConnectionChangedCbk(event, context);
             break;
+        case WIFI_BSSID_CHANGED_NOTIFY_EVENT:
+            DealBssidChangedCbk(event, context);
+            break;
         default:
+            LOGE("DealStaApCallback, Invalid event: %{public}d", event);
             break;
     }
     return;

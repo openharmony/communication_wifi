@@ -81,7 +81,7 @@ typedef struct WifiHalConnectMsg {
     char bssid[WIFI_MAC_LENGTH + 1];
 } WifiHalConnectMsg;
 
-typedef struct WifiHalConnectMsg {
+typedef struct WifiHalBssidChangedMsg {
     char reason[WIFI_REASON_LENGTH];
     char bssid[WIFI_MAC_LENGTH + 1];
 } WifiHalBssidChangedMsg;

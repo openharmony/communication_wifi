@@ -19,6 +19,7 @@
 #include "securec.h"
 #include "wifi_wpa_common.h"
 #include "utils/common.h" /* request for printf_decode to decode wpa's returned ssid info */
+#include "common/wpa_ctrl.h"
 #include "wifi_hal_common_func.h"
 #include "wifi_hal_callback.h"
 #include "wifi_hal_struct.h"

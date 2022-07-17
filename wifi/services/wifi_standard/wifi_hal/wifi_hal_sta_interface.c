@@ -695,7 +695,7 @@ WifiErrorNo GetRoamingCapabilities(WifiRoamCapability *capability)
 
 WifiErrorNo SetRoamConfig(char **blocklist, int blocksize, char **trustlist, int trustsize)
 {
-    LOGI("SetRoamConfig block size %{public}d, trust size %{public}d", blocksize, trustsize);.
+    LOGI("SetRoamConfig, blocksize:%{public}d, trustsize:%{public}d", blocksize, trustsize);.
     if (trustlist != NULL && trustsize > 0) {
         WifiWpaStaInterface *pStaIfc = GetWifiStaInterface(0);
         if (pStaIfc == NULL) {

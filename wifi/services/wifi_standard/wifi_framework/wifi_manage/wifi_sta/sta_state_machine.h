@@ -346,7 +346,7 @@ public:
      * @param reason: the reason of bssid changed(in)
      * @param bssid: the mac address of wifi(in)
      */
-    void StaStateMachine::OnBssidChangedEvent(std::string reason, std::string bssid);
+    void OnBssidChangedEvent(std::string reason, std::string bssid);
     /**
      * @Description Register sta callback function
      *

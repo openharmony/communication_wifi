@@ -19,7 +19,6 @@
 #include "securec.h"
 #include "wifi_wpa_common.h"
 #include "utils/common.h" /* request for printf_decode to decode wpa's returned ssid info */
-#include "common/wpa_ctrl.h"
 #include "wifi_hal_common_func.h"
 #include "wifi_hal_callback.h"
 #include "wifi_hal_struct.h"
@@ -47,6 +46,7 @@
 #define WPA_CB_CONNECTED 1
 #define WPA_CB_DISCONNECTED 2
 #define WPS_EVENT_PBC_OVERLAP "WPS-OVERLAP-DETECTED PBC session overlap"
+#define WPA_EVENT_BSSID_CHANGED "WPA-EVENT-BSSID-CHANGED "
 #define REPLY_BUF_LENGTH 4096
 #define CONNECTION_FULL_STATUS 17
 #define CONNECTION_REJECT_STATUS 37

@@ -339,8 +339,7 @@ ErrCode StaStateMachine::ConvertDeviceCfg(const WifiDeviceConfig &config) const
     idlConfig.privateKey = config.wifiEapConfig.privateKey;
     idlConfig.phase2Method = static_cast<int>(config.wifiEapConfig.phase2Method);
     idlConfig.wepKeyIdx = config.wepTxKeyIndex;
-    idlConfig.authAlgorithms = config.keyMgmt;
-    if (strcmp(config.keyMgmt, "WEP") == 0) {
+    if (strcmp(config.keyMgmt.c_str(), "WEP") == 0) {
         /* for wep */
         idlConfig.authAlgorithms = 0x02;
     }
@@ -1818,7 +1817,8 @@ bool StaStateMachine::LinkedState::ExecuteStateMsg(InternalMessage *msg)
     switch (msg->GetMessageName()) {
         case WIFI_SVR_CMD_STA_BSSID_CHANGED_EVENT: {
             ret = EXECUTED;
-            WifiIdlRoamConfig config = {0};
+            WifiIdlRoamConfig config;
+            memset_s(&config, sizeof(config), 0, sizeof(config));
             std::string reason = msg->GetStringFromMessage();
             pStaStateMachine->linkedInfo.bssid = msg->GetStringFromMessage();
             WIFI_LOGI("reveived bssid changed msg, reason:%{public}s,bssid:%{private}s.\n",

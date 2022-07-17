@@ -86,7 +86,7 @@ void WifiHalCbNotifyBssidChanged(const char *reasonPos, const char *bssidPos)
         LOGE("reasonPos or bssidPos is NULL");
         return;
     }
-    char *reasonEnd = strchar(reasonPos, ' ');
+    char *reasonEnd = strchr(reasonPos, ' ');
     if (reasonEnd != NULL) {
         int reasonLen = reasonEnd - reasonPos;
         reasonLen = reasonLen > WIFI_REASON_LENGTH ? WIFI_REASON_LENGTH : reasonLen;

@@ -105,7 +105,7 @@ public:
      */
     class InitState : public State {
     public:
-        explicit InitState(StaStateMachine *pStaStateMachine);
+        explicit InitState(StaStateMachine *staStateMachine);
         ~InitState() override;
         void GoInState() override;
         void GoOutState() override;

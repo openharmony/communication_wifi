@@ -58,6 +58,13 @@ int ConvertMacToArray(const char *macStr, unsigned char *mac, int macSize);
  */
 int CheckMacIsValid(const char *macStr);
 
+/**
+ * @Description Get the state of interface
+ * @param ifaceName - the name of interface
+ * @return int - 0: down 1: up
+ */
+int GetIfaceState(const char *ifaceName);
+
 #ifdef __cplusplus
 }
 #endif

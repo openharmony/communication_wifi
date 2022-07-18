@@ -56,11 +56,12 @@ WifiErrorNo StartSoftAp(int id)
         LOGE("hostapdHalDevice is NULL!");
         return WIFI_HAL_HOSTAPD_NOT_INIT;
     }
-
-    int ret = hostapdHalDevice->enableAp(id);
-    if (ret != 0) {
-        LOGE("enableAp failed! ret=%{public}d", ret);
-        return WIFI_HAL_FAILED;
+    if (GetIfaceState(AP_INTF) == 0 || id > 0) {
+        int ret = hostapdHalDevice->enableAp(id);
+        if (ret != 0) {
+            LOGE("enableAp failed! ret=%{public}d", ret);
+            return WIFI_HAL_FAILED;
+        }
     }
 
     LOGI("AP start successfully, id:%{public}d!", id);

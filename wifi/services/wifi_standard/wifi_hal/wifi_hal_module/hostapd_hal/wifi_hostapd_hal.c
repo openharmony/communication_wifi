@@ -113,12 +113,14 @@ static void DelCallbackMessage(const char *msg, int id)
 static void *HostapdReceiveCallback(void *arg)
 {
     if (arg == NULL) {
+        LOGE("%{public}s arg is null", __func__);
         return NULL;
     }
     WifiHostapdHalDeviceInfo *halDeviceInfo = arg;
     int id = halDeviceInfo->id;
     if (halDeviceInfo->hostapdHalDev == NULL ||
-        halDeviceInfo->hostapdHalDev->ctrlRecv) {
+        halDeviceInfo->hostapdHalDev->ctrlRecv == NULL) {
+        LOGE("%{public}s invalid HalDev or ctrlRecv", __func__);
         return NULL;
     }
     struct wpa_ctrl *ctrl = halDeviceInfo->hostapdHalDev->ctrlRecv;

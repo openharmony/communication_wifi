@@ -14,9 +14,14 @@
  */
 
 #include "wifi_hal_common_func.h"
+#include <net/if.h>
 #include <stddef.h>
 #include <stdint.h>
+#include <sys/ioctl.h>
+#include <sys/socket.h>
+#include <unistd.h>
 #include "securec.h"
+#include "wifi_log.h"
 
 #define MAC_UINT_SIZE 6
 #define MAC_STRING_SIZE 17
@@ -121,4 +126,30 @@ int CheckMacIsValid(const char *macStr)
         }
     }
     return 0;
+}
+
+int GetIfaceState(const char *ifaceName)
+{
+    int state = 0;
+    int sock = socket(AF_INET, SOCK_DGRAM, 0);
+    if (sock < 0) {
+        LOGE("GetIfaceState: create socket fail");
+        return state;
+    }
+
+    struct ifreq ifr;
+    (void)memset_s(&ifr, sizeof(ifr), 0, sizeof(ifr));
+    if (strcpy_s(ifr.ifr_name, IFNAMSIZ, ifaceName) != EOK) {
+        LOGE("GetIfaceState: strcpy_s fail");
+        close(sock);
+        return state;
+    }
+    if (ioctl(sock, SIOCGIFFLAGS, &ifr) < 0) {
+        LOGE("GetIfaceState: can not get interface state: %{public}s", ifaceName);
+        close(sock);
+        return state;
+    }
+    state = ((ifr.ifr_flags & IFF_UP) > 0 ? 1 : 0);
+    LOGD("GetIfaceState: current interface state: %{public}d", state);
+    return state;
 }

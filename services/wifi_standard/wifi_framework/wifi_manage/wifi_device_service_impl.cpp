@@ -110,11 +110,13 @@ ErrCode WifiDeviceServiceImpl::EnableWifi()
         }
     }
 
+#ifdef WIFI_SUPPORT_P2P
     sptr<WifiP2pServiceImpl> p2pService = WifiP2pServiceImpl::GetInstance();
     if (p2pService != nullptr && p2pService->EnableP2p() != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("Enable P2p failed!");
         return WIFI_OPT_FAILED;
     }
+#endif
 
     if (!WifiConfigCenter::GetInstance().SetWifiMidState(curState, WifiOprMidState::OPENING)) {
         WIFI_LOGI("set wifi mid state opening failed!");
@@ -175,11 +177,13 @@ ErrCode WifiDeviceServiceImpl::DisableWifi()
         }
     }
 
+#ifdef WIFI_SUPPORT_P2P
     sptr<WifiP2pServiceImpl> p2pService = WifiP2pServiceImpl::GetInstance();
     if (p2pService != nullptr && p2pService->DisableP2p() != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("Disable P2p failed!");
         return WIFI_OPT_FAILED;
     }
+#endif
 
     if (!WifiConfigCenter::GetInstance().SetWifiMidState(curState, WifiOprMidState::CLOSING)) {
         WIFI_LOGI("set wifi mid state opening failed! may be other activity has been operated");

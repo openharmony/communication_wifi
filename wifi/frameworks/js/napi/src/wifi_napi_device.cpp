@@ -311,9 +311,10 @@ static void JsObjToDeviceConfig(const napi_env& env, const napi_value& object, W
     /* "randomMacAddr" is not supported currently */
     int ipType = static_cast<int>(AssignIpMethod::UNASSIGNED);
     JsObjectToInt(env, object, "ipType", ipType);
-    if (AssignIpMethod(ipType) == AssignIpMethod::DHCP) {
+    WIFI_LOGI("JsObjToDeviceConfig, ipType: %{public}d.", ipType);
+    if (ipType == IP_TYPE_DHCP) {
         cppConfig.wifiIpConfig.assignMethod = AssignIpMethod::DHCP;
-    } else if (AssignIpMethod(ipType) == AssignIpMethod::STATIC) {
+    } else if (ipType == IP_TYPE_STATIC) {
         cppConfig.wifiIpConfig.assignMethod = AssignIpMethod::STATIC;
         ConfigStaticIp(env, object, cppConfig);
     }
@@ -966,8 +967,13 @@ static void DeviceConfigToJsArray(const napi_env& env, std::vector<WifiDeviceCon
     SetValueInt32(env, "randomMacType", DEFAULT_INVALID_VALUE, result);
     /* not supported currently */
     SetValueUtf8String(env, "randomMacAddr", std::string("").c_str(), result);
-    /* not fully supported, set as dhcp now */
-    SetValueInt32(env, "ipType", static_cast<int>(AssignIpMethod::DHCP), result);
+    if (vecDeviceConfigs[idx].wifiIpConfig.assignMethod == AssignIpMethod::STATIC) {
+        SetValueInt32(env, "ipType", IP_TYPE_STATIC, result);
+    } else {
+        SetValueInt32(env, "ipType", IP_TYPE_DHCP, result);
+    }
+    WIFI_LOGI("DeviceConfigToJsArray, idx:%{public}d, assignMethod:%{public}d!",
+        vecDeviceConfigs[idx].wifiIpConfig.assignMethod);
 
     napi_value ipCfgObj;
     napi_create_object(env, &ipCfgObj);

@@ -36,11 +36,13 @@
 #define DISABLE_AP_WAIT_MS 50000
 #define ABLE_AP_WAIT_MS 50000
 #define WIFI_MULTI_CMD_MAX_LEN 1024
+#define IFCAE_NAME_LEN 256
 static const char *g_serviceName = "hostapd";
 
 WifiErrorNo StartSoftAp(int id)
 {
     LOGI("Ready to start hostapd: %{public}d!", id);
+    char ifaceName[IFCAE_NAME_LEN] = {0};
     if (StartHostapd() != WIFI_HAL_SUCCESS) {
         LOGE("hostapd start failed!");
         return WIFI_HAL_OPEN_HOSTAPD_FAILED;
@@ -56,7 +58,9 @@ WifiErrorNo StartSoftAp(int id)
         LOGE("hostapdHalDevice is NULL!");
         return WIFI_HAL_HOSTAPD_NOT_INIT;
     }
-    if (GetIfaceState(AP_INTF) == 0 || id > 0) {
+
+    sprintf_s(ifaceName, IFCAE_NAME_LEN, AP_INTF"%d", id);
+    if (GetIfaceState(ifaceName) == 0 || id > 0) {
         int ret = hostapdHalDevice->enableAp(id);
         if (ret != 0) {
             LOGE("enableAp failed! ret=%{public}d", ret);

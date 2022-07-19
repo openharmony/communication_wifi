@@ -18,7 +18,7 @@ DHCP_ROOT_DIR = "$SUBSYSTEM_DIR/wifi/dhcp"
 
 declare_args() {
   wifi_feature_with_p2p = true
-  wifi_feature_with_ap_intf = "wlan0"
+  wifi_feature_with_ap_intf = "wlan"
   wifi_feature_with_ap_num = 1
   wifi_feature_with_auth_disable = false
   wifi_feature_with_dhcp_disable = false

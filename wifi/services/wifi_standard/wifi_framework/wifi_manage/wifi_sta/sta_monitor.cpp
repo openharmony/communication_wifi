@@ -89,9 +89,9 @@ void StaMonitor::OnConnectChangedCallBack(int status, int networkId, const std::
     pStaStateMachine->GetLinkedInfo(linkedInfo);
     /* P2P affects STA, causing problems or incorrect data updates */
     if ((linkedInfo.connState == ConnState::CONNECTED) &&
-        (linkedInfo.bssid != bssid) && (!pStaStateMachine->isRoaming())) {
+        (linkedInfo.bssid != bssid) && (!pStaStateMachine->IsRoaming())) {
         WIFI_LOGI("Sta ignored the event for bssid is mismatch, isRoam:%{public}d.",
-            pStaStateMachine->isRoaming());
+            pStaStateMachine->IsRoaming());
         return;
     }
     switch (status) {

@@ -336,7 +336,7 @@ public:
     /**
      * @Description  if it is roaming now.
      */
-    bool StaStateMachine::IsRoaming(void);
+    bool IsRoaming(void);
     /**
      * @Description  Connecting events
      *

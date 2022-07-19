@@ -510,9 +510,11 @@ void StaStateMachine::WpaStartedState::GoOutState()
 bool StaStateMachine::WpaStartedState::ExecuteStateMsg(InternalMessage *msg)
 {
     if (msg == nullptr) {
+        LOGI("msg is nullptr");
         return false;
     }
 
+    WIFI_LOGI("WpaStartedState ExecuteStateMsg-msgCode:%{public}d.\n", msg->GetMessageName());
     bool ret = NOT_EXECUTED;
     switch (msg->GetMessageName()) {
         case WIFI_SVR_CMD_STA_DISABLE_WIFI: {
@@ -1325,6 +1327,11 @@ void StaStateMachine::StartRoamToNetwork(std::string bssid)
     SendMessage(msg);
 }
 
+bool StaStateMachine::IsRoaming(void)
+{
+    return isRoam;
+}
+
 void StaStateMachine::OnNetworkConnectionEvent(int networkId, std::string bssid)
 {
     InternalMessage *msg = CreateMessage();
@@ -1809,6 +1816,7 @@ void StaStateMachine::LinkedState::GoOutState()
 bool StaStateMachine::LinkedState::ExecuteStateMsg(InternalMessage *msg)
 {
     if (msg == nullptr) {
+        WIFI_LOGI("msg is nullptr.");
         return false;
     }
 
@@ -1817,35 +1825,30 @@ bool StaStateMachine::LinkedState::ExecuteStateMsg(InternalMessage *msg)
     switch (msg->GetMessageName()) {
         case WIFI_SVR_CMD_STA_BSSID_CHANGED_EVENT: {
             ret = EXECUTED;
-            WifiIdlRoamConfig config;
-            memset_s(&config, sizeof(config), 0, sizeof(config));
             std::string reason = msg->GetStringFromMessage();
-            pStaStateMachine->linkedInfo.bssid = msg->GetStringFromMessage();
-            WIFI_LOGI("reveived bssid changed msg, reason:%{public}s,bssid:%{private}s.\n",
-                reason.c_str(), pStaStateMachine->linkedInfo.bssid.c_str());
-            WifiSettings::GetInstance().SaveLinkedInfo(pStaStateMachine->linkedInfo);
-            config.trustlistBssids.push_back(pStaStateMachine->linkedInfo.bssid);
-            if (WifiStaHalInterface::GetInstance().SetRoamConfig(config) != WIFI_IDL_OPT_OK) {
-                WIFI_LOGI("SetRoamConfig return fail.");
+            std::string bssid = msg->GetStringFromMessage();
+            WIFI_LOGI("reveived bssid changed event, reason:%{public}s,bssid:%{private}s.\n",
+                reason.c_str(), bssid.c_str());
+            if (strcmp(reason.c_str(), "ASSOC_COMPLETE") != 0) {
+                WIFI_LOGE("Bssid change not for ASSOC_COMPLETE, do nothing.");
+                return false;
+            }
+            if (WifiStaHalInterface::GetInstance().SetWpsBssid(pStaStateMachine->linkedInfo.networkId,
+                bssid) != WIFI_IDL_OPT_OK) {
+                WIFI_LOGE("SetWpsBssid return fail.");
                 return false;
             }
             pStaStateMachine->isRoam = true;
-            pStaStateMachine->StopTimer(static_cast<int>(CMD_NETWORK_CONNECT_TIMEOUT));
-            /* Notify result to InterfaceService. */
-            pStaStateMachine->staCallback.OnStaConnChanged(OperateResState::CONNECT_ASSOCIATED,
-                pStaStateMachine->linkedInfo);
-            pStaStateMachine->staCallback.OnStaConnChanged(OperateResState::CONNECT_OBTAINING_IP,
-                pStaStateMachine->linkedInfo);
-            /* The current state of StaStateMachine transfers to GetIpState. */
-            pStaStateMachine->SwitchState(pStaStateMachine->pGetIpState);
+            /* The current state of StaStateMachine transfers to pApRoamingState. */
+            pStaStateMachine->SwitchState(pStaStateMachine->pApRoamingState);
             break;
         }
         default:
-            WIFI_LOGE("Invalid mesage!");
+            WIFI_LOGE("NOT handle this event!");
             break;
     }
 
-    return EXECUTED;
+    return ret;
 }
 
 /* --------------------------- state machine Roaming State ------------------------------ */
@@ -1876,6 +1879,12 @@ bool StaStateMachine::ApRoamingState::ExecuteStateMsg(InternalMessage *msg)
             ret = EXECUTED;
             pStaStateMachine->isRoam = true;
             pStaStateMachine->StopTimer(static_cast<int>(CMD_NETWORK_CONNECT_TIMEOUT));
+            /* Save linkedInfo */
+            pStaStateMachine->linkedInfo.networkId = msg->GetParam1();
+            pStaStateMachine->linkedInfo.bssid = msg->GetStringFromMessage();
+            WIFI_LOGI("ApRoamingState, receive connection event, networkId:%{public}d, bssid:%{public}s.",
+                pStaStateMachine->linkedInfo.networkId, pStaStateMachine->linkedInfo.bssid.c_str());
+            WifiSettings::GetInstance().SaveLinkedInfo(pStaStateMachine->linkedInfo);
             pStaStateMachine->staCallback.OnStaConnChanged(
                 OperateResState::CONNECT_ASSOCIATED, pStaStateMachine->linkedInfo);
             pStaStateMachine->ConnectToNetworkProcess(msg);
@@ -2020,7 +2029,7 @@ void StaStateMachine::DhcpResultNotify::OnSuccess(int status, const std::string 
         return;
     }
     WIFI_LOGD("iptype=%{public}d, ip=%{private}s, gateway=%{private}s, \
-        subnet=%{private}s, serverAddress=%{private}s, leaseDuration=%d",
+        subnet=%{private}s, serverAddress=%{private}s, leaseDuration=%publicd",
         result.iptype,
         result.strYourCli.c_str(),
         result.strRouter1.c_str(),
@@ -2068,6 +2077,7 @@ void StaStateMachine::DhcpResultNotify::OnSuccess(int status, const std::string 
 
     WIFI_LOGI("DhcpResultNotify::OnSuccess, getIpSucNum=%{public}d, isRoam=%{public}d",
         pStaStateMachine->getIpSucNum, pStaStateMachine->isRoam);
+    pStaStateMachine->SwitchState(pStaStateMachine->pLinkedState);
     if (pStaStateMachine->getIpSucNum == 0 || pStaStateMachine->isRoam) {
         pStaStateMachine->SaveLinkstate(ConnState::CONNECTED, DetailedState::CONNECTED);
         pStaStateMachine->staCallback.OnStaConnChanged(
@@ -2078,6 +2088,15 @@ void StaStateMachine::DhcpResultNotify::OnSuccess(int status, const std::string 
         pStaStateMachine->pNetcheck->SignalNetCheckThread();
     }
     pStaStateMachine->getIpSucNum++;
+
+    WIFI_LOGI("DhcpResultNotify::OnSuccess, stop dhcp client");
+    if (pStaStateMachine->pDhcpService != nullptr) {
+        if (pStaStateMachine->currentTpType == IPTYPE_IPV4) {
+            pStaStateMachine->pDhcpService->StopDhcpClient(IF_NAME, false);
+        } else {
+            pStaStateMachine->pDhcpService->StopDhcpClient(IF_NAME, true);
+        }
+    }
     return;
 }
 

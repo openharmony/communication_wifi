@@ -287,6 +287,15 @@ public:
     WifiErrorNo GetRoamingCapabilities(WifiIdlRoamCapability &capability);
 
     /**
+     * @Description Set bssid to supplicant.
+     *
+     * @param networkId
+     * @param bssid
+     * @return WifiErrorNo
+     */
+    WifiErrorNo SetWpsBssid(int networkId, const std::string &bssid);
+
+    /**
      * @Description Setting Roaming Configurations.
      *
      * @param config

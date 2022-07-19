@@ -269,6 +269,15 @@ public:
     WifiErrorNo SetDeviceConfig(int networkId, const WifiIdlDeviceConfig &config);
 
     /**
+     * @Description Set bssid to supplicant.
+     *
+     * @param networkId
+     * @param bssid
+     * @return WifiErrorNo
+     */
+    WifiErrorNo SetWpsBssid(int networkId, const std::string &bssid);
+
+    /**
      * @Description Save the network.
      *
      * @return WifiErrorNo

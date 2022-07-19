@@ -65,7 +65,7 @@ enum class ConnStateJs {
     UNKNOWN /* Failed to set up the Wi-Fi connection */
 };
 
- enum class IpTypeJs {
+enum class IpTypeJs {
     /** Use statically configured IP settings */
     IP_TYPE_STATIC,
     /** Use dynamically configured IP settings */

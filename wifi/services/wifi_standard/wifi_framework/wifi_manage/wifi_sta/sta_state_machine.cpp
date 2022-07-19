@@ -2029,7 +2029,7 @@ void StaStateMachine::DhcpResultNotify::OnSuccess(int status, const std::string 
         return;
     }
     WIFI_LOGD("iptype=%{public}d, ip=%{private}s, gateway=%{private}s, \
-        subnet=%{private}s, serverAddress=%{private}s, leaseDuration=%publicd",
+        subnet=%{private}s, serverAddress=%{private}s, leaseDuration=%{public}d",
         result.iptype,
         result.strYourCli.c_str(),
         result.strRouter1.c_str(),

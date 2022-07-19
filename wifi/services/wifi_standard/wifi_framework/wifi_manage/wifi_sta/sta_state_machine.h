@@ -334,6 +334,10 @@ public:
      */
     void StartRoamToNetwork(std::string bssid);
     /**
+     * @Description  if it is roaming now.
+     */
+    bool StaStateMachine::IsRoaming(void);
+    /**
      * @Description  Connecting events
      *
      * @param networkId - the networkId of network which is going to be connected(in)

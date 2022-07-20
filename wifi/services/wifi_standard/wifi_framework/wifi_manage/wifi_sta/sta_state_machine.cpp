@@ -1769,7 +1769,7 @@ bool StaStateMachine::ConfigStaticIpAddress(StaticIpAddress &staticIpAddress)
 
 void StaStateMachine::HandleNetCheckResult(StaNetState netState, const std::string portalUrl)
 {
-    WIFI_LOGI("Enter HandleNetCheckResult, netState:%{public}d.");
+    WIFI_LOGI("Enter HandleNetCheckResult, netState:%{public}d.", netState);
     if (linkedInfo.connState == ConnState::DISCONNECTED) {
         WIFI_LOGE("Network disconnected\n");
         return;

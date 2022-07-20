@@ -526,9 +526,7 @@ void StaStateMachine::StopWifiProcess()
 {
     WIFI_LOGI("Enter StaStateMachine::StopWifiProcess.\n");
 #ifndef OHOS_ARCH_LITE
-    std::thread([this]() {
-        WifiNetAgent::GetInstance().UnregisterNetSupplier();
-    }).detach();
+    WifiNetAgent::GetInstance().UnregisterNetSupplier();
 #endif
     WIFI_LOGI("Stop wifi is in process...\n");
     WifiSettings::GetInstance().SetWifiState(static_cast<int>(WifiState::DISABLING));

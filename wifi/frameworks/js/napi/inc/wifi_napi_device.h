@@ -72,7 +72,7 @@ enum class IpTypeJs {
     IP_TYPE_DHCP,
     /** No IP details are assigned */
     IP_TYPE_UNKNOWN,
-}
+};
 
 class ScanInfoAsyncContext : public AsyncContext {
 public:

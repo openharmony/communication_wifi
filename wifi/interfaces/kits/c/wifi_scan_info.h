@@ -36,12 +36,22 @@
 #ifndef WIFI_SCAN_INFO_C_H
 #define WIFI_SCAN_INFO_C_H
 
+#include <stdint.h>
 #include "wifi_device_config.h"
 
 /**
  * @brief Indicates the maximum number of hotspots that can be detected in a Wi-Fi scan.
  */
 #define WIFI_SCAN_HOTSPOT_LIMIT 64
+
+typedef enum {
+    WIDTH_20MHZ = 0,
+    WIDTH_40MHZ = 1,
+    WIDTH_80MHZ = 2,
+    WIDTH_160MHZ = 3,
+    WIDTH_80MHZ_PLUS = 4,
+    WIDTH_INVALID
+} WifiChannelWidth;
 
 /**
  * @brief Represents the Wi-Fi scan result information.
@@ -61,6 +71,14 @@ typedef struct {
     int band;
     /** Frequency in MHz */
     int frequency;
+    /** Wifi channel width. For details, see {@link WifiChannelWidth}. */
+    WifiChannelWidth channelWidth;
+    /** Center frequency in MHz */
+    int centerFrequency0;
+    /** Center frequency in MHz */
+    int centerFrequency1;
+    /** Time stamp */
+    int64_t timestamp;
 } WifiScanInfo;
 
 #endif // WIFI_SCAN_INFO_C_H

@@ -74,7 +74,7 @@ ohos_unittest("manager_unittest") {
     "//base/security/access_token/interfaces/innerkits/accesstoken/include",
     "//foundation/communication/netmanager_base/services/netmanagernative/include/netsys",
     "$WIFI_ROOT_DIR/utils/inc",
-    "//foundation/distributedschedule/samgr/interfaces/innerkits/samgr_proxy/include",
+    "//foundation/systemabilitymgr/samgr/interfaces/innerkits/samgr_proxy/include",
     "//foundation/communication/netmanager_base/frameworks/native/netmanagernative",
     "//foundation/communication/netmanager_base/interfaces/innerkits/netmanagernative/include",
   ]

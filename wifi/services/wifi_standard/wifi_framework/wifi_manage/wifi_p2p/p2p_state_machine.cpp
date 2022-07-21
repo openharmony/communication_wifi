@@ -224,11 +224,7 @@ bool P2pStateMachine::ReawakenPersistentGroup(WifiP2pConfigInternal &config) con
 
     if (isJoin && !device.IsGroupLimit()) {
         if (groupName.empty()) {
-            WifiP2pDevice peerInfo;
-            if (WifiP2PHalInterface::GetInstance().GetP2pPeer(config.GetDeviceAddress(), peerInfo) ==
-                WifiErrorNo::WIFI_IDL_OPT_OK) {
-                groupName = peerInfo.GetNetworkName();
-            }
+            groupName = device.GetNetworkName();
         }
         int networkId = groupManager.GetGroupNetworkId(device, groupName);
         if (networkId >= 0) {
@@ -298,7 +294,15 @@ WifiP2pDevice P2pStateMachine::FetchNewerDeviceInfo(const std::string &deviceAdd
         WIFI_LOGE("Invalid device address.");
         return device;
     }
-    return deviceManager.GetDevices(device.GetDeviceAddress());
+    WifiP2pDevice newDevice = deviceManager.GetDevices(deviceAddr);
+    if (WifiP2PHalInterface::GetInstance().GetP2pPeer(deviceAddr, device) ==
+        WifiErrorNo::WIFI_IDL_OPT_OK) {
+        int groupCap = device.GetGroupCapabilitys();
+        deviceManager.UpdateDeviceGroupCap(deviceAddr, groupCap);
+        newDevice.SetGroupCapabilitys(groupCap);
+        newDevice.SetNetworkName(device.GetNetworkName());
+    }
+    return newDevice;
 }
 
 void P2pStateMachine::DealGroupCreationFailed()

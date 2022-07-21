@@ -76,7 +76,7 @@ if (defined(ohos_lite)) {
 
   config("wifi_sdk_header") {
     include_dirs = [
-      "//utils/native/base/include",
+      "//commonlibrary/c_utils/base/include",
       "//utils/system/safwk/native/include",
       "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
       "//foundation/arkui/ace_engine/frameworks/base/utils",
@@ -204,11 +204,11 @@ if (defined(ohos_lite)) {
       "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog",
       "//foundation/distributedschedule/samgr/interfaces/innerkits/samgr_proxy:samgr_proxy",
       "//third_party/bounds_checking_function:libsec_static",
-      "//utils/native/base:utils",
     ]
 
     external_deps = [
       "ability_base:want",
+      "c_utils:utils",
       "common_event_service:cesfwk_innerkits",
       "ipc:ipc_core",
     ]

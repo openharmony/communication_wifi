@@ -65,7 +65,7 @@ ohos_shared_library("wifi_p2p_service") {
 
   include_dirs = [
     "./",
-    "//utils/native/base/include",
+    "//commonlibrary/c_utils/base/include",
     "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
     "$WIFI_ROOT_DIR/frameworks/native/interfaces",
     "$WIFI_ROOT_DIR/services/wifi_standard/ipc_framework/cRPC/include",
@@ -106,6 +106,7 @@ ohos_shared_library("wifi_p2p_service") {
   }
 
   external_deps = [
+    "c_utils:utils",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
     "netmanager_base:net_conn_manager_if",
@@ -117,7 +118,6 @@ ohos_shared_library("wifi_p2p_service") {
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/idl_client:wifi_idl_client",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common:wifi_common_service",
     "$WIFI_ROOT_DIR/utils/src:wifi_utils",
-    "//utils/native/base:utils",
   ]
 
   part_name = "wifi"

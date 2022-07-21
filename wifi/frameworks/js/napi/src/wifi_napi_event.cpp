@@ -128,9 +128,14 @@ void NapiEvent::EventNotify(AsyncEventData *asyncEvent)
             napi_get_undefined(asyncData->env, &undefine);
             napi_get_reference_value(asyncData->env, asyncData->callbackRef, &handler);
             jsEvent = asyncData->packResult();
-            WIFI_LOGI("Push event to js, env: %{private}p, ref : %{private}p", asyncData->env, &asyncData->callbackRef);
-            if (napi_call_function(asyncData->env, nullptr, handler, 1, &jsEvent, &undefine) != napi_ok) {
-                WIFI_LOGE("Report event to Js failed");
+            {
+                std::shared_lock<std::shared_mutex> guard(g_regInfoMutex);
+                WIFI_LOGI("Push event to js, env: %{private}p, ref : %{private}p",
+                    asyncData->env, &asyncData->callbackRef);
+                if (asyncData->isObjExist() &&
+                    (napi_call_function(asyncData->env, nullptr, handler, 1, &jsEvent, &undefine) != napi_ok)) {
+                    WIFI_LOGE("Report event to Js failed");
+                }
             }
             napi_close_handle_scope(asyncData->env, scope);
 
@@ -143,12 +148,28 @@ void NapiEvent::EventNotify(AsyncEventData *asyncEvent)
     );
 }
 
-bool NapiEvent::CheckIsRegister(const std::string& type)
+bool NapiEvent::IsRegisterObjectExist(const RegObj& regObj, const std::string& type)
 {
-    return g_eventRegisterInfo.find(type) != g_eventRegisterInfo.end();
+    /* The caller has lock protect, don't need to lock again */
+    auto iter = g_eventRegisterInfo.find(type);
+    if (iter == g_eventRegisterInfo.end()) {
+        return false;
+    }
+    return (std::find(iter->second.begin(), iter->second.end(), regObj) != iter->second.end());
 }
 
-napi_value NapiEvent::CreateResult(const napi_env& env, int value) {
+std::vector<RegObj> NapiEvent::GetRegisterObjects(const std::string& type)
+{
+    std::shared_lock<std::shared_mutex> guard(g_regInfoMutex);
+    auto iter = g_eventRegisterInfo.find(type);
+    if (iter == g_eventRegisterInfo.end()) {
+        return std::vector<RegObj>();
+    }
+    return g_eventRegisterInfo[type];
+}
+
+napi_value NapiEvent::CreateResult(const napi_env& env, int value)
+{
     napi_value result;
     napi_create_int32(env, value, &result);
     return result;

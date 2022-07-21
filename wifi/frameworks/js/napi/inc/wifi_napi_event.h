@@ -27,24 +27,6 @@
 
 namespace OHOS {
 namespace Wifi {
-class AsyncEventData {
-public:
-    napi_env env;
-    napi_ref callbackRef;
-    std::function<napi_value ()> packResult;
-
-    explicit AsyncEventData(napi_env e, napi_ref r, std::function<napi_value ()> p) {
-        env = e;
-        callbackRef = r;
-        packResult = p;
-    }
-
-    AsyncEventData() = delete;
-
-    virtual ~AsyncEventData() {
-    }
-};
-
 class RegObj {
 public:
     RegObj() : m_regEnv(0), m_regHanderRef(nullptr) {
@@ -57,8 +39,40 @@ public:
     ~RegObj() {
     }
 
+    bool operator == (const RegObj& other) const {
+        return m_regEnv == other.m_regEnv && m_regHanderRef == other.m_regHanderRef;
+    }
+
+    bool operator != (const RegObj& other) const {
+        return !(*this == other);
+    }
+
+    bool operator < (const RegObj& other) const {
+        return m_regEnv < other.m_regEnv || (m_regEnv == other.m_regEnv && m_regHanderRef < other.m_regHanderRef);
+    }
+
     napi_env m_regEnv;
     napi_ref m_regHanderRef;
+};
+
+class AsyncEventData {
+public:
+    napi_env env;
+    napi_ref callbackRef;
+    std::function<napi_value ()> packResult;
+    std::function<bool ()> isObjExist;
+
+    explicit AsyncEventData(napi_env e, napi_ref r, std::function<napi_value ()> p, std::function<bool ()> checkFunc) {
+        env = e;
+        callbackRef = r;
+        packResult = p;
+        isObjExist = checkFunc;
+    }
+
+    AsyncEventData() = delete;
+
+    virtual ~AsyncEventData() {
+    }
 };
 
 static std::shared_mutex g_regInfoMutex;
@@ -66,7 +80,6 @@ static std::map<std::string, std::vector<RegObj>> g_eventRegisterInfo;
 
 class NapiEvent {
 public:
-    bool CheckIsRegister(const std::string& type);
     napi_value CreateResult(const napi_env& env, int value);
     napi_value CreateResult(const napi_env& env, const StationInfo& info);
     napi_value CreateResult(const napi_env& env, napi_value placehoders);
@@ -74,18 +87,21 @@ public:
     napi_value CreateResult(const napi_env& env, const std::vector<WifiP2pDevice>& devices);
     napi_value CreateResult(const napi_env& env, const WifiP2pLinkedInfo& info);
     void EventNotify(AsyncEventData *asyncEvent);
+    bool IsRegisterObjectExist(const RegObj& regObj, const std::string& type);
+    std::vector<RegObj> GetRegisterObjects(const std::string& type);
 
     template<typename T>
     void CheckAndNotify(const std::string& type, const T& obj) {
-        std::shared_lock<std::shared_mutex> guard(g_regInfoMutex);
-        if (!CheckIsRegister(type)) {
+        std::vector<RegObj> vecObj = GetRegisterObjects(type);
+        if (vecObj.empty()) {
             return;
         }
-
-        std::vector<RegObj>& vecObj = g_eventRegisterInfo[type];
         for (auto& each : vecObj) {
-            auto func = [this, env = each.m_regEnv, obj] () -> napi_value { return CreateResult(env, obj); };
-            AsyncEventData *asyncEvent = new (std::nothrow)AsyncEventData(each.m_regEnv, each.m_regHanderRef, func);
+            auto resultFunc = [this, env = each.m_regEnv, obj] () -> napi_value { return CreateResult(env, obj); };
+            auto isObjExistFunc = [this, eventObj = each, type] () -> bool
+                { return IsRegisterObjectExist(eventObj, type); };
+            AsyncEventData *asyncEvent =
+                new (std::nothrow)AsyncEventData(each.m_regEnv, each.m_regHanderRef, resultFunc, isObjExistFunc);
             if (asyncEvent == nullptr) {
                 return;
             }

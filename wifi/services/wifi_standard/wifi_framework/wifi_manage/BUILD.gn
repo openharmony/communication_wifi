@@ -76,8 +76,8 @@ if (defined(ohos_lite)) {
       "$WIFI_ROOT_DIR/utils/inc",
       "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits",
       "//foundation/communication/ipc/interfaces/innerkits/c/ipc/include",
-      "//foundation/distributedschedule/samgr_lite/interfaces/innerkits/registry",
-      "//foundation/distributedschedule/samgr_lite/interfaces/innerkits/samgr",
+      "//foundation/systemabilitymgr/samgr_lite/interfaces/innerkits/registry",
+      "//foundation/systemabilitymgr/samgr_lite/interfaces/innerkits/samgr",
       "//third_party/bounds_checking_function/include",
       "//utils/native/lite/include",
     ]
@@ -87,7 +87,7 @@ if (defined(ohos_lite)) {
       "$WIFI_ROOT_DIR/utils/src:wifi_utils",
       "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
       "//foundation/communication/ipc/interfaces/innerkits/c/ipc:ipc_single",
-      "//foundation/distributedschedule/samgr_lite/samgr:samgr",
+      "//foundation/systemabilitymgr/samgr_lite/samgr:samgr",
       "//third_party/bounds_checking_function:libsec_shared",
     ]
 
@@ -135,8 +135,8 @@ if (defined(ohos_lite)) {
       "$WIFI_ROOT_DIR/utils/inc",
       "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits",
       "//foundation/communication/ipc/interfaces/innerkits/c/ipc/include",
-      "//foundation/distributedschedule/samgr_lite/interfaces/innerkits/registry",
-      "//foundation/distributedschedule/samgr_lite/interfaces/innerkits/samgr",
+      "//foundation/systemabilitymgr/samgr_lite/interfaces/innerkits/registry",
+      "//foundation/systemabilitymgr/samgr_lite/interfaces/innerkits/samgr",
       "//third_party/bounds_checking_function/include",
       "//utils/native/lite/include",
     ]
@@ -147,7 +147,7 @@ if (defined(ohos_lite)) {
       "$WIFI_ROOT_DIR/utils/src:wifi_utils",
       "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
       "//foundation/communication/ipc/interfaces/innerkits/c/ipc:ipc_single",
-      "//foundation/distributedschedule/samgr_lite/samgr:samgr",
+      "//foundation/systemabilitymgr/samgr_lite/samgr:samgr",
       "//third_party/bounds_checking_function:libsec_shared",
     ]
 
@@ -164,7 +164,7 @@ if (defined(ohos_lite)) {
       "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
       "//foundation/arkui/ace_engine/frameworks/base/utils",
       "//foundation/arkui/ace_engine/frameworks",
-      "//foundation/distributedschedule/safwk/interfaces/innerkits/safwk/",
+      "//foundation/systemabilitymgr/safwk/interfaces/innerkits/safwk/",
       "$WIFI_ROOT_DIR/frameworks/native/interfaces",
       "$WIFI_ROOT_DIR/services/wifi_standard/ipc_framework/cRPC/include",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/common/include",
@@ -351,7 +351,7 @@ if (defined(ohos_lite)) {
       "$WIFI_ROOT_DIR/utils/src:wifi_utils",
       "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog",
       "//foundation/communication/netmanager_base/services/netmanagernative:netsys_native_manager",
-      "//foundation/distributedschedule/safwk/interfaces/innerkits/safwk:system_ability_fwk",
+      "//foundation/systemabilitymgr/safwk/interfaces/innerkits/safwk:system_ability_fwk",
       "//utils/native/base:utils",
     ]
 
@@ -366,7 +366,7 @@ if (defined(ohos_lite)) {
       "ipc:ipc_core",
       "netmanager_base:net_conn_manager_if",
       "safwk:system_ability_fwk",
-      "samgr_standard:samgr_proxy",
+      "samgr:samgr_proxy",
     ]
     defines = [
       "FEATURE_AP_SUPPORT",
@@ -389,7 +389,7 @@ if (defined(ohos_lite)) {
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/idl_client:wifi_idl_client",
       "$WIFI_ROOT_DIR/utils/src:wifi_utils",
       "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog",
-      "//foundation/distributedschedule/safwk/interfaces/innerkits/safwk:system_ability_fwk",
+      "//foundation/systemabilitymgr/safwk/interfaces/innerkits/safwk:system_ability_fwk",
       "//utils/native/base:utils",
     ]
 
@@ -404,7 +404,7 @@ if (defined(ohos_lite)) {
       ":wifi_scan_service_impl",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/idl_client:wifi_idl_client",
       "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog",
-      "//foundation/distributedschedule/safwk/interfaces/innerkits/safwk:system_ability_fwk",
+      "//foundation/systemabilitymgr/safwk/interfaces/innerkits/safwk:system_ability_fwk",
       "//utils/native/base:utils",
     ]
 
@@ -419,7 +419,7 @@ if (defined(ohos_lite)) {
       ":wifi_manager_service",
       "$WIFI_ROOT_DIR/utils/src:wifi_utils",
       "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog",
-      "//foundation/distributedschedule/safwk/interfaces/innerkits/safwk:system_ability_fwk",
+      "//foundation/systemabilitymgr/safwk/interfaces/innerkits/safwk:system_ability_fwk",
       "//utils/native/base:utils",
     ]
 
@@ -434,7 +434,7 @@ if (defined(ohos_lite)) {
       ":wifi_p2p_service_impl",
       "$WIFI_ROOT_DIR/utils/src:wifi_utils",
       "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog",
-      "//foundation/distributedschedule/safwk/interfaces/innerkits/safwk:system_ability_fwk",
+      "//foundation/systemabilitymgr/safwk/interfaces/innerkits/safwk:system_ability_fwk",
       "//utils/native/base:utils",
     ]
 

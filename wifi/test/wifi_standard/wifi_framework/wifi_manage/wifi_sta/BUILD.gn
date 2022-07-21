@@ -100,7 +100,7 @@ ohos_unittest("wifi_sta_unittest") {
     "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
     "//foundation/arkui/ace_engine/frameworks/base/utils",
     "//foundation/arkui/ace_engine/frameworks",
-    "//foundation/distributedschedule/safwk/interfaces/innerkits/safwk/",
+    "//foundation/systemabilitymgr/safwk/interfaces/innerkits/safwk/",
     "//foundation/ability/ability_lite/interfaces/kits/want_lite/",
     "$WIFI_ROOT_DIR/utils/inc",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common",

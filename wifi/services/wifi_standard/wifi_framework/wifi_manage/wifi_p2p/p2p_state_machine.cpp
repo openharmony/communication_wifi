@@ -900,11 +900,14 @@ bool P2pStateMachine::IsInterfaceReuse() const
 void P2pStateMachine::UpdateGroupInfoToWpa() const
 {
     WIFI_LOGI("Start update group info to wpa");
-    std::vector<WifiP2pGroupInfo> grpInfo = groupManager.GetGroups();
     /* 1) In the scenario of interface reuse, the configuration of sta may be deleted
      * 2) Dont remove p2p networks of wpa_s in initial phase after device reboot
      */
-    if (!IsInterfaceReuse() && grpInfo.size() > 0) {
+    if (IsInterfaceReuse()) {
+        return;
+    }
+    std::vector<WifiP2pGroupInfo> grpInfo = groupManager.GetGroups();
+    if (grpInfo.size() > 0) {
         if (WifiP2PHalInterface::GetInstance().RemoveNetwork(-1) != WIFI_IDL_OPT_OK) {
             WIFI_LOGE("Failed to delete all group info before update group info to wpa! Stop update!");
             return;

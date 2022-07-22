@@ -352,6 +352,12 @@ public:
      */
     void OnBssidChangedEvent(std::string reason, std::string bssid);
     /**
+     * @Description  dhcp result notify events
+     *
+     * @param result: true-success, false-fail(in)
+     */
+    void OnDhcpResultNotifyEvent(bool result);
+    /**
      * @Description Register sta callback function
      *
      * @param callbacks - Callback function pointer storage structure

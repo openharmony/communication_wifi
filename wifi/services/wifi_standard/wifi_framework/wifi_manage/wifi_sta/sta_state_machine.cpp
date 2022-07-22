@@ -863,11 +863,12 @@ void StaStateMachine::DealConnectionEvent(InternalMessage *msg)
 
 void StaStateMachine::DealDisconnectEvent(InternalMessage *msg)
 {
-    LOGD("Enter DealDisconnectEvent.\n");
+    LOGI("Enter DealDisconnectEvent.\n");
     if (msg == nullptr) {
         WIFI_LOGE("msg is null\n");
     }
     if (wpsState != SetupMethod::INVALID) {
+        WIFI_LOGE("wpsState is INVALID\n");
         return;
     }
 #ifndef OHOS_ARCH_LITE
@@ -1336,6 +1337,7 @@ void StaStateMachine::OnNetworkConnectionEvent(int networkId, std::string bssid)
 {
     InternalMessage *msg = CreateMessage();
     if (msg == nullptr) {
+        LOGE("msg is nullptr.\n");
         return;
     }
 
@@ -1349,12 +1351,26 @@ void StaStateMachine::OnBssidChangedEvent(std::string reason, std::string bssid)
 {
     InternalMessage *msg = CreateMessage();
     if (msg == nullptr) {
+        LOGE("msg is nullptr.\n");
         return;
     }
 
     msg->SetMessageName(WIFI_SVR_CMD_STA_BSSID_CHANGED_EVENT);
     msg->AddStringMessageBody(reason);
     msg->AddStringMessageBody(bssid);
+    SendMessage(msg);
+}
+
+void StaStateMachine::OnDhcpResultNotifyEvent(bool result)
+{
+    InternalMessage *msg = CreateMessage();
+    if (msg == nullptr) {
+        LOGE("msg is nullptr.\n");
+        return;
+    }
+
+    msg->SetMessageName(WIFI_SVR_CMD_STA_DHCP_RESULT_NOTIFY_EVENT);
+    msg->SetParam1(result);
     SendMessage(msg);
 }
 
@@ -1413,6 +1429,7 @@ bool StaStateMachine::SeparatedState::ExecuteStateMsg(InternalMessage *msg)
         return false;
     }
 
+    WIFI_LOGI("SeparatedState-msgCode=%{public}d received.\n", msg->GetMessageName());
     bool ret = NOT_EXECUTED;
     switch (msg->GetMessageName()) {
         case WIFI_SVR_CMD_STA_NETWORK_DISCONNECTION_EVENT:
@@ -1459,6 +1476,7 @@ bool StaStateMachine::ApLinkedState::ExecuteStateMsg(InternalMessage *msg)
         return false;
     }
 
+    WIFI_LOGI("ApLinkedState-msgCode=%{public}d received.\n", msg->GetMessageName());
     bool ret = NOT_EXECUTED;
     switch (msg->GetMessageName()) {
         /* The current state of StaStateMachine transfers to SeparatingState when
@@ -1488,6 +1506,7 @@ bool StaStateMachine::ApLinkedState::ExecuteStateMsg(InternalMessage *msg)
 
 void StaStateMachine::DisConnectProcess()
 {
+    WIFI_LOGI("Enter DisConnectProcess!");
     staCallback.OnStaConnChanged(OperateResState::DISCONNECT_DISCONNECTING, linkedInfo);
     if (WifiStaHalInterface::GetInstance().Disconnect() == WIFI_IDL_OPT_OK) {
         WIFI_LOGI("Disconnect() succeed!");
@@ -1712,7 +1731,20 @@ bool StaStateMachine::GetIpState::ExecuteStateMsg(InternalMessage *msg)
     }
 
     bool ret = NOT_EXECUTED;
-    WIFI_LOGI("GetIpState-msgCode=%{public}d not handled.\n", msg->GetMessageName());
+    bool result = false;
+    WIFI_LOGI("GetIpState-msgCode=%{public}d received.\n", msg->GetMessageName());
+    switch (msg->GetMessageName()) {
+        case WIFI_SVR_CMD_STA_DHCP_RESULT_NOTIFY_EVENT: {
+            ret = EXECUTED;
+            result = msg->GetParam1();
+            WIFI_LOGI("GetIpState, get ip result:%{public}d.\n", result);
+            pStaStateMachine->SwitchState(pStaStateMachine->pLinkedState);
+            break;
+        }
+        default:
+            break;
+    }
+
     return ret;
 }
 
@@ -1770,8 +1802,8 @@ bool StaStateMachine::ConfigStaticIpAddress(StaticIpAddress &staticIpAddress)
 void StaStateMachine::HandleNetCheckResult(StaNetState netState, const std::string portalUrl)
 {
     WIFI_LOGI("Enter HandleNetCheckResult, netState:%{public}d.", netState);
-    if (linkedInfo.connState == ConnState::DISCONNECTED) {
-        WIFI_LOGE("Network disconnected\n");
+    if (linkedInfo.connState != ConnState::CONNECTED) {
+        WIFI_LOGE("connState is NOT in connected state, connState:%{public}d\n", linkedInfo.connState);
         return;
     }
 
@@ -2075,7 +2107,7 @@ void StaStateMachine::DhcpResultNotify::OnSuccess(int status, const std::string 
 
     WIFI_LOGI("DhcpResultNotify::OnSuccess, getIpSucNum=%{public}d, isRoam=%{public}d",
         pStaStateMachine->getIpSucNum, pStaStateMachine->isRoam);
-    pStaStateMachine->SwitchState(pStaStateMachine->pLinkedState);
+    pStaStateMachine->OnDhcpResultNotifyEvent(true);
     if (pStaStateMachine->getIpSucNum == 0 || pStaStateMachine->isRoam) {
         pStaStateMachine->SaveLinkstate(ConnState::CONNECTED, DetailedState::CONNECTED);
         pStaStateMachine->staCallback.OnStaConnChanged(
@@ -2089,10 +2121,10 @@ void StaStateMachine::DhcpResultNotify::OnSuccess(int status, const std::string 
 
     WIFI_LOGI("DhcpResultNotify::OnSuccess, stop dhcp client");
     if (pStaStateMachine->pDhcpService != nullptr) {
-        if (pStaStateMachine->currentTpType == IPTYPE_IPV4) {
-            pStaStateMachine->pDhcpService->StopDhcpClient(IF_NAME, false);
-        } else {
+        if (pStaStateMachine->currentTpType == IPTYPE_IPV6) {
             pStaStateMachine->pDhcpService->StopDhcpClient(IF_NAME, true);
+        } else {
+            pStaStateMachine->pDhcpService->StopDhcpClient(IF_NAME, false);
         }
     }
     return;

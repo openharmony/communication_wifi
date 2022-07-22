@@ -972,7 +972,7 @@ static void DeviceConfigToJsArray(const napi_env& env, std::vector<WifiDeviceCon
     } else {
         SetValueInt32(env, "ipType", static_cast<int>(IpTypeJs::IP_TYPE_DHCP), result);
     }
-    WIFI_LOGI("DeviceConfigToJsArray, idx:%{public}d, assignMethod:%{public}d!",
+    WIFI_LOGI("DeviceConfigToJsArray, idx:%{public}d, assignMethod:%{public}x!",
         idx, static_cast<int>(vecDeviceConfigs[idx].wifiIpConfig.assignMethod));
 
     napi_value ipCfgObj;

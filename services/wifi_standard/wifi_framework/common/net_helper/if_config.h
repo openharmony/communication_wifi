@@ -63,6 +63,11 @@ private:
      * @return bool - true: success, false: failed
      */
     bool AsyncExecuteCommand(const std::string& cmd);
+
+    /**
+     * @Description : Check if the interface name is valid
+     */
+    bool CheckIfaceValid(const std::string& ifname);
 };
 }  // namespace Wifi
 }  // namespace OHOS

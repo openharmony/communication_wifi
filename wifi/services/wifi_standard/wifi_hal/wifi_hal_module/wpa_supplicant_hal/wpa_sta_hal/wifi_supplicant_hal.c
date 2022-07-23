@@ -481,6 +481,20 @@ static int WpaCliCmdPowerSave(WifiWpaStaInterface *this, int enable)
     return WpaCliCmd(cmd, buf, sizeof(buf));
 }
 
+static int WpaCliCmdSetRoamConfig(WifiWpaStaInterface *this, const char *bssid)
+{
+    if (this == NULL || bssid == NULL) {
+        return -1;
+    }
+    char buf[REPLY_BUF_SMALL_LENGTH] = {0};
+    char cmd[CMD_BUFFER_SIZE] = {0};
+    if (snprintf_s(cmd, sizeof(cmd), sizeof(cmd) - 1, "IFNAME=%s SET bssid %s", this->ifname, bssid) < 0) {
+        LOGE("snprintf err");
+        return -1;
+    }
+    return WpaCliCmd(cmd, buf, sizeof(buf));
+}
+
 static int WpaCliCmdSetCountryCode(WifiWpaStaInterface *this, const char *countryCode)
 {
     if (this == NULL || countryCode == NULL) {
@@ -1253,6 +1267,7 @@ WifiWpaStaInterface *GetWifiStaInterface(int staNo)
     p->wpaCliCmdWpsPin = WpaCliCmdWpsPin;
     p->wpaCliCmdWpsCancel = WpaCliCmdWpsCancel;
     p->wpaCliCmdPowerSave = WpaCliCmdPowerSave;
+    p->wpaCliCmdSetRoamConfig = WpaCliCmdSetRoamConfig;
     p->wpaCliCmdSetCountryCode = WpaCliCmdSetCountryCode;
     p->wpaCliCmdGetCountryCode = WpaCliCmdGetCountryCode;
     p->wpaCliCmdSetAutoConnect = WpaCliCmdSetAutoConnect;

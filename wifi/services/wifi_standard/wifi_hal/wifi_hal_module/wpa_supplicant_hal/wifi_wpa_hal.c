@@ -46,6 +46,7 @@
 #define WPA_CB_CONNECTED 1
 #define WPA_CB_DISCONNECTED 2
 #define WPS_EVENT_PBC_OVERLAP "WPS-OVERLAP-DETECTED PBC session overlap"
+#define WPA_EVENT_BSSID_CHANGED "WPA-EVENT-BSSID-CHANGED "
 #define REPLY_BUF_LENGTH 4096
 #define CONNECTION_FULL_STATUS 17
 #define CONNECTION_REJECT_STATUS 37
@@ -606,6 +607,22 @@ static void WpaCallBackFunc(const char *p)
         }
         pBssid += strlen("bssid=");
         WifiHalCbNotifyConnectChanged(WPA_CB_DISCONNECTED, -1, pBssid);
+    /* bssid changed event */
+    } else if (strncmp(p, WPA_EVENT_BSSID_CHANGED, strlen(WPA_EVENT_BSSID_CHANGED)) == 0) {
+        LOGI("Reveive WPA_EVENT_BSSID_CHANGED notify event");
+        char *pBssid = strstr(p, "BSSID=");
+        if (pBssid == NULL) {
+            LOGE("NO bssid find!");
+            return;
+        }
+        pBssid += strlen("BSSID=");
+        char *pReason = strstr(p, "REASON=");
+        if (pReason == NULL) {
+            LOGE("NO reason find!");
+            return;
+        }
+        pReason += strlen("REASON=");
+        WifiHalCbNotifyBssidChanged(pReason, pBssid);
     } else {
         WpaCallBackFuncTwo(p);
     }

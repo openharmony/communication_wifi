@@ -503,6 +503,11 @@ int StateMachineHandler::MoveSequenceToStateVector()
 
 void StateMachineHandler::SwitchState(State *targetState)
 {
+    if (targetState != nullptr) {
+        LOGE("targetState is null.");
+        return;
+    }
+    LOGE("SwitchState, Switch to targetState: %{public}s.", targetState->GetStateName().c_str());
     pTargetState = static_cast<State *>(targetState);
 }
 
@@ -535,8 +540,10 @@ void StateMachineHandler::PerformSwitchState(State *msgProcessedState, InternalM
 
     State *targetState = pTargetState;
     if (targetState != nullptr) {
-        LOGD("StateMachineHandler::PerformSwitchState targetState name is: %{public}s",
-            targetState->GetStateName().c_str());
+        if (pFirstState != nullptr) {
+            LOGI("StateMachineHandler::PerformSwitchState, Switch %{public}s -->> %{public}s",
+                pFirstState->GetStateName().c_str(), targetState->GetStateName().c_str());
+        }
         while (true) {
             StateInfo *commonStateInfo = BuildSequenceStateVector(targetState);
             mSwitchingStateFlag = true;

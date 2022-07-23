@@ -37,6 +37,7 @@ ErrCode StaMonitor::InitStaMonitor()
     using namespace std::placeholders;
     WifiEventCallback callBack = {
         std::bind(&StaMonitor::OnConnectChangedCallBack, this, _1, _2, _3),
+        std::bind(&StaMonitor::OnBssidChangedCallBack, this, _1, _2),
         std::bind(&StaMonitor::OnWpaStateChangedCallBack, this, _1),
         std::bind(&StaMonitor::OnWpaSsidWrongKeyCallBack, this, _1),
         std::bind(&StaMonitor::OnWpsPbcOverlapCallBack, this, _1),
@@ -87,8 +88,10 @@ void StaMonitor::OnConnectChangedCallBack(int status, int networkId, const std::
     WifiLinkedInfo linkedInfo;
     pStaStateMachine->GetLinkedInfo(linkedInfo);
     /* P2P affects STA, causing problems or incorrect data updates */
-    if ((linkedInfo.connState == ConnState::CONNECTED) && (linkedInfo.bssid != bssid)) {
-        WIFI_LOGI("Sta ignored the event for bssid is mismatch!");
+    if ((linkedInfo.connState == ConnState::CONNECTED) &&
+        (linkedInfo.bssid != bssid) && (!pStaStateMachine->IsRoaming())) {
+        WIFI_LOGI("Sta ignored the event for bssid is mismatch, isRoam:%{public}d.",
+            pStaStateMachine->IsRoaming());
         return;
     }
     switch (status) {
@@ -103,6 +106,30 @@ void StaMonitor::OnConnectChangedCallBack(int status, int networkId, const std::
         default:
             break;
     }
+}
+
+void StaMonitor::OnBssidChangedCallBack(const std::string &reason, const std::string &bssid)
+{
+    WIFI_LOGI("OnBssidChangedCallBack() reason:%{public}s,bssid=%{private}s",
+        reason.c_str(),
+        bssid.c_str());
+    if (pStaStateMachine == nullptr) {
+        WIFI_LOGE("The statemachine pointer is null.");
+        return;
+    }
+
+    WifiLinkedInfo linkedInfo;
+    pStaStateMachine->GetLinkedInfo(linkedInfo);
+    if (linkedInfo.connState != ConnState::CONNECTED) {
+        WIFI_LOGW("Sta ignored the event for NOT in connected status!, connState: %{public}d",
+            linkedInfo.connState);
+        return;
+    }
+    if (linkedInfo.bssid == bssid) {
+        WIFI_LOGW("Sta ignored the event for bssid is the same.");
+        return;
+    }
+    pStaStateMachine->OnBssidChangedEvent(reason, bssid);
 }
 
 void StaMonitor::OnWpaStateChangedCallBack(int status)

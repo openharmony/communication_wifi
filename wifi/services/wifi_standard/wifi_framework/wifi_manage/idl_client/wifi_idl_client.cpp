@@ -470,7 +470,7 @@ int WifiIdlClient::PushDeviceConfigAuthAlgorithm(
         }
     }
     if (alg & 0x2) {
-        if (strcat_s(pConfig->cfgValue, sizeof(pConfig->cfgValue), "SHARED ") != EOK) {
+        if (strcat_s(pConfig->cfgValue, sizeof(pConfig->cfgValue), "OPEN SHARED ") != EOK) {
             return 0;
         }
     }
@@ -542,6 +542,19 @@ WifiErrorNo WifiIdlClient::SetDeviceConfig(int networkId, const WifiIdlDeviceCon
     return SetNetwork(networkId, conf, num);
 }
 
+WifiErrorNo WifiIdlClient::SetWpsBssid(int networkId, const std::string &bssid)
+{
+    CHECK_CLIENT_NOT_NULL;
+    SetNetworkConfig conf;
+    int num = PushDeviceConfigString(&conf, DEVICE_CONFIG_BSSID, bssid);
+    if (num == 0) {
+        LOGE("SetWpsBssid, PushDeviceConfigString return error!");
+        return WIFI_IDL_OPT_OK;
+    }
+    
+    return SetNetwork(networkId, &conf, num);
+}
+
 WifiErrorNo WifiIdlClient::SaveDeviceConfig(void)
 {
     CHECK_CLIENT_NOT_NULL;
@@ -557,6 +570,7 @@ WifiErrorNo WifiIdlClient::ReqRegisterStaEventCallback(const WifiEventCallback &
     }
     if (callback.onConnectChanged != nullptr) {
         cEventCallback.onConnectChanged = OnConnectChanged;
+        cEventCallback.onBssidChanged = OnBssidChanged;
         cEventCallback.onWpaStateChanged = OnWpaStateChanged;
         cEventCallback.onSsidWrongkey = OnWpaSsidWrongKey;
         cEventCallback.onWpsOverlap = OnWpsOverlap;

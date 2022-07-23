@@ -239,6 +239,22 @@ static void IdlCbkConnectChanged(Context *context)
     return;
 }
 
+static void IdlCbkBssidChanged(Context *context)
+{
+    char reason[WIFI_REASON_LENGTH] = {0};
+    char bssid[WIFI_BSSID_LENGTH] = {0};
+    if (ReadStr(context, reason, sizeof(reason)) != 0 ||
+        ReadStr(context, bssid, sizeof(bssid)) != 0) {
+        LOGE("Read event info error!");
+        return;
+    }
+    IWifiEventCallback *callback = GetWifiEventCallback();
+    if (callback != NULL && callback->onBssidChanged != NULL) {
+        callback->onBssidChanged(reason, bssid);
+    }
+    return;
+}
+
 static void IdlCbkApStateChange(Context *context, int event)
 {
     int id = 0;
@@ -304,6 +320,9 @@ static int IdlDealStaApEvent(Context *context, int event)
             break;
         case WIFI_IDL_CBK_CMD_CONNECT_CHANGED:
             IdlCbkConnectChanged(context);
+            break;
+        case WIFI_IDL_CBK_CMD_BSSID_CHANGED:
+            IdlCbkBssidChanged(context);
             break;
         case WIFI_IDL_CBK_CMD_AP_ENABLE:
         case WIFI_IDL_CBK_CMD_AP_DISABLE:

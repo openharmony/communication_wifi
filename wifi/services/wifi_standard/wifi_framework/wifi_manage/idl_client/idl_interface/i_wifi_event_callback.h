@@ -27,6 +27,7 @@ typedef struct IWifiEventCallback {
     void (*onStopped)(void);
     void (*onFailure)(WifiErrorNo errCode);
     void (*onConnectChanged)(int status, int networkId, const char *bssid);
+    void (*onBssidChanged)(const char *reason, const char *bssid);
     void (*onWpaStateChanged)(int status);
     void (*onSsidWrongkey)(int status);
     void (*onWpsOverlap)(int status);

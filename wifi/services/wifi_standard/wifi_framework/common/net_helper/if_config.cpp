@@ -148,6 +148,9 @@ void IfConfig::AddIpAddr(
 {
     LOGI("Add ip address, ifName = %{public}s", ifName.c_str());
 
+    if (!CheckIfaceValid(ifName)) {
+        return;
+    }
     if (ipType == static_cast<int>(IpType::IPTYPE_IPV4)) {
         struct ifreq ifr;
         if (memset_s(&ifr, sizeof(ifr), 0, sizeof(ifr)) != EOK ||
@@ -262,6 +265,26 @@ bool IfConfig::GetIpAddr(const std::string& ifName, std::string& ipAddr)
     ipAddr = inet_ntoa(sin->sin_addr);
     close(fd);
     return true;
+}
+
+bool IfConfig::CheckIfaceValid(const std::string& ifname)
+{
+    struct if_nameindex *ifidxs, *ifni;
+
+    ifidxs = if_nameindex();
+    if (ifidxs == nullptr) {
+        LOGE("can not get interfaces");
+        return false;
+    }
+    for (ifni = ifidxs; !(ifni->if_index == 0 && ifni->if_name == nullptr); ifni++) {
+        if (strncmp(ifni->if_name, ifname.c_str(), strlen(ifni->if_name)) == 0) {
+            if_freenameindex(ifidxs);
+            return true;
+        }
+    }
+    if_freenameindex(ifidxs);
+    LOGE("invalid interface: %{public}s", ifname.c_str());
+    return false;
 }
 
 #ifdef OHOS_ARCH_LITE

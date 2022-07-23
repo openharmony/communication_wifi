@@ -155,6 +155,9 @@ void IfConfig::FlushIpAddr(const std::string& ifName, const int& ipType)
 void IfConfig::AddIpAddr(
     const std::string &ifName, const std::string &ipAddr, const std::string &mask, const int &ipType)
 {
+    if (!CheckIfaceValid(ifName)) {
+        return;
+    }
     if (ipType == static_cast<int>(StaIpType::IPTYPE_IPV4)) {
         struct ifreq ifr;
         if (memset_s(&ifr, sizeof(ifr), 0, sizeof(ifr)) != EOK ||
@@ -213,7 +216,7 @@ void IfConfig::AddIpAddr(
     return;
 }
 
-/**
+ /*
  * @Description : Add Route
  * @Return None
  */
@@ -368,6 +371,26 @@ void IfConfig::SetProxy(
     }
 
     return;
+}
+
+bool IfConfig::CheckIfaceValid(const std::string& ifname)
+{
+    struct if_nameindex *ifidxs, *ifni;
+
+    ifidxs = if_nameindex();
+    if (ifidxs == nullptr) {
+        LOGE("can not get interfaces");
+        return false;
+    }
+    for (ifni = ifidxs; !(ifni->if_index == 0 && ifni->if_name == nullptr); ifni++) {
+        if (strncmp(ifni->if_name, ifname.c_str(), strlen(ifni->if_name)) == 0) {
+            if_freenameindex(ifidxs);
+            return true;
+        }
+    }
+    if_freenameindex(ifidxs);
+    LOGE("invalid interface: %{public}s", ifname.c_str());
+    return false;
 }
 }  // namespace Wifi
 }  // namespace OHOS

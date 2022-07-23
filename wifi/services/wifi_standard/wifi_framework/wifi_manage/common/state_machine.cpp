@@ -503,7 +503,7 @@ int StateMachineHandler::MoveSequenceToStateVector()
 
 void StateMachineHandler::SwitchState(State *targetState)
 {
-    if (targetState != nullptr) {
+    if (targetState == nullptr) {
         LOGE("targetState is null.");
         return;
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,6 +14,7 @@
  */
 
 #include "dhcp_service.h"
+#include <net/if.h>
 #include "wifi_logger.h"
 
 DEFINE_WIFILOG_DHCP_LABEL("DhcpService");
@@ -36,6 +37,9 @@ DhcpService::~DhcpService()
 
 int DhcpService::StartDhcpClient(const std::string& ifname, bool bIpv6)
 {
+    if (!CheckIfaceValid(ifname)) {
+        return DHCP_OPT_FAILED;
+    }
     if (m_pClientService == nullptr) {
         m_pClientService = std::make_unique<DhcpClientServiceImpl>();
         if (m_pClientService == nullptr) {
@@ -49,6 +53,9 @@ int DhcpService::StartDhcpClient(const std::string& ifname, bool bIpv6)
 
 int DhcpService::StopDhcpClient(const std::string& ifname, bool bIpv6)
 {
+    if (!CheckIfaceValid(ifname)) {
+        return DHCP_OPT_FAILED;
+    }
     if (m_pClientService == nullptr) {
         m_pClientService = std::make_unique<DhcpClientServiceImpl>();
         if (m_pClientService == nullptr) {
@@ -102,6 +109,9 @@ int DhcpService::ReleaseDhcpClient(const std::string& ifname)
 
 int DhcpService::StartDhcpServer(const std::string& ifname)
 {
+    if (!CheckIfaceValid(ifname)) {
+        return DHCP_OPT_FAILED;
+    }
     if (InitServerService() != DHCP_OPT_SUCCESS) {
         WIFI_LOGE("DhcpService::StartDhcpServer() InitServerService failed!");
         return DHCP_OPT_FAILED;
@@ -210,6 +220,26 @@ int DhcpService::InitServerService()
         }
     }
     return DHCP_OPT_SUCCESS;
+}
+
+bool DhcpService::CheckIfaceValid(const std::string& ifname)
+{
+    struct if_nameindex *ifidxs, *ifni;
+
+    ifidxs = if_nameindex();
+    if (ifidxs == nullptr) {
+        WIFI_LOGE("can not get interfaces");
+        return false;
+    }
+    for (ifni = ifidxs; !(ifni->if_index == 0 && ifni->if_name == nullptr); ifni++) {
+        if (strncmp(ifni->if_name, ifname.c_str(), strlen(ifni->if_name)) == 0) {
+            if_freenameindex(ifidxs);
+            return true;
+        }
+    }
+    if_freenameindex(ifidxs);
+    WIFI_LOGE("invalid interface: %{public}s", ifname.c_str());
+    return false;
 }
 }  // namespace Wifi
 }  // namespace OHOS

@@ -467,13 +467,13 @@ ErrCode WifiDeviceServiceImpl::CheckRemoveCandidateConfig(void)
         return WIFI_OPT_STA_NOT_OPENED;
     }
 
-    return WIFI_SUCCESS;
+    return WIFI_OPT_SUCCESS;
 }
 
 ErrCode WifiDeviceServiceImpl::RemoveCandidateConfig(const WifiDeviceConfig &config)
 {
     ErrCode ret = CheckRemoveCandidateConfig();
-    if (ret != WIFI_SUCCESS) {
+    if (ret != WIFI_OPT_SUCCESS) {
         return ret;
     }
     /* check the caller's uid */
@@ -494,8 +494,9 @@ ErrCode WifiDeviceServiceImpl::RemoveCandidateConfig(const WifiDeviceConfig &con
         return WIFI_OPT_INVALID_CONFIG;
     }
     /* find the networkId of the removed config */
-    int networkId == INVALID_NETWORK_ID
-    for (size_t i = 0; i < configs.size(); i++) {
+    int networkId = INVALID_NETWORK_ID;
+    size_t size = configs.size()
+    for (size_t i = 0; i < size; i++) {
         if (configs[i].ssid == config.ssid) {
             networkId = configs[i].networkId;
             WIFI_LOGI("find the removed config, networkId:%{public}d!");
@@ -512,7 +513,7 @@ ErrCode WifiDeviceServiceImpl::RemoveCandidateConfig(const WifiDeviceConfig &con
 ErrCode WifiDeviceServiceImpl::RemoveCandidateConfig(int networkId)
 {
     ErrCode ret = CheckRemoveCandidateConfig();
-    if (ret != WIFI_SUCCESS) {
+    if (ret != WIFI_OPT_SUCCESS) {
         return ret;
     }
     int uid = 0;

@@ -673,9 +673,19 @@ void WifiDeviceStub::OnConnectToCandidateConfig(uint32_t code, MessageParcel &da
 void WifiDeviceStub::OnRemoveCandidateConfig(uint32_t code, MessageParcel &data, MessageParcel &reply)
 {
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
-    int networkId = data.ReadInt32();
-    ErrCode ret = RemoveCandidateConfig(networkId);
-
+    ErrCode ret = WIFI_OPT_FAILED;
+    int flag = data.ReadInt32();
+    /* Read a flag: 1-remove config by networkId, 2-remove config by WifiDeviceConfig */
+    if (flag == 1) {
+        int networkId = data.ReadInt32();
+        WIFI_LOGI("Remove candidate config by networkId: %{public}d", networkId);
+        ret = RemoveCandidateConfig(networkId);
+    } else {
+        WifiDeviceConfig config;
+        ReadWifiDeviceConfig(data, config);
+        WIFI_LOGD("Remove candidate config by config: %{private}s", config.ssid.c_str());
+        ret = RemoveCandidateConfig(config);
+    }
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
     return;

@@ -82,6 +82,14 @@ public:
     ErrCode PutWifiProtectRef(const std::string &protectName) override;
 
     /**
+     * @Description Remove a specified untrusted hotspot configuration.
+     *
+     * @param config - WifiDeviceConfig object
+     * @return ErrCode - operation result
+     */
+    ErrCode RemoveCandidateConfig(const WifiDeviceConfig &config) override;
+
+    /**
      * @Description Adds a specified untrusted hotspot configuration.
      *
      * @param config - WifiDeviceConfig object

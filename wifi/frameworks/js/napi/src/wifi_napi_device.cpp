@@ -401,7 +401,7 @@ napi_value AddUntrustedConfig(napi_env env, napi_callback_info info)
     asyncContext->executeFunc = [&](void* data) -> void {
         DeviceConfigContext *context = static_cast<DeviceConfigContext *>(data);
         TRACE_FUNC_CALL_NAME("wifiDevicePtr->AddUntrustedConfig");
-        ErrCode ret = wifiDevicePtr->AddDeviceConfig(*context->config, context->networkId);
+        ErrCode ret = wifiDevicePtr->AddCandidateConfig(*context->config, context->networkId);
         if (context->networkId < 0 || ret != WIFI_OPT_SUCCESS) {
             context->networkId = -1;
         }
@@ -466,21 +466,8 @@ napi_value RemoveUntrustedConfig(napi_env env, napi_callback_info info)
 
     asyncContext->executeFunc = [&](void* data) -> void {
         DeviceConfigContext *context = static_cast<DeviceConfigContext *>(data);
-        if (context->config == nullptr) {
-            return;
-        }
-        TRACE_FUNC_CALL_NAME("wifiDevicePtr->RemoveUntrustedConfig");
-        int networkId = context->config->networkId;
-        if (networkId < 0) {
-            networkId = GetDeviceConfigId(context->config);
-        }
-        if (networkId < 0) {
-            WIFI_LOGE("RemoveUntrustedConfig parameter is invalid.");
-            context->errorCode = WIFI_OPT_INVALID_PARAM;
-            return;
-        }
-        WIFI_LOGI("RemoveUntrustedConfig: %{public}d", networkId);
-        context->errorCode = wifiDevicePtr->RemoveDevice(networkId);
+        TRACE_FUNC_CALL_NAME("wifiDevicePtr->RemoveCandidateConfig");
+        context->errorCode = wifiDevicePtr->RemoveCandidateConfig(*context->config);
     };
 
     asyncContext->completeFunc = [&](void* data) -> void {

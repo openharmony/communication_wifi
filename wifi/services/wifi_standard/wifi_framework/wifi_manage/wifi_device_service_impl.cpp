@@ -455,34 +455,76 @@ ErrCode WifiDeviceServiceImpl::ConnectToCandidateConfig(int networkId)
     return pService->ConnectToCandidateConfig(uid, networkId);
 }
 
-ErrCode WifiDeviceServiceImpl::RemoveCandidateConfig(int networkId)
+ErrCode WifiDeviceServiceImpl::CheckRemoveCandidateConfig(void)
 {
     if (WifiPermissionUtils::VerifySetWifiInfoPermission() == PERMISSION_DENIED) {
-        WIFI_LOGE("RemoveCandidateConfig:VerifySetWifiInfoPermission PERMISSION_DENIED!");
+        WIFI_LOGE("CheckRemoveCandidateConfig:VerifySetWifiInfoPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
 
-    if (networkId < INVALID_NETWORK_ID) {
-        WIFI_LOGE("RemoveCandidateConfig networkId invalid param!");
-        return WIFI_OPT_INVALID_PARAM;
-    }
-
     if (!IsStaServiceRunning()) {
-        WIFI_LOGE("RemoveCandidateConfig:IsStaServiceRunning not running!");
+        WIFI_LOGE("CheckRemoveCandidateConfig:IsStaServiceRunning not running!");
         return WIFI_OPT_STA_NOT_OPENED;
     }
 
+    return WIFI_SUCCESS;
+}
+
+ErrCode WifiDeviceServiceImpl::RemoveCandidateConfig(const WifiDeviceConfig &config)
+{
+    ErrCode ret = CheckRemoveCandidateConfig();
+    if (ret != WIFI_SUCCESS) {
+        return ret;
+    }
+    /* check the caller's uid */
     int uid = 0;
     if (CheckCallingUid(uid) != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("CheckCallingUid failed!");
         return WIFI_OPT_INVALID_PARAM;
     }
-
     IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst();
     if (pService == nullptr) {
+        WIFI_LOGE("pService is nullptr!");
         return WIFI_OPT_STA_NOT_OPENED;
     }
+    /* get all candidate configs */
+    std::vector<WifiDeviceConfig> configs;
+    if (WifiConfigCenter::GetInstance().GetCandidateConfigs(uid, configs) != 0) {
+        WIFI_LOGE("NOT find the caller's configs!");
+        return WIFI_OPT_INVALID_CONFIG;
+    }
+    /* find the networkId of the removed config */
+    int networkId == INVALID_NETWORK_ID
+    for (size_t i = 0; i < configs.size(); i++) {
+        if (configs[i].ssid == config.ssid) {
+            networkId = configs[i].networkId;
+            WIFI_LOGI("find the removed config, networkId:%{public}d!");
+            break;
+        }
+    }
+    /* removed the config */
+    if (networkId != INVALID_NETWORK_ID) {
+        return pService->RemoveCandidateConfig(uid, networkId);
+    }
+    return WIFI_OPT_INVALID_CONFIG;
+}
 
+ErrCode WifiDeviceServiceImpl::RemoveCandidateConfig(int networkId)
+{
+    ErrCode ret = CheckRemoveCandidateConfig();
+    if (ret != WIFI_SUCCESS) {
+        return ret;
+    }
+    int uid = 0;
+    if (CheckCallingUid(uid) != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("CheckCallingUid failed!");
+        return WIFI_OPT_INVALID_PARAM;
+    }
+    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst();
+    if (pService == nullptr) {
+        WIFI_LOGE("pService is nullptr!");
+        return WIFI_OPT_STA_NOT_OPENED;
+    }
     if (networkId == INVALID_NETWORK_ID) {
         return pService->RemoveAllCandidateConfig(uid);
     } else {

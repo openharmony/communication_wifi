@@ -141,7 +141,11 @@ public:
 
     ErrCode ConnectToCandidateConfig(int networkId) override;
 
+    ErrCode CheckRemoveCandidateConfig(void) override;
+
     ErrCode RemoveCandidateConfig(int networkId) override;
+
+    ErrCode RemoveCandidateConfig(const WifiDeviceConfig &config) override;
 
     ErrCode GetCandidateConfigs(std::vector<WifiDeviceConfig> &result) override;
 

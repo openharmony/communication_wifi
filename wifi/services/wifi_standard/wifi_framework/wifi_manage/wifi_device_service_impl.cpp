@@ -499,7 +499,7 @@ ErrCode WifiDeviceServiceImpl::RemoveCandidateConfig(const WifiDeviceConfig &con
     for (size_t i = 0; i < size; i++) {
         if (configs[i].ssid == config.ssid) {
             networkId = configs[i].networkId;
-            WIFI_LOGI("find the removed config, networkId:%{public}d!");
+            WIFI_LOGI("find the removed config, networkId:%{public}d!", networkId);
             break;
         }
     }

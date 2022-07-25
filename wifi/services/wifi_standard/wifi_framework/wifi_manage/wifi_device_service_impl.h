@@ -143,6 +143,8 @@ public:
 
     ErrCode RemoveCandidateConfig(int networkId) override;
 
+    ErrCode RemoveCandidateConfig(const WifiDeviceConfig &config) override;
+
     ErrCode GetCandidateConfigs(std::vector<WifiDeviceConfig> &result) override;
 
 #ifndef OHOS_ARCH_LITE
@@ -160,6 +162,7 @@ private:
     static void SaBasicDump(std::string& result);
     static void SigHandler(int sig);
     static bool IsProcessNeedToRestart();
+    ErrCode CheckRemoveCandidateConfig(void);
 #ifndef OHOS_ARCH_LITE
     void RegisterAppRemoved();
     void UnRegisterAppRemoved();

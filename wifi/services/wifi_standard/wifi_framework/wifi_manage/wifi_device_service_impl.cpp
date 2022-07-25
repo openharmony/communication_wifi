@@ -495,7 +495,7 @@ ErrCode WifiDeviceServiceImpl::RemoveCandidateConfig(const WifiDeviceConfig &con
     }
     /* find the networkId of the removed config */
     int networkId = INVALID_NETWORK_ID;
-    size_t size = configs.size()
+    size_t size = configs.size();
     for (size_t i = 0; i < size; i++) {
         if (configs[i].ssid == config.ssid) {
             networkId = configs[i].networkId;

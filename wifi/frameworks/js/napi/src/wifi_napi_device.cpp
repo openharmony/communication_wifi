@@ -422,21 +422,6 @@ napi_value AddUntrustedConfig(napi_env env, napi_callback_info info)
     return DoAsyncWork(env, asyncContext, argc, argv, nonCallbackArgNum);
 }
 
-static int GetDeviceConfigId(WifiDeviceConfig *config)
-{
-    std::vector<WifiDeviceConfig> vecConfigs;
-    ErrCode ret = wifiDevicePtr->GetDeviceConfigs(vecConfigs);
-    if (ret != WIFI_OPT_SUCCESS) {
-        return INVALID_NETWORK_ID;
-    }
-    for (auto& each : vecConfigs) {
-        if (each.ssid == config->ssid) {
-            return each.networkId;
-        }
-    }
-    return INVALID_NETWORK_ID;
-}
-
 napi_value RemoveUntrustedConfig(napi_env env, napi_callback_info info)
 {
     TRACE_FUNC_CALL;

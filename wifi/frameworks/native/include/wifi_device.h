@@ -86,6 +86,14 @@ public:
     virtual ErrCode RemoveCandidateConfig(int networkId) = 0;
 
     /**
+     * @Description Remove a specified candidate hotspot configuration.
+     *
+     * @param config - WifiDeviceConfig object
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode RemoveCandidateConfig(const WifiDeviceConfig &config) = 0;
+
+    /**
      * @Description Connect to a candidate specified network.
      *
      * @param networkId - the candidate device network id

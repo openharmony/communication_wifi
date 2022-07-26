@@ -80,6 +80,7 @@ if (defined(ohos_lite)) {
 
     cflags_cc = [ "-fno-rtti" ]
     defines = [
+      "_GNU_SOURCE",
       "OHOS_ARCH_LITE",
       "AP_INTF=\"$wifi_feature_with_ap_intf\"",
       "AP_NUM=$wifi_feature_with_ap_num",

@@ -376,7 +376,8 @@ static void HandleGetConfigList(int argc, const char* argv[])
     Logd("enter command handler:%s", argv[CMD_IDX]);
     if (ptrWifiDevice != nullptr) {
         vector<WifiDeviceConfig> configs;
-        ErrCode ret = ptrWifiDevice->GetDeviceConfigs(configs);
+        bool isCandidate = false;
+        ErrCode ret = ptrWifiDevice->GetDeviceConfigs(configs, isCandidate);
         if (ret == WIFI_OPT_SUCCESS) {
             Logd("%s success", __func__);
             PrintfDeviceConfigs(configs);
@@ -429,7 +430,8 @@ static void HandleAddConfig(int argc, const char* argv[])
     }
     if (ptrWifiDevice != nullptr) {
         int nid;
-        ErrCode ret = ptrWifiDevice->AddDeviceConfig(config, nid);
+        bool isCandidate = false;
+        ErrCode ret = ptrWifiDevice->AddDeviceConfig(config, nid, isCandidate);
         if (ret == WIFI_OPT_SUCCESS) {
             Logd("%s success, nid=%d", __func__, nid);
         } else {
@@ -476,7 +478,8 @@ static void HandleConnectNetwork(int argc, const char* argv[])
         return;
     }
     if (ptrWifiDevice != nullptr) {
-        ErrCode ret = ptrWifiDevice->ConnectToNetwork(nid);
+        bool isCandidate = false;
+        ErrCode ret = ptrWifiDevice->ConnectToNetwork(nid, isCandidate);
         if (ret == WIFI_OPT_SUCCESS) {
             Logd("%s success, nid=%d", __func__, nid);
         } else {

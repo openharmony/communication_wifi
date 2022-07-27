@@ -434,28 +434,9 @@ ErrCode WifiDeviceProxy::PutWifiProtectRef(const std::string &protectName)
     return ErrCode(owner.retCode);
 }
 
-ErrCode WifiDeviceProxy::AddCandidateConfig(const WifiDeviceConfig &config, int &networkId)
-{
-    (void)config;
-    (void)networkId;
-    return WIFI_OPT_NOT_SUPPORTED;
-}
-
 ErrCode WifiDeviceProxy::RemoveCandidateConfig(int networkId)
 {
     (void)networkId;
-    return WIFI_OPT_NOT_SUPPORTED;
-}
-
-ErrCode WifiDeviceProxy::ConnectToCandidateConfig(int networkId)
-{
-    (void)networkId;
-    return WIFI_OPT_NOT_SUPPORTED;
-}
-
-ErrCode WifiDeviceProxy::GetCandidateConfigs(std::vector<WifiDeviceConfig> &result)
-{
-    (void)result;
     return WIFI_OPT_NOT_SUPPORTED;
 }
 
@@ -511,7 +492,7 @@ void WifiDeviceProxy::WriteDeviceConfig(const WifiDeviceConfig &config, IpcIo &r
     (void)WriteInt32(&req, (int)config.wifiPrivacySetting);
 }
 
-ErrCode WifiDeviceProxy::AddDeviceConfig(const WifiDeviceConfig &config, int &result)
+ErrCode WifiDeviceProxy::AddDeviceConfig(const WifiDeviceConfig &config, int &result, bool isCandidate)
 {
     if (remoteDied_ || remote_ == nullptr) {
         WIFI_LOGE("failed to %{public}s, remoteDied_: %{public}d, remote_: %{public}d",
@@ -525,6 +506,7 @@ ErrCode WifiDeviceProxy::AddDeviceConfig(const WifiDeviceConfig &config, int &re
 
     IpcIoInit(&req, data, IPC_DATA_SIZE_BIG, MAX_IPC_OBJ_COUNT);
     (void)WriteInt32(&req, 0);
+    (void)WriteBool(&req, isCandidate);
     WriteDeviceConfig(config, req);
     owner.variable = &result;
     owner.funcId = WIFI_SVR_CMD_ADD_DEVICE_CONFIG;
@@ -624,7 +606,7 @@ ErrCode WifiDeviceProxy::RemoveAllDevice()
     return ErrCode(owner.retCode);
 }
 
-ErrCode WifiDeviceProxy::GetDeviceConfigs(std::vector<WifiDeviceConfig> &result)
+ErrCode WifiDeviceProxy::GetDeviceConfigs(std::vector<WifiDeviceConfig> &result, bool isCandidate)
 {
     if (remoteDied_ || remote_ == nullptr) {
         WIFI_LOGE("failed to %{public}s, remoteDied_: %{public}d, remote_: %{public}d",
@@ -638,6 +620,7 @@ ErrCode WifiDeviceProxy::GetDeviceConfigs(std::vector<WifiDeviceConfig> &result)
 
     IpcIoInit(&req, data, IPC_DATA_SIZE_SMALL, MAX_IPC_OBJ_COUNT);
     (void)WriteInt32(&req, 0);
+    (void)WriteBool(&req, isCandidate);
     owner.variable = &result;
     owner.funcId = WIFI_SVR_CMD_GET_DEVICE_CONFIGS;
     int error = remote_->Invoke(remote_, WIFI_SVR_CMD_GET_DEVICE_CONFIGS, &req, &owner, IpcCallback);
@@ -710,7 +693,7 @@ ErrCode WifiDeviceProxy::DisableDeviceConfig(int networkId)
     return ErrCode(owner.retCode);
 }
 
-ErrCode WifiDeviceProxy::ConnectToNetwork(int networkId)
+ErrCode WifiDeviceProxy::ConnectToNetwork(int networkId, bool isCandidate)
 {
     if (remoteDied_ || remote_ == nullptr) {
         WIFI_LOGE("failed to %{public}s, remoteDied_: %{public}d, remote_: %{public}d",
@@ -724,6 +707,7 @@ ErrCode WifiDeviceProxy::ConnectToNetwork(int networkId)
 
     IpcIoInit(&req, data, IPC_DATA_SIZE_SMALL, MAX_IPC_OBJ_COUNT);
     (void)WriteInt32(&req, 0);
+    (void)WriteBool(&req, isCandidate);
     (void)WriteInt32(&req, networkId);
     owner.funcId = WIFI_SVR_CMD_CONNECT_TO;
     int error = remote_->Invoke(remote_, WIFI_SVR_CMD_CONNECT_TO, &req, &owner, IpcCallback);

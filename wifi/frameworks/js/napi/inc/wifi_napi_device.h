@@ -65,6 +65,15 @@ enum class ConnStateJs {
     UNKNOWN /* Failed to set up the Wi-Fi connection */
 };
 
+enum class IpTypeJs {
+    /** Use statically configured IP settings */
+    IP_TYPE_STATIC,
+    /** Use dynamically configured IP settings */
+    IP_TYPE_DHCP,
+    /** No IP details are assigned */
+    IP_TYPE_UNKNOWN,
+};
+
 class ScanInfoAsyncContext : public AsyncContext {
 public:
     std::vector<WifiScanInfo> vecScanInfos;

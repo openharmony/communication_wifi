@@ -80,14 +80,12 @@ if (defined(ohos_lite)) {
 
     include_dirs = [
       "include",
-      "//utils/native/base/include",
+      "//commonlibrary/c_utils/base/include",
       "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
     ]
     cflags_cc = [ "-fno-rtti" ]
-    deps = [
-      "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog",
-      "//utils/native/base:utils",
-    ]
+    deps = [ "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog" ]
+    external_deps = [ "c_utils:utils" ]
     subsystem_name = "communication"
     part_name = "wifi"
   }
@@ -96,15 +94,13 @@ if (defined(ohos_lite)) {
     sources = crpc_client_sources
     include_dirs = [
       "include",
-      "//utils/native/base/include",
+      "//commonlibrary/c_utils/base/include",
       "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/common/log",
     ]
     cflags_cc = [ "-fno-rtti" ]
-    deps = [
-      "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog",
-      "//utils/native/base:utils",
-    ]
+    deps = [ "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog" ]
+    external_deps = [ "c_utils:utils" ]
     subsystem_name = "communication"
     part_name = "wifi"
   }

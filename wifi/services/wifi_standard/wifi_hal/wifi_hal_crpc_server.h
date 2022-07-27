@@ -81,6 +81,11 @@ typedef struct WifiHalConnectMsg {
     char bssid[WIFI_MAC_LENGTH + 1];
 } WifiHalConnectMsg;
 
+typedef struct WifiHalBssidChangedMsg {
+    char reason[WIFI_REASON_LENGTH];
+    char bssid[WIFI_MAC_LENGTH + 1];
+} WifiHalBssidChangedMsg;
+
 typedef union WifiHalCallbackMsg {
     int scanStatus;
     WifiHalConnectMsg connMsg;
@@ -90,6 +95,7 @@ typedef union WifiHalCallbackMsg {
     P2pInvitationInfo invitaInfo;
     P2pServDiscRespInfo serverInfo;
     P2pServDiscReqInfo serDiscReqInfo;
+    WifiHalBssidChangedMsg bssidChangedMsg;
 } WifiHalCallbackMsg;
 
 typedef struct WifiHalEventCallbackMsg {

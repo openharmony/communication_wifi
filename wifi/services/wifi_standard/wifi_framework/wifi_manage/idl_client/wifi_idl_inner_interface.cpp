@@ -70,6 +70,17 @@ void OnConnectChanged(int status, int networkId, const char *mac)
     }
 }
 
+void OnBssidChanged(const char *reason, const char *bssid)
+{
+    if (reason == nullptr || bssid == nullptr) {
+        return;
+    }
+    const OHOS::Wifi::WifiEventCallback &cbk = OHOS::Wifi::WifiStaHalInterface::GetInstance().GetCallbackInst();
+    if (cbk.onBssidChanged) {
+        cbk.onBssidChanged(reason, bssid);
+    }
+}
+
 void OnWpaStateChanged(int status)
 {
     const OHOS::Wifi::WifiEventCallback &cbk = OHOS::Wifi::WifiStaHalInterface::GetInstance().GetCallbackInst();

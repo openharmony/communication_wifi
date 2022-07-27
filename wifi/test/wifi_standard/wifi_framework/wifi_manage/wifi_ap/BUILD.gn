@@ -16,7 +16,7 @@ import("//foundation/communication/wifi/wifi/wifi.gni")
 config("module_private_config") {
   visibility = [ ":*" ]
   include_dirs = [
-    "//utils/native/base/include",
+    "//commonlibrary/c_utils/base/include",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_ap",
   ]
 }
@@ -68,7 +68,7 @@ ohos_unittest("WifiApServiceTest") {
     "./",
     "../",
     "./Mock/",
-    "//utils/native/base/include",
+    "//commonlibrary/c_utils/base/include",
     "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
     "$WIFI_ROOT_DIR/frameworks/native/interfaces",
     "$WIFI_ROOT_DIR/services/wifi_standard/ipc_framework/cRPC/include",
@@ -102,9 +102,11 @@ ohos_unittest("WifiApServiceTest") {
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/idl_client:wifi_idl_client",
     "$WIFI_ROOT_DIR/utils/src:wifi_utils",
     "//third_party/googletest:gmock_main",
-    "//utils/native/base:utils",
   ]
-  external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+  external_deps = [
+    "c_utils:utils",
+    "hiviewdfx_hilog_native:libhilog",
+  ]
   defines = [
     "AP_INTF=\"$wifi_feature_with_ap_intf\"",
     "AP_INSTANCE_MAX_NUM=$wifi_feature_with_ap_num",

@@ -165,7 +165,7 @@ ErrCode StaStateMachine::InitStaStates()
     tmpErrNumber += JudgmentEmpty(pWpsState);
     pGetIpState = new (std::nothrow)GetIpState(this);
     tmpErrNumber += JudgmentEmpty(pGetIpState);
-    pLinkedState = new (std::nothrow)LinkedState();
+    pLinkedState = new (std::nothrow)LinkedState(this);
     tmpErrNumber += JudgmentEmpty(pLinkedState);
     pApRoamingState = new (std::nothrow)ApRoamingState(this);
     tmpErrNumber += JudgmentEmpty(pApRoamingState);
@@ -339,6 +339,11 @@ ErrCode StaStateMachine::ConvertDeviceCfg(const WifiDeviceConfig &config) const
     idlConfig.privateKey = config.wifiEapConfig.privateKey;
     idlConfig.phase2Method = static_cast<int>(config.wifiEapConfig.phase2Method);
     idlConfig.wepKeyIdx = config.wepTxKeyIndex;
+    if (strcmp(config.keyMgmt.c_str(), "WEP") == 0) {
+        /* for wep */
+        idlConfig.authAlgorithms = 0x02;
+    }
+
     for (int i = 0; i < MAX_WEPKEYS_SIZE; i++) {
         idlConfig.wepKeys[i] = config.wepKeys[i];
     }
@@ -505,9 +510,11 @@ void StaStateMachine::WpaStartedState::GoOutState()
 bool StaStateMachine::WpaStartedState::ExecuteStateMsg(InternalMessage *msg)
 {
     if (msg == nullptr) {
+        LOGI("msg is nullptr");
         return false;
     }
 
+    WIFI_LOGI("WpaStartedState ExecuteStateMsg-msgCode:%{public}d.\n", msg->GetMessageName());
     bool ret = NOT_EXECUTED;
     switch (msg->GetMessageName()) {
         case WIFI_SVR_CMD_STA_DISABLE_WIFI: {
@@ -854,11 +861,12 @@ void StaStateMachine::DealConnectionEvent(InternalMessage *msg)
 
 void StaStateMachine::DealDisconnectEvent(InternalMessage *msg)
 {
-    LOGD("Enter DealDisconnectEvent.\n");
+    LOGI("Enter DealDisconnectEvent.\n");
     if (msg == nullptr) {
         WIFI_LOGE("msg is null\n");
     }
     if (wpsState != SetupMethod::INVALID) {
+        WIFI_LOGE("wpsState is INVALID\n");
         return;
     }
 #ifndef OHOS_ARCH_LITE
@@ -1318,16 +1326,49 @@ void StaStateMachine::StartRoamToNetwork(std::string bssid)
     SendMessage(msg);
 }
 
+bool StaStateMachine::IsRoaming(void)
+{
+    return isRoam;
+}
+
 void StaStateMachine::OnNetworkConnectionEvent(int networkId, std::string bssid)
 {
     InternalMessage *msg = CreateMessage();
     if (msg == nullptr) {
+        LOGE("msg is nullptr.\n");
         return;
     }
 
     msg->SetMessageName(WIFI_SVR_CMD_STA_NETWORK_CONNECTION_EVENT);
     msg->SetParam1(networkId);
     msg->AddStringMessageBody(bssid);
+    SendMessage(msg);
+}
+
+void StaStateMachine::OnBssidChangedEvent(std::string reason, std::string bssid)
+{
+    InternalMessage *msg = CreateMessage();
+    if (msg == nullptr) {
+        LOGE("msg is nullptr.\n");
+        return;
+    }
+
+    msg->SetMessageName(WIFI_SVR_CMD_STA_BSSID_CHANGED_EVENT);
+    msg->AddStringMessageBody(reason);
+    msg->AddStringMessageBody(bssid);
+    SendMessage(msg);
+}
+
+void StaStateMachine::OnDhcpResultNotifyEvent(bool result)
+{
+    InternalMessage *msg = CreateMessage();
+    if (msg == nullptr) {
+        LOGE("msg is nullptr.\n");
+        return;
+    }
+
+    msg->SetMessageName(WIFI_SVR_CMD_STA_DHCP_RESULT_NOTIFY_EVENT);
+    msg->SetParam1(result);
     SendMessage(msg);
 }
 
@@ -1386,6 +1427,7 @@ bool StaStateMachine::SeparatedState::ExecuteStateMsg(InternalMessage *msg)
         return false;
     }
 
+    WIFI_LOGI("SeparatedState-msgCode=%{public}d received.\n", msg->GetMessageName());
     bool ret = NOT_EXECUTED;
     switch (msg->GetMessageName()) {
         case WIFI_SVR_CMD_STA_NETWORK_DISCONNECTION_EVENT:
@@ -1432,6 +1474,7 @@ bool StaStateMachine::ApLinkedState::ExecuteStateMsg(InternalMessage *msg)
         return false;
     }
 
+    WIFI_LOGI("ApLinkedState-msgCode=%{public}d received.\n", msg->GetMessageName());
     bool ret = NOT_EXECUTED;
     switch (msg->GetMessageName()) {
         /* The current state of StaStateMachine transfers to SeparatingState when
@@ -1461,6 +1504,7 @@ bool StaStateMachine::ApLinkedState::ExecuteStateMsg(InternalMessage *msg)
 
 void StaStateMachine::DisConnectProcess()
 {
+    WIFI_LOGI("Enter DisConnectProcess!");
     staCallback.OnStaConnChanged(OperateResState::DISCONNECT_DISCONNECTING, linkedInfo);
     if (WifiStaHalInterface::GetInstance().Disconnect() == WIFI_IDL_OPT_OK) {
         WIFI_LOGI("Disconnect() succeed!");
@@ -1615,13 +1659,14 @@ StaStateMachine::GetIpState::~GetIpState()
 
 void StaStateMachine::GetIpState::GoInState()
 {
+    WIFI_LOGI("GetIpState GoInState function.");
 #ifdef WIFI_DHCP_DISABLED
     SaveLinkstate(ConnState::CONNECTED, DetailedState::WORKING);
     staCallback.OnStaConnChanged(OperateResState::CONNECT_NETWORK_ENABLED, linkedInfo);
     SwitchState(pLinkedState);
     return;
 #endif
-    WIFI_LOGI("GetIpState GoInState function.");
+    pStaStateMachine->getIpSucNum = 0;
     WifiDeviceConfig config;
     AssignIpMethod assignMethod = AssignIpMethod::DHCP;
     int ret = WifiSettings::GetInstance().GetDeviceConfig(pStaStateMachine->linkedInfo.networkId, config);
@@ -1684,7 +1729,20 @@ bool StaStateMachine::GetIpState::ExecuteStateMsg(InternalMessage *msg)
     }
 
     bool ret = NOT_EXECUTED;
-    WIFI_LOGI("GetIpState-msgCode=%{public}d not handled.\n", msg->GetMessageName());
+    bool result = false;
+    WIFI_LOGI("GetIpState-msgCode=%{public}d received.\n", msg->GetMessageName());
+    switch (msg->GetMessageName()) {
+        case WIFI_SVR_CMD_STA_DHCP_RESULT_NOTIFY_EVENT: {
+            ret = EXECUTED;
+            result = msg->GetParam1();
+            WIFI_LOGI("GetIpState, get ip result:%{public}d.\n", result);
+            pStaStateMachine->SwitchState(pStaStateMachine->pLinkedState);
+            break;
+        }
+        default:
+            break;
+    }
+
     return ret;
 }
 
@@ -1741,9 +1799,9 @@ bool StaStateMachine::ConfigStaticIpAddress(StaticIpAddress &staticIpAddress)
 
 void StaStateMachine::HandleNetCheckResult(StaNetState netState, const std::string portalUrl)
 {
-    WIFI_LOGI("Enter HandleNetCheckResult");
-    if (linkedInfo.connState == ConnState::DISCONNECTED) {
-        WIFI_LOGE("Network disconnected\n");
+    WIFI_LOGI("Enter HandleNetCheckResult, netState:%{public}d.", netState);
+    if (linkedInfo.connState != ConnState::CONNECTED) {
+        WIFI_LOGE("connState is NOT in connected state, connState:%{public}d\n", linkedInfo.connState);
         return;
     }
 
@@ -1752,8 +1810,6 @@ void StaStateMachine::HandleNetCheckResult(StaNetState netState, const std::stri
         /* Save connection information to WifiSettings. */
         SaveLinkstate(ConnState::CONNECTED, DetailedState::WORKING);
         staCallback.OnStaConnChanged(OperateResState::CONNECT_NETWORK_ENABLED, linkedInfo);
-        /* The current state of StaStateMachine transfers to LinkedState. */
-        SwitchState(pLinkedState);
     } else if (netState == StaNetState::NETWORK_CHECK_PORTAL) {
         linkedInfo.portalUrl = portalUrl;
         SaveLinkstate(ConnState::CONNECTED, DetailedState::CAPTIVE_PORTAL_CHECK);
@@ -1766,8 +1822,8 @@ void StaStateMachine::HandleNetCheckResult(StaNetState netState, const std::stri
 }
 
 /* --------------------------- state machine Connected State ------------------------------ */
-StaStateMachine::LinkedState::LinkedState()
-    : State("LinkedState")
+StaStateMachine::LinkedState::LinkedState(StaStateMachine *staStateMachine)
+    : State("LinkedState"), pStaStateMachine(staStateMachine)
 {}
 
 StaStateMachine::LinkedState::~LinkedState()
@@ -1788,11 +1844,39 @@ void StaStateMachine::LinkedState::GoOutState()
 bool StaStateMachine::LinkedState::ExecuteStateMsg(InternalMessage *msg)
 {
     if (msg == nullptr) {
+        WIFI_LOGI("msg is nullptr.");
         return false;
     }
 
-    WIFI_LOGI("LinkedState-msgCode=%{public}d not handled.\n", msg->GetMessageName());
-    return NOT_EXECUTED;
+    WIFI_LOGI("LinkedState, reveived msgCode=%{public}d msg.\n", msg->GetMessageName());
+    bool ret = NOT_EXECUTED;
+    switch (msg->GetMessageName()) {
+        case WIFI_SVR_CMD_STA_BSSID_CHANGED_EVENT: {
+            ret = EXECUTED;
+            std::string reason = msg->GetStringFromMessage();
+            std::string bssid = msg->GetStringFromMessage();
+            WIFI_LOGI("reveived bssid changed event, reason:%{public}s,bssid:%{private}s.\n",
+                reason.c_str(), bssid.c_str());
+            if (strcmp(reason.c_str(), "ASSOC_COMPLETE") != 0) {
+                WIFI_LOGE("Bssid change not for ASSOC_COMPLETE, do nothing.");
+                return false;
+            }
+            if (WifiStaHalInterface::GetInstance().SetWpsBssid(pStaStateMachine->linkedInfo.networkId,
+                bssid) != WIFI_IDL_OPT_OK) {
+                WIFI_LOGE("SetWpsBssid return fail.");
+                return false;
+            }
+            pStaStateMachine->isRoam = true;
+            /* The current state of StaStateMachine transfers to pApRoamingState. */
+            pStaStateMachine->SwitchState(pStaStateMachine->pApRoamingState);
+            break;
+        }
+        default:
+            WIFI_LOGE("NOT handle this event!");
+            break;
+    }
+
+    return ret;
 }
 
 /* --------------------------- state machine Roaming State ------------------------------ */
@@ -1823,6 +1907,12 @@ bool StaStateMachine::ApRoamingState::ExecuteStateMsg(InternalMessage *msg)
             ret = EXECUTED;
             pStaStateMachine->isRoam = true;
             pStaStateMachine->StopTimer(static_cast<int>(CMD_NETWORK_CONNECT_TIMEOUT));
+            /* Save linkedInfo */
+            pStaStateMachine->linkedInfo.networkId = msg->GetParam1();
+            pStaStateMachine->linkedInfo.bssid = msg->GetStringFromMessage();
+            WIFI_LOGI("ApRoamingState, receive connection event, networkId:%{public}d, bssid:%{public}s.",
+                pStaStateMachine->linkedInfo.networkId, pStaStateMachine->linkedInfo.bssid.c_str());
+            WifiSettings::GetInstance().SaveLinkedInfo(pStaStateMachine->linkedInfo);
             pStaStateMachine->staCallback.OnStaConnChanged(
                 OperateResState::CONNECT_ASSOCIATED, pStaStateMachine->linkedInfo);
             pStaStateMachine->ConnectToNetworkProcess(msg);
@@ -1967,7 +2057,7 @@ void StaStateMachine::DhcpResultNotify::OnSuccess(int status, const std::string 
         return;
     }
     WIFI_LOGD("iptype=%{public}d, ip=%{private}s, gateway=%{private}s, \
-        subnet=%{private}s, serverAddress=%{private}s, leaseDuration=%d",
+        subnet=%{private}s, serverAddress=%{private}s, leaseDuration=%{public}d",
         result.iptype,
         result.strYourCli.c_str(),
         result.strRouter1.c_str(),
@@ -2015,6 +2105,7 @@ void StaStateMachine::DhcpResultNotify::OnSuccess(int status, const std::string 
 
     WIFI_LOGI("DhcpResultNotify::OnSuccess, getIpSucNum=%{public}d, isRoam=%{public}d",
         pStaStateMachine->getIpSucNum, pStaStateMachine->isRoam);
+    pStaStateMachine->OnDhcpResultNotifyEvent(true);
     if (pStaStateMachine->getIpSucNum == 0 || pStaStateMachine->isRoam) {
         pStaStateMachine->SaveLinkstate(ConnState::CONNECTED, DetailedState::CONNECTED);
         pStaStateMachine->staCallback.OnStaConnChanged(
@@ -2025,6 +2116,15 @@ void StaStateMachine::DhcpResultNotify::OnSuccess(int status, const std::string 
         pStaStateMachine->pNetcheck->SignalNetCheckThread();
     }
     pStaStateMachine->getIpSucNum++;
+
+    WIFI_LOGI("DhcpResultNotify::OnSuccess, stop dhcp client");
+    if (pStaStateMachine->pDhcpService != nullptr) {
+        if (pStaStateMachine->currentTpType == IPTYPE_IPV6) {
+            pStaStateMachine->pDhcpService->StopDhcpClient(IF_NAME, true);
+        } else {
+            pStaStateMachine->pDhcpService->StopDhcpClient(IF_NAME, false);
+        }
+    }
     return;
 }
 

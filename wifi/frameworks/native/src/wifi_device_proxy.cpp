@@ -277,6 +277,39 @@ ErrCode WifiDeviceProxy::AddCandidateConfig(const WifiDeviceConfig &config, int 
     return WIFI_OPT_SUCCESS;
 }
 
+ErrCode WifiDeviceProxy::RemoveCandidateConfig(const WifiDeviceConfig &config)
+{
+    if (mRemoteDied) {
+        WIFI_LOGE("failed to `%{public}s`,remote service is died!", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    MessageOption option;
+    MessageParcel data, reply;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    data.WriteInt32(0);
+    /* Write a flag: 1-remove config by networkId, 2-remove config by WifiDeviceConfig */
+    data.WriteInt32(2);
+    WriteDeviceConfig(config, data);
+    int error = Remote()->SendRequest(WIFI_SVR_CMD_REMOVE_CANDIDATE_CONFIG, data, reply, option);
+    if (error != ERR_NONE) {
+        WIFI_LOGE("Set Attr(%{public}d) failed,error=%{public}d", WIFI_SVR_CMD_REMOVE_CANDIDATE_CONFIG, error);
+        return WIFI_OPT_FAILED;
+    }
+    int exception = reply.ReadInt32();
+    if (exception) {
+        return WIFI_OPT_FAILED;
+    }
+    int ret = reply.ReadInt32();
+    if (ret != WIFI_OPT_SUCCESS) {
+        return ErrCode(ret);
+    }
+
+    return WIFI_OPT_SUCCESS;
+}
+
 ErrCode WifiDeviceProxy::RemoveCandidateConfig(int networkId)
 {
     if (mRemoteDied) {
@@ -290,6 +323,8 @@ ErrCode WifiDeviceProxy::RemoveCandidateConfig(int networkId)
         return WIFI_OPT_FAILED;
     }
     data.WriteInt32(0);
+    /* Write a flag: 1-remove config by networkId, 2-remove config by WifiDeviceConfig */
+    data.WriteInt32(1);
     data.WriteInt32(networkId);
     int error = Remote()->SendRequest(WIFI_SVR_CMD_REMOVE_CANDIDATE_CONFIG, data, reply, option);
     if (error != ERR_NONE) {

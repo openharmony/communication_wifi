@@ -22,6 +22,7 @@ namespace OHOS {
 namespace Wifi {
 struct WifiEventCallback {
     std::function<void(int, int, const std::string &)> onConnectChanged;
+    std::function<void(const std::string &, const std::string &)> onBssidChanged;
     std::function<void(int)> onWpaStateChanged;
     std::function<void(int)> onWpaSsidWrongKey;
     std::function<void(int)> onWpsOverlap;

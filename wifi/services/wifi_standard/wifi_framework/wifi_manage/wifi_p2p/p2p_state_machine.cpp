@@ -224,11 +224,7 @@ bool P2pStateMachine::ReawakenPersistentGroup(WifiP2pConfigInternal &config) con
 
     if (isJoin && !device.IsGroupLimit()) {
         if (groupName.empty()) {
-            WifiP2pDevice peerInfo;
-            if (WifiP2PHalInterface::GetInstance().GetP2pPeer(config.GetDeviceAddress(), peerInfo) ==
-                WifiErrorNo::WIFI_IDL_OPT_OK) {
-                groupName = peerInfo.GetNetworkName();
-            }
+            groupName = device.GetNetworkName();
         }
         int networkId = groupManager.GetGroupNetworkId(device, groupName);
         if (networkId >= 0) {
@@ -298,7 +294,15 @@ WifiP2pDevice P2pStateMachine::FetchNewerDeviceInfo(const std::string &deviceAdd
         WIFI_LOGE("Invalid device address.");
         return device;
     }
-    return deviceManager.GetDevices(device.GetDeviceAddress());
+    WifiP2pDevice newDevice = deviceManager.GetDevices(deviceAddr);
+    if (WifiP2PHalInterface::GetInstance().GetP2pPeer(deviceAddr, device) ==
+        WifiErrorNo::WIFI_IDL_OPT_OK) {
+        int groupCap = device.GetGroupCapabilitys();
+        deviceManager.UpdateDeviceGroupCap(deviceAddr, groupCap);
+        newDevice.SetGroupCapabilitys(groupCap);
+        newDevice.SetNetworkName(device.GetNetworkName());
+    }
+    return newDevice;
 }
 
 void P2pStateMachine::DealGroupCreationFailed()
@@ -900,11 +904,14 @@ bool P2pStateMachine::IsInterfaceReuse() const
 void P2pStateMachine::UpdateGroupInfoToWpa() const
 {
     WIFI_LOGI("Start update group info to wpa");
-    std::vector<WifiP2pGroupInfo> grpInfo = groupManager.GetGroups();
     /* 1) In the scenario of interface reuse, the configuration of sta may be deleted
      * 2) Dont remove p2p networks of wpa_s in initial phase after device reboot
      */
-    if (!IsInterfaceReuse() && grpInfo.size() > 0) {
+    if (IsInterfaceReuse()) {
+        return;
+    }
+    std::vector<WifiP2pGroupInfo> grpInfo = groupManager.GetGroups();
+    if (grpInfo.size() > 0) {
         if (WifiP2PHalInterface::GetInstance().RemoveNetwork(-1) != WIFI_IDL_OPT_OK) {
             WIFI_LOGE("Failed to delete all group info before update group info to wpa! Stop update!");
             return;

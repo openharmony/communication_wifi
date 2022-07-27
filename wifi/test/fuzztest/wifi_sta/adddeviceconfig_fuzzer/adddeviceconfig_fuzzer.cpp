@@ -27,11 +27,12 @@ namespace Wifi {
 
         WifiDeviceConfig config;
         int addResult;
+        bool isCandidate = false;
         config.ssid = std::string(reinterpret_cast<const char*>(data), size);
         config.bssid = std::string(reinterpret_cast<const char*>(data), size);
         config.preSharedKey = std::string(reinterpret_cast<const char*>(data), size);
         config.keyMgmt = std::string(reinterpret_cast<const char*>(data), size);
-        devicePtr->AddDeviceConfig(config, addResult);
+        devicePtr->AddDeviceConfig(config, addResult, isCandidate);
         return true;
     }
 }  // namespace Wifi

@@ -942,7 +942,7 @@ public:
     /**
      * @Description Get the Score Policy Candidate Score
      *
-     * @return int - priority
+     * @return int - score
      */
     int GetScoretacticsNormalScore();
 

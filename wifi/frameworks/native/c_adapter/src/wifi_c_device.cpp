@@ -71,27 +71,29 @@ WifiErrorCode GetScanInfoList(WifiScanInfo *result, unsigned int *size)
         return ERROR_WIFI_UNKNOWN;
     }
 
-    std::vector<OHOS::Wifi::WifiScanInfo> vecScnIanfos;
-    OHOS::Wifi::ErrCode ret = wifiScanPtr->GetScanInfoList(vecScnIanfos);
-    *size = (int)vecScnIanfos.size();
-    for (auto& each : vecScnIanfos) {
-        if (memcpy_s(result->ssid, WIFI_MAX_SSID_LEN, each.ssid.c_str(), each.ssid.size() + 1) != EOK) {
+    std::vector<OHOS::Wifi::WifiScanInfo> vecScanInfos;
+    OHOS::Wifi::ErrCode ret = wifiScanPtr->GetScanInfoList(vecScanInfos);
+    int vecSize = (int)vecScanInfos.size();
+    for (int i = 0; i < vecSize && i < WIFI_SCAN_HOTSPOT_LIMIT; ++i) {
+        if (memcpy_s(result->ssid, WIFI_MAX_SSID_LEN,
+            vecScanInfos[i].ssid.c_str(), vecScanInfos[i].ssid.size() + 1) != EOK) {
             return ERROR_WIFI_UNKNOWN;
         }
-        if (OHOS::Wifi::MacStrToArray(each.bssid, result->bssid) != EOK) {
+        if (OHOS::Wifi::MacStrToArray(vecScanInfos[i].bssid, result->bssid) != EOK) {
             WIFI_LOGE("Scan info convert bssid error!");
             return ERROR_WIFI_UNKNOWN;
         }
-        result->securityType = static_cast<int>(each.securityType);
-        result->rssi = each.rssi;
-        result->band = each.band;
-        result->frequency = each.frequency;
-        result->channelWidth = WifiChannelWidth(static_cast<int>(each.channelWidth));
-        result->centerFrequency0 = each.centerFrequency0;
-        result->centerFrequency1 = each.centerFrequency1;
-        result->timestamp = each.timestamp;
+        result->securityType = static_cast<int>(vecScanInfos[i].securityType);
+        result->rssi = vecScanInfos[i].rssi;
+        result->band = vecScanInfos[i].band;
+        result->frequency = vecScanInfos[i].frequency;
+        result->channelWidth = WifiChannelWidth(static_cast<int>(vecScanInfos[i].channelWidth));
+        result->centerFrequency0 = vecScanInfos[i].centerFrequency0;
+        result->centerFrequency1 = vecScanInfos[i].centerFrequency1;
+        result->timestamp = vecScanInfos[i].timestamp;
         ++result;
     }
+    *size = (vecSize < WIFI_SCAN_HOTSPOT_LIMIT) ? vecSize : WIFI_SCAN_HOTSPOT_LIMIT;
     return GetCErrorCode(ret);
 }
 

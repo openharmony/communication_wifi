@@ -103,6 +103,10 @@ ohos_source_set("wifi_device_service_impl") {
     ":wifi_manager_service_header",
   ]
 
+  if (wifi_feature_with_p2p) {
+    defines = [ "WIFI_SUPPORT_P2P" ]
+  }
+
   deps = [ ":wifi_p2p_service_impl" ]
   external_deps = [ "ipc:ipc_core" ]
 }
@@ -206,10 +210,6 @@ ohos_shared_library("wifi_device_ability") {
     "//foundation/distributedschedule/safwk/interfaces/innerkits/safwk:system_ability_fwk",
     "//utils/native/base:utils",
   ]
-
-  if (wifi_feature_with_p2p) {
-    defines = [ "WIFI_SUPPORT_P2P" ]
-  }
 
   external_deps = [ "ipc:ipc_core" ]
   part_name = "wifi_standard"

@@ -121,6 +121,12 @@ ErrCode WifiDeviceImpl::RemoveCandidateConfig(int networkId)
     return client_->RemoveCandidateConfig(networkId);
 }
 
+ErrCode WifiDeviceImpl::RemoveCandidateConfig(const WifiDeviceConfig &config)
+{
+    RETURN_IF_FAIL(client_);
+    return client_->RemoveCandidateConfig(config);
+}
+
 ErrCode WifiDeviceImpl::ConnectToCandidateConfig(int networkId)
 {
     RETURN_IF_FAIL(client_);

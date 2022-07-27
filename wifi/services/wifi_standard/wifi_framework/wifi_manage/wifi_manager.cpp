@@ -303,7 +303,7 @@ InitStatus WifiManager::GetInitStatus()
 
 void WifiManager::CloseStaService(void)
 {
-    WIFI_LOGD("close sta service");
+    WIFI_LOGI("close sta service");
     WifiServiceManager::GetInstance().UnloadService(WIFI_SERVICE_STA);
     WifiConfigCenter::GetInstance().SetWifiMidState(WifiOprMidState::CLOSED);
     WifiConfigCenter::GetInstance().SetWifiStaCloseTime();
@@ -313,7 +313,7 @@ void WifiManager::CloseStaService(void)
 #ifdef FEATURE_AP_SUPPORT
 void WifiManager::CloseApService(int id)
 {
-    WIFI_LOGD("close %{public}d ap service", id);
+    WIFI_LOGI("close %{public}d ap service", id);
     WifiServiceManager::GetInstance().UnloadService(WIFI_SERVICE_AP, id);
     WifiConfigCenter::GetInstance().SetApMidState(WifiOprMidState::CLOSED, id);
     WifiSettings::GetInstance().SetHotspotState(static_cast<int>(ApState::AP_STATE_CLOSED), id);

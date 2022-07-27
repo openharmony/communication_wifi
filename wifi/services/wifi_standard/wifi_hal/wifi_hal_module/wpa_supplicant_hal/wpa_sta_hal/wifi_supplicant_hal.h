@@ -92,6 +92,7 @@ struct WifiWpaStaInterface {
     int (*wpaCliCmdWpsPin)(WifiWpaStaInterface *p, const struct WpaWpsPinArgv *wpspin, int *pincode);
     int (*wpaCliCmdWpsCancel)(WifiWpaStaInterface *p);
     int (*wpaCliCmdPowerSave)(WifiWpaStaInterface *p, int enable);
+    int (*wpaCliCmdSetRoamConfig)(WifiWpaStaInterface *p, const char *bssid);
     int (*wpaCliCmdSetCountryCode)(WifiWpaStaInterface *p, const char *countryCode);
     int (*wpaCliCmdGetCountryCode)(WifiWpaStaInterface *p, char *countryCode, int codeSize);
     int (*wpaCliCmdSetAutoConnect)(WifiWpaStaInterface *p, int enable);

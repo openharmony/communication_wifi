@@ -24,7 +24,7 @@ namespace Wifi {
 StaAutoConnectService::StaAutoConnectService(StaStateMachine *staStateMachine)
     : pStaStateMachine(staStateMachine),
       pSavedDeviceAppraisal(nullptr),
-      firmwareRoamFlag(false),
+      firmwareRoamFlag(true),
       maxBlockedBssidNum(BLOCKLIST_INVALID_SIZE),
       selectDeviceLastTime(0),
       pAppraisals {nullptr, nullptr, nullptr, nullptr, nullptr, nullptr}

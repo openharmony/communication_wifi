@@ -19,7 +19,7 @@ ohos_shared_library("wifi") {
   include_dirs = [
     "//third_party/node/src",
     "//native_engine",
-    "//utils/native/base/include",
+    "//commonlibrary/c_utils/base/include",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/common/log",
     "$WIFI_ROOT_DIR/frameworks/native/interfaces",
     "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
@@ -45,12 +45,12 @@ ohos_shared_library("wifi") {
     "${ability_runtime_path}/frameworks/native/appkit:app_context",
     "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog",
     "//foundation/arkui/napi:ace_napi",
-    "//utils/native/base:utils",
   ]
 
   external_deps = [
     "access_token:libaccesstoken_sdk",
     "bundle_framework:appexecfwk_base",
+    "c_utils:utils",
     "ipc:ipc_core",
   ]
 
@@ -64,7 +64,7 @@ ohos_shared_library("wifiext") {
   include_dirs = [
     "//third_party/node/src",
     "//native_engine",
-    "//utils/native/base/include",
+    "//commonlibrary/c_utils/base/include",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/common/log",
     "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
     "$WIFI_ROOT_DIR/frameworks/native/include",
@@ -83,11 +83,11 @@ ohos_shared_library("wifiext") {
     "${ability_runtime_path}/frameworks/native/appkit:app_context",
     "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog",
     "//foundation/arkui/napi:ace_napi",
-    "//utils/native/base:utils",
   ]
 
   external_deps = [
     "bundle_framework:appexecfwk_base",
+    "c_utils:utils",
     "ipc:ipc_core",
   ]
 
@@ -101,7 +101,7 @@ ohos_shared_library("wifi_native_js") {
   include_dirs = [
     "//third_party/node/src",
     "//native_engine",
-    "//utils/native/base/include",
+    "//commonlibrary/c_utils/base/include",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/common/log",
     "$WIFI_ROOT_DIR/frameworks/js/napi/inc",
     "$WIFI_ROOT_DIR/frameworks/native/include",
@@ -127,7 +127,6 @@ ohos_shared_library("wifi_native_js") {
     "${ability_runtime_path}/frameworks/native/appkit:app_context",
     "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog",
     "//foundation/arkui/napi:ace_napi",
-    "//utils/native/base:utils",
   ]
 
   defines = [ "ENABLE_NAPI_COMPATIBLE" ]
@@ -135,6 +134,7 @@ ohos_shared_library("wifi_native_js") {
   external_deps = [
     "access_token:libaccesstoken_sdk",
     "bundle_framework:appexecfwk_base",
+    "c_utils:utils",
     "ipc:ipc_core",
   ]
 

@@ -48,6 +48,7 @@ RpcClient *GetChipRpcClient(void);
 RpcClient *GetStaRpcClient(void);
 
 void OnConnectChanged(int status, int networkId, const char *mac);
+void OnBssidChanged(const char *reason, const char *bssid);
 void OnWpaStateChanged(int status);
 void OnWpaSsidWrongKey(int status);
 void OnWpsOverlap(int status);

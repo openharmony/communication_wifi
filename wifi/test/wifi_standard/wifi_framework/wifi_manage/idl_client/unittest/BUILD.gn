@@ -18,7 +18,7 @@ module_output_path = "wifi/idl_client_test"
 config("module_private_config") {
   visibility = [ ":*" ]
   include_dirs = [
-    "//utils/native/base/include",
+    "//commonlibrary/c_utils/base/include",
     "$WIFI_ROOT_DIR/test/wifi_standard/wifi_framework/wifi_manage/idl_client/unittest",
   ]
 }
@@ -66,22 +66,23 @@ ohos_unittest("idl_client_unittest") {
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/common/log",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/idl_client",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/idl_client/idl_interface",
-    "//utils/native/base/include",
+    "//commonlibrary/c_utils/base/include",
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
     "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
   ]
 
-  deps = [
-    "$WIFI_ROOT_DIR/services/wifi_standard/ipc_framework/cRPC:crpc_client",
-    "//utils/native/base:utils",
-  ]
+  deps =
+      [ "$WIFI_ROOT_DIR/services/wifi_standard/ipc_framework/cRPC:crpc_client" ]
 
   ldflags = [
     "-fPIC",
     "--coverage",
   ]
 
-  external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+  external_deps = [
+    "c_utils:utils",
+    "hiviewdfx_hilog_native:libhilog",
+  ]
   configs = [ ":module_private_config" ]
 
   part_name = "wifi"
@@ -109,7 +110,7 @@ ohos_unittest("mock_wifi_hal_service") {
   ]
 
   include_dirs = [
-    "//utils/native/base/include",
+    "//commonlibrary/c_utils/base/include",
     "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
     "$WIFI_ROOT_DIR/frameworks/native/interfaces",
     "$WIFI_ROOT_DIR/services/wifi_standard/ipc_framework/cRPC/include",
@@ -121,8 +122,9 @@ ohos_unittest("mock_wifi_hal_service") {
   deps = [
     "$WIFI_ROOT_DIR/services/wifi_standard/ipc_framework/cRPC:crpc_server",
     "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog",
-    "//utils/native/base:utils",
   ]
+
+  external_deps = [ "c_utils:utils" ]
 
   cflags_cc = [ "-fno-rtti" ]
 

@@ -192,14 +192,14 @@ uint32_t AddressDistribute(DhcpAddressPool *pool, uint8_t macAddr[DHCP_HWADDR_LE
     if (pool->distribution == 0) {
         pool->distribution = pool->addressRange.beginAddress;
     }
-    int total = HostTotal(pool->netmask);
+    uint32_t total = HostTotal(pool->netmask);
     uint32_t distIp = pool->distribution;
     if (!distIp || distIp < pool->addressRange.beginAddress) {
         distIp = pool->addressRange.beginAddress;
     }
     int distSucess = 0;
     int outOfRange = 0;
-    for (int i = 0; i < total; i++) {
+    for (uint32_t i = 0; i < total; i++) {
         int offset = 0;
         if (i == 0) {
             offset = NextIpOffset(pool->netmask);

@@ -18,7 +18,7 @@ module_output_path = "wifi/crpc_test"
 config("module_private_config") {
   visibility = [ ":*" ]
   include_dirs = [
-    "//utils/native/base/include",
+    "//commonlibrary/c_utils/base/include",
     "$WIFI_ROOT_DIR/test/wifi_standard/ipc_framework/cRPC/unittest",
   ]
 }
@@ -42,8 +42,6 @@ ohos_unittest("crpc_unittest") {
     "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
   ]
 
-  deps = [ "//utils/native/base:utils" ]
-
   ldflags = [
     "-fPIC",
     "-Wl,--wrap=write",
@@ -51,7 +49,10 @@ ohos_unittest("crpc_unittest") {
     "--coverage",
   ]
 
-  external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+  external_deps = [
+    "c_utils:utils",
+    "hiviewdfx_hilog_native:libhilog",
+  ]
   configs = [ ":module_private_config" ]
 
   part_name = "wifi"

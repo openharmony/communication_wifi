@@ -81,6 +81,7 @@ typedef enum WifiHalEvent {
     WIFI_STA_LEAVE_EVENT,              /* STA disconnection notification in AP mode. */
     WIFI_SCAN_INFO_NOTIFY_EVENT,       /* Scan info notification. */
     WIFI_CONNECT_CHANGED_NOTIFY_EVENT, /* Connection status change notification. */
+    WIFI_BSSID_CHANGED_NOTIFY_EVENT,   /* Bssid change notification. */
     WIFI_AP_ENABLE_EVENT,              /* AP enabling notification. */
     WIFI_AP_DISABLE_EVENT,             /* AP closure notification. */
     WIFI_WPA_STATE_EVENT,              /* WPA status change. */
@@ -123,6 +124,7 @@ typedef enum WifiHalEvent {
 #define WIFI_NETWORK_CONFIG_VALUE_LENGTH 256
 #define WIFI_P2P_GROUP_CONFIG_VALUE_LENGTH 256
 #define WIFI_MAC_LENGTH 17
+#define WIFI_REASON_LENGTH 32
 #define WIFI_AP_PASSWORD_LENGTH 64
 #define WIFI_PIN_CODE_LENGTH 8
 

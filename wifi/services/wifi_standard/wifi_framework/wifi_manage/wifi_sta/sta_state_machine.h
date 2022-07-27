@@ -105,7 +105,7 @@ public:
      */
     class InitState : public State {
     public:
-        explicit InitState(StaStateMachine *pStaStateMachine);
+        explicit InitState(StaStateMachine *staStateMachine);
         ~InitState() override;
         void GoInState() override;
         void GoOutState() override;
@@ -253,11 +253,14 @@ public:
      */
     class LinkedState : public State {
     public:
-        explicit LinkedState();
+        explicit LinkedState(StaStateMachine *staStateMachine);
         ~LinkedState() override;
         void GoInState() override;
         void GoOutState() override;
         bool ExecuteStateMsg(InternalMessage *msg) override;
+
+    private:
+        StaStateMachine *pStaStateMachine;
     };
     /**
      * @Description  Definition of member function of ApRoamingState class in StaStateMachine.
@@ -331,13 +334,29 @@ public:
      */
     void StartRoamToNetwork(std::string bssid);
     /**
+     * @Description  if it is roaming now.
+     */
+    bool IsRoaming(void);
+    /**
      * @Description  Connecting events
      *
      * @param networkId - the networkId of network which is going to be connected(in)
      * @param bssid - bssid - the mac address of wifi(in)
      */
     void OnNetworkConnectionEvent(int networkId, std::string bssid);
-
+    /**
+     * @Description  Bssid change events
+     *
+     * @param reason: the reason of bssid changed(in)
+     * @param bssid: the mac address of wifi(in)
+     */
+    void OnBssidChangedEvent(std::string reason, std::string bssid);
+    /**
+     * @Description  dhcp result notify events
+     *
+     * @param result: true-success, false-fail(in)
+     */
+    void OnDhcpResultNotifyEvent(bool result);
     /**
      * @Description Register sta callback function
      *

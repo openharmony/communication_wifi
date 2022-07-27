@@ -22,7 +22,7 @@ even_path = "//base/notification/common_event_service"
 config("module_private_config") {
   visibility = [ ":*" ]
   include_dirs = [
-    "//utils/native/base/include",
+    "//commonlibrary/c_utils/base/include",
     "$DHCP_ROOT_DIR/services/mgr_service/include",
   ]
 }
@@ -52,17 +52,14 @@ ohos_unittest("dhcp_manage_unittest") {
     "$DHCP_ROOT_DIR/interfaces/inner_api/include",
     "$DHCP_ROOT_DIR/interfaces/inner_api/interfaces",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/common/log",
-    "//utils/native/base/include",
+    "//commonlibrary/c_utils/base/include",
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
     "${even_path}/cesfwk/kits/native/include",
     "${even_path}/cesfwk/innerkits/include",
     "//base/notification/common_event_service/frameworks/core/include",
   ]
 
-  deps = [
-    "//third_party/googletest:gmock_main",
-    "//utils/native/base:utils",
-  ]
+  deps = [ "//third_party/googletest:gmock_main" ]
 
   ldflags = [
     "-fPIC",
@@ -91,6 +88,7 @@ ohos_unittest("dhcp_manage_unittest") {
   external_deps = [
     "ability_base:want",
     "bundle_framework:appexecfwk_base",
+    "c_utils:utils",
     "common_event_service:cesfwk_innerkits",
     "eventhandler:libeventhandler",
     "hiviewdfx_hilog_native:libhilog",

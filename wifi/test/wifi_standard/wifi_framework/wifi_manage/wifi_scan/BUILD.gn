@@ -18,7 +18,7 @@ module_output_path = "wifi/scan_test"
 config("module_private_config") {
   visibility = [ ":*" ]
   include_dirs = [
-    "//utils/native/base/include",
+    "//commonlibrary/c_utils/base/include",
     "$WIFI_ROOT_DIR/test/wifi_standard/wifi_framework/wifi_manage/wifi_scan",
   ]
 }
@@ -56,7 +56,7 @@ ohos_unittest("wifi_scan_unittest") {
   ]
 
   include_dirs = [
-    "//utils/native/base/include",
+    "//commonlibrary/c_utils/base/include",
     "$WIFI_ROOT_DIR/frameworks/native/interfaces",
     "$WIFI_ROOT_DIR/services/wifi_standard/sdk/include",
     "$WIFI_ROOT_DIR/services/wifi_standard/ipc_framework/cRPC/include",
@@ -88,10 +88,12 @@ ohos_unittest("wifi_scan_unittest") {
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage:wifi_manager_service",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/idl_client:wifi_idl_client",
     "//third_party/googletest:gmock_main",
-    "//utils/native/base:utils",
   ]
   defines = [ "AP_INSTANCE_MAX_NUM=$wifi_feature_with_ap_num" ]
-  external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+  external_deps = [
+    "c_utils:utils",
+    "hiviewdfx_hilog_native:libhilog",
+  ]
   part_name = "wifi"
   subsystem_name = "communication"
 }

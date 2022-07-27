@@ -84,17 +84,19 @@ if (defined(ohos_lite)) {
 
     include_dirs = local_base_include_dirs
     include_dirs += [
-      "//utils/native/base/include",
+      "//commonlibrary/c_utils/base/include",
       "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
     ]
 
     deps = [
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage:wifi_manager_service",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/idl_client:wifi_idl_client",
-      "//utils/native/base:utils",
     ]
 
-    external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+    external_deps = [
+      "c_utils:utils",
+      "hiviewdfx_hilog_native:libhilog",
+    ]
     cflags_cc = [
       "-std=c++17",
       "-fno-rtti",

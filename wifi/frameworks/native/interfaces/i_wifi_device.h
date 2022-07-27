@@ -93,6 +93,14 @@ public:
     virtual ErrCode RemoveCandidateConfig(int networkId) = 0;
 
     /**
+     * @Description Remove the wifi candidate device config by WifiDeviceConfig
+     *
+     * @param config - the candidate config to be removed
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode RemoveCandidateConfig(const WifiDeviceConfig &config) = 0;
+
+    /**
      * @Description Connect to a candidate specified network.
      *
      * @param networkId - the candidate device network id

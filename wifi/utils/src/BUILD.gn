@@ -60,7 +60,6 @@ if (defined(ohos_lite)) {
     deps = [
       "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog",
       "//foundation/distributedschedule/samgr/interfaces/innerkits/samgr_proxy:samgr_proxy",
-      "//utils/native/base:utils",
     ]
 
     external_deps = [
@@ -68,6 +67,7 @@ if (defined(ohos_lite)) {
       "ability_runtime:app_manager",
       "bundle_framework:appexecfwk_base",
       "bundle_framework:appexecfwk_core",
+      "c_utils:utils",
       "hisysevent_native:libhisysevent",
       "ipc:ipc_core",
     ]

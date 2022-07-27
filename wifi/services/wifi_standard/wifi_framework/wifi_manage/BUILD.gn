@@ -160,7 +160,7 @@ if (defined(ohos_lite)) {
 } else {
   config("wifi_manager_service_header") {
     include_dirs = [
-      "//utils/native/base/include",
+      "//commonlibrary/c_utils/base/include",
       "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
       "//foundation/arkui/ace_engine/frameworks/base/utils",
       "//foundation/arkui/ace_engine/frameworks",
@@ -252,13 +252,11 @@ if (defined(ohos_lite)) {
       defines += [ "FEATURE_AP_SUPPORT" ]
     }
 
-    deps = [
-      ":wifi_p2p_service_impl",
-      "//utils/native/base:utils",
-    ]
+    deps = [ ":wifi_p2p_service_impl" ]
     external_deps = [
       "ability_base:want",
       "bundle_framework:appexecfwk_base",
+      "c_utils:utils",
       "common_event_service:cesfwk_innerkits",
       "eventhandler:libeventhandler",
       "ipc:ipc_core",
@@ -352,7 +350,6 @@ if (defined(ohos_lite)) {
       "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog",
       "//foundation/communication/netmanager_base/services/netmanagernative:netsys_native_manager",
       "//foundation/distributedschedule/safwk/interfaces/innerkits/safwk:system_ability_fwk",
-      "//utils/native/base:utils",
     ]
 
     configs = [ ":wifi_manager_service_header" ]
@@ -361,6 +358,7 @@ if (defined(ohos_lite)) {
       "ability_base:want",
       "access_token:libaccesstoken_sdk",
       "bundle_framework:appexecfwk_base",
+      "c_utils:utils",
       "common_event_service:cesfwk_innerkits",
       "eventhandler:libeventhandler",
       "ipc:ipc_core",
@@ -390,10 +388,12 @@ if (defined(ohos_lite)) {
       "$WIFI_ROOT_DIR/utils/src:wifi_utils",
       "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog",
       "//foundation/distributedschedule/safwk/interfaces/innerkits/safwk:system_ability_fwk",
-      "//utils/native/base:utils",
     ]
 
-    external_deps = [ "ipc:ipc_core" ]
+    external_deps = [
+      "c_utils:utils",
+      "ipc:ipc_core",
+    ]
     part_name = "wifi"
     subsystem_name = "communication"
   }
@@ -405,10 +405,12 @@ if (defined(ohos_lite)) {
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/idl_client:wifi_idl_client",
       "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog",
       "//foundation/distributedschedule/safwk/interfaces/innerkits/safwk:system_ability_fwk",
-      "//utils/native/base:utils",
     ]
 
-    external_deps = [ "ipc:ipc_core" ]
+    external_deps = [
+      "c_utils:utils",
+      "ipc:ipc_core",
+    ]
     part_name = "wifi"
     subsystem_name = "communication"
   }
@@ -420,10 +422,12 @@ if (defined(ohos_lite)) {
       "$WIFI_ROOT_DIR/utils/src:wifi_utils",
       "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog",
       "//foundation/distributedschedule/safwk/interfaces/innerkits/safwk:system_ability_fwk",
-      "//utils/native/base:utils",
     ]
 
-    external_deps = [ "ipc:ipc_core" ]
+    external_deps = [
+      "c_utils:utils",
+      "ipc:ipc_core",
+    ]
     part_name = "wifi"
     subsystem_name = "communication"
   }
@@ -435,10 +439,12 @@ if (defined(ohos_lite)) {
       "$WIFI_ROOT_DIR/utils/src:wifi_utils",
       "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog",
       "//foundation/distributedschedule/safwk/interfaces/innerkits/safwk:system_ability_fwk",
-      "//utils/native/base:utils",
     ]
 
-    external_deps = [ "ipc:ipc_core" ]
+    external_deps = [
+      "c_utils:utils",
+      "ipc:ipc_core",
+    ]
     part_name = "wifi"
     subsystem_name = "communication"
   }

@@ -18,7 +18,7 @@ module_output_path = "wifi/wifi_hal_test"
 config("module_private_config") {
   visibility = [ ":*" ]
   include_dirs = [
-    "//utils/native/base/include",
+    "//commonlibrary/c_utils/base/include",
     "$WIFI_ROOT_DIR/test/wifi_standard/wifi_hal/unittest",
   ]
 }
@@ -65,7 +65,7 @@ ohos_unittest("wifi_hal_unittest") {
   ]
 
   include_dirs = [
-    "//utils/native/base/include",
+    "//commonlibrary/c_utils/base/include",
     "$WIFI_ROOT_DIR/services/wifi_standard/ipc_framework/cRPC/include",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_hal",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_hal/common",
@@ -85,7 +85,6 @@ ohos_unittest("wifi_hal_unittest") {
     "$WIFI_ROOT_DIR/services/wifi_standard/ipc_framework/cRPC:crpc_server",
     "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog",
     "//drivers/peripheral/wlan/hal:wifi_hal",
-    "//utils/native/base:utils",
   ]
 
   ldflags = [
@@ -93,7 +92,10 @@ ohos_unittest("wifi_hal_unittest") {
     "--coverage",
   ]
 
-  external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+  external_deps = [
+    "c_utils:utils",
+    "hiviewdfx_hilog_native:libhilog",
+  ]
   configs = [ ":module_private_config" ]
   defines = [ "AP_INTF=\"$wifi_feature_with_ap_intf\"" ]
 
@@ -110,15 +112,15 @@ group("unittest") {
 ohos_shared_library("WifiHalVendorTest") {
   sources = [ "wifi_hal_vendor_interface_test.c" ]
   include_dirs = [
-    "//utils/native/base/include",
+    "//commonlibrary/c_utils/base/include",
     "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_hal",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_hal/common",
   ]
-  deps = [
-    "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog",
-    "//utils/native/base:utils",
-  ]
+  deps = [ "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog" ]
+
+  external_deps = [ "c_utils:utils" ]
+
   part_name = "wifi"
   subsystem_name = "communication"
 }

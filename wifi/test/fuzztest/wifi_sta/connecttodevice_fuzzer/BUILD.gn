@@ -38,12 +38,12 @@ ohos_fuzztest("ConnectToDeviceFuzzTest") {
   ]
   sources = [ "connecttodevice_fuzzer.cpp" ]
 
-  deps = [
-    "$WIFI_ROOT_DIR/frameworks/native:wifi_sdk",
-    "//utils/native/base:utils",
-  ]
+  deps = [ "$WIFI_ROOT_DIR/frameworks/native:wifi_sdk" ]
 
-  external_deps = [ "ipc:ipc_core" ]
+  external_deps = [
+    "c_utils:utils",
+    "ipc:ipc_core",
+  ]
 
   part_name = "wifi"
   subsystem_name = "communication"

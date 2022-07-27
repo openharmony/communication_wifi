@@ -38,7 +38,7 @@ ohos_shared_library("wifi_ap_service") {
 
   include_dirs = [
     "$WIFI_ROOT_DIR/services/wifi_standard/ipc_framework/interface",
-    "//utils/native/base/include",
+    "//commonlibrary/c_utils/base/include",
     "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
     "$WIFI_ROOT_DIR/frameworks/native/interfaces",
     "$WIFI_ROOT_DIR/services/wifi_standard/ipc_framework/cRPC/include",
@@ -70,7 +70,10 @@ ohos_shared_library("wifi_ap_service") {
     "-Wl,-E",
   ]
 
-  external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+  external_deps = [
+    "c_utils:utils",
+    "hiviewdfx_hilog_native:libhilog",
+  ]
 
   deps = [
     "$DHCP_ROOT_DIR/services/mgr_service:dhcp_manager_service",
@@ -78,7 +81,6 @@ ohos_shared_library("wifi_ap_service") {
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/idl_client:wifi_idl_client",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common:wifi_common_service",
     "$WIFI_ROOT_DIR/utils/src:wifi_utils",
-    "//utils/native/base:utils",
   ]
 
   defines = [ "AP_INTF=\"$wifi_feature_with_ap_intf\"" ]

@@ -136,11 +136,11 @@ ErrCode StaInterface::Disconnect()
     return WIFI_OPT_SUCCESS;
 }
 
-int StaInterface::AddCandidateConfig(const int uid, const WifiDeviceConfig &config)
+ErrCode StaInterface::AddCandidateConfig(const int uid, const WifiDeviceConfig &config, int& netWorkId)
 {
     LOGD("Enter StaInterface::AddCandidateConfig.\n");
     CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
-    return pStaService->AddCandidateConfig(uid, config);
+    return pStaService->AddCandidateConfig(uid, config, netWorkId);
 }
 
 ErrCode StaInterface::ConnectToCandidateConfig(const int uid, const int networkId)

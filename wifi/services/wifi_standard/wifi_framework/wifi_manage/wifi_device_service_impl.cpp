@@ -417,12 +417,7 @@ ErrCode WifiDeviceServiceImpl::AddCandidateConfig(const WifiDeviceConfig &config
     if (pService == nullptr) {
         return WIFI_OPT_STA_NOT_OPENED;
     }
-    int retNetworkId = pService->AddCandidateConfig(uid, config);
-    if (retNetworkId < 0) {
-        return WIFI_OPT_FAILED;
-    }
-    networkId = retNetworkId;
-    return WIFI_OPT_SUCCESS;
+    return pService->AddCandidateConfig(uid, config, networkId);
 }
 
 ErrCode WifiDeviceServiceImpl::ConnectToCandidateConfig(int networkId)

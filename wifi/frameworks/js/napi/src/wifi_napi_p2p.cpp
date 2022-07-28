@@ -155,7 +155,7 @@ napi_value GetP2pGroups(napi_env env, napi_callback_info info)
 
     asyncContext->completeFunc = [&](void* data) -> void {
         P2pGroupInfoListAsyncContext *context = static_cast<P2pGroupInfoListAsyncContext *>(data);
-        napi_create_object(context->env, &context->result);
+        napi_create_array_with_length(context->env, context->vecGroupInfoList.size(), &context->result);
         context->errorCode = GroupsToJsArray(context->env, context->vecGroupInfoList, context->result);
         WIFI_LOGI("Push get group info list to client");
     };

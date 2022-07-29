@@ -215,12 +215,13 @@ napi_value GetScanResults(napi_env env, napi_callback_info info)
     }
 
     WIFI_LOGI("GetScanInfoList, size: %{public}zu", scanInfos.size());
-    napi_value result;
-    ret = NativeScanInfosToJsObj(env, scanInfos, result);
+    napi_value arrayResult;
+    napi_create_array_with_length(env, scanInfos.size(), &arrayResult);
+    ret = NativeScanInfosToJsObj(env, scanInfos, arrayResult);
     if (ret != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("NativeScanInfosToJsObj return fail: %{public}d", ret);
     }
-    return result;
+    return arrayResult;
 }
 
 static void ConvertEncryptionMode(const SecTypeJs& securityType, std::string& keyMgmt)
@@ -529,6 +530,7 @@ napi_value AddCandidateConfig(napi_env env, napi_callback_info info)
         TRACE_FUNC_CALL_NAME("wifiDevicePtr->AddCandidateConfig");
         ErrCode ret = wifiDevicePtr->AddCandidateConfig(*context->config, context->networkId);
         if (context->networkId < 0 || ret != WIFI_OPT_SUCCESS) {
+            WIFI_LOGE("Add candidate device config failed: %{public}d", static_cast<int>(ret));
             context->networkId = -1;
         }
         context->errorCode = ret;
@@ -541,7 +543,7 @@ napi_value AddCandidateConfig(napi_env env, napi_callback_info info)
             delete context->config;
             context->config = nullptr;
         }
-        WIFI_LOGI("Push add untrusted device config result to client");
+        WIFI_LOGI("Push add candidate device config result to client");
     };
 
     size_t nonCallbackArgNum = 1;
@@ -580,7 +582,7 @@ napi_value RemoveCandidateConfig(napi_env env, napi_callback_info info)
             delete context->config;
             context->config = nullptr;
         }
-        WIFI_LOGI("Push remove untrusted device config result to client");
+        WIFI_LOGI("Push remove candidate device config result to client");
     };
 
     size_t nonCallbackArgNum = 1;

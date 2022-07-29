@@ -60,13 +60,11 @@ public:
     napi_env env;
     napi_ref callbackRef;
     std::function<napi_value ()> packResult;
-    std::function<bool ()> isObjExist;
 
-    explicit AsyncEventData(napi_env e, napi_ref r, std::function<napi_value ()> p, std::function<bool ()> checkFunc) {
+    explicit AsyncEventData(napi_env e, napi_ref r, std::function<napi_value ()> p) {
         env = e;
         callbackRef = r;
         packResult = p;
-        isObjExist = checkFunc;
     }
 
     AsyncEventData() = delete;
@@ -98,10 +96,8 @@ public:
         }
         for (auto& each : vecObj) {
             auto resultFunc = [this, env = each.m_regEnv, obj] () -> napi_value { return CreateResult(env, obj); };
-            auto isObjExistFunc = [this, eventObj = each, type] () -> bool
-                { return IsRegisterObjectExist(eventObj, type); };
             AsyncEventData *asyncEvent =
-                new (std::nothrow)AsyncEventData(each.m_regEnv, each.m_regHanderRef, resultFunc, isObjExistFunc);
+                new (std::nothrow)AsyncEventData(each.m_regEnv, each.m_regHanderRef, resultFunc);
             if (asyncEvent == nullptr) {
                 return;
             }

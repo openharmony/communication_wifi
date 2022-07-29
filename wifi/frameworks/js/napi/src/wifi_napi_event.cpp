@@ -121,25 +121,23 @@ void NapiEvent::EventNotify(AsyncEventData *asyncEvent)
             napi_open_handle_scope(asyncData->env, &scope);
             if (scope == nullptr) {
                 WIFI_LOGE("scope is nullptr");
-                napi_close_handle_scope(asyncData->env, scope);
                 goto EXIT;
             }
             napi_value undefine;
             napi_get_undefined(asyncData->env, &undefine);
             napi_get_reference_value(asyncData->env, asyncData->callbackRef, &handler);
-            jsEvent = asyncData->packResult();
-            {
-                std::shared_lock<std::shared_mutex> guard(g_regInfoMutex);
-                WIFI_LOGI("Push event to js, env: %{private}p, ref : %{private}p",
-                    asyncData->env, &asyncData->callbackRef);
-                if (asyncData->isObjExist() &&
-                    (napi_call_function(asyncData->env, nullptr, handler, 1, &jsEvent, &undefine) != napi_ok)) {
-                    WIFI_LOGE("Report event to Js failed");
-                }
+            if (handler == nullptr) {
+                WIFI_LOGE("handler is nullptr");
+                goto EXIT;
             }
-            napi_close_handle_scope(asyncData->env, scope);
+            jsEvent = asyncData->packResult();
+            WIFI_LOGI("Push event to js, env: %{private}p, ref : %{private}p", asyncData->env, &asyncData->callbackRef);
+            if (napi_call_function(asyncData->env, nullptr, handler, 1, &jsEvent, &undefine) != napi_ok) {
+                WIFI_LOGE("Report event to Js failed");
+            }
 
         EXIT:
+            napi_close_handle_scope(asyncData->env, scope);
             delete asyncData;
             asyncData = nullptr;
             delete work;
@@ -625,6 +623,7 @@ void EventRegister::DeleteRegisterObj(const napi_env& env, std::vector<RegObj>& 
             napi_strict_equals(iter->m_regEnv, handlerTemp, handler, &isEqual);
             if (isEqual) {
                 napi_delete_reference(iter->m_regEnv, iter->m_regHanderRef);
+                napi_reference_unref(iter->m_regEnv, iter->m_regHanderRef, nullptr);
                 WIFI_LOGI("Delete register object ref.");
                 iter = vecRegObjs.erase(iter);
             } else {
@@ -643,6 +642,7 @@ void EventRegister::DeleteAllRegisterObj(const napi_env& env, std::vector<RegObj
     for (; iter != vecRegObjs.end();) {
         if (env == iter->m_regEnv) {
             napi_delete_reference(iter->m_regEnv, iter->m_regHanderRef);
+            napi_reference_unref(iter->m_regEnv, iter->m_regHanderRef, nullptr);
             iter = vecRegObjs.erase(iter);
         } else {
             WIFI_LOGI("Unregister all event, env is not equal %{private}p, : %{private}p", env, iter->m_regEnv);

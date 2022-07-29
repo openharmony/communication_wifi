@@ -92,9 +92,10 @@ public:
      *
      * @param uid - call app uid
      * @param config - WifiDeviceConfig object
+     * @param netWorkId - the network id of the hotspot configuration.(out)
      * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
      */
-    virtual int AddCandidateConfig(const int uid, const WifiDeviceConfig &config) const;
+    virtual ErrCode AddCandidateConfig(const int uid, const WifiDeviceConfig &config, int& netWorkId) const;
     /**
      * @Description Connect to a candidate specified network.
      *

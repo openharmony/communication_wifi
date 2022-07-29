@@ -16,6 +16,7 @@
 #ifndef WIFI_WPA_HAL_H
 #define WIFI_WPA_HAL_H
 
+#include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdint.h>
@@ -50,7 +51,7 @@ struct stWifiWpaInterface {
     int (*wpaCliConnect)(WifiWpaInterface *p);
     void (*wpaCliClose)(WifiWpaInterface *p);
 
-    int (*wpaCliAddIface)(WifiWpaInterface *p, const AddInterfaceArgv *argv);
+    int (*wpaCliAddIface)(WifiWpaInterface *p, const AddInterfaceArgv *argv, bool isWpaAdd);
     int (*wpaCliRemoveIface)(WifiWpaInterface *p, const char *name);
 };
 

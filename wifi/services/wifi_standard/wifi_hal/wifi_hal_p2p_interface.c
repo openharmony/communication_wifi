@@ -28,7 +28,12 @@
 
 const int P2P_CONNECT_DELAY_TIME = 100000;
 const char *g_wpaSupplicantP2p = "wpa_supplicant";
+#ifdef NON_SEPERATE_P2P
+const char *g_systemCmdWpaP2pStart = "wpa_supplicant -iglan0 -g/data/misc/wifi/sockets/wpa"
+    " -m /data/misc/wifi/wpa_supplicant/p2p_supplicant.conf";
+#else
 const char *g_systemCmdWpaP2pStart = "wpa_supplicant -iglan0 -g/data/misc/wifi/sockets/wpa";
+#endif
 static int g_p2pSupplicantConnectEvent = 0;
 
 static WifiErrorNo P2pStartSupplicant(void)
@@ -86,8 +91,8 @@ static WifiErrorNo StopP2pWpaAndWpaHal(void)
     }
     WifiWpaInterface *pWpaInterface = GetWifiWapGlobalInterface();
     if (pWpaInterface != NULL) {
-#ifdef PRODUCT_RK
-        pWpaInterface->wpaCliRemoveIface(pWpaInterface, "p2p-wlan0-0");
+#ifdef NON_SEPERATE_P2P
+        pWpaInterface->wpaCliRemoveIface(pWpaInterface, "p2p-dev-wlan0");
 #else
         pWpaInterface->wpaCliRemoveIface(pWpaInterface, "p2p0");
 #endif
@@ -113,15 +118,19 @@ static WifiErrorNo AddP2pIface(void)
         return WIFI_HAL_FAILED;
     }
     AddInterfaceArgv argv;
-#ifdef PRODUCT_RK
-    if (strcpy_s(argv.name, sizeof(argv.name), "wlan0") != EOK ||
+#ifdef NON_SEPERATE_P2P
+    if (strcpy_s(argv.name, sizeof(argv.name), "p2p-dev-wlan0") != EOK ||
 #else
     if (strcpy_s(argv.name, sizeof(argv.name), "p2p0") != EOK ||
 #endif
         strcpy_s(argv.confName, sizeof(argv.confName), "/data/misc/wifi/wpa_supplicant/p2p_supplicant.conf") != EOK) {
         return WIFI_HAL_FAILED;
     }
-    if (pWpaInterface->wpaCliAddIface(pWpaInterface, &argv) < 0) {
+#ifdef NON_SEPERATE_P2P
+    if (pWpaInterface->wpaCliAddIface(pWpaInterface, &argv, false) < 0) {
+#else
+    if (pWpaInterface->wpaCliAddIface(pWpaInterface, &argv, true) < 0) {
+#endif
         LOGE("Failed to add wpa iface!");
         return WIFI_HAL_FAILED;
     }

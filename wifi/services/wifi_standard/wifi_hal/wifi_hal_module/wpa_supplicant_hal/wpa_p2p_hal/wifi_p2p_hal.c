@@ -1307,8 +1307,8 @@ WifiWpaP2pInterface *GetWifiWapP2pInterface()
         LOGE("alloc memory for p2p interface failed!");
         return NULL;
     }
-#ifdef PRODUCT_RK
-    StrSafeCopy(g_wpaP2pInterface->ifName, sizeof(g_wpaP2pInterface->ifName), "wlan0");
+#ifdef NON_SEPERATE_P2P
+    StrSafeCopy(g_wpaP2pInterface->ifName, sizeof(g_wpaP2pInterface->ifName), "p2p-dev-wlan0");
 #else
     StrSafeCopy(g_wpaP2pInterface->ifName, sizeof(g_wpaP2pInterface->ifName), "p2p0");
 #endif

@@ -1294,7 +1294,7 @@ void ScreenEventSubscriber::OnReceiveEvent(const OHOS::EventFwk::CommonEventData
     if (action == OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF) {
         /* Send suspend to wpa */
         if (pService->SetSuspendMode(true) != WIFI_OPT_SUCCESS) {
-            WIFI_LOGE("RemoveAllCandidateConfig failed");
+            WIFI_LOGE("SetSuspendMode failed");
         }
         return;
     }
@@ -1302,7 +1302,7 @@ void ScreenEventSubscriber::OnReceiveEvent(const OHOS::EventFwk::CommonEventData
     if (action == OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON) {
         /* Send resume to wpa */
         if (pService->SetSuspendMode(false) != WIFI_OPT_SUCCESS) {
-            WIFI_LOGE("RemoveAllCandidateConfig failed");
+            WIFI_LOGE("SetSuspendMode failed");
         }
         return;
     }

@@ -1706,7 +1706,7 @@ WifiErrorNo WifiIdlClient::ReqP2pHid2dConnect(const Hid2dConnectConfig &config) 
 WifiErrorNo WifiIdlClient::ReqWpaSetSuspendMode(bool mode)
 {
     CHECK_CLIENT_NOT_NULL;
-    return WpaSetSuspendMode(mode);
+    return SetSuspendMode(mode);
 }
 }  // namespace Wifi
 }  // namespace OHOS

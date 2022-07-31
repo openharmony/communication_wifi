@@ -360,7 +360,7 @@ ErrCode StaService::CancelWps() const
 
 ErrCode StaService::SetCountryCode(const std::string &countryCode) const
 {
-    LOGI("Enter StaService::SetCountryCode, countryCode=[%s]!", countryCode.c_str());
+    LOGI("Enter StaService::SetCountryCode, countryCode=[%{public}s]!", countryCode.c_str());
     if (WifiSupplicantHalInterface::GetInstance().WpaSetCountryCode(countryCode) != WIFI_IDL_OPT_OK) {
         LOGE("WpaSetCountryCode() failed!");
         return WIFI_OPT_FAILED;
@@ -393,6 +393,16 @@ ErrCode StaService::ReConnect() const
     WIFI_LOGI("Enter StaService::ReConnect.\n");
     CHECK_NULL_AND_RETURN(pStaStateMachine, WIFI_OPT_FAILED);
     pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_RECONNECT_NETWORK);
+    return WIFI_OPT_SUCCESS;
+}
+
+ErrCode StaService::SetSuspendMode(bool mode) const
+{
+    LOGI("Enter StaService::SetSuspendMode, mode=[%{public}d]!", mode);
+    if (WifiSupplicantHalInterface::GetInstance().WpaSetCountryCode(mode) != WIFI_IDL_OPT_OK) {
+        LOGE("WpaSetCountryCode() failed!");
+        return WIFI_OPT_FAILED;
+    }
     return WIFI_OPT_SUCCESS;
 }
 }  // namespace Wifi

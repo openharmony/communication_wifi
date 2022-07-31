@@ -911,3 +911,19 @@ int RpcGetConnectSignalInfo(RpcServer *server, Context *context)
     WriteEnd(context);
     return HAL_SUCCESS;
 }
+
+int RpcSetSuspendMode(RpcServer *server, Context *context)
+{
+    if (server == NULL || context == NULL) {
+        return HAL_FAILURE;
+    }
+    bool mode = 0;
+    if (ReadInt(context, &mode) < 0) {
+        return HAL_FAILURE;
+    }
+    WifiErrorNo err = SetWifiTxPower(mode);
+    WriteBegin(context, 0);
+    WriteInt(context, err);
+    WriteEnd(context);
+    return HAL_SUCCESS;
+}

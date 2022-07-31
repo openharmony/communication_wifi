@@ -1230,6 +1230,29 @@ static int WpaCliCmdWpaTerminate(WifiWpaStaInterface *this)
     return WpaCliCmd(cmd, buf, sizeof(buf));
 }
 
+static int WpaCliCmdWpaSetSuspendMode(WifiWpaStaInterface *this, bool mode)
+{
+    LOGI("Enter WpaCliCmdWpaSetSuspendMode");
+    if (this == NULL) {
+        LOGE("WpaCliCmdWpaSetSuspendMode, this is NULL.");
+        return -1;
+    }
+    char cmd[CMD_BUFFER_SIZE] = {0};
+    char buf[REPLY_BUF_SMALL_LENGTH] = {0};
+    if (mode == true) {
+        if (snprintf_s(cmd, sizeof(cmd), sizeof(cmd) - 1, "IFNAME=%s SUSPEND", this->ifname) < 0) {
+            LOGE("WpaCliCmdWpaSetSuspendMode, SUSPEND, snprintf_s err");
+            return -1;
+        }
+    } else {
+        if (snprintf_s(cmd, sizeof(cmd), sizeof(cmd) - 1, "IFNAME=%s RESUME", this->ifname) < 0) {
+            LOGE("WpaCliCmdWpaSetSuspendMode, RESUME, snprintf_s err");
+            return -1;
+        }
+    }
+    return WpaCliCmd(cmd, buf, sizeof(buf));
+}
+
 WifiWpaStaInterface *GetWifiStaInterface(int staNo)
 {
     char *name;
@@ -1277,6 +1300,7 @@ WifiWpaStaInterface *GetWifiStaInterface(int staNo)
     p->wpaCliCmdScanInfo = WpaCliCmdScanInfo;
     p->wpaCliCmdGetSignalInfo = WpaCliCmdGetSignalInfo;
     p->wpaCliCmdWpaTerminate = WpaCliCmdWpaTerminate;
+    p->wpaCliCmdWpaSetSuspendMode = WpaCliCmdWpaSetSuspendMode;
     p->next = g_wpaStaInterface;
     g_wpaStaInterface = p;
 

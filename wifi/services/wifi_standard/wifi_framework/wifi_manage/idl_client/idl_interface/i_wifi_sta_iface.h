@@ -295,6 +295,13 @@ WifiErrorNo GetNetworkList(WifiNetworkInfo *infos, int *size);
  */
 WifiErrorNo GetConnectSignalInfo(const char *endBssid, WpaSignalInfo *info);
 
+/**
+ * @Description send suspend mode for wpa.
+ *
+ * @param mode: true for suspend, false for resume.
+ * @return WifiErrorNo
+ */
+WifiErrorNo SetSuspendMode(bool mode);
 #ifdef __cplusplus
 }
 #endif

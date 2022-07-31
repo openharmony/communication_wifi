@@ -47,6 +47,7 @@ std::shared_ptr<WifiDeviceServiceImpl> WifiDeviceServiceImpl::g_instance;
 std::shared_ptr<WifiDeviceServiceImpl> WifiDeviceServiceImpl::GetInstance()
 #else
 const uint32_t TIMEOUT_APP_EVENT = 3000;
+const uint32_t TIMEOUT_SCREEN_EVENT = 3000;
 using TimeOutCallback = std::function<void()>;
 sptr<WifiDeviceServiceImpl> WifiDeviceServiceImpl::g_instance;
 const bool REGISTER_RESULT = SystemAbility::MakeAndRegisterAbility(WifiDeviceServiceImpl::GetInstance().GetRefPtr());
@@ -108,7 +109,7 @@ void WifiDeviceServiceImpl::SigHandler(int sig)
 void WifiDeviceServiceImpl::OnStart()
 {
     if (mState == ServiceRunningState::STATE_RUNNING) {
-        WIFI_LOGD("Service has already started.");
+        WIFI_LOGW("Service has already started.");
         return;
     }
     (void)signal(SIGUSR1, SigHandler);
@@ -126,6 +127,13 @@ void WifiDeviceServiceImpl::OnStart()
         TimeOutCallback timeOutcallback = std::bind(&WifiDeviceServiceImpl::RegisterAppRemoved, this);
         lpTimer_->Setup();
         lpTimer_->Register(timeOutcallback, TIMEOUT_APP_EVENT, true);
+    }
+
+    if (screenEventSubscriber_ == nullptr) {
+        lpScreenTimer_ = std::make_unique<Utils::Timer>("WifiDeviceServiceImpl");
+        TimeOutCallback timeOutcallback = std::bind(&WifiDeviceServiceImpl::RegisterScreenEvent, this);
+        lpScreenTimer_->Setup();
+        lpScreenTimer_->Register(timeOutcallback, TIMEOUT_SCREEN_EVENT, true);
     }
 #endif
 }
@@ -1201,6 +1209,52 @@ int32_t WifiDeviceServiceImpl::Dump(int32_t fd, const std::vector<std::u16string
     return ERR_OK;
 }
 
+void WifiDeviceServiceImpl::RegisterAppRemoved()
+{
+    OHOS::EventFwk::MatchingSkills matchingSkills;
+    matchingSkills.AddEvent(OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_PACKAGE_REMOVED);
+    EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
+    eventSubscriber_ = std::make_shared<AppEventSubscriber>(subscriberInfo);
+    if (!EventFwk::CommonEventManager::SubscribeCommonEvent(eventSubscriber_)) {
+        WIFI_LOGE("AppEvent SubscribeCommonEvent() failed");
+    } else {
+        WIFI_LOGI("AppEvent SubscribeCommonEvent() OK");
+    }
+}
+
+void WifiDeviceServiceImpl::UnRegisterAppRemoved()
+{
+    if (!EventFwk::CommonEventManager::UnSubscribeCommonEvent(eventSubscriber_)) {
+        WIFI_LOGE("AppEvent UnSubscribeCommonEvent() failed");
+    } else {
+        WIFI_LOGI("AppEvent UnSubscribeCommonEvent() OK");
+    }
+    eventSubscriber_ = nullptr;
+}
+
+void WifiDeviceServiceImpl::RegisterScreenEvent()
+{
+    OHOS::EventFwk::MatchingSkills matchingSkills;
+    matchingSkills.AddEvent(OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON);
+    matchingSkills.AddEvent(OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF);
+    EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
+    screenEventSubscriber_ = std::make_shared<ScreenEventReceiver>(subscriberInfo);
+    if (!EventFwk::CommonEventManager::SubscribeCommonEvent(screenEventSubscriber_)) {
+        WIFI_LOGE("ScreenEvent SubscribeCommonEvent() failed");
+    } else {
+        WIFI_LOGI("ScreenEvent SubscribeCommonEvent() OK");
+    }
+}
+
+void WifiDeviceServiceImpl::UnRegisterScreenEvent()
+{
+    if (!EventFwk::CommonEventManager::UnSubscribeCommonEvent(screenEventSubscriber_)) {
+        WIFI_LOGE("ScreenEvent UnSubscribeCommonEvent() failed");
+    } else {
+        WIFI_LOGI("ScreenEvent UnSubscribeCommonEvent() OK");
+    }
+    screenEventSubscriber_ = nullptr;
+}
 
 void AppEventSubscriber::OnReceiveEvent(const OHOS::EventFwk::CommonEventData &data)
 {
@@ -1227,29 +1281,31 @@ void AppEventSubscriber::OnReceiveEvent(const OHOS::EventFwk::CommonEventData &d
     }
 }
 
-void WifiDeviceServiceImpl::RegisterAppRemoved()
+void ScreenEventSubscriber::OnReceiveEvent(const OHOS::EventFwk::CommonEventData &data)
 {
-    WIFI_LOGI("RegisterAppRemoved");
-    OHOS::EventFwk::MatchingSkills matchingSkills;
-    matchingSkills.AddEvent(OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_PACKAGE_REMOVED);
-    EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
-    eventSubscriber_ = std::make_shared<AppEventSubscriber>(subscriberInfo);
-    if (!EventFwk::CommonEventManager::SubscribeCommonEvent(eventSubscriber_)) {
-        WIFI_LOGE("SubscribeCommonEvent() failed");
-    } else {
-        WIFI_LOGE("SubscribeCommonEvent() OK");
+    std::string action = data.GetWant().GetAction();
+    WIFI_LOGI("ScreenEventSubscriber::OnReceiveEvent: %{public}s.", action.c_str());
+    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst();
+    if (pService == nullptr) {
+        WIFI_LOGE("sta service is NOT start!");
+        return;
     }
-}
 
-void WifiDeviceServiceImpl::UnRegisterAppRemoved()
-{
-    WIFI_LOGI("UnRegisterAppRemoved");
-    if (!EventFwk::CommonEventManager::UnSubscribeCommonEvent(eventSubscriber_)) {
-        WIFI_LOGE("UnSubscribeCommonEvent() failed");
-    } else {
-        WIFI_LOGE("UnSubscribeCommonEvent() OK");
+    if (action == OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF) {
+        /* Send suspend to wpa */
+        if (pService->SetSuspendMode(true) != WIFI_OPT_SUCCESS) {
+            WIFI_LOGE("RemoveAllCandidateConfig failed");
+        }
+        return;
     }
-    eventSubscriber_ = nullptr;
+
+    if (action == OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON) {
+        /* Send resume to wpa */
+        if (pService->SetSuspendMode(false) != WIFI_OPT_SUCCESS) {
+            WIFI_LOGE("RemoveAllCandidateConfig failed");
+        }
+        return;
+    }
 }
 #endif
 }  // namespace Wifi

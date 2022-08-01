@@ -1107,7 +1107,7 @@ static int HasNobindgRequest(PDhcpServerContext ctx, PDhcpMsgInfo received, PDhc
         }
         return NotBindingRequest(&srvIns->addressPool, received, reply);
     }
-    return REPLY_ACK;
+    return REPLY_NONE;
 }
 
 static int OnReceivedRequest(PDhcpServerContext ctx, PDhcpMsgInfo received, PDhcpMsgInfo reply)
@@ -1121,10 +1121,7 @@ static int OnReceivedRequest(PDhcpServerContext ctx, PDhcpMsgInfo received, PDhc
     AddressBinding *binding = srvIns->addressPool.binding(received->packet.chaddr, &received->options);
     if (binding == NULL) {
         LOGE("OnReceivedRequest, binding is null");
-        return REPLY_NONE;
-    }
-    if ((ret = HasNobindgRequest(ctx, received, reply)) != REPLY_ACK) {
-        return ret;
+        return HasNobindgRequest(ctx, received, reply);
     }
     Rebinding(&srvIns->addressPool, binding);
     AddressBinding *lease = GetLease(&srvIns->addressPool, yourIpAddr);

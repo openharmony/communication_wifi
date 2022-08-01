@@ -1238,7 +1238,7 @@ void WifiDeviceServiceImpl::RegisterScreenEvent()
     matchingSkills.AddEvent(OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON);
     matchingSkills.AddEvent(OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF);
     EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
-    screenEventSubscriber_ = std::make_shared<ScreenEventReceiver>(subscriberInfo);
+    screenEventSubscriber_ = std::make_shared<ScreenEventSubscriber>(subscriberInfo);
     if (!EventFwk::CommonEventManager::SubscribeCommonEvent(screenEventSubscriber_)) {
         WIFI_LOGE("ScreenEvent SubscribeCommonEvent() failed");
     } else {

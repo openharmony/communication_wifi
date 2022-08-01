@@ -278,7 +278,7 @@ ErrCode StaInterface::RegisterStaServiceCallback(const StaServiceCallback &callb
 ErrCode StaInterface::SetSuspendMode(bool mode)
 {
     LOGI("Enter StaInterface::SetSuspendMode, mode=[%{public}d]!", mode);
-    if (pStaService->SetSuspendMode(mode) != WIFI_IDL_OPT_OK) {
+    if (pStaService->SetSuspendMode(mode) != WIFI_OPT_SUCCESS) {
         LOGE("SetSuspendMode() failed!");
         return WIFI_OPT_FAILED;
     }

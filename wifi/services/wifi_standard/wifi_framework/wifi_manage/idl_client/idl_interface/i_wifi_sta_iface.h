@@ -16,8 +16,8 @@
 #ifndef OHOS_IDL_IWIFI_STA_IFACE_H
 #define OHOS_IDL_IWIFI_STA_IFACE_H
 
-#include "wifi_error_no.h"
 #include <stdbool.h>
+#include "wifi_error_no.h"
 #include "i_wifi_event_callback.h"
 #include "i_wifi_struct.h"
 

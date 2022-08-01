@@ -205,7 +205,7 @@ if (defined(ohos_lite)) {
     }
 
     if (product_name == "rk3568") {
-      defines = [ "PRODUCT_RK" ]
+      defines = [ "NON_SEPERATE_P2P" ]
     }
   }
 

@@ -747,7 +747,7 @@ static void WpaCliClose(WifiWpaInterface *p)
     return;
 }
 
-static int WpaCliAddIface(WifiWpaInterface *p, const AddInterfaceArgv *argv)
+static int WpaCliAddIface(WifiWpaInterface *p, const AddInterfaceArgv *argv, bool isWpaAdd)
 {
     if (p == NULL || argv == NULL) {
         return -1;
@@ -768,8 +768,8 @@ static int WpaCliAddIface(WifiWpaInterface *p, const AddInterfaceArgv *argv)
     char cmd[WPA_CMD_BUF_LEN] = {0};
     char buf[WPA_CMD_REPLY_BUF_SMALL_LEN] = {0};
     LOGI("WpaCliAddIface CMD: %{public}s", cmd);
-    if (snprintf_s(cmd, sizeof(cmd), sizeof(cmd) - 1, "INTERFACE_ADD %s\t%s", argv->name, argv->confName) < 0 ||
-        WpaCliCmd(cmd, buf, sizeof(buf)) != 0) {
+    if (isWpaAdd && (snprintf_s(cmd, sizeof(cmd), sizeof(cmd) - 1, "INTERFACE_ADD %s\t%s",
+        argv->name, argv->confName) < 0 || WpaCliCmd(cmd, buf, sizeof(buf)) != 0)) {
         free(info);
         info = NULL;
         LOGI("WpaCliAddIface buf: %{public}s", buf);

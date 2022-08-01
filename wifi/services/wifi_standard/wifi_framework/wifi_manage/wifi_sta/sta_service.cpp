@@ -399,8 +399,8 @@ ErrCode StaService::ReConnect() const
 ErrCode StaService::SetSuspendMode(bool mode) const
 {
     LOGI("Enter StaService::SetSuspendMode, mode=[%{public}d]!", mode);
-    if (WifiSupplicantHalInterface::GetInstance().WpaSetCountryCode(mode) != WIFI_IDL_OPT_OK) {
-        LOGE("WpaSetCountryCode() failed!");
+    if (WifiSupplicantHalInterface::GetInstance().WpaSetSuspendMode(mode) != WIFI_IDL_OPT_OK) {
+        LOGE("WpaSetSuspendMode() failed!");
         return WIFI_OPT_FAILED;
     }
     return WIFI_OPT_SUCCESS;

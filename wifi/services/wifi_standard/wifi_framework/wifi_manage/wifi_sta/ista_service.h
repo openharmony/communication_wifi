@@ -202,6 +202,13 @@ public:
      * @return ErrCode - success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
      */
     virtual ErrCode RegisterStaServiceCallback(const StaServiceCallback &callbacks) = 0;
+    /**
+     * @Description send suspend mode for wpa.
+     *
+     * @param mode: true for suspend, false for resume.
+     * @return WifiErrorNo
+     */
+    virtual ErrCode SetSuspendMode(bool mode) = 0;
 };
 }  // namespace Wifi
 }  // namespace OHOS

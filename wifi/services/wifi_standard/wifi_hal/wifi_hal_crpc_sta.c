@@ -917,10 +917,11 @@ int RpcSetSuspendMode(RpcServer *server, Context *context)
     if (server == NULL || context == NULL) {
         return HAL_FAILURE;
     }
-    bool mode = 0;
-    if (ReadInt(context, &mode) < 0) {
+    int tmpMode = 0;
+    if (ReadInt(context, &tmpMode) < 0) {
         return HAL_FAILURE;
     }
+    bool mode = (tmpMode == 0) ? false : true;
     WifiErrorNo err = SetSuspendMode(mode);
     WriteBegin(context, 0);
     WriteInt(context, err);

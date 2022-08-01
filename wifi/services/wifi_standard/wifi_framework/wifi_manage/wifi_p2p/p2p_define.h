@@ -22,8 +22,8 @@
 
 namespace OHOS {
 namespace Wifi {
-#ifdef PRODUCT_RK
-const std::string P2P_INTERFACE("wlan0");
+#ifdef NON_SEPERATE_P2P
+const std::string P2P_INTERFACE("p2p-dev-wlan0");
 #else
 const std::string P2P_INTERFACE("p2p0");
 #endif

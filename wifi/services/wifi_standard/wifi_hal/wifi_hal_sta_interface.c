@@ -28,7 +28,12 @@
 #define WPA_TERMINATE_SLEEP_TIME (50 * 1000) /* 50ms */
 
 static const char *g_serviceName = "wpa_supplicant";
+#ifdef NON_SEPERATE_P2P
+static const char *g_startCmd = "wpa_supplicant -iglan0 -g/data/misc/wifi/sockets/wpa"
+    " -m/data/misc/wifi/wpa_supplicant/p2p_supplicant.conf";
+#else
 static const char *g_startCmd = "wpa_supplicant -iglan0 -g/data/misc/wifi/sockets/wpa";
+#endif
 
 static WifiErrorNo AddWpaIface(int staNo)
 {
@@ -53,7 +58,7 @@ static WifiErrorNo AddWpaIface(int staNo)
             return WIFI_HAL_FAILED;
         }
     }
-    if (pWpaInterface->wpaCliAddIface(pWpaInterface, &argv) < 0) {
+    if (pWpaInterface->wpaCliAddIface(pWpaInterface, &argv, true) < 0) {
         LOGE("Failed to add wpa iface!");
         return WIFI_HAL_FAILED;
     }
@@ -146,6 +151,11 @@ WifiErrorNo StartSupplicant(void)
     if (CopyConfigFile("wpa_supplicant.conf") != 0) {
         return WIFI_HAL_FAILED;
     }
+#ifdef NON_SEPERATE_P2P
+    if (CopyConfigFile("p2p_supplicant.conf") != 0) {
+        return WIFI_HAL_FAILED;
+    }
+#endif
     ModuleManageRetCode ret = StartModule(g_serviceName, g_startCmd);
     if (ret != MM_SUCCESS) {
         LOGE("start wpa_supplicant failed!");

@@ -20,6 +20,7 @@
 #include <string.h>
 #include <malloc.h>
 #include <stdint.h>
+#include <stdbool.h>
 #include "wifi_hal_struct.h"
 #include "wifi_hal_define.h"
 

@@ -21,6 +21,7 @@
 #include <unistd.h>
 #include <dirent.h>
 #include <stdio.h>
+#include <stdbool.h>
 #include <sys/types.h>
 #include "wifi_hal_define.h"
 #include "wifi_hal_struct.h"
@@ -389,6 +390,14 @@ WifiErrorNo GetNetworkList(WifiNetworkInfo *infos, int *size);
  * @return WifiErrorNo
  */
 WifiErrorNo GetConnectSignalInfo(const char *endBssid, WpaSignalInfo *info);
+
+/**
+ * @Description Send suspend mode to wpa
+ *
+ * @param mode - true for suspend mode, false for resume mode.
+ * @return WifiErrorNo
+ */
+WifiErrorNo SetSuspendMode(bool mode);
 #ifdef __cplusplus
 }
 #endif

@@ -122,7 +122,7 @@ public:
      *
      * @Return success: WIFI_OPT_SUCCESS, fail: WIFI_OPT_FAILED
      */
-    virtual ErrCode WpaSetSuspendMode(bool mode) const;
+    WifiErrorNo WpaSetSuspendMode(bool mode) const;
 private:
     SupplicantEventCallback mCallback;
 };

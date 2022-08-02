@@ -12,13 +12,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include "i_wifi_hotspot_iface.h"
+#include <stddef.h>
 #include "client.h"
+#include "context.h"
+#include "i_wifi_public_func.h"
 #include "serial.h"
-#include "wifi_log.h"
 #include "wifi_idl_define.h"
 #include "wifi_idl_inner_interface.h"
-#include "i_wifi_public_func.h"
+#include "wifi_log.h"
 
 #undef LOG_TAG
 #define LOG_TAG "WifiIdlHotspotIface"

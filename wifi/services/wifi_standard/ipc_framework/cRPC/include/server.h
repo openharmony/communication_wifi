@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -15,12 +15,11 @@
 #ifndef CRPC_SERVER_H
 #define CRPC_SERVER_H
 
-#include "common.h"
+#include <pthread.h>
+#include <bits/alltypes.h>
 #include "context.h"
 #include "evloop.h"
 #include "hash_table.h"
-#include "net.h"
-#include "serial.h"
 
 #ifdef __cplusplus
 extern "C" {

@@ -46,6 +46,7 @@ if (defined(ohos_lite)) {
       "//foundation/distributedschedule/samgr_lite/interfaces/innerkits/samgr",
       "//third_party/bounds_checking_function/include",
       "//utils/native/lite/include",
+      "//commonlibrary/c_utils/base/include",
     ]
 
     deps = [

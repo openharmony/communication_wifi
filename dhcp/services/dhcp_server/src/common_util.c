@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,23 +12,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include "common_util.h"
-#include <stdio.h>
-#include <stdint.h>
 #include <ctype.h>
-#include <signal.h>
 #include <securec.h>
-#include <fcntl.h>
-#include <unistd.h>
-#include <limits.h>
-#include <time.h>
-#include <sys/time.h>
-#include <sys/types.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <string.h>
 #include <sys/stat.h>
-#include <net/if.h>
-#include <arpa/inet.h>
-#include "dhcp_logger.h"
+#include <sys/time.h>
+#include <time.h>
+#include <unistd.h>
 #include "dhcp_define.h"
+#include "dhcp_logger.h"
 
 #define NEW_FILEPATH_MODE 0755
 #define TIME_BASE_YEAR 1900

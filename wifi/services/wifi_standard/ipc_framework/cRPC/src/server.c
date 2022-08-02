@@ -12,8 +12,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include "server.h"
+#include <fcntl.h>
+#include <pthread.h>
+#include <unistd.h>
+#include <stdlib.h>
+#include <bits/fcntl.h>
+#include <sys/epoll.h>
+#include <sys/socket.h>
+#include <sys/un.h>
+#include "common.h"
 #include "log.h"
+#include "net.h"
 
 #undef LOG_TAG
 #define LOG_TAG "WifiRpcServer"

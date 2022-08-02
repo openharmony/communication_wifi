@@ -12,10 +12,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include "client.h"
+#include <pthread.h>
+#include <securec.h>
 #include <signal.h>
-#include <sys/time.h>
+#include <string.h>
+#include <sys/un.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include "common.h"
 #include "log.h"
+#include "net.h"
 
 #undef LOG_TAG
 #define LOG_TAG "WifiRpcClient"

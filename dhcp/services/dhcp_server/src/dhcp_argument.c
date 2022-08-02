@@ -14,12 +14,17 @@
  */
 
 #include "dhcp_argument.h"
-#include "dhcp_option.h"
-#include "dhcp_config.h"
-#include "address_utils.h"
-#include "securec.h"
-#include "dhcp_logger.h"
 #include <getopt.h>
+#include <securec.h>
+#include <stddef.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <string.h>
+#include "address_utils.h"
+#include "dhcp_define.h"
+#include "dhcp_logger.h"
+#include "hash_table.h"
+
 #undef LOG_TAG
 #define LOG_TAG "DhcpArgument"
 

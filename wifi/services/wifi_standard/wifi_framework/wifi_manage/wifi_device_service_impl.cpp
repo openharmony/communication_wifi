@@ -156,7 +156,6 @@ void WifiDeviceServiceImpl::OnStop()
     }
     if (screenEventSubscriber_ != nullptr) {
         UnRegisterScreenEvent();
-        screenEventSubscriber_ = nullptr;
     }
     if (lpScreenTimer_ != nullptr) {
         lpScreenTimer_->Shutdown(false);

@@ -132,8 +132,12 @@ void WifiDeviceServiceImpl::OnStart()
     if (screenEventSubscriber_ == nullptr) {
         lpScreenTimer_ = std::make_unique<Utils::Timer>("WifiDeviceServiceImpl");
         TimeOutCallback timeOutcallback = std::bind(&WifiDeviceServiceImpl::RegisterScreenEvent, this);
-        lpScreenTimer_->Setup();
-        lpScreenTimer_->Register(timeOutcallback, TIMEOUT_SCREEN_EVENT, true);
+        if (lpScreenTimer_ != nullptr) {
+            lpScreenTimer_->Setup();
+            lpScreenTimer_->Register(timeOutcallback, TIMEOUT_SCREEN_EVENT, true);
+        } else {
+            WIFI_LOGE("lpScreenTimer_ is nullptr");
+        }
     }
 #endif
 }
@@ -149,6 +153,14 @@ void WifiDeviceServiceImpl::OnStop()
     if (lpTimer_ != nullptr) {
         lpTimer_->Shutdown(false);
         lpTimer_ = nullptr;
+    }
+    if (screenEventSubscriber_ != nullptr) {
+        UnRegisterScreenEvent();
+        screenEventSubscriber_ = nullptr;
+    }
+    if (lpScreenTimer_ != nullptr) {
+        lpScreenTimer_->Shutdown(false);
+        lpScreenTimer_ = nullptr;
     }
 #endif
     WIFI_LOGI("Stop sta service!");

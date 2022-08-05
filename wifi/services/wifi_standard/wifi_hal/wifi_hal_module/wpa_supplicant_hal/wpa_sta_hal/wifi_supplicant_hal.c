@@ -1232,23 +1232,17 @@ static int WpaCliCmdWpaTerminate(WifiWpaStaInterface *this)
 
 static int WpaCliCmdWpaSetSuspendMode(WifiWpaStaInterface *this, bool mode)
 {
-    LOGI("Enter WpaCliCmdWpaSetSuspendMode");
+    LOGI("Enter WpaCliCmdWpaSetSuspendMode, mode:%{public}d.");
     if (this == NULL) {
         LOGE("WpaCliCmdWpaSetSuspendMode, this is NULL.");
         return -1;
     }
     char cmd[CMD_BUFFER_SIZE] = {0};
     char buf[REPLY_BUF_SMALL_LENGTH] = {0};
-    if (mode == true) {
-        if (snprintf_s(cmd, sizeof(cmd), sizeof(cmd) - 1, "IFNAME=%s SUSPEND", this->ifname) < 0) {
-            LOGE("WpaCliCmdWpaSetSuspendMode, SUSPEND, snprintf_s err");
-            return -1;
-        }
-    } else {
-        if (snprintf_s(cmd, sizeof(cmd), sizeof(cmd) - 1, "IFNAME=%s RESUME", this->ifname) < 0) {
-            LOGE("WpaCliCmdWpaSetSuspendMode, RESUME, snprintf_s err");
-            return -1;
-        }
+    if (snprintf_s(cmd, sizeof(cmd), sizeof(cmd) - 1, "IFNAME=%s DRIVER SETSUSPENDMODE %d",
+        this->ifname, mode) < 0) {
+        LOGE("WpaCliCmdWpaSetSuspendMode, snprintf_s err");
+        return -1;
     }
     return WpaCliCmd(cmd, buf, sizeof(buf));
 }

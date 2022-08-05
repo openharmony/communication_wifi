@@ -1302,7 +1302,10 @@ void ScreenEventSubscriber::OnReceiveEvent(const OHOS::EventFwk::CommonEventData
         return;
     }
 
-    if (action == OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF) {
+    int screenState = WifiSettings::GetInstance().GetScreenState();
+    if (action == OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF &&
+        screenState = MODE_STATE_OPEN) {
+        WifiSettings::GetInstance().SetScreenState(MODE_STATE_CLOSE);
         /* Send suspend to wpa */
         if (pService->SetSuspendMode(true) != WIFI_OPT_SUCCESS) {
             WIFI_LOGE("SetSuspendMode failed");
@@ -1310,13 +1313,16 @@ void ScreenEventSubscriber::OnReceiveEvent(const OHOS::EventFwk::CommonEventData
         return;
     }
 
-    if (action == OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON) {
+    if (action == OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON &&
+        screenState == MODE_STATE_CLOSE) {
+        WifiSettings::GetInstance().SetScreenState(MODE_STATE_OPEN);
         /* Send resume to wpa */
         if (pService->SetSuspendMode(false) != WIFI_OPT_SUCCESS) {
             WIFI_LOGE("SetSuspendMode failed");
         }
         return;
     }
+    WIFI_LOGW("ScreenEventSubscriber::OnReceiveEvent, screen state: %{public}d.", screenState);
 }
 #endif
 }  // namespace Wifi

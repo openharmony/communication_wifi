@@ -1104,7 +1104,7 @@ private:
     int mApMaxConnNum;           /* ap support max sta numbers */
     int mLastSelectedNetworkId;  /* last selected networkid */
     time_t mLastSelectedTimeVal; /* last selected time */
-    int mScreenState;            /* 1 on 2 off */
+    int mScreenState;            /* 1 MODE_STATE_OPEN, 2 MODE_STATE_CLOSE */
     int mAirplaneModeState;      /* 1 on 2 off */
     ScanMode mAppRunningModeState; /* 0 app for 1 app back 2 sys for 3 sys back */
     int mPowerSavingModeState;   /* 1 on 2 off */

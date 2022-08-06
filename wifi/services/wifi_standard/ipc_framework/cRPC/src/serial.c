@@ -12,8 +12,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include <inttypes.h>
+
 #include "serial.h"
+#include <inttypes.h>
+#include <securec.h>
+#include <stdlib.h>
+#include <sys/un.h>
+#include "common.h"
 
 #define TMP_CHAR_LEN 64
 

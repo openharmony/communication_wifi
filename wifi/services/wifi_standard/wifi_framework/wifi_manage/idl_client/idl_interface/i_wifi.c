@@ -14,20 +14,23 @@
  */
 
 #include "i_wifi.h"
-#include "client.h" /* RPC client.h */
-#include "serial.h"
-#include "wifi_log.h"
-#include "wifi_idl_define.h"
-#include "wifi_idl_inner_interface.h"
+#include <securec.h>
+#include <stdlib.h>
+#include "client.h"
+#include "context.h"
 #include "i_wifi_chip.h"
 #include "i_wifi_chip_event_callback.h"
 #include "i_wifi_event_callback.h"
-#include "i_wifi_hotspot_iface.h"
-#include "i_wifi_sta_iface.h"
-#include "i_wifi_supplicant_iface.h"
 #include "i_wifi_event_p2p_callback.h"
+#include "i_wifi_hotspot_iface.h"
 #include "i_wifi_p2p_iface.h"
 #include "i_wifi_public_func.h"
+#include "i_wifi_sta_iface.h"
+#include "i_wifi_supplicant_iface.h"
+#include "serial.h"
+#include "wifi_idl_define.h"
+#include "wifi_idl_inner_interface.h"
+#include "wifi_log.h"
 
 #undef LOG_TAG
 #define LOG_TAG "WifiIdlIWifi"

@@ -1232,7 +1232,7 @@ static int WpaCliCmdWpaTerminate(WifiWpaStaInterface *this)
 
 static int WpaCliCmdWpaSetSuspendMode(WifiWpaStaInterface *this, bool mode)
 {
-    LOGI("Enter WpaCliCmdWpaSetSuspendMode, mode:%{public}d.");
+    LOGI("Enter WpaCliCmdWpaSetSuspendMode, mode:%{public}d.", mode);
     if (this == NULL) {
         LOGE("WpaCliCmdWpaSetSuspendMode, this is NULL.");
         return -1;

@@ -14,12 +14,10 @@
  */
 
 #include "dhcp_address_pool.h"
+#include <securec.h>
 #include <stdint.h>
+#include <stdio.h>
 #include <string.h>
-#include <time.h>
-#include <sys/time.h>
-#include <arpa/inet.h>
-#include "securec.h"
 #include "address_utils.h"
 #include "common_util.h"
 #include "dhcp_logger.h"

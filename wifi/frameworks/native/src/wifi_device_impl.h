@@ -15,8 +15,14 @@
 #ifndef OHOS_WIFI_DEVICE_IMPL_H
 #define OHOS_WIFI_DEVICE_IMPL_H
 
+#include <string>
+#include <vector>
+#include "i_wifi_device.h"
+#include "i_wifi_device_callback.h"
+#include "refbase.h"
 #include "wifi_device.h"
-#include "wifi_device_proxy.h"
+#include "wifi_errcode.h"
+#include "wifi_msg.h"
 
 namespace OHOS {
 namespace Wifi {

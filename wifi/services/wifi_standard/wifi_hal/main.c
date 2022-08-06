@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+#include <securec.h>
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>

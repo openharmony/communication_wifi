@@ -12,10 +12,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include "wifi_device_impl.h"
+#include <new>
 #ifndef OHOS_ARCH_LITE
+#include "iremote_broker.h"
+#include "iremote_object.h"
 #include "iservice_registry.h"
 #endif
+#include "wifi_device_proxy.h"
 #include "wifi_logger.h"
 
 DEFINE_WIFILOG_LABEL("WifiDeviceImpl");

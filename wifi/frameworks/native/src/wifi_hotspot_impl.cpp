@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,9 +12,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include "wifi_hotspot_impl.h"
-#include "wifi_hotspot_mgr_proxy.h"
+#include <new>
+#include "wifi_hotspot_proxy.h"
+#include "i_wifi_hotspot_mgr.h"
+#include "iremote_broker.h"
+#include "iremote_object.h"
 #include "iservice_registry.h"
+#include "wifi_hotspot_mgr_proxy.h"
 #include "wifi_logger.h"
 
 DEFINE_WIFILOG_HOTSPOT_LABEL("WifiHotspotImpl");

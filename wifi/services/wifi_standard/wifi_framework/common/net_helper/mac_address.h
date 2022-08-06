@@ -16,9 +16,9 @@
 #ifndef OHOS_MAC_ADDRESS_H
 #define OHOS_MAC_ADDRESS_H
 
-#include <sys/socket.h>
-#include <arpa/inet.h>
+#include <cstddef>
 #include <string>
+#include <sys/socket.h>
 
 constexpr int ZERO = 0;
 constexpr int ONE = 1;

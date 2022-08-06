@@ -14,6 +14,8 @@
  */
 
 #include "wifi_hal_crpc_chip.h"
+#include <securec.h>
+#include "serial.h"
 #include "wifi_hal_chip_interface.h"
 #include "wifi_hal_define.h"
 

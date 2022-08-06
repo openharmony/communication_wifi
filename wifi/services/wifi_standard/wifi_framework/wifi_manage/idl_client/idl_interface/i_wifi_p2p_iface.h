@@ -16,9 +16,10 @@
 #ifndef OHOS_IDL_IWIFI_P2P_IFACE_H
 #define OHOS_IDL_IWIFI_P2P_IFACE_H
 
-#include "wifi_error_no.h"
+#include <stdint.h>
 #include "i_wifi_event_p2p_callback.h"
 #include "i_wifi_struct.h"
+#include "wifi_error_no.h"
 
 #ifdef __cplusplus
 extern "C" {

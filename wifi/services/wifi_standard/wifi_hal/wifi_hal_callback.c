@@ -14,6 +14,7 @@
  */
 
 #include "wifi_hal_callback.h"
+#include <securec.h>
 #include "wifi_log.h"
 #include "wifi_hal_crpc_server.h"
 #include "wifi_hal_define.h"

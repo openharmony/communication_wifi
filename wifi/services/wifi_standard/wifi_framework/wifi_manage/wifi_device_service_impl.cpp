@@ -1304,7 +1304,7 @@ void ScreenEventSubscriber::OnReceiveEvent(const OHOS::EventFwk::CommonEventData
 
     int screenState = WifiSettings::GetInstance().GetScreenState();
     if (action == OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF &&
-        screenState = MODE_STATE_OPEN) {
+        screenState == MODE_STATE_OPEN) {
         WifiSettings::GetInstance().SetScreenState(MODE_STATE_CLOSE);
         /* Send suspend to wpa */
         if (pService->SetSuspendMode(true) != WIFI_OPT_SUCCESS) {

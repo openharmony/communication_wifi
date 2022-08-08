@@ -14,6 +14,7 @@
  */
 
 #include "wifi_hal_crpc_base.h"
+#include <stdlib.h>
 #include "serial.h"
 #include "wifi_hal_base_interface.h"
 #include "wifi_hal_define.h"

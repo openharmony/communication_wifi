@@ -14,8 +14,6 @@
  */
 
 #include "net.h"
-#include <bits/errno.h>
-#include <bits/fcntl.h>
 #include <fcntl.h>
 #include <poll.h>
 #include <unistd.h>

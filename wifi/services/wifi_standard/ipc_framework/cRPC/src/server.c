@@ -18,7 +18,6 @@
 #include <pthread.h>
 #include <unistd.h>
 #include <stdlib.h>
-#include <bits/fcntl.h>
 #include <sys/epoll.h>
 #include <sys/socket.h>
 #include <sys/un.h>

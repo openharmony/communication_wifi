@@ -14,9 +14,10 @@
  */
 
 #include "wifi_hal_crpc_p2p.h"
+#include <securec.h>
+#include "serial.h"
 #include "wifi_hal_p2p_interface.h"
 #include "wifi_hal_define.h"
-#include "securec.h"
 
 int RpcP2pStart(RpcServer *server, Context *context)
 {

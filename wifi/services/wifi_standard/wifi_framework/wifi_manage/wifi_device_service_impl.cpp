@@ -208,14 +208,6 @@ ErrCode WifiDeviceServiceImpl::EnableWifi()
     }
 #endif
 
-#ifdef FEATURE_P2P_SUPPORT
-    sptr<WifiP2pServiceImpl> p2pService = WifiP2pServiceImpl::GetInstance();
-    if (p2pService != nullptr && p2pService->EnableP2p() != WIFI_OPT_SUCCESS) {
-        WIFI_LOGE("Enable P2p failed!");
-        return WIFI_OPT_FAILED;
-    }
-#endif
-
     if (!WifiConfigCenter::GetInstance().SetWifiMidState(curState, WifiOprMidState::OPENING)) {
         WIFI_LOGI("set wifi mid state opening failed!");
         return WIFI_OPT_OPEN_SUCC_WHEN_OPENED;
@@ -249,6 +241,14 @@ ErrCode WifiDeviceServiceImpl::EnableWifi()
         WifiServiceManager::GetInstance().UnloadService(WIFI_SERVICE_STA);
         return errCode;
     }
+#ifdef FEATURE_P2P_SUPPORT
+    sptr<WifiP2pServiceImpl> p2pService = WifiP2pServiceImpl::GetInstance();
+    if (p2pService != nullptr && p2pService->EnableP2p() != WIFI_OPT_SUCCESS) {
+        // only record to log
+        WIFI_LOGE("Enable P2p failed!");
+    }
+#endif
+
     WifiSettings::GetInstance().SyncWifiConfig();
     return WIFI_OPT_SUCCESS;
 }
@@ -436,12 +436,7 @@ ErrCode WifiDeviceServiceImpl::AddCandidateConfig(const WifiDeviceConfig &config
     if (pService == nullptr) {
         return WIFI_OPT_STA_NOT_OPENED;
     }
-    int retNetworkId = pService->AddCandidateConfig(uid, config);
-    if (retNetworkId < 0) {
-        return WIFI_OPT_FAILED;
-    }
-    networkId = retNetworkId;
-    return WIFI_OPT_SUCCESS;
+    return pService->AddCandidateConfig(uid, config, networkId);
 }
 
 ErrCode WifiDeviceServiceImpl::ConnectToCandidateConfig(int networkId)

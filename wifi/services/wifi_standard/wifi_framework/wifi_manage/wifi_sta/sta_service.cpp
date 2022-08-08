@@ -106,25 +106,27 @@ ErrCode StaService::DisableWifi() const
     return WIFI_OPT_SUCCESS;
 }
 
-int StaService::AddCandidateConfig(const int uid, const WifiDeviceConfig &config) const
+ErrCode StaService::AddCandidateConfig(const int uid, const WifiDeviceConfig &config, int& netWorkId) const
 {
     LOGI("Enter StaService::AddCandidateConfig.\n");
+
+    netWorkId = INVALID_NETWORK_ID;
     constexpr int UID_UNTRUSTED_CONFIG_LEN = 16;
     std::vector<WifiDeviceConfig> tempConfigs;
     WifiSettings::GetInstance().GetAllCandidateConfig(uid, tempConfigs);
     if (tempConfigs.size() >= UID_UNTRUSTED_CONFIG_LEN) {
-        LOGE("StaService::AddCandidateConfig failed, max num is 16!");
-        return INVALID_NETWORK_ID;
+        LOGE("AddCandidateConfig failed, exceed max num: %{public}d\n", UID_UNTRUSTED_CONFIG_LEN);
+        return WIFI_OPT_FAILED;
     }
 
     if (config.keyMgmt == KEY_MGMT_NONE) {
         LOGE("StaService::AddCandidateConfig unsupport open or wep key!");
         return WIFI_OPT_NOT_SUPPORTED;
     }
-
     WifiDeviceConfig tempDeviceConfig = config;
     tempDeviceConfig.uid = uid;
-    return AddDeviceConfig(tempDeviceConfig);
+    netWorkId = AddDeviceConfig(tempDeviceConfig);
+    return (netWorkId == INVALID_NETWORK_ID) ? WIFI_OPT_FAILED : WIFI_OPT_SUCCESS;
 }
 
 ErrCode StaService::RemoveCandidateConfig(const int uid, const int networkId) const

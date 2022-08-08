@@ -19,7 +19,7 @@ module_output_path = "dhcp/dhcp_server_test"
 config("module_private_config") {
   visibility = [ ":*" ]
   include_dirs = [
-    "//utils/native/base/include",
+    "//commonlibrary/c_utils/base/include",
     "$DHCP_ROOT_DIR/services/dhcp_server/include",
   ]
 }
@@ -51,7 +51,7 @@ ohos_unittest("dhcp_server_unittest") {
   ]
 
   include_dirs = [
-    "//utils/native/base/include",
+    "//commonlibrary/c_utils/base/include",
     "//third_party/googletest/googlemock/include",
     "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
     "$DHCP_ROOT_DIR/services/dhcp_server/include",
@@ -64,8 +64,9 @@ ohos_unittest("dhcp_server_unittest") {
   deps = [
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
-    "//utils/native/base:utils",
   ]
+
+  external_deps = [ "c_utils:utils" ]
 
   ldflags = [
     "-fPIC",
@@ -81,7 +82,7 @@ ohos_unittest("dhcp_server_unittest") {
   configs = [ ":module_private_config" ]
 
   if (dhcp_hilog_enable) {
-    external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+    external_deps += [ "hiviewdfx_hilog_native:libhilog" ]
     defines += [ "DHCP_HILOG_ENABLE" ]
   }
 

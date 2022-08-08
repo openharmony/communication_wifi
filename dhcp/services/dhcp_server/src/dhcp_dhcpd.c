@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,28 +13,21 @@
  * limitations under the License.
  */
 
-#include <stdint.h>
-#include <stdlib.h>
-#include <time.h>
-#include <stdio.h>
-#include <getopt.h>
-#include <fcntl.h>
-#include <ctype.h>
-#include <signal.h>
 #include <errno.h>
+#include <signal.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <unistd.h>
-#include "dhcp_server.h"
-#include "dhcp_define.h"
-#include "dhcp_logger.h"
-#include "dhcp_ipv4.h"
-#include "hash_table.h"
 #include "address_utils.h"
-#include "securec.h"
-#include "dhcp_config.h"
+#include "dhcp_address_pool.h"
 #include "dhcp_argument.h"
+#include "dhcp_config.h"
+#include "dhcp_define.h"
+#include "dhcp_ipv4.h"
+#include "dhcp_logger.h"
+#include "dhcp_option.h"
+#include "dhcp_server.h"
 
 #undef LOG_TAG
 #define LOG_TAG "DhcpServerMain"

@@ -16,9 +16,11 @@
 #ifndef OHOS_WIFI_HOTSPOT_MGR_PROXY_H
 #define OHOS_WIFI_HOTSPOT_MGR_PROXY_H
 
-#include "iremote_proxy.h"
 #include "i_wifi_hotspot_mgr.h"
-#include "wifi_errcode.h"
+#include "iremote_broker.h"
+#include "iremote_object.h"
+#include "iremote_proxy.h"
+#include "refbase.h"
 
 namespace OHOS {
 namespace Wifi {

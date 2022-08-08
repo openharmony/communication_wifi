@@ -14,6 +14,8 @@
  */
 
 #include "wifi_hal_crpc_server.h"
+#include <securec.h>
+#include "serial.h"
 #include "wifi_hal_crpc_base.h"
 #include "wifi_hal_crpc_chip.h"
 #include "wifi_hal_crpc_supplicant.h"
@@ -21,7 +23,6 @@
 #include "wifi_hal_crpc_ap.h"
 #include "wifi_hal_crpc_common.h"
 #include "wifi_hal_crpc_p2p.h"
-#include "securec.h"
 #include "wifi_log.h"
 #include "wifi_hal_common_func.h"
 

@@ -15,13 +15,15 @@
 
 #include "mac_address.h"
 #include <unistd.h>
-#include <climits>
 #include <algorithm>
+#include <cctype>
+#include <cstdlib>
+#include <securec.h>
 #include <net/if.h>
-#include <sys/ioctl.h>
+#include <net/if_arp.h>
 #include <netinet/if_ether.h>
-#include "securec.h"
-#include "log_helper.h"
+#include <sys/ioctl.h>
+#include <sys/socket.h>
 #include "wifi_log.h"
 
 #undef LOG_TAG

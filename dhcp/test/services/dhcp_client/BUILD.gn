@@ -21,7 +21,7 @@ module_output_path = "dhcp/dhcp_client_test"
 config("module_private_config") {
   visibility = [ ":*" ]
   include_dirs = [
-    "//utils/native/base/include",
+    "//commonlibrary/c_utils/base/include",
     "$DHCP_ROOT_DIR/services/dhcp_client/include",
   ]
 }
@@ -51,7 +51,7 @@ ohos_unittest("dhcp_client_unittest") {
     "$DHCP_ROOT_DIR/services/dhcp_client/test",
     "$DHCP_ROOT_DIR/services/dhcp_client/include",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/common/log",
-    "//utils/native/base/include",
+    "//commonlibrary/c_utils/base/include",
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
     "//third_party/openssl/include",
   ]
@@ -59,7 +59,6 @@ ohos_unittest("dhcp_client_unittest") {
   deps = [
     "//third_party/googletest:gmock_main",
     "//third_party/openssl:libcrypto_static",
-    "//utils/native/base:utils",
   ]
 
   ldflags = [
@@ -87,6 +86,7 @@ ohos_unittest("dhcp_client_unittest") {
   external_deps = [
     "ability_base:want",
     "bundle_framework:appexecfwk_base",
+    "c_utils:utils",
     "common_event_service:cesfwk_innerkits",
     "eventhandler:libeventhandler",
     "hiviewdfx_hilog_native:libhilog",

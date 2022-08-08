@@ -70,15 +70,15 @@ if (defined(ohos_lite)) {
     sources = local_base_sources
 
     include_dirs = local_base_include_dirs
-    include_dirs += [ "//utils/native/base/include" ]
+    include_dirs += [ "//commonlibrary/c_utils/base/include" ]
 
-    deps = [ "//utils/native/base:utils" ]
+    external_deps = [ "c_utils:utils" ]
 
     cflags_cc = [ "-fno-rtti" ]
 
     defines = [ "__OHOS__" ]
     if (dhcp_hilog_enable) {
-      external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+      external_deps += [ "hiviewdfx_hilog_native:libhilog" ]
       defines += [ "DHCP_HILOG_ENABLE" ]
     }
 

@@ -14,7 +14,15 @@
  */
 
 #include "wifi_scan_proxy.h"
+#include <cstddef>
+#include <cstdint>
+#include <new>
+#include <string>
 #include "define.h"
+#include "ipc_types.h"
+#include "iremote_proxy.h"
+#include "message_option.h"
+#include "message_parcel.h"
 #include "wifi_common_util.h"
 #include "wifi_hisysevent.h"
 #include "wifi_logger.h"

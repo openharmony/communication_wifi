@@ -14,6 +14,9 @@
  */
 
 #include "wifi_hotspot_mgr_proxy.h"
+#include "ipc_types.h"
+#include "message_option.h"
+#include "message_parcel.h"
 #include "wifi_logger.h"
 
 DEFINE_WIFILOG_HOTSPOT_LABEL("WifiHotspotMgrProxy");

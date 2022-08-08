@@ -14,7 +14,11 @@
  */
 
 #include "dhcp_service.h"
+#include <map>
+#include <string>
 #include <net/if.h>
+#include "dhcp_client_service_impl.h"
+#include "dhcp_server_service.h"
 #include "wifi_logger.h"
 
 DEFINE_WIFILOG_DHCP_LABEL("DhcpService");

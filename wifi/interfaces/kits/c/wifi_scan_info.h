@@ -42,7 +42,7 @@
 /**
  * @brief Indicates the maximum number of hotspots that can be detected in a Wi-Fi scan.
  */
-#define WIFI_SCAN_HOTSPOT_LIMIT 64
+#define WIFI_SCAN_HOTSPOT_LIMIT 128
 
 typedef enum {
     WIDTH_20MHZ = 0,

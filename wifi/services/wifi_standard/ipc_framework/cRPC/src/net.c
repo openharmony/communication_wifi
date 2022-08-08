@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,8 +12,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include "net.h"
+#include <bits/errno.h>
+#include <bits/fcntl.h>
+#include <fcntl.h>
+#include <poll.h>
+#include <unistd.h>
+#include <securec.h>
+#include <sys/socket.h>
+#include <sys/un.h>
+#include "common.h"
+#include "errno.h"
 #include "log.h"
+
 #undef LOG_TAG
 #define LOG_TAG "WifiRpcNet"
 

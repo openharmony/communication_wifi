@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,14 +17,15 @@
 #define OHOS_DHCP_ADDRESS_POOL_H
 
 #include <stdint.h>
+#include "dhcp_binding.h"
 #include "dhcp_define.h"
 #include "dhcp_option.h"
 #include "hash_table.h"
-#include "dhcp_binding.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 typedef struct DhcpAddressPool DhcpAddressPool;
 typedef AddressBinding *(*QueryBind)(uint8_t macAddr[DHCP_HWADDR_LENGTH], PDhcpOptionList cliOptins);
 typedef AddressBinding *(*AddBind)(uint8_t macAddr[DHCP_HWADDR_LENGTH], PDhcpOptionList cliOptins);

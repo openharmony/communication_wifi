@@ -232,14 +232,14 @@ int WifiManager::Init()
     }
     if (WifiConfigCenter::GetInstance().GetStaLastRunState()) { /* Automatic startup upon startup */
         WIFI_LOGE("AutoStartStaApService");
-#ifdef FEATURE_P2P_SUPPORT
-        AutoStartP2pService();
-#endif
 #ifdef OHOS_ARCH_LITE
         std::thread startStaSrvThread(WifiManager::AutoStartStaServiceThread);
         startStaSrvThread.detach();
 #else
         AutoStartStaService();
+#ifdef FEATURE_P2P_SUPPORT
+        AutoStartP2pService();
+#endif
 #endif
     } else {
         /**

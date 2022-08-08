@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,6 +14,10 @@
  */
 
 #include "evloop.h"
+#include <unistd.h>
+#include <stdlib.h>
+#include <sys/epoll.h>
+#include "common.h"
 #include "log.h"
 
 #undef LOG_TAG

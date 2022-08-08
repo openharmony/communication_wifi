@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,9 +17,10 @@
 #define OHOS_IDL_IWIFI_CHIP_H
 
 #include <stdbool.h>
-#include "wifi_error_no.h"
+#include <stdint.h>
 #include "i_wifi_chip_event_callback.h"
 #include "i_wifi_struct.h"
+#include "wifi_error_no.h"
 
 #ifdef __cplusplus
 extern "C" {

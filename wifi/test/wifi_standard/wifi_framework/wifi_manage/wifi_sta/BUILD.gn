@@ -21,7 +21,7 @@ defines += [ "OHOS_WIFI_STA_TEST" ]
 config("module_private_config") {
   visibility = [ ":*" ]
   include_dirs = [
-    "//utils/native/base/include",
+    "//commonlibrary/c_utils/base/include",
     "$WIFI_ROOT_DIR/test/wifi_standard/wifi_framework/wifi_manage/wifi_sta",
   ]
 }
@@ -95,12 +95,12 @@ ohos_unittest("wifi_sta_unittest") {
     "//third_party/googletest/googlemock/include",
     "//third_party/googletest/googletest/include",
     "//base/notification/ces_standard/cesfwk/kits/native/include",
-    "//utils/native/base/include",
+    "//commonlibrary/c_utils/base/include",
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
     "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
     "//foundation/arkui/ace_engine/frameworks/base/utils",
     "//foundation/arkui/ace_engine/frameworks",
-    "//foundation/distributedschedule/safwk/interfaces/innerkits/safwk/",
+    "//foundation/systemabilitymgr/safwk/interfaces/innerkits/safwk/",
     "//foundation/ability/ability_lite/interfaces/kits/want_lite/",
     "$WIFI_ROOT_DIR/utils/inc",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common",
@@ -113,10 +113,10 @@ ohos_unittest("wifi_sta_unittest") {
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common:wifi_common_service",
     "$WIFI_ROOT_DIR/utils/src:wifi_utils",
     "//third_party/googletest:gmock_main",
-    "//utils/native/base:utils",
   ]
   external_deps = [
     "ability_base:want",
+    "c_utils:utils",
     "hiviewdfx_hilog_native:libhilog",
     "netmanager_base:net_conn_manager_if",
   ]

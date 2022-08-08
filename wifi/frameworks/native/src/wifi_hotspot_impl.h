@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,8 +16,16 @@
 #ifndef OHOS_WIFI_HOTSPOT_IMPL_H
 #define OHOS_WIFI_HOTSPOT_IMPL_H
 
+#include <cstdint>
+#include <set>
+#include <vector>
+#include "i_wifi_hotspot.h"
+#include "i_wifi_hotspot_callback.h"
+#include "refbase.h"
+#include "wifi_ap_msg.h"
+#include "wifi_common_msg.h"
+#include "wifi_errcode.h"
 #include "wifi_hotspot.h"
-#include "wifi_hotspot_proxy.h"
 
 namespace OHOS {
 namespace Wifi {

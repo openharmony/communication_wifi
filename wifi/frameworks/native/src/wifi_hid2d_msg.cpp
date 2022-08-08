@@ -14,6 +14,7 @@
  */
 
 #include "wifi_hid2d_msg.h"
+#include <string>
 
 namespace OHOS {
 namespace Wifi {

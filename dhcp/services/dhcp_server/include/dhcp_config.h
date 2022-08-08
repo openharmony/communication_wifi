@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,18 +16,15 @@
 #ifndef OHOS_DHCP_CONFIG_H
 #define OHOS_DHCP_CONFIG_H
 
-
 #include <stdint.h>
-#include <stdint.h>
-#include <time.h>
+#include "dhcp_address_pool.h"
 #include "dhcp_define.h"
 #include "dhcp_option.h"
-#include "dhcp_address_pool.h"
-#include "dhcp_binding.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 typedef struct DhcpConfig DhcpConfig;
 struct DhcpConfig {
     char ifname[IFACE_NAME_SIZE];           /* Network interface name. */

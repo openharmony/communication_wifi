@@ -16,11 +16,14 @@
 #ifndef OHOS_DHCP_SERVICE_H
 #define OHOS_DHCP_SERVICE_H
 
-#include "i_dhcp_service.h"
+#include <memory>
+#include <string>
+#include <vector>
 #include "dhcp_define.h"
-#include "dhcp_client_service_impl.h"
-#include "dhcp_server_service.h"
-
+#include "i_dhcp_client_service.h"
+#include "i_dhcp_result_notify.h"
+#include "i_dhcp_server_service.h"
+#include "i_dhcp_service.h"
 
 namespace OHOS {
 namespace Wifi {

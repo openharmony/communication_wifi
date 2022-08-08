@@ -40,7 +40,7 @@ config("wifi_fw_common_header") {
     ]
   } else {
     include_dirs += [
-      "//utils/native/base/include",
+      "//commonlibrary/c_utils/base/include",
       "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
     ]
   }
@@ -175,10 +175,12 @@ if (defined(ohos_lite)) {
       ":net_helper",
       ":wifi_utils",
       "$WIFI_ROOT_DIR/services/wifi_standard/ipc_framework/cRPC:crpc_client",
-      "//utils/native/base:utils",
     ]
 
-    external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+    external_deps = [
+      "c_utils:utils",
+      "hiviewdfx_hilog_native:libhilog",
+    ]
     cflags_cc = [
       "-std=c++17",
       "-fno-rtti",

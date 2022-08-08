@@ -14,7 +14,9 @@
  */
 
 #include "dhcp_service_api.h"
+#include <memory>
 #include "dhcp_service.h"
+#include "i_dhcp_service.h"
 #include "wifi_logger.h"
 
 DEFINE_WIFILOG_DHCP_LABEL("DhcpServiceApi");

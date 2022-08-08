@@ -23,6 +23,7 @@ namespace OHOS {
 namespace Wifi {
 DEFINE_WIFILOG_LABEL("WifiNAPIDevice");
 static constexpr int DEFAULT_INVALID_VALUE = -1;
+static constexpr int ERROR_CODE_API_IS_NOT_SUPPORTED = 801;
 
 std::unique_ptr<WifiDevice> wifiDevicePtr = WifiDevice::GetInstance(WIFI_DEVICE_ABILITY_ID);
 std::unique_ptr<WifiScan> wifiScanPtr = WifiScan::GetInstance(WIFI_SCAN_ABILITY_ID);
@@ -293,7 +294,7 @@ napi_value AddUntrustedConfig(napi_env env, napi_callback_info info)
         TRACE_FUNC_CALL_NAME("wifiDevicePtr->AddUntrustedConfig");
         /* This interface is not supported currently */
         context->addResult = -1;
-        context->errorCode = WIFI_OPT_NOT_SUPPORTED;
+        context->errorCode = ERROR_CODE_API_IS_NOT_SUPPORTED;
     };
 
     asyncContext->completeFunc = [&](void* data) -> void {
@@ -343,7 +344,7 @@ napi_value RemoveUntrustedConfig(napi_env env, napi_callback_info info)
         TRACE_FUNC_CALL_NAME("wifiDevicePtr->RemoveUntrustedConfig");
         /* This interface is not supported currently */
         context->addResult = -1;
-        context->errorCode = WIFI_OPT_NOT_SUPPORTED;
+        context->errorCode = ERROR_CODE_API_IS_NOT_SUPPORTED;
     };
 
     asyncContext->completeFunc = [&](void* data) -> void {

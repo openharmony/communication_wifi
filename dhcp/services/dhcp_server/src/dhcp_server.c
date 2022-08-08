@@ -15,7 +15,6 @@
 
 #include "dhcp_server.h"
 #include <arpa/inet.h>
-#include <bits/fcntl.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <net/if.h>

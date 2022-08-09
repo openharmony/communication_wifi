@@ -107,5 +107,11 @@ const SupplicantEventCallback &WifiSupplicantHalInterface::GetCallbackInst(void)
 {
     return mCallback;
 }
+
+WifiErrorNo WifiSupplicantHalInterface::WpaSetSuspendMode(bool mode) const
+{
+    CHECK_NULL_AND_RETURN(mIdlClient, WIFI_IDL_OPT_FAILED);
+    return mIdlClient->ReqWpaSetSuspendMode(mode);
+}
 }  // namespace Wifi
 }  // namespace OHOS

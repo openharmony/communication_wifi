@@ -20,6 +20,7 @@
 #include <string.h>
 #include <malloc.h>
 #include <stdint.h>
+#include <stdbool.h>
 #include "wifi_hal_struct.h"
 #include "wifi_hal_define.h"
 
@@ -102,6 +103,7 @@ struct WifiWpaStaInterface {
     int (*wpaCliCmdScanInfo)(WifiWpaStaInterface *p, ScanInfo *pcmd, int *size);
     int (*wpaCliCmdGetSignalInfo)(WifiWpaStaInterface *p, WpaSignalInfo *info);
     int (*wpaCliCmdWpaTerminate)(WifiWpaStaInterface *p);
+    int (*wpaCliCmdWpaSetSuspendMode)(WifiWpaStaInterface *p, bool mode);
 };
 
 /**

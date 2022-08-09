@@ -829,3 +829,23 @@ WifiErrorNo GetConnectSignalInfo(const char *endBssid, WpaSignalInfo *info)
     UnlockRpcClient(client);
     return result;
 }
+
+WifiErrorNo SetSuspendMode(bool mode)
+{
+    RpcClient *client = GetStaRpcClient();
+    LockRpcClient(client);
+    Context *context = client->context;
+    WriteBegin(context, 0);
+    WriteFunc(context, "SetSuspendMode");
+    WriteInt(context, mode);
+    WriteEnd(context);
+    if (RpcClientCall(client, "SetSuspendMode") != WIFI_IDL_OPT_OK) {
+        return WIFI_IDL_OPT_FAILED;
+    }
+    int result = WIFI_IDL_OPT_FAILED;
+    ReadInt(context, &result);
+    ReadClientEnd(client);
+    UnlockRpcClient(client);
+    return result;
+}
+

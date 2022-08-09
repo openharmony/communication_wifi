@@ -819,3 +819,20 @@ WifiErrorNo GetConnectSignalInfo(const char *endBssid, WpaSignalInfo *info)
     }
     return WIFI_HAL_SUCCESS;
 }
+
+WifiErrorNo SetSuspendMode(bool mode)
+{
+    LOGI("SetSuspendMode() mode: %{public}d", mode);
+    WifiWpaStaInterface *pStaIfc = GetWifiStaInterface(0);
+    if (pStaIfc == NULL) {
+        LOGE("GetWifiStaInterface return failed");
+        return WIFI_HAL_SUPPLICANT_NOT_INIT;
+    }
+    int ret = pStaIfc->wpaCliCmdWpaSetSuspendMode(pStaIfc, mode);
+    if (ret != WIFI_HAL_SUCCESS) {
+        LOGE("wpaCliCmdWpaSetSuspendMode return failed! ret = %{public}d", ret);
+        return WIFI_HAL_FAILED;
+    }
+    return WIFI_HAL_SUCCESS;
+}
+

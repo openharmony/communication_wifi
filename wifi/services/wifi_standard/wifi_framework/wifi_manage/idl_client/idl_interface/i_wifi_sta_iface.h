@@ -16,7 +16,9 @@
 #ifndef OHOS_IDL_IWIFI_STA_IFACE_H
 #define OHOS_IDL_IWIFI_STA_IFACE_H
 
+#include <stdbool.h>
 #include <stdint.h>
+#include "wifi_error_no.h"
 #include "i_wifi_event_callback.h"
 #include "i_wifi_struct.h"
 #include "wifi_error_no.h"
@@ -296,6 +298,13 @@ WifiErrorNo GetNetworkList(WifiNetworkInfo *infos, int *size);
  */
 WifiErrorNo GetConnectSignalInfo(const char *endBssid, WpaSignalInfo *info);
 
+/**
+ * @Description send suspend mode for wpa.
+ *
+ * @param mode: true for suspend, false for resume.
+ * @return WifiErrorNo
+ */
+WifiErrorNo SetSuspendMode(bool mode);
 #ifdef __cplusplus
 }
 #endif

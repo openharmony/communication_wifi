@@ -1060,6 +1060,13 @@ public:
      */
     WifiErrorNo ReqP2pHid2dConnect(const Hid2dConnectConfig &config) const;
 
+    /**
+     * @Description Send suspend mode to wpa
+     *
+     * @param mode: true for suspend, false for resume
+     * @return WifiErrorNo
+     */
+    WifiErrorNo ReqWpaSetSuspendMode(bool mode) const;
 public:
     RpcClient *pRpcClient;
 

@@ -244,8 +244,9 @@ if (defined(ohos_lite)) {
       ":wifi_manager_service_header",
     ]
 
+    defines = []
     if (wifi_feature_with_p2p) {
-      defines = [ "FEATURE_P2P_SUPPORT" ]
+      defines += [ "FEATURE_P2P_SUPPORT" ]
     }
 
     if (wifi_feature_with_ap_num > 0) {

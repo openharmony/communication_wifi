@@ -218,6 +218,9 @@ public:
     virtual ErrCode SetSuspendMode(bool mode) const;
 
 private:
+    void NotifyDeviceConfigChange(ConfigChange value) const;
+
+private:
     StaStateMachine *pStaStateMachine;
     StaMonitor *pStaMonitor;
     StaAutoConnectService *pStaAutoConnectService;

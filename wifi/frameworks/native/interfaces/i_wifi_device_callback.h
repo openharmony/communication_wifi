@@ -71,6 +71,13 @@ public:
      */
     virtual void OnStreamChanged(int direction) = 0;
 
+    /**
+     * @Description Deal device config change message
+     *
+     * @param ConfigChange - change type of config
+     */
+    virtual void OnDeviceConfigChanged(ConfigChange value) = 0;
+
 #ifndef OHOS_ARCH_LITE
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.wifi.IWifiDeviceCallBack");

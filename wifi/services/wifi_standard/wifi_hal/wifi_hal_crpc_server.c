@@ -166,6 +166,7 @@ static int InitRpcFuncMapSta(void)
     ret += PushRpcFunc("WpaBlocklistClear", RpcWpaBlocklistClear);
     ret += PushRpcFunc("GetNetworkList", RpcGetNetworkList);
     ret += PushRpcFunc("GetConnectSignalInfo", RpcGetConnectSignalInfo);
+    ret += PushRpcFunc("SetSuspendMode", RpcSetSuspendMode);
     return ret;
 }
 

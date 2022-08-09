@@ -208,6 +208,15 @@ public:
      */
     virtual ErrCode ReConnect() const;
 
+    /**
+     * @Description  Set suspend mode to wpa
+     *
+     * @param mode - true for suspend mode, false for resume mode
+     *
+     * @Return success: WIFI_OPT_SUCCESS, fail: WIFI_OPT_FAILED
+     */
+    virtual ErrCode SetSuspendMode(bool mode) const;
+
 private:
     StaStateMachine *pStaStateMachine;
     StaMonitor *pStaMonitor;

@@ -115,6 +115,14 @@ public:
      */
     const SupplicantEventCallback &GetCallbackInst(void) const;
 
+    /**
+     * @Description  Set suspend mode to wpa
+     *
+     * @param mode - true for suspend mode, false for resume mode
+     *
+     * @Return success: WIFI_OPT_SUCCESS, fail: WIFI_OPT_FAILED
+     */
+    WifiErrorNo WpaSetSuspendMode(bool mode) const;
 private:
     SupplicantEventCallback mCallback;
 };

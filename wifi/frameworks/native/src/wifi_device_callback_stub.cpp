@@ -69,6 +69,10 @@ int WifiDeviceCallBackStub::OnRemoteRequest(
             ret = RemoteOnStreamChanged(code, data, reply);
             break;
         }
+        case WIFI_CBK_CMD_DEVICE_CONFIG_CHANGE: {
+            ret = RemoteOnDeviceConfigChanged(code, data, reply);
+            break;
+        }
         default: {
             ret = IPCObjectStub::OnRemoteRequest(code, data, reply, option);
             break;
@@ -137,6 +141,14 @@ void WifiDeviceCallBackStub::OnStreamChanged(int direction)
     WIFI_LOGD("WifiDeviceCallBackStub::OnStreamChanged");
     if (callback_) {
         callback_->OnStreamChanged(direction);
+    }
+}
+
+void WifiDeviceCallBackStub::OnDeviceConfigChanged(ConfigChange value)
+{
+    WIFI_LOGD("WifiDeviceCallBackStub::OnDeviceConfigChanged");
+    if (callback_) {
+        callback_->OnDeviceConfigChanged(value);
     }
 }
 
@@ -218,6 +230,15 @@ int WifiDeviceCallBackStub::RemoteOnStreamChanged(uint32_t code, MessageParcel &
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
     int direction = data.ReadInt32();
     OnStreamChanged(direction);
+    reply.WriteInt32(0); /* Reply 0 to indicate that no exception occurs. */
+    return 0;
+}
+
+int WifiDeviceCallBackStub::RemoteOnDeviceConfigChanged(uint32_t code, MessageParcel &data, MessageParcel &reply)
+{
+    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+    int value = data.ReadInt32();
+    OnDeviceConfigChanged(ConfigChange(value));
     reply.WriteInt32(0); /* Reply 0 to indicate that no exception occurs. */
     return 0;
 }

@@ -32,6 +32,7 @@ public:
     void OnWifiRssiChanged(int rssi) override;
     void OnWifiWpsStateChanged(int state, const std::string &pinCode) override;
     void OnStreamChanged(int direction) override;
+    void OnDeviceConfigChanged(ConfigChange state) override;
     void RegisterUserCallBack(const std::shared_ptr<IWifiDeviceCallBack> &callBack);
     bool IsRemoteDied() const;
     void SetRemoteDied(bool val);
@@ -42,6 +43,7 @@ private:
     int RemoteOnWifiRssiChanged(uint32_t code, IpcIo *data);
     int RemoteOnWifiWpsStateChanged(uint32_t code, IpcIo *data);
     int RemoteOnStreamChanged(uint32_t code, IpcIo *data);
+    int RemoteOnDeviceConfigChanged(uint32_t code, IpcIo *data);
 
     std::shared_ptr<IWifiDeviceCallBack> callback_;
 

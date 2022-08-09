@@ -27,8 +27,10 @@
 #include <map>
 
 #include "wifi_internal_msg.h"
+#ifndef OHOS_ARCH_LITE
 #include "parcel.h"
 #include "iremote_object.h"
+#endif
 #include "i_wifi_device_callback.h"
 #include "i_wifi_scan_callback.h"
 #include "i_wifi_hotspot_callback.h"

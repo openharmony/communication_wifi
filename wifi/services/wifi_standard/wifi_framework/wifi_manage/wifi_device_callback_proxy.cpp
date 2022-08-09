@@ -165,5 +165,29 @@ void WifiDeviceCallBackProxy::OnStreamChanged(int direction)
     }
     return;
 }
+
+void WifiDeviceCallBackProxy::OnDeviceConfigChanged(ConfigChange value)
+{
+    WIFI_LOGD("WifiDeviceCallBackProxy::OnDeviceConfigChanged");
+    MessageOption option;
+    MessageParcel data;
+    MessageParcel reply;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return;
+    }
+    data.WriteInt32(0);
+    data.WriteInt32((int)value);
+    int error = Remote()->SendRequest(WIFI_CBK_CMD_DEVICE_CONFIG_CHANGE, data, reply, option);
+    if (error != ERR_NONE) {
+        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d", WIFI_CBK_CMD_DEVICE_CONFIG_CHANGE, error);
+        return;
+    }
+    int exception = reply.ReadInt32();
+    if (exception) {
+        WIFI_LOGE("notify wifi device config changed failed!");
+    }
+    return;
+}
 }  // namespace Wifi
 }  // namespace OHOS

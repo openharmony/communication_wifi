@@ -1101,6 +1101,11 @@ ErrCode ScanService::AllowExternScan()
     ScanMode scanMode = WifiSettings::GetInstance().GetAppRunningState();
     WIFI_LOGI("staScene is %{public}d, scanMode is %{public}d", staScene, (int)scanMode);
 
+    if (!AllowExternScanByThermal()) {
+        WIFI_LOGW("extern scan not allow by thermal level");
+        return WIFI_OPT_FAILED;
+    }
+
     if (!AllowExternScanByForbid(staScene, scanMode)) {
         WIFI_LOGW("extern scan not allow by forbid mode");
         return WIFI_OPT_FAILED;
@@ -1375,6 +1380,19 @@ ErrCode ScanService::ApplyScanPolices(ScanType type)
     }
     WIFI_LOGD("apply scan policies result: scan control ok.");
     return WIFI_OPT_SUCCESS;
+}
+
+bool ScanService::AllowExternScanByThermal()
+{
+    WIFI_LOGI("Enter ScanService::AllowExternScanByThermal.\n");
+
+    auto level = WifiSettings::GetInstance().GetThermalLevel();
+    static const int THERMAL_LEVEL_HOT = 3;
+    if (level >= THERMAL_LEVEL_HOT) {
+        WIFI_LOGW("ScanService::AllowExternScanByThermal, level=%{public}d is higher than hot\n", level);
+        return false;
+    }
+    return true;
 }
 
 bool ScanService::AllowExternScanByForbid(int staScene, ScanMode scanMode)

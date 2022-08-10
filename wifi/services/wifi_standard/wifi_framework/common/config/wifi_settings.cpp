@@ -1436,5 +1436,15 @@ bool WifiSettings::IsExplicitGroup(void)
 {
     return explicitGroup;
 }
+
+void WifiSettings::SetThermalLevel(const int &level)
+{
+    mThermalLevel = level;
+}
+
+int WifiSettings::GetThermalLevel() const
+{
+    return mThermalLevel;
+}
 } // namespace Wifi
 } // namespace OHOS

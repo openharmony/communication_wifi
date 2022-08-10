@@ -146,5 +146,24 @@ void WifiDeviceCallBackProxy::OnStreamChanged(int direction)
         WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d", WIFI_CBK_CMD_STREAM_DIRECTION, ret);
     }
 }
+
+void WifiDeviceCallBackProxy::OnDeviceConfigChanged(ConfigChange state)
+{
+    WIFI_LOGD("WifiDeviceCallBackProxy::OnDeviceConfigChanged");
+    IpcIo data;
+    uint8_t buff[DEFAULT_IPC_SIZE];
+    IpcIoInit(&data, buff, DEFAULT_IPC_SIZE, 0);
+    (void)WriteInt32(&data, 0);
+    (void)WriteInt32(&data, static_cast<int>(state));
+
+    IpcIo reply;
+    MessageOption option;
+    MessageOptionInit(&option);
+    option.flags = TF_OP_ASYNC;
+    int ret = SendRequest(sid_, WIFI_CBK_CMD_DEVICE_CONFIG_CHANGE, &data, &reply, option, nullptr);
+    if (ret != ERR_NONE) {
+        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d", WIFI_CBK_CMD_DEVICE_CONFIG_CHANGE, ret);
+    }
+}
 }  // namespace Wifi
 }  // namespace OHOS

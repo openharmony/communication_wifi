@@ -179,6 +179,12 @@ enum class WifiDeviceConfigStatus {
 
 enum class AssignIpMethod { DHCP, STATIC, UNASSIGNED };
 
+enum class ConfigChange {
+    CONFIG_ADD = 0,
+    CONFIG_UPDATE = 1,
+    CONFIG_REMOVE = 2,
+};
+
 class WifiIpAddress {
 public:
     int family;                             /* ip type */

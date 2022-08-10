@@ -321,6 +321,9 @@ void WifiInternalEventDispatcher::DealStaCallbackMsg(
             case WIFI_CBK_MSG_WPS_STATE_CHANGE:
                 callback->OnWifiWpsStateChanged(msg.msgData, msg.pinCode);
                 break;
+            case WIFI_CBK_MSG_DEVICE_CONFIG_CHANGE:
+                callback->OnDeviceConfigChanged(ConfigChange(msg.msgData));
+                break;
             default:
                 WIFI_LOGI("UnKnown msgcode %{public}d", msg.msgCode);
                 break;
@@ -402,6 +405,9 @@ void WifiInternalEventDispatcher::InvokeDeviceCallbacks(const WifiEventCallbackM
                 break;
             case WIFI_CBK_MSG_WPS_STATE_CHANGE:
                 callback->OnWifiWpsStateChanged(msg.msgData, msg.pinCode);
+                break;
+            case WIFI_CBK_MSG_DEVICE_CONFIG_CHANGE:
+                callback->OnDeviceConfigChanged(ConfigChange(msg.msgData));
                 break;
             default:
                 WIFI_LOGI("UnKnown msgcode %{public}d", msg.msgCode);
@@ -522,7 +528,7 @@ void WifiInternalEventDispatcher::SendP2pCallbackMsg(sptr<IWifiP2pCallback> &cal
         case WIFI_CBK_MSG_P2P_ACTION_RESULT:
             callback->OnP2pActionResult(msg.p2pAction, static_cast<ErrCode>(msg.msgData));
             break;
-        case WIFI_CBK_CMD_CFG_CHANGE:
+        case WIFI_CBK_MSG_CFG_CHANGE:
             SendConfigChangeEvent(callback, msg.cfgInfo);
             break;
         default:
@@ -605,14 +611,14 @@ void WifiInternalEventDispatcher::Run(WifiInternalEventDispatcher &instance)
         instance.mEventQue.pop_front();
         lock.unlock();
         WIFI_LOGD("WifiInternalEventDispatcher::Run broad cast a msg %{public}d", msg.msgCode);
-        if (msg.msgCode >= WIFI_CBK_MSG_STATE_CHANGE && msg.msgCode <= WIFI_CBK_MSG_WPS_STATE_CHANGE) {
+        if (msg.msgCode >= WIFI_CBK_MSG_STATE_CHANGE && msg.msgCode <= WIFI_CBK_MSG_MAX_INVALID_STA) {
             DealStaCallbackMsg(instance, msg);
         } else if (msg.msgCode == WIFI_CBK_MSG_SCAN_STATE_CHANGE) {
             DealScanCallbackMsg(instance, msg);
         } else if (msg.msgCode >= WIFI_CBK_MSG_HOTSPOT_STATE_CHANGE &&
-                   msg.msgCode <= WIFI_CBK_MSG_HOTSPOT_STATE_LEAVE) {
+                   msg.msgCode <= WIFI_CBK_MSG_MAX_INVALID_HOTSPOT) {
             DealHotspotCallbackMsg(instance, msg);
-        } else if (msg.msgCode >= WIFI_CBK_MSG_P2P_STATE_CHANGE && msg.msgCode <= WIFI_CBK_MSG_P2P_ACTION_RESULT) {
+        } else if (msg.msgCode >= WIFI_CBK_MSG_P2P_STATE_CHANGE && msg.msgCode <= WIFI_CBK_MSG_MAX_INVALID_P2P) {
             DealP2pCallbackMsg(instance, msg);
         } else {
             WIFI_LOGI("UnKnown msgcode %{public}d", msg.msgCode);

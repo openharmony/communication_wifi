@@ -152,6 +152,11 @@ public:
         Logd("receive %s event, direction:%d", __func__, direction);
     }
 
+    void OnDeviceConfigChanged(ConfigChange value) override
+    {
+        Logd("receive %s event:%d", __func__, static_cast<int>(value));
+    }
+
 #ifndef OHOS_ARCH_LITE
     OHOS::sptr<OHOS::IRemoteObject> AsObject() override
     {

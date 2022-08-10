@@ -824,7 +824,7 @@ void WifiManager::DealConfigChanged(CfgType type, char* data, int dataLen)
         return;
     }
     WifiEventCallbackMsg cbMsg;
-    cbMsg.msgCode = WIFI_CBK_CMD_CFG_CHANGE;
+    cbMsg.msgCode = WIFI_CBK_MSG_CFG_CHANGE;
     CfgInfo* cfgInfoPtr = new (std::nothrow) CfgInfo();
     if (cfgInfoPtr == nullptr) {
         WIFI_LOGE("DealConfigChanged: new CfgInfo failed");

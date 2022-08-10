@@ -30,6 +30,7 @@ const std::string EVENT_STA_POWER_STATE_CHANGE = "wifiStateChange";
 const std::string EVENT_STA_CONN_STATE_CHANGE = "wifiConnectionChange";
 const std::string EVENT_STA_SCAN_STATE_CHANGE = "wifiScanStateChange";
 const std::string EVENT_STA_RSSI_STATE_CHANGE = "wifiRssiChange";
+const std::string EVENT_STA_DEVICE_CONFIG_CHANGE = "deviceConfigChange";
 const std::string EVENT_HOTSPOT_STATE_CHANGE = "hotspotStateChange";
 const std::string EVENT_HOTSPOT_STA_JOIN = "hotspotStaJoin";
 const std::string EVENT_HOTSPOT_STA_LEAVE = "hotspotStaLeave";
@@ -46,6 +47,7 @@ static std::set<std::string> g_supportEventList = {
     EVENT_STA_CONN_STATE_CHANGE,
     EVENT_STA_SCAN_STATE_CHANGE,
     EVENT_STA_RSSI_STATE_CHANGE,
+    EVENT_STA_DEVICE_CONFIG_CHANGE,
     EVENT_HOTSPOT_STATE_CHANGE,
     EVENT_HOTSPOT_STA_JOIN,
     EVENT_HOTSPOT_STA_LEAVE,
@@ -76,6 +78,7 @@ std::multimap<std::string, std::string> g_EventPermissionMap = {
     { EVENT_STA_CONN_STATE_CHANGE, WIFI_PERMISSION_GET_WIFI_INFO },
     { EVENT_STA_SCAN_STATE_CHANGE, WIFI_PERMISSION_GET_WIFI_INFO },
     { EVENT_STA_RSSI_STATE_CHANGE, WIFI_PERMISSION_GET_WIFI_INFO },
+    { EVENT_STA_DEVICE_CONFIG_CHANGE, WIFI_PERMISSION_GET_WIFI_INFO },
     { EVENT_HOTSPOT_STATE_CHANGE, WIFI_PERMISSION_GET_WIFI_INFO },
     { EVENT_HOTSPOT_STA_JOIN, WIFI_PERMISSION_MANAGE_WIFI_HOTSPOT },
     { EVENT_HOTSPOT_STA_LEAVE, WIFI_PERMISSION_MANAGE_WIFI_HOTSPOT },
@@ -257,6 +260,11 @@ public:
     }
 
     void OnStreamChanged(int direction) override {
+    }
+
+    void OnDeviceConfigChanged(ConfigChange value) override {
+        WIFI_LOGI("sta received device config changed event: %{public}d", static_cast<int>(value));
+        CheckAndNotify(EVENT_STA_DEVICE_CONFIG_CHANGE, static_cast<int>(value));
     }
 
     OHOS::sptr<OHOS::IRemoteObject> AsObject() override {

@@ -64,6 +64,10 @@ int WifiDeviceCallBackStub::OnRemoteRequest(uint32_t code, IpcIo *data)
             ret = RemoteOnStreamChanged(code, data);
             break;
         }
+        case WIFI_CBK_CMD_DEVICE_CONFIG_CHANGE: {
+            ret = RemoteOnDeviceConfigChanged(code, data);
+            break;
+        }
         default: {
             ret = WIFI_OPT_FAILED;
         }
@@ -128,6 +132,14 @@ void WifiDeviceCallBackStub::OnStreamChanged(int direction)
     WIFI_LOGD("WifiDeviceCallBackStub::OnStreamChanged");
     if (callback_) {
         callback_->OnStreamChanged(direction);
+    }
+}
+
+void WifiDeviceCallBackStub::OnDeviceConfigChanged(ConfigChange state)
+{
+    WIFI_LOGD("WifiDeviceCallBackStub::OnDeviceConfigChanged");
+    if (callback_) {
+        callback_->OnDeviceConfigChanged(state);
     }
 }
 
@@ -215,6 +227,15 @@ int WifiDeviceCallBackStub::RemoteOnStreamChanged(uint32_t code, IpcIo *data)
     int direction = 0;
     (void)ReadInt32(data, &direction);
     OnStreamChanged(direction);
+    return 0;
+}
+
+int WifiDeviceCallBackStub::RemoteOnDeviceConfigChanged(uint32_t code, IpcIo *data)
+{
+    WIFI_LOGD("run %{public}s code %{public}u", __func__, code);
+    int state = 0;
+    (void)ReadInt32(data, &state);
+    OnDeviceConfigChanged(ConfigChange(state));
     return 0;
 }
 }  // namespace Wifi

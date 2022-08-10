@@ -273,8 +273,7 @@ WifiErrorCode RegisterWifiEvent(WifiEvent *event);
  * in {@link WifiErrorCode} otherwise.
  * @since 7
  */
-WifiErrorCode UnRegisterWifiEvent(const WifiEvent *event);
-
+WifiErrorCode UnRegisterWifiEvent(WifiEvent *event);
 #ifdef __cplusplus
 }
 #endif

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Huawei Device Co., Ltd.
+ * Copyright (c) 2020-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -75,6 +75,17 @@ extern "C" {
 #define WIFI_MAX_EVENT_SIZE 10
 
 /**
+ * @brief Enumerates of device configuration change.
+ *
+ * @since 9
+ */
+typedef enum {
+    CONFIG_ADD = 0,
+    CONFIG_UPDATE = 1,
+    CONFIG_REMOVE = 2,
+} ConfigChange;
+
+/**
  * @brief Represents the pointer to a Wi-Fi event callback for station and hotspot connection, disconnection, or scan.
  *
  *
@@ -93,22 +104,9 @@ typedef struct {
     void (*OnHotspotStaJoin)(StationInfo *info);
     /** Station disconnected */
     void (*OnHotspotStaLeave)(StationInfo *info);
+    /** Device config change */
+    void (*OnDeviceConfigChange)(ConfigChange state);
 } WifiEvent;
-
-/**
- * @brief Enumerates states in Wi-Fi events.
- *
- *
- *
- * @since 7
- */
-typedef enum {
-    /** Unavailable state */
-    WIFI_STATE_NOT_AVAILABLE = 0,
-    /** Available state */
-    WIFI_STATE_AVAILABLE
-} WifiEventState;
-
 #ifdef __cplusplus
 }
 #endif

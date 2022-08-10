@@ -75,6 +75,13 @@ public:
      */
     void OnStreamChanged(int direction) override;
 
+	/**
+     * @Description Deal device config change message
+     *
+     * @param ConfigChange - change type of config
+     */
+    void OnDeviceConfigChanged(ConfigChange value) override;
+
 private:
 #ifdef OHOS_ARCH_LITE
     SvcIdentity sid_;

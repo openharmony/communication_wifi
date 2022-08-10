@@ -16,6 +16,9 @@
 #include "sta_service.h"
 #include "sta_define.h"
 #include "sta_service_callback.h"
+#ifndef OHOS_ARCH_LITE
+#include "wifi_internal_event_dispatcher.h"
+#endif
 #include "wifi_logger.h"
 #include "wifi_settings.h"
 #include "wifi_sta_hal_interface.h"
@@ -179,6 +182,7 @@ int StaService::AddDeviceConfig(const WifiDeviceConfig &config) const
     LOGI("Enter StaService::AddDeviceConfig.\n");
     CHECK_NULL_AND_RETURN(pStaStateMachine, WIFI_OPT_FAILED);
     int netWorkId = INVALID_NETWORK_ID;
+    bool isUpdate = false;
     std::string bssid;
     WifiDeviceConfig tempDeviceConfig;
     if (WifiSettings::GetInstance().GetDeviceConfig(config.ssid, config.keyMgmt, tempDeviceConfig) == 0) {
@@ -187,6 +191,7 @@ int StaService::AddDeviceConfig(const WifiDeviceConfig &config) const
         CHECK_NULL_AND_RETURN(pStaAutoConnectService, WIFI_OPT_FAILED);
         bssid = config.bssid.empty() ? tempDeviceConfig.bssid : config.bssid;
         pStaAutoConnectService->EnableOrDisableBssid(bssid, true, 0);
+        isUpdate = true;
     } else {
         if (WifiStaHalInterface::GetInstance().GetNextNetworkId(netWorkId) != WIFI_IDL_OPT_OK) {
             LOGE("StaService::AddDeviceConfig GetNextNetworkId failed!");
@@ -209,6 +214,8 @@ int StaService::AddDeviceConfig(const WifiDeviceConfig &config) const
     /* Add the new network to WifiSettings. */
     WifiSettings::GetInstance().AddDeviceConfig(tempDeviceConfig);
     WifiSettings::GetInstance().SyncDeviceConfig();
+    ConfigChange changeType = isUpdate ? ConfigChange::CONFIG_UPDATE : ConfigChange::CONFIG_ADD;
+    NotifyDeviceConfigChange(changeType);
     return netWorkId;
 }
 
@@ -238,6 +245,7 @@ ErrCode StaService::RemoveDevice(int networkId) const
     /* Remove network configuration directly without notification to InterfaceService. */
     WifiSettings::GetInstance().RemoveDevice(networkId);
     WifiSettings::GetInstance().SyncDeviceConfig();
+    NotifyDeviceConfigChange(ConfigChange::CONFIG_REMOVE);
     return WIFI_OPT_SUCCESS;
 }
 
@@ -259,6 +267,7 @@ ErrCode StaService::RemoveAllDevice() const
         LOGE("RemoveAllDevice-SyncDeviceConfig() failed!");
         return WIFI_OPT_FAILED;
     }
+    NotifyDeviceConfigChange(ConfigChange::CONFIG_REMOVE);
     return WIFI_OPT_SUCCESS;
 }
 
@@ -406,6 +415,17 @@ ErrCode StaService::SetSuspendMode(bool mode) const
         return WIFI_OPT_FAILED;
     }
     return WIFI_OPT_SUCCESS;
+}
+
+void StaService::NotifyDeviceConfigChange(ConfigChange value) const
+{
+    WIFI_LOGI("Notify device config change: %{public}d\n", static_cast<int>(value));
+#ifndef OHOS_ARCH_LITE
+    WifiEventCallbackMsg cbMsg;
+    cbMsg.msgCode = WIFI_CBK_MSG_DEVICE_CONFIG_CHANGE;
+    cbMsg.msgData = static_cast<int>(value);
+    WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
+#endif
 }
 }  // namespace Wifi
 }  // namespace OHOS

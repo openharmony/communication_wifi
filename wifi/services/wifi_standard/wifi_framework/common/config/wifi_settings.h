@@ -1066,6 +1066,20 @@ public:
      */
     bool IsExplicitGroup(void);
 
+    /**
+     * @Description Set the thermal level
+     *
+     * @param level 0 COOL, 1 NORMAL, 2 WARM, 3 HOT, 4 OVERHEATED, 5 WARNING, 6 EMERGENCY
+     */
+    void SetThermalLevel(const int &level);
+
+    /**
+     * @Description Get the thermal level
+     *
+     * @return int 0 COOL, 1 NORMAL, 2 WARM, 3 HOT, 4 OVERHEATED, 5 WARNING, 6 EMERGENCY
+     */
+    int GetThermalLevel() const;
+
 private:
     WifiSettings();
     void InitWifiConfig();
@@ -1105,6 +1119,7 @@ private:
     int mLastSelectedNetworkId;  /* last selected networkid */
     time_t mLastSelectedTimeVal; /* last selected time */
     int mScreenState;            /* 1 MODE_STATE_OPEN, 2 MODE_STATE_CLOSE */
+    int mThermalLevel;           /* 1 COOL, 2 NORMAL, 3 WARM, 4 HOT, 5 OVERHEATED, 6 WARNING, 7 EMERGENCY */
     int mAirplaneModeState;      /* 1 on 2 off */
     ScanMode mAppRunningModeState; /* 0 app for 1 app back 2 sys for 3 sys back */
     int mPowerSavingModeState;   /* 1 on 2 off */

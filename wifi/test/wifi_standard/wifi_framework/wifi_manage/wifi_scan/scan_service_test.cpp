@@ -702,6 +702,11 @@ public:
         pScanService->AllowPnoScan();
     }
 
+    void AllowExternScanByThermal()
+    {
+        pScanService->AllowExternScanByThermal();
+    }
+
     void AllowExternScanByForbidSuccess1()
     {
         int staScene = 0;
@@ -1898,6 +1903,11 @@ HWTEST_F(ScanServiceTest, AllowSystemTimerScanSuccess, TestSize.Level1)
 HWTEST_F(ScanServiceTest, AllowPnoScanSuccess, TestSize.Level1)
 {
     AllowPnoScanSuccess();
+}
+
+HWTEST_F(ScanServiceTest, AllowExternScanByThermal, TestSize.Level1)
+{
+    AllowExternScanByThermal();
 }
 
 HWTEST_F(ScanServiceTest, AllowExternScanByForbidSuccess1, TestSize.Level1)

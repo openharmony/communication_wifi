@@ -48,6 +48,7 @@ std::shared_ptr<WifiDeviceServiceImpl> WifiDeviceServiceImpl::GetInstance()
 #else
 const uint32_t TIMEOUT_APP_EVENT = 3000;
 const uint32_t TIMEOUT_SCREEN_EVENT = 3000;
+const uint32_t TIMEOUT_THERMAL_EVENT = 3000;
 using TimeOutCallback = std::function<void()>;
 sptr<WifiDeviceServiceImpl> WifiDeviceServiceImpl::g_instance;
 const bool REGISTER_RESULT = SystemAbility::MakeAndRegisterAbility(WifiDeviceServiceImpl::GetInstance().GetRefPtr());
@@ -124,20 +125,27 @@ void WifiDeviceServiceImpl::OnStart()
 #ifndef OHOS_ARCH_LITE
     if (eventSubscriber_ == nullptr) {
         lpTimer_ = std::make_unique<Utils::Timer>("WifiDeviceServiceImpl");
-        TimeOutCallback timeOutcallback = std::bind(&WifiDeviceServiceImpl::RegisterAppRemoved, this);
+        TimeOutCallback timeoutCallback = std::bind(&WifiDeviceServiceImpl::RegisterAppRemoved, this);
         lpTimer_->Setup();
-        lpTimer_->Register(timeOutcallback, TIMEOUT_APP_EVENT, true);
+        lpTimer_->Register(timeoutCallback, TIMEOUT_APP_EVENT, true);
     }
 
     if (screenEventSubscriber_ == nullptr) {
         lpScreenTimer_ = std::make_unique<Utils::Timer>("WifiDeviceServiceImpl");
-        TimeOutCallback timeOutcallback = std::bind(&WifiDeviceServiceImpl::RegisterScreenEvent, this);
+        TimeOutCallback timeoutCallback = std::bind(&WifiDeviceServiceImpl::RegisterScreenEvent, this);
         if (lpScreenTimer_ != nullptr) {
             lpScreenTimer_->Setup();
-            lpScreenTimer_->Register(timeOutcallback, TIMEOUT_SCREEN_EVENT, true);
+            lpScreenTimer_->Register(timeoutCallback, TIMEOUT_SCREEN_EVENT, true);
         } else {
             WIFI_LOGE("lpScreenTimer_ is nullptr");
         }
+    }
+
+    if (thermalLevelSubscriber_ == nullptr) {
+        lpThermalTimer_ = std::make_unique<Utils::Timer>("WifiDeviceServiceImpl");
+        TimeOutCallback timeoutCallback = std::bind(&WifiDeviceServiceImpl::RegisterThermalLevel, this);
+        lpThermalTimer_->Setup();
+        lpThermalTimer_->Register(timeoutCallback, TIMEOUT_THERMAL_EVENT, true);
     }
 #endif
 }
@@ -160,6 +168,13 @@ void WifiDeviceServiceImpl::OnStop()
     if (lpScreenTimer_ != nullptr) {
         lpScreenTimer_->Shutdown(false);
         lpScreenTimer_ = nullptr;
+    }
+    if (thermalLevelSubscriber_ != nullptr) {
+        UnRegisterThermalLevel();
+    }
+    if (lpThermalTimer_ != nullptr) {
+        lpThermalTimer_->Shutdown(false);
+        lpThermalTimer_ = nullptr;
     }
 #endif
     WIFI_LOGI("Stop sta service!");
@@ -1262,6 +1277,29 @@ void WifiDeviceServiceImpl::UnRegisterScreenEvent()
     screenEventSubscriber_ = nullptr;
 }
 
+void WifiDeviceServiceImpl::RegisterThermalLevel()
+{
+    OHOS::EventFwk::MatchingSkills matchingSkills;
+    matchingSkills.AddEvent(OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_THERMAL_LEVEL_CHANGED);
+    EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
+    thermalLevelSubscriber_ = std::make_shared<ThermalLevelSubscriber>(subscriberInfo);
+    if (!EventFwk::CommonEventManager::SubscribeCommonEvent(thermalLevelSubscriber_)) {
+        WIFI_LOGE("THERMAL_LEVEL_CHANGED SubscribeCommonEvent() failed");
+    } else {
+        WIFI_LOGI("THERMAL_LEVEL_CHANGED SubscribeCommonEvent() OK");
+    }
+}
+
+void WifiDeviceServiceImpl::UnRegisterThermalLevel()
+{
+    if (!EventFwk::CommonEventManager::UnSubscribeCommonEvent(thermalLevelSubscriber_)) {
+        WIFI_LOGE("THERMAL_LEVEL_CHANGED UnSubscribeCommonEvent() failed");
+    } else {
+        WIFI_LOGI("THERMAL_LEVEL_CHANGED UnSubscribeCommonEvent() OK");
+    }
+    thermalLevelSubscriber_ = nullptr;
+}
+
 void AppEventSubscriber::OnReceiveEvent(const OHOS::EventFwk::CommonEventData &data)
 {
     std::string action = data.GetWant().GetAction();
@@ -1318,6 +1356,18 @@ void ScreenEventSubscriber::OnReceiveEvent(const OHOS::EventFwk::CommonEventData
         return;
     }
     WIFI_LOGW("ScreenEventSubscriber::OnReceiveEvent, screen state: %{public}d.", screenState);
+}
+
+void ThermalLevelSubscriber::OnReceiveEvent(const OHOS::EventFwk::CommonEventData &data)
+{
+    std::string action = data.GetWant().GetAction();
+    WIFI_LOGI("ThermalLevelSubscriber::OnReceiveEvent: %{public}s.", action.c_str());
+    if (action == OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_THERMAL_LEVEL_CHANGED) {
+        static const std::string THERMAL_EVENT_ID = "0";
+        int level = data.GetWant().GetIntParam(THERMAL_EVENT_ID, 0);
+        WifiSettings::GetInstance().SetThermalLevel(level);
+        WIFI_LOGI("ThermalLevelSubscriber SetThermalLevel: %{public}d.", level);
+    }
 }
 #endif
 }  // namespace Wifi

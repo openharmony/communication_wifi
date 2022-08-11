@@ -248,25 +248,32 @@ IScanService *WifiServiceManager::GetScanServiceInst()
 #ifdef FEATURE_AP_SUPPORT
 IApService *WifiServiceManager::GetApServiceInst(int id)
 {
-    if (mApServiceHandle.handle == nullptr) {
+    auto findInstance = [this, id]() -> IApService* {
+        auto it = mApServiceHandle.pService.find(id);
+        return (it != mApServiceHandle.pService.end()) ? it->second : nullptr;
+    };
+
+    auto apInstance = findInstance();
+    if (apInstance != nullptr) {
+        WIFI_LOGI("Ap service instance is exist %{public}d", id);
+        return apInstance;
+    }
+    WIFI_LOGI("[Get] create a new ap service instance: %{public}d", id);
+    std::string dlname;
+    if (GetServiceDll(WIFI_SERVICE_AP, dlname) < 0) {
+        WIFI_LOGE("Get ap dll name failed.");
         return nullptr;
     }
-
-    IApService *service = nullptr;
-    auto iter = mApServiceHandle.pService.find(id);
-    if (iter != mApServiceHandle.pService.end()) {
-        service = iter->second;
+    bool bPreLoad = WifiSettings::GetInstance().IsModulePreLoad(WIFI_SERVICE_AP);
+    if (LoadApService(dlname, bPreLoad) != 0) {
+        WIFI_LOGE("Reload ap service instance %{public}d failed!", id);
+        return nullptr;
     }
-
-    if (service == nullptr) {
-        service = mApServiceHandle.create(id);
-        auto ret = mApServiceHandle.pService.emplace(id, service);
-        if (!ret.second) {
-            mApServiceHandle.pService[id] = service;
-        }
+    auto reloadApInstance = findInstance();
+    if (reloadApInstance == nullptr) {
+        WIFI_LOGE("Get ap service instance %{public}d error!", id);
     }
-
-    return service;
+    return reloadApInstance;
 }
 #endif
 
@@ -339,6 +346,10 @@ int WifiServiceManager::UnloadApService(bool bPreLoad, int id)
             }
             mApServiceHandle.pService.erase(id);
         }
+    }
+    if (!bPreLoad && mApServiceHandle.pService.empty()) {
+        dlclose(mApServiceHandle.handle);
+        mApServiceHandle.Clear();
     }
     return 0;
 }

@@ -451,6 +451,15 @@ private:
      * @return success: ScanScene, failed: SCAN_SCENE_MAX
      */
     int GetStaScene();
+
+    /**
+     * @Description Determine whether scanning is allowed and scan the control policy through thermal level.
+     *
+     * @return true - allow extern scan
+     * @return false - not allow extern scan
+     */
+    bool AllowExternScanByThermal();
+
     /**
      * @Description Determine whether scanning is allowed and scan the control policy through forbidMap.
      *

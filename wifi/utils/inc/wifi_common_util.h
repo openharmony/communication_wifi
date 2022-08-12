@@ -48,6 +48,30 @@ std::string MacAnonymize(const std::string str);
 std::string IpAnonymize(const std::string str);
 
 /**
+ * @Description Ssid anonymization
+ *
+ * <p> a) Length less than or equal to 2, all bits are hidden;
+ * b) Length less than or equal to 4, hiding the middle bit;
+ * c) Length less than or equal to 8, hiding 3 bits from the second bit;
+ * d) Length greater than or equal to 9, showing the first and last three bits, the middle bits are hidden
+ * <p> eg:
+ * 1 -> *
+ * 12 -> **
+ * 123 -> 1*3
+ * 1234 -> 1**4
+ * 12345 -> 1***5
+ * 123456 -> 1***56
+ * 1234567 -> 1***567
+ * 12345678 -> 1***5678
+ * 123456789 -> 123***789
+ * 12345678910 -> 123*****910
+ *
+ * @param str - Input ssid
+ * @return std::string - Processed ssid
+ */
+std::string SsidAnonymize(const std::string str);
+
+/**
  * @Description Converting string MAC to a C-style MAC address
  *
  * @param strMac - Input MAC address

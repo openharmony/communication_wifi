@@ -90,6 +90,34 @@ std::string IpAnonymize(const std::string str)
     return DataAnonymize(str, '.', '*');
 }
 
+std::string SsidAnonymize(const std::string str)
+{
+    if (str.empty()) {
+        return str;
+    }
+
+    std::string s = str;
+    constexpr char hiddenChar = '*';
+    constexpr size_t minHiddenSize = 3;
+    constexpr size_t headKeepSize = 3;
+    constexpr size_t tailKeepSize = 3;
+    auto func = [hiddenChar](char& c) { c = hiddenChar; };
+    if (s.size() < minHiddenSize) {
+        std::for_each(s.begin(), s.end(), func);
+        return s;
+    }
+
+    if (s.size() < (minHiddenSize + headKeepSize + tailKeepSize)) {
+        size_t beginIndex = 1;
+        size_t hiddenSize = s.size() - minHiddenSize + 1;
+        hiddenSize = hiddenSize > minHiddenSize ? minHiddenSize : hiddenSize;
+        std::for_each(s.begin() + beginIndex, s.begin() + beginIndex + hiddenSize, func);
+        return s;
+    }
+    std::for_each(s.begin() + headKeepSize, s.begin() + s.size() - tailKeepSize, func);
+    return s;
+}
+
 static unsigned char ConvertStrChar(char ch)
 {
     constexpr int numDiffForHexAlphabet = 10;

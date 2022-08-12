@@ -39,10 +39,10 @@
         "subsystem": "communication",
         "syscap": [
             "SystemCapability.Communication.WiFi.STA",
-            "SystemCapability.Communication.WiFi.AP",
+            "SystemCapability.Communication.WiFi.AP.Core",
             "SystemCapability.Communication.WiFi.P2P",
             "SystemCapability.Communication.WiFi.Core",
-            "SystemCapability.Communication.WiFi.HotspotExt"
+            "SystemCapability.Communication.WiFi.AP.Extension"
         ],
         "features": [
             "wifi_feature_with_p2p",

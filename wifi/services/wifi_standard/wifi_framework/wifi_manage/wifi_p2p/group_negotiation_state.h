@@ -115,6 +115,13 @@ private:
     virtual bool ProcessGroupRemovedEvt(InternalMessage &msg) const;
 
     /**
+     * @Description Process remvoe group message received by the state machine
+     * @param msg - Message body sent by the state machine
+     * @return - bool true:handle   false:not handle
+     */
+    virtual bool ProcessCmdRemoveGroup(InternalMessage &msg) const;
+
+    /**
      * @Description Initialization
      * @param None
      * @return None

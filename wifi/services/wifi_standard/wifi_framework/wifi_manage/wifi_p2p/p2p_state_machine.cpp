@@ -64,7 +64,8 @@ P2pStateMachine::P2pStateMachine(P2pMonitor &monitor, WifiP2pGroupManager &group
       p2pGroupOperatingState(groupOperatingState),
       p2pIdleState(idleState),
       p2pInvitingState(invitingState),
-      p2pProvisionDiscoveryState(provisionDiscoveryState)
+      p2pProvisionDiscoveryState(provisionDiscoveryState),
+      p2pDevIface()
 {
     Initialize();
 }
@@ -726,6 +727,9 @@ void P2pStateMachine::DhcpResultNotify::OnFailed(int status, const std::string &
         status,
         reason.c_str(),
         ifname.c_str());
+    if (pP2pStateMachine->p2pDevIface == ifname) {
+        pP2pStateMachine->p2pDevIface = "";
+    }
     WifiP2PHalInterface::GetInstance().GroupRemove(ifname);
 }
 

@@ -254,6 +254,14 @@ void P2pHalCbConnectSupplicantFailed();
  * @param info
  */
 void P2pHalCbServDiscReq(const P2pServDiscReqInfo *info);
+
+/**
+ * @Description Indicates that a P2P interface is created
+ *
+ * @param ifName
+ * @param isGo
+ */
+void P2pHalCbP2pIfaceCreated(const char *ifName, int isGo);
 #ifdef __cplusplus
 }
 #endif

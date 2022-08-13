@@ -53,6 +53,8 @@ void GroupNegotiationState::Init()
         P2P_STATE_MACHINE_CMD::P2P_EVENT_INVITATION_RESULT, &GroupNegotiationState::ProcessInvitationResultEvt));
     mProcessFunMap.insert(
         std::make_pair(P2P_STATE_MACHINE_CMD::P2P_EVENT_GROUP_REMOVED, &GroupNegotiationState::ProcessGroupRemovedEvt));
+    mProcessFunMap.insert(
+        std::make_pair(P2P_STATE_MACHINE_CMD::CMD_REMOVE_GROUP, &GroupNegotiationState::ProcessCmdRemoveGroup));
 }
 
 bool GroupNegotiationState::ProcessNegotSucessEvt(InternalMessage &msg) const
@@ -184,6 +186,26 @@ bool GroupNegotiationState::ProcessGroupRemovedEvt(InternalMessage &msg) const
      */
     WIFI_LOGI("Recv event: %{public}d. The group has been removed.", msg.GetMessageName());
     p2pStateMachine.DealGroupCreationFailed();
+    p2pStateMachine.SwitchState(&p2pStateMachine.p2pIdleState);
+    return EXECUTED;
+}
+
+bool GroupNegotiationState::ProcessCmdRemoveGroup(InternalMessage &msg) const
+{
+    std::string ifName = p2pStateMachine.p2pDevIface;
+    if (ifName.empty()) {
+        WIFI_LOGE("invalid ifname on ProcessCmdRemoveGroup");
+        return EXECUTED;
+    }
+    p2pStateMachine.p2pDevIface = "";
+    WifiErrorNo ret = WifiP2PHalInterface::GetInstance().GroupRemove(ifName);
+    if (ret) {
+        WIFI_LOGE("P2P group (%{public}s) removal failed.", ifName.c_str());
+        p2pStateMachine.BroadcastActionResult(P2pActionCallback::RemoveGroup, WIFI_OPT_FAILED);
+    } else {
+        WIFI_LOGI("The P2P group (%{public}s) is successfully removed.", ifName.c_str());
+        p2pStateMachine.BroadcastActionResult(P2pActionCallback::RemoveGroup, WIFI_OPT_SUCCESS);
+    }
     p2pStateMachine.SwitchState(&p2pStateMachine.p2pIdleState);
     return EXECUTED;
 }

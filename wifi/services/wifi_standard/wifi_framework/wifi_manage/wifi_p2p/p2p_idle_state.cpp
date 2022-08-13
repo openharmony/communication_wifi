@@ -69,6 +69,8 @@ void P2pIdleState::Init()
         &P2pIdleState::ProcessCmdHid2dCreateGroup));
     mProcessFunMap.insert(
         std::make_pair(P2P_STATE_MACHINE_CMD::CMD_HID2D_CONNECT, &P2pIdleState::ProcessCmdHid2dConnect));
+    mProcessFunMap.insert(
+        std::make_pair(P2P_STATE_MACHINE_CMD::P2P_EVENT_IFACE_CREATED, &P2pIdleState::ProcessP2pIfaceCreatedEvt));
 }
 
 bool P2pIdleState::ProcessCmdStopDiscPeer(InternalMessage &msg) const
@@ -144,6 +146,10 @@ bool P2pIdleState::ProcessCmdHid2dConnect(InternalMessage &msg) const
     if (!msg.GetMessageObj(config)) {
         WIFI_LOGE("Hid2d connect:Failed to obtain config info.");
         return EXECUTED;
+    }
+
+    if (!p2pStateMachine.p2pDevIface.empty()) {
+        WIFI_LOGE("Hid2d connect:exists dev iface %{public}s", p2pStateMachine.p2pDevIface.c_str());
     }
     if (WifiErrorNo::WIFI_IDL_OPT_OK !=
         WifiP2PHalInterface::GetInstance().Hid2dConnect(config)) {
@@ -337,6 +343,23 @@ bool P2pIdleState::ProcessCmdHid2dCreateGroup(InternalMessage &msg) const
 {
     p2pStateMachine.DelayMessage(&msg);
     p2pStateMachine.SwitchState(&p2pStateMachine.p2pGroupOperatingState);
+    return EXECUTED;
+}
+
+bool P2pIdleState::ProcessP2pIfaceCreatedEvt(InternalMessage &msg) const
+{
+    if (msg.GetParam1() != 0) {
+        WIFI_LOGE("p2p interface created event receive: type error.");
+        return EXECUTED;
+    }
+
+    std::string ifName;
+    if (!msg.GetMessageObj(ifName)) {
+        WIFI_LOGE("p2p interface created event receive: Parameter error.");
+        return EXECUTED;
+    }
+    p2pStateMachine.p2pDevIface = ifName;
+    p2pStateMachine.SwitchState(&p2pStateMachine.p2pGroupNegotiationState);
     return EXECUTED;
 }
 

@@ -709,6 +709,8 @@ static void DealP2pCallback(int event, Context *context)
         case P2P_SERV_DISC_REQ_EVENT:
             DealP2pServerDiscReqCbk(event, context);
             break;
+        case P2P_IFACE_CREATED_EVENT:
+            DealIfaceCbk(event, context);
         default:
             break;
     }

@@ -665,3 +665,25 @@ void P2pHalCbServDiscReq(const P2pServDiscReqInfo *info)
     EmitEventCallbackMsg(pCbkMsg, P2P_SERV_DISC_REQ_EVENT);
     return;
 }
+
+void P2pHalCbP2pIfaceCreated(const char *ifName, int isGo)
+{
+    if (ifName == NULL) {
+        LOGE("P2p interface created event ifName is NULL");
+        return;
+    }
+    LOGI("P2p interface created event ifName: %{public}s, isGo: %{public}d", ifName, isGo);
+    WifiHalEventCallbackMsg *pCbkMsg = (WifiHalEventCallbackMsg *)calloc(1, sizeof(WifiHalEventCallbackMsg));
+    if (pCbkMsg == NULL) {
+        LOGE("create callback message failed!");
+        return;
+    }
+    pCbkMsg->msg.ifMsg.type = isGo;
+    if (strncpy_s(pCbkMsg->msg.ifMsg.ifname, sizeof(pCbkMsg->msg.ifMsg.ifname), ifName,
+        sizeof(pCbkMsg->msg.ifMsg.ifname) - 1) != EOK) {
+        free(pCbkMsg);
+        pCbkMsg = NULL;
+        return;
+    }
+    EmitEventCallbackMsg(pCbkMsg, P2P_IFACE_CREATED_EVENT);
+}

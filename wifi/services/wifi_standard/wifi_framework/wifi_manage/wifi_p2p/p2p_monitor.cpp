@@ -65,6 +65,7 @@ void P2pMonitor::MonitorBegins(const std::string &iface)
         std::bind(&P2pMonitor::WpaEventApStaConnected, this, _1),
         std::bind(&P2pMonitor::OnConnectSupplicantFailed, this),
         std::bind(&P2pMonitor::WpaEventServDiscReq, this, _1),
+        std::bind(&P2pMonitor::WpaEventP2pIfaceCreated, this, _1, _2),
     };
 
     WifiP2PHalInterface::GetInstance().RegisterP2pCallback(callback);
@@ -284,6 +285,12 @@ void P2pMonitor::Broadcast2SmConnectSupplicantFailed(const std::string &iface) c
 {
     std::any anyNone;
     MessageToStateMachine(iface, P2P_STATE_MACHINE_CMD::WPA_CONN_FAILED_EVENT, 0, 0, anyNone);
+}
+
+void P2pMonitor::Broadcast2SmP2pIfaceCreated(const std::string &iface, int type, const std::string &event) const
+{
+    std::any anyEvent = event;
+    MessageToStateMachine(iface, P2P_STATE_MACHINE_CMD::P2P_EVENT_IFACE_CREATED, type, 0, anyEvent);
 }
 
 void P2pMonitor::OnConnectSupplicant(int status) const
@@ -583,6 +590,17 @@ void P2pMonitor::OnConnectSupplicantFailed(void) const
 {
     WIFI_LOGD("OnConnectSupplicantFailed callback");
     Broadcast2SmConnectSupplicantFailed(selectIfacName);
+}
+
+void P2pMonitor::WpaEventP2pIfaceCreated(const std::string &ifName, int isGo) const
+{
+    WIFI_LOGI("onP2pIfaceCreated callback, ifname:%{private}s, isGo:%{public}s", ifName.c_str(),
+        (isGo == 0) ? "false" : "true");
+    if (ifName.empty()) {
+        WIFI_LOGE("ERROR! No ifname!");
+        return;
+    }
+    Broadcast2SmP2pIfaceCreated(selectIfacName, isGo, ifName);
 }
 }  // namespace Wifi
 }  // namespace OHOS

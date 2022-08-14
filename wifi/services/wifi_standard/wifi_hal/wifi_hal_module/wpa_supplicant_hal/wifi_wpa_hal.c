@@ -473,6 +473,30 @@ static void DealP2pServDiscReqEvent(char *buf)
     return;
 }
 
+static void DealP2pInterfaceCreated(const char *buf)
+{
+    int type;
+    char ifName[WIFI_IFACE_NAME_MAXLEN] = {0};
+    if (strncmp(buf, "GO ", strlen("GO ")) == 0) {
+        type = 1;
+    } else if (strncmp(buf, "GC ", strlen("GC ")) == 0) {
+        type = 0;
+    } else {
+        LOGE("p2p interface created invalid msg %{public}s", buf);
+        return;
+    }
+
+    const char *pos = buf + strlen("GO "); // GO and GC have same length
+    if (strlen(pos) >= WIFI_IFACE_NAME_MAXLEN || strlen(pos) == 0) {
+        LOGE("p2p interface created invalid ifname len %{public}zu", strlen(pos));
+        return;
+    }
+    if (strncpy_s(ifName, sizeof(ifName), pos, strlen(pos)) != EOK) {
+        return;
+    }
+    P2pHalCbP2pIfaceCreated(ifName, type);
+}
+
 static int DealWpaP2pCallBackSubFun(char *p)
 {
     if (p == NULL) {
@@ -502,6 +526,8 @@ static int DealWpaP2pCallBackSubFun(char *p)
         DealGroupStartInfo(p);
     } else if (strncmp(p, P2P_EVENT_GROUP_REMOVED, strlen(P2P_EVENT_GROUP_REMOVED)) == 0) {
         DealP2pGroupRemove(p + strlen(P2P_EVENT_GROUP_REMOVED));
+    } else if (strncmp(p, P2P_INTERFACE_CREATED, strlen(P2P_INTERFACE_CREATED)) == 0) {
+        DealP2pInterfaceCreated(p + strlen(P2P_INTERFACE_CREATED));
     } else {
         return 1;
     }

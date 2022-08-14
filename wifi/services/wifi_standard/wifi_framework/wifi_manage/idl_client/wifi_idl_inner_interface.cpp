@@ -421,3 +421,14 @@ void OnP2pServDiscReq(const P2pServDiscReqInfo *info)
         cbk.onP2pServDiscReq(cbInfo);
     }
 }
+
+void OnP2pIfaceCreated(const char *ifName, int isGo)
+{
+    if (ifName == nullptr) {
+        return;
+    }
+    const OHOS::Wifi::P2pHalCallback &cbk = OHOS::Wifi::WifiP2PHalInterface::GetInstance().GetP2pCallbackInst();
+    if (cbk.onP2pIfaceCreated) {
+        cbk.onP2pIfaceCreated(ifName, isGo);
+    }
+}

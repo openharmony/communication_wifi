@@ -139,6 +139,7 @@ enum class P2P_STATE_MACHINE_CMD {
     P2P_EVENT_PROV_DISC_FAILURE,
     AP_STA_DISCONNECTED,
     AP_STA_CONNECTED,
+    P2P_EVENT_IFACE_CREATED,
 
     /* if the requests to WPA is not synchronization need protected by a timeout mechanism */
     ENABLE_P2P_TIMED_OUT = 200,

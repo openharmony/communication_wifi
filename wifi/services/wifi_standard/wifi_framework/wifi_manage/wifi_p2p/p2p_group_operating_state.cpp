@@ -192,6 +192,9 @@ bool P2pGroupOperatingState::ProcessGroupRemovedEvt(const InternalMessage &msg) 
         groupManager.SetCurrentGroup(copy);
         groupManager.StashGroups();
     }
+    if (groupManager.GetCurrentGroup().GetInterface() == p2pStateMachine.p2pDevIface) {
+        p2pStateMachine.p2pDevIface = "";
+    }
     p2pStateMachine.ChangeConnectedStatus(P2pConnectedState::P2P_DISCONNECTED);
     IpPool::ReleaseIpPool();
     IfConfig::GetInstance().FlushIpAddr(groupManager.GetCurrentGroup().GetInterface(), IpType::IPTYPE_IPV4);
@@ -248,6 +251,9 @@ bool P2pGroupOperatingState::ProcessCmdRemoveGroup(const InternalMessage &msg) c
          * Only started groups can be removed.
          */
         WIFI_LOGI("now remove : %{private}s.", group.GetInterface().c_str());
+        if (p2pStateMachine.p2pDevIface == group.GetInterface()) {
+            p2pStateMachine.p2pDevIface = "";
+        }
         ret = WifiP2PHalInterface::GetInstance().GroupRemove(group.GetInterface());
         if (ret) {
             WIFI_LOGE("P2P group removal failed.");

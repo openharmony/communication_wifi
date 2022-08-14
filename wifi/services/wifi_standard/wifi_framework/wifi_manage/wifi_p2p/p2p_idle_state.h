@@ -162,6 +162,13 @@ private:
      */
     virtual bool ProcessCmdHid2dConnect(InternalMessage &msg) const;
 
+    /**
+     * @Description Process p2p interface created event received by the state machine
+     * @param msg - Message body sent by the state machine
+     * @param @return - bool true:handle   false:not handle
+     */
+    virtual bool ProcessP2pIfaceCreatedEvt(InternalMessage &msg) const;
+
 private:
     using ProcessFun = bool (P2pIdleState::*)(InternalMessage &msg) const;
     std::map<P2P_STATE_MACHINE_CMD, ProcessFun> mProcessFunMap;

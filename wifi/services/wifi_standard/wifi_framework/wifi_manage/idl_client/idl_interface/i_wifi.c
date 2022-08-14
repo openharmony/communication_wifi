@@ -707,6 +707,22 @@ static void IdlCbP2pServDiscReqEvent(Context *context)
     return;
 }
 
+static void IdlCbP2pIfaceCreatedEvent(Context *context)
+{
+    int id;
+    int isGo = 0;
+    char ifName[WIFI_INTERFACE_NAME_SIZE] = {0};
+    if (ReadInt(context, &id) < 0 || ReadInt(context, &isGo) < 0 ||
+        ReadStr(context, ifName, sizeof(ifName)) != 0) {
+        LOGE("Failed to read P2pIfaceCreatedEvent id:%{public}d", id);
+        return;
+    }
+    IWifiEventP2pCallback *callback = GetWifiP2pEventCallback();
+    if (callback != NULL && callback->onP2pIfaceCreated != NULL) {
+        callback->onP2pIfaceCreated(ifName, isGo);
+    }
+}
+
 static int IdlDealP2pEventFirst(Context *context, int event)
 {
     switch (event) {
@@ -781,6 +797,9 @@ static int IdlDealP2pEventSecond(Context *context, int event)
             break;
         case WIFI_IDL_CBK_CMD_P2P_SERV_DISC_REQ_EVENT:
             IdlCbP2pServDiscReqEvent(context);
+            break;
+        case WIFI_IDL_CBK_CMD_P2P_IFACE_CREATED_EVENT:
+            IdlCbP2pIfaceCreatedEvent(context);
             break;
         default:
             return -1;

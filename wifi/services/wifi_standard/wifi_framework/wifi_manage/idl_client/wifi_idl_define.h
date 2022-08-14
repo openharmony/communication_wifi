@@ -63,6 +63,7 @@ typedef enum WifiIdlEvent {
     WIFI_IDL_CBK_CMD_AP_STA_DISCONNECTED_EVENT,         /* STA Disconnected from AP */
     WIFI_IDL_CBK_CMD_AP_STA_CONNECTED_EVENT,            /* STA and AP connected event */
     WIFI_IDL_CBK_CMD_P2P_SERV_DISC_REQ_EVENT,           /* Service discovery request event */
+    WIFI_IDL_CBK_CMD_P2P_IFACE_CREATED_EVENT,           /* P2P interface created event */
 } WifiIdlEvent;
 
 #define WIFI_IDL_FALSE 0

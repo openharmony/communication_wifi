@@ -293,7 +293,8 @@ static int GetP2pCallbackEvents(int *events, int size)
         WIFI_IDL_CBK_CMD_AP_STA_DISCONNECTED_EVENT,
         WIFI_IDL_CBK_CMD_AP_STA_CONNECTED_EVENT,
         WIFI_IDL_CBK_CMD_SUP_CONN_FAILED_EVENT,
-        WIFI_IDL_CBK_CMD_P2P_SERV_DISC_REQ_EVENT
+        WIFI_IDL_CBK_CMD_P2P_SERV_DISC_REQ_EVENT,
+        WIFI_IDL_CBK_CMD_P2P_IFACE_CREATED_EVENT
     };
     int max = sizeof(p2pEvents) / sizeof(p2pEvents[0]);
     int num = 0;

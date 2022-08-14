@@ -413,6 +413,7 @@ private:
     P2pInvitingState &p2pInvitingState;
     ProvisionDiscoveryState &p2pProvisionDiscoveryState;
     static bool m_isNeedDhcp;
+    std::string p2pDevIface;
 };
 }  // namespace Wifi
 }  // namespace OHOS

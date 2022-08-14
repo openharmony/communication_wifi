@@ -243,6 +243,15 @@ private:
      */
     virtual void Broadcast2SmConnectSupplicantFailed(const std::string &iface) const;
 
+    /**
+     * @Description Broadcast p2p interface created event.
+     *
+     * @param iface - network interface for event processing
+     * @param type - 0: GC, 1: GO
+     * @param event - the name of interface created
+     */
+    virtual void Broadcast2SmP2pIfaceCreated(const std::string &iface, int type, const std::string &event) const;
+
 private:
     /**
      * @Description - Register the connection supplicant result callback function.
@@ -384,6 +393,13 @@ private:
      *
      */
     void OnConnectSupplicantFailed(void) const;
+
+    /**
+     * @Description Register the callback function for p2p interface created
+     * @param ifName - the name of interface created
+     * @param isGo - 0: GC, 1: GO
+     */
+    void WpaEventP2pIfaceCreated(const std::string &ifName, int isGo) const;
 
 private:
     /**

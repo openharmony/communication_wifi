@@ -90,11 +90,13 @@ class DeviceConfigContext : public AsyncContext {
 public:
     WifiDeviceConfig *config;
     int networkId;
+    bool isCandidate;
 
     DeviceConfigContext(napi_env env, napi_async_work work = nullptr, napi_deferred deferred = nullptr) :
         AsyncContext(env, work, deferred) {
             config = nullptr;
             networkId = -1;
+            isCandidate = false;
         }
 
     DeviceConfigContext() = delete;

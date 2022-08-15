@@ -347,11 +347,12 @@ napi_value AddDeviceConfig(napi_env env, napi_callback_info info)
     }
     JsObjToDeviceConfig(env, argv[0], *config);
     asyncContext->config = config;
+    asyncContext->isCandidate = false;
 
     asyncContext->executeFunc = [&](void* data) -> void {
         DeviceConfigContext *context = static_cast<DeviceConfigContext *>(data);
         TRACE_FUNC_CALL_NAME("wifiDevicePtr->AddDeviceConfig");
-        ErrCode ret = wifiDevicePtr->AddDeviceConfig(*context->config, context->networkId);
+        ErrCode ret = wifiDevicePtr->AddDeviceConfig(*context->config, context->networkId, context->isCandidate);
         if (context->networkId < 0 || ret != WIFI_OPT_SUCCESS) {
             context->networkId = -1;
         }
@@ -398,11 +399,12 @@ napi_value AddUntrustedConfig(napi_env env, napi_callback_info info)
     }
     JsObjToDeviceConfig(env, argv[0], *config);
     asyncContext->config = config;
+    asyncContext->isCandidate = true;
 
     asyncContext->executeFunc = [&](void* data) -> void {
         DeviceConfigContext *context = static_cast<DeviceConfigContext *>(data);
         TRACE_FUNC_CALL_NAME("wifiDevicePtr->AddUntrustedConfig");
-        ErrCode ret = wifiDevicePtr->AddCandidateConfig(*context->config, context->networkId);
+        ErrCode ret = wifiDevicePtr->AddDeviceConfig(*context->config, context->networkId, context->isCandidate);
         if (context->networkId < 0 || ret != WIFI_OPT_SUCCESS) {
             context->networkId = -1;
         }
@@ -496,11 +498,12 @@ napi_value AddCandidateConfig(napi_env env, napi_callback_info info)
     }
     JsObjToDeviceConfig(env, argv[0], *config);
     asyncContext->config = config;
+    asyncContext->isCandidate = true;
 
     asyncContext->executeFunc = [&](void* data) -> void {
         DeviceConfigContext *context = static_cast<DeviceConfigContext *>(data);
         TRACE_FUNC_CALL_NAME("wifiDevicePtr->AddCandidateConfig");
-        ErrCode ret = wifiDevicePtr->AddCandidateConfig(*context->config, context->networkId);
+        ErrCode ret = wifiDevicePtr->AddDeviceConfig(*context->config, context->networkId, context->isCandidate);
         if (context->networkId < 0 || ret != WIFI_OPT_SUCCESS) {
             WIFI_LOGE("Add candidate device config failed: %{public}d", static_cast<int>(ret));
             context->networkId = -1;
@@ -576,9 +579,10 @@ napi_value ConnectToCandidateConfig(napi_env env, napi_callback_info info)
 
     int networkId = -1;
     napi_get_value_int32(env, argv[0], &networkId);
+    bool isCandidate = true;
 
     NAPI_ASSERT(env, wifiDevicePtr != nullptr, "Wifi device instance is null.");
-    ErrCode ret = wifiDevicePtr->ConnectToCandidateConfig(networkId);
+    ErrCode ret = wifiDevicePtr->ConnectToNetwork(networkId, isCandidate);
     napi_value result;
     napi_get_boolean(env, ret == WIFI_OPT_SUCCESS, &result);
     return result;
@@ -599,9 +603,10 @@ napi_value ConnectToNetwork(napi_env env, napi_callback_info info)
 
     int networkId = -1;
     napi_get_value_int32(env, argv[0], &networkId);
+    bool isCandidate = false;
 
     NAPI_ASSERT(env, wifiDevicePtr != nullptr, "Wifi device instance is null.");
-    ErrCode ret = wifiDevicePtr->ConnectToNetwork(networkId);
+    ErrCode ret = wifiDevicePtr->ConnectToNetwork(networkId, isCandidate);
     napi_value result;
     napi_get_boolean(env, ret == WIFI_OPT_SUCCESS, &result);
     return result;
@@ -967,7 +972,8 @@ napi_value GetDeviceConfigs(napi_env env, napi_callback_info info)
     TRACE_FUNC_CALL;
     NAPI_ASSERT(env, wifiDevicePtr != nullptr, "Wifi device instance is null.");
     std::vector<WifiDeviceConfig> vecDeviceConfigs;
-    ErrCode ret = wifiDevicePtr->GetDeviceConfigs(vecDeviceConfigs);
+    bool isCandidate = false;
+    ErrCode ret = wifiDevicePtr->GetDeviceConfigs(vecDeviceConfigs, isCandidate);
     if (ret != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("Get device configs fail: %{public}d", ret);
     }
@@ -986,7 +992,8 @@ napi_value GetCandidateConfigs(napi_env env, napi_callback_info info)
     TRACE_FUNC_CALL;
     NAPI_ASSERT(env, wifiDevicePtr != nullptr, "Wifi device instance is null.");
     std::vector<WifiDeviceConfig> vecDeviceConfigs;
-    ErrCode ret = wifiDevicePtr->GetCandidateConfigs(vecDeviceConfigs);
+    bool isCandidate = true;
+    ErrCode ret = wifiDevicePtr->GetDeviceConfigs(vecDeviceConfigs, isCandidate);
     if (ret != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("Get candidate device configs fail: %{public}d", ret);
     }

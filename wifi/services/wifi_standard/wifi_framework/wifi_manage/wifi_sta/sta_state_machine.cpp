@@ -1944,7 +1944,7 @@ void StaStateMachine::ConnectToNetworkProcess(InternalMessage *msg)
     lastNetworkId = msg->GetParam1();
     std::string bssid = msg->GetStringFromMessage();
     WIFI_LOGI("ConnectToNetworkProcess, Receive msg: lastNetworkId=%{public}d, bssid=%{public}s",
-        lastNetworkId, MacAnonymize(bssid));
+        lastNetworkId, MacAnonymize(bssid).c_str());
     WifiDeviceConfig deviceConfig;
     int result = WifiSettings::GetInstance().GetDeviceConfig(lastNetworkId, deviceConfig);
     WIFI_LOGI("Device config networkId = %{public}d", deviceConfig.networkId);

@@ -97,7 +97,7 @@ public:
 
     ErrCode PutWifiProtectRef(const std::string &protectName) override;
 
-    ErrCode AddDeviceConfig(const WifiDeviceConfig &config, int &result) override;
+    ErrCode AddDeviceConfig(const WifiDeviceConfig &config, int &result, bool isCandidate) override;
 
     ErrCode UpdateDeviceConfig(const WifiDeviceConfig &config, int &result) override;
 
@@ -105,13 +105,13 @@ public:
 
     ErrCode RemoveAllDevice() override;
 
-    ErrCode GetDeviceConfigs(std::vector<WifiDeviceConfig> &result) override;
+    ErrCode GetDeviceConfigs(std::vector<WifiDeviceConfig> &result, bool isCandidate) override;
 
     ErrCode EnableDeviceConfig(int networkId, bool attemptEnable) override;
 
     ErrCode DisableDeviceConfig(int networkId) override;
 
-    ErrCode ConnectToNetwork(int networkId) override;
+    ErrCode ConnectToNetwork(int networkId, bool isCandidate) override;
 
     ErrCode ConnectToDevice(const WifiDeviceConfig &config) override;
 
@@ -153,15 +153,9 @@ public:
 
     bool SetLowLatencyMode(bool enabled) override;
 
-    ErrCode AddCandidateConfig(const WifiDeviceConfig &config, int &networkId) override;
-
-    ErrCode ConnectToCandidateConfig(int networkId) override;
-
     ErrCode RemoveCandidateConfig(int networkId) override;
 
     ErrCode RemoveCandidateConfig(const WifiDeviceConfig &config) override;
-
-    ErrCode GetCandidateConfigs(std::vector<WifiDeviceConfig> &result) override;
 
 #ifndef OHOS_ARCH_LITE
     int32_t Dump(int32_t fd, const std::vector<std::u16string>& args) override;

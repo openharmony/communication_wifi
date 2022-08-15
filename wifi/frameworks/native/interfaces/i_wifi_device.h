@@ -76,15 +76,6 @@ public:
     virtual ErrCode PutWifiProtectRef(const std::string &protectName) = 0;
 
     /**
-     * @Description Add a specified candidate hotspot configuration.
-     *
-     * @param config - WifiDeviceConfig object
-     * @param networkId - the device configuration's network id
-     * @return ErrCode - operation result
-     */
-    virtual ErrCode AddCandidateConfig(const WifiDeviceConfig &config, int &networkId) = 0;
-
-    /**
      * @Description Remove the wifi candidate device config equals to input network id
      *
      * @param networkId - the candidate device network id
@@ -101,29 +92,14 @@ public:
     virtual ErrCode RemoveCandidateConfig(const WifiDeviceConfig &config) = 0;
 
     /**
-     * @Description Connect to a candidate specified network.
-     *
-     * @param networkId - the candidate device network id
-     * @return ErrCode - operation result
-     */
-    virtual ErrCode ConnectToCandidateConfig(int networkId) = 0;
-
-    /**
-     * @Description Get all candidate device configs
-     *
-     * @param result - Get result vector of WifiDeviceConfig
-     * @return ErrCode - operation result
-     */
-    virtual ErrCode GetCandidateConfigs(std::vector<WifiDeviceConfig> &result) = 0;
-
-    /**
      * @Description Add a wifi device configuration.
      *
      * @param config - WifiDeviceConfig object
      * @param result - the device configuration's network id
+     * @param isCandidate - Whether is candidate
      * @return ErrCode - operation result
      */
-    virtual ErrCode AddDeviceConfig(const WifiDeviceConfig &config, int &result) = 0;
+    virtual ErrCode AddDeviceConfig(const WifiDeviceConfig &config, int &result, bool isCandidate) = 0;
 
     /**
      * @Description Update a wifi device configuration.
@@ -153,9 +129,10 @@ public:
      * @Description Get all the device configs
      *
      * @param result - Get result vector of WifiDeviceConfig
+     * @param isCandidate - Whether is candidate
      * @return ErrCode - operation result
      */
-    virtual ErrCode GetDeviceConfigs(std::vector<WifiDeviceConfig> &result) = 0;
+    virtual ErrCode GetDeviceConfigs(std::vector<WifiDeviceConfig> &result, bool isCandidate) = 0;
 
     /**
      * @Description Enable device config, when set attemptEnable, disable other device config
@@ -178,9 +155,10 @@ public:
      * @Description Connecting to a Specified Network
      *
      * @param networkId - network id
+     * @param isCandidate - Whether is candidate
      * @return ErrCode - operation result
      */
-    virtual ErrCode ConnectToNetwork(int networkId) = 0;
+    virtual ErrCode ConnectToNetwork(int networkId, bool isCandidate) = 0;
 
     /**
      * @Description Connect To a network base WifiDeviceConfig object

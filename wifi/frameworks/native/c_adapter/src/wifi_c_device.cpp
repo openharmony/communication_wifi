@@ -207,7 +207,8 @@ WifiErrorCode AddDeviceConfig(const WifiDeviceConfig *config, int *result)
     OHOS::Wifi::WifiDeviceConfig deviceConfig;
     ConvertDeviceConfigFromC(config, deviceConfig);
     int addResult = -1;
-    OHOS::Wifi::ErrCode ret = wifiDevicePtr->AddDeviceConfig(deviceConfig, addResult);
+    bool isCandidate = false;
+    OHOS::Wifi::ErrCode ret = wifiDevicePtr->AddDeviceConfig(deviceConfig, addResult, isCandidate);
     *result = addResult;
     return GetCErrorCode(ret);
 }
@@ -218,7 +219,8 @@ WifiErrorCode GetDeviceConfigs(WifiDeviceConfig *result, unsigned int *size)
     CHECK_PTR_RETURN(result, ERROR_WIFI_INVALID_ARGS);
     CHECK_PTR_RETURN(size, ERROR_WIFI_INVALID_ARGS);
     std::vector<OHOS::Wifi::WifiDeviceConfig> vecDeviceConfigs;
-    OHOS::Wifi::ErrCode ret = wifiDevicePtr->GetDeviceConfigs(vecDeviceConfigs);
+    bool isCandidate = false;
+    OHOS::Wifi::ErrCode ret = wifiDevicePtr->GetDeviceConfigs(vecDeviceConfigs, isCandidate);
     if (ret != OHOS::Wifi::WIFI_OPT_SUCCESS) {
         WIFI_LOGE("Get device configs error!");
         return GetCErrorCode(ret);
@@ -253,7 +255,8 @@ WifiErrorCode EnableDeviceConfig(int networkId)
 WifiErrorCode ConnectTo(int networkId)
 {
     CHECK_PTR_RETURN(wifiDevicePtr, ERROR_WIFI_NOT_AVAILABLE);
-    return GetCErrorCode(wifiDevicePtr->ConnectToNetwork(networkId));
+    bool isCandidate = false;
+    return GetCErrorCode(wifiDevicePtr->ConnectToNetwork(networkId, isCandidate));
 }
 
 WifiErrorCode ConnectToDevice(const WifiDeviceConfig *config)

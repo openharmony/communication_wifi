@@ -114,12 +114,6 @@ ErrCode WifiDeviceImpl::PutWifiProtectRef(const std::string &protectName)
     return client_->PutWifiProtectRef(protectName);
 }
 
-ErrCode WifiDeviceImpl::AddCandidateConfig(const WifiDeviceConfig &config, int &networkId)
-{
-    RETURN_IF_FAIL(client_);
-    return client_->AddCandidateConfig(config, networkId);
-}
-
 ErrCode WifiDeviceImpl::RemoveCandidateConfig(int networkId)
 {
     RETURN_IF_FAIL(client_);
@@ -132,22 +126,10 @@ ErrCode WifiDeviceImpl::RemoveCandidateConfig(const WifiDeviceConfig &config)
     return client_->RemoveCandidateConfig(config);
 }
 
-ErrCode WifiDeviceImpl::ConnectToCandidateConfig(int networkId)
+ErrCode WifiDeviceImpl::AddDeviceConfig(const WifiDeviceConfig &config, int &result, bool isCandidate)
 {
     RETURN_IF_FAIL(client_);
-    return client_->ConnectToCandidateConfig(networkId);
-}
-
-ErrCode WifiDeviceImpl::GetCandidateConfigs(std::vector<WifiDeviceConfig> &result)
-{
-    RETURN_IF_FAIL(client_);
-    return client_->GetCandidateConfigs(result);
-}
-
-ErrCode WifiDeviceImpl::AddDeviceConfig(const WifiDeviceConfig &config, int &result)
-{
-    RETURN_IF_FAIL(client_);
-    return client_->AddDeviceConfig(config, result);
+    return client_->AddDeviceConfig(config, result, isCandidate);
 }
 
 ErrCode WifiDeviceImpl::UpdateDeviceConfig(const WifiDeviceConfig &config, int &result)
@@ -168,10 +150,10 @@ ErrCode WifiDeviceImpl::RemoveAllDevice()
     return client_->RemoveAllDevice();
 }
 
-ErrCode WifiDeviceImpl::GetDeviceConfigs(std::vector<WifiDeviceConfig> &result)
+ErrCode WifiDeviceImpl::GetDeviceConfigs(std::vector<WifiDeviceConfig> &result, bool isCandidate)
 {
     RETURN_IF_FAIL(client_);
-    return client_->GetDeviceConfigs(result);
+    return client_->GetDeviceConfigs(result, isCandidate);
 }
 
 ErrCode WifiDeviceImpl::EnableDeviceConfig(int networkId, bool attemptEnable)
@@ -186,10 +168,10 @@ ErrCode WifiDeviceImpl::DisableDeviceConfig(int networkId)
     return client_->DisableDeviceConfig(networkId);
 }
 
-ErrCode WifiDeviceImpl::ConnectToNetwork(int networkId)
+ErrCode WifiDeviceImpl::ConnectToNetwork(int networkId, bool isCandidate)
 {
     RETURN_IF_FAIL(client_);
-    return client_->ConnectToNetwork(networkId);
+    return client_->ConnectToNetwork(networkId, isCandidate);
 }
 
 ErrCode WifiDeviceImpl::ConnectToDevice(const WifiDeviceConfig &config)

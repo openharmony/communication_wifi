@@ -203,11 +203,13 @@ void WifiDeviceStub::OnPutWifiProtectRef(uint32_t code, IpcIo *req, IpcIo *reply
 void WifiDeviceStub::OnAddDeviceConfig(uint32_t code, IpcIo *req, IpcIo *reply)
 {
     WIFI_LOGD("run %{public}s code %{public}u", __func__, code);
+    bool isCandidate = false;
     WifiDeviceConfig config;
+    (void)ReadBool(req, &isCandidate);
     ReadWifiDeviceConfig(req, config);
 
     int result = INVALID_NETWORK_ID;
-    ErrCode ret = AddDeviceConfig(config, result);
+    ErrCode ret = AddDeviceConfig(config, result, isCandidate);
 
     (void)WriteInt32(reply, 0);
     (void)WriteInt32(reply, ret);
@@ -251,8 +253,10 @@ void WifiDeviceStub::OnRemoveAllDevice(uint32_t code, IpcIo *req, IpcIo *reply)
 void WifiDeviceStub::OnGetDeviceConfigs(uint32_t code, IpcIo *req, IpcIo *reply)
 {
     WIFI_LOGD("run %{public}s code %{public}u", __func__, code);
+    bool isCandidate = false;
     std::vector<WifiDeviceConfig> result;
-    ErrCode ret = GetDeviceConfigs(result);
+    (void)ReadBool(req, &isCandidate);
+    ErrCode ret = GetDeviceConfigs(result, isCandidate);
     (void)WriteInt32(reply, 0);
     (void)WriteInt32(reply, ret);
 
@@ -291,8 +295,10 @@ void WifiDeviceStub::OnConnectTo(uint32_t code, IpcIo *req, IpcIo *reply)
 {
     WIFI_LOGD("run %{public}s code %{public}u", __func__, code);
     int networkId = 0;
+    bool isCandidate = false;
+    (void)ReadBool(req, &isCandidate);
     (void)ReadInt32(req, &networkId);
-    ErrCode ret = ConnectToNetwork(networkId);
+    ErrCode ret = ConnectToNetwork(networkId, isCandidate);
     (void)WriteInt32(reply, 0);
     (void)WriteInt32(reply, ret);
 }

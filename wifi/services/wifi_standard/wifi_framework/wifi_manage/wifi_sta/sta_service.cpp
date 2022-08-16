@@ -197,7 +197,7 @@ int StaService::AddDeviceConfig(const WifiDeviceConfig &config) const
             LOGE("StaService::AddDeviceConfig GetNextNetworkId failed!");
             return INVALID_NETWORK_ID;
         }
-        LOGD("StaService::AddDeviceConfig alloc new id[%{public}d] succeed!", netWorkId);
+        LOGI("StaService::AddDeviceConfig alloc new id[%{public}d] succeed!", netWorkId);
     }
     tempDeviceConfig = config;
     tempDeviceConfig.networkId = netWorkId;

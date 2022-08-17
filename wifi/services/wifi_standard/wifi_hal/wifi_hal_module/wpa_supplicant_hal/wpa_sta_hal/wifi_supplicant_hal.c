@@ -1223,7 +1223,7 @@ static int WpaCliCmdWpaTerminate(WifiWpaStaInterface *this)
     }
     char cmd[CMD_BUFFER_SIZE] = {0};
     char buf[REPLY_BUF_SMALL_LENGTH] = {0};
-    if (snprintf_s(cmd, sizeof(cmd), sizeof(cmd) - 1, "IFNAME=%s TERMINATE", this->ifname) < 0) {
+    if (snprintf_s(cmd, sizeof(cmd), sizeof(cmd) - 1, "TERMINATE") < 0) {
         LOGE("WpaCliCmdWpaTerminate, snprintf err");
         return -1;
     }

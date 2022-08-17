@@ -175,7 +175,6 @@ WifiErrorNo StopSupplicant(void)
     int res = pStaIfc->wpaCliCmdWpaTerminate(pStaIfc);
     if (res < 0) {
         LOGE("wpaCliCmdWpaTerminate failed! ret=%{public}d", res);
-        return WIFI_HAL_FAILED;
     }
     usleep(WPA_TERMINATE_SLEEP_TIME);
     ModuleManageRetCode ret = StopModule(g_serviceName);

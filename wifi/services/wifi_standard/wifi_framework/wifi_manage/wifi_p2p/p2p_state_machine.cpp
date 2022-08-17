@@ -812,6 +812,11 @@ int P2pStateMachine::GetAvailableFreqByBand(GroupOwnerBand band) const
     }
     if (WifiP2PHalInterface::GetInstance().P2pGetSupportFrequenciesByBand(static_cast<int>(band), freqList) ==
         WifiErrorNo::WIFI_IDL_OPT_FAILED) {
+        constexpr int DEFAULT_5G_FREQUENCY = 5745; // channal:149, frequency:5745
+        if (band == GroupOwnerBand::GO_BAND_5GHZ) {
+            WIFI_LOGE("Get support frequencies failed, use default 5g frequency!");
+            return DEFAULT_5G_FREQUENCY;
+        }
         WIFI_LOGE("Cannot get support frequencies according to band, choose random frequency");
         return 0;
     }

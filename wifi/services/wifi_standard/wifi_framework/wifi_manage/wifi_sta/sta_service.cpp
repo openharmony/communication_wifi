@@ -122,7 +122,7 @@ ErrCode StaService::AddCandidateConfig(const int uid, const WifiDeviceConfig &co
         return WIFI_OPT_FAILED;
     }
 
-    if (config.keyMgmt == KEY_MGMT_NONE) {
+    if (config.keyMgmt == KEY_MGMT_NONE || config.keyMgmt == KEY_MGMT_WEP) {
         LOGE("StaService::AddCandidateConfig unsupport open or wep key!");
         return WIFI_OPT_NOT_SUPPORTED;
     }

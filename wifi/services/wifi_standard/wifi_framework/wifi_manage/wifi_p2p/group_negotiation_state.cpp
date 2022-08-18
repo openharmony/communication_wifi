@@ -201,9 +201,11 @@ bool GroupNegotiationState::ProcessCmdRemoveGroup(InternalMessage &msg) const
     WifiErrorNo ret = WifiP2PHalInterface::GetInstance().GroupRemove(ifName);
     if (ret) {
         WIFI_LOGE("P2P group (%{public}s) removal failed.", ifName.c_str());
+        p2pStateMachine.ChangeConnectedStatus(P2pConnectedState::P2P_DISCONNECTED);
         p2pStateMachine.BroadcastActionResult(P2pActionCallback::RemoveGroup, WIFI_OPT_FAILED);
     } else {
         WIFI_LOGI("The P2P group (%{public}s) is successfully removed.", ifName.c_str());
+        p2pStateMachine.ChangeConnectedStatus(P2pConnectedState::P2P_DISCONNECTED);
         p2pStateMachine.BroadcastActionResult(P2pActionCallback::RemoveGroup, WIFI_OPT_SUCCESS);
     }
     p2pStateMachine.SwitchState(&p2pStateMachine.p2pIdleState);

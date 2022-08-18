@@ -129,7 +129,7 @@ WifiErrorNo Start(void)
 
 WifiErrorNo Stop(void)
 {
-    LOGD("Ready to Stop wifi");
+    LOGI("Ready to Stop wifi");
     WifiErrorNo err = StopWpaAndWpaHal(0);
     if (err == WIFI_HAL_FAILED) {
         LOGD("Wifi stop failed!");
@@ -141,7 +141,7 @@ WifiErrorNo Stop(void)
 
 WifiErrorNo ForceStop(void)
 {
-    LOGD("Ready force Stop wifi");
+    LOGI("Ready force Stop wifi");
     WifiWpaStaInterface *p = TraversalWifiStaInterface();
     while (p != NULL) {
         StopWpaAndWpaHal(p->staNo);

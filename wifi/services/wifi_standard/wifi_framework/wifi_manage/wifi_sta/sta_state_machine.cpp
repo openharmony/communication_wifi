@@ -434,7 +434,6 @@ void StaStateMachine::StartWifiProcess()
         WifiSettings::GetInstance().SetWifiState(static_cast<int>(WifiState::DISABLED));
         WifiSettings::GetInstance().SetUserLastSelectedNetworkId(INVALID_NETWORK_ID);
         staCallback.OnStaOpenRes(OperateResState::OPEN_WIFI_FAILED);
-        staCallback.OnStaOpenRes(OperateResState::OPEN_WIFI_DISABLED);
     }
 }
 

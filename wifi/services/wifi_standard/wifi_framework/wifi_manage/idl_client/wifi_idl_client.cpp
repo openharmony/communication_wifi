@@ -499,16 +499,22 @@ WifiErrorNo WifiIdlClient::SetDeviceConfig(int networkId, const WifiIdlDeviceCon
 {
     CHECK_CLIENT_NOT_NULL;
     if (CheckValidDeviceConfig(config) != WIFI_IDL_OPT_OK) {
+        LOGE("SetDeviceConfig, CheckValidDeviceConfig return error!");
         return WIFI_IDL_OPT_FAILED;
     }
     SetNetworkConfig conf[DEVICE_CONFIG_END_POS];
     if (memset_s(conf, sizeof(conf), 0, sizeof(conf)) != EOK) {
+        LOGE("SetDeviceConfig, memset_s return error!");
         return WIFI_IDL_OPT_FAILED;
     }
     int num = 0;
     num += PushDeviceConfigString(conf + num, DEVICE_CONFIG_SSID, config.ssid);
     num += PushDeviceConfigString(conf + num, DEVICE_CONFIG_PSK, config.psk);
-    num += PushDeviceConfigString(conf + num, DEVICE_CONFIG_KEYMGMT, config.keyMgmt);
+    if (config.keyMgmt == KEY_MGMT_NONE || config.keyMgmt == KEY_MGMT_WEP) {
+        num += PushDeviceConfigString(conf + num, DEVICE_CONFIG_KEYMGMT, KEY_MGMT_NONE);
+    } else {
+        num += PushDeviceConfigString(conf + num, DEVICE_CONFIG_KEYMGMT, config.keyMgmt);
+    }
     num += PushDeviceConfigString(conf + num, DEVICE_CONFIG_EAP, config.eap);
     num += PushDeviceConfigString(conf + num, DEVICE_CONFIG_IDENTITY, config.identity);
     num += PushDeviceConfigString(conf + num, DEVICE_CONFIG_PASSWORD, config.password);

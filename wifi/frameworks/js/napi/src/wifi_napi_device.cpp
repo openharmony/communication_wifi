@@ -228,8 +228,11 @@ static void ConvertEncryptionMode(const SecTypeJs& securityType, std::string& ke
 {
     switch (securityType) {
         case SecTypeJs::SEC_TYPE_OPEN:
-        case SecTypeJs::SEC_TYPE_WEP:
             keyMgmt = KEY_MGMT_NONE;
+            break;
+
+        case SecTypeJs::SEC_TYPE_WEP:
+            keyMgmt = KEY_MGMT_WEP;
             break;
 
         case SecTypeJs::SEC_TYPE_PSK:

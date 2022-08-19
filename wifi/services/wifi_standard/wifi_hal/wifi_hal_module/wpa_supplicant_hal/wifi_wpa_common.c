@@ -110,14 +110,18 @@ int InitWpaCtrl(WpaCtrl *pCtrl, const char *ifname)
     }
     int flag = 0;
     do {
-        pCtrl->pSend = wpa_ctrl_open("global");
         pCtrl->pRecv = wpa_ctrl_open("global");
-        if (pCtrl->pSend == NULL || pCtrl->pRecv == NULL) {
-            LOGE("open wpa control interface failed!");
+        if (pCtrl->pRecv == NULL) {
+            LOGE("open wpa control recv interface failed!");
             break;
         }
         if (wpa_ctrl_attach(pCtrl->pRecv) != 0) {
             LOGE("attach monitor interface failed!");
+            break;
+        }
+        pCtrl->pSend = wpa_ctrl_open("global");
+        if (pCtrl->pSend == NULL) {
+            LOGE("open wpa control send interface failed!");
             break;
         }
         flag += 1;

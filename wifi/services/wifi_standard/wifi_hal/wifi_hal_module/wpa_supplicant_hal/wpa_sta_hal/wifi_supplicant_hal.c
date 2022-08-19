@@ -714,6 +714,8 @@ static int WpaCliCmdScan(WifiWpaStaInterface *this, const ScanSettings *settings
     unsigned len = CMD_BUFFER_SIZE;
     if (settings != NULL) {
         unsigned expectLen = strlen("IFNAME=") + strlen(this->ifname) + 1 + strlen("SCAN");
+        LOGI("WpaCliCmdScan, freqSize=%{public}d, hiddenSsidSize=%{public}d",
+            settings->freqSize, settings->hiddenSsidSize);
         if (settings->freqSize > 0) {
             expectLen += strlen(" freq=") + (CMD_FREQ_MAX_LEN + 1) * settings->freqSize;
         }

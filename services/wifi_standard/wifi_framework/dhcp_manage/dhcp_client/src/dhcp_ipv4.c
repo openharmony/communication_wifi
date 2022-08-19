@@ -833,7 +833,8 @@ static int SyncDhcpResult(const struct DhcpPacket *packet, struct DhcpResult *re
     }
 
     /* Set the specified client process interface network info. */
-    if (SetLocalInterface(g_cltCnf->ifaceName, ntohl(g_requestedIp4)) != DHCP_OPT_SUCCESS) {
+    if (SetLocalInterface(g_cltCnf->ifaceName, inet_addr(result->strYiaddr), inet_addr(result->strOptSubnet))
+        != DHCP_OPT_SUCCESS) {
         LOGE("SyncDhcpResult() error, SetLocalInterface yiaddr:%{private}s failed!", result->strYiaddr);
         return DHCP_OPT_FAILED;
     }

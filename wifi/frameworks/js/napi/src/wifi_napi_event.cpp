@@ -26,6 +26,7 @@ namespace OHOS {
 namespace Wifi {
 DEFINE_WIFILOG_LABEL("WifiNAPIEvent");
 
+/* Events definition */
 const std::string EVENT_STA_POWER_STATE_CHANGE = "wifiStateChange";
 const std::string EVENT_STA_CONN_STATE_CHANGE = "wifiConnectionChange";
 const std::string EVENT_STA_SCAN_STATE_CHANGE = "wifiScanStateChange";
@@ -41,6 +42,23 @@ const std::string EVENT_P2P_PERSISTENT_GROUP_CHANGE = "p2pPersistentGroupChange"
 const std::string EVENT_P2P_PEER_DEVICE_CHANGE = "p2pPeerDeviceChange";
 const std::string EVENT_P2P_DISCOVERY_CHANGE = "p2pDiscoveryChange";
 const std::string EVENT_STREAM_CHANGE = "streamChange";
+
+/* Permissions definition */
+const std::string WIFI_PERMISSION_NULL = "ohos.permission.NULL";
+const std::string WIFI_PERMISSION_GET_WIFI_INFO = "ohos.permission.GET_WIFI_INFO";
+const std::string WIFI_PERMISSION_SET_WIFI_INFO = "ohos.permission.SET_WIFI_INFO";
+const std::string WIFI_PERMISSION_GET_WIFI_CONFIG = "ohos.permission.GET_WIFI_CONFIG";
+const std::string WIFI_PERMISSION_MANAGE_WIFI_CONNECTION = "ohos.permission.MANAGE_WIFI_CONNECTION";
+const std::string WIFI_PERMISSION_MANAGE_WIFI_HOTSPOT = "ohos.permission.MANAGE_WIFI_HOTSPOT";
+const std::string WIFI_PERMISSION_MANAGE_ENHANCER_WIFI = "ohos.permission.MANAGE_ENHANCER_WIFI";
+const std::string WIFI_PERMISSION_GET_WIFI_LOCAL_MAC = "ohos.permission.GET_WIFI_LOCAL_MAC";
+const std::string WIFI_PERMISSION_LOCATION = "ohos.permission.LOCATION";
+const std::string WIFI_PERMISSION_GET_P2P_DEVICE_LOCATION = "ohos.permission.GET_P2P_DEVICE_LOCATION";
+const std::string WIFI_PERMISSION_GET_WIFI_INFO_INTERNAL = "ohos.permission.GET_WIFI_INFO_INTERNAL";
+const int WIFI_NAPI_PERMISSION_DENIED = 0;
+const int WIFI_NAPI_PERMISSION_GRANTED = 1;
+
+constexpr uint32_t INVALID_REF_COUNT = 0xff;
 
 static std::set<std::string> g_supportEventList = {
     EVENT_STA_POWER_STATE_CHANGE,
@@ -58,20 +76,6 @@ static std::set<std::string> g_supportEventList = {
     EVENT_P2P_PEER_DEVICE_CHANGE,
     EVENT_P2P_DISCOVERY_CHANGE,
 };
-
-const std::string WIFI_PERMISSION_NULL = "ohos.permission.NULL";
-const std::string WIFI_PERMISSION_GET_WIFI_INFO = "ohos.permission.GET_WIFI_INFO";
-const std::string WIFI_PERMISSION_SET_WIFI_INFO = "ohos.permission.SET_WIFI_INFO";
-const std::string WIFI_PERMISSION_GET_WIFI_CONFIG = "ohos.permission.GET_WIFI_CONFIG";
-const std::string WIFI_PERMISSION_MANAGE_WIFI_CONNECTION = "ohos.permission.MANAGE_WIFI_CONNECTION";
-const std::string WIFI_PERMISSION_MANAGE_WIFI_HOTSPOT = "ohos.permission.MANAGE_WIFI_HOTSPOT";
-const std::string WIFI_PERMISSION_MANAGE_ENHANCER_WIFI = "ohos.permission.MANAGE_ENHANCER_WIFI";
-const std::string WIFI_PERMISSION_GET_WIFI_LOCAL_MAC = "ohos.permission.GET_WIFI_LOCAL_MAC";
-const std::string WIFI_PERMISSION_LOCATION = "ohos.permission.LOCATION";
-const std::string WIFI_PERMISSION_GET_P2P_DEVICE_LOCATION = "ohos.permission.GET_P2P_DEVICE_LOCATION";
-const std::string WIFI_PERMISSION_GET_WIFI_INFO_INTERNAL = "ohos.permission.GET_WIFI_INFO_INTERNAL";
-const int WIFI_NAPI_PERMISSION_DENIED = 0;
-const int WIFI_NAPI_PERMISSION_GRANTED = 1;
 
 std::multimap<std::string, std::string> g_EventPermissionMap = {
     { EVENT_STA_POWER_STATE_CHANGE, WIFI_PERMISSION_GET_WIFI_INFO },
@@ -109,30 +113,34 @@ void NapiEvent::EventNotify(AsyncEventData *asyncEvent)
         return;
     }
 
-    WIFI_LOGI("Get the event loop, napi_env: %{private}p", asyncEvent->env);
+    uint32_t refCount = INVALID_REF_COUNT;
+    napi_reference_ref(asyncEvent->env, asyncEvent->callbackRef, &refCount);
     work->data = asyncEvent;
+    WIFI_LOGI("event notify, env: %{private}p, callbackRef: %{private}p, refCount: %{public}d",
+        asyncEvent->env, asyncEvent->callbackRef, refCount);
     uv_queue_work(
         loop,
         work,
         [](uv_work_t* work) {},
         [](uv_work_t* work, int status) {
             AsyncEventData *asyncData = static_cast<AsyncEventData*>(work->data);
-            WIFI_LOGI("Napi event uv_queue_work, env: %{private}p, status: %{public}d", asyncData->env, status);
+            WIFI_LOGI("uv_queue_work, env: %{private}p, status: %{public}d", asyncData->env, status);
             napi_value handler = nullptr;
             napi_handle_scope scope = nullptr;
             napi_value jsEvent = nullptr;
+            uint32_t refCount = INVALID_REF_COUNT;
             napi_open_handle_scope(asyncData->env, &scope);
             if (scope == nullptr) {
                 WIFI_LOGE("scope is nullptr");
                 goto EXIT;
             }
-            napi_value undefine;
-            napi_get_undefined(asyncData->env, &undefine);
             napi_get_reference_value(asyncData->env, asyncData->callbackRef, &handler);
             if (handler == nullptr) {
                 WIFI_LOGE("handler is nullptr");
                 goto EXIT;
             }
+            napi_value undefine;
+            napi_get_undefined(asyncData->env, &undefine);
             jsEvent = asyncData->packResult();
             WIFI_LOGI("Push event to js, env: %{private}p, ref : %{private}p", asyncData->env, &asyncData->callbackRef);
             if (napi_call_function(asyncData->env, nullptr, handler, 1, &jsEvent, &undefine) != napi_ok) {
@@ -141,32 +149,18 @@ void NapiEvent::EventNotify(AsyncEventData *asyncEvent)
 
         EXIT:
             napi_close_handle_scope(asyncData->env, scope);
+            napi_reference_unref(asyncData->env, asyncData->callbackRef, &refCount);
+            WIFI_LOGI("uv_queue_work unref, env: %{private}p, callbackRef: %{private}p, refCount: %{public}d",
+                asyncData->env, asyncData->callbackRef, refCount);
+            if (refCount == 0) {
+                napi_delete_reference(asyncData->env, asyncData->callbackRef);
+            }
             delete asyncData;
-            asyncData = nullptr;
             delete work;
+            asyncData = nullptr;
             work = nullptr;
         }
     );
-}
-
-bool NapiEvent::IsRegisterObjectExist(const RegObj& regObj, const std::string& type)
-{
-    /* The caller has lock protect, don't need to lock again */
-    auto iter = g_eventRegisterInfo.find(type);
-    if (iter == g_eventRegisterInfo.end()) {
-        return false;
-    }
-    return (std::find(iter->second.begin(), iter->second.end(), regObj) != iter->second.end());
-}
-
-std::vector<RegObj> NapiEvent::GetRegisterObjects(const std::string& type)
-{
-    std::shared_lock<std::shared_mutex> guard(g_regInfoMutex);
-    auto iter = g_eventRegisterInfo.find(type);
-    if (iter == g_eventRegisterInfo.end()) {
-        return std::vector<RegObj>();
-    }
-    return g_eventRegisterInfo[type];
 }
 
 napi_value NapiEvent::CreateResult(const napi_env& env, int value)
@@ -630,8 +624,13 @@ void EventRegister::DeleteRegisterObj(const napi_env& env, std::vector<RegObj>& 
             bool isEqual = false;
             napi_strict_equals(iter->m_regEnv, handlerTemp, handler, &isEqual);
             if (isEqual) {
-                napi_delete_reference(iter->m_regEnv, iter->m_regHanderRef);
-                napi_reference_unref(iter->m_regEnv, iter->m_regHanderRef, nullptr);
+                uint32_t refCount = INVALID_REF_COUNT;
+                napi_reference_unref(iter->m_regEnv, iter->m_regHanderRef, &refCount);
+                WIFI_LOGI("delete ref, m_regEnv: %{private}p, m_regHanderRef: %{private}p, refCount: %{public}d",
+                    iter->m_regEnv, iter->m_regHanderRef, refCount);
+                if (refCount == 0) {
+                    napi_delete_reference(iter->m_regEnv, iter->m_regHanderRef);
+                }
                 WIFI_LOGI("Delete register object ref.");
                 iter = vecRegObjs.erase(iter);
             } else {
@@ -649,8 +648,13 @@ void EventRegister::DeleteAllRegisterObj(const napi_env& env, std::vector<RegObj
     auto iter = vecRegObjs.begin();
     for (; iter != vecRegObjs.end();) {
         if (env == iter->m_regEnv) {
-            napi_delete_reference(iter->m_regEnv, iter->m_regHanderRef);
-            napi_reference_unref(iter->m_regEnv, iter->m_regHanderRef, nullptr);
+            uint32_t refCount = INVALID_REF_COUNT;
+            napi_reference_unref(iter->m_regEnv, iter->m_regHanderRef, &refCount);
+            WIFI_LOGI("delete all ref, m_regEnv: %{private}p, m_regHanderRef: %{private}p, refCount: %{public}d",
+                iter->m_regEnv, iter->m_regHanderRef, refCount);
+            if (refCount == 0) {
+                napi_delete_reference(iter->m_regEnv, iter->m_regHanderRef);
+            }
             iter = vecRegObjs.erase(iter);
         } else {
             WIFI_LOGI("Unregister all event, env is not equal %{private}p, : %{private}p", env, iter->m_regEnv);

@@ -95,6 +95,21 @@ void WifiManager::AutoStartStaService(void)
     return;
 }
 
+void WifiManager::ForceStopWifi(void)
+{
+    WIFI_LOGI("Enter ForceStopWifi");
+    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst();
+    if (pService == nullptr || (pService->DisableWifi() != WIFI_OPT_SUCCESS)) {
+        WIFI_LOGE("service is null or disable wifi failed.");
+        WifiConfigCenter::GetInstance().SetWifiMidState(WifiOprMidState::CLOSED);
+        WifiServiceManager::GetInstance().UnloadService(WIFI_SERVICE_STA);
+        return;
+    }
+    WifiOprMidState curState = WifiConfigCenter::GetInstance().GetWifiMidState();
+    WIFI_LOGI("In force stop wifi, state: %{public}d", static_cast<int>(curState));
+    WifiConfigCenter::GetInstance().SetWifiMidState(curState, WifiOprMidState::CLOSED);
+}
+
 #ifdef OHOS_ARCH_LITE
 void WifiManager::AutoStartStaServiceThread(void)
 {
@@ -408,38 +423,35 @@ StaServiceCallback WifiManager::GetStaCallback()
 
 void WifiManager::DealStaOpenRes(OperateResState state)
 {
+    WIFI_LOGI("Enter DealStaOpenRes: %{public}d", static_cast<int>(state));
     WifiEventCallbackMsg cbMsg;
     cbMsg.msgCode = WIFI_CBK_MSG_STATE_CHANGE;
-    if (state == OperateResState::OPEN_WIFI_FAILED) {
-        WIFI_LOGD("DealStaOpenRes:upload wifi open failed event!");
-        cbMsg.msgData = static_cast<int>(WifiState::UNKNOWN);
-        WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
-    } else if (state == OperateResState::OPEN_WIFI_OPENING) {
+    if (state == OperateResState::OPEN_WIFI_OPENING) {
         cbMsg.msgData = static_cast<int>(WifiState::ENABLING);
         WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
-    } else if (state == OperateResState::OPEN_WIFI_DISABLED) {
-        WIFI_LOGD("DealStaOpenRes:wifi open failed,close wifi sta service!");
+        return;
+    }
+    if ((state == OperateResState::OPEN_WIFI_FAILED) || (state == OperateResState::OPEN_WIFI_DISABLED)) {
+        WIFI_LOGE("DealStaOpenRes:wifi open failed!");
+        WifiConfigCenter::GetInstance().SetWifiMidState(WifiOprMidState::OPENING, WifiOprMidState::CLOSED);
         DealStaCloseRes(state);
-    } else {
-        WIFI_LOGD("DealStaOpenRes:wifi open successfully!");
-        WifiConfigCenter::GetInstance().SetWifiMidState(WifiOprMidState::OPENING, WifiOprMidState::RUNNING);
-        WifiConfigCenter::GetInstance().SetStaLastRunState(true);
-        if (WifiConfigCenter::GetInstance().GetAirplaneModeState() == 1) {
-            WifiConfigCenter::GetInstance().SetWifiStateWhenAirplaneMode(true);
-        }
-
-        cbMsg.msgData = static_cast<int>(WifiState::ENABLED);
-        WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
-
-        CheckAndStartScanService();
+        return;
     }
 
-    return;
+    WIFI_LOGI("DealStaOpenRes:wifi open successfully!");
+    WifiConfigCenter::GetInstance().SetWifiMidState(WifiOprMidState::OPENING, WifiOprMidState::RUNNING);
+    WifiConfigCenter::GetInstance().SetStaLastRunState(true);
+    if (WifiConfigCenter::GetInstance().GetAirplaneModeState() == 1) {
+        WifiConfigCenter::GetInstance().SetWifiStateWhenAirplaneMode(true);
+    }
+    cbMsg.msgData = static_cast<int>(WifiState::ENABLED);
+    WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
+    CheckAndStartScanService();
 }
 
 void WifiManager::DealStaCloseRes(OperateResState state)
 {
-    WIFI_LOGI("Enter DealStaCloseRes");
+    WIFI_LOGI("Enter DealStaCloseRes: %{public}d", static_cast<int>(state));
     WifiEventCallbackMsg cbMsg;
     cbMsg.msgCode = WIFI_CBK_MSG_STATE_CHANGE;
     if (state == OperateResState::CLOSE_WIFI_CLOSING) {
@@ -448,18 +460,16 @@ void WifiManager::DealStaCloseRes(OperateResState state)
         return;
     }
     if (state == OperateResState::CLOSE_WIFI_FAILED) {
-        WIFI_LOGI("DealStaCloseRes:upload wifi close failed event!");
+        WIFI_LOGI("DealStaCloseRes: broadcast wifi close failed event!");
         cbMsg.msgData = static_cast<int>(WifiState::UNKNOWN);
         WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
+        ForceStopWifi();
     }
-
     if (WifiConfigCenter::GetInstance().GetAirplaneModeState() == 1) {
         WifiConfigCenter::GetInstance().SetWifiStateWhenAirplaneMode(false);
     }
-
     cbMsg.msgData = static_cast<int>(WifiState::DISABLED);
     WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
-
     CheckAndStopScanService();
     WifiManager::GetInstance().PushServiceCloseMsg(WifiCloseServiceCode::STA_SERVICE_CLOSE);
     return;
@@ -736,6 +746,7 @@ IP2pServiceCallbacks WifiManager::GetP2pCallback(void)
 
 void WifiManager::DealP2pStateChanged(P2pState state)
 {
+    WIFI_LOGI("DealP2pStateChanged, state: %{public}d", static_cast<int>(state));
     WifiEventCallbackMsg cbMsg;
     cbMsg.msgCode = WIFI_CBK_MSG_P2P_STATE_CHANGE;
     cbMsg.msgData = static_cast<int>(state);
@@ -745,6 +756,16 @@ void WifiManager::DealP2pStateChanged(P2pState state)
     }
     if (state == P2pState::P2P_STATE_STARTED) {
         WifiConfigCenter::GetInstance().SetP2pMidState(WifiOprMidState::OPENING, WifiOprMidState::RUNNING);
+    }
+    if (state == P2pState::P2P_STATE_CLOSED) {
+        bool ret = WifiConfigCenter::GetInstance().SetP2pMidState(WifiOprMidState::OPENING, WifiOprMidState::CLOSED);
+        if (ret) {
+            WIFI_LOGE("P2p start failed, stop wifi!");
+            ForceStopWifi();
+            cbMsg.msgCode = WIFI_CBK_MSG_STATE_CHANGE;
+            cbMsg.msgData = static_cast<int>(WifiState::DISABLED);
+            WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
+        }
     }
     WifiCommonEventHelper::PublishP2pStateChangedEvent((int)state, "OnP2pStateChanged");
     return;

@@ -186,6 +186,7 @@ private:
     static void DealConfigChanged(CfgType type, char* data, int dataLen);
 #endif
     static void AutoStartStaService(void);
+    static void ForceStopWifi(void);
 #ifdef FEATURE_P2P_SUPPORT
     static void AutoStartP2pService(void);
 #endif

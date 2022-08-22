@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -156,7 +156,7 @@ static WifiErrorCode GetStaListFromCpp(const std::vector<OHOS::Wifi::StationInfo
             WIFI_LOGE("Get sta list convert bssid error!");
             return ERROR_WIFI_UNKNOWN;
         }
-        result->ipAddress = OHOS::Wifi::IpTools::ConvertIpv4Address(each.ipAddr);
+        result->ipAddress = OHOS::Wifi::Ip2Number(each.ipAddr);
     }
     return WIFI_SUCCESS;
 }

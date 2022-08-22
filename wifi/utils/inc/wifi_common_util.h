@@ -100,9 +100,9 @@ bool IsMacArrayEmpty(const unsigned char mac[WIFI_MAC_LEN]);
  * @Description Converting a string IP Address to an integer IP address
  *
  * @param strIp - Input string IP address
- * @return int - integer IP address
+ * @return unsigned int - integer IP address
  */
-int Ip2Number(const std::string& strIp);
+unsigned int Ip2Number(const std::string& strIp);
 
 /**
  * @Description Converting an integer IP address to a string IP Address
@@ -110,7 +110,7 @@ int Ip2Number(const std::string& strIp);
  * @param intIp - Input integer IP address
  * @return string - string IP address
  */
-std::string Number2Ip(int intIp);
+std::string Number2Ip(unsigned int intIp);
 
 /**
  * @Description Splitting strings by delimiter

@@ -51,7 +51,7 @@ ohos_unittest("dhcp_manage_unittest") {
     "$DHCP_ROOT_DIR/services/mgr_service/include",
     "$DHCP_ROOT_DIR/interfaces/inner_api/include",
     "$DHCP_ROOT_DIR/interfaces/inner_api/interfaces",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/common/log",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/log",
     "//commonlibrary/c_utils/base/include",
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
     "${even_path}/cesfwk/kits/native/include",

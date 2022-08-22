@@ -20,7 +20,6 @@ if (defined(ohos_lite)) {
 }
 
 local_base_sources = [
-  "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/common/log/log_helper.c",
   "../common/handler.cpp",
   "../common/internal_message.cpp",
   "../common/message_queue.cpp",
@@ -36,11 +35,11 @@ local_base_include_dirs = [
   "$WIFI_ROOT_DIR/frameworks/native/interfaces",
   "$WIFI_ROOT_DIR/services/wifi_standard/ipc_framework/interface",
   "$WIFI_ROOT_DIR/services/wifi_standard/ipc_framework/cRPC/include",
-  "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/common/include",
-  "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/common/config",
-  "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/common/log",
-  "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/common/utils",
-  "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/common/net_helper",
+  "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/include",
+  "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/config",
+  "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/log",
+  "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/utils",
+  "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/net_helper",
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/common",
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_scan",
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/",
@@ -62,6 +61,7 @@ if (defined(ohos_lite)) {
     deps = [
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage:wifi_service_base",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/idl_client:wifi_idl_client",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit:wifi_toolkit",
       "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
       "//third_party/bounds_checking_function:libsec_shared",
     ]
@@ -91,6 +91,7 @@ if (defined(ohos_lite)) {
     deps = [
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage:wifi_manager_service",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/idl_client:wifi_idl_client",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit:wifi_toolkit",
     ]
 
     external_deps = [

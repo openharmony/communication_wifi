@@ -190,30 +190,30 @@ bool IsMacArrayEmpty(const unsigned char mac[WIFI_MAC_LEN])
     return true;
 }
 
-int Ip2Number(const std::string& strIp)
+unsigned int Ip2Number(const std::string& strIp)
 {
     std::string::size_type front = 0;
     std::string::size_type back = 0;
-    int number = 0;
+    unsigned int number = 0;
     int size = 32;
     constexpr int sectionSize = 8;
 
     std::string ip(strIp + '.');
     while ((back = ip.find_first_of('.', back)) != (std::string::size_type)std::string::npos) {
-        number |= atoi(ip.substr(front, back - front).c_str()) << (size -= sectionSize);
+        number |= std::stol(ip.substr(front, back - front).c_str()) << (size -= sectionSize);
         front = ++back;
     }
     return number;
 }
 
-std::string Number2Ip(int intIp)
+std::string Number2Ip(unsigned int intIp)
 {
     constexpr int fourthPartMoveLen = 24;
     constexpr int thirdPartMoveLen = 16;
     constexpr int secondPartMoveLen = 8;
 
     std::string ip;
-    ip.append(std::to_string(((unsigned int)intIp & 0xff000000) >> fourthPartMoveLen));
+    ip.append(std::to_string((intIp & 0xff000000) >> fourthPartMoveLen));
     ip.push_back('.');
     ip.append(std::to_string((intIp & 0x00ff0000) >> thirdPartMoveLen));
     ip.push_back('.');

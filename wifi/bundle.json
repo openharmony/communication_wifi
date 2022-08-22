@@ -78,7 +78,7 @@
                 "//foundation/communication/wifi/wifi/services/wifi_standard/wifi_framework:wifi_manage",
                 "//foundation/communication/wifi/wifi/services/wifi_standard/wifi_framework:wifi_system_ability",
                 "//foundation/communication/wifi/wifi/services/wifi_standard/wifi_hal:wifi_hal",
-                "//foundation/communication/wifi/wifi/utils/src:wifi_utils"
+                "//foundation/communication/wifi/wifi/utils:wifi_utils"
             ],
             "inner_kits": [
                 {
@@ -114,7 +114,7 @@
                 "//foundation/communication/wifi/wifi/test/wifi_standard/wifi_framework/wifi_manage/wifi_ap:unittest",
                 "//foundation/communication/wifi/wifi/test/wifi_standard/wifi_framework/wifi_manage/wifi_p2p/test:unittest",
                 "//foundation/communication/wifi/wifi/test/wifi_standard/ipc_framework/cRPC/unittest:unittest",
-                "//foundation/communication/wifi/wifi/test/wifi_standard/wifi_framework/common/unittest:unittest",
+                "//foundation/communication/wifi/wifi/test/wifi_standard/wifi_framework/wifi_toolkit/unittest:unittest",
                 "//foundation/communication/wifi/wifi/test/wifi_standard/wifi_framework/wifi_manage/unittest:unittest",
                 "//foundation/communication/wifi/wifi/test/wifi_standard/wifi_framework/wifi_manage/idl_client/unittest:unittest",
                 "//foundation/communication/wifi/wifi/test/wifi_standard/wifi_hal/unittest:unittest"

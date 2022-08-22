@@ -12,15 +12,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "dhcpd_interface.h"
-#include <netinet/in.h>
-#include <arpa/inet.h>
 
+#include "dhcpd_interface.h"
+#include <arpa/inet.h>
+#include <netinet/in.h>
+#include "dhcp_define.h"
+#include "dhcp_service.h"
 #include "network_interface.h"
 #include "wifi_global_func.h"
-#include "dhcpd_interface.h"
 #include "wifi_logger.h"
-#include "dhcp_service.h"
 
 DEFINE_WIFILOG_DHCP_LABEL("WifiDhcpdInterface");
 

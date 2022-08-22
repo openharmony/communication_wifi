@@ -17,13 +17,13 @@ if (defined(ohos_lite)) {
 
   shared_library("wifi_utils") {
     include_dirs = [
-      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/common/log",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/log",
       "$WIFI_ROOT_DIR/utils/inc",
       "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits",
       "//third_party/bounds_checking_function/include",
     ]
 
-    sources = [ "wifi_common_util.cpp" ]
+    sources = [ "src/wifi_common_util.cpp" ]
 
     deps = [
       "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
@@ -49,12 +49,12 @@ if (defined(ohos_lite)) {
     include_dirs = [
       "$WIFI_ROOT_DIR/utils/inc",
       "//base/hiviewdfx/hisysevent/interfaces/native/innerkits/hisysevent/include",
-      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/common/log",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/log",
     ]
 
     sources = [
-      "wifi_common_util.cpp",
-      "wifi_hisysevent.cpp",
+      "src/wifi_common_util.cpp",
+      "src/wifi_hisysevent.cpp",
     ]
 
     deps = [

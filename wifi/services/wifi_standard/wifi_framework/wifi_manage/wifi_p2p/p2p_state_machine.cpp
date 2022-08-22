@@ -14,19 +14,18 @@
  */
 
 #include "p2p_state_machine.h"
-
-#include <map>
 #include <functional>
-
-#include "wifi_p2p_hal_interface.h"
+#include <map>
 #include "dhcpd_interface.h"
-#include "wifi_global_func.h"
+#include "ip_tools.h"
 #include "wifi_broadcast_helper.h"
-#include "wifi_p2p_upnp_service_response.h"
-#include "wifi_p2p_dns_sd_service_response.h"
-#include "wifi_p2p_dns_sd_service_info.h"
+#include "wifi_global_func.h"
 #include "wifi_logger.h"
 #include "wifi_net_agent.h"
+#include "wifi_p2p_dns_sd_service_info.h"
+#include "wifi_p2p_dns_sd_service_response.h"
+#include "wifi_p2p_hal_interface.h"
+#include "wifi_p2p_upnp_service_response.h"
 
 DEFINE_WIFILOG_P2P_LABEL("P2pStateMachine");
 

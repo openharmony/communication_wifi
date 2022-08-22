@@ -55,7 +55,7 @@ if (defined(ohos_lite)) {
     sources = crpc_client_sources
     include_dirs = [
       "include",
-      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/common/log",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/log",
       "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits",
       "//third_party/bounds_checking_function/include",
     ]
@@ -96,7 +96,7 @@ if (defined(ohos_lite)) {
       "include",
       "//commonlibrary/c_utils/base/include",
       "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
-      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/common/log",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/log",
     ]
     cflags_cc = [ "-fno-rtti" ]
     deps = [ "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog" ]

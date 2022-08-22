@@ -27,8 +27,6 @@ ohos_unittest("idl_client_unittest") {
   module_out_path = module_output_path
   sources = [
     "$WIFI_ROOT_DIR/frameworks/native/src/wifi_p2p_msg.cpp",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/common/net_helper/ip_tools.cpp",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/common/utils/wifi_global_func.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/idl_client/idl_interface/i_wifi.c",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/idl_client/idl_interface/i_wifi_chip.c",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/idl_client/idl_interface/i_wifi_hotspot_iface.c",
@@ -59,11 +57,11 @@ ohos_unittest("idl_client_unittest") {
   include_dirs = [
     "$WIFI_ROOT_DIR/frameworks/native/interfaces",
     "$WIFI_ROOT_DIR/services/wifi_standard/ipc_framework/cRPC/include",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/common/include",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/common/config",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/common/net_helper",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/common/utils",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/common/log",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/include",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/config",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/net_helper",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/utils",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/log",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/idl_client",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/idl_client/idl_interface",
     "//commonlibrary/c_utils/base/include",
@@ -71,8 +69,10 @@ ohos_unittest("idl_client_unittest") {
     "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
   ]
 
-  deps =
-      [ "$WIFI_ROOT_DIR/services/wifi_standard/ipc_framework/cRPC:crpc_client" ]
+  deps = [
+    "$WIFI_ROOT_DIR/services/wifi_standard/ipc_framework/cRPC:crpc_client",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit:wifi_toolkit",
+  ]
 
   ldflags = [
     "-fPIC",
@@ -93,7 +93,6 @@ ohos_unittest("idl_client_unittest") {
 ohos_unittest("mock_wifi_hal_service") {
   module_out_path = module_output_path
   sources = [
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/common/log/log_helper.c",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_hal/common/wifi_hal_common_func.c",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_hal/main.c",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_hal/wifi_hal_adapter.c",
@@ -116,11 +115,12 @@ ohos_unittest("mock_wifi_hal_service") {
     "$WIFI_ROOT_DIR/services/wifi_standard/ipc_framework/cRPC/include",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_hal",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_hal/common",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/common/log",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/log",
   ]
 
   deps = [
     "$WIFI_ROOT_DIR/services/wifi_standard/ipc_framework/cRPC:crpc_server",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit:wifi_toolkit",
     "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog",
   ]
 

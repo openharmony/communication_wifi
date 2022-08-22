@@ -29,9 +29,6 @@ config("module_private_config") {
 ohos_unittest("manager_unittest") {
   module_out_path = module_output_path
   sources = [
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/common/config/wifi_config_file_spec.cpp",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/common/config/wifi_settings.cpp",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/common/utils/wifi_common_event_helper.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/common/wifi_permission_helper.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/common/wifi_permission_utils.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_auth_center.cpp",
@@ -51,11 +48,11 @@ ohos_unittest("manager_unittest") {
   include_dirs = [
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/common",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/common/include",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/common/net_helper",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/common/utils",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/common/log",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/common/config",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/include",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/net_helper",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/utils",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/log",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/config",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_scan",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_ap",
@@ -82,7 +79,8 @@ ohos_unittest("manager_unittest") {
   deps = [
     "$WIFI_ROOT_DIR/services/wifi_standard/ipc_framework/cRPC:crpc_client",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/idl_client:wifi_idl_client",
-    "$WIFI_ROOT_DIR/utils/src:wifi_utils",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit:wifi_toolkit",
+    "$WIFI_ROOT_DIR/utils:wifi_utils",
     "//foundation/communication/netmanager_base/services/netmanagernative:netsys_native_manager",
   ]
 

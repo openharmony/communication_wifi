@@ -17,8 +17,6 @@ import("//foundation/communication/wifi/wifi/wifi.gni")
 ohos_shared_library("wifi_ap_service") {
   install_enable = true
   sources = [
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/common/net_helper/dhcpd_interface.cpp",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/common/net_helper/if_config.cpp",
     "../common/handler.cpp",
     "../common/internal_message.cpp",
     "../common/message_queue.cpp",
@@ -42,11 +40,11 @@ ohos_shared_library("wifi_ap_service") {
     "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
     "$WIFI_ROOT_DIR/frameworks/native/interfaces",
     "$WIFI_ROOT_DIR/services/wifi_standard/ipc_framework/cRPC/include",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/common/include",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/common/net_helper",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/common/config",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/common/log",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/common/utils",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/include",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/net_helper",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/config",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/log",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/utils",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/common/include",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_ap",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage",
@@ -80,7 +78,8 @@ ohos_shared_library("wifi_ap_service") {
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage:wifi_manager_service",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/idl_client:wifi_idl_client",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common:wifi_common_service",
-    "$WIFI_ROOT_DIR/utils/src:wifi_utils",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit:wifi_toolkit",
+    "$WIFI_ROOT_DIR/utils:wifi_utils",
   ]
 
   defines = [ "AP_INTF=\"$wifi_feature_with_ap_intf\"" ]

@@ -57,6 +57,11 @@ public:
         const std::string &pac);
 
     bool ExecCommand(const std::vector<std::string> &vecCommandArg);
+
+    /**
+     * @Description : Check if the interface name is valid
+     */
+    bool CheckIfaceValid(const std::string& ifname);
 };
 }  // namespace Wifi
 }  // namespace OHOS

@@ -236,11 +236,6 @@ bool WifiP2pDevice::WpKeypadSupported() const
     return (supportWpsConfigMethods & static_cast<int>(WpsConfigMethod::WPS_CFG_KEYPAD)) != 0;
 }
 
-bool WifiP2pDevice::isGroupOwner() const
-{
-    return (groupCapabilitys & static_cast<int>(P2pGroupCapability::PGC_GROUP_OWNER)) != 0;
-}
-
 bool WifiP2pGroupInfo::operator==(const WifiP2pGroupInfo &group) const
 {
     return networkId == group.GetNetworkId();

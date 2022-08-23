@@ -134,8 +134,8 @@ HWTEST_F(DhcpFunctionTest, GetLocalIp_FAILED, TestSize.Level1)
 HWTEST_F(DhcpFunctionTest, SetLocalInterface_SUCCESS, TestSize.Level1)
 {
     char interface[INFNAME_SIZE] = "wlan0";
-    uint32_t ipaddr4 = 3226272231;
-    uint32_t netMask = 4294967040;
+    uint32_t ipaddr4 = 2981805322;
+    uint32_t netMask = 16318463;
     EXPECT_EQ(DHCP_OPT_SUCCESS, SetLocalInterface(interface, ipaddr4, netMask));
 }
 
@@ -164,9 +164,9 @@ HWTEST_F(DhcpFunctionTest, InitPidfile_FAILED, TestSize.Level1)
     char pidFile[DIR_MAX_LEN] = {0};
     EXPECT_EQ(DHCP_OPT_FAILED, InitPidfile(workDir, pidFile, getpid()));
 
-    EXPECT_EQ(DHCP_OPT_SUCCESS, InitPidfile("./", "./test/wlan0.pid", getpid()));
+    EXPECT_EQ(DHCP_OPT_FAILED, InitPidfile("./", "./test/wlan0.pid", getpid()));
 
-    EXPECT_EQ(DHCP_OPT_SUCCESS, InitPidfile("./test/", "./wlan0.pid", getpid()));
+    EXPECT_EQ(DHCP_OPT_FAILED, InitPidfile("./test/", "./wlan0.pid", getpid()));
 }
 
 HWTEST_F(DhcpFunctionTest, GetPID_SUCCESS, TestSize.Level1)

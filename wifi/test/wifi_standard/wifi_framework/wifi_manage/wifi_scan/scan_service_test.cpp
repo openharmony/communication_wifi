@@ -211,6 +211,7 @@ public:
     void ScanWithParamSuccess()
     {
         EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_)).WillRepeatedly(Return(true));
+        EXPECT_CALL(WifiSettings::GetInstance(), GetThermalLevel()).WillRepeatedly(Return(1));
         pScanService->scanStartedFlag = true;
         WifiScanParams params;
         params.band = SCAN_BAND_BOTH_WITH_DFS;

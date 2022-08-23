@@ -42,6 +42,7 @@ public:
     virtual int GetDeviceConfig(std::vector<WifiDeviceConfig> &results) = 0;
     virtual const std::vector<TrustListPolicy>& ReloadTrustListPolicies() = 0;
     virtual const MovingFreezePolicy& ReloadMovingFreezePolicy() = 0;
+    virtual int GetThermalLevel() const = 0;
 };
 
 class WifiSettings : public MockWifiSettings {
@@ -66,6 +67,7 @@ public:
     MOCK_METHOD1(GetDeviceConfig, int(std::vector<WifiDeviceConfig> &results));
     MOCK_METHOD0(ReloadTrustListPolicies, const std::vector<TrustListPolicy>&());
     MOCK_METHOD0(ReloadMovingFreezePolicy, const MovingFreezePolicy&());
+    MOCK_CONST_METHOD0(GetThermalLevel, int());
 };
 }  // namespace Wifi
 }  // namespace OHOS

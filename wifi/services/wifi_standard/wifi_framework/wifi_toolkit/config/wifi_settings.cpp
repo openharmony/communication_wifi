@@ -46,6 +46,7 @@ WifiSettings::WifiSettings()
 {
     mHotspotState[0] = static_cast<int>(ApState::AP_STATE_CLOSED);
     powerModel[0] = PowerModel::GENERAL;
+    mThermalLevel = static_cast<int>(ThermalLevel::NORMAL);
 }
 
 WifiSettings::~WifiSettings()

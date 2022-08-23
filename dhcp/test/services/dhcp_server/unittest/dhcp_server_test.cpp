@@ -137,7 +137,7 @@ bool DhcpServerTest::InitBindingRecodersTest()
         bind.chaddr[i] = testMac1[i];
     }
     if (AddLease(&srvIns->addressPool, &bind) != RET_SUCCESS) {
-        LOGD("failed to add lease recoder.");
+        LOGE("failed to add lease recoder.");
         return false;
     }
 
@@ -151,7 +151,7 @@ bool DhcpServerTest::InitBindingRecodersTest()
     bind.expireIn = Tmspsec();
     bind.bindingTime = bind.expireIn  - DHCP_LEASE_TIME;
     if (AddLease(&srvIns->addressPool, &bind) != RET_SUCCESS) {
-        LOGD("failed to add lease recoder.");
+        LOGE("failed to add lease recoder.");
         return false;
     }
 
@@ -165,7 +165,7 @@ bool DhcpServerTest::InitBindingRecodersTest()
     bind.expireIn = Tmspsec();
     bind.bindingTime = bind.expireIn  - DHCP_LEASE_TIME;
     if (AddLease(&srvIns->addressPool, &bind) != RET_SUCCESS) {
-        LOGD("failed to add lease recoder.");
+        LOGE("failed to add lease recoder.");
         return false;
     }
     srvIns->addressPool.leaseTime = DHCP_LEASE_TIME;
@@ -246,23 +246,23 @@ bool DhcpServerTest::ServerRun(void)
     }
     RegisterDhcpCallback(m_pServerCtx, TestServerCallback);
     if (StartDhcpServer(nullptr) != RET_FAILED) {
-        printf("failed to start dhcp server. \n");
+        LOGE("failed to start dhcp server. \n");
         retval = false;
     }
     DhcpServerContext tempCtx;
     memset_s(&tempCtx, sizeof(DhcpServerContext), 0, sizeof(DhcpServerContext));
     memset_s(tempCtx.ifname, sizeof(tempCtx.ifname), '\0', sizeof(tempCtx.ifname));
     if (StartDhcpServer(&tempCtx) != RET_FAILED) {
-        printf("failed to start dhcp server. \n");
+        LOGE("failed to start dhcp server. \n");
         retval = false;
     }
     strcpy_s(tempCtx.ifname, sizeof(tempCtx.ifname), "test_if1");
     if (StartDhcpServer(&tempCtx) != RET_FAILED) {
-        printf("failed to start dhcp server. \n");
+        LOGE("failed to start dhcp server. \n");
         retval = false;
     }
     if (m_pServerCtx && StartDhcpServer(m_pServerCtx) != RET_SUCCESS) {
-        printf("failed to start dhcp server. \n");
+        LOGE("failed to start dhcp server. \n");
         retval = false;
     }
     if (SaveLease(m_pServerCtx) != RET_SUCCESS) {
@@ -278,8 +278,9 @@ bool DhcpServerTest::ServerRun(void)
 bool DhcpServerTest::StartServerTest()
 {
     bool retval = true;
+    LOGI("start dhcp server test...");
     if (InitServerConfig(&m_serverConfg) != RET_SUCCESS) {
-        LOGD("failed to initialized dhcp server config.");
+        LOGE("failed to initialized dhcp server config.");
         retval = false;
     }
     if (!FixedOptionsTest()) {
@@ -291,7 +292,7 @@ bool DhcpServerTest::StartServerTest()
     if (InitDhcpClient() != RET_SUCCESS) {
         retval = false;
     }
-    LOGD("wait for test completed...");
+    LOGI("wait for test completed...");
     retval = ServerRun();
     return retval;
 }
@@ -301,8 +302,8 @@ void DhcpServerTest::DelayStopServer()
     const int SLEEP_TIME = 3;
     const int SLEEP_TIME1 = 1;
     const int SLEEP_TIME2 = 1;
-    LOGD("wait for dhcp server stopped...");
-    LOGD("wait %d seconds...\n", SERVER_RUNING_TIME);
+    LOGI("wait for dhcp server stopped...");
+    LOGI("wait %d seconds...\n", SERVER_RUNING_TIME);
     SystemFuncMock::GetInstance().SetMockFlag(true);
     EXPECT_CALL(SystemFuncMock::GetInstance(), close(_)).WillRepeatedly(Return(0));
     std::this_thread::sleep_for(std::chrono::seconds(SLEEP_TIME));
@@ -312,13 +313,13 @@ void DhcpServerTest::DelayStopServer()
     }
     std::this_thread::sleep_for(std::chrono::seconds(SERVER_RUNING_TIME));
     if (StopDhcpServer(m_pServerCtx) != RET_SUCCESS) {
-        LOGD("failed to stop dhcp server.");
+        LOGE("failed to stop dhcp server.");
         return;
     }
     int waitSesc = 0;
     while (waitSesc < SERVER_RUNING_TIME) {
         if (GetServerStatus(m_pServerCtx) == ST_STOPED) {
-            LOGD("dhcp server stopped.");
+            LOGI("dhcp server stopped.");
             break;
         } else {
             std::this_thread::sleep_for(std::chrono::seconds(SLEEP_TIME1));
@@ -339,7 +340,7 @@ int DhcpServerTest::TestDhcpRequestByMac(uint32_t testIp, uint32_t srvId, uint8_
     DhcpMsgInfo msgInfo = {{0}, 0, {0}};
     InitOptionList(&msgInfo.options);
     if (!InitMessage(m_pMockClient, &msgInfo, DHCPREQUEST)) {
-        LOGD("failed to init dhcp message.");
+        LOGE("failed to init dhcp message.");
         FreeOptionList(&msgInfo.options);
         return RET_FAILED;
     }
@@ -361,7 +362,7 @@ int DhcpServerTest::TestDhcpRequestByMac(uint32_t testIp, uint32_t srvId, uint8_
         }
     }
     if (SendDhcpMessage(m_pMockClient, &msgInfo) != RET_SUCCESS) {
-        LOGD("failed to send dhcp message.");
+        LOGE("failed to send dhcp message.");
         FreeOptionList(&msgInfo.options);
         return RET_FAILED;
     }
@@ -374,7 +375,7 @@ int DhcpServerTest::TestDhcpRelease(uint32_t testIp, uint32_t srvId)
     DhcpMsgInfo msgInfo = {{0}, 0, {0}};
     InitOptionList(&msgInfo.options);
     if (!InitMessage(m_pMockClient, &msgInfo, DHCPRELEASE)) {
-        LOGD("failed to init dhcp message.");
+        LOGE("failed to init dhcp message.");
         FreeOptionList(&msgInfo.options);
         return RET_FAILED;
     }
@@ -392,7 +393,7 @@ int DhcpServerTest::TestDhcpRelease(uint32_t testIp, uint32_t srvId)
     DhcpOption endOpt = {END_OPTION, 0, {0}};
     PushBackOption(&msgInfo.options, &endOpt);
     if (SendDhcpMessage(m_pMockClient, &msgInfo) != RET_SUCCESS) {
-        LOGD("failed to send dhcp message.");
+        LOGE("failed to send dhcp message.");
         FreeOptionList(&msgInfo.options);
         return RET_FAILED;
     }
@@ -406,14 +407,17 @@ int DhcpServerTest::InitDhcpRequests()
     uint32_t srvId = ParseIpAddr("192.168.189.254");
     DhcpMsgManager::GetInstance().SetClientIp(testIp);
     if (DhcpRequest(m_pMockClient) != RET_SUCCESS) {
+        LOGE("[InitDhcpRequests] DhcpRequest failed");
         return RET_FAILED;
     }
     DhcpMsgManager::GetInstance().SetClientIp(0);
     if (TestDhcpRequest(testIp, srvId) != RET_SUCCESS) {
+        LOGE("[InitDhcpRequests] TestDhcpRequest1 failed");
         return RET_FAILED;
     }
     testIp = ParseIpAddr("192.168.189.102");
     if (TestDhcpRequest(testIp, 0) != RET_SUCCESS) {
+        LOGE("[InitDhcpRequests] TestDhcpRequest2 failed");
         return RET_FAILED;
     }
     testIp = ParseIpAddr("192.168.189.120");
@@ -421,31 +425,37 @@ int DhcpServerTest::InitDhcpRequests()
     uint8_t testMac2[DHCP_HWADDR_LENGTH] =  {0x00, 0x0e, 0x3c, 0x65, 0x3a, 0x0b, 0};
     uint8_t testMac3[DHCP_HWADDR_LENGTH] =  {0x00, 0x0e, 0x3c, 0x65, 0x3a, 0x0c, 0};
     if (TestDhcpRequestByMac(testIp, srvId, testMac1) != RET_SUCCESS) {
+        LOGE("[InitDhcpRequests] TestDhcpRequestByMac1 failed");
         return RET_FAILED;
     }
     DhcpMsgManager::GetInstance().SetClientIp(testIp);
     if (TestDhcpRequest(testIp, srvId) != RET_SUCCESS) {
+        LOGE("[InitDhcpRequests] TestDhcpRequest3 failed");
         return RET_FAILED;
     }
     testIp = ParseIpAddr("192.168.189.101");
     if (TestDhcpRequestByMac(testIp, srvId, testMac2) != RET_SUCCESS) {
+        LOGE("[InitDhcpRequests] TestDhcpRequestByMac2 failed");
         return RET_FAILED;
     }
     testIp = ParseIpAddr("192.168.189.120");
     DhcpMsgManager::GetInstance().SetClientIp(testIp);
     if (TestDhcpRequestByMac(testIp, srvId, testMac3) != RET_SUCCESS) {
+        LOGE("[InitDhcpRequests] TestDhcpRequestByMac3 failed");
         return RET_FAILED;
     }
     DhcpMsgManager::GetInstance().SetClientIp(0);
     uint8_t testMac4[DHCP_HWADDR_LENGTH] =  {0x00, 0x0e, 0x3c, 0x65, 0x3a, 0x0d, 0};
     testIp = ParseIpAddr("192.168.190.210");
     if (TestDhcpRequestByMac(testIp, srvId, testMac4) != RET_SUCCESS) {
+        LOGE("[InitDhcpRequests] TestDhcpRequestByMac4 failed");
         return RET_FAILED;
     }
     uint8_t testMac5[DHCP_HWADDR_LENGTH] =  {0x0a, 0x0e, 0x3c, 0x65, 0x3a, 0x0e, 0};
     testIp = ParseIpAddr("192.168.189.130");
     DhcpMsgManager::GetInstance().SetClientIp(testIp);
     if (TestDhcpRequestByMac(testIp, srvId, testMac5) != RET_SUCCESS) {
+        LOGE("[InitDhcpRequests] TestDhcpRequestByMac5 failed");
         return RET_FAILED;
     }
     DhcpMsgManager::GetInstance().SetClientIp(0);
@@ -459,7 +469,7 @@ int DhcpServerTest::InitDhcpErrorRequests()
     DhcpMsgInfo msgInfo = {{0}, 0, {0}};
     InitOptionList(&msgInfo.options);
     if (!InitMessage(m_pMockClient, &msgInfo, DHCPREQUEST)) {
-        LOGD("failed to init dhcp message.");
+        LOGE("failed to init dhcp message.");
         FreeOptionList(&msgInfo.options);
         return RET_FAILED;
     }
@@ -471,14 +481,14 @@ int DhcpServerTest::InitDhcpErrorRequests()
     AppendAddressOption(&optSrvId, srvId);
     PushFrontOption(&msgInfo.options, &optSrvId);
     if (SendDhcpMessage(m_pMockClient, &msgInfo) != RET_SUCCESS) {
-        LOGD("failed to send dhcp message.");
+        LOGE("failed to send dhcp message.");
         FreeOptionList(&msgInfo.options);
         return RET_FAILED;
     }
 
     RemoveOption(&msgInfo.options, DHCP_MESSAGE_TYPE_OPTION);
     if (SendDhcpMessage(m_pMockClient, &msgInfo) != RET_SUCCESS) {
-        LOGD("failed to send dhcp message.");
+        LOGE("failed to send dhcp message.");
         FreeOptionList(&msgInfo.options);
         return RET_FAILED;
     }
@@ -486,7 +496,7 @@ int DhcpServerTest::InitDhcpErrorRequests()
     RemoveOption(&msgInfo.options, END_OPTION);
     RemoveOption(&msgInfo.options, SERVER_IDENTIFIER_OPTION);
     if (SendDhcpMessage(m_pMockClient, &msgInfo) != RET_SUCCESS) {
-        LOGD("failed to send dhcp message.");
+        LOGE("failed to send dhcp message.");
         FreeOptionList(&msgInfo.options);
         return RET_FAILED;
     }
@@ -497,13 +507,14 @@ int DhcpServerTest::InitDhcpClient()
 {
     uint8_t testMacAddr[DHCP_HWADDR_LENGTH] = {0x00, 0x0e, 0x3c, 0x65, 0x3a, 0x09, 0};
 
-    LOGD("init mock dhcp client.");
+    LOGI("init mock dhcp client.");
     const char* testIfname = "test_if0";
 
     if (memset_s(&m_clientConfg, sizeof(DhcpClientConfig), 0, sizeof(DhcpClientConfig)) != EOK) {
         return RET_FAILED;
     }
     if (!FillHwAddr(m_clientConfg.chaddr, DHCP_HWADDR_LENGTH, testMacAddr, MAC_ADDR_LENGTH)) {
+        LOGE("FillHwAddr failed");
         return RET_FAILED;
     }
     if (memset_s(m_clientConfg.ifname, IFACE_NAME_SIZE, '\0', IFACE_NAME_SIZE) != EOK) {
@@ -515,41 +526,50 @@ int DhcpServerTest::InitDhcpClient()
 
     m_pMockClient = InitialDhcpClient(&m_clientConfg);
     if (!m_pMockClient) {
+        LOGE("[InitDhcpClient] InitialDhcpClient failed");
         return RET_FAILED;
     }
     if (DhcpDiscover(m_pMockClient) != RET_SUCCESS) {
+        LOGE("[InitDhcpClient] DhcpDiscover1 failed");
         return RET_FAILED;
     }
     uint32_t testIp = ParseIpAddr("192.168.189.102");
     uint32_t srvId = ParseIpAddr("192.168.189.254");
     DhcpMsgManager::GetInstance().SetClientIp(testIp);
     if (DhcpDiscover(m_pMockClient) != RET_SUCCESS) {
+        LOGE("[InitDhcpClient] DhcpDiscover2 failed");
         return RET_FAILED;
     }
     InitDhcpRequests();
     InitDhcpErrorRequests();
     if (DhcpInform(m_pMockClient) != RET_SUCCESS) {
+        LOGE("[InitDhcpClient] DhcpInform1 failed");
         return RET_FAILED;
     }
     DhcpMsgManager::GetInstance().SetClientIp(testIp);
     if (DhcpInform(m_pMockClient) != RET_SUCCESS) {
+        LOGE("[InitDhcpClient] DhcpInform2 failed");
         return RET_FAILED;
     }
     DhcpMsgManager::GetInstance().SetClientIp(0);
     if (DhcpDecline(m_pMockClient) != RET_SUCCESS) {
+        LOGE("[InitDhcpClient] DhcpDecline1 failed");
         return RET_FAILED;
     }
     testIp = ParseIpAddr("192.168.189.118");
     DhcpMsgManager::GetInstance().SetClientIp(testIp);
     if (DhcpDecline(m_pMockClient) != RET_SUCCESS) {
+        LOGE("[InitDhcpClient] DhcpDecline2 failed");
         return RET_FAILED;
     }
     DhcpMsgManager::GetInstance().SetClientIp(0);
     if (DhcpRelease(m_pMockClient) != RET_SUCCESS) {
+        LOGE("[InitDhcpClient] DhcpRelease failed");
         return RET_FAILED;
     }
     testIp = ParseIpAddr("192.168.189.102");
     if (TestDhcpRelease(testIp, srvId)) {
+        LOGE("[InitDhcpClient] TestDhcpRelease failed");
         return RET_FAILED;
     }
     return RET_SUCCESS;

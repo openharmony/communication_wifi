@@ -54,6 +54,16 @@ namespace OHOS {
 namespace Wifi {
 using ChannelsTable = std::map<BandType, std::vector<int32_t>>;
 
+enum class ThermalLevel {
+    COOL = 0,
+    NORMAL = 1,
+    WARM = 2,
+    HOT = 3,
+    OVERHEATED = 4,
+    WARNING = 5,
+    EMERGENCY = 6,
+};
+
 class WifiSettings {
 public:
     ~WifiSettings();

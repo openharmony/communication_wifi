@@ -195,7 +195,7 @@ HWTEST_F(WifiHalCRpcServerTest, DealP2pDeviceFoundCbkTest, TestSize.Level1)
     StrSafeCopy(cbmsg->msg.deviceInfo.srcAddress, sizeof(cbmsg->msg.deviceInfo.srcAddress), "00:00:00:00:00:00");
     EXPECT_TRUE(PushBackCallbackMsg(P2P_DEVICE_FOUND_EVENT, cbmsg) == 0);
     EXPECT_TRUE(OnCallbackTransact(mServer, P2P_DEVICE_FOUND_EVENT, mContext) == 0);
-    EXPECT_TRUE(StrcmpMathRight(mContext->szWrite, "C\t119\t0\t0\t0\t0\t00:00:00:00:00:00\t\t\t\t\t$$$$$$") == 0);
+    EXPECT_TRUE(StrcmpMathRight(mContext->szWrite, "C\t120\t0\t0\t0\t0\t00:00:00:00:00:00\t\t\t\t\t$$$$$$") == 0);
     EXPECT_TRUE(EndCallbackTransact(mServer, P2P_DEVICE_FOUND_EVENT) == 0);
 }
 
@@ -205,7 +205,7 @@ HWTEST_F(WifiHalCRpcServerTest, DealP2pNegoriationCbkLostTest, TestSize.Level1)
     StrSafeCopy(cbmsg->msg.connMsg.bssid, sizeof(cbmsg->msg.connMsg.bssid), "00:00:00:00:00:00");
     EXPECT_TRUE(PushBackCallbackMsg(P2P_DEVICE_LOST_EVENT, cbmsg) == 0);
     EXPECT_TRUE(OnCallbackTransact(mServer, P2P_DEVICE_LOST_EVENT, mContext) == 0);
-    EXPECT_TRUE(StrcmpMathRight(mContext->szWrite, "C\t120\t00:00:00:00:00:00\t$$$$$$") == 0);
+    EXPECT_TRUE(StrcmpMathRight(mContext->szWrite, "C\t121\t00:00:00:00:00:00\t$$$$$$") == 0);
     EXPECT_TRUE(EndCallbackTransact(mServer, P2P_DEVICE_LOST_EVENT) == 0);
 }
 
@@ -215,7 +215,7 @@ HWTEST_F(WifiHalCRpcServerTest, DealP2pNegoriationCbkTest, TestSize.Level1)
     StrSafeCopy(cbmsg->msg.connMsg.bssid, sizeof(cbmsg->msg.connMsg.bssid), "00:00:00:00:00:00");
     EXPECT_TRUE(PushBackCallbackMsg(P2P_GO_NEGOTIATION_REQUEST_EVENT, cbmsg) == 0);
     EXPECT_TRUE(OnCallbackTransact(mServer, P2P_GO_NEGOTIATION_REQUEST_EVENT, mContext) == 0);
-    EXPECT_TRUE(StrcmpMathRight(mContext->szWrite, "C\t121\t0\t00:00:00:00:00:00\t$$$$$$") == 0);
+    EXPECT_TRUE(StrcmpMathRight(mContext->szWrite, "C\t122\t0\t00:00:00:00:00:00\t$$$$$$") == 0);
     EXPECT_TRUE(EndCallbackTransact(mServer, P2P_GO_NEGOTIATION_REQUEST_EVENT) == 0);
 }
 
@@ -227,7 +227,7 @@ HWTEST_F(WifiHalCRpcServerTest, DealP2pInviationCbkReceiveTest, TestSize.Level1)
     EXPECT_TRUE(PushBackCallbackMsg(P2P_INVITATION_RECEIVED_EVENT, cbmsg) == 0);
     EXPECT_TRUE(OnCallbackTransact(mServer, P2P_INVITATION_RECEIVED_EVENT, mContext) == 0);
     EXPECT_TRUE(StrcmpMathRight(mContext->szWrite,
-        "C\t124\t0\t0\t0\t00:00:00:00:00:00\t\t00:00:00:00:00:00\t$$$$$$") == 0);
+        "C\t125\t0\t0\t0\t00:00:00:00:00:00\t\t00:00:00:00:00:00\t$$$$$$") == 0);
     EXPECT_TRUE(EndCallbackTransact(mServer, P2P_INVITATION_RECEIVED_EVENT) == 0);
 }
 
@@ -237,7 +237,7 @@ HWTEST_F(WifiHalCRpcServerTest, DealP2pInviationCbkResultTest, TestSize.Level1)
     StrSafeCopy(cbmsg->msg.invitaInfo.bssid, sizeof(cbmsg->msg.invitaInfo.bssid), "00:00:00:00:00:00");
     EXPECT_TRUE(PushBackCallbackMsg(P2P_INVITATION_RESULT_EVENT, cbmsg) == 0);
     EXPECT_TRUE(OnCallbackTransact(mServer, P2P_INVITATION_RESULT_EVENT, mContext) == 0);
-    EXPECT_TRUE(StrcmpMathRight(mContext->szWrite, "C\t125\t0\t00:00:00:00:00:00\t$$$$$$") == 0);
+    EXPECT_TRUE(StrcmpMathRight(mContext->szWrite, "C\t126\t0\t00:00:00:00:00:00\t$$$$$$") == 0);
     EXPECT_TRUE(EndCallbackTransact(mServer, P2P_INVITATION_RESULT_EVENT) == 0);
 }
 
@@ -247,7 +247,7 @@ HWTEST_F(WifiHalCRpcServerTest, DealP2pInviationCbkFailureTest, TestSize.Level1)
     StrSafeCopy(cbmsg->msg.invitaInfo.bssid, sizeof(cbmsg->msg.invitaInfo.bssid), "00:00:00:00:00:00");
     EXPECT_TRUE(PushBackCallbackMsg(P2P_GROUP_FORMATION_FAILURE_EVENT, cbmsg) == 0);
     EXPECT_TRUE(OnCallbackTransact(mServer, P2P_GROUP_FORMATION_FAILURE_EVENT, mContext) == 0);
-    EXPECT_TRUE(StrcmpMathRight(mContext->szWrite, "C\t127\t00:00:00:00:00:00\t$$$$$$") == 0);
+    EXPECT_TRUE(StrcmpMathRight(mContext->szWrite, "C\t128\t00:00:00:00:00:00\t$$$$$$") == 0);
     EXPECT_TRUE(EndCallbackTransact(mServer, P2P_GROUP_FORMATION_FAILURE_EVENT) == 0);
 }
 
@@ -261,7 +261,7 @@ HWTEST_F(WifiHalCRpcServerTest, DealP2pGroupInfoCbkStartTest, TestSize.Level1)
     EXPECT_TRUE(PushBackCallbackMsg(P2P_GROUP_STARTED_EVENT, cbmsg) == 0);
     EXPECT_TRUE(OnCallbackTransact(mServer, P2P_GROUP_STARTED_EVENT, mContext) == 0);
     EXPECT_TRUE(StrcmpMathRight(mContext->szWrite,
-        "C\t128\t0\t0\t0\tp2p-dev-wlan0\ttest_p2p\t\t\t00:00:00:00:00:00\t$$$$$$") == 0);
+        "C\t129\t0\t0\t0\tp2p-dev-wlan0\ttest_p2p\t\t\t00:00:00:00:00:00\t$$$$$$") == 0);
     EXPECT_TRUE(EndCallbackTransact(mServer, P2P_GROUP_STARTED_EVENT) == 0);
 }
 
@@ -271,7 +271,7 @@ HWTEST_F(WifiHalCRpcServerTest, DealP2pGroupInfoCbkRemoveTest, TestSize.Level1)
     StrSafeCopy(cbmsg->msg.groupInfo.groupIfName, sizeof(cbmsg->msg.groupInfo.groupIfName), "p2p-dev-wlan0");
     EXPECT_TRUE(PushBackCallbackMsg(P2P_GROUP_REMOVED_EVENT, cbmsg) == 0);
     EXPECT_TRUE(OnCallbackTransact(mServer, P2P_GROUP_REMOVED_EVENT, mContext) == 0);
-    EXPECT_TRUE(StrcmpMathRight(mContext->szWrite, "C\t129\t0\tp2p-dev-wlan0\t$$$$$$") == 0);
+    EXPECT_TRUE(StrcmpMathRight(mContext->szWrite, "C\t130\t0\tp2p-dev-wlan0\t$$$$$$") == 0);
     EXPECT_TRUE(EndCallbackTransact(mServer, P2P_GROUP_REMOVED_EVENT) == 0);
 }
 
@@ -281,7 +281,7 @@ HWTEST_F(WifiHalCRpcServerTest, DealP2pDeviceInfoCbkPbcTest, TestSize.Level1)
     StrSafeCopy(cbmsg->msg.deviceInfo.srcAddress, sizeof(cbmsg->msg.deviceInfo.srcAddress), "00:00:00:00:00:00");
     EXPECT_TRUE(PushBackCallbackMsg(P2P_PROV_DISC_PBC_REQ_EVENT, cbmsg) == 0);
     EXPECT_TRUE(OnCallbackTransact(mServer, P2P_PROV_DISC_PBC_REQ_EVENT, mContext) == 0);
-    EXPECT_TRUE(StrcmpMathRight(mContext->szWrite, "C\t130\t00:00:00:00:00:00\t$$$$$$") == 0);
+    EXPECT_TRUE(StrcmpMathRight(mContext->szWrite, "C\t131\t00:00:00:00:00:00\t$$$$$$") == 0);
     EXPECT_TRUE(EndCallbackTransact(mServer, P2P_PROV_DISC_PBC_REQ_EVENT) == 0);
 }
 
@@ -292,7 +292,7 @@ HWTEST_F(WifiHalCRpcServerTest, DealP2pDeviceInfoCbkPinTest, TestSize.Level1)
     StrSafeCopy(cbmsg->msg.deviceInfo.deviceName, sizeof(cbmsg->msg.deviceInfo.deviceName), "test_p2p");
     EXPECT_TRUE(PushBackCallbackMsg(P2P_PROV_DISC_SHOW_PIN_EVENT, cbmsg) == 0);
     EXPECT_TRUE(OnCallbackTransact(mServer, P2P_PROV_DISC_SHOW_PIN_EVENT, mContext) == 0);
-    EXPECT_TRUE(StrcmpMathRight(mContext->szWrite, "C\t133\t00:00:00:00:00:00\ttest_p2p\t$$$$$$") == 0);
+    EXPECT_TRUE(StrcmpMathRight(mContext->szWrite, "C\t134\t00:00:00:00:00:00\ttest_p2p\t$$$$$$") == 0);
     EXPECT_TRUE(EndCallbackTransact(mServer, P2P_PROV_DISC_SHOW_PIN_EVENT) == 0);
 }
 
@@ -303,7 +303,7 @@ HWTEST_F(WifiHalCRpcServerTest, DealP2pDeviceInfoCbkConnectionTest, TestSize.Lev
         cbmsg->msg.deviceInfo.p2pDeviceAddress, sizeof(cbmsg->msg.deviceInfo.p2pDeviceAddress), "00:00:00:00:00:00");
     EXPECT_TRUE(PushBackCallbackMsg(AP_STA_DISCONNECTED_EVENT, cbmsg) == 0);
     EXPECT_TRUE(OnCallbackTransact(mServer, AP_STA_DISCONNECTED_EVENT, mContext) == 0);
-    EXPECT_TRUE(StrcmpMathRight(mContext->szWrite, "C\t137\t00:00:00:00:00:00\t$$$$$$") == 0);
+    EXPECT_TRUE(StrcmpMathRight(mContext->szWrite, "C\t138\t00:00:00:00:00:00\t$$$$$$") == 0);
     EXPECT_TRUE(EndCallbackTransact(mServer, AP_STA_DISCONNECTED_EVENT) == 0);
 }
 
@@ -313,7 +313,7 @@ HWTEST_F(WifiHalCRpcServerTest, DealP2pServerInfoCbkTest, TestSize.Level1)
     StrSafeCopy(cbmsg->msg.serverInfo.srcAddress, sizeof(cbmsg->msg.serverInfo.srcAddress), "00:00:00:00:00:00");
     EXPECT_TRUE(PushBackCallbackMsg(P2P_SERV_DISC_RESP_EVENT, cbmsg) == 0);
     EXPECT_TRUE(OnCallbackTransact(mServer, P2P_SERV_DISC_RESP_EVENT, mContext) == 0);
-    EXPECT_TRUE(StrcmpMathRight(mContext->szWrite, "C\t135\t0\t00:00:00:00:00:00\t0\t$$$$$$") == 0);
+    EXPECT_TRUE(StrcmpMathRight(mContext->szWrite, "C\t136\t0\t00:00:00:00:00:00\t0\t$$$$$$") == 0);
     EXPECT_TRUE(EndCallbackTransact(mServer, P2P_SERV_DISC_RESP_EVENT) == 0);
 }
 
@@ -323,7 +323,7 @@ HWTEST_F(WifiHalCRpcServerTest, DealP2pServerDiscReqCbkTest, TestSize.Level1)
     StrSafeCopy(cbmsg->msg.serDiscReqInfo.mac, sizeof(cbmsg->msg.serDiscReqInfo.mac), "00:00:00:00:00:00");
     EXPECT_TRUE(PushBackCallbackMsg(P2P_SERV_DISC_REQ_EVENT, cbmsg) == 0);
     EXPECT_TRUE(OnCallbackTransact(mServer, P2P_SERV_DISC_REQ_EVENT, mContext) == 0);
-    EXPECT_TRUE(StrcmpMathRight(mContext->szWrite, "C\t139\t0\t0\t0\t00:00:00:00:00:00\t0\t$$$$$$") == 0);
+    EXPECT_TRUE(StrcmpMathRight(mContext->szWrite, "C\t140\t0\t0\t0\t00:00:00:00:00:00\t0\t$$$$$$") == 0);
     EXPECT_TRUE(EndCallbackTransact(mServer, P2P_SERV_DISC_REQ_EVENT) == 0);
 }
 

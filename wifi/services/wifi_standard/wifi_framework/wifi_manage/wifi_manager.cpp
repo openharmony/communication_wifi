@@ -62,7 +62,7 @@ void WifiManager::AutoStartStaService(void)
     WifiOprMidState staState = WifiConfigCenter::GetInstance().GetWifiMidState();
     if (staState == WifiOprMidState::CLOSED) {
         if (!WifiConfigCenter::GetInstance().SetWifiMidState(staState, WifiOprMidState::OPENING)) {
-            WIFI_LOGD("set sta mid state opening failed! may be other activity has been operated");
+            WIFI_LOGW("set sta mid state opening failed! may be other activity has been operated");
             return;
         }
         ErrCode errCode = WIFI_OPT_FAILED;
@@ -153,7 +153,7 @@ void WifiManager::AutoStartP2pService(void)
     WifiOprMidState p2pState = WifiConfigCenter::GetInstance().GetP2pMidState();
     if (p2pState == WifiOprMidState::CLOSED) {
         if (!WifiConfigCenter::GetInstance().SetP2pMidState(p2pState, WifiOprMidState::OPENING)) {
-            WIFI_LOGD("set p2p mid state opening failed!");
+            WIFI_LOGW("set p2p mid state opening failed!");
             return;
         }
     }
@@ -190,13 +190,13 @@ void WifiManager::AutoStartP2pService(void)
 void WifiManager::AutoStartScanService(void)
 {
     if (!WifiConfigCenter::GetInstance().IsScanAlwaysActive()) {
-        WIFI_LOGD("Scan always is not open, not open scan service.");
+        WIFI_LOGW("Scan always is not open, not open scan service.");
         return;
     }
     ScanControlInfo info;
     WifiConfigCenter::GetInstance().GetScanControlInfo(info);
     if (!IsAllowScanAnyTime(info)) {
-        WIFI_LOGD("Scan control does not support scan always, not open scan service here.");
+        WIFI_LOGW("Scan control does not support scan always, not open scan service here.");
         return;
     }
     CheckAndStartScanService();
@@ -394,10 +394,10 @@ void WifiManager::DealCloseServiceMsg(WifiManager &manager)
                 break;
 #endif
             case WifiCloseServiceCode::SERVICE_THREAD_EXIT:
-                WIFI_LOGD("DealCloseServiceMsg thread exit!");
+                WIFI_LOGI("DealCloseServiceMsg thread exit!");
                 return;
             default:
-                WIFI_LOGD("Unknown message code, %{public}d", static_cast<int>(msg));
+                WIFI_LOGW("Unknown message code, %{public}d", static_cast<int>(msg));
                 break;
         }
     }
@@ -553,7 +553,7 @@ void WifiManager::CheckAndStartScanService(void)
         return;
     }
     if (!WifiConfigCenter::GetInstance().SetScanMidState(scanState, WifiOprMidState::OPENING)) {
-        WIFI_LOGD("Failed to set scan mid state opening! may be other activity has been operated");
+        WIFI_LOGW("Failed to set scan mid state opening! may be other activity has been operated");
         return;
     }
     ErrCode errCode = WIFI_OPT_FAILED;

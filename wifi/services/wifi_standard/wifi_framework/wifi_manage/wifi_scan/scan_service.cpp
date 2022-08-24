@@ -902,7 +902,7 @@ void ScanService::HandleMovingFreezeChanged()
         movingFreezeBakup);
     /* Moving -> Freeze, set the scanned flag to false. */
     if (!movingFreezeBakup && movingFreeze) {
-        WIFI_LOGD("set movingFreeze scanned false.");
+        WIFI_LOGW("set movingFreeze scanned false.");
         SetMovingFreezeScaned(false);
     }
 }
@@ -913,7 +913,7 @@ void ScanService::HandleCustomStatusChanged(int customScene, int customSceneStat
     WIFI_LOGD("sizeof(time_t):%{public}d", int(sizeof(time_t)));
 
     time_t now = time(nullptr);
-    WIFI_LOGD("customScene:%{public}d, status:%{public}d", customScene, customSceneStatus);
+    WIFI_LOGI("customScene:%{public}d, status:%{public}d", customScene, customSceneStatus);
     if (customSceneStatus == MODE_STATE_OPEN) {
         customSceneTimeMap.insert(std::pair<int, int>(customScene, now));
     }
@@ -933,16 +933,11 @@ void ScanService::HandleGetCustomSceneState(std::map<int, time_t>& sceneMap) con
 
 void ScanService::SystemScanProcess(bool scanAtOnce)
 {
-    WIFI_LOGI("Enter ScanService::SystemScanProcess.");
+    WIFI_LOGI("Enter ScanService::SystemScanProcess, scanAtOnce:%{public}d.", scanAtOnce);
     StopSystemScan();
 
     int state = WifiSettings::GetInstance().GetScreenState();
-    if (state == MODE_STATE_OPEN) {
-        WIFI_LOGD("Screen is on.");
-    } else {
-        WIFI_LOGD("ScreenOn is off.");
-    }
-
+    WIFI_LOGI("Screen state(1:OPEN, 2:CLOSE): %{public}d.", state);
     if (state == MODE_STATE_OPEN) {
         {
             std::unique_lock<std::mutex> lock(scanControlInfoMutex);
@@ -1021,7 +1016,7 @@ void ScanService::StartSystemTimerScan(bool scanAtOnce)
     } else {
         scanTime = systemScanIntervalMode.scanIntervalMode.interval - sinceLastScan;
     }
-    WIFI_LOGD("scanTime: %{public}d,  interval:%{public}d,  count:%{public}d",
+    WIFI_LOGI("scanTime: %{public}d,  interval:%{public}d,  count:%{public}d",
         scanTime,
         systemScanIntervalMode.scanIntervalMode.interval,
         systemScanIntervalMode.scanIntervalMode.count);
@@ -1151,12 +1146,12 @@ ErrCode ScanService::AllowSystemTimerScan()
     }
 
     if (!AllowScanDuringStaScene(staScene, ScanMode::SYSTEM_TIMER_SCAN)) {
-        WIFI_LOGD("system timer scan not allowed, staScene is %{public}d", staScene);
+        WIFI_LOGW("system timer scan not allowed, staScene is %{public}d", staScene);
         return WIFI_OPT_FAILED;
     }
 
     if (!AllowScanDuringCustomScene(ScanMode::SYSTEM_TIMER_SCAN)) {
-        WIFI_LOGD("system timer scan not allowed");
+        WIFI_LOGW("system timer scan not allowed");
         return WIFI_OPT_FAILED;
     }
 
@@ -1183,7 +1178,7 @@ ErrCode ScanService::AllowSystemTimerScan()
         return WIFI_OPT_FAILED;
     }
 
-    WIFI_LOGD("allow system timer scan");
+    WIFI_LOGI("allow system timer scan");
     return WIFI_OPT_SUCCESS;
 }
 
@@ -1192,15 +1187,17 @@ ErrCode ScanService::AllowPnoScan()
     WIFI_LOGI("Enter ScanService::AllowPnoScan.\n");
 
     if (staStatus != static_cast<int>(OperateResState::DISCONNECT_DISCONNECTED)) {
+        WIFI_LOGE("NOT allow PNO scan for staStatus: %{public}d", staStatus);
         return WIFI_OPT_FAILED;
     }
 
     int staScene = GetStaScene();
     if (staScene == SCAN_SCENE_MAX) {
+        WIFI_LOGE("NOT allow PNO scan for staScene: %{public}d", staScene);
         return WIFI_OPT_FAILED;
     }
     if (!AllowScanDuringStaScene(staScene, ScanMode::PNO_SCAN)) {
-        WIFI_LOGD("pnoScan is not allowed for forbid map, staScene is %{public}d", staScene);
+        WIFI_LOGW("pnoScan is not allowed for forbid map, staScene is %{public}d", staScene);
         return WIFI_OPT_FAILED;
     }
     if (!AllowScanDuringCustomScene(ScanMode::PNO_SCAN)) {
@@ -1221,7 +1218,7 @@ ErrCode ScanService::AllowPnoScan()
                 pnoScanIntervalMode.scanIntervalMode.count = iter->count;
                 if (!PnoScanByInterval(pnoScanIntervalMode.fixedScanCount, pnoScanIntervalMode.fixedCurrentTime,
                     pnoScanIntervalMode.scanIntervalMode.interval, pnoScanIntervalMode.scanIntervalMode.count)) {
-                    WIFI_LOGD("pnoScan is not allowed for interval mode");
+                    WIFI_LOGW("pnoScan is not allowed for interval mode");
                     return WIFI_OPT_FAILED;
                 }
             }
@@ -1229,11 +1226,11 @@ ErrCode ScanService::AllowPnoScan()
     }
 
     if (!AllowScanByDisableScanCtrl()) {
-        WIFI_LOGD("extern scan not allow by disable scan control.");
+        WIFI_LOGW("extern scan not allow by disable scan control.");
         return WIFI_OPT_FAILED;
     }
 
-    WIFI_LOGD("pno scan is allowed");
+    WIFI_LOGI("pno scan is allowed");
     return WIFI_OPT_SUCCESS;
 }
 
@@ -1333,7 +1330,7 @@ ErrCode ScanService::ApplyTrustListPolicy(ScanType scanType)
     SetScanTrustMode();
     policyResult = AllowScanByType(scanType);
     if (policyResult != WIFI_OPT_SUCCESS) {
-        WIFI_LOGD("AllowScanByType failed.");
+        WIFI_LOGW("AllowScanByType failed.");
     }
     ResetToNonTrustMode();
     WIFI_LOGI("apply trust list policy, ErrCode=%{public}d", static_cast<int>(policyResult));
@@ -1727,7 +1724,7 @@ bool ScanService::AllowScanDuringScanning(ScanMode scanMode) const
     std::unique_lock<std::mutex> lock(scanControlInfoMutex);
     for (auto iter = scanControlInfo.scanForbidList.begin(); iter != scanControlInfo.scanForbidList.end(); ++iter) {
         if (iter->scanScene == SCAN_SCENE_SCANNING && iter->scanMode == scanMode) {
-            WIFI_LOGD("scan not allow by scanning scene.");
+            WIFI_LOGW("scan not allow by scanning scene.");
             return false;
         }
     }
@@ -1741,14 +1738,14 @@ bool ScanService::AllowScanDuringScreenOff(ScanMode scanMode) const
     bool isTrustListMode = IsScanTrustMode();
     bool isInList = IsInScanTrust(SCAN_SCENE_SCREEN_OFF);
     if (isTrustListMode && isInList) {
-        WIFI_LOGD("Trust list mode,sceneId(SCAN_SCENE_SCREEN_OFF) in the list,return true.");
+        WIFI_LOGI("Trust list mode,sceneId(SCAN_SCENE_SCREEN_OFF) in the list,return true.");
         return true;
     }
 
     std::unique_lock<std::mutex> lock(scanControlInfoMutex);
     for (auto iter = scanControlInfo.scanForbidList.begin(); iter != scanControlInfo.scanForbidList.end(); ++iter) {
         if (iter->scanScene == SCAN_SCENE_SCREEN_OFF && iter->scanMode == scanMode) {
-            WIFI_LOGD("scan not allow by screen off scene.");
+            WIFI_LOGW("scan not allow by screen off scene.");
             return false;
         }
     }
@@ -1766,7 +1763,7 @@ bool ScanService::AllowScanDuringStaScene(int staScene, ScanMode scanMode)
     }
     std::unique_lock<std::mutex> lock(scanControlInfoMutex);
     for (auto iter = scanControlInfo.scanForbidList.begin(); iter != scanControlInfo.scanForbidList.end(); ++iter) {
-        WIFI_LOGD("now - staCurrentTime:%{public}d, iter->forbidTime:%{public}d", int(now - staCurrentTime),
+        WIFI_LOGI("now - staCurrentTime:%{public}d, iter->forbidTime:%{public}d", int(now - staCurrentTime),
             iter->forbidTime);
         /* forbid scan mode found in scan scene. */
         if (iter->scanScene == staScene && iter->scanMode == scanMode) {
@@ -1817,17 +1814,21 @@ bool ScanService::AllowCustomSceneCheck(const std::map<int, time_t>::const_itera
         if (iter->scanScene == customIter->first && iter->scanMode == scanMode) {
             /* forbidCount=0 and forbidTime=0, directly forbid scan. */
             if ((iter->forbidTime == 0) && (iter->forbidCount == 0)) {
-                WIFI_LOGD("Scan is forbidden by staScene.");
+                WIFI_LOGW("Scan is forbidden by staScene.");
                 return false;
             }
             /* Unconditional scan control for forbidCount times. */
             if (iter->forbidCount > 0 && iter->forbidCount - customSceneForbidCount > 0) {
                 customSceneForbidCount++;
+                WIFI_LOGW("Unconditional scan control for forbidCount times, customSceneForbidCount:%{public}d.",
+                    customSceneForbidCount);
                 return false;
             }
             /* Scan interval less than forbidTime, forbid scan. */
             time_t now = time(nullptr);
             if (iter->forbidTime > 0 && iter->forbidTime > now - customIter->second) {
+                WIFI_LOGW("Scan interval less than forbidTime, forbid scan, forbidTime:%{public}d.",
+                    iter->forbidTime);
                 return false;
             }
         }
@@ -2136,13 +2137,13 @@ bool ScanService::AllowScanByIntervalBlocklist(
     }
     /* If the app ID is in the blocklist, extern scan is forbidden. */
     if (std::find(scanBlocklist.begin(), scanBlocklist.end(), appId) != scanBlocklist.end()) {
-        WIFI_LOGD("extern scan not allowed by blocklist");
+        WIFI_LOGW("extern scan not allowed by blocklist");
         return false;
     }
     /* First scan */
     if (blockListScanTime == 0) {
         blockListScanTime = now;
-        WIFI_LOGD("blockListScanTime, first scan.");
+        WIFI_LOGW("blockListScanTime, first scan.");
         return true;
     }
     /**
@@ -2161,7 +2162,7 @@ bool ScanService::AllowScanByIntervalBlocklist(
          * is greater than count, the user is blocklisted forbidding scanning.
          */
         scanBlocklist.push_back(appId);
-        WIFI_LOGD("scanBlocklist.push_back(appId), return false.");
+        WIFI_LOGI("scanBlocklist.push_back(appId), return false.");
         return false;
     }
     blockListScanTime = now;
@@ -2195,7 +2196,7 @@ bool ScanService::AllowScanByMovingFreeze()
         WIFI_LOGD("In movingfreeze mode, return true for the first scan.");
         return true;
     } else {
-        WIFI_LOGD("In movingfreeze mode, return false for the already scanned.");
+        WIFI_LOGW("In movingfreeze mode, return false for the already scanned.");
         return false;
     }
 

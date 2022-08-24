@@ -75,7 +75,7 @@ int WifiHotspotStub::OnRemoteRequest(uint32_t code, MessageParcel &data, Message
 
     HandleFuncMap::iterator iter = handleFuncMap.find(code);
     if (iter == handleFuncMap.end()) {
-        WIFI_LOGD("not find function to deal, code %{public}u", code);
+        WIFI_LOGW("not find function to deal, code %{public}u", code);
         reply.WriteInt32(0);
         reply.WriteInt32(WIFI_OPT_NOT_SUPPORTED);
     } else {
@@ -312,13 +312,13 @@ void WifiHotspotStub::OnRegisterCallBack(
     do {
         sptr<IRemoteObject> remote = data.ReadRemoteObject();
         if (remote == nullptr) {
-            WIFI_LOGD("Failed to ReadRemoteObject!");
+            WIFI_LOGE("Failed to ReadRemoteObject!");
             break;
         }
         sptr<IWifiHotspotCallback> callback_ = iface_cast<IWifiHotspotCallback>(remote);
         if (callback_ == nullptr) {
             callback_ = new (std::nothrow) WifiHotspotCallbackProxy(remote);
-            WIFI_LOGD("create new WifiHotspotCallbackProxy!");
+            WIFI_LOGI("create new WifiHotspotCallbackProxy!");
         }
 
         if (mSingleCallback) {

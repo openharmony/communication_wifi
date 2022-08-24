@@ -31,7 +31,7 @@ WifiDeviceCallBackStub::~WifiDeviceCallBackStub()
 int WifiDeviceCallBackStub::OnRemoteRequest(
     uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
-    WIFI_LOGI("WifiDeviceCallBackStub::OnRemoteRequest, code:%{public}zu!", code);
+    WIFI_LOGI("WifiDeviceCallBackStub::OnRemoteRequest, code:%{public}u!", code);
     if (mRemoteDied) {
         WIFI_LOGE("Failed to `%{public}s`,Remote service is died!", __func__);
         return -1;

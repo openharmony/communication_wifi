@@ -16,15 +16,16 @@
 #include "sta_state_machine.h"
 #include <cstdio>
 #include <thread>
-#include "log_helper.h"
-#include "sta_monitor.h"
-#include "wifi_logger.h"
-#include "wifi_sta_hal_interface.h"
-#include "wifi_settings.h"
-#include "mac_address.h"
 #include "if_config.h"
-#include "wifi_common_util.h"
+#include "ip_tools.h"
+#include "log_helper.h"
+#include "mac_address.h"
+#include "sta_monitor.h"
 #include "wifi_chip_capability.h"
+#include "wifi_common_util.h"
+#include "wifi_logger.h"
+#include "wifi_settings.h"
+#include "wifi_sta_hal_interface.h"
 #include "wifi_supplicant_hal_interface.h"
 
 #ifndef OHOS_WIFI_STA_TEST
@@ -435,7 +436,6 @@ void StaStateMachine::StartWifiProcess()
         WifiSettings::GetInstance().SetWifiState(static_cast<int>(WifiState::DISABLED));
         WifiSettings::GetInstance().SetUserLastSelectedNetworkId(INVALID_NETWORK_ID);
         staCallback.OnStaOpenRes(OperateResState::OPEN_WIFI_FAILED);
-        staCallback.OnStaOpenRes(OperateResState::OPEN_WIFI_DISABLED);
     }
 }
 

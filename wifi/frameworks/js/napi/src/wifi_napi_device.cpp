@@ -228,8 +228,11 @@ static void ConvertEncryptionMode(const SecTypeJs& securityType, std::string& ke
 {
     switch (securityType) {
         case SecTypeJs::SEC_TYPE_OPEN:
-        case SecTypeJs::SEC_TYPE_WEP:
             keyMgmt = KEY_MGMT_NONE;
+            break;
+
+        case SecTypeJs::SEC_TYPE_WEP:
+            keyMgmt = KEY_MGMT_WEP;
             break;
 
         case SecTypeJs::SEC_TYPE_PSK:
@@ -951,9 +954,6 @@ static void DeviceConfigToJsArray(const napi_env& env, std::vector<WifiDeviceCon
     } else {
         SetValueInt32(env, "ipType", static_cast<int>(IpTypeJs::IP_TYPE_DHCP), result);
     }
-    WIFI_LOGI("DeviceConfigToJsArray, idx:%{public}d, assignMethod:%{public}x!",
-        idx, static_cast<int>(vecDeviceConfigs[idx].wifiIpConfig.assignMethod));
-
     napi_value ipCfgObj;
     napi_create_object(env, &ipCfgObj);
     IpConfigToJs(env, vecDeviceConfigs[idx].wifiIpConfig, ipCfgObj);

@@ -67,17 +67,18 @@ static WifiErrorNo AddWpaIface(int staNo)
 
 static WifiErrorNo RemoveWpaIface(int staNo)
 {
+    int ret = -1;
     WifiWpaInterface *pWpaInterface = GetWifiWapGlobalInterface();
     if (pWpaInterface == NULL) {
         LOGE("Get wpa interface failed!");
         return WIFI_HAL_FAILED;
     }
     if (staNo == 0) {
-        pWpaInterface->wpaCliRemoveIface(pWpaInterface, "wlan0");
+        ret = pWpaInterface->wpaCliRemoveIface(pWpaInterface, "wlan0");
     } else {
-        pWpaInterface->wpaCliRemoveIface(pWpaInterface, "wlan2");
+        ret = pWpaInterface->wpaCliRemoveIface(pWpaInterface, "wlan2");
     }
-    return WIFI_HAL_SUCCESS;
+    return (ret == 0 ? WIFI_HAL_SUCCESS : WIFI_HAL_FAILED);
 }
 
 static WifiErrorNo StopWpaAndWpaHal(int staNo)
@@ -85,13 +86,17 @@ static WifiErrorNo StopWpaAndWpaHal(int staNo)
     if (DisconnectSupplicant() != WIFI_HAL_SUCCESS) {
         LOGE("wpa_s hal already stop!");
     }
-    RemoveWpaIface(staNo);
+
+    if (RemoveWpaIface(staNo) != WIFI_HAL_SUCCESS) {
+        LOGE("RemoveWpaIface return fail!");
+    }
 
     if (StopSupplicant() != WIFI_HAL_SUCCESS) {
         LOGE("wpa_supplicant stop failed!");
         return WIFI_HAL_FAILED;
     }
-    LOGD("wpa_supplicant stop successfully");
+
+    LOGI("wpa_supplicant stop successfully");
     ReleaseWifiStaInterface(staNo);
     return WIFI_HAL_SUCCESS;
 }
@@ -99,7 +104,7 @@ static WifiErrorNo StopWpaAndWpaHal(int staNo)
 
 WifiErrorNo Start(void)
 {
-    LOGD("Ready to start wifi");
+    LOGI("Ready to start wifi");
     if (StartSupplicant() != WIFI_HAL_SUCCESS) {
         LOGE("wpa_supplicant start failed!");
         return WIFI_HAL_OPEN_SUPPLICANT_FAILED;
@@ -118,13 +123,13 @@ WifiErrorNo Start(void)
         return WIFI_HAL_CONN_SUPPLICANT_FAILED;
     }
     LOGD("SupplicantHal connect wpa_supplicant successfully!");
-    LOGD("Start wifi successfully");
+    LOGI("Start wifi successfully");
     return WIFI_HAL_SUCCESS;
 }
 
 WifiErrorNo Stop(void)
 {
-    LOGD("Ready to Stop wifi");
+    LOGI("Ready to Stop wifi");
     WifiErrorNo err = StopWpaAndWpaHal(0);
     if (err == WIFI_HAL_FAILED) {
         LOGD("Wifi stop failed!");
@@ -136,7 +141,7 @@ WifiErrorNo Stop(void)
 
 WifiErrorNo ForceStop(void)
 {
-    LOGD("Ready force Stop wifi");
+    LOGI("Ready force Stop wifi");
     WifiWpaStaInterface *p = TraversalWifiStaInterface();
     while (p != NULL) {
         StopWpaAndWpaHal(p->staNo);
@@ -175,7 +180,6 @@ WifiErrorNo StopSupplicant(void)
     int res = pStaIfc->wpaCliCmdWpaTerminate(pStaIfc);
     if (res < 0) {
         LOGE("wpaCliCmdWpaTerminate failed! ret=%{public}d", res);
-        return WIFI_HAL_FAILED;
     }
     usleep(WPA_TERMINATE_SLEEP_TIME);
     ModuleManageRetCode ret = StopModule(g_serviceName);

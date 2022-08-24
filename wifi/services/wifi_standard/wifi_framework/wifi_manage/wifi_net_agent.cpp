@@ -16,6 +16,7 @@
 #include "wifi_net_agent.h"
 #include <cinttypes>
 #include "inet_addr.h"
+#include "ip_tools.h"
 #include "iservice_registry.h"
 #include "netsys_native_service_proxy.h"
 #include "net_conn_client.h"

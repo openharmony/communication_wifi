@@ -225,14 +225,14 @@ int WifiScanStub::OnRegisterCallBack(uint32_t code, MessageParcel &data, Message
     do {
         sptr<IRemoteObject> remote = data.ReadRemoteObject();
         if (remote == nullptr) {
-            WIFI_LOGD("Failed to readRemoteObject!");
+            WIFI_LOGE("Failed to readRemoteObject!");
             break;
         }
 
         callback_ = iface_cast<IWifiScanCallback>(remote);
         if (callback_ == nullptr) {
             callback_ = new (std::nothrow) WifiScanCallbackProxy(remote);
-            WIFI_LOGD("create new `WifiScanCallbackProxy`!");
+            WIFI_LOGI("create new `WifiScanCallbackProxy`!");
         }
 
         if (mSingleCallback) {

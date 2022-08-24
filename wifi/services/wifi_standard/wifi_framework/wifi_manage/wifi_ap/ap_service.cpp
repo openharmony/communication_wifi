@@ -112,13 +112,13 @@ ErrCode ApService::GetStationList(std::vector<StationInfo> &result) const
     WIFI_LOGI("Instance %{public}d %{public}s", m_id, __func__);
     WifiSettings::GetInstance().GetStationList(result);
     if (result.empty()) {
-        WIFI_LOGD("GetStationList is empty.");
+        WIFI_LOGW("GetStationList is empty.");
         return ErrCode::WIFI_OPT_SUCCESS;
     }
     // get dhcp lease info, return full connected station info
     std::map<std::string, StationInfo> tmp;
     if (!m_ApStateMachine.GetConnectedStationInfo(tmp)) {
-        WIFI_LOGD("Get connected station info failed!");
+        WIFI_LOGW("Get connected station info failed!");
         return ErrCode::WIFI_OPT_FAILED;
     }
     for (auto iter = result.begin(); iter != result.end(); ++iter) {

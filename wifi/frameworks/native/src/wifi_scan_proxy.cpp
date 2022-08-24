@@ -51,7 +51,7 @@ WifiScanProxy::~WifiScanProxy()
 ErrCode WifiScanProxy::SetScanControlInfo(const ScanControlInfo &info)
 {
     if (mRemoteDied) {
-        WIFI_LOGD("failed to `%{public}s`,remote service is died!", __func__);
+        WIFI_LOGW("failed to `%{public}s`,remote service is died!", __func__);
         return WIFI_OPT_FAILED;
     }
     MessageOption option;
@@ -100,7 +100,7 @@ ErrCode WifiScanProxy::SetScanControlInfo(const ScanControlInfo &info)
 ErrCode WifiScanProxy::Scan()
 {
     if (mRemoteDied) {
-        WIFI_LOGD("failed to `%{public}s`,remote service is died!", __func__);
+        WIFI_LOGW("failed to `%{public}s`,remote service is died!", __func__);
         return WIFI_OPT_FAILED;
     }
     MessageOption option;
@@ -132,7 +132,7 @@ ErrCode WifiScanProxy::Scan()
 ErrCode WifiScanProxy::AdvanceScan(const WifiScanParams &params)
 {
     if (mRemoteDied) {
-        WIFI_LOGD("failed to `%{public}s`,remote service is died!", __func__);
+        WIFI_LOGW("failed to `%{public}s`,remote service is died!", __func__);
         return WIFI_OPT_FAILED;
     }
     MessageOption option;
@@ -172,7 +172,7 @@ ErrCode WifiScanProxy::AdvanceScan(const WifiScanParams &params)
 ErrCode WifiScanProxy::IsWifiClosedScan(bool &bOpen)
 {
     if (mRemoteDied) {
-        WIFI_LOGD("failed to `%{public}s`,remote service is died!", __func__);
+        WIFI_LOGW("failed to `%{public}s`,remote service is died!", __func__);
         return WIFI_OPT_FAILED;
     }
     MessageOption option;
@@ -203,7 +203,7 @@ ErrCode WifiScanProxy::IsWifiClosedScan(bool &bOpen)
 ErrCode WifiScanProxy::GetScanInfoList(std::vector<WifiScanInfo> &result)
 {
     if (mRemoteDied) {
-        WIFI_LOGD("failed to `%{public}s`,remote service is died!", __func__);
+        WIFI_LOGW("failed to `%{public}s`,remote service is died!", __func__);
         return WIFI_OPT_FAILED;
     }
     MessageOption option;
@@ -273,7 +273,7 @@ ErrCode WifiScanProxy::GetScanInfoList(std::vector<WifiScanInfo> &result)
 ErrCode WifiScanProxy::RegisterCallBack(const sptr<IWifiScanCallback> &callback)
 {
     if (mRemoteDied) {
-        WIFI_LOGD("failed to `%{public}s`,remote service is died!", __func__);
+        WIFI_LOGW("failed to `%{public}s`,remote service is died!", __func__);
         return WIFI_OPT_FAILED;
     }
     WIFI_LOGD("RegisterCallBack start!");
@@ -309,7 +309,7 @@ ErrCode WifiScanProxy::RegisterCallBack(const sptr<IWifiScanCallback> &callback)
 ErrCode WifiScanProxy::GetSupportedFeatures(long &features)
 {
     if (mRemoteDied) {
-        WIFI_LOGD("failed to `%{public}s`,remote service is died!", __func__);
+        WIFI_LOGW("failed to `%{public}s`,remote service is died!", __func__);
         return WIFI_OPT_FAILED;
     }
     MessageOption option;
@@ -339,7 +339,7 @@ ErrCode WifiScanProxy::GetSupportedFeatures(long &features)
 
 void WifiScanProxy::OnRemoteDied(const wptr<IRemoteObject>& remoteObject)
 {
-    WIFI_LOGD("Remote service is died!");
+    WIFI_LOGW("Remote service is died!");
     mRemoteDied = true;
     if (g_wifiScanCallbackStub == nullptr) {
         WIFI_LOGE("g_wifiScanCallbackStub is nullptr!");

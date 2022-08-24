@@ -561,13 +561,13 @@ void WifiDeviceStub::OnRegisterCallBack(uint32_t code, MessageParcel &data, Mess
     do {
         sptr<IRemoteObject> remote = data.ReadRemoteObject();
         if (remote == nullptr) {
-            WIFI_LOGD("Failed to ReadRemoteObject!");
+            WIFI_LOGW("Failed to ReadRemoteObject!");
             break;
         }
         callback_ = iface_cast<IWifiDeviceCallBack>(remote);
         if (callback_ == nullptr) {
             callback_ = new (std::nothrow) WifiDeviceCallBackProxy(remote);
-            WIFI_LOGD("create new WifiDeviceCallBackProxy!");
+            WIFI_LOGI("create new WifiDeviceCallBackProxy!");
         }
 
         if (mSingleCallback) {

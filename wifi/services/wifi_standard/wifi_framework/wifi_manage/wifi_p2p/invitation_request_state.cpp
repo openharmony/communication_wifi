@@ -56,7 +56,7 @@ bool InvitationRequestState::ExecuteStateMsg(InternalMessage *msg)
             if (status == P2pStatus::UNKNOWN_P2P_GROUP) {
                 int netId = groupManager.GetCurrentGroup().GetNetworkId();
                 if (netId >= 0) {
-                    WIFI_LOGD("Remove unknown client from currentGroup");
+                    WIFI_LOGW("Remove unknown client from currentGroup");
                     p2pStateMachine.groupManager.RemoveClientFromGroup(
                         netId, p2pStateMachine.savedP2pConfig.GetDeviceAddress());
                     p2pStateMachine.SwitchState(&p2pStateMachine.p2pGroupFormedState);
@@ -68,7 +68,7 @@ bool InvitationRequestState::ExecuteStateMsg(InternalMessage *msg)
             if (status == P2pStatus::SUCCESS) {
                 WIFI_LOGI("Invitation succeeded.");
             } else {
-                WIFI_LOGD("Invitation failed.");
+                WIFI_LOGW("Invitation failed.");
             }
             p2pStateMachine.SwitchState(&p2pStateMachine.p2pGroupFormedState);
             break;

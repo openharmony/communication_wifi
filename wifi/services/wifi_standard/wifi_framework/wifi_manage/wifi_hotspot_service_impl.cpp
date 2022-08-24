@@ -163,7 +163,7 @@ ErrCode WifiHotspotServiceImpl::SetHotspotConfig(const HotspotConfig &config)
     WifiConfigCenter::GetInstance().GetLinkedInfo(linkInfo);
 
     if (!linkInfo.ssid.empty() && linkInfo.ssid == config.GetSsid()) {
-        WIFI_LOGD("set ssid equal current linked ap ssid, no permission!");
+        WIFI_LOGE("set ssid equal current linked ap ssid, no permission!");
         return WIFI_OPT_INVALID_PARAM;
     }
 

@@ -108,7 +108,7 @@ ErrCode WifiHotspotProxy::IsHotspotDualBandSupported(bool &isSupported)
 ErrCode WifiHotspotProxy::GetHotspotState(int &state)
 {
     if (mRemoteDied) {
-        WIFI_LOGD("failed to `%{public}s`,remote service is died!", __func__);
+        WIFI_LOGW("failed to `%{public}s`,remote service is died!", __func__);
         return WIFI_OPT_FAILED;
     }
     MessageOption option;
@@ -140,7 +140,7 @@ ErrCode WifiHotspotProxy::GetHotspotState(int &state)
 ErrCode WifiHotspotProxy::GetHotspotConfig(HotspotConfig &result)
 {
     if (mRemoteDied) {
-        WIFI_LOGD("failed to `%{public}s`,remote service is died!", __func__);
+        WIFI_LOGW("failed to `%{public}s`,remote service is died!", __func__);
         return WIFI_OPT_FAILED;
     }
     MessageOption option;
@@ -179,7 +179,7 @@ ErrCode WifiHotspotProxy::GetHotspotConfig(HotspotConfig &result)
 ErrCode WifiHotspotProxy::SetHotspotConfig(const HotspotConfig &config)
 {
     if (mRemoteDied) {
-        WIFI_LOGD("failed to `%{public}s`,remote service is died!", __func__);
+        WIFI_LOGW("failed to `%{public}s`,remote service is died!", __func__);
         return WIFI_OPT_FAILED;
     }
     MessageOption option;
@@ -212,7 +212,7 @@ ErrCode WifiHotspotProxy::SetHotspotConfig(const HotspotConfig &config)
 ErrCode WifiHotspotProxy::GetStationList(std::vector<StationInfo> &result)
 {
     if (mRemoteDied) {
-        WIFI_LOGD("failed to `%{public}s`,remote service is died!", __func__);
+        WIFI_LOGW("failed to `%{public}s`,remote service is died!", __func__);
         return WIFI_OPT_FAILED;
     }
     MessageOption option;
@@ -257,7 +257,7 @@ ErrCode WifiHotspotProxy::GetStationList(std::vector<StationInfo> &result)
 ErrCode WifiHotspotProxy::DisassociateSta(const StationInfo &info)
 {
     if (mRemoteDied) {
-        WIFI_LOGD("failed to `%{public}s`,remote service is died!", __func__);
+        WIFI_LOGW("failed to `%{public}s`,remote service is died!", __func__);
         return WIFI_OPT_FAILED;
     }
     MessageOption option;
@@ -312,7 +312,7 @@ ErrCode WifiHotspotProxy::EnableHotspot(const ServiceType type)
 ErrCode WifiHotspotProxy::DisableHotspot(const ServiceType type)
 {
     if (mRemoteDied) {
-        WIFI_LOGD("failed to `%{public}s`,remote service is died!", __func__);
+        WIFI_LOGW("failed to `%{public}s`,remote service is died!", __func__);
         return WIFI_OPT_FAILED;
     }
     MessageOption option;
@@ -341,7 +341,7 @@ ErrCode WifiHotspotProxy::DisableHotspot(const ServiceType type)
 ErrCode WifiHotspotProxy::GetBlockLists(std::vector<StationInfo> &infos)
 {
     if (mRemoteDied) {
-        WIFI_LOGD("failed to `%{public}s`,remote service is died!", __func__);
+        WIFI_LOGW("failed to `%{public}s`,remote service is died!", __func__);
         return WIFI_OPT_FAILED;
     }
     MessageOption option;
@@ -387,7 +387,7 @@ ErrCode WifiHotspotProxy::GetBlockLists(std::vector<StationInfo> &infos)
 ErrCode WifiHotspotProxy::AddBlockList(const StationInfo &info)
 {
     if (mRemoteDied) {
-        WIFI_LOGD("failed to `%{public}s`,remote service is died!", __func__);
+        WIFI_LOGW("failed to `%{public}s`,remote service is died!", __func__);
         return WIFI_OPT_FAILED;
     }
     MessageOption option;
@@ -417,7 +417,7 @@ ErrCode WifiHotspotProxy::AddBlockList(const StationInfo &info)
 ErrCode WifiHotspotProxy::DelBlockList(const StationInfo &info)
 {
     if (mRemoteDied) {
-        WIFI_LOGD("failed to `%{public}s`,remote service is died!", __func__);
+        WIFI_LOGW("failed to `%{public}s`,remote service is died!", __func__);
         return WIFI_OPT_FAILED;
     }
     MessageOption option;
@@ -447,7 +447,7 @@ ErrCode WifiHotspotProxy::DelBlockList(const StationInfo &info)
 ErrCode WifiHotspotProxy::GetValidBands(std::vector<BandType> &bands)
 {
     if (mRemoteDied) {
-        WIFI_LOGD("failed to `%{public}s`,remote service is died!", __func__);
+        WIFI_LOGW("failed to `%{public}s`,remote service is died!", __func__);
         return WIFI_OPT_FAILED;
     }
     MessageOption option;
@@ -489,7 +489,7 @@ ErrCode WifiHotspotProxy::GetValidBands(std::vector<BandType> &bands)
 ErrCode WifiHotspotProxy::GetValidChannels(BandType band, std::vector<int32_t> &validchannels)
 {
     if (mRemoteDied) {
-        WIFI_LOGD("failed to `%{public}s`,remote service is died!", __func__);
+        WIFI_LOGW("failed to `%{public}s`,remote service is died!", __func__);
         return WIFI_OPT_FAILED;
     }
     MessageOption option;
@@ -563,7 +563,7 @@ ErrCode WifiHotspotProxy::RegisterCallBack(const sptr<IWifiHotspotCallback> &cal
 ErrCode WifiHotspotProxy::GetSupportedFeatures(long &features)
 {
     if (mRemoteDied) {
-        WIFI_LOGD("failed to `%{public}s`,remote service is died!", __func__);
+        WIFI_LOGW("failed to `%{public}s`,remote service is died!", __func__);
         return WIFI_OPT_FAILED;
     }
     MessageOption option;
@@ -594,7 +594,7 @@ ErrCode WifiHotspotProxy::GetSupportedFeatures(long &features)
 ErrCode WifiHotspotProxy::GetSupportedPowerModel(std::set<PowerModel>& setPowerModelList)
 {
     if (mRemoteDied) {
-        WIFI_LOGD("failed to `%{public}s`,remote service is died!", __func__);
+        WIFI_LOGW("failed to `%{public}s`,remote service is died!", __func__);
         return WIFI_OPT_FAILED;
     }
     MessageOption option;
@@ -636,7 +636,7 @@ ErrCode WifiHotspotProxy::GetSupportedPowerModel(std::set<PowerModel>& setPowerM
 ErrCode WifiHotspotProxy::GetPowerModel(PowerModel& model)
 {
     if (mRemoteDied) {
-        WIFI_LOGD("failed to `%{public}s`,remote service is died!", __func__);
+        WIFI_LOGW("failed to `%{public}s`,remote service is died!", __func__);
         return WIFI_OPT_FAILED;
     }
     MessageOption option;
@@ -668,7 +668,7 @@ ErrCode WifiHotspotProxy::GetPowerModel(PowerModel& model)
 ErrCode WifiHotspotProxy::SetPowerModel(const PowerModel& model)
 {
     if (mRemoteDied) {
-        WIFI_LOGD("failed to `%{public}s`,remote service is died!", __func__);
+        WIFI_LOGW("failed to `%{public}s`,remote service is died!", __func__);
         return WIFI_OPT_FAILED;
     }
     MessageOption option;
@@ -695,7 +695,7 @@ ErrCode WifiHotspotProxy::SetPowerModel(const PowerModel& model)
 
 void WifiHotspotProxy::OnRemoteDied(const wptr<IRemoteObject>& remoteObject)
 {
-    WIFI_LOGD("Remote service is died!");
+    WIFI_LOGW("Remote service is died!");
     mRemoteDied = true;
     if (g_wifiHotspotCallbackStub != nullptr) {
         g_wifiHotspotCallbackStub->SetRemoteDied(true);

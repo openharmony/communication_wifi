@@ -128,7 +128,7 @@ bool GroupNegotiationState::ProcessGroupStartedEvt(InternalMessage &msg) const
 
             p2pStateMachine.BroadcastP2pPeersChanged();
         } else {
-            WIFI_LOGD("fail:No GO device information is found.");
+            WIFI_LOGE("fail:No GO device information is found.");
         }
     }
     SharedLinkManager::SetSharedLinkCount(SHARED_LINKE_COUNT_ON_CONNECTED);
@@ -140,14 +140,14 @@ bool GroupNegotiationState::ProcessGroupStartedEvt(InternalMessage &msg) const
 bool GroupNegotiationState::ProcessGroupFormationFailEvt(InternalMessage &msg) const
 {
     int status = msg.GetParam1();
-    WIFI_LOGD("Group formation failure. Error code: %{public}d", status);
+    WIFI_LOGW("Group formation failure. Error code: %{public}d", status);
     return EXECUTED;
 }
 
 bool GroupNegotiationState::ProcessNegotFailEvt(InternalMessage &msg) const
 {
     int status = msg.GetParam1();
-    WIFI_LOGD("Negotiation failure. Error code: %{public}d", status);
+    WIFI_LOGE("Negotiation failure. Error code: %{public}d", status);
     p2pStateMachine.SwitchState(&p2pStateMachine.p2pIdleState);
     return EXECUTED;
 }

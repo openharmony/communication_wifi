@@ -428,7 +428,7 @@ ErrCode WifiScanProxy::GetSupportedFeatures(long &features)
 
 void WifiScanProxy::OnRemoteDied(void)
 {
-    WIFI_LOGD("Remote service is died!");
+    WIFI_LOGW("Remote service is died!");
     remoteDied_ = true;
     g_wifiScanCallbackStub.SetRemoteDied(true);
 }

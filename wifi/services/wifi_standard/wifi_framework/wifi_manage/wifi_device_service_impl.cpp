@@ -1105,7 +1105,7 @@ bool WifiDeviceServiceImpl::IsStaServiceRunning()
 {
     WifiOprMidState curState = WifiConfigCenter::GetInstance().GetWifiMidState();
     if (curState != WifiOprMidState::RUNNING) {
-        WIFI_LOGD("current wifi state is %{public}d", static_cast<int>(curState));
+        WIFI_LOGW("current wifi state is %{public}d", static_cast<int>(curState));
         return false;
     }
     return true;
@@ -1115,7 +1115,7 @@ bool WifiDeviceServiceImpl::IsScanServiceRunning()
 {
     WifiOprMidState curState = WifiConfigCenter::GetInstance().GetScanMidState();
     if (curState != WifiOprMidState::RUNNING) {
-        WIFI_LOGD("scan service does not started!");
+        WIFI_LOGW("scan service does not started!");
         return false;
     }
     return true;

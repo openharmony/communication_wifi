@@ -90,7 +90,7 @@ void SigHandler(int sig)
 void WifiHotspotMgrServiceImpl::OnStart()
 {
     if (mState == ServiceRunningState::STATE_RUNNING) {
-        WIFI_LOGD("Service has already started.");
+        WIFI_LOGW("Service has already started.");
         return;
     }
     if (!Init()) {

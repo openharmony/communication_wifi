@@ -207,7 +207,6 @@ public:
     bool WpsPbcSupported() const;
     bool WpsDisplaySupported() const;
     bool WpKeypadSupported() const;
-    bool isGroupOwner() const;
 
 private:
     std::string deviceName; /* the value range is 0 to 32 characters. */

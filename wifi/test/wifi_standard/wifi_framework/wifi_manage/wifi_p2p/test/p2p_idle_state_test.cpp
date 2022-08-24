@@ -306,9 +306,7 @@ HWTEST_F(P2pIdleStateTest, ProcessInvitationReceivedEvt4, TestSize.Level1)
     AddGroupManager();
     msg.SetMessageObj(group);
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), GetP2pPeer(_, _))
-        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_OK))
-        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED))
-        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
+        .WillRepeatedly(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
     AddDeviceManager1();
     EXPECT_TRUE(pP2pIdleState->ExecuteStateMsg(&msg));
 

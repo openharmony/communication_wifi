@@ -381,7 +381,8 @@ bool WifiDeviceServiceImpl::CheckConfigPwd(const WifiDeviceConfig &config)
         return CheckConfigEap(config);
     }
 
-    if (config.keyMgmt != KEY_MGMT_NONE && config.preSharedKey.empty()) {
+    if ((config.keyMgmt != KEY_MGMT_NONE && config.keyMgmt != KEY_MGMT_NONE) &&
+        config.preSharedKey.empty()) {
         WIFI_LOGE("CheckConfigPwd: preSharedKey is empty!");
         return false;
     }
@@ -389,7 +390,7 @@ bool WifiDeviceServiceImpl::CheckConfigPwd(const WifiDeviceConfig &config)
     int len = config.preSharedKey.length();
     bool isAllHex = std::all_of(config.preSharedKey.begin(), config.preSharedKey.end(), isxdigit);
     WIFI_LOGI("CheckConfigPwd, keyMgmt: %{public}s, len: %{public}d", config.keyMgmt.c_str(), len);
-    if (config.keyMgmt == KEY_MGMT_NONE) {
+    if (config.keyMgmt == KEY_MGMT_WEP) {
         for (int i = 0; i != WEPKEYS_SIZE; ++i) {
             if (!config.wepKeys[i].empty()) { // wep
                 int wepLen = config.wepKeys[i].size();
@@ -402,10 +403,14 @@ bool WifiDeviceServiceImpl::CheckConfigPwd(const WifiDeviceConfig &config)
                     wepLen == (WEP_KEY_LEN3 * MULTIPLE_HEXT_TO_ASCII)) {
                     return isAllHex;
                 }
+                WIFI_LOGE("CheckConfigPwd: invalid wepLen: %{public}d!", wepLen);
                 return false;
             }
         }
-        return config.preSharedKey.empty(); // open
+        return true;
+    }
+    if (config.keyMgmt == KEY_MGMT_NONE) {
+        return config.preSharedKey.empty();
     }
     int minLen = config.keyMgmt == KEY_MGMT_SAE ? MIN_SAE_LEN : MIN_PSK_LEN;
     int maxLen = isAllHex ? MAX_HEX_LEN : MAX_PRESHAREDKEY_LEN;

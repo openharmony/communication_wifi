@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,9 +17,6 @@
 #define OHOS_WIFI_COMMON_EVENT_HELPER_H
 
 #include <string>
-#ifndef OHOS_ARCH_LITE
-#include "common_event_subscriber.h"
-#endif
 
 namespace OHOS {
 namespace Wifi {

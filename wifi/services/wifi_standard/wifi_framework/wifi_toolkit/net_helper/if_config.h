@@ -17,7 +17,10 @@
 
 #include <memory>
 #include "wifi_log.h"
+
+#ifdef OHOS_ARCH_LITE
 #include "dhcp_define.h"
+#endif
 
 namespace OHOS {
 namespace Wifi {

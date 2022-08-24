@@ -85,19 +85,17 @@ public:
     napi_value CreateResult(const napi_env& env, const std::vector<WifiP2pDevice>& devices);
     napi_value CreateResult(const napi_env& env, const WifiP2pLinkedInfo& info);
     void EventNotify(AsyncEventData *asyncEvent);
-    bool IsRegisterObjectExist(const RegObj& regObj, const std::string& type);
-    std::vector<RegObj> GetRegisterObjects(const std::string& type);
 
     template<typename T>
     void CheckAndNotify(const std::string& type, const T& obj) {
-        std::vector<RegObj> vecObj = GetRegisterObjects(type);
-        if (vecObj.empty()) {
+        std::shared_lock<std::shared_mutex> guard(g_regInfoMutex);
+        auto it = g_eventRegisterInfo.find(type);
+        if (it == g_eventRegisterInfo.end()) {
             return;
         }
-        for (auto& each : vecObj) {
-            auto resultFunc = [this, env = each.m_regEnv, obj] () -> napi_value { return CreateResult(env, obj); };
-            AsyncEventData *asyncEvent =
-                new (std::nothrow)AsyncEventData(each.m_regEnv, each.m_regHanderRef, resultFunc);
+        for (auto& each : it->second) {
+            auto func = [this, env = each.m_regEnv, obj] () -> napi_value { return CreateResult(env, obj); };
+            AsyncEventData *asyncEvent = new (std::nothrow)AsyncEventData(each.m_regEnv, each.m_regHanderRef, func);
             if (asyncEvent == nullptr) {
                 return;
             }

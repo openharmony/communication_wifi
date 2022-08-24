@@ -122,7 +122,7 @@ ErrCode StaService::AddCandidateConfig(const int uid, const WifiDeviceConfig &co
         return WIFI_OPT_FAILED;
     }
 
-    if (config.keyMgmt == KEY_MGMT_NONE) {
+    if (config.keyMgmt == KEY_MGMT_NONE || config.keyMgmt == KEY_MGMT_WEP) {
         LOGE("StaService::AddCandidateConfig unsupport open or wep key!");
         return WIFI_OPT_NOT_SUPPORTED;
     }
@@ -197,7 +197,7 @@ int StaService::AddDeviceConfig(const WifiDeviceConfig &config) const
             LOGE("StaService::AddDeviceConfig GetNextNetworkId failed!");
             return INVALID_NETWORK_ID;
         }
-        LOGD("StaService::AddDeviceConfig alloc new id[%{public}d] succeed!", netWorkId);
+        LOGI("StaService::AddDeviceConfig alloc new id[%{public}d] succeed!", netWorkId);
     }
     tempDeviceConfig = config;
     tempDeviceConfig.networkId = netWorkId;

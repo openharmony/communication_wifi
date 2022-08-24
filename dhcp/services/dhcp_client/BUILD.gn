@@ -33,7 +33,7 @@ local_base_sources = [
 
 local_base_include_dirs = [
   "$DHCP_ROOT_DIR/services/dhcp_client/include",
-  "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/common/log",
+  "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/log",
 ]
 
 if (defined(ohos_lite)) {

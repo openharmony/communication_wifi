@@ -14,19 +14,18 @@
  */
 
 #include "p2p_state_machine.h"
-
-#include <map>
 #include <functional>
-
-#include "wifi_p2p_hal_interface.h"
+#include <map>
 #include "dhcpd_interface.h"
-#include "wifi_global_func.h"
+#include "ip_tools.h"
 #include "wifi_broadcast_helper.h"
-#include "wifi_p2p_upnp_service_response.h"
-#include "wifi_p2p_dns_sd_service_response.h"
-#include "wifi_p2p_dns_sd_service_info.h"
+#include "wifi_global_func.h"
 #include "wifi_logger.h"
 #include "wifi_net_agent.h"
+#include "wifi_p2p_dns_sd_service_info.h"
+#include "wifi_p2p_dns_sd_service_response.h"
+#include "wifi_p2p_hal_interface.h"
+#include "wifi_p2p_upnp_service_response.h"
 
 DEFINE_WIFILOG_P2P_LABEL("P2pStateMachine");
 
@@ -812,6 +811,11 @@ int P2pStateMachine::GetAvailableFreqByBand(GroupOwnerBand band) const
     }
     if (WifiP2PHalInterface::GetInstance().P2pGetSupportFrequenciesByBand(static_cast<int>(band), freqList) ==
         WifiErrorNo::WIFI_IDL_OPT_FAILED) {
+        constexpr int DEFAULT_5G_FREQUENCY = 5745; // channal:149, frequency:5745
+        if (band == GroupOwnerBand::GO_BAND_5GHZ) {
+            WIFI_LOGE("Get support frequencies failed, use default 5g frequency!");
+            return DEFAULT_5G_FREQUENCY;
+        }
         WIFI_LOGE("Cannot get support frequencies according to band, choose random frequency");
         return 0;
     }

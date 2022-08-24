@@ -24,7 +24,7 @@ local_base_sources = [ "$WIFI_ROOT_DIR/test/wifi_client/wifi_client.cpp" ]
 local_base_include_dirs = [
   "$WIFI_ROOT_DIR/frameworks/native/include",
   "$WIFI_ROOT_DIR/frameworks/native/interfaces",
-  "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/common/net_helper",
+  "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/net_helper",
 ]
 
 if (defined(ohos_lite)) {

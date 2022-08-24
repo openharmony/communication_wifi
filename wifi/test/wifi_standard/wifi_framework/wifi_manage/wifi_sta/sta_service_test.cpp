@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -90,6 +90,8 @@ public:
     void StaServiceAutoConnectServiceSuccess();
     void StaServiceRegisterStaServiceCallbackSuccess();
     void StaServiceRegisterStaServiceCallbackFail();
+    void StaServiceSetSuspendModeTest();
+
 public:
     std::unique_ptr<StaService> pStaService;
 };
@@ -515,6 +517,23 @@ void StaServiceTest::StaServiceRegisterStaServiceCallbackFail()
     pStaService->RegisterStaServiceCallback(instance.GetStaCallback());
 }
 
+/**
+ * @tc.name: Set suspend mode test
+ * @tc.desc: Set suspend mode test function.
+ * @tc.type: FUNC
+ * @tc.require: issueI5JRBB
+ */
+void StaServiceTest::StaServiceSetSuspendModeTest()
+{
+    EXPECT_CALL(WifiSupplicantHalInterface::GetInstance(), WpaSetSuspendMode(_))
+        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED))
+        .WillRepeatedly(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
+
+    EXPECT_TRUE(pStaService->SetSuspendMode(false) == WIFI_OPT_FAILED);
+    EXPECT_TRUE(pStaService->SetSuspendMode(false) == WIFI_OPT_SUCCESS);
+    EXPECT_TRUE(pStaService->SetSuspendMode(true) == WIFI_OPT_SUCCESS);
+}
+
 HWTEST_F(StaServiceTest, StaServiceInitStaServiceSuccess, TestSize.Level1)
 {
     StaServiceInitStaServiceSuccess();
@@ -673,6 +692,17 @@ HWTEST_F(StaServiceTest, StaServiceRegisterStaServiceCallbackSuccess, TestSize.L
 HWTEST_F(StaServiceTest, StaServiceRegisterStaServiceCallbackFail, TestSize.Level1)
 {
     StaServiceRegisterStaServiceCallbackFail();
+}
+
+/**
+ * @tc.name: Set suspend mode test
+ * @tc.desc: Set suspend mode test function.
+ * @tc.type: FUNC
+ * @tc.require: issueI5JRBB
+ */
+HWTEST_F(StaServiceTest, StaServiceSetSuspendMode, TestSize.Level1)
+{
+    StaServiceSetSuspendModeTest();
 }
 } // namespace Wifi
 } // namespace OHOS

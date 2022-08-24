@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -27,7 +27,7 @@ public:
     virtual ~MockWifiSupplicantHalInterface() = default;
     virtual WifiErrorNo StartSupplicant(void) = 0;
     virtual WifiErrorNo WpaSetCountryCode(const std::string &countryCode) const = 0;
-
+    virtual WifiErrorNo WpaSetSuspendMode(bool mode) const = 0;
 };
 
 class WifiSupplicantHalInterface : public MockWifiSupplicantHalInterface {
@@ -37,6 +37,7 @@ public:
 public:
     MOCK_METHOD0(StartSupplicant, WifiErrorNo());
     MOCK_CONST_METHOD1(WpaSetCountryCode, WifiErrorNo(const std::string &countryCode));
+    MOCK_CONST_METHOD1(WpaSetSuspendMode, WifiErrorNo(bool mode));
 };
 }  // namespace OHOS
 }  // namespace OHOS

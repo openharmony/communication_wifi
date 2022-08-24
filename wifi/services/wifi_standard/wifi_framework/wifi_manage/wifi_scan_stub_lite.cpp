@@ -35,7 +35,7 @@ int WifiScanStub::OnRemoteRequest(uint32_t code, IpcIo *req, IpcIo *reply)
 {
     WIFI_LOGD("WifiScanStub::OnRemoteRequest,code:%{public}u", code);
     if (req == nullptr || reply == nullptr) {
-        WIFI_LOGD("req:%{public}d, reply:%{public}d", req == nullptr, reply == nullptr);
+        WIFI_LOGE("req:%{public}d, reply:%{public}d", req == nullptr, reply == nullptr);
         return ERR_FAILED;
     }
 

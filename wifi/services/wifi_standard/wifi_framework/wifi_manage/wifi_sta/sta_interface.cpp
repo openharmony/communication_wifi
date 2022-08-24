@@ -46,7 +46,7 @@ extern "C" void Destroy(IStaService *pservice)
 
 ErrCode StaInterface::EnableWifi()
 {
-    WIFI_LOGD("Enter StaInterface::EnableWifi.\n");
+    WIFI_LOGI("Enter StaInterface::EnableWifi.\n");
     if(pStaService == nullptr) {
         pStaService = new (std::nothrow) StaService();
         if (pStaService == nullptr) {
@@ -205,7 +205,7 @@ ErrCode StaInterface::RemoveAllDevice()
     WIFI_LOGD("Enter StaInterface::RemoveAllDevice.\n");
     CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
     if (pStaService->RemoveAllDevice() != WIFI_OPT_SUCCESS) {
-        WIFI_LOGD("RemoveAllDevice failed.\n");
+        WIFI_LOGW("RemoveAllDevice failed.\n");
         return WIFI_OPT_FAILED;
     }
     return WIFI_OPT_SUCCESS;

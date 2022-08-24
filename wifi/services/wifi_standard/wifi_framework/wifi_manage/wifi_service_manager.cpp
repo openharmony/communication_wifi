@@ -376,7 +376,7 @@ int WifiServiceManager::UnloadP2pService(bool bPreLoad)
 int WifiServiceManager::UnloadService(const std::string &name, int id)
 {
     bool bPreLoad = WifiSettings::GetInstance().IsModulePreLoad(name);
-    WIFI_LOGD("WifiServiceManager::UnloadService name: %{public}s", name.c_str());
+    WIFI_LOGI("WifiServiceManager::UnloadService name: %{public}s", name.c_str());
     std::unique_lock<std::mutex> lock(mMutex);
     if (name == WIFI_SERVICE_STA) {
         return UnloadStaService(bPreLoad);
@@ -399,7 +399,7 @@ int WifiServiceManager::UnloadService(const std::string &name, int id)
 
 void WifiServiceManager::UninstallAllService()
 {
-    WIFI_LOGD("WifiServiceManager::UninstallAllService");
+    WIFI_LOGI("WifiServiceManager::UninstallAllService");
     UnloadStaService(false);
     UnloadScanService(false);
 #ifdef FEATURE_AP_SUPPORT

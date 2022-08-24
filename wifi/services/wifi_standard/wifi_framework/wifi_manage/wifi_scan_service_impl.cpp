@@ -76,7 +76,7 @@ WifiScanServiceImpl::~WifiScanServiceImpl()
 void WifiScanServiceImpl::OnStart()
 {
     if (mState == ServiceRunningState::STATE_RUNNING) {
-        WIFI_LOGD("Service has already started.");
+        WIFI_LOGW("Service has already started.");
         return;
     }
     if (!Init()) {
@@ -256,7 +256,7 @@ bool WifiScanServiceImpl::IsScanServiceRunning()
 {
     WifiOprMidState curState = WifiConfigCenter::GetInstance().GetScanMidState();
     if (curState != WifiOprMidState::RUNNING) {
-        WIFI_LOGD("scan service does not started!");
+        WIFI_LOGW("scan service does not started!");
         return false;
     }
     return true;

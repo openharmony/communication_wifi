@@ -302,7 +302,7 @@ void P2pMonitor::OnConnectSupplicant(int status) const
 void P2pMonitor::WpaEventDeviceFound(const IdlP2pDeviceFound &deviceInfo) const
 {
     const int minWfdLength = 6;
-    WIFI_LOGD("onDeviceFound callback");
+    WIFI_LOGI("onDeviceFound callback");
     WifiP2pDevice device;
     device.SetDeviceName(deviceInfo.deviceName);
     if (device.GetDeviceName().empty()) {
@@ -333,7 +333,7 @@ void P2pMonitor::WpaEventDeviceFound(const IdlP2pDeviceFound &deviceInfo) const
 
 void P2pMonitor::WpaEventDeviceLost(const std::string &p2pDeviceAddress) const
 {
-    WIFI_LOGD("onDeviceLost callback, p2pDeviceAddress:%{private}s", p2pDeviceAddress.c_str());
+    WIFI_LOGI("onDeviceLost callback, p2pDeviceAddress:%{private}s", p2pDeviceAddress.c_str());
     WifiP2pDevice device;
     device.SetDeviceAddress(p2pDeviceAddress);
     if (device.GetDeviceAddress().empty()) {
@@ -347,7 +347,7 @@ void P2pMonitor::WpaEventDeviceLost(const std::string &p2pDeviceAddress) const
 
 void P2pMonitor::WpaEventGoNegRequest(const std::string &srcAddress, short passwordId) const
 {
-    WIFI_LOGD("WpaEventGoNegRequest srcAddress:%{private}s, passwordId:%{private}hd", srcAddress.c_str(), passwordId);
+    WIFI_LOGI("WpaEventGoNegRequest srcAddress:%{private}s, passwordId:%{private}hd", srcAddress.c_str(), passwordId);
     WifiP2pConfigInternal config;
     config.SetDeviceAddress(srcAddress);
     if (config.GetDeviceAddress().empty()) {
@@ -380,20 +380,20 @@ void P2pMonitor::WpaEventGoNegRequest(const std::string &srcAddress, short passw
 
 void P2pMonitor::WpaEventGoNegSuccess(void) const
 {
-    WIFI_LOGD("onGoNegotiationSuccess callback");
+    WIFI_LOGI("onGoNegotiationSuccess callback");
     Broadcast2SmGoNegSuccess(selectIfacName);
 }
 
 void P2pMonitor::WpaEventGoNegFailure(int status) const
 {
-    WIFI_LOGD("onGoNegotiationFailure callback status:%{public}d", status);
+    WIFI_LOGI("onGoNegotiationFailure callback status:%{public}d", status);
     P2pStatus p2pStatus = IntStatusToP2pStatus(status);
     Broadcast2SmGoNegFailure(selectIfacName, p2pStatus);
 }
 
 void P2pMonitor::WpaEventInvitationReceived(const IdlP2pInvitationInfo &recvInfo) const
 {
-    WIFI_LOGD("onInvitationReceived callback");
+    WIFI_LOGI("onInvitationReceived callback");
     WifiP2pGroupInfo group;
     group.SetNetworkId(recvInfo.persistentNetworkId);
 

@@ -559,11 +559,13 @@ int LoadBindingRecoders(DhcpAddressPool *pool)
 int SaveBindingRecoders(const DhcpAddressPool *pool, int force)
 {
     if (pool == NULL) {
+        LOGE("Save binding record, pool is null");
         return RET_FAILED;
     }
     static uint64_t lastTime = 0;
     uint64_t currTime = Tmspsec();
     if (force == 0 && currTime < lastTime + DHCP_REFRESH_LEASE_FILE_INTERVAL) {
+        LOGE("Save binding record, time interval is not satisfied.");
         return RET_WAIT_SAVE;
     }
     char filePath[DHCP_LEASE_FILE_LENGTH] = {0};
@@ -574,6 +576,7 @@ int SaveBindingRecoders(const DhcpAddressPool *pool, int force)
     char line[DHCP_FILE_LINE_LENGTH] = {0};
     FILE *fp = fopen(filePath, "w");
     if (fp == NULL) {
+        LOGE("Save binding records %{private}s failed: %{public}d", filePath, errno);
         return RET_FAILED;
     }
     for (size_t index = 0; index < pool->leaseTable.capacity; ++index) {
@@ -581,7 +584,7 @@ int SaveBindingRecoders(const DhcpAddressPool *pool, int force)
         while (node != NULL) {
             AddressBinding *binding = (AddressBinding *)node->value;
             if (WriteAddressBinding(binding, line, sizeof(line)) != RET_SUCCESS) {
-                LOGW("Failed to convert binding info to string");
+                LOGE("Failed to convert binding info to string");
             } else {
                 fprintf(fp, "%s\n", line);
             }

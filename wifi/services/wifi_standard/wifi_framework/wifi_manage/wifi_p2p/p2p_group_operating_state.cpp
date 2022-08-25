@@ -264,6 +264,7 @@ bool P2pGroupOperatingState::ProcessCmdRemoveGroup(const InternalMessage &msg) c
             p2pStateMachine.SwitchState(&p2pStateMachine.p2pIdleState);
             p2pStateMachine.BroadcastActionResult(P2pActionCallback::RemoveGroup, WIFI_OPT_FAILED);
         } else {
+            p2pStateMachine.ChangeConnectedStatus(P2pConnectedState::P2P_DISCONNECTED);
             WIFI_LOGI("The P2P group is successfully removed.");
             p2pStateMachine.BroadcastActionResult(P2pActionCallback::RemoveGroup, WIFI_OPT_SUCCESS);
         }

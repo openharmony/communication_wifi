@@ -20,6 +20,12 @@ using namespace testing::ext;
 
 namespace OHOS {
 namespace Wifi {
+/**
+ * @tc.name: Events notify test
+ * @tc.desc: Events notify test function.
+ * @tc.type: FUNC
+ * @tc.require: issueI5LC60
+ */
 HWTEST_F(WifiInternalEventDispatcherTest, ThreadTest, TestSize.Level1)
 {
     WifiEventCallbackMsg msg;
@@ -33,6 +39,9 @@ HWTEST_F(WifiInternalEventDispatcherTest, ThreadTest, TestSize.Level1)
     EXPECT_EQ(0, WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(msg));
     sleep(1);
     msg.msgCode = WIFI_CBK_MSG_RSSI_CHANGE;
+    EXPECT_EQ(0, WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(msg));
+    sleep(1);
+    msg.msgCode = WIFI_CBK_MSG_DEVICE_CONFIG_CHANGE;
     EXPECT_EQ(0, WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(msg));
     sleep(1);
     msg.msgCode = WIFI_CBK_MSG_HOTSPOT_STATE_CHANGE;

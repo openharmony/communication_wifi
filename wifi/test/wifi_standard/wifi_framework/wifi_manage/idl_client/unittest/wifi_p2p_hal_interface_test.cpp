@@ -456,6 +456,12 @@ HWTEST_F(WifiP2pHalInterfaceTest, CancalReqServiceDiscovery_SUCCESS, TestSize.Le
     EXPECT_EQ(WifiErrorNo::WIFI_IDL_OPT_OK, WifiP2PHalInterface::GetInstance().CancelReqServiceDiscovery(id));
 }
 
+/**
+ * @tc.name: Save p2p config test
+ * @tc.desc: Save config of persistent group test function.
+ * @tc.type: FUNC
+ * @tc.require: issueI5EDUG
+ */
 HWTEST_F(WifiP2pHalInterfaceTest, StoreConfig_SUCCESS, TestSize.Level1)
 {
     EXPECT_EQ(WifiErrorNo::WIFI_IDL_OPT_OK, WifiP2PHalInterface::GetInstance().SaveConfig());

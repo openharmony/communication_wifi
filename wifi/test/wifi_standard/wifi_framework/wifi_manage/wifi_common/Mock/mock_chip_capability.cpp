@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,16 +13,14 @@
  * limitations under the License.
  */
 
-#include "wifi_device_death_recipient.h"
-#include "wifi_logger.h"
-#include "wifi_internal_event_dispatcher.h"
-DEFINE_WIFILOG_LABEL("WifiDeviceDeathRecipient");
+#include "mock_chip_capability.h"
+
 namespace OHOS {
 namespace Wifi {
-void WifiDeviceDeathRecipient::OnRemoteDied(const wptr<IRemoteObject>& remoteObject)
+ChipCapability &ChipCapability::GetInstance()
 {
-    WIFI_LOGW("WifiDeviceDeathRecipient::OnRemoteDied!");
-    WifiInternalEventDispatcher::GetInstance().RemoveStaCallback(remoteObject.promote());
+    static ChipCapability cp;
+    return cp;
 }
 }  // namespace Wifi
-}  // namespace OHOS
+} //  namespace OHOS

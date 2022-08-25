@@ -33,7 +33,7 @@ int WifiScanCallbackStub::OnRemoteRequest(
 {
     WIFI_LOGD("WifiScanCallbackStub::OnRemoteRequest code:%{public}u!", code);
     if (mRemoteDied) {
-        WIFI_LOGD("Failed to `%{public}s`,remote service is died!", __func__);
+        WIFI_LOGE("Failed to `%{public}s`,remote service is died!", __func__);
         return -1;
     }
 
@@ -44,7 +44,7 @@ int WifiScanCallbackStub::OnRemoteRequest(
 
     int exception = data.ReadInt32();
     if (exception) {
-        WIFI_LOGD("WifiScanCallbackStub::OnRemoteRequest exception! %{public}d!", exception);
+        WIFI_LOGE("WifiScanCallbackStub::OnRemoteRequest exception! %{public}d!", exception);
         return WIFI_OPT_FAILED;
     }
     int ret = -1;
@@ -64,7 +64,7 @@ int WifiScanCallbackStub::OnRemoteRequest(
 void WifiScanCallbackStub::RegisterCallBack(const sptr<IWifiScanCallback> &userCallback)
 {
     if (userCallback_ != nullptr) {
-        WIFI_LOGD("Callback has registered!");
+        WIFI_LOGE("Callback has registered!");
         return;
     }
     userCallback_ = userCallback;
@@ -82,7 +82,7 @@ void WifiScanCallbackStub::SetRemoteDied(bool val)
 
 void WifiScanCallbackStub::OnWifiScanStateChanged(int state)
 {
-    WIFI_LOGD("WifiScanCallbackStub::OnWifiScanStateChanged,state:%{public}d", state);
+    WIFI_LOGI("WifiScanCallbackStub::OnWifiScanStateChanged,state:%{public}d", state);
 
     if (userCallback_) {
         userCallback_->OnWifiScanStateChanged(state);

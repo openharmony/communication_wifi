@@ -34,7 +34,7 @@ int WifiHotspotCallbackStub::OnRemoteRequest(
 {
     WIFI_LOGD("WifiHotspotCallbackStub::OnRemoteRequest!");
     if (mRemoteDied) {
-        WIFI_LOGD("Failed to `%{public}s`,remote service is died!", __func__);
+        WIFI_LOGE("Failed to `%{public}s`,remote service is died!", __func__);
         return -1;
     }
 
@@ -113,7 +113,7 @@ void WifiHotspotCallbackStub::RegisterCallBack(const sptr<IWifiHotspotCallback> 
 
 void WifiHotspotCallbackStub::OnHotspotStateChanged(int state)
 {
-    WIFI_LOGD("WifiHotspotCallbackStub::OnHotspotStateChanged");
+    WIFI_LOGI("WifiHotspotCallbackStub::OnHotspotStateChanged, state:%{public}d.", state);
     if (userCallback_) {
         userCallback_->OnHotspotStateChanged(state);
     }
@@ -122,7 +122,7 @@ void WifiHotspotCallbackStub::OnHotspotStateChanged(int state)
 
 void WifiHotspotCallbackStub::OnHotspotStaJoin(const StationInfo &info)
 {
-    WIFI_LOGD("WifiHotspotCallbackStub::OnHotspotStaJoin");
+    WIFI_LOGI("WifiHotspotCallbackStub::OnHotspotStaJoin");
     if (userCallback_) {
         userCallback_->OnHotspotStaJoin(info);
     }
@@ -131,7 +131,7 @@ void WifiHotspotCallbackStub::OnHotspotStaJoin(const StationInfo &info)
 
 void WifiHotspotCallbackStub::OnHotspotStaLeave(const StationInfo &info)
 {
-    WIFI_LOGD("WifiHotspotCallbackStub::OnHotspotStaLeave");
+    WIFI_LOGI("WifiHotspotCallbackStub::OnHotspotStaLeave");
     if (userCallback_) {
         userCallback_->OnHotspotStaLeave(info);
     }

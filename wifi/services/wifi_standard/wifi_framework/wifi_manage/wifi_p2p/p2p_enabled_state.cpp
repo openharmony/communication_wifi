@@ -173,7 +173,7 @@ bool P2pEnabledState::ProcessCmdStopDiscPeer(InternalMessage &msg) const
 }
 bool P2pEnabledState::ProcessDeviceFoundEvt(InternalMessage &msg) const
 {
-    WIFI_LOGD("p2p_enabled_state recv P2P_EVENT_DEVICE_FOUND");
+    WIFI_LOGI("p2p_enabled_state recv P2P_EVENT_DEVICE_FOUND");
     WifiP2pDevice device;
     if (!msg.GetMessageObj(device)) {
         WIFI_LOGE("Failed to obtain device information.");
@@ -189,7 +189,7 @@ bool P2pEnabledState::ProcessDeviceFoundEvt(InternalMessage &msg) const
 }
 bool P2pEnabledState::ProcessDeviceLostEvt(InternalMessage &msg) const
 {
-    WIFI_LOGD("p2p_enabled_state recv P2P_EVENT_DEVICE_LOST");
+    WIFI_LOGI("p2p_enabled_state recv P2P_EVENT_DEVICE_LOST");
     WifiP2pDevice device;
     if (!msg.GetMessageObj(device)) {
         WIFI_LOGE("Failed to obtain device information.");
@@ -341,7 +341,7 @@ bool P2pEnabledState::P2pSettingsInitialization()
 
 bool P2pEnabledState::ProcessCmdAddLocalService(InternalMessage &msg) const
 {
-    WIFI_LOGD("p2p_enabled_state recv CMD_PUT_LOCAL_SERVICE");
+    WIFI_LOGI("p2p_enabled_state recv CMD_PUT_LOCAL_SERVICE");
     WifiP2pServiceInfo service;
     if (!msg.GetMessageObj(service)) {
         WIFI_LOGE("Failed to obtain WifiP2pServiceInfo information.");
@@ -406,7 +406,7 @@ bool P2pEnabledState::ProcessCmdDiscServices(InternalMessage &msg) const
         return EXECUTED;
     }
 
-    WIFI_LOGD("CMD_DISCOVER_SERVICES successful.");
+    WIFI_LOGI("CMD_DISCOVER_SERVICES successful.");
     p2pStateMachine.BroadcastActionResult(P2pActionCallback::DiscoverServices, ErrCode::WIFI_OPT_SUCCESS);
     p2pStateMachine.BroadcastP2pDiscoveryChanged(true);
     return EXECUTED;
@@ -459,7 +459,7 @@ bool P2pEnabledState::ProcessCmdRequestService(InternalMessage &msg) const
 
 bool P2pEnabledState::ProcessServiceDiscReqEvt(InternalMessage &msg) const
 {
-    WIFI_LOGD("p2p_enabled_state recv P2P_EVENT_SERV_DISC_REQ");
+    WIFI_LOGI("p2p_enabled_state recv P2P_EVENT_SERV_DISC_REQ");
     WifiP2pServiceRequestList reqList;
     if (!msg.GetMessageObj(reqList)) {
         WIFI_LOGE("Failed to obtain WifiP2pServiceRequestList information.");
@@ -498,7 +498,7 @@ bool P2pEnabledState::ProcessServiceDiscReqEvt(InternalMessage &msg) const
 
 bool P2pEnabledState::ProcessServiceDiscRspEvt(InternalMessage &msg) const
 {
-    WIFI_LOGD("p2p_enabled_state recv P2P_EVENT_SERV_DISC_RESP");
+    WIFI_LOGI("p2p_enabled_state recv P2P_EVENT_SERV_DISC_RESP");
     WifiP2pServiceResponseList respList;
     if (!msg.GetMessageObj(respList)) {
         WIFI_LOGE("Failed to obtain WifiP2pServiceResponseList information.");
@@ -522,7 +522,7 @@ bool P2pEnabledState::ProcessExceptionTimeOut(InternalMessage &msg) const
 
 bool P2pEnabledState::ProcessCmdSetDeviceName(InternalMessage &msg) const
 {
-    WIFI_LOGD("p2p_enabled_state CMD: set device name.");
+    WIFI_LOGI("p2p_enabled_state CMD: set device name.");
     std::string deviceName;
     if (!msg.GetMessageObj(deviceName)) {
         LOGE("Failed to obtain string information.");

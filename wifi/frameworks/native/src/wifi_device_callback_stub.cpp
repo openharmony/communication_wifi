@@ -31,9 +31,9 @@ WifiDeviceCallBackStub::~WifiDeviceCallBackStub()
 int WifiDeviceCallBackStub::OnRemoteRequest(
     uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
-    WIFI_LOGD("WifiDeviceCallBackStub::OnRemoteRequest!");
+    WIFI_LOGI("WifiDeviceCallBackStub::OnRemoteRequest, code:%{public}u!", code);
     if (mRemoteDied) {
-        WIFI_LOGD("Failed to `%{public}s`,Remote service is died!", __func__);
+        WIFI_LOGE("Failed to `%{public}s`,Remote service is died!", __func__);
         return -1;
     }
 
@@ -84,7 +84,7 @@ int WifiDeviceCallBackStub::OnRemoteRequest(
 void WifiDeviceCallBackStub::RegisterUserCallBack(const sptr<IWifiDeviceCallBack> &callBack)
 {
     if (callBack == nullptr) {
-        WIFI_LOGD("RegisterUserCallBack:callBack is nullptr!");
+        WIFI_LOGE("RegisterUserCallBack:callBack is nullptr!");
         return;
     }
     callback_ = callBack;
@@ -102,7 +102,7 @@ void WifiDeviceCallBackStub::SetRemoteDied(bool val)
 
 void WifiDeviceCallBackStub::OnWifiStateChanged(int state)
 {
-    WIFI_LOGD("WifiDeviceCallBackStub::OnWifiStateChanged");
+    WIFI_LOGI("WifiDeviceCallBackStub::OnWifiStateChanged, state:%{public}d!", state);
 
     if (callback_) {
         callback_->OnWifiStateChanged(state);
@@ -112,7 +112,7 @@ void WifiDeviceCallBackStub::OnWifiStateChanged(int state)
 
 void WifiDeviceCallBackStub::OnWifiConnectionChanged(int state, const WifiLinkedInfo &info)
 {
-    WIFI_LOGD("WifiDeviceCallBackStub::OnWifiConnectionChanged");
+    WIFI_LOGI("WifiDeviceCallBackStub::OnWifiConnectionChanged, state:%{public}d!", state);
     if (callback_) {
         callback_->OnWifiConnectionChanged(state, info);
     }
@@ -121,7 +121,7 @@ void WifiDeviceCallBackStub::OnWifiConnectionChanged(int state, const WifiLinked
 
 void WifiDeviceCallBackStub::OnWifiRssiChanged(int rssi)
 {
-    WIFI_LOGD("WifiDeviceCallBackStub::OnWifiRssiChanged");
+    WIFI_LOGI("WifiDeviceCallBackStub::OnWifiRssiChanged, rssi:%{public}d!", rssi);
     if (callback_) {
         callback_->OnWifiRssiChanged(rssi);
     }
@@ -130,7 +130,7 @@ void WifiDeviceCallBackStub::OnWifiRssiChanged(int rssi)
 
 void WifiDeviceCallBackStub::OnWifiWpsStateChanged(int state, const std::string &pinCode)
 {
-    WIFI_LOGD("WifiDeviceCallBackStub::OnWifiWpsStateChanged");
+    WIFI_LOGI("WifiDeviceCallBackStub::OnWifiWpsStateChanged, state:%{public}d!", state);
     if (callback_) {
         callback_->OnWifiWpsStateChanged(state, pinCode);
     }
@@ -138,7 +138,7 @@ void WifiDeviceCallBackStub::OnWifiWpsStateChanged(int state, const std::string 
 
 void WifiDeviceCallBackStub::OnStreamChanged(int direction)
 {
-    WIFI_LOGD("WifiDeviceCallBackStub::OnStreamChanged");
+    WIFI_LOGI("WifiDeviceCallBackStub::OnStreamChanged, direction:%{public}d!", direction);
     if (callback_) {
         callback_->OnStreamChanged(direction);
     }
@@ -146,7 +146,7 @@ void WifiDeviceCallBackStub::OnStreamChanged(int direction)
 
 void WifiDeviceCallBackStub::OnDeviceConfigChanged(ConfigChange value)
 {
-    WIFI_LOGD("WifiDeviceCallBackStub::OnDeviceConfigChanged");
+    WIFI_LOGI("WifiDeviceCallBackStub::OnDeviceConfigChanged, value:%{public}d!", value);
     if (callback_) {
         callback_->OnDeviceConfigChanged(value);
     }

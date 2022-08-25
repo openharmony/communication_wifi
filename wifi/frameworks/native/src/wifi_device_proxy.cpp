@@ -1186,7 +1186,7 @@ bool WifiDeviceProxy::SetLowLatencyMode(bool enabled)
 
 void WifiDeviceProxy::OnRemoteDied(const wptr<IRemoteObject> &remoteObject)
 {
-    WIFI_LOGD("Remote service is died!");
+    WIFI_LOGW("Remote service is died!");
     mRemoteDied = true;
     if (g_deviceCallBackStub == nullptr) {
         WIFI_LOGE("g_deviceCallBackStub is nullptr");

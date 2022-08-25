@@ -310,7 +310,7 @@ ErrCode StaService::ReAssociate() const
 
 ErrCode StaService::EnableDeviceConfig(int networkId, bool attemptEnable) const
 {
-    WIFI_LOGD("Enter StaService::EnableDeviceConfig! networkid is %{public}d", networkId);
+    WIFI_LOGI("Enter StaService::EnableDeviceConfig! networkid is %{public}d", networkId);
 
     /* Update wifi status. */
     if (WifiSettings::GetInstance().SetDeviceState(networkId, (int)WifiDeviceConfigStatus::ENABLED, attemptEnable) <
@@ -324,7 +324,7 @@ ErrCode StaService::EnableDeviceConfig(int networkId, bool attemptEnable) const
 
 ErrCode StaService::DisableDeviceConfig(int networkId) const
 {
-    WIFI_LOGD("Enter StaService::DisableDeviceConfig.networkid is %{public}d", networkId);
+    WIFI_LOGI("Enter StaService::DisableDeviceConfig.networkid is %{public}d", networkId);
 
     if (WifiSettings::GetInstance().SetDeviceState(networkId, (int)WifiDeviceConfigStatus::DISABLED) < 0) {
         WIFI_LOGE("Disable device config failed!");

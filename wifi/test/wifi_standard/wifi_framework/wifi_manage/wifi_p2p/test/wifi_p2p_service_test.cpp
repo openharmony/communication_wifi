@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,13 +12,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include <gtest/gtest.h>
 
-#include "wifi_p2p_service.h"
-#include "wifi_p2p_msg.h"
-#include "wifi_settings.h"
+#include <gtest/gtest.h>
 #include "mock_p2p_pendant.h"
 #include "mock_wifi_p2p_hal_interface.h"
+#include "wifi_hid2d_msg.h"
+#include "wifi_p2p_msg.h"
+#include "wifi_p2p_service.h"
+#include "wifi_settings.h"
 
 using ::testing::Return;
 using ::testing::ext::TestSize;
@@ -196,6 +197,55 @@ HWTEST_F(WifiP2pServiceTest, SetP2pWfdInfo, TestSize.Level1)
 {
     WifiP2pWfdInfo wfd;
     EXPECT_EQ(pWifiP2pService->SetP2pWfdInfo(wfd), ErrCode::WIFI_OPT_SUCCESS);
+}
+
+/**
+ * @tc.name: Set upper scene test
+ * @tc.desc: Set upper scene test function.
+ * @tc.type: FUNC
+ * @tc.require: issueI5LC5N
+ */
+HWTEST_F(WifiP2pServiceTest, SetUpperScene, TestSize.Level1)
+{
+    Hid2dUpperScene upperScene;
+    upperScene.scene = 0; // 0: video, 1: audio, 2: file
+    EXPECT_EQ(pWifiP2pService->Hid2dSetUpperScene("p2p0", upperScene), ErrCode::WIFI_OPT_SUCCESS);
+    upperScene.scene = 1;
+    EXPECT_EQ(pWifiP2pService->Hid2dSetUpperScene("p2p0", upperScene), ErrCode::WIFI_OPT_SUCCESS);
+    upperScene.scene = 2;
+    EXPECT_EQ(pWifiP2pService->Hid2dSetUpperScene("p2p0", upperScene), ErrCode::WIFI_OPT_SUCCESS);
+}
+
+/**
+ * @tc.name: Recommend channel test
+ * @tc.desc: Recommend channel test function.
+ * @tc.type: FUNC
+ * @tc.require: issueI5LC5N
+ */
+HWTEST_F(WifiP2pServiceTest, GetP2pRecommendChannel, TestSize.Level1)
+{
+    // recommendd channel is greater than 0
+    EXPECT_GT(pWifiP2pService->GetP2pRecommendChannel(), 0);
+}
+
+/**
+ * @tc.name: Hid2d shared link test
+ * @tc.desc: Hid2d shared link test function.
+ * @tc.type: FUNC
+ * @tc.require: issueI5LC5N
+ */
+HWTEST_F(WifiP2pServiceTest, HiD2dSharedLinkTest, TestSize.Level1)
+{
+    int count = pWifiP2pService->GetSharedLinkCount();
+    pWifiP2pService->IncreaseSharedLink();
+    EXPECT_EQ(pWifiP2pService->GetSharedLinkCount(), count + 1);
+    pWifiP2pService->IncreaseSharedLink();
+    EXPECT_EQ(pWifiP2pService->GetSharedLinkCount(), count + 2);
+
+    pWifiP2pService->DecreaseSharedLink();
+    EXPECT_EQ(pWifiP2pService->GetSharedLinkCount(), count + 1);
+    pWifiP2pService->DecreaseSharedLink();
+    EXPECT_EQ(pWifiP2pService->GetSharedLinkCount(), count);
 }
 }  // namespace Wifi
 }  // namespace OHOS

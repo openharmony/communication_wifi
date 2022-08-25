@@ -772,7 +772,7 @@ void StaAutoConnectServiceTest::SetRoamBlockedBssidFirmwareFail1()
     std::string bssid = "2a:76:93:47:e2:8a";
     blockedBssids.push_back(bssid);
 
-    EXPECT_CALL(WifiStaHalInterface::GetInstance(), SetRoamConfig(_)).WillOnce(Return(WIFI_IDL_OPT_FAILED));
+    ON_CALL(WifiStaHalInterface::GetInstance(), SetRoamConfig(_)).WillByDefault(Return(WIFI_IDL_OPT_FAILED));
     EXPECT_TRUE(pStaAutoConnectService->SetRoamBlockedBssidFirmware(blockedBssids) == false);
 }
 

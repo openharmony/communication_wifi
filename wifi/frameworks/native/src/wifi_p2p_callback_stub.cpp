@@ -96,7 +96,7 @@ void WifiP2pCallbackStub::SetRemoteDied(bool val)
 
 void WifiP2pCallbackStub::OnP2pStateChanged(int state)
 {
-    WIFI_LOGD("WifiP2pCallbackStub::OnP2pStateChanged: %{public}d", state);
+    WIFI_LOGI("WifiP2pCallbackStub::OnP2pStateChanged: %{public}d", state);
     if (userCallback_) {
         userCallback_->OnP2pStateChanged(state);
     }
@@ -105,7 +105,7 @@ void WifiP2pCallbackStub::OnP2pStateChanged(int state)
 
 void WifiP2pCallbackStub::OnP2pPersistentGroupsChanged(void)
 {
-    WIFI_LOGD("WifiP2pCallbackStub::OnP2pPersistentGroupsChanged");
+    WIFI_LOGI("WifiP2pCallbackStub::OnP2pPersistentGroupsChanged");
     if (userCallback_) {
         userCallback_->OnP2pPersistentGroupsChanged();
     }
@@ -114,7 +114,7 @@ void WifiP2pCallbackStub::OnP2pPersistentGroupsChanged(void)
 
 void WifiP2pCallbackStub::OnP2pThisDeviceChanged(const WifiP2pDevice &device)
 {
-    WIFI_LOGD("WifiP2pCallbackStub::OnP2pThisDeviceChanged");
+    WIFI_LOGI("WifiP2pCallbackStub::OnP2pThisDeviceChanged");
     if (userCallback_) {
         userCallback_->OnP2pThisDeviceChanged(device);
     }
@@ -123,7 +123,7 @@ void WifiP2pCallbackStub::OnP2pThisDeviceChanged(const WifiP2pDevice &device)
 
 void WifiP2pCallbackStub::OnP2pPeersChanged(const std::vector<WifiP2pDevice> &device)
 {
-    WIFI_LOGD("WifiP2pCallbackStub::OnP2pPeersChanged");
+    WIFI_LOGI("WifiP2pCallbackStub::OnP2pPeersChanged");
     if (userCallback_) {
         userCallback_->OnP2pPeersChanged(device);
     }
@@ -132,7 +132,7 @@ void WifiP2pCallbackStub::OnP2pPeersChanged(const std::vector<WifiP2pDevice> &de
 
 void WifiP2pCallbackStub::OnP2pServicesChanged(const std::vector<WifiP2pServiceInfo> &srvInfo)
 {
-    WIFI_LOGD("WifiP2pCallbackStub::OnP2pServicesChanged");
+    WIFI_LOGI("WifiP2pCallbackStub::OnP2pServicesChanged");
     if (userCallback_) {
         userCallback_->OnP2pServicesChanged(srvInfo);
     }
@@ -140,7 +140,7 @@ void WifiP2pCallbackStub::OnP2pServicesChanged(const std::vector<WifiP2pServiceI
 
 void WifiP2pCallbackStub::OnP2pConnectionChanged(const WifiP2pLinkedInfo &info)
 {
-    WIFI_LOGD("WifiP2pCallbackStub::OnP2pConnectionChanged: %{public}d", static_cast<int>(info.GetConnectState()));
+    WIFI_LOGI("WifiP2pCallbackStub::OnP2pConnectionChanged: %{public}d", static_cast<int>(info.GetConnectState()));
     if (userCallback_) {
         userCallback_->OnP2pConnectionChanged(info);
     }
@@ -149,7 +149,7 @@ void WifiP2pCallbackStub::OnP2pConnectionChanged(const WifiP2pLinkedInfo &info)
 
 void WifiP2pCallbackStub::OnP2pDiscoveryChanged(bool isChange)
 {
-    WIFI_LOGD("WifiP2pCallbackStub::OnP2pDiscoveryChanged");
+    WIFI_LOGI("WifiP2pCallbackStub::OnP2pDiscoveryChanged, isChange:%{public}d", isChange);
     if (userCallback_) {
         userCallback_->OnP2pDiscoveryChanged(isChange);
     }
@@ -158,7 +158,7 @@ void WifiP2pCallbackStub::OnP2pDiscoveryChanged(bool isChange)
 
 void WifiP2pCallbackStub::OnP2pActionResult(P2pActionCallback action, ErrCode code)
 {
-    WIFI_LOGD("WifiP2pCallbackStub::OnP2pActionResult");
+    WIFI_LOGI("WifiP2pCallbackStub::OnP2pActionResult");
     if (userCallback_) {
         userCallback_->OnP2pActionResult(action, code);
     }
@@ -166,7 +166,7 @@ void WifiP2pCallbackStub::OnP2pActionResult(P2pActionCallback action, ErrCode co
 
 void WifiP2pCallbackStub::OnConfigChanged(CfgType type, char* data, int dataLen)
 {
-    WIFI_LOGD("WifiP2pCallbackStub::OnConfigChanged");
+    WIFI_LOGI("WifiP2pCallbackStub::OnConfigChanged");
     if (userCallback_) {
         userCallback_->OnConfigChanged(type, data, dataLen);
     }

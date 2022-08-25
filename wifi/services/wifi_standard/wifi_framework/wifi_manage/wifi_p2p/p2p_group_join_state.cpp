@@ -49,7 +49,7 @@ bool P2pGroupJoinState::ExecuteStateMsg(InternalMessage *msg)
             if (wps.GetWpsMethod() == WpsMethod::WPS_METHOD_KEYPAD) {
                 std::string inputPin;
                 if (!msg->GetMessageObj(inputPin)) {
-                    WIFI_LOGD("Failed to obtain the pin code.");
+                    WIFI_LOGW("Failed to obtain the pin code.");
                     break;
                 }
                 WpsInfo wpsPin = wps;

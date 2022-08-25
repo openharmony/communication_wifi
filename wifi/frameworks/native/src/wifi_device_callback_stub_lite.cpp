@@ -78,7 +78,7 @@ int WifiDeviceCallBackStub::OnRemoteRequest(uint32_t code, IpcIo *data)
 void WifiDeviceCallBackStub::RegisterUserCallBack(const std::shared_ptr<IWifiDeviceCallBack> &callBack)
 {
     if (callBack == nullptr) {
-        WIFI_LOGD("RegisterUserCallBack:callBack is nullptr!");
+        WIFI_LOGE("RegisterUserCallBack:callBack is nullptr!");
         return;
     }
     callback_ = callBack;

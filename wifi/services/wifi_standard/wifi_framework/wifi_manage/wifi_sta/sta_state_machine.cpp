@@ -562,7 +562,7 @@ void StaStateMachine::StopWifiProcess()
         /* Callback result to InterfaceService. */
         WifiSettings::GetInstance().SetWifiState(static_cast<int>(WifiState::DISABLED));
         staCallback.OnStaCloseRes(OperateResState::CLOSE_WIFI_SUCCEED);
-        WIFI_LOGD("Stop WifiProcess successfully!");
+        WIFI_LOGI("Stop WifiProcess successfully!");
 
         /* The current state of StaStateMachine transfers to InitState. */
         SwitchState(pInitState);
@@ -951,7 +951,7 @@ void StaStateMachine::DealReConnectCmd(InternalMessage *msg)
     }
 
     if (WifiStaHalInterface::GetInstance().Reconnect() == WIFI_IDL_OPT_OK) {
-        WIFI_LOGD("StaStateMachine ReConnect successfully!");
+        WIFI_LOGI("StaStateMachine ReConnect successfully!");
         /* Callback result to InterfaceService */
         staCallback.OnStaConnChanged(OperateResState::CONNECT_CONNECTING, linkedInfo);
         StopTimer(static_cast<int>(CMD_NETWORK_CONNECT_TIMEOUT));
@@ -993,7 +993,7 @@ void StaStateMachine::DealStartWpsCmd(InternalMessage *msg)
 
     StartWpsMode(msg);
     if ((wpsState == SetupMethod::DISPLAY) || (wpsState == SetupMethod::KEYPAD)) {
-        WIFI_LOGD("Clear WPA block list every ten second!");
+        WIFI_LOGW("Clear WPA block list every ten second!");
         SendMessage(WPA_BLOCK_LIST_CLEAR_EVENT);
     }
 }

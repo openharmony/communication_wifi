@@ -90,6 +90,11 @@ HWTEST_F(WifiConfigCenterTest, GetScanInfoList_SUCCESS, TestSize.Level1)
     WifiScanInfo info1, info2;
     info1.bssid = "asdfg";
     info2.bssid = "adsgds";
+    struct timespec clkTime = {0, 0};
+    clock_gettime(CLOCK_MONOTONIC, &clkTime);
+    int64_t curr = static_cast<int64_t>(clkTime.tv_sec) * MSEC * MSEC + clkTime.tv_nsec / MSEC; /* us */
+    info1.timestamp = curr;
+    info2.timestamp = curr;
     setInfo.push_back(info1);
     setInfo.push_back(info2);
     WifiSettings::GetInstance().SaveScanInfoList(setInfo);
@@ -103,13 +108,17 @@ HWTEST_F(WifiConfigCenterTest, GetScanInfoList_FAILED, TestSize.Level1)
 {
     std::vector<WifiScanInfo> setInfo;
     std::vector<WifiScanInfo> getInfo;
-    WifiScanInfo info1, info2;
+    WifiScanInfo info1;
+    struct timespec clkTime = {0, 0};
+    clock_gettime(CLOCK_MONOTONIC, &clkTime);
+    int64_t curr = static_cast<int64_t>(clkTime.tv_sec) * MSEC * MSEC + clkTime.tv_nsec / MSEC; /* us */
+    info1.timestamp = curr;
     info1.bssid = "asdfg";
-    info2.bssid = "adsgds";
     setInfo.push_back(info1);
     WifiSettings::GetInstance().SaveScanInfoList(setInfo);
     WifiConfigCenter::GetInstance().GetScanInfoList(getInfo);
     EXPECT_EQ(setInfo.size(), getInfo.size());
+    setInfo.at(0).bssid = "adsgds";
     EXPECT_NE(setInfo.at(0).bssid, getInfo.at(0).bssid);
 }
 

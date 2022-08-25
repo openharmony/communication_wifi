@@ -60,7 +60,7 @@ WifiP2pServiceImpl::~WifiP2pServiceImpl()
 void WifiP2pServiceImpl::OnStart()
 {
     if (mState == ServiceRunningState::STATE_RUNNING) {
-        WIFI_LOGD("P2p service has already started.");
+        WIFI_LOGI("P2p service has already started.");
         return;
     }
     if (!Init()) {
@@ -100,11 +100,11 @@ ErrCode WifiP2pServiceImpl::CheckCanEnableP2p(void)
         return WIFI_OPT_PERMISSION_DENIED;
     }
     if (WifiConfigCenter::GetInstance().GetAirplaneModeState() == 1) {
-        WIFI_LOGD("current airplane mode and can not use p2p, open failed!");
+        WIFI_LOGW("current airplane mode and can not use p2p, open failed!");
         return WIFI_OPT_FORBID_AIRPLANE;
     }
     if (WifiConfigCenter::GetInstance().GetPowerSavingModeState() == 1) {
-        WIFI_LOGD("current power saving mode and can not use p2p, open failed!");
+        WIFI_LOGW("current power saving mode and can not use p2p, open failed!");
         return WIFI_OPT_FORBID_POWSAVING;
     }
     return WIFI_OPT_SUCCESS;
@@ -120,7 +120,7 @@ ErrCode WifiP2pServiceImpl::EnableP2p(void)
 
     WifiOprMidState curState = WifiConfigCenter::GetInstance().GetP2pMidState();
     if (curState != WifiOprMidState::CLOSED) {
-        WIFI_LOGD("current p2p state is %{public}d", static_cast<int>(curState));
+        WIFI_LOGW("current p2p state is %{public}d", static_cast<int>(curState));
         if (curState == WifiOprMidState::CLOSING) {
             return WIFI_OPT_OPEN_FAIL_WHEN_CLOSING;
         } else {
@@ -170,7 +170,7 @@ ErrCode WifiP2pServiceImpl::DisableP2p(void)
 
     WifiOprMidState curState = WifiConfigCenter::GetInstance().GetP2pMidState();
     if (curState != WifiOprMidState::RUNNING) {
-        WIFI_LOGD("current p2p state is %{public}d", static_cast<int>(curState));
+        WIFI_LOGI("current p2p state is %{public}d", static_cast<int>(curState));
         if (curState == WifiOprMidState::OPENING) {
             return WIFI_OPT_CLOSE_FAIL_WHEN_OPENING;
         } else {
@@ -728,7 +728,7 @@ bool WifiP2pServiceImpl::IsP2pServiceRunning()
 {
     WifiOprMidState curState = WifiConfigCenter::GetInstance().GetP2pMidState();
     if (curState != WifiOprMidState::RUNNING) {
-        WIFI_LOGD("p2p service does not started!");
+        WIFI_LOGW("p2p service does not started!");
         return false;
     }
     return true;

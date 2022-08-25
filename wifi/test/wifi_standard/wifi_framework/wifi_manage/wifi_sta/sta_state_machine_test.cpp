@@ -12,19 +12,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "sta_state_machine.h"
-#include "sta_define.h"
-#include "mock_wifi_settings.h"
-#include "mock_wifi_supplicant_hal_interface.h"
-#include "mock_wifi_sta_hal_interface.h"
-#include "mock_wifi_manager.h"
-#include "mock_dhcp_service.h"
-#include "mock_wifi_chip_hal_interface.h"
-#include "mock_sta_network_check.h"
-#include "mock_if_config.h"
+
 #include <gtest/gtest.h>
 #include "internal_message.h"
+#include "mock_chip_capability.h"
+#include "mock_dhcp_service.h"
 #include "mock_if_config.h"
+#include "mock_sta_network_check.h"
+#include "mock_wifi_chip_hal_interface.h"
+#include "mock_wifi_manager.h"
+#include "mock_wifi_settings.h"
+#include "mock_wifi_sta_hal_interface.h"
+#include "mock_wifi_supplicant_hal_interface.h"
+#include "sta_define.h"
+#include "sta_state_machine.h"
 
 using ::testing::_;
 using ::testing::AtLeast;

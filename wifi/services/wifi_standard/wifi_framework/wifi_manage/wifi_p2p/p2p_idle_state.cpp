@@ -94,7 +94,7 @@ bool P2pIdleState::ProcessCmdConnect(InternalMessage &msg) const
 {
     WifiP2pConfigInternal config;
     if (!msg.GetMessageObj(config)) {
-        WIFI_LOGD("p2p connect Parameter error.");
+        WIFI_LOGW("p2p connect Parameter error.");
         p2pStateMachine.BroadcastActionResult(P2pActionCallback::P2pConnect, ErrCode::WIFI_OPT_INVALID_PARAM);
         return EXECUTED;
     }
@@ -102,7 +102,7 @@ bool P2pIdleState::ProcessCmdConnect(InternalMessage &msg) const
 
     P2pConfigErrCode ret = p2pStateMachine.IsConfigUnusable(p2pStateMachine.savedP2pConfig);
     if (ret != P2pConfigErrCode::SUCCESS) {
-        WIFI_LOGD("Invalid device information.");
+        WIFI_LOGW("Invalid device information.");
         if (ret == P2pConfigErrCode::MAC_EMPTY) {
             p2pStateMachine.BroadcastActionResult(P2pActionCallback::P2pConnect, ErrCode::WIFI_OPT_INVALID_PARAM);
         } else if (ret == P2pConfigErrCode::MAC_NOT_FOUND) {
@@ -175,7 +175,7 @@ bool P2pIdleState::ProcessNegotReqEvt(InternalMessage &msg) const
 {
     WifiP2pConfigInternal conf;
     if (!msg.GetMessageObj(conf)) {
-        WIFI_LOGD("Failed to obtain conf.");
+        WIFI_LOGW("Failed to obtain conf.");
         return EXECUTED;
     }
     p2pStateMachine.savedP2pConfig = conf;
@@ -187,7 +187,7 @@ bool P2pIdleState::ProcessProvDiscShowPinEvt(InternalMessage &msg) const
 {
     WifiP2pTempDiscEvent provDisc;
     if (!msg.GetMessageObj(provDisc)) {
-        WIFI_LOGD("Failed to obtain provDisc.");
+        WIFI_LOGW("Failed to obtain provDisc.");
         return EXECUTED;
     }
     WifiP2pConfigInternal config;
@@ -260,7 +260,7 @@ bool P2pIdleState::ProcessGroupStartedEvt(InternalMessage &msg) const
 
             p2pStateMachine.BroadcastP2pPeersChanged();
         } else {
-            WIFI_LOGD("fail:No GO device information is found.");
+            WIFI_LOGW("fail:No GO device information is found.");
         }
     } else {
         WifiP2pGroupInfo currGrp = p2pStateMachine.groupManager.GetCurrentGroup();
@@ -284,7 +284,7 @@ bool P2pIdleState::ProcessInvitationReceivedEvt(InternalMessage &msg) const
 {
     WifiP2pGroupInfo group;
     if (!msg.GetMessageObj(group)) {
-        WIFI_LOGD("p2p invitation received: Parameter error.");
+        WIFI_LOGW("p2p invitation received: Parameter error.");
         return EXECUTED;
     }
     const WifiP2pDevice &owner = group.GetOwner();

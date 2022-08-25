@@ -284,7 +284,7 @@ bool GroupFormedState::ProcessCmdDiscServices(const InternalMessage &msg) const
         return EXECUTED;
     }
 
-    WIFI_LOGD("CMD_DISCOVER_SERVICES successful.");
+    WIFI_LOGI("CMD_DISCOVER_SERVICES successful.");
     p2pStateMachine.BroadcastActionResult(P2pActionCallback::DiscoverServices, ErrCode::WIFI_OPT_SUCCESS);
     p2pStateMachine.BroadcastP2pDiscoveryChanged(true);
     return EXECUTED;

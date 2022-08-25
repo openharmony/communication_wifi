@@ -40,7 +40,7 @@ WifiP2pProxy::~WifiP2pProxy()
 ErrCode WifiP2pProxy::EnableP2p(void)
 {
     if (mRemoteDied) {
-        WIFI_LOGD("failed to `%{public}s`,remote service is died!", __func__);
+        WIFI_LOGW("failed to `%{public}s`,remote service is died!", __func__);
         return WIFI_OPT_FAILED;
     }
     MessageOption option;
@@ -66,7 +66,7 @@ ErrCode WifiP2pProxy::EnableP2p(void)
 ErrCode WifiP2pProxy::DisableP2p(void)
 {
     if (mRemoteDied) {
-        WIFI_LOGD("failed to `%{public}s`,remote service is died!", __func__);
+        WIFI_LOGW("failed to `%{public}s`,remote service is died!", __func__);
         return WIFI_OPT_FAILED;
     }
     MessageOption option;
@@ -93,7 +93,7 @@ ErrCode WifiP2pProxy::DisableP2p(void)
 ErrCode WifiP2pProxy::DiscoverDevices(void)
 {
     if (mRemoteDied) {
-        WIFI_LOGD("failed to `%{public}s`,remote service is died!", __func__);
+        WIFI_LOGW("failed to `%{public}s`,remote service is died!", __func__);
         return WIFI_OPT_FAILED;
     }
     MessageOption option;
@@ -120,7 +120,7 @@ ErrCode WifiP2pProxy::DiscoverDevices(void)
 ErrCode WifiP2pProxy::StopDiscoverDevices(void)
 {
     if (mRemoteDied) {
-        WIFI_LOGD("failed to `%{public}s`,remote service is died!", __func__);
+        WIFI_LOGW("failed to `%{public}s`,remote service is died!", __func__);
         return WIFI_OPT_FAILED;
     }
     MessageOption option;
@@ -148,7 +148,7 @@ ErrCode WifiP2pProxy::StopDiscoverDevices(void)
 ErrCode WifiP2pProxy::DiscoverServices(void)
 {
     if (mRemoteDied) {
-        WIFI_LOGD("failed to `%{public}s`,remote service is died!", __func__);
+        WIFI_LOGW("failed to `%{public}s`,remote service is died!", __func__);
         return WIFI_OPT_FAILED;
     }
     MessageOption option;
@@ -175,7 +175,7 @@ ErrCode WifiP2pProxy::DiscoverServices(void)
 ErrCode WifiP2pProxy::StopDiscoverServices(void)
 {
     if (mRemoteDied) {
-        WIFI_LOGD("failed to `%{public}s`,remote service is died!", __func__);
+        WIFI_LOGW("failed to `%{public}s`,remote service is died!", __func__);
         return WIFI_OPT_FAILED;
     }
     MessageOption option;
@@ -203,7 +203,7 @@ ErrCode WifiP2pProxy::StopDiscoverServices(void)
 ErrCode WifiP2pProxy::RequestService(const WifiP2pDevice &device, const WifiP2pServiceRequest &request)
 {
     if (mRemoteDied) {
-        WIFI_LOGD("failed to `%{public}s`,remote service is died!", __func__);
+        WIFI_LOGW("failed to `%{public}s`,remote service is died!", __func__);
         return WIFI_OPT_FAILED;
     }
     MessageOption option;
@@ -231,7 +231,7 @@ ErrCode WifiP2pProxy::RequestService(const WifiP2pDevice &device, const WifiP2pS
 ErrCode WifiP2pProxy::PutLocalP2pService(const WifiP2pServiceInfo &srvInfo)
 {
     if (mRemoteDied) {
-        WIFI_LOGD("failed to `%{public}s`,remote service is died!", __func__);
+        WIFI_LOGW("failed to `%{public}s`,remote service is died!", __func__);
         return WIFI_OPT_FAILED;
     }
     MessageOption option;
@@ -259,7 +259,7 @@ ErrCode WifiP2pProxy::PutLocalP2pService(const WifiP2pServiceInfo &srvInfo)
 ErrCode WifiP2pProxy::DeleteLocalP2pService(const WifiP2pServiceInfo &srvInfo)
 {
     if (mRemoteDied) {
-        WIFI_LOGD("failed to `%{public}s`,remote service is died!", __func__);
+        WIFI_LOGW("failed to `%{public}s`,remote service is died!", __func__);
         return WIFI_OPT_FAILED;
     }
     MessageOption option;
@@ -288,7 +288,7 @@ ErrCode WifiP2pProxy::DeleteLocalP2pService(const WifiP2pServiceInfo &srvInfo)
 ErrCode WifiP2pProxy::StartP2pListen(int period, int interval)
 {
     if (mRemoteDied) {
-        WIFI_LOGD("failed to `%{public}s`,remote service is died!", __func__);
+        WIFI_LOGW("failed to `%{public}s`,remote service is died!", __func__);
         return WIFI_OPT_FAILED;
     }
     MessageOption option;
@@ -317,7 +317,7 @@ ErrCode WifiP2pProxy::StartP2pListen(int period, int interval)
 ErrCode WifiP2pProxy::StopP2pListen(void)
 {
     if (mRemoteDied) {
-        WIFI_LOGD("failed to `%{public}s`,remote service is died!", __func__);
+        WIFI_LOGW("failed to `%{public}s`,remote service is died!", __func__);
         return WIFI_OPT_FAILED;
     }
     MessageOption option;
@@ -344,7 +344,7 @@ ErrCode WifiP2pProxy::StopP2pListen(void)
 ErrCode WifiP2pProxy::CreateGroup(const WifiP2pConfig &config)
 {
     if (mRemoteDied) {
-        WIFI_LOGD("failed to `%{public}s`,remote service is died!", __func__);
+        WIFI_LOGW("failed to `%{public}s`,remote service is died!", __func__);
         return WIFI_OPT_FAILED;
     }
     MessageOption option;
@@ -372,7 +372,7 @@ ErrCode WifiP2pProxy::CreateGroup(const WifiP2pConfig &config)
 ErrCode WifiP2pProxy::RemoveGroup()
 {
     if (mRemoteDied) {
-        WIFI_LOGD("failed to `%{public}s`,remote service is died!", __func__);
+        WIFI_LOGW("failed to `%{public}s`,remote service is died!", __func__);
         return WIFI_OPT_FAILED;
     }
     MessageOption option;
@@ -398,7 +398,7 @@ ErrCode WifiP2pProxy::RemoveGroup()
 ErrCode WifiP2pProxy::DeleteGroup(const WifiP2pGroupInfo &group)
 {
     if (mRemoteDied) {
-        WIFI_LOGD("failed to `%{public}s`,remote service is died!", __func__);
+        WIFI_LOGW("failed to `%{public}s`,remote service is died!", __func__);
         return WIFI_OPT_FAILED;
     }
     MessageOption option;
@@ -565,7 +565,7 @@ void WifiP2pProxy::WriteWifiP2pConfigData(MessageParcel &data, const WifiP2pConf
 ErrCode WifiP2pProxy::P2pConnect(const WifiP2pConfig &config)
 {
     if (mRemoteDied) {
-        WIFI_LOGD("failed to `%{public}s`,remote service is died!", __func__);
+        WIFI_LOGW("failed to `%{public}s`,remote service is died!", __func__);
         return WIFI_OPT_FAILED;
     }
     MessageOption option;
@@ -593,7 +593,7 @@ ErrCode WifiP2pProxy::P2pConnect(const WifiP2pConfig &config)
 ErrCode WifiP2pProxy::P2pCancelConnect()
 {
     if (mRemoteDied) {
-        WIFI_LOGD("failed to `%{public}s`,remote service is died!", __func__);
+        WIFI_LOGW("failed to `%{public}s`,remote service is died!", __func__);
         return WIFI_OPT_FAILED;
     }
     MessageOption option;
@@ -620,7 +620,7 @@ ErrCode WifiP2pProxy::P2pCancelConnect()
 ErrCode WifiP2pProxy::QueryP2pLinkedInfo(WifiP2pLinkedInfo &linkedInfo)
 {
     if (mRemoteDied) {
-        WIFI_LOGD("failed to `%{public}s`,remote service is died!", __func__);
+        WIFI_LOGW("failed to `%{public}s`,remote service is died!", __func__);
         return WIFI_OPT_FAILED;
     }
     MessageOption option;
@@ -655,7 +655,7 @@ ErrCode WifiP2pProxy::QueryP2pLinkedInfo(WifiP2pLinkedInfo &linkedInfo)
 ErrCode WifiP2pProxy::GetCurrentGroup(WifiP2pGroupInfo &group)
 {
     if (mRemoteDied) {
-        WIFI_LOGD("failed to `%{public}s`,remote service is died!", __func__);
+        WIFI_LOGW("failed to `%{public}s`,remote service is died!", __func__);
         return WIFI_OPT_FAILED;
     }
     MessageOption option;
@@ -687,7 +687,7 @@ ErrCode WifiP2pProxy::GetCurrentGroup(WifiP2pGroupInfo &group)
 ErrCode WifiP2pProxy::GetP2pEnableStatus(int &status)
 {
     if (mRemoteDied) {
-        WIFI_LOGD("failed to `%{public}s`,remote service is died!", __func__);
+        WIFI_LOGW("failed to `%{public}s`,remote service is died!", __func__);
         return WIFI_OPT_FAILED;
     }
     MessageOption option;
@@ -719,7 +719,7 @@ ErrCode WifiP2pProxy::GetP2pEnableStatus(int &status)
 ErrCode WifiP2pProxy::GetP2pDiscoverStatus(int &status)
 {
     if (mRemoteDied) {
-        WIFI_LOGD("failed to `%{public}s`,remote service is died!", __func__);
+        WIFI_LOGW("failed to `%{public}s`,remote service is died!", __func__);
         return WIFI_OPT_FAILED;
     }
     MessageOption option;
@@ -751,7 +751,7 @@ ErrCode WifiP2pProxy::GetP2pDiscoverStatus(int &status)
 ErrCode WifiP2pProxy::GetP2pConnectedStatus(int &status)
 {
     if (mRemoteDied) {
-        WIFI_LOGD("failed to `%{public}s`,remote service is died!", __func__);
+        WIFI_LOGW("failed to `%{public}s`,remote service is died!", __func__);
         return WIFI_OPT_FAILED;
     }
     MessageOption option;
@@ -783,7 +783,7 @@ ErrCode WifiP2pProxy::GetP2pConnectedStatus(int &status)
 ErrCode WifiP2pProxy::QueryP2pDevices(std::vector<WifiP2pDevice> &devices)
 {
     if (mRemoteDied) {
-        WIFI_LOGD("failed to `%{public}s`,remote service is died!", __func__);
+        WIFI_LOGW("failed to `%{public}s`,remote service is died!", __func__);
         return WIFI_OPT_FAILED;
     }
     MessageOption option;
@@ -858,7 +858,7 @@ ErrCode WifiP2pProxy::QueryP2pLocalDevice(WifiP2pDevice &device)
 ErrCode WifiP2pProxy::QueryP2pGroups(std::vector<WifiP2pGroupInfo> &groups)
 {
     if (mRemoteDied) {
-        WIFI_LOGD("failed to `%{public}s`,remote service is died!", __func__);
+        WIFI_LOGW("failed to `%{public}s`,remote service is died!", __func__);
         return WIFI_OPT_FAILED;
     }
     MessageOption option;
@@ -901,7 +901,7 @@ ErrCode WifiP2pProxy::QueryP2pGroups(std::vector<WifiP2pGroupInfo> &groups)
 ErrCode WifiP2pProxy::QueryP2pServices(std::vector<WifiP2pServiceInfo> &services)
 {
     if (mRemoteDied) {
-        WIFI_LOGD("failed to `%{public}s`,remote service is died!", __func__);
+        WIFI_LOGW("failed to `%{public}s`,remote service is died!", __func__);
         return WIFI_OPT_FAILED;
     }
     MessageOption option;
@@ -944,7 +944,7 @@ ErrCode WifiP2pProxy::QueryP2pServices(std::vector<WifiP2pServiceInfo> &services
 ErrCode WifiP2pProxy::SetP2pDeviceName(const std::string &deviceName)
 {
     if (mRemoteDied) {
-        WIFI_LOGD("failed to `%{public}s`,remote service is died!", __func__);
+        WIFI_LOGW("failed to `%{public}s`,remote service is died!", __func__);
         return WIFI_OPT_FAILED;
     }
     MessageOption option;
@@ -975,7 +975,7 @@ ErrCode WifiP2pProxy::SetP2pDeviceName(const std::string &deviceName)
 ErrCode WifiP2pProxy::SetP2pWfdInfo(const WifiP2pWfdInfo &wfdInfo)
 {
     if (mRemoteDied) {
-        WIFI_LOGD("failed to `%{public}s`,remote service is died!", __func__);
+        WIFI_LOGW("failed to `%{public}s`,remote service is died!", __func__);
         return WIFI_OPT_FAILED;
     }
     MessageOption option;
@@ -1011,7 +1011,7 @@ ErrCode WifiP2pProxy::SetP2pWfdInfo(const WifiP2pWfdInfo &wfdInfo)
 ErrCode WifiP2pProxy::RegisterCallBack(const sptr<IWifiP2pCallback> &callback)
 {
     if (mRemoteDied) {
-        WIFI_LOGD("failed to `%{public}s`,remote service is died!", __func__);
+        WIFI_LOGW("failed to `%{public}s`,remote service is died!", __func__);
         return WIFI_OPT_FAILED;
     }
     MessageParcel data;
@@ -1050,7 +1050,7 @@ ErrCode WifiP2pProxy::RegisterCallBack(const sptr<IWifiP2pCallback> &callback)
 ErrCode WifiP2pProxy::GetSupportedFeatures(long &features)
 {
     if (mRemoteDied) {
-        WIFI_LOGD("failed to `%{public}s`,remote service is died!", __func__);
+        WIFI_LOGW("failed to `%{public}s`,remote service is died!", __func__);
         return WIFI_OPT_FAILED;
     }
     MessageOption option;
@@ -1081,7 +1081,7 @@ ErrCode WifiP2pProxy::GetSupportedFeatures(long &features)
 ErrCode WifiP2pProxy::Hid2dRequestGcIp(const std::string& gcMac, std::string& ipAddr)
 {
     if (mRemoteDied) {
-        WIFI_LOGD("failed to `%{public}s`,remote service is died!", __func__);
+        WIFI_LOGW("failed to `%{public}s`,remote service is died!", __func__);
         return WIFI_OPT_FAILED;
     }
     MessageOption option;
@@ -1113,7 +1113,7 @@ ErrCode WifiP2pProxy::Hid2dRequestGcIp(const std::string& gcMac, std::string& ip
 ErrCode WifiP2pProxy::Hid2dSharedlinkIncrease()
 {
     if (mRemoteDied) {
-        WIFI_LOGD("failed to `%{public}s`,remote service is died!", __func__);
+        WIFI_LOGW("failed to `%{public}s`,remote service is died!", __func__);
         return WIFI_OPT_FAILED;
     }
     MessageOption option;
@@ -1140,7 +1140,7 @@ ErrCode WifiP2pProxy::Hid2dSharedlinkIncrease()
 ErrCode WifiP2pProxy::Hid2dSharedlinkDecrease()
 {
     if (mRemoteDied) {
-        WIFI_LOGD("failed to `%{public}s`,remote service is died!", __func__);
+        WIFI_LOGW("failed to `%{public}s`,remote service is died!", __func__);
         return WIFI_OPT_FAILED;
     }
     MessageOption option;
@@ -1169,7 +1169,7 @@ ErrCode WifiP2pProxy::Hid2dCreateGroup(const int frequency, FreqType type)
     WIFI_LOGI("Request hid2d create group");
 
     if (mRemoteDied) {
-        WIFI_LOGD("failed to `%{public}s`,remote service is died!", __func__);
+        WIFI_LOGW("failed to `%{public}s`,remote service is died!", __func__);
         return WIFI_OPT_FAILED;
     }
     MessageOption option;
@@ -1200,7 +1200,7 @@ ErrCode WifiP2pProxy::Hid2dRemoveGcGroup(const std::string& gcIfName)
     WIFI_LOGI("Request hid2d remove group");
 
     if (mRemoteDied) {
-        WIFI_LOGD("failed to `%{public}s`,remote service is died!", __func__);
+        WIFI_LOGW("failed to `%{public}s`,remote service is died!", __func__);
         return WIFI_OPT_FAILED;
     }
     MessageOption option;
@@ -1230,7 +1230,7 @@ ErrCode WifiP2pProxy::Hid2dConnect(const Hid2dConnectConfig& config)
     WIFI_LOGI("Request hid2d connect");
 
     if (mRemoteDied) {
-        WIFI_LOGD("failed to `%{public}s`,remote service is died!", __func__);
+        WIFI_LOGW("failed to `%{public}s`,remote service is died!", __func__);
         return WIFI_OPT_FAILED;
     }
     MessageOption option;
@@ -1262,7 +1262,7 @@ ErrCode WifiP2pProxy::Hid2dConnect(const Hid2dConnectConfig& config)
 ErrCode WifiP2pProxy::Hid2dConfigIPAddr(const std::string& ifName, const IpAddrInfo& ipInfo)
 {
     if (mRemoteDied) {
-        WIFI_LOGD("failed to `%{public}s`,remote service is died!", __func__);
+        WIFI_LOGW("failed to `%{public}s`,remote service is died!", __func__);
         return WIFI_OPT_FAILED;
     }
     MessageOption option;
@@ -1293,7 +1293,7 @@ ErrCode WifiP2pProxy::Hid2dConfigIPAddr(const std::string& ifName, const IpAddrI
 ErrCode WifiP2pProxy::Hid2dReleaseIPAddr(const std::string& ifName)
 {
     if (mRemoteDied) {
-        WIFI_LOGD("failed to `%{public}s`,remote service is died!", __func__);
+        WIFI_LOGW("failed to `%{public}s`,remote service is died!", __func__);
         return WIFI_OPT_FAILED;
     }
     MessageOption option;
@@ -1322,7 +1322,7 @@ ErrCode WifiP2pProxy::Hid2dGetRecommendChannel(const RecommendChannelRequest& re
     RecommendChannelResponse& response)
 {
     if (mRemoteDied) {
-        WIFI_LOGD("failed to `%{public}s`,remote service is died!", __func__);
+        WIFI_LOGW("failed to `%{public}s`,remote service is died!", __func__);
         return WIFI_OPT_FAILED;
     }
     MessageOption option;
@@ -1364,7 +1364,7 @@ ErrCode WifiP2pProxy::Hid2dGetRecommendChannel(const RecommendChannelRequest& re
 ErrCode WifiP2pProxy::Hid2dGetChannelListFor5G(std::vector<int>& vecChannelList)
 {
     if (mRemoteDied) {
-        WIFI_LOGD("failed to `%{public}s`,remote service is died!", __func__);
+        WIFI_LOGW("failed to `%{public}s`,remote service is died!", __func__);
         return WIFI_OPT_FAILED;
     }
     MessageOption option;
@@ -1405,12 +1405,12 @@ ErrCode WifiP2pProxy::Hid2dGetSelfWifiCfgInfo(SelfCfgType cfgType,
     char cfgData[CFG_DATA_MAX_BYTES], int* getDatValidLen)
 {
     if (getDatValidLen == nullptr) {
-        WIFI_LOGD("getDatValidLen is nullptr!");
+        WIFI_LOGE("getDatValidLen is nullptr!");
         return WIFI_OPT_FAILED;
     }
 
     if (mRemoteDied) {
-        WIFI_LOGD("failed to `%{public}s`,remote service is died!", __func__);
+        WIFI_LOGW("failed to `%{public}s`,remote service is died!", __func__);
         return WIFI_OPT_FAILED;
     }
     MessageOption option;
@@ -1444,7 +1444,7 @@ ErrCode WifiP2pProxy::Hid2dGetSelfWifiCfgInfo(SelfCfgType cfgType,
             return WIFI_OPT_FAILED;
         }
         if (memcpy_s(cfgData, CFG_DATA_MAX_BYTES, dataBuffer, *getDatValidLen) != EOK) {
-            WIFI_LOGD("`%{public}s` memcpy_s failed!", __func__);
+            WIFI_LOGE("`%{public}s` memcpy_s failed!", __func__);
             return WIFI_OPT_FAILED;
         }
     }
@@ -1459,7 +1459,7 @@ ErrCode WifiP2pProxy::Hid2dSetPeerWifiCfgInfo(PeerCfgType cfgType,
         return WIFI_OPT_INVALID_PARAM;
     }
     if (mRemoteDied) {
-        WIFI_LOGD("failed to `%{public}s`,remote service is died!", __func__);
+        WIFI_LOGW("failed to `%{public}s`,remote service is died!", __func__);
         return WIFI_OPT_FAILED;
     }
     MessageOption option;
@@ -1488,7 +1488,7 @@ ErrCode WifiP2pProxy::Hid2dSetPeerWifiCfgInfo(PeerCfgType cfgType,
 ErrCode WifiP2pProxy::Hid2dSetUpperScene(const std::string& ifName, const Hid2dUpperScene& scene)
 {
     if (mRemoteDied) {
-        WIFI_LOGD("failed to `%{public}s`,remote service is died!", __func__);
+        WIFI_LOGW("failed to `%{public}s`,remote service is died!", __func__);
         return WIFI_OPT_FAILED;
     }
     MessageOption option;

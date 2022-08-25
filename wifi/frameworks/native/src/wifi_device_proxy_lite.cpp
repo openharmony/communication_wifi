@@ -1245,7 +1245,7 @@ bool WifiDeviceProxy::SetLowLatencyMode(bool enabled)
 
 void WifiDeviceProxy::OnRemoteDied(void)
 {
-    WIFI_LOGD("Remote service is died!");
+    WIFI_LOGW("Remote service is died!");
     remoteDied_ = true;
     g_deviceCallBackStub.SetRemoteDied(true);
 }

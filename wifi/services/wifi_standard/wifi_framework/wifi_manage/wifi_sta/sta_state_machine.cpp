@@ -425,7 +425,9 @@ void StaStateMachine::StartWifiProcess()
         InitLastWifiLinkedInfo();
         WifiSettings::GetInstance().SaveLinkedInfo(linkedInfo);
         SyncDeviceConfigToWpa();
+#ifndef OHOS_ARCH_LITE
         ChipCapability::GetInstance().InitializeChipCapability();
+#endif
         /* The current state of StaStateMachine transfers to SeparatedState after
          * enable supplicant.
          */

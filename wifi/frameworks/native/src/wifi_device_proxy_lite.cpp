@@ -440,6 +440,12 @@ ErrCode WifiDeviceProxy::RemoveCandidateConfig(int networkId)
     return WIFI_OPT_NOT_SUPPORTED;
 }
 
+ErrCode WifiDeviceProxy::RemoveCandidateConfig(const WifiDeviceConfig &config)
+{
+    (void)config;
+    return WIFI_OPT_NOT_SUPPORTED;
+}
+
 void WifiDeviceProxy::WriteIpAddress(IpcIo &req, const WifiIpAddress &address)
 {
     (void)WriteInt32(&req, address.family);

@@ -42,7 +42,7 @@
             "SystemCapability.Communication.WiFi.AP.Core",
             "SystemCapability.Communication.WiFi.P2P",
             "SystemCapability.Communication.WiFi.Core",
-            "SystemCapability.Communication.WiFi.AP.Extension"
+            "SystemCapability.Communication.WiFi.AP.Extension = false"
         ],
         "features": [
             "wifi_feature_with_p2p",

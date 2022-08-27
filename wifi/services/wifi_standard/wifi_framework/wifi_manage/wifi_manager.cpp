@@ -594,6 +594,7 @@ void WifiManager::CheckAndStopScanService(void)
      * service. Otherwise, disable the SCAN service.
      */
     WifiOprMidState scanState = WifiConfigCenter::GetInstance().GetScanMidState();
+    WIFI_LOGI("[CheckAndStopScanService] scanState %{public}d!", static_cast<int>(scanState));
     if (scanState != WifiOprMidState::OPENING && scanState != WifiOprMidState::RUNNING) {
         return;
     }
@@ -608,13 +609,16 @@ void WifiManager::CheckAndStopScanService(void)
     if (WifiConfigCenter::GetInstance().SetScanMidState(scanState, WifiOprMidState::CLOSING)) {
         IScanService *pService = WifiServiceManager::GetInstance().GetScanServiceInst();
         if (pService == nullptr) {
+            WIFI_LOGE("[CheckAndStopScanService] scan service is null.");
             WifiManager::GetInstance().PushServiceCloseMsg(WifiCloseServiceCode::SCAN_SERVICE_CLOSE);
+            WifiConfigCenter::GetInstance().SetScanMidState(scanState, WifiOprMidState::CLOSED);
             return;
         }
         ErrCode ret = pService->UnInit();
-        if (ret != WIFI_OPT_SUCCESS) {
-            WifiConfigCenter::GetInstance().SetScanMidState(WifiOprMidState::CLOSING, scanState);
+        if (ret != WIFI_OPT_SUCCESS) { // scan service is not exist
+            WIFI_LOGE("[CheckAndStopScanService] UnInit service failed!");
         }
+        WifiConfigCenter::GetInstance().SetScanMidState(scanState, WifiOprMidState::CLOSED);
     }
 }
 

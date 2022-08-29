@@ -23,7 +23,7 @@
 #include "wifi_settings.h"
 #include "wifi_sta_hal_interface.h"
 #include "wifi_supplicant_hal_interface.h"
-#inlcude "wifi_common_util.h"
+#include "wifi_common_util.h"
 
 DEFINE_WIFILOG_LABEL("StaService");
 namespace OHOS {

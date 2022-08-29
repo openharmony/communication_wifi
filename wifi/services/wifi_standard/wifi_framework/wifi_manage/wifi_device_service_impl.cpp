@@ -381,7 +381,7 @@ bool WifiDeviceServiceImpl::CheckConfigPwd(const WifiDeviceConfig &config)
         return CheckConfigEap(config);
     }
 
-    if ((config.keyMgmt != KEY_MGMT_NONE && config.keyMgmt != KEY_MGMT_NONE) &&
+    if ((config.keyMgmt != KEY_MGMT_NONE && config.keyMgmt != KEY_MGMT_WEP) &&
         config.preSharedKey.empty()) {
         WIFI_LOGE("CheckConfigPwd: preSharedKey is empty!");
         return false;

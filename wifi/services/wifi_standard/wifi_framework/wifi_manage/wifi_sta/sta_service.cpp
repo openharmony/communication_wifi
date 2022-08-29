@@ -23,6 +23,7 @@
 #include "wifi_settings.h"
 #include "wifi_sta_hal_interface.h"
 #include "wifi_supplicant_hal_interface.h"
+#inlcude "wifi_common_util.h"
 
 DEFINE_WIFILOG_LABEL("StaService");
 namespace OHOS {
@@ -187,7 +188,7 @@ int StaService::AddDeviceConfig(const WifiDeviceConfig &config) const
     WifiDeviceConfig tempDeviceConfig;
     if (WifiSettings::GetInstance().GetDeviceConfig(config.ssid, config.keyMgmt, tempDeviceConfig) == 0) {
         netWorkId = tempDeviceConfig.networkId;
-        LOGI("The same network name already exists in settings! netWorkId:%{public}d, ssid:%{public}s."
+        LOGI("The same network name already exists in settings! netWorkId:%{public}d, ssid:%{public}s.",
             netWorkId, SsidAnonymize(config.ssid).c_str());
         CHECK_NULL_AND_RETURN(pStaAutoConnectService, WIFI_OPT_FAILED);
         bssid = config.bssid.empty() ? tempDeviceConfig.bssid : config.bssid;

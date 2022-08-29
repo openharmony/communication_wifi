@@ -374,14 +374,16 @@ bool WifiDeviceServiceImpl::CheckConfigEap(const WifiDeviceConfig &config)
 bool WifiDeviceServiceImpl::CheckConfigPwd(const WifiDeviceConfig &config)
 {
     if ((config.ssid.length() <= 0) || (config.keyMgmt.length()) <= 0) {
+        WIFI_LOGE("CheckConfigPwd: invalid ssid or keyMgmt!");
         return false;
     }
 
+    WIFI_LOGE("CheckConfigPwd: keyMgmt = %{public}s!", config.keyMgmt.c_str());
     if (config.keyMgmt == KEY_MGMT_EAP) {
         return CheckConfigEap(config);
     }
 
-    if ((config.keyMgmt != KEY_MGMT_NONE && config.keyMgmt != KEY_MGMT_NONE) &&
+    if ((config.keyMgmt != KEY_MGMT_NONE && config.keyMgmt != KEY_MGMT_WEP) &&
         config.preSharedKey.empty()) {
         WIFI_LOGE("CheckConfigPwd: preSharedKey is empty!");
         return false;
@@ -389,7 +391,7 @@ bool WifiDeviceServiceImpl::CheckConfigPwd(const WifiDeviceConfig &config)
 
     int len = config.preSharedKey.length();
     bool isAllHex = std::all_of(config.preSharedKey.begin(), config.preSharedKey.end(), isxdigit);
-    WIFI_LOGI("CheckConfigPwd, keyMgmt: %{public}s, len: %{public}d", config.keyMgmt.c_str(), len);
+    WIFI_LOGI("CheckConfigPwd, ssid: %{public}s, psk len: %{public}d", SsidAnonymize(config.ssid), len);
     if (config.keyMgmt == KEY_MGMT_WEP) {
         for (int i = 0; i != WEPKEYS_SIZE; ++i) {
             if (!config.wepKeys[i].empty()) { // wep
@@ -736,15 +738,18 @@ ErrCode WifiDeviceServiceImpl::ConnectToNetwork(int networkId, bool isCandidate)
     }
 
     if (!IsStaServiceRunning()) {
+        WIFI_LOGE("ConnectToNetwork: sta service is not running!");
         return WIFI_OPT_STA_NOT_OPENED;
     }
 
     if (networkId < 0) {
+        WIFI_LOGE("ConnectToNetwork: invalid networkId = %{public}d!");
         return WIFI_OPT_INVALID_PARAM;
     }
 
     IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst();
     if (pService == nullptr) {
+        WIFI_LOGE("ConnectToNetwork: pService is nullptr!");
         return WIFI_OPT_STA_NOT_OPENED;
     }
 
@@ -781,10 +786,12 @@ ErrCode WifiDeviceServiceImpl::ConnectToDevice(const WifiDeviceConfig &config)
         return WIFI_OPT_INVALID_PARAM;
     }
     if (!IsStaServiceRunning()) {
+        WIFI_LOGE("ConnectToDevice: sta service is not running!");
         return WIFI_OPT_STA_NOT_OPENED;
     }
     IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst();
     if (pService == nullptr) {
+        WIFI_LOGE("ConnectToNetwork: pService is nullptr!");
         return WIFI_OPT_STA_NOT_OPENED;
     }
     return pService->ConnectToDevice(config);

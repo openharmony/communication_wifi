@@ -37,6 +37,7 @@ StateMachine::~StateMachine()
 
 bool StateMachine::InitialStateMachine()
 {
+    LOGI("InitialStateMachine\n");
     pStateMachineHandler = new (std::nothrow) StateMachineHandler(this);
     if (pStateMachineHandler == nullptr) {
         LOGE("pStateMachineHandler alloc failed.\n");
@@ -282,7 +283,7 @@ StateMachineHandler::StateMachineHandler(StateMachine *pStateMgr)
 
 StateMachineHandler::~StateMachineHandler()
 {
-    LOGD("StateMachineHandler::~StateMachineHandler");
+    LOGI("StateMachineHandler::~StateMachineHandler");
     StopHandlerThread();
     ReleaseDelayedMessages();
     ClearWhenQuit();
@@ -292,6 +293,7 @@ StateMachineHandler::~StateMachineHandler()
 bool StateMachineHandler::InitialSmHandler()
 {
     if (!InitialHandler()) {
+        LOGE("InitialHandler failed.");
         return false;
     }
     return true;

@@ -78,6 +78,7 @@ void *Handler::RunHandleThreadFunc(void *pInstance)
         return nullptr;
     }
 
+    LOGI("Run handler func.");
     Handler *pHandler = (Handler *)pInstance;
     pHandler->GetAndDistributeMessage();
 

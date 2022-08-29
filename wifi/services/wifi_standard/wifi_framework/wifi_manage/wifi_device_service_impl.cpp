@@ -378,7 +378,7 @@ bool WifiDeviceServiceImpl::CheckConfigPwd(const WifiDeviceConfig &config)
         return false;
     }
 
-    WIFI_LOGE("CheckConfigPwd: keyMgmt = %{public}s!", config.keyMgmt.c_str());
+    WIFI_LOGI("CheckConfigPwd: keyMgmt = %{public}s!", config.keyMgmt.c_str());
     if (config.keyMgmt == KEY_MGMT_EAP) {
         return CheckConfigEap(config);
     }

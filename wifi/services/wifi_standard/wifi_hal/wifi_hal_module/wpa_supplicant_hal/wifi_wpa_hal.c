@@ -747,20 +747,23 @@ static void *WpaReceiveCallback(void *arg)
 
 static int WpaCliConnect(WifiWpaInterface *p)
 {
+    LOGI("Wpa connect start.");
     if (p == NULL) {
+        LOGE("Wpa connect parameter error.");
         return -1;
     }
     if (p->wpaCtrl.pSend != NULL) {
+        LOGE("Wpa is already connected.");
         return 0;
     }
     int count = WPA_TRY_CONNECT_TIMES;
     while (count-- > 0) {
         int ret = InitWpaCtrl(&p->wpaCtrl, "/data/misc/wifi/sockets/wpa");
         if (ret == 0) {
-            LOGD("Global wpa interface connect successfully!");
+            LOGI("Global wpa interface connect successfully!");
             break;
         } else {
-            LOGD("Init wpaCtrl failed: %{public}d", ret);
+            LOGE("Init wpaCtrl failed: %{public}d", ret);
         }
         usleep(WPA_TRY_CONNECT_SLEEP_TIME);
     }
@@ -774,6 +777,7 @@ static int WpaCliConnect(WifiWpaInterface *p)
         LOGE("Create monitor thread failed!");
         return -1;
     }
+    LOGI("Wpa connect finish.");
     return 0;
 }
 
@@ -808,14 +812,15 @@ static int WpaCliAddIface(WifiWpaInterface *p, const AddInterfaceArgv *argv, boo
     StrSafeCopy(info->name, sizeof(info->name), argv->name);
     char cmd[WPA_CMD_BUF_LEN] = {0};
     char buf[WPA_CMD_REPLY_BUF_SMALL_LEN] = {0};
-    LOGI("WpaCliAddIface CMD: %{public}s", cmd);
+    LOGI("Add interface start.");
     if (isWpaAdd && (snprintf_s(cmd, sizeof(cmd), sizeof(cmd) - 1, "INTERFACE_ADD %s\t%s",
         argv->name, argv->confName) < 0 || WpaCliCmd(cmd, buf, sizeof(buf)) != 0)) {
         free(info);
         info = NULL;
-        LOGI("WpaCliAddIface buf: %{public}s", buf);
+        LOGI("WpaCliAddIface failed, cmd: %{public}s, buf: %{public}s", cmd, buf);
         return -1;
     }
+    LOGI("Add interface finish, cmd: %{public}s, buf: %{public}s", cmd, buf);
     info->num += 1;
     info->next = p->ifaces;
     p->ifaces = info;

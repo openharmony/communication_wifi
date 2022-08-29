@@ -743,7 +743,7 @@ ErrCode WifiDeviceServiceImpl::ConnectToNetwork(int networkId, bool isCandidate)
     }
 
     if (networkId < 0) {
-        WIFI_LOGE("ConnectToNetwork: invalid networkId = %{public}d!");
+        WIFI_LOGE("ConnectToNetwork: invalid networkId = %{public}d!", networkId);
         return WIFI_OPT_INVALID_PARAM;
     }
 

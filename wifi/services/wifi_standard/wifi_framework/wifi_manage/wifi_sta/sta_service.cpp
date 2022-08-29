@@ -188,7 +188,7 @@ int StaService::AddDeviceConfig(const WifiDeviceConfig &config) const
     if (WifiSettings::GetInstance().GetDeviceConfig(config.ssid, config.keyMgmt, tempDeviceConfig) == 0) {
         netWorkId = tempDeviceConfig.networkId;
         LOGI("The same network name already exists in settings! netWorkId:%{public}d, ssid:%{public}s."
-            netWorkId, SsidAnonymize(config.ssid));
+            netWorkId, SsidAnonymize(config.ssid).c_str());
         CHECK_NULL_AND_RETURN(pStaAutoConnectService, WIFI_OPT_FAILED);
         bssid = config.bssid.empty() ? tempDeviceConfig.bssid : config.bssid;
         pStaAutoConnectService->EnableOrDisableBssid(bssid, true, 0);
@@ -274,7 +274,7 @@ ErrCode StaService::RemoveAllDevice() const
 
 ErrCode StaService::ConnectToDevice(const WifiDeviceConfig &config) const
 {
-    LOGI("Enter StaService::ConnectToDevice, ssid = %{public}s.\n", SsidAnonymize(config.ssid));
+    LOGI("Enter StaService::ConnectToDevice, ssid = %{public}s.\n", SsidAnonymize(config.ssid).c_str());
     CHECK_NULL_AND_RETURN(pStaStateMachine, WIFI_OPT_FAILED);
     int netWorkId = AddDeviceConfig(config);
     if(netWorkId == INVALID_NETWORK_ID) {
@@ -296,7 +296,7 @@ ErrCode StaService::ConnectToNetwork(int networkId) const
     }
     CHECK_NULL_AND_RETURN(pStaAutoConnectService, WIFI_OPT_FAILED);
     CHECK_NULL_AND_RETURN(pStaStateMachine, WIFI_OPT_FAILED);
-    LOGI("StaService::ConnectToNetwork, ssid = %{public}s.", SsidAnonymize(config.ssid));
+    LOGI("StaService::ConnectToNetwork, ssid = %{public}s.", SsidAnonymize(config.ssid).c_str());
     pStaAutoConnectService->EnableOrDisableBssid(config.bssid, true, 0);
     pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_CONNECT_SAVED_NETWORK, networkId, NETWORK_SELECTED_BY_THE_USER);
     return WIFI_OPT_SUCCESS;

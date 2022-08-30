@@ -309,7 +309,7 @@ static struct DhcpPacket *ReadLease(void)
     return dhcp;
 }
 
-static ssize_t WriteLease(struct DhcpPacket *pkt)
+static ssize_t WriteLease(const struct DhcpPacket *pkt)
 {
     if (pkt == NULL) {
         return -1;
@@ -404,7 +404,9 @@ void SendReboot(struct DhcpPacket *p, time_t timestamp)
     g_transID = GetTransId();
     g_dhcp4State = DHCP_STATE_INITREBOOT;
     g_sentPacketNum = 0;
-    g_timeoutTimestamp = timestamp + g_renewalSec;
+
+    uint32_t uTimeoutSec = TIMEOUT_WAIT_SEC << g_sentPacketNum;
+    g_timeoutTimestamp = timestamp + uTimeoutSec;
     DhcpReboot(g_transID, g_requestedIp4);
 }
 
@@ -437,9 +439,6 @@ static void Reboot(time_t timestamp)
             rebindTime = leaseTime * REBIND_SEC_MULTIPLE;
             LOGI("Reboot read lease file leaseTime:%{public}u, renewalTime:%{public}u, rebindTime:%{public}u",
                 leaseTime, renewalTime, rebindTime);
-            free(pkt);
-            pkt = NULL;
-            return;
         }
     } else {
         LOGI("Reboot read lease file leaseTime option not found");
@@ -611,6 +610,7 @@ static void DhcpOfferPacketHandle(uint8_t type, const struct DhcpPacket *packet,
     }
 
     /* Receive dhcp offer packet finished, next send dhcp request packet. */
+    WriteLease(packet);
     g_dhcp4State = DHCP_STATE_REQUESTING;
     g_sentPacketNum = 0;
     g_timeoutTimestamp = timestamp;

@@ -269,7 +269,7 @@ int ReceiveDhcpMessage(int sock, PDhcpMsgInfo msgInfo)
         LOGE("receive error, %d",  errno);
         return RET_FAILED;
     }
-    if (rsize > (int)sizeof(DhcpMsgInfo) || rsize < DHCP_MSG_HEADER_SIZE) {
+    if (rsize > (int)sizeof(DhcpMessage) || rsize < DHCP_MSG_HEADER_SIZE) {
         LOGW("message length error, received %d bytes.", rsize);
         return RET_FAILED;
     }

@@ -352,7 +352,7 @@ static int InitializeDhcpConfig(const char *ifname, DhcpConfig *config)
             return RET_FAILED;
         }
     }
-    LOGI("load local dhcp config file:%s", configFile);
+    LOGD("load local dhcp config file:%s", configFile);
     if (LoadConfig(configFile, ifname, config) != RET_SUCCESS) {
         LOGE("failed to load configure file.");
         return RET_FAILED;

@@ -15,6 +15,7 @@
 #include "sta_saved_device_appraisal.h"
 #include "wifi_logger.h"
 #include "wifi_settings.h"
+#include "wifi_common_util.h"
 
 DEFINE_WIFILOG_LABEL("StaSavedDeviceAppraisal");
 

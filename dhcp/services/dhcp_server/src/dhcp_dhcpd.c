@@ -94,8 +94,7 @@ static int InitNetworkAbout(DhcpConfig *config)
         }
     } else {
         config->gateway = config->serverId;
-        LOGW("InitNetworkAbout, set gateway to serverId:%{public}x as default.",
-            config->serverId);
+        LOGW("InitNetworkAbout, set gateway to serverId as default.");
     }
     return RET_SUCCESS;
 }
@@ -171,7 +170,7 @@ static int InitDomainNameServer(DhcpConfig *config)
             pTok = strtok_r(NULL, ",", &pSave);
         }
     } else {
-        LOGW("%{public}s, set dns to serverId:0x%{public}x for default.", __func__, config->serverId);
+        LOGW("%{public}s, set dns to serverId as default.", __func__);
         uint32_t dnsAddress = config->serverId;
         if (AppendAddressOption(&argOpt, dnsAddress) != RET_SUCCESS) {
             LOGW("failed to append dns option.");

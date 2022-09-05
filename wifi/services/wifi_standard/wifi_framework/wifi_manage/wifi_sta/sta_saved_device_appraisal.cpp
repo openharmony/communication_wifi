@@ -65,8 +65,8 @@ ErrCode StaSavedDeviceAppraisal::DeviceAppraisals(
 
         int score = 0;
         AppraiseDeviceQuality(score, scanInfo, device, info);
-        WIFI_LOGI("The device %{public}s score is %{public}d.rssi is %{public}d.\n",
-            scanInfo.ssid.c_str(), score, scanInfo.rssi);
+        WIFI_LOGI("The device networkId:%{public}d ssid:%{public}s score is %{public}d, rssi is %{public}d.",
+            device.networkId, SsidAnonymize(scanInfo.ssid).c_str(), score, scanInfo.rssi);
 
         if (score > highestScore || (score == highestScore && scanInfo.rssi > scanInfoElected.rssi)) {
             highestScore = score;
@@ -78,6 +78,9 @@ ErrCode StaSavedDeviceAppraisal::DeviceAppraisals(
         }
     }
     if (sign == 1) {
+        WIFI_LOGI("DeviceAppraisals, Selected device, networkId:%{public}s, ssid:%{public}s, bssid:%{public}d.",
+            electedDevice.networkId, SsidAnonymize(electedDevice.ssid).c_str(),
+            MacAnonymize(electedDevice.bssid).c_str());
         if (info.connState == ConnState::CONNECTED && electedDevice.networkId == info.networkId) {
             WifiDeviceConfig networkInfo;
             electedDevice = networkInfo;

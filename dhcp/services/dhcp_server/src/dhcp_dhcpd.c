@@ -92,6 +92,10 @@ static int InitNetworkAbout(DhcpConfig *config)
             LOGE("error gateway argument.");
             return RET_FAILED;
         }
+    } else {
+        config->gateway = config->serverId;
+        LOGW("InitNetworkAbout, set gateway to serverId:%{public}x as default.",
+            config->serverId);
     }
     return RET_SUCCESS;
 }
@@ -146,10 +150,9 @@ static int InitAddressRange(DhcpConfig *config)
 
 static int InitDomainNameServer(DhcpConfig *config)
 {
+    DhcpOption argOpt = {DOMAIN_NAME_SERVER_OPTION, 0, {0}};
     ArgumentInfo *arg = GetArgument("dns");
     if (arg) {
-        DhcpOption argOpt = {DOMAIN_NAME_SERVER_OPTION, 0, {0}};
-
         char *pSave = NULL;
         char *pTok = strtok_r(arg->value, ",", &pSave);
         if ((pTok == NULL) || (strlen(pTok) == 0)) {
@@ -164,15 +167,21 @@ static int InitDomainNameServer(DhcpConfig *config)
             }
             if (AppendAddressOption(&argOpt, dnsAddress) != RET_SUCCESS) {
                 LOGW("failed to append dns option.");
-            };
+            }
             pTok = strtok_r(NULL, ",", &pSave);
         }
-
-        if (GetOption(&config->options, argOpt.code) != NULL) {
-            RemoveOption(&config->options, DOMAIN_NAME_SERVER_OPTION);
+    } else {
+        LOGW("%{public}s, set dns to serverId:0x%{public}x for default.", __func__, config->serverId);
+        uint32_t dnsAddress = config->serverId;
+        if (AppendAddressOption(&argOpt, dnsAddress) != RET_SUCCESS) {
+            LOGW("failed to append dns option.");
         }
-        PushBackOption(&config->options, &argOpt);
     }
+
+    if (GetOption(&config->options, argOpt.code) != NULL) {
+        RemoveOption(&config->options, DOMAIN_NAME_SERVER_OPTION);
+    }
+    PushBackOption(&config->options, &argOpt);
     return RET_SUCCESS;
 }
 
@@ -343,7 +352,7 @@ static int InitializeDhcpConfig(const char *ifname, DhcpConfig *config)
             return RET_FAILED;
         }
     }
-    LOGD("load local config file:%s", configFile);
+    LOGI("load local dhcp config file:%s", configFile);
     if (LoadConfig(configFile, ifname, config) != RET_SUCCESS) {
         LOGE("failed to load configure file.");
         return RET_FAILED;

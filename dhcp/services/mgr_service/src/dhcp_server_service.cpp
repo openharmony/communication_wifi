@@ -314,6 +314,7 @@ int DhcpServerService::SetDhcpRange(const std::string &ifname, const std::string
         WIFI_LOGE("SetDhcpRange tag m_mapTagDhcpRange no find tagName:%{public}s.", tagName.c_str());
         return DHCP_OPT_FAILED;
     }
+
     int nSize = (int)iterTag->second.size();
     if (nSize != 1) {
         WIFI_LOGE("SetDhcpRange tag %{public}s range size:%{public}d error.", tagName.c_str(), nSize);

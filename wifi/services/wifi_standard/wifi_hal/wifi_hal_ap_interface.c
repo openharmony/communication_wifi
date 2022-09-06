@@ -59,9 +59,13 @@ WifiErrorNo StartSoftAp(int id)
         return WIFI_HAL_HOSTAPD_NOT_INIT;
     }
 
-    sprintf_s(ifaceName, IFCAE_NAME_LEN, AP_INTF"%d", id);
+    int ret = sprintf_s(ifaceName, IFCAE_NAME_LEN, AP_INTF"%d", id);
+    if (ret == -1) {
+        LOGE("StartSoftAp failed! ret=%{public}d", ret);
+        return WIFI_HAL_FAILED;
+    }
     if (GetIfaceState(ifaceName) == 0 || id > 0) {
-        int ret = hostapdHalDevice->enableAp(id);
+        ret = hostapdHalDevice->enableAp(id);
         if (ret != 0) {
             LOGE("enableAp failed! ret=%{public}d", ret);
             return WIFI_HAL_FAILED;

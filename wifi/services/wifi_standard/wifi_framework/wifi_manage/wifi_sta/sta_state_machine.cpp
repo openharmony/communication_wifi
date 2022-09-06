@@ -1227,13 +1227,17 @@ void StaStateMachine::MacAddressGenerate(std::string &strMac)
     constexpr int two = 2;
     constexpr int hexBase = 16;
     constexpr int octBase = 8;
+    int ret = 0;
     char strMacTmp[arraySize] = {0};
     srand(static_cast<unsigned int>(time(nullptr)));
     for (int i = 0; i < macBitSize; i++) {
         if (i != firstBit) {
-            sprintf_s(strMacTmp, arraySize, "%x", rand() % hexBase);
+            ret = sprintf_s(strMacTmp, arraySize, "%x", rand() % hexBase);
         } else {
-            sprintf_s(strMacTmp, arraySize, "%x", two * (rand() % octBase));
+            ret = sprintf_s(strMacTmp, arraySize, "%x", two * (rand() % octBase));
+        }
+        if (ret == -1) {
+            LOGE("StaStateMachine::MacAddressGenerate failed, sprintf_s return -1!\n");
         }
         strMac += strMacTmp;
         if ((i % two) != 0 && (i != lastBit)) {

@@ -46,6 +46,7 @@ WifiSettings::WifiSettings()
       mPowerSavingModeState(MODE_STATE_CLOSE),
       mFreezeModeState(MODE_STATE_CLOSE),
       mNoChargerPlugModeState(MODE_STATE_CLOSE),
+      mHotspotIdleTimeout(0),
       explicitGroup(false)
 {
     mHotspotState[0] = static_cast<int>(ApState::AP_STATE_CLOSED);
@@ -692,6 +693,17 @@ int WifiSettings::GetHotspotConfig(HotspotConfig &config, int id)
         config = iter->second;
     }
     return 0;
+}
+
+int WifiSettings::SetHotspotIdleTimeout(int time)
+{
+    mHotspotIdleTimeout = time;
+    return 0;
+}
+
+int WifiSettings::GetHotspotIdleTimeout()
+{
+    return mHotspotIdleTimeout;
 }
 
 int WifiSettings::SyncHotspotConfig()

@@ -257,6 +257,21 @@ public:
     int GetHotspotConfig(HotspotConfig &config, int id = 0);
 
     /**
+     * @Description Set the idel timeout of Hotspot
+     *
+     * @return int - 0 success
+     */
+    int SetHotspotIdleTimeout(int time);
+
+    /**
+     * @Description Get the idel timeout of Hotspot
+     *
+     * @param time -input time,
+     * @return int - the hotspot idle timeout
+     */
+    int GetHotspotIdleTimeout();
+
+    /**
      * @Description Get current hotspot accept linked stations
      *
      * @param results - output StationInfo results

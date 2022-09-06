@@ -66,6 +66,11 @@ ErrCode ApInterface::SetHotspotConfig(const HotspotConfig &hotspotConfig)
     return m_ApService.SetHotspotConfig(hotspotConfig);
 }
 
+ErrCode ApInterface::SetHotspotIdleTimeout(int time)
+{
+    return m_ApService.SetHotspotIdleTimeout(time);
+}
+
 ErrCode ApInterface::DisconnetStation(const StationInfo &stationInfo)
 {
     return m_ApService.DisconnetStation(stationInfo);

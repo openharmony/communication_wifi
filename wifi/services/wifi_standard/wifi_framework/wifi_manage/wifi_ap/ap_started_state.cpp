@@ -82,6 +82,7 @@ void ApStartedState::GoInState()
         return;
     }
     UpdatePowerMode();
+    SetHotspotIdleTimer();
     m_ApStateMachine.OnApStateChange(ApState::AP_STATE_STARTED);
     ChipCapability::GetInstance().InitializeChipCapability();
 }
@@ -98,15 +99,16 @@ void ApStartedState::GoOutState()
     StopMonitor();
     m_ApStateMachine.OnApStateChange(ApState::AP_STATE_IDLE);
     WifiSettings::GetInstance().ClearStationList();
+    CancelHotspotIdleTimer();
 }
 
 void ApStartedState::Init()
 {
     mProcessFunMap.insert(std::make_pair(ApStatemachineEvent::CMD_FAIL, &ApStartedState::ProcessCmdFail));
     mProcessFunMap.insert(
-        std::make_pair(ApStatemachineEvent::CMD_STATION_JOIN, &ApStartedState::ProcessCmdStationJoin));
+        std::make_pair(ApStatemachineEvent::CMD_STATION_JOIN, (ProcessFun)&ApStartedState::ProcessCmdStationJoin));
     mProcessFunMap.insert(
-        std::make_pair(ApStatemachineEvent::CMD_STATION_LEAVE, &ApStartedState::ProcessCmdStationLeave));
+        std::make_pair(ApStatemachineEvent::CMD_STATION_LEAVE, (ProcessFun)&ApStartedState::ProcessCmdStationLeave));
     mProcessFunMap.insert(std::make_pair(
         ApStatemachineEvent::CMD_SET_HOTSPOT_CONFIG, (ProcessFun)&ApStartedState::ProcessCmdSetHotspotConfig));
     mProcessFunMap.insert(std::make_pair(
@@ -119,6 +121,8 @@ void ApStartedState::Init()
         std::make_pair(ApStatemachineEvent::CMD_STOP_HOTSPOT, &ApStartedState::ProcessCmdStopHotspot));
     mProcessFunMap.insert(
         std::make_pair(ApStatemachineEvent::CMD_DISCONNECT_STATION, &ApStartedState::ProcessCmdDisconnectStation));
+    mProcessFunMap.insert(std::make_pair(ApStatemachineEvent::CMD_SET_IDLE_TIMEOUT,
+    (ProcessFun)&ApStartedState::ProcessCmdSetHotspotIdleTimeout));
 }
 
 bool ApStartedState::ExecuteStateMsg(InternalMessage *msg)
@@ -261,7 +265,7 @@ void ApStartedState::ProcessCmdFail(InternalMessage &msg) const
     m_ApStateMachine.SwitchState(&m_ApStateMachine.m_ApIdleState);
 }
 
-void ApStartedState::ProcessCmdStationJoin(InternalMessage &msg) const
+void ApStartedState::ProcessCmdStationJoin(InternalMessage &msg)
 {
     WIFI_LOGI("Instance %{public}d %{public}s", m_id, __func__);
     StationInfo staInfo;
@@ -270,9 +274,10 @@ void ApStartedState::ProcessCmdStationJoin(InternalMessage &msg) const
     } else {
         WIFI_LOGE("failed to get station info.");
     }
+    CancelHotspotIdleTimer();
 }
 
-void ApStartedState::ProcessCmdStationLeave(InternalMessage &msg) const
+void ApStartedState::ProcessCmdStationLeave(InternalMessage &msg)
 {
     WIFI_LOGI("Instance %{public}d %{public}s", m_id, __func__);
     StationInfo staInfo;
@@ -280,6 +285,9 @@ void ApStartedState::ProcessCmdStationLeave(InternalMessage &msg) const
         m_ApStateMachine.m_ApStationsManager.StationLeave(staInfo.bssid);
     } else {
         WIFI_LOGE("failed to get station info.");
+    }
+    if (m_ApStateMachine.m_ApStationsManager.GetAllConnectedStations().size() == 0) {
+        SetHotspotIdleTimer();
     }
 }
 
@@ -367,6 +375,49 @@ void ApStartedState::UpdatePowerMode() const
     }
     LOGI("SetPowerModel(): %{public}d.", model);
     WifiSettings::GetInstance().SetPowerModel(PowerModel(model));
+}
+
+void ApStartedState::ProcessCmdSetHotspotIdleTimeout(InternalMessage &msg)
+{
+    int mTimeoutDelay = msg.GetIntFromMessage();
+    WIFI_LOGI("Set hotspot idle time is %{public}d", mTimeoutDelay);
+    if (mTimeoutDelay == WifiSettings::GetInstance().GetHotspotIdleTimeout()) {
+        return;
+    }
+    WifiSettings::GetInstance().SetHotspotIdleTimeout(mTimeoutDelay);
+    if (!mTimeoutDelay) {
+        CancelHotspotIdleTimer();
+        return;
+    }
+    if (mTimeoutDelay && m_ApStateMachine.m_ApStationsManager.GetAllConnectedStations().size() == 0) {
+        SetHotspotIdleTimer();
+    }
+}
+
+void ApStartedState::SetHotspotIdleTimer()
+{
+    WIFI_LOGI("SetHotspotIdleTimer.");
+    int mTimeoutDelay = WifiSettings::GetInstance().GetHotspotIdleTimeout();
+    if (!mTimeoutDelay) {
+        return;
+    }
+    if (idleTimerExist) {
+        CancelHotspotIdleTimer();
+    }
+    m_ApStateMachine.StartTimer(static_cast<int>(ApStatemachineEvent::CMD_STOP_HOTSPOT), mTimeoutDelay);
+    idleTimerExist = true;
+    WIFI_LOGI("SetHotspotIdleTimer success!");
+}
+
+void ApStartedState::CancelHotspotIdleTimer()
+{
+    WIFI_LOGI("CancelHotspotIdleTimer.");
+    if (!idleTimerExist) {
+        return;
+    }
+    m_ApStateMachine.StopTimer(static_cast<int>(ApStatemachineEvent::CMD_STOP_HOTSPOT));
+    idleTimerExist = false;
+    WIFI_LOGI("CancelHotspotIdleTimer success!");
 }
 }  // namespace Wifi
 }  // namespace OHOS

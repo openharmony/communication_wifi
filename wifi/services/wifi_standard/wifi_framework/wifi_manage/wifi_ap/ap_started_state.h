@@ -152,14 +152,14 @@ private:
      * @param msg - Message body sent by the state machine
      * @return None
      */
-    void ProcessCmdStationJoin(InternalMessage &msg) const;
+    void ProcessCmdStationJoin(InternalMessage &msg);
 
     /**
      * @Description  Process the STA disconnect message received by the state machine.
      * @param msg - Message body sent by the state machine
      * @return None
      */
-    void ProcessCmdStationLeave(InternalMessage &msg) const;
+    void ProcessCmdStationLeave(InternalMessage &msg);
 
     /**
      * @Description  Process the hotspot configuration message of the APP
@@ -168,6 +168,14 @@ private:
      * @return None
      */
     void ProcessCmdSetHotspotConfig(InternalMessage &msg);
+
+    /**
+     * @Description  Process the hotspot idle timeout message of the APP
+                     received by the state machine.
+     * @param msg - Message body sent by the state machine
+     * @return None
+     */
+    void ProcessCmdSetHotspotIdleTimeout(InternalMessage &msg);
 
     /**
      * @Description  Process the hotspot configuration update result
@@ -216,6 +224,20 @@ private:
     void UpdatePowerMode() const;
 
     /**
+     * @Description  Set a timer to turn off the hotspot.
+     * @param None
+     * @return None
+     */
+    void SetHotspotIdleTimer();
+
+    /**
+     * @Description  Cancel the timer to turn off the hotspot.
+     * @param None
+     * @return None
+     */
+    void CancelHotspotIdleTimer();
+
+    /**
      * @Description  Initialization.
      * @param None
      * @return None
@@ -238,6 +260,7 @@ private:
     ApConfigUse &m_ApConfigUse;
     ApMonitor &m_ApMonitor;
     int m_id;
+    bool idleTimerExist = false;
 };
 }  // namespace Wifi
 }  // namespace OHOS

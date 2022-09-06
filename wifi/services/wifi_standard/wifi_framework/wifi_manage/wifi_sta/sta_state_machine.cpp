@@ -1799,6 +1799,7 @@ bool StaStateMachine::ConfigStaticIpAddress(StaticIpAddress &staticIpAddress)
         }
 
         default:
+            WIFI_LOGE("Invalid currentTpType: %{public}d", currentTpType);
             return false;
     }
     return true;

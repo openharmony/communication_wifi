@@ -66,7 +66,7 @@ ErrCode StaSavedDeviceAppraisal::DeviceAppraisals(
 
         int score = 0;
         AppraiseDeviceQuality(score, scanInfo, device, info);
-        WIFI_LOGI("The device networkId:%{public}d ssid:%{public}s score is %{public}d, rssi is %{public}d.",
+        WIFI_LOGI("The device networkId:%{public}d ssid:%{public}s score:%{public}d rssi:%{public}d.",
             device.networkId, SsidAnonymize(scanInfo.ssid).c_str(), score, scanInfo.rssi);
 
         if (score > highestScore || (score == highestScore && scanInfo.rssi > scanInfoElected.rssi)) {
@@ -74,6 +74,7 @@ ErrCode StaSavedDeviceAppraisal::DeviceAppraisals(
             scanInfoElected.rssi = scanInfo.rssi;
             electedDevice = device;
             sign = 1;
+            WIFI_LOGI("set highestScore: %{public}d, ssid: %{public}s", highestScore, SsidAnonymize(device.ssid).c_str());
         } else {
             WIFI_LOGI("The config %{public}s is ignored!\n", scanInfo.ssid.c_str());
         }

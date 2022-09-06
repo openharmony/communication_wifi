@@ -27,7 +27,7 @@
 #define LOG_TAG "DhcpServer"
 
 #undef LOG_DOMAIN
-#define LOG_DOMAIN 0x0000000
+#define LOG_DOMAIN 0xD001560
 
 #define LOGD(...) ((void)HiLogPrint(LOG_CORE, LOG_DEBUG, LOG_DOMAIN, LOG_TAG, __VA_ARGS__))
 

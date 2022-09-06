@@ -201,6 +201,16 @@ int WifiConfigCenter::GetHotspotConfig(HotspotConfig &config, int id)
     return WifiSettings::GetInstance().GetHotspotConfig(config, id);
 }
 
+int WifiConfigCenter::SetHotspotIdleTimeout(int time)
+{
+    return WifiSettings::GetInstance().SetHotspotIdleTimeout(time);
+}
+
+int WifiConfigCenter::GetHotspotIdleTimeout()
+{
+    return WifiSettings::GetInstance().GetHotspotIdleTimeout();
+}
+
 int WifiConfigCenter::GetStationList(std::vector<StationInfo> &results, int id)
 {
     return WifiSettings::GetInstance().GetStationList(results, id);

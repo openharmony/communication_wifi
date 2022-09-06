@@ -44,6 +44,7 @@ private:
     void OnGetApStateWifi(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
     void OnGetHotspotConfig(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
     void OnSetApConfigWifi(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
+    void OnSetApIdleTimeout(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
     void OnGetStationList(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
     void OnDisassociateSta(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
     void OnEnableWifiAp(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);

@@ -452,6 +452,21 @@ public:
     int GetHotspotConfig(HotspotConfig &config, int id = 0);
 
     /**
+     * @Description Set the idel timeout of Hotspot
+     *
+     * @return int - 0 success
+     */
+    int SetHotspotIdleTimeout(int time);
+
+    /**
+     * @Description Get the idel timeout of Hotspot
+     *
+     * @param time -input time,
+     * @return int - the hotspot idle timeout
+     */
+    int GetHotspotIdleTimeout();
+
+    /**
      * @Description Synchronizing saved the Hotspot config into config file
      *
      * @return int - 0 success; -1 save file failed
@@ -1184,6 +1199,7 @@ private:
     WifiConfig mWifiConfig;
     std::pair<std::string, int> mBssidToTimeoutTime;
     std::map<int, PowerModel> powerModel;
+    int mHotspotIdleTimeout;
 
     std::mutex mStaMutex;
     std::mutex mApMutex;

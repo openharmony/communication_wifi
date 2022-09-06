@@ -62,6 +62,19 @@ ErrCode ApService::SetHotspotConfig(const HotspotConfig &cfg) const
     return ErrCode::WIFI_OPT_SUCCESS;
 }
 
+ErrCode ApService::SetHotspotIdleTimeout(int time) const
+{
+    WIFI_LOGI("SetHotspotIdleTimeout");
+    InternalMessage *msg = m_ApStateMachine.CreateMessage();
+    if (msg == nullptr) {
+        return ErrCode::WIFI_OPT_FAILED;
+    }
+    msg->SetMessageName(static_cast<int>(ApStatemachineEvent::CMD_SET_IDLE_TIMEOUT));
+    msg->AddIntMessageBody(time);
+    m_ApStateMachine.SendMessage(msg);
+    return ErrCode::WIFI_OPT_SUCCESS;
+}
+
 ErrCode ApService::AddBlockList(const StationInfo &stationInfo) const
 {
     WIFI_LOGI("Instance %{public}d %{public}s", m_id, __func__);

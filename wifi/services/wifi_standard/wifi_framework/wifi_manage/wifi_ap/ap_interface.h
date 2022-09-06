@@ -74,6 +74,14 @@ public:
     virtual ErrCode SetHotspotConfig(const HotspotConfig &hotspotConfig) override;
 
     /**
+     * @Description Set the idel timeout of Hotspot
+     *
+     * @param time -input time,
+     * @return ErrCode - success: WIFI_OPT_SUCCESS    failed: ERROR_CODE
+     */
+    virtual ErrCode SetHotspotIdleTimeout(int time) override;
+
+    /**
      * @Description  Disconnect Station connect from station information.
      * @param stationInfo - station information.
      * @return ErrCode - success: WIFI_OPT_SUCCESS    failed: ERROR_CODE

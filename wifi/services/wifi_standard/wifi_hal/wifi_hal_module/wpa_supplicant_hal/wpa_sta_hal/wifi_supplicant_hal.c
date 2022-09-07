@@ -23,7 +23,6 @@
 #include "wifi_wpa_common.h"
 #include "utils/common.h" /* request for printf_decode to decode wpa's returned ssid info */
 #include "wifi_hal_common_func.h"
-#include "wifi_common_util.h"
 
 #undef LOG_TAG
 #define LOG_TAG "WifiWpaStaHal"
@@ -1167,10 +1166,9 @@ static int WpaCliCmdScanInfo(WifiWpaStaInterface *this, ScanInfo *pcmd, int *siz
             LOGE("parse scan result line failed!");
             break;
         }
-        LOGI("%{public}2d %{public}s %{public}s %{public}d %{public}d %{public}d %{public}d %{public}d",
-            j, SsidAnonymize(pcmd[j].ssid).c_str(), MacAnonymize(pcmd[j].bssid).c_str(),
-            pcmd[j].freq, pcmd[j].siglv, pcmd[j].centerFrequency0, pcmd[j].centerFrequency1,
-            pcmd[j].channelWidth);
+        LOGD("%{public}2d %{public}s %{public}s %{public}d %{public}d %{public}d %{public}d %{public}d",
+            j, pcmd[j].ssid.c_str(), pcmd[j].bssid.c_str(), pcmd[j].freq, pcmd[j].siglv,
+            pcmd[j].centerFrequency0, pcmd[j].centerFrequency1, pcmd[j].channelWidth);
         token = strtok_r(NULL, "\n", &savedPtr);
         j++;
     }

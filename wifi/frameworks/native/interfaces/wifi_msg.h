@@ -207,8 +207,10 @@ public:
 
     void SetIpv4Address(const std::string &address)
     {
-        family = IPV4_ADDRESS_TYPE;
         addressIpv4 = IpTools::ConvertIpv4Address(address);
+        if (addressIpv4 != 0) {
+            family = IPV4_ADDRESS_TYPE;
+        }
         return;
     }
 
@@ -219,8 +221,10 @@ public:
 
     void SetIpv6Address(const std::string &address)
     {
-        family = IPV6_ADDRESS_TYPE;
         IpTools::ConvertIpv6Address(address, addressIpv6);
+        if (addressIpv6.size() != 0) {
+            family = IPV6_ADDRESS_TYPE;
+        }
         return;
     }
 };

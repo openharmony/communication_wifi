@@ -186,15 +186,18 @@ int InitHostapdCtrl(const char *ifname, int id)
     }
     int flag = 0;
     do {
-        g_hostapdHalDevInfo[id].hostapdHalDev->ctrlConn = wpa_ctrl_open(ifname);
         g_hostapdHalDevInfo[id].hostapdHalDev->ctrlRecv = wpa_ctrl_open(ifname);
-        if (g_hostapdHalDevInfo[id].hostapdHalDev->ctrlConn == NULL ||
-            g_hostapdHalDevInfo[id].hostapdHalDev->ctrlRecv == NULL) {
-            LOGE("open hostapd control interface failed!");
+        if (g_hostapdHalDevInfo[id].hostapdHalDev->ctrlRecv == NULL) {
+            LOGE("open hostapd control interface ctrlRecv failed!");
             break;
         }
         if (wpa_ctrl_attach(g_hostapdHalDevInfo[id].hostapdHalDev->ctrlRecv) != 0) {
             LOGE("attach hostapd monitor interface failed!");
+            break;
+        }
+        g_hostapdHalDevInfo[id].hostapdHalDev->ctrlConn = wpa_ctrl_open(ifname);
+        if (g_hostapdHalDevInfo[id].hostapdHalDev->ctrlConn == NULL) {
+            LOGE("open hostapd control interface ctrlConn failed!");
             break;
         }
         flag += 1;
@@ -214,6 +217,7 @@ void GetDestPort(char *destPort, size_t len, int id)
 static int HostapdCliConnect(int id)
 {
     if (g_hostapdHalDevInfo[id].hostapdHalDev == NULL) {
+        LOGE("hostapdHalDev is NULL!");
         return -1;
     }
     if (g_hostapdHalDevInfo[id].hostapdHalDev->ctrlConn != NULL) {
@@ -226,7 +230,7 @@ static int HostapdCliConnect(int id)
     while (retryCount-- > 0) {
         int ret = InitHostapdCtrl(ifname, id);
         if (ret == 0) {
-            LOGD("Global hostapd interface connect successfully!");
+            LOGI("Global hostapd interface connect successfully!");
             break;
         } else {
             LOGD("Init hostapd ctrl failed: %{public}d", ret);
@@ -234,6 +238,7 @@ static int HostapdCliConnect(int id)
         usleep(SLEEP_TIME_100_MS);
     }
     if (retryCount <= 0) {
+        LOGD("Retry init hostapd ctrl failed, retryCount: %{public}d", retryCount);
         return -1;
     }
     g_hostapdHalDevInfo[id].hostapdHalDev->threadRunFlag = 1;
@@ -710,6 +715,7 @@ static int InitHostapdHal(int id)
 WifiHostapdHalDevice *GetWifiHostapdDev(int id)
 {
     if (id < 0 || id >= AP_MAX_INSTANCE) {
+        LOGE("Invalid id: %{public}d!", id);
         return NULL;
     }
 
@@ -719,6 +725,7 @@ WifiHostapdHalDevice *GetWifiHostapdDev(int id)
 
     g_hostapdHalDevInfo[id].hostapdHalDev = (WifiHostapdHalDevice *)calloc(1, sizeof(WifiHostapdHalDevice));
     if (g_hostapdHalDevInfo[id].hostapdHalDev == NULL) {
+        LOGE("hostapdHalDev is NULL");
         return NULL;
     }
 
@@ -735,6 +742,7 @@ WifiHostapdHalDevice *GetWifiHostapdDev(int id)
     g_hostapdHalDevInfo[id].hostapdHalDev->setCountryCode = SetCountryCode;
 
     if (InitHostapdHal(id) != 0) {
+        LOGE("InitHostapdHal return failed!!");
         free(g_hostapdHalDevInfo[id].hostapdHalDev);
         g_hostapdHalDevInfo[id].hostapdHalDev = NULL;
         return NULL;

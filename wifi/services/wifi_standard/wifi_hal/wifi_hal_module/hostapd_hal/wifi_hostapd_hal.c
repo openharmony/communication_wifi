@@ -233,11 +233,12 @@ static int HostapdCliConnect(int id)
             LOGI("Global hostapd interface connect successfully!");
             break;
         } else {
-            LOGE("Init hostapd ctrl failed: %{public}d", ret);
+            LOGD("Init hostapd ctrl failed: %{public}d", ret);
         }
         usleep(SLEEP_TIME_100_MS);
     }
     if (retryCount <= 0) {
+        LOGD("Retry init hostapd ctrl failed, retryCount: %{public}d", retryCount);
         return -1;
     }
     g_hostapdHalDevInfo[id].hostapdHalDev->threadRunFlag = 1;

@@ -237,11 +237,12 @@ bool P2pIdleState::ProcessGroupStartedEvt(InternalMessage &msg) const
         /**
          * Update groups.
          */
-        p2pStateMachine.UpdatePersistentGroups();
+        p2pStateMachine.UpdateGroupManager();
         group.SetNetworkId(groupManager.GetGroupNetworkId(group.GetOwner(), group.GetGroupName()));
         WIFI_LOGI("the group network id is %{public}d set id is %{public}d",
             group.GetNetworkId(),
             p2pStateMachine.groupManager.GetGroupNetworkId(group.GetOwner(), group.GetGroupName()));
+        p2pStateMachine.UpdatePersistentGroups();
     }
     group.SetP2pGroupStatus(P2pGroupStatus::GS_STARTED);
     p2pStateMachine.groupManager.SetCurrentGroup(group);
@@ -380,5 +381,5 @@ bool P2pIdleState::ExecuteStateMsg(InternalMessage *msg)
         return NOT_EXECUTED;
     }
 }
-}  // namespace Wifi
-}  // namespace OHOS
+} // namespace Wifi
+} // namespace OHOS

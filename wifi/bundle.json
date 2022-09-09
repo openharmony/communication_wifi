@@ -49,7 +49,8 @@
             "wifi_feature_with_ap_intf",
             "wifi_feature_with_ap_num",
             "wifi_feature_with_auth_disable",
-            "wifi_feature_with_dhcp_disable"
+            "wifi_feature_with_dhcp_disable",
+            "wifi_feature_with_encryption"
         ],
         "adapted_system_type": [
             "standard"

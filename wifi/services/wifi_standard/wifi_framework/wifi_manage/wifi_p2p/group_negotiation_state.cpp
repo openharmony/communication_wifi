@@ -87,11 +87,13 @@ bool GroupNegotiationState::ProcessGroupStartedEvt(InternalMessage &msg) const
     }
 
     if (groupManager.GetCurrentGroup().IsPersistent()) {
-        p2pStateMachine.UpdatePersistentGroups();
+        p2pStateMachine.UpdateGroupManager();
         const WifiP2pDevice &owner = groupManager.GetCurrentGroup().GetOwner();
         WifiP2pGroupInfo copy = groupManager.GetCurrentGroup();
         copy.SetNetworkId(groupManager.GetGroupNetworkId(owner, groupManager.GetCurrentGroup().GetGroupName()));
         groupManager.SetCurrentGroup(copy);
+        groupManager.AddOrUpdateGroup(groupManager.GetCurrentGroup());
+        p2pStateMachine.UpdatePersistentGroups();
     } else {
         WifiP2pGroupInfo copy = groupManager.GetCurrentGroup();
         copy.SetNetworkId(TEMPORARY_NET_ID);
@@ -229,5 +231,5 @@ bool GroupNegotiationState::ExecuteStateMsg(InternalMessage *msg)
         return NOT_EXECUTED;
     }
 }
-}  // namespace Wifi
-}  // namespace OHOS
+} // namespace Wifi
+} // namespace OHOS

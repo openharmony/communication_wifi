@@ -85,7 +85,8 @@ bool P2pGroupOperatingState::ProcessCmdCreateGroup(const InternalMessage &msg) c
                 WIFI_LOGW("Some configuration settings failed!");
             }
             ret = WifiP2PHalInterface::GetInstance().GroupAdd(true, netId, freq);
-            (void)WifiP2PHalInterface::GetInstance().SaveConfig();
+            p2pStateMachine.UpdateGroupManager();
+            p2pStateMachine.UpdatePersistentGroups();
         }
     } else if (netId == PERSISTENT_NET_ID || netId == TEMPORARY_NET_ID) {
         /**
@@ -95,7 +96,8 @@ bool P2pGroupOperatingState::ProcessCmdCreateGroup(const InternalMessage &msg) c
         if (config.GetPassphrase().empty() && config.GetGroupName().empty()) {
             WifiSettings::GetInstance().SetExplicitGroup(true);
             ret = WifiP2PHalInterface::GetInstance().GroupAdd((netId == PERSISTENT_NET_ID) ? true : false, netId, freq);
-            (void)WifiP2PHalInterface::GetInstance().SaveConfig();
+            p2pStateMachine.UpdateGroupManager();
+            p2pStateMachine.UpdatePersistentGroups();
         } else if (!config.GetPassphrase().empty() && !config.GetGroupName().empty() &&
                    config.GetPassphrase().length() >= MIN_PSK_LEN && config.GetPassphrase().length() <= MAX_PSK_LEN) {
             WifiSettings::GetInstance().SetExplicitGroup(true);
@@ -133,11 +135,12 @@ bool P2pGroupOperatingState::ProcessGroupStartedEvt(const InternalMessage &msg) 
         /**
          * Update groups.
          */
-        p2pStateMachine.UpdatePersistentGroups();
+        p2pStateMachine.UpdateGroupManager();
         group.SetNetworkId(groupManager.GetGroupNetworkId(group.GetOwner(), group.GetGroupName()));
         WIFI_LOGI("the group network id is %{public}d set id is %{public}d",
             group.GetNetworkId(),
             p2pStateMachine.groupManager.GetGroupNetworkId(group.GetOwner(), group.GetGroupName()));
+        p2pStateMachine.UpdatePersistentGroups();
     } else {
         group.SetNetworkId(TEMPORARY_NET_ID);
         WIFI_LOGI("This is a temporary group.");
@@ -301,13 +304,13 @@ bool P2pGroupOperatingState::ProcessCmdDeleteGroup(const InternalMessage &msg) c
     }
 
     ret = WifiP2PHalInterface::GetInstance().RemoveNetwork(networkId);
-    (void)WifiP2PHalInterface::GetInstance().SaveConfig();
     groupManager.RemoveGroup(group);
     if (ret) {
         WIFI_LOGE("P2P group deletion failed.");
         p2pStateMachine.BroadcastActionResult(P2pActionCallback::DeleteGroup, WIFI_OPT_FAILED);
     } else {
         WIFI_LOGI("The P2P group is deleted successfully.");
+        p2pStateMachine.UpdateGroupManager();
         p2pStateMachine.UpdatePersistentGroups();
         p2pStateMachine.BroadcastActionResult(P2pActionCallback::DeleteGroup, WIFI_OPT_SUCCESS);
     }
@@ -352,5 +355,5 @@ bool P2pGroupOperatingState::ExecuteStateMsg(InternalMessage *msg)
         return NOT_EXECUTED;
     }
 }
-}  // namespace Wifi
-}  // namespace OHOS
+} // namespace Wifi
+} // namespace OHOS

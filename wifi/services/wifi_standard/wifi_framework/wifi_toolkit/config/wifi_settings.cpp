@@ -18,7 +18,9 @@
 #include "wifi_global_func.h"
 #include "wifi_log.h"
 #include "wifi_config_country_freqs.h"
-
+#ifdef FEATURE_ENCRYPTION_SUPPORT
+#include "wifi_encryption_util.h"
+#endif
 namespace OHOS {
 namespace Wifi {
 WifiSettings &WifiSettings::GetInstance()
@@ -140,7 +142,9 @@ int WifiSettings::Init()
     InitScanControlInfo();
     ReloadTrustListPolicies();
     ReloadMovingFreezePolicy();
-
+#ifdef FEATURE_ENCRYPTION_SUPPORT
+    SetUpHks();
+#endif
     return 0;
 }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -27,13 +27,11 @@
 #include <sys/time.h>
 #include <sys/types.h>
 
-
 using namespace OHOS::Wifi;
 
 #define MAGIC_COOKIE_LENGTH 4
 #define OPT_HEADER_LENGTH 2
 #define TIME_SEC_TO_USEC (1000 * 1000)
-#define DHCP_SEL_WAIT_TIMEOUTS 1500
 
 #undef LOG_TAG
 #define LOG_TAG "DhcpServerSystemFuncMock"
@@ -79,6 +77,8 @@ int __wrap_socket(int __domain, int __type, int __protocol)
     if (g_mockTag) {
         LOGD(" ==>mock enable.");
         return SystemFuncMock::GetInstance().socket(__domain, __type, __protocol);
+    } else {
+        LOGD(" ==>mock disable.");
     }
     return __real_socket(__domain, __type, __protocol);
 }
@@ -90,9 +90,12 @@ int __wrap_setsockopt(int __fd, int __level, int __optname, const void *__optval
     if (g_mockTag) {
         LOGD(" ==>mock enable.");
         return SystemFuncMock::GetInstance().setsockopt(__fd, __level, __optname, __optval, __optlen);
+    } else {
+        LOGD(" ==>mock disable.");
     }
     return __real_setsockopt(__fd, __level, __optname, __optval, __optlen);
 }
+
 int __real_select(int __nfds, fd_set *__readfds, fd_set *__writefds, fd_set *__exceptfds, struct timeval *__timeout);
 int __wrap_select(int __nfds, fd_set *__readfds, fd_set *__writefds, fd_set *__exceptfds, struct timeval *__timeout)
 {
@@ -114,6 +117,8 @@ int __wrap_select(int __nfds, fd_set *__readfds, fd_set *__writefds, fd_set *__e
             }
         }
         return retval;
+    } else {
+        LOGD(" ==>mock disable.");
     }
     return __real_select(__nfds, __readfds, __writefds, __exceptfds, __timeout);
 }
@@ -125,6 +130,8 @@ int __wrap_bind(int __fd, struct sockaddr *__addr, socklen_t __len)
     if (g_mockTag) {
         LOGD(" ==>mock enable.");
         return SystemFuncMock::GetInstance().bind(__fd, __addr, __len);
+    } else {
+        LOGD(" ==>mock disable.");
     }
     return __real_bind(__fd, __addr, __len);
 }
@@ -136,6 +143,8 @@ int __wrap_close(int _fileno)
     if (g_mockTag) {
         LOGD(" ==>mock enable.");
         return SystemFuncMock::GetInstance().close(_fileno);
+    } else {
+        LOGD(" ==>mock disable.");
     }
     return __real_close(_fileno);
 }
@@ -160,6 +169,8 @@ ssize_t recvfrom(int __fd, void *__buf, size_t __n, int __flags, struct sockaddr
                 return sizeof(DhcpMessage);
             }
         }
+    } else {
+        LOGD(" ==>mock disable.");
     }
     return SystemFuncMock::GetInstance().recvfrom(__fd, __buf, __n, __flags, __addr, __addr_len);
 }
@@ -188,6 +199,7 @@ int ParseMockOptions(DhcpMessage *packet)
     FreeOptionList(&reply.options);
     return retval;
 }
+
 ssize_t sendto(int __fd, const void *__buf, size_t __n, int __flags, struct sockaddr *__addr, socklen_t __addr_len)
 {
     LOGD("==>sendto.");
@@ -196,6 +208,8 @@ ssize_t sendto(int __fd, const void *__buf, size_t __n, int __flags, struct sock
         if (__buf == nullptr) {
             return SystemFuncMock::GetInstance().sendto(__fd, __buf, __n, __flags, __addr, __addr_len);
         }
+    } else {
+        LOGD(" ==>mock disable.");
     }
     return SystemFuncMock::GetInstance().sendto(__fd, __buf, __n, __flags, __addr, __addr_len);
 }

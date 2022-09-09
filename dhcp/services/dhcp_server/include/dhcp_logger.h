@@ -45,9 +45,9 @@
 
 #define LOG_DEBUG "Debug"
 #define LOG_TRACE "Trace"
-#define LOG_WARN " Warn"
+#define LOG_WARN "Warn"
 #define LOG_ERROR "Error"
-#define LOG_INFO " Info"
+#define LOG_INFO "Info"
 
 #define DEBUG_MODE 1
 

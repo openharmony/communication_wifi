@@ -36,14 +36,15 @@
 #include "dhcp_config.h"
 #include "dhcp_ipv4.h"
 #include "dhcp_logger.h"
-#include "dhcp_message.h"
 #include "dhcp_option.h"
 #include "hash_table.h"
 
 #undef LOG_TAG
 #define LOG_TAG "DhcpServer"
 
+#ifndef DHCP_SEL_WAIT_TIMEOUTS
 #define DHCP_SEL_WAIT_TIMEOUTS 1000
+#endif
 #define OPT_MESSAGE_TYPE_LEGTH 1
 #define OPT_HEADER_LENGTH 2
 #define OPT_TIME_LENGTH 4
@@ -254,8 +255,8 @@ int ReceiveDhcpMessage(int sock, PDhcpMsgInfo msgInfo)
     fd_set recvFd;
     FD_ZERO(&recvFd);
     FD_SET(sock, &recvFd);
-    time_t tms = DHCP_SEL_WAIT_TIMEOUTS;
-    tmt.tv_sec = tms;
+    time_t seconds = DHCP_SEL_WAIT_TIMEOUTS;
+    tmt.tv_sec = seconds;
     tmt.tv_usec = 0;
     if (select(sock + 1, &recvFd, NULL, NULL, &tmt) < 0) {
         LOGE("select error, %d", errno);
@@ -270,7 +271,7 @@ int ReceiveDhcpMessage(int sock, PDhcpMsgInfo msgInfo)
     srcAddrIn->sin_addr.s_addr = INADDR_ANY;
     int rsize = recvfrom(sock, recvBuffer, RECV_BUFFER_SIZE, 0, (struct sockaddr *)srcAddrIn, (socklen_t *)&ssize);
     if (!rsize) {
-        LOGE("receive error, %d",  errno);
+        LOGE("receive error, %d", errno);
         return RET_FAILED;
     }
     if (rsize > (int)sizeof(DhcpMessage) || rsize < DHCP_MSG_HEADER_SIZE) {
@@ -280,7 +281,7 @@ int ReceiveDhcpMessage(int sock, PDhcpMsgInfo msgInfo)
     msgInfo->length = rsize;
     if (memcpy_s(&msgInfo->packet, sizeof(DhcpMessage), recvBuffer, rsize) != EOK) {
         return RET_FAILED;
-    };
+    }
     if (msgInfo->packet.op != BOOTREQUEST) {
         LOGW("dhcp message type error!");
         return RET_FAILED;
@@ -536,7 +537,7 @@ static int BeginLooper(PDhcpServerContext ctx)
             int saveRet = SaveBindingRecoders(&srvIns->addressPool, 0);
             if (saveRet != RET_SUCCESS && saveRet != RET_WAIT_SAVE) {
                 LOGW("failed to save lease recoders.");
-            };
+            }
         }
     }
     FreeOptionList(&from.options);
@@ -1667,17 +1668,17 @@ PDhcpServerContext InitializeServer(DhcpConfig *config)
     }
     if ((context->instance = calloc(1, sizeof(ServerContext))) == NULL) {
         LOGE("failed to calloc server instance.");
-        FreeServerContext(context);
+        FreeServerContext(&context);
         return NULL;
     }
     if (InitServerContext(config, context) != RET_SUCCESS) {
         LOGE("failed initialize dhcp server context.");
-        FreeServerContext(context);
+        FreeServerContext(&context);
         return NULL;
     }
     if (InitServerFixedOptions(config, context) != RET_SUCCESS) {
         LOGE("failed initialize dhcp server fixed options.");
-        FreeServerContext(context);
+        FreeServerContext(&context);
         return NULL;
     }
     LOGD("server id: %s", ParseStrIp(config->serverId));
@@ -1691,23 +1692,23 @@ PDhcpServerContext InitializeServer(DhcpConfig *config)
     return context;
 }
 
-int FreeServerContext(PDhcpServerContext ctx)
+int FreeServerContext(PDhcpServerContext *ctx)
 {
-    if (!ctx) {
+    if (ctx == NULL || *ctx == NULL) {
         LOGE("dhcp server context pointer is null.");
         return RET_FAILED;
     }
-    ServerContext *srvIns = GetServerInstance(ctx);
+    ServerContext *srvIns = GetServerInstance(*ctx);
     if (!srvIns) {
         LOGE("dhcp server instance pointer is null.");
         return RET_FAILED;
     }
     FreeAddressPool(&srvIns->addressPool);
-    if (ctx->instance != NULL) {
-        free(ctx->instance);
-        ctx->instance = NULL;
-        free(ctx);
-        ctx = NULL;
+    if ((*ctx)->instance != NULL) {
+        free((*ctx)->instance);
+        (*ctx)->instance = NULL;
+        free(*ctx);
+        *ctx = NULL;
     }
     return RET_SUCCESS;
 }

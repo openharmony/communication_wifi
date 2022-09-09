@@ -38,7 +38,6 @@ HWTEST_F(WifiManagerServiceTest, StaCloseResTest, TestSize.Level1)
     ASSERT_TRUE(cbk.OnStaOpenRes != nullptr);
     ASSERT_TRUE(cbk.OnStaCloseRes != nullptr);
     cbk.OnStaOpenRes(OperateResState::OPEN_WIFI_SUCCEED);
-    cbk.OnStaCloseRes(OperateResState::CLOSE_WIFI_FAILED);
     cbk.OnStaCloseRes(OperateResState::CLOSE_WIFI_CLOSING);
     cbk.OnStaCloseRes(OperateResState::CLOSE_WIFI_SUCCEED);
     WifiSettings::GetInstance().SetAirplaneModeState(1);

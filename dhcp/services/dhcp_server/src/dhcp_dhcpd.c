@@ -38,7 +38,6 @@ static DhcpConfig g_dhcpConfig;
 
 static PDhcpServerContext g_dhcpServer = 0;
 
-
 enum SignalEvent {
     EXIT = 0,
     RELOAD,
@@ -373,7 +372,10 @@ void FreeSeverResources(void)
 {
     FreeArguments();
     FreeLocalConfig();
-    FreeServerContext(g_dhcpServer);
+    if (FreeServerContext(&g_dhcpServer) != RET_SUCCESS) {
+        LOGE("Free server context failed!");
+        return;
+    }
 }
 
 static void BeforeExit(void)

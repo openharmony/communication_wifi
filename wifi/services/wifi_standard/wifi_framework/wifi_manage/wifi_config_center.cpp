@@ -378,7 +378,7 @@ void WifiConfigCenter::SetAppPackageName(const std::string &appPackageName)
     WifiSettings::GetInstance().SetAppPackageName(appPackageName);
 }
 
-const std::string& WifiConfigCenter::GetAppPackageName() const
+const std::string WifiConfigCenter::GetAppPackageName() const
 {
     return WifiSettings::GetInstance().GetAppPackageName();
 }

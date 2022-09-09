@@ -788,9 +788,9 @@ public:
     /**
      * @Description Get app package name.
      *
-     * @return const std::string& - app package name.
+     * @return const std::string - app package name.
      */
-    const std::string& GetAppPackageName() const;
+    const std::string GetAppPackageName() const;
 
     /**
      * @Description Set freeze mode state.
@@ -1031,16 +1031,16 @@ public:
     /**
      * @Description get trustlist policies.
      *
-     * @return const std::vector<TrustListPolicy>& - trustlist policies.
+     * @return const std::vector<TrustListPolicy> - trustlist policies.
      */
-    const std::vector<TrustListPolicy>& ReloadTrustListPolicies();
+    const std::vector<TrustListPolicy> ReloadTrustListPolicies();
 
     /**
      * @Description get moving freeze state trustlist.
      *
-     * @return const MovingFreezePolicy& - moving freeze policy.
+     * @return const MovingFreezePolicy - moving freeze policy.
      */
-    const MovingFreezePolicy& ReloadMovingFreezePolicy();
+    const MovingFreezePolicy ReloadMovingFreezePolicy();
 
     /**
      * @Description get bssid of connection timeout for last time.

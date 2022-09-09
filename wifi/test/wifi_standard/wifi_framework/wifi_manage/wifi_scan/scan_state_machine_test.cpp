@@ -655,7 +655,10 @@ public:
     {
         EXPECT_CALL(WifiStaHalInterface::GetInstance(), Scan(_)).WillRepeatedly(Return(WIFI_IDL_OPT_OK));
         InterScanConfig interScanConfig;
-        pScanStateMachine->waitingScans.emplace(0, interScanConfig);
+        {
+            std::unique_lock<std::shared_mutex> guard(ScanStateMachine::lock);
+            pScanStateMachine->waitingScans.emplace(0, interScanConfig);
+        }
         pScanStateMachine->StartNewCommonScan();
     }
 

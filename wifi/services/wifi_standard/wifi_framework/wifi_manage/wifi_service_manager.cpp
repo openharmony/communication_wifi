@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,16 +12,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include "wifi_service_manager.h"
 #include <dlfcn.h>
 #include "wifi_logger.h"
 #include "define.h"
 #include "wifi_settings.h"
 
-DEFINE_WIFILOG_LABEL("WifiServiceManager");
-
 namespace OHOS {
 namespace Wifi {
+DEFINE_WIFILOG_LABEL("WifiServiceManager");
 WifiServiceManager &WifiServiceManager::GetInstance()
 {
     static WifiServiceManager gWifiServiceManager;
@@ -86,7 +86,10 @@ int WifiServiceManager::CheckPreLoadService(void)
 
 int WifiServiceManager::LoadStaService(const std::string &dlname, bool bCreate)
 {
+    WIFI_LOGI("WifiServiceManager::LoadStaService");
+    std::unique_lock<std::mutex> lock(mStaMutex);
     if (mStaServiceHandle.handle != nullptr) {
+        WIFI_LOGE("WifiServiceManager::handle is not null: %{public}s", dlname.c_str());
         return 0;
     }
     mStaServiceHandle.handle = dlopen(dlname.c_str(), RTLD_LAZY);
@@ -110,7 +113,10 @@ int WifiServiceManager::LoadStaService(const std::string &dlname, bool bCreate)
 
 int WifiServiceManager::LoadScanService(const std::string &dlname, bool bCreate)
 {
+    WIFI_LOGI("WifiServiceManager::LoadScanService");
+    std::unique_lock<std::mutex> lock(mScanMutex);
     if (mScanServiceHandle.handle != nullptr) {
+        WIFI_LOGE("WifiServiceManager::handle is not null: %{public}s", dlname.c_str());
         return 0;
     }
     mScanServiceHandle.handle = dlopen(dlname.c_str(), RTLD_LAZY);
@@ -135,7 +141,10 @@ int WifiServiceManager::LoadScanService(const std::string &dlname, bool bCreate)
 #ifdef FEATURE_AP_SUPPORT
 int WifiServiceManager::LoadApService(const std::string &dlname, bool bCreate)
 {
+    WIFI_LOGI("WifiServiceManager::LoadApService");
+    std::unique_lock<std::mutex> lock(mApMutex);
     if (mApServiceHandle.handle != nullptr) {
+        WIFI_LOGE("WifiServiceManager::handle is not null: %{public}s", dlname.c_str());
         return 0;
     }
     mApServiceHandle.handle = dlopen(dlname.c_str(), RTLD_LAZY);
@@ -165,7 +174,10 @@ int WifiServiceManager::LoadApService(const std::string &dlname, bool bCreate)
 #ifdef FEATURE_P2P_SUPPORT
 int WifiServiceManager::LoadP2pService(const std::string &dlname, bool bCreate)
 {
+    WIFI_LOGI("WifiServiceManager::LoadP2pService");
+    std::unique_lock<std::mutex> lock(mP2pMutex);
     if (mP2pServiceHandle.handle != nullptr) {
+        WIFI_LOGE("WifiServiceManager::handle is not null: %{public}s", dlname.c_str());
         return 0;
     }
     mP2pServiceHandle.handle = dlopen(dlname.c_str(), RTLD_LAZY);
@@ -197,7 +209,6 @@ int WifiServiceManager::CheckAndEnforceService(const std::string &name, bool bCr
         return -1;
     }
     WIFI_LOGD("WifiServiceManager::CheckAndEnforceService get dllname: %{public}s", dlname.c_str());
-    std::unique_lock<std::mutex> lock(mMutex);
     if (name == WIFI_SERVICE_STA) {
         return LoadStaService(dlname, bCreate);
     }
@@ -219,28 +230,28 @@ int WifiServiceManager::CheckAndEnforceService(const std::string &name, bool bCr
 
 IStaService *WifiServiceManager::GetStaServiceInst()
 {
+    WIFI_LOGI("WifiServiceManager::GetStaServiceInst");
+    std::unique_lock<std::mutex> lock(mStaMutex);
     if (mStaServiceHandle.handle == nullptr) {
+        WIFI_LOGE("WifiServiceManager, Sta handle is null");
         return nullptr;
     }
     if (mStaServiceHandle.pService == nullptr) {
-        std::unique_lock<std::mutex> lock(mMutex);
-        if (mStaServiceHandle.pService == nullptr) {
-            mStaServiceHandle.pService = mStaServiceHandle.create();
-        }
+        mStaServiceHandle.pService = mStaServiceHandle.create();
     }
     return mStaServiceHandle.pService;
 }
 
 IScanService *WifiServiceManager::GetScanServiceInst()
 {
+    WIFI_LOGI("WifiServiceManager::GetScanServiceInst");
+    std::unique_lock<std::mutex> lock(mScanMutex);
     if (mScanServiceHandle.handle == nullptr) {
+        WIFI_LOGE("WifiServiceManager, Scan handle is null");
         return nullptr;
     }
     if (mScanServiceHandle.pService == nullptr) {
-        std::unique_lock<std::mutex> lock(mMutex);
-        if (mScanServiceHandle.pService == nullptr) {
-            mScanServiceHandle.pService = mScanServiceHandle.create();
-        }
+        mScanServiceHandle.pService = mScanServiceHandle.create();
     }
     return mScanServiceHandle.pService;
 }
@@ -248,6 +259,8 @@ IScanService *WifiServiceManager::GetScanServiceInst()
 #ifdef FEATURE_AP_SUPPORT
 IApService *WifiServiceManager::GetApServiceInst(int id)
 {
+    WIFI_LOGI("WifiServiceManager::GetApServiceInst");
+    std::unique_lock<std::mutex> lock(mApMutex);
     if (mApServiceHandle.handle == nullptr) {
         WIFI_LOGE("Get ap service instance handle is null.");
         return nullptr;
@@ -264,7 +277,6 @@ IApService *WifiServiceManager::GetApServiceInst(int id)
     }
 
     WIFI_LOGI("[Get] create a new ap service instance: %{public}d", id);
-    std::unique_lock<std::mutex> lock(mMutex);
     IApService *service = mApServiceHandle.create(id);
     mApServiceHandle.pService[id] = service;
     return service;
@@ -274,14 +286,14 @@ IApService *WifiServiceManager::GetApServiceInst(int id)
 #ifdef FEATURE_P2P_SUPPORT
 IP2pService *WifiServiceManager::GetP2pServiceInst()
 {
+    WIFI_LOGI("WifiServiceManager::GetP2pServiceInst");
+    std::unique_lock<std::mutex> lock(mP2pMutex);
     if (mP2pServiceHandle.handle == nullptr) {
+        WIFI_LOGE("WifiServiceManager, P2p handle is null");
         return nullptr;
     }
     if (mP2pServiceHandle.pService == nullptr) {
-        std::unique_lock<std::mutex> lock(mMutex);
-        if (mP2pServiceHandle.pService == nullptr) {
-            mP2pServiceHandle.pService = mP2pServiceHandle.create();
-        }
+        mP2pServiceHandle.pService = mP2pServiceHandle.create();
     }
     return mP2pServiceHandle.pService;
 }
@@ -289,7 +301,10 @@ IP2pService *WifiServiceManager::GetP2pServiceInst()
 
 int WifiServiceManager::UnloadStaService(bool bPreLoad)
 {
+    WIFI_LOGI("WifiServiceManager::UnloadStaService");
+    std::unique_lock<std::mutex> lock(mStaMutex);
     if (mStaServiceHandle.handle == nullptr) {
+        WIFI_LOGE("WifiServiceManager::UnloadStaService handle is null");
         return 0;
     }
     if (mStaServiceHandle.pService != nullptr) {
@@ -305,7 +320,10 @@ int WifiServiceManager::UnloadStaService(bool bPreLoad)
 
 int WifiServiceManager::UnloadScanService(bool bPreLoad)
 {
+    WIFI_LOGI("WifiServiceManager::UnloadScanService");
+    std::unique_lock<std::mutex> lock(mScanMutex);
     if (mScanServiceHandle.handle == nullptr) {
+        WIFI_LOGE("WifiServiceManager::UnloadScanService handle is null");
         return 0;
     }
     if (mScanServiceHandle.pService != nullptr) {
@@ -322,8 +340,13 @@ int WifiServiceManager::UnloadScanService(bool bPreLoad)
 #ifdef FEATURE_AP_SUPPORT
 int WifiServiceManager::UnloadApService(bool bPreLoad, int id)
 {
-    if (mApServiceHandle.handle == nullptr) {
-        return 0;
+    WIFI_LOGI("WifiServiceManager::UnloadApService id=%{public}d, max_id=%{public}d", id, AP_INSTANCE_MAX_NUM);
+    {
+        std::unique_lock<std::mutex> lock(mApMutex);
+        if (mApServiceHandle.handle == nullptr) {
+            WIFI_LOGE("WifiServiceManager::UnloadApService handle is null");
+            return 0;
+        }
     }
 
     /* Unload all ap service */
@@ -332,6 +355,7 @@ int WifiServiceManager::UnloadApService(bool bPreLoad, int id)
             UnloadApService(bPreLoad, i);
         }
     } else {
+        std::unique_lock<std::mutex> lock(mApMutex);
         auto iter = mApServiceHandle.pService.find(id);
         if (iter != mApServiceHandle.pService.end()) {
             if (iter->second != nullptr) {
@@ -340,10 +364,10 @@ int WifiServiceManager::UnloadApService(bool bPreLoad, int id)
             }
             mApServiceHandle.pService.erase(id);
         }
-    }
-    if (!bPreLoad && mApServiceHandle.pService.empty()) {
-        dlclose(mApServiceHandle.handle);
-        mApServiceHandle.Clear();
+        if (!bPreLoad && mApServiceHandle.pService.empty()) {
+            dlclose(mApServiceHandle.handle);
+            mApServiceHandle.Clear();
+        }
     }
     return 0;
 }
@@ -352,7 +376,10 @@ int WifiServiceManager::UnloadApService(bool bPreLoad, int id)
 #ifdef FEATURE_P2P_SUPPORT
 int WifiServiceManager::UnloadP2pService(bool bPreLoad)
 {
+    WIFI_LOGI("WifiServiceManager::UnloadP2pService");
+    std::unique_lock<std::mutex> lock(mP2pMutex);
     if (mP2pServiceHandle.handle == nullptr) {
+        WIFI_LOGE("WifiServiceManager::UnloadP2pService handle is null");
         return 0;
     }
     if (mP2pServiceHandle.pService != nullptr) {
@@ -371,7 +398,6 @@ int WifiServiceManager::UnloadService(const std::string &name, int id)
 {
     bool bPreLoad = WifiSettings::GetInstance().IsModulePreLoad(name);
     WIFI_LOGI("WifiServiceManager::UnloadService name: %{public}s", name.c_str());
-    std::unique_lock<std::mutex> lock(mMutex);
     if (name == WIFI_SERVICE_STA) {
         return UnloadStaService(bPreLoad);
     }

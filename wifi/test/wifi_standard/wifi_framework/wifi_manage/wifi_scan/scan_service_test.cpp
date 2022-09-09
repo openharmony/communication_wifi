@@ -25,7 +25,6 @@ using ::testing::AtLeast;
 using ::testing::DoAll;
 using ::testing::Eq;
 using ::testing::Return;
-using ::testing::ReturnRef;
 using ::testing::SetArgReferee;
 using ::testing::StrEq;
 using ::testing::TypedEq;
@@ -67,7 +66,7 @@ public:
         EXPECT_CALL(WifiSettings::GetInstance(), GetWhetherToAllowNetworkSwitchover()).Times(AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_)).Times(AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), ReloadMovingFreezePolicy())
-            .WillRepeatedly(ReturnRef(defaultValue));
+            .WillRepeatedly(Return(defaultValue));
         EXPECT_EQ(pScanService->InitScanService(WifiManager::GetInstance().GetScanCallback()), true);
     }
 
@@ -84,7 +83,7 @@ public:
         EXPECT_CALL(WifiSettings::GetInstance(), GetWhetherToAllowNetworkSwitchover()).Times(AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_)).Times(AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), ReloadTrustListPolicies())
-            .WillRepeatedly(ReturnRef(refVecTrustList));
+            .WillRepeatedly(Return(refVecTrustList));
         EXPECT_EQ(pScanService->InitScanService(WifiManager::GetInstance().GetScanCallback()), true);
     }
 

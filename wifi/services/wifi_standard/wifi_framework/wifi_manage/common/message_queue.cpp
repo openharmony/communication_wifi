@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,10 +12,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include "message_queue.h"
 #include <sys/time.h>
-#include "wifi_log.h"
+#include <thread>
 #include "wifi_errcode.h"
+#include "wifi_log.h"
 
 #undef LOG_TAG
 #define LOG_TAG "OHWIFI_MESSAGE_QUEUE"
@@ -37,20 +39,19 @@ MessageQueue::~MessageQueue()
         delete current;
         current = next;
     }
-
     return;
 }
 
 bool MessageQueue::AddMessageToQueue(InternalMessage *message, int64_t handleTime)
 {
     if (message == nullptr) {
-        LOGE("message is null.\n");
+        LOGE("message is null.");
         return false;
     }
 
     if (mNeedQuit) {
         MessageManage::GetInstance().ReclaimMsg(message);
-        LOGE("Already quit the message queue.\n");
+        LOGE("Already quit the message queue.");
         return false;
     }
 
@@ -87,18 +88,15 @@ bool MessageQueue::AddMessageToQueue(InternalMessage *message, int64_t handleTim
 
     /* Wake up the process. */
     if (needWake) {
-        std::unique_lock<std::mutex> lck(mMtxBlock);
         mCvQueue.notify_all();
         mIsBlocked = false;
     }
-
     return true;
 }
 
 bool MessageQueue::DeleteMessageFromQueue(int messageName)
 {
     std::unique_lock<std::mutex> lck(mMtxQueue);
-
     InternalMessage *pTop = pMessageQueue;
     if (pTop == nullptr) {
         return true;
@@ -120,7 +118,6 @@ bool MessageQueue::DeleteMessageFromQueue(int messageName)
         pMessageQueue = pTop->GetNextMsg();
         MessageManage::GetInstance().ReclaimMsg(pTop);
     }
-
     return true;
 }
 
@@ -133,11 +130,10 @@ InternalMessage *MessageQueue::GetNextMessage()
         /* Obtains the current time, accurate to milliseconds. */
         struct timeval curTime = {0, 0};
         if (gettimeofday(&curTime, nullptr) != 0) {
-            LOGE("gettimeofday failed.\n");
+            LOGE("gettimeofday failed.");
             return nullptr;
         }
         int64_t nowTime = static_cast<int64_t>(curTime.tv_sec) * TIME_USEC_1000 + curTime.tv_usec / TIME_USEC_1000;
-
         {
             std::unique_lock<std::mutex> lck(mMtxQueue);
             InternalMessage *curMsg = pMessageQueue;
@@ -152,6 +148,7 @@ InternalMessage *MessageQueue::GetNextMessage()
                     mIsBlocked = false;
                     pMessageQueue = curMsg->GetNextMsg();
                     curMsg->SetNextMsg(nullptr);
+                    LOGD("Return first message.");
                     return curMsg;
                 }
             } else {
@@ -163,28 +160,26 @@ InternalMessage *MessageQueue::GetNextMessage()
         std::unique_lock<std::mutex> lck(mMtxBlock);
         if (mIsBlocked && (!mNeedQuit)) {
             if (mCvQueue.wait_for(lck, std::chrono::milliseconds(nextBlockTime)) == std::cv_status::timeout) {
-                LOGD("mCvQueue timeout.\n");
+                LOGD("mCvQueue timeout.");
             } else {
-                LOGD("Wake up.\n");
+                LOGD("Wake up.");
             }
         }
         mIsBlocked = false;
     }
-
-    LOGE("Already quit the message queue.\n");
+    LOGE("Already quit the message queue.");
     return nullptr;
 }
 
 void MessageQueue::StopQueueLoop()
 {
-    mNeedQuit = true;
-    if (mIsBlocked) {
-        std::unique_lock<std::mutex> lck(mMtxBlock);
+    LOGI("Start stop queue loop.");
+    while (mIsBlocked) {
+        mNeedQuit = true;
         mCvQueue.notify_all();
-        mIsBlocked = false;
+        std::this_thread::sleep_for(std::chrono::milliseconds(1)); // sleep 1 ms
     }
-
-    return;
+    LOGI("Queue loop has stopped.");
 }
 }  // namespace Wifi
 }  // namespace OHOS

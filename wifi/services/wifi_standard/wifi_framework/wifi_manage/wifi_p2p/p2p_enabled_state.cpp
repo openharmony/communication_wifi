@@ -328,13 +328,7 @@ bool P2pEnabledState::P2pSettingsInitialization()
         result = false;
     }
 
-    std::map<int, WifiP2pGroupInfo> wpaGroups;
-    retCode = WifiP2PHalInterface::GetInstance().ListNetworks(wpaGroups);
-    if (retCode == WifiErrorNo::WIFI_IDL_OPT_FAILED) {
-        WIFI_LOGE("Failed to get listNetworks.");
-        result = false;
-    }
-    groupManager.UpdateGroupsNetwork(wpaGroups);
+    p2pStateMachine.UpdateGroupManager();
     p2pStateMachine.UpdatePersistentGroups();
     return result;
 }

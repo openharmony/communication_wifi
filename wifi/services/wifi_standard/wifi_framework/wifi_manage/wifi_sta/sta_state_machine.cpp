@@ -753,6 +753,8 @@ void StaStateMachine::ConvertFreqToChannel()
         LOGE("GetDeviceConfig failed!");
         return;
     }
+    int tempBand = config.band;
+    int tempChannel = config.channel;
     if (linkedInfo.frequency >= FREQ_2G_MIN && linkedInfo.frequency <= FREQ_2G_MAX) {
         config.band = linkedInfo.band = static_cast<int>(BandType::BAND_2GHZ);
         config.channel = (linkedInfo.frequency - FREQ_2G_MIN) / CENTER_FREQ_DIFF + CHANNEL_2G_MIN;
@@ -762,9 +764,10 @@ void StaStateMachine::ConvertFreqToChannel()
         config.band = linkedInfo.band = static_cast<int>(BandType::BAND_5GHZ);
         config.channel = (linkedInfo.frequency - FREQ_5G_MIN) / CENTER_FREQ_DIFF + CHANNEL_5G_MIN;
     }
-
-    WifiSettings::GetInstance().AddDeviceConfig(config);
-    WifiSettings::GetInstance().SyncDeviceConfig();
+    if (tempBand != config.band || tempChannel != config.channel) {
+        WifiSettings::GetInstance().AddDeviceConfig(config);
+        WifiSettings::GetInstance().SyncDeviceConfig();
+    }
     return;
 }
 

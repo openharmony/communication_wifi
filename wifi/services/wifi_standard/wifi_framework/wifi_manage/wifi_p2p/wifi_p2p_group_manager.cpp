@@ -49,6 +49,19 @@ bool WifiP2pGroupManager::AddGroup(const WifiP2pGroupInfo &group)
     groupsInfo.push_back(group);
     return true;
 }
+
+bool WifiP2pGroupManager::AddOrUpdateGroup(const WifiP2pGroupInfo &group)
+{
+    std::unique_lock<std::mutex> lock(groupMutex);
+    for (auto it = groupsInfo.begin(); it != groupsInfo.end(); ++it) {
+        if (*it == group) {
+            groupsInfo.erase(it);
+            break;
+        }
+    }
+    groupsInfo.push_back(group);
+    return true;
+}
 bool WifiP2pGroupManager::RemoveGroup(const WifiP2pGroupInfo &group)
 {
     std::unique_lock<std::mutex> lock(groupMutex);
@@ -242,5 +255,5 @@ void WifiP2pGroupManager::UpdateGroupsNetwork(std::map<int, WifiP2pGroupInfo> wp
         }
     }
 }
-}  // namespace Wifi
-}  // namespace OHOS
+} // namespace Wifi
+} // namespace OHOS

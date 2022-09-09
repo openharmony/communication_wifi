@@ -23,7 +23,6 @@
 #include <mutex>
 #include <algorithm>
 #include "wifi_config_file_impl.h"
-
 constexpr int RANDOM_STR_LEN = 6;
 constexpr int MSEC = 1000;
 constexpr int FOREGROUND_SCAN_CONTROL_TIMES = 4;
@@ -1160,6 +1159,6 @@ private:
     WifiConfigFileImpl<WifiStoreRandomMac> mSavedWifiStoreRandomMac;
     bool explicitGroup;
 };
-}  // namespace Wifi
-}  // namespace OHOS
+} // namespace Wifi
+} // namespace OHOS
 #endif

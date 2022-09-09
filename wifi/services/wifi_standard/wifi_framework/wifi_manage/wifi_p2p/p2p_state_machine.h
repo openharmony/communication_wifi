@@ -159,6 +159,10 @@ private:
      */
     virtual void UpdateOwnDevice(P2pDeviceStatus status);
     /**
+     * @Description - Update groupManager from wpa_supplicant.
+     */
+    virtual void UpdateGroupManager() const;
+    /**
      * @Description - Update persistent groups and broadcast persistent groups status update event.
      */
     virtual void UpdatePersistentGroups() const;
@@ -415,7 +419,7 @@ private:
     static bool m_isNeedDhcp;
     std::string p2pDevIface;
 };
-}  // namespace Wifi
-}  // namespace OHOS
+} // namespace Wifi
+} // namespace OHOS
 
 #endif  // OHOS_P2P_STATE_MACHINE_H

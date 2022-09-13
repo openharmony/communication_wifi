@@ -62,11 +62,15 @@
             ]
         },
         "build": {
-            "sub_component": [
-                "//foundation/communication/wifi/dhcp/services/mgr_service:dhcp_manager_service",
-                "//foundation/communication/wifi/dhcp/services/dhcp_client:dhcp_client_service",
-                "//foundation/communication/wifi/dhcp/services/dhcp_server:dhcp_server"
-            ],
+            "group_type": {
+                "base_group": [
+                    "//foundation/communication/wifi/dhcp/services/mgr_service:dhcp_manager_service",
+                    "//foundation/communication/wifi/dhcp/services/dhcp_client:dhcp_client_service",
+                    "//foundation/communication/wifi/dhcp/services/dhcp_server:dhcp_server"
+                ],
+                "fwk_group": [],
+                "service_group": []
+            },
             "inner_kits": [
             ],
             "test": [

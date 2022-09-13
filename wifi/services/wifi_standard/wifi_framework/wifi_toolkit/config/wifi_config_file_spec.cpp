@@ -646,6 +646,7 @@ template<>
 std::string OutTClassString<HotspotConfig>(HotspotConfig &item, const std::string &fileName)
 {
     std::ostringstream ss;
+    ss << "    " <<"<HotspotConfig>" << std::endl;
     ss << "    " <<"ssid=" << ValidateString(item.GetSsid()) << std::endl;
     ss << "    " <<"HexSsid=" << ConvertArrayToHex((uint8_t*)&item.GetSsid()[0], item.GetSsid().length()) << std::endl;
 #ifdef FEATURE_ENCRYPTION_SUPPORT
@@ -665,6 +666,7 @@ std::string OutTClassString<HotspotConfig>(HotspotConfig &item, const std::strin
     ss << "    " <<"band=" << static_cast<int>(item.GetBand()) << std::endl;
     ss << "    " <<"channel=" << item.GetChannel() << std::endl;
     ss << "    " <<"maxConn=" << item.GetMaxConn() << std::endl;
+    ss << "    " <<"</HotspotConfig>" << std::endl;
     return ss.str();
 }
 
@@ -711,11 +713,13 @@ template<>
 std::string OutTClassString<P2pVendorConfig>(P2pVendorConfig &item, const std::string &fileName)
 {
     std::ostringstream ss;
+    ss << "    " <<"<P2pVendorConfig>" << std::endl;
     ss << "    " <<"randomMacSupport=" << item.GetRandomMacSupport() << std::endl;
     ss << "    " <<"autoListen=" << item.GetIsAutoListen() << std::endl;
     ss << "    " <<"deviceName=" << item.GetDeviceName() << std::endl;
     ss << "    " <<"primaryDeviceType=" << item.GetPrimaryDeviceType() << std::endl;
     ss << "    " <<"secondaryDeviceType=" << item.GetSecondaryDeviceType() << std::endl;
+    ss << "    " <<"</P2pVendorConfig>" << std::endl;
     return ss.str();
 }
 
@@ -756,9 +760,11 @@ template<>
 std::string OutTClassString<StationInfo>(StationInfo &item, const std::string &fileName)
 {
     std::ostringstream ss;
+    ss << "    " <<"<StationInfo>" << std::endl;
     ss << "    " <<"deviceName=" << item.deviceName << std::endl;
     ss << "    " <<"bssid=" << item.bssid << std::endl;
     ss << "    " <<"ipAddr=" << item.ipAddr << std::endl;
+    ss << "    " <<"</StationInfo>" << std::endl;
     return ss.str();
 }
 
@@ -914,6 +920,7 @@ template<>
 std::string OutTClassString<WifiConfig>(WifiConfig &item, const std::string &fileName)
 {
     std::ostringstream ss;
+    ss << "    " <<"<WifiConfig>" << std::endl;
     ss << "    " <<"scanAlwaysSwitch=" << item.scanAlwaysSwitch << std::endl; /* bool false->0 true->1 */
     ss << "    " <<"staAirplaneMode=" << item.staAirplaneMode << std::endl;
     ss << "    " <<"canOpenStaWhenAirplane=" << item.canOpenStaWhenAirplane << std::endl;
@@ -948,6 +955,7 @@ std::string OutTClassString<WifiConfig>(WifiConfig &item, const std::string &fil
     ss << "    " <<"fourthRssiLevel5G=" << item.fourthRssiLevel5G << std::endl;
     ss << "    " <<"strDnsBak=" << item.strDnsBak << std::endl;
     ss << "    " <<"isLoadStabak=" << item.isLoadStabak << std::endl;
+    ss << "    " <<"</WifiConfig>" << std::endl;
     return ss.str();
 }
 
@@ -1100,7 +1108,7 @@ std::string GetTClassName<WifiP2pGroupInfo>()
     return "WifiP2pGroupInfo";
 }
 
-static std::string OutWifiP2pDevicClassString(const WifiP2pDevice &item, std::string prefix = "")
+static std::string OutWifiP2pDeviceClassString(const WifiP2pDevice &item, std::string prefix = "")
 {
     std::ostringstream ss;
 
@@ -1119,6 +1127,7 @@ template<>
 std::string OutTClassString<WifiP2pGroupInfo>(WifiP2pGroupInfo &item, const std::string &fileName)
 {
     std::ostringstream ss;
+    ss << "    " <<"<WifiP2pGroupInfo>" << std::endl;
     ss << "    " <<"groupName=" << ValidateString(item.GetGroupName()) << std::endl;
     ss << "    " <<"groupNameHex="
        << ConvertArrayToHex((uint8_t*)&item.GetGroupName()[0], item.GetGroupName().length()) << std::endl;
@@ -1142,7 +1151,7 @@ std::string OutTClassString<WifiP2pGroupInfo>(WifiP2pGroupInfo &item, const std:
     ss << "    " <<"isPersistent=" << item.IsPersistent() << std::endl;
     ss << "    " <<"groupStatus=" << static_cast<int>(item.GetP2pGroupStatus()) << std::endl;
     ss << "    " <<"goIpAddress=" << item.GetGoIpAddress() << std::endl;
-    ss << OutWifiP2pDevicClassString(item.GetOwner(), "ownerDev.");
+    ss << OutWifiP2pDeviceClassString(item.GetOwner(), "ownerDev.");
     int size = item.GetClientDevices().size();
     for (int i = 0; i < size; i++) {
         std::string prefix = "vecDev_" + std::to_string(i) + ".";
@@ -1150,6 +1159,7 @@ std::string OutTClassString<WifiP2pGroupInfo>(WifiP2pGroupInfo &item, const std:
         const WifiP2pDevice &tmp = item.GetClientDevices().at(i);
         ss << OutWifiP2pDevicClassString(tmp, prefix);
     }
+    ss << "    " <<"</WifiP2pGroupInfo>" << std::endl;
     return ss.str();
 }
 
@@ -1189,9 +1199,11 @@ std::string GetTClassName<TrustListPolicy>()
 template <> std::string OutTClassString<TrustListPolicy>(TrustListPolicy &item, const std::string &fileName)
 {
     std::ostringstream ss;
+    ss << "    " <<"<TrustListPolicy>" << std::endl;
     ss << "    " <<"sceneId=" << item.sceneId << std::endl;
     ss << "    " <<"sceneName=" << item.sceneName << std::endl;
     ss << "    " <<"trustList=" << item.trustList << std::endl;
+    ss << "    " <<"</TrustListPolicy>" << std::endl;
     return ss.str();
 }
 
@@ -1223,7 +1235,9 @@ template <> std::string GetTClassName<MovingFreezePolicy>()
 template <> std::string OutTClassString<MovingFreezePolicy>(MovingFreezePolicy &item, const std::string &fileName)
 {
     std::ostringstream ss;
+    ss << "    " <<"<MovingFreezePolicy>" << std::endl;
     ss << "    " <<"trustList=" << item.trustList << std::endl;
+    ss << "    " <<"<MovingFreezePolicy>" << std::endl;
     return ss.str();
 }
 
@@ -1273,11 +1287,13 @@ template <> std::string GetTClassName<WifiStoreRandomMac>()
 template <> std::string OutTClassString<WifiStoreRandomMac>(WifiStoreRandomMac &item, const std::string &fileName)
 {
     std::ostringstream ss;
+    ss << "    " <<"<WifiStoreRandomMac>" << std::endl;
     ss << "    " <<"ssid=" << ValidateString(item.ssid) << std::endl;
     ss << "    " <<"HexSsid=" << ConvertArrayToHex((uint8_t*)&item.ssid[0], item.ssid.length()) << std::endl;
     ss << "    " <<"keyMgmt=" << item.keyMgmt << std::endl;
     ss << "    " <<"peerBssid=" << item.peerBssid << std::endl;
     ss << "    " <<"randomMac=" << item.randomMac << std::endl;
+    ss << "    " <<"<WifiStoreRandomMac>" << std::endl;
     return ss.str();
 }
 } // namespace Wifi

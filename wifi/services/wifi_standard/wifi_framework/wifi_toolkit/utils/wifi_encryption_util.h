@@ -29,19 +29,6 @@ constexpr uint32_t NONCE_SIZE = 16;
 
 const uint8_t AAD[AAD_SIZE] = {0};
 
-struct HksParam g_genParam[] = {
-    { .tag = HKS_TAG_KEY_STORAGE_FLAG, .uint32Param = HKS_STORAGE_PERSISTENT },
-    { .tag = HKS_TAG_ALGORITHM, .uint32Param = HKS_ALG_AES },
-    { .tag = HKS_TAG_KEY_SIZE, .uint32Param = HKS_AES_KEY_SIZE_256 },
-    { .tag = HKS_TAG_PURPOSE, .uint32Param = HKS_KEY_PURPOSE_ENCRYPT | HKS_KEY_PURPOSE_DECRYPT },
-    { .tag = HKS_TAG_DIGEST, .uint32Param = HKS_DIGEST_NONE },
-    { .tag = HKS_TAG_PADDING, .uint32Param = HKS_PADDING_NONE },
-    { .tag = HKS_TAG_IS_KEY_ALIAS, .boolParam = true },
-    { .tag = HKS_TAG_KEY_GENERATE_TYPE, .uint32Param = HKS_KEY_GENERATE_TYPE_DEFAULT },
-    { .tag = HKS_TAG_BLOCK_MODE, .uint32Param = HKS_MODE_GCM },
-    { .tag = HKS_TAG_ASSOCIATED_DATA, .blob = { .size = AAD_SIZE, .data = (uint8_t *)AAD } },
-};
-
 class EncryptedData final {
 public:
     std::string encryptedPassword = "";

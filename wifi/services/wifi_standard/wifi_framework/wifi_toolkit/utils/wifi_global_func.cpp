@@ -288,7 +288,7 @@ int HexStringToVec(const std::string &str, std::vector<char> &vec)
     return 0;
 }
 
-int HexStringToVec(const std::string &str, uint8_t plainText[], int plainLength, int &resultLength)
+int HexStringToVec(const std::string &str, uint8_t plainText[], uint32_t plainLength, uint32_t &resultLength)
 {
     if (plainLength < 0) {
         return false;
@@ -297,13 +297,13 @@ int HexStringToVec(const std::string &str, uint8_t plainText[], int plainLength,
     std::vector<char> result;
     result.clear();
     int ret = HexStringToVec(str, result);
-    if (ret == -1 || static_cast<int>(result.size()) > plainLength) {
+    if (ret == -1 || result.size() > plainLength) {
         return -1;
     }
     for (std::vector<char>::size_type i = 0; i < result.size(); ++i) {
         plainText[i] = result[i];
     }
-    resultLength = static_cast<int>(result.size());
+    resultLength = result.size();
     return 0;
 }
 
@@ -320,11 +320,11 @@ static char ConvertArrayChar(uint8_t ch)
     return '0';
 }
 
-std::string ConvertArrayToHex(const uint8_t plainText[], int size)
+std::string ConvertArrayToHex(const uint8_t plainText[], uint32_t size)
 {
     constexpr int bitWidth = 4;
     std::stringstream ss;
-    for (int i = 0; i < size; i++) {
+    for (uint32_t i = 0; i < size; i++) {
         ss << ConvertArrayChar(plainText[i] >> bitWidth) << ConvertArrayChar (plainText[i] & 0xf);
     }
     return ss.str();

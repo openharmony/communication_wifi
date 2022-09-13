@@ -234,7 +234,7 @@ int HexStringToVec(const std::string &str, std::vector<char> &vec);
  * @param resultLength - output Length of uint8_t* result, eg: 16
  * @return int - convert result, 0 success, -1 failed
  */
-int HexStringToVec(const std::string &str, uint8_t plainText[], int plainLength, int &resultLength);
+int HexStringToVec(const std::string &str, uint8_t plainText[], uint32_t plainLength, uint32_t &resultLength);
 
 /**
  * @Description Convert a uint8_t* to Hex string.
@@ -243,7 +243,7 @@ int HexStringToVec(const std::string &str, uint8_t plainText[], int plainLength,
  * @param size - input uint8_t* size, eg: 16
  * @return string - convert Hex string, eg: 010203...
  */
-std::string ConvertArrayToHex(const uint8_t plainText[], int size);
+std::string ConvertArrayToHex(const uint8_t plainText[], uint32_t size);
 
 /**
  * @Description Convert a string to validate string for write.

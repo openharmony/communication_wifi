@@ -202,7 +202,7 @@ int WifiConfigFileImpl<T>::LoadConfig()
     mValues.clear();
     T item;
     std::string line;
-    int ConfigError;
+    int configError;
     while (std::getline(fs, line)) {
         TrimString(line);
         if (line.empty()) {
@@ -210,8 +210,8 @@ int WifiConfigFileImpl<T>::LoadConfig()
         }
         if (line[0] == '[' && line[line.length() - 1] == '{') {
             ClearTClass(item); /* template function, needing specialization */
-            ConfigError = ReadNetwork(item, fs, line);
-            if (ConfigError > 0) {
+            configError = ReadNetwork(item, fs, line);
+            if (configError > 0) {
                 LOGE("Parse network failed.");
                 continue;
             }

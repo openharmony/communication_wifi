@@ -38,8 +38,8 @@ local_base_sources = [
   "net_helper/network_interface.cpp",
   "net_helper/raw_socket.cpp",
   "utils/wifi_common_event_helper.cpp",
-  "utils/wifi_global_func.cpp",
   "utils/wifi_encryption_util.cpp",
+  "utils/wifi_global_func.cpp",
 ]
 
 local_base_include_dirs = [
@@ -97,7 +97,7 @@ if (defined(ohos_lite)) {
 
     defines = [ "AP_INSTANCE_MAX_NUM=$wifi_feature_with_ap_num" ]
     if (wifi_feature_with_encryption) {
-        defines += [ "FEATURE_ENCRYPTION_SUPPORT" ]
+      defines += [ "FEATURE_ENCRYPTION_SUPPORT" ]
     }
 
     external_deps = [
@@ -105,7 +105,7 @@ if (defined(ohos_lite)) {
       "c_utils:utils",
       "common_event_service:cesfwk_innerkits",
       "eventhandler:libeventhandler",
-      "huks:libhukssdk"
+      "huks:libhukssdk",
     ]
 
     cflags_cc = [

@@ -843,14 +843,9 @@ static int SetWifiConfigValueFirst(WifiConfig &item, const std::string &key, con
     return 0;
 }
 
-template<>
-int SetTClassKeyValue<WifiConfig>(WifiConfig &item, const std::string &key, const std::string &value,
+static int SetWifiConfigValueSecond(WifiConfig &item, const std::string &key, const std::string &value,
     const std::string &fileName)
 {
-    int errorKeyValue = 0;
-    if (SetWifiConfigValueFirst(item, key, value, fileName) == 0) {
-        return errorKeyValue;
-    }
     if (key == "preLoadSta") {
         item.preLoadSta = (std::stoi(value) != 0); /* 0 -> false 1 -> true */
     } else if (key == "preLoadScan") {
@@ -888,9 +883,23 @@ int SetTClassKeyValue<WifiConfig>(WifiConfig &item, const std::string &key, cons
     } else if (key == "isLoadStabak") {
         item.isLoadStabak = (std::stoi(value) != 0);
     } else {
-        LOGE("Invalid config key value");
-        errorKeyValue++;
+        return -1;
     }
+    return 0;
+}
+template<>
+int SetTClassKeyValue<WifiConfig>(WifiConfig &item, const std::string &key, const std::string &value,
+    const std::string &fileName)
+{
+    int errorKeyValue = 0;
+    if (SetWifiConfigValueFirst(item, key, value, fileName) == 0) {
+        return errorKeyValue;
+    }
+    if (SetWifiConfigValueSecond(item, key, value, fileName) == 0)) {
+        return errorKeyValue;
+    }
+    LOGE("Invalid config key value");
+    errorKeyValue++;
     return errorKeyValue;
 }
 
@@ -1009,6 +1018,31 @@ static int SetWifiP2pGroupInfoEncrypt(WifiP2pGroupInfo &item, const std::string 
 }
 #endif
 
+static int SetWifiP2pGroupInfoDev(WifiP2pGroupInfo &item, const std::string &key, const std::string &value,
+    const std::string &fileName)
+{
+    if (key.compare(0, strlen("ownerDev."), "ownerDev.") == 0) {
+        WifiP2pDevice owner = item.GetOwner();
+        SetWifiP2pDevicClassKeyValue(owner, key.substr(strlen("ownerDev.")), value, fileName);
+        item.SetOwner(owner);
+    } else if (key.compare(0, strlen("vecDev_"), "vecDev_") == 0) {
+        std::string::size_type pos = key.find(".");
+        if (pos == std::string::npos) {
+            WifiP2pDevice device;
+            item.AddClientDevice(device);
+        } else {
+            unsigned long index = std::stoi(key.substr(strlen("vecDev_"), pos));
+            if (index < item.GetClientDevices().size()) {
+                std::vector<WifiP2pDevice> clients = item.GetClientDevices();
+                SetWifiP2pDevicClassKeyValue(clients[index], key.substr(pos + 1), value, fileName);
+                item.SetClientDevices(clients);
+            }
+        }
+    } else {
+        return -1;
+    }
+    return 0;
+}
 template<>
 int SetTClassKeyValue<WifiP2pGroupInfo>(WifiP2pGroupInfo &item, const std::string &key, const std::string &value,
     const std::string &fileName)
@@ -1049,23 +1083,8 @@ int SetTClassKeyValue<WifiP2pGroupInfo>(WifiP2pGroupInfo &item, const std::strin
         item.SetP2pGroupStatus(static_cast<P2pGroupStatus>(std::stoi(value)));
     } else if (key == "goIpAddress") {
         item.SetGoIpAddress(value);
-    } else if (key.compare(0, strlen("ownerDev."), "ownerDev.") == 0) {
-        WifiP2pDevice owner = item.GetOwner();
-        SetWifiP2pDevicClassKeyValue(owner, key.substr(strlen("ownerDev.")), value, fileName);
-        item.SetOwner(owner);
-    } else if (key.compare(0, strlen("vecDev_"), "vecDev_") == 0) {
-        std::string::size_type pos = key.find(".");
-        if (pos == std::string::npos) {
-            WifiP2pDevice device;
-            item.AddClientDevice(device);
-        } else {
-            unsigned long index = std::stoi(key.substr(strlen("vecDev_"), pos));
-            if (index < item.GetClientDevices().size()) {
-                std::vector<WifiP2pDevice> clients = item.GetClientDevices();
-                SetWifiP2pDevicClassKeyValue(clients[index], key.substr(pos + 1), value, fileName);
-                item.SetClientDevices(clients);
-            }
-        }
+    } else if (SetWifiP2pGroupInfoDev(item, key, value, fileName) == 0) {
+        return errorKeyValue;
     } else {
         LOGE("Invalid config key value");
         errorKeyValue++;
@@ -1099,7 +1118,7 @@ std::string OutTClassString<WifiP2pGroupInfo>(WifiP2pGroupInfo &item, const std:
 {
     std::ostringstream ss;
     ss << "    " <<"groupName=" << ValidateString(item.GetGroupName()) << std::endl;
-    ss << "    " <<"groupNameHex=" 
+    ss << "    " <<"groupNameHex="
        << ConvertArrayToHex((uint8_t*)&item.GetGroupName()[0], item.GetGroupName().length()) << std::endl;
     ss << "    " <<"networkId=" << item.GetNetworkId() << std::endl;
     ss << "    " <<"isGroupOwner=" << item.IsGroupOwner() << std::endl;

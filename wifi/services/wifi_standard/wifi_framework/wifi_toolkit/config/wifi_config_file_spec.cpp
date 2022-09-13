@@ -1043,6 +1043,7 @@ static int SetWifiP2pGroupInfoDev(WifiP2pGroupInfo &item, const std::string &key
     }
     return 0;
 }
+
 template<>
 int SetTClassKeyValue<WifiP2pGroupInfo>(WifiP2pGroupInfo &item, const std::string &key, const std::string &value,
     const std::string &fileName)

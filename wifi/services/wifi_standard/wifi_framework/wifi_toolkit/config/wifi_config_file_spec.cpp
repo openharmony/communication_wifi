@@ -1157,7 +1157,7 @@ std::string OutTClassString<WifiP2pGroupInfo>(WifiP2pGroupInfo &item, const std:
         std::string prefix = "vecDev_" + std::to_string(i) + ".";
         ss << "    " <<"vecDev_=" << i << std::endl;
         const WifiP2pDevice &tmp = item.GetClientDevices().at(i);
-        ss << OutWifiP2pDevicClassString(tmp, prefix);
+        ss << OutWifiP2pDeviceClassString(tmp, prefix);
     }
     ss << "    " <<"</WifiP2pGroupInfo>" << std::endl;
     return ss.str();

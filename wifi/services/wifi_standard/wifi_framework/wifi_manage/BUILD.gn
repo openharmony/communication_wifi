@@ -346,11 +346,11 @@ if (defined(ohos_lite)) {
       "access_token:libaccesstoken_sdk",
       "bundle_framework:appexecfwk_base",
       "c_utils:utils",
+      "huks:libhukssdk",
       "ipc:ipc_core",
       "netmanager_base:net_conn_manager_if",
       "safwk:system_ability_fwk",
       "samgr:samgr_proxy",
-      "huks:libhukssdk"
     ]
     defines = [
       "FEATURE_AP_SUPPORT",

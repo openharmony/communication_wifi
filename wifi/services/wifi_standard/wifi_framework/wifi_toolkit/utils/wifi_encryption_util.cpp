@@ -20,6 +20,20 @@
 DEFINE_WIFILOG_LABEL("WifiConfigEncryption");
 namespace OHOS {
 namespace Wifi {
+
+struct HksParam g_genParam[] = {
+    { .tag = HKS_TAG_KEY_STORAGE_FLAG, .uint32Param = HKS_STORAGE_PERSISTENT },
+    { .tag = HKS_TAG_ALGORITHM, .uint32Param = HKS_ALG_AES },
+    { .tag = HKS_TAG_KEY_SIZE, .uint32Param = HKS_AES_KEY_SIZE_256 },
+    { .tag = HKS_TAG_PURPOSE, .uint32Param = HKS_KEY_PURPOSE_ENCRYPT | HKS_KEY_PURPOSE_DECRYPT },
+    { .tag = HKS_TAG_DIGEST, .uint32Param = HKS_DIGEST_NONE },
+    { .tag = HKS_TAG_PADDING, .uint32Param = HKS_PADDING_NONE },
+    { .tag = HKS_TAG_IS_KEY_ALIAS, .boolParam = true },
+    { .tag = HKS_TAG_KEY_GENERATE_TYPE, .uint32Param = HKS_KEY_GENERATE_TYPE_DEFAULT },
+    { .tag = HKS_TAG_BLOCK_MODE, .uint32Param = HKS_MODE_GCM },
+    { .tag = HKS_TAG_ASSOCIATED_DATA, .blob = { .size = AAD_SIZE, .data = (uint8_t *)AAD } },
+};
+
 int32_t SetUpHks()
 {
     int32_t ret = HksInitialize();
@@ -107,13 +121,13 @@ int32_t WifiDecryption(const WifiEncryptionInfo &wifiEncryptionInfo, const Encry
     struct HksBlob authId = wifiEncryptionInfo.keyAlias;
     uint8_t cipherBuf[AES_COMMON_SIZE] = {0};
     uint32_t length = AES_COMMON_SIZE;
-    int retStrToArrat = HexStringToVec(encryptedData.encryptedPassword, cipherBuf, AES_COMMON_SIZE, length);
+    int32_t retStrToArrat = HexStringToVec(encryptedData.encryptedPassword, cipherBuf, AES_COMMON_SIZE, length);
     if (retStrToArrat != 0) {
         return HKS_FAILURE;
     }
 
     uint8_t nonce[NONCE_SIZE] = {0};
-    int lengthIV = NONCE_SIZE;
+    uint32_t lengthIV = NONCE_SIZE;
     retStrToArrat = HexStringToVec(encryptedData.IV, nonce, NONCE_SIZE, lengthIV);
         if (retStrToArrat != 0) {
         return HKS_FAILURE;
@@ -130,7 +144,7 @@ int32_t WifiDecryption(const WifiEncryptionInfo &wifiEncryptionInfo, const Encry
     HksAddParams(decryParamSet, IVParam, sizeof(IVParam) / sizeof(HksParam));
     HksBuildParamSet(&decryParamSet);
 
-    int ret = HksKeyExist(&authId, nullptr);
+    int32_t ret = HksKeyExist(&authId, nullptr);
     if (ret != HKS_SUCCESS) {
         WIFI_LOGE("wifi decryption key not exist");
         return ret;

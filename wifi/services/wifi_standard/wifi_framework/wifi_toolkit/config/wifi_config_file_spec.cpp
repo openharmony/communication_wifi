@@ -887,6 +887,7 @@ static int SetWifiConfigValueSecond(WifiConfig &item, const std::string &key, co
     }
     return 0;
 }
+
 template<>
 int SetTClassKeyValue<WifiConfig>(WifiConfig &item, const std::string &key, const std::string &value,
     const std::string &fileName)
@@ -895,7 +896,7 @@ int SetTClassKeyValue<WifiConfig>(WifiConfig &item, const std::string &key, cons
     if (SetWifiConfigValueFirst(item, key, value, fileName) == 0) {
         return errorKeyValue;
     }
-    if (SetWifiConfigValueSecond(item, key, value, fileName) == 0)) {
+    if (SetWifiConfigValueSecond(item, key, value, fileName) == 0) {
         return errorKeyValue;
     }
     LOGE("Invalid config key value");

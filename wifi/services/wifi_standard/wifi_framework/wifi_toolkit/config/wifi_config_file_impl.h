@@ -74,16 +74,16 @@ public:
     /**
      * @Description read and parses the network section of ini config file, need call SetConfigFilePath first
      *
-     * @return int - 0 Success; >0 parse failed 
+     * @return int - 0 Success; >0 parse failed
      */
-    int ReadNetworkSection(T &item, std::ifstream &fs, std::string &line, const std::string &mFileName);
+    int ReadNetworkSection(T &item, std::ifstream &fs, std::string &line);
 
     /**
      * @Description read and parses the networks of ini config file, need call SetConfigFilePath first
      *
      * @return int - 0 Success; >0 parse failed
      */
-    int ReadNetwork(T &item, std::ifstream &fs, std::string &line, const std::string &mFileName);
+    int ReadNetwork(T &item, std::ifstream &fs, std::string &line);
 
     /**
      * @Description read and parses the ini config file, need call SetConfigFilePath first
@@ -135,7 +135,7 @@ int WifiConfigFileImpl<T>::SetConfigFilePath(const std::string &fileName)
 }
 
 template<typename T>
-int WifiConfigFileImpl<T>::ReadNetworkSection(T &item, std::ifstream &fs, std::string &line, const std::string &mFileName)
+int WifiConfigFileImpl<T>::ReadNetworkSection(T &item, std::ifstream &fs, std::string &line)
 {
     int sectionError = 0;
     while (std::getline(fs, line)) {
@@ -143,7 +143,7 @@ int WifiConfigFileImpl<T>::ReadNetworkSection(T &item, std::ifstream &fs, std::s
         if (line.empty()) {
             continue;
         }
-        if (line[0] == '<' && line[line.length()-1] == '>') {
+        if (line[0] == '<' && line[line.length() - 1] == '>') {
             return sectionError;
         }
         std::string::size_type npos = line.find("=");
@@ -157,7 +157,7 @@ int WifiConfigFileImpl<T>::ReadNetworkSection(T &item, std::ifstream &fs, std::s
         TrimString(key);
         TrimString(value);
         /* template function, needing specialization */
-        sectionError +=SetTClassKeyValue(item, key, value, mFileName);
+        sectionError += SetTClassKeyValue(item, key, value, mFileName);
     }
     LOGE("Section config not end correctly");
     sectionError++;
@@ -165,7 +165,7 @@ int WifiConfigFileImpl<T>::ReadNetworkSection(T &item, std::ifstream &fs, std::s
 }
 
 template<typename T>
-int WifiConfigFileImpl<T>::ReadNetwork(T &item, std::ifstream &fs, std::string &line, const std::string &mFileName)
+int WifiConfigFileImpl<T>::ReadNetwork(T &item, std::ifstream &fs, std::string &line)
 {
     int networkError = 0;
     while (std::getline(fs, line)) {
@@ -173,7 +173,7 @@ int WifiConfigFileImpl<T>::ReadNetwork(T &item, std::ifstream &fs, std::string &
         if (line.empty()) {
             continue;
         }
-        if (line[0] == '<' && line[line.length()-1] == '>') {
+        if (line[0] == '<' && line[line.length() - 1] == '>') {
             networkError += ReadNetworkSection(item, fs, line, mFileName);
         } else if (line.compare("}") == 0) {
             return networkError;
@@ -210,13 +210,13 @@ int WifiConfigFileImpl<T>::LoadConfig()
         }
         if (line[0] == '[' && line[line.length() - 1] == '{') {
             ClearTClass(item); /* template function, needing specialization */
-            ConfigError = ReadNetwork(item, fs, line, mFileName);
+            ConfigError = ReadNetwork(item, fs, line);
             if (ConfigError > 0) {
                 LOGE("Parse network failed.");
                 continue;
             }
             mValues.push_back(item);
-        }    
+        }
     }
     fs.close();
     return 0;

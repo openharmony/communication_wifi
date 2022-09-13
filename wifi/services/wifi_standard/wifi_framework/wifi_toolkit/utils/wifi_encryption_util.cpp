@@ -41,7 +41,7 @@ int32_t GetKey(const WifiEncryptionInfo &wifiEncryptionInfo, const struct HksPar
         } else {
             return ret;
         }
-    }else if (keyExist != HKS_SUCCESS) {
+    } else if (keyExist != HKS_SUCCESS) {
         WIFI_LOGE("search key failed");
         return keyExist;
     }
@@ -59,7 +59,7 @@ int32_t WifiEncryption(const WifiEncryptionInfo &wifiEncryptionInfo, const std::
 
     uint8_t nonce[NONCE_SIZE] = {0};
     struct HksBlob randomIV = {NONCE_SIZE, nonce};
-    int32_t ret =HksGenerateRandom(NULL, &randomIV);
+    int32_t ret = HksGenerateRandom(NULL, &randomIV);
     if (ret != HKS_SUCCESS) {
         WIFI_LOGE("wifi encryption generate IV failed");
         return ret;
@@ -106,7 +106,7 @@ int32_t WifiDecryption(const WifiEncryptionInfo &wifiEncryptionInfo, const Encry
     }
     struct HksBlob authId = wifiEncryptionInfo.keyAlias;
     uint8_t cipherBuf[AES_COMMON_SIZE] = {0};
-    int length = AES_COMMON_SIZE;
+    uint32_t length = AES_COMMON_SIZE;
     int retStrToArrat = HexStringToVec(encryptedData.encryptedPassword, cipherBuf, AES_COMMON_SIZE, length);
     if (retStrToArrat != 0) {
         return HKS_FAILURE;

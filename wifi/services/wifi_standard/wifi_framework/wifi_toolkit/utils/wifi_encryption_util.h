@@ -23,13 +23,13 @@
 
 namespace OHOS {
 namespace Wifi {
-static constexpr uint32_t AES_COMMON_SIZE = 256;
-static constexpr uint32_t AAD_SIZE = 16;
-static constexpr uint32_t NONCE_SIZE = 16;
+constexpr uint32_t AES_COMMON_SIZE = 256;
+constexpr uint32_t AAD_SIZE = 16;
+constexpr uint32_t NONCE_SIZE = 16;
 
 const uint8_t AAD[AAD_SIZE] = {0};
 
-static struct HksParam g_genParam[] = {
+struct HksParam g_genParam[] = {
     { .tag = HKS_TAG_KEY_STORAGE_FLAG, .uint32Param = HKS_STORAGE_PERSISTENT },
     { .tag = HKS_TAG_ALGORITHM, .uint32Param = HKS_ALG_AES },
     { .tag = HKS_TAG_KEY_SIZE, .uint32Param = HKS_AES_KEY_SIZE_256 },
@@ -65,7 +65,7 @@ public:
         fileName = WIFI_ENCRY_KEY + file;
         keyAlias = { fileName.length(), (uint8_t *)&fileName[0] };
     }
-    WifiEncryptionInfo(const std::string file) 
+    WifiEncryptionInfo(const std::string file) explicit
     {
         SetFile(file);
     }

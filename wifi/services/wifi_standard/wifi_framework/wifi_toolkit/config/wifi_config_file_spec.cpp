@@ -206,7 +206,7 @@ static int SetWifiDeviceConfig(WifiDeviceConfig &item, const std::string &key, c
     }
 #ifdef FEATURE_ENCRYPTION_SUPPORT
     errorKeyValue = SetWifiDeviceConfigEncrypt(item, key, value, fileName);
-       if (errorKeyValue != -1) {
+    if (errorKeyValue != -1) {
         return errorKeyValue;
     } else {
         errorKeyValue = 0;
@@ -304,7 +304,7 @@ static int SetWifiDeviceConfigEap(WifiDeviceConfig &item, const std::string &key
     int errorKeyValue = 0;
 #ifdef FEATURE_ENCRYPTION_SUPPORT
     errorKeyValue = SetWifiDeviceConfigEncryptEap(item, key, value, fileName);
-       if (errorKeyValue != -1) {
+    if (errorKeyValue != -1) {
         return errorKeyValue;
     } else {
         errorKeyValue = 0;
@@ -475,14 +475,14 @@ static std::string OutPutWifiDeviceConfigIp(WifiDeviceConfig &item, const std::s
        << item.wifiIpConfig.staticIpAddress.gateway.GetIpv4Address() << std::endl;
     ss << "    " <<"wifiIpConfig.staticIpAddress.gateway.addressIpv6="
        << item.wifiIpConfig.staticIpAddress.gateway.GetIpv6Address() << std::endl;
-    ss << "    " <<"wifiIpConfig.staticIpAddress.dnsServer1.family=" << item.wifiIpConfig.staticIpAddress.dnsServer1.family
-       << std::endl;
+    ss << "    " <<"wifiIpConfig.staticIpAddress.dnsServer1.family="
+       << item.wifiIpConfig.staticIpAddress.dnsServer1.family << std::endl;
     ss << "    " <<"wifiIpConfig.staticIpAddress.dnsServer1.addressIpv4="
        << item.wifiIpConfig.staticIpAddress.dnsServer1.GetIpv4Address() << std::endl;
     ss << "    " <<"wifiIpConfig.staticIpAddress.dnsServer1.addressIpv6="
        << item.wifiIpConfig.staticIpAddress.dnsServer1.GetIpv6Address() << std::endl;
-    ss << "    " <<"wifiIpConfig.staticIpAddress.dnsServer2.family=" << item.wifiIpConfig.staticIpAddress.dnsServer2.family
-       << std::endl;
+    ss << "    " <<"wifiIpConfig.staticIpAddress.dnsServer2.family="
+       << item.wifiIpConfig.staticIpAddress.dnsServer2.family << std::endl;
     ss << "    " <<"wifiIpConfig.staticIpAddress.dnsServer2.addressIpv4="
        << item.wifiIpConfig.staticIpAddress.dnsServer2.GetIpv4Address() << std::endl;
     ss << "    " <<"wifiIpConfig.staticIpAddress.dnsServer2.addressIpv6="
@@ -526,12 +526,12 @@ static std::string OutPutWifiDeviceConfigProxy(WifiDeviceConfig &item, const std
     std::ostringstream ss;
     ss << "    " <<"<WifiDeviceConfigProxy>" << std::endl;
     ss << "    " <<"wifiProxyconfig.configureMethod=" << (int)item.wifiProxyconfig.configureMethod << std::endl;
-    ss << "    " <<"wifiProxyconfig.autoProxyConfig.pacWebAddress=" << item.wifiProxyconfig.autoProxyConfig.pacWebAddress
-       << std::endl;
-    ss << "    " <<"wifiProxyconfig.ManualProxyConfig.serverHostName=" << item.wifiProxyconfig.manualProxyConfig.serverHostName
-       << std::endl;
-    ss << "    " <<"wifiProxyconfig.ManualProxyConfig.serverPort=" << item.wifiProxyconfig.manualProxyConfig.serverPort
-       << std::endl;
+    ss << "    " <<"wifiProxyconfig.autoProxyConfig.pacWebAddress="
+       << item.wifiProxyconfig.autoProxyConfig.pacWebAddress << std::endl;
+    ss << "    " <<"wifiProxyconfig.ManualProxyConfig.serverHostName="
+       << item.wifiProxyconfig.manualProxyConfig.serverHostName << std::endl;
+    ss << "    " <<"wifiProxyconfig.ManualProxyConfig.serverPort="
+       << item.wifiProxyconfig.manualProxyConfig.serverPort << std::endl;
     ss << "    " <<"wifiProxyconfig.ManualProxyConfig.exclusionObjectList="
        << item.wifiProxyconfig.manualProxyConfig.exclusionObjectList << std::endl;
     ss << "    " <<"</WifiDeviceConfigProxy>" << std::endl;
@@ -602,7 +602,7 @@ int SetTClassKeyValue<HotspotConfig>(HotspotConfig &item, const std::string &key
     int errorKeyValue = 0;
 #ifdef FEATURE_ENCRYPTION_SUPPORT
     errorKeyValue = SetWifiHotspotConfigEncrypt(item, key, value, fileName);
-       if (errorKeyValue != -1) {
+    if (errorKeyValue != -1) {
         return errorKeyValue;
     } else {
         errorKeyValue = 0;
@@ -1016,7 +1016,7 @@ int SetTClassKeyValue<WifiP2pGroupInfo>(WifiP2pGroupInfo &item, const std::strin
     int errorKeyValue = 0;
 #ifdef FEATURE_ENCRYPTION_SUPPORT
     errorKeyValue = SetWifiP2pGroupInfoEncrypt(item, key, value, fileName);
-       if (errorKeyValue != -1) {
+    if (errorKeyValue != -1) {
         return errorKeyValue;
     } else {
         errorKeyValue = 0;
@@ -1099,7 +1099,8 @@ std::string OutTClassString<WifiP2pGroupInfo>(WifiP2pGroupInfo &item, const std:
 {
     std::ostringstream ss;
     ss << "    " <<"groupName=" << ValidateString(item.GetGroupName()) << std::endl;
-    ss << "    " <<"groupNameHex=" << ConvertArrayToHex((uint8_t*)&item.GetGroupName()[0], item.GetGroupName().length()) << std::endl;
+    ss << "    " <<"groupNameHex=" 
+       << ConvertArrayToHex((uint8_t*)&item.GetGroupName()[0], item.GetGroupName().length()) << std::endl;
     ss << "    " <<"networkId=" << item.GetNetworkId() << std::endl;
     ss << "    " <<"isGroupOwner=" << item.IsGroupOwner() << std::endl;
     ss << "    " <<"interface=" << item.GetInterface() << std::endl;

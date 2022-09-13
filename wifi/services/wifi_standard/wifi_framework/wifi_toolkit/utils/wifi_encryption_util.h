@@ -65,7 +65,7 @@ public:
         fileName = WIFI_ENCRY_KEY + file;
         keyAlias = { fileName.length(), (uint8_t *)&fileName[0] };
     }
-    WifiEncryptionInfo(const std::string file) explicit
+    explicit WifiEncryptionInfo(const std::string file)
     {
         SetFile(file);
     }

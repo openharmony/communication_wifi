@@ -174,7 +174,7 @@ int WifiConfigFileImpl<T>::ReadNetwork(T &item, std::ifstream &fs, std::string &
             continue;
         }
         if (line[0] == '<' && line[line.length() - 1] == '>') {
-            networkError += ReadNetworkSection(item, fs, line, mFileName);
+            networkError += ReadNetworkSection(item, fs, line);
         } else if (line.compare("}") == 0) {
             return networkError;
         } else {

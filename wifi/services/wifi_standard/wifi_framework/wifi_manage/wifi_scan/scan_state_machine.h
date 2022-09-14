@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,21 +12,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #ifndef OHOS_SCAN_STATE_MACHINE_H
 #define OHOS_SCAN_STATE_MACHINE_H
 
 #include <algorithm>
+#include <atomic>
 #include <map>
+#include <shared_mutex>
 #include <string>
 #include <utility>
 #include <vector>
-#include "wifi_log.h"
-#include "wifi_error_no.h"
-#include "wifi_scan_param.h"
 #include "scan_common.h"
 #include "state_machine.h"
-#include "wifi_msg.h"
 #include "wifi_errcode.h"
+#include "wifi_log.h"
+#include "wifi_msg.h"
+#include "wifi_scan_param.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -248,7 +250,7 @@ public:
     };
 
 private:
-    bool quitFlag;                               /* Scanning state machine exit flag */
+    std::atomic<bool> quitFlag;                               /* Scanning state machine exit flag */
     InitState *initState;                        /* Scanning initial status pointer */
     HardwareReady *hardwareReadyState;           /* Pointer to the hardware startup completion status */
     CommonScan *commonScanState;                 /* Pointer to the common scanning status */
@@ -286,6 +288,8 @@ private:
                                               * ongoing PNO scans
                                               */
     bool runningSwPnoFlag;                   /* Software PNO scanning is in progress. */
+
+    static std::shared_mutex lock;                  /* data lock */
 
     /**
      * @Description  Processing of Scan Requests Received in Idle State.

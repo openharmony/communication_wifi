@@ -57,7 +57,6 @@ ohos_unittest("manager_unittest") {
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_scan",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_ap",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_p2p",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_aware",
     "$WIFI_ROOT_DIR/frameworks/native/interfaces",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/idl_client",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/idl_client/idl_interface",
@@ -112,9 +111,8 @@ ohos_unittest("manager_unittest") {
   ]
   configs = [ ":module_private_config" ]
 
-  if (wifi_feature_with_auth_disable) {
-    defines += [ "PERMISSION_ALWAYS_GRANT" ]
-  }
+  # Do not modify the permission configuration of the unit test
+  defines += [ "PERMISSION_ALWAYS_GRANT" ]
 
   part_name = "wifi"
   subsystem_name = "communication"

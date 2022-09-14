@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,6 +16,7 @@
 #ifndef OHOS_MESSAGE_QUEUE_H
 #define OHOS_MESSAGE_QUEUE_H
 
+#include <atomic>
 #include <chrono>
 #include <condition_variable>
 #include <mutex>
@@ -73,9 +74,9 @@ private:
     /* Message Queuing */
     InternalMessage *pMessageQueue;
     /* No messages to be executed, blocking */
-    bool mIsBlocked;
+    std::atomic<bool> mIsBlocked;
     /* Exit Loop */
-    bool mNeedQuit;
+    std::atomic<bool> mNeedQuit;
     /* Thread lock of operation queue */
     std::mutex mMtxQueue;
     /* Blocked thread lock */

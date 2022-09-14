@@ -246,7 +246,7 @@ int WifiManager::Init()
         return -1;
     }
     if (WifiConfigCenter::GetInstance().GetStaLastRunState()) { /* Automatic startup upon startup */
-        WIFI_LOGE("AutoStartStaApService");
+        WIFI_LOGI("AutoStartSta/P2pService");
 #ifdef OHOS_ARCH_LITE
         std::thread startStaSrvThread(WifiManager::AutoStartStaServiceThread);
         startStaSrvThread.detach();
@@ -261,7 +261,7 @@ int WifiManager::Init()
          * The sta service automatically starts upon startup. After the sta
          * service is started, the scanning is directly started.
          */
-        WIFI_LOGE("AutoStartScanService");
+        WIFI_LOGI("AutoStartScanService");
         AutoStartScanService();
     }
     return 0;
@@ -269,6 +269,7 @@ int WifiManager::Init()
 
 void WifiManager::Exit()
 {
+    WIFI_LOGI("[WifiManager] Exit.");
     WifiServiceManager::GetInstance().UninstallAllService();
     WifiStaHalInterface::GetInstance().ExitAllIdlClient();
     WifiInternalEventDispatcher::GetInstance().Exit();

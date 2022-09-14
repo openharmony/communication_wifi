@@ -1342,9 +1342,9 @@ ErrCode ScanService::ApplyScanPolices(ScanType type)
 {
     LOGI("Enter ScanService::ApplyScanPolices.");
     /* Obtains app parameters and scenario status parameters. */
-    auto &appPackageName = WifiSettings::GetInstance().GetAppPackageName();
-    auto &trustListPolicies = WifiSettings::GetInstance().ReloadTrustListPolicies();
-    auto &movingFreezePolicy = WifiSettings::GetInstance().ReloadMovingFreezePolicy();
+    auto appPackageName = WifiSettings::GetInstance().GetAppPackageName();
+    auto trustListPolicies = WifiSettings::GetInstance().ReloadTrustListPolicies();
+    auto movingFreezePolicy = WifiSettings::GetInstance().ReloadMovingFreezePolicy();
     ErrCode rlt = WIFI_OPT_SUCCESS;
     if (appPackageName.empty()) {
         rlt = AllowScanByType(type);

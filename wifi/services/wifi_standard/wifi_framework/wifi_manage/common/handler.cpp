@@ -46,28 +46,27 @@ bool Handler::InitialHandler()
     }
 
     int ret = pthread_create(&handleThread, nullptr, RunHandleThreadFunc, this);
-    if (ret < 0) {
+    if (ret != 0) {
         LOGE("pthread_create failed.\n");
         return false;
     }
-
+    LOGI("pthread_create ret: %{public}d\n", ret);
     return true;
 }
 
 void Handler::StopHandlerThread()
 {
-    LOGI("Handler::StopHandlerThread");
+    LOGI("Enter StopHandlerThread");
     if (isRunning) {
         isRunning = false;
         if (pMyQueue != nullptr) {
             pMyQueue->StopQueueLoop();
         }
-
         if (handleThread != 0) {
             pthread_join(handleThread, nullptr);
         }
     }
-
+    LOGI("Leave StopHandlerThread");
     return;
 }
 

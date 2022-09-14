@@ -18,6 +18,7 @@
 
 #include "dhcp_config.h"
 #include "dhcp_define.h"
+#include "dhcp_message.h"
 
 enum DhcpServerState { ST_IDEL = 0, ST_STARTING, ST_RUNNING, ST_RELOADNG, ST_STOPING, ST_STOPED };
 typedef int (*DhcpServerCallback)(int, int, const char *ifname);
@@ -37,8 +38,9 @@ int StartDhcpServer(PDhcpServerContext ctx);
 int StopDhcpServer(PDhcpServerContext ctx);
 int GetServerStatus(PDhcpServerContext ctx);
 void RegisterDhcpCallback(PDhcpServerContext ctx, DhcpServerCallback callback);
-int FreeServerContext(PDhcpServerContext ctx);
+int FreeServerContext(PDhcpServerContext *ctx);
 int SaveLease(PDhcpServerContext ctx);
+int ReceiveDhcpMessage(int sock, PDhcpMsgInfo msgInfo);
 
 #ifdef __cplusplus
 }

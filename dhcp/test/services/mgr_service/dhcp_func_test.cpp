@@ -226,8 +226,6 @@ HWTEST_F(DhcpFuncTest, InitPidfile_TEST, TestSize.Level1)
     pidDir = "./";
     pidFile = "./wlan.pid";
     EXPECT_EQ(DHCP_OPT_FAILED, DhcpFunc::InitPidfile(pidDir, pidFile));
-    EXPECT_EQ(DHCP_OPT_SUCCESS, DhcpFunc::InitPidfile(pidDir, pidFile));
-    EXPECT_EQ(DHCP_OPT_SUCCESS, DhcpFunc::InitPidfile(pidDir, pidFile));
 
     MockSystemFunc::SetMockFlag(false);
 }

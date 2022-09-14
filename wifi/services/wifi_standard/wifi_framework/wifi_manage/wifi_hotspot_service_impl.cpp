@@ -14,7 +14,6 @@
  */
 
 #include "wifi_hotspot_service_impl.h"
-#include <file_ex.h>
 #include <csignal>
 #include "wifi_permission_utils.h"
 #include "wifi_global_func.h"
@@ -26,7 +25,6 @@
 #include "wifi_logger.h"
 #include "define.h"
 #include "wifi_logger.h"
-#include "wifi_dumper.h"
 #include "wifi_common_util.h"
 
 DEFINE_WIFILOG_HOTSPOT_LABEL("WifiHotspotServiceImpl");
@@ -668,23 +666,6 @@ void WifiHotspotServiceImpl::SaBasicDump(std::string& result)
         ConfigInfoDump(result);
         StationsInfoDump(result);
     }
-}
-
-int32_t WifiHotspotServiceImpl::Dump(int32_t fd, const std::vector<std::u16string>& args)
-{
-    std::vector<std::string> vecArgs;
-    std::transform(args.begin(), args.end(), std::back_inserter(vecArgs), [](const std::u16string &arg) {
-        return Str16ToStr8(arg);
-    });
-
-    WifiDumper dumper;
-    std::string result;
-    dumper.HotspotDump(SaBasicDump, vecArgs, result);
-    if (!SaveStringToFd(fd, result)) {
-        WIFI_LOGE("WiFi hotspot save string to fd failed.");
-        return ERR_OK;
-    }
-    return ERR_OK;
 }
 }  // namespace Wifi
 }  // namespace OHOS

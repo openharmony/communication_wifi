@@ -16,11 +16,12 @@
 #ifndef OHOS_WIFI_HOTSPOT_MGR_SERVICE_IMPL_H
 #define OHOS_WIFI_HOTSPOT_MGR_SERVICE_IMPL_H
 
-#include "wifi_errcode.h"
-#include "system_ability.h"
-#include "wifi_hotspot_stub.h"
-#include "wifi_hotspot_mgr_stub.h"
+#include <file_ex.h>
 #include "iremote_object.h"
+#include "system_ability.h"
+#include "wifi_errcode.h"
+#include "wifi_hotspot_mgr_stub.h"
+#include "wifi_hotspot_stub.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -38,6 +39,16 @@ public:
     void OnStart() override;
     void OnStop() override;
     sptr<IRemoteObject> GetWifiRemote(int id) override;
+
+    /**
+     * @Description dump hotspot information
+     *
+     * @param fd - file descriptor
+     * @param args - dump arguments
+     * @return ErrCode - operation result
+     */
+    int32_t Dump(int32_t fd, const std::vector<std::u16string>& args) override;
+
 private:
     bool Init();
     friend void SigHandler(int sig);

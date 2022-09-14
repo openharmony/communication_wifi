@@ -38,7 +38,7 @@ int WifiScanCallbackStub::OnRemoteRequest(
     }
 
     if (data.ReadInterfaceToken() != GetDescriptor()) {
-        WIFI_LOGE("Scan callback stub token verification error");
+        WIFI_LOGE("Scan callback stub token verification error: %{public}d", code);
         return WIFI_OPT_FAILED;
     }
 

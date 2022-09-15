@@ -144,7 +144,7 @@ WifiErrorNo DisassociateSta(const unsigned char *mac, int lenMac, int id);
  * @param id - ap id
  * @return WifiErrorNo
  */
-WifiErrorNo GetValidFrequenciesForBand(int32_t band, int *frequencies, int32_t *size, int id);
+WifiErrorNo WEAK_FUNC GetValidFrequenciesForBand(int32_t band, int *frequencies, int32_t *size, int id);
 
 /**
  * @Description Set the power mode.
@@ -153,7 +153,7 @@ WifiErrorNo GetValidFrequenciesForBand(int32_t band, int *frequencies, int32_t *
  * @param id - ap id
  * @return WifiErrorNo
  */
-WifiErrorNo WifiSetPowerModel(const int mode, int id);
+WifiErrorNo WEAK_FUNC WifiSetPowerModel(const int mode, int id);
 
 /**
  * @Description Get the power mode.
@@ -162,7 +162,7 @@ WifiErrorNo WifiSetPowerModel(const int mode, int id);
  * @param id - ap id
  * @return WifiErrorNo
  */
-WifiErrorNo WifiGetPowerModel(int* mode, int id);
+WifiErrorNo WEAK_FUNC WifiGetPowerModel(int* mode, int id);
 #ifdef __cplusplus
 }
 #endif

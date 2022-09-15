@@ -13,14 +13,18 @@
  * limitations under the License.
  */
 
-#include "mock_chip_capability.h"
+#ifndef OHOS_HDI_AP_IMPL_H
+#define OHOS_HDI_AP_IMPL_H
 
-namespace OHOS {
-namespace Wifi {
-ChipCapability &ChipCapability::GetInstance()
-{
-    static ChipCapability cp;
-    return cp;
+#include "wifi_hal_define.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+WifiErrorNo GetValidFrequenciesForBand(int32_t band, int *frequencies, int32_t *size, int id);
+WifiErrorNo WifiSetPowerModel(const int mode, int id);
+WifiErrorNo WifiGetPowerModel(int* mode, int id);
+#ifdef __cplusplus
 }
-}  // namespace Wifi
-} //  namespace OHOS
+#endif
+#endif

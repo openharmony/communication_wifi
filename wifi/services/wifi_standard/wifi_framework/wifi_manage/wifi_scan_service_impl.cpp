@@ -274,6 +274,7 @@ void WifiScanServiceImpl::SaBasicDump(std::string& result)
 #ifndef OHOS_ARCH_LITE
 int32_t WifiScanServiceImpl::Dump(int32_t fd, const std::vector<std::u16string>& args)
 {
+    WIFI_LOGI("Enter scan dump func.");
     std::vector<std::string> vecArgs;
     std::transform(args.begin(), args.end(), std::back_inserter(vecArgs), [](const std::u16string &arg) {
         return Str16ToStr8(arg);

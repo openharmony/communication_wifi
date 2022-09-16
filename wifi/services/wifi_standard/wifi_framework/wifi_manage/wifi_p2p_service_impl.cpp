@@ -1016,6 +1016,7 @@ void WifiP2pServiceImpl::SaBasicDump(std::string& result)
 
 int32_t WifiP2pServiceImpl::Dump(int32_t fd, const std::vector<std::u16string>& args)
 {
+    WIFI_LOGI("Enter p2p dump func.");
     std::vector<std::string> vecArgs;
     std::transform(args.begin(), args.end(), std::back_inserter(vecArgs), [](const std::u16string &arg) {
         return Str16ToStr8(arg);

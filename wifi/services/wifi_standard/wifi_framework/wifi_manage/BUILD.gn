@@ -242,6 +242,7 @@ if (defined(ohos_lite)) {
     deps = [ ":wifi_p2p_service_impl" ]
     external_deps = [
       "ability_base:want",
+      "bundle_framework:appexecfwk_base",
       "c_utils:utils",
       "common_event_service:cesfwk_innerkits",
       "ipc:ipc_core",

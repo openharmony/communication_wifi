@@ -85,6 +85,7 @@ ohos_shared_library("wifiext") {
   ]
 
   external_deps = [
+    "bundle_framework:appexecfwk_base",
     "c_utils:utils",
     "ipc:ipc_core",
   ]
@@ -130,7 +131,9 @@ ohos_shared_library("wifi_native_js") {
 
   external_deps = [
     "access_token:libaccesstoken_sdk",
+    "bundle_framework:appexecfwk_base",
     "c_utils:utils",
+    "ipc:ipc_core",
   ]
 
   relative_install_dir = "module"

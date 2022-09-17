@@ -205,9 +205,7 @@ if (defined(ohos_lite)) {
     ]
 
     external_deps = [
-      "ability_base:want",
       "c_utils:utils",
-      "common_event_service:cesfwk_innerkits",
       "ipc:ipc_core",
     ]
 

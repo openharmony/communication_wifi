@@ -13,14 +13,14 @@
  * limitations under the License.
  */
 
-#include "mock_chip_capability.h"
+#ifdef HDI_INTERFACE_SUPPORT
 
-namespace OHOS {
-namespace Wifi {
-ChipCapability &ChipCapability::GetInstance()
-{
-    static ChipCapability cp;
-    return cp;
-}
-}  // namespace Wifi
-} //  namespace OHOS
+#include "wifi_hdi_sta_impl.h"
+#include "wifi_hdi_proxy.h"
+#include "wifi_log.h"
+
+#undef LOG_TAG
+#define LOG_TAG "WifiHdiStaImpl"
+
+
+#endif

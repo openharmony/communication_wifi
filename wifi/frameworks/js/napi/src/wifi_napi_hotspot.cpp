@@ -203,5 +203,59 @@ napi_value GetStations(napi_env env, napi_callback_info info)
     }
     return arrayResult;
 }
+
+napi_value AddBlockList(napi_env env, napi_callback_info info)
+{
+    TRACE_FUNC_CALL;
+    size_t argc = 1;
+    napi_value argv[argc];
+    napi_value thisVar;
+    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, NULL));
+
+    napi_valuetype valueType;
+    napi_typeof(env, argv[0], &valueType);
+    NAPI_ASSERT(env, valueType == napi_string, "Wrong argument type. Object expected.");
+    NAPI_ASSERT(env, wifiHotspotPtr != nullptr, "Wifi hotspot instance is null.");
+
+    StationInfo stationInfo;
+    char bssid[WIFI_BSSID_LENGTH] = {0};
+    size_t len = 0;
+    napi_get_value_string_utf8(env, argv[0], bssid, sizeof(bssid), &len);
+    stationInfo.bssid = bssid;
+    ErrCode ret = wifiHotspotPtr->AddBlockList(stationInfo);
+    if (ret != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("Add block list fail: %{public}d", ret);
+    }
+    napi_value result;
+    napi_get_boolean(env, ret == WIFI_OPT_SUCCESS, &result);
+    return result;
+}
+
+napi_value DelBlockList(napi_env env, napi_callback_info info)
+{
+    TRACE_FUNC_CALL;
+    size_t argc = 1;
+    napi_value argv[argc];
+    napi_value thisVar;
+    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, NULL));
+
+    napi_valuetype valueType;
+    napi_typeof(env, argv[0], &valueType);
+    NAPI_ASSERT(env, valueType == napi_string, "Wrong argument type. Object expected.");
+    NAPI_ASSERT(env, wifiHotspotPtr != nullptr, "Wifi hotspot instance is null.");
+
+    StationInfo stationInfo;
+    char bssid[WIFI_BSSID_LENGTH] = {0};
+    size_t len = 0;
+    napi_get_value_string_utf8(env, argv[0], bssid, sizeof(bssid), &len);
+    stationInfo.bssid = bssid;
+    ErrCode ret = wifiHotspotPtr->DelBlockList(stationInfo);
+    if (ret != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("Del block list fail: %{public}d", ret);
+    }
+    napi_value result;
+    napi_get_boolean(env, ret == WIFI_OPT_SUCCESS, &result);
+    return result;
+}
 }  // namespace Wifi
 }  // namespace OHOS

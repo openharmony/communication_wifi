@@ -24,6 +24,7 @@ namespace OHOS {
 namespace Wifi {
 #define AP_CHANNEL_DEFAULT 6
 #define AP_CHANNEL_5G_DEFAULT 149
+#define WIFI_BSSID_LENGTH 18
 enum class ApState {
     AP_STATE_NONE = 0,
     AP_STATE_IDLE,

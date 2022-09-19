@@ -78,6 +78,7 @@ ohos_unittest("wifi_hal_unittest") {
     "//drivers/peripheral/wlan/interfaces/include",
     "//drivers/peripheral/wlan/client/include",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_hal/hdi/inc",
+    "$WIFI_ROOT_DIR/services/wifi_standard/include",
   ]
 
   deps = [

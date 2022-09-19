@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -23,6 +23,7 @@
 #include <unistd.h>
 #include "securec.h"
 #include "common/wpa_ctrl.h"
+#include "wifi_common_def.h"
 #include "wifi_hal_callback.h"
 #include "wifi_log.h"
 
@@ -34,12 +35,12 @@
  */
 #define CONFIG_DENY_MAC_FILE_NAME "deny_mac.conf"
 #define SLEEP_TIME_100_MS (100 * 1000)
-#define CONFIG_PATH_DIR "/data/misc/wifi/wpa_supplicant"
+#define CONFIG_PATH_DIR CONFIG_ROOR_DIR"/wpa_supplicant"
 #if (AP_NUM > 1)
 #define WIFI_5G_CFG "hostapd_0.conf"
 #define WIFI_2G_CFG "hostapd_1.conf"
-#define HOSTAPD_5G_CFG "/data/misc/wifi/wpa_supplicant/"WIFI_5G_CFG
-#define HOSTAPD_2G_CFG "/data/misc/wifi/wpa_supplicant/"WIFI_2G_CFG
+#define HOSTAPD_5G_CFG CONFIG_ROOR_DIR"/wpa_supplicant/"WIFI_5G_CFG
+#define HOSTAPD_2G_CFG CONFIG_ROOR_DIR"/wpa_supplicant/"WIFI_2G_CFG
 #define HOSTAPD_5G_UDPPORT "127.0.0.1:9866"
 #define HOSTAPD_2G_UDPPORT "127.0.0.1:9877"
 
@@ -49,7 +50,7 @@ WifiHostapdHalDeviceInfo g_hostapdHalDevInfo[] = {
 };
 #else
 #define WIFI_DEFAULT_CFG "hostapd.conf"
-#define HOSTAPD_DEFAULT_CFG "/data/misc/wifi/wpa_supplicant/"WIFI_DEFAULT_CFG
+#define HOSTAPD_DEFAULT_CFG CONFIG_ROOR_DIR"/wpa_supplicant/"WIFI_DEFAULT_CFG
 #define HOSTAPD_DEFAULT_UDPPORT "127.0.0.1:9877"
 WifiHostapdHalDeviceInfo g_hostapdHalDevInfo[] = {
     {AP_2G_MAIN_INSTANCE, NULL, WIFI_DEFAULT_CFG, HOSTAPD_DEFAULT_CFG, HOSTAPD_DEFAULT_UDPPORT}

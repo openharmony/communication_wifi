@@ -34,7 +34,7 @@ static ModuleInfo *g_halModuleList = NULL;
 
 #define STOP_MODULE_TRY_TIMES 30
 #define MAX_WPA_MAIN_ARGC_NUM 20
-#define MAX_WPA_MAIN_ARGV_LEN 64
+#define MAX_WPA_MAIN_ARGV_LEN 128
 
 struct StWpaMainParam {
     int argc;

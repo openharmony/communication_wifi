@@ -56,7 +56,7 @@ WifiIdlClient::~WifiIdlClient()
 
 int WifiIdlClient::InitClient(void)
 {
-    const std::string idlSockPath = "/data/misc/wifi/unix_sock.sock";
+    const std::string idlSockPath = CONFIG_ROOR_DIR"/unix_sock.sock";
     pRpcClient = CreateRpcClient(idlSockPath.c_str());
     if (pRpcClient == nullptr) {
         LOGE("init rpc client failed!");

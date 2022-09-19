@@ -177,7 +177,6 @@ if (defined(ohos_lite)) {
       "//base/security/access_token/interfaces/innerkits/accesstoken/include",
       "//foundation/communication/netmanager_base/frameworks/native/netmanagernative",
       "//foundation/communication/netmanager_base/interfaces/innerkits/netmanagernative/include",
-      "//foundation/communication/netmanager_base/interfaces/innerkits/netconnclient/include/proxy",
     ]
   }
 

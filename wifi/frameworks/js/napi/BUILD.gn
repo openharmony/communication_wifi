@@ -41,7 +41,6 @@ ohos_shared_library("wifi") {
   ]
   deps = [
     "$WIFI_ROOT_DIR/frameworks/native:wifi_sdk",
-    "$WIFI_ROOT_DIR/utils:wifi_utils",
     "${ability_runtime_path}/frameworks/native/appkit:app_context",
     "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog",
     "//foundation/arkui/napi:ace_napi",
@@ -88,7 +87,6 @@ ohos_shared_library("wifiext") {
   external_deps = [
     "bundle_framework:appexecfwk_base",
     "c_utils:utils",
-    "ipc:ipc_core",
   ]
 
   relative_install_dir = "module"
@@ -123,7 +121,6 @@ ohos_shared_library("wifi_native_js") {
   ]
   deps = [
     "$WIFI_ROOT_DIR/frameworks/native:wifi_sdk",
-    "$WIFI_ROOT_DIR/utils:wifi_utils",
     "${ability_runtime_path}/frameworks/native/appkit:app_context",
     "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog",
     "//foundation/arkui/napi:ace_napi",

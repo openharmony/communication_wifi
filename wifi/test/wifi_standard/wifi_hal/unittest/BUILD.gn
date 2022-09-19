@@ -27,7 +27,6 @@ ohos_unittest("wifi_hal_unittest") {
   module_out_path = module_output_path
   sources = [
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_hal/common/wifi_hal_common_func.c",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_hal/hdi/wifi_hdi_ap_instance.c",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_hal/wifi_hal_adapter.c",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_hal/wifi_hal_ap_interface.c",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_hal/wifi_hal_base_interface.c",
@@ -74,17 +73,16 @@ ohos_unittest("wifi_hal_unittest") {
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_hal/wifi_hal_module/wpa_supplicant_hal/wpa_sta_hal",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_hal/wifi_hal_module/wpa_supplicant_hal/wpa_p2p_hal",
     "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
-    "//third_party/wpa_supplicant/wpa_supplicant-2.9_standard/src/",
-    "//third_party/bounds_checking_function/include/",
-    "//drivers/peripheral/wlan/interfaces/include/",
-    "//drivers/peripheral/wlan/client/include/",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_hal/hdi",
+    "//third_party/wpa_supplicant/wpa_supplicant-2.9_standard/src",
+    "//third_party/bounds_checking_function/include",
+    "//drivers/peripheral/wlan/interfaces/include",
+    "//drivers/peripheral/wlan/client/include",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_hal/hdi/inc",
   ]
 
   deps = [
     "$WIFI_ROOT_DIR/services/wifi_standard/ipc_framework/cRPC:crpc_server",
     "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog",
-    "//drivers/peripheral/wlan/hal:wifi_hal",
   ]
 
   ldflags = [
@@ -96,8 +94,15 @@ ohos_unittest("wifi_hal_unittest") {
     "c_utils:utils",
     "hiviewdfx_hilog_native:libhilog",
   ]
-  configs = [ ":module_private_config" ]
+
   defines = [ "AP_INTF=\"$wifi_feature_with_ap_intf\"" ]
+
+  if (wifi_feature_is_hdi_supported) {
+    defines += [ "HDI_INTERFACE_SUPPORT" ]
+    external_deps += [ "drivers_interface_wlan:libwlan_proxy_1.0" ]
+  }
+
+  configs = [ ":module_private_config" ]
 
   part_name = "wifi"
   subsystem_name = "communication"

@@ -13,22 +13,14 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_HDI_INSTANCE_H
-#define OHOS_HDI_INSTANCE_H
+#ifdef HDI_INTERFACE_SUPPORT
 
-#include "wifi_hal.h"
-#include "wifi_hal_ap_feature.h"
-#include "wifi_hal_define.h"
+#include "wifi_hdi_p2p_impl.h"
+#include "wifi_hdi_proxy.h"
+#include "wifi_log.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#undef LOG_TAG
+#define LOG_TAG "WifiHdiP2pImpl"
 
-WifiErrorNo HdiGetAp(struct IWiFi **wifi, struct IWiFiAp **apFeature);
 
-WifiErrorNo HdiReleaseAp(struct IWiFi *wifi, struct IWiFiAp *apFeature);
-
-#ifdef __cplusplus
-}
-#endif
 #endif

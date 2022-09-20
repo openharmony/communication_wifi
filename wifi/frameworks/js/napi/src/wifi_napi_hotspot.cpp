@@ -214,7 +214,7 @@ napi_value AddBlockList(napi_env env, napi_callback_info info)
 
     napi_valuetype valueType;
     napi_typeof(env, argv[0], &valueType);
-    NAPI_ASSERT(env, valueType == napi_string, "Wrong argument type. Object expected.");
+    NAPI_ASSERT(env, valueType == napi_string, "Wrong argument type. String expected.");
     NAPI_ASSERT(env, wifiHotspotPtr != nullptr, "Wifi hotspot instance is null.");
 
     StationInfo stationInfo;
@@ -241,7 +241,7 @@ napi_value DelBlockList(napi_env env, napi_callback_info info)
 
     napi_valuetype valueType;
     napi_typeof(env, argv[0], &valueType);
-    NAPI_ASSERT(env, valueType == napi_string, "Wrong argument type. Object expected.");
+    NAPI_ASSERT(env, valueType == napi_string, "Wrong argument type. String expected.");
     NAPI_ASSERT(env, wifiHotspotPtr != nullptr, "Wifi hotspot instance is null.");
 
     StationInfo stationInfo;

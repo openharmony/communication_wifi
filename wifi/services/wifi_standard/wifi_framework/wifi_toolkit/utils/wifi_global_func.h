@@ -33,6 +33,7 @@ constexpr int MIN_PSK_LEN = 8;
 constexpr int MAX_PSK_LEN = 63;
 constexpr int HEX_TYPE_LEN = 3; /* 3 hex type: 0 a A */
 constexpr int MAX_AP_CONN = 32;
+constexpr int MAX_CONFIGS_NUM = 1000;
 
 /**
  * @Description Check valid ssid config

@@ -12,6 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#ifdef FEATURE_ENCRYPTION_SUPPORT
 #include "wifi_encryption_util.h"
 #include <iterator>
 #include <sstream>
@@ -168,3 +169,4 @@ int32_t WifiDecryption(const WifiEncryptionInfo &wifiEncryptionInfo, const Encry
 }
 } // namespace Wifi
 } // namespace OHOS
+#endif

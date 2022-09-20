@@ -17,6 +17,7 @@
 
 #include <algorithm>
 #include <cstring>
+#include <ctime>
 #include <iomanip>
 #include <map>
 #include <sstream>
@@ -393,6 +394,7 @@ struct WifiDeviceConfig {
     /* Random mac address */
     std::string macAddress;
     int uid;
+    time_t lastConnectTime;
     WifiIpConfig wifiIpConfig;
     WifiEapConfig wifiEapConfig;
     WifiProxyConfig wifiProxyconfig;

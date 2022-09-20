@@ -157,7 +157,7 @@ int WifiConfigFileImpl<T>::ReadNetworkSection(T &item, std::ifstream &fs, std::s
         TrimString(key);
         TrimString(value);
         /* template function, needing specialization */
-        sectionError += SetTClassKeyValue(item, key, value, mFileName);
+        sectionError += SetTClassKeyValue(item, key, value);
     }
     LOGE("Section config not end correctly");
     sectionError++;
@@ -242,7 +242,7 @@ int WifiConfigFileImpl<T>::SaveConfig()
          * specialization.
          */
         ss << "[" << GetTClassName<T>() << "_" << (i + 1) << "] {" << std::endl;
-        ss << OutTClassString(item, mFileName) << std::endl;
+        ss << OutTClassString(item) << std::endl;
         ss << "}" << std::endl;
     }
     std::string content = ss.str();

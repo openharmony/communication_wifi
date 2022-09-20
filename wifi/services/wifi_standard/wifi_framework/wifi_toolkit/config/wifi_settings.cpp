@@ -122,7 +122,7 @@ void WifiSettings::InitP2pVendorConfig()
 int WifiSettings::Init()
 {
     mCountryCode = "CN";
-    InitGetApMaxConnNum();
+    InitSettingsNum();
 
     /* read ini config */
     mSavedDeviceConfig.SetConfigFilePath(DEVICE_CONFIG_FILE_PATH);
@@ -367,6 +367,19 @@ int WifiSettings::SetDeviceState(int networkId, int state, bool bSetOther)
     return 0;
 }
 
+int WifiSettings::SetDeviceTime(int networkId)
+{
+    time_t timeNow;
+    time(&timeNow);
+    std::unique_lock<std::mutex> lock(mConfigMutex);
+    auto iter = mWifiDeviceConfig.find(networkId);
+    if (iter == mWifiDeviceConfig.end()) {
+        return -1;
+    }
+    iter->second.lastConnectTime = timeNow;
+    return 0;
+}
+
 int WifiSettings::GetCandidateConfig(const int uid, const int &networkId, WifiDeviceConfig &config)
 {
     std::vector<WifiDeviceConfig> configs;
@@ -439,14 +452,40 @@ int WifiSettings::GetWifiP2pGroupInfo(std::vector<WifiP2pGroupInfo> &groups)
     return 0;
 }
 
+int WifiSettings::RemoveExcessDeviceConfigs(std::vector<WifiDeviceConfig> &configs)
+{
+    int maxNumConfigs = mMaxNumConfigs;
+    if (maxNumConfigs < 0) {
+        return 1;
+    }
+    int numExcessNetworks = configs.size() - maxNumConfigs;
+    if (numExcessNetworks <= 0) {
+        return 1;
+    }
+    sort(configs.begin(), configs.end(), [](WifiDeviceConfig a, WifiDeviceConfig b) {
+        if (a.status != b.status) {
+            return (a.status == 0) < (b.status == 0);
+        } else if (a.lastConnectTime != b.lastConnectTime) {
+            return a.lastConnectTime < b.lastConnectTime;
+        } else {
+            return a.networkId < b.networkId;
+        }
+    });
+    configs.erase(configs.begin(),configs.begin()+numExcessNetworks);
+    return 0;
+}
+
 int WifiSettings::SyncDeviceConfig()
 {
 #ifndef CONFIG_NO_CONFIG_WRITE
     std::unique_lock<std::mutex> lock(mConfigMutex);
     std::vector<WifiDeviceConfig> tmp;
     for (auto iter = mWifiDeviceConfig.begin(); iter != mWifiDeviceConfig.end(); ++iter) {
-        tmp.push_back(iter->second);
+        if (!iter->second.isEphemeral) {
+            tmp.push_back(iter->second);
+        }
     }
+    RemoveExcessDeviceConfigs(tmp);
     mSavedDeviceConfig.SetValue(tmp);
     return mSavedDeviceConfig.SaveConfig();
 #else
@@ -929,10 +968,11 @@ void WifiSettings::InitDefaultP2pVendorConfig()
     mP2pVendorConfig.SetSecondaryDeviceType("");
 }
 
-void WifiSettings::InitGetApMaxConnNum()
+void WifiSettings::InitSettingsNum()
 {
     /* query drivers capability, support max connection num. */
     mApMaxConnNum = MAX_AP_CONN;
+    mMaxNumConfigs = MAX_CONFIGS_NUM;
 }
 
 void WifiSettings::InitScanControlForbidList(void)

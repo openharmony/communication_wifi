@@ -31,9 +31,9 @@ const int GENE_V6_ADDR_LEN = 64; /* Generally, the prefix length cannot exceed 6
 const int IP_V6_ADDR_LEN = 128;
 const int MAC_ADDR_MAX_LEN = 17;
 const int DHCP_LEASE_FORMAT_SIZE = 5;
-const int DHCP_LEASE_MAC_ADDR_POS = 1;
-const int DHCP_LEASE_IP_ADDR_POS = 2;
-const int DHCP_LEASE_HOSTNAME_POS = 3;
+const int DHCP_LEASE_MAC_ADDR_POS = 0;
+const int DHCP_LEASE_IP_ADDR_POS = 1;
+const int DHCP_LEASE_HOSTNAME_POS = 2;
 
 DhcpdInterface::DhcpdInterface()
     : mBindIpv4(Ipv4Address::INVALID_INET_ADDRESS), mBindIpv6(Ipv6Address::INVALID_INET6_ADDRESS)

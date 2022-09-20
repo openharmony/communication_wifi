@@ -108,7 +108,7 @@ typedef enum EnumServiceStatus {
     SERVICE_STATUS_INVALID  = 0,
     SERVICE_STATUS_START    = 1,
     SERVICE_STATUS_STOP     = 2
-} DhcpmServiceStatus;
+} DhcpServiceStatus;
 
 struct DhcpResult {
     int iptype;             /* 0-ipv4,1-ipv6 */

@@ -179,19 +179,16 @@ public:
     ErrCode SetPowerModel(const PowerModel& model) override;
 
     /**
-     * @Description dump p2p information
+     * @Description Dump sa basic information
      *
-     * @param fd - file descriptor
-     * @param args - dump arguments
-     * @return ErrCode - operation result
+     * @param result[out] - dump result
      */
-    int32_t Dump(int32_t fd, const std::vector<std::u16string>& args) override;
+    static void SaBasicDump(std::string& result);
 
 private:
     ErrCode CheckCanEnableHotspot(const ServiceType type);
     int CheckOperHotspotSwitchPermission(const ServiceType type);
     bool IsApServiceRunning();
-    static void SaBasicDump(std::string& result);
     static void ConfigInfoDump(std::string& result);
     static void StationsInfoDump(std::string& result);
     static void SigHandler(int sig);

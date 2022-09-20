@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,30 +13,14 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_WIFI_MANAGER_SERVICE_TEST_H
-#define OHOS_WIFI_MANAGER_SERVICE_TEST_H
+#ifdef HDI_INTERFACE_SUPPORT
 
-#include <gtest/gtest.h>
-#include "wifi_manager.h"
+#include "wifi_hdi_sta_impl.h"
+#include "wifi_hdi_proxy.h"
+#include "wifi_log.h"
 
-namespace OHOS {
-namespace Wifi {
-class WifiManagerServiceTest : public testing::Test {
-public:
-    static void SetupTestCase()
-    {
-        WifiManager::GetInstance().Init();
-    }
-    static void TearDownTestCase()
-    {
-    }
-    virtual void SetUp()
-    {}
-    virtual void TearDown()
-    {}
+#undef LOG_TAG
+#define LOG_TAG "WifiHdiStaImpl"
 
-public:
-};
-}  // namespace Wifi
-}  // namespace OHOS
+
 #endif

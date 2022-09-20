@@ -41,6 +41,8 @@ extern "C" {
 #define WIFI_HAL_FALSE 0
 #define WIFI_HAL_TRUE 1
 
+#define WEAK_FUNC __attribute__((weak))
+
 typedef enum WifiErrorNo {
     WIFI_HAL_SUCCESS = 0,                /* Success. */
     WIFI_HAL_FAILED = 1,                 /* Failed. */

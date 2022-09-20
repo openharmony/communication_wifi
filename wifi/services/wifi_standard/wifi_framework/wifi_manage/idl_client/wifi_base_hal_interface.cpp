@@ -52,6 +52,7 @@ bool WifiBaseHalInterface::InitIdlClient(void)
 
 void WifiBaseHalInterface::ExitAllIdlClient(void)
 {
+    LOGI("Exit all idl client!");
     if (mIdlClient != nullptr) {
         mIdlClient->ExitAllClient();
     }

@@ -29,7 +29,6 @@ using ::testing::SetArgReferee;
 using ::testing::StrEq;
 using ::testing::TypedEq;
 using ::testing::ext::TestSize;
-using ::testing::ReturnRef;
 
 namespace OHOS {
 namespace Wifi {
@@ -75,11 +74,11 @@ HWTEST_F(ScanInterfaceTest, InitTest, TestSize.Level1)
     EXPECT_CALL(WifiSupplicantHalInterface::GetInstance(), UnRegisterSupplicantEventCallback()).Times(AtLeast(1));
     EXPECT_CALL(WifiSettings::GetInstance(), GetWhetherToAllowNetworkSwitchover()).Times(AtLeast(0));
     EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_)).Times(AtLeast(0));
-    EXPECT_CALL(WifiSettings::GetInstance(), GetAppPackageName()).WillRepeatedly(ReturnRef(""));
+    EXPECT_CALL(WifiSettings::GetInstance(), GetAppPackageName()).WillRepeatedly(Return(""));
     EXPECT_CALL(WifiSettings::GetInstance(), ReloadTrustListPolicies())
-        .WillRepeatedly(ReturnRef(refVecTrustList));
+        .WillRepeatedly(Return(refVecTrustList));
     EXPECT_CALL(WifiSettings::GetInstance(), ReloadMovingFreezePolicy())
-        .WillRepeatedly(ReturnRef(defaultValue));
+        .WillRepeatedly(Return(defaultValue));
     pScanInterface->Init();
 }
 

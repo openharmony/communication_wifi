@@ -17,9 +17,12 @@
 #include "securec.h"
 #include "wifi_hal_adapter.h"
 #include "wifi_hal_module_manage.h"
+#ifdef HDI_INTERFACE_SUPPORT
+#include "wifi_hdi_proxy.h"
+#endif
 #include "wifi_log.h"
-#include "wifi_wpa_hal.h"
 #include "wifi_supplicant_hal.h"
+#include "wifi_wpa_hal.h"
 
 #undef LOG_TAG
 #define LOG_TAG "WifiHalStaInterface"
@@ -109,7 +112,7 @@ WifiErrorNo Start(void)
         LOGE("wpa_supplicant start failed!");
         return WIFI_HAL_OPEN_SUPPLICANT_FAILED;
     }
-    LOGD("wpa_supplicant start successfully!");
+    LOGI("wpa_supplicant start successfully!");
 
     if (AddWpaIface(0) != WIFI_HAL_SUCCESS) {
         LOGE("Failed to add wpa interface!");
@@ -122,7 +125,12 @@ WifiErrorNo Start(void)
         StopWpaAndWpaHal(0);
         return WIFI_HAL_CONN_SUPPLICANT_FAILED;
     }
-    LOGD("SupplicantHal connect wpa_supplicant successfully!");
+#ifdef HDI_INTERFACE_SUPPORT
+    if (HdiStart() != WIFI_HAL_SUCCESS) {
+        LOGE("[STA] Start hdi failed!");
+        return WIFI_HAL_FAILED;
+    }
+#endif
     LOGI("Start wifi successfully");
     return WIFI_HAL_SUCCESS;
 }
@@ -130,18 +138,30 @@ WifiErrorNo Start(void)
 WifiErrorNo Stop(void)
 {
     LOGI("Ready to Stop wifi");
-    WifiErrorNo err = StopWpaAndWpaHal(0);
-    if (err == WIFI_HAL_FAILED) {
-        LOGD("Wifi stop failed!");
+#ifdef HDI_INTERFACE_SUPPORT
+    if (HdiStop() != WIFI_HAL_SUCCESS) {
+        LOGE("[Ap] Stop hdi failed!");
         return WIFI_HAL_FAILED;
     }
-    LOGD("Wifi stop successfully!");
+#endif
+    WifiErrorNo err = StopWpaAndWpaHal(0);
+    if (err == WIFI_HAL_FAILED) {
+        LOGE("Wifi stop failed!");
+        return WIFI_HAL_FAILED;
+    }
+    LOGI("Wifi stop successfully!");
     return WIFI_HAL_SUCCESS;
 }
 
 WifiErrorNo ForceStop(void)
 {
     LOGI("Ready force Stop wifi");
+#ifdef HDI_INTERFACE_SUPPORT
+    if (HdiStop() != WIFI_HAL_SUCCESS) {
+        LOGE("[Ap] Stop hdi failed!");
+        return WIFI_HAL_FAILED;
+    }
+#endif
     WifiWpaStaInterface *p = TraversalWifiStaInterface();
     while (p != NULL) {
         StopWpaAndWpaHal(p->staNo);

@@ -129,12 +129,8 @@ static int SetWifiDeviceConfigFirst(WifiDeviceConfig &item, const std::string &k
         item.channel = std::stoi(value);
     } else if (key == "frequency") {
         item.frequency = std::stoi(value);
-    } else if (key == "level") {
-        item.level = std::stoi(value);
     } else if (key == "isPasspoint") {
         item.isPasspoint = std::stoi(value);
-    } else if (key == "isEphemeral") {
-        item.isEphemeral = std::stoi(value);
     } else if (key == "preSharedKey") {
         item.preSharedKey = value;
     } else if (key == "keyMgmt") {
@@ -427,9 +423,7 @@ static std::string OutPutWifiDeviceConfig(WifiDeviceConfig &item)
     ss << "    " <<"band=" << item.band << std::endl;
     ss << "    " <<"channel=" << item.channel << std::endl;
     ss << "    " <<"frequency=" << item.frequency << std::endl;
-    ss << "    " <<"level=" << item.level << std::endl;
     ss << "    " <<"isPasspoint=" << item.isPasspoint << std::endl;
-    ss << "    " <<"isEphemeral=" << item.isEphemeral << std::endl;
     ss << "    " <<"priority=" << item.priority << std::endl;
     ss << "    " <<"hiddenSSID=" << (int)item.hiddenSSID << std::endl;
     ss << "    " <<"keyMgmt=" << item.keyMgmt << std::endl;

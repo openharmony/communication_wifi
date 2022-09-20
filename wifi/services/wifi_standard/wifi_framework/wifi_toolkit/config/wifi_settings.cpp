@@ -471,7 +471,7 @@ int WifiSettings::RemoveExcessDeviceConfigs(std::vector<WifiDeviceConfig> &confi
             return a.networkId < b.networkId;
         }
     });
-    configs.erase(configs.begin(),configs.begin()+numExcessNetworks);
+    configs.erase(configs.begin(), configs.begin() + numExcessNetworks);
     return 0;
 }
 

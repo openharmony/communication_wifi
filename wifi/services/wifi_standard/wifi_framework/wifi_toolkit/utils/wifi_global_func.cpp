@@ -332,7 +332,7 @@ std::string ConvertArrayToHex(const uint8_t plainText[], uint32_t size)
 
 static bool ValidateChar(const char ch)
 {
-    if (ch > '~' || ch < ' ') {
+    if (ch == '\n' || ch == '\r') {
         return false;
     }
     return true;

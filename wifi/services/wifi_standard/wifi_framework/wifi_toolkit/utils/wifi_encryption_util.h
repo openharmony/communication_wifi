@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+#ifdef FEATURE_ENCRYPTION_SUPPORT
 #ifndef OHOS_WIFI_CONFIG_HKS_H
 #define OHOS_WIFI_CONFIG_HKS_H
 #include <string>
@@ -71,4 +71,5 @@ int32_t WifiDecryption(const WifiEncryptionInfo &wifiEncryptionInfo, const Encry
     std::string &decryptedData);
 }
 }
+#endif
 #endif

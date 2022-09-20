@@ -804,6 +804,7 @@ void StaStateMachine::DealConnectToUserSelectedNetwork(InternalMessage *msg)
     }
     /* Sets network status. */
     WifiSettings::GetInstance().EnableNetwork(networkId, forceReconnect);
+    WifiSettings::GetInstance().SetDeviceTime(networkId);
     WifiSettings::GetInstance().SetDeviceState(networkId, (int)WifiDeviceConfigStatus::ENABLED, false);
 }
 
@@ -835,6 +836,7 @@ void StaStateMachine::DealConnectionEvent(InternalMessage *msg)
     }
 
     WIFI_LOGI("enter DealConnectionEvent");
+    WifiSettings::GetInstance().SetDeviceTime(targetNetworkId);
     WifiSettings::GetInstance().SetDeviceState(targetNetworkId, (int)WifiDeviceConfigStatus::ENABLED, false);
     WifiSettings::GetInstance().SyncDeviceConfig();
     /* Stop clearing the Wpa_blocklist. */

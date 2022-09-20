@@ -105,9 +105,10 @@ if (defined(ohos_lite)) {
       "c_utils:utils",
       "common_event_service:cesfwk_innerkits",
       "eventhandler:libeventhandler",
-      "huks:libhukssdk",
     ]
-
+    if (wifi_feature_with_encryption) {
+      external_deps += [ "huks:libhukssdk" ]
+    }
     cflags_cc = [
       "-std=c++17",
       "-fno-rtti",

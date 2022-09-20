@@ -40,6 +40,7 @@ static void ClearWifiDeviceConfig(WifiDeviceConfig &item)
     item.wepTxKeyIndex = 0;
     item.priority = 0;
     item.hiddenSSID = false;
+    item.lastConnectTime = -1;
     return;
 }
 
@@ -103,8 +104,7 @@ void ClearTClass<WifiDeviceConfig>(WifiDeviceConfig &item)
     return;
 }
 
-static int SetWifiDeviceConfigFirst(WifiDeviceConfig &item, const std::string &key, const std::string &value,
-    const std::string &fileName)
+static int SetWifiDeviceConfigFirst(WifiDeviceConfig &item, const std::string &key, const std::string &value)
 {
     if (key == "networkId") {
         item.networkId = std::stoi(value);
@@ -145,6 +145,8 @@ static int SetWifiDeviceConfigFirst(WifiDeviceConfig &item, const std::string &k
         item.priority = std::stoi(value);
     } else if (key == "uid") {
         item.uid = std::stoi(value);
+    } else if (key == "lastConnectTime") {
+        item.lastConnectTime = std::stoi(value);
     } else {
         return -1;
     }
@@ -152,17 +154,16 @@ static int SetWifiDeviceConfigFirst(WifiDeviceConfig &item, const std::string &k
 }
 
 #ifdef FEATURE_ENCRYPTION_SUPPORT
-static int SetWifiDeviceConfigEncrypt(WifiDeviceConfig &item, const std::string &key, const std::string &value,
-    const std::string &fileName)
+static int SetWifiDeviceConfigEncrypt(WifiDeviceConfig &item, const std::string &key, const std::string &value)
 {
     int errorKeyValue = 0;
     WifiEncryptionInfo mWifiEncryptionInfo;
-    mWifiEncryptionInfo.SetFile(fileName);
+    mWifiEncryptionInfo.SetFile(GetTClassName<WifiDeviceConfig>());
     if (key == "encryptedData") {
         item.preSharedKey = value;
     } else if (key == "IV") {
         WifiEncryptionInfo mWifiEncryptionInfo;
-        mWifiEncryptionInfo.SetFile(fileName);
+        mWifiEncryptionInfo.SetFile(GetTClassName<WifiDeviceConfig>());
         EncryptedData *encry = new EncryptedData(item.preSharedKey, value);
         std::string decry = "";
         if (WifiDecryption(mWifiEncryptionInfo, *encry, decry) == HKS_SUCCESS) {
@@ -197,15 +198,14 @@ static int SetWifiDeviceConfigEncrypt(WifiDeviceConfig &item, const std::string 
 }
 #endif
 
-static int SetWifiDeviceConfig(WifiDeviceConfig &item, const std::string &key, const std::string &value,
-    const std::string &fileName)
+static int SetWifiDeviceConfig(WifiDeviceConfig &item, const std::string &key, const std::string &value)
 {
     int errorKeyValue = 0;
-    if (SetWifiDeviceConfigFirst(item, key, value, fileName) == 0) {
+    if (SetWifiDeviceConfigFirst(item, key, value) == 0) {
         return errorKeyValue;
     }
 #ifdef FEATURE_ENCRYPTION_SUPPORT
-    errorKeyValue = SetWifiDeviceConfigEncrypt(item, key, value, fileName);
+    errorKeyValue = SetWifiDeviceConfigEncrypt(item, key, value);
     if (errorKeyValue != -1) {
         return errorKeyValue;
     } else {
@@ -226,8 +226,7 @@ static int SetWifiDeviceConfig(WifiDeviceConfig &item, const std::string &key, c
     return errorKeyValue;
 }
 
-static int SetWifiDeviceConfigIp(WifiDeviceConfig &item, const std::string &key, const std::string &value,
-    const std::string &fileName)
+static int SetWifiDeviceConfigIp(WifiDeviceConfig &item, const std::string &key, const std::string &value)
 {
     int errorKeyValue = 0;
     if (key == "wifiIpConfig.assignMethod") {
@@ -273,12 +272,11 @@ static int SetWifiDeviceConfigIp(WifiDeviceConfig &item, const std::string &key,
 
 
 #ifdef FEATURE_ENCRYPTION_SUPPORT
-static int SetWifiDeviceConfigEncryptEap(WifiDeviceConfig &item, const std::string &key, const std::string &value,
-    const std::string &fileName)
+static int SetWifiDeviceConfigEncryptEap(WifiDeviceConfig &item, const std::string &key, const std::string &value)
 {
     int errorKeyValue = 0;
     WifiEncryptionInfo mWifiEncryptionInfo;
-    mWifiEncryptionInfo.SetFile(fileName);
+    mWifiEncryptionInfo.SetFile(GetTClassName<WifiDeviceConfig>());
     if (key == "wifiEapConfig.encryptedData") {
         item.wifiEapConfig.password = value;
     } else if (key == "wifiEapConfig.IV") {
@@ -298,12 +296,11 @@ static int SetWifiDeviceConfigEncryptEap(WifiDeviceConfig &item, const std::stri
 }
 #endif
 
-static int SetWifiDeviceConfigEap(WifiDeviceConfig &item, const std::string &key, const std::string &value,
-    const std::string &fileName)
+static int SetWifiDeviceConfigEap(WifiDeviceConfig &item, const std::string &key, const std::string &value)
 {
     int errorKeyValue = 0;
 #ifdef FEATURE_ENCRYPTION_SUPPORT
-    errorKeyValue = SetWifiDeviceConfigEncryptEap(item, key, value, fileName);
+    errorKeyValue = SetWifiDeviceConfigEncryptEap(item, key, value);
     if (errorKeyValue != -1) {
         return errorKeyValue;
     } else {
@@ -329,8 +326,7 @@ static int SetWifiDeviceConfigEap(WifiDeviceConfig &item, const std::string &key
     return errorKeyValue;
 }
 
-static int SetWifiDeviceConfigProxy(WifiDeviceConfig &item, const std::string &key, const std::string &value,
-    const std::string &fileName)
+static int SetWifiDeviceConfigProxy(WifiDeviceConfig &item, const std::string &key, const std::string &value)
 {
     int errorKeyValue = 0;
     if (key == "wifiProxyconfig.configureMethod") {
@@ -350,8 +346,7 @@ static int SetWifiDeviceConfigProxy(WifiDeviceConfig &item, const std::string &k
     return errorKeyValue;
 }
 
-static int SetWifiDeviceconfigPrivacy(WifiDeviceConfig &item, const std::string &key, const std::string &value,
-    const std::string &fileName)
+static int SetWifiDeviceconfigPrivacy(WifiDeviceConfig &item, const std::string &key, const std::string &value)
 {
     int errorKeyValue = 0;
     if (key == "wifiPrivacySetting") {
@@ -364,20 +359,19 @@ static int SetWifiDeviceconfigPrivacy(WifiDeviceConfig &item, const std::string 
 }
 
 template<>
-int SetTClassKeyValue<WifiDeviceConfig>(WifiDeviceConfig &item, const std::string &key, const std::string &value,
-    const std::string &fileName)
+int SetTClassKeyValue<WifiDeviceConfig>(WifiDeviceConfig &item, const std::string &key, const std::string &value)
 {
     int errorKeyValue = 0;
     if (key.compare(0, strlen("wifiIpConfig"), "wifiIpConfig") == 0) {
-        errorKeyValue += SetWifiDeviceConfigIp(item, key, value, fileName);
+        errorKeyValue += SetWifiDeviceConfigIp(item, key, value);
     } else if (key.compare(0, strlen("wifiEapConfig"), "wifiEapConfig") == 0) {
-        errorKeyValue += SetWifiDeviceConfigEap(item, key, value, fileName);
+        errorKeyValue += SetWifiDeviceConfigEap(item, key, value);
     } else if (key.compare(0, strlen("wifiProxyconfig"), "wifiProxyconfig") == 0) {
-        errorKeyValue += SetWifiDeviceConfigProxy(item, key, value, fileName);
+        errorKeyValue += SetWifiDeviceConfigProxy(item, key, value);
     } else if (key.compare(0, strlen("wifiPrivacySetting"), "wifiPrivacySetting") == 0) {
-        errorKeyValue += SetWifiDeviceconfigPrivacy(item, key, value, fileName);
+        errorKeyValue += SetWifiDeviceconfigPrivacy(item, key, value);
     } else {
-        errorKeyValue += SetWifiDeviceConfig(item, key, value, fileName);
+        errorKeyValue += SetWifiDeviceConfig(item, key, value);
     }
     return errorKeyValue;
 }
@@ -389,11 +383,11 @@ std::string GetTClassName<WifiDeviceConfig>()
 }
 
 #ifdef FEATURE_ENCRYPTION_SUPPORT
-static std::string OutPutEncryptionDeviceConfig(WifiDeviceConfig &item, const std::string &fileName)
+static std::string OutPutEncryptionDeviceConfig(WifiDeviceConfig &item)
 {
     std::ostringstream ss;
     WifiEncryptionInfo mWifiEncryptionInfo;
-    mWifiEncryptionInfo.SetFile(fileName);
+    mWifiEncryptionInfo.SetFile(GetTClassName<WifiDeviceConfig>());
     EncryptedData encry;
     if (WifiEncryption(mWifiEncryptionInfo, item.preSharedKey, encry) == HKS_SUCCESS) {
         ss << "    " <<"encryptedData=" << encry.encryptedPassword << std::endl;
@@ -421,7 +415,7 @@ static std::string OutPutEncryptionDeviceConfig(WifiDeviceConfig &item, const st
 }
 #endif
 
-static std::string OutPutWifiDeviceConfig(WifiDeviceConfig &item, const std::string &fileName)
+static std::string OutPutWifiDeviceConfig(WifiDeviceConfig &item)
 {
     std::ostringstream ss;
     ss << "    " <<"<WifiDeviceConfig>" << std::endl;
@@ -439,8 +433,9 @@ static std::string OutPutWifiDeviceConfig(WifiDeviceConfig &item, const std::str
     ss << "    " <<"priority=" << item.priority << std::endl;
     ss << "    " <<"hiddenSSID=" << (int)item.hiddenSSID << std::endl;
     ss << "    " <<"keyMgmt=" << item.keyMgmt << std::endl;
+    ss << "    " <<"lastConnectTime=" << item.lastConnectTime << std::endl;
 #ifdef FEATURE_ENCRYPTION_SUPPORT
-    ss <<OutPutEncryptionDeviceConfig(item, fileName);
+    ss <<OutPutEncryptionDeviceConfig(item);
 #else
     ss << "    " <<"preSharedKey=" << item.preSharedKey << std::endl;
     ss << "    " <<"wepTxKeyIndex=" << item.wepTxKeyIndex << std::endl;
@@ -452,7 +447,7 @@ static std::string OutPutWifiDeviceConfig(WifiDeviceConfig &item, const std::str
     return ss.str();
 }
 
-static std::string OutPutWifiDeviceConfigIp(WifiDeviceConfig &item, const std::string &fileName)
+static std::string OutPutWifiDeviceConfigIp(WifiDeviceConfig &item)
 {
     std::ostringstream ss;
     ss << "    " <<"<WifiDeviceConfigIp>" << std::endl;
@@ -492,7 +487,7 @@ static std::string OutPutWifiDeviceConfigIp(WifiDeviceConfig &item, const std::s
     return ss.str();
 }
 
-static std::string OutPutWifiDeviceConfigEap(WifiDeviceConfig &item, const std::string &fileName)
+static std::string OutPutWifiDeviceConfigEap(WifiDeviceConfig &item)
 {
     std::ostringstream ss;
     if (item.wifiEapConfig.eap.length() == 0) {
@@ -503,7 +498,7 @@ static std::string OutPutWifiDeviceConfigEap(WifiDeviceConfig &item, const std::
     ss << "    " <<"wifiEapConfig.identity=" << item.wifiEapConfig.identity << std::endl;
 #ifdef FEATURE_ENCRYPTION_SUPPORT
     WifiEncryptionInfo mWifiEncryptionInfo;
-    mWifiEncryptionInfo.SetFile(fileName);
+    mWifiEncryptionInfo.SetFile(GetTClassName<WifiDeviceConfig>());
     EncryptedData encry;
     if (WifiEncryption(mWifiEncryptionInfo, item.wifiEapConfig.password, encry) == HKS_SUCCESS) {
         ss << "    " <<"wifiEapConfig.encryptedData=" << encry.encryptedPassword << std::endl;
@@ -521,7 +516,7 @@ static std::string OutPutWifiDeviceConfigEap(WifiDeviceConfig &item, const std::
     return ss.str();
 }
 
-static std::string OutPutWifiDeviceConfigProxy(WifiDeviceConfig &item, const std::string &fileName)
+static std::string OutPutWifiDeviceConfigProxy(WifiDeviceConfig &item)
 {
     std::ostringstream ss;
     ss << "    " <<"<WifiDeviceConfigProxy>" << std::endl;
@@ -538,7 +533,7 @@ static std::string OutPutWifiDeviceConfigProxy(WifiDeviceConfig &item, const std
     return ss.str();
 }
 
-static std::string OutPutWifiDeviceConfigPrivacy(WifiDeviceConfig &item, const std::string &fileName)
+static std::string OutPutWifiDeviceConfigPrivacy(WifiDeviceConfig &item)
 {
     std::ostringstream ss;
     ss << "    " <<"<WifiDeviceConfigPrivacy>" << std::endl;
@@ -548,12 +543,12 @@ static std::string OutPutWifiDeviceConfigPrivacy(WifiDeviceConfig &item, const s
 }
 
 template<>
-std::string OutTClassString<WifiDeviceConfig>(WifiDeviceConfig &item, const std::string &fileName)
+std::string OutTClassString<WifiDeviceConfig>(WifiDeviceConfig &item)
 {
     std::ostringstream ss;
-    ss << OutPutWifiDeviceConfig(item, fileName) << OutPutWifiDeviceConfigIp(item, fileName)
-       << OutPutWifiDeviceConfigEap(item, fileName) << OutPutWifiDeviceConfigProxy(item, fileName)
-       << OutPutWifiDeviceConfigPrivacy(item, fileName);
+    ss << OutPutWifiDeviceConfig(item) << OutPutWifiDeviceConfigIp(item)
+       << OutPutWifiDeviceConfigEap(item) << OutPutWifiDeviceConfigProxy(item)
+       << OutPutWifiDeviceConfigPrivacy(item);
     return ss.str();
 }
 
@@ -570,12 +565,11 @@ void ClearTClass<HotspotConfig>(HotspotConfig &item)
 }
 
 #ifdef FEATURE_ENCRYPTION_SUPPORT
-static int SetWifiHotspotConfigEncrypt(HotspotConfig &item, const std::string &key, const std::string &value,
-    const std::string &fileName)
+static int SetWifiHotspotConfigEncrypt(HotspotConfig &item, const std::string &key, const std::string &value)
 {
     int errorKeyValue = 0;
     WifiEncryptionInfo mWifiEncryptionInfo;
-    mWifiEncryptionInfo.SetFile(fileName);
+    mWifiEncryptionInfo.SetFile(GetTClassName<HotspotConfig>());
     if (key == "encryptedData") {
         item.SetPreSharedKey(value);
     } else if (key == "IV") {
@@ -596,12 +590,11 @@ static int SetWifiHotspotConfigEncrypt(HotspotConfig &item, const std::string &k
 #endif
 
 template<>
-int SetTClassKeyValue<HotspotConfig>(HotspotConfig &item, const std::string &key, const std::string &value,
-    const std::string &fileName)
+int SetTClassKeyValue<HotspotConfig>(HotspotConfig &item, const std::string &key, const std::string &value)
 {
     int errorKeyValue = 0;
 #ifdef FEATURE_ENCRYPTION_SUPPORT
-    errorKeyValue = SetWifiHotspotConfigEncrypt(item, key, value, fileName);
+    errorKeyValue = SetWifiHotspotConfigEncrypt(item, key, value);
     if (errorKeyValue != -1) {
         return errorKeyValue;
     } else {
@@ -643,7 +636,7 @@ std::string GetTClassName<HotspotConfig>()
 }
 
 template<>
-std::string OutTClassString<HotspotConfig>(HotspotConfig &item, const std::string &fileName)
+std::string OutTClassString<HotspotConfig>(HotspotConfig &item)
 {
     std::ostringstream ss;
     ss << "    " <<"<HotspotConfig>" << std::endl;
@@ -651,7 +644,7 @@ std::string OutTClassString<HotspotConfig>(HotspotConfig &item, const std::strin
     ss << "    " <<"HexSsid=" << ConvertArrayToHex((uint8_t*)&item.GetSsid()[0], item.GetSsid().length()) << std::endl;
 #ifdef FEATURE_ENCRYPTION_SUPPORT
     WifiEncryptionInfo mWifiEncryptionInfo;
-    mWifiEncryptionInfo.SetFile(fileName);
+    mWifiEncryptionInfo.SetFile(GetTClassName<HotspotConfig>());
     EncryptedData encry;
     if (WifiEncryption(mWifiEncryptionInfo, item.GetPreSharedKey(), encry) == HKS_SUCCESS) {
         ss << "    " <<"encryptedData=" << encry.encryptedPassword << std::endl;
@@ -682,8 +675,7 @@ void ClearTClass<P2pVendorConfig>(P2pVendorConfig &item)
 }
 
 template<>
-int SetTClassKeyValue<P2pVendorConfig>(P2pVendorConfig &item, const std::string &key, const std::string &value,
-    const std::string &fileName)
+int SetTClassKeyValue<P2pVendorConfig>(P2pVendorConfig &item, const std::string &key, const std::string &value)
 {
     int errorKeyValue = 0;
     if (key == "randomMacSupport") {
@@ -710,7 +702,7 @@ std::string GetTClassName<P2pVendorConfig>()
 }
 
 template<>
-std::string OutTClassString<P2pVendorConfig>(P2pVendorConfig &item, const std::string &fileName)
+std::string OutTClassString<P2pVendorConfig>(P2pVendorConfig &item)
 {
     std::ostringstream ss;
     ss << "    " <<"<P2pVendorConfig>" << std::endl;
@@ -733,8 +725,7 @@ void ClearTClass<StationInfo>(StationInfo &item)
 }
 
 template<>
-int SetTClassKeyValue<StationInfo>(StationInfo &item, const std::string &key, const std::string &value,
-    const std::string &fileName)
+int SetTClassKeyValue<StationInfo>(StationInfo &item, const std::string &key, const std::string &value)
 {
     int errorKeyValue = 0;
     if (key == "deviceName") {
@@ -757,7 +748,7 @@ std::string GetTClassName<StationInfo>()
 }
 
 template<>
-std::string OutTClassString<StationInfo>(StationInfo &item, const std::string &fileName)
+std::string OutTClassString<StationInfo>(StationInfo &item)
 {
     std::ostringstream ss;
     ss << "    " <<"<StationInfo>" << std::endl;
@@ -808,8 +799,7 @@ void ClearTClass<WifiConfig>(WifiConfig &item)
     return;
 }
 
-static int SetWifiConfigValueFirst(WifiConfig &item, const std::string &key, const std::string &value,
-    const std::string &fileName)
+static int SetWifiConfigValueFirst(WifiConfig &item, const std::string &key, const std::string &value)
 {
     if (key == "scanAlwaysSwitch") {
         item.scanAlwaysSwitch = (std::stoi(value) != 0); /* 0 -> false 1 -> true */
@@ -849,8 +839,7 @@ static int SetWifiConfigValueFirst(WifiConfig &item, const std::string &key, con
     return 0;
 }
 
-static int SetWifiConfigValueSecond(WifiConfig &item, const std::string &key, const std::string &value,
-    const std::string &fileName)
+static int SetWifiConfigValueSecond(WifiConfig &item, const std::string &key, const std::string &value)
 {
     if (key == "preLoadSta") {
         item.preLoadSta = (std::stoi(value) != 0); /* 0 -> false 1 -> true */
@@ -895,14 +884,13 @@ static int SetWifiConfigValueSecond(WifiConfig &item, const std::string &key, co
 }
 
 template<>
-int SetTClassKeyValue<WifiConfig>(WifiConfig &item, const std::string &key, const std::string &value,
-    const std::string &fileName)
+int SetTClassKeyValue<WifiConfig>(WifiConfig &item, const std::string &key, const std::string &value)
 {
     int errorKeyValue = 0;
-    if (SetWifiConfigValueFirst(item, key, value, fileName) == 0) {
+    if (SetWifiConfigValueFirst(item, key, value) == 0) {
         return errorKeyValue;
     }
-    if (SetWifiConfigValueSecond(item, key, value, fileName) == 0) {
+    if (SetWifiConfigValueSecond(item, key, value) == 0) {
         return errorKeyValue;
     }
     LOGE("Invalid config key value");
@@ -917,7 +905,7 @@ std::string GetTClassName<WifiConfig>()
 }
 
 template<>
-std::string OutTClassString<WifiConfig>(WifiConfig &item, const std::string &fileName)
+std::string OutTClassString<WifiConfig>(WifiConfig &item)
 {
     std::ostringstream ss;
     ss << "    " <<"<WifiConfig>" << std::endl;
@@ -976,8 +964,7 @@ void ClearTClass<WifiP2pGroupInfo>(WifiP2pGroupInfo &item)
     item.ClearClientDevices();
 }
 
-static int SetWifiP2pDevicClassKeyValue(WifiP2pDevice &item, const std::string &key, const std::string &value,
-    const std::string &fileName)
+static int SetWifiP2pDevicClassKeyValue(WifiP2pDevice &item, const std::string &key, const std::string &value)
 {
     int errorKeyValue = 0;
     if (key == "deviceName") {
@@ -1002,12 +989,11 @@ static int SetWifiP2pDevicClassKeyValue(WifiP2pDevice &item, const std::string &
 }
 
 #ifdef FEATURE_ENCRYPTION_SUPPORT
-static int SetWifiP2pGroupInfoEncrypt(WifiP2pGroupInfo &item, const std::string &key, const std::string &value,
-    const std::string &fileName)
+static int SetWifiP2pGroupInfoEncrypt(WifiP2pGroupInfo &item, const std::string &key, const std::string &value)
 {
     int errorKeyValue = 0;
     WifiEncryptionInfo mWifiEncryptionInfo;
-    mWifiEncryptionInfo.SetFile(fileName);
+    mWifiEncryptionInfo.SetFile(GetTClassName<WifiP2pGroupInfo>());
     if (key == "encryptedData") {
         item.SetPassphrase(value);
     } else if (key == "IV") {
@@ -1027,12 +1013,11 @@ static int SetWifiP2pGroupInfoEncrypt(WifiP2pGroupInfo &item, const std::string 
 }
 #endif
 
-static int SetWifiP2pGroupInfoDev(WifiP2pGroupInfo &item, const std::string &key, const std::string &value,
-    const std::string &fileName)
+static int SetWifiP2pGroupInfoDev(WifiP2pGroupInfo &item, const std::string &key, const std::string &value)
 {
     if (key.compare(0, strlen("ownerDev."), "ownerDev.") == 0) {
         WifiP2pDevice owner = item.GetOwner();
-        SetWifiP2pDevicClassKeyValue(owner, key.substr(strlen("ownerDev.")), value, fileName);
+        SetWifiP2pDevicClassKeyValue(owner, key.substr(strlen("ownerDev.")), value);
         item.SetOwner(owner);
     } else if (key.compare(0, strlen("vecDev_"), "vecDev_") == 0) {
         std::string::size_type pos = key.find(".");
@@ -1043,7 +1028,7 @@ static int SetWifiP2pGroupInfoDev(WifiP2pGroupInfo &item, const std::string &key
             unsigned long index = std::stoi(key.substr(strlen("vecDev_"), pos));
             if (index < item.GetClientDevices().size()) {
                 std::vector<WifiP2pDevice> clients = item.GetClientDevices();
-                SetWifiP2pDevicClassKeyValue(clients[index], key.substr(pos + 1), value, fileName);
+                SetWifiP2pDevicClassKeyValue(clients[index], key.substr(pos + 1), value);
                 item.SetClientDevices(clients);
             }
         }
@@ -1054,12 +1039,11 @@ static int SetWifiP2pGroupInfoDev(WifiP2pGroupInfo &item, const std::string &key
 }
 
 template<>
-int SetTClassKeyValue<WifiP2pGroupInfo>(WifiP2pGroupInfo &item, const std::string &key, const std::string &value,
-    const std::string &fileName)
+int SetTClassKeyValue<WifiP2pGroupInfo>(WifiP2pGroupInfo &item, const std::string &key, const std::string &value)
 {
     int errorKeyValue = 0;
 #ifdef FEATURE_ENCRYPTION_SUPPORT
-    errorKeyValue = SetWifiP2pGroupInfoEncrypt(item, key, value, fileName);
+    errorKeyValue = SetWifiP2pGroupInfoEncrypt(item, key, value);
     if (errorKeyValue != -1) {
         return errorKeyValue;
     } else {
@@ -1093,7 +1077,7 @@ int SetTClassKeyValue<WifiP2pGroupInfo>(WifiP2pGroupInfo &item, const std::strin
         item.SetP2pGroupStatus(static_cast<P2pGroupStatus>(std::stoi(value)));
     } else if (key == "goIpAddress") {
         item.SetGoIpAddress(value);
-    } else if (SetWifiP2pGroupInfoDev(item, key, value, fileName) == 0) {
+    } else if (SetWifiP2pGroupInfoDev(item, key, value) == 0) {
         return errorKeyValue;
     } else {
         LOGE("Invalid config key value");
@@ -1124,7 +1108,7 @@ static std::string OutWifiP2pDeviceClassString(const WifiP2pDevice &item, std::s
 }
 
 template<>
-std::string OutTClassString<WifiP2pGroupInfo>(WifiP2pGroupInfo &item, const std::string &fileName)
+std::string OutTClassString<WifiP2pGroupInfo>(WifiP2pGroupInfo &item)
 {
     std::ostringstream ss;
     ss << "    " <<"<WifiP2pGroupInfo>" << std::endl;
@@ -1136,7 +1120,7 @@ std::string OutTClassString<WifiP2pGroupInfo>(WifiP2pGroupInfo &item, const std:
     ss << "    " <<"interface=" << item.GetInterface() << std::endl;
 #ifdef FEATURE_ENCRYPTION_SUPPORT
     WifiEncryptionInfo mWifiEncryptionInfo;
-    mWifiEncryptionInfo.SetFile(fileName);
+    mWifiEncryptionInfo.SetFile(GetTClassName<WifiP2pGroupInfo>());
     EncryptedData encry;
     if (WifiEncryption(mWifiEncryptionInfo, item.GetPassphrase(), encry) == HKS_SUCCESS) {
         ss << "    " <<"encryptedData=" << encry.encryptedPassword << std::endl;
@@ -1173,8 +1157,7 @@ void ClearTClass<TrustListPolicy>(TrustListPolicy &item)
 }
 
 template <>
-int SetTClassKeyValue<TrustListPolicy>(TrustListPolicy &item, const std::string &key, const std::string &value,
-    const std::string &fileName)
+int SetTClassKeyValue<TrustListPolicy>(TrustListPolicy &item, const std::string &key, const std::string &value)
 {
     int errorKeyValue = 0;
     if (key == "sceneId") {
@@ -1196,7 +1179,7 @@ std::string GetTClassName<TrustListPolicy>()
     return "TrustListPolicy";
 }
 
-template <> std::string OutTClassString<TrustListPolicy>(TrustListPolicy &item, const std::string &fileName)
+template <> std::string OutTClassString<TrustListPolicy>(TrustListPolicy &item)
 {
     std::ostringstream ss;
     ss << "    " <<"<TrustListPolicy>" << std::endl;
@@ -1214,8 +1197,7 @@ template <> void ClearTClass<MovingFreezePolicy>(MovingFreezePolicy &item)
 }
 
 template <>
-int SetTClassKeyValue<MovingFreezePolicy>(MovingFreezePolicy &item, const std::string &key, const std::string &value,
-    const std::string &fileName)
+int SetTClassKeyValue<MovingFreezePolicy>(MovingFreezePolicy &item, const std::string &key, const std::string &value)
 {
     int errorKeyValue = 0;
     if (key == "trustList") {
@@ -1232,7 +1214,7 @@ template <> std::string GetTClassName<MovingFreezePolicy>()
     return "MovingFreezePolicy";
 }
 
-template <> std::string OutTClassString<MovingFreezePolicy>(MovingFreezePolicy &item, const std::string &fileName)
+template <> std::string OutTClassString<MovingFreezePolicy>(MovingFreezePolicy &item)
 {
     std::ostringstream ss;
     ss << "    " <<"<MovingFreezePolicy>" << std::endl;
@@ -1251,8 +1233,7 @@ template <> void ClearTClass<WifiStoreRandomMac>(WifiStoreRandomMac &item)
 }
 
 template <>
-int SetTClassKeyValue<WifiStoreRandomMac>(WifiStoreRandomMac &item, const std::string &key, const std::string &value,
-    const std::string &fileName)
+int SetTClassKeyValue<WifiStoreRandomMac>(WifiStoreRandomMac &item, const std::string &key, const std::string &value)
 {
     int errorKeyValue = 0;
     if (key == "ssid") {
@@ -1284,7 +1265,7 @@ template <> std::string GetTClassName<WifiStoreRandomMac>()
     return "WifiStoreRandomMac";
 }
 
-template <> std::string OutTClassString<WifiStoreRandomMac>(WifiStoreRandomMac &item, const std::string &fileName)
+template <> std::string OutTClassString<WifiStoreRandomMac>(WifiStoreRandomMac &item)
 {
     std::ostringstream ss;
     ss << "    " <<"<WifiStoreRandomMac>" << std::endl;

@@ -288,7 +288,7 @@ public:
      * @param configs - WifiDeviceConfig objects
      * @return int - 0 if networks were removed, 1 otherwise.
      */
-    int RemoveExcessDeviceConfig(std::vector<WifiDeviceConfig> &configs);
+    int RemoveExcessDeviceConfigs(std::vector<WifiDeviceConfig> &configs);
 
     /**
      * @Description Reload wifi device config from config file

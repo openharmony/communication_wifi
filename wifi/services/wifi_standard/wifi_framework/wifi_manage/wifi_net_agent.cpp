@@ -93,7 +93,7 @@ void WifiNetAgent::UnregisterNetSupplier()
     WIFI_LOGI("Unregister network result:%{public}d", result);
 }
 
-void WifiNetAgent::UpdateNetSupplierInfo(sptr<NetManagerStandard::NetSupplierInfo> &netSupplierInfo)
+void WifiNetAgent::UpdateNetSupplierInfo(const sptr<NetManagerStandard::NetSupplierInfo> &netSupplierInfo)
 {
     TimeStats timeStats(__func__);
     WIFI_LOGI("Enter UpdateNetSupplierInfo.");

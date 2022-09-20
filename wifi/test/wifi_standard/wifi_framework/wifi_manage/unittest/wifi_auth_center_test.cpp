@@ -43,7 +43,7 @@ HWTEST_F(WifiAuthCenterTest, ChangePermission_SUCCESS, TestSize.Level1)
     for (int i = 0; i < ARRAY_PERMISSION; i++) {
         permissions[g_wifiPermissions[i].name] = num[i];
     }
-    EXPECT_EQ(0, WifiAuthCenter::GetInstance().ChangePermission(permissions, pid, uid));
+    EXPECT_EQ(PERMISSION_GRANTED, WifiAuthCenter::GetInstance().ChangePermission(permissions, pid, uid));
 }
 
 HWTEST_F(WifiAuthCenterTest, CheckChangePermission_GRANTED, TestSize.Level1)

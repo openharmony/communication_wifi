@@ -27,6 +27,8 @@ napi_value IsHotspotDualBandSupported(napi_env env, napi_callback_info info);
 napi_value SetHotspotConfig(napi_env env, napi_callback_info info);
 napi_value GetHotspotConfig(napi_env env, napi_callback_info info);
 napi_value GetStations(napi_env env, napi_callback_info info);
+napi_value AddBlockList(napi_env env, napi_callback_info info);
+napi_value DelBlockList(napi_env env, napi_callback_info info);
 }  // namespace Wifi
 }  // namespace OHOS
 

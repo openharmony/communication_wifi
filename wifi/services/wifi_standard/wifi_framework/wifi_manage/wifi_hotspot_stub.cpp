@@ -64,7 +64,7 @@ void WifiHotspotStub::InitHandleMap()
 int WifiHotspotStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
     if (data.ReadInterfaceToken() != GetDescriptor()) {
-        WIFI_LOGE("Hotspot stub token verification error");
+        WIFI_LOGE("Hotspot stub token verification error: %{public}d", code);
         return WIFI_OPT_FAILED;
     }
 

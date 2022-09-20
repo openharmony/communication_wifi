@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,15 +12,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include "scan_state_machine.h"
+#include "wifi_error_no.h"
 #include "wifi_logger.h"
 #include "wifi_settings.h"
 #include "wifi_sta_hal_interface.h"
 
-DEFINE_WIFILOG_SCAN_LABEL("ScanStateMachine");
-
 namespace OHOS {
 namespace Wifi {
+DEFINE_WIFILOG_SCAN_LABEL("ScanStateMachine");
+std::shared_mutex ScanStateMachine::lock;
+
 ScanStateMachine::ScanStateMachine()
     : StateMachine("ScanStateMachine"),
       quitFlag(false),
@@ -121,11 +124,11 @@ bool ScanStateMachine::InitScanStateMachine()
 
     if (InitCommonScanState() != true) {
         return false;
-    };
+    }
 
     if (InitPnoScanState() != true) {
         return false;
-    };
+    }
 
     BuildScanStateTree();
     SetFirstState(initState);
@@ -157,8 +160,11 @@ ScanStateMachine::InitState::~InitState()
 void ScanStateMachine::InitState::GoInState()
 {
     WIFI_LOGI("Enter ScanStateMachine::InitState::GoInState.\n");
-    pScanStateMachine->runningScans.clear();
-    pScanStateMachine->waitingScans.clear();
+    {
+        std::unique_lock<std::shared_mutex> guard(lock);
+        pScanStateMachine->runningScans.clear();
+        pScanStateMachine->waitingScans.clear();
+    }
 
     if (pScanStateMachine->quitFlag) {
         WIFI_LOGI("Notify finish ScanStateMachine.\n");
@@ -475,13 +481,11 @@ void ScanStateMachine::PnoScanHardware::GoInState()
         WIFI_LOGE("StartPnoScanHardware failed.");
         return;
     }
-    return;
 }
 
 void ScanStateMachine::PnoScanHardware::GoOutState()
 {
     WIFI_LOGI("Enter ScanStateMachine::PnoScanHardware::GoOutState.\n");
-    return;
 }
 
 bool ScanStateMachine::PnoScanHardware::ExecuteStateMsg(InternalMessage *msg)
@@ -525,7 +529,6 @@ ScanStateMachine::CommonScanAfterPno::CommonScanAfterPno(ScanStateMachine *paraS
     : State("CommonScanAfterPno")
 {
     pScanStateMachine = paraScanStateMachine;
-    return;
 }
 
 ScanStateMachine::CommonScanAfterPno::~CommonScanAfterPno()
@@ -535,7 +538,6 @@ void ScanStateMachine::CommonScanAfterPno::GoInState()
 {
     WIFI_LOGI("Enter ScanStateMachine::CommonScanAfterPno::GoInState.\n");
     pScanStateMachine->CommonScanAfterPnoProcess();
-    return;
 }
 
 void ScanStateMachine::CommonScanAfterPno::GoOutState()
@@ -545,8 +547,6 @@ void ScanStateMachine::CommonScanAfterPno::GoOutState()
         pScanStateMachine->StopTimer(static_cast<int>(WAIT_SCAN_RESULT_TIMER));
     }
     pScanStateMachine->remainWaitResultTimer = false;
-
-    return;
 }
 
 bool ScanStateMachine::CommonScanAfterPno::ExecuteStateMsg(InternalMessage *msg)
@@ -609,14 +609,12 @@ void ScanStateMachine::PnoScanSoftware::GoInState()
     if (!pScanStateMachine->StartNewSoftwareScan()) {
         WIFI_LOGE("failed to start new softwareScan");
     }
-    return;
 }
 
 void ScanStateMachine::PnoScanSoftware::GoOutState()
 {
     WIFI_LOGI("Enter ScanStateMachine::PnoScanSoftware::GoOutState.\n");
     pScanStateMachine->StopTimer(static_cast<int>(SOFTWARE_PNO_SCAN_TIMER));
-    return;
 }
 
 bool ScanStateMachine::PnoScanSoftware::ExecuteStateMsg(InternalMessage *msg)
@@ -649,13 +647,11 @@ ScanStateMachine::PnoSwScanFree::~PnoSwScanFree()
 void ScanStateMachine::PnoSwScanFree::GoInState()
 {
     WIFI_LOGI("Enter ScanStateMachine::PnoSwScanFree::GoInState.\n");
-    return;
 }
 
 void ScanStateMachine::PnoSwScanFree::GoOutState()
 {
     WIFI_LOGI("Enter ScanStateMachine::PnoSwScanFree::GoOutState.\n");
-    return;
 }
 
 bool ScanStateMachine::PnoSwScanFree::ExecuteStateMsg(InternalMessage *msg)
@@ -706,14 +702,12 @@ ScanStateMachine::PnoSwScanning::~PnoSwScanning()
 void ScanStateMachine::PnoSwScanning::GoInState()
 {
     WIFI_LOGI("Enter ScanStateMachine::PnoSwScanning::GoInState.\n");
-    return;
 }
 
 void ScanStateMachine::PnoSwScanning::GoOutState()
 {
     WIFI_LOGI("Enter ScanStateMachine::PnoSwScanning::GoOutState.\n");
     pScanStateMachine->StopTimer(static_cast<int>(WAIT_SCAN_RESULT_TIMER));
-    return;
 }
 
 bool ScanStateMachine::PnoSwScanning::ExecuteStateMsg(InternalMessage *msg)
@@ -773,10 +767,11 @@ void ScanStateMachine::CommonScanRequestProcess(InternalMessage *interMessage)
         WIFI_LOGE("invalid scan type");
         return;
     }
-    waitingScans.insert(std::pair<int, InterScanConfig>(requestIndex, scanConfig));
+    {
+        std::unique_lock<std::shared_mutex> guard(lock);
+        waitingScans.insert(std::pair<int, InterScanConfig>(requestIndex, scanConfig));
+    }
     StartNewCommonScan();
-
-    return;
 }
 
 bool ScanStateMachine::GetCommonScanRequestInfo(
@@ -794,7 +789,6 @@ bool ScanStateMachine::GetCommonScanRequestInfo(
         WIFI_LOGE("GetCommonScanConfig failed.");
         return false;
     }
-
     return true;
 }
 
@@ -835,7 +829,6 @@ bool ScanStateMachine::GetCommonScanConfig(InternalMessage *interMessage, InterS
     scanConfig.maxScansCache = interMessage->GetIntFromMessage();
     scanConfig.maxBackScanPeriod = interMessage->GetIntFromMessage();
     scanConfig.scanStyle = interMessage->GetIntFromMessage();
-
     return true;
 }
 
@@ -843,45 +836,46 @@ void ScanStateMachine::StartNewCommonScan()
 {
     WIFI_LOGI("Enter ScanStateMachine::StartNewCommonScan.\n");
 
-    if (waitingScans.size() == 0) {
-        ContinuePnoScanProcess();
-        return;
-    }
-
-    ClearRunningScanSettings();
-    bool hasFullScan = false;
-    /* Traverse the request list and combine parameters */
-    std::map<int, InterScanConfig>::iterator configIter = waitingScans.begin();
-    for (; configIter != waitingScans.end(); ++configIter) {
-        runningScanSettings.scanStyle = MergeScanStyle(runningScanSettings.scanStyle, configIter->second.scanStyle);
-
-        std::vector<std::string>::iterator hiddenIter = configIter->second.hiddenNetworkSsid.begin();
-        /* Remove duplicate hidden list */
-        for (; hiddenIter != configIter->second.hiddenNetworkSsid.end(); ++hiddenIter) {
-            if (std::find(runningScanSettings.hiddenNetworkSsid.begin(),
-                runningScanSettings.hiddenNetworkSsid.end(),
-                *hiddenIter) != runningScanSettings.hiddenNetworkSsid.end()) {
-                continue;
-            }
-            runningScanSettings.hiddenNetworkSsid.push_back(*hiddenIter);
+    {
+        std::shared_lock<std::shared_mutex> guard(lock);
+        if (waitingScans.size() == 0) {
+            ContinuePnoScanProcess();
+            return;
         }
+        ClearRunningScanSettings();
+        bool hasFullScan = false;
+        /* Traverse the request list and combine parameters */
+        std::map<int, InterScanConfig>::iterator configIter = waitingScans.begin();
+        for (; configIter != waitingScans.end(); ++configIter) {
+            runningScanSettings.scanStyle = MergeScanStyle(runningScanSettings.scanStyle, configIter->second.scanStyle);
+            std::vector<std::string>::iterator hiddenIter = configIter->second.hiddenNetworkSsid.begin();
+            /* Remove duplicate hidden list */
+            for (; hiddenIter != configIter->second.hiddenNetworkSsid.end(); ++hiddenIter) {
+                if (std::find(runningScanSettings.hiddenNetworkSsid.begin(),
+                    runningScanSettings.hiddenNetworkSsid.end(),
+                    *hiddenIter) != runningScanSettings.hiddenNetworkSsid.end()) {
+                    continue;
+                }
+                runningScanSettings.hiddenNetworkSsid.push_back(*hiddenIter);
+            }
 
-        if (!hasFullScan) {
-            /* When scanFreqs is empty, it means that scan all frequenties */
-            if (configIter->second.scanFreqs.empty()) {
-                runningScanSettings.scanFreqs.clear();
-                runningFullScanFlag = true;
-                hasFullScan = true;
-            } else {
-                std::vector<int>::iterator freqIter = configIter->second.scanFreqs.begin();
-                /* Repetitions are eliminated */
-                for (; freqIter != configIter->second.scanFreqs.end(); ++freqIter) {
-                    if (std::find(runningScanSettings.scanFreqs.begin(),
-                        runningScanSettings.scanFreqs.end(),
-                        *freqIter) != runningScanSettings.scanFreqs.end()) {
-                        continue;
+            if (!hasFullScan) {
+                /* When scanFreqs is empty, it means that scan all frequenties */
+                if (configIter->second.scanFreqs.empty()) {
+                    runningScanSettings.scanFreqs.clear();
+                    runningFullScanFlag = true;
+                    hasFullScan = true;
+                } else {
+                    std::vector<int>::iterator freqIter = configIter->second.scanFreqs.begin();
+                    /* Repetitions are eliminated */
+                    for (; freqIter != configIter->second.scanFreqs.end(); ++freqIter) {
+                        if (std::find(runningScanSettings.scanFreqs.begin(),
+                            runningScanSettings.scanFreqs.end(),
+                            *freqIter) != runningScanSettings.scanFreqs.end()) {
+                            continue;
+                        }
+                        runningScanSettings.scanFreqs.push_back(*freqIter);
                     }
-                    runningScanSettings.scanFreqs.push_back(*freqIter);
                 }
             }
         }
@@ -893,12 +887,11 @@ void ScanStateMachine::StartNewCommonScan()
         return;
     }
 
+    std::unique_lock<std::shared_mutex> guard(lock);
     runningScans.swap(waitingScans);
     waitingScans.clear();
     SwitchState(commonScanningState);
     WIFI_LOGI("StartNewCommonScan success.\n");
-
-    return;
 }
 
 void ScanStateMachine::ClearRunningScanSettings()
@@ -935,7 +928,6 @@ bool ScanStateMachine::StartSingleCommonScan(WifiScanParam &scanParam)
      * fails
      */
     StartTimer(static_cast<int>(WAIT_SCAN_RESULT_TIMER), MAX_WAIT_SCAN_RESULT_TIME);
-
     return true;
 }
 
@@ -951,12 +943,12 @@ void ScanStateMachine::CommonScanWhenRunning(InternalMessage *interMessage)
     }
 
     if (ActiveCoverNewScan(scanConfig)) {
+        std::unique_lock<std::shared_mutex> guard(lock);
         runningScans.insert(std::pair<int, InterScanConfig>(requestIndex, scanConfig));
     } else {
+        std::unique_lock<std::shared_mutex> guard(lock);
         waitingScans.insert(std::pair<int, InterScanConfig>(requestIndex, scanConfig));
     }
-
-    return;
 }
 
 bool ScanStateMachine::ActiveCoverNewScan(InterScanConfig &interScanConfig)
@@ -1003,7 +995,6 @@ bool ScanStateMachine::ActiveCoverNewScan(InterScanConfig &interScanConfig)
             return false;
         }
     }
-
     return true;
 }
 
@@ -1023,9 +1014,8 @@ void ScanStateMachine::CommonScanInfoProcess()
     if (scanStatusReportHandler) {
         scanStatusReportHandler(scanStatusReport);
     }
+    std::unique_lock<std::shared_mutex> guard(lock);
     runningScans.clear();
-
-    return;
 }
 
 void ScanStateMachine::GetSecurityTypeAndBand(std::vector<InterScanInfo> &scanInfos)
@@ -1088,8 +1078,6 @@ void ScanStateMachine::ReportStatusChange(ScanStatus status)
     if (scanStatusReportHandler) {
         scanStatusReportHandler(scanStatusReport);
     }
-
-    return;
 }
 
 void ScanStateMachine::ReportScanInnerEvent(ScanInnerEventType innerEvent)
@@ -1102,8 +1090,6 @@ void ScanStateMachine::ReportScanInnerEvent(ScanInnerEventType innerEvent)
     if (scanStatusReportHandler) {
         scanStatusReportHandler(scanStatusReport);
     }
-
-    return;
 }
 
 void ScanStateMachine::ReportCommonScanFailed(int requestIndex)
@@ -1120,8 +1106,6 @@ void ScanStateMachine::ReportCommonScanFailed(int requestIndex)
     if (scanStatusReportHandler) {
         scanStatusReportHandler(scanStatusReport);
     }
-
-    return;
 }
 
 void ScanStateMachine::ReportCommonScanFailedAndClear(bool runningFlag)
@@ -1131,9 +1115,11 @@ void ScanStateMachine::ReportCommonScanFailedAndClear(bool runningFlag)
     ScanStatusReport scanStatusReport;
     if (runningFlag) {
         GetRunningIndexList(scanStatusReport.requestIndexList);
+        std::unique_lock<std::shared_mutex> guard(lock);
         runningScans.clear();
     } else {
         GetWaitingIndexList(scanStatusReport.requestIndexList);
+        std::unique_lock<std::shared_mutex> guard(lock);
         waitingScans.clear();
     }
 
@@ -1145,28 +1131,24 @@ void ScanStateMachine::ReportCommonScanFailedAndClear(bool runningFlag)
     if (scanStatusReportHandler) {
         scanStatusReportHandler(scanStatusReport);
     }
-
-    return;
 }
 
 void ScanStateMachine::GetRunningIndexList(std::vector<int> &runningIndexList)
 {
+    std::shared_lock<std::shared_mutex> guard(lock);
     std::map<int, InterScanConfig>::iterator iter = runningScans.begin();
     for (; iter != runningScans.end(); ++iter) {
         runningIndexList.push_back(iter->first);
     }
-
-    return;
 }
 
 void ScanStateMachine::GetWaitingIndexList(std::vector<int> &waitingIndexList)
 {
+    std::shared_lock<std::shared_mutex> guard(lock);
     std::map<int, InterScanConfig>::iterator iter = waitingScans.begin();
     for (; iter != waitingScans.end(); ++iter) {
         waitingIndexList.push_back(iter->first);
     }
-
-    return;
 }
 
 bool ScanStateMachine::VerifyScanStyle(int scanStyle)
@@ -1206,7 +1188,7 @@ int ScanStateMachine::MergeScanStyle(int currentScanStyle, int newScanStyle)
 void ScanStateMachine::RemoveCommonScanRequest(int requestIndex)
 {
     WIFI_LOGI("Enter ScanStateMachine::RemoveCommonScanRequest.\n");
-
+    std::unique_lock<std::shared_mutex> guard(lock);
     if (runningScans.count(requestIndex) == 1) {
         runningScans.erase(requestIndex);
     }
@@ -1214,8 +1196,6 @@ void ScanStateMachine::RemoveCommonScanRequest(int requestIndex)
     if (waitingScans.count(requestIndex) == 1) {
         waitingScans.erase(requestIndex);
     }
-
-    return;
 }
 
 void ScanStateMachine::PnoScanRequestProcess(InternalMessage *interMessage)
@@ -1232,8 +1212,6 @@ void ScanStateMachine::PnoScanRequestProcess(InternalMessage *interMessage)
     } else {
         SwitchState(pnoScanSoftwareState);
     }
-
-    return;
 }
 
 void ScanStateMachine::ContinuePnoScanProcess()
@@ -1270,8 +1248,6 @@ void ScanStateMachine::PnoScanHardwareProcess(InternalMessage *interMessage)
         WIFI_LOGE("StartPnoScanHardware failed.");
         return;
     }
-
-    return;
 }
 
 bool ScanStateMachine::StartPnoScanHardware()
@@ -1305,7 +1281,6 @@ bool ScanStateMachine::StartPnoScanHardware()
         return false;
     }
     runningHwPnoFlag = true;
-
     return true;
 }
 
@@ -1326,7 +1301,6 @@ void ScanStateMachine::StopPnoScanHardware()
     }
 
     runningHwPnoFlag = false;
-    return;
 }
 
 void ScanStateMachine::UpdatePnoScanRequest(InternalMessage *interMessage)
@@ -1337,8 +1311,6 @@ void ScanStateMachine::UpdatePnoScanRequest(InternalMessage *interMessage)
         WIFI_LOGE("GetPnoScanRequestInfo failed.");
         return;
     }
-
-    return;
 }
 
 bool ScanStateMachine::GetPnoScanRequestInfo(InternalMessage *interMessage)
@@ -1418,7 +1390,6 @@ bool ScanStateMachine::GetPnoScanConfig(InternalMessage *interMessage, PnoScanCo
         }
         pnoScanConfig.freqs.push_back(freqs);
     }
-
     return true;
 }
 
@@ -1482,8 +1453,6 @@ void ScanStateMachine::CommonScanAfterPnoProcess()
         SwitchState(pnoScanHardwareState);
         return;
     }
-
-    return;
 }
 
 void ScanStateMachine::CommonScanAfterPnoResult()
@@ -1497,7 +1466,6 @@ void ScanStateMachine::CommonScanAfterPnoResult()
     }
 
     ReportPnoScanInfos(scanInfos);
-    return;
 }
 
 void ScanStateMachine::PnoScanFailedProcess()
@@ -1508,8 +1476,6 @@ void ScanStateMachine::PnoScanFailedProcess()
     runningSwPnoFlag = false;
     ClearPnoScanConfig();
     ReportStatusChange(PNO_SCAN_FAILED);
-
-    return;
 }
 
 void ScanStateMachine::ClearPnoScanConfig()
@@ -1544,7 +1510,6 @@ bool ScanStateMachine::GetScanInfos(std::vector<InterScanInfo> &scanInfos)
     }
     WIFI_LOGI("End: QueryScanInfos.");
     GetSecurityTypeAndBand(scanInfos);
-
     return true;
 }
 
@@ -1557,7 +1522,6 @@ bool ScanStateMachine::StartNewSoftwareScan()
         return false;
     }
     StartTimer(int(SOFTWARE_PNO_SCAN_TIMER), (runningPnoScanConfig.scanInterval) * SECOND_TO_MILLI_SECOND);
-
     return true;
 }
 
@@ -1582,7 +1546,6 @@ bool ScanStateMachine::RepeatStartCommonScan()
 
     runningSwPnoFlag = true;
     SwitchState(pnoSwScanningState);
-
     return true;
 }
 
@@ -1598,7 +1561,6 @@ void ScanStateMachine::StopPnoScanSoftware()
     StopTimer(int(WAIT_SCAN_RESULT_TIMER));
     /* Stop the PNO software scanning timer. */
     StopTimer(int(SOFTWARE_PNO_SCAN_TIMER));
-
     runningSwPnoFlag = false;
     return;
 }
@@ -1621,8 +1583,6 @@ void ScanStateMachine::PnoScanSoftwareProcess(InternalMessage *interMessage)
         WIFI_LOGE("StartPnoScanSoftware failed.");
         return;
     }
-
-    return;
 }
 
 void ScanStateMachine::SoftwareScanInfoProcess()
@@ -1635,7 +1595,6 @@ void ScanStateMachine::SoftwareScanInfoProcess()
     }
 
     ReportPnoScanInfos(scanInfos);
-    return;
 }
 
 bool ScanStateMachine::InitCommonScanState()
@@ -1671,7 +1630,6 @@ bool ScanStateMachine::InitCommonScanState()
         WIFI_LOGE("Alloc commonScanningState failed.\n");
         return false;
     }
-
     return true;
 }
 
@@ -1714,7 +1672,6 @@ bool ScanStateMachine::InitPnoScanState()
         WIFI_LOGE("Alloc pnoSwScanningState failed.\n");
         return false;
     }
-
     return true;
 }
 

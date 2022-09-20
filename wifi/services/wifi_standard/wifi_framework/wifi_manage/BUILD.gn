@@ -68,7 +68,6 @@ if (defined(ohos_lite)) {
       "//foundation/systemabilitymgr/samgr_lite/interfaces/innerkits/registry",
       "//foundation/systemabilitymgr/samgr_lite/interfaces/innerkits/samgr",
       "//third_party/bounds_checking_function/include",
-      "//utils/native/lite/include",
     ]
 
     deps = [
@@ -128,7 +127,6 @@ if (defined(ohos_lite)) {
       "//foundation/systemabilitymgr/samgr_lite/interfaces/innerkits/registry",
       "//foundation/systemabilitymgr/samgr_lite/interfaces/innerkits/samgr",
       "//third_party/bounds_checking_function/include",
-      "//utils/native/lite/include",
     ]
 
     deps = [
@@ -213,12 +211,7 @@ if (defined(ohos_lite)) {
       ":wifi_manager_service_header",
     ]
 
-    external_deps = [
-      "ability_base:want",
-      "bundle_framework:appexecfwk_base",
-      "eventhandler:libeventhandler",
-      "ipc:ipc_core",
-    ]
+    external_deps = [ "ipc:ipc_core" ]
   }
   ohos_source_set("wifi_device_service_impl") {
     part_name = "wifi"
@@ -254,7 +247,6 @@ if (defined(ohos_lite)) {
       "bundle_framework:appexecfwk_base",
       "c_utils:utils",
       "common_event_service:cesfwk_innerkits",
-      "eventhandler:libeventhandler",
       "ipc:ipc_core",
     ]
   }
@@ -275,12 +267,7 @@ if (defined(ohos_lite)) {
 
     deps = [ "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit:wifi_toolkit" ]
 
-    external_deps = [
-      "ability_base:want",
-      "bundle_framework:appexecfwk_base",
-      "eventhandler:libeventhandler",
-      "ipc:ipc_core",
-    ]
+    external_deps = [ "ipc:ipc_core" ]
     defines = [
       "FEATURE_AP_SUPPORT",
       "AP_INSTANCE_MAX_NUM=$wifi_feature_with_ap_num",
@@ -301,15 +288,9 @@ if (defined(ohos_lite)) {
       ":wifi_manager_service_header",
     ]
 
-    deps = [
-      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit:wifi_toolkit",
-      "//foundation/communication/netmanager_base/services/netmanagernative:netsys_native_manager",
-    ]
+    deps = [ "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit:wifi_toolkit" ]
 
     external_deps = [
-      "ability_base:want",
-      "bundle_framework:appexecfwk_base",
-      "eventhandler:libeventhandler",
       "ipc:ipc_core",
       "netmanager_base:net_conn_manager_if",
     ]
@@ -344,11 +325,9 @@ if (defined(ohos_lite)) {
 
     external_deps = [
       "access_token:libaccesstoken_sdk",
-      "bundle_framework:appexecfwk_base",
       "c_utils:utils",
       "ipc:ipc_core",
       "netmanager_base:net_conn_manager_if",
-      "safwk:system_ability_fwk",
       "samgr:samgr_proxy",
     ]
     if (wifi_feature_with_encryption) {
@@ -396,7 +375,6 @@ if (defined(ohos_lite)) {
     deps = [
       ":wifi_manager_service",
       ":wifi_scan_service_impl",
-      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/idl_client:wifi_idl_client",
       "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog",
       "//foundation/systemabilitymgr/safwk/interfaces/innerkits/safwk:system_ability_fwk",
     ]

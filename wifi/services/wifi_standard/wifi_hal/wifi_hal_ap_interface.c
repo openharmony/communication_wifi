@@ -16,15 +16,12 @@
 #include "wifi_hal_ap_interface.h"
 #include <errno.h>
 #include <securec.h>
-#ifdef OHOS_ARCH_LITE
 #include "wifi_hal_adapter.h"
-#else
-#include "wifi_hal.h"
-#include "wifi_hal_adapter.h"
-#include "wifi_hdi_ap_instance.h"
-#endif
 #include "wifi_hal_module_manage.h"
 #include "wifi_hal_common_func.h"
+#ifdef HDI_INTERFACE_SUPPORT
+#include "wifi_hdi_proxy.h"
+#endif
 #include "wifi_log.h"
 #include "wifi_wpa_hal.h"
 #include "wifi_hostapd_hal.h"
@@ -32,7 +29,6 @@
 #undef LOG_TAG
 #define LOG_TAG "WifiHalApInterface"
 
-#define NUMS_BAND 2
 #define DISABLE_AP_WAIT_MS 50000
 #define ABLE_AP_WAIT_MS 50000
 #define WIFI_MULTI_CMD_MAX_LEN 1024
@@ -47,18 +43,15 @@ WifiErrorNo StartSoftAp(int id)
         LOGE("hostapd start failed!");
         return WIFI_HAL_OPEN_HOSTAPD_FAILED;
     }
-
     if (StartHostapdHal(id) != WIFI_HAL_SUCCESS) {
         LOGE("hostapd init failed!");
         return WIFI_HAL_HOSTAPD_NOT_INIT;
     }
-
     WifiHostapdHalDevice *hostapdHalDevice = GetWifiHostapdDev(id);
     if (hostapdHalDevice == NULL) {
         LOGE("hostapdHalDevice is NULL!");
         return WIFI_HAL_HOSTAPD_NOT_INIT;
     }
-
     int ret = sprintf_s(ifaceName, IFCAE_NAME_LEN, AP_INTF"%d", id);
     if (ret == -1) {
         LOGE("StartSoftAp failed! ret=%{public}d", ret);
@@ -71,7 +64,12 @@ WifiErrorNo StartSoftAp(int id)
             return WIFI_HAL_FAILED;
         }
     }
-
+#ifdef HDI_INTERFACE_SUPPORT
+    if (HdiStart() != WIFI_HAL_SUCCESS) {
+        LOGE("[Ap] Start hdi failed!");
+        return WIFI_HAL_FAILED;
+    }
+#endif
     LOGI("AP start successfully, id:%{public}d!", id);
     return WIFI_HAL_SUCCESS;
 }
@@ -127,6 +125,12 @@ WifiErrorNo StartHostapdHal(int id)
 
 WifiErrorNo StopSoftAp(int id)
 {
+#ifdef HDI_INTERFACE_SUPPORT
+    if (HdiStop() != WIFI_HAL_SUCCESS) {
+        LOGE("[Ap] Stop hdi failed!");
+        return WIFI_HAL_FAILED;
+    }
+#endif
     WifiHostapdHalDevice *hostapdHalDevice = GetWifiHostapdDev(id);
     if (hostapdHalDevice != NULL) {
         int ret = hostapdHalDevice->disableAp(id);
@@ -136,18 +140,15 @@ WifiErrorNo StopSoftAp(int id)
     } else {
         LOGE("cant not get hostapd dev");
     }
-
     if (StopHostapd() != WIFI_HAL_SUCCESS) {
         LOGE("hostapd stop failed!");
         return WIFI_HAL_FAILED;
     }
-
     if (StopHostapdHal(id) != WIFI_HAL_SUCCESS) {
         LOGE("hostapd_hal stop failed!");
         return WIFI_HAL_FAILED;
     }
-
-    LOGD("AP stop successfully!");
+    LOGI("AP stop successfully!");
     return WIFI_HAL_SUCCESS;
 }
 
@@ -314,79 +315,24 @@ WifiErrorNo DisassociateSta(const unsigned char *mac, int lenMac, int id)
     return WIFI_HAL_SUCCESS;
 }
 
-static int32_t ConvertToNl80211Band(int32_t band)
-{
-    return (band > 0 && band <= NUMS_BAND) ? (band - 1) : band;
-}
-
 WifiErrorNo GetValidFrequenciesForBand(int32_t band, int *frequencies, int32_t *size, int id)
 {
     if (frequencies == NULL || size == NULL) {
         LOGE("%{public}s frequencies or size is null.", __func__);
         return WIFI_HAL_FAILED;
     }
-#ifdef OHOS_ARCH_LITE
+    LOGE("%{public}s func is not support!", __func__);
     return WIFI_HAL_FAILED;
-#else
-    uint32_t count = 0;
-    struct IWiFi *wifi = NULL;
-    struct IWiFiAp *apFeature = NULL;
-    WifiErrorNo ret = HdiGetAp(&wifi, &apFeature);
-    if (ret != WIFI_HAL_SUCCESS) {
-        return WIFI_HAL_FAILED;
-    }
-    ret = apFeature->baseFeature.getValidFreqsWithBand((struct IWiFiBaseFeature *)apFeature,
-        ConvertToNl80211Band(band), frequencies, *size, &count);
-    *size = count;
-    if (ret != 0) {
-        LOGE("%{public}s failed", __func__);
-    }
-    HdiReleaseAp(wifi, apFeature);
-    return (ret == 0) ? WIFI_HAL_SUCCESS : WIFI_HAL_FAILED;
-#endif
 }
 
 WifiErrorNo WifiSetPowerModel(const int mode, int id)
 {
-#ifdef OHOS_ARCH_LITE
+    LOGE("%{public}s func is not support!", __func__);
     return WIFI_HAL_FAILED;
-#else
-    LOGD("Instance %{public}d WifiSetPowerModel: %{public}d", id, mode);
-
-    struct IWiFi *wifi = NULL;
-    struct IWiFiAp *apFeature = NULL;
-    WifiErrorNo ret = HdiGetAp(&wifi, &apFeature);
-    if (ret != WIFI_HAL_SUCCESS) {
-        return WIFI_HAL_FAILED;
-    }
-    ret = wifi->setPowerMode(apFeature->baseFeature.ifName, mode);
-    if (ret != 0) {
-        LOGE("%{public}s failed", __func__);
-    }
-    HdiReleaseAp(wifi, apFeature);
-    return (ret == 0) ? WIFI_HAL_SUCCESS : WIFI_HAL_FAILED;
-#endif
 }
 
 WifiErrorNo WifiGetPowerModel(int* mode, int id)
 {
-#ifdef OHOS_ARCH_LITE
+    LOGE("%{public}s func is not support!", __func__);
     return WIFI_HAL_FAILED;
-#else
-    LOGD("Instance %{public}d WifiGetPowerModel", id);
-
-    struct IWiFi *wifi = NULL;
-    struct IWiFiAp *apFeature = NULL;
-    WifiErrorNo ret = HdiGetAp(&wifi, &apFeature);
-    if (ret != WIFI_HAL_SUCCESS) {
-        return WIFI_HAL_FAILED;
-    }
-    ret = wifi->getPowerMode(apFeature->baseFeature.ifName, (uint8_t *)mode);
-    if (ret != 0) {
-        LOGE("%{public}s failed", __func__);
-    }
-    LOGD("getPowerModel: %{public}d", *mode);
-    HdiReleaseAp(wifi, apFeature);
-    return (ret == 0) ? WIFI_HAL_SUCCESS : WIFI_HAL_FAILED;
-#endif
 }

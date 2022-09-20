@@ -112,6 +112,7 @@ napi_value GetCurrentGroup(napi_env env, napi_callback_info info)
     napi_value thisVar = nullptr;
     void *data = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, &data));
+    NAPI_ASSERT(env, wifiP2pPtr != nullptr, "Wifi p2p instance is null.");
 
     P2pGroupInfoAsyncContext *asyncContext = new P2pGroupInfoAsyncContext(env);
     NAPI_ASSERT(env, asyncContext != nullptr, "asyncContext is null.");
@@ -142,6 +143,7 @@ napi_value GetP2pGroups(napi_env env, napi_callback_info info)
     napi_value thisVar = nullptr;
     void *data = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, &data));
+    NAPI_ASSERT(env, wifiP2pPtr != nullptr, "Wifi p2p instance is null.");
 
     P2pGroupInfoListAsyncContext *asyncContext = new P2pGroupInfoListAsyncContext(env);
     NAPI_ASSERT(env, asyncContext != nullptr, "asyncContext is null.");
@@ -172,12 +174,12 @@ napi_value DeletePersistentGroup(napi_env env, napi_callback_info info)
     napi_value argv[argc];
     napi_value thisVar;
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, NULL));
+    NAPI_ASSERT(env, wifiP2pPtr != nullptr, "Wifi p2p instance is null.");
 
     napi_valuetype valueType;
     napi_typeof(env, argv[0], &valueType);
     NAPI_ASSERT(env, valueType == napi_number, "Wrong argument type. napi_number expected.");
 
-    NAPI_ASSERT(env, wifiP2pPtr != nullptr, "Wifi p2p instance is null.");
     WifiP2pGroupInfo groupInfo;
     int netId = -999;
     napi_get_value_int32(env, argv[0], &netId);
@@ -248,6 +250,7 @@ napi_value GetP2pLocalDevice(napi_env env, napi_callback_info info)
     napi_value thisVar = nullptr;
     void *data = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, &data));
+    NAPI_ASSERT(env, wifiP2pPtr != nullptr, "Wifi p2p instance is null.");
 
     P2pLocalDeviceAsyncContext *asyncContext = new P2pLocalDeviceAsyncContext(env);
     NAPI_ASSERT(env, asyncContext != nullptr, "asyncContext is null.");
@@ -279,12 +282,11 @@ napi_value SetDeviceName(napi_env env, napi_callback_info info)
     napi_value thisVar;
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, NULL));
     NAPI_ASSERT(env, argc == 1, "Wrong number of arguments");
+    NAPI_ASSERT(env, wifiP2pPtr != nullptr, "Wifi p2p instance is null.");
 
     napi_valuetype valueType;
     napi_typeof(env, argv[0], &valueType);
     NAPI_ASSERT(env, valueType == napi_string, "Wrong argument type. napi_number expected.");
-
-    NAPI_ASSERT(env, wifiP2pPtr != nullptr, "Wifi p2p instance is null.");
 
     char name[64] = {0};
     size_t typeLen = 0;
@@ -321,12 +323,12 @@ napi_value P2pConnect(napi_env env, napi_callback_info info)
     napi_value argv[argc];
     napi_value thisVar;
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, NULL));
+    NAPI_ASSERT(env, wifiP2pPtr != nullptr, "Wifi p2p instance is null.");
 
     napi_valuetype valueType;
     napi_typeof(env, argv[0], &valueType);
     NAPI_ASSERT(env, valueType == napi_object, "Wrong argument type. Object expected.");
 
-    NAPI_ASSERT(env, wifiP2pPtr != nullptr, "Wifi p2p instance is null.");
     WifiP2pConfig config;
     JsObjToP2pConfig(env, argv[0], config);
     ErrCode ret = wifiP2pPtr->P2pConnect(config);
@@ -356,12 +358,12 @@ napi_value CreateGroup(napi_env env, napi_callback_info info)
     napi_value argv[1];
     napi_value thisVar;
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, NULL));
+    NAPI_ASSERT(env, wifiP2pPtr != nullptr, "Wifi p2p instance is null.");
 
     napi_valuetype valueType;
     napi_typeof(env, argv[0], &valueType);
     NAPI_ASSERT(env, valueType == napi_object, "Wrong argument type. Object expected.");
 
-    NAPI_ASSERT(env, wifiP2pPtr != nullptr, "Wifi p2p instance is null.");
     WifiP2pConfig config;
     JsObjToP2pConfig(env, argv[0], config);
     ErrCode ret = wifiP2pPtr->CreateGroup(config);

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include "sta_network_check.h"
-#include "if_config.h"
 #include "wifi_logger.h"
 
 DEFINE_WIFILOG_LABEL("StaNetworkCheck");
@@ -35,6 +35,7 @@ StaNetworkCheck::StaNetworkCheck(NetStateHandler handle)
     lastNetState = NETWORK_STATE_UNKNOWN;
     isStopNetCheck = true;
     isExitNetCheckThread = false;
+    isExited = true;
 }
 
 StaNetworkCheck::~StaNetworkCheck()
@@ -73,7 +74,7 @@ bool StaNetworkCheck::HttpDetection()
         constexpr int PORTAL_CONTENT_LENGTH_MIN = 4;
         if (codeNum == NET_ERR_NO_CONTENT) {
             WIFI_LOGE("This network is normal!");
-            if ((lastNetState != NETWORK_STATE_WORKING) && (isExitNetCheckThread == false) &&
+            if ((lastNetState.load() != NETWORK_STATE_WORKING) && (isExitNetCheckThread == false) &&
                 (isStopNetCheck == false)) {
                 netStateHandler(StaNetState::NETWORK_STATE_WORKING, "");
             }
@@ -120,7 +121,7 @@ bool StaNetworkCheck::HttpDetection()
         }
     }
     WIFI_LOGE("This network can't online!");
-    if ((lastNetState != NETWORK_STATE_NOWORKING) && (isExitNetCheckThread == false) && (isStopNetCheck == false)) {
+    if ((lastNetState.load() != NETWORK_STATE_NOWORKING) && (isExitNetCheckThread == false) && (isStopNetCheck == false)) {
         netStateHandler(StaNetState::NETWORK_STATE_NOWORKING, "");
     }
     lastNetState = NETWORK_STATE_NOWORKING;
@@ -131,28 +132,28 @@ void StaNetworkCheck::RunNetCheckThreadFunc()
 {
     WIFI_LOGI("enter RunNetCheckThreadFunc!\n");
     int timeoutMs = 3000;
+    isExited = false;
     for (;;) {
         while (isStopNetCheck && !isExitNetCheckThread) {
             LOGI("waiting for signal.\n");
             std::unique_lock<std::mutex> lck(mMutex);
             mCondition.wait(lck);
         }
-
         if (isExitNetCheckThread) {
             WIFI_LOGI("break the loop\n");
+            isExited = true;
             break;
         }
-
         if (!HttpDetection()) {
             isStopNetCheck = true;
         }
-
         if (!isExitNetCheckThread) {
             std::unique_lock<std::mutex> lck(mMutex);
             if (mCondition_timeout.wait_for(lck, std::chrono::milliseconds(timeoutMs)) == std::cv_status::timeout) {
-                LOGD("mCondition_timeout timeout.\n");
+                LOGI("mCondition_timeout timeout.\n");
             } else {
-                LOGD("Wake up, break the loop.\n");
+                LOGI("Wake up, break the loop.\n");
+                isExited = true;
                 break;
             }
         }
@@ -172,14 +173,12 @@ ErrCode StaNetworkCheck::InitNetCheckThread()
 void StaNetworkCheck::StopNetCheckThread()
 {
     WIFI_LOGI("enter StopNetCheckThread!\n");
-    std::unique_lock<std::mutex> lck(mMutex);
     isStopNetCheck = true;
 }
 
 void StaNetworkCheck::SignalNetCheckThread()
 {
     WIFI_LOGI("enter SignalNetCheckThread!\n");
-    std::unique_lock<std::mutex> lck(mMutex);
     lastNetState = NETWORK_STATE_UNKNOWN;
     isStopNetCheck = false;
     mCondition.notify_one();
@@ -187,20 +186,21 @@ void StaNetworkCheck::SignalNetCheckThread()
 
 void StaNetworkCheck::ExitNetCheckThread()
 {
-    {
-        std::unique_lock<std::mutex> lck(mMutex);
-        isStopNetCheck = false;
+    isStopNetCheck = false;
+    while (!isExited) {
         isExitNetCheckThread = true;
         mCondition.notify_one();
         mCondition_timeout.notify_one();
+        std::this_thread::sleep_for(std::chrono::milliseconds(1)); // sleep 1 ms
     }
-
     if (pDealNetCheckThread != nullptr) {
-        LOGD("pDealNetCheckThread->join();");
-        pDealNetCheckThread->join();
+        if (pDealNetCheckThread->joinable()) {
+            LOGI("Exit net check join()");
+            pDealNetCheckThread->join();
+        }
         delete pDealNetCheckThread;
         pDealNetCheckThread = nullptr;
-        LOGD("pDealNetCheckThread = nullptr; done");
+        LOGI("Exit net check done");
     }
 }
 }  // namespace Wifi

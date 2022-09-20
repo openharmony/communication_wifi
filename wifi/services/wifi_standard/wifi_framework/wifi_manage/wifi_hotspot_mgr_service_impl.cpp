@@ -16,6 +16,7 @@
 #include <csignal>
 #include "wifi_logger.h"
 #include "wifi_config_center.h"
+#include "wifi_dumper.h"
 #include "wifi_manager.h"
 #include "wifi_hotspot_mgr_service_impl.h"
 #include "wifi_hotspot_service_impl.h"
@@ -140,6 +141,24 @@ sptr<IRemoteObject> WifiHotspotMgrServiceImpl::GetWifiRemote(int id)
         return mWifiService[id];
     }
     return nullptr;
+}
+
+int32_t WifiHotspotMgrServiceImpl::Dump(int32_t fd, const std::vector<std::u16string>& args)
+{
+    WIFI_LOGI("Enter hotspot dump func.");
+    std::vector<std::string> vecArgs;
+    std::transform(args.begin(), args.end(), std::back_inserter(vecArgs), [](const std::u16string &arg) {
+        return Str16ToStr8(arg);
+    });
+
+    WifiDumper dumper;
+    std::string result;
+    dumper.HotspotDump(WifiHotspotServiceImpl::SaBasicDump, vecArgs, result);
+    if (!SaveStringToFd(fd, result)) {
+        WIFI_LOGE("WiFi hotspot save string to fd failed.");
+        return ERR_OK;
+    }
+    return ERR_OK;
 }
 }  // namespace Wifi
 }  // namespace OHOS

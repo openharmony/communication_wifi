@@ -45,7 +45,6 @@ if (defined(ohos_lite)) {
       "//foundation/systemabilitymgr/samgr_lite/interfaces/innerkits/registry",
       "//foundation/systemabilitymgr/samgr_lite/interfaces/innerkits/samgr",
       "//third_party/bounds_checking_function/include",
-      "//utils/native/lite/include",
       "//commonlibrary/c_utils/base/include",
     ]
 
@@ -206,9 +205,7 @@ if (defined(ohos_lite)) {
     ]
 
     external_deps = [
-      "ability_base:want",
       "c_utils:utils",
-      "common_event_service:cesfwk_innerkits",
       "ipc:ipc_core",
     ]
 

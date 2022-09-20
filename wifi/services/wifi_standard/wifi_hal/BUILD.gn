@@ -21,7 +21,10 @@ if (defined(ohos_lite)) {
 
 local_base_sources = [
   "common/wifi_hal_common_func.c",
-  "hdi/wifi_hdi_ap_instance.c",
+  "hdi/src/wifi_hdi_ap_impl.c",
+  "hdi/src/wifi_hdi_p2p_impl.c",
+  "hdi/src/wifi_hdi_proxy.c",
+  "hdi/src/wifi_hdi_sta_impl.c",
   "main.c",
   "wifi_hal_adapter.c",
   "wifi_hal_ap_interface.c",
@@ -56,7 +59,7 @@ local_base_include_dirs = [
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_hal/wifi_hal_module/wpa_supplicant_hal",
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_hal/wifi_hal_module/wpa_supplicant_hal/wpa_sta_hal",
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_hal/wifi_hal_module/wpa_supplicant_hal/wpa_p2p_hal",
-  "$WIFI_ROOT_DIR/services/wifi_standard/wifi_hal/hdi",
+  "$WIFI_ROOT_DIR/services/wifi_standard/wifi_hal/hdi/inc",
 ]
 
 if (defined(ohos_lite)) {
@@ -99,27 +102,32 @@ if (defined(ohos_lite)) {
       "//third_party/wpa_supplicant/wpa_supplicant-2.9_standard/src/",
       "//third_party/bounds_checking_function/include/",
       "//drivers/peripheral/wlan/interfaces/include/",
-      "//drivers/peripheral/wlan/client/include/",
     ]
 
     deps = [
       "$WIFI_ROOT_DIR/services/wifi_standard/ipc_framework/cRPC:crpc_server",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_hal/etc/init:etc",
       "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog",
-      "//drivers/peripheral/wlan/hal:wifi_hal",
       "//third_party/wpa_supplicant/wpa_supplicant-2.9_standard:wpa_client",
     ]
 
     external_deps = [ "c_utils:utils" ]
 
-    cflags_cc = [ "-fno-rtti" ]
     defines = [
       "AP_INTF=\"$wifi_feature_with_ap_intf\"",
       "AP_NUM=$wifi_feature_with_ap_num",
     ]
+
+    if (wifi_feature_is_hdi_supported) {
+      defines += [ "HDI_INTERFACE_SUPPORT" ]
+      external_deps += [ "drivers_interface_wlan:libwlan_proxy_1.0" ]
+    }
+
     if (product_name == "rk3568") {
       defines += [ "NON_SEPERATE_P2P" ]
     }
+
+    cflags_cc = [ "-fno-rtti" ]
 
     part_name = "wifi"
     subsystem_name = "communication"

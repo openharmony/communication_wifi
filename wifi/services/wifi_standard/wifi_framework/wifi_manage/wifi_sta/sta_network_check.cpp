@@ -30,6 +30,7 @@ constexpr int NET_ERR_REQUEST_ERROR_CLASS_MAX = 499;
 
 StaNetworkCheck::StaNetworkCheck(NetStateHandler handle)
 {
+    WIFI_LOGI("StaNetworkCheck constructor\n");
     pDealNetCheckThread = nullptr;
     netStateHandler = handle;
     lastNetState = NETWORK_STATE_UNKNOWN;
@@ -48,6 +49,10 @@ StaNetworkCheck::~StaNetworkCheck()
 bool StaNetworkCheck::HttpDetection()
 {
     WIFI_LOGI("Enter httpDetection");
+    if (netStateHandler == nullptr) {
+        WIFI_LOGE("Handler func is null, ignore net detect of this time.");
+        return false;
+    }
     /* Detect portal hotspot and send message to InterfaceSeervice if result is yes. */
     HttpRequest httpRequest;
     std::string httpReturn;
@@ -63,7 +68,7 @@ bool StaNetworkCheck::HttpDetection()
             constexpr int NET_ERROR_LEN = 5;
             codeNum = std::atoi(httpReturn.substr(retCode + NET_ERROR_POS, NET_ERROR_LEN).c_str());
         }
-        
+
         size_t contLenStr = httpReturn.find(contStr);
         int contLenNum = 0;
         if (contLenStr > 0) {
@@ -187,6 +192,7 @@ void StaNetworkCheck::SignalNetCheckThread()
 void StaNetworkCheck::ExitNetCheckThread()
 {
     isStopNetCheck = false;
+    isExitNetCheckThread = true;
     while (!isExited) {
         isExitNetCheckThread = true;
         mCondition.notify_one();

@@ -36,7 +36,6 @@ ohos_unittest("toolkit_unittest") {
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/net_helper/mac_address.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/net_helper/network_interface.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/utils/wifi_global_func.cpp",
-    "toolkit_test.cpp",
     "wifi_config_file_test.cpp",
     "wifi_global_func_test.cpp",
     "wifi_ip_tools_test.cpp",
@@ -57,6 +56,11 @@ ohos_unittest("toolkit_unittest") {
   ldflags = [
     "-fPIC",
     "--coverage",
+  ]
+
+  deps = [
+    "//third_party/googletest:gmock_main",
+    "//third_party/googletest:gtest_main",
   ]
 
   external_deps = [

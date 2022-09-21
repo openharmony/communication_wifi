@@ -38,7 +38,6 @@ ohos_unittest("dhcp_client_unittest") {
     "dhcp_client_test.cpp",
     "dhcp_function_test.cpp",
     "dhcp_ipv4_test.cpp",
-    "dhcp_main_test.cpp",
     "dhcp_options_test.cpp",
     "dhcp_socket_test.cpp",
     "global_test.cpp",
@@ -58,6 +57,7 @@ ohos_unittest("dhcp_client_unittest") {
 
   deps = [
     "//third_party/googletest:gmock_main",
+    "//third_party/googletest:gtest_main",
     "//third_party/openssl:libcrypto_static",
   ]
 

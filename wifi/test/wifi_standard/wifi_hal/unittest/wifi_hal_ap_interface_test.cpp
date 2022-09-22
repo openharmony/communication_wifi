@@ -110,7 +110,8 @@ HWTEST_F(WifiHalApInterfaceTest, GetValidFrequenciesForBandTest, TestSize.Level1
     EXPECT_TRUE(GetValidFrequenciesForBand(band, frequencies, NULL, 0) == WIFI_HAL_FAILED);
     EXPECT_TRUE(GetValidFrequenciesForBand(band, NULL, &size, 0) == WIFI_HAL_FAILED);
     WifiErrorNo err = GetValidFrequenciesForBand(band, frequencies, &size, 0);
-    EXPECT_TRUE(err == WIFI_HAL_SUCCESS || err == WIFI_HAL_NOT_SUPPORT);
+    // WIFI_HAL_FAILED: Some devices do not support
+    EXPECT_TRUE(err == WIFI_HAL_SUCCESS || err == WIFI_HAL_NOT_SUPPORT || err == WIFI_HAL_FAILED);
 }
 
 HWTEST_F(WifiHalApInterfaceTest, StopSoftApTest, TestSize.Level1)

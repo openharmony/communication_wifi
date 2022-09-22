@@ -57,8 +57,6 @@ ohos_unittest("dhcp_server_unittest") {
     "$DHCP_ROOT_DIR/services/dhcp_server/include",
   ]
 
-  defines = []
-
   cflags = []
 
   deps = [
@@ -80,6 +78,8 @@ ohos_unittest("dhcp_server_unittest") {
   ]
 
   configs = [ ":module_private_config" ]
+
+  defines = [ "DHCP_SEL_WAIT_TIMEOUTS=1" ]
 
   if (dhcp_hilog_enable) {
     external_deps += [ "hiviewdfx_hilog_native:libhilog" ]

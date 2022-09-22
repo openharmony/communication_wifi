@@ -60,7 +60,7 @@ public:
      * @param supplierId network unique identity id returned after network registration
      * @param netSupplierInfo network data information
      */
-    void UpdateNetSupplierInfo(sptr<NetManagerStandard::NetSupplierInfo> &netSupplierInfo);
+    void UpdateNetSupplierInfo(const sptr<NetManagerStandard::NetSupplierInfo> &netSupplierInfo);
 
     /**
      * Update link information

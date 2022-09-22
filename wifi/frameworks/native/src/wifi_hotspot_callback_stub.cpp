@@ -39,7 +39,7 @@ int WifiHotspotCallbackStub::OnRemoteRequest(
     }
 
     if (data.ReadInterfaceToken() != GetDescriptor()) {
-        WIFI_LOGE("Hotspot callback stub token verification error");
+        WIFI_LOGE("Hotspot callback stub token verification error: %{public}d", code);
         return WIFI_OPT_FAILED;
     }
 

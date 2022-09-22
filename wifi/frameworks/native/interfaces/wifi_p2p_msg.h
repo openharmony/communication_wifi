@@ -24,7 +24,7 @@
 namespace OHOS {
 namespace Wifi {
 constexpr int WIFI_STR_MAC_LENGTH = 17;
-constexpr int MAX_PASSPHRASE_LENGTH = 63;
+constexpr int MAX_PASSPHRASE_LENGTH = 127;
 constexpr int DEVICE_NAME_LENGTH = 32;
 
 enum class P2pGroupStatus { GS_CREATING, GS_CREATED, GS_STARTED, GS_REMOVING, GS_INVALID };

@@ -1176,7 +1176,7 @@ void WifiSettings::SetAppPackageName(const std::string &appPackageName)
     mAppPackageName = appPackageName;
 }
 
-const std::string& WifiSettings::GetAppPackageName() const
+const std::string WifiSettings::GetAppPackageName() const
 {
     return mAppPackageName;
 }
@@ -1360,7 +1360,7 @@ int WifiSettings::SetP2pDeviceName(const std::string &deviceName)
     return mSavedWifiP2pVendorConfig.SaveConfig();
 }
 
-const std::vector<TrustListPolicy>& WifiSettings::ReloadTrustListPolicies()
+const std::vector<TrustListPolicy> WifiSettings::ReloadTrustListPolicies()
 {
     std::unique_lock<std::mutex> lock(mStaMutex);
     mTrustListPolicies.LoadConfig();
@@ -1376,7 +1376,7 @@ const std::vector<TrustListPolicy>& WifiSettings::ReloadTrustListPolicies()
     return mTrustListPolicies.GetValue();
 }
 
-const MovingFreezePolicy &WifiSettings::ReloadMovingFreezePolicy()
+const MovingFreezePolicy WifiSettings::ReloadMovingFreezePolicy()
 {
     std::unique_lock<std::mutex> lock(mStaMutex);
     mMovingFreezePolicy.LoadConfig();

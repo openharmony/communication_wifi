@@ -93,8 +93,8 @@ HWTEST_F(DhcpIpv4Test, TEST_SUCCESS, TestSize.Level1)
         .WillRepeatedly(Return(1));
     EXPECT_CALL(MockSystemFunc::GetInstance(), close(_)).WillRepeatedly(Return(0));
 
-    EXPECT_EQ(-1, DhcpDiscover(0, 1));
-    EXPECT_EQ(-1, DhcpRenew(0, 0, 0));
+    EXPECT_EQ(0, DhcpDiscover(0, 1));
+    EXPECT_EQ(0, DhcpRenew(0, 0, 0));
 
     MockSystemFunc::SetMockFlag(false);
 }

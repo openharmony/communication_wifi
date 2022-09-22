@@ -90,7 +90,6 @@ StaStateMachine::~StaStateMachine()
     ParsePointer(pGetIpState);
     ParsePointer(pLinkedState);
     ParsePointer(pApRoamingState);
-
     if (pDhcpService != nullptr) {
         if (currentTpType == IPTYPE_IPV4) {
             pDhcpService->StopDhcpClient(IF_NAME, false);
@@ -415,9 +414,9 @@ void StaStateMachine::StartWifiProcess()
         }
 #ifndef OHOS_ARCH_LITE
         WIFI_LOGI("Register netsupplier");
-        std::thread([this]() {
+        std::thread([cb = staCallback]() {
             WifiNetAgent::GetInstance().RegisterNetSupplier();
-            WifiNetAgent::GetInstance().RegisterNetSupplierCallback(staCallback);
+            WifiNetAgent::GetInstance().RegisterNetSupplierCallback(cb);
         }).detach();
 #endif
         /* Initialize Connection Information. */
@@ -848,9 +847,9 @@ void StaStateMachine::DealConnectionEvent(InternalMessage *msg)
     if (NetSupplierInfo != nullptr) {
         NetSupplierInfo->isAvailable_ = true;
         NetSupplierInfo->isRoaming_ = isRoam;
-        std::thread([this]() {
+        std::thread([netInfo = NetSupplierInfo]() {
             WIFI_LOGI("On connect update net supplier info\n");
-            WifiNetAgent::GetInstance().UpdateNetSupplierInfo(NetSupplierInfo);
+            WifiNetAgent::GetInstance().UpdateNetSupplierInfo(netInfo);
         }).detach();
     }
 #endif
@@ -875,9 +874,9 @@ void StaStateMachine::DealDisconnectEvent(InternalMessage *msg)
 #ifndef OHOS_ARCH_LITE
     if (NetSupplierInfo != nullptr) {
         NetSupplierInfo->isAvailable_ = false;
-        std::thread([this]() {
+        std::thread([netInfo = NetSupplierInfo]() {
             WIFI_LOGI("On disconnect update net supplier info\n");
-            WifiNetAgent::GetInstance().UpdateNetSupplierInfo(NetSupplierInfo);
+            WifiNetAgent::GetInstance().UpdateNetSupplierInfo(netInfo);
         }).detach();
     }
 #endif
@@ -1518,9 +1517,9 @@ void StaStateMachine::DisConnectProcess()
 #ifndef OHOS_ARCH_LITE
         if (NetSupplierInfo != nullptr) {
             NetSupplierInfo->isAvailable_ = false;
-            std::thread([this]() {
+            std::thread([netInfo = NetSupplierInfo]() {
                 WIFI_LOGI("Disconnect process update netsupplierinfo");
-                WifiNetAgent::GetInstance().UpdateNetSupplierInfo(NetSupplierInfo);
+                WifiNetAgent::GetInstance().UpdateNetSupplierInfo(netInfo);
             }).detach();
         }
 #endif

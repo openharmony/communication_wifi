@@ -199,7 +199,10 @@ private:
 #endif
 
 private:
-    std::mutex mMutex;
+    std::mutex mStaMutex;
+    std::mutex mScanMutex;
+    std::mutex mP2pMutex;
+    std::mutex mApMutex;
     std::unordered_map<std::string, std::string> mServiceDllMap;
     StaServiceHandle mStaServiceHandle;
     ScanServiceHandle mScanServiceHandle;

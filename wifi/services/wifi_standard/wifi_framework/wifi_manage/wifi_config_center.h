@@ -504,7 +504,7 @@ public:
      *
      * @return const std::string& - app package name.
      */
-    const std::string& GetAppPackageName() const;
+    const std::string GetAppPackageName() const;
 
     /**
      * @Description Set freeze mode state.

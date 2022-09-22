@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,30 +13,18 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_WIFI_MANAGER_SERVICE_TEST_H
-#define OHOS_WIFI_MANAGER_SERVICE_TEST_H
+#ifndef OHOS_HDI_AP_IMPL_H
+#define OHOS_HDI_AP_IMPL_H
 
-#include <gtest/gtest.h>
-#include "wifi_manager.h"
+#include "wifi_hal_define.h"
 
-namespace OHOS {
-namespace Wifi {
-class WifiManagerServiceTest : public testing::Test {
-public:
-    static void SetupTestCase()
-    {
-        WifiManager::GetInstance().Init();
-    }
-    static void TearDownTestCase()
-    {
-    }
-    virtual void SetUp()
-    {}
-    virtual void TearDown()
-    {}
-
-public:
-};
-}  // namespace Wifi
-}  // namespace OHOS
+#ifdef __cplusplus
+extern "C" {
+#endif
+WifiErrorNo GetValidFrequenciesForBand(int32_t band, int *frequencies, int32_t *size, int id);
+WifiErrorNo WifiSetPowerModel(const int mode, int id);
+WifiErrorNo WifiGetPowerModel(int* mode, int id);
+#ifdef __cplusplus
+}
+#endif
 #endif

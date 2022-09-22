@@ -68,7 +68,6 @@ if (defined(ohos_lite)) {
       "//foundation/systemabilitymgr/samgr_lite/interfaces/innerkits/registry",
       "//foundation/systemabilitymgr/samgr_lite/interfaces/innerkits/samgr",
       "//third_party/bounds_checking_function/include",
-      "//utils/native/lite/include",
     ]
 
     deps = [
@@ -128,7 +127,6 @@ if (defined(ohos_lite)) {
       "//foundation/systemabilitymgr/samgr_lite/interfaces/innerkits/registry",
       "//foundation/systemabilitymgr/samgr_lite/interfaces/innerkits/samgr",
       "//third_party/bounds_checking_function/include",
-      "//utils/native/lite/include",
     ]
 
     deps = [

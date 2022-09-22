@@ -41,7 +41,7 @@ public:
         FreeOptionList(&options);
     }
 public:
-    DhcpOptionList options;
+    DhcpOptionList options = {0};
 };
 
 HWTEST_F(DhcpOptionTest, InitOptionListTest, TestSize.Level1)

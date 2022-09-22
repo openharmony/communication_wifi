@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,17 +16,18 @@
 #ifndef OHOS_WIFI_NET_CHECK_H
 #define OHOS_WIFI_NET_CHECK_H
 
-#include <unistd.h>
+#include <atomic>
+#include <condition_variable>
 #include <cstring>
 #include <fstream>
-#include <vector>
-#include <condition_variable>
 #include <mutex>
 #include <thread>
-#include "wifi_log.h"
-#include "sta_define.h"
+#include <unistd.h>
+#include <vector>
 #include "http_request.h"
+#include "sta_define.h"
 #include "wifi_errcode.h"
+#include "wifi_log.h"
 
 #define DEFAULT_PORTAL_HTTPS_URL ""
 
@@ -55,10 +56,16 @@ public:
      */
     virtual void StopNetCheckThread();
 
+    /**
+     * @Description : Exit the NetCheck thread.
+     *
+     */
+    virtual void ExitNetCheckThread();
+
 private:
     std::thread *pDealNetCheckThread;
     NetStateHandler netStateHandler;
-    StaNetState lastNetState;
+    std::atomic<StaNetState> lastNetState;
 
     /**
      * @Description : Detect Internet ability
@@ -70,18 +77,14 @@ private:
      *
      */
     void RunNetCheckThreadFunc();
-    /**
-     * @Description : Exit the NetCheck thread.
-     *
-     */
-    void ExitNetCheckThread();
 
 private:
     std::mutex mMutex;
     std::condition_variable mCondition;
     std::condition_variable mCondition_timeout;
-    bool isStopNetCheck;
-    bool isExitNetCheckThread;
+    std::atomic<bool> isStopNetCheck;
+    std::atomic<bool> isExitNetCheckThread;
+    std::atomic<bool> isExited;
 };
 }  // namespace Wifi
 }  // namespace OHOS

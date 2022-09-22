@@ -117,7 +117,7 @@ HWTEST_F(DhcpSocketTest, SendToDhcpPacket_SUCCESS, TestSize.Level1)
     EXPECT_EQ(SendToDhcpPacket(NULL, 0, 0, ifindex, (uint8_t *)MAC_BCAST_ADDR), SOCKET_OPT_FAILED);
     struct DhcpPacket packet;
     packet.xid = 123456;
-    EXPECT_EQ(SendToDhcpPacket(&packet, 0, 0, ifindex, (uint8_t *)MAC_BCAST_ADDR), SOCKET_OPT_FAILED);
+    EXPECT_EQ(SendToDhcpPacket(&packet, 0, 0, ifindex, (uint8_t *)MAC_BCAST_ADDR), SOCKET_OPT_SUCCESS);
     MockSystemFunc::SetMockFlag(false);
 }
 

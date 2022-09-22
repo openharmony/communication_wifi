@@ -65,6 +65,8 @@ static napi_value Init(napi_env env, napi_value exports) {
         DECLARE_NAPI_FUNCTION("setHotspotConfig", SetHotspotConfig),
         DECLARE_NAPI_FUNCTION("getHotspotConfig", GetHotspotConfig),
         DECLARE_NAPI_FUNCTION("getStations", GetStations),
+        DECLARE_NAPI_FUNCTION("addBlockList", AddBlockList),
+        DECLARE_NAPI_FUNCTION("delBlockList", DelBlockList),
         DECLARE_NAPI_FUNCTION("getP2pLinkedInfo", GetP2pLinkedInfo),
         DECLARE_NAPI_FUNCTION("getCurrentGroup", GetCurrentGroup),
         DECLARE_NAPI_FUNCTION("getP2pPeerDevices", GetP2pDevices),

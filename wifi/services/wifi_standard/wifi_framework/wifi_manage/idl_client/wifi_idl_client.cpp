@@ -67,6 +67,7 @@ int WifiIdlClient::InitClient(void)
 
 void WifiIdlClient::ExitAllClient(void)
 {
+    LOGI("Exit all client!");
     if (pRpcClient == nullptr) {
         return;
     }

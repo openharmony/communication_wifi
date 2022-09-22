@@ -132,7 +132,6 @@ void StateMachine::StopHandlerThread()
         LOGE("Start StateMachine failed, pStateMachineHandler is nullptr!");
         return;
     }
-
     pStateMachineHandler->StopHandlerThread();
 }
 

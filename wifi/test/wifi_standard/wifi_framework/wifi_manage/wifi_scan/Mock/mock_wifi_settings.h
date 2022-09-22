@@ -31,7 +31,7 @@ public:
     virtual void SetScreenState(const int &state) = 0;
     virtual int GetScreenState() const = 0;
     virtual ScanMode GetAppRunningState() const = 0;
-    virtual const std::string& GetAppPackageName() const = 0;
+    virtual const std::string GetAppPackageName() const = 0;
     virtual int GetFreezeModeState() const = 0;
     virtual int GetNoChargerPlugModeState() const = 0;
     virtual void SetSupportHwPnoFlag(bool supportHwPnoFlag) = 0;
@@ -40,8 +40,8 @@ public:
     virtual int GetMinRssi5Ghz() = 0;
     virtual bool GetWhetherToAllowNetworkSwitchover() = 0;
     virtual int GetDeviceConfig(std::vector<WifiDeviceConfig> &results) = 0;
-    virtual const std::vector<TrustListPolicy>& ReloadTrustListPolicies() = 0;
-    virtual const MovingFreezePolicy& ReloadMovingFreezePolicy() = 0;
+    virtual const std::vector<TrustListPolicy> ReloadTrustListPolicies() = 0;
+    virtual const MovingFreezePolicy ReloadMovingFreezePolicy() = 0;
     virtual int GetThermalLevel() const = 0;
 };
 
@@ -56,7 +56,7 @@ public:
     MOCK_METHOD1(SetScreenState, void(const int &state));
     MOCK_CONST_METHOD0(GetScreenState, int());
     MOCK_CONST_METHOD0(GetAppRunningState, ScanMode());
-    MOCK_CONST_METHOD0(GetAppPackageName, const std::string&());
+    MOCK_CONST_METHOD0(GetAppPackageName, const std::string());
     MOCK_CONST_METHOD0(GetFreezeModeState, int());
     MOCK_CONST_METHOD0(GetNoChargerPlugModeState, int());
     MOCK_METHOD1(SetSupportHwPnoFlag, void(bool supportHwPnoFlag));
@@ -65,8 +65,8 @@ public:
     MOCK_METHOD0(GetMinRssi5Ghz, int());
     MOCK_METHOD0(GetWhetherToAllowNetworkSwitchover, bool());
     MOCK_METHOD1(GetDeviceConfig, int(std::vector<WifiDeviceConfig> &results));
-    MOCK_METHOD0(ReloadTrustListPolicies, const std::vector<TrustListPolicy>&());
-    MOCK_METHOD0(ReloadMovingFreezePolicy, const MovingFreezePolicy&());
+    MOCK_METHOD0(ReloadTrustListPolicies, const std::vector<TrustListPolicy>());
+    MOCK_METHOD0(ReloadMovingFreezePolicy, const MovingFreezePolicy());
     MOCK_CONST_METHOD0(GetThermalLevel, int());
 };
 }  // namespace Wifi

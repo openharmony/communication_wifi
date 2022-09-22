@@ -49,6 +49,11 @@ ohos_unittest("crpc_unittest") {
     "--coverage",
   ]
 
+  deps = [
+    "//third_party/googletest:gmock_main",
+    "//third_party/googletest:gtest_main",
+  ]
+
   external_deps = [
     "c_utils:utils",
     "hiviewdfx_hilog_native:libhilog",

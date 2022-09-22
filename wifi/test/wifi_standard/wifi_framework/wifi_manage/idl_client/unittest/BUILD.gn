@@ -42,7 +42,6 @@ ohos_unittest("idl_client_unittest") {
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/idl_client/wifi_p2p_hal_interface.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/idl_client/wifi_sta_hal_interface.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/idl_client/wifi_supplicant_hal_interface.cpp",
-    "idl_client_test_main.cpp",
     "wifi_ap_hal_interface_test.cpp",
     "wifi_chip_hal_interface_test.cpp",
     "wifi_idl_client_test.cpp",
@@ -70,6 +69,8 @@ ohos_unittest("idl_client_unittest") {
   deps = [
     "$WIFI_ROOT_DIR/services/wifi_standard/ipc_framework/cRPC:crpc_client",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit:wifi_toolkit",
+    "//third_party/googletest:gmock_main",
+    "//third_party/googletest:gtest_main",
   ]
 
   ldflags = [
@@ -135,8 +136,5 @@ ohos_unittest("mock_wifi_hal_service") {
 
 group("unittest") {
   testonly = true
-  deps = [
-    # ":idl_client_unittest",
-    # ":mock_wifi_hal_service",
-  ]
+  deps = []
 }

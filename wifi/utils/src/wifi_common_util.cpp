@@ -299,7 +299,8 @@ bool IsForegroundApp(const int uid)
     }
 
     auto iter = std::find_if(infos.begin(), infos.end(), [&uid](const RunningProcessInfo &rhs) {
-        return ((rhs.uid_ == uid) && (rhs.state_ == AppProcessState::APP_STATE_FOREGROUND));
+        return ((rhs.uid_ == uid) && (rhs.state_ == AppProcessState::APP_STATE_FOREGROUND ||
+                rhs.state_ == AppProcessState::APP_STATE_FOCUS));
     });
     if (iter != infos.end()) {
         return true;

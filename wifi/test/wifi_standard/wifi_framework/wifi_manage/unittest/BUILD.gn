@@ -40,7 +40,6 @@ ohos_unittest("manager_unittest") {
     "wifi_auth_center_test.cpp",
     "wifi_config_center_test.cpp",
     "wifi_internal_event_dispatcher_test.cpp",
-    "wifi_manage_test.cpp",
     "wifi_manager_service_test.cpp",
     "wifi_service_manager_test.cpp",
   ]
@@ -81,6 +80,8 @@ ohos_unittest("manager_unittest") {
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit:wifi_toolkit",
     "$WIFI_ROOT_DIR/utils:wifi_utils",
     "//foundation/communication/netmanager_base/services/netmanagernative:netsys_native_manager",
+    "//third_party/googletest:gmock_main",
+    "//third_party/googletest:gtest_main",
   ]
 
   ldflags = [

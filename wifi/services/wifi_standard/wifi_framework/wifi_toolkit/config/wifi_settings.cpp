@@ -463,7 +463,6 @@ int WifiSettings::increaseNumRebootsSinceLastUse()
     }
 
     std::unique_lock<std::mutex> lock(mConfigMutex);
-    bool found = false;
     for (auto iter = mWifiDeviceConfig.begin(); iter != mWifiDeviceConfig.end(); iter++) {
         iter->second.numRebootsSinceLastUse++;
     }

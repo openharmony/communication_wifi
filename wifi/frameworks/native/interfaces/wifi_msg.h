@@ -396,6 +396,7 @@ struct WifiDeviceConfig {
     int uid;
     time_t lastConnectTime;
     int numRebootsSinceLastUse;
+    int numAssociation;
     WifiIpConfig wifiIpConfig;
     WifiEapConfig wifiEapConfig;
     WifiProxyConfig wifiProxyconfig;

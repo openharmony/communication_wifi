@@ -1183,6 +1183,6 @@ private:
     WifiConfigFileImpl<WifiStoreRandomMac> mSavedWifiStoreRandomMac;
     bool explicitGroup;
 };
-} // namespace Wifi
-} // namespace OHOS
+}  // namespace Wifi
+}  // namespace OHOS
 #endif

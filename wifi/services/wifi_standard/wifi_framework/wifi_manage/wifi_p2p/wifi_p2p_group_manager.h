@@ -211,7 +211,7 @@ private:
     std::mutex groupMutex;
     WifiP2pLinkedInfo p2pConnInfo;      /* group connection information */
 };
-} // namespace Wifi
-} // namespace OHOS
+}  // namespace Wifi
+}  // namespace OHOS
 
 #endif  // OHOS_P2P_GROUP_MANAGER_H

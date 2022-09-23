@@ -419,7 +419,7 @@ private:
     static bool m_isNeedDhcp;
     std::string p2pDevIface;
 };
-} // namespace Wifi
-} // namespace OHOS
+}  // namespace Wifi
+}  // namespace OHOS
 
 #endif  // OHOS_P2P_STATE_MACHINE_H

@@ -752,7 +752,7 @@ void StaStateMachine::ConvertFreqToChannel()
         LOGE("GetDeviceConfig failed!");
         return;
     }
-    int config.frequency = linkedInfo.frequency;
+    config.frequency = linkedInfo.frequency;
     if (linkedInfo.frequency >= FREQ_2G_MIN && linkedInfo.frequency <= FREQ_2G_MAX) {
         config.band = linkedInfo.band = static_cast<int>(BandType::BAND_2GHZ);
         config.channel = (linkedInfo.frequency - FREQ_2G_MIN) / CENTER_FREQ_DIFF + CHANNEL_2G_MIN;

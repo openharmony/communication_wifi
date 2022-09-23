@@ -82,19 +82,3 @@ HWTEST_F(DhcpIpv4Test, TEST_FAILED, TestSize.Level1)
     EXPECT_EQ(DHCP_OPT_FAILED, GetPacketHeaderInfo(NULL, 0));
     EXPECT_EQ(DHCP_OPT_FAILED, GetPacketCommonInfo(NULL));
 }
-
-HWTEST_F(DhcpIpv4Test, TEST_SUCCESS, TestSize.Level1)
-{
-    MockSystemFunc::SetMockFlag(true);
-
-    EXPECT_CALL(MockSystemFunc::GetInstance(), socket(_, _, _)).WillRepeatedly(Return(1));
-    EXPECT_CALL(MockSystemFunc::GetInstance(), bind(_, _, _)).WillRepeatedly(Return(0));
-    EXPECT_CALL(MockSystemFunc::GetInstance(), sendto(_, _, _, _, _, _))
-        .WillRepeatedly(Return(1));
-    EXPECT_CALL(MockSystemFunc::GetInstance(), close(_)).WillRepeatedly(Return(0));
-
-    EXPECT_EQ(0, DhcpDiscover(0, 1));
-    EXPECT_EQ(0, DhcpRenew(0, 0, 0));
-
-    MockSystemFunc::SetMockFlag(false);
-}

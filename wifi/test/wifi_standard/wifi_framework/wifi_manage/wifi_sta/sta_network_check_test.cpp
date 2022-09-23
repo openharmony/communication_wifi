@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,10 +12,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "sta_network_check.h"
 
 #include <gtest/gtest.h>
 #include <memory>
+#include "sta_network_check.h"
 
 using ::testing::ext::TestSize;
 
@@ -43,7 +43,7 @@ public:
 
 public:
     std::unique_ptr<StaNetworkCheck> pStaNetworkCheck;
-    NetStateHandler handle;
+    NetStateHandler handle = nullptr;
 };
 
 void StaNetworkCheckTest::SignalNetCheckThreadSuccess()

@@ -255,5 +255,5 @@ void WifiP2pGroupManager::UpdateGroupsNetwork(std::map<int, WifiP2pGroupInfo> wp
         }
     }
 }
-} // namespace Wifi
-} // namespace OHOS
+}  // namespace Wifi
+}  // namespace OHOS

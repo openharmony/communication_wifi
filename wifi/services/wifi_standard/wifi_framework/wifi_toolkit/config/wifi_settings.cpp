@@ -1513,5 +1513,5 @@ int WifiSettings::GetThermalLevel() const
 {
     return mThermalLevel;
 }
-} // namespace Wifi
-} // namespace OHOS
+}  // namespace Wifi
+}  // namespace OHOS

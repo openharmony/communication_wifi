@@ -461,6 +461,6 @@ std::string GetTClassName<WifiStoreRandomMac>();
 template <>
 std::string OutTClassString<WifiStoreRandomMac>(WifiStoreRandomMac &item);
 /* ----------template function specialization declare end----------- */
-} // namespace Wifi
-} // namespace OHOS
+}  // namespace Wifi
+}  // namespace OHOS
 #endif

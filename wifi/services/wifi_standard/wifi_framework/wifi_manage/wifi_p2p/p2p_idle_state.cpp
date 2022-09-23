@@ -381,5 +381,5 @@ bool P2pIdleState::ExecuteStateMsg(InternalMessage *msg)
         return NOT_EXECUTED;
     }
 }
-} // namespace Wifi
-} // namespace OHOS
+}  // namespace Wifi
+}  // namespace OHOS

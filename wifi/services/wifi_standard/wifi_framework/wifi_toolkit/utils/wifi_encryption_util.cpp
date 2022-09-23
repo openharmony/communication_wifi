@@ -167,6 +167,6 @@ int32_t WifiDecryption(const WifiEncryptionInfo &wifiEncryptionInfo, const Encry
     HksFreeParamSet(&decryParamSet);
     return ret;
 }
-} // namespace Wifi
-} // namespace OHOS
+}  // namespace Wifi
+}  // namespace OHOS
 #endif

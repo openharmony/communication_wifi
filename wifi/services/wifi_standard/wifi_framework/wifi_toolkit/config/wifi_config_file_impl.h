@@ -279,6 +279,6 @@ int WifiConfigFileImpl<T>::SetValue(const std::vector<T> &results)
     mValues = results;
     return 0;
 }
-} // namespace Wifi
-} // namespace OHOS
+}  // namespace Wifi
+}  // namespace OHOS
 #endif

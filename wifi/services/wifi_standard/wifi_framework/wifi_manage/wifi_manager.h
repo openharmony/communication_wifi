@@ -191,9 +191,8 @@ private:
     static void AutoStartP2pService(void);
 #endif
     static void AutoStartScanService(void);
-#ifdef OHOS_ARCH_LITE
-    static void AutoStartStaServiceThread(void);
-#endif
+    static void CheckAndStartSta(void);
+    static void AutoStartServiceThread(void);
 
 private:
     std::thread mCloseServiceThread;

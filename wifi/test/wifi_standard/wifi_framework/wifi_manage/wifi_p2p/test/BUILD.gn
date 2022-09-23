@@ -96,7 +96,6 @@ ohos_unittest("wifi_p2p_test") {
     "wifi_p2p_service_request_list_test.cpp",
     "wifi_p2p_service_response_list_test.cpp",
     "wifi_p2p_service_test.cpp",
-    "wifi_p2p_test_entry.cpp",
     "wifi_p2p_upnp_service_info_test.cpp",
     "wifi_p2p_upnp_service_request_test.cpp",
     "wifi_p2p_upnp_service_response_test.cpp",
@@ -138,6 +137,7 @@ ohos_unittest("wifi_p2p_test") {
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit:wifi_toolkit",
     "$WIFI_ROOT_DIR/utils:wifi_utils",
     "//third_party/googletest:gmock_main",
+    "//third_party/googletest:gtest_main",
   ]
   external_deps = [
     "c_utils:utils",

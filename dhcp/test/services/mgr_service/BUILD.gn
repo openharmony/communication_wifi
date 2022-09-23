@@ -37,7 +37,6 @@ ohos_unittest("dhcp_manage_unittest") {
     "$DHCP_ROOT_DIR/services/mgr_service/src/dhcp_service.cpp",
     "dhcp_client_service_test.cpp",
     "dhcp_func_test.cpp",
-    "dhcp_manage_test.cpp",
     "dhcp_result_notify.cpp",
     "dhcp_server_service_test.cpp",
     "dhcp_service_test.cpp",
@@ -59,7 +58,10 @@ ohos_unittest("dhcp_manage_unittest") {
     "//base/notification/common_event_service/frameworks/core/include",
   ]
 
-  deps = [ "//third_party/googletest:gmock_main" ]
+  deps = [
+    "//third_party/googletest:gmock_main",
+    "//third_party/googletest:gtest_main",
+  ]
 
   ldflags = [
     "-fPIC",

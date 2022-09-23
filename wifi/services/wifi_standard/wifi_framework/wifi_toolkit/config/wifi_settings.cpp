@@ -145,6 +145,7 @@ int WifiSettings::Init()
 #ifdef FEATURE_ENCRYPTION_SUPPORT
     SetUpHks();
 #endif
+    increaseNumRebootsSinceLastUse();
     return 0;
 }
 
@@ -367,7 +368,7 @@ int WifiSettings::SetDeviceState(int networkId, int state, bool bSetOther)
     return 0;
 }
 
-int WifiSettings::SetDeviceTime(int networkId)
+int WifiSettings::SetDeviceAfterConnect(int networkId)
 {
     time_t timeNow;
     time(&timeNow);
@@ -377,6 +378,8 @@ int WifiSettings::SetDeviceTime(int networkId)
         return -1;
     }
     iter->second.lastConnectTime = timeNow;
+    iter->second.numRebootsSinceLastUse = 0;
+    iter->second.numAssociation++;
     return 0;
 }
 
@@ -452,6 +455,21 @@ int WifiSettings::GetWifiP2pGroupInfo(std::vector<WifiP2pGroupInfo> &groups)
     return 0;
 }
 
+int WifiSettings::increaseNumRebootsSinceLastUse()
+{
+    if (!deviceConfigLoadFlag.test_and_set()) {
+        LOGE("Reload wifi config");
+        ReloadDeviceConfig();
+    }
+
+    std::unique_lock<std::mutex> lock(mConfigMutex);
+    bool found = false;
+    for (auto iter = mWifiDeviceConfig.begin(); iter != mWifiDeviceConfig.end(); iter++) {
+        iter->second.numRebootsSinceLastUse++;
+    }
+    return 0;
+}
+
 int WifiSettings::RemoveExcessDeviceConfigs(std::vector<WifiDeviceConfig> &configs)
 {
     int maxNumConfigs = mMaxNumConfigs;
@@ -467,6 +485,10 @@ int WifiSettings::RemoveExcessDeviceConfigs(std::vector<WifiDeviceConfig> &confi
             return (a.status == 0) < (b.status == 0);
         } else if (a.lastConnectTime != b.lastConnectTime) {
             return a.lastConnectTime < b.lastConnectTime;
+        } else if (a.numRebootsSinceLastUse != b.numRebootsSinceLastUse) {
+            return a.numRebootsSinceLastUse > b.numRebootsSinceLastUse;
+        } else if (a.numAssociation != b.numAssociation) {
+            return a.numAssociation < b.numAssociation;
         } else {
             return a.networkId < b.networkId;
         }

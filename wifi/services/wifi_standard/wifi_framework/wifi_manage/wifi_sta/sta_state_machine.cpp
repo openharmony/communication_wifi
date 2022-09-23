@@ -752,8 +752,7 @@ void StaStateMachine::ConvertFreqToChannel()
         LOGE("GetDeviceConfig failed!");
         return;
     }
-    int tempBand = config.band;
-    int tempChannel = config.channel;
+    int config.frequency = linkedInfo.frequency;
     if (linkedInfo.frequency >= FREQ_2G_MIN && linkedInfo.frequency <= FREQ_2G_MAX) {
         config.band = linkedInfo.band = static_cast<int>(BandType::BAND_2GHZ);
         config.channel = (linkedInfo.frequency - FREQ_2G_MIN) / CENTER_FREQ_DIFF + CHANNEL_2G_MIN;
@@ -763,10 +762,7 @@ void StaStateMachine::ConvertFreqToChannel()
         config.band = linkedInfo.band = static_cast<int>(BandType::BAND_5GHZ);
         config.channel = (linkedInfo.frequency - FREQ_5G_MIN) / CENTER_FREQ_DIFF + CHANNEL_5G_MIN;
     }
-    if (tempBand != config.band || tempChannel != config.channel) {
-        WifiSettings::GetInstance().AddDeviceConfig(config);
-        WifiSettings::GetInstance().SyncDeviceConfig();
-    }
+    WifiSettings::GetInstance().AddDeviceConfig(config);
     return;
 }
 
@@ -803,7 +799,7 @@ void StaStateMachine::DealConnectToUserSelectedNetwork(InternalMessage *msg)
     }
     /* Sets network status. */
     WifiSettings::GetInstance().EnableNetwork(networkId, forceReconnect);
-    WifiSettings::GetInstance().SetDeviceTime(networkId);
+    WifiSettings::GetInstance().SetDeviceAfterConnect(networkId);
     WifiSettings::GetInstance().SetDeviceState(networkId, (int)WifiDeviceConfigStatus::ENABLED, false);
 }
 
@@ -835,7 +831,7 @@ void StaStateMachine::DealConnectionEvent(InternalMessage *msg)
     }
 
     WIFI_LOGI("enter DealConnectionEvent");
-    WifiSettings::GetInstance().SetDeviceTime(targetNetworkId);
+    WifiSettings::GetInstance().SetDeviceAfterConnect(targetNetworkId);
     WifiSettings::GetInstance().SetDeviceState(targetNetworkId, (int)WifiDeviceConfigStatus::ENABLED, false);
     WifiSettings::GetInstance().SyncDeviceConfig();
     /* Stop clearing the Wpa_blocklist. */

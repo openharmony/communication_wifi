@@ -248,13 +248,13 @@ public:
     int SetDeviceState(int networkId, int state, bool bSetOther = false);
 
     /**
-     * @Description Set a wifi device's last connect time who's networkId equals input networkId;
+     * @Description Set a wifi device's attributes who's networkId equals input networkId after connect;
      *
      * @param networkId - the wifi device's id
      * @return int - when 0 means success, other means some fails happened,
      *               Input state invalid or not find the wifi device config
      */
-    int SetDeviceTime(int networkId);
+    int SetDeviceAfterConnect(int networkId);
 
     /**
      * @Description Get the candidate device configuration
@@ -282,6 +282,12 @@ public:
      */
     int SyncDeviceConfig();
 
+    /**
+     * @Description Increments the number of reboots since last use for each configuration
+     *
+     * @return int - 0 success; -1 save file failed
+     */
+    int increaseNumRebootsSinceLastUse();
     /**
      * @Description Remove excess networks in case the number of saved networks exceeds the mas limit
      *

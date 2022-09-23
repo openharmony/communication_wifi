@@ -287,7 +287,7 @@ public:
      *
      * @return int - 0 success; -1 save file failed
      */
-    int increaseNumRebootsSinceLastUse();
+    int IncreaseNumRebootsSinceLastUse();
     /**
      * @Description Remove excess networks in case the number of saved networks exceeds the mas limit
      *

@@ -145,7 +145,7 @@ int WifiSettings::Init()
 #ifdef FEATURE_ENCRYPTION_SUPPORT
     SetUpHks();
 #endif
-    increaseNumRebootsSinceLastUse();
+    IncreaseNumRebootsSinceLastUse();
     return 0;
 }
 
@@ -455,7 +455,7 @@ int WifiSettings::GetWifiP2pGroupInfo(std::vector<WifiP2pGroupInfo> &groups)
     return 0;
 }
 
-int WifiSettings::increaseNumRebootsSinceLastUse()
+int WifiSettings::IncreaseNumRebootsSinceLastUse()
 {
     if (!deviceConfigLoadFlag.test_and_set()) {
         LOGE("Reload wifi config");

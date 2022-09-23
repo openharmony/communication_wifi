@@ -41,6 +41,8 @@ static void ClearWifiDeviceConfig(WifiDeviceConfig &item)
     item.priority = 0;
     item.hiddenSSID = false;
     item.lastConnectTime = -1;
+    item.numRebootsSinceLastUse = 0;
+    item.numAssociation = 0;
     return;
 }
 
@@ -104,8 +106,27 @@ void ClearTClass<WifiDeviceConfig>(WifiDeviceConfig &item)
     return;
 }
 
+static int SetWifiDeviceConfigOutDated(WifiDeviceConfig &item, const std::string &key, const std::string &value)
+{
+    if (key == "band") {
+        item.band = std::stoi(value);
+    } else if (key == "channel") {
+        item.channel = std::stoi(value);
+    } else if (key == "level") {
+        item.level = std::stoi(value);
+    } else if (key == "isEphemeral") {
+        item.isEphemeral = std::stoi(value);
+    } else {
+        return -1;
+    }
+    return 0;
+}
+
 static int SetWifiDeviceConfigFirst(WifiDeviceConfig &item, const std::string &key, const std::string &value)
 {
+    if(SetWifiDeviceConfigOutDated(item, key, value) == 0) {
+        return 0
+    }
     if (key == "networkId") {
         item.networkId = std::stoi(value);
     } else if (key == "status") {
@@ -123,10 +144,6 @@ static int SetWifiDeviceConfigFirst(WifiDeviceConfig &item, const std::string &k
         } else {
             return -1;
         }
-    } else if (key == "band") {
-        item.band = std::stoi(value);
-    } else if (key == "channel") {
-        item.channel = std::stoi(value);
     } else if (key == "frequency") {
         item.frequency = std::stoi(value);
     } else if (key == "isPasspoint") {
@@ -143,6 +160,10 @@ static int SetWifiDeviceConfigFirst(WifiDeviceConfig &item, const std::string &k
         item.uid = std::stoi(value);
     } else if (key == "lastConnectTime") {
         item.lastConnectTime = std::stoi(value);
+    } else if (key == "numRebootsSinceLastUse") {
+        item.numRebootsSinceLastUse = std::stoi(value);
+    } else if (key == "numAssociation") {
+        item.numAssociation = std::stoi(value);
     } else {
         return -1;
     }
@@ -420,14 +441,14 @@ static std::string OutPutWifiDeviceConfig(WifiDeviceConfig &item)
     ss << "    " <<"bssid=" << item.bssid << std::endl;
     ss << "    " <<"ssid=" << ValidateString(item.ssid) << std::endl;
     ss << "    " <<"HexSsid=" << ConvertArrayToHex((uint8_t*)&item.ssid[0], item.ssid.length()) << std::endl;
-    ss << "    " <<"band=" << item.band << std::endl;
-    ss << "    " <<"channel=" << item.channel << std::endl;
     ss << "    " <<"frequency=" << item.frequency << std::endl;
     ss << "    " <<"isPasspoint=" << item.isPasspoint << std::endl;
     ss << "    " <<"priority=" << item.priority << std::endl;
     ss << "    " <<"hiddenSSID=" << (int)item.hiddenSSID << std::endl;
     ss << "    " <<"keyMgmt=" << item.keyMgmt << std::endl;
     ss << "    " <<"lastConnectTime=" << item.lastConnectTime << std::endl;
+    ss << "    " <<"numRebootsSinceLastUse=" << item.numRebootsSinceLastUse << std::endl;
+    ss << "    " <<"numAssociation=" << item.numAssociation << std::endl;
 #ifdef FEATURE_ENCRYPTION_SUPPORT
     ss <<OutPutEncryptionDeviceConfig(item);
 #else

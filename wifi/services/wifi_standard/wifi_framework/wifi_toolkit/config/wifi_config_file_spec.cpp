@@ -124,7 +124,7 @@ static int SetWifiDeviceConfigOutDated(WifiDeviceConfig &item, const std::string
 
 static int SetWifiDeviceConfigFirst(WifiDeviceConfig &item, const std::string &key, const std::string &value)
 {
-    if(SetWifiDeviceConfigOutDated(item, key, value) == 0) {
+    if (SetWifiDeviceConfigOutDated(item, key, value) == 0) {
         return 0;
     }
     if (key == "networkId") {

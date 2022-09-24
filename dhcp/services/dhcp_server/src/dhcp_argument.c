@@ -166,7 +166,7 @@ void PrintRequiredArguments(void)
     }
     printf(".\n\n");
     printf("Usage: dhcp_server [options] \n");
-    printf("e.g: dhcp_server -i eth0 -c /data/dhcp/dhcp_server.conf \n");
+    printf("e.g: dhcp_server -i eth0 -c /data/service/el1/public/dhcp/dhcp_server.conf \n");
     printf("     dhcp_server --help \n\n");
 }
 

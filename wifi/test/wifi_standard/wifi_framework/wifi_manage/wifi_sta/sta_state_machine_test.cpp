@@ -48,7 +48,7 @@ public:
         pStaStateMachine.reset(new StaStateMachine());
         pStaStateMachine->InitStaStateMachine();
 
-        NetStateHandler handle;
+        NetStateHandler handle = nullptr;
         pStaStateMachine->pNetcheck = new MockStaNetworkCheck(handle);
         pStaStateMachine->RegisterStaServiceCallback(WifiManager::GetInstance().GetStaCallback());
     }

@@ -44,16 +44,13 @@ const std::string EVENT_P2P_DISCOVERY_CHANGE = "p2pDiscoveryChange";
 const std::string EVENT_STREAM_CHANGE = "streamChange";
 
 /* Permissions definition */
-const std::string WIFI_PERMISSION_NULL = "ohos.permission.NULL";
 const std::string WIFI_PERMISSION_GET_WIFI_INFO = "ohos.permission.GET_WIFI_INFO";
 const std::string WIFI_PERMISSION_SET_WIFI_INFO = "ohos.permission.SET_WIFI_INFO";
 const std::string WIFI_PERMISSION_GET_WIFI_CONFIG = "ohos.permission.GET_WIFI_CONFIG";
 const std::string WIFI_PERMISSION_MANAGE_WIFI_CONNECTION = "ohos.permission.MANAGE_WIFI_CONNECTION";
 const std::string WIFI_PERMISSION_MANAGE_WIFI_HOTSPOT = "ohos.permission.MANAGE_WIFI_HOTSPOT";
-const std::string WIFI_PERMISSION_MANAGE_ENHANCER_WIFI = "ohos.permission.MANAGE_ENHANCER_WIFI";
 const std::string WIFI_PERMISSION_GET_WIFI_LOCAL_MAC = "ohos.permission.GET_WIFI_LOCAL_MAC";
 const std::string WIFI_PERMISSION_LOCATION = "ohos.permission.LOCATION";
-const std::string WIFI_PERMISSION_GET_P2P_DEVICE_LOCATION = "ohos.permission.GET_P2P_DEVICE_LOCATION";
 const std::string WIFI_PERMISSION_GET_WIFI_INFO_INTERNAL = "ohos.permission.GET_WIFI_INFO_INTERNAL";
 const int WIFI_NAPI_PERMISSION_DENIED = 0;
 const int WIFI_NAPI_PERMISSION_GRANTED = 1;

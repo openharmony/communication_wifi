@@ -34,10 +34,8 @@ static PermissionDef g_wifiPermissions[] = {
     {"ohos.permission.GET_WIFI_CONFIG", USER_GRANT, NOT_RESTRICTED},
     {"ohos.permission.MANAGE_WIFI_CONNECTION", USER_GRANT, NOT_RESTRICTED},
     {"ohos.permission.MANAGE_WIFI_HOTSPOT", USER_GRANT, NOT_RESTRICTED},
-    {"ohos.permission.MANAGE_ENHANCER_WIFI", USER_GRANT, NOT_RESTRICTED},
     {"ohos.permission.GET_WIFI_LOCAL_MAC", USER_GRANT, NOT_RESTRICTED},
     {"ohos.permission.LOCATION", USER_GRANT, NOT_RESTRICTED},
-    {"ohos.permission.GET_P2P_DEVICE_LOCATION", USER_GRANT, NOT_RESTRICTED},
     {"ohos.permission.MANAGE_WIFI_HOTSPOT_EXT", USER_GRANT, NOT_RESTRICTED},
 };
 

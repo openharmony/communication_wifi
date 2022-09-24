@@ -370,14 +370,13 @@ int WifiSettings::SetDeviceState(int networkId, int state, bool bSetOther)
 
 int WifiSettings::SetDeviceAfterConnect(int networkId)
 {
-    time_t timeNow;
-    time(&timeNow);
     std::unique_lock<std::mutex> lock(mConfigMutex);
     auto iter = mWifiDeviceConfig.find(networkId);
     if (iter == mWifiDeviceConfig.end()) {
         return -1;
     }
-    iter->second.lastConnectTime = timeNow;
+    LOGI("Set Device After Connect");
+    iter->second.lastConnectTime = time(0);
     iter->second.numRebootsSinceLastUse = 0;
     iter->second.numAssociation++;
     return 0;
@@ -474,6 +473,7 @@ int WifiSettings::RemoveExcessDeviceConfigs(std::vector<WifiDeviceConfig> &confi
     if (numExcessNetworks <= 0) {
         return 1;
     }
+    LOGI("Remove %d configs", numExcessNetworks);
     sort(configs.begin(), configs.end(), [](WifiDeviceConfig a, WifiDeviceConfig b) {
         if (a.status != b.status) {
             return (a.status == 0) < (b.status == 0);

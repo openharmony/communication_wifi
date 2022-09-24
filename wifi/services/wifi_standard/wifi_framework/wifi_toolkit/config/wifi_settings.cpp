@@ -457,11 +457,6 @@ int WifiSettings::GetWifiP2pGroupInfo(std::vector<WifiP2pGroupInfo> &groups)
 
 int WifiSettings::IncreaseNumRebootsSinceLastUse()
 {
-    if (!deviceConfigLoadFlag.test_and_set()) {
-        LOGE("Reload wifi config");
-        ReloadDeviceConfig();
-    }
-
     std::unique_lock<std::mutex> lock(mConfigMutex);
     for (auto iter = mWifiDeviceConfig.begin(); iter != mWifiDeviceConfig.end(); iter++) {
         iter->second.numRebootsSinceLastUse++;

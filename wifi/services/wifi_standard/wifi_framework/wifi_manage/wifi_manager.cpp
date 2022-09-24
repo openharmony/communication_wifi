@@ -14,26 +14,25 @@
  */
 
 #include "wifi_manager.h"
+#include <dirent.h>
+#include "wifi_auth_center.h"
+#include "wifi_chip_hal_interface.h"
+#include "wifi_common_event_helper.h"
+#include "wifi_config_center.h"
 #include "wifi_global_func.h"
 #include "wifi_logger.h"
-#include "wifi_sta_hal_interface.h"
-#include "wifi_chip_hal_interface.h"
-#include "wifi_auth_center.h"
-#include "wifi_config_center.h"
 #ifdef OHOS_ARCH_LITE
-#include <dirent.h>
 #include "wifi_internal_event_dispatcher_lite.h"
 #else
 #include "wifi_internal_event_dispatcher.h"
 #endif
+#include "wifi_sta_hal_interface.h"
 #include "wifi_service_manager.h"
 #include "wifi_settings.h"
-#include "wifi_common_event_helper.h"
-
-DEFINE_WIFILOG_LABEL("WifiManager");
 
 namespace OHOS {
 namespace Wifi {
+DEFINE_WIFILOG_LABEL("WifiManager");
 int WifiManager::mCloseApIndex = 0;
 WifiManager &WifiManager::GetInstance()
 {
@@ -59,6 +58,7 @@ WifiManager::~WifiManager()
 
 void WifiManager::AutoStartStaService(void)
 {
+    WIFI_LOGI("AutoStartStaService");
     WifiOprMidState staState = WifiConfigCenter::GetInstance().GetWifiMidState();
     if (staState == WifiOprMidState::CLOSED) {
         if (!WifiConfigCenter::GetInstance().SetWifiMidState(staState, WifiOprMidState::OPENING)) {
@@ -110,8 +110,7 @@ void WifiManager::ForceStopWifi(void)
     WifiConfigCenter::GetInstance().SetWifiMidState(curState, WifiOprMidState::CLOSED);
 }
 
-#ifdef OHOS_ARCH_LITE
-void WifiManager::AutoStartStaServiceThread(void)
+void WifiManager::CheckAndStartSta(void)
 {
     DIR *dir = nullptr;
     struct dirent *dent = nullptr;
@@ -141,7 +140,15 @@ void WifiManager::AutoStartStaServiceThread(void)
     closedir(dir);
     AutoStartStaService();
 }
+
+void WifiManager::AutoStartServiceThread(void)
+{
+    WIFI_LOGI("Auto start service...");
+    CheckAndStartSta();
+#ifdef FEATURE_P2P_SUPPORT
+    AutoStartP2pService();
 #endif
+}
 
 #ifdef FEATURE_P2P_SUPPORT
 WifiCfgMonitorEventCallback WifiManager::cfgMonitorCallback = {
@@ -150,6 +157,7 @@ WifiCfgMonitorEventCallback WifiManager::cfgMonitorCallback = {
 
 void WifiManager::AutoStartP2pService(void)
 {
+    WIFI_LOGI("AutoStartP2pService");
     WifiOprMidState p2pState = WifiConfigCenter::GetInstance().GetP2pMidState();
     if (p2pState == WifiOprMidState::CLOSED) {
         if (!WifiConfigCenter::GetInstance().SetP2pMidState(p2pState, WifiOprMidState::OPENING)) {
@@ -189,6 +197,7 @@ void WifiManager::AutoStartP2pService(void)
 
 void WifiManager::AutoStartScanService(void)
 {
+    WIFI_LOGI("AutoStartScanService");
     if (!WifiConfigCenter::GetInstance().IsScanAlwaysActive()) {
         WIFI_LOGW("Scan always is not open, not open scan service.");
         return;
@@ -246,22 +255,14 @@ int WifiManager::Init()
         return -1;
     }
     if (WifiConfigCenter::GetInstance().GetStaLastRunState()) { /* Automatic startup upon startup */
-        WIFI_LOGI("AutoStartSta/P2pService");
-#ifdef OHOS_ARCH_LITE
-        std::thread startStaSrvThread(WifiManager::AutoStartStaServiceThread);
+        WIFI_LOGI("AutoStartServiceThread");
+        std::thread startStaSrvThread(WifiManager::AutoStartServiceThread);
         startStaSrvThread.detach();
-#else
-        AutoStartStaService();
-#ifdef FEATURE_P2P_SUPPORT
-        AutoStartP2pService();
-#endif
-#endif
     } else {
         /**
          * The sta service automatically starts upon startup. After the sta
          * service is started, the scanning is directly started.
          */
-        WIFI_LOGI("AutoStartScanService");
         AutoStartScanService();
     }
     return 0;

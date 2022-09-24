@@ -62,7 +62,6 @@ ohos_unittest("wifi_hal_unittest") {
     "wifi_hal_hostapd_test.cpp",
     "wifi_hal_p2p_interface_test.cpp",
     "wifi_hal_sta_interface_test.cpp",
-    "wifi_hal_test.cpp",
     "wifi_hal_wpa_p2p_test.cpp",
     "wifi_hal_wpa_sta_test.cpp",
   ]
@@ -87,6 +86,8 @@ ohos_unittest("wifi_hal_unittest") {
   deps = [
     "$WIFI_ROOT_DIR/services/wifi_standard/ipc_framework/cRPC:crpc_server",
     "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog",
+    "//third_party/googletest:gmock_main",
+    "//third_party/googletest:gtest_main",
   ]
 
   ldflags = [

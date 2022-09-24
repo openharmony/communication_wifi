@@ -240,9 +240,12 @@ static bool GetNetworkId(int argc, const char *argv[], int &nid)
 
 static bool GetDeviceConfig(int argc, const char *argv[], WifiDeviceConfig &config)
 {
+    int phase2 = 0;
     string keyMgmt = "";
     config.ssid = "";
     config.preSharedKey = "";
+    config.wifiEapConfig.eap = "";
+    config.wifiEapConfig.identity = "";
 
     for (int i = ARG_IDX; i < argc; i++) {
         if (strncmp(argv[i], "ssid=", strlen("ssid=")) == 0) {
@@ -251,24 +254,39 @@ static bool GetDeviceConfig(int argc, const char *argv[], WifiDeviceConfig &conf
             config.preSharedKey = argv[i] + strlen("pwd=");
         } else if (strncmp(argv[i], "key_mgmt=", strlen("key_mgmt=")) == 0) {
             keyMgmt = argv[i] + strlen("key_mgmt=");
+        } else if (strncmp(argv[i], "id=", strlen("id=")) == 0) {
+            config.wifiEapConfig.identity = argv[i] + strlen("id=");
+        } else if (strncmp(argv[i], "phase2=", strlen("phase2=")) == 0) {
+            (void)sscanf_s(argv[i], "phase2=%d", &phase2);
+        } else if (strncmp(argv[i], "eapmethod=", strlen("eapmethod=")) == 0) {
+            config.wifiEapConfig.eap = argv[i] + strlen("eapmethod=");
         }
     }
     if (config.ssid == "" || keyMgmt == "") {
         HelpCommand(argv[CMD_IDX]);
         return false;
     }
-    if (keyMgmt != "open" && keyMgmt != "wpa" && keyMgmt != "wpa2") {
-        Logd("key_mgmt should be one of {open, wpa, wpa2}");
+    if (keyMgmt != "open" && keyMgmt != "wpa" && keyMgmt != "wpa2" && keyMgmt != "eap") {
+        Logd("key_mgmt should be one of {open, wpa, wpa2, eap}");
         return false;
     }
-    if (keyMgmt != "open" && config.preSharedKey.length() < MIN_WPA_LENGTH) {
+    if ((keyMgmt != "open" && keyMgmt != "eap") && config.preSharedKey.length() < MIN_WPA_LENGTH) {
         Logd("password length should be >= %d", MIN_WPA_LENGTH);
         return false;
     }
     if (keyMgmt == "open") {
-        config.keyMgmt = "NONE";
+        config.keyMgmt = KEY_MGMT_NONE;
+    } else if (keyMgmt == "eap") {
+        config.keyMgmt = KEY_MGMT_EAP;
+        if (config.wifiEapConfig.eap == EAP_METHOD_PEAP) {
+            config.wifiEapConfig.phase2Method = Phase2Method(phase2);
+            config.wifiEapConfig.password = config.preSharedKey;
+            config.preSharedKey = "";
+        } else {
+            Logd("EapMethod %s unsupported", config.wifiEapConfig.eap.c_str());
+        }
     } else {
-        config.keyMgmt = "WPA-PSK";
+        config.keyMgmt = KEY_MGMT_WPA_PSK;
     }
     return true;
 }

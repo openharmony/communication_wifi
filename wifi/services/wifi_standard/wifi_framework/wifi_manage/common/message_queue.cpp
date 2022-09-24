@@ -25,7 +25,9 @@
 namespace OHOS {
 namespace Wifi {
 MessageQueue::MessageQueue() : pMessageQueue(nullptr), mIsBlocked(false), mNeedQuit(false)
-{}
+{
+    LOGI("MessageQueue::MessageQueue");
+}
 
 MessageQueue::~MessageQueue()
 {
@@ -44,6 +46,7 @@ MessageQueue::~MessageQueue()
 
 bool MessageQueue::AddMessageToQueue(InternalMessage *message, int64_t handleTime)
 {
+    LOGI("MessageQueue::AddMessageToQueue");
     if (message == nullptr) {
         LOGE("message is null.");
         return false;
@@ -96,6 +99,7 @@ bool MessageQueue::AddMessageToQueue(InternalMessage *message, int64_t handleTim
 
 bool MessageQueue::DeleteMessageFromQueue(int messageName)
 {
+    LOGI("MessageQueue::DeleteMessageFromQueue");
     std::unique_lock<std::mutex> lck(mMtxQueue);
     InternalMessage *pTop = pMessageQueue;
     if (pTop == nullptr) {
@@ -174,6 +178,7 @@ InternalMessage *MessageQueue::GetNextMessage()
 void MessageQueue::StopQueueLoop()
 {
     LOGI("Start stop queue loop.");
+    mNeedQuit = true;
     while (mIsBlocked) {
         mNeedQuit = true;
         mCvQueue.notify_all();

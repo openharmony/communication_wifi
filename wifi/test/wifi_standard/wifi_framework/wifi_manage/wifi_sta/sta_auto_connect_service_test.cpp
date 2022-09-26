@@ -768,17 +768,6 @@ void StaAutoConnectServiceTest::SetRoamBlockedBssidFirmwareSuccess()
     EXPECT_TRUE(pStaAutoConnectService->SetRoamBlockedBssidFirmware(blockedBssids) == true);
 }
 
-void StaAutoConnectServiceTest::SetRoamBlockedBssidFirmwareFail1()
-{
-    std::vector<std::string> blockedBssids;
-    std::string bssid = "2a:76:93:47:e2:8a";
-    blockedBssids.push_back(bssid);
-
-    ON_CALL(WifiStaHalInterface::GetInstance(), SetRoamConfig(_))
-        .WillByDefault(Return(WIFI_IDL_OPT_FAILED));
-    EXPECT_TRUE(pStaAutoConnectService->SetRoamBlockedBssidFirmware(blockedBssids) == false);
-}
-
 void StaAutoConnectServiceTest::SetRoamBlockedBssidFirmwareFail2()
 {
     ObtainRoamCapFromFirmwareSuccess();
@@ -1522,11 +1511,6 @@ HWTEST_F(StaAutoConnectServiceTest, ObtainRoamCapFromFirmwareFail2, TestSize.Lev
 HWTEST_F(StaAutoConnectServiceTest, SetRoamBlockedBssidFirmwareSuccess, TestSize.Level1)
 {
     SetRoamBlockedBssidFirmwareSuccess();
-}
-
-HWTEST_F(StaAutoConnectServiceTest, SetRoamBlockedBssidFirmwareFail1, TestSize.Level1)
-{
-    SetRoamBlockedBssidFirmwareFail1();
 }
 
 HWTEST_F(StaAutoConnectServiceTest, SetRoamBlockedBssidFirmwareFail2, TestSize.Level1)

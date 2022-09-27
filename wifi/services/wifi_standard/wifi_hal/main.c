@@ -18,13 +18,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "server.h"
-#include "wifi_log.h"
+#include "wifi_common_def.h"
 #include "wifi_hal_adapter.h"
 #include "wifi_hal_ap_interface.h"
 #include "wifi_hal_crpc_server.h"
-#include "wifi_hal_sta_interface.h"
 #include "wifi_hal_p2p_interface.h"
+#include "wifi_hal_sta_interface.h"
 #include "wifi_hostapd_hal.h"
+#include "wifi_log.h"
 
 #undef LOG_TAG
 #define LOG_TAG "WifiHalService"
@@ -81,7 +82,7 @@ static void SendStartNotify(void)
 int main(void)
 {
     LOGI("Wifi hal service starting...");
-    char rpcSockPath[] = "/data/misc/wifi/unix_sock.sock";
+    char rpcSockPath[] = CONFIG_ROOR_DIR"/unix_sock.sock";
     if (access(rpcSockPath, 0) == 0) {
         unlink(rpcSockPath);
     }

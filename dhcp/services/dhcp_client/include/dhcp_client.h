@@ -23,7 +23,7 @@
 extern "C" {
 #endif
 
-#define WORKDIR                 "/data/dhcp/"
+#define WORKDIR                 "/data/service/el1/public/dhcp/"
 #define DHCPC_NAME              "dhcp_client_service"
 #define DHCPC_CONF              "dhcp_client_service.conf"
 #define DHCPC_PID               "dhcp_client_service.pid"

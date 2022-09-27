@@ -14,18 +14,19 @@
  */
 
 #include "wifi_wpa_hal.h"
-#include <unistd.h>
 #include <poll.h>
+#include <unistd.h>
 #include "securec.h"
-#include "wifi_wpa_common.h"
 #include "utils/common.h" /* request for printf_decode to decode wpa's returned ssid info */
-#include "wifi_hal_common_func.h"
+#include "wifi_common_def.h"
 #include "wifi_hal_callback.h"
-#include "wifi_hal_struct.h"
+#include "wifi_hal_common_func.h"
 #include "wifi_hal_p2p_struct.h"
-#include "wifi_p2p_hal.h"
-
+#include "wifi_hal_struct.h"
 #include "wifi_log.h"
+#include "wifi_p2p_hal.h"
+#include "wifi_wpa_common.h"
+
 #undef LOG_TAG
 #define LOG_TAG "WifiWpaHal"
 
@@ -758,7 +759,7 @@ static int WpaCliConnect(WifiWpaInterface *p)
     }
     int count = WPA_TRY_CONNECT_TIMES;
     while (count-- > 0) {
-        int ret = InitWpaCtrl(&p->wpaCtrl, "/data/misc/wifi/sockets/wpa");
+        int ret = InitWpaCtrl(&p->wpaCtrl, CONFIG_ROOR_DIR"/sockets/wpa");
         if (ret == 0) {
             LOGI("Global wpa interface connect successfully!");
             break;

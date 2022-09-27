@@ -55,7 +55,6 @@ if (defined(ohos_lite)) {
     cflags_cc = [ "-fno-rtti" ]
 
     defines = [
-      "__OHOS__",
       "_GNU_SOURCE",
       "OHOS_ARCH_LITE",
     ]
@@ -76,7 +75,7 @@ if (defined(ohos_lite)) {
 
     cflags_cc = [ "-fno-rtti" ]
 
-    defines = [ "__OHOS__" ]
+    defines = []
     if (dhcp_hilog_enable) {
       external_deps += [ "hiviewdfx_hilog_native:libhilog" ]
       defines += [ "DHCP_HILOG_ENABLE" ]

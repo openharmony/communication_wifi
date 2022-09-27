@@ -134,10 +134,10 @@ void WifiManager::CheckAndStartSta(void)
                 return;
             }
         }
+        closedir(dir);
         sleep(sleepTime);
         currentWaitTime++;
     }
-    closedir(dir);
     AutoStartStaService();
 }
 

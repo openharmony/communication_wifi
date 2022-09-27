@@ -94,6 +94,19 @@ enum class SecTypeJs {
     SEC_TYPE_WEP = 2, /* Wired Equivalent Privacy (WEP) */
     SEC_TYPE_PSK = 3, /* Pre-shared key (PSK) */
     SEC_TYPE_SAE = 4, /* Simultaneous Authentication of Equals (SAE) */
+    SEC_TYPE_EAP = 5, /* Extensible Authentication Protocol (EAP) */
+};
+
+enum class EapMethodJs {
+    EAP_NONE = 0,
+    EAP_PEAP = 1,
+    EAP_TLS = 2,
+    EAP_TTLS = 3,
+    EAP_PWD = 4,
+    EAP_SIM = 5,
+    EAP_AKA = 6,
+    EAP_AKA_PRIME = 7,
+    EAP_UNAUTH_TLS = 8,
 };
 }  // namespace Wifi
 }  // namespace OHOS

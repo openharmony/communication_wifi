@@ -22,7 +22,7 @@
 #include <dlfcn.h>
 #include <unistd.h>
 
-typedef int socklen_t;
+typedef unsigned int socklen_t;
 
 using ::testing::_;
 using ::testing::Return;

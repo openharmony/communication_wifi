@@ -37,8 +37,6 @@
 DEFINE_WIFILOG_LABEL("StaStateMachine");
 #define PBC_ANY_BSSID "any"
 
-const int SLEEPTIME = 3;
-
 namespace OHOS {
 namespace Wifi {
 StaStateMachine::StaStateMachine()
@@ -2121,10 +2119,9 @@ void StaStateMachine::DhcpResultNotify::OnSuccess(int status, const std::string 
         pStaStateMachine->SaveLinkstate(ConnState::CONNECTED, DetailedState::CONNECTED);
         pStaStateMachine->staCallback.OnStaConnChanged(
             OperateResState::CONNECT_AP_CONNECTED, pStaStateMachine->linkedInfo);
-        /* Wait for the network adapter information to take effect. */
-        sleep(SLEEPTIME);
-        /* Check whether the Internet access is normal by send http. */
-        pStaStateMachine->pNetcheck->SignalNetCheckThread();
+        if (pStaStateMachine->pNetcheck != nullptr) {
+            pStaStateMachine->pNetcheck->SignalNetCheckThread();
+        }
     }
     pStaStateMachine->getIpSucNum++;
 

@@ -28,12 +28,14 @@
 #define LOG_TAG "WifiWpaStaHal"
 
 #define FAIL_BUSY 2
-#define SCAN_INFO_NONE 0
-#define SCAN_INFO_ONE 1
-#define SCAN_INFO_TWO 2
-#define SCAN_INFO_THREE 3
-#define SCAN_INFO_FOUR 4
-#define SCAN_INFO_FIVE 5
+
+#define COLUMN_INDEX_ZERO 0
+#define COLUMN_INDEX_ONE 1
+#define COLUMN_INDEX_TWO 2
+#define COLUMN_INDEX_THREE 3
+#define COLUMN_INDEX_FOUR 4
+#define COLUMN_INDEX_FIVE 5
+
 #define FAIL_PBC_OVERLAP_RETUEN 3
 #define CMD_BUFFER_SIZE 1024
 #define REPLY_BUF_LENGTH (4096 * 10)
@@ -570,14 +572,14 @@ static void ListNetworkProcess(WifiNetworkInfo *pcmd, char *tmpBuf, int bufLeng)
             continue;
         }
         tmpBuf[end] = '\0';
-        if (i == SCAN_INFO_NONE) {
+        if (i == COLUMN_INDEX_ZERO) {
             pcmd->id = atoi(tmpBuf);
-        } else if (i == SCAN_INFO_ONE) {
+        } else if (i == COLUMN_INDEX_ONE) {
             if (strcpy_s(pcmd->ssid, sizeof(pcmd->ssid), tmpBuf + start) != EOK) {
                 break;
             }
             printf_decode((u8 *)pcmd->ssid, sizeof(pcmd->ssid), pcmd->ssid);
-        } else if (i == SCAN_INFO_TWO) {
+        } else if (i == COLUMN_INDEX_TWO) {
             if (strcpy_s(pcmd->bssid, sizeof(pcmd->bssid), tmpBuf + start) != EOK) {
                 break;
             }
@@ -756,6 +758,7 @@ static int WpaCliCmdScan(WifiWpaStaInterface *this, const ScanSettings *settings
     return 0;
 }
 
+#ifndef OHOS_ARCH_LITE
 static int ConvertChanToFreqMhz(int channel, int band)
 {
     int BAND_FIRST_CH_NUM_24 = 1;
@@ -921,9 +924,9 @@ static bool GetChanWidthCenterFreqVht(ScanInfo *pcmd, ScanInfoElem* infoElem)
     if ((infoElem->content == NULL) || ((unsigned int)infoElem->size < VHT_INFO_SIZE)) {
         return false;
     }
-    int channelType = infoElem->content[SCAN_INFO_NONE] & UINT8_MASK;
-    int centerFrequencyIndex1 = infoElem->content[SCAN_INFO_ONE] & UINT8_MASK;
-    int centerFrequencyIndex2 = infoElem->content[SCAN_INFO_TWO] & UINT8_MASK;
+    int channelType = infoElem->content[COLUMN_INDEX_ZERO] & UINT8_MASK;
+    int centerFrequencyIndex1 = infoElem->content[COLUMN_INDEX_ONE] & UINT8_MASK;
+    int centerFrequencyIndex2 = infoElem->content[COLUMN_INDEX_TWO] & UINT8_MASK;
     pcmd->channelWidth = GetVhtChanWidth(channelType, centerFrequencyIndex1, centerFrequencyIndex2);
     if ((unsigned int)pcmd->channelWidth == UNSPECIFIED) {
         return false;
@@ -946,20 +949,20 @@ static bool GetChanWidthCenterFreqHe(ScanInfo *pcmd, ScanInfoElem* infoElem)
         return false;
     }
     char* content = infoElem->content + 1;
-    bool isVhtInfoExist = (content[SCAN_INFO_ONE] & VHT_OPER_INFO_EXTST_MASK) != 0;
-    bool is6GhzInfoExist = (content[SCAN_INFO_TWO] & GHZ_HE_INFO_EXIST_MASK_6) != 0;
-    bool coHostedBssPresent = (content[SCAN_INFO_ONE] & BSS_EXIST_MASK) != 0;
-    int expectedLen = HE_OPER_BASIC_LEN + (isVhtInfoExist ? SCAN_INFO_THREE : 0)
-        + (coHostedBssPresent ? 1 : 0) + (is6GhzInfoExist ? SCAN_INFO_FIVE: 0);
+    bool isVhtInfoExist = (content[COLUMN_INDEX_ONE] & VHT_OPER_INFO_EXTST_MASK) != 0;
+    bool is6GhzInfoExist = (content[COLUMN_INDEX_TWO] & GHZ_HE_INFO_EXIST_MASK_6) != 0;
+    bool coHostedBssPresent = (content[COLUMN_INDEX_ONE] & BSS_EXIST_MASK) != 0;
+    int expectedLen = HE_OPER_BASIC_LEN + (isVhtInfoExist ? COLUMN_INDEX_THREE : 0)
+        + (coHostedBssPresent ? 1 : 0) + (is6GhzInfoExist ? COLUMN_INDEX_FIVE: 0);
     if (infoElem->size < expectedLen) {
         return false;
     }
     if (is6GhzInfoExist) {
-        int startIndx = VHT_OPER_INFO_BEGIN_INDEX + (isVhtInfoExist ? SCAN_INFO_THREE : 0)
+        int startIndx = VHT_OPER_INFO_BEGIN_INDEX + (isVhtInfoExist ? COLUMN_INDEX_THREE : 0)
             + (coHostedBssPresent ? 1 : 0);
         int heChannelWidth = content[startIndx + 1] & GHZ_HE_WIDTH_MASK_6;
-        int centerSegFreq0 = content[startIndx + SCAN_INFO_TWO] & UINT8_MASK;
-        int centerSegFreq1 = content[startIndx + SCAN_INFO_THREE] & UINT8_MASK;
+        int centerSegFreq0 = content[startIndx + COLUMN_INDEX_TWO] & UINT8_MASK;
+        int centerSegFreq1 = content[startIndx + COLUMN_INDEX_THREE] & UINT8_MASK;
         pcmd->channelWidth = GetHeChanWidth(heChannelWidth, centerSegFreq0, centerSegFreq1);
         pcmd->centerFrequency0 = GetHeCentFreq(centerSegFreq0);
         pcmd->centerFrequency1 = GetHeCentFreq(centerSegFreq1);
@@ -1080,10 +1083,11 @@ static void GetInfoElems(int length, int end, char *srcBuf, ScanInfo *pcmd)
     pcmd->ieSize = infoElemsSize;
     return;
 }
+#endif
 
 static int DelScanInfoLine(ScanInfo *pcmd, char *srcBuf, int length)
 {
-    int i = 0;
+    int columnIndex = 0;
     int start = 0;
     int end = 0;
     int fail = 0;
@@ -1093,21 +1097,31 @@ static int DelScanInfoLine(ScanInfo *pcmd, char *srcBuf, int length)
             continue;
         }
         srcBuf[end] = '\0';
-        if (i == 0) {
+        if (columnIndex == COLUMN_INDEX_ZERO) {
             if (strcpy_s(pcmd->bssid, sizeof(pcmd->bssid), srcBuf + start) != EOK) {
                 fail = 1;
                 break;
             }
-        } else if (i == 1) {
+        } else if (columnIndex == COLUMN_INDEX_ONE) {
             pcmd->freq = atoi(srcBuf + start);
-        } else if (i == SCAN_INFO_TWO) {
+        } else if (columnIndex == COLUMN_INDEX_TWO) {
             pcmd->siglv = atoi(srcBuf + start);
-        } else if (i == SCAN_INFO_THREE) {
+        } else if (columnIndex == COLUMN_INDEX_THREE) {
             if (strcpy_s(pcmd->flags, sizeof(pcmd->flags), srcBuf + start) != EOK) {
                 fail = 1;
                 break;
             }
-        } else if (i == SCAN_INFO_FOUR) {
+#ifdef OHOS_ARCH_LITE // The wpa of arch lite don't return "informationElements".
+            start = end + 1;
+            if (strcpy_s(pcmd->ssid, sizeof(pcmd->ssid), srcBuf + start) != EOK) {
+                fail = 1;
+                break;
+            }
+            printf_decode((u8 *)pcmd->ssid, sizeof(pcmd->ssid), pcmd->ssid);
+            start = length;
+            break;
+#else
+        } else if (columnIndex == COLUMN_INDEX_FOUR) {
             if (strcpy_s(pcmd->ssid, sizeof(pcmd->ssid), srcBuf + start) != EOK) {
                 fail = 1;
                 break;
@@ -1116,8 +1130,9 @@ static int DelScanInfoLine(ScanInfo *pcmd, char *srcBuf, int length)
             GetInfoElems(length, end, srcBuf, pcmd);
             start = length;
             break;
+#endif
         }
-        ++i;
+        ++columnIndex;
         ++end;
         start = end;
     }

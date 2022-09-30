@@ -24,13 +24,6 @@
 
 DEFINE_WIFILOG_LABEL("WifiCDevice");
 
-static std::map<WifiSecurityType, std::string> g_secTypeKeyMgmtMap = {
-    {WIFI_SEC_TYPE_OPEN, "NONE"},
-    {WIFI_SEC_TYPE_WEP, "WEP"},
-    {WIFI_SEC_TYPE_PSK, "WPA-PSK"},
-    {WIFI_SEC_TYPE_SAE, "SAE"},
-};
-
 std::unique_ptr<OHOS::Wifi::WifiDevice> wifiDevicePtr = OHOS::Wifi::WifiDevice::GetInstance(WIFI_DEVICE_ABILITY_ID);
 std::unique_ptr<OHOS::Wifi::WifiScan> wifiScanPtr = OHOS::Wifi::WifiScan::GetInstance(WIFI_SCAN_ABILITY_ID);
 
@@ -95,23 +88,6 @@ WifiErrorCode GetScanInfoList(WifiScanInfo *result, unsigned int *size)
     }
     *size = (vecSize < WIFI_SCAN_HOTSPOT_LIMIT) ? vecSize : WIFI_SCAN_HOTSPOT_LIMIT;
     return GetCErrorCode(ret);
-}
-
-static std::string GetKeyMgmtBySecType(const int securityType)
-{
-    WifiSecurityType key = WifiSecurityType(securityType);
-    std::map<WifiSecurityType, std::string>::const_iterator iter = g_secTypeKeyMgmtMap.find(key);
-    return iter == g_secTypeKeyMgmtMap.end() ? "NONE" : iter->second;
-}
-
-static int GetSecTypeByKeyMgmt(const std::string& keyMgmt)
-{
-    for (auto& each : g_secTypeKeyMgmtMap) {
-        if (each.second == keyMgmt) {
-            return static_cast<int>(each.first);
-        }
-    }
-    return static_cast<int>(WIFI_SEC_TYPE_OPEN);
 }
 
 static void GetStaticIpFromC(const IpConfig& ipConfig, OHOS::Wifi::StaticIpAddress& staticIp)

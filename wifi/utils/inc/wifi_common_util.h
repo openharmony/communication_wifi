@@ -20,6 +20,7 @@
 #include <string>
 #include <vector>
 #include "securec.h"
+#include "wifi_device_config.h"
 
 #ifndef WIFI_MAC_LEN
 #define WIFI_MAC_LEN 6
@@ -27,6 +28,23 @@
 
 namespace OHOS {
 namespace Wifi {
+
+/**
+ * @Description get KeyMgmt by security type.
+ *
+ * @param securityType - Input security type
+ * @return std::string - KeyMgmt
+ */
+std::string GetKeyMgmtBySecType(const int securityType);
+
+/**
+ * @Description get security type by KeyMgmt
+ *
+ * @param keyMgmt - KeyMgmt
+ * @return int - security type
+ */
+int GetSecTypeByKeyMgmt(const std::string& keyMgmt);
+
 /**
  * @Description MAC address anonymization
  *

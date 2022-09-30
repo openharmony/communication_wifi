@@ -583,6 +583,9 @@ bool ScanService::StoreFullScanInfo(
 
     std::vector<WifiScanInfo> storeInfoList;
     for (auto iter = scanInfoList.begin(); iter != scanInfoList.end(); ++iter) {
+        if (iter->ssid.empty()) {
+            continue;
+        }
         WifiScanInfo scanInfo;
         scanInfo.bssid = iter->bssid;
         scanInfo.ssid = iter->ssid;
@@ -609,7 +612,7 @@ bool ScanService::StoreFullScanInfo(
         bool find = false;
         for (auto storedIter = storeInfoList.begin(); storedIter != storeInfoList.end(); ++storedIter) {
             if (iter->bssid == storedIter->bssid) {
-		find = true;
+                find = true;
                 break;
             }
         }
@@ -618,6 +621,7 @@ bool ScanService::StoreFullScanInfo(
         }
     }
 
+    WIFI_LOGI("Save %{public}d scan results.", (int)(storeInfoList.size()));
     if (WifiSettings::GetInstance().SaveScanInfoList(storeInfoList) != 0) {
         WIFI_LOGE("WifiSettings::GetInstance().SaveScanInfoList failed.\n");
         return false;
@@ -982,8 +986,7 @@ void ScanService::StopSystemScan()
 
 void ScanService::StartSystemTimerScan(bool scanAtOnce)
 {
-    WIFI_LOGI("Enter ScanService::StartSystemTimerScan.");
-
+    WIFI_LOGI("Enter ScanService::StartSystemTimerScan, scanAtOnce: %{public}d.", scanAtOnce);
     ErrCode rlt = ApplyScanPolices(ScanType::SCAN_TYPE_SYSTEMTIMER);
     if (rlt != WIFI_OPT_SUCCESS) {
         return;
@@ -1003,20 +1006,29 @@ void ScanService::StartSystemTimerScan(bool scanAtOnce)
      * or the time since the last scan is longer than the scan interval.
      */
     int scanTime = SYSTEM_SCAN_INIT_TIME;
-    WIFI_LOGD("interval:%{public}d", systemScanIntervalMode.scanIntervalMode.interval);
     if (systemScanIntervalMode.scanIntervalMode.interval > 0) {
         scanTime = systemScanIntervalMode.scanIntervalMode.interval;
     }
     if (scanAtOnce || (lastSystemScanTime == 0) ||
         (sinceLastScan >= systemScanIntervalMode.scanIntervalMode.interval)) {
-        if (Scan(false) != WIFI_OPT_SUCCESS) {
+        std::vector<WifiDeviceConfig> deviceConfigs;
+        if (WifiSettings::GetInstance().GetDeviceConfig(deviceConfigs) == 0
+            && deviceConfigs.size() == 0) {
+            WIFI_LOGW("NO saved configs, system timer scan is not allowed!");
+            std::vector<WifiScanInfo> results;
+            /* call GetScanInfoList to clear older scan results */
+            int ret = WifiSettings::GetInstance().GetScanInfoList(results);
+            if (ret != 0) {
+                WIFI_LOGW("GetScanInfoList return error. \n");
+            }
+        } else if (Scan(false) != WIFI_OPT_SUCCESS) {
             WIFI_LOGE("Scan failed.");
         }
         lastSystemScanTime = nowTime;
     } else {
         scanTime = systemScanIntervalMode.scanIntervalMode.interval - sinceLastScan;
     }
-    WIFI_LOGI("scanTime: %{public}d,  interval:%{public}d,  count:%{public}d",
+    WIFI_LOGI("StartSystemTimerScan, scanTime: %{public}d,  interval:%{public}d,  count:%{public}d",
         scanTime,
         systemScanIntervalMode.scanIntervalMode.interval,
         systemScanIntervalMode.scanIntervalMode.count);
@@ -1340,7 +1352,7 @@ ErrCode ScanService::ApplyTrustListPolicy(ScanType scanType)
 
 ErrCode ScanService::ApplyScanPolices(ScanType type)
 {
-    LOGI("Enter ScanService::ApplyScanPolices.");
+    LOGI("Enter ScanService::ApplyScanPolices, type: %{public}d", type);
     /* Obtains app parameters and scenario status parameters. */
     auto appPackageName = WifiSettings::GetInstance().GetAppPackageName();
     auto trustListPolicies = WifiSettings::GetInstance().ReloadTrustListPolicies();

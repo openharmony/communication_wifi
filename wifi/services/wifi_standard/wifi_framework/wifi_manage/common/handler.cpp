@@ -94,10 +94,10 @@ void Handler::GetAndDistributeMessage()
     while (isRunning) {
         InternalMessage *msg = pMyQueue->GetNextMessage();
         if (msg == nullptr) {
-            LOGE("GetNextMessage failed.\n");
+            LOGE("GetNextMessage null.\n");
             continue;
         }
-
+        LOGI("Handler get message: %{public}d\n", msg->GetMessageName());
         DistributeMessage(msg);
         MessageManage::GetInstance().ReclaimMsg(msg);
     }

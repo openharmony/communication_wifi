@@ -1079,8 +1079,19 @@ static void GetInfoElems(int length, int end, char *srcBuf, ScanInfo *pcmd)
         ++infoElemsSize;
     }
     GetChanWidthCenterFreq(pcmd, &iesNeedParse);
+    /* Do NOT report inforElement to up layer */
+    if (infoElemsTemp != NULL) {
+        for (int i = 0; i < infoElemsSize; i++) {
+            if (infoElemsTemp[i].content != NULL) {
+                free(infoElemsTemp[i].content);
+                infoElemsTemp[i].content = NULL;
+            }
+        }
+        free(infoElemsTemp);
+        infoElemsTemp = NULL;
+    }
     pcmd->infoElems = infoElemsTemp;
-    pcmd->ieSize = infoElemsSize;
+    pcmd->ieSize = 0;
     return;
 }
 #endif

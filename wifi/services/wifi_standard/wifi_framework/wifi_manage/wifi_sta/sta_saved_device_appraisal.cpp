@@ -55,8 +55,14 @@ ErrCode StaSavedDeviceAppraisal::DeviceAppraisals(
         }
 
         WifiDeviceConfig device;
-        if (WifiSettings::GetInstance().GetDeviceConfig(scanInfo.bssid, DEVICE_CONFIG_INDEX_BSSID, device) == -1) {
-            WIFI_LOGI("Skip unsaved Network %{public}s.", scanInfo.ssid.c_str()); /* Skipping Unsaved Networks */
+        std::string keymgmt = GetKeyMgmtBySecType((int)scanInfo.securityType);
+        if (WifiSettings::GetInstance().GetDeviceConfig(scanInfo.ssid, keymgmt, device) == 0) {
+            WIFI_LOGI("Skip unsaved ssid Network %{public}s.", SsidAnonymize(scanInfo.ssid)); /* Skipping Unsaved Networks */
+            continue;
+        }
+
+        if (device.bssid != scanInfo.bssid) {
+            WIFI_LOGI("Skip unsaved bssid Network %{public}s.", MacAnonymize(scanInfo.ssid)); /* Skipping Unsaved Networks */
             continue;
         }
 

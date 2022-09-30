@@ -50,19 +50,15 @@ ErrCode StaSavedDeviceAppraisal::DeviceAppraisals(
     scanInfoElected.rssi = VALUE_LIMIT_MIN_RSSI;
 
     for (auto scanInfo : scanInfos) {
-        if (scanInfo.bssid.size() == 0) {
-            continue;
-        }
-
         WifiDeviceConfig device;
         std::string keymgmt = GetKeyMgmtBySecType((int)scanInfo.securityType);
         if (WifiSettings::GetInstance().GetDeviceConfig(scanInfo.ssid, keymgmt, device) == 0) {
-            WIFI_LOGI("Skip unsaved ssid Network %{public}s.", SsidAnonymize(scanInfo.ssid)); /* Skipping Unsaved Networks */
+            WIFI_LOGI("Skip unsaved ssid Network %{public}s.", SsidAnonymize(scanInfo.ssid).c_str());
             continue;
         }
 
         if (device.bssid != scanInfo.bssid) {
-            WIFI_LOGI("Skip unsaved bssid Network %{public}s.", MacAnonymize(scanInfo.ssid)); /* Skipping Unsaved Networks */
+            WIFI_LOGI("Skip unsaved bssid Network %{public}s.", MacAnonymize(scanInfo.ssid).c_str());
             continue;
         }
 
@@ -82,7 +78,7 @@ ErrCode StaSavedDeviceAppraisal::DeviceAppraisals(
             sign = 1;
             WIFI_LOGI("set highestScore: %{public}d, ssid: %{public}s", highestScore, SsidAnonymize(device.ssid).c_str());
         } else {
-            WIFI_LOGI("The config %{public}s is ignored!\n", scanInfo.ssid.c_str());
+            WIFI_LOGI("The config %{public}s is ignored!\n", MacAnonymize(scanInfo.ssid).c_str());
         }
     }
     if (sign == 1) {
@@ -108,17 +104,17 @@ bool StaSavedDeviceAppraisal::WhetherSkipDevice(WifiDeviceConfig &device)
 {
     /* Skip this type of device and evaluate it by other appraisals */
     if (device.isPasspoint || device.isEphemeral) {
-        WIFI_LOGI("Skip isPasspoint or isEphemeral Network %{public}s.", device.ssid.c_str());
+        WIFI_LOGI("Skip isPasspoint or isEphemeral Network %{public}s.", SsidAnonymize(device.ssid).c_str());
         return true;
     }
 
     if (device.status == static_cast<int>(WifiDeviceConfigStatus::DISABLED)) {
-        WIFI_LOGI("Skip disabled Network %{public}s.", device.ssid.c_str());
+        WIFI_LOGI("Skip disabled Network %{public}s.", SsidAnonymize(device.ssid).c_str());
         return true;
     }
     std::string bssid = WifiSettings::GetInstance().GetConnectTimeoutBssid();
     if (!bssid.empty() && bssid == device.bssid) {
-        WIFI_LOGI("Skip the connect timeout Network %{public}s.", device.ssid.c_str());
+        WIFI_LOGI("Skip the connect timeout Network %{public}s.", SsidAnonymize(device.ssid).c_str());
         return true;
     }
     return false;

@@ -77,19 +77,18 @@ static SecTypeJs SecurityTypeNativeToJs(const WifiSecurity& cppSecurityType)
         case WifiSecurity::OPEN:
             jsSecurityType = SecTypeJs::SEC_TYPE_OPEN;
             break;
-
         case WifiSecurity::WEP:
             jsSecurityType = SecTypeJs::SEC_TYPE_WEP;
             break;
-
         case WifiSecurity::PSK:
             jsSecurityType = SecTypeJs::SEC_TYPE_PSK;
             break;
-
         case WifiSecurity::SAE:
             jsSecurityType = SecTypeJs::SEC_TYPE_SAE;
             break;
-
+        case WifiSecurity::EAP:
+            jsSecurityType = SecTypeJs::SEC_TYPE_EAP;
+            break;
         default:
             jsSecurityType = SecTypeJs::SEC_TYPE_INVALID;
             break;
@@ -230,19 +229,18 @@ static void ConvertEncryptionMode(const SecTypeJs& securityType, std::string& ke
         case SecTypeJs::SEC_TYPE_OPEN:
             keyMgmt = KEY_MGMT_NONE;
             break;
-
         case SecTypeJs::SEC_TYPE_WEP:
             keyMgmt = KEY_MGMT_WEP;
             break;
-
         case SecTypeJs::SEC_TYPE_PSK:
             keyMgmt = KEY_MGMT_WPA_PSK;
             break;
-
         case SecTypeJs::SEC_TYPE_SAE:
             keyMgmt = KEY_MGMT_SAE;
             break;
-
+        case SecTypeJs::SEC_TYPE_EAP:
+            keyMgmt = KEY_MGMT_EAP;
+            break;
         default:
             keyMgmt = KEY_MGMT_NONE;
             break;
@@ -256,6 +254,44 @@ static void ProcessPassphrase(const SecTypeJs& securityType, WifiDeviceConfig& c
         cppConfig.wepTxKeyIndex = 0;
         cppConfig.preSharedKey = "";
     }
+}
+
+void ProcessEapPeapConfig(const napi_env& env, const napi_value& object, WifiEapConfig& eapConfig)
+{
+    // identity, password, phase2Method filed is necessary
+    eapConfig.eap = EAP_METHOD_PEAP;
+    JsObjectToString(env, object, "identity", NAPI_MAX_STR_LENT, eapConfig.identity);
+    JsObjectToString(env, object, "password", NAPI_MAX_STR_LENT, eapConfig.password);
+
+    int phase2 = static_cast<int>(Phase2Method::NONE);
+    JsObjectToInt(env, object, "phase2Method", phase2);
+    eapConfig.phase2Method = Phase2Method(phase2);
+}
+
+napi_value ProcessEapConfig(const napi_env& env, const napi_value& object, WifiDeviceConfig& devConfig)
+{
+    bool hasProperty = false;
+
+    NAPI_CALL(env, napi_has_named_property(env, object, "eapConfig", &hasProperty));
+    if (!hasProperty) {
+        WIFI_LOGI("Js has no property: eapConfig.");
+        return UndefinedNapiValue(env);
+    }
+
+    napi_value napiEap;
+    napi_get_named_property(env, object, "eapConfig", &napiEap);
+
+    int eapMethod = static_cast<int>(EapMethodJs::EAP_NONE);
+    JsObjectToInt(env, napiEap, "eapMethod", eapMethod);
+    switch(EapMethodJs(eapMethod)) {
+        case EapMethodJs::EAP_PEAP:
+            ProcessEapPeapConfig(env, napiEap, devConfig.wifiEapConfig);
+            break;
+        default:
+            WIFI_LOGE("EapMethod: %{public}d unsupported", eapMethod);
+            break;
+    }
+    return UndefinedNapiValue(env);
 }
 
 napi_value ConfigStaticIp(const napi_env& env, const napi_value& object, WifiDeviceConfig& cppConfig)
@@ -322,6 +358,7 @@ static void JsObjToDeviceConfig(const napi_env& env, const napi_value& object, W
         cppConfig.wifiIpConfig.assignMethod = AssignIpMethod::STATIC;
         ConfigStaticIp(env, object, cppConfig);
     }
+    (void)ProcessEapConfig(env, object, cppConfig);
 }
 
 napi_value AddDeviceConfig(napi_env env, napi_callback_info info)
@@ -862,6 +899,7 @@ static SecTypeJs ConvertKeyMgmtToSecType(const std::string& keyMgmt)
         {KEY_MGMT_WEP, SecTypeJs::SEC_TYPE_WEP},
         {KEY_MGMT_WPA_PSK, SecTypeJs::SEC_TYPE_PSK},
         {KEY_MGMT_SAE, SecTypeJs::SEC_TYPE_SAE},
+        {KEY_MGMT_EAP, SecTypeJs::SEC_TYPE_EAP},
     };
 
     std::map<std::string, SecTypeJs>::iterator iter = mapKeyMgmtToSecType.find(keyMgmt);

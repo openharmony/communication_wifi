@@ -833,6 +833,7 @@ static int WpaCliRemoveIface(WifiWpaInterface *p, const char *name)
     if (p == NULL || name == NULL) {
         return -1;
     }
+    LOGI("Remove interface: %{public}s", name);
     WpaIfaceInfo *prev = NULL;
     WpaIfaceInfo *info = p->ifaces;
     while (info != NULL) {
@@ -863,6 +864,18 @@ static int WpaCliRemoveIface(WifiWpaInterface *p, const char *name)
     return 0;
 }
 
+static int WpaCliWpaTerminate()
+{
+    LOGI("Enter WpaCliWpaTerminate");
+    char cmd[WPA_CMD_BUF_LEN] = {0};
+    char buf[WPA_CMD_REPLY_BUF_SMALL_LEN] = {0};
+    if (snprintf_s(cmd, sizeof(cmd), sizeof(cmd) - 1, "TERMINATE") < 0) {
+        LOGE("WpaCliWpaTerminate, snprintf err");
+        return -1;
+    }
+    return WpaCliCmd(cmd, buf, sizeof(buf));
+}
+
 WifiWpaInterface *GetWifiWapGlobalInterface(void)
 {
     if (g_wpaInterface != NULL) {
@@ -877,6 +890,7 @@ WifiWpaInterface *GetWifiWapGlobalInterface(void)
     g_wpaInterface->wpaCliClose = WpaCliClose;
     g_wpaInterface->wpaCliAddIface = WpaCliAddIface;
     g_wpaInterface->wpaCliRemoveIface = WpaCliRemoveIface;
+    g_wpaInterface->wpaCliTerminate = WpaCliWpaTerminate;
     return g_wpaInterface;
 }
 

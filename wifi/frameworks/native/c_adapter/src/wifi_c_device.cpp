@@ -130,7 +130,7 @@ static void ConvertDeviceConfigFromC(const WifiDeviceConfig *config, OHOS::Wifi:
         deviceConfig.bssid = OHOS::Wifi::MacArrayToStr(config->bssid);
     }
     deviceConfig.preSharedKey = config->preSharedKey;
-    deviceConfig.keyMgmt = GetKeyMgmtBySecType(config->securityType);
+    deviceConfig.keyMgmt = OHOS:Wifi:GetKeyMgmtBySecType(config->securityType);
     deviceConfig.networkId = config->netId;
     deviceConfig.frequency = config->freq;
     /* wapiPskType is not support, don't verify now */
@@ -159,7 +159,7 @@ static OHOS::Wifi::ErrCode ConvertDeviceConfigFromCpp(const OHOS::Wifi::WifiDevi
     if (memcpy_s(result->preSharedKey, WIFI_MAX_KEY_LEN, deviceConfig.preSharedKey.c_str(), WIFI_MAX_KEY_LEN) != EOK) {
         return OHOS::Wifi::WIFI_OPT_FAILED;
     }
-    result->securityType = GetSecTypeByKeyMgmt(deviceConfig.keyMgmt);
+    result->securityType = OHOS:Wifi:GetSecTypeByKeyMgmt(deviceConfig.keyMgmt);
     result->netId = deviceConfig.networkId;
     result->freq = deviceConfig.frequency;
     /* wapiPskType is not support now */

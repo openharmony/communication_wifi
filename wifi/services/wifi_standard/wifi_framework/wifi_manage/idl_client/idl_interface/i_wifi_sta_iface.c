@@ -456,8 +456,10 @@ WifiErrorNo GetNetworkList(WifiNetworkInfo *infos, int *size)
 
 static void GetScanInfoElems(Context *context, ScanInfo* scanInfo)
 {
+    const unsigned int MAX_INFO_ELEMS_SIZE = 256;
     ReadInt(context, &scanInfo->ieSize);
-    if (scanInfo->ieSize <= 0) {
+    if (scanInfo->ieSize <= 0 || scanInfo->ieSize > MAX_INFO_ELEMS_SIZE) {
+        LOGE("Invalid ieSize: %{public}d!", scanInfo->ieSize);
         return;
     }
     /* This pointer will be released in its client */

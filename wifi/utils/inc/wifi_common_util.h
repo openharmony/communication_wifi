@@ -20,7 +20,6 @@
 #include <string>
 #include <vector>
 #include "securec.h"
-#include "wifi_device_config.h"
 
 #ifndef WIFI_MAC_LEN
 #define WIFI_MAC_LEN 6

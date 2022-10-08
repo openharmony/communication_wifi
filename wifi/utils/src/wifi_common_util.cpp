@@ -26,6 +26,7 @@
 #include "system_ability_definition.h"
 #endif
 #include "wifi_logger.h"
+#include "wifi_device_config.h"
 
 namespace OHOS {
 namespace Wifi {

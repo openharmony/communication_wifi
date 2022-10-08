@@ -41,9 +41,10 @@ constexpr int STA_CAN_ONLY_WITH_WIFI_OFF_MODE = 3;
 constexpr int STA_DISABLED_MODE = 4;
 
 constexpr int CMD_NETWORK_CONNECT_TIMEOUT = 0X01;
-constexpr int STA_NETWORK_CONNECTTING_DELAY = 20 * 1000;
-
 constexpr int CMD_SIGNAL_POLL = 0X02;
+constexpr int CMD_START_NETCHECK = 0X03;
+
+constexpr int STA_NETWORK_CONNECTTING_DELAY = 20 * 1000;
 constexpr int STA_SIGNAL_POLL_DELAY = 3 * 1000;
 
 /* pincode length */
@@ -651,6 +652,12 @@ private:
      * @param deviceKeymgmt - Encryption mode of the current network[in]
      */
     bool ComparedKeymgmt(const std::string scanInfoKeymgmt, const std::string deviceKeymgmt);
+    /**
+     * @Description : Deal network check cmd.
+     *
+     * @param msg - Message body received by the state machine[in]
+     */
+    void DealNetworkCheck(InternalMessage *msg);
 
 private:
     StaSmHandleFuncMap staSmHandleFuncMap;

@@ -28,9 +28,6 @@
 #undef LOG_TAG
 #define LOG_TAG "WifiHalStaInterface"
 
-#define WPA_CMD_STOP_LENG 64
-#define WPA_TERMINATE_SLEEP_TIME (50 * 1000) /* 50ms */
-
 #ifdef NON_SEPERATE_P2P
 #define START_CMD "wpa_supplicant -iglan0 -g"CONFIG_ROOR_DIR"/sockets/wpa"\
     " -m"CONFIG_ROOR_DIR"/wpa_supplicant/p2p_supplicant.conf"
@@ -98,9 +95,8 @@ static WifiErrorNo StopWpaAndWpaHal(int staNo)
         LOGE("wpa_supplicant stop failed!");
         return WIFI_HAL_FAILED;
     }
-
-    LOGI("wpa_supplicant stop successfully");
     ReleaseWifiStaInterface(staNo);
+    LOGI("wpa_supplicant stop successfully");
     return WIFI_HAL_SUCCESS;
 }
 
@@ -191,21 +187,12 @@ WifiErrorNo StartSupplicant(void)
 WifiErrorNo StopSupplicant(void)
 {
     LOGI("Stop supplicant");
-    WifiWpaStaInterface *pStaIfc = GetWifiStaInterface(0);
-    if (pStaIfc == NULL) {
-        LOGE("Supplicant is NOT inited!");
-        return WIFI_HAL_SUPPLICANT_NOT_INIT;
-    }
-    int res = pStaIfc->wpaCliCmdWpaTerminate(pStaIfc);
-    if (res < 0) {
-        LOGE("wpaCliCmdWpaTerminate failed! ret=%{public}d", res);
-    }
-    usleep(WPA_TERMINATE_SLEEP_TIME);
     ModuleManageRetCode ret = StopModule(WPA_SUPPLICANT_NAME);
     if (ret == MM_FAILED) {
         LOGE("stop wpa_supplicant failed!");
         return WIFI_HAL_FAILED;
     }
+
     if (ret == MM_SUCCESS) {
         ReleaseWpaGlobalInterface();
     }

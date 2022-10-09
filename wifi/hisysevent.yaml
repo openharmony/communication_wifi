@@ -15,24 +15,24 @@ domain: COMMUNICATION
 
 # Start or stop Wi-Fi switch
 WIFI_STATE:
-  __BASE: {type: STATISTIC, level: MINOR, tag: PowerStats, desc: start or stop wifi AP message}
-  TYPE: {type: STRING, desc: sta or ap}
-  OPER_TYPE: {type: INT32, desc: operation type, enable or disable}
+  __BASE: {type: STATISTIC, level: MINOR, tag: PowerStats, desc: Wi-Fi enable or disable event}
+  TYPE: {type: STRING, desc: Service type}
+  OPER_TYPE: {type: INT32, desc: Enable(0) or disable(1)}
 
 # Connect or disconnect Wi-Fi
 WIFI_CONNECTION:
-  __BASE: {type: STATISTIC, level: MINOR, tag: PowerStats, desc: wifi connection or disconnection message}
-  TYPE: {type: INT32, desc: connect or disconnect operation type}
-  PACKAGE_NAME: {type: STRING, desc: package name}
+  __BASE: {type: STATISTIC, level: MINOR, tag: PowerStats, desc: Wi-Fi connection event}
+  TYPE: {type: INT32, desc: Connect(0) or disconnect(1)}
+  PACKAGE_NAME: {type: STRING, desc: Package name}
 
 # Scans Wi-Fi hotspots
 WIFI_SCAN:
-  __BASE: {type: STATISTIC, level: MINOR, tag: PowerStats, desc: wifi scan message}
-  EXECUTE_RESULT: {type: INT32, desc: wifi scan execute result}
-  PACKAGE_NAME: {type: STRING, desc: package name}
+  __BASE: {type: STATISTIC, level: MINOR, tag: PowerStats, desc: Wi-Fi scan event}
+  EXECUTE_RESULT: {type: INT32, desc: Scan fail(0) or scan success(1)}
+  PACKAGE_NAME: {type: STRING, desc: Package name}
 
 # Wi-Fi event received
 WIFI_EVENT_RECEIVED:
-  __BASE: {type: STATISTIC, level: MINOR, tag: PowerStats, desc: wifi event for int value}
-  EVENT_TYPE: {type: STRING, desc: event type}
-  VALUE: {type: INT32, desc: event value}
+  __BASE: {type: STATISTIC, level: MINOR, tag: PowerStats, desc: Wi-Fi event}
+  EVENT_TYPE: {type: STRING, desc: Event type}
+  VALUE: {type: INT32, desc: Event value}

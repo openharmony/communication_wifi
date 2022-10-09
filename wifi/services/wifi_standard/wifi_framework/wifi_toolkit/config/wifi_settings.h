@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -22,6 +22,7 @@
 #include <memory>
 #include <mutex>
 #include <algorithm>
+#include "wifi_common_def.h"
 #include "wifi_config_file_impl.h"
 constexpr int RANDOM_STR_LEN = 6;
 constexpr int MSEC = 1000;
@@ -39,15 +40,15 @@ constexpr int MODE_UPDATE = 2;
 /* Obtain the scanning result that is valid within 180s. */
 constexpr int WIFI_GET_SCAN_INFO_VALID_TIMESTAMP = 180;
 
-constexpr char DEVICE_CONFIG_FILE_PATH[] = "/data/misc/wifi/device_config.conf";
-constexpr char HOTSPOT_CONFIG_FILE_PATH[] = "/data/misc/wifi/hotspot_config.conf";
-constexpr char BLOCK_LIST_FILE_PATH[] = "/data/misc/wifi/block_list.conf";
-constexpr char WIFI_CONFIG_FILE_PATH[] = "/data/misc/wifi/wifi_config.conf";
-constexpr char WIFI_P2P_GROUP_INFO_FILE_PATH[] = "/data/misc/wifi/p2p_groups.conf";
-constexpr char WIFI_P2P_VENDOR_CONFIG_FILE_PATH[] = "/data/misc/wifi/p2p_vendor_config.conf";
-const std::string WIFI_TRUST_LIST_POLICY_FILE_PATH = "/data/misc/wifi/trust_list_polices.conf";
-const std::string WIFI_MOVING_FREEZE_POLICY_FILE_PATH = "/data/misc/wifi/moving_freeze_policy.conf";
-constexpr char WIFI_STA_RANDOM_MAC_FILE_PATH[] = "/data/misc/wifi/sta_randomMac.conf";
+constexpr char DEVICE_CONFIG_FILE_PATH[] = CONFIG_ROOR_DIR"/device_config.conf";
+constexpr char HOTSPOT_CONFIG_FILE_PATH[] = CONFIG_ROOR_DIR"/hotspot_config.conf";
+constexpr char BLOCK_LIST_FILE_PATH[] = CONFIG_ROOR_DIR"/block_list.conf";
+constexpr char WIFI_CONFIG_FILE_PATH[] = CONFIG_ROOR_DIR"/wifi_config.conf";
+constexpr char WIFI_P2P_GROUP_INFO_FILE_PATH[] = CONFIG_ROOR_DIR"/p2p_groups.conf";
+constexpr char WIFI_P2P_VENDOR_CONFIG_FILE_PATH[] = CONFIG_ROOR_DIR"/p2p_vendor_config.conf";
+const std::string WIFI_TRUST_LIST_POLICY_FILE_PATH = CONFIG_ROOR_DIR"/trust_list_polices.conf";
+const std::string WIFI_MOVING_FREEZE_POLICY_FILE_PATH = CONFIG_ROOR_DIR"/moving_freeze_policy.conf";
+constexpr char WIFI_STA_RANDOM_MAC_FILE_PATH[] = CONFIG_ROOR_DIR"/sta_randomMac.conf";
 
 namespace OHOS {
 namespace Wifi {

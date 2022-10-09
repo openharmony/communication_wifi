@@ -24,7 +24,7 @@
 
 namespace OHOS {
 namespace Wifi {
-MessageQueue::MessageQueue() : pMessageQueue(nullptr), mIsBlocked(false), mNeedQuit(false)
+MessageQueue::MessageQueue() : pMessageQueue(nullptr), mIsBlocked(false), mNeedQuit(false), mWakeup(false)
 {
     LOGI("MessageQueue::MessageQueue");
 }
@@ -44,14 +44,18 @@ MessageQueue::~MessageQueue()
     return;
 }
 
+bool MessageQueue::WakeupOrKeepOriginalValue()
+{
+    return mIsBlocked ? mIsBlocked : mWakeup;
+}
+
 bool MessageQueue::AddMessageToQueue(InternalMessage *message, int64_t handleTime)
 {
-    LOGI("MessageQueue::AddMessageToQueue");
     if (message == nullptr) {
         LOGE("message is null.");
         return false;
     }
-
+    LOGI("MessageQueue::AddMessageToQueue: %{public}d", message->GetMessageName());
     if (mNeedQuit) {
         MessageManage::GetInstance().ReclaimMsg(message);
         LOGE("Already quit the message queue.");
@@ -59,7 +63,6 @@ bool MessageQueue::AddMessageToQueue(InternalMessage *message, int64_t handleTim
     }
 
     message->SetHandleTime(handleTime);
-    bool needWake = false;
     /*
      * If the queue is empty, the current message needs to be executed
      * immediately, or the execution time is earlier than the queue header, the
@@ -72,11 +75,15 @@ bool MessageQueue::AddMessageToQueue(InternalMessage *message, int64_t handleTim
         if (pTop == nullptr || handleTime == 0 || handleTime < pTop->GetHandleTime()) {
             message->SetNextMsg(pTop);
             pMessageQueue = message;
-            needWake = mIsBlocked;
-            /* Inserts messages in the middle of the queue based on the execution time. */
+            mWakeup = WakeupOrKeepOriginalValue();
         } else {
             InternalMessage *pPrev = nullptr;
             InternalMessage *pCurrent = pTop;
+            /* If the inserted message is executed earlier(In the head position), the thread needs to be awakened */
+            if (handleTime <= pTop->GetHandleTime()) {
+                mWakeup = WakeupOrKeepOriginalValue();
+            }
+            /* Inserts messages in the middle of the queue based on the execution time. */
             while (pCurrent != nullptr) {
                 pPrev = pCurrent;
                 pCurrent = pCurrent->GetNextMsg();
@@ -89,8 +96,9 @@ bool MessageQueue::AddMessageToQueue(InternalMessage *message, int64_t handleTim
         }
     }
 
+    LOGI("Add message needWake: %{public}d", static_cast<int>(mWakeup.load()));
     /* Wake up the process. */
-    if (needWake) {
+    if (mWakeup) {
         mCvQueue.notify_all();
         mIsBlocked = false;
     }
@@ -137,22 +145,24 @@ InternalMessage *MessageQueue::GetNextMessage()
             LOGE("gettimeofday failed.");
             return nullptr;
         }
+
         int64_t nowTime = static_cast<int64_t>(curTime.tv_sec) * TIME_USEC_1000 + curTime.tv_usec / TIME_USEC_1000;
         {
-            std::unique_lock<std::mutex> lck(mMtxQueue);
+            std::unique_lock<std::mutex> lck(mMtxQueue); // Data queue lock
             InternalMessage *curMsg = pMessageQueue;
             mIsBlocked = true;
             if (curMsg != nullptr) {
                 if (nowTime < curMsg->GetHandleTime()) {
                     /* The execution time of the first message is not reached.
-                       The remaining time is blocked here. */
+                        The remaining time is blocked here. */
                     nextBlockTime = curMsg->GetHandleTime() - nowTime;
                 } else {
-                    /* Return the first message. */
+                    /* Get the message of queue header. */
+                    mWakeup = false;
                     mIsBlocked = false;
                     pMessageQueue = curMsg->GetNextMsg();
                     curMsg->SetNextMsg(nullptr);
-                    LOGD("Return first message.");
+                    LOGI("Get queue message: %{public}d", curMsg->GetMessageName());
                     return curMsg;
                 }
             } else {
@@ -161,14 +171,16 @@ InternalMessage *MessageQueue::GetNextMessage()
             }
         }
 
-        std::unique_lock<std::mutex> lck(mMtxBlock);
-        if (mIsBlocked && (!mNeedQuit)) {
+        std::unique_lock<std::mutex> lck(mMtxBlock); // mCvQueue lock
+        if (mIsBlocked && (!mNeedQuit) && (!mWakeup)) {
+            LOGI("mCvQueue wait_for: %{public}d", nextBlockTime);
             if (mCvQueue.wait_for(lck, std::chrono::milliseconds(nextBlockTime)) == std::cv_status::timeout) {
-                LOGD("mCvQueue timeout.");
+                LOGI("mCvQueue wake up, reason: cv_status::timeout.");
             } else {
-                LOGD("Wake up.");
+                LOGI("mCvQueue is wake up.");
             }
         }
+        mWakeup = false;
         mIsBlocked = false;
     }
     LOGE("Already quit the message queue.");

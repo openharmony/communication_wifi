@@ -34,13 +34,10 @@
 #include "mock_dhcp_service.h"
 #endif
 
-DEFINE_WIFILOG_LABEL("StaStateMachine");
-#define PBC_ANY_BSSID "any"
-
-const int SLEEPTIME = 3;
-
 namespace OHOS {
 namespace Wifi {
+DEFINE_WIFILOG_LABEL("StaStateMachine");
+#define PBC_ANY_BSSID "any"
 StaStateMachine::StaStateMachine()
     : StateMachine("StaStateMachine"),
       lastNetworkId(INVALID_NETWORK_ID),
@@ -660,6 +657,7 @@ int StaStateMachine::InitStaSMHandleMap()
     staSmHandleFuncMap[WIFI_SVR_CMD_STA_WPA_PASSWD_WRONG_EVENT] = &StaStateMachine::DealWpaLinkFailEvent;
     staSmHandleFuncMap[WIFI_SVR_CMD_STA_WPA_FULL_CONNECT_EVENT] = &StaStateMachine::DealWpaLinkFailEvent;
     staSmHandleFuncMap[WIFI_SVR_CMD_STA_WPA_ASSOC_REJECT_EVENT] = &StaStateMachine::DealWpaLinkFailEvent;
+    staSmHandleFuncMap[CMD_START_NETCHECK] = &StaStateMachine::DealNetworkCheck;
     return WIFI_OPT_SUCCESS;
 }
 
@@ -882,6 +880,7 @@ void StaStateMachine::DealDisconnectEvent(InternalMessage *msg)
     }
 #endif
     StopTimer(static_cast<int>(CMD_SIGNAL_POLL));
+    StopTimer(static_cast<int>(CMD_START_NETCHECK));
     pNetcheck->StopNetCheckThread();
     if (currentTpType == IPTYPE_IPV4) {
         pDhcpService->StopDhcpClient(IF_NAME, false);
@@ -2049,6 +2048,21 @@ void StaStateMachine::SetWifiLinkedInfo(int networkId)
     }
 }
 
+void StaStateMachine::DealNetworkCheck(InternalMessage *msg)
+{
+    LOGI("enter DealNetworkCheck.\n");
+    if (msg == nullptr) {
+        LOGE("InternalMessage msg is null.");
+        return;
+    }
+
+    if (pNetcheck == nullptr) {
+        LOGE("pNetcheck is null.");
+        return;
+    }
+    pNetcheck->SignalNetCheckThread();
+}
+
 /* ------------------ state machine dhcp callback function ----------------- */
 
 StaStateMachine::DhcpResultNotify::DhcpResultNotify(StaStateMachine *staStateMachine)
@@ -2122,10 +2136,9 @@ void StaStateMachine::DhcpResultNotify::OnSuccess(int status, const std::string 
         pStaStateMachine->SaveLinkstate(ConnState::CONNECTED, DetailedState::CONNECTED);
         pStaStateMachine->staCallback.OnStaConnChanged(
             OperateResState::CONNECT_AP_CONNECTED, pStaStateMachine->linkedInfo);
-        /* Wait for the network adapter information to take effect. */
-        sleep(SLEEPTIME);
-        /* Check whether the Internet access is normal by send http. */
-        pStaStateMachine->pNetcheck->SignalNetCheckThread();
+        /* Delay to wait for the network adapter information to take effect. */
+        constexpr int NETCHECK_DELAY_TIME = 2000; // 2000 ms
+        pStaStateMachine->StartTimer(static_cast<int>(CMD_START_NETCHECK), NETCHECK_DELAY_TIME);
     }
     pStaStateMachine->getIpSucNum++;
 

@@ -36,6 +36,8 @@ extern "C" {
 #define WIFI_P2P_SERVER_NAME_LENGTH 256
 #define WIFI_NETWORK_PSK_MAXLEN 64
 
+#define WPA_SUPPLICANT_NAME "wpa_supplicant"
+
 #define HAL_SUCCESS 0
 #define HAL_FAILURE (-1)
 #define WIFI_HAL_FALSE 0

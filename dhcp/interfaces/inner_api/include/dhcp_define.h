@@ -64,7 +64,7 @@ const std::string INVALID_STRING("*");
 const std::string EVENT_DATA_DELIMITER(",");
 const std::string EVENT_DATA_IPV4("ipv4");
 const std::string EVENT_DATA_IPV6("ipv6");
-const std::string DHCP_WORK_DIR("/data/dhcp/");
+const std::string DHCP_WORK_DIR("/data/service/el1/public/dhcp/");
 const std::string DHCP_CLIENT_PID_FILETYPE(".pid");
 const std::string DHCP_RESULT_FILETYPE(".result");
 #ifdef OHOS_ARCH_LITE
@@ -74,9 +74,9 @@ const std::string DHCP_SERVER_FILE("/bin/dhcp_server");
 const std::string DHCP_CLIENT_FILE("/system/bin/dhcp_client_service");
 const std::string DHCP_SERVER_FILE("/system/bin/dhcp_server");
 #endif
-const std::string DHCP_SERVER_CONFIG_FILE("/data/dhcp/etc/dhcpd.conf");
-const std::string DHCP_SERVER_CONFIG_DIR("/data/dhcp/etc/");
-const std::string DHCP_SERVER_LEASES_FILE("/data/dhcp/dhcpd_lease.lease");
+const std::string DHCP_SERVER_CONFIG_FILE(DHCP_WORK_DIR + "etc/dhcpd.conf");
+const std::string DHCP_SERVER_CONFIG_DIR(DHCP_WORK_DIR + "etc/");
+const std::string DHCP_SERVER_LEASES_FILE(DHCP_WORK_DIR + "dhcpd_lease.lease");
 const std::string DHCP_SERVER_CFG_IPV4("#ipv4");
 const std::string DHCP_SERVER_CFG_IPV6("#ipv6");
 const std::string COMMON_EVENT_DHCP_GET_IPV4 = "usual.event.wifi.dhcp.GET_IPV4";

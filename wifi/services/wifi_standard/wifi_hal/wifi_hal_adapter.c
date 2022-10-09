@@ -20,6 +20,7 @@
 #include <string.h>
 #include <unistd.h>
 #include "securec.h"
+#include "wifi_common_def.h"
 #include "wifi_log.h"
 
 #undef LOG_TAG
@@ -28,7 +29,7 @@
 WifiHalVendorInterface *g_wifiHalVendorInterface = NULL;
 
 #define MODULE_NAME_MAX_LEN 256
-#define MODULE_CONFIG_FILE_PATH "/data/misc/wifi/wifi_hal_vendor.conf"
+#define MODULE_CONFIG_FILE_PATH CONFIG_ROOR_DIR"/wifi_hal_vendor.conf"
 #define PATH_NUM 2
 #define BUFF_SIZE 256
 
@@ -158,7 +159,7 @@ int ExcuteCmd(const char *szCmd)
 int CopyConfigFile(const char* configName)
 {
     char buf[BUFF_SIZE] = {0};
-    if (snprintf_s(buf, sizeof(buf), sizeof(buf) - 1, "/data/misc/wifi/wpa_supplicant/%s", configName) < 0) {
+    if (snprintf_s(buf, sizeof(buf), sizeof(buf) - 1, "%s/wpa_supplicant/%s", CONFIG_ROOR_DIR, configName) < 0) {
         LOGE("snprintf_s dest dir failed.");
         return HAL_FAILURE;
     }
@@ -174,7 +175,8 @@ int CopyConfigFile(const char* configName)
         }
         if (access(path[i], F_OK) != -1) {
             char cmd[BUFF_SIZE] = {0};
-            if (snprintf_s(cmd, sizeof(cmd), sizeof(cmd) - 1, "cp %s /data/misc/wifi/wpa_supplicant/", path[i]) < 0) {
+            if (snprintf_s(cmd, sizeof(cmd), sizeof(cmd) - 1,
+                "cp %s %s/wpa_supplicant/", path[i], CONFIG_ROOR_DIR) < 0) {
                 LOGE("snprintf_s cp cmd failed.");
                 return HAL_FAILURE;
             }

@@ -14,18 +14,19 @@
  */
 
 #include "wifi_wpa_hal.h"
-#include <unistd.h>
 #include <poll.h>
+#include <unistd.h>
 #include "securec.h"
-#include "wifi_wpa_common.h"
 #include "utils/common.h" /* request for printf_decode to decode wpa's returned ssid info */
-#include "wifi_hal_common_func.h"
+#include "wifi_common_def.h"
 #include "wifi_hal_callback.h"
-#include "wifi_hal_struct.h"
+#include "wifi_hal_common_func.h"
 #include "wifi_hal_p2p_struct.h"
-#include "wifi_p2p_hal.h"
-
+#include "wifi_hal_struct.h"
 #include "wifi_log.h"
+#include "wifi_p2p_hal.h"
+#include "wifi_wpa_common.h"
+
 #undef LOG_TAG
 #define LOG_TAG "WifiWpaHal"
 
@@ -758,7 +759,7 @@ static int WpaCliConnect(WifiWpaInterface *p)
     }
     int count = WPA_TRY_CONNECT_TIMES;
     while (count-- > 0) {
-        int ret = InitWpaCtrl(&p->wpaCtrl, "/data/misc/wifi/sockets/wpa");
+        int ret = InitWpaCtrl(&p->wpaCtrl, CONFIG_ROOR_DIR"/sockets/wpa");
         if (ret == 0) {
             LOGI("Global wpa interface connect successfully!");
             break;
@@ -832,6 +833,7 @@ static int WpaCliRemoveIface(WifiWpaInterface *p, const char *name)
     if (p == NULL || name == NULL) {
         return -1;
     }
+    LOGI("Remove interface: %{public}s", name);
     WpaIfaceInfo *prev = NULL;
     WpaIfaceInfo *info = p->ifaces;
     while (info != NULL) {
@@ -862,6 +864,18 @@ static int WpaCliRemoveIface(WifiWpaInterface *p, const char *name)
     return 0;
 }
 
+static int WpaCliWpaTerminate()
+{
+    LOGI("Enter WpaCliWpaTerminate");
+    char cmd[WPA_CMD_BUF_LEN] = {0};
+    char buf[WPA_CMD_REPLY_BUF_SMALL_LEN] = {0};
+    if (snprintf_s(cmd, sizeof(cmd), sizeof(cmd) - 1, "TERMINATE") < 0) {
+        LOGE("WpaCliWpaTerminate, snprintf err");
+        return -1;
+    }
+    return WpaCliCmd(cmd, buf, sizeof(buf));
+}
+
 WifiWpaInterface *GetWifiWapGlobalInterface(void)
 {
     if (g_wpaInterface != NULL) {
@@ -876,6 +890,7 @@ WifiWpaInterface *GetWifiWapGlobalInterface(void)
     g_wpaInterface->wpaCliClose = WpaCliClose;
     g_wpaInterface->wpaCliAddIface = WpaCliAddIface;
     g_wpaInterface->wpaCliRemoveIface = WpaCliRemoveIface;
+    g_wpaInterface->wpaCliTerminate = WpaCliWpaTerminate;
     return g_wpaInterface;
 }
 

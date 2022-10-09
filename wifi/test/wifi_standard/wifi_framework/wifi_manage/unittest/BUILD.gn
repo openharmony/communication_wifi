@@ -72,6 +72,7 @@ ohos_unittest("manager_unittest") {
     "//foundation/systemabilitymgr/samgr/interfaces/innerkits/samgr_proxy/include",
     "//foundation/communication/netmanager_base/frameworks/native/netmanagernative",
     "//foundation/communication/netmanager_base/interfaces/innerkits/netmanagernative/include",
+    "$WIFI_ROOT_DIR/services/wifi_standard/include",
   ]
 
   deps = [

@@ -14,26 +14,28 @@
  */
 
 #include "wifi_hal_p2p_interface.h"
-#include "wifi_log.h"
-#include "wifi_wpa_hal.h"
-#include "wifi_p2p_hal.h"
-#include "wifi_hal_callback.h"
-#include "wifi_hal_module_manage.h"
-#include "wifi_hal_common_func.h"
-#include "wifi_hal_adapter.h"
 #include "securec.h"
+#include "wifi_common_def.h"
+#include "wifi_hal_adapter.h"
+#include "wifi_hal_callback.h"
+#include "wifi_hal_common_func.h"
+#include "wifi_hal_module_manage.h"
+#include "wifi_log.h"
+#include "wifi_p2p_hal.h"
+#include "wifi_wpa_hal.h"
 
 #undef LOG_TAG
 #define LOG_TAG "WifiHalP2pInterface"
 
 const int P2P_CONNECT_DELAY_TIME = 100000;
-const char *g_wpaSupplicantP2p = "wpa_supplicant";
+
 #ifdef NON_SEPERATE_P2P
-const char *g_systemCmdWpaP2pStart = "wpa_supplicant -iglan0 -g/data/misc/wifi/sockets/wpa"
-    " -m /data/misc/wifi/wpa_supplicant/p2p_supplicant.conf";
+#define P2P_START_CMD "wpa_supplicant -iglan0 -g"CONFIG_ROOR_DIR"/sockets/wpa"\
+    " -m "CONFIG_ROOR_DIR"/wpa_supplicant/p2p_supplicant.conf"
 #else
-const char *g_systemCmdWpaP2pStart = "wpa_supplicant -iglan0 -g/data/misc/wifi/sockets/wpa";
+#define P2P_START_CMD "wpa_supplicant -iglan0 -g"CONFIG_ROOR_DIR"/sockets/wpa"
 #endif
+
 static int g_p2pSupplicantConnectEvent = 0;
 
 static WifiErrorNo P2pStartSupplicant(void)
@@ -42,7 +44,7 @@ static WifiErrorNo P2pStartSupplicant(void)
     if (CopyConfigFile("p2p_supplicant.conf") != 0) {
         return WIFI_HAL_FAILED;
     }
-    ModuleManageRetCode ret = StartModule(g_wpaSupplicantP2p, g_systemCmdWpaP2pStart);
+    ModuleManageRetCode ret = StartModule(WPA_SUPPLICANT_NAME, P2P_START_CMD);
     if (ret == MM_SUCCESS) {
         return WIFI_HAL_SUCCESS;
     }
@@ -62,7 +64,7 @@ static WifiErrorNo P2pConnectSupplicant(void)
 
 static WifiErrorNo P2pStopSupplicant(void)
 {
-    ModuleManageRetCode ret = StopModule(g_wpaSupplicantP2p);
+    ModuleManageRetCode ret = StopModule(WPA_SUPPLICANT_NAME);
     if (ret == MM_FAILED) {
         LOGE("stop p2p_wpa_supplicant failed!");
         return WIFI_HAL_FAILED;
@@ -123,7 +125,7 @@ static WifiErrorNo AddP2pIface(void)
 #else
     if (strcpy_s(argv.name, sizeof(argv.name), "p2p0") != EOK ||
 #endif
-        strcpy_s(argv.confName, sizeof(argv.confName), "/data/misc/wifi/wpa_supplicant/p2p_supplicant.conf") != EOK) {
+        strcpy_s(argv.confName, sizeof(argv.confName), CONFIG_ROOR_DIR"/wpa_supplicant/p2p_supplicant.conf") != EOK) {
         return WIFI_HAL_FAILED;
     }
 #ifdef NON_SEPERATE_P2P

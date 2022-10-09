@@ -118,12 +118,12 @@ void WifiManager::CheckAndStartSta(void)
     const int sleepTime = 1;
     const int maxWaitTimes = 30;
 
-    dir = opendir("/sys/class/net");
-    if (dir == nullptr) {
-        AutoStartStaService();
-        return;
-    }
     while (currentWaitTime < maxWaitTimes) {
+        dir = opendir("/sys/class/net");
+        if (dir == nullptr) {
+            AutoStartStaService();
+            return;
+        }
         while ((dent = readdir(dir)) != nullptr) {
             if (dent->d_name[0] == '.') {
                 continue;
@@ -134,10 +134,10 @@ void WifiManager::CheckAndStartSta(void)
                 return;
             }
         }
+        closedir(dir);
         sleep(sleepTime);
         currentWaitTime++;
     }
-    closedir(dir);
     AutoStartStaService();
 }
 

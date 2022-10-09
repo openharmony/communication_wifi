@@ -31,19 +31,13 @@
 #define DHCP_MAX_PATH_LENGTH 256
 #define DHCP_ONE_BYTE_BITS 8
 
-#ifdef __OHOS__
-#define DHCPD_CONFIG_FILE "/data/dhcp/etc/dhcpd.conf"
-#define DHCPD_EXT_CONFIG_PATH "/data/dhcp/etc/dhcpd.d"
-#define DHCPD_LOG_PATH "/data/log/dhcpd"
-#define DHCPD_LEASE_FILE "/data/dhcp/dhcpd_lease.lease"
-#define DHCPD_PID_FILE "/data/dhcp/dhcpd.pid"
-#else
-#define DHCPD_CONFIG_FILE "/etc/dhcp/dhcpd.conf"
-#define DHCPD_EXT_CONFIG_PATH "/etc/dhcp/dhcpd.d"
-#define DHCPD_LEASE_FILE "/etc/dhcp/dhcpd_lease.lease"
-#define DHCPD_LOG_PATH "/var/log/dhcpd"
-#define DHCPD_PID_FILE "/etc/dhcp/dhcpd.pid"
-#endif  // __OHOS__
+#define DHCP_ROOT "/data/service/el1/public/dhcp/"
+
+#define DHCPD_CONFIG_FILE DHCP_ROOT"etc/dhcpd.conf"
+#define DHCPD_EXT_CONFIG_PATH DHCP_ROOT"etc/dhcpd.d"
+#define DHCPD_LEASE_FILE DHCP_ROOT"dhcpd_lease.lease"
+#define DHCPD_PID_FILE DHCP_ROOT"dhcpd.pid"
+
 #define DHCPD_VERSION "0.0.1"
 
 #define DHCP_SERVER_PORT 67

@@ -23,18 +23,18 @@
 #include <sys/prctl.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include "securec.h"
 #include "wifi_hal_define.h"
 #include "wifi_log.h"
-#include "securec.h"
+#include "wifi_wpa_hal.h"
 
 #undef LOG_TAG
 #define LOG_TAG "WifiHalModuleManage"
 
 static ModuleInfo *g_halModuleList = NULL;
 
-#define STOP_MODULE_TRY_TIMES 30
 #define MAX_WPA_MAIN_ARGC_NUM 20
-#define MAX_WPA_MAIN_ARGV_LEN 64
+#define MAX_WPA_MAIN_ARGV_LEN 128
 
 struct StWpaMainParam {
     int argc;
@@ -154,35 +154,63 @@ int StartModuleInternal(const char *moduleName, const char *startCmd, pid_t *pPr
     return HAL_SUCCESS;
 }
 
-int StopModuleInternal(const char *moduleName, pid_t processId)
+static int StopModuleInternalKillProcess(pid_t processId)
+{
+    LOGI("Stop module kill process: %{public}d", processId);
+    if (kill(processId, SIGTERM) == -1) {
+        if (ESRCH == errno) {
+            LOGI("kill [%{public}d] success, pid no exist", processId);
+            return HAL_SUCCESS;
+        }
+        LOGE("kill [%{public}d] failed", processId);
+        return HAL_FAILURE;
+    }
+    return HAL_SUCCESS;
+}
+
+static int StopModuleInternalCheckProcess(const char *moduleName, pid_t processId)
 {
     if (moduleName == NULL) {
         return HAL_SUCCESS;
     }
-    LOGI("Start stop module internal");
-    int tryTimes = STOP_MODULE_TRY_TIMES;
+    LOGI("Stop module internal check wpa process: %{public}d", processId);
+    const int STOP_MODULE_TRY_TIMES = 30;
     const int SLEEP_TIME_US = 1000 * 100; // 100ms
+    int tryTimes = STOP_MODULE_TRY_TIMES;
     while (tryTimes-- >= 0) {
-        if (kill(processId, SIGTERM) == -1) {
-            if (ESRCH == errno) {
-                LOGI("kill [%{public}d] success, pid no exist", processId);
-                return HAL_SUCCESS;
-            }
-            LOGE("kill [%{public}d] failed", processId);
-            return HAL_FAILURE;
-        }
-        usleep(SLEEP_TIME_US);
         int ret = waitpid(processId, NULL, WNOHANG);
         if (ret <= 0) {
-            LOGI("Waitpid %{public}d return %{public}d, tryTimes value %{public}d and retry", processId, ret, tryTimes);
+            LOGI("Waitpid %{public}d ret %{public}d, tryTimes %{public}d and retry", processId, ret, tryTimes);
+            usleep(SLEEP_TIME_US);
             continue;
         } else {
-            LOGI("waitpid [%{public}d] success", processId);
+            LOGI("Stop wpa process [%{public}d] success, tryTimes %{public}d", processId, tryTimes);
             return HAL_SUCCESS;
         }
     }
-    LOGE("stop [%{public}d] failed, cannot send SIGTERM signal to stop process", processId);
+    LOGE("Stop wpa process [%{public}d] failed for timeout, try to kill process", processId);
+    StopModuleInternalKillProcess(processId);
     return HAL_FAILURE;
+}
+
+static int StopModuleInternalSendTerminate()
+{
+    WifiWpaInterface *pWpaInterface = GetWifiWapGlobalInterface();
+    if (pWpaInterface == NULL) {
+        LOGE("Get wpa global interface failed!");
+        return HAL_FAILURE;
+    }
+    int ret = pWpaInterface->wpaCliTerminate(pWpaInterface);
+    return (ret == 0 ? HAL_SUCCESS : HAL_FAILURE);
+}
+
+int StopModuleInternal(const char *moduleName, pid_t processId)
+{
+    int ret = StopModuleInternalSendTerminate();
+    if (ret != HAL_SUCCESS) {
+        LOGE("Send terminate failed!");
+    }
+    return StopModuleInternalCheckProcess(moduleName, processId);
 }
 
 ModuleInfo *FindModule(const char *moduleName)

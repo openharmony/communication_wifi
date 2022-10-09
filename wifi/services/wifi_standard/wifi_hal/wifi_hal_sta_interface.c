@@ -15,6 +15,7 @@
 
 #include "wifi_hal_sta_interface.h"
 #include "securec.h"
+#include "wifi_common_def.h"
 #include "wifi_hal_adapter.h"
 #include "wifi_hal_module_manage.h"
 #ifdef HDI_INTERFACE_SUPPORT
@@ -27,15 +28,11 @@
 #undef LOG_TAG
 #define LOG_TAG "WifiHalStaInterface"
 
-#define WPA_CMD_STOP_LENG 64
-#define WPA_TERMINATE_SLEEP_TIME (50 * 1000) /* 50ms */
-
-static const char *g_serviceName = "wpa_supplicant";
 #ifdef NON_SEPERATE_P2P
-static const char *g_startCmd = "wpa_supplicant -iglan0 -g/data/misc/wifi/sockets/wpa"
-    " -m/data/misc/wifi/wpa_supplicant/p2p_supplicant.conf";
+#define START_CMD "wpa_supplicant -iglan0 -g"CONFIG_ROOR_DIR"/sockets/wpa"\
+    " -m"CONFIG_ROOR_DIR"/wpa_supplicant/p2p_supplicant.conf"
 #else
-static const char *g_startCmd = "wpa_supplicant -iglan0 -g/data/misc/wifi/sockets/wpa";
+#define START_CMD "wpa_supplicant -iglan0 -g"CONFIG_ROOR_DIR"/sockets/wpa"
 #endif
 
 static WifiErrorNo AddWpaIface(int staNo)
@@ -52,12 +49,12 @@ static WifiErrorNo AddWpaIface(int staNo)
     AddInterfaceArgv argv;
     if (staNo == 0) {
         if (strcpy_s(argv.name, sizeof(argv.name), "wlan0") != EOK || strcpy_s(argv.confName, sizeof(argv.confName),
-            "/data/misc/wifi/wpa_supplicant/wpa_supplicant.conf") != EOK) {
+            CONFIG_ROOR_DIR"/wpa_supplicant/wpa_supplicant.conf") != EOK) {
             return WIFI_HAL_FAILED;
         }
     } else {
         if (strcpy_s(argv.name, sizeof(argv.name), "wlan2") != EOK || strcpy_s(argv.confName, sizeof(argv.confName),
-            "/data/misc/wifi/wpa_supplicant/wpa_supplicant.conf") != EOK) {
+            CONFIG_ROOR_DIR"/wpa_supplicant/wpa_supplicant.conf") != EOK) {
             return WIFI_HAL_FAILED;
         }
     }
@@ -98,12 +95,10 @@ static WifiErrorNo StopWpaAndWpaHal(int staNo)
         LOGE("wpa_supplicant stop failed!");
         return WIFI_HAL_FAILED;
     }
-
-    LOGI("wpa_supplicant stop successfully");
     ReleaseWifiStaInterface(staNo);
+    LOGI("wpa_supplicant stop successfully");
     return WIFI_HAL_SUCCESS;
 }
-
 
 WifiErrorNo Start(void)
 {
@@ -181,7 +176,7 @@ WifiErrorNo StartSupplicant(void)
         return WIFI_HAL_FAILED;
     }
 #endif
-    ModuleManageRetCode ret = StartModule(g_serviceName, g_startCmd);
+    ModuleManageRetCode ret = StartModule(WPA_SUPPLICANT_NAME, START_CMD);
     if (ret != MM_SUCCESS) {
         LOGE("start wpa_supplicant failed!");
         return WIFI_HAL_FAILED;
@@ -192,21 +187,12 @@ WifiErrorNo StartSupplicant(void)
 WifiErrorNo StopSupplicant(void)
 {
     LOGI("Stop supplicant");
-    WifiWpaStaInterface *pStaIfc = GetWifiStaInterface(0);
-    if (pStaIfc == NULL) {
-        LOGE("Supplicant is NOT inited!");
-        return WIFI_HAL_SUPPLICANT_NOT_INIT;
-    }
-    int res = pStaIfc->wpaCliCmdWpaTerminate(pStaIfc);
-    if (res < 0) {
-        LOGE("wpaCliCmdWpaTerminate failed! ret=%{public}d", res);
-    }
-    usleep(WPA_TERMINATE_SLEEP_TIME);
-    ModuleManageRetCode ret = StopModule(g_serviceName);
+    ModuleManageRetCode ret = StopModule(WPA_SUPPLICANT_NAME);
     if (ret == MM_FAILED) {
         LOGE("stop wpa_supplicant failed!");
         return WIFI_HAL_FAILED;
     }
+
     if (ret == MM_SUCCESS) {
         ReleaseWpaGlobalInterface();
     }
@@ -859,4 +845,3 @@ WifiErrorNo SetSuspendMode(bool mode)
     }
     return WIFI_HAL_SUCCESS;
 }
-

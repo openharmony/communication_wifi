@@ -54,6 +54,8 @@ static std::map<WifiSecurityType, std::string> g_secTypeKeyMgmtMap = {
     {WIFI_SEC_TYPE_WEP, "WEP"},
     {WIFI_SEC_TYPE_PSK, "WPA-PSK"},
     {WIFI_SEC_TYPE_SAE, "SAE"},
+    {WIFI_SEC_TYPE_EAP, "WPA-EAP"},
+    {WIFI_SEC_TYPE_EAP_SUITE_B, "WPA-EAP"},
 };
 
 std::string GetKeyMgmtBySecType(const int securityType)

@@ -159,7 +159,7 @@ static int SetWifiDeviceConfigFirst(WifiDeviceConfig &item, const std::string &k
     } else if (key == "uid") {
         item.uid = std::stoi(value);
     } else if (key == "lastConnectTime") {
-        item.lastConnectTime = std::stoi(value);
+        item.lastConnectTime = std::stol(value);
     } else if (key == "numRebootsSinceLastUse") {
         item.numRebootsSinceLastUse = std::stoi(value);
     } else if (key == "numAssociation") {

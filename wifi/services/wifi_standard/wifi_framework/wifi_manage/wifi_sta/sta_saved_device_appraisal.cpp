@@ -51,10 +51,8 @@ ErrCode StaSavedDeviceAppraisal::DeviceAppraisals(
 
     for (auto scanInfo : scanInfos) {
         WifiDeviceConfig device;
-        std::string keymgmt = GetKeyMgmtBySecType((int)scanInfo.securityType);
-        if (WifiSettings::GetInstance().GetDeviceConfig(scanInfo.ssid, keymgmt, device) == 0) {
-            WIFI_LOGI("Skip unsaved ssid Network %{public}s, keymgmt:%{public}s, securityType:%{public}d.",
-                SsidAnonymize(scanInfo.ssid).c_str(), keymgmt.c_str(), (int)scanInfo.securityType);
+        if (WifiSettings::GetInstance().GetDeviceConfig(scanInfo.ssid, DEVICE_CONFIG_INDEX_SSID, device) != 0) {
+            WIFI_LOGI("Skip unsaved ssid Network %{public}s.", SsidAnonymize(scanInfo.ssid).c_str());
             continue;
         }
 

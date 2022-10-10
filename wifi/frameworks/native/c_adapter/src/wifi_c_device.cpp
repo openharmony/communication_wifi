@@ -24,6 +24,13 @@
 
 DEFINE_WIFILOG_LABEL("WifiCDevice");
 
+static std::map<WifiSecurityType, std::string> g_secTypeKeyMgmtMap = {
+    {WIFI_SEC_TYPE_OPEN, "NONE"},
+    {WIFI_SEC_TYPE_WEP, "WEP"},
+    {WIFI_SEC_TYPE_PSK, "WPA-PSK"},
+    {WIFI_SEC_TYPE_SAE, "SAE"},
+};
+
 std::unique_ptr<OHOS::Wifi::WifiDevice> wifiDevicePtr = OHOS::Wifi::WifiDevice::GetInstance(WIFI_DEVICE_ABILITY_ID);
 std::unique_ptr<OHOS::Wifi::WifiScan> wifiScanPtr = OHOS::Wifi::WifiScan::GetInstance(WIFI_SCAN_ABILITY_ID);
 
@@ -90,6 +97,23 @@ WifiErrorCode GetScanInfoList(WifiScanInfo *result, unsigned int *size)
     return GetCErrorCode(ret);
 }
 
+static std::string GetKeyMgmtBySecType(const int securityType)
+{
+    WifiSecurityType key = WifiSecurityType(securityType);
+    std::map<WifiSecurityType, std::string>::const_iterator iter = g_secTypeKeyMgmtMap.find(key);
+    return iter == g_secTypeKeyMgmtMap.end() ? "NONE" : iter->second;
+}
+
+static int GetSecTypeByKeyMgmt(const std::string& keyMgmt)
+{
+    for (auto& each : g_secTypeKeyMgmtMap) {
+        if (each.second == keyMgmt) {
+            return static_cast<int>(each.first);
+        }
+    }
+    return static_cast<int>(WIFI_SEC_TYPE_OPEN);
+}
+
 static void GetStaticIpFromC(const IpConfig& ipConfig, OHOS::Wifi::StaticIpAddress& staticIp)
 {
     /* Just IPV4 now */
@@ -130,7 +154,7 @@ static void ConvertDeviceConfigFromC(const WifiDeviceConfig *config, OHOS::Wifi:
         deviceConfig.bssid = OHOS::Wifi::MacArrayToStr(config->bssid);
     }
     deviceConfig.preSharedKey = config->preSharedKey;
-    deviceConfig.keyMgmt = OHOS:Wifi:GetKeyMgmtBySecType(config->securityType);
+    deviceConfig.keyMgmt = GetKeyMgmtBySecType(config->securityType);
     deviceConfig.networkId = config->netId;
     deviceConfig.frequency = config->freq;
     /* wapiPskType is not support, don't verify now */
@@ -159,7 +183,7 @@ static OHOS::Wifi::ErrCode ConvertDeviceConfigFromCpp(const OHOS::Wifi::WifiDevi
     if (memcpy_s(result->preSharedKey, WIFI_MAX_KEY_LEN, deviceConfig.preSharedKey.c_str(), WIFI_MAX_KEY_LEN) != EOK) {
         return OHOS::Wifi::WIFI_OPT_FAILED;
     }
-    result->securityType = OHOS:Wifi:GetSecTypeByKeyMgmt(deviceConfig.keyMgmt);
+    result->securityType = GetSecTypeByKeyMgmt(deviceConfig.keyMgmt);
     result->netId = deviceConfig.networkId;
     result->freq = deviceConfig.frequency;
     /* wapiPskType is not support now */

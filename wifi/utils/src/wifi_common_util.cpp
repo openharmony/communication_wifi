@@ -26,7 +26,6 @@
 #include "system_ability_definition.h"
 #endif
 #include "wifi_logger.h"
-#include "wifi_device_config.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -48,32 +47,6 @@ constexpr int MIN_5G_CHANNEL = 36;
 constexpr int MAX_5G_CHANNEL = 165;
 constexpr int FREQ_CHANNEL_1 = 2412;
 constexpr int FREQ_CHANNEL_36 = 5180;
-
-static std::map<WifiSecurityType, std::string> g_secTypeKeyMgmtMap = {
-    {WIFI_SEC_TYPE_OPEN, "NONE"},
-    {WIFI_SEC_TYPE_WEP, "WEP"},
-    {WIFI_SEC_TYPE_PSK, "WPA-PSK"},
-    {WIFI_SEC_TYPE_SAE, "SAE"},
-    {WIFI_SEC_TYPE_EAP, "WPA-EAP"},
-    {WIFI_SEC_TYPE_EAP_SUITE_B, "WPA-EAP"},
-};
-
-std::string GetKeyMgmtBySecType(const int securityType)
-{
-    WifiSecurityType key = WifiSecurityType(securityType);
-    std::map<WifiSecurityType, std::string>::const_iterator iter = g_secTypeKeyMgmtMap.find(key);
-    return iter == g_secTypeKeyMgmtMap.end() ? "NONE" : iter->second;
-}
-
-int GetSecTypeByKeyMgmt(const std::string& keyMgmt)
-{
-    for (auto& each : g_secTypeKeyMgmtMap) {
-        if (each.second == keyMgmt) {
-            return static_cast<int>(each.first);
-        }
-    }
-    return static_cast<int>(WIFI_SEC_TYPE_OPEN);
-}
 
 static std::string DataAnonymize(const std::string str, const char delim,
     const char hiddenCh, const int startIdx = 0)

@@ -64,7 +64,7 @@ static WifiErrorNo P2pConnectSupplicant(void)
 
 static WifiErrorNo P2pStopSupplicant(void)
 {
-    ModuleManageRetCode ret = StopModule(WPA_SUPPLICANT_NAME);
+    ModuleManageRetCode ret = StopModule(WPA_SUPPLICANT_NAME, false);
     if (ret == MM_FAILED) {
         LOGE("stop p2p_wpa_supplicant failed!");
         return WIFI_HAL_FAILED;

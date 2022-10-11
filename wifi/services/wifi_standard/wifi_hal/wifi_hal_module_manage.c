@@ -190,7 +190,7 @@ static int StopModuleInternalCheckProcess(const char *moduleName, pid_t processI
     }
     LOGE("Stop wpa process [%{public}d] failed for timeout, try to kill process", processId);
     StopModuleInternalKillProcess(processId);
-    return HAL_FAILURE;
+    return HAL_SUCCESS;
 }
 
 static int StopModuleInternalSendTerminate()
@@ -204,11 +204,16 @@ static int StopModuleInternalSendTerminate()
     return (ret == 0 ? HAL_SUCCESS : HAL_FAILURE);
 }
 
-int StopModuleInternal(const char *moduleName, pid_t processId)
+int StopModuleInternal(const char *moduleName, pid_t processId, bool isHostapd)
 {
-    int ret = StopModuleInternalSendTerminate();
+    int ret;
+    if (isHostapd) {
+        ret = StopModuleInternalKillProcess(processId);
+    } else {
+        ret = StopModuleInternalSendTerminate();
+    }
     if (ret != HAL_SUCCESS) {
-        LOGE("Send terminate failed!");
+        LOGE("Send stop module command failed!");
     }
     return StopModuleInternalCheckProcess(moduleName, processId);
 }
@@ -261,7 +266,7 @@ ModuleManageRetCode StartModule(const char *moduleName, const char *startCmd)
     return MM_SUCCESS;
 }
 
-ModuleManageRetCode StopModule(const char *moduleName)
+ModuleManageRetCode StopModule(const char *moduleName, bool isHostapd)
 {
     if (moduleName == NULL) {
         return MM_FAILED;
@@ -275,7 +280,7 @@ ModuleManageRetCode StopModule(const char *moduleName)
         LOGD("module %{public}s reference left %{public}d, return ok", moduleName, p->referenceCount);
         return MM_REDUCE_REFERENCE;
     }
-    int ret = StopModuleInternal(p->szModuleName, p->processId);
+    int ret = StopModuleInternal(p->szModuleName, p->processId, isHostapd);
     if (ret != 0) { /* stop module failed! */
         p->referenceCount += 1;
         return MM_FAILED;

@@ -27,6 +27,8 @@
 #include "wifi_settings.h"
 #include "wifi_sta_hal_interface.h"
 #include "wifi_supplicant_hal_interface.h"
+#include "iservice_registry.h"
+#include "system_ability_definition.h"
 
 #ifndef OHOS_WIFI_STA_TEST
 #include "dhcp_service.h"
@@ -68,7 +70,11 @@ StaStateMachine::StaStateMachine()
       pGetIpState(nullptr),
       pLinkedState(nullptr),
       pApRoamingState(nullptr)
-{}
+{
+#ifndef OHOS_ARCH_LITE
+    SubscribeSystemAbility();
+#endif // OHOS_ARCH_LITE
+}
 
 StaStateMachine::~StaStateMachine()
 {
@@ -2215,5 +2221,33 @@ void StaStateMachine::SetOperationalMode(int mode)
 {
     SendMessage(WIFI_SVR_CMD_STA_OPERATIONAL_MODE, mode, 0);
 }
+
+#ifndef OHOS_ARCH_LITE
+void StaStateMachine::SubscribeSystemAbility(void)
+{
+    auto samgrProxy = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    statusChangeListener_ = new (std::nothrow) SystemAbilityStatusChangeListener(*this);
+    if (samgrProxy == nullptr || statusChangeListener_ == nullptr) {
+        LOGE("samgrProxy or statusChangeListener_ is nullptr");
+        return;
+    }
+    int32_t ret = samgrProxy->SubscribeSystemAbility(COMM_NET_CONN_MANAGER_SYS_ABILITY_ID, statusChangeListener_);
+    LOGI("SubscribeSystemAbility COMM_NET_CONN_MANAGER_SYS_ABILITY_ID result:%{public}d", ret);
+}
+
+void StaStateMachine::OnRemoteRestart(void)
+{
+    LOGI("OnRemoteRestart()");
+    int state = WifiSettings::GetInstance().GetWifiState();
+    if (state != static_cast<int>(WifiState::ENABLED)) {
+        return;
+    }
+    std::thread thread([cb = staCallback]() {
+        WifiNetAgent::GetInstance().RegisterNetSupplier();
+        WifiNetAgent::GetInstance().RegisterNetSupplierCallback(cb);
+    });
+    thread.detach();
+}
+#endif // OHOS_ARCH_LITE
 }  // namespace Wifi
 }  // namespace OHOS

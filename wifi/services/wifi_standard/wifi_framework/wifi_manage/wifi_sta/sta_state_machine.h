@@ -19,6 +19,10 @@
 #include <sys/types.h>
 #include <fstream>
 #include <vector>
+
+#include "system_ability.h"
+#include "system_ability_status_change_stub.h"
+
 #include "wifi_internal_msg.h"
 #include "wifi_log.h"
 #include "wifi_errcode.h"
@@ -381,6 +385,32 @@ public:
      */
     int GetLinkedInfo(WifiLinkedInfo& linkedInfo);
 
+#ifndef OHOS_ARCH_LITE
+private:
+    class SystemAbilityStatusChangeListener : public OHOS::SystemAbilityStatusChangeStub {
+    public:
+        explicit SystemAbilityStatusChangeListener(StaStateMachine &stateMachine) : stateMachine_(stateMachine){};
+        ~SystemAbilityStatusChangeListener() = default;
+        void OnAddSystemAbility(int32_t systemAbilityId, const std::string &deviceId) override
+        {
+            LOGI("OnAddSystemAbility()");
+            if (hasSARemoved_) {
+                hasSARemoved_ = false;
+                stateMachine_.OnRemoteRestart();
+            }
+        }
+        void OnRemoveSystemAbility(int32_t systemAbilityId, const std::string &deviceId) override
+        {
+            LOGI("OnRemoveSystemAbility()");
+            hasSARemoved_ = true;
+        }
+
+    private:
+        StaStateMachine &stateMachine_;
+        bool hasSARemoved_ = false;
+    };
+#endif // OHOS_ARCH_LITE
+
 private:
     /**
      * @Description  Destruct state.
@@ -658,12 +688,23 @@ private:
      * @param msg - Message body received by the state machine[in]
      */
     void DealNetworkCheck(InternalMessage *msg);
+#ifndef OHOS_ARCH_LITE
+    /**
+     * @Description Subscribe system ability.
+     */
+    void SubscribeSystemAbility(void);
+    /**
+     * @Description On remote died callback.
+     */
+    void OnRemoteRestart(void);
+#endif // OHOS_ARCH_LITE
 
 private:
     StaSmHandleFuncMap staSmHandleFuncMap;
     StaServiceCallback staCallback;
 #ifndef OHOS_ARCH_LITE
     sptr<NetManagerStandard::NetSupplierInfo> NetSupplierInfo;
+    sptr<ISystemAbilityStatusChange> statusChangeListener_;
 #endif
 
     int lastNetworkId;

@@ -868,7 +868,7 @@ void ScanService::HandleScreenStatusChanged()
 
 void ScanService::HandleStaStatusChanged(int status)
 {
-    WIFI_LOGI("Enter ScanService::HandleStaStatusChanged.");
+    WIFI_LOGI("Enter ScanService::HandleStaStatusChanged, change to status: %{public}d.", status);
 
     staStatus = status;
     switch (staStatus) {
@@ -945,13 +945,13 @@ void ScanService::SystemScanProcess(bool scanAtOnce)
     if (state == MODE_STATE_OPEN) {
         {
             std::unique_lock<std::mutex> lock(scanControlInfoMutex);
+            int i = 0;
             for (auto iter = scanControlInfo.scanIntervalList.begin(); iter != scanControlInfo.scanIntervalList.end();
                 ++iter) {
                 if (iter->scanScene == SCAN_SCENE_ALL && iter->scanMode == ScanMode::SYSTEM_TIMER_SCAN &&
                     iter->isSingle == false) {
-                    WIFI_LOGD("iter->intervalMode is:%{public}d", iter->intervalMode);
-                    WIFI_LOGD("iter->interval is:%{public}d", iter->interval);
-                    WIFI_LOGD("iter->count is:%{public}d", iter->count);
+                    WIFI_LOGI("iter[%{public}d]: intervalMode:%{public}d, interval:%{public}d, count:%{public}d",
+                        i++, iter->intervalMode, iter->interval, iter->count);
                     systemScanIntervalMode.scanIntervalMode.intervalMode = iter->intervalMode;
                     systemScanIntervalMode.scanIntervalMode.interval = iter->interval;
                     systemScanIntervalMode.scanIntervalMode.count = iter->count;
@@ -1096,7 +1096,7 @@ ErrCode ScanService::AllowExternScan()
     WIFI_LOGI("Enter ScanService::AllowExternScan.\n");
     int staScene = GetStaScene();
     ScanMode scanMode = WifiSettings::GetInstance().GetAppRunningState();
-    WIFI_LOGI("staScene is %{public}d, scanMode is %{public}d", staScene, (int)scanMode);
+    WIFI_LOGI("AllowExternScan, staScene is %{public}d, scanMode is %{public}d", staScene, (int)scanMode);
 
     if (!AllowExternScanByThermal()) {
         WIFI_LOGW("extern scan not allow by thermal level");
@@ -1132,23 +1132,26 @@ ErrCode ScanService::AllowSystemTimerScan()
 
     if (staStatus != static_cast<int>(OperateResState::DISCONNECT_DISCONNECTED) &&
         staStatus != static_cast<int>(OperateResState::CONNECT_AP_CONNECTED)) {
+        WIFI_LOGW("system timer scan not allowed for staStatus: %{public}d.", staStatus);
         return WIFI_OPT_FAILED;
     }
 
     /* The network is connected and cannot be automatically switched. */
     autoNetworkSelection = WifiSettings::GetInstance().GetWhetherToAllowNetworkSwitchover();
     if ((staStatus == static_cast<int>(OperateResState::CONNECT_AP_CONNECTED)) && (!autoNetworkSelection)) {
+        WIFI_LOGW("system timer scan not allowed for CONNECT_AP_CONNECTED");
         return WIFI_OPT_FAILED;
     }
 
     int staScene = GetStaScene();
     /* Determines whether to allow scanning based on the STA status. */
     if (staScene == SCAN_SCENE_MAX) {
+        WIFI_LOGW("system timer scan not allowed for invalid staScene: %{public}d", staScene);
         return WIFI_OPT_FAILED;
     }
 
     if (!AllowScanDuringStaScene(staScene, ScanMode::SYSTEM_TIMER_SCAN)) {
-        WIFI_LOGW("system timer scan not allowed, staScene is %{public}d", staScene);
+        WIFI_LOGW("system timer scan not allowed, staScene: %{public}d", staScene);
         return WIFI_OPT_FAILED;
     }
 
@@ -1176,7 +1179,7 @@ ErrCode ScanService::AllowSystemTimerScan()
     }
 
     if (!AllowScanByDisableScanCtrl()) {
-        WIFI_LOGD("extern scan not allow by disable scan control.");
+        WIFI_LOGW("system timer scan not allow by disable scan control.");
         return WIFI_OPT_FAILED;
     }
 
@@ -1228,7 +1231,7 @@ ErrCode ScanService::AllowPnoScan()
     }
 
     if (!AllowScanByDisableScanCtrl()) {
-        WIFI_LOGW("extern scan not allow by disable scan control.");
+        WIFI_LOGW("pnoScan not allow by disable scan control.");
         return WIFI_OPT_FAILED;
     }
 
@@ -1238,7 +1241,7 @@ ErrCode ScanService::AllowPnoScan()
 
 ErrCode ScanService::AllowScanByType(ScanType scanType)
 {
-    LOGI("Enter ScanService::AllowScanByType.");
+    LOGI("Enter ScanService::AllowScanByType, scanType: %{public}d.", scanType);
 
     ErrCode allScanResult = WIFI_OPT_SUCCESS;
     switch (scanType) {
@@ -1256,7 +1259,7 @@ ErrCode ScanService::AllowScanByType(ScanType scanType)
             break;
     }
 
-    WIFI_LOGW("AllowScanByType ErrCode=%{public}d.", static_cast<int>(allScanResult));
+    WIFI_LOGW("AllowScanByType, allScanResult:%{public}d.", static_cast<int>(allScanResult));
     return allScanResult;
 }
 
@@ -1350,7 +1353,7 @@ ErrCode ScanService::ApplyScanPolices(ScanType type)
     ErrCode rlt = WIFI_OPT_SUCCESS;
     if (appPackageName.empty()) {
         rlt = AllowScanByType(type);
-        WIFI_LOGW("appPackageName empty, apply scan polices ErrCode=%{public}d.", static_cast<int>(rlt));
+        WIFI_LOGW("appPackageName empty, apply scan polices rlt: %{public}d.", static_cast<int>(rlt));
         if (scanResultBackup != -1 && rlt == WIFI_OPT_MOVING_FREEZE_CTRL) {
             mScanSerivceCallbacks.OnScanFinishEvent(scanResultBackup);
         }
@@ -1372,7 +1375,7 @@ ErrCode ScanService::ApplyScanPolices(ScanType type)
     rlt = ApplyTrustListPolicy(type);
     if (rlt != WIFI_OPT_SUCCESS) {
         if (scanResultBackup != -1 && rlt == WIFI_OPT_MOVING_FREEZE_CTRL) {
-            LOGE("trust list policy, but moving freeze ctrl failed.");
+            WIFI_LOGE("trust list policy, but moving freeze ctrl failed.");
             mScanSerivceCallbacks.OnScanFinishEvent(scanResultBackup);
         }
         return rlt;
@@ -1396,7 +1399,8 @@ bool ScanService::AllowExternScanByThermal()
 
 bool ScanService::AllowExternScanByForbid(int staScene, ScanMode scanMode)
 {
-    WIFI_LOGI("Enter ScanService::AllowExternScanByForbid.\n");
+    WIFI_LOGI("Enter ScanService::AllowExternScanByForbid, staScene:%{public}d, staScene:%{public}d."
+        staScene, scanMode);
 
     if (IsExternScanning()) {
         if (!AllowScanDuringScanning(scanMode)) {

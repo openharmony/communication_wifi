@@ -1399,7 +1399,7 @@ bool ScanService::AllowExternScanByThermal()
 
 bool ScanService::AllowExternScanByForbid(int staScene, ScanMode scanMode)
 {
-    WIFI_LOGI("Enter ScanService::AllowExternScanByForbid, staScene:%{public}d, staScene:%{public}d."
+    WIFI_LOGI("Enter ScanService::AllowExternScanByForbid, staScene:%{public}d, scanMode:%{public}d.",
         staScene, scanMode);
 
     if (IsExternScanning()) {

@@ -1011,17 +1011,7 @@ void ScanService::StartSystemTimerScan(bool scanAtOnce)
     }
     if (scanAtOnce || (lastSystemScanTime == 0) ||
         (sinceLastScan >= systemScanIntervalMode.scanIntervalMode.interval)) {
-        std::vector<WifiDeviceConfig> deviceConfigs;
-        if (WifiSettings::GetInstance().GetDeviceConfig(deviceConfigs) == 0
-            && deviceConfigs.size() == 0) {
-            WIFI_LOGW("NO saved configs, system timer scan is not allowed!");
-            std::vector<WifiScanInfo> results;
-            /* call GetScanInfoList to clear older scan results */
-            int ret = WifiSettings::GetInstance().GetScanInfoList(results);
-            if (ret != 0) {
-                WIFI_LOGW("GetScanInfoList return error. \n");
-            }
-        } else if (Scan(false) != WIFI_OPT_SUCCESS) {
+        if (Scan(false) != WIFI_OPT_SUCCESS) {
             WIFI_LOGE("Scan failed.");
         }
         lastSystemScanTime = nowTime;
@@ -1766,7 +1756,8 @@ bool ScanService::AllowScanDuringScreenOff(ScanMode scanMode) const
 
 bool ScanService::AllowScanDuringStaScene(int staScene, ScanMode scanMode)
 {
-    WIFI_LOGI("Enter ScanService::AllowScanDuringStaScene.\n");
+    WIFI_LOGI("Enter ScanService::AllowScanDuringStaScene, staScene:%{public}d, scanMode:%{public}d",
+        staScene, scanMode);
 
     time_t now = time(nullptr);
     if (now < 0) {

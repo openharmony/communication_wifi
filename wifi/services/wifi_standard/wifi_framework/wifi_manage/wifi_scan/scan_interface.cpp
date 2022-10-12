@@ -85,14 +85,14 @@ ErrCode ScanInterface::ScanWithParam(const WifiScanParams &wifiScanParams)
 
 ErrCode ScanInterface::DisableScan(bool disable)
 {
-    WIFI_LOGI("Enter ScanInterface::DisableScan");
+    WIFI_LOGI("Enter ScanInterface::DisableScan, disable=%{public}d.", disable);
     CHECK_NULL_AND_RETURN(pScanService, WIFI_OPT_FAILED);
     return pScanService->DisableScan(disable);
 }
 
 ErrCode ScanInterface::OnScreenStateChanged(int screenState)
 {
-    WIFI_LOGI("Enter ScanInterface::OnScreenStateChanged\n");
+    WIFI_LOGI("Enter ScanInterface::OnScreenStateChanged, screenState=%{public}d.", screenState);
 
     if (screenState != MODE_STATE_OPEN && screenState != MODE_STATE_CLOSE) {
         WIFI_LOGE("screenState param is error");
@@ -105,7 +105,7 @@ ErrCode ScanInterface::OnScreenStateChanged(int screenState)
 
 ErrCode ScanInterface::OnClientModeStatusChanged(int staStatus)
 {
-    WIFI_LOGI("Enter ScanInterface::OnClientModeStatusChanged\n");
+    WIFI_LOGI("Enter ScanInterface::OnClientModeStatusChanged, staStatus=%{public}d.", staStatus);
     CHECK_NULL_AND_RETURN(pScanService, WIFI_OPT_FAILED);
     pScanService->HandleStaStatusChanged(staStatus);
     pScanService->SetStaCurrentTime();

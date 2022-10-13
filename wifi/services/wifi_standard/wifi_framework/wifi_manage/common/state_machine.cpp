@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include <inttypes.h>
+#include <cinttypes>
 #include "state_machine.h"
 #include "wifi_log.h"
 

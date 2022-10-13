@@ -61,7 +61,7 @@ int StopProcess(const char *pidFile)
     }
 
     LOGI("StopProcess() sending signal SIGTERM to process:%{public}d.", pid);
-    if (kill(pid, SIGTERM == -1)) {
+    if (kill(pid, SIGTERM) == -1) {
         if (ESRCH == errno) {
             LOGW("StopProcess() pidFile:%{public}s,pid:%{public}d is not exist.", pidFile, pid);
             unlink(pidFile);

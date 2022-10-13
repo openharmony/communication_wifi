@@ -32,7 +32,8 @@ public:
      * @param None
      * @return None
      */
-    AuthorizingNegotiationRequestState(P2pStateMachine &, WifiP2pGroupManager &, WifiP2pDeviceManager &);
+    AuthorizingNegotiationRequestState(P2pStateMachine &stateMachine, WifiP2pGroupManager &groupMgr,
+        WifiP2pDeviceManager &deviceMgr);
 
     /**
      * @Description Destroy the Authorizing Negotlation Request State object

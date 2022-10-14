@@ -34,7 +34,7 @@ public:
      * @param None
      * @return None
      */
-    ApStartedState(ApStateMachine &, ApConfigUse &, ApMonitor &, int id = 0);
+    ApStartedState(ApStateMachine &apStateMachine, ApConfigUse &apConfigUse, ApMonitor &apMonitor, int id = 0);
     /**
      * @Description  destructor method.
      * @param None

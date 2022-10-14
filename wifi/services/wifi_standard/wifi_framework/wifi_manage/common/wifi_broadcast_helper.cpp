@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 #include "wifi_broadcast_helper.h"
-#include <stdio.h>
+#include <cstdio>
 #include <vector>
 #include "wifi_logger.h"
 
@@ -33,7 +33,7 @@ void WifiBroadCastHelper::Show(const std::string &v)
     return;
 }
 
-void WifiBroadCastHelper::Show(int v)
+void WifiBroadCastHelper::Show(const int v)
 {
     WIFI_LOGI("    -i:%{public}d", v);
     return;

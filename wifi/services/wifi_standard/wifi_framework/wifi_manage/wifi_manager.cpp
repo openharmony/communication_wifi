@@ -245,10 +245,6 @@ int WifiManager::Init()
 #ifdef FEATURE_P2P_SUPPORT
     InitP2pCallback();
 #endif
-    if (!WifiConfigCenter::GetInstance().GetSupportedBandChannel()) {
-        WIFI_LOGE("Failed to get current chip supported band and channel!");
-    }
-
     if (WifiServiceManager::GetInstance().CheckPreLoadService() < 0) {
         WIFI_LOGE("WifiServiceManager check preload feature service failed!");
         WifiManager::GetInstance().Exit();

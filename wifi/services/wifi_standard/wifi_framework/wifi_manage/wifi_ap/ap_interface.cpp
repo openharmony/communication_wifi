@@ -81,9 +81,9 @@ ErrCode ApInterface::GetValidBands(std::vector<BandType> &bands)
     return m_ApService.GetValidBands(bands);
 }
 
-ErrCode ApInterface::GetValidChannels(BandType band, std::vector<int32_t> &validchannel)
+ErrCode ApInterface::GetValidChannels(BandType band, std::vector<int32_t> &validChannel)
 {
-    return m_ApService.GetValidChannels(band, validchannel);
+    return m_ApService.GetValidChannels(band, validChannel);
 }
 
 ErrCode ApInterface::RegisterApServiceCallbacks(const IApServiceCallbacks &callbacks)

@@ -149,8 +149,8 @@ ErrCode WifiHotspotServiceImpl::SetHotspotConfig(const HotspotConfig &config)
         }
         std::vector<int32_t> valid2GChannel;
         std::vector<int32_t> valid5GChannel;
-        (void)pService->GetValidChannels(BandType::BAND_2GHZ, &valid2GChannel);
-        (void)pService->GetValidChannels(BandType::BAND_5GHZ, &valid5GChannel);
+        (void)pService->GetValidChannels(BandType::BAND_2GHZ, valid2GChannel);
+        (void)pService->GetValidChannels(BandType::BAND_5GHZ, valid5GChannel);
         if (valid2GChannel.size() + valid5GChannel.size() == 0) {
             WIFI_LOGE("Failed to get supported band and channel!");
         } else {

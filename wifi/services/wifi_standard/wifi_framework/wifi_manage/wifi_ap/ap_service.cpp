@@ -145,7 +145,7 @@ ErrCode ApService::GetValidBands(std::vector<BandType> &bands)
         return ErrCode::WIFI_OPT_SUCCESS;
     }
 
-    std::vector<BandType> &tmpBands;
+    std::vector<BandType> tmpBands;
     /* Get freqs from hal */
     if (WifiApHalInterface::GetInstance().GetFrequenciesByBand(static_cast<int>(BandType::BAND_2GHZ), allowed2GFreq)) {
         WIFI_LOGW("%{public}s, fail to get 2.4G channel", __func__);
@@ -179,7 +179,7 @@ ErrCode ApService::GetValidChannels(BandType band, std::vector<int32_t> &validCh
     if (channelsInfo.size() > 0) {
         auto it = channelsInfo.find(band);
         if (it == channelsInfo.end()) {
-            WIFI_LOGE("%{public}s, NOT find the band: %{public}d.", band, __func__);
+            WIFI_LOGE("%{public}s, NOT find the band: %{public}d.", __func__, band);
             return ErrCode::WIFI_OPT_INVALID_PARAM;
         }
         validChannel = channelsInfo[band];

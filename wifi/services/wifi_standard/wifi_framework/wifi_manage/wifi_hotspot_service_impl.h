@@ -163,14 +163,6 @@ public:
     ErrCode GetSupportedPowerModel(std::set<PowerModel>& setPowerModelList) override;
 
     /**
-     * @Description Get supported channels by band
-     *
-     * @param band - the band which to get supported channels
-     * @param channels - the supported channels
-     * @return ErrCode - operation result
-     */
-    ErrCode GetSupportedChannelsByBand(int band, std::vector<int> &channels)
-    /**
      * @Description Get power model
      *
      * @param model - current power model

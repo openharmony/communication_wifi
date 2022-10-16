@@ -268,7 +268,8 @@ void WifiManager::Exit()
 {
     WIFI_LOGI("[WifiManager] Exit.");
     WifiServiceManager::GetInstance().UninstallAllService();
-    WifiStaHalInterface::GetInstance().ExitAllIdlClient();
+    /* NOTE:: DO NOT allow call hal interface function, delete at 2022.10.16 */
+    /* Refer to WifiStaHalInterface::GetInstance().ExitAllIdlClient(); */
     WifiInternalEventDispatcher::GetInstance().Exit();
     if (mCloseServiceThread.joinable()) {
         PushServiceCloseMsg(WifiCloseServiceCode::SERVICE_THREAD_EXIT);
@@ -292,11 +293,6 @@ void WifiManager::AddSupportedFeatures(WifiFeatures feature)
 
 int WifiManager::GetSupportedFeatures(long &features)
 {
-    int capability = 0;
-    if (WifiChipHalInterface::GetInstance().GetChipCapabilities(capability) != WIFI_IDL_OPT_OK) {
-        WIFI_LOGE("Failed to get chip capability!");
-        return -1;
-    }
     long supportedFeatures = mSupportedFeatures;
     supportedFeatures |= static_cast<long>(WifiFeatures::WIFI_FEATURE_INFRA);
     supportedFeatures |= static_cast<long>(WifiFeatures::WIFI_FEATURE_INFRA_5G);
@@ -305,7 +301,9 @@ int WifiManager::GetSupportedFeatures(long &features)
     supportedFeatures |= static_cast<long>(WifiFeatures::WIFI_FEATURE_WPA3_SAE);
     supportedFeatures |= static_cast<long>(WifiFeatures::WIFI_FEATURE_WPA3_SUITE_B);
     supportedFeatures |= static_cast<long>(WifiFeatures::WIFI_FEATURE_OWE);
-    features = (supportedFeatures & capability);
+    /* NOTE: features = supportedFeatures & WifiChipHalInterface::GetInstance().GetChipCapabilities */
+    /* It does NOT allow call HalInterface from wifi_manager */
+    features = supportedFeatures;
     return 0;
 }
 

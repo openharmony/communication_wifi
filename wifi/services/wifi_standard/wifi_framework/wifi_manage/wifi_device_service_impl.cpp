@@ -323,26 +323,20 @@ ErrCode WifiDeviceServiceImpl::DisableWifi()
 
 ErrCode WifiDeviceServiceImpl::InitWifiProtect(const WifiProtectType &protectType, const std::string &protectName)
 {
-    if (WifiProtectManager::GetInstance().InitWifiProtect(protectType, protectName)) {
-        return WIFI_OPT_SUCCESS;
-    }
-    return WIFI_OPT_FAILED;
+    /* refer to WifiProtectManager::GetInstance().InitWifiProtect, DO NOT support now! */
+    return WIFI_OPT_SUCCESS;
 }
 
 ErrCode WifiDeviceServiceImpl::GetWifiProtectRef(const WifiProtectMode &protectMode, const std::string &protectName)
 {
-    if (WifiProtectManager::GetInstance().GetWifiProtect(protectMode, protectName)) {
-        return WIFI_OPT_SUCCESS;
-    }
-    return WIFI_OPT_FAILED;
+    /* refer to WifiProtectManager::GetInstance().GetWifiProtect, DO NOT support now! */
+    return WIFI_OPT_SUCCESS;
 }
 
 ErrCode WifiDeviceServiceImpl::PutWifiProtectRef(const std::string &protectName)
 {
-    if (WifiProtectManager::GetInstance().PutWifiProtect(protectName)) {
-        return WIFI_OPT_SUCCESS;
-    }
-    return WIFI_OPT_FAILED;
+    /* refer to WifiProtectManager::GetInstance().PutWifiProtect, DO NOT support now! */
+    return WIFI_OPT_SUCCESS;
 }
 
 bool WifiDeviceServiceImpl::CheckConfigEap(const WifiDeviceConfig &config)
@@ -1063,7 +1057,8 @@ ErrCode WifiDeviceServiceImpl::GetDeviceMacAddress(std::string &result)
 bool WifiDeviceServiceImpl::SetLowLatencyMode(bool enabled)
 {
     WIFI_LOGI("SetLowLatencyMode");
-    return WifiProtectManager::GetInstance().SetLowLatencyMode(enabled);
+    /* refer to WifiProtectManager::GetInstance().SetLowLatencyMode, DO NOT support now! */
+    return true;
 }
 
 ErrCode WifiDeviceServiceImpl::CheckCanEnableWifi(void)

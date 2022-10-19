@@ -64,9 +64,9 @@ static int DefaultArgument(const char *argument, const char *val)
     return RET_SUCCESS;
 }
 
-const char *optionString = "i:c:d:g:s:n:P:S:Bp:o:lb:rvhD";
+const char *g_optionString = "i:c:d:g:s:n:P:S:Bp:o:lb:rvhD";
 
-static struct option longOptions[] = {
+static struct option g_longOptions[] = {
     {"ifname", REQUIRED_ARG, 0, 'i'},
     {"conf", REQUIRED_ARG, 0, 'c'},
     {"dns", REQUIRED_ARG, 0, 'd'},
@@ -83,22 +83,22 @@ static struct option longOptions[] = {
 };
 
 static DhcpUsage usages[] = {
-    {&longOptions[NUM_ZERO], "<interface>", "network interface name.", "--ifname eth0", 1, PutArgument},
-    {&longOptions[NUM_ONE], "<file>", "configure file name.", "--conf /etc/conf/dhcp_server.conf", 0, PutArgument},
-    {&longOptions[NUM_TWO], "<dns1>[,dns2][,dns3][...]", "domain name server IP address list.", "", 0, PutArgument},
-    {&longOptions[NUM_THREE], "<gateway>", "gateway option.", "", 0, PutIpArgument},
-    {&longOptions[NUM_FOUR], "<server>", "server identifier.", "", 1, PutIpArgument},
-    {&longOptions[NUM_FIVE], "<netmask>", "default subnet mask.", "", 1, PutIpArgument},
-    {&longOptions[NUM_SIX], "<beginip>,<endip>", "pool address range.", "", 0,
+    {&g_longOptions[NUM_ZERO], "<interface>", "network interface name.", "--ifname eth0", 1, PutArgument},
+    {&g_longOptions[NUM_ONE], "<file>", "configure file name.", "--conf /etc/conf/dhcp_server.conf", 0, PutArgument},
+    {&g_longOptions[NUM_TWO], "<dns1>[,dns2][,dns3][...]", "domain name server IP address list.", "", 0, PutArgument},
+    {&g_longOptions[NUM_THREE], "<gateway>", "gateway option.", "", 0, PutIpArgument},
+    {&g_longOptions[NUM_FOUR], "<server>", "server identifier.", "", 1, PutIpArgument},
+    {&g_longOptions[NUM_FIVE], "<netmask>", "default subnet mask.", "", 1, PutIpArgument},
+    {&g_longOptions[NUM_SIX], "<beginip>,<endip>", "pool address range.", "", 0,
         PutPoolArgument},
-    {&longOptions[NUM_SEVEN], "<leaseTime>", "set lease time value, the value is in units of seconds.", "", 0,
+    {&g_longOptions[NUM_SEVEN], "<leaseTime>", "set lease time value, the value is in units of seconds.", "", 0,
         PutArgument},
-    {&longOptions[NUM_EIGHT], "<renewalTime>", "set renewal time value, the value is in units of seconds.", "", 0,
+    {&g_longOptions[NUM_EIGHT], "<renewalTime>", "set renewal time value, the value is in units of seconds.", "", 0,
         PutArgument},
-    {&longOptions[NUM_NINE], "<rebindingTime>", "set rebinding time value, the value is in units of seconds.", "", 0,
+    {&g_longOptions[NUM_NINE], "<rebindingTime>", "set rebinding time value, the value is in units of seconds.", "", 0,
         PutArgument},
-    {&longOptions[NUM_TEN], "", "show version information.", "", 0, ShowVersion},
-    {&longOptions[NUM_ELEVEN], "", "show help information.", "", 0, DefaultArgument},
+    {&g_longOptions[NUM_TEN], "", "show version information.", "", 0, ShowVersion},
+    {&g_longOptions[NUM_ELEVEN], "", "show help information.", "", 0, DefaultArgument},
     {0, "", "", ""},
 };
 
@@ -265,11 +265,11 @@ int PutArgument(const char *argument, const char *val)
     return RET_FAILED;
 }
 
-int findIndex(int c)
+int FindIndex(int c)
 {
-    int size = sizeof(longOptions) / sizeof(longOptions[0]);
+    int size = sizeof(g_longOptions) / sizeof(g_longOptions[0]);
     for (int i = 0; i < size; ++i) {
-        if (longOptions[i].val == c) {
+        if (g_longOptions[i].val == c) {
             return i;
         }
     }
@@ -283,14 +283,14 @@ int ParseArguments(int argc, char *argv[])
     size_t optsc = sizeof(usages) / sizeof(DhcpUsage);
     int index = -1;
     int rst = RET_SUCCESS;
-    while ((ret = getopt_long(argc, argv, optionString, longOptions, &index)) != -1) {
+    while ((ret = getopt_long(argc, argv, g_optionString, g_longOptions, &index)) != -1) {
         if (ret == '?') {
             LOGW("unknown input arguments! ret = ?");
             index = -1;
             continue;
         }
         if (index < 0) {
-            index = findIndex(ret);
+            index = FindIndex(ret);
         }
         if (index < 0 || index >= (int)optsc) {
             LOGD("unknown input arguments! ret = %c, index = %d", ret, index);

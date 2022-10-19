@@ -187,7 +187,7 @@ WifiErrorNo StartSupplicant(void)
 WifiErrorNo StopSupplicant(void)
 {
     LOGI("Stop supplicant");
-    ModuleManageRetCode ret = StopModule(WPA_SUPPLICANT_NAME);
+    ModuleManageRetCode ret = StopModule(WPA_SUPPLICANT_NAME, false);
     if (ret == MM_FAILED) {
         LOGE("stop wpa_supplicant failed!");
         return WIFI_HAL_FAILED;

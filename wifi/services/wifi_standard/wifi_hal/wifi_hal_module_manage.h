@@ -17,6 +17,7 @@
 #define OHOS_WIFI_HAL_MODULE_MANAGE_H
 
 #include <pthread.h>
+#include <stdbool.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -58,10 +59,10 @@ ModuleManageRetCode StartModule(const char *moduleName, const char *startCmd);
  * @Description Stop a specified service.
  *
  * @param moduleName
- * @param modulePropertyName
+ * @param isHostapd
  * @return ModuleManageRetCode
  */
-ModuleManageRetCode StopModule(const char *moduleName);
+ModuleManageRetCode StopModule(const char *moduleName, bool isHostapd);
 
 #ifdef __cplusplus
 }

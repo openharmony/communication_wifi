@@ -456,7 +456,12 @@ WifiErrorNo GetNetworkList(WifiNetworkInfo *infos, int *size)
 
 static void GetScanInfoElems(Context *context, ScanInfo* scanInfo)
 {
+    const unsigned int MAX_INFO_ELEMS_SIZE = 256;
     ReadInt(context, &scanInfo->ieSize);
+    if (scanInfo->ieSize <= 0 || scanInfo->ieSize > MAX_INFO_ELEMS_SIZE) {
+        LOGE("Invalid ieSize: %{public}d!", scanInfo->ieSize);
+        return;
+    }
     /* This pointer will be released in its client */
     scanInfo->infoElems = (ScanInfoElem *)calloc(scanInfo->ieSize, sizeof(ScanInfoElem));
     if (scanInfo->infoElems == NULL) {
@@ -465,6 +470,9 @@ static void GetScanInfoElems(Context *context, ScanInfo* scanInfo)
     for (int i = 0; i < scanInfo->ieSize; ++i) {
         ReadInt(context, (int *)&scanInfo->infoElems[i].id);
         ReadInt(context, &scanInfo->infoElems[i].size);
+        if (scanInfo->infoElems[i].size <= 0) {
+            continue;
+        }
         /* This pointer will be released in its client */
         scanInfo->infoElems[i].content = calloc(scanInfo->infoElems[i].size + 1, sizeof(char));
         if (scanInfo->infoElems[i].content == NULL) {

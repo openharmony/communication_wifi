@@ -848,7 +848,7 @@ int AddReplyServerIdOption(PDhcpOptionList options, uint32_t serverId)
         LOGE("option list pointer is null.");
         return RET_FAILED;
     }
-    if (!serverId || serverId==INADDR_BROADCAST) {
+    if (!serverId || serverId == INADDR_BROADCAST) {
         LOGE("servier id error.");
         return RET_FAILED;
     }

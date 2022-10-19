@@ -155,7 +155,7 @@ WifiErrorNo StopSoftAp(int id)
 WifiErrorNo StopHostapd(void)
 {
     ModuleManageRetCode ret;
-    ret = StopModule(g_serviceName);
+    ret = StopModule(g_serviceName, true);
     if (ret == MM_FAILED) {
         LOGE("stop hostapd failed!");
         return WIFI_HAL_FAILED;

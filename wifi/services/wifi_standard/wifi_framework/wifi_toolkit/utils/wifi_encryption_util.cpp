@@ -131,7 +131,7 @@ int32_t WifiDecryption(const WifiEncryptionInfo &wifiEncryptionInfo, const Encry
     uint8_t nonce[NONCE_SIZE] = {0};
     uint32_t lengthIV = NONCE_SIZE;
     retStrToArrat = HexStringToVec(encryptedData.IV, nonce, NONCE_SIZE, lengthIV);
-        if (retStrToArrat != 0) {
+    if (retStrToArrat != 0) {
         return HKS_FAILURE;
     }
     struct HksParam IVParam[] = {

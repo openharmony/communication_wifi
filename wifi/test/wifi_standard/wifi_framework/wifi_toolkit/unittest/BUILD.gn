@@ -38,7 +38,7 @@ ohos_unittest("toolkit_unittest") {
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/utils/wifi_encryption_util.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/utils/wifi_global_func.cpp",
     "wifi_config_file_test.cpp",
-	"wifi_encryption_util_test.cpp"
+    "wifi_encryption_util_test.cpp",
     "wifi_global_func_test.cpp",
     "wifi_ip_tools_test.cpp",
     "wifi_log_helper_test.cpp",

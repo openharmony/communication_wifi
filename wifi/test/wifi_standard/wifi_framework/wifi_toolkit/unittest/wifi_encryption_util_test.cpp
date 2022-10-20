@@ -36,59 +36,44 @@ static struct HksParam g_genParam[] = {
 
 HWTEST_F(WifiEncryptionUtilFuncTest, GetKey_001, TestSize.Level1)
 {
-	WifiEncryptionInfo testEncryptionInfo;
-	testEncryptionInfo.setFile("TestKey");
-    struct HksParam IVParam[] = {
-        { .tag = HKS_TAG_NONCE, .blob = { .size = NONCE_SIZE, .data = nonce } },
-    };
+    WifiEncryptionInfo testEncryptionInfo;
+    testEncryptionInfo.SetFile("TestKey");
     struct HksParamSet *testParamSet = nullptr;
     EXPECT_TRUE(HksInitParamSet(&testParamSet) == HKS_SUCCESS);
-	EXPECT_TRUE(HksAddParams(testParamSet, g_genParam, sizeof(g_genParam) / sizeof(HksParam)) == HKS_SUCCESS);
-	EXPECT_TRUE(HksAddParams(testParamSet, IVParam, sizeof(IVParam) / sizeof(HksParam)) == HKS_SUCCESS);
-	EXPECT_TRUE(HksBuildParamSet(&testParamSet) == HKS_SUCCESS);
-	EXPECT_TRUE(GetKey(testEncryptionInfo, testParamSet) == HKS_SUCCESS);
+    EXPECT_TRUE(HksAddParams(testParamSet, g_genParam, sizeof(g_genParam) / sizeof(HksParam)) == HKS_SUCCESS);
+    EXPECT_TRUE(HksBuildParamSet(&testParamSet) == HKS_SUCCESS);
+    EXPECT_TRUE(GetKey(testEncryptionInfo, testParamSet) == HKS_SUCCESS);
 }
 
 HWTEST_F(WifiEncryptionUtilFuncTest, WifiEncryption_002, TestSize.Level1)
 {
-	WifiEncryptionInfo testEncryptionInfo;
-	testEncryptionInfo.setFile("TestEncryption");
-	EncryptedData encryResult;
-	const std::string inputString = "12345678";
-	EXPECT_TRUE(WifiEncryption(testEncryptionInfo, inputString, encryResult) == HKS_SUCCESS);
+    WifiEncryptionInfo testEncryptionInfo;
+    testEncryptionInfo.SetFile("TestEncryption");
+    EncryptedData encryResult;
+    const std::string inputString = "12345678";
+    EXPECT_TRUE(WifiEncryption(testEncryptionInfo, inputString, encryResult) == HKS_SUCCESS);
 }
 
 HWTEST_F(WifiEncryptionUtilFuncTest, WifiEncryption_003, TestSize.Level1)
 {
-	WifiEncryptionInfo testEncryptionInfo;
-	testEncryptionInfo.setFile("TestEncryption");
-	EncryptedData encryResult;
-	const std::string inputString = "";
-	EXPECT_TRUE(WifiEncryption(testEncryptionInfo, inputString, encryResult) == HKS_SUCCESS);
-	EXPECT_TRUE(inputString.compare(encryResult.encryptedPassword) == 0);
+    WifiEncryptionInfo testEncryptionInfo;
+    testEncryptionInfo.SetFile("TestEncryption");
+    EncryptedData encryResult;
+    const std::string inputString = "";
+    EXPECT_TRUE(WifiEncryption(testEncryptionInfo, inputString, encryResult) == HKS_SUCCESS);
+    EXPECT_TRUE(inputString.compare(encryResult.encryptedPassword) == 0);
 }
 
 HWTEST_F(WifiEncryptionUtilFuncTest, WifiDecryption_004, TestSize.Level1)
 {
-	WifiEncryptionInfo testEncryptionInfo;
-	testEncryptionInfo.setFile("TestDecryption");
-	EncryptedData encryResult;
-	const std::string inputString = "12345678";
-	EXPECT_TRUE(WifiEncryption(testEncryptionInfo, inputString, encryResult) == HKS_SUCCESS);
-	std::string decryptedData = "";
-	EXPECT_TRUE(WifiDecryption(testEncryptionInfo, encryResult, decryptedData) == HKS_SUCCESS);
-	EXPECT_TRUE(inputString.compare(decryptedData) == 0);
-}
-
-HWTEST_F(WifiEncryptionUtilFuncTest, WifiDecryptionFailed_005, TestSize.Level1)
-{
-	WifiEncryptionInfo testEncryptionInfo;
-	testEncryptionInfo.setFile("NonExist");
-	EncryptedData encryResult;
-	const std::string inputString = "12345678";
-	std::string decryptedData = "";
-	EXPECT_TRUE(WifiDecryption(testEncryptionInfo, encryResult, decryptedData) != HKS_SUCCESS);
-	EXPECT_TRUE(decryptedData.compare("") == 0);
+    WifiEncryptionInfo testEncryptionInfo;
+    testEncryptionInfo.SetFile("TestDecryption");
+    EncryptedData encryResult;
+    const std::string inputString = "12345678";
+    EXPECT_TRUE(WifiEncryption(testEncryptionInfo, inputString, encryResult) == HKS_SUCCESS);
+    std::string decryptedData = "";
+    EXPECT_TRUE(WifiDecryption(testEncryptionInfo, encryResult, decryptedData) == HKS_SUCCESS);
+    EXPECT_TRUE(inputString.compare(decryptedData) == 0);
 }
 
 }  // namespace Wifi

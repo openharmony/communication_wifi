@@ -13,14 +13,14 @@
  * limitations under the License.
  */
 #ifdef FEATURE_ENCRYPTION_SUPPORT
-#ifndef OHOS_WIFI_NETWORK_INTERFACE_TEST_H
-#define OHOS_WIFI_NETWORK_INTERFACE_TEST_H
+#ifndef OHOS_WIFI_ENCRYPTION_UTIL_TEST_H
+#define OHOS_WIFI_ENCRYPTION_UTIL_TEST_H
 
 #include <gtest/gtest.h>
 #include "wifi_encryption_util.h"
 namespace OHOS {
 namespace Wifi {
-class WifiNetworkInterfaceTest : public testing::Test {
+class WifiEncryptionUtilFuncTest : public testing::Test {
 public:
     static void SetUpTestCase()
     {}
@@ -28,8 +28,8 @@ public:
     {}
     virtual void SetUp()
     {
-		ASSERT_EQ(SetUpHks(), HKS_SUCCESS)
-	}
+        ASSERT_EQ(SetUpHks(), HKS_SUCCESS);
+    }
     virtual void TearDown()
     {}
 };

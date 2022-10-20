@@ -60,13 +60,37 @@ public:
     ~WifiEncryptionInfo() {}
 };
 
+/**
+ * @Description  Set up Huks service
+ */
 int32_t SetUpHks();
 
+/**
+ * @Description  Generate new or get existed GCM-AES key based on input encryptionInfo and genParamSet
+ * @param wifiEncryptionInfo  - keyAlias info
+ * @param genParamSet - generate params
+ * @return HKS_SUCCESS - find key, others - find key failed
+ */
 int32_t GetKey(const WifiEncryptionInfo &wifiEncryptionInfo, const struct HksParamSet *genParamSet);
 
+/**
+ * @Description  Encrypt inputString using GCM-AES based on input encryptionInfo
+ * @param wifiEncryptionInfo  - keyAlias info
+ * @param inputString - plaint string that needs to be encrypted
+ * @param encryptedData - encrypted result with encrypted string and IV value
+ * @return HKS_SUCCESS - encryption success, others - encryption failed
+ */
 int32_t WifiEncryption(const WifiEncryptionInfo &wifiEncryptionInfo, const std::string &inputString,
     EncryptedData &encryptedData);
 
+
+/**
+ * @Description  Decrypt encryptedData using GCM-AES based on input encryptionInfo
+ * @param wifiEncryptionInfo  - keyAlias info
+ * @param encryptedData - encrypted result with encrypted string and IV value
+ * @param decryptedData - string after decryption
+ * @return HKS_SUCCESS - decryption success, others - decryption failed
+ */
 int32_t WifiDecryption(const WifiEncryptionInfo &wifiEncryptionInfo, const EncryptedData &encryptedData,
     std::string &decryptedData);
 }

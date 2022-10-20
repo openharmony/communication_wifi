@@ -65,12 +65,13 @@ ohos_unittest("toolkit_unittest") {
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
   ]
-
+  defines = []
   external_deps = [
     "c_utils:utils",
     "hiviewdfx_hilog_native:libhilog",
   ]
   if (wifi_feature_with_encryption) {
+      defines += [ "FEATURE_ENCRYPTION_SUPPORT" ]
       external_deps += [ "huks:libhukssdk" ]
     }
   configs = [ ":module_private_config" ]

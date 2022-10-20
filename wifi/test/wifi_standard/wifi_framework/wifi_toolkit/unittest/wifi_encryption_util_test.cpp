@@ -81,7 +81,7 @@ HWTEST_F(WifiEncryptionUtilFuncTest, WifiDecryption_005, TestSize.Level1)
     WifiEncryptionInfo testEncryptionInfo;
     testEncryptionInfo.SetFile("TestDecryption");
     EncryptedData encryResult;
-    encryResuolt.encryptedPassword = "";
+    encryResult.encryptedPassword = "";
     std::string decryptedData = "";
     EXPECT_TRUE(WifiDecryption(testEncryptionInfo, encryResult, decryptedData) == HKS_SUCCESS);
     EXPECT_TRUE(decryptedData.compare("") == 0);
@@ -92,7 +92,7 @@ HWTEST_F(WifiEncryptionUtilFuncTest, WifiDecryptionFailed_006, TestSize.Level1)
     WifiEncryptionInfo testEncryptionInfo;
     testEncryptionInfo.SetFile("TestDecryption");
     EncryptedData encryResult;
-    encryResuolt.encryptedPassword = "1234567";
+    encryResult.encryptedPassword = "1234567";
     std::string decryptedData = "";
     EXPECT_TRUE(WifiDecryption(testEncryptionInfo, encryResult, decryptedData) != HKS_SUCCESS);
     EXPECT_TRUE(decryptedData.compare("") == 0);
@@ -103,8 +103,8 @@ HWTEST_F(WifiEncryptionUtilFuncTest, WifiDecryptionFailed_007, TestSize.Level1)
     WifiEncryptionInfo testEncryptionInfo;
     testEncryptionInfo.SetFile("TestDecryption");
     EncryptedData encryResult;
-    encryResuolt.encryptedPassword = "12345678";
-    encryResuolt.encryptedPassword = "1234567";
+    encryResult.encryptedPassword = "12345678";
+    encryResult.encryptedPassword = "1234567";
     std::string decryptedData = "";
     EXPECT_TRUE(WifiDecryption(testEncryptionInfo, encryResult, decryptedData) != HKS_SUCCESS);
     EXPECT_TRUE(decryptedData.compare("") == 0);
@@ -120,8 +120,7 @@ HWTEST_F(WifiEncryptionUtilFuncTest, WifiDecryption_008, TestSize.Level1)
     std::string decryptedData = "";
     WifiEncryptionInfo testDecryptionInfo;
     testDecryptionInfo.SetFile("TestDecryption008");
-    EXPECT_TRUE(WifiDecryption(testDecryptionInfo, encryResult, decryptedData) == HKS_SUCCESS);
-    EXPECT_TRUE(inputString.compare(decryptedData) != 0);
+    EXPECT_TRUE(WifiDecryption(testDecryptionInfo, encryResult, decryptedData) != HKS_SUCCESS);
 }
 }  // namespace Wifi
 }  // namespace OHOS

@@ -84,10 +84,13 @@ void StaAutoConnectService::OnScanInfosReadyHandler(const std::vector<InterScanI
 
     WifiDeviceConfig electedDevice;
     if (AutoSelectDevice(electedDevice, scanInfos, blockedBssids, info) == WIFI_OPT_SUCCESS) {
-        WIFI_LOGI("AutoSelectDevice succeed.\n");
+        WIFI_LOGI("AutoSelectDevice succeed: ",
+            "[networkId:%{public}d, ssid:%{public}s, bssid:%{public}s, psk len:%{public}d]."
+            electedDevice.networkId, SsidAnonymize(electedDevice.ssid).c_str(),
+            MacAnonymize(electedDevice.bssid).c_str(), electedDevice.preSharedKey.length());
         ConnectElectedDevice(electedDevice);
     } else {
-        WIFI_LOGI("Exit network selection.\n");
+        WIFI_LOGI("AutoSelectDevice return fail.");
         return;
     }
 }
@@ -148,11 +151,11 @@ bool StaAutoConnectService::AddOrDelBlockedBssids(std::string bssid, bool enable
 
 void StaAutoConnectService::GetBlockedBssids(std::vector<std::string> &blockedBssids)
 {
-    WIFI_LOGI("Enter StaAutoConnectService::GetBlockedBssids.\n");
-
     for (auto iter = blockedBssidMap.begin(); iter != blockedBssidMap.end(); ++iter) {
         blockedBssids.push_back(iter->first);
     }
+    WIFI_LOGI("StaAutoConnectService::GetBlockedBssids, blockedBssids count: %{public}d.",
+        blockedBssids.size());
     return;
 }
 
@@ -195,7 +198,7 @@ void StaAutoConnectService::ConnectElectedDevice(WifiDeviceConfig &electedDevice
 {
     WIFI_LOGI("Enter StaAutoConnectService::ConnectElectedDevice.\n");
     if (electedDevice.bssid.empty()) {
-        WIFI_LOGE("electedDevice is null.\n");
+        WIFI_LOGE("electedDevice bssid is empty.");
         return;
     }
 
@@ -317,7 +320,7 @@ ErrCode StaAutoConnectService::AutoSelectDevice(WifiDeviceConfig &electedDevice,
 {
     WIFI_LOGI("Enter StaAutoConnectService::SelectNetwork.\n");
     if (scanInfos.empty()) {
-        WIFI_LOGE("No scanInfo.\n");
+        WIFI_LOGE("scanInfo is empty.");
         return WIFI_OPT_FAILED;
     }
 

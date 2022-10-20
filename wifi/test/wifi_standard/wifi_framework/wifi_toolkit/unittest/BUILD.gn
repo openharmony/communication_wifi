@@ -71,9 +71,9 @@ ohos_unittest("toolkit_unittest") {
     "hiviewdfx_hilog_native:libhilog",
   ]
   if (wifi_feature_with_encryption) {
-      defines += [ "FEATURE_ENCRYPTION_SUPPORT" ]
-      external_deps += [ "huks:libhukssdk" ]
-    }
+    external_deps += [ "huks:libhukssdk" ]
+    defines += [ "FEATURE_ENCRYPTION_SUPPORT" ]
+  }
   configs = [ ":module_private_config" ]
 
   part_name = "wifi"

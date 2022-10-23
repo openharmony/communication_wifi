@@ -323,8 +323,8 @@ void ApStartedState::ProcessCmdAddBlockList(InternalMessage &msg) const
     staInfo.deviceName = msg.GetStringFromMessage();
     staInfo.bssid = msg.GetStringFromMessage();
     staInfo.ipAddr = msg.GetStringFromMessage();
-    WIFI_LOGI("staInfo:%{private}s, %{private}s, %{private}s.", staInfo.deviceName.c_str(), staInfo.bssid.c_str(),
-        staInfo.ipAddr.c_str());
+    WIFI_LOGI("staInfo:%{private}s, %{public}s, %{public}s.",
+        staInfo.deviceName.c_str(), MacAnonymize(staInfo.bssid).c_str(), IpAnonymize(staInfo.ipAddr).c_str());
     m_ApStateMachine.m_ApStationsManager.AddBlockList(staInfo);
 }
 
@@ -335,8 +335,8 @@ void ApStartedState::ProcessCmdDelBlockList(InternalMessage &msg) const
     staInfo.deviceName = msg.GetStringFromMessage();
     staInfo.bssid = msg.GetStringFromMessage();
     staInfo.ipAddr = msg.GetStringFromMessage();
-    WIFI_LOGI("staInfo:%{private}s, %{private}s, %{private}s.", staInfo.deviceName.c_str(), staInfo.bssid.c_str(),
-        staInfo.ipAddr.c_str());
+    WIFI_LOGI("staInfo:%{private}s, %{public}s, %{public}s.", staInfo.deviceName.c_str(),
+        MacAnonymize(staInfo.bssid).c_str(), IpAnonymize(staInfo.ipAddr).c_str());
     m_ApStateMachine.m_ApStationsManager.DelBlockList(staInfo);
 }
 

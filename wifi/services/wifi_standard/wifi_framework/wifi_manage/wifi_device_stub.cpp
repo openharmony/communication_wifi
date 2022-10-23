@@ -655,7 +655,7 @@ void WifiDeviceStub::OnRemoveCandidateConfig(uint32_t code, MessageParcel &data,
     } else {
         WifiDeviceConfig config;
         ReadWifiDeviceConfig(data, config);
-        WIFI_LOGD("Remove candidate config by config: %{private}s", config.ssid.c_str());
+        WIFI_LOGD("Remove candidate config by config: %{public}s", SsidAnonymize(config.ssid).c_str());
         ret = RemoveCandidateConfig(config);
     }
     reply.WriteInt32(0);

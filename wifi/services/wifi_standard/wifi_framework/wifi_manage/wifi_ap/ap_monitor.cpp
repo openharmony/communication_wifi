@@ -43,8 +43,8 @@ void ApMonitor::DealStaJoinOrLeave(const StationInfo &info, ApStatemachineEvent 
     WIFI_LOGI("StationChangeEvent  event: [%{public}d(join=3,leave=4)] %{public}s . %{private}s . %{private}s.,",
         event,
         info.deviceName.c_str(),
-        info.bssid.c_str(),
-        info.ipAddr.c_str());
+        MacAnonymize(info.bssid).c_str(),
+        IpAnonymize(info.ipAddr).c_str());
     SendMessage(m_selectIfacName, event, 0, 0, anySta);
 }
 

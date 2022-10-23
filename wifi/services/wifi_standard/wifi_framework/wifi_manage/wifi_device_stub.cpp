@@ -20,6 +20,7 @@
 #include "wifi_device_callback_proxy.h"
 #include "wifi_internal_event_dispatcher.h"
 #include "wifi_device_death_recipient.h"
+#include "wifi_common_util.h"
 
 DEFINE_WIFILOG_LABEL("WifiDeviceStub");
 

@@ -20,6 +20,7 @@
 #include "wifi_ap_hal_interface.h"
 #include "ap_state_machine.h"
 #include "wifi_logger.h"
+#include "wifi_common_util.h"
 
 DEFINE_WIFILOG_HOTSPOT_LABEL("WifiApStationsManager");
 

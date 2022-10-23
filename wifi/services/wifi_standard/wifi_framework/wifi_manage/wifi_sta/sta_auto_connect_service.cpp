@@ -16,6 +16,7 @@
 #include "wifi_logger.h"
 #include "wifi_sta_hal_interface.h"
 #include "wifi_settings.h"
+#include "wifi_common_util.h"
 
 DEFINE_WIFILOG_LABEL("StaAutoConnectService");
 
@@ -85,7 +86,7 @@ void StaAutoConnectService::OnScanInfosReadyHandler(const std::vector<InterScanI
     WifiDeviceConfig electedDevice;
     if (AutoSelectDevice(electedDevice, scanInfos, blockedBssids, info) == WIFI_OPT_SUCCESS) {
         WIFI_LOGI("AutoSelectDevice succeed: "
-            "[networkId:%{public}d, ssid:%{public}s, bssid:%{public}s, psk len:%{public}d]."
+            "[networkId:%{public}d, ssid:%{public}s, bssid:%{public}s, psk len:%{public}d].",
             electedDevice.networkId, SsidAnonymize(electedDevice.ssid).c_str(),
             MacAnonymize(electedDevice.bssid).c_str(), electedDevice.preSharedKey.length());
         ConnectElectedDevice(electedDevice);
@@ -398,9 +399,9 @@ bool StaAutoConnectService::RoamingEncryptionModeCheck(
             mgmt = "NONE";
         }
         if (mgmt == network.keyMgmt) {
-            WIFI_LOGI("The Current network bssid %s signal strength is %{public}d",
+            WIFI_LOGI("The Current network bssid %{public}s signal strength is %{public}d",
                 MacAnonymize(info.bssid).c_str(), info.rssi);
-            WIFI_LOGI("The Roaming network bssid %s signal strength is %{public}d",
+            WIFI_LOGI("The Roaming network bssid %{public}s signal strength is %{public}d",
                 MacAnonymize(scanInfo.bssid).c_str(), scanInfo.rssi);
             int rssi = scanInfo.rssi - info.rssi;
             if (rssi > MIN_ROAM_RSSI_DIFF) {

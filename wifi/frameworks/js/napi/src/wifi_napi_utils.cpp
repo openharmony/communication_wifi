@@ -256,22 +256,7 @@ static napi_value DoCallBackAsyncWork(const napi_env& env, AsyncContext *asyncCo
             napi_value undefine, callback;
             napi_get_undefined(env, &undefine);
             context->completeFunc(data);
-            constexpr int ARGS_TWO = 2;
-            napi_value result[ARGS_TWO] = {nullptr};
-            napi_create_uint32(env, context->errorCode, &result[0]);
-            result[1] = context->result;
-            if (context->errorCode == ERR_CODE_SUCCESS) {
-                napi_get_reference_value(env, context->callback[0], &callback);
-                napi_call_function(env, nullptr, callback, ARGS_TWO, result, &undefine);
-            } else {
-                napi_ref errCb = context->callback[1];
-                if (!errCb) {
-                    WIFI_LOGE("Get callback func[1] is null");
-                    errCb = context->callback[0];
-                }
-                napi_get_reference_value(env, errCb, &callback);
-                napi_call_function(env, nullptr, callback, ARGS_TWO, result, &undefine);
-            }
+            HandleCallbackErrCode(env, context);
             if (context->callback[0] != nullptr) {
                 napi_delete_reference(env, context->callback[0]);
             }

@@ -17,6 +17,7 @@
 #include "securec.h"
 #include "wifi_logger.h"
 #include "context.h"
+#include "wifi_napi_errcode.h"
 
 namespace OHOS {
 namespace Wifi {

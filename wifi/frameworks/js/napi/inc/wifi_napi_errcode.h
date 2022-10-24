@@ -16,8 +16,9 @@
 #ifndef WIFI_NAPI_ERRCODE_H_
 #define WIFI_NAPI_ERRCODE_H_
 
-#include <string>
 #include "wifi_napi_utils.h"
+#include <string>
+#include "wifi_napi_errcode.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -75,14 +76,19 @@ do { \
 } while (0)
 #endif
 
-void HandleCallbackErrCode(    const napi_env &env, const AsyncContext &info);
-
 /**
- * @brief Thow error code for async function.
+ * @brief Thow error code for async-callback function.
  *
  * @param env The env.
  * @param info The input data.
- * @param result The result to be return.
+ */
+void HandleCallbackErrCode(    const napi_env &env, const AsyncContext &info);
+
+/**
+ * @brief Thow error code for async-promise function.
+ *
+ * @param env The env.
+ * @param info The input data.
  */
 void HandlePromiseErrCode(    const napi_env &env, const AsyncContext &info);
 

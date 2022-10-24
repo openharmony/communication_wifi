@@ -254,8 +254,6 @@ static napi_value DoCallBackAsyncWork(const napi_env& env, AsyncContext *asyncCo
                 return;
             }
             AsyncContext *context = (AsyncContext *)data;
-            napi_value undefine, callback;
-            napi_get_undefined(env, &undefine);
             context->completeFunc(data);
             HandleCallbackErrCode(env, *context);
             if (context->callback[0] != nullptr) {

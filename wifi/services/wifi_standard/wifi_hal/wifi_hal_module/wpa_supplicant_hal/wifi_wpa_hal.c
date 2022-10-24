@@ -683,8 +683,8 @@ static void *WpaReceiveCallback(void *arg)
     if (arg == NULL) {
         return NULL;
     }
-    char staIface[] = "IFACE=wlan";
-    char p2pIface[] = "IFACE=p2p";
+    char staIface[] = "IFNAME=wlan";
+    char p2pIface[] = "IFNAME=p2p";
     WifiWpaInterface *pWpa = arg;
     char *buf = (char *)calloc(REPLY_BUF_LENGTH, sizeof(char));
     if (buf == NULL) {
@@ -723,7 +723,7 @@ static void *WpaReceiveCallback(void *arg)
         if (strncmp(p, WPA_EVENT_TERMINATING, strlen(WPA_EVENT_TERMINATING)) == 0) {
             break;
         }
-        char *iface = strstr(buf, "IFACE=");
+        char *iface = strstr(buf, "IFNAME=");
         if (iface == NULL) {
             /* if 'IFACE=' is not reported */
             if (WpaP2pCallBackFunc(p) == 0) {

@@ -160,11 +160,11 @@ ohos_shared_library("wifi_manager") {
   sources = [
     "src/wifi_napi_device.cpp",
     "src/wifi_napi_entry.cpp",
+    "src/wifi_napi_errcode.cpp",
     "src/wifi_napi_event.cpp",
     "src/wifi_napi_hotspot.cpp",
     "src/wifi_napi_p2p.cpp",
     "src/wifi_napi_utils.cpp",
-    "src/wifi_napi_errcode.cpp",
   ]
   deps = [
     "$WIFI_ROOT_DIR/frameworks/native:wifi_sdk",

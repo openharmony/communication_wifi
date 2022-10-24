@@ -38,17 +38,14 @@ enum {
     WIFI_NAPI_ERRCODE_NOT_SUPPORTED = 801,     /* not supported */
 };
 
+#ifdef ENABLE_NAPI_WIFI_MANAGER
 #ifndef WIFI_NAPI_ASSERT
 #define WIFI_NAPI_ASSERT(env, cond, errCode) \
 do { \
     if (!(cond)) { \
         napi_value res = nullptr; \
-        #ifdef ENABLE_NAPI_WIFI_MANAGER \
         HandleSyncErrCode(env, errCode); \
         napi_get_undefined(env, &res); \
-        #else \
-        napi_get_boolean(env, cond, &res); \
-        #endif \
         return res; \
     } \
 } while (0)
@@ -59,22 +56,35 @@ do { \
 do { \
     napi_value res = nullptr; \
     if (!(cond)) { \
-        #ifdef ENABLE_NAPI_WIFI_MANAGER \
         HandleSyncErrCode(env, errCode); \
-        napi_get_undefined(env, &res); \
-        #else \
-        napi_get_boolean(env, cond, &res); \
-        #endif \
-        return res; \
     } \
-    #ifdef ENABLE_NAPI_WIFI_MANAGER \
     napi_get_undefined(env, &res); \
-    #else \
-    napi_get_boolean(env, cond, &res); \
-    #endif \
     return res; \
 } while (0)
 #endif
+
+#else /* #else WIFI_NAPI_ASSERT */
+
+#ifndef WIFI_NAPI_ASSERT
+#define WIFI_NAPI_ASSERT(env, cond, errCode) \
+do { \
+    if (!(cond)) { \
+        napi_value res = nullptr; \
+        napi_get_boolean(env, cond, &res); \
+        return res; \
+    } \
+} while (0)
+#endif
+
+#ifndef WIFI_NAPI_RETURN
+#define WIFI_NAPI_RETURN(env, cond, errCode) \
+do { \
+    napi_value res = nullptr; \
+    napi_get_boolean(env, cond, &res); \
+    return res; \
+} while (0)
+#endif
+#endif /* #endif WIFI_NAPI_ASSERT */
 
 /**
  * @brief Thow error code for async-callback function.

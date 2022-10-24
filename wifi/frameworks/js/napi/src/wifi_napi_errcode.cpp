@@ -120,7 +120,7 @@ void HandleCallbackErrCode(    const napi_env &env, const AsyncContext &info)
     napi_value result[RESULT_PARAMS_NUM] = {nullptr};
     result[1] = info.result;
     if (info.errorCode == ERR_CODE_SUCCESS) {
-#ifdef ENABLE_NAPI_THROW_ERRCODE
+#ifdef ENABLE_NAPI_WIFI_MANAGER
         napi_create_uint32(env, undefine, &result[0]);
 #else
         napi_create_uint32(env, info.errorCode, &result[0]);
@@ -134,7 +134,7 @@ void HandleCallbackErrCode(    const napi_env &env, const AsyncContext &info)
             errCb = info.callback[0];
         }
         napi_get_reference_value(env, errCb, &callback);
-#ifdef ENABLE_NAPI_THROW_ERRCODE
+#ifdef ENABLE_NAPI_WIFI_MANAGER
         std::string errMsg = GetNapiErrMsg(env, info.errorCode);
         int32_t errCodeInfo = GetNapiErrCode(env, info.errorCode);
         results[0] = GetCallbackErrorValue(env, errCodeInfo, errMsg);
@@ -151,7 +151,7 @@ void HandlePromiseErrCode(    const napi_env &env, const AsyncContext &info)
     if (info.errorCode == ErrCode::WIFI_OPT_SUCCESS) {
         napi_resolve_deferred(env, info.deferred, info.result);
     } else {
-#ifdef ENABLE_NAPI_THROW_ERRCODE
+#ifdef ENABLE_NAPI_WIFI_MANAGER
         int32_t errCodeInfo = GetNapiErrCode(env, info.errorCode);
         std::string errMsg = GetNapiErrMsg(env, info.errorCode);
         napi_value businessError = nullptr;

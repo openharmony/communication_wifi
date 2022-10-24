@@ -256,7 +256,7 @@ static napi_value DoCallBackAsyncWork(const napi_env& env, AsyncContext *asyncCo
             napi_value undefine, callback;
             napi_get_undefined(env, &undefine);
             context->completeFunc(data);
-            HandleCallbackErrCode(env, context);
+            HandleCallbackErrCode(env, *context);
             if (context->callback[0] != nullptr) {
                 napi_delete_reference(env, context->callback[0]);
             }
@@ -293,11 +293,7 @@ static napi_value DoPromiseAsyncWork(const napi_env& env, AsyncContext *asyncCon
             }
             AsyncContext *context = (AsyncContext *)data;
             context->completeFunc(data);
-            if (context->errorCode == ERR_CODE_SUCCESS) {
-                napi_resolve_deferred(context->env, context->deferred, context->result);
-            } else {
-                napi_reject_deferred(context->env, context->deferred, context->result);
-            }
+            HandlePromiseErrCode(env, *context);
             napi_delete_async_work(env, context->work);
             delete context;
         },

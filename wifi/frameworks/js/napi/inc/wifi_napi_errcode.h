@@ -43,7 +43,7 @@ enum {
 do { \
     if (!(cond)) { \
         napi_value res = nullptr; \
-        #ifdef ENABLE_NAPI_THROW_ERRCODE \
+        #ifdef ENABLE_NAPI_WIFI_MANAGER \
         HandleSyncErrCode(env, errCode); \
         napi_get_undefined(env, &res); \
         #else \
@@ -59,7 +59,7 @@ do { \
 do { \
     napi_value res = nullptr; \
     if (!(cond)) { \
-        #ifdef ENABLE_NAPI_THROW_ERRCODE \
+        #ifdef ENABLE_NAPI_WIFI_MANAGER \
         HandleSyncErrCode(env, errCode); \
         napi_get_undefined(env, &res); \
         #else \
@@ -67,7 +67,7 @@ do { \
         #endif \
         return res; \
     } \
-    #ifdef ENABLE_NAPI_THROW_ERRCODE \
+    #ifdef ENABLE_NAPI_WIFI_MANAGER \
     napi_get_undefined(env, &res); \
     #else \
     napi_get_boolean(env, cond, &res); \

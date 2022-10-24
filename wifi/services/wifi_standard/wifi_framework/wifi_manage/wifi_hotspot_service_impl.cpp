@@ -139,7 +139,19 @@ ErrCode WifiHotspotServiceImpl::SetHotspotConfig(const HotspotConfig &config)
     }
 
     if (!mGetChannels) {
-        if  (!WifiConfigCenter::GetInstance().GetSupportedBandChannel()) {
+        if (!IsApServiceRunning()) {
+            return WIFI_OPT_AP_NOT_OPENED;
+        }
+        IApService *pService = WifiServiceManager::GetInstance().GetApServiceInst(m_id);
+        if (pService == nullptr) {
+            WIFI_LOGE("Instance %{public}d get hotspot service is null!", m_id);
+            return WIFI_OPT_AP_NOT_OPENED;
+        }
+        std::vector<int32_t> valid2GChannel;
+        std::vector<int32_t> valid5GChannel;
+        (void)pService->GetValidChannels(BandType::BAND_2GHZ, valid2GChannel);
+        (void)pService->GetValidChannels(BandType::BAND_5GHZ, valid5GChannel);
+        if (valid2GChannel.size() + valid5GChannel.size() == 0) {
             WIFI_LOGE("Failed to get supported band and channel!");
         } else {
             mGetChannels = true;

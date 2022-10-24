@@ -18,7 +18,9 @@
 #include "wifi_global_func.h"
 #include "wifi_log.h"
 #include "wifi_config_country_freqs.h"
-
+#ifdef FEATURE_ENCRYPTION_SUPPORT
+#include "wifi_encryption_util.h"
+#endif
 namespace OHOS {
 namespace Wifi {
 WifiSettings &WifiSettings::GetInstance()
@@ -120,7 +122,7 @@ void WifiSettings::InitP2pVendorConfig()
 int WifiSettings::Init()
 {
     mCountryCode = "CN";
-    InitGetApMaxConnNum();
+    InitSettingsNum();
 
     /* read ini config */
     mSavedDeviceConfig.SetConfigFilePath(DEVICE_CONFIG_FILE_PATH);
@@ -140,7 +142,10 @@ int WifiSettings::Init()
     InitScanControlInfo();
     ReloadTrustListPolicies();
     ReloadMovingFreezePolicy();
-
+#ifdef FEATURE_ENCRYPTION_SUPPORT
+    SetUpHks();
+#endif
+    IncreaseNumRebootsSinceLastUse();
     return 0;
 }
 
@@ -363,6 +368,20 @@ int WifiSettings::SetDeviceState(int networkId, int state, bool bSetOther)
     return 0;
 }
 
+int WifiSettings::SetDeviceAfterConnect(int networkId)
+{
+    std::unique_lock<std::mutex> lock(mConfigMutex);
+    auto iter = mWifiDeviceConfig.find(networkId);
+    if (iter == mWifiDeviceConfig.end()) {
+        return -1;
+    }
+    LOGI("Set Device After Connect");
+    iter->second.lastConnectTime = time(0);
+    iter->second.numRebootsSinceLastUse = 0;
+    iter->second.numAssociation++;
+    return 0;
+}
+
 int WifiSettings::GetCandidateConfig(const int uid, const int &networkId, WifiDeviceConfig &config)
 {
     std::vector<WifiDeviceConfig> configs;
@@ -435,14 +454,54 @@ int WifiSettings::GetWifiP2pGroupInfo(std::vector<WifiP2pGroupInfo> &groups)
     return 0;
 }
 
+int WifiSettings::IncreaseNumRebootsSinceLastUse()
+{
+    std::unique_lock<std::mutex> lock(mConfigMutex);
+    for (auto iter = mWifiDeviceConfig.begin(); iter != mWifiDeviceConfig.end(); iter++) {
+        iter->second.numRebootsSinceLastUse++;
+    }
+    return 0;
+}
+
+int WifiSettings::RemoveExcessDeviceConfigs(std::vector<WifiDeviceConfig> &configs)
+{
+    int maxNumConfigs = mMaxNumConfigs;
+    if (maxNumConfigs < 0) {
+        return 1;
+    }
+    int numExcessNetworks = configs.size() - maxNumConfigs;
+    if (numExcessNetworks <= 0) {
+        return 1;
+    }
+    LOGI("Remove %d configs", numExcessNetworks);
+    sort(configs.begin(), configs.end(), [](WifiDeviceConfig a, WifiDeviceConfig b) {
+        if (a.status != b.status) {
+            return (a.status == 0) < (b.status == 0);
+        } else if (a.lastConnectTime != b.lastConnectTime) {
+            return a.lastConnectTime < b.lastConnectTime;
+        } else if (a.numRebootsSinceLastUse != b.numRebootsSinceLastUse) {
+            return a.numRebootsSinceLastUse > b.numRebootsSinceLastUse;
+        } else if (a.numAssociation != b.numAssociation) {
+            return a.numAssociation < b.numAssociation;
+        } else {
+            return a.networkId < b.networkId;
+        }
+    });
+    configs.erase(configs.begin(), configs.begin() + numExcessNetworks);
+    return 0;
+}
+
 int WifiSettings::SyncDeviceConfig()
 {
 #ifndef CONFIG_NO_CONFIG_WRITE
     std::unique_lock<std::mutex> lock(mConfigMutex);
     std::vector<WifiDeviceConfig> tmp;
     for (auto iter = mWifiDeviceConfig.begin(); iter != mWifiDeviceConfig.end(); ++iter) {
-        tmp.push_back(iter->second);
+        if (!iter->second.isEphemeral) {
+            tmp.push_back(iter->second);
+        }
     }
+    RemoveExcessDeviceConfigs(tmp);
     mSavedDeviceConfig.SetValue(tmp);
     return mSavedDeviceConfig.SaveConfig();
 #else
@@ -925,10 +984,11 @@ void WifiSettings::InitDefaultP2pVendorConfig()
     mP2pVendorConfig.SetSecondaryDeviceType("");
 }
 
-void WifiSettings::InitGetApMaxConnNum()
+void WifiSettings::InitSettingsNum()
 {
     /* query drivers capability, support max connection num. */
     mApMaxConnNum = MAX_AP_CONN;
+    mMaxNumConfigs = MAX_CONFIGS_NUM;
 }
 
 void WifiSettings::InitScanControlForbidList(void)
@@ -1447,5 +1507,5 @@ int WifiSettings::GetThermalLevel() const
 {
     return mThermalLevel;
 }
-} // namespace Wifi
-} // namespace OHOS
+}  // namespace Wifi
+}  // namespace OHOS

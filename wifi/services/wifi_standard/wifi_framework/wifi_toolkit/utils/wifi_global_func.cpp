@@ -288,6 +288,69 @@ int HexStringToVec(const std::string &str, std::vector<char> &vec)
     return 0;
 }
 
+int HexStringToVec(const std::string &str, uint8_t plainText[], uint32_t plainLength, uint32_t &resultLength)
+{
+    if (plainLength < 0) {
+        return false;
+    }
+
+    std::vector<char> result;
+    result.clear();
+    int ret = HexStringToVec(str, result);
+    if (ret == -1 || result.size() > plainLength) {
+        return -1;
+    }
+    for (std::vector<char>::size_type i = 0; i < result.size(); ++i) {
+        plainText[i] = result[i];
+    }
+    resultLength = result.size();
+    return 0;
+}
+
+static char ConvertArrayChar(uint8_t ch)
+{
+    constexpr int maxDecNum = 9;
+    constexpr int numDiffForHexAlphabet = 10;
+    if (ch >= 0 && ch <= maxDecNum) {
+        return '0' + ch;
+    }
+    if (ch >= 0xa && ch <= 0xf) {
+        return ch + 'a' - numDiffForHexAlphabet;
+    }
+    return '0';
+}
+
+std::string ConvertArrayToHex(const uint8_t plainText[], uint32_t size)
+{
+    constexpr int bitWidth = 4;
+    std::stringstream ss;
+    for (uint32_t i = 0; i < size; i++) {
+        ss << ConvertArrayChar(plainText[i] >> bitWidth) << ConvertArrayChar (plainText[i] & 0xf);
+    }
+    return ss.str();
+}
+
+static bool ValidateChar(const char ch)
+{
+    if (ch == '\n' || ch == '\r') {
+        return false;
+    }
+    return true;
+}
+
+std::string ValidateString(const std::string  &str)
+{
+    std::stringstream ss;
+    ss << "\"";
+    for (char ch : str) {
+        if (ValidateChar(ch)) {
+            ss << ch;
+        }
+    }
+    ss << "\"";
+    return ss.str();
+}
+
 void TransformFrequencyIntoChannel(const std::vector<int> &freqVector, std::vector<int> &chanVector)
 {
     int channel;

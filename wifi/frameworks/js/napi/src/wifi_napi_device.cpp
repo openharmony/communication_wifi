@@ -26,14 +26,13 @@ static constexpr int DEFAULT_INVALID_VALUE = -1;
 
 std::unique_ptr<WifiDevice> wifiDevicePtr = WifiDevice::GetInstance(WIFI_DEVICE_ABILITY_ID);
 std::unique_ptr<WifiScan> wifiScanPtr = WifiScan::GetInstance(WIFI_SCAN_ABILITY_ID);
+
 napi_value EnableWifi(napi_env env, napi_callback_info info)
 {
     TRACE_FUNC_CALL;
-    NAPI_ASSERT(env, wifiDevicePtr != nullptr, "Wifi device instance is null.");
+    WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_INVALID_PARAM);
     ErrCode ret = wifiDevicePtr->EnableWifi();
-    napi_value result;
-    napi_get_boolean(env, ret == WIFI_OPT_SUCCESS, &result);
-    return result;
+    WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, WIFI_OPT_SUCCESS);
 }
 
 napi_value DisableWifi(napi_env env, napi_callback_info info)

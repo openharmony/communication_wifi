@@ -17,6 +17,7 @@
 #include "wifi_p2p_hal_interface.h"
 #include "dhcpd_interface.h"
 #include "wifi_logger.h"
+#include "wifi_common_util.h"
 
 DEFINE_WIFILOG_P2P_LABEL("P2pMonitor");
 
@@ -425,7 +426,8 @@ void P2pMonitor::WpaEventInvitationReceived(const IdlP2pInvitationInfo &recvInfo
 
 void P2pMonitor::WpaEventInvitationResult(const std::string &bssid, int status) const
 {
-    WIFI_LOGD("onInvitationResult callback, bssid:%{private}s, status:%{public}d", bssid.c_str(), status);
+    WIFI_LOGI("onInvitationResult callback, bssid:%{public}s, status:%{public}d",
+        MacAnonymize(bssid).c_str(), status);
     P2pStatus p2pStatus = IntStatusToP2pStatus(status);
     Broadcast2SmInvitationResult(selectIfacName, p2pStatus);
 }

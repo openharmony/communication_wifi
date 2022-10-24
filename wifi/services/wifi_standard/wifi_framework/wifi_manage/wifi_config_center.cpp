@@ -236,33 +236,6 @@ int WifiConfigCenter::GetValidChannels(ChannelsTable &channelsInfo)
     return WifiSettings::GetInstance().GetValidChannels(channelsInfo);
 }
 
-bool WifiConfigCenter::GetSupportedBandChannel()
-{
-    std::vector<int> allowed5GFreq, allowed2GFreq;
-    std::vector<int> allowed5GChan, allowed2GChan;
-    if (WifiApHalInterface::GetInstance().GetFrequenciesByBand(static_cast<int>(BandType::BAND_2GHZ), allowed2GFreq)) {
-        WIFI_LOGW("fail to get 2.4G channel");
-        WifiSettings::GetInstance().SetDefaultFrequenciesByCountryBand(BandType::BAND_2GHZ, allowed2GFreq);
-    }
-    if (WifiApHalInterface::GetInstance().GetFrequenciesByBand(static_cast<int>(BandType::BAND_5GHZ), allowed5GFreq)) {
-        WIFI_LOGW("fail to get 5G channel");
-        WifiSettings::GetInstance().SetDefaultFrequenciesByCountryBand(BandType::BAND_5GHZ, allowed5GFreq);
-    }
-
-    TransformFrequencyIntoChannel(allowed5GFreq, allowed5GChan);
-    TransformFrequencyIntoChannel(allowed2GFreq, allowed2GChan);
-
-    ChannelsTable ChanTbs;
-    ChanTbs[BandType::BAND_2GHZ] = allowed2GChan;
-    ChanTbs[BandType::BAND_5GHZ] = allowed5GChan;
-
-    if (WifiSettings::GetInstance().SetValidChannels(ChanTbs)) {
-        WIFI_LOGE("fail to SetValidChannels");
-        return false;
-    }
-    return true;
-}
-
 WifiOprMidState WifiConfigCenter::GetScanMidState()
 {
     return mScanMidState.load();

@@ -110,7 +110,7 @@ public:
      * @param validchannel - band's valid channel
      * @return ErrCode - success: WIFI_OPT_SUCCESS    failed: ERROR_CODE
      */
-    virtual ErrCode GetValidChannels(BandType band, std::vector<int32_t> &validchannel) override;
+    virtual ErrCode GetValidChannels(BandType band, std::vector<int32_t> &validChannel) override;
 
     /**
      * @Description Get supported power model list

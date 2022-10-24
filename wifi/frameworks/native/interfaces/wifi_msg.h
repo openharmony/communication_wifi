@@ -17,6 +17,7 @@
 
 #include <algorithm>
 #include <cstring>
+#include <ctime>
 #include <iomanip>
 #include <map>
 #include <sstream>
@@ -393,6 +394,9 @@ struct WifiDeviceConfig {
     /* Random mac address */
     std::string macAddress;
     int uid;
+    time_t lastConnectTime;
+    int numRebootsSinceLastUse;
+    int numAssociation;
     WifiIpConfig wifiIpConfig;
     WifiEapConfig wifiEapConfig;
     WifiProxyConfig wifiProxyconfig;
@@ -414,6 +418,9 @@ struct WifiDeviceConfig {
         wifiPrivacySetting = WifiPrivacyConfig::RANDOMMAC;
         rssi = -100;
         uid = WIFI_INVALID_UID;
+        lastConnectTime = -1;
+        numRebootsSinceLastUse = 0;
+        numAssociation = 0;
     }
 };
 

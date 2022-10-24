@@ -159,6 +159,10 @@ private:
      */
     virtual void UpdateOwnDevice(P2pDeviceStatus status);
     /**
+     * @Description - Update groupManager from wpa_supplicant.
+     */
+    virtual void UpdateGroupManager() const;
+    /**
      * @Description - Update persistent groups and broadcast persistent groups status update event.
      */
     virtual void UpdatePersistentGroups() const;

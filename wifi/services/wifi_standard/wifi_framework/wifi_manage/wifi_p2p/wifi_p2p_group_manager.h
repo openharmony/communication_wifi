@@ -63,6 +63,13 @@ public:
     virtual bool AddGroup(const WifiP2pGroupInfo &group);
 
     /**
+     * @Description - Adding or Updating a P2P group.
+     * @param group - P2P group to be modified or add
+     * @return true: adding or Updating succeeded    false: adding or Updating failed
+     */
+    virtual bool AddOrUpdateGroup(const WifiP2pGroupInfo &group);
+
+    /**
      * @Description - Remove a P2P group.
      * @param group - P2P group to be removed
      * @return true: delete successfully    false: delete failed

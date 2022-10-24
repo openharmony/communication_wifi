@@ -151,6 +151,7 @@ if (defined(ohos_lite)) {
     include_dirs = [
       "//commonlibrary/c_utils/base/include",
       "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
+      "//base/security/huks/interfaces/innerkits/huks_standard/main/include",
       "//foundation/arkui/ace_engine/frameworks/base/utils",
       "//foundation/arkui/ace_engine/frameworks",
       "//foundation/systemabilitymgr/safwk/interfaces/innerkits/safwk/",
@@ -236,6 +237,10 @@ if (defined(ohos_lite)) {
 
     if (wifi_feature_with_ap_num > 0) {
       defines += [ "FEATURE_AP_SUPPORT" ]
+    }
+
+    if (wifi_feature_with_encryption) {
+      defines += [ "FEATURE_ENCRYPTION_SUPPORT" ]
     }
 
     deps = [ ":wifi_p2p_service_impl" ]
@@ -327,6 +332,9 @@ if (defined(ohos_lite)) {
       "netmanager_base:net_conn_manager_if",
       "samgr:samgr_proxy",
     ]
+    if (wifi_feature_with_encryption) {
+      external_deps += [ "huks:libhukssdk" ]
+    }
     defines = [
       "FEATURE_AP_SUPPORT",
       "FEATURE_P2P_SUPPORT",
@@ -335,6 +343,10 @@ if (defined(ohos_lite)) {
 
     if (wifi_feature_with_auth_disable) {
       defines += [ "PERMISSION_ALWAYS_GRANT" ]
+    }
+
+    if (wifi_feature_with_encryption) {
+      defines += [ "FEATURE_ENCRYPTION_SUPPORT" ]
     }
 
     part_name = "wifi"

@@ -18,6 +18,7 @@
 #include <functional>
 #include "wifi_common_util.h"
 #include "wifi_logger.h"
+#include "wifi_napi_errcode.h"
 
 namespace OHOS {
 namespace Wifi {

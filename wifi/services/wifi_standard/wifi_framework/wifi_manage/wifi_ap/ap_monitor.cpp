@@ -24,6 +24,7 @@
 #include "wifi_ap_hal_interface.h"
 #include "wifi_logger.h"
 #include "dhcpd_interface.h"
+#include "wifi_common_util.h"
 
 DEFINE_WIFILOG_HOTSPOT_LABEL("WifiApMonitor");
 

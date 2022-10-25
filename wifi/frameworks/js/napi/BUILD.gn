@@ -159,7 +159,6 @@ ohos_shared_library("wifi_manager") {
     "$WIFI_ROOT_DIR/utils/inc",
     "$WIFI_ROOT_DIR/frameworks/js/napi/inc",
   ]
-
   sources = [
     "src/wifi_napi_device.cpp",
     "src/wifi_napi_entry.cpp",
@@ -175,16 +174,13 @@ ohos_shared_library("wifi_manager") {
     "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog",
     "//foundation/arkui/napi:ace_napi",
   ]
-
   defines = [ "ENABLE_NAPI_WIFI_MANAGER" ]
-
   external_deps = [
     "access_token:libaccesstoken_sdk",
     "bundle_framework:appexecfwk_base",
     "c_utils:utils",
     "ipc:ipc_core",
   ]
-
   relative_install_dir = "module"
   part_name = "wifi"
   subsystem_name = "communication"

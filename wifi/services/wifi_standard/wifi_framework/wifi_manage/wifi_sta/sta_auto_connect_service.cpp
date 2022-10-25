@@ -86,9 +86,9 @@ void StaAutoConnectService::OnScanInfosReadyHandler(const std::vector<InterScanI
     WifiDeviceConfig electedDevice;
     if (AutoSelectDevice(electedDevice, scanInfos, blockedBssids, info) == WIFI_OPT_SUCCESS) {
         WIFI_LOGI("AutoSelectDevice succeed: "
-            "[networkId:%{public}d, ssid:%{public}s, bssid:%{public}s, psk len:%{public}u].",
+            "[networkId:%{public}d, ssid:%{public}s, bssid:%{public}s, psk len:%{public}d].",
             electedDevice.networkId, SsidAnonymize(electedDevice.ssid).c_str(),
-            MacAnonymize(electedDevice.bssid).c_str(), electedDevice.preSharedKey.length());
+            MacAnonymize(electedDevice.bssid).c_str(), (int)electedDevice.preSharedKey.length());
         ConnectElectedDevice(electedDevice);
     } else {
         WIFI_LOGI("AutoSelectDevice return fail.");
@@ -155,8 +155,8 @@ void StaAutoConnectService::GetBlockedBssids(std::vector<std::string> &blockedBs
     for (auto iter = blockedBssidMap.begin(); iter != blockedBssidMap.end(); ++iter) {
         blockedBssids.push_back(iter->first);
     }
-    WIFI_LOGI("StaAutoConnectService::GetBlockedBssids, blockedBssids count: %{public}u.",
-        blockedBssids.size());
+    WIFI_LOGI("StaAutoConnectService::GetBlockedBssids, blockedBssids count: %{public}d.",
+        (int)blockedBssids.size());
     return;
 }
 

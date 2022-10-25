@@ -95,6 +95,7 @@ static std::string GetNapiErrMsg(const napi_env &env, const int32_t errCode)
     return "Inner error.";
 }
 
+#ifdef ENABLE_NAPI_WIFI_MANAGER
 static napi_value GetCallbackErrorValue(napi_env env, const int32_t errCode, const std::string errMsg)
 {
     if (errCode == ErrCode::WIFI_OPT_SUCCESS) {
@@ -110,6 +111,7 @@ static napi_value GetCallbackErrorValue(napi_env env, const int32_t errCode, con
     NAPI_CALL(env, napi_set_named_property(env, businessError, "message", eMsg));
     return businessError;
 }
+#endif
 
 void HandleCallbackErrCode(    const napi_env &env, const AsyncContext &info)
 {

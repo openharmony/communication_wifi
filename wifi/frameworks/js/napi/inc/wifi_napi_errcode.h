@@ -63,7 +63,7 @@ do { \
 } while (0)
 #endif
 
-#else /* #else WIFI_NAPI_ASSERT */
+#else /* #else ENABLE_NAPI_WIFI_MANAGER */
 
 #ifndef WIFI_NAPI_ASSERT
 #define WIFI_NAPI_ASSERT(env, cond, errCode) \
@@ -84,7 +84,7 @@ do { \
     return res; \
 } while (0)
 #endif
-#endif /* #endif WIFI_NAPI_ASSERT */
+#endif /* #endif ENABLE_NAPI_WIFI_MANAGER */
 
 /**
  * @brief Thow error code for async-callback function.
@@ -102,6 +102,7 @@ void HandleCallbackErrCode(    const napi_env &env, const AsyncContext &info);
  */
 void HandlePromiseErrCode(    const napi_env &env, const AsyncContext &info);
 
+#ifdef ENABLE_NAPI_WIFI_MANAGER
 /**
  * @brief Thow error code for async function.
  *
@@ -109,6 +110,7 @@ void HandlePromiseErrCode(    const napi_env &env, const AsyncContext &info);
  * @param errCode The error code.
  */
 void HandleSyncErrCode(const napi_env &env, int32_t errCode);
+#endif
 }  // namespace Wifi
 }  // namespace OHOS
 #endif

@@ -712,7 +712,7 @@ static void *WpaReceiveCallback(void *arg)
         if (len <= 0) {
             continue;
         }
-        LOGE("wpa recv buf: %{public}s!", buf);
+        LOGD("wpa recv buf: %{public}s!", buf);
         /* Message format: IFACE=wlan0 <priority>EventType params... */
         char *p = strchr(buf, '>');
         if (p == NULL) {

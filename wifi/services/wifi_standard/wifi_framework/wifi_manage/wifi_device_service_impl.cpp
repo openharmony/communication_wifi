@@ -946,8 +946,8 @@ ErrCode WifiDeviceServiceImpl::GetLinkedInfo(WifiLinkedInfo &info)
         info.macAddress = "";
     }
 
-    WIFI_LOGI("GetLinkedInfo, networkId=%{public}d, ssid=%{private}s, rssi=%{public}d, frequency=%{public}d",
-        info.networkId, info.ssid.c_str(), info.rssi, info.frequency);
+    WIFI_LOGI("GetLinkedInfo, networkId=%{public}d, ssid=%{public}s, rssi=%{public}d, frequency=%{public}d",
+        info.networkId, SsidAnonymize(info.ssid).c_str(), info.rssi, info.frequency);
     WIFI_LOGI("GetLinkedInfo, connState=%{public}d, supplicantState=%{public}d, detailedState=%{public}d",
         info.connState, info.supplicantState, info.detailedState);
     return WIFI_OPT_SUCCESS;

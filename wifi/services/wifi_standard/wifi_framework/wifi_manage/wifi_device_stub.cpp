@@ -20,6 +20,7 @@
 #include "wifi_device_callback_proxy.h"
 #include "wifi_internal_event_dispatcher.h"
 #include "wifi_device_death_recipient.h"
+#include "wifi_common_util.h"
 
 DEFINE_WIFILOG_LABEL("WifiDeviceStub");
 
@@ -655,7 +656,7 @@ void WifiDeviceStub::OnRemoveCandidateConfig(uint32_t code, MessageParcel &data,
     } else {
         WifiDeviceConfig config;
         ReadWifiDeviceConfig(data, config);
-        WIFI_LOGD("Remove candidate config by config: %{private}s", config.ssid.c_str());
+        WIFI_LOGD("Remove candidate config by config: %{public}s", SsidAnonymize(config.ssid).c_str());
         ret = RemoveCandidateConfig(config);
     }
     reply.WriteInt32(0);

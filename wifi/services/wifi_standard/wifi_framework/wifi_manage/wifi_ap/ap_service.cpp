@@ -178,8 +178,8 @@ ErrCode ApService::GetValidChannels(BandType band, std::vector<int32_t> &validCh
         auto it = channelsInfo.find(band);
         if (it != channelsInfo.end()) {
             validChannel = channelsInfo[band];
-            WIFI_LOGI("%{public}s, get valid channel size:%{public}u, band:%{public}d from WifiSettings.",
-                __func__, validChannel.size(), band);
+            WIFI_LOGI("%{public}s, get valid channel size:%{public}d, band:%{public}d from WifiSettings.",
+                __func__, (int)validChannel.size(), band);
             return ErrCode::WIFI_OPT_SUCCESS;
         }
     }
@@ -211,8 +211,8 @@ ErrCode ApService::GetValidChannels(BandType band, std::vector<int32_t> &validCh
         WIFI_LOGE("%{public}s, invalid band: %{public}d", __func__, band);
         return ErrCode::WIFI_OPT_INVALID_PARAM;
     }
-    WIFI_LOGI("%{public}s, get valid channel size:%{public}u, band:%{public}d from hal service.",
-        __func__, validChannel.size(), band);
+    WIFI_LOGI("%{public}s, get valid channel size:%{public}d, band:%{public}d from hal service.",
+        __func__, (int)validChannel.size(), band);
     return ErrCode::WIFI_OPT_SUCCESS;
 }
 

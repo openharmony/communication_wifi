@@ -34,6 +34,7 @@ ohos_shared_library("wifi") {
   sources = [
     "src/wifi_napi_device.cpp",
     "src/wifi_napi_entry.cpp",
+    "src/wifi_napi_errcode.cpp",
     "src/wifi_napi_event.cpp",
     "src/wifi_napi_hotspot.cpp",
     "src/wifi_napi_p2p.cpp",
@@ -75,6 +76,7 @@ ohos_shared_library("wifiext") {
   sources = [
     "src/wifi_ext_napi_entry.cpp",
     "src/wifi_ext_napi_hotspot.cpp",
+    "src/wifi_napi_errcode.cpp",
     "src/wifi_napi_utils.cpp",
   ]
   deps = [
@@ -114,6 +116,7 @@ ohos_shared_library("wifi_native_js") {
   sources = [
     "src/wifi_napi_device.cpp",
     "src/wifi_napi_entry.cpp",
+    "src/wifi_napi_errcode.cpp",
     "src/wifi_napi_event.cpp",
     "src/wifi_napi_hotspot.cpp",
     "src/wifi_napi_p2p.cpp",

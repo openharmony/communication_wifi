@@ -56,13 +56,6 @@ static std::map<int32_t, std::string> napiErrMsgMap {
     { WIFI_NAPI_ERRCODE_NOT_SUPPORTED, "Capability not supported." },
 };
 
-static napi_value NapiGetNull(const napi_env &env)
-{
-    napi_value res = nullptr;
-    napi_get_null(env, &res);
-    return res;
-}
-
 static napi_value NapiGetUndefined(const napi_env &env)
 {
     napi_value undefined = nullptr;
@@ -96,10 +89,17 @@ static std::string GetNapiErrMsg(const napi_env &env, const int32_t errCode)
 }
 
 #ifdef ENABLE_NAPI_WIFI_MANAGER
+static napi_value NapiGetNull(const napi_env &env)
+{
+    napi_value res = nullptr;
+    napi_get_null(env, &res);
+    return res;
+}
+
 static napi_value GetCallbackErrorValue(napi_env env, const int32_t errCode, const std::string errMsg)
 {
     if (errCode == ErrCode::WIFI_OPT_SUCCESS) {
-        return NapiGetNull(env);
+        return NapiGetUndefined(env);
     }
     napi_value businessError = nullptr;
     napi_value eCode = nullptr;
@@ -121,7 +121,7 @@ void HandleCallbackErrCode(    const napi_env &env, const AsyncContext &info)
     napi_value callback = nullptr;
     napi_value result[RESULT_PARAMS_NUM] = {nullptr};
     result[1] = info.result;
-    if (info.errorCode == ERR_CODE_SUCCESS) {
+    if (info.errorCode == ErrCode::WIFI_OPT_SUCCESS) {
 #ifdef ENABLE_NAPI_WIFI_MANAGER
         napi_create_uint32(env, undefine, &result[0]);
 #else

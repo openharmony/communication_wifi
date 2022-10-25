@@ -123,7 +123,7 @@ void HandleCallbackErrCode(    const napi_env &env, const AsyncContext &info)
     result[1] = info.result;
     if (info.errorCode == ErrCode::WIFI_OPT_SUCCESS) {
 #ifdef ENABLE_NAPI_WIFI_MANAGER
-        napi_create_uint32(env, undefine, &result[0]);
+        result[0] = NapiGetUndefined(env);
 #else
         napi_create_uint32(env, info.errorCode, &result[0]);
         napi_get_reference_value(env, info.callback[0], &callback);
@@ -139,7 +139,7 @@ void HandleCallbackErrCode(    const napi_env &env, const AsyncContext &info)
 #ifdef ENABLE_NAPI_WIFI_MANAGER
         std::string errMsg = GetNapiErrMsg(env, info.errorCode);
         int32_t errCodeInfo = GetNapiErrCode(env, info.errorCode);
-        results[0] = GetCallbackErrorValue(env, errCodeInfo, errMsg);
+        result[0] = GetCallbackErrorValue(env, errCodeInfo, errMsg);
 #else
         napi_create_uint32(env, info.errorCode, &result[0]);
 #endif

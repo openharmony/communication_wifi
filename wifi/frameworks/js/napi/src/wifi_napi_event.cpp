@@ -21,6 +21,7 @@
 #include "wifi_logger.h"
 #include "wifi_napi_utils.h"
 #include "wifi_scan.h"
+#include "wifi_napi_errcode.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -587,15 +588,25 @@ void EventRegister::Register(const napi_env& env, const std::string& type, napi_
     WIFI_LOGI("Register event: %{public}s, env: %{private}p", type.c_str(), env);
     if (!IsEventSupport(type)) {
         WIFI_LOGE("Register type error or not support!");
+#ifdef ENABLE_NAPI_WIFI_MANAGER
+        HandleSyncErrCode(env, WIFI_OPT_NOT_SUPPORTED);
+#endif
         return;
     }
     if (CheckPermission(type) != WIFI_NAPI_PERMISSION_GRANTED) {
         WIFI_LOGE("Register fail for NO permission!");
+#ifdef ENABLE_NAPI_WIFI_MANAGER
+        HandleSyncErrCode(env, WIFI_OPT_PERMISSION_DENIED);
+#endif
         return;
     }
     std::unique_lock<std::shared_mutex> guard(g_regInfoMutex);
     if (!isEventRegistered) {
-        if (RegisterWifiEvents() != WIFI_OPT_SUCCESS) {
+        ErrCode ret = RegisterWifiEvents();
+        if (ret != WIFI_OPT_SUCCESS) {
+#ifdef ENABLE_NAPI_WIFI_MANAGER
+            HandleSyncErrCode(env, ret);
+#endif
             return;
         }
         isEventRegistered = true;
@@ -665,16 +676,25 @@ void EventRegister::Unregister(const napi_env& env, const std::string& type, nap
     WIFI_LOGI("Unregister event: %{public}s, env: %{private}p", type.c_str(), env);
     if (!IsEventSupport(type)) {
         WIFI_LOGE("Unregister type error or not support!");
+#ifdef ENABLE_NAPI_WIFI_MANAGER
+        HandleSyncErrCode(env, WIFI_OPT_NOT_SUPPORTED);
+#endif
         return;
     }
     if (CheckPermission(type) != WIFI_NAPI_PERMISSION_GRANTED) {
         WIFI_LOGE("Unregister fail for NO permission!");
+#ifdef ENABLE_NAPI_WIFI_MANAGER
+        HandleSyncErrCode(env, WIFI_OPT_PERMISSION_DENIED);
+#endif
         return;
     }
     std::unique_lock<std::shared_mutex> guard(g_regInfoMutex);
     auto iter = g_eventRegisterInfo.find(type);
     if (iter == g_eventRegisterInfo.end()) {
         WIFI_LOGE("Unregister type not registered!");
+#ifdef ENABLE_NAPI_WIFI_MANAGER
+        HandleSyncErrCode(env, WIFI_OPT_NOT_SUPPORTED);
+#endif
         return;
     }
     if (handler != nullptr) {

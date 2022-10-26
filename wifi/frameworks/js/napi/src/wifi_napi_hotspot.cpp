@@ -18,6 +18,7 @@
 #include "wifi_logger.h"
 #include <vector>
 #include <map>
+#include "wifi_napi_errcode.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -33,43 +34,37 @@ std::map<SecTypeJs, KeyMgmt> g_mapSecTypeToKeyMgmt = {
 napi_value EnableHotspot(napi_env env, napi_callback_info info)
 {
     TRACE_FUNC_CALL;
-    NAPI_ASSERT(env, wifiHotspotPtr != nullptr, "Wifi hotspot instance is null.");
+    WIFI_NAPI_ASSERT(env, wifiHotspotPtr != nullptr, WIFI_OPT_FAILED);
     ErrCode ret = wifiHotspotPtr->EnableHotspot();
     if (ret != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("Enable hotspot error: %{public}d", ret);
     }
-    napi_value result;
-    napi_get_boolean(env, ret == WIFI_OPT_SUCCESS, &result);
-    return result;
+    WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, ret);
 }
 
 napi_value DisableHotspot(napi_env env, napi_callback_info info)
 {
     TRACE_FUNC_CALL;
-    NAPI_ASSERT(env, wifiHotspotPtr != nullptr, "Wifi hotspot instance is null.");
+    WIFI_NAPI_ASSERT(env, wifiHotspotPtr != nullptr, WIFI_OPT_FAILED);
     ErrCode ret = wifiHotspotPtr->DisableHotspot();
     if (ret != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("Disable hotspot error: %{public}d", ret);
     }
-    napi_value result;
-    napi_get_boolean(env, ret == WIFI_OPT_SUCCESS, &result);
-    return result;
+    WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, ret);
 }
 
 napi_value IsHotspotActive(napi_env env, napi_callback_info info)
 {
-    NAPI_ASSERT(env, wifiHotspotPtr != nullptr, "Wifi hotspot instance is null.");
-    napi_value result;
-    napi_get_boolean(env, wifiHotspotPtr->IsHotspotActive(), &result);
-    return result;
+    WIFI_NAPI_ASSERT(env, wifiHotspotPtr != nullptr, WIFI_OPT_FAILED);
+    bool ret = wifiHotspotPtr->IsHotspotActive();
+    WIFI_NAPI_RETURN(env, ret == true, WIFI_OPT_FAILED);
 }
 
 napi_value IsHotspotDualBandSupported(napi_env env, napi_callback_info info)
 {
-    NAPI_ASSERT(env, wifiHotspotPtr != nullptr, "Wifi hotspot instance is null.");
-    napi_value result;
-    napi_get_boolean(env, wifiHotspotPtr->IsHotspotDualBandSupported(), &result);
-    return result;
+    WIFI_NAPI_ASSERT(env, wifiHotspotPtr != nullptr, WIFI_OPT_FAILED);
+    bool ret = wifiHotspotPtr->IsHotspotDualBandSupported();
+    WIFI_NAPI_RETURN(env, ret == true, WIFI_OPT_FAILED);
 }
 
 static KeyMgmt GetKeyMgmtFromJsSecurityType(int secType)
@@ -130,8 +125,8 @@ napi_value SetHotspotConfig(napi_env env, napi_callback_info info)
 
     napi_valuetype valueType;
     napi_typeof(env, argv[0], &valueType);
-    NAPI_ASSERT(env, valueType == napi_object, "Wrong argument type. Object expected.");
-    NAPI_ASSERT(env, wifiHotspotPtr != nullptr, "Wifi hotspot instance is null.");
+    WIFI_NAPI_ASSERT(env, valueType == napi_object, WIFI_OPT_INVALID_PARAM);
+    WIFI_NAPI_ASSERT(env, wifiHotspotPtr != nullptr, WIFI_OPT_FAILED);
 
     ErrCode ret = WIFI_OPT_FAILED;
     HotspotConfig config;
@@ -141,9 +136,7 @@ napi_value SetHotspotConfig(napi_env env, napi_callback_info info)
             WIFI_LOGE("Set hotspot config error: %{public}d", ret);
         }
     }
-    napi_value result;
-    napi_get_boolean(env, ret == WIFI_OPT_SUCCESS, &result);
-    return result;
+    WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, ret);
 }
 
 static void HotspotconfigToJs(const napi_env& env, HotspotConfig& cppConfig, napi_value& result)
@@ -158,12 +151,13 @@ static void HotspotconfigToJs(const napi_env& env, HotspotConfig& cppConfig, nap
 napi_value GetHotspotConfig(napi_env env, napi_callback_info info)
 {
     TRACE_FUNC_CALL;
-    NAPI_ASSERT(env, wifiHotspotPtr != nullptr, "Wifi hotspot instance is null.");
+    WIFI_NAPI_ASSERT(env, wifiHotspotPtr != nullptr, WIFI_OPT_FAILED);
     HotspotConfig config;
     ErrCode ret = wifiHotspotPtr->GetHotspotConfig(config);
     if (ret != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("Get hotspot config error: %{public}d", ret);
     }
+    WIFI_NAPI_ASSERT(env, ret == WIFI_OPT_SUCCESS, ret);
     napi_value result;
     napi_create_object(env, &result);
     HotspotconfigToJs(env, config, result);
@@ -188,13 +182,14 @@ static void StationInfoToJsArray(const napi_env& env, const std::vector<StationI
 napi_value GetStations(napi_env env, napi_callback_info info)
 {
     TRACE_FUNC_CALL;
-    NAPI_ASSERT(env, wifiHotspotPtr != nullptr, "Wifi hotspot instance is null.");
+    WIFI_NAPI_ASSERT(env, wifiHotspotPtr != nullptr, WIFI_OPT_FAILED);
     std::vector<StationInfo> vecStationInfo;
     ErrCode ret = wifiHotspotPtr->GetStationList(vecStationInfo);
     if (ret != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("Get station list error: %{public}d", ret);
     }
     WIFI_LOGI("Get station list size: %{public}zu", vecStationInfo.size());
+    WIFI_NAPI_ASSERT(env, ret == WIFI_OPT_SUCCESS, ret);
 
     napi_value arrayResult;
     napi_create_array_with_length(env, vecStationInfo.size(), &arrayResult);
@@ -214,8 +209,8 @@ napi_value AddBlockList(napi_env env, napi_callback_info info)
 
     napi_valuetype valueType;
     napi_typeof(env, argv[0], &valueType);
-    NAPI_ASSERT(env, valueType == napi_string, "Wrong argument type. String expected.");
-    NAPI_ASSERT(env, wifiHotspotPtr != nullptr, "Wifi hotspot instance is null.");
+    WIFI_NAPI_ASSERT(env, valueType == napi_string, WIFI_OPT_INVALID_PARAM);
+    WIFI_NAPI_ASSERT(env, wifiHotspotPtr != nullptr, WIFI_OPT_FAILED);
 
     StationInfo stationInfo;
     char bssid[WIFI_BSSID_LENGTH] = {0};
@@ -226,9 +221,7 @@ napi_value AddBlockList(napi_env env, napi_callback_info info)
     if (ret != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("Add block list fail: %{public}d", ret);
     }
-    napi_value result;
-    napi_get_boolean(env, ret == WIFI_OPT_SUCCESS, &result);
-    return result;
+    WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, ret);
 }
 
 napi_value DelBlockList(napi_env env, napi_callback_info info)
@@ -241,8 +234,8 @@ napi_value DelBlockList(napi_env env, napi_callback_info info)
 
     napi_valuetype valueType;
     napi_typeof(env, argv[0], &valueType);
-    NAPI_ASSERT(env, valueType == napi_string, "Wrong argument type. String expected.");
-    NAPI_ASSERT(env, wifiHotspotPtr != nullptr, "Wifi hotspot instance is null.");
+    WIFI_NAPI_ASSERT(env, valueType == napi_string, WIFI_OPT_INVALID_PARAM);
+    WIFI_NAPI_ASSERT(env, wifiHotspotPtr != nullptr, WIFI_OPT_FAILED);
 
     StationInfo stationInfo;
     char bssid[WIFI_BSSID_LENGTH] = {0};
@@ -253,9 +246,7 @@ napi_value DelBlockList(napi_env env, napi_callback_info info)
     if (ret != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("Del block list fail: %{public}d", ret);
     }
-    napi_value result;
-    napi_get_boolean(env, ret == WIFI_OPT_SUCCESS, &result);
-    return result;
+    WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, ret);
 }
 }  // namespace Wifi
 }  // namespace OHOS

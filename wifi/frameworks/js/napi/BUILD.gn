@@ -150,16 +150,15 @@ ohos_shared_library("wifi_manager") {
     "//native_engine",
     "//commonlibrary/c_utils/base/include",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/log",
-    "$WIFI_ROOT_DIR/frameworks/js/napi/inc",
-    "$WIFI_ROOT_DIR/frameworks/native/include",
     "$WIFI_ROOT_DIR/frameworks/native/interfaces",
     "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
     "//base/security/access_token/interfaces/innerkits/accesstoken/include",
+    "$WIFI_ROOT_DIR/frameworks/native/include",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/net_helper",
     "${ability_runtime_path}/interfaces/kits/native/appkit/ability_runtime/context",
     "$WIFI_ROOT_DIR/utils/inc",
+    "$WIFI_ROOT_DIR/frameworks/js/napi/inc",
   ]
-
   sources = [
     "src/wifi_napi_device.cpp",
     "src/wifi_napi_entry.cpp",
@@ -175,16 +174,13 @@ ohos_shared_library("wifi_manager") {
     "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog",
     "//foundation/arkui/napi:ace_napi",
   ]
-
-  defines = [ "ENABLE_NAPI_COMPATIBLE" ]
-
+  defines = [ "ENABLE_NAPI_WIFI_MANAGER" ]
   external_deps = [
     "access_token:libaccesstoken_sdk",
     "bundle_framework:appexecfwk_base",
     "c_utils:utils",
     "ipc:ipc_core",
   ]
-
   relative_install_dir = "module"
   part_name = "wifi"
   subsystem_name = "communication"

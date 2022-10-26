@@ -364,7 +364,6 @@ if (defined(ohos_lite)) {
     }
     defines = [
       "FEATURE_AP_SUPPORT",
-      "FEATURE_P2P_SUPPORT",
       "AP_INSTANCE_MAX_NUM=$wifi_feature_with_ap_num",
     ]
 
@@ -374,6 +373,10 @@ if (defined(ohos_lite)) {
 
     if (wifi_feature_with_encryption) {
       defines += [ "FEATURE_ENCRYPTION_SUPPORT" ]
+    }
+
+    if (wifi_feature_with_p2p) {
+      defines += [ "FEATURE_P2P_SUPPORT" ]
     }
 
     part_name = "wifi"

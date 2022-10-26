@@ -82,7 +82,10 @@ napi_value GetSupportedPowerModel(napi_env env, napi_callback_info info)
     asyncContext->executeFunc = [&](void* data) -> void {
         PowerModelListAsyncContext *context = static_cast<PowerModelListAsyncContext *>(data);
         std::unique_ptr<WifiHotspot> hotspot = GetHotspotInstance();
-        WIFI_NAPI_ASSERT(env, hotspot != nullptr, WIFI_OPT_FAILED);
+        if (hotspot == nullptr) {
+            WIFI_LOGE("hotspot instance is null.");
+            return;
+        }
         TRACE_FUNC_CALL_NAME("hotspot->GetSupportedPowerModel");
         context->errorCode = hotspot->GetSupportedPowerModel(context->setPowerModelList);
     };
@@ -114,7 +117,10 @@ napi_value GetPowerModel(napi_env env, napi_callback_info info)
     asyncContext->executeFunc = [&](void* data) -> void {
         PowerModelAsyncContext *context = static_cast<PowerModelAsyncContext *>(data);
         std::unique_ptr<WifiHotspot> hotspot = GetHotspotInstance();
-        WIFI_NAPI_ASSERT(env, hotspot != nullptr, WIFI_OPT_FAILED);
+        if (hotspot == nullptr) {
+            WIFI_LOGE("hotspot instance is null.");
+            return;
+        }
         TRACE_FUNC_CALL_NAME("hotspot->GetPowerModel");
         context->errorCode = hotspot->GetPowerModel(context->powerModel);
     };

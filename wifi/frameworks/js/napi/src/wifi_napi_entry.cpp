@@ -75,6 +75,7 @@ static napi_value Init(napi_env env, napi_value exports) {
         DECLARE_NAPI_FUNCTION("removeGroup", RemoveGroup),
         DECLARE_NAPI_FUNCTION("p2pConnect", P2pConnect),
         DECLARE_NAPI_FUNCTION("p2pCancelConnect", P2pCancelConnect),
+        DECLARE_NAPI_FUNCTION("p2pDisonnect", P2pCancelConnect),
         DECLARE_NAPI_FUNCTION("startDiscoverDevices", StartDiscoverDevices),
         DECLARE_NAPI_FUNCTION("stopDiscoverDevices", StopDiscoverDevices),
         DECLARE_NAPI_FUNCTION("deletePersistentGroup", DeletePersistentGroup),

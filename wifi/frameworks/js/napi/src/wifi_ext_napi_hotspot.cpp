@@ -29,28 +29,24 @@ napi_value EnableHotspot(napi_env env, napi_callback_info info)
 {
     TRACE_FUNC_CALL;
     std::unique_ptr<WifiHotspot> hotspot = GetHotspotInstance();
-    NAPI_ASSERT(env, hotspot != nullptr, "Wifi hotspot instance is null.");
+    WIFI_NAPI_ASSERT(env, hotspot != nullptr, WIFI_OPT_FAILED);
     ErrCode ret = hotspot->EnableHotspot(ServiceType::WIFI_EXT);
     if (ret != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("Enable hotspot error: %{public}d", ret);
     }
-    napi_value result;
-    napi_get_boolean(env, ret == WIFI_OPT_SUCCESS, &result);
-    return result;
+    WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, ret);
 }
 
 napi_value DisableHotspot(napi_env env, napi_callback_info info)
 {
     TRACE_FUNC_CALL;
     std::unique_ptr<WifiHotspot> hotspot = GetHotspotInstance();
-    NAPI_ASSERT(env, hotspot != nullptr, "Wifi hotspot instance is null.");
+    WIFI_NAPI_ASSERT(env, hotspot != nullptr, WIFI_OPT_FAILED);
     ErrCode ret = hotspot->DisableHotspot(ServiceType::WIFI_EXT);
     if (ret != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("Disable hotspot error: %{public}d", ret);
     }
-    napi_value result;
-    napi_get_boolean(env, ret == WIFI_OPT_SUCCESS, &result);
-    return result;
+    WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, ret);
 }
 
 static ErrCode NativePowerModelListToJsObj(const napi_env& env,
@@ -79,16 +75,13 @@ napi_value GetSupportedPowerModel(napi_env env, napi_callback_info info)
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, &data));
 
     PowerModelListAsyncContext *asyncContext = new (std::nothrow) PowerModelListAsyncContext(env);
-    NAPI_ASSERT(env, asyncContext != nullptr, "asyncContext is null.");
+    WIFI_NAPI_ASSERT(env, asyncContext != nullptr, WIFI_OPT_FAILED);
     napi_create_string_latin1(env, "getSupportedPowerModel", NAPI_AUTO_LENGTH, &asyncContext->resourceName);
 
     asyncContext->executeFunc = [&](void* data) -> void {
         PowerModelListAsyncContext *context = static_cast<PowerModelListAsyncContext *>(data);
         std::unique_ptr<WifiHotspot> hotspot = GetHotspotInstance();
-        if (hotspot == nullptr) {
-            WIFI_LOGE("hotspot instance is null.");
-            return;
-        }
+        WIFI_NAPI_ASSERT(env, hotspot != nullptr, WIFI_OPT_FAILED);
         TRACE_FUNC_CALL_NAME("hotspot->GetSupportedPowerModel");
         context->errorCode = hotspot->GetSupportedPowerModel(context->setPowerModelList);
     };
@@ -114,16 +107,13 @@ napi_value GetPowerModel(napi_env env, napi_callback_info info)
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, &data));
 
     PowerModelAsyncContext *asyncContext = new (std::nothrow) PowerModelAsyncContext(env);
-    NAPI_ASSERT(env, asyncContext != nullptr, "asyncContext is null.");
+    WIFI_NAPI_ASSERT(env, asyncContext != nullptr, WIFI_OPT_FAILED);
     napi_create_string_latin1(env, "getPowerModel", NAPI_AUTO_LENGTH, &asyncContext->resourceName);
 
     asyncContext->executeFunc = [&](void* data) -> void {
         PowerModelAsyncContext *context = static_cast<PowerModelAsyncContext *>(data);
         std::unique_ptr<WifiHotspot> hotspot = GetHotspotInstance();
-        if (hotspot == nullptr) {
-            WIFI_LOGE("hotspot instance is null.");
-            return;
-        }
+        WIFI_NAPI_ASSERT(env, hotspot != nullptr, WIFI_OPT_FAILED);
         TRACE_FUNC_CALL_NAME("hotspot->GetPowerModel");
         context->errorCode = hotspot->GetPowerModel(context->powerModel);
     };
@@ -145,25 +135,21 @@ napi_value SetPowerModel(napi_env env, napi_callback_info info)
     napi_value argv[1];
     napi_value thisVar;
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, NULL));
-    NAPI_ASSERT(env, argc == 1, "Wrong number of arguments");
+    WIFI_NAPI_ASSERT(env, argc == 1, WIFI_OPT_INVALID_PARAM);
 
     napi_valuetype valueType;
     napi_typeof(env, argv[0], &valueType);
-    NAPI_ASSERT(env, valueType == napi_number, "Wrong argument type. napi_number expected.");
+    WIFI_NAPI_ASSERT(env, valueType == napi_number, WIFI_OPT_INVALID_PARAM);
 
     int model = -1;
     napi_get_value_int32(env, argv[0], &model);
-
     std::unique_ptr<WifiHotspot> hotspot = GetHotspotInstance();
-    NAPI_ASSERT(env, hotspot != nullptr, "Wifi hotspot instance is null.");
-
+    WIFI_NAPI_ASSERT(env, hotspot != nullptr, WIFI_OPT_FAILED);
     ErrCode ret = hotspot->SetPowerModel(static_cast<PowerModel>(model));
     if (ret != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("Set power model error: %{public}d", ret);
     }
-    napi_value result;
-    napi_get_boolean(env, ret == WIFI_OPT_SUCCESS, &result);
-    return result;
+    WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, ret);
 }
 }  // namespace Wifi
 }  // namespace OHOS

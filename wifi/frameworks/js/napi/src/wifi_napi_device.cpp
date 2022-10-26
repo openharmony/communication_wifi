@@ -31,7 +31,7 @@ std::unique_ptr<WifiScan> wifiScanPtr = WifiScan::GetInstance(WIFI_SCAN_ABILITY_
 napi_value EnableWifi(napi_env env, napi_callback_info info)
 {
     TRACE_FUNC_CALL;
-    WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_INVALID_PARAM);
+    WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED);
     ErrCode ret = wifiDevicePtr->EnableWifi();
     WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, WIFI_OPT_SUCCESS);
 }
@@ -39,14 +39,14 @@ napi_value EnableWifi(napi_env env, napi_callback_info info)
 napi_value DisableWifi(napi_env env, napi_callback_info info)
 {
     TRACE_FUNC_CALL;
-    WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_INVALID_PARAM);
+    WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED);
     ErrCode ret = wifiDevicePtr->DisableWifi();
     WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, WIFI_OPT_SUCCESS);
 }
 
 napi_value IsWifiActive(napi_env env, napi_callback_info info)
 {
-    WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_INVALID_PARAM);
+    WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED);
     bool activeStatus = false;
     ErrCode ret = wifiDevicePtr->IsWifiActive(activeStatus);
     if (ret != WIFI_OPT_SUCCESS) {
@@ -58,7 +58,7 @@ napi_value IsWifiActive(napi_env env, napi_callback_info info)
 napi_value Scan(napi_env env, napi_callback_info info)
 {
     TRACE_FUNC_CALL;
-    WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_INVALID_PARAM);
+    WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED);
     ErrCode ret = wifiScanPtr->Scan();
     WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, WIFI_OPT_SUCCESS);
 }
@@ -172,10 +172,10 @@ napi_value GetScanInfos(napi_env env, napi_callback_info info)
     napi_value thisVar = nullptr;
     void *data = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, &data));
-    WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_INVALID_PARAM);
+    WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED);
 
     ScanInfoAsyncContext *asyncContext = new ScanInfoAsyncContext(env);
-    WIFI_NAPI_ASSERT(env, asyncContext != nullptr, WIFI_OPT_INVALID_PARAM);
+    WIFI_NAPI_ASSERT(env, asyncContext != nullptr, WIFI_OPT_FAILED);
     napi_create_string_latin1(env, "getScanInfos", NAPI_AUTO_LENGTH, &asyncContext->resourceName);
 
     asyncContext->executeFunc = [&](void* data) -> void {
@@ -199,7 +199,7 @@ napi_value GetScanInfos(napi_env env, napi_callback_info info)
 napi_value GetScanResults(napi_env env, napi_callback_info info)
 {
     TRACE_FUNC_CALL;
-    WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_INVALID_PARAM);
+    WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED);
     std::vector<WifiScanInfo> scanInfos;
     ErrCode ret = wifiScanPtr->GetScanInfoList(scanInfos);
     if (ret != WIFI_OPT_SUCCESS) {
@@ -364,14 +364,14 @@ napi_value AddDeviceConfig(napi_env env, napi_callback_info info)
     void *data = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, &data));
     WIFI_NAPI_ASSERT(env, argc >= 1, WIFI_OPT_INVALID_PARAM);
-    WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_INVALID_PARAM);
+    WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED);
 
     napi_valuetype valueType;
     napi_typeof(env, argv[0], &valueType);
     WIFI_NAPI_ASSERT(env, valueType == napi_object, WIFI_OPT_INVALID_PARAM);
 
     DeviceConfigContext *asyncContext = new DeviceConfigContext(env);
-    WIFI_NAPI_ASSERT(env, asyncContext != nullptr, WIFI_OPT_INVALID_PARAM);
+    WIFI_NAPI_ASSERT(env, asyncContext != nullptr, WIFI_OPT_FAILED);
     napi_create_string_latin1(env, "addDeviceConfig", NAPI_AUTO_LENGTH, &asyncContext->resourceName);
 
     WifiDeviceConfig *config = new WifiDeviceConfig();
@@ -416,14 +416,14 @@ napi_value AddUntrustedConfig(napi_env env, napi_callback_info info)
     void *data = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, &data));
     WIFI_NAPI_ASSERT(env, argc >= 1, WIFI_OPT_INVALID_PARAM);
-    WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_INVALID_PARAM);
+    WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED);
 
     napi_valuetype valueType;
     napi_typeof(env, argv[0], &valueType);
     WIFI_NAPI_ASSERT(env, valueType == napi_object, WIFI_OPT_INVALID_PARAM);
 
     DeviceConfigContext *asyncContext = new DeviceConfigContext(env);
-    WIFI_NAPI_ASSERT(env, asyncContext != nullptr, WIFI_OPT_INVALID_PARAM);
+    WIFI_NAPI_ASSERT(env, asyncContext != nullptr, WIFI_OPT_FAILED);
     napi_create_string_latin1(env, "AddUntrustedConfig", NAPI_AUTO_LENGTH, &asyncContext->resourceName);
 
     WifiDeviceConfig *config = new WifiDeviceConfig();
@@ -468,14 +468,14 @@ napi_value RemoveUntrustedConfig(napi_env env, napi_callback_info info)
     void *data = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, &data));
     WIFI_NAPI_ASSERT(env, argc >= 1, WIFI_OPT_INVALID_PARAM);
-    WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_INVALID_PARAM);
+    WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED);
 
     napi_valuetype valueType;
     napi_typeof(env, argv[0], &valueType);
     WIFI_NAPI_ASSERT(env, valueType == napi_object, WIFI_OPT_INVALID_PARAM);
 
     DeviceConfigContext *asyncContext = new DeviceConfigContext(env);
-    WIFI_NAPI_ASSERT(env, asyncContext != nullptr, WIFI_OPT_INVALID_PARAM);
+    WIFI_NAPI_ASSERT(env, asyncContext != nullptr, WIFI_OPT_FAILED);
     napi_create_string_latin1(env, "RemoveUntrustedConfig", NAPI_AUTO_LENGTH, &asyncContext->resourceName);
 
     WifiDeviceConfig *config = new WifiDeviceConfig();
@@ -515,14 +515,14 @@ napi_value AddCandidateConfig(napi_env env, napi_callback_info info)
     void *data = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, &data));
     WIFI_NAPI_ASSERT(env, argc >= 1, WIFI_OPT_INVALID_PARAM);
-    WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_INVALID_PARAM);
+    WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED);
 
     napi_valuetype valueType;
     napi_typeof(env, argv[0], &valueType);
     WIFI_NAPI_ASSERT(env, valueType == napi_object, WIFI_OPT_INVALID_PARAM);
 
     DeviceConfigContext *asyncContext = new DeviceConfigContext(env);
-    WIFI_NAPI_ASSERT(env, asyncContext != nullptr, WIFI_OPT_INVALID_PARAM);
+    WIFI_NAPI_ASSERT(env, asyncContext != nullptr, WIFI_OPT_FAILED);
     napi_create_string_latin1(env, "AddCandidateConfig", NAPI_AUTO_LENGTH, &asyncContext->resourceName);
 
     WifiDeviceConfig *config = new WifiDeviceConfig();
@@ -568,14 +568,14 @@ napi_value RemoveCandidateConfig(napi_env env, napi_callback_info info)
     void *data = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, &data));
     WIFI_NAPI_ASSERT(env, argc >= 1, WIFI_OPT_INVALID_PARAM);
-    WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_INVALID_PARAM);
+    WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED);
 
     napi_valuetype valueType;
     napi_typeof(env, argv[0], &valueType);
     WIFI_NAPI_ASSERT(env, valueType == napi_number, WIFI_OPT_INVALID_PARAM);
 
     DeviceConfigContext *asyncContext = new DeviceConfigContext(env);
-    WIFI_NAPI_ASSERT(env, asyncContext != nullptr, WIFI_OPT_INVALID_PARAM);
+    WIFI_NAPI_ASSERT(env, asyncContext != nullptr, WIFI_OPT_FAILED);
     napi_create_string_latin1(env, "RemoveCandidateConfig", NAPI_AUTO_LENGTH, &asyncContext->resourceName);
 
     napi_get_value_int32(env, argv[0], &asyncContext->networkId);
@@ -615,7 +615,7 @@ napi_value ConnectToCandidateConfig(napi_env env, napi_callback_info info)
     napi_get_value_int32(env, argv[0], &networkId);
     bool isCandidate = true;
 
-    WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_INVALID_PARAM);
+    WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED);
     ErrCode ret = wifiDevicePtr->ConnectToNetwork(networkId, isCandidate);
     WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, ret);
 }

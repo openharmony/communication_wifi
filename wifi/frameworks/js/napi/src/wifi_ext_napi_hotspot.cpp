@@ -15,6 +15,7 @@
 
 #include "wifi_ext_napi_hotspot.h"
 #include "wifi_logger.h"
+#include "wifi_napi_errcode.h"
 
 namespace OHOS {
 namespace Wifi {

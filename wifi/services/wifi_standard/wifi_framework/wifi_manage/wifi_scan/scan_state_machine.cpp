@@ -18,6 +18,7 @@
 #include "wifi_logger.h"
 #include "wifi_settings.h"
 #include "wifi_sta_hal_interface.h"
+#include "wifi_common_util.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -1434,7 +1435,7 @@ bool ScanStateMachine::NeedCommonScanAfterPno(std::vector<InterScanInfo> &scanIn
 {
     WIFI_LOGI("Enter ScanStateMachine::NeedCommonScanAfterPno.\n");
     if (scanInfos.size() > 0) {
-        WIFI_LOGI("Enter UpdateNetworkScoreCache.[%{public}s]\n", scanInfos[0].bssid.c_str());
+        WIFI_LOGI("Enter UpdateNetworkScoreCache.[%{public}s]\n", MacAnonymize(scanInfos[0].bssid).c_str());
     }
     return false;
 }

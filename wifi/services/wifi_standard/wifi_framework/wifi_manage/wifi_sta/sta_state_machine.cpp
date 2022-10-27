@@ -695,7 +695,7 @@ void StaStateMachine::DealSignalPollResult(InternalMessage *msg)
         int currentSignalLevel = WifiSettings::GetInstance().GetSignalLevel(linkedInfo.rssi, linkedInfo.band);
         LOGI("DealSignalPollResult, networkId:%{public}d, ssid:%{private}s, rssi:%{public}d, band:%{public}d, "
             "connState:%{public}d, detailedState:%{public}d.\n",
-            linkedInfo.networkId, linkedInfo.ssid.c_str(), linkedInfo.rssi, linkedInfo.band,
+            linkedInfo.networkId, SsidAnonymize(linkedInfo.ssid).c_str(), linkedInfo.rssi, linkedInfo.band,
             linkedInfo.connState, linkedInfo.detailedState);
         LOGI("DealSignalPollResult currentSignalLevel:%{public}d, lastSignalLevel:%{public}d.\n",
             currentSignalLevel, lastSignalLevel);
@@ -1023,10 +1023,10 @@ void StaStateMachine::StartWpsMode(InternalMessage *msg)
     }
     wpsParam.multiAp = MULTI_AP;
     WIFI_LOGI("wpsConfig  setup = %{public}d", wpsConfig.setup);
-    WIFI_LOGI("wpsParam.AnyFlag = %{public}d, wpsParam.mulitAp = %{public}d, wpsParam.bssid = %s",
+    WIFI_LOGI("wpsParam.AnyFlag = %{public}d, wpsParam.mulitAp = %{public}d, wpsParam.bssid = %{public}s",
         wpsParam.anyFlag,
         wpsParam.multiAp,
-        wpsParam.bssid.c_str());
+        MacAnonymize(wpsParam.bssid).c_str());
 
     if (wpsConfig.setup == SetupMethod::PBC) {
         if (WifiStaHalInterface::GetInstance().StartWpsPbcMode(wpsParam) == WIFI_IDL_OPT_OK) {
@@ -1865,8 +1865,8 @@ bool StaStateMachine::LinkedState::ExecuteStateMsg(InternalMessage *msg)
             ret = EXECUTED;
             std::string reason = msg->GetStringFromMessage();
             std::string bssid = msg->GetStringFromMessage();
-            WIFI_LOGI("reveived bssid changed event, reason:%{public}s,bssid:%{private}s.\n",
-                reason.c_str(), bssid.c_str());
+            WIFI_LOGI("reveived bssid changed event, reason:%{public}s,bssid:%{public}s.\n",
+                reason.c_str(), MacAnonymize(bssid).c_str());
             if (strcmp(reason.c_str(), "ASSOC_COMPLETE") != 0) {
                 WIFI_LOGE("Bssid change not for ASSOC_COMPLETE, do nothing.");
                 return false;
@@ -1979,7 +1979,7 @@ void StaStateMachine::ConnectToNetworkProcess(InternalMessage *msg)
             WifiSettings::GetInstance().AddDeviceConfig(deviceConfig);
         }
         WifiSettings::GetInstance().SyncDeviceConfig();
-        WIFI_LOGD("Device ssid = %s", deviceConfig.ssid.c_str());
+        WIFI_LOGD("Device ssid = %s", SsidAnonymize(deviceConfig.ssid).c_str());
     }
 
     std::string macAddr;

@@ -237,21 +237,21 @@ if (defined(ohos_lite)) {
     ]
 
     defines = []
-    if (wifi_feature_with_p2p) {
-      defines += [ "FEATURE_P2P_SUPPORT" ]
-    }
-
     if (wifi_feature_with_ap_num > 0) {
       defines += [ "FEATURE_AP_SUPPORT" ]
     }
 
     deps = [
-      ":wifi_p2p_service_impl",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit:wifi_toolkit",
       "$WIFI_ROOT_DIR/utils:wifi_utils",
       "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog",
       "//foundation/systemabilitymgr/safwk/interfaces/innerkits/safwk:system_ability_fwk",
     ]
+
+    if (wifi_feature_with_p2p) {
+      defines += [ "FEATURE_P2P_SUPPORT" ]
+      deps += [ ":wifi_p2p_service_impl" ]
+    }
 
     if (wifi_feature_with_encryption) {
       defines += [ "FEATURE_ENCRYPTION_SUPPORT" ]

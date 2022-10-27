@@ -711,7 +711,7 @@ void EventRegister::Unregister(const napi_env& env, const std::string& type, nap
     if (!IsEventSupport(type)) {
         WIFI_LOGE("Unregister type error or not support!");
 #ifdef ENABLE_NAPI_WIFI_MANAGER
-        HandleSyncErrCode(env, WIFI_OPT_NOT_SUPPORTED);
+        HandleSyncErrCode(env, WIFI_OPT_NOT_SUPPORTED, sysCap);
 #endif
         return;
     }

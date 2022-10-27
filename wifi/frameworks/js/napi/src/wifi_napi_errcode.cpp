@@ -152,7 +152,7 @@ void HandlePromiseErrCode(    const napi_env &env, const AsyncContext &info)
     } else {
 #ifdef ENABLE_NAPI_WIFI_MANAGER
         int32_t errCodeInfo = info.sysCap + GetNapiErrCode(env, info.errorCode);
-        std::string errMsg = GetNapiErrMsg(env, info.errorCode);
+        std::string errMsg = GetNapiErrMsg(env, info.errorCode, info.sysCap);
         napi_value businessError = nullptr;
         napi_value eCode = nullptr;
         napi_value eMsg = nullptr;

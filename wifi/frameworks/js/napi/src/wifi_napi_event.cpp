@@ -487,7 +487,7 @@ static int32_t findSysCap(const std::string& type)
     int32_t sysCap = SYSCAP_WIFI_STA;
     auto iter = g_EventSysCapMap.find(type);
      if(iter == g_EventSysCapMap.end()) {
-         WIFI_LOGI("findSysCap, type:%{public}s, DO NOT find sysCap.", type);
+         WIFI_LOGI("findSysCap, type:%{public}s, DO NOT find sysCap.", type.c_str());
          return sysCap;
     }
     sysCap = iter->second;
@@ -705,7 +705,9 @@ void EventRegister::DeleteAllRegisterObj(const napi_env& env, std::vector<RegObj
 
 void EventRegister::Unregister(const napi_env& env, const std::string& type, napi_value handler)
 {
-    WIFI_LOGI("Unregister event: %{public}s, env: %{private}p", type.c_str(), env);
+    int32_t sysCap = findSysCap(type);
+    WIFI_LOGI("Unregister event: %{public}s, env: %{private}p, sysCap:%{public}d",
+        type.c_str(), env, (int)sysCap);
     if (!IsEventSupport(type)) {
         WIFI_LOGE("Unregister type error or not support!");
 #ifdef ENABLE_NAPI_WIFI_MANAGER
@@ -716,7 +718,7 @@ void EventRegister::Unregister(const napi_env& env, const std::string& type, nap
     if (CheckPermission(type) != WIFI_NAPI_PERMISSION_GRANTED) {
         WIFI_LOGE("Unregister fail for NO permission!");
 #ifdef ENABLE_NAPI_WIFI_MANAGER
-        HandleSyncErrCode(env, WIFI_OPT_PERMISSION_DENIED);
+        HandleSyncErrCode(env, WIFI_OPT_PERMISSION_DENIED, sysCap);
 #endif
         return;
     }
@@ -725,7 +727,7 @@ void EventRegister::Unregister(const napi_env& env, const std::string& type, nap
     if (iter == g_eventRegisterInfo.end()) {
         WIFI_LOGE("Unregister type not registered!");
 #ifdef ENABLE_NAPI_WIFI_MANAGER
-        HandleSyncErrCode(env, WIFI_OPT_NOT_SUPPORTED);
+        HandleSyncErrCode(env, WIFI_OPT_NOT_SUPPORTED, sysCap);
 #endif
         return;
     }

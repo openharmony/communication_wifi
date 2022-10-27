@@ -97,6 +97,24 @@ std::multimap<std::string, std::string> g_EventPermissionMap = {
     { EVENT_STREAM_CHANGE, WIFI_PERMISSION_MANAGE_WIFI_CONNECTION },
 };
 
+std::map<std::string, std::int32_t> g_EventSysCapMap = {
+    { EVENT_STA_POWER_STATE_CHANGE, SYSCAP_WIFI_STA },
+    { EVENT_STA_CONN_STATE_CHANGE, SYSCAP_WIFI_STA },
+    { EVENT_STA_SCAN_STATE_CHANGE, SYSCAP_WIFI_STA },
+    { EVENT_STA_RSSI_STATE_CHANGE, SYSCAP_WIFI_STA },
+    { EVENT_STA_DEVICE_CONFIG_CHANGE, SYSCAP_WIFI_STA },
+    { EVENT_HOTSPOT_STATE_CHANGE, SYSCAP_WIFI_AP_CORE },
+    { EVENT_HOTSPOT_STA_JOIN, SYSCAP_WIFI_AP_CORE },
+    { EVENT_HOTSPOT_STA_LEAVE, SYSCAP_WIFI_AP_CORE },
+    { EVENT_P2P_STATE_CHANGE, SYSCAP_WIFI_P2P },
+    { EVENT_P2P_CONN_STATE_CHANGE, SYSCAP_WIFI_P2P },
+    { EVENT_P2P_DEVICE_STATE_CHANGE, SYSCAP_WIFI_P2P },
+    { EVENT_P2P_PERSISTENT_GROUP_CHANGE, SYSCAP_WIFI_P2P },
+    { EVENT_P2P_PEER_DEVICE_CHANGE, SYSCAP_WIFI_P2P },
+    { EVENT_P2P_DISCOVERY_CHANGE, SYSCAP_WIFI_P2P },
+    { EVENT_STREAM_CHANGE, SYSCAP_WIFI_P2P },
+};
+
 void NapiEvent::EventNotify(AsyncEventData *asyncEvent)
 {
     WIFI_LOGI("Enter wifi event notify");
@@ -464,6 +482,18 @@ napi_value Off(napi_env env, napi_callback_info cbinfo) {
     return result;
 }
 
+static int32_t findSysCap(const std::string& type)
+{
+    int32_t sysCap = SYSCAP_WIFI_STA;
+    auto iter = g_EventSysCapMap.find(type);
+     if(iter == g_EventSysCapMap.end()) {
+         WIFI_LOGI("findSysCap, type:%{public}s, DO NOT find sysCap.", type);
+         return sysCap;
+    }
+    sysCap = iter->second;
+    return sysCap;
+}
+
 sptr<WifiNapiDeviceEventCallback> wifiDeviceCallback =
     sptr<WifiNapiDeviceEventCallback>(new (std::nothrow) WifiNapiDeviceEventCallback());
 
@@ -585,18 +615,20 @@ int EventRegister::CheckPermission(const std::string& eventType)
 
 void EventRegister::Register(const napi_env& env, const std::string& type, napi_value handler)
 {
-    WIFI_LOGI("Register event: %{public}s, env: %{private}p", type.c_str(), env);
+    int32_t sysCap = findSysCap(type);
+    WIFI_LOGI("Register event: %{public}s, env: %{private}p, %{public}d.",
+        type.c_str(), env, (int)sysCap);
     if (!IsEventSupport(type)) {
         WIFI_LOGE("Register type error or not support!");
 #ifdef ENABLE_NAPI_WIFI_MANAGER
-        HandleSyncErrCode(env, WIFI_OPT_NOT_SUPPORTED);
+        HandleSyncErrCode(env, WIFI_OPT_NOT_SUPPORTED, sysCap);
 #endif
         return;
     }
     if (CheckPermission(type) != WIFI_NAPI_PERMISSION_GRANTED) {
         WIFI_LOGE("Register fail for NO permission!");
 #ifdef ENABLE_NAPI_WIFI_MANAGER
-        HandleSyncErrCode(env, WIFI_OPT_PERMISSION_DENIED);
+        HandleSyncErrCode(env, WIFI_OPT_PERMISSION_DENIED, sysCap);
 #endif
         return;
     }
@@ -605,7 +637,7 @@ void EventRegister::Register(const napi_env& env, const std::string& type, napi_
         ErrCode ret = RegisterWifiEvents();
         if (ret != WIFI_OPT_SUCCESS) {
 #ifdef ENABLE_NAPI_WIFI_MANAGER
-            HandleSyncErrCode(env, ret);
+            HandleSyncErrCode(env, ret, sysCap);
 #endif
             return;
         }

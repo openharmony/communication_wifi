@@ -24,6 +24,12 @@
 namespace OHOS {
 namespace Wifi {
 static constexpr int NAPI_MAX_STR_LENT = 128;
+static const std::int32_t SYSCAP_WIFI_CORE = 2400000;
+static const std::int32_t SYSCAP_WIFI_STA = 2500000;
+static const std::int32_t SYSCAP_WIFI_AP_CORE = 2600000;
+static const std::int32_t SYSCAP_WIFI_AP_EXT = 2700000;
+static const std::int32_t SYSCAP_WIFI_P2P = 2800000;
+
 class TraceFuncCall final {
 public:
     TraceFuncCall(std::string funcName);
@@ -53,6 +59,7 @@ public:
     std::function<void(void*)> completeFunc;
     napi_value resourceName;
     napi_value result;
+    int32_t sysCap;
     int errorCode;
 
     AsyncContext(napi_env e, napi_async_work w = nullptr, napi_deferred d = nullptr)
@@ -63,6 +70,7 @@ public:
         executeFunc = nullptr;
         completeFunc = nullptr;
         result = nullptr;
+        sysCap = 0;
         errorCode = ERR_CODE_SUCCESS;
     }
 

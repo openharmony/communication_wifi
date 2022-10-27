@@ -31,36 +31,36 @@ std::unique_ptr<WifiScan> wifiScanPtr = WifiScan::GetInstance(WIFI_SCAN_ABILITY_
 napi_value EnableWifi(napi_env env, napi_callback_info info)
 {
     TRACE_FUNC_CALL;
-    WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED);
+    WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
     ErrCode ret = wifiDevicePtr->EnableWifi();
-    WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, WIFI_OPT_SUCCESS);
+    WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_STA);
 }
 
 napi_value DisableWifi(napi_env env, napi_callback_info info)
 {
     TRACE_FUNC_CALL;
-    WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED);
+    WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
     ErrCode ret = wifiDevicePtr->DisableWifi();
-    WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, WIFI_OPT_SUCCESS);
+    WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_STA);
 }
 
 napi_value IsWifiActive(napi_env env, napi_callback_info info)
 {
-    WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED);
+    WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
     bool activeStatus = false;
     ErrCode ret = wifiDevicePtr->IsWifiActive(activeStatus);
     if (ret != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("Get wifi active status fail: %{public}d", ret);
     }
-    WIFI_NAPI_RETURN(env, activeStatus, WIFI_OPT_SUCCESS);
+    WIFI_NAPI_RETURN(env, activeStatus, WIFI_OPT_SUCCESS, SYSCAP_WIFI_STA);
 }
 
 napi_value Scan(napi_env env, napi_callback_info info)
 {
     TRACE_FUNC_CALL;
-    WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED);
+    WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
     ErrCode ret = wifiScanPtr->Scan();
-    WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, WIFI_OPT_SUCCESS);
+    WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_STA);
 }
 
 static SecTypeJs SecurityTypeNativeToJs(const WifiSecurity& cppSecurityType)
@@ -172,10 +172,10 @@ napi_value GetScanInfos(napi_env env, napi_callback_info info)
     napi_value thisVar = nullptr;
     void *data = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, &data));
-    WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED);
+    WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
 
     ScanInfoAsyncContext *asyncContext = new ScanInfoAsyncContext(env);
-    WIFI_NAPI_ASSERT(env, asyncContext != nullptr, WIFI_OPT_FAILED);
+    WIFI_NAPI_ASSERT(env, asyncContext != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
     napi_create_string_latin1(env, "getScanInfos", NAPI_AUTO_LENGTH, &asyncContext->resourceName);
 
     asyncContext->executeFunc = [&](void* data) -> void {
@@ -193,20 +193,21 @@ napi_value GetScanInfos(napi_env env, napi_callback_info info)
     };
 
     size_t nonCallbackArgNum = 0;
+    asyncContext.sysCap = SYSCAP_WIFI_STA;
     return DoAsyncWork(env, asyncContext, argc, argv, nonCallbackArgNum);
 }
 
 napi_value GetScanResults(napi_env env, napi_callback_info info)
 {
     TRACE_FUNC_CALL;
-    WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED);
+    WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
     std::vector<WifiScanInfo> scanInfos;
     ErrCode ret = wifiScanPtr->GetScanInfoList(scanInfos);
     if (ret != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("GetScanInfoList return fail: %{public}d", ret);
     }
 
-    WIFI_NAPI_ASSERT(env, ret == WIFI_OPT_SUCCESS, ret);
+    WIFI_NAPI_ASSERT(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_STA);
     WIFI_LOGI("GetScanInfoList, size: %{public}zu", scanInfos.size());
     napi_value arrayResult;
     napi_create_array_with_length(env, scanInfos.size(), &arrayResult);
@@ -363,15 +364,15 @@ napi_value AddDeviceConfig(napi_env env, napi_callback_info info)
     napi_value thisVar = nullptr;
     void *data = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, &data));
-    WIFI_NAPI_ASSERT(env, argc >= 1, WIFI_OPT_INVALID_PARAM);
-    WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED);
+    WIFI_NAPI_ASSERT(env, argc >= 1, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_STA);
+    WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
 
     napi_valuetype valueType;
     napi_typeof(env, argv[0], &valueType);
-    WIFI_NAPI_ASSERT(env, valueType == napi_object, WIFI_OPT_INVALID_PARAM);
+    WIFI_NAPI_ASSERT(env, valueType == napi_object, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_STA);
 
     DeviceConfigContext *asyncContext = new DeviceConfigContext(env);
-    WIFI_NAPI_ASSERT(env, asyncContext != nullptr, WIFI_OPT_FAILED);
+    WIFI_NAPI_ASSERT(env, asyncContext != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
     napi_create_string_latin1(env, "addDeviceConfig", NAPI_AUTO_LENGTH, &asyncContext->resourceName);
 
     WifiDeviceConfig *config = new WifiDeviceConfig();
@@ -404,6 +405,7 @@ napi_value AddDeviceConfig(napi_env env, napi_callback_info info)
     };
 
     size_t nonCallbackArgNum = 1;
+    asyncContext.sysCap = SYSCAP_WIFI_STA;
     return DoAsyncWork(env, asyncContext, argc, argv, nonCallbackArgNum);
 }
 
@@ -415,15 +417,15 @@ napi_value AddUntrustedConfig(napi_env env, napi_callback_info info)
     napi_value thisVar = nullptr;
     void *data = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, &data));
-    WIFI_NAPI_ASSERT(env, argc >= 1, WIFI_OPT_INVALID_PARAM);
-    WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED);
+    WIFI_NAPI_ASSERT(env, argc >= 1, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_STA);
+    WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
 
     napi_valuetype valueType;
     napi_typeof(env, argv[0], &valueType);
-    WIFI_NAPI_ASSERT(env, valueType == napi_object, WIFI_OPT_INVALID_PARAM);
+    WIFI_NAPI_ASSERT(env, valueType == napi_object, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_STA);
 
     DeviceConfigContext *asyncContext = new DeviceConfigContext(env);
-    WIFI_NAPI_ASSERT(env, asyncContext != nullptr, WIFI_OPT_FAILED);
+    WIFI_NAPI_ASSERT(env, asyncContext != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
     napi_create_string_latin1(env, "AddUntrustedConfig", NAPI_AUTO_LENGTH, &asyncContext->resourceName);
 
     WifiDeviceConfig *config = new WifiDeviceConfig();
@@ -456,6 +458,7 @@ napi_value AddUntrustedConfig(napi_env env, napi_callback_info info)
     };
 
     size_t nonCallbackArgNum = 1;
+    asyncContext.sysCap = SYSCAP_WIFI_STA;
     return DoAsyncWork(env, asyncContext, argc, argv, nonCallbackArgNum);
 }
 
@@ -467,15 +470,15 @@ napi_value RemoveUntrustedConfig(napi_env env, napi_callback_info info)
     napi_value thisVar = nullptr;
     void *data = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, &data));
-    WIFI_NAPI_ASSERT(env, argc >= 1, WIFI_OPT_INVALID_PARAM);
-    WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED);
+    WIFI_NAPI_ASSERT(env, argc >= 1, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_STA);
+    WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
 
     napi_valuetype valueType;
     napi_typeof(env, argv[0], &valueType);
-    WIFI_NAPI_ASSERT(env, valueType == napi_object, WIFI_OPT_INVALID_PARAM);
+    WIFI_NAPI_ASSERT(env, valueType == napi_object, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_STA);
 
     DeviceConfigContext *asyncContext = new DeviceConfigContext(env);
-    WIFI_NAPI_ASSERT(env, asyncContext != nullptr, WIFI_OPT_FAILED);
+    WIFI_NAPI_ASSERT(env, asyncContext != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
     napi_create_string_latin1(env, "RemoveUntrustedConfig", NAPI_AUTO_LENGTH, &asyncContext->resourceName);
 
     WifiDeviceConfig *config = new WifiDeviceConfig();
@@ -503,6 +506,7 @@ napi_value RemoveUntrustedConfig(napi_env env, napi_callback_info info)
     };
 
     size_t nonCallbackArgNum = 1;
+    asyncContext.sysCap = SYSCAP_WIFI_STA;
     return DoAsyncWork(env, asyncContext, argc, argv, nonCallbackArgNum);
 }
 
@@ -514,15 +518,15 @@ napi_value AddCandidateConfig(napi_env env, napi_callback_info info)
     napi_value thisVar = nullptr;
     void *data = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, &data));
-    WIFI_NAPI_ASSERT(env, argc >= 1, WIFI_OPT_INVALID_PARAM);
-    WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED);
+    WIFI_NAPI_ASSERT(env, argc >= 1, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_STA);
+    WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
 
     napi_valuetype valueType;
     napi_typeof(env, argv[0], &valueType);
-    WIFI_NAPI_ASSERT(env, valueType == napi_object, WIFI_OPT_INVALID_PARAM);
+    WIFI_NAPI_ASSERT(env, valueType == napi_object, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_STA);
 
     DeviceConfigContext *asyncContext = new DeviceConfigContext(env);
-    WIFI_NAPI_ASSERT(env, asyncContext != nullptr, WIFI_OPT_FAILED);
+    WIFI_NAPI_ASSERT(env, asyncContext != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
     napi_create_string_latin1(env, "AddCandidateConfig", NAPI_AUTO_LENGTH, &asyncContext->resourceName);
 
     WifiDeviceConfig *config = new WifiDeviceConfig();
@@ -556,6 +560,7 @@ napi_value AddCandidateConfig(napi_env env, napi_callback_info info)
     };
 
     size_t nonCallbackArgNum = 1;
+    asyncContext.sysCap = SYSCAP_WIFI_STA;
     return DoAsyncWork(env, asyncContext, argc, argv, nonCallbackArgNum);
 }
 
@@ -567,15 +572,15 @@ napi_value RemoveCandidateConfig(napi_env env, napi_callback_info info)
     napi_value thisVar = nullptr;
     void *data = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, &data));
-    WIFI_NAPI_ASSERT(env, argc >= 1, WIFI_OPT_INVALID_PARAM);
-    WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED);
+    WIFI_NAPI_ASSERT(env, argc >= 1, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_STA);
+    WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
 
     napi_valuetype valueType;
     napi_typeof(env, argv[0], &valueType);
-    WIFI_NAPI_ASSERT(env, valueType == napi_number, WIFI_OPT_INVALID_PARAM);
+    WIFI_NAPI_ASSERT(env, valueType == napi_number, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_STA);
 
     DeviceConfigContext *asyncContext = new DeviceConfigContext(env);
-    WIFI_NAPI_ASSERT(env, asyncContext != nullptr, WIFI_OPT_FAILED);
+    WIFI_NAPI_ASSERT(env, asyncContext != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
     napi_create_string_latin1(env, "RemoveCandidateConfig", NAPI_AUTO_LENGTH, &asyncContext->resourceName);
 
     napi_get_value_int32(env, argv[0], &asyncContext->networkId);
@@ -595,6 +600,7 @@ napi_value RemoveCandidateConfig(napi_env env, napi_callback_info info)
     };
 
     size_t nonCallbackArgNum = 1;
+    asyncContext.sysCap = SYSCAP_WIFI_STA;
     return DoAsyncWork(env, asyncContext, argc, argv, nonCallbackArgNum);
 }
 
@@ -605,19 +611,19 @@ napi_value ConnectToCandidateConfig(napi_env env, napi_callback_info info)
     napi_value argv[1];
     napi_value thisVar;
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, NULL));
-    WIFI_NAPI_ASSERT(env, argc == 1, WIFI_OPT_INVALID_PARAM);
+    WIFI_NAPI_ASSERT(env, argc == 1, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_STA);
 
     napi_valuetype valueType;
     napi_typeof(env, argv[0], &valueType);
-    WIFI_NAPI_ASSERT(env, valueType == napi_number, WIFI_OPT_INVALID_PARAM);
+    WIFI_NAPI_ASSERT(env, valueType == napi_number, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_STA);
 
     int networkId = -1;
     napi_get_value_int32(env, argv[0], &networkId);
     bool isCandidate = true;
 
-    WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED);
+    WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
     ErrCode ret = wifiDevicePtr->ConnectToNetwork(networkId, isCandidate);
-    WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, ret);
+    WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_STA);
 }
 
 napi_value ConnectToNetwork(napi_env env, napi_callback_info info)
@@ -627,19 +633,19 @@ napi_value ConnectToNetwork(napi_env env, napi_callback_info info)
     napi_value argv[1];
     napi_value thisVar;
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, NULL));
-    WIFI_NAPI_ASSERT(env, argc == 1, WIFI_OPT_INVALID_PARAM);
+    WIFI_NAPI_ASSERT(env, argc == 1, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_STA);
 
     napi_valuetype valueType;
     napi_typeof(env, argv[0], &valueType);
-    WIFI_NAPI_ASSERT(env, valueType == napi_number, WIFI_OPT_INVALID_PARAM);
+    WIFI_NAPI_ASSERT(env, valueType == napi_number, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_STA);
 
     int networkId = -1;
     napi_get_value_int32(env, argv[0], &networkId);
     bool isCandidate = false;
 
-    WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED);
+    WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
     ErrCode ret = wifiDevicePtr->ConnectToNetwork(networkId, isCandidate);
-    WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, ret);
+    WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_STA);
 }
 
 napi_value ConnectToDevice(napi_env env, napi_callback_info info)
@@ -652,31 +658,31 @@ napi_value ConnectToDevice(napi_env env, napi_callback_info info)
 
     napi_valuetype valueType;
     napi_typeof(env, argv[0], &valueType);
-    WIFI_NAPI_ASSERT(env, valueType == napi_object, WIFI_OPT_INVALID_PARAM);
+    WIFI_NAPI_ASSERT(env, valueType == napi_object, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_STA);
 
-    WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED);
+    WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
     WifiDeviceConfig config;
     JsObjToDeviceConfig(env, argv[0], config);
     ErrCode ret = wifiDevicePtr->ConnectToDevice(config);
     if (ret != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("Connect to device fail: %{public}d", ret);
     }
-    WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, ret);
+    WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_STA);
 }
 
 napi_value IsConnected(napi_env env, napi_callback_info info)
 {
     TRACE_FUNC_CALL;
-    WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED);
-    WIFI_NAPI_RETURN(env, wifiDevicePtr->IsConnected(), WIFI_OPT_SUCCESS);
+    WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
+    WIFI_NAPI_RETURN(env, wifiDevicePtr->IsConnected(), WIFI_OPT_SUCCESS, SYSCAP_WIFI_STA);
 }
 
 napi_value Disconnect(napi_env env, napi_callback_info info)
 {
     TRACE_FUNC_CALL;
-    WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED);
+    WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
     ErrCode ret = wifiDevicePtr->Disconnect();
-    WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, ret);
+    WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_STA);
 }
 
 napi_value GetSignalLevel(napi_env env, napi_callback_info info)
@@ -686,16 +692,16 @@ napi_value GetSignalLevel(napi_env env, napi_callback_info info)
     napi_value thisVar;
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, NULL));
     /* the input have 2 parameters */
-    WIFI_NAPI_ASSERT(env, argc == 2, WIFI_OPT_INVALID_PARAM);
+    WIFI_NAPI_ASSERT(env, argc == 2, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_STA);
 
     napi_valuetype type1;
     napi_valuetype type2;
     napi_typeof(env, argv[0], &type1);
     napi_typeof(env, argv[1], &type2);
-    WIFI_NAPI_ASSERT(env, type1 == napi_number, WIFI_OPT_INVALID_PARAM);
-    WIFI_NAPI_ASSERT(env, type2 == napi_number, WIFI_OPT_INVALID_PARAM);
-    WIFI_NAPI_ASSERT(env, argc == 2, WIFI_OPT_INVALID_PARAM);
-    WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED);
+    WIFI_NAPI_ASSERT(env, type1 == napi_number, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_STA);
+    WIFI_NAPI_ASSERT(env, type2 == napi_number, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_STA);
+    WIFI_NAPI_ASSERT(env, argc == 2, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_STA);
+    WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
 
     int level = -1;
     int rssi = 0;
@@ -706,23 +712,23 @@ napi_value GetSignalLevel(napi_env env, napi_callback_info info)
     if (ret != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("Get wifi signal level fail: %{public}d", ret);
     }
-    WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, ret);
+    WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_STA);
 }
 
 napi_value ReConnect(napi_env env, napi_callback_info info)
 {
     TRACE_FUNC_CALL;
-    WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED);
+    WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
     ErrCode ret = wifiDevicePtr->ReConnect();
-    WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, ret);
+    WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_STA);
 }
 
 napi_value ReAssociate(napi_env env, napi_callback_info info)
 {
     TRACE_FUNC_CALL;
-    WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED);
+    WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
     ErrCode ret = wifiDevicePtr->ReAssociate();
-    WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, ret);
+    WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_STA);
 }
 
 static void IpInfoToJsObj(const napi_env& env, IpInfo& ipInfo, napi_value& result)
@@ -740,7 +746,7 @@ static void IpInfoToJsObj(const napi_env& env, IpInfo& ipInfo, napi_value& resul
 napi_value GetIpInfo(napi_env env, napi_callback_info info)
 {
     TRACE_FUNC_CALL;
-    WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED);
+    WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
 
     IpInfo ipInfo;
     napi_value result;
@@ -748,7 +754,7 @@ napi_value GetIpInfo(napi_env env, napi_callback_info info)
     if (ret != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("Get ip info fail: %{public}d", ret);
     }
-    WIFI_NAPI_ASSERT(env, ret == WIFI_OPT_SUCCESS, ret);
+    WIFI_NAPI_ASSERT(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_STA);
     IpInfoToJsObj(env, ipInfo, result);
     return result;
 }
@@ -783,10 +789,10 @@ napi_value GetLinkedInfo(napi_env env, napi_callback_info info)
     napi_value thisVar = nullptr;
     void *data = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, &data));
-    WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED);
+    WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
 
     LinkedInfoAsyncContext *asyncContext = new LinkedInfoAsyncContext(env);
-    WIFI_NAPI_ASSERT(env, asyncContext != nullptr, WIFI_OPT_FAILED);
+    WIFI_NAPI_ASSERT(env, asyncContext != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
     napi_create_string_latin1(env, "getLinkedInfo", NAPI_AUTO_LENGTH, &asyncContext->resourceName);
 
     asyncContext->executeFunc = [&](void* data) -> void {
@@ -803,6 +809,7 @@ napi_value GetLinkedInfo(napi_env env, napi_callback_info info)
     };
 
     size_t nonCallbackArgNum = 0;
+    asyncContext.sysCap = SYSCAP_WIFI_STA;
     return DoAsyncWork(env, asyncContext, argc, argv, nonCallbackArgNum);
 }
 
@@ -813,26 +820,26 @@ napi_value RemoveDevice(napi_env env, napi_callback_info info)
     napi_value argv[1];
     napi_value thisVar;
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, NULL));
-    WIFI_NAPI_ASSERT(env, argc == 1, WIFI_OPT_INVALID_PARAM);
+    WIFI_NAPI_ASSERT(env, argc == 1, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_STA);
 
     napi_valuetype valueType;
     napi_typeof(env, argv[0], &valueType);
-    WIFI_NAPI_ASSERT(env, valueType == napi_number, WIFI_OPT_INVALID_PARAM);
+    WIFI_NAPI_ASSERT(env, valueType == napi_number, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_STA);
 
     int networkId = -1;
     napi_get_value_int32(env, argv[0], &networkId);
-    WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED);
+    WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
 
     ErrCode ret = wifiDevicePtr->RemoveDevice(networkId);
-    WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, ret);
+    WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_STA);
 }
 
 napi_value RemoveAllNetwork(napi_env env, napi_callback_info info)
 {
     TRACE_FUNC_CALL;
-    WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED);
+    WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
     ErrCode ret = wifiDevicePtr->RemoveAllDevice();
-    WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, ret);
+    WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_STA);
 }
 
 napi_value DisableNetwork(napi_env env, napi_callback_info info)
@@ -842,29 +849,29 @@ napi_value DisableNetwork(napi_env env, napi_callback_info info)
     napi_value argv[1];
     napi_value thisVar;
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, NULL));
-    WIFI_NAPI_ASSERT(env, argc == 1, WIFI_OPT_INVALID_PARAM);
+    WIFI_NAPI_ASSERT(env, argc == 1, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_STA);
 
     napi_valuetype valueType;
     napi_typeof(env, argv[0], &valueType);
-    WIFI_NAPI_ASSERT(env, valueType == napi_number, WIFI_OPT_INVALID_PARAM);
-    WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED);
+    WIFI_NAPI_ASSERT(env, valueType == napi_number, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_STA);
+    WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
 
     int networkId = -1;
     napi_get_value_int32(env, argv[0], &networkId);
     ErrCode ret = wifiDevicePtr->DisableDeviceConfig(networkId);
-    WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, ret);
+    WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_STA);
 }
 
 napi_value GetCountryCode(napi_env env, napi_callback_info info)
 {
     TRACE_FUNC_CALL;
-    WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED);
+    WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_CORE);
     std::string countryCode;
     ErrCode ret = wifiDevicePtr->GetCountryCode(countryCode);
     if (ret != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("Get countryCode fail: %{public}d", ret);
     }
-    WIFI_NAPI_ASSERT(env, ret == WIFI_OPT_SUCCESS, ret);
+    WIFI_NAPI_ASSERT(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_CORE);
     napi_value cc;
     napi_create_string_utf8(env, countryCode.c_str(), NAPI_AUTO_LENGTH, &cc);
     return cc;
@@ -986,7 +993,7 @@ static void DeviceConfigToJsArray(const napi_env& env, std::vector<WifiDeviceCon
 napi_value GetDeviceConfigs(napi_env env, napi_callback_info info)
 {
     TRACE_FUNC_CALL;
-    WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED);
+    WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
     std::vector<WifiDeviceConfig> vecDeviceConfigs;
     bool isCandidate = false;
     ErrCode ret = wifiDevicePtr->GetDeviceConfigs(vecDeviceConfigs, isCandidate);
@@ -994,7 +1001,7 @@ napi_value GetDeviceConfigs(napi_env env, napi_callback_info info)
         WIFI_LOGE("Get device configs fail: %{public}d", ret);
     }
 
-    WIFI_NAPI_ASSERT(env, ret == WIFI_OPT_SUCCESS, ret);
+    WIFI_NAPI_ASSERT(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_STA);
     WIFI_LOGI("Get device configs size: %{public}zu", vecDeviceConfigs.size());
     napi_value arrayResult;
     napi_create_array_with_length(env, vecDeviceConfigs.size(), &arrayResult);
@@ -1007,7 +1014,7 @@ napi_value GetDeviceConfigs(napi_env env, napi_callback_info info)
 napi_value GetCandidateConfigs(napi_env env, napi_callback_info info)
 {
     TRACE_FUNC_CALL;
-    WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED);
+    WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
     std::vector<WifiDeviceConfig> vecDeviceConfigs;
     bool isCandidate = true;
     ErrCode ret = wifiDevicePtr->GetDeviceConfigs(vecDeviceConfigs, isCandidate);
@@ -1015,7 +1022,7 @@ napi_value GetCandidateConfigs(napi_env env, napi_callback_info info)
         WIFI_LOGE("Get candidate device configs fail: %{public}d", ret);
     }
 
-    WIFI_NAPI_ASSERT(env, ret == WIFI_OPT_SUCCESS, ret);
+    WIFI_NAPI_ASSERT(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_STA);
     WIFI_LOGI("Get candidate device configs size: %{public}zu", vecDeviceConfigs.size());
     napi_value arrayResult;
     napi_create_array_with_length(env, vecDeviceConfigs.size(), &arrayResult);
@@ -1035,9 +1042,9 @@ napi_value UpdateNetwork(napi_env env, napi_callback_info info)
 
     napi_valuetype valueType;
     napi_typeof(env, argv[0], &valueType);
-    WIFI_NAPI_ASSERT(env, valueType == napi_object, WIFI_OPT_INVALID_PARAM);
+    WIFI_NAPI_ASSERT(env, valueType == napi_object, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_STA);
 
-    WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED);
+    WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
     int updateResult;
     WifiDeviceConfig config;
     JsObjToDeviceConfig(env, argv[0], config);
@@ -1046,7 +1053,7 @@ napi_value UpdateNetwork(napi_env env, napi_callback_info info)
         WIFI_LOGE("Update device config fail: %{public}d", ret);
     }
 
-    WIFI_NAPI_ASSERT(env, ret == WIFI_OPT_SUCCESS, ret);
+    WIFI_NAPI_ASSERT(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_STA);
     napi_value result;
     napi_create_uint32(env, updateResult, &result);
     return result;
@@ -1055,14 +1062,14 @@ napi_value UpdateNetwork(napi_env env, napi_callback_info info)
 napi_value GetSupportedFeatures(napi_env env, napi_callback_info info)
 {
     TRACE_FUNC_CALL;
-    WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED);
+    WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_CORE);
     long features = -1;
     ErrCode ret = wifiDevicePtr->GetSupportedFeatures(features);
     if (ret != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("Get supported features fail: %{public}d", ret);
     }
 
-    WIFI_NAPI_ASSERT(env, ret == WIFI_OPT_SUCCESS, ret);
+    WIFI_NAPI_ASSERT(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_CORE);
     napi_value result;
     napi_create_int64(env, features, &result);
     return result;
@@ -1075,31 +1082,31 @@ napi_value IsFeatureSupported(napi_env env, napi_callback_info info)
     napi_value argv[1];
     napi_value thisVar;
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, NULL));
-    WIFI_NAPI_ASSERT(env, argc == 1, WIFI_OPT_INVALID_PARAM);
+    WIFI_NAPI_ASSERT(env, argc == 1, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_CORE);
 
     napi_valuetype valueType;
     napi_typeof(env, argv[0], &valueType);
-    WIFI_NAPI_ASSERT(env, valueType == napi_number, WIFI_OPT_INVALID_PARAM);
+    WIFI_NAPI_ASSERT(env, valueType == napi_number, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_CORE);
 
     long feature = -1;
     napi_get_value_int64(env, argv[0], (int64_t*)&feature);
-    WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED);
+    WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_CORE);
 
     bool ret = wifiDevicePtr->IsFeatureSupported(feature);
-    WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, ret);
+    WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_CORE);
 }
 
 napi_value GetDeviceMacAddress(napi_env env, napi_callback_info info)
 {
     TRACE_FUNC_CALL;
-    WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED);
+    WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
     std::string macAddr;
     ErrCode ret = wifiDevicePtr->GetDeviceMacAddress(macAddr);
     if (ret != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("Get mac address fail: %{public}d", ret);
     }
 
-    WIFI_NAPI_ASSERT(env, ret == WIFI_OPT_SUCCESS, ret);
+    WIFI_NAPI_ASSERT(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_STA);
     napi_value addr;
     napi_create_string_utf8(env, macAddr.c_str(), NAPI_AUTO_LENGTH, &addr);
     return addr;

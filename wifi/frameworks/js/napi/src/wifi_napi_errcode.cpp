@@ -22,38 +22,37 @@ namespace OHOS {
 namespace Wifi {
 DEFINE_WIFILOG_LABEL("WifiNAPIErrCode");
 static std::map<int32_t, int32_t> errCodeMap = {
-    { ErrCode::WIFI_OPT_SUCCESS, WIFI_NAPI_SUCCESS },
-    { ErrCode::WIFI_OPT_FAILED, WIFI_NAPI_ERRCODE_FAILED_UNKNOWN },
-    { ErrCode::WIFI_OPT_NOT_SUPPORTED, WIFI_NAPI_ERRCODE_NOT_SUPPORTED },
-    { ErrCode::WIFI_OPT_INVALID_PARAM, WIFI_NAPI_ERRCODE_INVALID_PARAM },
-    { ErrCode::WIFI_OPT_FORBID_AIRPLANE, WIFI_NAPI_ERRCODE_FORBID_AIRPLANE },
-    { ErrCode::WIFI_OPT_FORBID_POWSAVING, WIFI_NAPI_ERRCODE_FORBID_POWSAVING},
-    { ErrCode::WIFI_OPT_PERMISSION_DENIED, WIFI_NAPI_ERRCODE_PERMISSION_DENIED },
-    { ErrCode::WIFI_OPT_OPEN_FAIL_WHEN_CLOSING, WIFI_NAPI_ERRCODE_FAILED_UNKNOWN },
-    { ErrCode::WIFI_OPT_OPEN_SUCC_WHEN_OPENED, WIFI_NAPI_ERRCODE_FAILED_UNKNOWN },
-    { ErrCode::WIFI_OPT_CLOSE_FAIL_WHEN_OPENING, WIFI_NAPI_ERRCODE_FAILED_UNKNOWN },
-    { ErrCode::WIFI_OPT_CLOSE_SUCC_WHEN_CLOSED, WIFI_NAPI_ERRCODE_FAILED_UNKNOWN },
-    { ErrCode::WIFI_OPT_STA_NOT_OPENED, WIFI_NAPI_ERRCODE_WIFI_NOT_OPENED },
-    { ErrCode::WIFI_OPT_SCAN_NOT_OPENED, WIFI_NAPI_ERRCODE_FAILED_UNKNOWN },
-    { ErrCode::WIFI_OPT_AP_NOT_OPENED, WIFI_NAPI_ERRCODE_AP_NOT_OPENED },
-    { ErrCode::WIFI_OPT_INVALID_CONFIG, WIFI_NAPI_ERRCODE_FAILED_UNKNOWN },
-    { ErrCode::WIFI_OPT_P2P_NOT_OPENED, WIFI_NAPI_ERRCODE_WIFI_NOT_OPENED },
-    { ErrCode::WIFI_OPT_P2P_MAC_NOT_FOUND, WIFI_NAPI_ERRCODE_FAILED_UNKNOWN },
-    { ErrCode::WIFI_OPT_P2P_ERR_MAC_FORMAT, WIFI_NAPI_ERRCODE_FAILED_UNKNOWN },
-    { ErrCode::WIFI_OPT_P2P_ERR_INTENT, WIFI_NAPI_ERRCODE_FAILED_UNKNOWN },
-    { ErrCode::WIFI_OPT_P2P_ERR_SIZE_NW_NAME, WIFI_NAPI_ERRCODE_FAILED_UNKNOWN },
-    { ErrCode::WIFI_OPT_MOVING_FREEZE_CTRL, WIFI_NAPI_ERRCODE_FAILED_UNKNOWN },
+    { ErrCode::WIFI_OPT_SUCCESS, WifiNapiErrCode::WIFI_ERRCODE_SUCCESS },
+    { ErrCode::WIFI_OPT_FAILED, WifiNapiErrCode::WIFI_ERRCODE_OPERATION_FAILED },
+    { ErrCode::WIFI_OPT_NOT_SUPPORTED, WifiNapiErrCode::WIFI_ERRCODE_NOT_SUPPORTED },
+    { ErrCode::WIFI_OPT_INVALID_PARAM, WifiNapiErrCode::WIFI_ERRCODE_INVALID_PARAM },
+    { ErrCode::WIFI_OPT_FORBID_AIRPLANE, WifiNapiErrCode::WIFI_ERRCODE_OPERATION_FAILED },
+    { ErrCode::WIFI_OPT_FORBID_POWSAVING, WifiNapiErrCode::WIFI_ERRCODE_OPERATION_FAILED},
+    { ErrCode::WIFI_OPT_PERMISSION_DENIED, WifiNapiErrCode::WIFI_ERRCODE_PERMISSION_DENIED },
+    { ErrCode::WIFI_OPT_OPEN_FAIL_WHEN_CLOSING, WifiNapiErrCode::WIFI_ERRCODE_OPEN_FAIL_WHEN_CLOSING },
+    { ErrCode::WIFI_OPT_OPEN_SUCC_WHEN_OPENED, WifiNapiErrCode::WIFI_ERRCODE_CLOSE_FAIL_WHEN_OPENING },
+    { ErrCode::WIFI_OPT_CLOSE_FAIL_WHEN_OPENING, WifiNapiErrCode::WIFI_ERRCODE_OPERATION_FAILED },
+    { ErrCode::WIFI_OPT_CLOSE_SUCC_WHEN_CLOSED, WifiNapiErrCode::WIFI_ERRCODE_OPERATION_FAILED },
+    { ErrCode::WIFI_OPT_STA_NOT_OPENED, WifiNapiErrCode::WIFI_ERRCODE_WIFI_NOT_OPENED },
+    { ErrCode::WIFI_OPT_SCAN_NOT_OPENED, WifiNapiErrCode::WIFI_ERRCODE_OPERATION_FAILED },
+    { ErrCode::WIFI_OPT_AP_NOT_OPENED, WifiNapiErrCode::WIFI_ERRCODE_OPERATION_FAILED },
+    { ErrCode::WIFI_OPT_INVALID_CONFIG, WifiNapiErrCode::WIFI_ERRCODE_OPERATION_FAILED },
+    { ErrCode::WIFI_OPT_P2P_NOT_OPENED, WifiNapiErrCode::WIFI_ERRCODE_WIFI_NOT_OPENED },
+    { ErrCode::WIFI_OPT_P2P_MAC_NOT_FOUND, WifiNapiErrCode::WIFI_ERRCODE_OPERATION_FAILED },
+    { ErrCode::WIFI_OPT_P2P_ERR_MAC_FORMAT, WifiNapiErrCode::WIFI_ERRCODE_OPERATION_FAILED },
+    { ErrCode::WIFI_OPT_P2P_ERR_INTENT, WifiNapiErrCode::WIFI_ERRCODE_OPERATION_FAILED },
+    { ErrCode::WIFI_OPT_P2P_ERR_SIZE_NW_NAME, WifiNapiErrCode::WIFI_ERRCODE_OPERATION_FAILED },
+    { ErrCode::WIFI_OPT_MOVING_FREEZE_CTRL, WifiNapiErrCode::WIFI_ERRCODE_OPERATION_FAILED },
 };
 
 static std::map<int32_t, std::string> napiErrMsgMap {
-    { WIFI_NAPI_ERRCODE_FAILED_UNKNOWN, "System exception." },
-    { WIFI_NAPI_ERRCODE_FORBID_AIRPLANE, "Airplane mode is opened." },
-    { WIFI_NAPI_ERRCODE_FORBID_POWSAVING, "Power saving is opened." },
-    { WIFI_NAPI_ERRCODE_WIFI_NOT_OPENED, "WIFI doesn't open." },
-    { WIFI_NAPI_ERRCODE_AP_NOT_OPENED, "AP doesn't open." },
-    { WIFI_NAPI_ERRCODE_PERMISSION_DENIED, "Permission denied." },
-    { WIFI_NAPI_ERRCODE_INVALID_PARAM, "Parameter error." },
-    { WIFI_NAPI_ERRCODE_NOT_SUPPORTED, "Capability not supported." },
+    { WifiNapiErrCode::WIFI_ERRCODE_OPERATION_FAILED, "System exception." },
+    { WifiNapiErrCode::WIFI_ERRCODE_WIFI_NOT_OPENED, "WIFI doesn't open." },
+    { WifiNapiErrCode::WIFI_ERRCODE_PERMISSION_DENIED, "Permission denied." },
+    { WifiNapiErrCode::WIFI_ERRCODE_INVALID_PARAM, "Parameter error." },
+    { WifiNapiErrCode::WIFI_ERRCODE_NOT_SUPPORTED, "Capability not supported." },
+    { WifiNapiErrCode::WIFI_ERRCODE_OPEN_FAIL_WHEN_CLOSING, "Failed for wifi is closing." },
+    { WifiNapiErrCode::WIFI_ERRCODE_CLOSE_FAIL_WHEN_OPENING, "Failed for wifi is opening." },
 };
 
 static napi_value NapiGetUndefined(const napi_env &env)
@@ -67,12 +66,12 @@ static int32_t GetNapiErrCode(const napi_env &env, const int32_t errCodeIn)
 {
     auto iter = errCodeMap.find(errCodeIn);
     if (iter != errCodeMap.end()) {
-        return WIFI_NAPI_ERRCODE_FAILED_UNKNOWN;
+        return WifiNapiErrCode::WIFI_ERRCODE_OPERATION_FAILED;
     }
     return iter->second;
 }
 
-static std::string GetNapiErrMsg(const napi_env &env, const int32_t errCode)
+static std::string GetNapiErrMsg(const napi_env &env, const int32_t errCode, int sysCap)
 {
     if (errCode == ErrCode::WIFI_OPT_SUCCESS) {
         return "";
@@ -82,6 +81,7 @@ static std::string GetNapiErrMsg(const napi_env &env, const int32_t errCode)
     auto iter = napiErrMsgMap.find(napiErrCode);
     if (iter != napiErrMsgMap.end()) {
         std::string errMessage = "BussinessError ";
+        napiErrCode += sysCap;
         errMessage.append(std::to_string(napiErrCode)).append(": ").append(iter->second);
         return errMessage;
     }
@@ -98,9 +98,6 @@ static napi_value NapiGetNull(const napi_env &env)
 
 static napi_value GetCallbackErrorValue(napi_env env, const int32_t errCode, const std::string errMsg)
 {
-    if (errCode == ErrCode::WIFI_OPT_SUCCESS) {
-        return NapiGetUndefined(env);
-    }
     napi_value businessError = nullptr;
     napi_value eCode = nullptr;
     napi_value eMsg = nullptr;
@@ -115,7 +112,7 @@ static napi_value GetCallbackErrorValue(napi_env env, const int32_t errCode, con
 
 void HandleCallbackErrCode(    const napi_env &env, const AsyncContext &info)
 {
-    WIFI_LOGI("HandleCallbackErrCode, errCode = %{public}d", info.errorCode);
+    WIFI_LOGI("HandleCallbackErrCode, errCode = %{public}d", (int)info.errorCode);
     constexpr int RESULT_PARAMS_NUM = 2;
     napi_value undefine = NapiGetUndefined(env);
     napi_value callback = nullptr;
@@ -137,8 +134,8 @@ void HandleCallbackErrCode(    const napi_env &env, const AsyncContext &info)
         }
         napi_get_reference_value(env, errCb, &callback);
 #ifdef ENABLE_NAPI_WIFI_MANAGER
-        std::string errMsg = GetNapiErrMsg(env, info.errorCode);
-        int32_t errCodeInfo = GetNapiErrCode(env, info.errorCode);
+        std::string errMsg = GetNapiErrMsg(env, info.errorCode, info.sysCap);
+        int32_t errCodeInfo = GetNapiErrCode(env, info.errorCode) + info.sysCap;
         result[0] = GetCallbackErrorValue(env, errCodeInfo, errMsg);
 #else
         napi_create_uint32(env, info.errorCode, &result[0]);
@@ -149,12 +146,12 @@ void HandleCallbackErrCode(    const napi_env &env, const AsyncContext &info)
 
 void HandlePromiseErrCode(    const napi_env &env, const AsyncContext &info)
 {
-    WIFI_LOGI("HandlePromiseErrCode, errCode = %{public}d", info.errorCode);
+    WIFI_LOGI("HandlePromiseErrCode, errCode = %{public}d", (int)info.errorCode);
     if (info.errorCode == ErrCode::WIFI_OPT_SUCCESS) {
         napi_resolve_deferred(env, info.deferred, info.result);
     } else {
 #ifdef ENABLE_NAPI_WIFI_MANAGER
-        int32_t errCodeInfo = GetNapiErrCode(env, info.errorCode);
+        int32_t errCodeInfo = info.sysCap + GetNapiErrCode(env, info.errorCode);
         std::string errMsg = GetNapiErrMsg(env, info.errorCode);
         napi_value businessError = nullptr;
         napi_value eCode = nullptr;
@@ -173,14 +170,14 @@ void HandlePromiseErrCode(    const napi_env &env, const AsyncContext &info)
     }
 }
 
-void HandleSyncErrCode(const napi_env &env, int32_t errCode)
+void HandleSyncErrCode(const napi_env &env, int32_t errCode, int32_t sysCap)
 {
-    WIFI_LOGI("HandleSyncErrCode, errCode = %{public}d", errCode);
+    WIFI_LOGI("HandleSyncErrCode, errCode = %{public}d", (int)errCode);
     if (errCode == ErrCode::WIFI_OPT_SUCCESS) {
         return;
     }
-    std::string errMsg = GetNapiErrMsg(env, errCode);
-    int32_t errCodeInfo = GetNapiErrCode(env, errCode);
+    std::string errMsg = GetNapiErrMsg(env, errCode, sysCap);
+    int32_t errCodeInfo = sysCap + GetNapiErrCode(env, errCode);
     if (errMsg != "") {
         napi_throw_error(env, std::to_string(errCodeInfo).c_str(), errMsg.c_str());
     }

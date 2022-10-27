@@ -113,10 +113,10 @@ napi_value GetCurrentGroup(napi_env env, napi_callback_info info)
     napi_value thisVar = nullptr;
     void *data = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, &data));
-    WIFI_NAPI_ASSERT(env, wifiP2pPtr != nullptr, WIFI_OPT_FAILED);
+    WIFI_NAPI_ASSERT(env, wifiP2pPtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_P2P);
 
     P2pGroupInfoAsyncContext *asyncContext = new P2pGroupInfoAsyncContext(env);
-    WIFI_NAPI_ASSERT(env, asyncContext != nullptr, WIFI_OPT_FAILED);
+    WIFI_NAPI_ASSERT(env, asyncContext != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_P2P);
     napi_create_string_latin1(env, "getCurrentGroup", NAPI_AUTO_LENGTH, &asyncContext->resourceName);
 
     asyncContext->executeFunc = [&](void* data) -> void {
@@ -133,6 +133,7 @@ napi_value GetCurrentGroup(napi_env env, napi_callback_info info)
     };
 
     size_t nonCallbackArgNum = 0;
+    asyncContext->sysCap = SYSCAP_WIFI_P2P;
     return DoAsyncWork(env, asyncContext, argc, argv, nonCallbackArgNum);
 }
 
@@ -144,10 +145,10 @@ napi_value GetP2pGroups(napi_env env, napi_callback_info info)
     napi_value thisVar = nullptr;
     void *data = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, &data));
-    WIFI_NAPI_ASSERT(env, wifiP2pPtr != nullptr, WIFI_OPT_FAILED);
+    WIFI_NAPI_ASSERT(env, wifiP2pPtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_P2P);
 
     P2pGroupInfoListAsyncContext *asyncContext = new P2pGroupInfoListAsyncContext(env);
-    WIFI_NAPI_ASSERT(env, asyncContext != nullptr, WIFI_OPT_FAILED);
+    WIFI_NAPI_ASSERT(env, asyncContext != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_P2P);
     napi_create_string_latin1(env, "GetP2pGroups", NAPI_AUTO_LENGTH, &asyncContext->resourceName);
 
     asyncContext->executeFunc = [&](void* data) -> void {
@@ -164,6 +165,7 @@ napi_value GetP2pGroups(napi_env env, napi_callback_info info)
     };
 
     size_t nonCallbackArgNum = 0;
+    asyncContext->sysCap = SYSCAP_WIFI_P2P;
     return DoAsyncWork(env, asyncContext, argc, argv, nonCallbackArgNum);
 }
 
@@ -175,36 +177,36 @@ napi_value DeletePersistentGroup(napi_env env, napi_callback_info info)
     napi_value argv[argc];
     napi_value thisVar;
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, NULL));
-    WIFI_NAPI_ASSERT(env, wifiP2pPtr != nullptr, WIFI_OPT_FAILED);
+    WIFI_NAPI_ASSERT(env, wifiP2pPtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_P2P);
 
     napi_valuetype valueType;
     napi_typeof(env, argv[0], &valueType);
-    WIFI_NAPI_ASSERT(env, valueType == napi_number, WIFI_OPT_INVALID_PARAM);
+    WIFI_NAPI_ASSERT(env, valueType == napi_number, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_P2P);
 
     WifiP2pGroupInfo groupInfo;
     int netId = -999;
     napi_get_value_int32(env, argv[0], &netId);
     groupInfo.SetNetworkId(netId);
     ErrCode ret = wifiP2pPtr->DeleteGroup(groupInfo);
-    WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, ret);
+    WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_P2P);
 }
 
 napi_value StartDiscoverDevices(napi_env env, napi_callback_info info)
 {
     TRACE_FUNC_CALL;
-    WIFI_NAPI_ASSERT(env, wifiP2pPtr != nullptr, WIFI_OPT_FAILED);
+    WIFI_NAPI_ASSERT(env, wifiP2pPtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_P2P);
 
     ErrCode ret = wifiP2pPtr->DiscoverDevices();
-    WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, ret);
+    WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_P2P);
 }
 
 napi_value StopDiscoverDevices(napi_env env, napi_callback_info info)
 {
     TRACE_FUNC_CALL;
-    WIFI_NAPI_ASSERT(env, wifiP2pPtr != nullptr, WIFI_OPT_FAILED);
+    WIFI_NAPI_ASSERT(env, wifiP2pPtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_P2P);
 
     ErrCode ret = wifiP2pPtr->StopDiscoverDevices();
-    WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, ret);
+    WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_P2P);
 }
 
 napi_value GetP2pDevices(napi_env env, napi_callback_info info)
@@ -214,10 +216,10 @@ napi_value GetP2pDevices(napi_env env, napi_callback_info info)
     napi_value thisVar = nullptr;
     void *data = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, &data));
-    WIFI_NAPI_ASSERT(env, wifiP2pPtr != nullptr, WIFI_OPT_FAILED);
+    WIFI_NAPI_ASSERT(env, wifiP2pPtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_P2P);
 
     QueryP2pDeviceAsyncContext *asyncContext = new QueryP2pDeviceAsyncContext(env);
-    WIFI_NAPI_ASSERT(env, asyncContext != nullptr, WIFI_OPT_FAILED);
+    WIFI_NAPI_ASSERT(env, asyncContext != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_P2P);
     napi_create_string_latin1(env, "GetP2pDevices", NAPI_AUTO_LENGTH, &asyncContext->resourceName);
 
     asyncContext->executeFunc = [&](void* data) -> void {
@@ -234,6 +236,7 @@ napi_value GetP2pDevices(napi_env env, napi_callback_info info)
     };
 
     size_t nonCallbackArgNum = 0;
+    asyncContext->sysCap = SYSCAP_WIFI_P2P;
     return DoAsyncWork(env, asyncContext, argc, argv, nonCallbackArgNum);
 }
 
@@ -245,10 +248,10 @@ napi_value GetP2pLocalDevice(napi_env env, napi_callback_info info)
     napi_value thisVar = nullptr;
     void *data = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, &data));
-    WIFI_NAPI_ASSERT(env, wifiP2pPtr != nullptr, WIFI_OPT_FAILED);
+    WIFI_NAPI_ASSERT(env, wifiP2pPtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_P2P);
 
     P2pLocalDeviceAsyncContext *asyncContext = new P2pLocalDeviceAsyncContext(env);
-    WIFI_NAPI_ASSERT(env, asyncContext != nullptr, WIFI_OPT_FAILED);
+    WIFI_NAPI_ASSERT(env, asyncContext != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_P2P);
     napi_create_string_latin1(env, "GetP2pLocalDevice", NAPI_AUTO_LENGTH, &asyncContext->resourceName);
 
     asyncContext->executeFunc = [&](void* data) -> void {
@@ -266,6 +269,7 @@ napi_value GetP2pLocalDevice(napi_env env, napi_callback_info info)
     };
 
     size_t nonCallbackArgNum = 0;
+    asyncContext->sysCap = SYSCAP_WIFI_P2P;
     return DoAsyncWork(env, asyncContext, argc, argv, nonCallbackArgNum);
 }
 
@@ -276,18 +280,18 @@ napi_value SetDeviceName(napi_env env, napi_callback_info info)
     napi_value argv[1];
     napi_value thisVar;
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, NULL));
-    WIFI_NAPI_ASSERT(env, argc == 1, WIFI_OPT_INVALID_PARAM);
-    WIFI_NAPI_ASSERT(env, wifiP2pPtr != nullptr, WIFI_OPT_FAILED);
+    WIFI_NAPI_ASSERT(env, argc == 1, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_P2P);
+    WIFI_NAPI_ASSERT(env, wifiP2pPtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_P2P);
 
     napi_valuetype valueType;
     napi_typeof(env, argv[0], &valueType);
-    WIFI_NAPI_ASSERT(env, valueType == napi_string, WIFI_OPT_INVALID_PARAM);
+    WIFI_NAPI_ASSERT(env, valueType == napi_string, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_P2P);
 
     char name[64] = {0};
     size_t typeLen = 0;
     napi_get_value_string_utf8(env, argv[0], name, sizeof(name), &typeLen);
     ErrCode ret = wifiP2pPtr->SetP2pDeviceName(name);
-    WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, ret);
+    WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_P2P);
 }
 
 static void JsObjToP2pConfig(const napi_env& env, const napi_value& object, WifiP2pConfig& config)
@@ -316,11 +320,11 @@ napi_value P2pConnect(napi_env env, napi_callback_info info)
     napi_value argv[argc];
     napi_value thisVar;
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, NULL));
-    WIFI_NAPI_ASSERT(env, wifiP2pPtr != nullptr, WIFI_OPT_FAILED);
+    WIFI_NAPI_ASSERT(env, wifiP2pPtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_P2P);
 
     napi_valuetype valueType;
     napi_typeof(env, argv[0], &valueType);
-    WIFI_NAPI_ASSERT(env, valueType == napi_object, WIFI_OPT_INVALID_PARAM);
+    WIFI_NAPI_ASSERT(env, valueType == napi_object, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_P2P);
 
     WifiP2pConfig config;
     JsObjToP2pConfig(env, argv[0], config);
@@ -328,15 +332,15 @@ napi_value P2pConnect(napi_env env, napi_callback_info info)
     if (ret != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("Connect to device fail: %{public}d", ret);
     }
-    WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, ret);
+    WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_P2P);
 }
 
 napi_value P2pCancelConnect(napi_env env, napi_callback_info info)
 {
     TRACE_FUNC_CALL;
-    WIFI_NAPI_ASSERT(env, wifiP2pPtr != nullptr, WIFI_OPT_FAILED);
+    WIFI_NAPI_ASSERT(env, wifiP2pPtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_P2P);
     ErrCode ret = wifiP2pPtr->P2pCancelConnect();
-    WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, ret);
+    WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_P2P);
 }
 
 napi_value CreateGroup(napi_env env, napi_callback_info info)
@@ -346,24 +350,24 @@ napi_value CreateGroup(napi_env env, napi_callback_info info)
     napi_value argv[1];
     napi_value thisVar;
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, NULL));
-    WIFI_NAPI_ASSERT(env, wifiP2pPtr != nullptr, WIFI_OPT_FAILED);
+    WIFI_NAPI_ASSERT(env, wifiP2pPtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_P2P);
 
     napi_valuetype valueType;
     napi_typeof(env, argv[0], &valueType);
-    WIFI_NAPI_ASSERT(env, valueType == napi_object, WIFI_OPT_INVALID_PARAM);
+    WIFI_NAPI_ASSERT(env, valueType == napi_object, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_P2P);
 
     WifiP2pConfig config;
     JsObjToP2pConfig(env, argv[0], config);
     ErrCode ret = wifiP2pPtr->CreateGroup(config);
-    WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, ret);
+    WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_P2P);
 }
 
 napi_value RemoveGroup(napi_env env, napi_callback_info info)
 {
     TRACE_FUNC_CALL;
-    WIFI_NAPI_ASSERT(env, wifiP2pPtr != nullptr, WIFI_OPT_FAILED);
+    WIFI_NAPI_ASSERT(env, wifiP2pPtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_P2P);
     ErrCode ret = wifiP2pPtr->RemoveGroup();
-    WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, ret);
+    WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_P2P);
 }
 
 static void LinkedInfoToJs(const napi_env& env, WifiP2pLinkedInfo& linkedInfo, napi_value& result)
@@ -381,10 +385,10 @@ napi_value GetP2pLinkedInfo(napi_env env, napi_callback_info info)
     napi_value thisVar = nullptr;
     void *data = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, &data));
-    WIFI_NAPI_ASSERT(env, wifiP2pPtr != nullptr, WIFI_OPT_FAILED);
+    WIFI_NAPI_ASSERT(env, wifiP2pPtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_P2P);
 
     P2pLinkedInfoAsyncContext *asyncContext = new P2pLinkedInfoAsyncContext(env);
-    WIFI_NAPI_ASSERT(env, asyncContext != nullptr, WIFI_OPT_FAILED);
+    WIFI_NAPI_ASSERT(env, asyncContext != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_P2P);
     napi_create_string_latin1(env, "queryP2pLinkedInfo", NAPI_AUTO_LENGTH, &asyncContext->resourceName);
 
     asyncContext->executeFunc = [&](void* data) -> void {
@@ -401,6 +405,7 @@ napi_value GetP2pLinkedInfo(napi_env env, napi_callback_info info)
     };
 
     size_t nonCallbackArgNum = 0;
+    asyncContext->sysCap = SYSCAP_WIFI_P2P;
     return DoAsyncWork(env, asyncContext, argc, argv, nonCallbackArgNum);
 }
 }  // namespace Wifi

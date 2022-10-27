@@ -26,25 +26,24 @@ static const std::string BUSINESS_ERROR_PROPERTY_CODE = "code";
 static const std::string BUSINESS_ERROR_PROPERTY_MESSAGE = "message";
 static const std::string BUSINESS_ERROR_PROPERTY_DATA = "data";
 
-enum {
-    WIFI_NAPI_SUCCESS = 0,                     /* successfully */
-    WIFI_NAPI_ERRCODE_FAILED_UNKNOWN = 1,      /* failed */
-    WIFI_NAPI_ERRCODE_FORBID_AIRPLANE = 4,     /* forbid when current airplane opened */
-    WIFI_NAPI_ERRCODE_FORBID_POWSAVING = 5,    /* forbid when current powersaving opened */
-    WIFI_NAPI_ERRCODE_WIFI_NOT_OPENED  = 11,   /* sta service not opened */
-    WIFI_NAPI_ERRCODE_AP_NOT_OPENED = 13,      /* ap service not opened */
-    WIFI_NAPI_ERRCODE_PERMISSION_DENIED = 201, /* permission denied */
-    WIFI_NAPI_ERRCODE_INVALID_PARAM = 401,     /* invalid params */
-    WIFI_NAPI_ERRCODE_NOT_SUPPORTED = 801,     /* not supported */
+enum WifiNapiErrCode {
+    WIFI_ERRCODE_SUCCESS = 0, /* successfully */
+    WIFI_ERRCODE_PERMISSION_DENIED = 201, /* permission denied */
+    WIFI_ERRCODE_INVALID_PARAM = 401, /* invalid params */
+    WIFI_ERRCODE_NOT_SUPPORTED = 801, /* not supported */
+    WIFI_ERRCODE_OPERATION_FAILED = 1000, /* failed */
+    WIFI_ERRCODE_WIFI_NOT_OPENED  = 1001, /* sta service not opened */
+    WIFI_ERRCODE_OPEN_FAIL_WHEN_CLOSING = 1003, /* forbid when current airplane opened */
+    WIFI_ERRCODE_CLOSE_FAIL_WHEN_OPENING = 1004, /* forbid when current powersaving opened */
 };
 
 #ifdef ENABLE_NAPI_WIFI_MANAGER
 #ifndef WIFI_NAPI_ASSERT
-#define WIFI_NAPI_ASSERT(env, cond, errCode) \
+#define WIFI_NAPI_ASSERT(env, cond, errCode, sysCap) \
 do { \
     if (!(cond)) { \
         napi_value res = nullptr; \
-        HandleSyncErrCode(env, errCode); \
+        HandleSyncErrCode(env, errCode, sysCap); \
         napi_get_undefined(env, &res); \
         return res; \
     } \
@@ -52,11 +51,11 @@ do { \
 #endif
 
 #ifndef WIFI_NAPI_RETURN
-#define WIFI_NAPI_RETURN(env, cond, errCode) \
+#define WIFI_NAPI_RETURN(env, cond, errCode, sysCap) \
 do { \
     napi_value res = nullptr; \
     if (!(cond)) { \
-        HandleSyncErrCode(env, errCode); \
+        HandleSyncErrCode(env, errCode, sysCap); \
     } \
     napi_get_undefined(env, &res); \
     return res; \
@@ -66,7 +65,7 @@ do { \
 #else /* #else ENABLE_NAPI_WIFI_MANAGER */
 
 #ifndef WIFI_NAPI_ASSERT
-#define WIFI_NAPI_ASSERT(env, cond, errCode) \
+#define WIFI_NAPI_ASSERT(env, cond, errCode, sysCap) \
 do { \
     if (!(cond)) { \
         napi_value res = nullptr; \
@@ -77,7 +76,7 @@ do { \
 #endif
 
 #ifndef WIFI_NAPI_RETURN
-#define WIFI_NAPI_RETURN(env, cond, errCode) \
+#define WIFI_NAPI_RETURN(env, cond, errCode, sysCap) \
 do { \
     napi_value res = nullptr; \
     napi_get_boolean(env, cond, &res); \
@@ -100,7 +99,8 @@ void HandleCallbackErrCode(    const napi_env &env, const AsyncContext &info);
  * @param env The env.
  * @param info The input data.
  */
-void HandlePromiseErrCode(    const napi_env &env, const AsyncContext &info);
+void HandlePromiseErrCode(const napi_env &env, const AsyncContext &info);
+
 
 #ifdef ENABLE_NAPI_WIFI_MANAGER
 /**
@@ -108,8 +108,9 @@ void HandlePromiseErrCode(    const napi_env &env, const AsyncContext &info);
  *
  * @param env The env.
  * @param errCode The error code.
+ * @param sysCap System capability code.
  */
-void HandleSyncErrCode(const napi_env &env, int32_t errCode);
+void HandleSyncErrCode(const napi_env &env, int32_t errCode, int32_t sysCap);
 #endif
 }  // namespace Wifi
 }  // namespace OHOS

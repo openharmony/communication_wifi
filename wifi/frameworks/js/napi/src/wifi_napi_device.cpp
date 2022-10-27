@@ -298,10 +298,6 @@ napi_value ConfigStaticIp(const napi_env& env, const napi_value& object, WifiDev
 {
     bool hasProperty = false;
     JsObjectToInt(env, object, "prefixLength", cppConfig.wifiIpConfig.staticIpAddress.ipAddress.prefixLength);
-    if (cppConfig.wifiIpConfig.staticIpAddress.ipAddress.prefixLength <= 0) {
-        constexpr int defaultPrefixLen = 24;
-        cppConfig.wifiIpConfig.staticIpAddress.ipAddress.prefixLength = defaultPrefixLen;
-    }
     NAPI_CALL(env, napi_has_named_property(env, object, "staticIp", &hasProperty));
     if (!hasProperty) {
         WIFI_LOGE("Js has no property: staticIp.");

@@ -209,8 +209,8 @@ napi_value AddBlockList(napi_env env, napi_callback_info info)
 
     napi_valuetype valueType;
     napi_typeof(env, argv[0], &valueType);
-    WIFI_NAPI_ASSERT(env, valueType == napi_string, WIFI_OPT_INVALID_PARAM);
-    WIFI_NAPI_ASSERT(env, wifiHotspotPtr != nullptr, WIFI_OPT_FAILED);
+    WIFI_NAPI_ASSERT(env, valueType == napi_string, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_AP_CORE);
+    WIFI_NAPI_ASSERT(env, wifiHotspotPtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_AP_CORE);
 
     StationInfo stationInfo;
     char bssid[WIFI_BSSID_LENGTH] = {0};

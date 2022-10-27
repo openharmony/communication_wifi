@@ -193,7 +193,7 @@ napi_value GetScanInfos(napi_env env, napi_callback_info info)
     };
 
     size_t nonCallbackArgNum = 0;
-    asyncContext.sysCap = SYSCAP_WIFI_STA;
+    asyncContext->sysCap = SYSCAP_WIFI_STA;
     return DoAsyncWork(env, asyncContext, argc, argv, nonCallbackArgNum);
 }
 
@@ -405,7 +405,7 @@ napi_value AddDeviceConfig(napi_env env, napi_callback_info info)
     };
 
     size_t nonCallbackArgNum = 1;
-    asyncContext.sysCap = SYSCAP_WIFI_STA;
+    asyncContext->sysCap = SYSCAP_WIFI_STA;
     return DoAsyncWork(env, asyncContext, argc, argv, nonCallbackArgNum);
 }
 
@@ -458,7 +458,7 @@ napi_value AddUntrustedConfig(napi_env env, napi_callback_info info)
     };
 
     size_t nonCallbackArgNum = 1;
-    asyncContext.sysCap = SYSCAP_WIFI_STA;
+    asyncContext->sysCap = SYSCAP_WIFI_STA;
     return DoAsyncWork(env, asyncContext, argc, argv, nonCallbackArgNum);
 }
 
@@ -506,7 +506,7 @@ napi_value RemoveUntrustedConfig(napi_env env, napi_callback_info info)
     };
 
     size_t nonCallbackArgNum = 1;
-    asyncContext.sysCap = SYSCAP_WIFI_STA;
+    asyncContext->sysCap = SYSCAP_WIFI_STA;
     return DoAsyncWork(env, asyncContext, argc, argv, nonCallbackArgNum);
 }
 
@@ -560,7 +560,7 @@ napi_value AddCandidateConfig(napi_env env, napi_callback_info info)
     };
 
     size_t nonCallbackArgNum = 1;
-    asyncContext.sysCap = SYSCAP_WIFI_STA;
+    asyncContext->sysCap = SYSCAP_WIFI_STA;
     return DoAsyncWork(env, asyncContext, argc, argv, nonCallbackArgNum);
 }
 
@@ -600,7 +600,7 @@ napi_value RemoveCandidateConfig(napi_env env, napi_callback_info info)
     };
 
     size_t nonCallbackArgNum = 1;
-    asyncContext.sysCap = SYSCAP_WIFI_STA;
+    asyncContext->sysCap = SYSCAP_WIFI_STA;
     return DoAsyncWork(env, asyncContext, argc, argv, nonCallbackArgNum);
 }
 
@@ -809,7 +809,7 @@ napi_value GetLinkedInfo(napi_env env, napi_callback_info info)
     };
 
     size_t nonCallbackArgNum = 0;
-    asyncContext.sysCap = SYSCAP_WIFI_STA;
+    asyncContext->sysCap = SYSCAP_WIFI_STA;
     return DoAsyncWork(env, asyncContext, argc, argv, nonCallbackArgNum);
 }
 

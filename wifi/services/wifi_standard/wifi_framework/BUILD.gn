@@ -50,6 +50,6 @@ group("wifi_manage") {
     ]
   }
   if (wifi_feature_with_p2p) {
-	deps += [ "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_p2p:wifi_p2p_service" ]
+    deps += [ "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_p2p:wifi_p2p_service" ]
   }
 }

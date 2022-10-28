@@ -75,6 +75,7 @@ static napi_value Init(napi_env env, napi_value exports) {
         DECLARE_NAPI_FUNCTION("removeGroup", RemoveGroup),
         DECLARE_NAPI_FUNCTION("p2pConnect", P2pConnect),
         DECLARE_NAPI_FUNCTION("p2pCancelConnect", P2pCancelConnect),
+        DECLARE_NAPI_FUNCTION("p2pDisonnect", P2pCancelConnect),
         DECLARE_NAPI_FUNCTION("startDiscoverDevices", StartDiscoverDevices),
         DECLARE_NAPI_FUNCTION("stopDiscoverDevices", StopDiscoverDevices),
         DECLARE_NAPI_FUNCTION("deletePersistentGroup", DeletePersistentGroup),
@@ -93,7 +94,11 @@ static napi_module wifiJsModule = {
     .nm_flags = 0,
     .nm_filename = NULL,
     .nm_register_func = Init,
+#ifdef ENABLE_NAPI_WIFI_MANAGER
+    .nm_modname = "wifiManager",
+#else
     .nm_modname = "wifi",
+#endif
     .nm_priv = ((void *)0),
     .reserved = { 0 }
 };

@@ -193,7 +193,7 @@ static int StopModuleInternalCheckProcess(const char *moduleName, pid_t processI
     return HAL_SUCCESS;
 }
 
-static int StopModuleInternalSendTerminate()
+static int StopModuleInternalSendTerminate(void)
 {
     WifiWpaInterface *pWpaInterface = GetWifiWapGlobalInterface();
     if (pWpaInterface == NULL) {

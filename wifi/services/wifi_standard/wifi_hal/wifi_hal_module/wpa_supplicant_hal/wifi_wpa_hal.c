@@ -865,7 +865,7 @@ static int WpaCliRemoveIface(WifiWpaInterface *p, const char *name)
     return 0;
 }
 
-static int WpaCliWpaTerminate()
+static int WpaCliWpaTerminate(void)
 {
     LOGI("Enter WpaCliWpaTerminate");
     char cmd[WPA_CMD_BUF_LEN] = {0};

@@ -953,7 +953,7 @@ static bool GetChanWidthCenterFreqHe(ScanInfo *pcmd, ScanInfoElem* infoElem)
     bool is6GhzInfoExist = (content[COLUMN_INDEX_TWO] & GHZ_HE_INFO_EXIST_MASK_6) != 0;
     bool coHostedBssPresent = (content[COLUMN_INDEX_ONE] & BSS_EXIST_MASK) != 0;
     int expectedLen = HE_OPER_BASIC_LEN + (isVhtInfoExist ? COLUMN_INDEX_THREE : 0)
-        + (coHostedBssPresent ? 1 : 0) + (is6GhzInfoExist ? COLUMN_INDEX_FIVE: 0);
+        + (coHostedBssPresent ? 1 : 0) + (is6GhzInfoExist ? COLUMN_INDEX_FIVE : 0);
     if (infoElem->size < expectedLen) {
         return false;
     }

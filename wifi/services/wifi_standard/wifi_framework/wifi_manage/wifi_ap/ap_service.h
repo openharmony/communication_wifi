@@ -32,7 +32,7 @@ public:
      * @param None
      * @return None
      */
-    ApService(ApStateMachine &apStateMachine, int id = 0);
+    explicit ApService(ApStateMachine &apStateMachine, int id = 0);
 
     /**
      * @Description  destructor method.

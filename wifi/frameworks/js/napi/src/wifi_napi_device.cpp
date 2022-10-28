@@ -283,7 +283,7 @@ napi_value ProcessEapConfig(const napi_env& env, const napi_value& object, WifiD
 
     int eapMethod = static_cast<int>(EapMethodJs::EAP_NONE);
     JsObjectToInt(env, napiEap, "eapMethod", eapMethod);
-    switch(EapMethodJs(eapMethod)) {
+    switch (EapMethodJs(eapMethod)) {
         case EapMethodJs::EAP_PEAP:
             ProcessEapPeapConfig(env, napiEap, devConfig.wifiEapConfig);
             break;

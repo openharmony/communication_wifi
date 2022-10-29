@@ -78,10 +78,6 @@ bool P2pIdleState::ProcessCmdStopDiscPeer(InternalMessage &msg) const
     WIFI_LOGI("recv CMD: %{public}d", msg.GetMessageName());
     WifiErrorNo retCode = WifiP2PHalInterface::GetInstance().P2pStopFind();
     if (retCode == WifiErrorNo::WIFI_IDL_OPT_OK) {
-        retCode = WifiP2PHalInterface::GetInstance().P2pFlush();
-        if (retCode != WifiErrorNo::WIFI_IDL_OPT_OK) {
-            WIFI_LOGE("call P2pFlush() failed, ErrCode: %{public}d", static_cast<int>(retCode));
-        }
         p2pStateMachine.serviceManager.SetQueryId(std::string(""));
         p2pStateMachine.BroadcastActionResult(P2pActionCallback::StopDiscoverDevices, ErrCode::WIFI_OPT_SUCCESS);
     } else {

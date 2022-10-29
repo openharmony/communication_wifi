@@ -93,6 +93,11 @@ static void DealP2pFindInfo(char *buf)
                 retMsg.value[len++] = ' ';
                 StrSafeCopy(retMsg.value + len, sizeof(retMsg.value) - len, s);
             }
+            if (len == 1) { /* special deal: name='   xxx'*/
+                s = strtok_r(NULL, "\'", &savedPtr);
+                retMsg.value[len++] = ' ';
+                StrSafeCopy(retMsg.value + len, sizeof(retMsg.value) - len, s);
+            } /* can not deal with name='  x\'  x'*/
             TrimQuotationMark(retMsg.value, '\'');
             StrSafeCopy(info.deviceName, sizeof(info.deviceName), retMsg.value);
         }

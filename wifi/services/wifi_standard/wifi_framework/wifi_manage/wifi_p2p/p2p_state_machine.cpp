@@ -620,7 +620,11 @@ void P2pStateMachine::HandlerDiscoverPeers()
 {
     WIFI_LOGD("p2p_enabled_state recv CMD_DEVICE_DISCOVERS");
     CancelSupplicantSrvDiscReq();
-    WifiErrorNo retCode = WifiP2PHalInterface::GetInstance().P2pFind(DISC_TIMEOUT_S);
+    WifiErrorNo retCode = WifiP2PHalInterface::GetInstance().P2pFlush();
+    if (retCode != WifiErrorNo::WIFI_IDL_OPT_OK) {
+        WIFI_LOGE("call P2pFlush() failed, ErrCode: %{public}d", static_cast<int>(retCode));
+    }
+    retCode = WifiP2PHalInterface::GetInstance().P2pFind(DISC_TIMEOUT_S);
     if (retCode == WifiErrorNo::WIFI_IDL_OPT_OK) {
         WIFI_LOGD("call P2pFind successful, CMD_DEVICE_DISCOVERS successful.");
         BroadcastActionResult(P2pActionCallback::DiscoverDevices, ErrCode::WIFI_OPT_SUCCESS);

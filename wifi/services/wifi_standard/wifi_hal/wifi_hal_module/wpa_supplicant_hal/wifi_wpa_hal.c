@@ -88,12 +88,7 @@ static void DealP2pFindInfo(char *buf)
             }
         } else if (strncmp(retMsg.key, "name", strlen("name")) == 0) {
             unsigned len = strlen(retMsg.value);
-            if (len < sizeof(retMsg.value) - 1 && retMsg.value[len - 1] != '\'') { /* special deal: name='xxx xxx' */
-                s = strtok_r(NULL, "\'", &savedPtr);
-                retMsg.value[len++] = ' ';
-                StrSafeCopy(retMsg.value + len, sizeof(retMsg.value) - len, s);
-            }
-            if (len == 1) { /* special deal: name='   xxx'*/
+            if (len == 1 || len < sizeof(retMsg.value) - 1 && retMsg.value[len - 1] != '\'') { /* special deal: name='xxx xxx' || '   xxx' */
                 s = strtok_r(NULL, "\'", &savedPtr);
                 retMsg.value[len++] = ' ';
                 StrSafeCopy(retMsg.value + len, sizeof(retMsg.value) - len, s);

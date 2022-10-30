@@ -151,6 +151,7 @@ bool WifiP2pDeviceManager::UpdateDeviceStatus(const P2pDeviceStatus status)
     for (auto it = p2pDevices.begin(); it != p2pDevices.end(); it++) {
         it->SetP2pDeviceStatus(status);
     }
+    return true;
 }
 
 bool WifiP2pDeviceManager::UpdateDeviceStatus(const WifiP2pDevice &device)

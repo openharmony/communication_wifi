@@ -14,6 +14,7 @@
  */
 
 #include "wifi_config_file_spec.h"
+#include "wifi_global_func.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -117,7 +118,7 @@ static int SetWifiDeviceConfigFirst(WifiDeviceConfig &item, const std::string &k
             std::string strSsid(vec.begin(), vec.end());
             item.ssid = strSsid;
         } else {
-            return;
+            return -1;
         }
     } else if (key == "band") {
         item.band = std::stoi(value);

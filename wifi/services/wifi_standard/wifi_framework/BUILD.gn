@@ -46,9 +46,7 @@ group("wifi_manage") {
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit:wifi_toolkit",
   ]
   if (!defined(ohos_lite)) {
-    deps += [
-      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common:wifi_common_service",
-    ]
+    deps += [ "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common:wifi_common_service" ]
     if (wifi_feature_with_ap_num > 0) {
       deps += [ "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_p2p:wifi_ap_service" ]
     }
@@ -57,4 +55,3 @@ group("wifi_manage") {
     }
   }
 }
-

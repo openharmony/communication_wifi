@@ -55,8 +55,7 @@
 static WifiWpaInterface *g_wpaInterface = NULL;
 
 /* Detailed device string pattern from wpa_supplicant with WFD info
- * Example:
- * P2P-DEVICE-FOUND 00:18:6b:de:a3:6e p2p_dev_addr=00:18:6b:de:a3:6e
+ * Example: P2P-DEVICE-FOUND 00:18:6b:de:a3:6e p2p_dev_addr=00:18:6b:de:a3:6e
  * pri_dev_type=1-0050F204-1 name='Huawei P50 pro' config_methods=0x188
  * dev_capb=0x25 group_capab=0x9
  * wfd_dev_info=0x000000000000
@@ -95,7 +94,8 @@ static void DealP2pFindInfo(char *buf)
             }
         } else if (strncmp(retMsg.key, "name", strlen("name")) == 0) {
             unsigned len = strlen(retMsg.value);
-            if (len == 1 || (len < sizeof(retMsg.value) - 1 && retMsg.value[len - 1] != '\'')) { /* special deal: name='xxx xxx' || '   xxx' */
+            if (len == 1 || (len < sizeof(retMsg.value) - 1 && retMsg.value[len - 1] != '\'')) {
+                /* special deal: name='xxx xxx' || '   xxx' */
                 s = strtok_r(NULL, "\'", &savedPtr);
                 retMsg.value[len++] = ' ';
                 StrSafeCopy(retMsg.value + len, sizeof(retMsg.value) - len, s);

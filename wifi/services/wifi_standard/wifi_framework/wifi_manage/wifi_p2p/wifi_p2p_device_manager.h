@@ -117,11 +117,11 @@ public:
      */
     virtual bool UpdateDeviceStatus(const WifiP2pDevice &device);
     /**
-     * @Description - Updates the status of a P2P device based on the device information.
+     * @Description - Updates the status of P2P devices based on the device information.
      * @param  status - status that needs to be updated
      * @return - bool true:success    false:failed
      */
-    virtual bool UpdateDeviceStatus(const P2pDeviceStatus status);
+    virtual bool UpdateAllDeviceStatus(const P2pDeviceStatus status);
     /**
      * @Description - Obtain information about a P2P device based on the device address.
      * @param  devices - MAC of the device

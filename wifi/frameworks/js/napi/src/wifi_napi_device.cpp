@@ -688,11 +688,12 @@ napi_value Disconnect(napi_env env, napi_callback_info info)
 napi_value GetSignalLevel(napi_env env, napi_callback_info info)
 {
     size_t argc = 2;
+    const int PARAMS_NUM = 2;
     napi_value argv[2];
     napi_value thisVar;
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, NULL));
     /* the input have 2 parameters */
-    WIFI_NAPI_ASSERT(env, argc == 2, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_STA);
+    WIFI_NAPI_ASSERT(env, argc == PARAMS_NUM, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_STA);
 
     napi_valuetype type1;
     napi_valuetype type2;
@@ -700,7 +701,6 @@ napi_value GetSignalLevel(napi_env env, napi_callback_info info)
     napi_typeof(env, argv[1], &type2);
     WIFI_NAPI_ASSERT(env, type1 == napi_number, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_STA);
     WIFI_NAPI_ASSERT(env, type2 == napi_number, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_STA);
-    WIFI_NAPI_ASSERT(env, argc == 2, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_STA);
     WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
 
     int level = -1;

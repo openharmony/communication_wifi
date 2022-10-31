@@ -651,7 +651,7 @@ void P2pStateMachine::ChangeConnectedStatus(P2pConnectedState connectedState)
         UpdateOwnDevice(P2pDeviceStatus::PDS_AVAILABLE);
         ClearWifiP2pInfo();
         BroadcastP2pConnectionChanged();
-        deviceManager.UpdateDeviceStatus(P2pDeviceStatus::PDS_AVAILABLE);
+        deviceManager.UpdateAllDeviceStatus(P2pDeviceStatus::PDS_AVAILABLE);
     }
     return;
 }

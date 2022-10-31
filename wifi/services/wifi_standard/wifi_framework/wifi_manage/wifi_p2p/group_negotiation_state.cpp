@@ -152,7 +152,7 @@ bool GroupNegotiationState::ProcessNegotFailEvt(InternalMessage &msg) const
     WIFI_LOGE("Negotiation failure. Error code: %{public}d", status);
     WifiErrorNo ret = WifiP2PHalInterface::GetInstance().P2pFlush();
     if (ret != WifiErrorNo::WIFI_IDL_OPT_OK) {
-        WIFI_LOGE("call P2pFlush() failed, ErrCode: %{public}d", static_cast<int>(retCode));
+        WIFI_LOGE("call P2pFlush() failed, ErrCode: %{public}d", static_cast<int>(ret));
     }
     p2pStateMachine.SwitchState(&p2pStateMachine.p2pIdleState);
     return EXECUTED;
@@ -215,7 +215,7 @@ bool GroupNegotiationState::ProcessCmdRemoveGroup(InternalMessage &msg) const
         p2pStateMachine.BroadcastActionResult(P2pActionCallback::RemoveGroup, WIFI_OPT_SUCCESS);
         ret = WifiP2PHalInterface::GetInstance().P2pFlush();
         if (ret != WifiErrorNo::WIFI_IDL_OPT_OK) {
-            WIFI_LOGE("call P2pFlush() failed, ErrCode: %{public}d", static_cast<int>(retCode));
+            WIFI_LOGE("call P2pFlush() failed, ErrCode: %{public}d", static_cast<int>(ret));
         }
     }
     p2pStateMachine.SwitchState(&p2pStateMachine.p2pIdleState);

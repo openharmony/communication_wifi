@@ -226,6 +226,33 @@ std::string Vec2Stream(const std::string &prefix, const std::vector<char> &vecCh
 int HexStringToVec(const std::string &str, std::vector<char> &vec);
 
 /**
+ * @Description Convert a hex type string to uint8_t*.
+ *
+ * @param str - input hex string, eg: 010203...
+ * @param plainText - output uint8_t* result, eg: [1,2,3,...]
+ * @param plainLength - input maxLength of uint8_t* result, eg: 256
+ * @param resultLength - output Length of uint8_t* result, eg: 16
+ * @return int - convert result, 0 success, -1 failed
+ */
+int HexStringToVec(const std::string &str, uint8_t plainText[], int plainLength, int &resultLength);
+
+/**
+ * @Description Convert a uint8_t* to Hex string.
+ *
+ * @param plainText - input uint8_t*, eg: [1,2,3,...]
+ * @param size - input uint8_t* size, eg: 16
+ * @return string - convert Hex string, eg: 010203...
+ */
+std::string ConvertArrayToHex(const uint8_t plainText[], int size);
+
+/**
+ * @Description Convert a string to validate string for write.
+ *
+ * @param str - input string
+ * @return string - validate string wrapped by ""
+ */
+std::string ValidateString(const std::string  &str);
+/**
  * @Description Check is a valid 5G frequency.
  *
  * @param freq - Frequency input

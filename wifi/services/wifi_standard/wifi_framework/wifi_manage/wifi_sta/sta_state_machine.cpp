@@ -2240,16 +2240,48 @@ void StaStateMachine::SubscribeSystemAbilityChanged(void)
 
 void StaStateMachine::OnNetManagerRestart(void)
 {
-    LOGI("OnRemoteRestart()");
+    LOGI("OnNetManagerRestart()");
     int state = WifiSettings::GetInstance().GetWifiState();
     if (state != static_cast<int>(WifiState::ENABLED)) {
         return;
     }
-    std::thread thread([cb = staCallback]() {
+    std::thread thread([cb = staCallback, supplierInfo = NetSupplierInfo, this]() {
         WifiNetAgent::GetInstance().RegisterNetSupplier();
         WifiNetAgent::GetInstance().RegisterNetSupplierCallback(cb);
+        ReUpdateNetSupplierInfo(supplierInfo);
+        ReUpdateNetLinkInfo();
     });
     thread.detach();
+}
+
+void StaStateMachine::ReUpdateNetSupplierInfo(sptr<NetManagerStandard::NetSupplierInfo> supplierInfo)
+{
+    LOGI("ReUpdateNetSupplierInfo()");
+    WifiLinkedInfo linkedInfo;
+    WifiSettings::GetInstance().GetLinkedInfo(linkedInfo);
+    if ((linkedInfo.detailedState == DetailedState::NOTWORKING) && (linkedInfo.connState == ConnState::CONNECTED)) {
+        if (supplierInfo != nullptr) {
+            TimeStats timeStats("Call UpdateNetSupplierInfo");
+            WifiNetAgent::GetInstance().UpdateNetSupplierInfo(supplierInfo);
+        }
+    }
+}
+
+void StaStateMachine::ReUpdateNetLinkInfo(void)
+{
+    LOGI("ReUpdateNetLinkInfo()");
+    WifiLinkedInfo linkedInfo;
+    WifiSettings::GetInstance().GetLinkedInfo(linkedInfo);
+    if ((linkedInfo.detailedState == DetailedState::NOTWORKING) && (linkedInfo.connState == ConnState::CONNECTED)) {
+        IpInfo wifiIpInfo;
+        WifiSettings::GetInstance().GetIpInfo(wifiIpInfo);
+        std::string ipAddress = IpTools::ConvertIpv4Address(wifiIpInfo.ipAddress);
+        std::string gateway = IpTools::ConvertIpv4Address(wifiIpInfo.gateway);
+        std::string netmask = IpTools::ConvertIpv4Address(wifiIpInfo.netmask);
+        std::string primaryDns = IpTools::ConvertIpv4Address(wifiIpInfo.primaryDns);
+        std::string secondDns = IpTools::ConvertIpv4Address(wifiIpInfo.secondDns);
+        WifiNetAgent::GetInstance().UpdateNetLinkInfo(ipAddress, netmask, gateway, primaryDns, secondDns);
+    }
 }
 
 StaStateMachine::SystemAbilityStatusChangeListener::SystemAbilityStatusChangeListener(StaStateMachine &stateMachine)
@@ -2277,5 +2309,5 @@ void StaStateMachine::SystemAbilityStatusChangeListener::OnRemoveSystemAbility(i
     }
 }
 #endif // OHOS_ARCH_LITE
-}  // namespace Wifi
-}  // namespace OHOS
+} // namespace Wifi
+} // namespace OHOS

@@ -323,6 +323,7 @@ public:
         * @param ifname - interface name,eg:wlan0
         */
         void OnSerExitNotify(const std::string& ifname) override;
+
     private:
         StaStateMachine *pStaStateMachine;
     };
@@ -688,6 +689,15 @@ private:
      * @Description On netmanager restart.
      */
     void OnNetManagerRestart(void);
+    /**
+     * @Description Reupdate net supplier info
+     */
+    void ReUpdateNetSupplierInfo(sptr<NetManagerStandard::NetSupplierInfo> supplierInfo);
+
+    /**
+     * @Description Reupdate net link inf
+     */
+    void ReUpdateNetLinkInfo(void);
 #endif // OHOS_ARCH_LITE
 
 private:

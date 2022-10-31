@@ -711,8 +711,11 @@ napi_value GetSignalLevel(napi_env env, napi_callback_info info)
     ErrCode ret = wifiDevicePtr->GetSignalLevel(rssi, band, level);
     if (ret != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("Get wifi signal level fail: %{public}d", ret);
+        WIFI_NAPI_ASSERT(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_STA);
     }
-    WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_STA);
+    napi_value result;
+    napi_create_uint32(env, level, &result);
+    return result;
 }
 
 napi_value ReConnect(napi_env env, napi_callback_info info)

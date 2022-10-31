@@ -72,6 +72,20 @@ public:
     int SetConfigFilePath(const std::string &fileName);
 
     /**
+     * @Description read and parses the network section of ini config file, need call SetConfigFilePath first
+     *
+     * @return int - 0 Success; >0 parse failed
+     */
+    int ReadNetworkSection(T &item, std::ifstream &fs, std::string &line);
+
+    /**
+     * @Description read and parses the networks of ini config file, need call SetConfigFilePath first
+     *
+     * @return int - 0 Success; >0 parse failed
+     */
+    int ReadNetwork(T &item, std::ifstream &fs, std::string &line);
+
+    /**
      * @Description read and parses the ini config file, need call SetConfigFilePath first
      *
      * @return int - 0 Success; -1 file not exist
@@ -121,6 +135,59 @@ int WifiConfigFileImpl<T>::SetConfigFilePath(const std::string &fileName)
 }
 
 template<typename T>
+int WifiConfigFileImpl<T>::ReadNetworkSection(T &item, std::ifstream &fs, std::string &line)
+{
+    int sectionError = 0;
+    while (std::getline(fs, line)) {
+        TrimString(line);
+        if (line.empty()) {
+            continue;
+        }
+        if (line[0] == '<' && line[line.length() - 1] == '>') {
+            return sectionError;
+        }
+        std::string::size_type npos = line.find("=");
+        if (npos == std::string::npos) {
+            LOGE("Invalid config line");
+            sectionError++;
+            continue;
+        }
+        std::string key = line.substr(0, npos);
+        std::string value = line.substr(npos + 1);
+        TrimString(key);
+        TrimString(value);
+        /* template function, needing specialization */
+        sectionError += SetTClassKeyValue(item, key, value);
+    }
+    LOGE("Section config not end correctly");
+    sectionError++;
+    return sectionError;
+}
+
+template<typename T>
+int WifiConfigFileImpl<T>::ReadNetwork(T &item, std::ifstream &fs, std::string &line)
+{
+    int networkError = 0;
+    while (std::getline(fs, line)) {
+        TrimString(line);
+        if (line.empty()) {
+            continue;
+        }
+        if (line[0] == '<' && line[line.length() - 1] == '>') {
+            networkError += ReadNetworkSection(item, fs, line);
+        } else if (line.compare("}") == 0) {
+            return networkError;
+        } else {
+            LOGE("Invalid config line");
+            networkError++;
+        }
+    }
+    LOGE("Network config not end correctly");
+    networkError++;
+    return networkError;
+}
+
+template<typename T>
 int WifiConfigFileImpl<T>::LoadConfig()
 {
     if (mFileName.empty()) {
@@ -133,35 +200,23 @@ int WifiConfigFileImpl<T>::LoadConfig()
         return -1;
     }
     mValues.clear();
-    bool bSection = false;
     T item;
     std::string line;
+    int configError;
     while (std::getline(fs, line)) {
         TrimString(line);
         if (line.empty()) {
             continue;
         }
-        if (line[0] == '[' && line[line.length() - 1] == ']') {
-            if (bSection) {
-                mValues.push_back(item);
-            }
-            bSection = true;
+        if (line[0] == '[' && line[line.length() - 1] == '{') {
             ClearTClass(item); /* template function, needing specialization */
-            continue;
+            configError = ReadNetwork(item, fs, line);
+            if (configError > 0) {
+                LOGE("Parse network failed.");
+                continue;
+            }
+            mValues.push_back(item);
         }
-        std::string::size_type npos = line.find("=");
-        if (npos == std::string::npos) {
-            continue;
-        }
-        std::string key = line.substr(0, npos);
-        std::string value = line.substr(npos + 1);
-        TrimString(key);
-        TrimString(value);
-        /* template function, needing specialization */
-        SetTClassKeyValue(item, key, value);
-    }
-    if (bSection) {
-        mValues.push_back(item);
     }
     fs.close();
     return 0;
@@ -186,8 +241,9 @@ int WifiConfigFileImpl<T>::SaveConfig()
          * here use template function GetTClassName OutTClassString, needing
          * specialization.
          */
-        ss << "[" << GetTClassName<T>() << "_" << (i + 1) << "]" << std::endl;
+        ss << "[" << GetTClassName<T>() << "_" << (i + 1) << "] {" << std::endl;
         ss << OutTClassString(item) << std::endl;
+        ss << "}" << std::endl;
     }
     std::string content = ss.str();
     int ret = fwrite(content.c_str(), 1, content.length(), fp);

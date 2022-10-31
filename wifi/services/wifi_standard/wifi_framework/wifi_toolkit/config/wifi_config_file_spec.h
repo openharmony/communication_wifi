@@ -21,6 +21,7 @@
 #include <vector>
 #include "wifi_internal_msg.h"
 #include "wifi_p2p_msg.h"
+
 namespace OHOS {
 namespace Wifi {
 /* ----------------- template function begin ----------------------- */
@@ -38,6 +39,7 @@ void ClearTClass(T &item)
     return;
 }
 
+
 /**
  * @Description Set item's data, input key is the item's member and input value is the
  *              member's value
@@ -46,15 +48,16 @@ void ClearTClass(T &item)
  * @param item - T &item
  * @param key - Item key
  * @param value - Item value
+ * @return int - parse error: 0 Success, >0 parse failed
  */
 template <typename T>
-void SetTClassKeyValue(T &item, const std::string &key, const std::string &value)
+int SetTClassKeyValue(T &item, const std::string &key, const std::string &value)
 {
     /* fixed compile warning, -Werror,-Wunused-parameter */
     item;
     std::ostringstream ss;
     ss << key << value << std::endl;
-    return;
+    return 0;
 }
 
 /**
@@ -105,9 +108,10 @@ void ClearTClass<WifiDeviceConfig>(WifiDeviceConfig &item);
  * @param item - WifiDeviceConfig &item
  * @param key - WifiDeviceConfig struct member name
  * @param value - the WifiDeviceConfig item member value
+ * @return int - parse error: 0 Success, >0 parse failed
  */
 template <>
-void SetTClassKeyValue<WifiDeviceConfig>(WifiDeviceConfig &item, const std::string &key, const std::string &value);
+int SetTClassKeyValue<WifiDeviceConfig>(WifiDeviceConfig &item, const std::string &key, const std::string &value);
 
 /**
  * @Description Output WifiDeviceConfig class name
@@ -145,9 +149,10 @@ void ClearTClass<HotspotConfig>(HotspotConfig &item);
  * @param item - HotspotConfig &item
  * @param key - HotspotConfig struct member name
  * @param value - the HotspotConfig item member value
+ * @return int - parse error: 0 Success, >0 parse failed
  */
 template <>
-void SetTClassKeyValue<HotspotConfig>(HotspotConfig &item, const std::string &key, const std::string &value);
+int SetTClassKeyValue<HotspotConfig>(HotspotConfig &item, const std::string &key, const std::string &value);
 
 /**
  * @Description Output HotspotConfig class name
@@ -185,9 +190,10 @@ void ClearTClass<P2pVendorConfig>(P2pVendorConfig &item);
  * @param item - P2pVendorConfig &item
  * @param key - P2pVendorConfig struct member name
  * @param value - the P2pVendorConfig item member value
+ * @return int - parse error: 0 Success, >0 parse failed
  */
 template<>
-void SetTClassKeyValue<P2pVendorConfig>(P2pVendorConfig &item, const std::string &key, const std::string &value);
+int SetTClassKeyValue<P2pVendorConfig>(P2pVendorConfig &item, const std::string &key, const std::string &value);
 
 /**
  * @Description Output P2pVendorConfig class name
@@ -225,9 +231,10 @@ void ClearTClass<StationInfo>(StationInfo &item);
  * @param item - StationInfo &item
  * @param key - StationInfo struct member name
  * @param value - the StationInfo item member value
+ * @return int - parse error: 0 Success, >0 parse failed
  */
 template <>
-void SetTClassKeyValue<StationInfo>(StationInfo &item, const std::string &key, const std::string &value);
+int SetTClassKeyValue<StationInfo>(StationInfo &item, const std::string &key, const std::string &value);
 
 /**
  * @Description Output StationInfo class name
@@ -265,9 +272,10 @@ void ClearTClass<WifiConfig>(WifiConfig &item);
  * @param item - WifiConfig &item
  * @param key - WifiConfig struct member name
  * @param value - the WifiConfig item member value
+ * @return int - parse error: 0 Success, >0 parse failed
  */
 template <>
-void SetTClassKeyValue<WifiConfig>(WifiConfig &item, const std::string &key, const std::string &value);
+int SetTClassKeyValue<WifiConfig>(WifiConfig &item, const std::string &key, const std::string &value);
 
 /**
  * @Description Output WifiConfig class name
@@ -305,9 +313,10 @@ void ClearTClass<WifiP2pGroupInfo>(WifiP2pGroupInfo &item);
  * @param item - WifiP2pGroupInfo &item
  * @param key - WifiP2pGroupInfo struct member name
  * @param value - the WifiP2pGroupInfo item member value
+ * @return int - parse error: 0 Success, >0 parse failed
  */
 template<>
-void SetTClassKeyValue<WifiP2pGroupInfo>(WifiP2pGroupInfo &item, const std::string &key, const std::string &value);
+int SetTClassKeyValue<WifiP2pGroupInfo>(WifiP2pGroupInfo &item, const std::string &key, const std::string &value);
 
 /**
  * @Description Output WifiP2pGroupInfo class name
@@ -345,9 +354,10 @@ void ClearTClass<TrustListPolicy>(TrustListPolicy &item);
  * @param item - TrustListPolicy &item
  * @param key - TrustListPolicy struct member name
  * @param value - the TrustListPolicy item member value
+ * @return int - parse error: 0 Success, >0 parse failed
  */
 template <>
-void SetTClassKeyValue<TrustListPolicy>(TrustListPolicy &item, const std::string &key, const std::string &value);
+int SetTClassKeyValue<TrustListPolicy>(TrustListPolicy &item, const std::string &key, const std::string &value);
 
 /**
  * @Description Output TrustListPolicy class name
@@ -385,9 +395,10 @@ void ClearTClass<MovingFreezePolicy>(MovingFreezePolicy &item);
  * @param item - MovingFreezePolicy &item
  * @param key - MovingFreezePolicy struct member name
  * @param value - the MovingFreezePolicy item member value
+ * @return int - parse error: 0 Success, >0 parse failed
  */
 template <>
-void SetTClassKeyValue<MovingFreezePolicy>(MovingFreezePolicy &item, const std::string &key, const std::string &value);
+int SetTClassKeyValue<MovingFreezePolicy>(MovingFreezePolicy &item, const std::string &key, const std::string &value);
 
 /**
  * @Description Output MovingFreezePolicy class name
@@ -425,9 +436,10 @@ void ClearTClass<WifiStoreRandomMac>(WifiStoreRandomMac &item);
  * @param item - WifiStoreRandomMac &item
  * @param key - WifiStoreRandomMac struct member name
  * @param value - the WifiStoreRandomMac item member value
+ * @return int - parse error: 0 Success, >0 parse failed
  */
 template <>
-void SetTClassKeyValue<WifiStoreRandomMac>(WifiStoreRandomMac &item, const std::string &key, const std::string &value);
+int SetTClassKeyValue<WifiStoreRandomMac>(WifiStoreRandomMac &item, const std::string &key, const std::string &value);
 
 /**
  * @Description Output WifiStoreRandomMac class name

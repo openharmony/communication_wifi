@@ -178,37 +178,28 @@ void P2pStateMachine::InitializeThisDevice()
     deviceManager.GetThisDevice().SetSecondaryDeviceType(p2pVendorCfg.GetSecondaryDeviceType());
 }
 
-void P2pStateMachine::UpdatePersistentGroups() const
+void P2pStateMachine::UpdateGroupManager() const
 {
-    std::map<int, WifiP2pGroupInfo> mapGroups;
-    WifiErrorNo retCode = WifiP2PHalInterface::GetInstance().ListNetworks(mapGroups);
-    if (retCode != WifiErrorNo::WIFI_IDL_OPT_OK) {
-        WIFI_LOGE("Failed to get p2p networks.");
+    std::map<int, WifiP2pGroupInfo> wpaGroups;
+    WifiErrorNo retCode = WifiP2PHalInterface::GetInstance().ListNetworks(wpaGroups);
+    if (retCode == WifiErrorNo::WIFI_IDL_OPT_FAILED) {
+        WIFI_LOGE("Failed to get listNetworks");
         return;
     }
-
-    for (auto iter : mapGroups) {
-        WifiP2pGroupInfo &p2pGroupInfo = iter.second;
-        if (deviceManager.GetThisDevice() == p2pGroupInfo.GetOwner()) {
-            p2pGroupInfo.SetOwner(deviceManager.GetThisDevice());
-        }
-        groupManager.UpdateWpaGroup(p2pGroupInfo);
+    for (auto wpaGroup = wpaGroups.begin(); wpaGroup != wpaGroups.end(); ++wpaGroup) {
+        groupManager.UpdateWpaGroup(wpaGroup->second);
     }
+    groupManager.UpdateGroupsNetwork(wpaGroups);
+}
 
+void P2pStateMachine::UpdatePersistentGroups() const
+{
+    WIFI_LOGI("UpdatePersistentGroups");
     std::vector<WifiP2pGroupInfo> groups;
     groups = groupManager.GetGroups();
-    for (auto it : groups) {
-        if (mapGroups.find(it.GetNetworkId()) == mapGroups.end()) {
-            WifiP2pGroupInfo removeGroup;
-            removeGroup.SetNetworkId(it.GetNetworkId());
-            groupManager.RemoveGroup(removeGroup);
-        }
-    }
     WifiSettings::GetInstance().SetWifiP2pGroupInfo(groups);
-
-    if (retCode == WifiErrorNo::WIFI_IDL_OPT_OK) {
-        BroadcastPersistentGroupsChanged();
-    }
+    WifiSettings::GetInstance().SyncWifiP2pGroupInfoConfig();
+    BroadcastPersistentGroupsChanged();
 }
 
 bool P2pStateMachine::ReawakenPersistentGroup(WifiP2pConfigInternal &config) const
@@ -274,6 +265,7 @@ bool P2pStateMachine::ReawakenPersistentGroup(WifiP2pConfigInternal &config) con
             if (WifiErrorNo::WIFI_IDL_OPT_OK !=
                 WifiP2PHalInterface::GetInstance().Reinvoke(networkId, device.GetDeviceAddress())) {
                 WIFI_LOGE("Failed to reinvoke.");
+                UpdateGroupManager();
                 UpdatePersistentGroups();
                 return false;
             } else {
@@ -324,6 +316,7 @@ void P2pStateMachine::RemoveGroupByNetworkId(int networkId) const
     if (WifiP2PHalInterface::GetInstance().RemoveNetwork(networkId) != WifiErrorNo::WIFI_IDL_OPT_OK) {
         WIFI_LOGE("failed to remove networkId, networkId is %{public}d.", networkId);
     }
+    UpdateGroupManager();
     UpdatePersistentGroups();
     BroadcastPersistentGroupsChanged();
 }
@@ -640,6 +633,7 @@ void P2pStateMachine::HandlerDiscoverPeers()
 
 void P2pStateMachine::ChangeConnectedStatus(P2pConnectedState connectedState)
 {
+    WIFI_LOGI("ChangeConnectedStatus, connectedState: %{public}d", connectedState);
     WifiP2pLinkedInfo p2pInfo;
     WifiSettings::GetInstance().GetP2pInfo(p2pInfo);
     p2pInfo.SetConnectState(connectedState);
@@ -657,6 +651,7 @@ void P2pStateMachine::ChangeConnectedStatus(P2pConnectedState connectedState)
         UpdateOwnDevice(P2pDeviceStatus::PDS_AVAILABLE);
         ClearWifiP2pInfo();
         BroadcastP2pConnectionChanged();
+        deviceManager.UpdateAllDeviceStatus(P2pDeviceStatus::PDS_AVAILABLE);
     }
     return;
 }
@@ -829,6 +824,7 @@ bool P2pStateMachine::SetGroupConfig(const WifiP2pConfigInternal &config, bool n
 {
     WifiErrorNo ret;
     IdlP2pGroupConfig wpaConfig;
+    WifiP2pGroupInfo group;
     if (newGroup) {
         WIFI_LOGI("SetGroupConfig, new group");
         wpaConfig.ssid = config.GetGroupName();
@@ -864,6 +860,10 @@ bool P2pStateMachine::SetGroupConfig(const WifiP2pConfigInternal &config, bool n
         wpaConfig.disabled = knownConfig.disabled;
         wpaConfig.mode = knownConfig.mode;
     }
+    group.SetGroupName(config.GetGroupName());
+    group.SetPassphrase(config.GetPassphrase());
+    group.SetNetworkId(config.GetNetId());
+    groupManager.AddOrUpdateGroup(group);
     ret = WifiP2PHalInterface::GetInstance().P2pSetGroupConfig(config.GetNetId(), wpaConfig);
     if (ret == WifiErrorNo::WIFI_IDL_OPT_FAILED) {
         return false;
@@ -896,12 +896,16 @@ bool P2pStateMachine::DealCreateNewGroupWithConfig(const WifiP2pConfigInternal &
     }
 
     if (ret == WIFI_IDL_OPT_FAILED || netId == TEMPORARY_NET_ID) {
-            WIFI_LOGD("Remove network %{public}d!", createdNetId);
-            WifiP2PHalInterface::GetInstance().RemoveNetwork(createdNetId);
+        WIFI_LOGD("Remove network %{public}d!", createdNetId);
+        WifiP2PHalInterface::GetInstance().RemoveNetwork(createdNetId);
+        WifiP2pGroupInfo removedInfo;
+        removedInfo.SetNetworkId(createdNetId);
+        groupManager.RemoveGroup(removedInfo);
     }
 
-    (void)WifiP2PHalInterface::GetInstance().SaveConfig();
-    return (ret == WIFI_IDL_OPT_FAILED) ? false : true ;
+    UpdateGroupManager();
+    UpdatePersistentGroups();
+    return (ret == WIFI_IDL_OPT_FAILED) ? false : true;
 }
 
 bool P2pStateMachine::IsInterfaceReuse() const

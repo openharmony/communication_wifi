@@ -953,7 +953,7 @@ static bool GetChanWidthCenterFreqHe(ScanInfo *pcmd, ScanInfoElem* infoElem)
     bool is6GhzInfoExist = (content[COLUMN_INDEX_TWO] & GHZ_HE_INFO_EXIST_MASK_6) != 0;
     bool coHostedBssPresent = (content[COLUMN_INDEX_ONE] & BSS_EXIST_MASK) != 0;
     int expectedLen = HE_OPER_BASIC_LEN + (isVhtInfoExist ? COLUMN_INDEX_THREE : 0)
-        + (coHostedBssPresent ? 1 : 0) + (is6GhzInfoExist ? COLUMN_INDEX_FIVE: 0);
+        + (coHostedBssPresent ? 1 : 0) + (is6GhzInfoExist ? COLUMN_INDEX_FIVE : 0);
     if (infoElem->size < expectedLen) {
         return false;
     }
@@ -1079,8 +1079,19 @@ static void GetInfoElems(int length, int end, char *srcBuf, ScanInfo *pcmd)
         ++infoElemsSize;
     }
     GetChanWidthCenterFreq(pcmd, &iesNeedParse);
+    /* Do NOT report inforElement to up layer */
+    if (infoElemsTemp != NULL) {
+        for (int i = 0; i < infoElemsSize; i++) {
+            if (infoElemsTemp[i].content != NULL) {
+                free(infoElemsTemp[i].content);
+                infoElemsTemp[i].content = NULL;
+            }
+        }
+        free(infoElemsTemp);
+        infoElemsTemp = NULL;
+    }
     pcmd->infoElems = infoElemsTemp;
-    pcmd->ieSize = infoElemsSize;
+    pcmd->ieSize = 0;
     return;
 }
 #endif

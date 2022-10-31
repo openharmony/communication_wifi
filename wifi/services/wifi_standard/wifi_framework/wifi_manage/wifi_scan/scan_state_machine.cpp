@@ -913,7 +913,7 @@ bool ScanStateMachine::StartSingleCommonScan(WifiScanParam &scanParam)
 
     for (auto hiddenIter = scanParam.hiddenNetworkSsid.begin(); hiddenIter != scanParam.hiddenNetworkSsid.end();
          ++hiddenIter) {
-        WIFI_LOGI("hidden ssid is %{public}s.\n", hiddenIter->c_str());
+        WIFI_LOGI("hidden ssid is %{public}s.\n", SsidAnonymize(*hiddenIter).c_str());
     }
 
     WIFI_LOGI("Begin call Scan.\n");

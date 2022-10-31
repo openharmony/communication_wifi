@@ -157,7 +157,7 @@ static char ConvertArrayChar(unsigned char ch)
 {
     constexpr int maxDecNum = 9;
     constexpr int numDiffForHexAlphabet = 10;
-    if (ch >= 0 && ch <= maxDecNum) {
+    if (ch <= maxDecNum) {
         return '0' + ch;
     }
     if (ch >= 0xa && ch <= 0xf) {
@@ -266,7 +266,6 @@ bool IsSystemApp()
         return false;
     }
 
-    std::string bundleName;
     int uid = IPCSkeleton::GetCallingUid();
     bool isSysApp = bundleInstance->CheckIsSystemAppByUid(uid);
     WIFI_LOGI("Is system App uid[%{public}d]: %{public}d", uid, isSysApp);
@@ -286,9 +285,6 @@ bool IsForegroundApp(const int uid)
     int32_t userId = static_cast<int32_t>(uid / UID_CALLINGUID_TRANSFORM_DIVISOR);
 
     auto appMgrClient = std::make_unique<AppMgrClient>();
-    if (appMgrClient == nullptr) {
-        return false;
-    }
     appMgrClient->ConnectAppMgrService();
     AppMgrResultCode ret;
     std::vector<RunningProcessInfo> infos;

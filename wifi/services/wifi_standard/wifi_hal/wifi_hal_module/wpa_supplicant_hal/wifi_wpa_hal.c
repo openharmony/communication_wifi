@@ -194,11 +194,6 @@ static void DealServiceDiscRespEvent(char *buf)
             info.updateIndicator = atoi(token);
         } else if (index == P2P_SERVICE_INFO_THIRD_SECTION) {
             unsigned len = strlen(token) + 1;
-            if (len == 0) {
-                free(info.tlvs);
-                info.tlvs = NULL;
-                return;
-            }
             if (info.tlvs != NULL) {
                 free(info.tlvs);
                 info.tlvs = NULL;
@@ -449,11 +444,6 @@ static void DealP2pServDiscReqEvent(char *buf)
             info.updateIndic = atoi(token);
         } else if (index == P2P_SERVICE_DISC_REQ_FIVE) {
             unsigned len = strlen(token) + 1;
-            if (len == 0) {
-                free(info.tlvs);
-                info.tlvs = NULL;
-                return;
-            }
             if (info.tlvs != NULL) {
                 free(info.tlvs);
                 info.tlvs = NULL;

@@ -582,8 +582,8 @@ WifiErrorNo WifiIdlClient::ReqRegisterStaEventCallback(const WifiEventCallback &
         cEventCallback.onSsidWrongkey = OnWpaSsidWrongKey;
         cEventCallback.onWpsOverlap = OnWpsOverlap;
         cEventCallback.onWpsTimeOut = OnWpsTimeOut;
-        cEventCallback.onWpsConnectionFull = onWpaConnectionFull;
-        cEventCallback.onWpsConnectionReject = onWpaConnectionReject;
+        cEventCallback.onWpsConnectionFull = OnWpaConnectionFull;
+        cEventCallback.onWpsConnectionReject = OnWpaConnectionReject;
     }
     return RegisterStaEventCallback(cEventCallback);
 }

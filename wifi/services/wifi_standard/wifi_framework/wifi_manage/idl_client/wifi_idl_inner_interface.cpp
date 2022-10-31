@@ -97,7 +97,7 @@ void OnWpaSsidWrongKey(int status)
     }
 }
 
-void onWpaConnectionFull(int status)
+void OnWpaConnectionFull(int status)
 {
     const OHOS::Wifi::WifiEventCallback &cbk = OHOS::Wifi::WifiStaHalInterface::GetInstance().GetCallbackInst();
     if (cbk.onWpaConnectionFull) {
@@ -105,7 +105,7 @@ void onWpaConnectionFull(int status)
     }
 }
 
-void onWpaConnectionReject(int status)
+void OnWpaConnectionReject(int status)
 {
     const OHOS::Wifi::WifiEventCallback &cbk = OHOS::Wifi::WifiStaHalInterface::GetInstance().GetCallbackInst();
     if (cbk.onWpaConnectionReject) {

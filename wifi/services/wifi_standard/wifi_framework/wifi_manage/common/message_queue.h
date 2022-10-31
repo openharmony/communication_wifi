@@ -71,20 +71,12 @@ public:
     void StopQueueLoop();
 
 private:
-    /**
-     * @Description : Set the mWakeup to true or keep it its original value.
-     */
-    inline bool WakeupOrKeepOriginalValue();
-
-private:
     /* Message Queuing */
     InternalMessage *pMessageQueue;
     /* No messages to be executed, blocking */
     std::atomic<bool> mIsBlocked;
     /* Exit Loop */
     std::atomic<bool> mNeedQuit;
-    /* Wakeup flag, true: to wake up the thread */
-    std::atomic<bool> mWakeup;
     /* Thread lock of operation queue */
     std::mutex mMtxQueue;
     /* Blocked thread lock */

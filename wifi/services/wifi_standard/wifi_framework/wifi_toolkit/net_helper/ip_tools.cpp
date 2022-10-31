@@ -120,8 +120,9 @@ void IpTools::ConvertIpv6Address(const std::string &address, std::vector<unsigne
 std::string IpTools::ConvertIpv4Mask(int prefixLength)
 {
     std::string netMask;
-    if (prefixLength < MIN_PREFIX_LEN || prefixLength > MAX_PREFIX_LEN) {
-        return netMask;
+    if (prefixLength <= MIN_PREFIX_LEN || prefixLength > MAX_PREFIX_LEN) {
+        const int defaultPrefix = 24;
+        prefixLength = defaultPrefix;
     }
 
     int mask[IPV4_BYTE_NUM] = {0, 0, 0, 0};

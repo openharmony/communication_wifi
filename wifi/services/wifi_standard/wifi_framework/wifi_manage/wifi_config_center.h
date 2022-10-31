@@ -313,11 +313,6 @@ public:
     int GetValidChannels(ChannelsTable &channelsInfo);
 
     /**
-     * @Description request to chip for initiation current valid bands and channels
-     */
-    bool GetSupportedBandChannel();
-
-    /**
      * @Description Get current scan service middle state
      *
      * @return WifiOprMidState - which can be a CLOSED/CLOSING/OPENING/RUNNING/UNKNOWN

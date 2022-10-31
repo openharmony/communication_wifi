@@ -80,7 +80,8 @@ public:
      * @param None
      * @return None
      */
-    ApStateMachine(ApStationsManager &, ApRootState &, ApIdleState &, ApStartedState &, ApMonitor &, int id = 0);
+    ApStateMachine(ApStationsManager &apStationsManager, ApRootState &apRootState, ApIdleState &apIdleState,
+        ApStartedState &apStartedState, ApMonitor &apMonitor, int id = 0);
 
     /**
      * @Description  destructor method.

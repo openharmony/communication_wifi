@@ -137,6 +137,7 @@ int RpcGetScanInfos(RpcServer *server, Context *context)
                 WriteInt(context, results[i].infoElems[j].size);
                 WriteUStr(context, (unsigned char *)results[i].infoElems[j].content, results[i].infoElems[j].size);
                 free(results[i].infoElems[j].content);
+                results[i].infoElems[j].content = NULL;
             }
             if (results[i].infoElems != NULL) {
                 free(results[i].infoElems);

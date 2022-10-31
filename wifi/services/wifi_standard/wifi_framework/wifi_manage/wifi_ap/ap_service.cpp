@@ -135,27 +135,84 @@ ErrCode ApService::GetStationList(std::vector<StationInfo> &result) const
 ErrCode ApService::GetValidBands(std::vector<BandType> &bands)
 {
     WIFI_LOGI("Instance %{public}d %{public}s", m_id, __func__);
-    if (WifiSettings::GetInstance().GetValidBands(bands) < 0) {
-        WIFI_LOGE("Delete block list failed!");
+    std::vector<int> allowed5GFreq;
+    std::vector<int> allowed2GFreq;
+    if (WifiSettings::GetInstance().GetValidBands(bands) != 0) {
+        WIFI_LOGE("%{public}s, GetValidBands failed!", __func__);
+        return ErrCode::WIFI_OPT_FAILED;
+    }
+    if (bands.size() > 0) {
+        return ErrCode::WIFI_OPT_SUCCESS;
+    }
+
+    /* Get freqs from hal */
+    if (WifiApHalInterface::GetInstance().GetFrequenciesByBand(static_cast<int>(BandType::BAND_2GHZ), allowed2GFreq)) {
+        WIFI_LOGW("%{public}s, fail to get 2.4G channel", __func__);
+    }
+    if (WifiApHalInterface::GetInstance().GetFrequenciesByBand(static_cast<int>(BandType::BAND_5GHZ), allowed5GFreq)) {
+        WIFI_LOGW("%{public}s, fail to get 5G channel", __func__);
+    }
+    if (allowed2GFreq.size() > 0) {
+        bands.push_back(BandType::BAND_2GHZ);
+    }
+    if (allowed5GFreq.size() > 0) {
+        bands.push_back(BandType::BAND_5GHZ);
+    }
+    if (bands.size() <= 0) {
+        WIFI_LOGW("%{public}s, GetValidBands failed!", __func__);
         return ErrCode::WIFI_OPT_FAILED;
     }
     return ErrCode::WIFI_OPT_SUCCESS;
 }
 
-ErrCode ApService::GetValidChannels(BandType band, std::vector<int32_t> &validchannel)
+ErrCode ApService::GetValidChannels(BandType band, std::vector<int32_t> &validChannel)
 {
     WIFI_LOGI("Instance %{public}d %{public}s", m_id, __func__);
     ChannelsTable channelsInfo;
-    if (WifiSettings::GetInstance().GetValidChannels(channelsInfo)) {
-        WIFI_LOGE("Failed to obtain data from the WifiSettings.");
+    if (WifiSettings::GetInstance().GetValidChannels(channelsInfo) != 0) {
+        WIFI_LOGE("Failed to obtain channels from the WifiSettings.");
         return ErrCode::WIFI_OPT_FAILED;
     }
-    auto it = channelsInfo.find(band);
-    if (it == channelsInfo.end()) {
-        WIFI_LOGE("The value of band is invalid.");
+
+    if (channelsInfo.size() > 0) {
+        auto it = channelsInfo.find(band);
+        if (it != channelsInfo.end()) {
+            validChannel = channelsInfo[band];
+            WIFI_LOGI("%{public}s, get valid channel size:%{public}d, band:%{public}d from WifiSettings.",
+                __func__, (int)validChannel.size(), band);
+            return ErrCode::WIFI_OPT_SUCCESS;
+        }
+    }
+
+    /* get freqs from hal service */
+    std::vector<int32_t> allowed5GFreq, allowed2GFreq;
+    std::vector<int32_t> allowed5GChan, allowed2GChan;
+    if (WifiApHalInterface::GetInstance().GetFrequenciesByBand(static_cast<int>(BandType::BAND_2GHZ), allowed2GFreq)) {
+        WIFI_LOGW("%{public}s, fail to get 2.4G channel", __func__);
+    }
+    if (WifiApHalInterface::GetInstance().GetFrequenciesByBand(static_cast<int>(BandType::BAND_5GHZ), allowed5GFreq)) {
+        WIFI_LOGW("%{public}s, fail to get 5G channel", __func__);
+    }
+    if (allowed2GFreq.size() == 0) {
+        WifiSettings::GetInstance().SetDefaultFrequenciesByCountryBand(BandType::BAND_2GHZ, allowed2GFreq);
+    }
+    TransformFrequencyIntoChannel(allowed2GFreq, allowed2GChan);
+    TransformFrequencyIntoChannel(allowed5GFreq, allowed5GChan);
+
+    ChannelsTable ChanTbs;
+    ChanTbs[BandType::BAND_2GHZ] = allowed2GChan;
+    ChanTbs[BandType::BAND_5GHZ] = allowed5GChan;
+    if (WifiSettings::GetInstance().SetValidChannels(ChanTbs)) {
+        WIFI_LOGE("%{public}s, fail to SetValidChannels", __func__);
+    }
+    if (band == BandType::BAND_2GHZ || band == BandType::BAND_5GHZ) {
+        validChannel = ChanTbs[band];
+    } else {
+        WIFI_LOGE("%{public}s, invalid band: %{public}d", __func__, band);
         return ErrCode::WIFI_OPT_INVALID_PARAM;
     }
-    validchannel = channelsInfo[band];
+    WIFI_LOGI("%{public}s, get valid channel size:%{public}d, band:%{public}d from hal service.",
+        __func__, (int)validChannel.size(), band);
     return ErrCode::WIFI_OPT_SUCCESS;
 }
 

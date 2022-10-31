@@ -35,8 +35,10 @@ ohos_unittest("toolkit_unittest") {
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/net_helper/ipv6_address.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/net_helper/mac_address.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/net_helper/network_interface.cpp",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/utils/wifi_encryption_util.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/utils/wifi_global_func.cpp",
     "wifi_config_file_test.cpp",
+    "wifi_encryption_util_test.cpp",
     "wifi_global_func_test.cpp",
     "wifi_ip_tools_test.cpp",
     "wifi_log_helper_test.cpp",
@@ -63,11 +65,15 @@ ohos_unittest("toolkit_unittest") {
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
   ]
-
+  defines = []
   external_deps = [
     "c_utils:utils",
     "hiviewdfx_hilog_native:libhilog",
   ]
+  if (wifi_feature_with_encryption) {
+    external_deps += [ "huks:libhukssdk" ]
+    defines += [ "FEATURE_ENCRYPTION_SUPPORT" ]
+  }
   configs = [ ":module_private_config" ]
 
   part_name = "wifi"

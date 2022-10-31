@@ -24,7 +24,6 @@
 #include <algorithm>
 #include "wifi_common_def.h"
 #include "wifi_config_file_impl.h"
-
 constexpr int RANDOM_STR_LEN = 6;
 constexpr int MSEC = 1000;
 constexpr int FOREGROUND_SCAN_CONTROL_TIMES = 4;
@@ -250,6 +249,15 @@ public:
     int SetDeviceState(int networkId, int state, bool bSetOther = false);
 
     /**
+     * @Description Set a wifi device's attributes who's networkId equals input networkId after connect;
+     *
+     * @param networkId - the wifi device's id
+     * @return int - when 0 means success, other means some fails happened,
+     *               Input state invalid or not find the wifi device config
+     */
+    int SetDeviceAfterConnect(int networkId);
+
+    /**
      * @Description Get the candidate device configuration
      *
      * @param uid - call app uid
@@ -274,6 +282,20 @@ public:
      * @return int - 0 success; -1 save file failed
      */
     int SyncDeviceConfig();
+
+    /**
+     * @Description Increments the number of reboots since last use for each configuration
+     *
+     * @return int - 0 success; -1 save file failed
+     */
+    int IncreaseNumRebootsSinceLastUse();
+    /**
+     * @Description Remove excess networks in case the number of saved networks exceeds the mas limit
+     *
+     * @param configs - WifiDeviceConfig objects
+     * @return int - 0 if networks were removed, 1 otherwise.
+     */
+    int RemoveExcessDeviceConfigs(std::vector<WifiDeviceConfig> &configs);
 
     /**
      * @Description Reload wifi device config from config file
@@ -1098,7 +1120,7 @@ private:
     void InitHotspotConfig();
     void InitDefaultP2pVendorConfig();
     void InitP2pVendorConfig();
-    void InitGetApMaxConnNum();
+    void InitSettingsNum();
     void InitScanControlForbidList();
     void InitScanControlIntervalList();
     void InitScanControlInfo();
@@ -1127,6 +1149,7 @@ private:
     std::atomic<int> mP2pDiscoverState;
     std::atomic<int> mP2pConnectState;
     int mApMaxConnNum;           /* ap support max sta numbers */
+    int mMaxNumConfigs;          /* max saved configs numbers */
     int mLastSelectedNetworkId;  /* last selected networkid */
     time_t mLastSelectedTimeVal; /* last selected time */
     int mScreenState;            /* 1 MODE_STATE_OPEN, 2 MODE_STATE_CLOSE */

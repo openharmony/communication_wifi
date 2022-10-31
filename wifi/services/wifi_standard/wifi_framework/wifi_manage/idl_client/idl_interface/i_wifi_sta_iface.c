@@ -456,7 +456,7 @@ WifiErrorNo GetNetworkList(WifiNetworkInfo *infos, int *size)
 
 static void GetScanInfoElems(Context *context, ScanInfo* scanInfo)
 {
-    const unsigned int MAX_INFO_ELEMS_SIZE = 256;
+    const int MAX_INFO_ELEMS_SIZE = 256;
     ReadInt(context, &scanInfo->ieSize);
     if (scanInfo->ieSize <= 0 || scanInfo->ieSize > MAX_INFO_ELEMS_SIZE) {
         return;

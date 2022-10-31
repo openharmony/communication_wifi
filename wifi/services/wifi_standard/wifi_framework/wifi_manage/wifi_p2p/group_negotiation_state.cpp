@@ -213,6 +213,10 @@ bool GroupNegotiationState::ProcessCmdRemoveGroup(InternalMessage &msg) const
         WIFI_LOGI("The P2P group (%{public}s) is successfully removed.", ifName.c_str());
         p2pStateMachine.ChangeConnectedStatus(P2pConnectedState::P2P_DISCONNECTED);
         p2pStateMachine.BroadcastActionResult(P2pActionCallback::RemoveGroup, WIFI_OPT_SUCCESS);
+        ret = WifiP2PHalInterface::GetInstance().P2pFlush();
+        if (ret != WifiErrorNo::WIFI_IDL_OPT_OK) {
+            WIFI_LOGE("call P2pFlush() failed, ErrCode: %{public}d", static_cast<int>(retCode));
+        }
     }
     p2pStateMachine.SwitchState(&p2pStateMachine.p2pIdleState);
     return EXECUTED;

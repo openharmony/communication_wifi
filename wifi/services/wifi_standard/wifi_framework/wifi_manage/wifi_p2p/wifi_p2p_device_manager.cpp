@@ -145,15 +145,6 @@ bool WifiP2pDeviceManager::UpdateDeviceStatus(const std::string &deviceAddress, 
     return false;
 }
 
-bool WifiP2pDeviceManager::UpdateDeviceStatus(const P2pDeviceStatus status)
-{
-    std::unique_lock<std::mutex> lock(deviceMutex);
-    for (auto it = p2pDevices.begin(); it != p2pDevices.end(); it++) {
-        it->SetP2pDeviceStatus(status);
-    }
-    return true;
-}
-
 bool WifiP2pDeviceManager::UpdateDeviceStatus(const WifiP2pDevice &device)
 {
     if (!device.IsValid()) {
@@ -161,6 +152,15 @@ bool WifiP2pDeviceManager::UpdateDeviceStatus(const WifiP2pDevice &device)
     }
 
     return UpdateDeviceStatus(device.GetDeviceAddress(), device.GetP2pDeviceStatus());
+}
+
+bool WifiP2pDeviceManager::UpdateAllDeviceStatus(const P2pDeviceStatus status)
+{
+    std::unique_lock<std::mutex> lock(deviceMutex);
+    for (auto it = p2pDevices.begin(); it != p2pDevices.end(); it++) {
+        it->SetP2pDeviceStatus(status);
+    }
+    return true;
 }
 
 WifiP2pDevice WifiP2pDeviceManager::GetDevices(const std::string &deviceAddress)

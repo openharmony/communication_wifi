@@ -637,6 +637,7 @@ void P2pStateMachine::HandlerDiscoverPeers()
 
 void P2pStateMachine::ChangeConnectedStatus(P2pConnectedState connectedState)
 {
+    WIFI_LOGI("ChangeConnectedStatus, connectedState: %{public}d", connectedState);
     WifiP2pLinkedInfo p2pInfo;
     WifiSettings::GetInstance().GetP2pInfo(p2pInfo);
     p2pInfo.SetConnectState(connectedState);
@@ -654,6 +655,7 @@ void P2pStateMachine::ChangeConnectedStatus(P2pConnectedState connectedState)
         UpdateOwnDevice(P2pDeviceStatus::PDS_AVAILABLE);
         ClearWifiP2pInfo();
         BroadcastP2pConnectionChanged();
+        deviceManager.UpdateAllDeviceStatus(P2pDeviceStatus::PDS_AVAILABLE);
     }
     return;
 }

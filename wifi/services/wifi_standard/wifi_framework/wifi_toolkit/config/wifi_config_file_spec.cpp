@@ -110,6 +110,15 @@ static int SetWifiDeviceConfigFirst(WifiDeviceConfig &item, const std::string &k
         item.bssid = value;
     } else if (key == "ssid") {
         item.ssid = value;
+    } else if (key == "HexSsid") {
+        std::vector<char> vec;
+        vec.clear();
+        if (HexStringToVec(value, vec) == 0) {
+            std::string strSsid(vec.begin(), vec.end());
+            item.ssid = strSsid;
+        } else {
+            return;
+        }
     } else if (key == "band") {
         item.band = std::stoi(value);
     } else if (key == "channel") {
@@ -264,7 +273,8 @@ static std::string OutPutWifiDeviceConfig(WifiDeviceConfig &item)
     ss << "uid=" << item.uid << std::endl;
     ss << "status=" << item.status << std::endl;
     ss << "bssid=" << item.bssid << std::endl;
-    ss << "ssid=" << item.ssid << std::endl;
+    ss << "ssid=" << ValidateString(item.ssid) << std::endl;
+    ss << "HexSsid=" << ConvertArrayToHex((uint8_t*)&item.ssid[0], item.ssid.length()) << std::endl;
     ss << "band=" << item.band << std::endl;
     ss << "channel=" << item.channel << std::endl;
     ss << "frequency=" << item.frequency << std::endl;
@@ -380,6 +390,15 @@ void SetTClassKeyValue<HotspotConfig>(HotspotConfig &item, const std::string &ke
 {
     if (key == "ssid") {
         item.SetSsid(value);
+    } else if (key == "HexSsid") {
+        std::vector<char> vec;
+        vec.clear();
+        if (HexStringToVec(value, vec) == 0) {
+            std::string strSsid(vec.begin(), vec.end());
+            item.SetSsid(strSsid);
+        } else {
+            return;
+        }
     } else if (key == "preSharedKey") {
         item.SetPreSharedKey(value);
     } else if (key == "securityType") {
@@ -404,7 +423,8 @@ template<>
 std::string OutTClassString<HotspotConfig>(HotspotConfig &item)
 {
     std::ostringstream ss;
-    ss << "ssid=" << item.GetSsid() << std::endl;
+    ss << "ssid=" << ValidateString(item.GetSsid()) << std::endl;
+    ss << "HexSsid=" << ConvertArrayToHex((uint8_t*)&item.GetSsid()[0], item.GetSsid().length()) << std::endl;
     ss << "preSharedKey=" << item.GetPreSharedKey() << std::endl;
     ss << "securityType=" << static_cast<int>(item.GetSecurityType()) << std::endl;
     ss << "band=" << static_cast<int>(item.GetBand()) << std::endl;
@@ -871,6 +891,15 @@ void SetTClassKeyValue<WifiStoreRandomMac>(WifiStoreRandomMac &item, const std::
 {
     if (key == "ssid") {
         item.ssid = value;
+    } else if (key == "HexSsid") {
+        std::vector<char> vec;
+        vec.clear();
+        if (HexStringToVec(value, vec) == 0) {
+            std::string strSsid(vec.begin(), vec.end());
+            item.ssid = strSsid;
+        } else {
+            return;
+        }
     } else if (key == "keyMgmt") {
         item.keyMgmt = value;
     } else if (key == "peerBssid") {
@@ -889,7 +918,8 @@ template <> std::string GetTClassName<WifiStoreRandomMac>()
 template <> std::string OutTClassString<WifiStoreRandomMac>(WifiStoreRandomMac &item)
 {
     std::ostringstream ss;
-    ss << "ssid=" << item.ssid << std::endl;
+    ss << "ssid=" << ValidateString(item.ssid) << std::endl;
+    ss << "HexSsid=" << ConvertArrayToHex((uint8_t*)&item.ssid[0], item.ssid.length()) << std::endl;
     ss << "keyMgmt=" << item.keyMgmt << std::endl;
     ss << "peerBssid=" << item.peerBssid << std::endl;
     ss << "randomMac=" << item.randomMac << std::endl;

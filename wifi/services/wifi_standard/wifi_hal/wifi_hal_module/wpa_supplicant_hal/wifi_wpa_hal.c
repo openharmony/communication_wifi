@@ -58,8 +58,7 @@ static WifiWpaInterface *g_wpaInterface = NULL;
  * Example: P2P-DEVICE-FOUND 00:18:6b:de:a3:6e p2p_dev_addr=00:18:6b:de:a3:6e
  * pri_dev_type=1-0050F204-1 name='Huawei P50 pro' config_methods=0x188
  * dev_capb=0x25 group_capab=0x9
- * wfd_dev_info=0x000000000000
-*/
+ * wfd_dev_info=0x000000000000 */
 static void DealP2pFindInfo(char *buf)
 {
     if (buf == NULL || strlen(buf) < WIFI_MAC_LENGTH) {
@@ -720,7 +719,7 @@ static void *WpaReceiveCallback(void *arg)
             continue;
         }
         LOGD("wpa recv buf: %{public}s!", buf);
-        /* Message format: IFACE=wlan0 <priority>EventType params... */
+        /* Message format: IFNAME=wlan0 <priority>EventType params... */
         char *p = strchr(buf, '>');
         if (p == NULL) {
             p = buf;
@@ -732,7 +731,7 @@ static void *WpaReceiveCallback(void *arg)
         }
         char *iface = strstr(buf, "IFNAME=");
         if (iface == NULL) {
-            /* if 'IFACE=' is not reported */
+            /* if 'IFNAME=' is not reported */
             if (WpaP2pCallBackFunc(p) == 0) {
                 continue;
             }

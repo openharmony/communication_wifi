@@ -486,9 +486,9 @@ static int32_t findSysCap(const std::string& type)
 {
     int32_t sysCap = SYSCAP_WIFI_STA;
     auto iter = g_EventSysCapMap.find(type);
-     if(iter == g_EventSysCapMap.end()) {
-         WIFI_LOGI("findSysCap, type:%{public}s, DO NOT find sysCap.", type.c_str());
-         return sysCap;
+    if (iter == g_EventSysCapMap.end()) {
+        WIFI_LOGI("findSysCap, type:%{public}s, DO NOT find sysCap.", type.c_str());
+        return sysCap;
     }
     sysCap = iter->second;
     return sysCap;

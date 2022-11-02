@@ -126,9 +126,9 @@ if (defined(ohos_lite)) {
     external_deps = [
       "c_utils:utils",
       "hiviewdfx_hilog_native:libhilog",
-      "netmanager_base:net_conn_manager_if",
       "ipc:ipc_core",
-      "samgr:samgr_proxy",
+      "netmanager_base:net_conn_manager_if",
+      "samgr:samgr_proxy"
     ]
 
     part_name = "wifi"

@@ -27,6 +27,10 @@
 #include "wifi_settings.h"
 #include "wifi_sta_hal_interface.h"
 #include "wifi_supplicant_hal_interface.h"
+#ifndef OHOS_ARCH_LITE
+#include "iservice_registry.h"
+#include "system_ability_definition.h"
+#endif // OHOS_ARCH_LITE
 
 #ifndef OHOS_WIFI_STA_TEST
 #include "dhcp_service.h"
@@ -68,7 +72,11 @@ StaStateMachine::StaStateMachine()
       pGetIpState(nullptr),
       pLinkedState(nullptr),
       pApRoamingState(nullptr)
-{}
+{
+#ifndef OHOS_ARCH_LITE
+    SubscribeSystemAbilityChanged();
+#endif // OHOS_ARCH_LITE
+}
 
 StaStateMachine::~StaStateMachine()
 {
@@ -2215,5 +2223,90 @@ void StaStateMachine::SetOperationalMode(int mode)
 {
     SendMessage(WIFI_SVR_CMD_STA_OPERATIONAL_MODE, mode, 0);
 }
-}  // namespace Wifi
-}  // namespace OHOS
+
+#ifndef OHOS_ARCH_LITE
+void StaStateMachine::SubscribeSystemAbilityChanged(void)
+{
+    auto samgrProxy = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    statusChangeListener_ = new (std::nothrow) SystemAbilityStatusChangeListener(*this);
+    if (samgrProxy == nullptr || statusChangeListener_ == nullptr) {
+        LOGE("samgrProxy or statusChangeListener_ is nullptr");
+        return;
+    }
+    int32_t ret = samgrProxy->SubscribeSystemAbility(COMM_NET_CONN_MANAGER_SYS_ABILITY_ID, statusChangeListener_);
+    LOGI("SubscribeSystemAbility COMM_NET_CONN_MANAGER_SYS_ABILITY_ID result:%{public}d", ret);
+}
+
+void StaStateMachine::OnNetManagerRestart(void)
+{
+    LOGI("OnNetManagerRestart()");
+    int state = WifiSettings::GetInstance().GetWifiState();
+    if (state != static_cast<int>(WifiState::ENABLED)) {
+        return;
+    }
+    std::thread thread([cb = staCallback, supplierInfo = NetSupplierInfo, this]() {
+        WifiNetAgent::GetInstance().RegisterNetSupplier();
+        WifiNetAgent::GetInstance().RegisterNetSupplierCallback(cb);
+        ReUpdateNetSupplierInfo(supplierInfo);
+        ReUpdateNetLinkInfo();
+    });
+    thread.detach();
+}
+
+void StaStateMachine::ReUpdateNetSupplierInfo(sptr<NetManagerStandard::NetSupplierInfo> supplierInfo)
+{
+    LOGI("ReUpdateNetSupplierInfo()");
+    WifiLinkedInfo linkedInfo;
+    WifiSettings::GetInstance().GetLinkedInfo(linkedInfo);
+    if ((linkedInfo.detailedState == DetailedState::NOTWORKING) && (linkedInfo.connState == ConnState::CONNECTED)) {
+        if (supplierInfo != nullptr) {
+            TimeStats timeStats("Call UpdateNetSupplierInfo");
+            WifiNetAgent::GetInstance().UpdateNetSupplierInfo(supplierInfo);
+        }
+    }
+}
+
+void StaStateMachine::ReUpdateNetLinkInfo(void)
+{
+    LOGI("ReUpdateNetLinkInfo()");
+    WifiLinkedInfo linkedInfo;
+    WifiSettings::GetInstance().GetLinkedInfo(linkedInfo);
+    if ((linkedInfo.detailedState == DetailedState::NOTWORKING) && (linkedInfo.connState == ConnState::CONNECTED)) {
+        IpInfo wifiIpInfo;
+        WifiSettings::GetInstance().GetIpInfo(wifiIpInfo);
+        std::string ipAddress = IpTools::ConvertIpv4Address(wifiIpInfo.ipAddress);
+        std::string gateway = IpTools::ConvertIpv4Address(wifiIpInfo.gateway);
+        std::string netmask = IpTools::ConvertIpv4Address(wifiIpInfo.netmask);
+        std::string primaryDns = IpTools::ConvertIpv4Address(wifiIpInfo.primaryDns);
+        std::string secondDns = IpTools::ConvertIpv4Address(wifiIpInfo.secondDns);
+        WifiNetAgent::GetInstance().UpdateNetLinkInfo(ipAddress, netmask, gateway, primaryDns, secondDns);
+    }
+}
+
+StaStateMachine::SystemAbilityStatusChangeListener::SystemAbilityStatusChangeListener(StaStateMachine &stateMachine)
+    : stateMachine_(stateMachine){};
+
+void StaStateMachine::SystemAbilityStatusChangeListener::OnAddSystemAbility(int32_t systemAbilityId,
+                                                                            const std::string &deviceId)
+{
+    LOGI("OnAddSystemAbility() systemAbilityId:%{public}d", systemAbilityId);
+    if (systemAbilityId == COMM_NET_CONN_MANAGER_SYS_ABILITY_ID) {
+        if (!hasSARemoved_) {
+            return;
+        }
+        hasSARemoved_ = false;
+        stateMachine_.OnNetManagerRestart();
+    }
+}
+
+void StaStateMachine::SystemAbilityStatusChangeListener::OnRemoveSystemAbility(int32_t systemAbilityId,
+                                                                               const std::string &deviceId)
+{
+    LOGI("OnRemoveSystemAbility() systemAbilityId:%{public}d", systemAbilityId);
+    if (systemAbilityId == COMM_NET_CONN_MANAGER_SYS_ABILITY_ID) {
+        hasSARemoved_ = true;
+    }
+}
+#endif // OHOS_ARCH_LITE
+} // namespace Wifi
+} // namespace OHOS

@@ -19,6 +19,12 @@
 #include <sys/types.h>
 #include <fstream>
 #include <vector>
+
+#ifndef OHOS_ARCH_LITE
+#include "system_ability.h"
+#include "system_ability_status_change_stub.h"
+#endif // OHOS_ARCH_LITE
+
 #include "wifi_internal_msg.h"
 #include "wifi_log.h"
 #include "wifi_errcode.h"
@@ -317,6 +323,7 @@ public:
         * @param ifname - interface name,eg:wlan0
         */
         void OnSerExitNotify(const std::string& ifname) override;
+
     private:
         StaStateMachine *pStaStateMachine;
     };
@@ -380,6 +387,21 @@ public:
      * @return int - operation result
      */
     int GetLinkedInfo(WifiLinkedInfo& linkedInfo);
+
+#ifndef OHOS_ARCH_LITE
+private:
+    class SystemAbilityStatusChangeListener : public OHOS::SystemAbilityStatusChangeStub {
+    public:
+        explicit SystemAbilityStatusChangeListener(StaStateMachine &stateMachine);
+        ~SystemAbilityStatusChangeListener() = default;
+        void OnAddSystemAbility(int32_t systemAbilityId, const std::string &deviceId) override;
+        void OnRemoveSystemAbility(int32_t systemAbilityId, const std::string &deviceId) override;
+
+    private:
+        StaStateMachine &stateMachine_;
+        bool hasSARemoved_ = false;
+    };
+#endif // OHOS_ARCH_LITE
 
 private:
     /**
@@ -658,12 +680,32 @@ private:
      * @param msg - Message body received by the state machine[in]
      */
     void DealNetworkCheck(InternalMessage *msg);
+#ifndef OHOS_ARCH_LITE
+    /**
+     * @Description Subscribe system ability changed.
+     */
+    void SubscribeSystemAbilityChanged(void);
+    /**
+     * @Description On netmanager restart.
+     */
+    void OnNetManagerRestart(void);
+    /**
+     * @Description Reupdate net supplier info
+     */
+    void ReUpdateNetSupplierInfo(sptr<NetManagerStandard::NetSupplierInfo> supplierInfo);
+
+    /**
+     * @Description Reupdate net link inf
+     */
+    void ReUpdateNetLinkInfo(void);
+#endif // OHOS_ARCH_LITE
 
 private:
     StaSmHandleFuncMap staSmHandleFuncMap;
     StaServiceCallback staCallback;
 #ifndef OHOS_ARCH_LITE
     sptr<NetManagerStandard::NetSupplierInfo> NetSupplierInfo;
+    sptr<ISystemAbilityStatusChange> statusChangeListener_;
 #endif
 
     int lastNetworkId;

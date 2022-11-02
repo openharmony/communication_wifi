@@ -100,6 +100,7 @@ if (defined(ohos_lite)) {
     include_dirs += [
       "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
       "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
+      "//foundation/systemability/safwk/interfaces/innerkits/safwk",
       "//commonlibrary/c_utils/base/include",
     ]
 
@@ -125,7 +126,9 @@ if (defined(ohos_lite)) {
     external_deps = [
       "c_utils:utils",
       "hiviewdfx_hilog_native:libhilog",
+      "ipc:ipc_core",
       "netmanager_base:net_conn_manager_if",
+      "samgr:samgr_proxy",
     ]
 
     part_name = "wifi"

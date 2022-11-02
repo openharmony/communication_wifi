@@ -54,6 +54,11 @@
 
 static WifiWpaInterface *g_wpaInterface = NULL;
 
+/* Detailed device string pattern from wpa_supplicant with WFD info
+ * Example: P2P-DEVICE-FOUND 00:18:6b:de:a3:6e p2p_dev_addr=00:18:6b:de:a3:6e
+ * pri_dev_type=1-0050F204-1 name='Huawei P50 pro' config_methods=0x188
+ * dev_capb=0x25 group_capab=0x9
+ * wfd_dev_info=0x000000000000 */
 static void DealP2pFindInfo(char *buf)
 {
     if (buf == NULL || strlen(buf) < WIFI_MAC_LENGTH) {
@@ -88,11 +93,12 @@ static void DealP2pFindInfo(char *buf)
             }
         } else if (strncmp(retMsg.key, "name", strlen("name")) == 0) {
             unsigned len = strlen(retMsg.value);
-            if (len < sizeof(retMsg.value) - 1 && retMsg.value[len - 1] != '\'') { /* special deal: name='xxx xxx' */
+            if (len == 1 || (len < sizeof(retMsg.value) - 1 && retMsg.value[len - 1] != '\'')) {
+                /* special deal: name='xxx xxx' || '   xxx' */
                 s = strtok_r(NULL, "\'", &savedPtr);
                 retMsg.value[len++] = ' ';
                 StrSafeCopy(retMsg.value + len, sizeof(retMsg.value) - len, s);
-            }
+            } /* can not deal with name='  x\'  x'*/
             TrimQuotationMark(retMsg.value, '\'');
             StrSafeCopy(info.deviceName, sizeof(info.deviceName), retMsg.value);
         }
@@ -703,7 +709,7 @@ static void *WpaReceiveCallback(void *arg)
             continue;
         }
         LOGD("wpa recv buf: %{public}s!", buf);
-        /* Message format: IFACE=wlan0 <priority>EventType params... */
+        /* Message format: IFNAME=wlan0 <priority>EventType params... */
         char *p = strchr(buf, '>');
         if (p == NULL) {
             p = buf;
@@ -715,7 +721,7 @@ static void *WpaReceiveCallback(void *arg)
         }
         char *iface = strstr(buf, "IFNAME=");
         if (iface == NULL) {
-            /* if 'IFACE=' is not reported */
+            /* if 'IFNAME=' is not reported */
             if (WpaP2pCallBackFunc(p) == 0) {
                 continue;
             }

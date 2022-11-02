@@ -118,7 +118,9 @@ ohos_unittest("wifi_sta_unittest") {
     "ability_base:want",
     "c_utils:utils",
     "hiviewdfx_hilog_native:libhilog",
+    "ipc:ipc_core",
     "netmanager_base:net_conn_manager_if",
+    "samgr:samgr_proxy",
   ]
   defines += [ "AP_INSTANCE_MAX_NUM=$wifi_feature_with_ap_num" ]
   part_name = "wifi"

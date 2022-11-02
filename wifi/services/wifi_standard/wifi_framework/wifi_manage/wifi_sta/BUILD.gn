@@ -100,6 +100,7 @@ if (defined(ohos_lite)) {
     include_dirs += [
       "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
       "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
+      "//foundation/systemability/safwk/interfaces/innerkits/safwk",
       "//commonlibrary/c_utils/base/include",
     ]
 

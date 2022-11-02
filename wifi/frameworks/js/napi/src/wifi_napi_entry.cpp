@@ -95,7 +95,7 @@ static napi_module wifiJsModule = {
     .nm_filename = NULL,
     .nm_register_func = Init,
 #ifdef ENABLE_NAPI_WIFI_MANAGER
-    .nm_modname = "wifi_manager",
+    .nm_modname = "wifiManager",
 #else
     .nm_modname = "wifi",
 #endif

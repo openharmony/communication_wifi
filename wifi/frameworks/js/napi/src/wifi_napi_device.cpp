@@ -51,7 +51,7 @@ napi_value IsWifiActive(napi_env env, napi_callback_info info)
     ErrCode ret = wifiDevicePtr->IsWifiActive(activeStatus);
     if (ret != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("Get wifi active status fail: %{public}d", ret);
-        WIFI_NAPI_ASSERT(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_STA)
+        WIFI_NAPI_ASSERT(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_STA);
     }
     napi_value result;
     napi_get_boolean(env, activeStatus, &result);

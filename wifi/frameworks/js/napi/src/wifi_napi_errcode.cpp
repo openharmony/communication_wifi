@@ -65,7 +65,7 @@ static napi_value NapiGetUndefined(const napi_env &env)
 static int32_t GetNapiErrCode(const napi_env &env, const int32_t errCodeIn)
 {
     auto iter = errCodeMap.find(errCodeIn);
-    if (iter != errCodeMap.end()) {
+    if (iter == errCodeMap.end()) {
         return WifiNapiErrCode::WIFI_ERRCODE_OPERATION_FAILED;
     }
     return iter->second;

@@ -143,7 +143,7 @@ ohos_shared_library("wifi_native_js") {
   subsystem_name = "communication"
 }
 
-ohos_shared_library("wifiManager") {
+ohos_shared_library("wifimanager") {
   install_enable = true
   include_dirs = [
     "//third_party/node/src",

@@ -51,8 +51,11 @@ napi_value IsWifiActive(napi_env env, napi_callback_info info)
     ErrCode ret = wifiDevicePtr->IsWifiActive(activeStatus);
     if (ret != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("Get wifi active status fail: %{public}d", ret);
+        WIFI_NAPI_ASSERT(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_STA);
     }
-    WIFI_NAPI_RETURN(env, activeStatus, WIFI_OPT_SUCCESS, SYSCAP_WIFI_STA);
+    napi_value result;
+    napi_get_boolean(env, activeStatus, &result);
+    return result;
 }
 
 napi_value Scan(napi_env env, napi_callback_info info)
@@ -674,7 +677,9 @@ napi_value IsConnected(napi_env env, napi_callback_info info)
 {
     TRACE_FUNC_CALL;
     WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
-    WIFI_NAPI_RETURN(env, wifiDevicePtr->IsConnected(), WIFI_OPT_SUCCESS, SYSCAP_WIFI_STA);
+    napi_value result;
+    napi_get_boolean(env, wifiDevicePtr->IsConnected(), &result);
+    return result;
 }
 
 napi_value Disconnect(napi_env env, napi_callback_info info)

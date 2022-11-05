@@ -296,6 +296,7 @@ ErrCode WifiDeviceProxy::Init()
 
 ErrCode WifiDeviceProxy::EnableWifi()
 {
+    WIFI_LOGI("Enter WifiDeviceProxy::EnableWifi, InterfaceToken:%{public}d", GetDescriptor());
     if (remoteDied_ || remote_ == nullptr) {
         WIFI_LOGE("failed to %{public}s, remoteDied_: %{public}d, remote_: %{public}d",
             __func__, remoteDied_, remote_ == nullptr);

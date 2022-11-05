@@ -334,7 +334,7 @@ napi_value ConfigStaticIp(const napi_env& env, const napi_value& object, WifiDev
 
 static void JsObjToDeviceConfig(const napi_env& env, const napi_value& object, WifiDeviceConfig& cppConfig)
 {
-    memset_s(&cppConfig, sizoef(cppConfig), 0, sizoef(cppConfig));
+    memset_s(&cppConfig, sizeof(cppConfig), 0, sizeof(cppConfig));
     JsObjectToString(env, object, "ssid", NAPI_MAX_STR_LENT, cppConfig.ssid); /* ssid max length is 32 + '\0' */
     JsObjectToString(env, object, "bssid", NAPI_MAX_STR_LENT, cppConfig.bssid); /* max bssid length: 18 */
     JsObjectToString(env, object, "preSharedKey", NAPI_MAX_STR_LENT, cppConfig.preSharedKey);

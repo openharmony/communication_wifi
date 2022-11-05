@@ -185,3 +185,40 @@ ohos_shared_library("wifimanager") {
   part_name = "wifi"
   subsystem_name = "communication"
 }
+
+ohos_shared_library("wifimanagerext") {
+  install_enable = true
+  include_dirs = [
+    "//third_party/node/src",
+    "//native_engine",
+    "//commonlibrary/c_utils/base/include",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/log",
+    "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
+    "$WIFI_ROOT_DIR/frameworks/native/include",
+    "$WIFI_ROOT_DIR/frameworks/native/interfaces",
+    "$WIFI_ROOT_DIR/frameworks/js/napi/inc",
+    "${ability_runtime_path}/interfaces/kits/native/appkit/ability_runtime/context",
+  ]
+
+  sources = [
+    "src/wifi_ext_napi_entry.cpp",
+    "src/wifi_ext_napi_hotspot.cpp",
+    "src/wifi_napi_errcode.cpp",
+    "src/wifi_napi_utils.cpp",
+  ]
+  deps = [
+    "$WIFI_ROOT_DIR/frameworks/native:wifi_sdk",
+    "${ability_runtime_path}/frameworks/native/appkit:app_context",
+    "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog",
+    "//foundation/arkui/napi:ace_napi",
+  ]
+  defines = [ "ENABLE_NAPI_WIFI_MANAGER" ]
+  external_deps = [
+    "bundle_framework:appexecfwk_base",
+    "c_utils:utils",
+  ]
+
+  relative_install_dir = "module"
+  part_name = "wifi"
+  subsystem_name = "communication"
+}

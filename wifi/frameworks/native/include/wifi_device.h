@@ -229,14 +229,6 @@ public:
     virtual ErrCode GetSupportedFeatures(long &features) = 0;
 
     /**
-     * @Description Check if supported input feature
-     *
-     * @param feature - input feature
-     * @return bool - true if supported, false if unsupported
-     */
-    virtual bool IsFeatureSupported(long feature) = 0;
-
-    /**
      * @Description Enable device config, when set attemptEnable, disable other device config
      *
      * @param networkId - need enable device config's network id

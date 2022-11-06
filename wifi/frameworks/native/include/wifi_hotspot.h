@@ -36,16 +36,18 @@ public:
     /**
      * @Description Check whether the hotspot is active.
      *
-     * @return bool - operation result
+     * @param isActive - active / inactive
+     * @return ErrCode - operation result
      */
-    virtual bool IsHotspotActive(void) = 0;
+    virtual ErrCode IsHotspotActive(bool &isActive) = 0;
 
     /**
      * @Description Check whether the hotspot supports dual band.
      *
-     * @return bool - operation result
+     * @param isSupported - Supported / NOT Supported
+     * @return ErrCode - operation result
      */
-    virtual bool IsHotspotDualBandSupported(void) = 0;
+    virtual ErrCode IsHotspotDualBandSupported(bool &isSupported) = 0;
 
     /**
      * @Description Get the Hotspot Config object

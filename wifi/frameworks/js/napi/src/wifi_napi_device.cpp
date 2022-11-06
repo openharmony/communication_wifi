@@ -1091,15 +1091,26 @@ napi_value GetSupportedFeatures(napi_env env, napi_callback_info info)
 napi_value IsFeatureSupported(napi_env env, napi_callback_info info)
 {
     TRACE_FUNC_CALL;
+    size_t argc = 1;
+    napi_value argv[1];
+    napi_value thisVar;
+    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, NULL));
+    WIFI_NAPI_ASSERT(env, argc == 1, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_CORE);
+
+    napi_valuetype valueType;
+    napi_typeof(env, argv[0], &valueType);
+    WIFI_NAPI_ASSERT(env, valueType == napi_number, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_CORE);
+    long feature = -1;
+    napi_get_value_int64(env, argv[0], (int64_t*)&feature);
     WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_CORE);
-    long features = -1;
-    ErrCode ret = wifiDevicePtr->GetSupportedFeatures(features);
+    long supportedFeatures = -1;
+    ErrCode ret = wifiDevicePtr->GetSupportedFeatures(supportedFeatures);
     if (ret != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("Get supported features fail: %{public}d", ret);
         WIFI_NAPI_ASSERT(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_CORE);
     }
 
-    bool res = ((tmpFeatures & feature) == feature);
+    bool res = ((supportedFeatures & feature) == feature);
     napi_value result;
     napi_get_boolean(env, res, &result);
     return result;

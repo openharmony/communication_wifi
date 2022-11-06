@@ -274,16 +274,6 @@ ErrCode WifiDeviceImpl::GetSupportedFeatures(long &features)
     return client_->GetSupportedFeatures(features);
 }
 
-bool WifiDeviceImpl::IsFeatureSupported(long feature)
-{
-    RETURN_IF_FAIL(client_);
-    long tmpFeatures = 0;
-    if (client_->GetSupportedFeatures(tmpFeatures) != WIFI_OPT_SUCCESS) {
-        return false;
-    }
-    return ((tmpFeatures & feature) == feature);
-}
-
 ErrCode WifiDeviceImpl::GetDeviceMacAddress(std::string &result)
 {
     RETURN_IF_FAIL(client_);

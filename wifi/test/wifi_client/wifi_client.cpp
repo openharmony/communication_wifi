@@ -616,25 +616,6 @@ static void HandleGetSupportedFeatures(int argc, const char* argv[])
     }
 }
 
-static void HandleIsFeatureSupported(int argc, const char* argv[])
-{
-    Logd("enter command handler:%s", argv[CMD_IDX]);
-    long feature = 0L;
-    for (int i = ARG_IDX; i < argc; i++) {
-        if (strncmp(argv[i], "feature=0x", strlen("feature=0x")) == 0) {
-            (void)sscanf_s(argv[i], "feature=0x%lx", &feature);
-        }
-    }
-    if (feature == 0) {
-        HelpCommand(argv[CMD_IDX]);
-        return;
-    }
-    if (ptrWifiDevice != nullptr) {
-        bool supported = ptrWifiDevice->IsFeatureSupported(feature);
-        Logd("%s feature:0x%lx, supported:%d", __func__, feature, supported);
-    }
-}
-
 static void HandleEnableConfig(int argc, const char* argv[])
 {
     Logd("enter command handler:%s", argv[CMD_IDX]);
@@ -757,7 +738,6 @@ static const struct sta_cli_cmd g_sta_cli_cmds[] = {
     {"get_country", HandleGetCountry, "get_country"},
     {"get_signal_level", HandleGetSignalLevel, "get_signal_level rssi=%d band=2g/5g"},
     {"get_supported_features", HandleGetSupportedFeatures, "get_supported_features"},
-    {"is_feature_supported", HandleIsFeatureSupported, "is_feature_supported feature=0x%x"},
     {"enable_config", HandleEnableConfig, "enable_config nid=%d disableothers=true/false"},
     {"disable_config", HandleDisableConfig, "disable_config nid=%d"},
     {"reconnect", HandleReconnect, "reconnect"},

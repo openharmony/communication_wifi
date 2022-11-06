@@ -38,16 +38,22 @@ WifiErrorCode DisableHotspot()
     return GetCErrorCode(hotspotPtr->DisableHotspot());
 }
 
-ErrCode IsHotspotActive(bool &isActive)
+int IsHotspotActive(void)
 {
     CHECK_PTR_RETURN(hotspotPtr, ERROR_WIFI_NOT_AVAILABLE);
-    return hotspotPtr->IsHotspotActive(isActive);
+    bool isActive = false;
+    int res = 0;
+    ErrCode ret = hotspotPtr->IsHotspotActive(isActive);
+    if (ret == WIFI_OPT_SUCCESS && isActive) {
+        res = 1;
+    }
+    return res;
 }
 
-ErrCode IsHotspotDualBandSupported(bool &isSupported)
+WifiErrorCode IsHotspotDualBandSupported(bool &isSupported)
 {
     CHECK_PTR_RETURN(hotspotPtr, ERROR_WIFI_NOT_AVAILABLE);
-    return hotspotPtr->IsHotspotDualBandSupported(isSupported);
+    return GetCErrorCode(hotspotPtr->IsHotspotDualBandSupported(isSupported));
 }
 
 /* Others type is not support for AP */

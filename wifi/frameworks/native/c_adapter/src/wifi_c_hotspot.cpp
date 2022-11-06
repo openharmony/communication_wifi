@@ -43,8 +43,8 @@ int IsHotspotActive(void)
     CHECK_PTR_RETURN(hotspotPtr, ERROR_WIFI_NOT_AVAILABLE);
     bool isActive = false;
     int res = 0;
-    ErrCode ret = hotspotPtr->IsHotspotActive(isActive);
-    if (ret == WIFI_OPT_SUCCESS && isActive) {
+    OHOS::Wifi::ErrCode ret = hotspotPtr->IsHotspotActive(isActive);
+    if (ret == OHOS::Wifi::WIFI_OPT_SUCCESS && isActive) {
         res = 1;
     }
     return res;

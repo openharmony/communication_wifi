@@ -24,10 +24,14 @@ HWTEST_F(WifiManagerServiceTest, StaOpenResTest, TestSize.Level1)
     StaServiceCallback cbk = WifiManager::GetInstance().GetStaCallback();
     ASSERT_TRUE(cbk.OnStaOpenRes != nullptr);
     cbk.OnStaOpenRes(OperateResState::OPEN_WIFI_FAILED);
+    sleep(1);
     cbk.OnStaOpenRes(OperateResState::OPEN_WIFI_OPENING);
+    sleep(1);
     cbk.OnStaOpenRes(OperateResState::OPEN_WIFI_SUCCEED);
+    sleep(1);
     WifiSettings::GetInstance().SetAirplaneModeState(1);
     cbk.OnStaOpenRes(OperateResState::OPEN_WIFI_SUCCEED);
+    sleep(1);
     cbk.OnStaOpenRes(OperateResState::OPEN_WIFI_DISABLED);
     sleep(2);
 }

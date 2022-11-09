@@ -659,7 +659,7 @@ ErrCode WifiDeviceProxy::IsConnected(bool &isConnected)
     }
     int exception = reply.ReadInt32();
     if (exception) {
-        return false;
+        return WIFI_OPT_FAILED;
     }
     int ret = reply.ReadInt32();
     if (ret != WIFI_OPT_SUCCESS) {

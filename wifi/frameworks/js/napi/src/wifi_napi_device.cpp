@@ -334,7 +334,6 @@ napi_value ConfigStaticIp(const napi_env& env, const napi_value& object, WifiDev
 
 static void JsObjToDeviceConfig(const napi_env& env, const napi_value& object, WifiDeviceConfig& cppConfig)
 {
-    memset_s(&cppConfig, sizeof(cppConfig), 0, sizeof(cppConfig));
     JsObjectToString(env, object, "ssid", NAPI_MAX_STR_LENT, cppConfig.ssid); /* ssid max length is 32 + '\0' */
     JsObjectToString(env, object, "bssid", NAPI_MAX_STR_LENT, cppConfig.bssid); /* max bssid length: 18 */
     JsObjectToString(env, object, "preSharedKey", NAPI_MAX_STR_LENT, cppConfig.preSharedKey);
@@ -678,12 +677,14 @@ napi_value IsConnected(napi_env env, napi_callback_info info)
 {
     TRACE_FUNC_CALL;
     WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
-    WifiLinkedInfo linkedInfo;
-    ErrCode ret = wifiDevicePtr->GetLinkedInfo(linkedInfo);
-    WIFI_NAPI_ASSERT(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_STA);
-    bool res = (linkedInfo.connState == ConnState::CONNECTED) ? true : false;
+    bool isConnected = false;
+    ErrCode ret = wifiDevicePtr->IsConnected(isConnected);
+    if (ret != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("IsConnected return error: %{public}d", ret);
+        WIFI_NAPI_ASSERT(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_STA);
+    }
     napi_value result;
-    napi_get_boolean(env, res, &result);
+    napi_get_boolean(env, isConnected, &result);
     return result;
 }
 

@@ -177,9 +177,10 @@ public:
     /**
      * @Description Check whether Wi-Fi is connected.
      *
-     * @return bool - true: connected, false: not connected
+     * @param bool - true: connected, false: not connected
+     * @return ErrCode - operation result
      */
-    bool IsConnected() override;
+    ErrCode IsConnected(bool &isConnected) override;
 
     /**
      * @Description Reconnect to the currently active network

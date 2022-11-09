@@ -149,7 +149,7 @@ public:
      *
      * @return bool - true: connected, false: not connected
      */
-    virtual bool IsConnected() = 0;
+    virtual ErrCode IsConnected(bool &isConnected) = 0;
 
     /**
      * @Description Disconnect.

@@ -44,10 +44,10 @@ int IsHotspotActive(void)
     bool isActive = false;
     int res = 0;
     OHOS::Wifi::ErrCode ret = hotspotPtr->IsHotspotActive(isActive);
-    if (ret == OHOS::Wifi::WIFI_OPT_SUCCESS && isActive) {
-        res = 1;
+    if (ret != OHOS::Wifi::WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("IsHotspotActive return error: %{public}d!", ret);
     }
-    return res;
+    return (ret == OHOS::Wifi::WIFI_OPT_SUCCESS && isActive) ? 1 : 0;
 }
 
 WifiErrorCode IsHotspotDualBandSupported(bool &isSupported)

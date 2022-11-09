@@ -180,10 +180,10 @@ ErrCode WifiDeviceImpl::ConnectToDevice(const WifiDeviceConfig &config)
     return client_->ConnectToDevice(config);
 }
 
-bool WifiDeviceImpl::IsConnected()
+ErrCode WifiDeviceImpl::IsConnected(bool &isConnected)
 {
     RETURN_IF_FAIL(client_);
-    return client_->IsConnected();
+    return client_->IsConnected(isConnected);
 }
 
 ErrCode WifiDeviceImpl::ReConnect()

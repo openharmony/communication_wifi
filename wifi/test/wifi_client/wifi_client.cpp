@@ -362,8 +362,9 @@ static void HandleGetStatus(int argc, const char* argv[])
     }
     Logd("wifi is enabled");
 #ifndef OHOS_ARCH_LITE
-    bool connected = ptrWifiDevice->IsConnected();
-    if (!connected) {
+    bool connected = false;
+    ret = ptrWifiDevice->IsConnected(connected);
+    if (ret != WIFI_OPT_SUCCESS || !connected) {
         Logd("wifi is disconnected");
         return;
     }

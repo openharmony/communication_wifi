@@ -291,6 +291,10 @@ public:
     std::string privateKey; /* EAP mode client private key */
     Phase2Method phase2Method;
 
+    WifiEapConfig()
+    {
+        phase2Method = Phase2Method::NONE;
+    }
     /**
      * @Description convert Phase2Method to string
      *

@@ -152,9 +152,10 @@ public:
     /**
      * @Description Check whether Wi-Fi is connected.
      *
-     * @return bool - true: connected, false: not connected
+     * @param isConnected - true: connected, false: not connected
+     * @return ErrCode - operation result
      */
-    bool IsConnected() override;
+    ErrCode IsConnected(bool &isConnected) override;
 
     /**
      * @Description Disconnect

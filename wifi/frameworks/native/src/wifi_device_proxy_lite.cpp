@@ -756,7 +756,7 @@ ErrCode WifiDeviceProxy::ConnectToDevice(const WifiDeviceConfig &config)
     return ErrCode(owner.retCode);
 }
 
-bool WifiDeviceProxy::IsConnected()
+ErrCode WifiDeviceProxy::IsConnected(bool &isConnected)
 {
     if (remoteDied_ || remote_ == nullptr) {
         WIFI_LOGE("failed to %{public}s, remoteDied_: %{public}d, remote_: %{public}d",
@@ -764,14 +764,13 @@ bool WifiDeviceProxy::IsConnected()
         return WIFI_OPT_FAILED;
     }
 
-    bool result = false;
     IpcIo req;
     char data[IPC_DATA_SIZE_SMALL];
     struct IpcOwner owner = {.exception = -1, .retCode = 0, .variable = nullptr};
 
     IpcIoInit(&req, data, IPC_DATA_SIZE_SMALL, MAX_IPC_OBJ_COUNT);
     (void)WriteInt32(&req, 0);
-    owner.variable = &result;
+    owner.variable = &isConnected;
     owner.funcId = WIFI_SVR_CMD_IS_WIFI_CONNECTED;
     int error = remote_->Invoke(remote_, WIFI_SVR_CMD_IS_WIFI_CONNECTED, &req, &owner, IpcCallback);
     if (error != EC_SUCCESS) {
@@ -782,7 +781,7 @@ bool WifiDeviceProxy::IsConnected()
     if (owner.exception) {
         return false;
     }
-    return result;
+    return ErrCode(owner.retCode);
 }
 
 ErrCode WifiDeviceProxy::ReConnect()

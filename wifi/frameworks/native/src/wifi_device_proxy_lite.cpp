@@ -767,7 +767,6 @@ ErrCode WifiDeviceProxy::IsConnected(bool &isConnected)
     IpcIo req;
     char data[IPC_DATA_SIZE_SMALL];
     struct IpcOwner owner = {.exception = -1, .retCode = 0, .variable = nullptr};
-
     IpcIoInit(&req, data, IPC_DATA_SIZE_SMALL, MAX_IPC_OBJ_COUNT);
     (void)WriteInt32(&req, 0);
     owner.variable = &isConnected;
@@ -779,7 +778,7 @@ ErrCode WifiDeviceProxy::IsConnected(bool &isConnected)
     }
 
     if (owner.exception) {
-        return false;
+        return WIFI_OPT_FAILED;
     }
     return ErrCode(owner.retCode);
 }

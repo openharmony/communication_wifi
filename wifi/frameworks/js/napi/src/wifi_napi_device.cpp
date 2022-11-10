@@ -677,8 +677,14 @@ napi_value IsConnected(napi_env env, napi_callback_info info)
 {
     TRACE_FUNC_CALL;
     WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
+    bool isConnected = false;
+    ErrCode ret = wifiDevicePtr->IsConnected(isConnected);
+    if (ret != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("IsConnected return error: %{public}d", ret);
+        WIFI_NAPI_ASSERT(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_STA);
+    }
     napi_value result;
-    napi_get_boolean(env, wifiDevicePtr->IsConnected(), &result);
+    napi_get_boolean(env, isConnected, &result);
     return result;
 }
 
@@ -1095,13 +1101,19 @@ napi_value IsFeatureSupported(napi_env env, napi_callback_info info)
     napi_valuetype valueType;
     napi_typeof(env, argv[0], &valueType);
     WIFI_NAPI_ASSERT(env, valueType == napi_number, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_CORE);
-
     long feature = -1;
     napi_get_value_int64(env, argv[0], (int64_t*)&feature);
     WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_CORE);
+    bool isSupported = false;
+    ErrCode ret = wifiDevicePtr->IsFeatureSupported(feature, isSupported);
+    if (ret != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("Get supported features fail: %{public}d", ret);
+        WIFI_NAPI_ASSERT(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_CORE);
+    }
 
-    bool ret = wifiDevicePtr->IsFeatureSupported(feature);
-    WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_CORE);
+    napi_value result;
+    napi_get_boolean(env, isSupported, &result);
+    return result;
 }
 
 napi_value GetDeviceMacAddress(napi_env env, napi_callback_info info)

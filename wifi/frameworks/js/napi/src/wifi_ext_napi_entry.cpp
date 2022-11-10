@@ -39,7 +39,11 @@ static napi_module wifiExtJsModule = {
     .nm_flags = 0,
     .nm_filename = NULL,
     .nm_register_func = Init,
+#ifdef ENABLE_NAPI_WIFI_MANAGER
+    .nm_modname = "wifiManagerExt",
+#else
     .nm_modname = "wifiext",
+#endif
     .nm_priv = ((void *)0),
     .reserved = { 0 }
 };

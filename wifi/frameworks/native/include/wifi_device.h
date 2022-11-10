@@ -229,6 +229,15 @@ public:
     virtual ErrCode GetSupportedFeatures(long &features) = 0;
 
     /**
+     * @Description Check if supported input feature
+     *
+     * @param feature - input feature
+     * @param isSupported - return true if supported, false if unsupported
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode IsFeatureSupported(long feature, bool &isSupported) = 0;
+
+    /**
      * @Description Enable device config, when set attemptEnable, disable other device config
      *
      * @param networkId - need enable device config's network id

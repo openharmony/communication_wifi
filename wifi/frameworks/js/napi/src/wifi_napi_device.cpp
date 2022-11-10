@@ -1104,16 +1104,15 @@ napi_value IsFeatureSupported(napi_env env, napi_callback_info info)
     long feature = -1;
     napi_get_value_int64(env, argv[0], (int64_t*)&feature);
     WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_CORE);
-    long supportedFeatures = -1;
-    ErrCode ret = wifiDevicePtr->GetSupportedFeatures(supportedFeatures);
+    bool isSupported = false;
+    ErrCode ret = wifiDevicePtr->IsFeatureSupported(feature, isSupported);
     if (ret != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("Get supported features fail: %{public}d", ret);
         WIFI_NAPI_ASSERT(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_CORE);
     }
 
-    bool res = ((supportedFeatures & feature) == feature);
     napi_value result;
-    napi_get_boolean(env, res, &result);
+    napi_get_boolean(env, isSupported, &result);
     return result;
 }
 

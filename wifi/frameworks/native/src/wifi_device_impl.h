@@ -235,6 +235,15 @@ public:
     ErrCode GetSupportedFeatures(long &features) override;
 
     /**
+     * @Description Check if supported input feature
+     *
+     * @param feature - input feature
+     * @param isSupported - true / false
+     * @return ErrCode - operation result
+     */
+    ErrCode IsFeatureSupported(long feature, bool &isSupported);
+
+    /**
      * @Description Enable device config, when set attemptEnable, disable other device config
      *
      * @param networkId - need enable device config's network id

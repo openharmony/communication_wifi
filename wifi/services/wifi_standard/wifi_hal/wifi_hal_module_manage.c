@@ -90,7 +90,7 @@ static void *WpaThreadMain(void *p)
     struct StWpaMainParam param = {0};
     SplitCmdString(startCmd, &param);
 #ifdef OHOS_ARCH_LITE
-    void *handleLibWpa = dlopen("libwpa.so", RTLD_NOW | RTLD_LOCAL);
+    void *handleLibWpa = dlopen("libwpa.so", RTLD_NOW | RTLD_LOCAL | RTLD_NODELETE);
 #else
 #ifdef __aarch64__
     void *handleLibWpa = dlopen("/system/lib64/libwpa.z.so", RTLD_NOW | RTLD_LOCAL);

@@ -152,9 +152,10 @@ public:
     /**
      * @Description Check whether Wi-Fi is connected.
      *
-     * @return bool - true: connected, false: not connected
+     * @param isConnected - true: connected, false: not connected
+     * @return ErrCode - operation result
      */
-    bool IsConnected() override;
+    ErrCode IsConnected(bool &isConnected) override;
 
     /**
      * @Description Disconnect
@@ -237,10 +238,10 @@ public:
      * @Description Check if supported input feature
      *
      * @param feature - input feature
-     * @return true - supported
-     * @return false - unsupported
+     * @param isSupported - return true if supported, false if unsupported
+     * @return ErrCode - operation result
      */
-    bool IsFeatureSupported(long feature) override;
+    ErrCode IsFeatureSupported(long feature, bool &isSupported) override;
 
     /**
      * @Description Enable device config, when set attemptEnable, disable other device config

@@ -42,7 +42,7 @@ WifiHotspotProxy::WifiHotspotProxy(const sptr<IRemoteObject> &impl)
 WifiHotspotProxy::~WifiHotspotProxy()
 {}
 
-ErrCode WifiHotspotProxy::IsHotspotActive(bool &bActive)
+ErrCode WifiHotspotProxy::IsHotspotActive(bool &isActive)
 {
     if (mRemoteDied) {
         WIFI_LOGE("failed to `%{public}s`,remote service is died!", __func__);
@@ -69,7 +69,7 @@ ErrCode WifiHotspotProxy::IsHotspotActive(bool &bActive)
     if (ErrCode(ret) != WIFI_OPT_SUCCESS) {
         return ErrCode(ret);
     }
-    bActive = ((reply.ReadInt32() == 1) ? true : false);
+    isActive = ((reply.ReadInt32() == 1) ? true : false);
     return WIFI_OPT_SUCCESS;
 }
 

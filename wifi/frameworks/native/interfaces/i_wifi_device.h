@@ -171,9 +171,10 @@ public:
     /**
      * @Description Check whether Wi-Fi is connected.
      *
+     * @param isConnected - true / false
      * @return bool - true: connected, false: not connected
      */
-    virtual bool IsConnected() = 0;
+    virtual ErrCode IsConnected(bool &isConnected) = 0;
 
     /**
      * @Description Reconnect to the currently active network

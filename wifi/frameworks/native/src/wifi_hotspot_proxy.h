@@ -32,10 +32,10 @@ public:
     /**
      * @Description Check whether the hotspot is active.
      *
-     * @param bActive - active / inactive
+     * @param isActive - active / inactive
      * @return ErrCode - operation result
      */
-    ErrCode IsHotspotActive(bool &bActive) override;
+    ErrCode IsHotspotActive(bool &isActive) override;
 
     /**
      * @Description Check whether the hotspot supports dual band.

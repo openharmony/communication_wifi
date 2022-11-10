@@ -41,13 +41,18 @@ WifiErrorCode DisableHotspot()
 int IsHotspotActive(void)
 {
     CHECK_PTR_RETURN(hotspotPtr, ERROR_WIFI_NOT_AVAILABLE);
-    return hotspotPtr->IsHotspotActive();
+    bool isActive = false;
+    OHOS::Wifi::ErrCode ret = hotspotPtr->IsHotspotActive(isActive);
+    if (ret != OHOS::Wifi::WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("IsHotspotActive return error: %{public}d!", ret);
+    }
+    return (ret == OHOS::Wifi::WIFI_OPT_SUCCESS && isActive) ? 1 : 0;
 }
 
-int IsHotspotDualBandSupported(void)
+WifiErrorCode IsHotspotDualBandSupported(bool &isSupported)
 {
     CHECK_PTR_RETURN(hotspotPtr, ERROR_WIFI_NOT_AVAILABLE);
-    return hotspotPtr->IsHotspotDualBandSupported();
+    return GetCErrorCode(hotspotPtr->IsHotspotDualBandSupported(isSupported));
 }
 
 /* Others type is not support for AP */

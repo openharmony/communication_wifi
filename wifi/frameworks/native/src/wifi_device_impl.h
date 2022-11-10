@@ -241,7 +241,7 @@ public:
      * @param isSupported - true / false
      * @return ErrCode - operation result
      */
-    ErrCode IsFeatureSupported(long feature, bool &isSupported);
+    ErrCode IsFeatureSupported(long feature, bool &isSupported) override;
 
     /**
      * @Description Enable device config, when set attemptEnable, disable other device config

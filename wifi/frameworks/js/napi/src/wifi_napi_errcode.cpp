@@ -46,7 +46,7 @@ static std::map<int32_t, int32_t> errCodeMap = {
 };
 
 static std::map<int32_t, std::string> napiErrMsgMap {
-    { WifiNapiErrCode::WIFI_ERRCODE_OPERATION_FAILED, "System exception." },
+    { WifiNapiErrCode::WIFI_ERRCODE_OPERATION_FAILED, "Operation failed." },
     { WifiNapiErrCode::WIFI_ERRCODE_WIFI_NOT_OPENED, "WIFI doesn't open." },
     { WifiNapiErrCode::WIFI_ERRCODE_PERMISSION_DENIED, "Permission denied." },
     { WifiNapiErrCode::WIFI_ERRCODE_INVALID_PARAM, "Parameter error." },

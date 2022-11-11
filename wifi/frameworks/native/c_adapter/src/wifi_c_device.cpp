@@ -199,6 +199,19 @@ static OHOS::Wifi::ErrCode ConvertDeviceConfigFromCpp(const OHOS::Wifi::WifiDevi
     return OHOS::Wifi::WIFI_OPT_SUCCESS;
 }
 
+static void ConvertScanParamsFromC(const WifiScanParams *params, OHOS::Wifi::WifiScanParams& scanParams)
+{
+    CHECK_PTR_RETURN_VOID(params);
+    scanParams.ssid = params->ssid;
+    if (OHOS::Wifi::IsMacArrayEmpty(params->ssid)) {
+        scanParams.bssid = "";
+    } else {
+        scanParams.bssid = OHOS::Wifi::MacArrayToStr(params.bssid);
+    }
+    scanParams.freqs.push_back(params->freqs);
+    scanParams.band = params->band;
+}
+
 WifiErrorCode AddDeviceConfig(const WifiDeviceConfig *config, int *result)
 {
     CHECK_PTR_RETURN(wifiDevicePtr, ERROR_WIFI_NOT_AVAILABLE);
@@ -326,14 +339,41 @@ WifiErrorCode GetDeviceMacAddress(unsigned char *result)
 
 WifiErrorCode AdvanceScan(WifiScanParams *params)
 {
+    CHECK_PTR_RETURN(wifiScanPtr, ERROR_WIFI_NOT_AVAILABLE);
     CHECK_PTR_RETURN(params, ERROR_WIFI_INVALID_ARGS);
-    return GetCErrorCode(OHOS::Wifi::WIFI_OPT_NOT_SUPPORTED);
+    OHOS::Wifi::WifiScanParams scanParams;
+    ConvertScanparamsFromC(params, scanParams);
+    OHOS::Wifi::ErrCode ret = wifiScanPtr->AdvanceScan(scanParams);
+    return GetCErrorCode(ret);
+}
+
+static OHOS::Wifi::ErrCode GetIpInfoFromCpp(const OHOS::Wifi::IpInfo& ipInfo, IpInfo *info)
+{
+    CHECK_PTR_RETURN(info, OHOS::Wifi::WIFI_OPT_INVALID_PARAM);
+    info->netGate = ipInfo.gateway;
+    info->ipAddress = ipInfo.ipAddress;
+    info->netMask = ipInfo.netmask;
+    info->dns1 = ipInfo.primaryDns;
+    info->dns2 = ipInfo.secondDns;
+    info->serverAddress = ipInfo.serverIp;
+    info->leaseDuration = ipInfo.leaseDuration;
+    return OHOS::Wifi::WIFI_OPT_SUCCESS;
 }
 
 WifiErrorCode GetIpInfo(IpInfo *info)
 {
+    CHECK_PTR_RETURN(wifiDevicePtr, ERROR_WIFI_NOT_AVAILABLE);
     CHECK_PTR_RETURN(info, ERROR_WIFI_INVALID_ARGS);
-    return GetCErrorCode(OHOS::Wifi::WIFI_OPT_NOT_SUPPORTED);
+    OHOS::Wifi::IpInfo ipInfo;
+    OHOS::Wifi::ErrCode ret = wifiDevicePtr->GetIpInfo(ipInfo);
+    if (ret == OHOS::Wifi::WIFI_OPT_SUCCESS) {
+        OHOS::Wifi::ErrCode retValue = GetIpInfoFromCpp(ipInfo, info);
+        if (retValue != OHOS::Wifi::WIFI_OPT_SUCCESS) {
+            WIFI_LOGE("Get ip info from cpp error!");
+            ret = retValue;
+        }
+    }
+    return GetCErrorCode(ret);
 }
 
 int GetSignalLevel(int rssi, int band)

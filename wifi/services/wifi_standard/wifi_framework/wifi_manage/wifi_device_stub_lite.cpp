@@ -316,9 +316,13 @@ void WifiDeviceStub::OnConnect2To(uint32_t code, IpcIo *req, IpcIo *reply)
 void WifiDeviceStub::OnIsWifiConnected(uint32_t code, IpcIo *req, IpcIo *reply)
 {
     WIFI_LOGD("run %{public}s code %{public}u", __func__, code);
+    bool isConnected = false;
+    ErrCode ret = IsConnected(isConnected);
     (void)WriteInt32(reply, 0);
-    (void)WriteInt32(reply, WIFI_OPT_SUCCESS);
-    (void)WriteBool(reply, IsConnected());
+    (void)WriteInt32(reply, ret);
+    if (ret == WIFI_OPT_SUCCESS) {
+        (void)WriteBool(reply, isConnected);
+    }
 }
 
 void WifiDeviceStub::OnReConnect(uint32_t code, IpcIo *req, IpcIo *reply)

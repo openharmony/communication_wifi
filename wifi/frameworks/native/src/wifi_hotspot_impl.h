@@ -44,16 +44,18 @@ public:
     /**
      * @Description Check whether the hotspot is active.
      *
-     * @return bool - operation result
+     * @param isActive - the flag of whether hotspot is active.
+     * @return ErrCode - operation result
      */
-    bool IsHotspotActive(void) override;
+    ErrCode IsHotspotActive(bool &isActive) override;
 
     /**
      * @Description Check whether the hotspot supports dual band.
      *
-     * @return bool - operation result
+     * @param isSupported - the flag of whether dual band is supported.
+     * @return ErrCode - operation result
      */
-    bool IsHotspotDualBandSupported(void) override;
+    ErrCode IsHotspotDualBandSupported(bool &isSupported) override;
 
     /**
      * @Description Get the Hotspot Config object

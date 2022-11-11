@@ -78,23 +78,16 @@ bool WifiHotspotImpl::Init(int id)
     return true;
 }
 
-bool WifiHotspotImpl::IsHotspotActive(void)
-{
-    if (!(client_)) {
-        WIFI_LOGI("get client failed.");
-        return false;
-    }
-    bool bActive = false;
-    client_->IsHotspotActive(bActive);
-    return bActive;
-}
-
-bool WifiHotspotImpl::IsHotspotDualBandSupported(void)
+ErrCode WifiHotspotImpl::IsHotspotActive(bool &isActive)
 {
     RETURN_IF_FAIL(client_);
-    bool isSupported = false;
-    client_->IsHotspotDualBandSupported(isSupported);
-    return isSupported;
+    return client_->IsHotspotActive(isActive);
+}
+
+ErrCode WifiHotspotImpl::IsHotspotDualBandSupported(bool &isSupported)
+{
+    RETURN_IF_FAIL(client_);
+    return client_->IsHotspotDualBandSupported(isSupported);
 }
 
 ErrCode WifiHotspotImpl::GetHotspotState(int &state)

@@ -32,7 +32,7 @@ public:
      * @param None
      * @return None
      */
-    ApService(ApStateMachine &apStateMachine, int id = 0);
+    explicit ApService(ApStateMachine &apStateMachine, int id = 0);
 
     /**
      * @Description  destructor method.
@@ -107,7 +107,7 @@ public:
      * @param validchannel - band's valid channel
      * @return ErrCode - success: WIFI_OPT_SUCCESS    failed: ERROR_CODE
      */
-    ErrCode GetValidChannels(BandType band, std::vector<int32_t> &validchannel);
+    ErrCode GetValidChannels(BandType band, std::vector<int32_t> &validChannel);
 
     /**
      * @Description Sets the callback function for the state machine.

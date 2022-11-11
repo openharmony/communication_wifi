@@ -20,6 +20,7 @@
 #include "wifi_ap_hal_interface.h"
 #include "ap_state_machine.h"
 #include "wifi_logger.h"
+#include "wifi_common_util.h"
 
 DEFINE_WIFILOG_HOTSPOT_LABEL("WifiApStationsManager");
 
@@ -78,7 +79,8 @@ bool ApStationsManager::EnableAllBlockList() const
     bool ret = true;
     for (std::vector<StationInfo>::iterator iter = results.begin(); iter != results.end(); iter++) {
         if (WifiApHalInterface::GetInstance().AddBlockByMac(iter->bssid, m_id) != WifiErrorNo::WIFI_IDL_OPT_OK) {
-            WIFI_LOGE("Instance is %{public}d failed to add block bssid is:%{private}s.", m_id, iter->bssid.c_str());
+            WIFI_LOGE("Instance is %{public}d failed to add block bssid is:%{public}s.", m_id,
+                MacAnonymize(iter->bssid).c_str());
             ret = false;
         }
     }
@@ -146,10 +148,10 @@ bool ApStationsManager::DisConnectStation(const StationInfo &staInfo) const
     std::string mac = staInfo.bssid;
     int ret = static_cast<int>(WifiApHalInterface::GetInstance().DisconnectStaByMac(mac, m_id));
     if (ret != WifiErrorNo::WIFI_IDL_OPT_OK) {
-        WIFI_LOGE("Instance is %{public}d failed to DisConnectStation staInfo bssid:%{private}s,address:%{private}s, name:%{private}s.",
+        WIFI_LOGE("Instance is %{public}d failed to DisConnectStation staInfo bssid:%{public}s,address:%{public}s, name:%{private}s.",
             m_id,
-            staInfo.bssid.c_str(),
-            staInfo.ipAddr.c_str(),
+            MacAnonymize(staInfo.bssid).c_str(),
+            IpAnonymize(staInfo.ipAddr).c_str(),
             staInfo.deviceName.c_str());
         return false;
     }

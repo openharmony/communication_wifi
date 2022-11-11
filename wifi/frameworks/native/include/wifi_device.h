@@ -149,7 +149,7 @@ public:
      *
      * @return bool - true: connected, false: not connected
      */
-    virtual bool IsConnected() = 0;
+    virtual ErrCode IsConnected(bool &isConnected) = 0;
 
     /**
      * @Description Disconnect.
@@ -232,9 +232,10 @@ public:
      * @Description Check if supported input feature
      *
      * @param feature - input feature
-     * @return bool - true if supported, false if unsupported
+     * @param isSupported - return true if supported, false if unsupported
+     * @return ErrCode - operation result
      */
-    virtual bool IsFeatureSupported(long feature) = 0;
+    virtual ErrCode IsFeatureSupported(long feature, bool &isSupported) = 0;
 
     /**
      * @Description Enable device config, when set attemptEnable, disable other device config

@@ -18,6 +18,7 @@
 #include "wifi_logger.h"
 #include "wifi_supplicant_hal_interface.h"
 #include "wifi_sta_hal_interface.h"
+#include "wifi_common_util.h"
 
 DEFINE_WIFILOG_LABEL("StaMonitor");
 
@@ -76,10 +77,10 @@ void StaMonitor::SetStateMachine(StaStateMachine *paraStaStateMachine)
 
 void StaMonitor::OnConnectChangedCallBack(int status, int networkId, const std::string &bssid)
 {
-    WIFI_LOGI("OnConnectChangedCallBack() status:%{public}d,networkId=%{public}d,bssid=%{private}s",
+    WIFI_LOGI("OnConnectChangedCallBack() status:%{public}d,networkId=%{public}d,bssid=%{public}s",
         status,
         networkId,
-        bssid.c_str());
+        MacAnonymize(bssid).c_str());
     if (pStaStateMachine == nullptr) {
         WIFI_LOGE("The statemachine pointer is null.");
         return;
@@ -110,9 +111,9 @@ void StaMonitor::OnConnectChangedCallBack(int status, int networkId, const std::
 
 void StaMonitor::OnBssidChangedCallBack(const std::string &reason, const std::string &bssid)
 {
-    WIFI_LOGI("OnBssidChangedCallBack() reason:%{public}s,bssid=%{private}s",
+    WIFI_LOGI("OnBssidChangedCallBack() reason:%{public}s,bssid=%{public}s",
         reason.c_str(),
-        bssid.c_str());
+        MacAnonymize(bssid).c_str());
     if (pStaStateMachine == nullptr) {
         WIFI_LOGE("The statemachine pointer is null.");
         return;

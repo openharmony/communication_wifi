@@ -93,9 +93,9 @@ static void *WpaThreadMain(void *p)
     void *handleLibWpa = dlopen("libwpa.so", RTLD_NOW | RTLD_LOCAL);
 #else
 #ifdef __aarch64__
-    void *handleLibWpa = dlopen("/system/lib64/libwpa.z.so", RTLD_NOW | RTLD_LOCAL);
+    void *handleLibWpa = dlopen("/system/lib64/libwpa.z.so", RTLD_NOW | RTLD_LOCAL | RTLD_NODELETE);
 #else
-    void *handleLibWpa = dlopen("/system/lib/libwpa.z.so", RTLD_NOW | RTLD_LOCAL);
+    void *handleLibWpa = dlopen("/system/lib/libwpa.z.so", RTLD_NOW | RTLD_LOCAL | RTLD_NODELETE);
 #endif
 #endif
     if (handleLibWpa == NULL) {

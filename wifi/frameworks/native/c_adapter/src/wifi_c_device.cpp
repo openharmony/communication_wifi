@@ -203,10 +203,10 @@ static void ConvertScanParamsFromC(const WifiScanParams *params, OHOS::Wifi::Wif
 {
     CHECK_PTR_RETURN_VOID(params);
     scanParams.ssid = params->ssid;
-    if (OHOS::Wifi::IsMacArrayEmpty(params->ssid)) {
+    if (OHOS::Wifi::IsMacArrayEmpty(params->bssid)) {
         scanParams.bssid = "";
     } else {
-        scanParams.bssid = OHOS::Wifi::MacArrayToStr(params.bssid);
+        scanParams.bssid = OHOS::Wifi::MacArrayToStr(params->bssid);
     }
     scanParams.freqs.push_back(params->freqs);
     scanParams.band = params->band;
@@ -342,7 +342,7 @@ WifiErrorCode AdvanceScan(WifiScanParams *params)
     CHECK_PTR_RETURN(wifiScanPtr, ERROR_WIFI_NOT_AVAILABLE);
     CHECK_PTR_RETURN(params, ERROR_WIFI_INVALID_ARGS);
     OHOS::Wifi::WifiScanParams scanParams;
-    ConvertScanparamsFromC(params, scanParams);
+    ConvertScanParamsFromC(params, scanParams);
     OHOS::Wifi::ErrCode ret = wifiScanPtr->AdvanceScan(scanParams);
     return GetCErrorCode(ret);
 }

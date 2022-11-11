@@ -53,6 +53,14 @@ public:
      */
     virtual ErrCode GetScanInfoList(std::vector<WifiScanInfo> &result) = 0;
 
+    /**
+     * @Description Start scan with specified params
+     *
+     * @param params - WifiScanParams object
+     * @return ErrCode - operation result
+     */
+     virtual ErrCode AdvanceScan(const WifiScanParams &params) = 0;
+
 #ifdef OHOS_ARCH_LITE
     virtual ErrCode RegisterCallBack(const std::shared_ptr<IWifiScanCallback> &callback) = 0;
 #else

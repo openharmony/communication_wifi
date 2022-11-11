@@ -59,7 +59,7 @@ public:
      * @param params - WifiScanParams object
      * @return ErrCode - operation result
      */
-     virtual ErrCode AdvanceScan(const WifiScanParams &params) = 0;
+    virtual ErrCode AdvanceScan(const WifiScanParams &params) = 0;
 
 #ifdef OHOS_ARCH_LITE
     virtual ErrCode RegisterCallBack(const std::shared_ptr<IWifiScanCallback> &callback) = 0;

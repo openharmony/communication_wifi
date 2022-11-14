@@ -56,15 +56,23 @@ napi_value DisableHotspot(napi_env env, napi_callback_info info)
 napi_value IsHotspotActive(napi_env env, napi_callback_info info)
 {
     WIFI_NAPI_ASSERT(env, wifiHotspotPtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_AP_CORE);
-    bool ret = wifiHotspotPtr->IsHotspotActive();
-    WIFI_NAPI_RETURN(env, ret == true, WIFI_OPT_FAILED, SYSCAP_WIFI_AP_CORE);
+    bool isActive = false;
+    ErrCode ret = wifiHotspotPtr->IsHotspotActive(isActive);
+    WIFI_NAPI_ASSERT(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_AP_CORE);
+    napi_value result;
+    napi_get_boolean(env, isActive, &result);
+    return result;
 }
 
 napi_value IsHotspotDualBandSupported(napi_env env, napi_callback_info info)
 {
     WIFI_NAPI_ASSERT(env, wifiHotspotPtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_AP_CORE);
-    bool ret = wifiHotspotPtr->IsHotspotDualBandSupported();
-    WIFI_NAPI_RETURN(env, ret == true, WIFI_OPT_FAILED, SYSCAP_WIFI_AP_CORE);
+    bool isSupported = false;
+    ErrCode ret = wifiHotspotPtr->IsHotspotDualBandSupported(isSupported);
+    WIFI_NAPI_ASSERT(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_AP_CORE);
+    napi_value result;
+    napi_get_boolean(env, isSupported, &result);
+    return result;
 }
 
 static KeyMgmt GetKeyMgmtFromJsSecurityType(int secType)

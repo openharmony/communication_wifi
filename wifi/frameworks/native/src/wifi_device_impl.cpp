@@ -180,10 +180,10 @@ ErrCode WifiDeviceImpl::ConnectToDevice(const WifiDeviceConfig &config)
     return client_->ConnectToDevice(config);
 }
 
-bool WifiDeviceImpl::IsConnected()
+ErrCode WifiDeviceImpl::IsConnected(bool &isConnected)
 {
     RETURN_IF_FAIL(client_);
-    return client_->IsConnected();
+    return client_->IsConnected(isConnected);
 }
 
 ErrCode WifiDeviceImpl::ReConnect()
@@ -274,14 +274,17 @@ ErrCode WifiDeviceImpl::GetSupportedFeatures(long &features)
     return client_->GetSupportedFeatures(features);
 }
 
-bool WifiDeviceImpl::IsFeatureSupported(long feature)
+ErrCode WifiDeviceImpl::IsFeatureSupported(long feature, bool &isSupported)
 {
     RETURN_IF_FAIL(client_);
     long tmpFeatures = 0;
-    if (client_->GetSupportedFeatures(tmpFeatures) != WIFI_OPT_SUCCESS) {
-        return false;
+    isSupported = false;
+    ErrCode ret = client_->GetSupportedFeatures(tmpFeatures);
+    if (ret != WIFI_OPT_SUCCESS) {
+        return ret;
     }
-    return ((tmpFeatures & feature) == feature);
+    isSupported = ((tmpFeatures & feature) == feature);
+    return WIFI_OPT_SUCCESS;
 }
 
 ErrCode WifiDeviceImpl::GetDeviceMacAddress(std::string &result)

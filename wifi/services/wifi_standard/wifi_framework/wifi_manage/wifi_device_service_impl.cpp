@@ -797,7 +797,7 @@ ErrCode WifiDeviceServiceImpl::ConnectToDevice(const WifiDeviceConfig &config)
     return pService->ConnectToDevice(config);
 }
 
-bool WifiDeviceServiceImpl::IsConnected()
+ErrCode WifiDeviceServiceImpl::IsConnected(bool &isConnected)
 {
     WifiLinkedInfo linkedInfo;
 
@@ -807,7 +807,8 @@ bool WifiDeviceServiceImpl::IsConnected()
     }
 
     WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
-    return linkedInfo.connState == ConnState::CONNECTED;
+    isConnected = (linkedInfo.connState == ConnState::CONNECTED);
+    return WIFI_OPT_SUCCESS;
 }
 
 ErrCode WifiDeviceServiceImpl::ReConnect()

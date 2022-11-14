@@ -388,8 +388,13 @@ void WifiDeviceStub::OnConnect2To(uint32_t code, MessageParcel &data, MessagePar
 void WifiDeviceStub::OnIsWifiConnected(uint32_t code, MessageParcel &data, MessageParcel &reply)
 {
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+    bool isConnected = false;
+    ErrCode ret = IsConnected(isConnected);
     reply.WriteInt32(0);
-    reply.WriteBool(IsConnected());
+    reply.WriteInt32(ret);
+    if (ret == WIFI_OPT_SUCCESS) {
+        reply.WriteBool(isConnected);
+    }
     return;
 }
 

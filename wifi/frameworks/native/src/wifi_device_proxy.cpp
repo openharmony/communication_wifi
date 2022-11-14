@@ -639,7 +639,7 @@ ErrCode WifiDeviceProxy::ConnectToDevice(const WifiDeviceConfig &config)
     return ErrCode(reply.ReadInt32());
 }
 
-bool WifiDeviceProxy::IsConnected()
+ErrCode WifiDeviceProxy::IsConnected(bool &isConnected)
 {
     if (mRemoteDied) {
         WIFI_LOGE("failed to `%{public}s`,remote service is died!", __func__);
@@ -659,9 +659,14 @@ bool WifiDeviceProxy::IsConnected()
     }
     int exception = reply.ReadInt32();
     if (exception) {
-        return false;
+        return WIFI_OPT_FAILED;
     }
-    return reply.ReadBool();
+    int ret = reply.ReadInt32();
+    if (ret != WIFI_OPT_SUCCESS) {
+        return ErrCode(ret);
+    }
+    isConnected = reply.ReadBool();
+    return WIFI_OPT_SUCCESS;
 }
 
 ErrCode WifiDeviceProxy::ReConnect()

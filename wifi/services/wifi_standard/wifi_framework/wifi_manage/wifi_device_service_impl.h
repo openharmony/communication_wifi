@@ -115,7 +115,7 @@ public:
 
     ErrCode ConnectToDevice(const WifiDeviceConfig &config) override;
 
-    bool IsConnected() override;
+    ErrCode IsConnected(bool &isConnected) override;
 
     ErrCode ReConnect() override;
 

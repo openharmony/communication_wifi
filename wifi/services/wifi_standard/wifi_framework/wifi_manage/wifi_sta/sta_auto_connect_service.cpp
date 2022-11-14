@@ -16,6 +16,7 @@
 #include "wifi_logger.h"
 #include "wifi_sta_hal_interface.h"
 #include "wifi_settings.h"
+#include "wifi_common_util.h"
 
 DEFINE_WIFILOG_LABEL("StaAutoConnectService");
 
@@ -84,10 +85,13 @@ void StaAutoConnectService::OnScanInfosReadyHandler(const std::vector<InterScanI
 
     WifiDeviceConfig electedDevice;
     if (AutoSelectDevice(electedDevice, scanInfos, blockedBssids, info) == WIFI_OPT_SUCCESS) {
-        WIFI_LOGI("AutoSelectDevice succeed.\n");
+        WIFI_LOGI("AutoSelectDevice succeed: "
+            "[networkId:%{public}d, ssid:%{public}s, bssid:%{public}s, psk len:%{public}d].",
+            electedDevice.networkId, SsidAnonymize(electedDevice.ssid).c_str(),
+            MacAnonymize(electedDevice.bssid).c_str(), (int)electedDevice.preSharedKey.length());
         ConnectElectedDevice(electedDevice);
     } else {
-        WIFI_LOGI("Exit network selection.\n");
+        WIFI_LOGI("AutoSelectDevice return fail.");
         return;
     }
 }
@@ -148,11 +152,11 @@ bool StaAutoConnectService::AddOrDelBlockedBssids(std::string bssid, bool enable
 
 void StaAutoConnectService::GetBlockedBssids(std::vector<std::string> &blockedBssids)
 {
-    WIFI_LOGI("Enter StaAutoConnectService::GetBlockedBssids.\n");
-
     for (auto iter = blockedBssidMap.begin(); iter != blockedBssidMap.end(); ++iter) {
         blockedBssids.push_back(iter->first);
     }
+    WIFI_LOGI("StaAutoConnectService::GetBlockedBssids, blockedBssids count: %{public}d.",
+        (int)blockedBssids.size());
     return;
 }
 
@@ -195,7 +199,7 @@ void StaAutoConnectService::ConnectElectedDevice(WifiDeviceConfig &electedDevice
 {
     WIFI_LOGI("Enter StaAutoConnectService::ConnectElectedDevice.\n");
     if (electedDevice.bssid.empty()) {
-        WIFI_LOGE("electedDevice is null.\n");
+        WIFI_LOGE("electedDevice bssid is empty.");
         return;
     }
 
@@ -317,7 +321,7 @@ ErrCode StaAutoConnectService::AutoSelectDevice(WifiDeviceConfig &electedDevice,
 {
     WIFI_LOGI("Enter StaAutoConnectService::SelectNetwork.\n");
     if (scanInfos.empty()) {
-        WIFI_LOGE("No scanInfo.\n");
+        WIFI_LOGE("scanInfo is empty.");
         return WIFI_OPT_FAILED;
     }
 
@@ -395,9 +399,10 @@ bool StaAutoConnectService::RoamingEncryptionModeCheck(
             mgmt = "NONE";
         }
         if (mgmt == network.keyMgmt) {
-            WIFI_LOGI("The Current network bssid %s signal strength is %{public}d", info.bssid.c_str(), info.rssi);
-            WIFI_LOGI(
-                "The Roaming network bssid %s signal strength is %{public}d", scanInfo.bssid.c_str(), scanInfo.rssi);
+            WIFI_LOGI("The Current network bssid %{public}s signal strength is %{public}d",
+                MacAnonymize(info.bssid).c_str(), info.rssi);
+            WIFI_LOGI("The Roaming network bssid %{public}s signal strength is %{public}d",
+                MacAnonymize(scanInfo.bssid).c_str(), scanInfo.rssi);
             int rssi = scanInfo.rssi - info.rssi;
             if (rssi > MIN_ROAM_RSSI_DIFF) {
                 WIFI_LOGI("Roming network rssi - Current network rssi > 6.");
@@ -573,7 +578,7 @@ void StaAutoConnectService::GetAvailableScanInfos(std::vector<InterScanInfo> &av
 
         auto itr = find(blockedBssids.begin(), blockedBssids.end(), scanInfo.bssid);
         if (itr != blockedBssids.end()) { /* Skip Blocklist Network */
-            WIFI_LOGI("Skip blocklistedBssid network, ssid: %{public}s.\n", scanInfo.ssid.c_str());
+            WIFI_LOGI("Skip blocklistedBssid network, ssid: %{public}s.\n", SsidAnonymize(scanInfo.ssid).c_str());
             continue;
         }
 
@@ -581,13 +586,13 @@ void StaAutoConnectService::GetAvailableScanInfos(std::vector<InterScanInfo> &av
         if (scanInfo.frequency < MIN_5GHZ_BAND_FREQUENCY) {
             if (scanInfo.rssi <= MIN_RSSI_VALUE_24G) {
                 WIFI_LOGI("Skip network %{public}s with low 2.4G signals %{public}d.\n",
-                    scanInfo.ssid.c_str(), scanInfo.rssi);
+                    SsidAnonymize(scanInfo.ssid).c_str(), scanInfo.rssi);
                 continue;
             }
         } else {
             if (scanInfo.rssi <= MIN_RSSI_VALUE_5G) {
                 WIFI_LOGI("Skip network %{public}s with low 5G signals %{public}d.\n",
-                    scanInfo.ssid.c_str(), scanInfo.rssi);
+                    SsidAnonymize(scanInfo.ssid).c_str(), scanInfo.rssi);
                 continue;
             }
         }

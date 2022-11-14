@@ -51,6 +51,7 @@
 #define REPLY_BUF_LENGTH 4096
 #define CONNECTION_FULL_STATUS 17
 #define CONNECTION_REJECT_STATUS 37
+#define SSID_EMPTY_LENGTH 1
 
 static WifiWpaInterface *g_wpaInterface = NULL;
 
@@ -93,7 +94,7 @@ static void DealP2pFindInfo(char *buf)
             }
         } else if (strncmp(retMsg.key, "name", strlen("name")) == 0) {
             unsigned len = strlen(retMsg.value);
-            if (len == 1 || (len < sizeof(retMsg.value) - 1 && retMsg.value[len - 1] != '\'')) {
+            if (len == SSID_EMPTY_LENGTH || (len < sizeof(retMsg.value) - 1 && retMsg.value[len - 1] != '\'')) {
                 /* special deal: name='xxx xxx' || '   xxx' */
                 s = strtok_r(NULL, "\'", &savedPtr);
                 retMsg.value[len++] = ' ';
@@ -158,7 +159,7 @@ static void DealGroupStartInfo(char *buf)
         } else if (strncmp(retMsg.key, "ssid", strlen("ssid")) == 0 ||
                    strncmp(retMsg.key, "passphrase", strlen("passphrase")) == 0) {
             unsigned len = strlen(retMsg.value);
-            if (len == 1 || (len < sizeof(retMsg.value) - 1 && retMsg.value[len - 1] != '\'')) {
+            if (len == SSID_EMPTY_LENGTH || (len < sizeof(retMsg.value) - 1 && retMsg.value[len - 1] != '\"')) {
                 token = strtok_r(NULL, "\"", &savedPtr);
                 retMsg.value[len++] = ' ';
                 StrSafeCopy(retMsg.value + len, sizeof(retMsg.value) - len, token);

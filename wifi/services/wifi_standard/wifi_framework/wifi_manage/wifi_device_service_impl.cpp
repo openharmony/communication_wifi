@@ -15,6 +15,7 @@
 
 #include "wifi_device_service_impl.h"
 #include <algorithm>
+#include <chrono>
 #include <csignal>
 #include <unistd.h>
 #ifndef OHOS_ARCH_LITE
@@ -37,7 +38,9 @@
 #include "wifi_dumper.h"
 #include "wifi_common_util.h"
 #include "wifi_protect_manager.h"
-
+#ifndef OHOS_ARCH_LITE
+#include "xcollie/watchdog.h"
+#endif
 DEFINE_WIFILOG_LABEL("WifiDeviceServiceImpl");
 namespace OHOS {
 namespace Wifi {
@@ -49,6 +52,9 @@ std::shared_ptr<WifiDeviceServiceImpl> WifiDeviceServiceImpl::GetInstance()
 const uint32_t TIMEOUT_APP_EVENT = 3000;
 const uint32_t TIMEOUT_SCREEN_EVENT = 3000;
 const uint32_t TIMEOUT_THERMAL_EVENT = 3000;
+constexpr int32_t WATCHDOG_INTERVAL_MS = 10000;
+constexpr int32_t WATCHDOG_DELAY_MS = 15000;
+
 using TimeOutCallback = std::function<void()>;
 sptr<WifiDeviceServiceImpl> WifiDeviceServiceImpl::g_instance;
 const bool REGISTER_RESULT = SystemAbility::MakeAndRegisterAbility(WifiDeviceServiceImpl::GetInstance().GetRefPtr());
@@ -151,8 +157,28 @@ void WifiDeviceServiceImpl::OnStart()
         lpThermalTimer_->Setup();
         lpThermalTimer_->Register(timeoutCallback, TIMEOUT_THERMAL_EVENT, true);
     }
+
+    StartWatchdog();
 #endif
 }
+
+#ifndef OHOS_ARCH_LITE
+void WifiDeviceServiceImpl::StartWatchdog(void)
+{
+    auto taskFunc = [this]() {
+        uint64_t now = std::chrono::duration_cast<std::chrono::milliseconds>(
+        std::chrono::steady_clock::now().time_since_epoch()).count();
+        uint64_t interval = now - WifiSettings::GetInstance().GetThreadStartTime();
+        if ((WifiSettings::GetInstance().GetThreadStatusFlag()) && (interval > WATCHDOG_INTERVAL_MS)) {
+            WIFI_LOGE("watchdog happened, thread need restart");
+        } else {
+            WIFI_LOGI("thread work normally");
+        }
+    };
+    HiviewDFX::Watchdog::GetInstance().RunPeriodicalTask("WifiDeviceServiceImpl", taskFunc,
+        WATCHDOG_INTERVAL_MS, WATCHDOG_DELAY_MS);
+}
+#endif
 
 void WifiDeviceServiceImpl::OnStop()
 {

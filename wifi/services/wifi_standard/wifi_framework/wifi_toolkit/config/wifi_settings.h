@@ -1113,6 +1113,27 @@ public:
      */
     int GetThermalLevel() const;
 
+    /**
+     * @Description SetThreadStatusFlag
+     *
+     * @param state true thread start, false thread end
+     */
+    void SetThreadStatusFlag(bool state);
+
+    /**
+     * @Description GetThreadStatusFlag
+     *
+     * @return ThreadStatusFlag
+     */
+    bool GetThreadStatusFlag(void);
+
+    /**
+     * @Description GetThreadStartTime
+     *
+     * @return StartTime
+     */
+    uint64_t GetThreadStartTime(void);
+
 private:
     WifiSettings();
     void InitWifiConfig();
@@ -1183,6 +1204,8 @@ private:
     MovingFreezePolicy mFPolicy;
     WifiConfigFileImpl<WifiStoreRandomMac> mSavedWifiStoreRandomMac;
     bool explicitGroup;
+    std::atomic_bool mThreadStatusFlag_ { false };
+    std::atomic_uint64_t mThreadStartTime { 0 };
 };
 }  // namespace Wifi
 }  // namespace OHOS

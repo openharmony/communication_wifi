@@ -14,6 +14,7 @@
  */
 #include "wifi_settings.h"
 #include <algorithm>
+#include <chrono>
 #include "define.h"
 #include "wifi_global_func.h"
 #include "wifi_log.h"
@@ -1507,6 +1508,25 @@ void WifiSettings::SetThermalLevel(const int &level)
 int WifiSettings::GetThermalLevel() const
 {
     return mThermalLevel;
+}
+
+void WifiSettings::SetThreadStatusFlag(bool state)
+{
+    if (state) {
+        mThreadStartTime = std::chrono::duration_cast<std::chrono::milliseconds>(
+        std::chrono::steady_clock::now().time_since_epoch()).count();
+    }
+    mThreadStatusFlag_ = state;
+}
+
+bool WifiSettings::GetThreadStatusFlag(void)
+{
+    return mThreadStatusFlag_;
+}
+
+uint64_t WifiSettings::GetThreadStartTime(void)
+{
+    return mThreadStartTime;
 }
 }  // namespace Wifi
 }  // namespace OHOS

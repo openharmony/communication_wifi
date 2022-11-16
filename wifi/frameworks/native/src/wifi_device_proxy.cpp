@@ -39,7 +39,9 @@ WifiDeviceProxy::WifiDeviceProxy(const sptr<IRemoteObject> &impl) : IRemoteProxy
 }
 
 WifiDeviceProxy::~WifiDeviceProxy()
-{}
+{
+    WIFI_LOGI("enter ~WifiDeviceProxy!");
+}
 
 ErrCode WifiDeviceProxy::EnableWifi()
 {

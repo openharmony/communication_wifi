@@ -123,8 +123,8 @@ void HandleCallbackErrCode(    const napi_env &env, const AsyncContext &info)
         result[0] = NapiGetUndefined(env);
 #else
         napi_create_uint32(env, info.errorCode, &result[0]);
-        napi_get_reference_value(env, info.callback[0], &callback);
 #endif
+        napi_get_reference_value(env, info.callback[0], &callback);
         napi_call_function(env, nullptr, callback, RESULT_PARAMS_NUM, result, &undefine);
     } else {
         napi_ref errCb = info.callback[1];

@@ -85,6 +85,7 @@ public:
 
     void OnStart() override;
     void OnStop() override;
+    void StartWatchdog(void);
 #endif
 
     ErrCode EnableWifi() override;

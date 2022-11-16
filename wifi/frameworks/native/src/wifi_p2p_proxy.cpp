@@ -35,7 +35,9 @@ WifiP2pProxy::WifiP2pProxy(const sptr<IRemoteObject> &impl) : IRemoteProxy<IWifi
 }
 
 WifiP2pProxy::~WifiP2pProxy()
-{}
+{
+    WIFI_LOGI("enter ~WifiP2pProxy!");
+}
 
 ErrCode WifiP2pProxy::EnableP2p(void)
 {

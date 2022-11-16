@@ -46,7 +46,9 @@ WifiScanProxy::WifiScanProxy(const sptr<IRemoteObject> &remote) : IRemoteProxy<I
 }
 
 WifiScanProxy::~WifiScanProxy()
-{}
+{
+    WIFI_LOGI("enter ~WifiP2pProxy!");
+}
 
 ErrCode WifiScanProxy::SetScanControlInfo(const ScanControlInfo &info)
 {

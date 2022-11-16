@@ -40,7 +40,9 @@ WifiHotspotProxy::WifiHotspotProxy(const sptr<IRemoteObject> &impl)
 }
 
 WifiHotspotProxy::~WifiHotspotProxy()
-{}
+{
+    WIFI_LOGI("enter ~WifiHotspotProxy!");
+}
 
 ErrCode WifiHotspotProxy::IsHotspotActive(bool &isActive)
 {

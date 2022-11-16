@@ -19,5 +19,11 @@ group("fuzztest") {
   deps += [
     "adddeviceconfig_fuzzer:AddDeviceConfigFuzzTest",
     "connecttodevice_fuzzer:ConnectToDeviceFuzzTest",
+    "disablewifi_fuzzer:DisableWifiFuzzTest",
+    "disconnect_fuzzer:DisconnectFuzzTest",
+    "enablewifi_fuzzer:EnableWifiFuzzTest",
+    "isconnected_fuzzer:IsConnectedFuzzTest",
+    "reassociate_fuzzer:ReAssociateFuzzTest",
+    "reconnect_fuzzer:ReConnectFuzzTest",
   ]
 }

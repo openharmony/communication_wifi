@@ -43,12 +43,12 @@ namespace Wifi {
     {
         unsigned char gcMac[MACLEN] = {0};
         unsigned int ipAddr[IPLEN] = {0};
-        if (size >= 6) {
+        if (size >= MACLEN) {
             if (memcpy_s(gcMac, MACLEN, data, MACLEN) != EOK) {
                 gcMac[MACLEN] = {0}
             }
 
-            for(int i=0; i<IPLEN; i++) {
+            for (int i = 0; i < IPLEN; i++) {
                 ipAddr[i] = static_cast<int> (data[i]);
             }
         }
@@ -143,7 +143,7 @@ namespace Wifi {
         response->centerFreq1 = static_cast<int> (data[index++]);
         response->centerFreq2 = static_cast<int> (data[index++]);        
 
-        (void)Hid2dGetRecommendChannel(nullptr,nullptr);
+        (void)Hid2dGetRecommendChannel(nullptr, nullptr);
     }
 
     void Hid2dGetChannelListFor5GTest(const uint8_t* data, size_t size)
@@ -166,7 +166,7 @@ namespace Wifi {
 
     void Hid2dSetPeerWifiCfgInfoTest(const uint8_t* data, size_t size)
     {
-        PeerCfgType cfgType = TYPE_OF_SET_PEER_CONFIG; 
+        PeerCfgType cfgType = TYPE_OF_SET_PEER_CONFIG;
         int setDataValidLen = static_cast<int> (data[0]);
         char cfgData[DATA_MAX_BYTES] = {0};
 

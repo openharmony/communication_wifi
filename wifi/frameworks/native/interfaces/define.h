@@ -192,4 +192,5 @@
 #define MODE_STATE_OPEN (1)
 #define MODE_STATE_CLOSE (2)
 
+#define DECLARE_INTERFACE_DESCRIPTOR_L1 u"ohos.wifi.IWifiDeviceService"
 #endif

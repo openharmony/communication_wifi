@@ -23,6 +23,7 @@ namespace Wifi {
     bool WifiCHid2dFuzzerTest(const uint8_t* data, size_t size)
     {
         Hid2dRequestGcIpTest(data, size);
+        /*
         Hid2dSharedlinkIncreaseTest();
         Hid2dSharedlinkDecreaseTest();
         Hid2dCreateGroupTest(data, size);
@@ -36,6 +37,7 @@ namespace Wifi {
         Hid2dSetPeerWifiCfgInfoTest(data, size);
         Hid2dIsWideBandwidthSupportedTest();
         Hid2dSetUpperSceneTest(data, size);
+        */
         return true;
     }
 
@@ -54,7 +56,7 @@ namespace Wifi {
         }
         (void)Hid2dRequestGcIp(gcMac, ipAddr);
     }
-
+/*
     void Hid2dSharedlinkIncreaseTest(void)
     {
         (void)Hid2dSharedlinkIncrease();
@@ -198,7 +200,7 @@ namespace Wifi {
 
         (void)Hid2dSetUpperScene(ifName, scene);
     }
-
+*/
 }  // namespace Wifi
 }  // namespace OHOS
 

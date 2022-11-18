@@ -471,7 +471,7 @@ int WifiSettings::RemoveExcessDeviceConfigs(std::vector<WifiDeviceConfig> &confi
     if (maxNumConfigs < 0) {
         return 1;
     }
-    int numExcessNetworks = configs.size() - maxNumConfigs;
+    int numExcessNetworks = static_cast<int>(configs.size()) - maxNumConfigs;
     if (numExcessNetworks <= 0) {
         return 1;
     }

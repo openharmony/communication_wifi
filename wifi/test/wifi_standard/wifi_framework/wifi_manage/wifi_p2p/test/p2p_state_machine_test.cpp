@@ -454,7 +454,7 @@ HWTEST_F(P2pStateMachineTest, P2pConnectWithPinDisplay_SUCCESS, TestSize.Level1)
 
 HWTEST_F(P2pStateMachineTest, DealGroupCreationFailed, TestSize.Level1)
 {
-    EXPECT_CALL(WifiP2PHalInterface::GetInstance(), P2pFlush(_))
+    EXPECT_CALL(WifiP2PHalInterface::GetInstance(), P2pFlush())
         .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED));
     WarpDealGroupCreationFailed();
 }

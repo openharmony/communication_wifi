@@ -67,6 +67,7 @@ public:
     virtual int GetScanInfoList(std::vector<WifiScanInfo> &results) = 0;
     virtual std::string GetConnectTimeoutBssid() = 0;
     virtual int SetConnectTimeoutBssid(std::string &bssid) = 0;
+    virtual int SetDeviceAfterConnect(int networkId) = 0;
 };
 
 class WifiSettings : public MockWifiSettings {
@@ -118,6 +119,7 @@ public:
     MOCK_METHOD1(GetScanInfoList, int(std::vector<WifiScanInfo> &results));
     MOCK_METHOD0(GetConnectTimeoutBssid, std::string());
     MOCK_METHOD1(SetConnectTimeoutBssid, int(std::string &bssid));
+    MOCK_METHOD1(SetDeviceAfterConnect, int(int networkId));
 };
 }  // namespace OHOS
 }  // namespace Wifi

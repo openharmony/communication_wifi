@@ -45,7 +45,8 @@ WifiSettings::WifiSettings()
       mAppRunningModeState(ScanMode::SYS_FOREGROUND_SCAN),
       mPowerSavingModeState(MODE_STATE_CLOSE),
       mFreezeModeState(MODE_STATE_CLOSE),
-      mNoChargerPlugModeState(MODE_STATE_CLOSE)
+      mNoChargerPlugModeState(MODE_STATE_CLOSE),
+      explicitGroup(false)
 {
     mHotspotState[0] = static_cast<int>(ApState::AP_STATE_CLOSED);
     powerModel[0] = PowerModel::GENERAL;

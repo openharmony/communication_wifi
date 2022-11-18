@@ -21,7 +21,7 @@
 #define IPLEN 4
 #define VALUE 10
 #define NAMELEN 32
-#define DATA_MAX_BYTES
+#define DATA_MAX_BYTES 255
 
 void Hid2dRequestGcIpTest(const uint8_t* data, size_t size);
 void Hid2dSharedlinkIncreaseTest(void);

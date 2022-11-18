@@ -92,9 +92,6 @@ HWTEST_F(P2pEnabledStateTest, GoInState, TestSize.Level1)
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), SetServiceDiscoveryExternal(Eq(false)))
         .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED))
         .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
-    EXPECT_CALL(WifiP2PHalInterface::GetInstance(), ListNetworks(_))
-        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED))
-        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED));
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), SetPersistentReconnect(Eq(1)))
         .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED))
         .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_OK));

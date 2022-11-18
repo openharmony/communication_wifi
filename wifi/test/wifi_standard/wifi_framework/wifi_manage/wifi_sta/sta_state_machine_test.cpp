@@ -387,6 +387,7 @@ public:
         EXPECT_CALL(WifiSettings::GetInstance(), EnableNetwork(_, _)).Times(AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), SetDeviceState(_, _, _)).Times(AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_)).Times(testing::AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), SetDeviceAfterConnect(_)).Times(AtLeast(0));
         EXPECT_CALL(WifiStaHalInterface::GetInstance(), EnableNetwork(_)).WillRepeatedly(Return(WIFI_IDL_OPT_OK));
         EXPECT_CALL(WifiStaHalInterface::GetInstance(), Connect(_)).WillRepeatedly(Return(WIFI_IDL_OPT_OK));
         EXPECT_CALL(WifiStaHalInterface::GetInstance(), SaveDeviceConfig()).WillRepeatedly(Return(WIFI_IDL_OPT_OK));

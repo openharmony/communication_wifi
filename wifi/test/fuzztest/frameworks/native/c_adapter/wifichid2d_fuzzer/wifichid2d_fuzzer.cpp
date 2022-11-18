@@ -18,6 +18,7 @@
 #include <string.h>
 #include <unistd.h>
 
+#include "wifi_c_utils.h"
 #include "wifichid2d_fuzzer.h"
 #include "wifi_hid2d.h"
 #include "../../../../../../interfaces/kits/c/wifi_hid2d.h"
@@ -51,7 +52,7 @@ void Hid2dRequestGcIpTest(const uint8_t* data, size_t size)
     unsigned int ipAddr[IPLEN] = {0};
     if (size >= MACLEN) {
         if (memcpy_s(gcMac, MACLEN, data, MACLEN) != EOK) {
-            gcMac[MACLEN] = {0}
+            memset_s(gcMac, MACLEN, 0, MACLEN);
         }
 
         for (int i = 0; i < IPLEN; i++) {
@@ -76,7 +77,7 @@ void Hid2dSharedlinkDecreaseTest(void)
 void Hid2dCreateGroupTest(const uint8_t* data, size_t size)
 {
     unsigned int index = 0;
-    WifiErrorCode Hid2dCreateGroup(const int frequency, FreqType type)
+    WifiErrorCode Hid2dCreateGroup(const int frequency, FreqType type);
     int frequency = static_cast<int>(data[index++]);
     FreqType type = FREQUENCY_DEFAULT;
     if (data[index++] > VALUE) {
@@ -90,7 +91,7 @@ void Hid2dRemoveGcGroupTest(const uint8_t* data, size_t size)
     char gcIfName[NAMELEN] = {0};
     if (size >= NAMELEN) {
         if (memcpy_s(gcIfName, NAMELEN, data, NAMELEN) != EOK) {
-            gcIfName[MACLEN] = {0};
+            memset_s(gcIfName, MACLEN, 0, MACLEN);
         }
     }
     (void)Hid2dRemoveGcGroup(gcIfName);
@@ -98,11 +99,11 @@ void Hid2dRemoveGcGroupTest(const uint8_t* data, size_t size)
 
 void Hid2dConnectTest(const uint8_t* data, size_t size)
 {
-    string ssid = std::string(reinterpret_cast<const char*>(data), size);
-    string bssid = std::string(reinterpret_cast<const char*>(data), size);
-    string preSharedKey = std::string(reinterpret_cast<const char*>(data), size);
+    std::string ssid = std::string(reinterpret_cast<const char*>(data), size);
+    std::string bssid = std::string(reinterpret_cast<const char*>(data), size);
+    std::string preSharedKey = std::string(reinterpret_cast<const char*>(data), size);
 
-    OHOS::Wifi::Hid2dConnectConfig* cppConfig;
+    const OHOS::Wifi::Hid2dConnectConfig* cppConfig;
     cppConfig->SetSsid(ssid);
     cppConfig->SetBssid(bssid);
     cppConfig->SetPreSharedKey(preSharedKey);
@@ -116,7 +117,7 @@ void Hid2dConfigIPAddrTest(const uint8_t* data, size_t size)
     unsigned int netmask[IPV4_ARRAY_LEN];
     char ifName[NAMELEN] = {0};
     if (memcpy_s(ifName, NAMELEN, data, size) != EOK) {
-        ifName[MACLEN] = {0};
+        memset_s(ifName, MACLEN, 0, MACLEN);
     }
         
     OHOS::Wifi::IpAddrInfo* ipAddrInfo;
@@ -138,8 +139,8 @@ void Hid2dReleaseIPAddrTest(const uint8_t* data, size_t size)
 
 void Hid2dGetRecommendChannelTest(const uint8_t* data, size_t size)
 {
-    RecommendChannelResponse *request = nullptr;
-    RecommendChannelResponse *response = nullptr;
+    const RecommendChannelResponse *request = nullptr;
+    const RecommendChannelResponse *response = nullptr;
     int index = 0;
 
     request->index = static_cast<int> (data[index++]);
@@ -156,7 +157,7 @@ void Hid2dGetRecommendChannelTest(const uint8_t* data, size_t size)
 
 void Hid2dGetChannelListFor5GTest(const uint8_t* data, size_t size)
 {
-    int *chanList = reinterpret_cast<int*>(data);
+    const int *chanList = reinterpret_cast<const int*>(data);
     (void)Hid2dGetChannelListFor5G(chanList, size);
 }
 
@@ -169,7 +170,7 @@ void Hid2dGetSelfWifiCfgInfoTest(const uint8_t* data, size_t size)
     if (memcpy_s(cfgData, DATA_MAX_BYTES, data, size) != EOK) {
         cfgData[DATA_MAX_BYTES] = {0};
     }
-    (void)Hid2dGetSelfWifiCfgInfo(cfgType, cfgData, getDatValidLen)
+    (void)Hid2dGetSelfWifiCfgInfo(cfgType, cfgData, getDatValidLen);
 }
 
 void Hid2dSetPeerWifiCfgInfoTest(const uint8_t* data, size_t size)
@@ -192,7 +193,7 @@ void Hid2dIsWideBandwidthSupportedTest(void)
 
 void Hid2dSetUpperSceneTest(const uint8_t* data, size_t size)
 {
-    char ifName[NAMELEN] = {0};
+    unsigned char ifName[NAMELEN] = {0};
     int index = 0;
     Hid2dUpperScene* scene;
 
@@ -201,7 +202,7 @@ void Hid2dSetUpperSceneTest(const uint8_t* data, size_t size)
     scene->fps = static_cast<int> (data[index++]);
     scene->bw = static_cast<unsigned int> (data[index++]);
     if (memcpy_s(ifName, NAMELEN, data, size) != EOK) {
-        ifName[MACLEN] = {0};
+        memset_s(ifName, MACLEN, 0, MACLEN);
     }
 
     (void)Hid2dSetUpperScene(ifName, scene);

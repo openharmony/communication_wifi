@@ -13,6 +13,11 @@
  * limitations under the License.
  */
 
+#include <stdint.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+
 #include "wifichid2d_fuzzer.h"
 #include "wifi_hid2d.h"
 #include "../../../../../../interfaces/kits/c/wifi_hid2d.h"

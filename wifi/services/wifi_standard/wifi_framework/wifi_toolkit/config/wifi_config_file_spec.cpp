@@ -1040,7 +1040,7 @@ static int SetWifiP2pGroupInfoDev(WifiP2pGroupInfo &item, const std::string &key
             WifiP2pDevice device;
             item.AddClientDevice(device);
         } else {
-            unsigned long index = std::stoi(key.substr(strlen("vecDev_"), pos));
+            unsigned long index = static_cast<unsigned long>(std::stoi(key.substr(strlen("vecDev_"), pos)));
             if (index < item.GetClientDevices().size()) {
                 std::vector<WifiP2pDevice> clients = item.GetClientDevices();
                 SetWifiP2pDevicClassKeyValue(clients[index], key.substr(pos + 1), value);

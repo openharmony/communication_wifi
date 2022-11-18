@@ -31,14 +31,8 @@ WifiScanStub::WifiScanStub() : callback_(nullptr)
 WifiScanStub::~WifiScanStub()
 {}
 
-int WifiScanStub::OnRemoteRequest(uint32_t code, IpcIo *req, IpcIo *reply)
+static int WifiScanStub::CheckInterfaceToken(IpcIo *req)
 {
-    WIFI_LOGD("WifiScanStub::OnRemoteRequest,code:%{public}u", code);
-    if (req == nullptr || reply == nullptr) {
-        WIFI_LOGE("req:%{public}d, reply:%{public}d", req == nullptr, reply == nullptr);
-        return ERR_FAILED;
-    }
-
     size_t length;
     uint16_t* interfaceRead = nullptr;
     interfaceRead = ReadInterfaceToken(req, &length);
@@ -48,7 +42,19 @@ int WifiScanStub::OnRemoteRequest(uint32_t code, IpcIo *req, IpcIo *reply)
             return WIFI_OPT_FAILED;
         }
     }
+    return WIFI_OPT_SUCCESS;
+}
 
+int WifiScanStub::OnRemoteRequest(uint32_t code, IpcIo *req, IpcIo *reply)
+{
+    WIFI_LOGD("WifiScanStub::OnRemoteRequest,code:%{public}u", code);
+    if (req == nullptr || reply == nullptr) {
+        WIFI_LOGE("req:%{public}d, reply:%{public}d", req == nullptr, reply == nullptr);
+        return ERR_FAILED;
+    }
+    if(CheckInterfaceToken(req) == WIFI_OPT_FAILED) {
+        return WIFI_OPT_FAILED;
+    }
     int exception = ERR_FAILED;
     (void)ReadInt32(req, &exception);
     if (exception) {

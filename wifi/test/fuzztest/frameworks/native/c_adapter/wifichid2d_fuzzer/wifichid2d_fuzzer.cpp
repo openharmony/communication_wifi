@@ -188,21 +188,22 @@ namespace Wifi {
 */
 }  // namespace Wifi
 }  // namespace OHOS
-    void Hid2dRequestGcIpTest(const uint8_t* data, size_t size)
-    {
-        unsigned char gcMac[MACLEN] = {0};
-        unsigned int ipAddr[IPLEN] = {0};
-        if (size >= MACLEN) {
-            if (memcpy_s(gcMac, MACLEN, data, MACLEN) != EOK) {
-                gcMac[MACLEN] = {0}
-            }
 
-            for (int i = 0; i < IPLEN; i++) {
-                ipAddr[i] = static_cast<int> (data[i]);
-            }
+void Hid2dRequestGcIpTest(const uint8_t* data, size_t size)
+{
+    unsigned char gcMac[MACLEN] = {0};
+    unsigned int ipAddr[IPLEN] = {0};
+    if (size >= MACLEN) {
+        if (memcpy_s(gcMac, MACLEN, data, MACLEN) != EOK) {
+            gcMac[MACLEN] = {0}
         }
-        (void)Hid2dRequestGcIp(gcMac, ipAddr);
+
+        for (int i = 0; i < IPLEN; i++) {
+            ipAddr[i] = static_cast<int> (data[i]);
+        }
     }
+    (void)Hid2dRequestGcIp(gcMac, ipAddr);
+}
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {

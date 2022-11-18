@@ -192,6 +192,6 @@
 #define MODE_STATE_OPEN (1)
 #define MODE_STATE_CLOSE (2)
 const std::u16string InterfaceDescriptorL1 = u"ohos.wifi.IWifiDeviceService";
-#define DECLARE_INTERFACE_DESCRIPTOR_L1_LENGTH strlen(InterfaceDescriptorL1)
+#define DECLARE_INTERFACE_DESCRIPTOR_L1_LENGTH InterfaceDescriptorL1.length()
 #define DECLARE_INTERFACE_DESCRIPTOR_L1 ((uint16_t*)&InterfaceDescriptorL1[0])
 #endif

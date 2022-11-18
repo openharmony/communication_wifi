@@ -585,15 +585,16 @@ int WifiDeviceStub::OnRemoteRequest(uint32_t code, IpcIo *req, IpcIo *reply)
         WIFI_LOGD("req:%{public}d, reply:%{public}d", req == nullptr, reply == nullptr);
         return ERR_FAILED;
     }
-	size_t length;
+
+    size_t length;
     uint16_t* interfaceRead = nullptr;
-	interfaceRead = ReadInterfaceToken(req, &length);
-	for (size_t i = 0; i < length; i++) {
-		if (interfaceRead[i] != DECLARE_INTERFACE_DESCRIPTOR_L1[i]) {
-	        WIFI_LOGE("Sta stub token verification error: %{public}d", code);
-			return WIFI_OPT_FAILED;
-		}
-	}
+    interfaceRead = ReadInterfaceToken(req, &length);
+    for (size_t i = 0; i < length; i++) {
+        if (interfaceRead[i] != DECLARE_INTERFACE_DESCRIPTOR_L1[i]) {
+            WIFI_LOGE("Sta stub token verification error: %{public}d", code);
+            return WIFI_OPT_FAILED;
+        }
+    }
 
     int exception = 0;
     (void)ReadInt32(req, &exception);

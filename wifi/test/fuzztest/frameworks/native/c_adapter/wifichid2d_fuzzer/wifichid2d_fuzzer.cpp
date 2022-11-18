@@ -12,9 +12,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include <stddef.h>
-#include <stdint.h>
-#include <string.h>
+#include <cstddef>
+#include <cstdint>
+#include <cstring>
 #include "securec.h"
 #include "wifichid2d_fuzzer.h"
 #include "../../../../../../interfaces/kits/c/wifi_hid2d.h"

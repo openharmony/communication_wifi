@@ -39,6 +39,16 @@ int WifiScanStub::OnRemoteRequest(uint32_t code, IpcIo *req, IpcIo *reply)
         return ERR_FAILED;
     }
 
+    size_t length;
+    uint16_t* interfaceRead = nullptr;
+    interfaceRead = ReadInterfaceToken(req, &length);
+    for (size_t i = 0; i < length; i++) {
+        if (interfaceRead[i] != DECLARE_INTERFACE_DESCRIPTOR_L1[i]) {
+            WIFI_LOGE("Sta stub token verification error: %{public}d", code);
+            return WIFI_OPT_FAILED;
+        }
+    }
+
     int exception = ERR_FAILED;
     (void)ReadInt32(req, &exception);
     if (exception) {

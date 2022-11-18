@@ -16,6 +16,8 @@
 #ifndef WIFI_C_HID2D__H
 #define WIFI_C_HID2D__H
 
+#include <stdint.h>
+
 #define FUZZ_PROJECT_NAME "wifichid2d_fuzzer"
 #define MACLEN 6
 #define IPLEN 4
@@ -24,7 +26,6 @@
 #define DATA_MAX_BYTES
 
 void Hid2dRequestGcIpTest(const uint8_t* data, size_t size);
-/*
 void Hid2dSharedlinkIncreaseTest(void);
 void Hid2dSharedlinkDecreaseTest(void);
 void Hid2dCreateGroupTest(const uint8_t* data, size_t size);
@@ -38,6 +39,5 @@ void Hid2dGetSelfWifiCfgInfoTest(const uint8_t* data, size_t size);
 void Hid2dSetPeerWifiCfgInfoTest(const uint8_t* data, size_t size);
 void Hid2dIsWideBandwidthSupportedTest(void);
 void Hid2dSetUpperSceneTest(const uint8_t* data, size_t size);
-*/
 
 #endif

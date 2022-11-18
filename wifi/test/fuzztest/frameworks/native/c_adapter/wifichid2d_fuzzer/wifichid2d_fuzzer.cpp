@@ -14,8 +14,8 @@
  */
 
 #include "wifichid2d_fuzzer.h"
-#include <stdint.h>
-#include "../../../../interfaces/kits/c/wifi_hid2d.h"
+#include "wifi_hid2d.h"
+#include "../../../../../../interfaces/kits/c/wifi_hid2d.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -50,7 +50,7 @@ void Hid2dRequestGcIpTest(const uint8_t* data, size_t size)
         }
 
         for (int i = 0; i < IPLEN; i++) {
-            ipAddr[i] = static_cast<int> (data[i]);
+            ipAddr[i] = static_cast<int>(data[i]);
         }
     }
 
@@ -72,7 +72,7 @@ void Hid2dCreateGroupTest(const uint8_t* data, size_t size)
 {
     unsigned int index = 0;
     WifiErrorCode Hid2dCreateGroup(const int frequency, FreqType type)
-    int frequency = static_cast<int> (data[index++]);
+    int frequency = static_cast<int>(data[index++]);
     FreqType type = FREQUENCY_DEFAULT;
     if (data[index++] > VALUE) {
         type = FREQUENCY_160M;
@@ -144,7 +144,7 @@ void Hid2dGetRecommendChannelTest(const uint8_t* data, size_t size)
     response->index = static_cast<int> (data[index++]);
     response->centerFreq = static_cast<int> (data[index++]);
     response->centerFreq1 = static_cast<int> (data[index++]);
-    response->centerFreq2 = static_cast<int> (data[index++]);        
+    response->centerFreq2 = static_cast<int> (data[index++]);
 
     (void)Hid2dGetRecommendChannel(nullptr, nullptr);
 }
@@ -170,7 +170,7 @@ void Hid2dGetSelfWifiCfgInfoTest(const uint8_t* data, size_t size)
 void Hid2dSetPeerWifiCfgInfoTest(const uint8_t* data, size_t size)
 {
     PeerCfgType cfgType = TYPE_OF_SET_PEER_CONFIG;
-    int setDataValidLen = static_cast<int> (data[0]);
+    int setDataValidLen = static_cast<int>(data[0]);
     char cfgData[DATA_MAX_BYTES] = {0};
 
     if (memcpy_s(cfgData, DATA_MAX_BYTES, data, size) != EOK) {

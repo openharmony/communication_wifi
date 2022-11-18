@@ -56,7 +56,7 @@ void Hid2dSharedlinkIncreaseTest(void)
 
 void Hid2dSharedlinkDecreaseTest(void)
 {
-    (void)Hid2dSharedlinkDecreaseTest();
+    (void)Hid2dSharedlinkDecrease();
 }
 
 void Hid2dIsWideBandwidthSupportedTest(void)

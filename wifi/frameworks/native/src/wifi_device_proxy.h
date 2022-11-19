@@ -337,8 +337,12 @@ private:
     void ReadLinkedInfo(MessageParcel &reply, WifiLinkedInfo &info);
     void WriteDeviceConfig(const WifiDeviceConfig &config, MessageParcel &data);
     void ParseDeviceConfigs(MessageParcel &reply, std::vector<WifiDeviceConfig> &result);
+    void RemoveDeathRecipient(void);
     static BrokerDelegator<WifiDeviceProxy> g_delegator;
+    sptr<IRemoteObject> remote_ = nullptr;
     bool mRemoteDied;
+    std::mutex mutex_;
+    sptr<IRemoteObject::DeathRecipient> deathRecipient_ = nullptr;
 #endif
 };
 }  // namespace Wifi

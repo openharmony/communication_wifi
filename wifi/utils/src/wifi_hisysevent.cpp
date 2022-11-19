@@ -24,7 +24,7 @@ DEFINE_WIFILOG_LABEL("WifiHiSysEvent");
 template<typename... Types>
 static void WriteEvent(const std::string& eventType, Types... args)
 {
-    int ret = HiviewDFX::HiSysEvent::Write(HiviewDFX::HiSysEvent::Domain::COMMUNICATION, eventType,
+    int ret = HiSysEventWrite(HiviewDFX::HiSysEvent::Domain::COMMUNICATION, eventType,
         HiviewDFX::HiSysEvent::EventType::STATISTIC, args...);
     if (ret != 0) {
         WIFI_LOGE("Write event fail: %{public}s", eventType.c_str());

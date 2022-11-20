@@ -15,16 +15,6 @@
 
 #ifndef WIFI_C_HOTSPOT__H
 #define WIFI_C_HOTSPOT__H
-
 #define FUZZ_PROJECT_NAME "wifichotspot_fuzzer"
-
-#define MAX_SSID_LEN 33
-
-void IsHotspotDualBandSupportedTest(const uint8_t* data, size_t size);
-void SetHotspotConfigTest(const uint8_t* data, size_t size);
-void GetHotspotConfigTest(const uint8_t* data, size_t size);
-void GetStationListTest(const uint8_t* data, size_t size);
-void DisassociateStaTest(const uint8_t* data, size_t size);
-void AddTxPowerInfoTest(const uint8_t* data, size_t size);
 
 #endif

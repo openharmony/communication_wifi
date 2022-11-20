@@ -35,7 +35,7 @@ public:
     explicit WifiDeviceProxy();
     ErrCode Init(void);
 #else
-class WifiDeviceProxy : public IRemoteProxy<IWifiDevice>, public IRemoteObject::DeathRecipient {
+class WifiDeviceProxy : public IRemoteProxy<IWifiDevice> {
 public:
     explicit WifiDeviceProxy(const sptr<IRemoteObject> &impl);
 #endif
@@ -325,13 +325,25 @@ private:
     void WriteIpAddress(IpcIo &req, const WifiIpAddress &address);
     void WriteDeviceConfig(const WifiDeviceConfig &config, IpcIo &req);
 #else
+private:
+    class WifiDeathRecipient : public IRemoteObject::DeathRecipient {
+    public:
+        explicit WifiDeathRecipient(WifiDeviceProxy &client) : client_(client) {}
+        ~WifiDeathRecipient() override = default;
+        void OnRemoteDied(const wptr<IRemoteObject> &remote) override
+        {
+            client_.OnRemoteDied(remote);
+        }
+
+    private:
+        WifiDeviceProxy &client_;
+    };
+
     /**
     * @Description Handle remote object died event.
     * @param remoteObject remote object.
     */
-    void OnRemoteDied(const wptr<IRemoteObject> &remoteObject) override;
-
-private:
+    void OnRemoteDied(const wptr<IRemoteObject> &remoteObject);
     void WriteIpAddress(MessageParcel &data, const WifiIpAddress &address);
     void ReadIpAddress(MessageParcel &reply, WifiIpAddress &address);
     void ReadLinkedInfo(MessageParcel &reply, WifiLinkedInfo &info);

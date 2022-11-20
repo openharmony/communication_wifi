@@ -45,7 +45,8 @@ WifiSettings::WifiSettings()
       mAppRunningModeState(ScanMode::SYS_FOREGROUND_SCAN),
       mPowerSavingModeState(MODE_STATE_CLOSE),
       mFreezeModeState(MODE_STATE_CLOSE),
-      mNoChargerPlugModeState(MODE_STATE_CLOSE)
+      mNoChargerPlugModeState(MODE_STATE_CLOSE),
+      explicitGroup(false)
 {
     mHotspotState[0] = static_cast<int>(ApState::AP_STATE_CLOSED);
     powerModel[0] = PowerModel::GENERAL;
@@ -471,7 +472,7 @@ int WifiSettings::RemoveExcessDeviceConfigs(std::vector<WifiDeviceConfig> &confi
     if (maxNumConfigs < 0) {
         return 1;
     }
-    int numExcessNetworks = configs.size() - maxNumConfigs;
+    int numExcessNetworks = static_cast<int>(configs.size()) - maxNumConfigs;
     if (numExcessNetworks <= 0) {
         return 1;
     }

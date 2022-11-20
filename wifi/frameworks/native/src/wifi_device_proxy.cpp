@@ -35,7 +35,7 @@ WifiDeviceProxy::WifiDeviceProxy(const sptr<IRemoteObject> &impl) : IRemoteProxy
             WIFI_LOGW("not proxy object!");
             return;
         }
-        deathRecipient_ = sptr<IRemoteObject::DeathRecipient *>(this);
+        deathRecipient_ = sptr<IRemoteObject::DeathRecipient>(this);
         if (!impl->AddDeathRecipient(deathRecipient_)) {
             WIFI_LOGW("AddDeathRecipient failed!");
             return;
@@ -53,7 +53,7 @@ WifiDeviceProxy::~WifiDeviceProxy()
 
 void WifiDeviceProxy::RemoveDeathRecipient(void)
 {
-    WIFI_LOGI("enter RemoveDeathRecipient, deathRecipient_: %{private}p!", deathRecipient_);
+    WIFI_LOGI("enter RemoveDeathRecipient, deathRecipient_: %{private}p!", (void*)deathRecipient_);
     std::lock_guard<std::mutex> lock(mutex_);
     if (remote_ == nullptr) {
         WIFI_LOGI("remote_ is nullptr!");

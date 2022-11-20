@@ -65,7 +65,7 @@ void WifiDeviceProxy::RemoveDeathRecipient(void)
     }
     remote_->RemoveDeathRecipient(deathRecipient_);
     remote_ = nullptr;
- }
+}
 
 ErrCode WifiDeviceProxy::EnableWifi()
 {

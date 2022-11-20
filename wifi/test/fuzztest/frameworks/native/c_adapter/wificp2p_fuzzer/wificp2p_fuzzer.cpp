@@ -32,7 +32,6 @@ namespace Wifi {
         (void)StopP2pListen();
         (void)RemoveGroup();
         (void)P2pCancelConnect();
-        (void)UnregisterCfgChangCallback();
         return true;
     }
 }  // namespace Wifi

@@ -17,6 +17,7 @@ group("fuzztest") {
   deps = []
 
   deps += [
+    "../frameworks/native/c_adapter/wifichid2d_fuzzer:WifiCHotSpotFuzzTest",
     "adddeviceconfig_fuzzer:AddDeviceConfigFuzzTest",
     "connecttodevice_fuzzer:ConnectToDeviceFuzzTest",
     "disablewifi_fuzzer:DisableWifiFuzzTest",

@@ -12,7 +12,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+#include <cstddef>
+#include <cstdint>
+#include <cstring>
+#include "securec.h"
 #include "wifichotspot_fuzzer.h"
 #include "../../../../../../interfaces/kits/c/wifi_hotspot.h"
 

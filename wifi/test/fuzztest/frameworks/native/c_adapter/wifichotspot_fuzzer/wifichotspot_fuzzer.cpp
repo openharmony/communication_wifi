@@ -23,11 +23,10 @@ namespace OHOS {
 namespace Wifi {
     bool WifiCHotSpotFuzzerTest(const uint8_t* data, size_t size)
     {
-        HotspotConfig *config = reinterpret_cast<const HotspotConfig*>(data);
         (void)EnableHotspot();
         (void)DisableHotspot();
         (void)IsHotspotActive();
-        SetHotspotConfig(config);
+        SetHotspotConfig(nullptr);
         GetHotspotConfig(nullptr);
         GetStationList(nullptr, nullptr);
         DisassociateSta(nullptr, size);

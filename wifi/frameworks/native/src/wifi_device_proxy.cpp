@@ -30,6 +30,7 @@ static sptr<WifiDeviceCallBackStub> g_deviceCallBackStub =
 WifiDeviceProxy::WifiDeviceProxy(const sptr<IRemoteObject> &impl) : IRemoteProxy<IWifiDevice>(impl),
     remote_(nullptr), mRemoteDied(false), deathRecipient_(nullptr)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     if (impl) {
         if (!impl->IsProxyObject()) {
             WIFI_LOGW("not proxy object!");

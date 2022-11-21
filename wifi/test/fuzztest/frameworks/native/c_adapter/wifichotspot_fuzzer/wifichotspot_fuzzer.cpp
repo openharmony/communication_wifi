@@ -26,10 +26,6 @@ namespace Wifi {
         (void)EnableHotspot();
         (void)DisableHotspot();
         (void)IsHotspotActive();
-        SetHotspotConfig(nullptr);
-        GetHotspotConfig(nullptr);
-        GetStationList(nullptr, nullptr);
-        DisassociateSta(nullptr, size);
         AddTxPowerInfo(0);
         return true;
     }

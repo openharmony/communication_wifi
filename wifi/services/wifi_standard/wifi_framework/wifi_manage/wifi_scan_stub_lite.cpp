@@ -38,7 +38,7 @@ int WifiScanStub::CheckInterfaceToken(uint32_t code, IpcIo *req)
     interfaceRead = ReadInterfaceToken(req, &length);
     for (size_t i = 0; i < length; i++) {
         if (i >= DECLARE_INTERFACE_DESCRIPTOR_L1_LENGTH ||interfaceRead[i] != DECLARE_INTERFACE_DESCRIPTOR_L1[i]) {
-            WIFI_LOGE("Sta stub token verification error: %{public}d", code);
+            WIFI_LOGE("Scan stub token verification error: %{public}d", code);
             return WIFI_OPT_FAILED;
         }
     }

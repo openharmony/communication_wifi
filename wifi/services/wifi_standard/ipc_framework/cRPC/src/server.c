@@ -210,7 +210,7 @@ int RunRpcLoop(RpcServer *server)
     EventLoop *loop = server->loop;
     while (!loop->stop) {
         BeforeLoop(server);
-        int retval = epoll_wait(loop->epfd, loop->epEvents, loop->setSize, 5);
+        int retval = epoll_wait(loop->epfd, loop->epEvents, loop->setSize, -1);
         for (int i = 0; i < retval; ++i) {
             struct epoll_event *e = loop->epEvents + i;
             int fd = e->data.fd;
@@ -281,6 +281,8 @@ int EmitEvent(RpcServer *server, int event)
     server->events[server->nEvents] = event;
     ++server->nEvents;
     pthread_mutex_unlock(&server->mutex);
+    /* Triger write to socket */
+    BeforeLoop(server);
     return 0;
 }
 

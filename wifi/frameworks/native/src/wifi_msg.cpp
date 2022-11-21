@@ -24,7 +24,7 @@ static const std::string METHOD_STRS[] = { "NONE", "PAP", "MSCHAP", "MSCHAPV2", 
 
 std::string WifiEapConfig::Phase2MethodToStr(const std::string& eap, const int& method)
 {
-    if (method < 0 || method > (sizeof(METHOD_STRS) / sizeof(METHOD_STRS[0]))) {
+    if (method < 0 || method >= (sizeof(METHOD_STRS) / sizeof(METHOD_STRS[0]))) {
         return "auth=NONE";
     }
     std::string prefix = (eap == EAP_METHOD_TTLS && method == static_cast<int>(Phase2Method::GTC)) ?

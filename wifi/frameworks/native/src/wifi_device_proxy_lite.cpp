@@ -307,6 +307,10 @@ ErrCode WifiDeviceProxy::EnableWifi()
     struct IpcOwner owner = {.exception = -1, .retCode = 0, .variable = nullptr};
 
     IpcIoInit(&req, data, IPC_DATA_SIZE_SMALL, MAX_IPC_OBJ_COUNT);
+    if (!WriteInterfaceToken(&data, DECLARE_INTERFACE_DESCRIPTOR_L1, DECLARE_INTERFACE_DESCRIPTOR_L1_LENGTH)) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
     (void)WriteInt32(&req, 0);
     owner.funcId = WIFI_SVR_CMD_ENABLE_WIFI;
     int error = remote_->Invoke(remote_, WIFI_SVR_CMD_ENABLE_WIFI, &req, &owner, IpcCallback);
@@ -334,6 +338,10 @@ ErrCode WifiDeviceProxy::DisableWifi()
     struct IpcOwner owner = {.exception = -1, .retCode = 0, .variable = nullptr};
 
     IpcIoInit(&req, data, IPC_DATA_SIZE_SMALL, MAX_IPC_OBJ_COUNT);
+    if (!WriteInterfaceToken(&data, DECLARE_INTERFACE_DESCRIPTOR_L1, DECLARE_INTERFACE_DESCRIPTOR_L1_LENGTH)) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
     (void)WriteInt32(&req, 0);
     owner.funcId = WIFI_SVR_CMD_DISABLE_WIFI;
     int error = remote_->Invoke(remote_, WIFI_SVR_CMD_DISABLE_WIFI, &req, &owner, IpcCallback);
@@ -361,6 +369,10 @@ ErrCode WifiDeviceProxy::InitWifiProtect(const WifiProtectType &protectType, con
     struct IpcOwner owner = {.exception = -1, .retCode = 0, .variable = nullptr};
 
     IpcIoInit(&req, data, IPC_DATA_SIZE_SMALL, MAX_IPC_OBJ_COUNT);
+    if (!WriteInterfaceToken(&data, DECLARE_INTERFACE_DESCRIPTOR_L1, DECLARE_INTERFACE_DESCRIPTOR_L1_LENGTH)) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
     (void)WriteInt32(&req, 0);
     (void)WriteInt32(&req, (int)protectType);
     (void)WriteString(&req, protectName.c_str());
@@ -390,6 +402,10 @@ ErrCode WifiDeviceProxy::GetWifiProtectRef(const WifiProtectMode &protectMode, c
     struct IpcOwner owner = {.exception = -1, .retCode = 0, .variable = nullptr};
 
     IpcIoInit(&req, data, IPC_DATA_SIZE_SMALL, MAX_IPC_OBJ_COUNT);
+    if (!WriteInterfaceToken(&data, DECLARE_INTERFACE_DESCRIPTOR_L1, DECLARE_INTERFACE_DESCRIPTOR_L1_LENGTH)) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
     (void)WriteInt32(&req, 0);
     (void)WriteInt32(&req, (int)protectMode);
     (void)WriteString(&req, protectName.c_str());
@@ -419,6 +435,10 @@ ErrCode WifiDeviceProxy::PutWifiProtectRef(const std::string &protectName)
     struct IpcOwner owner = {.exception = -1, .retCode = 0, .variable = nullptr};
 
     IpcIoInit(&req, data, IPC_DATA_SIZE_SMALL, MAX_IPC_OBJ_COUNT);
+    if (!WriteInterfaceToken(&data, DECLARE_INTERFACE_DESCRIPTOR_L1, DECLARE_INTERFACE_DESCRIPTOR_L1_LENGTH)) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
     (void)WriteInt32(&req, 0);
     (void)WriteString(&req, protectName.c_str());
     owner.funcId = WIFI_SVR_CMD_PUT_WIFI_PROTECT;
@@ -511,6 +531,10 @@ ErrCode WifiDeviceProxy::AddDeviceConfig(const WifiDeviceConfig &config, int &re
     struct IpcOwner owner = {.exception = -1, .retCode = 0, .variable = nullptr};
 
     IpcIoInit(&req, data, IPC_DATA_SIZE_BIG, MAX_IPC_OBJ_COUNT);
+    if (!WriteInterfaceToken(&data, DECLARE_INTERFACE_DESCRIPTOR_L1, DECLARE_INTERFACE_DESCRIPTOR_L1_LENGTH)) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
     (void)WriteInt32(&req, 0);
     (void)WriteBool(&req, isCandidate);
     WriteDeviceConfig(config, req);
@@ -541,6 +565,10 @@ ErrCode WifiDeviceProxy::UpdateDeviceConfig(const WifiDeviceConfig &config, int 
     struct IpcOwner owner = {.exception = -1, .retCode = 0, .variable = nullptr};
 
     IpcIoInit(&req, data, IPC_DATA_SIZE_BIG, MAX_IPC_OBJ_COUNT);
+    if (!WriteInterfaceToken(&data, DECLARE_INTERFACE_DESCRIPTOR_L1, DECLARE_INTERFACE_DESCRIPTOR_L1_LENGTH)) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
     (void)WriteInt32(&req, 0);
     WriteDeviceConfig(config, req);
     owner.variable = &result;
@@ -570,6 +598,10 @@ ErrCode WifiDeviceProxy::RemoveDevice(int networkId)
     struct IpcOwner owner = {.exception = -1, .retCode = 0, .variable = nullptr};
 
     IpcIoInit(&req, data, IPC_DATA_SIZE_SMALL, MAX_IPC_OBJ_COUNT);
+    if (!WriteInterfaceToken(&data, DECLARE_INTERFACE_DESCRIPTOR_L1, DECLARE_INTERFACE_DESCRIPTOR_L1_LENGTH)) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
     (void)WriteInt32(&req, 0);
     (void)WriteInt32(&req, networkId);
     owner.funcId = WIFI_SVR_CMD_REMOVE_DEVICE_CONFIG;
@@ -598,6 +630,10 @@ ErrCode WifiDeviceProxy::RemoveAllDevice()
     struct IpcOwner owner = {.exception = -1, .retCode = 0, .variable = nullptr};
 
     IpcIoInit(&req, data, IPC_DATA_SIZE_SMALL, MAX_IPC_OBJ_COUNT);
+    if (!WriteInterfaceToken(&data, DECLARE_INTERFACE_DESCRIPTOR_L1, DECLARE_INTERFACE_DESCRIPTOR_L1_LENGTH)) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
     (void)WriteInt32(&req, 0);
     owner.funcId = WIFI_SVR_CMD_REMOVE_ALL_DEVICE_CONFIG;
     int error = remote_->Invoke(remote_, WIFI_SVR_CMD_REMOVE_ALL_DEVICE_CONFIG, &req, &owner, IpcCallback);
@@ -625,6 +661,10 @@ ErrCode WifiDeviceProxy::GetDeviceConfigs(std::vector<WifiDeviceConfig> &result,
     struct IpcOwner owner = {.exception = -1, .retCode = 0, .variable = nullptr};
 
     IpcIoInit(&req, data, IPC_DATA_SIZE_SMALL, MAX_IPC_OBJ_COUNT);
+    if (!WriteInterfaceToken(&data, DECLARE_INTERFACE_DESCRIPTOR_L1, DECLARE_INTERFACE_DESCRIPTOR_L1_LENGTH)) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
     (void)WriteInt32(&req, 0);
     (void)WriteBool(&req, isCandidate);
     owner.variable = &result;
@@ -655,6 +695,10 @@ ErrCode WifiDeviceProxy::EnableDeviceConfig(int networkId, bool attemptEnable)
     struct IpcOwner owner = {.exception = -1, .retCode = 0, .variable = nullptr};
 
     IpcIoInit(&req, data, IPC_DATA_SIZE_SMALL, MAX_IPC_OBJ_COUNT);
+    if (!WriteInterfaceToken(&data, DECLARE_INTERFACE_DESCRIPTOR_L1, DECLARE_INTERFACE_DESCRIPTOR_L1_LENGTH)) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
     (void)WriteInt32(&req, 0);
     (void)WriteInt32(&req, networkId);
     (void)WriteInt32(&req, attemptEnable);
@@ -684,6 +728,10 @@ ErrCode WifiDeviceProxy::DisableDeviceConfig(int networkId)
     struct IpcOwner owner = {.exception = -1, .retCode = 0, .variable = nullptr};
 
     IpcIoInit(&req, data, IPC_DATA_SIZE_SMALL, MAX_IPC_OBJ_COUNT);
+    if (!WriteInterfaceToken(&data, DECLARE_INTERFACE_DESCRIPTOR_L1, DECLARE_INTERFACE_DESCRIPTOR_L1_LENGTH)) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
     (void)WriteInt32(&req, 0);
     (void)WriteInt32(&req, networkId);
     owner.funcId = WIFI_SVR_CMD_DISABLE_DEVICE;
@@ -712,6 +760,10 @@ ErrCode WifiDeviceProxy::ConnectToNetwork(int networkId, bool isCandidate)
     struct IpcOwner owner = {.exception = -1, .retCode = 0, .variable = nullptr};
 
     IpcIoInit(&req, data, IPC_DATA_SIZE_SMALL, MAX_IPC_OBJ_COUNT);
+    if (!WriteInterfaceToken(&data, DECLARE_INTERFACE_DESCRIPTOR_L1, DECLARE_INTERFACE_DESCRIPTOR_L1_LENGTH)) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
     (void)WriteInt32(&req, 0);
     (void)WriteBool(&req, isCandidate);
     (void)WriteInt32(&req, networkId);
@@ -741,6 +793,10 @@ ErrCode WifiDeviceProxy::ConnectToDevice(const WifiDeviceConfig &config)
     struct IpcOwner owner = {.exception = -1, .retCode = 0, .variable = nullptr};
 
     IpcIoInit(&req, data, IPC_DATA_SIZE_BIG, MAX_IPC_OBJ_COUNT);
+    if (!WriteInterfaceToken(&data, DECLARE_INTERFACE_DESCRIPTOR_L1, DECLARE_INTERFACE_DESCRIPTOR_L1_LENGTH)) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
     (void)WriteInt32(&req, 0);
     WriteDeviceConfig(config, req);
     owner.funcId = WIFI_SVR_CMD_CONNECT2_TO;
@@ -768,6 +824,10 @@ ErrCode WifiDeviceProxy::IsConnected(bool &isConnected)
     char data[IPC_DATA_SIZE_SMALL];
     struct IpcOwner owner = {.exception = -1, .retCode = 0, .variable = nullptr};
     IpcIoInit(&req, data, IPC_DATA_SIZE_SMALL, MAX_IPC_OBJ_COUNT);
+    if (!WriteInterfaceToken(&data, DECLARE_INTERFACE_DESCRIPTOR_L1, DECLARE_INTERFACE_DESCRIPTOR_L1_LENGTH)) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
     (void)WriteInt32(&req, 0);
     owner.variable = &isConnected;
     owner.funcId = WIFI_SVR_CMD_IS_WIFI_CONNECTED;
@@ -796,6 +856,10 @@ ErrCode WifiDeviceProxy::ReConnect()
     struct IpcOwner owner = {.exception = -1, .retCode = 0, .variable = nullptr};
 
     IpcIoInit(&req, data, IPC_DATA_SIZE_SMALL, MAX_IPC_OBJ_COUNT);
+    if (!WriteInterfaceToken(&data, DECLARE_INTERFACE_DESCRIPTOR_L1, DECLARE_INTERFACE_DESCRIPTOR_L1_LENGTH)) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
     (void)WriteInt32(&req, 0);
     owner.funcId = WIFI_SVR_CMD_RECONNECT;
     int error = remote_->Invoke(remote_, WIFI_SVR_CMD_RECONNECT, &req, &owner, IpcCallback);
@@ -823,6 +887,10 @@ ErrCode WifiDeviceProxy::ReAssociate(void)
     struct IpcOwner owner = {.exception = -1, .retCode = 0, .variable = nullptr};
 
     IpcIoInit(&req, data, IPC_DATA_SIZE_SMALL, MAX_IPC_OBJ_COUNT);
+    if (!WriteInterfaceToken(&data, DECLARE_INTERFACE_DESCRIPTOR_L1, DECLARE_INTERFACE_DESCRIPTOR_L1_LENGTH)) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
     (void)WriteInt32(&req, 0);
     owner.funcId = WIFI_SVR_CMD_REASSOCIATE;
     int error = remote_->Invoke(remote_, WIFI_SVR_CMD_REASSOCIATE, &req, &owner, IpcCallback);
@@ -850,6 +918,10 @@ ErrCode WifiDeviceProxy::Disconnect(void)
     struct IpcOwner owner = {.exception = -1, .retCode = 0, .variable = nullptr};
 
     IpcIoInit(&req, data, IPC_DATA_SIZE_SMALL, MAX_IPC_OBJ_COUNT);
+    if (!WriteInterfaceToken(&data, DECLARE_INTERFACE_DESCRIPTOR_L1, DECLARE_INTERFACE_DESCRIPTOR_L1_LENGTH)) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
     (void)WriteInt32(&req, 0);
     owner.funcId = WIFI_SVR_CMD_DISCONNECT;
     int error = remote_->Invoke(remote_, WIFI_SVR_CMD_DISCONNECT, &req, &owner, IpcCallback);
@@ -877,6 +949,10 @@ ErrCode WifiDeviceProxy::StartWps(const WpsConfig &config)
     struct IpcOwner owner = {.exception = -1, .retCode = 0, .variable = nullptr};
 
     IpcIoInit(&req, data, IPC_DATA_SIZE_SMALL, MAX_IPC_OBJ_COUNT);
+    if (!WriteInterfaceToken(&data, DECLARE_INTERFACE_DESCRIPTOR_L1, DECLARE_INTERFACE_DESCRIPTOR_L1_LENGTH)) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
     (void)WriteInt32(&req, 0);
     (void)WriteInt32(&req, static_cast<int>(config.setup));
     (void)WriteString(&req, config.pin.c_str());
@@ -907,6 +983,10 @@ ErrCode WifiDeviceProxy::CancelWps(void)
     struct IpcOwner owner = {.exception = -1, .retCode = 0, .variable = nullptr};
 
     IpcIoInit(&req, data, IPC_DATA_SIZE_SMALL, MAX_IPC_OBJ_COUNT);
+    if (!WriteInterfaceToken(&data, DECLARE_INTERFACE_DESCRIPTOR_L1, DECLARE_INTERFACE_DESCRIPTOR_L1_LENGTH)) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
     (void)WriteInt32(&req, 0);
     owner.funcId = WIFI_SVR_CMD_CANCEL_WPS;
     int error = remote_->Invoke(remote_, WIFI_SVR_CMD_CANCEL_WPS, &req, &owner, IpcCallback);
@@ -934,6 +1014,10 @@ ErrCode WifiDeviceProxy::IsWifiActive(bool &bActive)
     struct IpcOwner owner = {.exception = -1, .retCode = 0, .variable = nullptr};
 
     IpcIoInit(&req, data, IPC_DATA_SIZE_SMALL, MAX_IPC_OBJ_COUNT);
+    if (!WriteInterfaceToken(&data, DECLARE_INTERFACE_DESCRIPTOR_L1, DECLARE_INTERFACE_DESCRIPTOR_L1_LENGTH)) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
     (void)WriteInt32(&req, 0);
     owner.variable = &bActive;
     owner.funcId = WIFI_SVR_CMD_IS_WIFI_ACTIVE;
@@ -962,6 +1046,10 @@ ErrCode WifiDeviceProxy::GetWifiState(int &state)
     struct IpcOwner owner = {.exception = -1, .retCode = 0, .variable = nullptr};
 
     IpcIoInit(&req, data, IPC_DATA_SIZE_SMALL, MAX_IPC_OBJ_COUNT);
+    if (!WriteInterfaceToken(&data, DECLARE_INTERFACE_DESCRIPTOR_L1, DECLARE_INTERFACE_DESCRIPTOR_L1_LENGTH)) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
     (void)WriteInt32(&req, 0);
     owner.variable = &state;
     owner.funcId = WIFI_SVR_CMD_GET_WIFI_STATE;
@@ -990,6 +1078,10 @@ ErrCode WifiDeviceProxy::GetLinkedInfo(WifiLinkedInfo &info)
     struct IpcOwner owner = {.exception = -1, .retCode = 0, .variable = nullptr};
 
     IpcIoInit(&req, data, IPC_DATA_SIZE_SMALL, MAX_IPC_OBJ_COUNT);
+    if (!WriteInterfaceToken(&data, DECLARE_INTERFACE_DESCRIPTOR_L1, DECLARE_INTERFACE_DESCRIPTOR_L1_LENGTH)) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
     (void)WriteInt32(&req, 0);
     owner.variable = &info;
     owner.funcId = WIFI_SVR_CMD_GET_LINKED_INFO;
@@ -1018,6 +1110,10 @@ ErrCode WifiDeviceProxy::GetIpInfo(IpInfo &info)
     struct IpcOwner owner = {.exception = -1, .retCode = 0, .variable = nullptr};
 
     IpcIoInit(&req, data, IPC_DATA_SIZE_SMALL, MAX_IPC_OBJ_COUNT);
+    if (!WriteInterfaceToken(&data, DECLARE_INTERFACE_DESCRIPTOR_L1, DECLARE_INTERFACE_DESCRIPTOR_L1_LENGTH)) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
     (void)WriteInt32(&req, 0);
     owner.variable = &info;
     owner.funcId = WIFI_SVR_CMD_GET_DHCP_INFO;
@@ -1046,6 +1142,10 @@ ErrCode WifiDeviceProxy::SetCountryCode(const std::string &countryCode)
     struct IpcOwner owner = {.exception = -1, .retCode = 0, .variable = nullptr};
 
     IpcIoInit(&req, data, IPC_DATA_SIZE_SMALL, MAX_IPC_OBJ_COUNT);
+    if (!WriteInterfaceToken(&data, DECLARE_INTERFACE_DESCRIPTOR_L1, DECLARE_INTERFACE_DESCRIPTOR_L1_LENGTH)) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
     (void)WriteInt32(&req, 0);
     (void)WriteString(&req, countryCode.c_str());
     owner.funcId = WIFI_SVR_CMD_SET_COUNTRY_CODE;
@@ -1074,6 +1174,10 @@ ErrCode WifiDeviceProxy::GetCountryCode(std::string &countryCode)
     struct IpcOwner owner = {.exception = -1, .retCode = 0, .variable = nullptr};
 
     IpcIoInit(&req, data, IPC_DATA_SIZE_SMALL, MAX_IPC_OBJ_COUNT);
+    if (!WriteInterfaceToken(&data, DECLARE_INTERFACE_DESCRIPTOR_L1, DECLARE_INTERFACE_DESCRIPTOR_L1_LENGTH)) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
     (void)WriteInt32(&req, 0);
     owner.variable = &countryCode;
     owner.funcId = WIFI_SVR_CMD_GET_COUNTRY_CODE;
@@ -1110,6 +1214,10 @@ ErrCode WifiDeviceProxy::RegisterCallBack(const std::shared_ptr<IWifiDeviceCallB
     struct IpcOwner owner = {.exception = -1, .retCode = 0, .variable = nullptr};
 
     IpcIoInit(&req, data, IPC_DATA_SIZE_SMALL, MAX_IPC_OBJ_COUNT);
+    if (!WriteInterfaceToken(&data, DECLARE_INTERFACE_DESCRIPTOR_L1, DECLARE_INTERFACE_DESCRIPTOR_L1_LENGTH)) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
     (void)WriteInt32(&req, 0);
     bool writeRemote = WriteRemoteObject(&req, &g_sid);
     if (!writeRemote) {
@@ -1144,6 +1252,10 @@ ErrCode WifiDeviceProxy::GetSignalLevel(const int &rssi, const int &band, int &l
     struct IpcOwner owner = {.exception = -1, .retCode = 0, .variable = nullptr};
 
     IpcIoInit(&req, data, IPC_DATA_SIZE_SMALL, MAX_IPC_OBJ_COUNT);
+    if (!WriteInterfaceToken(&data, DECLARE_INTERFACE_DESCRIPTOR_L1, DECLARE_INTERFACE_DESCRIPTOR_L1_LENGTH)) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
     (void)WriteInt32(&req, 0);
     (void)WriteInt32(&req, rssi);
     (void)WriteInt32(&req, band);
@@ -1174,6 +1286,10 @@ ErrCode WifiDeviceProxy::GetSupportedFeatures(long &features)
     struct IpcOwner owner = {.exception = -1, .retCode = 0, .variable = nullptr};
 
     IpcIoInit(&req, data, IPC_DATA_SIZE_SMALL, MAX_IPC_OBJ_COUNT);
+    if (!WriteInterfaceToken(&data, DECLARE_INTERFACE_DESCRIPTOR_L1, DECLARE_INTERFACE_DESCRIPTOR_L1_LENGTH)) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
     (void)WriteInt32(&req, 0);
     owner.variable = &features;
     owner.funcId = WIFI_SVR_CMD_GET_SUPPORTED_FEATURES;
@@ -1202,6 +1318,10 @@ ErrCode WifiDeviceProxy::GetDeviceMacAddress(std::string &result)
     struct IpcOwner owner = {.exception = -1, .retCode = 0, .variable = nullptr};
 
     IpcIoInit(&req, data, IPC_DATA_SIZE_SMALL, MAX_IPC_OBJ_COUNT);
+    if (!WriteInterfaceToken(&data, DECLARE_INTERFACE_DESCRIPTOR_L1, DECLARE_INTERFACE_DESCRIPTOR_L1_LENGTH)) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
     (void)WriteInt32(&req, 0);
     owner.variable = &result;
     owner.funcId = WIFI_SVR_CMD_GET_DERVICE_MAC_ADD;
@@ -1231,6 +1351,10 @@ bool WifiDeviceProxy::SetLowLatencyMode(bool enabled)
     struct IpcOwner owner = {.exception = -1, .retCode = 0, .variable = nullptr};
 
     IpcIoInit(&req, data, IPC_DATA_SIZE_SMALL, MAX_IPC_OBJ_COUNT);
+    if (!WriteInterfaceToken(&data, DECLARE_INTERFACE_DESCRIPTOR_L1, DECLARE_INTERFACE_DESCRIPTOR_L1_LENGTH)) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
     (void)WriteInt32(&req, 0);
     (void)WriteBool(&req, enabled);
     owner.variable = &result;

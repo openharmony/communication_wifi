@@ -31,7 +31,7 @@ WifiScanStub::WifiScanStub() : callback_(nullptr)
 WifiScanStub::~WifiScanStub()
 {}
 
-static int WifiScanStub::CheckInterfaceToken(IpcIo *req)
+int WifiScanStub::CheckInterfaceToken(IpcIo *req)
 {
     size_t length;
     uint16_t* interfaceRead = nullptr;

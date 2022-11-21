@@ -208,6 +208,10 @@ ErrCode WifiScanProxy::SetScanControlInfo(const ScanControlInfo &info)
     struct IpcOwner owner = {.exception = -1, .retCode = 0, .variable = nullptr};
 
     IpcIoInit(&request, data, IPC_DATA_SIZE_BIG, MAX_IPC_OBJ_COUNT);
+    if (!WriteInterfaceToken(&data, DECLARE_INTERFACE_DESCRIPTOR_L1, DECLARE_INTERFACE_DESCRIPTOR_L1_LENGTH)) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
     (void)WriteInt32(&request, 0);
     (void)WriteInt32(&request, info.scanForbidList.size());
     for (auto iter = info.scanForbidList.begin(); iter != info.scanForbidList.end(); iter++) {
@@ -253,6 +257,10 @@ ErrCode WifiScanProxy::Scan()
     struct IpcOwner owner = {.exception = -1, .retCode = 0, .variable = nullptr};
 
     IpcIoInit(&request, data, IPC_DATA_SIZE_SMALL, MAX_IPC_OBJ_COUNT);
+    if (!WriteInterfaceToken(&data, DECLARE_INTERFACE_DESCRIPTOR_L1, DECLARE_INTERFACE_DESCRIPTOR_L1_LENGTH)) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
     (void)WriteInt32(&request, 0);
 
     owner.funcId = WIFI_SVR_CMD_FULL_SCAN;
@@ -281,6 +289,10 @@ ErrCode WifiScanProxy::AdvanceScan(const WifiScanParams &params)
     struct IpcOwner owner = {.exception = -1, .retCode = 0, .variable = nullptr};
 
     IpcIoInit(&request, data, IPC_DATA_SIZE_MID, MAX_IPC_OBJ_COUNT);
+    if (!WriteInterfaceToken(&data, DECLARE_INTERFACE_DESCRIPTOR_L1, DECLARE_INTERFACE_DESCRIPTOR_L1_LENGTH)) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
     (void)WriteInt32(&request, 0);
     (void)WriteString(&request, params.ssid.c_str());
     (void)WriteString(&request, params.bssid.c_str());
@@ -317,6 +329,10 @@ ErrCode WifiScanProxy::IsWifiClosedScan(bool &bOpen)
     struct IpcOwner owner = {.exception = -1, .retCode = 0, .variable = nullptr};
 
     IpcIoInit(&request, data, IPC_DATA_SIZE_SMALL, MAX_IPC_OBJ_COUNT);
+    if (!WriteInterfaceToken(&data, DECLARE_INTERFACE_DESCRIPTOR_L1, DECLARE_INTERFACE_DESCRIPTOR_L1_LENGTH)) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
     (void)WriteInt32(&request, 0);
     owner.variable = &bOpen;
     owner.funcId = WIFI_SVR_CMD_IS_SCAN_ALWAYS_ACTIVE;
@@ -345,6 +361,10 @@ ErrCode WifiScanProxy::GetScanInfoList(std::vector<WifiScanInfo> &result)
     struct IpcOwner owner = {.exception = -1, .retCode = 0, .variable = nullptr};
 
     IpcIoInit(&request, data, IPC_DATA_SIZE_SMALL, MAX_IPC_OBJ_COUNT);
+    if (!WriteInterfaceToken(&data, DECLARE_INTERFACE_DESCRIPTOR_L1, DECLARE_INTERFACE_DESCRIPTOR_L1_LENGTH)) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
     (void)WriteInt32(&request, 0);
     owner.variable = &result;
     owner.funcId = WIFI_SVR_CMD_GET_SCAN_INFO_LIST;
@@ -381,6 +401,10 @@ ErrCode WifiScanProxy::RegisterCallBack(const std::shared_ptr<IWifiScanCallback>
     struct IpcOwner owner = {.exception = -1, .retCode = 0, .variable = nullptr};
 
     IpcIoInit(&request, data, IPC_DATA_SIZE_SMALL, MAX_IPC_OBJ_COUNT);
+    if (!WriteInterfaceToken(&data, DECLARE_INTERFACE_DESCRIPTOR_L1, DECLARE_INTERFACE_DESCRIPTOR_L1_LENGTH)) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
     (void)WriteInt32(&request, 0);
     (void)WriteRemoteObject(&request, &g_sid);
 
@@ -411,6 +435,10 @@ ErrCode WifiScanProxy::GetSupportedFeatures(long &features)
     struct IpcOwner owner = {.exception = -1, .retCode = 0, .variable = nullptr};
 
     IpcIoInit(&request, data, IPC_DATA_SIZE_SMALL, MAX_IPC_OBJ_COUNT);
+    if (!WriteInterfaceToken(&data, DECLARE_INTERFACE_DESCRIPTOR_L1, DECLARE_INTERFACE_DESCRIPTOR_L1_LENGTH)) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
     (void)WriteInt32(&request, 0);
     owner.variable = &features;
     owner.funcId = WIFI_SVR_CMD_GET_SUPPORTED_FEATURES;

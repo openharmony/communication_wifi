@@ -23,20 +23,50 @@ DEFINE_WIFILOG_P2P_LABEL("WifiP2pProxy");
 
 static sptr<WifiP2pCallbackStub> g_wifiP2pCallbackStub =
     sptr<WifiP2pCallbackStub>(new (std::nothrow) WifiP2pCallbackStub());
-WifiP2pProxy::WifiP2pProxy(const sptr<IRemoteObject> &impl) : IRemoteProxy<IWifiP2p>(impl), mRemoteDied(false)
+
+WifiP2pProxy::WifiP2pProxy(const sptr<IRemoteObject> &impl) : IRemoteProxy<IWifiP2p>(impl),
+    mRemoteDied(false), remote_(nullptr), deathRecipient_(nullptr)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     if (impl) {
-        if ((impl->IsProxyObject()) && (!impl->AddDeathRecipient(this))) {
-            WIFI_LOGD("AddDeathRecipient!");
-        } else {
-            WIFI_LOGW("no recipient!");
+        if (!impl->IsProxyObject()) {
+            WIFI_LOGW("not proxy object!");
+            return;
         }
+        deathRecipient_ = new (std::nothrow) WifiDeathRecipient(*this);
+        if (deathRecipient_ == nullptr) {
+            WIFI_LOGW("deathRecipient_ is nullptr!");
+        }
+        if (!impl->AddDeathRecipient(deathRecipient_)) {
+            WIFI_LOGW("AddDeathRecipient failed!");
+            return;
+        }
+        remote_ = impl;
+        WIFI_LOGI("AddDeathRecipient success! deathRecipient_: %{private}p", (void*)deathRecipient_);
+
     }
 }
 
 WifiP2pProxy::~WifiP2pProxy()
 {
     WIFI_LOGI("enter ~WifiP2pProxy!");
+    RemoveDeathRecipient();
+}
+
+void WifiP2pProxy::RemoveDeathRecipient(void)
+{
+    WIFI_LOGI("enter RemoveDeathRecipient, deathRecipient_: %{private}p!", (void*)deathRecipient_);
+    std::lock_guard<std::mutex> lock(mutex_);
+    if (remote_ == nullptr) {
+        WIFI_LOGI("remote_ is nullptr!");
+        return;
+    }
+    if (deathRecipient_ == nullptr) {
+        WIFI_LOGI("deathRecipient_ is nullptr!");
+        return;
+    }
+    remote_->RemoveDeathRecipient(deathRecipient_);
+    remote_ = nullptr;
 }
 
 ErrCode WifiP2pProxy::EnableP2p(void)
@@ -1527,6 +1557,12 @@ void WifiP2pProxy::OnRemoteDied(const wptr<IRemoteObject>& remoteObject)
         return;
     }
     g_wifiP2pCallbackStub->SetRemoteDied(true);
+}
+
+bool WifiP2pProxy::IsRemoteDied(void)
+{
+    WIFI_LOGI("IsRemoteDied! mRemoteDied: %{public}d", mRemoteDied);
+    return mRemoteDied;
 }
 }  // namespace Wifi
 }  // namespace OHOS

@@ -32,7 +32,6 @@ WifiDeviceProxy::WifiDeviceProxy(const sptr<IRemoteObject> &impl) : IRemoteProxy
 {
     std::lock_guard<std::mutex> lock(mutex_);
     if (impl) {
-        remote_ = impl;
         if (!remote_->IsProxyObject()) {
             WIFI_LOGW("not proxy object!");
             return;
@@ -45,6 +44,7 @@ WifiDeviceProxy::WifiDeviceProxy(const sptr<IRemoteObject> &impl) : IRemoteProxy
             WIFI_LOGW("AddDeathRecipient failed!");
             return;
         }
+        remote_ = impl;
         WIFI_LOGI("AddDeathRecipient success! deathRecipient_: %{private}p", (void*)deathRecipient_);
     }
 }
@@ -1231,6 +1231,12 @@ void WifiDeviceProxy::OnRemoteDied(const wptr<IRemoteObject> &remoteObject)
     if (g_deviceCallBackStub != nullptr) {
         g_deviceCallBackStub->SetRemoteDied(true);
     }
+}
+
+bool WifiDeviceProxy::IsRemoteDied(void)
+{
+    WIFI_LOGI("IsRemoteDied! mRemoteDied: %{public}d", mRemoteDied);
+    return mRemoteDied;
 }
 }  // namespace Wifi
 }  // namespace OHOS

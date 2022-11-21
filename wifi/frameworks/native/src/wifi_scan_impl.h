@@ -89,7 +89,15 @@ public:
      */
     ErrCode AdvanceScan(const WifiScanParams &params);
 
+    /**
+     * @Description Check whether service is died.
+     *
+     * @return bool - true: service is died, false: service is not died.
+     */
+    bool IsRemoteDied(void);
+
 private:
+    bool WifiScanImpl::GetWifiScanProxy(void);
     int systemAbilityId_;
 #ifdef OHOS_ARCH_LITE
     IWifiScan *client_;

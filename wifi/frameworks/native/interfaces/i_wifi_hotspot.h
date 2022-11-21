@@ -184,6 +184,7 @@ public:
      * @return ErrCode - operation result
      */
     virtual ErrCode SetPowerModel(const PowerModel& model) = 0;
+
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.wifi.IWifiHotspotService");
 };

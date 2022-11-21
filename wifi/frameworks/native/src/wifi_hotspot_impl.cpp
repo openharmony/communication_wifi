@@ -43,6 +43,18 @@ WifiHotspotImpl::~WifiHotspotImpl()
 
 bool WifiHotspotImpl::Init(int id)
 {
+    instId = id;
+    return GetWifiHotspotProxy();
+}
+
+bool WifiHotspotImpl::GetWifiHotspotProxy(void)
+{
+    WIFI_LOGI("enter GetWifiHotspotProxy!");
+    if (client_ != nullptr && !IsRemoteDied()) {
+        WIFI_LOGI("client_ is existed now!");
+        return true;
+    }
+
     sptr<ISystemAbilityManager> sa_mgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (sa_mgr == nullptr) {
         WIFI_LOGE("failed to get SystemAbilityManager");
@@ -64,119 +76,119 @@ bool WifiHotspotImpl::Init(int id)
         return false;
     }
 
-    sptr<IRemoteObject> service = hotspotMgr->GetWifiRemote(id);
+    sptr<IRemoteObject> service = hotspotMgr->GetWifiRemote(instId);
     if (service == nullptr) {
-        WIFI_LOGE("wifi device remote obj is null, %{public}d", id);
+        WIFI_LOGE("wifi device remote obj is null, %{public}d", instId);
         return false;
     }
+
     client_ = new (std::nothrow) WifiHotspotProxy(service);
     if (client_ == nullptr) {
         WIFI_LOGE("wifi device id init failed., %{public}d", systemAbilityId_);
         return false;
     }
-
     return true;
 }
 
 ErrCode WifiHotspotImpl::IsHotspotActive(bool &isActive)
 {
-    RETURN_IF_FAIL(client_);
+    RETURN_IF_FAIL(GetWifiHotspotProxy());
     return client_->IsHotspotActive(isActive);
 }
 
 ErrCode WifiHotspotImpl::IsHotspotDualBandSupported(bool &isSupported)
 {
-    RETURN_IF_FAIL(client_);
+    RETURN_IF_FAIL(GetWifiHotspotProxy());
     return client_->IsHotspotDualBandSupported(isSupported);
 }
 
 ErrCode WifiHotspotImpl::GetHotspotState(int &state)
 {
-    RETURN_IF_FAIL(client_);
+    RETURN_IF_FAIL(GetWifiHotspotProxy());
     return client_->GetHotspotState(state);
 }
 
 ErrCode WifiHotspotImpl::GetHotspotConfig(HotspotConfig &config)
 {
-    RETURN_IF_FAIL(client_);
+    RETURN_IF_FAIL(GetWifiHotspotProxy());
     return client_->GetHotspotConfig(config);
 }
 
 ErrCode WifiHotspotImpl::SetHotspotConfig(const HotspotConfig &config)
 {
-    RETURN_IF_FAIL(client_);
+    RETURN_IF_FAIL(GetWifiHotspotProxy());
     return client_->SetHotspotConfig(config);
 }
 
 ErrCode WifiHotspotImpl::GetStationList(std::vector<StationInfo> &result)
 {
-    RETURN_IF_FAIL(client_);
+    RETURN_IF_FAIL(GetWifiHotspotProxy());
     return client_->GetStationList(result);
 }
 
 ErrCode WifiHotspotImpl::DisassociateSta(const StationInfo &info)
 {
-    RETURN_IF_FAIL(client_);
+    RETURN_IF_FAIL(GetWifiHotspotProxy());
     return client_->DisassociateSta(info);
 }
 
 ErrCode WifiHotspotImpl::EnableHotspot(const ServiceType type)
 {
-    RETURN_IF_FAIL(client_);
+    RETURN_IF_FAIL(GetWifiHotspotProxy());
     return client_->EnableHotspot(type);
 }
 
 ErrCode WifiHotspotImpl::DisableHotspot(const ServiceType type)
 {
-    RETURN_IF_FAIL(client_);
+    RETURN_IF_FAIL(GetWifiHotspotProxy());
     return client_->DisableHotspot(type);
 }
 
 ErrCode WifiHotspotImpl::GetBlockLists(std::vector<StationInfo> &infos)
 {
-    RETURN_IF_FAIL(client_);
+    RETURN_IF_FAIL(GetWifiHotspotProxy());
     return client_->GetBlockLists(infos);
 }
 
 ErrCode WifiHotspotImpl::AddBlockList(const StationInfo &info)
 {
-    RETURN_IF_FAIL(client_);
+    RETURN_IF_FAIL(GetWifiHotspotProxy());
     return client_->AddBlockList(info);
 }
 
 ErrCode WifiHotspotImpl::DelBlockList(const StationInfo &info)
 {
-    RETURN_IF_FAIL(client_);
+    RETURN_IF_FAIL(GetWifiHotspotProxy());
     return client_->DelBlockList(info);
 }
 
 ErrCode WifiHotspotImpl::GetValidBands(std::vector<BandType> &bands)
 {
-    RETURN_IF_FAIL(client_);
+    RETURN_IF_FAIL(GetWifiHotspotProxy());
     return client_->GetValidBands(bands);
 }
 
 ErrCode WifiHotspotImpl::GetValidChannels(BandType band, std::vector<int32_t> &validchannels)
 {
-    RETURN_IF_FAIL(client_);
+    RETURN_IF_FAIL(GetWifiHotspotProxy());
     return client_->GetValidChannels(band, validchannels);
 }
 
 ErrCode WifiHotspotImpl::RegisterCallBack(const sptr<IWifiHotspotCallback> &callback)
 {
-    RETURN_IF_FAIL(client_);
+    RETURN_IF_FAIL(GetWifiHotspotProxy());
     return client_->RegisterCallBack(callback);
 }
 
 ErrCode WifiHotspotImpl::GetSupportedFeatures(long &features)
 {
-    RETURN_IF_FAIL(client_);
+    RETURN_IF_FAIL(GetWifiHotspotProxy());
     return client_->GetSupportedFeatures(features);
 }
 
 bool WifiHotspotImpl::IsFeatureSupported(long feature)
 {
-    RETURN_IF_FAIL(client_);
+    RETURN_IF_FAIL(GetWifiHotspotProxy());
     long tmpFeatures = 0;
     if (client_->GetSupportedFeatures(tmpFeatures) != WIFI_OPT_SUCCESS) {
         return false;
@@ -186,20 +198,26 @@ bool WifiHotspotImpl::IsFeatureSupported(long feature)
 
 ErrCode WifiHotspotImpl::GetSupportedPowerModel(std::set<PowerModel>& setPowerModelList)
 {
-    RETURN_IF_FAIL(client_);
+    RETURN_IF_FAIL(GetWifiHotspotProxy());
     return client_->GetSupportedPowerModel(setPowerModelList);
 }
 
 ErrCode WifiHotspotImpl::GetPowerModel(PowerModel& model)
 {
-    RETURN_IF_FAIL(client_);
+    RETURN_IF_FAIL(GetWifiHotspotProxy());
     return client_->GetPowerModel(model);
 }
 
 ErrCode WifiHotspotImpl::SetPowerModel(const PowerModel& model)
 {
-    RETURN_IF_FAIL(client_);
+    RETURN_IF_FAIL(GetWifiHotspotProxy());
     return client_->SetPowerModel(model);
+}
+
+bool WifiHotspotImpl::IsRemoteDied(void)
+{
+    RETURN_IF_FAIL(GetWifiHotspotProxy());
+    return client_->IsRemoteDied();
 }
 }  // namespace Wifi
 }  // namespace OHOS

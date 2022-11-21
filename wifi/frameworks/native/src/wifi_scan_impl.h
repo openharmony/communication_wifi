@@ -97,7 +97,7 @@ public:
     bool IsRemoteDied(void);
 
 private:
-    bool WifiScanImpl::GetWifiScanProxy(void);
+    bool GetWifiScanProxy(void);
     int systemAbilityId_;
 #ifdef OHOS_ARCH_LITE
     IWifiScan *client_;

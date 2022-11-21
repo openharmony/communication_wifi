@@ -25,6 +25,9 @@
 #undef LOG_TAG
 #define LOG_TAG "WifiCrpc"
 
+#undef LOG_DOMAIN
+#define  LOG_DOMAIN    0xD001560
+
 #define LOGD(...) ((void)HiLogPrint(LOG_CORE, LOG_DEBUG, LOG_DOMAIN, LOG_TAG, __VA_ARGS__))
 
 #define LOGI(...) ((void)HiLogPrint(LOG_CORE, LOG_INFO, LOG_DOMAIN, LOG_TAG, __VA_ARGS__))

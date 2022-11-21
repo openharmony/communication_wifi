@@ -166,8 +166,8 @@ void WifiDeviceServiceImpl::OnStart()
 void WifiDeviceServiceImpl::StartWatchdog(void)
 {
     auto taskFunc = [this]() {
-        uint64_t now = std::chrono::duration_cast<std::chrono::milliseconds>(
-        std::chrono::steady_clock::now().time_since_epoch()).count();
+        uint64_t now = static_cast<uint64_t>(std::chrono::duration_cast<std::chrono::milliseconds>(
+        std::chrono::steady_clock::now().time_since_epoch()).count());
         uint64_t interval = now - WifiSettings::GetInstance().GetThreadStartTime();
         if ((WifiSettings::GetInstance().GetThreadStatusFlag()) && (interval > WATCHDOG_INTERVAL_MS)) {
             WIFI_LOGE("watchdog happened, thread need restart");

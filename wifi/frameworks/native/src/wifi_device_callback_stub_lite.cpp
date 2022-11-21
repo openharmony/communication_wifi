@@ -27,6 +27,20 @@ WifiDeviceCallBackStub::WifiDeviceCallBackStub() : callback_(nullptr), mRemoteDi
 WifiDeviceCallBackStub::~WifiDeviceCallBackStub()
 {}
 
+int WifiDeviceCallBackStub::OnRemoteInterfaceToken(IpcIo *data)
+{
+    size_t length;
+    uint16_t* interfaceRead = nullptr;
+    interfaceRead = ReadInterfaceToken(data, &length);
+    for (size_t i = 0; i < length; i++) {
+        if (i >= DECLARE_INTERFACE_DESCRIPTOR_L1_LENGTH || interfaceRead[i] != DECLARE_INTERFACE_DESCRIPTOR_L1[i]) {
+            WIFI_LOGE("Sta stub token verification error: %{public}d", code);
+            return WIFI_OPT_FAILED;
+        }
+    }
+    return WIFI_OPT_SUCCESS;
+}
+
 int WifiDeviceCallBackStub::OnRemoteRequest(uint32_t code, IpcIo *data)
 {
     int ret = WIFI_OPT_FAILED;
@@ -37,16 +51,9 @@ int WifiDeviceCallBackStub::OnRemoteRequest(uint32_t code, IpcIo *data)
         return ret;
     }
 
-    size_t length;
-    uint16_t* interfaceRead = nullptr;
-    interfaceRead = ReadInterfaceToken(data, &length);
-    for (size_t i = 0; i < length; i++) {
-        if (i >= DECLARE_INTERFACE_DESCRIPTOR_L1_LENGTH || interfaceRead[i] != DECLARE_INTERFACE_DESCRIPTOR_L1[i]) {
-            WIFI_LOGE("Sta stub token verification error: %{public}d", code);
-            return WIFI_OPT_FAILED;
-        }
+    if (OnRemoteInterfaceToken(data) == WIFI_OPT_FAILED) {
+        return WIFI_OPT_FAILED;
     }
-
     int exception = WIFI_OPT_FAILED;
     (void)ReadInt32(data, &exception);
     if (exception) {

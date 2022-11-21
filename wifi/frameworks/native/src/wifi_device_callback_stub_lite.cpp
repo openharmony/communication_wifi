@@ -27,7 +27,7 @@ WifiDeviceCallBackStub::WifiDeviceCallBackStub() : callback_(nullptr), mRemoteDi
 WifiDeviceCallBackStub::~WifiDeviceCallBackStub()
 {}
 
-int WifiDeviceCallBackStub::OnRemoteInterfaceToken(IpcIo *data)
+int WifiDeviceCallBackStub::OnRemoteInterfaceToken(uint32_t code, IpcIo *data)
 {
     size_t length;
     uint16_t* interfaceRead = nullptr;
@@ -51,7 +51,7 @@ int WifiDeviceCallBackStub::OnRemoteRequest(uint32_t code, IpcIo *data)
         return ret;
     }
 
-    if (OnRemoteInterfaceToken(data) == WIFI_OPT_FAILED) {
+    if (OnRemoteInterfaceToken(code, data) == WIFI_OPT_FAILED) {
         return WIFI_OPT_FAILED;
     }
     int exception = WIFI_OPT_FAILED;

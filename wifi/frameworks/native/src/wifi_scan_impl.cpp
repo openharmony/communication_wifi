@@ -65,6 +65,9 @@ bool WifiScanImpl::Init()
 
 bool WifiScanImpl::GetWifiScanProxy(void)
 {
+#ifdef OHOS_ARCH_LITE
+    return (client_ != nullptr);
+#else
     WIFI_LOGI("enter GetWifiScanProxy!");
     if (client_ != nullptr && !IsRemoteDied()) {
         WIFI_LOGI("client_ is existed now!");
@@ -90,6 +93,7 @@ bool WifiScanImpl::GetWifiScanProxy(void)
         return false;
     }
     return true;
+#endif
 }
 
 ErrCode WifiScanImpl::SetScanControlInfo(const ScanControlInfo &info)

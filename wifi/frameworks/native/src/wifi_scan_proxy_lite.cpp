@@ -208,7 +208,7 @@ ErrCode WifiScanProxy::SetScanControlInfo(const ScanControlInfo &info)
     struct IpcOwner owner = {.exception = -1, .retCode = 0, .variable = nullptr};
 
     IpcIoInit(&request, data, IPC_DATA_SIZE_BIG, MAX_IPC_OBJ_COUNT);
-    if (!WriteInterfaceToken(&data, DECLARE_INTERFACE_DESCRIPTOR_L1, DECLARE_INTERFACE_DESCRIPTOR_L1_LENGTH)) {
+    if (!WriteInterfaceToken(&request, DECLARE_INTERFACE_DESCRIPTOR_L1, DECLARE_INTERFACE_DESCRIPTOR_L1_LENGTH)) {
         WIFI_LOGE("Write interface token error: %{public}s", __func__);
         return WIFI_OPT_FAILED;
     }
@@ -257,7 +257,7 @@ ErrCode WifiScanProxy::Scan()
     struct IpcOwner owner = {.exception = -1, .retCode = 0, .variable = nullptr};
 
     IpcIoInit(&request, data, IPC_DATA_SIZE_SMALL, MAX_IPC_OBJ_COUNT);
-    if (!WriteInterfaceToken(&data, DECLARE_INTERFACE_DESCRIPTOR_L1, DECLARE_INTERFACE_DESCRIPTOR_L1_LENGTH)) {
+    if (!WriteInterfaceToken(&request, DECLARE_INTERFACE_DESCRIPTOR_L1, DECLARE_INTERFACE_DESCRIPTOR_L1_LENGTH)) {
         WIFI_LOGE("Write interface token error: %{public}s", __func__);
         return WIFI_OPT_FAILED;
     }
@@ -289,7 +289,7 @@ ErrCode WifiScanProxy::AdvanceScan(const WifiScanParams &params)
     struct IpcOwner owner = {.exception = -1, .retCode = 0, .variable = nullptr};
 
     IpcIoInit(&request, data, IPC_DATA_SIZE_MID, MAX_IPC_OBJ_COUNT);
-    if (!WriteInterfaceToken(&data, DECLARE_INTERFACE_DESCRIPTOR_L1, DECLARE_INTERFACE_DESCRIPTOR_L1_LENGTH)) {
+    if (!WriteInterfaceToken(&request, DECLARE_INTERFACE_DESCRIPTOR_L1, DECLARE_INTERFACE_DESCRIPTOR_L1_LENGTH)) {
         WIFI_LOGE("Write interface token error: %{public}s", __func__);
         return WIFI_OPT_FAILED;
     }
@@ -329,7 +329,7 @@ ErrCode WifiScanProxy::IsWifiClosedScan(bool &bOpen)
     struct IpcOwner owner = {.exception = -1, .retCode = 0, .variable = nullptr};
 
     IpcIoInit(&request, data, IPC_DATA_SIZE_SMALL, MAX_IPC_OBJ_COUNT);
-    if (!WriteInterfaceToken(&data, DECLARE_INTERFACE_DESCRIPTOR_L1, DECLARE_INTERFACE_DESCRIPTOR_L1_LENGTH)) {
+    if (!WriteInterfaceToken(&request, DECLARE_INTERFACE_DESCRIPTOR_L1, DECLARE_INTERFACE_DESCRIPTOR_L1_LENGTH)) {
         WIFI_LOGE("Write interface token error: %{public}s", __func__);
         return WIFI_OPT_FAILED;
     }
@@ -361,7 +361,7 @@ ErrCode WifiScanProxy::GetScanInfoList(std::vector<WifiScanInfo> &result)
     struct IpcOwner owner = {.exception = -1, .retCode = 0, .variable = nullptr};
 
     IpcIoInit(&request, data, IPC_DATA_SIZE_SMALL, MAX_IPC_OBJ_COUNT);
-    if (!WriteInterfaceToken(&data, DECLARE_INTERFACE_DESCRIPTOR_L1, DECLARE_INTERFACE_DESCRIPTOR_L1_LENGTH)) {
+    if (!WriteInterfaceToken(&request, DECLARE_INTERFACE_DESCRIPTOR_L1, DECLARE_INTERFACE_DESCRIPTOR_L1_LENGTH)) {
         WIFI_LOGE("Write interface token error: %{public}s", __func__);
         return WIFI_OPT_FAILED;
     }
@@ -401,7 +401,7 @@ ErrCode WifiScanProxy::RegisterCallBack(const std::shared_ptr<IWifiScanCallback>
     struct IpcOwner owner = {.exception = -1, .retCode = 0, .variable = nullptr};
 
     IpcIoInit(&request, data, IPC_DATA_SIZE_SMALL, MAX_IPC_OBJ_COUNT);
-    if (!WriteInterfaceToken(&data, DECLARE_INTERFACE_DESCRIPTOR_L1, DECLARE_INTERFACE_DESCRIPTOR_L1_LENGTH)) {
+    if (!WriteInterfaceToken(&request, DECLARE_INTERFACE_DESCRIPTOR_L1, DECLARE_INTERFACE_DESCRIPTOR_L1_LENGTH)) {
         WIFI_LOGE("Write interface token error: %{public}s", __func__);
         return WIFI_OPT_FAILED;
     }
@@ -435,7 +435,7 @@ ErrCode WifiScanProxy::GetSupportedFeatures(long &features)
     struct IpcOwner owner = {.exception = -1, .retCode = 0, .variable = nullptr};
 
     IpcIoInit(&request, data, IPC_DATA_SIZE_SMALL, MAX_IPC_OBJ_COUNT);
-    if (!WriteInterfaceToken(&data, DECLARE_INTERFACE_DESCRIPTOR_L1, DECLARE_INTERFACE_DESCRIPTOR_L1_LENGTH)) {
+    if (!WriteInterfaceToken(&request, DECLARE_INTERFACE_DESCRIPTOR_L1, DECLARE_INTERFACE_DESCRIPTOR_L1_LENGTH)) {
         WIFI_LOGE("Write interface token error: %{public}s", __func__);
         return WIFI_OPT_FAILED;
     }

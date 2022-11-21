@@ -38,7 +38,7 @@ public:
     void SetRemoteDied(bool val);
 
 private:
-    int OnRemoteInterfaceToken(IpcIo *data);
+    int OnRemoteInterfaceToken(uint32_t code, IpcIo *data);
     int RemoteOnWifiStateChanged(uint32_t code, IpcIo *data);
     int RemoteOnWifiConnectionChanged(uint32_t code, IpcIo *data);
     int RemoteOnWifiRssiChanged(uint32_t code, IpcIo *data);

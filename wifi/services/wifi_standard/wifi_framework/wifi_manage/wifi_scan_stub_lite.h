@@ -34,7 +34,7 @@ protected:
     std::shared_ptr<IWifiScanCallback> GetCallback() const;
 
 private:
-    int CheckInterfaceToken(IpcIo *req);
+    int CheckInterfaceToken(uint32_t code, IpcIo *req);
     int OnSetScanControlInfo(uint32_t code, IpcIo *req, IpcIo *reply);
     int OnScan(uint32_t code, IpcIo *req, IpcIo *reply);
     int OnScanByParams(uint32_t code, IpcIo *req, IpcIo *reply);

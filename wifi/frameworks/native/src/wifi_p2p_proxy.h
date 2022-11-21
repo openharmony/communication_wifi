@@ -22,7 +22,7 @@
 
 namespace OHOS {
 namespace Wifi {
-class WifiP2pProxy : public IRemoteProxy<IWifiP2p>, public IRemoteObject::DeathRecipient {
+class WifiP2pProxy : public IRemoteProxy<IWifiP2p> {
 public:
     explicit WifiP2pProxy(const sptr<IRemoteObject> &impl);
     ~WifiP2pProxy();
@@ -373,7 +373,28 @@ public:
     */
     void OnRemoteDied(const wptr<IRemoteObject> &remoteObject) override;
 
+    /**
+     * @Description Check whether service is died.
+     *
+     * @return bool - true: service is died, false: service is not died.
+     */
+    bool IsRemoteDied(void);
+
 private:
+    class WifiDeathRecipient : public IRemoteObject::DeathRecipient {
+    public:
+        explicit WifiDeathRecipient(WifiP2pProxy &client) : client_(client) {}
+        ~WifiDeathRecipient() override = default;
+        void OnRemoteDied(const wptr<IRemoteObject> &remote) override
+        {
+            client_.OnRemoteDied(remote);
+        }
+
+    private:
+        WifiP2pProxy &client_;
+    };
+
+    void RemoveDeathRecipient(void);
     void ReadWifiP2pServiceInfo(MessageParcel &reply, WifiP2pServiceInfo &info) const;
     void WriteWifiP2pServiceInfo(MessageParcel &data, const WifiP2pServiceInfo &info) const;
     void WriteWifiP2pServiceRequest(
@@ -387,6 +408,9 @@ private:
 private:
     bool mRemoteDied;
     static BrokerDelegator<WifiP2pProxy> delegator;
+    sptr<IRemoteObject> remote_ = nullptr;
+    std::mutex mutex_;
+    sptr<IRemoteObject::DeathRecipient> deathRecipient_ = nullptr;
 };
 }  // namespace Wifi
 }  // namespace OHOS

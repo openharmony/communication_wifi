@@ -57,7 +57,20 @@ bool WifiScanImpl::Init()
         return false;
     }
     client_ = scanProxy;
+    return true;
 #else
+    return GetWifiScanProxy();
+#endif
+}
+
+bool WifiScanImpl::GetWifiScanProxy(void)
+{
+    WIFI_LOGI("enter GetWifiScanProxy!");
+    if (client_ != nullptr && !IsRemoteDied()) {
+        WIFI_LOGI("client_ is existed now!");
+        return true;
+    }
+
     sptr<ISystemAbilityManager> sa_mgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (sa_mgr == nullptr) {
         WIFI_LOGE("failed to get SystemAbilityManager");
@@ -76,37 +89,36 @@ bool WifiScanImpl::Init()
         WIFI_LOGE("wifi scan init failed. %{public}d", systemAbilityId_);
         return false;
     }
-#endif
     return true;
 }
 
 ErrCode WifiScanImpl::SetScanControlInfo(const ScanControlInfo &info)
 {
-    RETURN_IF_FAIL(client_);
+    RETURN_IF_FAIL(GetWifiScanProxy());
     return client_->SetScanControlInfo(info);
 }
 
 ErrCode WifiScanImpl::Scan()
 {
-    RETURN_IF_FAIL(client_);
+    RETURN_IF_FAIL(GetWifiScanProxy());
     return client_->Scan();
 }
 
 ErrCode WifiScanImpl::AdvanceScan(const WifiScanParams &params)
 {
-    RETURN_IF_FAIL(client_);
+    RETURN_IF_FAIL(GetWifiScanProxy());
     return client_->AdvanceScan(params);
 }
 
 ErrCode WifiScanImpl::IsWifiClosedScan(bool &bOpen)
 {
-    RETURN_IF_FAIL(client_);
+    RETURN_IF_FAIL(GetWifiScanProxy());
     return client_->IsWifiClosedScan(bOpen);
 }
 
 ErrCode WifiScanImpl::GetScanInfoList(std::vector<WifiScanInfo> &result)
 {
-    RETURN_IF_FAIL(client_);
+    RETURN_IF_FAIL(GetWifiScanProxy());
     return client_->GetScanInfoList(result);
 }
 
@@ -116,24 +128,30 @@ ErrCode WifiScanImpl::RegisterCallBack(const std::shared_ptr<IWifiScanCallback> 
 ErrCode WifiScanImpl::RegisterCallBack(const sptr<IWifiScanCallback> &callback)
 #endif
 {
-    RETURN_IF_FAIL(client_);
+    RETURN_IF_FAIL(GetWifiScanProxy());
     return client_->RegisterCallBack(callback);
 }
 
 ErrCode WifiScanImpl::GetSupportedFeatures(long &features)
 {
-    RETURN_IF_FAIL(client_);
+    RETURN_IF_FAIL(GetWifiScanProxy());
     return client_->GetSupportedFeatures(features);
 }
 
 bool WifiScanImpl::IsFeatureSupported(long feature)
 {
-    RETURN_IF_FAIL(client_);
+    RETURN_IF_FAIL(GetWifiScanProxy());
     long tmpFeatures = 0;
     if (client_->GetSupportedFeatures(tmpFeatures) != WIFI_OPT_SUCCESS) {
         return false;
     }
     return ((tmpFeatures & feature) == feature);
+}
+
+bool WifiScanImpl::IsRemoteDied(void)
+{
+    RETURN_IF_FAIL(GetWifiScanProxy());
+    return client_->IsRemoteDied();
 }
 }  // namespace Wifi
 }  // namespace OHOS

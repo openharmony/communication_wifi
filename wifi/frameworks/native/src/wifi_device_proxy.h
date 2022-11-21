@@ -312,6 +312,13 @@ public:
      */
     bool SetLowLatencyMode(bool enabled) override;
 
+    /**
+     * @Description Check whether service is died.
+     *
+     * @return bool - true: service is died, false: service is not died.
+     */
+    bool IsRemoteDied(void);
+
 #ifdef OHOS_ARCH_LITE
     /**
     * @Description Handle remote object died event.

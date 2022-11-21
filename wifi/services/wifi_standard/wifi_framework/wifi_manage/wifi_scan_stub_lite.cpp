@@ -52,7 +52,7 @@ int WifiScanStub::OnRemoteRequest(uint32_t code, IpcIo *req, IpcIo *reply)
         WIFI_LOGE("req:%{public}d, reply:%{public}d", req == nullptr, reply == nullptr);
         return ERR_FAILED;
     }
-    if(CheckInterfaceToken(req) == WIFI_OPT_FAILED) {
+    if (CheckInterfaceToken(req) == WIFI_OPT_FAILED) {
         return WIFI_OPT_FAILED;
     }
     int exception = ERR_FAILED;

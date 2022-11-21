@@ -282,7 +282,7 @@ int EmitEvent(RpcServer *server, int event)
     ++server->nEvents;
     pthread_mutex_unlock(&server->mutex);
     /* Triger write to socket */
-    RunRpcLoop(server);
+    BeforeLoop(server);
     return 0;
 }
 

@@ -69,7 +69,7 @@ bool WifiScanImpl::GetWifiScanProxy(void)
     return (client_ != nullptr);
 #else
     WIFI_LOGI("enter GetWifiScanProxy!");
-    if (client_ != nullptr && !IsRemoteDied()) {
+    if (IsRemoteDied() == false) {
         WIFI_LOGI("client_ is existed now!");
         return true;
     }
@@ -154,8 +154,7 @@ bool WifiScanImpl::IsFeatureSupported(long feature)
 
 bool WifiScanImpl::IsRemoteDied(void)
 {
-    RETURN_IF_FAIL(GetWifiScanProxy());
-    return client_->IsRemoteDied();
+    return (client_ == nullptr) ? true : client_->IsRemoteDied();
 }
 }  // namespace Wifi
 }  // namespace OHOS

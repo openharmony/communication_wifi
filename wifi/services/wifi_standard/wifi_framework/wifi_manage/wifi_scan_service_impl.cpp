@@ -290,5 +290,10 @@ int32_t WifiScanServiceImpl::Dump(int32_t fd, const std::vector<std::u16string>&
     return ERR_OK;
 }
 #endif
+
+bool WifiScanServiceImpl::IsRemoteDied(void)
+{
+    return false;
+}
 }  // namespace Wifi
 }  // namespace OHOS

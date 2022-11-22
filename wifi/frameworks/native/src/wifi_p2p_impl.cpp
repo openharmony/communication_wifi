@@ -45,7 +45,7 @@ bool WifiP2pImpl::Init(void)
 bool WifiP2pImpl::GetWifiP2pProxy(void)
 {
     WIFI_LOGI("enter GetWifiP2pProxy!");
-    if (client_ != nullptr && !IsRemoteDied()) {
+    if (IsRemoteDied() == false) {
         WIFI_LOGI("client_ is existed now!");
         return true;
     }
@@ -339,8 +339,7 @@ ErrCode WifiP2pImpl::Hid2dSetUpperScene(const std::string& ifName, const Hid2dUp
 
 bool WifiP2pImpl::IsRemoteDied(void)
 {
-    RETURN_IF_FAIL(GetWifiP2pProxy());
-    return client_->IsRemoteDied();
+    return (client_ == nullptr) ? true: client_->IsRemoteDied();
 }
 }  // namespace Wifi
 }  // namespace OHOS

@@ -1206,6 +1206,11 @@ void WifiDeviceServiceImpl::SaBasicDump(std::string& result)
     result += "\n";
 }
 
+bool WifiDeviceServiceImpl::IsRemoteDied(void)
+{
+    return false;
+}
+
 #ifndef OHOS_ARCH_LITE
 int32_t WifiDeviceServiceImpl::Dump(int32_t fd, const std::vector<std::u16string>& args)
 {

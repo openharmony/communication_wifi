@@ -185,6 +185,13 @@ public:
      */
     virtual ErrCode SetPowerModel(const PowerModel& model) = 0;
 
+    /**
+     * @Description Check whether service is died.
+     *
+     * @return bool - true: service is died, false: service is not died.
+     */
+    virtual bool IsRemoteDied(void) = 0;
+
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.wifi.IWifiHotspotService");
 };

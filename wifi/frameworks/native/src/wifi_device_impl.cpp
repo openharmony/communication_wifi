@@ -71,7 +71,7 @@ bool WifiDeviceImpl::GetWifiDeviceProxy()
     return (client_ != nullptr);
 #else
     WIFI_LOGI("enter GetWifiDeviceProxy!");
-    if (client_ != nullptr && !IsRemoteDied()) {
+    if (IsRemoteDied() == false) {
         WIFI_LOGI("client_ is existed now!");
         return true;
     }
@@ -318,7 +318,9 @@ bool WifiDeviceImpl::SetLowLatencyMode(bool enabled)
 
 bool WifiDeviceImpl::IsRemoteDied(void)
 {
-    RETURN_IF_FAIL(GetWifiDeviceProxy());
+    if (client_ == nullptr) {
+        return true;
+    }
     return client_->IsRemoteDied();
 }
 }  // namespace Wifi

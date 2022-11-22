@@ -586,6 +586,7 @@ int WifiDeviceStub::OnRemoteRequest(uint32_t code, IpcIo *req, IpcIo *reply)
         return ERR_FAILED;
     }
 
+    WIFI_LOGE("run ReadInterfaceToken L1");
     size_t length;
     uint16_t* interfaceRead = nullptr;
     interfaceRead = ReadInterfaceToken(req, &length);

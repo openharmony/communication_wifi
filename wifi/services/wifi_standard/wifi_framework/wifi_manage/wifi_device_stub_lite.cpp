@@ -580,13 +580,13 @@ void WifiDeviceStub::InitHandleMap()
 
 int WifiDeviceStub::OnRemoteRequest(uint32_t code, IpcIo *req, IpcIo *reply)
 {
-    WIFI_LOGD("run: %{public}s code: %{public}u", __func__, code);
+    WIFI_LOGD("run: %{public}s code: %{public}u L1", __func__, code);
     if (req == nullptr || reply == nullptr) {
         WIFI_LOGD("req:%{public}d, reply:%{public}d", req == nullptr, reply == nullptr);
         return ERR_FAILED;
     }
 
-    WIFI_LOGD("run ReadInterfaceToken L1");
+    WIFI_LOGD("run ReadInterfaceToken L1 code %{public}u", code);
     size_t length;
     uint16_t* interfaceRead = nullptr;
     interfaceRead = ReadInterfaceToken(req, &length);

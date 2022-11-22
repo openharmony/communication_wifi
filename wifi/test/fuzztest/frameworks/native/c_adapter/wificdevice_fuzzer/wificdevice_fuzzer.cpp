@@ -85,7 +85,7 @@ namespace Wifi {
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
-    OHOS::Wifi::EnableWifiFuzzerTest(data, size);
+    OHOS::Wifi::WifiCDeviceFuzzerTest(data, size);
     return 0;
 }
 

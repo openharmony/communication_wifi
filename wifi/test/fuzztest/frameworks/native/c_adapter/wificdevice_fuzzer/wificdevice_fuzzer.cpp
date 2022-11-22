@@ -15,7 +15,7 @@
 #include <cstddef>
 #include <cstdint>
 #include "wificdevice_fuzzer.h"
-#include "../../../../../../interfaces/lits/c/wifi_device.h"
+#include "../../../../../../interfaces/kits/c/wifi_device.h"
 
 
 void EnableWifiTest()

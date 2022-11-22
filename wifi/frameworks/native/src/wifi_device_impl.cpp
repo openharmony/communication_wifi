@@ -318,10 +318,7 @@ bool WifiDeviceImpl::SetLowLatencyMode(bool enabled)
 
 bool WifiDeviceImpl::IsRemoteDied(void)
 {
-    if (client_ == nullptr) {
-        return true;
-    }
-    return client_->IsRemoteDied();
+    return (client_ == nullptr) ? true : client_->IsRemoteDied();
 }
 }  // namespace Wifi
 }  // namespace OHOS

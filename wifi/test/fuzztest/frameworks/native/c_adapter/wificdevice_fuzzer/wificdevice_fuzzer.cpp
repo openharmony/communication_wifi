@@ -64,7 +64,7 @@ void ConnectToTest(const uint8_t* data, size_t size)
         return;
     }
     int networkId = static_cast<int>(data[0]);
-    ConnectTo(networkId)
+    ConnectTo(networkId);
 }
 namespace OHOS {
 namespace Wifi {

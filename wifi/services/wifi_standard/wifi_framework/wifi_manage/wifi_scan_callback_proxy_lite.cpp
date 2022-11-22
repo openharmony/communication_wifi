@@ -37,6 +37,10 @@ void WifiScanCallbackProxy::OnWifiScanStateChanged(int state)
     IpcIo data;
     uint8_t buff[DEFAULT_IPC_SIZE];
     IpcIoInit(&data, buff, DEFAULT_IPC_SIZE, 0);
+    if (!WriteInterfaceToken(&data, DECLARE_INTERFACE_DESCRIPTOR_L1, DECLARE_INTERFACE_DESCRIPTOR_L1_LENGTH)) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return;
+    }
     (void)WriteInt32(&data, 0);
     (void)WriteInt32(&data, state);
     IpcIo reply;

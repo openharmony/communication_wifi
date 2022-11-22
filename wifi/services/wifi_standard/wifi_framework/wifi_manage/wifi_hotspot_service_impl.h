@@ -190,7 +190,7 @@ public:
      *
      * @return bool - true: service is died, false: service is not died.
      */
-    bool IsRemoteDied(void);
+    bool IsRemoteDied(void) override;
 
 private:
     ErrCode CheckCanEnableHotspot(const ServiceType type);

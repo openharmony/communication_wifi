@@ -162,7 +162,7 @@ public:
     * @Description Handle remote object died event.
     * @param remoteObject remote object.
     */
-    void OnRemoteDied(const wptr<IRemoteObject>& remoteObject) override;
+    void OnRemoteDied(const wptr<IRemoteObject>& remoteObject);
 
     /**
      * @Description Get supported power model list
@@ -193,7 +193,7 @@ public:
      *
      * @return bool - true: service is died, false: service is not died.
      */
-    bool IsRemoteDied(void);
+    bool IsRemoteDied(void) override;
 
 private:
     class WifiDeathRecipient : public IRemoteObject::DeathRecipient {

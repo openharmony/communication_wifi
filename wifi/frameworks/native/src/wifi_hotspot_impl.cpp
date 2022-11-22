@@ -50,7 +50,7 @@ bool WifiHotspotImpl::Init(int id)
 bool WifiHotspotImpl::GetWifiHotspotProxy(void)
 {
     WIFI_LOGI("enter GetWifiHotspotProxy!");
-    if (client_ != nullptr && !IsRemoteDied()) {
+    if (IsRemoteDied() == false) {
         WIFI_LOGI("client_ is existed now!");
         return true;
     }
@@ -216,8 +216,7 @@ ErrCode WifiHotspotImpl::SetPowerModel(const PowerModel& model)
 
 bool WifiHotspotImpl::IsRemoteDied(void)
 {
-    RETURN_IF_FAIL(GetWifiHotspotProxy());
-    return client_->IsRemoteDied();
+    return (client_ == nullptr) ? true : client_->IsRemoteDied();
 }
 }  // namespace Wifi
 }  // namespace OHOS

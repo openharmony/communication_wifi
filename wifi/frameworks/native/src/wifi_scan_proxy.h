@@ -103,7 +103,7 @@ public:
      *
      * @return bool - true: service is died, false: service is not died.
      */
-    bool IsRemoteDied(void);
+    bool IsRemoteDied(void) override;
 
 #ifdef OHOS_ARCH_LITE
     void OnRemoteDied(void);
@@ -113,7 +113,7 @@ private:
     SvcIdentity svcIdentity_ = { 0 };
     bool remoteDied_;
 #else
-    void OnRemoteDied(const wptr<IRemoteObject>& remoteObject) override;
+    void OnRemoteDied(const wptr<IRemoteObject>& remoteObject);
 private:
     class WifiDeathRecipient : public IRemoteObject::DeathRecipient {
     public:

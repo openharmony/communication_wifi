@@ -306,6 +306,13 @@ public:
      */
     virtual bool SetLowLatencyMode(bool enabled) = 0;
 
+    /**
+     * @Description Check whether service is died.
+     *
+     * @return bool - true: service is died, false: service is not died.
+     */
+    virtual bool IsRemoteDied(void) = 0;
+
 #ifndef OHOS_ARCH_LITE
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.wifi.IWifiDeviceService");

@@ -31,6 +31,20 @@ WifiScanStub::WifiScanStub() : callback_(nullptr)
 WifiScanStub::~WifiScanStub()
 {}
 
+int WifiScanStub::CheckInterfaceToken(uint32_t code, IpcIo *req)
+{
+    size_t length;
+    uint16_t* interfaceRead = nullptr;
+    interfaceRead = ReadInterfaceToken(req, &length);
+    for (size_t i = 0; i < length; i++) {
+        if (i >= DECLARE_INTERFACE_DESCRIPTOR_L1_LENGTH ||interfaceRead[i] != DECLARE_INTERFACE_DESCRIPTOR_L1[i]) {
+            WIFI_LOGE("Scan stub token verification error: %{public}d", code);
+            return WIFI_OPT_FAILED;
+        }
+    }
+    return WIFI_OPT_SUCCESS;
+}
+
 int WifiScanStub::OnRemoteRequest(uint32_t code, IpcIo *req, IpcIo *reply)
 {
     WIFI_LOGD("WifiScanStub::OnRemoteRequest,code:%{public}u", code);
@@ -38,7 +52,9 @@ int WifiScanStub::OnRemoteRequest(uint32_t code, IpcIo *req, IpcIo *reply)
         WIFI_LOGE("req:%{public}d, reply:%{public}d", req == nullptr, reply == nullptr);
         return ERR_FAILED;
     }
-
+    if (CheckInterfaceToken(code, req) == WIFI_OPT_FAILED) {
+        return WIFI_OPT_FAILED;
+    }
     int exception = ERR_FAILED;
     (void)ReadInt32(req, &exception);
     if (exception) {

@@ -580,11 +580,23 @@ void WifiDeviceStub::InitHandleMap()
 
 int WifiDeviceStub::OnRemoteRequest(uint32_t code, IpcIo *req, IpcIo *reply)
 {
-    WIFI_LOGD("run: %{public}s code: %{public}u", __func__, code);
+    WIFI_LOGD("run: %{public}s code: %{public}u L1", __func__, code);
     if (req == nullptr || reply == nullptr) {
         WIFI_LOGD("req:%{public}d, reply:%{public}d", req == nullptr, reply == nullptr);
         return ERR_FAILED;
     }
+
+    WIFI_LOGD("run ReadInterfaceToken L1 code %{public}u", code);
+    size_t length;
+    uint16_t* interfaceRead = nullptr;
+    interfaceRead = ReadInterfaceToken(req, &length);
+    for (size_t i = 0; i < length; i++) {
+        if (i >= DECLARE_INTERFACE_DESCRIPTOR_L1_LENGTH || interfaceRead[i] != DECLARE_INTERFACE_DESCRIPTOR_L1[i]) {
+            WIFI_LOGE("Sta stub token verification error: %{public}d", code);
+            return WIFI_OPT_FAILED;
+        }
+    }
+
     int exception = 0;
     (void)ReadInt32(req, &exception);
     if (exception) {

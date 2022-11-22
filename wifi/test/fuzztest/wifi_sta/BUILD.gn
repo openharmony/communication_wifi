@@ -20,6 +20,7 @@ group("fuzztest") {
     "../frameworks/native/c_adapter/wifichid2d_fuzzer:WifiCHid2dFuzzTest",
     "../frameworks/native/c_adapter/wifichotspot_fuzzer:WifiCHotSpotFuzzTest",
     "../frameworks/native/c_adapter/wificp2p_fuzzer:WifiCP2PFuzzTest",
+    "../frameworks/native/c_adapter/wificdevice_fuzzer:WifiCDeviceFuzzerTest",
     "adddeviceconfig_fuzzer:AddDeviceConfigFuzzTest",
     "connecttodevice_fuzzer:ConnectToDeviceFuzzTest",
     "disablewifi_fuzzer:DisableWifiFuzzTest",

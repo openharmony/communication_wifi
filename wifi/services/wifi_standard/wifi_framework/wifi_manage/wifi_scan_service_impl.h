@@ -68,6 +68,7 @@ public:
 #ifndef OHOS_ARCH_LITE
     int32_t Dump(int32_t fd, const std::vector<std::u16string>& args) override;
 #endif
+    bool IsRemoteDied(void) override;
 
 private:
     bool Init();

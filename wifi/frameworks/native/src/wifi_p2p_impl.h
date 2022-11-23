@@ -377,7 +377,15 @@ public:
      */
     ErrCode Hid2dSetUpperScene(const std::string& ifName, const Hid2dUpperScene& scene) override;
 
+    /**
+     * @Description Check whether service is died.
+     *
+     * @return bool - true: service is died, false: service is not died.
+     */
+    bool IsRemoteDied(void);
+
 private:
+    bool GetWifiP2pProxy(void);
     int systemAbilityId_;
     sptr<IWifiP2p> client_;
 };

@@ -34,20 +34,47 @@ namespace Wifi {
 static sptr<WifiScanCallbackStub> g_wifiScanCallbackStub =
     sptr<WifiScanCallbackStub>(new (std::nothrow) WifiScanCallbackStub());
 
-WifiScanProxy::WifiScanProxy(const sptr<IRemoteObject> &remote) : IRemoteProxy<IWifiScan>(remote), mRemoteDied(false)
+WifiScanProxy::WifiScanProxy(const sptr<IRemoteObject> &remote) : IRemoteProxy<IWifiScan>(remote),
+    mRemoteDied(false), remote_(nullptr), deathRecipient_(nullptr)
 {
     if (remote) {
-        if ((remote->IsProxyObject()) && (!remote->AddDeathRecipient(this))) {
-            WIFI_LOGD("AddDeathRecipient!");
-        } else {
-            WIFI_LOGW("no recipient!");
+        if (!remote->IsProxyObject()) {
+            WIFI_LOGW("not proxy object!");
+            return;
         }
+        deathRecipient_ = new (std::nothrow) WifiDeathRecipient(*this);
+        if (deathRecipient_ == nullptr) {
+            WIFI_LOGW("deathRecipient_ is nullptr!");
+        }
+        if (!remote->AddDeathRecipient(deathRecipient_)) {
+            WIFI_LOGW("AddDeathRecipient failed!");
+            return;
+        }
+        remote_ = remote;
+        WIFI_LOGI("AddDeathRecipient success! deathRecipient_: %{private}p", (void*)deathRecipient_);
     }
 }
 
 WifiScanProxy::~WifiScanProxy()
 {
     WIFI_LOGI("enter ~WifiP2pProxy!");
+    RemoveDeathRecipient();
+}
+
+void WifiScanProxy::RemoveDeathRecipient(void)
+{
+    WIFI_LOGI("enter RemoveDeathRecipient, deathRecipient_: %{private}p!", (void*)deathRecipient_);
+    std::lock_guard<std::mutex> lock(mutex_);
+    if (remote_ == nullptr) {
+        WIFI_LOGI("remote_ is nullptr!");
+        return;
+    }
+    if (deathRecipient_ == nullptr) {
+        WIFI_LOGI("deathRecipient_ is nullptr!");
+        return;
+    }
+    remote_->RemoveDeathRecipient(deathRecipient_);
+    remote_ = nullptr;
 }
 
 ErrCode WifiScanProxy::SetScanControlInfo(const ScanControlInfo &info)
@@ -348,6 +375,14 @@ void WifiScanProxy::OnRemoteDied(const wptr<IRemoteObject>& remoteObject)
         return;
     }
     g_wifiScanCallbackStub->SetRemoteDied(true);
+}
+
+bool WifiScanProxy::IsRemoteDied(void)
+{
+    if (mRemoteDied) {
+        WIFI_LOGW("IsRemoteDied! remote is died now!");
+    }
+    return mRemoteDied;
 }
 }  // namespace Wifi
 }  // namespace OHOS

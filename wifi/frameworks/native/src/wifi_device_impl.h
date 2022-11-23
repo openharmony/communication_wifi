@@ -313,7 +313,15 @@ public:
      */
     bool SetLowLatencyMode(bool enabled) override;
 
+    /**
+     * @Description Check whether service is died.
+     *
+     * @return bool - true: service is died, false: service is not died.
+     */
+    bool IsRemoteDied(void);
+
 private:
+    bool GetWifiDeviceProxy(void);
     int systemAbilityId_;
 #ifdef OHOS_ARCH_LITE
     IWifiDevice *client_;

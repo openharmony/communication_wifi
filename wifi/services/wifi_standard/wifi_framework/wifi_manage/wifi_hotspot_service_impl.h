@@ -185,6 +185,13 @@ public:
      */
     static void SaBasicDump(std::string& result);
 
+    /**
+     * @Description Check whether service is died.
+     *
+     * @return bool - true: service is died, false: service is not died.
+     */
+    bool IsRemoteDied(void) override;
+
 private:
     ErrCode CheckCanEnableHotspot(const ServiceType type);
     int CheckOperHotspotSwitchPermission(const ServiceType type);

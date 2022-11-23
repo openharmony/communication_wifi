@@ -158,6 +158,8 @@ public:
 
     ErrCode RemoveCandidateConfig(const WifiDeviceConfig &config) override;
 
+    bool IsRemoteDied(void) override;
+
 #ifndef OHOS_ARCH_LITE
     int32_t Dump(int32_t fd, const std::vector<std::u16string>& args) override;
 #endif

@@ -98,7 +98,7 @@ void Hid2dRemoveGcGroupTest(const uint8_t* data, size_t size)
 void Hid2dConnectTest(const uint8_t* data, size_t size)
 {
     Hid2dConnectConfig cppConfig;
-    if (size > sizeof(Hid2dConnectConfig)) {
+    if (size >= sizeof(Hid2dConnectConfig)) {
         if (memcpy_s(cppConfig.ssid, MAX_SSID_LEN, data, MAX_SSID_LEN - 1) != EOK) {
             return;
         }
@@ -107,7 +107,7 @@ void Hid2dConnectTest(const uint8_t* data, size_t size)
             return;
         }
 
-        if (memcpy_s(cppConfig.preShareKey, MAX_KEY_LEN, data, MAX_KEY_LEN - 1) != EOK) {
+        if (memcpy_s(cppConfig.preSharedKey, MAX_KEY_LEN, data, MAX_KEY_LEN - 1) != EOK) {
             return;
         }
         cppConfig.frequency = static_cast<int> (data[0]);
@@ -118,7 +118,7 @@ void Hid2dConnectTest(const uint8_t* data, size_t size)
 void Hid2dConfigIPAddrTest(const uint8_t* data, size_t size)
 {
     int index = 0;
-    char ifName[NAMELEN] = {0};
+    char ifName[IF_NAME_LEN] = {0};
 	IpAddrInfo ipAddrInfo;
 	if (size >= IF_NAME_LEN) {
         if (memcpy_s(ifName, IF_NAME_LEN, data, IF_NAME_LEN - 1) != EOK) {
@@ -162,7 +162,7 @@ void Hid2dGetRecommendChannelTest(const uint8_t* data, size_t size)
             return;
         }
 
-        if (memcpy_s(request.localIfName, IF_NAME_LEN, data, IF_NAME_LEN - 1) != EOK) {
+        if (memcpy_s(request.localIfName, IF_NAME_LEN, data + IF_NAME_LEN, IF_NAME_LEN - 1) != EOK) {
             return;
         }
 	}
@@ -223,7 +223,6 @@ void Hid2dSetUpperSceneTest(const uint8_t* data, size_t size)
     int index = 0;
     Hid2dUpperScene scene;
 
-    char ifName[IF_NAME_LEN] = {0};
     if (size >= IF_NAME_LEN) {
         if (memcpy_s(ifName, IF_NAME_LEN, data, IF_NAME_LEN - 1) != EOK) {
             return;
@@ -231,7 +230,7 @@ void Hid2dSetUpperSceneTest(const uint8_t* data, size_t size)
 	}
 
 	if (size >= sizeof(Hid2dUpperScene)) {
-        if (memcpy_s(scene->mac, MAC_LEN, data, MAC_LEN) != EOK) {
+        if (memcpy_s(scene.mac, MAC_LEN, data, MAC_LEN) != EOK) {
             return;
         }
 		scene.scene = static_cast<unsigned int> (data[index++]);

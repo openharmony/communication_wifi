@@ -28,20 +28,46 @@ static sptr<WifiHotspotCallbackStub> g_wifiHotspotCallbackStub =
     sptr<WifiHotspotCallbackStub>(new (std::nothrow) WifiHotspotCallbackStub());
 
 WifiHotspotProxy::WifiHotspotProxy(const sptr<IRemoteObject> &impl)
-    : IRemoteProxy<IWifiHotspot>(impl), mRemoteDied(false)
+    : IRemoteProxy<IWifiHotspot>(impl), mRemoteDied(false), remote_(nullptr), deathRecipient_(nullptr)
 {
     if (impl) {
-        if ((impl->IsProxyObject()) && (!impl->AddDeathRecipient(this))) {
-            WIFI_LOGD("AddDeathRecipient!");
-        } else {
-            WIFI_LOGW("no recipient!");
+        if (!impl->IsProxyObject()) {
+            WIFI_LOGW("not proxy object!");
+            return;
         }
+        deathRecipient_ = new (std::nothrow) WifiDeathRecipient(*this);
+        if (deathRecipient_ == nullptr) {
+            WIFI_LOGW("deathRecipient_ is nullptr!");
+        }
+        if (!impl->AddDeathRecipient(deathRecipient_)) {
+            WIFI_LOGW("AddDeathRecipient failed!");
+            return;
+        }
+        remote_ = impl;
+        WIFI_LOGI("AddDeathRecipient success! deathRecipient_: %{private}p", (void*)deathRecipient_);
     }
 }
 
 WifiHotspotProxy::~WifiHotspotProxy()
 {
     WIFI_LOGI("enter ~WifiHotspotProxy!");
+    RemoveDeathRecipient();
+}
+
+void WifiHotspotProxy::RemoveDeathRecipient(void)
+{
+    WIFI_LOGI("enter RemoveDeathRecipient, deathRecipient_: %{private}p!", (void*)deathRecipient_);
+    std::lock_guard<std::mutex> lock(mutex_);
+    if (remote_ == nullptr) {
+        WIFI_LOGI("remote_ is nullptr!");
+        return;
+    }
+    if (deathRecipient_ == nullptr) {
+        WIFI_LOGI("deathRecipient_ is nullptr!");
+        return;
+    }
+    remote_->RemoveDeathRecipient(deathRecipient_);
+    remote_ = nullptr;
 }
 
 ErrCode WifiHotspotProxy::IsHotspotActive(bool &isActive)
@@ -699,9 +725,18 @@ void WifiHotspotProxy::OnRemoteDied(const wptr<IRemoteObject>& remoteObject)
 {
     WIFI_LOGW("Remote service is died!");
     mRemoteDied = true;
+    RemoveDeathRecipient();
     if (g_wifiHotspotCallbackStub != nullptr) {
         g_wifiHotspotCallbackStub->SetRemoteDied(true);
     }
+}
+
+bool WifiHotspotProxy::IsRemoteDied(void)
+{
+    if (mRemoteDied) {
+        WIFI_LOGW("IsRemoteDied! remote is died now!");
+    }
+    return mRemoteDied;
 }
 }  // namespace Wifi
 }  // namespace OHOS

@@ -23,7 +23,7 @@
 
 namespace OHOS {
 namespace Wifi {
-class WifiHotspotProxy : public IRemoteProxy<IWifiHotspot>, public IRemoteObject::DeathRecipient {
+class WifiHotspotProxy : public IRemoteProxy<IWifiHotspot> {
 public:
     explicit WifiHotspotProxy(const sptr<IRemoteObject> &impl);
 
@@ -162,7 +162,7 @@ public:
     * @Description Handle remote object died event.
     * @param remoteObject remote object.
     */
-    void OnRemoteDied(const wptr<IRemoteObject>& remoteObject) override;
+    void OnRemoteDied(const wptr<IRemoteObject>& remoteObject);
 
     /**
      * @Description Get supported power model list
@@ -188,10 +188,33 @@ public:
      */
     ErrCode SetPowerModel(const PowerModel& model) override;
 
-private:
-    static BrokerDelegator<WifiHotspotProxy> g_delegator;
+    /**
+     * @Description Check whether service is died.
+     *
+     * @return bool - true: service is died, false: service is not died.
+     */
+    bool IsRemoteDied(void) override;
 
+private:
+    class WifiDeathRecipient : public IRemoteObject::DeathRecipient {
+    public:
+        explicit WifiDeathRecipient(WifiHotspotProxy &client) : client_(client) {}
+        ~WifiDeathRecipient() override = default;
+        void OnRemoteDied(const wptr<IRemoteObject> &remote) override
+        {
+            client_.OnRemoteDied(remote);
+        }
+
+    private:
+        WifiHotspotProxy &client_;
+    };
+
+    void RemoveDeathRecipient(void);
+    static BrokerDelegator<WifiHotspotProxy> g_delegator;
     bool mRemoteDied;
+    sptr<IRemoteObject> remote_ = nullptr;
+    std::mutex mutex_;
+    sptr<IRemoteObject::DeathRecipient> deathRecipient_ = nullptr;
 };
 }  // namespace Wifi
 }  // namespace OHOS

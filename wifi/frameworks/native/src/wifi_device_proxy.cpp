@@ -27,20 +27,48 @@ namespace Wifi {
 static sptr<WifiDeviceCallBackStub> g_deviceCallBackStub =
     sptr<WifiDeviceCallBackStub>(new (std::nothrow) WifiDeviceCallBackStub());
 
-WifiDeviceProxy::WifiDeviceProxy(const sptr<IRemoteObject> &impl) : IRemoteProxy<IWifiDevice>(impl), mRemoteDied(false)
+WifiDeviceProxy::WifiDeviceProxy(const sptr<IRemoteObject> &impl) : IRemoteProxy<IWifiDevice>(impl),
+    remote_(nullptr), mRemoteDied(false), deathRecipient_(nullptr)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     if (impl) {
-        if ((impl->IsProxyObject()) && (!impl->AddDeathRecipient(this))) {
-            WIFI_LOGD("AddDeathRecipient!");
-        } else {
-            WIFI_LOGW("no recipient!");
+        if (!impl->IsProxyObject()) {
+            WIFI_LOGW("not proxy object!");
+            return;
         }
+        deathRecipient_ = new (std::nothrow) WifiDeathRecipient(*this);
+        if (deathRecipient_ == nullptr) {
+            WIFI_LOGW("deathRecipient_ is nullptr!");
+        }
+        if (!impl->AddDeathRecipient(deathRecipient_)) {
+            WIFI_LOGW("AddDeathRecipient failed!");
+            return;
+        }
+        remote_ = impl;
+        WIFI_LOGI("AddDeathRecipient success! deathRecipient_: %{private}p", (void*)deathRecipient_);
     }
 }
 
 WifiDeviceProxy::~WifiDeviceProxy()
 {
     WIFI_LOGI("enter ~WifiDeviceProxy!");
+    RemoveDeathRecipient();
+}
+
+void WifiDeviceProxy::RemoveDeathRecipient(void)
+{
+    WIFI_LOGI("enter RemoveDeathRecipient, deathRecipient_: %{private}p!", (void*)deathRecipient_);
+    std::lock_guard<std::mutex> lock(mutex_);
+    if (remote_ == nullptr) {
+        WIFI_LOGI("remote_ is nullptr!");
+        return;
+    }
+    if (deathRecipient_ == nullptr) {
+        WIFI_LOGI("deathRecipient_ is nullptr!");
+        return;
+    }
+    remote_->RemoveDeathRecipient(deathRecipient_);
+    remote_ = nullptr;
 }
 
 ErrCode WifiDeviceProxy::EnableWifi()
@@ -1193,8 +1221,9 @@ bool WifiDeviceProxy::SetLowLatencyMode(bool enabled)
 
 void WifiDeviceProxy::OnRemoteDied(const wptr<IRemoteObject> &remoteObject)
 {
-    WIFI_LOGW("Remote service is died!");
+    WIFI_LOGW("Remote service is died! remoteObject: %{private}p", &remoteObject);
     mRemoteDied = true;
+    RemoveDeathRecipient();
     if (g_deviceCallBackStub == nullptr) {
         WIFI_LOGE("g_deviceCallBackStub is nullptr");
         return;
@@ -1202,6 +1231,14 @@ void WifiDeviceProxy::OnRemoteDied(const wptr<IRemoteObject> &remoteObject)
     if (g_deviceCallBackStub != nullptr) {
         g_deviceCallBackStub->SetRemoteDied(true);
     }
+}
+
+bool WifiDeviceProxy::IsRemoteDied(void)
+{
+    if (mRemoteDied) {
+        WIFI_LOGW("IsRemoteDied! remote is died now!");
+    }
+    return mRemoteDied;
 }
 }  // namespace Wifi
 }  // namespace OHOS

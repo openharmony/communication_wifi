@@ -23,6 +23,7 @@ DEFINE_WIFILOG_LABEL("WifiDeviceCallBackProxy");
 
 namespace OHOS {
 namespace Wifi {
+
 WifiDeviceCallBackProxy::WifiDeviceCallBackProxy(SvcIdentity *sid) : sid_(*sid)
 {}
 
@@ -37,6 +38,10 @@ void WifiDeviceCallBackProxy::OnWifiStateChanged(int state)
     IpcIo data;
     uint8_t buff[DEFAULT_IPC_SIZE];
     IpcIoInit(&data, buff, DEFAULT_IPC_SIZE, 0);
+    if (!WriteInterfaceToken(&data, DECLARE_INTERFACE_DESCRIPTOR_L1, DECLARE_INTERFACE_DESCRIPTOR_L1_LENGTH)) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return;
+    }
     (void)WriteInt32(&data, 0);
     (void)WriteInt32(&data, state);
 
@@ -57,6 +62,10 @@ void WifiDeviceCallBackProxy::OnWifiConnectionChanged(int state, const WifiLinke
     constexpr int IPC_DATA_SIZE = 1024;
     uint8_t buff[IPC_DATA_SIZE];
     IpcIoInit(&data, buff, IPC_DATA_SIZE, 0);
+    if (!WriteInterfaceToken(&data, DECLARE_INTERFACE_DESCRIPTOR_L1, DECLARE_INTERFACE_DESCRIPTOR_L1_LENGTH)) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return;
+    }
     (void)WriteInt32(&data, 0);
     (void)WriteInt32(&data, state);
     (void)WriteInt32(&data, info.networkId);
@@ -95,6 +104,10 @@ void WifiDeviceCallBackProxy::OnWifiRssiChanged(int rssi)
     IpcIo data;
     uint8_t buff[DEFAULT_IPC_SIZE];
     IpcIoInit(&data, buff, DEFAULT_IPC_SIZE, 0);
+    if (!WriteInterfaceToken(&data, DECLARE_INTERFACE_DESCRIPTOR_L1, DECLARE_INTERFACE_DESCRIPTOR_L1_LENGTH)) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return;
+    }
     (void)WriteInt32(&data, 0);
     (void)WriteInt32(&data, rssi);
 
@@ -114,6 +127,10 @@ void WifiDeviceCallBackProxy::OnWifiWpsStateChanged(int state, const std::string
     IpcIo data;
     uint8_t buff[DEFAULT_IPC_SIZE];
     IpcIoInit(&data, buff, DEFAULT_IPC_SIZE, 0);
+    if (!WriteInterfaceToken(&data, DECLARE_INTERFACE_DESCRIPTOR_L1, DECLARE_INTERFACE_DESCRIPTOR_L1_LENGTH)) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return;
+    }
     (void)WriteInt32(&data, 0);
     (void)WriteInt32(&data, state);
     (void)WriteString(&data, pinCode.c_str());
@@ -134,6 +151,10 @@ void WifiDeviceCallBackProxy::OnStreamChanged(int direction)
     IpcIo data;
     uint8_t buff[DEFAULT_IPC_SIZE];
     IpcIoInit(&data, buff, DEFAULT_IPC_SIZE, 0);
+    if (!WriteInterfaceToken(&data, DECLARE_INTERFACE_DESCRIPTOR_L1, DECLARE_INTERFACE_DESCRIPTOR_L1_LENGTH)) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return;
+    }
     (void)WriteInt32(&data, 0);
     (void)WriteInt32(&data, direction);
 
@@ -153,6 +174,10 @@ void WifiDeviceCallBackProxy::OnDeviceConfigChanged(ConfigChange state)
     IpcIo data;
     uint8_t buff[DEFAULT_IPC_SIZE];
     IpcIoInit(&data, buff, DEFAULT_IPC_SIZE, 0);
+    if (!WriteInterfaceToken(&data, DECLARE_INTERFACE_DESCRIPTOR_L1, DECLARE_INTERFACE_DESCRIPTOR_L1_LENGTH)) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return;
+    }
     (void)WriteInt32(&data, 0);
     (void)WriteInt32(&data, static_cast<int>(state));
 

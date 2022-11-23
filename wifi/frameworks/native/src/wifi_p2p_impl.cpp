@@ -338,7 +338,7 @@ ErrCode WifiP2pImpl::Hid2dSetUpperScene(const std::string& ifName, const Hid2dUp
 
 bool WifiP2pImpl::IsRemoteDied(void)
 {
-    return (client_ == nullptr) ? true: client_->IsRemoteDied();
+    return (client_ == nullptr) ? true : client_->IsRemoteDied();
 }
 }  // namespace Wifi
 }  // namespace OHOS

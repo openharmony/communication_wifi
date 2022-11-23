@@ -111,7 +111,7 @@ void Hid2dConnectTest(const uint8_t* data, size_t size)
             return;
         }
         cppConfig.frequency = static_cast<int> (data[0]);
-	}
+    }
     (void)Hid2dConnect(&cppConfig);
 }
 
@@ -119,31 +119,31 @@ void Hid2dConfigIPAddrTest(const uint8_t* data, size_t size)
 {
     int index = 0;
     char ifName[IF_NAME_LEN] = {0};
-	IpAddrInfo ipAddrInfo;
-	if (size >= IF_NAME_LEN) {
+    IpAddrInfo ipAddrInfo;
+    if (size >= IF_NAME_LEN) {
         if (memcpy_s(ifName, IF_NAME_LEN, data, IF_NAME_LEN - 1) != EOK) {
             return;
         }
-	}
+    }
 
-	if(size >= sizeof(IpAddrInfo)) {
+    if(size >= sizeof(IpAddrInfo)) {
         for (int i = 0; i < IPV4_ARRAY_LEN; i++) {
             ipAddrInfo.ip[i] = static_cast<int> (data[index++]);
-			ipAddrInfo.gateway[i] = static_cast<int> (data[index++]);
-			ipAddrInfo.netmask[i] = static_cast<int> (data[index++]);
-		}
-	}
+            ipAddrInfo.gateway[i] = static_cast<int> (data[index++]);
+            ipAddrInfo.netmask[i] = static_cast<int> (data[index++]);
+        }
+    }
     (void)Hid2dConfigIPAddr(ifName, &ipAddrInfo);
 }
 
 void Hid2dReleaseIPAddrTest(const uint8_t* data, size_t size)
 {
     char ifName[IF_NAME_LEN] = {0};
-	if (size >= IF_NAME_LEN) {
+    if (size >= IF_NAME_LEN) {
         if (memcpy_s(ifName, IF_NAME_LEN, data, IF_NAME_LEN - 1) != EOK) {
             return;
         }
-	}
+    }
     (void)Hid2dReleaseIPAddr(ifName);
 }
 
@@ -155,8 +155,8 @@ void Hid2dGetRecommendChannelTest(const uint8_t* data, size_t size)
 
     if (size >= sizeof(RecommendChannelRequest)) {
         request.remoteIfMode = static_cast<int> (data[index++]);
-	    request.localIfMode = static_cast<int> (data[index++]);
-		request.prefBand = static_cast<int> (data[index++]);
+        request.localIfMode = static_cast<int> (data[index++]);
+        request.prefBand = static_cast<int> (data[index++]);
 
         if (memcpy_s(request.remoteIfName, IF_NAME_LEN, data, IF_NAME_LEN - 1) != EOK) {
             return;
@@ -165,15 +165,15 @@ void Hid2dGetRecommendChannelTest(const uint8_t* data, size_t size)
         if (memcpy_s(request.localIfName, IF_NAME_LEN, data + IF_NAME_LEN, IF_NAME_LEN - 1) != EOK) {
             return;
         }
-	}
-	index = 0;
-	if (size >= sizeof(RecommendChannelResponse)) {
+    }
+    index = 0;
+    if (size >= sizeof(RecommendChannelResponse)) {
         response.index = static_cast<int> (data[index++]);
         response.centerFreq = static_cast<int> (data[index++]);
         response.centerFreq1 = static_cast<int> (data[index++]);
         response.centerFreq2 = static_cast<int> (data[index++]);
         response.bandwidth = static_cast<int> (data[index++]);
-	}
+    }
     (void)Hid2dGetRecommendChannel(&request, &response);
 }
 
@@ -183,10 +183,10 @@ void Hid2dGetChannelListFor5GTest(const uint8_t* data, size_t size)
     int chanList = 0;
     int lenth = 0;
 
-	if (size >= TWO) {
+    if (size >= TWO) {
         chanList = static_cast<int> (data[index++]);
         lenth = static_cast<int> (data[index++]);
-	}
+    }
     (void)Hid2dGetChannelListFor5G(&chanList, lenth);
 }
 
@@ -195,12 +195,12 @@ void Hid2dGetSelfWifiCfgInfoTest(const uint8_t* data, size_t size)
     int getDatValidLen = 0;
     char cfgData[DATA_MAX_BYTES] = {0};
     SelfCfgType cfgType = TYPE_OF_GET_SELF_CONFIG;
-	if (size >= DATA_MAX_BYTES) {
-	    getDatValidLen = static_cast<int> (data[0]);
+    if (size >= DATA_MAX_BYTES) {
+        getDatValidLen = static_cast<int> (data[0]);
         if (memcpy_s(cfgData, DATA_MAX_BYTES, data, DATA_MAX_BYTES - 1) != EOK) {
             return;
         }
-	}
+    }
     (void)Hid2dGetSelfWifiCfgInfo(cfgType, cfgData, &getDatValidLen);
 }
 
@@ -227,17 +227,16 @@ void Hid2dSetUpperSceneTest(const uint8_t* data, size_t size)
         if (memcpy_s(ifName, IF_NAME_LEN, data, IF_NAME_LEN - 1) != EOK) {
             return;
         }
-	}
+    }
 
-	if (size >= sizeof(Hid2dUpperScene)) {
+    if (size >= sizeof(Hid2dUpperScene)) {
         if (memcpy_s(scene.mac, MAC_LEN, data, MAC_LEN) != EOK) {
             return;
         }
-		scene.scene = static_cast<unsigned int> (data[index++]);
+        scene.scene = static_cast<unsigned int> (data[index++]);
         scene.fps = static_cast<int> (data[index++]);
         scene.bw = static_cast<unsigned int> (data[index++]);
-	}
-
+    }
     (void)Hid2dSetUpperScene(ifName, &scene);
 }
 /* Fuzzer entry point */

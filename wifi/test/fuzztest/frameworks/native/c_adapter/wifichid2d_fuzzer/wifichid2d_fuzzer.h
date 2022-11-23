@@ -19,10 +19,21 @@
 #define FUZZ_PROJECT_NAME "wifichid2d_fuzzer"
 #define MACLEN 6
 #define IPLEN 4
+#define TWO 2
+#define DATA_MAX_BYTES 255
 
 void Hid2dRequestGcIpTest(const uint8_t* data, size_t size);
 void Hid2dSharedlinkIncreaseTest(void);
 void Hid2dSharedlinkDecreaseTest(void);
 void Hid2dIsWideBandwidthSupportedTest(void);
-
+void Hid2dCreateGroupTest(const uint8_t* data, size_t size);
+void Hid2dRemoveGcGroupTest(const uint8_t* data, size_t size);
+void Hid2dConnectTest(const uint8_t* data, size_t size);
+void Hid2dConfigIPAddrTest(const uint8_t* data, size_t size);
+void Hid2dReleaseIPAddrTest(const uint8_t* data, size_t size);
+void Hid2dGetRecommendChannelTest(const uint8_t* data, size_t size);
+void Hid2dGetChannelListFor5GTest(const uint8_t* data, size_t size);
+void Hid2dGetSelfWifiCfgInfoTest(const uint8_t* data, size_t size);
+void Hid2dSetPeerWifiCfgInfoTest(const uint8_t* data, size_t size);
+void Hid2dSetUpperSceneTest(const uint8_t* data, size_t size);
 #endif

@@ -26,4 +26,4 @@ public:
 };
 }  // namespace Wifi
 }  // namespace OHOS
-
+#endif

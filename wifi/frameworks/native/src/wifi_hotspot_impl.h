@@ -202,8 +202,18 @@ public:
      * @return ErrCode - operation result
      */
     ErrCode SetPowerModel(const PowerModel& model) override;
+
+    /**
+     * @Description Check whether service is died.
+     *
+     * @return bool - true: service is died, false: service is not died.
+     */
+    bool IsRemoteDied(void);
+
 private:
+    bool GetWifiHotspotProxy(void);
     int systemAbilityId_;
+    int instId;
     sptr<IWifiHotspot> client_;
 };
 }  // namespace Wifi

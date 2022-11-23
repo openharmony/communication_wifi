@@ -59,7 +59,22 @@ bool WifiDeviceImpl::Init()
         return false;
     }
     client_ = deviceProxy;
+    return true;
 #else
+    return GetWifiDeviceProxy();
+#endif
+}
+
+bool WifiDeviceImpl::GetWifiDeviceProxy()
+{
+#ifdef OHOS_ARCH_LITE
+    return (client_ != nullptr);
+#else
+    if (IsRemoteDied() == false) {
+        return true;
+    }
+
+    WIFI_LOGI("GetWifiDeviceProxy, get new sa from remote!");
     sptr<ISystemAbilityManager> sa_mgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (sa_mgr == nullptr) {
         WIFI_LOGE("failed to get SystemAbilityManager");
@@ -76,185 +91,186 @@ bool WifiDeviceImpl::Init()
     if (client_ == nullptr) {
         client_ = new (std::nothrow) WifiDeviceProxy(object);
     }
+
     if (client_ == nullptr) {
         WIFI_LOGE("wifi device init failed. %{public}d", systemAbilityId_);
         return false;
     }
-#endif
     return true;
+#endif
 }
 
 ErrCode WifiDeviceImpl::EnableWifi()
 {
-    RETURN_IF_FAIL(client_);
+    RETURN_IF_FAIL(GetWifiDeviceProxy());
     return client_->EnableWifi();
 }
 
 ErrCode WifiDeviceImpl::DisableWifi()
 {
-    RETURN_IF_FAIL(client_);
+    RETURN_IF_FAIL(GetWifiDeviceProxy());
     return client_->DisableWifi();
 }
 
 ErrCode WifiDeviceImpl::InitWifiProtect(const WifiProtectType &protectType, const std::string &protectName)
 {
-    RETURN_IF_FAIL(client_);
+    RETURN_IF_FAIL(GetWifiDeviceProxy());
     return client_->InitWifiProtect(protectType, protectName);
 }
 
 ErrCode WifiDeviceImpl::GetWifiProtectRef(const WifiProtectMode &protectMode, const std::string &protectName)
 {
-    RETURN_IF_FAIL(client_);
+    RETURN_IF_FAIL(GetWifiDeviceProxy());
     return client_->GetWifiProtectRef(protectMode, protectName);
 }
 
 ErrCode WifiDeviceImpl::PutWifiProtectRef(const std::string &protectName)
 {
-    RETURN_IF_FAIL(client_);
+    RETURN_IF_FAIL(GetWifiDeviceProxy());
     return client_->PutWifiProtectRef(protectName);
 }
 
 ErrCode WifiDeviceImpl::RemoveCandidateConfig(int networkId)
 {
-    RETURN_IF_FAIL(client_);
+    RETURN_IF_FAIL(GetWifiDeviceProxy());
     return client_->RemoveCandidateConfig(networkId);
 }
 
 ErrCode WifiDeviceImpl::RemoveCandidateConfig(const WifiDeviceConfig &config)
 {
-    RETURN_IF_FAIL(client_);
+    RETURN_IF_FAIL(GetWifiDeviceProxy());
     return client_->RemoveCandidateConfig(config);
 }
 
 ErrCode WifiDeviceImpl::AddDeviceConfig(const WifiDeviceConfig &config, int &result, bool isCandidate)
 {
-    RETURN_IF_FAIL(client_);
+    RETURN_IF_FAIL(GetWifiDeviceProxy());
     return client_->AddDeviceConfig(config, result, isCandidate);
 }
 
 ErrCode WifiDeviceImpl::UpdateDeviceConfig(const WifiDeviceConfig &config, int &result)
 {
-    RETURN_IF_FAIL(client_);
+    RETURN_IF_FAIL(GetWifiDeviceProxy());
     return client_->UpdateDeviceConfig(config, result);
 }
 
 ErrCode WifiDeviceImpl::RemoveDevice(int networkId)
 {
-    RETURN_IF_FAIL(client_);
+    RETURN_IF_FAIL(GetWifiDeviceProxy());
     return client_->RemoveDevice(networkId);
 }
 
 ErrCode WifiDeviceImpl::RemoveAllDevice()
 {
-    RETURN_IF_FAIL(client_);
+    RETURN_IF_FAIL(GetWifiDeviceProxy());
     return client_->RemoveAllDevice();
 }
 
 ErrCode WifiDeviceImpl::GetDeviceConfigs(std::vector<WifiDeviceConfig> &result, bool isCandidate)
 {
-    RETURN_IF_FAIL(client_);
+    RETURN_IF_FAIL(GetWifiDeviceProxy());
     return client_->GetDeviceConfigs(result, isCandidate);
 }
 
 ErrCode WifiDeviceImpl::EnableDeviceConfig(int networkId, bool attemptEnable)
 {
-    RETURN_IF_FAIL(client_);
+    RETURN_IF_FAIL(GetWifiDeviceProxy());
     return client_->EnableDeviceConfig(networkId, attemptEnable);
 }
 
 ErrCode WifiDeviceImpl::DisableDeviceConfig(int networkId)
 {
-    RETURN_IF_FAIL(client_);
+    RETURN_IF_FAIL(GetWifiDeviceProxy());
     return client_->DisableDeviceConfig(networkId);
 }
 
 ErrCode WifiDeviceImpl::ConnectToNetwork(int networkId, bool isCandidate)
 {
-    RETURN_IF_FAIL(client_);
+    RETURN_IF_FAIL(GetWifiDeviceProxy());
     return client_->ConnectToNetwork(networkId, isCandidate);
 }
 
 ErrCode WifiDeviceImpl::ConnectToDevice(const WifiDeviceConfig &config)
 {
-    RETURN_IF_FAIL(client_);
+    RETURN_IF_FAIL(GetWifiDeviceProxy());
     return client_->ConnectToDevice(config);
 }
 
 ErrCode WifiDeviceImpl::IsConnected(bool &isConnected)
 {
-    RETURN_IF_FAIL(client_);
+    RETURN_IF_FAIL(GetWifiDeviceProxy());
     return client_->IsConnected(isConnected);
 }
 
 ErrCode WifiDeviceImpl::ReConnect()
 {
-    RETURN_IF_FAIL(client_);
+    RETURN_IF_FAIL(GetWifiDeviceProxy());
     return client_->ReConnect();
 }
 
 ErrCode WifiDeviceImpl::ReAssociate()
 {
-    RETURN_IF_FAIL(client_);
+    RETURN_IF_FAIL(GetWifiDeviceProxy());
     return client_->ReAssociate();
 }
 
 ErrCode WifiDeviceImpl::Disconnect()
 {
-    RETURN_IF_FAIL(client_);
+    RETURN_IF_FAIL(GetWifiDeviceProxy());
     return client_->Disconnect();
 }
 
 ErrCode WifiDeviceImpl::StartWps(const WpsConfig &config)
 {
-    RETURN_IF_FAIL(client_);
+    RETURN_IF_FAIL(GetWifiDeviceProxy());
     return client_->StartWps(config);
 }
 
 ErrCode WifiDeviceImpl::CancelWps()
 {
-    RETURN_IF_FAIL(client_);
+    RETURN_IF_FAIL(GetWifiDeviceProxy());
     return client_->CancelWps();
 }
 
 ErrCode WifiDeviceImpl::IsWifiActive(bool &bActive)
 {
-    RETURN_IF_FAIL(client_);
+    RETURN_IF_FAIL(GetWifiDeviceProxy());
     return client_->IsWifiActive(bActive);
 }
 
 ErrCode WifiDeviceImpl::GetWifiState(int &state)
 {
-    RETURN_IF_FAIL(client_);
+    RETURN_IF_FAIL(GetWifiDeviceProxy());
     return client_->GetWifiState(state);
 }
 
 ErrCode WifiDeviceImpl::GetLinkedInfo(WifiLinkedInfo &info)
 {
-    RETURN_IF_FAIL(client_);
+    RETURN_IF_FAIL(GetWifiDeviceProxy());
     return client_->GetLinkedInfo(info);
 }
 
 ErrCode WifiDeviceImpl::GetIpInfo(IpInfo &info)
 {
-    RETURN_IF_FAIL(client_);
+    RETURN_IF_FAIL(GetWifiDeviceProxy());
     return client_->GetIpInfo(info);
 }
 
 ErrCode WifiDeviceImpl::SetCountryCode(const std::string &countryCode)
 {
-    RETURN_IF_FAIL(client_);
+    RETURN_IF_FAIL(GetWifiDeviceProxy());
     return client_->SetCountryCode(countryCode);
 }
 
 ErrCode WifiDeviceImpl::GetCountryCode(std::string &countryCode)
 {
-    RETURN_IF_FAIL(client_);
+    RETURN_IF_FAIL(GetWifiDeviceProxy());
     return client_->GetCountryCode(countryCode);
 }
 
 ErrCode WifiDeviceImpl::GetSignalLevel(const int &rssi, const int &band, int &level)
 {
-    RETURN_IF_FAIL(client_);
+    RETURN_IF_FAIL(GetWifiDeviceProxy());
     return client_->GetSignalLevel(rssi, band, level);
 }
 
@@ -264,19 +280,19 @@ ErrCode WifiDeviceImpl::RegisterCallBack(const std::shared_ptr<IWifiDeviceCallBa
 ErrCode WifiDeviceImpl::RegisterCallBack(const sptr<IWifiDeviceCallBack> &callback)
 #endif
 {
-    RETURN_IF_FAIL(client_);
+    RETURN_IF_FAIL(GetWifiDeviceProxy());
     return client_->RegisterCallBack(callback);
 }
 
 ErrCode WifiDeviceImpl::GetSupportedFeatures(long &features)
 {
-    RETURN_IF_FAIL(client_);
+    RETURN_IF_FAIL(GetWifiDeviceProxy());
     return client_->GetSupportedFeatures(features);
 }
 
 ErrCode WifiDeviceImpl::IsFeatureSupported(long feature, bool &isSupported)
 {
-    RETURN_IF_FAIL(client_);
+    RETURN_IF_FAIL(GetWifiDeviceProxy());
     long tmpFeatures = 0;
     isSupported = false;
     ErrCode ret = client_->GetSupportedFeatures(tmpFeatures);
@@ -289,14 +305,19 @@ ErrCode WifiDeviceImpl::IsFeatureSupported(long feature, bool &isSupported)
 
 ErrCode WifiDeviceImpl::GetDeviceMacAddress(std::string &result)
 {
-    RETURN_IF_FAIL(client_);
+    RETURN_IF_FAIL(GetWifiDeviceProxy());
     return client_->GetDeviceMacAddress(result);
 }
 
 bool WifiDeviceImpl::SetLowLatencyMode(bool enabled)
 {
-    RETURN_IF_FAIL(client_);
+    RETURN_IF_FAIL(GetWifiDeviceProxy());
     return client_->SetLowLatencyMode(enabled);
+}
+
+bool WifiDeviceImpl::IsRemoteDied(void)
+{
+    return (client_ == nullptr) ? true : client_->IsRemoteDied();
 }
 }  // namespace Wifi
 }  // namespace OHOS

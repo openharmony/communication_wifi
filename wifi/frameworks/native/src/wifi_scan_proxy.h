@@ -39,7 +39,7 @@ public:static WifiScanProxy *GetInstance(void);
     explicit WifiScanProxy(void);
     ErrCode Init(void);
 #else
-class WifiScanProxy : public IRemoteProxy<IWifiScan>, public IRemoteObject::DeathRecipient {
+class WifiScanProxy : public IRemoteProxy<IWifiScan> {
 public:
     explicit WifiScanProxy(const sptr<IRemoteObject> &remote);
 #endif
@@ -98,6 +98,13 @@ public:
      */
     ErrCode GetSupportedFeatures(long &features) override;
 
+    /**
+     * @Description Check whether service is died.
+     *
+     * @return bool - true: service is died, false: service is not died.
+     */
+    bool IsRemoteDied(void) override;
+
 #ifdef OHOS_ARCH_LITE
     void OnRemoteDied(void);
 private:
@@ -106,10 +113,27 @@ private:
     SvcIdentity svcIdentity_ = { 0 };
     bool remoteDied_;
 #else
-    void OnRemoteDied(const wptr<IRemoteObject>& remoteObject) override;
+    void OnRemoteDied(const wptr<IRemoteObject>& remoteObject);
 private:
+    class WifiDeathRecipient : public IRemoteObject::DeathRecipient {
+    public:
+        explicit WifiDeathRecipient(WifiScanProxy &client) : client_(client) {}
+        ~WifiDeathRecipient() override = default;
+        void OnRemoteDied(const wptr<IRemoteObject> &remote) override
+        {
+            client_.OnRemoteDied(remote);
+        }
+
+    private:
+        WifiScanProxy &client_;
+    };
+
+    void RemoveDeathRecipient(void);
     static BrokerDelegator<WifiScanProxy> g_delegator;
     bool mRemoteDied;
+    sptr<IRemoteObject> remote_ = nullptr;
+    std::mutex mutex_;
+    sptr<IRemoteObject::DeathRecipient> deathRecipient_ = nullptr;
 #endif
 };
 }  // namespace Wifi

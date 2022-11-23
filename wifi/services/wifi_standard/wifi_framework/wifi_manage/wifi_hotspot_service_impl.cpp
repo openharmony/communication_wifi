@@ -667,5 +667,10 @@ void WifiHotspotServiceImpl::SaBasicDump(std::string& result)
         StationsInfoDump(result);
     }
 }
+
+bool WifiHotspotServiceImpl::IsRemoteDied(void)
+{
+    return false;
+}
 }  // namespace Wifi
 }  // namespace OHOS

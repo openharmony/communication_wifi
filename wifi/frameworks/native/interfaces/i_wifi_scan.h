@@ -93,6 +93,13 @@ public:
      * @return ErrCode - operation result
      */
     virtual ErrCode GetSupportedFeatures(long &features) = 0;
+
+    /**
+     * @Description Check whether service is died.
+     *
+     * @return bool - true: service is died, false: service is not died.
+     */
+    virtual bool IsRemoteDied(void) = 0;
 };
 }  // namespace Wifi
 }  // namespace OHOS

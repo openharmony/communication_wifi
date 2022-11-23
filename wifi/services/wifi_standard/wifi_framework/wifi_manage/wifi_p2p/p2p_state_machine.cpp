@@ -577,7 +577,7 @@ void P2pStateMachine::NotifyUserInvitationReceivedMessage()
         "Receiving device:" +
         deviceManager.GetDeviceName(savedP2pConfig.GetDeviceAddress());
     dialog.SetButton("accepts", acceptEvent, nullptr);
-    dialog.SetButton("rejects", rejectEvent, nullptr);
+    dialog.SetButton("rejects", acceptEvent, nullptr);
 
     switch (wps.GetWpsMethod()) {
         case WpsMethod::WPS_METHOD_KEYPAD: {

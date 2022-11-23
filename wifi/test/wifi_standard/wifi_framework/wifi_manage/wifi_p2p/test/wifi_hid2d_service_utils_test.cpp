@@ -23,6 +23,8 @@ using ::testing::ext::TestSize;
 
 namespace OHOS {
 namespace Wifi {
+std::string gcMac;
+std::string serverIp;
 class WifiHid2dServiceUtilsTest : public testing::Test {
 public:
     static void SetUpTestCase()
@@ -44,29 +46,23 @@ public:
 public:
     std::unique_ptr<IpPool> pIpPool;
     std::unique_ptr<SharedLinkManager> pSharedLinkManager;
-    WifiP2pGroupManager groupManager;
-    WifiP2pDeviceManager deviceManager;
 };
 
 HWTEST_F(WifiHid2dServiceUtilsTest, InitIpPool, TestSize.Level1)
 {
-    std::string& serverIp;
     EXPECT_EQ(pIpPool->InitIpPool(serverIp), true);
 }
 HWTEST_F(WifiHid2dServiceUtilsTest, GetIp, TestSize.Level1)
 {
-    std::string& gcMac;
     pIpPool->GetIp(gcMac);
 }
 HWTEST_F(WifiHid2dServiceUtilsTest, ReleaseIp, TestSize.Level1)
 {
-    std::string& gcMac;
     pIpPool->ReleaseIp(gcMac);
 }
 HWTEST_F(WifiHid2dServiceUtilsTest, ReleaseIpPool, TestSize.Level1)
 {
-    std::string& gcMac;
-    pIpPool->ReleaseIpPool();
+    pIpPool->ReleaseIpPool(gcMac);
 }
 HWTEST_F(WifiHid2dServiceUtilsTest, IncreaseSharedLink, TestSize.Level1)
 {

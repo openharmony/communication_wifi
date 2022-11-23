@@ -733,7 +733,9 @@ void WifiHotspotProxy::OnRemoteDied(const wptr<IRemoteObject>& remoteObject)
 
 bool WifiHotspotProxy::IsRemoteDied(void)
 {
-    WIFI_LOGI("IsRemoteDied! mRemoteDied: %{public}d", mRemoteDied);
+    if (mRemoteDied) {
+        WIFI_LOGW("IsRemoteDied! remote is died now!");
+    }
     return mRemoteDied;
 }
 }  // namespace Wifi

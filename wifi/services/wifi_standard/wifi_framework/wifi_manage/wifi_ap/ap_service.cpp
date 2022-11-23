@@ -155,7 +155,7 @@ ErrCode ApService::GetValidChannels(BandType band, std::vector<int32_t> &validCh
         WIFI_LOGE("The value of band is invalid.");
         return ErrCode::WIFI_OPT_INVALID_PARAM;
     }
-    validchannel = channelsInfo[band];
+    validChannel = channelsInfo[band];
     return ErrCode::WIFI_OPT_SUCCESS;
 }
 

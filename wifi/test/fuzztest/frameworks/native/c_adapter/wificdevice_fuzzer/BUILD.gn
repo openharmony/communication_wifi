@@ -1,0 +1,49 @@
+# Copyright (C) 2022 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+#####################hydra-fuzz###################
+import("//build/config/features.gni")
+import("//build/test.gni")
+import("//foundation/communication/wifi/wifi/wifi.gni")
+module_output_path = "wifi/wifi_sta"
+
+##############################fuzztest##########################################
+ohos_fuzztest("WifiCDeviceFuzzTest") {
+  module_out_path = module_output_path
+  fuzz_config_file = "$WIFI_ROOT_DIR/test/fuzztest/frameworks/native/c_adapter/wificdevice_fuzzer"
+
+  include_dirs = [
+    "$WIFI_ROOT_DIR/frameworks/native/include",
+    "$WIFI_ROOT_DIR/frameworks/native/interfaces",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/net_helper",
+    "$WIFI_ROOT_DIR/test/fuzztest/fuzz_common_func",
+  ]
+
+  cflags = [
+    "-g",
+    "-O0",
+    "-Wno-unused-variable",
+    "-fno-omit-frame-pointer",
+  ]
+  sources = [ "wificdevice_fuzzer.cpp" ]
+
+  deps = [ "$WIFI_ROOT_DIR/frameworks/native:wifi_sdk" ]
+
+  external_deps = [
+    "c_utils:utils",
+    "ipc:ipc_core",
+  ]
+
+  part_name = "wifi"
+  subsystem_name = "communication"
+}

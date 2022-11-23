@@ -140,9 +140,12 @@ struct WifiLinkedInfo {
         band = 0;
         frequency = 0;
         linkSpeed = 0;
+        macType = 0;
         ipAddress = 0;
         connState = ConnState::UNKNOWN;
         ifHiddenSSID = false;
+        rxLinkSpeed = 0;
+        txLinkSpeed = 0;
         chload = 0;
         snr = 0;
         isDataRestricted = 0;

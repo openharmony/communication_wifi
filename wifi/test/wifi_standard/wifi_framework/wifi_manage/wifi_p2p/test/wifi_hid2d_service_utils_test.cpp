@@ -62,7 +62,7 @@ HWTEST_F(WifiHid2dServiceUtilsTest, ReleaseIp, TestSize.Level1)
 }
 HWTEST_F(WifiHid2dServiceUtilsTest, ReleaseIpPool, TestSize.Level1)
 {
-    pIpPool->ReleaseIpPool(gcMac);
+    pIpPool->ReleaseIpPool();
 }
 HWTEST_F(WifiHid2dServiceUtilsTest, IncreaseSharedLink, TestSize.Level1)
 {

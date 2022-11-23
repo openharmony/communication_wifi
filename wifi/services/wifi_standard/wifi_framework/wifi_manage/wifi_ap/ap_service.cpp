@@ -142,7 +142,7 @@ ErrCode ApService::GetValidBands(std::vector<BandType> &bands)
     return ErrCode::WIFI_OPT_SUCCESS;
 }
 
-ErrCode ApService::GetValidChannels(BandType band, std::vector<int32_t> &validchannel)
+ErrCode ApService::GetValidChannels(BandType band, std::vector<int32_t> &validChannel)
 {
     WIFI_LOGI("Instance %{public}d %{public}s", m_id, __func__);
     ChannelsTable channelsInfo;
@@ -155,7 +155,7 @@ ErrCode ApService::GetValidChannels(BandType band, std::vector<int32_t> &validch
         WIFI_LOGE("The value of band is invalid.");
         return ErrCode::WIFI_OPT_INVALID_PARAM;
     }
-    validchannel = channelsInfo[band];
+    validChannel = channelsInfo[band];
     return ErrCode::WIFI_OPT_SUCCESS;
 }
 

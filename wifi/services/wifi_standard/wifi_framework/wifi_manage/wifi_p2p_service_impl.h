@@ -393,6 +393,13 @@ public:
      */
     int32_t Dump(int32_t fd, const std::vector<std::u16string>& args) override;
 
+    /**
+     * @Description Check whether service is died.
+     *
+     * @return bool - true: service is died, false: service is not died.
+     */
+    bool IsRemoteDied(void) override;
+
 private:
     bool Init();
     ErrCode CheckCanEnableP2p(void);

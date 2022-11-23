@@ -1031,5 +1031,10 @@ int32_t WifiP2pServiceImpl::Dump(int32_t fd, const std::vector<std::u16string>& 
     }
     return ERR_OK;
 }
+
+bool WifiP2pServiceImpl::IsRemoteDied(void)
+{
+    return false;
+}
 }  // namespace Wifi
 }  // namespace OHOS

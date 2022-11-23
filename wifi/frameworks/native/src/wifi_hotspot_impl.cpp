@@ -49,12 +49,11 @@ bool WifiHotspotImpl::Init(int id)
 
 bool WifiHotspotImpl::GetWifiHotspotProxy(void)
 {
-    WIFI_LOGI("enter GetWifiHotspotProxy!");
     if (IsRemoteDied() == false) {
-        WIFI_LOGI("client_ is existed now!");
         return true;
     }
 
+    WIFI_LOGI("GetWifiHotspotProxy, get new sa from remote!");
     sptr<ISystemAbilityManager> sa_mgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (sa_mgr == nullptr) {
         WIFI_LOGE("failed to get SystemAbilityManager");

@@ -43,7 +43,6 @@ WifiP2pProxy::WifiP2pProxy(const sptr<IRemoteObject> &impl) : IRemoteProxy<IWifi
         }
         remote_ = impl;
         WIFI_LOGI("AddDeathRecipient success! deathRecipient_: %{private}p", (void*)deathRecipient_);
-
     }
 }
 
@@ -1561,7 +1560,9 @@ void WifiP2pProxy::OnRemoteDied(const wptr<IRemoteObject>& remoteObject)
 
 bool WifiP2pProxy::IsRemoteDied(void)
 {
-    WIFI_LOGI("IsRemoteDied! mRemoteDied: %{public}d", mRemoteDied);
+    if (mRemoteDied) {
+        WIFI_LOGW("IsRemoteDied! remote is died now!");
+    }
     return mRemoteDied;
 }
 }  // namespace Wifi

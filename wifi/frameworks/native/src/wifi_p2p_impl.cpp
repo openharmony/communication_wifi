@@ -44,12 +44,11 @@ bool WifiP2pImpl::Init(void)
 
 bool WifiP2pImpl::GetWifiP2pProxy(void)
 {
-    WIFI_LOGI("enter GetWifiP2pProxy!");
     if (IsRemoteDied() == false) {
-        WIFI_LOGI("client_ is existed now!");
         return true;
     }
 
+    WIFI_LOGI("GetWifiP2pProxy, get new sa from remote!");
     sptr<ISystemAbilityManager> sa_mgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (sa_mgr == nullptr) {
         WIFI_LOGE("failed to get SystemAbilityManager");

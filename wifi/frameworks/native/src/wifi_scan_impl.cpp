@@ -68,12 +68,11 @@ bool WifiScanImpl::GetWifiScanProxy(void)
 #ifdef OHOS_ARCH_LITE
     return (client_ != nullptr);
 #else
-    WIFI_LOGI("enter GetWifiScanProxy!");
     if (IsRemoteDied() == false) {
-        WIFI_LOGI("client_ is existed now!");
         return true;
     }
 
+    WIFI_LOGI("GetWifiScanProxy, get new sa from remote!");
     sptr<ISystemAbilityManager> sa_mgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (sa_mgr == nullptr) {
         WIFI_LOGE("failed to get SystemAbilityManager");

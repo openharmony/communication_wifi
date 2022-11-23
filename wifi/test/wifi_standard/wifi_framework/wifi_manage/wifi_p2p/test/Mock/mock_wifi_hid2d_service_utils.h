@@ -21,7 +21,7 @@ namespace Wifi {
 class MockWifiHid2dServiceUtils : public IpPool {
 public:
 
-    ~MockP2pEnabledState() = default;
+    ~MockWifiHid2dServiceUtils() = default;
     MOCK_METHOD1(InitIpPool, bool(const std::string& serverIp));
 };
 }  // namespace Wifi

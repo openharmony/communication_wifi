@@ -82,16 +82,16 @@ void AddDeviceConfigTest(const uint8_t* data, size_t size)
             return;
         }
         config.securityType = static_cast<int>(data[index++]);
-	    config.netId = static_cast<int>(data[index++]);
-	    config.freq = static_cast<int>(data[index++]);
-	    config.wapiPskType = static_cast<int>(data[index++]);
-	    config.isHiddenSsid = static_cast<int>(data[index++]);
+        config.netId = static_cast<int>(data[index++]);
+        config.freq = static_cast<int>(data[index++]);
+        config.wapiPskType = static_cast<int>(data[index++]);
+        config.isHiddenSsid = static_cast<int>(data[index++]);
         IpType ipType = STATIC_IP;
         if (ipType % 2 ==1) {
             ipType = DHCP;
-		} else if(ipType % 2 ==1) {
+        } else if(ipType % 2 ==1) {
             ipType = UNKNOWN;
-		}
+        }
     }
     int result = static_cast<int>(data[index++]);
     AddDeviceConfig(&config, &result);
@@ -111,7 +111,7 @@ void AdvanceScanTest(const uint8_t* data, size_t size)
         params.freqs = static_cast<int>(data[index++]);
         params.band = static_cast<int>(data[index++]);
         params.ssidLen = static_cast<int>(data[index++]);
-	}
+    }
     AdvanceScan(&params);
 }
 void GetSignalLevelTest(const uint8_t* data, size_t size)

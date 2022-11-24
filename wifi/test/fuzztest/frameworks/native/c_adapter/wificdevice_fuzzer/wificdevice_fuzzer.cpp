@@ -137,9 +137,9 @@ namespace Wifi {
         EnableDeviceConfigTest(data, size);
         ConnectToTest(data, size);
         DisconnectTest();
-        AddDeviceConfig(data, size);
+        AddDeviceConfigTest(data, size);
         AdvanceScanTest(data, size);
-        GetSignalLevel(data, size);
+        GetSignalLevelTest(data, size);
         return true;
     }
 }  // namespace Wifi

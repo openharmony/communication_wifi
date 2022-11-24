@@ -72,13 +72,13 @@ void AddDeviceConfigTest(const uint8_t* data, size_t size)
     int index = 0;
     WifiDeviceConfig config;
     if (size >= sizeof(WifiDeviceConfig)) {
-        if (memcpy_s(config.ssid, WIFI_MAX_SSID_LEN, data, WIFI_MAX_SSID_LEN - 1) != EOK){
+        if (memcpy_s(config.ssid, WIFI_MAX_SSID_LEN, data, WIFI_MAX_SSID_LEN - 1) != EOK) {
             return;
         }
-        if (memcpy_s(config.bssid, WIFI_MAC_LEN, data, WIFI_MAC_LEN - 1) != EOK){
+        if (memcpy_s(config.bssid, WIFI_MAC_LEN, data, WIFI_MAC_LEN - 1) != EOK) {
             return;
         }
-        if (memcpy_s(config.preSharedKey, WIFI_MAX_KEY_LEN, data, WIFI_MAX_KEY_LEN - 1) != EOK){
+        if (memcpy_s(config.preSharedKey, WIFI_MAX_KEY_LEN, data, WIFI_MAX_KEY_LEN - 1) != EOK) {
             return;
         }
         config.securityType = static_cast<int>(data[index++]);
@@ -87,9 +87,9 @@ void AddDeviceConfigTest(const uint8_t* data, size_t size)
         config.wapiPskType = static_cast<int>(data[index++]);
         config.isHiddenSsid = static_cast<int>(data[index++]);
         IpType ipType = STATIC_IP;
-        if (ipType % 2 ==1) {
+        if (ipType % 2 == 1) {
             ipType = DHCP;
-        } else if(ipType % 2 ==1) {
+        } else if(ipType % 2 == 0) {
             ipType = UNKNOWN;
         }
     }
@@ -101,10 +101,10 @@ void AdvanceScanTest(const uint8_t* data, size_t size)
     int index = 0;
     WifiScanParams params;
     if (size >= sizeof(WifiScanParams)) {
-        if (memcpy_s(params.ssid, WIFI_MAX_SSID_LEN, data, WIFI_MAX_SSID_LEN - 1) != EOK){
+        if (memcpy_s(params.ssid, WIFI_MAX_SSID_LEN, data, WIFI_MAX_SSID_LEN - 1) != EOK) {
             return;
         }
-        if (memcpy_s(params.bssid, WIFI_MAC_LEN, data, WIFI_MAC_LEN - 1) != EOK){
+        if (memcpy_s(params.bssid, WIFI_MAC_LEN, data, WIFI_MAC_LEN - 1) != EOK) {
             return;
         }
         params.scanType = WIFI_FREQ_SCAN;

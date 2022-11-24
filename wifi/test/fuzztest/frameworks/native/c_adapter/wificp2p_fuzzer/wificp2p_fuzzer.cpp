@@ -24,7 +24,7 @@ static void GetP2pEnableStatusTest(const uint8_t* data, size_t size)
 {
     P2pState state = P2P_STATE_NONE;
     if(size > 0) {
-        int temp = static_cast<int>(data[0] % P2P_STATE_CLOSED);
+        int temp = static_cast<int>(data[0]) % P2P_STATE_CLOSED;
         state = static_cast<P2pState>(temp);
     }
     (void)GetP2pEnableStatus(&state);

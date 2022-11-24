@@ -89,7 +89,7 @@ void AddDeviceConfigTest(const uint8_t* data, size_t size)
         IpType ipType = STATIC_IP;
         if (ipType % 2 == 1) {
             ipType = DHCP;
-        } else if(ipType % 2 == 0) {
+        } else if (ipType % 2 == 0) {
             ipType = UNKNOWN;
         }
     }

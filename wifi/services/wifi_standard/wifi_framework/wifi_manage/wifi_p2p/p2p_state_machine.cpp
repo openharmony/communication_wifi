@@ -569,7 +569,7 @@ void P2pStateMachine::NotifyUserInvitationReceivedMessage()
     std::function<void(AlertDialog &, std::any)> rejectEvent = [=](AlertDialog &dlg, std::any msg) {
         AlertDialog dlgBuf = dlg;
         std::any andMsg = msg;
-        SendMessage(static_cast<int>(P2P_STATE_MACHINE_CMD::PEER_CONNECTION_USER_REJECT), andMsg);
+        SendMessage(static_cast<int>(P2P_STATE_MACHINE_CMD::INTERNAL_CONN_USER_ACCEPT), andMsg);
     };
 
     AlertDialog &dialog = AbstractUI::GetInstance().Build();
@@ -577,7 +577,7 @@ void P2pStateMachine::NotifyUserInvitationReceivedMessage()
         "Receiving device:" +
         deviceManager.GetDeviceName(savedP2pConfig.GetDeviceAddress());
     dialog.SetButton("accepts", acceptEvent, nullptr);
-    dialog.SetButton("rejects", acceptEvent, nullptr);
+    dialog.SetButton("rejects", rejectEvent, nullptr);
 
     switch (wps.GetWpsMethod()) {
         case WpsMethod::WPS_METHOD_KEYPAD: {

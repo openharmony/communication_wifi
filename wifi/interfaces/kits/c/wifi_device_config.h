@@ -216,7 +216,7 @@ typedef struct {
     /** Length of the SSID. */
     char ssidLen;
     /** Basic service set ID (BSSID). Its length is defined by {@link WIFI_MAC_LEN}. */
-    char bssid[WIFI_MAC_LEN];
+    unsigned char bssid[WIFI_MAC_LEN];
     /** Frequency. */
     int freqs;
     /** Frequency band. */

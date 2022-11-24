@@ -87,7 +87,7 @@ public:
      * @param params - WifiScanParams object
      * @return ErrCode - operation result
      */
-    ErrCode AdvanceScan(const WifiScanParams &params);
+    ErrCode AdvanceScan(const WifiScanParams &params) override;
 
     /**
      * @Description Check whether service is died.

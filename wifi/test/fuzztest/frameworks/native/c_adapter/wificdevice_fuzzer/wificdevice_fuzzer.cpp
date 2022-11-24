@@ -27,10 +27,6 @@ void DisableWifiTest()
 {
     DisableWifi();
 }
-void IsWifiActiveTest()
-{
-    IsWifiActive();
-}
 void ScanTest()
 {
     Scan();

@@ -49,7 +49,7 @@ void DisableDeviceConfigTest(const uint8_t* data, size_t size)
         return;
     }
     int networkId = static_cast<int>(data[0]);
-    DisableDevice Config(networkId);
+    DisableDeviceConfig(networkId);
 }
 void EnableDeviceConfigTest(const uint8_t* data, size_t size)
 {

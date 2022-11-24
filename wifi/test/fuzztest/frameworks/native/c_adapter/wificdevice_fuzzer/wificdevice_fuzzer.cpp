@@ -74,13 +74,13 @@ void AddDeviceConfigTest(const uint8_t* data, size_t size)
     if (size >= sizeof(WifiDeviceConfig)) {
         if (memcpy_s(config.ssid, WIFI_MAX_SSID_LEN, data, WIFI_MAX_SSID_LEN - 1) != EOK){
             return;
-		}
-		if (memcpy_s(config.bssid, WIFI_MAC_LEN, data, WIFI_MAC_LEN - 1) != EOK){
+        }
+        if (memcpy_s(config.bssid, WIFI_MAC_LEN, data, WIFI_MAC_LEN - 1) != EOK){
             return;
-		}
-		if (memcpy_s(config.preSharedKey, WIFI_MAX_KEY_LEN, data, WIFI_MAX_KEY_LEN - 1) != EOK){
+        }
+        if (memcpy_s(config.preSharedKey, WIFI_MAX_KEY_LEN, data, WIFI_MAX_KEY_LEN - 1) != EOK){
             return;
-		}
+        }
         config.securityType = static_cast<int>(data[index++]);
 	    config.netId = static_cast<int>(data[index++]);
 	    config.freq = static_cast<int>(data[index++]);
@@ -109,8 +109,8 @@ void AdvanceScanTest(const uint8_t* data, size_t size)
         }
         params.scanType = WIFI_FREQ_SCAN;
         params.freqs = static_cast<int>(data[index++]);
-	    params.band = static_cast<int>(data[index++]);
-	    params.ssidLen = static_cast<int>(data[index++]);
+        params.band = static_cast<int>(data[index++]);
+        params.ssidLen = static_cast<int>(data[index++]);
 	}
     AdvanceScan(&params);
 }

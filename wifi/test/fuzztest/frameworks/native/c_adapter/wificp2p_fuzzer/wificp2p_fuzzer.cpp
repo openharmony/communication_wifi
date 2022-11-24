@@ -23,7 +23,7 @@
 static void GetP2pEnableStatusTest(const uint8_t* data, size_t size)
 {
     P2pState state = P2P_STATE_NONE;
-    if(size > 0) {
+    if (size > 0) {
         int temp = static_cast<int>(data[0]) % P2P_STATE_CLOSED;
         state = static_cast<P2pState>(temp);
     }
@@ -36,7 +36,7 @@ static void GStartP2pListenTest(const uint8_t* data, size_t size)
     int period = 0;
     int interval = 0;
 
-    if(index >= 2) {
+    if(index >= TWO) {
         period = static_cast<int>(data[index++]);
         interval = static_cast<int>(data[index++]);
     }
@@ -159,7 +159,7 @@ static void QueryP2pLocalDeviceTest(const uint8_t* data, size_t size)
 {
     WifiP2pDevice deviceInfo;
     int index = 0;
-    if(size >= sizeof(WifiP2pDevice)) {
+    if (size >= sizeof(WifiP2pDevice)) {
         if (memcpy_s(deviceInfo.deviceName, P2P_NAME_LENGTH, data, P2P_NAME_LENGTH - 1) != EOK) {
             return;
         }
@@ -194,7 +194,7 @@ static void QueryP2pDevicesTest(const uint8_t* data, size_t size)
     int index = 0;
     int retSize = 0;
     int msize = 0;
-    if(size >= sizeof(WifiP2pDevice)) {
+    if (size >= sizeof(WifiP2pDevice)) {
         if (memcpy_s(clientDevices.deviceName, P2P_NAME_LENGTH, data, P2P_NAME_LENGTH - 1) != EOK) {
             return;
         }

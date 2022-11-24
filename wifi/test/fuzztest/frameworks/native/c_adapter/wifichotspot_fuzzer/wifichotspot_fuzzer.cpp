@@ -84,7 +84,7 @@ static void DisassociateStaTest(const uint8_t* data, size_t size)
     int index = 0;
     unsigned char mac = 0;
     int macLen = 0;
-    if (size >= 2) {
+    if (size >= TWO) {
         mac = data[index++];
         macLen = static_cast<unsigned int>(data[index++]);
     }

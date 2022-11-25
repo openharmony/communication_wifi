@@ -572,7 +572,7 @@ void P2pStateMachine::NotifyUserInvitationReceivedMessage()
     std::function<void(AlertDialog &, std::any)> rejectEvent = [=](AlertDialog &dlg, std::any msg) {
         AlertDialog dlgBuf = dlg;
         std::any andMsg = msg;
-        SendMessage(static_cast<int>(P2P_STATE_MACHINE_CMD::PEER_CONNECTION_USER_REJECT), andMsg);
+        SendMessage(static_cast<int>(P2P_STATE_MACHINE_CMD::INTERNAL_CONN_USER_ACCEPT), andMsg);
     };
 
     AlertDialog &dialog = AbstractUI::GetInstance().Build();

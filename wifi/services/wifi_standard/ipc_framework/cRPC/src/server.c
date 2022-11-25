@@ -80,6 +80,7 @@ RpcServer *CreateRpcServer(const char *path)
             break;
         }
         server->listenFd = ret;
+        server->isHandlingMsg = false;
         server->loop = CreateEventLoop(MAX_SUPPORT_CLIENT_FD_SIZE);
         if (server->loop == NULL) {
             break;
@@ -210,7 +211,9 @@ int RunRpcLoop(RpcServer *server)
     EventLoop *loop = server->loop;
     while (!loop->stop) {
         BeforeLoop(server);
+        server->isHandlingMsg = false;
         int retval = epoll_wait(loop->epfd, loop->epEvents, loop->setSize, -1);
+        server->isHandlingMsg = true;
         for (int i = 0; i < retval; ++i) {
             struct epoll_event *e = loop->epEvents + i;
             int fd = e->data.fd;
@@ -282,7 +285,9 @@ int EmitEvent(RpcServer *server, int event)
     ++server->nEvents;
     pthread_mutex_unlock(&server->mutex);
     /* Triger write to socket */
-    BeforeLoop(server);
+    if (server->isHandlingMsg == false) {
+        BeforeLoop(server);
+    }
     return 0;
 }
 

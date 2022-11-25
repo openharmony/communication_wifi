@@ -44,6 +44,7 @@ typedef struct RpcServer {
     int events[100];
     int nEvents;
     struct EventNode eventNode[100];
+    bool isHandlingMsg;
 } RpcServer;
 
 /**

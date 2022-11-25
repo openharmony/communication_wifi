@@ -563,13 +563,13 @@ void P2pStateMachine::NotifyUserInvitationReceivedMessage()
         if (wps.GetWpsMethod() == WpsMethod::WPS_METHOD_KEYPAD) {
             anyPin = dlg.GetInputBox(inputBoxPin);
         }
-        /* PEER_CONNECTION_USER_REJECT -> INTERNAL_CONN_USER_ACCEPT @2022-11-24 */
         sendMessage(static_cast<int>(P2P_STATE_MACHINE_CMD::INTERNAL_CONN_USER_ACCEPT), anyPin);
     };
 
     std::function<void(AlertDialog &, std::any)> rejectEvent = [=](AlertDialog &dlg, std::any msg) {
         AlertDialog dlgBuf = dlg;
         std::any andMsg = msg;
+        /* PEER_CONNECTION_USER_REJECT -> INTERNAL_CONN_USER_ACCEPT @2022-11-24 */
         SendMessage(static_cast<int>(P2P_STATE_MACHINE_CMD::INTERNAL_CONN_USER_ACCEPT), andMsg);
     };
 

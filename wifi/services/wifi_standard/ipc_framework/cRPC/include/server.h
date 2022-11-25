@@ -16,6 +16,7 @@
 #define CRPC_SERVER_H
 
 #include <pthread.h>
+#include <stdbool.h>
 #include "context.h"
 #include "evloop.h"
 #include "hash_table.h"

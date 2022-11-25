@@ -17,4 +17,5 @@
 #define WIFI_C_HOTSPOT__H
 #define FUZZ_PROJECT_NAME "wifichotspot_fuzzer"
 
+#define TWO 2
 #endif

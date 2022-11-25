@@ -189,10 +189,15 @@ void WifiP2pCallbackStub::RemoteOnP2pPersistentGroupsChanged(uint32_t code, Mess
 
 void WifiP2pCallbackStub::ReadWifiP2pDeviceData(MessageParcel &data, WifiP2pDevice &device)
 {
-    device.SetDeviceName(data.ReadCString());
-    device.SetDeviceAddress(data.ReadCString());
-    device.SetPrimaryDeviceType(data.ReadCString());
-    device.SetSecondaryDeviceType(data.ReadCString());
+    const char *readStr = nullptr;
+    readStr = data.ReadCString();
+    device.SetDeviceName((readStr != nullptr) ? readStr : "");
+    readStr = data.ReadCString();
+    device.SetDeviceAddress((readStr != nullptr) ? readStr : "");
+    readStr = data.ReadCString();
+    device.SetPrimaryDeviceType((readStr != nullptr) ? readStr : "");
+    readStr = data.ReadCString();
+    device.SetSecondaryDeviceType((readStr != nullptr) ? readStr : "");
     device.SetP2pDeviceStatus(static_cast<P2pDeviceStatus>(data.ReadInt32()));
     WifiP2pWfdInfo wfdInfo;
     wfdInfo.SetWfdEnabled(data.ReadBool());
@@ -237,6 +242,7 @@ void WifiP2pCallbackStub::RemoteOnP2pPeersChanged(uint32_t code, MessageParcel &
 void WifiP2pCallbackStub::RemoteOnP2pServicesChanged(uint32_t code, MessageParcel &data, MessageParcel &reply)
 {
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+    const char *readStr = nullptr;
     constexpr int MAX_SIZE = 512;
     std::vector<WifiP2pServiceInfo> srvInfo;
     int size = data.ReadInt32();
@@ -247,13 +253,17 @@ void WifiP2pCallbackStub::RemoteOnP2pServicesChanged(uint32_t code, MessageParce
     }
     for (int i = 0; i < size; ++i) {
         WifiP2pServiceInfo info;
-        info.SetServiceName(data.ReadCString());
-        info.SetDeviceAddress(data.ReadCString());
+        readStr = data.ReadCString();
+        info.SetServiceName((readStr != nullptr) ? readStr : "");
+        readStr = data.ReadCString();
+        info.SetDeviceAddress((readStr != nullptr) ? readStr : "");
         info.SetServicerProtocolType(static_cast<P2pServicerProtocolType>(data.ReadInt32()));
         int length = data.ReadInt32();
         std::vector<std::string> queryList;
         for (int j = 0; j < length; j++) {
-            queryList.push_back(data.ReadCString());
+            readStr = data.ReadCString();
+            std::string queryStr = (readStr != nullptr) ? readStr : "";
+            queryList.push_back(queryStr);
         }
         info.SetQueryList(queryList);
         srvInfo.emplace_back(info);
@@ -265,10 +275,12 @@ void WifiP2pCallbackStub::RemoteOnP2pServicesChanged(uint32_t code, MessageParce
 void WifiP2pCallbackStub::RemoteOnP2pConnectionChanged(uint32_t code, MessageParcel &data, MessageParcel &reply)
 {
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+    const char *readStr = nullptr;
     WifiP2pLinkedInfo info;
     info.SetConnectState(static_cast<P2pConnectedState>(data.ReadInt32()));
     info.SetIsGroupOwner(data.ReadBool());
-    info.SetIsGroupOwnerAddress(data.ReadCString());
+    readStr = data.ReadCString();
+    info.SetIsGroupOwnerAddress((readStr != nullptr) ? readStr : "");
     OnP2pConnectionChanged(info);
     reply.WriteInt32(0);
 }

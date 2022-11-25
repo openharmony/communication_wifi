@@ -144,10 +144,13 @@ int WifiScanStub::OnScan(uint32_t code, MessageParcel &data, MessageParcel &repl
 int WifiScanStub::OnScanByParams(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
     WIFI_LOGD("run OnScanByParams code %{public}u, datasize %{public}zu", code, data.GetRawDataSize());
+    const char *readStr = nullptr;
     constexpr int MAX_FREQS_SIZE = 512;
     WifiScanParams params;
-    params.ssid = data.ReadCString();
-    params.bssid = data.ReadCString();
+    readStr = data.ReadCString();
+    params.ssid = (readStr != nullptr) ? readStr : "";
+    readStr = data.ReadCString();
+    params.bssid = (readStr != nullptr) ? readStr : "";
     int size = data.ReadInt32();
     if (size > MAX_FREQS_SIZE) {
         reply.WriteInt32(0);

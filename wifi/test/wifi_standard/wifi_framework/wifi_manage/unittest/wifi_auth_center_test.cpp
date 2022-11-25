@@ -12,6 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#include <gtest/gtest.h>
 #include "wifi_auth_center_test.h"
 #include "permission_def.h"
 
@@ -198,6 +199,153 @@ HWTEST_F(WifiAuthCenterTest, CheckNetworkSettingsPermission_DENIED, TestSize.Lev
     }
     WifiAuthCenter::GetInstance().ChangePermission(permissions, pid, uid);
     EXPECT_EQ(PERMISSION_GRANTED, WifiAuthCenter::GetInstance().VerifyWifiConnectionPermission(pid, uid));
+}
+HWTEST_F(WifiAuthCenterTest, SetWifiConfigPermission_GRANTED, TestSize.Level1)
+{
+    std::map<std::string, int> permissions;
+    int num[ARRAY_PERMISSION] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
+    for (int i = 0; i < ARRAY_PERMISSION; i++) {
+        permissions[g_wifiPermissions[i].name] = num[i];
+    }
+    WifiAuthCenter::GetInstance().ChangePermission(permissions, pid, uid);
+    EXPECT_EQ(PERMISSION_GRANTED, WifiAuthCenter::GetInstance().VerifySetWifiConfigPermission(pid, uid));
+}
+
+HWTEST_F(WifiAuthCenterTest, SetWifiConfigPermission_DENIED, TestSize.Level1)
+{
+    std::map<std::string, int> permissions;
+    int num[ARRAY_PERMISSION] = {0};
+    for (int i = 0; i < ARRAY_PERMISSION; i++) {
+        permissions[g_wifiPermissions[i].name] = num[i];
+    }
+    WifiAuthCenter::GetInstance().ChangePermission(permissions, pid, uid);
+    EXPECT_EQ(PERMISSION_GRANTED, WifiAuthCenter::GetInstance().VerifySetWifiConfigPermission(pid, uid));
+}
+HWTEST_F(WifiAuthCenterTest, GetWifiConfigPermission_GRANTED, TestSize.Level1)
+{
+    std::map<std::string, int> permissions;
+    int num[ARRAY_PERMISSION] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
+    for (int i = 0; i < ARRAY_PERMISSION; i++) {
+        permissions[g_wifiPermissions[i].name] = num[i];
+    }
+    WifiAuthCenter::GetInstance().ChangePermission(permissions, pid, uid);
+    EXPECT_EQ(PERMISSION_GRANTED, WifiAuthCenter::GetInstance().VerifyGetWifiConfigPermission(pid, uid));
+}
+
+HWTEST_F(WifiAuthCenterTest, GetWifiConfigPermission_DENIED, TestSize.Level1)
+{
+    std::map<std::string, int> permissions;
+    int num[ARRAY_PERMISSION] = {0};
+    for (int i = 0; i < ARRAY_PERMISSION; i++) {
+        permissions[g_wifiPermissions[i].name] = num[i];
+    }
+    WifiAuthCenter::GetInstance().ChangePermission(permissions, pid, uid);
+    EXPECT_EQ(PERMISSION_GRANTED, WifiAuthCenter::GetInstance().VerifyGetWifiConfigPermission(pid, uid));
+}
+HWTEST_F(WifiAuthCenterTest, GetWifiDirectPermission_GRANTED, TestSize.Level1)
+{
+    std::map<std::string, int> permissions;
+    int num[ARRAY_PERMISSION] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
+    for (int i = 0; i < ARRAY_PERMISSION; i++) {
+        permissions[g_wifiPermissions[i].name] = num[i];
+    }
+    WifiAuthCenter::GetInstance().ChangePermission(permissions, pid, uid);
+    EXPECT_EQ(PERMISSION_GRANTED, WifiAuthCenter::GetInstance().VerifyGetWifiDirectDevicePermission(pid, uid));
+}
+
+HWTEST_F(WifiAuthCenterTest, GetWifiDirectPermission_DENIED, TestSize.Level1)
+{
+    std::map<std::string, int> permissions;
+    int num[ARRAY_PERMISSION] = {0};
+    for (int i = 0; i < ARRAY_PERMISSION; i++) {
+        permissions[g_wifiPermissions[i].name] = num[i];
+    }
+    WifiAuthCenter::GetInstance().ChangePermission(permissions, pid, uid);
+    EXPECT_EQ(PERMISSION_GRANTED, WifiAuthCenter::GetInstance().VerifyGetWifiDirectDevicePermission(pid, uid));
+}
+HWTEST_F(WifiAuthCenterTest, WifiHotspotPermission_GRANTED, TestSize.Level1)
+{
+    std::map<std::string, int> permissions;
+    int num[ARRAY_PERMISSION] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
+    for (int i = 0; i < ARRAY_PERMISSION; i++) {
+        permissions[g_wifiPermissions[i].name] = num[i];
+    }
+    WifiAuthCenter::GetInstance().ChangePermission(permissions, pid, uid);
+    EXPECT_EQ(PERMISSION_GRANTED, WifiAuthCenter::GetInstance().VerifyManageWifiHotspotPermission(pid, uid));
+}
+
+HWTEST_F(WifiAuthCenterTest, WifiHotspotPermission_DENIED, TestSize.Level1)
+{
+    std::map<std::string, int> permissions;
+    int num[ARRAY_PERMISSION] = {0};
+    for (int i = 0; i < ARRAY_PERMISSION; i++) {
+        permissions[g_wifiPermissions[i].name] = num[i];
+    }
+    WifiAuthCenter::GetInstance().ChangePermission(permissions, pid, uid);
+    EXPECT_EQ(PERMISSION_GRANTED, WifiAuthCenter::GetInstance().VerifyManageWifiHotspotPermission(pid, uid));
+}
+HWTEST_F(WifiAuthCenterTest, GetWifiPeersMacPermission_GRANTED, TestSize.Level1)
+{
+    std::map<std::string, int> permissions;
+    int num[ARRAY_PERMISSION] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
+    for (int i = 0; i < ARRAY_PERMISSION; i++) {
+        permissions[g_wifiPermissions[i].name] = num[i];
+    }
+    WifiAuthCenter::GetInstance().ChangePermission(permissions, pid, uid);
+    EXPECT_EQ(PERMISSION_GRANTED, WifiAuthCenter::GetInstance().VerifyGetWifiPeersMacPermission(pid, uid));
+}
+
+HWTEST_F(WifiAuthCenterTest, GetWifiPeersMacPermission_DENIED, TestSize.Level1)
+{
+    std::map<std::string, int> permissions;
+    int num[ARRAY_PERMISSION] = {0};
+    for (int i = 0; i < ARRAY_PERMISSION; i++) {
+        permissions[g_wifiPermissions[i].name] = num[i];
+    }
+    WifiAuthCenter::GetInstance().ChangePermission(permissions, pid, uid);
+    EXPECT_EQ(PERMISSION_GRANTED, WifiAuthCenter::GetInstance().VerifyGetWifiPeersMacPermission(pid, uid));
+}
+HWTEST_F(WifiAuthCenterTest, GetWifiInfoPermission_GRANTED, TestSize.Level1)
+{
+    std::map<std::string, int> permissions;
+    int num[ARRAY_PERMISSION] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
+    for (int i = 0; i < ARRAY_PERMISSION; i++) {
+        permissions[g_wifiPermissions[i].name] = num[i];
+    }
+    WifiAuthCenter::GetInstance().ChangePermission(permissions, pid, uid);
+    EXPECT_EQ(PERMISSION_GRANTED, WifiAuthCenter::GetInstance().VerifyGetWifiInfoInternalPermission(pid, uid));
+}
+
+HWTEST_F(WifiAuthCenterTest, GetWifiInfoPermission_DENIED, TestSize.Level1)
+{
+    std::map<std::string, int> permissions;
+    int num[ARRAY_PERMISSION] = {0};
+    for (int i = 0; i < ARRAY_PERMISSION; i++) {
+        permissions[g_wifiPermissions[i].name] = num[i];
+    }
+    WifiAuthCenter::GetInstance().ChangePermission(permissions, pid, uid);
+    EXPECT_EQ(PERMISSION_GRANTED, WifiAuthCenter::GetInstance().VerifyGetWifiInfoInternalPermission(pid, uid));
+}
+HWTEST_F(WifiAuthCenterTest, HotspotExtPermission_GRANTED, TestSize.Level1)
+{
+    std::map<std::string, int> permissions;
+    int num[ARRAY_PERMISSION] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
+    for (int i = 0; i < ARRAY_PERMISSION; i++) {
+        permissions[g_wifiPermissions[i].name] = num[i];
+    }
+    WifiAuthCenter::GetInstance().ChangePermission(permissions, pid, uid);
+    EXPECT_EQ(PERMISSION_GRANTED, WifiAuthCenter::GetInstance().VerifyManageWifiHotspotExtPermission(pid, uid));
+}
+
+HWTEST_F(WifiAuthCenterTest, HotspotExtPermission_DENIED, TestSize.Level1)
+{
+    std::map<std::string, int> permissions;
+    int num[ARRAY_PERMISSION] = {0};
+    for (int i = 0; i < ARRAY_PERMISSION; i++) {
+        permissions[g_wifiPermissions[i].name] = num[i];
+    }
+    WifiAuthCenter::GetInstance().ChangePermission(permissions, pid, uid);
+    EXPECT_EQ(PERMISSION_GRANTED, WifiAuthCenter::GetInstance().VerifyManageWifiHotspotExtPermission(pid, uid));
 }
 }  // namespace Wifi
 }  // namespace OHOS

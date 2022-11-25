@@ -224,23 +224,29 @@ void WifiDeviceProxy::ReadIpAddress(MessageParcel &reply, WifiIpAddress &address
 
 void WifiDeviceProxy::ParseDeviceConfigs(MessageParcel &reply, std::vector<WifiDeviceConfig> &result)
 {
+    const char *readStr = nullptr;
     int retSize = reply.ReadInt32();
     for (int i = 0; i < retSize; ++i) {
         WifiDeviceConfig config;
         config.networkId = reply.ReadInt32();
         config.status = reply.ReadInt32();
-        config.bssid = reply.ReadCString();
-        config.ssid = reply.ReadCString();
+        readStr = reply.ReadCString();
+        config.bssid = (readStr != nullptr) ? readStr : "";
+        readStr = reply.ReadCString();
+        config.ssid = (readStr != nullptr) ? readStr : "";
         config.band = reply.ReadInt32();
         config.channel = reply.ReadInt32();
         config.frequency = reply.ReadInt32();
         config.level = reply.ReadInt32();
         config.isPasspoint = reply.ReadBool();
         config.isEphemeral = reply.ReadBool();
-        config.preSharedKey = reply.ReadCString();
-        config.keyMgmt = reply.ReadCString();
+        readStr = reply.ReadCString();
+        config.preSharedKey = (readStr != nullptr) ? readStr : "";
+        readStr = reply.ReadCString();
+        config.keyMgmt = (readStr != nullptr) ? readStr : "";
         for (int j = 0; j < WEPKEYS_SIZE; j++) {
-            config.wepKeys[j] = reply.ReadCString();
+            readStr = reply.ReadCString();
+            config.wepKeys[j] = (readStr != nullptr) ? readStr : "";
         }
         config.wepTxKeyIndex = reply.ReadInt32();
         config.priority = reply.ReadInt32();
@@ -253,15 +259,22 @@ void WifiDeviceProxy::ParseDeviceConfigs(MessageParcel &reply, std::vector<WifiD
         ReadIpAddress(reply, config.wifiIpConfig.staticIpAddress.gateway);
         ReadIpAddress(reply, config.wifiIpConfig.staticIpAddress.dnsServer1);
         ReadIpAddress(reply, config.wifiIpConfig.staticIpAddress.dnsServer2);
-        config.wifiIpConfig.staticIpAddress.domains = reply.ReadCString();
-        config.wifiEapConfig.eap = reply.ReadCString();
-        config.wifiEapConfig.identity = reply.ReadCString();
-        config.wifiEapConfig.password = reply.ReadCString();
+        readStr = reply.ReadCString();
+        config.wifiIpConfig.staticIpAddress.domains = (readStr != nullptr) ? readStr : "";
+        readStr = reply.ReadCString();
+        config.wifiEapConfig.eap = (readStr != nullptr) ? readStr : "";
+        readStr = reply.ReadCString();
+        config.wifiEapConfig.identity = (readStr != nullptr) ? readStr : "";
+        readStr = reply.ReadCString();
+        config.wifiEapConfig.password = (readStr != nullptr) ? readStr : "";
         config.wifiProxyconfig.configureMethod = ConfigureProxyMethod(reply.ReadInt32());
-        config.wifiProxyconfig.autoProxyConfig.pacWebAddress = reply.ReadCString();
-        config.wifiProxyconfig.manualProxyConfig.serverHostName = reply.ReadCString();
+        readStr = reply.ReadCString();
+        config.wifiProxyconfig.autoProxyConfig.pacWebAddress = (readStr != nullptr) ? readStr : "";
+        readStr = reply.ReadCString();
+        config.wifiProxyconfig.manualProxyConfig.serverHostName = (readStr != nullptr) ? readStr : "";
         config.wifiProxyconfig.manualProxyConfig.serverPort = reply.ReadInt32();
-        config.wifiProxyconfig.manualProxyConfig.exclusionObjectList = reply.ReadCString();
+        readStr = reply.ReadCString();
+        config.wifiProxyconfig.manualProxyConfig.exclusionObjectList = (readStr != nullptr) ? readStr : "";
         config.wifiPrivacySetting = WifiPrivacyConfig(reply.ReadInt32());
 
         result.emplace_back(config);
@@ -561,14 +574,18 @@ ErrCode WifiDeviceProxy::GetWifiState(int &state)
 
 void WifiDeviceProxy::ReadLinkedInfo(MessageParcel &reply, WifiLinkedInfo &info)
 {
+    const char *readStr = nullptr;
     info.networkId = reply.ReadInt32();
-    info.ssid = reply.ReadCString();
-    info.bssid = reply.ReadCString();
+    readStr = reply.ReadCString();
+    info.ssid = (readStr != nullptr) ? readStr : "";
+    readStr = reply.ReadCString();
+    info.bssid = (readStr != nullptr) ? readStr : "";
     info.rssi = reply.ReadInt32();
     info.band = reply.ReadInt32();
     info.frequency = reply.ReadInt32();
     info.linkSpeed = reply.ReadInt32();
-    info.macAddress = reply.ReadCString();
+    readStr = reply.ReadCString();
+    info.macAddress = (readStr != nullptr) ? readStr : "";
     info.ipAddress = reply.ReadInt32();
     int tmpConnState = reply.ReadInt32();
     if ((tmpConnState >= 0) && (tmpConnState <= (int)ConnState::FAILED)) {
@@ -685,6 +702,7 @@ ErrCode WifiDeviceProxy::SetCountryCode(const std::string &countryCode)
 
 ErrCode WifiDeviceProxy::GetCountryCode(std::string &countryCode)
 {
+    const char *readStr = nullptr;
     if (mRemoteDied) {
         WIFI_LOGD("failed to `%{public}s`,remote service is died!", __func__);
         return WIFI_OPT_FAILED;
@@ -706,7 +724,8 @@ ErrCode WifiDeviceProxy::GetCountryCode(std::string &countryCode)
         return ErrCode(ret);
     }
 
-    countryCode = reply.ReadCString();
+    readStr = reply.ReadCString();
+    countryCode = (readStr != nullptr) ? readStr : "";
     return WIFI_OPT_SUCCESS;
 }
 
@@ -802,6 +821,7 @@ ErrCode WifiDeviceProxy::GetDeviceMacAddress(std::string &result)
         WIFI_LOGD("failed to `%{public}s`,remote service is died!", __func__);
         return WIFI_OPT_FAILED;
     }
+    const char *readStr = nullptr;
     MessageOption option;
     MessageParcel data;
     MessageParcel reply;
@@ -821,7 +841,8 @@ ErrCode WifiDeviceProxy::GetDeviceMacAddress(std::string &result)
     if (ErrCode(ret) != WIFI_OPT_SUCCESS) {
         return ErrCode(ret);
     }
-    result = reply.ReadCString();
+    readStr = reply.ReadCString();
+    result = (readStr != nullptr) ? readStr : "";
     return WIFI_OPT_SUCCESS;
 }
 

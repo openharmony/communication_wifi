@@ -91,6 +91,10 @@ ohos_shared_library("wifiext") {
     "c_utils:utils",
   ]
 
+  if (wifi_feature_with_ap_extension) {
+    defines = [ "FEATURE_AP_EXTENSION" ]
+  }
+
   relative_install_dir = "module"
   part_name = "wifi"
   subsystem_name = "communication"
@@ -213,6 +217,9 @@ ohos_shared_library("wifimanagerext") {
     "//foundation/arkui/napi:ace_napi",
   ]
   defines = [ "ENABLE_NAPI_WIFI_MANAGER" ]
+  if (wifi_feature_with_ap_extension) {
+    defines += [ "FEATURE_AP_EXTENSION" ]
+  }
   external_deps = [
     "bundle_framework:appexecfwk_base",
     "c_utils:utils",

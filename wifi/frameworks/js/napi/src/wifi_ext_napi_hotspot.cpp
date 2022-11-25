@@ -16,7 +16,7 @@
 #include "wifi_ext_napi_hotspot.h"
 #include "wifi_logger.h"
 #include "wifi_napi_errcode.h"
-
+#ifdef FEATURE_AP_EXTENSION
 namespace OHOS {
 namespace Wifi {
 DEFINE_WIFILOG_LABEL("WifiExtNAPIHotspot");
@@ -162,3 +162,4 @@ napi_value SetPowerModel(napi_env env, napi_callback_info info)
 }
 }  // namespace Wifi
 }  // namespace OHOS
+#endif

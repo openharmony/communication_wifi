@@ -22,12 +22,13 @@
 
 namespace OHOS {
 namespace Wifi {
+#ifdef FEATURE_AP_EXTENSION
 napi_value EnableHotspot(napi_env env, napi_callback_info info);
 napi_value DisableHotspot(napi_env env, napi_callback_info info);
 napi_value GetSupportedPowerModel(napi_env env, napi_callback_info info);
 napi_value GetPowerModel(napi_env env, napi_callback_info info);
 napi_value SetPowerModel(napi_env env, napi_callback_info info);
-
+#endif
 class PowerModelAsyncContext : public AsyncContext {
 public:
     PowerModel powerModel;

@@ -57,7 +57,7 @@ bool IfConfig::SyncExecuteCommand(const std::string& cmd)
 {
     int ret = system(cmd.c_str());
     if (ret == SYSTEM_COMMAND_ERR || ret == SYSTEM_NOT_EXECUTED) {
-        LOGE("exec failed. cmd: %s, error:%{public}d", cmd.c_str(), errno);
+        LOGE("exec failed. cmd: %{private}s, error:%{public}d", cmd.c_str(), errno);
         return false;
     }
     LOGI("Exec cmd end - sync");
@@ -96,7 +96,7 @@ bool IfConfig::ExecCommand(const std::vector<std::string> &vecCommandArg)
         command += iter;
         command += " ";
     }
-    LOGI("Exec cmd start: [%s]", command.c_str());
+    LOGD("Exec cmd start: [%s]", command.c_str());
     return AsyncExecuteCommand(command);
 }
 
@@ -320,10 +320,13 @@ void IfConfig::SetNetDns(const std::string& ifName, const std::string& dns1, con
     ipRouteCmd.push_back("setnetdns");
     ipRouteCmd.push_back(ifName);
     ipRouteCmd.push_back("");
-    ipRouteCmd.push_back(dns1);
-    ipRouteCmd.push_back(dns2);
+    if (Ipv4Address::IsValidIPv4(dns1) || Ipv6Address::IsValidIPv6(dns1)) {
+        ipRouteCmd.push_back(dns1);
+    }
+    if (Ipv4Address::IsValidIPv4(dns2) || Ipv6Address::IsValidIPv6(dns2)) {
+        ipRouteCmd.push_back(dns2);
+    }
     ExecCommand(ipRouteCmd);
-
     return;
 }
 

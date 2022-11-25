@@ -285,7 +285,7 @@ int EmitEvent(RpcServer *server, int event)
     ++server->nEvents;
     pthread_mutex_unlock(&server->mutex);
     /* Triger write to socket */
-    if (server->isHandlingMsg) {
+    if (server->isHandlingMsg == false) {
         BeforeLoop(server);
     }
     return 0;

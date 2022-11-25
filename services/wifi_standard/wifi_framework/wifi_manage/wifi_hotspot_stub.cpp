@@ -120,14 +120,21 @@ void WifiHotspotStub::OnGetHotspotConfig(
 void WifiHotspotStub::OnSetApConfigWifi(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
     WIFI_LOGD("run %{public}s code %{public}u, datasize %zu", __func__, code, data.GetRawDataSize());
+    ErrCode ret = WIFI_OPT_FAILED;
     HotspotConfig config;
-    config.SetSsid(data.ReadCString());
+    const char *ssid = data.ReadCString();
     config.SetSecurityType(static_cast<KeyMgmt>(data.ReadInt32()));
     config.SetBand(static_cast<BandType>(data.ReadInt32()));
     config.SetChannel(data.ReadInt32());
-    config.SetPreSharedKey(data.ReadCString());
+    const char *preSharedKey = data.ReadCString();
     config.SetMaxConn(data.ReadInt32());
-    ErrCode ret = SetHotspotConfig(config);
+    if (ssid == nullptr || preSharedKey == nullptr) {
+        ret = WIFI_OPT_INVALID_PARAM;
+    } else {
+        config.SetSsid(ssid);
+        config.SetPreSharedKey(preSharedKey);
+        ret = SetHotspotConfig(config);
+    }
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
 
@@ -158,11 +165,19 @@ void WifiHotspotStub::OnGetStationList(uint32_t code, MessageParcel &data, Messa
 void WifiHotspotStub::OnDisassociateSta(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
     WIFI_LOGD("run %{public}s code %{public}u, datasize %zu", __func__, code, data.GetRawDataSize());
+    ErrCode ret = WIFI_OPT_FAILED;
     StationInfo info;
-    info.deviceName = data.ReadCString();
-    info.bssid = data.ReadCString();
-    info.ipAddr = data.ReadCString();
-    ErrCode ret = DisassociateSta(info);
+    const char *deviceName = data.ReadCString();
+    const char *bssid = data.ReadCString();
+    const char *ipAddr = data.ReadCString();
+    if (deviceName == nullptr || bssid == nullptr || ipAddr == nullptr) {
+        ret = WIFI_OPT_INVALID_PARAM;
+    } else {
+        info.deviceName = deviceName;
+        info.bssid = bssid;
+        info.ipAddr = ipAddr;
+        ret = DisassociateSta(info);
+    }
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
     return;
@@ -229,11 +244,19 @@ void WifiHotspotStub::OnDisableWifiAp(uint32_t code, MessageParcel &data, Messag
 void WifiHotspotStub::OnAddBlockList(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
     WIFI_LOGD("run %{public}s code %{public}u, datasize %zu", __func__, code, data.GetRawDataSize());
+    ErrCode ret = WIFI_OPT_FAILED;
     StationInfo info;
-    info.deviceName = data.ReadCString();
-    info.bssid = data.ReadCString();
-    info.ipAddr = data.ReadCString();
-    ErrCode ret = AddBlockList(info);
+    const char *deviceName = data.ReadCString();
+    const char *bssid = data.ReadCString();
+    const char *ipAddr = data.ReadCString();
+    if (deviceName == nullptr || bssid == nullptr || ipAddr == nullptr) {
+        ret = WIFI_OPT_INVALID_PARAM;
+    } else {
+        info.deviceName = deviceName;
+        info.bssid = bssid;
+        info.ipAddr = ipAddr;
+        ret = AddBlockList(info);
+    }
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
 
@@ -243,11 +266,19 @@ void WifiHotspotStub::OnAddBlockList(uint32_t code, MessageParcel &data, Message
 void WifiHotspotStub::OnDelBlockList(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
     WIFI_LOGD("run %{public}s code %{public}u, datasize %zu", __func__, code, data.GetRawDataSize());
+    ErrCode ret = WIFI_OPT_FAILED;
     StationInfo info;
-    info.deviceName = data.ReadCString();
-    info.bssid = data.ReadCString();
-    info.ipAddr = data.ReadCString();
-    ErrCode ret = DelBlockList(info);
+    const char *deviceName = data.ReadCString();
+    const char *bssid = data.ReadCString();
+    const char *ipAddr = data.ReadCString();
+    if (deviceName == nullptr || bssid == nullptr || ipAddr == nullptr) {
+        ret = WIFI_OPT_INVALID_PARAM;
+    } else {
+        info.deviceName = deviceName;
+        info.bssid = bssid;
+        info.ipAddr = ipAddr;
+        ret = DelBlockList(info);
+    }
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
 

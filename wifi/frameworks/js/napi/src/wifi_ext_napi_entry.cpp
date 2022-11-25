@@ -23,11 +23,13 @@ namespace Wifi {
 static napi_value Init(napi_env env, napi_value exports)
 {
     napi_property_descriptor desc[] = {
+#ifdef FEATURE_AP_EXTENSION
         DECLARE_NAPI_FUNCTION("enableHotspot", EnableHotspot),
         DECLARE_NAPI_FUNCTION("disableHotspot", DisableHotspot),
         DECLARE_NAPI_FUNCTION("getSupportedPowerModel", GetSupportedPowerModel),
         DECLARE_NAPI_FUNCTION("getPowerModel", GetPowerModel),
         DECLARE_NAPI_FUNCTION("setPowerModel", SetPowerModel),
+#endif
     };
 
     NAPI_CALL(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(napi_property_descriptor), desc));

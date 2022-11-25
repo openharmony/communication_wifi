@@ -119,11 +119,11 @@ void WifiDeviceStub::OnInitWifiProtect(uint32_t code, MessageParcel &data, Messa
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
     ErrCode ret = WIFI_OPT_FAILED;
     WifiProtectType protectType = (WifiProtectType)data.ReadInt32();
-    const char *protectName = data.ReadCString();
-    if (protectName == nullptr) {
+    const char *readStr = data.ReadCString();
+    if (readStr == nullptr) {
         ret = WIFI_OPT_INVALID_PARAM;
     } else {
-        std::string protectName = protectName;
+        std::string protectName = readStr;
         ret = InitWifiProtect(protectType, protectName);
     }
     reply.WriteInt32(0);
@@ -136,11 +136,11 @@ void WifiDeviceStub::OnGetWifiProtectRef(uint32_t code, MessageParcel &data, Mes
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
     ErrCode ret = WIFI_OPT_FAILED;
     WifiProtectMode protectMode = (WifiProtectMode)data.ReadInt32();
-    const char *protectName = data.ReadCString();
-    if (protectName == nullptr) {
+    const char *readStr = data.ReadCString();
+    if (readStr == nullptr) {
         ret = WIFI_OPT_INVALID_PARAM;
     } else {
-        std::string protectName = protectName;
+        std::string protectName = readStr;
         ret = GetWifiProtectRef(protectMode, protectName);
     }
     reply.WriteInt32(0);
@@ -152,11 +152,11 @@ void WifiDeviceStub::OnPutWifiProtectRef(uint32_t code, MessageParcel &data, Mes
 {
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
     ErrCode ret = WIFI_OPT_FAILED;
-    const char *protectName = data.ReadCString();
-    if (protectName == nullptr) {
+    const char *readStr = data.ReadCString();
+    if (readStr == nullptr) {
         ret = WIFI_OPT_INVALID_PARAM;
     } else {
-        std::string protectName = protectName;
+        std::string protectName = readStr;
         ret = PutWifiProtectRef(protectName);
     }
     reply.WriteInt32(0);
@@ -467,13 +467,13 @@ void WifiDeviceStub::OnStartWps(uint32_t code, MessageParcel &data, MessageParce
     ErrCode ret = WIFI_OPT_FAILED;
     WpsConfig config;
     config.setup = SetupMethod(data.ReadInt32());
-    const char *pin = data.ReadCString();
-    const char *bssid = data.ReadCString();
-    if (pin == nullptr || bssid == nullptr) {
+    const char *pinRead = data.ReadCString();
+    const char *bssidRead = data.ReadCString();
+    if (pinRead == nullptr || bssidRead == nullptr) {
         ret = WIFI_OPT_INVALID_PARAM;
     } else {
-        config.pin = pin;
-        config.bssid = bssid;
+        config.pin = pinRead;
+        config.bssid = bssidRead;
         ret = StartWps(config);
     }
 
@@ -578,11 +578,11 @@ void WifiDeviceStub::OnSetCountryCode(uint32_t code, MessageParcel &data, Messag
 {
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
     ErrCode ret = WIFI_OPT_FAILED;
-    const char *countrycode = data.ReadCString();
-    if (countrycode == nullptr) {
+    const char *countryCodeRead = data.ReadCString();
+    if (countryCodeRead == nullptr) {
         ret = WIFI_OPT_INVALID_PARAM;
     } else {
-        std::string countrycode = countrycode;
+        std::string countrycode = countryCodeRead;
         ret = SetCountryCode(countrycode);
     }
     reply.WriteInt32(0);

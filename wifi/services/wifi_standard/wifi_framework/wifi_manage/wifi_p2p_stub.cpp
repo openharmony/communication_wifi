@@ -745,15 +745,15 @@ void WifiP2pStub::OnHid2dConnect(uint32_t code, MessageParcel &data,
 
     ErrCode ret = WIFI_OPT_FAILED;
     Hid2dConnectConfig config;
-    const char *ssid = data.ReadCString();
-    const char *bssid = data.ReadCString();
-    const char *preSharedKey = data.ReadCString();
-    if (ssid == nullptr || bssid == nullptr || preSharedKey == nullptr) {
+    const char *ssidRead = data.ReadCString();
+    const char *bssidRead = data.ReadCString();
+    const char *preSharedKeyRead = data.ReadCString();
+    if (ssidRead == nullptr || bssidRead == nullptr || preSharedKeyRead == nullptr) {
         ret = WIFI_OPT_INVALID_PARAM;
     } else {
-        config.SetSsid(ssid);
-        config.SetBssid(bssid);
-        config.SetPreSharedKey(preSharedKey);
+        config.SetSsid(ssidRead);
+        config.SetBssid(bssidRead);
+        config.SetPreSharedKey(preSharedKeyRead);
         config.SetFrequency(data.ReadInt32());
         config.SetDhcpMode(DhcpMode(data.ReadInt32()));
 
@@ -771,17 +771,17 @@ void WifiP2pStub::OnHid2dConfigIPAddr(uint32_t code, MessageParcel &data,
 
     ErrCode ret = WIFI_OPT_FAILED;
     IpAddrInfo ipInfo;
-    const char *ifName = data.ReadCString();
-    const char *ip = data.ReadCString();
-    const char *gateway = data.ReadCString();
-    const char *netmask = data.ReadCString();
-    if (ifName == nullptr || ip == nullptr || gateway == nullptr || netmask == nullptr) {
+    const char *ifNameRead = data.ReadCString();
+    const char *ipRead = data.ReadCString();
+    const char *gatewayRead = data.ReadCString();
+    const char *netmaskRead = data.ReadCString();
+    if (ifNameRead == nullptr || ipRead == nullptr || gatewayRead == nullptr || netmaskRead == nullptr) {
         ret = WIFI_OPT_INVALID_PARAM;
     } else {
-        std::string ifName = ifName;
-        ipInfo.ip = ip;
-        ipInfo.gateway = gateway;
-        ipInfo.netmask = netmask;
+        std::string ifName = ifNameRead;
+        ipInfo.ip = ipRead;
+        ipInfo.gateway = gatewayRead;
+        ipInfo.netmask = netmaskRead;
         ret = Hid2dConfigIPAddr(ifName, ipInfo);
     }
     reply.WriteInt32(0);
@@ -794,11 +794,11 @@ void WifiP2pStub::OnHid2dReleaseIPAddr(uint32_t code, MessageParcel &data,
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
 
     ErrCode ret = WIFI_OPT_FAILED;
-    const char *ifName = data.ReadCString();
-    if (ifName == nullptr) {
+    const char *ifNameRead = data.ReadCString();
+    if (ifNameRead == nullptr) {
         ret = WIFI_OPT_INVALID_PARAM;
     } else {
-        std::string ifName = ifName;
+        std::string ifName = ifNameRead;
         ret = Hid2dReleaseIPAddr(ifName);
     }
     reply.WriteInt32(0);
@@ -900,13 +900,13 @@ void WifiP2pStub::OnHid2dSetUpperScene(
 
     ErrCode ret = WIFI_OPT_FAILED;
     Hid2dUpperScene scene;
-    const char *ifName = data.ReadCString();
-    const char *mac = data.ReadCString();
-    if (ifName == nullptr || mac == nullptr) {
+    const char *ifNameRead = data.ReadCString();
+    const char *macRead = data.ReadCString();
+    if (ifNameRead == nullptr || macRead == nullptr) {
         ret = WIFI_OPT_INVALID_PARAM;
     } else {
-        std::string ifName = ifName;
-        scene.mac = mac;
+        std::string ifName = ifNameRead;
+        scene.mac = macRead;
         scene.scene = data.ReadUint32();
         scene.fps = data.ReadInt32();
         scene.bw = data.ReadUint32();

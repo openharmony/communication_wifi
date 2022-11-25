@@ -17,7 +17,79 @@
 #include <cstring>
 #include "securec.h"
 #include "wifichotspot_fuzzer.h"
+#include "wifi_fuzz_common_func.h"
 #include "../../../../../../interfaces/kits/c/wifi_hotspot.h"
+
+static void SetHotspotConfigTest(const uint8_t* data, size_t size)
+{
+    HotspotConfig config;
+    int index = 0;
+
+    if (size >= sizeof(HotspotConfig)) {
+        if (memcpy_s(config.ssid, WIFI_MAX_SSID_LEN, data, WIFI_MAX_SSID_LEN - 1) != EOK) {
+            return;
+        }
+
+        if (memcpy_s(config.preSharedKey, WIFI_MAX_KEY_LEN, data, WIFI_MAX_KEY_LEN - 1) != EOK) {
+            return;
+        }
+        config.securityType = static_cast<int>(data[index++]);
+        config.band = static_cast<int>(data[index++]);
+        config.channelNum = static_cast<int>(data[index++]);
+        config.securityType = static_cast<int>(data[index++]);
+    }
+    (void)SetHotspotConfig(&config);
+}
+
+static void GetHotspotConfigTest(const uint8_t* data, size_t size)
+{
+    HotspotConfig result;
+    int index = 0;
+
+    if (size >= sizeof(HotspotConfig)) {
+        if (memcpy_s(result.ssid, WIFI_MAX_SSID_LEN, data, WIFI_MAX_SSID_LEN - 1) != EOK) {
+            return;
+        }
+
+        if (memcpy_s(result.preSharedKey, WIFI_MAX_KEY_LEN, data, WIFI_MAX_KEY_LEN - 1) != EOK) {
+            return;
+        }
+        result.securityType = static_cast<int>(data[index++]);
+        result.band = static_cast<int>(data[index++]);
+        result.channelNum = static_cast<int>(data[index++]);
+        result.securityType = static_cast<int>(data[index++]);
+    }
+    (void)GetHotspotConfig(&result);
+}
+
+static void GetStationListTest(const uint8_t* data, size_t size)
+{
+    StationInfo result;
+    unsigned int mSize = 0;
+    int index = 0;
+
+    if (size >= sizeof(StationInfo)) {
+        if (memcpy_s(result.macAddress, WIFI_MAC_LEN, data, WIFI_MAC_LEN) != EOK) {
+            return;
+        }
+        result.ipAddress = OHOS::Wifi::U32_AT(data);
+        result.disconnectedReason = static_cast<unsigned short>(data[index++]);
+        mSize = static_cast<unsigned int>(data[index++]);
+    }
+    (void)GetStationList(&result, &mSize);
+}
+
+static void DisassociateStaTest(const uint8_t* data, size_t size)
+{
+    int index = 0;
+    unsigned char mac = 0;
+    int macLen = 0;
+    if (size >= TWO) {
+        mac = data[index++];
+        macLen = static_cast<unsigned int>(data[index++]);
+    }
+    (void)DisassociateSta(&mac, macLen);
+}
 
 namespace OHOS {
 namespace Wifi {
@@ -26,7 +98,11 @@ namespace Wifi {
         (void)EnableHotspot();
         (void)DisableHotspot();
         (void)IsHotspotActive();
-        AddTxPowerInfo(0);
+        (void)AddTxPowerInfo(0);
+        SetHotspotConfigTest(data, size);
+        GetHotspotConfigTest(data, size);
+        GetStationListTest(data, size);
+        DisassociateStaTest(data, size);
         return true;
     }
 }  // namespace Wifi

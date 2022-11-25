@@ -17,5 +17,6 @@
 #define WIFI_C_P2P__H
 
 #define FUZZ_PROJECT_NAME "wificp2p_fuzzer"
+#define TWO 2
 
 #endif

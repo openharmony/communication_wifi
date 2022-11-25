@@ -36,7 +36,7 @@ static void GStartP2pListenTest(const uint8_t* data, size_t size)
     int period = 0;
     int interval = 0;
 
-    if(index >= TWO) {
+    if (index >= TWO) {
         period = static_cast<int>(data[index++]);
         interval = static_cast<int>(data[index++]);
     }

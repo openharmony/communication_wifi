@@ -149,7 +149,7 @@ int WifiPermissionUtils::VerifyGetWifiInfoInternalPermission()
 
 int WifiPermissionUtils::VerifyManageWifiHotspotExtPermission()
 {
-    return WifiAuthCenter::GetInstance().VerifyManageWifiHotspotPermission(
+    return WifiAuthCenter::GetInstance().VerifyManageWifiHotspotExtPermission(
         IPCSkeleton::GetCallingPid(), IPCSkeleton::GetCallingUid());
 }
 #endif

@@ -244,8 +244,13 @@ ErrCode WifiHotspotServiceImpl::DisassociateSta(const StationInfo &info)
 
 int WifiHotspotServiceImpl::CheckOperHotspotSwitchPermission(const ServiceType type)
 {
-    return (type == ServiceType::WIFI_EXT) ? PERMISSION_GRANTED :
+#ifdef FEATURE_AP_EXTENSION
+    return (type == ServiceType::WIFI_EXT) ? WifiPermissionUtils::VerifyManageWifiHotspotExtPermission() :
         WifiPermissionUtils::VerifyManageWifiHotspotPermission();
+#else
+    return (type == ServiceType::WIFI_EXT) ? PERMISSION_DENIED :
+        WifiPermissionUtils::VerifyManageWifiHotspotPermission();
+#endif
 }
 
 ErrCode WifiHotspotServiceImpl::CheckCanEnableHotspot(const ServiceType type)

@@ -16,6 +16,7 @@
 #define CRPC_SERVER_H
 
 #include <pthread.h>
+#include <stdbool.h>
 #include "context.h"
 #include "evloop.h"
 #include "hash_table.h"
@@ -44,6 +45,7 @@ typedef struct RpcServer {
     int events[100];
     int nEvents;
     struct EventNode eventNode[100];
+    bool isHandlingMsg;
 } RpcServer;
 
 /**

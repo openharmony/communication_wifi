@@ -360,13 +360,13 @@ void WifiDeviceStub::OnStartWps(uint32_t code, MessageParcel &data, MessageParce
     ErrCode ret = WIFI_OPT_FAILED;
     WpsConfig config;
     config.setup = SetupMethod(data.ReadInt32());
-    const char *pin = data.ReadCString();
-    const char *bssid = data.ReadCString();
-    if (pin == nullptr || bssid == nullptr) {
+    const char *pinRead = data.ReadCString();
+    const char *bssidRead = data.ReadCString();
+    if (pinRead == nullptr || bssidRead == nullptr) {
         ret = WIFI_OPT_INVALID_PARAM;
     } else {
-        config.pin = pin;
-        config.bssid = bssid;
+        config.pin = pinRead;
+        config.bssid = bssidRead;
         ret = StartWps(config);
     }
 
@@ -468,11 +468,11 @@ void WifiDeviceStub::OnSetCountryCode(uint32_t code, MessageParcel &data, Messag
 {
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
     ErrCode ret = WIFI_OPT_FAILED;
-    const char *countrycode = data.ReadCString();
-    if (countrycode == nullptr) {
+    const char *countryCodeRead = data.ReadCString();
+    if (countryCodeRead == nullptr) {
         ret = WIFI_OPT_INVALID_PARAM;
     } else {
-        std::string countrycode = countrycode;
+        std::string countrycode = countryCodeRead;
         ret = SetCountryCode(countrycode);
     }
     reply.WriteInt32(0);

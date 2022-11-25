@@ -195,10 +195,10 @@ bool P2pGroupOperatingState::ProcessGroupRemovedEvt(const InternalMessage &msg) 
     if (groupManager.GetCurrentGroup().GetInterface() == p2pStateMachine.p2pDevIface) {
         p2pStateMachine.p2pDevIface = "";
     }
+    SharedLinkManager::SetSharedLinkCount(SHARED_LINKE_COUNT_ON_DISCONNECTED);
     p2pStateMachine.ChangeConnectedStatus(P2pConnectedState::P2P_DISCONNECTED);
     IpPool::ReleaseIpPool();
     IfConfig::GetInstance().FlushIpAddr(groupManager.GetCurrentGroup().GetInterface(), IpType::IPTYPE_IPV4);
-    SharedLinkManager::SetSharedLinkCount(SHARED_LINKE_COUNT_ON_DISCONNECTED);
     if (groupManager.GetCurrentGroup().IsGroupOwner()) {
         if (!p2pStateMachine.StopDhcpServer()) {
             WIFI_LOGW("failed to stop Dhcp server.");

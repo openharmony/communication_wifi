@@ -17,4 +17,6 @@
 #define WIFI_FUZZ_WIFI_C_DEVICE_H
 
 #define FUZZ_PROJECT_NAME "wificdevice_fuzzer"
+
+#define TWO 2
 #endif

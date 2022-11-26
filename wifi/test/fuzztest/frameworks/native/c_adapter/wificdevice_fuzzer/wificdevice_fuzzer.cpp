@@ -37,7 +37,7 @@ static void DisconnectTest()
 }
 static void RemoveDeviceTest(const uint8_t* data, size_t size)
 {
-    if (size <= 0) {
+    if (size == 0) {
         return;
     }
     int networkId = static_cast<int>(data[0]);
@@ -45,7 +45,7 @@ static void RemoveDeviceTest(const uint8_t* data, size_t size)
 }
 static void DisableDeviceConfigTest(const uint8_t* data, size_t size)
 {
-    if (size <= 0) {
+    if (size == 0) {
         return;
     }
     int networkId = static_cast<int>(data[0]);
@@ -53,7 +53,7 @@ static void DisableDeviceConfigTest(const uint8_t* data, size_t size)
 }
 static void EnableDeviceConfigTest(const uint8_t* data, size_t size)
 {
-    if (size <= 0) {
+    if (size == 0) {
         return;
     }
     int networkId = static_cast<int>(data[0]);
@@ -61,7 +61,7 @@ static void EnableDeviceConfigTest(const uint8_t* data, size_t size)
 }
 static void ConnectToTest(const uint8_t* data, size_t size)
 {
-    if (size <= 0) {
+    if (size == 0) {
         return;
     }
     int networkId = static_cast<int>(data[0]);
@@ -86,19 +86,13 @@ static void AddDeviceConfigTest(const uint8_t* data, size_t size)
         config.freq = static_cast<int>(data[index++]);
         config.wapiPskType = static_cast<int>(data[index++]);
         config.isHiddenSsid = static_cast<int>(data[index++]);
-        IpType ipType = STATIC_IP;
-        if (ipType % TWO) {
-            ipType = DHCP;
-        } else {
-            ipType = UNKNOWN;
-        }
+        config.ipType = static_cast<IpType>(static_cast<int>(data[index++]) % TWO);
     }
     int result = static_cast<int>(data[index++]);
     AddDeviceConfig(&config, &result);
 }
 static void AdvanceScanTest(const uint8_t* data, size_t size)
 {
-    int index = 0;
     WifiScanParams params;
     if (size >= sizeof(WifiScanParams)) {
         if (memcpy_s(params.ssid, WIFI_MAX_SSID_LEN, data, WIFI_MAX_SSID_LEN - 1) != EOK) {
@@ -107,6 +101,7 @@ static void AdvanceScanTest(const uint8_t* data, size_t size)
         if (memcpy_s(params.bssid, WIFI_MAC_LEN, data, WIFI_MAC_LEN - 1) != EOK) {
             return;
         }
+        int index = 0;
         params.scanType = WIFI_FREQ_SCAN;
         params.freqs = static_cast<int>(data[index++]);
         params.band = static_cast<int>(data[index++]);
@@ -118,8 +113,8 @@ static void GetSignalLevelTest(const uint8_t* data, size_t size)
 {
     int rssi = 0;
     int band = 0;
-    int index = 0;
     if (size >= TWO) {
+        int index = 0;
         rssi = static_cast<int>(data[index++]);
         band = static_cast<int>(data[index++]);
     }

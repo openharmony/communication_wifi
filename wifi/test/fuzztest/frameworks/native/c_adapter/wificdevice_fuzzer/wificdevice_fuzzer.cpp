@@ -19,23 +19,23 @@
 #include "../../../../../../interfaces/kits/c/wifi_device.h"
 
 
-void EnableWifiTest()
+static void EnableWifiTest()
 {
     EnableWifi();
 }
-void DisableWifiTest()
+static void DisableWifiTest()
 {
     DisableWifi();
 }
-void ScanTest()
+static void ScanTest()
 {
     Scan();
 }
-void DisconnectTest()
+static void DisconnectTest()
 {
     Disconnect();
 }
-void RemoveDeviceTest(const uint8_t* data, size_t size)
+static void RemoveDeviceTest(const uint8_t* data, size_t size)
 {
     if (size <= 0) {
         return;
@@ -43,7 +43,7 @@ void RemoveDeviceTest(const uint8_t* data, size_t size)
     int networkId = static_cast<int>(data[0]);
     RemoveDevice(networkId);
 }
-void DisableDeviceConfigTest(const uint8_t* data, size_t size)
+static void DisableDeviceConfigTest(const uint8_t* data, size_t size)
 {
     if (size <= 0) {
         return;
@@ -51,7 +51,7 @@ void DisableDeviceConfigTest(const uint8_t* data, size_t size)
     int networkId = static_cast<int>(data[0]);
     DisableDeviceConfig(networkId);
 }
-void EnableDeviceConfigTest(const uint8_t* data, size_t size)
+static void EnableDeviceConfigTest(const uint8_t* data, size_t size)
 {
     if (size <= 0) {
         return;
@@ -59,7 +59,7 @@ void EnableDeviceConfigTest(const uint8_t* data, size_t size)
     int networkId = static_cast<int>(data[0]);
     EnableDeviceConfig(networkId);
 }
-void ConnectToTest(const uint8_t* data, size_t size)
+static void ConnectToTest(const uint8_t* data, size_t size)
 {
     if (size <= 0) {
         return;
@@ -67,7 +67,7 @@ void ConnectToTest(const uint8_t* data, size_t size)
     int networkId = static_cast<int>(data[0]);
     ConnectTo(networkId);
 }
-void AddDeviceConfigTest(const uint8_t* data, size_t size)
+static void AddDeviceConfigTest(const uint8_t* data, size_t size)
 {
     int index = 0;
     WifiDeviceConfig config;
@@ -87,16 +87,16 @@ void AddDeviceConfigTest(const uint8_t* data, size_t size)
         config.wapiPskType = static_cast<int>(data[index++]);
         config.isHiddenSsid = static_cast<int>(data[index++]);
         IpType ipType = STATIC_IP;
-        if (ipType % 2 == 1) {
+        if (ipType % TWO) {
             ipType = DHCP;
-        } else if (ipType % 2 == 0) {
+        } else {
             ipType = UNKNOWN;
         }
     }
     int result = static_cast<int>(data[index++]);
     AddDeviceConfig(&config, &result);
 }
-void AdvanceScanTest(const uint8_t* data, size_t size)
+static void AdvanceScanTest(const uint8_t* data, size_t size)
 {
     int index = 0;
     WifiScanParams params;
@@ -114,12 +114,12 @@ void AdvanceScanTest(const uint8_t* data, size_t size)
     }
     AdvanceScan(&params);
 }
-void GetSignalLevelTest(const uint8_t* data, size_t size)
+static void GetSignalLevelTest(const uint8_t* data, size_t size)
 {
     int rssi = 0;
     int band = 0;
     int index = 0;
-    if (size >= 2) {
+    if (size >= TWO) {
         rssi = static_cast<int>(data[index++]);
         band = static_cast<int>(data[index++]);
     }

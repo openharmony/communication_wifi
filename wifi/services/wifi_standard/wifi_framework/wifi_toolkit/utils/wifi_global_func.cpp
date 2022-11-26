@@ -311,7 +311,7 @@ static char ConvertArrayChar(uint8_t ch)
 {
     constexpr int maxDecNum = 9;
     constexpr int numDiffForHexAlphabet = 10;
-    if (ch >= 0 && ch <= maxDecNum) {
+    if (ch <= maxDecNum) {
         return '0' + ch;
     }
     if (ch >= 0xa && ch <= 0xf) {

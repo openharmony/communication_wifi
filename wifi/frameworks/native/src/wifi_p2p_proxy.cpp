@@ -42,7 +42,7 @@ WifiP2pProxy::WifiP2pProxy(const sptr<IRemoteObject> &impl) : IRemoteProxy<IWifi
             return;
         }
         remote_ = impl;
-        WIFI_LOGI("AddDeathRecipient success! deathRecipient_: %{private}p", (void*)deathRecipient_);
+        WIFI_LOGI("AddDeathRecipient success! deathRecipient_: %{private}p", static_cast<void*>(deathRecipient_));
     }
 }
 
@@ -54,7 +54,7 @@ WifiP2pProxy::~WifiP2pProxy()
 
 void WifiP2pProxy::RemoveDeathRecipient(void)
 {
-    WIFI_LOGI("enter RemoveDeathRecipient, deathRecipient_: %{private}p!", (void*)deathRecipient_);
+    WIFI_LOGI("enter RemoveDeathRecipient, deathRecipient_: %{private}p!", static_cast<void*>(deathRecipient_));
     std::lock_guard<std::mutex> lock(mutex_);
     if (remote_ == nullptr) {
         WIFI_LOGI("remote_ is nullptr!");

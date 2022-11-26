@@ -148,14 +148,21 @@ void WifiHotspotStub::OnGetHotspotConfig(
 void WifiHotspotStub::OnSetApConfigWifi(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+    ErrCode ret = WIFI_OPT_FAILED;
     HotspotConfig config;
-    config.SetSsid(data.ReadCString());
+    const char *ssidRead = data.ReadCString();
     config.SetSecurityType(static_cast<KeyMgmt>(data.ReadInt32()));
     config.SetBand(static_cast<BandType>(data.ReadInt32()));
     config.SetChannel(data.ReadInt32());
-    config.SetPreSharedKey(data.ReadCString());
+    const char *preSharedKeyRead = data.ReadCString();
     config.SetMaxConn(data.ReadInt32());
-    ErrCode ret = SetHotspotConfig(config);
+    if (ssidRead == nullptr || preSharedKeyRead == nullptr) {
+        ret = WIFI_OPT_INVALID_PARAM;
+    } else {
+        config.SetSsid(ssidRead);
+        config.SetPreSharedKey(preSharedKeyRead);
+        ret = SetHotspotConfig(config);
+    }
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
 
@@ -186,11 +193,19 @@ void WifiHotspotStub::OnGetStationList(uint32_t code, MessageParcel &data, Messa
 void WifiHotspotStub::OnDisassociateSta(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+    ErrCode ret = WIFI_OPT_FAILED;
     StationInfo info;
-    info.deviceName = data.ReadCString();
-    info.bssid = data.ReadCString();
-    info.ipAddr = data.ReadCString();
-    ErrCode ret = DisassociateSta(info);
+    const char *deviceNameRead = data.ReadCString();
+    const char *bssidRead = data.ReadCString();
+    const char *ipAddrRead = data.ReadCString();
+    if (deviceNameRead == nullptr || bssidRead == nullptr || ipAddrRead == nullptr) {
+        ret = WIFI_OPT_INVALID_PARAM;
+    } else {
+        info.deviceName = deviceNameRead;
+        info.bssid = bssidRead;
+        info.ipAddr = ipAddrRead;
+        ret = DisassociateSta(info);
+    }
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
     return;
@@ -259,11 +274,19 @@ void WifiHotspotStub::OnDisableWifiAp(uint32_t code, MessageParcel &data, Messag
 void WifiHotspotStub::OnAddBlockList(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+    ErrCode ret = WIFI_OPT_FAILED;
     StationInfo info;
-    info.deviceName = data.ReadCString();
-    info.bssid = data.ReadCString();
-    info.ipAddr = data.ReadCString();
-    ErrCode ret = AddBlockList(info);
+    const char *deviceNameRead = data.ReadCString();
+    const char *bssidRead = data.ReadCString();
+    const char *ipAddrRead = data.ReadCString();
+    if (deviceNameRead == nullptr || bssidRead == nullptr || ipAddrRead == nullptr) {
+        ret = WIFI_OPT_INVALID_PARAM;
+    } else {
+        info.deviceName = deviceNameRead;
+        info.bssid = bssidRead;
+        info.ipAddr = ipAddrRead;
+        ret = AddBlockList(info);
+    }
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
 
@@ -273,11 +296,19 @@ void WifiHotspotStub::OnAddBlockList(uint32_t code, MessageParcel &data, Message
 void WifiHotspotStub::OnDelBlockList(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+    ErrCode ret = WIFI_OPT_FAILED;
     StationInfo info;
-    info.deviceName = data.ReadCString();
-    info.bssid = data.ReadCString();
-    info.ipAddr = data.ReadCString();
-    ErrCode ret = DelBlockList(info);
+    const char *deviceNameRead = data.ReadCString();
+    const char *bssidRead = data.ReadCString();
+    const char *ipAddrRead = data.ReadCString();
+    if (deviceNameRead == nullptr || bssidRead == nullptr || ipAddrRead == nullptr) {
+        ret = WIFI_OPT_INVALID_PARAM;
+    } else {
+        info.deviceName = deviceNameRead;
+        info.bssid = bssidRead;
+        info.ipAddr = ipAddrRead;
+        ret = DelBlockList(info);
+    }
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
 

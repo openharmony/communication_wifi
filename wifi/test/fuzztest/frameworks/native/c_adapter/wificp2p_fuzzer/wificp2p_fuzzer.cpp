@@ -61,7 +61,7 @@ static void CreateGroupTest(const uint8_t* data, size_t size)
         }
         config.netId = static_cast<int>(OHOS::Wifi::U32_AT(data));
         config.groupOwnerIntent = static_cast<int>(data[index++]);
-        config.goBand =GO_BAND_AUTO;
+        config.goBand = GO_BAND_AUTO;
     }
     (void)CreateGroup(&config);
 }
@@ -114,7 +114,7 @@ static void P2pConnectTest(const uint8_t* data, size_t size)
         }
         config.netId = static_cast<int>(OHOS::Wifi::U32_AT(data));
         config.groupOwnerIntent = static_cast<int>(data[index++]);
-        config.goBand =GO_BAND_AUTO;
+        config.goBand = GO_BAND_AUTO;
     }
     (void)P2pConnect(&config);
 }

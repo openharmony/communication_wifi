@@ -337,9 +337,11 @@ static void AddParamaterRebootList(struct DhcpPacket *packet)
     int end = GetEndOptionIndex(packet->options);
     int i;
     int len = 0;
-    uint8_t arrReqCode[DHCP_REQ_CODE_NUM] = {SUBNET_MASK_OPTION,
+    uint8_t arrReqCode[DHCP_REQ_CODE_NUM] = {
+        SUBNET_MASK_OPTION,
         STATIC_ROUTE_OPTION,
         ROUTER_OPTION,
+        DOMAIN_NAME_SERVER_OPTION,
         BROADCAST_ADDRESS_OPTION,
         IP_ADDRESS_LEASE_TIME_OPTION,
         RENEWAL_TIME_VALUE_OPTION,

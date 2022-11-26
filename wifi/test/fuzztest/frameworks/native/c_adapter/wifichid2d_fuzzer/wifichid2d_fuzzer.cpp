@@ -117,7 +117,6 @@ void Hid2dConnectTest(const uint8_t* data, size_t size)
 
 void Hid2dConfigIPAddrTest(const uint8_t* data, size_t size)
 {
-    int index = 0;
     char ifName[IF_NAME_LEN] = {0};
     IpAddrInfo ipAddrInfo;
     if (size >= IF_NAME_LEN) {
@@ -127,6 +126,7 @@ void Hid2dConfigIPAddrTest(const uint8_t* data, size_t size)
     }
 
     if (size >= sizeof(IpAddrInfo)) {
+        int index = 0;
         for (int i = 0; i < IPV4_ARRAY_LEN; i++) {
             ipAddrInfo.ip[i] = static_cast<int>(data[index++]);
             ipAddrInfo.gateway[i] = static_cast<int>(data[index++]);
@@ -179,11 +179,11 @@ void Hid2dGetRecommendChannelTest(const uint8_t* data, size_t size)
 
 void Hid2dGetChannelListFor5GTest(const uint8_t* data, size_t size)
 {
-    int index = 0;
     int chanList = 0;
     int lenth = 0;
 
     if (size >= TWO) {
+        int index = 0;
         chanList = static_cast<int>(data[index++]);
         lenth = static_cast<int>(data[index++]);
     }
@@ -220,7 +220,6 @@ void Hid2dSetPeerWifiCfgInfoTest(const uint8_t* data, size_t size)
 void Hid2dSetUpperSceneTest(const uint8_t* data, size_t size)
 {
     char ifName[IF_NAME_LEN] = {0};
-    int index = 0;
     Hid2dUpperScene scene;
 
     if (size >= IF_NAME_LEN) {
@@ -233,6 +232,7 @@ void Hid2dSetUpperSceneTest(const uint8_t* data, size_t size)
         if (memcpy_s(scene.mac, MAC_LEN, data, MAC_LEN) != EOK) {
             return;
         }
+        int index = 0;
         scene.scene = static_cast<unsigned int>(data[index++]);
         scene.fps = static_cast<int>(data[index++]);
         scene.bw = static_cast<unsigned int>(data[index++]);

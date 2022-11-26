@@ -23,10 +23,12 @@
 #include <sys/types.h>
 #include <iostream>
 #include <vector>
+#include <thread>
 #include "securec.h"
 #include "if_config.h"
 #include "ip_tools.h"
-#include <thread>
+#include "ipv4_address.h"
+#include "ipv6_address.h"
 
 namespace OHOS {
 namespace Wifi {

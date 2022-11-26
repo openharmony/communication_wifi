@@ -204,9 +204,9 @@ ErrCode WifiScanProxy::GetScanInfoList(std::vector<WifiScanInfo> &result)
         WifiScanInfo info;
         readStr = reply.ReadCString();
         info.bssid = (readStr != nullptr) ? readStr : "";
-        reply.ReadCString();
+        readStr = reply.ReadCString();
         info.ssid = (readStr != nullptr) ? readStr : "";
-        reply.ReadCString();
+        readStr = reply.ReadCString();
         info.capabilities = (readStr != nullptr) ? readStr : "";
         info.frequency = reply.ReadInt32();
         info.rssi = reply.ReadInt32();

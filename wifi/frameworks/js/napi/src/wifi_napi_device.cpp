@@ -336,6 +336,7 @@ static void JsObjToDeviceConfig(const napi_env& env, const napi_value& object, W
 {
     JsObjectToString(env, object, "ssid", NAPI_MAX_STR_LENT, cppConfig.ssid); /* ssid max length is 32 + '\0' */
     JsObjectToString(env, object, "bssid", NAPI_MAX_STR_LENT, cppConfig.bssid); /* max bssid length: 18 */
+    WIFI_LOGE("JsObjToDeviceConfig, bssid length: %{public}d.", static_cast<int>(cppConfig.bssid.length()));
     JsObjectToString(env, object, "preSharedKey", NAPI_MAX_STR_LENT, cppConfig.preSharedKey);
     JsObjectToBool(env, object, "isHiddenSsid", cppConfig.hiddenSSID);
     int type = static_cast<int>(SecTypeJs::SEC_TYPE_INVALID);

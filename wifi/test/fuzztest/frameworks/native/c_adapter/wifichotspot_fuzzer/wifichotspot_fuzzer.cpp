@@ -36,7 +36,6 @@ static void SetHotspotConfigTest(const uint8_t* data, size_t size)
         config.securityType = static_cast<int>(data[index++]);
         config.band = static_cast<int>(data[index++]);
         config.channelNum = static_cast<int>(data[index++]);
-        config.securityType = static_cast<int>(data[index++]);
     }
     (void)SetHotspotConfig(&config);
 }
@@ -57,7 +56,6 @@ static void GetHotspotConfigTest(const uint8_t* data, size_t size)
         result.securityType = static_cast<int>(data[index++]);
         result.band = static_cast<int>(data[index++]);
         result.channelNum = static_cast<int>(data[index++]);
-        result.securityType = static_cast<int>(data[index++]);
     }
     (void)GetHotspotConfig(&result);
 }

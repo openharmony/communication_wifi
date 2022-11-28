@@ -32,11 +32,11 @@ static void GetP2pEnableStatusTest(const uint8_t* data, size_t size)
 
 static void GStartP2pListenTest(const uint8_t* data, size_t size)
 {
+    int index = 0;
     int period = 0;
     int interval = 0;
 
     if (index >= TWO) {
-        int index = 0;
         period = static_cast<int>(data[index++]);
         interval = static_cast<int>(data[index++]);
     }
@@ -114,7 +114,7 @@ static void P2pConnectTest(const uint8_t* data, size_t size)
         int index = 0;
         config.netId = static_cast<int>(OHOS::Wifi::U32_AT(data));
         config.groupOwnerIntent = static_cast<int>(data[index++]);
-        config.goBand =GO_BAND_AUTO;
+        config.goBand = GO_BAND_AUTO;
     }
     (void)P2pConnect(&config);
 }

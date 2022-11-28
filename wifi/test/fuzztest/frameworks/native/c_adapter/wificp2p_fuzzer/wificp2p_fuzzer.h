@@ -18,4 +18,5 @@
 
 #define FUZZ_PROJECT_NAME "wificp2p_fuzzer"
 #define TWO 2
+
 #endif

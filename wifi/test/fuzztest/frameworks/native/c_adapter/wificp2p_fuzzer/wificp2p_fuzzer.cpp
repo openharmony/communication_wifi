@@ -46,7 +46,6 @@ static void GStartP2pListenTest(const uint8_t* data, size_t size)
 static void CreateGroupTest(const uint8_t* data, size_t size)
 {
     WifiP2pConfig config;
-    int index = 0;
     if (size > sizeof(WifiP2pConfig)) {
         if (memcpy_s(config.devAddr, COMMON_MAC_LEN, data, COMMON_MAC_LEN) != EOK) {
             return;
@@ -59,16 +58,16 @@ static void CreateGroupTest(const uint8_t* data, size_t size)
         if (memcpy_s(config.groupName, P2P_NAME_LENGTH, data + COMMON_MAC_LEN, P2P_NAME_LENGTH - 1) != EOK) {
             return;
         }
+        int index = 0;
         config.netId = static_cast<int>(OHOS::Wifi::U32_AT(data));
         config.groupOwnerIntent = static_cast<int>(data[index++]);
-        config.goBand =GO_BAND_AUTO;
+        config.goBand = GO_BAND_AUTO;
     }
     (void)CreateGroup(&config);
 }
 
 static void DeleteGroupTest(const uint8_t* data, size_t size)
 {
-    int index = 0;
     WifiP2pGroupInfo group;
 
     if (size > sizeof(WifiP2pGroupInfo)) {
@@ -87,6 +86,7 @@ static void DeleteGroupTest(const uint8_t* data, size_t size)
         if (memcpy_s(group.goIpAddress, IP_ADDR_STR_LEN, data, IP_ADDR_STR_LEN - 1) != EOK) {
             return;
         }
+        int index = 0;
         group.isP2pGroupOwner = static_cast<int>(data[index++]);
         group.networkId = static_cast<int>(data[index++]);
         group.frequency = static_cast<int>(data[index++]);
@@ -99,7 +99,6 @@ static void DeleteGroupTest(const uint8_t* data, size_t size)
 static void P2pConnectTest(const uint8_t* data, size_t size)
 {
     WifiP2pConfig config;
-    int index = 0;
     if (size > sizeof(WifiP2pConfig)) {
         if (memcpy_s(config.devAddr, COMMON_MAC_LEN, data, COMMON_MAC_LEN) != EOK) {
             return;
@@ -112,16 +111,16 @@ static void P2pConnectTest(const uint8_t* data, size_t size)
         if (memcpy_s(config.groupName, P2P_NAME_LENGTH, data + COMMON_MAC_LEN, P2P_NAME_LENGTH - 1) != EOK) {
             return;
         }
+        int index = 0;
         config.netId = static_cast<int>(OHOS::Wifi::U32_AT(data));
         config.groupOwnerIntent = static_cast<int>(data[index++]);
-        config.goBand =GO_BAND_AUTO;
+        config.goBand = GO_BAND_AUTO;
     }
     (void)P2pConnect(&config);
 }
 
 static void GetCurrentGroupTest(const uint8_t* data, size_t size)
 {
-    int index = 0;
     WifiP2pGroupInfo groupInfo;
 
     if (size > sizeof(WifiP2pGroupInfo)) {
@@ -140,6 +139,7 @@ static void GetCurrentGroupTest(const uint8_t* data, size_t size)
         if (memcpy_s(groupInfo.goIpAddress, IP_ADDR_STR_LEN, data, IP_ADDR_STR_LEN - 1) != EOK) {
             return;
         }
+        int index = 0;
         groupInfo.isP2pGroupOwner = static_cast<int>(data[index++]);
         groupInfo.networkId = static_cast<int>(data[index++]);
         groupInfo.frequency = static_cast<int>(data[index++]);
@@ -158,7 +158,6 @@ static void GetP2pConnectedStatusTest(const uint8_t* data, size_t size)
 static void QueryP2pLocalDeviceTest(const uint8_t* data, size_t size)
 {
     WifiP2pDevice deviceInfo;
-    int index = 0;
     if (size >= sizeof(WifiP2pDevice)) {
         if (memcpy_s(deviceInfo.deviceName, P2P_NAME_LENGTH, data, P2P_NAME_LENGTH - 1) != EOK) {
             return;
@@ -175,7 +174,7 @@ static void QueryP2pLocalDeviceTest(const uint8_t* data, size_t size)
         if (memcpy_s(deviceInfo.primaryDeviceType, DEVICE_TYPE_LENGTH, data, DEVICE_TYPE_LENGTH - 1) != EOK) {
             return;
         }
-
+        int index = 0;
         deviceInfo.status = static_cast<P2pDeviceStatus>(static_cast<int>(data[index++]) % PDS_UNAVAILABLE);
         deviceInfo.wfdInfo.wfdEnabled = static_cast<int>(data[index++]);
         deviceInfo.wfdInfo.deviceInfo = static_cast<int>(data[index++]);
@@ -191,7 +190,6 @@ static void QueryP2pLocalDeviceTest(const uint8_t* data, size_t size)
 static void QueryP2pDevicesTest(const uint8_t* data, size_t size)
 {
     WifiP2pDevice clientDevices;
-    int index = 0;
     int retSize = 0;
     int msize = 0;
     if (size >= sizeof(WifiP2pDevice)) {
@@ -210,7 +208,7 @@ static void QueryP2pDevicesTest(const uint8_t* data, size_t size)
         if (memcpy_s(clientDevices.primaryDeviceType, DEVICE_TYPE_LENGTH, data, DEVICE_TYPE_LENGTH - 1) != EOK) {
             return;
         }
-
+        int index = 0;
         clientDevices.status = static_cast<P2pDeviceStatus>(static_cast<int>(data[index++]) % PDS_UNAVAILABLE);
         clientDevices.wfdInfo.wfdEnabled = static_cast<int>(data[index++]);
         clientDevices.wfdInfo.deviceInfo = static_cast<int>(data[index++]);
@@ -219,14 +217,13 @@ static void QueryP2pDevicesTest(const uint8_t* data, size_t size)
         clientDevices.supportWpsConfigMethods = static_cast<unsigned int>(data[index++]);
         clientDevices.deviceCapabilitys = static_cast<int>(data[index++]);
         clientDevices.groupCapabilitys = static_cast<int>(data[index++]);
-        size = static_cast<int>(data[index++]);
+        msize = static_cast<int>(data[index++]);
     }
     (void)QueryP2pDevices(&clientDevices, msize, &retSize);
 }
 
 static void QueryP2pGroupsTest(const uint8_t* data, size_t size)
 {
-    int index = 0;
     WifiP2pGroupInfo groupInfo;
     int msize = 0;
 
@@ -246,6 +243,7 @@ static void QueryP2pGroupsTest(const uint8_t* data, size_t size)
         if (memcpy_s(groupInfo.goIpAddress, IP_ADDR_STR_LEN, data, IP_ADDR_STR_LEN - 1) != EOK) {
             return;
         }
+        int index = 0;
         groupInfo.isP2pGroupOwner =  static_cast<int>(data[index++]);
         groupInfo.networkId =  static_cast<int>(data[index++]);
         groupInfo.frequency =  static_cast<int>(data[index++]);

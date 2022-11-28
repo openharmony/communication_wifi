@@ -16,6 +16,7 @@
 #include <cstdint>
 #include "securec.h"
 #include "wificdevice_fuzzer.h"
+#include "wifi_fuzz_common_func.h"
 #include "../../../../../../interfaces/kits/c/wifi_device.h"
 
 
@@ -120,11 +121,11 @@ static void GetSignalLevelTest(const uint8_t* data, size_t size)
     }
     GetSignalLevel(rssi, band);
 }
-//
+
 static void GetScanInfoListTest(const uint8_t* data, size_t size)
 {
     WifiScanInfo result;
-    int mSize;
+    unsigned int mSize;
     if (size >= sizeof(WifiScanInfo)) {
         if (memcpy_s(result.ssid, WIFI_MAX_SSID_LEN, data, WIFI_MAX_SSID_LEN - 1) != EOK) {
             return;
@@ -144,7 +145,7 @@ static void GetScanInfoListTest(const uint8_t* data, size_t size)
         result.timestamp = static_cast<int64_t>(OHOS::Wifi::U32_AT(data));
         mSize = static_cast<unsigned int>(data[0]);
     }
-    (void)GetScanInfoList(&result, &size);
+    (void)GetScanInfoList(&result, &mSize);
 }
 
 static void GetDeviceConfigsTest(const uint8_t* data, size_t size)
@@ -175,7 +176,7 @@ static void GetDeviceConfigsTest(const uint8_t* data, size_t size)
         result.isHiddenSsid = static_cast<int>(data[index++]);
         mSize = static_cast<unsigned int>(data[0]);
     }
-    (void)GetDeviceConfigs(&result, &size);
+    (void)GetDeviceConfigs(&result, &mSize);
 }
 
 static void ConnectToDeviceTest(const uint8_t* data, size_t size)
@@ -210,7 +211,7 @@ static void ConnectToDeviceTest(const uint8_t* data, size_t size)
 static void GetLinkedInfoTest(const uint8_t* data, size_t size)
 {
     WifiLinkedInfo result;
-    if(size >= sizeof(WifiLinkedInfo)) {
+    if (size >= sizeof(WifiLinkedInfo)) {
         if (memcpy_s(result.ssid, WIFI_MAX_SSID_LEN, data, WIFI_MAX_SSID_LEN - 1) != EOK) {
             return;
         }
@@ -226,7 +227,6 @@ static void GetLinkedInfoTest(const uint8_t* data, size_t size)
         result.connState = static_cast<WifiConnState>(static_cast<int>(data[index++]) % (WIFI_CONNECTED + 1));
         result.disconnectedReason = static_cast<unsigned short>(data[index++]);
         result.ipAddress = static_cast<unsigned int>(data[index++]);
-
     }
     (void)GetLinkedInfo(&result);
 }
@@ -262,7 +262,7 @@ static void SetLowLatencyModeTest(const uint8_t* data, size_t size)
     if (size > 0) {
         enabled = static_cast<int>(data[0]);
     }
-    (void)SetLowLatencyMode(int enabled);
+    (void)SetLowLatencyMode(enabled);
 }
 
 namespace OHOS {

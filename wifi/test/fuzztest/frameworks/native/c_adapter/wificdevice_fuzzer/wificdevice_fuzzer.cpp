@@ -258,10 +258,11 @@ static void GetIpInfoTest(const uint8_t* data, size_t size)
 
 static void SetLowLatencyModeTest(const uint8_t* data, size_t size)
 {
-    int enabled;
-    if (size > 0) {
-        enabled = static_cast<int>(data[0]);
+    int enabled = 0;
+    if (size == 0) {
+        return;
     }
+    enabled = static_cast<int>(data[0]);
     (void)SetLowLatencyMode(enabled);
 }
 

@@ -51,7 +51,7 @@ WifiScanProxy::WifiScanProxy(const sptr<IRemoteObject> &remote) : IRemoteProxy<I
             return;
         }
         remote_ = remote;
-        WIFI_LOGI("AddDeathRecipient success! deathRecipient_: %{private}p", (void*)deathRecipient_);
+        WIFI_LOGI("AddDeathRecipient success! deathRecipient_: %{private}p", static_cast<void*>(deathRecipient_));
     }
 }
 
@@ -63,7 +63,7 @@ WifiScanProxy::~WifiScanProxy()
 
 void WifiScanProxy::RemoveDeathRecipient(void)
 {
-    WIFI_LOGI("enter RemoveDeathRecipient, deathRecipient_: %{private}p!", (void*)deathRecipient_);
+    WIFI_LOGI("enter RemoveDeathRecipient, deathRecipient_: %{private}p!", static_cast<void*>(deathRecipient_));
     std::lock_guard<std::mutex> lock(mutex_);
     if (remote_ == nullptr) {
         WIFI_LOGI("remote_ is nullptr!");

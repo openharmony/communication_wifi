@@ -35,7 +35,7 @@ namespace Wifi {
         }                                             \
     } while (0)
 
-WifiHotspotImpl::WifiHotspotImpl(int systemAbilityId) : systemAbilityId_(systemAbilityId)
+WifiHotspotImpl::WifiHotspotImpl(int systemAbilityId) : systemAbilityId_(systemAbilityId), instId(0)
 {}
 
 WifiHotspotImpl::~WifiHotspotImpl()

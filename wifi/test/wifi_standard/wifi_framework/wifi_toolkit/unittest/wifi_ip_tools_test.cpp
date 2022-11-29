@@ -73,15 +73,6 @@ HWTEST_F(WifiIpToolsTest, ConvertIpv6AddressTest, TestSize.Level1)
     EXPECT_TRUE(addr == tmp);
 }
 
-HWTEST_F(WifiIpToolsTest, ConvertIpv4MaskTest, TestSize.Level1)
-{
-    EXPECT_TRUE(IpTools::ConvertIpv4Mask(-1) == "");
-    EXPECT_TRUE(IpTools::ConvertIpv4Mask(33) == "");
-    EXPECT_TRUE(IpTools::ConvertIpv4Mask(0) == "0.0.0.0");
-    EXPECT_TRUE(IpTools::ConvertIpv4Mask(32) == "255.255.255.255");
-    EXPECT_TRUE(IpTools::ConvertIpv4Mask(11) == "255.224.0.0");
-}
-
 HWTEST_F(WifiIpToolsTest, ConvertIpv6MaskTest, TestSize.Level1)
 {
     EXPECT_TRUE(IpTools::ConvertIpv6Mask(-1) == "");

@@ -31,7 +31,6 @@ void Hid2dConnectTest(const uint8_t* data, size_t size);
 void Hid2dConfigIPAddrTest(const uint8_t* data, size_t size);
 void Hid2dReleaseIPAddrTest(const uint8_t* data, size_t size);
 void Hid2dGetRecommendChannelTest(const uint8_t* data, size_t size);
-void Hid2dGetChannelListFor5GTest(const uint8_t* data, size_t size);
 void Hid2dGetSelfWifiCfgInfoTest(const uint8_t* data, size_t size);
 void Hid2dSetPeerWifiCfgInfoTest(const uint8_t* data, size_t size);
 void Hid2dSetUpperSceneTest(const uint8_t* data, size_t size);

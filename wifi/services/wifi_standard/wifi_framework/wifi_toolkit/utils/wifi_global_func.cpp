@@ -300,7 +300,7 @@ int HexStringToVec(const std::string &str, uint8_t plainText[], int plainLength,
     if (ret == -1 || static_cast<int>(result.size()) > plainLength) {
         return -1;
     }
-    for(std::vector<char>::size_type i = 0; i < result.size(); ++i) {
+    for (std::vector<char>::size_type i = 0; i < result.size(); ++i) {
         plainText[i] = result[i];
     }
     resultLength = static_cast<int>(result.size());
@@ -342,8 +342,7 @@ std::string ValidateString(const std::string  &str)
 {
     std::stringstream ss;
     ss << "\"";
-    for(char ch : str)
-    {
+    for (char ch : str) {
         if (ValidateChar(ch)) {
             ss << ch;
         }

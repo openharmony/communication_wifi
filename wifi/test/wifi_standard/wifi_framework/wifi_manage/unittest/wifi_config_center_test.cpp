@@ -588,5 +588,56 @@ HWTEST_F(WifiConfigCenterTest, SetWifiStateWhenAirplaneModeTest, TestSize.Level1
     WifiConfigCenter::GetInstance().SetWifiStateWhenAirplaneMode(true);
     EXPECT_TRUE(WifiConfigCenter::GetInstance().GetWifiStateWhenAirplaneMode() == true);
 }
+
+HWTEST_F(WifiConfigCenterTest, SetAppPackageName_SUCCESS, TestSize.Level1)
+{
+    std::string setname;
+	setname = "name";
+    WifiConfigCenter::GetInstance().SetAppPackageName(setname);
+    EXPECT_EQ(setname, WifiConfigCenter::GetInstance().GetAppPackageName());
+}
+
+HWTEST_F(WifiConfigCenterTest, SetFreezeModeState_SUCCESS, TestSize.Level1)
+{
+    int state = 15;
+    WifiConfigCenter::GetInstance().SetFreezeModeState(state);
+    EXPECT_EQ(state, WifiConfigCenter::GetInstance().GetFreezeModeState());
+}
+
+HWTEST_F(WifiConfigCenterTest, SetNoChargerPlugModeState_SUCCESS, TestSize.Level1)
+{
+    int state = 15;
+    WifiConfigCenter::GetInstance().SetNoChargerPlugModeState(state);
+    EXPECT_EQ(state, WifiConfigCenter::GetInstance().GetNoChargerPlugModeState());
+}
+
+HWTEST_F(WifiConfigCenterTest, SetP2pDeviceName_SUCCESS, TestSize.Level1)
+{
+	std::string setname = "name";
+    WifiConfigCenter::GetInstance().SetNoChargerPlugModeState(setname);
+}
+
+HWTEST_F(WifiConfigCenterTest, AddDeviceConfig_SUCCESS, TestSize.Level1)
+{
+    std::vector<WifiDeviceConfig> getconfig;
+    WifiDeviceConfig config;
+    config.networkId = 15;
+    config.bssid = "asdgdsklf";
+    getconfig.push_back(config);
+    WifiConfigCenter::GetInstance().AddDeviceConfig(config);
+    WifiConfigCenter::GetInstance().GetDeviceConfig(getconfig));
+	WifiConfigCenter::GetInstance().RemoveDevice(config.networkId));
+    EXPECT_EQ(config.bssid, getconfig.at(0).bssid);
+    EXPECT_EQ(config.networkId, getconfig.at(0).networkId);
+}
+
+HWTEST_F(WifiConfigCenterTest, SetCountryCode_SUCCESS, TestSize.Level1)
+{
+    std::string setname, getname;
+	setname = "name";
+    WifiConfigCenter::GetInstance().SetCountryCode(mode);
+    WifiConfigCenter::GetInstance().GetCountryCode(getname);
+    EXPECT_EQ(setname, getname);
+}
 }  // namespace Wifi
 }  // namespace OHOS

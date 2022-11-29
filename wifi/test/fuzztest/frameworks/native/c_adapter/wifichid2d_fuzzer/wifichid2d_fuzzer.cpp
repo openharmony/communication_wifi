@@ -34,7 +34,6 @@ namespace Wifi {
         Hid2dConfigIPAddrTest(data, size);
         Hid2dReleaseIPAddrTest(data, size);
         Hid2dGetRecommendChannelTest(data, size);
-        Hid2dGetChannelListFor5GTest(data, size);
         Hid2dGetSelfWifiCfgInfoTest(data, size);
         Hid2dSetPeerWifiCfgInfoTest(data, size);
         Hid2dSetUpperSceneTest(data, size);
@@ -175,17 +174,6 @@ void Hid2dGetRecommendChannelTest(const uint8_t* data, size_t size)
         response.bandwidth = static_cast<int>(data[index++]);
     }
     (void)Hid2dGetRecommendChannel(&request, &response);
-}
-
-void Hid2dGetChannelListFor5GTest(const uint8_t* data, size_t size)
-{
-    if (size == 0) {
-        return;
-    }
-    int lenth = static_cast<int>(data[0]);
-    int* chanList = (int*)malloc(sizeof(int) * lenth);
-    (void)Hid2dGetChannelListFor5G(chanList, lenth);
-    free(chanList);
 }
 
 void Hid2dGetSelfWifiCfgInfoTest(const uint8_t* data, size_t size)

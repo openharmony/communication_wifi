@@ -179,15 +179,13 @@ void Hid2dGetRecommendChannelTest(const uint8_t* data, size_t size)
 
 void Hid2dGetChannelListFor5GTest(const uint8_t* data, size_t size)
 {
-    int chanList = 0;
-    int lenth = 0;
-
-    if (size >= TWO) {
-        int index = 0;
-        chanList = static_cast<int>(data[index++]);
-        lenth = static_cast<int>(data[index++]);
+    if (size == 0) {
+        return;
     }
-    (void)Hid2dGetChannelListFor5G(&chanList, lenth);
+    int lenth = static_cast<int>(data[0]);
+    int* chanList = (int*)malloc(sizeof(int) * lenth);
+    (void)Hid2dGetChannelListFor5G(chanList, lenth);
+    free(chanList);
 }
 
 void Hid2dGetSelfWifiCfgInfoTest(const uint8_t* data, size_t size)

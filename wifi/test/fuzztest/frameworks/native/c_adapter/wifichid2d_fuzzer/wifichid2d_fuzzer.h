@@ -19,7 +19,6 @@
 #define FUZZ_PROJECT_NAME "wifichid2d_fuzzer"
 #define MACLEN 6
 #define IPLEN 4
-#define TWO 2
 #define DATA_MAX_BYTES 255
 
 void Hid2dRequestGcIpTest(const uint8_t* data, size_t size);

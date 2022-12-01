@@ -105,8 +105,10 @@ int WifiServiceManager::LoadStaService(const std::string &dlname, bool bCreate)
         mStaServiceHandle.Clear();
         return -1;
     }
+    WIFI_LOGI("WifiServiceManager::LoadStaService, bCreate: %{public}d", bCreate);
     if (bCreate) {
         mStaServiceHandle.pService = mStaServiceHandle.create();
+        WIFI_LOGI("WifiServiceManager::LoadStaService, pService: %{public}p", (void*)mStaServiceHandle.pService);
     }
     return 0;
 }
@@ -310,10 +312,14 @@ int WifiServiceManager::UnloadStaService(bool bPreLoad)
         WIFI_LOGE("WifiServiceManager::UnloadStaService handle is null");
         return 0;
     }
+    WIFI_LOGI("WifiServiceManager::UnloadStaService, mStaServiceHandle.pService:%{public}p",
+        (void*)mStaServiceHandle.pService);
     if (mStaServiceHandle.pService != nullptr) {
         mStaServiceHandle.destroy(mStaServiceHandle.pService);
         mStaServiceHandle.pService = nullptr;
     }
+    WIFI_LOGI("WifiServiceManager::UnloadStaService, mStaServiceHandle.handle:%{public}p",
+        (void*)mStaServiceHandle.handle);
     if (!bPreLoad) {
         dlclose(mStaServiceHandle.handle);
         mStaServiceHandle.Clear();
@@ -329,10 +335,14 @@ int WifiServiceManager::UnloadScanService(bool bPreLoad)
         WIFI_LOGE("WifiServiceManager::UnloadScanService handle is null");
         return 0;
     }
+    WIFI_LOGI("WifiServiceManager::UnloadScanService, mScanServiceHandle.pService:%{public}p",
+        (void*)mScanServiceHandle.pService);
     if (mScanServiceHandle.pService != nullptr) {
         mScanServiceHandle.destroy(mScanServiceHandle.pService);
         mScanServiceHandle.pService = nullptr;
     }
+    WIFI_LOGI("WifiServiceManager::UnloadScanService, mScanServiceHandle.handle:%{public}p",
+        (void*)mScanServiceHandle.handle);
     if (!bPreLoad) {
         dlclose(mScanServiceHandle.handle);
         mScanServiceHandle.Clear();

@@ -20,6 +20,7 @@
 #include "mock_sta_service.h"
 #include "mock_wifi_settings.h"
 #include "mock_wifi_sta_hal_interface.h"
+#include "mock_wifi_supplicant_hal_interface.h"
 
 using ::testing::_;
 using ::testing::AtLeast;
@@ -257,6 +258,105 @@ public:
         EXPECT_CALL(*pMockStaService, SetCountryCode(_)).WillRepeatedly(Return(WIFI_OPT_FAILED));
         EXPECT_TRUE(pStaInterface->SetCountryCode(countryCode) == WIFI_OPT_FAILED);
     }
+    void ConnectToCandidateConfigFail()
+    {
+	    const int uid; 
+	   	const int networkId;
+        EXPECT_CALL(*pMockStaService, ConnectToCandidateConfig(_)).WillRepeatedly(Return(WIFI_OPT_FAILED));
+        EXPECT_TRUE(pStaInterface->ConnectToCandidateConfig(uid, networkId) == WIFI_OPT_FAILED);
+    }
+
+    void ConnectToCandidateConfigSuccess()
+    {
+        const int uid; 
+        const int networkId;
+        EXPECT_CALL(*pMockStaService, ConnectToCandidateConfig(_)).WillRepeatedly(Return(WIFI_OPT_SUCCESS));
+        EXPECT_TRUE(pStaInterface->ConnectToCandidateConfig(uid, networkId) == WIFI_OPT_SUCCESS);	
+    }
+    void RemoveCandidateConfigSuccess()
+    {
+        const int uid; 
+        const int networkId;
+        EXPECT_CALL(*pMockStaService, RemoveCandidateConfig(_)).WillRepeatedly(Return(WIFI_OPT_SUCCESS));
+        EXPECT_TRUE(pStaInterface->RemoveCandidateConfig(uid, networkId) == WIFI_OPT_SUCCESS);	
+    }
+
+    void RemoveCandidateConfigFail()
+    {
+	    const int uid; 
+     	const int networkId;
+        EXPECT_CALL(*pMockStaService, RemoveCandidateConfig(_)).WillRepeatedly(Return(WIFI_OPT_FAILED));
+        EXPECT_TRUE(pStaInterface->RemoveCandidateConfig(uid, networkId) == WIFI_OPT_FAILED);
+    }
+
+    void RemoveAllCandidateConfigSuccess()
+    {
+        const int uid; 
+        EXPECT_CALL(*pMockStaService, RemoveAllCandidateConfig(_)).WillRepeatedly(Return(WIFI_OPT_SUCCESS));
+        EXPECT_TRUE(pStaInterface->RemoveAllCandidateConfig(uid, networkId) == WIFI_OPT_SUCCESS);	
+    }
+
+    void RemoveAllCandidateConfigFail()
+    {
+	    const int uid; 
+        EXPECT_CALL(*pMockStaService, RemoveAllCandidateConfig(_)).WillRepeatedly(Return(WIFI_OPT_FAILED));
+        EXPECT_TRUE(pStaInterface->RemoveAllCandidateConfig(uid, networkId) == WIFI_OPT_FAILED);
+    }
+
+    void AddCandidateConfigSuccess()
+    {
+	    const int uid = 1; 
+     	const int networkId = 0;
+		WifiDeviceConfig config;
+        EXPECT_CALL(*pMockStaService, AddCandidateConfig(_, _, _)).WillRepeatedly(Return(WIFI_OPT_SUCCESS));
+        EXPECT_TRUE(pStaInterface->AddCandidateConfig(uid, config, networkId) == WIFI_OPT_SUCCESS);
+    }
+
+    void AddCandidateConfigSupported()
+    {
+        const int uid = 1; 
+        const int networkId = 0;
+        WifiDeviceConfig config;
+        config.keyMgmt = "WEP";
+        EXPECT_CALL(*pMockStaService, AddCandidateConfig(_, config, _)).WillRepeatedly(Return(WIFI_OPT_NOT_SUPPORTED));
+        EXPECT_TRUE(pStaInterface->AddCandidateConfig(uid, config, networkId) == WIFI_OPT_NOT_SUPPORTED);
+    }
+
+    void AddCandidateConfigFail()
+    {
+        const int uid = 1; 
+     	const int networkId = 0;
+	    WifiDeviceConfig config;
+        EXPECT_CALL(*pMockStaService, AddCandidateConfig(_, _, _)).WillRepeatedly(Return(WIFI_OPT_FAILED));
+        EXPECT_TRUE(pStaInterface->AddCandidateConfig(uid, config, networkId) == WIFI_OPT_FAILED);
+    }
+
+    void SetSuspendModeFail()
+    {
+        bool mode = true;
+        EXPECT_CALL(*pMockStaService, SetSuspendMode(_)).WillRepeatedly(Return(WIFI_OPT_FAILED));
+        EXPECT_TRUE(pStaInterface->SetSuspendMode(uid, config, networkId) == WIFI_OPT_FAILED);
+    }
+
+    void SetSuspendModeSuccess()
+    {
+        bool mode = true;
+        EXPECT_CALL(*pMockStaService, SetSuspendMode(_)).WillRepeatedly(Return(WIFI_OPT_SUCCESS));
+        EXPECT_TRUE(pStaInterface->SetSuspendMode(mode) == WIFI_OPT_SUCCESS);
+    }
+
+    void RemoveAllDeviceFail()
+    {
+        EXPECT_CALL(*pMockStaService, RemoveAllDevice(_)).WillRepeatedly(Return(WIFI_OPT_FAILED));
+        EXPECT_TRUE(pStaInterface->RemoveAllDevice() == WIFI_OPT_FAILED);
+    }
+
+    void RemoveAllDeviceSuccess()
+    {
+        EXPECT_CALL(*pMockStaService, RemoveAllDevice(_)).WillRepeatedly(Return(WIFI_OPT_SUCCESS));
+        EXPECT_TRUE(pStaInterface->RemoveAllDevice() == WIFI_OPT_SUCCESS);
+    }
+
 };
 
 extern "C" IStaService *Create(void);
@@ -422,6 +522,71 @@ HWTEST_F(StaInterfaceTest, RegisterStaServiceCallbackSuceess, TestSize.Level1)
 {
     StaServiceCallback callbacks;
     pStaInterface->RegisterStaServiceCallback(callbacks);
+}
+
+HWTEST_F(StaInterfaceTest, ConnectToCandidateConfigSuccess, TestSize.Level1)
+{
+    ConnectToCandidateConfigSuccess();
+}
+
+HWTEST_F(StaInterfaceTest, ConnectToCandidateConfigFail, TestSize.Level1)
+{
+    ConnectToCandidateConfigFail();
+}
+
+HWTEST_F(StaInterfaceTest, RemoveCandidateConfigSuccess, TestSize.Level1)
+{
+    RemoveCandidateConfigSuccess();
+}
+
+HWTEST_F(StaInterfaceTest, RemoveCandidateConfigFail, TestSize.Level1)
+{
+    RemoveCandidateConfigFail();
+}
+
+HWTEST_F(StaInterfaceTest, RemoveAllCandidateConfigSuccess, TestSize.Level1)
+{
+    RemoveAllCandidateConfigSuccess();
+}
+
+HWTEST_F(StaInterfaceTest, RemoveAllCandidateConfigFail, TestSize.Level1)
+{
+    RemoveAllCandidateConfigFail();
+}
+
+HWTEST_F(StaInterfaceTest, AddCandidateConfigSuccess, TestSize.Level1)
+{
+    AddCandidateConfigSuccess();
+}
+
+HWTEST_F(StaInterfaceTest, AddCandidateConfigFail, TestSize.Level1)RemoveAllDeviceFail
+{
+    AddCandidateConfigFail();
+}
+
+HWTEST_F(StaInterfaceTest, AddCandidateConfigSupported, TestSize.Level1)
+{
+    AddCandidateConfigSupported();
+}
+
+HWTEST_F(StaInterfaceTest, SetSuspendModeSuccess, TestSize.Level1)
+{
+    SetSuspendModeSuccess();
+}
+
+HWTEST_F(StaInterfaceTest, SetSuspendModeFail, TestSize.Level1)
+{
+    SetSuspendModeFail();
+}
+
+HWTEST_F(StaInterfaceTest, RemoveAllDeviceSuccess, TestSize.Level1)
+{
+    RemoveAllDeviceSuccess();
+}
+
+HWTEST_F(StaInterfaceTest, RemoveAllDeviceFail, TestSize.Level1)
+{
+    RemoveAllDeviceFail();
 }
 } // namespace Wifi
 } // namespace OHOS

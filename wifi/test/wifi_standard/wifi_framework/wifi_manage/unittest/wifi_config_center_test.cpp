@@ -613,8 +613,8 @@ HWTEST_F(WifiConfigCenterTest, SetNoChargerPlugModeState_SUCCESS, TestSize.Level
 
 HWTEST_F(WifiConfigCenterTest, SetP2pDeviceName_SUCCESS, TestSize.Level1)
 {
-	std::string setname = "name";
-    WifiConfigCenter::GetInstance().SetNoChargerPlugModeState(setname);
+    std::string setname = "name";
+    WifiConfigCenter::GetInstance().SetP2pDeviceName(setname);
 }
 
 HWTEST_F(WifiConfigCenterTest, AddDeviceConfig_SUCCESS, TestSize.Level1)
@@ -624,9 +624,9 @@ HWTEST_F(WifiConfigCenterTest, AddDeviceConfig_SUCCESS, TestSize.Level1)
     config.networkId = 15;
     config.bssid = "asdgdsklf";
     getconfig.push_back(config);
-    WifiConfigCenter::GetInstance().AddDeviceConfig(config);
-    WifiConfigCenter::GetInstance().GetDeviceConfig(getconfig));
-	WifiConfigCenter::GetInstance().RemoveDevice(config.networkId));
+    WifiConfigCenter::GetInstance().AddDeviceConfig(config));
+    WifiConfigCenter::GetInstance().GetDeviceConfig(getconfig);
+    WifiConfigCenter::GetInstance().RemoveDevice(config.networkId);
     EXPECT_EQ(config.bssid, getconfig.at(0).bssid);
     EXPECT_EQ(config.networkId, getconfig.at(0).networkId);
 }
@@ -634,8 +634,8 @@ HWTEST_F(WifiConfigCenterTest, AddDeviceConfig_SUCCESS, TestSize.Level1)
 HWTEST_F(WifiConfigCenterTest, SetCountryCode_SUCCESS, TestSize.Level1)
 {
     std::string setname, getname;
-	setname = "name";
-    WifiConfigCenter::GetInstance().SetCountryCode(mode);
+    setname = "name";
+    WifiConfigCenter::GetInstance().SetCountryCode(setname);
     WifiConfigCenter::GetInstance().GetCountryCode(getname);
     EXPECT_EQ(setname, getname);
 }

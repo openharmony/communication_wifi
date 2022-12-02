@@ -634,7 +634,7 @@ HWTEST_F(WifiConfigCenterTest, AddDeviceConfig_SUCCESS, TestSize.Level1)
 HWTEST_F(WifiConfigCenterTest, SetCountryCode_SUCCESS, TestSize.Level1)
 {
     std::string setname, getname;
-    setname = "name";
+    setname = "";
     WifiConfigCenter::GetInstance().SetCountryCode(setname);
     WifiConfigCenter::GetInstance().GetCountryCode(getname);
     EXPECT_EQ(setname, getname);

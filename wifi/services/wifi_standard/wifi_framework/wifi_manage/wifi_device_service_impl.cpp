@@ -45,6 +45,7 @@ DEFINE_WIFILOG_LABEL("WifiDeviceServiceImpl");
 namespace OHOS {
 namespace Wifi {
 std::mutex WifiDeviceServiceImpl::g_instanceLock;
+bool WifiDeviceServiceImpl::isServiceStart = false;
 #ifdef OHOS_ARCH_LITE
 std::shared_ptr<WifiDeviceServiceImpl> WifiDeviceServiceImpl::g_instance;
 std::shared_ptr<WifiDeviceServiceImpl> WifiDeviceServiceImpl::GetInstance()
@@ -79,18 +80,19 @@ sptr<WifiDeviceServiceImpl> WifiDeviceServiceImpl::GetInstance()
 WifiDeviceServiceImpl::WifiDeviceServiceImpl()
 #ifdef OHOS_ARCH_LITE
     : mPublishFlag(false), mState(ServiceRunningState::STATE_NOT_START)
-
 #else
     : SystemAbility(WIFI_DEVICE_ABILITY_ID, true), mPublishFlag(false), mState(ServiceRunningState::STATE_NOT_START)
 #endif
-{}
+{
+    isServiceStart = false;
+}
 
 WifiDeviceServiceImpl::~WifiDeviceServiceImpl()
 {}
 
 bool WifiDeviceServiceImpl::IsProcessNeedToRestart()
 {
-    return (WifiConfigCenter::GetInstance().GetWifiMidState() == WifiOprMidState::RUNNING);
+    return WifiDeviceServiceImpl::isServiceStart;
 }
 
 void WifiDeviceServiceImpl::SigHandler(int sig)
@@ -125,6 +127,7 @@ void WifiDeviceServiceImpl::OnStart()
         OnStop();
         return;
     }
+    isServiceStart = true;
     mState = ServiceRunningState::STATE_RUNNING;
     WIFI_LOGI("Start sta service!");
     WifiManager::GetInstance();

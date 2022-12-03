@@ -206,6 +206,7 @@ private:
     std::unique_ptr<Utils::Timer> lpThermalTimer_ = nullptr;
 #endif
     static std::mutex g_instanceLock;
+    static bool isServiceStart;
     bool mPublishFlag;
     ServiceRunningState mState;
 };

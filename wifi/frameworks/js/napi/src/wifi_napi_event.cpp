@@ -246,16 +246,19 @@ public:
 
 public:
     void OnWifiStateChanged(int state) override {
-        WIFI_LOGI("sta received state changed event: %{public}d", state);
+        WIFI_LOGI("sta received state changed event: %{public}d [0:DISABLING, 1:DISABLED, 2:ENABLING, 3:ENABLED]",
+            state);
         if (m_wifiStateConvertMap.find(state) == m_wifiStateConvertMap.end()) {
+            WIFI_LOGW("not find state.");
             return;
         }
         CheckAndNotify(EVENT_STA_POWER_STATE_CHANGE, m_wifiStateConvertMap[state]);
     }
 
     void OnWifiConnectionChanged(int state, const WifiLinkedInfo &info) override {
-        WIFI_LOGI("sta received connection changed event: %{public}d", state);
+        WIFI_LOGI("sta received connection changed event: %{public}d [4:CONNECTED, 6:DISCONNECTED]", state);
         if (m_connectStateConvertMap.find(state) == m_connectStateConvertMap.end()) {
+            WIFI_LOGW("not find connect state.");
             return;
         }
         CheckAndNotify(EVENT_STA_CONN_STATE_CHANGE, m_connectStateConvertMap[state]);
@@ -399,7 +402,7 @@ public:
     }
 
     void OnP2pPeersChanged(const std::vector<WifiP2pDevice>& devices) override {
-        WIFI_LOGI("received peers changed event: %{public}d", (int)devices.size());
+        WIFI_LOGI("received p2p peers changed event, devices count: %{public}d", static_cast<int>(devices.size()));
         CheckAndNotify(EVENT_P2P_PEER_DEVICE_CHANGE, devices);
     }
 
@@ -407,7 +410,8 @@ public:
     }
 
     void OnP2pConnectionChanged(const WifiP2pLinkedInfo& info) override {
-        WIFI_LOGI("received connection changed event");
+        WIFI_LOGI("received p2p connection changed event, state: %{public}d",
+            static_cast<int>(info.GetConnectState()));
         CheckAndNotify(EVENT_P2P_CONN_STATE_CHANGE, info);
     }
 

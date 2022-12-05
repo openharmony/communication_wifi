@@ -21,7 +21,7 @@ namespace Wifi {
     std::unique_ptr<WifiDevice> devicePtr = WifiDevice::GetInstance(WIFI_DEVICE_ABILITY_ID);
     bool EnableWifiFuzzerTest(const uint8_t* data, size_t size)
     {
-		WifiLinkedInfo info;
+        WifiLinkedInfo info;
         std::string get_countryCode = std::string(reinterpret_cast<const char*>(data), size);
         std::string set_countryCode = std::string(reinterpret_cast<const char*>(data), size);
         int addResult;

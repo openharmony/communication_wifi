@@ -353,6 +353,7 @@ public:
     }
 
     void OnP2pThisDeviceChanged(const OHOS::Wifi::WifiP2pDevice &device) override {
+        WIFI_LOGI("%{public}s, received this device changed event", __func__);
     }
 
     void OnP2pPeersChanged(const std::vector<OHOS::Wifi::WifiP2pDevice> &devices) override {
@@ -383,6 +384,7 @@ public:
     }
 
     void OnP2pServicesChanged(const std::vector<OHOS::Wifi::WifiP2pServiceInfo> &srvInfo) override {
+        WIFI_LOGI("%{public}s, received p2p services changed event", __func__);
     }
 
     void OnP2pConnectionChanged(const OHOS::Wifi::WifiP2pLinkedInfo &info) override {
@@ -393,9 +395,11 @@ public:
     }
 
     void OnP2pDiscoveryChanged(bool isChange) override {
+        WIFI_LOGI("%{public}s, received p2p discovery changed event", __func__);
     }
 
     void OnP2pActionResult(OHOS::Wifi::P2pActionCallback action, OHOS::Wifi::ErrCode code) override {
+        WIFI_LOGI("%{public}s, received p2p action results event", __func__);
     }
 
     void OnConfigChanged(OHOS::Wifi::CfgType type, char* data, int dataLen) override {

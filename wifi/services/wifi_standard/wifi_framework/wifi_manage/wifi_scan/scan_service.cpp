@@ -482,14 +482,14 @@ int ScanService::StoreRequestScanConfig(const ScanConfig &scanConfig, const Inte
 
     std::unique_lock<std::mutex> lock(scanConfigMapMutex);
     scanConfigMap.insert(std::pair<int, StoreScanConfig>(scanConfigStoreIndex, storeScanConfig));
-
+    WIFI_LOGI("StoreRequestScanConfig, add success, scanConfigStoreIndex: %{public}d", scanConfigStoreIndex);
     return scanConfigStoreIndex;
 }
 
 void ScanService::HandleCommonScanFailed(std::vector<int> &requestIndexList)
 {
-    WIFI_LOGI("Enter ScanService::HandleCommonScanFailed.\n");
-
+    WIFI_LOGI("Enter ScanService::HandleCommonScanFailed, requestIndexList size: %{public}d.",
+        static_cast<int>(requestIndexList.size()));
     if (staStatus != static_cast<int>(OperateResState::DISCONNECT_DISCONNECTED) &&
         staStatus != static_cast<int>(OperateResState::CONNECT_AP_CONNECTED)) {
         return;
@@ -516,8 +516,8 @@ void ScanService::HandleCommonScanFailed(std::vector<int> &requestIndexList)
 void ScanService::HandleCommonScanInfo(
     std::vector<int> &requestIndexList, std::vector<InterScanInfo> &scanInfoList)
 {
-    WIFI_LOGI("Enter ScanService::HandleCommonScanInfo.\n");
-
+    WIFI_LOGI("Enter ScanService::HandleCommonScanInfo, requestIndexList size: %{public}d.",
+        static_cast<int>(requestIndexList.size()));
     bool fullScanStored = false;
     {
         std::unique_lock<std::mutex> lock(scanConfigMapMutex);

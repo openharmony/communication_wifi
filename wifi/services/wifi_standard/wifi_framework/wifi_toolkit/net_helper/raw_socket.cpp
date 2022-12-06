@@ -168,9 +168,9 @@ int RawSocket::Close(void)
 
     if (socketFd_ >= 0) {
         ret = close(socketFd_);
-    }
-    if (ret != OPT_SUCC) {
-        LOGE("close fail.");
+        if (ret != OPT_SUCC) {
+            LOGE("close fail.");
+        }
     }
     socketFd_ = -1;
     ifaceIndex_ = 0;

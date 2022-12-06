@@ -191,7 +191,7 @@
 
 #define MODE_STATE_OPEN (1)
 #define MODE_STATE_CLOSE (2)
-#define InterfaceDescriptorL1  u"ohos.wifi.IWifiDeviceService"
-#define DECLARE_INTERFACE_DESCRIPTOR_L1_LENGTH (sizeof(InterfaceDescriptorL1)/sizeof(uint16_t))
-#define DECLARE_INTERFACE_DESCRIPTOR_L1 ((uint16_t*)&InterfaceDescriptorL1[0])
+#define INTERFACEDESCRIPTORL1  u"ohos.wifi.IWifiDeviceService"
+#define DECLARE_INTERFACE_DESCRIPTOR_L1_LENGTH (sizeof(INTERFACEDESCRIPTORL1)/sizeof(uint16_t))
+#define DECLARE_INTERFACE_DESCRIPTOR_L1 ((uint16_t*)&INTERFACEDESCRIPTORL1[0])
 #endif

@@ -100,7 +100,7 @@ namespace Wifi {
 
     void GetSupportedFeaturesTest(const uint8_t* data, size_t size)
     {
-        if (size == 0) {
+        if (size < FOUR) {
             return;
         }
         long features = static_cast<long>(OHOS::Wifi::U32_AT(data));
@@ -109,7 +109,7 @@ namespace Wifi {
 
     void IsFeatureSupportedTest(const uint8_t* data, size_t size)
     {
-        if (size == 0) {
+        if (size < FOUR) {
             return;
         }
         long features = static_cast<long>(OHOS::Wifi::U32_AT(data));

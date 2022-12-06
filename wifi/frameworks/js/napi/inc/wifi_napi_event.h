@@ -24,7 +24,6 @@
 #include <shared_mutex>
 #include "wifi_p2p.h"
 #include "wifi_hotspot.h"
-#include "wifi_logger.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -92,7 +91,6 @@ public:
         std::shared_lock<std::shared_mutex> guard(g_regInfoMutex);
         auto it = g_eventRegisterInfo.find(type);
         if (it == g_eventRegisterInfo.end()) {
-            WIFI_LOGW("not find register info.");
             return;
         }
         for (auto& each : it->second) {

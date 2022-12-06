@@ -76,7 +76,7 @@ namespace Wifi {
             return;
         }
         WifiP2pLinkedInfo linkedInfo;
-        bool isP2pGroupOwner = (static_cast<int>(data[0]) % TWO)? true : false;
+        bool isP2pGroupOwner = (static_cast<int>(data[0]) % TWO) ? true : false;
         std::string groupOwnerAddress = std::string(reinterpret_cast<const char*>(data), size);
         linkedInfo.SetIsGroupOwner(isP2pGroupOwner);
         linkedInfo.SetIsGroupOwnerAddress(groupOwnerAddress);
@@ -127,7 +127,7 @@ namespace Wifi {
         WifiP2pWfdInfo wfdInfo;
         if (size >= Four) {
             int index = 0;
-            bool wfdEnabled = (static_cast<int>(data[index++]) % TWO)? true : false;
+            bool wfdEnabled = (static_cast<int>(data[index++]) % TWO) ? true : false;
             int deviceInfo = static_cast<int>(data[index++]);
             int ctrlPort = static_cast<int>(data[index++]);
             int maxThroughput =  static_cast<int>(data[index++]);

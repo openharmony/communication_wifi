@@ -222,7 +222,6 @@ static void GetLinkedInfoTest(const uint8_t* data, size_t size)
         int index = 0;
         result.rssi = static_cast<int>(data[index++]);
         result.band = static_cast<int>(data[index++]);
-        result.rssi = static_cast<int>(data[index++]);
         result.frequency = static_cast<int>(data[index++]);
         result.connState = static_cast<WifiConnState>(static_cast<int>(data[index++]) % (WIFI_CONNECTED + 1));
         result.disconnectedReason = static_cast<unsigned short>(data[index++]);

@@ -20,7 +20,7 @@ module_output_path = "wifi/wifi_sta"
 ##############################fuzztest##########################################
 ohos_fuzztest("WifiP2pImplFuzzTest") {
   module_out_path = module_output_path
-  fuzz_config_file = 
+  fuzz_config_file =
       "$WIFI_ROOT_DIR/test/fuzztest/frameworks/native/src/wifip2pimpl_fuzzer"
 
   include_dirs = [

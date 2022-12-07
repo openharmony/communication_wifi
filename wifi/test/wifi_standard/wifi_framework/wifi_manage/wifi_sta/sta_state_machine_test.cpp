@@ -1279,7 +1279,7 @@ public:
     void DealSignalPollResult()
     {
         InternalMessage msg;
-        EXPECT_CALL(WifiStaHalInterface::GetInstance(), GetConnectSignalInfo(bssid, Info)).Times(AtLeast(0));
+        EXPECT_CALL(WifiStaHalInterface::GetInstance(), GetConnectSignalInfo(_, _)).Times(AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_));
         EXPECT_CALL(WifiSettings::GetInstance(), GetSignalLevel(_, _)).Times(AtLeast(0));
         pStaStateMachine->DealSignalPollResult(&msg);
@@ -1348,7 +1348,7 @@ public:
     void DealNetworkCheckSuccess()
     {
         InternalMessage msg;
-        pStaStateMachine->DealNetworkCheck(msg);
+        pStaStateMachine->DealNetworkCheck(&msg);
     }
 
     void DealNetworkCheckFail()
@@ -1370,8 +1370,8 @@ public:
         EXPECT_CALL(WifiStaHalInterface::GetInstance(), Reconnect())
             .WillOnce(Return(WIFI_IDL_OPT_OK))
             .WillOnce(Return(WIFI_IDL_OPT_FAILED));
-        pStaStateMachine->DealReConnectCmd(msg);
-        pStaStateMachine->DealReConnectCmd(msg);
+        pStaStateMachine->DealReConnectCmd(&msg);
+        pStaStateMachine->DealReConnectCmd(&msg);
     }
 
     void DealReConnectCmdFail()
@@ -1384,10 +1384,10 @@ public:
         EXPECT_CALL(WifiSettings::GetInstance(), SetDeviceAfterConnect(_)).Times(testing::AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), SetDeviceState(_, _, _)).Times(testing::AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), SyncDeviceConfig(_)).Times(testing::AtLeast(0));;
-        EXPECT_CALL(WifiSettings::GetInstance(), SetUserLastSelectedNetworkId(_)).Times(testing::AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), SetUserLastSelectedNetworkId()).Times(testing::AtLeast(0));
         pStaStateMachine->wpsState = SetupMethod::INVALID;
         InternalMessage msg;
-        pStaStateMachine->DealConnectionEvent(msg);
+        pStaStateMachine->DealConnectionEvent(&msg);
     }
 
     void DealConnectionEventFail()
@@ -1604,6 +1604,11 @@ HWTEST_F(StaStateMachineTest, LinkedStateGoOutStateSuccess, TestSize.Level1)
 HWTEST_F(StaStateMachineTest, LinkedStateExeMsgFail, TestSize.Level1)
 {
     LinkedStateExeMsgFail();
+}
+
+HWTEST_F(StaStateMachineTest, LinkedStateExeMsgSuccess, TestSize.Level1)
+{
+    LinkedStateExeMsgSuccess();
 }
 
 HWTEST_F(StaStateMachineTest, InitStaSMHandleMapSuccess, TestSize.Level1)
@@ -2036,25 +2041,6 @@ HWTEST_F(StaStateMachineTest, HandleNetCheckResultFail, TestSize.Level1)
     HandleNetCheckResultFail();
 }
 
-HWTEST_F(StaStateMachineTest, LinkedStateGoInStateSuccess, TestSize.Level1)
-{
-    LinkedStateGoInStateSuccess();
-}
-
-HWTEST_F(StaStateMachineTest, LinkedStateGoOutStateSuccess, TestSize.Level1)
-{
-    LinkedStateGoOutStateSuccess();
-}
-
-HWTEST_F(StaStateMachineTest, LinkedStateExeMsgSuccess, TestSize.Level1)
-{
-    LinkedStateExeMsgSuccess();
-}
-
-HWTEST_F(StaStateMachineTest, LinkedStateExeMsgFail, TestSize.Level1)
-{
-    LinkedStateExeMsgFail();
-}
 
 HWTEST_F(StaStateMachineTest, ApRoamingStateGoInStateSuccess, TestSize.Level1)
 {

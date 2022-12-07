@@ -362,21 +362,6 @@ public:
         pStaStateMachine->pWpaStoppingState->ExecuteStateMsg(nullptr);
     }
 
-    void LinkStateGoInStateSuccess()
-    {
-        pStaStateMachine->pLinkedState->GoInState();
-    }
-
-    void LinkStateGoOutStateSuccess()
-    {
-        pStaStateMachine->pLinkedState->GoOutState();
-    }
-
-    void LinkStateExeMsgFail()
-    {
-        EXPECT_FALSE(pStaStateMachine->pLinkedState->ExecuteStateMsg(nullptr));
-    }
-
     void InitStaSMHandleMapSuccess()
     {
         EXPECT_EQ(WIFI_OPT_SUCCESS, pStaStateMachine->InitStaSMHandleMap());
@@ -1138,7 +1123,6 @@ public:
     void LinkedStateExeMsgSuccess()
     {
         InternalMessage msg;
-        EXPECT_CALL(WifiSettings::GetInstance(), SetMessageName(0x301A)).WillRepeatedly(Return());
         pStaStateMachine->pLinkedState->ExecuteStateMsg(&msg);
     }
 
@@ -1294,20 +1278,17 @@ public:
 
     void DealSignalPollResult()
     {
-    	std::string bssid = "2a:76:93:47:e2:8b";
-        InternalMessage *msg;
-        WifiWpaSignalInfo Info;
-        EXPECT_CALL(WifiStaHalInterface::GetInstance(), GetConnectSignalInfo(bssid, Info)).WillRepeatedly(Return());
-        EXPECT_CALL(WifiSettings::GetInstance(), GetSignalLevel(_, _)).WillRepeatedly(Return());
-        pStaStateMachine->DealSignalPollResult(msg);
+        InternalMessage msg;
+        EXPECT_CALL(WifiStaHalInterface::GetInstance(), GetConnectSignalInfo(bssid, Info)).Times(AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_));
+        EXPECT_CALL(WifiSettings::GetInstance(), GetSignalLevel(_, _)).Times(AtLeast(0));
+        pStaStateMachine->DealSignalPollResult(&msg);
     }
 
     void ConvertFreqToChannelTest()
     {
-        WifiDeviceConfig config;
-		config.networkId = 15;
-        EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _)).WillRepeatedly(Return(-1));
-        EXPECT_CALL(WifiSettings::GetInstance(), AddDeviceConfig(config)).WillRepeatedly(Return(15));
+        EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _)).Times(AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), AddDeviceConfig(_)).Times(AtLeast(0));
 		pStaStateMachine->linkedInfo.frequency = FREQ_2G_MIN;
         pStaStateMachine->ConvertFreqToChannel();
 
@@ -1316,8 +1297,6 @@ public:
 
         pStaStateMachine->linkedInfo.frequency = FREQ_5G_MIN;
         pStaStateMachine->ConvertFreqToChannel();
-
-		
     }
 
     void LinkStateGoInStateSuccess()
@@ -1333,7 +1312,7 @@ public:
     void LinkStateExeMsgSuccess()
     {
         InternalMessage msg;
-        EXPECT_TRUE(pStaStateMachine->pLinkState->ExecuteStateMsg(&msg));
+        pStaStateMachine->pLinkState->ExecuteStateMsg(&msg);
     }
 
     void LinkStateExeMsgFail()
@@ -1356,18 +1335,14 @@ public:
 
     void ReUpdateNetSupplierInfoSuccess()
     {
-        WifiLinkedInfo linkedInfo;
-        linkedInfo.detailedState = DetailedState::NOTWORKING;
-		linkedInfo.connState = ConnState::CONNECTED;
-        EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(linkedInfo)).WillRepeatedly(Return(0));
-        pStaStateMachine->OnNetManagerRestart();
+        sptr<NetManagerStandard::NetSupplierInfo> supplierInfo;
+        pStaStateMachine->ReUpdateNetSupplierInfo(supplierInfo);
     }
 
     void ReUpdateNetSupplierInfoFail()
     {
-        WifiLinkedInfo linkedInfo;
-        EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(linkedInfo)).WillRepeatedly(Return(0));
-        pStaStateMachine->OnNetManagerRestart();
+        sptr<NetManagerStandard::NetSupplierInfo> supplierInfo;
+        pStaStateMachine->ReUpdateNetSupplierInfo(supplierInfo);
     }
 
     void DealNetworkCheckSuccess()
@@ -1385,27 +1360,29 @@ public:
     {
         std::string reason;
 		std::string bssid;
-        pStaStateMachine->DealNetworkCheck(reason, bssid);
+        pStaStateMachine->OnBssidChangedEvent(reason, bssid);
     }
 
     void DealReConnectCmdSuccess()
     {
         InternalMessage msg;
-        EXPECT_CALL(WifiStaHalInterface::GetInstance(), Reconnect()).Willonce(Return(WIFI_IDL_OPT_OK));
-        EXPECT_CALL(WifiStaHalInterface::GetInstance(), Reconnect()).Willonce(Return(WIFI_IDL_OPT_FAILED));
-        pStaStateMachine->DealNetworkCheck(msg);
-        pStaStateMachine->DealNetworkCheck(msg);
+        pStaStateMachine->linkedInfo.connState = ConnState::CONNECTING;
+        EXPECT_CALL(WifiStaHalInterface::GetInstance(), Reconnect())
+            .WillOnce(Return(WIFI_IDL_OPT_OK))
+            .WillOnce(Return(WIFI_IDL_OPT_FAILED));
+        pStaStateMachine->DealReConnectCmd(msg);
+        pStaStateMachine->DealReConnectCmd(msg);
     }
 
     void DealReConnectCmdFail()
     {
-        pStaStateMachine->DealNetworkCheck(nullptr);
+        pStaStateMachine->DealReConnectCmd(nullptr);
     }
 
     void DealConnectionEventSuccess()
     {
         EXPECT_CALL(WifiSettings::GetInstance(), SetDeviceAfterConnect(_)).Times(testing::AtLeast(0));
-        EXPECT_CALL(WifiSettings::GetInstance(), SetDeviceState(_, _)).Times(testing::AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), SetDeviceState(_, _, _)).Times(testing::AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), SyncDeviceConfig(_)).Times(testing::AtLeast(0));;
         EXPECT_CALL(WifiSettings::GetInstance(), SetUserLastSelectedNetworkId(_)).Times(testing::AtLeast(0));
         pStaStateMachine->wpsState = SetupMethod::INVALID;
@@ -1417,15 +1394,6 @@ public:
     {
         pStaStateMachine->DealConnectionEvent(nullptr);
     }
-
-
-
-
-
-	pStaStateMachine->wpsState = SetupMethod::INVALID;
-	pStaStateMachine->currentTpType = IPTYPE_IPV4;
-	pStaStateMachine->lastLinkedInfo.detailedState = DetailedState::CONNECTING;
-
 };
 
 HWTEST_F(StaStateMachineTest, InitWifiLinkedInfoSuccess, TestSize.Level1)
@@ -1623,19 +1591,19 @@ HWTEST_F(StaStateMachineTest, WpaStoppingStateExeMsgFail, TestSize.Level1)
     WpaStoppingStateExeMsgFail();
 }
 
-HWTEST_F(StaStateMachineTest, LinkStateGoInStateSuccess, TestSize.Level1)
+HWTEST_F(StaStateMachineTest, LinkedStateGoInStateSuccess, TestSize.Level1)
 {
-    LinkStateGoInStateSuccess();
+    LinkedStateGoInStateSuccess();
 }
 
-HWTEST_F(StaStateMachineTest, LinkStateGoOutStateSuccess, TestSize.Level1)
+HWTEST_F(StaStateMachineTest, LinkedStateGoOutStateSuccess, TestSize.Level1)
 {
-    LinkStateGoOutStateSuccess();
+    LinkedStateGoOutStateSuccess();
 }
 
-HWTEST_F(StaStateMachineTest, LinkStateExeMsgFail, TestSize.Level1)
+HWTEST_F(StaStateMachineTest, LinkedStateExeMsgFail, TestSize.Level1)
 {
-    LinkStateExeMsgFail();
+    LinkedStateExeMsgFail();
 }
 
 HWTEST_F(StaStateMachineTest, InitStaSMHandleMapSuccess, TestSize.Level1)

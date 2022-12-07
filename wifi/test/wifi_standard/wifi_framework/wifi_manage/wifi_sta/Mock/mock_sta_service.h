@@ -43,10 +43,10 @@ public:
     MOCK_CONST_METHOD1(RegisterStaServiceCallback, void(const StaServiceCallback &callbacks));
     MOCK_CONST_METHOD2(ConnectToCandidateConfig, ErrCode(const int uid, const int networkId));
     MOCK_CONST_METHOD2(RemoveCandidateConfig, ErrCode(const int uid, const int networkId));
-    MOCK_CONST_METHOD1(RemoveAllCandidateConfig, int(const int uid));
+    MOCK_CONST_METHOD1(RemoveAllCandidateConfig, ErrCode(const int uid));
     MOCK_CONST_METHOD1(SetSuspendMode, ErrCode(bool mode));
-    MOCK_CONST_METHOD1(RemoveAllDevice, ErrCode());
-    MOCK_CONST_METHOD1(AddCandidateConfig, ErrCode(cconst int uid, const WifiDeviceConfig &config, int& netWorkId));
+    MOCK_CONST_METHOD0(RemoveAllDevice, ErrCode());
+    MOCK_CONST_METHOD3(AddCandidateConfig, ErrCode(cconst int uid, const WifiDeviceConfig &config, int& netWorkId));
 };
 }  // namespace OHOS
 }  // namespace OHOS

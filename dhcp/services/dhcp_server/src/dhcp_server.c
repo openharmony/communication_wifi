@@ -968,7 +968,7 @@ static uint32_t GetRequestIpAddress(PDhcpMsgInfo received)
     return reqIp;
 }
 
-static int GetYourIpAddress(PDhcpMsgInfo received, uint32_t *yourIpAddr)
+static int GetYourIpAddress(PDhcpMsgInfo received, uint32_t *yourIpAddr, DhcpAddressPool *pool)
 {
     uint32_t cliIp = received->packet.ciaddr;
     uint32_t srcIp = SourceIpAddress();
@@ -994,6 +994,11 @@ static int GetYourIpAddress(PDhcpMsgInfo received, uint32_t *yourIpAddr)
         *yourIpAddr = reqIp;
     }
 
+    if ((ntohl(*yourIpAddr) < ntohl(pool->addressRange.beginAddress))
+            || (ntohl(*yourIpAddr) > ntohl(pool->addressRange.endAddress))) {
+        return RET_FAILED;
+    }
+
     if (srcIp && srcIp != INADDR_BROADCAST) {
         DestinationAddr(srcIp);
     } else if (srcIp == INADDR_ANY) {
@@ -1005,7 +1010,7 @@ static int GetYourIpAddress(PDhcpMsgInfo received, uint32_t *yourIpAddr)
 static int NotBindingRequest(DhcpAddressPool *pool, PDhcpMsgInfo received, PDhcpMsgInfo reply)
 {
     uint32_t yourIpAddr = 0;
-    if (GetYourIpAddress(received, &yourIpAddr) != RET_SUCCESS) {
+    if (GetYourIpAddress(received, &yourIpAddr, pool) != RET_SUCCESS) {
         return REPLY_NONE;
     }
     AddressBinding *lease = GetLease(pool, yourIpAddr);
@@ -1064,8 +1069,16 @@ static int ValidateRequestMessage(const PDhcpServerContext ctx, const PDhcpMsgIn
     if (!srvIns) {
         return RET_FAILED;
     }
-    if (GetYourIpAddress(received, &yourIpAddr) != RET_SUCCESS) {
+    if (GetYourIpAddress(received, &yourIpAddr, &srvIns->addressPool) != RET_SUCCESS) {
         if (yourIpAddr && yourIpAddr != INADDR_BROADCAST) {
+            AddressBinding *lease = GetLease(&srvIns->addressPool, yourIpAddr);
+            if (lease) {
+                RemoveLease(&srvIns->addressPool, lease);
+                LOGD("lease recoder has been removed.");
+            } else {
+                LOGW("can't found lease recoder.");
+            }
+            RemoveBinding(received->packet.chaddr);
             return REPLY_NAK;
         }
         return REPLY_NONE;

@@ -41,6 +41,12 @@ public:
     MOCK_CONST_METHOD1(SetCountryCode, ErrCode(const std::string &countryCode));
     MOCK_METHOD1(AutoConnectService, ErrCode(const std::vector<InterScanInfo> &scanInfos));
     MOCK_CONST_METHOD1(RegisterStaServiceCallback, void(const StaServiceCallback &callbacks));
+    MOCK_CONST_METHOD2(ConnectToCandidateConfig, ErrCode(const int uid, const int networkId));
+    MOCK_CONST_METHOD2(RemoveCandidateConfig, ErrCode(const int uid, const int networkId));
+    MOCK_CONST_METHOD1(RemoveAllCandidateConfig, ErrCode(const int uid));
+    MOCK_CONST_METHOD1(SetSuspendMode, ErrCode(bool mode));
+    MOCK_CONST_METHOD0(RemoveAllDevice, ErrCode());
+    MOCK_CONST_METHOD3(AddCandidateConfig, ErrCode(const int uid, const WifiDeviceConfig &config, int& netWorkId));
 };
 }  // namespace OHOS
 }  // namespace OHOS

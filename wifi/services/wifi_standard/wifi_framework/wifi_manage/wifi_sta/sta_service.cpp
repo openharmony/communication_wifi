@@ -81,6 +81,27 @@ ErrCode StaService::InitStaService(const StaServiceCallback &callbacks)
 
     pStaMonitor->SetStateMachine(pStaStateMachine);
 
+    std::vector<int> freqs2G;
+    std::vector<int> freqs5G;
+    WifiErrorNo ret = WifiStaHalInterface::GetInstance().GetSupportFrequencies(SCAN_BAND_24_GHZ, freqs2G);
+    if (ret != WIFI_IDL_OPT_OK) {
+        WIFI_LOGE("get 2g frequencies failed.");
+        WifiSettings::GetInstance().SetDefaultFrequenciesByCountryBand(BandType::BAND_2GHZ, freqs2G);
+    }
+    ret = WifiStaHalInterface::GetInstance().GetSupportFrequencies(SCAN_BAND_5_GHZ, freqs2G);
+    if (ret != WIFI_IDL_OPT_OK) {
+        WIFI_LOGE("get 5g frequencies failed.");
+        WifiSettings::GetInstance().SetDefaultFrequenciesByCountryBand(BandType::BAND_5GHZ, freqs5G);
+    }
+    std::vector<int32_t> supp2Gfreqs(freqs2G.begin(), freqs2G.end());
+    std::vector<int32_t> supp5Gfreqs(freqs5G.begin(), freqs5G.end());
+    ChannelsTable ChanTbs;
+    ChanTbs[BandType::BAND_2GHZ] = supp2Gfreqs;
+    ChanTbs[BandType::BAND_5GHZ] = supp5Gfreqs;
+    if (WifiSettings::GetInstance().SetValidChannels(ChanTbs)) {
+        WIFI_LOGE("%{public}s, fail to SetValidChannels", __func__);
+    }
+
     pStaAutoConnectService = new (std::nothrow) StaAutoConnectService(pStaStateMachine);
     if (pStaAutoConnectService == nullptr) {
         WIFI_LOGE("Alloc pStaAutoConnectService failed.\n");

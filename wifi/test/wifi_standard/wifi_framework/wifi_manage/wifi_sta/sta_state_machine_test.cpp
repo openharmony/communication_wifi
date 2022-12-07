@@ -2211,6 +2211,5 @@ HWTEST_F(StaStateMachineTest, DealConnectionEventSuccess, TestSize.Level1)
 {
     DealReConnectCmdSuccess();
 }
-
 } // namespace Wifi
 } // namespace OHOS

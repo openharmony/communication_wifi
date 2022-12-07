@@ -39,11 +39,15 @@ int WifiServiceManager::Init()
 #ifdef OHOS_ARCH_LITE
     mServiceDllMap.insert(std::make_pair(WIFI_SERVICE_STA, "libwifi_sta_service.so"));
     mServiceDllMap.insert(std::make_pair(WIFI_SERVICE_SCAN, "libwifi_scan_service.so"));
+    mStaServiceHandle.Clear();
+    mScanServiceHandle.Clear();
 #ifdef FEATURE_AP_SUPPORT
     mServiceDllMap.insert(std::make_pair(WIFI_SERVICE_AP, "libwifi_ap_service.so"));
+    mApServiceHandle.Clear();
 #endif
 #ifdef FEATURE_P2P_SUPPORT
     mServiceDllMap.insert(std::make_pair(WIFI_SERVICE_P2P, "libwifi_p2p_service.so"));
+    mP2pServiceHandle.Clear();
 #endif
     mServiceDllMap.insert(std::make_pair(WIFI_SERVICE_AWARE, "libwifi_aware_service.so"));
 #else
@@ -132,8 +136,11 @@ int WifiServiceManager::LoadScanService(const std::string &dlname, bool bCreate)
         mScanServiceHandle.Clear();
         return -1;
     }
+    WIFI_LOGI("WifiServiceManager::LoadScanService bCreate:%{public}d",bCreate);
     if (bCreate) {
         mScanServiceHandle.pService = mScanServiceHandle.create();
+        WIFI_LOGI("WifiServiceManager::LoadScanService pService:%{public}p",(void*)mScanServiceHandle.pService);
+
     }
     return 0;
 }

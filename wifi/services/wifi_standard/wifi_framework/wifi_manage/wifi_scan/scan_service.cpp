@@ -103,13 +103,16 @@ bool ScanService::InitScanService(const IScanSerivceCallbacks &scanSerivceCallba
         WIFI_LOGE("GetSupportFrequencies failed.\n");
     }
 
-    std::vector<int32_t> supp2Gfreqs(freqs2G.begin(), freqs2G.end());
-    std::vector<int32_t> supp5Gfreqs(freqs5G.begin(), freqs5G.end());
     ChannelsTable ChanTbs;
-    ChanTbs[BandType::BAND_2GHZ] = supp2Gfreqs;
-    ChanTbs[BandType::BAND_5GHZ] = supp5Gfreqs;
-    if (WifiSettings::GetInstance().SetValidChannels(ChanTbs)) {
-        WIFI_LOGE("%{public}s, fail to SetValidChannels", __func__);
+    (void)WifiSettings::GetInstance().GetValidChannels(ChanTbs);
+    if (ChanTbs[BandType::BAND_2GHZ].size() == 0) {
+        std::vector<int32_t> supp2Gfreqs(freqs2G.begin(), freqs2G.end());
+        std::vector<int32_t> supp5Gfreqs(freqs5G.begin(), freqs5G.end());
+        ChanTbs[BandType::BAND_2GHZ] = supp2Gfreqs;
+        ChanTbs[BandType::BAND_5GHZ] = supp5Gfreqs;
+        if (WifiSettings::GetInstance().SetValidChannels(ChanTbs)) {
+            WIFI_LOGE("%{public}s, fail to SetValidChannels", __func__);
+        }
     }
     pScanMonitor->SetScanStateMachine(pScanStateMachine);
     pScanStateMachine->SendMessage(static_cast<int>(CMD_SCAN_PREPARE));

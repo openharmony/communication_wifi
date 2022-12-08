@@ -86,12 +86,14 @@ ErrCode StaService::InitStaService(const StaServiceCallback &callbacks)
     if (ChanTbs[BandType::BAND_2GHZ].size() == 0) {
         std::vector<int> freqs2G;
         std::vector<int> freqs5G;
-        WifiErrorNo ret = WifiStaHalInterface::GetInstance().GetSupportFrequencies(BandType::BAND_2GHZ, freqs2G);
+        int band = static_cast<int>(BandType::BAND_2GHZ);
+        WifiErrorNo ret = WifiStaHalInterface::GetInstance().GetSupportFrequencies(band, freqs2G);
         if (ret != WIFI_IDL_OPT_OK) {
             WIFI_LOGE("get 2g frequencies failed.");
             WifiSettings::GetInstance().SetDefaultFrequenciesByCountryBand(BandType::BAND_2GHZ, freqs2G);
         }
-        ret = WifiStaHalInterface::GetInstance().GetSupportFrequencies(BandType::BAND_5GHZ, freqs5G);
+        band = static_cast<int>(BandType::BAND_5GHZ);
+        ret = WifiStaHalInterface::GetInstance().GetSupportFrequencies(band, freqs5G);
         if (ret != WIFI_IDL_OPT_OK) {
             WIFI_LOGE("get 5g frequencies failed.");
             WifiSettings::GetInstance().SetDefaultFrequenciesByCountryBand(BandType::BAND_5GHZ, freqs5G);

@@ -43,6 +43,7 @@ constexpr int BAND = 2;
 constexpr int FREQUENCY = 2437;
 constexpr int TIMESTAMP = -750366468;
 constexpr int UID = 5225;
+constexpr int TWO = 2;
 
 class StaServiceTest : public testing::Test {
 public:
@@ -542,7 +543,7 @@ void StaServiceTest::StaServiceAddCandidateConfigTestSucc()
     int netWorkId = NETWORK_ID;
     EXPECT_CALL(WifiSettings::GetInstance(), GetAllCandidateConfig(_, _)).Times(AtLeast(1));
     EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(config.ssid, config.keyMgmt, _))
-        .WillOnce(DoAll(SetArgReferee<2>(config), Return(0)));
+        .WillOnce(DoAll(SetArgReferee<TWO>(config), Return(0)));
     EXPECT_CALL(WifiStaHalInterface::GetInstance(), GetNextNetworkId(_))
         .WillRepeatedly(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
     EXPECT_TRUE(pStaService->AddCandidateConfig(uid, config, netWorkId) == WIFI_OPT_SUCCESS);
@@ -574,7 +575,7 @@ void StaServiceTest::StaServiceAddCandidateConfigTestFail1()
     int netWorkId = NETWORK_ID;
     EXPECT_CALL(WifiSettings::GetInstance(), GetAllCandidateConfig(_, _)).Times(AtLeast(1));
     EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(config.ssid, config.keyMgmt, _))
-        .WillOnce(DoAll(SetArgReferee<2>(config), Return(1)));
+        .WillOnce(DoAll(SetArgReferee<TWO>(config), Return(1)));
     EXPECT_CALL(WifiStaHalInterface::GetInstance(), GetNextNetworkId(_))
         .WillRepeatedly(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED));
     EXPECT_TRUE(pStaService->AddCandidateConfig(uid, config, netWorkId) == WIFI_OPT_FAILED);
@@ -625,7 +626,7 @@ void StaServiceTest::StaServiceConnectToCandidateConfigTestSucc()
     int uid = UID;
     int netWorkId = NETWORK_ID;
     EXPECT_CALL(WifiSettings::GetInstance(), GetCandidateConfig(_, _, _))
-        .WillOnce(DoAll(SetArgReferee<2>(config), Return(0)));
+        .WillOnce(DoAll(SetArgReferee<TWO>(config), Return(0)));
     EXPECT_TRUE(pStaService->ConnectToCandidateConfig(uid, netWorkId) == WIFI_OPT_SUCCESS);
 }
 
@@ -640,7 +641,7 @@ void StaServiceTest::StaServiceConnectToCandidateConfigTestFail0()
     int uid = UID;
     int netWorkId = NETWORK_ID;
     EXPECT_CALL(WifiSettings::GetInstance(), GetCandidateConfig(_, _, _))
-        .WillOnce(DoAll(SetArgReferee<2>(config), Return(0)));
+        .WillOnce(DoAll(SetArgReferee<TWO>(config), Return(0)));
     EXPECT_TRUE(pStaService->ConnectToCandidateConfig(uid, netWorkId) == WIFI_OPT_NOT_SUPPORTED);
 }
 
@@ -655,7 +656,7 @@ void StaServiceTest::StaServiceConnectToCandidateConfigTestFail1()
     int uid = UID;
     int netWorkId = NETWORK_ID;
     EXPECT_CALL(WifiSettings::GetInstance(), GetCandidateConfig(_, _, _))
-        .WillOnce(DoAll(SetArgReferee<2>(config), Return(-1)));
+        .WillOnce(DoAll(SetArgReferee<TWO>(config), Return(-1)));
     EXPECT_TRUE(pStaService->ConnectToCandidateConfig(uid, netWorkId) == WIFI_OPT_FAILED);
 }
 

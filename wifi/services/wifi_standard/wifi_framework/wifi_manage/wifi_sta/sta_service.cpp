@@ -81,9 +81,9 @@ ErrCode StaService::InitStaService(const StaServiceCallback &callbacks)
 
     pStaMonitor->SetStateMachine(pStaStateMachine);
 
-    ChannelsTable ChanTbs;
-    (void)WifiSettings::GetInstance().GetValidChannels(ChanTbs);
-    if (ChanTbs[BandType::BAND_2GHZ].size() == 0) {
+    ChannelsTable chanTbs;
+    (void)WifiSettings::GetInstance().GetValidChannels(chanTbs);
+    if (chanTbs[BandType::BAND_2GHZ].size() == 0) {
         std::vector<int> freqs2G;
         std::vector<int> freqs5G;
         int band = static_cast<int>(BandType::BAND_2GHZ);
@@ -100,9 +100,9 @@ ErrCode StaService::InitStaService(const StaServiceCallback &callbacks)
         }
         std::vector<int32_t> supp2Gfreqs(freqs2G.begin(), freqs2G.end());
         std::vector<int32_t> supp5Gfreqs(freqs5G.begin(), freqs5G.end());
-        ChanTbs[BandType::BAND_2GHZ] = supp2Gfreqs;
-        ChanTbs[BandType::BAND_5GHZ] = supp5Gfreqs;
-        if (WifiSettings::GetInstance().SetValidChannels(ChanTbs)) {
+        chanTbs[BandType::BAND_2GHZ] = supp2Gfreqs;
+        chanTbs[BandType::BAND_5GHZ] = supp5Gfreqs;
+        if (WifiSettings::GetInstance().SetValidChannels(chanTbs)) {
             WIFI_LOGE("%{public}s, fail to SetValidChannels", __func__);
         }
     }

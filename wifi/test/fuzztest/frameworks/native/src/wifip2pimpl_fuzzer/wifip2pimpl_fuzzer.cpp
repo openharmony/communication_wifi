@@ -125,7 +125,7 @@ namespace Wifi {
     void SetP2pWfdInfoTest(const uint8_t* data, size_t size)
     {
         WifiP2pWfdInfo wfdInfo;
-        if (size >= Four) {
+        if (size >= FOUR) {
             int index = 0;
             bool wfdEnabled = (static_cast<int>(data[index++]) % TWO) ? true : false;
             int deviceInfo = static_cast<int>(data[index++]);

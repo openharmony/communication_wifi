@@ -68,6 +68,8 @@ public:
     virtual std::string GetConnectTimeoutBssid() = 0;
     virtual int SetConnectTimeoutBssid(std::string &bssid) = 0;
     virtual int SetDeviceAfterConnect(int networkId) = 0;
+    virtual int GetCandidateConfig(const int uid, const int &networkId, WifiDeviceConfig &config) = 0;
+    virtual int GetAllCandidateConfig(const int uid, std::vector<WifiDeviceConfig> &configs) = 0;
 };
 
 class WifiSettings : public MockWifiSettings {
@@ -120,6 +122,8 @@ public:
     MOCK_METHOD0(GetConnectTimeoutBssid, std::string());
     MOCK_METHOD1(SetConnectTimeoutBssid, int(std::string &bssid));
     MOCK_METHOD1(SetDeviceAfterConnect, int(int networkId));
+    MOCK_METHOD3(GetCandidateConfig, int(const int uid, const int &networkId, WifiDeviceConfig &config));
+    MOCK_METHOD2(GetAllCandidateConfig, int(const int uid, std::vector<WifiDeviceConfig> &configs));
 };
 }  // namespace OHOS
 }  // namespace Wifi

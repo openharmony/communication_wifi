@@ -934,6 +934,9 @@ ErrCode WifiP2pServiceImpl::Hid2dGetChannelListFor5G(std::vector<int>& vecChanne
         vecChannelList = channels[BandType::BAND_5GHZ];
     }
 
+    if (vecChannelList.size() == 0) {
+        WifiSettings::GetInstance().SetDefaultFrequenciesByCountryBand(BandType::BAND_5GHZ, vecChannelList);
+    }
     std::string strChannel;
     for (auto channel : vecChannelList) {
         strChannel += std::to_string(channel) + ",";

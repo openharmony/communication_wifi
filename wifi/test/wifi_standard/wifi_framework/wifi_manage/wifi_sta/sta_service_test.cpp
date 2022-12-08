@@ -42,6 +42,7 @@ constexpr int NETWORK_ID = 15;
 constexpr int BAND = 2;
 constexpr int FREQUENCY = 2437;
 constexpr int TIMESTAMP = -750366468;
+constexpr int UID = 5225;
 
 class StaServiceTest : public testing::Test {
 public:
@@ -91,7 +92,19 @@ public:
     void StaServiceRegisterStaServiceCallbackSuccess();
     void StaServiceRegisterStaServiceCallbackFail();
     void StaServiceSetSuspendModeTest();
-
+    void StaServiceAddCandidateConfigTestSucc();
+    void StaServiceAddCandidateConfigTestFail0();
+    void StaServiceAddCandidateConfigTestFail1();
+    void StaServiceRemoveCandidateConfigTestSucc();
+    void StaServiceRemoveCandidateConfigTestFail();
+    void StaServiceRemoveAllCandidateConfigTestSucc();
+    void StaServiceConnectToCandidateConfigTestSucc();
+    void StaServiceConnectToCandidateConfigTestFail0();
+    void StaServiceConnectToCandidateConfigTestFail1();
+    void StaServiceRemoveAllDeviceTestSucc();
+    void StaServiceRemoveAllDeviceTestFail0();
+    void StaServiceRemoveAllDeviceTestFail1();
+    void StaServiceReConnectTestSucc();
 public:
     std::unique_ptr<StaService> pStaService;
 };
@@ -517,6 +530,170 @@ void StaServiceTest::StaServiceRegisterStaServiceCallbackFail()
     pStaService->RegisterStaServiceCallback(instance.GetStaCallback());
 }
 
+void StaServiceTest::StaServiceAddCandidateConfigTestSucc()
+{
+    WifiDeviceConfig config;
+    config.bssid = "01:23:45:67:89:AB";
+    config.band = BAND;
+    config.networkId = NETWORK_ID;
+    config.ssid = "networkId";
+    config.keyMgmt = "123456";
+    int uid = UID;
+    int netWorkId = NETWORK_ID;
+    EXPECT_CALL(WifiSettings::GetInstance(), GetAllCandidateConfig(_, _)).Times(AtLeast(1));
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(config.ssid, config.keyMgmt, _))
+        .WillOnce(DoAll(SetArgReferee<2>(config), Return(0)));
+    EXPECT_CALL(WifiStaHalInterface::GetInstance(), GetNextNetworkId(_))
+        .WillRepeatedly(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
+    EXPECT_TRUE(pStaService->AddCandidateConfig(uid, config, netWorkId) == WIFI_OPT_SUCCESS);
+}
+
+void StaServiceTest::StaServiceAddCandidateConfigTestFail0()
+{
+    WifiDeviceConfig config;
+    config.bssid = "01:23:45:67:89:AB";
+    config.band = BAND;
+    config.networkId = NETWORK_ID;
+    config.ssid = "networkId";
+    config.keyMgmt = "NONE";
+    int uid = UID;
+    int netWorkId = NETWORK_ID;
+    EXPECT_CALL(WifiSettings::GetInstance(), GetAllCandidateConfig(_, _)).Times(AtLeast(1));
+    EXPECT_TRUE(pStaService->AddCandidateConfig(uid, config, netWorkId) == WIFI_OPT_NOT_SUPPORTED);
+}
+
+void StaServiceTest::StaServiceAddCandidateConfigTestFail1()
+{
+    WifiDeviceConfig config;
+    config.bssid = "01:23:45:67:89:AB";
+    config.band = BAND;
+    config.networkId = NETWORK_ID;
+    config.ssid = "networkId";
+    config.keyMgmt = "123456";
+    int uid = UID;
+    int netWorkId = NETWORK_ID;
+    EXPECT_CALL(WifiSettings::GetInstance(), GetAllCandidateConfig(_, _)).Times(AtLeast(1));
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(config.ssid, config.keyMgmt, _))
+        .WillOnce(DoAll(SetArgReferee<2>(config), Return(1)));
+    EXPECT_CALL(WifiStaHalInterface::GetInstance(), GetNextNetworkId(_))
+        .WillRepeatedly(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED));
+    EXPECT_TRUE(pStaService->AddCandidateConfig(uid, config, netWorkId) == WIFI_OPT_FAILED);
+}
+
+void StaServiceTest::StaServiceRemoveCandidateConfigTestSucc()
+{
+    int uid = UID;
+    int networkId = NETWORK_ID;
+    EXPECT_CALL(WifiSettings::GetInstance(), GetCandidateConfig(_, _, _))
+    .WillRepeatedly(Return(0));
+    EXPECT_CALL(WifiStaHalInterface::GetInstance(), RemoveDevice(_))
+        .WillRepeatedly(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
+    EXPECT_CALL(WifiStaHalInterface::GetInstance(), SaveDeviceConfig())
+        .WillRepeatedly(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _)).Times(AtLeast(0)).WillRepeatedly(Return(1));
+    EXPECT_CALL(WifiSettings::GetInstance(), RemoveDevice(_)).Times(AtLeast(1));
+    EXPECT_CALL(WifiSettings::GetInstance(), SyncDeviceConfig()).Times(AtLeast(1));
+    EXPECT_TRUE(pStaService->RemoveCandidateConfig(uid, networkId) == WIFI_OPT_SUCCESS);
+}
+
+void StaServiceTest::StaServiceRemoveCandidateConfigTestFail()
+{
+    int uid = UID;
+    int networkId = NETWORK_ID;
+    EXPECT_CALL(WifiSettings::GetInstance(), GetCandidateConfig(_, _, _))
+    .WillRepeatedly(Return(-1));
+    EXPECT_TRUE(pStaService->RemoveCandidateConfig(uid, networkId) == WIFI_OPT_FAILED);
+}
+
+void StaServiceTest::StaServiceRemoveAllCandidateConfigTestSucc()
+{
+    int uid = UID;
+    EXPECT_CALL(WifiSettings::GetInstance(), GetAllCandidateConfig(_, _)).Times(AtLeast(1));
+    EXPECT_CALL(WifiStaHalInterface::GetInstance(), RemoveDevice(_))
+        .WillRepeatedly(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED));
+    EXPECT_TRUE(pStaService->RemoveAllCandidateConfig(uid) == WIFI_OPT_SUCCESS);
+}
+
+void StaServiceTest::StaServiceConnectToCandidateConfigTestSucc()
+{
+    WifiDeviceConfig config;
+    config.bssid = "01:23:45:67:89:AB";
+    config.band = BAND;
+    config.networkId = NETWORK_ID;
+    config.ssid = "networkId";
+    config.keyMgmt = "123456";
+    int uid = UID;
+    int netWorkId = NETWORK_ID;
+    EXPECT_CALL(WifiSettings::GetInstance(), GetCandidateConfig(_, _, _))
+        .WillOnce(DoAll(SetArgReferee<2>(config), Return(0)));
+    EXPECT_TRUE(pStaService->ConnectToCandidateConfig(uid, netWorkId) == WIFI_OPT_SUCCESS);
+}
+
+void StaServiceTest::StaServiceConnectToCandidateConfigTestFail0()
+{
+    WifiDeviceConfig config;
+    config.bssid = "01:23:45:67:89:AB";
+    config.band = BAND;
+    config.networkId = NETWORK_ID;
+    config.ssid = "networkId";
+    config.keyMgmt = "NONE";
+    int uid = UID;
+    int netWorkId = NETWORK_ID;
+    EXPECT_CALL(WifiSettings::GetInstance(), GetCandidateConfig(_, _, _))
+        .WillOnce(DoAll(SetArgReferee<2>(config), Return(0)));
+    EXPECT_TRUE(pStaService->ConnectToCandidateConfig(uid, netWorkId) == WIFI_OPT_NOT_SUPPORTED);
+}
+
+void StaServiceTest::StaServiceConnectToCandidateConfigTestFail1()
+{
+    WifiDeviceConfig config;
+    config.bssid = "01:23:45:67:89:AB";
+    config.band = BAND;
+    config.networkId = NETWORK_ID;
+    config.ssid = "networkId";
+    config.keyMgmt = "123456";
+    int uid = UID;
+    int netWorkId = NETWORK_ID;
+    EXPECT_CALL(WifiSettings::GetInstance(), GetCandidateConfig(_, _, _))
+        .WillOnce(DoAll(SetArgReferee<2>(config), Return(-1)));
+    EXPECT_TRUE(pStaService->ConnectToCandidateConfig(uid, netWorkId) == WIFI_OPT_FAILED);
+}
+
+void StaServiceTest::StaServiceRemoveAllDeviceTestSucc()
+{
+    EXPECT_CALL(WifiStaHalInterface::GetInstance(), ClearDeviceConfig())
+    .WillRepeatedly(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
+    EXPECT_CALL(WifiStaHalInterface::GetInstance(), SaveDeviceConfig())
+        .WillRepeatedly(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
+    EXPECT_CALL(WifiSettings::GetInstance(), ClearDeviceConfig()).Times(AtLeast(1));
+    EXPECT_CALL(WifiSettings::GetInstance(), SyncDeviceConfig())
+        .WillRepeatedly(Return(0));
+    EXPECT_TRUE(pStaService->RemoveAllDevice() == WIFI_OPT_SUCCESS);
+}
+
+void StaServiceTest::StaServiceRemoveAllDeviceTestFail0()
+{
+    EXPECT_CALL(WifiStaHalInterface::GetInstance(), ClearDeviceConfig())
+    .WillRepeatedly(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED));
+    EXPECT_TRUE(pStaService->RemoveAllDevice() == WIFI_OPT_FAILED);
+}
+
+void StaServiceTest::StaServiceRemoveAllDeviceTestFail1()
+{
+    EXPECT_CALL(WifiStaHalInterface::GetInstance(), ClearDeviceConfig())
+    .WillRepeatedly(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
+    EXPECT_CALL(WifiStaHalInterface::GetInstance(), SaveDeviceConfig())
+        .WillRepeatedly(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
+    EXPECT_CALL(WifiSettings::GetInstance(), ClearDeviceConfig()).Times(AtLeast(1));
+    EXPECT_CALL(WifiSettings::GetInstance(), SyncDeviceConfig())
+        .WillRepeatedly(Return(1));
+    EXPECT_TRUE(pStaService->RemoveAllDevice() == WIFI_OPT_FAILED);
+}
+
+void StaServiceTest::StaServiceReConnectTestSucc()
+{
+    EXPECT_TRUE(pStaService->ReConnect() == WIFI_OPT_SUCCESS);
+}
 /**
  * @tc.name: Set suspend mode test
  * @tc.desc: Set suspend mode test function.
@@ -694,6 +871,70 @@ HWTEST_F(StaServiceTest, StaServiceRegisterStaServiceCallbackFail, TestSize.Leve
     StaServiceRegisterStaServiceCallbackFail();
 }
 
+HWTEST_F(StaServiceTest, StaServiceAddCandidateConfigTestSucc, TestSize.Level1)
+{
+    StaServiceAddCandidateConfigTestSucc();
+}
+
+HWTEST_F(StaServiceTest, StaServiceAddCandidateConfigTestFail0, TestSize.Level1)
+{
+    StaServiceAddCandidateConfigTestFail0();
+}
+
+HWTEST_F(StaServiceTest, StaServiceAddCandidateConfigTestFail1, TestSize.Level1)
+{
+    StaServiceAddCandidateConfigTestFail1();
+}
+
+HWTEST_F(StaServiceTest, StaServiceRemoveCandidateConfigTestSucc, TestSize.Level1)
+{
+    StaServiceRemoveCandidateConfigTestSucc();
+}
+
+HWTEST_F(StaServiceTest, StaServiceRemoveCandidateConfigTestFail, TestSize.Level1)
+{
+    StaServiceRemoveCandidateConfigTestFail();
+}
+
+HWTEST_F(StaServiceTest, StaServiceRemoveAllCandidateConfigTestSucc, TestSize.Level1)
+{
+    StaServiceRemoveAllCandidateConfigTestSucc();
+}
+
+HWTEST_F(StaServiceTest, StaServiceConnectToCandidateConfigTestSucc, TestSize.Level1)
+{
+    StaServiceConnectToCandidateConfigTestSucc();
+}
+
+HWTEST_F(StaServiceTest, StaServiceConnectToCandidateConfigTestFail0, TestSize.Level1)
+{
+    StaServiceConnectToCandidateConfigTestFail0();
+}
+
+HWTEST_F(StaServiceTest, StaServiceConnectToCandidateConfigTestFail1, TestSize.Level1)
+{
+    StaServiceConnectToCandidateConfigTestFail1();
+}
+
+HWTEST_F(StaServiceTest, StaServiceRemoveAllDeviceTestSucc, TestSize.Level1)
+{
+    StaServiceRemoveAllDeviceTestSucc();
+}
+
+HWTEST_F(StaServiceTest, StaServiceRemoveAllDeviceTestFail0, TestSize.Level1)
+{
+    StaServiceRemoveAllDeviceTestFail0();
+}
+
+HWTEST_F(StaServiceTest, StaServiceRemoveAllDeviceTestFail1, TestSize.Level1)
+{
+    StaServiceRemoveAllDeviceTestFail1();
+}
+
+HWTEST_F(StaServiceTest, StaServiceReConnectTestSucc, TestSize.Level1)
+{
+    StaServiceReConnectTestSucc();
+}
 /**
  * @tc.name: Set suspend mode test
  * @tc.desc: Set suspend mode test function.

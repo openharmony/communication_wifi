@@ -218,6 +218,7 @@ enum class Phase2MethodJs {
     PHASE2_AKA,
     PHASE2_AKA_PRIME,
 };
+
 enum class WifiChannelWidthJs {
     WIDTH_20MHZ = 0,
     WIDTH_40MHZ = 1,
@@ -226,6 +227,13 @@ enum class WifiChannelWidthJs {
     WIDTH_80MHZ_PLUS = 4,
     WIDTH_INVALID
 };
+
+enum class PowerModelJs {
+    SLEEPING = 0,
+    GENERAL = 1,
+    THROUGH_WALL = 2
+};
+
 }  // namespace Wifi
 }  // namespace OHOS
 

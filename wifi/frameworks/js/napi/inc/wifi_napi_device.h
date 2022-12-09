@@ -54,26 +54,6 @@ napi_value GetSupportedFeatures(napi_env env, napi_callback_info info);
 napi_value IsFeatureSupported(napi_env env, napi_callback_info info);
 napi_value GetDeviceMacAddress(napi_env env, napi_callback_info info);
 
-enum class ConnStateJs {
-    SCANNING, /* The device is searching for an available AP */
-    CONNECTING, /* The Wi-Fi connection is being set up */
-    AUTHENTICATING, /* The Wi-Fi connection is being authenticated */
-    OBTAINING_IPADDR, /* The IP address of the Wi-Fi connection is being obtained */
-    CONNECTED, /* The Wi-Fi connection has been set up */
-    DISCONNECTING, /* The Wi-Fi connection is being torn down */
-    DISCONNECTED, /* The Wi-Fi connection has been torn down */
-    UNKNOWN /* Failed to set up the Wi-Fi connection */
-};
-
-enum class IpTypeJs {
-    /** Use statically configured IP settings */
-    IP_TYPE_STATIC,
-    /** Use dynamically configured IP settings */
-    IP_TYPE_DHCP,
-    /** No IP details are assigned */
-    IP_TYPE_UNKNOWN,
-};
-
 class ScanInfoAsyncContext : public AsyncContext {
 public:
     std::vector<WifiScanInfo> vecScanInfos;

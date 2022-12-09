@@ -90,6 +90,172 @@ static napi_value Init(napi_env env, napi_value exports) {
     NAPI_CALL(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(napi_property_descriptor), desc));
     return exports;
 }
+static napi_value PropertyValueInit(napi_env env, napi_value exports)
+{
+    napi_value securityTypeObj = SecurityTypeInit(env);
+    napi_value ipTypeObj = IpTypeInit(env);
+    napi_value connStateObj = ConnStateInit(env);
+    napi_value suppStateObj = SuppStateInit(env);
+    napi_value p2pConnStateObj = P2pConnStateInit(env);
+    napi_value p2pDeviceStateObj = P2pDeviceStateInit(env);
+    napi_value groupOwnerBandObj = GroupOwnerBandInit(env);
+    napi_value phase2MethodObj = Phase2MethodInit(env);
+    napi_value WifiChannelWidthObj = WifiChannelWidthInit(env);
+    napi_value EapMethodObj = EapMethodInit(env);
+    napi_property_descriptor exportFuncs[] = {
+#ifdef ENABLE_NAPI_WIFI_MANAGER
+        DECLARE_NAPI_PROPERTY("Phase2Method", phase2MethodObj),
+        DECLARE_NAPI_PROPERTY("WifiChannelWidth", WifiChannelWidthObj),
+        DECLARE_NAPI_PROPERTY("EapMethod", EapMethodObj),
+#endif
+        DECLARE_NAPI_PROPERTY("WifiSecurityType", securityTypeObj),
+        DECLARE_NAPI_PROPERTY("IpType", ipTypeObj),
+        DECLARE_NAPI_PROPERTY("ConnState", connStateObj),
+        DECLARE_NAPI_PROPERTY("SuppState", suppStateObj),
+        DECLARE_NAPI_PROPERTY("P2pConnectState", p2pConnStateObj),
+        DECLARE_NAPI_PROPERTY("P2pDeviceState", p2pDeviceStateObj),
+        DECLARE_NAPI_PROPERTY("GroupOwnerBand", groupOwnerBandObj)
+    };
+    napi_define_properties(env, exports, sizeof(exportFuncs) / sizeof(*exportFuncs), exportFuncs);
+    return exports;
+}
+
+static napi_value SecurityTypeInit(napi_env env)
+{
+    napi_value securityType = nullptr;
+    napi_create_object(env, &securityType);
+    SetNamedPropertyByInteger(env, securityType, static_cast<int>(SecTypeJs::SEC_TYPE_INVALID), "WIFI_SEC_TYPE_INVALID");
+    SetNamedPropertyByInteger(env, securityType, static_cast<int>(SecTypeJs::SEC_TYPE_OPEN), "WIFI_SEC_TYPE_OPEN");
+    SetNamedPropertyByInteger(env, securityType, static_cast<int>(SecTypeJs::SEC_TYPE_WEP), "WIFI_SEC_TYPE_WEP");
+    SetNamedPropertyByInteger(env, securityType, static_cast<int>(SecTypeJs::SEC_TYPE_PSK), "WIFI_SEC_TYPE_PSK");
+    SetNamedPropertyByInteger(env, securityType, static_cast<int>(SecTypeJs::SEC_TYPE_SAE), "WIFI_SEC_TYPE_SAE");
+#ifdef ENABLE_NAPI_WIFI_MANAGER
+    SetNamedPropertyByInteger(env, securityType, static_cast<int>(SecTypeJs::SEC_TYPE_EAP), "WIFI_SEC_TYPE_EAP");
+    SetNamedPropertyByInteger(env, securityType, static_cast<int>(SecTypeJs::SEC_TYPE_EAP_SUITE_B), "WIFI_SEC_TYPE_EAP_SUITE_B");
+    SetNamedPropertyByInteger(env, securityType, static_cast<int>(SecTypeJs::SEC_TYPE_OWE), "WIFI_SEC_TYPE_OWE");
+    SetNamedPropertyByInteger(env, securityType, static_cast<int>(SecTypeJs::SEC_TYPE_WAPI_CERT), "WIFI_SEC_TYPE_WAPI_CERT");
+    SetNamedPropertyByInteger(env, securityType, static_cast<int>(SecTypeJs::SEC_TYPE_WAPI_PSK), "WIFI_SEC_TYPE_WAPI_PSK");
+#endif
+    return securityType;
+}
+
+static napi_value IpTypeInit(napi_env env)
+{
+    napi_value IpType = nullptr;
+    napi_create_object(env, &IpType);
+    SetNamedPropertyByInteger(env, IpType, static_cast<int>(IpTypeJs::IP_TYPE_STATIC), "STATIC");
+    SetNamedPropertyByInteger(env, IpType, static_cast<int>(IpTypeJs::IP_TYPE_DHCP), "DHCP");
+    SetNamedPropertyByInteger(env, IpType, static_cast<int>(IpTypeJs::IP_TYPE_UNKNOWN), "UNKNOWN");
+    return IpType;
+}
+
+static napi_value ConnStateInit(napi_env env)
+{
+    napi_value connState = nullptr;
+    napi_create_object(env, &connState);
+    SetNamedPropertyByInteger(env, connState, static_cast<int>(ConnStateJs::SCANNING), "SCANNING");
+    SetNamedPropertyByInteger(env, connState, static_cast<int>(ConnStateJs::CONNECTING), "CONNECTING");
+    SetNamedPropertyByInteger(env, connState, static_cast<int>(ConnStateJs::AUTHENTICATING), "AUTHENTICATING");
+    SetNamedPropertyByInteger(env, connState, static_cast<int>(ConnStateJs::OBTAINING_IPADDR), "OBTAINING_IPADDR");
+    SetNamedPropertyByInteger(env, connState, static_cast<int>(ConnStateJs::CONNECTED), "CONNECTED");
+    SetNamedPropertyByInteger(env, connState, static_cast<int>(ConnStateJs::DISCONNECTING), "DISCONNECTING");
+    SetNamedPropertyByInteger(env, connState, static_cast<int>(ConnStateJs::DISCONNECTED), "DISCONNECTED");
+    SetNamedPropertyByInteger(env, connState, static_cast<int>(ConnStateJs::UNKNOWN), "UNKNOWN");
+    return connState;
+}
+
+static napi_value SuppStateInit(napi_env env)
+{
+    napi_value suppState = nullptr;
+    napi_create_object(env, &suppState);
+    SetNamedPropertyByInteger(env, suppState, static_cast<int>(SuppStateJs::DISCONNECTED), "DISCONNECTED");
+    SetNamedPropertyByInteger(env, suppState, static_cast<int>(SuppStateJs::INTERFACE_DISABLED), "INTERFACE_DISABLED");
+    SetNamedPropertyByInteger(env, suppState, static_cast<int>(SuppStateJs::INACTIVE), "INACTIVE");
+    SetNamedPropertyByInteger(env, suppState, static_cast<int>(SuppStateJs::SCANNING), "SCANNING");
+    SetNamedPropertyByInteger(env, suppState, static_cast<int>(SuppStateJs::AUTHENTICATING), "AUTHENTICATING");
+    SetNamedPropertyByInteger(env, suppState, static_cast<int>(SuppStateJs::ASSOCIATING), "ASSOCIATING");
+    SetNamedPropertyByInteger(env, suppState, static_cast<int>(SuppStateJs::ASSOCIATED), "ASSOCIATED");
+    SetNamedPropertyByInteger(env, suppState, static_cast<int>(SuppStateJs::FOUR_WAY_HANDSHAKE), "FOUR_WAY_HANDSHAKE");
+    SetNamedPropertyByInteger(env, suppState, static_cast<int>(SuppStateJs::GROUP_HANDSHAKE), "GROUP_HANDSHAKE");
+    SetNamedPropertyByInteger(env, suppState, static_cast<int>(SuppStateJs::COMPLETED), "COMPLETED");
+    SetNamedPropertyByInteger(env, suppState, static_cast<int>(SuppStateJs::UNINITIALIZED), "UNINITIALIZED");
+    SetNamedPropertyByInteger(env, suppState, static_cast<int>(SuppStateJs::INVALID), "INVALID");
+    return suppState;
+}
+
+static napi_value P2pConnStateInit(napi_env env)
+{
+    napi_value p2pConnState = nullptr;
+    napi_create_object(env, &p2pConnState);
+    SetNamedPropertyByInteger(env, p2pConnState, static_cast<int>(P2pConnectStateJs::DISCONNECTED), "DISCONNECTED");
+    SetNamedPropertyByInteger(env, p2pConnState, static_cast<int>(P2pConnectStateJs::CONNECTED), "CONNECTED");
+    return p2pConnState;
+}
+
+static napi_value P2pDeviceStateInit(napi_env env)
+{
+    napi_value p2pDeviceState = nullptr;
+    napi_create_object(env, &p2pDeviceState);
+    SetNamedPropertyByInteger(env, p2pDeviceState, static_cast<int>(P2pDeviceStatusJs::CONNECTED), "CONNECTED");
+    SetNamedPropertyByInteger(env, p2pDeviceState, static_cast<int>(P2pDeviceStatusJs::INVITED), "INVITED");
+    SetNamedPropertyByInteger(env, p2pDeviceState, static_cast<int>(P2pDeviceStatusJs::FAILED), "FAILED");
+    SetNamedPropertyByInteger(env, p2pDeviceState, static_cast<int>(P2pDeviceStatusJs::AVAILABLE), "AVAILABLE");
+    SetNamedPropertyByInteger(env, p2pDeviceState, static_cast<int>(P2pDeviceStatusJs::UNAVAILABLE), "UNAVAILABLE");
+    return p2pDeviceState;
+}
+
+static napi_value GroupOwnerBandInit(napi_env env)
+{
+    napi_value groupOwnerBand = nullptr;
+    napi_create_object(env, &groupOwnerBand);
+    SetNamedPropertyByInteger(env, groupOwnerBand, static_cast<int>(GroupOwnerBandJs::GO_BAND_AUTO), "GO_BAND_AUTO");
+    SetNamedPropertyByInteger(env, groupOwnerBand, static_cast<int>(GroupOwnerBandJs::GO_BAND_2GHZ), "GO_BAND_2GHZ");
+    SetNamedPropertyByInteger(env, groupOwnerBand, static_cast<int>(GroupOwnerBandJs::GO_BAND_5GHZ), "GO_BAND_5GHZ");
+    return groupOwnerBand;
+}
+
+static napi_value Phase2MethodInit(napi_env env)
+{
+    napi_value phase2Method = nullptr;
+    napi_create_object(env, &phase2Method);
+    SetNamedPropertyByInteger(env, phase2Method, static_cast<int>(Phase2MethodJs::PHASE2_NONE), "PHASE2_NONE");
+    SetNamedPropertyByInteger(env, phase2Method, static_cast<int>(Phase2MethodJs::PHASE2_PAP), "PHASE2_PAP");
+    SetNamedPropertyByInteger(env, phase2Method, static_cast<int>(Phase2MethodJs::PHASE2_MSCHAP), "PHASE2_MSCHAP");
+    SetNamedPropertyByInteger(env, phase2Method, static_cast<int>(Phase2MethodJs::PHASE2_MSCHAPV2), "PHASE2_MSCHAPV2");
+    SetNamedPropertyByInteger(env, phase2Method, static_cast<int>(Phase2MethodJs::PHASE2_GTC), "PHASE2_GTC");
+    SetNamedPropertyByInteger(env, phase2Method, static_cast<int>(Phase2MethodJs::PHASE2_SIM), "PHASE2_SIM");
+    SetNamedPropertyByInteger(env, phase2Method, static_cast<int>(Phase2MethodJs::PHASE2_AKA), "PHASE2_AKA");
+    SetNamedPropertyByInteger(env, phase2Method, static_cast<int>(Phase2MethodJs::PHASE2_AKA_PRIME), "PHASE2_AKA_PRIME");
+    return phase2Method;
+}
+static napi_value WifiChannelWidthInit(napi_env env)
+{
+    napi_value wifiChannelWidth = nullptr;
+    napi_create_object(env, &wifiChannelWidth);
+    SetNamedPropertyByInteger(env, wifiChannelWidth, static_cast<int>(WifiChannelWidthJs::WIDTH_20MHZ), "WIDTH_20MHZ");
+    SetNamedPropertyByInteger(env, wifiChannelWidth, static_cast<int>(WifiChannelWidthJs::WIDTH_40MHZ), "WIDTH_40MHZ");
+    SetNamedPropertyByInteger(env, wifiChannelWidth, static_cast<int>(WifiChannelWidthJs::WIDTH_80MHZ), "WIDTH_80MHZ");
+    SetNamedPropertyByInteger(env, wifiChannelWidth, static_cast<int>(WifiChannelWidthJs::WIDTH_160MHZ), "WIDTH_160MHZ");
+    SetNamedPropertyByInteger(env, wifiChannelWidth, static_cast<int>(WifiChannelWidthJs::WIDTH_80MHZ_PLUS), "WIDTH_80MHZ_PLUS");
+    SetNamedPropertyByInteger(env, wifiChannelWidth, static_cast<int>(WifiChannelWidthJs::WIDTH_INVALID), "WIDTH_INVALID");
+    return wifiChannelWidth;
+}
+
+static napi_value EapMethodInit(napi_env env)
+{
+    napi_value eapMethod = nullptr;
+    napi_create_object(env, &eapMethod);
+    SetNamedPropertyByInteger(env, eapMethod, static_cast<int>(EapMethodJs::EAP_NONE), "EAP_NONE");
+    SetNamedPropertyByInteger(env, eapMethod, static_cast<int>(EapMethodJs::EAP_PEAP), "EAP_PEAP");
+    SetNamedPropertyByInteger(env, eapMethod, static_cast<int>(EapMethodJs::EAP_TLS), "EAP_TLS");
+    SetNamedPropertyByInteger(env, eapMethod, static_cast<int>(EapMethodJs::EAP_TTLS), "EAP_TTLS");
+    SetNamedPropertyByInteger(env, eapMethod, static_cast<int>(EapMethodJs::EAP_PWD), "EAP_PWD");
+    SetNamedPropertyByInteger(env, eapMethod, static_cast<int>(EapMethodJs::EAP_SIM), "EAP_SIM");
+    SetNamedPropertyByInteger(env, eapMethod, static_cast<int>(EapMethodJs::EAP_AKA), "EAP_AKA");
+    SetNamedPropertyByInteger(env, eapMethod, static_cast<int>(EapMethodJs::EAP_AKA_PRIME), "EAP_AKA_PRIME");
+    SetNamedPropertyByInteger(env, eapMethod, static_cast<int>(EapMethodJs::EAP_UNAUTH_TLS), "EAP_UNAUTH_TLS");
+    return eapMethod;
+}
 
 static napi_module wifiJsModule = {
     .nm_version = 1,

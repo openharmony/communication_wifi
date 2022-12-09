@@ -523,7 +523,7 @@ static int BeginLooper(PDhcpServerContext ctx)
         ClearOptions(&reply.options);
         int recvRet = ReceiveDhcpMessage(ctx->instance->serverFd, &from);
         if (recvRet == RET_ERROR || recvRet == ERR_SELECT) {
-            break;
+            continue;
         }
         if (ContinueReceive(&from, recvRet)) {
             continue;

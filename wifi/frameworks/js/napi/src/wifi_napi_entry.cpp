@@ -169,9 +169,11 @@ static napi_value PropertyValueInit(napi_env env, napi_value exports)
     napi_value p2pConnStateObj = P2pConnStateInit(env);
     napi_value p2pDeviceStateObj = P2pDeviceStateInit(env);
     napi_value groupOwnerBandObj = GroupOwnerBandInit(env);
+#ifdef ENABLE_NAPI_WIFI_MANAGER
     napi_value phase2MethodObj = Phase2MethodInit(env);
     napi_value WifiChannelWidthObj = WifiChannelWidthInit(env);
     napi_value EapMethodObj = EapMethodInit(env);
+#endif
     napi_property_descriptor exportFuncs[] = {
 #ifdef ENABLE_NAPI_WIFI_MANAGER
         DECLARE_NAPI_PROPERTY("Phase2Method", phase2MethodObj),

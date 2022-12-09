@@ -117,6 +117,7 @@ static napi_value GroupOwnerBandInit(napi_env env)
     return groupOwnerBand;
 }
 
+#ifdef ENABLE_NAPI_WIFI_MANAGER
 static napi_value Phase2MethodInit(napi_env env)
 {
     napi_value phase2Method = nullptr;
@@ -159,6 +160,7 @@ static napi_value EapMethodInit(napi_env env)
     SetNamedPropertyByInteger(env, eapMethod, static_cast<int>(EapMethodJs::EAP_UNAUTH_TLS), "EAP_UNAUTH_TLS");
     return eapMethod;
 }
+#endif
 
 static napi_value PropertyValueInit(napi_env env, napi_value exports)
 {

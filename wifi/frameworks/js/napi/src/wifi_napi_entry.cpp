@@ -26,6 +26,7 @@ namespace Wifi {
  * Module initialization function
  */
 static napi_value Init(napi_env env, napi_value exports) {
+    napi_value PropertyValueInit(env, exports);
     napi_property_descriptor desc[] = {
         DECLARE_NAPI_FUNCTION("enableWifi", EnableWifi),
         DECLARE_NAPI_FUNCTION("disableWifi", DisableWifi),

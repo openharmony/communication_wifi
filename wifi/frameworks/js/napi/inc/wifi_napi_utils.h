@@ -118,7 +118,7 @@ enum class SecTypeJs {
     SEC_TYPE_WAPI_CERT = 8,
     /** WAPI pre-shared key to be specified. */
     SEC_TYPE_WAPI_PSK = 9,
-}
+};
 #else
 enum class SecTypeJs {
     SEC_TYPE_INVALID = 0, /* Invalid security type */

@@ -91,35 +91,6 @@ static napi_value Init(napi_env env, napi_value exports) {
     NAPI_CALL(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(napi_property_descriptor), desc));
     return exports;
 }
-static napi_value PropertyValueInit(napi_env env, napi_value exports)
-{
-    napi_value securityTypeObj = SecurityTypeInit(env);
-    napi_value ipTypeObj = IpTypeInit(env);
-    napi_value connStateObj = ConnStateInit(env);
-    napi_value suppStateObj = SuppStateInit(env);
-    napi_value p2pConnStateObj = P2pConnStateInit(env);
-    napi_value p2pDeviceStateObj = P2pDeviceStateInit(env);
-    napi_value groupOwnerBandObj = GroupOwnerBandInit(env);
-    napi_value phase2MethodObj = Phase2MethodInit(env);
-    napi_value WifiChannelWidthObj = WifiChannelWidthInit(env);
-    napi_value EapMethodObj = EapMethodInit(env);
-    napi_property_descriptor exportFuncs[] = {
-#ifdef ENABLE_NAPI_WIFI_MANAGER
-        DECLARE_NAPI_PROPERTY("Phase2Method", phase2MethodObj),
-        DECLARE_NAPI_PROPERTY("WifiChannelWidth", WifiChannelWidthObj),
-        DECLARE_NAPI_PROPERTY("EapMethod", EapMethodObj),
-#endif
-        DECLARE_NAPI_PROPERTY("WifiSecurityType", securityTypeObj),
-        DECLARE_NAPI_PROPERTY("IpType", ipTypeObj),
-        DECLARE_NAPI_PROPERTY("ConnState", connStateObj),
-        DECLARE_NAPI_PROPERTY("SuppState", suppStateObj),
-        DECLARE_NAPI_PROPERTY("P2pConnectState", p2pConnStateObj),
-        DECLARE_NAPI_PROPERTY("P2pDeviceState", p2pDeviceStateObj),
-        DECLARE_NAPI_PROPERTY("GroupOwnerBand", groupOwnerBandObj)
-    };
-    napi_define_properties(env, exports, sizeof(exportFuncs) / sizeof(*exportFuncs), exportFuncs);
-    return exports;
-}
 
 static napi_value SecurityTypeInit(napi_env env)
 {
@@ -256,6 +227,36 @@ static napi_value EapMethodInit(napi_env env)
     SetNamedPropertyByInteger(env, eapMethod, static_cast<int>(EapMethodJs::EAP_AKA_PRIME), "EAP_AKA_PRIME");
     SetNamedPropertyByInteger(env, eapMethod, static_cast<int>(EapMethodJs::EAP_UNAUTH_TLS), "EAP_UNAUTH_TLS");
     return eapMethod;
+}
+
+static napi_value PropertyValueInit(napi_env env, napi_value exports)
+{
+    napi_value securityTypeObj = SecurityTypeInit(env);
+    napi_value ipTypeObj = IpTypeInit(env);
+    napi_value connStateObj = ConnStateInit(env);
+    napi_value suppStateObj = SuppStateInit(env);
+    napi_value p2pConnStateObj = P2pConnStateInit(env);
+    napi_value p2pDeviceStateObj = P2pDeviceStateInit(env);
+    napi_value groupOwnerBandObj = GroupOwnerBandInit(env);
+    napi_value phase2MethodObj = Phase2MethodInit(env);
+    napi_value WifiChannelWidthObj = WifiChannelWidthInit(env);
+    napi_value EapMethodObj = EapMethodInit(env);
+    napi_property_descriptor exportFuncs[] = {
+#ifdef ENABLE_NAPI_WIFI_MANAGER
+        DECLARE_NAPI_PROPERTY("Phase2Method", phase2MethodObj),
+        DECLARE_NAPI_PROPERTY("WifiChannelWidth", WifiChannelWidthObj),
+        DECLARE_NAPI_PROPERTY("EapMethod", EapMethodObj),
+#endif
+        DECLARE_NAPI_PROPERTY("WifiSecurityType", securityTypeObj),
+        DECLARE_NAPI_PROPERTY("IpType", ipTypeObj),
+        DECLARE_NAPI_PROPERTY("ConnState", connStateObj),
+        DECLARE_NAPI_PROPERTY("SuppState", suppStateObj),
+        DECLARE_NAPI_PROPERTY("P2pConnectState", p2pConnStateObj),
+        DECLARE_NAPI_PROPERTY("P2pDeviceState", p2pDeviceStateObj),
+        DECLARE_NAPI_PROPERTY("GroupOwnerBand", groupOwnerBandObj)
+    };
+    napi_define_properties(env, exports, sizeof(exportFuncs) / sizeof(*exportFuncs), exportFuncs);
+    return exports;
 }
 
 static napi_module wifiJsModule = {

@@ -17,11 +17,32 @@
 
 namespace OHOS {
 namespace Wifi {
+
+static napi_value PowerModelInit(napi_env env)
+{
+    napi_value PowerModel = nullptr;
+    napi_create_object(env, &PowerModel);
+    SetNamedPropertyByInteger(env, PowerModel, static_cast<int>(PowerModelJs::SLEEPING), "SLEEPING");
+    SetNamedPropertyByInteger(env, PowerModel, static_cast<int>(PowerModelJs::GENERAL), "GENERAL");
+    SetNamedPropertyByInteger(env, PowerModel, static_cast<int>(PowerModelJs::THROUGH_WALL), "THROUGH_WALL");
+    return PowerModel;
+}
+static napi_value PropertyValueInit(napi_env env, napi_value exports)
+{
+    napi_value PowerModeloBJ = PowerModelInit(env);
+    napi_property_descriptor exportFuncs[] = {
+        DECLARE_NAPI_PROPERTY("PowerModel", PowerModeloBJ)
+    };
+    napi_define_properties(env, exports, sizeof(exportFuncs) / sizeof(*exportFuncs), exportFuncs);
+    return exports;
+}
+
 /*
  * Module initialization function
  */
 static napi_value Init(napi_env env, napi_value exports)
 {
+    PropertyValueInit(env, exports);
     napi_property_descriptor desc[] = {
 #ifdef FEATURE_AP_EXTENSION
         DECLARE_NAPI_FUNCTION("enableHotspot", EnableHotspot),

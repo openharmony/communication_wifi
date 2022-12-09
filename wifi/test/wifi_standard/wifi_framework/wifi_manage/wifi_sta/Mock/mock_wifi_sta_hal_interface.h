@@ -63,6 +63,7 @@ public:
     virtual WifiErrorNo WpaBlocklistClear() = 0;
     virtual WifiErrorNo GetNetworkList(std::vector<WifiWpaNetworkInfo> &networkList) = 0;
     virtual WifiErrorNo GetConnectSignalInfo(const std::string &endBssid, WifiWpaSignalInfo &info) = 0;
+    virtual WifiErrorNo SetWpsBssid(int networkId, const std::string &bssid) = 0;
 };
 
 class WifiStaHalInterface : public MockWifiStaHalInterface {
@@ -103,6 +104,8 @@ public:
     MOCK_METHOD0(WpaBlocklistClear, WifiErrorNo());
     MOCK_METHOD1(GetNetworkList, WifiErrorNo(std::vector<WifiWpaNetworkInfo> &networkList));
     MOCK_METHOD2(GetConnectSignalInfo, WifiErrorNo(const std::string &endBssid, WifiWpaSignalInfo &info));
+    MOCK_METHOD2(SetWpsBssid, WifiErrorNo(int networkId, const std::string &bssid));
+
 };
 }  // namespace OHOS
 }  // namespace OHOS

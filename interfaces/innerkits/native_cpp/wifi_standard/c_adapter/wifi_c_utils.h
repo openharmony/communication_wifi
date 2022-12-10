@@ -61,6 +61,14 @@ WifiErrorCode IpStrToArray(const std::string& str, unsigned int ipAddr[IPV4_ARRA
  * @return std::string - result
  */
 std::string IpArrayToStr(const unsigned int ipAddr[IPV4_ARRAY_LEN]);
+
+/**
+ * @Description : Converts an IPv4 address in the int format to a string format.
+ *
+ * @param addressIpv4 - IPv4 address in the int format.[in]
+ * @return std::string : IPv4 address in string format.
+ */
+std::string ConvertIpv4AddrToStr(unsigned int addressIpv4);
 }  // namespace Wifi
 }  // namespace OHOS
 

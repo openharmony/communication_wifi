@@ -147,7 +147,7 @@ static WifiErrorCode GetStaListFromCpp(const std::vector<OHOS::Wifi::StationInfo
             WIFI_LOGE("Get sta list convert bssid error!");
             return ERROR_WIFI_UNKNOWN;
         }
-        result->ipAddress = OHOS::Wifi::IpTools::ConvertIpv4Address(each.ipAddr);
+        result->ipAddress = OHOS::Wifi::ConvertIpv4AddrToStr(each.ipAddr);
     }
     return WIFI_SUCCESS;
 }

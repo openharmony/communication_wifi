@@ -64,20 +64,5 @@ std::string IpArrayToStr(const unsigned int ipAddr[IPV4_ARRAY_LEN]) {
     }
     return str;
 }
-
-std::string ConvertIpv4Address(unsigned int addressIpv4)
-{
-    std::string address;
-    if (addressIpv4 == 0) {
-        return address;
-    }
-
-    std::ostringstream stream;
-    stream<<((addressIpv4>>BITS_24) & 0xFF)<<"."<<((addressIpv4>>BITS_16) & 0xFF)<<"."
-    <<((addressIpv4>>BITS_8) & 0xFF)<<"."<<(addressIpv4 & 0xFF);
-    address = stream.str();
-
-    return address;
-}
 }  // namespace Wifi
 }  // namespace OHOS

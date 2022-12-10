@@ -133,6 +133,7 @@ ohos_shared_library("wifi_sdk") {
     "src/wifi_p2p_msg.cpp",
     "src/wifi_scan.cpp",
     "src/wifi_scan_callback_stub.cpp",
+    "//foundation/communication/wifi/services/wifi_standard/wifi_framework/common/net_helper/ip_tools.cpp",
   ]
 
   deps = [

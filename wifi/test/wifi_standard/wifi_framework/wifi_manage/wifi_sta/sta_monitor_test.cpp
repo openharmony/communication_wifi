@@ -221,14 +221,14 @@ void StaMonitorTest::OnWpsTimeOutCallBackFail1()
 
 void StaMonitorTest::OnBssidChangedCallBackSuccess()
 {
-    std::string reason = "null"
+    std::string reason = "null";
     std::string bssid = "01:23:45:67:89:AB";
     pStaMonitor->OnBssidChangedCallBack(reason, bssid);
 }
 
 void StaMonitorTest::OnBssidChangedCallBackFail()
 {
-    std::string reason = "null"
+    std::string reason = "null";
     std::string bssid = "01:23:45:67:89:AB";
     pStaMonitor->pStaStateMachine = nullptr;
     pStaMonitor->OnBssidChangedCallBack(reason, bssid);

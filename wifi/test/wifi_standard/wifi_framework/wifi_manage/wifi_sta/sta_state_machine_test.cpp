@@ -390,7 +390,7 @@ public:
     {
     
         InternalMessage msg;
-		pStaStateMachine->linkedInfo.connState = ConnState::CONNECTED;
+        pStaStateMachine->linkedInfo.connState = ConnState::CONNECTED;
         pStaStateMachine->DealConnectToUserSelectedNetwork(&msg);
         pStaStateMachine->DealConnectToUserSelectedNetwork(nullptr);
     }
@@ -1041,7 +1041,7 @@ public:
     void GetIpStateStateExeMsgSuccess()
     {
         InternalMessage msg;
-		msg.SetMessageName(WIFI_SVR_CMD_STA_DHCP_RESULT_NOTIFY_EVENT);
+        msg.SetMessageName(WIFI_SVR_CMD_STA_DHCP_RESULT_NOTIFY_EVENT);
         pStaStateMachine->pGetIpState->ExecuteStateMsg(&msg);
     }
 
@@ -1333,7 +1333,6 @@ public:
         EXPECT_CALL(WifiSettings::GetInstance(), GetSignalLevel(_, _)).Times(AtLeast(0));
         pStaStateMachine->DealSignalPollResult(&msg);
         pStaStateMachine->DealSignalPollResult(nullptr);
-
     }
 
     void ConvertFreqToChannelTest()
@@ -1459,22 +1458,22 @@ public:
     void ComparedKeymgmtTest()
     {
         std::string scanInfoKeymgmt;
-		std::string deviceKeymgmt;
+        std::string deviceKeymgmt;
         pStaStateMachine->ComparedKeymgmt(scanInfoKeymgmt, deviceKeymgmt);
         deviceKeymgmt = "WPA-PSK";
         pStaStateMachine->ComparedKeymgmt(scanInfoKeymgmt, deviceKeymgmt);
-		deviceKeymgmt = "WPA-EAP";
+        deviceKeymgmt = "WPA-EAP";
         pStaStateMachine->ComparedKeymgmt(scanInfoKeymgmt, deviceKeymgmt);
-		deviceKeymgmt = "SAE";
+        deviceKeymgmt = "SAE";
         pStaStateMachine->ComparedKeymgmt(scanInfoKeymgmt, deviceKeymgmt);
-		deviceKeymgmt = "NONE";
+        deviceKeymgmt = "NONE";
         pStaStateMachine->ComparedKeymgmt(scanInfoKeymgmt, deviceKeymgmt);
     }
 	void ReUpdateNetLinkInfoTest()
     {
         WifiLinkedInfo linkedInfo;
         linkedInfo.detailedState = DetailedState::NOTWORKING;
-		linkedInfo.connState = ConnState::CONNECTED;
+        linkedInfo.connState = ConnState::CONNECTED;
         EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_)).WillOnce(Return(0));
         pStaStateMachine->ReUpdateNetLinkInfo();		
     }

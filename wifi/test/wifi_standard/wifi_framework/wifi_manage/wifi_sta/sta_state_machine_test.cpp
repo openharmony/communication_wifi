@@ -388,6 +388,10 @@ public:
 
     void DealConnectToUserSelectedNetworkFail()
     {
+    
+        InternalMessage msg;
+        pStaStateMachine->linkedInfo.connState = ConnState::CONNECTED;
+        pStaStateMachine->DealConnectToUserSelectedNetwork(&msg);
         pStaStateMachine->DealConnectToUserSelectedNetwork(nullptr);
     }
 
@@ -646,6 +650,7 @@ public:
         pStaStateMachine->wpsState = SetupMethod::KEYPAD;
         InternalMessage msg;
         pStaStateMachine->DealCancelWpsCmd(&msg);
+        pStaStateMachine->DealCancelWpsCmd(nullptr);
     }
 
     void DealStartRoamCmdSuccess()
@@ -972,9 +977,17 @@ public:
         result.push_back(wifiDeviceConfig);
         EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_))
             .WillRepeatedly(DoAll(SetArgReferee<0>(result), Return(0)));
-        EXPECT_CALL(WifiStaHalInterface::GetInstance(), GetNextNetworkId(_)).WillRepeatedly(Return(WIFI_IDL_OPT_OK));
-        EXPECT_CALL(WifiStaHalInterface::GetInstance(), SetDeviceConfig(_, _)).WillRepeatedly(Return(WIFI_IDL_OPT_OK));
-        EXPECT_CALL(WifiStaHalInterface::GetInstance(), SaveDeviceConfig());
+        EXPECT_CALL(WifiStaHalInterface::GetInstance(), GetNextNetworkId(_))
+            .WillOnce(Return(WIFI_IDL_OPT_OK))
+            .WillOnce(Return(WIFI_IDL_OPT_OK))
+            .WillOnce(Return(WIFI_IDL_OPT_FAILED));
+        EXPECT_CALL(WifiStaHalInterface::GetInstance(), SetDeviceConfig(_, _))
+            .WillOnce(Return(WIFI_IDL_OPT_OK))
+            .WillOnce(Return(WIFI_IDL_OPT_FAILED));
+        EXPECT_CALL(WifiStaHalInterface::GetInstance(), SaveDeviceConfig())
+            .WillRepeatedly(Return(WIFI_IDL_OPT_FAILED));
+        pStaStateMachine->SyncAllDeviceConfigs();
+        pStaStateMachine->SyncAllDeviceConfigs();
         pStaStateMachine->SyncAllDeviceConfigs();
     }
 
@@ -1028,11 +1041,14 @@ public:
     void GetIpStateStateExeMsgSuccess()
     {
         InternalMessage msg;
+        msg.SetMessageName(WIFI_SVR_CMD_STA_DHCP_RESULT_NOTIFY_EVENT);
         pStaStateMachine->pGetIpState->ExecuteStateMsg(&msg);
     }
 
     void GetIpStateStateExeMsgFail()
     {
+        InternalMessage msg;
+        pStaStateMachine->pGetIpState->ExecuteStateMsg(&msg);
         pStaStateMachine->pGetIpState->ExecuteStateMsg(nullptr);
     }
 
@@ -1101,6 +1117,12 @@ public:
     {
         EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_));
         pStaStateMachine->linkedInfo.connState = ConnState::CONNECTED;
+        pStaStateMachine->HandleNetCheckResult(StaNetState::NETWORK_CHECK_PORTAL, "");
+    }
+    void HandleNetCheckResultSuccess4()
+    {
+        EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_));
+        pStaStateMachine->linkedInfo.connState = ConnState::CONNECTED;
         pStaStateMachine->HandleNetCheckResult(StaNetState::NETWORK_STATE_UNKNOWN, "");
     }
 
@@ -1121,6 +1143,33 @@ public:
     }
 
     void LinkedStateExeMsgSuccess()
+    {
+        InternalMessage msg;
+        msg.SetMessageName(WIFI_SVR_CMD_STA_BSSID_CHANGED_EVENT);
+        msg.AddStringMessageBody("ASSOC_COMPLETE");
+        EXPECT_CALL(WifiStaHalInterface::GetInstance(), SetWpsBssid(_, _)).WillRepeatedly(Return(WIFI_IDL_OPT_OK));
+        pStaStateMachine->pLinkedState->ExecuteStateMsg(&msg);
+    }
+
+    void LinkedStateExeMsgFail4()
+    {
+        InternalMessage msg;
+        msg.SetMessageName(WIFI_SVR_CMD_STA_BSSID_CHANGED_EVENT);
+        msg.AddStringMessageBody("hello");
+        pStaStateMachine->pLinkedState->ExecuteStateMsg(&msg);
+    }
+
+
+    void LinkedStateExeMsgFail3()
+    {
+        InternalMessage msg;
+        msg.SetMessageName(WIFI_SVR_CMD_STA_BSSID_CHANGED_EVENT);
+        msg.AddStringMessageBody("ASSOC_COMPLETE");
+        EXPECT_CALL(WifiStaHalInterface::GetInstance(), SetWpsBssid(_, _)).WillRepeatedly(Return(WIFI_IDL_OPT_FAILED));
+        pStaStateMachine->pLinkedState->ExecuteStateMsg(&msg);
+    }
+
+    void LinkedStateExeMsgFail2()
     {
         InternalMessage msg;
         pStaStateMachine->pLinkedState->ExecuteStateMsg(&msg);
@@ -1283,6 +1332,7 @@ public:
         EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_));
         EXPECT_CALL(WifiSettings::GetInstance(), GetSignalLevel(_, _)).Times(AtLeast(0));
         pStaStateMachine->DealSignalPollResult(&msg);
+        pStaStateMachine->DealSignalPollResult(nullptr);
     }
 
     void ConvertFreqToChannelTest()
@@ -1376,6 +1426,9 @@ public:
 
     void DealReConnectCmdFail()
     {
+        InternalMessage msg;  
+        pStaStateMachine->linkedInfo.connState = ConnState::CONNECTED;
+        pStaStateMachine->DealReConnectCmd(&msg);
         pStaStateMachine->DealReConnectCmd(nullptr);
     }
 
@@ -1383,7 +1436,8 @@ public:
     {
         EXPECT_CALL(WifiSettings::GetInstance(), SetDeviceAfterConnect(_)).Times(testing::AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), SetDeviceState(_, _, _)).Times(testing::AtLeast(0));
-        EXPECT_CALL(WifiSettings::GetInstance(), SyncDeviceConfig()).Times(testing::AtLeast(0));;
+        EXPECT_CALL(WifiSettings::GetInstance(), SyncDeviceConfig()).Times(testing::AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_));
         EXPECT_CALL(WifiSettings::GetInstance(), SetUserLastSelectedNetworkId(_)).Times(testing::AtLeast(0));
         pStaStateMachine->wpsState = SetupMethod::INVALID;
         InternalMessage msg;
@@ -1393,6 +1447,35 @@ public:
     void DealConnectionEventFail()
     {
         pStaStateMachine->DealConnectionEvent(nullptr);
+    }
+
+    void OnConnectFailed()
+    {
+        int networkId = 15;
+        EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_));
+        pStaStateMachine->OnConnectFailed(networkId);
+    }
+    void ComparedKeymgmtTest()
+    {
+        std::string scanInfoKeymgmt;
+        std::string deviceKeymgmt;
+        pStaStateMachine->ComparedKeymgmt(scanInfoKeymgmt, deviceKeymgmt);
+        deviceKeymgmt = "WPA-PSK";
+        pStaStateMachine->ComparedKeymgmt(scanInfoKeymgmt, deviceKeymgmt);
+        deviceKeymgmt = "WPA-EAP";
+        pStaStateMachine->ComparedKeymgmt(scanInfoKeymgmt, deviceKeymgmt);
+        deviceKeymgmt = "SAE";
+        pStaStateMachine->ComparedKeymgmt(scanInfoKeymgmt, deviceKeymgmt);
+        deviceKeymgmt = "NONE";
+        pStaStateMachine->ComparedKeymgmt(scanInfoKeymgmt, deviceKeymgmt);
+    }
+	void ReUpdateNetLinkInfoTest()
+    {
+        WifiLinkedInfo linkedInfo;
+        linkedInfo.detailedState = DetailedState::NOTWORKING;
+        linkedInfo.connState = ConnState::CONNECTED;
+        EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_)).WillOnce(Return(0));
+        pStaStateMachine->ReUpdateNetLinkInfo();		
     }
 };
 
@@ -1609,6 +1692,21 @@ HWTEST_F(StaStateMachineTest, LinkedStateExeMsgFail, TestSize.Level1)
 HWTEST_F(StaStateMachineTest, LinkedStateExeMsgSuccess, TestSize.Level1)
 {
     LinkedStateExeMsgSuccess();
+}
+
+HWTEST_F(StaStateMachineTest, LinkedStateExeMsgFail4, TestSize.Level1)
+{
+    LinkedStateExeMsgFail4();
+}
+
+HWTEST_F(StaStateMachineTest, LinkedStateExeMsgFail3, TestSize.Level1)
+{
+    LinkedStateExeMsgFail3();
+}
+
+HWTEST_F(StaStateMachineTest, LinkedStateExeMsgFail2, TestSize.Level1)
+{
+    LinkedStateExeMsgFail2();
 }
 
 HWTEST_F(StaStateMachineTest, InitStaSMHandleMapSuccess, TestSize.Level1)
@@ -2036,11 +2134,15 @@ HWTEST_F(StaStateMachineTest, HandleNetCheckResultSuccess3, TestSize.Level1)
     HandleNetCheckResultSuccess3();
 }
 
+HWTEST_F(StaStateMachineTest, HandleNetCheckResultSuccess4, TestSize.Level1)
+{
+    HandleNetCheckResultSuccess4();
+}
+
 HWTEST_F(StaStateMachineTest, HandleNetCheckResultFail, TestSize.Level1)
 {
     HandleNetCheckResultFail();
 }
-
 
 HWTEST_F(StaStateMachineTest, ApRoamingStateGoInStateSuccess, TestSize.Level1)
 {
@@ -2209,7 +2311,22 @@ HWTEST_F(StaStateMachineTest, DealConnectionEventFail, TestSize.Level1)
 
 HWTEST_F(StaStateMachineTest, DealConnectionEventSuccess, TestSize.Level1)
 {
-    DealReConnectCmdSuccess();
+    DealConnectionEventSuccess();
+}
+
+HWTEST_F(StaStateMachineTest, OnConnectFailedTest, TestSize.Level1)
+{
+    OnConnectFailed();
+}
+
+HWTEST_F(StaStateMachineTest, ComparedKeymgmtTest, TestSize.Level1)
+{
+    ComparedKeymgmtTest();
+}
+
+HWTEST_F(StaStateMachineTest, ReUpdateNetLinkInfoTest, TestSize.Level1)
+{
+    ReUpdateNetLinkInfoTest();
 }
 } // namespace Wifi
 } // namespace OHOS

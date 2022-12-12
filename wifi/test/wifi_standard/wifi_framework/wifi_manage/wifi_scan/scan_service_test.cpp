@@ -205,6 +205,8 @@ public:
     {
         pScanService->scanStartedFlag = false;
         pScanService->Scan(false);
+        pScanService->Scan(true);
+
     }
 
     void ScanWithParamSuccess()
@@ -227,7 +229,7 @@ public:
 
     void ScanWithParamFail2()
     {
-        pScanService->scanStartedFlag = false;
+        pScanService->scanStartedFlag = true;
         WifiScanParams params;
         params.band = -1;
         EXPECT_EQ(WIFI_OPT_FAILED, pScanService->ScanWithParam(params));
@@ -282,6 +284,15 @@ public:
     {
         ScanConfig scanConfig;
         scanConfig.scanBand = SCAN_BAND_UNSPECIFIED;
+        scanConfig.externFlag = true;
+        scanConfig.scanStyle = SCAN_TYPE_HIGH_ACCURACY;
+        EXPECT_EQ(false, pScanService->SingleScan(scanConfig));
+    }
+
+    void SingleScanFail2()
+    {
+        ScanConfig scanConfig;
+        scanConfig.scanBand = static_cast<ScanBandType>(-1);
         scanConfig.externFlag = true;
         scanConfig.scanStyle = SCAN_TYPE_HIGH_ACCURACY;
         EXPECT_EQ(false, pScanService->SingleScan(scanConfig));
@@ -602,6 +613,7 @@ public:
         mode.scanMode = ScanMode::SYSTEM_TIMER_SCAN;
         mode.isSingle = false;
         pScanService->scanControlInfo.scanIntervalList.push_back(mode);
+        EXPECT_CALL(WifiSettings::GetInstance(), SetScreenState(1));
         pScanService->SystemScanProcess(true);
     }
 
@@ -1007,6 +1019,7 @@ public:
 
     void SetStaCurrentTimeSuccess()
     {
+        EXPECT_CALL(WifiSettings::GetInstance(), SetScreenState(2));
         pScanService->SetStaCurrentTime();
     }
 
@@ -2308,6 +2321,11 @@ HWTEST_F(ScanServiceTest, AllowScanByIntervalBlocklistFail1, TestSize.Level1)
 HWTEST_F(ScanServiceTest, AllowScanByIntervalBlocklistFail2, TestSize.Level1)
 {
     AllowScanByIntervalBlocklistFail2();
+}
+
+HWTEST_F(ScanServiceTest, SingleScanFail2, TestSize.Level1)
+{
+    SingleScanFail2();
 }
 } // namespace Wifi
 } // namespace OHOS

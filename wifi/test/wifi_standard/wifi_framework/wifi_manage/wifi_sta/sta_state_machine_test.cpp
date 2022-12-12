@@ -173,6 +173,33 @@ public:
 
     void ConvertDeviceCfgFail2()
     {
+        EXPECT_CALL(WifiStaHalInterface::GetInstance(), SetDeviceConfig(_, _))
+            .WillRepeatedly(Return(WIFI_IDL_OPT_FAILED));
+        EXPECT_CALL(WifiStaHalInterface::GetInstance(), SaveDeviceConfig()).WillRepeatedly(Return(WIFI_IDL_OPT_FAILED));
+        WifiDeviceConfig config;
+        EXPECT_EQ(WIFI_OPT_FAILED, pStaStateMachine->ConvertDeviceCfg(config));
+    }
+
+    void SyncDeviceConfigToWpaSuccess0()
+    {
+        EXPECT_CALL(WifiSettings::GetInstance(), ReloadDeviceConfig()).WillRepeatedly(Return(WIFI_IDL_OPT_FAILED));
+        pStaStateMachine->SyncDeviceConfigToWpa();
+    }
+
+    void SyncDeviceConfigToWpaSuccess1()
+    {
+        EXPECT_CALL(WifiSettings::GetInstance(), ReloadDeviceConfig()).WillRepeatedly(Return(WIFI_IDL_OPT_OK));
+        EXPECT_CALL(WifiStaHalInterface::GetInstance(), ClearDeviceConfig()).WillRepeatedly(Return(WIFI_IDL_OPT_FAILED));
+        pStaStateMachine->SyncDeviceConfigToWpa();
+    }
+
+    void SyncDeviceConfigToWpaSuccess2()
+    {
+        EXPECT_CALL(WifiSettings::GetInstance(), ReloadDeviceConfig()).WillRepeatedly(Return(WIFI_IDL_OPT_OK));
+        EXPECT_CALL(WifiStaHalInterface::GetInstance(), ClearDeviceConfig()).WillRepeatedly(Return(WIFI_IDL_OPT_OK));
+        EXPECT_CALL(WifiStaHalInterface::GetInstance(), GetNextNetworkId(_))
+            .WillRepeatedly(DoAll(SetArgReferee<0>(1), Return(WIFI_IDL_OPT_OK)));
+        pStaStateMachine->SyncDeviceConfigToWpa();
     }
 
     void StartWifiProcessSuccess()
@@ -221,6 +248,18 @@ public:
     }
 
     void StartWifiProcessFail2()
+    {
+        EXPECT_CALL(WifiStaHalInterface::GetInstance(), StartWifi()).WillRepeatedly(Return(WIFI_IDL_OPT_OK));
+        EXPECT_CALL(WifiStaHalInterface::GetInstance(), WpaAutoConnect(_)).WillRepeatedly(Return(WIFI_IDL_OPT_OK));
+        EXPECT_CALL(WifiManager::GetInstance(), DealStaOpenRes(_)).Times(testing::AtLeast(1));
+        EXPECT_CALL(WifiSettings::GetInstance(), SetWifiState(_)).Times(testing::AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), SetMacAddress(_)).Times(testing::AtLeast(0));
+        EXPECT_CALL(WifiStaHalInterface::GetInstance(), GetStaDeviceMacAddress(_))
+            .WillRepeatedly(Return(WIFI_IDL_OPT_FAILED));
+        pStaStateMachine->StartWifiProcess();
+    }
+
+    void StartWifiProcessFail3()
     {
         EXPECT_CALL(WifiStaHalInterface::GetInstance(), StartWifi()).WillRepeatedly(Return(WIFI_IDL_OPT_OK));
         EXPECT_CALL(WifiStaHalInterface::GetInstance(), WpaAutoConnect(_)).WillRepeatedly(Return(WIFI_IDL_OPT_FAILED));
@@ -1579,6 +1618,11 @@ HWTEST_F(StaStateMachineTest, StartWifiProcessFail2, TestSize.Level1)
     StartWifiProcessFail2();
 }
 
+HWTEST_F(StaStateMachineTest, StartWifiProcessFail3, TestSize.Level1)
+{
+    StartWifiProcessFail3();
+}
+
 HWTEST_F(StaStateMachineTest, InitWpsSettingsSuccess, TestSize.Level1)
 {
     InitWpsSettingsSuccess();
@@ -2327,6 +2371,26 @@ HWTEST_F(StaStateMachineTest, ComparedKeymgmtTest, TestSize.Level1)
 HWTEST_F(StaStateMachineTest, ReUpdateNetLinkInfoTest, TestSize.Level1)
 {
     ReUpdateNetLinkInfoTest();
+}
+
+HWTEST_F(StaStateMachineTest, ConvertDeviceCfgFail2, TestSize.Level1)
+{
+    ConvertDeviceCfgFail2();
+}
+
+HWTEST_F(StaStateMachineTest, SyncDeviceConfigToWpaSuccess0, TestSize.Level1)
+{
+    SyncDeviceConfigToWpaSuccess0();
+}
+
+HWTEST_F(StaStateMachineTest, SyncDeviceConfigToWpaSuccess1, TestSize.Level1)
+{
+    SyncDeviceConfigToWpaSuccess1();
+}
+
+HWTEST_F(StaStateMachineTest, SyncDeviceConfigToWpaSuccess2, TestSize.Level1)
+{
+    SyncDeviceConfigToWpaSuccess2();
 }
 } // namespace Wifi
 } // namespace OHOS

@@ -55,6 +55,7 @@ public:
     void UnInitStaMonitorSuccess();
     void UnInitStaMonitorFail();
     void SetStateMachineSuccess();
+    void SetStateMachineFail();
     void OnConnectChangedCallBackSuccess1();
     void OnConnectChangedCallBackSuccess2();
     void OnConnectChangedCallBackFail1();
@@ -73,6 +74,12 @@ public:
     void OnWpsTimeOutCallBackSuccess();
     void OnWpsTimeOutCallBackFail1();
     void OnWpsTimeOutCallBackFail2();
+    void OnBssidChangedCallBackSuccess();
+    void OnBssidChangedCallBackFail();
+    void OnWpaConnectionFullCallBackSuccess();
+    void OnWpaConnectionFullCallBackFail();
+    void OnWpaConnectionRejectCallBackSuccess();
+    void OnWpaConnectionRejectCallBackFail();
 };
 
 void StaMonitorTest::InitStaMonitorSuccess()
@@ -106,6 +113,11 @@ void StaMonitorTest::UnInitStaMonitorFail()
 void StaMonitorTest::SetStateMachineSuccess()
 {
     pStaMonitor->SetStateMachine(pStaMonitor->pStaStateMachine);
+}
+
+void StaMonitorTest::SetStateMachineFail()
+{
+    pStaMonitor->SetStateMachine(nullptr);
 }
 
 void StaMonitorTest::OnConnectChangedCallBackSuccess1()
@@ -207,6 +219,47 @@ void StaMonitorTest::OnWpsTimeOutCallBackFail1()
     pStaMonitor->OnWpsTimeOutCallBack(status);
 }
 
+void StaMonitorTest::OnBssidChangedCallBackSuccess()
+{
+    std::string reason = "null";
+    std::string bssid = "01:23:45:67:89:AB";
+    pStaMonitor->OnBssidChangedCallBack(reason, bssid);
+}
+
+void StaMonitorTest::OnBssidChangedCallBackFail()
+{
+    std::string reason = "null";
+    std::string bssid = "01:23:45:67:89:AB";
+    pStaMonitor->pStaStateMachine = nullptr;
+    pStaMonitor->OnBssidChangedCallBack(reason, bssid);
+}
+
+void StaMonitorTest::OnWpaConnectionFullCallBackSuccess()
+{
+    int status = 1;
+    pStaMonitor->onWpaConnectionFullCallBack(status);
+}
+
+void StaMonitorTest::OnWpaConnectionFullCallBackFail()
+{
+    int status = 1;
+    pStaMonitor->pStaStateMachine = nullptr;
+    pStaMonitor->onWpaConnectionFullCallBack(status);
+}
+
+void StaMonitorTest::OnWpaConnectionRejectCallBackSuccess()
+{
+    int status = 1;
+    pStaMonitor->onWpaConnectionRejectCallBack(status);
+}
+
+void StaMonitorTest::OnWpaConnectionRejectCallBackFail()
+{
+    int status = 1;
+    pStaMonitor->pStaStateMachine = nullptr;
+    pStaMonitor->onWpaConnectionRejectCallBack(status);
+}
+
 HWTEST_F(StaMonitorTest, InitStaMonitorSuccess, TestSize.Level1)
 {
     InitStaMonitorSuccess();
@@ -242,6 +295,10 @@ HWTEST_F(StaMonitorTest, SetStateMachineSuccess, TestSize.Level1)
     SetStateMachineSuccess();
 }
 
+HWTEST_F(StaMonitorTest, SetStateMachineFail, TestSize.Level1)
+{
+    SetStateMachineFail();
+}
 
 HWTEST_F(StaMonitorTest, OnConnectChangedCallBackSuccess1, TestSize.Level1)
 {
@@ -296,6 +353,36 @@ HWTEST_F(StaMonitorTest, OnWpsTimeOutCallBackSuccess, TestSize.Level1)
 HWTEST_F(StaMonitorTest, OnWpsTimeOutCallBackFail1, TestSize.Level1)
 {
     OnWpsTimeOutCallBackFail1();
+}
+
+HWTEST_F(StaMonitorTest, OnBssidChangedCallBackSuccess, TestSize.Level1)
+{
+    OnBssidChangedCallBackSuccess();
+}
+
+HWTEST_F(StaMonitorTest, OnBssidChangedCallBackFail, TestSize.Level1)
+{
+    OnBssidChangedCallBackFail();
+}
+
+HWTEST_F(StaMonitorTest, OnWpaConnectionFullCallBackSuccess, TestSize.Level1)
+{
+    OnWpaConnectionFullCallBackSuccess();
+}
+
+HWTEST_F(StaMonitorTest, OnWpaConnectionFullCallBackFail, TestSize.Level1)
+{
+    OnWpaConnectionFullCallBackFail();
+}
+
+HWTEST_F(StaMonitorTest, OnWpaConnectionRejectCallBackSuccess, TestSize.Level1)
+{
+    OnWpaConnectionRejectCallBackSuccess();
+}
+
+HWTEST_F(StaMonitorTest, OnWpaConnectionRejectCallBackFail, TestSize.Level1)
+{
+    OnWpaConnectionRejectCallBackFail();
 }
 } // WIFI
 } // OHOS

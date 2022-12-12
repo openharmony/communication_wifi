@@ -390,7 +390,7 @@ public:
     {
     
         InternalMessage msg;
-		pStaStateMachine->linkedInfo.connState = ConnState::CONNECTED
+		pStaStateMachine->linkedInfo.connState = ConnState::CONNECTED;
         pStaStateMachine->DealConnectToUserSelectedNetwork(&msg);
         pStaStateMachine->DealConnectToUserSelectedNetwork(nullptr);
     }
@@ -1041,7 +1041,7 @@ public:
     void GetIpStateStateExeMsgSuccess()
     {
         InternalMessage msg;
-		msg->SetMessageName(WIFI_SVR_CMD_STA_DHCP_RESULT_NOTIFY_EVENT);
+		msg.SetMessageName(WIFI_SVR_CMD_STA_DHCP_RESULT_NOTIFY_EVENT);
         pStaStateMachine->pGetIpState->ExecuteStateMsg(&msg);
     }
 
@@ -2325,7 +2325,7 @@ HWTEST_F(StaStateMachineTest, ComparedKeymgmtTest, TestSize.Level1)
     ComparedKeymgmtTest();
 }
 
-HWTEST_F(StaStateMachineTest, ComparedKeymgmtTest, TestSize.Level1)
+HWTEST_F(StaStateMachineTest, ReUpdateNetLinkInfoTest, TestSize.Level1)
 {
     ReUpdateNetLinkInfoTest();
 }

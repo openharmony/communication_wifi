@@ -173,6 +173,25 @@ public:
 
     void ConvertDeviceCfgFail2()
     {
+        EXPECT_CALL(WifiStaHalInterface::GetInstance(), SetDeviceConfig(_, _))
+            .WillRepeatedly(Return(WIFI_IDL_OPT_FAILED));
+        EXPECT_CALL(WifiStaHalInterface::GetInstance(), SaveDeviceConfig()).WillRepeatedly(Return(WIFI_IDL_OPT_FAILED));
+        WifiDeviceConfig config;
+        EXPECT_EQ(WIFI_OPT_FAILED, pStaStateMachine->ConvertDeviceCfg(config));
+    }
+
+    void SyncDeviceConfigToWpaSuccess0()
+    {
+        EXPECT_CALL(WifiSettings::GetInstance(), ReloadDeviceConfig()).WillRepeatedly(Return(WIFI_IDL_OPT_FAILED));
+        pStaStateMachine->SyncDeviceConfigToWpa();
+    }
+
+    void SyncDeviceConfigToWpaSuccess1()
+    {
+        EXPECT_CALL(WifiSettings::GetInstance(), ReloadDeviceConfig()).WillRepeatedly(Return(WIFI_IDL_OPT_OK));
+        EXPECT_CALL(WifiStaHalInterface::GetInstance(), ClearDeviceConfig())
+            .WillRepeatedly(Return(WIFI_IDL_OPT_FAILED));
+        pStaStateMachine->SyncDeviceConfigToWpa();
     }
 
     void StartWifiProcessSuccess()
@@ -1562,6 +1581,16 @@ HWTEST_F(StaStateMachineTest, ConvertDeviceCfgFail1, TestSize.Level1)
 HWTEST_F(StaStateMachineTest, ConvertDeviceCfgFail2, TestSize.Level1)
 {
     ConvertDeviceCfgFail2();
+}
+
+HWTEST_F(StaStateMachineTest, SyncDeviceConfigToWpaSuccess0, TestSize.Level1)
+{
+    SyncDeviceConfigToWpaSuccess0();
+}
+
+HWTEST_F(StaStateMachineTest, SyncDeviceConfigToWpaSuccess1, TestSize.Level1)
+{
+    SyncDeviceConfigToWpaSuccess1();
 }
 
 HWTEST_F(StaStateMachineTest, StartWifiProcessSuccess, TestSize.Level1)

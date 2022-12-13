@@ -886,7 +886,6 @@ void ReleaseWpaGlobalInterface(void)
     }
     WpaIfaceInfo *p = g_wpaInterface->ifaces;
     while (p != NULL) {
-        WpaCliRemoveIface(g_wpaInterface, p->name);
         WpaIfaceInfo *q = p->next;
         free(p);
         p = q;

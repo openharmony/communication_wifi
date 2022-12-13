@@ -36,6 +36,10 @@ public:
      */
     bool InitScanMonitor();
     /**
+     * @Description  Scan monitor uninitialization function.
+     */
+    void UnInitScanMonitor();
+    /**
      * @Description  scanMonitor needs to send messages to the scan state machine.
      *
      * @param paraScanStateMachine - scan state machine[in]

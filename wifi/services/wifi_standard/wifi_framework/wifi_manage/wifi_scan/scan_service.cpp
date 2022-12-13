@@ -125,6 +125,7 @@ bool ScanService::InitScanService(const IScanSerivceCallbacks &scanSerivceCallba
 void ScanService::UnInitScanService()
 {
     WIFI_LOGI("Enter ScanService::UnInitScanService.\n");
+    pScanMonitor->UnInitScanMonitor();
     pScanStateMachine->StopTimer(static_cast<int>(SYSTEM_SCAN_TIMER));
     pScanStateMachine->StopTimer(static_cast<int>(DISCONNECTED_SCAN_TIMER));
     pScanStateMachine->StopTimer(static_cast<int>(RESTART_PNO_SCAN_TIMER));

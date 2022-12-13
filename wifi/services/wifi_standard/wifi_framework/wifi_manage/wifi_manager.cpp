@@ -29,6 +29,8 @@
 #include "wifi_sta_hal_interface.h"
 #include "wifi_service_manager.h"
 #include "wifi_settings.h"
+#include "common_event_manager.h"
+#include "common_event_support.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -235,7 +237,21 @@ int WifiManager::Init()
         return -1;
     }
     mCloseServiceThread = std::thread(WifiManager::DealCloseServiceMsg, std::ref(*this));
-
+    
+#ifndef OHOS_ARCH_LITE
+    if (screenEventSubscriber_ == nullptr) {
+        const uint32_t TIMEOUT_SCREEN_EVENT = 3000;
+        lpScreenTimer_ = std::make_unique<Utils::Timer>("WifiManager");
+        using TimeOutCallback = std::function<void()>;
+        TimeOutCallback timeoutCallback = std::bind(&WifiManager::RegisterScreenEvent, this);
+        if (lpScreenTimer_ != nullptr) {
+            lpScreenTimer_->Setup();
+            lpScreenTimer_->Register(timeoutCallback, TIMEOUT_SCREEN_EVENT, true);
+        } else {
+            WIFI_LOGE("lpScreenTimer_ is nullptr");
+        }
+    }
+#endif
     mInitStatus = INIT_OK;
     InitStaCallback();
     InitScanCallback();
@@ -275,6 +291,15 @@ void WifiManager::Exit()
         PushServiceCloseMsg(WifiCloseServiceCode::SERVICE_THREAD_EXIT);
         mCloseServiceThread.join();
     }
+#ifndef
+    if (screenEventSubscriber_ != nullptr) {
+        UnRegisterScreenEvent();
+    }
+    if (lpScreenTimer_ != nullptr) {
+        lpScreenTimer_->Shutdown(false);
+        lpScreenTimer_ = nullptr;
+    }
+#endif
     return;
 }
 
@@ -875,6 +900,76 @@ void WifiManager::DealConfigChanged(CfgType type, char* data, int dataLen)
 void WifiManager::RegisterCfgMonitorCallback(WifiCfgMonitorEventCallback callback)
 {
     cfgMonitorCallback = callback;
+}
+#endif
+
+#ifndef OHOS_ARCH_LITE
+void WifiManager::RegisterScreenEvent()
+{
+    OHOS::EventFwk::MatchingSkills matchingSkills;
+    matchingSkills.AddEvent(OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON);
+    matchingSkills.AddEvent(OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF);
+    EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
+    screenEventSubscriber_ = std::make_shared<ScreenEventSubscriber>(subscriberInfo);
+    if (!EventFwk::CommonEventManager::SubscribeCommonEvent(screenEventSubscriber_)) {
+        WIFI_LOGE("ScreenEvent SubscribeCommonEvent() failed");
+    } else {
+        WIFI_LOGI("ScreenEvent SubscribeCommonEvent() OK");
+    }
+}
+
+void WifiManager::UnRegisterScreenEvent()
+{
+    if (!EventFwk::CommonEventManager::UnSubscribeCommonEvent(screenEventSubscriber_)) {
+        WIFI_LOGE("ScreenEvent UnSubscribeCommonEvent() failed");
+    } else {
+        WIFI_LOGI("ScreenEvent UnSubscribeCommonEvent() OK");
+    }
+    screenEventSubscriber_ = nullptr;
+}
+
+void ScreenEventSubscriber::OnReceiveEvent(const OHOS::EventFwk::CommonEventData &data)
+{
+    std::string action = data.GetWant().GetAction();
+    WIFI_LOGI("ScreenEventSubscriber::OnReceiveEvent: %{public}s.", action.c_str());
+    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst();
+    if (pService == nullptr) {
+        WIFI_LOGE("sta service is NOT start!");
+        return;
+    }
+
+    int screenState = WifiSettings::GetInstance().GetScreenState();
+    IScanService *pScanService = WifiServiceManager::GetInstance().GetScanServiceInst();
+    if (pScanService == nullptr) {
+        WIFI_LOGE("scan service is NOT start!");
+        return;
+    }
+    if (action == OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF &&
+        screenState == MODE_STATE_OPEN) {
+        WifiSettings::GetInstance().SetScreenState(MODE_STATE_CLOSE);
+        if (pScanService->OnScreenStateChanged(MODE_STATE_CLOSE) != WIFI_OPT_SUCCESS) {
+            WIFI_LOGE("OnScreenStateChanged failed");
+        }
+        /* Send suspend to wpa */
+        if (pService->SetSuspendMode(true) != WIFI_OPT_SUCCESS) {
+            WIFI_LOGE("SetSuspendMode failed");
+        }
+        return;
+    }
+
+    if (action == OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON &&
+        screenState == MODE_STATE_CLOSE) {
+        WifiSettings::GetInstance().SetScreenState(MODE_STATE_OPEN);
+        if (pScanService->OnScreenStateChanged(MODE_STATE_OPEN) != WIFI_OPT_SUCCESS) {
+            WIFI_LOGE("OnScreenStateChanged failed");
+        }
+        /* Send resume to wpa */
+        if (pService->SetSuspendMode(false) != WIFI_OPT_SUCCESS) {
+            WIFI_LOGE("SetSuspendMode failed");
+        }
+        return;
+    }
+    WIFI_LOGW("ScreenEventSubscriber::OnReceiveEvent, screen state: %{public}d.", screenState);
 }
 #endif
 }  // namespace Wifi

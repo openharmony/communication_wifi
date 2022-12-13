@@ -51,7 +51,6 @@ std::shared_ptr<WifiDeviceServiceImpl> WifiDeviceServiceImpl::g_instance;
 std::shared_ptr<WifiDeviceServiceImpl> WifiDeviceServiceImpl::GetInstance()
 #else
 const uint32_t TIMEOUT_APP_EVENT = 3000;
-const uint32_t TIMEOUT_SCREEN_EVENT = 3000;
 const uint32_t TIMEOUT_THERMAL_EVENT = 3000;
 constexpr int32_t WATCHDOG_INTERVAL_MS = 10000;
 constexpr int32_t WATCHDOG_DELAY_MS = 15000;
@@ -143,17 +142,6 @@ void WifiDeviceServiceImpl::OnStart()
         }
     }
 
-    if (screenEventSubscriber_ == nullptr) {
-        lpScreenTimer_ = std::make_unique<Utils::Timer>("WifiDeviceServiceImpl");
-        TimeOutCallback timeoutCallback = std::bind(&WifiDeviceServiceImpl::RegisterScreenEvent, this);
-        if (lpScreenTimer_ != nullptr) {
-            lpScreenTimer_->Setup();
-            lpScreenTimer_->Register(timeoutCallback, TIMEOUT_SCREEN_EVENT, true);
-        } else {
-            WIFI_LOGE("lpScreenTimer_ is nullptr");
-        }
-    }
-
     if (thermalLevelSubscriber_ == nullptr) {
         lpThermalTimer_ = std::make_unique<Utils::Timer>("WifiDeviceServiceImpl");
         TimeOutCallback timeoutCallback = std::bind(&WifiDeviceServiceImpl::RegisterThermalLevel, this);
@@ -194,13 +182,6 @@ void WifiDeviceServiceImpl::OnStop()
     if (lpTimer_ != nullptr) {
         lpTimer_->Shutdown(false);
         lpTimer_ = nullptr;
-    }
-    if (screenEventSubscriber_ != nullptr) {
-        UnRegisterScreenEvent();
-    }
-    if (lpScreenTimer_ != nullptr) {
-        lpScreenTimer_->Shutdown(false);
-        lpScreenTimer_ = nullptr;
     }
     if (thermalLevelSubscriber_ != nullptr) {
         UnRegisterThermalLevel();
@@ -1256,30 +1237,6 @@ void WifiDeviceServiceImpl::UnRegisterAppRemoved()
     eventSubscriber_ = nullptr;
 }
 
-void WifiDeviceServiceImpl::RegisterScreenEvent()
-{
-    OHOS::EventFwk::MatchingSkills matchingSkills;
-    matchingSkills.AddEvent(OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON);
-    matchingSkills.AddEvent(OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF);
-    EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
-    screenEventSubscriber_ = std::make_shared<ScreenEventSubscriber>(subscriberInfo);
-    if (!EventFwk::CommonEventManager::SubscribeCommonEvent(screenEventSubscriber_)) {
-        WIFI_LOGE("ScreenEvent SubscribeCommonEvent() failed");
-    } else {
-        WIFI_LOGI("ScreenEvent SubscribeCommonEvent() OK");
-    }
-}
-
-void WifiDeviceServiceImpl::UnRegisterScreenEvent()
-{
-    if (!EventFwk::CommonEventManager::UnSubscribeCommonEvent(screenEventSubscriber_)) {
-        WIFI_LOGE("ScreenEvent UnSubscribeCommonEvent() failed");
-    } else {
-        WIFI_LOGI("ScreenEvent UnSubscribeCommonEvent() OK");
-    }
-    screenEventSubscriber_ = nullptr;
-}
-
 void WifiDeviceServiceImpl::RegisterThermalLevel()
 {
     OHOS::EventFwk::MatchingSkills matchingSkills;
@@ -1328,39 +1285,6 @@ void AppEventSubscriber::OnReceiveEvent(const OHOS::EventFwk::CommonEventData &d
             WIFI_LOGE("RemoveAllCandidateConfig failed");
         }
     }
-}
-
-void ScreenEventSubscriber::OnReceiveEvent(const OHOS::EventFwk::CommonEventData &data)
-{
-    std::string action = data.GetWant().GetAction();
-    WIFI_LOGI("ScreenEventSubscriber::OnReceiveEvent: %{public}s.", action.c_str());
-    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst();
-    if (pService == nullptr) {
-        WIFI_LOGE("sta service is NOT start!");
-        return;
-    }
-
-    int screenState = WifiSettings::GetInstance().GetScreenState();
-    if (action == OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF &&
-        screenState == MODE_STATE_OPEN) {
-        WifiSettings::GetInstance().SetScreenState(MODE_STATE_CLOSE);
-        /* Send suspend to wpa */
-        if (pService->SetSuspendMode(true) != WIFI_OPT_SUCCESS) {
-            WIFI_LOGE("SetSuspendMode failed");
-        }
-        return;
-    }
-
-    if (action == OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON &&
-        screenState == MODE_STATE_CLOSE) {
-        WifiSettings::GetInstance().SetScreenState(MODE_STATE_OPEN);
-        /* Send resume to wpa */
-        if (pService->SetSuspendMode(false) != WIFI_OPT_SUCCESS) {
-            WIFI_LOGE("SetSuspendMode failed");
-        }
-        return;
-    }
-    WIFI_LOGW("ScreenEventSubscriber::OnReceiveEvent, screen state: %{public}d.", screenState);
 }
 
 void ThermalLevelSubscriber::OnReceiveEvent(const OHOS::EventFwk::CommonEventData &data)

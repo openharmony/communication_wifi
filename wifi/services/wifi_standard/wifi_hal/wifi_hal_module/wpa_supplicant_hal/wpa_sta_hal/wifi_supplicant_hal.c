@@ -642,9 +642,34 @@ static int WpaCliCmdListNetworks(WifiWpaStaInterface *this, WifiNetworkInfo *pcm
     return 0;
 }
 
+static unsigned AssignCmdLen(WifiWpaStaInterface *this, const ScanSettings *settings)
+{
+    if (settings->scanStyle == SCAN_TYPE_PNO) {
+        unsigned exceptedLen = strlen("IFNAME=") + strlen(this->ifname) + 1 + strlen("set pno x");
+        if (settings->isStartPnoScan) {
+            LOGI("AssignCmdLen, startPnoScan, freqSize=%{public}d", settings->freqSize);
+            if (settings->freqSize > 0) {
+                exceptedLen += strlen(" freq=") + (CMD_FREQ_MAX_LEN + 1) * settings->freqSize;
+            }
+        }
+        return exceptedLen;
+    }
+    unsigned exceptedLen = strlen("IFNAME=") + strlen(this->ifname) + 1 + strlen("SCAN");
+    LOGI("AssignCmdLen, startScan, freSize=%{public}d, hiddenSsidSize=%{public}d",
+        settings->freqSize, settings->hiddenSsidSize);
+    if (settings->freqSize > 0) {
+        exceptedLen += strlen(" freq=") + (CMD_FREQ_MAX_LEN + 1) * settings->freqSize;
+    }
+    for (int i = 0; i < settings->hiddenSsidSize; ++i) {
+        unsigned ssidLen = strlen(settings->hiddenSsid[i]);
+        exceptedLen += strlen(" ssid ") + (ssidLen << 1);
+    }
+    return exceptedLen;
+}
+
 static int ConcatScanSetting(const ScanSettings *settings, char *buff, int len)
 {
-    if (settings == NULL) {
+    if (settings == NULL || (settings->scanStyle == SCAN_TYPE_PNO && !settings->isStartPnoScan)) {
         return 0;
     }
     int pos = 0;
@@ -670,7 +695,7 @@ static int ConcatScanSetting(const ScanSettings *settings, char *buff, int len)
         }
         pos += res;
     }
-    for (i = 0; i < settings->hiddenSsidSize; ++i) {
+    for (i = 0; (i < settings->hiddenSsidSize) && (settings->scanStyle != SCAN_TYPE_PNO); ++i) {
         res = snprintf_s(buff + pos, len - pos, len - pos - 1, " ssid ");
         if (res < 0) {
             LOGE("snprintf error");
@@ -714,27 +739,25 @@ static int WpaCliCmdScan(WifiWpaStaInterface *this, const ScanSettings *settings
     /* Invalidate expired scan results */
     WpaCliCmdBssFlush(this);
     unsigned len = CMD_BUFFER_SIZE;
-    if (settings != NULL) {
-        unsigned expectLen = strlen("IFNAME=") + strlen(this->ifname) + 1 + strlen("SCAN");
-        LOGI("WpaCliCmdScan, freqSize=%{public}d, hiddenSsidSize=%{public}d",
-            settings->freqSize, settings->hiddenSsidSize);
-        if (settings->freqSize > 0) {
-            expectLen += strlen(" freq=") + (CMD_FREQ_MAX_LEN + 1) * settings->freqSize;
-        }
-        for (int i = 0; i < settings->hiddenSsidSize; ++i) {
-            unsigned ssidLen = strlen(settings->hiddenSsid[i]);
-            expectLen += strlen(" ssid ") + (ssidLen << 1); /* double size, convert to hex */
-        }
-        if (expectLen >= len) {
-            len = expectLen + 1;
-        }
+    unsigned expectedLen = AssignCmdLen(this, settings);
+    if (expectedLen >= len) {
+        len = expectedLen + 1;
     }
     char *pcmd = (char *)calloc(len, sizeof(char));
     if (pcmd == NULL) {
         return -1;
     }
     int pos = 0;
-    int res = snprintf_s(pcmd, len, len - 1, "IFNAME=%s SCAN", this->ifname);
+    int res = 0;
+    if (settings != NULL) {
+        if (settings->scanStyle == SCAN_TYPE_PNO && settings->isStartPnoScan) {
+            res = snprintf_s(pcmd, len, len - 1, "IFNAME=%s set pno 1", this->ifname);
+        } else if (settings->scanStyle == SCAN_TYPE_PNO && !settings->isStartPnoScan) {
+            res = snprintf_s(pcmd, len, len - 1, "IFNAME=%s set pno 0", this->ifname);
+        } else {
+            res = snprintf_s(pcmd, len, len - 1, "IFNAME=%s SCAN", this->ifname);
+        }
+    }
     if (res < 0) {
         LOGE("snprintf error");
         free(pcmd);

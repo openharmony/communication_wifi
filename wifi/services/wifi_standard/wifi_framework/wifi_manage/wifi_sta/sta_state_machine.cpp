@@ -790,19 +790,30 @@ void StaStateMachine::DealConnectToUserSelectedNetwork(InternalMessage *msg)
 
     int networkId = msg->GetParam1();
     bool forceReconnect = msg->GetParam2();
-    if (linkedInfo.connState == ConnState::CONNECTED && networkId == linkedInfo.networkId) {
-        WIFI_LOGE("This network is in use and does not need to be reconnected.\n");
-        return;
-    }
+
+    if (networkId == linkedInfo.networkId) {
+        if (linkedInfo.connState == ConnState::CONNECTED) {
+            staCallback.OnStaConnChanged(OperateResState::CONNECT_AP_CONNECTED, linkedInfo);
+            WIFI_LOGI("This network is in use and does not need to be reconnected.\n");
+            return;
+        }
+        if (linkedInfo.connState == ConnState::CONNECTING &&
+            linkedInfo.detailedState == DetailedState::OBTAINING_IPADDR) {
+            WIFI_LOGI("This network is connecting and does not need to be reconnected.\n");
+            return;
+        }
+     }
 
     /* Save connection information. */
     SaveLinkstate(ConnState::CONNECTING, DetailedState::CONNECTING);
     /* Callback result to InterfaceService. */
     staCallback.OnStaConnChanged(OperateResState::CONNECT_CONNECTING, linkedInfo);
+
     if (StartConnectToNetwork(networkId) != WIFI_OPT_SUCCESS) {
         OnConnectFailed(networkId);
         return;
     }
+
     /* Sets network status. */
     WifiSettings::GetInstance().EnableNetwork(networkId, forceReconnect);
     WifiSettings::GetInstance().SetDeviceAfterConnect(networkId);
@@ -842,8 +853,8 @@ void StaStateMachine::DealConnectionEvent(InternalMessage *msg)
     WifiSettings::GetInstance().SyncDeviceConfig();
     /* Stop clearing the Wpa_blocklist. */
     StopTimer(static_cast<int>(WPA_BLOCK_LIST_CLEAR_EVENT));
-    StopTimer(static_cast<int>(CMD_NETWORK_CONNECT_TIMEOUT));
     ConnectToNetworkProcess(msg);
+    StopTimer(static_cast<int>(CMD_NETWORK_CONNECT_TIMEOUT));
     StartTimer(static_cast<int>(CMD_SIGNAL_POLL), 0);
 
     if (wpsState != SetupMethod::INVALID) {

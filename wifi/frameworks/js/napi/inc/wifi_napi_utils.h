@@ -96,7 +96,7 @@ napi_status SetValueBool(const napi_env& env, const char* fieldStr, const bool b
 napi_value DoAsyncWork(const napi_env& env, AsyncContext *asyncContext,
     const size_t argc, const napi_value *argv, const size_t nonCallbackArgNum);
 void SetNamedPropertyByInteger(napi_env, napi_value dstObj, int32_t objName, const char *propName);
-#ifdef ENABLE_NAPI_WIFI_MANAGER
+
 enum class SecTypeJs {
     /** Invalid security type */
     SEC_TYPE_INVALID = 0,
@@ -110,6 +110,7 @@ enum class SecTypeJs {
     SEC_TYPE_SAE = 4,
     /** EAP authentication. */
     SEC_TYPE_EAP = 5,
+#ifdef ENABLE_NAPI_WIFI_MANAGER
     /** SUITE_B_192 192 bit level. */
     SEC_TYPE_EAP_SUITE_B = 6,
     /** Opportunistic Wireless Encryption. */
@@ -118,17 +119,8 @@ enum class SecTypeJs {
     SEC_TYPE_WAPI_CERT = 8,
     /** WAPI pre-shared key to be specified. */
     SEC_TYPE_WAPI_PSK = 9,
-};
-#else
-enum class SecTypeJs {
-    SEC_TYPE_INVALID = 0, /* Invalid security type */
-    SEC_TYPE_OPEN = 1, /* Open */
-    SEC_TYPE_WEP = 2, /* Wired Equivalent Privacy (WEP) */
-    SEC_TYPE_PSK = 3, /* Pre-shared key (PSK) */
-    SEC_TYPE_SAE = 4, /* Simultaneous Authentication of Equals (SAE) */
-    SEC_TYPE_EAP = 5, /* EAP authentication. */
-};
 #endif
+};
 
 enum class EapMethodJs {
     EAP_NONE = 0,

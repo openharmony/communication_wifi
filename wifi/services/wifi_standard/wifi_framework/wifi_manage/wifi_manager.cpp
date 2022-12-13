@@ -291,7 +291,7 @@ void WifiManager::Exit()
         PushServiceCloseMsg(WifiCloseServiceCode::SERVICE_THREAD_EXIT);
         mCloseServiceThread.join();
     }
-#ifndef
+#ifndef OHOS_ARCH_LITE
     if (screenEventSubscriber_ != nullptr) {
         UnRegisterScreenEvent();
     }

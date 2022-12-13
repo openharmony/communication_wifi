@@ -97,14 +97,14 @@ static napi_value P2pConnStateInit(napi_env env)
 
 static napi_value P2pDeviceStatusInit(napi_env env)
 {
-    napi_value P2pDeviceStatus = nullptr;
-    napi_create_object(env, &P2pDeviceStatus);
-    SetNamedPropertyByInteger(env, P2pDeviceStatus, static_cast<int>(P2pDeviceStatusJs::CONNECTED), "CONNECTED");
-    SetNamedPropertyByInteger(env, P2pDeviceStatus, static_cast<int>(P2pDeviceStatusJs::INVITED), "INVITED");
-    SetNamedPropertyByInteger(env, P2pDeviceStatus, static_cast<int>(P2pDeviceStatusJs::FAILED), "FAILED");
-    SetNamedPropertyByInteger(env, P2pDeviceStatus, static_cast<int>(P2pDeviceStatusJs::AVAILABLE), "AVAILABLE");
-    SetNamedPropertyByInteger(env, P2pDeviceStatus, static_cast<int>(P2pDeviceStatusJs::UNAVAILABLE), "UNAVAILABLE");
-    return P2pDeviceStatus;
+    napi_value p2pDeviceStatus = nullptr;
+    napi_create_object(env, &p2pDeviceStatus);
+    SetNamedPropertyByInteger(env, p2pDeviceStatus, static_cast<int>(P2pDeviceStatusJs::CONNECTED), "CONNECTED");
+    SetNamedPropertyByInteger(env, p2pDeviceStatus, static_cast<int>(P2pDeviceStatusJs::INVITED), "INVITED");
+    SetNamedPropertyByInteger(env, p2pDeviceStatus, static_cast<int>(P2pDeviceStatusJs::FAILED), "FAILED");
+    SetNamedPropertyByInteger(env, p2pDeviceStatus, static_cast<int>(P2pDeviceStatusJs::AVAILABLE), "AVAILABLE");
+    SetNamedPropertyByInteger(env, p2pDeviceStatus, static_cast<int>(P2pDeviceStatusJs::UNAVAILABLE), "UNAVAILABLE");
+    return p2pDeviceStatus;
 }
 
 static napi_value GroupOwnerBandInit(napi_env env)
@@ -190,7 +190,7 @@ static napi_value PropertyValueInit(napi_env env, napi_value exports)
         DECLARE_NAPI_PROPERTY("P2pDeviceStatus", P2pDeviceStatusObj),
         DECLARE_NAPI_PROPERTY("GroupOwnerBand", groupOwnerBandObj)
     };
-    napi_define_properties(env, exports, sizeof(exportFuncs) / sizeof(*exportFuncs), exportFuncs);
+    napi_define_properties(env, exports, sizeof(exportFuncs) / sizeof(napi_property_descriptor), exportFuncs);
     return exports;
 }
 

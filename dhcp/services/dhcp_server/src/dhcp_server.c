@@ -1707,8 +1707,8 @@ int FreeServerContext(PDhcpServerContext *ctx)
     if ((*ctx)->instance != NULL) {
         free((*ctx)->instance);
         (*ctx)->instance = NULL;
-        free(*ctx);
-        *ctx = NULL;
     }
+    free(*ctx);
+    *ctx = NULL;
     return RET_SUCCESS;
 }

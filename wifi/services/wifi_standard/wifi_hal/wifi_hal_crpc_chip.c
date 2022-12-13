@@ -54,7 +54,7 @@ int RpcGetWifiChipIds(RpcServer *server, Context *context)
     if (maxSize <= 0) {
         return HAL_FAILURE;
     }
-    uint8_t *chipIds = (uint8_t *)calloc(maxSize * sizeof(int), sizeof(uint8_t));
+    uint8_t *chipIds = (uint8_t *)calloc(maxSize * sizeof(uint8_t), sizeof(uint8_t));
     if (chipIds == NULL) {
         return HAL_FAILURE;
     }

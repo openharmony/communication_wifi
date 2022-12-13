@@ -176,6 +176,7 @@ if (defined(ohos_lite)) {
       "$DHCP_ROOT_DIR/interfaces/inner_api/interfaces",
       "$WIFI_ROOT_DIR/utils/inc",
       "//foundation/appexecfwk/adapter/interfaces/innerkits/appexecfwk_base/include",
+      "//base/notification/common_event_service/interfaces/inner_api",
       "//base/security/access_token/interfaces/innerkits/accesstoken/include",
       "//foundation/communication/netmanager_base/frameworks/native/netmanagernative",
       "//foundation/communication/netmanager_base/interfaces/innerkits/netmanagernative/include",
@@ -219,6 +220,7 @@ if (defined(ohos_lite)) {
     ]
 
     external_deps = [
+      "ability_base:want",
       "c_utils:utils",
       "ipc:ipc_core",
     ]
@@ -245,6 +247,7 @@ if (defined(ohos_lite)) {
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit:wifi_toolkit",
       "$WIFI_ROOT_DIR/utils:wifi_utils",
       "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog",
+      "//base/notification/common_event_service/frameworks/native:cesfwk_innerkits",
       "//foundation/systemabilitymgr/safwk/interfaces/innerkits/safwk:system_ability_fwk",
     ]
 
@@ -289,6 +292,7 @@ if (defined(ohos_lite)) {
     ]
 
     external_deps = [
+      "ability_base:want",
       "c_utils:utils",
       "ipc:ipc_core",
     ]
@@ -325,6 +329,7 @@ if (defined(ohos_lite)) {
     ]
 
     external_deps = [
+      "ability_base:want",
       "c_utils:utils",
       "ipc:ipc_core",
       "netmanager_base:net_conn_manager_if",
@@ -351,6 +356,7 @@ if (defined(ohos_lite)) {
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit:wifi_toolkit",
       "$WIFI_ROOT_DIR/utils:wifi_utils",
       "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog",
+      "//base/notification/common_event_service/frameworks/native:cesfwk_innerkits",
       "//foundation/communication/netmanager_base/services/netmanagernative:netsys_native_manager",
       "//foundation/systemabilitymgr/safwk/interfaces/innerkits/safwk:system_ability_fwk",
     ]
@@ -358,6 +364,7 @@ if (defined(ohos_lite)) {
     configs = [ ":wifi_manager_service_header" ]
 
     external_deps = [
+      "ability_base:want",
       "access_token:libaccesstoken_sdk",
       "c_utils:utils",
       "ipc:ipc_core",

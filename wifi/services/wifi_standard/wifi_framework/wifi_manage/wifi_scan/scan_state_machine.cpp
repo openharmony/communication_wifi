@@ -513,6 +513,7 @@ bool ScanStateMachine::PnoScanHardware::ExecuteStateMsg(InternalMessage *msg)
             return true;
 
         case PNO_SCAN_RESULT_EVENT:
+        case SCAN_RESULT_EVENT:
             pScanStateMachine->HwPnoScanInfoProcess();
             return true;
 

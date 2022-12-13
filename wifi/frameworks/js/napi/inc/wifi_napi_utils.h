@@ -178,7 +178,7 @@ enum class SuppStateJs {
     /** Failed to establish a connection to the supplicant. */
     UNINITIALIZED,
     /** The supplicant is in an unknown or invalid state. */
-    INVALID
+    INVALID,
 };
 
 enum class P2pConnectStateJs {
@@ -217,13 +217,13 @@ enum class WifiChannelWidthJs {
     WIDTH_80MHZ = 2,
     WIDTH_160MHZ = 3,
     WIDTH_80MHZ_PLUS = 4,
-    WIDTH_INVALID
+    WIDTH_INVALID,
 };
 
 enum class PowerModelJs {
     SLEEPING = 0,
     GENERAL = 1,
-    THROUGH_WALL = 2
+    THROUGH_WALL = 2,
 };
 
 }  // namespace Wifi

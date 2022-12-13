@@ -24,9 +24,7 @@ ScanMonitor::ScanMonitor() : pScanStateMachine(nullptr)
 {}
 
 ScanMonitor::~ScanMonitor()
-{
-    (void)WifiSupplicantHalInterface::GetInstance().UnRegisterSupplicantEventCallback();
-}
+{}
 
 bool ScanMonitor::InitScanMonitor()
 {
@@ -40,6 +38,15 @@ bool ScanMonitor::InitScanMonitor()
     }
 
     return true;
+}
+
+void ScanMonitor::UnInitScanMonitor()
+{
+    WIFI_LOGI("Enter ScanMonitor::UnInitScanMonitor.");
+    if (WifiSupplicantHalInterface::GetInstance().UnRegisterSupplicantEventCallback() != WIFI_IDL_OPT_OK) {
+        WIFI_LOGE("UnRegisterSupplicantEventCallback failed.");
+    }
+    return;
 }
 
 void ScanMonitor::SetScanStateMachine(ScanStateMachine *paraScanStateMachine)

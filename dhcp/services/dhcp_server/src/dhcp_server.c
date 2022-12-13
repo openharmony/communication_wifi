@@ -534,7 +534,7 @@ static int BeginLooper(PDhcpServerContext ctx)
             LOGE("failed to send reply message.");
         }
         if (replyType == REPLY_ACK || replyType == REPLY_OFFER) {
-            int saveRet = SaveBindingRecoders(&srvIns->addressPool, 0);
+            int saveRet = SaveBindingRecoders(&srvIns->addressPool, 1);
             if (saveRet != RET_SUCCESS && saveRet != RET_WAIT_SAVE) {
                 LOGW("failed to save lease recoders.");
             }

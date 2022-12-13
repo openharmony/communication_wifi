@@ -95,16 +95,16 @@ static napi_value P2pConnStateInit(napi_env env)
     return p2pConnState;
 }
 
-static napi_value P2pDeviceStateInit(napi_env env)
+static napi_value P2pDeviceStatusInit(napi_env env)
 {
-    napi_value p2pDeviceState = nullptr;
-    napi_create_object(env, &p2pDeviceState);
-    SetNamedPropertyByInteger(env, p2pDeviceState, static_cast<int>(P2pDeviceStatusJs::CONNECTED), "CONNECTED");
-    SetNamedPropertyByInteger(env, p2pDeviceState, static_cast<int>(P2pDeviceStatusJs::INVITED), "INVITED");
-    SetNamedPropertyByInteger(env, p2pDeviceState, static_cast<int>(P2pDeviceStatusJs::FAILED), "FAILED");
-    SetNamedPropertyByInteger(env, p2pDeviceState, static_cast<int>(P2pDeviceStatusJs::AVAILABLE), "AVAILABLE");
-    SetNamedPropertyByInteger(env, p2pDeviceState, static_cast<int>(P2pDeviceStatusJs::UNAVAILABLE), "UNAVAILABLE");
-    return p2pDeviceState;
+    napi_value P2pDeviceStatus = nullptr;
+    napi_create_object(env, &P2pDeviceStatus);
+    SetNamedPropertyByInteger(env, P2pDeviceStatus, static_cast<int>(P2pDeviceStatusJs::CONNECTED), "CONNECTED");
+    SetNamedPropertyByInteger(env, P2pDeviceStatus, static_cast<int>(P2pDeviceStatusJs::INVITED), "INVITED");
+    SetNamedPropertyByInteger(env, P2pDeviceStatus, static_cast<int>(P2pDeviceStatusJs::FAILED), "FAILED");
+    SetNamedPropertyByInteger(env, P2pDeviceStatus, static_cast<int>(P2pDeviceStatusJs::AVAILABLE), "AVAILABLE");
+    SetNamedPropertyByInteger(env, P2pDeviceStatus, static_cast<int>(P2pDeviceStatusJs::UNAVAILABLE), "UNAVAILABLE");
+    return P2pDeviceStatus;
 }
 
 static napi_value GroupOwnerBandInit(napi_env env)
@@ -169,7 +169,7 @@ static napi_value PropertyValueInit(napi_env env, napi_value exports)
     napi_value connStateObj = ConnStateInit(env);
     napi_value suppStateObj = SuppStateInit(env);
     napi_value p2pConnStateObj = P2pConnStateInit(env);
-    napi_value p2pDeviceStateObj = P2pDeviceStateInit(env);
+    napi_value P2pDeviceStatusObj = P2pDeviceStatusInit(env);
     napi_value groupOwnerBandObj = GroupOwnerBandInit(env);
 #ifdef ENABLE_NAPI_WIFI_MANAGER
     napi_value phase2MethodObj = Phase2MethodInit(env);
@@ -187,7 +187,7 @@ static napi_value PropertyValueInit(napi_env env, napi_value exports)
         DECLARE_NAPI_PROPERTY("ConnState", connStateObj),
         DECLARE_NAPI_PROPERTY("SuppState", suppStateObj),
         DECLARE_NAPI_PROPERTY("P2pConnectState", p2pConnStateObj),
-        DECLARE_NAPI_PROPERTY("P2pDeviceState", p2pDeviceStateObj),
+        DECLARE_NAPI_PROPERTY("P2pDeviceStatus", P2pDeviceStatusObj),
         DECLARE_NAPI_PROPERTY("GroupOwnerBand", groupOwnerBandObj)
     };
     napi_define_properties(env, exports, sizeof(exportFuncs) / sizeof(*exportFuncs), exportFuncs);

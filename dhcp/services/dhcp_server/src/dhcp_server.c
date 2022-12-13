@@ -258,9 +258,14 @@ int ReceiveDhcpMessage(int sock, PDhcpMsgInfo msgInfo)
     time_t seconds = DHCP_SEL_WAIT_TIMEOUTS;
     tmt.tv_sec = seconds;
     tmt.tv_usec = 0;
-    if (select(sock + 1, &recvFd, NULL, NULL, &tmt) < 0) {
+    int ret = select(sock + 1, &recvFd, NULL, NULL, &tmt);
+    if (ret < 0) {
         LOGE("select error, %d", errno);
         return ERR_SELECT;
+    }
+    if (ret == 0) {
+        LOGE("select time out.");
+        return RET_SELECT_TIME_OUT;
     }
     if (!FD_ISSET(sock, &recvFd)) {
         LOGE("failed to select isset.");
@@ -523,7 +528,7 @@ static int BeginLooper(PDhcpServerContext ctx)
         ClearOptions(&reply.options);
         int recvRet = ReceiveDhcpMessage(ctx->instance->serverFd, &from);
         if (recvRet == RET_ERROR || recvRet == ERR_SELECT) {
-            break;
+            continue;
         }
         if (ContinueReceive(&from, recvRet)) {
             continue;

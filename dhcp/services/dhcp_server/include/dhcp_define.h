@@ -77,7 +77,8 @@ enum DhcpReturnCode {
     ERR_SELECT,
     RET_BREAK,
     RET_WAIT_SAVE,
-    RET_NO_SUPPORTED
+    RET_NO_SUPPORTED,
+    RET_SELECT_TIME_OUT
 };
 
 #endif

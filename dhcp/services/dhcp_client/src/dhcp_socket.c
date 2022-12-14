@@ -336,7 +336,6 @@ int CheckPacketIpSum(struct UdpDhcpPacket *pPacket, const int bytes)
     }
 
     if (CheckUdpPacket(pPacket, bytes) != SOCKET_OPT_SUCCESS) {
-        usleep(SLEEP_TIME_500_MS);
         return SOCKET_OPT_FAILED;
     }
 

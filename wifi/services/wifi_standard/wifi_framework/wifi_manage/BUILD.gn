@@ -366,6 +366,7 @@ if (defined(ohos_lite)) {
     external_deps = [
       "ability_base:want",
       "access_token:libaccesstoken_sdk",
+      "bundle_framework:appexecfwk_base",
       "c_utils:utils",
       "ipc:ipc_core",
       "netmanager_base:net_conn_manager_if",

@@ -540,6 +540,9 @@ int LoadBindingRecoders(DhcpAddressPool *pool)
     if (fp == NULL) {
         return RET_FAILED;
     }
+    uint32_t beginIp = pool->addressRange.beginAddress;
+    uint32_t endIp = pool->addressRange.endAddress;
+    uint32_t netmask = pool->netmask;
     char line[DHCP_FILE_LINE_LENGTH] = {0};
     while (fgets(line, DHCP_FILE_LINE_LENGTH, fp) != NULL) {
         TrimString(line);
@@ -550,7 +553,9 @@ int LoadBindingRecoders(DhcpAddressPool *pool)
         if (ParseAddressBinding(&bind, line) != 0) {
             continue;
         }
-        Insert(&(pool->leaseTable), (uintptr_t)&bind.ipAddress, (uintptr_t)&bind);
+        if (IpInRange(bind.ipAddress, beginIp, endIp, netmask)) {
+            Insert(&(pool->leaseTable), (uintptr_t)&bind.ipAddress, (uintptr_t)&bind);
+        }
     }
     fclose(fp);
     return RET_SUCCESS;

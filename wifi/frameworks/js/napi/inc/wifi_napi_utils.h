@@ -145,6 +145,21 @@ enum class ConnStateJs {
     UNKNOWN /* Failed to set up the Wi-Fi connection */
 };
 
+enum class SuppStateJs {
+    DISCONNECTED = 0, /* The network interface is disabled. */
+    INTERFACE_DISABLED, /* The supplicant is disabled. */
+    INACTIVE, /* The supplicant is scanning for a Wi-Fi connection. */
+    SCANNING, /* The supplicant is authenticating with a specified AP. */
+    AUTHENTICATING, /* The supplicant is associating with a specified AP. */
+    ASSOCIATING, /* The supplicant is associated with a specified AP. */
+    ASSOCIATED, /* The four-way handshake is ongoing. */
+    FOUR_WAY_HANDSHAKE, /* The group handshake is ongoing. */
+    GROUP_HANDSHAKE, /* All authentication is completed. */
+    COMPLETED, /* Failed to establish a connection to the supplicant. */
+    UNINITIALIZED, /* The supplicant is in an unknown or invalid state. */
+    INVALID,
+};
+
 enum class IpTypeJs {
     /** Use statically configured IP settings */
     IP_TYPE_STATIC,
@@ -152,33 +167,6 @@ enum class IpTypeJs {
     IP_TYPE_DHCP,
     /** No IP details are assigned */
     IP_TYPE_UNKNOWN,
-};
-
-enum class SuppStateJs {
-    /** The supplicant is not associated with or is disconnected from the AP. */
-    DISCONNECTED,
-    /** The network interface is disabled. */
-    INTERFACE_DISABLED,
-    /** The supplicant is disabled. */
-    INACTIVE,
-    /** The supplicant is scanning for a Wi-Fi connection. */
-    SCANNING,
-    /** The supplicant is authenticating with a specified AP. */
-    AUTHENTICATING,
-    /** The supplicant is associating with a specified AP. */
-    ASSOCIATING,
-    /** The supplicant is associated with a specified AP. */
-    ASSOCIATED,
-    /** The four-way handshake is ongoing. */
-    FOUR_WAY_HANDSHAKE,
-    /** The group handshake is ongoing. */
-    GROUP_HANDSHAKE,
-    /** All authentication is completed. */
-    COMPLETED,
-    /** Failed to establish a connection to the supplicant. */
-    UNINITIALIZED,
-    /** The supplicant is in an unknown or invalid state. */
-    INVALID,
 };
 
 enum class P2pConnectStateJs {

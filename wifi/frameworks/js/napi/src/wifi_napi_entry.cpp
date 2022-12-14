@@ -23,6 +23,25 @@ namespace OHOS {
 namespace Wifi {
 #ifndef ENABLE_NAPI_COMPATIBLE
 
+static napi_value SuppStateInit(napi_env env)
+{
+    napi_value suppState = nullptr;
+    napi_create_object(env, &suppState);
+    SetNamedPropertyByInteger(env, suppState, static_cast<int>(SuppStateJs::DISCONNECTED), "DISCONNECTED");
+    SetNamedPropertyByInteger(env, suppState, static_cast<int>(SuppStateJs::INTERFACE_DISABLED), "INTERFACE_DISABLED");
+    SetNamedPropertyByInteger(env, suppState, static_cast<int>(SuppStateJs::INACTIVE), "INACTIVE");
+    SetNamedPropertyByInteger(env, suppState, static_cast<int>(SuppStateJs::SCANNING), "SCANNING");
+    SetNamedPropertyByInteger(env, suppState, static_cast<int>(SuppStateJs::AUTHENTICATING), "AUTHENTICATING");
+    SetNamedPropertyByInteger(env, suppState, static_cast<int>(SuppStateJs::ASSOCIATING), "ASSOCIATING");
+    SetNamedPropertyByInteger(env, suppState, static_cast<int>(SuppStateJs::ASSOCIATED), "ASSOCIATED");
+    SetNamedPropertyByInteger(env, suppState, static_cast<int>(SuppStateJs::FOUR_WAY_HANDSHAKE), "FOUR_WAY_HANDSHAKE");
+    SetNamedPropertyByInteger(env, suppState, static_cast<int>(SuppStateJs::GROUP_HANDSHAKE), "GROUP_HANDSHAKE");
+    SetNamedPropertyByInteger(env, suppState, static_cast<int>(SuppStateJs::COMPLETED), "COMPLETED");
+    SetNamedPropertyByInteger(env, suppState, static_cast<int>(SuppStateJs::UNINITIALIZED), "UNINITIALIZED");
+    SetNamedPropertyByInteger(env, suppState, static_cast<int>(SuppStateJs::INVALID), "INVALID");
+    return suppState;
+}
+
 static napi_value SecurityTypeInit(napi_env env)
 {
     napi_value securityType = nullptr;
@@ -67,24 +86,6 @@ static napi_value ConnStateInit(napi_env env)
     return connState;
 }
 
-static napi_value SuppStateInit(napi_env env)
-{
-    napi_value suppState = nullptr;
-    napi_create_object(env, &suppState);
-    SetNamedPropertyByInteger(env, suppState, static_cast<int>(SuppStateJs::DISCONNECTED), "DISCONNECTED");
-    SetNamedPropertyByInteger(env, suppState, static_cast<int>(SuppStateJs::INTERFACE_DISABLED), "INTERFACE_DISABLED");
-    SetNamedPropertyByInteger(env, suppState, static_cast<int>(SuppStateJs::INACTIVE), "INACTIVE");
-    SetNamedPropertyByInteger(env, suppState, static_cast<int>(SuppStateJs::SCANNING), "SCANNING");
-    SetNamedPropertyByInteger(env, suppState, static_cast<int>(SuppStateJs::AUTHENTICATING), "AUTHENTICATING");
-    SetNamedPropertyByInteger(env, suppState, static_cast<int>(SuppStateJs::ASSOCIATING), "ASSOCIATING");
-    SetNamedPropertyByInteger(env, suppState, static_cast<int>(SuppStateJs::ASSOCIATED), "ASSOCIATED");
-    SetNamedPropertyByInteger(env, suppState, static_cast<int>(SuppStateJs::FOUR_WAY_HANDSHAKE), "FOUR_WAY_HANDSHAKE");
-    SetNamedPropertyByInteger(env, suppState, static_cast<int>(SuppStateJs::GROUP_HANDSHAKE), "GROUP_HANDSHAKE");
-    SetNamedPropertyByInteger(env, suppState, static_cast<int>(SuppStateJs::COMPLETED), "COMPLETED");
-    SetNamedPropertyByInteger(env, suppState, static_cast<int>(SuppStateJs::UNINITIALIZED), "UNINITIALIZED");
-    SetNamedPropertyByInteger(env, suppState, static_cast<int>(SuppStateJs::INVALID), "INVALID");
-    return suppState;
-}
 
 static napi_value P2pConnStateInit(napi_env env)
 {
@@ -164,10 +165,10 @@ static napi_value EapMethodInit(napi_env env)
 
 static napi_value PropertyValueInit(napi_env env, napi_value exports)
 {
+    napi_value suppStateObj = SuppStateInit(env);
     napi_value securityTypeObj = SecurityTypeInit(env);
     napi_value ipTypeObj = IpTypeInit(env);
     napi_value connStateObj = ConnStateInit(env);
-    napi_value suppStateObj = SuppStateInit(env);
     napi_value p2pConnStateObj = P2pConnStateInit(env);
     napi_value P2pDeviceStatusObj = P2pDeviceStatusInit(env);
     napi_value groupOwnerBandObj = GroupOwnerBandInit(env);
@@ -182,13 +183,13 @@ static napi_value PropertyValueInit(napi_env env, napi_value exports)
         DECLARE_NAPI_PROPERTY("WifiChannelWidth", WifiChannelWidthObj),
         DECLARE_NAPI_PROPERTY("EapMethod", EapMethodObj),
 #endif
+        DECLARE_NAPI_PROPERTY("SuppState", suppStateObj),
         DECLARE_NAPI_PROPERTY("WifiSecurityType", securityTypeObj),
         DECLARE_NAPI_PROPERTY("IpType", ipTypeObj),
         DECLARE_NAPI_PROPERTY("ConnState", connStateObj),
-        DECLARE_NAPI_PROPERTY("SuppState", suppStateObj),
         DECLARE_NAPI_PROPERTY("P2pConnectState", p2pConnStateObj),
         DECLARE_NAPI_PROPERTY("P2pDeviceStatus", P2pDeviceStatusObj),
-        DECLARE_NAPI_PROPERTY("GroupOwnerBand", groupOwnerBandObj)
+        DECLARE_NAPI_PROPERTY("GroupOwnerBand", groupOwnerBandObj),
     };
     napi_define_properties(env, exports, sizeof(exportFuncs) / sizeof(napi_property_descriptor), exportFuncs);
     return exports;

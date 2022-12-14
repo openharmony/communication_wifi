@@ -33,8 +33,10 @@
 #ifdef FEATURE_P2P_SUPPORT
 #include "ip2p_service_callbacks.h"
 #endif
+#ifndef OHOS_ARCH_LITE
 #include "common_event_manager.h"
 #include "timer.h"
+#endif
 
 namespace OHOS {
 namespace Wifi {

@@ -25,12 +25,13 @@
 #include "wifi_internal_event_dispatcher_lite.h"
 #else
 #include "wifi_internal_event_dispatcher.h"
+#include "common_event_manager.h"
+#include "common_event_support.h"
 #endif
 #include "wifi_sta_hal_interface.h"
 #include "wifi_service_manager.h"
 #include "wifi_settings.h"
-#include "common_event_manager.h"
-#include "common_event_support.h"
+
 
 namespace OHOS {
 namespace Wifi {

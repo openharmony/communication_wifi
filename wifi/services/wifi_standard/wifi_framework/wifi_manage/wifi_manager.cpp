@@ -37,6 +37,10 @@ namespace OHOS {
 namespace Wifi {
 DEFINE_WIFILOG_LABEL("WifiManager");
 int WifiManager::mCloseApIndex = 0;
+#ifndef OHOS_ARCH_LITE
+const uint32_t TIMEOUT_SCREEN_EVENT = 3000;
+#endif
+
 WifiManager &WifiManager::GetInstance()
 {
     static WifiManager gWifiManager;
@@ -241,7 +245,6 @@ int WifiManager::Init()
     
 #ifndef OHOS_ARCH_LITE
     if (screenEventSubscriber_ == nullptr) {
-        const uint32_t TIMEOUT_SCREEN_EVENT = 3000;
         lpScreenTimer_ = std::make_unique<Utils::Timer>("WifiManager");
         using TimeOutCallback = std::function<void()>;
         TimeOutCallback timeoutCallback = std::bind(&WifiManager::RegisterScreenEvent, this);

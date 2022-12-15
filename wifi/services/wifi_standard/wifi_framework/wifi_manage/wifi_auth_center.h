@@ -32,6 +32,13 @@ public:
     int Init();
 
     /**
+     * @Description Verify whether the app is system app
+     *
+     * @return bool - true : system app
+     */
+    static bool IsSystemAppByToken();
+
+    /**
      * @Description Initialize the rights of the simulated app
      *
      * @param pid - define the app's process id

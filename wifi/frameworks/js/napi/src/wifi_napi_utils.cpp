@@ -315,5 +315,12 @@ napi_value DoAsyncWork(const napi_env& env, AsyncContext *asyncContext,
         return promise;
     }
 }
+void SetNamedPropertyByInteger(napi_env env, napi_value dstObj, int32_t objName, const char *propName)
+{
+    napi_value prop = nullptr;
+    if (napi_create_int32(env, objName, &prop) == napi_ok) {
+        napi_set_named_property(env, dstObj, propName, prop);
+    }
+}
 }  // namespace Wifi
 }  // namespace OHOS

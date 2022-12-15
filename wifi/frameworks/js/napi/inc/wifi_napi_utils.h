@@ -95,14 +95,31 @@ napi_status SetValueInt64(const napi_env& env, const char* fieldStr, const int64
 napi_status SetValueBool(const napi_env& env, const char* fieldStr, const bool boolValue, napi_value& result);
 napi_value DoAsyncWork(const napi_env& env, AsyncContext *asyncContext,
     const size_t argc, const napi_value *argv, const size_t nonCallbackArgNum);
+void SetNamedPropertyByInteger(napi_env, napi_value dstObj, int32_t objName, const char *propName);
 
 enum class SecTypeJs {
-    SEC_TYPE_INVALID = 0, /* Invalid security type */
-    SEC_TYPE_OPEN = 1, /* Open */
-    SEC_TYPE_WEP = 2, /* Wired Equivalent Privacy (WEP) */
-    SEC_TYPE_PSK = 3, /* Pre-shared key (PSK) */
-    SEC_TYPE_SAE = 4, /* Simultaneous Authentication of Equals (SAE) */
-    SEC_TYPE_EAP = 5, /* Extensible Authentication Protocol (EAP) */
+    /** Invalid security type */
+    SEC_TYPE_INVALID = 0,
+    /** Open */
+    SEC_TYPE_OPEN = 1,
+    /** Wired Equivalent Privacy (WEP) */
+    SEC_TYPE_WEP = 2,
+    /** Pre-shared key (PSK) */
+    SEC_TYPE_PSK = 3,
+    /** Simultaneous Authentication of Equals (SAE) */
+    SEC_TYPE_SAE = 4,
+    /** EAP authentication. */
+    SEC_TYPE_EAP = 5,
+#ifdef ENABLE_NAPI_WIFI_MANAGER
+    /** SUITE_B_192 192 bit level. */
+    SEC_TYPE_EAP_SUITE_B = 6,
+    /** Opportunistic Wireless Encryption. */
+    SEC_TYPE_OWE = 7,
+    /** WAPI certificate to be specified. */
+    SEC_TYPE_WAPI_CERT = 8,
+    /** WAPI pre-shared key to be specified. */
+    SEC_TYPE_WAPI_PSK = 9,
+#endif
 };
 
 enum class EapMethodJs {
@@ -116,6 +133,87 @@ enum class EapMethodJs {
     EAP_AKA_PRIME = 7,
     EAP_UNAUTH_TLS = 8,
 };
+
+enum class ConnStateJs {
+    SCANNING, /* The device is searching for an available AP */
+    CONNECTING, /* The Wi-Fi connection is being set up */
+    AUTHENTICATING, /* The Wi-Fi connection is being authenticated */
+    OBTAINING_IPADDR, /* The IP address of the Wi-Fi connection is being obtained */
+    CONNECTED, /* The Wi-Fi connection has been set up */
+    DISCONNECTING, /* The Wi-Fi connection is being torn down */
+    DISCONNECTED, /* The Wi-Fi connection has been torn down */
+    UNKNOWN /* Failed to set up the Wi-Fi connection */
+};
+
+enum class SuppStateJs {
+    DISCONNECTED = 0, /* The network interface is disabled. */
+    INTERFACE_DISABLED, /* The supplicant is disabled. */
+    INACTIVE, /* The supplicant is scanning for a Wi-Fi connection. */
+    SCANNING, /* The supplicant is authenticating with a specified AP. */
+    AUTHENTICATING, /* The supplicant is associating with a specified AP. */
+    ASSOCIATING, /* The supplicant is associated with a specified AP. */
+    ASSOCIATED, /* The four-way handshake is ongoing. */
+    FOUR_WAY_HANDSHAKE, /* The group handshake is ongoing. */
+    GROUP_HANDSHAKE, /* All authentication is completed. */
+    COMPLETED, /* Failed to establish a connection to the supplicant. */
+    UNINITIALIZED, /* The supplicant is in an unknown or invalid state. */
+    INVALID,
+};
+
+enum class IpTypeJs {
+    /** Use statically configured IP settings */
+    IP_TYPE_STATIC,
+    /** Use dynamically configured IP settings */
+    IP_TYPE_DHCP,
+    /** No IP details are assigned */
+    IP_TYPE_UNKNOWN,
+};
+
+enum class P2pConnectStateJs {
+    DISCONNECTED = 0,
+    CONNECTED = 1,
+};
+
+enum class P2pDeviceStatusJs {
+    CONNECTED = 0,
+    INVITED = 1,
+    FAILED = 2,
+    AVAILABLE = 3,
+    UNAVAILABLE = 4,
+};
+
+enum class GroupOwnerBandJs {
+    GO_BAND_AUTO = 0,
+    GO_BAND_2GHZ = 1,
+    GO_BAND_5GHZ = 2,
+};
+
+enum class Phase2MethodJs {
+    PHASE2_NONE,
+    PHASE2_PAP,
+    PHASE2_MSCHAP,
+    PHASE2_MSCHAPV2,
+    PHASE2_GTC,
+    PHASE2_SIM,
+    PHASE2_AKA,
+    PHASE2_AKA_PRIME,
+};
+
+enum class WifiChannelWidthJs {
+    WIDTH_20MHZ = 0,
+    WIDTH_40MHZ = 1,
+    WIDTH_80MHZ = 2,
+    WIDTH_160MHZ = 3,
+    WIDTH_80MHZ_PLUS = 4,
+    WIDTH_INVALID,
+};
+
+enum class PowerModelJs {
+    SLEEPING = 0,
+    GENERAL = 1,
+    THROUGH_WALL = 2,
+};
+
 }  // namespace Wifi
 }  // namespace OHOS
 

@@ -15,7 +15,9 @@
 #ifndef OHOS_DEFINE_H
 #define OHOS_DEFINE_H
 
+#ifndef OHOS_ARCH_LITE
 #include "system_ability_definition.h"
+#endif
 
 /* ------------sta module message define--------- */
 #define WIFI_SVR_CMD_ENABLE_WIFI 0x1001               /* open wifi */

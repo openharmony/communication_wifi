@@ -423,6 +423,7 @@ ErrCode WifiP2pServiceImpl::DeleteGroup(const WifiP2pGroupInfo &group)
 {
     WIFI_LOGI("DeleteGroup, group name [%{public}s]", group.GetGroupName().c_str());
     if (!WifiAuthCenter::IsSystemAppByToken()) {
+        WIFI_LOGE("DeleteGroup:NOT System APP, PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
     if (WifiPermissionUtils::VerifySetWifiInfoPermission() == PERMISSION_DENIED) {
@@ -665,6 +666,7 @@ ErrCode WifiP2pServiceImpl::QueryP2pGroups(std::vector<WifiP2pGroupInfo> &groups
 {
     WIFI_LOGI("QueryP2pGroups");
     if (!WifiAuthCenter::IsSystemAppByToken()) {
+        WIFI_LOGE("QueryP2pGroups:NOT System APP, PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
     if (WifiPermissionUtils::VerifyGetWifiInfoInternalPermission() == PERMISSION_DENIED) {
@@ -744,6 +746,7 @@ ErrCode WifiP2pServiceImpl::SetP2pDeviceName(const std::string &deviceName)
 {
     WIFI_LOGI("SetP2pDeviceName:%{public}s", deviceName.c_str());
     if (!WifiAuthCenter::IsSystemAppByToken()) {
+        WIFI_LOGE("SetP2pDeviceName:NOT System APP, PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
     if (WifiPermissionUtils::VerifySetWifiInfoPermission() == PERMISSION_DENIED) {

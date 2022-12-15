@@ -46,17 +46,21 @@ static napi_value SecurityTypeInit(napi_env env)
 {
     napi_value securityType = nullptr;
     napi_create_object(env, &securityType);
-    SetNamedPropertyByInteger(env, securityType, static_cast<int>(SecTypeJs::SEC_TYPE_INVALID), "WIFI_SEC_TYPE_INVALID");
+    SetNamedPropertyByInteger(env, securityType,
+        static_cast<int>(SecTypeJs::SEC_TYPE_INVALID), "WIFI_SEC_TYPE_INVALID");
     SetNamedPropertyByInteger(env, securityType, static_cast<int>(SecTypeJs::SEC_TYPE_OPEN), "WIFI_SEC_TYPE_OPEN");
     SetNamedPropertyByInteger(env, securityType, static_cast<int>(SecTypeJs::SEC_TYPE_WEP), "WIFI_SEC_TYPE_WEP");
     SetNamedPropertyByInteger(env, securityType, static_cast<int>(SecTypeJs::SEC_TYPE_PSK), "WIFI_SEC_TYPE_PSK");
     SetNamedPropertyByInteger(env, securityType, static_cast<int>(SecTypeJs::SEC_TYPE_SAE), "WIFI_SEC_TYPE_SAE");
 #ifdef ENABLE_NAPI_WIFI_MANAGER
     SetNamedPropertyByInteger(env, securityType, static_cast<int>(SecTypeJs::SEC_TYPE_EAP), "WIFI_SEC_TYPE_EAP");
-    SetNamedPropertyByInteger(env, securityType, static_cast<int>(SecTypeJs::SEC_TYPE_EAP_SUITE_B), "WIFI_SEC_TYPE_EAP_SUITE_B");
+    SetNamedPropertyByInteger(env, securityType,
+        static_cast<int>(SecTypeJs::SEC_TYPE_EAP_SUITE_B), "WIFI_SEC_TYPE_EAP_SUITE_B");
     SetNamedPropertyByInteger(env, securityType, static_cast<int>(SecTypeJs::SEC_TYPE_OWE), "WIFI_SEC_TYPE_OWE");
-    SetNamedPropertyByInteger(env, securityType, static_cast<int>(SecTypeJs::SEC_TYPE_WAPI_CERT), "WIFI_SEC_TYPE_WAPI_CERT");
-    SetNamedPropertyByInteger(env, securityType, static_cast<int>(SecTypeJs::SEC_TYPE_WAPI_PSK), "WIFI_SEC_TYPE_WAPI_PSK");
+    SetNamedPropertyByInteger(env, securityType,
+        static_cast<int>(SecTypeJs::SEC_TYPE_WAPI_CERT), "WIFI_SEC_TYPE_WAPI_CERT");
+    SetNamedPropertyByInteger(env, securityType,
+        static_cast<int>(SecTypeJs::SEC_TYPE_WAPI_PSK), "WIFI_SEC_TYPE_WAPI_PSK");
 #endif
     return securityType;
 }
@@ -130,7 +134,8 @@ static napi_value Phase2MethodInit(napi_env env)
     SetNamedPropertyByInteger(env, phase2Method, static_cast<int>(Phase2MethodJs::PHASE2_GTC), "PHASE2_GTC");
     SetNamedPropertyByInteger(env, phase2Method, static_cast<int>(Phase2MethodJs::PHASE2_SIM), "PHASE2_SIM");
     SetNamedPropertyByInteger(env, phase2Method, static_cast<int>(Phase2MethodJs::PHASE2_AKA), "PHASE2_AKA");
-    SetNamedPropertyByInteger(env, phase2Method, static_cast<int>(Phase2MethodJs::PHASE2_AKA_PRIME), "PHASE2_AKA_PRIME");
+    SetNamedPropertyByInteger(env, phase2Method,
+        static_cast<int>(Phase2MethodJs::PHASE2_AKA_PRIME), "PHASE2_AKA_PRIME");
     return phase2Method;
 }
 static napi_value WifiChannelWidthInit(napi_env env)
@@ -141,8 +146,10 @@ static napi_value WifiChannelWidthInit(napi_env env)
     SetNamedPropertyByInteger(env, wifiChannelWidth, static_cast<int>(WifiChannelWidthJs::WIDTH_40MHZ), "WIDTH_40MHZ");
     SetNamedPropertyByInteger(env, wifiChannelWidth, static_cast<int>(WifiChannelWidthJs::WIDTH_80MHZ), "WIDTH_80MHZ");
     SetNamedPropertyByInteger(env, wifiChannelWidth, static_cast<int>(WifiChannelWidthJs::WIDTH_160MHZ), "WIDTH_160MHZ");
-    SetNamedPropertyByInteger(env, wifiChannelWidth, static_cast<int>(WifiChannelWidthJs::WIDTH_80MHZ_PLUS), "WIDTH_80MHZ_PLUS");
-    SetNamedPropertyByInteger(env, wifiChannelWidth, static_cast<int>(WifiChannelWidthJs::WIDTH_INVALID), "WIDTH_INVALID");
+    SetNamedPropertyByInteger(env, wifiChannelWidth,
+        static_cast<int>(WifiChannelWidthJs::WIDTH_80MHZ_PLUS), "WIDTH_80MHZ_PLUS");
+    SetNamedPropertyByInteger(env, wifiChannelWidth,
+        static_cast<int>(WifiChannelWidthJs::WIDTH_INVALID), "WIDTH_INVALID");
     return wifiChannelWidth;
 }
 

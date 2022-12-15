@@ -15,6 +15,8 @@
 #ifndef OHOS_DEFINE_H
 #define OHOS_DEFINE_H
 
+#include "system_ability_definition.h"
+
 /* ------------sta module message define--------- */
 #define WIFI_SVR_CMD_ENABLE_WIFI 0x1001               /* open wifi */
 #define WIFI_SVR_CMD_DISABLE_WIFI 0x1002              /* close wifi */
@@ -177,10 +179,10 @@
 #define WIFI_SERVICE_AWARE "AwareService" /* AWARE */
 
 /* ---------Feature service ability id */
-#define WIFI_DEVICE_ABILITY_ID 1120
-#define WIFI_HOTSPOT_ABILITY_ID 1121
-#define WIFI_P2P_ABILITY_ID 1123
-#define WIFI_SCAN_ABILITY_ID 1124
+#define WIFI_DEVICE_ABILITY_ID OHOS::WIFI_DEVICE_SYS_ABILITY_ID /* 1120 */
+#define WIFI_HOTSPOT_ABILITY_ID OHOS::WIFI_HOTSPOT_SYS_ABILITY_ID /* 1121 */
+#define WIFI_P2P_ABILITY_ID OHOS::WIFI_P2P_SYS_ABILITY_ID /* 1123 */
+#define WIFI_SCAN_ABILITY_ID OHOS::WIFI_SCAN_SYS_ABILITY_ID /* 1124 */
 
 #define MODE_STATE_SCREEN (1)
 #define MODE_STATE_AIR_PLANE (2)

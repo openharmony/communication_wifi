@@ -26,6 +26,7 @@ config("module_private_config") {
 ohos_unittest("native_unittest") {
   module_out_path = module_output_path
   sources = [
+    "wifi_c_hid2d_test.cpp",
     "wifi_c_hotspot_test.cpp",
   ]
 
@@ -49,8 +50,8 @@ ohos_unittest("native_unittest") {
   ]
 
   external_deps = [
-    "ipc:ipc_core",
     "c_utils:utils",
+    "ipc:ipc_core",
   ]
 
   part_name = "wifi"

@@ -34,6 +34,7 @@ namespace OHOS {
 namespace Wifi {
 constexpr int FREQ_2_DOT_4_GHZ = 2450;
 constexpr int FREQ_5_GHZ = 5200;
+constexpr int TWO = 2;
 class ScanServiceTest : public testing::Test {
 public:
     static void SetUpTestCase() {}
@@ -1019,7 +1020,7 @@ public:
 
     void SetStaCurrentTimeSuccess()
     {
-        EXPECT_CALL(WifiSettings::GetInstance(), SetScreenState(2));
+        EXPECT_CALL(WifiSettings::GetInstance(), SetScreenState(TWO));
         pScanService->SetStaCurrentTime();
     }
 

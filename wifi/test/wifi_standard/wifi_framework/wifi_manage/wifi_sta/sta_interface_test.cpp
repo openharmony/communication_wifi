@@ -260,61 +260,61 @@ public:
     }
     void ConnectToCandidateConfigFail()
     {
-	    int uid = 1; 
-	   	int networkId = 0;
+        int uid = 1;
+        int networkId = 0;
         EXPECT_CALL(*pMockStaService, ConnectToCandidateConfig(_, _)).WillRepeatedly(Return(WIFI_OPT_FAILED));
         EXPECT_TRUE(pStaInterface->ConnectToCandidateConfig(uid, networkId) == WIFI_OPT_FAILED);
     }
 
     void ConnectToCandidateConfigSuccess()
     {
-        int uid = 1; 
+        int uid = 1;
         int networkId = 0;
         EXPECT_CALL(*pMockStaService, ConnectToCandidateConfig(_, _)).WillRepeatedly(Return(WIFI_OPT_SUCCESS));
-        EXPECT_TRUE(pStaInterface->ConnectToCandidateConfig(uid, networkId) == WIFI_OPT_SUCCESS);	
+        EXPECT_TRUE(pStaInterface->ConnectToCandidateConfig(uid, networkId) == WIFI_OPT_SUCCESS);
     }
     void RemoveCandidateConfigSuccess()
     {
-        int uid = 1; 
+        int uid = 1;
         int networkId = 0;
         EXPECT_CALL(*pMockStaService, RemoveCandidateConfig(_, _)).WillRepeatedly(Return(WIFI_OPT_SUCCESS));
-        EXPECT_TRUE(pStaInterface->RemoveCandidateConfig(uid, networkId) == WIFI_OPT_SUCCESS);	
+        EXPECT_TRUE(pStaInterface->RemoveCandidateConfig(uid, networkId) == WIFI_OPT_SUCCESS);
     }
 
     void RemoveCandidateConfigFail()
     {
-	    int uid = 1; 
-     	int networkId = 0;
+        int uid = 1;
+        int networkId = 0;
         EXPECT_CALL(*pMockStaService, RemoveCandidateConfig(_, _)).WillRepeatedly(Return(WIFI_OPT_FAILED));
         EXPECT_TRUE(pStaInterface->RemoveCandidateConfig(uid, networkId) == WIFI_OPT_FAILED);
     }
 
     void RemoveAllCandidateConfigSuccess()
     {
-        int uid = 1; 
+        int uid = 1;
         EXPECT_CALL(*pMockStaService, RemoveAllCandidateConfig(_)).WillRepeatedly(Return(WIFI_OPT_SUCCESS));
-        EXPECT_TRUE(pStaInterface->RemoveAllCandidateConfig(uid) == WIFI_OPT_SUCCESS);	
+        EXPECT_TRUE(pStaInterface->RemoveAllCandidateConfig(uid) == WIFI_OPT_SUCCESS);
     }
 
     void RemoveAllCandidateConfigFail()
     {
-	    int uid = 1; 
+        int uid = 1;
         EXPECT_CALL(*pMockStaService, RemoveAllCandidateConfig(_)).WillRepeatedly(Return(WIFI_OPT_FAILED));
         EXPECT_TRUE(pStaInterface->RemoveAllCandidateConfig(uid) == WIFI_OPT_FAILED);
     }
 
     void AddCandidateConfigSuccess()
     {
-	    int uid = 1; 
-     	int networkId = 0;
-		WifiDeviceConfig config;
+        int uid = 1;
+        int networkId = 0;
+        WifiDeviceConfig config;
         EXPECT_CALL(*pMockStaService, AddCandidateConfig(_, _, _)).WillRepeatedly(Return(WIFI_OPT_SUCCESS));
         EXPECT_TRUE(pStaInterface->AddCandidateConfig(uid, config, networkId) == WIFI_OPT_SUCCESS);
     }
 
     void AddCandidateConfigSupported()
     {
-        int uid = 1; 
+        int uid = 1;
         int networkId = 0;
         WifiDeviceConfig config;
         config.keyMgmt = "WEP";
@@ -324,9 +324,9 @@ public:
 
     void AddCandidateConfigFail()
     {
-        int uid = 1; 
-     	int networkId = 0;
-	    WifiDeviceConfig config;
+        int uid = 1;
+        int networkId = 0;
+        WifiDeviceConfig config;
         EXPECT_CALL(*pMockStaService, AddCandidateConfig(_, _, _)).WillRepeatedly(Return(WIFI_OPT_FAILED));
         EXPECT_TRUE(pStaInterface->AddCandidateConfig(uid, config, networkId) == WIFI_OPT_FAILED);
     }

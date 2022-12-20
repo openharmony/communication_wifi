@@ -786,7 +786,7 @@ public:
         pScanService->scanControlInfo.scanForbidList.push_back(forbidMode);
         EXPECT_CALL(WifiSettings::GetInstance(), SetWhetherToAllowNetworkSwitchover(true));
         pScanService->staStatus = static_cast<int>(OperateResState::CONNECT_AP_CONNECTED);
-		pScanService->scanTrustMode = false;
+        pScanService->scanTrustMode = false;
         EXPECT_EQ(pScanService->AllowSystemTimerScan(), WIFI_OPT_FAILED);
     }
 
@@ -807,10 +807,9 @@ public:
         pScanService->scanControlInfo.scanForbidList.push_back(forbidMode);
         EXPECT_CALL(WifiSettings::GetInstance(), SetWhetherToAllowNetworkSwitchover(true));
         pScanService->staStatus = static_cast<int>(OperateResState::CONNECT_AP_CONNECTED);
-		pScanService->scanTrustMode = false;
+        pScanService->scanTrustMode = false;
         EXPECT_EQ(pScanService->AllowSystemTimerScan(), WIFI_OPT_FAILED);
     }
-
 
     void AllowSystemTimerScanFail6()
     {

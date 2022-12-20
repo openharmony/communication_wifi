@@ -136,11 +136,10 @@ int WifiServiceManager::LoadScanService(const std::string &dlname, bool bCreate)
         mScanServiceHandle.Clear();
         return -1;
     }
-    WIFI_LOGI("WifiServiceManager::LoadScanService bCreate:%{public}d",bCreate);
+    WIFI_LOGI("WifiServiceManager::LoadScanService bCreate:%{public}d", bCreate);
     if (bCreate) {
         mScanServiceHandle.pService = mScanServiceHandle.create();
-        WIFI_LOGI("WifiServiceManager::LoadScanService pService:%{public}p",(void*)mScanServiceHandle.pService);
-
+        WIFI_LOGI("WifiServiceManager::LoadScanService pService:%{public}p", (void*)mScanServiceHandle.pService);
     }
     return 0;
 }

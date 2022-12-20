@@ -105,7 +105,6 @@ public:
     MOCK_METHOD1(GetNetworkList, WifiErrorNo(std::vector<WifiWpaNetworkInfo> &networkList));
     MOCK_METHOD2(GetConnectSignalInfo, WifiErrorNo(const std::string &endBssid, WifiWpaSignalInfo &info));
     MOCK_METHOD2(SetWpsBssid, WifiErrorNo(int networkId, const std::string &bssid));
-
 };
 }  // namespace OHOS
 }  // namespace OHOS

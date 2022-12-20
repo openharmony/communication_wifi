@@ -37,7 +37,7 @@ public:
 HWTEST_F(wifiHid2d_Test, Hid2dRequestGcIpTests, TestSize.Level1)
 {
     unsigned char gcMac[MAC_LEN];
-	unsigned int ipAddr[IPV4_ARRAY_LEN];
+    unsigned int ipAddr[IPV4_ARRAY_LEN];
     Hid2dRequestGcIp(gcMac, ipAddr);
 }
 

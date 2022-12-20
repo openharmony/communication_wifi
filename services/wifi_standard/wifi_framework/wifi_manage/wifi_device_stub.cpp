@@ -115,9 +115,15 @@ void WifiDeviceStub::OnDisableWifi(uint32_t code, MessageParcel &data, MessagePa
 void WifiDeviceStub::OnInitWifiProtect(uint32_t code, MessageParcel &data, MessageParcel &reply)
 {
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+    ErrCode ret = WIFI_OPT_FAILED;
     WifiProtectType protectType = (WifiProtectType)data.ReadInt32();
-    std::string protectName = data.ReadCString();
-    ErrCode ret = InitWifiProtect(protectType, protectName);
+    const char *readStr = data.ReadCString();
+    if (readStr == nullptr) {
+        ret = WIFI_OPT_INVALID_PARAM;
+    } else {
+        std::string protectName = readStr;
+        ret = InitWifiProtect(protectType, protectName);
+    }
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
     return;
@@ -126,9 +132,15 @@ void WifiDeviceStub::OnInitWifiProtect(uint32_t code, MessageParcel &data, Messa
 void WifiDeviceStub::OnGetWifiProtectRef(uint32_t code, MessageParcel &data, MessageParcel &reply)
 {
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+    ErrCode ret = WIFI_OPT_FAILED;
     WifiProtectMode protectMode = (WifiProtectMode)data.ReadInt32();
-    std::string protectName = data.ReadCString();
-    ErrCode ret = GetWifiProtectRef(protectMode, protectName);
+    const char *readStr = data.ReadCString();
+    if (readStr == nullptr) {
+        ret = WIFI_OPT_INVALID_PARAM;
+    } else {
+        std::string protectName = readStr;
+        ret = GetWifiProtectRef(protectMode, protectName);
+    }
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
     return;
@@ -137,8 +149,14 @@ void WifiDeviceStub::OnGetWifiProtectRef(uint32_t code, MessageParcel &data, Mes
 void WifiDeviceStub::OnPutWifiProtectRef(uint32_t code, MessageParcel &data, MessageParcel &reply)
 {
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
-    std::string protectName = data.ReadCString();
-    ErrCode ret = PutWifiProtectRef(protectName);
+    ErrCode ret = WIFI_OPT_FAILED;
+    const char *readStr = data.ReadCString();
+    if (readStr == nullptr) {
+        ret = WIFI_OPT_INVALID_PARAM;
+    } else {
+        std::string protectName = readStr;
+        ret = PutWifiProtectRef(protectName);
+    }
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
     return;
@@ -179,20 +197,26 @@ void WifiDeviceStub::OnUpdateDeviceConfig(uint32_t code, MessageParcel &data, Me
 
 void WifiDeviceStub::ReadWifiDeviceConfig(MessageParcel &data, WifiDeviceConfig &config)
 {
+    const char *readStr = nullptr;
     config.networkId = data.ReadInt32();
     config.status = data.ReadInt32();
-    config.bssid = data.ReadCString();
-    config.ssid = data.ReadCString();
+    readStr = data.ReadCString();
+    config.bssid = (readStr != nullptr) ? readStr : "";
+    readStr = data.ReadCString();
+    config.ssid = (readStr != nullptr) ? readStr : "";
     config.band = data.ReadInt32();
     config.channel = data.ReadInt32();
     config.frequency = data.ReadInt32();
     config.level = data.ReadInt32();
     config.isPasspoint = data.ReadBool();
     config.isEphemeral = data.ReadBool();
-    config.preSharedKey = data.ReadCString();
-    config.keyMgmt = data.ReadCString();
+    readStr = data.ReadCString();
+    config.preSharedKey = (readStr != nullptr) ? readStr : "";
+    readStr = data.ReadCString();
+    config.keyMgmt = (readStr != nullptr) ? readStr : "";
     for (int i = 0; i < WEPKEYS_SIZE; i++) {
-        config.wepKeys[i] = data.ReadCString();
+        readStr = data.ReadCString();
+        config.wepKeys[i] = (readStr != nullptr) ? readStr : "";
     }
     config.wepTxKeyIndex = data.ReadInt32();
     config.priority = data.ReadInt32();
@@ -205,15 +229,22 @@ void WifiDeviceStub::ReadWifiDeviceConfig(MessageParcel &data, WifiDeviceConfig 
     ReadIpAddress(data, config.wifiIpConfig.staticIpAddress.gateway);
     ReadIpAddress(data, config.wifiIpConfig.staticIpAddress.dnsServer1);
     ReadIpAddress(data, config.wifiIpConfig.staticIpAddress.dnsServer2);
-    config.wifiIpConfig.staticIpAddress.domains = data.ReadCString();
-    config.wifiEapConfig.eap = data.ReadCString();
-    config.wifiEapConfig.identity = data.ReadCString();
-    config.wifiEapConfig.password = data.ReadCString();
+    readStr = data.ReadCString();
+    config.wifiIpConfig.staticIpAddress.domains = (readStr != nullptr) ? readStr : "";
+    readStr = data.ReadCString();
+    config.wifiEapConfig.eap = (readStr != nullptr) ? readStr : "";
+    readStr = data.ReadCString();
+    config.wifiEapConfig.identity = (readStr != nullptr) ? readStr : "";
+    readStr = data.ReadCString();
+    config.wifiEapConfig.password = (readStr != nullptr) ? readStr : "";
     config.wifiProxyconfig.configureMethod = ConfigureProxyMethod(data.ReadInt32());
-    config.wifiProxyconfig.autoProxyConfig.pacWebAddress = data.ReadCString();
-    config.wifiProxyconfig.manualProxyConfig.serverHostName = data.ReadCString();
+    readStr = data.ReadCString();
+    config.wifiProxyconfig.autoProxyConfig.pacWebAddress = (readStr != nullptr) ? readStr : "";
+    readStr = data.ReadCString();
+    config.wifiProxyconfig.manualProxyConfig.serverHostName = (readStr != nullptr) ? readStr : "";
     config.wifiProxyconfig.manualProxyConfig.serverPort = data.ReadInt32();
-    config.wifiProxyconfig.manualProxyConfig.exclusionObjectList = data.ReadCString();
+    readStr = data.ReadCString();
+    config.wifiProxyconfig.manualProxyConfig.exclusionObjectList = (readStr != nullptr) ? readStr : "";
     config.wifiPrivacySetting = WifiPrivacyConfig(data.ReadInt32());
     return;
 }
@@ -414,12 +445,19 @@ void WifiDeviceStub::OnDisconnect(uint32_t code, MessageParcel &data, MessagePar
 void WifiDeviceStub::OnStartWps(uint32_t code, MessageParcel &data, MessageParcel &reply)
 {
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+    ErrCode ret = WIFI_OPT_FAILED;
     WpsConfig config;
     config.setup = SetupMethod(data.ReadInt32());
-    config.pin = data.ReadCString();
-    config.bssid = data.ReadCString();
+    const char *pinRead = data.ReadCString();
+    const char *bssidRead = data.ReadCString();
+    if (pinRead == nullptr || bssidRead == nullptr) {
+        ret = WIFI_OPT_INVALID_PARAM;
+    } else {
+        config.pin = pinRead;
+        config.bssid = bssidRead;
+        ret = StartWps(config);
+    }
 
-    ErrCode ret = StartWps(config);
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
 
@@ -519,8 +557,14 @@ void WifiDeviceStub::OnGetIpInfo(uint32_t code, MessageParcel &data, MessageParc
 void WifiDeviceStub::OnSetCountryCode(uint32_t code, MessageParcel &data, MessageParcel &reply)
 {
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
-    std::string countrycode = data.ReadCString();
-    ErrCode ret = SetCountryCode(countrycode);
+    ErrCode ret = WIFI_OPT_FAILED;
+    const char *countryCodeRead = data.ReadCString();
+    if (countryCodeRead == nullptr) {
+        ret = WIFI_OPT_INVALID_PARAM;
+    } else {
+        std::string countrycode = countryCodeRead;
+        ret = SetCountryCode(countrycode);
+    }
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
 

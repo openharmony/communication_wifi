@@ -109,6 +109,7 @@ ErrCode WifiHotspotProxy::GetHotspotConfig(HotspotConfig &result)
         WIFI_LOGD("failed to `%{public}s`,remote service is died!", __func__);
         return WIFI_OPT_FAILED;
     }
+    const char *readStr = nullptr;
     MessageOption option;
     MessageParcel data;
     MessageParcel reply;
@@ -132,11 +133,13 @@ ErrCode WifiHotspotProxy::GetHotspotConfig(HotspotConfig &result)
         return ErrCode(ret);
     }
 
-    result.SetSsid(reply.ReadCString());
+    readStr = reply.ReadCString();
+    result.SetSsid((readStr != nullptr) ? readStr : "");
     result.SetSecurityType(static_cast<KeyMgmt>(reply.ReadInt32()));
     result.SetBand(static_cast<BandType>(reply.ReadInt32()));
     result.SetChannel(reply.ReadInt32());
-    result.SetPreSharedKey(reply.ReadCString());
+    readStr = reply.ReadCString();
+    result.SetPreSharedKey((readStr != nullptr) ? readStr : "");
     result.SetMaxConn(reply.ReadInt32());
 
     return WIFI_OPT_SUCCESS;
@@ -181,6 +184,7 @@ ErrCode WifiHotspotProxy::GetStationList(std::vector<StationInfo> &result)
         WIFI_LOGD("failed to `%{public}s`,remote service is died!", __func__);
         return WIFI_OPT_FAILED;
     }
+    const char *readStr = nullptr;
     MessageOption option;
     MessageParcel data;
     MessageParcel reply;
@@ -211,9 +215,12 @@ ErrCode WifiHotspotProxy::GetStationList(std::vector<StationInfo> &result)
     }
     for (int i = 0; i < size; i++) {
         StationInfo info;
-        info.deviceName = reply.ReadCString();
-        info.bssid = reply.ReadCString();
-        info.ipAddr = reply.ReadCString();
+        readStr = reply.ReadCString();
+        info.deviceName = (readStr != nullptr) ? readStr : "";
+        readStr = reply.ReadCString();
+        info.bssid = (readStr != nullptr) ? readStr : "";
+        readStr = reply.ReadCString();
+        info.ipAddr = (readStr != nullptr) ? readStr : "";
         result.emplace_back(info);
     }
 
@@ -306,6 +313,7 @@ ErrCode WifiHotspotProxy::GetBlockLists(std::vector<StationInfo> &infos)
         WIFI_LOGD("failed to `%{public}s`,remote service is died!", __func__);
         return WIFI_OPT_FAILED;
     }
+    const char *readStr = nullptr;
     MessageOption option;
     MessageParcel data;
     MessageParcel reply;
@@ -338,9 +346,12 @@ ErrCode WifiHotspotProxy::GetBlockLists(std::vector<StationInfo> &infos)
 
     for (int i = 0; i < size; i++) {
         StationInfo info;
-        info.deviceName = reply.ReadCString();
-        info.bssid = reply.ReadCString();
-        info.ipAddr = reply.ReadCString();
+        readStr = reply.ReadCString();
+        info.deviceName = (readStr != nullptr) ? readStr : "";
+        readStr = reply.ReadCString();
+        info.bssid = (readStr != nullptr) ? readStr : "";
+        readStr = reply.ReadCString();
+        info.ipAddr = (readStr != nullptr) ? readStr : "";
         infos.push_back(info);
     }
     return WIFI_OPT_SUCCESS;

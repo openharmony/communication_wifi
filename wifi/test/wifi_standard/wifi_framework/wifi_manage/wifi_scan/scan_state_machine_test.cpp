@@ -829,6 +829,14 @@ public:
         pScanStateMachine->PnoScanRequestProcess(&msg);
     }
 
+    void PnoScanRequestProcessFail()
+    {
+        InternalMessage msg;
+        pScanStateMachine->supportHwPnoFlag = false;
+        pScanStateMachine->PnoScanRequestProcess(nullptr);
+        pScanStateMachine->PnoScanRequestProcess(&msg);
+    }
+
     void ContinuePnoScanProcess()
     {
         pScanStateMachine->pnoConfigStoredFlag = true;
@@ -838,7 +846,9 @@ public:
     void PnoScanHardwareProcessTest1()
     {
         pScanStateMachine->runningHwPnoFlag = false;
+        pScanStateMachine->pnoConfigStoredFlag = true;
         InternalMessage msg;
+        EXPECT_CALL(WifiStaHalInterface::GetInstance(), StartPnoScan(_)).WillRepeatedly(Return(WIFI_IDL_OPT_FAILED));
         pScanStateMachine->PnoScanHardwareProcess(&msg);
     }
 
@@ -847,6 +857,7 @@ public:
         pScanStateMachine->runningHwPnoFlag = true;
         InternalMessage msg;
         pScanStateMachine->PnoScanHardwareProcess(&msg);
+        pScanStateMachine->PnoScanHardwareProcess(nullptr);
     }
 
     void StartPnoScanHardwareSuccess1()
@@ -870,6 +881,14 @@ public:
         EXPECT_CALL(WifiStaHalInterface::GetInstance(), StartPnoScan(_)).WillRepeatedly(Return(WIFI_IDL_OPT_OK));
         pScanStateMachine->runningHwPnoFlag = false;
         pScanStateMachine->pnoConfigStoredFlag = false;
+        EXPECT_EQ(true, pScanStateMachine->StartPnoScanHardware());
+    }
+
+    void StartPnoScanHardwareFail()
+    {
+        EXPECT_CALL(WifiStaHalInterface::GetInstance(), StartPnoScan(_)).WillRepeatedly(Return(WIFI_IDL_OPT_FAILED));
+        pScanStateMachine->runningHwPnoFlag = false;
+        pScanStateMachine->pnoConfigStoredFlag = true;
         EXPECT_EQ(true, pScanStateMachine->StartPnoScanHardware());
     }
 
@@ -901,11 +920,13 @@ public:
     {
         InternalMessage msg;
         pScanStateMachine->UpdatePnoScanRequest(&msg);
+        pScanStateMachine->UpdatePnoScanRequest(nullptr);
     }
 
     void GetPnoScanRequestInfoTest1()
     {
         InternalMessage msg;
+        msg.ClearMessageBody();
         pScanStateMachine->GetPnoScanRequestInfo(&msg);
     }
 
@@ -1944,6 +1965,16 @@ HWTEST_F(ScanStateMachineTest, LoadDriverTest, TestSize.Level1)
 HWTEST_F(ScanStateMachineTest, UnLoadDriverTest, TestSize.Level1)
 {
     UnLoadDriverTest();
+}
+
+HWTEST_F(ScanStateMachineTest, PnoScanRequestProcessFail, TestSize.Level1)
+{
+    PnoScanRequestProcessFail();
+}
+
+HWTEST_F(ScanStateMachineTest, StartPnoScanHardwareFail, TestSize.Level1)
+{
+    StartPnoScanHardwareFail();
 }
 } // namespace Wifi
 } // namespace OHOS

@@ -338,25 +338,29 @@ WifiErrorCode QueryP2pGroups(WifiP2pGroupInfo* groupInfo, int size)
 class WifiP2pCEventCallback : public OHOS::Wifi::IWifiP2pCallback
 {
 public:
-    void OnP2pStateChanged(int state) override {
+    void OnP2pStateChanged(int state) override
+    {
         WIFI_LOGI("received state changed event: %{public}d", state);
         if (stateChangeCb != nullptr) {
             stateChangeCb(P2pState(state));
         }
     }
 
-    void OnP2pPersistentGroupsChanged(void) override {
+    void OnP2pPersistentGroupsChanged(void) override
+    {
         WIFI_LOGI("received group changed event");
         if (groupChangeCb != nullptr) {
             groupChangeCb();
         }
     }
 
-    void OnP2pThisDeviceChanged(const OHOS::Wifi::WifiP2pDevice &device) override {
+    void OnP2pThisDeviceChanged(const OHOS::Wifi::WifiP2pDevice &device) override
+    {
         WIFI_LOGI("%{public}s, received this device changed event", __func__);
     }
 
-    void OnP2pPeersChanged(const std::vector<OHOS::Wifi::WifiP2pDevice> &devices) override {
+    void OnP2pPeersChanged(const std::vector<OHOS::Wifi::WifiP2pDevice> &devices) override
+    {
         WIFI_LOGI("received peers changed event: %{public}d", (int)devices.size());
         WifiP2pDevice *devicePtr = nullptr;
         if (!devices.empty()) {
@@ -383,33 +387,39 @@ public:
         }
     }
 
-    void OnP2pServicesChanged(const std::vector<OHOS::Wifi::WifiP2pServiceInfo> &srvInfo) override {
+    void OnP2pServicesChanged(const std::vector<OHOS::Wifi::WifiP2pServiceInfo> &srvInfo) override
+    {
         WIFI_LOGI("%{public}s, received p2p services changed event", __func__);
     }
 
-    void OnP2pConnectionChanged(const OHOS::Wifi::WifiP2pLinkedInfo &info) override {
+    void OnP2pConnectionChanged(const OHOS::Wifi::WifiP2pLinkedInfo &info) override
+    {
         WIFI_LOGI("received connection changed event");
         if (connectionChangeCb != nullptr) {
             connectionChangeCb(ConvertP2pLinkedInfo(info));
         }
     }
 
-    void OnP2pDiscoveryChanged(bool isChange) override {
+    void OnP2pDiscoveryChanged(bool isChange) override
+    {
         WIFI_LOGI("%{public}s, received p2p discovery changed event", __func__);
     }
 
-    void OnP2pActionResult(OHOS::Wifi::P2pActionCallback action, OHOS::Wifi::ErrCode code) override {
+    void OnP2pActionResult(OHOS::Wifi::P2pActionCallback action, OHOS::Wifi::ErrCode code) override
+    {
         WIFI_LOGI("%{public}s, received p2p action results event", __func__);
     }
 
-    void OnConfigChanged(OHOS::Wifi::CfgType type, char* data, int dataLen) override {
+    void OnConfigChanged(OHOS::Wifi::CfgType type, char* data, int dataLen) override
+    {
         WIFI_LOGI("received config change event: %{public}d", static_cast<int>(type));
         if (cfgChangeCallback != nullptr) {
             cfgChangeCallback(CfgType(type), data, dataLen);
         }
     }
 
-    OHOS::sptr<OHOS::IRemoteObject> AsObject() override {
+    OHOS::sptr<OHOS::IRemoteObject> AsObject() override
+    {
         return nullptr;
     }
 

@@ -1445,7 +1445,7 @@ public:
 
     void DealReConnectCmdFail()
     {
-        InternalMessage msg;  
+        InternalMessage msg;
         pStaStateMachine->linkedInfo.connState = ConnState::CONNECTED;
         pStaStateMachine->DealReConnectCmd(&msg);
         pStaStateMachine->DealReConnectCmd(nullptr);
@@ -1494,7 +1494,7 @@ public:
         linkedInfo.detailedState = DetailedState::NOTWORKING;
         linkedInfo.connState = ConnState::CONNECTED;
         EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_)).WillOnce(Return(0));
-        pStaStateMachine->ReUpdateNetLinkInfo();		
+        pStaStateMachine->ReUpdateNetLinkInfo();
     }
 };
 

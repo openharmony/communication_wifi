@@ -66,6 +66,7 @@ static void SendStartNotify(void)
 {
     int pid = GetWifiServicePid();
     if (pid <= 0) {
+        LOGI("%{public}s is NOT running.", WIFI_SERVICE_NAME);
         return;
     }
     LOGI("Send SIGUSR1/2 SIG to pid %{public}d", pid);

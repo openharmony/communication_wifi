@@ -35,6 +35,9 @@ namespace Wifi {
 constexpr int FREQ_2_DOT_4_GHZ = 2450;
 constexpr int FREQ_5_GHZ = 5200;
 constexpr int TWO = 2;
+constexpr int Four = 4;
+constexpr int FailedNum = 6;
+constexpr int Status = 17;
 class ScanServiceTest : public testing::Test {
 public:
     static void SetUpTestCase() {}
@@ -678,7 +681,7 @@ public:
     {
         EXPECT_CALL(WifiSettings::GetInstance(), GetMinRssi2Dot4Ghz()).Times(AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), GetMinRssi5Ghz()).Times(AtLeast(0));
-        pScanService->pnoScanFailedNum = 6;
+        pScanService->pnoScanFailedNum = FailedNum;
         pScanService->RestartPnoScanTimeOut();
     }
 
@@ -719,7 +722,7 @@ public:
 
     void AllowExternScanFail2()
     {
-        EXPECT_CALL(WifiSettings::GetInstance(), SetThermalLevel(4)).Times(AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), SetThermalLevel(Four)).Times(AtLeast(0));
         EXPECT_EQ(pScanService->AllowExternScan(), WIFI_OPT_FAILED);
     }
 
@@ -732,8 +735,8 @@ public:
         forbidMode.forbidTime = 0;
         forbidMode.forbidCount = 0;
         pScanService->scanControlInfo.scanForbidList.push_back(forbidMode);
-        pScanService->staStatus = 17;
-        EXPECT_CALL(WifiSettings::GetInstance(), SetThermalLevel(2)).Times(AtLeast(0));
+        pScanService->staStatus = Status;
+        EXPECT_CALL(WifiSettings::GetInstance(), SetThermalLevel(TWO)).Times(AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), SetAppRunningState(scanMode)).Times(AtLeast(0));
         EXPECT_EQ(pScanService->AllowExternScan(), WIFI_OPT_FAILED);
     }
@@ -741,7 +744,7 @@ public:
     void AllowExternScanFail4()
     {
         pScanService->disableScanFlag = true;
-        EXPECT_CALL(WifiSettings::GetInstance(), SetThermalLevel(2)).Times(AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), SetThermalLevel(TWO)).Times(AtLeast(0));
         EXPECT_EQ(pScanService->AllowExternScan(), WIFI_OPT_FAILED);
     }
 
@@ -772,7 +775,7 @@ public:
     void AllowSystemTimerScanFail3()
     {
         EXPECT_CALL(WifiSettings::GetInstance(), SetWhetherToAllowNetworkSwitchover(true));
-        pScanService->staStatus = 255;
+        pScanService->staStatus = FREQ_2_DOT_4_GHZ;
         EXPECT_EQ(pScanService->AllowSystemTimerScan(), WIFI_OPT_FAILED);
     }
 

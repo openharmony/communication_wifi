@@ -117,12 +117,6 @@ HWTEST_F(WifiP2pTest, GetP2pConnectedStatusTests, TestSize.Level1)
     GetP2pConnectedStatus(status);
 }
 
-HWTEST_F(WifiP2pTest, QueryP2pLocalDeviceTests, TestSize.Level1)
-{
-    WifiP2pDevice* deviceInfo = nullptr;
-    QueryP2pLocalDevice();
-}
-
 HWTEST_F(WifiP2pTest, QueryP2pDevicesTests, TestSize.Level1)
 {
     WifiP2pDevice* clientDevices = nullptr;
@@ -162,7 +156,7 @@ HWTEST_F(WifiP2pTest, RegisterP2pPeersChangedCallbackTest, TestSize.Level1)
     RegisterP2pPeersChangedCallback(callback);
 }
 
-HWTEST_F(WifiP2pTest, RegisterP2pPersistentGroupsChangedCallbackTest, TestSize.Level1)
+HWTEST_F(WifiP2pTest, RegisterCfgChangCallbackTest, TestSize.Level1)
 {
     WifiCfgChangCallback callback = nullptr;
     RegisterCfgChangCallback(callback);

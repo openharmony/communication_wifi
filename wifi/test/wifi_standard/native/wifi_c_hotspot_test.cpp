@@ -69,7 +69,7 @@ public:
 
     void DisassociateStaTests()
     {
-        unsigned std::string *mac = nullptr;
+        unsigned char *mac = nullptr;
         int macLen = 0;
         DisassociateSta(mac, macLen);
     }

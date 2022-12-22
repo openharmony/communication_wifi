@@ -592,7 +592,7 @@ HWTEST_F(WifiConfigCenterTest, SetWifiStateWhenAirplaneModeTest, TestSize.Level1
 HWTEST_F(WifiConfigCenterTest, SetAppPackageName_SUCCESS, TestSize.Level1)
 {
     std::string setname;
-	setname = "name";
+    setname = "name";
     WifiConfigCenter::GetInstance().SetAppPackageName(setname);
     EXPECT_EQ(setname, WifiConfigCenter::GetInstance().GetAppPackageName());
 }

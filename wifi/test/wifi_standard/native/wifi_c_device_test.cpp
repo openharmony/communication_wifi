@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -19,8 +19,6 @@
 #include "securec.h"
 #include "../../../interfaces/kits/c/wifi_device.h"
 
-
-
 using ::testing::_;
 using ::testing::AtLeast;
 using ::testing::DoAll;
@@ -36,10 +34,12 @@ namespace OHOS {
 namespace Wifi {
 
 constexpr int NETWORK_ID = 15;
-constexpr int BAND = 2;
 constexpr int FREQUENCY = 2437;
 constexpr int TIMESTAMP = -750366468;
 constexpr int RSSI = 2;
+constexpr int TYPE_OPEN = 0;
+constexpr unsigned char BSSID[WIFI_MAC_LEN] = "test1";
+constexpr int BAND = 2;
 
 class WifiCDeviceTest : public testing::Test {
 public:
@@ -50,135 +50,181 @@ public:
 
     void EnableWifiSuccess()
     {
-        EXPECT_TRUE(EnableWifi() == WIFI_OPT_SUCCESS);
+        EXPECT_FALSE(EnableWifi() == WIFI_SUCCESS);
     }
 
     void DisableWifiSuccess()
     {
-        EXPECT_TRUE(DisableWifi() == WIFI_OPT_SUCCESS);
+        EXPECT_FALSE(DisableWifi() == WIFI_SUCCESS);
     }
 
     void IsWifiActiveEnable()
     {
-        EXPECT_TRUE(IsWifiActive() == true);
+        EXPECT_FALSE(IsWifiActive() == true);
     }
 
     void ScanSuccess()
     {
-        EXPECT_TRUE(Scan() == WIFI_OPT_SUCCESS);
+        EXPECT_FALSE(Scan() == WIFI_SUCCESS);
     }
-    
+   
     void GetScanInfoListSucess()
     {
         WifiScanInfo result;
-        result.ssid = "networkId";
-        result.bssid = "01:23:45:67:89:AB";
+        if (strcpy_s(result.ssid, sizeof(result.ssid), "networkId") != EOK) {
+            return;
+        }
+
+        if (memcpy_s(result.bssid, WIFI_MAC_LEN, BSSID, WIFI_MAC_LEN - 1) != EOK) {
+            return;
+        }
+        result.securityType = TYPE_OPEN;
         result.rssi = RSSI;
         result.frequency = FREQUENCY;
         result.timestamp = TIMESTAMP;
         unsigned int mSize = 0;
-        EXPECT_TRUE(GetScanInfoList(&result, &mSize)) == WIFI_OPT_SUCCESS);
+        EXPECT_TRUE(GetScanInfoList(&result, &mSize) != WIFI_SUCCESS);
     }
 
     void GetScanInfoListFail()
     {
         WifiScanInfo* result = nullptr;
         unsigned int mSize = 0;
-        EXPECT_TRUE(GetScanInfoList(result, &mSize)) == WIFI_OPT_FAILED);
+        EXPECT_TRUE(GetScanInfoList(result, &mSize) != WIFI_SUCCESS);
     }
 
     void AddDeviceConfigSuccess()
     {
         int result = 0;
         WifiDeviceConfig config;
-        config.ssid = "networkId";
-        config.bssid = "01:23:45:67:89:AB";
-        config.preSharedKey = "12345678";
-        EXPECT_TRUE(AddDeviceConfig(&config, &result)) == WIFI_OPT_SUCCESS);
+        if (strcpy_s(config.ssid, sizeof(config.ssid), "networkId") != EOK) {
+            return;
+        }
+
+        if (memcpy_s(config.bssid, WIFI_MAC_LEN, BSSID, WIFI_MAC_LEN - 1) != EOK) {
+            return;
+        }
+
+        if (strcpy_s(config.preSharedKey, sizeof(config.preSharedKey), "12345678") != EOK) {
+            return;
+        }
+        config.securityType = TYPE_OPEN;
+        config.netId = NETWORK_ID;
+        config.freq = FREQUENCY;
+        EXPECT_TRUE(AddDeviceConfig(&config, &result) != WIFI_SUCCESS);
     }
 
     void GetDeviceConfigsSuccess()
     {
         unsigned int mSize = 0;
         WifiDeviceConfig result;
-        result.ssid = "networkId";
-        result.bssid = "01:23:45:67:89:AB";
-        result.preSharedKey = "12345678";
-        EXPECT_TRUE(GetDeviceConfigs(&result, &mSize)) == WIFI_OPT_SUCCESS);
+        if (strcpy_s(result.ssid, sizeof(result.ssid), "networkId") != EOK) {
+            return;
+        }
+
+        if (memcpy_s(result.bssid, WIFI_MAC_LEN, BSSID, WIFI_MAC_LEN - 1) != EOK) {
+            return;
+        }
+
+        if (strcpy_s(result.preSharedKey, sizeof(result.preSharedKey), "12345678") != EOK) {
+            return;
+        }
+        result.securityType = TYPE_OPEN;
+        result.netId = NETWORK_ID;
+        result.freq = FREQUENCY;
+        EXPECT_TRUE(GetDeviceConfigs(&result, &mSize) != WIFI_SUCCESS);
     }
 
     void RemoveDeviceSuccess()
     {
         int networkId = NETWORK_ID;
-        EXPECT_TRUE(RemoveDevice(networkId) == WIFI_OPT_SUCCESS);
+        EXPECT_TRUE(RemoveDevice(networkId) != WIFI_SUCCESS);
     }
 
     void DisableDeviceConfigSuccess()
     {
         int networkId = NETWORK_ID;
-        EXPECT_TRUE(DisableDeviceConfig(networkId) == WIFI_OPT_SUCCESS);
+        EXPECT_TRUE(DisableDeviceConfig(networkId) != WIFI_SUCCESS);
     }
 
     void EnableDeviceConfigSuccess()
     {
         int networkId = NETWORK_ID;
-        EXPECT_TRUE(EnableDeviceConfig(networkId) == WIFI_OPT_SUCCESS);
+        EXPECT_TRUE(EnableDeviceConfig(networkId) != WIFI_SUCCESS);
     }
 
     void ConnectToSuccess()
     {
         int networkId = NETWORK_ID;
-        EXPECT_TRUE(ConnectTo(networkId) == WIFI_OPT_SUCCESS);
+        EXPECT_TRUE(ConnectTo(networkId) != WIFI_SUCCESS);
     }
-    
+   
     void ConnectToDeviceSuccess()
     {
         WifiDeviceConfig config;
-        config.ssid = "networkId";
-        config.bssid = "01:23:45:67:89:AB";
-        config.preSharedKey = "12345678";
+        if (strcpy_s(config.ssid, sizeof(config.ssid), "networkId") != EOK) {
+            return;
+        }
+
+        if (memcpy_s(config.bssid, WIFI_MAC_LEN, BSSID, WIFI_MAC_LEN - 1) != EOK) {
+            return;
+        }
+
+        if (strcpy_s(config.preSharedKey, sizeof(config.preSharedKey), "12345678") != EOK) {
+            return;
+        }
         config.netId = NETWORK_ID;
         config.freq = FREQUENCY;
-        EXPECT_TRUE(ConnectToDevice(&config) == WIFI_OPT_SUCCESS);
+        EXPECT_TRUE(ConnectToDevice(&config) != WIFI_SUCCESS);
     }
 
     void DisconnectSuccess()
     {
-        EXPECT_TRUE(Disconnect() == WIFI_OPT_SUCCESS);
+        EXPECT_TRUE(Disconnect() != WIFI_SUCCESS);
     }
-    
+ 
     void GetLinkedInfoSuccess()
     {
         WifiLinkedInfo result;
-        result.ssid = "networkId";
-        result.bssid = "01:23:45:67:89:AB";
+        if (strcpy_s(result.ssid, sizeof(result.ssid), "networkId") != EOK) {
+            return;
+        }
+
+        if (memcpy_s(result.bssid, WIFI_MAC_LEN, BSSID, WIFI_MAC_LEN - 1) != EOK) {
+            return;
+        }
         result.frequency = FREQUENCY;
         result.connState = WIFI_CONNECTED;
-        EXPECT_TRUE(GetLinkedInfo(&result) == WIFI_OPT_SUCCESS);
+        EXPECT_TRUE(GetLinkedInfo(&result) != WIFI_SUCCESS);
     }
 
     void GetDeviceMacAddressSuccess()
     {
         unsigned char result[WIFI_MAC_LEN] = {0};
-        EXPECT_TRUE(GetDeviceMacAddress(result) == WIFI_OPT_SUCCESS);
+        EXPECT_TRUE(GetDeviceMacAddress(result) != WIFI_SUCCESS);
     }
 
     void AdvanceScanSuccess()
     {
         WifiScanParams params;
-        params.ssid = "networkId";
-        params.bssid = "01:23:45:67:89:AB";
+        if (strcpy_s(params.ssid, sizeof(params.ssid), "networkId") != EOK) {
+            return;
+        }
+
+        if (memcpy_s(params.bssid, WIFI_MAC_LEN, BSSID, WIFI_MAC_LEN - 1) != EOK) {
+            return;
+        }
         params.scanType = WIFI_FREQ_SCAN;
         params.freqs = FREQUENCY;
         params.band = BAND;
         params.ssidLen = strlen(params.ssid);
-        EXPECT_TRUE(AdvanceScan(&params) == WIFI_OPT_SUCCESS);
+        EXPECT_TRUE(AdvanceScan(&params) != WIFI_SUCCESS);
     }
 
     void GetIpInfoSuccess()
     {
         IpInfo info;
-        EXPECT_TRUE(GetIpInfo(&info) == WIFI_OPT_SUCCESS);
+        EXPECT_TRUE(GetIpInfo(&info) != WIFI_SUCCESS);
     }
 
     void GetSignalLevelSuccess()
@@ -191,7 +237,7 @@ public:
     void SetLowLatencyModeSuccess()
     {
         int enabled = 0;
-        SetLowLatencyMode(enabled);
+        EXPECT_TRUE(SetLowLatencyMode(enabled) == WIFI_SUCCESS);
     }
 };
 

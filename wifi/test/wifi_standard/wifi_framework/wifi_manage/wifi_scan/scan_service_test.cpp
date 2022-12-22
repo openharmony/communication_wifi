@@ -35,6 +35,9 @@ namespace Wifi {
 constexpr int FREQ_2_DOT_4_GHZ = 2450;
 constexpr int FREQ_5_GHZ = 5200;
 constexpr int TWO = 2;
+constexpr int Four = 4;
+constexpr int FailedNum = 6;
+constexpr int Status = 17;
 class ScanServiceTest : public testing::Test {
 public:
     static void SetUpTestCase() {}
@@ -532,6 +535,14 @@ public:
         EXPECT_EQ(true, pScanService->PnoScan(pnoScanConfig, interScanConfig));
     }
 
+    void PnoScanFail()
+    {
+        PnoScanConfig pnoScanConfig;
+        InterScanConfig interScanConfig;
+        pScanService->pScanStateMachine = nullptr;
+        EXPECT_EQ(true, pScanService->PnoScan(pnoScanConfig, interScanConfig));
+    }
+
     void AddPnoScanMessageBodySuccess()
     {
         InternalMessage interMessage;
@@ -565,6 +576,13 @@ public:
 
     void EndPnoScanFail()
     {
+        pScanService->EndPnoScan();
+    }
+
+    void EndPnoScanFail2()
+    {
+        pScanService->isPnoScanBegined = true;
+        pScanService->pScanStateMachine = nullptr;
         pScanService->EndPnoScan();
     }
 
@@ -659,6 +677,14 @@ public:
         pScanService->RestartPnoScanTimeOut();
     }
 
+    void RestartPnoScanTimeOutFail()
+    {
+        EXPECT_CALL(WifiSettings::GetInstance(), GetMinRssi2Dot4Ghz()).Times(AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), GetMinRssi5Ghz()).Times(AtLeast(0));
+        pScanService->pnoScanFailedNum = FailedNum;
+        pScanService->RestartPnoScanTimeOut();
+    }
+
     void GetScanControlInfoSuccess()
     {
         EXPECT_CALL(WifiStaHalInterface::GetInstance(), StopPnoScan()).Times(AtLeast(0));
@@ -694,15 +720,110 @@ public:
         pScanService->AllowExternScan();
     }
 
+    void AllowExternScanFail2()
+    {
+        EXPECT_CALL(WifiSettings::GetInstance(), SetThermalLevel(Four)).Times(AtLeast(0));
+        EXPECT_EQ(pScanService->AllowExternScan(), WIFI_OPT_FAILED);
+    }
+
+    void AllowExternScanFail3()
+    {
+        ScanMode scanMode = ScanMode::SYS_FOREGROUND_SCAN;
+        ScanForbidMode forbidMode;
+        forbidMode.scanScene = SCAN_SCENE_CONNECTED;
+        forbidMode.scanMode = scanMode;
+        forbidMode.forbidTime = 0;
+        forbidMode.forbidCount = 0;
+        pScanService->scanControlInfo.scanForbidList.push_back(forbidMode);
+        pScanService->staStatus = Status;
+        EXPECT_CALL(WifiSettings::GetInstance(), SetThermalLevel(TWO)).Times(AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), SetAppRunningState(scanMode)).Times(AtLeast(0));
+        EXPECT_EQ(pScanService->AllowExternScan(), WIFI_OPT_FAILED);
+    }
+
+    void AllowExternScanFail4()
+    {
+        pScanService->disableScanFlag = true;
+        EXPECT_CALL(WifiSettings::GetInstance(), SetThermalLevel(TWO)).Times(AtLeast(0));
+        EXPECT_EQ(pScanService->AllowExternScan(), WIFI_OPT_FAILED);
+    }
+
     void AllowSystemTimerScanSuccess()
     {
-        EXPECT_CALL(WifiSettings::GetInstance(), GetWhetherToAllowNetworkSwitchover());
+        EXPECT_CALL(WifiSettings::GetInstance(), SetWhetherToAllowNetworkSwitchover(true));
         ScanIntervalMode mode;
         mode.scanScene = SCAN_SCENE_ALL;
         mode.scanMode = ScanMode::SYSTEM_TIMER_SCAN;
         mode.isSingle = false;
         pScanService->scanControlInfo.scanIntervalList.push_back(mode);
         pScanService->AllowSystemTimerScan();
+    }
+
+    void AllowSystemTimerScanFail1()
+    {
+        pScanService->staStatus = static_cast<int>(OperateResState::CLOSE_WIFI_FAILED);
+        pScanService->AllowSystemTimerScan();
+    }
+
+    void AllowSystemTimerScanFail2()
+    {
+        EXPECT_CALL(WifiSettings::GetInstance(), SetWhetherToAllowNetworkSwitchover(false));
+        pScanService->staStatus = static_cast<int>(OperateResState::CONNECT_AP_CONNECTED);
+        EXPECT_EQ(pScanService->AllowSystemTimerScan(), WIFI_OPT_FAILED);
+    }
+
+    void AllowSystemTimerScanFail3()
+    {
+        EXPECT_CALL(WifiSettings::GetInstance(), SetWhetherToAllowNetworkSwitchover(true));
+        pScanService->staStatus = FREQ_2_DOT_4_GHZ;
+        EXPECT_EQ(pScanService->AllowSystemTimerScan(), WIFI_OPT_FAILED);
+    }
+
+    void AllowSystemTimerScanFail4()
+    {
+        ScanMode scanMode = ScanMode::SYSTEM_TIMER_SCAN;
+        ScanForbidMode forbidMode;
+        forbidMode.scanScene = static_cast<int>(OperateResState::CONNECT_AP_CONNECTED);
+        forbidMode.scanMode = scanMode;
+        forbidMode.forbidTime = 0;
+        forbidMode.forbidCount = 0;
+        pScanService->scanControlInfo.scanForbidList.push_back(forbidMode);
+        EXPECT_CALL(WifiSettings::GetInstance(), SetWhetherToAllowNetworkSwitchover(true));
+        pScanService->staStatus = static_cast<int>(OperateResState::CONNECT_AP_CONNECTED);
+        pScanService->scanTrustMode = false;
+        EXPECT_EQ(pScanService->AllowSystemTimerScan(), WIFI_OPT_FAILED);
+    }
+
+    void AllowSystemTimerScanFail5()
+    {
+        const int staScene = 17;
+        time_t now = time(nullptr);
+        if (now < 0) {
+            return;
+        }
+        pScanService->customSceneTimeMap.emplace(staScene, now);
+        ScanMode scanMode = ScanMode::SYSTEM_TIMER_SCAN;
+        ScanForbidMode forbidMode;
+        forbidMode.scanScene = static_cast<int>(OperateResState::CONNECT_AP_CONNECTED);
+        forbidMode.scanMode = scanMode;
+        forbidMode.forbidTime = 0;
+        forbidMode.forbidCount = 0;
+        pScanService->scanControlInfo.scanForbidList.push_back(forbidMode);
+        EXPECT_CALL(WifiSettings::GetInstance(), SetWhetherToAllowNetworkSwitchover(true));
+        pScanService->staStatus = static_cast<int>(OperateResState::CONNECT_AP_CONNECTED);
+        pScanService->scanTrustMode = false;
+        EXPECT_EQ(pScanService->AllowSystemTimerScan(), WIFI_OPT_FAILED);
+    }
+
+
+    void AllowSystemTimerScanFail6()
+    {
+        EXPECT_CALL(WifiSettings::GetInstance(), SetWhetherToAllowNetworkSwitchover(true));
+        pScanService->staStatus = static_cast<int>(OperateResState::CONNECT_AP_CONNECTED);
+        pScanService->ResetToNonTrustMode();
+        pScanService->SetMovingFreezeState(true);
+        pScanService->SetMovingFreezeScaned(true);
+        EXPECT_EQ(pScanService->AllowSystemTimerScan(), WIFI_OPT_FAILED);
     }
 
     void AllowPnoScanSuccess()
@@ -1532,6 +1653,19 @@ public:
             appId, blockListScanTime, lessThanIntervalCount, interval, count);
         EXPECT_EQ(rlt, false);
     }
+
+    void HandleMovingFreezeChangedTest()
+    {
+        EXPECT_CALL(WifiSettings::GetInstance(), GetAppRunningState()).Times(AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), GetFreezeModeState()).Times(AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), GetNoChargerPlugModeState()).Times(AtLeast(0));
+        pScanService->HandleMovingFreezeChanged();
+    }
+    void HandleGetCustomSceneStateTest()
+    {
+        std::map<int, time_t> sceneMap;
+        pScanService->HandleGetCustomSceneState(sceneMap);
+    }
 };
 
 HWTEST_F(ScanServiceTest, InitScanServiceSuccess1, TestSize.Level1)
@@ -1819,6 +1953,11 @@ HWTEST_F(ScanServiceTest, EndPnoScanFail, TestSize.Level1)
     EndPnoScanFail();
 }
 
+HWTEST_F(ScanServiceTest, EndPnoScanFail2, TestSize.Level1)
+{
+    EndPnoScanFail2();
+}
+
 HWTEST_F(ScanServiceTest, HandleScreenStatusChangedSuccess, TestSize.Level1)
 {
     HandleScreenStatusChangedSuccess();
@@ -1889,6 +2028,11 @@ HWTEST_F(ScanServiceTest, RestartPnoScanTimeOutSuccess, TestSize.Level1)
     RestartPnoScanTimeOutSuccess();
 }
 
+HWTEST_F(ScanServiceTest, RestartPnoScanTimeOutFail, TestSize.Level1)
+{
+    RestartPnoScanTimeOutFail();
+}
+
 HWTEST_F(ScanServiceTest, GetScanControlInfoSuccess, TestSize.Level1)
 {
     GetScanControlInfoSuccess();
@@ -1909,9 +2053,54 @@ HWTEST_F(ScanServiceTest, AllowExternScanFail1, TestSize.Level1)
     AllowExternScanFail1();
 }
 
+HWTEST_F(ScanServiceTest, AllowExternScanFail2, TestSize.Level1)
+{
+    AllowExternScanFail2();
+}
+
+HWTEST_F(ScanServiceTest, AllowExternScanFail3, TestSize.Level1)
+{
+    AllowExternScanFail3();
+}
+
+HWTEST_F(ScanServiceTest, AllowExternScanFail4, TestSize.Level1)
+{
+    AllowExternScanFail4();
+}
+
 HWTEST_F(ScanServiceTest, AllowSystemTimerScanSuccess, TestSize.Level1)
 {
     AllowSystemTimerScanSuccess();
+}
+
+HWTEST_F(ScanServiceTest, AllowSystemTimerScanFail1, TestSize.Level1)
+{
+    AllowSystemTimerScanFail1();
+}
+
+HWTEST_F(ScanServiceTest, AllowSystemTimerScanFail2, TestSize.Level1)
+{
+    AllowSystemTimerScanFail2();
+}
+
+HWTEST_F(ScanServiceTest, AllowSystemTimerScanFail3, TestSize.Level1)
+{
+    AllowSystemTimerScanFail3();
+}
+
+HWTEST_F(ScanServiceTest, AllowSystemTimerScanFail4, TestSize.Level1)
+{
+    AllowSystemTimerScanFail4();
+}
+
+HWTEST_F(ScanServiceTest, AllowSystemTimerScanFail5, TestSize.Level1)
+{
+    AllowSystemTimerScanFail5();
+}
+
+HWTEST_F(ScanServiceTest, AllowSystemTimerScanFail6, TestSize.Level1)
+{
+    AllowSystemTimerScanFail6();
 }
 
 HWTEST_F(ScanServiceTest, AllowPnoScanSuccess, TestSize.Level1)
@@ -2327,6 +2516,21 @@ HWTEST_F(ScanServiceTest, AllowScanByIntervalBlocklistFail2, TestSize.Level1)
 HWTEST_F(ScanServiceTest, SingleScanFail2, TestSize.Level1)
 {
     SingleScanFail2();
+}
+
+HWTEST_F(ScanServiceTest, PnoScanFail, TestSize.Level1)
+{
+    PnoScanFail();
+}
+
+HWTEST_F(ScanServiceTest, HandleMovingFreezeChangedTest, TestSize.Level1)
+{
+    HandleMovingFreezeChangedTest();
+}
+
+HWTEST_F(ScanServiceTest, HandleGetCustomSceneStateTest, TestSize.Level1)
+{
+    HandleGetCustomSceneStateTest();
 }
 } // namespace Wifi
 } // namespace OHOS

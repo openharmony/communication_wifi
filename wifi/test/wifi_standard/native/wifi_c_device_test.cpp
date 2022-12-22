@@ -241,7 +241,6 @@ public:
     }
 };
 
-
 HWTEST_F(WifiCDeviceTest, EnableWifiSuccess, TestSize.Level1)
 {
     EnableWifiSuccess();

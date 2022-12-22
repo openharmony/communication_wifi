@@ -24,78 +24,78 @@ using ::testing::ext::TestSize;
 
 namespace OHOS {
 namespace Wifi {
-class wifiHid2d_Test : public testing::Test {
+class WifiHid2dTest : public testing::Test {
 public:
     static void SetUpTestCase() {}
     static void TearDownTestCase() {}
     virtual void SetUp() {}
-    virtual void TearDown(){}
+    virtual void TearDown() {}
 };
 
-HWTEST_F(wifiHid2d_Test, Hid2dRequestGcIpTests, TestSize.Level1)
+HWTEST_F(WifiHid2dTest, Hid2dRequestGcIpTests, TestSize.Level1)
 {
     unsigned char gcMac[MAC_LEN];
     unsigned int ipAddr[IPV4_ARRAY_LEN];
     Hid2dRequestGcIp(gcMac, ipAddr);
 }
 
-HWTEST_F(wifiHid2d_Test, Hid2dSharedlinkIncreaseTests, TestSize.Level1)
+HWTEST_F(WifiHid2dTest, Hid2dSharedlinkIncreaseTests, TestSize.Level1)
 {
     Hid2dSharedlinkIncrease();
 }
 
-HWTEST_F(wifiHid2d_Test, Hid2dSharedlinkDecreaseTests, TestSize.Level1)
+HWTEST_F(WifiHid2dTest, Hid2dSharedlinkDecreaseTests, TestSize.Level1)
 {
     Hid2dSharedlinkDecrease();
 }
 
-HWTEST_F(wifiHid2d_Test, Hid2dCreateGroupTests, TestSize.Level1)
+HWTEST_F(WifiHid2dTest, Hid2dCreateGroupTests, TestSize.Level1)
 {
     int frequency = 0;
     FreqType type = FreqType::FREQUENCY_160M;
     Hid2dCreateGroup(frequency, type);
 }
 
-HWTEST_F(wifiHid2d_Test, Hid2dRemoveGcGroupTests, TestSize.Level1)
+HWTEST_F(WifiHid2dTest, Hid2dRemoveGcGroupTests, TestSize.Level1)
 {
     char gcIfName[IF_NAME_LEN];
     Hid2dRemoveGcGroup(gcIfName);
 }
 
-HWTEST_F(wifiHid2d_Test, Hid2dConnectTests, TestSize.Level1)
+HWTEST_F(WifiHid2dTest, Hid2dConnectTests, TestSize.Level1)
 {
     Hid2dConnectConfig *config;
     Hid2dConnect(config);
 }
 
-HWTEST_F(wifiHid2d_Test, Hid2dConfigIPAddrTests, TestSize.Level1)
+HWTEST_F(WifiHid2dTest, Hid2dConfigIPAddrTests, TestSize.Level1)
 {
     char ifName[IF_NAME_LEN];
     IpAddrInfo* ipInfo;
     Hid2dConfigIPAddr(ifName, ipInfo);
 }
 
-HWTEST_F(wifiHid2d_Test, Hid2dReleaseIPAddrTests, TestSize.Level1)
+HWTEST_F(WifiHid2dTest, Hid2dReleaseIPAddrTests, TestSize.Level1)
 {
     char ifName[IF_NAME_LEN];
     Hid2dReleaseIPAddr(ifName);
 }
 
-HWTEST_F(wifiHid2d_Test, Hid2dGetRecommendChannelTests, TestSize.Level1)
+HWTEST_F(WifiHid2dTest, Hid2dGetRecommendChannelTests, TestSize.Level1)
 {
     RecommendChannelRequest *request = nullptr;
     RecommendChannelResponse *response = nullptr;
     Hid2dGetRecommendChannel(request, response);
 }
 
-HWTEST_F(wifiHid2d_Test, Hid2dGetChannelListFor5GTests, TestSize.Level1)
+HWTEST_F(WifiHid2dTest, Hid2dGetChannelListFor5GTests, TestSize.Level1)
 {
     int *chanList = nullptr;
     int len = 0;
     Hid2dGetChannelListFor5G(chanList, len);
 }
 
-HWTEST_F(wifiHid2d_Test, Hid2dGetSelfWifiCfgInfoTests, TestSize.Level1)
+HWTEST_F(WifiHid2dTest, Hid2dGetSelfWifiCfgInfoTests, TestSize.Level1)
 {
     SelfCfgType cfgType = SelfCfgType::TYPE_OF_GET_SELF_CONFIG;
     char cfgData[CFG_DATA_MAX_BYTES];
@@ -103,12 +103,12 @@ HWTEST_F(wifiHid2d_Test, Hid2dGetSelfWifiCfgInfoTests, TestSize.Level1)
     Hid2dGetSelfWifiCfgInfo(cfgType, cfgData, getDatValidLen);
 }
 
-HWTEST_F(wifiHid2d_Test, Hid2dIsWideBandwidthSupportedTests, TestSize.Level1)
+HWTEST_F(WifiHid2dTest, Hid2dIsWideBandwidthSupportedTests, TestSize.Level1)
 {
     Hid2dIsWideBandwidthSupported();
 }
 
-HWTEST_F(wifiHid2d_Test, Hid2dSetUpperSceneTests, TestSize.Level1)
+HWTEST_F(WifiHid2dTest, Hid2dSetUpperSceneTests, TestSize.Level1)
 {
     char ifName[IF_NAME_LEN];
     Hid2dUpperScene *scene;

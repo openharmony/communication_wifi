@@ -25,12 +25,12 @@ using ::testing::ext::TestSize;
 
 namespace OHOS {
 namespace Wifi {
-class wifiHotspot_Test : public testing::Test {
+class WifiHotspotTest : public testing::Test {
 public:
     static void SetUpTestCase() {}
     static void TearDownTestCase() {}
     virtual void SetUp() {}
-    virtual void TearDown(){}
+    virtual void TearDown() {}
 
 public:
     void EnableHotspotTest()
@@ -80,39 +80,39 @@ public:
         AddTxPowerInfo(power);
     }
 };
-HWTEST_F(wifiHotspot_Test, EnableHotspotTest, TestSize.Level1)
+HWTEST_F(WifiHotspotTest, EnableHotspotTest, TestSize.Level1)
 {
     EnableHotspotTest();
 }
 
-HWTEST_F(wifiHotspot_Test, DisableHotspotTest, TestSize.Level1)
+HWTEST_F(WifiHotspotTest, DisableHotspotTest, TestSize.Level1)
 {
     DisableHotspotTest();
 }
 
-HWTEST_F(wifiHotspot_Test, IsHotspotActiveTest, TestSize.Level1)
+HWTEST_F(WifiHotspotTest, IsHotspotActiveTest, TestSize.Level1)
 {
     IsHotspotActiveTest();
 }
 
-HWTEST_F(wifiHotspot_Test, SetHotspotConfigTests, TestSize.Level1)
+HWTEST_F(WifiHotspotTest, SetHotspotConfigTests, TestSize.Level1)
 {
-     SetHotspotConfigTests();
+    SetHotspotConfigTests();
 }
 
-HWTEST_F(wifiHotspot_Test, GetHotspotConfigTests, TestSize.Level1)
+HWTEST_F(WifiHotspotTest, GetHotspotConfigTests, TestSize.Level1)
 {
-     GetHotspotConfigTests();
+    GetHotspotConfigTests();
 }
 
-HWTEST_F(wifiHotspot_Test, DisassociateStaTests, TestSize.Level1)
+HWTEST_F(WifiHotspotTest, DisassociateStaTests, TestSize.Level1)
 {
-     DisassociateStaTests();
+    DisassociateStaTests();
 }
 
-HWTEST_F(wifiHotspot_Test, AddTxPowerInfoTests, TestSize.Level1)
+HWTEST_F(WifiHotspotTest, AddTxPowerInfoTests, TestSize.Level1)
 {
-     AddTxPowerInfoTests();
+    AddTxPowerInfoTests();
 }
 }
 }

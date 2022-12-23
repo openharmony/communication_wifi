@@ -133,19 +133,20 @@ int CreateUnixServer(const char *path, int backlog)
     setsockopt(sock, SOL_SOCKET, SO_KEEPALIVE, (void *)&keepAlive, sizeof(keepAlive));
     int reuseaddr = 1;
     setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, (void *)&reuseaddr, sizeof(reuseaddr));
-    if (bind(sock, (struct sockaddr *)&sockAddr, sizeof(sockAddr)) < 0) {
-        LOGE("bind failed!");
+    int ret = bind(sock, (struct sockaddr *)&sockAddr, sizeof(sockAddr));
+    if (ret < 0) {
+        LOGE("bind failed, ret: %{public}d, errno: %{public}d!", ret, errno);
         close(sock);
         return -1;
     }
     if (SetNonBlock(sock, 1) != 0) {
-        LOGE("set socket non block failed!");
+        LOGE("set socket non block failed, errno: %{public}d!", errno);
         close(sock);
         return -1;
     }
     fcntl(sock, F_SETFD, FD_CLOEXEC);
     if (listen(sock, backlog) < 0) {
-        LOGE("listen failed!");
+        LOGE("listen failed, errno: %{public}d!", errno);
         close(sock);
         return -1;
     }

@@ -42,6 +42,7 @@ constexpr int RSSI = 8;
 constexpr int FREQUENCY = 5200;
 constexpr int INVALIDRSSI = -110;
 constexpr int VALIDRSSI = -60;
+constexpr int TWO = 2;
 
 class StaSavedDeviceAppraisalTest : public testing::Test {
 public:
@@ -133,7 +134,7 @@ void StaSavedDeviceAppraisalTest::SaveNetworkEvaluatorSuccess1()
     deviceConfig.networkId = 0;
 
     EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(scanInfos[0].ssid, DEVICE_CONFIG_INDEX_SSID, _))
-        .WillOnce(DoAll(SetArgReferee<2>(deviceConfig), Return(0)));
+        .WillOnce(DoAll(SetArgReferee<TWO>(deviceConfig), Return(0)));
     EXPECT_CALL(WifiSettings::GetInstance(), GetSignalLevel(_, _)).Times(AtLeast(0));
     EXPECT_CALL(WifiSettings::GetInstance(), GetUserLastSelectedNetworkId()).Times(AtLeast(1)).WillOnce(Return(0));
     EXPECT_CALL(WifiSettings::GetInstance(), GetConnectTimeoutBssid())
@@ -159,7 +160,7 @@ void StaSavedDeviceAppraisalTest::SaveNetworkEvaluatorSuccess2()
     deviceConfig.networkId = 0;
 
     EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(scanInfos[0].ssid, DEVICE_CONFIG_INDEX_SSID, _))
-        .WillOnce(DoAll(SetArgReferee<2>(deviceConfig), Return(0)));
+        .WillOnce(DoAll(SetArgReferee<TWO>(deviceConfig), Return(0)));
     EXPECT_CALL(WifiSettings::GetInstance(), GetSignalLevel(_, _)).Times(AtLeast(0));
     EXPECT_CALL(WifiSettings::GetInstance(), GetUserLastSelectedNetworkId()).Times(AtLeast(1)).WillOnce(Return(0));
     EXPECT_CALL(WifiSettings::GetInstance(), GetUserLastSelectedNetworkTimeVal()).Times(AtLeast(1));
@@ -182,7 +183,7 @@ void StaSavedDeviceAppraisalTest::SaveNetworkEvaluatorSuccess3()
     deviceConfig.networkId = 0;
 
     EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(scanInfos[0].ssid, DEVICE_CONFIG_INDEX_SSID, _))
-        .WillOnce(DoAll(SetArgReferee<2>(deviceConfig), Return(1)));
+        .WillOnce(DoAll(SetArgReferee<TWO>(deviceConfig), Return(1)));
     EXPECT_CALL(WifiSettings::GetInstance(), GetSignalLevel(_, _)).Times(AtLeast(0));
     EXPECT_CALL(WifiSettings::GetInstance(), GetUserLastSelectedNetworkId()).Times(AtLeast(1)).WillOnce(Return(0));
     EXPECT_CALL(WifiSettings::GetInstance(), GetUserLastSelectedNetworkTimeVal()).Times(AtLeast(1));

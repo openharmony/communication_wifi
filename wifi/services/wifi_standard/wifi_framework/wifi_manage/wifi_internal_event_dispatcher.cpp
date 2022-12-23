@@ -305,6 +305,7 @@ void WifiInternalEventDispatcher::DealStaCallbackMsg(
 
     auto callback = instance.GetSingleStaCallback();
     if (callback != nullptr) {
+        WIFI_LOGI("Single Callback Msg: %{public}d", msg.msgCode);
         switch (msg.msgCode) {
             case WIFI_CBK_MSG_STATE_CHANGE:
                 callback->OnWifiStateChanged(msg.msgData);
@@ -390,6 +391,7 @@ void WifiInternalEventDispatcher::InvokeDeviceCallbacks(const WifiEventCallbackM
         if (callback == nullptr) {
             continue;
         }
+        WIFI_LOGI("InvokeDeviceCallbacks, msg.msgCode: %{public}d", msg.msgCode);
         switch (msg.msgCode) {
             case WIFI_CBK_MSG_STATE_CHANGE:
                 callback->OnWifiStateChanged(msg.msgData);

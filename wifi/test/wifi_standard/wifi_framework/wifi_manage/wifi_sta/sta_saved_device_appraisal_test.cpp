@@ -39,6 +39,9 @@ namespace Wifi {
 constexpr int NETWORK_ID = 15;
 constexpr int BAND = 2;
 constexpr int RSSI = 8;
+constexpr int FREQUENCY = 5200;
+constexpr int INVALIDRSSI = -110;
+constexpr int VALIDRSSI = -60;
 
 class StaSavedDeviceAppraisalTest : public testing::Test {
 public:
@@ -63,12 +66,16 @@ public:
 public:
     void SaveNetworkEvaluatorSuccess1();
     void SaveNetworkEvaluatorSuccess2();
+    void SaveNetworkEvaluatorSuccess3();
     void SaveNetworkEvaluatorFail1();
     void AppraiseDeviceQualitySuccess1();
     void AppraiseDeviceQualitySuccess2();
+    void AppraiseDeviceQualitySuccess3();
     void WhetherSkipDeviceSuccess1();
+    void WhetherSkipDeviceSuccess2();
     void WhetherSkipDeviceFail1();
-
+    void CalculateSignalBarsSuccess1();
+    void CalculateSignalBarsSuccess2();
 public:
     std::unique_ptr<StaSavedDeviceAppraisal> pStaSavedDeviceAppraisal;
 
@@ -78,7 +85,6 @@ private:
     void GetInterScanInfoVector(std::vector<InterScanInfo> &scanInfos) const;
     void GetWifiLinkedInfo(WifiLinkedInfo &info);
 };
-
 
 void StaSavedDeviceAppraisalTest::GetScanInfoConfig(InterScanInfo &scanInfo) const
 {
@@ -161,6 +167,27 @@ void StaSavedDeviceAppraisalTest::SaveNetworkEvaluatorSuccess2()
     EXPECT_TRUE(pStaSavedDeviceAppraisal->DeviceAppraisals(deviceConfig, scanInfos, info) == WIFI_OPT_SUCCESS);
 }
 
+void StaSavedDeviceAppraisalTest::SaveNetworkEvaluatorSuccess3()
+{
+    WifiDeviceConfig deviceConfig;
+    std::vector<InterScanInfo> scanInfos;
+    WifiLinkedInfo info;
+    GetWifiDeviceConfig(deviceConfig);
+    GetInterScanInfoVector(scanInfos);
+    GetWifiLinkedInfo(info);
+
+    deviceConfig.isPasspoint = false;
+    deviceConfig.isEphemeral = false;
+    deviceConfig.status = static_cast<int>(WifiDeviceConfigStatus::ENABLED);
+    deviceConfig.networkId = 0;
+
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(scanInfos[0].ssid, DEVICE_CONFIG_INDEX_SSID, _))
+        .WillOnce(DoAll(SetArgReferee<2>(deviceConfig), Return(1)));
+    EXPECT_CALL(WifiSettings::GetInstance(), GetSignalLevel(_, _)).Times(AtLeast(0));
+    EXPECT_CALL(WifiSettings::GetInstance(), GetUserLastSelectedNetworkId()).Times(AtLeast(1)).WillOnce(Return(0));
+    EXPECT_CALL(WifiSettings::GetInstance(), GetUserLastSelectedNetworkTimeVal()).Times(AtLeast(1));
+    EXPECT_TRUE(pStaSavedDeviceAppraisal->DeviceAppraisals(deviceConfig, scanInfos, info) == WIFI_OPT_FAILED);
+}
 
 void StaSavedDeviceAppraisalTest::SaveNetworkEvaluatorFail1()
 {
@@ -218,6 +245,24 @@ void StaSavedDeviceAppraisalTest::AppraiseDeviceQualitySuccess2()
     pStaSavedDeviceAppraisal->AppraiseDeviceQuality(score, scanInfo, deviceConfig, info);
 }
 
+void StaSavedDeviceAppraisalTest::AppraiseDeviceQualitySuccess3()
+{
+    int score = 1;
+    InterScanInfo scanInfo;
+    WifiDeviceConfig deviceConfig;
+    WifiLinkedInfo info;
+    GetScanInfoConfig(scanInfo);
+    GetWifiDeviceConfig(deviceConfig);
+    GetWifiLinkedInfo(info);
+    scanInfo.band = NETWORK_5G_BAND;
+    scanInfo.frequency = FREQUENCY;
+    deviceConfig.networkId = 0;
+    EXPECT_CALL(WifiSettings::GetInstance(), GetSignalLevel(_, _)).Times(AtLeast(0));
+    EXPECT_CALL(WifiSettings::GetInstance(), GetUserLastSelectedNetworkId()).Times(AtLeast(1)).WillOnce(Return(0));
+    EXPECT_CALL(WifiSettings::GetInstance(), GetUserLastSelectedNetworkTimeVal()).Times(AtLeast(1));
+    pStaSavedDeviceAppraisal->AppraiseDeviceQuality(score, scanInfo, deviceConfig, info);
+}
+
 void StaSavedDeviceAppraisalTest::WhetherSkipDeviceSuccess1()
 {
     WifiDeviceConfig deviceConfig;
@@ -227,6 +272,19 @@ void StaSavedDeviceAppraisalTest::WhetherSkipDeviceSuccess1()
     deviceConfig.status = static_cast<int>(WifiDeviceConfigStatus::ENABLED);
 
     EXPECT_TRUE(pStaSavedDeviceAppraisal->WhetherSkipDevice(deviceConfig) == false);
+}
+
+void StaSavedDeviceAppraisalTest::WhetherSkipDeviceSuccess2()
+{
+    WifiDeviceConfig deviceConfig;
+    GetWifiDeviceConfig(deviceConfig);
+    deviceConfig.isPasspoint = false;
+    deviceConfig.isEphemeral = false;
+    deviceConfig.status = static_cast<int>(WifiDeviceConfigStatus::ENABLED);
+    EXPECT_CALL(WifiSettings::GetInstance(), GetConnectTimeoutBssid())
+        .Times(AtLeast(1))
+        .WillRepeatedly(Return("2a:76:93:47:e2:8a"));
+    EXPECT_TRUE(pStaSavedDeviceAppraisal->WhetherSkipDevice(deviceConfig) == true);
 }
 
 void StaSavedDeviceAppraisalTest::WhetherSkipDeviceFail1()
@@ -239,6 +297,20 @@ void StaSavedDeviceAppraisalTest::WhetherSkipDeviceFail1()
     EXPECT_TRUE(pStaSavedDeviceAppraisal->WhetherSkipDevice(deviceConfig) == true);
 }
 
+void StaSavedDeviceAppraisalTest::CalculateSignalBarsSuccess1()
+{
+    int rssi = INVALIDRSSI;
+    int signalBars = 0;
+    EXPECT_TRUE(pStaSavedDeviceAppraisal->CalculateSignalBars(rssi, signalBars) == 0);
+}
+
+void StaSavedDeviceAppraisalTest::CalculateSignalBarsSuccess2()
+{
+    int rssi = VALIDRSSI;
+    int signalBars = 0;
+    EXPECT_TRUE(pStaSavedDeviceAppraisal->CalculateSignalBars(rssi, signalBars) == 0);
+}
+
 HWTEST_F(StaSavedDeviceAppraisalTest, SaveNetworkEvaluatorSuccess1, TestSize.Level1)
 {
     SaveNetworkEvaluatorSuccess1();
@@ -247,6 +319,11 @@ HWTEST_F(StaSavedDeviceAppraisalTest, SaveNetworkEvaluatorSuccess1, TestSize.Lev
 HWTEST_F(StaSavedDeviceAppraisalTest, SaveNetworkEvaluatorSuccess2, TestSize.Level1)
 {
     SaveNetworkEvaluatorSuccess2();
+}
+
+HWTEST_F(StaSavedDeviceAppraisalTest, SaveNetworkEvaluatorSuccess3, TestSize.Level1)
+{
+    SaveNetworkEvaluatorSuccess3();
 }
 
 HWTEST_F(StaSavedDeviceAppraisalTest, SaveNetworkEvaluatorFail1, TestSize.Level1)
@@ -264,14 +341,34 @@ HWTEST_F(StaSavedDeviceAppraisalTest, AppraiseDeviceQualitySuccess2, TestSize.Le
     AppraiseDeviceQualitySuccess2();
 }
 
+HWTEST_F(StaSavedDeviceAppraisalTest, AppraiseDeviceQualitySuccess3, TestSize.Level1)
+{
+    AppraiseDeviceQualitySuccess3();
+}
+
 HWTEST_F(StaSavedDeviceAppraisalTest, WhetherSkipDeviceSuccess1, TestSize.Level1)
 {
     WhetherSkipDeviceSuccess1();
 }
 
+HWTEST_F(StaSavedDeviceAppraisalTest, WhetherSkipDeviceSuccess2, TestSize.Level1)
+{
+    WhetherSkipDeviceSuccess2();
+}
+
 HWTEST_F(StaSavedDeviceAppraisalTest, WhetherSkipDeviceFail1, TestSize.Level1)
 {
     WhetherSkipDeviceFail1();
+}
+
+HWTEST_F(StaSavedDeviceAppraisalTest, CalculateSignalBarsSuccess1, TestSize.Level1)
+{
+    CalculateSignalBarsSuccess1();
+}
+
+HWTEST_F(StaSavedDeviceAppraisalTest, CalculateSignalBarsSuccess2, TestSize.Level1)
+{
+    CalculateSignalBarsSuccess2();
 }
 } // Wifi
 } // OHOS

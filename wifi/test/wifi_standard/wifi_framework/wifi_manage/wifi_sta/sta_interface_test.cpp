@@ -374,13 +374,13 @@ public:
     void ReConnectSuceess()
     {
         EXPECT_CALL(*pMockStaService, ReConnect()).WillRepeatedly(Return(WIFI_OPT_SUCCESS));
-        EXPECT_TRUE(pStaInterface->DisableWifi() == WIFI_OPT_SUCCESS);
+        EXPECT_TRUE(pStaInterface->ReConnect() == WIFI_OPT_SUCCESS);
     }
 
     void ReConnectFail()
     {
         EXPECT_CALL(*pMockStaService, ReConnect()).WillRepeatedly(Return(WIFI_OPT_FAILED));
-        EXPECT_TRUE(pStaInterface->DisableWifi() == WIFI_OPT_FAILED);
+        EXPECT_TRUE(pStaInterface->ReConnect() == WIFI_OPT_FAILED);
     }
 };
 

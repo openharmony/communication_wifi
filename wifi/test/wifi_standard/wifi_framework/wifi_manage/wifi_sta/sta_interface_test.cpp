@@ -73,6 +73,20 @@ public:
         EXPECT_TRUE(pStaInterface->EnableWifi() == WIFI_OPT_SUCCESS);
     }
 
+    void EnableWifiFail1()
+    {
+        EXPECT_CALL(*pMockStaService, InitStaService(_)).WillRepeatedly(Return(WIFI_OPT_FAILED));
+        EXPECT_CALL(*pMockStaService, EnableWifi()).WillRepeatedly(Return(WIFI_OPT_SUCCESS));
+        EXPECT_TRUE(pStaInterface->EnableWifi() == WIFI_OPT_FAILED);
+    }
+
+    void EnableWifiFail2()
+    {
+        EXPECT_CALL(*pMockStaService, InitStaService(_)).WillRepeatedly(Return(WIFI_OPT_SUCCESS));
+        EXPECT_CALL(*pMockStaService, EnableWifi()).WillRepeatedly(Return(WIFI_OPT_FAILED));
+        EXPECT_TRUE(pStaInterface->EnableWifi() == WIFI_OPT_FAILED);
+    }
+
     void DisableWifiSuceess()
     {
         EXPECT_CALL(*pMockStaService, DisableWifi()).WillRepeatedly(Return(WIFI_OPT_SUCCESS));
@@ -357,6 +371,17 @@ public:
         EXPECT_TRUE(pStaInterface->RemoveAllDevice() == WIFI_OPT_SUCCESS);
     }
 
+    void ReConnectSuceess()
+    {
+        EXPECT_CALL(*pMockStaService, ReConnect()).WillRepeatedly(Return(WIFI_OPT_SUCCESS));
+        EXPECT_TRUE(pStaInterface->DisableWifi() == WIFI_OPT_SUCCESS);
+    }
+
+    void ReConnectFail()
+    {
+        EXPECT_CALL(*pMockStaService, ReConnect()).WillRepeatedly(Return(WIFI_OPT_FAILED));
+        EXPECT_TRUE(pStaInterface->DisableWifi() == WIFI_OPT_FAILED);
+    }
 };
 
 extern "C" IStaService *Create(void);
@@ -376,6 +401,16 @@ HWTEST_F(StaInterfaceTest, DestroySuccess, TestSize.Level1)
 HWTEST_F(StaInterfaceTest, EnableWifiSuccess, TestSize.Level1)
 {
     EnableWifiSuccess();
+}
+
+HWTEST_F(StaInterfaceTest, EnableWifiFail1, TestSize.Level1)
+{
+    EnableWifiFail1();
+}
+
+HWTEST_F(StaInterfaceTest, EnableWifiFail2, TestSize.Level1)
+{
+    EnableWifiFail2();
 }
 
 HWTEST_F(StaInterfaceTest, DisableWifiSuceess, TestSize.Level1)
@@ -587,6 +622,16 @@ HWTEST_F(StaInterfaceTest, RemoveAllDeviceSuccess, TestSize.Level1)
 HWTEST_F(StaInterfaceTest, RemoveAllDeviceFail, TestSize.Level1)
 {
     RemoveAllDeviceFail();
+}
+
+HWTEST_F(StaInterfaceTest, ReConnectSuceess, TestSize.Level1)
+{
+    ReConnectSuceess();
+}
+
+HWTEST_F(StaInterfaceTest, ReConnectFail, TestSize.Level1)
+{
+    ReConnectFail();
 }
 } // namespace Wifi
 } // namespace OHOS

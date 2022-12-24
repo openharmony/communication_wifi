@@ -45,7 +45,7 @@ constexpr int RSSI = 8;
 constexpr int SMALLER_THAN_RSSI_DELIMITING_VALUE = -66;
 constexpr int FREQUENCY = 5200;
 constexpr int INVALIDRSSI = -90;
-constexpr int TWO = 8;
+constexpr int TWO = 2;
 
 class StaAutoConnectServiceTest : public testing::Test {
 public:

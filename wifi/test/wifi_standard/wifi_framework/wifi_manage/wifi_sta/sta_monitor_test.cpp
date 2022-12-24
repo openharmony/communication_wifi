@@ -15,6 +15,7 @@
 #include "sta_monitor.h"
 #include <gtest/gtest.h>
 #include "mock_sta_state_machine.h"
+#include "mock_wifi_settings.h"
 #include "mock_wifi_sta_hal_interface.h"
 #include "wifi_idl_define.h"
 #include <string>
@@ -28,7 +29,6 @@ using ::testing::SetArgReferee;
 using ::testing::StrEq;
 using ::testing::TypedEq;
 using ::testing::ext::TestSize;
-
 
 namespace OHOS {
 namespace Wifi {
@@ -76,6 +76,8 @@ public:
     void OnWpsTimeOutCallBackFail2();
     void OnBssidChangedCallBackSuccess();
     void OnBssidChangedCallBackFail();
+    void OnBssidChangedCallBackFail1();
+    void OnBssidChangedCallBackFail2();
     void OnWpaConnectionFullCallBackSuccess();
     void OnWpaConnectionFullCallBackFail();
     void OnWpaConnectionRejectCallBackSuccess();
@@ -125,6 +127,11 @@ void StaMonitorTest::OnConnectChangedCallBackSuccess1()
     int status = WPA_CB_CONNECTED;
     int networkId = 1;
     std::string bssid = "01:23:45:67:89:AB";
+    WifiLinkedInfo linkedInfo;
+    linkedInfo.connState = ConnState::DISCONNECTED;
+    EXPECT_CALL(WifiSettings::GetInstance(), GetLinkedInfo(_))
+        .Times(AtLeast(0))
+        .WillOnce(DoAll(SetArgReferee<0>(linkedInfo), Return(0)));
     pStaMonitor->OnConnectChangedCallBack(status, networkId, bssid);
 }
 
@@ -133,6 +140,11 @@ void StaMonitorTest::OnConnectChangedCallBackSuccess2()
     int status = WPA_CB_DISCONNECTED;
     int networkId = 1;
     std::string bssid = "01:23:45:67:89:AB";
+    WifiLinkedInfo linkedInfo;
+    linkedInfo.connState = ConnState::DISCONNECTED;
+    EXPECT_CALL(WifiSettings::GetInstance(), GetLinkedInfo(_))
+        .Times(AtLeast(0))
+        .WillOnce(DoAll(SetArgReferee<0>(linkedInfo), Return(0)));
     pStaMonitor->OnConnectChangedCallBack(status, networkId, bssid);
 }
 
@@ -231,6 +243,31 @@ void StaMonitorTest::OnBssidChangedCallBackFail()
     std::string reason = "null";
     std::string bssid = "01:23:45:67:89:AB";
     pStaMonitor->pStaStateMachine = nullptr;
+    pStaMonitor->OnBssidChangedCallBack(reason, bssid);
+}
+
+void StaMonitorTest::OnBssidChangedCallBackFail1()
+{
+    std::string reason = "null";
+    std::string bssid = "01:23:45:67:89:AB";
+    WifiLinkedInfo linkedInfo;
+    linkedInfo.connState = ConnState::DISCONNECTED;
+    EXPECT_CALL(WifiSettings::GetInstance(), GetLinkedInfo(_))
+        .Times(AtLeast(0))
+        .WillOnce(DoAll(SetArgReferee<0>(linkedInfo), Return(0)));
+    pStaMonitor->OnBssidChangedCallBack(reason, bssid);
+}
+
+void StaMonitorTest::OnBssidChangedCallBackFail2()
+{
+    std::string reason = "null";
+    std::string bssid = "01:23:45:67:89:AB";
+    WifiLinkedInfo linkedInfo;
+    linkedInfo.connState = ConnState::CONNECTED;
+    linkedInfo.bssid = "01:23:45:67:89:AB";
+    EXPECT_CALL(WifiSettings::GetInstance(), GetLinkedInfo(_))
+        .Times(AtLeast(0))
+        .WillOnce(DoAll(SetArgReferee<0>(linkedInfo), Return(0)));
     pStaMonitor->OnBssidChangedCallBack(reason, bssid);
 }
 
@@ -363,6 +400,16 @@ HWTEST_F(StaMonitorTest, OnBssidChangedCallBackSuccess, TestSize.Level1)
 HWTEST_F(StaMonitorTest, OnBssidChangedCallBackFail, TestSize.Level1)
 {
     OnBssidChangedCallBackFail();
+}
+
+HWTEST_F(StaMonitorTest, OnBssidChangedCallBackFail1, TestSize.Level1)
+{
+    OnBssidChangedCallBackFail1();
+}
+
+HWTEST_F(StaMonitorTest, OnBssidChangedCallBackFail2, TestSize.Level1)
+{
+    OnBssidChangedCallBackFail2();
 }
 
 HWTEST_F(StaMonitorTest, OnWpaConnectionFullCallBackSuccess, TestSize.Level1)

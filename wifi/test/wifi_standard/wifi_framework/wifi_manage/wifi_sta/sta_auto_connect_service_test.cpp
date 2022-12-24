@@ -45,6 +45,7 @@ constexpr int RSSI = 8;
 constexpr int SMALLER_THAN_RSSI_DELIMITING_VALUE = -66;
 constexpr int FREQUENCY = 5200;
 constexpr int INVALIDRSSI = -90;
+constexpr int TWO = 8;
 
 class StaAutoConnectServiceTest : public testing::Test {
 public:
@@ -919,7 +920,7 @@ void StaAutoConnectServiceTest::GetAvailableScanInfosSuccess2()
     WifiDeviceConfig deviceConfig;
     GetWifiDeviceConfig(deviceConfig);
     EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(deviceConfig.bssid, DEVICE_CONFIG_INDEX_BSSID, _))
-    .Times(AtLeast(0)).WillOnce(DoAll(SetArgReferee<2>(deviceConfig), Return(0)));
+    .Times(AtLeast(0)).WillOnce(DoAll(SetArgReferee<TWO>(deviceConfig), Return(0)));
     pStaAutoConnectService->GetAvailableScanInfos(availableScanInfos, scanInfos, blockedBssids, info);
 }
 
@@ -946,7 +947,7 @@ void StaAutoConnectServiceTest::GetAvailableScanInfosSuccess3()
     WifiDeviceConfig deviceConfig;
     GetWifiDeviceConfig(deviceConfig);
     EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(deviceConfig.bssid, DEVICE_CONFIG_INDEX_BSSID, _))
-    .Times(AtLeast(0)).WillOnce(DoAll(SetArgReferee<2>(deviceConfig), Return(0)));
+    .Times(AtLeast(0)).WillOnce(DoAll(SetArgReferee<TWO>(deviceConfig), Return(0)));
     pStaAutoConnectService->GetAvailableScanInfos(availableScanInfos, scanInfos, blockedBssids, info);
 }
 

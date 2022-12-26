@@ -105,20 +105,6 @@ public:
     {
         pScanMonitor->SendScanFailedEvent();
     }
-
-    void UnInitScanMonitorSuccessTest()
-    {
-        EXPECT_CALL(WifiSupplicantHalInterface::GetInstance(), UnRegisterSupplicantEventCallback())
-            .WillRepeatedly(Return(WIFI_IDL_OPT_OK));
-        pScanMonitor->UnInitScanMonitor();
-    }
-
-    void UnInitScanMonitorFailTest()
-    {
-        EXPECT_CALL(WifiSupplicantHalInterface::GetInstance(), UnRegisterSupplicantEventCallback())
-            .WillRepeatedly(Return(WIFI_IDL_OPT_FAILED));
-        pScanMonitor->UnInitScanMonitor();
-    }
 };
 
 HWTEST_F(ScanMonitorTest, InitScanMonitorSuccessTest, TestSize.Level1)
@@ -169,16 +155,6 @@ HWTEST_F(ScanMonitorTest, SendPnoScanInfoEventTest, TestSize.Level1)
 HWTEST_F(ScanMonitorTest, SendScanFailedEventTest, TestSize.Level1)
 {
     SendScanFailedEventTest();
-}
-
-HWTEST_F(ScanMonitorTest, UnInitScanMonitorSuccessTest, TestSize.Level1)
-{
-    UnInitScanMonitorSuccessTest();
-}
-
-HWTEST_F(ScanMonitorTest, UnInitScanMonitorFailTest, TestSize.Level1)
-{
-    UnInitScanMonitorFailTest();
 }
 } // namespace Wifi
 } // namespace OHOS

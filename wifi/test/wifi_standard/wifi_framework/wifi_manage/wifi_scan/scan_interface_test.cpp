@@ -173,7 +173,7 @@ HWTEST_F(ScanInterfaceTest, DisableScanTest, TestSize.Level1)
 
 HWTEST_F(ScanInterfaceTest, OnAppRunningModeChangedTest, TestSize.Level1)
 {
-    ScanMode appRunMode = APP_FOREGROUND_SCAN;
+    ScanMode appRunMode = ScanMode::APP_FOREGROUND_SCAN;
     EXPECT_EQ(WIFI_OPT_SUCCESS, pScanInterface->OnAppRunningModeChanged(appRunMode));
 }
 

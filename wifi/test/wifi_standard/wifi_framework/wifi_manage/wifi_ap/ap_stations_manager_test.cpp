@@ -77,7 +77,7 @@ public:
 
     void BroadCastStationChangeTest(const StationInfo &staInfo, ApStatemachineEvent act)
     {
-        WIFI_LOGI("BroadCastStationChangeTest enter");
+        WIFI_LOGI("BroadCastStationChangeTest Enter");
     }
 
     void RegisterEventHandler_SUCCESS()
@@ -357,6 +357,11 @@ HWTEST_F(ApStationsManager_test, DelAssociationStation_FAILED, TestSize.Level1)
 {
     EXPECT_CALL(WifiSettings::GetInstance(), ManageStation(Eq(staInfo), Eq(1), 0)).WillOnce(Return(-1));
     EXPECT_FALSE(WrapDelAssociationStation(staInfo));
+}
+
+HWTEST_F(ApStationsManager_test, RegisterEventHandler_SUCCESS, TestSize.Level1)
+{
+    RegisterEventHandler_SUCCESS();
 }
 } // namespace Wifi
 } // namespace OHOS

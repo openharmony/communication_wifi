@@ -67,7 +67,7 @@ if (defined(ohos_lite)) {
       "//third_party/openssl/include",
     ]
 
-    deps = [ "//third_party/openssl:libcrypto_static" ]
+    deps = [ "//third_party/openssl:libcrypto_shared" ]
 
     cflags_cc = [ "-fno-rtti" ]
 

@@ -203,8 +203,12 @@ public:
     {
         pApStartedState->ProcessCmdSetHotspotConfig(message);
     }
-    void WrapProcessCmdUpdateConfigResult(InternalMessage &message)
+    void WrapProcessCmdUpdateConfigResult()
     {
+        InternalMessage message;
+        message.SetParam1(1);
+        EXPECT_CALL(WifiSettings::GetInstance(), SetHotspotConfig(_, _))
+            .WillRepeatedly(Return(1));
         pApStartedState->ProcessCmdUpdateConfigResult(message);
     }
     void WrapProcessCmdAddBlockList(InternalMessage &message)
@@ -222,6 +226,20 @@ public:
     void WrapProcessCmdDisconnectStation(InternalMessage &message)
     {
         pApStartedState->ProcessCmdDisconnectStation(message);
+    }
+    void WrapStopAp_FAILED()
+    {
+        EXPECT_CALL(WifiApHalInterface::GetInstance(), StopAp(_))
+            .WillRepeatedly(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED));
+        pApStartedState->StopAp();    
+    }
+    void WrapUpdatePowerMode()
+    {
+        EXPECT_CALL(WifiApHalInterface::GetInstance(), GetPowerModel(_, _))
+            .WillRepeatedly(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED));
+        EXPECT_CALL(WifiApHalInterface::GetInstance(), SetPowerModel(_, _))
+            .WillRepeatedly(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
+        pApStartedState->UpdatePowerMode();
     }
 
 public:
@@ -493,23 +511,19 @@ HWTEST_F(ApStartedState_test, ExecuteStateMsg_FAILED, TestSize.Level1)
     EXPECT_FALSE(pApStartedState->ExecuteStateMsg(nullptr));
 }
 
-HWTEST_F(ApStartedState_test, ProcessCmdStationJoin_FAILED, TestSize.Level1)
+HWTEST_F(ApStartedState_test, WrapStopAp_FAILED, TestSize.Level1)
 {
-    pApStartedState->ProcessCmdStationJoin(nullptr);
+    WrapStopAp_FAILED();
 }
 
-HWTEST_F(ApStartedState_test, ProcessCmdStationLeave_FAILED, TestSize.Level1)
+HWTEST_F(ApStartedState_test, WrapUpdatePowerMode, TestSize.Level1)
 {
-    pApStartedState->ProcessCmdStationLeave(nullptr);
+    WrapUpdatePowerMode();
 }
 
-HWTEST_F(ApStartedState_test, UpdatePowerMode_FAILED, TestSize.Level1)
+HWTEST_F(ApStartedState_test, WrapProcessCmdUpdateConfigResult, TestSize.Level1)
 {
-    EXPECT_CALL(WifiApHalInterface::GetInstance(), GetPowerModel(_, _))
-        .WillRepeatedly(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED));
-    EXPECT_CALL(WifiApHalInterface::GetInstance(), SetPowerModel(_, _))
-        .WillRepeatedly(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
-    pApStartedState->UpdatePowerMode();
+    WrapProcessCmdUpdateConfigResult();
 }
 } // namespace Wifi
 } // namespace OHOS

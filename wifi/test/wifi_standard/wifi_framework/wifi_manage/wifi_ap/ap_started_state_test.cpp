@@ -492,5 +492,24 @@ HWTEST_F(ApStartedState_test, ExecuteStateMsg_FAILED, TestSize.Level1)
     EXPECT_FALSE(pApStartedState->ExecuteStateMsg(msg));
     EXPECT_FALSE(pApStartedState->ExecuteStateMsg(nullptr));
 }
+
+HWTEST_F(ApStartedState_test, ProcessCmdStationJoin_FAILED, TestSize.Level1)
+{
+    pApStartedState->ProcessCmdStationJoin(nullptr);
+}
+
+HWTEST_F(ApStartedState_test, ProcessCmdStationLeave_FAILED, TestSize.Level1)
+{
+    pApStartedState->ProcessCmdStationLeave(nullptr);
+}
+
+HWTEST_F(ApStartedState_test, UpdatePowerMode_FAILED, TestSize.Level1)
+{
+    EXPECT_CALL(WifiApHalInterface::GetInstance(), GetPowerModel(_, _))
+        .WillRepeatedly(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED));
+    EXPECT_CALL(WifiApHalInterface::GetInstance(), SetPowerModel(_, _))
+        .WillRepeatedly(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
+    pApStartedState->UpdatePowerMode();
+}
 } // namespace Wifi
 } // namespace OHOS

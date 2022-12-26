@@ -32,8 +32,6 @@ using ::testing::ext::TestSize;
 
 namespace OHOS {
 namespace Wifi {
-constexpr int STATE_APP_RUN = 3;
-constexpr int STATE_OPEN = 1;
 class ScanInterfaceTest : public testing::Test {
 public:
     static void SetUpTestCase()
@@ -173,18 +171,6 @@ HWTEST_F(ScanInterfaceTest, DisableScanTest, TestSize.Level1)
     EXPECT_EQ(WIFI_OPT_SUCCESS, pScanInterface->DisableScan(disable));
 }
 
-HWTEST_F(ScanInterfaceTest, OnScreenStateChangedSuccess, TestSize.Level1)
-{
-    int screenState = STATE_OPEN;
-    EXPECT_EQ(WIFI_OPT_SUCCESS, pScanInterface->OnScreenStateChanged(screenState));
-}
-
-HWTEST_F(ScanInterfaceTest, OnScreenStateChangedFail, TestSize.Level1)
-{
-    int screenState = STATE_APP_RUN;
-    EXPECT_EQ(WIFI_OPT_INVALID_PARAM, pScanInterface->OnScreenStateChanged(screenState));
-}
-
 HWTEST_F(ScanInterfaceTest, OnAppRunningModeChangedTest, TestSize.Level1)
 {
     ScanMode appRunMode = APP_FOREGROUND_SCAN;
@@ -196,29 +182,10 @@ HWTEST_F(ScanInterfaceTest, OnMovingFreezeStateChangeTest, TestSize.Level1)
     EXPECT_EQ(WIFI_OPT_SUCCESS, pScanInterface->OnMovingFreezeStateChange());
 }
 
-HWTEST_F(ScanInterfaceTest, OnCustomControlStateChangedSucess, TestSize.Level1)
-{
-    int customScene = STATE_OPEN
-    int customSceneStatus = 0;
-    EXPECT_EQ(WIFI_OPT_SUCCESS, pScanInterface->OnCustomControlStateChanged(customScene, customSceneStatus));
-}
-
-HWTEST_F(ScanInterfaceTest, OnCustomControlStateChangedFail, TestSize.Level1)
-{
-    int customScene = STATE_APP_RUN
-    int customSceneStatus = 0;
-    EXPECT_EQ(WIFI_OPT_INVALID_PARAM, pScanInterface->OnCustomControlStateChanged(customScene, customSceneStatus));
-}
-
 HWTEST_F(ScanInterfaceTest, OnGetCustomSceneStateTest, TestSize.Level1)
 {
     std::map<int, time_t> sceneMap;
     EXPECT_EQ(WIFI_OPT_SUCCESS, pScanInterface->OnGetCustomSceneState(sceneMap));
-}
-
-HWTEST_F(ScanInterfaceTest, OnControlStrategyChangedTest, TestSize.Level1)
-{
-    EXPECT_EQ(WIFI_OPT_SUCCESS, pScanInterface->OnControlStrategyChanged(sceneMap));
 }
 }  // namespace Wifi
 }  // namespace OHOS

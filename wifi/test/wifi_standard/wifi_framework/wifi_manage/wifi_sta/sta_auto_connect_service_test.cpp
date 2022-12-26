@@ -43,6 +43,9 @@ constexpr int NETWORK_ID = 15;
 constexpr int BAND = 2;
 constexpr int RSSI = 8;
 constexpr int SMALLER_THAN_RSSI_DELIMITING_VALUE = -66;
+constexpr int FREQUENCY = 5200;
+constexpr int INVALIDRSSI = -90;
+constexpr int TWO = 2;
 
 class StaAutoConnectServiceTest : public testing::Test {
 public:
@@ -134,13 +137,18 @@ public:
     void ConnectElectedDeviceSuccess2();
     void ConnectElectedDeviceFail1();
     void GetAvailableScanInfosSuccess();
+    void GetAvailableScanInfosSuccess1();
+    void GetAvailableScanInfosSuccess2();
+    void GetAvailableScanInfosSuccess3();
     void AllowAutoSelectDeviceSuccess1();
     void AllowAutoSelectDeviceSuccess2();
     void AllowAutoSelectDeviceSuccess3();
+    void AllowAutoSelectDeviceSuccess4();
     void AllowAutoSelectDeviceFail1();
     void AllowAutoSelectDeviceFail2();
     void AllowAutoSelectDeviceFail3();
     void AllowAutoSelectDeviceFail4();
+    void AllowAutoSelectDeviceFail5();
     void CurrentDeviceGoodEnoughSuccess();
     void CurrentDeviceGoodEnoughFail1();
     void CurrentDeviceGoodEnoughFail2();
@@ -297,7 +305,6 @@ void StaAutoConnectServiceTest::OnScanResultsReadyHandlerSuccess1()
     pStaAutoConnectService->OnScanInfosReadyHandler(scanInfos);
 }
 
-
 void StaAutoConnectServiceTest::OnScanResultsReadyHandlerSuccess2()
 {
     WifiDeviceConfig deviceConfig;
@@ -314,7 +321,6 @@ void StaAutoConnectServiceTest::OnScanResultsReadyHandlerSuccess2()
 
     pStaAutoConnectService->OnScanInfosReadyHandler(scanInfos);
 }
-
 
 void StaAutoConnectServiceTest::OnScanResultsReadyHandlerSuccess3()
 {
@@ -444,7 +450,6 @@ void StaAutoConnectServiceTest::OnScanResultsReadyHandlerFail6()
     pStaAutoConnectService->OnScanInfosReadyHandler(scanInfos);
 }
 
-
 void StaAutoConnectServiceTest::OnScanResultsReadyHandlerFail7()
 {
     std::vector<InterScanInfo> scanInfos;
@@ -532,7 +537,6 @@ void StaAutoConnectServiceTest::AutoSelectDeviceSuccess2()
         WIFI_OPT_SUCCESS);
 }
 
-
 void StaAutoConnectServiceTest::AutoSelectDeviceSuccess3()
 {
     WifiDeviceConfig deviceConfig;
@@ -583,7 +587,6 @@ void StaAutoConnectServiceTest::AutoSelectDeviceFail2()
     EXPECT_TRUE(pStaAutoConnectService->AutoSelectDevice(deviceConfig, scanInfos, blockedBssids, info) ==
         WIFI_OPT_FAILED);
 }
-
 
 void StaAutoConnectServiceTest::AutoSelectDeviceFail3()
 {
@@ -707,7 +710,6 @@ void StaAutoConnectServiceTest::AddOrDelBlockedBssidsSuccess()
     EXPECT_TRUE(pStaAutoConnectService->AddOrDelBlockedBssids(bssid, enable, reason) == true);
 }
 
-
 void StaAutoConnectServiceTest::AddOrDelBlockedBssidsFail()
 {
     std::string bssid = "2a:76:93:47:e2:8a";
@@ -738,7 +740,6 @@ void StaAutoConnectServiceTest::ObtainRoamCapFromFirmwareFail1()
 
     EXPECT_TRUE(pStaAutoConnectService->ObtainRoamCapFromFirmware() == false);
 }
-
 
 void StaAutoConnectServiceTest::ObtainRoamCapFromFirmwareFail2()
 {
@@ -871,6 +872,85 @@ void StaAutoConnectServiceTest::GetAvailableScanInfosSuccess()
     pStaAutoConnectService->GetAvailableScanInfos(availableScanInfos, scanInfos, blockedBssids, info);
 }
 
+void StaAutoConnectServiceTest::GetAvailableScanInfosSuccess1()
+{
+    std::vector<InterScanInfo> availableScanInfos;
+    std::vector<InterScanInfo> scanInfos;
+    std::vector<std::string> blockedBssids;
+    WifiLinkedInfo info;
+    GetInterScanInfoVector(availableScanInfos);
+
+    InterScanInfo scanInfo;
+    scanInfo.bssid = "2a:76:93:47:e2:8a";
+    scanInfo.ssid = "";
+    scanInfo.band = NETWORK_ID;
+    scanInfo.rssi = RSSI;
+    scanInfo.securityType = WifiSecurity::OPEN;
+    scanInfos.push_back(scanInfo);
+
+    std::string bssid1 = "2a:76:93:47:e2:8a";
+    blockedBssids.push_back(bssid1);
+    GetWifiLinkedInfo(info);
+    WifiDeviceConfig deviceConfig;
+    GetWifiDeviceConfig(deviceConfig);
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(deviceConfig.bssid, DEVICE_CONFIG_INDEX_BSSID, _))
+    .Times(AtLeast(0)).WillOnce(DoAll(SetArgReferee<2>(deviceConfig), Return(0)));
+    pStaAutoConnectService->GetAvailableScanInfos(availableScanInfos, scanInfos, blockedBssids, info);
+}
+
+void StaAutoConnectServiceTest::GetAvailableScanInfosSuccess2()
+{
+    std::vector<InterScanInfo> availableScanInfos;
+    std::vector<InterScanInfo> scanInfos;
+    std::vector<std::string> blockedBssids;
+    WifiLinkedInfo info;
+    GetInterScanInfoVector(availableScanInfos);
+
+    InterScanInfo scanInfo;
+    scanInfo.bssid = "2a:76:93:47:e2:8a";
+    scanInfo.ssid = "HMWIFI_W2_EAP_G2_03";
+    scanInfo.band = NETWORK_ID;
+    scanInfo.rssi = INVALIDRSSI;
+    scanInfo.securityType = WifiSecurity::OPEN;
+    scanInfos.push_back(scanInfo);
+
+    std::string bssid1 = "2a:76:93:47:e2:8a";
+    blockedBssids.push_back(bssid1);
+    GetWifiLinkedInfo(info);
+    WifiDeviceConfig deviceConfig;
+    GetWifiDeviceConfig(deviceConfig);
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(deviceConfig.bssid, DEVICE_CONFIG_INDEX_BSSID, _))
+    .Times(AtLeast(0)).WillOnce(DoAll(SetArgReferee<TWO>(deviceConfig), Return(0)));
+    pStaAutoConnectService->GetAvailableScanInfos(availableScanInfos, scanInfos, blockedBssids, info);
+}
+
+void StaAutoConnectServiceTest::GetAvailableScanInfosSuccess3()
+{
+    std::vector<InterScanInfo> availableScanInfos;
+    std::vector<InterScanInfo> scanInfos;
+    std::vector<std::string> blockedBssids;
+    WifiLinkedInfo info;
+    GetInterScanInfoVector(availableScanInfos);
+
+    InterScanInfo scanInfo;
+    scanInfo.bssid = "2a:76:93:47:e2:8a";
+    scanInfo.ssid = "HMWIFI_W2_EAP_G2_03";
+    scanInfo.band = NETWORK_ID;
+    scanInfo.rssi = INVALIDRSSI;
+    scanInfo.securityType = WifiSecurity::OPEN;
+    scanInfo.frequency = FREQUENCY;
+    scanInfos.push_back(scanInfo);
+
+    std::string bssid1 = "2a:76:93:47:e2:8a";
+    blockedBssids.push_back(bssid1);
+    GetWifiLinkedInfo(info);
+    WifiDeviceConfig deviceConfig;
+    GetWifiDeviceConfig(deviceConfig);
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(deviceConfig.bssid, DEVICE_CONFIG_INDEX_BSSID, _))
+    .Times(AtLeast(0)).WillOnce(DoAll(SetArgReferee<TWO>(deviceConfig), Return(0)));
+    pStaAutoConnectService->GetAvailableScanInfos(availableScanInfos, scanInfos, blockedBssids, info);
+}
+
 void StaAutoConnectServiceTest::AllowAutoSelectDeviceSuccess1()
 {
     std::vector<InterScanInfo> scanInfos;
@@ -901,6 +981,18 @@ void StaAutoConnectServiceTest::AllowAutoSelectDeviceSuccess3()
     GetInterScanInfoVector(scanInfos);
     GetWifiLinkedInfo(info);
     info.detailedState = DetailedState::NOTWORKING;
+
+    EXPECT_CALL(WifiSettings::GetInstance(), GetWhetherToAllowNetworkSwitchover()).WillOnce(Return(true));
+    EXPECT_TRUE(pStaAutoConnectService->AllowAutoSelectDevice(scanInfos, info) == true);
+}
+
+void StaAutoConnectServiceTest::AllowAutoSelectDeviceSuccess4()
+{
+    std::vector<InterScanInfo> scanInfos;
+    WifiLinkedInfo info;
+    GetInterScanInfoVector(scanInfos);
+    GetWifiLinkedInfo(info);
+    info.detailedState = DetailedState::PASSWORD_ERROR;
 
     EXPECT_CALL(WifiSettings::GetInstance(), GetWhetherToAllowNetworkSwitchover()).WillOnce(Return(true));
     EXPECT_TRUE(pStaAutoConnectService->AllowAutoSelectDevice(scanInfos, info) == true);
@@ -955,6 +1047,15 @@ void StaAutoConnectServiceTest::AllowAutoSelectDeviceFail4()
     GetWifiLinkedInfo(info);
     info.detailedState = DetailedState::INVALID;
 
+    EXPECT_TRUE(pStaAutoConnectService->AllowAutoSelectDevice(scanInfos, info) == false);
+}
+
+void StaAutoConnectServiceTest::AllowAutoSelectDeviceFail5()
+{
+    std::vector<InterScanInfo> scanInfos;
+    WifiLinkedInfo info;
+    GetWifiLinkedInfo(info);
+    info.detailedState = DetailedState::INVALID;
     EXPECT_TRUE(pStaAutoConnectService->AllowAutoSelectDevice(scanInfos, info) == false);
 }
 
@@ -1564,6 +1665,21 @@ HWTEST_F(StaAutoConnectServiceTest, GetAvailableScanInfosSuccess, TestSize.Level
     GetAvailableScanInfosSuccess();
 }
 
+HWTEST_F(StaAutoConnectServiceTest, GetAvailableScanInfosSuccess1, TestSize.Level1)
+{
+    GetAvailableScanInfosSuccess1();
+}
+
+HWTEST_F(StaAutoConnectServiceTest, GetAvailableScanInfosSuccess2, TestSize.Level1)
+{
+    GetAvailableScanInfosSuccess2();
+}
+
+HWTEST_F(StaAutoConnectServiceTest, GetAvailableScanInfosSuccess3, TestSize.Level1)
+{
+    GetAvailableScanInfosSuccess3();
+}
+
 HWTEST_F(StaAutoConnectServiceTest, AllowAutoSelectDeviceSuccess1, TestSize.Level1)
 {
     AllowAutoSelectDeviceSuccess1();
@@ -1577,6 +1693,11 @@ HWTEST_F(StaAutoConnectServiceTest, AllowAutoSelectDeviceSuccess2, TestSize.Leve
 HWTEST_F(StaAutoConnectServiceTest, AllowAutoSelectDeviceSuccess3, TestSize.Level1)
 {
     AllowAutoSelectDeviceSuccess3();
+}
+
+HWTEST_F(StaAutoConnectServiceTest, AllowAutoSelectDeviceSuccess4, TestSize.Level1)
+{
+    AllowAutoSelectDeviceSuccess4();
 }
 
 HWTEST_F(StaAutoConnectServiceTest, AllowAutoSelectDeviceFail1, TestSize.Level1)
@@ -1597,6 +1718,11 @@ HWTEST_F(StaAutoConnectServiceTest, AllowAutoSelectDeviceFail3, TestSize.Level1)
 HWTEST_F(StaAutoConnectServiceTest, AllowAutoSelectDeviceFail4, TestSize.Level1)
 {
     AllowAutoSelectDeviceFail4();
+}
+
+HWTEST_F(StaAutoConnectServiceTest, AllowAutoSelectDeviceFail5, TestSize.Level1)
+{
+    AllowAutoSelectDeviceFail5();
 }
 
 HWTEST_F(StaAutoConnectServiceTest, CurrentDeviceGoodEnoughSuccess, TestSize.Level1)

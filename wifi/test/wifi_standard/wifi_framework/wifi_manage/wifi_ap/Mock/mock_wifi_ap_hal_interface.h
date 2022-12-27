@@ -44,6 +44,7 @@ public:
     virtual WifiErrorNo AddBlockByMac(const std::string &mac, int id = 0) = 0;
     virtual WifiErrorNo DelBlockByMac(const std::string &mac, int id = 0) = 0;
     virtual WifiErrorNo RemoveStation(const std::string &mac, int id = 0) = 0;
+    virtual WifiErrorNo GetFrequenciesByBand(int band, std::vector<int> &frequencies) = 0;
     virtual WifiErrorNo GetFrequenciesByBand(int band, std::vector<int> &frequencies, int id = 0) = 0;
     virtual WifiErrorNo RegisterApEvent(IWifiApMonitorEventCallback callback, int id = 0) = 0;
     virtual WifiErrorNo SetWifiCountryCode(const std::string &code, int id = 0) = 0;
@@ -63,6 +64,7 @@ public:
     MOCK_METHOD2(AddBlockByMac, WifiErrorNo(const std::string &mac, int id));
     MOCK_METHOD2(DelBlockByMac, WifiErrorNo(const std::string &mac, int id));
     MOCK_METHOD2(RemoveStation, WifiErrorNo(const std::string &mac, int id));
+    MOCK_METHOD2(GetFrequenciesByBand, WifiErrorNo(int band, std::vector<int> &frequencies));
     MOCK_METHOD3(GetFrequenciesByBand, WifiErrorNo(int band, std::vector<int> &frequencies, int id));
     MOCK_METHOD2(RegisterApEvent, WifiErrorNo(IWifiApMonitorEventCallback callback, int id));
     MOCK_METHOD2(SetWifiCountryCode, WifiErrorNo(const std::string &code, int id));

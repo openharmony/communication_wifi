@@ -12,22 +12,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "scan_interface.h"
-#include <gtest/gtest.h>
-#include "mock_wifi_manager.h"
-#include "mock_scan_service.h"
-#include "mock_wifi_settings.h"
-#include "mock_wifi_supplicant_hal_interface.h"
-#include "mock_wifi_sta_hal_interface.h"
+#include "../../../interfaces/kits/c/wifi_event.h"
+#include <set>
+#include "../../../interfaces/kits/c/wifi_device.h"
+#include "../../../interfaces/kits/c/wifi_scan_info.h"
 
-using ::testing::_;
-using ::testing::AtLeast;
-using ::testing::DoAll;
-using ::testing::Eq;
 using ::testing::Return;
-using ::testing::SetArgReferee;
-using ::testing::StrEq;
-using ::testing::TypedEq;
 using ::testing::ext::TestSize;
 
 namespace OHOS {
@@ -36,76 +26,31 @@ class WifiEventTest : public testing::Test{
 public:
     static void SetUpTestCase(){};
     static void TearDownTestCase(){};
-    static void SetUp(){};
-    static void TearDown(){};
-
-    void AddEventCallbackTest()
+    virtual void SetUp(){};
+    virtual void TearDown(){};
+	
+    void RegisterWifiEventTest()
     {
-        WifiEvent *cb = nullptr;
-        AddEventCallback(cb);
+        WifiEvent *event = nullptr;
+        RegisterWifiEvent(event);
+    }
+    void UnRegisterWifiEventTest()
+    {
+        WifiEvent *event = nullptr;
+        UnRegisterWifiEvent(WifiEvent);
     }
 
-    void OnWifiStateChangedTest()
-    {
-        int state = 1;s
-		OnWifiStateChanged(state);
-    }
+};
 
-    void  OnWifiRssiChangedTest()
-    {
-        int rssi = 1;
-		OnWifiRssiChanged(rssi);
-    }
-    void OnWifiConnectionChangedTest()
-    {
-        int state = 1;
-        WifiLinkedInfo linkInfo = ERROR_WIFI_INVALID_ARGS;
-        OnWifiConnectionChanged(linkInfo);
-    }
-    void RegisterWifiEventsTest()
-    {
-        RegisterWifiEvents();
-    }
-    void IsEventRegisteredTest()
-    {
-        IsEventRegistered();
-    }
-    void SetIsEventRegistratedTest()
-    {
-        bool isEventRegistered = true;
-        SetIsEventRegistrated(isEventRegistered);
-    }
-
+HWTEST_F(WifiEventTest, SetIsEventRegistratedTest, TestSize.Level1)
+{
+    RegisterWifiEventTest();
+}
+HWTEST_F(WifiEventTest, SetIsEventRegistratedTest, TestSize.Level1)
+{
+    UnRegisterWifiEventTest();
 }
 
-HWTEST_F(StaMonitorTest, AddEventCallbackTest, TestSize.Level1)
-{
-    AddEventCallbackTest();
-}
-HWTEST_F(StaMonitorTest, OnWifiStateChangedTest, TestSize.Level1)
-{
-    OnWifiStateChangedTest();
-}
-HWTEST_F(StaMonitorTest, OnWifiRssiChangedTest, TestSize.Level1)
-{
-    OnWifiRssiChangedTest();
-}
-HWTEST_F(StaMonitorTest, OnWifiConnectionChangedTest, TestSize.Level1)
-{
-    OnWifiConnectionChangedTest();
-}
-HWTEST_F(StaMonitorTest, RegisterWifiEventsTest, TestSize.Level1)
-{
-    RegisterWifiEventsTest();
-}
-HWTEST_F(StaMonitorTest, IsEventRegisteredTest, TestSize.Level1)
-{
-    IsEventRegisteredTest();
-}
-HWTEST_F(StaMonitorTest, SetIsEventRegistratedTest, TestSize.Level1)
-{
-    SetIsEventRegistratedTest();
-}
 
 }  // namespace Wifi
 }  // namespace OHOS

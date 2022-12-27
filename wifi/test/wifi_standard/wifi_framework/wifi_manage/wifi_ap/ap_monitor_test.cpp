@@ -53,8 +53,14 @@ public:
     }
 
 public:
+    void Registertest()
+    {
+    }
+
     void WraUnregisterHandler(const std::string &iface)
     {
+        auto handler = std::bind((&ApMonitor_Test::Registertest), this);
+        pApMonitor->RegisterHandler(iface, handler);
         pApMonitor->UnregisterHandler(iface);
         return;
     }

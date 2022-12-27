@@ -150,5 +150,42 @@ HWTEST_F(ScanInterfaceTest, RegisterScanCallbacksTest, TestSize.Level1)
     IScanSerivceCallbacks callbacks;
     EXPECT_EQ(WIFI_OPT_SUCCESS, pScanInterface->RegisterScanCallbacks(callbacks));
 }
+
+HWTEST_F(ScanInterfaceTest, ScanTest, TestSize.Level1)
+{
+    bool externFlag = false;
+    EXPECT_EQ(WIFI_OPT_SUCCESS, pScanInterface->Scan(externFlag));
+}
+
+HWTEST_F(ScanInterfaceTest, ScanWithParamTest, TestSize.Level1)
+{
+    WifiScanParams wifiScanParams;
+    wifiScanParams.ssid = "HMWIFI_G2_03";
+    wifiScanParams.bssid = "2a:76:93:47:e2:8a";
+    EXPECT_EQ(WIFI_OPT_SUCCESS, pScanInterface->ScanWithParam(wifiScanParams));
+}
+
+HWTEST_F(ScanInterfaceTest, DisableScanTest, TestSize.Level1)
+{
+    bool disable = false;
+    EXPECT_EQ(WIFI_OPT_SUCCESS, pScanInterface->DisableScan(disable));
+}
+
+HWTEST_F(ScanInterfaceTest, OnAppRunningModeChangedTest, TestSize.Level1)
+{
+    ScanMode appRunMode = ScanMode::APP_FOREGROUND_SCAN;
+    EXPECT_EQ(WIFI_OPT_SUCCESS, pScanInterface->OnAppRunningModeChanged(appRunMode));
+}
+
+HWTEST_F(ScanInterfaceTest, OnMovingFreezeStateChangeTest, TestSize.Level1)
+{
+    EXPECT_EQ(WIFI_OPT_SUCCESS, pScanInterface->OnMovingFreezeStateChange());
+}
+
+HWTEST_F(ScanInterfaceTest, OnGetCustomSceneStateTest, TestSize.Level1)
+{
+    std::map<int, time_t> sceneMap;
+    EXPECT_EQ(WIFI_OPT_SUCCESS, pScanInterface->OnGetCustomSceneState(sceneMap));
+}
 }  // namespace Wifi
 }  // namespace OHOS

@@ -229,5 +229,26 @@ HWTEST_F(ApConfigUse_Test, CheckBandChannel_3, TestSize.Level1)
     EXPECT_EQ(apConfig.GetChannel(), 6);
     EXPECT_EQ(apConfig.GetBand(), BandType::BAND_2GHZ);
 }
+HWTEST_F(ApConfigUse_Test, CheckBandChannel_4, TestSize.Level1)
+{
+    HotspotConfig apConfig;
+    apConfig.SetBand(BandType::BAND_5GHZ);
+    apConfig.SetChannel(133);
+    std::vector<int32_t> band_2G_channel = { 1, 2, 3, 4, 5, 6, 7 };
+    std::vector<int32_t> band_5G_channel = { 149, 168, 169 };
+    ChannelsTable ChannelsTb = {{ BandType::BAND_5GHZ, band_5G_channel }, { BandType::BAND_2GHZ, band_2G_channel }};
+    pApConfigUse->CheckBandChannel(apConfig, ChannelsTb);
+    EXPECT_EQ(apConfig.GetBand(), BandType::BAND_5GHZ);
+}
+HWTEST_F(ApConfigUse_Test, CheckBandChannel_5, TestSize.Level1)
+{
+    HotspotConfig apConfig;
+    apConfig.SetBand(BandType::BAND_ANY);
+    apConfig.SetChannel(133);
+    std::vector<int32_t> band_2G_channel = { 1, 2, 3, 4, 5, 6, 7 };
+    std::vector<int32_t> band_5G_channel = { 149, 168, 169 };
+    ChannelsTable ChannelsTb = {{ BandType::BAND_5GHZ, band_5G_channel }, { BandType::BAND_2GHZ, band_2G_channel }};
+    pApConfigUse->CheckBandChannel(apConfig, ChannelsTb);
+}
 } // namespace Wifi
 } // namespace OHOS

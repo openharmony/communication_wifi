@@ -227,11 +227,11 @@ public:
     {
         pApStartedState->ProcessCmdDisconnectStation(message);
     }
-    void WrapStopAp_FAILED()
+    void WrapStopApFailed()
     {
         EXPECT_CALL(WifiApHalInterface::GetInstance(), StopAp(_))
             .WillRepeatedly(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED));
-        pApStartedState->StopAp();    
+        pApStartedState->StopAp();
     }
     void WrapUpdatePowerMode()
     {
@@ -511,9 +511,9 @@ HWTEST_F(ApStartedState_test, ExecuteStateMsg_FAILED, TestSize.Level1)
     EXPECT_FALSE(pApStartedState->ExecuteStateMsg(nullptr));
 }
 
-HWTEST_F(ApStartedState_test, WrapStopAp_FAILED, TestSize.Level1)
+HWTEST_F(ApStartedState_test, WrapStopApFailed, TestSize.Level1)
 {
-    WrapStopAp_FAILED();
+    WrapStopApFailed();
 }
 
 HWTEST_F(ApStartedState_test, WrapUpdatePowerMode, TestSize.Level1)

@@ -271,14 +271,14 @@ HWTEST_F(ApService_test, GetSupportedPowerModelSuccess, TestSize.Level1)
 
 HWTEST_F(ApService_test, GetPowerModelSuccess, TestSize.Level1)
 {
-    PowerModel model;
+    PowerModel model = PowerModel::SLEEPING;
     EXPECT_CALL(WifiSettings::GetInstance(), GetPowerModel(_, _)).WillOnce(Return(0));
     EXPECT_EQ(ErrCode::WIFI_OPT_SUCCESS, pApService->GetPowerModel(model));
 }
 
 HWTEST_F(ApService_test, SetPowerModelSuccess, TestSize.Level1)
 {
-    PowerModel model;
+    PowerModel model = PowerModel::SLEEPING;
     EXPECT_CALL(WifiApHalInterface::GetInstance(), SetPowerModel(_, _))
         .WillRepeatedly(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
     EXPECT_CALL(WifiSettings::GetInstance(), SetPowerModel(_, _)).WillOnce(Return(ErrCode::WIFI_OPT_SUCCESS));
@@ -287,7 +287,7 @@ HWTEST_F(ApService_test, SetPowerModelSuccess, TestSize.Level1)
 
 HWTEST_F(ApService_test, SetPowerModelFailed, TestSize.Level1)
 {
-    PowerModel model;
+    PowerModel model = PowerModel::SLEEPING;
     EXPECT_CALL(WifiApHalInterface::GetInstance(), SetPowerModel(_, _))
         .WillRepeatedly(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED));
     EXPECT_CALL(WifiSettings::GetInstance(), SetPowerModel(_, _)).WillRepeatedly(Return(ErrCode::WIFI_OPT_SUCCESS));

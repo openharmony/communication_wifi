@@ -13,7 +13,8 @@
  * limitations under the License.
  */
 #include "../../../interfaces/kits/c/wifi_event.h"
-#include <set>
+#include <gmock/gmock.h>
+#include <gtest/gtest.h>
 #include "../../../interfaces/kits/c/wifi_device.h"
 #include "../../../interfaces/kits/c/wifi_scan_info.h"
 
@@ -37,7 +38,7 @@ public:
     void UnRegisterWifiEventTest()
     {
         WifiEvent *event = nullptr;
-        UnRegisterWifiEvent(WifiEvent);
+        UnRegisterWifiEvent(event);
     }
 
 };
@@ -46,7 +47,7 @@ HWTEST_F(WifiEventTest, SetIsEventRegistratedTest, TestSize.Level1)
 {
     RegisterWifiEventTest();
 }
-HWTEST_F(WifiEventTest, SetIsEventRegistratedTest, TestSize.Level1)
+HWTEST_F(WifiEventTest, UnRegisterWifiEventTest, TestSize.Level1)
 {
     UnRegisterWifiEventTest();
 }

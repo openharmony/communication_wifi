@@ -21,6 +21,7 @@
 #include "operator_overload.h"
 
 #include "ap_stations_manager.h"
+#include "wifi_logger.h"
 
 using namespace OHOS;
 using ::testing::_;
@@ -30,6 +31,7 @@ using ::testing::Eq;
 using ::testing::Return;
 using ::testing::StrEq;
 using ::testing::ext::TestSize;
+DEFINE_WIFILOG_LABEL("ApStationsManager_test");
 
 namespace OHOS {
 namespace Wifi {
@@ -73,6 +75,16 @@ public:
         return pApStaMgr->DelAssociationStation(info);
     }
 
+    void BroadCastStationChangeTest(const StationInfo &staInfo, ApStatemachineEvent act)
+    {
+        WIFI_LOGI("BroadCastStationChangeTest Enter");
+    }
+
+    void RegisterEventHandlerSuccess()
+    {
+        pApStaMgr->RegisterEventHandler(std::bind(&ApStationsManager_test::BroadCastStationChangeTest, this,
+            std::placeholders::_1, std::placeholders::_2));
+    }
 public:
     ApStationsManager *pApStaMgr;
 };
@@ -345,6 +357,11 @@ HWTEST_F(ApStationsManager_test, DelAssociationStation_FAILED, TestSize.Level1)
 {
     EXPECT_CALL(WifiSettings::GetInstance(), ManageStation(Eq(staInfo), Eq(1), 0)).WillOnce(Return(-1));
     EXPECT_FALSE(WrapDelAssociationStation(staInfo));
+}
+
+HWTEST_F(ApStationsManager_test, RegisterEventHandlerSuccess, TestSize.Level1)
+{
+    RegisterEventHandlerSuccess();
 }
 } // namespace Wifi
 } // namespace OHOS

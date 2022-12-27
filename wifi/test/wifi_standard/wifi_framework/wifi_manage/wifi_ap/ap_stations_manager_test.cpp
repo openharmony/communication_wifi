@@ -80,9 +80,9 @@ public:
         WIFI_LOGI("BroadCastStationChangeTest Enter");
     }
 
-    void RegisterEventHandler_SUCCESS()
+    void RegisterEventHandlerSuccess()
     {
-        pApStaMgr->RegisterEventHandler(std::bind(&ApStationsManager_test::BroadCastStationChangeTest, this, 
+        pApStaMgr->RegisterEventHandler(std::bind(&ApStationsManager_test::BroadCastStationChangeTest, this,
             std::placeholders::_1, std::placeholders::_2));
     }
 public:
@@ -359,9 +359,9 @@ HWTEST_F(ApStationsManager_test, DelAssociationStation_FAILED, TestSize.Level1)
     EXPECT_FALSE(WrapDelAssociationStation(staInfo));
 }
 
-HWTEST_F(ApStationsManager_test, RegisterEventHandler_SUCCESS, TestSize.Level1)
+HWTEST_F(ApStationsManager_test, RegisterEventHandlerSuccess, TestSize.Level1)
 {
-    RegisterEventHandler_SUCCESS();
+    RegisterEventHandlerSuccess();
 }
 } // namespace Wifi
 } // namespace OHOS

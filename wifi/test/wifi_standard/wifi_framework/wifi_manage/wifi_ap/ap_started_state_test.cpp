@@ -203,8 +203,12 @@ public:
     {
         pApStartedState->ProcessCmdSetHotspotConfig(message);
     }
-    void WrapProcessCmdUpdateConfigResult(InternalMessage &message)
+    void WrapProcessCmdUpdateConfigResult()
     {
+        InternalMessage message;
+        message.SetParam1(1);
+        EXPECT_CALL(WifiSettings::GetInstance(), SetHotspotConfig(_, _))
+            .WillRepeatedly(Return(1));
         pApStartedState->ProcessCmdUpdateConfigResult(message);
     }
     void WrapProcessCmdAddBlockList(InternalMessage &message)
@@ -222,6 +226,20 @@ public:
     void WrapProcessCmdDisconnectStation(InternalMessage &message)
     {
         pApStartedState->ProcessCmdDisconnectStation(message);
+    }
+    void WrapStopApFailed()
+    {
+        EXPECT_CALL(WifiApHalInterface::GetInstance(), StopAp(_))
+            .WillRepeatedly(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED));
+        pApStartedState->StopAp();
+    }
+    void WrapUpdatePowerMode()
+    {
+        EXPECT_CALL(WifiApHalInterface::GetInstance(), GetPowerModel(_, _))
+            .WillRepeatedly(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED));
+        EXPECT_CALL(WifiApHalInterface::GetInstance(), SetPowerModel(_, _))
+            .WillRepeatedly(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
+        pApStartedState->UpdatePowerMode();
     }
 
 public:
@@ -491,6 +509,21 @@ HWTEST_F(ApStartedState_test, ExecuteStateMsg_FAILED, TestSize.Level1)
     msg->SetMessageName(static_cast<int>(ApStatemachineEvent::CMD_START_HOTSPOT));
     EXPECT_FALSE(pApStartedState->ExecuteStateMsg(msg));
     EXPECT_FALSE(pApStartedState->ExecuteStateMsg(nullptr));
+}
+
+HWTEST_F(ApStartedState_test, WrapStopApFailed, TestSize.Level1)
+{
+    WrapStopApFailed();
+}
+
+HWTEST_F(ApStartedState_test, WrapUpdatePowerMode, TestSize.Level1)
+{
+    WrapUpdatePowerMode();
+}
+
+HWTEST_F(ApStartedState_test, WrapProcessCmdUpdateConfigResult, TestSize.Level1)
+{
+    WrapProcessCmdUpdateConfigResult();
 }
 } // namespace Wifi
 } // namespace OHOS

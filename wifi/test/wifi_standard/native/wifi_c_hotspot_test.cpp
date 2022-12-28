@@ -53,7 +53,7 @@ public:
     void SetHotspotConfigTests()
     {
         HotspotConfig config;
-		config.band = Mode;
+        config.band = Mode;
         SetHotspotConfig(&config);
     }
 
@@ -61,15 +61,15 @@ public:
     {
         HotspotConfig result;
         result.band = Mode;
-        GetHotspotConfig(result);
+        GetHotspotConfig(&result);
     }
 
     void GetStationListTest()
     {
-        StationInfo *result;
+        StationInfo result;
         result.ipAddress = Status;
         unsigned int *size = &Status;
-        GetStationList(result, size);
+        GetStationList(&result, size);
     }
 
     void DisassociateStaTests()

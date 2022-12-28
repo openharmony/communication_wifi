@@ -344,7 +344,7 @@ int WifiP2pService::GetP2pRecommendChannel(void)
     
     WifiLinkedInfo linkedInfo;
     WifiSettings::GetInstance().GetLinkedInfo(linkedInfo);
-    if (linkedInfo.connState == CONNECTED) {
+    if (linkedInfo.connState == CONNECTED && linkedInfo.band == static_cast<int>(BandType::BAND_5GHZ)) {
         channel = FrequencyToChannel(linkedInfo.frequency);
         WIFI_LOGI("Recommend linked channel: %{public}d", channel);
         return channel;
@@ -367,6 +367,11 @@ int WifiP2pService::GetP2pRecommendChannel(void)
             channel = vec5GChannels[0];
         }
         WIFI_LOGI("Recommend 5G channel: %{public}d", channel);
+        return channel;
+    }
+    if (linkedInfo.connState == CONNECTED && linkedInfo.band == static_cast<int>(BandType::BAND_2GHZ)) {
+        channel = FrequencyToChannel(linkedInfo.frequency);
+        WIFI_LOGI("Recommend linked 2G channel: %{public}d", channel);
         return channel;
     }
     WIFI_LOGI("Recommend 2G channel: %{public}d", COMMON_USING_2G_CHANNEL);

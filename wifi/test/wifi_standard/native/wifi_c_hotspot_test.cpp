@@ -26,6 +26,7 @@ using ::testing::ext::TestSize;
 namespace OHOS {
 namespace Wifi {
 unsigned int Status = 17;
+unsigned char result = 5;
 int Mode = 1;
 class WifiHotspotTest : public testing::Test {
 public:
@@ -74,7 +75,7 @@ public:
 
     void DisassociateStaTests()
     {
-        unsigned char *mac = &Status;
+        unsigned char *mac = &result;
         int macLen = 0;
         DisassociateSta(mac, macLen);
     }

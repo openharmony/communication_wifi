@@ -1350,6 +1350,7 @@ public:
         EXPECT_CALL(WifiStaHalInterface::GetInstance(), GetConnectSignalInfo(_, _)).Times(AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_));
         EXPECT_CALL(WifiSettings::GetInstance(), GetSignalLevel(_, _)).Times(AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), SyncDeviceConfig()).Times(AtLeast(0));
         pStaStateMachine->DealSignalPollResult(&msg);
         pStaStateMachine->DealSignalPollResult(nullptr);
     }
@@ -1358,6 +1359,7 @@ public:
     {
         EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _)).Times(AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), AddDeviceConfig(_)).Times(AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), SyncDeviceConfig()).Times(AtLeast(0));
 		pStaStateMachine->linkedInfo.frequency = FREQ_2G_MIN;
         pStaStateMachine->ConvertFreqToChannel();
 

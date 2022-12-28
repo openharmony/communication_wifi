@@ -22,28 +22,32 @@ using ::testing::ext::TestSize;
 
 namespace OHOS {
 namespace Wifi {
-constexpr int NetWorkId = 15;
-constexpr int Config = 5;
-constexpr int Band = 5;
+int NetWorkId = 15;
+int Config = 5;
+int Band = 5;
+P2pState Moded = P2pState::P2P_STATE_CLOSING;
 class WifiP2pTest : public testing::Test {
 public:
     static void SetUpTestCase() {}
     static void TearDownTestCase() {}
     virtual void SetUp() {}
     virtual void TearDown() {}
-public:
-    void P2pCallback(P2pState state)
-    {}
-
-    void P2pPersistentCallback(void)
-    {}
-
-    void P2pConnectionCallback(const WifiP2pLinkedInfo info)
-    {}
-
-    void P2pPeersCallback(WifiP2pDevice* devices, int len)
-    {}
 };
+void P2pCallback(P2pState state)
+{}
+
+void P2pPersistentCallback(void)
+{}
+
+void P2pConnectionCallback(const WifiP2pLinkedInfo info)
+{}
+
+void P2pPeersCallback(WifiP2pDevice* devices, int len)
+{}
+
+void WifiCfgChangCallback(CfgType, char* data, int dataLen)
+{}
+
 HWTEST_F(WifiP2pTest, EnableP2pTest, TestSize.Level1)
 {
     EnableP2p();
@@ -56,7 +60,7 @@ HWTEST_F(WifiP2pTest, DisableP2pTest, TestSize.Level1)
 
 HWTEST_F(WifiP2pTest, GetP2pEnableStatusTests, TestSize.Level1)
 {
-    P2pState* state = P2pState::P2P_STATE_CLOSING;
+    P2pState* state = &Moded;
     GetP2pEnableStatus(state);
 }
 
@@ -94,9 +98,9 @@ HWTEST_F(WifiP2pTest, StopP2pListenTests, TestSize.Level1)
 
 HWTEST_F(WifiP2pTest, CreateGroupTests, TestSize.Level1)
 {
-    WifiP2pConfig* config = nullptr;
-    config->netId = NetWorkId;
-    CreateGroup(config);
+    WifiP2pConfig config;
+    config.netId = NetWorkId;
+    CreateGroup(&config);
 }
 
 HWTEST_F(WifiP2pTest, RemoveGroupTests, TestSize.Level1)
@@ -106,15 +110,15 @@ HWTEST_F(WifiP2pTest, RemoveGroupTests, TestSize.Level1)
 
 HWTEST_F(WifiP2pTest, DeleteGroupTests, TestSize.Level1)
 {
-    WifiP2pGroupInfo* group;
-    group->networkId = NetWorkId;
-    DeleteGroup(group);
+    WifiP2pGroupInfo group;
+    group.networkId = NetWorkId;
+    DeleteGroup(&group);
 }
 
 HWTEST_F(WifiP2pTest, P2pConnectTests, TestSize.Level1)
 {
-    WifiP2pConfig* config;
-    config->netId = NetWorkId;
+    WifiP2pConfig config;
+    config.netId = NetWorkId;
     P2pConnect(config);
 }
 
@@ -125,34 +129,32 @@ HWTEST_F(WifiP2pTest, P2pCancelConnectTests, TestSize.Level1)
 
 HWTEST_F(WifiP2pTest, GetCurrentGroupTests, TestSize.Level1)
 {
-    WifiP2pGroupInfo* groupInfo;
-    groupInfo->networkId = NetWorkId;
-    groupInfo->interface = Band;
-    GetCurrentGroup(groupInfo);
+    WifiP2pGroupInfo groupInfo;
+    groupInfo.networkId = NetWorkId;
+    GetCurrentGroup(&groupInfo);
 }
 
 HWTEST_F(WifiP2pTest, GetP2pConnectedStatusTests, TestSize.Level1)
 {
-    int* status;
-    status = NetWorkId;
+    int* status = &NetWorkId;
     GetP2pConnectedStatus(status);
 }
 
 HWTEST_F(WifiP2pTest, QueryP2pDevicesTests, TestSize.Level1)
 {
-    WifiP2pDevice* clientDevices;
-    clientDevices->groupCapabilitys = NetWorkId;
+    WifiP2pDevice clientDevices;
+    clientDevices.groupCapabilitys = NetWorkId;
     int size = 0;
-    int* retSize = Config;
-    QueryP2pDevices(clientDevices, size, retSize);
+    int* retSize = &Config;
+    QueryP2pDevices(&clientDevices, size, retSize);
 }
 
 HWTEST_F(WifiP2pTest, QueryP2pGroupsTests, TestSize.Level1)
 {
-    WifiP2pGroupInfo* groupInfo;
-    groupInfo->networkId = NetWorkId;
+    WifiP2pGroupInfo groupInfo;
+    groupInfo.networkId = NetWorkId;
     int size = 0;
-    QueryP2pGroups(groupInfo, size);
+    QueryP2pGroups(&groupInfo, size);
 }
 
 HWTEST_F(WifiP2pTest, RegisterP2pStateChangedCallbackTest, TestSize.Level1)
@@ -173,13 +175,12 @@ HWTEST_F(WifiP2pTest, RegisterP2pConnectionChangedCallbackTest, TestSize.Level1)
 
 HWTEST_F(WifiP2pTest, RegisterP2pPeersChangedCallbackTest, TestSize.Level1)
 {
-    P2pPeersChangedCallback callback = nullptr;
-    RegisterP2pPeersChangedCallback(callback);
+    RegisterP2pPeersChangedCallback(P2pPeersCallback);
 }
 
 HWTEST_F(WifiP2pTest, RegisterCfgChangCallbackTest, TestSize.Level1)
 {
-    RegisterCfgChangCallback(P2pPeersCallback);
+    RegisterCfgChangCallback(WifiCfgChangCallback);
 }
 }
 }

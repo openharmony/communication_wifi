@@ -25,7 +25,8 @@ using ::testing::ext::TestSize;
 
 namespace OHOS {
 namespace Wifi {
-constexpr int Status = 17;
+unsigned int Status = 17;
+int Mode = 1;
 class WifiHotspotTest : public testing::Test {
 public:
     static void SetUpTestCase() {}
@@ -51,30 +52,29 @@ public:
 
     void SetHotspotConfigTests()
     {
-        HotspotConfig *config;
-		config->band = BandType::BAND_2GHZ;
-        SetHotspotConfig(config);
+        HotspotConfig config;
+		config.band = Mode;
+        SetHotspotConfig(&config);
     }
 
     void GetHotspotConfigTests()
     {
-        HotspotConfig *result;
-        result->ssid = "Huaweicom";
-		result->band = BandType::BAND_2GHZ;
+        HotspotConfig result;
+        result.band = Mode;
         GetHotspotConfig(result);
     }
 
     void GetStationListTest()
     {
         StationInfo *result;
-        result->bssid = "Huaweicom";
-        unsigned int *size = Status;
+        result.ipAddress = Status;
+        unsigned int *size = &Status;
         GetStationList(result, size);
     }
 
     void DisassociateStaTests()
     {
-        unsigned char *mac = nullptr;
+        unsigned char *mac = &Status;
         int macLen = 0;
         DisassociateSta(mac, macLen);
     }

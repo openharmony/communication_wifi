@@ -119,7 +119,7 @@ HWTEST_F(WifiP2pTest, P2pConnectTests, TestSize.Level1)
 {
     WifiP2pConfig config;
     config.netId = NetWorkId;
-    P2pConnect(config);
+    P2pConnect(&config);
 }
 
 HWTEST_F(WifiP2pTest, P2pCancelConnectTests, TestSize.Level1)

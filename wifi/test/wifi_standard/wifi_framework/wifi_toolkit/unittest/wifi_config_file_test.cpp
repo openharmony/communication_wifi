@@ -119,10 +119,7 @@ HWTEST_F(WifiConfigFileTest, SaveDeviceValueCheck, TestSize.Level1)
     EXPECT_TRUE(tmp.status == ldCfg.status);
     EXPECT_TRUE(tmp.bssid == ldCfg.bssid);
     EXPECT_TRUE(tmp.ssid == ldCfg.ssid);
-    EXPECT_TRUE(tmp.band == ldCfg.band);
-    EXPECT_TRUE(tmp.channel == ldCfg.channel);
     EXPECT_TRUE(tmp.isPasspoint == ldCfg.isPasspoint);
-    EXPECT_TRUE(tmp.isEphemeral == ldCfg.isEphemeral);
     EXPECT_TRUE(tmp.preSharedKey == ldCfg.preSharedKey);
     EXPECT_TRUE(tmp.keyMgmt == ldCfg.keyMgmt);
     EXPECT_TRUE(tmp.wepTxKeyIndex == ldCfg.wepTxKeyIndex);

@@ -114,7 +114,9 @@ void StaServiceTest::StaServiceInitStaServiceSuccess()
 {
     WifiIdlRoamCapability capability;
     capability.maxBlocklistSize = 1;
-
+    std::vector<int32_t> band_2G_channel = { 1, 2, 3, 4, 5, 6, 7 };
+    std::vector<int32_t> band_5G_channel = { 149, 168, 169 };
+    ChannelsTable temp = { { BandType::BAND_2GHZ, band_2G_channel }, { BandType::BAND_5GHZ, band_5G_channel } };
     EXPECT_CALL(WifiStaHalInterface::GetInstance(), RegisterStaEventCallback(_))
         .WillRepeatedly(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
     EXPECT_CALL(WifiStaHalInterface::GetInstance(), StartWifi()).WillRepeatedly(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
@@ -134,6 +136,7 @@ void StaServiceTest::StaServiceInitStaServiceSuccess()
     EXPECT_CALL(WifiSettings::GetInstance(), GetSavedDeviceAppraisalPriority()).Times(AtLeast(0));
     EXPECT_CALL(WifiSettings::GetInstance(), GetExternDeviceAppraisalPriority()).Times(AtLeast(0));
     EXPECT_CALL(WifiSettings::GetInstance(), ReloadDeviceConfig()).Times(AtLeast(0));
+    EXPECT_CALL(WifiSettings::GetInstance(), GetValidChannels(_)).WillOnce(DoAll(SetArgReferee<0>(temp), Return(0)));
     EXPECT_CALL(WifiStaHalInterface::GetInstance(), ClearDeviceConfig()).Times(AtLeast(0));
     EXPECT_CALL(WifiStaHalInterface::GetInstance(), SaveDeviceConfig()).Times(AtLeast(0));
     EXPECT_CALL(WifiStaHalInterface::GetInstance(), GetDeviceConfig(_)).Times(AtLeast(0));

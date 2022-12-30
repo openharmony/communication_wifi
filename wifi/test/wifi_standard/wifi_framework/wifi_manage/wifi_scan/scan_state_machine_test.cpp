@@ -889,7 +889,7 @@ public:
         EXPECT_CALL(WifiStaHalInterface::GetInstance(), StartPnoScan(_)).WillRepeatedly(Return(WIFI_IDL_OPT_FAILED));
         pScanStateMachine->runningHwPnoFlag = false;
         pScanStateMachine->pnoConfigStoredFlag = true;
-        EXPECT_EQ(true, pScanStateMachine->StartPnoScanHardware());
+        EXPECT_EQ(false, pScanStateMachine->StartPnoScanHardware());
     }
 
     void StopPnoScanHardwareTest1()

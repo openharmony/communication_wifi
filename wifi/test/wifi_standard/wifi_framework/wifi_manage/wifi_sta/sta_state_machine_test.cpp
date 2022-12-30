@@ -407,7 +407,6 @@ public:
 
     void DealConnectToUserSelectedNetworkFail()
     {
-    
         InternalMessage msg;
         pStaStateMachine->linkedInfo.connState = ConnState::CONNECTED;
         pStaStateMachine->DealConnectToUserSelectedNetwork(&msg);
@@ -1178,7 +1177,6 @@ public:
         pStaStateMachine->pLinkedState->ExecuteStateMsg(&msg);
     }
 
-
     void LinkedStateExeMsgFail3()
     {
         InternalMessage msg;
@@ -1360,7 +1358,7 @@ public:
         EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _)).Times(AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), AddDeviceConfig(_)).Times(AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), SyncDeviceConfig()).Times(AtLeast(0));
-		pStaStateMachine->linkedInfo.frequency = FREQ_2G_MIN;
+        pStaStateMachine->linkedInfo.frequency = FREQ_2G_MIN;
         pStaStateMachine->ConvertFreqToChannel();
 
         pStaStateMachine->linkedInfo.frequency = CHANNEL_14_FREQ;
@@ -1430,7 +1428,7 @@ public:
     void OnBssidChangedEventSuccess()
     {
         std::string reason;
-		std::string bssid;
+        std::string bssid;
         pStaStateMachine->OnBssidChangedEvent(reason, bssid);
     }
 
@@ -1490,7 +1488,7 @@ public:
         deviceKeymgmt = "NONE";
         pStaStateMachine->ComparedKeymgmt(scanInfoKeymgmt, deviceKeymgmt);
     }
-	void ReUpdateNetLinkInfoTest()
+    void ReUpdateNetLinkInfoTest()
     {
         WifiLinkedInfo linkedInfo;
         linkedInfo.detailedState = DetailedState::NOTWORKING;

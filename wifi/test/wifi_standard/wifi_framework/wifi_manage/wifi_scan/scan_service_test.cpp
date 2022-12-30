@@ -35,9 +35,9 @@ namespace Wifi {
 constexpr int FREQ_2_DOT_4_GHZ = 2450;
 constexpr int FREQ_5_GHZ = 5200;
 constexpr int TWO = 2;
-constexpr int Four = 4;
-constexpr int FailedNum = 6;
-constexpr int Status = 17;
+constexpr int FOUR = 4;
+constexpr int FAILEDNUM = 6;
+constexpr int STATUS = 17;
 class ScanServiceTest : public testing::Test {
 public:
     static void SetUpTestCase() {}
@@ -210,7 +210,6 @@ public:
         pScanService->scanStartedFlag = false;
         pScanService->Scan(false);
         pScanService->Scan(true);
-
     }
 
     void ScanWithParamSuccess()
@@ -681,7 +680,7 @@ public:
     {
         EXPECT_CALL(WifiSettings::GetInstance(), GetMinRssi2Dot4Ghz()).Times(AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), GetMinRssi5Ghz()).Times(AtLeast(0));
-        pScanService->pnoScanFailedNum = FailedNum;
+        pScanService->pnoScanFailedNum = FAILEDNUM;
         pScanService->RestartPnoScanTimeOut();
     }
 
@@ -722,7 +721,7 @@ public:
 
     void AllowExternScanFail2()
     {
-        EXPECT_CALL(WifiSettings::GetInstance(), SetThermalLevel(Four)).Times(AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), SetThermalLevel(FOUR)).Times(AtLeast(0));
         EXPECT_EQ(pScanService->AllowExternScan(), WIFI_OPT_FAILED);
     }
 
@@ -735,7 +734,7 @@ public:
         forbidMode.forbidTime = 0;
         forbidMode.forbidCount = 0;
         pScanService->scanControlInfo.scanForbidList.push_back(forbidMode);
-        pScanService->staStatus = Status;
+        pScanService->staStatus = STATUS;
         EXPECT_CALL(WifiSettings::GetInstance(), SetThermalLevel(TWO)).Times(AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), SetAppRunningState(scanMode)).Times(AtLeast(0));
         EXPECT_EQ(pScanService->AllowExternScan(), WIFI_OPT_FAILED);

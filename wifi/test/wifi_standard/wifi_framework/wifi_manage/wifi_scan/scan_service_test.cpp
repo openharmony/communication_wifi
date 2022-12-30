@@ -680,7 +680,7 @@ public:
     {
         EXPECT_CALL(WifiSettings::GetInstance(), GetMinRssi2Dot4Ghz()).Times(AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), GetMinRssi5Ghz()).Times(AtLeast(0));
-        pScanService->pnoScanFailedNum = FailedNum;
+        pScanService->pnoScanFailedNum = FAILEDNUM;
         pScanService->RestartPnoScanTimeOut();
     }
 
@@ -721,7 +721,7 @@ public:
 
     void AllowExternScanFail2()
     {
-        EXPECT_CALL(WifiSettings::GetInstance(), SetThermalLevel(Four)).Times(AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), SetThermalLevel(FOUR)).Times(AtLeast(0));
         EXPECT_EQ(pScanService->AllowExternScan(), WIFI_OPT_FAILED);
     }
 
@@ -734,7 +734,7 @@ public:
         forbidMode.forbidTime = 0;
         forbidMode.forbidCount = 0;
         pScanService->scanControlInfo.scanForbidList.push_back(forbidMode);
-        pScanService->staStatus = Status;
+        pScanService->staStatus = STATUS;
         EXPECT_CALL(WifiSettings::GetInstance(), SetThermalLevel(TWO)).Times(AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), SetAppRunningState(scanMode)).Times(AtLeast(0));
         EXPECT_EQ(pScanService->AllowExternScan(), WIFI_OPT_FAILED);

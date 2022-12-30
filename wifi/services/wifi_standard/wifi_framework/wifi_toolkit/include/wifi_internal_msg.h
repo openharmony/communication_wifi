@@ -183,6 +183,10 @@ struct InterScanInfo {
     }
 };
 
+struct WifiCallingInfo {
+    int callingUid;
+    int callingPid;
+};
 
 struct SingleAppForbid {
     int appID;

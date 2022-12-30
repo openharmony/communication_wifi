@@ -137,6 +137,13 @@ std::string GetBundleName();
 bool IsSystemApp();
 
 /**
+ * @Description get calling pid
+ *
+ * @return int - calling pid
+ */
+int GetCallingPid();
+
+/**
  * @Description get calling uid
  *
  * @return int - calling uid

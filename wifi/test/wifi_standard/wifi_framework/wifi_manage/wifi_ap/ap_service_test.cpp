@@ -215,7 +215,7 @@ HWTEST_F(ApService_test, GetValidBandsSuccess, TestSize.Level1)
     EXPECT_CALL(WifiSettings::GetInstance(), GetValidBands(Eq(vecSta)))
         .WillOnce(DoAll(SetArgReferee<0>(vecSta), Return(WifiErrorNo::WIFI_IDL_OPT_OK)));
     EXPECT_CALL(WifiApHalInterface::GetInstance(), GetFrequenciesByBand(_, Eq(allowed2GFreq)))
-       .WillOnce(DoAll(SetArgReferee<1>(allowed2GFreq), Return(WifiErrorNo::WIFI_IDL_OPT_OK)));
+        .WillOnce(DoAll(SetArgReferee<1>(allowed2GFreq), Return(WifiErrorNo::WIFI_IDL_OPT_OK)));
     EXPECT_CALL(WifiApHalInterface::GetInstance(), GetFrequenciesByBand(_, _))
         .WillRepeatedly(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
     EXPECT_EQ(ErrCode::WIFI_OPT_FAILED, pApService->GetValidBands(vecSta));

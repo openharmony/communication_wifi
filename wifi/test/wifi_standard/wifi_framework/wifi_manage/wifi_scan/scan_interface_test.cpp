@@ -79,7 +79,6 @@ HWTEST_F(ScanInterfaceTest, InitTest, TestSize.Level1)
         .WillRepeatedly(Return(refVecTrustList));
     EXPECT_CALL(WifiSettings::GetInstance(), ReloadMovingFreezePolicy())
         .WillRepeatedly(Return(defaultValue));
-    pScanInterface->Init();
 }
 
 HWTEST_F(ScanInterfaceTest, UnInitTest, TestSize.Level1)

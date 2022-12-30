@@ -78,6 +78,7 @@ int WifiInternalEventDispatcher::RemoveStaCallback(const sptr<IRemoteObject> &re
         auto iter = mStaCallbacks.find(remote);
         if (iter != mStaCallbacks.end()) {
             mStaCallbacks.erase(iter);
+            mStaCallBackInfo.erase(mStaCallBackInfo.find(remote));
             WIFI_LOGD("WifiInternalEventDispatcher::RemoveStaCallback!");
         }
     }
@@ -132,6 +133,7 @@ int WifiInternalEventDispatcher::RemoveScanCallback(const sptr<IRemoteObject> &r
         auto iter = mScanCallbacks.find(remote);
         if (iter != mScanCallbacks.end()) {
             mScanCallbacks.erase(iter);
+            mScanCallbacks.erase(mScanCallBackInfo.find(remote));
             WIFI_LOGD("WifiInternalEventDispatcher::RemoveScanCallback!");
         }
     }

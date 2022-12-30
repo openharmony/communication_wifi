@@ -133,7 +133,7 @@ int WifiInternalEventDispatcher::RemoveScanCallback(const sptr<IRemoteObject> &r
         auto iter = mScanCallbacks.find(remote);
         if (iter != mScanCallbacks.end()) {
             mScanCallbacks.erase(iter);
-            mScanCallbacks.erase(mScanCallBackInfo.find(remote));
+            mScanCallBackInfo.erase(mScanCallBackInfo.find(remote));
             WIFI_LOGD("WifiInternalEventDispatcher::RemoveScanCallback!");
         }
     }
@@ -390,11 +390,11 @@ void WifiInternalEventDispatcher::InvokeScanCallbacks(const WifiEventCallbackMsg
             continue;
         }
         WIFI_LOGI("InvokeScanCallbacks, msg.msgCode: %{public}d", msg.msgCode);
+        bool isFrozen = false;
+#ifdef FEATURE_APP_FROZEN
         auto remote = itr->first;
         int uid = mScanCallBackInfo[remote].callingUid;
         int pid = mScanCallBackInfo[remote].callingPid;
-        bool isFrozen = false;
-#ifdef FEATURE_APP_FROZEN
         isFrozen = SuspendManager::SuspendManagerClient::GetInstance().IsAppFrozen(pid, uid);
         WIFI_LOGI("Check calling APP is frozen, uid: %{public}d, pid: %{public}d, isFrozen: %{public}d",
             uid, pid, isFrozen);
@@ -422,11 +422,11 @@ void WifiInternalEventDispatcher::InvokeDeviceCallbacks(const WifiEventCallbackM
             continue;
         }
         WIFI_LOGI("InvokeDeviceCallbacks, msg.msgCode: %{public}d", msg.msgCode);
+        bool isFrozen = false;
+#ifdef FEATURE_APP_FROZEN
         auto remote = itr->first;
         int uid = mStaCallBackInfo[remote].callingUid;
         int pid = mStaCallBackInfo[remote].callingPid;
-        bool isFrozen = false;
-#ifdef FEATURE_APP_FROZEN
         isFrozen = SuspendManager::SuspendManagerClient::GetInstance().IsAppFrozen(pid, uid);
         WIFI_LOGI("Check calling APP is frozen, uid: %{public}d, pid: %{public}d, isFrozen: %{public}d",
             uid, pid, isFrozen);

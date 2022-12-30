@@ -174,7 +174,7 @@ public:
 void StaAutoConnectServiceTest::InitAutoConnectService()
 {
     WifiIdlRoamCapability capability;
-    capability.maxBlocklistSize = 2;
+    capability.maxBlocklistSize = TWO;
 
     EXPECT_CALL(WifiStaHalInterface::GetInstance(), RegisterStaEventCallback(_))
         .WillRepeatedly(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
@@ -277,7 +277,7 @@ void StaAutoConnectServiceTest::InitAutoConnectServiceSuccess()
         .WillOnce(DoAll(SetArgReferee<0>(capabilities), Return(WIFI_IDL_OPT_OK)));
 
     WifiIdlRoamCapability capability;
-    capability.maxBlocklistSize = 2;
+    capability.maxBlocklistSize = TWO;
     EXPECT_CALL(WifiStaHalInterface::GetInstance(), GetRoamingCapabilities(_))
         .WillRepeatedly(DoAll(SetArgReferee<0>(capability), Return(WIFI_IDL_OPT_OK)));
     EXPECT_CALL(WifiStaHalInterface::GetInstance(), SetRoamConfig(_)).Times(AtLeast(0));
@@ -721,7 +721,7 @@ void StaAutoConnectServiceTest::AddOrDelBlockedBssidsFail()
 void StaAutoConnectServiceTest::ObtainRoamCapFromFirmwareSuccess()
 {
     WifiIdlRoamCapability capability;
-    capability.maxBlocklistSize = 2;
+    capability.maxBlocklistSize = TWO;
 
     EXPECT_CALL(WifiStaHalInterface::GetInstance(), GetStaCapabilities(_))
         .WillOnce(Return(WIFI_IDL_OPT_FAILED)); // if it is false, it will do process.
@@ -867,7 +867,7 @@ void StaAutoConnectServiceTest::GetAvailableScanInfosSuccess()
     GetWifiDeviceConfig(deviceConfig);
 
     EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(deviceConfig.bssid, DEVICE_CONFIG_INDEX_BSSID, _))
-    .Times(AtLeast(0)).WillOnce(DoAll(SetArgReferee<2>(deviceConfig), Return(0)));
+    .Times(AtLeast(0)).WillOnce(DoAll(SetArgReferee<TWO>(deviceConfig), Return(0)));
 
     pStaAutoConnectService->GetAvailableScanInfos(availableScanInfos, scanInfos, blockedBssids, info);
 }
@@ -947,7 +947,7 @@ void StaAutoConnectServiceTest::GetAvailableScanInfosSuccess3()
     WifiDeviceConfig deviceConfig;
     GetWifiDeviceConfig(deviceConfig);
     EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(deviceConfig.bssid, DEVICE_CONFIG_INDEX_BSSID, _))
-    .Times(AtLeast(0)).WillOnce(DoAll(SetArgReferee<2>(deviceConfig), Return(0)));
+    .Times(AtLeast(0)).WillOnce(DoAll(SetArgReferee<TWO>(deviceConfig), Return(0)));
     pStaAutoConnectService->GetAvailableScanInfos(availableScanInfos, scanInfos, blockedBssids, info);
 }
 
@@ -1208,7 +1208,7 @@ void StaAutoConnectServiceTest::RoamingEncryptionModeCheckSuccess()
     int indexType = DEVICE_CONFIG_INDEX_SSID;
 
     EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(scanInfo.ssid, indexType, _))
-        .WillOnce(DoAll(SetArgReferee<2>(deviceConfig), Return(0)));
+        .WillOnce(DoAll(SetArgReferee<TWO>(deviceConfig), Return(0)));
 
     EXPECT_TRUE(pStaAutoConnectService->RoamingEncryptionModeCheck(deviceConfig, scanInfo, info) == true);
 }
@@ -1224,7 +1224,7 @@ void StaAutoConnectServiceTest::RoamingEncryptionModeCheckFail1()
     int indexType = DEVICE_CONFIG_INDEX_SSID;
 
     EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(scanInfo.ssid, indexType, _))
-        .WillOnce(DoAll(SetArgReferee<2>(deviceConfig), Return(0)));
+        .WillOnce(DoAll(SetArgReferee<TWO>(deviceConfig), Return(0)));
 
     EXPECT_TRUE(pStaAutoConnectService->RoamingEncryptionModeCheck(deviceConfig, scanInfo, info) == false);
 }
@@ -1242,7 +1242,7 @@ void StaAutoConnectServiceTest::RoamingEncryptionModeCheckFail2()
     int indexType = DEVICE_CONFIG_INDEX_SSID;
 
     EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(scanInfo.ssid, indexType, _))
-        .WillOnce(DoAll(SetArgReferee<2>(deviceConfig), Return(0)));
+        .WillOnce(DoAll(SetArgReferee<TWO>(deviceConfig), Return(0)));
 
     EXPECT_TRUE(pStaAutoConnectService->RoamingEncryptionModeCheck(deviceConfig, scanInfo, info) == false);
 }
@@ -1262,7 +1262,7 @@ void StaAutoConnectServiceTest::RoamingEncryptionModeCheckFail3()
     int indexType = DEVICE_CONFIG_INDEX_SSID;
 
     EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(scanInfo.ssid, indexType, _))
-        .WillOnce(DoAll(SetArgReferee<2>(deviceConfig), Return(0)));
+        .WillOnce(DoAll(SetArgReferee<TWO>(deviceConfig), Return(0)));
 
     EXPECT_TRUE(pStaAutoConnectService->RoamingEncryptionModeCheck(deviceConfig, scanInfo, info) == false);
 }
@@ -1282,7 +1282,7 @@ void StaAutoConnectServiceTest::RoamingEncryptionModeCheckFail4()
     int indexType = DEVICE_CONFIG_INDEX_SSID;
 
     EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(scanInfo.ssid, indexType, _))
-        .WillOnce(DoAll(SetArgReferee<2>(deviceConfig), Return(0)));
+        .WillOnce(DoAll(SetArgReferee<TWO>(deviceConfig), Return(0)));
 
     EXPECT_TRUE(pStaAutoConnectService->RoamingEncryptionModeCheck(deviceConfig, scanInfo, info) == false);
 }
@@ -1308,7 +1308,7 @@ void StaAutoConnectServiceTest::RoamingSelectionSuccess1()
     int indexType = DEVICE_CONFIG_INDEX_SSID;
 
     EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(scanInfos[0].ssid, indexType, _))
-        .WillOnce(DoAll(SetArgReferee<2>(deviceConfig), Return(0)));
+        .WillOnce(DoAll(SetArgReferee<TWO>(deviceConfig), Return(0)));
 
     EXPECT_TRUE(pStaAutoConnectService->RoamingSelection(deviceConfig, scanInfos, info) == true);
 }
@@ -1328,7 +1328,7 @@ void StaAutoConnectServiceTest::RoamingSelectionFail1()
 
 
     EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(scanInfos[0].ssid, indexType, _))
-        .WillOnce(DoAll(SetArgReferee<2>(deviceConfig), Return(0)));
+        .WillOnce(DoAll(SetArgReferee<TWO>(deviceConfig), Return(0)));
 
     EXPECT_TRUE(pStaAutoConnectService->RoamingSelection(deviceConfig, scanInfos, info) == false);
 }
@@ -1348,7 +1348,7 @@ void StaAutoConnectServiceTest::RoamingSelectionFail2()
     int indexType = DEVICE_CONFIG_INDEX_SSID;
 
     EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(scanInfos[0].ssid, indexType, _))
-        .WillOnce(DoAll(SetArgReferee<2>(deviceConfig), Return(0)));
+        .WillOnce(DoAll(SetArgReferee<TWO>(deviceConfig), Return(0)));
 
     EXPECT_TRUE(pStaAutoConnectService->RoamingSelection(deviceConfig, scanInfos, info) == false);
 }
@@ -1370,7 +1370,7 @@ void StaAutoConnectServiceTest::RoamingSelectionFail3()
     int indexType = DEVICE_CONFIG_INDEX_SSID;
 
     EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(scanInfos[0].ssid, indexType, _))
-        .WillOnce(DoAll(SetArgReferee<2>(deviceConfig), Return(0)));
+        .WillOnce(DoAll(SetArgReferee<TWO>(deviceConfig), Return(0)));
 
     EXPECT_TRUE(pStaAutoConnectService->RoamingSelection(deviceConfig, scanInfos, info) == false);
 }
@@ -1392,7 +1392,7 @@ void StaAutoConnectServiceTest::RoamingSelectionFail4()
     int indexType = DEVICE_CONFIG_INDEX_SSID;
 
     EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(scanInfos[0].ssid, indexType, _))
-        .WillOnce(DoAll(SetArgReferee<2>(deviceConfig), Return(0)));
+        .WillOnce(DoAll(SetArgReferee<TWO>(deviceConfig), Return(0)));
 
     EXPECT_TRUE(pStaAutoConnectService->RoamingSelection(deviceConfig, scanInfos, info) == false);
 }
@@ -1403,7 +1403,7 @@ void StaAutoConnectServiceTest::SyncBlockedSsidFirmwareSuccess()
     bool enable = false;
     int reason = AP_CANNOT_HANDLE_NEW_STA;
     WifiIdlRoamCapability capability;
-    capability.maxBlocklistSize = 2;
+    capability.maxBlocklistSize = TWO;
 
     pStaAutoConnectService->AddOrDelBlockedBssids(bssid, enable, reason);
 
@@ -1420,7 +1420,7 @@ void StaAutoConnectServiceTest::SyncBlockedSsidFirmwareSuccess()
 void StaAutoConnectServiceTest::SyncBlockedSsidFirmwareFail()
 {
     WifiIdlRoamCapability capability;
-    capability.maxBlocklistSize = 2;
+    capability.maxBlocklistSize = TWO;
 
     EXPECT_CALL(WifiStaHalInterface::GetInstance(), GetStaCapabilities(_))
         .WillOnce(Return(WIFI_IDL_OPT_FAILED)); // if it is false, it will do process.

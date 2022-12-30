@@ -1640,12 +1640,10 @@ public:
 
 HWTEST_F(ScanServiceTest, InitScanServiceSuccess1, TestSize.Level1)
 {
-
 }
 
 HWTEST_F(ScanServiceTest, InitScanServiceSuccess2, TestSize.Level1)
 {
-
 }
 
 HWTEST_F(ScanServiceTest, UnInitScanServiceSuccess, TestSize.Level1)

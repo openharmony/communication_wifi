@@ -145,7 +145,7 @@ static napi_value WifiChannelWidthInit(napi_env env)
     SetNamedPropertyByInteger(env, wifiChannelWidth, static_cast<int>(WifiChannelWidthJs::WIDTH_20MHZ), "WIDTH_20MHZ");
     SetNamedPropertyByInteger(env, wifiChannelWidth, static_cast<int>(WifiChannelWidthJs::WIDTH_40MHZ), "WIDTH_40MHZ");
     SetNamedPropertyByInteger(env, wifiChannelWidth, static_cast<int>(WifiChannelWidthJs::WIDTH_80MHZ), "WIDTH_80MHZ");
-    SetNamedPropertyByInteger(env, wifiChannelWidth, 
+    SetNamedPropertyByInteger(env, wifiChannelWidth,
         static_cast<int>(WifiChannelWidthJs::WIDTH_160MHZ), "WIDTH_160MHZ");
     SetNamedPropertyByInteger(env, wifiChannelWidth,
         static_cast<int>(WifiChannelWidthJs::WIDTH_80MHZ_PLUS), "WIDTH_80MHZ_PLUS");

@@ -272,6 +272,11 @@ bool IsSystemApp()
     return isSysApp;
 }
 
+int GetCallingPid()
+{
+    return IPCSkeleton::GetCallingPid();
+}
+
 int GetCallingUid()
 {
     return IPCSkeleton::GetCallingUid();

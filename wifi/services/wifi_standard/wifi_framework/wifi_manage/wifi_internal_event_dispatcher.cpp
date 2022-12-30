@@ -18,6 +18,10 @@
 #include "wifi_permission_helper.h"
 #include "wifi_errcode.h"
 #include "wifi_common_event_helper.h"
+#include "wifi_common_util.h"
+#ifdef FEATURE_APP_FROZEN
+#include "suspend_manager_client.h"
+#endif
 
 DEFINE_WIFILOG_LABEL("WifiInternalEventDispatcher");
 
@@ -49,15 +53,21 @@ int WifiInternalEventDispatcher::SendSystemNotifyMsg() /* parameters */
 }
 
 int WifiInternalEventDispatcher::AddStaCallback(
-    const sptr<IRemoteObject> &remote, const sptr<IWifiDeviceCallBack> &callback)
+    const sptr<IRemoteObject> &remote, const sptr<IWifiDeviceCallBack> &callback, int pid)
 {
-    WIFI_LOGD("WifiInternalEventDispatcher::AddStaCallback!");
+    WIFI_LOGD("WifiInternalEventDispatcher::AddStaCallback, remote:%{private}p!", static_cast<void*>(remote));
     if (remote == nullptr || callback == nullptr) {
         WIFI_LOGE("remote object is null!");
         return 1;
     }
+    WifiCallingInfo callbackInfo;
+    callbackInfo.callingUid = GetCallingUid();
+    callbackInfo.callingPid = pid;
+    WIFI_LOGI("%{public}s, add uid: %{public}d, pid: %{public}d", __func__, callbackInfo.callingUid,
+        callbackInfo.callingPid);
     std::unique_lock<std::mutex> lock(mStaCallbackMutex);
     mStaCallbacks[remote] = callback;
+    mStaCallBackInfo[remote] = callbackInfo;
     return 0;
 }
 
@@ -68,6 +78,7 @@ int WifiInternalEventDispatcher::RemoveStaCallback(const sptr<IRemoteObject> &re
         auto iter = mStaCallbacks.find(remote);
         if (iter != mStaCallbacks.end()) {
             mStaCallbacks.erase(iter);
+            mStaCallBackInfo.erase(mStaCallBackInfo.find(remote));
             WIFI_LOGD("WifiInternalEventDispatcher::RemoveStaCallback!");
         }
     }
@@ -97,15 +108,21 @@ bool WifiInternalEventDispatcher::HasStaRemote(const sptr<IRemoteObject> &remote
 }
 
 int WifiInternalEventDispatcher::AddScanCallback(
-    const sptr<IRemoteObject> &remote, const sptr<IWifiScanCallback> &callback)
+    const sptr<IRemoteObject> &remote, const sptr<IWifiScanCallback> &callback, int pid)
 {
     WIFI_LOGD("WifiInternalEventDispatcher::AddCallbackClient!");
     if (remote == nullptr || callback == nullptr) {
         WIFI_LOGE("remote object is null!");
         return 1;
     }
+    WifiCallingInfo callbackInfo;
+    callbackInfo.callingUid = GetCallingUid();
+    callbackInfo.callingPid = pid;
+    WIFI_LOGI("%{public}s, add uid: %{public}d, pid: %{public}d", __func__, callbackInfo.callingUid,
+        callbackInfo.callingPid);
     std::unique_lock<std::mutex> lock(mScanCallbackMutex);
     mScanCallbacks[remote] = callback;
+    mScanCallBackInfo[remote] = callbackInfo;
     return 0;
 }
 
@@ -116,6 +133,7 @@ int WifiInternalEventDispatcher::RemoveScanCallback(const sptr<IRemoteObject> &r
         auto iter = mScanCallbacks.find(remote);
         if (iter != mScanCallbacks.end()) {
             mScanCallbacks.erase(iter);
+            mScanCallBackInfo.erase(mScanCallBackInfo.find(remote));
             WIFI_LOGD("WifiInternalEventDispatcher::RemoveScanCallback!");
         }
     }
@@ -371,9 +389,21 @@ void WifiInternalEventDispatcher::InvokeScanCallbacks(const WifiEventCallbackMsg
         if (callback == nullptr) {
             continue;
         }
+        WIFI_LOGI("InvokeScanCallbacks, msg.msgCode: %{public}d", msg.msgCode);
+        bool isFrozen = false;
+#ifdef FEATURE_APP_FROZEN
+        auto remote = itr->first;
+        int uid = mScanCallBackInfo[remote].callingUid;
+        int pid = mScanCallBackInfo[remote].callingPid;
+        isFrozen = SuspendManager::SuspendManagerClient::GetInstance().IsAppFrozen(pid, uid);
+        WIFI_LOGI("Check calling APP is frozen, uid: %{public}d, pid: %{public}d, isFrozen: %{public}d",
+            uid, pid, isFrozen);
+#endif
         switch (msg.msgCode) {
             case WIFI_CBK_MSG_SCAN_STATE_CHANGE:
-                callback->OnWifiScanStateChanged(msg.msgData);
+                if (isFrozen == false) {
+                    callback->OnWifiScanStateChanged(msg.msgData);
+                }
                 break;
             default:
                 WIFI_LOGI("UnKnown msgcode %{public}d", msg.msgCode);
@@ -392,6 +422,15 @@ void WifiInternalEventDispatcher::InvokeDeviceCallbacks(const WifiEventCallbackM
             continue;
         }
         WIFI_LOGI("InvokeDeviceCallbacks, msg.msgCode: %{public}d", msg.msgCode);
+        bool isFrozen = false;
+#ifdef FEATURE_APP_FROZEN
+        auto remote = itr->first;
+        int uid = mStaCallBackInfo[remote].callingUid;
+        int pid = mStaCallBackInfo[remote].callingPid;
+        isFrozen = SuspendManager::SuspendManagerClient::GetInstance().IsAppFrozen(pid, uid);
+        WIFI_LOGI("Check calling APP is frozen, uid: %{public}d, pid: %{public}d, isFrozen: %{public}d",
+            uid, pid, isFrozen);
+#endif
         switch (msg.msgCode) {
             case WIFI_CBK_MSG_STATE_CHANGE:
                 callback->OnWifiStateChanged(msg.msgData);
@@ -400,10 +439,14 @@ void WifiInternalEventDispatcher::InvokeDeviceCallbacks(const WifiEventCallbackM
                 callback->OnWifiConnectionChanged(msg.msgData, msg.linkInfo);
                 break;
             case WIFI_CBK_MSG_RSSI_CHANGE:
-                callback->OnWifiRssiChanged(msg.msgData);
+                if (isFrozen == false) {
+                    callback->OnWifiRssiChanged(msg.msgData);
+                }
                 break;
             case WIFI_CBK_MSG_STREAM_DIRECTION:
-                callback->OnStreamChanged(msg.msgData);
+                if (isFrozen == false) {
+                    callback->OnStreamChanged(msg.msgData);
+                }
                 break;
             case WIFI_CBK_MSG_WPS_STATE_CHANGE:
                 callback->OnWifiWpsStateChanged(msg.msgData, msg.pinCode);

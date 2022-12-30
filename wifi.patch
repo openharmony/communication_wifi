@@ -1,11 +1,3 @@
-From eadc1942c46e988396d53a1e3e1023f470c5286f Mon Sep 17 00:00:00 2001
-From: y00825051 <y00825051@notesmail.huawei.com>
-Date: Thu, 29 Dec 2022 20:38:26 +0800
-Subject: [PATCH] TicketNo:DTS2022122300621 Description:Bugfix for app frozen. Team:PDU_PTL Feature or Bugfix:Feature Binary Source:No PrivateCode(Yes/No):No
-
-Change-Id: I5582129e577e907aea335fd0bb912ae729398712
----
-
 diff --git a/wifi/frameworks/native/src/wifi_device_proxy.cpp b/wifi/frameworks/native/src/wifi_device_proxy.cpp
 index c5ba872..f2c0131 100644
 --- a/wifi/frameworks/native/src/wifi_device_proxy.cpp

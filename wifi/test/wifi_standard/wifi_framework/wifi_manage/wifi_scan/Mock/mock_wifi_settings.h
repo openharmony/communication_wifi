@@ -44,8 +44,8 @@ public:
     virtual const MovingFreezePolicy ReloadMovingFreezePolicy() = 0;
     virtual int GetThermalLevel() const = 0;
     virtual void SetThermalLevel(const int &level) = 0;
-    virtual void SetAppRunningState(ScanMode appRunMode)      = 0;
-    virtual int SetWhetherToAllowNetworkSwitchover(bool bSwitch) 	       = 0;
+    virtual void SetAppRunningState(ScanMode appRunMode) = 0;
+    virtual int SetWhetherToAllowNetworkSwitchover(bool bSwitch) = 0;
 };
 
 class WifiSettings : public MockWifiSettings {

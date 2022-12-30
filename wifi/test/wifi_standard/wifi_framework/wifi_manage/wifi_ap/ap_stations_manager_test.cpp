@@ -31,10 +31,10 @@ using ::testing::Eq;
 using ::testing::Return;
 using ::testing::StrEq;
 using ::testing::ext::TestSize;
-DEFINE_WIFILOG_LABEL("ApStationsManager_test");
 
 namespace OHOS {
 namespace Wifi {
+DEFINE_WIFILOG_LABEL("ApStationsManager_test");
 const std::string Mac = "AA:BB:CC:DD:EE:FF";
 static StationInfo staInfo = {
     "test_deviceName",

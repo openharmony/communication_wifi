@@ -1,0 +1,296 @@
+From eadc1942c46e988396d53a1e3e1023f470c5286f Mon Sep 17 00:00:00 2001
+From: y00825051 <y00825051@notesmail.huawei.com>
+Date: Thu, 29 Dec 2022 20:38:26 +0800
+Subject: [PATCH] TicketNo:DTS2022122300621 Description:Bugfix for app frozen. Team:PDU_PTL Feature or Bugfix:Feature Binary Source:No PrivateCode(Yes/No):No
+
+Change-Id: I5582129e577e907aea335fd0bb912ae729398712
+---
+
+diff --git a/wifi/frameworks/native/src/wifi_device_proxy.cpp b/wifi/frameworks/native/src/wifi_device_proxy.cpp
+index c5ba872..f2c0131 100644
+--- a/wifi/frameworks/native/src/wifi_device_proxy.cpp
++++ b/wifi/frameworks/native/src/wifi_device_proxy.cpp
+@@ -1106,6 +1106,8 @@
+         return WIFI_OPT_FAILED;
+     }
+ 
++    data.WriteInt32(GetCallingPid());
++    WIFI_LOGD("%{public}s uid: %{public}d, pid: %{public}d", __func__, GetCallingUid(), GetCallingPid());
+     int error = Remote()->SendRequest(WIFI_SVR_CMD_REGISTER_CALLBACK_CLIENT, data, reply, option);
+     if (error != ERR_NONE) {
+         WIFI_LOGE("Set Attr(%{public}d) failed, code is %{public}d", WIFI_SVR_CMD_REGISTER_CALLBACK_CLIENT, error);
+diff --git a/wifi/frameworks/native/src/wifi_scan_proxy.cpp b/wifi/frameworks/native/src/wifi_scan_proxy.cpp
+index 49ba312..a9ab7e4 100644
+--- a/wifi/frameworks/native/src/wifi_scan_proxy.cpp
++++ b/wifi/frameworks/native/src/wifi_scan_proxy.cpp
+@@ -329,6 +329,8 @@
+         return WIFI_OPT_FAILED;
+     }
+ 
++    data.WriteInt32(GetCallingPid());
++    WIFI_LOGD("%{public}s uid: %{public}d, pid: %{public}d", __func__, GetCallingUid(), GetCallingPid());
+     int error = Remote()->SendRequest(WIFI_SVR_CMD_REGISTER_SCAN_CALLBACK, data, reply, option);
+     if (error != ERR_NONE) {
+         WIFI_LOGE("RegisterCallBack failed, error code is %{public}d", error);
+diff --git a/wifi/services/wifi_standard/wifi_framework/wifi_manage/BUILD.gn b/wifi/services/wifi_standard/wifi_framework/wifi_manage/BUILD.gn
+index 252139c..fc16dbc 100644
+--- a/wifi/services/wifi_standard/wifi_framework/wifi_manage/BUILD.gn
++++ b/wifi/services/wifi_standard/wifi_framework/wifi_manage/BUILD.gn
+@@ -360,6 +360,7 @@
+     external_deps = [
+       "access_token:libaccesstoken_sdk",
+       "c_utils:utils",
++      "efficiency_manager:suspend_manager_client",
+       "ipc:ipc_core",
+       "netmanager_base:net_conn_manager_if",
+       "samgr:samgr_proxy",
+diff --git a/wifi/services/wifi_standard/wifi_framework/wifi_manage/wifi_device_stub.cpp b/wifi/services/wifi_standard/wifi_framework/wifi_manage/wifi_device_stub.cpp
+index 24227ed..84b472e 100644
+--- a/wifi/services/wifi_standard/wifi_framework/wifi_manage/wifi_device_stub.cpp
++++ b/wifi/services/wifi_standard/wifi_framework/wifi_manage/wifi_device_stub.cpp
+@@ -83,6 +83,7 @@
+         return WIFI_OPT_FAILED;
+     }
+ 
++    WIFI_LOGI("%{public}s code: %{public}u, uid: %{public}d, pid: %{public}d", __func__, code, GetCallingUid(), GetCallingPid());
+     HandleFuncMap::iterator iter = handleFuncMap.find(code);
+     if (iter == handleFuncMap.end()) {
+         WIFI_LOGI("not find function to deal, code %{public}u", code);
+@@ -608,7 +609,7 @@
+ 
+ void WifiDeviceStub::OnRegisterCallBack(uint32_t code, MessageParcel &data, MessageParcel &reply)
+ {
+-    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
++    WIFI_LOGI("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+     ErrCode ret = WIFI_OPT_FAILED;
+     do {
+         sptr<IRemoteObject> remote = data.ReadRemoteObject();
+@@ -622,6 +623,8 @@
+             WIFI_LOGI("create new WifiDeviceCallBackProxy!");
+         }
+ 
++        int pid = data.ReadInt32();
++        WIFI_LOGI("%{public}s, pid: %{public}d", __func__, pid);
+         if (mSingleCallback) {
+             ret = RegisterCallBack(callback_);
+         } else {
+@@ -632,7 +635,7 @@
+                 WIFI_LOGD("AddDeathRecipient!");
+             }
+             if (callback_ != nullptr) {
+-                WifiInternalEventDispatcher::GetInstance().AddStaCallback(remote, callback_);
++                WifiInternalEventDispatcher::GetInstance().AddStaCallback(remote, callback_, pid);
+             }
+             ret = WIFI_OPT_SUCCESS;
+         }
+diff --git a/wifi/services/wifi_standard/wifi_framework/wifi_manage/wifi_internal_event_dispatcher.cpp b/wifi/services/wifi_standard/wifi_framework/wifi_manage/wifi_internal_event_dispatcher.cpp
+index 1a4f179..623ae37 100644
+--- a/wifi/services/wifi_standard/wifi_framework/wifi_manage/wifi_internal_event_dispatcher.cpp
++++ b/wifi/services/wifi_standard/wifi_framework/wifi_manage/wifi_internal_event_dispatcher.cpp
+@@ -18,6 +18,8 @@
+ #include "wifi_permission_helper.h"
+ #include "wifi_errcode.h"
+ #include "wifi_common_event_helper.h"
++#include "wifi_common_util.h"
++#include "suspend_manager_client.h"
+ 
+ DEFINE_WIFILOG_LABEL("WifiInternalEventDispatcher");
+ 
+@@ -49,15 +51,20 @@
+ }
+ 
+ int WifiInternalEventDispatcher::AddStaCallback(
+-    const sptr<IRemoteObject> &remote, const sptr<IWifiDeviceCallBack> &callback)
++    const sptr<IRemoteObject> &remote, const sptr<IWifiDeviceCallBack> &callback, int pid)
+ {
+-    WIFI_LOGD("WifiInternalEventDispatcher::AddStaCallback!");
++    WIFI_LOGD("WifiInternalEventDispatcher::AddStaCallback, remote:%{public}p!", (void*)remote);
+     if (remote == nullptr || callback == nullptr) {
+         WIFI_LOGE("remote object is null!");
+         return 1;
+     }
++    WifiCallingInfo callbackInfo;
++    callbackInfo.callingUid = GetCallingUid();
++    callbackInfo.callingPid = pid;
++    WIFI_LOGI("%{public}s uid: %{public}d, pid: %{public}d", __func__, callbackInfo.callingUid, callbackInfo.callingPid);
+     std::unique_lock<std::mutex> lock(mStaCallbackMutex);
+     mStaCallbacks[remote] = callback;
++    mStaCallBackInfo[remote] = callbackInfo;
+     return 0;
+ }
+ 
+@@ -97,15 +104,20 @@
+ }
+ 
+ int WifiInternalEventDispatcher::AddScanCallback(
+-    const sptr<IRemoteObject> &remote, const sptr<IWifiScanCallback> &callback)
++    const sptr<IRemoteObject> &remote, const sptr<IWifiScanCallback> &callback, int pid)
+ {
+     WIFI_LOGD("WifiInternalEventDispatcher::AddCallbackClient!");
+     if (remote == nullptr || callback == nullptr) {
+         WIFI_LOGE("remote object is null!");
+         return 1;
+     }
++    WifiCallingInfo callbackInfo;
++    callbackInfo.callingUid = GetCallingUid();
++    callbackInfo.callingPid = pid;
++    WIFI_LOGI("%{public}s uid: %{public}d, pid: %{public}d", __func__, callbackInfo.callingUid, callbackInfo.callingPid);
+     std::unique_lock<std::mutex> lock(mScanCallbackMutex);
+     mScanCallbacks[remote] = callback;
++    mScanCallBackInfo[remote] = callbackInfo;
+     return 0;
+ }
+ 
+@@ -371,9 +383,18 @@
+         if (callback == nullptr) {
+             continue;
+         }
++        WIFI_LOGI("InvokeScanCallbacks, msg.msgCode: %{public}d", msg.msgCode);
++        auto remote = itr->first;
++        int uid = mScanCallBackInfo[remote].callingUid;
++        int pid = mScanCallBackInfo[remote].callingPid;
++        bool isFrozen = SuspendManager::SuspendManagerClient::GetInstance().IsAppFrozen(pid, uid);
++        WIFI_LOGI("Check calling APP is frozen, uid: %{public}d, pid: %{public}d, isFrozen: %{public}d",
++            uid, pid, isFrozen);
+         switch (msg.msgCode) {
+             case WIFI_CBK_MSG_SCAN_STATE_CHANGE:
+-                callback->OnWifiScanStateChanged(msg.msgData);
++                if (isFrozen == false) {
++                    callback->OnWifiScanStateChanged(msg.msgData);
++                }
+                 break;
+             default:
+                 WIFI_LOGI("UnKnown msgcode %{public}d", msg.msgCode);
+@@ -392,6 +413,12 @@
+             continue;
+         }
+         WIFI_LOGI("InvokeDeviceCallbacks, msg.msgCode: %{public}d", msg.msgCode);
++        auto remote = itr->first;
++        int uid = mStaCallBackInfo[remote].callingUid;
++        int pid = mStaCallBackInfo[remote].callingPid;
++        bool isFrozen = SuspendManager::SuspendManagerClient::GetInstance().IsAppFrozen(pid, uid);
++        WIFI_LOGI("Check calling APP is frozen, uid: %{public}d, pid: %{public}d, isFrozen: %{public}d",
++            uid, pid, isFrozen);
+         switch (msg.msgCode) {
+             case WIFI_CBK_MSG_STATE_CHANGE:
+                 callback->OnWifiStateChanged(msg.msgData);
+@@ -400,10 +427,13 @@
+                 callback->OnWifiConnectionChanged(msg.msgData, msg.linkInfo);
+                 break;
+             case WIFI_CBK_MSG_RSSI_CHANGE:
+-                callback->OnWifiRssiChanged(msg.msgData);
+-                break;
++                if (isFrozen == false) {
++                    callback->OnWifiRssiChanged(msg.msgData);
++                }
+             case WIFI_CBK_MSG_STREAM_DIRECTION:
+-                callback->OnStreamChanged(msg.msgData);
++                if (isFrozen == false) {
++                    callback->OnStreamChanged(msg.msgData);
++                }
+                 break;
+             case WIFI_CBK_MSG_WPS_STATE_CHANGE:
+                 callback->OnWifiWpsStateChanged(msg.msgData, msg.pinCode);
+diff --git a/wifi/services/wifi_standard/wifi_framework/wifi_manage/wifi_internal_event_dispatcher.h b/wifi/services/wifi_standard/wifi_framework/wifi_manage/wifi_internal_event_dispatcher.h
+index 8990014..323c5d9 100644
+--- a/wifi/services/wifi_standard/wifi_framework/wifi_manage/wifi_internal_event_dispatcher.h
++++ b/wifi/services/wifi_standard/wifi_framework/wifi_manage/wifi_internal_event_dispatcher.h
+@@ -38,8 +38,15 @@
+ 
+ namespace OHOS {
+ namespace Wifi {
++class WifiCallingInfo {
++public:
++    int callingUid;
++    int callingPid;
++};
+ using StaCallbackMapType = std::map<sptr<IRemoteObject>, sptr<IWifiDeviceCallBack>>;
++using StaCallbackInfo = std::map<sptr<IRemoteObject>, WifiCallingInfo>;
+ using ScanCallbackMapType = std::map<sptr<IRemoteObject>, sptr<IWifiScanCallback>>;
++using ScanCallbackInfo = std::map<sptr<IRemoteObject>, WifiCallingInfo>;
+ using HotspotCallbackMapType = std::map<sptr<IRemoteObject>, sptr<IWifiHotspotCallback>>;
+ using P2pCallbackMapType = std::map<sptr<IRemoteObject>, sptr<IWifiP2pCallback>>;
+ class WifiInternalEventDispatcher {
+@@ -89,12 +96,12 @@
+     static void Run(WifiInternalEventDispatcher &instance);
+ 
+     static WifiInternalEventDispatcher &GetInstance();
+-    int AddStaCallback(const sptr<IRemoteObject> &remote, const sptr<IWifiDeviceCallBack> &callback);
++    int AddStaCallback(const sptr<IRemoteObject> &remote, const sptr<IWifiDeviceCallBack> &callback, int pid);
+     int SetSingleStaCallback(const sptr<IWifiDeviceCallBack> &callback);
+     sptr<IWifiDeviceCallBack> GetSingleStaCallback() const;
+     int RemoveStaCallback(const sptr<IRemoteObject> &remote);
+     bool HasStaRemote(const sptr<IRemoteObject> &remote);
+-    int AddScanCallback(const sptr<IRemoteObject> &remote, const sptr<IWifiScanCallback> &callback);
++    int AddScanCallback(const sptr<IRemoteObject> &remote, const sptr<IWifiScanCallback> &callback, int pid);
+     int SetSingleScanCallback(const sptr<IWifiScanCallback> &callback);
+     sptr<IWifiScanCallback> GetSingleScanCallback() const;
+     int RemoveScanCallback(const sptr<IRemoteObject> &remote);
+@@ -132,9 +139,11 @@
+     std::deque<WifiEventCallbackMsg> mEventQue;
+     std::mutex mStaCallbackMutex;
+     StaCallbackMapType mStaCallbacks;
++    StaCallbackInfo mStaCallBackInfo;
+     sptr<IWifiDeviceCallBack> mStaSingleCallback;
+     std::mutex mScanCallbackMutex;
+     ScanCallbackMapType mScanCallbacks;
++    ScanCallbackInfo mScanCallBackInfo;
+     sptr<IWifiScanCallback> mScanSingleCallback;
+     std::mutex mHotspotCallbackMutex;
+     std::map<int, HotspotCallbackMapType> mHotspotCallbacks;
+diff --git a/wifi/services/wifi_standard/wifi_framework/wifi_manage/wifi_scan_stub.cpp b/wifi/services/wifi_standard/wifi_framework/wifi_manage/wifi_scan_stub.cpp
+index 88683c9..9e5404e 100644
+--- a/wifi/services/wifi_standard/wifi_framework/wifi_manage/wifi_scan_stub.cpp
++++ b/wifi/services/wifi_standard/wifi_framework/wifi_manage/wifi_scan_stub.cpp
+@@ -238,6 +238,8 @@
+             WIFI_LOGI("create new `WifiScanCallbackProxy`!");
+         }
+ 
++        int pid = data.ReadInt32();
++        WIFI_LOGD("%{public}s, pid: %{public}d", __func__, pid);
+         if (mSingleCallback) {
+             ret = RegisterCallBack(callback_);
+         } else {
+@@ -248,7 +250,7 @@
+                 WIFI_LOGD("AddDeathRecipient!");
+             }
+             if (callback_ != nullptr) {
+-                WifiInternalEventDispatcher::GetInstance().AddScanCallback(remote, callback_);
++                WifiInternalEventDispatcher::GetInstance().AddScanCallback(remote, callback_, pid);
+             }
+             ret = WIFI_OPT_SUCCESS;
+         }
+diff --git a/wifi/utils/inc/wifi_common_util.h b/wifi/utils/inc/wifi_common_util.h
+index 2afc162..e31579e 100644
+--- a/wifi/utils/inc/wifi_common_util.h
++++ b/wifi/utils/inc/wifi_common_util.h
+@@ -144,6 +144,13 @@
+ int GetCallingUid();
+ 
+ /**
++ * @Description get calling pid
++ *
++ * @return int - calling pid
++ */
++int GetCallingPid();
++
++/**
+  * @Description Check uid the app is a foregroud app
+  *
+  * @param uid - Input uid
+diff --git a/wifi/utils/src/wifi_common_util.cpp b/wifi/utils/src/wifi_common_util.cpp
+index 7ca25ab..e5ab268 100644
+--- a/wifi/utils/src/wifi_common_util.cpp
++++ b/wifi/utils/src/wifi_common_util.cpp
+@@ -277,6 +277,11 @@
+     return IPCSkeleton::GetCallingUid();
+ }
+ 
++int GetCallingPid()
++{
++    return IPCSkeleton::GetCallingPid();
++}
++
+ bool IsForegroundApp(const int uid)
+ {
+     using namespace OHOS::AppExecFwk;

@@ -35,9 +35,9 @@ namespace Wifi {
 constexpr int FREQ_2_DOT_4_GHZ = 2450;
 constexpr int FREQ_5_GHZ = 5200;
 constexpr int TWO = 2;
-constexpr int Four = 4;
-constexpr int FailedNum = 6;
-constexpr int Status = 17;
+constexpr int FOUR = 4;
+constexpr int FAILEDNUM = 6;
+constexpr int STATUS = 17;
 class ScanServiceTest : public testing::Test {
 public:
     static void SetUpTestCase() {}
@@ -210,7 +210,6 @@ public:
         pScanService->scanStartedFlag = false;
         pScanService->Scan(false);
         pScanService->Scan(true);
-
     }
 
     void ScanWithParamSuccess()

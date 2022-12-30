@@ -31,7 +31,7 @@ using ::testing::Eq;
 using ::testing::Return;
 using ::testing::StrEq;
 using ::testing::ext::TestSize;
-DEFINE_WIFILOG_LABEL("ApStationsManager_test");
+static DEFINE_WIFILOG_LABEL("ApStationsManager_test");
 
 namespace OHOS {
 namespace Wifi {

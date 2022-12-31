@@ -331,6 +331,10 @@ if (defined(ohos_lite)) {
       "netmanager_base:net_conn_manager_if",
       "samgr:samgr_proxy",
     ]
+    if (wifi_feature_with_app_frozen) {
+      external_deps += [ "efficiency_manager:suspend_manager_client" ]
+      defines += [ "FEATURE_APP_FROZEN" ]
+    }
     defines = [
       "FEATURE_AP_SUPPORT",
       "FEATURE_P2P_SUPPORT",

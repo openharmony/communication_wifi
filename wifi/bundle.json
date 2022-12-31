@@ -51,7 +51,8 @@
             "wifi_feature_with_auth_disable",
             "wifi_feature_with_dhcp_disable",
             "wifi_feature_is_hdi_supported",
-            "wifi_feature_with_ap_extension"
+            "wifi_feature_with_ap_extension",
+            "wifi_feature_with_app_frozen"
         ],
         "adapted_system_type": [
             "standard"

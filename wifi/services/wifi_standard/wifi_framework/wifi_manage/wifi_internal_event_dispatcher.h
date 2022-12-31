@@ -39,7 +39,9 @@
 namespace OHOS {
 namespace Wifi {
 using StaCallbackMapType = std::map<sptr<IRemoteObject>, sptr<IWifiDeviceCallBack>>;
+using StaCallbackInfo = std::map<sptr<IRemoteObject>, WifiCallingInfo>;
 using ScanCallbackMapType = std::map<sptr<IRemoteObject>, sptr<IWifiScanCallback>>;
+using ScanCallbackInfo = std::map<sptr<IRemoteObject>, WifiCallingInfo>;
 using HotspotCallbackMapType = std::map<sptr<IRemoteObject>, sptr<IWifiHotspotCallback>>;
 using P2pCallbackMapType = std::map<sptr<IRemoteObject>, sptr<IWifiP2pCallback>>;
 class WifiInternalEventDispatcher {
@@ -89,12 +91,12 @@ public:
     static void Run(WifiInternalEventDispatcher &instance);
 
     static WifiInternalEventDispatcher &GetInstance();
-    int AddStaCallback(const sptr<IRemoteObject> &remote, const sptr<IWifiDeviceCallBack> &callback);
+    int AddStaCallback(const sptr<IRemoteObject> &remote, const sptr<IWifiDeviceCallBack> &callback, int pid);
     int SetSingleStaCallback(const sptr<IWifiDeviceCallBack> &callback);
     sptr<IWifiDeviceCallBack> GetSingleStaCallback() const;
     int RemoveStaCallback(const sptr<IRemoteObject> &remote);
     bool HasStaRemote(const sptr<IRemoteObject> &remote);
-    int AddScanCallback(const sptr<IRemoteObject> &remote, const sptr<IWifiScanCallback> &callback);
+    int AddScanCallback(const sptr<IRemoteObject> &remote, const sptr<IWifiScanCallback> &callback, int pid);
     int SetSingleScanCallback(const sptr<IWifiScanCallback> &callback);
     sptr<IWifiScanCallback> GetSingleScanCallback() const;
     int RemoveScanCallback(const sptr<IRemoteObject> &remote);
@@ -132,9 +134,11 @@ private:
     std::deque<WifiEventCallbackMsg> mEventQue;
     std::mutex mStaCallbackMutex;
     StaCallbackMapType mStaCallbacks;
+    StaCallbackInfo mStaCallBackInfo;
     sptr<IWifiDeviceCallBack> mStaSingleCallback;
     std::mutex mScanCallbackMutex;
     ScanCallbackMapType mScanCallbacks;
+    ScanCallbackInfo mScanCallBackInfo;
     sptr<IWifiScanCallback> mScanSingleCallback;
     std::mutex mHotspotCallbackMutex;
     std::map<int, HotspotCallbackMapType> mHotspotCallbacks;

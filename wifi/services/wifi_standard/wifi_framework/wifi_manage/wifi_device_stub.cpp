@@ -83,6 +83,8 @@ int WifiDeviceStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageP
         return WIFI_OPT_FAILED;
     }
 
+    WIFI_LOGD("%{public}s, code: %{public}u, uid: %{public}d, pid: %{public}d",
+        __func__, code, GetCallingUid(), GetCallingPid());
     HandleFuncMap::iterator iter = handleFuncMap.find(code);
     if (iter == handleFuncMap.end()) {
         WIFI_LOGI("not find function to deal, code %{public}u", code);
@@ -622,6 +624,8 @@ void WifiDeviceStub::OnRegisterCallBack(uint32_t code, MessageParcel &data, Mess
             WIFI_LOGI("create new WifiDeviceCallBackProxy!");
         }
 
+        int pid = data.ReadInt32();
+        WIFI_LOGD("%{public}s, get pid: %{public}d", __func__, pid);
         if (mSingleCallback) {
             ret = RegisterCallBack(callback_);
         } else {
@@ -632,7 +636,7 @@ void WifiDeviceStub::OnRegisterCallBack(uint32_t code, MessageParcel &data, Mess
                 WIFI_LOGD("AddDeathRecipient!");
             }
             if (callback_ != nullptr) {
-                WifiInternalEventDispatcher::GetInstance().AddStaCallback(remote, callback_);
+                WifiInternalEventDispatcher::GetInstance().AddStaCallback(remote, callback_, pid);
             }
             ret = WIFI_OPT_SUCCESS;
         }

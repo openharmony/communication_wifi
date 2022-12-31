@@ -329,6 +329,9 @@ ErrCode WifiScanProxy::RegisterCallBack(const sptr<IWifiScanCallback> &callback)
         return WIFI_OPT_FAILED;
     }
 
+    int pid = GetCallingPid();
+    data.WriteInt32(pid);
+    WIFI_LOGD("%{public}s, calling uid: %{public}d, pid: %{public}d", __func__, GetCallingUid(), pid);
     int error = Remote()->SendRequest(WIFI_SVR_CMD_REGISTER_SCAN_CALLBACK, data, reply, option);
     if (error != ERR_NONE) {
         WIFI_LOGE("RegisterCallBack failed, error code is %{public}d", error);

@@ -190,9 +190,9 @@ napi_value NapiEvent::CreateResult(const napi_env& env, const StationInfo& info)
 {
     napi_value result;
     napi_create_object(env, &result);
-    SetValueUtf8String(env, "name", info.deviceName.c_str(), result);
-    SetValueUtf8String(env, "macAddress", info.bssid.c_str(), result);
-    SetValueUtf8String(env, "ipAddress", info.ipAddr.c_str(), result);
+    SetValueUtf8String(env, "name", info.deviceName, result);
+    SetValueUtf8String(env, "macAddress", info.bssid, result);
+    SetValueUtf8String(env, "ipAddress", info.ipAddr, result);
     return result;
 }
 
@@ -200,9 +200,9 @@ napi_value NapiEvent::CreateResult(const napi_env& env, const WifiP2pDevice& dev
 {
     napi_value result;
     napi_create_object(env, &result);
-    SetValueUtf8String(env, "deviceName", device.GetDeviceName().c_str(), result);
-    SetValueUtf8String(env, "deviceAddress", device.GetDeviceAddress().c_str(), result);
-    SetValueUtf8String(env, "primaryDeviceType", device.GetPrimaryDeviceType().c_str(), result);
+    SetValueUtf8String(env, "deviceName", device.GetDeviceName(), result);
+    SetValueUtf8String(env, "deviceAddress", device.GetDeviceAddress(), result);
+    SetValueUtf8String(env, "primaryDeviceType", device.GetPrimaryDeviceType(), result);
     SetValueInt32(env, "devStatus", static_cast<int>(device.GetP2pDeviceStatus()), result);
     SetValueInt32(env, "groupCapability", device.GetGroupCapabilitys(), result);
     return result;
@@ -227,7 +227,7 @@ napi_value NapiEvent::CreateResult(const napi_env& env, const WifiP2pLinkedInfo&
     napi_create_object(env, &result);
     SetValueInt32(env, "connectState", static_cast<int>(info.GetConnectState()), result);
     SetValueBool(env, "isGroupOwner", info.IsGroupOwner(), result);
-    SetValueUtf8String(env, "groupOwnerAddr", info.GetGroupOwnerAddress().c_str(), result);
+    SetValueUtf8String(env, "groupOwnerAddr", info.GetGroupOwnerAddress(), result);
     return result;
 }
 

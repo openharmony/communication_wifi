@@ -61,9 +61,14 @@ public:
 
     void InitScanServiceSuccess1()
     {
+        std::vector<int32_t> band_2G_channel = { 1, 2, 3, 4, 5, 6, 7 };
+        std::vector<int32_t> band_5G_channel = { 149, 168, 169 };
+        ChannelsTable temp = { { BandType::BAND_2GHZ, band_2G_channel }, { BandType::BAND_5GHZ, band_5G_channel } };
         EXPECT_CALL(WifiSettings::GetInstance(), GetSupportHwPnoFlag()).Times(AtLeast(1));
         EXPECT_CALL(WifiSupplicantHalInterface::GetInstance(), RegisterSupplicantEventCallback(_)).Times(AtLeast(1));
         EXPECT_CALL(WifiStaHalInterface::GetInstance(), GetSupportFrequencies(_, _)).Times(AtLeast(1));
+        EXPECT_CALL(WifiSettings::GetInstance(), GetValidChannels(_))
+            .WillOnce(DoAll(SetArgReferee<0>(temp), Return(0)));
         EXPECT_CALL(WifiSettings::GetInstance(), GetScanControlInfo(_)).Times(AtLeast(1));
         EXPECT_CALL(WifiManager::GetInstance(), DealScanOpenRes()).Times(AtLeast(0));
         EXPECT_CALL(WifiSupplicantHalInterface::GetInstance(), UnRegisterSupplicantEventCallback()).Times(AtLeast(1));
@@ -76,8 +81,13 @@ public:
 
     void InitScanServiceSuccess2()
     {
+        std::vector<int32_t> band_2G_channel = { 1, 2, 3, 4, 5, 6, 7 };
+        std::vector<int32_t> band_5G_channel = { 149, 168, 169 };
+        ChannelsTable temp = { { BandType::BAND_2GHZ, band_2G_channel }, { BandType::BAND_5GHZ, band_5G_channel } };
         EXPECT_CALL(WifiStaHalInterface::GetInstance(), GetSupportFrequencies(_, _))
             .WillRepeatedly(Return(WIFI_IDL_OPT_FAILED));
+        EXPECT_CALL(WifiSettings::GetInstance(), GetValidChannels(_))
+            .WillOnce(DoAll(SetArgReferee<0>(temp), Return(0)));
         EXPECT_CALL(WifiSettings::GetInstance(), GetSupportHwPnoFlag()).Times(AtLeast(1));
         EXPECT_CALL(WifiSupplicantHalInterface::GetInstance(), RegisterSupplicantEventCallback(_)).Times(AtLeast(1));
         EXPECT_CALL(WifiSettings::GetInstance(), GetScanControlInfo(_)).Times(AtLeast(1));

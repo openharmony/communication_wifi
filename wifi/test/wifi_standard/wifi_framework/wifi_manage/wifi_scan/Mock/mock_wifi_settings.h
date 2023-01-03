@@ -21,6 +21,8 @@
 
 namespace OHOS {
 namespace Wifi {
+using ChannelsTable = std::map<BandType, std::vector<int32_t>>;
+
 class MockWifiSettings {
 public:
     virtual ~MockWifiSettings() = default;
@@ -46,6 +48,7 @@ public:
     virtual void SetThermalLevel(const int &level) = 0;
     virtual void SetAppRunningState(ScanMode appRunMode) = 0;
     virtual int SetWhetherToAllowNetworkSwitchover(bool bSwitch) = 0;
+    virtual int GetValidChannels(ChannelsTable &channelsInfo) = 0;
 };
 
 class WifiSettings : public MockWifiSettings {
@@ -74,6 +77,7 @@ public:
     MOCK_METHOD1(SetThermalLevel, void(const int &level));
     MOCK_METHOD1(SetAppRunningState, void(ScanMode appRunMode));
     MOCK_METHOD1(SetWhetherToAllowNetworkSwitchover, int(bool bSwitch));
+    MOCK_METHOD1(GetValidChannels, int(ChannelsTable &channelsInfo));
 };
 }  // namespace Wifi
 }  // namespace OHOS

@@ -15,12 +15,14 @@
 #ifndef OHOS_MOCK_WIFISETTINGS_H
 #define OHOS_MOCK_WIFISETTINGS_H
 
+#include "wifi_ap_msg.h"
 #include "wifi_msg.h"
 #include <gmock/gmock.h>
 #include "wifi_internal_msg.h"
 
 namespace OHOS {
 namespace Wifi {
+using ChannelsTable = std::map<BandType, std::vector<int32_t>>;
 class MockWifiSettings {
 public:
     virtual ~MockWifiSettings() = default;
@@ -70,6 +72,7 @@ public:
     virtual int SetDeviceAfterConnect(int networkId) = 0;
     virtual int GetCandidateConfig(const int uid, const int &networkId, WifiDeviceConfig &config) = 0;
     virtual int GetAllCandidateConfig(const int uid, std::vector<WifiDeviceConfig> &configs) = 0;
+    virtual int GetValidChannels(ChannelsTable &channelsInfo) = 0;
 };
 
 class WifiSettings : public MockWifiSettings {
@@ -124,6 +127,7 @@ public:
     MOCK_METHOD1(SetDeviceAfterConnect, int(int networkId));
     MOCK_METHOD3(GetCandidateConfig, int(const int uid, const int &networkId, WifiDeviceConfig &config));
     MOCK_METHOD2(GetAllCandidateConfig, int(const int uid, std::vector<WifiDeviceConfig> &configs));
+    MOCK_METHOD1(GetValidChannels, int(ChannelsTable &channelsInfo));
 };
 }  // namespace OHOS
 }  // namespace Wifi

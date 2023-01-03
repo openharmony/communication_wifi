@@ -36,6 +36,7 @@ typedef enum ScanStyle {
     SCAN_TYPE_LOW_SPAN = 0,
     SCAN_TYPE_LOW_POWER = 1,
     SCAN_TYPE_HIGH_ACCURACY = 2,
+    SCAN_TYPE_PNO = 3,
     SCAN_TYPE_INVALID = 0XFF
 } ScanStyle;
 
@@ -45,6 +46,14 @@ typedef struct ScanSettings {
     int hiddenSsidSize;
     char **hiddenSsid;
     ScanStyle scanStyle;
+
+    /* Only available for PNO scan */
+    int savedPnoSsidSize;
+    char **savedPnoSsid;
+    int pnoScanInterval;
+    int minPnoRssi2Dot4Ghz;
+    int minPnoRssi5Ghz;
+    int isStartPnoScan;
 } ScanSettings;
 
 typedef struct ScanInfoElem {

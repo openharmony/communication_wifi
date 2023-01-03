@@ -15,6 +15,10 @@
 
 #include "wifi_auth_center.h"
 #include "wifi_permission_helper.h"
+#ifndef OHOS_ARCH_LITE
+#include "ipc_skeleton.h"
+#include "tokenid_kit.h"
+#endif
 
 namespace OHOS {
 namespace Wifi {
@@ -35,6 +39,14 @@ int WifiAuthCenter::Init()
     /* init system auth service client here */
     return 0;
 }
+
+#ifndef OHOS_ARCH_LITE
+bool WifiAuthCenter::IsSystemAppByToken(){
+    uint64_t tokenId = IPCSkeleton::GetCallingFullTokenID();
+    bool isSystemApp = Security::AccessToken::TokenIdKit::IsSystemAppByFullTokenID(tokenId);
+    return isSystemApp;
+}
+#endif
 
 int WifiAuthCenter::InitPermission(const int &pid, const int &uid)
 {

@@ -406,7 +406,7 @@ public:
     }
 
     void DealConnectToUserSelectedNetworkFail()
-    { 
+    {
         InternalMessage msg;
         pStaStateMachine->linkedInfo.connState = ConnState::CONNECTED;
         pStaStateMachine->DealConnectToUserSelectedNetwork(&msg);

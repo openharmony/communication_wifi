@@ -202,7 +202,6 @@ static napi_value PropertyValueInit(napi_env env, napi_value exports)
     napi_define_properties(env, exports, sizeof(exportFuncs) / sizeof(napi_property_descriptor), exportFuncs);
     return exports;
 }
-
 /*
  * Module initialization function
  */

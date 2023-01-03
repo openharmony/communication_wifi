@@ -344,10 +344,12 @@ int WifiP2pService::GetP2pRecommendChannel(void)
     
     WifiLinkedInfo linkedInfo;
     WifiSettings::GetInstance().GetLinkedInfo(linkedInfo);
-    if (linkedInfo.connState == CONNECTED && linkedInfo.band == static_cast<int>(BandType::BAND_5GHZ)) {
+    if (linkedInfo.connState == CONNECTED) {
         channel = FrequencyToChannel(linkedInfo.frequency);
-        WIFI_LOGI("Recommend linked channel: %{public}d", channel);
-        return channel;
+        if (linkedInfo.band == static_cast<int>(BandType::BAND_5GHZ)) {
+            WIFI_LOGI("Recommend linked channel: %{public}d", channel);
+            return channel;
+        }
     }
 
     ChannelsTable channels;
@@ -369,13 +371,9 @@ int WifiP2pService::GetP2pRecommendChannel(void)
         WIFI_LOGI("Recommend 5G channel: %{public}d", channel);
         return channel;
     }
-    if (linkedInfo.connState == CONNECTED && linkedInfo.band == static_cast<int>(BandType::BAND_2GHZ)) {
-        channel = FrequencyToChannel(linkedInfo.frequency);
-        WIFI_LOGI("Recommend linked 2G channel: %{public}d", channel);
-        return channel;
-    }
-    WIFI_LOGI("Recommend 2G channel: %{public}d", COMMON_USING_2G_CHANNEL);
-    return COMMON_USING_2G_CHANNEL;
+    channel = (channel == 0) ? COMMON_USING_2G_CHANNEL : channel;
+    WIFI_LOGI("Recommend 2G channel: %{public}d", channel);
+    return channel;
 }
 
 ErrCode WifiP2pService::Hid2dSetUpperScene(const std::string& ifName, const Hid2dUpperScene& scene)

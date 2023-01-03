@@ -15,6 +15,7 @@
 #ifndef OHOS_MOCK_WIFI_SETTINGS_H
 #define OHOS_MOCK_WIFI_SETTINGS_H
 
+#include "wifi_ap_msg.h"
 #include "wifi_msg.h"
 #include "wifi_internal_msg.h"
 #include <gmock/gmock.h>

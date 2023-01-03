@@ -238,6 +238,8 @@ int WifiScanStub::OnRegisterCallBack(uint32_t code, MessageParcel &data, Message
             WIFI_LOGI("create new `WifiScanCallbackProxy`!");
         }
 
+        int pid = data.ReadInt32();
+        WIFI_LOGD("%{public}s, get pid: %{public}d", __func__, pid);
         if (mSingleCallback) {
             ret = RegisterCallBack(callback_);
         } else {
@@ -248,7 +250,7 @@ int WifiScanStub::OnRegisterCallBack(uint32_t code, MessageParcel &data, Message
                 WIFI_LOGD("AddDeathRecipient!");
             }
             if (callback_ != nullptr) {
-                WifiInternalEventDispatcher::GetInstance().AddScanCallback(remote, callback_);
+                WifiInternalEventDispatcher::GetInstance().AddScanCallback(remote, callback_, pid);
             }
             ret = WIFI_OPT_SUCCESS;
         }

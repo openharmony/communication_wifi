@@ -331,11 +331,17 @@ if (defined(ohos_lite)) {
       "netmanager_base:net_conn_manager_if",
       "samgr:samgr_proxy",
     ]
+
     defines = [
       "FEATURE_AP_SUPPORT",
       "FEATURE_P2P_SUPPORT",
       "AP_INSTANCE_MAX_NUM=$wifi_feature_with_ap_num",
     ]
+
+    if (wifi_feature_with_app_frozen) {
+      external_deps += [ "efficiency_manager:suspend_manager_client" ]
+      defines += [ "FEATURE_APP_FROZEN" ]
+    }
 
     if (wifi_feature_with_auth_disable) {
       defines += [ "PERMISSION_ALWAYS_GRANT" ]

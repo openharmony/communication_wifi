@@ -290,13 +290,48 @@ WifiErrorNo GetNetworkList(WifiNetworkInfo *infos, int *size)
 WifiErrorNo StartPnoScan(const PnoScanSettings *settings)
 {
     LOGD("Ready to start pnoscan with param.");
-    return WIFI_HAL_NOT_SUPPORT;
+    ScanSettings scanSettings;
+    scanSettings.freqs = settings->freqs;
+    scanSettings.freqSize = settings->freqSize;
+    scanSettings.hiddenSsidSize = settings->hiddenSsidSize;
+    scanSettings.hiddenSsid = settings->hiddenSsid;
+    scanSettings.savedPnoSsidSize = settings->savedSsidSize;
+    scanSettings.savedPnoSsid = settings->savedSsid;
+    scanSettings.minPnoRssi2Dot4Ghz = settings->minRssi2Dot4Ghz;
+    scanSettings.minPnoRssi5Ghz = settings->minRssi5Ghz;
+    scanSettings.pnoScanInterval = settings->scanInterval;
+    scanSettings.scanStyle = SCAN_TYPE_PNO;
+    scanSettings.isStartPnoScan = 1;
+    WifiWpaStaInterface *pStaIfc = GetWifiStaInterface(0);
+    if (pStaIfc == NULL) {
+        return WIFI_HAL_SUPPLICANT_NOT_INIT;
+    }
+    int ret = pStaIfc->wpaCliCmdScan(pStaIfc, &scanSettings);
+    if (ret < 0) {
+        LOGE("StartPnoScan failed! ret=%{public}d", ret);
+        return WIFI_HAL_FAILED;
+    }
+    LOGD("StartPnoScan successfully!");
+    return WIFI_HAL_SUCCESS;
 }
 
 WifiErrorNo StopPnoScan(void)
 {
     LOGD("Ready to stop pnoscan.");
-    return WIFI_HAL_NOT_SUPPORT;
+    ScanSettings scanSettings;
+    scanSettings.scanStyle = SCAN_TYPE_PNO;
+    scanSettings.isStartPnoScan = 0;
+    WifiWpaStaInterface *pStaIfc = GetWifiStaInterface(0);
+    if (pStaIfc == NULL) {
+        return WIFI_HAL_SUPPLICANT_NOT_INIT;
+    }
+    int ret = pStaIfc->wpaCliCmdScan(pStaIfc, &scanSettings);
+    if (ret < 0) {
+        LOGE("StartPnoScan failed! ret=%{public}d", ret);
+        return WIFI_HAL_FAILED;
+    }
+    LOGD("StartPnoScan successfully!");
+    return WIFI_HAL_SUCCESS;
 }
 
 WifiErrorNo Connect(int networkId)

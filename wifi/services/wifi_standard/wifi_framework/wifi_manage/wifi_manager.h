@@ -33,6 +33,10 @@
 #ifdef FEATURE_P2P_SUPPORT
 #include "ip2p_service_callbacks.h"
 #endif
+#ifndef OHOS_ARCH_LITE
+#include "common_event_manager.h"
+#include "timer.h"
+#endif
 
 namespace OHOS {
 namespace Wifi {
@@ -58,6 +62,16 @@ enum class WifiCloseServiceCode {
 struct WifiCfgMonitorEventCallback {
     std::function<void(int)> onStaConnectionChange = nullptr;
 };
+
+#ifndef OHOS_ARCH_LITE
+class ScreenEventSubscriber : public OHOS::EventFwk::CommonEventSubscriber {
+public:
+    explicit ScreenEventSubscriber(const OHOS::EventFwk::CommonEventSubscribeInfo &subscriberInfo)
+        : CommonEventSubscriber(subscriberInfo) {}
+    virtual ~ScreenEventSubscriber() {};
+    void OnReceiveEvent(const OHOS::EventFwk::CommonEventData &data) override;
+};
+#endif
 
 class WifiManager {
 public:
@@ -207,6 +221,12 @@ private:
 #ifdef FEATURE_P2P_SUPPORT
     IP2pServiceCallbacks mP2pCallback;
     static WifiCfgMonitorEventCallback cfgMonitorCallback;
+#endif
+#ifndef OHOS_ARCH_LITE
+    void RegisterScreenEvent();
+    void UnRegisterScreenEvent();
+    std::shared_ptr<ScreenEventSubscriber> screenEventSubscriber_ = nullptr;
+    std::unique_ptr<Utils::Timer> lpScreenTimer_ = nullptr;
 #endif
     InitStatus mInitStatus;
     long mSupportedFeatures;

@@ -51,7 +51,6 @@ std::shared_ptr<WifiDeviceServiceImpl> WifiDeviceServiceImpl::g_instance;
 std::shared_ptr<WifiDeviceServiceImpl> WifiDeviceServiceImpl::GetInstance()
 #else
 const uint32_t TIMEOUT_APP_EVENT = 3000;
-const uint32_t TIMEOUT_SCREEN_EVENT = 3000;
 const uint32_t TIMEOUT_THERMAL_EVENT = 3000;
 constexpr int32_t WATCHDOG_INTERVAL_MS = 10000;
 constexpr int32_t WATCHDOG_DELAY_MS = 15000;
@@ -143,17 +142,6 @@ void WifiDeviceServiceImpl::OnStart()
         }
     }
 
-    if (screenEventSubscriber_ == nullptr) {
-        lpScreenTimer_ = std::make_unique<Utils::Timer>("WifiDeviceServiceImpl");
-        TimeOutCallback timeoutCallback = std::bind(&WifiDeviceServiceImpl::RegisterScreenEvent, this);
-        if (lpScreenTimer_ != nullptr) {
-            lpScreenTimer_->Setup();
-            lpScreenTimer_->Register(timeoutCallback, TIMEOUT_SCREEN_EVENT, true);
-        } else {
-            WIFI_LOGE("lpScreenTimer_ is nullptr");
-        }
-    }
-
     if (thermalLevelSubscriber_ == nullptr) {
         lpThermalTimer_ = std::make_unique<Utils::Timer>("WifiDeviceServiceImpl");
         TimeOutCallback timeoutCallback = std::bind(&WifiDeviceServiceImpl::RegisterThermalLevel, this);
@@ -194,13 +182,6 @@ void WifiDeviceServiceImpl::OnStop()
     if (lpTimer_ != nullptr) {
         lpTimer_->Shutdown(false);
         lpTimer_ = nullptr;
-    }
-    if (screenEventSubscriber_ != nullptr) {
-        UnRegisterScreenEvent();
-    }
-    if (lpScreenTimer_ != nullptr) {
-        lpScreenTimer_->Shutdown(false);
-        lpScreenTimer_ = nullptr;
     }
     if (thermalLevelSubscriber_ != nullptr) {
         UnRegisterThermalLevel();
@@ -303,6 +284,10 @@ ErrCode WifiDeviceServiceImpl::EnableWifi()
 
 ErrCode WifiDeviceServiceImpl::DisableWifi()
 {
+    if (!WifiAuthCenter::IsSystemAppByToken()) {
+        WIFI_LOGE("DisableWifi: NOT System APP, PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
     if (WifiPermissionUtils::VerifySetWifiInfoPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("DisableWifi:VerifySetWifiInfoPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
@@ -539,6 +524,10 @@ ErrCode WifiDeviceServiceImpl::RemoveCandidateConfig(int networkId)
 
 ErrCode WifiDeviceServiceImpl::AddDeviceConfig(const WifiDeviceConfig &config, int &result, bool isCandidate)
 {
+    if (!WifiAuthCenter::IsSystemAppByToken()) {
+        WIFI_LOGE("AddDeviceConfig: NOT System APP, PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
     if (WifiPermissionUtils::VerifySetWifiInfoPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("AddDeviceConfig:VerifySetWifiInfoPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
@@ -584,6 +573,10 @@ ErrCode WifiDeviceServiceImpl::AddDeviceConfig(const WifiDeviceConfig &config, i
 
 ErrCode WifiDeviceServiceImpl::UpdateDeviceConfig(const WifiDeviceConfig &config, int &result)
 {
+    if (!WifiAuthCenter::IsSystemAppByToken()) {
+        WIFI_LOGE("UpdateDeviceConfig: NOT System APP, PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
     if (WifiPermissionUtils::VerifySetWifiInfoPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("UpdateDeviceConfig:VerifySetWifiInfoPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
@@ -613,6 +606,10 @@ ErrCode WifiDeviceServiceImpl::UpdateDeviceConfig(const WifiDeviceConfig &config
 
 ErrCode WifiDeviceServiceImpl::RemoveDevice(int networkId)
 {
+    if (!WifiAuthCenter::IsSystemAppByToken()) {
+        WIFI_LOGE("RemoveDevice: NOT System APP, PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
     if (WifiPermissionUtils::VerifySetWifiInfoPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("RemoveDevice:VerifySetWifiInfoPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
@@ -640,6 +637,10 @@ ErrCode WifiDeviceServiceImpl::RemoveDevice(int networkId)
 
 ErrCode WifiDeviceServiceImpl::RemoveAllDevice()
 {
+    if (!WifiAuthCenter::IsSystemAppByToken()) {
+        WIFI_LOGE("RemoveAllDevice:NOT System APP, PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
     if (WifiPermissionUtils::VerifySetWifiInfoPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("RemoveAllDevice:VerifySetWifiInfoPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
@@ -663,6 +664,10 @@ ErrCode WifiDeviceServiceImpl::RemoveAllDevice()
 
 ErrCode WifiDeviceServiceImpl::GetDeviceConfigs(std::vector<WifiDeviceConfig> &result, bool isCandidate)
 {
+    if (!WifiAuthCenter::IsSystemAppByToken()) {
+        WIFI_LOGE("GetDeviceConfigs:NOT System APP, PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
     if (WifiPermissionUtils::VerifyGetWifiInfoInternalPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("GetDeviceConfigs:VerifyGetWifiInfoPermission() PERMISSION_DENIED!");
 
@@ -699,6 +704,10 @@ ErrCode WifiDeviceServiceImpl::GetDeviceConfigs(std::vector<WifiDeviceConfig> &r
 
 ErrCode WifiDeviceServiceImpl::EnableDeviceConfig(int networkId, bool attemptEnable)
 {
+    if (!WifiAuthCenter::IsSystemAppByToken()) {
+        WIFI_LOGE("EnableDeviceConfig:NOT System APP, PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
     if (WifiPermissionUtils::VerifySetWifiInfoPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("EnableDeviceConfig:VerifySetWifiInfoPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
@@ -721,6 +730,10 @@ ErrCode WifiDeviceServiceImpl::EnableDeviceConfig(int networkId, bool attemptEna
 
 ErrCode WifiDeviceServiceImpl::DisableDeviceConfig(int networkId)
 {
+    if (!WifiAuthCenter::IsSystemAppByToken()) {
+        WIFI_LOGE("DisableDeviceConfig:NOT System APP, PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
     if (WifiPermissionUtils::VerifySetWifiInfoPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("DisableDeviceConfig:VerifySetWifiInfoPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
@@ -748,6 +761,10 @@ ErrCode WifiDeviceServiceImpl::DisableDeviceConfig(int networkId)
 
 ErrCode WifiDeviceServiceImpl::ConnectToNetwork(int networkId, bool isCandidate)
 {
+    if (!WifiAuthCenter::IsSystemAppByToken()) {
+        WIFI_LOGE("ConnectToCandidateConfig:NOT System APP, PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
     if (isCandidate) {
         if (WifiPermissionUtils::VerifySetWifiInfoPermission() == PERMISSION_DENIED) {
             WIFI_LOGE("ConnectToCandidateConfig:VerifySetWifiInfoPermission PERMISSION_DENIED!");
@@ -789,6 +806,10 @@ ErrCode WifiDeviceServiceImpl::ConnectToNetwork(int networkId, bool isCandidate)
 
 ErrCode WifiDeviceServiceImpl::ConnectToDevice(const WifiDeviceConfig &config)
 {
+    if (!WifiAuthCenter::IsSystemAppByToken()) {
+        WIFI_LOGE("ConnectToDevice:NOT System APP, PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
     if (WifiPermissionUtils::VerifySetWifiInfoPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("ConnectToDevice:VerifySetWifiInfoPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
@@ -836,6 +857,10 @@ ErrCode WifiDeviceServiceImpl::IsConnected(bool &isConnected)
 
 ErrCode WifiDeviceServiceImpl::ReConnect()
 {
+    if (!WifiAuthCenter::IsSystemAppByToken()) {
+        WIFI_LOGE("ReConnect:NOT System APP, PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
     if (WifiPermissionUtils::VerifySetWifiInfoPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("ReConnect:VerifySetWifiInfoPermission() PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
@@ -859,6 +884,10 @@ ErrCode WifiDeviceServiceImpl::ReConnect()
 
 ErrCode WifiDeviceServiceImpl::ReAssociate(void)
 {
+    if (!WifiAuthCenter::IsSystemAppByToken()) {
+        WIFI_LOGE("ReAssociate:NOT System APP, PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
     if (WifiPermissionUtils::VerifyWifiConnectionPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("ReAssociate:VerifyWifiConnectionPermission() PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
@@ -877,6 +906,10 @@ ErrCode WifiDeviceServiceImpl::ReAssociate(void)
 
 ErrCode WifiDeviceServiceImpl::Disconnect(void)
 {
+    if (!WifiAuthCenter::IsSystemAppByToken()) {
+        WIFI_LOGE("Disconnect:NOT System APP, PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
     if (WifiPermissionUtils::VerifySetWifiInfoPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("Disconnect:VerifySetWifiInfoPermission() PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
@@ -1055,6 +1088,10 @@ ErrCode WifiDeviceServiceImpl::GetSignalLevel(const int &rssi, const int &band, 
 
 ErrCode WifiDeviceServiceImpl::GetSupportedFeatures(long &features)
 {
+    if (!WifiAuthCenter::IsSystemAppByToken()) {
+        WIFI_LOGE("GetSupportedFeatures:NOT System APP, PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
     if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("GetSupportedFeatures:VerifyGetWifiInfoPermission() PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
@@ -1070,6 +1107,10 @@ ErrCode WifiDeviceServiceImpl::GetSupportedFeatures(long &features)
 ErrCode WifiDeviceServiceImpl::GetDeviceMacAddress(std::string &result)
 {
     WIFI_LOGI("GetDeviceMacAddress");
+    if (!WifiAuthCenter::IsSystemAppByToken()) {
+        WIFI_LOGE("GetDeviceMacAddress:NOT System APP, PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
     if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("GetDeviceMacAddress:VerifyGetWifiInfoPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
@@ -1093,6 +1134,10 @@ bool WifiDeviceServiceImpl::SetLowLatencyMode(bool enabled)
 
 ErrCode WifiDeviceServiceImpl::CheckCanEnableWifi(void)
 {
+    if (!WifiAuthCenter::IsSystemAppByToken()) {
+        WIFI_LOGE("EnableWifi:NOT System APP, PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
     if (WifiPermissionUtils::VerifySetWifiInfoPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("EnableWifi:VerifySetWifiInfoPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
@@ -1256,30 +1301,6 @@ void WifiDeviceServiceImpl::UnRegisterAppRemoved()
     eventSubscriber_ = nullptr;
 }
 
-void WifiDeviceServiceImpl::RegisterScreenEvent()
-{
-    OHOS::EventFwk::MatchingSkills matchingSkills;
-    matchingSkills.AddEvent(OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON);
-    matchingSkills.AddEvent(OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF);
-    EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
-    screenEventSubscriber_ = std::make_shared<ScreenEventSubscriber>(subscriberInfo);
-    if (!EventFwk::CommonEventManager::SubscribeCommonEvent(screenEventSubscriber_)) {
-        WIFI_LOGE("ScreenEvent SubscribeCommonEvent() failed");
-    } else {
-        WIFI_LOGI("ScreenEvent SubscribeCommonEvent() OK");
-    }
-}
-
-void WifiDeviceServiceImpl::UnRegisterScreenEvent()
-{
-    if (!EventFwk::CommonEventManager::UnSubscribeCommonEvent(screenEventSubscriber_)) {
-        WIFI_LOGE("ScreenEvent UnSubscribeCommonEvent() failed");
-    } else {
-        WIFI_LOGI("ScreenEvent UnSubscribeCommonEvent() OK");
-    }
-    screenEventSubscriber_ = nullptr;
-}
-
 void WifiDeviceServiceImpl::RegisterThermalLevel()
 {
     OHOS::EventFwk::MatchingSkills matchingSkills;
@@ -1328,39 +1349,6 @@ void AppEventSubscriber::OnReceiveEvent(const OHOS::EventFwk::CommonEventData &d
             WIFI_LOGE("RemoveAllCandidateConfig failed");
         }
     }
-}
-
-void ScreenEventSubscriber::OnReceiveEvent(const OHOS::EventFwk::CommonEventData &data)
-{
-    std::string action = data.GetWant().GetAction();
-    WIFI_LOGI("ScreenEventSubscriber::OnReceiveEvent: %{public}s.", action.c_str());
-    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst();
-    if (pService == nullptr) {
-        WIFI_LOGE("sta service is NOT start!");
-        return;
-    }
-
-    int screenState = WifiSettings::GetInstance().GetScreenState();
-    if (action == OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF &&
-        screenState == MODE_STATE_OPEN) {
-        WifiSettings::GetInstance().SetScreenState(MODE_STATE_CLOSE);
-        /* Send suspend to wpa */
-        if (pService->SetSuspendMode(true) != WIFI_OPT_SUCCESS) {
-            WIFI_LOGE("SetSuspendMode failed");
-        }
-        return;
-    }
-
-    if (action == OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON &&
-        screenState == MODE_STATE_CLOSE) {
-        WifiSettings::GetInstance().SetScreenState(MODE_STATE_OPEN);
-        /* Send resume to wpa */
-        if (pService->SetSuspendMode(false) != WIFI_OPT_SUCCESS) {
-            WIFI_LOGE("SetSuspendMode failed");
-        }
-        return;
-    }
-    WIFI_LOGW("ScreenEventSubscriber::OnReceiveEvent, screen state: %{public}d.", screenState);
 }
 
 void ThermalLevelSubscriber::OnReceiveEvent(const OHOS::EventFwk::CommonEventData &data)

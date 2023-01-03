@@ -43,14 +43,6 @@ public:
     virtual void OnReceiveEvent(const OHOS::EventFwk::CommonEventData &data) override;
 };
 
-class ScreenEventSubscriber : public OHOS::EventFwk::CommonEventSubscriber {
-public:
-    explicit ScreenEventSubscriber(const OHOS::EventFwk::CommonEventSubscribeInfo &subscriberInfo)
-        : CommonEventSubscriber(subscriberInfo) {}
-    virtual ~ScreenEventSubscriber() {};
-    virtual void OnReceiveEvent(const OHOS::EventFwk::CommonEventData &data) override;
-};
-
 class ThermalLevelSubscriber : public OHOS::EventFwk::CommonEventSubscriber {
 public:
     explicit ThermalLevelSubscriber(const OHOS::EventFwk::CommonEventSubscribeInfo &subscriberInfo)
@@ -179,8 +171,6 @@ private:
 #ifndef OHOS_ARCH_LITE
     void RegisterAppRemoved();
     void UnRegisterAppRemoved();
-    void RegisterScreenEvent();
-    void UnRegisterScreenEvent();
     void RegisterThermalLevel();
     void UnRegisterThermalLevel();
 #endif
@@ -199,10 +189,8 @@ private:
 #else
     static sptr<WifiDeviceServiceImpl> g_instance;
     std::shared_ptr<AppEventSubscriber> eventSubscriber_ = nullptr;
-    std::shared_ptr<ScreenEventSubscriber> screenEventSubscriber_ = nullptr;
     std::shared_ptr<ThermalLevelSubscriber> thermalLevelSubscriber_ = nullptr;
     std::unique_ptr<Utils::Timer> lpTimer_ = nullptr;
-    std::unique_ptr<Utils::Timer> lpScreenTimer_ = nullptr;
     std::unique_ptr<Utils::Timer> lpThermalTimer_ = nullptr;
 #endif
     static std::mutex g_instanceLock;

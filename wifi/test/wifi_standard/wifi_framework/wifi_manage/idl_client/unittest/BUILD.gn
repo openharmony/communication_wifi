@@ -69,7 +69,7 @@ ohos_unittest("idl_client_unittest") {
     "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
   ]
 
-  defines += [ "AP_INSTANCE_MAX_NUM=$wifi_feature_with_ap_num" ]
+  defines = [ "AP_INSTANCE_MAX_NUM=$wifi_feature_with_ap_num" ]
 
   deps = [
     "$WIFI_ROOT_DIR/services/wifi_standard/ipc_framework/cRPC:crpc_client",

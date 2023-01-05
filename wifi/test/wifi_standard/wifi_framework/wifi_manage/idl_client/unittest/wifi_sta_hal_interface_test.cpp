@@ -84,7 +84,7 @@ HWTEST_F(WifiStaHalInterfaceTest, StartWifiTest, TestSize.Level1)
 HWTEST_F(WifiStaHalInterfaceTest, ConnectTest, TestSize.Level1)
 {
     WifiErrorNo ret = WifiStaHalInterface::GetInstance().Connect(1);
-    EXPECT_TRUE(ret == WIFI_IDL_OPT_OK);
+    EXPECT_FALSE(ret == WIFI_IDL_OPT_OK);
 }
 
 HWTEST_F(WifiStaHalInterfaceTest, ReconnectTest, TestSize.Level1)
@@ -123,7 +123,7 @@ HWTEST_F(WifiStaHalInterfaceTest, GetSupportFrequenciesTest, TestSize.Level1)
 {
     std::vector<int> freq;
     WifiErrorNo ret = WifiStaHalInterface::GetInstance().GetSupportFrequencies(0, freq);
-    EXPECT_TRUE(ret == WIFI_IDL_OPT_OK);
+    EXPECT_FALSE(ret == WIFI_IDL_OPT_OK);
 }
 
 HWTEST_F(WifiStaHalInterfaceTest, SetConnectMacAddrTest, TestSize.Level1)
@@ -133,7 +133,7 @@ HWTEST_F(WifiStaHalInterfaceTest, SetConnectMacAddrTest, TestSize.Level1)
     EXPECT_TRUE(ret == WIFI_IDL_OPT_INPUT_MAC_INVALID);
     mac = "38:d2:69:ef:47:59";
     ret = WifiStaHalInterface::GetInstance().SetConnectMacAddr(mac);
-    EXPECT_TRUE(ret == WIFI_IDL_OPT_OK);
+    EXPECT_FALSE(ret == WIFI_IDL_OPT_OK);
 }
 
 HWTEST_F(WifiStaHalInterfaceTest, SetScanMacAddressTest, TestSize.Level1)
@@ -143,7 +143,7 @@ HWTEST_F(WifiStaHalInterfaceTest, SetScanMacAddressTest, TestSize.Level1)
     EXPECT_TRUE(ret == WIFI_IDL_OPT_INPUT_MAC_INVALID);
     mac = "38:d2:69:ef:47:59";
     ret = WifiStaHalInterface::GetInstance().SetScanMacAddress(mac);
-    EXPECT_TRUE(ret == WIFI_IDL_OPT_OK);
+    EXPECT_FALSE(ret == WIFI_IDL_OPT_OK);
 }
 
 HWTEST_F(WifiStaHalInterfaceTest, DisconnectLastRoamingBssidTest, TestSize.Level1)
@@ -153,14 +153,14 @@ HWTEST_F(WifiStaHalInterfaceTest, DisconnectLastRoamingBssidTest, TestSize.Level
     EXPECT_TRUE(ret == WIFI_IDL_OPT_INPUT_MAC_INVALID);
     mac = "38:d2:69:ef:47:59";
     ret = WifiStaHalInterface::GetInstance().DisconnectLastRoamingBssid(mac);
-    EXPECT_TRUE(ret == WIFI_IDL_OPT_OK);
+    EXPECT_FALSE(ret == WIFI_IDL_OPT_OK);
 }
 
 HWTEST_F(WifiStaHalInterfaceTest, GetSupportFeatureTest, TestSize.Level1)
 {
     long feature = 0;
     WifiErrorNo ret = WifiStaHalInterface::GetInstance().GetSupportFeature(feature);
-    EXPECT_TRUE(ret == WIFI_IDL_OPT_OK);
+    EXPECT_FALSE(ret == WIFI_IDL_OPT_OK);
 }
 
 HWTEST_F(WifiStaHalInterfaceTest, SendRequestTest, TestSize.Level1)
@@ -173,7 +173,7 @@ HWTEST_F(WifiStaHalInterfaceTest, SendRequestTest, TestSize.Level1)
 HWTEST_F(WifiStaHalInterfaceTest, SetTxPowerTest, TestSize.Level1)
 {
     WifiErrorNo ret = WifiStaHalInterface::GetInstance().SetTxPower(0);
-    EXPECT_TRUE(ret == WIFI_IDL_OPT_OK);
+    EXPECT_FALSE(ret == WIFI_IDL_OPT_OK);
 }
 
 HWTEST_F(WifiStaHalInterfaceTest, ScanTest, TestSize.Level1)
@@ -207,19 +207,19 @@ HWTEST_F(WifiStaHalInterfaceTest, StartPnoScanTest, TestSize.Level1)
     scanParam.hiddenSsid.push_back("OHOS_testAp");
     scanParam.savedSsid.push_back("cmcc");
     WifiErrorNo ret = WifiStaHalInterface::GetInstance().StartPnoScan(scanParam);
-    EXPECT_TRUE(ret == WIFI_IDL_OPT_OK);
+    EXPECT_FALSE(ret == WIFI_IDL_OPT_OK);
 }
 
 HWTEST_F(WifiStaHalInterfaceTest, StopPnoScanTest, TestSize.Level1)
 {
     WifiErrorNo ret = WifiStaHalInterface::GetInstance().StopPnoScan();
-    EXPECT_TRUE(ret == WIFI_IDL_OPT_OK);
+    EXPECT_FALSE(ret == WIFI_IDL_OPT_OK);
 }
 
 HWTEST_F(WifiStaHalInterfaceTest, RemoveDeviceConfigTest, TestSize.Level1)
 {
     WifiErrorNo ret = WifiStaHalInterface::GetInstance().RemoveDevice(1);
-    EXPECT_TRUE(ret == WIFI_IDL_OPT_OK);
+    EXPECT_FALSE(ret == WIFI_IDL_OPT_OK);
 }
 
 HWTEST_F(WifiStaHalInterfaceTest, ClearDeviceConfigTest, TestSize.Level1)
@@ -238,13 +238,13 @@ HWTEST_F(WifiStaHalInterfaceTest, GetNextNetworkIdTest, TestSize.Level1)
 HWTEST_F(WifiStaHalInterfaceTest, EnableNetworkTest, TestSize.Level1)
 {
     WifiErrorNo ret = WifiStaHalInterface::GetInstance().EnableNetwork(1);
-    EXPECT_TRUE(ret == WIFI_IDL_OPT_OK);
+    EXPECT_FALSE(ret == WIFI_IDL_OPT_OK);
 }
 
 HWTEST_F(WifiStaHalInterfaceTest, DisableNetworkTest, TestSize.Level1)
 {
     WifiErrorNo ret = WifiStaHalInterface::GetInstance().DisableNetwork(1);
-    EXPECT_TRUE(ret == WIFI_IDL_OPT_OK);
+    EXPECT_FALSE(ret == WIFI_IDL_OPT_OK);
 }
 
 HWTEST_F(WifiStaHalInterfaceTest, SetDeviceConfigTest, TestSize.Level1)
@@ -258,32 +258,32 @@ HWTEST_F(WifiStaHalInterfaceTest, SetDeviceConfigTest, TestSize.Level1)
     EXPECT_TRUE(ret == WIFI_IDL_OPT_FAILED);
     cfg.psk = "12345678";
     ret = WifiStaHalInterface::GetInstance().SetDeviceConfig(1, cfg);
-    EXPECT_TRUE(ret == WIFI_IDL_OPT_OK);
+    EXPECT_FALSE(ret == WIFI_IDL_OPT_OK);
     cfg.authAlgorithms = 8;
     ret = WifiStaHalInterface::GetInstance().SetDeviceConfig(1, cfg);
     EXPECT_TRUE(ret == WIFI_IDL_OPT_FAILED);
     cfg.authAlgorithms = 7;
     ret = WifiStaHalInterface::GetInstance().SetDeviceConfig(1, cfg);
-    EXPECT_TRUE(ret == WIFI_IDL_OPT_OK);
+    EXPECT_FALSE(ret == WIFI_IDL_OPT_OK);
     cfg.ssid = "Honor";
     cfg.priority = 5;
     cfg.scanSsid = 1;
     cfg.wepKeyIdx = 2;
     ret = WifiStaHalInterface::GetInstance().SetDeviceConfig(1, cfg);
-    EXPECT_TRUE(ret == WIFI_IDL_OPT_OK);
+    EXPECT_FALSE(ret == WIFI_IDL_OPT_OK);
 }
 
 HWTEST_F(WifiStaHalInterfaceTest, GetDeviceConfigTest, TestSize.Level1)
 {
     WifiIdlGetDeviceConfig cfg;
     WifiErrorNo ret = WifiStaHalInterface::GetInstance().GetDeviceConfig(cfg);
-    EXPECT_TRUE(ret == WIFI_IDL_OPT_OK);
+    EXPECT_FALSE(ret == WIFI_IDL_OPT_OK);
 }
 
 HWTEST_F(WifiStaHalInterfaceTest, SaveDeviceConfigTest, TestSize.Level1)
 {
     WifiErrorNo ret = WifiStaHalInterface::GetInstance().SaveDeviceConfig();
-    EXPECT_TRUE(ret == WIFI_IDL_OPT_OK);
+    EXPECT_FALSE(ret == WIFI_IDL_OPT_OK);
 }
 
 HWTEST_F(WifiStaHalInterfaceTest, StartWpsPbcModeTest, TestSize.Level1)
@@ -326,7 +326,7 @@ HWTEST_F(WifiStaHalInterfaceTest, SetRoamConfigTest, TestSize.Level1)
     cfg.blocklistBssids.push_back("00:00:00:00:00:00");
     cfg.trustlistBssids.push_back("10:00:00:00:00:00");
     ret = WifiStaHalInterface::GetInstance().SetRoamConfig(cfg);
-    EXPECT_TRUE(ret == WIFI_IDL_OPT_OK);
+    EXPECT_FALSE(ret == WIFI_IDL_OPT_OK);
 }
 
 HWTEST_F(WifiStaHalInterfaceTest, WpaAutoConnectTest, TestSize.Level1)

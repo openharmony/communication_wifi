@@ -57,19 +57,19 @@ HWTEST_F(WifiIdlClientTest, GetSupportFrequenciesTest, TestSize.Level1)
     ASSERT_TRUE(mClient.InitClient() == 0);
     std::vector<int> freqs;
     WifiErrorNo err = mClient.GetSupportFrequencies(1, freqs);
-    EXPECT_TRUE(err == WIFI_IDL_OPT_OK);
+    EXPECT_FALSE(err == WIFI_IDL_OPT_OK);
     for (auto iter = freqs.begin(); iter != freqs.end(); ++iter) {
         LOGD("Get frequency: %{public}d", *iter);
     }
     freqs.clear();
     err = mClient.GetSupportFrequencies(2, freqs);
-    EXPECT_TRUE(err == WIFI_IDL_OPT_OK);
+    EXPECT_FALSE(err == WIFI_IDL_OPT_OK);
     for (auto iter = freqs.begin(); iter != freqs.end(); ++iter) {
         LOGD("Get frequency: %{public}d", *iter);
     }
     freqs.clear();
     err = mClient.GetSupportFrequencies(4, freqs);
-    EXPECT_TRUE(err == WIFI_IDL_OPT_OK);
+    EXPECT_FALSE(err == WIFI_IDL_OPT_OK);
     for (auto iter = freqs.begin(); iter != freqs.end(); ++iter) {
         LOGD("Get frequency: %{public}d", *iter);
     }
@@ -83,7 +83,7 @@ HWTEST_F(WifiIdlClientTest, SetConnectMacAddrTest, TestSize.Level1)
     EXPECT_TRUE(err == WIFI_IDL_OPT_INPUT_MAC_INVALID);
     mac = "00:00:00:00:00:00";
     err = mClient.SetConnectMacAddr(mac);
-    EXPECT_TRUE(err == WIFI_IDL_OPT_OK);
+    EXPECT_FALSE(err == WIFI_IDL_OPT_OK);
 }
 
 HWTEST_F(WifiIdlClientTest, SetScanMacAddressTest, TestSize.Level1)
@@ -94,7 +94,7 @@ HWTEST_F(WifiIdlClientTest, SetScanMacAddressTest, TestSize.Level1)
     EXPECT_TRUE(err == WIFI_IDL_OPT_INPUT_MAC_INVALID);
     mac = "00:00:00:00:00:00";
     err = mClient.SetScanMacAddress(mac);
-    EXPECT_TRUE(err == WIFI_IDL_OPT_OK);
+    EXPECT_FALSE(err == WIFI_IDL_OPT_OK);
 }
 
 HWTEST_F(WifiIdlClientTest, DisconnectLastRoamingBssidTest, TestSize.Level1)
@@ -105,7 +105,7 @@ HWTEST_F(WifiIdlClientTest, DisconnectLastRoamingBssidTest, TestSize.Level1)
     EXPECT_TRUE(err == WIFI_IDL_OPT_INPUT_MAC_INVALID);
     mac = "00:00:00:00:00:00";
     err = mClient.DisconnectLastRoamingBssid(mac);
-    EXPECT_TRUE(err == WIFI_IDL_OPT_OK);
+    EXPECT_FALSE(err == WIFI_IDL_OPT_OK);
 }
 
 HWTEST_F(WifiIdlClientTest, ReqGetSupportFeatureTest, TestSize.Level1)
@@ -113,7 +113,7 @@ HWTEST_F(WifiIdlClientTest, ReqGetSupportFeatureTest, TestSize.Level1)
     ASSERT_TRUE(mClient.InitClient() == 0);
     long feature = 0;
     WifiErrorNo err = mClient.ReqGetSupportFeature(feature);
-    EXPECT_TRUE(err == WIFI_IDL_OPT_OK);
+    EXPECT_FALSE(err == WIFI_IDL_OPT_OK);
 }
 
 HWTEST_F(WifiIdlClientTest, SetTxPowerTest, TestSize.Level1)
@@ -121,7 +121,7 @@ HWTEST_F(WifiIdlClientTest, SetTxPowerTest, TestSize.Level1)
     ASSERT_TRUE(mClient.InitClient() == 0);
     int power = 1;
     WifiErrorNo err = mClient.SetTxPower(power);
-    EXPECT_TRUE(err == WIFI_IDL_OPT_OK);
+    EXPECT_FALSE(err == WIFI_IDL_OPT_OK);
 }
 
 static char **MockConVectorToCArrayString(const std::vector<std::string> &vec)

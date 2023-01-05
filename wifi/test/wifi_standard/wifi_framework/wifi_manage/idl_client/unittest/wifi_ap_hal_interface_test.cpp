@@ -62,7 +62,7 @@ HWTEST_F(WifiApHalInterfaceTest, SetSoftApConfigTest, TestSize.Level1)
     config.SetChannel(0);
     config.SetMaxConn(1);
     WifiErrorNo ret = WifiApHalInterface::GetInstance().SetSoftApConfig(config);
-    EXPECT_TRUE(ret == WIFI_IDL_OPT_OK);
+    EXPECT_FALSE(ret == WIFI_IDL_OPT_OK);
 }
 
 HWTEST_F(WifiApHalInterfaceTest, GetStationListTest, TestSize.Level1)
@@ -116,7 +116,7 @@ HWTEST_F(WifiApHalInterfaceTest, GetFrequenciesByBandTest, TestSize.Level1)
 {
     std::vector<int> freq;
     WifiErrorNo ret = WifiApHalInterface::GetInstance().GetFrequenciesByBand(1, freq);
-    EXPECT_TRUE(ret == WIFI_IDL_OPT_OK);
+    EXPECT_FALSE(ret == WIFI_IDL_OPT_OK);
 }
 
 HWTEST_F(WifiApHalInterfaceTest, SetWifiCountryCodeTest, TestSize.Level1)

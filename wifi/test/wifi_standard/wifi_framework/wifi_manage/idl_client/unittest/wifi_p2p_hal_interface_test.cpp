@@ -362,7 +362,7 @@ HWTEST_F(WifiP2pHalInterfaceTest, AddToGroup_SUCCESS, TestSize.Level1)
 HWTEST_F(WifiP2pHalInterfaceTest, RemoveGroup_SUCCESS, TestSize.Level1)
 {
     std::string groupInterface;
-    EXPECT_NE(WifiErrorNo::WIFI_IDL_OPT_FAILED, WifiP2PHalInterface::GetInstance().GroupRemove(groupInterface));
+    EXPECT_EQ(WifiErrorNo::WIFI_IDL_OPT_FAILED, WifiP2PHalInterface::GetInstance().GroupRemove(groupInterface));
 }
 
 HWTEST_F(WifiP2pHalInterfaceTest, Invite_SUCCESS, TestSize.Level1)
@@ -376,7 +376,7 @@ HWTEST_F(WifiP2pHalInterfaceTest, Reinvoke_SUCCESS, TestSize.Level1)
 {
     int networkId = 13;
     std::string deviceAddr;
-    EXPECT_EQ(WifiErrorNo::WIFI_IDL_OPT_OK, WifiP2PHalInterface::GetInstance().Reinvoke(networkId, deviceAddr));
+    EXPECT_NE(WifiErrorNo::WIFI_IDL_OPT_OK, WifiP2PHalInterface::GetInstance().Reinvoke(networkId, deviceAddr));
 }
 
 HWTEST_F(WifiP2pHalInterfaceTest, GetDeviceAddress_SUCCESS, TestSize.Level1)

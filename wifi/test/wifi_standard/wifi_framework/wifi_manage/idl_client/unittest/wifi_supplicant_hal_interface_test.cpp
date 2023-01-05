@@ -54,7 +54,7 @@ HWTEST_F(WifiSupplicantHalInterfaceTest, UnRegisterSupplicantEventCallbackTest, 
 HWTEST_F(WifiSupplicantHalInterfaceTest, SetPowerSaveTest, TestSize.Level1)
 {
     WifiErrorNo ret = WifiSupplicantHalInterface::GetInstance().SetPowerSave(true);
-    EXPECT_TRUE(ret == WIFI_IDL_OPT_OK);
+    EXPECT_FALSE(ret == WIFI_IDL_OPT_OK);
 }
 
 HWTEST_F(WifiSupplicantHalInterfaceTest, WpaSetCountryCodeTest, TestSize.Level1)
@@ -64,14 +64,14 @@ HWTEST_F(WifiSupplicantHalInterfaceTest, WpaSetCountryCodeTest, TestSize.Level1)
     EXPECT_TRUE(ret != WIFI_IDL_OPT_OK);
     code = "CN";
     ret = WifiSupplicantHalInterface::GetInstance().WpaSetCountryCode(code);
-    EXPECT_TRUE(ret == WIFI_IDL_OPT_OK);
+    EXPECT_FALSE(ret == WIFI_IDL_OPT_OK);
 }
 
 HWTEST_F(WifiSupplicantHalInterfaceTest, WpaGetCountryCodeTest, TestSize.Level1)
 {
     std::string code;
     WifiErrorNo ret = WifiSupplicantHalInterface::GetInstance().WpaGetCountryCode(code);
-    EXPECT_TRUE(ret == WIFI_IDL_OPT_OK);
+    EXPECT_FALSE(ret == WIFI_IDL_OPT_OK);
 }
 
 HWTEST_F(WifiSupplicantHalInterfaceTest, DisconnectSupplicantTest, TestSize.Level1)

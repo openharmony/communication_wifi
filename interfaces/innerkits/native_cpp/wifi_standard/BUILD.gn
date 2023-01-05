@@ -133,6 +133,7 @@ ohos_shared_library("wifi_sdk") {
     "src/wifi_p2p_msg.cpp",
     "src/wifi_scan.cpp",
     "src/wifi_scan_callback_stub.cpp",
+    "//foundation/communication/wifi/services/wifi_standard/wifi_framework/common/net_helper/ip_tools.cpp",
   ]
 
   deps = [
@@ -144,7 +145,6 @@ ohos_shared_library("wifi_sdk") {
     "//base/notification/ces_standard/frameworks/core:cesfwk_core",
     "//base/notification/ces_standard/frameworks/native:cesfwk_innerkits",
     "//foundation/aafwk/standard/interfaces/innerkits/want:want",
-    "//foundation/communication/wifi/services/wifi_standard/wifi_framework/wifi_manage:wifi_manager_service",
     "//foundation/communication/wifi/utils/src:wifi_utils",
     "//foundation/distributedschedule/samgr/interfaces/innerkits/samgr_proxy:samgr_proxy",
     "//third_party/bounds_checking_function:libsec_static",

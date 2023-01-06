@@ -64,6 +64,7 @@ HWTEST_F(ContextTest, AppendCacheTest, TestSize.Level1)
         ContextAppendWrite(ctx, buff, strlen(buff));
         ASSERT_TRUE(ctx->wEnd == (i + 1) * 32);
     }
+    ContextAppendWrite(test, buff, strlen(buff));
     ASSERT_TRUE(strcpy_s(buff, sizeof(buff), "123456789 123456789 123456789 1") == EOK);
     ContextAppendWrite(ctx, buff, strlen(buff));
     ASSERT_TRUE(ctx->wEnd == 1023);
@@ -78,6 +79,8 @@ HWTEST_F(ContextTest, AppendCacheTest, TestSize.Level1)
     ContextAppendWrite(ctx, buff, strlen(buff));
     ASSERT_TRUE(ctx->wCapacity == 2048);
     ASSERT_TRUE(ctx->wEnd == (1023 + 1024));
+    ctx->wCapacity = -1;
+    ContextAppendWrite(ctx, buff, strlen(buff));
 }
 
 static int ExpandReadCache(Context *context, int len)
@@ -142,6 +145,7 @@ HWTEST_F(ContextTest, ContextGetReadRecordTest, TestSize.Level1)
     ctx = CreateContext(1024);
     ASSERT_TRUE(ctx != nullptr);
     ASSERT_TRUE(ctx->rCapacity == 1024);
+    ContextGetReadRecord(test);
     char *p = ContextGetReadRecord(ctx);
     ASSERT_TRUE(p == nullptr);
 
@@ -172,6 +176,7 @@ HWTEST_F(ContextTest, ContextReadNetTest, TestSize.Level1)
 {
     ctx = CreateContext(1024);
     ASSERT_TRUE(ctx != nullptr);
+    ContextReadNet(test);
     int ret = ContextReadNet(ctx);
     EXPECT_TRUE(ret == MAX_ONE_LINE_SIZE - 1);
     ctx->rBegin = 1024 - 5;

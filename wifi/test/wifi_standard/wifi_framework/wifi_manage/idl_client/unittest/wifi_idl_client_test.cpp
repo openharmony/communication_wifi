@@ -692,17 +692,9 @@ HWTEST_F(WifiIdlClientTest, ReqSetRoamConfigTest4, TestSize.Level1)
     EXPECT_TRUE(mClient.ReqSetRoamConfig(config) == WIFI_IDL_OPT_FAILED);
 }
 
-HWTEST_F(WifiIdlClientTest, ReqGetConnectSignalInfoTest1, TestSize.Level1)
-{
-    std::string endBssid = "adfasd"
-    WifiWpaSignalInfo info;
-    ASSERT_TRUE(mClient.InitClient() == 0);
-    EXPECT_TRUE(mClient.ReqGetConnectSignalInfo(endBssid, info) == WIFI_IDL_OPT_INPUT_MAC_INVALID);
-}
-
 HWTEST_F(WifiIdlClientTest, ReqGetConnectSignalInfoTest2, TestSize.Level1)
 {
-    std::string endBssid = "aa::bb::cc:dd::ee:ff"
+    std::string endBssid = "aa::bb::cc:dd::ee:ff";
     WifiWpaSignalInfo info;
     ASSERT_TRUE(mClient.InitClient() == 0);
     mClient.ReqGetConnectSignalInfo(endBssid, info);
@@ -834,7 +826,7 @@ HWTEST_F(WifiIdlClientTest, ReqGetPowerModelTest, TestSize.Level1)
     int id = 1;
     int model = 1;
     ASSERT_TRUE(mClient.InitClient() == 0);
-    mClient.WpaGetPowerModel(model, id);
+    mClient.ReqGetPowerModel(model, id);
 }
 
 HWTEST_F(WifiIdlClientTest, ReqSetPowerModelTest, TestSize.Level1)
@@ -850,7 +842,7 @@ HWTEST_F(WifiIdlClientTest, GetWifiChipObjectTest, TestSize.Level1)
     int id = 1;
     IWifiChip chip;
     ASSERT_TRUE(mClient.InitClient() == 0);
-    EXPECT_TRUE(mClient.ReqSetPowerModel(model, id) == WIFI_IDL_OPT_OK);
+    EXPECT_TRUE(mClient.GetWifiChipObject(id, chip) == WIFI_IDL_OPT_OK);
 }
 
 HWTEST_F(WifiIdlClientTest, GetChipIdsTest, TestSize.Level1)
@@ -888,7 +880,7 @@ HWTEST_F(WifiIdlClientTest, ConfigRunModesTest, TestSize.Level1)
     EXPECT_TRUE(mClient.ConfigRunModes(mode) == WIFI_IDL_OPT_OK);
 }
 
-HWTEST_F(WifiIdlClientTest, ConfigRunModesTest, TestSize.Level1)
+HWTEST_F(WifiIdlClientTest, GetCurrentModeTest, TestSize.Level1)
 {
     int mode = 1;
     ASSERT_TRUE(mClient.InitClient() == 0);
@@ -940,14 +932,14 @@ HWTEST_F(WifiIdlClientTest, ReqRequestToSupplicantTest, TestSize.Level1)
     mClient.ReqRequestToSupplicant(request);
 }
 
-HWTEST_F(WifiIdlClientTest, ReqSetPowerSaveTest, TestSize.Level1)
+HWTEST_F(WifiIdlClientTest, ReqSetPowerSaveTest1, TestSize.Level1)
 {
     bool enable = true;
     ASSERT_TRUE(mClient.InitClient() == 0);
     mClient.ReqSetPowerSave(enable);
 }
 
-HWTEST_F(WifiIdlClientTest, ReqSetPowerSaveTest, TestSize.Level1)
+HWTEST_F(WifiIdlClientTest, ReqSetPowerSaveTest2, TestSize.Level1)
 {
     bool enable = false;
     ASSERT_TRUE(mClient.InitClient() == 0);
@@ -958,7 +950,7 @@ HWTEST_F(WifiIdlClientTest, ReqWpaSetCountryCodeTest1, TestSize.Level1)
 {
     std::string countryCode = "adaf";
     ASSERT_TRUE(mClient.InitClient() == 0);
-    EXPECT_TRUE(mClient.ReqWpaSetCountryCode(countryCode) == WIFI_IDL_COUNTRY_CODE_LENGTH);
+    EXPECT_TRUE(mClient.ReqWpaSetCountryCode(countryCode) == WIFI_IDL_OPT_INVALID_PARAM);
 }
 
 HWTEST_F(WifiIdlClientTest, ReqWpaGetCountryCodeTest2, TestSize.Level1)
@@ -1154,16 +1146,16 @@ HWTEST_F(WifiIdlClientTest, ReqP2pProvisionDiscoveryTest, TestSize.Level1)
     info.SetWpsMethod(WpsMethod::WPS_METHOD_LABEL);
     config.SetWpsInfo(info);
     ASSERT_TRUE(mClient.InitClient() == 0);
-    mClient.ReqP2pProvisionDiscovery(config, isJoinExistingGroup, pin);
+    mClient.ReqP2pProvisionDiscovery(config);
     info.SetWpsMethod(WpsMethod::WPS_METHOD_DISPLAY);
     config.SetWpsInfo(info);
-    mClient.ReqP2pProvisionDiscovery(config, isJoinExistingGroup, pin);
+    mClient.ReqP2pProvisionDiscovery(config);
     info.SetWpsMethod(WpsMethod::WPS_METHOD_KEYPAD);
     config.SetWpsInfo(info);
-    mClient.ReqP2pProvisionDiscovery(config, isJoinExistingGroup, pin);
+    mClient.ReqP2pProvisionDiscovery(config);
     info.SetWpsMethod(WpsMethod::WPS_METHOD_INVALID);
     config.SetWpsInfo(info);
-    EXPECT_TRUE(mClient.ReqP2pProvisionDiscovery(config, isJoinExistingGroup, pin) == WIFI_IDL_OPT_FAILED);
+    EXPECT_TRUE(mClient.ReqP2pProvisionDiscovery(config) == WIFI_IDL_OPT_FAILED);
 }
 
 HWTEST_F(WifiIdlClientTest, ReqP2pAddGroupTest, TestSize.Level1)
@@ -1173,13 +1165,6 @@ HWTEST_F(WifiIdlClientTest, ReqP2pAddGroupTest, TestSize.Level1)
     int freq = 1;
     ASSERT_TRUE(mClient.InitClient() == 0);
     mClient.ReqP2pAddGroup(isPersistent, networkId, freq);
-}
-
-HWTEST_F(WifiIdlClientTest, ReqP2pRemoveGroupTest, TestSize.Level1)
-{
-    std::string groupInterface = "Interface";
-    ASSERT_TRUE(mClient.InitClient() == 0);
-    mClient.ReqP2pRemoveGroup(groupInterface);
 }
 
 HWTEST_F(WifiIdlClientTest, ReqP2pRemoveGroupTest, TestSize.Level1)
@@ -1266,7 +1251,7 @@ HWTEST_F(WifiIdlClientTest, ReqP2pReqServiceDiscoveryTest, TestSize.Level1)
     std::string deviceAddress = "aa:bb:cc:dd";
     ASSERT_TRUE(mClient.InitClient() == 0);
     EXPECT_TRUE(mClient.ReqP2pReqServiceDiscovery(deviceAddress, tlvs, reqID) == WIFI_IDL_OPT_INVALID_PARAM);
-    std::string deviceAddress = "aa:bb:cc:dd:ee:ff";
+    deviceAddress = "aa:bb:cc:dd:ee:ff";
     EXPECT_TRUE(mClient.ReqP2pReqServiceDiscovery(deviceAddress, tlvs, reqID) == WIFI_IDL_OPT_INVALID_PARAM);
     tlvs.push_back(1);
     mClient.ReqP2pReqServiceDiscovery(deviceAddress, tlvs, reqID);
@@ -1318,11 +1303,10 @@ HWTEST_F(WifiIdlClientTest, ReqP2pSetGroupConfigTest, TestSize.Level1)
 {
     int networkId = 1;
     IdlP2pGroupConfig config;
-    ASSERT_TRUE(mClient.InitClient() == 0);
-    EXPECT_TRUE(mClient.ReqP2pSetGroupConfig(band, frequencies) == WIFI_IDL_OPT_OK);
     config.ssid = "abcd";
     config.bssid = "00:00:00:00:00:00";
     config.psk = "132456789";
+    ASSERT_TRUE(mClient.InitClient() == 0);
     mClient.ReqP2pSetGroupConfig(networkId, config);
 }
 

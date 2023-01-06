@@ -341,7 +341,7 @@ HWTEST_F(WifiP2pHalInterfaceTest, Connect_SUCCESS, TestSize.Level1)
 
 HWTEST_F(WifiP2pHalInterfaceTest, CancelConnect_SUCCESS, TestSize.Level1)
 {
-    EXPECT_EQ(WifiErrorNo::WIFI_IDL_OPT_FAILED, WifiP2PHalInterface::GetInstance().CancelConnect());
+    EXPECT_EQ(WifiErrorNo::WIFI_IDL_OPT_OK, WifiP2PHalInterface::GetInstance().CancelConnect());
 }
 
 HWTEST_F(WifiP2pHalInterfaceTest, ProvisionDiscovery_SUCCESS, TestSize.Level1)

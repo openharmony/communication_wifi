@@ -46,6 +46,7 @@ HWTEST_F(HashTableTest, InitHashTableTest, TestSize.Level1)
 HWTEST_F(HashTableTest, UseHashTableTest, TestSize.Level1)
 {
     table = InitHashTable(3);
+    HashTable *p = nullptr;
     ASSERT_NE(table, nullptr);
     for (int fd = 1; fd <= 100; ++fd) {
         Context *ctx = (Context *)calloc(1, sizeof(Context));
@@ -55,9 +56,12 @@ HWTEST_F(HashTableTest, UseHashTableTest, TestSize.Level1)
     ASSERT_EQ(table->size, 100);
     Context *ctx = (Context *)calloc(1, sizeof(Context));
     ctx->fd = 1;
+    InsertHashTable(p, ctx);
     EXPECT_EQ(InsertHashTable(table, ctx), -2);
     free(ctx);
     int del = 0;
+    int fd = 1;
+    FindContext(p, fd);
     for (int fd = 1; fd <= 100; ++fd) {
         Context *pCtx = FindContext(table, fd);
         EXPECT_NE(pCtx, nullptr);

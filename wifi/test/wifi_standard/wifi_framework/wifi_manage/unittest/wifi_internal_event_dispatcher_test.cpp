@@ -73,7 +73,8 @@ HWTEST_F(WifiInternalEventDispatcherTest, AddStaCallbackFail, TestSize.Level1)
 {
     sptr<IRemoteObject> remote;
     sptr<IWifiDeviceCallBack> callback;
-    EXPECT_EQ(1, WifiInternalEventDispatcher::GetInstance().AddStaCallback(remote, callback));
+    int pid = 0;
+    EXPECT_EQ(1, WifiInternalEventDispatcher::GetInstance().AddStaCallback(remote, callback, pid));
 }
 
 HWTEST_F(WifiInternalEventDispatcherTest, RemoveStaCallbackFail, TestSize.Level1)

@@ -26,7 +26,6 @@ HWTEST_F(SerialTest, SerialTest, TestSize.Level1)
     WriteBegin(ctx, 0);
     ASSERT_EQ(WriteBegin(test, 0), -1);
 
-	
     WriteFunc(ctx, "SerialTest");
     ASSERT_EQ(WriteFunc(test, "SerialTest"), -1);
 

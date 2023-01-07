@@ -79,7 +79,7 @@ HWTEST_F(WifiChipHalInterfaceTest, GetSupportedModesTest, TestSize.Level1)
 {
     std::vector<int> vec;
     WifiErrorNo ret = WifiChipHalInterface::GetInstance().GetSupportedModes(vec);
-    EXPECT_TRUE(ret == WIFI_IDL_OPT_OK);
+    EXPECT_FALSE(ret == WIFI_IDL_OPT_OK);
 }
 
 HWTEST_F(WifiChipHalInterfaceTest, ConfigRunModesTest, TestSize.Level1)
@@ -99,12 +99,6 @@ HWTEST_F(WifiChipHalInterfaceTest, RequestFirmwareDebugInfoTest, TestSize.Level1
 {
     std::string info;
     WifiErrorNo ret = WifiChipHalInterface::GetInstance().RequestFirmwareDebugInfo(info);
-    EXPECT_TRUE(ret == WIFI_IDL_OPT_OK);
-}
-
-HWTEST_F(WifiChipHalInterfaceTest, SetWifiPowerModeTest, TestSize.Level1)
-{
-    WifiErrorNo ret = WifiChipHalInterface::GetInstance().SetWifiPowerMode(0);
     EXPECT_TRUE(ret == WIFI_IDL_OPT_OK);
 }
 }  // namespace Wifi

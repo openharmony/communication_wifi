@@ -25,9 +25,9 @@ using ::testing::ext::TestSize;
 
 namespace OHOS {
 namespace Wifi {
-unsigned int Status = 17;
-unsigned char result = 5;
-int Mode = 1;
+unsigned int g_status = 17;
+unsigned char g_result = 5;
+int g_mode = 1;
 class WifiHotspotTest : public testing::Test {
 public:
     static void SetUpTestCase() {}
@@ -54,28 +54,28 @@ public:
     void SetHotspotConfigTests()
     {
         HotspotConfig config;
-        config.band = Mode;
+        config.band = g_mode;
         SetHotspotConfig(&config);
     }
 
     void GetHotspotConfigTests()
     {
         HotspotConfig result;
-        result.band = Mode;
+        result.band = g_mode;
         GetHotspotConfig(&result);
     }
 
     void GetStationListTest()
     {
         StationInfo result;
-        result.ipAddress = Status;
-        unsigned int *size = &Status;
+        result.ipAddress = g_status;
+        unsigned int *size = &g_status;
         GetStationList(&result, size);
     }
 
     void DisassociateStaTests()
     {
-        unsigned char *mac = &result;
+        unsigned char *mac = &g_result;
         int macLen = 0;
         DisassociateSta(mac, macLen);
     }

@@ -143,5 +143,5 @@ ohos_unittest("mock_wifi_hal_service") {
 
 group("unittest") {
   testonly = true
-  deps = []
+  deps = [ "idl_client_unittest" ]
 }

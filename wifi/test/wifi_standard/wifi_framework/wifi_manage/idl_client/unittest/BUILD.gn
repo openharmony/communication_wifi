@@ -96,51 +96,6 @@ ohos_unittest("idl_client_unittest") {
   testonly = true
 }
 
-ohos_unittest("mock_wifi_hal_service") {
-  module_out_path = module_output_path
-  sources = [
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_hal/common/wifi_hal_common_func.c",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_hal/main.c",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_hal/wifi_hal_adapter.c",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_hal/wifi_hal_callback.c",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_hal/wifi_hal_crpc_ap.c",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_hal/wifi_hal_crpc_base.c",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_hal/wifi_hal_crpc_chip.c",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_hal/wifi_hal_crpc_common.c",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_hal/wifi_hal_crpc_p2p.c",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_hal/wifi_hal_crpc_server.c",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_hal/wifi_hal_crpc_sta.c",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_hal/wifi_hal_crpc_supplicant.c",
-    "mock_wifi_hal_service.c",
-  ]
-
-  include_dirs = [
-    "//commonlibrary/c_utils/base/include",
-    "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
-    "$WIFI_ROOT_DIR/frameworks/native/interfaces",
-    "$WIFI_ROOT_DIR/services/wifi_standard/ipc_framework/cRPC/include",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_hal",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_hal/common",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/log",
-  ]
-
-  deps = [
-    "$WIFI_ROOT_DIR/services/wifi_standard/ipc_framework/cRPC:crpc_server",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit:wifi_toolkit",
-    "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog",
-  ]
-
-  external_deps = [ "c_utils:utils" ]
-
-  cflags_cc = [ "-fno-rtti" ]
-
-  defines = []
-
-  part_name = "wifi"
-  subsystem_name = "communication"
-  testonly = true
-}
-
 group("unittest") {
   testonly = true
   deps = [ "idl_client_unittest" ]

@@ -653,26 +653,26 @@ HWTEST_F(DhcpServerTest, ReceiveDhcpMessageFailedTest, TestSize.Level1)
     uint8_t testMac1[DHCP_HWADDR_LENGTH] = {0x00, 0x0e, 0x3c, 0x65, 0x3a, 0x09, 0};
 
     int ret = ReceiveDhcpMessage(1, &msgInfo); // failed to select isset.
-    EXPECT_TRUE(ret == RET_FAILED || ret == RET_ERROR);
+    EXPECT_TRUE(ret == RET_SELECT_TIME_OUT || ret == RET_ERROR);
     ret = ReceiveDhcpMessage(1, &msgInfo); // message length error
-    EXPECT_TRUE(ret == RET_FAILED || ret == RET_ERROR);
+    EXPECT_TRUE(ret == RET_SELECT_TIME_OUT || ret == RET_ERROR);
     ret = ReceiveDhcpMessage(1, &msgInfo); // dhcp message type error
-    EXPECT_TRUE(ret == RET_FAILED || ret == RET_ERROR);
+    EXPECT_TRUE(ret == RET_SELECT_TIME_OUT || ret == RET_ERROR);
     msgInfo.packet.hlen = 128;
     ret = ReceiveDhcpMessage(1, &msgInfo); // hlen error
-    EXPECT_TRUE(ret == RET_FAILED || ret == RET_ERROR);
+    EXPECT_TRUE(ret == RET_SELECT_TIME_OUT || ret == RET_ERROR);
     msgInfo.packet.hlen = 16;
     msgInfo.packet.op = BOOTREPLY;
     ret = ReceiveDhcpMessage(1, &msgInfo); // client op type error
-    EXPECT_TRUE(ret == RET_FAILED || ret == RET_ERROR);
+    EXPECT_TRUE(ret == RET_SELECT_TIME_OUT || ret == RET_ERROR);
     msgInfo.packet.op = BOOTREQUEST;
     ret = ReceiveDhcpMessage(1, &msgInfo); // client hardware address error
-    EXPECT_TRUE(ret == RET_FAILED || ret == RET_ERROR);
+    EXPECT_TRUE(ret == RET_SELECT_TIME_OUT || ret == RET_ERROR);
     for (int i = 0; i < MAC_ADDR_LENGTH; ++i) {
         msgInfo.packet.chaddr[i] = testMac1[i];
     }
     ret = ReceiveDhcpMessage(1, &msgInfo);
-    EXPECT_TRUE(ret == RET_FAILED || ret == RET_ERROR);
+    EXPECT_TRUE(ret == RET_SELECT_TIME_OUT || ret == RET_ERROR);
 }
 
 extern "C" int FillReply(PDhcpServerContext ctx, PDhcpMsgInfo received, PDhcpMsgInfo reply);

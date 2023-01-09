@@ -22,10 +22,9 @@ using ::testing::ext::TestSize;
 
 namespace OHOS {
 namespace Wifi {
-int NetWorkId = 15;
-int Config = 5;
-int Band = 5;
-P2pState Moded = P2pState::P2P_STATE_CLOSING;
+int g_networkid = 15;
+int g_config = 5;
+P2pState g_moded = P2pState::P2P_STATE_CLOSING;
 class WifiP2pTest : public testing::Test {
 public:
     static void SetUpTestCase() {}
@@ -60,7 +59,7 @@ HWTEST_F(WifiP2pTest, DisableP2pTest, TestSize.Level1)
 
 HWTEST_F(WifiP2pTest, GetP2pEnableStatusTests, TestSize.Level1)
 {
-    P2pState* state = &Moded;
+    P2pState* state = &g_moded;
     GetP2pEnableStatus(state);
 }
 
@@ -99,7 +98,7 @@ HWTEST_F(WifiP2pTest, StopP2pListenTests, TestSize.Level1)
 HWTEST_F(WifiP2pTest, CreateGroupTests, TestSize.Level1)
 {
     WifiP2pConfig config;
-    config.netId = NetWorkId;
+    config.netId = g_networkid;
     CreateGroup(&config);
 }
 
@@ -111,14 +110,14 @@ HWTEST_F(WifiP2pTest, RemoveGroupTests, TestSize.Level1)
 HWTEST_F(WifiP2pTest, DeleteGroupTests, TestSize.Level1)
 {
     WifiP2pGroupInfo group;
-    group.networkId = NetWorkId;
+    group.networkId = g_networkid;
     DeleteGroup(&group);
 }
 
 HWTEST_F(WifiP2pTest, P2pConnectTests, TestSize.Level1)
 {
     WifiP2pConfig config;
-    config.netId = NetWorkId;
+    config.netId = g_networkid;
     P2pConnect(&config);
 }
 
@@ -130,36 +129,35 @@ HWTEST_F(WifiP2pTest, P2pCancelConnectTests, TestSize.Level1)
 HWTEST_F(WifiP2pTest, GetCurrentGroupTests, TestSize.Level1)
 {
     WifiP2pGroupInfo groupInfo;
-    groupInfo.networkId = NetWorkId;
+    groupInfo.networkId = g_networkid;
     GetCurrentGroup(&groupInfo);
 }
 
 HWTEST_F(WifiP2pTest, GetP2pConnectedStatusTests, TestSize.Level1)
 {
-    int* status = &NetWorkId;
+    int* status = &g_networkid;
     GetP2pConnectedStatus(status);
 }
 
 HWTEST_F(WifiP2pTest, QueryP2pDevicesTests, TestSize.Level1)
 {
     WifiP2pDevice clientDevices;
-    clientDevices.groupCapabilitys = NetWorkId;
+    clientDevices.groupCapabilitys = g_networkid;
     int size = 0;
-    int* retSize = &Config;
+    int* retSize = &g_config;
     QueryP2pDevices(&clientDevices, size, retSize);
 }
 
 HWTEST_F(WifiP2pTest, QueryP2pGroupsTests, TestSize.Level1)
 {
     WifiP2pGroupInfo groupInfo;
-    groupInfo.networkId = NetWorkId;
+    groupInfo.networkId = g_networkid;
     int size = 0;
     QueryP2pGroups(&groupInfo, size);
 }
 
 HWTEST_F(WifiP2pTest, RegisterP2pStateChangedCallbackTest, TestSize.Level1)
 {
-
     RegisterP2pStateChangedCallback(P2pCallback);
 }
 

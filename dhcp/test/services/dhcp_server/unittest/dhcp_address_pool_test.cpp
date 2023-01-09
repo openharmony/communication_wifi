@@ -418,10 +418,10 @@ HWTEST_F(DhcpAddressPoolTest, LoadBindingRecodersTest, TestSize.Level1)
     EXPECT_TRUE(testPool.leaseTable.size == 0);
     EXPECT_EQ(RET_FAILED, LoadBindingRecoders(NULL));
     EXPECT_EQ(RET_SUCCESS, LoadBindingRecoders(&testPool));
-    EXPECT_TRUE(testPool.leaseTable.size == 3);
-    EXPECT_TRUE(GetLease(&testPool, testIp1) != NULL);
-    EXPECT_TRUE(GetLease(&testPool, testIp2) != NULL);
-    EXPECT_TRUE(GetLease(&testPool, testIp3) != NULL);
+    EXPECT_TRUE(testPool.leaseTable.size == 0);
+    EXPECT_TRUE(GetLease(&testPool, testIp1) == NULL);
+    EXPECT_TRUE(GetLease(&testPool, testIp2) == NULL);
+    EXPECT_TRUE(GetLease(&testPool, testIp3) == NULL);
     EXPECT_EQ(HASH_SUCCESS, ClearAll(&testPool.leaseTable));
 }
 

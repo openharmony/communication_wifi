@@ -87,7 +87,7 @@ HWTEST_F(RpcNetTest, WaitFdEventTest, TestSize.Level1)
     EXPECT_TRUE(WaitFdEvent(servFd, READ_EVENT, 100) == 0);
     int cliFd = ConnectUnixServer("./rpc_test.sock");
     EXPECT_TRUE(cliFd >= 0);
-    EXPECT_TRUE(WaitFdEvent(servFd, READ_EVENT, 100) == 1);
+    EXPECT_TRUE(WaitFdEvent(cliFd, WRIT_EVENT, 100) == 1);
     close(cliFd);
     close(servFd);
     if (access("./rpc_test.sock", 0) == 0) {

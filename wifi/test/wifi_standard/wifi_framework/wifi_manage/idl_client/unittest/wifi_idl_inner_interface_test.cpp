@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,10 +12,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+#include <cstddef>
+#include <cstdint>
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 #include "wifi_idl_inner_interface.h"
+#include "securec.h"
 
 using namespace testing::ext;
 
@@ -23,6 +25,7 @@ namespace OHOS {
 namespace Wifi {
 
 constexpr int LENTH = 16;
+constexpr int LENTH1 = 11;
 class wifi_idl_inner_interface_test : public testing::Test {
 public:
     static void SetUpTestCase()
@@ -42,8 +45,10 @@ HWTEST_F(wifi_idl_inner_interface_test, OnApStaJoinOrLeaveTest, TestSize.Level1)
     OnApStaJoinOrLeave(info, id);
     CStationInfo infomation;
     infomation.type = 1;
-    infomation.mac = "00:00:AA:BB:CC:DD";
-    OnApStaJoinOrLeave(&info, id);
+    if (memcpy_s(infomation.mac, WIFI_MAC_ADDR_LENGTH, "00:00:AA:BB:CC:DD", WIFI_MAC_ADDR_LENGTH - 1) != EOK) {
+        return;
+    }
+    OnApStaJoinOrLeave(&infomation, id);
 }
 
 HWTEST_F(wifi_idl_inner_interface_test, OnApEnableOrDisableTest, TestSize.Level1)
@@ -88,15 +93,11 @@ HWTEST_F(wifi_idl_inner_interface_test, OnP2pDeviceFoundTest, TestSize.Level1)
     P2pDeviceInfo* info = nullptr;
     OnP2pDeviceFound(info);
     P2pDeviceInfo information;
-    information.srcAddress = "AA:BB:CC:DD:EE:FF";
-    information.p2pDeviceAddress = "AA:BB:CC:DD:EE:FF";
-    information.primaryDeviceType = "NONE";
-    information.configMethods = 1;
-    information.deviceCapabilities = 1;
-    information.groupCapabilities = 1;
-    information.wfdDeviceInfo = "tv";
-    information.wfdLength = LENTH;
-    OnP2pDeviceFound(information);
+    if (memcpy_s(information.wfdDeviceInfo, WIFI_P2P_WFD_DEVICE_INFO_LENGTH, "watchpannel", LENTH1) != EOK) {
+        return;
+    }
+    information.wfdLength = LENTH1;
+    OnP2pDeviceFound(&information);
 }
 
 HWTEST_F(wifi_idl_inner_interface_test, OnP2pDeviceLostTest, TestSize.Level1)
@@ -104,7 +105,7 @@ HWTEST_F(wifi_idl_inner_interface_test, OnP2pDeviceLostTest, TestSize.Level1)
     char *p2pDevic = nullptr;
     OnP2pDeviceLost(p2pDevic);
     char p2pDeviceAddress[] = "00:00:AA:BB:CC:DD";
-    OnP2pDeviceLost(&p2pDeviceAddress);
+    OnP2pDeviceLost(p2pDeviceAddress);
 }
 
 HWTEST_F(wifi_idl_inner_interface_test, OnP2pGoNegotiationRequestTest, TestSize.Level1)
@@ -112,8 +113,8 @@ HWTEST_F(wifi_idl_inner_interface_test, OnP2pGoNegotiationRequestTest, TestSize.
     char *srcAdd = nullptr;
     short passwordId = 1;
     OnP2pGoNegotiationRequest(srcAdd, passwordId);
-    char srcAddress = "00:00:AA:BB:CC:DD";
-    OnP2pGoNegotiationRequest(&srcAddress, passwordId);
+    char srcAddress[] = "00:00:AA:BB:CC:DD";
+    OnP2pGoNegotiationRequest(srcAddress, passwordId);
 }
 
 HWTEST_F(wifi_idl_inner_interface_test, OnP2pGoNegotiationSuccessTest, TestSize.Level1)
@@ -129,25 +130,22 @@ HWTEST_F(wifi_idl_inner_interface_test, OnP2pGoNegotiationFailureTest, TestSize.
 
 HWTEST_F(wifi_idl_inner_interface_test, OnP2pInvitationResultTest, TestSize.Level1)
 {
-    char *bssid = nullptr;
+    char *bss = nullptr;
     int status = 1;
+    OnP2pInvitationResult(bss, status);
+    char bssid[] = "00:00:AA:BB:CC:DD";
     OnP2pInvitationResult(bssid, status);
-    char *bssid = "00:00:AA:BB:CC:DD";
-    OnP2pInvitationResult(&bssid, status);
 }
 
 HWTEST_F(wifi_idl_inner_interface_test, OnP2pInvitationReceivedTest, TestSize.Level1)
 {
     P2pInvitationInfo *info = nullptr;
-    OnP2pDeviceLost(info);
+    OnP2pInvitationReceived(info);
     P2pInvitationInfo information;
     information.type = 1;
     information.persistentNetworkId = 1;
     information.operatingFrequency = 1;
-    information.srcAddress = "00:00:AA:BB:CC:DD";
-    information.goDeviceAddress = "00:11:AA:BB:CC:DD";
-    information.bssid = "00:22:AA:BB:CC:DD";
-    OnP2pDeviceLost(&information);
+    OnP2pInvitationReceived(&information);
 }
 
 HWTEST_F(wifi_idl_inner_interface_test, OnP2pGroupFormationSuccessTest, TestSize.Level1)
@@ -159,7 +157,7 @@ HWTEST_F(wifi_idl_inner_interface_test, OnP2pGroupFormationFailureTest, TestSize
 {
     char *failure = nullptr;
     OnP2pGroupFormationFailure(failure);
-    char *failureReason = "test";
+    char failureReason[] = "test";
     OnP2pGroupFormationFailure(failureReason);
 }
 
@@ -171,17 +169,16 @@ HWTEST_F(wifi_idl_inner_interface_test, OnP2pGroupStartedTest, TestSize.Level1)
     groupInfo.isGo = 1;
     groupInfo.isPersistent = 0;
     groupInfo.frequency = 1;
-    groupInfo.ssid = "hauwei";
     OnP2pGroupStarted(&groupInfo);
 }
 
 HWTEST_F(wifi_idl_inner_interface_test, OnP2pGroupRemovedTest, TestSize.Level1)
 {
-    char *groupIfName = nullptr;
+    char *groupIf = nullptr;
     int isGo = 1;
+    OnP2pGroupRemoved(groupIf, isGo);
+    char groupIfName[] = "huawei";
     OnP2pGroupRemoved(groupIfName, isGo);
-    char *groupIfName = "huawei";
-    OnP2pGroupRemoved(groupIfName);
 }
 
 HWTEST_F(wifi_idl_inner_interface_test, OnP2pProvisionDiscoveryTest, TestSize.Level1)
@@ -190,7 +187,7 @@ HWTEST_F(wifi_idl_inner_interface_test, OnP2pProvisionDiscoveryTest, TestSize.Le
     OnP2pProvisionDiscoveryPbcRequest(p2pDeviceAdd);
     OnP2pProvisionDiscoveryPbcResponse(p2pDeviceAdd);
     OnP2pProvisionDiscoveryEnterPin(p2pDeviceAdd);
-    char *p2pDeviceAddress = "00:22:AA:BB:CC:DD";
+    char p2pDeviceAddress[] = "00:22:AA:BB:CC:DD";
     OnP2pProvisionDiscoveryPbcRequest(p2pDeviceAddress);
     OnP2pProvisionDiscoveryPbcResponse(p2pDeviceAddress);
     OnP2pProvisionDiscoveryEnterPin(p2pDeviceAddress);
@@ -201,9 +198,9 @@ HWTEST_F(wifi_idl_inner_interface_test, OnP2pProvisionDiscoveryShowPinTest, Test
     char *p2pDeviceAddress = nullptr;
     char *generatedPin = nullptr;
     OnP2pProvisionDiscoveryShowPin(p2pDeviceAddress, generatedPin);
-    char *p2pDeviceAdd = "00:22:AA:BB:CC:DD";
+    char p2pDeviceAdd[] = "00:22:AA:BB:CC:DD";
     OnP2pProvisionDiscoveryShowPin(p2pDeviceAdd, generatedPin);
-    char *Pin = "test";
+    char Pin[] = "test";
     OnP2pProvisionDiscoveryShowPin(p2pDeviceAdd, Pin);
 }
 
@@ -219,12 +216,12 @@ HWTEST_F(wifi_idl_inner_interface_test, OnP2pFindStoppedTest, TestSize.Level1)
 
 HWTEST_F(wifi_idl_inner_interface_test, OnP2pServiceDiscoveryResponseTest, TestSize.Level1)
 {
-    char *srcAddress = nullptr;
+    char *srcAdd = nullptr;
     short updateIndicator = 1;
-    unsigned char *tlvs = "test";
+    unsigned char tlvs[] = "test";
     size_t tlvsLength = 1;
-    OnP2pServiceDiscoveryResponse(srcAddress, updateIndicator, tlvs, tlvsLength);
-    char *srcAddress = "AA:BB:CC:DD:EE:FF";
+    OnP2pServiceDiscoveryResponse(srcAdd, updateIndicator, tlvs, tlvsLength);
+    char srcAddress[] = "AA:BB:CC:DD:EE:FF";
     OnP2pServiceDiscoveryResponse(srcAddress, updateIndicator, tlvs, tlvsLength);
 }
 
@@ -233,7 +230,7 @@ HWTEST_F(wifi_idl_inner_interface_test, OnP2pStaDeauthorizedTest, TestSize.Level
     char *p2pDeviceAddress = nullptr;
     OnP2pStaDeauthorized(p2pDeviceAddress);
     OnP2pStaAuthorized(p2pDeviceAddress);
-    char *p2pDeviceAdd = "AA:BB:CC:DD:EE:FF";
+    char p2pDeviceAdd[] = "AA:BB:CC:DD:EE:FF";
     OnP2pStaDeauthorized(p2pDeviceAdd);
     OnP2pStaAuthorized(p2pDeviceAdd);
 }
@@ -249,13 +246,15 @@ HWTEST_F(wifi_idl_inner_interface_test, OnP2pServDiscReqTest, TestSize.Level1)
     OnP2pServDiscReq(info);
     P2pServDiscReqInfo infomation;
     infomation.tlvsLength = LENTH;
-    infomation.tlvs = "AABBCCDDEEFFGGHH";
-    OnP2pServDiscReq(&info);
+    if (memcpy_s(infomation.tlvs, WIFI_MAC_ADDR_LENGTH, "AABBCCDDEEFFGGHH", LENTH) != EOK) {
+        return;
+    }
+    OnP2pServDiscReq(&infomation);
 }
 
 HWTEST_F(wifi_idl_inner_interface_test, OnP2pIfaceCreatedTest, TestSize.Level1)
 {
-    char *ifName = "TV";
+    char ifName[] = "TV";
     int isGo = 1;
     OnP2pIfaceCreated(ifName, isGo);
 }

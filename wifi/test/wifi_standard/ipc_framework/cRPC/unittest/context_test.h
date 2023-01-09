@@ -38,6 +38,7 @@ public:
 
 public:
     Context *ctx;
+    Context *test = NULL;
 };
 }  // namespace Wifi
 }  // namespace OHOS

@@ -63,5 +63,83 @@ HWTEST_F(WifiInternalEventDispatcherTest, ThreadTest, TestSize.Level1)
     EXPECT_EQ(0, WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(msg));
     sleep(2);
 }
+
+HWTEST_F(WifiInternalEventDispatcherTest, SendSystemNotify, TestSize.Level1)
+{
+    EXPECT_EQ(0, WifiInternalEventDispatcher::GetInstance().SendSystemNotifyMsg());
+}
+
+HWTEST_F(WifiInternalEventDispatcherTest, AddStaCallbackFail, TestSize.Level1)
+{
+    sptr<IRemoteObject> remote;
+    sptr<IWifiDeviceCallBack> callback;
+    int pid = 0;
+    EXPECT_EQ(1, WifiInternalEventDispatcher::GetInstance().AddStaCallback(remote, callback, pid));
+}
+
+HWTEST_F(WifiInternalEventDispatcherTest, RemoveStaCallbackFail, TestSize.Level1)
+{
+    sptr<IRemoteObject> remote;
+    EXPECT_EQ(0, WifiInternalEventDispatcher::GetInstance().RemoveStaCallback(remote));
+}
+
+HWTEST_F(WifiInternalEventDispatcherTest, GetSingleStaCallbackSuccess, TestSize.Level1)
+{
+    sptr<IWifiDeviceCallBack> callback;
+    EXPECT_EQ(0, WifiInternalEventDispatcher::GetInstance().SetSingleStaCallback(callback));
+}
+
+HWTEST_F(WifiInternalEventDispatcherTest, HasScanRemoteFail, TestSize.Level1)
+{
+    sptr<IRemoteObject> remote;
+    EXPECT_EQ(false, WifiInternalEventDispatcher::GetInstance().HasScanRemote(remote));
+}
+
+HWTEST_F(WifiInternalEventDispatcherTest, AddHotspotCallbackFail, TestSize.Level1)
+{
+    sptr<IRemoteObject> remote;
+    sptr<IWifiHotspotCallback> callback;
+    int id = 0;
+    EXPECT_EQ(true, WifiInternalEventDispatcher::GetInstance().AddHotspotCallback(remote, callback, id));
+}
+
+HWTEST_F(WifiInternalEventDispatcherTest, RemoveHotspotCallbackFail, TestSize.Level1)
+{
+    sptr<IRemoteObject> remote;
+    int id = 0;
+    EXPECT_EQ(0, WifiInternalEventDispatcher::GetInstance().RemoveHotspotCallback(remote, id));
+}
+
+HWTEST_F(WifiInternalEventDispatcherTest, SetSingleHotspotSuccess, TestSize.Level1)
+{
+    sptr<IWifiHotspotCallback> callback;
+    int id = 0;
+    EXPECT_EQ(0, WifiInternalEventDispatcher::GetInstance().SetSingleHotspotCallback(callback, id));
+}
+
+HWTEST_F(WifiInternalEventDispatcherTest, HasHotspotRemoteFail, TestSize.Level1)
+{
+    sptr<IRemoteObject> remote;
+    int id = 0;
+    EXPECT_EQ(false, WifiInternalEventDispatcher::GetInstance().HasHotspotRemote(remote, id));
+}
+
+HWTEST_F(WifiInternalEventDispatcherTest, AddP2pCallbackFail, TestSize.Level1)
+{
+    sptr<IRemoteObject> remote;
+    sptr<IWifiP2pCallback> callback;
+    EXPECT_EQ(1, WifiInternalEventDispatcher::GetInstance().AddP2pCallback(remote, callback));
+}
+
+HWTEST_F(WifiInternalEventDispatcherTest, RemoveP2pCallbackFail, TestSize.Level1)
+{
+    sptr<IRemoteObject> remote;
+    EXPECT_EQ(0, WifiInternalEventDispatcher::GetInstance().RemoveP2pCallback(remote));
+}
+
+HWTEST_F(WifiInternalEventDispatcherTest, ExitFail, TestSize.Level1)
+{
+    WifiInternalEventDispatcher::GetInstance().Exit();
+}
 }  // namespace Wifi
 }  // namespace OHOS

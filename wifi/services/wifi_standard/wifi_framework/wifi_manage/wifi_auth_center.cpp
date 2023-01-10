@@ -53,7 +53,7 @@ bool WifiAuthCenter::IsSystemAppByToken(){
         fullTokenId, isSystemApp, tokenId, callingType);
     if(callingType == TOKEN_HAP && !isSystemApp) {
         WIFI_LOGE("The caller is not a system app.");
-        return false; 
+        return false;
     }
     return true;
 }

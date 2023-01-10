@@ -48,6 +48,7 @@ ohos_unittest("idl_client_unittest") {
     "wifi_ap_hal_interface_test.cpp",
     "wifi_chip_hal_interface_test.cpp",
     "wifi_idl_client_test.cpp",
+    "wifi_idl_inner_interface_test.cpp",
     "wifi_idl_interface_test.cpp",
     "wifi_p2p_hal_interface_test.cpp",
     "wifi_sta_hal_interface_test.cpp",
@@ -142,5 +143,5 @@ ohos_unittest("mock_wifi_hal_service") {
 
 group("unittest") {
   testonly = true
-  deps = []
+  deps = [ ":idl_client_unittest" ]
 }

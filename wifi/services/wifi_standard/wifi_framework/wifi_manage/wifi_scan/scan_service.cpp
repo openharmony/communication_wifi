@@ -110,10 +110,10 @@ bool ScanService::InitScanService(const IScanSerivceCallbacks &scanSerivceCallba
         std::vector<int32_t> supp2Gfreqs(freqs2G.begin(), freqs2G.end());
         std::vector<int32_t> supp5Gfreqs(freqs5G.begin(), freqs5G.end());
         for (auto iter = supp2Gfreqs.begin(); iter != supp2Gfreqs.end(); iter++) {
-            chanTbs[BandType::BAND_2GHZ].push_back(*iter);
+            chanTbs[BandType::BAND_2GHZ].push_back(FrequencyToChannel(*iter));
         }
         for (auto iter = supp5Gfreqs.begin(); iter != supp5Gfreqs.end(); iter++) {
-            chanTbs[BandType::BAND_5GHZ].push_back(*iter);
+            chanTbs[BandType::BAND_5GHZ].push_back(FrequencyToChannel(*iter));
         }
         if (WifiSettings::GetInstance().SetValidChannels(chanTbs)) {
             WIFI_LOGE("%{public}s, fail to SetValidChannels", __func__);

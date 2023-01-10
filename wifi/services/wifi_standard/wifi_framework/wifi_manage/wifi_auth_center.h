@@ -17,12 +17,9 @@
 #define OHOS_WIFI_AUTH_CENTER_H
 
 #include <map>
-#include "accesstoken_kit.h"
 
 namespace OHOS {
 namespace Wifi {
-using namespace OHOS::Security::AccessToken;
-
 class WifiAuthCenter {
 public:
     static WifiAuthCenter &GetInstance();

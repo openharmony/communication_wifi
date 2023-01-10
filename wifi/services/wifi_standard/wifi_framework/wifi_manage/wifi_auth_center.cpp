@@ -46,12 +46,12 @@ int WifiAuthCenter::Init()
 #ifndef OHOS_ARCH_LITE
 bool WifiAuthCenter::IsSystemAppByToken(){
     uint64_t fullTokenId = IPCSkeleton::GetCallingFullTokenID();
-    bool isSystemApp = TokenIdKit::IsSystemAppByFullTokenID(fullTokenId);
+    bool isSystemApp = Security::AccessToken::TokenIdKit::IsSystemAppByFullTokenID(fullTokenId);
     uint32_t tokenId = IPCSkeleton::GetCallingTokenID();
-    ATokenTypeEnum callingType = AccessTokenKit::GetTokenTypeFlag(tokenId);
-    WIFI_LOGI("fullTokenId: 0x%{pubilc}x, isSystemApp: %{public}d, tokenId: 0x%{pubilc}x, callingType: 0x%{pubilc}x.",
+    Security::AccessToken::ATokenTypeEnum callingType = Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(tokenId);
+    WIFI_LOGI("fullTokenId:0x%" PRIu64 ", isSystemApp:%{public}d, tokenId:0x%" PRIu64 ", callingType:0x%" PRIu64 ".",
         fullTokenId, isSystemApp, tokenId, callingType);
-    if(callingType == TOKEN_HAP && !isSystemApp) {
+    if (callingType == TOKEN_HAP && !isSystemApp) {
         WIFI_LOGE("The caller is not a system app.");
         return false;
     }

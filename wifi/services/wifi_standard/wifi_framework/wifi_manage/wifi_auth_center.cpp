@@ -16,8 +16,10 @@
 #include "wifi_auth_center.h"
 #include "wifi_permission_helper.h"
 #ifndef OHOS_ARCH_LITE
+#include <cinttypes>
 #include "ipc_skeleton.h"
 #include "tokenid_kit.h"
+#include "accesstoken_kit.h"
 #include "wifi_logger.h"
 #endif
 
@@ -49,9 +51,9 @@ bool WifiAuthCenter::IsSystemAppByToken(){
     bool isSystemApp = Security::AccessToken::TokenIdKit::IsSystemAppByFullTokenID(fullTokenId);
     uint32_t tokenId = IPCSkeleton::GetCallingTokenID();
     Security::AccessToken::ATokenTypeEnum callingType = Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(tokenId);
-    WIFI_LOGI("fullTokenId:0x%" PRIu64 ", isSystemApp:%{public}d, tokenId:0x%" PRIu64 ", callingType:0x%" PRIu64 ".",
+    WIFI_LOGI("fullTokenId:0x%" PRIu64 ", isSystemApp:%{public}d, tokenId:%{public}lu, callingType:%{public}d.",
         fullTokenId, isSystemApp, tokenId, callingType);
-    if (callingType == TOKEN_HAP && !isSystemApp) {
+    if (callingType == Security::AccessToken::TOKEN_HAP && !isSystemApp) {
         WIFI_LOGE("The caller is not a system app.");
         return false;
     }

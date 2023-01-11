@@ -31,7 +31,6 @@ namespace OHOS {
 namespace Wifi {
 DEFINE_WIFILOG_LABEL("WifiCommonUtil");
 
-constexpr int INVALID_FREQ_OR_CHANNEL = -1;
 constexpr int FREQ_2G_MIN = 2412;
 constexpr int FREQ_2G_MAX = 2472;
 constexpr int FREQ_5G_MIN = 5170;

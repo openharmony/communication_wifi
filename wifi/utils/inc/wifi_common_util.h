@@ -27,6 +27,9 @@
 
 namespace OHOS {
 namespace Wifi {
+
+constexpr int INVALID_FREQ_OR_CHANNEL = -1;
+
 /**
  * @Description MAC address anonymization
  *

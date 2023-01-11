@@ -159,20 +159,6 @@ int GetCallingUid();
 bool IsForegroundApp(const int uid);
 
 /**
- * @Description Convert frequency to channel
- *
- * @return int - channel
- */
-int FrequencyToChannel(int freq);
-
-/**
- * @Description Convert channel to frequency
- *
- * @return int - frequency
- */
-int ChannelToFrequency(int channel);
-
-/**
  * @Description Time consuming statistics
  *
  */
@@ -187,6 +173,20 @@ private:
     std::chrono::steady_clock::time_point m_startTime;
 };
 #endif
+
+/**
+ * @Description Convert frequency to channel
+ *
+ * @return int - channel
+ */
+int FrequencyToChannel(int freq);
+
+/**
+ * @Description Convert channel to frequency
+ *
+ * @return int - frequency
+ */
+int ChannelToFrequency(int channel);
 }  // namespace Wifi
 }  // namespace OHOS
 #endif

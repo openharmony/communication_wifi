@@ -60,7 +60,7 @@ ErrCode StaService::InitStaService(const StaServiceCallback &callbacks)
         WIFI_LOGE("Alloc pStaStateMachine failed.\n");
         return WIFI_OPT_FAILED;
     }
-    
+
     if (pStaStateMachine->InitStaStateMachine() != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("InitStaStateMachine failed.\n");
         return WIFI_OPT_FAILED;
@@ -73,12 +73,12 @@ ErrCode StaService::InitStaService(const StaServiceCallback &callbacks)
         WIFI_LOGE("Alloc pStaMonitor failed.\n");
         return WIFI_OPT_FAILED;
     }
-    
+
     if (pStaMonitor->InitStaMonitor() != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("InitStaMonitor failed.\n");
         return WIFI_OPT_FAILED;
     }
-    
+
     pStaMonitor->SetStateMachine(pStaStateMachine);
 
     ChannelsTable chanTbs;
@@ -101,10 +101,18 @@ ErrCode StaService::InitStaService(const StaServiceCallback &callbacks)
         std::vector<int32_t> supp2Gfreqs(freqs2G.begin(), freqs2G.end());
         std::vector<int32_t> supp5Gfreqs(freqs5G.begin(), freqs5G.end());
         for (auto iter = supp2Gfreqs.begin(); iter != supp2Gfreqs.end(); iter++) {
-            chanTbs[BandType::BAND_2GHZ].push_back(FrequencyToChannel(*iter));
+            int32_t channel = FrequencyToChannel(*iter);
+            if (channel == INVALID_FREQ_OR_CHANNEL) {
+                continue;
+            }
+            chanTbs[BandType::BAND_2GHZ].push_back(channel);
         }
         for (auto iter = supp5Gfreqs.begin(); iter != supp5Gfreqs.end(); iter++) {
-            chanTbs[BandType::BAND_5GHZ].push_back(FrequencyToChannel(*iter));
+            int32_t channel = FrequencyToChannel(*iter);
+            if (channel == INVALID_FREQ_OR_CHANNEL) {
+                continue;
+            }
+            chanTbs[BandType::BAND_5GHZ].push_back(channel);
         }
         if (WifiSettings::GetInstance().SetValidChannels(chanTbs)) {
             WIFI_LOGE("%{public}s, fail to SetValidChannels", __func__);

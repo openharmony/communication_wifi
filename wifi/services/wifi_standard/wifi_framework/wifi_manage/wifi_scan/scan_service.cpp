@@ -74,12 +74,12 @@ bool ScanService::InitScanService(const IScanSerivceCallbacks &scanSerivceCallba
         WIFI_LOGE("Alloc pScanStateMachine failed.\n");
         return false;
     }
-    
+
     if (!pScanStateMachine->InitScanStateMachine()) {
         WIFI_LOGE("InitScanStateMachine failed.\n");
         return false;
     }
-    
+
     if (!pScanStateMachine->EnrollScanStatusListener(
         std::bind(&ScanService::HandleScanStatusReport, this, std::placeholders::_1))) {
         WIFI_LOGE("ScanStateMachine_->EnrollScanStatusListener failed.\n");
@@ -90,7 +90,7 @@ bool ScanService::InitScanService(const IScanSerivceCallbacks &scanSerivceCallba
         WIFI_LOGE("Alloc pScanMonitor failed.\n");
         return false;
     }
-    
+
     if (!pScanMonitor->InitScanMonitor()) {
         WIFI_LOGE("InitScanMonitor failed.\n");
         return false;
@@ -110,10 +110,18 @@ bool ScanService::InitScanService(const IScanSerivceCallbacks &scanSerivceCallba
         std::vector<int32_t> supp2Gfreqs(freqs2G.begin(), freqs2G.end());
         std::vector<int32_t> supp5Gfreqs(freqs5G.begin(), freqs5G.end());
         for (auto iter = supp2Gfreqs.begin(); iter != supp2Gfreqs.end(); iter++) {
-            chanTbs[BandType::BAND_2GHZ].push_back(FrequencyToChannel(*iter));
+            int32_t channel = FrequencyToChannel(*iter);
+            if (channel == INVALID_FREQ_OR_CHANNEL) {
+                continue;
+            }
+            chanTbs[BandType::BAND_2GHZ].push_back(channel);
         }
         for (auto iter = supp5Gfreqs.begin(); iter != supp5Gfreqs.end(); iter++) {
-            chanTbs[BandType::BAND_5GHZ].push_back(FrequencyToChannel(*iter));
+            int32_t channel = FrequencyToChannel(*iter);
+            if (channel == INVALID_FREQ_OR_CHANNEL) {
+                continue;
+            }
+            chanTbs[BandType::BAND_5GHZ].push_back(channel);
         }
         if (WifiSettings::GetInstance().SetValidChannels(chanTbs)) {
             WIFI_LOGE("%{public}s, fail to SetValidChannels", __func__);

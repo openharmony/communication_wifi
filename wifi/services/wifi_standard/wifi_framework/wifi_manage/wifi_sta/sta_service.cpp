@@ -60,6 +60,7 @@ ErrCode StaService::InitStaService(const StaServiceCallback &callbacks)
         WIFI_LOGE("Alloc pStaStateMachine failed.\n");
         return WIFI_OPT_FAILED;
     }
+    
     if (pStaStateMachine->InitStaStateMachine() != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("InitStaStateMachine failed.\n");
         return WIFI_OPT_FAILED;
@@ -72,10 +73,12 @@ ErrCode StaService::InitStaService(const StaServiceCallback &callbacks)
         WIFI_LOGE("Alloc pStaMonitor failed.\n");
         return WIFI_OPT_FAILED;
     }
+    
     if (pStaMonitor->InitStaMonitor() != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("InitStaMonitor failed.\n");
         return WIFI_OPT_FAILED;
     }
+    
     pStaMonitor->SetStateMachine(pStaStateMachine);
 
     ChannelsTable chanTbs;

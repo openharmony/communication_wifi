@@ -51,7 +51,7 @@ bool WifiAuthCenter::IsSystemAppByToken(){
     bool isSystemApp = Security::AccessToken::TokenIdKit::IsSystemAppByFullTokenID(fullTokenId);
     uint32_t tokenId = IPCSkeleton::GetCallingTokenID();
     Security::AccessToken::ATokenTypeEnum callingType = Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(tokenId);
-    WIFI_LOGI("fullTokenId:0x%" PRIu64 ", isSystemApp:%{public}d, tokenId:%{public}lu, callingType:%{public}d.",
+    WIFI_LOGI("fullTokenId:%" PRIu64 ", isSystemApp:%{public}d, tokenId:%{public}lu, callingType:%{public}d.",
         fullTokenId, isSystemApp, tokenId, callingType);
     if (callingType == Security::AccessToken::TOKEN_HAP && !isSystemApp) {
         WIFI_LOGE("The caller is not a system app.");

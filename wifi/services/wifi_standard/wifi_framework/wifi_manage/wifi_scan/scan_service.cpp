@@ -74,10 +74,12 @@ bool ScanService::InitScanService(const IScanSerivceCallbacks &scanSerivceCallba
         WIFI_LOGE("Alloc pScanStateMachine failed.\n");
         return false;
     }
+    
     if (!pScanStateMachine->InitScanStateMachine()) {
         WIFI_LOGE("InitScanStateMachine failed.\n");
         return false;
     }
+    
     if (!pScanStateMachine->EnrollScanStatusListener(
         std::bind(&ScanService::HandleScanStatusReport, this, std::placeholders::_1))) {
         WIFI_LOGE("ScanStateMachine_->EnrollScanStatusListener failed.\n");
@@ -88,6 +90,7 @@ bool ScanService::InitScanService(const IScanSerivceCallbacks &scanSerivceCallba
         WIFI_LOGE("Alloc pScanMonitor failed.\n");
         return false;
     }
+    
     if (!pScanMonitor->InitScanMonitor()) {
         WIFI_LOGE("InitScanMonitor failed.\n");
         return false;

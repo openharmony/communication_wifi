@@ -17,6 +17,10 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
+#define BUFSIZE 1
+#define NETWORKID 1
+#define ENABLE 1
+#define CODESIZE 1
 
 using ::testing::Return;
 using ::testing::ext::TestSize;
@@ -51,6 +55,59 @@ public:
     {
         ConnectSupplicant();
     }
+
+    void DisconnectSupplicantTest()
+    {
+        DisconnectSupplicant();
+    }
+
+    void RequestToSupplicantTest()
+    {
+        char* buf = nullptr;
+		int32_t bufsize = BUFSIZE; 
+        RequestToSupplicant(buf, bufsize);
+    }
+
+    void RegisterSupplicantEventCallbackTest()
+    {
+        ISupplicantEventCallback callback = nullptr;
+        RegisterSupplicantEventCallback(callback);
+    }
+
+    void ConnectTest()
+    {
+        int networkId = NETWORKID;
+        Connect(networkId);
+    }
+
+    void ReconnectTest()
+    {
+        Reconnect();
+    }
+
+    void DisconnectTest()
+    {
+        Disconnect();
+    }
+
+    void SetPowerSaveTest()
+    {
+        int enable = ENABLE;
+        SetPowerSave(enable);
+    }
+
+    void WpaSetCountryCodeTest()
+    {
+        char* countryCode = nullptr;
+        WpaSetCountryCode(countryCode);
+    }
+
+    void WpaGetCountryCodeTest()
+    {
+        char* countryCode = nullptr;
+        int codesize = CODESIZE;
+        WpaGetCountryCode(countryCode, codesize);
+    }
 };	
 
 HWTEST_F(WifiSupplicantifaceTest, RpcClientCallTest, TestSize.Level1)
@@ -73,6 +130,45 @@ HWTEST_F(WifiSupplicantifaceTest, ConnectSupplicantTest, TestSize.Level1)
     ConnectSupplicantTest();
 }
 
+HWTEST_F(WifiSupplicantifaceTest, DisconnectSupplicantTest, TestSize.Level1)
+{
+    DisconnectSupplicantTest();
+}
+
+HWTEST_F(WifiSupplicantifaceTest, RequestToSupplicantTest, TestSize.Level1)
+{
+    RequestToSupplicantTest();
+}
+
+HWTEST_F(WifiSupplicantifaceTest, ConnectTest, TestSize.Level1)
+{
+    ConnectTest();
+}
+
+HWTEST_F(WifiSupplicantifaceTest, ReconnectTest, TestSize.Level1)
+{
+    ReconnectTest();
+}
+
+HWTEST_F(WifiSupplicantifaceTest, DisconnectTest, TestSize.Level1)
+{
+    DisconnectTest();
+}
+
+HWTEST_F(WifiSupplicantifaceTest, SetPowerSaveTest, TestSize.Level1)
+{
+    SetPowerSaveTest();
+}
+
+HWTEST_F(WifiSupplicantifaceTest, WpaSetCountryCodeTest, TestSize.Level1)
+{
+    WpaSetCountryCodeTest();
+}
+
+HWTEST_F(WifiSupplicantifaceTest, WpaGetCountryCodeTest, TestSize.Level1)
+{
+    WpaGetCountryCodeTest();
+}
 
 }  // namespace Wifi
 }  // namespace OHOS

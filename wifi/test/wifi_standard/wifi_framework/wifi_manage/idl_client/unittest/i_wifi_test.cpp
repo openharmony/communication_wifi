@@ -12,17 +12,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
+#include <gtest/gtest.h>
+#include "client.h"
 #include "i_wifi.h"
 
 using namespace testing::ext;
 
 namespace OHOS {
 namespace Wifi {
-
-constexpr int LENTH = 5;
-
 class IWifiTest : public testing::Test {
 public:
     static void SetUpTestCase()
@@ -37,16 +34,16 @@ public:
 
 HWTEST_F(IWifiTest, GetWifiChipTest, TestSize.Level1)
 {
-    uint8_t id = 1;;
+    uint8_t id = 1;
     IWifiChip chip;
     GetWifiChip(id, &chip);
 }
 
 HWTEST_F(IWifiTest, GetWifiChipIdsTest, TestSize.Level1)
 {
-    uint8_t ids = 1;;
+    uint8_t ids = 1;
     int32_t size = 1;
-    GetWifiChip(&ids, &size);
+    GetWifiChipIds(&ids, &size);
 }
 
 HWTEST_F(IWifiTest, StopTest, TestSize.Level1)
@@ -62,7 +59,8 @@ HWTEST_F(IWifiTest, NotifyClearTest, TestSize.Level1)
 HWTEST_F(IWifiTest, OnTransactTest, TestSize.Level1)
 {
     Context context;
-    context.szRead = "12";
+    char test[] = "12";
+    context.szRead = test;
     OnTransact(&context);
 }
 }  // namespace Wifi

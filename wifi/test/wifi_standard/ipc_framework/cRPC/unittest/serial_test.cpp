@@ -20,7 +20,7 @@ using namespace testing::ext;
 
 namespace OHOS {
 namespace Wifi {
-HWTEST_F(SerialTest, SerialTest, TestSize.Level1)
+HWTEST_F(SerialTest, SerialOneTest, TestSize.Level1)
 {
     ctx = CreateContext(1024);
     WriteBegin(ctx, 0);
@@ -53,7 +53,11 @@ HWTEST_F(SerialTest, SerialTest, TestSize.Level1)
 
     WriteEnd(ctx);
     ASSERT_EQ(WriteEnd(test), -1);
+}
 
+HWTEST_F(SerialTest, SerialTwoTest, TestSize.Level1)
+{
+    ctx = CreateContext(1024);
     ctx->oneProcess = ctx->szWrite;
     ctx->nSize = ctx->wEnd;
 

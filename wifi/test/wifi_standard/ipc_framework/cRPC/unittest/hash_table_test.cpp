@@ -60,8 +60,8 @@ HWTEST_F(HashTableTest, UseHashTableTest, TestSize.Level1)
     EXPECT_EQ(InsertHashTable(table, ctx), -2);
     free(ctx);
     int del = 0;
-    int fd = 1;
-    FindContext(p, fd);
+    int file = 1;
+    FindContext(p, file);
     for (int fd = 1; fd <= 100; ++fd) {
         Context *pCtx = FindContext(table, fd);
         EXPECT_NE(pCtx, nullptr);

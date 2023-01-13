@@ -179,7 +179,7 @@ public:
     void StartScanTest()
     {
         ScanSettings *settings;
-		settings->freqs = NUM;
+        settings->freqs = NUM;
         settings->freqSize = SIZE;
         settings->hiddenSsidSize = SIZE;
         StartScan(settings);
@@ -209,12 +209,12 @@ public:
         ScanInfo* scanInfo;
         context->fd = NUM;
         context->rBegin = NUM;
-		context->nPos = NUM;
-		context->nSize = SIZE;
+        context->nPos = NUM;
+        context->nSize = SIZE;
         scanInfo->freq = NUM;
-		scanInfo->antValue = NUM;
-		scanInfo->associated = NUM;
-		scanInfo->centerFrequency0 = NUM;
+        scanInfo->antValue = NUM;
+        scanInfo->associated = NUM;
+        scanInfo->centerFrequency0 = NUM;
         if (strcpy_s(context->szRead, sizeof(context->szRead), "GetScanInfoElems") != EOK) {
             return;
         }
@@ -237,11 +237,11 @@ public:
     VOID StartPnoScanTest()
     {
         PnoScanSettings *settings;
-		settings->freqSize = NUM;
-		settings->freqs = nullptr;
-		settings->hiddenSsidSize = NUM;
-		settings->minRssi5Ghz = NUM;
-		settings->minRssi2Dot4Ghz = NUM;
+        settings->freqSize = NUM;
+        settings->freqs = nullptr;
+        settings->hiddenSsidSize = NUM;
+        settings->minRssi5Ghz = NUM;
+        settings->minRssi2Dot4Ghz = NUM;
         if (strcpy_s(settings->hiddenSsid, sizeof(settings->hiddenSsid), "StartPnoScan") != EOK) {
             return;
         }

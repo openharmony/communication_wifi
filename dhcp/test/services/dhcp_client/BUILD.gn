@@ -58,7 +58,7 @@ ohos_unittest("dhcp_client_unittest") {
   deps = [
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
-    "//third_party/openssl:libcrypto_static",
+    "//third_party/openssl:libcrypto_shared",
   ]
 
   ldflags = [

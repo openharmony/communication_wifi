@@ -202,26 +202,20 @@ void WifiDeviceStub::OnUpdateDeviceConfig(uint32_t code, MessageParcel &data, Me
 
 void WifiDeviceStub::ReadWifiDeviceConfig(MessageParcel &data, WifiDeviceConfig &config)
 {
-    const char *readStr = nullptr;
     config.networkId = data.ReadInt32();
     config.status = data.ReadInt32();
-    readStr = data.ReadCString();
-    config.bssid = (readStr != nullptr) ? readStr : "";
-    readStr = data.ReadCString();
-    config.ssid = (readStr != nullptr) ? readStr : "";
+    config.bssid = data.ReadString();
+    config.ssid = data.ReadString();
     config.band = data.ReadInt32();
     config.channel = data.ReadInt32();
     config.frequency = data.ReadInt32();
     config.level = data.ReadInt32();
     config.isPasspoint = data.ReadBool();
     config.isEphemeral = data.ReadBool();
-    readStr = data.ReadCString();
-    config.preSharedKey = (readStr != nullptr) ? readStr : "";
-    readStr = data.ReadCString();
-    config.keyMgmt = (readStr != nullptr) ? readStr : "";
+    config.preSharedKey = data.ReadString();
+    config.keyMgmt = data.ReadString();
     for (int i = 0; i < WEPKEYS_SIZE; i++) {
-        readStr = data.ReadCString();
-        config.wepKeys[i] = (readStr != nullptr) ? readStr : "";
+        config.wepKeys[i] = data.ReadString();
     }
     config.wepTxKeyIndex = data.ReadInt32();
     config.priority = data.ReadInt32();
@@ -234,27 +228,18 @@ void WifiDeviceStub::ReadWifiDeviceConfig(MessageParcel &data, WifiDeviceConfig 
     ReadIpAddress(data, config.wifiIpConfig.staticIpAddress.gateway);
     ReadIpAddress(data, config.wifiIpConfig.staticIpAddress.dnsServer1);
     ReadIpAddress(data, config.wifiIpConfig.staticIpAddress.dnsServer2);
-    readStr = data.ReadCString();
-    config.wifiIpConfig.staticIpAddress.domains = (readStr != nullptr) ? readStr : "";
-    readStr = data.ReadCString();
-    config.wifiEapConfig.eap = (readStr != nullptr) ? readStr : "";
-    readStr = data.ReadCString();
-    config.wifiEapConfig.identity = (readStr != nullptr) ? readStr : "";
-    readStr = data.ReadCString();
-    config.wifiEapConfig.password = (readStr != nullptr) ? readStr : "";
-    readStr = data.ReadCString();
-    config.wifiEapConfig.clientCert = (readStr != nullptr) ? readStr : "";
-    readStr = data.ReadCString();
-    config.wifiEapConfig.privateKey = (readStr != nullptr) ? readStr : "";
+    config.wifiIpConfig.staticIpAddress.domains = data.ReadString();
+    config.wifiEapConfig.eap = data.ReadString();
+    config.wifiEapConfig.identity = data.ReadString();
+    config.wifiEapConfig.password = data.ReadString();
+    config.wifiEapConfig.clientCert = data.ReadString();
+    config.wifiEapConfig.privateKey = data.ReadString();
     config.wifiEapConfig.phase2Method = Phase2Method(data.ReadInt32());
     config.wifiProxyconfig.configureMethod = ConfigureProxyMethod(data.ReadInt32());
-    readStr = data.ReadCString();
-    config.wifiProxyconfig.autoProxyConfig.pacWebAddress = (readStr != nullptr) ? readStr : "";
-    readStr = data.ReadCString();
-    config.wifiProxyconfig.manualProxyConfig.serverHostName = (readStr != nullptr) ? readStr : "";
+    config.wifiProxyconfig.autoProxyConfig.pacWebAddress = data.ReadString();
+    config.wifiProxyconfig.manualProxyConfig.serverHostName = data.ReadString();
     config.wifiProxyconfig.manualProxyConfig.serverPort = data.ReadInt32();
-    readStr = data.ReadCString();
-    config.wifiProxyconfig.manualProxyConfig.exclusionObjectList = (readStr != nullptr) ? readStr : "";
+    config.wifiProxyconfig.manualProxyConfig.exclusionObjectList = data.ReadString();
     config.wifiPrivacySetting = WifiPrivacyConfig(data.ReadInt32());
     return;
 }

@@ -139,10 +139,19 @@ ErrCode WifiHotspotServiceImpl::SetHotspotConfig(const HotspotConfig &config)
     }
 
     if (!mGetChannels) {
-        if  (!WifiConfigCenter::GetInstance().GetSupportedBandChannel()) {
-            WIFI_LOGE("Failed to get supported band and channel!");
+        IApService *pService = WifiServiceManager::GetInstance().GetApServiceInst(m_id);
+        if (IsApServiceRunning() && pService != nullptr) {
+            std::vector<int32_t> valid2GChannel;
+            std::vector<int32_t> valid5GChannel;
+            (void)pService->GetValidChannels(BandType::BAND_2GHZ, valid2GChannel);
+            (void)pService->GetValidChannels(BandType::BAND_5GHZ, valid5GChannel);
+            if (valid2GChannel.size() + valid5GChannel.size() == 0) {
+                WIFI_LOGE("Failed to get supported band and channel!");
+            } else {
+                mGetChannels = true;
+            }
         } else {
-            mGetChannels = true;
+            WIFI_LOGE("Instance %{public}d, ap service is not started!", m_id);
         }
     }
     std::vector<BandType> bandsFromCenter;
@@ -159,7 +168,6 @@ ErrCode WifiHotspotServiceImpl::SetHotspotConfig(const HotspotConfig &config)
 
     WifiLinkedInfo linkInfo;
     WifiConfigCenter::GetInstance().GetLinkedInfo(linkInfo);
-
     if (!linkInfo.ssid.empty() && linkInfo.ssid == config.GetSsid()) {
         WIFI_LOGE("set ssid equal current linked ap ssid, no permission!");
         return WIFI_OPT_INVALID_PARAM;

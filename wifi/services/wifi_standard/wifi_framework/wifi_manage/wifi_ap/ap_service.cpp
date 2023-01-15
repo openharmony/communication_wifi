@@ -218,8 +218,7 @@ ErrCode ApService::GetValidChannels(BandType band, std::vector<int32_t> &validCh
 
 ErrCode ApService::RegisterApServiceCallbacks(const IApServiceCallbacks &callbacks)
 {
-    WIFI_LOGI("Instance %{public}d %{public}s", m_id, __func__);
-    WIFI_LOGI("RegisterApServiceCallbacks.");
+    WIFI_LOGI("%{public}s, Instance %{public}d ", __func__, m_id);
     m_ApStateMachine.RegisterApServiceCallbacks(callbacks);
     return ErrCode::WIFI_OPT_SUCCESS;
 }

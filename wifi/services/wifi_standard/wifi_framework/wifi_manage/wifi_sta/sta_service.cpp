@@ -81,6 +81,44 @@ ErrCode StaService::InitStaService(const StaServiceCallback &callbacks)
 
     pStaMonitor->SetStateMachine(pStaStateMachine);
 
+    ChannelsTable chanTbs;
+    (void)WifiSettings::GetInstance().GetValidChannels(chanTbs);
+    if (chanTbs[BandType::BAND_2GHZ].size() == 0) {
+        std::vector<int> freqs2G;
+        std::vector<int> freqs5G;
+        int band = static_cast<int>(BandType::BAND_2GHZ);
+        WifiErrorNo ret = WifiStaHalInterface::GetInstance().GetSupportFrequencies(band, freqs2G);
+        if (ret != WIFI_IDL_OPT_OK) {
+            WIFI_LOGE("get 2g frequencies failed.");
+            WifiSettings::GetInstance().SetDefaultFrequenciesByCountryBand(BandType::BAND_2GHZ, freqs2G);
+        }
+        band = static_cast<int>(BandType::BAND_5GHZ);
+        ret = WifiStaHalInterface::GetInstance().GetSupportFrequencies(band, freqs5G);
+        if (ret != WIFI_IDL_OPT_OK) {
+            WIFI_LOGE("get 5g frequencies failed.");
+            WifiSettings::GetInstance().SetDefaultFrequenciesByCountryBand(BandType::BAND_5GHZ, freqs5G);
+        }
+        std::vector<int32_t> supp2Gfreqs(freqs2G.begin(), freqs2G.end());
+        std::vector<int32_t> supp5Gfreqs(freqs5G.begin(), freqs5G.end());
+        for (auto iter = supp2Gfreqs.begin(); iter != supp2Gfreqs.end(); iter++) {
+            int32_t channel = FrequencyToChannel(*iter);
+            if (channel == INVALID_FREQ_OR_CHANNEL) {
+                continue;
+            }
+            chanTbs[BandType::BAND_2GHZ].push_back(channel);
+        }
+        for (auto iter = supp5Gfreqs.begin(); iter != supp5Gfreqs.end(); iter++) {
+            int32_t channel = FrequencyToChannel(*iter);
+            if (channel == INVALID_FREQ_OR_CHANNEL) {
+                continue;
+            }
+            chanTbs[BandType::BAND_5GHZ].push_back(channel);
+        }
+        if (WifiSettings::GetInstance().SetValidChannels(chanTbs)) {
+            WIFI_LOGE("%{public}s, fail to SetValidChannels", __func__);
+        }
+    }
+
     pStaAutoConnectService = new (std::nothrow) StaAutoConnectService(pStaStateMachine);
     if (pStaAutoConnectService == nullptr) {
         WIFI_LOGE("Alloc pStaAutoConnectService failed.\n");

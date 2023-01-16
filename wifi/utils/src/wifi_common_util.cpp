@@ -31,7 +31,6 @@ namespace OHOS {
 namespace Wifi {
 DEFINE_WIFILOG_LABEL("WifiCommonUtil");
 
-constexpr int INVALID_FREQ_OR_CHANNEL = -1;
 constexpr int FREQ_2G_MIN = 2412;
 constexpr int FREQ_2G_MAX = 2472;
 constexpr int FREQ_5G_MIN = 5170;
@@ -312,6 +311,22 @@ bool IsForegroundApp(const int uid)
     return false;
 }
 
+TimeStats::TimeStats(const std::string desc): m_desc(desc)
+{
+    m_startTime = std::chrono::steady_clock::now();
+    WIFI_LOGI("[Time stats][start] %{public}s.", m_desc.c_str());
+}
+
+TimeStats::~TimeStats()
+{
+    auto us = std::chrono::duration_cast<std::chrono::microseconds>
+        (std::chrono::steady_clock::now() - m_startTime).count();
+    constexpr int TIME_BASE = 1000;
+    WIFI_LOGI("[Time stats][end] %{public}s, time cost:%{public}lldus, %{public}lldms, %{public}llds",
+        m_desc.c_str(), us, us / TIME_BASE, us / TIME_BASE / TIME_BASE);
+}
+#endif
+
 int FrequencyToChannel(int freq)
 {
     WIFI_LOGI("FrequencyToChannel: %{public}d", freq);
@@ -338,20 +353,5 @@ int ChannelToFrequency(int channel)
     return INVALID_FREQ_OR_CHANNEL;
 }
 
-TimeStats::TimeStats(const std::string desc): m_desc(desc)
-{
-    m_startTime = std::chrono::steady_clock::now();
-    WIFI_LOGI("[Time stats][start] %{public}s.", m_desc.c_str());
-}
-
-TimeStats::~TimeStats()
-{
-    auto us = std::chrono::duration_cast<std::chrono::microseconds>
-        (std::chrono::steady_clock::now() - m_startTime).count();
-    constexpr int TIME_BASE = 1000;
-    WIFI_LOGI("[Time stats][end] %{public}s, time cost:%{public}lldus, %{public}lldms, %{public}llds",
-        m_desc.c_str(), us, us / TIME_BASE, us / TIME_BASE / TIME_BASE);
-}
-#endif
 }  // namespace Wifi
 }  // namespace OHOS

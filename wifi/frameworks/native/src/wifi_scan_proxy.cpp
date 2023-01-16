@@ -235,7 +235,6 @@ ErrCode WifiScanProxy::GetScanInfoList(std::vector<WifiScanInfo> &result)
         WIFI_LOGW("failed to `%{public}s`,remote service is died!", __func__);
         return WIFI_OPT_FAILED;
     }
-    const char *readStr = nullptr;
     MessageOption option;
     MessageParcel data;
     MessageParcel reply;
@@ -266,12 +265,9 @@ ErrCode WifiScanProxy::GetScanInfoList(std::vector<WifiScanInfo> &result)
     }
     for (int i = 0; i < tmpsize; ++i) {
         WifiScanInfo info;
-        readStr = reply.ReadCString();
-        info.bssid = (readStr != nullptr) ? readStr : "";
-        readStr = reply.ReadCString();
-        info.ssid = (readStr != nullptr) ? readStr : "";
-        readStr = reply.ReadCString();
-        info.capabilities = (readStr != nullptr) ? readStr : "";
+        info.bssid = reply.ReadString();
+        info.ssid = reply.ReadString();
+        info.capabilities = reply.ReadString();
         info.frequency = reply.ReadInt32();
         info.rssi = reply.ReadInt32();
         info.timestamp = reply.ReadInt64();

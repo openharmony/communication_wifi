@@ -36,7 +36,7 @@ public:
     void RpcClientCallTest1()
     {
         RpcClient* client = nullptr;
-        const char* func = nullptr;
+        std::string func = nullptr;
         RpcClientCall(client, func);
     }
 
@@ -46,10 +46,7 @@ public:
         client.callLockFlag = NUMBER;
         client.threadRunFlag = NUMBER;
         client.waitReply = NUMBER;
-        const char* func = nullptr;
-        if (strcpy_s(func, sizeof(func), "RpcClientCall") != EOK) {
-            return;
-        }
+        std::string func = "RpcClientCall";
         RpcClientCall(&client, func);
     }
 };

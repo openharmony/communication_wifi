@@ -117,13 +117,11 @@ public:
     void Unregister(const napi_env& env, const std::string& type, napi_value handler);
 
 private:
-    ErrCode RegisterWifiEvents();
+    ErrCode RegisterWifiEvents(int32_t sysCap);
     bool IsEventSupport(const std::string& type);
     int CheckPermission(const std::string& eventType);
     void DeleteRegisterObj(const napi_env& env, std::vector<RegObj>& vecRegObjs, napi_value& handler);
     void DeleteAllRegisterObj(const napi_env& env, std::vector<RegObj>& vecRegObjs);
-
-    static bool isEventRegistered;
 };
 
 napi_value On(napi_env env, napi_callback_info cbinfo);

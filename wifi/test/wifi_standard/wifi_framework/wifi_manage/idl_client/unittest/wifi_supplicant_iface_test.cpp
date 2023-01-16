@@ -36,7 +36,7 @@ public:
     void RpcClientCallTest1()
     {
         RpcClient* client = nullptr;
-        std::string func = nullptr;
+        char func[] = "RpcClientCall";
         RpcClientCall(client, func);
     }
 
@@ -46,7 +46,7 @@ public:
         client.callLockFlag = NUMBER;
         client.threadRunFlag = NUMBER;
         client.waitReply = NUMBER;
-        std::string func = "RpcClientCall";
+        char func[] = "RpcClientCall";
         RpcClientCall(&client, func);
     }
 };

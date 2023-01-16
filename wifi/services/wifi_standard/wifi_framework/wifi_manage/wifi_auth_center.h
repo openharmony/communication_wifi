@@ -17,6 +17,7 @@
 #define OHOS_WIFI_AUTH_CENTER_H
 
 #include <map>
+#include "wifi_logger.h"
 
 namespace OHOS {
 namespace Wifi {

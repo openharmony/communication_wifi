@@ -58,6 +58,7 @@ public:
     void SetStateMachineFail();
     void OnConnectChangedCallBackSuccess1();
     void OnConnectChangedCallBackSuccess2();
+    void OnConnectChangedCallBackSuccess3();
     void OnConnectChangedCallBackFail1();
     void OnConnectChangedCallBackFail2();
     void OnConnectChangedCallBackFail3();
@@ -138,6 +139,19 @@ void StaMonitorTest::OnConnectChangedCallBackSuccess1()
 void StaMonitorTest::OnConnectChangedCallBackSuccess2()
 {
     int status = WPA_CB_DISCONNECTED;
+    int networkId = 1;
+    std::string bssid = "01:23:45:67:89:AB";
+    WifiLinkedInfo linkedInfo;
+    linkedInfo.connState = ConnState::DISCONNECTED;
+    EXPECT_CALL(WifiSettings::GetInstance(), GetLinkedInfo(_))
+        .Times(AtLeast(0))
+        .WillOnce(DoAll(SetArgReferee<0>(linkedInfo), Return(0)));
+    pStaMonitor->OnConnectChangedCallBack(status, networkId, bssid);
+}
+
+void StaMonitorTest::OnConnectChangedCallBackSuccess3()
+{
+    int status = 0;
     int networkId = 1;
     std::string bssid = "01:23:45:67:89:AB";
     WifiLinkedInfo linkedInfo;
@@ -345,6 +359,11 @@ HWTEST_F(StaMonitorTest, OnConnectChangedCallBackSuccess1, TestSize.Level1)
 HWTEST_F(StaMonitorTest, OnConnectChangedCallBackSuccess2, TestSize.Level1)
 {
     OnConnectChangedCallBackSuccess2();
+}
+
+HWTEST_F(StaMonitorTest, OnConnectChangedCallBackSuccess3, TestSize.Level1)
+{
+    OnConnectChangedCallBackSuccess3();
 }
 
 HWTEST_F(StaMonitorTest, OnWpaStateChangedCallBackSuccess, TestSize.Level1)

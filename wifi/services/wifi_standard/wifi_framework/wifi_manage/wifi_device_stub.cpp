@@ -516,13 +516,13 @@ void WifiDeviceStub::OnGetLinkedInfo(uint32_t code, MessageParcel &data, Message
 
     if (ret == WIFI_OPT_SUCCESS) {
         reply.WriteInt32(wifiInfo.networkId);
-        reply.WriteCString(wifiInfo.ssid.c_str());
-        reply.WriteCString(wifiInfo.bssid.c_str());
+        reply.WriteString(wifiInfo.ssid);
+        reply.WriteString(wifiInfo.bssid);
         reply.WriteInt32(wifiInfo.rssi);
         reply.WriteInt32(wifiInfo.band);
         reply.WriteInt32(wifiInfo.frequency);
         reply.WriteInt32(wifiInfo.linkSpeed);
-        reply.WriteCString(wifiInfo.macAddress.c_str());
+        reply.WriteString(wifiInfo.macAddress);
         reply.WriteInt32(wifiInfo.macType);
         reply.WriteInt32(wifiInfo.ipAddress);
         reply.WriteInt32((int)wifiInfo.connState);
@@ -532,7 +532,7 @@ void WifiDeviceStub::OnGetLinkedInfo(uint32_t code, MessageParcel &data, Message
         reply.WriteInt32(wifiInfo.chload);
         reply.WriteInt32(wifiInfo.snr);
         reply.WriteInt32(wifiInfo.isDataRestricted);
-        reply.WriteCString(wifiInfo.portalUrl.c_str());
+        reply.WriteString(wifiInfo.portalUrl);
         reply.WriteInt32((int)wifiInfo.supplicantState);
         reply.WriteInt32((int)wifiInfo.detailedState);
     }
@@ -547,7 +547,6 @@ void WifiDeviceStub::OnGetIpInfo(uint32_t code, MessageParcel &data, MessageParc
     ErrCode ret = GetIpInfo(info);
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
-
     if (ret == WIFI_OPT_SUCCESS) {
         reply.WriteInt32(info.ipAddress);
         reply.WriteInt32(info.gateway);
@@ -557,7 +556,6 @@ void WifiDeviceStub::OnGetIpInfo(uint32_t code, MessageParcel &data, MessageParc
         reply.WriteInt32(info.serverIp);
         reply.WriteInt32(info.leaseDuration);
     }
-
     return;
 }
 
@@ -565,16 +563,10 @@ void WifiDeviceStub::OnSetCountryCode(uint32_t code, MessageParcel &data, Messag
 {
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
     ErrCode ret = WIFI_OPT_FAILED;
-    const char *countryCodeRead = data.ReadCString();
-    if (countryCodeRead == nullptr) {
-        ret = WIFI_OPT_INVALID_PARAM;
-    } else {
-        std::string countrycode = countryCodeRead;
-        ret = SetCountryCode(countrycode);
-    }
+    std::string countrycode = data.ReadString();
+    ret = SetCountryCode(countrycode);
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
-
     return;
 }
 
@@ -587,7 +579,7 @@ void WifiDeviceStub::OnGetCountryCode(uint32_t code, MessageParcel &data, Messag
     reply.WriteInt32(ret);
 
     if (ret == WIFI_OPT_SUCCESS) {
-        reply.WriteCString(countryCode.c_str());
+        reply.WriteString(countryCode);
     }
 
     return;

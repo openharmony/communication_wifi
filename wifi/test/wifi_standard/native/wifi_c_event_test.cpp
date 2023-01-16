@@ -23,7 +23,7 @@ using ::testing::ext::TestSize;
 
 namespace OHOS {
 namespace Wifi {
-class WifiEventTest : public testing::Test{
+class WifiEventTest : public testing::Test {
 public:
     static void SetUpTestCase(){};
     static void TearDownTestCase(){};
@@ -40,18 +40,16 @@ public:
         WifiEvent *event = nullptr;
         UnRegisterWifiEvent(event);
     }
-
 };
 
 HWTEST_F(WifiEventTest, SetIsEventRegistratedTest, TestSize.Level1)
 {
     RegisterWifiEventTest();
 }
+
 HWTEST_F(WifiEventTest, UnRegisterWifiEventTest, TestSize.Level1)
 {
     UnRegisterWifiEventTest();
 }
-
-
 }  // namespace Wifi
 }  // namespace OHOS

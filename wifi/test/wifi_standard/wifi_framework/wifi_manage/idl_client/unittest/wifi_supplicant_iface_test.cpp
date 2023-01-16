@@ -19,10 +19,7 @@
 #include <cstdint>
 #include "securec.h"
 
-
-
 #define NUMBER 5
-
 
 using ::testing::Return;
 using ::testing::ext::TestSize;
@@ -45,19 +42,15 @@ public:
 
     void RpcClientCallTest2()
     {
-        RpcClient* client;
-        client->callLockFlag = NUMBER;
-        client->threadRunFlag = NUMBER;
-        client->waitReply = NUMBER;
-        char* func;
+        RpcClient client;
+        client.callLockFlag = NUMBER;
+        client.threadRunFlag = NUMBER;
+        client.waitReply = NUMBER;
+        char* func = nullptr;
         if (strcpy_s(func, sizeof(func), "RpcClientCall") != EOK) {
             return;
         }
-        if (strcpy_s(client->context, sizeof(client->context), "RpcClientCall") != EOK) {
-            return;
-        }
-
-        RpcClientCall(client, func);
+        RpcClientCall(&client, func);
     }
 
 };	

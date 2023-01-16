@@ -60,10 +60,10 @@ public:
         WifiRoamCapability *capability = nullptr;
         GetRoamingCapabilities(capability);
     }
-}
-HWTEST_F(WifiStaIfaceTest, GetDeviceMacAddressTest, TestSize.Level1)
+};
+HWTEST_F(WifiStaIfaceTest, StartScanTest, TestSize.Level1)
 {
-    GetDeviceMacAddressTest();
+    StartScanTest();
 }
 HWTEST_F(WifiStaIfaceTest, StartPnoScanTest, TestSize.Level1)
 {

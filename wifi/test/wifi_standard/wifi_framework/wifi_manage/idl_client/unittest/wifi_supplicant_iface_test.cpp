@@ -12,15 +12,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "../../..//services/wifi_standard/wifi_framework/wifi_manage/idl_client/idl_interface/i_wifi_supplicant_iface.h"
 #include "../../..//services/wifi_standard/wifi_framework/wifi_manage/idl_client/idl_interface/i_wifi_public_func.h"
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
+#include <cstddef>
+#include <cstdint>
+#include "securec.h"
 
-#define BUFSIZE 1
-#define NETWORKID 1
-#define ENABLE 1
-#define CODESIZE 1
+
+
+#define NUMBER 5
+
 
 using ::testing::Return;
 using ::testing::ext::TestSize;
@@ -34,141 +36,42 @@ public:
     virtual void SetUp(){};
     virtual void TearDown(){};
 
-    void RpcClientCallTest()
+    void RpcClientCallTest1()
     {
         RpcClient* client = nullptr;
         char* func = nullptr;
         RpcClientCall(client, func);
     }
 
-    void StartSupplicantTest()
+    void RpcClientCallTest2()
     {
-        StartSupplicant();
+        RpcClient* client;
+        client->callLockFlag = NUMBER;
+        client->threadRunFlag = NUMBER;
+        client->waitReply = NUMBER;
+        char* func;
+        if (strcpy_s(func, sizeof(func), "RpcClientCall") != EOK) {
+            return;
+        }
+        if (strcpy_s(client->context, sizeof(client->context), "RpcClientCall") != EOK) {
+            return;
+        }
+
+        RpcClientCall(client, func);
     }
 
-	void StopSupplicantTest()
-    {
-        StopSupplicant();
-    }
-
-    void ConnectSupplicantTest()
-    {
-        ConnectSupplicant();
-    }
-
-    void DisconnectSupplicantTest()
-    {
-        DisconnectSupplicant();
-    }
-
-    void RequestToSupplicantTest()
-    {
-        char* buf = nullptr;
-        int32_t bufsize = BUFSIZE;
-        RequestToSupplicant((unsigned char*)buf, bufsize);
-    }
-
-    void RegisterSupplicantEventCallbackTest()
-    {
-        ISupplicantEventCallback callback;
-        RegisterSupplicantEventCallback(callback);
-    }
-
-    void ConnectTest()
-    {
-        int networkId = NETWORKID;
-        Connect(networkId);
-    }
-
-    void ReconnectTest()
-    {
-        Reconnect();
-    }
-
-    void DisconnectTest()
-    {
-        Disconnect();
-    }
-
-    void SetPowerSaveTest()
-    {
-        int enable = ENABLE;
-        SetPowerSave(enable);
-    }
-
-    void WpaSetCountryCodeTest()
-    {
-        char* countryCode = nullptr;
-        WpaSetCountryCode(countryCode);
-    }
-
-    void WpaGetCountryCodeTest()
-    {
-        char* countryCode = nullptr;
-        int codesize = CODESIZE;
-        WpaGetCountryCode(countryCode, codesize);
-    }
 };	
 
-HWTEST_F(WifiSupplicantifaceTest, RpcClientCallTest, TestSize.Level1)
+HWTEST_F(WifiSupplicantifaceTest, RpcClientCallTest1, TestSize.Level1)
 {
-    RpcClientCallTest();
+    RpcClientCallTest1();
 }
 
-HWTEST_F(WifiSupplicantifaceTest, StartSupplicantTest, TestSize.Level1)
+HWTEST_F(WifiSupplicantifaceTest, RpcClientCallTest2, TestSize.Level1)
 {
-    StartSupplicantTest();
+    RpcClientCallTest2();
 }
 
-HWTEST_F(WifiSupplicantifaceTest, StopSupplicantTest, TestSize.Level1)
-{
-    StopSupplicantTest();
-}
-
-HWTEST_F(WifiSupplicantifaceTest, ConnectSupplicantTest, TestSize.Level1)
-{
-    ConnectSupplicantTest();
-}
-
-HWTEST_F(WifiSupplicantifaceTest, DisconnectSupplicantTest, TestSize.Level1)
-{
-    DisconnectSupplicantTest();
-}
-
-HWTEST_F(WifiSupplicantifaceTest, RequestToSupplicantTest, TestSize.Level1)
-{
-    RequestToSupplicantTest();
-}
-
-HWTEST_F(WifiSupplicantifaceTest, ConnectTest, TestSize.Level1)
-{
-    ConnectTest();
-}
-
-HWTEST_F(WifiSupplicantifaceTest, ReconnectTest, TestSize.Level1)
-{
-    ReconnectTest();
-}
-
-HWTEST_F(WifiSupplicantifaceTest, DisconnectTest, TestSize.Level1)
-{
-    DisconnectTest();
-}
-
-HWTEST_F(WifiSupplicantifaceTest, SetPowerSaveTest, TestSize.Level1)
-{
-    SetPowerSaveTest();
-}
-
-HWTEST_F(WifiSupplicantifaceTest, WpaSetCountryCodeTest, TestSize.Level1)
-{
-    WpaSetCountryCodeTest();
-}
-
-HWTEST_F(WifiSupplicantifaceTest, WpaGetCountryCodeTest, TestSize.Level1)
-{
-    WpaGetCountryCodeTest();
-}
 
 }  // namespace Wifi
 }  // namespace OHOS

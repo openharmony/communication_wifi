@@ -15,6 +15,9 @@
 #include "../../../services/wifi_standard/wifi_framework/wifi_manage/idl_client/idl_interface/i_wifi_sta_iface.h"
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
+#include <cstddef>
+#include <cstdint>
+
 
 #define CAPABILITIES 1
 #define LENMAC 5
@@ -43,7 +46,7 @@ public:
 	
     void GetStaCapabilitiesTest()
     {
-        int32_t capabilities = CAPABILITIES;
+        int32_t* capabilities = &CAPABILITIES;
         GetStaCapabilities(capabilities);
     }
 
@@ -82,7 +85,7 @@ public:
         if (strcpy_s(reulat, sizeof(reulat), "SetScanningMacAddress") != EOK) {
             return;
         }
-        SetScanningMacAddress((unsigned char *)reulat, lenMac)
+        SetScanningMacAddress((unsigned char *)reulat, lenMac);
     }
 
     void DeauthLastRoamingBssidTest()
@@ -97,7 +100,7 @@ public:
 
     void GetSupportFeatureTest()
     {
-        long* feature = LONGNUM;
+        long* feature = &LONGNUM;
         GetSupportFeature(feature);
     }
 
@@ -130,7 +133,7 @@ public:
 
     void AddNetworkTest()
     {
-        int* networkId = NETWORK;
+        int* networkId = &NETWORK;
         AddNetwork(networkId);
     }
 	
@@ -187,7 +190,7 @@ public:
 
     void GetNetworkListTest()
     {
-        int *size = SIZE;
+        int *size = &SIZE;
         WifiNetworkInfo *infos;
         infos->id = NUM;
         if (strcpy_s(infos->ssid, sizeof(infos->ssid), "GetNetworkList") != EOK) {
@@ -230,11 +233,11 @@ public:
 
     void GetScanInfosTest()
     {
-        int* size = SIZE;
+        int* size = &SIZE;
         GetScanInfos(size);
     }
 
-    VOID StartPnoScanTest()
+    void StartPnoScanTest()
     {
         PnoScanSettings *settings;
         settings->freqSize = NUM;
@@ -255,7 +258,7 @@ public:
 
     void CheckRegisterEventTest()
     {
-        int *events = EVENTS;
+        int *events = &EVENTS;
         int size = SIZE;
         CheckRegisterEvent(events, size);
     }
@@ -294,7 +297,7 @@ public:
         if (strcpy_s(param->pinCode, sizeof(param->bssid), "StartWpsPinMode") != EOK) {
             return;
         }
-		int *pinCode = PINCODE;
+        int *pinCode = &PINCODE;
         StartWpsPinMode(param, pinCode);
     }
 

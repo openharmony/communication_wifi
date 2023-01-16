@@ -52,6 +52,7 @@ ohos_unittest("idl_client_unittest") {
     "wifi_idl_interface_test.cpp",
     "wifi_p2p_hal_interface_test.cpp",
     "wifi_sta_hal_interface_test.cpp",
+    "wifi_sta_iface_test.cpp",
     "wifi_supplicant_hal_interface_test.cpp",
     "wifi_supplicant_iface_test.cpp",
   ]

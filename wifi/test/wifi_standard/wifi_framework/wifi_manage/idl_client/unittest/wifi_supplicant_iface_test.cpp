@@ -26,7 +26,7 @@ using ::testing::ext::TestSize;
 
 namespace OHOS {
 namespace Wifi {
-class WifiSupplicantifaceTest : public testing::Test{
+class WifiSupplicantifaceTest : public testing::Test {
 public:
     static void SetUpTestCase(){};
     static void TearDownTestCase(){};
@@ -36,7 +36,7 @@ public:
     void RpcClientCallTest1()
     {
         RpcClient* client = nullptr;
-        char* func = nullptr;
+        const char* func = nullptr;
         RpcClientCall(client, func);
     }
 
@@ -46,15 +46,13 @@ public:
         client.callLockFlag = NUMBER;
         client.threadRunFlag = NUMBER;
         client.waitReply = NUMBER;
-        char* func = nullptr;
+        const char* func = nullptr;
         if (strcpy_s(func, sizeof(func), "RpcClientCall") != EOK) {
             return;
         }
         RpcClientCall(&client, func);
     }
-
-};	
-
+};
 HWTEST_F(WifiSupplicantifaceTest, RpcClientCallTest1, TestSize.Level1)
 {
     RpcClientCallTest1();
@@ -64,7 +62,5 @@ HWTEST_F(WifiSupplicantifaceTest, RpcClientCallTest2, TestSize.Level1)
 {
     RpcClientCallTest2();
 }
-
-
 }  // namespace Wifi
 }  // namespace OHOS

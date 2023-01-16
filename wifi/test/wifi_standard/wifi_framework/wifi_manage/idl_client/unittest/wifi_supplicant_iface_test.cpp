@@ -64,13 +64,13 @@ public:
     void RequestToSupplicantTest()
     {
         char* buf = nullptr;
-		int32_t bufsize = BUFSIZE; 
-        RequestToSupplicant(buf, bufsize);
+        int32_t bufsize = BUFSIZE;
+        RequestToSupplicant((unsigned char*)buf, bufsize);
     }
 
     void RegisterSupplicantEventCallbackTest()
     {
-        ISupplicantEventCallback callback = nullptr;
+        ISupplicantEventCallback callback;
         RegisterSupplicantEventCallback(callback);
     }
 

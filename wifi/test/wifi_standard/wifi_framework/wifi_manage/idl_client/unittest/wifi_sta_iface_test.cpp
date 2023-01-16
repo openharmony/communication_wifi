@@ -23,7 +23,7 @@ using ::testing::ext::TestSize;
 
 namespace OHOS {
 namespace Wifi {
-class WifiStaIfaceTest : public testing::Test{
+class WifiStaIfaceTest : public testing::Test {
 public:
     static void SetUpTestCase(){};
     static void TearDownTestCase(){};
@@ -81,7 +81,5 @@ HWTEST_F(WifiStaIfaceTest, GetRoamingCapabilitiesTest, TestSize.Level1)
 {
     GetRoamingCapabilitiesTest();
 }
-
-
 }  // namespace Wifi
 }  // namespace OHOS

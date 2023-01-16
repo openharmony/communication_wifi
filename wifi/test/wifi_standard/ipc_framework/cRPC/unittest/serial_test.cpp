@@ -20,7 +20,7 @@ using namespace testing::ext;
 
 namespace OHOS {
 namespace Wifi {
-HWTEST_F(SerialTest, SerialTest, TestSize.Level1)
+HWTEST_F(SerialTest, SerialOneTest, TestSize.Level1)
 {
     ctx = CreateContext(1024);
     WriteBegin(ctx, 0);
@@ -53,7 +53,11 @@ HWTEST_F(SerialTest, SerialTest, TestSize.Level1)
 
     WriteEnd(ctx);
     ASSERT_EQ(WriteEnd(test), -1);
+}
 
+HWTEST_F(SerialTest, SerialTwoTest, TestSize.Level1)
+{
+    ctx = CreateContext(1024);
     ctx->oneProcess = ctx->szWrite;
     ctx->nSize = ctx->wEnd;
 
@@ -92,6 +96,7 @@ HWTEST_F(SerialTest, SerialTest, TestSize.Level1)
     ASSERT_EQ(ReadStr(test, str, 1024), -1);
     ASSERT_EQ(ReadStr(ctx, str, 1024), 0);
     EXPECT_TRUE(strcmp(str, "Hello, world") == 0);
+    int count = strlen("2c:f0:xx:xx:xx:be");
     ASSERT_EQ(ReadUStr(test, (unsigned char *)str, count + 1), -1);
     ASSERT_EQ(ReadUStr(ctx, (unsigned char *)str, count + 1), 0);
     EXPECT_TRUE(strcmp(str, "2c:f0:xx:xx:xx:be") == 0);

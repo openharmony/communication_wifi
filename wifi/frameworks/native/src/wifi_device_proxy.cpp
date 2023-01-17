@@ -909,18 +909,14 @@ ErrCode WifiDeviceProxy::GetWifiState(int &state)
 
 void WifiDeviceProxy::ReadLinkedInfo(MessageParcel &reply, WifiLinkedInfo &info)
 {
-    const char *readStr = nullptr;
     info.networkId = reply.ReadInt32();
-    readStr = reply.ReadCString();
-    info.ssid = (readStr != nullptr) ? readStr : "";
-    readStr = reply.ReadCString();
-    info.bssid = (readStr != nullptr) ? readStr : "";
+    info.ssid = reply.ReadString();
+    info.bssid = reply.ReadString();
     info.rssi = reply.ReadInt32();
     info.band = reply.ReadInt32();
     info.frequency = reply.ReadInt32();
     info.linkSpeed = reply.ReadInt32();
-    readStr = reply.ReadCString();
-    info.macAddress = (readStr != nullptr) ? readStr : "";
+    info.macAddress = reply.ReadString();
     info.macType = reply.ReadInt32();
     info.ipAddress = reply.ReadInt32();
     int tmpConnState = reply.ReadInt32();
@@ -935,8 +931,7 @@ void WifiDeviceProxy::ReadLinkedInfo(MessageParcel &reply, WifiLinkedInfo &info)
     info.chload = reply.ReadInt32();
     info.snr = reply.ReadInt32();
     info.isDataRestricted = reply.ReadInt32();
-    readStr = reply.ReadCString();
-    info.portalUrl = (readStr != nullptr) ? readStr : "";
+    info.portalUrl = reply.ReadString();
 
     int tmpState = reply.ReadInt32();
     if ((tmpState >= 0) && (tmpState <= (int)SupplicantState::INVALID)) {
@@ -1035,7 +1030,7 @@ ErrCode WifiDeviceProxy::SetCountryCode(const std::string &countryCode)
         return WIFI_OPT_FAILED;
     }
     data.WriteInt32(0);
-    data.WriteCString(countryCode.c_str());
+    data.WriteString(countryCode);
     int error = Remote()->SendRequest(WIFI_SVR_CMD_SET_COUNTRY_CODE, data, reply, option);
     if (error != ERR_NONE) {
         WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d", WIFI_SVR_CMD_SET_COUNTRY_CODE, error);
@@ -1050,7 +1045,6 @@ ErrCode WifiDeviceProxy::SetCountryCode(const std::string &countryCode)
 
 ErrCode WifiDeviceProxy::GetCountryCode(std::string &countryCode)
 {
-    const char *readStr = nullptr;
     if (mRemoteDied) {
         WIFI_LOGE("failed to `%{public}s`,remote service is died!", __func__);
         return WIFI_OPT_FAILED;
@@ -1075,9 +1069,7 @@ ErrCode WifiDeviceProxy::GetCountryCode(std::string &countryCode)
     if (ret != WIFI_OPT_SUCCESS) {
         return ErrCode(ret);
     }
-
-    readStr = reply.ReadCString();
-    countryCode = (readStr != nullptr) ? readStr : "";
+    countryCode = reply.ReadString();
     return WIFI_OPT_SUCCESS;
 }
 

@@ -164,20 +164,16 @@ int WifiDeviceCallBackStub::RemoteOnWifiStateChanged(uint32_t code, MessageParce
 int WifiDeviceCallBackStub::RemoteOnWifiConnectionChanged(uint32_t code, MessageParcel &data, MessageParcel &reply)
 {
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
-    const char *readStr = nullptr;
     int state = data.ReadInt32();
     WifiLinkedInfo info;
     info.networkId = data.ReadInt32();
-    readStr = data.ReadCString();
-    info.ssid = (readStr != nullptr) ? readStr : "";
-    readStr = data.ReadCString();
-    info.bssid = (readStr != nullptr) ? readStr : "";
+    info.ssid = data.ReadString();
+    info.bssid = data.ReadString();
     info.rssi = data.ReadInt32();
     info.band = data.ReadInt32();
     info.frequency = data.ReadInt32();
     info.linkSpeed = data.ReadInt32();
-    readStr = data.ReadCString();
-    info.macAddress = (readStr != nullptr) ? readStr : "";
+    info.macAddress = data.ReadString();
     info.ipAddress = data.ReadInt32();
     int tmpConnState = data.ReadInt32();
     if (tmpConnState >= 0 && tmpConnState <= int(ConnState::UNKNOWN)) {
@@ -191,8 +187,7 @@ int WifiDeviceCallBackStub::RemoteOnWifiConnectionChanged(uint32_t code, Message
     info.chload = data.ReadInt32();
     info.snr = data.ReadInt32();
     info.isDataRestricted = data.ReadInt32();
-    readStr = data.ReadCString();
-    info.portalUrl = (readStr != nullptr) ? readStr : "";
+    info.portalUrl = data.ReadString();
     int tmpState = data.ReadInt32();
     if (tmpState >= 0 && tmpState <= int(SupplicantState::INVALID)) {
         info.supplicantState = SupplicantState(tmpState);

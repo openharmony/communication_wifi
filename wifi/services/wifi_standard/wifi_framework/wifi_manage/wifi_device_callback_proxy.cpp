@@ -63,13 +63,13 @@ void WifiDeviceCallBackProxy::OnWifiConnectionChanged(int state, const WifiLinke
     data.WriteInt32(0);
     data.WriteInt32(state);
     data.WriteInt32(info.networkId);
-    data.WriteCString(info.ssid.c_str());
-    data.WriteCString(info.bssid.c_str());
+    data.WriteString(info.ssid);
+    data.WriteString(info.bssid);
     data.WriteInt32(info.rssi);
     data.WriteInt32(info.band);
     data.WriteInt32(info.frequency);
     data.WriteInt32(info.linkSpeed);
-    data.WriteCString(info.macAddress.c_str());
+    data.WriteString(info.macAddress);
     data.WriteInt32(info.ipAddress);
     data.WriteInt32((int)info.connState);
     data.WriteBool(info.ifHiddenSSID);
@@ -78,7 +78,7 @@ void WifiDeviceCallBackProxy::OnWifiConnectionChanged(int state, const WifiLinke
     data.WriteInt32(info.chload);
     data.WriteInt32(info.snr);
     data.WriteInt32(info.isDataRestricted);
-    data.WriteCString(info.portalUrl.c_str());
+    data.WriteString(info.portalUrl);
     data.WriteInt32((int)info.supplicantState);
     data.WriteInt32((int)info.detailedState);
     int error = Remote()->SendRequest(WIFI_CBK_CMD_CONNECTION_CHANGE, data, reply, option);

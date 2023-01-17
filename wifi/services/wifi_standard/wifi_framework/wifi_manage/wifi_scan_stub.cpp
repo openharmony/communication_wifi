@@ -197,9 +197,9 @@ int WifiScanStub::OnGetScanInfoList(uint32_t code, MessageParcel &data, MessageP
     unsigned int size = result.size();
     reply.WriteInt32(size);
     for (unsigned int i = 0; i < size; ++i) {
-        reply.WriteCString(result[i].bssid.c_str());
-        reply.WriteCString(result[i].ssid.c_str());
-        reply.WriteCString(result[i].capabilities.c_str());
+        reply.WriteString(result[i].bssid);
+        reply.WriteString(result[i].ssid);
+        reply.WriteString(result[i].capabilities);
         reply.WriteInt32(result[i].frequency);
         reply.WriteInt32(result[i].rssi);
         reply.WriteInt64(result[i].timestamp);

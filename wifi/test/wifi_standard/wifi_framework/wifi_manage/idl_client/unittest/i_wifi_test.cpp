@@ -390,10 +390,10 @@ HWTEST_F(IWifiTest, OnTransactTest21, TestSize.Level1)
     mTestContext->nPos = 0;
     mTestContext->nSize = strlen(test1) + 1;
     EXPECT_TRUE(OnTransact(mTestContext) == 0);
-    char test1[] = "122\t8\taddress\t";
-    mTestContext->oneProcess = test1;
+    char test2[] = "122\t8\taddress\t";
+    mTestContext->oneProcess = test2;
     mTestContext->nPos = 0;
-    mTestContext->nSize = strlen(test1) + 1;
+    mTestContext->nSize = strlen(test2) + 1;
     EXPECT_TRUE(OnTransact(mTestContext) == 0);
 }
 

@@ -47,7 +47,7 @@ bool WifiNetAgent::RegisterNetSupplier()
     using NetManagerStandard::NetCap;
     std::set<NetCap> netCaps {NetCap::NET_CAPABILITY_INTERNET};
     int32_t result = netManager->RegisterNetSupplier(NetBearType::BEARER_WIFI, ident, netCaps, supplierId);
-    if (result == ERR_NONE) {
+    if (result == NETMANAGER_SUCCESS) {
         WIFI_LOGI("Register NetSupplier successful");
         return true;
     }
@@ -72,7 +72,7 @@ bool WifiNetAgent::RegisterNetSupplierCallback(const StaServiceCallback &callbac
     }
 
     int32_t result = netManager->RegisterNetSupplierCallback(supplierId, pNetConnCallback);
-    if (result == ERR_NONE) {
+    if (result == NETMANAGER_SUCCESS) {
         WIFI_LOGI("Register NetSupplierCallback successful");
         return true;
     }

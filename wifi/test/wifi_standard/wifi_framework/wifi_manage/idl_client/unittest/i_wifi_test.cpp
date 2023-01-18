@@ -15,7 +15,6 @@
 #include <gtest/gtest.h>
 #include "client.h"
 #include "i_wifi.h"
-#include "i_wifi_sta_iface.h"
 #include "wifi_log.h"
 #include "serial.h"
 
@@ -56,8 +55,8 @@ public:
         }
     }
 
-pubilc:
-    static Context mTestContext;
+public:
+    static Context *mTestContext;
 };
 
 Context *IWifiTest::mTestContext = nullptr;
@@ -138,17 +137,17 @@ HWTEST_F(IWifiTest, OnTransactTest4, TestSize.Level1)
     mTestContext->nPos = 0;
     mTestContext->nSize = strlen(test) + 1;
     EXPECT_TRUE(OnTransact(mTestContext) == 0);
-    char test1[] = "105\t1\tiface";
+    char test1[] = "105\t2\t1";
     mTestContext->oneProcess = test1;
     mTestContext->nPos = 0;
     mTestContext->nSize = strlen(test1) + 1;
     EXPECT_TRUE(OnTransact(mTestContext) == 0);
-    char test2[] = "105\t1\tiface\tidace";
+    char test2[] = "105\t2\t1\tidace";
     mTestContext->oneProcess = test2;
     mTestContext->nPos = 0;
     mTestContext->nSize = strlen(test2) + 1;
     EXPECT_TRUE(OnTransact(mTestContext) == 0);
-    char test3[] = "105\t1\tiface\tidace\t";
+    char test3[] = "105\t2\t1\tidace\t";
     mTestContext->oneProcess = test3;
     mTestContext->nPos = 0;
     mTestContext->nSize = strlen(test3) + 1;
@@ -157,7 +156,7 @@ HWTEST_F(IWifiTest, OnTransactTest4, TestSize.Level1)
 
 HWTEST_F(IWifiTest, OnTransactTest5, TestSize.Level1)
 {
-    char test[] = "106\t1";
+    char test[] = "106\t1\t";
     mTestContext->oneProcess = test;
     mTestContext->nPos = 0;
     mTestContext->nSize = strlen(test) + 1;
@@ -171,7 +170,7 @@ HWTEST_F(IWifiTest, OnTransactTest6, TestSize.Level1)
     mTestContext->nPos = 0;
     mTestContext->nSize = strlen(test) + 1;
     EXPECT_TRUE(OnTransact(mTestContext) == 0);
-    char test1[] = "107\t1\t";
+    char test1[] = "107\t2\t";
     mTestContext->oneProcess = test1;
     mTestContext->nPos = 0;
     mTestContext->nSize = strlen(test1) + 1;
@@ -190,12 +189,12 @@ HWTEST_F(IWifiTest, OnTransactTest7, TestSize.Level1)
     mTestContext->nPos = 0;
     mTestContext->nSize = strlen(test1) + 1;
     EXPECT_TRUE(OnTransact(mTestContext) == 0);
-    char test2[] = "108\t1\t1\tiface";
+    char test2[] = "108\t2\t1\tiface";
     mTestContext->oneProcess = test2;
     mTestContext->nPos = 0;
     mTestContext->nSize = strlen(test2) + 1;
     EXPECT_TRUE(OnTransact(mTestContext) == 0);
-    char test3[] = "108\t1\t1\tiface\t";
+    char test3[] = "108\t2\t1\tiface\t";
     mTestContext->oneProcess = test3;
     mTestContext->nPos = 0;
     mTestContext->nSize = strlen(test3) + 1;
@@ -204,25 +203,20 @@ HWTEST_F(IWifiTest, OnTransactTest7, TestSize.Level1)
 
 HWTEST_F(IWifiTest, OnTransactTest8, TestSize.Level1)
 {
-    char test[] = "109\t1";
+    char test[] = "109\tnone";
     mTestContext->oneProcess = test;
     mTestContext->nPos = 0;
     mTestContext->nSize = strlen(test) + 1;
     EXPECT_TRUE(OnTransact(mTestContext) == 0);
-    char test1[] = "109\t2\t1";
+    char test1[] = "109\tnone\thonor";
     mTestContext->oneProcess = test1;
     mTestContext->nPos = 0;
     mTestContext->nSize = strlen(test1) + 1;
     EXPECT_TRUE(OnTransact(mTestContext) == 0);
-    char test2[] = "109\t1\t1\tiface";
+    char test2[] = "109\tnone\thonor\t";
     mTestContext->oneProcess = test2;
     mTestContext->nPos = 0;
     mTestContext->nSize = strlen(test2) + 1;
-    EXPECT_TRUE(OnTransact(mTestContext) == 0);
-    char test3[] = "109\t1\t1\tiface\t";
-    mTestContext->oneProcess = test3;
-    mTestContext->nPos = 0;
-    mTestContext->nSize = strlen(test3) + 1;
     EXPECT_TRUE(OnTransact(mTestContext) == 0);
 }
 
@@ -242,7 +236,7 @@ HWTEST_F(IWifiTest, OnTransactTest9, TestSize.Level1)
 
 HWTEST_F(IWifiTest, OnTransactTest10, TestSize.Level1)
 {
-    char test[] = "111\t8\t";
+    char test[] = "111\t8";
     mTestContext->oneProcess = test;
     mTestContext->nPos = 0;
     mTestContext->nSize = strlen(test) + 1;
@@ -315,10 +309,10 @@ HWTEST_F(IWifiTest, OnTransactTest17, TestSize.Level1)
     mTestContext->nPos = 0;
     mTestContext->nSize = strlen(test) + 1;
     EXPECT_TRUE(OnTransact(mTestContext) == 0);
-    char test[] = "118\t8\t";
-    mTestContext->oneProcess = test;
+    char test1[] = "118\t8\t";
+    mTestContext->oneProcess = test1;
     mTestContext->nPos = 0;
-    mTestContext->nSize = strlen(test) + 1;
+    mTestContext->nSize = strlen(test1) + 1;
     EXPECT_TRUE(OnTransact(mTestContext) == 0);
 }
 
@@ -364,9 +358,9 @@ HWTEST_F(IWifiTest, OnTransactTest19, TestSize.Level1)
     mTestContext->nSize = strlen(test5) + 1;
     EXPECT_TRUE(OnTransact(mTestContext) == 0);
     char test6[] = "120\t8\t9\t7\t6\tsrc\tp2p\type";
-    mTestContext->oneProcess = test5;
+    mTestContext->oneProcess = test6;
     mTestContext->nPos = 0;
-    mTestContext->nSize = strlen(test5) + 1;
+    mTestContext->nSize = strlen(test6) + 1;
     EXPECT_TRUE(OnTransact(mTestContext) == 0);
 }
 

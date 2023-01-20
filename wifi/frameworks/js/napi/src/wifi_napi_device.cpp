@@ -190,8 +190,10 @@ napi_value GetScanInfos(napi_env env, napi_callback_info info)
 
     asyncContext->completeFunc = [&](void* data) -> void {
         ScanInfoAsyncContext *context = static_cast<ScanInfoAsyncContext *>(data);
-        napi_create_array_with_length(context->env, context->vecScanInfos.size(), &context->result);
-        context->errorCode = NativeScanInfosToJsObj(context->env, context->vecScanInfos, context->result);
+        if (context->errorCode == WIFI_OPT_SUCCESS) {
+            napi_create_array_with_length(context->env, context->vecScanInfos.size(), &context->result);
+            context->errorCode = NativeScanInfosToJsObj(context->env, context->vecScanInfos, context->result);
+        }
         WIFI_LOGI("Push scan info list to client");
     };
 

@@ -127,8 +127,10 @@ napi_value GetCurrentGroup(napi_env env, napi_callback_info info)
 
     asyncContext->completeFunc = [&](void* data) -> void {
         P2pGroupInfoAsyncContext *context = static_cast<P2pGroupInfoAsyncContext *>(data);
-        napi_create_object(context->env, &context->result);
-        context->errorCode = GroupInfosToJs(context->env, context->groupInfo, context->result);
+        if (context->errorCode == WIFI_OPT_SUCCESS) {
+            napi_create_object(context->env, &context->result);
+            context->errorCode = GroupInfosToJs(context->env, context->groupInfo, context->result);
+        }
         WIFI_LOGI("Push get current group result to client");
     };
 
@@ -159,8 +161,10 @@ napi_value GetP2pGroups(napi_env env, napi_callback_info info)
 
     asyncContext->completeFunc = [&](void* data) -> void {
         P2pGroupInfoListAsyncContext *context = static_cast<P2pGroupInfoListAsyncContext *>(data);
-        napi_create_array_with_length(context->env, context->vecGroupInfoList.size(), &context->result);
-        context->errorCode = GroupsToJsArray(context->env, context->vecGroupInfoList, context->result);
+        if (context->errorCode == WIFI_OPT_SUCCESS) {
+            napi_create_array_with_length(context->env, context->vecGroupInfoList.size(), &context->result);
+            context->errorCode = GroupsToJsArray(context->env, context->vecGroupInfoList, context->result);
+        }
         WIFI_LOGI("Push get group info list to client");
     };
 
@@ -230,8 +234,10 @@ napi_value GetP2pDevices(napi_env env, napi_callback_info info)
 
     asyncContext->completeFunc = [&](void* data) -> void {
         QueryP2pDeviceAsyncContext *context = static_cast<QueryP2pDeviceAsyncContext *>(data);
-        napi_create_array_with_length(context->env, context->vecP2pDevices.size(), &context->result);
-        context->errorCode = DevicesToJsArray(context->env, context->vecP2pDevices, context->result);
+        if (context->errorCode == WIFI_OPT_SUCCESS) {
+            napi_create_array_with_length(context->env, context->vecP2pDevices.size(), &context->result);
+            context->errorCode = DevicesToJsArray(context->env, context->vecP2pDevices, context->result);
+        }
         WIFI_LOGI("Push P2p Device List to client");
     };
 
@@ -262,9 +268,10 @@ napi_value GetP2pLocalDevice(napi_env env, napi_callback_info info)
 
     asyncContext->completeFunc = [&](void* data) -> void {
         P2pLocalDeviceAsyncContext *context = static_cast<P2pLocalDeviceAsyncContext *>(data);
-        napi_create_object(context->env, &context->result);
-        context->errorCode = WIFI_OPT_SUCCESS;
-        DeviceInfoToJs(context->env, context->deviceInfo, context->result);
+        if (context->errorCode == WIFI_OPT_SUCCESS) {
+            napi_create_object(context->env, &context->result);
+            DeviceInfoToJs(context->env, context->deviceInfo, context->result);
+        }
         WIFI_LOGI("Push get p2p local device result to client");
     };
 
@@ -399,8 +406,10 @@ napi_value GetP2pLinkedInfo(napi_env env, napi_callback_info info)
 
     asyncContext->completeFunc = [&](void* data) -> void {
         P2pLinkedInfoAsyncContext *context = static_cast<P2pLinkedInfoAsyncContext *>(data);
-        napi_create_object(context->env, &context->result);
-        LinkedInfoToJs(context->env, context->linkedInfo, context->result);
+        if (context->errorCode == WIFI_OPT_SUCCESS) {
+            napi_create_object(context->env, &context->result);
+            LinkedInfoToJs(context->env, context->linkedInfo, context->result);
+        }
         WIFI_LOGI("Push get linkedInfo result to client");
     };
 

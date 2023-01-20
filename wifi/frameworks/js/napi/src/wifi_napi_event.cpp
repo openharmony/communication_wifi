@@ -73,6 +73,7 @@ static std::set<std::string> g_supportEventList = {
     EVENT_P2P_PERSISTENT_GROUP_CHANGE,
     EVENT_P2P_PEER_DEVICE_CHANGE,
     EVENT_P2P_DISCOVERY_CHANGE,
+    EVENT_STREAM_CHANGE,
 };
 
 std::multimap<std::string, std::string> g_EventPermissionMap = {
@@ -438,15 +439,21 @@ napi_value On(napi_env env, napi_callback_info cbinfo) {
     napi_value argv[2] = {0};
     napi_value thisVar = 0;
     napi_get_cb_info(env, cbinfo, &argc, argv, &thisVar, nullptr);
-    NAPI_ASSERT(env, argc >= requireArgc, "requires 2 parameter");
+    if (requireArgc > argc) {
+        WIFI_NAPI_RETURN(env, false, WIFI_OPT_INVALID_PARAM, 0);
+    }
 
     napi_valuetype eventName = napi_undefined;
     napi_typeof(env, argv[0], &eventName);
-    NAPI_ASSERT(env, eventName == napi_string, "type mismatch for parameter 1");
+    if (eventName != napi_string) {
+        WIFI_NAPI_RETURN(env, false, WIFI_OPT_INVALID_PARAM, 0);
+    }
 
     napi_valuetype handler = napi_undefined;
     napi_typeof(env, argv[1], &handler);
-    NAPI_ASSERT(env, handler == napi_function, "type mismatch for parameter 2");
+    if (handler != napi_function) {
+        WIFI_NAPI_RETURN(env, false, WIFI_OPT_INVALID_PARAM, 0);
+    }
 
     char type[64] = {0};
     size_t typeLen = 0;
@@ -465,16 +472,22 @@ napi_value Off(napi_env env, napi_callback_info cbinfo) {
     napi_value argv[2] = {0};
     napi_value thisVar = 0;
     napi_get_cb_info(env, cbinfo, &argc, argv, &thisVar, nullptr);
-    NAPI_ASSERT(env, argc >= requireArgc, "requires at least 1 parameter");
+    if (requireArgc > argc) {
+        WIFI_NAPI_RETURN(env, false, WIFI_OPT_INVALID_PARAM, 0);
+    }
 
     napi_valuetype eventName = napi_undefined;
     napi_typeof(env, argv[0], &eventName);
-    NAPI_ASSERT(env, eventName == napi_string, "type mismatch for parameter 1");
+    if (eventName != napi_string) {
+        WIFI_NAPI_RETURN(env, false, WIFI_OPT_INVALID_PARAM, 0);
+    }
 
     if (argc >= requireArgcWithCb) {
         napi_valuetype handler = napi_undefined;
         napi_typeof(env, argv[1], &handler);
-        NAPI_ASSERT(env, handler == napi_function, "type mismatch for parameter 2");
+        if (handler != napi_function) {
+            WIFI_NAPI_RETURN(env, false, WIFI_OPT_INVALID_PARAM, 0);
+        }
     }
 
     char type[64] = {0};

@@ -44,14 +44,14 @@ public:
 HWTEST_F(RawSocketTest, CreateSocket_Fail1, TestSize.Level1)
 {
     char *iface = nullptr;
-    uint16_t protocol = &SIZE;
+    uint16_t protocol = 0;
     EXPECT_TRUE(pRawSocket->CreateSocket(iface, protocol) == -1);
 }
 
 HWTEST_F(RawSocketTest, CreateSocket_Fail2, TestSize.Level1)
 {
     char iface[] = "config";
-    uint16_t protocol = &SIZE;
+    uint16_t protocol = 0;
     EXPECT_TRUE(pRawSocket->CreateSocket(iface, protocol) == -1);
 }
 
@@ -77,7 +77,7 @@ HWTEST_F(RawSocketTest, Recv_Fail, TestSize.Level1)
     uint8_t *buff = &NUMBLE;
     int count = 10;
     int timeoutMillis = 10;
-    EXPECT_TRUE(pRawSocket->Recv(buff, count, destHwaddr) == 0);
+    EXPECT_TRUE(pRawSocket->Recv(buff, count, timeoutMillis) == 0);
 }
 
 HWTEST_F(RawSocketTest, Close_Success, TestSize.Level1)

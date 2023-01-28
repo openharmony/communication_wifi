@@ -13,15 +13,13 @@
  * limitations under the License.
  */
 #include <gtest/gtest.h>
-#include "arp_checker.h"
-
-
+#include <gmock/gmock.h>
+#include "securec.h"
+#include "http_request.h"
 
 using namespace testing::ext;
-
 namespace OHOS {
 namespace Wifi {
-
 class HttpRequestTest : public testing::Test {
 public:
     static void SetUpTestCase()
@@ -45,45 +43,45 @@ HWTEST_F(HttpRequestTest, ArpChecker_Fail1, TestSize.Level1)
 {
     std::string strUrl = "";
     std::string strResponse = "";
-    EXPECT_TRUE(pArpChecker->HttpGet(&strUrl, &strResponse) == -1);
+    EXPECT_TRUE(pHttpRequest->HttpGet(strUrl, strResponse) == -1);
 }
 
 HWTEST_F(HttpRequestTest, ArpChecker_Fail2, TestSize.Level1)
 {
-    std::string str[1033] = {0};
-    for (int i = 0; i<1033; i++)
-		str[i] = "s";
+    std::string str[1033];
+    if (memset_s(str, 1033, '*', 1033) != EOK)
+        return;
     std::string strResponse = "";
-    EXPECT_TRUE(pArpChecker->HttpGet(&strUrl, &strResponse) == -1);
+    EXPECT_TRUE(pHttpRequest->HttpGet(str, strResponse) == -1);
 }
 
 HWTEST_F(HttpRequestTest, GetPortFromUrl_Fail3, TestSize.Level1)
 {
     std::string strUrl = "https://-10";
     std::string strResponse = "";
-    EXPECT_TRUE(pArpChecker->HttpGet(&strUrl, &strResponse) == -1);
+    EXPECT_TRUE(pHttpRequest->HttpGet(strUrl, strResponse) == -1);
 }
 
 HWTEST_F(HttpRequestTest, GetPortFromUrl_Fail3, TestSize.Level1)
 {
     std::string strUrl = "https//";
     std::string strResponse = "";
-    EXPECT_TRUE(pArpChecker->HttpGet(&strUrl, &strResponse) == -1);
+    EXPECT_TRUE(pHttpRequest->HttpGet(strUrl, strResponse) == -1);
 }
 
 HWTEST_F(HttpRequestTest, GetPortFromUrl_Fail4, TestSize.Level1)
 {
     std::string strUrl = "http://192.168.3.22";
     std::string strResponse = "";
-    EXPECT_TRUE(pArpChecker->HttpGet(&strUrl, &strResponse) == -1);
+    EXPECT_TRUE(pHttpRequest->HttpGet(strUrl, strResponse) == -1);
 }
 
 HWTEST_F(HttpRequestTest, HttpPost_Success, TestSize.Level1)
 {
-    std::string strUrl = "http://10";
+    std::string strUrl = "http://192.168.3.22";
     std::string strResponse = "";
     std::string strdata = "";
-    EXPECT_TRUE(pArpChecker->HttpGet(&strUrl, &strdata, &strResponse) == -1);
+    EXPECT_TRUE(pHttpRequest->HttpPost(strUrl, strdata, strResponse) == -1);
 }
 }  // namespace Wifi
 }  // namespace OHOS

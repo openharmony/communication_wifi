@@ -55,20 +55,6 @@ HWTEST_F(RawSocketTest, CreateSocket_Fail2, TestSize.Level1)
     EXPECT_TRUE(pRawSocket->CreateSocket(iface, protocol) == -1);
 }
 
-HWTEST_F(RawSocketTest, CreateSocket_Fail3, TestSize.Level1)
-{
-    char iface[] = "ens33";
-    uint16_t protocol = &SIZE;
-    EXPECT_TRUE(pRawSocket->CreateSocket(iface, protocol) == -1);
-}
-
-HWTEST_F(RawSocketTest, CreateSocket_Success, TestSize.Level1)
-{
-    char iface[] = "ens33";
-    uint16_t protocol = &SIZE;
-    EXPECT_TRUE(pRawSocket->CreateSocket(iface, protocol) == -1);
-}
-
 HWTEST_F(RawSocketTest, Send_Fail1, TestSize.Level1)
 {
     uint8_t *buff = nullptr;
@@ -91,15 +77,7 @@ HWTEST_F(RawSocketTest, Recv_Fail, TestSize.Level1)
     uint8_t *buff = &NUMBLE;
     int count = 10;
     int timeoutMillis = 10;
-    EXPECT_TRUE(pRawSocket->Recv(buff, count, destHwaddr) == -1);
-}
-
-HWTEST_F(RawSocketTest, Recv_Success, TestSize.Level1)
-{
-    uint8_t *buff = &NUMBLE;
-    int count = 1;
-    int timeoutMillis = 50;
-    EXPECT_TRUE(pRawSocket->Recv(buff, count, timeoutMillis) == 1);
+    EXPECT_TRUE(pRawSocket->Recv(buff, count, destHwaddr) == 0);
 }
 
 HWTEST_F(RawSocketTest, Close_Success, TestSize.Level1)

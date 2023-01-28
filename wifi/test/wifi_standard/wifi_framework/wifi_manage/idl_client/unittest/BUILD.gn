@@ -55,7 +55,6 @@ ohos_unittest("idl_client_unittest") {
     "wifi_p2p_hal_interface_test.cpp",
     "wifi_sta_hal_interface_test.cpp",
     "wifi_supplicant_hal_interface_test.cpp",
-    "i_wifi_hotspot_iface_test.cpp",
   ]
 
   include_dirs = [

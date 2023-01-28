@@ -49,8 +49,9 @@ HWTEST_F(HttpRequestTest, ArpChecker_Fail1, TestSize.Level1)
 HWTEST_F(HttpRequestTest, ArpChecker_Fail2, TestSize.Level1)
 {
     char str[1033];
-    if (memset_s(str, 1033, '*', 1033) != EOK)
+    if (memset_s(str, 1033, '*', 1033) != EOK) {
         return;
+    }
     std::string url = str;
     std::string strResponse = "";
     EXPECT_TRUE(pHttpRequest->HttpGet(url, strResponse) == -1);

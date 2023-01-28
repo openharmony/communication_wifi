@@ -48,11 +48,12 @@ HWTEST_F(HttpRequestTest, ArpChecker_Fail1, TestSize.Level1)
 
 HWTEST_F(HttpRequestTest, ArpChecker_Fail2, TestSize.Level1)
 {
-    std::string str[1033];
+    char str[1033];
     if (memset_s(str, 1033, '*', 1033) != EOK)
         return;
+    std::string url = str;
     std::string strResponse = "";
-    EXPECT_TRUE(pHttpRequest->HttpGet(str, strResponse) == -1);
+    EXPECT_TRUE(pHttpRequest->HttpGet(url, strResponse) == -1);
 }
 
 HWTEST_F(HttpRequestTest, GetPortFromUrl_Fail3, TestSize.Level1)
@@ -62,14 +63,14 @@ HWTEST_F(HttpRequestTest, GetPortFromUrl_Fail3, TestSize.Level1)
     EXPECT_TRUE(pHttpRequest->HttpGet(strUrl, strResponse) == -1);
 }
 
-HWTEST_F(HttpRequestTest, GetPortFromUrl_Fail3, TestSize.Level1)
+HWTEST_F(HttpRequestTest, GetPortFromUrl_Fail4, TestSize.Level1)
 {
     std::string strUrl = "https//";
     std::string strResponse = "";
     EXPECT_TRUE(pHttpRequest->HttpGet(strUrl, strResponse) == -1);
 }
 
-HWTEST_F(HttpRequestTest, GetPortFromUrl_Fail4, TestSize.Level1)
+HWTEST_F(HttpRequestTest, GetPortFromUrl_Fail5, TestSize.Level1)
 {
     std::string strUrl = "http://192.168.3.22";
     std::string strResponse = "";

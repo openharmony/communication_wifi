@@ -13,12 +13,9 @@
  * limitations under the License.
  */
 #include <gtest/gtest.h>
-#include "arp_checker.h"
-
-
+#include "raw_socket.h"
 
 using namespace testing::ext;
-
 namespace OHOS {
 namespace Wifi {
 
@@ -37,97 +34,76 @@ public:
     }
     virtual void TearDown()
     {
-        pArpChecker.reset();
+        pRawSocket.reset();
     }
 
 public:
     std::unique_ptr<RawSocket> pRawSocket;
 };
 
-HWTEST_F(RawSocketTest, ArpChecker_Fail1, TestSize.Level1)
+HWTEST_F(RawSocketTest, CreateSocket_Fail1, TestSize.Level1)
 {
-    char iface[] = "";
-    uint16_t protocol;
+    char *iface = nullptr;
+    uint16_t protocol = &SIZE;
     EXPECT_TRUE(pRawSocket->CreateSocket(iface, protocol) == -1);
 }
 
-HWTEST_F(RawSocketTest, ArpChecker_Fail2, TestSize.Level1)
+HWTEST_F(RawSocketTest, CreateSocket_Fail2, TestSize.Level1)
 {
     char iface[] = "config";
-    uint16_t protocol;
+    uint16_t protocol = &SIZE;
     EXPECT_TRUE(pRawSocket->CreateSocket(iface, protocol) == -1);
 }
 
-HWTEST_F(RawSocketTest, ArpChecker_Fail3, TestSize.Level1)
+HWTEST_F(RawSocketTest, CreateSocket_Fail3, TestSize.Level1)
 {
     char iface[] = "ens33";
-    uint16_t protocol = -1;
+    uint16_t protocol = &SIZE;
     EXPECT_TRUE(pRawSocket->CreateSocket(iface, protocol) == -1);
 }
 
-HWTEST_F(RawSocketTest, ArpChecker_Success, TestSize.Level1)
+HWTEST_F(RawSocketTest, CreateSocket_Success, TestSize.Level1)
 {
     char iface[] = "ens33";
-    uint16_t protocol = 123456789;
+    uint16_t protocol = &SIZE;
     EXPECT_TRUE(pRawSocket->CreateSocket(iface, protocol) == -1);
 }
 
-HWTEST_F(RawSocketTest, ArpChecker_Success, TestSize.Level1)
+HWTEST_F(RawSocketTest, Send_Fail1, TestSize.Level1)
 {
-	uint8_t *buff = nullptr;
+    uint8_t *buff = nullptr;
     int count = 10;
     uint8_t *destHwaddr = nullptr;
     EXPECT_TRUE(pRawSocket->Send(buff, count, destHwaddr) == -1);
 }
 
-HWTEST_F(RawSocketTest, ArpChecker_Success, TestSize.Level1)
+HWTEST_F(RawSocketTest, Send_Fail2, TestSize.Level1)
 {
-	uint8_t *buff = &NUMBLE;
+    uint8_t *buff = &NUMBLE;
     int count = 10;
     uint8_t *destHwaddr = &SIZE;
+    pRawSocket->Close();
     EXPECT_TRUE(pRawSocket->Send(buff, count, destHwaddr) == -1);
 }
 
-HWTEST_F(RawSocketTest, ArpChecker_Success, TestSize.Level1)
+HWTEST_F(RawSocketTest, Recv_Fail, TestSize.Level1)
 {
-	uint8_t *buff = &NUMBLE;
-    int count = 10;
-    uint8_t *destHwaddr = &SIZE;
-    pRawSocket->ifaceIndex = 33;
-    pRawSocket->socketFd_ = 5;
-    EXPECT_TRUE(pRawSocket->Send(buff, count, destHwaddr) == 0);
-}
-
-HWTEST_F(RawSocketTest, ArpChecker_Success, TestSize.Level1)
-{
-	uint8_t *buff = &NUMBLE;
+    uint8_t *buff = &NUMBLE;
     int count = 10;
     int timeoutMillis = 10;
-    pRawSocket->socketFd_ = -1;
     EXPECT_TRUE(pRawSocket->Recv(buff, count, destHwaddr) == -1);
 }
 
-HWTEST_F(RawSocketTest, ArpChecker_Success, TestSize.Level1)
+HWTEST_F(RawSocketTest, Recv_Success, TestSize.Level1)
 {
-	uint8_t *buff = nullptr;
-    int count = 10;
-    int timeoutMillis = 1;
-    pRawSocket->socketFd_ = 0;
-    EXPECT_TRUE(pRawSocket->Recv(buff, count, timeoutMillis) == -1);
-}
-
-HWTEST_F(RawSocketTest, ArpChecker_Success, TestSize.Level1)
-{
-	uint8_t *buff = &NUMBLE;
+    uint8_t *buff = &NUMBLE;
     int count = 1;
     int timeoutMillis = 50;
-    pRawSocket->socketFd_ = 1;
     EXPECT_TRUE(pRawSocket->Recv(buff, count, timeoutMillis) == 1);
 }
 
 HWTEST_F(RawSocketTest, Close_Success, TestSize.Level1)
 {
-    pRawSocket->socketFd_ = 1;
     EXPECT_TRUE(pRawSocket->Close() == -1);
 }
 }  // namespace Wifi

@@ -739,7 +739,10 @@ static int WpaCliCmdScan(WifiWpaStaInterface *this, const ScanSettings *settings
     /* Invalidate expired scan results */
     WpaCliCmdBssFlush(this);
     unsigned len = CMD_BUFFER_SIZE;
-    unsigned expectedLen = AssignCmdLen(this, settings);
+    unsigned expectedLen = 0;
+    if (settings != NULL) {
+        expectedLen = AssignCmdLen(this, settings);
+    }
     if (expectedLen >= len) {
         len = expectedLen + 1;
     }

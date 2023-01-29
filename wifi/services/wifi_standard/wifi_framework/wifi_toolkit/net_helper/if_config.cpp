@@ -272,7 +272,7 @@ bool IfConfig::GetIpAddr(const std::string& ifName, std::string& ipAddr)
 bool IfConfig::CheckIfaceValid(const std::string& ifname)
 {
     struct if_nameindex *ifidxs, *ifni;
-    if (ifname == nullptr) {
+    if (ifname.c_str() == nullptr) {
         LOGE("ifname is nullptr");
         return false;
     }

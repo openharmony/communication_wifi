@@ -12,9 +12,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#include <cstddef>
+#include <cstdint>
+#include <cstring>
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
-
+#include "securec.h"
 #include "../../../interfaces/kits/c/wifi_hid2d.h"
 #include "../../../interfaces/kits/c/wifi_device.h"
 

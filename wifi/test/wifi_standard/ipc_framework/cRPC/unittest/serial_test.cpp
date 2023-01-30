@@ -20,9 +20,11 @@ using namespace testing::ext;
 
 namespace OHOS {
 namespace Wifi {
+
+Context *SerialTest::ctx = nullptr;
+
 HWTEST_F(SerialTest, SerialOneTest, TestSize.Level1)
 {
-    ctx = CreateContext(1024);
     WriteBegin(ctx, 0);
     ASSERT_EQ(WriteBegin(test, 0), -1);
 
@@ -53,6 +55,53 @@ HWTEST_F(SerialTest, SerialOneTest, TestSize.Level1)
 
     WriteEnd(ctx);
     ASSERT_EQ(WriteEnd(test), -1);
+}
+
+HWTEST_F(SerialTest, SerialTwoTest, TestSize.Level1)
+{
+    ctx->oneProcess = ctx->szWrite;
+    ctx->nSize = ctx->wEnd;
+
+    EXPECT_TRUE(strncmp(ctx->oneProcess, "N\t", 2) == 0);
+    ctx->nPos = 2;
+    char str[1024] = {0};
+    ASSERT_EQ(ReadFunc(ctx, str, 1024), 0);
+    ASSERT_EQ(ReadFunc(test, str, 1024), -1);
+
+    ctx->nSize = ctx->nPos;
+    ASSERT_EQ(ReadFunc(ctx, str, 1024), -1);
+
+    EXPECT_TRUE(strcmp(str, "SerialTest") == 0);
+    int i = 0;
+    ctx->nSize = ctx->wEnd;
+    ASSERT_EQ(ReadInt(test, &i), -1);
+    ASSERT_EQ(ReadInt(ctx, &i), 0);
+
+    EXPECT_TRUE(i == 100);
+    long l = 0;
+    ASSERT_EQ(ReadLong(test, &l), -1);
+    ASSERT_EQ(ReadLong(ctx, &l), 0);
+    EXPECT_TRUE(l == 1234567890L);
+    int64_t t = 0;
+    ASSERT_EQ(ReadInt64(test, &t), -1);
+    ASSERT_EQ(ReadInt64(ctx, &t), 0);
+    EXPECT_TRUE(t == 12345678909832323LL);
+    double d = 0.0;
+    ASSERT_EQ(ReadDouble(test, &d), -1);
+    ASSERT_EQ(ReadDouble(ctx, &d), 0);
+    EXPECT_TRUE(d - 3.14159 < 0.000001 && d - 3.14159 > -0.000001);
+    char c = ' ';
+    ASSERT_EQ(ReadChar(test, &c), -1);
+    ASSERT_EQ(ReadChar(ctx, &c), 0);
+    EXPECT_TRUE(c == 'a');
+    ASSERT_EQ(ReadStr(test, str, 1024), -1);
+    ASSERT_EQ(ReadStr(ctx, str, 1024), 0);
+    EXPECT_TRUE(strcmp(str, "Hello, world") == 0);
+    int count = strlen("2c:f0:xx:xx:xx:be");
+    ASSERT_EQ(ReadUStr(test, (unsigned char *)str, count + 1), -1);
+    ASSERT_EQ(ReadUStr(ctx, (unsigned char *)str, count + 1), 0);
+    EXPECT_TRUE(strcmp(str, "2c:f0:xx:xx:xx:be") == 0);
+    EXPECT_TRUE(strncmp(ctx->oneProcess + ctx->nPos, "$$$$$$", 6) == 0);
 }
 }  // namespace Wifi
 }  // namespace OHOS

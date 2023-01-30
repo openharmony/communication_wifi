@@ -23,21 +23,23 @@ namespace Wifi {
 class SerialTest : public testing::Test {
 public:
     static void SetUpTestCase()
-    {}
+    {
+        ctx = CreateContext(1024);
+    }
     static void TearDownTestCase()
-    {}
-    virtual void SetUp()
-    {}
-    virtual void TearDown()
     {
         if (ctx != nullptr) {
             ReleaseContext(ctx);
             ctx = nullptr;
         }
     }
+    virtual void SetUp()
+    {}
+    virtual void TearDown()
+    {}
 
 public:
-    Context *ctx;
+    static Context *ctx;
     Context *test = NULL;
 };
 }  // namespace Wifi

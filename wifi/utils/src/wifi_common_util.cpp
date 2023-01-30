@@ -159,7 +159,7 @@ static char ConvertArrayChar(unsigned char ch)
     if (ch <= maxDecNum) {
         return '0' + ch;
     }
-    if (ch >= 0xa && ch <= 0xf) {
+    if (ch <= 0xf) {
         return ch + 'a' - numDiffForHexAlphabet;
     }
     return '0';

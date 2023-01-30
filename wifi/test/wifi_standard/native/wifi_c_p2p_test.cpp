@@ -148,6 +148,15 @@ HWTEST_F(WifiP2pTest, QueryP2pDevicesTests, TestSize.Level1)
     QueryP2pDevices(&clientDevices, size, retSize);
 }
 
+HWTEST_F(WifiP2pTest, QueryP2pLocalDeviceTests, TestSize.Level1)
+{
+    WifiP2pDevice deviceInfo;
+    deviceInfo.supportWpsConfigMethods = 1;
+    deviceInfo.deviceCapabilitys = 1;
+    deviceInfo.groupCapabilitys = 1;
+    QueryP2pLocalDevice(&deviceInfo);
+}
+
 HWTEST_F(WifiP2pTest, QueryP2pGroupsTests, TestSize.Level1)
 {
     WifiP2pGroupInfo groupInfo;
@@ -179,6 +188,11 @@ HWTEST_F(WifiP2pTest, RegisterP2pPeersChangedCallbackTest, TestSize.Level1)
 HWTEST_F(WifiP2pTest, RegisterCfgChangCallbackTest, TestSize.Level1)
 {
     RegisterCfgChangCallback(WifiCfgChangCallback);
+}
+
+HWTEST_F(WifiP2pTest, UnregisterCfgChangCallbackTest, TestSize.Level1)
+{
+    UnregisterCfgChangCallback();
 }
 }
 }

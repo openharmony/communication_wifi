@@ -12,9 +12,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#include <cstddef>
+#include <cstdint>
+#include <cstring>
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
-
+#include "securec.h"
 #include "../../../interfaces/kits/c/wifi_hid2d.h"
 #include "../../../interfaces/kits/c/wifi_device.h"
 
@@ -24,6 +27,9 @@ using ::testing::ext::TestSize;
 
 namespace OHOS {
 namespace Wifi {
+
+constexpr unsigned int IP[IPV4_ARRAY_LEN] = {192, 168, 2, 5};
+
 class WifiHid2dTest : public testing::Test {
 public:
     static void SetUpTestCase() {}
@@ -71,8 +77,11 @@ HWTEST_F(WifiHid2dTest, Hid2dConnectTests, TestSize.Level1)
 HWTEST_F(WifiHid2dTest, Hid2dConfigIPAddrTests, TestSize.Level1)
 {
     char ifName[IF_NAME_LEN];
-    IpAddrInfo* ipInfo;
-    Hid2dConfigIPAddr(ifName, ipInfo);
+    IpAddrInfo ipInfo;
+    if (memcpy_s(ipInfo.ip, sizeof(IP), IP, sizeof(IP)) != EOK) {
+        return;
+    }
+    Hid2dConfigIPAddr(ifName, &ipInfo);
 }
 
 HWTEST_F(WifiHid2dTest, Hid2dReleaseIPAddrTests, TestSize.Level1)
@@ -103,6 +112,14 @@ HWTEST_F(WifiHid2dTest, Hid2dGetSelfWifiCfgInfoTests, TestSize.Level1)
     Hid2dGetSelfWifiCfgInfo(cfgType, cfgData, getDatValidLen);
 }
 
+HWTEST_F(WifiHid2dTest, Hid2dSetPeerWifiCfgInfoTests, TestSize.Level1)
+{
+    PeerCfgType cfgType = PeerCfgType::TYPE_OF_SET_PEER_CONFIG;
+    char cfgData[CFG_DATA_MAX_BYTES] = "test";
+    int setDataValidLen = 1;
+    Hid2dSetPeerWifiCfgInfo(cfgType, cfgData, setDataValidLen);
+}
+
 HWTEST_F(WifiHid2dTest, Hid2dIsWideBandwidthSupportedTests, TestSize.Level1)
 {
     Hid2dIsWideBandwidthSupported();
@@ -111,8 +128,11 @@ HWTEST_F(WifiHid2dTest, Hid2dIsWideBandwidthSupportedTests, TestSize.Level1)
 HWTEST_F(WifiHid2dTest, Hid2dSetUpperSceneTests, TestSize.Level1)
 {
     char ifName[IF_NAME_LEN];
-    Hid2dUpperScene *scene;
-    Hid2dSetUpperScene(ifName, scene);
+    Hid2dUpperScene scene;
+    scene.scene = 1;
+    scene.fps = 1;
+    scene.bw = 1;
+    Hid2dSetUpperScene(ifName, &scene);
 }
 }
 }

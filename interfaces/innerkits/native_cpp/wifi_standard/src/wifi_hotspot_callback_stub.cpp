@@ -73,10 +73,14 @@ int WifiHotspotCallbackStub::RemoteOnHotspotStateChanged(uint32_t code, MessageP
 int WifiHotspotCallbackStub::RemoteOnHotspotStaJoin(uint32_t code, MessageParcel &data, MessageParcel &reply)
 {
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+    const char *readStr = nullptr;
     StationInfo info;
-    info.deviceName = data.ReadCString();
-    info.bssid = data.ReadCString();
-    info.ipAddr = data.ReadCString();
+    readStr = data.ReadCString();
+    info.deviceName = (readStr != nullptr) ? readStr : "";
+    readStr = data.ReadCString();
+    info.bssid = (readStr != nullptr) ? readStr : "";
+    readStr = data.ReadCString();
+    info.ipAddr = (readStr != nullptr) ? readStr : "";
     OnHotspotStaJoin(info);
     reply.WriteInt32(0);
     return 0;
@@ -85,10 +89,14 @@ int WifiHotspotCallbackStub::RemoteOnHotspotStaJoin(uint32_t code, MessageParcel
 int WifiHotspotCallbackStub::RemoteOnHotspotStaLeave(uint32_t code, MessageParcel &data, MessageParcel &reply)
 {
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+    const char *readStr = nullptr;
     StationInfo info;
-    info.deviceName = data.ReadCString();
-    info.bssid = data.ReadCString();
-    info.ipAddr = data.ReadCString();
+    readStr = data.ReadCString();
+    info.deviceName = (readStr != nullptr) ? readStr : "";
+    readStr = data.ReadCString();
+    info.bssid = (readStr != nullptr) ? readStr : "";
+    readStr = data.ReadCString();
+    info.ipAddr = (readStr != nullptr) ? readStr : "";
     OnHotspotStaLeave(info);
     reply.WriteInt32(0);
     return 0;

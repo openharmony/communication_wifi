@@ -91,7 +91,7 @@ do { \
  * @param env The env.
  * @param info The input data.
  */
-void HandleCallbackErrCode(    const napi_env &env, const AsyncContext &info);
+void HandleCallbackErrCode(const napi_env &env, const AsyncContext &info);
 
 /**
  * @brief Thow error code for async-promise function.

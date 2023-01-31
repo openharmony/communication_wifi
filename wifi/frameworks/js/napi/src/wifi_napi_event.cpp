@@ -73,7 +73,6 @@ static std::set<std::string> g_supportEventList = {
     EVENT_P2P_PERSISTENT_GROUP_CHANGE,
     EVENT_P2P_PEER_DEVICE_CHANGE,
     EVENT_P2P_DISCOVERY_CHANGE,
-    EVENT_STREAM_CHANGE,
 };
 
 std::multimap<std::string, std::string> g_EventPermissionMap = {
@@ -440,18 +439,21 @@ napi_value On(napi_env env, napi_callback_info cbinfo) {
     napi_value thisVar = 0;
     napi_get_cb_info(env, cbinfo, &argc, argv, &thisVar, nullptr);
     if (requireArgc > argc) {
+        WIFI_LOGI("requireArgc:%{public}zu, argc:%{public}zu", requireArgc, argc);
         WIFI_NAPI_RETURN(env, false, WIFI_OPT_INVALID_PARAM, 0);
     }
 
     napi_valuetype eventName = napi_undefined;
     napi_typeof(env, argv[0], &eventName);
     if (eventName != napi_string) {
+        WIFI_LOGI("first argv != napi_string");
         WIFI_NAPI_RETURN(env, false, WIFI_OPT_INVALID_PARAM, 0);
     }
 
     napi_valuetype handler = napi_undefined;
     napi_typeof(env, argv[1], &handler);
     if (handler != napi_function) {
+        WIFI_LOGI("second argv != napi_function");
         WIFI_NAPI_RETURN(env, false, WIFI_OPT_INVALID_PARAM, 0);
     }
 
@@ -473,12 +475,14 @@ napi_value Off(napi_env env, napi_callback_info cbinfo) {
     napi_value thisVar = 0;
     napi_get_cb_info(env, cbinfo, &argc, argv, &thisVar, nullptr);
     if (requireArgc > argc) {
+        WIFI_LOGI("requireArgc:%{public}zu, argc:%{public}zu", requireArgc, argc);
         WIFI_NAPI_RETURN(env, false, WIFI_OPT_INVALID_PARAM, 0);
     }
 
     napi_valuetype eventName = napi_undefined;
     napi_typeof(env, argv[0], &eventName);
     if (eventName != napi_string) {
+        WIFI_LOGI("first argv != napi_string");
         WIFI_NAPI_RETURN(env, false, WIFI_OPT_INVALID_PARAM, 0);
     }
 
@@ -486,6 +490,7 @@ napi_value Off(napi_env env, napi_callback_info cbinfo) {
         napi_valuetype handler = napi_undefined;
         napi_typeof(env, argv[1], &handler);
         if (handler != napi_function) {
+            WIFI_LOGI("second argv != napi_function");
             WIFI_NAPI_RETURN(env, false, WIFI_OPT_INVALID_PARAM, 0);
         }
     }

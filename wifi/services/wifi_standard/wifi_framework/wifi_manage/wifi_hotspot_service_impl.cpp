@@ -203,6 +203,31 @@ ErrCode WifiHotspotServiceImpl::SetHotspotConfig(const HotspotConfig &config)
     return WIFI_OPT_SUCCESS;
 }
 
+ErrCode WifiHotspotServiceImpl::SetHotspotIdleTimeout(int time)
+{
+    WIFI_LOGI("SetHotspotIdleTimeout");
+    if (WifiPermissionUtils::VerifyManageWifiHotspotPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("SetHotspotIdleTimeout:VerifyManageWifiHotspotPermission PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+    /* Set the hotspot idle timeout unit to 1 minute */
+    constexpr int hotspotIdleTimeoutUnit = 60000;
+    int delayTime = time * hotspotIdleTimeoutUnit;
+    if (delayTime < 0) {
+        delayTime = 0;
+    }
+    if (!IsApServiceRunning()) {
+        WifiConfigCenter::GetInstance().SetHotspotIdleTimeout(delayTime);
+    } else {
+        IApService *pService = WifiServiceManager::GetInstance().GetApServiceInst();
+        if (pService == nullptr) {
+            return WIFI_OPT_AP_NOT_OPENED;
+        }
+        return pService->SetHotspotIdleTimeout(delayTime);
+    }
+    return WIFI_OPT_SUCCESS;
+}
+
 ErrCode WifiHotspotServiceImpl::GetStationList(std::vector<StationInfo> &result)
 {
     WIFI_LOGI("Instance %{public}d %{public}s!", m_id, __func__);

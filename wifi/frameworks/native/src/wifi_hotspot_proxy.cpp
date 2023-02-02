@@ -240,6 +240,38 @@ ErrCode WifiHotspotProxy::SetHotspotConfig(const HotspotConfig &config)
     return ErrCode(reply.ReadInt32());
 }
 
+ErrCode WifiHotspotProxy::SetHotspotIdleTimeout(int time)
+{
+    if (mRemoteDied) {
+        WIFI_LOGE("failed to `%{private}s`,remote service is died!", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    MessageOption option;
+    MessageParcel data;
+    MessageParcel reply;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error: %{private}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    data.WriteInt32(0);
+    data.WriteInt32(time);
+    int error = Remote()->SendRequest(WIFI_SVR_CMD_SETTIMEOUT_AP, data, reply, option);
+    if (error != ERR_NONE) {
+        WIFI_LOGE("Set Attr(%{private}d) failed,error code is %{private}d", WIFI_SVR_CMD_SETTIMEOUT_AP, error);
+        return WIFI_OPT_FAILED;
+    }
+
+    int exception = reply.ReadInt32();
+    if (exception) {
+        return WIFI_OPT_FAILED;
+    }
+    int ret = reply.ReadInt32();
+    if (ErrCode(ret) != WIFI_OPT_SUCCESS) {
+        return ErrCode(ret);
+    }
+    return WIFI_OPT_SUCCESS;
+}
+
 ErrCode WifiHotspotProxy::GetStationList(std::vector<StationInfo> &result)
 {
     if (mRemoteDied) {

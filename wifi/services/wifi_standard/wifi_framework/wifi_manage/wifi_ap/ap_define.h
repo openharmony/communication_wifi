@@ -48,6 +48,7 @@ enum class ApStatemachineEvent {
     CMD_DEL_BLOCK_LIST,              /* del block station */
     CMD_DISCONNECT_STATION,          /* disconnect station */
     CMD_UPDATE_HOTSPOTCONFIG_RESULT, /* Update hotspot configuration result */
+    CMD_SET_IDLE_TIMEOUT,            /* Set ap idle timeout */
                                      /* (asynchronous result) */
 };
 

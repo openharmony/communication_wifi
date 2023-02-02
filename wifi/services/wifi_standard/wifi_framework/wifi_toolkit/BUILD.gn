@@ -50,7 +50,6 @@ local_base_include_dirs = [
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/config",
   "//commonlibrary/c_utils/base/include",
   "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
-  "//base/security/huks/interfaces/inner_api/huks_standard/main/include",
   "$WIFI_ROOT_DIR/frameworks/native/interfaces",
   "$DHCP_ROOT_DIR/interfaces/inner_api/interfaces",
   "$DHCP_ROOT_DIR/interfaces/inner_api/include",
@@ -106,6 +105,7 @@ if (defined(ohos_lite)) {
       "c_utils:utils",
       "common_event_service:cesfwk_innerkits",
       "eventhandler:libeventhandler",
+      "huks:libhukssdk",
     ]
     if (wifi_feature_with_encryption) {
       external_deps += [ "huks:libhukssdk" ]

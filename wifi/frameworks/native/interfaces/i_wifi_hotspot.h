@@ -73,6 +73,14 @@ public:
     virtual ErrCode SetHotspotConfig(const HotspotConfig &config) = 0;
 
     /**
+     * @Description Set the idel timeout of Hotspot
+     *
+     * @param time -input time,
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode SetHotspotIdleTimeout(int time) = 0;
+
+    /**
      * @Description Get the Station List object.
      *
      * @param result - Get result vector of connect Station Info

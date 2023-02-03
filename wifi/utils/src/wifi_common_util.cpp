@@ -58,7 +58,7 @@ static std::string DataAnonymize(const std::string str, const char delim,
             return std::string(s.size(), hiddenCh);
         }
         auto idx1 = 2;
-        const auto idx2 = s.size() - 4;
+        const auto idx2 = (int)(s.size() - 4);
         while (idx1++ < idx2) {
             s[idx1] = hiddenCh;
         }

@@ -40,7 +40,7 @@ constexpr int MODE_UPDATE = 2;
 /* Obtain the scanning result that is valid within 180s. */
 constexpr int WIFI_GET_SCAN_INFO_VALID_TIMESTAMP = 180;
 /* Hotspot is idle auto close after 10min. */
-constexpr int HOSSPOT_IDLE_TIMEOUT_INTERVAL_MS = 10 * 60 *1000;
+constexpr int HOTSPOT_IDLE_TIMEOUT_INTERVAL_MS = 10 * 60 *1000;
 
 
 constexpr char DEVICE_CONFIG_FILE_PATH[] = CONFIG_ROOR_DIR"/device_config.conf";

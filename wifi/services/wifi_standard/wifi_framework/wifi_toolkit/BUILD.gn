@@ -93,13 +93,13 @@ if (defined(ohos_lite)) {
     include_dirs = local_base_include_dirs
     include_dirs += [
       "//base/security/certificate_manager/frameworks/cert_manager_standard/main/common/include",
-      "//base/security/certificate_manager/interfaces/innerkits/cert_manager_standard/main/include"
+      "//base/security/certificate_manager/interfaces/innerkits/cert_manager_standard/main/include",
     ]
 
     deps = [
       "$DHCP_ROOT_DIR/services/mgr_service:dhcp_manager_service",
       "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog",
-      "//base/security/certificate_manager/interfaces/innerkits/cert_manager_standard/main:cert_manager_sdk"
+      "//base/security/certificate_manager/interfaces/innerkits/cert_manager_standard/main:cert_manager_sdk",
     ]
 
     defines = [ "AP_INSTANCE_MAX_NUM=$wifi_feature_with_ap_num" ]

@@ -256,7 +256,7 @@ static void ProcessPassphrase(const SecTypeJs& securityType, WifiDeviceConfig& c
     }
 }
 
-void ProcessEapPeapConfig(const napi_env& env, const napi_value& object, WifiEapConfig& eapConfig)
+static void ProcessEapPeapConfig(const napi_env& env, const napi_value& object, WifiEapConfig& eapConfig)
 {
     // identity, password, phase2Method filed is necessary
     eapConfig.eap = EAP_METHOD_PEAP;
@@ -266,6 +266,14 @@ void ProcessEapPeapConfig(const napi_env& env, const napi_value& object, WifiEap
     int phase2 = static_cast<int>(Phase2Method::NONE);
     JsObjectToInt(env, object, "phase2Method", phase2);
     eapConfig.phase2Method = Phase2Method(phase2);
+}
+
+static void ProcessEapTlsConfig(const napi_env& env, const napi_value& object, WifiEapConfig& eapConfig)
+{
+    eapConfig.eap = EAP_METHOD_TLS;
+    JsObjectToString(env, object, "identity", NAPI_MAX_STR_LENT, eapConfig.identity);
+    JsObjectToString(env, object, "certPassword", NAPI_MAX_STR_LENT, eapConfig.certPassword);
+    eapConfig.certEntry = JsObjectToU8Vector(env, object, "certEntry");
 }
 
 napi_value ProcessEapConfig(const napi_env& env, const napi_value& object, WifiDeviceConfig& devConfig)
@@ -286,6 +294,9 @@ napi_value ProcessEapConfig(const napi_env& env, const napi_value& object, WifiD
     switch (EapMethodJs(eapMethod)) {
         case EapMethodJs::EAP_PEAP:
             ProcessEapPeapConfig(env, napiEap, devConfig.wifiEapConfig);
+            break;
+        case EapMethodJs::EAP_TLS:
+            ProcessEapTlsConfig(env, napiEap, devConfig.wifiEapConfig);
             break;
         default:
             WIFI_LOGE("EapMethod: %{public}d unsupported", eapMethod);

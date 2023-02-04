@@ -137,6 +137,43 @@ napi_value JsObjectToBool(const napi_env& env, const napi_value& object, const c
     return UndefinedNapiValue(env);
 }
 
+std::vector<uint8_t> JsObjectToU8Vector(const napi_env& env, const napi_value& object, const char* fieldStr)
+{
+    bool hasProperty = false;
+    NAPI_CALL_BASE(env, napi_has_named_property(env, object, fieldStr, &hasProperty), {});
+    if (!hasProperty) {
+         WIFI_LOGW("Js to U8Vector no property: %{public}s", fieldStr);
+         return {};
+    }
+
+    bool isTypedArray = false;
+    if (napi_is_typedarray(env, object, &isTypedArray) != napi_ok || !isTypedArray) {
+        WIFI_LOGW("property is not typedarray: %{public}s", fieldStr);
+        return {};
+    }
+
+    size_t length = 0;
+    size_t offset = 0;
+    napi_typedarray_type type;
+    napi_value buffer = nullptr;
+    NAPI_CALL_BASE(env, napi_get_typedarray_info(env, object, &type, &length, nullptr, &buffer, &offset), {});
+    if (type != napi_uint8_array || buffer == nullptr) {
+        WIFI_LOGW("%{public}s type: %{public}zu, buffer:%{public}d", fieldStr, type, buffer == nullptr);
+        return {};
+    }
+
+    size_t total = 0;
+    uint8_t *data = nullptr;
+    NAPI_CALL_BASE(env, napi_get_arraybuffer_info(env, buffer, reinterpret_cast<void **>(&data), &total), {});
+    length = std::min<size_t>(length, total - offset);
+    std::vector<uint8_t> result(length);
+    int retCode = memcpy_s(result.data(), result.size(), &data[offset], length);
+    if (retCode != 0) {
+        return {};
+    }
+    return result;
+}
+
 napi_status SetValueUtf8String(const napi_env& env, const char* fieldStr, const char* str,
     napi_value& result, size_t strLen)
 {

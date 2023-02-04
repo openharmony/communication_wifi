@@ -266,6 +266,8 @@ void WifiDeviceProxy::WriteDeviceConfig(const WifiDeviceConfig &config, MessageP
     data.WriteString(config.wifiEapConfig.password);
     data.WriteString(config.wifiEapConfig.clientCert);
     data.WriteString(config.wifiEapConfig.privateKey);
+    data.WriteUInt8Vector(config.wifiEapConfig.certEntry);
+    data.WriteCString(config.wifiEapConfig.certPassword.c_str());
     data.WriteInt32(static_cast<int>(config.wifiEapConfig.phase2Method));
     data.WriteInt32((int)config.wifiProxyconfig.configureMethod);
     data.WriteString(config.wifiProxyconfig.autoProxyConfig.pacWebAddress);

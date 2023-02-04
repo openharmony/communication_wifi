@@ -361,8 +361,9 @@ bool WifiDeviceServiceImpl::CheckConfigEap(const WifiDeviceConfig &config)
     }
     if (config.wifiEapConfig.eap == EAP_METHOD_TLS) {
         if (config.wifiEapConfig.identity.empty() ||
-            config.wifiEapConfig.clientCert.empty() ||
-            config.wifiEapConfig.privateKey.empty()) {
+            (config.wifiEapConfig.certEntry.size() == 0 &&
+            (config.wifiEapConfig.clientCert.empty() ||
+            config.wifiEapConfig.privateKey.empty()))) {
             WIFI_LOGE("CheckConfigEap: with invalid TLS params!");
             return false;
         }

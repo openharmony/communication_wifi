@@ -52,7 +52,7 @@ int WifiCertUtils::InstallCert(const std::vector<uint8_t>& certEntry, const std:
     certAlias.size = strlen(certAliasBuf) + 1;
     certAlias.data = (uint8_t *)certAliasBuf;
 
-    uint32_t store = 0;
+    uint32_t store = 3;
     char retUriBuf[MAX_ALIAS_LEN] = { 0 };
     struct CmBlob keyUri = { sizeof(retUriBuf), (uint8_t *)retUriBuf };
     int ret = CmInstallAppCert(&appCert, &appCertPwd, &certAlias, store, &keyUri);

@@ -142,8 +142,8 @@ std::vector<uint8_t> JsObjectToU8Vector(const napi_env& env, const napi_value& o
     bool hasProperty = false;
     NAPI_CALL_BASE(env, napi_has_named_property(env, object, fieldStr, &hasProperty), {});
     if (!hasProperty) {
-         WIFI_LOGW("Js to U8Vector no property: %{public}s", fieldStr);
-         return {};
+        WIFI_LOGW("Js to U8Vector no property: %{public}s", fieldStr);
+        return {};
     }
 
     bool isTypedArray = false;

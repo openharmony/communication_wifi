@@ -32,6 +32,8 @@ HWTEST_F(WifiIpToolsTest, ConvertIpv4AddressTest, TestSize.Level1)
     EXPECT_TRUE(IpTools::ConvertIpv4Address("192.168:0.1") == 0);
     EXPECT_TRUE(IpTools::ConvertIpv4Address("289.168.0.1") == 0);
     EXPECT_TRUE(IpTools::ConvertIpv4Address("-1.168.0.1") == 0);
+    EXPECT_TRUE(IpTools::ConvertIpv4Address("192.168.0.289") == 0);
+    EXPECT_TRUE(IpTools::ConvertIpv4Address("192.168.0.-1") == 0);
     EXPECT_TRUE(IpTools::ConvertIpv4Address("192.168.0.1") == 0xc0a80001);
 }
 
@@ -68,6 +70,8 @@ HWTEST_F(WifiIpToolsTest, ConvertIpv6AddressTest, TestSize.Level1)
     ipv6Str = "2001:0db8:3c4d:0000:0000:1a2f:1a2b";
     IpTools::ConvertIpv6Address(ipv6Str, addr);
     EXPECT_TRUE(addr.size() == 0);
+    ipv6Str = "2001:0db8:3c4d:0015:0000:0000:1a2f:1";
+    IpTools::ConvertIpv6Address(ipv6Str, addr);
     ipv6Str = "2001:0db8:3c4d:0015:0000:0000:1a2f:1a2b";
     IpTools::ConvertIpv6Address(ipv6Str, addr);
     EXPECT_TRUE(addr == tmp);

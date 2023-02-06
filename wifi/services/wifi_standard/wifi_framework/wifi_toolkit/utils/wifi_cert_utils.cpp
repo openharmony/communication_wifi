@@ -27,6 +27,8 @@ int WifiCertUtils::InstallCert(const std::vector<uint8_t>& certEntry, const std:
 {
     if (certEntry.size() == 0 || (pwd.size() + 1) > MAX_ALIAS_LEN ||
             (alias.size() + 1) > MAX_ALIAS_LEN) {
+        WIFI_LOGE("InstallCert, certEntry.size: %{public}u, pwd.size: %{public}u, alias.size: %{public}u.",
+            certEntry.size(), pwd.size(), alias.size());
         return -1;
     }
 
@@ -36,8 +38,8 @@ int WifiCertUtils::InstallCert(const std::vector<uint8_t>& certEntry, const std:
     char certPwdBuf[MAX_ALIAS_LEN] = { 0 };
     char certAliasBuf[MAX_ALIAS_LEN] = { 0 };
     uint8_t *data = (uint8_t *)malloc(certEntry.size());
-
     if (data == nullptr) {
+        WIFI_LOGE("InstallCert, data is null.");
         return -1;
     }
 
@@ -59,7 +61,7 @@ int WifiCertUtils::InstallCert(const std::vector<uint8_t>& certEntry, const std:
 
     free(data);
     if (ret == 0) {
-        uri = (char *)keyUri.data;
+        uri = keyUri.data;
     }
 
     return ret;
@@ -68,6 +70,7 @@ int WifiCertUtils::InstallCert(const std::vector<uint8_t>& certEntry, const std:
 int WifiCertUtils::UninstallCert(std::string& uri)
 {
     if (uri.size() >= MAX_ALIAS_LEN) {
+        WIFI_LOGE("UninstallCert, uri.size: %{public}u.", uri.size());
         return -1;
     }
 

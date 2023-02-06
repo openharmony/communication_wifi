@@ -27,8 +27,9 @@ static std::map<int32_t, int32_t> errCodeMap = {
     { ErrCode::WIFI_OPT_NOT_SUPPORTED, WifiNapiErrCode::WIFI_ERRCODE_NOT_SUPPORTED },
     { ErrCode::WIFI_OPT_INVALID_PARAM, WifiNapiErrCode::WIFI_ERRCODE_INVALID_PARAM },
     { ErrCode::WIFI_OPT_FORBID_AIRPLANE, WifiNapiErrCode::WIFI_ERRCODE_OPERATION_FAILED },
-    { ErrCode::WIFI_OPT_FORBID_POWSAVING, WifiNapiErrCode::WIFI_ERRCODE_OPERATION_FAILED},
+    { ErrCode::WIFI_OPT_FORBID_POWSAVING, WifiNapiErrCode::WIFI_ERRCODE_OPERATION_FAILED },
     { ErrCode::WIFI_OPT_PERMISSION_DENIED, WifiNapiErrCode::WIFI_ERRCODE_PERMISSION_DENIED },
+    { ErrCode::WIFI_OPT_NON_SYSTEMAPP, WifiNapiErrCode::WIFI_ERRCODE_NON_SYSTEMAPP },
     { ErrCode::WIFI_OPT_OPEN_FAIL_WHEN_CLOSING, WifiNapiErrCode::WIFI_ERRCODE_OPEN_FAIL_WHEN_CLOSING },
     { ErrCode::WIFI_OPT_OPEN_SUCC_WHEN_OPENED, WifiNapiErrCode::WIFI_ERRCODE_CLOSE_FAIL_WHEN_OPENING },
     { ErrCode::WIFI_OPT_CLOSE_FAIL_WHEN_OPENING, WifiNapiErrCode::WIFI_ERRCODE_CLOSE_FAIL_WHEN_OPENING },
@@ -49,6 +50,7 @@ static std::map<int32_t, std::string> napiErrMsgMap {
     { WifiNapiErrCode::WIFI_ERRCODE_OPERATION_FAILED, "Operation failed." },
     { WifiNapiErrCode::WIFI_ERRCODE_WIFI_NOT_OPENED, "WIFI doesn't open." },
     { WifiNapiErrCode::WIFI_ERRCODE_PERMISSION_DENIED, "Permission denied." },
+    { WifiNapiErrCode::WIFI_ERRCODE_NON_SYSTEMAPP, "non-system application." },
     { WifiNapiErrCode::WIFI_ERRCODE_INVALID_PARAM, "Parameter error." },
     { WifiNapiErrCode::WIFI_ERRCODE_NOT_SUPPORTED, "Capability not supported." },
     { WifiNapiErrCode::WIFI_ERRCODE_OPEN_FAIL_WHEN_CLOSING, "Failed for wifi is closing." },
@@ -70,7 +72,8 @@ static int32_t GetNapiErrCode(const napi_env &env, const int32_t errCodeIn, cons
     }
     if (iter->second == WifiNapiErrCode::WIFI_ERRCODE_PERMISSION_DENIED ||
         iter->second == WifiNapiErrCode::WIFI_ERRCODE_INVALID_PARAM ||
-        iter->second == WifiNapiErrCode::WIFI_ERRCODE_NOT_SUPPORTED) {
+        iter->second == WifiNapiErrCode::WIFI_ERRCODE_NOT_SUPPORTED ||
+        iter->second == WifiNapiErrCode::WIFI_ERRCODE_NON_SYSTEMAPP) {
         return iter->second;
     }
     return iter->second + sysCap;

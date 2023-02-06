@@ -45,7 +45,7 @@ ErrCode WifiHotspotServiceImpl::IsHotspotActive(bool &bActive)
     WIFI_LOGI("Instance %{public}d %{public}s!", m_id, __func__);
     if (!WifiAuthCenter::IsSystemAppByToken()) {
         WIFI_LOGE("IsHotspotActive:NOT System APP, PERMISSION_DENIED!");
-        return WIFI_OPT_PERMISSION_DENIED;
+        return WIFI_OPT_NON_SYSTEMAPP;
     }
     if (WifiPermissionUtils::VerifyManageWifiHotspotPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("IsHotspotActive:VerifyManageWifiHotspotPermission PERMISSION_DENIED!");
@@ -61,7 +61,7 @@ ErrCode WifiHotspotServiceImpl::IsHotspotDualBandSupported(bool &isSupported)
     WIFI_LOGI("IsHotspotDualBandSupported");
     if (!WifiAuthCenter::IsSystemAppByToken()) {
         WIFI_LOGE("IsHotspotDualBandSupported:NOT System APP, PERMISSION_DENIED!");
-        return WIFI_OPT_PERMISSION_DENIED;
+        return WIFI_OPT_NON_SYSTEMAPP;
     }
     if (WifiPermissionUtils::VerifyGetWifiInfoInternalPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("IsHotspotDualBandSupported:VerifyGetWifiInfoInternalPermission PERMISSION_DENIED!");
@@ -120,7 +120,7 @@ ErrCode WifiHotspotServiceImpl::GetHotspotConfig(HotspotConfig &result)
     WIFI_LOGI("Instance %{public}d %{public}s!", m_id, __func__);
     if (!WifiAuthCenter::IsSystemAppByToken()) {
         WIFI_LOGE("GetHotspotConfig:NOT System APP, PERMISSION_DENIED!");
-        return WIFI_OPT_PERMISSION_DENIED;
+        return WIFI_OPT_NON_SYSTEMAPP;
     }
     if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("GetHotspotConfig:VerifyGetWifiInfoPermission PERMISSION_DENIED!");
@@ -142,7 +142,7 @@ ErrCode WifiHotspotServiceImpl::SetHotspotConfig(const HotspotConfig &config)
         static_cast<int>(config.GetBand()));
     if (!WifiAuthCenter::IsSystemAppByToken()) {
         WIFI_LOGE("SetHotspotConfig:NOT System APP, PERMISSION_DENIED!");
-        return WIFI_OPT_PERMISSION_DENIED;
+        return WIFI_OPT_NON_SYSTEMAPP;
     }
     if (WifiPermissionUtils::VerifySetWifiInfoPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("SetHotspotConfig:VerifySetWifiInfoPermission PERMISSION_DENIED!");
@@ -233,7 +233,7 @@ ErrCode WifiHotspotServiceImpl::GetStationList(std::vector<StationInfo> &result)
     WIFI_LOGI("Instance %{public}d %{public}s!", m_id, __func__);
     if (!WifiAuthCenter::IsSystemAppByToken()) {
         WIFI_LOGE("GetStationList:NOT System APP, PERMISSION_DENIED!");
-        return WIFI_OPT_PERMISSION_DENIED;
+        return WIFI_OPT_NON_SYSTEMAPP;
     }
     if (WifiPermissionUtils::VerifyGetWifiInfoInternalPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("GetStationList:VerifyGetWifiInfoInternalPermission PERMISSION_DENIED!");
@@ -310,7 +310,7 @@ ErrCode WifiHotspotServiceImpl::CheckCanEnableHotspot(const ServiceType type)
 {
     if (!WifiAuthCenter::IsSystemAppByToken()) {
         WIFI_LOGE("EnableHotspot:NOT System APP, PERMISSION_DENIED!");
-        return WIFI_OPT_PERMISSION_DENIED;
+        return WIFI_OPT_NON_SYSTEMAPP;
     }
     if (CheckOperHotspotSwitchPermission(type) == PERMISSION_DENIED) {
         WIFI_LOGE("EnableHotspot:VerifyManageWifiHotspotPermission PERMISSION_DENIED!");
@@ -391,7 +391,7 @@ ErrCode WifiHotspotServiceImpl::DisableHotspot(const ServiceType type)
     WIFI_LOGI("current ap service is %{public}d %{public}s", m_id, __func__);
     if (!WifiAuthCenter::IsSystemAppByToken()) {
         WIFI_LOGE("DisableHotspot:NOT System APP, PERMISSION_DENIED!");
-        return WIFI_OPT_PERMISSION_DENIED;
+        return WIFI_OPT_NON_SYSTEMAPP;
     }
     if (CheckOperHotspotSwitchPermission(type) == PERMISSION_DENIED) {
         WIFI_LOGE("EnableHotspot:VerifyManageWifiHotspotPermission PERMISSION_DENIED!");

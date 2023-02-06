@@ -12,37 +12,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef OHOS_WIFI_CRPC_SERIAL_TEST_H
-#define OHOS_WIFI_CRPC_SERIAL_TEST_H
-
 #include <gtest/gtest.h>
-#include "context.h"
+#include <ifaddrs.h>
+#include <string>
+#include "ipv4_address.h"
+#include "ipv6_address.h"
+
+using namespace testing::ext;
 
 namespace OHOS {
 namespace Wifi {
-constexpr int BUFFER_1K = 1024;
-class SerialTest : public testing::Test {
+class BaseAddressTest : public testing::Test {
 public:
     static void SetUpTestCase()
-    {
-        ctx = CreateContext(BUFFER_1K);
-    }
+    {}
     static void TearDownTestCase()
-    {
-        if (ctx != nullptr) {
-            ReleaseContext(ctx);
-            ctx = nullptr;
-        }
-    }
+    {}
     virtual void SetUp()
     {}
     virtual void TearDown()
     {}
-
-public:
-    static Context *ctx;
-    Context *test = NULL;
 };
+
+HWTEST_F(BaseAddressTest, DumpTest, TestSize.Level1)
+{
+    Ipv4Address ip = Ipv4Address::Create("10.0.0.1", "255.255.255.0");
+    ip.Dump();
+    Ipv6Address ipv6 = Ipv6Address::Create("fe80::47b1:fa81:b33e:ea6b/64");
+    ipv6.Dump();
+}
 }  // namespace Wifi
 }  // namespace OHOS
-#endif

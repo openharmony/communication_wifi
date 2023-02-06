@@ -293,6 +293,8 @@ public:
     std::string clientCert; /* EAP mode client certificate */
     std::string privateKey; /* EAP mode client private key */
     Phase2Method phase2Method;
+    std::vector<uint8_t> certEntry;
+    std::string certPassword;
 
     WifiEapConfig()
     {

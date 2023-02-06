@@ -711,6 +711,7 @@ IApServiceCallbacks WifiManager::GetApCallback()
 
 void WifiManager::DealApStateChanged(ApState state, int id)
 {
+    WIFI_LOGE("%{public}s, state: %{public}d!", __func__, state);
     WifiEventCallbackMsg cbMsg;
     cbMsg.msgCode = WIFI_CBK_MSG_HOTSPOT_STATE_CHANGE;
     cbMsg.msgData = static_cast<int>(state);

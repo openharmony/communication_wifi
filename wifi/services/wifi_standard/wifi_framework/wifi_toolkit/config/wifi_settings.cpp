@@ -16,6 +16,7 @@
 #include <algorithm>
 #include <chrono>
 #include "define.h"
+#include "wifi_cert_utils.h"
 #include "wifi_global_func.h"
 #include "wifi_log.h"
 #include "wifi_config_country_freqs.h"
@@ -254,6 +255,13 @@ int WifiSettings::RemoveDevice(int networkId)
     std::unique_lock<std::mutex> lock(mConfigMutex);
     auto iter = mWifiDeviceConfig.find(networkId);
     if (iter != mWifiDeviceConfig.end()) {
+        if (!iter->second.wifiEapConfig.clientCert.empty()) {
+            if (WifiCertUtils::UninstallCert(iter->second.wifiEapConfig.clientCert) != 0) {
+                LOGE("uninstall cert %{public}s fail", iter->second.wifiEapConfig.clientCert.c_str());
+            } else {
+                LOGD("uninstall cert %{public}s success", iter->second.wifiEapConfig.clientCert.c_str());
+            }
+        }
         mWifiDeviceConfig.erase(iter);
     }
     return 0;
@@ -262,6 +270,16 @@ int WifiSettings::RemoveDevice(int networkId)
 void WifiSettings::ClearDeviceConfig(void)
 {
     std::unique_lock<std::mutex> lock(mConfigMutex);
+    for (auto iter = mWifiDeviceConfig.begin(); iter != mWifiDeviceConfig.end(); iter++) {
+        if (iter->second.wifiEapConfig.clientCert.empty()) {
+            continue;
+        }
+        if (WifiCertUtils::UninstallCert(iter->second.wifiEapConfig.clientCert) != 0) {
+            LOGE("uninstall cert %{public}s fail", iter->second.wifiEapConfig.clientCert.c_str());
+        } else {
+            LOGD("uninstall cert %{public}s success", iter->second.wifiEapConfig.clientCert.c_str());
+        }
+    }
     mWifiDeviceConfig.clear();
     return;
 }

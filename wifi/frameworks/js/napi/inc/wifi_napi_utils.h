@@ -87,6 +87,7 @@ napi_value JsObjectToString(const napi_env& env, const napi_value& object,
 napi_value JsObjectToInt(const napi_env& env, const napi_value& object, const char* fieldStr, int& fieldRef);
 napi_value JsObjectToUint(const napi_env& env, const napi_value& object, const char* fieldStr, uint32_t& fieldRef);
 napi_value JsObjectToBool(const napi_env& env, const napi_value& object, const char* fieldStr, bool& fieldRef);
+std::vector<uint8_t> JsObjectToU8Vector(const napi_env& env, const napi_value& object, const char* fieldStr);
 napi_status SetValueUtf8String(const napi_env& env, const char* fieldStr, const char* str,
     napi_value& result, size_t strLen = NAPI_AUTO_LENGTH);
 napi_status SetValueUtf8String(const napi_env& env, const std::string &fieldStr, const std::string &valueStr,

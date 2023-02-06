@@ -26,6 +26,8 @@
 #include "wifi_hotspot.h"
 #include "wifi_logger.h"
 
+DEFINE_WIFILOG_LABEL("WifiNapiEvent");
+
 namespace OHOS {
 namespace Wifi {
 class RegObj {

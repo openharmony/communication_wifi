@@ -29,52 +29,34 @@ class WifiDhcpdInterfaceTest : public testing::Test{
 public:
     static void SetUpTestCase(){};
     static void TearDownTestCase(){};
-    virtual void SetUp(){};
-    virtual void TearDown(){};
-
-    void SetDhcpEventFuncTest()
+    virtual void SetUp()
     {
-        char* ifaceName[] = nullptr;
-        IDhcpResultNotify* pResultNotify = nullptr;
-        DhcpdInterface.SetDhcpEventFunc(ifaceName, pResultNotify);
-    }
-
-    void AssignIpAddrTest()
+        pDhcpdInterface = std::make_unique<DhcpdInterface>();
+    };
+    virtual void TearDown()
     {
-        bool isIpV4 = false;
-        std::vector<Ipv4Address> vecIpv4Addr;
-        std::vector<Ipv6Address> vecIpv6Addr;
-        vecIpv4Addr.push_back("111");
-        vecIpv6Addr.push_back("111");
-        Ipv4Address ipv4;
-        Ipv6Address ipv6;
-        DhcpdInterface.AssignIpAddr(ipv4, ipv6, vecIpv4Addr, vecIpv6Addr, isIpV4);
-    }
-
-    void AssignIpAddrV6Test()
-    {
-        std::vector<Ipv6Address> vecIpAddr;
-        vecIpAddr.push_back("111");
-        vecIpAddr.push_back("111");
-        vecIpAddr.push_back("111");
-        DhcpdInterface.AssignIpAddrV6(vecIpAddr);
-    }
+        pDhcpdInterface.reset();
+    };
+public:
+    std::unique_ptr<DhcpdInterface> pDhcpdInterface;
 };
 
 HWTEST_F(WifiDhcpdInterfaceTest, SetDhcpEventFuncTest, TestSize.Level1)
 {
-    SetDhcpEventFuncTest();
+    std::string ifaceName = "DHCPFUNC";
+    IDhcpResultNotify* pResultNotify = nullptr;
+    pDhcpdInterface->SetDhcpEventFunc(ifaceName, pResultNotify);
+
 }
 HWTEST_F(WifiDhcpdInterfaceTest, AssignIpAddrTest, TestSize.Level1)
 {
-    AssignIpAddrTest();
-}
-HWTEST_F(WifiDhcpdInterfaceTest, AssignIpAddrV6Test, TestSize.Level1)
-{
-    AssignIpAddrV6Test();
-}
+    bool isIpV4 = false;
+    std::string ifaceName = "StartDhcpServer";
+    Ipv4Address ipv4(Ipv4Address::INVALID_INET_ADDRESS);
+    Ipv6Address IPV6(Ipv6Address::INVALID_INET6_ADDRESS);
+    pDhcpdInterface->StartDhcpServer(ifaceName, ipv4, IPV6, isIpV4);
 
-
+}
 }  // namespace Wifi
 }  // namespace OHOS
 

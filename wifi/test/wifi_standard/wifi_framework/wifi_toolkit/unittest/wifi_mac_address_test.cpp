@@ -12,14 +12,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "../../../services/wifi_standard/wifi_framework/wifi_toolkit/net_helper/mac_address.h"
+#include "mac_address.h"
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 #include <cstddef>
 #include <cstdint>
 #include "securec.h"
-
-#define SIZE 15
 
 using ::testing::Return;
 using ::testing::ext::TestSize;
@@ -33,35 +31,22 @@ public:
     virtual void SetUp(){};
     virtual void TearDown(){};
 
-    void CreateTest()
-    {
-        char mac[SIZE];
-        if (strcpy_s(mac, sizeof(mac), "CreateTest1234") != EOK) {
-            return;
-        }
-        MacAddress.Create(&mac);
-    }
-    void DumpTest()
-    {
-        MacAddress.Dump();
-	}
-    void IsValidTest()
-    {
-        MacAddress.IsValid();
-    }
 };
 
-HWTEST_F(WifiCMacAddress, CreateTest, TestSize.Level1)
+HWTEST_F(WifiCMacAddress, CreateTest1, TestSize.Level1)
 {
-    CreateTest();
+    std::string mac = "CreateTest1234"; 	 
+    MacAddress::Create(mac);
 }
-HWTEST_F(WifiCMacAddress, DumpTest, TestSize.Level1)
+HWTEST_F(WifiCMacAddress, CreateTest2, TestSize.Level1)
 {
-    DumpTest();
+    sockaddr hwAddr;
+    for (int i = 0; i < 7; i++)
+    {
+        hwAddr.sa_data[i] = i;
+    }
+    MacAddress::Create(hwAddr);
 }
-HWTEST_F(WifiCMacAddress, IsValidTest, TestSize.Level1)
-{
-    IsValidTest();
-}
+
 }  // namespace Wifi
 }  // namespace OHOS

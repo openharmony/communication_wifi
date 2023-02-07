@@ -153,3 +153,46 @@ int GetIfaceState(const char *ifaceName)
     LOGD("GetIfaceState: current interface state: %{public}d", state);
     return state;
 }
+
+int CharReplace(char* data, int start, int end, const char hiddenChar)
+{
+    if (!data) {
+        LOGE("CharReplace: data invalid.");
+        return 1;
+    }
+    for (int i = start; i < end; i++) {
+        data[i] = hiddenChar;
+    }
+    
+    return 0;
+}
+
+int DataAnonymize(const char *input, int inputLen, char* output, int outputSize)
+{
+    if (!input || !output || inputLen > outputSize) {
+        LOGE("DataAnonymize: arg invalid.");
+        return 1;
+    }
+
+    if (memcpy_s(output, outputSize, input, inputLen) != EOK) {
+        LOGE("DataAnonymize: memcpy_s fail");
+        return 1;
+    }
+
+    const char hiddenChar = '*';
+    const int minHiddenSize = 3;
+    const int headKeepSize = 3;
+    const int tailKeepSize = 3;
+
+    if (inputLen < minHiddenSize) {
+        return CharReplace(output, 0, inputLen, hiddenChar);
+    }
+
+    if (inputLen < (minHiddenSize + headKeepSize + tailKeepSize)) {
+        int beginIndex = 1;
+        int hiddenSize = inputLen - minHiddenSize + 1;
+        hiddenSize = hiddenSize > minHiddenSize ? minHiddenSize : hiddenSize;
+        return CharReplace(output, beginIndex,  beginIndex + hiddenSize, hiddenChar);
+    }
+    return CharReplace(output, headKeepSize, inputLen - tailKeepSize, hiddenChar);
+}

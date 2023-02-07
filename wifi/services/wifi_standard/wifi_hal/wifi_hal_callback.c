@@ -261,7 +261,7 @@ void P2pHalCbDeviceFound(const P2pDeviceInfo *device)
     if (device == NULL) {
         return;
     }
-    LOGI("P2p device found event deviceName: %{public}s", device->deviceName);
+    ANONYMIZE_LOGI("P2p device found event deviceName: %{public}s", device->deviceName);
     WifiHalEventCallbackMsg *pCbkMsg = (WifiHalEventCallbackMsg *)calloc(1, sizeof(WifiHalEventCallbackMsg));
     if (pCbkMsg == NULL) {
         LOGE("create callback message failed!");

@@ -38,4 +38,14 @@
 
 #define LOGF(...) ((void)HiLogPrint(LOG_CORE, LOG_FATAL, LOG_DOMAIN, LOG_TAG, __VA_ARGS__))
 
+#define ANONYMIZE_LOGI(format, data) \
+{ \
+    if (data) \
+    { \
+        char anonymizeData[WIFI_NAME_MAX_LENGTH] = {0}; \
+        (void)DataAnonymize(data, strlen(data), anonymizeData, WIFI_NAME_MAX_LENGTH); \
+        LOGI(format, anonymizeData); \
+    } \
+}
+
 #endif

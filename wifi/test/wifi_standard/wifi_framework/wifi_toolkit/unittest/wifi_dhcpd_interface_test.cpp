@@ -13,7 +13,7 @@
  * limitations under the License.
  */
  
-#include "../../../services/wifi_standard/wifi_framework/wifi_toolkit/net_helper/dhcpd_interface.h"
+#include "dhcpd_interface.h"
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 #include <cstddef>
@@ -46,15 +46,14 @@ HWTEST_F(WifiDhcpdInterfaceTest, SetDhcpEventFuncTest, TestSize.Level1)
     std::string ifaceName = "DHCPFUNC";
     IDhcpResultNotify* pResultNotify = nullptr;
     pDhcpdInterface->SetDhcpEventFunc(ifaceName, pResultNotify);
-
 }
-HWTEST_F(WifiDhcpdInterfaceTest, AssignIpAddrTest, TestSize.Level1)
+HWTEST_F(WifiDhcpdInterfaceTest, StartDhcpServerTest, TestSize.Level1)
 {
     bool isIpV4 = false;
     std::string ifaceName = "StartDhcpServer";
     Ipv4Address ipv4(Ipv4Address::INVALID_INET_ADDRESS);
-    Ipv6Address IPV6(Ipv6Address::INVALID_INET6_ADDRESS);
-    pDhcpdInterface->StartDhcpServer(ifaceName, ipv4, IPV6, isIpV4);
+    Ipv6Address ipv6(Ipv6Address::INVALID_INET6_ADDRESS);
+    pDhcpdInterface->StartDhcpServer(ifaceName, ipv4, ipv6, isIpV4);
 
 }
 }  // namespace Wifi

@@ -54,7 +54,6 @@ HWTEST_F(WifiDhcpdInterfaceTest, StartDhcpServerTest, TestSize.Level1)
     Ipv4Address ipv4(Ipv4Address::INVALID_INET_ADDRESS);
     Ipv6Address ipv6(Ipv6Address::INVALID_INET6_ADDRESS);
     pDhcpdInterface->StartDhcpServer(ifaceName, ipv4, ipv6, isIpV4);
-
 }
 }  // namespace Wifi
 }  // namespace OHOS

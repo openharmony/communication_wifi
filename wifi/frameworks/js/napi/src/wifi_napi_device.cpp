@@ -308,10 +308,9 @@ napi_value ProcessEapConfig(const napi_env& env, const napi_value& object, WifiD
 napi_value ConfigStaticIp(const napi_env& env, const napi_value& object, WifiDeviceConfig& cppConfig)
 {
     bool hasProperty = false;
-    JsObjectToInt(env, object, "prefixLength", cppConfig.wifiIpConfig.staticIpAddress.ipAddress.prefixLength);
     NAPI_CALL(env, napi_has_named_property(env, object, "staticIp", &hasProperty));
     if (!hasProperty) {
-        WIFI_LOGE("Js has no property: staticIp.");
+        WIFI_LOGE("ConfigStaticIp, Js has no property: staticIp.");
         return UndefinedNapiValue(env);
     }
     napi_value staticIp;
@@ -323,10 +322,11 @@ napi_value ConfigStaticIp(const napi_env& env, const napi_value& object, WifiDev
         cppConfig.wifiIpConfig.staticIpAddress.ipAddress.address.addressIpv4);
     cppConfig.wifiIpConfig.staticIpAddress.ipAddress.address.family = 0;
     JsObjectToUint(env, staticIp, "gateway", cppConfig.wifiIpConfig.staticIpAddress.gateway.addressIpv4);
+    JsObjectToInt(env, staticIp, "prefixLength", cppConfig.wifiIpConfig.staticIpAddress.ipAddress.prefixLength);
 
     NAPI_CALL(env, napi_has_named_property(env, staticIp, "dnsServers", &hasProperty));
     if (!hasProperty) {
-        WIFI_LOGE("Js has no property: dnsServers.");
+        WIFI_LOGE("ConfigStaticIp, Js has no property: dnsServers.");
         return UndefinedNapiValue(env);
     }
     uint32_t arrayLength = 0;
@@ -334,7 +334,7 @@ napi_value ConfigStaticIp(const napi_env& env, const napi_value& object, WifiDev
     napi_get_named_property(env, staticIp, "dnsServers", &dnsServers);
     napi_get_array_length(env, dnsServers, &arrayLength);
     if (arrayLength != DNS_NUM) {
-        WIFI_LOGE("It needs two dns servers.");
+        WIFI_LOGE("ConfigStaticIp, It needs two dns servers.");
         return UndefinedNapiValue(env);
     }
     napi_get_element(env, dnsServers, 0, &primaryDns);
@@ -345,7 +345,7 @@ napi_value ConfigStaticIp(const napi_env& env, const napi_value& object, WifiDev
     return UndefinedNapiValue(env);
 }
 
-static void JsObjToDeviceConfig(const napi_env& env, const napi_value& object, WifiDeviceConfig& cppConfig)
+static napi_value JsObjToDeviceConfig(const napi_env& env, const napi_value& object, WifiDeviceConfig& cppConfig)
 {
     JsObjectToString(env, object, "ssid", NAPI_MAX_STR_LENT, cppConfig.ssid); /* ssid max length is 32 + '\0' */
     JsObjectToString(env, object, "bssid", NAPI_MAX_STR_LENT, cppConfig.bssid); /* max bssid length: 18 */
@@ -368,9 +368,15 @@ static void JsObjToDeviceConfig(const napi_env& env, const napi_value& object, W
         cppConfig.wifiIpConfig.assignMethod = AssignIpMethod::DHCP;
     } else if (IpTypeJs(ipType) == IpTypeJs::IP_TYPE_STATIC) {
         cppConfig.wifiIpConfig.assignMethod = AssignIpMethod::STATIC;
-        ConfigStaticIp(env, object, cppConfig);
+        napi_valuetype valueType;
+        napi_value ret = ConfigStaticIp(env, object, cppConfig);
+        napi_typeof(env, ret, &valueType);
+        if (valueType == napi_undefined) {
+            WIFI_LOGI("JsObjToDeviceConfig, ConfigStaticIp return napi_undefined.");
+            return UndefinedNapiValue(env);
+        }
     }
-    (void)ProcessEapConfig(env, object, cppConfig);
+    return ProcessEapConfig(env, object, cppConfig);
 }
 
 napi_value AddDeviceConfig(napi_env env, napi_callback_info info)
@@ -397,10 +403,12 @@ napi_value AddDeviceConfig(napi_env env, napi_callback_info info)
         delete asyncContext;
         return UndefinedNapiValue(env);
     }
-    JsObjToDeviceConfig(env, argv[0], *config);
+    napi_value ret = JsObjToDeviceConfig(env, argv[0], *config);
+    napi_typeof(env, ret, &valueType);
+    WIFI_NAPI_ASSERT(env, valueType != napi_undefined, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_STA);
+
     asyncContext->config = config;
     asyncContext->isCandidate = false;
-
     asyncContext->executeFunc = [&](void* data) -> void {
         DeviceConfigContext *context = static_cast<DeviceConfigContext *>(data);
         TRACE_FUNC_CALL_NAME("wifiDevicePtr->AddDeviceConfig");
@@ -450,7 +458,9 @@ napi_value AddUntrustedConfig(napi_env env, napi_callback_info info)
         delete asyncContext;
         return UndefinedNapiValue(env);
     }
-    JsObjToDeviceConfig(env, argv[0], *config);
+    napi_value ret = JsObjToDeviceConfig(env, argv[0], *config);
+    napi_typeof(env, ret, &valueType);
+    WIFI_NAPI_ASSERT(env, valueType != napi_undefined, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_STA);
     asyncContext->config = config;
     asyncContext->isCandidate = true;
 
@@ -503,9 +513,10 @@ napi_value RemoveUntrustedConfig(napi_env env, napi_callback_info info)
         delete asyncContext;
         return UndefinedNapiValue(env);
     }
-    JsObjToDeviceConfig(env, argv[0], *config);
+    napi_value ret = JsObjToDeviceConfig(env, argv[0], *config);
+    napi_typeof(env, ret, &valueType);
+    WIFI_NAPI_ASSERT(env, valueType != napi_undefined, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_STA);
     asyncContext->config = config;
-
     asyncContext->executeFunc = [&](void* data) -> void {
         DeviceConfigContext *context = static_cast<DeviceConfigContext *>(data);
         TRACE_FUNC_CALL_NAME("wifiDevicePtr->RemoveCandidateConfig");
@@ -551,10 +562,12 @@ napi_value AddCandidateConfig(napi_env env, napi_callback_info info)
         delete asyncContext;
         return UndefinedNapiValue(env);
     }
-    JsObjToDeviceConfig(env, argv[0], *config);
+
+    napi_value ret = JsObjToDeviceConfig(env, argv[0], *config);
+    napi_typeof(env, ret, &valueType);
+    WIFI_NAPI_ASSERT(env, valueType != napi_undefined, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_STA);
     asyncContext->config = config;
     asyncContext->isCandidate = true;
-
     asyncContext->executeFunc = [&](void* data) -> void {
         DeviceConfigContext *context = static_cast<DeviceConfigContext *>(data);
         TRACE_FUNC_CALL_NAME("wifiDevicePtr->AddCandidateConfig");
@@ -679,7 +692,9 @@ napi_value ConnectToDevice(napi_env env, napi_callback_info info)
 
     WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
     WifiDeviceConfig config;
-    JsObjToDeviceConfig(env, argv[0], config);
+    napi_value ret = JsObjToDeviceConfig(env, argv[0], config);
+    napi_typeof(env, ret, &valueType);
+    WIFI_NAPI_ASSERT(env, valueType != napi_undefined, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_STA);
     ErrCode ret = wifiDevicePtr->ConnectToDevice(config);
     if (ret != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("Connect to device fail: %{public}d", ret);
@@ -1075,7 +1090,9 @@ napi_value UpdateNetwork(napi_env env, napi_callback_info info)
     WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
     int updateResult;
     WifiDeviceConfig config;
-    JsObjToDeviceConfig(env, argv[0], config);
+    napi_value ret = JsObjToDeviceConfig(env, argv[0], config);
+    napi_typeof(env, ret, &valueType);
+    WIFI_NAPI_ASSERT(env, valueType != napi_undefined, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_STA);
     ErrCode ret = wifiDevicePtr->UpdateDeviceConfig(config, updateResult);
     if (ret != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("Update device config fail: %{public}d", ret);

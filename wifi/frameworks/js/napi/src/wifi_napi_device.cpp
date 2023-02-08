@@ -692,8 +692,8 @@ napi_value ConnectToDevice(napi_env env, napi_callback_info info)
 
     WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
     WifiDeviceConfig config;
-    napi_value ret = JsObjToDeviceConfig(env, argv[0], config);
-    napi_typeof(env, ret, &valueType);
+    napi_value napiRet = JsObjToDeviceConfig(env, argv[0], config);
+    napi_typeof(env, napiRet, &valueType);
     WIFI_NAPI_ASSERT(env, valueType != napi_undefined, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_STA);
     ErrCode ret = wifiDevicePtr->ConnectToDevice(config);
     if (ret != WIFI_OPT_SUCCESS) {
@@ -1090,8 +1090,8 @@ napi_value UpdateNetwork(napi_env env, napi_callback_info info)
     WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
     int updateResult;
     WifiDeviceConfig config;
-    napi_value ret = JsObjToDeviceConfig(env, argv[0], config);
-    napi_typeof(env, ret, &valueType);
+    napi_value napiRet = JsObjToDeviceConfig(env, argv[0], config);
+    napi_typeof(env, napiRet, &valueType);
     WIFI_NAPI_ASSERT(env, valueType != napi_undefined, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_STA);
     ErrCode ret = wifiDevicePtr->UpdateDeviceConfig(config, updateResult);
     if (ret != WIFI_OPT_SUCCESS) {

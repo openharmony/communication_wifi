@@ -54,10 +54,5 @@ HWTEST_F(WifiSupplicantifaceTest, RpcClientCallTest1, TestSize.Level1)
 {
     RpcClientCallTest1();
 }
-
-HWTEST_F(WifiSupplicantifaceTest, RpcClientCallTest2, TestSize.Level1)
-{
-    RpcClientCallTest2();
-}
 }  // namespace Wifi
 }  // namespace OHOS

@@ -32,6 +32,8 @@ ohos_unittest("native_unittest") {
     "wifi_c_hotspot_test.cpp",
     "wifi_c_p2p_test.cpp",
     "wifi_c_utils_test.cpp",
+    "wifi_msg_test.cpp",
+    "wifi_p2p_msg_test.cpp",
   ]
 
   include_dirs = [

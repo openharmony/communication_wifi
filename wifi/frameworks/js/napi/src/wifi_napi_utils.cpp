@@ -158,7 +158,7 @@ std::vector<uint8_t> JsObjectToU8Vector(const napi_env& env, const napi_value& o
     napi_value buffer = nullptr;
     NAPI_CALL_BASE(env, napi_get_typedarray_info(env, object, &type, &length, nullptr, &buffer, &offset), {});
     if (type != napi_uint8_array || buffer == nullptr) {
-        WIFI_LOGW("%{public}s type: %{public}zu, buffer:%{public}d", fieldStr, type, buffer == nullptr);
+        WIFI_LOGW("%{public}s, buffer is nullptr: %{public}d", fieldStr, buffer == nullptr);
         return {};
     }
 

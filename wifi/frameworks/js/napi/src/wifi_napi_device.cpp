@@ -279,7 +279,6 @@ static void ProcessEapTlsConfig(const napi_env& env, const napi_value& object, W
 napi_value ProcessEapConfig(const napi_env& env, const napi_value& object, WifiDeviceConfig& devConfig)
 {
     bool hasProperty = false;
-
     NAPI_CALL(env, napi_has_named_property(env, object, "eapConfig", &hasProperty));
     if (!hasProperty) {
         WIFI_LOGI("Js has no property: eapConfig.");
@@ -288,9 +287,9 @@ napi_value ProcessEapConfig(const napi_env& env, const napi_value& object, WifiD
 
     napi_value napiEap;
     napi_get_named_property(env, object, "eapConfig", &napiEap);
-
     int eapMethod = static_cast<int>(EapMethodJs::EAP_NONE);
     JsObjectToInt(env, napiEap, "eapMethod", eapMethod);
+    WIFI_LOGI("ProcessEapConfig, eapMethod: %{public}d.", eapMethod);
     switch (EapMethodJs(eapMethod)) {
         case EapMethodJs::EAP_PEAP:
             ProcessEapPeapConfig(env, napiEap, devConfig.wifiEapConfig);
@@ -300,9 +299,9 @@ napi_value ProcessEapConfig(const napi_env& env, const napi_value& object, WifiD
             break;
         default:
             WIFI_LOGE("EapMethod: %{public}d unsupported", eapMethod);
-            break;
+            return UndefinedNapiValue(env);
     }
-    return UndefinedNapiValue(env);
+    return CreateInt32(env);
 }
 
 napi_value ConfigStaticIp(const napi_env& env, const napi_value& object, WifiDeviceConfig& cppConfig)
@@ -363,7 +362,7 @@ static napi_value JsObjToDeviceConfig(const napi_env& env, const napi_value& obj
     /* "randomMacAddr" is not supported currently */
     int ipType = static_cast<int>(AssignIpMethod::UNASSIGNED);
     JsObjectToInt(env, object, "ipType", ipType);
-    WIFI_LOGI("JsObjToDeviceConfig, ipType: %{public}d.", ipType);
+    WIFI_LOGI("JsObjToDeviceConfig, ipType: %{public}d, type: %{public}d.", ipType, type);
     if (IpTypeJs(ipType) == IpTypeJs::IP_TYPE_DHCP) {
         cppConfig.wifiIpConfig.assignMethod = AssignIpMethod::DHCP;
     } else if (IpTypeJs(ipType) == IpTypeJs::IP_TYPE_STATIC) {
@@ -376,7 +375,11 @@ static napi_value JsObjToDeviceConfig(const napi_env& env, const napi_value& obj
             return UndefinedNapiValue(env);
         }
     }
-    return ProcessEapConfig(env, object, cppConfig);
+
+    if (SecTypeJs(type) == SecTypeJs::SEC_TYPE_EAP) {
+        return ProcessEapConfig(env, object, cppConfig);
+    }
+    return CreateInt32(env);
 }
 
 napi_value AddDeviceConfig(napi_env env, napi_callback_info info)
@@ -1090,8 +1093,8 @@ napi_value UpdateNetwork(napi_env env, napi_callback_info info)
     WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
     int updateResult;
     WifiDeviceConfig config;
-    napi_value napiRet = JsObjToDeviceConfig(env, argv[0], config);
-    napi_typeof(env, napiRet, &valueType);
+    napi_value res = JsObjToDeviceConfig(env, argv[0], config);
+    napi_typeof(env, res, &valueType);
     WIFI_NAPI_ASSERT(env, valueType != napi_undefined, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_STA);
     ErrCode ret = wifiDevicePtr->UpdateDeviceConfig(config, updateResult);
     if (ret != WIFI_OPT_SUCCESS) {

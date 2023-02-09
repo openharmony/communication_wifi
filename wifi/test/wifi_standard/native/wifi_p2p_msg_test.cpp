@@ -14,6 +14,7 @@
  */
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
+#include <vector>
 #include "wifi_p2p_msg.h"
 
 using ::testing::_;
@@ -30,12 +31,12 @@ using ::testing::ext::TestSize;
 namespace OHOS {
 namespace Wifi {
 constexpr int TIMES = 253;
-constexpr int DATA = 0x12;
+constexpr unsigned char DATA = 0x12;
 class WifiP2PMsgTest : public testing::Test {
 public:
     static void SetUpTestCase() {}
     static void TearDownTestCase() {}
-    virtual void SetUp() 
+    virtual void SetUp()
     {
         pWifiP2pWfdInfo = std::make_unique<WifiP2pWfdInfo>();
         pWifiP2pGroupInfo = std::make_unique<WifiP2pGroupInfo>();
@@ -118,16 +119,16 @@ HWTEST_F(WifiP2PMsgTest, WifiP2pServiceRequestTest, TestSize.Level1)
 HWTEST_F(WifiP2PMsgTest, WifiP2pServiceResponseTest, TestSize.Level1)
 {
     std::vector<unsigned char> data;
-    pWifiP2pServiceResponse->SetQuery(data);
+    pWifiP2pServiceResponse->SetData(data);
     pWifiP2pServiceResponse->GetTlv();
     data.push_back(0x00);
     data.push_back(0x00);
-    pWifiP2pServiceResponse->SetQuery(data);
+    pWifiP2pServiceResponse->SetData(data);
     pWifiP2pServiceResponse->GetTlv();
     for (int i = 0; i < TIMES; i++) {
         data.push_back(DATA);
     }
-    pWifiP2pServiceRequest->SetQuery(data);
+    pWifiP2pServiceResponse->SetData(data);
     pWifiP2pServiceResponse->GetTlv();
 }
 } // namespace Wifi

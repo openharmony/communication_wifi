@@ -51,19 +51,19 @@ HWTEST_F(WifiMsgTest, Phase2MethodToStrTest, TestSize.Level1)
     method = FOUR;
     EXPECT_TRUE(WifiEapConfig::Phase2MethodToStr(eap, method) == "autheap=GTC");
     method = FIVE;
-    EXPECT_TRUE(WifiEapConfig::Phase2MethodToStr(eap, method) == "auth=SIM"); 
+    EXPECT_TRUE(WifiEapConfig::Phase2MethodToStr(eap, method) == "auth=SIM");
 }
 
 HWTEST_F(WifiMsgTest, Phase2MethodFromStrTest, TestSize.Level1)
 {
     std::string str = "NONE";
-    EXPECT_TRUE(WifiEapConfig::Phase2MethodFromStr(str) == "Phase2Method::NONE");
+    EXPECT_TRUE(WifiEapConfig::Phase2MethodFromStr(str) == Phase2Method::NONE);
     str = "auth=PAP";
-    EXPECT_TRUE(WifiEapConfig::Phase2MethodFromStr(str) == "Phase2Method::PAP");
+    EXPECT_TRUE(WifiEapConfig::Phase2MethodFromStr(str) == Phase2Method::PAP);
     str = "auth=NONE";
-    EXPECT_TRUE(WifiEapConfig::Phase2MethodFromStr(str) == "Phase2Method::NONE");
+    EXPECT_TRUE(WifiEapConfig::Phase2MethodFromStr(str) == Phase2Method::NONE);
     str = "autheap=PAP";
-    EXPECT_TRUE(WifiEapConfig::Phase2MethodFromStr(str) == "Phase2Method::PAP"); 
+    EXPECT_TRUE(WifiEapConfig::Phase2MethodFromStr(str) == Phase2Method::PAP);
 }
 } // namespace Wifi
 } // namespace OHOS

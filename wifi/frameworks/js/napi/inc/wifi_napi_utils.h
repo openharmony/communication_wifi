@@ -82,7 +82,6 @@ public:
 };
 
 napi_value UndefinedNapiValue(const napi_env& env);
-napi_value CreateInt32(const napi_env& env);
 napi_value JsObjectToString(const napi_env& env, const napi_value& object,
     const char* fieldStr, const int bufLen, std::string& fieldRef);
 napi_value JsObjectToInt(const napi_env& env, const napi_value& object, const char* fieldStr, int& fieldRef);

@@ -49,13 +49,6 @@ napi_value UndefinedNapiValue(const napi_env& env)
     return result;
 }
 
-napi_value CreateInt32(const napi_env& env)
-{
-    napi_value result;
-    napi_get_undefined(env, &result);
-    return result;
-}
-
 napi_value JsObjectToString(const napi_env& env, const napi_value& object,
     const char* fieldStr, const int bufLen, std::string& fieldRef)
 {
@@ -149,13 +142,13 @@ std::vector<uint8_t> JsObjectToU8Vector(const napi_env& env, const napi_value& o
     bool hasProperty = false;
     NAPI_CALL_BASE(env, napi_has_named_property(env, object, fieldStr, &hasProperty), {});
     if (!hasProperty) {
-        WIFI_LOGW("JsObjectToU8Vector, Js to U8Vector no property: %{public}s", fieldStr);
+        WIFI_LOGW("Js to U8Vector no property: %{public}s", fieldStr);
         return {};
     }
 
     bool isTypedArray = false;
     if (napi_is_typedarray(env, object, &isTypedArray) != napi_ok || !isTypedArray) {
-        WIFI_LOGW("JsObjectToU8Vector, property is not typedarray: %{public}s", fieldStr);
+        WIFI_LOGW("property is not typedarray: %{public}s", fieldStr);
         return {};
     }
 
@@ -165,8 +158,7 @@ std::vector<uint8_t> JsObjectToU8Vector(const napi_env& env, const napi_value& o
     napi_value buffer = nullptr;
     NAPI_CALL_BASE(env, napi_get_typedarray_info(env, object, &type, &length, nullptr, &buffer, &offset), {});
     if (type != napi_uint8_array || buffer == nullptr) {
-        WIFI_LOGW("JsObjectToU8Vector, %{public}s, buffer is nullptr: %{public}d",
-            fieldStr, (int)(buffer == nullptr));
+        WIFI_LOGW("%{public}s type: %{public}zu, buffer:%{public}d", fieldStr, type, buffer == nullptr);
         return {};
     }
 
@@ -177,7 +169,6 @@ std::vector<uint8_t> JsObjectToU8Vector(const napi_env& env, const napi_value& o
     std::vector<uint8_t> result(length);
     int retCode = memcpy_s(result.data(), result.size(), &data[offset], length);
     if (retCode != 0) {
-        WIFI_LOGW("JsObjectToU8Vector, memcpy_s return fail: %{public}d", retCode);
         return {};
     }
     return result;

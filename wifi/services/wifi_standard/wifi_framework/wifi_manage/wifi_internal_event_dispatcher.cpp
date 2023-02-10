@@ -382,6 +382,7 @@ void WifiInternalEventDispatcher::DealScanCallbackMsg(
 
 void WifiInternalEventDispatcher::InvokeScanCallbacks(const WifiEventCallbackMsg &msg)
 {
+    std::unique_lock<std::mutex> lock(mScanCallbackMutex);
     ScanCallbackMapType callbacks = mScanCallbacks;
     ScanCallbackMapType::iterator itr;
     for (itr = callbacks.begin(); itr != callbacks.end(); itr++) {
@@ -414,6 +415,7 @@ void WifiInternalEventDispatcher::InvokeScanCallbacks(const WifiEventCallbackMsg
 
 void WifiInternalEventDispatcher::InvokeDeviceCallbacks(const WifiEventCallbackMsg &msg)
 {
+    std::unique_lock<std::mutex> lock(mStaCallbackMutex);
     StaCallbackMapType callbacks = mStaCallbacks;
     StaCallbackMapType::iterator itr;
     for (itr = callbacks.begin(); itr != callbacks.end(); itr++) {
@@ -463,6 +465,7 @@ void WifiInternalEventDispatcher::InvokeDeviceCallbacks(const WifiEventCallbackM
 
 void WifiInternalEventDispatcher::InvokeHotspotCallbacks(const WifiEventCallbackMsg &msg)
 {
+    std::unique_lock<std::mutex> lock(mHotspotCallbackMutex);
     auto iter = mHotspotCallbacks.find(msg.id);
     if (iter != mHotspotCallbacks.end()) {
         HotspotCallbackMapType callbacks = iter->second;
@@ -517,6 +520,7 @@ void WifiInternalEventDispatcher::DealHotspotCallbackMsg(
 
 void WifiInternalEventDispatcher::InvokeP2pCallbacks(const WifiEventCallbackMsg &msg)
 {
+    std::unique_lock<std::mutex> lock(mP2pCallbackMutex);
     P2pCallbackMapType callbacks = mP2pCallbacks;
     P2pCallbackMapType::iterator itr;
     for (itr = callbacks.begin(); itr != callbacks.end(); itr++) {

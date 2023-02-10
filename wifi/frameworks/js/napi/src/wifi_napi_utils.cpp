@@ -51,8 +51,9 @@ napi_value UndefinedNapiValue(const napi_env& env)
 
 napi_value CreateInt32(const napi_env& env)
 {
-    napi_value result;
-    napi_get_undefined(env, &result);
+    int32_t value = 1;
+    napi_value result = nullptr;
+    napi_create_int32(env, value, &result);
     return result;
 }
 

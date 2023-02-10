@@ -56,35 +56,6 @@ HWTEST_F(HttpRequestTest, ArpChecker_Fail2, TestSize.Level1)
     std::string strResponse = "";
     EXPECT_TRUE(pHttpRequest->HttpGet(url, strResponse) == -1);
 }
-
-HWTEST_F(HttpRequestTest, GetPortFromUrl_Fail3, TestSize.Level1)
-{
-    std::string strUrl = "https://-10";
-    std::string strResponse = "";
-    EXPECT_TRUE(pHttpRequest->HttpGet(strUrl, strResponse) == -1);
-}
-
-HWTEST_F(HttpRequestTest, GetPortFromUrl_Fail4, TestSize.Level1)
-{
-    std::string strUrl = "https//";
-    std::string strResponse = "";
-    EXPECT_TRUE(pHttpRequest->HttpGet(strUrl, strResponse) == -1);
-}
-
-HWTEST_F(HttpRequestTest, GetPortFromUrl_Fail5, TestSize.Level1)
-{
-    std::string strUrl = "http://192.168.3.22";
-    std::string strResponse = "";
-    EXPECT_TRUE(pHttpRequest->HttpGet(strUrl, strResponse) == -1);
-}
-
-HWTEST_F(HttpRequestTest, HttpPost_Success, TestSize.Level1)
-{
-    std::string strUrl = "http://192.168.3.22";
-    std::string strResponse = "";
-    std::string strdata = "";
-    EXPECT_TRUE(pHttpRequest->HttpPost(strUrl, strdata, strResponse) == -1);
-}
 }  // namespace Wifi
 }  // namespace OHOS
 

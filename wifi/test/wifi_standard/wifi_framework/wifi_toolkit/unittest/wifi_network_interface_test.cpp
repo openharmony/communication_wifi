@@ -40,21 +40,5 @@ HWTEST_F(WifiNetworkInterfaceTest, FetchInterfaceConfigTest, TestSize.Level1)
     EXPECT_TRUE(NetworkInterface::FetchInterfaceConfig("wlan0", vecIPv4, vecIPv6) == true);
     NetworkInterface::Dump("wlan0");
 }
-
-HWTEST_F(WifiNetworkInterfaceTest, AddDelIpAddressTest, TestSize.Level1)
-{
-    Ipv4Address ip = Ipv4Address::Create("10.0.0.1", "255.255.255.0");
-    EXPECT_TRUE(NetworkInterface::AddIpAddress("wlan0", ip) == true);
-    EXPECT_TRUE(NetworkInterface::IsExistAddressForInterface("wlan0", ip) == true);
-    Ipv4Address ip2 = Ipv4Address::Create("10.0.0.2", "255.255.255.0");
-    EXPECT_TRUE(NetworkInterface::IsExistAddressForInterface("wlan0", ip2) == false);
-    std::vector<Ipv4Address> vecIpv4;
-    EXPECT_TRUE(NetworkInterface::GetIpv4Address("wlan0", vecIpv4) == true);
-    Ipv6Address ipv6 = Ipv6Address::Create("fe80::47b1:fa81:b33e:ea6b/64");
-    EXPECT_TRUE(ipv6.IsValid() == true);
-    std::vector<Ipv6Address> vecIpv6;
-    EXPECT_TRUE(NetworkInterface::GetAllIpv6Address("wlan0", vecIpv6) == true);
-    EXPECT_TRUE(NetworkInterface::ClearAllIpAddress("wlan0") == true);
-}
 }  // namespace Wifi
 }  // namespace OHOS

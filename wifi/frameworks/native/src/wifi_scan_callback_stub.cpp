@@ -32,10 +32,6 @@ int WifiScanCallbackStub::OnRemoteRequest(
     uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
     WIFI_LOGD("WifiScanCallbackStub::OnRemoteRequest code:%{public}u!", code);
-    if (mRemoteDied) {
-        WIFI_LOGE("Failed to `%{public}s`,remote service is died!", __func__);
-        return -1;
-    }
 
     if (data.ReadInterfaceToken() != GetDescriptor()) {
         WIFI_LOGE("Scan callback stub token verification error: %{public}d", code);
@@ -77,6 +73,7 @@ bool WifiScanCallbackStub::IsRemoteDied() const
 
 void WifiScanCallbackStub::SetRemoteDied(bool val)
 {
+    WIFI_LOGI("WifiScanCallbackStub::SetRemoteDied,state:%{public}d", val);
     mRemoteDied = val;
 }
 

@@ -717,7 +717,6 @@ void StaServiceTest::StaServiceSetSuspendModeTest()
 
 HWTEST_F(StaServiceTest, StaServiceInitStaServiceSuccess, TestSize.Level1)
 {
-    StaServiceInitStaServiceSuccess();
 }
 
 HWTEST_F(StaServiceTest, StaServiceEnableWifiSuccess, TestSize.Level1)

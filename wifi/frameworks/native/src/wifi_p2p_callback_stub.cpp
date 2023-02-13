@@ -49,10 +49,6 @@ int WifiP2pCallbackStub::OnRemoteRequest(
     uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
     WIFI_LOGD("WifiP2pCallbackStub::OnRemoteRequest code:%{public}u!", code);
-    if (mRemoteDied) {
-        WIFI_LOGD("Failed to `%{public}s`,remote service is died!", __func__);
-        return -1;
-    }
 
     if (data.ReadInterfaceToken() != GetDescriptor()) {
         WIFI_LOGE("P2p callback stub token verification error: %{public}d", code);
@@ -91,6 +87,7 @@ bool WifiP2pCallbackStub::IsRemoteDied() const
 
 void WifiP2pCallbackStub::SetRemoteDied(bool val)
 {
+    WIFI_LOGI("WifiP2pCallbackStub::SetRemoteDied: %{public}d", val);
     mRemoteDied = val;
 }
 

@@ -43,7 +43,7 @@ void WifiBroadCastHelper::Show(const WifiP2pDevice &v)
 {
     std::string rollpri;
     WIFI_LOGI("    -WifiP2pDevice:");
-    WIFI_LOGI("       DeviceName:%{public}s", v.GetDeviceName().c_str());
+    WIFI_LOGI("       DeviceName:%{private}s", v.GetDeviceName().c_str());
     WIFI_LOGI("       DeviceAddress:%{private}s", v.GetDeviceAddress().c_str());
     WIFI_LOGI("       PrimaryDeviceType:%{public}s", v.GetPrimaryDeviceType().c_str());
     WIFI_LOGI("       SecondaryDeviceType:%{public}s", v.GetSecondaryDeviceType().c_str());

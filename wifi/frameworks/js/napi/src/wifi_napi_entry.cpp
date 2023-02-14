@@ -216,6 +216,7 @@ static napi_value Init(napi_env env, napi_value exports) {
         DECLARE_NAPI_FUNCTION("getScanInfosSync", GetScanResults),
         DECLARE_NAPI_FUNCTION("getScanResults", GetScanInfos),
         DECLARE_NAPI_FUNCTION("getScanResultsSync", GetScanResults),
+        DECLARE_NAPI_FUNCTION("getScanInfoList", GetScanResults),
         DECLARE_NAPI_FUNCTION("addDeviceConfig", AddDeviceConfig),
         DECLARE_NAPI_FUNCTION("addUntrustedConfig", AddUntrustedConfig),
         DECLARE_NAPI_FUNCTION("removeUntrustedConfig", RemoveUntrustedConfig),

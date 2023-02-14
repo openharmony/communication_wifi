@@ -1087,10 +1087,6 @@ ErrCode WifiDeviceServiceImpl::GetSignalLevel(const int &rssi, const int &band, 
         return WIFI_OPT_PERMISSION_DENIED;
     }
 
-    if (!IsStaServiceRunning()) {
-        return WIFI_OPT_STA_NOT_OPENED;
-    }
-
     level = WifiConfigCenter::GetInstance().GetSignalLevel(rssi, band);
     return WIFI_OPT_SUCCESS;
 }
@@ -1128,6 +1124,11 @@ ErrCode WifiDeviceServiceImpl::GetDeviceMacAddress(std::string &result)
     if (WifiPermissionUtils::VerifyGetWifiLocalMacPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("GetDeviceMacAddress:VerifyGetWifiLocalMacPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
+    }
+
+    /* mac will be got from hal when wifi is enabled. if wifi is disabled, we don't return mac. */
+    if (!IsStaServiceRunning()) {
+        return WIFI_OPT_STA_NOT_OPENED;
     }
 
     WifiConfigCenter::GetInstance().GetMacAddress(result);

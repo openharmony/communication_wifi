@@ -64,15 +64,17 @@ public:
             mTestContext->wBegin = mTestContext->wEnd = 0;
         }
     }
+public:
+    static Context *mTestContext;
 
     static void OnIfaceAddedTest(int32_t type, char *ifname)
     {
-        LOGI("Mock SetWifiChipEventCallbackTest!");
+        LOGI("Mock OnIfaceAddedTest!");
     }
 
     static void OnIfaceRemovedTest(int32_t type, char *ifname)
     {
-        LOGI("Mock SetWifiChipEventCallbackTest!");
+        LOGI("Mock OnIfaceRemovedTest!");
     }
 
     static void SetWifiChipEventCallbackTest()
@@ -305,8 +307,6 @@ public:
         IWifiEventP2pCallback callback;
         SetWifiP2pEventCallback(callback);
     }
-public:
-    static Context *mTestContext;
 };
 
 Context *IWifiTest::mTestContext = nullptr;

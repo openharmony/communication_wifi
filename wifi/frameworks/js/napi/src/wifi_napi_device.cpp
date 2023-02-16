@@ -190,8 +190,8 @@ napi_value GetScanInfos(napi_env env, napi_callback_info info)
 
     asyncContext->completeFunc = [&](void* data) -> void {
         ScanInfoAsyncContext *context = static_cast<ScanInfoAsyncContext *>(data);
+        napi_create_array_with_length(context->env, context->vecScanInfos.size(), &context->result);
         if (context->errorCode == WIFI_OPT_SUCCESS) {
-            napi_create_array_with_length(context->env, context->vecScanInfos.size(), &context->result);
             context->errorCode = NativeScanInfosToJsObj(context->env, context->vecScanInfos, context->result);
         }
         WIFI_LOGI("Push scan info list to client");
@@ -341,7 +341,7 @@ napi_value ConfigStaticIp(const napi_env& env, const napi_value& object, WifiDev
     napi_get_value_uint32(env, primaryDns, &cppConfig.wifiIpConfig.staticIpAddress.dnsServer1.addressIpv4);
     napi_get_value_uint32(env, secondDns, &cppConfig.wifiIpConfig.staticIpAddress.dnsServer2.addressIpv4);
 
-    return UndefinedNapiValue(env);
+    return CreateInt32(env);
 }
 
 static napi_value JsObjToDeviceConfig(const napi_env& env, const napi_value& object, WifiDeviceConfig& cppConfig)

@@ -173,7 +173,7 @@ void HandlePromiseErrCode(    const napi_env &env, const AsyncContext &info)
         napi_set_named_property(env, businessError, "data", eData);
         napi_reject_deferred(env, info.deferred, businessError);
 #else
-        napi_reject_deferred(info.env, info.deferred, info.result);
+        napi_reject_deferred(env, info.deferred, info.result);
 #endif
     }
 }

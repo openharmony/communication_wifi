@@ -132,6 +132,7 @@ void WifiNetAgent::UpdateNetLinkInfo(const std::string &ip, const std::string &m
 
     sptr<NetManagerStandard::INetAddr> dns = (std::make_unique<NetManagerStandard::INetAddr>()).release();
     dns->type_ = NetManagerStandard::INetAddr::IPV4;
+    dns->family_ = NetManagerStandard::INetAddr::IPV4;
     dns->address_ = strDns;
     netLinkInfo->dnsList_.push_back(*dns);
     dns->address_ = strBakDns;

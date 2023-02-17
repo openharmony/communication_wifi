@@ -24,18 +24,21 @@ using ::testing::ext::TestSize;
 
 namespace OHOS {
 namespace Wifi {
-class WifiCMacAddress : public testing::Test{
+class WifiCMacAddress : public testing::Test {
 public:
-    static void SetUpTestCase(){};
-    static void TearDownTestCase(){};
-    virtual void SetUp(){};
-    virtual void TearDown(){};
-
+    static void SetUpTestCase()
+    {}
+    static void TearDownTestCase()
+    {}
+    virtual void SetUp()
+    {}
+    virtual void TearDown()
+    {}
 };
 
 HWTEST_F(WifiCMacAddress, CreateTest1, TestSize.Level1)
 {
-    std::string mac = "CreateTest1234"; 	 
+    std::string mac = "CreateTest1234";
     MacAddress::Create(mac);
 }
 HWTEST_F(WifiCMacAddress, CreateTest2, TestSize.Level1)

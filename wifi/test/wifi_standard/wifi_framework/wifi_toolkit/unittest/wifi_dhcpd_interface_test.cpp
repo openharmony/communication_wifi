@@ -25,18 +25,20 @@ using ::testing::ext::TestSize;
 
 namespace OHOS {
 namespace Wifi {
-class WifiDhcpdInterfaceTest : public testing::Test{
+class WifiDhcpdInterfaceTest : public testing::Test {
 public:
-    static void SetUpTestCase(){};
-    static void TearDownTestCase(){};
+    static void SetUpTestCase()
+    {}
+    static void TearDownTestCase()
+    {}
     virtual void SetUp()
     {
         pDhcpdInterface = std::make_unique<DhcpdInterface>();
-    };
+    }
     virtual void TearDown()
     {
         pDhcpdInterface.reset();
-    };
+    }
 public:
     std::unique_ptr<DhcpdInterface> pDhcpdInterface;
 };

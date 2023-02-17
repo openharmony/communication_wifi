@@ -31,11 +31,19 @@
 static IWifiApEventCallback g_wifiApEventCallback[AP_INSTANCE_MAX_NUM];
 void SetWifiApEventCallback(IWifiApEventCallback callback, int id)
 {
+    if (id >= AP_INSTANCE_MAX_NUM) {
+        LOGE("SetWifiApEventCallback error");
+        return;
+    }
     g_wifiApEventCallback[id] = callback;
 }
 
 IWifiApEventCallback *GetWifiApEventCallback(int id)
 {
+    if (id >= AP_INSTANCE_MAX_NUM) {
+        LOGE("GetWifiApEventCallback error");
+        return NULL;
+    }
     return &g_wifiApEventCallback[id];
 }
 

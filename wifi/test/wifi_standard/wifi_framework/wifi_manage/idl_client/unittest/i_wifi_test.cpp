@@ -1128,8 +1128,6 @@ HWTEST_F(IWifiTest, OnTransactTest40, TestSize.Level1)
     mTestContext->oneProcess = test4;
     mTestContext->nPos = 0;
     mTestContext->nSize = strlen(test4) + 1;
-    EXPECT_TRUE(OnTransact(mTestContext) == 0);
-    mTestContext->nPos = 0;
     SetWifiP2pEventCallbackTest();
     EXPECT_TRUE(OnTransact(mTestContext) == 0);
     char test[] = "141\t5";

@@ -124,7 +124,7 @@ if (defined(ohos_lite)) {
       external_deps += [ "drivers_interface_wlan:libwlan_proxy_1.0" ]
     }
 
-    if (product_name == "rk3568") {
+    if (product_name == "rk3568" || device_name == "rk3588") {
       defines += [ "NON_SEPERATE_P2P" ]
     }
 

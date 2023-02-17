@@ -1061,7 +1061,7 @@ HWTEST_F(IWifiTest, OnTransactTest37, TestSize.Level1)
 
 HWTEST_F(IWifiTest, OnTransactTest38, TestSize.Level1)
 {
-    char test[] = "139\taddress";
+    char test[] = "139\taddress\t";
     mTestContext->oneProcess = test;
     mTestContext->nPos = 0;
     mTestContext->nSize = strlen(test) + 1;
@@ -1078,6 +1078,7 @@ HWTEST_F(IWifiTest, OnTransactTest39, TestSize.Level1)
     mTestContext->oneProcess = test;
     mTestContext->nPos = 0;
     mTestContext->nSize = strlen(test) + 1;
+    ResetWifiP2pEventCallbackTest();
     EXPECT_TRUE(OnTransact(mTestContext) == 0);
     char test1[] = "140\t1\t";
     mTestContext->oneProcess = test1;
@@ -1123,6 +1124,14 @@ HWTEST_F(IWifiTest, OnTransactTest39, TestSize.Level1)
 
 HWTEST_F(IWifiTest, OnTransactTest40, TestSize.Level1)
 {
+    char test4[] = "140\t1\t2\t3\t00:11:22:33:44:55\t0\tTlv\t";
+    mTestContext->oneProcess = test4;
+    mTestContext->nPos = 0;
+    mTestContext->nSize = strlen(test4) + 1;
+    EXPECT_TRUE(OnTransact(mTestContext) == 0);
+    mTestContext->nPos = 0;
+    SetWifiP2pEventCallbackTest();
+    EXPECT_TRUE(OnTransact(mTestContext) == 0);
     char test[] = "141\t5";
     mTestContext->oneProcess = test;
     mTestContext->nPos = 0;
@@ -1156,14 +1165,6 @@ HWTEST_F(IWifiTest, OnTransactTest41, TestSize.Level1)
     mTestContext->nPos = 0;
     mTestContext->nSize = strlen(test) + 1;
     ResetWifiP2pEventCallbackTest();
-    EXPECT_TRUE(OnTransact(mTestContext) == 0);
-    char test2[] = "140\t1\t2\t3\t00:11:22:33:44:55\t0\tTlv\t";
-    mTestContext->oneProcess = test2;
-    mTestContext->nPos = 0;
-    mTestContext->nSize = strlen(test2) + 1;
-    EXPECT_TRUE(OnTransact(mTestContext) == 0);
-    mTestContext->nPos = 0;
-    SetWifiP2pEventCallbackTest();
     EXPECT_TRUE(OnTransact(mTestContext) == 0);
 }
 

@@ -1169,7 +1169,7 @@ HWTEST_F(IWifiTest, OnTransactTest41, TestSize.Level1)
 
 HWTEST_F(IWifiTest, NumStrToNumArryTest, TestSize.Level1)
 {
-    char test[] = "136\t5\taddress\t6\t123abcABC*\t";
+    char test[] = "136\t5\taddress\t10\t123abcABC*\t";
     mTestContext->oneProcess = test;
     mTestContext->nPos = 0;
     mTestContext->nSize = strlen(test) + 1;

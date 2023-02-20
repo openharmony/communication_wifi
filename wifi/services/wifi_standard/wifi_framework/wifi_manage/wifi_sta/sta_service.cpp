@@ -249,7 +249,7 @@ int StaService::AddDeviceConfig(const WifiDeviceConfig &config) const
         config.wifiEapConfig.clientCert.empty() && config.wifiEapConfig.privateKey.empty()) {
         std::string uri;
         std::string formatSsid = config.ssid;
-        for (int i = 0; i < formatSsid.size(); i++) {
+        for (int i = 0; i < (int)formatSsid.size(); i++) {
             // other char is invalid in certificate manager
             if (!isalnum(formatSsid[i]) && formatSsid[i] != '_') {
                 formatSsid[i] = '_';

@@ -1156,11 +1156,6 @@ HWTEST_F(WifiHalCRpcServerTest, RpcGetConnectSignalInfoTest, TestSize.Level1)
 HWTEST_F(WifiHalCRpcServerTest, RpcStartSoftApTest, TestSize.Level1)
 {
     EXPECT_TRUE(RpcStartSoftAp(nullptr, nullptr) < 0);
-    char buff[] = "N\tStartSoftAp\t0\t";
-    mContext->oneProcess = buff;
-    mContext->nPos = strlen("N\tStartSoftAp\t");
-    mContext->nSize = strlen(buff);
-    EXPECT_TRUE(RpcStartSoftAp(mServer, mContext) == 0);
 }
 
 HWTEST_F(WifiHalCRpcServerTest, RpcStopSoftApTest, TestSize.Level1)

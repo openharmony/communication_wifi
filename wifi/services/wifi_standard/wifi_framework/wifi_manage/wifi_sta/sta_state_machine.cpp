@@ -802,7 +802,7 @@ void StaStateMachine::DealConnectToUserSelectedNetwork(InternalMessage *msg)
             WIFI_LOGI("This network is connecting and does not need to be reconnected.\n");
             return;
         }
-     }
+    }
 
     /* Save connection information. */
     SaveLinkstate(ConnState::CONNECTING, DetailedState::CONNECTING);

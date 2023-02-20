@@ -39,6 +39,7 @@ WifiSettings::WifiSettings()
       mP2pDiscoverState(0),
       mP2pConnectState(0),
       mApMaxConnNum(0),
+      mMaxNumConfigs(0),
       mLastSelectedNetworkId(-1),
       mLastSelectedTimeVal(0),
       mScreenState(MODE_STATE_OPEN),

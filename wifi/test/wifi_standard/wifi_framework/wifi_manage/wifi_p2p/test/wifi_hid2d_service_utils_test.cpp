@@ -40,7 +40,6 @@ public:
     {
         pIpPool.reset();
         pSharedLinkManager.reset();
-
     }
 
 public:
@@ -83,5 +82,3 @@ HWTEST_F(WifiHid2dServiceUtilsTest, GetSharedLinkCount, TestSize.Level1)
 }
 }
 }
-
-

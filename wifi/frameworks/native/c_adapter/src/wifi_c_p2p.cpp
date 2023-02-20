@@ -25,19 +25,19 @@ constexpr int INVALID_VALUE = -1;
 DEFINE_WIFILOG_LABEL("WifiCP2P");
 std::unique_ptr<OHOS::Wifi::WifiP2p> wifiP2pPtr = OHOS::Wifi::WifiP2p::GetInstance(WIFI_P2P_ABILITY_ID);
 
-WifiErrorCode EnableP2p()
+NO_SANITIZE("cfi") WifiErrorCode EnableP2p()
 {
     CHECK_PTR_RETURN(wifiP2pPtr, ERROR_WIFI_NOT_AVAILABLE);
     return GetCErrorCode(wifiP2pPtr->EnableP2p());
 }
 
-WifiErrorCode DisableP2p()
+NO_SANITIZE("cfi") WifiErrorCode DisableP2p()
 {
     CHECK_PTR_RETURN(wifiP2pPtr, ERROR_WIFI_NOT_AVAILABLE);
     return GetCErrorCode(wifiP2pPtr->DisableP2p());
 }
 
-WifiErrorCode GetP2pEnableStatus(P2pState* state)
+NO_SANITIZE("cfi") WifiErrorCode GetP2pEnableStatus(P2pState* state)
 {
     CHECK_PTR_RETURN(state, ERROR_WIFI_INVALID_ARGS);
     CHECK_PTR_RETURN(wifiP2pPtr, ERROR_WIFI_NOT_AVAILABLE);
@@ -48,37 +48,37 @@ WifiErrorCode GetP2pEnableStatus(P2pState* state)
     return GetCErrorCode(ret);
 }
 
-WifiErrorCode DiscoverDevices()
+NO_SANITIZE("cfi") WifiErrorCode DiscoverDevices()
 {
     CHECK_PTR_RETURN(wifiP2pPtr, ERROR_WIFI_NOT_AVAILABLE);
     return GetCErrorCode(wifiP2pPtr->DiscoverDevices());
 }
 
-WifiErrorCode StopDiscoverDevices()
+NO_SANITIZE("cfi") WifiErrorCode StopDiscoverDevices()
 {
     CHECK_PTR_RETURN(wifiP2pPtr, ERROR_WIFI_NOT_AVAILABLE);
     return GetCErrorCode(wifiP2pPtr->StopDiscoverDevices());
 }
 
-WifiErrorCode DiscoverServices()
+NO_SANITIZE("cfi") WifiErrorCode DiscoverServices()
 {
     CHECK_PTR_RETURN(wifiP2pPtr, ERROR_WIFI_NOT_AVAILABLE);
     return GetCErrorCode(wifiP2pPtr->DiscoverServices());
 }
 
-WifiErrorCode StopDiscoverServices()
+NO_SANITIZE("cfi") WifiErrorCode StopDiscoverServices()
 {
     CHECK_PTR_RETURN(wifiP2pPtr, ERROR_WIFI_NOT_AVAILABLE);
     return GetCErrorCode(wifiP2pPtr->StopDiscoverServices());
 }
 
-WifiErrorCode StartP2pListen(int period, int interval)
+NO_SANITIZE("cfi") WifiErrorCode StartP2pListen(int period, int interval)
 {
     CHECK_PTR_RETURN(wifiP2pPtr, ERROR_WIFI_NOT_AVAILABLE);
     return GetCErrorCode(wifiP2pPtr->StartP2pListen(period, interval));
 }
 
-WifiErrorCode StopP2pListen()
+NO_SANITIZE("cfi") WifiErrorCode StopP2pListen()
 {
     CHECK_PTR_RETURN(wifiP2pPtr, ERROR_WIFI_NOT_AVAILABLE);
     return GetCErrorCode(wifiP2pPtr->StopP2pListen());
@@ -95,7 +95,7 @@ static void ConvertConfigCToCpp(const WifiP2pConfig* config, OHOS::Wifi::WifiP2p
     cppConfig.SetGroupName(config->groupName);
 }
 
-WifiErrorCode CreateGroup(const WifiP2pConfig* config)
+NO_SANITIZE("cfi") WifiErrorCode CreateGroup(const WifiP2pConfig* config)
 {
     CHECK_PTR_RETURN(wifiP2pPtr, ERROR_WIFI_NOT_AVAILABLE);
     CHECK_PTR_RETURN(config, ERROR_WIFI_INVALID_ARGS);
@@ -104,7 +104,7 @@ WifiErrorCode CreateGroup(const WifiP2pConfig* config)
     return GetCErrorCode(wifiP2pPtr->CreateGroup(cppConfig));
 }
 
-WifiErrorCode RemoveGroup()
+NO_SANITIZE("cfi") WifiErrorCode RemoveGroup()
 {
     CHECK_PTR_RETURN(wifiP2pPtr, ERROR_WIFI_NOT_AVAILABLE);
     return GetCErrorCode(wifiP2pPtr->RemoveGroup());
@@ -154,7 +154,7 @@ static void ConvertGroupInfoCToCpp(const WifiP2pGroupInfo* group, OHOS::Wifi::Wi
     cppGroup.SetGoIpAddress(group->goIpAddress);
 }
 
-WifiErrorCode DeleteGroup(const WifiP2pGroupInfo* group)
+NO_SANITIZE("cfi") WifiErrorCode DeleteGroup(const WifiP2pGroupInfo* group)
 {
     CHECK_PTR_RETURN(wifiP2pPtr, ERROR_WIFI_NOT_AVAILABLE);
     CHECK_PTR_RETURN(group, ERROR_WIFI_INVALID_ARGS);
@@ -163,7 +163,7 @@ WifiErrorCode DeleteGroup(const WifiP2pGroupInfo* group)
     return GetCErrorCode(wifiP2pPtr->DeleteGroup(groupInfo));
 }
 
-WifiErrorCode P2pConnect(const WifiP2pConfig* config)
+NO_SANITIZE("cfi") WifiErrorCode P2pConnect(const WifiP2pConfig* config)
 {
     CHECK_PTR_RETURN(wifiP2pPtr, ERROR_WIFI_NOT_AVAILABLE);
     CHECK_PTR_RETURN(config, ERROR_WIFI_INVALID_ARGS);
@@ -172,7 +172,7 @@ WifiErrorCode P2pConnect(const WifiP2pConfig* config)
     return GetCErrorCode(wifiP2pPtr->P2pConnect(deviceConfig));
 }
 
-WifiErrorCode P2pCancelConnect()
+NO_SANITIZE("cfi") WifiErrorCode P2pCancelConnect()
 {
     CHECK_PTR_RETURN(wifiP2pPtr, ERROR_WIFI_NOT_AVAILABLE);
     return GetCErrorCode(wifiP2pPtr->P2pCancelConnect());
@@ -254,7 +254,7 @@ static OHOS::Wifi::ErrCode ConvertGroupInfoCppToC(const OHOS::Wifi::WifiP2pGroup
     return OHOS::Wifi::WIFI_OPT_SUCCESS;
 }
 
-WifiErrorCode GetCurrentGroup(WifiP2pGroupInfo* groupInfo)
+NO_SANITIZE("cfi") WifiErrorCode GetCurrentGroup(WifiP2pGroupInfo* groupInfo)
 {
     CHECK_PTR_RETURN(wifiP2pPtr, ERROR_WIFI_NOT_AVAILABLE);
     CHECK_PTR_RETURN(groupInfo, ERROR_WIFI_INVALID_ARGS);
@@ -267,7 +267,7 @@ WifiErrorCode GetCurrentGroup(WifiP2pGroupInfo* groupInfo)
     return GetCErrorCode(ConvertGroupInfoCppToC(cppGroupInfo, groupInfo));
 }
 
-WifiErrorCode GetP2pConnectedStatus(int* status)
+NO_SANITIZE("cfi") WifiErrorCode GetP2pConnectedStatus(int* status)
 {
     CHECK_PTR_RETURN(wifiP2pPtr, ERROR_WIFI_NOT_AVAILABLE);
     CHECK_PTR_RETURN(status, ERROR_WIFI_INVALID_ARGS);
@@ -280,7 +280,7 @@ WifiErrorCode GetP2pConnectedStatus(int* status)
     return GetCErrorCode(ret);
 }
 
-WifiErrorCode QueryP2pLocalDevice(WifiP2pDevice* deviceInfo)
+NO_SANITIZE("cfi") WifiErrorCode QueryP2pLocalDevice(WifiP2pDevice* deviceInfo)
 {
     CHECK_PTR_RETURN(wifiP2pPtr, ERROR_WIFI_NOT_AVAILABLE);
     CHECK_PTR_RETURN(deviceInfo, ERROR_WIFI_INVALID_ARGS);
@@ -292,7 +292,7 @@ WifiErrorCode QueryP2pLocalDevice(WifiP2pDevice* deviceInfo)
     return GetCErrorCode(ConvertP2PDeviceCppToC(cppDeviceInfo, deviceInfo));
 }
 
-WifiErrorCode QueryP2pDevices(WifiP2pDevice* clientDevices, int size, int* retSize)
+NO_SANITIZE("cfi") WifiErrorCode QueryP2pDevices(WifiP2pDevice* clientDevices, int size, int* retSize)
 {
     CHECK_PTR_RETURN(wifiP2pPtr, ERROR_WIFI_NOT_AVAILABLE);
     CHECK_PTR_RETURN(clientDevices, ERROR_WIFI_INVALID_ARGS);
@@ -314,7 +314,7 @@ WifiErrorCode QueryP2pDevices(WifiP2pDevice* clientDevices, int size, int* retSi
     return WIFI_SUCCESS;
 }
 
-WifiErrorCode QueryP2pGroups(WifiP2pGroupInfo* groupInfo, int size)
+NO_SANITIZE("cfi") WifiErrorCode QueryP2pGroups(WifiP2pGroupInfo* groupInfo, int size)
 {
     CHECK_PTR_RETURN(wifiP2pPtr, ERROR_WIFI_NOT_AVAILABLE);
     CHECK_PTR_RETURN(groupInfo, ERROR_WIFI_INVALID_ARGS);
@@ -455,7 +455,7 @@ private:
 OHOS::sptr<WifiP2pCEventCallback> sptrCallback =
     OHOS::sptr<WifiP2pCEventCallback>(new (std::nothrow) WifiP2pCEventCallback());
 
-WifiErrorCode RegisterP2pStateChangedCallback(const P2pStateChangedCallback callback)
+NO_SANITIZE("cfi") WifiErrorCode RegisterP2pStateChangedCallback(const P2pStateChangedCallback callback)
 {
     CHECK_PTR_RETURN(callback, ERROR_WIFI_INVALID_ARGS);
     CHECK_PTR_RETURN(wifiP2pPtr, ERROR_WIFI_NOT_AVAILABLE);
@@ -465,6 +465,7 @@ WifiErrorCode RegisterP2pStateChangedCallback(const P2pStateChangedCallback call
     return WIFI_SUCCESS;
 }
 
+NO_SANITIZE("cfi")
 WifiErrorCode RegisterP2pPersistentGroupsChangedCallback(const P2pPersistentGroupsChangedCallback callback)
 {
     CHECK_PTR_RETURN(callback, ERROR_WIFI_INVALID_ARGS);
@@ -475,7 +476,7 @@ WifiErrorCode RegisterP2pPersistentGroupsChangedCallback(const P2pPersistentGrou
     return WIFI_SUCCESS;
 }
 
-WifiErrorCode RegisterP2pConnectionChangedCallback(const P2pConnectionChangedCallback callback)
+NO_SANITIZE("cfi") WifiErrorCode RegisterP2pConnectionChangedCallback(const P2pConnectionChangedCallback callback)
 {
     CHECK_PTR_RETURN(callback, ERROR_WIFI_INVALID_ARGS);
     CHECK_PTR_RETURN(wifiP2pPtr, ERROR_WIFI_NOT_AVAILABLE);
@@ -485,7 +486,7 @@ WifiErrorCode RegisterP2pConnectionChangedCallback(const P2pConnectionChangedCal
     return WIFI_SUCCESS;
 }
 
-WifiErrorCode RegisterP2pPeersChangedCallback(const P2pPeersChangedCallback callback)
+NO_SANITIZE("cfi") WifiErrorCode RegisterP2pPeersChangedCallback(const P2pPeersChangedCallback callback)
 {
     CHECK_PTR_RETURN(callback, ERROR_WIFI_INVALID_ARGS);
     CHECK_PTR_RETURN(wifiP2pPtr, ERROR_WIFI_NOT_AVAILABLE);
@@ -495,7 +496,7 @@ WifiErrorCode RegisterP2pPeersChangedCallback(const P2pPeersChangedCallback call
     return WIFI_SUCCESS;
 }
 
-WifiErrorCode RegisterCfgChangCallback(const WifiCfgChangCallback callback)
+NO_SANITIZE("cfi") WifiErrorCode RegisterCfgChangCallback(const WifiCfgChangCallback callback)
 {
     CHECK_PTR_RETURN(callback, ERROR_WIFI_INVALID_ARGS);
     CHECK_PTR_RETURN(wifiP2pPtr, ERROR_WIFI_NOT_AVAILABLE);
@@ -505,7 +506,7 @@ WifiErrorCode RegisterCfgChangCallback(const WifiCfgChangCallback callback)
     return WIFI_SUCCESS;
 }
 
-WifiErrorCode UnregisterCfgChangCallback(void)
+NO_SANITIZE("cfi") WifiErrorCode UnregisterCfgChangCallback(void)
 {
     CHECK_PTR_RETURN(sptrCallback, ERROR_WIFI_NOT_AVAILABLE);
     sptrCallback->cfgChangeCallback = nullptr;

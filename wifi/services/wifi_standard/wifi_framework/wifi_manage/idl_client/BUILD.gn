@@ -132,6 +132,11 @@ if (defined(ohos_lite)) {
   }
 
   ohos_shared_library("wifi_idl_client") {
+    sanitize = {
+      cfi = true
+      boundary_sanitize = true
+      cfi_cross_dso = true
+    }
     install_enable = true
     sources = idl_client_sources
 

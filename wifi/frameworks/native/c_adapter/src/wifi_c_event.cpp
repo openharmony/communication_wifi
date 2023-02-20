@@ -24,6 +24,7 @@
 #include "wifi_hotspot.h"
 #include "wifi_logger.h"
 #include "wifi_scan.h"
+#include "wifi_common_util.h"
 
 DEFINE_WIFILOG_LABEL("WifiCEvent");
 std::set<WifiEvent*> GetEventCallBacks();
@@ -41,7 +42,7 @@ public:
         WIFI_LOGI("sta received state changed event: %{public}d", state);
     }
 
-    void OnWifiConnectionChanged(int state, const OHOS::Wifi::WifiLinkedInfo &info) override {
+    NO_SANITIZE("cfi") void OnWifiConnectionChanged(int state, const OHOS::Wifi::WifiLinkedInfo &info) override {
         WIFI_LOGI("sta received connection changed event: %{public}d", state);
         WifiLinkedInfo linkInfo;
         WifiErrorCode ret = GetLinkedInfo(&linkInfo);
@@ -67,7 +68,7 @@ public:
     void OnStreamChanged(int direction) override {
     }
 
-    void OnDeviceConfigChanged(OHOS::Wifi::ConfigChange value) override {
+    NO_SANITIZE("cfi") void OnDeviceConfigChanged(OHOS::Wifi::ConfigChange value) override {
         std::set<WifiEvent*> setCallbacks = GetEventCallBacks();
         for (auto& callback : setCallbacks) {
             if (callback && callback->OnDeviceConfigChange) {
@@ -90,7 +91,7 @@ public:
     }
 
 public:
-    void OnWifiScanStateChanged(int state) override {
+    NO_SANITIZE("cfi") void OnWifiScanStateChanged(int state) override {
         WIFI_LOGI("scan received state changed event: %{public}d", state);
         std::set<WifiEvent*> setCallbacks = GetEventCallBacks();
         for (auto& callback : setCallbacks) {
@@ -114,7 +115,7 @@ public:
     }
 
 public:
-    void OnHotspotStateChanged(int state) override {
+    NO_SANITIZE("cfi") void OnHotspotStateChanged(int state) override {
         WIFI_LOGI("Hotspot received state changed event: %{public}d", state);
         std::set<WifiEvent*> setCallbacks = GetEventCallBacks();
         for (auto& callback : setCallbacks) {
@@ -163,7 +164,7 @@ public:
         m_setEventCallback.erase(cb);
     }
 
-    WifiErrorCode RegisterWifiEvents() {
+    NO_SANITIZE("cfi") WifiErrorCode RegisterWifiEvents() {
         using namespace OHOS::Wifi;
         std::unique_ptr<WifiDevice> wifiStaPtr = WifiDevice::GetInstance(WIFI_DEVICE_ABILITY_ID);
         if (wifiStaPtr == nullptr) {

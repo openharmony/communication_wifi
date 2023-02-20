@@ -31,7 +31,7 @@ std::map<SecTypeJs, KeyMgmt> g_mapSecTypeToKeyMgmt = {
     {SecTypeJs::SEC_TYPE_PSK, KeyMgmt::WPA_PSK},
 };
 
-napi_value EnableHotspot(napi_env env, napi_callback_info info)
+NO_SANITIZE("cfi") napi_value EnableHotspot(napi_env env, napi_callback_info info)
 {
     TRACE_FUNC_CALL;
     WIFI_NAPI_ASSERT(env, wifiHotspotPtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_AP_CORE);
@@ -42,7 +42,7 @@ napi_value EnableHotspot(napi_env env, napi_callback_info info)
     WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_AP_CORE);
 }
 
-napi_value DisableHotspot(napi_env env, napi_callback_info info)
+NO_SANITIZE("cfi") napi_value DisableHotspot(napi_env env, napi_callback_info info)
 {
     TRACE_FUNC_CALL;
     WIFI_NAPI_ASSERT(env, wifiHotspotPtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_AP_CORE);
@@ -53,7 +53,7 @@ napi_value DisableHotspot(napi_env env, napi_callback_info info)
     WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_AP_CORE);
 }
 
-napi_value IsHotspotActive(napi_env env, napi_callback_info info)
+NO_SANITIZE("cfi") napi_value IsHotspotActive(napi_env env, napi_callback_info info)
 {
     WIFI_NAPI_ASSERT(env, wifiHotspotPtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_AP_CORE);
     bool isActive = false;
@@ -64,7 +64,7 @@ napi_value IsHotspotActive(napi_env env, napi_callback_info info)
     return result;
 }
 
-napi_value IsHotspotDualBandSupported(napi_env env, napi_callback_info info)
+NO_SANITIZE("cfi") napi_value IsHotspotDualBandSupported(napi_env env, napi_callback_info info)
 {
     WIFI_NAPI_ASSERT(env, wifiHotspotPtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_AP_CORE);
     bool isSupported = false;
@@ -123,7 +123,7 @@ static bool GetHotspotconfigFromJs(const napi_env& env, const napi_value& object
     return true;
 }
 
-napi_value SetHotspotIdleTimeout(napi_env env, napi_callback_info info)
+NO_SANITIZE("cfi") napi_value SetHotspotIdleTimeout(napi_env env, napi_callback_info info)
 {
     TRACE_FUNC_CALL;
     size_t argc = 1;
@@ -145,7 +145,7 @@ napi_value SetHotspotIdleTimeout(napi_env env, napi_callback_info info)
     return result;
 }
 
-napi_value SetHotspotConfig(napi_env env, napi_callback_info info)
+NO_SANITIZE("cfi") napi_value SetHotspotConfig(napi_env env, napi_callback_info info)
 {
     TRACE_FUNC_CALL;
     size_t argc = 1;
@@ -178,7 +178,7 @@ static void HotspotconfigToJs(const napi_env& env, HotspotConfig& cppConfig, nap
     SetValueInt32(env, "maxConn", cppConfig.GetMaxConn(), result);
 }
 
-napi_value GetHotspotConfig(napi_env env, napi_callback_info info)
+NO_SANITIZE("cfi") napi_value GetHotspotConfig(napi_env env, napi_callback_info info)
 {
     TRACE_FUNC_CALL;
     WIFI_NAPI_ASSERT(env, wifiHotspotPtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_AP_CORE);
@@ -209,7 +209,7 @@ static void StationInfoToJsArray(const napi_env& env, const std::vector<StationI
     }
 }
 
-napi_value GetStations(napi_env env, napi_callback_info info)
+NO_SANITIZE("cfi") napi_value GetStations(napi_env env, napi_callback_info info)
 {
     TRACE_FUNC_CALL;
     WIFI_NAPI_ASSERT(env, wifiHotspotPtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_AP_CORE);
@@ -229,7 +229,7 @@ napi_value GetStations(napi_env env, napi_callback_info info)
     return arrayResult;
 }
 
-napi_value AddBlockList(napi_env env, napi_callback_info info)
+NO_SANITIZE("cfi") napi_value AddBlockList(napi_env env, napi_callback_info info)
 {
     TRACE_FUNC_CALL;
     size_t argc = 1;
@@ -254,7 +254,7 @@ napi_value AddBlockList(napi_env env, napi_callback_info info)
     WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_AP_CORE);
 }
 
-napi_value DelBlockList(napi_env env, napi_callback_info info)
+NO_SANITIZE("cfi") napi_value DelBlockList(napi_env env, napi_callback_info info)
 {
     TRACE_FUNC_CALL;
     size_t argc = 1;

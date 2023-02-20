@@ -16,12 +16,13 @@
 #include "wifi_hotspot.h"
 #include "wifi_hotspot_impl.h"
 #include "wifi_logger.h"
+#include "wifi_common_util.h"
 
 DEFINE_WIFILOG_HOTSPOT_LABEL("WifiHotspot");
 
 namespace OHOS {
 namespace Wifi {
-std::unique_ptr<WifiHotspot> WifiHotspot::CreateWifiHotspot(int systemAbilityId, int id)
+NO_SANITIZE("cfi") std::unique_ptr<WifiHotspot> WifiHotspot::CreateWifiHotspot(int systemAbilityId, int id)
 {
     if (id >= AP_INSTANCE_MAX_NUM) {
         WIFI_LOGE("the max obj id is %{public}d, current id is %{public}d", AP_INSTANCE_MAX_NUM, id);
@@ -41,7 +42,7 @@ std::unique_ptr<WifiHotspot> WifiHotspot::CreateWifiHotspot(int systemAbilityId,
     return nullptr;
 }
 
-std::unique_ptr<WifiHotspot> WifiHotspot::GetInstance(int systemAbilityId, int id)
+NO_SANITIZE("cfi") std::unique_ptr<WifiHotspot> WifiHotspot::GetInstance(int systemAbilityId, int id)
 {
     if (id >= AP_INSTANCE_MAX_NUM) {
         WIFI_LOGE("the max obj id is %{public}d, current id is %{public}d", AP_INSTANCE_MAX_NUM, id);

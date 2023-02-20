@@ -171,6 +171,12 @@ if (defined(ohos_lite)) {
   }
 
   ohos_shared_library("wifi_sdk") {
+    sanitize = {
+      cfi = true
+      boundary_sanitize = true
+      cfi_cross_dso = true
+      blocklist = "../wifi_frameworks_sdk_block.txt"
+    }
     install_enable = true
     sources = [
       "c_adapter/src/wifi_c_device.cpp",

@@ -16,12 +16,13 @@
 #include "wifi_hid2d.h"
 #include "wifi_p2p_impl.h"
 #include "wifi_logger.h"
+#include "wifi_common_util.h"
 
 DEFINE_WIFILOG_LABEL("Hid2d");
 
 namespace OHOS {
 namespace Wifi {
-std::unique_ptr<Hid2d> Hid2d::CreateWifiHid2d(int systemAbilityId)
+NO_SANITIZE("cfi") std::unique_ptr<Hid2d> Hid2d::CreateWifiHid2d(int systemAbilityId)
 {
     std::unique_ptr<WifiP2pImpl> impl = std::make_unique<WifiP2pImpl>(systemAbilityId);
     if (impl != nullptr) {
@@ -35,7 +36,7 @@ std::unique_ptr<Hid2d> Hid2d::CreateWifiHid2d(int systemAbilityId)
     return nullptr;
 }
 
-std::unique_ptr<Hid2d> Hid2d::GetInstance(int systemAbilityId)
+NO_SANITIZE("cfi") std::unique_ptr<Hid2d> Hid2d::GetInstance(int systemAbilityId)
 {
     std::unique_ptr<WifiP2pImpl> impl = std::make_unique<WifiP2pImpl>(systemAbilityId);
     if (impl != nullptr) {

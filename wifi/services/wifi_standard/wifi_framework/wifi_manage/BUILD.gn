@@ -151,7 +151,6 @@ if (defined(ohos_lite)) {
     include_dirs = [
       "//commonlibrary/c_utils/base/include",
       "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
-      "//base/security/huks/interfaces/innerkits/huks_standard/main/include",
       "//foundation/arkui/ace_engine/frameworks/base/utils",
       "//foundation/arkui/ace_engine/frameworks",
       "//foundation/systemabilitymgr/safwk/interfaces/innerkits/safwk/",
@@ -222,6 +221,7 @@ if (defined(ohos_lite)) {
     external_deps = [
       "ability_base:want",
       "c_utils:utils",
+      "huks:libhukssdk",
       "ipc:ipc_core",
     ]
   }
@@ -266,6 +266,7 @@ if (defined(ohos_lite)) {
       "c_utils:utils",
       "common_event_service:cesfwk_innerkits",
       "hicollie_native:libhicollie",
+      "huks:libhukssdk",
       "ipc:ipc_core",
     ]
   }
@@ -294,6 +295,7 @@ if (defined(ohos_lite)) {
     external_deps = [
       "ability_base:want",
       "c_utils:utils",
+      "huks:libhukssdk",
       "ipc:ipc_core",
     ]
 
@@ -331,6 +333,7 @@ if (defined(ohos_lite)) {
     external_deps = [
       "ability_base:want",
       "c_utils:utils",
+      "huks:libhukssdk",
       "ipc:ipc_core",
       "netmanager_base:net_conn_manager_if",
     ]
@@ -369,6 +372,7 @@ if (defined(ohos_lite)) {
       "access_token:libtokenid_sdk",
       "bundle_framework:appexecfwk_base",
       "c_utils:utils",
+      "huks:libhukssdk",
       "ipc:ipc_core",
       "netmanager_base:net_conn_manager_if",
       "samgr:samgr_proxy",

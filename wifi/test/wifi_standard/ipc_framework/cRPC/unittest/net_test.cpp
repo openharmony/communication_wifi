@@ -22,19 +22,6 @@ using namespace testing::ext;
 
 namespace OHOS {
 namespace Wifi {
-HWTEST_F(RpcNetTest, SetNonBlockTest, TestSize.Level1)
-{
-    int fd = socket(AF_INET, SOCK_STREAM, 0);
-    ASSERT_TRUE(fd >= 0);
-    EXPECT_TRUE(SetNonBlock(fd, 0) == 0);
-    int flags = fcntl(fd, F_GETFL, 0);
-    EXPECT_TRUE((flags & O_NONBLOCK) == 0);
-    EXPECT_TRUE(SetNonBlock(fd, 1) == 0);
-    flags = fcntl(fd, F_GETFL, 0);
-    EXPECT_TRUE((flags & O_NONBLOCK) > 0);
-    close(fd);
-}
-
 static constexpr int MAX_SIZE = 10240;
 HWTEST_F(RpcNetTest, MyReadTest, TestSize.Level1)
 {

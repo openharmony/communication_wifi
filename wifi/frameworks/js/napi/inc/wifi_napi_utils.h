@@ -47,6 +47,18 @@ private:
 #define TRACE_FUNC_CALL TraceFuncCall func(__func__)
 #define TRACE_FUNC_CALL_NAME(name) TraceFuncCall funcName(name)
 
+#ifndef NO_SANITIZE
+#ifdef __has_attribute
+#if __has_attribute(no_sanitize)
+#define NO_SANITIZE(type) __attribute__((no_sanitize(type)))
+#endif
+#endif
+#endif
+
+#ifndef NO_SANITIZE
+#define NO_SANITIZE(type)
+#endif
+
 constexpr int ERR_CODE_SUCCESS = 0;
 
 class AsyncContext {

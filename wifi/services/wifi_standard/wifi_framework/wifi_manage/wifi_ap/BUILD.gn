@@ -15,6 +15,11 @@ import("//build/ohos.gni")
 import("//foundation/communication/wifi/wifi/wifi.gni")
 
 ohos_shared_library("wifi_ap_service") {
+  sanitize = {
+    cfi = true
+    boundary_sanitize = true
+    cfi_cross_dso = true
+  }
   install_enable = true
   sources = [
     "../common/handler.cpp",

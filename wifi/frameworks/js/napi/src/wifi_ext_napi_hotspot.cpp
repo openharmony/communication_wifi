@@ -16,6 +16,7 @@
 #include "wifi_ext_napi_hotspot.h"
 #include "wifi_logger.h"
 #include "wifi_napi_errcode.h"
+
 #ifdef FEATURE_AP_EXTENSION
 namespace OHOS {
 namespace Wifi {
@@ -26,7 +27,7 @@ std::unique_ptr<WifiHotspot> GetHotspotInstance()
     return WifiHotspot::GetInstance(WIFI_HOTSPOT_ABILITY_ID);
 }
 
-napi_value EnableHotspot(napi_env env, napi_callback_info info)
+NO_SANITIZE("cfi") napi_value EnableHotspot(napi_env env, napi_callback_info info)
 {
     TRACE_FUNC_CALL;
     std::unique_ptr<WifiHotspot> hotspot = GetHotspotInstance();
@@ -38,7 +39,7 @@ napi_value EnableHotspot(napi_env env, napi_callback_info info)
     WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_AP_EXT);
 }
 
-napi_value DisableHotspot(napi_env env, napi_callback_info info)
+NO_SANITIZE("cfi") napi_value DisableHotspot(napi_env env, napi_callback_info info)
 {
     TRACE_FUNC_CALL;
     std::unique_ptr<WifiHotspot> hotspot = GetHotspotInstance();
@@ -66,7 +67,7 @@ static ErrCode NativePowerModelListToJsObj(const napi_env& env,
     return WIFI_OPT_SUCCESS;
 }
 
-napi_value GetSupportedPowerModel(napi_env env, napi_callback_info info)
+NO_SANITIZE("cfi") napi_value GetSupportedPowerModel(napi_env env, napi_callback_info info)
 {
     TRACE_FUNC_CALL;
     size_t argc = 1;
@@ -102,7 +103,7 @@ napi_value GetSupportedPowerModel(napi_env env, napi_callback_info info)
     return DoAsyncWork(env, asyncContext, argc, argv, nonCallbackArgNum);
 }
 
-napi_value GetPowerModel(napi_env env, napi_callback_info info)
+NO_SANITIZE("cfi") napi_value GetPowerModel(napi_env env, napi_callback_info info)
 {
     TRACE_FUNC_CALL;
     size_t argc = 1;
@@ -137,7 +138,7 @@ napi_value GetPowerModel(napi_env env, napi_callback_info info)
     return DoAsyncWork(env, asyncContext, argc, argv, nonCallbackArgNum);
 }
 
-napi_value SetPowerModel(napi_env env, napi_callback_info info)
+NO_SANITIZE("cfi") napi_value SetPowerModel(napi_env env, napi_callback_info info)
 {
     TRACE_FUNC_CALL;
     size_t argc = 1;

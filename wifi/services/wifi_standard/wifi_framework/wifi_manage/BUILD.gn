@@ -338,6 +338,11 @@ if (defined(ohos_lite)) {
   }
 
   ohos_shared_library("wifi_manager_service") {
+    sanitize = {
+      cfi = true
+      boundary_sanitize = true
+      cfi_cross_dso = true
+    }
     install_enable = true
     sources = [
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/common/wifi_permission_helper.cpp",
@@ -407,6 +412,11 @@ if (defined(ohos_lite)) {
   }
 
   ohos_shared_library("wifi_device_ability") {
+    sanitize = {
+      cfi = true
+      boundary_sanitize = true
+      cfi_cross_dso = true
+    }
     install_enable = true
     deps = [
       ":wifi_device_service_impl",
@@ -418,6 +428,11 @@ if (defined(ohos_lite)) {
   }
 
   ohos_shared_library("wifi_scan_ability") {
+    sanitize = {
+      cfi = true
+      boundary_sanitize = true
+      cfi_cross_dso = true
+    }
     install_enable = true
     deps = [
       ":wifi_manager_service",
@@ -429,6 +444,11 @@ if (defined(ohos_lite)) {
   }
 
   ohos_shared_library("wifi_hotspot_ability") {
+    sanitize = {
+      cfi = true
+      boundary_sanitize = true
+      cfi_cross_dso = true
+    }
     install_enable = true
     deps = [
       ":wifi_hotspot_service_impl",
@@ -440,6 +460,11 @@ if (defined(ohos_lite)) {
   }
 
   ohos_shared_library("wifi_p2p_ability") {
+    sanitize = {
+      cfi = true
+      boundary_sanitize = true
+      cfi_cross_dso = true
+    }
     install_enable = true
     deps = [
       ":wifi_manager_service",

@@ -25,7 +25,8 @@ DEFINE_WIFILOG_LABEL("WifiCHid2d");
 
 std::unique_ptr<OHOS::Wifi::Hid2d> wifiHid2dPtr = OHOS::Wifi::Hid2d::GetInstance(WIFI_P2P_ABILITY_ID);
 
-WifiErrorCode Hid2dRequestGcIp(const unsigned char gcMac[MAC_LEN], unsigned int ipAddr[IPV4_ARRAY_LEN])
+NO_SANITIZE("cfi") WifiErrorCode Hid2dRequestGcIp(const unsigned char gcMac[MAC_LEN],
+    unsigned int ipAddr[IPV4_ARRAY_LEN])
 {
     CHECK_PTR_RETURN(wifiHid2dPtr, ERROR_WIFI_NOT_AVAILABLE);
 
@@ -39,31 +40,31 @@ WifiErrorCode Hid2dRequestGcIp(const unsigned char gcMac[MAC_LEN], unsigned int 
     return OHOS::Wifi::IpStrToArray(strIpAddr, ipAddr);
 }
 
-WifiErrorCode Hid2dSharedlinkIncrease(void)
+NO_SANITIZE("cfi") WifiErrorCode Hid2dSharedlinkIncrease(void)
 {
     CHECK_PTR_RETURN(wifiHid2dPtr, ERROR_WIFI_NOT_AVAILABLE);
     return GetCErrorCode(wifiHid2dPtr->Hid2dSharedlinkIncrease());
 }
 
-WifiErrorCode Hid2dSharedlinkDecrease(void)
+NO_SANITIZE("cfi") WifiErrorCode Hid2dSharedlinkDecrease(void)
 {
     CHECK_PTR_RETURN(wifiHid2dPtr, ERROR_WIFI_NOT_AVAILABLE);
     return GetCErrorCode(wifiHid2dPtr->Hid2dSharedlinkDecrease());
 }
 
-WifiErrorCode Hid2dCreateGroup(const int frequency, FreqType type)
+NO_SANITIZE("cfi") WifiErrorCode Hid2dCreateGroup(const int frequency, FreqType type)
 {
     CHECK_PTR_RETURN(wifiHid2dPtr, ERROR_WIFI_NOT_AVAILABLE);
     return GetCErrorCode(wifiHid2dPtr->Hid2dCreateGroup(frequency, OHOS::Wifi::FreqType(static_cast<int>(type))));
 }
 
-WifiErrorCode Hid2dRemoveGcGroup(const char gcIfName[IF_NAME_LEN])
+NO_SANITIZE("cfi") WifiErrorCode Hid2dRemoveGcGroup(const char gcIfName[IF_NAME_LEN])
 {
     CHECK_PTR_RETURN(wifiHid2dPtr, ERROR_WIFI_NOT_AVAILABLE);
     return GetCErrorCode(wifiHid2dPtr->Hid2dRemoveGcGroup(gcIfName));
 }
 
-WifiErrorCode Hid2dConnect(const Hid2dConnectConfig *config)
+NO_SANITIZE("cfi") WifiErrorCode Hid2dConnect(const Hid2dConnectConfig *config)
 {
     CHECK_PTR_RETURN(wifiHid2dPtr, ERROR_WIFI_NOT_AVAILABLE);
     CHECK_PTR_RETURN(config, ERROR_WIFI_INVALID_ARGS);
@@ -77,7 +78,7 @@ WifiErrorCode Hid2dConnect(const Hid2dConnectConfig *config)
     return GetCErrorCode(wifiHid2dPtr->Hid2dConnect(cppConfig));
 }
 
-WifiErrorCode Hid2dConfigIPAddr(const char ifName[IF_NAME_LEN], const IpAddrInfo* ipInfo)
+NO_SANITIZE("cfi") WifiErrorCode Hid2dConfigIPAddr(const char ifName[IF_NAME_LEN], const IpAddrInfo* ipInfo)
 {
     CHECK_PTR_RETURN(wifiHid2dPtr, ERROR_WIFI_NOT_AVAILABLE);
     CHECK_PTR_RETURN(ipInfo, ERROR_WIFI_INVALID_ARGS);
@@ -89,7 +90,7 @@ WifiErrorCode Hid2dConfigIPAddr(const char ifName[IF_NAME_LEN], const IpAddrInfo
     return GetCErrorCode(wifiHid2dPtr->Hid2dConfigIPAddr(ifName, ipAddrInfo));
 }
 
-WifiErrorCode Hid2dReleaseIPAddr(const char ifName[IF_NAME_LEN])
+NO_SANITIZE("cfi") WifiErrorCode Hid2dReleaseIPAddr(const char ifName[IF_NAME_LEN])
 {
     CHECK_PTR_RETURN(wifiHid2dPtr, ERROR_WIFI_NOT_AVAILABLE);
     return GetCErrorCode(wifiHid2dPtr->Hid2dReleaseIPAddr(ifName));
@@ -119,7 +120,8 @@ static void ConvertRecommendChannelResponse(const OHOS::Wifi::RecommendChannelRe
     response->bandwidth = rsp.bandwidth;
 }
 
-WifiErrorCode Hid2dGetRecommendChannel(const RecommendChannelRequest *request, RecommendChannelResponse *response)
+NO_SANITIZE("cfi") WifiErrorCode Hid2dGetRecommendChannel(const RecommendChannelRequest *request,
+    RecommendChannelResponse *response)
 {
     CHECK_PTR_RETURN(wifiHid2dPtr, ERROR_WIFI_NOT_AVAILABLE);
     CHECK_PTR_RETURN(request, ERROR_WIFI_INVALID_ARGS);
@@ -135,7 +137,7 @@ WifiErrorCode Hid2dGetRecommendChannel(const RecommendChannelRequest *request, R
     return WIFI_SUCCESS;
 }
 
-WifiErrorCode Hid2dGetChannelListFor5G(int *chanList, int len)
+NO_SANITIZE("cfi") WifiErrorCode Hid2dGetChannelListFor5G(int *chanList, int len)
 {
     CHECK_PTR_RETURN(wifiHid2dPtr, ERROR_WIFI_NOT_AVAILABLE);
     CHECK_PTR_RETURN(chanList, ERROR_WIFI_INVALID_ARGS);
@@ -156,7 +158,8 @@ WifiErrorCode Hid2dGetChannelListFor5G(int *chanList, int len)
     return GetCErrorCode(ret);
 }
 
-WifiErrorCode Hid2dGetSelfWifiCfgInfo(SelfCfgType cfgType, char cfgData[CFG_DATA_MAX_BYTES], int* getDatValidLen)
+NO_SANITIZE("cfi") WifiErrorCode Hid2dGetSelfWifiCfgInfo(SelfCfgType cfgType,
+    char cfgData[CFG_DATA_MAX_BYTES], int* getDatValidLen)
 {
     CHECK_PTR_RETURN(wifiHid2dPtr, ERROR_WIFI_NOT_AVAILABLE);
     CHECK_PTR_RETURN(getDatValidLen, ERROR_WIFI_INVALID_ARGS);
@@ -164,7 +167,8 @@ WifiErrorCode Hid2dGetSelfWifiCfgInfo(SelfCfgType cfgType, char cfgData[CFG_DATA
         OHOS::Wifi::SelfCfgType(static_cast<int>(cfgType)), cfgData, getDatValidLen));
 }
 
-WifiErrorCode Hid2dSetPeerWifiCfgInfo(PeerCfgType cfgType, char cfgData[CFG_DATA_MAX_BYTES], int setDataValidLen)
+NO_SANITIZE("cfi") WifiErrorCode Hid2dSetPeerWifiCfgInfo(PeerCfgType cfgType,
+    char cfgData[CFG_DATA_MAX_BYTES], int setDataValidLen)
 {
     CHECK_PTR_RETURN(wifiHid2dPtr, ERROR_WIFI_NOT_AVAILABLE);
     return GetCErrorCode(wifiHid2dPtr->Hid2dSetPeerWifiCfgInfo(
@@ -177,7 +181,7 @@ int Hid2dIsWideBandwidthSupported(void)
     return NOT_SUPPORT;
 }
 
-WifiErrorCode Hid2dSetUpperScene(const char ifName[IF_NAME_LEN], const Hid2dUpperScene *scene)
+NO_SANITIZE("cfi") WifiErrorCode Hid2dSetUpperScene(const char ifName[IF_NAME_LEN], const Hid2dUpperScene *scene)
 {
     CHECK_PTR_RETURN(wifiHid2dPtr, ERROR_WIFI_NOT_AVAILABLE);
     CHECK_PTR_RETURN(scene, ERROR_WIFI_INVALID_ARGS);

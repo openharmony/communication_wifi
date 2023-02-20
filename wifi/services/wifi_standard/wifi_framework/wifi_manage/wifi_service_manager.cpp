@@ -18,6 +18,7 @@
 #include "wifi_logger.h"
 #include "define.h"
 #include "wifi_settings.h"
+#include "wifi_common_util.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -307,7 +308,7 @@ IP2pService *WifiServiceManager::GetP2pServiceInst()
 }
 #endif
 
-int WifiServiceManager::UnloadStaService(bool bPreLoad)
+NO_SANITIZE("cfi") int WifiServiceManager::UnloadStaService(bool bPreLoad)
 {
     WIFI_LOGI("WifiServiceManager::UnloadStaService");
     std::unique_lock<std::mutex> lock(mStaMutex);
@@ -326,7 +327,7 @@ int WifiServiceManager::UnloadStaService(bool bPreLoad)
     return 0;
 }
 
-int WifiServiceManager::UnloadScanService(bool bPreLoad)
+NO_SANITIZE("cfi") int WifiServiceManager::UnloadScanService(bool bPreLoad)
 {
     WIFI_LOGI("WifiServiceManager::UnloadScanService");
     std::unique_lock<std::mutex> lock(mScanMutex);
@@ -346,7 +347,7 @@ int WifiServiceManager::UnloadScanService(bool bPreLoad)
 }
 
 #ifdef FEATURE_AP_SUPPORT
-int WifiServiceManager::UnloadApService(bool bPreLoad, int id)
+NO_SANITIZE("cfi") int WifiServiceManager::UnloadApService(bool bPreLoad, int id)
 {
     WIFI_LOGI("WifiServiceManager::UnloadApService id=%{public}d, max_id=%{public}d", id, AP_INSTANCE_MAX_NUM);
     {
@@ -382,7 +383,7 @@ int WifiServiceManager::UnloadApService(bool bPreLoad, int id)
 #endif
 
 #ifdef FEATURE_P2P_SUPPORT
-int WifiServiceManager::UnloadP2pService(bool bPreLoad)
+NO_SANITIZE("cfi") int WifiServiceManager::UnloadP2pService(bool bPreLoad)
 {
     WIFI_LOGI("WifiServiceManager::UnloadP2pService");
     std::unique_lock<std::mutex> lock(mP2pMutex);

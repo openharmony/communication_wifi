@@ -34,19 +34,19 @@ static std::map<WifiSecurityType, std::string> g_secTypeKeyMgmtMap = {
 std::unique_ptr<OHOS::Wifi::WifiDevice> wifiDevicePtr = OHOS::Wifi::WifiDevice::GetInstance(WIFI_DEVICE_ABILITY_ID);
 std::unique_ptr<OHOS::Wifi::WifiScan> wifiScanPtr = OHOS::Wifi::WifiScan::GetInstance(WIFI_SCAN_ABILITY_ID);
 
-WifiErrorCode EnableWifi()
+NO_SANITIZE("cfi") WifiErrorCode EnableWifi()
 {
     CHECK_PTR_RETURN(wifiDevicePtr, ERROR_WIFI_NOT_AVAILABLE);
     return GetCErrorCode(wifiDevicePtr->EnableWifi());
 }
 
-WifiErrorCode DisableWifi()
+NO_SANITIZE("cfi") WifiErrorCode DisableWifi()
 {
     CHECK_PTR_RETURN(wifiDevicePtr, ERROR_WIFI_NOT_AVAILABLE);
     return GetCErrorCode(wifiDevicePtr->DisableWifi());
 }
 
-int IsWifiActive()
+NO_SANITIZE("cfi") int IsWifiActive()
 {
     if (wifiDevicePtr == nullptr) {
         return false;
@@ -57,13 +57,13 @@ int IsWifiActive()
     return (ret == OHOS::Wifi::WIFI_OPT_SUCCESS) && isActive;
 }
 
-WifiErrorCode Scan()
+NO_SANITIZE("cfi") WifiErrorCode Scan()
 {
     CHECK_PTR_RETURN(wifiScanPtr, ERROR_WIFI_NOT_AVAILABLE);
     return GetCErrorCode(wifiScanPtr->Scan());
 }
 
-WifiErrorCode GetScanInfoList(WifiScanInfo *result, unsigned int *size)
+NO_SANITIZE("cfi") WifiErrorCode GetScanInfoList(WifiScanInfo *result, unsigned int *size)
 {
     CHECK_PTR_RETURN(wifiScanPtr, ERROR_WIFI_NOT_AVAILABLE);
     if (result == nullptr || size == nullptr) {
@@ -212,7 +212,7 @@ static void ConvertScanParamsFromC(const WifiScanParams *params, OHOS::Wifi::Wif
     scanParams.band = params->band;
 }
 
-WifiErrorCode AddDeviceConfig(const WifiDeviceConfig *config, int *result)
+NO_SANITIZE("cfi") WifiErrorCode AddDeviceConfig(const WifiDeviceConfig *config, int *result)
 {
     CHECK_PTR_RETURN(wifiDevicePtr, ERROR_WIFI_NOT_AVAILABLE);
     CHECK_PTR_RETURN(config, ERROR_WIFI_INVALID_ARGS);
@@ -226,7 +226,7 @@ WifiErrorCode AddDeviceConfig(const WifiDeviceConfig *config, int *result)
     return GetCErrorCode(ret);
 }
 
-WifiErrorCode GetDeviceConfigs(WifiDeviceConfig *result, unsigned int *size)
+NO_SANITIZE("cfi") WifiErrorCode GetDeviceConfigs(WifiDeviceConfig *result, unsigned int *size)
 {
     CHECK_PTR_RETURN(wifiDevicePtr, ERROR_WIFI_NOT_AVAILABLE);
     CHECK_PTR_RETURN(result, ERROR_WIFI_INVALID_ARGS);
@@ -249,7 +249,7 @@ WifiErrorCode GetDeviceConfigs(WifiDeviceConfig *result, unsigned int *size)
     return GetCErrorCode(ret);
 }
 
-WifiErrorCode RemoveDevice(int networkId)
+NO_SANITIZE("cfi") WifiErrorCode RemoveDevice(int networkId)
 {
     CHECK_PTR_RETURN(wifiDevicePtr, ERROR_WIFI_NOT_AVAILABLE);
     return GetCErrorCode(wifiDevicePtr->RemoveDevice(networkId));
@@ -265,14 +265,14 @@ WifiErrorCode EnableDeviceConfig(int networkId)
     return GetCErrorCode(OHOS::Wifi::WIFI_OPT_NOT_SUPPORTED);
 }
 
-WifiErrorCode ConnectTo(int networkId)
+NO_SANITIZE("cfi") WifiErrorCode ConnectTo(int networkId)
 {
     CHECK_PTR_RETURN(wifiDevicePtr, ERROR_WIFI_NOT_AVAILABLE);
     bool isCandidate = false;
     return GetCErrorCode(wifiDevicePtr->ConnectToNetwork(networkId, isCandidate));
 }
 
-WifiErrorCode ConnectToDevice(const WifiDeviceConfig *config)
+NO_SANITIZE("cfi") WifiErrorCode ConnectToDevice(const WifiDeviceConfig *config)
 {
     CHECK_PTR_RETURN(wifiDevicePtr, ERROR_WIFI_NOT_AVAILABLE);
     CHECK_PTR_RETURN(config, ERROR_WIFI_INVALID_ARGS);
@@ -281,7 +281,7 @@ WifiErrorCode ConnectToDevice(const WifiDeviceConfig *config)
     return GetCErrorCode(wifiDevicePtr->ConnectToDevice(deviceConfig));
 }
 
-WifiErrorCode Disconnect()
+NO_SANITIZE("cfi") WifiErrorCode Disconnect()
 {
     CHECK_PTR_RETURN(wifiDevicePtr, ERROR_WIFI_NOT_AVAILABLE);
     return GetCErrorCode(wifiDevicePtr->Disconnect());
@@ -306,7 +306,7 @@ static OHOS::Wifi::ErrCode GetLinkedInfoFromCpp(const OHOS::Wifi::WifiLinkedInfo
     return OHOS::Wifi::WIFI_OPT_SUCCESS;
 }
 
-WifiErrorCode GetLinkedInfo(WifiLinkedInfo *result)
+NO_SANITIZE("cfi") WifiErrorCode GetLinkedInfo(WifiLinkedInfo *result)
 {
     CHECK_PTR_RETURN(wifiDevicePtr, ERROR_WIFI_NOT_AVAILABLE);
     CHECK_PTR_RETURN(result, ERROR_WIFI_INVALID_ARGS);
@@ -322,7 +322,7 @@ WifiErrorCode GetLinkedInfo(WifiLinkedInfo *result)
     return GetCErrorCode(ret);
 }
 
-WifiErrorCode GetDeviceMacAddress(unsigned char *result)
+NO_SANITIZE("cfi") WifiErrorCode GetDeviceMacAddress(unsigned char *result)
 {
     CHECK_PTR_RETURN(wifiDevicePtr, ERROR_WIFI_NOT_AVAILABLE);
     CHECK_PTR_RETURN(result, ERROR_WIFI_INVALID_ARGS);
@@ -337,7 +337,7 @@ WifiErrorCode GetDeviceMacAddress(unsigned char *result)
     return GetCErrorCode(ret);
 }
 
-WifiErrorCode AdvanceScan(WifiScanParams *params)
+NO_SANITIZE("cfi") WifiErrorCode AdvanceScan(WifiScanParams *params)
 {
     CHECK_PTR_RETURN(wifiScanPtr, ERROR_WIFI_NOT_AVAILABLE);
     CHECK_PTR_RETURN(params, ERROR_WIFI_INVALID_ARGS);
@@ -360,7 +360,7 @@ static OHOS::Wifi::ErrCode GetIpInfoFromCpp(const OHOS::Wifi::IpInfo& ipInfo, Ip
     return OHOS::Wifi::WIFI_OPT_SUCCESS;
 }
 
-WifiErrorCode GetIpInfo(IpInfo *info)
+NO_SANITIZE("cfi") WifiErrorCode GetIpInfo(IpInfo *info)
 {
     CHECK_PTR_RETURN(wifiDevicePtr, ERROR_WIFI_NOT_AVAILABLE);
     CHECK_PTR_RETURN(info, ERROR_WIFI_INVALID_ARGS);
@@ -376,7 +376,7 @@ WifiErrorCode GetIpInfo(IpInfo *info)
     return GetCErrorCode(ret);
 }
 
-int GetSignalLevel(int rssi, int band)
+NO_SANITIZE("cfi") int GetSignalLevel(int rssi, int band)
 {
     CHECK_PTR_RETURN(wifiDevicePtr, ERROR_WIFI_NOT_AVAILABLE);
     int level = -1;
@@ -387,7 +387,7 @@ int GetSignalLevel(int rssi, int band)
     return level;
 }
 
-WifiErrorCode SetLowLatencyMode(int enabled)
+NO_SANITIZE("cfi") WifiErrorCode SetLowLatencyMode(int enabled)
 {
     CHECK_PTR_RETURN(wifiDevicePtr, ERROR_WIFI_NOT_AVAILABLE);
     bool ret = wifiDevicePtr->SetLowLatencyMode(enabled);

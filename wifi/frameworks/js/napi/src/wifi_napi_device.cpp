@@ -28,7 +28,7 @@ static constexpr int DEFAULT_INVALID_VALUE = -1;
 std::unique_ptr<WifiDevice> wifiDevicePtr = WifiDevice::GetInstance(WIFI_DEVICE_ABILITY_ID);
 std::unique_ptr<WifiScan> wifiScanPtr = WifiScan::GetInstance(WIFI_SCAN_ABILITY_ID);
 
-napi_value EnableWifi(napi_env env, napi_callback_info info)
+NO_SANITIZE("cfi") napi_value EnableWifi(napi_env env, napi_callback_info info)
 {
     TRACE_FUNC_CALL;
     WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
@@ -36,7 +36,7 @@ napi_value EnableWifi(napi_env env, napi_callback_info info)
     WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_STA);
 }
 
-napi_value DisableWifi(napi_env env, napi_callback_info info)
+NO_SANITIZE("cfi") napi_value DisableWifi(napi_env env, napi_callback_info info)
 {
     TRACE_FUNC_CALL;
     WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
@@ -44,7 +44,7 @@ napi_value DisableWifi(napi_env env, napi_callback_info info)
     WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_STA);
 }
 
-napi_value IsWifiActive(napi_env env, napi_callback_info info)
+NO_SANITIZE("cfi") napi_value IsWifiActive(napi_env env, napi_callback_info info)
 {
     WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
     bool activeStatus = false;
@@ -58,7 +58,7 @@ napi_value IsWifiActive(napi_env env, napi_callback_info info)
     return result;
 }
 
-napi_value Scan(napi_env env, napi_callback_info info)
+NO_SANITIZE("cfi") napi_value Scan(napi_env env, napi_callback_info info)
 {
     TRACE_FUNC_CALL;
     WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
@@ -167,7 +167,7 @@ static ErrCode NativeScanInfosToJsObj(const napi_env& env,
     return WIFI_OPT_SUCCESS;
 }
 
-napi_value GetScanInfos(napi_env env, napi_callback_info info)
+NO_SANITIZE("cfi") napi_value GetScanInfos(napi_env env, napi_callback_info info)
 {
     TRACE_FUNC_CALL;
     size_t argc = 2;
@@ -202,7 +202,7 @@ napi_value GetScanInfos(napi_env env, napi_callback_info info)
     return DoAsyncWork(env, asyncContext, argc, argv, nonCallbackArgNum);
 }
 
-napi_value GetScanResults(napi_env env, napi_callback_info info)
+NO_SANITIZE("cfi") napi_value GetScanResults(napi_env env, napi_callback_info info)
 {
     TRACE_FUNC_CALL;
     WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
@@ -382,7 +382,7 @@ static napi_value JsObjToDeviceConfig(const napi_env& env, const napi_value& obj
     return CreateInt32(env);
 }
 
-napi_value AddDeviceConfig(napi_env env, napi_callback_info info)
+NO_SANITIZE("cfi") napi_value AddDeviceConfig(napi_env env, napi_callback_info info)
 {
     TRACE_FUNC_CALL;
     size_t argc = 3;
@@ -437,7 +437,7 @@ napi_value AddDeviceConfig(napi_env env, napi_callback_info info)
     return DoAsyncWork(env, asyncContext, argc, argv, nonCallbackArgNum);
 }
 
-napi_value AddUntrustedConfig(napi_env env, napi_callback_info info)
+NO_SANITIZE("cfi") napi_value AddUntrustedConfig(napi_env env, napi_callback_info info)
 {
     TRACE_FUNC_CALL;
     size_t argc = 2;
@@ -492,7 +492,7 @@ napi_value AddUntrustedConfig(napi_env env, napi_callback_info info)
     return DoAsyncWork(env, asyncContext, argc, argv, nonCallbackArgNum);
 }
 
-napi_value RemoveUntrustedConfig(napi_env env, napi_callback_info info)
+NO_SANITIZE("cfi") napi_value RemoveUntrustedConfig(napi_env env, napi_callback_info info)
 {
     TRACE_FUNC_CALL;
     size_t argc = 3;
@@ -541,7 +541,7 @@ napi_value RemoveUntrustedConfig(napi_env env, napi_callback_info info)
     return DoAsyncWork(env, asyncContext, argc, argv, nonCallbackArgNum);
 }
 
-napi_value AddCandidateConfig(napi_env env, napi_callback_info info)
+NO_SANITIZE("cfi") napi_value AddCandidateConfig(napi_env env, napi_callback_info info)
 {
     TRACE_FUNC_CALL;
     size_t argc = 2;
@@ -597,7 +597,7 @@ napi_value AddCandidateConfig(napi_env env, napi_callback_info info)
     return DoAsyncWork(env, asyncContext, argc, argv, nonCallbackArgNum);
 }
 
-napi_value RemoveCandidateConfig(napi_env env, napi_callback_info info)
+NO_SANITIZE("cfi") napi_value RemoveCandidateConfig(napi_env env, napi_callback_info info)
 {
     TRACE_FUNC_CALL;
     size_t argc = 3;
@@ -637,7 +637,7 @@ napi_value RemoveCandidateConfig(napi_env env, napi_callback_info info)
     return DoAsyncWork(env, asyncContext, argc, argv, nonCallbackArgNum);
 }
 
-napi_value ConnectToCandidateConfig(napi_env env, napi_callback_info info)
+NO_SANITIZE("cfi") napi_value ConnectToCandidateConfig(napi_env env, napi_callback_info info)
 {
     TRACE_FUNC_CALL;
     size_t argc = 1;
@@ -659,7 +659,7 @@ napi_value ConnectToCandidateConfig(napi_env env, napi_callback_info info)
     WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_STA);
 }
 
-napi_value ConnectToNetwork(napi_env env, napi_callback_info info)
+NO_SANITIZE("cfi") napi_value ConnectToNetwork(napi_env env, napi_callback_info info)
 {
     TRACE_FUNC_CALL;
     size_t argc = 1;
@@ -681,7 +681,7 @@ napi_value ConnectToNetwork(napi_env env, napi_callback_info info)
     WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_STA);
 }
 
-napi_value ConnectToDevice(napi_env env, napi_callback_info info)
+NO_SANITIZE("cfi") napi_value ConnectToDevice(napi_env env, napi_callback_info info)
 {
     TRACE_FUNC_CALL;
     size_t argc = 1;
@@ -705,7 +705,7 @@ napi_value ConnectToDevice(napi_env env, napi_callback_info info)
     WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_STA);
 }
 
-napi_value IsConnected(napi_env env, napi_callback_info info)
+NO_SANITIZE("cfi") napi_value IsConnected(napi_env env, napi_callback_info info)
 {
     TRACE_FUNC_CALL;
     WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
@@ -720,7 +720,7 @@ napi_value IsConnected(napi_env env, napi_callback_info info)
     return result;
 }
 
-napi_value Disconnect(napi_env env, napi_callback_info info)
+NO_SANITIZE("cfi") napi_value Disconnect(napi_env env, napi_callback_info info)
 {
     TRACE_FUNC_CALL;
     WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
@@ -728,7 +728,7 @@ napi_value Disconnect(napi_env env, napi_callback_info info)
     WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_STA);
 }
 
-napi_value GetSignalLevel(napi_env env, napi_callback_info info)
+NO_SANITIZE("cfi") napi_value GetSignalLevel(napi_env env, napi_callback_info info)
 {
     size_t argc = 2;
     const int PARAMS_NUM = 2;
@@ -761,7 +761,7 @@ napi_value GetSignalLevel(napi_env env, napi_callback_info info)
     return result;
 }
 
-napi_value ReConnect(napi_env env, napi_callback_info info)
+NO_SANITIZE("cfi") napi_value ReConnect(napi_env env, napi_callback_info info)
 {
     TRACE_FUNC_CALL;
     WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
@@ -769,7 +769,7 @@ napi_value ReConnect(napi_env env, napi_callback_info info)
     WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_STA);
 }
 
-napi_value ReAssociate(napi_env env, napi_callback_info info)
+NO_SANITIZE("cfi") napi_value ReAssociate(napi_env env, napi_callback_info info)
 {
     TRACE_FUNC_CALL;
     WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
@@ -789,7 +789,7 @@ static void IpInfoToJsObj(const napi_env& env, IpInfo& ipInfo, napi_value& resul
     SetValueUnsignedInt32(env, "leaseDuration", ipInfo.leaseDuration, result);
 }
 
-napi_value GetIpInfo(napi_env env, napi_callback_info info)
+NO_SANITIZE("cfi") napi_value GetIpInfo(napi_env env, napi_callback_info info)
 {
     TRACE_FUNC_CALL;
     WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
@@ -827,7 +827,7 @@ static void LinkedInfoToJs(const napi_env& env, WifiLinkedInfo& linkedInfo, napi
 }
 
 /* This interface has not been fully implemented */
-napi_value GetLinkedInfo(napi_env env, napi_callback_info info)
+NO_SANITIZE("cfi") napi_value GetLinkedInfo(napi_env env, napi_callback_info info)
 {
     TRACE_FUNC_CALL;
     size_t argc = 2;
@@ -859,7 +859,7 @@ napi_value GetLinkedInfo(napi_env env, napi_callback_info info)
     return DoAsyncWork(env, asyncContext, argc, argv, nonCallbackArgNum);
 }
 
-napi_value RemoveDevice(napi_env env, napi_callback_info info)
+NO_SANITIZE("cfi") napi_value RemoveDevice(napi_env env, napi_callback_info info)
 {
     TRACE_FUNC_CALL;
     size_t argc = 1;
@@ -880,7 +880,7 @@ napi_value RemoveDevice(napi_env env, napi_callback_info info)
     WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_STA);
 }
 
-napi_value RemoveAllNetwork(napi_env env, napi_callback_info info)
+NO_SANITIZE("cfi") napi_value RemoveAllNetwork(napi_env env, napi_callback_info info)
 {
     TRACE_FUNC_CALL;
     WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
@@ -888,7 +888,7 @@ napi_value RemoveAllNetwork(napi_env env, napi_callback_info info)
     WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_STA);
 }
 
-napi_value DisableNetwork(napi_env env, napi_callback_info info)
+NO_SANITIZE("cfi") napi_value DisableNetwork(napi_env env, napi_callback_info info)
 {
     TRACE_FUNC_CALL;
     size_t argc = 1;
@@ -908,7 +908,7 @@ napi_value DisableNetwork(napi_env env, napi_callback_info info)
     WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_STA);
 }
 
-napi_value GetCountryCode(napi_env env, napi_callback_info info)
+NO_SANITIZE("cfi") napi_value GetCountryCode(napi_env env, napi_callback_info info)
 {
     TRACE_FUNC_CALL;
     WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_CORE);
@@ -1036,7 +1036,7 @@ static void DeviceConfigToJsArray(const napi_env& env, std::vector<WifiDeviceCon
     }
 }
 
-napi_value GetDeviceConfigs(napi_env env, napi_callback_info info)
+NO_SANITIZE("cfi") napi_value GetDeviceConfigs(napi_env env, napi_callback_info info)
 {
     TRACE_FUNC_CALL;
     WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
@@ -1057,7 +1057,7 @@ napi_value GetDeviceConfigs(napi_env env, napi_callback_info info)
     return arrayResult;
 }
 
-napi_value GetCandidateConfigs(napi_env env, napi_callback_info info)
+NO_SANITIZE("cfi") napi_value GetCandidateConfigs(napi_env env, napi_callback_info info)
 {
     TRACE_FUNC_CALL;
     WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
@@ -1078,7 +1078,7 @@ napi_value GetCandidateConfigs(napi_env env, napi_callback_info info)
     return arrayResult;
 }
 
-napi_value UpdateNetwork(napi_env env, napi_callback_info info)
+NO_SANITIZE("cfi") napi_value UpdateNetwork(napi_env env, napi_callback_info info)
 {
     TRACE_FUNC_CALL;
     size_t argc = 1;
@@ -1107,7 +1107,7 @@ napi_value UpdateNetwork(napi_env env, napi_callback_info info)
     return result;
 }
 
-napi_value GetSupportedFeatures(napi_env env, napi_callback_info info)
+NO_SANITIZE("cfi") napi_value GetSupportedFeatures(napi_env env, napi_callback_info info)
 {
     TRACE_FUNC_CALL;
     WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_CORE);
@@ -1123,7 +1123,7 @@ napi_value GetSupportedFeatures(napi_env env, napi_callback_info info)
     return result;
 }
 
-napi_value IsFeatureSupported(napi_env env, napi_callback_info info)
+NO_SANITIZE("cfi") napi_value IsFeatureSupported(napi_env env, napi_callback_info info)
 {
     TRACE_FUNC_CALL;
     size_t argc = 1;
@@ -1150,7 +1150,7 @@ napi_value IsFeatureSupported(napi_env env, napi_callback_info info)
     return result;
 }
 
-napi_value GetDeviceMacAddress(napi_env env, napi_callback_info info)
+NO_SANITIZE("cfi") napi_value GetDeviceMacAddress(napi_env env, napi_callback_info info)
 {
     TRACE_FUNC_CALL;
     WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);

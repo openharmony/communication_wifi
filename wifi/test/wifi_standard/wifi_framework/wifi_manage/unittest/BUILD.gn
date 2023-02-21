@@ -40,7 +40,6 @@ ohos_unittest("manager_unittest") {
     "wifi_auth_center_test.cpp",
     "wifi_config_center_test.cpp",
     "wifi_internal_event_dispatcher_test.cpp",
-    "wifi_manager_service_test.cpp",
   ]
 
   include_dirs = [

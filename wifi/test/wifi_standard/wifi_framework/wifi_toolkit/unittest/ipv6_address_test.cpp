@@ -41,7 +41,7 @@ HWTEST_F(Ipv6AddressTest, GetIn6Addr_Fail1, TestSize.Level1)
 {
     std::string ipv6Prefix = "fe80::555b:6cea:81fa:1ff2%8";
 	size_t prefixLength = PREFIX_LENGTH;
-    MacAddress mac = MacAddress::Creat(ipv6Prefix);
+    MacAddress mac = MacAddress::Create(ipv6Prefix);
     Ipv6Address::Create(ipv6Prefix, mac, prefixLength);
 }
 
@@ -49,7 +49,7 @@ HWTEST_F(Ipv6AddressTest, Create_Success1, TestSize.Level1)
 {
     std::string ipv6Prefix = "fe80::555b:6cea:81fa:1ff2%8";
 	size_t prefixLength = PREFIX_LENGTHS;
-    MacAddress mac = MacAddress::Creat(ipv6Prefix);
+    MacAddress mac = MacAddress::Create(ipv6Prefix);
     Ipv6Address::Create(ipv6Prefix, mac, prefixLength);
 }
 
@@ -120,7 +120,7 @@ HWTEST_F(Ipv6AddressTest, GetIpv6Mask_Fail, TestSize.Level1)
 HWTEST_F(Ipv6AddressTest, GetIpv6Mask_Fail2, TestSize.Level1)
 {
 	size_t prefixLength = MAX_IPV6_LENGTH;
-    Ipv6Address-::GetIpv6Mask(prefixLength);
+    Ipv6Address::GetIpv6Mask(prefixLength);
 }
 
 HWTEST_F(Ipv6AddressTest, GetIpv6Mask_Success, TestSize.Level1)

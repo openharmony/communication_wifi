@@ -40,5 +40,18 @@ HWTEST_F(WifiNetworkInterfaceTest, FetchInterfaceConfigTest, TestSize.Level1)
     EXPECT_TRUE(NetworkInterface::FetchInterfaceConfig("wlan0", vecIPv4, vecIPv6) == true);
     NetworkInterface::Dump("wlan0");
 }
+
+HWTEST_F(WifiNetworkInterfaceTest, FetchInterfaceConfigTest, TestSize.Level1)
+{
+    size_t prefixLength = PREFIX_LENGTHS;
+	in_addr ipv4;
+	in_addr mask;
+    Ipv4Address::Create("", prefixLength);  
+    Ipv4Address::Create("", "");
+    Ipv4Address::Create(ipv4, mask);
+    Ipv4Address::GetNetworkAddressWithString();
+    Ipv4Address::GetHostAddressWithString();
+    Ipv4Address::GetNetwork();
+}
 }  // namespace Wifi
 }  // namespace OHOS

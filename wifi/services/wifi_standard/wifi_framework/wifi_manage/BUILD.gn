@@ -413,6 +413,7 @@ if (defined(ohos_lite)) {
       ":wifi_manager_service",
     ]
 
+    shlib_type = "sa"
     part_name = "wifi"
     subsystem_name = "communication"
   }
@@ -424,6 +425,7 @@ if (defined(ohos_lite)) {
       ":wifi_scan_service_impl",
     ]
 
+    shlib_type = "sa"
     part_name = "wifi"
     subsystem_name = "communication"
   }
@@ -435,6 +437,7 @@ if (defined(ohos_lite)) {
       ":wifi_manager_service",
     ]
 
+    shlib_type = "sa"
     part_name = "wifi"
     subsystem_name = "communication"
   }
@@ -446,6 +449,7 @@ if (defined(ohos_lite)) {
       ":wifi_p2p_service_impl",
     ]
 
+    shlib_type = "sa"
     part_name = "wifi"
     subsystem_name = "communication"
   }

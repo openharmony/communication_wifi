@@ -290,7 +290,7 @@ void WifiP2pStub::OnQueryP2pLinkedInfo(uint32_t code, MessageParcel &data, Messa
     if (ret == WIFI_OPT_SUCCESS) {
         reply.WriteInt32(static_cast<int>(config.GetConnectState()));
         reply.WriteBool(config.IsGroupOwner());
-        reply.WriteCString(config.GetGroupOwnerAddress().c_str());
+        reply.WriteString(config.GetGroupOwnerAddress());
     }
     return;
 }
@@ -475,15 +475,10 @@ void WifiP2pStub::WriteWifiP2pServiceInfo(MessageParcel &reply, const WifiP2pSer
 
 void WifiP2pStub::ReadWifiP2pDeviceData(MessageParcel &data, WifiP2pDevice &device)
 {
-    const char *readStr = nullptr;
-    readStr = data.ReadCString();
-    device.SetDeviceName((readStr != nullptr) ? readStr : "");
-    readStr = data.ReadCString();
-    device.SetDeviceAddress((readStr != nullptr) ? readStr : "");
-    readStr = data.ReadCString();
-    device.SetPrimaryDeviceType((readStr != nullptr) ? readStr : "");
-    readStr = data.ReadCString();
-    device.SetSecondaryDeviceType((readStr != nullptr) ? readStr : "");
+    device.SetDeviceName(data.ReadString());
+    device.SetDeviceAddress(data.ReadString());
+    device.SetPrimaryDeviceType(data.ReadString());
+    device.SetSecondaryDeviceType(data.ReadString());
     device.SetP2pDeviceStatus(static_cast<P2pDeviceStatus>(data.ReadInt32()));
     WifiP2pWfdInfo wfdInfo;
     wfdInfo.SetWfdEnabled(data.ReadBool());
@@ -498,10 +493,10 @@ void WifiP2pStub::ReadWifiP2pDeviceData(MessageParcel &data, WifiP2pDevice &devi
 
 void WifiP2pStub::WriteWifiP2pDeviceData(MessageParcel &reply, const WifiP2pDevice &device)
 {
-    reply.WriteCString(device.GetDeviceName().c_str());
-    reply.WriteCString(device.GetDeviceAddress().c_str());
-    reply.WriteCString(device.GetPrimaryDeviceType().c_str());
-    reply.WriteCString(device.GetSecondaryDeviceType().c_str());
+    reply.WriteString(device.GetDeviceName());
+    reply.WriteString(device.GetDeviceAddress());
+    reply.WriteString(device.GetPrimaryDeviceType());
+    reply.WriteString(device.GetSecondaryDeviceType());
     reply.WriteInt32(static_cast<int>(device.GetP2pDeviceStatus()));
     reply.WriteBool(device.GetWfdInfo().GetWfdEnabled());
     reply.WriteInt32(device.GetWfdInfo().GetDeviceInfo());
@@ -514,24 +509,19 @@ void WifiP2pStub::WriteWifiP2pDeviceData(MessageParcel &reply, const WifiP2pDevi
 
 bool WifiP2pStub::ReadWifiP2pGroupData(MessageParcel &data, WifiP2pGroupInfo &info)
 {
-    const char *readStr = nullptr;
     constexpr int MAX_DEV_SIZE = 256;
     info.SetIsGroupOwner(data.ReadBool());
     WifiP2pDevice device;
     ReadWifiP2pDeviceData(data, device);
     info.SetOwner(device);
-    readStr = data.ReadCString();
-    info.SetPassphrase((readStr != nullptr) ? readStr : "");
-    readStr = data.ReadCString();
-    info.SetInterface((readStr != nullptr) ? readStr : "");
-    readStr = data.ReadCString();
-    info.SetGroupName((readStr != nullptr) ? readStr : "");
+    info.SetPassphrase(data.ReadString());
+    info.SetInterface(data.ReadString());
+    info.SetGroupName(data.ReadString());
     info.SetFrequency(data.ReadInt32());
     info.SetIsPersistent(data.ReadBool());
     info.SetP2pGroupStatus(static_cast<P2pGroupStatus>(data.ReadInt32()));
     info.SetNetworkId(data.ReadInt32());
-    readStr = data.ReadCString();
-    info.SetGoIpAddress((readStr != nullptr) ? readStr : "");
+    info.SetGoIpAddress(data.ReadString());
     int size = data.ReadInt32();
     if (size > MAX_DEV_SIZE) {
         return false;
@@ -548,14 +538,14 @@ void WifiP2pStub::WriteWifiP2pGroupData(MessageParcel &reply, const WifiP2pGroup
 {
     reply.WriteBool(info.IsGroupOwner());
     WriteWifiP2pDeviceData(reply, info.GetOwner());
-    reply.WriteCString(info.GetPassphrase().c_str());
-    reply.WriteCString(info.GetInterface().c_str());
-    reply.WriteCString(info.GetGroupName().c_str());
+    reply.WriteString(info.GetPassphrase());
+    reply.WriteString(info.GetInterface());
+    reply.WriteString(info.GetGroupName());
     reply.WriteInt32(info.GetFrequency());
     reply.WriteBool(info.IsPersistent());
     reply.WriteInt32(static_cast<int>(info.GetP2pGroupStatus()));
     reply.WriteInt32(info.GetNetworkId());
-    reply.WriteCString(info.GetGoIpAddress().c_str());
+    reply.WriteString(info.GetGoIpAddress());
     std::vector<WifiP2pDevice> deviceVec = info.GetClientDevices();
     reply.WriteInt32(deviceVec.size());
     for (auto it = deviceVec.begin(); it != deviceVec.end(); ++it) {
@@ -565,13 +555,9 @@ void WifiP2pStub::WriteWifiP2pGroupData(MessageParcel &reply, const WifiP2pGroup
 
 void WifiP2pStub::ReadWifiP2pConfigData(MessageParcel &data, WifiP2pConfig &config)
 {
-    const char *readStr = nullptr;
-    readStr = data.ReadCString();
-    config.SetDeviceAddress((readStr != nullptr) ? readStr : "");
-    readStr = data.ReadCString();
-    config.SetPassphrase((readStr != nullptr) ? readStr : "");
-    readStr = data.ReadCString();
-    config.SetGroupName((readStr != nullptr) ? readStr : "");
+    config.SetDeviceAddress(data.ReadString());
+    config.SetPassphrase(data.ReadString());
+    config.SetGroupName(data.ReadString());
     config.SetGoBand(static_cast<GroupOwnerBand>(data.ReadInt32()));
     config.SetNetId(data.ReadInt32());
     config.SetGroupOwnerIntent(data.ReadInt32());
@@ -641,13 +627,8 @@ void WifiP2pStub::OnSetP2pDeviceName(uint32_t code, MessageParcel &data, Message
 {
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
     ErrCode ret = WIFI_OPT_FAILED;
-    const char *readStr = data.ReadCString();
-    if (readStr == nullptr) {
-        ret = WIFI_OPT_INVALID_PARAM;
-    } else {
-        std::string deviceName = readStr;
-        ret = SetP2pDeviceName(deviceName);
-    }
+    std::string deviceName = data.ReadString();
+    ret = SetP2pDeviceName(deviceName);
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
 

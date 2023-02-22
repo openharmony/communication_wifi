@@ -77,10 +77,10 @@ void WifiP2pCallbackProxy::OnP2pPersistentGroupsChanged(void)
 
 void WifiP2pCallbackProxy::WriteWifiP2pDeviceData(MessageParcel &data, const WifiP2pDevice &device)
 {
-    data.WriteCString(device.GetDeviceName().c_str());
-    data.WriteCString(device.GetDeviceAddress().c_str());
-    data.WriteCString(device.GetPrimaryDeviceType().c_str());
-    data.WriteCString(device.GetSecondaryDeviceType().c_str());
+    data.WriteString(device.GetDeviceName());
+    data.WriteString(device.GetDeviceAddress());
+    data.WriteString(device.GetPrimaryDeviceType());
+    data.WriteString(device.GetSecondaryDeviceType());
     data.WriteInt32(static_cast<int>(device.GetP2pDeviceStatus()));
     data.WriteBool(device.GetWfdInfo().GetWfdEnabled());
     data.WriteInt32(device.GetWfdInfo().GetDeviceInfo());

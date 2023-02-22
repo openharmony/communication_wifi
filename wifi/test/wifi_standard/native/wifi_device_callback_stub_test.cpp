@@ -34,11 +34,13 @@ class WifiDeviceCallBackStubTest : public testing::Test {
 public:
     static void SetUpTestCase() {}
     static void TearDownTestCase() {}
-    virtual void SetUp() {
+    virtual void SetUp()
+    {
         pWifiDeviceCallBackStub = std::make_unique<WifiDeviceCallBackStub>();
     }
 
-    virtual void TearDown() {
+    virtual void TearDown()
+    {
         pWifiDeviceCallBackStub.reset();
     }
 
@@ -48,40 +50,49 @@ public:
 
 class IWifiDeviceCallBackMock : public IWifiDeviceCallBack {
 public:
-    IWifiDeviceCallBackMock() {
+    IWifiDeviceCallBackMock()
+    {
         WIFI_LOGI("IWifiDeviceCallBackMock");
     }
 
-    ~IWifiDeviceCallBackMock() {
+    ~IWifiDeviceCallBackMock()
+    {
         WIFI_LOGI("~IWifiDeviceCallBackMock");
     }
 
 public:
-    void OnWifiStateChanged(int state) override {
+    void OnWifiStateChanged(int state) override
+    {
         WIFI_LOGI("OnWifiStateChanged test");
     }
 
-    void OnWifiConnectionChanged(int state, const WifiLinkedInfo &info) override {
+    void OnWifiConnectionChanged(int state, const WifiLinkedInfo &info) override
+    {
         WIFI_LOGI("OnWifiConnectionChanged test");
     }
 
-    void OnWifiRssiChanged(int rssi) override {
+    void OnWifiRssiChanged(int rssi) override
+    {
         WIFI_LOGI("OnWifiRssiChanged test");
     }
 
-    void OnWifiWpsStateChanged(int state, const std::string &pinCode) override {
+    void OnWifiWpsStateChanged(int state, const std::string &pinCode) override
+    {
         WIFI_LOGI("OnWifiWpsStateChanged test");
     }
 
-    void OnStreamChanged(int direction) override {
+    void OnStreamChanged(int direction) override
+    {
         WIFI_LOGI("OnStreamChanged test");
     }
 
-    void OnDeviceConfigChanged(ConfigChange value) override {
+    void OnDeviceConfigChanged(ConfigChange value) override
+    {
         WIFI_LOGI("OnDeviceConfigChanged test");
     }
 
-    OHOS::sptr<OHOS::IRemoteObject> AsObject() override {
+    OHOS::sptr<OHOS::IRemoteObject> AsObject() override
+    {
         return nullptr;
     }
 };

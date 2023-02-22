@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -52,7 +52,7 @@ public:
         WIFI_LOGI("IWifiDeviceCallBackMock");
     }
 
-    virtual ~IWifiDeviceCallBackMock() {
+    ~IWifiDeviceCallBackMock() {
         WIFI_LOGI("~IWifiDeviceCallBackMock");
     }
 
@@ -84,6 +84,7 @@ public:
     OHOS::sptr<OHOS::IRemoteObject> AsObject() override {
         return nullptr;
     }
+};
 
 HWTEST_F(WifiDeviceCallBackStubTest, OnRemoteRequestTest1, TestSize.Level1)
 {
@@ -99,21 +100,7 @@ HWTEST_F(WifiDeviceCallBackStubTest, OnRemoteRequestTest1, TestSize.Level1)
 HWTEST_F(WifiDeviceCallBackStubTest, OnRemoteRequestTest2, TestSize.Level1)
 {
     WIFI_LOGI("OnRemoteRequestTest2 enter");
-    uint32_t code = 0;
-    MessageParcel data;
-    MessageParcel reply;
-    MessageOption option;
-    EXPECT_TRUE(pWifiDeviceCallBackStub->OnRemoteRequest(code, data, reply, option) == 0);
-    sptr<IWifiDeviceCallBack> callBack = new (std::nothrow) IWifiDeviceCallBackMock();
-    pWifiDeviceCallBackStub->RegisterUserCallBack(callBack);
-    EXPECT_TRUE(pWifiDeviceCallBackStub->OnRemoteRequest(code, data, reply, option) == 0);
-    delete callBack;
-}
-
-HWTEST_F(WifiDeviceCallBackStubTest, OnRemoteRequestTest2, TestSize.Level1)
-{
-    WIFI_LOGI("OnRemoteRequestTest2 enter");
-    uint32_t code = 0;
+    uint32_t code = WIFI_CBK_CMD_STATE_CHANGE;
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
@@ -127,7 +114,7 @@ HWTEST_F(WifiDeviceCallBackStubTest, OnRemoteRequestTest2, TestSize.Level1)
 HWTEST_F(WifiDeviceCallBackStubTest, OnRemoteRequestTest3, TestSize.Level1)
 {
     WIFI_LOGI("OnRemoteRequestTest3 enter");
-    uint32_t code = 0;
+    uint32_t code = WIFI_CBK_CMD_CONNECTION_CHANGE;
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
@@ -141,7 +128,7 @@ HWTEST_F(WifiDeviceCallBackStubTest, OnRemoteRequestTest3, TestSize.Level1)
 HWTEST_F(WifiDeviceCallBackStubTest, OnRemoteRequestTest4, TestSize.Level1)
 {
     WIFI_LOGI("OnRemoteRequestTest4 enter");
-    uint32_t code = 0;
+    uint32_t code = WIFI_CBK_CMD_RSSI_CHANGE;
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
@@ -155,7 +142,7 @@ HWTEST_F(WifiDeviceCallBackStubTest, OnRemoteRequestTest4, TestSize.Level1)
 HWTEST_F(WifiDeviceCallBackStubTest, OnRemoteRequestTest5, TestSize.Level1)
 {
     WIFI_LOGI("OnRemoteRequestTest5 enter");
-    uint32_t code = 0;
+    uint32_t code = WIFI_CBK_CMD_WPS_STATE_CHANGE;
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
@@ -169,7 +156,7 @@ HWTEST_F(WifiDeviceCallBackStubTest, OnRemoteRequestTest5, TestSize.Level1)
 HWTEST_F(WifiDeviceCallBackStubTest, OnRemoteRequestTest6, TestSize.Level1)
 {
     WIFI_LOGI("OnRemoteRequestTest6 enter");
-    uint32_t code = 0;
+    uint32_t code = WIFI_CBK_CMD_STREAM_DIRECTION;
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
@@ -197,7 +184,7 @@ HWTEST_F(WifiDeviceCallBackStubTest, OnRemoteRequestTest7, TestSize.Level1)
 HWTEST_F(WifiDeviceCallBackStubTest, OnRemoteRequestTest8, TestSize.Level1)
 {
     WIFI_LOGI("OnRemoteRequestTest8 enter");
-    uint32_t code = 0;
+    uint32_t code = WIFI_CBK_CMD_DEVICE_CONFIG_CHANGE;
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
@@ -214,5 +201,5 @@ HWTEST_F(WifiDeviceCallBackStubTest, IsRemoteDiedTest, TestSize.Level1)
     pWifiDeviceCallBackStub->SetRemoteDied(val);
     EXPECT_TRUE(pWifiDeviceCallBackStub->IsRemoteDied() == true);
 }
-} // WIFI
-} // OHOS
+} // namespace Wifi
+} // namespace OHOS

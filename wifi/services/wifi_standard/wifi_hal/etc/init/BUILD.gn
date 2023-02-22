@@ -15,6 +15,7 @@ if (defined(ohos_lite)) {
   import("//build/lite/config/component/lite_component.gni")
 } else {
   import("//build/ohos.gni")
+  import("//foundation/communication/wifi/wifi/wifi.gni")
 }
 
 group("etc") {
@@ -34,7 +35,6 @@ if (defined(ohos_lite)) {
     outputs = [ "$root_out_dir/system/etc/wifi/wpa_supplicant.conf" ]
   }
 } else {
-  import("//foundation/communication/wifi/wifi/wifi.gni")
   ohos_prebuilt_etc("wifi_hal_service.cfg") {
     source = "wifi_hal_service.cfg"
     relative_install_dir = "init"

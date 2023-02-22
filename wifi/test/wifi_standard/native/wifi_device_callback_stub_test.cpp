@@ -170,7 +170,7 @@ HWTEST_F(WifiDeviceCallBackStubTest, OnRemoteRequestTest6, TestSize.Level1)
 HWTEST_F(WifiDeviceCallBackStubTest, OnRemoteRequestTest7, TestSize.Level1)
 {
     WIFI_LOGI("OnRemoteRequestTest7 enter");
-    uint32_t code = 0;
+    uint32_t code = WIFI_CBK_CMD_DEVICE_CONFIG_CHANGE;
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
@@ -184,7 +184,7 @@ HWTEST_F(WifiDeviceCallBackStubTest, OnRemoteRequestTest7, TestSize.Level1)
 HWTEST_F(WifiDeviceCallBackStubTest, OnRemoteRequestTest8, TestSize.Level1)
 {
     WIFI_LOGI("OnRemoteRequestTest8 enter");
-    uint32_t code = WIFI_CBK_CMD_DEVICE_CONFIG_CHANGE;
+    uint32_t code = 0;
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;

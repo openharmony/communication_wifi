@@ -50,7 +50,7 @@ if (defined(ohos_lite)) {
 
   ohos_prebuilt_etc("hostapd.conf") {
     source = "hostapd.conf"
-    if (wifi_feature_non_driver_hdf_wifi) {
+    if (wifi_feature_non_hdf_driver) {
       source = "default_conf/hostapd.conf"
     }
     relative_install_dir = "wifi"

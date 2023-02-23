@@ -34,34 +34,34 @@ public:
     static void TearDownTestCase(){}
     virtual void SetUp()
 	{
-        pWifiScanCallbackStub = std:make_unique<WifiScanCallbackStub>();
+        pWifiScan = std:make_unique<WifiScanCallbackStub>();
     }
     virtual void TearDown()
 	{
-        pWifiScanCallbackStub.reset();
+        pWifiScan.reset();
     }
 public:
-    std::unique_ptr<WifiScanCallbackStub> pWifiScanCallbackStub;
+    std::unique_ptr<WifiScanCallbackStub> pWifiScan;
 
 }; 
 HWTEST_F(WifiScanCallbackStubTest, OnWifiScanStateChangedTest, TestSize.Level1)
 {
     int state = NUMBER;
-    pWifiScanCallbackStub->OnWifiScanStateChanged(state);
+    pWifiScan->OnWifiScanStateChanged(state);
 }
 HWTEST_F(WifiScanCallbackStubTest, SetRemoteDiedTest, TestSize.Level1)
 {
     bool val = true;
-    pWifiScanCallbackStub->SetRemoteDied(val);
+    pWifiScan->SetRemoteDied(val);
 }
 HWTEST_F(WifiScanCallbackStubTest, IsRemoteDiedTest, TestSize.Level1)
 {
-    pWifiScanCallbackStub->IsRemoteDied();
+    pWifiScan->IsRemoteDied();
 }
 HWTEST_F(WifiScanCallbackStubTest, RegisterCallBackTest, TestSize.Level1)
 {
     sptr<IWifiScanCallback> userCallback;
-    pWifiScanCallbackStub->RegisterCallBack(userCallback);
+    pWifiScan->RegisterCallBack(userCallback);
 }
 HWTEST_F(WifiScanCallbackStubTest, OnRemoteRequestTest, TestSize.Level1)
 {
@@ -69,7 +69,7 @@ HWTEST_F(WifiScanCallbackStubTest, OnRemoteRequestTest, TestSize.Level1)
 	MessageParcel data;
 	MessageParcel reply;
 	MessageOption option;
-    pWifiScanCallbackStub->OnRemoteRequest(code, data, reply, option);
+    pWifiScan->OnRemoteRequest(code, data, reply, option);
 }
 
 }  // namespace Wifi

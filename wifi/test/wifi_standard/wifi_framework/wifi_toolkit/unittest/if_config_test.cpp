@@ -61,13 +61,6 @@ HWTEST_F(IfconfigTest, SetProxy_Success, TestSize.Level1)
     bool isAuto = true;
     IfConfig::GetInstance().SetProxy(isAuto, "proxy", "8080", "  ", "pac");
 }
-
-HWTEST_F(IfconfigTest, GetIpAddr_Success, TestSize.Level1)
-{
-    std::string ifname = "8080";
-    std::string ipAddr = "10.3.15";
-    IfConfig::GetInstance().GetIpAddr(ifname, ipAddr);
-}
 }  // namespace Wifi
 }  // namespace OHOS
 

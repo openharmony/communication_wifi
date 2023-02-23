@@ -34,7 +34,7 @@ ohos_unittest("native_unittest") {
     "wifi_c_utils_test.cpp",
     "wifi_device_callback_stub_test.cpp",
     "wifi_msg_test.cpp",
-    "wifi_p2p_callback_stub_test",
+    "wifi_p2p_callback_stub_test.cpp",
     "wifi_p2p_msg_test.cpp",
   ]
 

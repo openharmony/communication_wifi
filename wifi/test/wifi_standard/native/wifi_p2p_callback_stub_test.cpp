@@ -14,8 +14,8 @@
  */
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
-#include "wifi_device_callback_stub.h"
 #include "wifi_logger.h"
+#include "wifi_p2p_callback_stub.h"
 
 using ::testing::_;
 using ::testing::AtLeast;
@@ -30,6 +30,7 @@ using ::testing::ext::TestSize;
 DEFINE_WIFILOG_LABEL("WifiP2pCallbackStubTest");
 namespace OHOS {
 namespace Wifi {
+constexpr int BUFFER_1K = 1024;
 class WifiP2pCallbackStubTest : public testing::Test {
 public:
     static void SetUpTestCase() {}
@@ -142,6 +143,7 @@ HWTEST_F(WifiP2pCallbackStubTest, RemoteOnP2pStateChangedTest, TestSize.Level1)
     pWifiP2pCallbackStub->OnRemoteRequest(code, data, reply, option);
     const sptr<IWifiP2pCallback> userCallback = new (std::nothrow) IWifiP2pCallbackMock();
     pWifiP2pCallbackStub->RegisterCallBack(userCallback);
+    pWifiP2pCallbackStub->RegisterCallBack(userCallback);
     pWifiP2pCallbackStub->OnRemoteRequest(code, data, reply, option);
     delete userCallback;
 }
@@ -181,11 +183,25 @@ HWTEST_F(WifiP2pCallbackStubTest, RemoteOnP2pPeersChangedTest, TestSize.Level1)
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
+    data.WriteInt32(0);
+    data.WriteInt32(1);
     pWifiP2pCallbackStub->OnRemoteRequest(code, data, reply, option);
     const sptr<IWifiP2pCallback> userCallback = new (std::nothrow) IWifiP2pCallbackMock();
     pWifiP2pCallbackStub->RegisterCallBack(userCallback);
     pWifiP2pCallbackStub->OnRemoteRequest(code, data, reply, option);
     delete userCallback;
+}
+
+HWTEST_F(WifiP2pCallbackStubTest, RemoteOnP2pPeersChangedTest2, TestSize.Level1)
+{
+    WIFI_LOGI("RemoteOnP2pPeersChangedTest2 enter");
+    uint32_t code = WIFI_CBK_CMD_PEER_CHANGE;
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    data.WriteInt32(0);
+    data.WriteInt32(BUFFER_1K);
+    pWifiP2pCallbackStub->OnRemoteRequest(code, data, reply, option);
 }
 
 HWTEST_F(WifiP2pCallbackStubTest, RemoteOnP2pServicesChangedTest, TestSize.Level1)
@@ -195,11 +211,25 @@ HWTEST_F(WifiP2pCallbackStubTest, RemoteOnP2pServicesChangedTest, TestSize.Level
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
+    data.WriteInt32(0);
+    data.WriteInt32(1);
     pWifiP2pCallbackStub->OnRemoteRequest(code, data, reply, option);
     const sptr<IWifiP2pCallback> userCallback = new (std::nothrow) IWifiP2pCallbackMock();
     pWifiP2pCallbackStub->RegisterCallBack(userCallback);
     pWifiP2pCallbackStub->OnRemoteRequest(code, data, reply, option);
     delete userCallback;
+}
+
+HWTEST_F(WifiP2pCallbackStubTest, RemoteOnP2pServicesChangedTest2, TestSize.Level1)
+{
+    WIFI_LOGI("RemoteOnP2pServicesChangedTest2 enter");
+    uint32_t code = WIFI_CBK_CMD_SERVICE_CHANGE;
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    data.WriteInt32(0);
+    data.WriteInt32(BUFFER_1K);
+    pWifiP2pCallbackStub->OnRemoteRequest(code, data, reply, option);
 }
 
 HWTEST_F(WifiP2pCallbackStubTest, RemoteOnP2pConnectionChangedTest, TestSize.Level1)
@@ -251,6 +281,35 @@ HWTEST_F(WifiP2pCallbackStubTest, RemoteOnConfigChangedTest, TestSize.Level1)
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
+    data.WriteInt32(0);
+    data.WriteInt32(0);
+    pWifiP2pCallbackStub->OnRemoteRequest(code, data, reply, option);
+}
+
+HWTEST_F(WifiP2pCallbackStubTest, RemoteOnConfigChangedTest1, TestSize.Level1)
+{
+    WIFI_LOGI("RemoteOnConfigChangedTest1 enter");
+    uint32_t code = WIFI_CBK_CMD_CFG_CHANGE;
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    data.WriteInt32(0);
+    data.WriteInt32(1);
+    data.WriteInt32(1);
+    pWifiP2pCallbackStub->OnRemoteRequest(code, data, reply, option);
+}
+
+HWTEST_F(WifiP2pCallbackStubTest, RemoteOnConfigChangedTest2, TestSize.Level1)
+{
+    WIFI_LOGI("RemoteOnConfigChangedTest2 enter");
+    uint32_t code = WIFI_CBK_CMD_CFG_CHANGE;
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    data.WriteInt32(0);
+    data.WriteInt32(1);
+    data.WriteInt32(1);
+    reply.WriteBuffer("abcd", 1);
     pWifiP2pCallbackStub->OnRemoteRequest(code, data, reply, option);
     const sptr<IWifiP2pCallback> userCallback = new (std::nothrow) IWifiP2pCallbackMock();
     pWifiP2pCallbackStub->RegisterCallBack(userCallback);
@@ -263,7 +322,7 @@ HWTEST_F(WifiP2pCallbackStubTest, IsRemoteDiedTest, TestSize.Level1)
     WIFI_LOGI("IsRemoteDiedTest enter");
     bool val = false;
     pWifiP2pCallbackStub->SetRemoteDied(val);
-    EXPECT_TRUE(pWifiP2pCallbackStub->IsRemoteDied() = false);
+    EXPECT_TRUE(pWifiP2pCallbackStub->IsRemoteDied() == false);
 }
 } // namespace Wifi
 } // namespace OHOS

@@ -34,7 +34,7 @@ public:
     static void TearDownTestCase(){}
     virtual void SetUp()
 	{
-        pWifiScan = std:make_unique<WifiScanCallbackStub>();
+        pWifiScan = std::make_unique<WifiScanCallbackStub>();
     }
     virtual void TearDown()
 	{

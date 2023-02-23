@@ -40,6 +40,9 @@ public:
 	{
         pWifiScanCallbackStub.reset();
     }
+public:
+    std::unique_ptr<WifiScanCallbackStub> pWifiScanCallbackStub;
+
 }; 
 HWTEST_F(WifiScanCallbackStubTest, OnWifiScanStateChangedTest, TestSize.Level1)
 {

@@ -63,7 +63,7 @@ HWTEST_F(WifiScanCallbackStubTest, RegisterCallBackTest, TestSize.Level1)
     sptr<IWifiScanCallback> userCallback;
     pWifiScanCallbackStub->RegisterCallBack(userCallback);
 }
-HWTEST_F(WifiScanCallbackStubTest, OnRemoteRequest, TestSize.Level1)
+HWTEST_F(WifiScanCallbackStubTest, OnRemoteRequestTest, TestSize.Level1)
 {
     uint32_t code = NUMBER;
 	MessageParcel data;

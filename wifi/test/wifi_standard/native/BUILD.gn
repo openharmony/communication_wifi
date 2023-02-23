@@ -36,6 +36,7 @@ ohos_unittest("native_unittest") {
     "wifi_msg_test.cpp",
     "wifi_p2p_callback_stub_test.cpp",
     "wifi_p2p_msg_test.cpp",
+    "wifi_scan_callback_stub_test.cpp",
   ]
 
   include_dirs = [

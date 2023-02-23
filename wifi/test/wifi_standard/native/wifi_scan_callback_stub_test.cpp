@@ -33,11 +33,11 @@ public:
     static void SetUpTestCase(){}
     static void TearDownTestCase(){}
     virtual void SetUp()
-	{
+    {
         pWifiScan = std::make_unique<WifiScanCallbackStub>();
     }
     virtual void TearDown()
-	{
+    {
         pWifiScan.reset();
     }
 public:
@@ -66,9 +66,9 @@ HWTEST_F(WifiScanCallbackStubTest, RegisterCallBackTest, TestSize.Level1)
 HWTEST_F(WifiScanCallbackStubTest, OnRemoteRequestTest, TestSize.Level1)
 {
     uint32_t code = NUMBER;
-	MessageParcel data;
-	MessageParcel reply;
-	MessageOption option;
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
     pWifiScan->OnRemoteRequest(code, data, reply, option);
 }
 

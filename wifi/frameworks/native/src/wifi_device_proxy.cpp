@@ -475,7 +475,6 @@ void WifiDeviceProxy::ReadIpAddress(MessageParcel &reply, WifiIpAddress &address
 
 void WifiDeviceProxy::ParseDeviceConfigs(MessageParcel &reply, std::vector<WifiDeviceConfig> &result)
 {
-    const char *readStr = nullptr;
     constexpr int MAX_DEVICE_CONFIG_SIZE = 1024;
     int retSize = reply.ReadInt32();
     if (retSize > MAX_DEVICE_CONFIG_SIZE) {
@@ -486,23 +485,18 @@ void WifiDeviceProxy::ParseDeviceConfigs(MessageParcel &reply, std::vector<WifiD
         WifiDeviceConfig config;
         config.networkId = reply.ReadInt32();
         config.status = reply.ReadInt32();
-        readStr = reply.ReadCString();
-        config.bssid = (readStr != nullptr) ? readStr : "";
-        readStr = reply.ReadCString();
-        config.ssid = (readStr != nullptr) ? readStr : "";
+        config.bssid = reply.ReadString();;
+        config.ssid = reply.ReadString();;
         config.band = reply.ReadInt32();
         config.channel = reply.ReadInt32();
         config.frequency = reply.ReadInt32();
         config.level = reply.ReadInt32();
         config.isPasspoint = reply.ReadBool();
         config.isEphemeral = reply.ReadBool();
-        readStr = reply.ReadCString();
-        config.preSharedKey = (readStr != nullptr) ? readStr : "";
-        readStr = reply.ReadCString();
-        config.keyMgmt = (readStr != nullptr) ? readStr : "";
+        config.preSharedKey = reply.ReadString();
+        config.keyMgmt = reply.ReadString();
         for (int j = 0; j < WEPKEYS_SIZE; j++) {
-            readStr = reply.ReadCString();
-            config.wepKeys[j] = (readStr != nullptr) ? readStr : "";
+            config.wepKeys[j] = reply.ReadString();
         }
         config.wepTxKeyIndex = reply.ReadInt32();
         config.priority = reply.ReadInt32();
@@ -515,27 +509,18 @@ void WifiDeviceProxy::ParseDeviceConfigs(MessageParcel &reply, std::vector<WifiD
         ReadIpAddress(reply, config.wifiIpConfig.staticIpAddress.gateway);
         ReadIpAddress(reply, config.wifiIpConfig.staticIpAddress.dnsServer1);
         ReadIpAddress(reply, config.wifiIpConfig.staticIpAddress.dnsServer2);
-        readStr = reply.ReadCString();
-        config.wifiIpConfig.staticIpAddress.domains = (readStr != nullptr) ? readStr : "";
-        readStr = reply.ReadCString();
-        config.wifiEapConfig.eap = (readStr != nullptr) ? readStr : "";
-        readStr = reply.ReadCString();
-        config.wifiEapConfig.identity = (readStr != nullptr) ? readStr : "";
-        readStr = reply.ReadCString();
-        config.wifiEapConfig.password = (readStr != nullptr) ? readStr : "";
-        readStr = reply.ReadCString();
-        config.wifiEapConfig.clientCert = (readStr != nullptr) ? readStr : "";
-        readStr = reply.ReadCString();
-        config.wifiEapConfig.privateKey= (readStr != nullptr) ? readStr : "";
+        config.wifiIpConfig.staticIpAddress.domains = reply.ReadString();
+        config.wifiEapConfig.eap = reply.ReadString();
+        config.wifiEapConfig.identity = reply.ReadString();
+        config.wifiEapConfig.password = reply.ReadString();
+        config.wifiEapConfig.clientCert = reply.ReadString();
+        config.wifiEapConfig.privateKey= reply.ReadString();
         config.wifiEapConfig.phase2Method = Phase2Method(reply.ReadInt32());
         config.wifiProxyconfig.configureMethod = ConfigureProxyMethod(reply.ReadInt32());
-        readStr = reply.ReadCString();
-        config.wifiProxyconfig.autoProxyConfig.pacWebAddress = (readStr != nullptr) ? readStr : "";
-        readStr = reply.ReadCString();
-        config.wifiProxyconfig.manualProxyConfig.serverHostName = (readStr != nullptr) ? readStr : "";
+        config.wifiProxyconfig.autoProxyConfig.pacWebAddress = reply.ReadString();
+        config.wifiProxyconfig.manualProxyConfig.serverHostName = reply.ReadString();
         config.wifiProxyconfig.manualProxyConfig.serverPort = reply.ReadInt32();
-        readStr = reply.ReadCString();
-        config.wifiProxyconfig.manualProxyConfig.exclusionObjectList = (readStr != nullptr) ? readStr : "";
+        config.wifiProxyconfig.manualProxyConfig.exclusionObjectList = reply.ReadString();
         config.wifiPrivacySetting = WifiPrivacyConfig(reply.ReadInt32());
         config.uid = reply.ReadInt32();
 

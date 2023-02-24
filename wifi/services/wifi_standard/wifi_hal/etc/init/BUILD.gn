@@ -15,6 +15,7 @@ if (defined(ohos_lite)) {
   import("//build/lite/config/component/lite_component.gni")
 } else {
   import("//build/ohos.gni")
+  import("//foundation/communication/wifi/wifi/wifi.gni")
 }
 
 group("etc") {
@@ -50,7 +51,7 @@ if (defined(ohos_lite)) {
 
   ohos_prebuilt_etc("hostapd.conf") {
     source = "hostapd.conf"
-    if (product_name == "rk3568") {
+    if (wifi_feature_non_hdf_driver) {
       source = "default_conf/hostapd.conf"
     }
     relative_install_dir = "wifi"

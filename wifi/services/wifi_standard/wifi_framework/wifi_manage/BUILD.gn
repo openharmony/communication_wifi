@@ -195,7 +195,7 @@ if (defined(ohos_lite)) {
       cflags += [ "-DBINDER_IPC_32BIT" ]
     }
 
-    if (product_name == "rk3568") {
+    if (wifi_feature_non_seperate_p2p) {
       defines = [ "NON_SEPERATE_P2P" ]
     }
   }

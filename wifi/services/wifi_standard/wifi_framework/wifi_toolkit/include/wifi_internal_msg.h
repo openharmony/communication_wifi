@@ -54,6 +54,7 @@ constexpr int WIFI_STANDARD_11N = 4;
 constexpr int WIFI_STANDARD_11AC = 5;
 constexpr int WIFI_STANDARD_11AX = 6;
 constexpr int WIFI_STANDARD_11AD = 7;
+constexpr int WIFI_STANDARD_UNKNOWN = 0;
 constexpr int WIFI_802_11A = 1;
 constexpr int WIFI_802_11B = 2;
 constexpr int WIFI_802_11G = 3;

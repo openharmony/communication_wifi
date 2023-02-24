@@ -1041,7 +1041,8 @@ void ScanStateMachine::SetWifiMode(InterScanInfo &scanInfo)
         scanInfo.wifiMode = WIFI_802_11A;
     }
     WIFI_LOGI("ScanStateMachine::SetWifiMode %{public}d %{public}d %{public}d %{public}d %{public}d %{public}d.\n",
-              scanInfo.wifiMode, scanInfo.isVhtInfoExist, scanInfo.isHtInfoExist, scanInfo.isHeInfoExist, scanInfo.isErpExist, scanInfo.maxRates);
+              scanInfo.wifiMode, scanInfo.isVhtInfoExist, scanInfo.isHtInfoExist, scanInfo.isHeInfoExist,
+              scanInfo.isErpExist, scanInfo.maxRates);
     return;
 }
 

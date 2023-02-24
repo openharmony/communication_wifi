@@ -1020,7 +1020,7 @@ void ScanStateMachine::CommonScanInfoProcess()
     runningScans.clear();
 }
 
-void ScanStateMachine::SetWifiMode(InterScanInfo scanInfo)
+void ScanStateMachine::SetWifiMode(InterScanInfo &scanInfo)
 {
     scanInfo.wifiMode = WIFI_MODE_UNDEFINED;
     if (scanInfo.isHeInfoExist) {
@@ -1032,7 +1032,7 @@ void ScanStateMachine::SetWifiMode(InterScanInfo scanInfo)
     } else if (scanInfo.isErpExist) {
         scanInfo.wifiMode = WIFI_802_11G;
     } else if (scanInfo.band == SCAN_24GHZ_BAND) {
-        if (scaninfo.maxRates < 24000000) {
+        if (scanInfo.maxRates < 24000000) {
             scanInfo.wifiMode = WIFI_802_11B;
         } else {
             scanInfo.wifiMode = WIFI_802_11G;

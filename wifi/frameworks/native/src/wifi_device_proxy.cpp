@@ -486,7 +486,7 @@ void WifiDeviceProxy::ParseDeviceConfigs(MessageParcel &reply, std::vector<WifiD
         config.networkId = reply.ReadInt32();
         config.status = reply.ReadInt32();
         config.bssid = reply.ReadString();
-        config.ssid = reply.ReadString();;
+        config.ssid = reply.ReadString();
         config.band = reply.ReadInt32();
         config.channel = reply.ReadInt32();
         config.frequency = reply.ReadInt32();

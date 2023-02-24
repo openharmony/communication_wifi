@@ -58,6 +58,17 @@ enum class ScanMode {
     SCAN_MODE_MAX            /* Invalid value */
 };
 
+enum class WifiMode {
+    WIFI_MODE_UNDEFINED = 0,
+    WIFI_802_11A,
+    WIFI_802_11B,
+    WIFI_802_11G,
+    WIFI_802_11N,
+    WIFI_802_11AC,
+    WIFI_802_11AX,
+    WIFI_MODE_MAX,
+};
+
 enum class WifiSecurity {
     OPEN = 0,
     WEP = 1,
@@ -130,6 +141,7 @@ struct WifiScanInfo {
     std::vector<WifiInfoElem> infoElems;
     int64_t features;
     int64_t timestamp;
+    int wifiStandard;
 
     WifiScanInfo()
     {
@@ -142,6 +154,7 @@ struct WifiScanInfo {
         securityType = WifiSecurity::INVALID;
         features = 0;
         timestamp = 0;
+        wifiStandard = 0;
     }
 };
 

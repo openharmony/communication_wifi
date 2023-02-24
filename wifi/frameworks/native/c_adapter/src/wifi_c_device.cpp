@@ -303,6 +303,7 @@ static OHOS::Wifi::ErrCode GetLinkedInfoFromCpp(const OHOS::Wifi::WifiLinkedInfo
     result->connState = linkedInfo.connState == OHOS::Wifi::ConnState::CONNECTED ? WIFI_CONNECTED : WIFI_DISCONNECTED;
     /* disconnectedReason not support */
     result->ipAddress = linkedInfo.ipAddress;
+    result->wifiStandard = linkedInfo.wifiStandard;
     return OHOS::Wifi::WIFI_OPT_SUCCESS;
 }
 

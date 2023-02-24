@@ -74,6 +74,7 @@ typedef struct {
     unsigned short disconnectedReason;
     /** IP address of the connected hotspot */
     unsigned int ipAddress;
+    unsigned int wifiStandard;
 } WifiLinkedInfo;
 #endif // WIFI_LITE_WIFI_LINKED_INFO_H
 /** @} */

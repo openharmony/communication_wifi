@@ -132,6 +132,7 @@ struct WifiLinkedInfo {
     std::string portalUrl;
     SupplicantState supplicantState; /* wpa_supplicant state */
     DetailedState detailedState;     /* connection state */
+    int wifiStandard;                /* wifi standard */
 
     WifiLinkedInfo()
     {
@@ -151,6 +152,7 @@ struct WifiLinkedInfo {
         isDataRestricted = 0;
         supplicantState = SupplicantState::INVALID;
         detailedState = DetailedState::INVALID;
+        wifiStandard = 0;
     }
 };
 

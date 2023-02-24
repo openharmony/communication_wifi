@@ -946,6 +946,7 @@ void WifiDeviceProxy::ReadLinkedInfo(MessageParcel &reply, WifiLinkedInfo &info)
     } else {
         info.detailedState = DetailedState::INVALID;
     }
+    info.wifiStandard = reply.ReadInt32();
 }
 
 ErrCode WifiDeviceProxy::GetLinkedInfo(WifiLinkedInfo &info)

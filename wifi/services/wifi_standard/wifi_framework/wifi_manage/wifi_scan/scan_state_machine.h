@@ -359,6 +359,12 @@ private:
      */
     void GetSecurityTypeAndBand(std::vector<InterScanInfo> &scanInfo);
     /**
+     * @Description The band and security type are parsed from the scanning result obtained by the IDL.
+     * 
+     * @param scanInfo - scan result[inout]
+     */
+    void GetWifiMode(const std::string &bssid, InterScanInfo &scanInfo);
+    /**
      * @Description  Reporting Status to ScanService.
      *
      * @param status - status code[in]

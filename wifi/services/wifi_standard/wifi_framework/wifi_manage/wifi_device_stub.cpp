@@ -535,6 +535,7 @@ void WifiDeviceStub::OnGetLinkedInfo(uint32_t code, MessageParcel &data, Message
         reply.WriteString(wifiInfo.portalUrl);
         reply.WriteInt32((int)wifiInfo.supplicantState);
         reply.WriteInt32((int)wifiInfo.detailedState);
+        reply.WriteInt32((int)wifiInfo.wifiStandard);
     }
 
     return;

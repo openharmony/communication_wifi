@@ -626,6 +626,7 @@ bool ScanService::StoreFullScanInfo(
         scanInfo.features = iter->features;
         scanInfo.timestamp = iter->timestamp;
         scanInfo.band = iter->band;
+        iter->GetWifiStandard(scanInfo.wifiStandard);
         storeInfoList.push_back(scanInfo);
     }
 

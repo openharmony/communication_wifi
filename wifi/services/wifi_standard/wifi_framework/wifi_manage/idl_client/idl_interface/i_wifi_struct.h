@@ -106,6 +106,12 @@ typedef struct ScanInfo {
     int64_t timestamp;
     int associated;
     int antValue;
+    int isVhtInfoExist;
+    int isHtInfoExist;
+    int isHeInfoExist;
+    int isErpExist;
+    int maxRates;
+    int extMaxRates;
 } ScanInfo;
 
 typedef struct WifiNetworkInfo {

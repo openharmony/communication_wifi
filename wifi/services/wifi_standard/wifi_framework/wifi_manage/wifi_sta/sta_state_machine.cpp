@@ -746,6 +746,10 @@ void StaStateMachine::DealSignalPollResult(InternalMessage *msg)
         linkedInfo.frequency = signalInfo.frequency;
     }
     linkedInfo.snr = linkedInfo.rssi - signalInfo.noise;
+    wifiSettings::GetInstance().GetScanInfo(linkedInfo.bssid, linkedInfo.wifiStandard);
+    LOGI("DealSignalPollResult GetWifiStandard:%{public}d, bssid:%{public}s.\n",
+         linkedInfo.wifiStandard, MacAnonymize(linkedInfo.bssid).c_str());
+
     WifiSettings::GetInstance().SaveLinkedInfo(linkedInfo);
     ConvertFreqToChannel();
     StartTimer(static_cast<int>(CMD_SIGNAL_POLL), STA_SIGNAL_POLL_DELAY);

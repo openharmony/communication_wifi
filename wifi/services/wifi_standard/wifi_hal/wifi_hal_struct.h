@@ -96,6 +96,12 @@ typedef struct ScanInfo {
     char flags[WIFI_SCAN_INFO_CAPABILITY_LENGTH];
     int64_t timestamp;
     Ant ant;
+    int isVhtInfoExist;
+    int isHtInfoExist;
+    int isHeInfoExist;
+    int isErpExist;
+    int maxRates;
+    int extMaxRates;
 } ScanInfo;
 
 typedef struct WifiNetworkInfo {

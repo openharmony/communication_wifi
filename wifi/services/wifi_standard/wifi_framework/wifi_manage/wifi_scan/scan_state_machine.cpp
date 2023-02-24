@@ -1020,6 +1020,31 @@ void ScanStateMachine::CommonScanInfoProcess()
     runningScans.clear();
 }
 
+void ScanStateMachine::GetWifiMode(InterScanInfo scanInfo)
+{
+    scanInfo.wifiMode = WIFI_MODE_UNDEFINED;
+    if (scanInfo.isHeInfoExist) {
+        scanInfo.wifiMode = WIFI_802_11AX;
+    } else if (scanInfo.band != SCAN_24GHZ_BAND && scanInfo.isVhtInfoExist) {
+        scanInfo.wifiMode = WIFI_802_11AC;
+    } else if (scanInfo.isHtInfoExist) {
+        scanInfo.wifiMode = WIFI_802_11N;
+    } else if (scanInfo.isErpExist) {
+        scanInfo.wifiMode = WIFI_802_11G;
+    } else if (scanInfo.band == SCAN_24GHZ_BAND) {
+        if (scaninfo.maxRates < 24000000) {
+            scanInfo.wifiMode = WIFI_802_11B;
+        } else {
+            scanInfo.wifiMode = WIFI_802_11G;
+        }
+    } else (scanInfo.isErpExist) {
+        scanInfo.wifiMode = WIFI_802_11A;
+    }
+    WIFI_LOGI("ScanStateMachine::GetWifiMode %{public}d %{public}d %{public}d %{public}d %{public}d %{public}d.\n",
+              scanInfo.wifiMode, scanInfo.isVhtInfoExist, scanInfo.isHtInfoExist, scanInfo.isHeInfoExist, scanInfo.isErpExist, scanInfo.maxRates);
+    return;
+}
+
 void ScanStateMachine::GetSecurityTypeAndBand(std::vector<InterScanInfo> &scanInfos)
 {
     WIFI_LOGI("Enter ScanStateMachine::GetSecurityTypeAndBand.\n");
@@ -1033,7 +1058,7 @@ void ScanStateMachine::GetSecurityTypeAndBand(std::vector<InterScanInfo> &scanIn
             WIFI_LOGE("invalid frequency value: %{public}d", iter->frequency);
             iter->band = 0;
         }
-
+        GetWifiMode(*iter);
         iter->securityType = WifiSecurity::OPEN;
         if (iter->capabilities.find("WAPI-PSK") != std::string::npos) {
             iter->securityType = WifiSecurity::WAPI_PSK;

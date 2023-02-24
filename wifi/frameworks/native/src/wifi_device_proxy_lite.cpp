@@ -151,6 +151,7 @@ static void ReadLinkedInfo(IpcIo *reply, WifiLinkedInfo &info)
     } else {
         info.detailedState = DetailedState::INVALID;
     }
+    (void)ReadInt32(reply, &info.wifiStandard);
 }
 
 static void ReadDhcpInfo(IpcIo *reply, IpInfo &info)

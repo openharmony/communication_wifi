@@ -208,6 +208,18 @@ int WifiSettings::GetScanInfoList(std::vector<WifiScanInfo> &results)
     return 0;
 }
 
+int WifiSettings::GetWifiStandard(const std::string &bssid, int &wifiStandard)
+{
+    std::unique_lock<std::mutex> lock(mInfoMutex);
+    for (auto iter = mWifiScanInfoList.begin(); iter != mWifiScanInfoList.end(); ++iter) {
+        if (iter->bssid == bssid) {
+            wifiStandard = iter->wifiStandard;
+            break;
+        }
+    }
+    return 0;
+}
+
 int WifiSettings::GetScanControlInfo(ScanControlInfo &info)
 {
     std::unique_lock<std::mutex> lock(mInfoMutex);

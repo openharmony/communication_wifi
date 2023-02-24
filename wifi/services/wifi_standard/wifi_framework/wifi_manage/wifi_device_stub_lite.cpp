@@ -425,6 +425,7 @@ void WifiDeviceStub::OnGetLinkedInfo(uint32_t code, IpcIo *req, IpcIo *reply)
         (void)WriteString(reply, wifiInfo.portalUrl.c_str());
         (void)WriteInt32(reply, (int)wifiInfo.supplicantState);
         (void)WriteInt32(reply, (int)wifiInfo.detailedState);
+        (void)WriteInt32(reply, (int)wifiInfo.wifiStandard);
     }
 }
 

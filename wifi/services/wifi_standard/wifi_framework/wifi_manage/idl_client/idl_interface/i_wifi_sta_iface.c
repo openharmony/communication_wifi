@@ -515,6 +515,12 @@ ScanInfo* GetScanInfos(int *size)
                     ReadInt(context, &scanInfos[i].channelWidth);
                     ReadInt(context, &scanInfos[i].centerFrequency0);
                     ReadInt(context, &scanInfos[i].centerFrequency1);
+                    ReadInt(context, &scanInfos[i].isVhtInfoExist);
+                    ReadInt(context, &scanInfos[i].isHtInfoExist);
+                    ReadInt(context, &scanInfos[i].isHeInfoExist);
+                    ReadInt(context, &scanInfos[i].isErpExist);
+                    ReadInt(context, &scanInfos[i].maxRates);
+                    ReadInt(context, &scanInfos[i].extMaxRates);
                     GetScanInfoElems(context, &scanInfos[i]);
                 }
             } else {

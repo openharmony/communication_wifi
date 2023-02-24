@@ -793,6 +793,7 @@ static void LinkedInfoToJs(const napi_env& env, WifiLinkedInfo& linkedInfo, napi
     SetValueUnsignedInt32(env, "ipAddress", linkedInfo.ipAddress, result);
     SetValueInt32(env, "suppState", static_cast<int>(linkedInfo.supplicantState), result);
     SetValueInt32(env, "connState", static_cast<int>(linkedInfo.connState), result);
+    SetValueInt32(env, "wifiStandard", static_cast<int>(linkedInfo.wifiStandard), result);
 }
 
 /* This interface has not been fully implemented */

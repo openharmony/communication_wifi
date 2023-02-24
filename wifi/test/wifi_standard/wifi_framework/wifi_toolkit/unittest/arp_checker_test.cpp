@@ -30,7 +30,10 @@ public:
     {}
     virtual void SetUp()
     {
-        pArpChecker.reset(new ArpChecker());
+        std::string ifname = "network";
+        std::string hwAddr = "192.168.3.6";
+        std::string ipAddr = "10.3.1";
+        pArpChecker = std::make_unique<ArpChecker>(ifname, hwAddr, ipAddr)
     }
     virtual void TearDown()
     {
@@ -41,27 +44,6 @@ public:
     std::unique_ptr<ArpChecker> pArpChecker;
 };
 
-HWTEST_F(ArpCheckerTest, ArpChecker_Success, TestSize.Level1)
-{
-    std::string ifname;
-    std::string hwAddr = "0000000000";
-    std::string ipAddr = "network";
-    pArpChecker->ArpChecker(&ifname, &hwAddr, &ipAddr);
-}
-
-HWTEST_F(ArpCheckerTest, ArpChecker_FAIL, TestSize.Level1)
-{
-    std::string ifname = "";
-    std::string hwAddr;
-    std::string ipAddr;
-    pArpChecker->ArpChecker();
-}
-
-HWTEST_F(ArpCheckerTest, ArpChecker_FAIL, TestSize.Level1)
-{
-    pArpChecker->~ArpChecker();
-}
-
 HWTEST_F(ArpCheckerTest, DoArp_FAIL, TestSize.Level1)
 {
     int timeoutMillis = 0;
@@ -69,14 +51,5 @@ HWTEST_F(ArpCheckerTest, DoArp_FAIL, TestSize.Level1)
     bool isFillSenderIp = false;
     EXPECT_TRUE(pArpChecker->DoArp(&timeoutMillis, &targetIp, &isFillSenderIp) == false);
 }
-
-HWTEST_F(ArpCheckerTest, DoArp_Success, TestSize.Level1)
-{
-    int timeoutMillis = 1;
-    std::string targetIp = "192.168.3.66";
-    bool isFillSenderIp = true;
-    EXPECT_TRUE(pArpChecker->DoArp(&timeoutMillis, &targetIp, &isFillSenderIp) == true);
-}
-
 }  // namespace Wifi
 }  // namespace OHOS

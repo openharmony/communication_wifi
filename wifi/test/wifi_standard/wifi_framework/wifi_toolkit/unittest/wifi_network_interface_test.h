@@ -28,7 +28,12 @@ public:
     virtual void SetUp()
     {}
     virtual void TearDown()
-    {}
+    {
+        pIpv4Address.reset();
+    }
+
+public:
+    std::unique_ptr<Ipv4Address> pIpv4Address;
 };
 }  // namespace Wifi
 }  // namespace OHOS

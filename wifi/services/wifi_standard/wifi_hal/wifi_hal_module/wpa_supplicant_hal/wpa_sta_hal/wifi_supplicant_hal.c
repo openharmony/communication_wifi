@@ -1072,15 +1072,15 @@ static void GetChanWidthCenterFreq(ScanInfo *pcmd, struct NeedParseIe* iesNeedPa
         return;
     }
     if ((iesNeedParse->ieMaxRate != NULL) && GetChanMaxRates(pcmd, iesNeedParse->ieMaxRate)) {
-        LOGD("pcmd maxRates is %d.", pcmd->maxRates);
+        LOGE("pcmd maxRates is %{public}d.", pcmd->maxRates);
         return;
     }
     if ((iesNeedParse->ieExtMaxRate != NULL) && GetChanExtMaxRates(pcmd, iesNeedParse->ieExtMaxRate)) {
-        LOGD("pcmd extMaxRates is %d.", pcmd->extMaxRates);
+        LOGE("pcmd extMaxRates is %{public}d.", pcmd->extMaxRates);
         return;
     }
     if (iesNeedParse->ieErp != NULL) {
-        LOGD("pcmd isErpExist is true.");
+        LOGE("pcmd isErpExist is true.");
         pcmd->isErpExist = 1;
         return;
     }
@@ -1274,8 +1274,7 @@ static int WpaCliCmdScanInfo(WifiWpaStaInterface *this, ScanInfo *pcmd, int *siz
             LOGE("parse scan result line failed!");
             break;
         }
-        LOGD("-->>%{public}2d %{public}s %{public}s %{public}d %{public}d %{public}d %{public}d %{public}d \
-        %{public}d %{public}d %{public}d %{public}d %{public}d %{public}d",
+        LOGD("-->>%{public}2d %{public}s %{public}s %{public}d %{public}d %{public}d %{public}d %{public}d %{public}d %{public}d %{public}d %{public}d %{public}d %{public}d",
              j, pcmd[j].ssid, pcmd[j].bssid, pcmd[j].freq, pcmd[j].siglv,
              pcmd[j].centerFrequency0, pcmd[j].centerFrequency1, pcmd[j].channelWidth,
              pcmd[j].isVhtInfoExist, pcmd[j].isHtInfoExist, pcmd[j].isHeInfoExist, pcmd[j].isErpExist,

@@ -1051,7 +1051,7 @@ static bool GetChanExtMaxRates(ScanInfo *pcmd, ScanInfoElem* infoElem)
     }
     int maxIndex = infoElem->size - 1;
     int maxRates = infoElem->content[maxIndex] & UINT8_MASK;
-    pcmd->maxRates = maxRates;
+    pcmd->extMaxRates = maxRates;
     return true;
 }
 
@@ -1072,15 +1072,15 @@ static void GetChanWidthCenterFreq(ScanInfo *pcmd, struct NeedParseIe* iesNeedPa
         return;
     }
     if ((iesNeedParse->ieMaxRate != NULL) && GetChanMaxRates(pcmd, iesNeedParse->ieMaxRate)) {
-        LOGI("pcmd maxRates is %d.", pcmd->maxRates);
+        LOGD("pcmd maxRates is %d.", pcmd->maxRates);
         return;
     }
     if ((iesNeedParse->ieExtMaxRate != NULL) && GetChanExtMaxRates(pcmd, iesNeedParse->ieExtMaxRate)) {
-        LOGI("pcmd extMaxRates is %d.", pcmd->extMaxRates);
+        LOGD("pcmd extMaxRates is %d.", pcmd->extMaxRates);
         return;
     }
     if (iesNeedParse->ieErp != NULL) {
-        LOGI("pcmd isErpExist is true.");
+        LOGD("pcmd isErpExist is true.");
         pcmd->isErpExist = 1;
         return;
     }
@@ -1099,6 +1099,9 @@ static void RecordIeNeedParse(unsigned int id, ScanInfoElem* ie, struct NeedPars
             break;
         case VHT_OPER_EID:
             iesNeedParse->ieVhtOper = ie;
+            break;
+        case HT_OPER_EID:
+            iesNeedParse->ieHtOper = ie;
             break;
         case SUPPORTED_RATES_EID:
             iesNeedParse->ieMaxRate = ie;
@@ -1271,7 +1274,7 @@ static int WpaCliCmdScanInfo(WifiWpaStaInterface *this, ScanInfo *pcmd, int *siz
             LOGE("parse scan result line failed!");
             break;
         }
-        LOGD("-->>%{public}2d %{public}s %{public}s %{public}d %{public}d %{public}d %{public}d %{public}d\
+        LOGD("-->>%{public}2d %{public}s %{public}s %{public}d %{public}d %{public}d %{public}d %{public}d \
         %{public}d %{public}d %{public}d %{public}d %{public}d %{public}d",
              j, pcmd[j].ssid, pcmd[j].bssid, pcmd[j].freq, pcmd[j].siglv,
              pcmd[j].centerFrequency0, pcmd[j].centerFrequency1, pcmd[j].channelWidth,

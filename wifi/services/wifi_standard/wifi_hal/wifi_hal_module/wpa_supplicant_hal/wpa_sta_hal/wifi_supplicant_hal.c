@@ -1081,9 +1081,9 @@ static void GetChanWidthCenterFreq(ScanInfo *pcmd, struct NeedParseIe* iesNeedPa
     }
     if (iesNeedParse->ieErp != NULL) {
         LOGI("pcmd isErpExist is true.");
-        pcmd->isErpExist = true;
+        pcmd->isErpExist = 1;
         return;
-    }    
+    }
     LOGE("GetChanWidthCenterFreq fail.");
     return;
 }

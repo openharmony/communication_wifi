@@ -290,7 +290,7 @@ void WifiDeviceStub::WriteWifiDeviceConfig(MessageParcel &reply, const WifiDevic
     WriteIpAddress(reply, config.wifiIpConfig.staticIpAddress.gateway);
     WriteIpAddress(reply, config.wifiIpConfig.staticIpAddress.dnsServer1);
     WriteIpAddress(reply, config.wifiIpConfig.staticIpAddress.dnsServer2);
-    reply.WriteString(config.wifiIpConfig.staticIpAddress.domainsmuqia);
+    reply.WriteString(config.wifiIpConfig.staticIpAddress.domains);
     reply.WriteString(config.wifiEapConfig.eap);
     reply.WriteString(config.wifiEapConfig.identity);
     reply.WriteString(config.wifiEapConfig.password);

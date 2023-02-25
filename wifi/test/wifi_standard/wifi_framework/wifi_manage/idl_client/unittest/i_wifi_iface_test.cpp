@@ -115,7 +115,7 @@ HWTEST_F(IWifiIfaceTest, GetValidFrequenciesForBandTest, TestSize.Level1)
 
 HWTEST_F(IWifiIfaceTest, SetCountryCodeTest, TestSize.Level1)
 {
-    const char code;
+    const char code = 0;
     int id = 0;
     SetCountryCode(&code, id);
 }
@@ -124,7 +124,7 @@ HWTEST_F(IWifiIfaceTest, RegisterAsscociatedEventTest, TestSize.Level1)
 {
     IWifiApEventCallback callback;
     int id = 0;
-    RegisterAsscociatedEvent(callback, id)
+    RegisterAsscociatedEvent(callback, id);
     callback.onStaJoinOrLeave = onStaJoinOrLeaveTest;
     RegisterAsscociatedEvent(callback, id);
 }

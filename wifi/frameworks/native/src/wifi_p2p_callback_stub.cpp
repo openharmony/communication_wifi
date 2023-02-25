@@ -49,10 +49,6 @@ int WifiP2pCallbackStub::OnRemoteRequest(
     uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
     WIFI_LOGD("WifiP2pCallbackStub::OnRemoteRequest code:%{public}u!", code);
-    if (mRemoteDied) {
-        WIFI_LOGD("Failed to `%{public}s`,remote service is died!", __func__);
-        return -1;
-    }
 
     if (data.ReadInterfaceToken() != GetDescriptor()) {
         WIFI_LOGE("P2p callback stub token verification error: %{public}d", code);
@@ -91,6 +87,7 @@ bool WifiP2pCallbackStub::IsRemoteDied() const
 
 void WifiP2pCallbackStub::SetRemoteDied(bool val)
 {
+    WIFI_LOGI("WifiP2pCallbackStub::SetRemoteDied: %{public}d", val);
     mRemoteDied = val;
 }
 
@@ -189,15 +186,10 @@ void WifiP2pCallbackStub::RemoteOnP2pPersistentGroupsChanged(uint32_t code, Mess
 
 void WifiP2pCallbackStub::ReadWifiP2pDeviceData(MessageParcel &data, WifiP2pDevice &device)
 {
-    const char *readStr = nullptr;
-    readStr = data.ReadCString();
-    device.SetDeviceName((readStr != nullptr) ? readStr : "");
-    readStr = data.ReadCString();
-    device.SetDeviceAddress((readStr != nullptr) ? readStr : "");
-    readStr = data.ReadCString();
-    device.SetPrimaryDeviceType((readStr != nullptr) ? readStr : "");
-    readStr = data.ReadCString();
-    device.SetSecondaryDeviceType((readStr != nullptr) ? readStr : "");
+    device.SetDeviceName(data.ReadString());
+    device.SetDeviceAddress(data.ReadString());
+    device.SetPrimaryDeviceType(data.ReadString());
+    device.SetSecondaryDeviceType(data.ReadString());
     device.SetP2pDeviceStatus(static_cast<P2pDeviceStatus>(data.ReadInt32()));
     WifiP2pWfdInfo wfdInfo;
     wfdInfo.SetWfdEnabled(data.ReadBool());

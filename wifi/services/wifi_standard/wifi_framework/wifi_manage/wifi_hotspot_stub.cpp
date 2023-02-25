@@ -58,6 +58,7 @@ void WifiHotspotStub::InitHandleMap()
     handleFuncMap[WIFI_SVR_CMD_GET_POWER_MODEL] = &WifiHotspotStub::OnGetPowerModel;
     handleFuncMap[WIFI_SVR_CMD_SET_POWER_MODEL] = &WifiHotspotStub::OnSetPowerModel;
     handleFuncMap[WIFI_SVR_CMD_IS_HOTSPOT_DUAL_BAND_SUPPORTED] = &WifiHotspotStub::OnIsHotspotDualBandSupported;
+    handleFuncMap[WIFI_SVR_CMD_SETTIMEOUT_AP] = &WifiHotspotStub::OnSetApIdleTimeout;
     return;
 }
 
@@ -423,6 +424,18 @@ void WifiHotspotStub::OnSetPowerModel(uint32_t code, MessageParcel &data, Messag
     ErrCode ret = SetPowerModel(model);
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
+    return;
+}
+
+void WifiHotspotStub::OnSetApIdleTimeout(uint32_t code, MessageParcel &data,
+    MessageParcel &reply, MessageOption &option)
+{
+    WIFI_LOGD("run %{private}s code %{private}u, datasize %{private}zu", __func__, code, data.GetRawDataSize());
+    int time = data.ReadInt32();
+    int ret = SetHotspotIdleTimeout(time);
+    reply.WriteInt32(0);
+    reply.WriteInt32(ret);
+
     return;
 }
 }  // namespace Wifi

@@ -53,7 +53,9 @@
             "wifi_feature_with_encryption",
             "wifi_feature_is_hdi_supported",
             "wifi_feature_with_ap_extension",
-            "wifi_feature_with_app_frozen"
+            "wifi_feature_with_app_frozen",
+            "wifi_feature_non_seperate_p2p",
+            "wifi_feature_non_hdf_driver"
         ],
         "adapted_system_type": [
             "standard"

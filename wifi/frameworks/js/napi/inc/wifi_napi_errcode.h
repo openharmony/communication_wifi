@@ -29,6 +29,7 @@ static const std::string BUSINESS_ERROR_PROPERTY_DATA = "data";
 enum WifiNapiErrCode {
     WIFI_ERRCODE_SUCCESS = 0, /* successfully */
     WIFI_ERRCODE_PERMISSION_DENIED = 201, /* permission denied */
+    WIFI_ERRCODE_NON_SYSTEMAPP = 202, /* not system app */
     WIFI_ERRCODE_INVALID_PARAM = 401, /* invalid params */
     WIFI_ERRCODE_NOT_SUPPORTED = 801, /* not supported */
     WIFI_ERRCODE_OPERATION_FAILED = 1000, /* failed */
@@ -91,7 +92,7 @@ do { \
  * @param env The env.
  * @param info The input data.
  */
-void HandleCallbackErrCode(    const napi_env &env, const AsyncContext &info);
+void HandleCallbackErrCode(const napi_env &env, const AsyncContext &info);
 
 /**
  * @brief Thow error code for async-promise function.

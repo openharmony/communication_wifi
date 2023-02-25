@@ -49,6 +49,14 @@ napi_value UndefinedNapiValue(const napi_env& env)
     return result;
 }
 
+napi_value CreateInt32(const napi_env& env)
+{
+    int32_t value = 1;
+    napi_value result = nullptr;
+    napi_create_int32(env, value, &result);
+    return result;
+}
+
 napi_value JsObjectToString(const napi_env& env, const napi_value& object,
     const char* fieldStr, const int bufLen, std::string& fieldRef)
 {
@@ -135,6 +143,45 @@ napi_value JsObjectToBool(const napi_env& env, const napi_value& object, const c
         WIFI_LOGW("Js to bool no property: %{public}s", fieldStr);
     }
     return UndefinedNapiValue(env);
+}
+
+std::vector<uint8_t> JsObjectToU8Vector(const napi_env& env, const napi_value& object, const char* fieldStr)
+{
+    bool hasProperty = false;
+    NAPI_CALL_BASE(env, napi_has_named_property(env, object, fieldStr, &hasProperty), {});
+    if (!hasProperty) {
+        WIFI_LOGW("JsObjectToU8Vector, Js to U8Vector no property: %{public}s", fieldStr);
+        return {};
+    }
+
+    bool isTypedArray = false;
+    if (napi_is_typedarray(env, object, &isTypedArray) != napi_ok || !isTypedArray) {
+        WIFI_LOGW("JsObjectToU8Vector, property is not typedarray: %{public}s", fieldStr);
+        return {};
+    }
+
+    size_t length = 0;
+    size_t offset = 0;
+    napi_typedarray_type type;
+    napi_value buffer = nullptr;
+    NAPI_CALL_BASE(env, napi_get_typedarray_info(env, object, &type, &length, nullptr, &buffer, &offset), {});
+    if (type != napi_uint8_array || buffer == nullptr) {
+        WIFI_LOGW("JsObjectToU8Vector, %{public}s, buffer is nullptr: %{public}d",
+            fieldStr, (int)(buffer == nullptr));
+        return {};
+    }
+
+    size_t total = 0;
+    uint8_t *data = nullptr;
+    NAPI_CALL_BASE(env, napi_get_arraybuffer_info(env, buffer, reinterpret_cast<void **>(&data), &total), {});
+    length = std::min<size_t>(length, total - offset);
+    std::vector<uint8_t> result(length);
+    int retCode = memcpy_s(result.data(), result.size(), &data[offset], length);
+    if (retCode != 0) {
+        WIFI_LOGW("JsObjectToU8Vector, memcpy_s return fail: %{public}d", retCode);
+        return {};
+    }
+    return result;
 }
 
 napi_status SetValueUtf8String(const napi_env& env, const char* fieldStr, const char* str,

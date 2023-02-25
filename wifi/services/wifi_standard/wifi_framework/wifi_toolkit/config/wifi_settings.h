@@ -39,6 +39,9 @@ constexpr int MODE_DEL = 1;
 constexpr int MODE_UPDATE = 2;
 /* Obtain the scanning result that is valid within 180s. */
 constexpr int WIFI_GET_SCAN_INFO_VALID_TIMESTAMP = 180;
+/* Hotspot idle status auto close timeout 10min. */
+constexpr int HOTSPOT_IDLE_TIMEOUT_INTERVAL_MS = 10 * 60 * 1000;
+
 
 constexpr char DEVICE_CONFIG_FILE_PATH[] = CONFIG_ROOR_DIR"/device_config.conf";
 constexpr char HOTSPOT_CONFIG_FILE_PATH[] = CONFIG_ROOR_DIR"/hotspot_config.conf";
@@ -143,7 +146,7 @@ public:
      * @param results - output scan result
      * @return int - 0 success
      */
-    int GetWifiStandard(const std::string &bssid, int &wifiStandard);
+    int SetWifiLinkedStandardAndMaxSpeed(WifiLinkedInfo &linkInfo);
     /**
      * @Description save the p2p connected info
      *
@@ -457,6 +460,21 @@ public:
      * @return int - 0 success
      */
     int GetHotspotConfig(HotspotConfig &config, int id = 0);
+
+    /**
+     * @Description Set the idel timeout of Hotspot
+     *
+     * @return int - 0 success
+     */
+    int SetHotspotIdleTimeout(int time);
+
+    /**
+     * @Description Get the idel timeout of Hotspot
+     *
+     * @param time -input time,
+     * @return int - the hotspot idle timeout
+     */
+    int GetHotspotIdleTimeout();
 
     /**
      * @Description Synchronizing saved the Hotspot config into config file
@@ -1191,6 +1209,7 @@ private:
     WifiConfig mWifiConfig;
     std::pair<std::string, int> mBssidToTimeoutTime;
     std::map<int, PowerModel> powerModel;
+    int mHotspotIdleTimeout;
 
     std::mutex mStaMutex;
     std::mutex mApMutex;

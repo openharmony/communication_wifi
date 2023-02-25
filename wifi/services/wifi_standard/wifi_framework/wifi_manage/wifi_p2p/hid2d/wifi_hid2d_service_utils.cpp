@@ -18,6 +18,7 @@
 #include <shared_mutex>
 #include "dhcp_define.h"
 #include "wifi_logger.h"
+#include "wifi_common_util.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -54,7 +55,7 @@ bool IpPool::InitIpPool(const std::string& serverIp)
 
 std::string IpPool::GetIp(const std::string& gcMac)
 {
-    WIFI_LOGI("Get ip, gcMac: %{private}s", gcMac.c_str());
+    WIFI_LOGI("Get ip, gcMac: %{public}s", MacAnonymize(gcMac).c_str());
 
     std::unique_lock<std::shared_mutex> guard(g_ipPoolMutex);
     std::string ip = "";
@@ -70,7 +71,7 @@ std::string IpPool::GetIp(const std::string& gcMac)
 
 void IpPool::ReleaseIp(const std::string& gcMac)
 {
-    WIFI_LOGI("Release ip, gcMac: %{private}s", gcMac.c_str());
+    WIFI_LOGI("Release ip, gcMac: %{public}s", MacAnonymize(gcMac).c_str());
 
     std::unique_lock<std::shared_mutex> guard(g_ipPoolMutex);
     auto iter = mapGcMacToAllocIp.find(gcMac);

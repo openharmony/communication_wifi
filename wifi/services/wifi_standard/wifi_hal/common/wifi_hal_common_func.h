@@ -65,6 +65,17 @@ int CheckMacIsValid(const char *macStr);
  */
 int GetIfaceState(const char *ifaceName);
 
+/**
+ * @DataAnonymize Anonymize the input data
+ * @param input - the data to anonymize
+ * @param inputlen - the length of the input data
+ * @param output - anonymized data
+ * @param outputSize - the size the output data
+ * @return int - 0: success 1: failied
+ */
+int DataAnonymize(const char *input, int inputLen, char* output, int outputSize);
+
+
 #ifdef __cplusplus
 }
 #endif

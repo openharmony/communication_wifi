@@ -133,7 +133,8 @@ struct WifiLinkedInfo {
     SupplicantState supplicantState; /* wpa_supplicant state */
     DetailedState detailedState;     /* connection state */
     int wifiStandard;                /* wifi standard */
-
+    int maxSupportedRxLinkSpeed;
+    int maxSupportedTxLinkSpeed;
     WifiLinkedInfo()
     {
         networkId = INVALID_NETWORK_ID;
@@ -153,6 +154,8 @@ struct WifiLinkedInfo {
         supplicantState = SupplicantState::INVALID;
         detailedState = DetailedState::INVALID;
         wifiStandard = 0;
+        maxSupportedRxLinkSpeed = 0;
+        maxSupportedTxLinkSpeed = 0;
     }
 };
 
@@ -295,6 +298,8 @@ public:
     std::string clientCert; /* EAP mode client certificate */
     std::string privateKey; /* EAP mode client private key */
     Phase2Method phase2Method;
+    std::vector<uint8_t> certEntry;
+    std::string certPassword;
 
     WifiEapConfig()
     {

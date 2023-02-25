@@ -82,11 +82,13 @@ public:
 };
 
 napi_value UndefinedNapiValue(const napi_env& env);
+napi_value CreateInt32(const napi_env& env);
 napi_value JsObjectToString(const napi_env& env, const napi_value& object,
     const char* fieldStr, const int bufLen, std::string& fieldRef);
 napi_value JsObjectToInt(const napi_env& env, const napi_value& object, const char* fieldStr, int& fieldRef);
 napi_value JsObjectToUint(const napi_env& env, const napi_value& object, const char* fieldStr, uint32_t& fieldRef);
 napi_value JsObjectToBool(const napi_env& env, const napi_value& object, const char* fieldStr, bool& fieldRef);
+std::vector<uint8_t> JsObjectToU8Vector(const napi_env& env, const napi_value& object, const char* fieldStr);
 napi_status SetValueUtf8String(const napi_env& env, const char* fieldStr, const char* str,
     napi_value& result, size_t strLen = NAPI_AUTO_LENGTH);
 napi_status SetValueUtf8String(const napi_env& env, const std::string &fieldStr, const std::string &valueStr,
@@ -209,6 +211,17 @@ enum class WifiChannelWidthJs {
     WIDTH_160MHZ = 3,
     WIDTH_80MHZ_PLUS = 4,
     WIDTH_INVALID,
+};
+
+enum class WifiStandardJs {
+    WIFI_STANDARD_UNDEFINED = 0,
+    WIFI_STANDARD_11A = 1,
+    WIFI_STANDARD_11B = 2,
+    WIFI_STANDARD_11G = 3,
+    WIFI_STANDARD_11N = 4,
+    WIFI_STANDARD_11AC = 5,
+    WIFI_STANDARD_11AX = 6,
+    WIFI_STANDARD_11AD = 7,
 };
 
 enum class PowerModelJs {

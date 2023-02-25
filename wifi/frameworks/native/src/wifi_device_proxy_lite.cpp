@@ -152,6 +152,8 @@ static void ReadLinkedInfo(IpcIo *reply, WifiLinkedInfo &info)
         info.detailedState = DetailedState::INVALID;
     }
     (void)ReadInt32(reply, &info.wifiStandard);
+    (void)ReadInt32(reply, &info.maxSupportedRxLinkSpeed);
+    (void)ReadInt32(reply, &info.maxSupportedTxLinkSpeed);
 }
 
 static void ReadDhcpInfo(IpcIo *reply, IpInfo &info)

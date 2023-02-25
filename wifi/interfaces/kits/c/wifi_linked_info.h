@@ -75,6 +75,12 @@ typedef struct {
     /** IP address of the connected hotspot */
     unsigned int ipAddress;
     unsigned int wifiStandard;
+    int maxSupportedRxLinkSpeed;
+    int maxSupportedTxLinkSpeed;
+    /* Downstream network speed */
+    int rxLinkSpeed;
+    /* Upstream network speed */
+    int txLinkSpeed;
 } WifiLinkedInfo;
 #endif // WIFI_LITE_WIFI_LINKED_INFO_H
 /** @} */

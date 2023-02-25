@@ -266,6 +266,8 @@ void WifiDeviceProxy::WriteDeviceConfig(const WifiDeviceConfig &config, MessageP
     data.WriteString(config.wifiEapConfig.password);
     data.WriteString(config.wifiEapConfig.clientCert);
     data.WriteString(config.wifiEapConfig.privateKey);
+    data.WriteUInt8Vector(config.wifiEapConfig.certEntry);
+    data.WriteString(config.wifiEapConfig.certPassword);
     data.WriteInt32(static_cast<int>(config.wifiEapConfig.phase2Method));
     data.WriteInt32((int)config.wifiProxyconfig.configureMethod);
     data.WriteString(config.wifiProxyconfig.autoProxyConfig.pacWebAddress);
@@ -947,6 +949,8 @@ void WifiDeviceProxy::ReadLinkedInfo(MessageParcel &reply, WifiLinkedInfo &info)
         info.detailedState = DetailedState::INVALID;
     }
     info.wifiStandard = reply.ReadInt32();
+    info.maxSupportedRxLinkSpeed = reply.ReadInt32();
+    info.maxSupportedTxLinkSpeed = reply.ReadInt32();
 }
 
 ErrCode WifiDeviceProxy::GetLinkedInfo(WifiLinkedInfo &info)

@@ -123,6 +123,28 @@ static bool GetHotspotconfigFromJs(const napi_env& env, const napi_value& object
     return true;
 }
 
+napi_value SetHotspotIdleTimeout(napi_env env, napi_callback_info info)
+{
+    TRACE_FUNC_CALL;
+    size_t argc = 1;
+    napi_value argv[1];
+    napi_value thisVar;
+    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, NULL));
+    NAPI_ASSERT(env, argc == 1, "Wrong number of arguments");
+
+    napi_valuetype valueType;
+    napi_typeof(env, argv[0], &valueType);
+    NAPI_ASSERT(env, valueType == napi_number, "Wrong argument type. Object expected.");
+    NAPI_ASSERT(env, wifiHotspotPtr != nullptr, "Wifi hotspot instance is null.");
+
+    int time = 0;
+    napi_get_value_int32(env, argv[0], &time);
+    ErrCode ret = wifiHotspotPtr->SetHotspotIdleTimeout(time);
+    napi_value result;
+    napi_get_boolean(env, ret == WIFI_OPT_SUCCESS, &result);
+    return result;
+}
+
 napi_value SetHotspotConfig(napi_env env, napi_callback_info info)
 {
     TRACE_FUNC_CALL;

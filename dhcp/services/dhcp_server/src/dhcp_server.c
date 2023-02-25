@@ -1141,6 +1141,10 @@ static int OnReceivedRequest(PDhcpServerContext ctx, PDhcpMsgInfo received, PDhc
         return ret;
     }
     ServerContext *srvIns = GetServerInstance(ctx);
+    if (srvIns == NULL) {
+        LOGE("OnReceivedRequest, srvIns is null");
+        return REPLY_NONE;
+    }
     AddressBinding *binding = srvIns->addressPool.binding(received->packet.chaddr, &received->options);
     if (binding == NULL) {
         LOGE("OnReceivedRequest, binding is null");
@@ -1434,11 +1438,11 @@ static int SendDhcpNak(PDhcpServerContext ctx, PDhcpMsgInfo reply)
     if (AppendReplyTypeOption(reply, REPLY_NAK) != RET_SUCCESS) {
         return RET_FAILED;
     }
-    if (!ctx || !ctx->instance) {
-        LOGE("dhcp server context pointer is null.");
+    ServerContext *srvIns = GetServerInstance(ctx);
+    if (srvIns == NULL) {
+        LOGE("SendDhcpNak, srvIns is null");
         return RET_FAILED;
     }
-    ServerContext *srvIns = GetServerInstance(ctx);
     if (ParseReplyOptions(reply) != RET_SUCCESS) {
         return RET_FAILED;
     }

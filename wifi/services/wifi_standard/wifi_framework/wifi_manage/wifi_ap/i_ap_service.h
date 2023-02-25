@@ -40,6 +40,7 @@ public:
     virtual ErrCode GetSupportedPowerModel(std::set<PowerModel>& setPowerModelList) = 0;
     virtual ErrCode GetPowerModel(PowerModel& model) = 0;
     virtual ErrCode SetPowerModel(const PowerModel& model) = 0;
+    virtual ErrCode SetHotspotIdleTimeout(int time) = 0;
 
     /**
      * @Description - Registers all callbacks provided by the P2P service.

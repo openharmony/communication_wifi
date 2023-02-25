@@ -64,6 +64,14 @@ public:
     ErrCode SetHotspotConfig(const HotspotConfig &cfg) const;
 
     /**
+     * @Description Set the idel timeout of Hotspot
+     *
+     * @param time -input time,
+     * @return ErrCode - success: WIFI_OPT_SUCCESS    failed: ERROR_CODE
+     */
+    ErrCode SetHotspotIdleTimeout(int time) const;
+
+    /**
      * @Description  add block list
      * @param stationInfo - sta infos
      * @return ErrCode - success: WIFI_OPT_SUCCESS    failed: ERROR_CODE

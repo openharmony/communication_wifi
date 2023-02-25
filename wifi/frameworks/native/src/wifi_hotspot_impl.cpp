@@ -119,6 +119,12 @@ ErrCode WifiHotspotImpl::SetHotspotConfig(const HotspotConfig &config)
     return client_->SetHotspotConfig(config);
 }
 
+ErrCode WifiHotspotImpl::SetHotspotIdleTimeout(int time)
+{
+    RETURN_IF_FAIL(client_);
+    return client_->SetHotspotIdleTimeout(time);
+}
+
 ErrCode WifiHotspotImpl::GetStationList(std::vector<StationInfo> &result)
 {
     RETURN_IF_FAIL(GetWifiHotspotProxy());

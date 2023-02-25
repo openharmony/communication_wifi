@@ -153,7 +153,28 @@ static napi_value WifiChannelWidthInit(napi_env env)
         static_cast<int>(WifiChannelWidthJs::WIDTH_INVALID), "WIDTH_INVALID");
     return wifiChannelWidth;
 }
-
+static napi_value WifiStandardInit(napi_env env)
+{
+    napi_value wifiStandard = nullptr;
+    napi_create_object(env, &wifiStandard);
+    SetNamedPropertyByInteger(env, wifiStandard,
+        static_cast<int>(WifiStandardJs::WIFI_STANDARD_UNDEFINED), "WIFI_STANDARD_UNDEFINED");
+    SetNamedPropertyByInteger(env, wifiStandard,
+        static_cast<int>(WifiStandardJs::WIFI_STANDARD_11A), "WIFI_STANDARD_11A");
+    SetNamedPropertyByInteger(env, wifiStandard,
+        static_cast<int>(WifiStandardJs::WIFI_STANDARD_11B), "WIFI_STANDARD_11B");
+    SetNamedPropertyByInteger(env, wifiStandard,
+        static_cast<int>(WifiStandardJs::WIFI_STANDARD_11G), "WIFI_STANDARD_11G");
+    SetNamedPropertyByInteger(env, wifiStandard,
+        static_cast<int>(WifiStandardJs::WIFI_STANDARD_11N), "WIFI_STANDARD_11N");
+    SetNamedPropertyByInteger(env, wifiStandard,
+        static_cast<int>(WifiStandardJs::WIFI_STANDARD_11AC), "WIFI_STANDARD_11AC");
+    SetNamedPropertyByInteger(env, wifiStandard,
+        static_cast<int>(WifiStandardJs::WIFI_STANDARD_11AX), "WIFI_STANDARD_11AX");
+    SetNamedPropertyByInteger(env, wifiStandard,
+        static_cast<int>(WifiStandardJs::WIFI_STANDARD_11AD), "WIFI_STANDARD_11AD");
+    return wifiStandard;
+}
 static napi_value EapMethodInit(napi_env env)
 {
     napi_value eapMethod = nullptr;
@@ -184,12 +205,14 @@ static napi_value PropertyValueInit(napi_env env, napi_value exports)
     napi_value phase2MethodObj = Phase2MethodInit(env);
     napi_value WifiChannelWidthObj = WifiChannelWidthInit(env);
     napi_value EapMethodObj = EapMethodInit(env);
+    napi_value WifiStandardObj = WifiStandardInit(env);
 #endif
     napi_property_descriptor exportFuncs[] = {
 #ifdef ENABLE_NAPI_WIFI_MANAGER
         DECLARE_NAPI_PROPERTY("Phase2Method", phase2MethodObj),
         DECLARE_NAPI_PROPERTY("WifiChannelWidth", WifiChannelWidthObj),
         DECLARE_NAPI_PROPERTY("EapMethod", EapMethodObj),
+        DECLARE_NAPI_PROPERTY("WifiStandard", WifiStandardObj),
 #endif
         DECLARE_NAPI_PROPERTY("SuppState", suppStateObj),
         DECLARE_NAPI_PROPERTY("WifiSecurityType", securityTypeObj),
@@ -216,6 +239,7 @@ static napi_value Init(napi_env env, napi_value exports) {
         DECLARE_NAPI_FUNCTION("getScanInfosSync", GetScanResults),
         DECLARE_NAPI_FUNCTION("getScanResults", GetScanInfos),
         DECLARE_NAPI_FUNCTION("getScanResultsSync", GetScanResults),
+        DECLARE_NAPI_FUNCTION("getScanInfoList", GetScanResults),
         DECLARE_NAPI_FUNCTION("addDeviceConfig", AddDeviceConfig),
         DECLARE_NAPI_FUNCTION("addUntrustedConfig", AddUntrustedConfig),
         DECLARE_NAPI_FUNCTION("removeUntrustedConfig", RemoveUntrustedConfig),
@@ -233,37 +257,50 @@ static napi_value Init(napi_env env, napi_value exports) {
         DECLARE_NAPI_FUNCTION("getIpInfo", GetIpInfo),
         DECLARE_NAPI_FUNCTION("getLinkedInfo", GetLinkedInfo),
         DECLARE_NAPI_FUNCTION("removeDevice", RemoveDevice),
+        DECLARE_NAPI_FUNCTION("removeDeviceConfig", RemoveDevice),
         DECLARE_NAPI_FUNCTION("removeAllNetwork", RemoveAllNetwork),
+        DECLARE_NAPI_FUNCTION("removeAllDeviceConfigs", RemoveAllNetwork),
         DECLARE_NAPI_FUNCTION("disableNetwork", DisableNetwork),
+        DECLARE_NAPI_FUNCTION("disableDeviceConfig", DisableNetwork),
         DECLARE_NAPI_FUNCTION("getCountryCode", GetCountryCode),
         DECLARE_NAPI_FUNCTION("getDeviceConfigs", GetDeviceConfigs),
         DECLARE_NAPI_FUNCTION("updateNetwork", UpdateNetwork),
+        DECLARE_NAPI_FUNCTION("updateDeviceConfig", UpdateNetwork),
         DECLARE_NAPI_FUNCTION("getSupportedFeatures", GetSupportedFeatures),
         DECLARE_NAPI_FUNCTION("isFeatureSupported", IsFeatureSupported),
         DECLARE_NAPI_FUNCTION("getDeviceMacAddress", GetDeviceMacAddress),
         DECLARE_NAPI_FUNCTION("isHotspotActive", IsHotspotActive),
         DECLARE_NAPI_FUNCTION("isHotspotDualBandSupported", IsHotspotDualBandSupported),
+        DECLARE_NAPI_FUNCTION("setHotspotIdleTimeout", SetHotspotIdleTimeout),
         DECLARE_NAPI_FUNCTION("enableHotspot", EnableHotspot),
         DECLARE_NAPI_FUNCTION("disableHotspot", DisableHotspot),
         DECLARE_NAPI_FUNCTION("setHotspotConfig", SetHotspotConfig),
         DECLARE_NAPI_FUNCTION("getHotspotConfig", GetHotspotConfig),
         DECLARE_NAPI_FUNCTION("getStations", GetStations),
+        DECLARE_NAPI_FUNCTION("getHotspotStations", GetStations),
         DECLARE_NAPI_FUNCTION("addBlockList", AddBlockList),
         DECLARE_NAPI_FUNCTION("delBlockList", DelBlockList),
         DECLARE_NAPI_FUNCTION("getP2pLinkedInfo", GetP2pLinkedInfo),
         DECLARE_NAPI_FUNCTION("getCurrentGroup", GetCurrentGroup),
+        DECLARE_NAPI_FUNCTION("getCurrentP2pGroup", GetCurrentGroup),
         DECLARE_NAPI_FUNCTION("getP2pPeerDevices", GetP2pDevices),
         DECLARE_NAPI_FUNCTION("getP2pLocalDevice", GetP2pLocalDevice),
         DECLARE_NAPI_FUNCTION("createGroup", CreateGroup),
+        DECLARE_NAPI_FUNCTION("createP2pGroup", CreateGroup),
         DECLARE_NAPI_FUNCTION("removeGroup", RemoveGroup),
+        DECLARE_NAPI_FUNCTION("removeP2pGroup", RemoveGroup),
         DECLARE_NAPI_FUNCTION("p2pConnect", P2pConnect),
         DECLARE_NAPI_FUNCTION("p2pCancelConnect", P2pCancelConnect),
         DECLARE_NAPI_FUNCTION("p2pDisconnect", P2pCancelConnect),
         DECLARE_NAPI_FUNCTION("startDiscoverDevices", StartDiscoverDevices),
+        DECLARE_NAPI_FUNCTION("startDiscoverP2pDevices", StartDiscoverDevices),
         DECLARE_NAPI_FUNCTION("stopDiscoverDevices", StopDiscoverDevices),
+        DECLARE_NAPI_FUNCTION("stopDiscoverP2pDevices", StopDiscoverDevices),
         DECLARE_NAPI_FUNCTION("deletePersistentGroup", DeletePersistentGroup),
+        DECLARE_NAPI_FUNCTION("deletePersistentP2pGroup", DeletePersistentGroup),
         DECLARE_NAPI_FUNCTION("getP2pGroups", GetP2pGroups),
         DECLARE_NAPI_FUNCTION("setDeviceName", SetDeviceName),
+        DECLARE_NAPI_FUNCTION("setP2pDeviceName", SetDeviceName),
         DECLARE_NAPI_FUNCTION("on", On),
         DECLARE_NAPI_FUNCTION("off", Off),
     };

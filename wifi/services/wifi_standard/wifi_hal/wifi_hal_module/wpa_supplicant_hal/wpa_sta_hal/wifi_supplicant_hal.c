@@ -744,7 +744,10 @@ static int WpaCliCmdScan(WifiWpaStaInterface *this, const ScanSettings *settings
     /* Invalidate expired scan results */
     WpaCliCmdBssFlush(this);
     unsigned len = CMD_BUFFER_SIZE;
-    unsigned expectedLen = AssignCmdLen(this, settings);
+    unsigned expectedLen = 0;
+    if (settings != NULL) {
+        expectedLen = AssignCmdLen(this, settings);
+    }
     if (expectedLen >= len) {
         len = expectedLen + 1;
     }
@@ -1274,7 +1277,7 @@ static int WpaCliCmdScanInfo(WifiWpaStaInterface *this, ScanInfo *pcmd, int *siz
             LOGE("parse scan result line failed!");
             break;
         }
-        LOGE("-->>%{public}2d %{public}s %{public}s %{public}d %{public}d %{public}d %{public}d %{public}d %{public}d \
+        LOGD("-->>%{public}2d %{public}s %{public}s %{public}d %{public}d %{public}d %{public}d %{public}d %{public}d \
          %{public}d %{public}d %{public}d %{public}d %{public}d",
              j, pcmd[j].ssid, pcmd[j].bssid, pcmd[j].freq, pcmd[j].siglv,
              pcmd[j].centerFrequency0, pcmd[j].centerFrequency1, pcmd[j].channelWidth,

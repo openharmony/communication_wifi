@@ -266,18 +266,18 @@ void WifiDeviceStub::WriteWifiDeviceConfig(MessageParcel &reply, const WifiDevic
 {
     reply.WriteInt32(config.networkId);
     reply.WriteInt32(config.status);
-    reply.WriteCString(config.bssid.c_str());
-    reply.WriteCString(config.ssid.c_str());
+    reply.WriteString(config.bssid);
+    reply.WriteString(config.ssid);
     reply.WriteInt32(config.band);
     reply.WriteInt32(config.channel);
     reply.WriteInt32(config.frequency);
     reply.WriteInt32(config.level);
     reply.WriteBool(config.isPasspoint);
     reply.WriteBool(config.isEphemeral);
-    reply.WriteCString(config.preSharedKey.c_str());
-    reply.WriteCString(config.keyMgmt.c_str());
+    reply.WriteString(config.preSharedKey);
+    reply.WriteString(config.keyMgmt);
     for (int j = 0; j < WEPKEYS_SIZE; j++) {
-        reply.WriteCString(config.wepKeys[j].c_str());
+        reply.WriteString(config.wepKeys[j]);
     }
     reply.WriteInt32(config.wepTxKeyIndex);
     reply.WriteInt32(config.priority);
@@ -290,18 +290,18 @@ void WifiDeviceStub::WriteWifiDeviceConfig(MessageParcel &reply, const WifiDevic
     WriteIpAddress(reply, config.wifiIpConfig.staticIpAddress.gateway);
     WriteIpAddress(reply, config.wifiIpConfig.staticIpAddress.dnsServer1);
     WriteIpAddress(reply, config.wifiIpConfig.staticIpAddress.dnsServer2);
-    reply.WriteCString(config.wifiIpConfig.staticIpAddress.domains.c_str());
-    reply.WriteCString(config.wifiEapConfig.eap.c_str());
-    reply.WriteCString(config.wifiEapConfig.identity.c_str());
-    reply.WriteCString(config.wifiEapConfig.password.c_str());
-    reply.WriteCString(config.wifiEapConfig.clientCert.c_str());
-    reply.WriteCString(config.wifiEapConfig.privateKey.c_str());
+    reply.WriteString(config.wifiIpConfig.staticIpAddress.domains);
+    reply.WriteString(config.wifiEapConfig.eap);
+    reply.WriteString(config.wifiEapConfig.identity);
+    reply.WriteString(config.wifiEapConfig.password);
+    reply.WriteString(config.wifiEapConfig.clientCert);
+    reply.WriteString(config.wifiEapConfig.privateKey);
     reply.WriteInt32(static_cast<int>(config.wifiEapConfig.phase2Method));
     reply.WriteInt32((int)config.wifiProxyconfig.configureMethod);
-    reply.WriteCString(config.wifiProxyconfig.autoProxyConfig.pacWebAddress.c_str());
-    reply.WriteCString(config.wifiProxyconfig.manualProxyConfig.serverHostName.c_str());
+    reply.WriteString(config.wifiProxyconfig.autoProxyConfig.pacWebAddress);
+    reply.WriteString(config.wifiProxyconfig.manualProxyConfig.serverHostName);
     reply.WriteInt32(config.wifiProxyconfig.manualProxyConfig.serverPort);
-    reply.WriteCString(config.wifiProxyconfig.manualProxyConfig.exclusionObjectList.c_str());
+    reply.WriteString(config.wifiProxyconfig.manualProxyConfig.exclusionObjectList);
     reply.WriteInt32((int)config.wifiPrivacySetting);
     reply.WriteInt32(config.uid);
     return;

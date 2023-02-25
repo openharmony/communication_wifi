@@ -20,24 +20,27 @@
 
 namespace OHOS {
 namespace Wifi {
+constexpr int BUFFER_1K = 1024;
 class SerialTest : public testing::Test {
 public:
     static void SetUpTestCase()
-    {}
+    {
+        ctx = CreateContext(BUFFER_1K);
+    }
     static void TearDownTestCase()
-    {}
-    virtual void SetUp()
-    {}
-    virtual void TearDown()
     {
         if (ctx != nullptr) {
             ReleaseContext(ctx);
             ctx = nullptr;
         }
     }
+    virtual void SetUp()
+    {}
+    virtual void TearDown()
+    {}
 
 public:
-    Context *ctx;
+    static Context *ctx;
     Context *test = NULL;
 };
 }  // namespace Wifi

@@ -304,6 +304,10 @@ static OHOS::Wifi::ErrCode GetLinkedInfoFromCpp(const OHOS::Wifi::WifiLinkedInfo
     /* disconnectedReason not support */
     result->ipAddress = linkedInfo.ipAddress;
     result->wifiStandard = linkedInfo.wifiStandard;
+    result->maxSupportedRxLinkSpeed = linkedInfo.maxSupportedRxLinkSpeed;
+    result->maxSupportedTxLinkSpeed = linkedInfo.maxSupportedTxLinkSpeed;
+    result->rxLinkSpeed = linkedInfo.rxLinkSpeed;
+    result->txLinkSpeed = linkedInfo.txLinkSpeed;
     return OHOS::Wifi::WIFI_OPT_SUCCESS;
 }
 

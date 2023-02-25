@@ -23,6 +23,7 @@
 #include "wifi_settings.h"
 #include "wifi_sta_hal_interface.h"
 #include "wifi_supplicant_hal_interface.h"
+#include "wifi_cert_utils.h"
 #include "wifi_common_util.h"
 
 DEFINE_WIFILOG_LABEL("StaService");
@@ -244,7 +245,27 @@ int StaService::AddDeviceConfig(const WifiDeviceConfig &config) const
     if (!bssid.empty()) {
         tempDeviceConfig.bssid = bssid;
     }
-
+    if (config.wifiEapConfig.eap == EAP_METHOD_TLS && config.wifiEapConfig.certEntry.size() > 0 &&
+        config.wifiEapConfig.clientCert.empty() && config.wifiEapConfig.privateKey.empty()) {
+        std::string uri;
+        std::string formatSsid = config.ssid;
+        for (int i = 0; i < (int)formatSsid.size(); i++) {
+            // other char is invalid in certificate manager
+            if (!isalnum(formatSsid[i]) && formatSsid[i] != '_') {
+                formatSsid[i] = '_';
+            }
+        }
+        std::string alias = formatSsid + "_TLS_" + std::to_string(config.uid < 0 ? 0 : config.uid);
+        int ret = WifiCertUtils::InstallCert(config.wifiEapConfig.certEntry,
+            config.wifiEapConfig.certPassword, alias, uri);
+        if (ret == 0) {
+            tempDeviceConfig.wifiEapConfig.clientCert = uri;
+            tempDeviceConfig.wifiEapConfig.privateKey = uri;
+            LOGE("install cert: %{public}s", tempDeviceConfig.wifiEapConfig.clientCert.c_str());
+        } else {
+            LOGE("install cert: %{public}d, alias: %{public}s", ret, alias.c_str());
+        }
+    }
     /* Setting the network to wpa */
     if(pStaStateMachine->ConvertDeviceCfg(tempDeviceConfig) != WIFI_OPT_SUCCESS) {
         LOGE("StaService::AddDeviceConfig ConvertDeviceCfg failed!");

@@ -58,7 +58,7 @@ static std::string DataAnonymize(const std::string str, const char delim,
             return std::string(s.size(), hiddenCh);
         }
         auto idx1 = 2;
-        const auto idx2 = s.size() - 4;
+        const auto idx2 = static_cast<int>(s.size() - 4);
         while (idx1++ < idx2) {
             s[idx1] = hiddenCh;
         }
@@ -159,7 +159,7 @@ static char ConvertArrayChar(unsigned char ch)
     if (ch <= maxDecNum) {
         return '0' + ch;
     }
-    if (ch >= 0xa && ch <= 0xf) {
+    if (ch <= 0xf) {
         return ch + 'a' - numDiffForHexAlphabet;
     }
     return '0';

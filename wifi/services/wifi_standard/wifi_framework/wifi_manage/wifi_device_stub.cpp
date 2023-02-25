@@ -234,6 +234,8 @@ void WifiDeviceStub::ReadWifiDeviceConfig(MessageParcel &data, WifiDeviceConfig 
     config.wifiEapConfig.password = data.ReadString();
     config.wifiEapConfig.clientCert = data.ReadString();
     config.wifiEapConfig.privateKey = data.ReadString();
+    data.ReadUInt8Vector(&config.wifiEapConfig.certEntry);
+    config.wifiEapConfig.certPassword = data.ReadString();
     config.wifiEapConfig.phase2Method = Phase2Method(data.ReadInt32());
     config.wifiProxyconfig.configureMethod = ConfigureProxyMethod(data.ReadInt32());
     config.wifiProxyconfig.autoProxyConfig.pacWebAddress = data.ReadString();
@@ -536,6 +538,8 @@ void WifiDeviceStub::OnGetLinkedInfo(uint32_t code, MessageParcel &data, Message
         reply.WriteInt32((int)wifiInfo.supplicantState);
         reply.WriteInt32((int)wifiInfo.detailedState);
         reply.WriteInt32((int)wifiInfo.wifiStandard);
+        reply.WriteInt32((int)wifiInfo.maxSupportedRxLinkSpeed);
+        reply.WriteInt32((int)wifiInfo.maxSupportedTxLinkSpeed);
     }
 
     return;

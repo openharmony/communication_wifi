@@ -20,6 +20,7 @@
 #include <mutex>
 #include <ctime>
 #include <set>
+#include <math.h>
 #include <unordered_set>
 #include "iscan_service_callbacks.h"
 #include "define.h"
@@ -43,6 +44,56 @@ const int CUSTOM_SCAN_SCENE = 2;
 const int SCREEN_SCAN_SCENE = 3;
 const int OTHER_SCAN_SCENE = 4;
 const int SYSTEM_SCAN_INIT_TIME = 20;
+
+const int TONE_PER_SYM_11ABG = 48;
+const int TONE_PER_SYM_11N_20MHZ = 52;
+const int TONE_PER_SYM_11N_40MHZ = 108;
+const int TONE_PER_SYM_11AC_20MHZ = 52;
+const int TONE_PER_SYM_11AC_40MHZ = 108;
+const int TONE_PER_SYM_11AC_80MHZ = 234;
+const int TONE_PER_SYM_11AC_160MHZ = 468;
+const int TONE_PER_SYM_11AX_20MHZ = 234;
+const int TONE_PER_SYM_11AX_40MHZ = 468;
+const int TONE_PER_SYM_11AX_80MHZ = 980;
+const int TONE_PER_SYM_11AX_160MHZ = 1960;
+
+const int SYM_DURATION_11ABG_NS = 4000;
+// 11n OFDM symbol duration in ns with 0.4us guard interval
+const int SYM_DURATION_11N_NS = 3600;
+// 11ac OFDM symbol duration in ns with 0.4us guard interval
+const int SYM_DURATION_11AC_NS = 3600;
+const int SYM_DURATION_11AX_NS = 13600;
+const int MICRO_TO_NANO_RATIO = 1000;
+
+const int BIT_PER_TONE_SCALE = 1000;
+const int MAX_BITS_PER_TONE_11ABG = (int) round((6 * 3.0 * BIT_PER_TONE_SCALE) / 4.0);
+const int MAX_BITS_PER_TONE_11N = (int) round((6 * 5.0 * BIT_PER_TONE_SCALE) / 6.0);
+const int MAX_BITS_PER_TONE_11AC = (int) round((8 * 5.0 * BIT_PER_TONE_SCALE) / 6.0);
+const int MAX_BITS_PER_TONE_11AX = (int) round((10 * 5.0 * BIT_PER_TONE_SCALE) / 6.0);
+
+const int TWO_DB = 3;
+const int SNR_BIT_PER_TONE_HIGH_SNR_SCALE = BIT_PER_TONE_SCALE / TWO_DB;
+const int SNR_BIT_PER_TONE_LUT_MIN = -10; // minimum snrDb supported by LUT
+const int SNR_BIT_PER_TONE_LUT_MAX = 9;   // maximum snrDb supported by LUT
+const int SNR_BIT_PER_TONE_LUT[] = {0, 171, 212, 262, 323, 396, 484, 586,
+                                          706, 844, 1000, 1176, 1370, 1583, 1812, 2058, 2317, 2588, 2870, 3161};
+const int NOISE_FLOOR_20MHZ_DBM = -96;
+
+const int SNR_MARGIN_DB = 16;
+const int MAX_NUM_SPATIAL_STREAM_11AX = 8;
+const int MAX_NUM_SPATIAL_STREAM_11AC = 8;
+const int MAX_NUM_SPATIAL_STREAM_11N = 4;
+const int MAX_NUM_SPATIAL_STREAM_11ABG = 1;
+
+const int B_MODE_MAX_MBPS = 11;
+const int MAX_CHANNEL_UTILIZATION = 255;
+const int MAX_RSSI = 200;
+
+const int MAX_RX_SPATIAL_STREAMS = 2;
+const int MAX_TX_SPATIAL_STREAMS = 2;
+
+int WifiMaxThroughput(int wifiStandard, bool is11bMode,
+                      WifiChannelWidth channelWidth, int rssiDbm, int maxNumSpatialStream, int channelUtilization);
 
 class ScanService {
     FRIEND_GTEST(ScanService);
@@ -254,6 +305,8 @@ private:
      * @return success: Saved request index, failed: MAX_SCAN_CONFIG_STORE_INDEX
      */
     int StoreRequestScanConfig(const ScanConfig &scanConfig, const InterScanConfig &interConfig);
+
+    int GetWifiMaxSupportedMaxSpeed(const InterScanInfo &scanInfo, const int &maxNumberSpatialStreams);
     /**
      * @Description Save the scanning result in the configuration center.
      *

@@ -131,7 +131,8 @@ struct WifiScanInfo {
     int64_t features;
     int64_t timestamp;
     int wifiStandard;
-
+    int maxSupportedRxLinkSpeed;
+    int maxSupportedTxLinkSpeed;
     WifiScanInfo()
     {
         frequency = 0;
@@ -144,6 +145,8 @@ struct WifiScanInfo {
         features = 0;
         timestamp = 0;
         wifiStandard = 0;
+        maxSupportedRxLinkSpeed = 0;
+        maxSupportedTxLinkSpeed = 0;
     }
 };
 

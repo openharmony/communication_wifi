@@ -68,6 +68,14 @@ public:
     ErrCode SetHotspotConfig(const HotspotConfig &config) override;
 
     /**
+     * @Description Set the idel timeout of Hotspot
+     *
+     * @param time -input time,
+     * @return ErrCode - operation result
+     */
+    ErrCode SetHotspotIdleTimeout(int time) override;
+
+    /**
      * @Description Get the Station List object
      *
      * @param result - Get result vector of connect Station Info

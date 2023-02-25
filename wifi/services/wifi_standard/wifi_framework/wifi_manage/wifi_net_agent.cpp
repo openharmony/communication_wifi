@@ -47,7 +47,7 @@ bool WifiNetAgent::RegisterNetSupplier()
     using NetManagerStandard::NetCap;
     std::set<NetCap> netCaps {NetCap::NET_CAPABILITY_INTERNET};
     int32_t result = netManager->RegisterNetSupplier(NetBearType::BEARER_WIFI, ident, netCaps, supplierId);
-    if (result == ERR_NONE) {
+    if (result == NETMANAGER_SUCCESS) {
         WIFI_LOGI("Register NetSupplier successful");
         return true;
     }
@@ -72,7 +72,7 @@ bool WifiNetAgent::RegisterNetSupplierCallback(const StaServiceCallback &callbac
     }
 
     int32_t result = netManager->RegisterNetSupplierCallback(supplierId, pNetConnCallback);
-    if (result == ERR_NONE) {
+    if (result == NETMANAGER_SUCCESS) {
         WIFI_LOGI("Register NetSupplierCallback successful");
         return true;
     }
@@ -124,6 +124,7 @@ void WifiNetAgent::UpdateNetLinkInfo(const std::string &ip, const std::string &m
     unsigned int prefixLength = IpTools::GetMaskLength(mask);
     sptr<NetManagerStandard::INetAddr> netAddr = (std::make_unique<NetManagerStandard::INetAddr>()).release();
     netAddr->type_ = NetManagerStandard::INetAddr::IPV4;
+    netAddr->family_ = NetManagerStandard::INetAddr::IPV4;
     netAddr->address_ = ip;
     netAddr->netMask_ = mask;
     netAddr->prefixlen_ = prefixLength;
@@ -131,6 +132,7 @@ void WifiNetAgent::UpdateNetLinkInfo(const std::string &ip, const std::string &m
 
     sptr<NetManagerStandard::INetAddr> dns = (std::make_unique<NetManagerStandard::INetAddr>()).release();
     dns->type_ = NetManagerStandard::INetAddr::IPV4;
+    dns->family_ = NetManagerStandard::INetAddr::IPV4;
     dns->address_ = strDns;
     netLinkInfo->dnsList_.push_back(*dns);
     dns->address_ = strBakDns;

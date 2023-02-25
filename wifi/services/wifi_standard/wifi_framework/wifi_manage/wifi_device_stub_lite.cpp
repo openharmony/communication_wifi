@@ -426,6 +426,8 @@ void WifiDeviceStub::OnGetLinkedInfo(uint32_t code, IpcIo *req, IpcIo *reply)
         (void)WriteInt32(reply, (int)wifiInfo.supplicantState);
         (void)WriteInt32(reply, (int)wifiInfo.detailedState);
         (void)WriteInt32(reply, (int)wifiInfo.wifiStandard);
+        (void)WriteInt32(reply, (int)wifiInfo.maxSupportedRxLinkSpeed);
+        (void)WriteInt32(reply, (int)wifiInfo.maxSupportedTxLinkSpeed);
     }
 }
 

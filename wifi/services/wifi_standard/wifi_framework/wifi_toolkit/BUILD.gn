@@ -85,6 +85,11 @@ if (defined(ohos_lite)) {
   }
 } else {
   ohos_shared_library("wifi_toolkit") {
+    sanitize = {
+      cfi = true
+      boundary_sanitize = true
+      cfi_cross_dso = true
+    }
     install_enable = true
     sources = local_base_sources
     sources += [ "utils/wifi_cert_utils.cpp" ]

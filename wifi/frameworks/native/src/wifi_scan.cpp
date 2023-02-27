@@ -18,12 +18,13 @@
 #endif
 #include "wifi_logger.h"
 #include "wifi_scan_impl.h"
+#include "wifi_common_util.h"
 
 DEFINE_WIFILOG_SCAN_LABEL("WifiScan");
 
 namespace OHOS {
 namespace Wifi {
-std::unique_ptr<WifiScan> WifiScan::CreateWifiScan(int systemAbilityId)
+NO_SANITIZE("cfi") std::unique_ptr<WifiScan> WifiScan::CreateWifiScan(int systemAbilityId)
 {
     std::unique_ptr<WifiScanImpl> pImpl = std::make_unique<WifiScanImpl>(systemAbilityId);
     if (pImpl != nullptr) {
@@ -37,7 +38,7 @@ std::unique_ptr<WifiScan> WifiScan::CreateWifiScan(int systemAbilityId)
     return nullptr;
 }
 
-std::unique_ptr<WifiScan> WifiScan::GetInstance(int systemAbilityId)
+NO_SANITIZE("cfi") std::unique_ptr<WifiScan> WifiScan::GetInstance(int systemAbilityId)
 {
     std::unique_ptr<WifiScanImpl> pImpl = std::make_unique<WifiScanImpl>(systemAbilityId);
     if (pImpl != nullptr) {

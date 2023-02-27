@@ -528,7 +528,7 @@ sptr<WifiNapiHotspotEventCallback> wifiHotspotCallback =
 sptr<WifiNapiP2pEventCallback> wifiP2pCallback =
     sptr<WifiNapiP2pEventCallback>(new (std::nothrow) WifiNapiP2pEventCallback());
 
-ErrCode EventRegister::RegisterWifiEvents(int32_t sysCap)
+NO_SANITIZE("cfi") ErrCode EventRegister::RegisterWifiEvents(int32_t sysCap)
 {
     if (sysCap == SYSCAP_WIFI_STA) {
         std::unique_ptr<WifiDevice> wifiStaPtr = WifiDevice::GetInstance(WIFI_DEVICE_ABILITY_ID);

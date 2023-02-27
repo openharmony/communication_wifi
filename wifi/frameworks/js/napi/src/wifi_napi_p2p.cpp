@@ -105,7 +105,7 @@ static ErrCode GroupsToJsArray(const napi_env& env,
     return WIFI_OPT_SUCCESS;
 }
 
-napi_value GetCurrentGroup(napi_env env, napi_callback_info info)
+NO_SANITIZE("cfi") napi_value GetCurrentGroup(napi_env env, napi_callback_info info)
 {
     TRACE_FUNC_CALL;
     size_t argc = 1;
@@ -139,7 +139,7 @@ napi_value GetCurrentGroup(napi_env env, napi_callback_info info)
     return DoAsyncWork(env, asyncContext, argc, argv, nonCallbackArgNum);
 }
 
-napi_value GetP2pGroups(napi_env env, napi_callback_info info)
+NO_SANITIZE("cfi") napi_value GetP2pGroups(napi_env env, napi_callback_info info)
 {
     TRACE_FUNC_CALL;
     size_t argc = 1;
@@ -173,8 +173,7 @@ napi_value GetP2pGroups(napi_env env, napi_callback_info info)
     return DoAsyncWork(env, asyncContext, argc, argv, nonCallbackArgNum);
 }
 
-
-napi_value DeletePersistentGroup(napi_env env, napi_callback_info info)
+NO_SANITIZE("cfi") napi_value DeletePersistentGroup(napi_env env, napi_callback_info info)
 {
     TRACE_FUNC_CALL;
     size_t argc = 1;
@@ -195,7 +194,7 @@ napi_value DeletePersistentGroup(napi_env env, napi_callback_info info)
     WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_P2P);
 }
 
-napi_value StartDiscoverDevices(napi_env env, napi_callback_info info)
+NO_SANITIZE("cfi") napi_value StartDiscoverDevices(napi_env env, napi_callback_info info)
 {
     TRACE_FUNC_CALL;
     WIFI_NAPI_ASSERT(env, wifiP2pPtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_P2P);
@@ -204,7 +203,7 @@ napi_value StartDiscoverDevices(napi_env env, napi_callback_info info)
     WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_P2P);
 }
 
-napi_value StopDiscoverDevices(napi_env env, napi_callback_info info)
+NO_SANITIZE("cfi") napi_value StopDiscoverDevices(napi_env env, napi_callback_info info)
 {
     TRACE_FUNC_CALL;
     WIFI_NAPI_ASSERT(env, wifiP2pPtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_P2P);
@@ -213,7 +212,7 @@ napi_value StopDiscoverDevices(napi_env env, napi_callback_info info)
     WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_P2P);
 }
 
-napi_value GetP2pDevices(napi_env env, napi_callback_info info)
+NO_SANITIZE("cfi") napi_value GetP2pDevices(napi_env env, napi_callback_info info)
 {
     size_t argc = 1;
     napi_value argv[argc];
@@ -246,7 +245,7 @@ napi_value GetP2pDevices(napi_env env, napi_callback_info info)
     return DoAsyncWork(env, asyncContext, argc, argv, nonCallbackArgNum);
 }
 
-napi_value GetP2pLocalDevice(napi_env env, napi_callback_info info)
+NO_SANITIZE("cfi") napi_value GetP2pLocalDevice(napi_env env, napi_callback_info info)
 {
     TRACE_FUNC_CALL;
     size_t argc = 1;
@@ -280,7 +279,7 @@ napi_value GetP2pLocalDevice(napi_env env, napi_callback_info info)
     return DoAsyncWork(env, asyncContext, argc, argv, nonCallbackArgNum);
 }
 
-napi_value SetDeviceName(napi_env env, napi_callback_info info)
+NO_SANITIZE("cfi") napi_value SetDeviceName(napi_env env, napi_callback_info info)
 {
     TRACE_FUNC_CALL;
     size_t argc = 1;
@@ -320,7 +319,7 @@ static void JsObjToP2pConfig(const napi_env& env, const napi_value& object, Wifi
     config.SetGoBand(static_cast<GroupOwnerBand>(band));
 }
 
-napi_value P2pConnect(napi_env env, napi_callback_info info)
+NO_SANITIZE("cfi") napi_value P2pConnect(napi_env env, napi_callback_info info)
 {
     TRACE_FUNC_CALL;
     size_t argc = 1;
@@ -350,7 +349,7 @@ napi_value P2pCancelConnect(napi_env env, napi_callback_info info)
     WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_P2P);
 }
 
-napi_value CreateGroup(napi_env env, napi_callback_info info)
+NO_SANITIZE("cfi") napi_value CreateGroup(napi_env env, napi_callback_info info)
 {
     TRACE_FUNC_CALL;
     size_t argc = 1;
@@ -369,7 +368,7 @@ napi_value CreateGroup(napi_env env, napi_callback_info info)
     WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_P2P);
 }
 
-napi_value RemoveGroup(napi_env env, napi_callback_info info)
+NO_SANITIZE("cfi") napi_value RemoveGroup(napi_env env, napi_callback_info info)
 {
     TRACE_FUNC_CALL;
     WIFI_NAPI_ASSERT(env, wifiP2pPtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_P2P);
@@ -384,7 +383,7 @@ static void LinkedInfoToJs(const napi_env& env, WifiP2pLinkedInfo& linkedInfo, n
     SetValueUtf8String(env, "groupOwnerAddr", linkedInfo.GetGroupOwnerAddress().c_str(), result);
 }
 
-napi_value GetP2pLinkedInfo(napi_env env, napi_callback_info info)
+NO_SANITIZE("cfi") napi_value GetP2pLinkedInfo(napi_env env, napi_callback_info info)
 {
     TRACE_FUNC_CALL;
     size_t argc = 1;

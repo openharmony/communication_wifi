@@ -15,12 +15,13 @@
 #include "wifi_device.h"
 #include "wifi_device_impl.h"
 #include "wifi_logger.h"
+#include "wifi_common_util.h"
 
 DEFINE_WIFILOG_LABEL("WifiDevice");
 
 namespace OHOS {
 namespace Wifi {
-std::unique_ptr<WifiDevice> WifiDevice::CreateWifiDevice(int systemAbilityId)
+NO_SANITIZE("cfi") std::unique_ptr<WifiDevice> WifiDevice::CreateWifiDevice(int systemAbilityId)
 {
     std::unique_ptr<WifiDeviceImpl> device = std::make_unique<WifiDeviceImpl>(systemAbilityId);
     if (device != nullptr) {
@@ -34,7 +35,7 @@ std::unique_ptr<WifiDevice> WifiDevice::CreateWifiDevice(int systemAbilityId)
     return nullptr;
 }
 
-std::unique_ptr<WifiDevice> WifiDevice::GetInstance(int systemAbilityId)
+NO_SANITIZE("cfi") std::unique_ptr<WifiDevice> WifiDevice::GetInstance(int systemAbilityId)
 {
     std::unique_ptr<WifiDeviceImpl> device = std::make_unique<WifiDeviceImpl>(systemAbilityId);
     if (device != nullptr) {

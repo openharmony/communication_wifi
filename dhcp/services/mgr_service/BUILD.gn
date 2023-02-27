@@ -69,6 +69,11 @@ if (defined(ohos_lite)) {
   }
 } else {
   ohos_shared_library("dhcp_manager_service") {
+    sanitize = {
+      cfi = true
+      boundary_sanitize = true
+      cfi_cross_dso = true
+    }
     install_enable = true
     sources = local_base_sources
 

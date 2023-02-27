@@ -101,6 +101,14 @@ HWTEST_F(WifiHotspotTest, IsHotspotActiveTest, TestSize.Level1)
     IsHotspotActiveTest();
 }
 
+HWTEST_F(WifiHotspotTest, IsHotspotDualBandSupportedTest, TestSize.Level1)
+{
+    bool isSupported = false;
+    IsHotspotDualBandSupported(isSupported);
+    isSupported = true;
+    IsHotspotDualBandSupported(isSupported);
+}
+
 HWTEST_F(WifiHotspotTest, SetHotspotConfigTests, TestSize.Level1)
 {
     SetHotspotConfigTests();
@@ -109,6 +117,11 @@ HWTEST_F(WifiHotspotTest, SetHotspotConfigTests, TestSize.Level1)
 HWTEST_F(WifiHotspotTest, GetHotspotConfigTests, TestSize.Level1)
 {
     GetHotspotConfigTests();
+}
+
+HWTEST_F(WifiHotspotTest, GetStationListTests, TestSize.Level1)
+{
+    GetStationListTest();
 }
 
 HWTEST_F(WifiHotspotTest, DisassociateStaTests, TestSize.Level1)

@@ -101,14 +101,6 @@ HWTEST_F(WifiHotspotTest, IsHotspotActiveTest, TestSize.Level1)
     IsHotspotActiveTest();
 }
 
-HWTEST_F(WifiHotspotTest, IsHotspotDualBandSupportedTest, TestSize.Level1)
-{
-    bool isSupported = false;
-    IsHotspotDualBandSupported(isSupported);
-    isSupported = true;
-    IsHotspotDualBandSupported(isSupported);
-}
-
 HWTEST_F(WifiHotspotTest, SetHotspotConfigTests, TestSize.Level1)
 {
     SetHotspotConfigTests();

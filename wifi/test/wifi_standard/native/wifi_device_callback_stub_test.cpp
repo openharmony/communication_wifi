@@ -105,6 +105,9 @@ HWTEST_F(WifiDeviceCallBackStubTest, OnRemoteRequestTest1, TestSize.Level1)
     MessageParcel reply;
     MessageOption option;
     data.WriteInt32(1);
+    if (!data.WriteInterfaceToken(IWifiDeviceCallBack::GetDescriptor())) {
+        return;
+    }
     pWifiDeviceCallBackStub->OnRemoteRequest(code, data, reply, option);
 }
 
@@ -115,9 +118,16 @@ HWTEST_F(WifiDeviceCallBackStubTest, OnRemoteRequestTest2, TestSize.Level1)
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
+    if (!data.WriteInterfaceToken(IWifiDeviceCallBack::GetDescriptor())) {
+        return;
+    }
     pWifiDeviceCallBackStub->OnRemoteRequest(code, data, reply, option);
     sptr<IWifiDeviceCallBack> callBack = new (std::nothrow) IWifiDeviceCallBackMock();
     pWifiDeviceCallBackStub->RegisterUserCallBack(callBack);
+    pWifiDeviceCallBackStub->RegisterUserCallBack(nullptr);
+    if (!data.WriteInterfaceToken(IWifiDeviceCallBack::GetDescriptor())) {
+        return;
+    }
     pWifiDeviceCallBackStub->OnRemoteRequest(code, data, reply, option);
     delete callBack;
 }
@@ -129,9 +139,15 @@ HWTEST_F(WifiDeviceCallBackStubTest, OnRemoteRequestTest3, TestSize.Level1)
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
+    if (!data.WriteInterfaceToken(IWifiDeviceCallBack::GetDescriptor())) {
+        return;
+    }
     pWifiDeviceCallBackStub->OnRemoteRequest(code, data, reply, option);
     sptr<IWifiDeviceCallBack> callBack = new (std::nothrow) IWifiDeviceCallBackMock();
     pWifiDeviceCallBackStub->RegisterUserCallBack(callBack);
+    if (!data.WriteInterfaceToken(IWifiDeviceCallBack::GetDescriptor())) {
+        return;
+    }
     pWifiDeviceCallBackStub->OnRemoteRequest(code, data, reply, option);
     delete callBack;
 }
@@ -143,9 +159,15 @@ HWTEST_F(WifiDeviceCallBackStubTest, OnRemoteRequestTest4, TestSize.Level1)
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
+    if (!data.WriteInterfaceToken(IWifiDeviceCallBack::GetDescriptor())) {
+        return;
+    }
     pWifiDeviceCallBackStub->OnRemoteRequest(code, data, reply, option);
     sptr<IWifiDeviceCallBack> callBack = new (std::nothrow) IWifiDeviceCallBackMock();
     pWifiDeviceCallBackStub->RegisterUserCallBack(callBack);
+    if (!data.WriteInterfaceToken(IWifiDeviceCallBack::GetDescriptor())) {
+        return;
+    }
     pWifiDeviceCallBackStub->OnRemoteRequest(code, data, reply, option);
     delete callBack;
 }
@@ -157,9 +179,15 @@ HWTEST_F(WifiDeviceCallBackStubTest, OnRemoteRequestTest5, TestSize.Level1)
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
+    if (!data.WriteInterfaceToken(IWifiDeviceCallBack::GetDescriptor())) {
+        return;
+    }
     pWifiDeviceCallBackStub->OnRemoteRequest(code, data, reply, option);
     sptr<IWifiDeviceCallBack> callBack = new (std::nothrow) IWifiDeviceCallBackMock();
     pWifiDeviceCallBackStub->RegisterUserCallBack(callBack);
+    if (!data.WriteInterfaceToken(IWifiDeviceCallBack::GetDescriptor())) {
+        return;
+    }
     pWifiDeviceCallBackStub->OnRemoteRequest(code, data, reply, option);
     delete callBack;
 }
@@ -171,9 +199,15 @@ HWTEST_F(WifiDeviceCallBackStubTest, OnRemoteRequestTest6, TestSize.Level1)
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
+    if (!data.WriteInterfaceToken(IWifiDeviceCallBack::GetDescriptor())) {
+        return;
+    }
     pWifiDeviceCallBackStub->OnRemoteRequest(code, data, reply, option);
     sptr<IWifiDeviceCallBack> callBack = new (std::nothrow) IWifiDeviceCallBackMock();
     pWifiDeviceCallBackStub->RegisterUserCallBack(callBack);
+    if (!data.WriteInterfaceToken(IWifiDeviceCallBack::GetDescriptor())) {
+        return;
+    }
     pWifiDeviceCallBackStub->OnRemoteRequest(code, data, reply, option);
     delete callBack;
 }
@@ -185,9 +219,15 @@ HWTEST_F(WifiDeviceCallBackStubTest, OnRemoteRequestTest7, TestSize.Level1)
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
+    if (!data.WriteInterfaceToken(IWifiDeviceCallBack::GetDescriptor())) {
+        return;
+    }
     pWifiDeviceCallBackStub->OnRemoteRequest(code, data, reply, option);
     sptr<IWifiDeviceCallBack> callBack = new (std::nothrow) IWifiDeviceCallBackMock();
     pWifiDeviceCallBackStub->RegisterUserCallBack(callBack);
+    if (!data.WriteInterfaceToken(IWifiDeviceCallBack::GetDescriptor())) {
+        return;
+    }
     pWifiDeviceCallBackStub->OnRemoteRequest(code, data, reply, option);
     delete callBack;
 }
@@ -199,6 +239,9 @@ HWTEST_F(WifiDeviceCallBackStubTest, OnRemoteRequestTest8, TestSize.Level1)
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
+    if (!data.WriteInterfaceToken(IWifiDeviceCallBack::GetDescriptor())) {
+        return;
+    }
     pWifiDeviceCallBackStub->OnRemoteRequest(code, data, reply, option);
 }
 

@@ -17,6 +17,7 @@
 #include "wifi_logger.h"
 #include "wifi_msg.h"
 #include "wifi_errcode.h"
+#include "wifi_common_util.h"
 
 DEFINE_WIFILOG_LABEL("WifiDeviceCallBackStub");
 namespace OHOS {
@@ -111,7 +112,7 @@ void WifiDeviceCallBackStub::SetRemoteDied(bool val)
     mRemoteDied = val;
 }
 
-void WifiDeviceCallBackStub::OnWifiStateChanged(int state)
+NO_SANITIZE("cfi") void WifiDeviceCallBackStub::OnWifiStateChanged(int state)
 {
     WIFI_LOGD("WifiDeviceCallBackStub::OnWifiStateChanged");
 
@@ -120,7 +121,7 @@ void WifiDeviceCallBackStub::OnWifiStateChanged(int state)
     }
 }
 
-void WifiDeviceCallBackStub::OnWifiConnectionChanged(int state, const WifiLinkedInfo &info)
+NO_SANITIZE("cfi") void WifiDeviceCallBackStub::OnWifiConnectionChanged(int state, const WifiLinkedInfo &info)
 {
     WIFI_LOGD("WifiDeviceCallBackStub::OnWifiConnectionChanged");
     if (callback_) {
@@ -128,7 +129,7 @@ void WifiDeviceCallBackStub::OnWifiConnectionChanged(int state, const WifiLinked
     }
 }
 
-void WifiDeviceCallBackStub::OnWifiRssiChanged(int rssi)
+NO_SANITIZE("cfi") void WifiDeviceCallBackStub::OnWifiRssiChanged(int rssi)
 {
     WIFI_LOGD("WifiDeviceCallBackStub::OnWifiRssiChanged");
     if (callback_) {
@@ -136,7 +137,7 @@ void WifiDeviceCallBackStub::OnWifiRssiChanged(int rssi)
     }
 }
 
-void WifiDeviceCallBackStub::OnWifiWpsStateChanged(int state, const std::string &pinCode)
+NO_SANITIZE("cfi") void WifiDeviceCallBackStub::OnWifiWpsStateChanged(int state, const std::string &pinCode)
 {
     WIFI_LOGD("WifiDeviceCallBackStub::OnWifiWpsStateChanged");
     if (callback_) {
@@ -144,7 +145,7 @@ void WifiDeviceCallBackStub::OnWifiWpsStateChanged(int state, const std::string 
     }
 }
 
-void WifiDeviceCallBackStub::OnStreamChanged(int direction)
+NO_SANITIZE("cfi") void WifiDeviceCallBackStub::OnStreamChanged(int direction)
 {
     WIFI_LOGD("WifiDeviceCallBackStub::OnStreamChanged");
     if (callback_) {
@@ -152,7 +153,7 @@ void WifiDeviceCallBackStub::OnStreamChanged(int direction)
     }
 }
 
-void WifiDeviceCallBackStub::OnDeviceConfigChanged(ConfigChange state)
+NO_SANITIZE("cfi") void WifiDeviceCallBackStub::OnDeviceConfigChanged(ConfigChange state)
 {
     WIFI_LOGD("WifiDeviceCallBackStub::OnDeviceConfigChanged");
     if (callback_) {

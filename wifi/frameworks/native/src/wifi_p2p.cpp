@@ -15,12 +15,12 @@
 #include "wifi_p2p.h"
 #include "wifi_p2p_impl.h"
 #include "wifi_logger.h"
-
+#include "wifi_common_util.h"
 DEFINE_WIFILOG_P2P_LABEL("WifiP2p");
 
 namespace OHOS {
 namespace Wifi {
-std::unique_ptr<WifiP2p> WifiP2p::CreateWifiP2p(int systemAbilityId)
+NO_SANITIZE("cfi") std::unique_ptr<WifiP2p> WifiP2p::CreateWifiP2p(int systemAbilityId)
 {
     std::unique_ptr<WifiP2pImpl> impl = std::make_unique<WifiP2pImpl>(systemAbilityId);
     if (impl != nullptr) {
@@ -34,7 +34,7 @@ std::unique_ptr<WifiP2p> WifiP2p::CreateWifiP2p(int systemAbilityId)
     return nullptr;
 }
 
-std::unique_ptr<WifiP2p> WifiP2p::GetInstance(int systemAbilityId)
+NO_SANITIZE("cfi") std::unique_ptr<WifiP2p> WifiP2p::GetInstance(int systemAbilityId)
 {
     std::unique_ptr<WifiP2pImpl> impl = std::make_unique<WifiP2pImpl>(systemAbilityId);
     if (impl != nullptr) {

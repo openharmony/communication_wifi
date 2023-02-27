@@ -26,19 +26,19 @@ DEFINE_WIFILOG_LABEL("WifiCHotspot");
 
 std::unique_ptr<OHOS::Wifi::WifiHotspot> hotspotPtr = OHOS::Wifi::WifiHotspot::GetInstance(WIFI_HOTSPOT_ABILITY_ID);
 
-WifiErrorCode EnableHotspot()
+NO_SANITIZE("cfi") WifiErrorCode EnableHotspot()
 {
     CHECK_PTR_RETURN(hotspotPtr, ERROR_WIFI_NOT_AVAILABLE);
     return GetCErrorCode(hotspotPtr->EnableHotspot());
 }
 
-WifiErrorCode DisableHotspot()
+NO_SANITIZE("cfi") WifiErrorCode DisableHotspot()
 {
     CHECK_PTR_RETURN(hotspotPtr, ERROR_WIFI_NOT_AVAILABLE);
     return GetCErrorCode(hotspotPtr->DisableHotspot());
 }
 
-int IsHotspotActive(void)
+NO_SANITIZE("cfi") int IsHotspotActive(void)
 {
     CHECK_PTR_RETURN(hotspotPtr, ERROR_WIFI_NOT_AVAILABLE);
     bool isActive = false;
@@ -49,7 +49,7 @@ int IsHotspotActive(void)
     return (ret == OHOS::Wifi::WIFI_OPT_SUCCESS && isActive) ? 1 : 0;
 }
 
-WifiErrorCode IsHotspotDualBandSupported(bool &isSupported)
+NO_SANITIZE("cfi") WifiErrorCode IsHotspotDualBandSupported(bool &isSupported)
 {
     CHECK_PTR_RETURN(hotspotPtr, ERROR_WIFI_NOT_AVAILABLE);
     return GetCErrorCode(hotspotPtr->IsHotspotDualBandSupported(isSupported));
@@ -117,7 +117,7 @@ static WifiErrorCode GetHotspotConfigFromCpp(const OHOS::Wifi::HotspotConfig& ho
     return WIFI_SUCCESS;
 }
 
-WifiErrorCode SetHotspotConfig(const HotspotConfig *config)
+NO_SANITIZE("cfi") WifiErrorCode SetHotspotConfig(const HotspotConfig *config)
 {
     CHECK_PTR_RETURN(config, ERROR_WIFI_INVALID_ARGS);
     CHECK_PTR_RETURN(hotspotPtr, ERROR_WIFI_NOT_AVAILABLE);
@@ -129,7 +129,7 @@ WifiErrorCode SetHotspotConfig(const HotspotConfig *config)
     return GetCErrorCode(hotspotPtr->SetHotspotConfig(hotspotConfig));
 }
 
-WifiErrorCode GetHotspotConfig(HotspotConfig *result)
+NO_SANITIZE("cfi") WifiErrorCode GetHotspotConfig(HotspotConfig *result)
 {
     CHECK_PTR_RETURN(hotspotPtr, ERROR_WIFI_NOT_AVAILABLE);
     CHECK_PTR_RETURN(result, ERROR_WIFI_INVALID_ARGS);
@@ -166,7 +166,7 @@ static WifiErrorCode GetStaListFromCpp(const std::vector<OHOS::Wifi::StationInfo
     return WIFI_SUCCESS;
 }
 
-WifiErrorCode GetStationList(StationInfo *result, unsigned int *size)
+NO_SANITIZE("cfi") WifiErrorCode GetStationList(StationInfo *result, unsigned int *size)
 {
     CHECK_PTR_RETURN(hotspotPtr, ERROR_WIFI_NOT_AVAILABLE);
     CHECK_PTR_RETURN(result, ERROR_WIFI_INVALID_ARGS);

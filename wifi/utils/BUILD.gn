@@ -45,6 +45,11 @@ if (defined(ohos_lite)) {
   import("//foundation/communication/wifi/wifi/wifi.gni")
 
   ohos_shared_library("wifi_utils") {
+    sanitize = {
+      cfi = true
+      boundary_sanitize = true
+      cfi_cross_dso = true
+    }
     install_enable = true
     include_dirs = [
       "$WIFI_ROOT_DIR/utils/inc",

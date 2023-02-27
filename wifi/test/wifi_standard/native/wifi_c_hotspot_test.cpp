@@ -111,6 +111,11 @@ HWTEST_F(WifiHotspotTest, GetHotspotConfigTests, TestSize.Level1)
     GetHotspotConfigTests();
 }
 
+HWTEST_F(WifiHotspotTest, GetStationListTests, TestSize.Level1)
+{
+    GetStationListTest();
+}
+
 HWTEST_F(WifiHotspotTest, DisassociateStaTests, TestSize.Level1)
 {
     DisassociateStaTests();

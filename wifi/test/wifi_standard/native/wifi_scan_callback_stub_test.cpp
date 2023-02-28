@@ -62,7 +62,8 @@ public:
         WIFI_LOGI("OnWifiScanStateChanged Mock");
     }
 
-    OHOS::sptr<OHOS::IRemoteObject> AsObject() override {
+    OHOS::sptr<OHOS::IRemoteObject> AsObject() override 
+    {
         return nullptr;
     }
 };

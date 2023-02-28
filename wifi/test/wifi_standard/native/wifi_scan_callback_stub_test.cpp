@@ -59,9 +59,9 @@ public:
     void OnWifiScanStateChanged(int state) override
     {
         WIFI_LOGI("OnWifiScanStateChanged Mock");
-	}
+    }
 
-    OHOS::sptr<OHOS::IRemoteObject> AsObject() override{
+    OHOS::sptr<OHOS::IRemoteObject> AsObject() override {
         return nullptr;
     }
 };
@@ -118,7 +118,7 @@ HWTEST_F(WifiScanCallbackStubTest, OnRemoteRequestTest1, TestSize.Level1)
     if (!data.WriteInterfaceToken(IWifiScanCallback::GetDescriptor())) {
         return;
     }
-	pWifiScan->OnRemoteRequest(code, data, reply, option);
+    pWifiScan->OnRemoteRequest(code, data, reply, option);
 }
 
 }  // namespace Wifi

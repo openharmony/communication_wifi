@@ -27,6 +27,7 @@ DEFINE_WIFILOG_LABEL("WifiScanCallbackStubTest");
 
 namespace OHOS {
 namespace Wifi {
+constexpr int NUMBER = 2;
 class WifiScanCallbackStubTest : public testing::Test {
 public:
     static void SetUpTestCase(){}

@@ -15,13 +15,10 @@
 #include <gtest/gtest.h>
 #include "arp_checker.h"
 
-
-
 using namespace testing::ext;
 
 namespace OHOS {
 namespace Wifi {
-
 class ArpCheckerTest : public testing::Test {
 public:
     static void SetUpTestCase()
@@ -49,7 +46,7 @@ HWTEST_F(ArpCheckerTest, DoArp_FAIL, TestSize.Level1)
     int timeoutMillis = 0;
     std::string targetIp = "192.168.3.66";
     bool isFillSenderIp = false;
-    EXPECT_TRUE(pArpChecker->DoArp(&timeoutMillis, &targetIp, &isFillSenderIp) == false);
+    EXPECT_TRUE(pArpChecker->DoArp(timeoutMillis, targetIp, isFillSenderIp) == false);
 }
 }  // namespace Wifi
 }  // namespace OHOS

@@ -1451,6 +1451,9 @@ int WifiSettings::SetP2pDeviceName(const std::string &deviceName)
 {
     std::unique_lock<std::mutex> lock(mP2pMutex);
     mP2pVendorConfig.SetDeviceName(deviceName);
+    std::vector<P2pVendorConfig> tmp;
+    tmp.push_back(mP2pVendorConfig);
+    mSavedWifiP2pVendorConfig.SetValue(tmp);
     return mSavedWifiP2pVendorConfig.SaveConfig();
 }
 

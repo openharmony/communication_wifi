@@ -23,11 +23,10 @@
 
 using ::testing::Return;
 using ::testing::ext::TestSize;
-
 DEFINE_WIFILOG_LABEL("WifiDeviceCallBackStubTest");
+
 namespace OHOS {
 namespace Wifi {
-constexpr int NUMBER = 1;
 class WifiScanCallbackStubTest : public testing::Test {
 public:
     static void SetUpTestCase(){}
@@ -56,6 +55,16 @@ public:
     {
         WIFI_LOGI("~IWifiScanCallBackMock");
     }
+
+public:
+    void OnWifiScanStateChanged(int state) override
+    {
+        WIFI_LOGI("OnWifiScanStateChanged MOCK");
+	}
+
+    OHOS::sptr<OHOS::IRmoteObject> AsObject() override{
+        return nullptr;
+    }
 };
 
 HWTEST_F(WifiScanCallbackStubTest, OnWifiScanStateChangedTest, TestSize.Level1)
@@ -77,7 +86,7 @@ HWTEST_F(WifiScanCallbackStubTest, IsRemoteDiedTest, TestSize.Level1)
 
 HWTEST_F(WifiScanCallbackStubTest, RegisterCallBackTest, TestSize.Level1)
 {
-    sptr<IWifiScanCallback> userCallback =  new (std::nothrow) IWifiScanCallback();
+    sptr<IWifiScanCallback> userCallback =  new (std::nothrow) IWifiScanCallBackMock();
     pWifiScan->RegisterCallBack(userCallback);
 	pWifiScan->RegisterCallBack(userCallback);
 }
@@ -97,7 +106,7 @@ HWTEST_F(WifiScanCallbackStubTest, OnRemoteRequestTest, TestSize.Level1)
 HWTEST_F(WifiScanCallbackStubTest, OnRemoteRequestTest1, TestSize.Level1)
 {
     WIFI_LOGI("OnRemoteRequestTest1 ENTER");
-    uint32_t code = NUMBER;
+    uint32_t code = WIFI_CBK_CMD_SCAN_STATE_CHANGE;
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
@@ -105,7 +114,8 @@ HWTEST_F(WifiScanCallbackStubTest, OnRemoteRequestTest1, TestSize.Level1)
         return;
     }
     pWifiScan->OnRemoteRequest(code, data, reply, option);
-    sptr<IWifiScanCallback> userCallback =  new (std::nothrow) IWifiScanCallback();
+    sptr<IWifiScanCallback> userCallback =  new (std::nothrow) IWifiScanCallBackMock();
+    pWifiScan->OnRemoteRequest(code, data, reply, option);
     if (!data.WriteInterfaceToken(IWifiScanCallback::GetDescriptor())) {
         return;
     }

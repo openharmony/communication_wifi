@@ -189,15 +189,10 @@ void WifiP2pCallbackStub::RemoteOnP2pPersistentGroupsChanged(uint32_t code, Mess
 
 void WifiP2pCallbackStub::ReadWifiP2pDeviceData(MessageParcel &data, WifiP2pDevice &device)
 {
-    const char *readStr = nullptr;
-    readStr = data.ReadCString();
-    device.SetDeviceName((readStr != nullptr) ? readStr : "");
-    readStr = data.ReadCString();
-    device.SetDeviceAddress((readStr != nullptr) ? readStr : "");
-    readStr = data.ReadCString();
-    device.SetPrimaryDeviceType((readStr != nullptr) ? readStr : "");
-    readStr = data.ReadCString();
-    device.SetSecondaryDeviceType((readStr != nullptr) ? readStr : "");
+    device.SetDeviceName(data.ReadString());
+    device.SetDeviceAddress(data.ReadString());
+    device.SetPrimaryDeviceType(data.ReadString());
+    device.SetSecondaryDeviceType(data.ReadString());
     device.SetP2pDeviceStatus(static_cast<P2pDeviceStatus>(data.ReadInt32()));
     WifiP2pWfdInfo wfdInfo;
     wfdInfo.SetWfdEnabled(data.ReadBool());

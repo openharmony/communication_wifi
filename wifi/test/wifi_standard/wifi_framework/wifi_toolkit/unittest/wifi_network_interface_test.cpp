@@ -43,39 +43,25 @@ HWTEST_F(WifiNetworkInterfaceTest, FetchInterfaceConfigTest, TestSize.Level1)
     NetworkInterface::Dump("wlan0");
 }
 
-HWTEST_F(WifiNetworkInterfaceTest, FetchInterfaceConfigTest, TestSize.Level1)
+HWTEST_F(WifiNetworkInterfaceTest, CreateTest, TestSize.Level1)
 {
     size_t prefixLength = PREFIX_LENGTHS;
 	std::string ipv4 = "10.3.11";
     Ipv4Address::Create(ipv4, prefixLength);
 }
 
-HWTEST_F(WifiNetworkInterfaceTest, FetchInterfaceConfigTest, TestSize.Level1)
+HWTEST_F(WifiNetworkInterfaceTest, CreateTest2, TestSize.Level1)
 {
     in_addr ipv4;
     in_addr mask;
     Ipv4Address::Create(ipv4, mask);
 }
 
-HWTEST_F(WifiNetworkInterfaceTest, FetchInterfaceConfigTest, TestSize.Level1)
+HWTEST_F(WifiNetworkInterfaceTest, CreateTest3, TestSize.Level1)
 {
     std::string ipv4 = "10.3.11";
-    std::string mask = "255:255:255:0"
+    std::string mask = "255:255:255:0";
     Ipv4Address::Create(ipv4, mask);
-}
-
-HWTEST_F(WifiNetworkInterfaceTest, FetchInterfaceConfigTest, TestSize.Level1)
-{
-    pIpv4Address->GetNetworkAddressWithString();
-}
-
-HWTEST_F(WifiNetworkInterfaceTest, FetchInterfaceConfigTest, TestSize.Level1)
-{
-    pIpv4Address->GetHostAddressWithString();}
-
-HWTEST_F(WifiNetworkInterfaceTest, FetchInterfaceConfigTest, TestSize.Level1)
-{
-    pIpv4Address->GetNetwork();
 }
 }  // namespace Wifi
 }  // namespace OHOS

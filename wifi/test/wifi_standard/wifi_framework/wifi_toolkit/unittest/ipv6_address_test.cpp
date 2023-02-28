@@ -79,7 +79,7 @@ HWTEST_F(Ipv6AddressTest, Create_Fail3, TestSize.Level1)
 HWTEST_F(Ipv6AddressTest, Create_Success3, TestSize.Level1)
 {
 	struct in6_addr i6Addr;
-	size_t prefixLength = PREFIX_LENGTHS;
+    size_t prefixLength = PREFIX_LENGTHS;
     Ipv6Address::Create(i6Addr, prefixLength);
 }
 
@@ -93,39 +93,39 @@ HWTEST_F(Ipv6AddressTest, Create_Fail4, TestSize.Level1)
 HWTEST_F(Ipv6AddressTest, Create_Success4, TestSize.Level1)
 {
 	std::string ipv6 = "fe80::555b:6cea:81fa:1ff2%8";
-	size_t prefixLength = PREFIX_LENGTHS;
+    size_t prefixLength = PREFIX_LENGTHS;
     Ipv6Address::Create(ipv6, prefixLength);
 }
 
 HWTEST_F(Ipv6AddressTest, GetIpv6Prefix_Fail, TestSize.Level1)
 {
 	struct in6_addr ip6Addr;
-	size_t prefixLength = PREFIX_LENGTH;
+    size_t prefixLength = PREFIX_LENGTH;
     Ipv6Address::GetIpv6Prefix(ip6Addr, prefixLength);
 }
 
 HWTEST_F(Ipv6AddressTest, GetIpv6PrefixTest, TestSize.Level1)
 {
 	struct in6_addr ip6Addr;
-	size_t prefixLength = PREFIX_LENGTH;
+    size_t prefixLength = PREFIX_LENGTH;
     Ipv6Address::GetIpv6Prefix(ip6Addr, prefixLength);
 }
 
 HWTEST_F(Ipv6AddressTest, GetIpv6Mask_Fail, TestSize.Level1)
 {
-	size_t prefixLength = PREFIX_LENGTH;
+    size_t prefixLength = PREFIX_LENGTH;
     Ipv6Address::GetIpv6Mask(prefixLength);
 }
 
 HWTEST_F(Ipv6AddressTest, GetIpv6Mask_Fail2, TestSize.Level1)
 {
-	size_t prefixLength = MAX_IPV6_LENGTH;
+    size_t prefixLength = MAX_IPV6_LENGTH;
     Ipv6Address::GetIpv6Mask(prefixLength);
 }
 
 HWTEST_F(Ipv6AddressTest, GetIpv6Mask_Success, TestSize.Level1)
 {
-	size_t prefixLength = PREFIX_LENGTHS;
+    size_t prefixLength = PREFIX_LENGTHS;
     Ipv6Address::GetIpv6Mask(prefixLength);
 }
 }  // namespace Wifi

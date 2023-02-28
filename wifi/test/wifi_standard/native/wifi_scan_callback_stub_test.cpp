@@ -41,7 +41,7 @@ public:
     }
 public:
     std::unique_ptr<WifiScanCallbackStub> pWifiScan;
-}; 
+};
 
 class IWifiScanCallbackMock : public IWifiScanCallback {
 public:
@@ -50,7 +50,7 @@ public:
         WIFI_LOGI("IWifiScanCallbackMock");
     }
 
-    virtual ~IWifiScanCallBackMock()
+    virtual ~IWifiScanCallbackMock()
     {
         WIFI_LOGI("~IWifiScanCallbackMock");
     }
@@ -61,7 +61,7 @@ public:
         WIFI_LOGI("OnWifiScanStateChanged Mock");
 	}
 
-    OHOS::sptr<OHOS::IRmoteObject> AsObject() override{
+    OHOS::sptr<OHOS::IRemoteObject> AsObject() override{
         return nullptr;
     }
 };
@@ -114,7 +114,7 @@ HWTEST_F(WifiScanCallbackStubTest, OnRemoteRequestTest1, TestSize.Level1)
     }
     pWifiScan->OnRemoteRequest(code, data, reply, option);
     sptr<IWifiScanCallback> userCallback =  new (std::nothrow) IWifiScanCallbackMock();
-    pWifiScan->Registe(userCallback);
+    pWifiScan->RegisterCallBack(userCallback);
     if (!data.WriteInterfaceToken(IWifiScanCallback::GetDescriptor())) {
         return;
     }

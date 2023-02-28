@@ -87,7 +87,7 @@ HWTEST_F(WifiScanCallbackStubTest, RegisterCallBackTest, TestSize.Level1)
 {
     sptr<IWifiScanCallback> userCallback =  new (std::nothrow) IWifiScanCallbackMock();
     pWifiScan->RegisterCallBack(userCallback);
-	pWifiScan->RegisterCallBack(userCallback);
+    pWifiScan->RegisterCallBack(userCallback);
 }
 
 HWTEST_F(WifiScanCallbackStubTest, OnRemoteRequestTest, TestSize.Level1)

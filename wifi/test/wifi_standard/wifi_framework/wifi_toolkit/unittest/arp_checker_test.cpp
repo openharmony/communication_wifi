@@ -30,7 +30,7 @@ public:
         std::string ifname = "network";
         std::string hwAddr = "192.168.3.6";
         std::string ipAddr = "10.3.1";
-        pArpChecker = std::make_unique<ArpChecker>(ifname, hwAddr, ipAddr)
+        pArpChecker = std::make_unique<ArpChecker>(ifname, hwAddr, ipAddr);
     }
     virtual void TearDown()
     {

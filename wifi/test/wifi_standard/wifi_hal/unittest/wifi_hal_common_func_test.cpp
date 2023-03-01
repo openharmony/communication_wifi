@@ -85,7 +85,6 @@ HWTEST_F(WifiHalCommonTest, ConvertMacToStrFail4, TestSize.Level1)
     char macStr[MAC_LEN + 1] = "00:00:00:00:00:00";
     int strLen = MAC_LEN;
     EXPECT_EQ(ConvertMacToStr(mac, macSize, macStr, strLen), -1);
-
 }
 
 HWTEST_F(WifiHalCommonTest, ConvertMacToStrSuccess, TestSize.Level1)
@@ -94,7 +93,7 @@ HWTEST_F(WifiHalCommonTest, ConvertMacToStrSuccess, TestSize.Level1)
     int macSize = LENTH;
     char macStr[MAC_LEN + 1] = "00:00:00:00:00:00";
     int strLen = MAC_LEN + 1;
-    EXPECT_EQ(ConvertMacToStr(mac, macSize, macStr, strLen), -1);
+    EXPECT_EQ(ConvertMacToStr(mac, macSize, macStr, strLen), 0);
 }
 
 HWTEST_F(WifiHalCommonTest, ConvertMacToArrayFail1, TestSize.Level1)
@@ -144,7 +143,7 @@ HWTEST_F(WifiHalCommonTest, ConvertMacToArraySuccess, TestSize.Level1)
 {
     unsigned char mac[LENTH] = "ABCDE";
     int macSize = LENTH;
-    EXPECT_EQ(ConvertMacToArray("AA:BB:CC:DD:EE:FF", mac, macSize), -1);
+    EXPECT_EQ(ConvertMacToArray("AA:BB:CC:DD:EE:FF", mac, macSize), 0);
 }
 
 HWTEST_F(WifiHalCommonTest, CheckMacIsValidFail1, TestSize.Level1)
@@ -170,12 +169,12 @@ HWTEST_F(WifiHalCommonTest, CheckMacIsValidFail4, TestSize.Level1)
 
 HWTEST_F(WifiHalCommonTest, CheckMacIsValidSuccess, TestSize.Level1)
 {
-    EXPECT_EQ(CheckMacIsValid("00:00:00:00:00:00"), -1);
+    EXPECT_EQ(CheckMacIsValid("00:00:00:00:00:00"), 0);
 }
 
 HWTEST_F(WifiHalCommonTest, DataAnonymizeFail, TestSize.Level1)
 {
-    char output[MAC_LEN] = "AA,bb:CC:DD:EE:FF";
+    char output[MAC_LEN] = "AA,bb:CC:DD:EE:F";
     EXPECT_EQ(DataAnonymize(NULL, 5, output, 5), 1);
     EXPECT_EQ(DataAnonymize("ABCDEF", 5, NULL, 0), 1);
     EXPECT_EQ(DataAnonymize("ABCDEF", 6, output, 5), 1);

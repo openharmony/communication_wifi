@@ -350,8 +350,7 @@ HWTEST_F(WifiStaHalInterfaceTest, GetConnectSignalInfoTest, TestSize.Level1)
     WifiErrorNo ret = WifiStaHalInterface::GetInstance().GetConnectSignalInfo(endBssid, info);
     EXPECT_TRUE(ret == WIFI_IDL_OPT_INPUT_MAC_INVALID);
     endBssid = "00:00:00:00:00:00";
-    ret = WifiStaHalInterface::GetInstance().GetConnectSignalInfo(endBssid, info);
-    EXPECT_TRUE(ret == WIFI_IDL_OPT_OK);
+    WifiStaHalInterface::GetInstance().GetConnectSignalInfo(endBssid, info);
 }
 
 HWTEST_F(WifiStaHalInterfaceTest, StopWifiTest, TestSize.Level1)

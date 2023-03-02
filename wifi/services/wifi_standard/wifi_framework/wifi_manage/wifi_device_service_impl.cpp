@@ -525,16 +525,16 @@ ErrCode WifiDeviceServiceImpl::RemoveCandidateConfig(int networkId)
 
 ErrCode WifiDeviceServiceImpl::AddDeviceConfig(const WifiDeviceConfig &config, int &result, bool isCandidate)
 {
-    if (!WifiAuthCenter::IsSystemAppByToken()) {
-        WIFI_LOGE("AddDeviceConfig: NOT System APP, PERMISSION_DENIED!");
-        return WIFI_OPT_NON_SYSTEMAPP;
-    }
     if (WifiPermissionUtils::VerifySetWifiInfoPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("AddDeviceConfig:VerifySetWifiInfoPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
 
     if (!isCandidate) {
+        if (!WifiAuthCenter::IsSystemAppByToken()) {
+            WIFI_LOGE("AddDeviceConfig: NOT System APP, PERMISSION_DENIED!");
+            return WIFI_OPT_NON_SYSTEMAPP;
+        }
         if (WifiPermissionUtils::VerifySetWifiConfigPermission() == PERMISSION_DENIED) {
             WIFI_LOGE("AddDeviceConfig:VerifySetWifiConfigPermission PERMISSION_DENIED!");
             return WIFI_OPT_PERMISSION_DENIED;
@@ -665,7 +665,7 @@ ErrCode WifiDeviceServiceImpl::RemoveAllDevice()
 
 ErrCode WifiDeviceServiceImpl::GetDeviceConfigs(std::vector<WifiDeviceConfig> &result, bool isCandidate)
 {
-    if (!WifiAuthCenter::IsSystemAppByToken()) {
+    if (!isCandidate && !WifiAuthCenter::IsSystemAppByToken()) {
         WIFI_LOGE("GetDeviceConfigs:NOT System APP, PERMISSION_DENIED!");
         return WIFI_OPT_NON_SYSTEMAPP;
     }
@@ -762,16 +762,16 @@ ErrCode WifiDeviceServiceImpl::DisableDeviceConfig(int networkId)
 
 ErrCode WifiDeviceServiceImpl::ConnectToNetwork(int networkId, bool isCandidate)
 {
-    if (!WifiAuthCenter::IsSystemAppByToken()) {
-        WIFI_LOGE("ConnectToCandidateConfig:NOT System APP, PERMISSION_DENIED!");
-        return WIFI_OPT_NON_SYSTEMAPP;
-    }
     if (isCandidate) {
         if (WifiPermissionUtils::VerifySetWifiInfoPermission() == PERMISSION_DENIED) {
             WIFI_LOGE("ConnectToCandidateConfig:VerifySetWifiInfoPermission PERMISSION_DENIED!");
             return WIFI_OPT_PERMISSION_DENIED;
         }
     } else {
+        if (!WifiAuthCenter::IsSystemAppByToken()) {
+            WIFI_LOGE("ConnectToCandidateConfig:NOT System APP, PERMISSION_DENIED!");
+            return WIFI_OPT_NON_SYSTEMAPP;
+        }
         if (WifiPermissionUtils::VerifyWifiConnectionPermission() == PERMISSION_DENIED) {
             WIFI_LOGE("ConnectToNetwork:VerifyWifiConnectionPermission PERMISSION_DENIED!");
             return WIFI_OPT_PERMISSION_DENIED;
@@ -1093,10 +1093,6 @@ ErrCode WifiDeviceServiceImpl::GetSignalLevel(const int &rssi, const int &band, 
 
 ErrCode WifiDeviceServiceImpl::GetSupportedFeatures(long &features)
 {
-    if (!WifiAuthCenter::IsSystemAppByToken()) {
-        WIFI_LOGE("GetSupportedFeatures:NOT System APP, PERMISSION_DENIED!");
-        return WIFI_OPT_NON_SYSTEMAPP;
-    }
     if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("GetSupportedFeatures:VerifyGetWifiInfoPermission() PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;

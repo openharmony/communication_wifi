@@ -30,8 +30,8 @@ namespace Wifi {
 constexpr int NUMBER = 2;
 class WifiHotspotCallbackStubTest : public testing::Test {
 public:
-    static void SetUpTestCase(){}
-    static void TearDownTestCase(){}
+    static void SetUpTestCase() {}
+    static void TearDownTestCase() {}
     virtual void SetUp()
     {
         pWifiHotspot = std::make_unique<WifiHotspotCallbackStub>();
@@ -72,7 +72,7 @@ public:
         WIFI_LOGI("OnHotspotStaLeave Mock");
     }
 
-    OHOS::sptr<OHOS::IRemoteObject> AsObject() override 
+    OHOS::sptr<OHOS::IRemoteObject> AsObject() override
     {
         return nullptr;
     }

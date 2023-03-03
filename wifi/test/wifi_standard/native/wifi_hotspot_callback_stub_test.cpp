@@ -41,7 +41,7 @@ public:
         pWifiHotspot.reset();
     }
 public:
-    std::unique_ptr<WifiHotspotCallbackStub> pWifiScan;
+    std::unique_ptr<WifiHotspotCallbackStub> pWifiHotspot;
 };
 
 class IWifiScanCallbackMock : public IWifiHotspotCallback {
@@ -60,6 +60,16 @@ public:
     void OnWifiScanStateChanged(int state) override
     {
         WIFI_LOGI("OnWifiScanStateChanged Mock");
+    }
+
+    void OnHotspotStaJoin(const StationInfo &info) override
+    {
+        WIFI_LOGI("OnHotspotStaJoin Mock");
+    }
+
+    void OnHotspotStaLeave(const StationInfo &info) override
+    {
+        WIFI_LOGI("OnHotspotStaLeave Mock");
     }
 
     OHOS::sptr<OHOS::IRemoteObject> AsObject() override 
@@ -110,18 +120,6 @@ HWTEST_F(WifiHotspotCallbackStubTest, OnHotspotStateChangedTest, TestSize.Level1
 {
     int state = NUMBER;
     pWifiHotspot->OnHotspotStateChanged(state);
-}
-
-HWTEST_F(WifiHotspotCallbackStubTest, OnHotspotStaJoinTest, TestSize.Level1)
-{
-    StationInfo info;
-    pWifiHotspot->OnHotspotStaJoin(info);
-}
-
-HWTEST_F(WifiHotspotCallbackStubTest, OnHotspotStaLeaveTest, TestSize.Level1)
-{
-    StationInfo info;
-    pWifiHotspot->OnHotspotStaLeave(info);
 }
 
 HWTEST_F(WifiHotspotCallbackStubTest, SetRemoteDiedTest, TestSize.Level1)

@@ -44,7 +44,7 @@ public:
     std::unique_ptr<WifiHotspotCallbackStub> pWifiHotspot;
 };
 
-class IWifiScanCallbackMock : public IWifiHotspotCallback {
+class IWifiHotspotCallbackMock : public IWifiHotspotCallback {
 public:
     IWifiHotspotCallbackMock()
     {
@@ -57,9 +57,9 @@ public:
     }
 
 public:
-    void OnWifiScanStateChanged(int state) override
+    void OnWifiHotspotStateChanged(int state) override
     {
-        WIFI_LOGI("OnWifiScanStateChanged Mock");
+        WIFI_LOGI("OnWifiHotspotStateChanged Mock");
     }
 
     void OnHotspotStaJoin(const StationInfo &info) override
@@ -77,6 +77,19 @@ public:
         return nullptr;
     }
 };
+
+HWTEST_F(WifiHotspotCallbackStubTest, RegisterCallBackTest, TestSize.Level1)
+{
+    sptr<IWifiHotspotCallback> userCallback =  new (std::nothrow) IWifiHotspotCallbackMock();
+    pWifiHotspot->RegisterCallBack(userCallback);
+    pWifiHotspot->RegisterCallBack(userCallback);
+}
+
+HWTEST_F(WifiHotspotCallbackStubTest, OnHotspotStateChangedTest, TestSize.Level1)
+{
+    int state = NUMBER;
+    pWifiHotspot->OnHotspotStateChanged(state);
+}
 
 HWTEST_F(WifiHotspotCallbackStubTest, OnRemoteRequestTest, TestSize.Level1)
 {
@@ -101,25 +114,12 @@ HWTEST_F(WifiHotspotCallbackStubTest, OnRemoteRequestTest1, TestSize.Level1)
         return;
     }
     pWifiHotspot->OnRemoteRequest(code, data, reply, option);
-    sptr<IWifiHotspotCallback> userCallback =  new (std::nothrow) IWifiScanCallbackMock();
+    sptr<IWifiHotspotCallback> userCallback =  new (std::nothrow) IWifiHotspotCallbackMock();
     pWifiHotspot->RegisterCallBack(userCallback);
     if (!data.WriteInterfaceToken(IWifiHotspotCallback::GetDescriptor())) {
         return;
     }
     pWifiHotspot->OnRemoteRequest(code, data, reply, option);
-}
-
-HWTEST_F(WifiHotspotCallbackStubTest, RegisterCallBackTest, TestSize.Level1)
-{
-    sptr<IWifiHotspotCallback> userCallback =  new (std::nothrow) IWifiScanCallbackMock();
-    pWifiHotspot->RegisterCallBack(userCallback);
-    pWifiHotspot->RegisterCallBack(userCallback);
-}
-
-HWTEST_F(WifiHotspotCallbackStubTest, OnHotspotStateChangedTest, TestSize.Level1)
-{
-    int state = NUMBER;
-    pWifiHotspot->OnHotspotStateChanged(state);
 }
 
 HWTEST_F(WifiHotspotCallbackStubTest, SetRemoteDiedTest, TestSize.Level1)

@@ -51,15 +51,15 @@ public:
         WIFI_LOGI("IWifiHotspotCallbackMock");
     }
 
-    virtual ~IWifiHotspotCallbackMock()
+    ~IWifiHotspotCallbackMock()
     {
         WIFI_LOGI("~IWifiHotspotCallbackMock");
     }
 
 public:
-    void OnWifiHotspotStateChanged(int state) override
+    void OnHotspotStateChanged(int state) override
     {
-        WIFI_LOGI("OnWifiHotspotStateChanged Mock");
+        WIFI_LOGI("OnHotspotStateChanged Mock");
     }
 
     void OnHotspotStaJoin(const StationInfo &info) override

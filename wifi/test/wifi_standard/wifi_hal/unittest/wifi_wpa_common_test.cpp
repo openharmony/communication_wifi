@@ -32,7 +32,7 @@ public:
     virtual void TearDown() {}
 };
 
-HWTEST_F(WifiHalCommonTest, Hex2DecTest, TestSize.Level1)
+HWTEST_F(WifiWpaCommonTest, Hex2DecTest, TestSize.Level1)
 {
     char str[] = "0z1259";
     char src[] = "0a1259";

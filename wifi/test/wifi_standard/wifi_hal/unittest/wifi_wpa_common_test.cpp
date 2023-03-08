@@ -40,7 +40,7 @@ HWTEST_F(WifiWpaCommonTest, Hex2DecTest, TestSize.Level1)
     EXPECT_EQ(Hex2Dec(nullptr), 0);
     EXPECT_EQ(Hex2Dec(str), 0);
     EXPECT_EQ(Hex2Dec(src), 0);
-    EXPECT_TRUE(Hex2Dec(srf), 0);
+    EXPECT_TRUE(Hex2Dec(srf));
 }
 
 HWTEST_F(WifiWpaCommonTest, TrimQuotationMarkTest, TestSize.Level1)

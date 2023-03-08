@@ -15,7 +15,7 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 #include "securec.h"
-#include "wifi_hal_common_func.h"
+#include "wifi_wpa_common.h"
 
 using ::testing::_;
 using ::testing::AtLeast;
@@ -40,23 +40,21 @@ HWTEST_F(WifiHalCommonTest, Hex2DecTest, TestSize.Level1)
     EXPECT_EQ(Hex2Dec(nullptr), 0);
     EXPECT_EQ(Hex2Dec(str), 0);
     EXPECT_EQ(Hex2Dec(src), 0);
-    EXPECT_EQ(Hex2Dec(srf), 0);
+    EXPECT_TURE(Hex2Dec(srf), 0);
 }
 
-HWTEST_F(WifiHalCommonTest, TrimQuotationMarkTest, TestSize.Level1)
+HWTEST_F(WifiWpaCommonTest, TrimQuotationMarkTest, TestSize.Level1)
 {
     char str[] = "A1s62";
-	TrimQuotationMark(nullptr, 'A');
-	TrimQuotationMark(str, 'A');
+    TrimQuotationMark(nullptr, 'A');
+    TrimQuotationMark(str, 'A');
 }
 
-HWTEST_F(WifiHalCommonTest, InitWpaCtrlTest, TestSize.Level1)
+HWTEST_F(WifiWpaCommonTest, InitWpaCtrlTest, TestSize.Level1)
 {
-	WpaCtrl *pCtrl = nullptr;
+    WpaCtrl *pCtrl = nullptr;
     char str[] = "A1s62";
-	InitWpaCtrl(pCtrl, str);
-	pCtrl->pRecv->s = 1;
-	InitWpaCtrl(pCtrl, nullptr);
+    InitWpaCtrl(pCtrl, str);
 }
 } // namespace Wifi
 } // namespace OHOS

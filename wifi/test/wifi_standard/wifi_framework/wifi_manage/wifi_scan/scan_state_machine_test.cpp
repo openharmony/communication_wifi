@@ -539,59 +539,60 @@ public:
         pScanStateMachine->pnoSwScanningState->GoOutState();
     }
 
+
     void PnoSwScanningExeMsgSuccess1()
     {
         EXPECT_CALL(WifiStaHalInterface::GetInstance(), QueryScanInfos(_)).WillRepeatedly(Return(WIFI_IDL_OPT_OK));
         InternalMessage msg;
         msg.SetMessageName(SCAN_RESULT_EVENT);
-        pScanStateMachine->pnoSwScanningState->ExecuteStateMsg(&msg);
+        EXPECT_EQ(pScanStateMachine->pnoSwScanningState->ExecuteStateMsg(&msg), true);
     }
 
     void PnoSwScanningExeMsgSuccess2()
     {
         InternalMessage msg;
         msg.SetMessageName(SCAN_FAILED_EVENT);
-        pScanStateMachine->pnoSwScanningState->ExecuteStateMsg(&msg);
+        EXPECT_EQ(pScanStateMachine->pnoSwScanningState->ExecuteStateMsg(&msg), true);
     }
 
     void PnoSwScanningExeMsgSuccess3()
     {
         InternalMessage msg;
         msg.SetMessageName(WAIT_SCAN_RESULT_TIMER);
-        pScanStateMachine->pnoSwScanningState->ExecuteStateMsg(&msg);
+        EXPECT_EQ(pScanStateMachine->pnoSwScanningState->ExecuteStateMsg(&msg), true);
     }
 
     void PnoSwScanningExeMsgSuccess4()
     {
         InternalMessage msg;
         msg.SetMessageName(CMD_START_PNO_SCAN);
-        pScanStateMachine->pnoSwScanningState->ExecuteStateMsg(&msg);
+        EXPECT_EQ(pScanStateMachine->pnoSwScanningState->ExecuteStateMsg(&msg), true);
     }
 
     void PnoSwScanningExeMsgSuccess5()
     {
         InternalMessage msg;
         msg.SetMessageName(CMD_RESTART_PNO_SCAN);
-        pScanStateMachine->pnoSwScanningState->ExecuteStateMsg(&msg);
+        EXPECT_EQ(pScanStateMachine->pnoSwScanningState->ExecuteStateMsg(&msg), true);
     }
 
     void PnoSwScanningExeMsgSuccess6()
     {
         InternalMessage msg;
         msg.SetMessageName(SOFTWARE_PNO_SCAN_TIMER);
-        pScanStateMachine->pnoSwScanningState->ExecuteStateMsg(&msg);
+        EXPECT_EQ(pScanStateMachine->pnoSwScanningState->ExecuteStateMsg(&msg), true);
     }
 
     void PnoSwScanningExeMsgSuccess7()
     {
         InternalMessage msg;
         msg.SetMessageName(SCAN_INNER_EVENT_INVALID);
-        pScanStateMachine->pnoSwScanningState->ExecuteStateMsg(&msg);
+        EXPECT_EQ(pScanStateMachine->pnoSwScanningState->ExecuteStateMsg(&msg), false);
     }
 
     void PnoSwScanningExeMsgFail()
     {
-        pScanStateMachine->pnoSwScanningState->ExecuteStateMsg(nullptr);
+        EXPECT_EQ(pScanStateMachine->pnoSwScanningState->ExecuteStateMsg(&msg), true);
     }
 
     void CommonScanRequestProcessTest()
@@ -604,16 +605,18 @@ public:
     void GetCommonScanRequestInfoTest1()
     {
         InternalMessage interMessage;
+        MessageBody body;
+		interMessage.AddIntMessageBody(10);
         int requestIndex = 0;
         InterScanConfig scanConfig;
-        pScanStateMachine->GetCommonScanRequestInfo(&interMessage, requestIndex, scanConfig);
+        EXPECT_FALSE(pScanStateMachine->GetCommonScanRequestInfo(&interMessage, requestIndex, scanConfig));
     }
 
     void GetCommonScanRequestInfoTest2()
     {
         int requestIndex = 0;
         InterScanConfig scanConfig;
-        pScanStateMachine->GetCommonScanRequestInfo(nullptr, requestIndex, scanConfig);
+        EXPECT_FALSE(pScanStateMachine->GetCommonScanRequestInfo(nullptr, requestIndex, scanConfig));
     }
 
     void GetCommonScanConfigSuccess()
@@ -624,13 +627,13 @@ public:
         msg.AddIntMessageBody(1);
         msg.AddStringMessageBody("hmwifi2");
         InterScanConfig scanConfig;
-        pScanStateMachine->GetCommonScanConfig(&msg, scanConfig);
+        EXPECT_TRUE(pScanStateMachine->GetCommonScanConfig(&msg, scanConfig));
     }
 
     void GetCommonScanConfigFail1()
     {
         InterScanConfig scanConfig;
-        pScanStateMachine->GetCommonScanConfig(nullptr, scanConfig);
+        EXPECT_FALSE(pScanStateMachine->GetCommonScanConfig(nullptr, scanConfig));
     }
 
     void GetCommonScanConfigFail2()
@@ -638,7 +641,7 @@ public:
         InternalMessage msg;
         msg.AddIntMessageBody(1);
         InterScanConfig scanConfig;
-        pScanStateMachine->GetCommonScanConfig(&msg, scanConfig);
+        EXPECT_FALSE(pScanStateMachine->GetCommonScanConfig(&msg, scanConfig));
     }
 
     void GetCommonScanConfigFail3()
@@ -646,9 +649,10 @@ public:
         InternalMessage msg;
         msg.AddIntMessageBody(1);
         msg.AddStringMessageBody("hmwifi1");
-        msg.AddIntMessageBody(1);
+        msg.AddIntMessageBody(3);
+        msg.AddIntMessageBody(0);
         InterScanConfig scanConfig;
-        pScanStateMachine->GetCommonScanConfig(&msg, scanConfig);
+        EXPECT_TRUE(pScanStateMachine->GetCommonScanConfig(&msg, scanConfig), false);
     }
 
     void StartNewCommonScanTest1()
@@ -676,14 +680,18 @@ public:
     {
         EXPECT_CALL(WifiStaHalInterface::GetInstance(), Scan(_)).WillRepeatedly(Return(WIFI_IDL_OPT_OK));
         WifiScanParam scanParam;
-        pScanStateMachine->StartSingleCommonScan(scanParam);
+        scanParam.scanFreqs.push_back(FREQ_5_GHZ_VALUE);
+        scanParam.hiddenNetworkSsid.push_back("wifi_ssid");
+        EXPECT_EQ(pScanStateMachine->StartSingleCommonScan(scanParam), true);
     }
 
     void StartSingleCommonScanFail()
     {
         EXPECT_CALL(WifiStaHalInterface::GetInstance(), Scan(_)).WillRepeatedly(Return(WIFI_IDL_OPT_FAILED));
         WifiScanParam scanParam;
-        pScanStateMachine->StartSingleCommonScan(scanParam);
+        scanParam.scanFreqs.push_back(FREQ_5_GHZ_VALUE);
+        scanParam.hiddenNetworkSsid.push_back("wifi_ssid");
+        EXPECT_EQ(pScanStateMachine->StartSingleCommonScan(scanParam), false);
     }
 
     void CommonScanWhenRunningSuccess()
@@ -777,42 +785,42 @@ public:
     {
         pScanStateMachine->runningScanSettings.scanStyle = SCAN_TYPE_LOW_SPAN;
         int scanStyle = SCAN_TYPE_LOW_POWER;
-        pScanStateMachine->ActiveScanStyle(scanStyle);
+        EXPECT_EQ(pScanStateMachine->ActiveScanStyle(scanStyle), true);
     }
 
     void ActiveScanStyleTest2()
     {
         pScanStateMachine->runningScanSettings.scanStyle = SCAN_TYPE_HIGH_ACCURACY;
         int scanStyle = SCAN_TYPE_LOW_POWER;
-        pScanStateMachine->ActiveScanStyle(scanStyle);
+        EXPECT_EQ(pScanStateMachine->ActiveScanStyle(scanStyle), true);
     }
 
     void ActiveScanStyleTest3()
     {
         pScanStateMachine->runningScanSettings.scanStyle = SCAN_TYPE_INVALID;
         int scanStyle = SCAN_TYPE_LOW_POWER;
-        pScanStateMachine->ActiveScanStyle(scanStyle);
+        EXPECT_EQ(pScanStateMachine->ActiveScanStyle(scanStyle), false);
     }
 
     void MergeScanStyleTest1()
     {
         int currentScanStyle = SCAN_TYPE_LOW_SPAN;
         int newScanStyle = SCAN_TYPE_HIGH_ACCURACY;
-        pScanStateMachine->MergeScanStyle(currentScanStyle, newScanStyle);
+        EXPECT_EQ(pScanStateMachine->MergeScanStyle(currentScanStyle, newScanStyle), SCAN_TYPE_HIGH_ACCURACY);
     }
 
     void MergeScanStyleTest2()
     {
         int currentScanStyle = SCAN_TYPE_HIGH_ACCURACY;
         int newScanStyle = SCAN_TYPE_HIGH_ACCURACY;
-        pScanStateMachine->MergeScanStyle(currentScanStyle, newScanStyle);
+        EXPECT_EQ(pScanStateMachine->MergeScanStyle(currentScanStyle, newScanStyle), SCAN_TYPE_HIGH_ACCURACY);
     }
 
     void MergeScanStyleTest3()
     {
         int currentScanStyle = SCAN_TYPE_INVALID;
         int newScanStyle = SCAN_TYPE_HIGH_ACCURACY;
-        pScanStateMachine->MergeScanStyle(currentScanStyle, newScanStyle);
+        EXPECT_EQ(pScanStateMachine->MergeScanStyle(currentScanStyle, newScanStyle), SCAN_TYPE_HIGH_ACCURACY);
     }
 
     void RemoveCommonScanRequestTest()

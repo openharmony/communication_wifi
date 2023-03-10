@@ -42,7 +42,6 @@ HWTEST_F(DhcpFuncTest, Ip4StrConToInt_SUCCESS, TestSize.Level1)
     std::string strIp = "192.77.1.232";
     uint32_t uSerIp = 0;
     EXPECT_EQ(true, DhcpFunc::Ip4StrConToInt(strIp, uSerIp));
-    printf("DhcpFuncTest Ip4StrConToInt_SUCCESS strIp:%s -> uSerIp:%u.\n", strIp.c_str(), uSerIp);
 }
 
 HWTEST_F(DhcpFuncTest, Ip4StrConToInt_FAILED, TestSize.Level1)
@@ -61,7 +60,6 @@ HWTEST_F(DhcpFuncTest, Ip4IntConToStr_SUCCESS, TestSize.Level1)
     uint32_t uSerIp = 3226272232;
     std::string strIp = DhcpFunc::Ip4IntConToStr(uSerIp);
     EXPECT_STRNE(strIp.c_str(), "");
-    printf("DhcpFuncTest Ip4IntConToStr_SUCCESS uSerIp:%u -> strIp:%s.\n", uSerIp, strIp.c_str());
 }
 
 HWTEST_F(DhcpFuncTest, Ip4IntConToStr_FAILED, TestSize.Level1)

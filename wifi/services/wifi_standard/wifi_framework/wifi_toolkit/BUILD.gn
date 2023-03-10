@@ -13,11 +13,11 @@
 
 if (defined(ohos_lite)) {
   import("//build/lite/config/component/lite_component.gni")
-  import("//foundation/communication/wifi/dhcp/dhcp_lite.gni")
+  import("//foundation/communication/dhcp/dhcp_lite.gni")
   import("//foundation/communication/wifi/wifi/wifi_lite.gni")
 } else {
   import("//build/ohos.gni")
-  import("//foundation/communication/wifi/dhcp/dhcp.gni")
+  import("//foundation/communication/dhcp/dhcp.gni")
   import("//foundation/communication/wifi/wifi/wifi.gni")
 }
 

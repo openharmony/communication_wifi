@@ -15,7 +15,7 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 #include "securec.h"
-#include "wifi_hal_crpc_p2p.h"
+#include "wifi_hal_callback.h"
 
 using ::testing::_;
 using ::testing::AtLeast;
@@ -38,14 +38,16 @@ public:
 HWTEST_F(WifiHalCallbackTest, RpcP2pSetWpsSecondaryDeviceTypeTest, TestSize.Level1)
 {
     int status = STATUS_MSG;
-    WifiHalCallbackTest(status);
+    WifiHalCbNotifyScanEnd(status);
 }
 
 HWTEST_F(WifiHalCallbackTest, WifiHalCbNotifyConnectChangedTest, TestSize.Level1)
 {
     int status = STATUS_MSG;
-    int networkId = NET_WORk;
-    WifiHalCbNotifyConnectChanged(status);
+    int networkId = NET_WORK;
+    char pos[] = "WIFI_REASON_LENGTH"
+    WifiHalCbNotifyConnectChanged(status, networkId, NULL);
+    WifiHalCbNotifyConnectChanged(status, networkId, pos);
 }
 
 HWTEST_F(WifiHalCallbackTest, WifiHalCbNotifyBssidChangedTest, TestSize.Level1)
@@ -146,7 +148,7 @@ HWTEST_F(WifiHalCallbackTest, P2pHalCbDeviceLostTest, TestSize.Level1)
 
 HWTEST_F(WifiHalCallbackTest, P2pHalCbGoNegotiationRequestTest, TestSize.Level1)
 {
-    char srcAddress,[] = "00:00:00:00:00:00";
+    char srcAddress[] = "00:00:00:00:00:00";
     short passwordId = NET_WORK;
     P2pHalCbGoNegotiationRequest(nullptr, passwordId);
     P2pHalCbGoNegotiationRequest(srcAddress, passwordId);
@@ -207,23 +209,23 @@ HWTEST_F(WifiHalCallbackTest, P2pHalCbGroupRemovedTest, TestSize.Level1)
 
 HWTEST_F(WifiHalCallbackTest, P2pHalCbProvisionDiscoveryPbcRequestTest, TestSize.Level1)
 {
-    P2pHalCbProvisionDiscoveryPbcRequest(NULL,);
+    P2pHalCbProvisionDiscoveryPbcRequest(NULL);
     P2pHalCbProvisionDiscoveryPbcRequest("P2P_PROV_DISC_PBC_REQ_EVENT");
 }
 
 HWTEST_F(WifiHalCallbackTest, P2pHalCbProvisionDiscoveryPbcResponseTest, TestSize.Level1)
 {
-    P2pHalCbProvisionDiscoveryPbcResponse(NULL,);
+    P2pHalCbProvisionDiscoveryPbcResponse(NULL);
     P2pHalCbProvisionDiscoveryPbcResponse("00:00:00:00:00:00");
 }
 
 HWTEST_F(WifiHalCallbackTest, P2pHalCbProvisionDiscoveryEnterPinTest, TestSize.Level1)
 {
-    P2pHalCbProvisionDiscoveryEnterPin(NULL,);
+    P2pHalCbProvisionDiscoveryEnterPin(NULL);
     P2pHalCbProvisionDiscoveryEnterPin("00:00:00:00:00:00");
 }
 
-HWTEST_F(WifiHalCallbackTest, P2pHalCbProvisionDiscoveryEnterPinTest, TestSize.Level1)
+HWTEST_F(WifiHalCallbackTest, P2pHalCbProvisionDiscoveryShowPinTest, TestSize.Level1)
 {
     char address[] = "00:00:00:00:00:00";
     char pin[] = "P2P_PROV_DISC_SHOW_PIN_EVEN";
@@ -265,8 +267,8 @@ HWTEST_F(WifiHalCallbackTest, P2pHalCbServDiscReqTest, TestSize.Level1)
 {
     int state = STATUS_MSG;
     char ifName[] = "wifibssid";
-    P2pHalCbServDiscReq(NULL, state);
-    P2pHalCbServDiscReq(ifName, state);
+    P2pHalCbP2pIfaceCreated(NULL, state);
+    P2pHalCbP2pIfaceCreated(ifName, state);
 }
 } // namespace Wifi
 } // namespace OHOS

@@ -592,7 +592,7 @@ public:
 
     void PnoSwScanningExeMsgFail()
     {
-        EXPECT_EQ(pScanStateMachine->pnoSwScanningState->ExecuteStateMsg(&msg), true);
+        EXPECT_EQ(pScanStateMachine->pnoSwScanningState->ExecuteStateMsg(nullptr), true);
     }
 
     void CommonScanRequestProcessTest()
@@ -606,7 +606,7 @@ public:
     {
         InternalMessage interMessage;
         MessageBody body;
-		interMessage.AddIntMessageBody(10);
+        interMessage.AddIntMessageBody(10);
         int requestIndex = 0;
         InterScanConfig scanConfig;
         EXPECT_FALSE(pScanStateMachine->GetCommonScanRequestInfo(&interMessage, requestIndex, scanConfig));
@@ -622,10 +622,8 @@ public:
     void GetCommonScanConfigSuccess()
     {
         InternalMessage msg;
-        msg.AddIntMessageBody(1);
-        msg.AddStringMessageBody("hmwifi1");
-        msg.AddIntMessageBody(1);
-        msg.AddStringMessageBody("hmwifi2");
+        msg.AddIntMessageBody(0);
+        msg.AddIntMessageBody(0);
         InterScanConfig scanConfig;
         EXPECT_TRUE(pScanStateMachine->GetCommonScanConfig(&msg, scanConfig));
     }
@@ -652,7 +650,7 @@ public:
         msg.AddIntMessageBody(3);
         msg.AddIntMessageBody(0);
         InterScanConfig scanConfig;
-        EXPECT_TRUE(pScanStateMachine->GetCommonScanConfig(&msg, scanConfig), false);
+        EXPECT_EQ(pScanStateMachine->GetCommonScanConfig(&msg, scanConfig), false);
     }
 
     void StartNewCommonScanTest1()

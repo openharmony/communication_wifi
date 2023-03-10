@@ -45,7 +45,7 @@ HWTEST_F(WifiHalCallbackTest, WifiHalCbNotifyConnectChangedTest, TestSize.Level1
 {
     int status = STATUS_MSG;
     int networkId = NET_WORK;
-    char pos[] = "WIFI_REASON_LENGTH"
+    char pos[] = "WIFI_REASON_LENGTH";
     WifiHalCbNotifyConnectChanged(status, networkId, NULL);
     WifiHalCbNotifyConnectChanged(status, networkId, pos);
 }
@@ -263,7 +263,7 @@ HWTEST_F(WifiHalCallbackTest, P2pHalCbServDiscReqTest, TestSize.Level1)
     P2pHalCbServDiscReq(info);
 }
 
-HWTEST_F(WifiHalCallbackTest, P2pHalCbServDiscReqTest, TestSize.Level1)
+HWTEST_F(WifiHalCallbackTest, P2pHalCbP2pIfaceCreatedTest, TestSize.Level1)
 {
     int state = STATUS_MSG;
     char ifName[] = "wifibssid";

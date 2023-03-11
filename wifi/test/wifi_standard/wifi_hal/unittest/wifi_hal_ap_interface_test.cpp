@@ -28,10 +28,6 @@ void WifiHalApInterfaceTest::SetUpTestCase()
     MockInitApSupportedCmd();
 }
 
-HWTEST_F(WifiHalApInterfaceTest, StartSoftApTest, TestSize.Level1)
-{
-}
-
 HWTEST_F(WifiHalApInterfaceTest, GetStaInfosTest, TestSize.Level1)
 {
     char infos[4096] = {0};

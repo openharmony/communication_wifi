@@ -29,7 +29,6 @@ public:
     virtual void SetUp()
     {
         if (CreateHashTable(&table, sizeof(uint32_t),  sizeof(uint32_t), HASH_MINI_CAPACITY) != HASH_SUCCESS) {
-            printf("failed to create hash table.\n");
         }
     }
     virtual void TearDown()
@@ -64,7 +63,6 @@ HWTEST_F(HashTableTest, InsertTest, TestSize.Level1)
         uint32_t key = keyOffset + i;
         uint32_t val = valOffset;
         if (Insert(&table, (uintptr_t)&key, (uintptr_t)&val) != HASH_INSERTED) {
-            printf("failed to test insert.\n");
             testRet = 0;
         }
     }

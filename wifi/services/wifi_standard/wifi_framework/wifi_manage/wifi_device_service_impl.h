@@ -152,6 +152,10 @@ public:
 
     bool IsRemoteDied(void) override;
 
+    ErrCode IsBandTypeSupported(int bandType, bool &supported) override;
+
+    ErrCode Get5GHzChannelList(std::vector<int> &result) override;
+
 #ifndef OHOS_ARCH_LITE
     int32_t Dump(int32_t fd, const std::vector<std::u16string>& args) override;
 #endif

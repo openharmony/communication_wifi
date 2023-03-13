@@ -162,6 +162,14 @@ enum class ConnStateJs {
     UNKNOWN /* Failed to set up the Wi-Fi connection */
 };
 
+enum class BandTypeJS {
+    BAND_NONE = 0, /* unknown */
+    BAND_2GHZ = 1, /* 2.4GHz */
+    BAND_5GHZ = 2, /* 5GHz */
+    BAND_6GHZ = 3, /* GGHz */
+    BAND_ANY = 4, /* Dual-mode frequency band */
+};
+
 enum class SuppStateJs {
     DISCONNECTED = 0, /* The network interface is disabled. */
     INTERFACE_DISABLED, /* The supplicant is disabled. */

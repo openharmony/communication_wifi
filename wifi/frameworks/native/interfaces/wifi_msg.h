@@ -24,6 +24,7 @@
 #include <string>
 #include <vector>
 #include "ip_tools.h"
+#include "wifi_scan_msg.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -135,6 +136,7 @@ struct WifiLinkedInfo {
     int wifiStandard;                /* wifi standard */
     int maxSupportedRxLinkSpeed;
     int maxSupportedTxLinkSpeed;
+    WifiChannelWidth channelWidth; /* curr ap channel width */
     WifiLinkedInfo()
     {
         networkId = INVALID_NETWORK_ID;
@@ -156,6 +158,7 @@ struct WifiLinkedInfo {
         wifiStandard = 0;
         maxSupportedRxLinkSpeed = 0;
         maxSupportedTxLinkSpeed = 0;
+        channelWidth = WifiChannelWidth::WIDTH_INVALID;
     }
 };
 

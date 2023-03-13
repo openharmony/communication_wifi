@@ -53,6 +53,8 @@ napi_value UpdateNetwork(napi_env env, napi_callback_info info);
 napi_value GetSupportedFeatures(napi_env env, napi_callback_info info);
 napi_value IsFeatureSupported(napi_env env, napi_callback_info info);
 napi_value GetDeviceMacAddress(napi_env env, napi_callback_info info);
+napi_value IsBandTypeSupported(napi_env env, napi_callback_info info);
+napi_value Get5GHzChannelList(napi_env env, napi_callback_info info);
 
 class ScanInfoAsyncContext : public AsyncContext {
 public:

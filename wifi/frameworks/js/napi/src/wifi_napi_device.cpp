@@ -829,6 +829,7 @@ static void LinkedInfoToJs(const napi_env& env, WifiLinkedInfo& linkedInfo, napi
     SetValueInt32(env, "maxSupportedTxLinkSpeed", static_cast<int>(linkedInfo.maxSupportedTxLinkSpeed), result);
     SetValueInt32(env, "rxLinkSpeed", static_cast<int>(linkedInfo.rxLinkSpeed), result);
     SetValueInt32(env, "linkSpeed", static_cast<int>(linkedInfo.txLinkSpeed), result);
+    SetValueInt32(env, "channelWidth", static_cast<int>(linkedInfo.channelWidth), result);
 }
 
 /* This interface has not been fully implemented */
@@ -1170,5 +1171,60 @@ NO_SANITIZE("cfi") napi_value GetDeviceMacAddress(napi_env env, napi_callback_in
     napi_create_string_utf8(env, macAddr.c_str(), NAPI_AUTO_LENGTH, &addr);
     return addr;
 }
+
+NO_SANITIZE("cfi") napi_value IsBandTypeSupported(napi_env env, napi_callback_info info)
+{
+    TRACE_FUNC_CALL;
+    WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
+
+    size_t argc = 1;
+    napi_value argv[1];
+    napi_value thisVar;
+    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, NULL));
+    WIFI_NAPI_ASSERT(env, argc == 1, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_STA);
+
+    napi_valuetype valueType;
+    napi_typeof(env, argv[0], &valueType);
+    WIFI_NAPI_ASSERT(env, valueType == napi_number, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_STA);
+    int bandType = 1;
+    napi_get_value_int32(env, argv[0], &bandType);
+    WIFI_NAPI_ASSERT(env, bandType > (int)BandTypeJS::BAND_NONE && bandType < (int)BandTypeJS::BAND_ANY,
+        WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_STA);
+    bool supported = false;
+    ErrCode ret = wifiDevicePtr->IsBandTypeSupported(bandType, supported);
+    if (ret != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("Get band type supported fail: %{public}d", ret);
+        WIFI_NAPI_ASSERT(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_STA);
+    }
+    napi_value result;
+    napi_get_boolean(env, supported, &result);
+    return result;
+}
+
+NO_SANITIZE("cfi") napi_value Get5GHzChannelList(napi_env env, napi_callback_info info)
+{
+    TRACE_FUNC_CALL;
+    WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
+    std::vector<int> vec5GChannels;
+    ErrCode ret = wifiDevicePtr->Get5GHzChannelList(vec5GChannels);
+    if (ret != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("Get 5g channellist fail: %{public}d", ret);
+    }
+
+    WIFI_NAPI_ASSERT(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_STA);
+    WIFI_LOGI("Get 5g channellist size: %{public}zu", vec5GChannels.size());
+    napi_value arrayResult;
+    napi_create_array_with_length(env, vec5GChannels.size(), &arrayResult);
+    for (size_t i = 0; i != vec5GChannels.size(); ++i) {
+        napi_value result;
+        napi_create_uint32(env, vec5GChannels[i], &result);
+        napi_status status = napi_set_element(env, arrayResult, i, result);
+        if (status != napi_ok) {
+            WIFI_LOGE("wifi napi set 56 list element error: %{public}d", status);
+        }
+    }
+    return arrayResult;
+}
+
 }  // namespace Wifi
 }  // namespace OHOS

@@ -306,6 +306,23 @@ public:
     ErrCode GetDeviceMacAddress(std::string &result) override;
 
     /**
+     * @Description check wifi-band type is supported
+     *
+     * @param bandType - wifi band type
+     * @param supported - supported / unsupported
+     * @return ErrCode - operation result
+     */
+    ErrCode IsBandTypeSupported(int bandType, bool &supported) override;
+
+    /**
+     * @Description get all 5g channellist
+     *
+     * @param result - get result vector of int
+     * @return ErrCode - operation result
+     */
+    ErrCode Get5GHzChannelList(std::vector<int> &result) override;
+
+    /**
      * @Description set low latency mode
      *
      * @param enabled - true: enable low latency, false: disable low latency

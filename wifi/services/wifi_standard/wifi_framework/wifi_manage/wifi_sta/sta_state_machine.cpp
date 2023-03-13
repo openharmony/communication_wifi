@@ -204,6 +204,7 @@ void StaStateMachine::InitWifiLinkedInfo()
     linkedInfo.isDataRestricted = 0;
     linkedInfo.portalUrl = "";
     linkedInfo.detailedState = DetailedState::DISCONNECTED;
+    linkedInfo.channelWidth = WifiChannelWidth::WIDTH_INVALID;
 }
 
 void StaStateMachine::InitLastWifiLinkedInfo()

@@ -69,6 +69,9 @@ struct NeedParseIe {
     ScanInfoElem* ieExtern;
     ScanInfoElem* ieVhtOper;
     ScanInfoElem* ieHtOper;
+    ScanInfoElem* ieMaxRate;
+    ScanInfoElem* ieErp;
+    ScanInfoElem* ieExtMaxRate;
 };
 
 typedef struct WifiWpaStaInterface WifiWpaStaInterface;

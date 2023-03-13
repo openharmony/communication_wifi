@@ -211,6 +211,20 @@ int WifiSettings::GetScanInfoList(std::vector<WifiScanInfo> &results)
     return 0;
 }
 
+int WifiSettings::SetWifiLinkedStandardAndMaxSpeed(WifiLinkedInfo &linkInfo)
+{
+    std::unique_lock<std::mutex> lock(mInfoMutex);
+    for (auto iter = mWifiScanInfoList.begin(); iter != mWifiScanInfoList.end(); ++iter) {
+        if (iter->bssid == linkInfo.bssid) {
+            linkInfo.wifiStandard = iter->wifiStandard;
+            linkInfo.maxSupportedRxLinkSpeed = iter->maxSupportedRxLinkSpeed;
+            linkInfo.maxSupportedTxLinkSpeed = iter->maxSupportedTxLinkSpeed;
+            break;
+        }
+    }
+    return 0;
+}
+
 int WifiSettings::GetScanControlInfo(ScanControlInfo &info)
 {
     std::unique_lock<std::mutex> lock(mInfoMutex);

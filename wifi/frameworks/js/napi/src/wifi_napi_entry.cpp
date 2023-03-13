@@ -153,7 +153,28 @@ static napi_value WifiChannelWidthInit(napi_env env)
         static_cast<int>(WifiChannelWidthJs::WIDTH_INVALID), "WIDTH_INVALID");
     return wifiChannelWidth;
 }
-
+static napi_value WifiStandardInit(napi_env env)
+{
+    napi_value wifiStandard = nullptr;
+    napi_create_object(env, &wifiStandard);
+    SetNamedPropertyByInteger(env, wifiStandard,
+        static_cast<int>(WifiStandardJs::WIFI_STANDARD_UNDEFINED), "WIFI_STANDARD_UNDEFINED");
+    SetNamedPropertyByInteger(env, wifiStandard,
+        static_cast<int>(WifiStandardJs::WIFI_STANDARD_11A), "WIFI_STANDARD_11A");
+    SetNamedPropertyByInteger(env, wifiStandard,
+        static_cast<int>(WifiStandardJs::WIFI_STANDARD_11B), "WIFI_STANDARD_11B");
+    SetNamedPropertyByInteger(env, wifiStandard,
+        static_cast<int>(WifiStandardJs::WIFI_STANDARD_11G), "WIFI_STANDARD_11G");
+    SetNamedPropertyByInteger(env, wifiStandard,
+        static_cast<int>(WifiStandardJs::WIFI_STANDARD_11N), "WIFI_STANDARD_11N");
+    SetNamedPropertyByInteger(env, wifiStandard,
+        static_cast<int>(WifiStandardJs::WIFI_STANDARD_11AC), "WIFI_STANDARD_11AC");
+    SetNamedPropertyByInteger(env, wifiStandard,
+        static_cast<int>(WifiStandardJs::WIFI_STANDARD_11AX), "WIFI_STANDARD_11AX");
+    SetNamedPropertyByInteger(env, wifiStandard,
+        static_cast<int>(WifiStandardJs::WIFI_STANDARD_11AD), "WIFI_STANDARD_11AD");
+    return wifiStandard;
+}
 static napi_value EapMethodInit(napi_env env)
 {
     napi_value eapMethod = nullptr;
@@ -184,12 +205,14 @@ static napi_value PropertyValueInit(napi_env env, napi_value exports)
     napi_value phase2MethodObj = Phase2MethodInit(env);
     napi_value WifiChannelWidthObj = WifiChannelWidthInit(env);
     napi_value EapMethodObj = EapMethodInit(env);
+    napi_value WifiStandardObj = WifiStandardInit(env);
 #endif
     napi_property_descriptor exportFuncs[] = {
 #ifdef ENABLE_NAPI_WIFI_MANAGER
         DECLARE_NAPI_PROPERTY("Phase2Method", phase2MethodObj),
         DECLARE_NAPI_PROPERTY("WifiChannelWidth", WifiChannelWidthObj),
         DECLARE_NAPI_PROPERTY("EapMethod", EapMethodObj),
+        DECLARE_NAPI_PROPERTY("WifiStandard", WifiStandardObj),
 #endif
         DECLARE_NAPI_PROPERTY("SuppState", suppStateObj),
         DECLARE_NAPI_PROPERTY("WifiSecurityType", securityTypeObj),

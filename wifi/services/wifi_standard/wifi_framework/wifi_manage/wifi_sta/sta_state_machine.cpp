@@ -746,6 +746,12 @@ void StaStateMachine::DealSignalPollResult(InternalMessage *msg)
         linkedInfo.frequency = signalInfo.frequency;
     }
     linkedInfo.snr = linkedInfo.rssi - signalInfo.noise;
+    if (linkedInfo.wifiStandard == WIFI_MODE_UNDEFINED) {
+        WifiSettings::GetInstance().SetWifiLinkedStandardAndMaxSpeed(linkedInfo);
+    }
+    LOGI("DealSignalPollResult GetWifiStandard:%{public}d, bssid:%{public}s rxmax:%{public}d txmax:%{public}d.\n",
+         linkedInfo.wifiStandard, MacAnonymize(linkedInfo.bssid).c_str(), linkedInfo.maxSupportedRxLinkSpeed,
+         linkedInfo.maxSupportedTxLinkSpeed);
     WifiSettings::GetInstance().SaveLinkedInfo(linkedInfo);
     ConvertFreqToChannel();
     StartTimer(static_cast<int>(CMD_SIGNAL_POLL), STA_SIGNAL_POLL_DELAY);

@@ -428,6 +428,7 @@ void WifiDeviceStub::OnGetLinkedInfo(uint32_t code, IpcIo *req, IpcIo *reply)
         (void)WriteInt32(reply, (int)wifiInfo.wifiStandard);
         (void)WriteInt32(reply, (int)wifiInfo.maxSupportedRxLinkSpeed);
         (void)WriteInt32(reply, (int)wifiInfo.maxSupportedTxLinkSpeed);
+        (void)WriteInt32(reply, (int)wifiInfo.channelWidth);
     }
 }
 
@@ -546,6 +547,34 @@ void WifiDeviceStub::OnSetLowLatencyMode(uint32_t code, IpcIo *req, IpcIo *reply
     (void)WriteBool(reply, SetLowLatencyMode(enabled));
 }
 
+void WifiDeviceStub::OnIsBandTypeSupported(uint32_t code, IpcIo *req, IpcIo *reply)
+{
+    WIFI_LOGD("run %{public}s code %{public}u", __func__, code);
+    bool bandType = false;
+    (void)ReadBool(req, &bandType);
+    bool result = false;
+    ErrCode ret = IsBandTypeSupported(bandType, result);
+    (void)WriteInt32(reply, 0);
+    (void)WriteInt32(reply, ret);
+    (void)WriteBool(reply, result);
+}
+
+void WifiDeviceStub::OnGet5GHzChannelList(uint32_t code, IpcIo *req, IpcIo *reply)
+{
+    WIFI_LOGD("run %{public}s code %{public}u", __func__, code);
+    std::vector<int> result;
+    ErrCode ret = Get5GHzChannelList(result);
+    (void)WriteInt32(reply, 0);
+    (void)WriteInt32(reply, ret);
+    if (ret == WIFI_OPT_SUCCESS) {
+        unsigned int size = result.size();
+        (void)WriteInt32(reply, size);
+        for (unsigned int i = 0; i < size; ++i) {
+            (void)WriteInt32(reply, result[i]);
+        }
+    }
+}
+
 void WifiDeviceStub::InitHandleMap()
 {
     handleFuncMap_[WIFI_SVR_CMD_ENABLE_WIFI] = &WifiDeviceStub::OnEnableWifi;
@@ -579,6 +608,8 @@ void WifiDeviceStub::InitHandleMap()
     handleFuncMap_[WIFI_SVR_CMD_GET_DERVICE_MAC_ADD] = &WifiDeviceStub::OnGetDeviceMacAdd;
     handleFuncMap_[WIFI_SVR_CMD_IS_WIFI_CONNECTED] = &WifiDeviceStub::OnIsWifiConnected;
     handleFuncMap_[WIFI_SVR_CMD_SET_LOW_LATENCY_MODE] = &WifiDeviceStub::OnSetLowLatencyMode;
+    handleFuncMap_[WIFI_SVR_CMD_GET_BANDTYPE_SUPPORTED] = &WifiDeviceStub::OnIsBandTypeSupported;
+    handleFuncMap_[WIFI_SVR_CMD_GET_5G_CHANNELLIST] = &WifiDeviceStub::OnGet5GHzChannelList;
 }
 
 int WifiDeviceStub::OnRemoteRequest(uint32_t code, IpcIo *req, IpcIo *reply)

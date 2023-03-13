@@ -649,21 +649,23 @@ bool ScanService::StoreFullScanInfo(
     if (ret != 0) {
         WIFI_LOGW("GetScanInfoList return error. \n");
     }
-    for (auto iter = results.begin(); iter != results.end(); ++iter) {
+
+    for (auto storedIter = storeInfoList.begin(); storedIter != storeInfoList.end(); ++storedIter) {
         bool find = false;
-        for (auto storedIter = storeInfoList.begin(); storedIter != storeInfoList.end(); ++storedIter) {
+        for (auto iter = results.begin(); iter != results.end(); ++iter) {
             if (iter->bssid == storedIter->bssid) {
                 find = true;
                 break;
             }
         }
         if (!find) {
-            storeInfoList.push_back(*iter);
+            results.push_back(*storedIter);
         }
+        WifiSettings::GetInstance().UpdateLinkedChannelWidth(storedIter->bssid, storedIter->channelWidth);
     }
 
-    WIFI_LOGI("Save %{public}d scan results.", (int)(storeInfoList.size()));
-    if (WifiSettings::GetInstance().SaveScanInfoList(storeInfoList) != 0) {
+    WIFI_LOGI("Save %{public}d scan results.", (int)(results.size()));
+    if (WifiSettings::GetInstance().SaveScanInfoList(results) != 0) {
         WIFI_LOGE("WifiSettings::GetInstance().SaveScanInfoList failed.\n");
         return false;
     }

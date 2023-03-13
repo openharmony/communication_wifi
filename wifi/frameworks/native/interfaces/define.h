@@ -59,6 +59,8 @@
 #define WIFI_SVR_CMD_IS_WIFI_CONNECTED 0x1026         /* is Wi-Fi connected */
 #define WIFI_SVR_CMD_SET_LOW_LATENCY_MODE 0x1027    /* set low latency mode */
 #define WIFI_SVR_CMD_REMOVE_CANDIDATE_CONFIG 0x1028 /* remove an candidate network config */
+#define WIFI_SVR_CMD_GET_BANDTYPE_SUPPORTED 0x1029    /* get taget bandtype supported */
+#define WIFI_SVR_CMD_GET_5G_CHANNELLIST 0x1030        /* get 5g channellist */
 /* -------------ap module message define----------------- */
 #define WIFI_SVR_CMD_ENABLE_WIFI_AP 0x1100            /* open ap */
 #define WIFI_SVR_CMD_DISABLE_WIFI_AP 0x1101           /* close ap */

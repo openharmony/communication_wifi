@@ -25,6 +25,9 @@
 
 DEFINE_WIFILOG_SCAN_LABEL("ScanService");
 
+#define MIN(A, B) (((A) >= (B)) ? (B) : (A))
+#define MAX(A, B) (((A) >= (B)) ? (A) : (B))
+
 namespace OHOS {
 namespace Wifi {
 ScanService::ScanService()
@@ -595,6 +598,15 @@ void ScanService::HandleCommonScanInfo(
     return;
 }
 
+int ScanService::GetWifiMaxSupportedMaxSpeed(const InterScanInfo &scanInfo, const int &maxNumberSpatialStreams)
+{
+    int wifiStandard = 0;
+    bool is11bMode = scanInfo.IsWifi11bMode();
+    scanInfo.GetWifiStandard(wifiStandard);
+    return WifiMaxThroughput(wifiStandard, is11bMode, scanInfo.channelWidth,
+        MAX_RSSI, maxNumberSpatialStreams, 0);
+}
+
 bool ScanService::StoreFullScanInfo(
     const StoreScanConfig &scanConfig, const std::vector<InterScanInfo> &scanInfoList)
 {
@@ -626,6 +638,9 @@ bool ScanService::StoreFullScanInfo(
         scanInfo.features = iter->features;
         scanInfo.timestamp = iter->timestamp;
         scanInfo.band = iter->band;
+        scanInfo.maxSupportedRxLinkSpeed = GetWifiMaxSupportedMaxSpeed(*iter, MAX_RX_SPATIAL_STREAMS);
+        scanInfo.maxSupportedTxLinkSpeed = GetWifiMaxSupportedMaxSpeed(*iter, MAX_TX_SPATIAL_STREAMS);
+        iter->GetWifiStandard(scanInfo.wifiStandard);
         storeInfoList.push_back(scanInfo);
     }
 
@@ -2257,6 +2272,117 @@ bool ScanService::IsPackageInTrustList(const std::string &trustList, int sceneId
     }
 
     return bFind;
+}
+
+int CalculateBitPerTone(int snrDb)
+{
+    int bitPerTone;
+    if (snrDb <= SNR_BIT_PER_TONE_LUT_MAX) {
+        int lutInIdx = MAX(snrDb, SNR_BIT_PER_TONE_LUT_MIN) - SNR_BIT_PER_TONE_LUT_MIN;
+        lutInIdx = MIN(lutInIdx, sizeof(SNR_BIT_PER_TONE_LUT) / sizeof(int) - 1);
+        bitPerTone = SNR_BIT_PER_TONE_LUT[lutInIdx];
+    } else {
+        bitPerTone = snrDb * SNR_BIT_PER_TONE_HIGH_SNR_SCALE;
+    }
+    return bitPerTone;
+}
+
+int CalculateAirTimeFraction(int channelUtilization, int channelWidthFactor)
+{
+    int airTimeFraction20MHZ = MAX_CHANNEL_UTILIZATION - channelUtilization;
+    int airTimeFraction = airTimeFraction20MHZ;
+
+    for (int i = 1; i <= channelWidthFactor; ++i) {
+        airTimeFraction *= airTimeFraction;
+        airTimeFraction /= MAX_CHANNEL_UTILIZATION;
+    }
+    WIFI_LOGI("airTime20: %{public}d airTime: %{public}d", airTimeFraction20MHZ, airTimeFraction);
+    return airTimeFraction;
+}
+
+int WifiMaxThroughput(int wifiStandard, bool is11bMode, WifiChannelWidth channelWidth, int rssiDbm,
+                      int maxNumSpatialStream, int channelUtilization)
+{
+    int channelWidthFactor;
+    int numTonePerSym;
+    int symDurationNs;
+    int maxBitsPerTone;
+    if (maxNumSpatialStream < 1) {
+        WIFI_LOGI("maxNumSpatialStream < 1 due to wrong implementation. Overridden to 1");
+        maxNumSpatialStream = 1;
+    }
+    if (wifiStandard == WIFI_MODE_UNDEFINED) {
+        return -1;
+    } else if (wifiStandard == WIFI_802_11A ||
+    wifiStandard == WIFI_802_11B ||
+    wifiStandard == WIFI_802_11G) {
+        numTonePerSym = TONE_PER_SYM_11ABG;
+        channelWidthFactor = 0;
+        maxNumSpatialStream = MAX_NUM_SPATIAL_STREAM_11ABG;
+        maxBitsPerTone = MAX_BITS_PER_TONE_11ABG;
+        symDurationNs = SYM_DURATION_11ABG_NS;
+    } else if (wifiStandard == WIFI_802_11N) {
+        if (channelWidth == WifiChannelWidth::WIDTH_20MHZ) {
+            numTonePerSym = TONE_PER_SYM_11N_20MHZ;
+            channelWidthFactor = 0;
+        } else {
+            numTonePerSym = TONE_PER_SYM_11N_40MHZ;
+            channelWidthFactor = 1;
+        }
+        maxNumSpatialStream = MIN(maxNumSpatialStream, MAX_NUM_SPATIAL_STREAM_11N);
+        maxBitsPerTone = MAX_BITS_PER_TONE_11N;
+        symDurationNs = SYM_DURATION_11N_NS;
+    } else if (wifiStandard == WIFI_802_11AC) {
+        if (channelWidth == WifiChannelWidth::WIDTH_20MHZ) {
+            numTonePerSym = TONE_PER_SYM_11AC_20MHZ;
+            channelWidthFactor = 0;
+        } else if (channelWidth == WifiChannelWidth::WIDTH_40MHZ) {
+            numTonePerSym = TONE_PER_SYM_11AC_40MHZ;
+            channelWidthFactor = 1;
+        } else if (channelWidth == WifiChannelWidth::WIDTH_80MHZ) {
+            numTonePerSym = TONE_PER_SYM_11AC_80MHZ;
+            channelWidthFactor = 2;
+        } else {
+            numTonePerSym = TONE_PER_SYM_11AC_160MHZ;
+            channelWidthFactor = 3;
+        }
+        maxNumSpatialStream = MIN(maxNumSpatialStream, MAX_NUM_SPATIAL_STREAM_11AC);
+        maxBitsPerTone = MAX_BITS_PER_TONE_11AC;
+        symDurationNs = SYM_DURATION_11AC_NS;
+    } else {
+        if (channelWidth == WifiChannelWidth::WIDTH_20MHZ) {
+            numTonePerSym = TONE_PER_SYM_11AX_20MHZ;
+            channelWidthFactor = 0;
+        } else if (channelWidth == WifiChannelWidth::WIDTH_40MHZ) {
+            numTonePerSym = TONE_PER_SYM_11AX_40MHZ;
+            channelWidthFactor = 1;
+        } else if (channelWidth == WifiChannelWidth::WIDTH_80MHZ) {
+            numTonePerSym = TONE_PER_SYM_11AX_80MHZ;
+            channelWidthFactor = 2;
+        } else {
+            numTonePerSym = TONE_PER_SYM_11AX_160MHZ;
+            channelWidthFactor = 3;
+        }
+        maxNumSpatialStream = MIN(maxNumSpatialStream, MAX_NUM_SPATIAL_STREAM_11AX);
+        maxBitsPerTone = MAX_BITS_PER_TONE_11AX;
+        symDurationNs = SYM_DURATION_11AX_NS;
+    }
+    int noiseFloorDbBoost = TWO_DB * channelWidthFactor;
+    int noiseFloorDbm = NOISE_FLOOR_20MHZ_DBM + noiseFloorDbBoost + SNR_MARGIN_DB;
+    int snrDb = rssiDbm - noiseFloorDbm;
+
+    int bitPerTone = CalculateBitPerTone(snrDb);
+    bitPerTone = MIN(bitPerTone, maxBitsPerTone);
+
+    long bitPerToneTotal = bitPerTone * maxNumSpatialStream;
+    long numBitPerSym = bitPerToneTotal * numTonePerSym;
+    long phyRateMbps = (int)((numBitPerSym * MICRO_TO_NANO_RATIO) / (symDurationNs * BIT_PER_TONE_SCALE));
+    int airTimeFraction = CalculateAirTimeFraction(channelUtilization, channelWidthFactor);
+    int throughputMbps = (phyRateMbps * airTimeFraction) / MAX_CHANNEL_UTILIZATION;
+    if (is11bMode) {
+        throughputMbps = MIN(throughputMbps, B_MODE_MAX_MBPS);
+    }
+    return throughputMbps;
 }
 }  // namespace Wifi
 }  // namespace OHOS

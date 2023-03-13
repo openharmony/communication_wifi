@@ -141,6 +141,13 @@ public:
     int GetScanInfoList(std::vector<WifiScanInfo> &results);
 
     /**
+     * @Description Get scan result by bssid
+     *
+     * @param results - output scan result
+     * @return int - 0 success
+     */
+    int SetWifiLinkedStandardAndMaxSpeed(WifiLinkedInfo &linkInfo);
+    /**
      * @Description save the p2p connected info
      *
      * @param linkedInfo - WifiP2pLinkedInfo object

@@ -131,6 +131,12 @@ int RpcGetScanInfos(RpcServer *server, Context *context)
             WriteInt(context, results[i].channelWidth);
             WriteInt(context, results[i].centerFrequency0);
             WriteInt(context, results[i].centerFrequency1);
+            WriteInt(context, results[i].isVhtInfoExist);
+            WriteInt(context, results[i].isHtInfoExist);
+            WriteInt(context, results[i].isHeInfoExist);
+            WriteInt(context, results[i].isErpExist);
+            WriteInt(context, results[i].maxRates);
+            WriteInt(context, results[i].extMaxRates);
             WriteInt(context, results[i].ieSize);
             for (int j = 0; j < results[i].ieSize; ++j) {
                 WriteInt(context, results[i].infoElems[j].id);

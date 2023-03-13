@@ -60,6 +60,11 @@ const unsigned int HT_INFO_SIZE = 3;
 const unsigned int UINT8_MASK = 0xFF;
 const unsigned int UNSPECIFIED = -1;
 const unsigned int MAX_INFO_ELEMS_SIZE = 256;
+const unsigned int SUPP_RATES_SIZE = 8;
+const unsigned int EXT_SUPP_RATES_SIZE = 4;
+const unsigned int SUPPORTED_RATES_EID = 1;
+const unsigned int ERP_EID = 42;
+const unsigned int EXT_SUPPORTED_RATES_EID = 50;
 
 const unsigned int BAND_5_GHZ = 2;
 const unsigned int BAND_6_GHZ = 8;
@@ -953,6 +958,7 @@ static bool GetChanWidthCenterFreqVht(ScanInfo *pcmd, ScanInfoElem* infoElem)
     int channelType = infoElem->content[COLUMN_INDEX_ZERO] & UINT8_MASK;
     int centerFrequencyIndex1 = infoElem->content[COLUMN_INDEX_ONE] & UINT8_MASK;
     int centerFrequencyIndex2 = infoElem->content[COLUMN_INDEX_TWO] & UINT8_MASK;
+    pcmd->isVhtInfoExist = 1;
     pcmd->channelWidth = GetVhtChanWidth(channelType, centerFrequencyIndex1, centerFrequencyIndex2);
     if ((unsigned int)pcmd->channelWidth == UNSPECIFIED) {
         return false;
@@ -980,6 +986,7 @@ static bool GetChanWidthCenterFreqHe(ScanInfo *pcmd, ScanInfoElem* infoElem)
     bool coHostedBssPresent = (content[COLUMN_INDEX_ONE] & BSS_EXIST_MASK) != 0;
     int expectedLen = HE_OPER_BASIC_LEN + (isVhtInfoExist ? COLUMN_INDEX_THREE : 0)
         + (coHostedBssPresent ? 1 : 0) + (is6GhzInfoExist ? COLUMN_INDEX_FIVE : 0);
+    pcmd->isHeInfoExist = 1;
     if (infoElem->size < expectedLen) {
         return false;
     }
@@ -1017,6 +1024,37 @@ static bool GetChanWidthCenterFreqHt(ScanInfo *pcmd, ScanInfoElem* infoElem)
     int secondOffsetChannel = infoElem->content[1] & offsetBit;
     pcmd->channelWidth = GetHtChanWidth(secondOffsetChannel);
     pcmd->centerFrequency0 = GetHtCentFreq0(pcmd->freq, secondOffsetChannel);
+    pcmd->isHtInfoExist = 1;
+    return true;
+}
+
+static bool GetChanMaxRates(ScanInfo *pcmd, ScanInfoElem* infoElem)
+{
+    if ((pcmd == NULL) || (infoElem == NULL)) {
+        LOGE("pcmd or infoElem is NULL.");
+        return false;
+    }
+    if ((infoElem->content == NULL) || ((unsigned int)infoElem->size < SUPP_RATES_SIZE)) {
+        return false;
+    }
+    int maxIndex = infoElem->size - 1;
+    int maxRates = infoElem->content[maxIndex] & UINT8_MASK;
+    pcmd->maxRates = maxRates;
+    return true;
+}
+
+static bool GetChanExtMaxRates(ScanInfo *pcmd, ScanInfoElem* infoElem)
+{
+    if ((pcmd == NULL) || (infoElem == NULL)) {
+        LOGE("pcmd or infoElem is NULL.");
+        return false;
+    }
+    if ((infoElem->content == NULL) || ((unsigned int)infoElem->size < EXT_SUPP_RATES_SIZE)) {
+        return false;
+    }
+    int maxIndex = infoElem->size - 1;
+    int maxRates = infoElem->content[maxIndex] & UINT8_MASK;
+    pcmd->extMaxRates = maxRates;
     return true;
 }
 
@@ -1036,7 +1074,19 @@ static void GetChanWidthCenterFreq(ScanInfo *pcmd, struct NeedParseIe* iesNeedPa
     if ((iesNeedParse->ieHtOper != NULL) && GetChanWidthCenterFreqHt(pcmd, iesNeedParse->ieHtOper)) {
         return;
     }
-
+    if ((iesNeedParse->ieMaxRate != NULL) && GetChanMaxRates(pcmd, iesNeedParse->ieMaxRate)) {
+        LOGE("pcmd maxRates is %{public}d.", pcmd->maxRates);
+        return;
+    }
+    if ((iesNeedParse->ieExtMaxRate != NULL) && GetChanExtMaxRates(pcmd, iesNeedParse->ieExtMaxRate)) {
+        LOGE("pcmd extMaxRates is %{public}d.", pcmd->extMaxRates);
+        return;
+    }
+    if (iesNeedParse->ieErp != NULL) {
+        LOGE("pcmd isErpExist is true.");
+        pcmd->isErpExist = 1;
+        return;
+    }
     LOGE("GetChanWidthCenterFreq fail.");
     return;
 }
@@ -1055,6 +1105,15 @@ static void RecordIeNeedParse(unsigned int id, ScanInfoElem* ie, struct NeedPars
             break;
         case HT_OPER_EID:
             iesNeedParse->ieHtOper = ie;
+            break;
+        case SUPPORTED_RATES_EID:
+            iesNeedParse->ieMaxRate = ie;
+            break;
+        case ERP_EID:
+            iesNeedParse->ieErp = ie;
+            break;
+        case EXT_SUPPORTED_RATES_EID:
+            iesNeedParse->ieExtMaxRate = ie;
             break;
         default:
             break;
@@ -1218,9 +1277,12 @@ static int WpaCliCmdScanInfo(WifiWpaStaInterface *this, ScanInfo *pcmd, int *siz
             LOGE("parse scan result line failed!");
             break;
         }
-        LOGD("-->>%{public}2d %{public}s %{public}s %{public}d %{public}d %{public}d %{public}d %{public}d",
-            j, pcmd[j].ssid, pcmd[j].bssid, pcmd[j].freq, pcmd[j].siglv,
-            pcmd[j].centerFrequency0, pcmd[j].centerFrequency1, pcmd[j].channelWidth);
+        LOGD("-->>%{public}2d %{public}s %{public}s %{public}d %{public}d %{public}d %{public}d %{public}d %{public}d \
+         %{public}d %{public}d %{public}d %{public}d %{public}d",
+             j, pcmd[j].ssid, pcmd[j].bssid, pcmd[j].freq, pcmd[j].siglv,
+             pcmd[j].centerFrequency0, pcmd[j].centerFrequency1, pcmd[j].channelWidth,
+             pcmd[j].isVhtInfoExist, pcmd[j].isHtInfoExist, pcmd[j].isHeInfoExist, pcmd[j].isErpExist,
+             pcmd[j].maxRates, pcmd[j].extMaxRates);
         token = strtok_r(NULL, "\n", &savedPtr);
         j++;
     }

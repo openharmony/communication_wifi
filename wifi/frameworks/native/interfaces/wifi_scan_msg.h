@@ -130,7 +130,9 @@ struct WifiScanInfo {
     std::vector<WifiInfoElem> infoElems;
     int64_t features;
     int64_t timestamp;
-
+    int wifiStandard;
+    int maxSupportedRxLinkSpeed;
+    int maxSupportedTxLinkSpeed;
     WifiScanInfo()
     {
         frequency = 0;
@@ -142,6 +144,9 @@ struct WifiScanInfo {
         securityType = WifiSecurity::INVALID;
         features = 0;
         timestamp = 0;
+        wifiStandard = 0;
+        maxSupportedRxLinkSpeed = 0;
+        maxSupportedTxLinkSpeed = 0;
     }
 };
 

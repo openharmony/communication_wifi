@@ -41,6 +41,7 @@ const int SCAN_24GHZ_MAX_FREQUENCY = 2500;
 const int SCAN_5GHZ_MIN_FREQUENCY = 5000;
 const int SCAN_24GHZ_BAND = 1;
 const int SCAN_5GHZ_BAND = 2;
+const int MAX_RATES_24G = 24000000;
 
 class ScanStateMachine : public StateMachine {
     FRIEND_GTEST(ScanStateMachine);
@@ -358,6 +359,12 @@ private:
      * @param scanInfo - scan result[inout]
      */
     void GetSecurityTypeAndBand(std::vector<InterScanInfo> &scanInfo);
+    /**
+     * @Description The wifi mode are parsed from the scanning result obtained by the IDL.
+     * 
+     * @param scanInfo - scan result[inout]
+     */
+    void SetWifiMode(InterScanInfo &scanInfos);
     /**
      * @Description  Reporting Status to ScanService.
      *

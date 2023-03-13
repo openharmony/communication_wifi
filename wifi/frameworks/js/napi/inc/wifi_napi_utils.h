@@ -225,6 +225,17 @@ enum class WifiChannelWidthJs {
     WIDTH_INVALID,
 };
 
+enum class WifiStandardJs {
+    WIFI_STANDARD_UNDEFINED = 0,
+    WIFI_STANDARD_11A = 1,
+    WIFI_STANDARD_11B = 2,
+    WIFI_STANDARD_11G = 3,
+    WIFI_STANDARD_11N = 4,
+    WIFI_STANDARD_11AC = 5,
+    WIFI_STANDARD_11AX = 6,
+    WIFI_STANDARD_11AD = 7,
+};
+
 enum class PowerModelJs {
     SLEEPING = 0,
     GENERAL = 1,

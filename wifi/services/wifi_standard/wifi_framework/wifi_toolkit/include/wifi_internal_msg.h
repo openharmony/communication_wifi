@@ -48,6 +48,13 @@ constexpr int RSSI_LEVEL_1_5G = -85;
 constexpr int RSSI_LEVEL_2_5G = -79;
 constexpr int RSSI_LEVEL_3_5G = -72;
 constexpr int RSSI_LEVEL_4_5G = -65;
+constexpr int WIFI_MODE_UNDEFINED = 0;
+constexpr int WIFI_802_11A = 1;
+constexpr int WIFI_802_11B = 2;
+constexpr int WIFI_802_11G = 3;
+constexpr int WIFI_802_11N = 4;
+constexpr int WIFI_802_11AC = 5;
+constexpr int WIFI_802_11AX = 6;
 
 enum class WifiOprMidState { CLOSED = 0, OPENING = 1, RUNNING = 2, CLOSING = 3, UNKNOWN };
 
@@ -144,6 +151,12 @@ struct InterScanInfo {
     int64_t features;
     int64_t timestamp;
     Ant ant;
+    int wifiMode;
+    bool isVhtInfoExist;
+    bool isHtInfoExist;
+    bool isHeInfoExist;
+    bool isErpExist;
+    int maxRates;
 
     InterScanInfo()
         : frequency(0),
@@ -155,7 +168,13 @@ struct InterScanInfo {
           securityType(WifiSecurity::INVALID),
           features(0),
           timestamp(0),
-          ant(Ant::NETWORK_ANT_INVALID)
+          ant(Ant::NETWORK_ANT_INVALID),
+          wifiMode(WIFI_MODE_UNDEFINED),
+          isVhtInfoExist(false),
+          isHtInfoExist(false),
+          isHeInfoExist(false),
+          isErpExist(false),
+          maxRates(0)
     {}
 
     ~InterScanInfo()
@@ -180,6 +199,16 @@ struct InterScanInfo {
                 mgmt = "NONE";
                 break;
         }
+    }
+
+    void GetWifiStandard(int &standard) const
+    {
+        standard = wifiMode;
+    }
+    
+    bool IsWifi11bMode() const
+    {
+        return wifiMode == WIFI_802_11B;
     }
 };
 

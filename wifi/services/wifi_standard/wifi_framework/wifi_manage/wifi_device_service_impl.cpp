@@ -1009,9 +1009,11 @@ ErrCode WifiDeviceServiceImpl::GetLinkedInfo(WifiLinkedInfo &info)
     }
 
     WIFI_LOGI("GetLinkedInfo, networkId=%{public}d, ssid=%{public}s, rssi=%{public}d, frequency=%{public}d",
-        info.networkId, SsidAnonymize(info.ssid).c_str(), info.rssi, info.frequency);
-    WIFI_LOGI("GetLinkedInfo, connState=%{public}d, supplicantState=%{public}d, detailedState=%{public}d",
-        info.connState, info.supplicantState, info.detailedState);
+              info.networkId, SsidAnonymize(info.ssid).c_str(), info.rssi, info.frequency);
+    WIFI_LOGI("GetLinkedInfo, connState=%{public}d, supplicantState=%{public}d, detailedState=%{public}d,\
+     wifiStandard=%{public}d RxMaxSpeed=%{public}d TxmaxSpeed=%{public}d rxSpeed=%{public}d txSpeed=%{public}d",
+              info.connState, info.supplicantState, info.detailedState, info.wifiStandard,
+              info.maxSupportedRxLinkSpeed, info.maxSupportedTxLinkSpeed, info.rxLinkSpeed, info.txLinkSpeed);
     return WIFI_OPT_SUCCESS;
 }
 

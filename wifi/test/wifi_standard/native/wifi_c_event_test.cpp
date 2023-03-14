@@ -44,12 +44,12 @@ public:
 
 HWTEST_F(WifiEventTest, SetIsEventRegistratedTest, TestSize.Level1)
 {
-    RegisterWifiEventTest();
+    EXPECT_EQ(RegisterWifiEventTest(), WIFI_SUCCESS);
 }
 
 HWTEST_F(WifiEventTest, UnRegisterWifiEventTest, TestSize.Level1)
 {
-    UnRegisterWifiEventTest();
+    EXPECT_EQ(UnRegisterWifiEventTest(), WIFI_SUCCESS);
 }
 }  // namespace Wifi
 }  // namespace OHOS

@@ -556,7 +556,7 @@ HWTEST_F(StaInterfaceTest, SetCountryCodeFail, TestSize.Level1)
 HWTEST_F(StaInterfaceTest, RegisterStaServiceCallbackSuceess, TestSize.Level1)
 {
     StaServiceCallback callbacks;
-    pStaInterface->RegisterStaServiceCallback(callbacks);
+    EXPECT_EQ(pStaInterface->RegisterStaServiceCallback(callbacks), WIFI_OPT_SUCCESS);
 }
 
 HWTEST_F(StaInterfaceTest, ConnectToCandidateConfigSuccess, TestSize.Level1)

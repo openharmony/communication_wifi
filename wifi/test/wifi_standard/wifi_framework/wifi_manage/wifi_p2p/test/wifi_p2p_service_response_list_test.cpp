@@ -174,7 +174,7 @@ HWTEST_F(WifiP2pServiceResponseListTest, ParseTlvs2RespList1, TestSize.Level1)
     tlvList.push_back(0x00);
     tlvList.push_back(0x01);
     tlvList.push_back(0x01);
-    pWifiP2pServiceResponseList->ParseTlvs2RespList(tlvList);
+    EXPECT_TRUE(pWifiP2pServiceResponseList->ParseTlvs2RespList(tlvList));
 }
 
 HWTEST_F(WifiP2pServiceResponseListTest, ParseTlvs2RespList2, TestSize.Level1)

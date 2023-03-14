@@ -101,7 +101,7 @@ HWTEST_F(Ipv6AddressTest, GetIpv6Prefix_Fail, TestSize.Level1)
 {
 	struct in6_addr ip6Addr;
     size_t prefixLength = PREFIX_LENGTH;
-    Ipv6Address::GetIpv6Prefix(ip6Addr, prefixLength);
+    EXPECT_EQ(Ipv6Address::GetIpv6Prefix(ip6Addr, prefixLength), IN6ADDR_ANY_INIT);
 }
 
 HWTEST_F(Ipv6AddressTest, GetIpv6PrefixTest, TestSize.Level1)
@@ -114,7 +114,7 @@ HWTEST_F(Ipv6AddressTest, GetIpv6PrefixTest, TestSize.Level1)
 HWTEST_F(Ipv6AddressTest, GetIpv6Mask_Fail, TestSize.Level1)
 {
     size_t prefixLength = PREFIX_LENGTH;
-    Ipv6Address::GetIpv6Mask(prefixLength);
+    EXPECT_EQ(Ipv6Address::GetIpv6Prefix(ip6Addr, prefixLength), IN6ADDR_ANY_INIT);
 }
 
 HWTEST_F(Ipv6AddressTest, GetIpv6Mask_Fail2, TestSize.Level1)

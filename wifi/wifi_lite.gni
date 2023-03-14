@@ -17,7 +17,7 @@ ability_runtime_innerkits_path =
 
 SUBSYSTEM_DIR = "//foundation/communication"
 WIFI_ROOT_DIR = "$SUBSYSTEM_DIR/wifi/wifi"
-DHCP_ROOT_DIR = "$SUBSYSTEM_DIR/wifi/dhcp"
+DHCP_ROOT_DIR = "$SUBSYSTEM_DIR/dhcp"
 
 declare_args() {
   wifi_feature_with_p2p = false

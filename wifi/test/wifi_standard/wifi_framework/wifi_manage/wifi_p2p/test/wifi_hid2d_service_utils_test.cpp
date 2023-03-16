@@ -51,34 +51,37 @@ HWTEST_F(WifiHid2dServiceUtilsTest, InitIpPool, TestSize.Level1)
 {
     EXPECT_EQ(pIpPool->InitIpPool(serverIp), true);
 }
+
 HWTEST_F(WifiHid2dServiceUtilsTest, GetIp, TestSize.Level1)
 {
     pIpPool->GetIp(gcMac);
 }
+
 HWTEST_F(WifiHid2dServiceUtilsTest, ReleaseIp, TestSize.Level1)
 {
     pIpPool->ReleaseIp(gcMac);
 }
+
 HWTEST_F(WifiHid2dServiceUtilsTest, ReleaseIpPool, TestSize.Level1)
 {
     pIpPool->ReleaseIpPool();
 }
+
 HWTEST_F(WifiHid2dServiceUtilsTest, IncreaseSharedLink, TestSize.Level1)
 {
     pSharedLinkManager->IncreaseSharedLink();
 }
+
 HWTEST_F(WifiHid2dServiceUtilsTest, DecreaseSharedLink, TestSize.Level1)
 {
     pSharedLinkManager->DecreaseSharedLink();
 }
+
 HWTEST_F(WifiHid2dServiceUtilsTest, SetSharedLinkCount, TestSize.Level1)
 {
     int count = 1;
     pSharedLinkManager->SetSharedLinkCount(count);
-}
-HWTEST_F(WifiHid2dServiceUtilsTest, GetSharedLinkCount, TestSize.Level1)
-{
-    pSharedLinkManager->GetSharedLinkCount();
+    EXPECT_EQ(pSharedLinkManager->GetSharedLinkCount(), count);
 }
 }
 }

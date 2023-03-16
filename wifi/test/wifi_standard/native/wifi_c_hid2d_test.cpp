@@ -122,7 +122,7 @@ HWTEST_F(WifiHid2dTest, Hid2dSetPeerWifiCfgInfoTests, TestSize.Level1)
 
 HWTEST_F(WifiHid2dTest, Hid2dIsWideBandwidthSupportedTests, TestSize.Level1)
 {
-    Hid2dIsWideBandwidthSupported();
+    EXPECT_EQ(Hid2dIsWideBandwidthSupported(), 0);
 }
 
 HWTEST_F(WifiHid2dTest, Hid2dSetUpperSceneTests, TestSize.Level1)

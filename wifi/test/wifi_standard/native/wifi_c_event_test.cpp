@@ -25,31 +25,22 @@ namespace OHOS {
 namespace Wifi {
 class WifiEventTest : public testing::Test {
 public:
-    static void SetUpTestCase(){};
-    static void TearDownTestCase(){};
-    virtual void SetUp(){};
-    virtual void TearDown(){};
-	
-    void RegisterWifiEventTest()
-    {
-        WifiEvent *event = nullptr;
-        RegisterWifiEvent(event);
-    }
-    void UnRegisterWifiEventTest()
-    {
-        WifiEvent *event = nullptr;
-        UnRegisterWifiEvent(event);
-    }
+    static void SetUpTestCase() {};
+    static void TearDownTestCase() {};
+    virtual void SetUp() {};
+    virtual void TearDown() {};
 };
 
 HWTEST_F(WifiEventTest, SetIsEventRegistratedTest, TestSize.Level1)
 {
-    RegisterWifiEventTest();
+    WifiEvent *event = nullptr;
+    EXPECT_EQ(RegisterWifiEvent(event), ERROR_WIFI_INVALID_ARGS);
 }
 
 HWTEST_F(WifiEventTest, UnRegisterWifiEventTest, TestSize.Level1)
 {
-    UnRegisterWifiEventTest();
+    WifiEvent *event = nullptr;
+    EXPECT_EQ(UnRegisterWifiEvent(event), WIFI_SUCCESS);
 }
 }  // namespace Wifi
 }  // namespace OHOS

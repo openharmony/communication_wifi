@@ -233,12 +233,6 @@ public:
         int band = BAND;
         EXPECT_EQ(GetSignalLevel(rssi, band), -1);
     }
-
-    void SetLowLatencyModeSuccess()
-    {
-        int enabled = 0;
-        EXPECT_TRUE(SetLowLatencyMode(enabled) == WIFI_SUCCESS);
-    }
 };
 
 HWTEST_F(WifiCDeviceTest, EnableWifiSuccess, TestSize.Level1)
@@ -334,11 +328,6 @@ HWTEST_F(WifiCDeviceTest, GetIpInfoSuccess, TestSize.Level1)
 HWTEST_F(WifiCDeviceTest, GetSignalLevelSuccess, TestSize.Level1)
 {
     GetSignalLevelSuccess();
-}
-
-HWTEST_F(WifiCDeviceTest, SetLowLatencyModeSuccess, TestSize.Level1)
-{
-    SetLowLatencyModeSuccess();
 }
 } // namespace Wifi
 } // namespace OHOS

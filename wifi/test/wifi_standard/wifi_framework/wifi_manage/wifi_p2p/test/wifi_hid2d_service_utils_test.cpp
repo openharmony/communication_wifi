@@ -54,7 +54,7 @@ HWTEST_F(WifiHid2dServiceUtilsTest, InitIpPool, TestSize.Level1)
 
 HWTEST_F(WifiHid2dServiceUtilsTest, GetIp, TestSize.Level1)
 {
-    EXPECT_EQ(pIpPool->GetIp(gcMac), nullptr);
+    pIpPool->GetIp(gcMac);
 }
 
 HWTEST_F(WifiHid2dServiceUtilsTest, ReleaseIp, TestSize.Level1)

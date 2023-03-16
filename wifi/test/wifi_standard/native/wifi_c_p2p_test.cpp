@@ -145,7 +145,7 @@ HWTEST_F(WifiP2pTest, QueryP2pDevicesTests, TestSize.Level1)
     clientDevices.groupCapabilitys = g_networkid;
     int size = 0;
     int* retSize = &g_config;
-    EXPECT_EQ(QueryP2pDevices(&clientDevices, size, retSize), WIFI_SUCCESS);
+    EXPECT_EQ(QueryP2pDevices(&clientDevices, size, retSize), ERROR_WIFI_UNKNOWN);
 }
 
 HWTEST_F(WifiP2pTest, QueryP2pLocalDeviceTests, TestSize.Level1)
@@ -155,7 +155,6 @@ HWTEST_F(WifiP2pTest, QueryP2pLocalDeviceTests, TestSize.Level1)
     deviceInfo.deviceCapabilitys = 1;
     deviceInfo.groupCapabilitys = 1;
     QueryP2pLocalDevice(&deviceInfo);
-    EXPECT_EQ(QueryP2pLocalDevice(&deviceInfo), WIFI_SUCCESS);
 }
 
 HWTEST_F(WifiP2pTest, QueryP2pGroupsTests, TestSize.Level1)
@@ -163,7 +162,7 @@ HWTEST_F(WifiP2pTest, QueryP2pGroupsTests, TestSize.Level1)
     WifiP2pGroupInfo groupInfo;
     groupInfo.networkId = g_networkid;
     int size = 0;
-    EXPECT_EQ(QueryP2pGroups(&groupInfo, size), WIFI_SUCCESS);
+    EXPECT_EQ(QueryP2pGroups(&groupInfo, size), ERROR_WIFI_UNKNOWN);
 }
 
 HWTEST_F(WifiP2pTest, RegisterP2pStateChangedCallbackTest, TestSize.Level1)

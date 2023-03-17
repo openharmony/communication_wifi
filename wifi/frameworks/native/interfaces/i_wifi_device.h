@@ -313,6 +313,23 @@ public:
      */
     virtual bool IsRemoteDied(void) = 0;
 
+    /**
+     * @Description check wifi-band type is supported
+     *
+     * @param bandType - wifi band type
+     * @param supported - supported / unsupported
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode IsBandTypeSupported(int bandType, bool &supported) = 0;
+
+    /**
+     * @Description get all 5g channellist
+     *
+     * @param result - get result vector of int
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode Get5GHzChannelList(std::vector<int> &result) = 0;
+
 #ifndef OHOS_ARCH_LITE
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.wifi.IWifiDeviceService");

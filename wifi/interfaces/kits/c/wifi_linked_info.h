@@ -36,6 +36,7 @@
 #ifndef WIFI_LITE_WIFI_LINKED_INFO_H
 #define WIFI_LITE_WIFI_LINKED_INFO_H
 #include "wifi_device_config.h"
+#include "wifi_scan_info.h"
 
 /**
  * @brief Enumerates Wi-Fi connection states.
@@ -81,6 +82,7 @@ typedef struct {
     int rxLinkSpeed;
     /* Upstream network speed */
     int txLinkSpeed;
+    WifiChannelWidth channelWidth; /* curr ap channel width */
 } WifiLinkedInfo;
 #endif // WIFI_LITE_WIFI_LINKED_INFO_H
 /** @} */

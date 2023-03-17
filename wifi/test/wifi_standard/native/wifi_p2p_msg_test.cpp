@@ -60,7 +60,7 @@ public:
 
 HWTEST_F(WifiP2PMsgTest, isSessionAvailableTest, TestSize.Level1)
 {
-    pWifiP2pWfdInfo->isSessionAvailable();
+    EXPECT_FALSE(pWifiP2pWfdInfo->isSessionAvailable());
 }
 
 HWTEST_F(WifiP2PMsgTest, setSessionAvailableTest, TestSize.Level1)

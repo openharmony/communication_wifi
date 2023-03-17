@@ -177,10 +177,6 @@ HWTEST_F(WifiManagerServiceTest, ApLeaveResTest, TestSize.Level1)
     sleep(1);
 }
 
-HWTEST_F(WifiManagerServiceTest, P2pStateChangeTest, TestSize.Level1)
-{
-}
-
 HWTEST_F(WifiManagerServiceTest, P2pPeersChangeTest, TestSize.Level1)
 {
     IP2pServiceCallbacks cbk = WifiManager::GetInstance().GetP2pCallback();

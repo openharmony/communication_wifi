@@ -90,7 +90,6 @@ static napi_value ConnStateInit(napi_env env)
     return connState;
 }
 
-
 static napi_value P2pConnStateInit(napi_env env)
 {
     napi_value p2pConnState = nullptr;
@@ -190,6 +189,18 @@ static napi_value EapMethodInit(napi_env env)
     SetNamedPropertyByInteger(env, eapMethod, static_cast<int>(EapMethodJs::EAP_UNAUTH_TLS), "EAP_UNAUTH_TLS");
     return eapMethod;
 }
+
+static napi_value WifiBandTypeInit(napi_env env)
+{
+    napi_value bandType = nullptr;
+    napi_create_object(env, &bandType);
+    SetNamedPropertyByInteger(env, bandType, static_cast<int>(BandTypeJS::BAND_NONE), "BAND_NONE");
+    SetNamedPropertyByInteger(env, bandType, static_cast<int>(BandTypeJS::BAND_2GHZ), "BAND_2GHZ");
+    SetNamedPropertyByInteger(env, bandType, static_cast<int>(BandTypeJS::BAND_5GHZ), "BAND_5GHZ");
+    SetNamedPropertyByInteger(env, bandType, static_cast<int>(BandTypeJS::BAND_6GHZ), "BAND_6GHZ");
+    SetNamedPropertyByInteger(env, bandType, static_cast<int>(BandTypeJS::BAND_ANY), "BAND_ANY");
+    return bandType;
+}
 #endif
 
 static napi_value PropertyValueInit(napi_env env, napi_value exports)
@@ -206,6 +217,7 @@ static napi_value PropertyValueInit(napi_env env, napi_value exports)
     napi_value WifiChannelWidthObj = WifiChannelWidthInit(env);
     napi_value EapMethodObj = EapMethodInit(env);
     napi_value WifiStandardObj = WifiStandardInit(env);
+    napi_value bandTypeObj = WifiBandTypeInit(env);
 #endif
     napi_property_descriptor exportFuncs[] = {
 #ifdef ENABLE_NAPI_WIFI_MANAGER
@@ -213,6 +225,7 @@ static napi_value PropertyValueInit(napi_env env, napi_value exports)
         DECLARE_NAPI_PROPERTY("WifiChannelWidth", WifiChannelWidthObj),
         DECLARE_NAPI_PROPERTY("EapMethod", EapMethodObj),
         DECLARE_NAPI_PROPERTY("WifiStandard", WifiStandardObj),
+        DECLARE_NAPI_PROPERTY("BandType", bandTypeObj),
 #endif
         DECLARE_NAPI_PROPERTY("SuppState", suppStateObj),
         DECLARE_NAPI_PROPERTY("WifiSecurityType", securityTypeObj),
@@ -301,6 +314,8 @@ static napi_value Init(napi_env env, napi_value exports) {
         DECLARE_NAPI_FUNCTION("getP2pGroups", GetP2pGroups),
         DECLARE_NAPI_FUNCTION("setDeviceName", SetDeviceName),
         DECLARE_NAPI_FUNCTION("setP2pDeviceName", SetDeviceName),
+        DECLARE_NAPI_FUNCTION("isBandTypeSupported", IsBandTypeSupported),
+        DECLARE_NAPI_FUNCTION("get5GHzChannelList", Get5GHzChannelList),
         DECLARE_NAPI_FUNCTION("on", On),
         DECLARE_NAPI_FUNCTION("off", Off),
     };

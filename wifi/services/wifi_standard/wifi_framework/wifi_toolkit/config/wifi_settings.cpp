@@ -610,6 +610,9 @@ int WifiSettings::SaveIpInfo(const IpInfo &info)
 int WifiSettings::GetLinkedInfo(WifiLinkedInfo &info)
 {
     std::unique_lock<std::mutex> lock(mInfoMutex);
+    if (mWifiLinkedInfo.channelWidth == WifiChannelWidth::WIDTH_INVALID) {
+        GetLinkedChannelWidth();
+    }
     info = mWifiLinkedInfo;
     return 0;
 }
@@ -617,7 +620,13 @@ int WifiSettings::GetLinkedInfo(WifiLinkedInfo &info)
 int WifiSettings::SaveLinkedInfo(const WifiLinkedInfo &info)
 {
     std::unique_lock<std::mutex> lock(mInfoMutex);
+    WifiChannelWidth channelWidth = mWifiLinkedInfo.channelWidth;
+    std::string bssid = mWifiLinkedInfo.bssid;
     mWifiLinkedInfo = info;
+    if (bssid == info.bssid) {
+        mWifiLinkedInfo.channelWidth = channelWidth;
+    }
+    
     return 0;
 }
 
@@ -1157,6 +1166,25 @@ void WifiSettings::InitScanControlInfo()
 {
     InitScanControlForbidList();
     InitScanControlIntervalList();
+}
+
+void WifiSettings::GetLinkedChannelWidth()
+{
+    for (auto iter = mWifiScanInfoList.begin(); iter != mWifiScanInfoList.end(); ++iter) {
+        if (iter->bssid == mWifiLinkedInfo.bssid) {
+            mWifiLinkedInfo.channelWidth = iter->channelWidth;
+            return;
+        }
+    }
+    LOGE("WifiSettings GetLinkedChannelWidth failed.");
+}
+
+void WifiSettings::UpdateLinkedChannelWidth(std::string bssid, WifiChannelWidth channelWidth)
+{
+    std::unique_lock<std::mutex> lock(mInfoMutex);
+    if (bssid == mWifiLinkedInfo.bssid) {
+        mWifiLinkedInfo.channelWidth = channelWidth;
+    }
 }
 
 bool WifiSettings::EnableNetwork(int networkId, bool disableOthers)

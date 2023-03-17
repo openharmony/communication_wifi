@@ -68,6 +68,8 @@ void WifiDeviceStub::InitHandleMap()
     handleFuncMap[WIFI_SVR_CMD_IS_WIFI_CONNECTED] = &WifiDeviceStub::OnIsWifiConnected;
     handleFuncMap[WIFI_SVR_CMD_SET_LOW_LATENCY_MODE] = &WifiDeviceStub::OnSetLowLatencyMode;
     handleFuncMap[WIFI_SVR_CMD_REMOVE_CANDIDATE_CONFIG] = &WifiDeviceStub::OnRemoveCandidateConfig;
+    handleFuncMap[WIFI_SVR_CMD_GET_BANDTYPE_SUPPORTED] = &WifiDeviceStub::OnIsBandTypeSupported;
+    handleFuncMap[WIFI_SVR_CMD_GET_5G_CHANNELLIST] = &WifiDeviceStub::OnGet5GHzChannelList;
     return;
 }
 
@@ -540,6 +542,7 @@ void WifiDeviceStub::OnGetLinkedInfo(uint32_t code, MessageParcel &data, Message
         reply.WriteInt32((int)wifiInfo.wifiStandard);
         reply.WriteInt32((int)wifiInfo.maxSupportedRxLinkSpeed);
         reply.WriteInt32((int)wifiInfo.maxSupportedTxLinkSpeed);
+        reply.WriteInt32((int)wifiInfo.channelWidth);
     }
 
     return;
@@ -698,6 +701,36 @@ void WifiDeviceStub::OnRemoveCandidateConfig(uint32_t code, MessageParcel &data,
     }
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
+    return;
+}
+
+void WifiDeviceStub::OnIsBandTypeSupported(uint32_t code, MessageParcel &data, MessageParcel &reply)
+{
+    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+    ErrCode ret = WIFI_OPT_FAILED;
+    int bandType = data.ReadInt32();
+    bool result = false;
+    ret = IsBandTypeSupported(bandType, result);
+    reply.WriteInt32(0);
+    reply.WriteInt32(ret);
+    reply.WriteBool(result);
+    return;
+}
+
+void WifiDeviceStub::OnGet5GHzChannelList(uint32_t code, MessageParcel &data, MessageParcel &reply)
+{
+    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+    std::vector<int> channelList;
+    ErrCode ret = Get5GHzChannelList(channelList);
+    reply.WriteInt32(0);
+    reply.WriteInt32(ret);
+    if (ret == WIFI_OPT_SUCCESS) {
+        unsigned int size = channelList.size();
+        reply.WriteInt32(size);
+        for (unsigned int i = 0; i < size; ++i) {
+            reply.WriteInt32(channelList[i]);
+        }
+    }
     return;
 }
 }  // namespace Wifi

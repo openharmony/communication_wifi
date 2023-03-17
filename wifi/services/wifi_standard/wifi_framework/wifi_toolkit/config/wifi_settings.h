@@ -133,6 +133,15 @@ public:
     int SaveScanInfoList(const std::vector<WifiScanInfo> &results);
 
     /**
+     * @Description UpdateLinkedChannelWidth
+     *
+     * @param bssid ap ssid
+     * @param channelWidth ap channelwidth
+     * @return void
+     */
+    void UpdateLinkedChannelWidth(std::string bssid, WifiChannelWidth channelWidth);
+
+    /**
      * @Description Get scan results
      *
      * @param results - output vector of scan results
@@ -1170,6 +1179,7 @@ private:
     void InitScanControlForbidList();
     void InitScanControlIntervalList();
     void InitScanControlInfo();
+    void GetLinkedChannelWidth();
 
 private:
     int mWifiStaCapabilities;            /* Sta capability */

@@ -66,7 +66,8 @@ private:
     void OnGetDeviceMacAdd(uint32_t code, IpcIo *req, IpcIo *reply);
     void OnIsWifiConnected(uint32_t code, IpcIo *req, IpcIo *reply);
     void OnSetLowLatencyMode(uint32_t code, IpcIo *req, IpcIo *reply);
-
+    void OnIsBandTypeSupported(uint32_t code, IpcIo *req, IpcIo *reply);
+    void OnGet5GHzChannelList(uint32_t code, IpcIo *req, IpcIo *reply);
 private:
     void ReadWifiDeviceConfig(IpcIo *req, WifiDeviceConfig &config);
     void ReadIpAddress(IpcIo *req, WifiIpAddress &address);

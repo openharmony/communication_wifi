@@ -669,6 +669,9 @@ void WifiHotspotServiceImpl::ConfigInfoDump(std::string& result)
             case BandType::BAND_ANY:
                 retStr = "dual-mode frequency band";
                 break;
+            case BandType::BAND_6GHZ:
+                retStr = "6GHz";
+                break;
             default:
                 retStr = "unknown band";
         }

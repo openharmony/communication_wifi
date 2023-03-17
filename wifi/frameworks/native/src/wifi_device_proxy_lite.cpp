@@ -49,6 +49,17 @@ static void ReadIpAddress(IpcIo *reply, WifiIpAddress &address)
     return;
 }
 
+static void Parse5GChannels(IpcIo *reply, std::vector<int> &result)
+{
+    int retSize = 0;
+    (void)ReadInt32(reply, &retSize);
+    for (int i = 0; i < retSize; ++i) {
+        int channel = 0;
+        (void)ReadInt32(reply, &channel);
+        result.emplace_back(channel);
+    }
+}
+
 static void ParseDeviceConfigs(IpcIo *reply, std::vector<WifiDeviceConfig> &result)
 {
     size_t readLen;
@@ -154,6 +165,14 @@ static void ReadLinkedInfo(IpcIo *reply, WifiLinkedInfo &info)
     (void)ReadInt32(reply, &info.wifiStandard);
     (void)ReadInt32(reply, &info.maxSupportedRxLinkSpeed);
     (void)ReadInt32(reply, &info.maxSupportedTxLinkSpeed);
+
+    int tmpChanWidth = (int)WifiChannelWidth::WIDTH_INVALID;
+    (void)ReadInt32(reply, &tmpChanWidth);
+    if ((tmpChanWidth >= 0) && (tmpChanWidth <= (int)WifiChannelWidth::WIDTH_INVALID)) {
+        info.channelWidth = (WifiChannelWidth)tmpChanWidth;
+    } else {
+        info.channelWidth = WifiChannelWidth::WIDTH_INVALID;
+    }
 }
 
 static void ReadDhcpInfo(IpcIo *reply, IpInfo &info)
@@ -218,6 +237,14 @@ static int IpcCallback(void *owner, int code, IpcIo *reply)
         }
         case WIFI_SVR_CMD_GET_DHCP_INFO: {
             ReadDhcpInfo(reply, *((IpInfo *)data->variable));
+            break;
+        }
+        case WIFI_SVR_CMD_GET_BANDTYPE_SUPPORTED: {
+            (void)ReadBool(reply, (bool *)data->variable);
+            break;
+        }
+        case WIFI_SVR_CMD_GET_5G_CHANNELLIST: {
+            Parse5GChannels(reply, *((std::vector<int> *)data->variable));
             break;
         }
         default:
@@ -1379,6 +1406,74 @@ void WifiDeviceProxy::OnRemoteDied(void)
     WIFI_LOGW("Remote service is died!");
     remoteDied_ = true;
     g_deviceCallBackStub.SetRemoteDied(true);
+}
+ErrCode WifiDeviceProxy::IsBandTypeSupported(int bandType, bool &supported)
+{
+    if (remoteDied_ || remote_ == nullptr) {
+        WIFI_LOGE("failed to %{public}s, remoteDied_: %{public}d, remote_: %{public}d",
+            __func__, remoteDied_, remote_ == nullptr);
+        return WIFI_OPT_FAILED;
+    }
+
+    IpcIo req;
+    char data[IPC_DATA_SIZE_SMALL];
+    struct IpcOwner owner = {.exception = -1, .retCode = 0, .variable = nullptr};
+
+    IpcIoInit(&req, data, IPC_DATA_SIZE_SMALL, MAX_IPC_OBJ_COUNT);
+    if (!WriteInterfaceToken(&req, DECLARE_INTERFACE_DESCRIPTOR_L1, DECLARE_INTERFACE_DESCRIPTOR_L1_LENGTH)) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    (void)WriteInt32(&req, 0);
+    (void)WriteInt32(&req, bandType);
+    owner.variable = &supported;
+    owner.funcId = WIFI_SVR_CMD_GET_BANDTYPE_SUPPORTED;
+    int error = remote_->Invoke(remote_, WIFI_SVR_CMD_GET_BANDTYPE_SUPPORTED, &req, &owner, IpcCallback);
+    if (error != EC_SUCCESS) {
+        WIFI_LOGE("IsBandTypeSupported (%{public}d) failed,error code is %{public}d",
+            WIFI_SVR_CMD_GET_BANDTYPE_SUPPORTED, error);
+        return WIFI_OPT_FAILED;
+    }
+
+    if (owner.exception) {
+        return WIFI_OPT_FAILED;
+    }
+
+    return ErrCode(owner.retCode);
+}
+
+ErrCode WifiDeviceProxy::Get5GHzChannelList(std::vector<int> &result)
+{
+    if (remoteDied_ || remote_ == nullptr) {
+        WIFI_LOGE("failed to %{public}s, remoteDied_: %{public}d, remote_: %{public}d",
+            __func__, remoteDied_, remote_ == nullptr);
+        return WIFI_OPT_FAILED;
+    }
+
+    IpcIo req;
+    char data[IPC_DATA_SIZE_SMALL];
+    struct IpcOwner owner = {.exception = -1, .retCode = 0, .variable = nullptr};
+
+    IpcIoInit(&req, data, IPC_DATA_SIZE_SMALL, MAX_IPC_OBJ_COUNT);
+    if (!WriteInterfaceToken(&req, DECLARE_INTERFACE_DESCRIPTOR_L1, DECLARE_INTERFACE_DESCRIPTOR_L1_LENGTH)) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    (void)WriteInt32(&req, 0);
+    owner.variable = &result;
+    owner.funcId = WIFI_SVR_CMD_GET_5G_CHANNELLIST;
+    int error = remote_->Invoke(remote_, WIFI_SVR_CMD_GET_5G_CHANNELLIST, &req, &owner, IpcCallback);
+    if (error != EC_SUCCESS) {
+        WIFI_LOGE("Get5GHzChannelList(%{public}d) failed,error code is %{public}d",
+            WIFI_SVR_CMD_GET_5G_CHANNELLIST, error);
+        return WIFI_OPT_FAILED;
+    }
+
+    if (owner.exception) {
+        return WIFI_OPT_FAILED;
+    }
+
+    return ErrCode(owner.retCode);
 }
 }  // namespace Wifi
 }  // namespace OHOS

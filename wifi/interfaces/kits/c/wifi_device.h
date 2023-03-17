@@ -254,6 +254,23 @@ int GetSignalLevel(int rssi, int band);
 WifiErrorCode SetLowLatencyMode(int enabled);
 
 /**
+* @Description check wifi-band type is supported
+*
+* @param bandType - wifi band type
+* @param supported - supported / unsupported
+* @return ErrCode - operation result
+*/
+WifiErrorCode IsBandTypeSupported(int bandType, bool *supported);
+
+/**
+* @Description get all 5g channellist
+*
+* @param result - get result vector of int
+* @return ErrCode - operation result
+*/
+WifiErrorCode Get5GHzChannelList(int *result);
+
+/**
  * @brief Registers a callback for a specified Wi-Fi event.
  *
  * The registered callback will be invoked when the Wi-Fi event defined in {@link WifiEvent} occurs. \n

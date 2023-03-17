@@ -309,6 +309,18 @@ ErrCode WifiDeviceImpl::GetDeviceMacAddress(std::string &result)
     return client_->GetDeviceMacAddress(result);
 }
 
+ErrCode WifiDeviceImpl::IsBandTypeSupported(int bandType, bool &supported)
+{
+    RETURN_IF_FAIL(GetWifiDeviceProxy());
+    return client_->IsBandTypeSupported(bandType, supported);
+}
+
+ErrCode WifiDeviceImpl::Get5GHzChannelList(std::vector<int> &result)
+{
+    RETURN_IF_FAIL(GetWifiDeviceProxy());
+    return client_->Get5GHzChannelList(result);
+}
+
 bool WifiDeviceImpl::SetLowLatencyMode(bool enabled)
 {
     RETURN_IF_FAIL(GetWifiDeviceProxy());

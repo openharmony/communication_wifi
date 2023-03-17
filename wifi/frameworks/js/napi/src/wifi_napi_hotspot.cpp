@@ -120,6 +120,9 @@ static bool GetHotspotconfigFromJs(const napi_env& env, const napi_value& object
     config.SetPreSharedKey(str);
     JsObjectToInt(env, object, "maxConn", value);
     config.SetMaxConn(value);
+    value = 0;
+    JsObjectToInt(env, object, "channel", value);
+    config.SetChannel(value);
     return true;
 }
 
@@ -176,6 +179,7 @@ static void HotspotconfigToJs(const napi_env& env, HotspotConfig& cppConfig, nap
     SetValueInt32(env, "band", static_cast<int>(cppConfig.GetBand()), result);
     SetValueUtf8String(env, "preSharedKey", cppConfig.GetPreSharedKey().c_str(), result);
     SetValueInt32(env, "maxConn", cppConfig.GetMaxConn(), result);
+    SetValueInt32(env, "channel", cppConfig.GetChannel(), result);
 }
 
 NO_SANITIZE("cfi") napi_value GetHotspotConfig(napi_env env, napi_callback_info info)

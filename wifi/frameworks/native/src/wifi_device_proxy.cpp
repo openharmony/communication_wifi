@@ -936,6 +936,12 @@ void WifiDeviceProxy::ReadLinkedInfo(MessageParcel &reply, WifiLinkedInfo &info)
     info.wifiStandard = reply.ReadInt32();
     info.maxSupportedRxLinkSpeed = reply.ReadInt32();
     info.maxSupportedTxLinkSpeed = reply.ReadInt32();
+    int tmpChanWidth = reply.ReadInt32();
+    if ((tmpChanWidth >= 0) && (tmpChanWidth <= (int)WifiChannelWidth::WIDTH_INVALID)) {
+        info.channelWidth = (WifiChannelWidth)tmpChanWidth;
+    } else {
+        info.channelWidth = WifiChannelWidth::WIDTH_INVALID;
+    }
 }
 
 ErrCode WifiDeviceProxy::GetLinkedInfo(WifiLinkedInfo &info)
@@ -1248,6 +1254,74 @@ bool WifiDeviceProxy::IsRemoteDied(void)
         WIFI_LOGW("IsRemoteDied! remote is died now!");
     }
     return mRemoteDied;
+}
+
+ErrCode WifiDeviceProxy::IsBandTypeSupported(int bandType, bool &supported)
+{
+    if (mRemoteDied) {
+        WIFI_LOGE("failed to `%{public}s`,remote service is died!", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    MessageOption option;
+    MessageParcel data, reply;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    data.WriteInt32(0);
+    data.WriteInt32(bandType);
+    int error = Remote()->SendRequest(WIFI_SVR_CMD_GET_BANDTYPE_SUPPORTED, data, reply, option);
+    if (error != ERR_NONE) {
+        WIFI_LOGE("IsBandTypeSupported (%{public}d) failed,error code is %{public}d",
+            WIFI_SVR_CMD_GET_BANDTYPE_SUPPORTED, error);
+        return WIFI_OPT_FAILED;
+    }
+
+    int exception = reply.ReadInt32();
+    if (exception) {
+        return WIFI_OPT_FAILED;
+    }
+    int ret = reply.ReadInt32();
+    if (ret != WIFI_OPT_SUCCESS) {
+        return ErrCode(ret);
+    }
+    supported = reply.ReadInt32();
+    return WIFI_OPT_SUCCESS;
+}
+
+ErrCode WifiDeviceProxy::Get5GHzChannelList(std::vector<int> &result)
+{
+    if (mRemoteDied) {
+        WIFI_LOGE("failed to `%{public}s`,remote service is died!", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    MessageOption option;
+    MessageParcel data, reply;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    data.WriteInt32(0);
+    int error = Remote()->SendRequest(WIFI_SVR_CMD_GET_5G_CHANNELLIST, data, reply, option);
+    if (error != ERR_NONE) {
+        WIFI_LOGE("Get5GHzChannelList(%{public}d) failed,error code is %{public}d",
+            WIFI_SVR_CMD_GET_5G_CHANNELLIST, error);
+        return WIFI_OPT_FAILED;
+    }
+
+    int exception = reply.ReadInt32();
+    if (exception) {
+        return WIFI_OPT_FAILED;
+    }
+    int ret = reply.ReadInt32();
+    if (ret != WIFI_OPT_SUCCESS) {
+        return ErrCode(ret);
+    }
+    int retSize = reply.ReadInt32();
+    for (int i = 0; i < retSize; ++i) {
+        result.emplace_back(reply.ReadInt32());
+    }
+    return WIFI_OPT_SUCCESS;
 }
 }  // namespace Wifi
 }  // namespace OHOS

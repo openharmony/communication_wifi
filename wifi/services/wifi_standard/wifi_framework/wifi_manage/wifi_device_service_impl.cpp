@@ -1226,7 +1226,7 @@ void WifiDeviceServiceImpl::SaBasicDump(std::string& result)
         ss << "  Connection.bssid: " << MacAnonymize(linkedInfo.bssid) << "\n";
         ss << "  Connection.rssi: " << linkedInfo.rssi << "\n";
 
-        enum {BAND_2GHZ = 1, BAND_5GHZ = 2, BAND_ANY = 3};
+        enum {BAND_2GHZ = 1, BAND_5GHZ = 2, BAND_6GHZ = 3, BAND_ANY = 4};
         auto funcStrBand = [](int band) {
             std::string retStr;
             switch (band) {
@@ -1238,6 +1238,9 @@ void WifiDeviceServiceImpl::SaBasicDump(std::string& result)
                     break;
                 case BAND_ANY:
                     retStr = "dual-mode frequency band";
+                    break;
+                case BAND_6GHZ:
+                    retStr = "6GHz";
                     break;
                 default:
                     retStr = "unknown band";
@@ -1265,6 +1268,47 @@ void WifiDeviceServiceImpl::SaBasicDump(std::string& result)
 bool WifiDeviceServiceImpl::IsRemoteDied(void)
 {
     return false;
+}
+
+ErrCode WifiDeviceServiceImpl::IsBandTypeSupported(int bandType, bool &supported)
+{
+    WIFI_LOGI("Enter get bandtype is supported.");
+    if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("WifiDeviceServiceImpl:IsBandTypeSupported() PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+
+    if (bandType <= (int)BandType::BAND_NONE || bandType >= (int)BandType::BAND_ANY) {
+        WIFI_LOGE("IsBandTypeSupported bandType error %{public}d!", bandType);
+        return WIFI_OPT_INVALID_PARAM;
+    } else {
+        ChannelsTable channels;
+        WifiSettings::GetInstance().GetValidChannels(channels);
+        supported = channels.find((BandType)bandType) != channels.end();
+    }
+    return WIFI_OPT_SUCCESS;
+}
+
+ErrCode WifiDeviceServiceImpl::Get5GHzChannelList(std::vector<int> &result)
+{
+    WIFI_LOGI("Enter get 5g channel list.");
+    if (!WifiAuthCenter::IsSystemAppByToken()) {
+        WIFI_LOGE("Get5GHzChannelList: NOT System APP, PERMISSION_DENIED!");
+        return WIFI_OPT_NON_SYSTEMAPP;
+    }
+
+    if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("WifiDeviceServiceImpl:Get5GHzChannelList() PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+
+    ChannelsTable channels;
+    WifiSettings::GetInstance().GetValidChannels(channels);
+    if (channels.find(BandType::BAND_5GHZ) != channels.end()) {
+        result = channels[BandType::BAND_5GHZ];
+    }
+    
+    return WIFI_OPT_SUCCESS;
 }
 
 #ifndef OHOS_ARCH_LITE

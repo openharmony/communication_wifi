@@ -17,7 +17,7 @@
 #define OHOS_HDI_PROXY_H
 
 #include "wifi_hal_define.h"
-#include "v1_0/iwlan_interface.h"
+#include "v1_1/iwlan_interface.h"
 #include "wifi_hal_base_feature.h"
 
 #ifdef __cplusplus

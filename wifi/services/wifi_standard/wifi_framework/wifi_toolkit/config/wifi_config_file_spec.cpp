@@ -135,6 +135,8 @@ static int SetWifiDeviceConfigFirst(WifiDeviceConfig &item, const std::string &k
         item.bssid = value;
     } else if (key == "ssid") {
         item.ssid = value;
+    } else if (key == "userSelectBssid") {
+        item.userSelectBssid = value;
     } else if (key == "HexSsid") {
         std::vector<char> vec;
         vec.clear();
@@ -439,6 +441,7 @@ static std::string OutPutWifiDeviceConfig(WifiDeviceConfig &item)
     ss << "    " <<"uid=" << item.uid << std::endl;
     ss << "    " <<"status=" << item.status << std::endl;
     ss << "    " <<"bssid=" << item.bssid << std::endl;
+    ss << "    " <<"userSelectBssid=" << item.userSelectBssid << std::endl;
     ss << "    " <<"ssid=" << ValidateString(item.ssid) << std::endl;
     ss << "    " <<"HexSsid=" << ConvertArrayToHex((uint8_t*)&item.ssid[0], item.ssid.length()) << std::endl;
     ss << "    " <<"frequency=" << item.frequency << std::endl;

@@ -1165,7 +1165,7 @@ public:
         InternalMessage msg;
         msg.SetMessageName(WIFI_SVR_CMD_STA_BSSID_CHANGED_EVENT);
         msg.AddStringMessageBody("ASSOC_COMPLETE");
-        EXPECT_CALL(WifiStaHalInterface::GetInstance(), SetWpsBssid(_, _)).WillRepeatedly(Return(WIFI_IDL_OPT_OK));
+        EXPECT_CALL(WifiStaHalInterface::GetInstance(), SetBssid(_, _)).WillRepeatedly(Return(WIFI_IDL_OPT_OK));
         pStaStateMachine->pLinkedState->ExecuteStateMsg(&msg);
     }
 
@@ -1182,7 +1182,7 @@ public:
         InternalMessage msg;
         msg.SetMessageName(WIFI_SVR_CMD_STA_BSSID_CHANGED_EVENT);
         msg.AddStringMessageBody("ASSOC_COMPLETE");
-        EXPECT_CALL(WifiStaHalInterface::GetInstance(), SetWpsBssid(_, _)).WillRepeatedly(Return(WIFI_IDL_OPT_FAILED));
+        EXPECT_CALL(WifiStaHalInterface::GetInstance(), SetBssid(_, _)).WillRepeatedly(Return(WIFI_IDL_OPT_FAILED));
         pStaStateMachine->pLinkedState->ExecuteStateMsg(&msg);
     }
 

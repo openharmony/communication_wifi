@@ -75,6 +75,7 @@ P2pStateMachine::~P2pStateMachine()
     groupManager.StashGroups();
     if (pDhcpService.get() != nullptr) {
         pDhcpService->StopDhcpClient(groupManager.GetCurrentGroup().GetInterface(), false);
+        pDhcpService->RemoveDhcpResult(pDhcpResultNotify.get());
     } else {
         WIFI_LOGE("pDhcpService is nullptr, cannot stop dhcp client.");
     }

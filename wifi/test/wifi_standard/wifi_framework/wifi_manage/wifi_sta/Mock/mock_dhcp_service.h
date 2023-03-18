@@ -27,6 +27,7 @@ public:
     int StartDhcpClient(const std::string& ifname, bool bIpv6);
     int StopDhcpClient(const std::string& ifname, bool bIpv6);
     int GetDhcpResult(const std::string& ifname, IDhcpResultNotify *pResultNotify, int timeouts);
+    int RemoveDhcpResult(IDhcpResultNotify *pResultNotify);
     int GetDhcpInfo(const std::string& ifname, DhcpServiceInfo& dhcp);
     int RenewDhcpClient(const std::string& ifname);
     int ReleaseDhcpClient(const std::string& ifname);

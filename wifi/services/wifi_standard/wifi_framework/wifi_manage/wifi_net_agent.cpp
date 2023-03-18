@@ -15,6 +15,7 @@
 
 #include "wifi_net_agent.h"
 #include <cinttypes>
+#include <thread>
 #include "inet_addr.h"
 #include "ip_tools.h"
 #include "iservice_registry.h"
@@ -23,6 +24,7 @@
 #include "system_ability_definition.h"
 #include "wifi_common_util.h"
 #include "wifi_logger.h"
+#include "wifi_settings.h"
 
 DEFINE_WIFILOG_LABEL("WifiNetAgent");
 
@@ -190,6 +192,55 @@ bool WifiNetAgent::AddRoute(const std::string interface, const std::string ipAdd
     netsysService->NetworkAddRoute(OHOS::nmd::LOCAL_NETWORK_NETID, interface, destAddress, ipAddress);
     LOGI("NetAgent add route finish");
     return true;
+}
+
+void WifiNetAgent::OnStaMachineUpdateNetLinkInfo(const std::string &strIp, const std::string &strMask,
+    const std::string &strGateWay, const std::string &strDns, const std::string &strBakDns)
+{
+    std::thread([ip = strIp, mask = strMask, gateWay = strGateWay, dns = strDns, bakDns = strBakDns, this]() {
+        UpdateNetLinkInfo(ip, mask, gateWay, dns, bakDns);
+    }).detach();
+}
+
+void WifiNetAgent::OnStaMachineUpdateNetSupplierInfo(const sptr<NetManagerStandard::NetSupplierInfo> &netSupplierInfo)
+{
+    std::thread([netInfo = netSupplierInfo, this]() {
+        UpdateNetSupplierInfo(netInfo);
+    }).detach();
+}
+
+void WifiNetAgent::OnStaMachineWifiStart(const StaServiceCallback &callback)
+{
+    std::thread([cb = callback, this]() {
+        RegisterNetSupplier();
+        RegisterNetSupplierCallback(cb);
+    }).detach();
+}
+
+void WifiNetAgent::OnStaMachineNetManagerRestart(const sptr<NetManagerStandard::NetSupplierInfo> &netSupplierInfo,
+    const StaServiceCallback &callback)
+{
+    std::thread([cb = callback, supplierInfo = netSupplierInfo, this]() {
+        RegisterNetSupplier();
+        RegisterNetSupplierCallback(cb);
+        WifiLinkedInfo linkedInfo;
+        WifiSettings::GetInstance().GetLinkedInfo(linkedInfo);
+        if ((linkedInfo.detailedState == DetailedState::NOTWORKING)
+            && (linkedInfo.connState == ConnState::CONNECTED)) {
+            if (supplierInfo != nullptr) {
+                TimeStats timeStats("Call UpdateNetSupplierInfo");
+                UpdateNetSupplierInfo(supplierInfo);
+            }
+            IpInfo wifiIpInfo;
+            WifiSettings::GetInstance().GetIpInfo(wifiIpInfo);
+            std::string ipAddress = IpTools::ConvertIpv4Address(wifiIpInfo.ipAddress);
+            std::string gateway = IpTools::ConvertIpv4Address(wifiIpInfo.gateway);
+            std::string netmask = IpTools::ConvertIpv4Address(wifiIpInfo.netmask);
+            std::string primaryDns = IpTools::ConvertIpv4Address(wifiIpInfo.primaryDns);
+            std::string secondDns = IpTools::ConvertIpv4Address(wifiIpInfo.secondDns);
+            UpdateNetLinkInfo(ipAddress, netmask, gateway, primaryDns, secondDns);
+        }
+    }).detach();
 }
 
 WifiNetAgent::NetConnCallback::NetConnCallback(const StaServiceCallback &callback)

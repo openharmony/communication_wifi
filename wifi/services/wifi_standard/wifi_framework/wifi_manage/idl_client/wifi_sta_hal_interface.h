@@ -293,7 +293,7 @@ public:
      * @param bssid
      * @return WifiErrorNo
      */
-    WifiErrorNo SetWpsBssid(int networkId, const std::string &bssid);
+    WifiErrorNo SetBssid(int networkId, const std::string &bssid);
 
     /**
      * @Description Setting Roaming Configurations.

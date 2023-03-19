@@ -275,7 +275,7 @@ public:
      * @param bssid
      * @return WifiErrorNo
      */
-    WifiErrorNo SetWpsBssid(int networkId, const std::string &bssid);
+    WifiErrorNo SetBssid(int networkId, const std::string &bssid);
 
     /**
      * @Description Save the network.
@@ -1073,7 +1073,8 @@ public:
 private:
     char **ConVectorToCArrayString(const std::vector<std::string> &vec) const;
     WifiErrorNo ConvertPnoScanParam(const WifiPnoScanParam &param, PnoScanSettings *pSettings) const;
-    int PushDeviceConfigString(SetNetworkConfig *pConfig, DeviceConfigType type, const std::string &msg) const;
+    int PushDeviceConfigString(SetNetworkConfig *pConfig, DeviceConfigType type,
+        const std::string &msg, bool checkEmpty = true) const;
     int PushDeviceConfigInt(SetNetworkConfig *pConfig, DeviceConfigType type, int i) const;
     int PushDeviceConfigAuthAlgorithm(SetNetworkConfig *pConfig, DeviceConfigType type, unsigned int alg) const;
     WifiErrorNo CheckValidDeviceConfig(const WifiIdlDeviceConfig &config) const;

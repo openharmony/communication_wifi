@@ -445,9 +445,9 @@ WifiErrorNo WifiIdlClient::GetDeviceConfig(WifiIdlGetDeviceConfig &config)
 }
 
 int WifiIdlClient::PushDeviceConfigString(
-    SetNetworkConfig *pConfig, DeviceConfigType type, const std::string &msg) const
+    SetNetworkConfig *pConfig, DeviceConfigType type, const std::string &msg, bool checkEmpty) const
 {
-    if (msg.length() > 0) {
+    if (!checkEmpty || msg.length() > 0) {
         pConfig->cfgParam = type;
         if (strncpy_s(pConfig->cfgValue, sizeof(pConfig->cfgValue), msg.c_str(), msg.length()) != EOK) {
             return 0;
@@ -555,13 +555,13 @@ WifiErrorNo WifiIdlClient::SetDeviceConfig(int networkId, const WifiIdlDeviceCon
     return SetNetwork(networkId, conf, num);
 }
 
-WifiErrorNo WifiIdlClient::SetWpsBssid(int networkId, const std::string &bssid)
+WifiErrorNo WifiIdlClient::SetBssid(int networkId, const std::string &bssid)
 {
     CHECK_CLIENT_NOT_NULL;
     SetNetworkConfig conf;
-    int num = PushDeviceConfigString(&conf, DEVICE_CONFIG_BSSID, bssid);
+    int num = PushDeviceConfigString(&conf, DEVICE_CONFIG_BSSID, bssid, false);
     if (num == 0) {
-        LOGE("SetWpsBssid, PushDeviceConfigString return error!");
+        LOGE("SetBssid, PushDeviceConfigString return error!");
         return WIFI_IDL_OPT_OK;
     }
     

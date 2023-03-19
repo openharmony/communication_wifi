@@ -224,6 +224,7 @@ int StaService::AddDeviceConfig(const WifiDeviceConfig &config) const
     int netWorkId = INVALID_NETWORK_ID;
     bool isUpdate = false;
     std::string bssid;
+    std::string userSelectbssid = config.bssid;
     WifiDeviceConfig tempDeviceConfig;
     if (WifiSettings::GetInstance().GetDeviceConfig(config.ssid, config.keyMgmt, tempDeviceConfig) == 0) {
         netWorkId = tempDeviceConfig.networkId;
@@ -242,6 +243,7 @@ int StaService::AddDeviceConfig(const WifiDeviceConfig &config) const
     }
     tempDeviceConfig = config;
     tempDeviceConfig.networkId = netWorkId;
+    tempDeviceConfig.userSelectBssid = userSelectbssid;
     if (!bssid.empty()) {
         tempDeviceConfig.bssid = bssid;
     }

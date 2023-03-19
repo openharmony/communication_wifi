@@ -80,6 +80,37 @@ public:
      */
     bool AddRoute(const std::string interface, const std::string ipAddress, int prefixLength);
 
+    /**
+     * Add OnStaMachineUpdateNetLinkInfo
+     *
+     * @param DhcpResult dhcp result info
+     */
+    void OnStaMachineUpdateNetLinkInfo(const std::string &strIp, const std::string &strMask,
+        const std::string &strGateWay, const std::string &strDns, const std::string &strBakDns);
+
+    /**
+     * Add OnStaMachineUpdateNetSupplierInfo
+     *
+     * @param netSupplierInfo net Supplier Info
+     */
+    void OnStaMachineUpdateNetSupplierInfo(const sptr<NetManagerStandard::NetSupplierInfo> &netSupplierInfo);
+
+    /**
+     * Add OnStaMachineWifiStart
+     *
+     * @param callback callback
+     */
+    void OnStaMachineWifiStart(const StaServiceCallback &callback);
+
+    /**
+     * Add OnStaMachineNetManagerRestart
+     *
+     * @param netSupplierInfo net Supplier Info
+     * @param callback callback
+     */
+    void OnStaMachineNetManagerRestart(const sptr<NetManagerStandard::NetSupplierInfo> &netSupplierInfo,
+        const StaServiceCallback &callback);
+
 public:
     class NetConnCallback : public NetManagerStandard::NetSupplierCallbackBase {
     public:

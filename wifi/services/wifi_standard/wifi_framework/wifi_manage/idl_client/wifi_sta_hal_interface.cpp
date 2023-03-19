@@ -242,10 +242,10 @@ WifiErrorNo WifiStaHalInterface::GetRoamingCapabilities(WifiIdlRoamCapability &c
     return mIdlClient->ReqGetRoamingCapabilities(capability);
 }
 
-WifiErrorNo WifiStaHalInterface::SetWpsBssid(int networkId, const std::string &bssid)
+WifiErrorNo WifiStaHalInterface::SetBssid(int networkId, const std::string &bssid)
 {
     CHECK_NULL_AND_RETURN(mIdlClient, WIFI_IDL_OPT_FAILED);
-    return mIdlClient->SetWpsBssid(networkId, bssid);
+    return mIdlClient->SetBssid(networkId, bssid);
 }
 
 WifiErrorNo WifiStaHalInterface::SetRoamConfig(const WifiIdlRoamConfig &config)

@@ -414,6 +414,8 @@ struct WifiDeviceConfig {
     time_t lastConnectTime;
     int numRebootsSinceLastUse;
     int numAssociation;
+    /* save select mac address */
+    std::string userSelectBssid;
     WifiIpConfig wifiIpConfig;
     WifiEapConfig wifiEapConfig;
     WifiProxyConfig wifiProxyconfig;

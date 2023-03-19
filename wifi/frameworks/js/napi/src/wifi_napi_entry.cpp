@@ -198,7 +198,6 @@ static napi_value WifiBandTypeInit(napi_env env)
     SetNamedPropertyByInteger(env, bandType, static_cast<int>(BandTypeJS::BAND_2GHZ), "BAND_2GHZ");
     SetNamedPropertyByInteger(env, bandType, static_cast<int>(BandTypeJS::BAND_5GHZ), "BAND_5GHZ");
     SetNamedPropertyByInteger(env, bandType, static_cast<int>(BandTypeJS::BAND_6GHZ), "BAND_6GHZ");
-    SetNamedPropertyByInteger(env, bandType, static_cast<int>(BandTypeJS::BAND_ANY), "BAND_ANY");
     return bandType;
 }
 #endif

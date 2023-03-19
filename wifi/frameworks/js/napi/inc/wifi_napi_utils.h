@@ -167,7 +167,6 @@ enum class BandTypeJS {
     BAND_2GHZ = 1, /* 2.4GHz */
     BAND_5GHZ = 2, /* 5GHz */
     BAND_6GHZ = 3, /* GGHz */
-    BAND_ANY = 4, /* Dual-mode frequency band */
 };
 
 enum class SuppStateJs {

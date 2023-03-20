@@ -249,13 +249,15 @@ std::string GetBundleName()
         return "";
     }
 
-    std::string bundleName;
-    int uid = IPCSkeleton::GetCallingUid();
-    if (!bundleInstance->GetBundleNameForUid(uid, bundleName)) {
-        WIFI_LOGE("Get bundle name failed!");
+    AppExecFwk::BundleInfo bundleInfo;
+    auto ret = bundleInstance->GetBundleInfoForSelf(0, bundleInfo);
+    if (ret != OHOS::ERR_OK) {
+        WIFI_LOGE("GetBundleInfoForSelf failed! ret[%{public}d]", ret);
+        return "";
     }
-    WIFI_LOGI("Get bundle name uid[%{public}d]: %{public}s", uid, bundleName.c_str());
-    return bundleName;
+
+    WIFI_LOGI("Get bundle name uid[%{public}d]: %{public}s", bundleInfo.uid, bundleInfo.name.c_str());
+    return bundleInfo.name;
 }
 
 bool IsSystemApp()

@@ -43,10 +43,10 @@ int WifiCertUtils::InstallCert(const std::vector<uint8_t>& certEntry, const std:
         return -1;
     }
 
-    errno_t ret = memcpy_s(data, certEntry.size(), certEntry.data(), certEntry.size());
-    ret += memcpy_s(certPwdBuf, sizeof(certPwdBuf), pwd.c_str(), pwd.size());
-    ret += memcpy_s(certAliasBuf, sizeof(certAliasBuf), alias.c_str(), alias.size());
-    if (ret != EOK) {
+    errno_t retErr = memcpy_s(data, certEntry.size(), certEntry.data(), certEntry.size());
+    retErr += memcpy_s(certPwdBuf, sizeof(certPwdBuf), pwd.c_str(), pwd.size());
+    retErr += memcpy_s(certAliasBuf, sizeof(certAliasBuf), alias.c_str(), alias.size());
+    if (retErr != EOK) {
         LOGE("InstallCert memcpy_s error.");
         return -1;
     }

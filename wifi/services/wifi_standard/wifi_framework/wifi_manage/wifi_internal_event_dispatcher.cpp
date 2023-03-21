@@ -55,7 +55,7 @@ int WifiInternalEventDispatcher::SendSystemNotifyMsg() /* parameters */
 int WifiInternalEventDispatcher::AddStaCallback(
     const sptr<IRemoteObject> &remote, const sptr<IWifiDeviceCallBack> &callback, int pid)
 {
-    WIFI_LOGD("WifiInternalEventDispatcher::AddStaCallback, remote:%{private}p!", static_cast<void*>(remote));
+    WIFI_LOGD("WifiInternalEventDispatcher::AddStaCallback, remote!");
     if (remote == nullptr || callback == nullptr) {
         WIFI_LOGE("remote object is null!");
         return 1;

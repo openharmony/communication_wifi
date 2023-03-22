@@ -26,10 +26,23 @@ DEFINE_WIFILOG_SCAN_LABEL("WifiScanStub");
 namespace OHOS {
 namespace Wifi {
 WifiScanStub::WifiScanStub() : callback_(nullptr), mSingleCallback(false)
-{}
+{
+    InitHandleMap();
+}
 
 WifiScanStub::~WifiScanStub()
 {}
+
+void WifiScanStub::InitHandleMap()
+{
+    handleFuncMap[WIFI_SVR_CMD_SET_SCAN_CONTROL_INFO] = &WifiScanStub::OnSetScanControlInfo;
+    handleFuncMap[WIFI_SVR_CMD_FULL_SCAN] = &WifiScanStub::OnScan;
+    handleFuncMap[WIFI_SVR_CMD_SPECIFIED_PARAMS_SCAN] = &WifiScanStub::OnScanByParams;
+    handleFuncMap[WIFI_SVR_CMD_IS_SCAN_ALWAYS_ACTIVE] = &WifiScanStub::OnIsWifiClosedScan;
+    handleFuncMap[WIFI_SVR_CMD_GET_SCAN_INFO_LIST] = &WifiScanStub::OnGetScanInfoList;
+    handleFuncMap[WIFI_SVR_CMD_REGISTER_SCAN_CALLBACK] = &WifiScanStub::OnRegisterCallBack;
+    handleFuncMap[WIFI_SVR_CMD_GET_SUPPORTED_FEATURES] = &WifiScanStub::OnGetSupportedFeatures;
+}
 
 int WifiScanStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
@@ -40,46 +53,19 @@ int WifiScanStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessagePar
         return WIFI_OPT_FAILED;
     }
 
-    int exception = data.ReadInt32();
-    if (exception) {
-        return WIFI_OPT_FAILED;
+    HandleFuncMap::iterator iter = handleFuncMap.find(code);
+    if (iter == handleFuncMap.end()) {
+        WIFI_LOGI("not find function to deal, code %{public}u", code);
+        reply.WriteInt32(0);
+        reply.WriteInt32(WIFI_OPT_NOT_SUPPORTED);
+        return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
+    } else {
+        int exception = data.ReadInt32();
+        if (exception) {
+            return WIFI_OPT_FAILED;
+        }
+        return (this->*(iter->second))(code, data, reply, option);
     }
-
-    int ret = -1;
-    switch (code) {
-        case WIFI_SVR_CMD_SET_SCAN_CONTROL_INFO: {
-            ret = OnSetScanControlInfo(code, data, reply, option);
-            break;
-        }
-        case WIFI_SVR_CMD_FULL_SCAN: {
-            ret = OnScan(code, data, reply, option);
-            break;
-        }
-        case WIFI_SVR_CMD_SPECIFIED_PARAMS_SCAN: {
-            ret = OnScanByParams(code, data, reply, option);
-            break;
-        }
-        case WIFI_SVR_CMD_IS_SCAN_ALWAYS_ACTIVE: {
-            ret = OnIsWifiClosedScan(code, data, reply, option);
-            break;
-        }
-        case WIFI_SVR_CMD_GET_SCAN_INFO_LIST: {
-            ret = OnGetScanInfoList(code, data, reply, option);
-            break;
-        }
-        case WIFI_SVR_CMD_REGISTER_SCAN_CALLBACK: {
-            ret = OnRegisterCallBack(code, data, reply, option);
-            break;
-        }
-        case WIFI_SVR_CMD_GET_SUPPORTED_FEATURES: {
-            ret = OnGetSupportedFeatures(code, data, reply, option);
-            break;
-        }
-        default: {
-            ret = IPCObjectStub::OnRemoteRequest(code, data, reply, option);
-        }
-    }
-    return ret;
 }
 
 sptr<IWifiScanCallback> WifiScanStub::GetCallback() const

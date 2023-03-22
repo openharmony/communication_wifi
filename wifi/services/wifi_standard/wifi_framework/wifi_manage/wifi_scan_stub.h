@@ -24,6 +24,9 @@ namespace OHOS {
 namespace Wifi {
 class WifiScanStub : public IRemoteStub<IWifiScan> {
 public:
+    using handleFunc = int (WifiScanStub::*)(
+    uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
+    using HandleFuncMap = std::map<int, handleFunc>;
     WifiScanStub();
     virtual ~WifiScanStub() override;
 
@@ -36,6 +39,7 @@ protected:
     sptr<IWifiScanCallback> GetCallback() const;
 
 private:
+    void InitHandleMap();
     int OnSetScanControlInfo(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
     int OnScan(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
     int OnScanByParams(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
@@ -46,7 +50,7 @@ private:
 
     sptr<IWifiScanCallback> callback_;
     sptr<IRemoteObject::DeathRecipient> deathRecipient_;
-
+    HandleFuncMap handleFuncMap;
     bool mSingleCallback;
 };
 }  // namespace Wifi

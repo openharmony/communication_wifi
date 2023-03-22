@@ -43,9 +43,13 @@ int WifiCertUtils::InstallCert(const std::vector<uint8_t>& certEntry, const std:
         return -1;
     }
 
-    (void)memcpy_s(data, certEntry.size(), certEntry.data(), certEntry.size());
-    (void)memcpy_s(certPwdBuf, sizeof(certPwdBuf), pwd.c_str(), pwd.size());
-    (void)memcpy_s(certAliasBuf, sizeof(certAliasBuf), alias.c_str(), alias.size());
+    errno_t retErr = memcpy_s(data, certEntry.size(), certEntry.data(), certEntry.size());
+    retErr += memcpy_s(certPwdBuf, sizeof(certPwdBuf), pwd.c_str(), pwd.size());
+    retErr += memcpy_s(certAliasBuf, sizeof(certAliasBuf), alias.c_str(), alias.size());
+    if (retErr != EOK) {
+        LOGE("InstallCert memcpy_s error.");
+        return -1;
+    }
 
     appCert.size = certEntry.size();
     appCert.data = data;
@@ -78,7 +82,10 @@ int WifiCertUtils::UninstallCert(std::string& uri)
     struct CmBlob keyUri;
     char keyUriBuf[MAX_ALIAS_LEN] = { 0 };
 
-    (void)memcpy_s(keyUriBuf, sizeof(keyUriBuf), uri.c_str(), uri.size());
+    if (memcpy_s(keyUriBuf, sizeof(keyUriBuf), uri.c_str(), uri.size()) != EOK) {
+        LOGE("UninstallCert memcpy_s error.");
+        return -1;
+    }
     keyUri.size = strlen(keyUriBuf) + 1;
     keyUri.data = (uint8_t *)keyUriBuf;
     return CmUninstallAppCert(&keyUri, store);

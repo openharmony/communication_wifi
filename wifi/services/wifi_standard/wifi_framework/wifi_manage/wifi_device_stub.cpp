@@ -79,12 +79,7 @@ int WifiDeviceStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageP
         WIFI_LOGE("Sta stub token verification error: %{public}d", code);
         return WIFI_OPT_FAILED;
     }
-
-    int exception = data.ReadInt32();
-    if (exception) {
-        return WIFI_OPT_FAILED;
-    }
-
+    
     WIFI_LOGD("%{public}s, code: %{public}u, uid: %{public}d, pid: %{public}d",
         __func__, code, GetCallingUid(), GetCallingPid());
     HandleFuncMap::iterator iter = handleFuncMap.find(code);
@@ -92,7 +87,12 @@ int WifiDeviceStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageP
         WIFI_LOGI("not find function to deal, code %{public}u", code);
         reply.WriteInt32(0);
         reply.WriteInt32(WIFI_OPT_NOT_SUPPORTED);
+        return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
     } else {
+        int exception = data.ReadInt32();
+        if (exception) {
+            return WIFI_OPT_FAILED;
+        }
         (this->*(iter->second))(code, data, reply);
     }
 

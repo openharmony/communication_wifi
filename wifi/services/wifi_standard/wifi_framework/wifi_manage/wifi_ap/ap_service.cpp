@@ -171,7 +171,7 @@ ErrCode ApService::GetValidBands(std::vector<BandType> &bands)
     if (allowed5GFreq.size() > 0) {
         bands.push_back(BandType::BAND_5GHZ);
     }
-    if (bands.size() <= 0) {
+    if (bands.size() == 0) {
         WIFI_LOGW("%{public}s, GetValidBands failed!", __func__);
         return ErrCode::WIFI_OPT_FAILED;
     }

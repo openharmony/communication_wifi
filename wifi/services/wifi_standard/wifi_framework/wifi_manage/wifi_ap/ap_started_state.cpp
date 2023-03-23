@@ -389,7 +389,7 @@ void ApStartedState::ProcessCmdSetHotspotIdleTimeout(InternalMessage &msg)
         CancelHotspotIdleTimer();
         return;
     }
-    if (mTimeoutDelay && m_ApStateMachine.m_ApStationsManager.GetAllConnectedStations().size() == 0) {
+    if (m_ApStateMachine.m_ApStationsManager.GetAllConnectedStations().size() == 0) {
         SetHotspotIdleTimer();
     }
 }

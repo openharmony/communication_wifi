@@ -181,8 +181,6 @@ static int SetWifiDeviceConfigEncrypt(WifiDeviceConfig &item, const std::string 
     if (key == "encryptedData") {
         item.preSharedKey = value;
     } else if (key == "IV") {
-        WifiEncryptionInfo mWifiEncryptionInfo;
-        mWifiEncryptionInfo.SetFile(GetTClassName<WifiDeviceConfig>());
         EncryptedData *encry = new EncryptedData(item.preSharedKey, value);
         std::string decry = "";
         if (WifiDecryption(mWifiEncryptionInfo, *encry, decry) == HKS_SUCCESS) {

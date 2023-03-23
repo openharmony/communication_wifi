@@ -129,7 +129,7 @@ if (defined(ohos_lite)) {
     }
 
     cflags_cc = [ "-fno-rtti" ]
-
+    cflags = [ "-Wno-deprecated-non-prototype" ]
     part_name = "wifi"
     subsystem_name = "communication"
   }

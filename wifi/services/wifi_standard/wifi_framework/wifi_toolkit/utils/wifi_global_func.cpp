@@ -290,10 +290,6 @@ int HexStringToVec(const std::string &str, std::vector<char> &vec)
 
 int HexStringToVec(const std::string &str, uint8_t plainText[], uint32_t plainLength, uint32_t &resultLength)
 {
-    if (plainLength < 0) {
-        return false;
-    }
-
     std::vector<char> result;
     result.clear();
     int ret = HexStringToVec(str, result);
@@ -314,7 +310,7 @@ static char ConvertArrayChar(uint8_t ch)
     if (ch <= maxDecNum) {
         return '0' + ch;
     }
-    if (ch >= 0xa && ch <= 0xf) {
+    if (ch <= 0xf) {
         return ch + 'a' - numDiffForHexAlphabet;
     }
     return '0';

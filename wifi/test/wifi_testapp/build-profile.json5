@@ -1,0 +1,40 @@
+{
+  "app": {
+    "signingConfigs": [
+      {
+        "name": "default",
+        "material": {
+          "certpath": "C:\\Users\\Administrator\\.ohos\\config\\openharmony\\auto_ohos_default_kaihong.sample.wifitest.cer",
+          "storePassword": "0000001BA66996CA247B1CAEA557855EFE15D58F39B4268029755322629ED91C7B7F7FAEB46D7901F0ED86",
+          "keyAlias": "debugKey",
+          "keyPassword": "0000001B775524947AC8EBA270B0ED8DE4D7465B24C55104D73486D2D5BBF74DFAD9C0F3A8A54A7F81751B",
+          "profile": "C:\\Users\\Administrator\\.ohos\\config\\openharmony\\auto_ohos_default_kaihong.sample.wifitest.p7b",
+          "signAlg": "SHA256withECDSA",
+          "storeFile": "C:\\Users\\Administrator\\.ohos\\config\\openharmony\\auto_ohos_default_kaihong.sample.wifitest.p12"
+        }
+      }
+    ],
+    "compileSdkVersion": 9,
+    "compatibleSdkVersion": 9,
+    "products": [
+      {
+        "name": "default",
+        "signingConfig": "default",
+      }
+    ]
+  },
+  "modules": [
+    {
+      "name": "entry",
+      "srcPath": "./entry",
+      "targets": [
+        {
+          "name": "default",
+          "applyToProducts": [
+            "default"
+          ]
+        }
+      ]
+    }
+  ]
+}

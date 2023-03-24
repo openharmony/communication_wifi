@@ -1,0 +1,229 @@
+{
+  "string": [
+    {
+      "name": "entry_desc",
+      "value": "description"
+    },
+    {
+      "name": "MainAbility_desc",
+      "value": "description"
+    },
+    {
+      "name": "form_FormAbility_desc",
+      "value": "form_description"
+    },
+    {
+      "name": "form_FormAbility_label",
+      "value": "form_label"
+    },
+    {
+      "name": "MainAbility2_desc",
+      "value": "description"
+    },
+    {
+      "name": "btn_fullscreen",
+      "value": "全屏截屏"
+    },
+    {
+      "name": "btn_fixedsize",
+      "value": "部分截屏"
+    },
+
+    {
+      "name": "MainAbility2_label",
+      "value": "label"
+    },    {
+      "name": "MainAbility3_desc",
+      "value": "description"
+    },
+    {
+      "name": "MainAbility3_label",
+      "value": "label"
+    },
+    {
+      "name": "PageAbility_desc",
+      "value": "description"
+    },
+    {
+      "name": "PageAbility_label",
+      "value": "label"
+    },
+    {
+      "name": "DataAbility_desc",
+      "value": "hap sample empty provider"
+    },
+    {
+      "name": "MainAbility_label",
+      "value": "wifi专项测试"
+    },
+    {
+      "name": "api",
+      "value": "接口测试"
+    },
+    {
+      "name": "scenario",
+      "value": "场景测试"
+    },
+    {
+      "name": "autotest",
+      "value": "自动测试"
+    },
+    {
+      "name": "profile",
+      "value": "Profile测试"
+    },
+    {
+      "name": "testcase",
+      "value": "接口"
+    },
+    {
+      "name": "result",
+      "value": "结果"
+    },
+    {
+      "name": "benchmark",
+      "value": "性能测试"
+    },
+    {
+      "name": "test_title",
+      "value": "WIFI测试"
+    },
+    {
+      "name": "api_test_title",
+      "value": "手动API测试"
+    },
+    {
+      "name": "manual_test_title",
+      "value": "手动场景化测试"
+    },
+    {
+      "name": "auto_test_title",
+      "value": "自动化测试"
+    },
+    {
+      "name": "conf_title",
+      "value": "配置信息"
+    },
+    {
+      "name": "cancel",
+      "value": "取消"
+    },
+    {
+      "name": "confirm",
+      "value": "确认"
+    },
+    {
+      "name": "version",
+      "value": "1.1.1"
+    },
+
+    {
+      "name": "more",
+      "value": "more"
+    },
+    {
+      "name": "put_away",
+      "value": "put away"
+    },
+    {
+      "name": "cancelPairing",
+      "value": "取消配对"
+    },
+    {
+      "name": "scanning",
+      "value": "正在搜索…"
+    },
+    {
+      "name": "entry_MainAbility",
+      "value": "eTSWLAN"
+    },
+    {
+      "name": "description_mainability",
+      "value": "eTSWLAN Ability"
+    },
+    {
+      "name": "sure",
+      "value": "Sure"
+    },
+    {
+      "name": "wlan",
+      "value": "WLAN"
+    },
+    {
+      "name": "available_wlan",
+      "value": "Available WLAN"
+    },
+    {
+      "name": "connected",
+      "value": "Connected"
+    },
+    {
+      "name": "about",
+      "value": "About"
+    },
+    {
+      "name": "ip_address",
+      "value": "IP address:"
+    },
+    {
+      "name": "gate_way",
+      "value": "Gateway:"
+    },
+    {
+      "name": "net_mask",
+      "value": "Netmask:"
+    },
+    {
+      "name": "primary_dns",
+      "value": "Primary Dns IP address:"
+    },
+    {
+      "name": "second_dns",
+      "value": "Second DNS IP address:"
+    },
+    {
+      "name": "server_ip",
+      "value": "DHCP server IP:"
+    },
+    {
+      "name": "lease_duration",
+      "value": "IP address lease duration:"
+    },
+    {
+      "name": "country_code",
+      "value": "Country code:"
+    },
+    {
+      "name": "infrastructure_feature",
+      "value": "Infrastructure Feature:"
+    },
+    {
+      "name": "ghz_feature",
+      "value": "5 GHz Feature:"
+    },
+    {
+      "name": "gas_anqp_feature",
+      "value": "GAS/ANQP Feature:"
+    },
+    {
+      "name": "wifi_direct",
+      "value": "WiFi-Direct Feature:"
+    },
+    {
+      "name": "soft_ap",
+      "value": "Soft AP Feature:"
+    },
+    {
+      "name": "wifi_aware",
+      "value": "WiFi Aware Feature:"
+    },
+    {
+      "name": "encryption",
+      "value": "encrypted"
+    },
+    {
+      "name": "open",
+      "value": "open"
+    }
+  ]
+}

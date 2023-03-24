@@ -1108,7 +1108,7 @@ std::string GetTClassName<WifiP2pGroupInfo>()
     return "WifiP2pGroupInfo";
 }
 
-static std::string OutWifiP2pDeviceClassString(const WifiP2pDevice &item, std::string prefix = "")
+static std::string OutWifiP2pDeviceClassString(const WifiP2pDevice &item, const std::string prefix = "")
 {
     std::ostringstream ss;
 

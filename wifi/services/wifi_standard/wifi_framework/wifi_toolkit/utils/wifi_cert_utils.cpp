@@ -37,7 +37,7 @@ int WifiCertUtils::InstallCert(const std::vector<uint8_t>& certEntry, const std:
     struct CmBlob certAlias;
     char certPwdBuf[MAX_ALIAS_LEN] = { 0 };
     char certAliasBuf[MAX_ALIAS_LEN] = { 0 };
-    uint8_t *data = (uint8_t *)malloc(certEntry.size());
+    uint8_t *data = reinterpret_cast<uint8_t*>(malloc(certEntry.size()));
     if (data == nullptr) {
         LOGE("InstallCert, malloc return null.");
         return -1;
@@ -45,6 +45,7 @@ int WifiCertUtils::InstallCert(const std::vector<uint8_t>& certEntry, const std:
 
     if (memcpy_s(data, certEntry.size(), certEntry.data(), certEntry.size()) != EOK) {
         LOGE("memcpy_s certEntry.data() error.");
+        free(data);
         return -1;
     }
     (void)memcpy_s(certPwdBuf, sizeof(certPwdBuf), pwd.c_str(), pwd.size());
@@ -53,18 +54,18 @@ int WifiCertUtils::InstallCert(const std::vector<uint8_t>& certEntry, const std:
     appCert.size = certEntry.size();
     appCert.data = data;
     appCertPwd.size = strlen(certPwdBuf) + 1;
-    appCertPwd.data = (uint8_t *)certPwdBuf;
+    appCertPwd.data = reinterpret_cast<uint8_t*>(certPwdBuf);
     certAlias.size = strlen(certAliasBuf) + 1;
-    certAlias.data = (uint8_t *)certAliasBuf;
+    certAlias.data = reinterpret_cast<uint8_t*>(certAliasBuf);
 
     uint32_t store = 3;
     char retUriBuf[MAX_ALIAS_LEN] = { 0 };
-    struct CmBlob keyUri = { sizeof(retUriBuf), (uint8_t *)retUriBuf };
+    struct CmBlob keyUri = { sizeof(retUriBuf), reinterpret_cast<uint8_t*>(retUriBuf) };
     int ret = CmInstallAppCert(&appCert, &appCertPwd, &certAlias, store, &keyUri);
 
     free(data);
     if (ret == 0) {
-        uri = (char *)keyUri.data;
+        uri = reinterpret_cast<char*>(keyUri.data);
     }
 
     return ret;
@@ -86,7 +87,7 @@ int WifiCertUtils::UninstallCert(std::string& uri)
         return -1;
     }
     keyUri.size = strlen(keyUriBuf) + 1;
-    keyUri.data = (uint8_t *)keyUriBuf;
+    keyUri.data = reinterpret_cast<uint8_t*>(keyUriBuf);
     return CmUninstallAppCert(&keyUri, store);
 }
 }

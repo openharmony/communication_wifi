@@ -364,7 +364,7 @@ private:
      * 
      * @param scanInfo - scan result[inout]
      */
-    void SetWifiMode(InterScanInfo &scanInfos);
+    void SetWifiMode(InterScanInfo &scanInfo);
     /**
      * @Description  Reporting Status to ScanService.
      *

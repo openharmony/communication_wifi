@@ -500,7 +500,7 @@ int WifiSettings::IncreaseNumRebootsSinceLastUse()
     return 0;
 }
 
-int WifiSettings::RemoveExcessDeviceConfigs(std::vector<WifiDeviceConfig> &configs)
+int WifiSettings::RemoveExcessDeviceConfigs(std::vector<WifiDeviceConfig> &configs) const
 {
     int maxNumConfigs = mMaxNumConfigs;
     if (maxNumConfigs < 0) {
@@ -743,7 +743,7 @@ int WifiSettings::SetHotspotIdleTimeout(int time)
     return 0;
 }
 
-int WifiSettings::GetHotspotIdleTimeout()
+int WifiSettings::GetHotspotIdleTimeout() const
 {
     return mHotspotIdleTimeout;
 }
@@ -1179,7 +1179,7 @@ void WifiSettings::GetLinkedChannelWidth()
     LOGE("WifiSettings GetLinkedChannelWidth failed.");
 }
 
-void WifiSettings::UpdateLinkedChannelWidth(std::string bssid, WifiChannelWidth channelWidth)
+void WifiSettings::UpdateLinkedChannelWidth(const std::string bssid, WifiChannelWidth channelWidth)
 {
     std::unique_lock<std::mutex> lock(mInfoMutex);
     if (bssid == mWifiLinkedInfo.bssid) {
@@ -1596,12 +1596,12 @@ void WifiSettings::SetThreadStatusFlag(bool state)
     mThreadStatusFlag_ = state;
 }
 
-bool WifiSettings::GetThreadStatusFlag(void)
+bool WifiSettings::GetThreadStatusFlag(void) const
 {
     return mThreadStatusFlag_;
 }
 
-uint64_t WifiSettings::GetThreadStartTime(void)
+uint64_t WifiSettings::GetThreadStartTime(void) const
 {
     return mThreadStartTime;
 }

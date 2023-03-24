@@ -320,7 +320,7 @@ void WifiManager::AddSupportedFeatures(WifiFeatures feature)
     mSupportedFeatures |= static_cast<long>(feature);
 }
 
-int WifiManager::GetSupportedFeatures(long &features)
+int WifiManager::GetSupportedFeatures(long &features) const
 {
     long supportedFeatures = mSupportedFeatures;
     supportedFeatures |= static_cast<long>(WifiFeatures::WIFI_FEATURE_INFRA);

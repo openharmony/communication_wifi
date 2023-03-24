@@ -151,6 +151,7 @@ int GetIfaceState(const char *ifaceName)
     }
     state = ((ifr.ifr_flags & IFF_UP) > 0 ? 1 : 0);
     LOGD("GetIfaceState: current interface state: %{public}d", state);
+    close(sock);
     return state;
 }
 

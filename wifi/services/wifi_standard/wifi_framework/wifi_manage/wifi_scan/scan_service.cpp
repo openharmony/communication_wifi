@@ -2376,7 +2376,7 @@ int WifiMaxThroughput(int wifiStandard, bool is11bMode, WifiChannelWidth channel
     int bitPerTone = CalculateBitPerTone(snrDb);
     bitPerTone = MIN(bitPerTone, maxBitsPerTone);
 
-    long bitPerToneTotal = bitPerTone * maxNumSpatialStream;
+    long bitPerToneTotal = static_cast<long>(bitPerTone) * maxNumSpatialStream;
     long numBitPerSym = bitPerToneTotal * numTonePerSym;
     long phyRateMbps = (int)((numBitPerSym * MICRO_TO_NANO_RATIO) / (symDurationNs * BIT_PER_TONE_SCALE));
     int airTimeFraction = CalculateAirTimeFraction(channelUtilization, channelWidthFactor);

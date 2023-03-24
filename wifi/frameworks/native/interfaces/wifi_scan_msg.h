@@ -163,6 +163,7 @@ typedef struct tagScanForbidMode {
     ScanMode scanMode; /* Restricted Scan Mode */
     tagScanForbidMode()
     {
+        scanScene = 0;
         forbidTime = 0;
         forbidCount = 0;
         scanMode = ScanMode::SCAN_MODE_MAX;

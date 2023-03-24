@@ -137,7 +137,7 @@ public:
      * @param features - output supported features
      * @return int - operation result
      */
-    int GetSupportedFeatures(long &features);
+    int GetSupportedFeatures(long &features) const;
 
     /**
      * @Description Add supported feature

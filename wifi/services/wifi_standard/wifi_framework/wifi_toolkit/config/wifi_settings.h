@@ -314,7 +314,7 @@ public:
      * @param configs - WifiDeviceConfig objects
      * @return int - 0 if networks were removed, 1 otherwise.
      */
-    int RemoveExcessDeviceConfigs(std::vector<WifiDeviceConfig> &configs);
+    int RemoveExcessDeviceConfigs(std::vector<WifiDeviceConfig> &configs) const;
 
     /**
      * @Description Reload wifi device config from config file
@@ -483,7 +483,7 @@ public:
      * @param time -input time,
      * @return int - the hotspot idle timeout
      */
-    int GetHotspotIdleTimeout();
+    int GetHotspotIdleTimeout() const;
 
     /**
      * @Description Synchronizing saved the Hotspot config into config file
@@ -1159,14 +1159,14 @@ public:
      *
      * @return ThreadStatusFlag
      */
-    bool GetThreadStatusFlag(void);
+    bool GetThreadStatusFlag(void) const;
 
     /**
      * @Description GetThreadStartTime
      *
      * @return StartTime
      */
-    uint64_t GetThreadStartTime(void);
+    uint64_t GetThreadStartTime(void) const;
 
 private:
     WifiSettings();

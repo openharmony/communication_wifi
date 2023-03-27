@@ -124,6 +124,7 @@ void WifiNetAgent::UpdateNetLinkInfo(const std::string &ip, const std::string &m
     unsigned int prefixLength = IpTools::GetMaskLength(mask);
     sptr<NetManagerStandard::INetAddr> netAddr = (std::make_unique<NetManagerStandard::INetAddr>()).release();
     netAddr->type_ = NetManagerStandard::INetAddr::IPV4;
+    netAddr->family_ = NetManagerStandard::INetAddr::IPV4;
     netAddr->address_ = ip;
     netAddr->netMask_ = mask;
     netAddr->prefixlen_ = prefixLength;
@@ -131,6 +132,7 @@ void WifiNetAgent::UpdateNetLinkInfo(const std::string &ip, const std::string &m
 
     sptr<NetManagerStandard::INetAddr> dns = (std::make_unique<NetManagerStandard::INetAddr>()).release();
     dns->type_ = NetManagerStandard::INetAddr::IPV4;
+    dns->family_ = NetManagerStandard::INetAddr::IPV4;
     dns->address_ = strDns;
     netLinkInfo->dnsList_.push_back(*dns);
     dns->address_ = strBakDns;

@@ -261,6 +261,8 @@ private:
     std::map<std::string, std::thread *> m_mapDhcpRecvMsgThread;
 #endif
     std::map<std::string, std::list<DhcpResultReq*>> m_mapDhcpResultNotify;
+
+    std::mutex m_subscriberMutex;
     std::map<std::string, std::shared_ptr<OHOS::Wifi::DhcpEventSubscriber>> m_mapEventSubscriber;
 };
 }  // namespace Wifi

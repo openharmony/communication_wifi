@@ -27,11 +27,11 @@ static std::map<int32_t, int32_t> errCodeMap = {
     { ErrCode::WIFI_OPT_NOT_SUPPORTED, WifiNapiErrCode::WIFI_ERRCODE_NOT_SUPPORTED },
     { ErrCode::WIFI_OPT_INVALID_PARAM, WifiNapiErrCode::WIFI_ERRCODE_INVALID_PARAM },
     { ErrCode::WIFI_OPT_FORBID_AIRPLANE, WifiNapiErrCode::WIFI_ERRCODE_OPERATION_FAILED },
-    { ErrCode::WIFI_OPT_FORBID_POWSAVING, WifiNapiErrCode::WIFI_ERRCODE_OPERATION_FAILED},
+    { ErrCode::WIFI_OPT_FORBID_POWSAVING, WifiNapiErrCode::WIFI_ERRCODE_OPERATION_FAILED },
     { ErrCode::WIFI_OPT_PERMISSION_DENIED, WifiNapiErrCode::WIFI_ERRCODE_PERMISSION_DENIED },
     { ErrCode::WIFI_OPT_OPEN_FAIL_WHEN_CLOSING, WifiNapiErrCode::WIFI_ERRCODE_OPEN_FAIL_WHEN_CLOSING },
     { ErrCode::WIFI_OPT_OPEN_SUCC_WHEN_OPENED, WifiNapiErrCode::WIFI_ERRCODE_CLOSE_FAIL_WHEN_OPENING },
-    { ErrCode::WIFI_OPT_CLOSE_FAIL_WHEN_OPENING, WifiNapiErrCode::WIFI_ERRCODE_OPERATION_FAILED },
+    { ErrCode::WIFI_OPT_CLOSE_FAIL_WHEN_OPENING, WifiNapiErrCode::WIFI_ERRCODE_CLOSE_FAIL_WHEN_OPENING },
     { ErrCode::WIFI_OPT_CLOSE_SUCC_WHEN_CLOSED, WifiNapiErrCode::WIFI_ERRCODE_OPERATION_FAILED },
     { ErrCode::WIFI_OPT_STA_NOT_OPENED, WifiNapiErrCode::WIFI_ERRCODE_WIFI_NOT_OPENED },
     { ErrCode::WIFI_OPT_SCAN_NOT_OPENED, WifiNapiErrCode::WIFI_ERRCODE_OPERATION_FAILED },
@@ -62,13 +62,18 @@ static napi_value NapiGetUndefined(const napi_env &env)
     return undefined;
 }
 
-static int32_t GetNapiErrCode(const napi_env &env, const int32_t errCodeIn)
+static int32_t GetNapiErrCode(const napi_env &env, const int32_t errCodeIn, const int32_t sysCap = 0)
 {
     auto iter = errCodeMap.find(errCodeIn);
     if (iter == errCodeMap.end()) {
-        return WifiNapiErrCode::WIFI_ERRCODE_OPERATION_FAILED;
+        return WifiNapiErrCode::WIFI_ERRCODE_OPERATION_FAILED + sysCap;
     }
-    return iter->second;
+    if (iter->second == WifiNapiErrCode::WIFI_ERRCODE_PERMISSION_DENIED ||
+        iter->second == WifiNapiErrCode::WIFI_ERRCODE_INVALID_PARAM ||
+        iter->second == WifiNapiErrCode::WIFI_ERRCODE_NOT_SUPPORTED) {
+        return iter->second;
+    }
+    return iter->second + sysCap;
 }
 
 static std::string GetNapiErrMsg(const napi_env &env, const int32_t errCode, int sysCap)
@@ -81,7 +86,7 @@ static std::string GetNapiErrMsg(const napi_env &env, const int32_t errCode, int
     auto iter = napiErrMsgMap.find(napiErrCode);
     if (iter != napiErrMsgMap.end()) {
         std::string errMessage = "BussinessError ";
-        napiErrCode += sysCap;
+        napiErrCode = GetNapiErrCode(env, errCode, sysCap);
         errMessage.append(std::to_string(napiErrCode)).append(": ").append(iter->second);
         return errMessage;
     }
@@ -135,7 +140,7 @@ void HandleCallbackErrCode(    const napi_env &env, const AsyncContext &info)
         napi_get_reference_value(env, errCb, &callback);
 #ifdef ENABLE_NAPI_WIFI_MANAGER
         std::string errMsg = GetNapiErrMsg(env, info.errorCode, info.sysCap);
-        int32_t errCodeInfo = GetNapiErrCode(env, info.errorCode) + info.sysCap;
+        int32_t errCodeInfo = GetNapiErrCode(env, info.errorCode, info.sysCap);
         result[0] = GetCallbackErrorValue(env, errCodeInfo, errMsg);
 #else
         napi_create_uint32(env, info.errorCode, &result[0]);
@@ -151,7 +156,7 @@ void HandlePromiseErrCode(    const napi_env &env, const AsyncContext &info)
         napi_resolve_deferred(env, info.deferred, info.result);
     } else {
 #ifdef ENABLE_NAPI_WIFI_MANAGER
-        int32_t errCodeInfo = info.sysCap + GetNapiErrCode(env, info.errorCode);
+        int32_t errCodeInfo = GetNapiErrCode(env, info.errorCode, info.sysCap);
         std::string errMsg = GetNapiErrMsg(env, info.errorCode, info.sysCap);
         napi_value businessError = nullptr;
         napi_value eCode = nullptr;
@@ -177,7 +182,7 @@ void HandleSyncErrCode(const napi_env &env, int32_t errCode, int32_t sysCap)
         return;
     }
     std::string errMsg = GetNapiErrMsg(env, errCode, sysCap);
-    int32_t errCodeInfo = sysCap + GetNapiErrCode(env, errCode);
+    int32_t errCodeInfo = GetNapiErrCode(env, errCode, sysCap);
     if (errMsg != "") {
         napi_throw_error(env, std::to_string(errCodeInfo).c_str(), errMsg.c_str());
     }

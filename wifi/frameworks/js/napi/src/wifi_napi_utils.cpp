@@ -49,6 +49,14 @@ napi_value UndefinedNapiValue(const napi_env& env)
     return result;
 }
 
+napi_value CreateInt32(const napi_env& env)
+{
+    int32_t value = 1;
+    napi_value result = nullptr;
+    napi_create_int32(env, value, &result);
+    return result;
+}
+
 napi_value JsObjectToString(const napi_env& env, const napi_value& object,
     const char* fieldStr, const int bufLen, std::string& fieldRef)
 {
@@ -189,6 +197,25 @@ napi_status SetValueUtf8String(const napi_env& env, const char* fieldStr, const 
     status = napi_set_named_property(env, result, fieldStr, value);
     if (status != napi_ok) {
         WIFI_LOGE("Set utf8 string named property error! field: %{public}s", fieldStr);
+    }
+    return status;
+}
+
+napi_status SetValueUtf8String(const napi_env& env, const std::string &fieldStr, const std::string &valueStr,
+    napi_value& result)
+{
+    WIFI_LOGD("SetValueUtf8String, fieldStr: %{public}s, valueStr: %{public}s",
+        fieldStr.c_str(), valueStr.c_str());
+    napi_value value;
+    size_t len = valueStr.length();
+    napi_status status = napi_create_string_utf8(env, valueStr.c_str(), len, &value);
+    if (status != napi_ok) {
+        WIFI_LOGE("Set value create utf8 string error! field: %{public}s", fieldStr.c_str());
+        return status;
+    }
+    status = napi_set_named_property(env, result, fieldStr.c_str(), value);
+    if (status != napi_ok) {
+        WIFI_LOGE("Set utf8 string named property error! field: %{public}s", fieldStr.c_str());
     }
     return status;
 }

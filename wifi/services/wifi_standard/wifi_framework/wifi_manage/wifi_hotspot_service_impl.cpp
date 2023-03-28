@@ -170,6 +170,7 @@ ErrCode WifiHotspotServiceImpl::SetHotspotConfig(const HotspotConfig &config)
             WIFI_LOGE("Instance %{public}d, ap service is not started!", m_id);
         }
     }
+
     std::vector<BandType> bandsFromCenter;
     WifiConfigCenter::GetInstance().GetValidBands(bandsFromCenter);
     ChannelsTable channInfoFromCenter;

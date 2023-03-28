@@ -122,6 +122,10 @@ static bool GetHotspotconfigFromJs(const napi_env& env, const napi_value& object
     config.SetMaxConn(value);
     value = 0;
     JsObjectToInt(env, object, "channel", value);
+    if (value == 0) {
+        value = (int)AP_CHANNEL_DEFAULT;
+    }
+    
     config.SetChannel(value);
     return true;
 }

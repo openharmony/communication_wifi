@@ -125,7 +125,6 @@ static bool GetHotspotconfigFromJs(const napi_env& env, const napi_value& object
     if (value == 0) {
         value = (int)AP_CHANNEL_DEFAULT;
     }
-    
     config.SetChannel(value);
     return true;
 }

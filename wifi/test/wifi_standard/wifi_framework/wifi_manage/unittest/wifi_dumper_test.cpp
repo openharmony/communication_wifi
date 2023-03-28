@@ -17,6 +17,11 @@
 #include "wifi_logger.h"
 
 DEFINE_WIFILOG_LABEL("WifiDumperTest");
+using ::testing::ext::TestSize;
+
+namespace OHOS {
+namespace Wifi {
+const std::string ARGS_HELP = "-h";
 
 class WifiDumperTest : public testing::Test {
 public:
@@ -50,10 +55,11 @@ public:
 */
 HWTEST_F(WifiDumperTest, DeviceDump001, TestSize.Level1)
 {
+    WIFI_LOGI("DeviceDump001 enter");
     std::function<void(std::string&)> saBasicDumpFunc = BasicDumpFuncTest;
     std::vector<std::string> vecArgs;
     std::string result = "";
-    EXPECT_TRUE(DeviceDump(BasicDumpFuncTest, vecArgs, result))
+    EXPECT_TRUE(pWifiDumper->DeviceDump(BasicDumpFuncTest, vecArgs, result));
 }
 /**
  * @tc.name: DeviceDump002
@@ -63,11 +69,12 @@ HWTEST_F(WifiDumperTest, DeviceDump001, TestSize.Level1)
 */
 HWTEST_F(WifiDumperTest, DeviceDump002, TestSize.Level1)
 {
+    WIFI_LOGI("DeviceDump002 enter");
     std::function<void(std::string&)> saBasicDumpFunc = BasicDumpFuncTest;
     std::vector<std::string> vecArgs;
     vecArgs.push_back("abc");
     std::string result = "";
-    EXPECT_TRUE(DeviceDump(BasicDumpFuncTest, vecArgs, result))
+    EXPECT_TRUE(pWifiDumper->DeviceDump(BasicDumpFuncTest, vecArgs, result));
 }
 /**
  * @tc.name: DeviceDump003
@@ -77,11 +84,12 @@ HWTEST_F(WifiDumperTest, DeviceDump002, TestSize.Level1)
 */
 HWTEST_F(WifiDumperTest, DeviceDump003, TestSize.Level1)
 {
+    WIFI_LOGI("DeviceDump003 enter");
     std::function<void(std::string&)> saBasicDumpFunc = BasicDumpFuncTest;
     std::vector<std::string> vecArgs;
     vecArgs.push_back(ARGS_HELP);
     std::string result = "";
-    EXPECT_TRUE(DeviceDump(BasicDumpFuncTest, vecArgs, result))
+    EXPECT_TRUE(pWifiDumper->DeviceDump(BasicDumpFuncTest, vecArgs, result));
 }
 /**
  * @tc.name: ScanDump001
@@ -91,10 +99,11 @@ HWTEST_F(WifiDumperTest, DeviceDump003, TestSize.Level1)
 */
 HWTEST_F(WifiDumperTest, ScanDump001, TestSize.Level1)
 {
+    WIFI_LOGI("ScanDump001 enter");
     std::function<void(std::string&)> saBasicDumpFunc = BasicDumpFuncTest;
     std::vector<std::string> vecArgs;
     std::string result = "";
-    EXPECT_TRUE(ScanDump(BasicDumpFuncTest, vecArgs, result))
+    EXPECT_TRUE(pWifiDumper->ScanDump(BasicDumpFuncTest, vecArgs, result));
 }
 /**
  * @tc.name: ScanDump002
@@ -104,11 +113,12 @@ HWTEST_F(WifiDumperTest, ScanDump001, TestSize.Level1)
 */
 HWTEST_F(WifiDumperTest, ScanDump002, TestSize.Level1)
 {
+    WIFI_LOGI("ScanDump002 enter");
     std::function<void(std::string&)> saBasicDumpFunc = BasicDumpFuncTest;
     std::vector<std::string> vecArgs;
     vecArgs.push_back("abc");
     std::string result = "";
-    EXPECT_TRUE(ScanDump(BasicDumpFuncTest, vecArgs, result))
+    EXPECT_TRUE(pWifiDumper->ScanDump(BasicDumpFuncTest, vecArgs, result));
 }
 /**
  * @tc.name: ScanDump003
@@ -118,11 +128,12 @@ HWTEST_F(WifiDumperTest, ScanDump002, TestSize.Level1)
 */
 HWTEST_F(WifiDumperTest, ScanDump003, TestSize.Level1)
 {
+    WIFI_LOGI("ScanDump003 enter");
     std::function<void(std::string&)> saBasicDumpFunc = BasicDumpFuncTest;
     std::vector<std::string> vecArgs;
     vecArgs.push_back(ARGS_HELP);
     std::string result = "";
-    EXPECT_TRUE(ScanDump(BasicDumpFuncTest, vecArgs, result))
+    EXPECT_TRUE(pWifiDumper->ScanDump(BasicDumpFuncTest, vecArgs, result));
 }
 /**
  * @tc.name: P2pDump001
@@ -132,10 +143,11 @@ HWTEST_F(WifiDumperTest, ScanDump003, TestSize.Level1)
 */
 HWTEST_F(WifiDumperTest, P2pDump001, TestSize.Level1)
 {
+    WIFI_LOGI("P2pDump001 enter");
     std::function<void(std::string&)> saBasicDumpFunc = BasicDumpFuncTest;
     std::vector<std::string> vecArgs;
     std::string result = "";
-    EXPECT_TRUE(P2pDump(BasicDumpFuncTest, vecArgs, result))
+    EXPECT_TRUE(pWifiDumper->P2pDump(BasicDumpFuncTest, vecArgs, result));
 }
 /**
  * @tc.name: P2pDump002
@@ -145,11 +157,12 @@ HWTEST_F(WifiDumperTest, P2pDump001, TestSize.Level1)
 */
 HWTEST_F(WifiDumperTest, P2pDump002, TestSize.Level1)
 {
+    WIFI_LOGI("P2pDump002 enter");
     std::function<void(std::string&)> saBasicDumpFunc = BasicDumpFuncTest;
     std::vector<std::string> vecArgs;
     vecArgs.push_back("abc");
     std::string result = "";
-    EXPECT_TRUE(P2pDump(BasicDumpFuncTest, vecArgs, result))
+    EXPECT_TRUE(pWifiDumper->P2pDump(BasicDumpFuncTest, vecArgs, result));
 }
 /**
  * @tc.name: P2pDump003
@@ -159,11 +172,12 @@ HWTEST_F(WifiDumperTest, P2pDump002, TestSize.Level1)
 */
 HWTEST_F(WifiDumperTest, P2pDump003, TestSize.Level1)
 {
+    WIFI_LOGI("P2pDump003 enter");
     std::function<void(std::string&)> saBasicDumpFunc = BasicDumpFuncTest;
     std::vector<std::string> vecArgs;
     vecArgs.push_back(ARGS_HELP);
     std::string result = "";
-    EXPECT_TRUE(P2pDump(BasicDumpFuncTest, vecArgs, result))
+    EXPECT_TRUE(pWifiDumper->P2pDump(BasicDumpFuncTest, vecArgs, result));
 }
 /**
  * @tc.name: HotspotDump001
@@ -173,10 +187,11 @@ HWTEST_F(WifiDumperTest, P2pDump003, TestSize.Level1)
 */
 HWTEST_F(WifiDumperTest, HotspotDump001, TestSize.Level1)
 {
+    WIFI_LOGI("HotspotDump001 enter");
     std::function<void(std::string&)> saBasicDumpFunc = BasicDumpFuncTest;
     std::vector<std::string> vecArgs;
     std::string result = "";
-    EXPECT_TRUE(HotspotDump(BasicDumpFuncTest, vecArgs, result))
+    EXPECT_TRUE(pWifiDumper->HotspotDump(BasicDumpFuncTest, vecArgs, result));
 }
 /**
  * @tc.name: HotspotDump002
@@ -186,11 +201,12 @@ HWTEST_F(WifiDumperTest, HotspotDump001, TestSize.Level1)
 */
 HWTEST_F(WifiDumperTest, HotspotDump002, TestSize.Level1)
 {
+    WIFI_LOGI("HotspotDump002 enter");
     std::function<void(std::string&)> saBasicDumpFunc = BasicDumpFuncTest;
     std::vector<std::string> vecArgs;
     vecArgs.push_back("abc");
     std::string result = "";
-    EXPECT_TRUE(HotspotDump(BasicDumpFuncTest, vecArgs, result))
+    EXPECT_TRUE(pWifiDumper->HotspotDump(BasicDumpFuncTest, vecArgs, result));
 }
 /**
  * @tc.name: HotspotDump003
@@ -200,54 +216,12 @@ HWTEST_F(WifiDumperTest, HotspotDump002, TestSize.Level1)
 */
 HWTEST_F(WifiDumperTest, HotspotDump003, TestSize.Level1)
 {
+    WIFI_LOGI("HotspotDump003 enter");
     std::function<void(std::string&)> saBasicDumpFunc = BasicDumpFuncTest;
     std::vector<std::string> vecArgs;
     vecArgs.push_back(ARGS_HELP);
     std::string result = "";
-    EXPECT_TRUE(HotspotDump(BasicDumpFuncTest, vecArgs, result))
+    EXPECT_TRUE(pWifiDumper->HotspotDump(BasicDumpFuncTest, vecArgs, result));
 }
-
-
-
-
-/*
-bool WifiDumper::HotspotDump(std::function<void(std::string&)> saBasicDumpFunc,
-    const std::vector<std::string>& vecArgs, std::string& result)
-{
-    PrintArgs(vecArgs);
-    result.clear();
-    if (!vecArgs.empty() && vecArgs[0] == ARGS_HELP) {
-        result = ShowHotspotDumpUsage();
-        return true;
-    }
-
-    saBasicDumpFunc(result);
-    return true;
 }
-namespace OHOS {
-namespace Wifi {
-class WifiDumper {
-public:
-    bool DeviceDump(std::function<void(std::string&)> saBasicDumpFunc,
-        const std::vector<std::string> &vecArgs, std::string &result);
-
-    bool ScanDump(std::function<void(std::string&)> saBasicDumpFunc,
-        const std::vector<std::string> &vecArgs, std::string &result);
-
-    bool P2pDump(std::function<void(std::string&)> saBasicDumpFunc,
-        const std::vector<std::string> &vecArgs, std::string &result);
-
-    bool HotspotDump(std::function<void(std::string&)> saBasicDumpFunc,
-        const std::vector<std::string> &vecArgs, std::string &result);
-
-private:
-    std::string ShowDeviceDumpUsage() const;
-    std::string ShowScanDumpUsage() const;
-    std::string ShowP2pDumpUsage() const;
-    std::string ShowHotspotDumpUsage() const;
-    void PrintArgs(const std::vector<std::string>& vecArgs);
-};
-}  // namespace Wifi
-}  // namespace OHOS
-#endif
-*/
+}

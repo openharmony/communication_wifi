@@ -309,6 +309,7 @@ public:
     WifiEapConfig()
     {
         phase2Method = Phase2Method::NONE;
+        (void) memset_s(certPassword, sizeof(certPassword), 0, sizeof(certPassword));
     }
     /**
      * @Description convert Phase2Method to string

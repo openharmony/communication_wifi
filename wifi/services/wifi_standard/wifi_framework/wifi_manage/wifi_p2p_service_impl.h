@@ -411,6 +411,8 @@ private:
     static std::mutex instanceLock;
     bool mPublishFlag;
     ServiceRunningState mState;
+    static constexpr int WIFI_P2P_PASSPHRASE_MIN_LEN = 8;
+    static constexpr int WIFI_P2P_PASSPHRASE_MAX_LEN = 63;
 };
 }  // namespace Wifi
 }  // namespace OHOS

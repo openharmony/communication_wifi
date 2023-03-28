@@ -25,6 +25,7 @@
 #include <vector>
 #include "ip_tools.h"
 #include "wifi_scan_msg.h"
+#include "securec.h"
 
 namespace OHOS {
 namespace Wifi {

@@ -38,6 +38,7 @@
 #include "wifi_dumper.h"
 #include "wifi_common_util.h"
 #include "wifi_protect_manager.h"
+#include "wifi_global_func.h"
 #ifndef OHOS_ARCH_LITE
 #include "xcollie/watchdog.h"
 #endif
@@ -543,6 +544,11 @@ ErrCode WifiDeviceServiceImpl::AddDeviceConfig(const WifiDeviceConfig &config, i
 
     if (!CheckConfigPwd(config)) {
         WIFI_LOGE("CheckConfigPwd failed!");
+        return WIFI_OPT_INVALID_PARAM;
+    }
+
+    if (isCandidate && config.bssid.length() != 0 && CheckMacIsValid(config.bssid) != 0) {
+        WIFI_LOGE("AddDeviceConfig:VerifyBSSID failed!");
         return WIFI_OPT_INVALID_PARAM;
     }
 

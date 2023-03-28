@@ -29,6 +29,7 @@
 #include "wifi_net_agent.h"
 #include "wifi_permission_utils.h"
 #include "wifi_service_manager.h"
+#include "wifi_global_func.h"
 
 DEFINE_WIFILOG_P2P_LABEL("WifiP2pServiceImpl");
 
@@ -384,6 +385,15 @@ ErrCode WifiP2pServiceImpl::CreateGroup(const WifiP2pConfig &config)
         WIFI_LOGE("CreateGroup:VerifyGetWifiInfoPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
+    int passLen = config.GetPassphrase().length();
+    if (passLen < WIFI_P2P_PASSPHRASE_MIN_LEN || passLen > WIFI_P2P_PASSPHRASE_MAX_LEN) {
+        WIFI_LOGE("CreateGroup:VerifyPassphrase length failed!");
+        return WIFI_OPT_INVALID_PARAM;
+    }
+    if (CheckMacIsValid(config.GetDeviceAddress()) != 0) {
+        WIFI_LOGE("CreateGroup:VerifyDeviceAddress failed!");
+        return WIFI_OPT_INVALID_PARAM;
+    }
 
     if (!IsP2pServiceRunning()) {
         WIFI_LOGE("P2pService is not running!");
@@ -415,6 +425,13 @@ ErrCode WifiP2pServiceImpl::RemoveGroup()
     if (pService == nullptr) {
         WIFI_LOGE("Get P2P service failed!");
         return WIFI_OPT_P2P_NOT_OPENED;
+    }
+
+    WifiP2pGroupInfo config;
+    ErrCode ret = pService->GetCurrentGroup(config);
+    if (ret != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("RemoveGroup:GetCurrentGroup failed!");
+        return WIFI_OPT_FAILED;
     }
     return pService->RemoveGroup();
 }
@@ -464,6 +481,16 @@ ErrCode WifiP2pServiceImpl::P2pConnect(const WifiP2pConfig &config)
             WIFI_LOGE("P2pConnect:VerifyGetScanInfosPermission PERMISSION_DENIED!");
             return WIFI_OPT_PERMISSION_DENIED;
         }
+    }
+    if (CheckMacIsValid(config.GetDeviceAddress()) != 0) {
+        WIFI_LOGE("P2pConnect:VerifyDeviceAddress failed!");
+        return WIFI_OPT_INVALID_PARAM;
+    }
+
+    int passLen = config.GetPassphrase().length();
+    if (passLen != 0 && (passLen < WIFI_P2P_PASSPHRASE_MIN_LEN || passLen > WIFI_P2P_PASSPHRASE_MAX_LEN)) {
+        WIFI_LOGE("P2pConnect:VerifyPassphrase failed!");
+        return WIFI_OPT_INVALID_PARAM;
     }
 
     if (!IsP2pServiceRunning()) {

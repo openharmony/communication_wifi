@@ -49,6 +49,7 @@ DhcpClientServiceImpl::DhcpClientServiceImpl()
 
 DhcpClientServiceImpl::~DhcpClientServiceImpl()
 {
+    std::unique_lock<std::mutex> lock(m_subscriberMutex);
     if (!m_mapEventSubscriber.empty()) {
         WIFI_LOGE("DhcpClientServiceImpl destructor mapEventSubscriber is not empty!");
         if (UnsubscribeAllDhcpEvent() != DHCP_OPT_SUCCESS) {
@@ -212,6 +213,7 @@ int DhcpClientServiceImpl::SubscribeDhcpEvent(const std::string &strAction)
         return DHCP_OPT_ERROR;
     }
 #ifndef OHOS_ARCH_LITE
+    std::unique_lock<std::mutex> lock(m_subscriberMutex);
     auto iterSubscriber = m_mapEventSubscriber.find(strAction);
     if (iterSubscriber == m_mapEventSubscriber.end()) {
         EventFwk::MatchingSkills matchingSkills;
@@ -243,6 +245,7 @@ int DhcpClientServiceImpl::UnsubscribeDhcpEvent(const std::string &strAction)
         WIFI_LOGE("UnsubscribeDhcpEvent error, strAction is empty!");
         return DHCP_OPT_ERROR;
     }
+    std::unique_lock<std::mutex> lock(m_subscriberMutex);
     auto iterSubscriber = m_mapEventSubscriber.find(strAction);
     if (iterSubscriber == m_mapEventSubscriber.end()) {
         WIFI_LOGI("UnsubscribeDhcpEvent map no exist %{public}s, no need unsubscriber", strAction.c_str());

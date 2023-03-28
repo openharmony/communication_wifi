@@ -271,8 +271,13 @@ static void ProcessEapPeapConfig(const napi_env& env, const napi_value& object, 
 static void ProcessEapTlsConfig(const napi_env& env, const napi_value& object, WifiEapConfig& eapConfig)
 {
     eapConfig.eap = EAP_METHOD_TLS;
+    std::string certPassword;
     JsObjectToString(env, object, "identity", NAPI_MAX_STR_LENT, eapConfig.identity);
-    JsObjectToString(env, object, "certPassword", NAPI_MAX_STR_LENT, eapConfig.certPassword);
+    JsObjectToString(env, object, "certPassword", NAPI_MAX_STR_LENT, certPassword);
+    if (strncpy_s(eapConfig.certPassword, sizeof(eapConfig.certPassword), certPassword.c_str(),
+        sizeof(eapConfig.certPassword) - 1) != EOK) {
+        WIFI_LOGE("ProcessEapTlsConfig strcpy_s failed!");
+    }
     eapConfig.certEntry = JsObjectToU8Vector(env, object, "certEntry");
 }
 

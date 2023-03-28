@@ -259,7 +259,7 @@ int StaService::AddDeviceConfig(const WifiDeviceConfig &config) const
         }
         std::string alias = formatSsid + "_TLS_" + std::to_string(config.uid < 0 ? 0 : config.uid);
         int ret = WifiCertUtils::InstallCert(config.wifiEapConfig.certEntry,
-            config.wifiEapConfig.certPassword, alias, uri);
+            std::string(config.wifiEapConfig.certPassword), alias, uri);
         if (ret == 0) {
             tempDeviceConfig.wifiEapConfig.clientCert = uri;
             tempDeviceConfig.wifiEapConfig.privateKey = uri;

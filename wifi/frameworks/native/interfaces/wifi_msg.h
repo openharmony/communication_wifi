@@ -25,6 +25,7 @@
 #include <vector>
 #include "ip_tools.h"
 #include "wifi_scan_msg.h"
+#include "securec.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -34,6 +35,7 @@ namespace Wifi {
 #define WIFI_INVALID_UID (-1)
 #define IPV4_ADDRESS_TYPE 0
 #define IPV6_ADDRESS_TYPE 1
+#define WIFI_PASSWORD_LEN 128
 
 const std::string KEY_MGMT_NONE = "NONE";
 const std::string KEY_MGMT_WEP = "WEP";
@@ -302,11 +304,12 @@ public:
     std::string privateKey; /* EAP mode client private key */
     Phase2Method phase2Method;
     std::vector<uint8_t> certEntry;
-    std::string certPassword;
+    char certPassword[WIFI_PASSWORD_LEN];
 
     WifiEapConfig()
     {
         phase2Method = Phase2Method::NONE;
+        (void) memset_s(certPassword, sizeof(certPassword), 0, sizeof(certPassword));
     }
     /**
      * @Description convert Phase2Method to string

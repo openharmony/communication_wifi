@@ -237,7 +237,11 @@ void WifiDeviceStub::ReadWifiDeviceConfig(MessageParcel &data, WifiDeviceConfig 
     config.wifiEapConfig.clientCert = data.ReadString();
     config.wifiEapConfig.privateKey = data.ReadString();
     data.ReadUInt8Vector(&config.wifiEapConfig.certEntry);
-    config.wifiEapConfig.certPassword = data.ReadString();
+    std::string certPassword = data.ReadString();
+    if (strcpy_s(config.wifiEapConfig.certPassword, sizeof(config.wifiEapConfig.certPassword),
+        certPassword.c_str()) != EOK) {
+        WIFI_LOGE("ReadWifiDeviceConfig strcpy_s failed!");
+    }
     config.wifiEapConfig.phase2Method = Phase2Method(data.ReadInt32());
     config.wifiProxyconfig.configureMethod = ConfigureProxyMethod(data.ReadInt32());
     config.wifiProxyconfig.autoProxyConfig.pacWebAddress = data.ReadString();

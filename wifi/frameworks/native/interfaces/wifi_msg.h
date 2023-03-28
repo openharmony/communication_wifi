@@ -34,6 +34,7 @@ namespace Wifi {
 #define WIFI_INVALID_UID (-1)
 #define IPV4_ADDRESS_TYPE 0
 #define IPV6_ADDRESS_TYPE 1
+#define WIFI_PASSWORD_LEN 128
 
 const std::string KEY_MGMT_NONE = "NONE";
 const std::string KEY_MGMT_WEP = "WEP";
@@ -302,7 +303,7 @@ public:
     std::string privateKey; /* EAP mode client private key */
     Phase2Method phase2Method;
     std::vector<uint8_t> certEntry;
-    std::string certPassword;
+    char certPassword[];
 
     WifiEapConfig()
     {

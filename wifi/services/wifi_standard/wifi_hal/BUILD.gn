@@ -121,7 +121,7 @@ if (defined(ohos_lite)) {
 
     if (wifi_feature_is_hdi_supported) {
       defines += [ "HDI_INTERFACE_SUPPORT" ]
-      external_deps += [ "drivers_interface_wlan:libwlan_proxy_1.0" ]
+      external_deps += [ "drivers_interface_wlan:libwlan_proxy_1.1" ]
     }
 
     if (wifi_feature_non_seperate_p2p) {

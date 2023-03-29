@@ -65,6 +65,7 @@ if (defined(ohos_lite)) {
       "$WIFI_ROOT_DIR/utils/inc",
       "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits",
       "//foundation/communication/ipc/interfaces/innerkits/c/ipc/include",
+      "//foundation/communication/netmanager_base/services/netmanagernative/include/netsys",
       "//foundation/systemabilitymgr/samgr_lite/interfaces/innerkits/registry",
       "//foundation/systemabilitymgr/samgr_lite/interfaces/innerkits/samgr",
       "//third_party/bounds_checking_function/include",

@@ -81,6 +81,16 @@ int DhcpService::GetDhcpResult(const std::string& ifname, IDhcpResultNotify *pRe
     return m_pClientService->GetDhcpResult(ifname, pResultNotify, timeouts);
 }
 
+int DhcpService::RemoveDhcpResult(IDhcpResultNotify *pResultNotify)
+{
+    if (m_pClientService == nullptr) {
+        WIFI_LOGE("DhcpService::RemoveDhcpResult() error, m_pClientService = nullptr!");
+        return DHCP_OPT_FAILED;
+    }
+
+    return m_pClientService->RemoveDhcpResult(pResultNotify);
+}
+
 int DhcpService::GetDhcpInfo(const std::string& ifname, DhcpServiceInfo& dhcp)
 {
     if (m_pClientService == nullptr) {

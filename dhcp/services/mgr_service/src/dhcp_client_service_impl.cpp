@@ -872,6 +872,34 @@ int DhcpClientServiceImpl::GetDhcpResult(const std::string &ifname, IDhcpResultN
     return DHCP_OPT_SUCCESS;
 }
 
+int DhcpClientServiceImpl::RemoveDhcpResult(IDhcpResultNotify *pResultNotify)
+{
+    if (pResultNotify == nullptr) {
+        WIFI_LOGE("RemoveDhcpResult error, pResultNotify is nullptr!");
+        return DHCP_OPT_FAILED;
+    }
+
+    std::unique_lock<std::mutex> lock(mResultNotifyMutex);
+    for (auto &itemNotify : m_mapDhcpResultNotify) {
+        auto iterReq = itemNotify.second.begin();
+        while (iterReq != itemNotify.second.end()) {
+            if ((*iterReq == nullptr) || ((*iterReq)->pResultNotify == nullptr)) {
+                WIFI_LOGE("DhcpClientServiceImpl::RemoveDhcpResult error, *iterReq or pResultNotify is nullptr!");
+                continue;
+            }
+            if ((*iterReq)->pResultNotify == pResultNotify) {
+                delete *iterReq;
+                *iterReq = nullptr;
+                iterReq = itemNotify.second.erase(iterReq);
+            } else {
+                ++iterReq;
+            }
+        }
+    }
+    WIFI_LOGI("RemoveDhcpResul success!");
+    return DHCP_OPT_SUCCESS;
+}
+
 int DhcpClientServiceImpl::GetDhcpInfo(const std::string &ifname, DhcpServiceInfo &dhcp)
 {
     if (ifname.empty()) {

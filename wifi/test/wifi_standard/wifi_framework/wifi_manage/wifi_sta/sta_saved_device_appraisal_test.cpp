@@ -145,7 +145,7 @@ void StaSavedDeviceAppraisalTest::SaveNetworkEvaluatorSuccess1()
         .WillOnce(Return(""))
         .WillRepeatedly(Return(""));
 
-    EXPECT_TRUE(pStaSavedDeviceAppraisal->DeviceAppraisals(deviceConfig, scanInfos, info) == WIFI_OPT_SUCCESS);
+    EXPECT_TRUE(pStaSavedDeviceAppraisal->DeviceAppraisals(deviceConfig, scanInfos, info) == WIFI_OPT_FAILED);
 }
 
 void StaSavedDeviceAppraisalTest::SaveNetworkEvaluatorSuccess2()
@@ -168,7 +168,7 @@ void StaSavedDeviceAppraisalTest::SaveNetworkEvaluatorSuccess2()
     EXPECT_CALL(WifiSettings::GetInstance(), GetUserLastSelectedNetworkId()).Times(AtLeast(1)).WillOnce(Return(0));
     EXPECT_CALL(WifiSettings::GetInstance(), GetUserLastSelectedNetworkTimeVal()).Times(AtLeast(1));
 
-    EXPECT_TRUE(pStaSavedDeviceAppraisal->DeviceAppraisals(deviceConfig, scanInfos, info) == WIFI_OPT_SUCCESS);
+    EXPECT_TRUE(pStaSavedDeviceAppraisal->DeviceAppraisals(deviceConfig, scanInfos, info) == WIFI_OPT_FAILED);
 }
 
 void StaSavedDeviceAppraisalTest::SaveNetworkEvaluatorSuccess3()

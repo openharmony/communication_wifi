@@ -83,6 +83,7 @@ if (defined(ohos_lite)) {
     ]
 
     cflags_cc = [ "-fno-rtti" ]
+    cflags = [ "-Wno-deprecated-non-prototype" ]
     defines = [
       "_GNU_SOURCE",
       "OHOS_ARCH_LITE",

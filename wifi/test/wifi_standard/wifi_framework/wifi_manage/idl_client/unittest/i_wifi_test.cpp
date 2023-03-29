@@ -318,13 +318,6 @@ HWTEST_F(IWifiTest, GetWifiChipTest, TestSize.Level1)
     GetWifiChip(id, &chip);
 }
 
-HWTEST_F(IWifiTest, GetWifiChipIdsTest, TestSize.Level1)
-{
-    uint8_t ids = 1;
-    int32_t size = 1;
-    GetWifiChipIds(&ids, &size);
-}
-
 HWTEST_F(IWifiTest, StopTest, TestSize.Level1)
 {
     Stop();

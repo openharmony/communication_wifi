@@ -170,7 +170,7 @@ public:
     {
         EXPECT_CALL(WifiStaHalInterface::GetInstance(), Scan(_)).WillRepeatedly(Return(WIFI_IDL_OPT_OK));
         InternalMessage msg;
-        msg.SetMessageName(CMD_START_COMMON_SCAN);
+        msg.SetMessageName(CMD_SCAN_PREPARE);
         pScanStateMachine->hardwareReadyState->ExecuteStateMsg(&msg);
     }
 

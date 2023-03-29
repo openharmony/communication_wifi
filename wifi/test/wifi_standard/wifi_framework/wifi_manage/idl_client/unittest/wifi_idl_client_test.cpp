@@ -607,7 +607,7 @@ HWTEST_F(WifiIdlClientTest, SetWpsBssidTest1, TestSize.Level1)
     int networkId = 1;
     std::string bssid = "";
     ASSERT_TRUE(mClient.InitClient() == 0);
-    EXPECT_TRUE(mClient.SetBssid(networkId, bssid) == WIFI_IDL_OPT_OK);
+    EXPECT_TRUE(mClient.SetBssid(networkId, bssid) == WIFI_IDL_OPT_FAILED);
 }
 
 HWTEST_F(WifiIdlClientTest, SetWpsBssidTest2, TestSize.Level1)

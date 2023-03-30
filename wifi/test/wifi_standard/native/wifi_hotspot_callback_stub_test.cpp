@@ -109,6 +109,7 @@ HWTEST_F(WifiHotspotCallbackStubTest, RegisterCallBack_002, TestSize.Level1)
 */
 HWTEST_F(WifiHotspotCallbackStubTest, OnRemoteRequest_001, TestSize.Level1)
 {
+    WIFI_LOGI("OnRemoteRequest_001 enter");
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
@@ -125,6 +126,7 @@ HWTEST_F(WifiHotspotCallbackStubTest, OnRemoteRequest_001, TestSize.Level1)
 */
 HWTEST_F(WifiHotspotCallbackStubTest, OnRemoteRequest_002, TestSize.Level1)
 {
+    WIFI_LOGI("OnRemoteRequest_002 enter");
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
@@ -139,6 +141,7 @@ HWTEST_F(WifiHotspotCallbackStubTest, OnRemoteRequest_002, TestSize.Level1)
 */
 HWTEST_F(WifiHotspotCallbackStubTest, OnRemoteRequest_003, TestSize.Level1)
 {
+    WIFI_LOGI("OnRemoteRequest_003 enter");
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
@@ -147,7 +150,7 @@ HWTEST_F(WifiHotspotCallbackStubTest, OnRemoteRequest_003, TestSize.Level1)
         return;
     }
     data.WriteInt32(1);
-    EXPECT_TRUE(pWifiHotspot->OnRemoteRequest(code, data, reply, option) == WIFI_OPT_FAILED);
+    EXPECT_TRUE(pWifiHotspot->OnRemoteRequest(code, data, reply, option) == -1);
 }
 /**
  * @tc.name: OnRemoteRequest_004
@@ -157,6 +160,7 @@ HWTEST_F(WifiHotspotCallbackStubTest, OnRemoteRequest_003, TestSize.Level1)
 */
 HWTEST_F(WifiHotspotCallbackStubTest, OnRemoteRequest_004, TestSize.Level1)
 {
+    WIFI_LOGI("OnRemoteRequest_004 enter");
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
@@ -175,6 +179,7 @@ HWTEST_F(WifiHotspotCallbackStubTest, OnRemoteRequest_004, TestSize.Level1)
 */
 HWTEST_F(WifiHotspotCallbackStubTest, OnHotspotStateChanged_001, TestSize.Level1)
 {
+    WIFI_LOGI("OnHotspotStateChanged_001 enter");
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
@@ -184,6 +189,9 @@ HWTEST_F(WifiHotspotCallbackStubTest, OnHotspotStateChanged_001, TestSize.Level1
     }
     pWifiHotspot->OnRemoteRequest(code, data, reply, option);
     sptr<IWifiHotspotCallback> userCallback =  new (std::nothrow) IWifiHotspotCallbackMock();
+    if (!data.WriteInterfaceToken(IWifiHotspotCallback::GetDescriptor())) {
+        return;
+    }
     pWifiHotspot->OnRemoteRequest(code, data, reply, option);
     delete userCallback;
 }
@@ -195,6 +203,7 @@ HWTEST_F(WifiHotspotCallbackStubTest, OnHotspotStateChanged_001, TestSize.Level1
 */
 HWTEST_F(WifiHotspotCallbackStubTest, OnHotspotStaJoin_001, TestSize.Level1)
 {
+    WIFI_LOGI("OnHotspotStaJoin_001 enter");
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
@@ -204,6 +213,9 @@ HWTEST_F(WifiHotspotCallbackStubTest, OnHotspotStaJoin_001, TestSize.Level1)
     }
     pWifiHotspot->OnRemoteRequest(code, data, reply, option);
     sptr<IWifiHotspotCallback> userCallback =  new (std::nothrow) IWifiHotspotCallbackMock();
+    if (!data.WriteInterfaceToken(IWifiHotspotCallback::GetDescriptor())) {
+        return;
+    }
     pWifiHotspot->OnRemoteRequest(code, data, reply, option);
     delete userCallback;
 }
@@ -215,6 +227,7 @@ HWTEST_F(WifiHotspotCallbackStubTest, OnHotspotStaJoin_001, TestSize.Level1)
 */
 HWTEST_F(WifiHotspotCallbackStubTest, OnHotspotStaLeave_001, TestSize.Level1)
 {
+    WIFI_LOGI("OnHotspotStaLeave_001 enter");
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
@@ -224,6 +237,9 @@ HWTEST_F(WifiHotspotCallbackStubTest, OnHotspotStaLeave_001, TestSize.Level1)
     }
     pWifiHotspot->OnRemoteRequest(code, data, reply, option);
     sptr<IWifiHotspotCallback> userCallback =  new (std::nothrow) IWifiHotspotCallbackMock();
+    if (!data.WriteInterfaceToken(IWifiHotspotCallback::GetDescriptor())) {
+        return;
+    }
     pWifiHotspot->OnRemoteRequest(code, data, reply, option);
     delete userCallback;
 }

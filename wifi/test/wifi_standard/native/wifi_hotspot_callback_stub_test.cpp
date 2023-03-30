@@ -20,14 +20,14 @@
 #include <cstdint>
 #include "securec.h"
 #include "wifi_logger.h"
+#include "wifi_errcode.h"
 
 using ::testing::Return;
 using ::testing::ext::TestSize;
-DEFINE_WIFILOG_LABEL("WifiHotspotCallbackStub");
+DEFINE_WIFILOG_LABEL("WifiHotspotCallbackStubTest");
 
 namespace OHOS {
 namespace Wifi {
-constexpr int NUMBER = 2;
 class WifiHotspotCallbackStubTest : public testing::Test {
 public:
     static void SetUpTestCase() {}
@@ -115,7 +115,7 @@ HWTEST_F(WifiHotspotCallbackStubTest, OnRemoteRequest_001, TestSize.Level1)
     uint32_t code = 0;
     pWifiHotspot->SetRemoteDied(true);
     EXPECT_TRUE(pWifiHotspot->IsRemoteDied());
-    EXPECT_TRUE(pWifiHotspot->OnRemoteRequest(code, data, reply, option) == -1)
+    EXPECT_TRUE(pWifiHotspot->OnRemoteRequest(code, data, reply, option) == -1);
 }
 /**
  * @tc.name: OnRemoteRequest_002
@@ -129,7 +129,7 @@ HWTEST_F(WifiHotspotCallbackStubTest, OnRemoteRequest_002, TestSize.Level1)
     MessageParcel reply;
     MessageOption option;
     uint32_t code = 0;
-    EXPECT_TRUE(pWifiHotspot->OnRemoteRequest(code, data, reply, option) == WIFI_OPT_FAILED)
+    EXPECT_TRUE(pWifiHotspot->OnRemoteRequest(code, data, reply, option) == WIFI_OPT_FAILED);
 }
 /**
  * @tc.name: OnRemoteRequest_003
@@ -147,7 +147,7 @@ HWTEST_F(WifiHotspotCallbackStubTest, OnRemoteRequest_003, TestSize.Level1)
         return;
     }
     data.WriteInt32(1);
-    EXPECT_TRUE(pWifiHotspot->OnRemoteRequest(code, data, reply, option) == WIFI_OPT_FAILED)
+    EXPECT_TRUE(pWifiHotspot->OnRemoteRequest(code, data, reply, option) == WIFI_OPT_FAILED);
 }
 /**
  * @tc.name: OnRemoteRequest_004

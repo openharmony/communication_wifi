@@ -77,61 +77,157 @@ public:
         return nullptr;
     }
 };
-
-HWTEST_F(WifiHotspotCallbackStubTest, RegisterCallBackTest, TestSize.Level1)
+/**
+ * @tc.name: RegisterCallBack_001
+ * @tc.desc: RegisterCallBack with nullptr
+ * @tc.type: FUNC
+ * @tc.require: issue
+*/
+HWTEST_F(WifiHotspotCallbackStubTest, RegisterCallBack_001, TestSize.Level1)
 {
+    WIFI_LOGI("RegisterCallBack_001 enter");
+    pWifiHotspot->RegisterCallBack(nullptr);
+}
+/**
+ * @tc.name: RegisterCallBack_002
+ * @tc.desc: RegisterCallBack with userCallback
+ * @tc.type: FUNC
+ * @tc.require: issue
+*/
+HWTEST_F(WifiHotspotCallbackStubTest, RegisterCallBack_002, TestSize.Level1)
+{
+    WIFI_LOGI("RegisterCallBack_002 enter");
     sptr<IWifiHotspotCallback> userCallback =  new (std::nothrow) IWifiHotspotCallbackMock();
     pWifiHotspot->RegisterCallBack(userCallback);
-    pWifiHotspot->RegisterCallBack(userCallback);
+    delete userCallback;
 }
-
-HWTEST_F(WifiHotspotCallbackStubTest, OnHotspotStateChangedTest, TestSize.Level1)
+/**
+ * @tc.name: OnRemoteRequest_001
+ * @tc.desc: OnRemoteRequest with RemoteDied is true
+ * @tc.type: FUNC
+ * @tc.require: issue
+*/
+HWTEST_F(WifiHotspotCallbackStubTest, OnRemoteRequest_001, TestSize.Level1)
 {
-    int state = NUMBER;
-    pWifiHotspot->OnHotspotStateChanged(state);
-}
-
-HWTEST_F(WifiHotspotCallbackStubTest, OnRemoteRequestTest, TestSize.Level1)
-{
-    uint32_t code = NUMBER;
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
-    if (!data.WriteInterfaceToken(IWifiHotspotCallback::GetDescriptor())) {
-        return;
-    }
-    pWifiHotspot->OnRemoteRequest(code, data, reply, option);
+    uint32_t code = 0;
+    pWifiHotspot->SetRemoteDied(true);
+    EXPECT_TRUE(pWifiHotspot->IsRemoteDied());
+    EXPECT_TRUE(pWifiHotspot->OnRemoteRequest(code, data, reply, option) == -1)
 }
-
-HWTEST_F(WifiHotspotCallbackStubTest, OnRemoteRequestTest1, TestSize.Level1)
+/**
+ * @tc.name: OnRemoteRequest_002
+ * @tc.desc: OnRemoteRequest without GetDescriptor
+ * @tc.type: FUNC
+ * @tc.require: issue
+*/
+HWTEST_F(WifiHotspotCallbackStubTest, OnRemoteRequest_002, TestSize.Level1)
 {
-    WIFI_LOGI("OnRemoteRequestTest1 ENTER");
-    uint32_t code = WIFI_CBK_CMD_SCAN_STATE_CHANGE;
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
+    uint32_t code = 0;
+    EXPECT_TRUE(pWifiHotspot->OnRemoteRequest(code, data, reply, option) == WIFI_OPT_FAILED)
+}
+/**
+ * @tc.name: OnRemoteRequest_003
+ * @tc.desc: OnRemoteRequest with exception is 1
+ * @tc.type: FUNC
+ * @tc.require: issue
+*/
+HWTEST_F(WifiHotspotCallbackStubTest, OnRemoteRequest_003, TestSize.Level1)
+{
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    uint32_t code = 0;
+    if (!data.WriteInterfaceToken(IWifiHotspotCallback::GetDescriptor())) {
+        return;
+    }
+    data.WriteInt32(1);
+    EXPECT_TRUE(pWifiHotspot->OnRemoteRequest(code, data, reply, option) == WIFI_OPT_FAILED)
+}
+/**
+ * @tc.name: OnRemoteRequest_004
+ * @tc.desc: OnRemoteRequest for default case
+ * @tc.type: FUNC
+ * @tc.require: issue
+*/
+HWTEST_F(WifiHotspotCallbackStubTest, OnRemoteRequest_004, TestSize.Level1)
+{
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    uint32_t code = 1;
+    if (!data.WriteInterfaceToken(IWifiHotspotCallback::GetDescriptor())) {
+        return;
+    }
+    data.WriteInt32(0);
+    pWifiHotspot->OnRemoteRequest(code, data, reply, option);
+}
+/**
+ * @tc.name: OnHotspotStateChanged_001
+ * @tc.desc: OnHotspotStateChanged
+ * @tc.type: FUNC
+ * @tc.require: issue
+*/
+HWTEST_F(WifiHotspotCallbackStubTest, OnHotspotStateChanged_001, TestSize.Level1)
+{
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    uint32_t code = WIFI_CBK_CMD_HOTSPOT_STATE_CHANGE;
     if (!data.WriteInterfaceToken(IWifiHotspotCallback::GetDescriptor())) {
         return;
     }
     pWifiHotspot->OnRemoteRequest(code, data, reply, option);
     sptr<IWifiHotspotCallback> userCallback =  new (std::nothrow) IWifiHotspotCallbackMock();
-    pWifiHotspot->RegisterCallBack(userCallback);
+    pWifiHotspot->OnRemoteRequest(code, data, reply, option);
+    delete userCallback;
+}
+/**
+ * @tc.name: OnHotspotStaJoin_001
+ * @tc.desc: OnHotspotStaJoin
+ * @tc.type: FUNC
+ * @tc.require: issue
+*/
+HWTEST_F(WifiHotspotCallbackStubTest, OnHotspotStaJoin_001, TestSize.Level1)
+{
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    uint32_t code = WIFI_CBK_CMD_HOTSPOT_STATE_JOIN;
     if (!data.WriteInterfaceToken(IWifiHotspotCallback::GetDescriptor())) {
         return;
     }
     pWifiHotspot->OnRemoteRequest(code, data, reply, option);
+    sptr<IWifiHotspotCallback> userCallback =  new (std::nothrow) IWifiHotspotCallbackMock();
+    pWifiHotspot->OnRemoteRequest(code, data, reply, option);
+    delete userCallback;
+}
+/**
+ * @tc.name: OnHotspotStaLeave_001
+ * @tc.desc: OnHotspotStaLeave
+ * @tc.type: FUNC
+ * @tc.require: issue
+*/
+HWTEST_F(WifiHotspotCallbackStubTest, OnHotspotStaLeave_001, TestSize.Level1)
+{
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    uint32_t code = WIFI_CBK_CMD_HOTSPOT_STATE_LEAVE;
+    if (!data.WriteInterfaceToken(IWifiHotspotCallback::GetDescriptor())) {
+        return;
+    }
+    pWifiHotspot->OnRemoteRequest(code, data, reply, option);
+    sptr<IWifiHotspotCallback> userCallback =  new (std::nothrow) IWifiHotspotCallbackMock();
+    pWifiHotspot->OnRemoteRequest(code, data, reply, option);
+    delete userCallback;
 }
 
-HWTEST_F(WifiHotspotCallbackStubTest, SetRemoteDiedTest, TestSize.Level1)
-{
-    bool val = true;
-    pWifiHotspot->SetRemoteDied(val);
-}
-
-HWTEST_F(WifiHotspotCallbackStubTest, IsRemoteDiedTest, TestSize.Level1)
-{
-    pWifiHotspot->IsRemoteDied();
-}
 }  // namespace Wifi
 }  // namespace OHOS
 

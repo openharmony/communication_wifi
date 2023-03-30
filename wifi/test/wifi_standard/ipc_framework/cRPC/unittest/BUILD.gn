@@ -35,6 +35,7 @@ ohos_unittest("crpc_unittest") {
     "net_test.cpp",
     "rpc_test_main.cpp",
     "serial_test.cpp",
+    "server_test.cpp",
   ]
 
   include_dirs = [

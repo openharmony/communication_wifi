@@ -101,6 +101,7 @@ StaStateMachine::~StaStateMachine()
         } else {
             pDhcpService->StopDhcpClient(IF_NAME, true);
         }
+        pDhcpService->RemoveDhcpResult(pDhcpResultNotify);
     }
     ParsePointer(pDhcpResultNotify);
     ParsePointer(pDhcpService);
@@ -419,10 +420,7 @@ void StaStateMachine::StartWifiProcess()
         }
 #ifndef OHOS_ARCH_LITE
         WIFI_LOGI("Register netsupplier");
-        std::thread([cb = staCallback]() {
-            WifiNetAgent::GetInstance().RegisterNetSupplier();
-            WifiNetAgent::GetInstance().RegisterNetSupplierCallback(cb);
-        }).detach();
+        WifiNetAgent::GetInstance().OnStaMachineWifiStart(staCallback);
 #endif
         /* Initialize Connection Information. */
         InitWifiLinkedInfo();
@@ -853,10 +851,8 @@ void StaStateMachine::DealConnectionEvent(InternalMessage *msg)
     if (NetSupplierInfo != nullptr) {
         NetSupplierInfo->isAvailable_ = true;
         NetSupplierInfo->isRoaming_ = isRoam;
-        std::thread([netInfo = NetSupplierInfo]() {
-            WIFI_LOGI("On connect update net supplier info\n");
-            WifiNetAgent::GetInstance().UpdateNetSupplierInfo(netInfo);
-        }).detach();
+        WIFI_LOGI("On connect update net supplier info\n");
+        WifiNetAgent::GetInstance().OnStaMachineUpdateNetSupplierInfo(NetSupplierInfo);
     }
 #endif
     /* Callback result to InterfaceService. */
@@ -880,10 +876,8 @@ void StaStateMachine::DealDisconnectEvent(InternalMessage *msg)
 #ifndef OHOS_ARCH_LITE
     if (NetSupplierInfo != nullptr) {
         NetSupplierInfo->isAvailable_ = false;
-        std::thread([netInfo = NetSupplierInfo]() {
-            WIFI_LOGI("On disconnect update net supplier info\n");
-            WifiNetAgent::GetInstance().UpdateNetSupplierInfo(netInfo);
-        }).detach();
+        WIFI_LOGI("On disconnect update net supplier info\n");
+        WifiNetAgent::GetInstance().OnStaMachineUpdateNetSupplierInfo(NetSupplierInfo);
     }
 #endif
     StopTimer(static_cast<int>(CMD_SIGNAL_POLL));
@@ -1524,10 +1518,8 @@ void StaStateMachine::DisConnectProcess()
 #ifndef OHOS_ARCH_LITE
         if (NetSupplierInfo != nullptr) {
             NetSupplierInfo->isAvailable_ = false;
-            std::thread([netInfo = NetSupplierInfo]() {
-                WIFI_LOGI("Disconnect process update netsupplierinfo");
-                WifiNetAgent::GetInstance().UpdateNetSupplierInfo(netInfo);
-            }).detach();
+            WIFI_LOGI("Disconnect process update netsupplierinfo");
+            WifiNetAgent::GetInstance().OnStaMachineUpdateNetSupplierInfo(NetSupplierInfo);
         }
 #endif
         WIFI_LOGI("Disconnect update wifi status");
@@ -2124,11 +2116,9 @@ void StaStateMachine::DhcpResultNotify::OnSuccess(int status, const std::string 
                 IpAnonymize(result.strYourCli).c_str(), IpAnonymize(result.strSubnet).c_str(),
                 IpAnonymize(result.strRouter1).c_str(), IpAnonymize(result.strDns1).c_str(),
                 IpAnonymize(result.strDns2).c_str());
-            std::thread([result]() {
-                WIFI_LOGI("On dhcp success update net linke info");
-                WifiNetAgent::GetInstance().UpdateNetLinkInfo(result.strYourCli, result.strSubnet, result.strRouter1,
-                    result.strDns1, result.strDns2);
-            }).detach();
+            WIFI_LOGI("On dhcp success update net linke info");
+            WifiNetAgent::GetInstance().OnStaMachineUpdateNetLinkInfo(result.strYourCli, result.strSubnet,
+                result.strRouter1, result.strDns1, result.strDns2);
 #endif
         }
 #ifdef OHOS_ARCH_LITE
@@ -2244,13 +2234,7 @@ void StaStateMachine::OnNetManagerRestart(void)
     if (state != static_cast<int>(WifiState::ENABLED)) {
         return;
     }
-    std::thread thread([cb = staCallback, supplierInfo = NetSupplierInfo, this]() {
-        WifiNetAgent::GetInstance().RegisterNetSupplier();
-        WifiNetAgent::GetInstance().RegisterNetSupplierCallback(cb);
-        ReUpdateNetSupplierInfo(supplierInfo);
-        ReUpdateNetLinkInfo();
-    });
-    thread.detach();
+    WifiNetAgent::GetInstance().OnStaMachineNetManagerRestart(NetSupplierInfo, staCallback);
 }
 
 void StaStateMachine::ReUpdateNetSupplierInfo(sptr<NetManagerStandard::NetSupplierInfo> supplierInfo)

@@ -189,9 +189,11 @@ HWTEST_F(WifiHotspotCallbackStubTest, OnHotspotStateChanged_001, TestSize.Level1
     }
     pWifiHotspot->OnRemoteRequest(code, data, reply, option);
     sptr<IWifiHotspotCallback> userCallback =  new (std::nothrow) IWifiHotspotCallbackMock();
+    pWifiHotspot->RegisterCallBack(userCallback);
     if (!data.WriteInterfaceToken(IWifiHotspotCallback::GetDescriptor())) {
         return;
     }
+
     pWifiHotspot->OnRemoteRequest(code, data, reply, option);
     delete userCallback;
 }
@@ -213,6 +215,7 @@ HWTEST_F(WifiHotspotCallbackStubTest, OnHotspotStaJoin_001, TestSize.Level1)
     }
     pWifiHotspot->OnRemoteRequest(code, data, reply, option);
     sptr<IWifiHotspotCallback> userCallback =  new (std::nothrow) IWifiHotspotCallbackMock();
+    pWifiHotspot->RegisterCallBack(userCallback);
     if (!data.WriteInterfaceToken(IWifiHotspotCallback::GetDescriptor())) {
         return;
     }
@@ -237,6 +240,7 @@ HWTEST_F(WifiHotspotCallbackStubTest, OnHotspotStaLeave_001, TestSize.Level1)
     }
     pWifiHotspot->OnRemoteRequest(code, data, reply, option);
     sptr<IWifiHotspotCallback> userCallback =  new (std::nothrow) IWifiHotspotCallbackMock();
+    pWifiHotspot->RegisterCallBack(userCallback);
     if (!data.WriteInterfaceToken(IWifiHotspotCallback::GetDescriptor())) {
         return;
     }

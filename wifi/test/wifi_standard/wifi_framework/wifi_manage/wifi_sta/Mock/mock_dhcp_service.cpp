@@ -41,6 +41,11 @@ int DhcpService::GetDhcpResult(const std::string &ifname, IDhcpResultNotify *pRe
     return 0;
 }
 
+int DhcpService::RemoveDhcpResult(IDhcpResultNotify *pResultNotify)
+{
+    return 0;
+}
+
 int DhcpService::GetDhcpInfo(const std::string &ifname, DhcpServiceInfo &dhcp)
 {
     WIFI_LOGD("Enter DhcpService::[%{public}s].ifname:%{public}s, dhcp.clientRunStatus:%{public}d", __FUNCTION__,

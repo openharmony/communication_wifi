@@ -69,6 +69,14 @@ public:
     virtual int GetDhcpResult(const std::string& ifname, IDhcpResultNotify *pResultNotify, int timeouts) = 0;
 
     /**
+     * @Description : remove the dhcp result of specified interface asynchronously.
+     *
+     * @param dhcp - dhcp result notify [in]
+     * @Return : success - DHCP_OPT_SUCCESS, failed - others.
+     */
+    virtual int RemoveDhcpResult(IDhcpResultNotify *pResultNotify) = 0;
+
+    /**
      * @Description : Obtain the dhcp info of specified interface synchronously.
      *
      * @param ifname - interface name, eg:wlan0 [in]

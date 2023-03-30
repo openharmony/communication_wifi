@@ -70,6 +70,14 @@ public:
     int GetDhcpResult(const std::string& ifname, IDhcpResultNotify *pResultNotify, int timeouts) override;
 
     /**
+     * @Description : remove the dhcp result of specified interface asynchronously.
+     *
+     * @param dhcp - dhcp result notify [in]
+     * @Return : success - DHCP_OPT_SUCCESS, failed - others.
+     */
+    int RemoveDhcpResult(IDhcpResultNotify *pResultNotify) override;
+
+    /**
      * @Description : Obtain the dhcp info of specified interface synchronously.
      *
      * @param ifname - interface name, eg:wlan0 [in]

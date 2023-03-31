@@ -1,17 +1,3 @@
-/**
- * Copyright (c) 2022 Shenzhen Kaihong Digital Industry Development Co., Ltd.
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 {
   "app": {
     "signingConfigs": [
@@ -19,9 +5,9 @@
         "name": "default",
         "material": {
           "certpath": "C:\\Users\\Administrator\\.ohos\\config\\openharmony\\auto_ohos_default_kaihong.sample.wifitest.cer",
-          "storePassword": "0000001BA66996CA247B1CAEA557855EFE15D58F39B4268029755322629ED91C7B7F7FAEB46D7901F0ED86",
+          "storePassword": "00000019C7E853853FDCA6408EDC31D6CDA28EBB14C1EBCED00D74560A767BD590492EF139226372F2",
           "keyAlias": "debugKey",
-          "keyPassword": "0000001B775524947AC8EBA270B0ED8DE4D7465B24C55104D73486D2D5BBF74DFAD9C0F3A8A54A7F81751B",
+          "keyPassword": "00000019BE1EAACBC642587D5EFB32AEA28D2D86F8F8C7ED0A1E09F92F19D52635478DCB9CA3CB4A46",
           "profile": "C:\\Users\\Administrator\\.ohos\\config\\openharmony\\auto_ohos_default_kaihong.sample.wifitest.p7b",
           "signAlg": "SHA256withECDSA",
           "storeFile": "C:\\Users\\Administrator\\.ohos\\config\\openharmony\\auto_ohos_default_kaihong.sample.wifitest.p12"

@@ -31,7 +31,7 @@ export class WifiModel {
         return
       }
       Logger.log(TAG, `scan info call back: ${result.length}`)
-      for (var i = 0; i < result.length; ++i) {
+      for (let i = 0; i < result.length; ++i) {
         wifiList.push({
           ssid: result[i].ssid,
           bssid: result[i].bssid,

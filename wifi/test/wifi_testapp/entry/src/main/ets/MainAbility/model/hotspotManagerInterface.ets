@@ -24,10 +24,10 @@ import Router from '@system.router';
 import wifiManager from '@ohos.wifiManager';
 
 
-let hotspotEnable =false
+let hotspotManagerEnable =false
 export function testEnableHotspotManager(): string {
   let message = " enableHotspot test"
-  if(hotspotEnable) {
+  if(hotspotManagerEnable) {
     message ="热点已经使能"
   }else{
     let ret =wifiManager.enableHotspot()
@@ -37,8 +37,8 @@ export function testEnableHotspotManager(): string {
       message ="热点使能执行结果：" + ret+"\n"
       message += "热点已打开或打开失败,请确认"
     }
-    hotspotEnable = true
-    AppStorage.SetOrCreate('hotspotIsOn', hotspotEnable);
+    hotspotManagerEnable = true
+    AppStorage.SetOrCreate('hotspotIsOn', hotspotManagerEnable);
   }
   prompt.showToast({ message: message })
   return message
@@ -46,7 +46,7 @@ export function testEnableHotspotManager(): string {
 
 export function testDisableHotspotManager():string {
   let message = "disableWifi test"
-  if (!hotspotEnable) {
+  if (!hotspotManagerEnable) {
     message = '热点还未使能';
   }else {
     let ret = wifiManager.disableHotspot();
@@ -56,8 +56,8 @@ export function testDisableHotspotManager():string {
       message = "热点去使能执行结果：" + ret + "\n"
       message += "热点已关闭或关闭失败,请确认"
     }
-    hotspotEnable = false;
-    AppStorage.SetOrCreate('hotspotIsOn', hotspotEnable);
+    hotspotManagerEnable = false;
+    AppStorage.SetOrCreate('hotspotIsOn', hotspotManagerEnable);
   }
   prompt.showToast({ message: message })
   return message
@@ -74,6 +74,11 @@ export function testIsHotspotDualBandSupportedManager(): string {
 export function testIsHostActiveManager():string {
   let message = "isHostActive test"
   let ret = wifiManager.isHotspotActive()
+  if(ret){
+    hotspotManagerEnable =true
+  }else{
+    hotspotManagerEnable =false
+  }
   message = "HostActive is " + ret
   prompt.showToast({ message : message })
   return message
@@ -81,25 +86,27 @@ export function testIsHostActiveManager():string {
 
 export function testSetHotspotConfigManager(): string{
   let message = "SetHotspotConfig test"
-  let ssid1 ="testApp"
-  let securityType1 = 3
-  let band1 = 2;
-  let preSharedKey1 ="12345678"
-  let maxConn1 =3
+  let ssid ="testApp"
+  let securityType = 3
+  let band = 1;
+  let preSharedKey ="12345678"
+  let maxConn =3
+  let channel =6
   //  let ssid1 =AppStorage.Get("ssid1")
   //  let securityType1=AppStorage.Get("securityTpye1")
   //  let band1 = AppStorage.Get("band1")
   //  let preSharedKey1 = AppStorage.Get("preSharedKey1")
   //  let maxConn1 = AppStorage.Get("maxConn1")
-  let hotspotConfig ={
-    ssid:ssid1,
-    securityType :securityType1,
-    band :band1,
-    preSharedKey:preSharedKey1,
-    maxConn:maxConn1
+  let config ={
+    ssid:ssid,
+    securityType: securityType,
+    band: band,
+    preSharedKey: preSharedKey,
+    maxConn: maxConn,
+    channel:channel
   }
-  let ret = wifiManager.setHotspotConfig(hotspotConfig)
-  message = "SetHotspotConfig is" + ret
+  let ret = wifiManager.setHotspotConfig(config)
+  message = "SetHotspotConfig is " + ret
   prompt.showToast({ message : message })
   return message
 }
@@ -109,6 +116,8 @@ export function testGetHotspotConfigManager() :string{
   let ret = wifiManager.getHotspotConfig()
   message = "HotspotConfig is " +JSON.stringify(ret)
   console.info("HotspotConfig is" + JSON.stringify(ret))
+  let getHotspotConfigManagerMessage = JSON.stringify(ret)
+  AppStorage.SetOrCreate("getHotspotConfigManagerMessage",getHotspotConfigManagerMessage)
   prompt.showToast({message : message})
   return message
 }
@@ -118,6 +127,8 @@ export function testGetHotspotStationsManager(): string{
   let ret =wifiManager.getHotspotStations()
   message = "GetStations is" + JSON.stringify(ret)
   console.info("GetStations is" + JSON.stringify(ret))
+  let getStationsManagerMessage = JSON.stringify(ret)
+  AppStorage.SetOrCreate("getStationsManagerMessage",getStationsManagerMessage)
   prompt.showToast({message : message})
   return message
 }
@@ -133,25 +144,26 @@ export function testOnHotspotStateChangeManager():string{
     message = "关闭注册热点状态改变事件"
   }else{
     wifiManager.on("hotspotStateChange",(number)=>{
-      let hotspotStateMessage =""
+      let hotspotStateManagerMessage =""
       switch(number){
         case 0:
-          hotspotStateMessage = "inactive";
+          hotspotStateManagerMessage = "inactive";
           break;
         case 1:
-          hotspotStateMessage = "active";
+          hotspotStateManagerMessage = "active";
           break;
         case 2:
-          hotspotStateMessage = "activating";
+          hotspotStateManagerMessage = "activating";
           break;
         case 3:
-          hotspotStateMessage = "de-activating";
+          hotspotStateManagerMessage = "de-activating";
           break;
         default:
-          hotspotStateMessage = '未知状态';
+          hotspotStateManagerMessage = '未知状态';
           break;
       }
-      prompt.showToast({ message: "状态为:" + hotspotStateMessage })
+      prompt.showToast({ message: "状态为:" + hotspotStateManagerMessage })
+      AppStorage.SetOrCreate("hotspotStateManagerMessage",hotspotStateManagerMessage)
     })
     message = "打开注册热点状态变化"
     prompt.showToast({ message: message })
@@ -171,9 +183,10 @@ export function testOnHotspotStaJoinManager(){
     message = "关闭注册Wi-Fi 热点 sta加入变化事件"
   }else{
     wifiManager.on("hotspotStaJoin",(data)=>{
-      let hotspotStaJoinMessage = "name:"+ data.name+";macAddress:"+data.macAddress +";ipAddress:"+data.ipAddress
-      message = JSON.stringify(data)
-      prompt.showToast({ message: hotspotStaJoinMessage })
+      let hotspotStaJoinManagerMessage = "name:"+ data.name+";macAddress:"+data.macAddress +";ipAddress:"+data.ipAddress
+      message ="状态为: "+JSON.stringify(data)
+      AppStorage.SetOrCreate("hotspotStaJoinManagerMessage",message)
+      prompt.showToast({ message: hotspotStaJoinManagerMessage })
     })
     message = "打开注册Wi-Fi 热点 sta加入变化"
     prompt.showToast({ message: message })
@@ -193,9 +206,10 @@ export function testOnHotspotStaLeaveManager(){
     message = "关闭注册Wi-Fi 热点 sta离开变化事件"
   }else{
     wifiManager.on("hotspotStaLeave",(data)=>{
-      let hotspotStaLeaveMessage = "name:"+ data.name+";macAddress:"+data.macAddress +";ipAddress:"+data.ipAddress
-      message = JSON.stringify(data)
-      prompt.showToast({ message: hotspotStaLeaveMessage })
+      let hotspotStaLeaveManagerMessage = "name:"+ data.name+";macAddress:"+data.macAddress +";ipAddress:"+data.ipAddress
+      message ="状态为: "+ JSON.stringify(data)
+      AppStorage.SetOrCreate("hotspotStaLeaveManagerMessage",message)
+      prompt.showToast({ message: hotspotStaLeaveManagerMessage })
     })
     message = "打开注册Wi-Fi 热点 sta离开变化"
     prompt.showToast({ message: message })

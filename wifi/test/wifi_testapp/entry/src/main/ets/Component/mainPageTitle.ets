@@ -36,7 +36,7 @@ export struct MainPageTitle {
   @State myscale: number = 1
   @State angle: number = 0
 
-  getScreen = (isFullScreen: boolean) => {
+    getScreen = (isFullScreen: boolean) => {
     let screenshotOptions: screenshot.ScreenshotOptions = {
       screenRect: { left: 0, top: 0, width: 400, height: 400 },
       imageSize: { width: 400, height: 400 },

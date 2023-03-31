@@ -12,9 +12,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 /*
  homepage of wifi test
  */
+
 import { Category, TestData } from '../MainAbility/model/testData'
 import { initTestData } from '../MainAbility/model/testDataModels'
 import { MainPageTitle } from '../Component/mainPageTitle';

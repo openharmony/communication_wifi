@@ -13,10 +13,6 @@
  * limitations under the License.
  */
 
-/**
- *  PswDialog Of Wifi test
- */
-
 import wifi from '@ohos.wifi'
 
 @CustomDialog

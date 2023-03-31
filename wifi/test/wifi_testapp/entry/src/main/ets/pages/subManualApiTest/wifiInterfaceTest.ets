@@ -21,9 +21,7 @@
 import { PageTitle } from '../../Component/pageTitle';
 import { TestImageDisplay } from '../../Component/testImageDisplay';
 import { ContentTable } from '../../Component/contentTable';
-
 import Router from '@system.router';
-
 import ConfigData from '../../Utils/ConfigData';
 import LogUtil from '../../Utils/LogUtil';
 import { initWiFiApiData } from '../../MainAbility/model/testDataModels'
@@ -47,7 +45,7 @@ struct WifiDeviceSetting {
   @State staticIp_ipAddress: number = 3232235880 ;
   @State staticIp_gateway: number = 3232235777 ;
   @State staticIp_dnsServers: number = 3716386629 ;
-  @State staticIp_domains: Array<string> = "0" ;
+  @State staticIp_domains: Array<string> = ["0","1","2"] ;
 
   aboutToAppear() {
     AppStorage.SetOrCreate('ssid', this.ssid);
@@ -337,7 +335,7 @@ struct WifiDeviceSetting {
 
             Row() {
               Text("staticIp_domains:").fontSize(15).width(125);
-              TextInput({ text: this.descriptorUUID, placeholder: "0" })
+              TextInput({ text: this.descriptorUUID, placeholder: ["0","1","2"] })
                 .fontSize("15vp")
                 .onChange((strInput) => {
                   this.staticIp_domains = strInput;
@@ -374,7 +372,6 @@ struct Index {
   @StorageLink('setScanModeRet') setScanModeRet: boolean = false;
   @State deviceId: string = '';
   @State currentClick: number = -1;
-  @StorageLink('linkedInfoMessage') linkedInfoMessage: string = '';
   @StorageLink('pairedMac') pairedMac: string = "32:32:235:878";
   private ssid = "TP-LINK_6365";
   private bssid = "6C:B1:58:75:63:65";
@@ -390,8 +387,13 @@ struct Index {
   @State staticIp_ipAddress: number = 3232235880 ;
   @State staticIp_gateway: number = 3232235777 ;
   @State staticIp_dnsServers: number = 3716386629 ;
-  @State staticIp_domains: Array<string> = "0" ;
+  @State staticIp_domains: Array<string> =["0","1","2"] ;
+
+  @StorageLink('linkedInfoMessage') linkedInfoMessage: string = '';
   @StorageLink('ipInfoMessage') ipInfoMessage: string = '';
+  @StorageLink('getDeviceConfigsMessage') getDeviceConfigsMessage: string = '';
+  @StorageLink('getScanInfoMessage') getScanInfoMessage: string = '';
+
 
   aboutToAppear() {
     AppStorage.SetOrCreate('ssid', this.ssid);
@@ -458,11 +460,11 @@ struct Index {
         Column() {
           Scroll(){
             Column(){
-              Text("当前配置:")
-                .fontSize("17vp")
-                .margin({ top: "5vp", left: "10vp" })
-                .textAlign(TextAlign.Start)
-                .width("100%")
+//              Text("当前配置:")
+//                .fontSize("17vp")
+//                .margin({ top: "5vp", left: "10vp" })
+//                .textAlign(TextAlign.Start)
+//                .width("100%")
               Text("WLAN连接信息:" + this.linkedInfoMessage)
                 .fontSize("17vp")
                 .margin({ top: "5vp", left: "15vp" })
@@ -473,12 +475,12 @@ struct Index {
                 .margin({ top: "5vp", left: "15vp" })
                 .textAlign(TextAlign.Start)
                 .width("90%")
-              Text("获取网络配置:" + this.Rssi)
+              Text("获取网络配置:" + this.getDeviceConfigsMessage)
                 .fontSize("17vp")
                 .margin({ top: "5vp", left: "15vp"  })
                 .textAlign(TextAlign.Start)
                 .width("90%")
-              Text("扫描结果:" + this.bleConnectionStateInfo)
+              Text("扫描结果:" + this.getScanInfoMessage)
                 .fontSize("17vp")
                 .margin({ top: "5vp", left: "15vp" })
                 .textAlign(TextAlign.Start)
@@ -489,7 +491,7 @@ struct Index {
           .scrollBarWidth(10)
           .scrollBar(BarState.Auto)
         }
-        .height(110)
+        .height(100)
         .width("95%")
         .backgroundColor($r("sys.color.ohos_id_color_foreground_contrary"))
 
@@ -501,4 +503,3 @@ struct Index {
     .height("100%")
   }
 }
-

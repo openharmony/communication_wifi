@@ -25,13 +25,13 @@ import wifiManager from '@ohos.wifiManager';
 
 let wifiManagerEnable = false
 export function testEnableWifiManager(){
-  let message = "enableWiFi test"
+  let message = ($r('app.string.testEnableWifi'))
   if (wifiManagerEnable) {
-    message = 'WiFi已经使能';
+    message = $r('app.string.wifi_enable');
   } else {
     let ret = wifiManager.enableWifi();
     if (ret) {
-      message += "WiFi已打开或打开失败,请确认"
+      message +=  $r('app.string.wifi_enable_confirm')
     }
     wifiManagerEnable = true;
     AppStorage.SetOrCreate('wifiManagerIsOn', wifiManagerEnable);
@@ -91,6 +91,8 @@ export function testGetScanInfoListManager(){
   let message ="getScanInfoList test"
   let ret =wifiManager.getScanInfoList()
   message ="扫描结果为："+JSON.stringify(ret)
+  let getScanInfoManagerMessage = ret
+  AppStorage.SetOrCreate("getScanInfoManagerMessage",getScanInfoManagerMessage)
   prompt.showToast({message:message})
   return message
 }
@@ -423,8 +425,8 @@ export function testGetIpInfoManager(){
   }else {
     let IpInfo = wifiManager.getIpInfo()
     message = "IpInfo: " + JSON.stringify(IpInfo)
-    let ipInfoMessage = message
-    AppStorage.SetOrCreate("ipInfoMessage", ipInfoMessage)
+    let ipInfoManagerMessage = IpInfo
+    AppStorage.SetOrCreate("ipInfoManagerMessage", ipInfoManagerMessage)
   }
   prompt.showToast({ message: message })
   return message
@@ -473,6 +475,8 @@ export function testGetDeviceConfigsManager(){
   }else {
     let array = wifiManager.getDeviceConfigs()
     message = " DeviceConfigs is " + array
+    let getDeviceConfigsManagerMessage = array
+    AppStorage.SetOrCreate("getDeviceConfigsManagerMessage",getDeviceConfigsManagerMessage)
   }
   prompt.showToast({ message: message })
   return message

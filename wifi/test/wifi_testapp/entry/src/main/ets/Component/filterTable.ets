@@ -12,24 +12,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 // @ts-nocheck
 import { TestData, TestApi } from '../MainAbility/model/testData'
-import { initHotspotApIData } from '../MainAbility/model/testDataModels'
+import { initWiFiApiData } from '../MainAbility/model/testDataModels'
 
 /**
-  * FilterTable Of Wifi test
-  */
+ * BleFilterTable Of Bluetooth test
+ */
 
 @Component
 export struct FilterTable {
   private testItem: TestData
-  @State apiItems: TestApi[] = initHotspotApIData()
-
-  @State ssid: string = "dayu200";
-  @State securityType: string = "3";//00:1A:7D:DA:71:15
-  @State band: string = "2";
-  @State preSharedKey: string = "123456";
-  @State maxConn: string = "最大连接设备数量";
+  @State apiItems: TestApi[] = initWiFiApiData()
+  @State changeIndex: number = -1
+  // input ble scan parameters:
+  /*ScanFilter*/
+  @State cbxBleScanFilter: boolean = false;
+  @State ssid: string = "testApp";
+  @State securityType: number = 3;
+  @State band: number = 2;
+  @State preSharedKey: string = "12345678";
+  @State maxConn: number = 32 ;
+  @State channel: number = 6 ;
 
   getCurrentState(index: number) {
     //    console.log("currentState:" + index.toString() + this.apiItems[index].result)
@@ -37,142 +42,154 @@ export struct FilterTable {
   }
 
   aboutToAppear() {
-    AppStorage.SetOrCreate('ssid', this.ssid);
-    AppStorage.SetOrCreate('securityType', this.securityType);
-    AppStorage.SetOrCreate('band', this.band);
-    AppStorage.SetOrCreate('preSharedKey', this.preSharedKey);
-    AppStorage.SetOrCreate('maxConn', this.maxConn);
-
+    //    AppStorage.SetOrCreate('txtScanFilterDeviceId', this.txtScanFilter_deviceId);
+    //    AppStorage.SetOrCreate('txtScanFilterName', this.txtScanFilter_name);
+    //    AppStorage.SetOrCreate('txtScanFilterServiceUuid', this.txtScanFilter_serviceUuid);
+    //    AppStorage.SetOrCreate('txtScanOptions_interval', this.txtScanOptions_interval);
+    //    AppStorage.SetOrCreate('txtScanOptionsDutyMode', '0');
+    //    AppStorage.SetOrCreate('txtScanOptionsMatchMode', '0');
+    //    AppStorage.SetOrCreate('cbxBleScanFilter', this.cbxBleScanFilter);
+    //    AppStorage.SetOrCreate('cbxBleScanOptions', this.cbxBleScanOptions);
   }
+
   build() {
     Scroll() {
       Column() {
-//        Row() {
-//          Text("BLE扫描过滤参数:")
-//            .fontSize("17vp")
-//            .fontColor("#4444444")
-//            .width("80%")
-//            .padding({left: 10})
-//          Checkbox({ name: 'bleScanFilter', group: 'checkboxGroup99' })
-//            .select(this.cbxBleScanFilter)
-//            .selectedColor(0x39a2db)
-//            .onChange((value) => {
-//              if (value) {
-//                this.cbxBleScanFilter = true;
-//              } else {
-//                this.cbxBleScanFilter = false;
-//              }
-//              AppStorage.SetOrCreate('cbxBleScanFilter', value);
-//            })
-//            .width(15)
-//        }
-//        .height(30)
-//        .width("100%")
-//        .borderWidth(1)
-//        .borderColor($r("app.color.lead"))
         Column() {
           Column() {
-            Column() {
-              Row(){
-                Text("ssid").fontSize("17vp").width(60);
-                TextInput({ text: this.ssid, placeholder: "dayu200" })
-                  .fontSize("15vp")
-                  .onChange((strInput) => {
-                    this.ssid = strInput;
-                    AppStorage.SetOrCreate('ssid', strInput);
-                  })
-                  .width("80%")
-                  .borderRadius(1)
-              }
-              .padding(5)
-              .justifyContent(FlexAlign.Start)
-              .alignItems(VerticalAlign.Center)
-
-              Row(){
-                Text("securityType").fontSize(17).width(60);
-                TextInput({ text: this.securityType, placeholder: "3" })
-                  .fontSize("15vp")
-                  .onChange((strInput) => {
-                    this.securityType = strInput;
-                    AppStorage.SetOrCreate('securityType', strInput);
-                  })
-                  .width("80%")
-                  .borderRadius(1)
-              }
-              .padding(5)
-              .justifyContent(FlexAlign.Start)
-              .alignItems(VerticalAlign.Center)
-
-              Row() {
-                Text("band").fontSize(17).width(60);
-                TextInput({ text: this.band, placeholder: "2" })
-                  .fontSize("15vp")
-                  .onChange((strInput) => {
-                    this.band = strInput;
-                    AppStorage.SetOrCreate('band', strInput);
-                  })
-                  .width("80%")
-                  .borderRadius(1)
-              }
-              .padding(5)
-              .justifyContent(FlexAlign.Start)
-              .alignItems(VerticalAlign.Center)
-
-
-              Row() {
-                Text("preSharedKey").fontSize(17).width(80)
-                TextInput({ text: this.preSharedKey, placeholder: "123456" })
-                  .fontSize("17vp")
-                  .onChange((strInput) => {
-                    this.preSharedKey = strInput;
-                    AppStorage.SetOrCreate('preSharedKey', strInput);
-                  })
-                  .width("80%")
-              }
-              .padding(5)
-              .justifyContent(FlexAlign.Start)
-              .alignItems(VerticalAlign.Center)
-
-              Row() {
-                Text("maxConn").fontSize(17).width(80)
-                TextInput({ text: this.maxConn, placeholder: "最大连接设备数量" })
-                  .fontSize("17vp")
-                  .onChange((strInput) => {
-                    this.maxConn = strInput;
-                    AppStorage.SetOrCreate('maxConn', strInput);
-                  })
-                  .width("80%")
-              }
-              .padding(5)
-              .justifyContent(FlexAlign.Start)
-              .alignItems(VerticalAlign.Center)
-
-
+            Row() {
+              Text("ssid").fontSize("17vp").width(60);
+              TextInput({ text: this.ssid, placeholder: "testApp" })
+                .fontSize("15vp")
+                .onChange((strInput) => {
+                  this.ssid = strInput;
+                  AppStorage.SetOrCreate("ssid", strInput);
+                })
+                .width("80%")
+                .borderRadius(1)
             }
-            .height(300)
-            .width('100%')
             .padding(5)
-          }
-          .borderColor($r("app.color.lead"))
-          .borderWidth(1)
+            .justifyContent(FlexAlign.Start)
+            .alignItems(VerticalAlign.Center)
 
-
-
-          Column() {
-            Column() {
+            Row() {
+              Text("securityType").fontSize(17).width(110);
+              TextInput({ text: this.securityType, placeholder: "3" })
+                .fontSize("15vp")
+                .onChange((strInput) => {
+                  this.securityType = strInput;
+                  AppStorage.SetOrCreate('securityType', strInput);
+                })
+                .width("80%")
+                .borderRadius(1)
             }
-            .width('100%')
             .padding(5)
+            .justifyContent(FlexAlign.Start)
+            .alignItems(VerticalAlign.Center)
+
+            Row() {
+              Text("maxConn").fontSize(17).width(80)
+              Column() {
+                Select([
+                  { value: '8' },
+                  { value: '16' },
+                  { value: '32' }
+                ])
+                  .selected(2)
+                  .value('32')
+                  .font({ size: 17 })
+                  .selectedOptionFont({ size: 17 })
+                  .optionFont({ size: 15 })
+                  .width("80%")
+                  .onSelect((index: number) => {
+                    console.info("Select:" + index)
+                    AppStorage.SetOrCreate('maxConn', index);
+                  })
+              }
+              .width("80%")
+            }
+            .padding(5)
+            .justifyContent(FlexAlign.Start)
+            .alignItems(VerticalAlign.Center)
+
+            Row() {
+              Text("band").fontSize(17).width(60);
+              TextInput({ text: this.band, placeholder: "1" })
+                .fontSize("15vp")
+                .onChange((strInput) => {
+                  this.band = strInput;
+                  AppStorage.SetOrCreate('band', strInput);
+                })
+                .width("80%")
+                .borderRadius(1)
+            }
+            .padding(5)
+            .justifyContent(FlexAlign.Start)
+            .alignItems(VerticalAlign.Center)
+
+
+            Row() {
+              Text("preSharedKey").fontSize(17).width(120)
+              TextInput({ text: this.preSharedKey, placeholder: "12345678" })
+                .fontSize("17vp")
+                .onChange((strInput) => {
+                  this.preSharedKey = strInput;
+                  AppStorage.SetOrCreate('preSharedKey', strInput);
+                })
+                .width("80%")
+            }
+            .padding(5)
+            .justifyContent(FlexAlign.Start)
+            .alignItems(VerticalAlign.Center)
+            Row() {
+              Text("channel").fontSize(17).width(120)
+              TextInput({ text: this.channel, placeholder: "6" })
+                .fontSize("17vp")
+                .onChange((strInput) => {
+                  this.channel = strInput;
+                  AppStorage.SetOrCreate('channel', strInput);
+                })
+                .width("80%")
+            }
+            .padding(5)
+            .justifyContent(FlexAlign.Start)
+            .alignItems(VerticalAlign.Center)
+//            Row() {
+//              Text("maxConn").fontSize(17).width(80)
+//              Column() {
+//                Select([
+//                  { value: 'LOW_POWER' },
+//                  { value: 'BALANCED' },
+//                  { value: 'LOW_LATENCY' }
+//                ])
+//                  .selected(2)
+//                  .value('LOW_POWER')
+//                  .font({ size: 17 })
+//                  .selectedOptionFont({ size: 17 })
+//                  .optionFont({ size: 15 })
+//                  .width("80%")
+//                  .onSelect((index: number) => {
+//                    console.info("Select:" + index)
+//                    AppStorage.SetOrCreate('txtScanOptionsDutyMode', index);
+//                  })
+//              }
+//              .width("80%")
+//            }
+//            .padding(5)
+//            .justifyContent(FlexAlign.Start)
+//            .alignItems(VerticalAlign.Center)
           }
-          .height(240)
-          .borderWidth(1)
-          .borderColor($r("app.color.lead"))
+          .height(300)
+          .width('100%')
+          .padding(5)
         }
+        .borderColor($r("app.color.lead"))
+        .borderWidth(1)
       }
       .height("100%")
       .backgroundColor($r("app.color.white"))
     }
     .scrollBarWidth(20)
-    .padding({ bottom: 10})
+    .padding({ bottom: 10 })
   }
 }

@@ -12,9 +12,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 /*
  * BaseSettingsController Of Wifi test
  */
+
 import ISettingsController from './ISettingsController'
 
 export default abstract class BaseSettingsController implements ISettingsController {

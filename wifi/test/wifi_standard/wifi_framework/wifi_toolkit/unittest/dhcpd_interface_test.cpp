@@ -57,7 +57,7 @@ public:
 
 class DhcpNotifyMock : public IDhcpResultNotify {
 public:
-    explicit DhcpNotifyMock(ApStateMachine &apStateMachine)
+    explicit DhcpNotifyMock()
     {
         WIFI_LOGI("DhcpNotifyMock constructor...");
     }
@@ -81,7 +81,7 @@ public:
     {
         WIFI_LOGI("OnSerExitNotify mock enter...");
     }
-}
+};
 /**
  * @tc.name: StartDhcpServer_001
  * @tc.desc: StartDhcpServer

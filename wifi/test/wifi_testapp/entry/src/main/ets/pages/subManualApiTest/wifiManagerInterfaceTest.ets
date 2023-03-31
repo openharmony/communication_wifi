@@ -47,7 +47,7 @@ struct WifiDeviceSetting {
   @State staticIp_ipAddress1: number = 3232235880 ;
   @State staticIp_gateway1: number = 3232235777 ;
   @State staticIp_dnsServers1: number = 3716386629 ;
-  @State staticIp_domains1: Array<string> = "0" ;
+  @State staticIp_domains1: Array<string> = ["0","1","2"] ;
 
   aboutToAppear() {
     AppStorage.SetOrCreate('ssid1', this.ssid1);
@@ -265,7 +265,7 @@ struct WifiDeviceSetting {
 
             Row() {
               Text("ipType1:").fontSize(15).width(60);
-              TextInput({ text: this.descriptorUUID, placeholder: "1"  }) //DHCP
+              TextInput({ text: this.ipType1, placeholder: "1"  }) //DHCP
                 .fontSize("15vp")
                 .onChange((strInput) => {
                   this.ipType1 = strInput;
@@ -283,7 +283,7 @@ struct WifiDeviceSetting {
 
             Row() {
               Text("staticIp_ipAddress1:").fontSize(15).width(135);
-              TextInput({ text: this.descriptorUUID, placeholder: "3232235880" })
+              TextInput({ text: this.staticIp_ipAddress1, placeholder: "3232235880" })
                 .fontSize("15vp")
                 .onChange((strInput) => {
                   this.staticIp_ipAddress1 = strInput;
@@ -301,7 +301,7 @@ struct WifiDeviceSetting {
 
             Row() {
               Text("staticIp_gateway1:").fontSize(15).width(130);
-              TextInput({ text: this.descriptorUUID, placeholder: "3232235777" })
+              TextInput({ text: this.staticIp_gateway1, placeholder: "3232235777" })
                 .fontSize("15vp")
                 .onChange((strInput) => {
                   this.staticIp_gateway1 = strInput;
@@ -319,7 +319,7 @@ struct WifiDeviceSetting {
 
             Row() {
               Text("staticIp_dnsServers1:").fontSize(15).width(140);
-              TextInput({ text: this.descriptorUUID, placeholder: "3716386629"})
+              TextInput({ text: this.staticIp_dnsServers1, placeholder: "3716386629"})
                 .fontSize("15vp")
                 .onChange((strInput) => {
                   this.staticIp_dnsServers1 = strInput;
@@ -337,7 +337,7 @@ struct WifiDeviceSetting {
 
             Row() {
               Text("staticIp_domains1:").fontSize(15).width(125);
-              TextInput({ text: this.descriptorUUID, placeholder: "0" })
+              TextInput({ text: this.staticIp_domains1, placeholder: "0" })
                 .fontSize("15vp")
                 .onChange((strInput) => {
                   this.staticIp_domains1 = strInput;
@@ -375,7 +375,6 @@ struct Index {
   @StorageLink('setScanModeRet') setScanModeRet: boolean = false;
   @State deviceId: string = '';
   @State currentClick: number = -1;
-  @StorageLink('linkedInfoManagerMessage') linkedInfoManagerMessage: string = '';
   @StorageLink('pairedMac') pairedMac: string = "32:32:235:878";
   private ssid1 = "TP-LINK_6365";
   private bssid1 = "6C:B1:58:75:63:65";
@@ -391,9 +390,11 @@ struct Index {
   @State staticIp_ipAddress1: number = 3232235880 ;
   @State staticIp_gateway1: number = 3232235777 ;
   @State staticIp_dnsServers1: number = 3716386629 ;
-  @State staticIp_domains1: Array<string> = "0" ;
+  @State staticIp_domains1: Array<string> = ["0","1","2"] ;
   @StorageLink('ipInfoManagerMessage') ipInfoManagerMessage: string = '';
-
+  @StorageLink('linkedInfoManagerMessage') linkedInfoManagerMessage: string = '';
+  @StorageLink('getDeviceConfigsManagerMessage') getDeviceConfigsManagerMessage: string = '';
+  @StorageLink('getScanInfoManagerMessage') getScanInfoManagerMessage: string = '';
   aboutToAppear() {
     AppStorage.SetOrCreate('ssid1', this.ssid1);
     AppStorage.SetOrCreate('bssid1', this.bssid1);
@@ -459,11 +460,11 @@ struct Index {
         Column() {
           Scroll(){
             Column(){
-              Text("当前配置:")
-                .fontSize("17vp")
-                .margin({ top: "5vp", left: "10vp" })
-                .textAlign(TextAlign.Start)
-                .width("100%")
+//              Text("当前配置:")
+//                .fontSize("17vp")
+//                .margin({ top: "5vp", left: "10vp" })
+//                .textAlign(TextAlign.Start)
+//                .width("100%")
               Text("WLAN连接信息:" + this.linkedInfoManagerMessage)
                 .fontSize("17vp")
                 .margin({ top: "5vp", left: "15vp" })
@@ -474,12 +475,12 @@ struct Index {
                 .margin({ top: "5vp", left: "15vp" })
                 .textAlign(TextAlign.Start)
                 .width("90%")
-              Text("获取网络配置:" + this.RssiManager)
+              Text("获取网络配置:" + this.getDeviceConfigsManagerMessage)
                 .fontSize("17vp")
                 .margin({ top: "5vp", left: "15vp"  })
                 .textAlign(TextAlign.Start)
                 .width("90%")
-              Text("扫描结果:" + this.bleConnectionStateInfoManager)
+              Text("扫描结果:" + this.getScanInfoManagerMessage)
                 .fontSize("17vp")
                 .margin({ top: "5vp", left: "15vp" })
                 .textAlign(TextAlign.Start)
@@ -490,7 +491,7 @@ struct Index {
           .scrollBarWidth(10)
           .scrollBar(BarState.Auto)
         }
-        .height(110)
+        .height(100)
         .width("95%")
         .backgroundColor($r("sys.color.ohos_id_color_foreground_contrary"))
 

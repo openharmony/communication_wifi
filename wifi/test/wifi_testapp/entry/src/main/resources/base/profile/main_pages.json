@@ -7,6 +7,27 @@
     "pages/subManualApiTest/p2pInterfaceTest",
     "pages/subManualApiTest/wifiManagerInterfaceTest",
     "pages/subManualApiTest/hotspotManagerInterfaceTest",
-    "pages/subManualApiTest/p2pManagerInterfaceTest"
+    "pages/subManualApiTest/p2pManagerInterfaceTest",
+
+    "pages/subAutoTest/wifiAutoTest",
+    "pages/subAutoTest/wifiManagerAutoTest",
+    "pages/subAutoTest/hotspotAutoTest",
+    "pages/subAutoTest/hotspotManagerAutoTest",
+    "pages/subAutoTest/p2pAutoTest",
+    "pages/subAutoTest/p2pManagerAutoTest",
+
+    "pages/subScenarioTest/wifiScanScenarioTest",
+    "pages/subScenarioTest/wifiManagerScanScenarioTest",
+    "pages/subScenarioTest/hotspotCreateScenarioTest",
+    "pages/subScenarioTest/hotspotManagerCreateScenarioTest",
+    "pages/subScenarioTest/p2pConnectScenarioTest",
+    "pages/subScenarioTest/p2pManagerConnectScenarioTest",
+
+    "pages/subBenchmarkTest/wifiFoundBenchmarkTest",
+    "pages/subBenchmarkTest/wifiManagerFoundBenchmarkTest",
+    "pages/subBenchmarkTest/hotspotConnectBenchmarkTest",
+    "pages/subBenchmarkTest/hotspotManagerConnectBenchmarkTest",
+    "pages/subBenchmarkTest/p2pConnectBenchmarkTest",
+    "pages/subBenchmarkTest/p2pManagerConnectBenchmarkTest"
   ]
 }

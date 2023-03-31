@@ -13,9 +13,6 @@
  * limitations under the License.
  */
 
-/*
-  basicDataSource of wifi test
- */
 import wifi from '@ohos.wifi'
 
 class BasicDataSource implements IDataSource {

@@ -104,7 +104,7 @@ HWTEST_F(DhcpdInterfaceTest, SetDhcpEventFunc_001, TestSize.Level1)
     WIFI_LOGI("SetDhcpEventFunc_001 enter");
     std::string ifaceName = "wlan0";
     IDhcpResultNotify *pResultNotify = nullptr;
-    EXPECT_FALSE(pDhcpdInterface->SetDhcpEventFunc(ifaceName, pResultNotify.get()));
+    EXPECT_FALSE(pDhcpdInterface->SetDhcpEventFunc(ifaceName, pResultNotify));
 }
 /**
  * @tc.name: SetDhcpEventFunc_002

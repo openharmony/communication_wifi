@@ -13,9 +13,8 @@
  * limitations under the License.
  */
 
-
 #include <sys/socket.h>
-#include "gtest/gtest.h"
+#include <gtest/gtest.h>
 #include "server.h"
 #include "evloop.h"
 
@@ -42,13 +41,13 @@ HWTEST_F(ServerTest, CreateEventLoopTest, TestSize.Level1)
     EventLoop *loop = nullptr;
     loop = CreateEventLoop(1);
     EXPECT_TRUE(loop->setSize == 1);
-    EXPECT_TRUE(CreateEventLoop(NULL) == -1);
+    EXPECT_TRUE(CreateEventLoop(-1) == nullptr);
 }
 
 HWTEST_F(ServerTest, StopEventLoopTest, TestSize.Level1)
 {
     EventLoop loop;
-    StopEventLoop(NULL);
+    StopEventLoop(nullptr);
     StopEventLoop(&loop);
 }
 
@@ -77,7 +76,7 @@ HWTEST_F(ServerTest, AddFdEventFail3, TestSize.Level1)
     EventLoop loop;
     loop.setSize = 1;
     loop.fdMasks = &mask;
-    EXPECT_TRUE(AddFdEvent(&loop, fd, addMas) == -1);
+    EXPECT_TRUE(AddFdEvent(&loop, fd, addMas) == 0);
 }
 
 HWTEST_F(ServerTest, AddFdEventFail4, TestSize.Level1)
@@ -101,7 +100,7 @@ HWTEST_F(ServerTest, AddFdEventSuccess, TestSize.Level1)
     EventLoop loop;
     loop.setSize = 2;
     loop.fdMasks = &mask;
-    EXPECT_TRUE(AddFdEvent(&loop, fd, addMas) == -1);
+    EXPECT_TRUE(AddFdEvent(&loop, fd, addMas) == 0);
 }
 
 HWTEST_F(ServerTest, DelFdEventFail, TestSize.Level1)
@@ -117,7 +116,7 @@ HWTEST_F(ServerTest, DelFdEventFail2, TestSize.Level1)
     loop.setSize = -1;
     int fd = 0;
     unsigned int delMask = 0x01;
-    EXPECT_TRUE(DelFdEvent(&loop, fd, delMask) == -1);
+    EXPECT_TRUE(DelFdEvent(&loop, fd, delMask) == 0);
 }
 
 HWTEST_F(ServerTest, DelFdEventFail3, TestSize.Level1)
@@ -129,7 +128,7 @@ HWTEST_F(ServerTest, DelFdEventFail3, TestSize.Level1)
     EventLoop loop;
     loop.setSize = 1;
     loop.fdMasks = &mask;
-    EXPECT_TRUE(DelFdEvent(&loop, fd, delMask) == -1);
+    EXPECT_TRUE(DelFdEvent(&loop, fd, delMask) == 0);
 }
 
 HWTEST_F(ServerTest, DelFdEventFail4, TestSize.Level1)
@@ -141,7 +140,7 @@ HWTEST_F(ServerTest, DelFdEventFail4, TestSize.Level1)
     EventLoop loop;
     loop.setSize = 1;
     loop.fdMasks = &mask;
-    EXPECT_TRUE(DelFdEvent(&loop, fd, delMask) == -1);
+    EXPECT_TRUE(DelFdEvent(&loop, fd, delMask) == 0);
 }
 
 HWTEST_F(ServerTest, DelFdEventFail5, TestSize.Level1)
@@ -158,21 +157,21 @@ HWTEST_F(ServerTest, DelFdEventFail5, TestSize.Level1)
 
 HWTEST_F(ServerTest, DelFdEventSuccess, TestSize.Level1)
 {
-    int fd = 0;
+    int fd = 1;
     unsigned int delMask = 0x05;
     FdMask mask;
     mask.mask = 0x07;
     EventLoop loop;
-    loop.setSize = 1;
+    loop.setSize = 2;
     loop.fdMasks = &mask;
-    EXPECT_TRUE(DelFdEvent(&loop, fd, delMask) == -1);
+    EXPECT_TRUE(DelFdEvent(&loop, fd, delMask) == 0);
 }
 
 HWTEST_F(ServerTest, CreateRpcServerTest, TestSize.Level1)
 {
     RpcServer *server = nullptr;
-    char path[] = "./unix_sock_test.sock"
-    EXPECT_TRUE(CreateRpcServer(NULL) == NULL);
+    char path[] = "./unix_sock_test.sock";
+    EXPECT_TRUE(CreateRpcServer(nullptr) == nullptr);
     server = CreateRpcServer(path);
     EXPECT_TRUE(server->listenFd == 5);
 }

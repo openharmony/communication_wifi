@@ -16,6 +16,7 @@ if (defined(ohos_lite)) {
 } else {
   import("//build/ohos.gni")
   import("//foundation/communication/wifi/wifi/wifi.gni")
+  import("//third_party/wpa_supplicant/wpa_supplicant-2.9_standard/wpa.gni")
 }
 
 group("etc") {
@@ -43,7 +44,11 @@ if (defined(ohos_lite)) {
   }
 
   ohos_prebuilt_etc("wpa_supplicant.conf") {
-    source = "wpa_supplicant.conf"
+    if ("${CONFIG_CTRL_IFACE}" == "unix") {
+      source = "unix_socket/wpa_supplicant.conf"
+    } else {
+      source = "udp_socket/wpa_supplicant.conf"
+    }
     relative_install_dir = "wifi"
     part_name = "wifi"
     subsystem_name = "communication"
@@ -52,7 +57,11 @@ if (defined(ohos_lite)) {
   ohos_prebuilt_etc("hostapd.conf") {
     source = "hostapd.conf"
     if (wifi_feature_non_hdf_driver) {
-      source = "default_conf/hostapd.conf"
+      if ("${CONFIG_CTRL_IFACE}" == "unix") {
+        source = "default_conf/unix_socket/hostapd.conf"
+      } else {
+        source = "default_conf/udp_socket/hostapd.conf"
+      }
     }
     relative_install_dir = "wifi"
     part_name = "wifi"
@@ -60,7 +69,11 @@ if (defined(ohos_lite)) {
   }
 
   ohos_prebuilt_etc("p2p_supplicant.conf") {
-    source = "p2p_supplicant.conf"
+    if ("${CONFIG_CTRL_IFACE}" == "unix") {
+      source = "unix_socket/p2p_supplicant.conf"
+    } else {
+      source = "udp_socket/p2p_supplicant.conf"
+    }
     relative_install_dir = "wifi"
     part_name = "wifi"
     subsystem_name = "communication"

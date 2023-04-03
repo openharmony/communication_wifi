@@ -92,6 +92,7 @@ ohos_unittest("wifi_hal_unittest") {
     "//third_party/googletest:gtest_main",
   ]
 
+  cflags = [ "-Wno-deprecated-non-prototype" ]
   ldflags = [
     "-fPIC",
     "--coverage",

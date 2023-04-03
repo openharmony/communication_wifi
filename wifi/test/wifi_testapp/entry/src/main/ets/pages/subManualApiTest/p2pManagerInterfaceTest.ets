@@ -29,128 +29,140 @@ const G_MAC = '6c:96:d7:3d:87:6f'
 
 @Component
 struct p2pSetting {
-  private peripheralDeviceId = G_MAC;// '10:2C:6B:11:B3:17';DaYu200//
+  @State deviceAddressManager : string = '6c:96:d7:3d:87:6f';
+  @State netIdManager : number = -2 ;
+  @State passphraseManager : string = "12345678" ;
+  @State groupNameManager : string ="testGroup"
+  @State goBandManager : number = 0 ;
+  @State devNameManager : string ="test"
 
   aboutToAppear() {
+    AppStorage.SetOrCreate("deviceAddressManager",this.deviceAddressManager)
+    AppStorage.SetOrCreate("netIdManager",this.netIdManager)
+    AppStorage.SetOrCreate("passphraseManager",this.passphraseManager)
+    AppStorage.SetOrCreate("groupNameManager",this.groupNameManager)
+    AppStorage.SetOrCreate("goBandManager",this.goBandManager)
+    AppStorage.SetOrCreate("devNameManager",this.devNameManager)
   }
 
   build() {
-    //    Column() {
-    //      Row() {
-    //        Text("外围设备MAC:").fontSize(16).width(70)
-    //        TextInput({ text: this.peripheralDeviceId, placeholder: "input peripheral deviceId." })
-    //          .fontSize("15vp")
-    //          .onChange((strInput) => {
-    //            this.peripheralDeviceId = strInput;
-    //            //判断合法性
-    //            if (strInput.length >= 17) {
-    //              AppStorage.SetOrCreate('peripheralDeviceId', strInput);
-    //            }
-    //          })
-    //          .width("80%")
-    //          .borderRadius(1)
-    //      }
-    //      .backgroundColor($r("app.color.moon"))
-    //      .padding(5)
-    //      .justifyContent(FlexAlign.Start)
-    //      .alignItems(VerticalAlign.Center)
-    //
-    //      Column() {
-    //        Stack().height("0.25vp").backgroundColor("#000000");
-    //        Column() {
-    //          Row() {
-    //            Text("服务UUID:").fontSize(15).width(60);
-    //            TextInput({ text: this.serviceUUID, placeholder: "input Service UUID" })
-    //              .fontSize("15vp")
-    //              .onChange((strInput) => {
-    //                this.serviceUUID = strInput;
-    //                if (strInput.length >= 36) {
-    //                  AppStorage.SetOrCreate('serviceUUID', strInput);
-    //                }
-    //              })
-    //              .width("80%")
-    //              .borderRadius(1)
-    //          }
-    //          .padding(5)
-    //          .justifyContent(FlexAlign.Start)
-    //          .alignItems(VerticalAlign.Center)
-    //          .backgroundColor($r("app.color.spring"))
-    //
-    //          Row() {
-    //            Text("特征值UUID:").fontSize(15).width(60);
-    //            TextInput({ text: this.characteristicUUID, placeholder: "input Characteristic UUID" })
-    //              .fontSize("15vp")
-    //              .onChange((strInput) => {
-    //                this.characteristicUUID = strInput;
-    //                if (strInput.length >= 36) {
-    //                  AppStorage.SetOrCreate('characteristicUUID', strInput);
-    //                }
-    //              })
-    //              .width("80%")
-    //              .borderRadius(1)
-    //          }
-    //          .backgroundColor($r("app.color.spring"))
-    //          .padding(5)
-    //          .justifyContent(FlexAlign.Start)
-    //          .alignItems(VerticalAlign.Center)
-    //
-    //          Row() {
-    //            Text("特征值Value:").fontSize(15).width(60);
-    //            TextInput({ text: this.characteristicUUID, placeholder: "Characteristic Value" })
-    //              .fontSize("15vp")
-    //              .onChange((strInput) => {
-    //                this.characteristicValue = strInput;
-    //                if (strInput.length >= 1) {
-    //                  AppStorage.SetOrCreate('characteristicValue', strInput);
-    //                }
-    //              })
-    //              .width("80%")
-    //              .borderRadius(1)
-    //          }
-    //          .backgroundColor($r("app.color.spring"))
-    //          .padding(5)
-    //          .justifyContent(FlexAlign.Start)
-    //          .alignItems(VerticalAlign.Center)
-    //
-    //          Row() {
-    //            Text("描述符UUID:").fontSize(15).width(60);
-    //            TextInput({ text: this.descriptorUUID, placeholder: "input descriptor UUID" })
-    //              .fontSize("15vp")
-    //              .onChange((strInput) => {
-    //                this.descriptorUUID = strInput;
-    //                if (strInput.length >= 36) {
-    //                  AppStorage.SetOrCreate('descriptorUUID', strInput);
-    //                }
-    //              })
-    //              .width("80%")
-    //              .borderRadius(1)
-    //          }
-    //          .backgroundColor($r("app.color.spring"))
-    //          .padding(5)
-    //          .justifyContent(FlexAlign.Start)
-    //          .alignItems(VerticalAlign.Center)
-    //
-    //          Row() {
-    //            Text("描述符Value:").fontSize(15).width(60);
-    //            TextInput({ text: this.descriptorUUID, placeholder: "descriptor Value" })
-    //              .fontSize("15vp")
-    //              .onChange((strInput) => {
-    //                this.descriptorValue = strInput;
-    //                if (strInput.length >= 1) {
-    //                  AppStorage.SetOrCreate('descriptorValue', strInput);
-    //                }
-    //              })
-    //              .width("80%")
-    //              .borderRadius(1)
-    //          }
-    //          .backgroundColor($r("app.color.spring"))
-    //          .padding(5)
-    //          .justifyContent(FlexAlign.Start)
-    //          .alignItems(VerticalAlign.Center)
-    //        }
-    //        Stack().height("0.25vp").backgroundColor("#000000");
-    //      }
-    //    }
+    Column() {
+      Row() {
+        Text("deviceAddressManager:").fontSize(16).width(120)
+        TextInput({ text: this.deviceAddressManager, placeholder: "input peripheral deviceId." })
+          .fontSize("15vp")
+          .onChange((strInput) => {
+            this.deviceAddressManager = strInput;
+            //判断合法性
+            if (strInput.length >= 1) {
+              AppStorage.SetOrCreate('deviceAddressManager', strInput);
+            }
+          })
+          .width("80%")
+          .borderRadius(1)
+      }
+      .backgroundColor($r("app.color.moon"))
+      .padding(5)
+      .justifyContent(FlexAlign.Start)
+      .alignItems(VerticalAlign.Center)
+
+      Column() {
+        Stack().height("0.25vp").backgroundColor("#000000");
+        Column() {
+          Row() {
+            Text("netIdManager:").fontSize(15).width(60);
+            TextInput({ text: this.netIdManager, placeholder: "input netId" })
+              .fontSize("15vp")
+              .onChange((strInput) => {
+                this.netIdManager = strInput;
+                //判断合法性
+                if (strInput.length >= 1) {
+                  AppStorage.SetOrCreate('netIdManager', strInput);
+                }
+              })
+              .width("80%")
+              .borderRadius(1)
+          }
+          .padding(5)
+          .justifyContent(FlexAlign.Start)
+          .alignItems(VerticalAlign.Center)
+          .backgroundColor($r("app.color.spring"))
+
+          Row() {
+            Text("passphraseManager:").fontSize(15).width(100);
+            TextInput({ text: this.passphraseManager, placeholder: "input passphrase" })
+              .fontSize("15vp")
+              .onChange((strInput) => {
+                this.passphraseManager = strInput;
+                if (strInput.length >= 1) {
+                  AppStorage.SetOrCreate('passphraseManager', strInput);
+                }
+              })
+              .width("80%")
+              .borderRadius(1)
+          }
+          .backgroundColor($r("app.color.spring"))
+          .padding(5)
+          .justifyContent(FlexAlign.Start)
+          .alignItems(VerticalAlign.Center)
+
+          Row() {
+            Text("groupNameManager:").fontSize(15).width(100);
+            TextInput({ text: this.groupNameManager, placeholder: "groupNameManager" })
+              .fontSize("15vp")
+              .onChange((strInput) => {
+                this.groupNameManager = strInput;
+                if (strInput.length >= 1) {
+                  AppStorage.SetOrCreate('groupNameManager', strInput);
+                }
+              })
+              .width("80%")
+              .borderRadius(1)
+          }
+          .backgroundColor($r("app.color.spring"))
+          .padding(5)
+          .justifyContent(FlexAlign.Start)
+          .alignItems(VerticalAlign.Center)
+
+          Row() {
+            Text("goBandManager:").fontSize(15).width(80);
+            TextInput({ text: this.goBandManager, placeholder: "input descriptor UUID" })
+              .fontSize("15vp")
+              .onChange((strInput) => {
+                this.goBandManager = strInput;
+                if (strInput.length >= 1) {
+                  AppStorage.SetOrCreate('goBandManager', strInput);
+                }
+              })
+              .width("80%")
+              .borderRadius(1)
+          }
+          .backgroundColor($r("app.color.spring"))
+          .padding(5)
+          .justifyContent(FlexAlign.Start)
+          .alignItems(VerticalAlign.Center)
+
+          Row() {
+            Text("devNameManager:").fontSize(15).width(60);
+            TextInput({ text: this.devNameManager, placeholder: "descriptor devNameManager" })
+              .fontSize("15vp")
+              .onChange((strInput) => {
+                this.devNameManager = strInput;
+                if (strInput.length >= 1) {
+                  AppStorage.SetOrCreate('devNameManager', strInput);
+                }
+              })
+              .width("80%")
+              .borderRadius(1)
+          }
+          .backgroundColor($r("app.color.spring"))
+          .padding(5)
+          .justifyContent(FlexAlign.Start)
+          .alignItems(VerticalAlign.Center)
+        }
+        Stack().height("0.25vp").backgroundColor("#000000");
+      }
+    }
   }
 }
 
@@ -165,10 +177,25 @@ struct Index {
   @State deviceId: string = '';
   @State currentClick: number = -1;
   @StorageLink('pairedDeviceId') pairedDeviceId: string = '';
+  @State deviceAddressManager : string = '6c:96:d7:3d:87:6f';
+  @State netIdManager : number = -2 ;
+  @State passphraseManager : string = "12345678" ;
+  @State groupNameManager : string ="testGroup"
+  @State goBandManager : number = 0 ;
+  @State devNameManager : string ="test"
+  @StorageLink('p2pStateManagerMessage') p2pStateManagerMessage: string = "";
+  @StorageLink('p2pLinkManagerMessage') p2pLinkManagerMessage: string = "";
+  @StorageLink('p2pGroupManagerMessage') p2pGroupManagerMessage: string = "";
+  @StorageLink('p2pDevicManagereMessage') p2pDeviceManagerMessage: string = "";
 
   aboutToAppear() {
+    AppStorage.SetOrCreate("deviceAddressManager",this.deviceAddressManager)
+    AppStorage.SetOrCreate("netIdManager",this.netIdManager)
+    AppStorage.SetOrCreate("passphraseManager",this.passphraseManager)
+    AppStorage.SetOrCreate("groupNameManager",this.groupNameManager)
+    AppStorage.SetOrCreate("goBandManager",this.goBandManager)
+    AppStorage.SetOrCreate("devNameManager",this.devNameManager)
   }
-
   init() {
     console.log("init-----------")
   }
@@ -182,26 +209,27 @@ struct Index {
       Stack().height("0.5vp").backgroundColor("#000000");
 
       Column() {
-        Text("目标设备MAC：")
-          .fontSize("20vp")
-          .height(50)
-          .width('100%')
-          .padding({top: 10, left: 10})
+        Row() {
+          Text("目标设备IP：")
+            .fontSize("20vp")
+            .height(40)
+            .padding({ top: 5})
+            .width("28%")
+            .align(Alignment.Start)
 
-        Row(){
           TextInput({ text: this.pairedMac, placeholder: "请输入即将连接的设备MAC" })
-            .height(50)
+            .height(40)
             .borderStyle(BorderStyle.Dashed)
             .backgroundColor($r("app.color.white"))
             .onChange((str) => {
               this.deviceId = str;
             })
-            .width('75%')
-            .padding({top: 10, left: 10})
+            .width("45%")
+            .padding({ top: 5, left: 5 })
           Image($r('app.media.Switch'))
-            .height(48)
-            .width(48)
-            .padding({ top: 10, bottom: 10, left: 10 })
+            .height(50)
+            .padding({ top: 5, bottom: 5, left: 10 })
+            .width('15%')
             .onClick(() => {
               this.showList = !this.showList;
             })
@@ -211,7 +239,45 @@ struct Index {
       if (this.showList) {
         p2pSetting()
       }else{
+        Column() {
+          Scroll(){
+            Column(){
+//              Text("当前配置:")
+//                .fontSize("17vp")
+//                .margin({ top: "5vp", left: "10vp" })
+//                .textAlign(TextAlign.Start)
+//                .width("100%")
+              Text("开关结果:" + this.p2pStateManagerMessage)
+                .fontSize("17vp")
+                .margin({ top: "5vp", left: "15vp" })
+                .textAlign(TextAlign.Start)
+                .width("90%")
+              Text("连接信息:" + this.p2pLinkManagerMessage)
+                .fontSize("17vp")
+                .margin({ top: "5vp", left: "15vp" })
+                .textAlign(TextAlign.Start)
+                .width("90%")
+              Text("组信息:" + this.p2pGroupManagerMessage)
+                .fontSize("17vp")
+                .margin({ top: "5vp", left: "15vp" })
+                .textAlign(TextAlign.Start)
+                .width("90%")
+              Text("对端信息:" + this.p2pDeviceManagerMessage)
+                .fontSize("17vp")
+                .margin({ top: "5vp", left: "15vp"  })
+                .textAlign(TextAlign.Start)
+                .width("90%")
+            }
+            .width("100%")
+          }
+          .scrollBarWidth(10)
+          .scrollBar(BarState.Auto)
+        }
+        .height(100)
+        .width("95%")
+        .backgroundColor($r("sys.color.ohos_id_color_foreground_contrary"))
         ContentTable({ testItem: this.testItem, apiItems: initP2pApiData() })
+
       }
     }
     .alignItems(HorizontalAlign.Center)

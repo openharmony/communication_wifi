@@ -33,10 +33,14 @@ struct Index {
   @State showList: boolean = true;
   private testItem: TestData = Router.getParams().testId;
   @State message: string = "";
-  @StorageLink('setLocalNameRet') setLocalNameRet: boolean = false;
-  @StorageLink('setScanModeRet') setScanModeRet: boolean = false;
-    aboutToAppear() {
-    }
+  @StorageLink('hotspotStateManagerMessage') hotspotStateManagerMessage: string = "";
+  @StorageLink('getStationsManagerMessage') getStationsManagerMessage: string = "";
+  @StorageLink('getHotspotConfigManagerMessage') getHotspotConfigManagerMessage: string = "";
+  @StorageLink('hotspotStaJoinManagerMessage') hotspotStaJoinManagerMessage: string = "";
+  @StorageLink('hotspotStaLeaveManagerMessage') hotspotStaLeaveManagerMessage: string = "";
+  aboutToAppear() {
+
+  }
 
   init() {
     console.log("init-----------")
@@ -81,6 +85,49 @@ struct Index {
       .align(Alignment.TopStart)
 
       if (this.showList) {
+        Column() {
+          Scroll(){
+            Column(){
+              //              Text("当前配置:")
+              //                .fontSize("17vp")
+              //                .margin({ top: "5vp", left: "10vp" })
+              //                .textAlign(TextAlign.Start)
+              //                .width("100%")
+              Text("热点状态:" + this.hotspotStateManagerMessage)
+                .fontSize("17vp")
+                .margin({ top: "5vp", left: "15vp" })
+                .textAlign(TextAlign.Start)
+                .width("90%")
+              Text("热点配置:" + this.getHotspotConfigManagerMessage)
+                .fontSize("17vp")
+                .margin({ top: "5vp", left: "15vp" })
+                .textAlign(TextAlign.Start)
+                .width("90%")
+              Text("连接设备:" + this.getStationsManagerMessage)
+                .fontSize("17vp")
+                .margin({ top: "5vp", left: "15vp"  })
+                .textAlign(TextAlign.Start)
+                .width("90%")
+              Text("加入状态:" + this.hotspotStaJoinManagerMessage)
+                .fontSize("17vp")
+                .margin({ top: "5vp", left: "15vp" })
+                .textAlign(TextAlign.Start)
+                .width("90%")
+              Text("离开状态:" + this.hotspotStaLeaveManagerMessage)
+                .fontSize("17vp")
+                .margin({ top: "5vp", left: "15vp" })
+                .textAlign(TextAlign.Start)
+                .width("90%")
+            }
+            .width("100%")
+          }
+          .scrollBarWidth(10)
+          .scrollBar(BarState.Auto)
+        }
+        .height(100)
+        .width("95%")
+        .backgroundColor($r("sys.color.ohos_id_color_foreground_contrary"))
+
         ContentTable({ testItem: this.testItem, apiItems: initHotspotManagerApIData() })
       } else {
         FilterTable({ testItem: this.testItem })

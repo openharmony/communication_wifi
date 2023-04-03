@@ -12,9 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/*
-   wifiView of wifi test
- */
+
 import Logger from '../MainAbility/model/Logger'
 
 const TAG:string = 'WifiView'

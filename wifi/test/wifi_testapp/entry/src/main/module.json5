@@ -88,6 +88,9 @@
       },
       {
         "name": "ohos.permission.MANAGE_WIFI_HOTSPOT"
+      },
+      {
+        "name": "ohos.permission.GET_WIFI_INFO_INTERNAL"
       }
     ]
   }

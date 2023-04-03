@@ -42,7 +42,7 @@ export class TestData {
 
 export enum CaseCategory  {
   Wifi,
-  WifiManger,
+  WifiManager,
   Hotspot,
   HotspotManager,
   P2p,
@@ -71,8 +71,11 @@ export class TestApi {
 
 export enum AutoCategory {
   WifiAuto,
+  WifiManagerAuto,
   HotspotAuto,
-  P2pAuto
+  HotspotManagerAuto,
+  P2pAuto,
+  P2pManagerAuto
 }
 
 export class TestAuto{
@@ -97,9 +100,12 @@ export class TestAuto{
 }
 
 export enum ScenarioCategory {
-  WifiFoundScenario,
-  HotspotFoundScenario,
+  WifiScanScenario,
+  WifiManagerScanScenario,
+  HotspotCreateScenario,
+  HotspotManagerCreateScenario,
   P2pConnectScenario,
+  P2pManagerConnectScenario,
 }
 
 export class TestScenario{
@@ -125,8 +131,11 @@ export class TestScenario{
 
 export enum BenchmarkCategory {
   WifiBenchmark,
+  WifiManagerBenchmark,
   HotspotBenchmark,
+  HotspotManagerBenchmark,
   P2pBenchmark,
+  P2pManagerBenchmark,
 }
 
 export class TestBenchmark{

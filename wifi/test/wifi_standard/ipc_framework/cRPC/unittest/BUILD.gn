@@ -27,14 +27,17 @@ ohos_unittest("crpc_unittest") {
   module_out_path = module_output_path
   sources = [
     "$WIFI_ROOT_DIR/services/wifi_standard/ipc_framework/cRPC/src/context.c",
+    "$WIFI_ROOT_DIR/services/wifi_standard/ipc_framework/cRPC/src/evloop.c",
     "$WIFI_ROOT_DIR/services/wifi_standard/ipc_framework/cRPC/src/hash_table.c",
     "$WIFI_ROOT_DIR/services/wifi_standard/ipc_framework/cRPC/src/net.c",
     "$WIFI_ROOT_DIR/services/wifi_standard/ipc_framework/cRPC/src/serial.c",
+    "$WIFI_ROOT_DIR/services/wifi_standard/ipc_framework/cRPC/src/server.c",
     "context_test.cpp",
     "hash_table_test.cpp",
     "net_test.cpp",
     "rpc_test_main.cpp",
     "serial_test.cpp",
+    "server_test.cpp",
   ]
 
   include_dirs = [

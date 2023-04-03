@@ -15,6 +15,7 @@
 /*
   mainAbility of wifi test
  */
+
 import hilog from '@ohos.hilog';
 import Ability from '@ohos.application.Ability'
 import Window from '@ohos.window'

@@ -33,9 +33,11 @@ struct Index {
   @State showList: boolean = true;
   private testItem: TestData = Router.getParams().testId;
   @State message: string = "";
-  @StorageLink('setLocalNameRet') setLocalNameRet: boolean = false;
-  @StorageLink('setScanModeRet') setScanModeRet: boolean = false;
-
+  @StorageLink('hotspotStateMessage') hotspotStateMessage: string = "";
+  @StorageLink('getStationsMessage') getStationsMessage: string = "";
+  @StorageLink('getHotspotConfigMessage') getHotspotConfigMessage: string = "";
+  @StorageLink('hotspotStaJoinMessage') hotspotStaJoinMessage: string = "";
+  @StorageLink('hotspotStaLeaveMessage') hotspotStaLeaveMessage: string = "";
   aboutToAppear() {
 
   }
@@ -50,7 +52,6 @@ struct Index {
         TestImageDisplay({ testItem: this.testItem })
         PageTitle({ testItem: this.testItem })
       }
-
       Stack().height("0.5vp").backgroundColor("#000000");
       Column() {
         Row() {
@@ -81,13 +82,54 @@ struct Index {
         .height(60)
       }
       .align(Alignment.TopStart)
-
       if (this.showList) {
+        Column() {
+          Scroll(){
+            Column(){
+//              Text("当前配置:")
+//                .fontSize("17vp")
+//                .margin({ top: "5vp", left: "10vp" })
+//                .textAlign(TextAlign.Start)
+//                .width("100%")
+              Text("热点状态:" + this.hotspotStateMessage)
+                .fontSize("17vp")
+                .margin({ top: "5vp", left: "15vp" })
+                .textAlign(TextAlign.Start)
+                .width("90%")
+              Text("热点配置:" + this.getHotspotConfigMessage)
+                .fontSize("17vp")
+                .margin({ top: "5vp", left: "15vp" })
+                .textAlign(TextAlign.Start)
+                .width("90%")
+              Text("连接设备:" + this.getStationsMessage)
+                .fontSize("17vp")
+                .margin({ top: "5vp", left: "15vp"  })
+                .textAlign(TextAlign.Start)
+                .width("90%")
+              Text("加入状态:" + this.hotspotStaJoinMessage)
+                .fontSize("17vp")
+                .margin({ top: "5vp", left: "15vp" })
+                .textAlign(TextAlign.Start)
+                .width("90%")
+              Text("离开状态:" + this.hotspotStaLeaveMessage)
+                .fontSize("17vp")
+                .margin({ top: "5vp", left: "15vp" })
+                .textAlign(TextAlign.Start)
+                .width("90%")
+            }
+            .width("100%")
+          }
+          .scrollBarWidth(10)
+          .scrollBar(BarState.Auto)
+        }
+        .height(100)
+        .width("95%")
+        .backgroundColor($r("sys.color.ohos_id_color_foreground_contrary"))
+
         ContentTable({ testItem: this.testItem, apiItems: initHotspotApIData() })
       } else {
         FilterTable({ testItem: this.testItem })
       }
-
     }
     .alignItems(HorizontalAlign.Center)
     .backgroundColor($r("app.color.lead"))

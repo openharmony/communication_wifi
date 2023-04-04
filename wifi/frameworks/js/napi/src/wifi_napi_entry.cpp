@@ -314,7 +314,7 @@ static napi_value Init(napi_env env, napi_value exports) {
         DECLARE_NAPI_FUNCTION("setDeviceName", SetDeviceName),
         DECLARE_NAPI_FUNCTION("setP2pDeviceName", SetDeviceName),
         DECLARE_NAPI_FUNCTION("isBandTypeSupported", IsBandTypeSupported),
-        DECLARE_NAPI_FUNCTION("get5GHzChannelList", Get5GHzChannelList),
+        DECLARE_NAPI_FUNCTION("get5GChannelList", Get5GHzChannelList),
         DECLARE_NAPI_FUNCTION("on", On),
         DECLARE_NAPI_FUNCTION("off", Off),
     };

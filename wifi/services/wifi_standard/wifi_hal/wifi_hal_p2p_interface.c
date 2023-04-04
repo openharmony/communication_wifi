@@ -35,7 +35,6 @@ const int P2P_CONNECT_DELAY_TIME = 100000;
     " -g@abstract:"CONFIG_ROOR_DIR"/sockets/wpa/wlan0"
 #else
 #define P2P_START_CMD "wpa_supplicant -iglan0 -g"CONFIG_ROOR_DIR"/sockets/wpa"\
-    " -m "CONFIG_ROOR_DIR"/wpa_supplicant/p2p_supplicant.conf"
     " -m"CONFIG_ROOR_DIR"/wpa_supplicant/p2p_supplicant.conf"
 #endif // WPA_CTRL_IFACE_UNIX
 

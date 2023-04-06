@@ -21,7 +21,6 @@
 #include <vector>
 
 #ifndef OHOS_ARCH_LITE
-#include "system_ability.h"
 #include "system_ability_status_change_stub.h"
 #endif // OHOS_ARCH_LITE
 

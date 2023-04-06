@@ -48,20 +48,20 @@ public:
 */
 HWTEST_F(WifiBroadCastHelperTest, Show001, TestSize.Level1)
 {
-    WIFI_LOGI("ChangePermission001 enter");
+    WIFI_LOGI("Show001 enter");
     WifiP2pServiceInfo v;
     v.SetServicerProtocolType(P2pServicerProtocolType::SERVICE_TYPE_ALL);
-    pWifiBroadCastHelper->ChangePermission(v);
+    pWifiBroadCastHelper->Show(v);
     v.SetServicerProtocolType(P2pServicerProtocolType::SERVICE_TYPE_BONJOUR);
-    pWifiBroadCastHelper->ChangePermission(v);
+    pWifiBroadCastHelper->Show(v);
     v.SetServicerProtocolType(P2pServicerProtocolType::SERVICE_TYPE_UP_NP);
-    pWifiBroadCastHelper->ChangePermission(v);
+    pWifiBroadCastHelper->Show(v);
     v.SetServicerProtocolType(P2pServicerProtocolType::SERVICE_TYPE_WS_DISCOVERY);
-    pWifiBroadCastHelper->ChangePermission(v);
+    pWifiBroadCastHelper->Show(v);
     v.SetServicerProtocolType(P2pServicerProtocolType::SERVICE_TYPE_VENDOR_SPECIFIC);
-    pWifiBroadCastHelper->ChangePermission(v);
+    pWifiBroadCastHelper->Show(v);
     v.SetServicerProtocolType(SERVICE_ERR);
-    pWifiBroadCastHelper->ChangePermission(v);
+    pWifiBroadCastHelper->Show(v);
 }
 }
 }

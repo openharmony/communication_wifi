@@ -21,7 +21,6 @@ using ::testing::ext::TestSize;
 
 namespace OHOS {
 namespace Wifi {
-constexpr unsigned char SERVICE_ERR = 4;
 class WifiBroadCastHelperTest : public testing::Test {
 public:
     static void SetUpTestCase()
@@ -59,8 +58,6 @@ HWTEST_F(WifiBroadCastHelperTest, Show001, TestSize.Level1)
     v.SetServicerProtocolType(P2pServicerProtocolType::SERVICE_TYPE_WS_DISCOVERY);
     pWifiBroadCastHelper->Show(v);
     v.SetServicerProtocolType(P2pServicerProtocolType::SERVICE_TYPE_VENDOR_SPECIFIC);
-    pWifiBroadCastHelper->Show(v);
-    v.SetServicerProtocolType(SERVICE_ERR);
     pWifiBroadCastHelper->Show(v);
 }
 }

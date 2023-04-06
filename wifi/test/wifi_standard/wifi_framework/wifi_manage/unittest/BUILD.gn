@@ -29,6 +29,7 @@ config("module_private_config") {
 ohos_unittest("manager_unittest") {
   module_out_path = module_output_path
   sources = [
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/common/wifi_broadcast_helper.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/common/wifi_permission_helper.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/common/wifi_permission_utils.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_auth_center.cpp",
@@ -38,6 +39,7 @@ ohos_unittest("manager_unittest") {
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_manager.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_net_agent.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_service_manager.cpp",
+    "common/wifi_broadcast_helper_test.cpp",
     "common/wifi_permission_helper_test.cpp",
     "wifi_auth_center_test.cpp",
     "wifi_config_center_test.cpp",

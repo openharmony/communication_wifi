@@ -15,6 +15,7 @@
 
 #include "wifi_hotspot_service_impl.h"
 #include <csignal>
+#include <limits>
 #include "wifi_permission_utils.h"
 #include "wifi_global_func.h"
 #include "wifi_auth_center.h"
@@ -212,10 +213,12 @@ ErrCode WifiHotspotServiceImpl::SetHotspotIdleTimeout(int time)
     }
     /* Set the hotspot idle timeout unit to 1 minute */
     constexpr int hotspotIdleTimeoutUnit = 60000;
-    int delayTime = time * hotspotIdleTimeoutUnit;
-    if (delayTime < 0) {
-        delayTime = 0;
+    int maxValue = std::numeric_limits<int>::max() / hotspotIdleTimeoutUnit;
+    if (maxValue <= time || time < 0) {
+        WIFI_LOGE("SetHotspotIdleTimeout invalid time:%{public}d maxValue is %{public}d", time, maxValue);
+        return WIFI_OPT_INVALID_PARAM;
     }
+    int delayTime = time * hotspotIdleTimeoutUnit;
     if (!IsApServiceRunning()) {
         WifiConfigCenter::GetInstance().SetHotspotIdleTimeout(delayTime);
     } else {

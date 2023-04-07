@@ -217,7 +217,7 @@ ErrCode WifiHotspotServiceImpl::SetHotspotIdleTimeout(int time)
     if (maxValue <= time || time < 0) {
         WIFI_LOGE("SetHotspotIdleTimeout invalid time:%{public}d maxValue is %{public}d", time, maxValue);
         return WIFI_OPT_INVALID_PARAM;
-    } 
+    }
     int delayTime = time * hotspotIdleTimeoutUnit;
     if (!IsApServiceRunning()) {
         WifiConfigCenter::GetInstance().SetHotspotIdleTimeout(delayTime);

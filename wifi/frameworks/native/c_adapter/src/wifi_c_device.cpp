@@ -152,7 +152,7 @@ static OHOS::Wifi::ErrCode ConvertDeviceConfigFromC(
         return OHOS::Wifi::WIFI_OPT_INVALID_PARAM;
     }
     deviceConfig.ssid = config->ssid;
-    if (strnlen(config->bssid, WIFI_MAC_LEN) == WIFI_MAC_LEN) {
+    if (strnlen((const char*)config->bssid, WIFI_MAC_LEN) == WIFI_MAC_LEN) {
         return OHOS::Wifi::WIFI_OPT_INVALID_PARAM;
     }
     if (OHOS::Wifi::IsMacArrayEmpty(config->bssid)) {

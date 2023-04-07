@@ -79,7 +79,12 @@ napi_value JsObjectToString(const napi_env& env, const napi_value& object,
         }
         (void)memset_s(buf, bufLen, 0, bufLen);
         size_t result = 0;
-        NAPI_CALL(env, napi_get_value_string_utf8(env, field, buf, bufLen, &result));
+        if (napi_get_value_string_utf8(env, field, buf, bufLen, &result) != napi_ok) {
+            free(buf);
+            buf = nullptr;
+            napi_throw_error(env, NULL, "get string value error");
+            return NULL;
+        }
         fieldRef = buf;
         free(buf);
         buf = nullptr;

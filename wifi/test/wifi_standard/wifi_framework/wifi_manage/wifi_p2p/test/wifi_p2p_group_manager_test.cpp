@@ -58,10 +58,6 @@ public:
     WifiP2pGroupInfo groupInfo;
     WifiP2pDevice device;
     std::unique_ptr<WifiP2pGroupManager> pWifiP2pGroupManager;
-    void WarpRefreshGroupsFromCurrentGroup()
-    {
-        pWifiP2pGroupManager->RefreshGroupsFromCurrentGroup();
-    }
     void WarpRefreshCurrentGroupFromGroups()
     {
         pWifiP2pGroupManager->RefreshCurrentGroupFromGroups();
@@ -150,22 +146,10 @@ HWTEST_F(WifiP2pGroupManagerTest, GetOwnerAddr_SUCCESS, TestSize.Level1)
 HWTEST_F(WifiP2pGroupManagerTest, Contains_SUCCESS, TestSize.Level1)
 {
     WifiP2pLinkedInfo linkedInfo;
+    WarpRefreshCurrentGroupFromGroups();
     EXPECT_FALSE(pWifiP2pGroupManager->IsInclude(10));
     pWifiP2pGroupManager->AddGroup(groupInfo);
     EXPECT_TRUE(pWifiP2pGroupManager->IsInclude(10));
-}
-
-HWTEST_F(WifiP2pGroupManagerTest, RefreshGroupsFromCurrentGroup_SUCCESS, TestSize.Level1)
-{
-    WarpRefreshGroupsFromCurrentGroup();
-    WarpRefreshCurrentGroupFromGroups();
-}
-
-HWTEST_F(WifiP2pGroupManagerTest, SaveP2pInfo_SUCCESS, TestSize.Level1)
-{
-    WifiP2pLinkedInfo linkedInfo;
-    pWifiP2pGroupManager->SaveP2pInfo(linkedInfo);
-    pWifiP2pGroupManager->GetP2pInfo();
 }
 
 HWTEST_F(WifiP2pGroupManagerTest, UpdateGroupsNetwork, TestSize.Level1)

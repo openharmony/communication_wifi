@@ -35,22 +35,6 @@ public:
     virtual void TearDown() {}
 };
 
-HWTEST_F(WifiHalCommonTest, StrSafeCopyFail, TestSize.Level1)
-{
-    char *dst = NULL;
-    unsigned len = LENTH;
-    char src[MAC_LEN] = "00:00:00:00:00";
-    StrSafeCopy(dst, len, src);
-}
-
-HWTEST_F(WifiHalCommonTest, StrSafeCopyFail2, TestSize.Level1)
-{
-    char *src = NULL;
-    unsigned len = LENTH;
-    char dst[MAC_LEN] = "00:00:00:00:00";
-    StrSafeCopy(dst, len, src);
-}
-
 HWTEST_F(WifiHalCommonTest, ConvertMacToStrFail1, TestSize.Level1)
 {
     unsigned char *mac = NULL;

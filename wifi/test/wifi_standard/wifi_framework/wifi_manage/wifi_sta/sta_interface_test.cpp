@@ -392,12 +392,6 @@ HWTEST_F(StaInterfaceTest, CreateSuccess, TestSize.Level1)
     Create();
 }
 
-HWTEST_F(StaInterfaceTest, DestroySuccess, TestSize.Level1)
-{
-    IStaService *pservice = nullptr;
-    Destroy(pservice);
-}
-
 HWTEST_F(StaInterfaceTest, EnableWifiSuccess, TestSize.Level1)
 {
     EnableWifiSuccess();

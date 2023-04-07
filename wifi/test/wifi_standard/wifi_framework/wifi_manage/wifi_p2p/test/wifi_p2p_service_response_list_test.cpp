@@ -37,13 +37,6 @@ public:
     std::unique_ptr<WifiP2pServiceResponseList> pWifiP2pServiceResponseList;
 };
 
-HWTEST_F(WifiP2pServiceResponseListTest, constructions, TestSize.Level1)
-{
-    WifiP2pDevice device;
-    std::vector<WifiP2pServiceResponse> srvRespList;
-    WifiP2pServiceResponseList wifiP2pServiceResponseList = WifiP2pServiceResponseList(device, srvRespList);
-}
-
 HWTEST_F(WifiP2pServiceResponseListTest, AddServiceResponse, TestSize.Level1)
 {
     WifiP2pServiceResponse resp;

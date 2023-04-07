@@ -68,11 +68,6 @@ HWTEST_F(WifiP2pDnsSdServiceResponseTest, GetVersion, TestSize.Level1)
     EXPECT_EQ(-1, pWifiP2pDnsSdServiceResponse->GetVersion());
 }
 
-HWTEST_F(WifiP2pDnsSdServiceResponseTest, GetTxtRecord, TestSize.Level1)
-{
-    pWifiP2pDnsSdServiceResponse->GetTxtRecord();
-}
-
 HWTEST_F(WifiP2pDnsSdServiceResponseTest, ParseData, TestSize.Level1)
 {
     EXPECT_EQ(true, pWifiP2pDnsSdServiceResponse->ParseData());

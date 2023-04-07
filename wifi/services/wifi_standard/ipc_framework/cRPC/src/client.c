@@ -74,11 +74,19 @@ static char *RpcClientReadMsg(RpcClient *client)
 static void RpcClientDealReadMsg(RpcClient *client, char *buff)
 {
     if (client == NULL) {
+        if (buff != NULL) {
+            free(buff);
+            buff = NULL;
+        }
         return;
     }
 
     char szTmp[TMP_BUFF_SIZE] = {0};
     if (snprintf_s(szTmp, sizeof(szTmp), sizeof(szTmp) - 1, "N%c", client->context->cSplit) < 0) {
+        if (buff != NULL) {
+            free(buff);
+            buff = NULL;
+        }
         return;
     }
     if (strncmp(buff, szTmp, strlen(szTmp)) == 0) { /* deal reply message */

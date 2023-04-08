@@ -114,6 +114,7 @@ if (defined(ohos_lite)) {
     sources = [
       "src/wifi_device_impl.cpp",
       "src/wifi_device_proxy.cpp",
+      "src/wifi_sa_event.cpp",
     ]
 
     configs = [

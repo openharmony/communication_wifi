@@ -586,6 +586,68 @@ NO_SANITIZE("cfi") ErrCode EventRegister::RegisterWifiEvents(int32_t sysCap)
     return WIFI_OPT_FAILED;
 }
 
+void WifiNapiAbilityStatusChange::OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId)
+{
+    WIFI_LOGI("WifiNapiAbilityStatusChange OnAddSystemAbility systemAbilityId:%{public}d", systemAbilityId);
+    switch (systemAbilityId) {
+        case WIFI_DEVICE_ABILITY_ID: {
+            std::unique_ptr<WifiDevice> wifiStaPtr = WifiDevice::GetInstance(WIFI_DEVICE_ABILITY_ID);
+            if (wifiStaPtr == nullptr) {
+                WIFI_LOGE("Register sta event get instance failed!");
+                return;
+            }
+            ErrCode ret = wifiStaPtr->RegisterCallBack(wifiDeviceCallback);
+            if (ret != WIFI_OPT_SUCCESS) {
+                WIFI_LOGE("Register sta event failed!");
+                return;
+            }
+            break;
+        }
+        case WIFI_SCAN_ABILITY_ID: {
+            std::unique_ptr<WifiScan> wifiScanPtr = WifiScan::GetInstance(WIFI_SCAN_ABILITY_ID);
+            if (wifiScanPtr == nullptr) {
+                WIFI_LOGE("Register scan event get instance failed!");
+                return;
+            }
+            ErrCode ret = wifiScanPtr->RegisterCallBack(wifiScanCallback);
+            if (ret != WIFI_OPT_SUCCESS) {
+                WIFI_LOGE("Register scan event failed!");
+                return;
+            }
+            break;
+        }
+        case WIFI_HOTSPOT_ABILITY_ID: {
+            std::unique_ptr<WifiHotspot> wifiHotspotPtr = WifiHotspot::GetInstance(WIFI_HOTSPOT_ABILITY_ID);
+            if (wifiHotspotPtr == nullptr) {
+                WIFI_LOGE("Register hotspot event get instance failed!");
+                return;
+            }
+            ErrCode ret = wifiHotspotPtr->RegisterCallBack(wifiHotspotCallback);
+            if (ret != WIFI_OPT_SUCCESS) {
+                WIFI_LOGE("Register hotspot event failed!");
+                return;
+            }
+            break;
+        }
+        case WIFI_P2P_ABILITY_ID: {
+            std::unique_ptr<WifiP2p> wifiP2pPtr = WifiP2p::GetInstance(WIFI_P2P_ABILITY_ID);
+            if (wifiP2pPtr == nullptr) {
+                WIFI_LOGE("Register p2p event get instance failed!");
+                return;
+            }
+            ErrCode ret = wifiP2pPtr->RegisterCallBack(wifiP2pCallback);
+            if (ret != WIFI_OPT_SUCCESS) {
+                WIFI_LOGE("Register p2p event failed!");
+                return;
+            }
+            break;
+        }
+        default:
+            WIFI_LOGI("OnAddSystemAbility unhandled sysabilityId:%{public}d", systemAbilityId);
+            return;
+    }
+}
+
 EventRegister& EventRegister::GetInstance()
 {
     static EventRegister inst;

@@ -17,6 +17,7 @@
 #include "i_wifi_scan.h"
 #ifndef OHOS_ARCH_LITE
 #include "iservice_registry.h"
+#include "wifi_sa_manager.h"
 #endif
 #include "wifi_logger.h"
 #include "wifi_scan_proxy.h"
@@ -59,6 +60,7 @@ bool WifiScanImpl::Init()
     client_ = scanProxy;
     return true;
 #else
+    WifiSaLoadManager::GetInstance().LoadWifiSa(systemAbilityId_);
     return GetWifiScanProxy();
 #endif
 }
@@ -77,6 +79,11 @@ bool WifiScanImpl::GetWifiScanProxy(void)
     if (sa_mgr == nullptr) {
         WIFI_LOGE("failed to get SystemAbilityManager");
         return false;
+    }
+    auto objectSA = sa_mgr->CheckSystemAbility(systemAbilityId_);
+    if (objectSA == nullptr) {
+        WIFI_LOGI("GetWifiScanProxy, load sa from remote again!");
+        WifiSaLoadManager::GetInstance().LoadWifiSa(systemAbilityId_);
     }
     sptr<IRemoteObject> object = sa_mgr->GetSystemAbility(systemAbilityId_);
     if (object == nullptr) {

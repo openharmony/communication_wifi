@@ -22,6 +22,7 @@
 #include "iservice_registry.h"
 #include "wifi_hotspot_mgr_proxy.h"
 #include "wifi_logger.h"
+#include "wifi_sa_manager.h"
 
 DEFINE_WIFILOG_HOTSPOT_LABEL("WifiHotspotImpl");
 
@@ -44,6 +45,7 @@ WifiHotspotImpl::~WifiHotspotImpl()
 bool WifiHotspotImpl::Init(int id)
 {
     instId = id;
+    WifiSaLoadManager::GetInstance().LoadWifiSa(systemAbilityId_);
     return GetWifiHotspotProxy();
 }
 
@@ -59,7 +61,11 @@ bool WifiHotspotImpl::GetWifiHotspotProxy(void)
         WIFI_LOGE("failed to get SystemAbilityManager");
         return false;
     }
-
+    auto objectSA = sa_mgr->CheckSystemAbility(systemAbilityId_);
+    if (objectSA == nullptr) {
+        WIFI_LOGI("GetWifiHotspotProxy, load sa from remote again!");
+        WifiSaLoadManager::GetInstance().LoadWifiSa(systemAbilityId_);
+    }
     sptr<IRemoteObject> object = sa_mgr->GetSystemAbility(systemAbilityId_);
     if (object == nullptr) {
         WIFI_LOGE("failed to get hotspot mgr");

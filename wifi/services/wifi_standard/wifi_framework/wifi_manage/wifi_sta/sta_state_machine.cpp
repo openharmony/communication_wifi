@@ -36,7 +36,6 @@
 #else
 #include "mock_dhcp_service.h"
 #endif
-
 namespace OHOS {
 namespace Wifi {
 DEFINE_WIFILOG_LABEL("StaStateMachine");

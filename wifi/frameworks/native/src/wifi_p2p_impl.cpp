@@ -17,6 +17,7 @@
 #include "if_config.h"
 #include "mac_address.h"
 #include "wifi_logger.h"
+#include "wifi_sa_manager.h"
 
 DEFINE_WIFILOG_P2P_LABEL("WifiP2pImpl");
 namespace OHOS {
@@ -38,6 +39,7 @@ WifiP2pImpl::~WifiP2pImpl()
 
 bool WifiP2pImpl::Init(void)
 {
+    WifiSaLoadManager::GetInstance().LoadWifiSa(systemAbilityId_);
     return GetWifiP2pProxy();
 }
 
@@ -54,7 +56,11 @@ bool WifiP2pImpl::GetWifiP2pProxy(void)
         WIFI_LOGE("failed to get SystemAbilityManager");
         return false;
     }
-
+    auto objectSA = sa_mgr->CheckSystemAbility(systemAbilityId_);
+    if (objectSA == nullptr) {
+        WIFI_LOGI("GetWifiP2pProxy, load sa from remote again!");
+        WifiSaLoadManager::GetInstance().LoadWifiSa(systemAbilityId_);
+    }
     sptr<IRemoteObject> object = sa_mgr->GetSystemAbility(systemAbilityId_);
     if (object == nullptr) {
         WIFI_LOGE("failed to get P2P_SERVICE");

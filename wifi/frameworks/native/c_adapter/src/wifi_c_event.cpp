@@ -25,118 +25,102 @@
 #include "wifi_logger.h"
 #include "wifi_scan.h"
 #include "wifi_common_util.h"
-
+#include "../../src/wifi_sa_event.h"
 DEFINE_WIFILOG_LABEL("WifiCEvent");
 std::set<WifiEvent*> GetEventCallBacks();
 
-class WifiCDeviceEventCallback : public OHOS::Wifi::IWifiDeviceCallBack {
-public:
-    WifiCDeviceEventCallback() {
-    }
+void WifiCDeviceEventCallback::OnWifiStateChanged(int state)
+{
+    WIFI_LOGI("sta received state changed event: %{public}d", state);
+}
 
-    virtual ~WifiCDeviceEventCallback() {
+NO_SANITIZE("cfi") void WifiCDeviceEventCallback::OnWifiConnectionChanged(int state,
+    const OHOS::Wifi::WifiLinkedInfo &info)
+{
+    WIFI_LOGI("sta received connection changed event: %{public}d", state);
+    WifiLinkedInfo linkInfo;
+    WifiErrorCode ret = GetLinkedInfo(&linkInfo);
+    if (ret != WIFI_SUCCESS) {
+        WIFI_LOGE("Received event get linked info failed");
+        return;
     }
-
-public:
-    void OnWifiStateChanged(int state) override {
-        WIFI_LOGI("sta received state changed event: %{public}d", state);
-    }
-
-    NO_SANITIZE("cfi") void OnWifiConnectionChanged(int state, const OHOS::Wifi::WifiLinkedInfo &info) override {
-        WIFI_LOGI("sta received connection changed event: %{public}d", state);
-        WifiLinkedInfo linkInfo;
-        WifiErrorCode ret = GetLinkedInfo(&linkInfo);
-        if (ret != WIFI_SUCCESS) {
-            WIFI_LOGE("Received event get linked info failed");
-            return;
-        }
-        std::set<WifiEvent*> setCallbacks = GetEventCallBacks();
-        for (auto& callback : setCallbacks) {
-            if (callback && callback->OnWifiConnectionChanged) {
-                callback->OnWifiConnectionChanged(state, &linkInfo);
-            }
+    std::set<WifiEvent*> setCallbacks = GetEventCallBacks();
+    for (auto& callback : setCallbacks) {
+        if (callback && callback->OnWifiConnectionChanged) {
+            callback->OnWifiConnectionChanged(state, &linkInfo);
         }
     }
+}
 
-    void OnWifiRssiChanged(int rssi) override {
-        WIFI_LOGI("sta received rssi changed event: %{public}d", rssi);
-    }
+void WifiCDeviceEventCallback::OnWifiRssiChanged(int rssi)
+{
+    WIFI_LOGI("sta received rssi changed event: %{public}d", rssi);
+}
 
-    void OnWifiWpsStateChanged(int state, const std::string &pinCode) override {
-    }
+void WifiCDeviceEventCallback::OnWifiWpsStateChanged(int state, const std::string &pinCode)
+{
+}
 
-    void OnStreamChanged(int direction) override {
-    }
+void WifiCDeviceEventCallback::OnStreamChanged(int direction)
+{
+}
 
-    NO_SANITIZE("cfi") void OnDeviceConfigChanged(OHOS::Wifi::ConfigChange value) override {
-        std::set<WifiEvent*> setCallbacks = GetEventCallBacks();
-        for (auto& callback : setCallbacks) {
-            if (callback && callback->OnDeviceConfigChange) {
-                callback->OnDeviceConfigChange(ConfigChange(static_cast<int>(value)));
-            }
+NO_SANITIZE("cfi") void WifiCDeviceEventCallback::OnDeviceConfigChanged(OHOS::Wifi::ConfigChange value)
+{
+    std::set<WifiEvent*> setCallbacks = GetEventCallBacks();
+    for (auto& callback : setCallbacks) {
+        if (callback && callback->OnDeviceConfigChange) {
+            callback->OnDeviceConfigChange(ConfigChange(static_cast<int>(value)));
         }
     }
+}
 
-    OHOS::sptr<OHOS::IRemoteObject> AsObject() override {
-        return nullptr;
-    }
-};
+OHOS::sptr<OHOS::IRemoteObject> WifiCDeviceEventCallback::AsObject()
+{
+    return nullptr;
+}
 
-class WifiCScanEventCallback : public OHOS::Wifi::IWifiScanCallback {
-public:
-    WifiCScanEventCallback() {
-    }
-
-    virtual ~WifiCScanEventCallback() {
-    }
-
-public:
-    NO_SANITIZE("cfi") void OnWifiScanStateChanged(int state) override {
-        WIFI_LOGI("scan received state changed event: %{public}d", state);
-        std::set<WifiEvent*> setCallbacks = GetEventCallBacks();
-        for (auto& callback : setCallbacks) {
-            if (callback && callback->OnWifiScanStateChanged) {
-                callback->OnWifiScanStateChanged(state, WIFI_SCAN_HOTSPOT_LIMIT);
-            }
+NO_SANITIZE("cfi") void WifiCScanEventCallback::OnWifiScanStateChanged(int state)
+{
+    WIFI_LOGI("scan received state changed event: %{public}d", state);
+    std::set<WifiEvent*> setCallbacks = GetEventCallBacks();
+    for (auto& callback : setCallbacks) {
+        if (callback && callback->OnWifiScanStateChanged) {
+            callback->OnWifiScanStateChanged(state, WIFI_SCAN_HOTSPOT_LIMIT);
         }
     }
+}
 
-    OHOS::sptr<OHOS::IRemoteObject> AsObject() override {
-        return nullptr;
-    }
-};
+OHOS::sptr<OHOS::IRemoteObject> WifiCScanEventCallback::AsObject()
+{
+    return nullptr;
+}
 
-class WifiCHotspotEventCallback : public OHOS::Wifi::IWifiHotspotCallback {
-public:
-    WifiCHotspotEventCallback() {
-    }
-
-    virtual ~WifiCHotspotEventCallback() {
-    }
-
-public:
-    NO_SANITIZE("cfi") void OnHotspotStateChanged(int state) override {
-        WIFI_LOGI("Hotspot received state changed event: %{public}d", state);
-        std::set<WifiEvent*> setCallbacks = GetEventCallBacks();
-        for (auto& callback : setCallbacks) {
-            if (callback && callback->OnHotspotStateChanged) {
-                callback->OnHotspotStateChanged(state);
-            }
+NO_SANITIZE("cfi") void WifiCHotspotEventCallback::OnHotspotStateChanged(int state)
+{
+    WIFI_LOGI("Hotspot received state changed event: %{public}d", state);
+    std::set<WifiEvent*> setCallbacks = GetEventCallBacks();
+    for (auto& callback : setCallbacks) {
+        if (callback && callback->OnHotspotStateChanged) {
+            callback->OnHotspotStateChanged(state);
         }
     }
+}
 
-    void OnHotspotStaJoin(const OHOS::Wifi::StationInfo &info) override {
-        WIFI_LOGI("Hotspot received sta join event");
-    }
+void WifiCHotspotEventCallback::OnHotspotStaJoin(const OHOS::Wifi::StationInfo &info)
+{
+    WIFI_LOGI("Hotspot received sta join event");
+}
 
-    void OnHotspotStaLeave(const OHOS::Wifi::StationInfo &info) override {
-        WIFI_LOGI("Hotspot received sta leave event");
-    }
+void WifiCHotspotEventCallback::OnHotspotStaLeave(const OHOS::Wifi::StationInfo &info)
+{
+    WIFI_LOGI("Hotspot received sta leave event");
+}
 
-    OHOS::sptr<OHOS::IRemoteObject> AsObject() override {
-        return nullptr;
-    }
-};
+OHOS::sptr<OHOS::IRemoteObject> WifiCHotspotEventCallback::AsObject()
+{
+    return nullptr;
+}
 
 OHOS::sptr<WifiCDeviceEventCallback> wifiCDeviceCallback =
     OHOS::sptr<WifiCDeviceEventCallback>(new (std::nothrow) WifiCDeviceEventCallback());
@@ -145,78 +129,82 @@ OHOS::sptr<WifiCScanEventCallback> wifiCScanCallback =
 OHOS::sptr<WifiCHotspotEventCallback> wifiCHotspotCallback =
     OHOS::sptr<WifiCHotspotEventCallback>(new (std::nothrow) WifiCHotspotEventCallback());
 
-class EventManager {
-public:
-    EventManager() {
+bool EventManager::AddEventCallback(WifiEvent *cb)
+{
+    if (cb == NULL) {
+        return false;
+    }
+    return m_setEventCallback.insert(cb).second;
+}
+
+void EventManager::RemoveEventCallback(WifiEvent *cb)
+{
+    m_setEventCallback.erase(cb);
+}
+
+NO_SANITIZE("cfi") WifiErrorCode EventManager::RegisterWifiEvents()
+{
+    using namespace OHOS::Wifi;
+    std::unique_ptr<WifiDevice> wifiStaPtr = WifiDevice::GetInstance(WIFI_DEVICE_ABILITY_ID);
+    if (wifiStaPtr == nullptr) {
+        WIFI_LOGE("Register sta event get instance failed!");
+        return ERROR_WIFI_UNKNOWN;
+    }
+    ErrCode ret = wifiStaPtr->RegisterCallBack(wifiCDeviceCallback);
+    if (ret != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("Register sta event failed!");
+        return ERROR_WIFI_UNKNOWN;
     }
 
-    virtual ~EventManager() {
+    std::unique_ptr<WifiScan> wifiScanPtr = WifiScan::GetInstance(WIFI_SCAN_ABILITY_ID);
+    if (wifiScanPtr == nullptr) {
+        WIFI_LOGE("Register scan event get instance failed!");
+        return ERROR_WIFI_UNKNOWN;
+    }
+    ret = wifiScanPtr->RegisterCallBack(wifiCScanCallback);
+    if (ret != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("Register scan event failed!");
+        return ERROR_WIFI_UNKNOWN;
     }
 
-    bool AddEventCallback(WifiEvent *cb) {
-        if (cb == NULL) {
-            return false;
-        }
-        return m_setEventCallback.insert(cb).second;
+    std::unique_ptr<WifiHotspot> wifiHotspotPtr = WifiHotspot::GetInstance(WIFI_HOTSPOT_ABILITY_ID);
+    if (wifiHotspotPtr == nullptr) {
+        WIFI_LOGE("Register hotspot event get instance failed!");
+        return ERROR_WIFI_UNKNOWN;
     }
-
-    void RemoveEventCallback(WifiEvent *cb) {
-        m_setEventCallback.erase(cb);
+    ret = wifiHotspotPtr->RegisterCallBack(wifiCHotspotCallback);
+    if (ret != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("Register hotspot event failed!");
+        return ERROR_WIFI_UNKNOWN;
     }
+    return WIFI_SUCCESS;
+}
 
-    NO_SANITIZE("cfi") WifiErrorCode RegisterWifiEvents() {
-        using namespace OHOS::Wifi;
-        std::unique_ptr<WifiDevice> wifiStaPtr = WifiDevice::GetInstance(WIFI_DEVICE_ABILITY_ID);
-        if (wifiStaPtr == nullptr) {
-            WIFI_LOGE("Register sta event get instance failed!");
-            return ERROR_WIFI_UNKNOWN;
-        }
-        ErrCode ret = wifiStaPtr->RegisterCallBack(wifiCDeviceCallback);
-        if (ret != WIFI_OPT_SUCCESS) {
-            WIFI_LOGE("Register sta event failed!");
-            return ERROR_WIFI_UNKNOWN;
-        }
+EventManager::EventManager()
+{
+    WIFI_LOGI("C Register InitListener!");
+    mSaStatusListener = new OHOS::Wifi::WifiAbilityStatusChange();
+    mSaStatusListener->Init(WIFI_DEVICE_ABILITY_ID);
+    mSaStatusListener->Init(WIFI_SCAN_ABILITY_ID);
+    mSaStatusListener->Init(WIFI_HOTSPOT_ABILITY_ID);
+    mSaStatusListener->Init(WIFI_P2P_ABILITY_ID);
+}
 
-        std::unique_ptr<WifiScan> wifiScanPtr = WifiScan::GetInstance(WIFI_SCAN_ABILITY_ID);
-        if (wifiScanPtr == nullptr) {
-            WIFI_LOGE("Register scan event get instance failed!");
-            return ERROR_WIFI_UNKNOWN;
-        }
-        ret = wifiScanPtr->RegisterCallBack(wifiCScanCallback);
-        if (ret != WIFI_OPT_SUCCESS) {
-            WIFI_LOGE("Register scan event failed!");
-            return ERROR_WIFI_UNKNOWN;
-        }
+bool EventManager::IsEventRegistered()
+{
+    return m_isEventRegistered;
+}
 
-        std::unique_ptr<WifiHotspot> wifiHotspotPtr = WifiHotspot::GetInstance(WIFI_HOTSPOT_ABILITY_ID);
-        if (wifiHotspotPtr == nullptr) {
-            WIFI_LOGE("Register hotspot event get instance failed!");
-            return ERROR_WIFI_UNKNOWN;
-        }
-        ret = wifiHotspotPtr->RegisterCallBack(wifiCHotspotCallback);
-        if (ret != WIFI_OPT_SUCCESS) {
-            WIFI_LOGE("Register hotspot event failed!");
-            return ERROR_WIFI_UNKNOWN;
-        }
-        return WIFI_SUCCESS;
-    }
+void EventManager::SetIsEventRegistrated(bool isEventRegistered)
+{
+    m_isEventRegistered = isEventRegistered;
+}
 
-    bool IsEventRegistered() {
-        return m_isEventRegistered;
-    }
+std::set<WifiEvent*> EventManager::GetEventCallBacks()
+{
+    return m_setEventCallback;
+}
 
-    void SetIsEventRegistrated(bool isEventRegistered) {
-        m_isEventRegistered = isEventRegistered;
-    }
-
-    std::set<WifiEvent*> GetEventCallBacks() {
-        return m_setEventCallback;
-    }
-
-private:
-    static std::set<WifiEvent*> m_setEventCallback;
-    static bool m_isEventRegistered;
-};
 std::set<WifiEvent*> EventManager::m_setEventCallback;
 bool EventManager::m_isEventRegistered = false;
 static EventManager g_eventManager;

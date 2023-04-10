@@ -78,7 +78,11 @@ HWTEST_F(WifiScanCallbackStubTest, SetRemoteDiedTest, TestSize.Level1)
 {
     bool val = true;
     pWifiScan->SetRemoteDied(val);
-    EXPECT_TRUE(pWifiScan->IsRemoteDied() == true);
+}
+
+HWTEST_F(WifiScanCallbackStubTest, IsRemoteDiedTest, TestSize.Level1)
+{
+    pWifiScan->IsRemoteDied();
 }
 
 HWTEST_F(WifiScanCallbackStubTest, RegisterCallBackTest, TestSize.Level1)

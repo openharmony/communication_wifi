@@ -38,7 +38,7 @@ public:
 
 public:
     void StopNetCheckThreadSuccess();
-    void HttpDetectionSuccess();
+    bool HttpDetectionSuccess();
 
 public:
     std::unique_ptr<StaNetworkCheck> pStaNetworkCheck;
@@ -50,9 +50,9 @@ void StaNetworkCheckTest::StopNetCheckThreadSuccess()
     pStaNetworkCheck->StopNetCheckThread();
 }
 
-void StaNetworkCheckTest::HttpDetectionSuccess()
+bool StaNetworkCheckTest::HttpDetectionSuccess()
 {
-    pStaNetworkCheck->HttpDetection();
+    return pStaNetworkCheck->HttpDetection();
 }
 
 HWTEST_F(StaNetworkCheckTest, StopNetCheckThreadSuccess, TestSize.Level1)

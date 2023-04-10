@@ -37,9 +37,9 @@ HWTEST_F(WifiWpaCommonTest, Hex2DecTest, TestSize.Level1)
     char str[] = "0z1259";
     char src[] = "0a1259";
     char srf[] = "0xaAfF29";
-    char str[] = "A1s62";
+    char stc[] = "A1s62";
     TrimQuotationMark(nullptr, 'A');
-    TrimQuotationMark(str, 'A');
+    TrimQuotationMark(stc, 'A');
     EXPECT_EQ(Hex2Dec(nullptr), 0);
     EXPECT_EQ(Hex2Dec(str), 0);
     EXPECT_EQ(Hex2Dec(src), 0);

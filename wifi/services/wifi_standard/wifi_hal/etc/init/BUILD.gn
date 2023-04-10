@@ -34,9 +34,9 @@ group("etc") {
 if (defined(ohos_lite)) {
   copy("wpa_supplicant.conf") {
     if ("${CONFIG_CTRL_IFACE}" == "unix") {
-      sources = ["unix_socket/wpa_supplicant.conf"]
+      sources = [ "unix_socket/wpa_supplicant.conf" ]
     } else {
-      sources = ["udp_socket/wpa_supplicant.conf"]
+      sources = [ "udp_socket/wpa_supplicant.conf" ]
     }
     outputs = [ "$root_out_dir/system/etc/wifi/wpa_supplicant.conf" ]
   }

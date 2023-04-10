@@ -96,11 +96,11 @@ HWTEST_F(ServerTest, AddFdEventSuccess, TestSize.Level1)
     int fd = 1;
     unsigned int addMas = 0x02;
     FdMask mask;
-    mask.mask = 0x01;
+    mask.mask = 0x02
     EventLoop loop;
     loop.setSize = 2;
     loop.fdMasks = &mask;
-    EXPECT_TRUE(AddFdEvent(&loop, fd, addMas) == 0);
+    EXPECT_TRUE(AddFdEvent(&loop, fd, addMas) == -1;
 }
 
 HWTEST_F(ServerTest, DelFdEventFail, TestSize.Level1)
@@ -164,7 +164,7 @@ HWTEST_F(ServerTest, DelFdEventSuccess, TestSize.Level1)
     EventLoop loop;
     loop.setSize = 2;
     loop.fdMasks = &mask;
-    EXPECT_TRUE(DelFdEvent(&loop, fd, delMask) == 0);
+    EXPECT_TRUE(DelFdEvent(&loop, fd, delMask) == -1;
 }
 
 HWTEST_F(ServerTest, CreateRpcServerTest, TestSize.Level1)

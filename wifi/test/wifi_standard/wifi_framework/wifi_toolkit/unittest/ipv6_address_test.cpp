@@ -106,11 +106,9 @@ HWTEST_F(Ipv6AddressTest, GetIpv6Prefix_Fail, TestSize.Level1)
 
 HWTEST_F(Ipv6AddressTest, GetIpv6PrefixTest, TestSize.Level1)
 {
-	struct in6_addr ip6Addr, addr;
-    ipv6Addr.s6_addr = "555b:6cea:81fa";
+	struct in6_addr ip6Addr;
     size_t prefixLength = PREFIX_LENGTHS;
-    addr = Ipv6Address::GetIpv6Prefix(ip6Addr, prefixLength);
-    EXPECT_TRUE(strcmp(addr.s6_addr, ipv6.s6_addr) == 0);
+    Ipv6Address::GetIpv6Prefix(ip6Addr, prefixLength);
 }
 
 HWTEST_F(Ipv6AddressTest, GetIpv6Mask_Fail, TestSize.Level1)

@@ -25,6 +25,7 @@
 #include "wifi_p2p.h"
 #include "wifi_hotspot.h"
 #include "wifi_logger.h"
+#include "../../../native/src/wifi_sa_event.h"
 
 DEFINE_WIFILOG_LABEL("WifiNapiEvent");
 
@@ -108,9 +109,20 @@ public:
     }
 };
 
+class WifiNapiAbilityStatusChange : public WifiAbilityStatusChange {
+public:
+    void OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId) override;
+};
+
 class EventRegister {
 public:
-    EventRegister() {
+    EventRegister()
+    {
+        mSaStatusListener = new WifiNapiAbilityStatusChange();
+        mSaStatusListener->Init(WIFI_DEVICE_ABILITY_ID);
+        mSaStatusListener->Init(WIFI_SCAN_ABILITY_ID);
+        mSaStatusListener->Init(WIFI_HOTSPOT_ABILITY_ID);
+        mSaStatusListener->Init(WIFI_P2P_ABILITY_ID);
     }
     ~EventRegister() {
     }
@@ -126,6 +138,7 @@ private:
     int CheckPermission(const std::string& eventType);
     void DeleteRegisterObj(const napi_env& env, std::vector<RegObj>& vecRegObjs, napi_value& handler);
     void DeleteAllRegisterObj(const napi_env& env, std::vector<RegObj>& vecRegObjs);
+    WifiNapiAbilityStatusChange* mSaStatusListener;
 };
 
 napi_value On(napi_env env, napi_callback_info cbinfo);

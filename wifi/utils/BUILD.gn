@@ -53,6 +53,7 @@ if (defined(ohos_lite)) {
     install_enable = true
     include_dirs = [
       "$WIFI_ROOT_DIR/utils/inc",
+      "$WIFI_ROOT_DIR/frameworks/native/interfaces",
       "//base/hiviewdfx/hisysevent/interfaces/native/innerkits/hisysevent/include",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/log",
     ]
@@ -60,6 +61,7 @@ if (defined(ohos_lite)) {
     sources = [
       "src/wifi_common_util.cpp",
       "src/wifi_hisysevent.cpp",
+      "src/wifi_sa_manager.cpp",
     ]
 
     deps = [

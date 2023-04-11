@@ -32,7 +32,6 @@
 #include "wifi_settings.h"
 #include "wifi_logger.h"
 #include "wifi_common_util.h"
-
 DEFINE_WIFILOG_HOTSPOT_LABEL("WifiApStartedState");
 namespace OHOS {
 namespace Wifi {

@@ -27,11 +27,13 @@
 #include "wifi_internal_event_dispatcher.h"
 #include "common_event_manager.h"
 #include "common_event_support.h"
+#include "wifi_sa_manager.h"
 #endif
 #include "wifi_sta_hal_interface.h"
 #include "wifi_service_manager.h"
 #include "wifi_settings.h"
-
+#include "define.h"
+#include "wifi_config_center.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -347,6 +349,14 @@ void WifiManager::CloseStaService(void)
     WifiServiceManager::GetInstance().UnloadService(WIFI_SERVICE_STA);
     WifiConfigCenter::GetInstance().SetWifiMidState(WifiOprMidState::CLOSED);
     WifiConfigCenter::GetInstance().SetWifiStaCloseTime();
+    #ifndef OHOS_ARCH_LITE
+    WifiSaLoadManager::GetInstance().UnloadWifiSa(WIFI_DEVICE_ABILITY_ID);
+    WifiSaLoadManager::GetInstance().UnloadWifiSa(WIFI_SCAN_ABILITY_ID);
+    WifiSaLoadManager::GetInstance().UnloadWifiSa(WIFI_P2P_ABILITY_ID);
+    if (static_cast<int>(ApState::AP_STATE_CLOSED) == WifiConfigCenter::GetInstance().GetHotspotState(0)) {
+        WifiSaLoadManager::GetInstance().UnloadWifiSa(WIFI_HOTSPOT_ABILITY_ID);
+    }
+    #endif
     return;
 }
 
@@ -362,6 +372,9 @@ void WifiManager::CloseApService(int id)
     cbMsg.msgData = static_cast<int>(ApState::AP_STATE_CLOSED);
     cbMsg.id = id;
     WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
+    #ifndef OHOS_ARCH_LITE
+    WifiSaLoadManager::GetInstance().UnloadWifiSa(WIFI_HOTSPOT_ABILITY_ID);
+    #endif
     return;
 }
 #endif
@@ -385,6 +398,9 @@ void WifiManager::CloseP2pService(void)
     cbMsg.msgCode = WIFI_CBK_MSG_P2P_STATE_CHANGE;
     cbMsg.msgData = static_cast<int>(P2pState::P2P_STATE_CLOSED);
     WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
+    #ifndef OHOS_ARCH_LITE
+    WifiSaLoadManager::GetInstance().UnloadWifiSa(WIFI_P2P_ABILITY_ID);
+    #endif
     return;
 }
 #endif

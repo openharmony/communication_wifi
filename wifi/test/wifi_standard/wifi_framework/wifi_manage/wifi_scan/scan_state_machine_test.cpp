@@ -300,7 +300,6 @@ public:
         pScanStateMachine->pnoScanHardwareState->GoOutState();
         msg.SetMessageName(CMD_START_PNO_SCAN);
         EXPECT_TRUE(pScanStateMachine->pnoScanHardwareState->ExecuteStateMsg(&msg) == true);
-
     }
 
     void PnoScanHardwareExeMsgSuccess2()

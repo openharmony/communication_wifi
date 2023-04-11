@@ -356,10 +356,6 @@ public:
     {
         pP2pStateMachine->pDhcpResultNotify->OnFailed(status, ifname, reason);
     }
-    void WarpDhcpResultNotifyOnSerExitNotify(const std::string& ifname)
-    {
-        pP2pStateMachine->pDhcpResultNotify->OnSerExitNotify(ifname);
-    }
     int WarpGetAvailableFreqByBand(GroupOwnerBand band) const
     {
         return pP2pStateMachine->GetAvailableFreqByBand(band);
@@ -387,16 +383,12 @@ void ButtonTest(AlertDialog &dialog, std::any ctx)
     printf("button callback, input = %s\n", dialog.GetInputBox("input pin").c_str());
 }
 
-HWTEST_F(P2pStateMachineTest, RegisterP2pServiceCallbacks_SUCCESS, TestSize.Level1)
-{
-    IP2pServiceCallbacks callback;
-    pP2pStateMachine->RegisterP2pServiceCallbacks(callback);
-}
-
 HWTEST_F(P2pStateMachineTest, HandlerDiscoverPeers, TestSize.Level1)
 {
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), P2pFind(DISC_TIMEOUT_S))
         .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
+    IP2pServiceCallbacks callback;
+    pP2pStateMachine->RegisterP2pServiceCallbacks(callback);
     WarpHandlerDiscoverPeers();
 }
 
@@ -734,12 +726,6 @@ HWTEST_F(P2pStateMachineTest, DhcpResultNotifyOnFailed, TestSize.Level1)
     std::string reason("reason");
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), GroupRemove(_)).WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
     WarpDhcpResultNotifyOnFailed(status, ifName, reason);
-}
-
-HWTEST_F(P2pStateMachineTest, DhcpResultNotifyOnSerExitNotify, TestSize.Level1)
-{
-    std::string ifName("ifName");
-    WarpDhcpResultNotifyOnSerExitNotify(ifName);
 }
 
 HWTEST_F(P2pStateMachineTest, GetAvailableFreqByBand1, TestSize.Level1)

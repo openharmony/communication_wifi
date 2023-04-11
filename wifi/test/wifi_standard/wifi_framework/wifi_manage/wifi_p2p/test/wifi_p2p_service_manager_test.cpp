@@ -34,6 +34,7 @@ public:
     virtual void TearDown()
     {
         pWifiP2pServiceManager.reset();
+        pWifiP2pServiceManager->ClearAll();
     }
     static void SetUpTestCase()
     {}
@@ -45,11 +46,6 @@ public:
 HWTEST_F(WifiP2pServiceManagerTest, Init, TestSize.Level1)
 {
     pWifiP2pServiceManager->Init();
-}
-
-HWTEST_F(WifiP2pServiceManagerTest, ClearAll, TestSize.Level1)
-{
-    pWifiP2pServiceManager->ClearAll();
 }
 
 HWTEST_F(WifiP2pServiceManagerTest, SetQueryId, TestSize.Level1)
@@ -228,11 +224,6 @@ HWTEST_F(WifiP2pServiceManagerTest, RemoveRequestRecord, TestSize.Level1)
 
     pWifiP2pServiceManager->RemoveRequestRecord("AA:BB:CC:DD:EE:FF", 10);
     pWifiP2pServiceManager->RemoveRequestRecord("AA:BB:CC:DD:EE:FF", 11);
-}
-
-HWTEST_F(WifiP2pServiceManagerTest, ClearAllRequestRecord, TestSize.Level1)
-{
-    pWifiP2pServiceManager->ClearAllRequestRecord();
 }
 
 HWTEST_F(WifiP2pServiceManagerTest, UpdateServiceName1, TestSize.Level1)

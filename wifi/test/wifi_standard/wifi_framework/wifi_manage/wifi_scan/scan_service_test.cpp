@@ -1114,14 +1114,10 @@ public:
         EXPECT_EQ(false, pScanService->GetHiddenNetworkSsidList(hiddenNetworkSsid));
     }
 
-    void ClearScanControlValueSuccess()
-    {
-        pScanService->ClearScanControlValue();
-    }
-
     void SetStaCurrentTimeSuccess()
     {
         EXPECT_CALL(WifiSettings::GetInstance(), SetScreenState(TWO));
+        pScanService->ClearScanControlValue();
         pScanService->SetStaCurrentTime();
     }
 
@@ -1638,13 +1634,10 @@ public:
     {
         EXPECT_CALL(WifiSettings::GetInstance(), GetAppRunningState()).Times(AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), GetFreezeModeState()).Times(AtLeast(0));
-        EXPECT_CALL(WifiSettings::GetInstance(), GetNoChargerPlugModeState()).Times(AtLeast(0));
-        pScanService->HandleMovingFreezeChanged();
-    }
-    void HandleGetCustomSceneStateTest()
-    {
         std::map<int, time_t> sceneMap;
         pScanService->HandleGetCustomSceneState(sceneMap);
+        EXPECT_CALL(WifiSettings::GetInstance(), GetNoChargerPlugModeState()).Times(AtLeast(0));
+        pScanService->HandleMovingFreezeChanged();
     }
 };
 
@@ -2248,11 +2241,6 @@ HWTEST_F(ScanServiceTest, GetHiddenNetworkSsidListFail, TestSize.Level1)
     GetHiddenNetworkSsidListFail();
 }
 
-HWTEST_F(ScanServiceTest, ClearScanControlValueSuccess, TestSize.Level1)
-{
-    ClearScanControlValueSuccess();
-}
-
 HWTEST_F(ScanServiceTest, SetStaCurrentTimeSuccess, TestSize.Level1)
 {
     SetStaCurrentTimeSuccess();
@@ -2491,11 +2479,6 @@ HWTEST_F(ScanServiceTest, PnoScanFail, TestSize.Level1)
 HWTEST_F(ScanServiceTest, HandleMovingFreezeChangedTest, TestSize.Level1)
 {
     HandleMovingFreezeChangedTest();
-}
-
-HWTEST_F(ScanServiceTest, HandleGetCustomSceneStateTest, TestSize.Level1)
-{
-    HandleGetCustomSceneStateTest();
 }
 } // namespace Wifi
 } // namespace OHOS

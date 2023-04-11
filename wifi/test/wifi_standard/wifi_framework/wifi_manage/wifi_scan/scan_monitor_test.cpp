@@ -62,13 +62,8 @@ public:
     {
         EXPECT_CALL(WifiSupplicantHalInterface::GetInstance(), RegisterSupplicantEventCallback(_))
             .WillRepeatedly(Return(WIFI_IDL_OPT_FAILED));
-
-        EXPECT_EQ(pScanMonitor->InitScanMonitor(), false);
-    }
-
-    void ReceiveScanEventFromIdlTest()
-    {
         pScanMonitor->ReceiveScanEventFromIdl(0);
+        EXPECT_EQ(pScanMonitor->InitScanMonitor(), false);
     }
 
     void ProcessReceiveScanEventTest1()
@@ -115,11 +110,6 @@ HWTEST_F(ScanMonitorTest, InitScanMonitorSuccessTest, TestSize.Level1)
 HWTEST_F(ScanMonitorTest, InitScanMonitorFailTest, TestSize.Level1)
 {
     InitScanMonitorFailTest();
-}
-
-HWTEST_F(ScanMonitorTest, ReceiveScanEventFromIdlTest, TestSize.Level1)
-{
-    ReceiveScanEventFromIdlTest();
 }
 
 HWTEST_F(ScanMonitorTest, ProcessReceiveScanEventTest1, TestSize.Level1)

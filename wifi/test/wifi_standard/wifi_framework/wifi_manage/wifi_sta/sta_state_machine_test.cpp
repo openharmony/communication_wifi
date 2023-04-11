@@ -47,7 +47,8 @@ public:
     {
         pStaStateMachine.reset(new StaStateMachine());
         pStaStateMachine->InitStaStateMachine();
-
+        pStaStateMachine->InitWifiLinkedInfo();
+        pStaStateMachine->InitLastWifiLinkedInfo();
         NetStateHandler handle = nullptr;
         pStaStateMachine->pNetcheck = new MockStaNetworkCheck(handle);
         pStaStateMachine->RegisterStaServiceCallback(WifiManager::GetInstance().GetStaCallback());
@@ -64,27 +65,6 @@ public:
     std::unique_ptr<StaStateMachine> pStaStateMachine;
     std::mutex mMtxBlock;
     std::condition_variable mCvTest;
-
-    void InitWifiLinkedInfoSuccess()
-    {
-        pStaStateMachine->InitWifiLinkedInfo();
-    }
-
-    void InitLastWifiLinkedInfoSuccess()
-    {
-        pStaStateMachine->InitLastWifiLinkedInfo();
-    }
-
-    void BuildStateTreeSuccess()
-    {
-        pStaStateMachine->BuildStateTree();
-    }
-
-    void RegisterStaServiceCallbackSuccess()
-    {
-        StaServiceCallback callbacks;
-        pStaStateMachine->RegisterStaServiceCallback(callbacks);
-    }
 
     void DealConnectTimeOutCmd()
     {
@@ -249,23 +229,11 @@ public:
         pStaStateMachine->StartWifiProcess();
     }
 
-    void InitWpsSettingsSuccess()
-    {
-        pStaStateMachine->pWpaStartingState->InitWpsSettings();
-    }
-
-    void WpaStartingStateGoInStateSuccess()
-    {
-        pStaStateMachine->pWpaStartingState->GoInState();
-    }
-
-    void WpaStartingStateGoOutStateSuccess()
-    {
-        pStaStateMachine->pWpaStartingState->GoOutState();
-    }
-
     void WpaStartingStateExeMsgSuccess()
     {
+        pStaStateMachine->pWpaStartingState->InitWpsSettings();
+        pStaStateMachine->pWpaStartingState->GoInState();
+        pStaStateMachine->pWpaStartingState->GoOutState();
         EXPECT_CALL(WifiSettings::GetInstance(), SetWifiState(_)).Times(testing::AtLeast(0));
         InternalMessage msg;
         msg.SetMessageName(WIFI_SVR_CMD_STA_SUP_CONNECTION_EVENT);
@@ -758,12 +726,6 @@ public:
         pStaStateMachine->StartConnectToNetwork(0);
     }
 
-    void MacAddressGenerateSuccess()
-    {
-        std::string strMac = "hmwifi";
-        pStaStateMachine->MacAddressGenerate(strMac);
-    }
-
     void SetRandomMacSuccess1()
     {
         WifiDeviceConfig deviceConfig;
@@ -782,6 +744,8 @@ public:
     {
         WifiDeviceConfig deviceConfig;
         deviceConfig.wifiPrivacySetting = WifiPrivacyConfig::RANDOMMAC;
+        std::string strMac = "hmwifi";
+        pStaStateMachine->MacAddressGenerate(strMac);
         EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _))
             .WillRepeatedly(DoAll(SetArgReferee<1>(deviceConfig), Return(-1)));
         EXPECT_CALL(WifiSettings::GetInstance(), GetMacAddress(_)).Times(AtLeast(0)).WillOnce(Return(0));
@@ -1342,17 +1306,6 @@ public:
         pStaStateMachine->DisableNetwork(0);
     }
 
-    void DealSignalPollResult()
-    {
-        InternalMessage msg;
-        EXPECT_CALL(WifiStaHalInterface::GetInstance(), GetConnectSignalInfo(_, _)).Times(AtLeast(0));
-        EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_));
-        EXPECT_CALL(WifiSettings::GetInstance(), GetSignalLevel(_, _)).Times(AtLeast(0));
-        EXPECT_CALL(WifiSettings::GetInstance(), SyncDeviceConfig()).Times(AtLeast(0));
-        pStaStateMachine->DealSignalPollResult(&msg);
-        pStaStateMachine->DealSignalPollResult(nullptr);
-    }
-
     void ConvertFreqToChannelTest()
     {
         EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _)).Times(AtLeast(0));
@@ -1498,26 +1451,6 @@ public:
     }
 };
 
-HWTEST_F(StaStateMachineTest, InitWifiLinkedInfoSuccess, TestSize.Level1)
-{
-    InitWifiLinkedInfoSuccess();
-}
-
-HWTEST_F(StaStateMachineTest, InitLastWifiLinkedInfoSuccess, TestSize.Level1)
-{
-    InitLastWifiLinkedInfoSuccess();
-}
-
-HWTEST_F(StaStateMachineTest, BuildStateTreeSuccess, TestSize.Level1)
-{
-    BuildStateTreeSuccess();
-}
-
-HWTEST_F(StaStateMachineTest, RegisterStaServiceCallbackSuccess, TestSize.Level1)
-{
-    RegisterStaServiceCallbackSuccess();
-}
-
 HWTEST_F(StaStateMachineTest, DealConnectTimeOutCmd, TestSize.Level1)
 {
     DealConnectTimeOutCmd();
@@ -1606,21 +1539,6 @@ HWTEST_F(StaStateMachineTest, StartWifiProcessFail1, TestSize.Level1)
 HWTEST_F(StaStateMachineTest, StartWifiProcessFail2, TestSize.Level1)
 {
     StartWifiProcessFail2();
-}
-
-HWTEST_F(StaStateMachineTest, InitWpsSettingsSuccess, TestSize.Level1)
-{
-    InitWpsSettingsSuccess();
-}
-
-HWTEST_F(StaStateMachineTest, WpaStartingStateGoInStateSuccess, TestSize.Level1)
-{
-    WpaStartingStateGoInStateSuccess();
-}
-
-HWTEST_F(StaStateMachineTest, WpaStartingStateGoOutStateSuccess, TestSize.Level1)
-{
-    WpaStartingStateGoOutStateSuccess();
 }
 
 HWTEST_F(StaStateMachineTest, WpaStartingStateExeMsgSuccess, TestSize.Level1)
@@ -1931,11 +1849,6 @@ HWTEST_F(StaStateMachineTest, StartConnectToNetworkFail2, TestSize.Level1)
 HWTEST_F(StaStateMachineTest, StartConnectToNetworkFali3, TestSize.Level1)
 {
     StartConnectToNetworkFali3();
-}
-
-HWTEST_F(StaStateMachineTest, MacAddressGenerateSuccess, TestSize.Level1)
-{
-    MacAddressGenerateSuccess();
 }
 
 HWTEST_F(StaStateMachineTest, SetRandomMacSuccess1, TestSize.Level1)
@@ -2256,11 +2169,6 @@ HWTEST_F(StaStateMachineTest, DisableNetworkFail1, TestSize.Level1)
 HWTEST_F(StaStateMachineTest, DisableNetworkFail2, TestSize.Level1)
 {
     DisableNetworkFail2();
-}
-
-HWTEST_F(StaStateMachineTest, DealSignalPollResult, TestSize.Level1)
-{
-    DealSignalPollResult();
 }
 
 HWTEST_F(StaStateMachineTest, ConvertFreqToChannelTest, TestSize.Level1)

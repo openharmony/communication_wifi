@@ -170,6 +170,7 @@ HWTEST_F(WifiHalCRpcServerTest, DealIfaceCbkTest, TestSize.Level1)
     WifiHalEventCallbackMsg *cbmsg = (WifiHalEventCallbackMsg *)calloc(1, sizeof(WifiHalEventCallbackMsg));
     cbmsg->msg.ifMsg.id = 0;
     cbmsg->msg.ifMsg.type = 100;
+    StrSafeCopy(nullptr, sizeof(cbmsg->msg.ifMsg.ifname), "wlan0");
     StrSafeCopy(cbmsg->msg.ifMsg.ifname, sizeof(cbmsg->msg.ifMsg.ifname), "wlan0");
     EXPECT_TRUE(PushBackCallbackMsg(WIFI_ADD_IFACE_EVENT, cbmsg) == 0);
     EXPECT_TRUE(OnCallbackTransact(mServer, WIFI_ADD_IFACE_EVENT, mContext) == 0);
@@ -182,6 +183,8 @@ HWTEST_F(WifiHalCRpcServerTest, DealConnectionChangedCbkTest, TestSize.Level1)
     WifiHalEventCallbackMsg *cbmsg = (WifiHalEventCallbackMsg *)calloc(1, sizeof(WifiHalEventCallbackMsg));
     cbmsg->msg.connMsg.status = 100;
     cbmsg->msg.connMsg.networkId = 1;
+    char *src = nullptr;
+    StrSafeCopy(cbmsg->msg.connMsg.bssid, sizeof(cbmsg->msg.connMsg.bssid), src);
     StrSafeCopy(cbmsg->msg.connMsg.bssid, sizeof(cbmsg->msg.connMsg.bssid), "00:00:00:00:00:00");
     EXPECT_TRUE(PushBackCallbackMsg(WIFI_CONNECT_CHANGED_NOTIFY_EVENT, cbmsg) == 0);
     EXPECT_TRUE(OnCallbackTransact(mServer, WIFI_CONNECT_CHANGED_NOTIFY_EVENT, mContext) == 0);

@@ -1,0 +1,12 @@
+{
+    "process":"wifi_manager_service",
+        "systemability":[
+            {
+                "name":1121,
+                "libpath":"libwifi_hotspot_ability.z.so",
+                "run-on-create":false,
+                "distributed":false,
+                "dump-level":1
+            }
+        ]
+}

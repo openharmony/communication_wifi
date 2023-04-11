@@ -19,6 +19,7 @@
 #include "iremote_broker.h"
 #include "iremote_object.h"
 #include "iservice_registry.h"
+#include "wifi_sa_manager.h"
 #endif
 #include "wifi_device_proxy.h"
 #include "wifi_logger.h"
@@ -61,6 +62,7 @@ bool WifiDeviceImpl::Init()
     client_ = deviceProxy;
     return true;
 #else
+    WifiSaLoadManager::GetInstance().LoadWifiSa(systemAbilityId_);
     return GetWifiDeviceProxy();
 #endif
 }
@@ -80,7 +82,11 @@ bool WifiDeviceImpl::GetWifiDeviceProxy()
         WIFI_LOGE("failed to get SystemAbilityManager");
         return false;
     }
-
+    auto objectSA = sa_mgr->CheckSystemAbility(systemAbilityId_);
+    if (objectSA == nullptr) {
+        WIFI_LOGI("GetWifiDeviceProxy, load sa from remote again!");
+        WifiSaLoadManager::GetInstance().LoadWifiSa(systemAbilityId_);
+    }
     sptr<IRemoteObject> object = sa_mgr->GetSystemAbility(systemAbilityId_);
     if (object == nullptr) {
         WIFI_LOGE("failed to get DEVICE_SERVICE");

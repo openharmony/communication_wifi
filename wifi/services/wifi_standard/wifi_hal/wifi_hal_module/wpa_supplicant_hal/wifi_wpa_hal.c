@@ -53,6 +53,12 @@
 #define CONNECTION_REJECT_STATUS 37
 #define SSID_EMPTY_LENGTH 1
 
+#ifdef WPA_CTRL_IFACE_UNIX
+#define WPA_CTRL_OPEN_IFNAME "@abstract:"CONFIG_ROOR_DIR"/sockets/wpa/wlan0"
+#else
+#define WPA_CTRL_OPEN_IFNAME ""CONFIG_ROOR_DIR"/sockets/wpa"
+#endif // WPA_CTRL_IFACE_UNIX
+
 static WifiWpaInterface *g_wpaInterface = NULL;
 
 /* Detailed device string pattern from wpa_supplicant with WFD info
@@ -757,7 +763,7 @@ static int WpaCliConnect(WifiWpaInterface *p)
     }
     int count = WPA_TRY_CONNECT_TIMES;
     while (count-- > 0) {
-        int ret = InitWpaCtrl(&p->wpaCtrl, CONFIG_ROOR_DIR"/sockets/wpa");
+        int ret = InitWpaCtrl(&p->wpaCtrl, WPA_CTRL_OPEN_IFNAME);
         if (ret == 0) {
             LOGI("Global wpa interface connect successfully!");
             break;

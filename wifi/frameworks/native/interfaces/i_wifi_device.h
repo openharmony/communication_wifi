@@ -267,9 +267,11 @@ public:
      * @return ErrCode - operation result
      */
 #ifdef OHOS_ARCH_LITE
-    virtual ErrCode RegisterCallBack(const std::shared_ptr<IWifiDeviceCallBack> &callback) = 0;
+    virtual ErrCode RegisterCallBack(const std::shared_ptr<IWifiDeviceCallBack> &callback,
+        const std::vector<std::string> &event) = 0;
 #else
-    virtual ErrCode RegisterCallBack(const sptr<IWifiDeviceCallBack> &callback) = 0;
+    virtual ErrCode RegisterCallBack(const sptr<IWifiDeviceCallBack> &callback,
+        const std::vector<std::string> &event) = 0;
 #endif
 
     /**

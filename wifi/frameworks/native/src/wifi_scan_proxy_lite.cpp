@@ -380,7 +380,8 @@ ErrCode WifiScanProxy::GetScanInfoList(std::vector<WifiScanInfo> &result)
     return ErrCode(owner.retCode);
 }
 
-ErrCode WifiScanProxy::RegisterCallBack(const std::shared_ptr<IWifiScanCallback> &callback)
+ErrCode WifiScanProxy::RegisterCallBack(const std::shared_ptr<IWifiScanCallback> &callback,
+    const std::vector<std::string> &event)
 {
     if (remoteDied_ || remote_ == nullptr) {
         WIFI_LOGE("failed to %{public}s, remoteDied_: %{public}d, remote_: %{public}d",
@@ -407,7 +408,13 @@ ErrCode WifiScanProxy::RegisterCallBack(const std::shared_ptr<IWifiScanCallback>
     }
     (void)WriteInt32(&request, 0);
     (void)WriteRemoteObject(&request, &g_sid);
-
+    int eventNum = event.size();
+    (void)WriteInt32(&request, eventNum);
+    if (eventNum > 0) {
+        for (auto &eventName : event) {
+            (void)WriteString(&request, eventName.c_str());
+        }
+    }
     owner.funcId = WIFI_SVR_CMD_REGISTER_SCAN_CALLBACK;
     int error = remote_->Invoke(remote_, WIFI_SVR_CMD_REGISTER_SCAN_CALLBACK, &request, &owner, IpcCallback);
     if (error != EC_SUCCESS) {

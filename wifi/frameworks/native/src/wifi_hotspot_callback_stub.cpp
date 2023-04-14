@@ -33,11 +33,6 @@ int WifiHotspotCallbackStub::OnRemoteRequest(
     uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
     WIFI_LOGD("WifiHotspotCallbackStub::OnRemoteRequest!");
-    if (mRemoteDied) {
-        WIFI_LOGE("Failed to `%{public}s`,remote service is died!", __func__);
-        return -1;
-    }
-
     if (data.ReadInterfaceToken() != GetDescriptor()) {
         WIFI_LOGE("Hotspot callback stub token verification error: %{public}d", code);
         return WIFI_OPT_FAILED;

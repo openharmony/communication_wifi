@@ -51,9 +51,11 @@ public:
     virtual ErrCode GetScanInfoList(std::vector<WifiScanInfo> &result) override;
 
 #ifdef OHOS_ARCH_LITE
-    virtual ErrCode RegisterCallBack(const std::shared_ptr<IWifiScanCallback> &callback) override;
+    virtual ErrCode RegisterCallBack(const std::shared_ptr<IWifiScanCallback> &callback,
+        const std::vector<std::string> &event) override;
 #else
-    virtual ErrCode RegisterCallBack(const sptr<IWifiScanCallback> &callback) override;
+    virtual ErrCode RegisterCallBack(const sptr<IWifiScanCallback> &callback,
+        const std::vector<std::string> &event) override;
 #endif
 
     /**

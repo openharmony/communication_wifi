@@ -440,7 +440,9 @@ NO_SANITIZE("cfi") WifiErrorCode RegisterP2pStateChangedCallback(const P2pStateC
     CHECK_PTR_RETURN(sptrCallback, ERROR_WIFI_NOT_AVAILABLE);
     EventManager::GetInstance().Init();
     sptrCallback->stateChangeCb = callback;
-    wifiP2pPtr->RegisterCallBack(sptrCallback);
+    std::vector<std::string> event = {EVENT_P2P_STATE_CHANGE};
+    wifiP2pPtr->RegisterCallBack(sptrCallback, event);
+    EventManager::GetInstance().SetP2PCallbackEvent(sptrCallback, EVENT_P2P_STATE_CHANGE);
     return WIFI_SUCCESS;
 }
 
@@ -452,7 +454,9 @@ WifiErrorCode RegisterP2pPersistentGroupsChangedCallback(const P2pPersistentGrou
     CHECK_PTR_RETURN(sptrCallback, ERROR_WIFI_NOT_AVAILABLE);
     EventManager::GetInstance().Init();
     sptrCallback->groupChangeCb = callback;
-    wifiP2pPtr->RegisterCallBack(sptrCallback);
+    std::vector<std::string> event = {EVENT_P2P_PERSISTENT_GROUP_CHANGE};
+    wifiP2pPtr->RegisterCallBack(sptrCallback, event);
+    EventManager::GetInstance().SetP2PCallbackEvent(sptrCallback, EVENT_P2P_PERSISTENT_GROUP_CHANGE);
     return WIFI_SUCCESS;
 }
 
@@ -463,7 +467,9 @@ NO_SANITIZE("cfi") WifiErrorCode RegisterP2pConnectionChangedCallback(const P2pC
     CHECK_PTR_RETURN(sptrCallback, ERROR_WIFI_NOT_AVAILABLE);
     EventManager::GetInstance().Init();
     sptrCallback->connectionChangeCb = callback;
-    wifiP2pPtr->RegisterCallBack(sptrCallback);
+    std::vector<std::string> event = {EVENT_P2P_CONN_STATE_CHANGE};
+    wifiP2pPtr->RegisterCallBack(sptrCallback, event);
+    EventManager::GetInstance().SetP2PCallbackEvent(sptrCallback, EVENT_P2P_CONN_STATE_CHANGE);
     return WIFI_SUCCESS;
 }
 
@@ -474,7 +480,9 @@ NO_SANITIZE("cfi") WifiErrorCode RegisterP2pPeersChangedCallback(const P2pPeersC
     CHECK_PTR_RETURN(sptrCallback, ERROR_WIFI_NOT_AVAILABLE);
     EventManager::GetInstance().Init();
     sptrCallback->peersChangeCb = callback;
-    wifiP2pPtr->RegisterCallBack(sptrCallback);
+    std::vector<std::string> event = {EVENT_P2P_PEER_DEVICE_CHANGE};
+    wifiP2pPtr->RegisterCallBack(sptrCallback, event);
+    EventManager::GetInstance().SetP2PCallbackEvent(sptrCallback, EVENT_P2P_PEER_DEVICE_CHANGE);
     return WIFI_SUCCESS;
 }
 
@@ -485,7 +493,9 @@ NO_SANITIZE("cfi") WifiErrorCode RegisterCfgChangCallback(const WifiCfgChangCall
     CHECK_PTR_RETURN(sptrCallback, ERROR_WIFI_NOT_AVAILABLE);
     EventManager::GetInstance().Init();
     sptrCallback->cfgChangeCallback = callback;
-    wifiP2pPtr->RegisterCallBack(sptrCallback);
+    std::vector<std::string> event = {EVENT_P2P_CONFIG_CHANGE};
+    wifiP2pPtr->RegisterCallBack(sptrCallback, event);
+    EventManager::GetInstance().SetP2PCallbackEvent(sptrCallback, EVENT_P2P_CONFIG_CHANGE);
     return WIFI_SUCCESS;
 }
 
@@ -493,5 +503,6 @@ NO_SANITIZE("cfi") WifiErrorCode UnregisterCfgChangCallback(void)
 {
     CHECK_PTR_RETURN(sptrCallback, ERROR_WIFI_NOT_AVAILABLE);
     sptrCallback->cfgChangeCallback = nullptr;
+    EventManager::GetInstance().RemoveP2PCallbackEvent(EVENT_P2P_CONFIG_CHANGE);
     return WIFI_SUCCESS;
 }

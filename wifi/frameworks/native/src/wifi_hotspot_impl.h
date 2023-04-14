@@ -168,7 +168,8 @@ public:
      * @param callback - callback struct
      * @return ErrCode - operation result
      */
-    ErrCode RegisterCallBack(const sptr<IWifiHotspotCallback> &callback) override;
+    ErrCode RegisterCallBack(const sptr<IWifiHotspotCallback> &callback,
+        const std::vector<std::string> &event) override;
 
     /**
      * @Description Get supported features

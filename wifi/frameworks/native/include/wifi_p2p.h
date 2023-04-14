@@ -228,7 +228,7 @@ public:
      * @param callback - IWifiP2pCallback object
      * @return ErrCode - operation result
      */
-    virtual ErrCode RegisterCallBack(const sptr<IWifiP2pCallback> &callback) = 0;
+    virtual ErrCode RegisterCallBack(const sptr<IWifiP2pCallback> &callback, const std::vector<std::string> &event) = 0;
 
     /**
      * @Description Get supported features

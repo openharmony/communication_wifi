@@ -23,15 +23,6 @@
 
 DEFINE_WIFILOG_LABEL("WifiAbilityStatusChange");
 
-OHOS::sptr<WifiCDeviceEventCallback> wifiUDeviceCallback =
-    OHOS::sptr<WifiCDeviceEventCallback>(new (std::nothrow) WifiCDeviceEventCallback());
-OHOS::sptr<WifiCScanEventCallback> wifiUScanCallback =
-    OHOS::sptr<WifiCScanEventCallback>(new (std::nothrow) WifiCScanEventCallback());
-OHOS::sptr<WifiCHotspotEventCallback> wifiUHotspotCallback =
-    OHOS::sptr<WifiCHotspotEventCallback>(new (std::nothrow) WifiCHotspotEventCallback());
-OHOS::sptr<WifiP2pCEventCallback> wifiUP2pCallback =
-    OHOS::sptr<WifiP2pCEventCallback>(new (std::nothrow) WifiP2pCEventCallback());
-
 namespace OHOS {
 namespace Wifi {
 void WifiAbilityStatusChange::OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId)
@@ -39,55 +30,23 @@ void WifiAbilityStatusChange::OnAddSystemAbility(int32_t systemAbilityId, const 
     WIFI_LOGI("WifiAbilityStatusChange OnAddSystemAbility systemAbilityId:%{public}d", systemAbilityId);
     switch (systemAbilityId) {
         case WIFI_DEVICE_ABILITY_ID: {
-            std::unique_ptr<WifiDevice> wifiStaPtr = WifiDevice::GetInstance(WIFI_DEVICE_ABILITY_ID);
-            if (wifiStaPtr == nullptr) {
-                WIFI_LOGE("Register sta event get instance failed!");
-                return;
-            }
-            ErrCode ret = wifiStaPtr->RegisterCallBack(wifiUDeviceCallback);
-            if (ret != WIFI_OPT_SUCCESS) {
-                WIFI_LOGE("Register sta event failed!");
-                return;
-            }
+            EventManager::GetInstance().RegisterDeviceEvent(WifiCDeviceEventCallback::deviceCallbackEvent);
             break;
         }
         case WIFI_SCAN_ABILITY_ID: {
-            std::unique_ptr<WifiScan> wifiScanPtr = WifiScan::GetInstance(WIFI_SCAN_ABILITY_ID);
-            if (wifiScanPtr == nullptr) {
-                WIFI_LOGE("Register scan event get instance failed!");
-                return;
-            }
-            ErrCode ret = wifiScanPtr->RegisterCallBack(wifiUScanCallback);
-            if (ret != WIFI_OPT_SUCCESS) {
-                WIFI_LOGE("Register scan event failed!");
-                return;
-            }
+            EventManager::GetInstance().RegisterScanEvent(WifiCScanEventCallback::scanCallbackEvent);
             break;
         }
         case WIFI_HOTSPOT_ABILITY_ID: {
-            std::unique_ptr<WifiHotspot> wifiHotspotPtr = WifiHotspot::GetInstance(WIFI_HOTSPOT_ABILITY_ID);
-            if (wifiHotspotPtr == nullptr) {
-                WIFI_LOGE("Register hotspot event get instance failed!");
-                return;
-            }
-            ErrCode ret = wifiHotspotPtr->RegisterCallBack(wifiUHotspotCallback);
-            if (ret != WIFI_OPT_SUCCESS) {
-                WIFI_LOGE("Register hotspot event failed!");
-                return;
-            }
+            EventManager::GetInstance().RegisterHotspotEvent(WifiCHotspotEventCallback::hotspotCallbackEvent);
             break;
         }
         case WIFI_P2P_ABILITY_ID: {
-            std::unique_ptr<WifiP2p> wifiP2pPtr = WifiP2p::GetInstance(WIFI_P2P_ABILITY_ID);
-            if (wifiP2pPtr == nullptr) {
-                WIFI_LOGE("Register p2p event get instance failed!");
-                return;
+            std::vector<std::string> event;
+            for (auto &eventName : EventManager::GetInstance().GetP2PCallbackEvent()) {
+                event.emplace_back(eventName);
             }
-            ErrCode ret = wifiP2pPtr->RegisterCallBack(wifiUP2pCallback);
-            if (ret != WIFI_OPT_SUCCESS) {
-                WIFI_LOGE("Register p2p event failed!");
-                return;
-            }
+            EventManager::GetInstance().RegisterP2PEvent(event);
             break;
         }
         default:

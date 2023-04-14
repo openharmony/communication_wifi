@@ -25,6 +25,7 @@
 #include <thread>
 #include <string>
 #include <map>
+#include <unordered_set>
 
 #include "wifi_internal_msg.h"
 #include "i_wifi_device_callback.h"
@@ -79,10 +80,12 @@ public:
     static void Run(WifiInternalEventDispatcher &instance);
 
     static WifiInternalEventDispatcher &GetInstance();
-    int SetSingleStaCallback(const std::shared_ptr<IWifiDeviceCallBack> &callback);
+    int SetSingleStaCallback(const std::shared_ptr<IWifiDeviceCallBack> &callback, const std::string &eventName);
     std::shared_ptr<IWifiDeviceCallBack> GetSingleStaCallback() const;
-    int SetSingleScanCallback(const std::shared_ptr<IWifiScanCallback> &callback);
+    std::unordered_set<int>& GetStaSingleCallbackEvent();
+    int SetSingleScanCallback(const std::shared_ptr<IWifiScanCallback> &callback, const std::string &eventName);
     std::shared_ptr<IWifiScanCallback> GetSingleScanCallback() const;
+    std::unordered_set<int>& GetScanSingleCallbackEvent();
 private:
     static void DealStaCallbackMsg(WifiInternalEventDispatcher &pInstance, const WifiEventCallbackMsg &msg);
     static void DealScanCallbackMsg(WifiInternalEventDispatcher &pInstance, const WifiEventCallbackMsg &msg);
@@ -96,7 +99,9 @@ private:
     std::condition_variable mCondition;
     std::deque<WifiEventCallbackMsg> mEventQue;
     std::shared_ptr<IWifiDeviceCallBack> mStaSingleCallback;
+    std::unordered_set<int> mStaSingleCallbackEvent;
     std::shared_ptr<IWifiScanCallback> mScanSingleCallback;
+    std::unordered_set<int> mScanSingleCallbackEvent;
 };
 }  // namespace Wifi
 }  // namespace OHOS

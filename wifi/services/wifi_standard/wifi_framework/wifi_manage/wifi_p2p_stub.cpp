@@ -585,8 +585,16 @@ void WifiP2pStub::OnRegisterCallBack(uint32_t code, MessageParcel &data, Message
             WIFI_LOGI("create new `WifiP2pCallbackProxy`!");
         }
 
+        int eventNum = data.ReadInt32();
+        std::vector<std::string> event;
+        if (eventNum > 0) {
+            for (int i = 0; i < eventNum; ++i) {
+                event.emplace_back(data.ReadString());
+            }
+        }
+
         if (mSingleCallback) {
-            ret = RegisterCallBack(callback_);
+            ret = RegisterCallBack(callback_, event);
         } else {
             if (deathRecipient_ == nullptr) {
                 deathRecipient_ = new (std::nothrow) WifiP2pDeathRecipient();
@@ -595,9 +603,10 @@ void WifiP2pStub::OnRegisterCallBack(uint32_t code, MessageParcel &data, Message
                 WIFI_LOGD("AddDeathRecipient!");
             }
             if (callback_ != nullptr) {
-                WifiInternalEventDispatcher::GetInstance().AddP2pCallback(remote, callback_);
+                for (auto &eventName : event) {
+                    ret = WifiInternalEventDispatcher::GetInstance().AddP2pCallback(remote, callback_, eventName);
+                }
             }
-            ret = WIFI_OPT_SUCCESS;
         }
         MonitorCfgChange();
     } while (0);

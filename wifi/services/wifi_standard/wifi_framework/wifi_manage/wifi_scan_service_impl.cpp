@@ -228,13 +228,17 @@ ErrCode WifiScanServiceImpl::GetScanInfoList(std::vector<WifiScanInfo> &result)
 }
 
 #ifdef OHOS_ARCH_LITE
-ErrCode WifiScanServiceImpl::RegisterCallBack(const std::shared_ptr<IWifiScanCallback> &callback)
+ErrCode WifiScanServiceImpl::RegisterCallBack(const std::shared_ptr<IWifiScanCallback> &callback,
+    const std::vector<std::string> &event)
 #else
-ErrCode WifiScanServiceImpl::RegisterCallBack(const sptr<IWifiScanCallback> &callback)
+ErrCode WifiScanServiceImpl::RegisterCallBack(const sptr<IWifiScanCallback> &callback,
+    const std::vector<std::string> &event)
 #endif
 {
     WIFI_LOGI("WifiScanServiceImpl::RegisterCallBack!");
-    WifiInternalEventDispatcher::GetInstance().SetSingleScanCallback(callback);
+    for (auto &eventName : event) {
+        WifiInternalEventDispatcher::GetInstance().SetSingleScanCallback(callback, eventName);
+    }
     return WIFI_OPT_SUCCESS;
 }
 

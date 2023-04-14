@@ -26,36 +26,6 @@
 namespace OHOS {
 namespace Wifi {
 DEFINE_WIFILOG_LABEL("WifiNAPIEvent");
-
-/* Events definition */
-const std::string EVENT_STA_POWER_STATE_CHANGE = "wifiStateChange";
-const std::string EVENT_STA_CONN_STATE_CHANGE = "wifiConnectionChange";
-const std::string EVENT_STA_SCAN_STATE_CHANGE = "wifiScanStateChange";
-const std::string EVENT_STA_RSSI_STATE_CHANGE = "wifiRssiChange";
-const std::string EVENT_STA_DEVICE_CONFIG_CHANGE = "deviceConfigChange";
-const std::string EVENT_HOTSPOT_STATE_CHANGE = "hotspotStateChange";
-const std::string EVENT_HOTSPOT_STA_JOIN = "hotspotStaJoin";
-const std::string EVENT_HOTSPOT_STA_LEAVE = "hotspotStaLeave";
-const std::string EVENT_P2P_STATE_CHANGE = "p2pStateChange";
-const std::string EVENT_P2P_CONN_STATE_CHANGE = "p2pConnectionChange";
-const std::string EVENT_P2P_DEVICE_STATE_CHANGE = "p2pDeviceChange";
-const std::string EVENT_P2P_PERSISTENT_GROUP_CHANGE = "p2pPersistentGroupChange";
-const std::string EVENT_P2P_PEER_DEVICE_CHANGE = "p2pPeerDeviceChange";
-const std::string EVENT_P2P_DISCOVERY_CHANGE = "p2pDiscoveryChange";
-const std::string EVENT_STREAM_CHANGE = "streamChange";
-
-/* Permissions definition */
-const std::string WIFI_PERMISSION_GET_WIFI_INFO = "ohos.permission.GET_WIFI_INFO";
-const std::string WIFI_PERMISSION_SET_WIFI_INFO = "ohos.permission.SET_WIFI_INFO";
-const std::string WIFI_PERMISSION_GET_WIFI_CONFIG = "ohos.permission.GET_WIFI_CONFIG";
-const std::string WIFI_PERMISSION_MANAGE_WIFI_CONNECTION = "ohos.permission.MANAGE_WIFI_CONNECTION";
-const std::string WIFI_PERMISSION_MANAGE_WIFI_HOTSPOT = "ohos.permission.MANAGE_WIFI_HOTSPOT";
-const std::string WIFI_PERMISSION_GET_WIFI_LOCAL_MAC = "ohos.permission.GET_WIFI_LOCAL_MAC";
-const std::string WIFI_PERMISSION_LOCATION = "ohos.permission.LOCATION";
-const std::string WIFI_PERMISSION_GET_WIFI_INFO_INTERNAL = "ohos.permission.GET_WIFI_INFO_INTERNAL";
-const int WIFI_NAPI_PERMISSION_DENIED = 0;
-const int WIFI_NAPI_PERMISSION_GRANTED = 1;
-
 constexpr uint32_t INVALID_REF_COUNT = 0xff;
 
 static std::set<std::string> g_supportEventList = {
@@ -73,28 +43,6 @@ static std::set<std::string> g_supportEventList = {
     EVENT_P2P_PERSISTENT_GROUP_CHANGE,
     EVENT_P2P_PEER_DEVICE_CHANGE,
     EVENT_P2P_DISCOVERY_CHANGE,
-};
-
-std::multimap<std::string, std::string> g_EventPermissionMap = {
-    { EVENT_STA_POWER_STATE_CHANGE, WIFI_PERMISSION_GET_WIFI_INFO },
-    { EVENT_STA_CONN_STATE_CHANGE, WIFI_PERMISSION_GET_WIFI_INFO },
-    { EVENT_STA_SCAN_STATE_CHANGE, WIFI_PERMISSION_GET_WIFI_INFO },
-    { EVENT_STA_RSSI_STATE_CHANGE, WIFI_PERMISSION_GET_WIFI_INFO },
-    { EVENT_STA_DEVICE_CONFIG_CHANGE, WIFI_PERMISSION_GET_WIFI_INFO },
-    { EVENT_HOTSPOT_STATE_CHANGE, WIFI_PERMISSION_GET_WIFI_INFO },
-    { EVENT_HOTSPOT_STA_JOIN, WIFI_PERMISSION_MANAGE_WIFI_HOTSPOT },
-    { EVENT_HOTSPOT_STA_LEAVE, WIFI_PERMISSION_MANAGE_WIFI_HOTSPOT },
-    { EVENT_P2P_STATE_CHANGE, WIFI_PERMISSION_GET_WIFI_INFO },
-    { EVENT_P2P_CONN_STATE_CHANGE, WIFI_PERMISSION_GET_WIFI_INFO },
-    { EVENT_P2P_DEVICE_STATE_CHANGE, WIFI_PERMISSION_GET_WIFI_INFO },
-    { EVENT_P2P_DEVICE_STATE_CHANGE, WIFI_PERMISSION_LOCATION },
-    { EVENT_P2P_DEVICE_STATE_CHANGE, WIFI_PERMISSION_GET_WIFI_INFO_INTERNAL },
-    { EVENT_P2P_PERSISTENT_GROUP_CHANGE, WIFI_PERMISSION_GET_WIFI_INFO },
-    { EVENT_P2P_PEER_DEVICE_CHANGE, WIFI_PERMISSION_GET_WIFI_INFO },
-    { EVENT_P2P_PEER_DEVICE_CHANGE, WIFI_PERMISSION_LOCATION },
-    { EVENT_P2P_PEER_DEVICE_CHANGE, WIFI_PERMISSION_GET_WIFI_INFO_INTERNAL },
-    { EVENT_P2P_DISCOVERY_CHANGE, WIFI_PERMISSION_GET_WIFI_INFO },
-    { EVENT_STREAM_CHANGE, WIFI_PERMISSION_MANAGE_WIFI_CONNECTION },
 };
 
 std::map<std::string, std::int32_t> g_EventSysCapMap = {
@@ -528,58 +476,99 @@ sptr<WifiNapiHotspotEventCallback> wifiHotspotCallback =
 sptr<WifiNapiP2pEventCallback> wifiP2pCallback =
     sptr<WifiNapiP2pEventCallback>(new (std::nothrow) WifiNapiP2pEventCallback());
 
-NO_SANITIZE("cfi") ErrCode EventRegister::RegisterWifiEvents(int32_t sysCap)
+ErrCode EventRegister::RegisterDeviceEvents(const std::vector<std::string> &event)
 {
+    if (event.empty()) {
+        WIFI_LOGE("Register sta event is empty!");
+        return WIFI_OPT_FAILED;
+    }
+    std::unique_ptr<WifiDevice> wifiStaPtr = WifiDevice::GetInstance(WIFI_DEVICE_ABILITY_ID);
+    if (wifiStaPtr == nullptr) {
+        WIFI_LOGE("Register sta event get instance failed!");
+        return WIFI_OPT_FAILED;
+    }
+    ErrCode ret = wifiStaPtr->RegisterCallBack(wifiDeviceCallback, event);
+    if (ret != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("Register sta event failed!");
+        return ret;
+    }
+    return WIFI_OPT_SUCCESS;
+}
+
+ErrCode EventRegister::RegisterScanEvents(const std::vector<std::string> &event)
+{
+    if (event.empty()) {
+        WIFI_LOGE("Register scan event is empty!");
+        return WIFI_OPT_FAILED;
+    }
+    std::unique_ptr<WifiScan> wifiScanPtr = WifiScan::GetInstance(WIFI_SCAN_ABILITY_ID);
+    if (wifiScanPtr == nullptr) {
+        WIFI_LOGE("Register scan event get instance failed!");
+        return WIFI_OPT_FAILED;
+    }
+    ErrCode ret = wifiScanPtr->RegisterCallBack(wifiScanCallback, event);
+    if (ret != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("Register scan event failed!");
+        return ret;
+    }
+    return WIFI_OPT_SUCCESS;
+}
+
+ErrCode EventRegister::RegisterHotspotEvents(const std::vector<std::string> &event)
+{
+    if (event.empty()) {
+        WIFI_LOGE("Register hotspot event is empty!");
+        return WIFI_OPT_FAILED;
+    }
+    std::unique_ptr<WifiHotspot> wifiHotspotPtr = WifiHotspot::GetInstance(WIFI_HOTSPOT_ABILITY_ID);
+    if (wifiHotspotPtr == nullptr) {
+        WIFI_LOGE("Register hotspot event get instance failed!");
+        return WIFI_OPT_FAILED;
+    }
+    ErrCode ret = wifiHotspotPtr->RegisterCallBack(wifiHotspotCallback, event);
+    if (ret != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("Register hotspot event failed!");
+        return ret;
+    }
+    return WIFI_OPT_SUCCESS;
+}
+
+ErrCode EventRegister::RegisterP2PEvents(const std::vector<std::string> &event)
+{
+    if (event.empty()) {
+        WIFI_LOGE("Register p2p event is empty!");
+        return WIFI_OPT_FAILED;
+    }
+    std::unique_ptr<WifiP2p> wifiP2pPtr = WifiP2p::GetInstance(WIFI_P2P_ABILITY_ID);
+    if (wifiP2pPtr == nullptr) {
+        WIFI_LOGE("Register p2p event get instance failed!");
+        return WIFI_OPT_FAILED;
+    }
+    ErrCode ret = wifiP2pPtr->RegisterCallBack(wifiP2pCallback, event);
+    if (ret != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("Register p2p event failed!");
+        return ret;
+    }
+    return WIFI_OPT_SUCCESS;
+}
+
+NO_SANITIZE("cfi") ErrCode EventRegister::RegisterWifiEvents(int32_t sysCap, const std::string& type)
+{
+    std::vector<std::string> event = {type};
     if (sysCap == SYSCAP_WIFI_STA) {
-        std::unique_ptr<WifiDevice> wifiStaPtr = WifiDevice::GetInstance(WIFI_DEVICE_ABILITY_ID);
-        if (wifiStaPtr == nullptr) {
-            WIFI_LOGE("Register sta event get instance failed!");
-            return WIFI_OPT_FAILED;
-        }
-        ErrCode ret = wifiStaPtr->RegisterCallBack(wifiDeviceCallback);
+        ErrCode ret = RegisterDeviceEvents(event);
         if (ret != WIFI_OPT_SUCCESS) {
-            WIFI_LOGE("Register sta event failed!");
             return ret;
         }
-        std::unique_ptr<WifiScan> wifiScanPtr = WifiScan::GetInstance(WIFI_SCAN_ABILITY_ID);
-        if (wifiScanPtr == nullptr) {
-            WIFI_LOGE("Register scan event get instance failed!");
-            return WIFI_OPT_FAILED;
-        }
-        ret = wifiScanPtr->RegisterCallBack(wifiScanCallback);
-        if (ret != WIFI_OPT_SUCCESS) {
-            WIFI_LOGE("Register scan event failed!");
-            return ret;
-        }
-        return WIFI_OPT_SUCCESS;
+        return RegisterScanEvents(event);
     }
 
     if (sysCap == SYSCAP_WIFI_AP_CORE) {
-        std::unique_ptr<WifiHotspot> wifiHotspotPtr = WifiHotspot::GetInstance(WIFI_HOTSPOT_ABILITY_ID);
-        if (wifiHotspotPtr == nullptr) {
-            WIFI_LOGE("Register hotspot event get instance failed!");
-            return WIFI_OPT_FAILED;
-        }
-        ErrCode ret = wifiHotspotPtr->RegisterCallBack(wifiHotspotCallback);
-        if (ret != WIFI_OPT_SUCCESS) {
-            WIFI_LOGE("Register hotspot event failed!");
-            return ret;
-        }
-        return WIFI_OPT_SUCCESS;
+        return RegisterHotspotEvents(event);
     }
 
     if (sysCap == SYSCAP_WIFI_P2P) {
-        std::unique_ptr<WifiP2p> wifiP2pPtr = WifiP2p::GetInstance(WIFI_P2P_ABILITY_ID);
-        if (wifiP2pPtr == nullptr) {
-            WIFI_LOGE("Register p2p event get instance failed!");
-            return WIFI_OPT_FAILED;
-        }
-        ErrCode ret = wifiP2pPtr->RegisterCallBack(wifiP2pCallback);
-        if (ret != WIFI_OPT_SUCCESS) {
-            WIFI_LOGE("Register p2p event failed!");
-            return ret;
-        }
-        return WIFI_OPT_SUCCESS;
+        return RegisterP2PEvents(event);
     }
 
     WIFI_LOGE("RegisterWifiEvents, invalid sysCap: %{public}d!", static_cast<int>(sysCap));
@@ -589,57 +578,46 @@ NO_SANITIZE("cfi") ErrCode EventRegister::RegisterWifiEvents(int32_t sysCap)
 void WifiNapiAbilityStatusChange::OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId)
 {
     WIFI_LOGI("WifiNapiAbilityStatusChange OnAddSystemAbility systemAbilityId:%{public}d", systemAbilityId);
+    std::vector<std::string> event;
     switch (systemAbilityId) {
         case WIFI_DEVICE_ABILITY_ID: {
-            std::unique_ptr<WifiDevice> wifiStaPtr = WifiDevice::GetInstance(WIFI_DEVICE_ABILITY_ID);
-            if (wifiStaPtr == nullptr) {
-                WIFI_LOGE("Register sta event get instance failed!");
-                return;
+            std::unique_lock<std::shared_mutex> guard(g_regInfoMutex);
+            for (auto &iter : g_eventRegisterInfo) {
+                if (findSysCap(iter.first) == SYSCAP_WIFI_STA) {
+                    event.emplace_back(iter.first);
+                }
             }
-            ErrCode ret = wifiStaPtr->RegisterCallBack(wifiDeviceCallback);
-            if (ret != WIFI_OPT_SUCCESS) {
-                WIFI_LOGE("Register sta event failed!");
-                return;
-            }
+            EventRegister::GetInstance().RegisterDeviceEvents(event);
             break;
         }
         case WIFI_SCAN_ABILITY_ID: {
-            std::unique_ptr<WifiScan> wifiScanPtr = WifiScan::GetInstance(WIFI_SCAN_ABILITY_ID);
-            if (wifiScanPtr == nullptr) {
-                WIFI_LOGE("Register scan event get instance failed!");
-                return;
+            std::unique_lock<std::shared_mutex> guard(g_regInfoMutex);
+            for (auto &iter : g_eventRegisterInfo) {
+                if (findSysCap(iter.first) == SYSCAP_WIFI_STA) {
+                    event.emplace_back(iter.first);
+                }
             }
-            ErrCode ret = wifiScanPtr->RegisterCallBack(wifiScanCallback);
-            if (ret != WIFI_OPT_SUCCESS) {
-                WIFI_LOGE("Register scan event failed!");
-                return;
-            }
+            EventRegister::GetInstance().RegisterScanEvents(event);
             break;
         }
         case WIFI_HOTSPOT_ABILITY_ID: {
-            std::unique_ptr<WifiHotspot> wifiHotspotPtr = WifiHotspot::GetInstance(WIFI_HOTSPOT_ABILITY_ID);
-            if (wifiHotspotPtr == nullptr) {
-                WIFI_LOGE("Register hotspot event get instance failed!");
-                return;
+            std::unique_lock<std::shared_mutex> guard(g_regInfoMutex);
+            for (auto &iter : g_eventRegisterInfo) {
+                if (findSysCap(iter.first) == SYSCAP_WIFI_AP_CORE) {
+                    event.emplace_back(iter.first);
+                }
             }
-            ErrCode ret = wifiHotspotPtr->RegisterCallBack(wifiHotspotCallback);
-            if (ret != WIFI_OPT_SUCCESS) {
-                WIFI_LOGE("Register hotspot event failed!");
-                return;
-            }
+            EventRegister::GetInstance().RegisterHotspotEvents(event);
             break;
         }
         case WIFI_P2P_ABILITY_ID: {
-            std::unique_ptr<WifiP2p> wifiP2pPtr = WifiP2p::GetInstance(WIFI_P2P_ABILITY_ID);
-            if (wifiP2pPtr == nullptr) {
-                WIFI_LOGE("Register p2p event get instance failed!");
-                return;
+            std::unique_lock<std::shared_mutex> guard(g_regInfoMutex);
+            for (auto &iter : g_eventRegisterInfo) {
+                if (findSysCap(iter.first) == SYSCAP_WIFI_P2P) {
+                    event.emplace_back(iter.first);
+                }
             }
-            ErrCode ret = wifiP2pPtr->RegisterCallBack(wifiP2pCallback);
-            if (ret != WIFI_OPT_SUCCESS) {
-                WIFI_LOGE("Register p2p event failed!");
-                return;
-            }
+            EventRegister::GetInstance().RegisterP2PEvents(event);
             break;
         }
         default:
@@ -659,50 +637,6 @@ bool EventRegister::IsEventSupport(const std::string& type)
     return g_supportEventList.find(type) != g_supportEventList.end();
 }
 
-int EventRegister::CheckPermission(const std::string& eventType)
-{
-    auto callerToken = IPCSkeleton::GetCallingTokenID();
-    auto tokenType = Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(callerToken);
-    if (tokenType == Security::AccessToken::ATokenTypeEnum::TOKEN_NATIVE) {
-        return WIFI_NAPI_PERMISSION_GRANTED;
-    }
-
-    if (tokenType != Security::AccessToken::ATokenTypeEnum::TOKEN_HAP) {
-        WIFI_LOGE("Invalid tokenType=%{public}x, permission denied!", tokenType);
-        return WIFI_NAPI_PERMISSION_DENIED;
-    }
-
-    std::multimap<std::string, std::string> *permissions = &g_EventPermissionMap;
-    size_t count = permissions->count(eventType);
-    if (count <= 0) {
-        WIFI_LOGE("NO permission defined for tokenType=%{public}x !", tokenType);
-        return WIFI_NAPI_PERMISSION_DENIED;
-    }
-
-    std::string permissionName;
-    int hasPermission = 1;
-    std::multimap<std::string, std::string>::iterator it = permissions->find(eventType);
-    for (size_t i = 0; i < count; i++) {
-        permissionName = (*(it++)).second;
-        int res = Security::AccessToken::AccessTokenKit::VerifyAccessToken(callerToken, permissionName);
-        if (permissionName.compare(WIFI_PERMISSION_GET_WIFI_INFO_INTERNAL) == 0) {
-            if (res == Security::AccessToken::PermissionState::PERMISSION_GRANTED) {
-                return WIFI_NAPI_PERMISSION_GRANTED;
-            }
-            /* NO permission */
-            WIFI_LOGE("callerToken=0x%{public}x has no permission=%{public}s",
-                callerToken, permissionName.c_str());
-        } else {
-            if (res != Security::AccessToken::PermissionState::PERMISSION_GRANTED) {
-                WIFI_LOGW("callerToken=0x%{public}x has no permission=%{public}s",
-                    callerToken, permissionName.c_str());
-               hasPermission = 0;
-            }
-        }
-    }
-    return ((hasPermission == 1) ? WIFI_NAPI_PERMISSION_GRANTED : WIFI_NAPI_PERMISSION_DENIED);
-}
-
 void EventRegister::Register(const napi_env& env, const std::string& type, napi_value handler)
 {
     int32_t sysCap = findSysCap(type);
@@ -715,15 +649,8 @@ void EventRegister::Register(const napi_env& env, const std::string& type, napi_
 #endif
         return;
     }
-    if (CheckPermission(type) != WIFI_NAPI_PERMISSION_GRANTED) {
-        WIFI_LOGE("Register fail for NO permission!");
-#ifdef ENABLE_NAPI_WIFI_MANAGER
-        HandleSyncErrCode(env, WIFI_OPT_PERMISSION_DENIED, sysCap);
-#endif
-        return;
-    }
     std::unique_lock<std::shared_mutex> guard(g_regInfoMutex);
-    ErrCode ret = RegisterWifiEvents(sysCap);
+    ErrCode ret = RegisterWifiEvents(sysCap, type);
     if (ret != WIFI_OPT_SUCCESS) {
 #ifdef ENABLE_NAPI_WIFI_MANAGER
         HandleSyncErrCode(env, ret, sysCap);
@@ -800,13 +727,6 @@ void EventRegister::Unregister(const napi_env& env, const std::string& type, nap
         WIFI_LOGE("Unregister type error or not support!");
 #ifdef ENABLE_NAPI_WIFI_MANAGER
         HandleSyncErrCode(env, WIFI_OPT_NOT_SUPPORTED, sysCap);
-#endif
-        return;
-    }
-    if (CheckPermission(type) != WIFI_NAPI_PERMISSION_GRANTED) {
-        WIFI_LOGE("Unregister fail for NO permission!");
-#ifdef ENABLE_NAPI_WIFI_MANAGER
-        HandleSyncErrCode(env, WIFI_OPT_PERMISSION_DENIED, sysCap);
 #endif
         return;
     }

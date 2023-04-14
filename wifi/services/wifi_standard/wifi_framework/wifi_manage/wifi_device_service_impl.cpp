@@ -1073,9 +1073,11 @@ ErrCode WifiDeviceServiceImpl::GetCountryCode(std::string &countryCode)
 }
 
 #ifdef OHOS_ARCH_LITE
-ErrCode WifiDeviceServiceImpl::RegisterCallBack(const std::shared_ptr<IWifiDeviceCallBack> &callback)
+ErrCode WifiDeviceServiceImpl::RegisterCallBack(const std::shared_ptr<IWifiDeviceCallBack> &callback,
+    const std::vector<std::string> &event)
 #else
-ErrCode WifiDeviceServiceImpl::RegisterCallBack(const sptr<IWifiDeviceCallBack> &callback)
+ErrCode WifiDeviceServiceImpl::RegisterCallBack(const sptr<IWifiDeviceCallBack> &callback,
+    const std::vector<std::string> &event)
 #endif
 {
     WIFI_LOGI("RegisterCallBack");
@@ -1089,7 +1091,9 @@ ErrCode WifiDeviceServiceImpl::RegisterCallBack(const sptr<IWifiDeviceCallBack> 
         return WIFI_OPT_PERMISSION_DENIED;
     }
 
-    WifiInternalEventDispatcher::GetInstance().SetSingleStaCallback(callback);
+    for (auto &eventName : event) {
+        WifiInternalEventDispatcher::GetInstance().SetSingleStaCallback(callback, eventName);
+    }
     return WIFI_OPT_SUCCESS;
 }
 

@@ -1044,7 +1044,7 @@ ErrCode WifiP2pProxy::SetP2pWfdInfo(const WifiP2pWfdInfo &wfdInfo)
 }
 
 
-ErrCode WifiP2pProxy::RegisterCallBack(const sptr<IWifiP2pCallback> &callback)
+ErrCode WifiP2pProxy::RegisterCallBack(const sptr<IWifiP2pCallback> &callback, const std::vector<std::string> &event)
 {
     if (mRemoteDied) {
         WIFI_LOGW("failed to `%{public}s`,remote service is died!", __func__);
@@ -1068,7 +1068,13 @@ ErrCode WifiP2pProxy::RegisterCallBack(const sptr<IWifiP2pCallback> &callback)
         WIFI_LOGE("RegisterCallBack WriteRemoteObject failed!");
         return WIFI_OPT_FAILED;
     }
-
+    int eventNum = event.size();
+    data.WriteInt32(eventNum);
+    if (eventNum > 0) {
+        for (auto &eventName : event) {
+            data.WriteString(eventName);
+        }
+    }
     int error = Remote()->SendRequest(WIFI_SVR_CMD_P2P_REGISTER_CALLBACK, data, reply, option);
     if (error != ERR_NONE) {
         WIFI_LOGE("RegisterCallBack failed, error code is %{public}d", error);

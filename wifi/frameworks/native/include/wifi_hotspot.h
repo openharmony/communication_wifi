@@ -160,7 +160,8 @@ public:
      * @param callback - callback struct
      * @return ErrCode - operation result
      */
-    virtual ErrCode RegisterCallBack(const sptr<IWifiHotspotCallback> &callback) = 0;
+    virtual ErrCode RegisterCallBack(const sptr<IWifiHotspotCallback> &callback,
+        const std::vector<std::string> &event) = 0;
 
     /**
      * @Description Get supported features

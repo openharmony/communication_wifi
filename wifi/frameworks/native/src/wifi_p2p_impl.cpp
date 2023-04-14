@@ -229,10 +229,10 @@ ErrCode WifiP2pImpl::QueryP2pServices(std::vector<WifiP2pServiceInfo> &services)
     return client_->QueryP2pServices(services);
 }
 
-ErrCode WifiP2pImpl::RegisterCallBack(const sptr<IWifiP2pCallback> &callback)
+ErrCode WifiP2pImpl::RegisterCallBack(const sptr<IWifiP2pCallback> &callback, const std::vector<std::string> &event)
 {
     RETURN_IF_FAIL(GetWifiP2pProxy());
-    return client_->RegisterCallBack(callback);
+    return client_->RegisterCallBack(callback, event);
 }
 
 ErrCode WifiP2pImpl::GetSupportedFeatures(long &features)

@@ -1069,7 +1069,8 @@ ErrCode WifiDeviceProxy::GetCountryCode(std::string &countryCode)
     return WIFI_OPT_SUCCESS;
 }
 
-ErrCode WifiDeviceProxy::RegisterCallBack(const sptr<IWifiDeviceCallBack> &callback)
+ErrCode WifiDeviceProxy::RegisterCallBack(const sptr<IWifiDeviceCallBack> &callback,
+    const std::vector<std::string> &event)
 {
     if (mRemoteDied) {
         WIFI_LOGE("failed to `%{public}s`,remote service is died!", __func__);
@@ -1096,6 +1097,13 @@ ErrCode WifiDeviceProxy::RegisterCallBack(const sptr<IWifiDeviceCallBack> &callb
 
     int pid = GetCallingPid();
     data.WriteInt32(pid);
+    int eventNum = event.size();
+    data.WriteInt32(eventNum);
+    if (eventNum > 0) {
+        for (auto &eventName : event) {
+            data.WriteString(eventName);
+        }
+    }
     WIFI_LOGD("%{public}s, calling uid: %{public}d, pid: %{public}d", __func__, GetCallingUid(), pid);
     int error = Remote()->SendRequest(WIFI_SVR_CMD_REGISTER_CALLBACK_CLIENT, data, reply, option);
     if (error != ERR_NONE) {

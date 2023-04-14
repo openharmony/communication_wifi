@@ -281,13 +281,15 @@ ErrCode WifiDeviceImpl::GetSignalLevel(const int &rssi, const int &band, int &le
 }
 
 #ifdef OHOS_ARCH_LITE
-ErrCode WifiDeviceImpl::RegisterCallBack(const std::shared_ptr<IWifiDeviceCallBack> &callback)
+ErrCode WifiDeviceImpl::RegisterCallBack(const std::shared_ptr<IWifiDeviceCallBack> &callback,
+    const std::vector<std::string> &event)
 #else
-ErrCode WifiDeviceImpl::RegisterCallBack(const sptr<IWifiDeviceCallBack> &callback)
+ErrCode WifiDeviceImpl::RegisterCallBack(const sptr<IWifiDeviceCallBack> &callback,
+    const std::vector<std::string> &event)
 #endif
 {
     RETURN_IF_FAIL(GetWifiDeviceProxy());
-    return client_->RegisterCallBack(callback);
+    return client_->RegisterCallBack(callback, event);
 }
 
 ErrCode WifiDeviceImpl::GetSupportedFeatures(long &features)

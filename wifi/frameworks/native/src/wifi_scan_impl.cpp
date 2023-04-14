@@ -133,13 +133,14 @@ ErrCode WifiScanImpl::GetScanInfoList(std::vector<WifiScanInfo> &result)
 }
 
 #ifdef OHOS_ARCH_LITE
-ErrCode WifiScanImpl::RegisterCallBack(const std::shared_ptr<IWifiScanCallback> &callback)
+ErrCode WifiScanImpl::RegisterCallBack(const std::shared_ptr<IWifiScanCallback> &callback,
+    const std::vector<std::string> &event)
 #else
-ErrCode WifiScanImpl::RegisterCallBack(const sptr<IWifiScanCallback> &callback)
+ErrCode WifiScanImpl::RegisterCallBack(const sptr<IWifiScanCallback> &callback, const std::vector<std::string> &event)
 #endif
 {
     RETURN_IF_FAIL(GetWifiScanProxy());
-    return client_->RegisterCallBack(callback);
+    return client_->RegisterCallBack(callback, event);
 }
 
 ErrCode WifiScanImpl::GetSupportedFeatures(long &features)

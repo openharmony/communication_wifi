@@ -201,7 +201,8 @@ static sptr<WifiScanEventCallback> scanCallback =
 static void RegisterDeviceEvents(void)
 {
     if (ptrWifiDevice != nullptr) {
-        ErrCode ret = ptrWifiDevice->RegisterCallBack(deviceCallback);
+        std::vector<std::string> event = {EVENT_STA_POWER_STATE_CHANGE};
+        ErrCode ret = ptrWifiDevice->RegisterCallBack(deviceCallback, event);
         if (ret == WIFI_OPT_SUCCESS) {
             Logd("%s success", __func__);
         } else {
@@ -213,7 +214,8 @@ static void RegisterDeviceEvents(void)
 static void RegisterScanEvents(void)
 {
     if (ptrWifiScan != nullptr) {
-        ErrCode ret = ptrWifiScan->RegisterCallBack(scanCallback);
+        std::vector<std::string> event = {EVENT_STA_SCAN_STATE_CHANGE};
+        ErrCode ret = ptrWifiScan->RegisterCallBack(scanCallback, event);
         if (ret == WIFI_OPT_SUCCESS) {
             Logd("%s success", __func__);
         } else {

@@ -185,10 +185,11 @@ ErrCode WifiHotspotImpl::GetValidChannels(BandType band, std::vector<int32_t> &v
     return client_->GetValidChannels(band, validchannels);
 }
 
-ErrCode WifiHotspotImpl::RegisterCallBack(const sptr<IWifiHotspotCallback> &callback)
+ErrCode WifiHotspotImpl::RegisterCallBack(const sptr<IWifiHotspotCallback> &callback,
+    const std::vector<std::string> &event)
 {
     RETURN_IF_FAIL(GetWifiHotspotProxy());
-    return client_->RegisterCallBack(callback);
+    return client_->RegisterCallBack(callback, event);
 }
 
 ErrCode WifiHotspotImpl::GetSupportedFeatures(long &features)

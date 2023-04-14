@@ -1223,7 +1223,8 @@ ErrCode WifiDeviceProxy::GetCountryCode(std::string &countryCode)
     return ErrCode(owner.retCode);
 }
 
-ErrCode WifiDeviceProxy::RegisterCallBack(const std::shared_ptr<IWifiDeviceCallBack> &callback)
+ErrCode WifiDeviceProxy::RegisterCallBack(const std::shared_ptr<IWifiDeviceCallBack> &callback,
+    const std::vector<std::string> &event)
 {
     if (remoteDied_ || remote_ == nullptr) {
         WIFI_LOGE("failed to %{public}s, remoteDied_: %{public}d, remote_: %{public}d",
@@ -1254,7 +1255,13 @@ ErrCode WifiDeviceProxy::RegisterCallBack(const std::shared_ptr<IWifiDeviceCallB
         WIFI_LOGE("WriteRemoteObject failed.");
         return WIFI_OPT_FAILED;
     }
-
+    int eventNum = event.size();
+    (void)WriteInt32(&req, eventNum);
+    if (eventNum > 0) {
+        for (auto &eventName : event) {
+            (void)WriteString(&req, eventName.c_str());
+        }
+    }
     owner.funcId = WIFI_SVR_CMD_REGISTER_CALLBACK_CLIENT;
     int error = remote_->Invoke(remote_, WIFI_SVR_CMD_REGISTER_CALLBACK_CLIENT, &req, &owner, IpcCallback);
     if (error != EC_SUCCESS) {

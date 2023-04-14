@@ -25,6 +25,8 @@
 #include <thread>
 #include <string>
 #include <map>
+#include <unordered_set>
+#include <functional>
 
 #include "wifi_internal_msg.h"
 #ifndef OHOS_ARCH_LITE
@@ -43,7 +45,11 @@ using StaCallbackInfo = std::map<sptr<IRemoteObject>, WifiCallingInfo>;
 using ScanCallbackMapType = std::map<sptr<IRemoteObject>, sptr<IWifiScanCallback>>;
 using ScanCallbackInfo = std::map<sptr<IRemoteObject>, WifiCallingInfo>;
 using HotspotCallbackMapType = std::map<sptr<IRemoteObject>, sptr<IWifiHotspotCallback>>;
+using HotspotCallbackInfo = std::map<sptr<IRemoteObject>, std::unordered_set<int>>;
 using P2pCallbackMapType = std::map<sptr<IRemoteObject>, sptr<IWifiP2pCallback>>;
+using P2pCallbackInfo = std::map<sptr<IRemoteObject>, std::unordered_set<int>>;
+using CallbackEventPermissionMap = std::multimap<int, std::pair<std::function<int()>, std::string>>;
+
 class WifiInternalEventDispatcher {
 public:
     WifiInternalEventDispatcher();
@@ -91,22 +97,26 @@ public:
     static void Run(WifiInternalEventDispatcher &instance);
 
     static WifiInternalEventDispatcher &GetInstance();
-    int AddStaCallback(const sptr<IRemoteObject> &remote, const sptr<IWifiDeviceCallBack> &callback, int pid);
-    int SetSingleStaCallback(const sptr<IWifiDeviceCallBack> &callback);
+    ErrCode AddStaCallback(const sptr<IRemoteObject> &remote, const sptr<IWifiDeviceCallBack> &callback, int pid,
+        const std::string &eventName);
+    int SetSingleStaCallback(const sptr<IWifiDeviceCallBack> &callback, const std::string &eventName);
     sptr<IWifiDeviceCallBack> GetSingleStaCallback() const;
     int RemoveStaCallback(const sptr<IRemoteObject> &remote);
     bool HasStaRemote(const sptr<IRemoteObject> &remote);
-    int AddScanCallback(const sptr<IRemoteObject> &remote, const sptr<IWifiScanCallback> &callback, int pid);
-    int SetSingleScanCallback(const sptr<IWifiScanCallback> &callback);
+    ErrCode AddScanCallback(const sptr<IRemoteObject> &remote, const sptr<IWifiScanCallback> &callback, int pid,
+        const std::string &eventName);
+    int SetSingleScanCallback(const sptr<IWifiScanCallback> &callback, const std::string &eventName);
     sptr<IWifiScanCallback> GetSingleScanCallback() const;
     int RemoveScanCallback(const sptr<IRemoteObject> &remote);
     bool HasScanRemote(const sptr<IRemoteObject> &remote);
-    int AddHotspotCallback(const sptr<IRemoteObject> &remote, const sptr<IWifiHotspotCallback> &callback, int id = 0);
+    ErrCode AddHotspotCallback(const sptr<IRemoteObject> &remote, const sptr<IWifiHotspotCallback> &callback,
+        const std::string &eventName, int id = 0);
     int SetSingleHotspotCallback(const sptr<IWifiHotspotCallback> &callback, int id = 0);
     sptr<IWifiHotspotCallback> GetSingleHotspotCallback(int id) const;
     int RemoveHotspotCallback(const sptr<IRemoteObject> &remote, int id = 0);
     bool HasHotspotRemote(const sptr<IRemoteObject> &remote, int id = 0);
-    int AddP2pCallback(const sptr<IRemoteObject> &remote, const sptr<IWifiP2pCallback> &callback);
+    ErrCode AddP2pCallback(const sptr<IRemoteObject> &remote, const sptr<IWifiP2pCallback> &callback,
+        const std::string &eventName);
     int SetSingleP2pCallback(const sptr<IWifiP2pCallback> &callback);
     sptr<IWifiP2pCallback> GetSingleP2pCallback() const;
     int RemoveP2pCallback(const sptr<IRemoteObject> &remote);
@@ -116,6 +126,7 @@ public:
     void InvokeDeviceCallbacks(const WifiEventCallbackMsg &msg);
     void InvokeHotspotCallbacks(const WifiEventCallbackMsg &msg);
     void InvokeP2pCallbacks(const WifiEventCallbackMsg &msg);
+    bool VerifyRegisterCallbackPermission(int callbackEventId);
 private:
     static void DealStaCallbackMsg(WifiInternalEventDispatcher &pInstance, const WifiEventCallbackMsg &msg);
     static void DealScanCallbackMsg(WifiInternalEventDispatcher &pInstance, const WifiEventCallbackMsg &msg);
@@ -142,9 +153,11 @@ private:
     sptr<IWifiScanCallback> mScanSingleCallback;
     std::mutex mHotspotCallbackMutex;
     std::map<int, HotspotCallbackMapType> mHotspotCallbacks;
+    std::map<int, HotspotCallbackInfo> mHotspotCallbackInfo;
     std::map<int, sptr<IWifiHotspotCallback>> mHotspotSingleCallback;
     std::mutex mP2pCallbackMutex;
     P2pCallbackMapType mP2pCallbacks;
+    P2pCallbackInfo mP2pCallbackInfo;
     sptr<IWifiP2pCallback> mP2pSingleCallback;
 };
 }  // namespace Wifi

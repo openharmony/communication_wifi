@@ -144,6 +144,13 @@ void EventManager::RemoveEventCallback(WifiEvent *cb)
 
 NO_SANITIZE("cfi") WifiErrorCode EventManager::RegisterWifiEvents()
 {
+    if (mSaStatusListener == nullptr) {
+        mSaStatusListener = new OHOS::Wifi::WifiAbilityStatusChange();
+        mSaStatusListener->Init(WIFI_DEVICE_ABILITY_ID);
+        mSaStatusListener->Init(WIFI_SCAN_ABILITY_ID);
+        mSaStatusListener->Init(WIFI_HOTSPOT_ABILITY_ID);
+        mSaStatusListener->Init(WIFI_P2P_ABILITY_ID);
+    }
     using namespace OHOS::Wifi;
     std::unique_ptr<WifiDevice> wifiStaPtr = WifiDevice::GetInstance(WIFI_DEVICE_ABILITY_ID);
     if (wifiStaPtr == nullptr) {
@@ -182,12 +189,7 @@ NO_SANITIZE("cfi") WifiErrorCode EventManager::RegisterWifiEvents()
 
 EventManager::EventManager()
 {
-    WIFI_LOGI("C Register InitListener!");
-    mSaStatusListener = new OHOS::Wifi::WifiAbilityStatusChange();
-    mSaStatusListener->Init(WIFI_DEVICE_ABILITY_ID);
-    mSaStatusListener->Init(WIFI_SCAN_ABILITY_ID);
-    mSaStatusListener->Init(WIFI_HOTSPOT_ABILITY_ID);
-    mSaStatusListener->Init(WIFI_P2P_ABILITY_ID);
+    
 }
 
 bool EventManager::IsEventRegistered()

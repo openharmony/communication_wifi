@@ -26,6 +26,7 @@
 #include "wifi_scan.h"
 #include "wifi_common_util.h"
 #include "../../src/wifi_sa_event.h"
+#include "wifi_sa_event.h"
 DEFINE_WIFILOG_LABEL("WifiCEvent");
 std::set<WifiEvent*> GetEventCallBacks();
 
@@ -153,7 +154,9 @@ NO_SANITIZE("cfi") WifiErrorCode EventManager::RegisterWifiEvents()
     }
     using namespace OHOS::Wifi;
     std::unique_ptr<WifiDevice> wifiStaPtr = WifiDevice::GetInstance(WIFI_DEVICE_ABILITY_ID);
-    if (wifiStaPtr == nullptr) {
+
+    if (wifiStaPtr == nullptr)
+    {
         WIFI_LOGE("Register sta event get instance failed!");
         return ERROR_WIFI_UNKNOWN;
     }
@@ -207,9 +210,27 @@ std::set<WifiEvent*> EventManager::GetEventCallBacks()
     return m_setEventCallback;
 }
 
+void EventManager::Init()
+{
+    if (mSaStatusListener == nullptr) {
+        WIFI_LOGI("EventManager Listener Init!");
+        mSaStatusListener = new OHOS::Wifi::WifiAbilityStatusChange();
+        mSaStatusListener->Init(WIFI_DEVICE_ABILITY_ID);
+        mSaStatusListener->Init(WIFI_SCAN_ABILITY_ID);
+        mSaStatusListener->Init(WIFI_HOTSPOT_ABILITY_ID);
+        mSaStatusListener->Init(WIFI_P2P_ABILITY_ID);
+    }
+    return ;
+}
+
 std::set<WifiEvent*> EventManager::m_setEventCallback;
 bool EventManager::m_isEventRegistered = false;
 static EventManager g_eventManager;
+
+EventManager& EventManager::GetInstance()
+{
+    return g_eventManager;
+}
 
 std::set<WifiEvent*> GetEventCallBacks() {
     return g_eventManager.GetEventCallBacks();

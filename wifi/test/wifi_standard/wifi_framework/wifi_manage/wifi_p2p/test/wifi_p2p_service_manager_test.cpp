@@ -34,7 +34,6 @@ public:
     virtual void TearDown()
     {
         pWifiP2pServiceManager.reset();
-        pWifiP2pServiceManager->ClearAll();
     }
     static void SetUpTestCase()
     {}

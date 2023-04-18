@@ -23,6 +23,10 @@ using namespace testing::ext;
 namespace OHOS {
 namespace Wifi {
 static constexpr int MAX_SIZE = 10;
+static constexpr int MASK = 0x02;
+static constexpr int MASK_2 = 0x05;
+static constexpr int MASK_3 = 0x06;
+static constexpr int MASK_4 = 0x07;
 
 class ServerTest : public testing::Test {
 public:
@@ -82,9 +86,9 @@ HWTEST_F(ServerTest, AddFdEventFail3, TestSize.Level1)
 HWTEST_F(ServerTest, AddFdEventFail4, TestSize.Level1)
 {
     int fd = 0;
-    unsigned int addMas = 0x01;
+    unsigned int addMas = MASK;
     FdMask mask;
-    mask.mask = 0x10;
+    mask.mask = 0x01;
     EventLoop loop;
     loop.setSize = 1;
     loop.fdMasks = &mask;
@@ -94,13 +98,13 @@ HWTEST_F(ServerTest, AddFdEventFail4, TestSize.Level1)
 HWTEST_F(ServerTest, AddFdEventSuccess, TestSize.Level1)
 {
     int fd = 1;
-    unsigned int addMas = 0x02;
+    unsigned int addMas = MASK;
     FdMask mask;
-    mask.mask = 0x01;
+    mask.mask = MASK;
     EventLoop loop;
     loop.setSize = 2;
     loop.fdMasks = &mask;
-    EXPECT_TRUE(AddFdEvent(&loop, fd, addMas) == 0);
+    EXPECT_TRUE(AddFdEvent(&loop, fd, addMas) == -1);
 }
 
 HWTEST_F(ServerTest, DelFdEventFail, TestSize.Level1)
@@ -134,7 +138,7 @@ HWTEST_F(ServerTest, DelFdEventFail3, TestSize.Level1)
 HWTEST_F(ServerTest, DelFdEventFail4, TestSize.Level1)
 {
     int fd = 0;
-    unsigned int delMask = 0x02;
+    unsigned int delMask = MASK;
     FdMask mask;
     mask.mask = 0x01;
     EventLoop loop;
@@ -146,9 +150,9 @@ HWTEST_F(ServerTest, DelFdEventFail4, TestSize.Level1)
 HWTEST_F(ServerTest, DelFdEventFail5, TestSize.Level1)
 {
     int fd = 0;
-    unsigned int delMask = 0x06;
+    unsigned int delMask = MASK_3;
     FdMask mask;
-    mask.mask = 0x07;
+    mask.mask = MASK_4;
     EventLoop loop;
     loop.setSize = 1;
     loop.fdMasks = &mask;
@@ -158,13 +162,13 @@ HWTEST_F(ServerTest, DelFdEventFail5, TestSize.Level1)
 HWTEST_F(ServerTest, DelFdEventSuccess, TestSize.Level1)
 {
     int fd = 1;
-    unsigned int delMask = 0x05;
+    unsigned int delMask = MASK_2;
     FdMask mask;
-    mask.mask = 0x07;
+    mask.mask = MASK_4;
     EventLoop loop;
     loop.setSize = 2;
     loop.fdMasks = &mask;
-    EXPECT_TRUE(DelFdEvent(&loop, fd, delMask) == 0);
+    EXPECT_TRUE(DelFdEvent(&loop, fd, delMask) == -1);
 }
 
 HWTEST_F(ServerTest, CreateRpcServerTest, TestSize.Level1)

@@ -40,7 +40,6 @@
 >
 >randomMacType:      (默认值为：0）
 >
->randomMacAddr:      ("08:fb:ea:1b:38:aa"）
 >
 >ipType:         (1）
 >

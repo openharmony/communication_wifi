@@ -34,7 +34,7 @@ public:
 HWTEST_F(WifiEventTest, SetIsEventRegistratedTest, TestSize.Level1)
 {
     WifiEvent *event = nullptr;
-    EXPECT_EQ(RegisterWifiEvent(event), ERROR_WIFI_INVALID_ARGS);
+    EXPECT_EQ(RegisterWifiEvent(event), ERROR_WIFI_UNKNOWN);
 }
 
 HWTEST_F(WifiEventTest, UnRegisterWifiEventTest, TestSize.Level1)

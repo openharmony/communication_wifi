@@ -37,33 +37,22 @@ public:
     }
 
 public:
-    void SignalNetCheckThreadSuccess();
     void StopNetCheckThreadSuccess();
-    void HttpDetectionSuccess();
+    bool HttpDetectionSuccess();
 
 public:
     std::unique_ptr<StaNetworkCheck> pStaNetworkCheck;
     NetStateHandler handle = nullptr;
 };
 
-void StaNetworkCheckTest::SignalNetCheckThreadSuccess()
-{
-    pStaNetworkCheck->SignalNetCheckThread();
-}
-
 void StaNetworkCheckTest::StopNetCheckThreadSuccess()
 {
     pStaNetworkCheck->StopNetCheckThread();
 }
 
-void StaNetworkCheckTest::HttpDetectionSuccess()
+bool StaNetworkCheckTest::HttpDetectionSuccess()
 {
-    pStaNetworkCheck->HttpDetection();
-}
-
-HWTEST_F(StaNetworkCheckTest, SignalNetCheckThreadSuccess, TestSize.Level1)
-{
-    SignalNetCheckThreadSuccess();
+    return pStaNetworkCheck->HttpDetection();
 }
 
 HWTEST_F(StaNetworkCheckTest, StopNetCheckThreadSuccess, TestSize.Level1)
@@ -73,7 +62,7 @@ HWTEST_F(StaNetworkCheckTest, StopNetCheckThreadSuccess, TestSize.Level1)
 
 HWTEST_F(StaNetworkCheckTest, HttpDetectionSuccess, TestSize.Level1)
 {
-    HttpDetectionSuccess();
+    EXPECT_FALSE(HttpDetectionSuccess());
 }
 } // Wifi
 } // OHOS

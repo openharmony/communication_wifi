@@ -144,14 +144,21 @@ static void GetStaticIpFromCpp(const OHOS::Wifi::StaticIpAddress& staticIp, IpCo
     /* netmask: not support now */
 }
 
-static void ConvertDeviceConfigFromC(const WifiDeviceConfig *config, OHOS::Wifi::WifiDeviceConfig& deviceConfig)
+static OHOS::Wifi::ErrCode ConvertDeviceConfigFromC(
+    const WifiDeviceConfig *config, OHOS::Wifi::WifiDeviceConfig& deviceConfig)
 {
-    CHECK_PTR_RETURN_VOID(config);
+    CHECK_PTR_RETURN(config, OHOS::Wifi::WIFI_OPT_INVALID_PARAM);
+    if (strnlen(config->ssid, WIFI_MAX_SSID_LEN) == WIFI_MAX_SSID_LEN) {
+        return OHOS::Wifi::WIFI_OPT_INVALID_PARAM;
+    }
     deviceConfig.ssid = config->ssid;
     if (OHOS::Wifi::IsMacArrayEmpty(config->bssid)) {
         deviceConfig.bssid = "";
     } else {
         deviceConfig.bssid = OHOS::Wifi::MacArrayToStr(config->bssid);
+    }
+    if (strnlen(config->preSharedKey, WIFI_MAX_KEY_LEN) == WIFI_MAX_KEY_LEN) {
+        return OHOS::Wifi::WIFI_OPT_INVALID_PARAM;
     }
     deviceConfig.preSharedKey = config->preSharedKey;
     deviceConfig.keyMgmt = GetKeyMgmtBySecType(config->securityType);
@@ -167,6 +174,7 @@ static void ConvertDeviceConfigFromC(const WifiDeviceConfig *config, OHOS::Wifi:
         deviceConfig.wifiIpConfig.assignMethod = OHOS::Wifi::AssignIpMethod::UNASSIGNED;
     }
     deviceConfig.hiddenSSID = config->isHiddenSsid;
+    return OHOS::Wifi::WIFI_OPT_SUCCESS;
 }
 
 static OHOS::Wifi::ErrCode ConvertDeviceConfigFromCpp(const OHOS::Wifi::WifiDeviceConfig& deviceConfig,
@@ -218,10 +226,14 @@ NO_SANITIZE("cfi") WifiErrorCode AddDeviceConfig(const WifiDeviceConfig *config,
     CHECK_PTR_RETURN(config, ERROR_WIFI_INVALID_ARGS);
     CHECK_PTR_RETURN(result, ERROR_WIFI_INVALID_ARGS);
     OHOS::Wifi::WifiDeviceConfig deviceConfig;
-    ConvertDeviceConfigFromC(config, deviceConfig);
+    OHOS::Wifi::ErrCode ret = ConvertDeviceConfigFromC(config, deviceConfig);
+    if (ret != OHOS::Wifi::WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("AddDeviceConfig get device configs from c error!");
+        return GetCErrorCode(ret);
+    }
     int addResult = -1;
     bool isCandidate = false;
-    OHOS::Wifi::ErrCode ret = wifiDevicePtr->AddDeviceConfig(deviceConfig, addResult, isCandidate);
+    ret = wifiDevicePtr->AddDeviceConfig(deviceConfig, addResult, isCandidate);
     *result = addResult;
     return GetCErrorCode(ret);
 }
@@ -277,7 +289,11 @@ NO_SANITIZE("cfi") WifiErrorCode ConnectToDevice(const WifiDeviceConfig *config)
     CHECK_PTR_RETURN(wifiDevicePtr, ERROR_WIFI_NOT_AVAILABLE);
     CHECK_PTR_RETURN(config, ERROR_WIFI_INVALID_ARGS);
     OHOS::Wifi::WifiDeviceConfig deviceConfig;
-    ConvertDeviceConfigFromC(config, deviceConfig);
+    OHOS::Wifi::ErrCode ret = ConvertDeviceConfigFromC(config, deviceConfig);
+    if (ret != OHOS::Wifi::WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("ConnectToDevice get device configs from c error!");
+        return GetCErrorCode(ret);
+    }
     return GetCErrorCode(wifiDevicePtr->ConnectToDevice(deviceConfig));
 }
 

@@ -692,16 +692,14 @@ int EventRegister::CheckPermission(const std::string& eventType)
             /* NO permission */
             WIFI_LOGE("callerToken=0x%{public}x has no permission=%{public}s",
                 callerToken, permissionName.c_str());
-            return WIFI_NAPI_PERMISSION_DENIED;
-        }
-
-        if (res != Security::AccessToken::PermissionState::PERMISSION_GRANTED) {
-            WIFI_LOGW("callerToken=0x%{public}x has no permission=%{public}s",
-                callerToken, permissionName.c_str());
-            hasPermission = 0;
+        } else {
+            if (res != Security::AccessToken::PermissionState::PERMISSION_GRANTED) {
+                WIFI_LOGW("callerToken=0x%{public}x has no permission=%{public}s",
+                    callerToken, permissionName.c_str());
+               hasPermission = 0;
+            }
         }
     }
-
     return ((hasPermission == 1) ? WIFI_NAPI_PERMISSION_GRANTED : WIFI_NAPI_PERMISSION_DENIED);
 }
 

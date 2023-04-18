@@ -37,24 +37,20 @@ HWTEST_F(WifiWpaCommonTest, Hex2DecTest, TestSize.Level1)
     char str[] = "0z1259";
     char src[] = "0a1259";
     char srf[] = "0xaAfF29";
+    char stc[] = "A1s62";
+    TrimQuotationMark(nullptr, 'A');
+    TrimQuotationMark(stc, 'A');
     EXPECT_EQ(Hex2Dec(nullptr), 0);
     EXPECT_EQ(Hex2Dec(str), 0);
     EXPECT_EQ(Hex2Dec(src), 0);
     EXPECT_TRUE(Hex2Dec(srf));
 }
 
-HWTEST_F(WifiWpaCommonTest, TrimQuotationMarkTest, TestSize.Level1)
-{
-    char str[] = "A1s62";
-    TrimQuotationMark(nullptr, 'A');
-    TrimQuotationMark(str, 'A');
-}
-
 HWTEST_F(WifiWpaCommonTest, InitWpaCtrlTest, TestSize.Level1)
 {
     WpaCtrl *pCtrl = nullptr;
     char str[] = "A1s62";
-    InitWpaCtrl(pCtrl, str);
+    EXPECT_TRUE(InitWpaCtrl(pCtrl, str) == -1);
 }
 } // namespace Wifi
 } // namespace OHOS

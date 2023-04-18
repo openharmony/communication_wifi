@@ -75,115 +75,100 @@ public:
     {
         InternalMessage msg;
         msg.SetMessageName(CMD_SCAN_PREPARE);
-        pScanStateMachine->initState->ExecuteStateMsg(&msg);
+        EXPECT_TRUE(pScanStateMachine->initState->ExecuteStateMsg(&msg) == true);
     }
 
     void InitExeMsgSuccess2()
     {
         InternalMessage msg;
         msg.SetMessageName(CMD_SCAN_FINISH);
-        pScanStateMachine->initState->ExecuteStateMsg(&msg);
+        EXPECT_TRUE(pScanStateMachine->initState->ExecuteStateMsg(&msg) == true);
     }
 
     void InitExeMsgSuccess3()
     {
         InternalMessage msg;
         msg.SetMessageName(CMD_START_COMMON_SCAN);
-        pScanStateMachine->initState->ExecuteStateMsg(&msg);
+        EXPECT_TRUE(pScanStateMachine->initState->ExecuteStateMsg(&msg) == true);
     }
 
     void InitExeMsgSuccess4()
     {
         InternalMessage msg;
         msg.SetMessageName(CMD_START_PNO_SCAN);
-        pScanStateMachine->initState->ExecuteStateMsg(&msg);
+        EXPECT_TRUE(pScanStateMachine->initState->ExecuteStateMsg(&msg) == true);
     }
 
     void InitExeMsgSuccess5()
     {
         InternalMessage msg;
         msg.SetMessageName(CMD_STOP_PNO_SCAN);
-        pScanStateMachine->initState->ExecuteStateMsg(&msg);
+        EXPECT_TRUE(pScanStateMachine->initState->ExecuteStateMsg(&msg) == true);
     }
 
     void InitExeMsgSuccess6()
     {
         InternalMessage msg;
         msg.SetMessageName(HARDWARE_LOAD_EVENT);
-        pScanStateMachine->initState->ExecuteStateMsg(&msg);
+        EXPECT_TRUE(pScanStateMachine->initState->ExecuteStateMsg(&msg) == true);
     }
 
     void InitExeMsgSuccess7()
     {
         InternalMessage msg;
         msg.SetMessageName(HARDWARE_UNLOAD_EVENT);
-        pScanStateMachine->initState->ExecuteStateMsg(&msg);
+        EXPECT_TRUE(pScanStateMachine->initState->ExecuteStateMsg(&msg) == true);
     }
 
     void InitExeMsgSuccess8()
     {
         InternalMessage msg;
         msg.SetMessageName(CMD_STOP_COMMON_SCAN);
-        pScanStateMachine->initState->ExecuteStateMsg(&msg);
+        EXPECT_TRUE(pScanStateMachine->initState->ExecuteStateMsg(&msg) == true);
     }
 
     void InitExeMsgSuccess9()
     {
         InternalMessage msg;
         msg.SetMessageName(SYSTEM_SCAN_TIMER);
-        pScanStateMachine->initState->ExecuteStateMsg(&msg);
+        EXPECT_TRUE(pScanStateMachine->initState->ExecuteStateMsg(&msg) == true);
     }
 
     void InitExeMsgSuccess10()
     {
         InternalMessage msg;
         msg.SetMessageName(SCAN_INNER_EVENT_INVALID);
-        pScanStateMachine->initState->ExecuteStateMsg(&msg);
+        EXPECT_TRUE(pScanStateMachine->initState->ExecuteStateMsg(&msg) == false);
     }
 
     void InitExeMsgFail()
     {
-        pScanStateMachine->initState->ExecuteStateMsg(nullptr);
-    }
-
-    void LoadDriverTest()
-    {
-        pScanStateMachine->initState->LoadDriver();
-    }
-
-    void UnLoadDriverTest()
-    {
-        pScanStateMachine->initState->UnLoadDriver();
-    }
-
-    void HardwareReadyGoInStateTest()
-    {
-        pScanStateMachine->hardwareReadyState->GoInState();
-    }
-
-    void HardwareReadyGoOutStateMsgTest()
-    {
-        pScanStateMachine->hardwareReadyState->GoOutState();
+        EXPECT_TRUE(pScanStateMachine->initState->ExecuteStateMsg(nullptr) == true);
     }
 
     void HardwareReadyExeMsgSuccess1()
     {
         EXPECT_CALL(WifiStaHalInterface::GetInstance(), Scan(_)).WillRepeatedly(Return(WIFI_IDL_OPT_OK));
+        pScanStateMachine->hardwareReadyState->GoInState();
+        pScanStateMachine->hardwareReadyState->GoOutState();
         InternalMessage msg;
         msg.SetMessageName(CMD_SCAN_PREPARE);
-        pScanStateMachine->hardwareReadyState->ExecuteStateMsg(&msg);
+        EXPECT_TRUE(pScanStateMachine->hardwareReadyState->ExecuteStateMsg(&msg) == false);
     }
 
     void HardwareReadyExeMsgSuccess2()
     {
         InternalMessage msg;
         msg.SetMessageName(CMD_START_PNO_SCAN);
-        pScanStateMachine->hardwareReadyState->ExecuteStateMsg(&msg);
+        EXPECT_TRUE(pScanStateMachine->hardwareReadyState->ExecuteStateMsg(&msg) == true);
     }
 
     void HardwareReadyExeMsgFail()
     {
-        pScanStateMachine->hardwareReadyState->ExecuteStateMsg(nullptr);
+        InternalMessage msg;
+        msg.SetMessageName(CMD_START_COMMON_SCAN);
+        EXPECT_TRUE(pScanStateMachine->hardwareReadyState->ExecuteStateMsg(&msg) == true);
+        EXPECT_TRUE(pScanStateMachine->hardwareReadyState->ExecuteStateMsg(nullptr) == true);
     }
 
     void CommonScanGoInStateTest()
@@ -200,66 +185,57 @@ public:
     {
         InternalMessage msg;
         msg.SetMessageName(CMD_STOP_COMMON_SCAN);
-        pScanStateMachine->commonScanState->ExecuteStateMsg(&msg);
+        InterScanConfig interScanConfig;
+        pScanStateMachine->runningScans.emplace(0, interScanConfig);
+        pScanStateMachine->waitingScans.emplace(0, interScanConfig);
+        pScanStateMachine->RemoveCommonScanRequest(0);
+        EXPECT_TRUE(pScanStateMachine->commonScanState->ExecuteStateMsg(&msg) == true);
     }
 
     void CommonScanExeMsgFail()
     {
-        pScanStateMachine->commonScanState->ExecuteStateMsg(nullptr);
-    }
-
-    void CommonScanUnworkedGoInStateTest()
-    {
-        EXPECT_CALL(WifiStaHalInterface::GetInstance(), Scan(_)).WillRepeatedly(Return(WIFI_IDL_OPT_OK));
-        pScanStateMachine->commonScanUnworkedState->GoInState();
-    }
-
-    void CommonScanUnworkedGoOutStateTest()
-    {
-        pScanStateMachine->commonScanUnworkedState->GoOutState();
+        InternalMessage msg;
+        msg.SetMessageName(CMD_START_COMMON_SCAN);
+        EXPECT_TRUE(pScanStateMachine->commonScanState->ExecuteStateMsg(&msg) == false);
+        EXPECT_TRUE(pScanStateMachine->commonScanState->ExecuteStateMsg(nullptr) == true);
     }
 
     void CommonScanUnworkedExeMsgSuccess1()
     {
         InternalMessage msg;
         msg.SetMessageName(CMD_START_COMMON_SCAN);
-        pScanStateMachine->commonScanUnworkedState->ExecuteStateMsg(&msg);
+        EXPECT_CALL(WifiStaHalInterface::GetInstance(), Scan(_)).WillRepeatedly(Return(WIFI_IDL_OPT_OK));
+        pScanStateMachine->commonScanUnworkedState->GoInState();
+        pScanStateMachine->commonScanUnworkedState->GoOutState();
+        EXPECT_TRUE(pScanStateMachine->commonScanUnworkedState->ExecuteStateMsg(&msg) == true);
     }
 
     void CommonScanUnworkedExeMsgSuccess2()
     {
         InternalMessage msg;
         msg.SetMessageName(CMD_START_PNO_SCAN);
-        pScanStateMachine->commonScanUnworkedState->ExecuteStateMsg(&msg);
+        EXPECT_TRUE(pScanStateMachine->commonScanUnworkedState->ExecuteStateMsg(&msg) == true);
     }
 
     void CommonScanUnworkedExeMsgSuccess3()
     {
         InternalMessage msg;
         msg.SetMessageName(CMD_SCAN_PREPARE);
-        pScanStateMachine->commonScanUnworkedState->ExecuteStateMsg(&msg);
+        EXPECT_TRUE(pScanStateMachine->commonScanUnworkedState->ExecuteStateMsg(&msg) == false);
     }
 
     void CommonScanUnworkedExeMsgFail()
     {
-        pScanStateMachine->commonScanUnworkedState->ExecuteStateMsg(nullptr);
-    }
-
-    void CommonScanningGoInStateTest()
-    {
-        pScanStateMachine->commonScanningState->GoInState();
-    }
-
-    void CommonScanningGoOutStateTest()
-    {
-        pScanStateMachine->commonScanningState->GoOutState();
+        EXPECT_TRUE(pScanStateMachine->commonScanUnworkedState->ExecuteStateMsg(nullptr) == true);
     }
 
     void CommonScanningExeMsgSuccess1()
     {
         InternalMessage msg;
         msg.SetMessageName(CMD_START_COMMON_SCAN);
-        pScanStateMachine->commonScanningState->ExecuteStateMsg(&msg);
+        pScanStateMachine->commonScanningState->GoInState();
+        pScanStateMachine->commonScanningState->GoOutState();
+        EXPECT_TRUE(pScanStateMachine->commonScanningState->ExecuteStateMsg(&msg) == true);
     }
 
     void CommonScanningExeMsgSuccess2()
@@ -267,80 +243,63 @@ public:
         EXPECT_CALL(WifiStaHalInterface::GetInstance(), QueryScanInfos(_)).WillRepeatedly(Return(WIFI_IDL_OPT_OK));
         InternalMessage msg;
         msg.SetMessageName(SCAN_RESULT_EVENT);
-        pScanStateMachine->commonScanningState->ExecuteStateMsg(&msg);
+        EXPECT_TRUE(pScanStateMachine->commonScanningState->ExecuteStateMsg(&msg) == true);
     }
 
     void CommonScanningExeMsgSuccess3()
     {
         InternalMessage msg;
         msg.SetMessageName(SCAN_FAILED_EVENT);
-        pScanStateMachine->commonScanningState->ExecuteStateMsg(&msg);
+        EXPECT_TRUE(pScanStateMachine->commonScanningState->ExecuteStateMsg(&msg) == true);
     }
 
     void CommonScanningExeMsgSuccess4()
     {
         InternalMessage msg;
         msg.SetMessageName(WAIT_SCAN_RESULT_TIMER);
-        pScanStateMachine->commonScanningState->ExecuteStateMsg(&msg);
+        EXPECT_TRUE(pScanStateMachine->commonScanningState->ExecuteStateMsg(&msg) == true);
     }
 
     void CommonScanningExeMsgSuccess5()
     {
         InternalMessage msg;
         msg.SetMessageName(CMD_START_PNO_SCAN);
-        pScanStateMachine->commonScanningState->ExecuteStateMsg(&msg);
+        EXPECT_TRUE(pScanStateMachine->commonScanningState->ExecuteStateMsg(&msg) == true);
     }
 
     void CommonScanningExeMsgSuccess6()
     {
         InternalMessage msg;
         msg.SetMessageName(CMD_SCAN_FINISH);
-        pScanStateMachine->commonScanningState->ExecuteStateMsg(&msg);
+        EXPECT_TRUE(pScanStateMachine->commonScanningState->ExecuteStateMsg(&msg) == false);
     }
 
     void CommonScanningExeMsgFail()
     {
-        pScanStateMachine->commonScanningState->ExecuteStateMsg(nullptr);
-    }
-
-    void PnoScanGoInStateTest()
-    {
-        pScanStateMachine->pnoScanState->GoInState();
-    }
-
-    void PnoScanGoOutStateTest()
-    {
-        pScanStateMachine->pnoScanState->GoOutState();
+        EXPECT_TRUE(pScanStateMachine->commonScanningState->ExecuteStateMsg(nullptr) == true);
     }
 
     void PnoScanExeMsgSuccess()
     {
         InternalMessage msg;
-        pScanStateMachine->pnoScanState->ExecuteStateMsg(&msg);
+        pScanStateMachine->pnoScanState->GoInState();
+        pScanStateMachine->pnoScanState->GoOutState();
+        EXPECT_TRUE(pScanStateMachine->pnoScanState->ExecuteStateMsg(&msg) == false);
     }
 
     void PnoScanExeMsgFail()
     {
-        pScanStateMachine->pnoScanState->ExecuteStateMsg(nullptr);
-    }
-
-    void PnoScanHardwareGoInStateTest()
-    {
-        EXPECT_CALL(WifiStaHalInterface::GetInstance(), StartPnoScan(_)).WillRepeatedly(Return(WIFI_IDL_OPT_OK));
-        pScanStateMachine->pnoScanHardwareState->GoInState();
-    }
-
-    void PnoScanHardwareGoOutStateTest()
-    {
-        pScanStateMachine->pnoScanHardwareState->GoOutState();
+        EXPECT_TRUE(pScanStateMachine->pnoScanState->ExecuteStateMsg(nullptr) == false);
     }
 
     void PnoScanHardwareExeMsgSuccess1()
     {
         EXPECT_CALL(WifiStaHalInterface::GetInstance(), StartPnoScan(_)).WillRepeatedly(Return(WIFI_IDL_OPT_OK));
         InternalMessage msg;
+        pScanStateMachine->pnoScanHardwareState->GoInState();
+        pScanStateMachine->pnoScanHardwareState->GoOutState();
         msg.SetMessageName(CMD_START_PNO_SCAN);
-        pScanStateMachine->pnoScanHardwareState->ExecuteStateMsg(&msg);
+        EXPECT_TRUE(pScanStateMachine->pnoScanHardwareState->ExecuteStateMsg(&msg) == true);
     }
 
     void PnoScanHardwareExeMsgSuccess2()
@@ -348,7 +307,7 @@ public:
         EXPECT_CALL(WifiStaHalInterface::GetInstance(), StopPnoScan()).WillRepeatedly(Return(WIFI_IDL_OPT_OK));
         InternalMessage msg;
         msg.SetMessageName(CMD_STOP_PNO_SCAN);
-        pScanStateMachine->pnoScanHardwareState->ExecuteStateMsg(&msg);
+        EXPECT_TRUE(pScanStateMachine->pnoScanHardwareState->ExecuteStateMsg(&msg) == true);
     }
 
     void PnoScanHardwareExeMsgSuccess3()
@@ -357,7 +316,7 @@ public:
         EXPECT_CALL(WifiStaHalInterface::GetInstance(), StopPnoScan()).WillRepeatedly(Return(WIFI_IDL_OPT_OK));
         InternalMessage msg;
         msg.SetMessageName(CMD_RESTART_PNO_SCAN);
-        pScanStateMachine->pnoScanHardwareState->ExecuteStateMsg(&msg);
+        EXPECT_TRUE(pScanStateMachine->pnoScanHardwareState->ExecuteStateMsg(&msg) == true);
     }
 
     void PnoScanHardwareExeMsgSuccess4()
@@ -365,26 +324,26 @@ public:
         EXPECT_CALL(WifiStaHalInterface::GetInstance(), QueryScanInfos(_)).WillRepeatedly(Return(WIFI_IDL_OPT_OK));
         InternalMessage msg;
         msg.SetMessageName(PNO_SCAN_RESULT_EVENT);
-        pScanStateMachine->pnoScanHardwareState->ExecuteStateMsg(&msg);
+        EXPECT_TRUE(pScanStateMachine->pnoScanHardwareState->ExecuteStateMsg(&msg) == true);
     }
 
     void PnoScanHardwareExeMsgSuccess5()
     {
         InternalMessage msg;
         msg.SetMessageName(CMD_START_COMMON_SCAN);
-        pScanStateMachine->pnoScanHardwareState->ExecuteStateMsg(&msg);
+        EXPECT_TRUE(pScanStateMachine->pnoScanHardwareState->ExecuteStateMsg(&msg) == true);
     }
 
     void PnoScanHardwareExeMsgSuccess6()
     {
         InternalMessage msg;
         msg.SetMessageName(CMD_SCAN_FINISH);
-        pScanStateMachine->pnoScanHardwareState->ExecuteStateMsg(&msg);
+        EXPECT_TRUE(pScanStateMachine->pnoScanHardwareState->ExecuteStateMsg(&msg) == false);
     }
 
     void PnoScanHardwareExeMsgFail()
     {
-        pScanStateMachine->pnoScanHardwareState->ExecuteStateMsg(nullptr);
+        EXPECT_TRUE(pScanStateMachine->pnoScanHardwareState->ExecuteStateMsg(nullptr) == true);
     }
 
     void CommonScanAfterPnoGoInStateTest()
@@ -392,10 +351,6 @@ public:
         EXPECT_CALL(WifiStaHalInterface::GetInstance(), StopPnoScan()).WillRepeatedly(Return(WIFI_IDL_OPT_OK));
         EXPECT_CALL(WifiStaHalInterface::GetInstance(), Scan(_)).WillRepeatedly(Return(WIFI_IDL_OPT_OK));
         pScanStateMachine->commonScanAfterPnoState->GoInState();
-    }
-
-    void CommonScanAfterPnoGoOutStateTest()
-    {
         pScanStateMachine->commonScanAfterPnoState->GoOutState();
     }
 
@@ -404,57 +359,53 @@ public:
         EXPECT_CALL(WifiStaHalInterface::GetInstance(), QueryScanInfos(_)).WillRepeatedly(Return(WIFI_IDL_OPT_OK));
         InternalMessage msg;
         msg.SetMessageName(SCAN_RESULT_EVENT);
-        pScanStateMachine->commonScanAfterPnoState->ExecuteStateMsg(&msg);
+        EXPECT_TRUE(pScanStateMachine->commonScanAfterPnoState->ExecuteStateMsg(&msg) == true);
     }
 
     void CommonScanAfterPnoExeMsgSuccess2()
     {
         InternalMessage msg;
         msg.SetMessageName(SCAN_FAILED_EVENT);
-        pScanStateMachine->commonScanAfterPnoState->ExecuteStateMsg(&msg);
+        EXPECT_TRUE(pScanStateMachine->commonScanAfterPnoState->ExecuteStateMsg(&msg) == true);
     }
 
     void CommonScanAfterPnoExeMsgSuccess3()
     {
         InternalMessage msg;
         msg.SetMessageName(CMD_START_PNO_SCAN);
-        pScanStateMachine->commonScanAfterPnoState->ExecuteStateMsg(&msg);
+        EXPECT_TRUE(pScanStateMachine->commonScanAfterPnoState->ExecuteStateMsg(&msg) == true);
     }
 
     void CommonScanAfterPnoExeMsgSuccess4()
     {
         InternalMessage msg;
         msg.SetMessageName(CMD_START_COMMON_SCAN);
-        pScanStateMachine->commonScanAfterPnoState->ExecuteStateMsg(&msg);
+        EXPECT_TRUE(pScanStateMachine->commonScanAfterPnoState->ExecuteStateMsg(&msg) == true);
     }
 
     void CommonScanAfterPnoExeMsgSuccess5()
     {
         InternalMessage msg;
         msg.SetMessageName(CMD_RESTART_PNO_SCAN);
-        pScanStateMachine->commonScanAfterPnoState->ExecuteStateMsg(&msg);
+        EXPECT_TRUE(pScanStateMachine->commonScanAfterPnoState->ExecuteStateMsg(&msg) == true);
     }
 
     void CommonScanAfterPnoExeMsgSuccess6()
     {
         InternalMessage msg;
         msg.SetMessageName(CMD_SCAN_FINISH);
-        pScanStateMachine->commonScanAfterPnoState->ExecuteStateMsg(&msg);
+        EXPECT_TRUE(pScanStateMachine->commonScanAfterPnoState->ExecuteStateMsg(&msg) == false);
     }
 
     void CommonScanAfterPnoExeMsgFail()
     {
-        pScanStateMachine->commonScanAfterPnoState->ExecuteStateMsg(nullptr);
+        EXPECT_TRUE(pScanStateMachine->commonScanAfterPnoState->ExecuteStateMsg(nullptr) == true);
     }
 
     void PnoScanSoftwareGoInStateTest()
     {
         EXPECT_CALL(WifiStaHalInterface::GetInstance(), Scan(_)).WillRepeatedly(Return(WIFI_IDL_OPT_OK));
         pScanStateMachine->pnoScanSoftwareState->GoInState();
-    }
-
-    void PnoScanSoftwareGoOutStateTest()
-    {
         pScanStateMachine->pnoScanSoftwareState->GoOutState();
     }
 
@@ -462,19 +413,19 @@ public:
     {
         InternalMessage msg;
         msg.SetMessageName(CMD_STOP_PNO_SCAN);
-        pScanStateMachine->pnoScanSoftwareState->ExecuteStateMsg(&msg);
+        EXPECT_TRUE(pScanStateMachine->pnoScanSoftwareState->ExecuteStateMsg(&msg) == true);
     }
 
     void PnoScanSoftwareExeMsgSuccess2()
     {
         InternalMessage msg;
         msg.SetMessageName(CMD_SCAN_FINISH);
-        pScanStateMachine->pnoScanSoftwareState->ExecuteStateMsg(&msg);
+        EXPECT_TRUE(pScanStateMachine->pnoScanSoftwareState->ExecuteStateMsg(&msg) == false);
     }
 
     void PnoScanSoftwareExeMsgFail()
     {
-        pScanStateMachine->pnoScanSoftwareState->ExecuteStateMsg(nullptr);
+        EXPECT_TRUE(pScanStateMachine->pnoScanSoftwareState->ExecuteStateMsg(nullptr) == true);
     }
 
     void PnoSwScanFreeGoInStateTest()
@@ -492,7 +443,7 @@ public:
         EXPECT_CALL(WifiStaHalInterface::GetInstance(), Scan(_)).WillRepeatedly(Return(WIFI_IDL_OPT_OK));
         InternalMessage msg;
         msg.SetMessageName(CMD_START_PNO_SCAN);
-        pScanStateMachine->pnoSwScanFreeState->ExecuteStateMsg(&msg);
+        EXPECT_TRUE(pScanStateMachine->pnoSwScanFreeState->ExecuteStateMsg(&msg) == true);
     }
 
     void PnoSwScanFreeExeMsgSuccess2()
@@ -500,51 +451,42 @@ public:
         EXPECT_CALL(WifiStaHalInterface::GetInstance(), Scan(_)).WillRepeatedly(Return(WIFI_IDL_OPT_OK));
         InternalMessage msg;
         msg.SetMessageName(CMD_RESTART_PNO_SCAN);
-        pScanStateMachine->pnoSwScanFreeState->ExecuteStateMsg(&msg);
+        EXPECT_TRUE(pScanStateMachine->pnoSwScanFreeState->ExecuteStateMsg(&msg) == true);
     }
 
     void PnoSwScanFreeExeMsgSuccess3()
     {
         InternalMessage msg;
         msg.SetMessageName(CMD_START_COMMON_SCAN);
-        pScanStateMachine->pnoSwScanFreeState->ExecuteStateMsg(&msg);
+        EXPECT_TRUE(pScanStateMachine->pnoSwScanFreeState->ExecuteStateMsg(&msg) == true);
     }
 
     void PnoSwScanFreeExeMsgSuccess4()
     {
         InternalMessage msg;
         msg.SetMessageName(SOFTWARE_PNO_SCAN_TIMER);
-        pScanStateMachine->pnoSwScanFreeState->ExecuteStateMsg(&msg);
+        EXPECT_TRUE(pScanStateMachine->pnoSwScanFreeState->ExecuteStateMsg(&msg) == true);
     }
 
     void PnoSwScanFreeExeMsgSuccess5()
     {
         InternalMessage msg;
         msg.SetMessageName(CMD_SCAN_FINISH);
-        pScanStateMachine->pnoSwScanFreeState->ExecuteStateMsg(&msg);
+        EXPECT_TRUE(pScanStateMachine->pnoSwScanFreeState->ExecuteStateMsg(&msg) == false);
     }
 
     void PnoSwScanFreeExeMsgFail()
     {
-        pScanStateMachine->pnoSwScanFreeState->ExecuteStateMsg(nullptr);
+        EXPECT_TRUE(pScanStateMachine->pnoSwScanFreeState->ExecuteStateMsg(nullptr) == true);
     }
-
-    void PnoSwScanningGoInStateTest()
-    {
-        pScanStateMachine->pnoSwScanningState->GoInState();
-    }
-
-    void PnoSwScanningGoOutStateTest()
-    {
-        pScanStateMachine->pnoSwScanningState->GoOutState();
-    }
-
 
     void PnoSwScanningExeMsgSuccess1()
     {
         EXPECT_CALL(WifiStaHalInterface::GetInstance(), QueryScanInfos(_)).WillRepeatedly(Return(WIFI_IDL_OPT_OK));
         InternalMessage msg;
         msg.SetMessageName(SCAN_RESULT_EVENT);
+        pScanStateMachine->pnoSwScanningState->GoInState();
+        pScanStateMachine->pnoSwScanningState->GoOutState();
         EXPECT_EQ(pScanStateMachine->pnoSwScanningState->ExecuteStateMsg(&msg), true);
     }
 
@@ -593,13 +535,6 @@ public:
     void PnoSwScanningExeMsgFail()
     {
         EXPECT_EQ(pScanStateMachine->pnoSwScanningState->ExecuteStateMsg(nullptr), true);
-    }
-
-    void CommonScanRequestProcessTest()
-    {
-        EXPECT_CALL(WifiStaHalInterface::GetInstance(), Scan(_)).WillRepeatedly(Return(WIFI_IDL_OPT_OK));
-        InternalMessage msg;
-        pScanStateMachine->CommonScanRequestProcess(&msg);
     }
 
     void GetCommonScanRequestInfoTest1()
@@ -669,17 +604,13 @@ public:
         pScanStateMachine->StartNewCommonScan();
     }
 
-    void ClearRunningScanSettingsTest()
-    {
-        pScanStateMachine->ClearRunningScanSettings();
-    }
-
     void StartSingleCommonScanSuccess()
     {
         EXPECT_CALL(WifiStaHalInterface::GetInstance(), Scan(_)).WillRepeatedly(Return(WIFI_IDL_OPT_OK));
         WifiScanParam scanParam;
         scanParam.scanFreqs.push_back(FREQ_5_GHZ_VALUE);
         scanParam.hiddenNetworkSsid.push_back("wifi_ssid");
+        pScanStateMachine->ClearRunningScanSettings();
         EXPECT_EQ(pScanStateMachine->StartSingleCommonScan(scanParam), true);
     }
 
@@ -690,12 +621,6 @@ public:
         scanParam.scanFreqs.push_back(FREQ_5_GHZ_VALUE);
         scanParam.hiddenNetworkSsid.push_back("wifi_ssid");
         EXPECT_EQ(pScanStateMachine->StartSingleCommonScan(scanParam), false);
-    }
-
-    void CommonScanWhenRunningSuccess()
-    {
-        InternalMessage msg;
-        pScanStateMachine->CommonScanWhenRunning(&msg);
     }
 
     void CommonScanWhenRunningFail()
@@ -722,23 +647,6 @@ public:
     void CommonScanInfoProcessTest()
     {
         pScanStateMachine->CommonScanInfoProcess();
-    }
-
-    void ReportStatusChangeTest()
-    {
-        ScanStatus status = SCAN_STARTED_STATUS;
-        pScanStateMachine->ReportStatusChange(status);
-    }
-
-    void ReportScanInnerEventTest()
-    {
-        ScanInnerEventType innerEvent = WAIT_SCAN_RESULT_TIMER;
-        pScanStateMachine->ReportScanInnerEvent(innerEvent);
-    }
-
-    void ReportCommonScanFailedTest()
-    {
-        pScanStateMachine->ReportCommonScanFailed(0);
     }
 
     void ReportCommonScanFailedAndClearTest1()
@@ -821,14 +729,6 @@ public:
         EXPECT_EQ(pScanStateMachine->MergeScanStyle(currentScanStyle, newScanStyle), SCAN_TYPE_HIGH_ACCURACY);
     }
 
-    void RemoveCommonScanRequestTest()
-    {
-        InterScanConfig interScanConfig;
-        pScanStateMachine->runningScans.emplace(0, interScanConfig);
-        pScanStateMachine->waitingScans.emplace(0, interScanConfig);
-        pScanStateMachine->RemoveCommonScanRequest(0);
-    }
-
     void PnoScanRequestProcessTest()
     {
         InternalMessage msg;
@@ -843,17 +743,12 @@ public:
         pScanStateMachine->PnoScanRequestProcess(&msg);
     }
 
-    void ContinuePnoScanProcess()
-    {
-        pScanStateMachine->pnoConfigStoredFlag = true;
-        pScanStateMachine->ContinuePnoScanProcess();
-    }
-
     void PnoScanHardwareProcessTest1()
     {
         pScanStateMachine->runningHwPnoFlag = false;
         pScanStateMachine->pnoConfigStoredFlag = true;
         InternalMessage msg;
+        pScanStateMachine->ContinuePnoScanProcess();
         EXPECT_CALL(WifiStaHalInterface::GetInstance(), StartPnoScan(_)).WillRepeatedly(Return(WIFI_IDL_OPT_FAILED));
         pScanStateMachine->PnoScanHardwareProcess(&msg);
     }
@@ -1037,16 +932,6 @@ public:
         pScanStateMachine->CommonScanAfterPnoResult();
     }
 
-    void PnoScanFailedProcessSuccessTest()
-    {
-        pScanStateMachine->PnoScanFailedProcess();
-    }
-
-    void ClearPnoScanConfigTest()
-    {
-        pScanStateMachine->ClearPnoScanConfig();
-    }
-
     void GetScanInfosSuccess()
     {
         EXPECT_CALL(WifiStaHalInterface::GetInstance(), QueryScanInfos(_)).WillRepeatedly(Return(WIFI_IDL_OPT_OK));
@@ -1167,10 +1052,6 @@ public:
         pScanStateMachine->InitPnoScanState();
     }
 
-    void BuildScanStateTreeTest()
-    {
-        pScanStateMachine->BuildScanStateTree();
-    }
 };
 
 HWTEST_F(ScanStateMachineTest, InitGoInStateTest, TestSize.Level1)
@@ -1238,16 +1119,6 @@ HWTEST_F(ScanStateMachineTest, InitExeMsgFail, TestSize.Level1)
     InitExeMsgFail();
 }
 
-HWTEST_F(ScanStateMachineTest, HardwareReadyGoInStateTest, TestSize.Level1)
-{
-    HardwareReadyGoInStateTest();
-}
-
-HWTEST_F(ScanStateMachineTest, HardwareReadyGoOutStateMsgTest, TestSize.Level1)
-{
-    HardwareReadyGoOutStateMsgTest();
-}
-
 HWTEST_F(ScanStateMachineTest, HardwareReadyExeMsgSuccess1, TestSize.Level1)
 {
     HardwareReadyExeMsgSuccess1();
@@ -1283,16 +1154,6 @@ HWTEST_F(ScanStateMachineTest, CommonScanExeMsgFail, TestSize.Level1)
     CommonScanExeMsgFail();
 }
 
-HWTEST_F(ScanStateMachineTest, CommonScanUnworkedGoInStateTest, TestSize.Level1)
-{
-    CommonScanUnworkedGoInStateTest();
-}
-
-HWTEST_F(ScanStateMachineTest, CommonScanUnworkedGoOutStateTest, TestSize.Level1)
-{
-    CommonScanUnworkedGoOutStateTest();
-}
-
 HWTEST_F(ScanStateMachineTest, CommonScanUnworkedExeMsgSuccess1, TestSize.Level1)
 {
     CommonScanUnworkedExeMsgSuccess1();
@@ -1311,16 +1172,6 @@ HWTEST_F(ScanStateMachineTest, CommonScanUnworkedExeMsgSuccess3, TestSize.Level1
 HWTEST_F(ScanStateMachineTest, CommonScanUnworkedExeMsgFail, TestSize.Level1)
 {
     CommonScanUnworkedExeMsgFail();
-}
-
-HWTEST_F(ScanStateMachineTest, CommonScanningGoInStateTest, TestSize.Level1)
-{
-    CommonScanningGoInStateTest();
-}
-
-HWTEST_F(ScanStateMachineTest, CommonScanningGoOutStateTest, TestSize.Level1)
-{
-    CommonScanningGoOutStateTest();
 }
 
 HWTEST_F(ScanStateMachineTest, CommonScanningExeMsgSuccess1, TestSize.Level1)
@@ -1358,16 +1209,6 @@ HWTEST_F(ScanStateMachineTest, CommonScanningExeMsgFail, TestSize.Level1)
     CommonScanningExeMsgFail();
 }
 
-HWTEST_F(ScanStateMachineTest, PnoScanGoInStateTest, TestSize.Level1)
-{
-    PnoScanGoInStateTest();
-}
-
-HWTEST_F(ScanStateMachineTest, PnoScanGoOutStateTest, TestSize.Level1)
-{
-    PnoScanGoOutStateTest();
-}
-
 HWTEST_F(ScanStateMachineTest, PnoScanExeMsgSuccess, TestSize.Level1)
 {
     PnoScanExeMsgSuccess();
@@ -1376,16 +1217,6 @@ HWTEST_F(ScanStateMachineTest, PnoScanExeMsgSuccess, TestSize.Level1)
 HWTEST_F(ScanStateMachineTest, PnoScanExeMsgFail, TestSize.Level1)
 {
     PnoScanExeMsgFail();
-}
-
-HWTEST_F(ScanStateMachineTest, PnoScanHardwareGoInStateTest, TestSize.Level1)
-{
-    PnoScanHardwareGoInStateTest();
-}
-
-HWTEST_F(ScanStateMachineTest, PnoScanHardwareGoOutStateTest, TestSize.Level1)
-{
-    PnoScanHardwareGoOutStateTest();
 }
 
 HWTEST_F(ScanStateMachineTest, PnoScanHardwareExeMsgSuccess1, TestSize.Level1)
@@ -1428,11 +1259,6 @@ HWTEST_F(ScanStateMachineTest, CommonScanAfterPnoGoInStateTest, TestSize.Level1)
     CommonScanAfterPnoGoInStateTest();
 }
 
-HWTEST_F(ScanStateMachineTest, CommonScanAfterPnoGoOutStateTest, TestSize.Level1)
-{
-    CommonScanAfterPnoGoOutStateTest();
-}
-
 HWTEST_F(ScanStateMachineTest, CommonScanAfterPnoExeMsgSuccess1, TestSize.Level1)
 {
     CommonScanAfterPnoExeMsgSuccess1();
@@ -1471,11 +1297,6 @@ HWTEST_F(ScanStateMachineTest, CommonScanAfterPnoExeMsgFail, TestSize.Level1)
 HWTEST_F(ScanStateMachineTest, PnoScanSoftwareGoInStateTest, TestSize.Level1)
 {
     PnoScanSoftwareGoInStateTest();
-}
-
-HWTEST_F(ScanStateMachineTest, PnoScanSoftwareGoOutStateTest, TestSize.Level1)
-{
-    PnoScanSoftwareGoOutStateTest();
 }
 
 HWTEST_F(ScanStateMachineTest, PnoScanSoftwareExeMsgSuccess1, TestSize.Level1)
@@ -1533,16 +1354,6 @@ HWTEST_F(ScanStateMachineTest, PnoSwScanFreeExeMsgFail, TestSize.Level1)
     PnoSwScanFreeExeMsgFail();
 }
 
-HWTEST_F(ScanStateMachineTest, PnoSwScanningGoInStateTest, TestSize.Level1)
-{
-    PnoSwScanningGoInStateTest();
-}
-
-HWTEST_F(ScanStateMachineTest, PnoSwScanningGoOutStateTest, TestSize.Level1)
-{
-    PnoSwScanningGoOutStateTest();
-}
-
 HWTEST_F(ScanStateMachineTest, PnoSwScanningExeMsgSuccess1, TestSize.Level1)
 {
     PnoSwScanningExeMsgSuccess1();
@@ -1581,11 +1392,6 @@ HWTEST_F(ScanStateMachineTest, PnoSwScanningExeMsgSuccess7, TestSize.Level1)
 HWTEST_F(ScanStateMachineTest, PnoSwScanningExeMsgFail, TestSize.Level1)
 {
     PnoSwScanningExeMsgFail();
-}
-
-HWTEST_F(ScanStateMachineTest, CommonScanRequestProcessTest, TestSize.Level1)
-{
-    CommonScanRequestProcessTest();
 }
 
 HWTEST_F(ScanStateMachineTest, GetCommonScanRequestInfoTest1, TestSize.Level1)
@@ -1628,11 +1434,6 @@ HWTEST_F(ScanStateMachineTest, StartNewCommonScanTest2, TestSize.Level1)
     StartNewCommonScanTest2();
 }
 
-HWTEST_F(ScanStateMachineTest, ClearRunningScanSettingsTest, TestSize.Level1)
-{
-    ClearRunningScanSettingsTest();
-}
-
 HWTEST_F(ScanStateMachineTest, StartSingleCommonScanSuccess, TestSize.Level1)
 {
     StartSingleCommonScanSuccess();
@@ -1641,11 +1442,6 @@ HWTEST_F(ScanStateMachineTest, StartSingleCommonScanSuccess, TestSize.Level1)
 HWTEST_F(ScanStateMachineTest, StartSingleCommonScanFail, TestSize.Level1)
 {
     StartSingleCommonScanFail();
-}
-
-HWTEST_F(ScanStateMachineTest, CommonScanWhenRunningSuccess, TestSize.Level1)
-{
-    CommonScanWhenRunningSuccess();
 }
 
 HWTEST_F(ScanStateMachineTest, CommonScanWhenRunningFail, TestSize.Level1)
@@ -1666,21 +1462,6 @@ HWTEST_F(ScanStateMachineTest, ActiveCoverNewScanFail, TestSize.Level1)
 HWTEST_F(ScanStateMachineTest, CommonScanInfoProcessTest, TestSize.Level1)
 {
     CommonScanInfoProcessTest();
-}
-
-HWTEST_F(ScanStateMachineTest, ReportStatusChangeTest, TestSize.Level1)
-{
-    ReportStatusChangeTest();
-}
-
-HWTEST_F(ScanStateMachineTest, ReportScanInnerEventTest, TestSize.Level1)
-{
-    ReportScanInnerEventTest();
-}
-
-HWTEST_F(ScanStateMachineTest, ReportCommonScanFailedTest, TestSize.Level1)
-{
-    ReportCommonScanFailedTest();
 }
 
 HWTEST_F(ScanStateMachineTest, ReportCommonScanFailedAndClearTest1, TestSize.Level1)
@@ -1743,19 +1524,9 @@ HWTEST_F(ScanStateMachineTest, MergeScanStyleTest3, TestSize.Level1)
     MergeScanStyleTest3();
 }
 
-HWTEST_F(ScanStateMachineTest, RemoveCommonScanRequestTest, TestSize.Level1)
-{
-    RemoveCommonScanRequestTest();
-}
-
 HWTEST_F(ScanStateMachineTest, PnoScanRequestProcessTest, TestSize.Level1)
 {
     PnoScanRequestProcessTest();
-}
-
-HWTEST_F(ScanStateMachineTest, ContinuePnoScanProcess, TestSize.Level1)
-{
-    ContinuePnoScanProcess();
 }
 
 HWTEST_F(ScanStateMachineTest, PnoScanHardwareProcessTest1, TestSize.Level1)
@@ -1873,16 +1644,6 @@ HWTEST_F(ScanStateMachineTest, CommonScanAfterPnoResultTest2, TestSize.Level1)
     CommonScanAfterPnoResultTest2();
 }
 
-HWTEST_F(ScanStateMachineTest, PnoScanFailedProcessSuccessTest, TestSize.Level1)
-{
-    PnoScanFailedProcessSuccessTest();
-}
-
-HWTEST_F(ScanStateMachineTest, ClearPnoScanConfigTest, TestSize.Level1)
-{
-    ClearPnoScanConfigTest();
-}
-
 HWTEST_F(ScanStateMachineTest, GetScanInfosSuccess, TestSize.Level1)
 {
     GetScanInfosSuccess();
@@ -1956,21 +1717,6 @@ HWTEST_F(ScanStateMachineTest, InitCommonScanStateTest, TestSize.Level1)
 HWTEST_F(ScanStateMachineTest, InitPnoScanState, TestSize.Level1)
 {
     InitPnoScanState();
-}
-
-HWTEST_F(ScanStateMachineTest, BuildScanStateTreeTest, TestSize.Level1)
-{
-    BuildScanStateTreeTest();
-}
-
-HWTEST_F(ScanStateMachineTest, LoadDriverTest, TestSize.Level1)
-{
-    LoadDriverTest();
-}
-
-HWTEST_F(ScanStateMachineTest, UnLoadDriverTest, TestSize.Level1)
-{
-    UnLoadDriverTest();
 }
 
 HWTEST_F(ScanStateMachineTest, PnoScanRequestProcessFail, TestSize.Level1)

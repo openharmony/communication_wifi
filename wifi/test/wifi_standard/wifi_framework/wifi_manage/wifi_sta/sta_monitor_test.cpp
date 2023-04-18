@@ -54,8 +54,6 @@ public:
     void InitStaMonitorFail();
     void UnInitStaMonitorSuccess();
     void UnInitStaMonitorFail();
-    void SetStateMachineSuccess();
-    void SetStateMachineFail();
     void OnConnectChangedCallBackSuccess1();
     void OnConnectChangedCallBackSuccess2();
     void OnConnectChangedCallBackSuccess3();
@@ -110,17 +108,9 @@ void StaMonitorTest::UnInitStaMonitorFail()
 {
     EXPECT_CALL(WifiStaHalInterface::GetInstance(), RegisterStaEventCallback(_))
         .WillRepeatedly(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED));
-    EXPECT_TRUE(pStaMonitor->UnInitStaMonitor() == WIFI_OPT_FAILED);
-}
-
-void StaMonitorTest::SetStateMachineSuccess()
-{
     pStaMonitor->SetStateMachine(pStaMonitor->pStaStateMachine);
-}
-
-void StaMonitorTest::SetStateMachineFail()
-{
     pStaMonitor->SetStateMachine(nullptr);
+    EXPECT_TRUE(pStaMonitor->UnInitStaMonitor() == WIFI_OPT_FAILED);
 }
 
 void StaMonitorTest::OnConnectChangedCallBackSuccess1()
@@ -339,16 +329,6 @@ HWTEST_F(StaMonitorTest, OnConnectChangedCallBackFail1, TestSize.Level1)
 HWTEST_F(StaMonitorTest, OnConnectChangedCallBackFail2, TestSize.Level1)
 {
     OnConnectChangedCallBackFail2();
-}
-
-HWTEST_F(StaMonitorTest, SetStateMachineSuccess, TestSize.Level1)
-{
-    SetStateMachineSuccess();
-}
-
-HWTEST_F(StaMonitorTest, SetStateMachineFail, TestSize.Level1)
-{
-    SetStateMachineFail();
 }
 
 HWTEST_F(StaMonitorTest, OnConnectChangedCallBackSuccess1, TestSize.Level1)

@@ -20,6 +20,15 @@ using namespace testing::ext;
 
 namespace OHOS {
 namespace Wifi {
+
+constexpr int FREP_2G_MIN = 2412;
+
+constexpr int FREP_5G_MIN = 5170;
+constexpr int CHANNEL_14_FREP = 2484;
+constexpr int CENTER_FREP_DIFF = 5;
+constexpr int CHANNEL_2G_MIN = 1;
+
+
 HWTEST_F(WifiGlobalFuncTest, CfgCheckSsid, TestSize.Level1)
 {
     HotspotConfig config;
@@ -142,6 +151,84 @@ HWTEST_F(WifiGlobalFuncTest, ConvertConnStateInternalTest, TestSize.Level1)
                 ConnState::DISCONNECTING);
     EXPECT_TRUE(
         ConvertConnStateInternal(OperateResState::DISCONNECT_DISCONNECTED, isReport) == ConnState::DISCONNECTED);
+    EXPECT_TRUE(
+        ConvertConnStateInternal(OperateResState::CONNECT_NETWORK_ENABLED, isReport) == ConnState::UNKNOWN);
+    EXPECT_TRUE(
+        ConvertConnStateInternal(OperateResState::CONNECT_NETWORK_DISABLED, isReport) == ConnState::UNKNOWN);
+    EXPECT_TRUE(
+        ConvertConnStateInternal(OperateResState::CONNECT_PASSWORD_WRONG, isReport) == ConnState::UNKNOWN);
+    EXPECT_TRUE(
+        ConvertConnStateInternal(OperateResState::CONNECT_CONNECTION_FULL, isReport) == ConnState::UNKNOWN);
+    EXPECT_TRUE(
+        ConvertConnStateInternal(OperateResState::CONNECT_CONNECTION_REJECT, isReport) == ConnState::UNKNOWN);
+    EXPECT_TRUE(
+        ConvertConnStateInternal(OperateResState::CONNECT_CONNECTING_TIMEOUT, isReport) == ConnState::UNKNOWN);
+    EXPECT_TRUE(
+        ConvertConnStateInternal(OperateResState::CONNECT_OBTAINING_IP, isReport) == ConnState::OBTAINING_IPADDR);
+    EXPECT_TRUE(
+        ConvertConnStateInternal(OperateResState::CONNECT_OBTAINING_IP_FAILED, isReport) == ConnState::UNKNOWN);
+    EXPECT_TRUE(ConvertConnStateInternal(OperateResState::CONNECT_ASSOCIATING, isReport) == ConnState::UNKNOWN);
+    EXPECT_TRUE(ConvertConnStateInternal(OperateResState::CONNECT_ASSOCIATED, isReport) == ConnState::UNKNOWN);
+    EXPECT_TRUE(ConvertConnStateInternal(OperateResState::OPEN_WIFI_SUCCEED, isReport) == ConnState::UNKNOWN);
+}
+
+HWTEST_F(WifiGlobalFuncTest, IsAllowScanAnyTimeTest, TestSize.Level1)
+{
+    ScanForbidMode mode;
+    mode.scanMode = ScanMode::ANYTIME_SCAN;
+    mode.scanScene = SCAN_SCENE_ALL;
+    ScanControlInfo info, cont;
+    info.scanForbidList.push_back(mode);
+    EXPECT_FALSE(IsAllowScanAnyTime(info));
+    EXPECT_TRUE(IsAllowScanAnyTime(cont));
+}
+
+HWTEST_F(WifiGlobalFuncTest, HexStringToVecTest, TestSize.Level1)
+{
+    uint8_t plainText[CENTER_FREP_DIFF] = {0};
+    uint32_t plainLength = 0;
+    uint32_t resultLength;
+    EXPECT_TRUE(HexStringToVec("01234", plainText, plainLength, resultLength) == -1);
+    EXPECT_TRUE(HexStringToVec("$0", plainText, plainLength, resultLength) == -1);
+    EXPECT_TRUE(HexStringToVec("0$", plainText, plainLength, resultLength) == -1);
+    EXPECT_TRUE(HexStringToVec("00000", plainText, plainLength, resultLength) == -1);
+    EXPECT_TRUE(HexStringToVec("00000", plainText, 10, resultLength) == 0);
+}
+
+HWTEST_F(WifiGlobalFuncTest, TransformFrequencyIntoChannelTest1, TestSize.Level1)
+{
+    std::vector<int> freqVector, chanVector;
+    int target = FREP_2G_MIN;
+    freqVector.push_back(target);
+    TransformFrequencyIntoChannel(freqVector, chanVector);
+    EXPECT_TRUE(count(chanVector.begin(), chanVector.end(), target) != 0);
+}
+
+HWTEST_F(WifiGlobalFuncTest, TransformFrequencyIntoChannelTest2, TestSize.Level1)
+{
+    std::vector<int> freqVector, chanVector;
+    int target = CHANNEL_14_FREP;
+    freqVector.push_back(target);
+    TransformFrequencyIntoChannel(freqVector, chanVector);
+    EXPECT_TRUE(count(chanVector.begin(), chanVector.end(), target) != 0);
+}
+
+HWTEST_F(WifiGlobalFuncTest, TransformFrequencyIntoChannelTest3, TestSize.Level1)
+{
+    std::vector<int> freqVector, chanVector;
+    int target = FREP_5G_MIN;
+    freqVector.push_back(target);
+    TransformFrequencyIntoChannel(freqVector, chanVector);
+    EXPECT_TRUE(count(chanVector.begin(), chanVector.end(), target) != 0);
+}
+
+HWTEST_F(WifiGlobalFuncTest, TransformFrequencyIntoChannelTest4, TestSize.Level1)
+{
+    std::vector<int> freqVector, chanVector;
+    int target = CHANNEL_2G_MIN;
+    freqVector.push_back(target);
+    TransformFrequencyIntoChannel(freqVector, chanVector);
+    EXPECT_TRUE(count(chanVector.begin(), chanVector.end(), target) != 0);
 }
 
 HWTEST_F(WifiGlobalFuncTest, SplitStringTest, TestSize.Level1)

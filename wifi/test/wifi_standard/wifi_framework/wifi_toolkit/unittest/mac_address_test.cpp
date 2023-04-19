@@ -42,7 +42,7 @@ HWTEST_F(MacAddressTest, Create_001, TestSize.Level1)
     WIFI_LOGI("Create_001");
     sockaddr hwAddr;
     for (int i = 0; i < (FIVE + 1); i++) {
-        hwAddr.sa_data[i] = i;
+        hwAddr.sa_data[i] = 0;
     }
     EXPECT_TRUE(MacAddress::Create(hwAddr) == MacAddress::INVALID_MAC_ADDRESS);
 }
@@ -67,21 +67,20 @@ HWTEST_F(MacAddressTest, Create_002, TestSize.Level1)
 HWTEST_F(MacAddressTest, IsValidMac_001, TestSize.Level1)
 {
     WIFI_LOGI("IsValidMac_001");
-    sockaddr hwAddr;
     std::string mac = "AA:BB:CC:DD:";
     EXPECT_FALSE(MacAddress::IsValidMac(mac));
     mac = "AA:BB:CC:DD:EEFFF";
     EXPECT_FALSE(MacAddress::IsValidMac(mac));
-    mac = "AA:BB:CC:DD://";
+    mac = "AA:BB:CC:DD:EE://";
     EXPECT_FALSE(MacAddress::IsValidMac(mac));
-    mac = "AA:BB:CC:DD:::";
+    mac = "AA:BB:CC:DD:EE:::";
     EXPECT_FALSE(MacAddress::IsValidMac(mac));
-    mac = "AA:BB:CC:DD:~~";
+    mac = "AA:BB:CC:DD:EE:~~";
     EXPECT_FALSE(MacAddress::IsValidMac(mac));
 }
 /**
  * @tc.name: IsValidMac_002
- * @tc.desc: true mac
+ * @tc.desc: right mac
  * @tc.type: FUNC
  * @tc.require: issue
 */
@@ -102,7 +101,7 @@ HWTEST_F(MacAddressTest, GetMacAddr_001, TestSize.Level1)
     WIFI_LOGI("GetMacAddr_001");
     std::string ifName = "AA:BB:CC:DD:EE:FF";
     unsigned char macAddr[MAC_LEN] = {0};
-    EXPECT_TRUE(MacAddress::IsValidMac(mac));
+    EXPECT_FALSE(MacAddress::GetMacAddr(ifName, macAddr));
 }
 }  // namespace Wifi
 }  // namespace OHOS

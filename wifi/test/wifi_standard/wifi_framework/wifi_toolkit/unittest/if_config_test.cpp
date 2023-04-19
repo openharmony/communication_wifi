@@ -108,12 +108,10 @@ HWTEST_F(IfconfigTest, SetProxy_003, TestSize.Level1)
 */
 HWTEST_F(IfconfigTest, FlushIpAddr_001, TestSize.Level1)
 {
-    IFI_LOGI("FlushIpAddr_001");
+    WIFI_LOGI("FlushIpAddr_001");
     std::string ifName = "test";
     int ipType = static_cast<int>(IpType::IPTYPE_IPV6);
     IfConfig::GetInstance().FlushIpAddr(ifName, ipType);
 }
 }  // namespace Wifi
 }  // namespace OHOS
-
-

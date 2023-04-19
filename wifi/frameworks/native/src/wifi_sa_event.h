@@ -150,6 +150,8 @@ public:
     virtual ~EventManager() {
     }
 
+    static EventManager& GetInstance();
+
     bool AddEventCallback(WifiEvent *cb);
 
     void RemoveEventCallback(WifiEvent *cb);
@@ -162,6 +164,7 @@ public:
 
     std::set<WifiEvent*> GetEventCallBacks();
 
+    void Init();
 private:
     static std::set<WifiEvent*> m_setEventCallback;
     static bool m_isEventRegistered;

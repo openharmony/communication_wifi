@@ -207,9 +207,27 @@ std::set<WifiEvent*> EventManager::GetEventCallBacks()
     return m_setEventCallback;
 }
 
+void EventManager::Init()
+{
+    if (mSaStatusListener == nullptr) {
+        WIFI_LOGI("EventManager Listener Init!");
+        mSaStatusListener = new OHOS::Wifi::WifiAbilityStatusChange();
+        mSaStatusListener->Init(WIFI_DEVICE_ABILITY_ID);
+        mSaStatusListener->Init(WIFI_SCAN_ABILITY_ID);
+        mSaStatusListener->Init(WIFI_HOTSPOT_ABILITY_ID);
+        mSaStatusListener->Init(WIFI_P2P_ABILITY_ID);
+    }
+    return;
+}
+
 std::set<WifiEvent*> EventManager::m_setEventCallback;
 bool EventManager::m_isEventRegistered = false;
 static EventManager g_eventManager;
+
+EventManager& EventManager::GetInstance()
+{
+    return g_eventManager;
+}
 
 std::set<WifiEvent*> GetEventCallBacks() {
     return g_eventManager.GetEventCallBacks();

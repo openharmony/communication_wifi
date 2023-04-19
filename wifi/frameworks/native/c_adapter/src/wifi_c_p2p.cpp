@@ -28,6 +28,7 @@ std::unique_ptr<OHOS::Wifi::WifiP2p> wifiP2pPtr = OHOS::Wifi::WifiP2p::GetInstan
 NO_SANITIZE("cfi") WifiErrorCode EnableP2p()
 {
     CHECK_PTR_RETURN(wifiP2pPtr, ERROR_WIFI_NOT_AVAILABLE);
+    EventManager::GetInstance().Init();
     return GetCErrorCode(wifiP2pPtr->EnableP2p());
 }
 
@@ -437,6 +438,7 @@ NO_SANITIZE("cfi") WifiErrorCode RegisterP2pStateChangedCallback(const P2pStateC
     CHECK_PTR_RETURN(callback, ERROR_WIFI_INVALID_ARGS);
     CHECK_PTR_RETURN(wifiP2pPtr, ERROR_WIFI_NOT_AVAILABLE);
     CHECK_PTR_RETURN(sptrCallback, ERROR_WIFI_NOT_AVAILABLE);
+    EventManager::GetInstance().Init();
     sptrCallback->stateChangeCb = callback;
     wifiP2pPtr->RegisterCallBack(sptrCallback);
     return WIFI_SUCCESS;
@@ -448,6 +450,7 @@ WifiErrorCode RegisterP2pPersistentGroupsChangedCallback(const P2pPersistentGrou
     CHECK_PTR_RETURN(callback, ERROR_WIFI_INVALID_ARGS);
     CHECK_PTR_RETURN(wifiP2pPtr, ERROR_WIFI_NOT_AVAILABLE);
     CHECK_PTR_RETURN(sptrCallback, ERROR_WIFI_NOT_AVAILABLE);
+    EventManager::GetInstance().Init();
     sptrCallback->groupChangeCb = callback;
     wifiP2pPtr->RegisterCallBack(sptrCallback);
     return WIFI_SUCCESS;
@@ -458,6 +461,7 @@ NO_SANITIZE("cfi") WifiErrorCode RegisterP2pConnectionChangedCallback(const P2pC
     CHECK_PTR_RETURN(callback, ERROR_WIFI_INVALID_ARGS);
     CHECK_PTR_RETURN(wifiP2pPtr, ERROR_WIFI_NOT_AVAILABLE);
     CHECK_PTR_RETURN(sptrCallback, ERROR_WIFI_NOT_AVAILABLE);
+    EventManager::GetInstance().Init();
     sptrCallback->connectionChangeCb = callback;
     wifiP2pPtr->RegisterCallBack(sptrCallback);
     return WIFI_SUCCESS;
@@ -468,6 +472,7 @@ NO_SANITIZE("cfi") WifiErrorCode RegisterP2pPeersChangedCallback(const P2pPeersC
     CHECK_PTR_RETURN(callback, ERROR_WIFI_INVALID_ARGS);
     CHECK_PTR_RETURN(wifiP2pPtr, ERROR_WIFI_NOT_AVAILABLE);
     CHECK_PTR_RETURN(sptrCallback, ERROR_WIFI_NOT_AVAILABLE);
+    EventManager::GetInstance().Init();
     sptrCallback->peersChangeCb = callback;
     wifiP2pPtr->RegisterCallBack(sptrCallback);
     return WIFI_SUCCESS;
@@ -478,6 +483,7 @@ NO_SANITIZE("cfi") WifiErrorCode RegisterCfgChangCallback(const WifiCfgChangCall
     CHECK_PTR_RETURN(callback, ERROR_WIFI_INVALID_ARGS);
     CHECK_PTR_RETURN(wifiP2pPtr, ERROR_WIFI_NOT_AVAILABLE);
     CHECK_PTR_RETURN(sptrCallback, ERROR_WIFI_NOT_AVAILABLE);
+    EventManager::GetInstance().Init();
     sptrCallback->cfgChangeCallback = callback;
     wifiP2pPtr->RegisterCallBack(sptrCallback);
     return WIFI_SUCCESS;

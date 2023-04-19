@@ -41,6 +41,8 @@
 #include "wifi_global_func.h"
 #ifndef OHOS_ARCH_LITE
 #include "xcollie/watchdog.h"
+#include "wifi_sa_manager.h"
+#include "define.h"
 #endif
 DEFINE_WIFILOG_LABEL("WifiDeviceServiceImpl");
 namespace OHOS {
@@ -272,6 +274,9 @@ ErrCode WifiDeviceServiceImpl::EnableWifi()
         return errCode;
     }
 #ifdef FEATURE_P2P_SUPPORT
+#ifndef OHOS_ARCH_LITE
+    WifiSaLoadManager::GetInstance().LoadWifiSa(WIFI_P2P_ABILITY_ID);
+#endif
     sptr<WifiP2pServiceImpl> p2pService = WifiP2pServiceImpl::GetInstance();
     if (p2pService != nullptr && p2pService->EnableP2p() != WIFI_OPT_SUCCESS) {
         // only record to log

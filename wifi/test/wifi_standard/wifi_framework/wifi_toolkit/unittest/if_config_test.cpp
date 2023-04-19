@@ -16,6 +16,9 @@
 #include <gmock/gmock.h>
 #include "securec.h"
 #include "if_config.h"
+#include "wifi_logger.h"
+
+DEFINE_WIFILOG_DHCP_LABEL("IfconfigTest");
 
 using namespace testing::ext;
 namespace OHOS {
@@ -31,37 +34,84 @@ public:
     virtual void TearDown()
     {}
 };
-
-HWTEST_F(IfconfigTest, AddIpAddr_Fail1, TestSize.Level1)
+/**
+ * @tc.name: AddIpAddr_001
+ * @tc.desc: test with error ifName
+ * @tc.type: FUNC
+ * @tc.require: issue
+*/
+HWTEST_F(IfconfigTest, AddIpAddr_001, TestSize.Level1)
 {
+    WIFI_LOGI("AddIpAddr_001");
     std::string ifName = "";
     std::string ipAddr = "";
     std::string mask = "";
     int ipType = static_cast<int>(IpType::IPTYPE_IPV4);
     IfConfig::GetInstance().AddIpAddr(ifName, ipAddr, mask, ipType);
 }
-
-HWTEST_F(IfconfigTest, AddIpAddr_Success, TestSize.Level1)
+/**
+ * @tc.name: AddIpAddr_002
+ * @tc.desc: test with IpType IPTYPE_IPV6
+ * @tc.type: FUNC
+ * @tc.require: issue
+*/
+HWTEST_F(IfconfigTest, AddIpAddr_002, TestSize.Level1)
 {
-    std::string ifName = "";
+    WIFI_LOGI("AddIpAddr_002");
+    std::string ifName = "wlan0";
     std::string ipAddr = "";
     std::string mask = "";
     int ipType = static_cast<int>(IpType::IPTYPE_IPV6);
     IfConfig::GetInstance().AddIpAddr(ifName, ipAddr, mask, ipType);
 }
-
-HWTEST_F(IfconfigTest, SetProxy_Fail1, TestSize.Level1)
+/**
+ * @tc.name: SetProxy_001
+ * @tc.desc: test with isAuto false
+ * @tc.type: FUNC
+ * @tc.require: issue
+*/
+HWTEST_F(IfconfigTest, SetProxy_001, TestSize.Level1)
 {
+    WIFI_LOGI("SetProxy_001");
     bool isAuto = false;
-    IfConfig::GetInstance().SetProxy(isAuto, "proxy", "8080", "  ", "pac");
+    IfConfig::GetInstance().SetProxy(isAuto, "proxy", "8080", " ", "pac");
 }
-
-HWTEST_F(IfconfigTest, SetProxy_Success, TestSize.Level1)
+/**
+ * @tc.name: SetProxy_002
+ * @tc.desc: test with isAuto true but noProxys is empty
+ * @tc.type: FUNC
+ * @tc.require: issue
+*/
+HWTEST_F(IfconfigTest, SetProxy_002, TestSize.Level1)
 {
+    WIFI_LOGI("SetProxy_002");
     bool isAuto = true;
     IfConfig::GetInstance().SetProxy(isAuto, "proxy", "8080", "  ", "pac");
 }
+/**
+ * @tc.name: SetProxy_003
+ * @tc.desc: test with isAuto true but noProxys is empty
+ * @tc.type: FUNC
+ * @tc.require: issue
+*/
+HWTEST_F(IfconfigTest, SetProxy_003, TestSize.Level1)
+{
+    WIFI_LOGI("SetProxy_003");
+    bool isAuto = true;
+    IfConfig::GetInstance().SetProxy(isAuto, "", "8080", "noProxys", "pac");
+}
+/**
+ * @tc.name: FlushIpAddr_001
+ * @tc.desc: test with ipType is IPTYPE_IPV6
+ * @tc.type: FUNC
+ * @tc.require: issue
+*/
+HWTEST_F(IfconfigTest, FlushIpAddr_001, TestSize.Level1)
+{
+    WIFI_LOGI("FlushIpAddr_001");
+    std::string ifName = "test";
+    int ipType = static_cast<int>(IpType::IPTYPE_IPV6);
+    IfConfig::GetInstance().FlushIpAddr(ifName, ipType);
+}
 }  // namespace Wifi
 }  // namespace OHOS
-
-

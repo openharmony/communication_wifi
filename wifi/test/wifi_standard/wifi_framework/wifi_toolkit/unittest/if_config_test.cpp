@@ -36,7 +36,7 @@ public:
 };
 /**
  * @tc.name: AddIpAddr_001
- * @tc.desc: test with error ifname
+ * @tc.desc: test with error ifName
  * @tc.type: FUNC
  * @tc.require: issue
 */
@@ -74,7 +74,7 @@ HWTEST_F(IfconfigTest, SetProxy_001, TestSize.Level1)
 {
     WIFI_LOGI("SetProxy_001");
     bool isAuto = false;
-    IfConfig::GetInstance().SetProxy(isAuto, "proxy", "8080", "  ", "pac");
+    IfConfig::GetInstance().SetProxy(isAuto, "proxy", "8080", " ", "pac");
 }
 /**
  * @tc.name: SetProxy_002
@@ -84,7 +84,7 @@ HWTEST_F(IfconfigTest, SetProxy_001, TestSize.Level1)
 */
 HWTEST_F(IfconfigTest, SetProxy_002, TestSize.Level1)
 {
-    IFI_LOGI("SetProxy_002");
+    WIFI_LOGI("SetProxy_002");
     bool isAuto = true;
     IfConfig::GetInstance().SetProxy(isAuto, "proxy", "8080", "  ", "pac");
 }
@@ -96,11 +96,10 @@ HWTEST_F(IfconfigTest, SetProxy_002, TestSize.Level1)
 */
 HWTEST_F(IfconfigTest, SetProxy_003, TestSize.Level1)
 {
-    IFI_LOGI("SetProxy_003");
+    WIFI_LOGI("SetProxy_003");
     bool isAuto = true;
     IfConfig::GetInstance().SetProxy(isAuto, "", "8080", "noProxys", "pac");
 }
-void IfConfig::FlushIpAddr(const std::string& ifName, const int& ipType)
 /**
  * @tc.name: FlushIpAddr_001
  * @tc.desc: test with ipType is IPTYPE_IPV6

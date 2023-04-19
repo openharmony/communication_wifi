@@ -90,13 +90,12 @@ HWTEST_F(HttpRequestTest, HttpGet_003, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require: issue
 */
-HWTEST_F(HttpRequestTest, HttpGet_003, TestSize.Level1)
+HWTEST_F(HttpRequestTest, HttpGet_004, TestSize.Level1)
 {
-    WIFI_LOGI("HttpGet_003");
+    WIFI_LOGI("HttpGet_004");
     std::string strUrl = "http://";
     std::string strResponse = "";
     EXPECT_TRUE(pHttpRequest->HttpGet(strUrl, strResponse) == -1);
 }
 }  // namespace Wifi
 }  // namespace OHOS
-

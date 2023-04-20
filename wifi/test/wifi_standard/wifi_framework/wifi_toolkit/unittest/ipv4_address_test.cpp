@@ -112,7 +112,7 @@ HWTEST_F(Ipv4AddressTest, GetMaskWithString_001, TestSize.Level1)
     std::string ipv4 = "192.168.3.144";
     size_t prefixLength = EIGHT;
     Ipv4Address mIpv4Address = Ipv4Address::Create(ipv4, prefixLength);
-    EXPECT_TRUE(mIpv4Address.GetMaskWithString()== "255.0.0.0");
+    EXPECT_TRUE(mIpv4Address.GetMaskWithString() == "255.0.0.0");
 }
 /**
  * @tc.name: GetNetworkAddressWithString_001
@@ -136,7 +136,7 @@ HWTEST_F(Ipv4AddressTest, GetNetworkAddressWithString_001, TestSize.Level1)
 */
 HWTEST_F(Ipv4AddressTest, GetHostAddressWithString_001, TestSize.Level1)
 {
-    WIFI_LOGI("GetNetworkAddressWithString_001");
+    WIFI_LOGI("GetHostAddressWithString_001");
     std::string ipv4 = "192.168.3.144";
     size_t prefixLength = EIGHT;
     Ipv4Address mIpv4Address = Ipv4Address::Create(ipv4, prefixLength);
@@ -158,4 +158,3 @@ HWTEST_F(Ipv4AddressTest, GetNetwork_001, TestSize.Level1)
 }
 }  // namespace Wifi
 }  // namespace OHOS
-

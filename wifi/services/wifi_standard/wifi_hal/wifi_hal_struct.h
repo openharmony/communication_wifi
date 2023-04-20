@@ -163,6 +163,8 @@ typedef struct WpaSignalInfo {
     int rxrate;
     int noise;
     int frequency;
+    int txPackets;
+    int rxPackets;
 } WpaSignalInfo;
 #ifdef __cplusplus
 }

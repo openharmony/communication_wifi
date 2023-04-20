@@ -24,7 +24,7 @@
 
 #define MAX_FEATURE_NUMBER 16
 
-const char *WLAN_SERVICE_NAME = "wlan_interface_service"; // Move the define to HDF module
+const char *HDI_SERVICE_NAME = "wlan_interface_service"; // Move the define to HDF module
 
 static pthread_mutex_t g_mutex;
 static unsigned int g_wlanRefCount = 0;
@@ -138,7 +138,7 @@ WifiErrorNo HdiStart()
         LOGI("%{public}s wlan ref count: %d", __func__, g_wlanRefCount);
         return WIFI_HAL_SUCCESS;
     }
-    g_wlanObj = IWlanInterfaceGetInstance(WLAN_SERVICE_NAME, false);
+    g_wlanObj = IWlanInterfaceGetInstance(HDI_SERVICE_NAME, false);
     if (g_wlanObj == NULL) {
         pthread_mutex_unlock(&g_mutex);
         LOGE("%{public}s WlanInterfaceGetInstance failed", __func__);
@@ -147,7 +147,7 @@ WifiErrorNo HdiStart()
     int32_t ret = g_wlanObj->Start(g_wlanObj);
     if (ret != HDF_SUCCESS) {
         LOGE("%{public}s Start failed: %{public}d", __func__, ret);
-        IWlanInterfaceReleaseInstance(WLAN_SERVICE_NAME, g_wlanObj, false);
+        IWlanInterfaceReleaseInstance(HDI_SERVICE_NAME, g_wlanObj, false);
         g_wlanObj = NULL;
         pthread_mutex_unlock(&g_mutex);
         return WIFI_HAL_FAILED;
@@ -180,7 +180,7 @@ WifiErrorNo HdiStop()
     if (ret != HDF_SUCCESS) {
         LOGE("%{public}s Stop failed: %{public}d", __func__, ret);
     }
-    IWlanInterfaceReleaseInstance(WLAN_SERVICE_NAME, g_wlanObj, false);
+    IWlanInterfaceReleaseInstance(HDI_SERVICE_NAME, g_wlanObj, false);
     --g_wlanRefCount;
     g_wlanObj = NULL;
     pthread_mutex_unlock(&g_mutex);

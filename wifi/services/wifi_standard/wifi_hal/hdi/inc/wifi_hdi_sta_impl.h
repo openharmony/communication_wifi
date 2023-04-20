@@ -16,10 +16,64 @@
 #ifndef OHOS_HDI_STA_IMPL_H
 #define OHOS_HDI_STA_IMPL_H
 
+#include "wifi_hal_define.h"
+#include "wifi_hal_struct.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+/**
+ * @Description hdi sta init
+ *
+ * @return void
+ */
+void HdiStaInit();
+
+/**
+ * @Description hdi sta uninit
+ *
+ * @return void
+ */
+void HdiStaUnInit();
+
+/**
+ * @Description start scan wifi info.
+ *
+ * @return WifiErrorNo - operation result
+ */
+WifiErrorNo HdiStartScan(const ScanSettings *settings);
+
+/**
+ * @Description Get the scan infos from saved info.
+ *
+ * @param infos - saved infos
+ * @param *size - input max size,and output scan size
+ * @return WifiErrorNo - operation result
+ */
+WifiErrorNo GetHdiScanInfos(ScanInfo* infos, int *size);
+
+/**
+ * @Description Get the signal infos from hdi.
+ *
+ * @param infos - saved infos
+ * @return WifiErrorNo - operation result
+ */
+WifiErrorNo GetHdiSignalInfo(WpaSignalInfo *info);
+
+/**
+ * @Description register hdi callback event
+ *
+ * @return WifiHdiProxy - interface proxy object
+ */
+WifiErrorNo RegisterHdiStaCallbackEvent();
+
+/**
+ * @Description unregister hdi callback event
+ *
+ * @return NONE
+ */
+void UnRegisterHdiStaCallbackEvent();
 
 #ifdef __cplusplus
 }

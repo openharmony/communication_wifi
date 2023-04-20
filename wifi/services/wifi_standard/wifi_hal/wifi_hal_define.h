@@ -46,6 +46,9 @@ extern "C" {
 
 #define WEAK_FUNC __attribute__((weak))
 
+#define STA_CB_SCAN_FAILED 1
+#define STA_CB_SCAN_OVER_OK 2
+
 typedef enum WifiErrorNo {
     WIFI_HAL_SUCCESS = 0,                /* Success. */
     WIFI_HAL_FAILED = 1,                 /* Failed. */

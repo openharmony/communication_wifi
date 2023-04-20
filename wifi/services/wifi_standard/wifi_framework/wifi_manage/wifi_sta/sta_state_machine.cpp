@@ -26,6 +26,7 @@
 #include "wifi_settings.h"
 #include "wifi_sta_hal_interface.h"
 #include "wifi_supplicant_hal_interface.h"
+#include "wifi_hisysevent.h"
 #ifndef OHOS_ARCH_LITE
 #include "iservice_registry.h"
 #include "system_ability_definition.h"
@@ -724,7 +725,6 @@ void StaStateMachine::DealSignalPollResult(InternalMessage *msg)
     } else {
         linkedInfo.rssi = INVALID_RSSI_VALUE;
     }
-
     if (signalInfo.txrate > 0) {
         linkedInfo.txLinkSpeed = signalInfo.txrate;
         linkedInfo.linkSpeed = signalInfo.txrate;

@@ -334,6 +334,8 @@ bool P2pIdleState::ProcessInvitationReceivedEvt(InternalMessage &msg) const
     WifiP2pConfigInternal config;
     config.SetDeviceAddress(owner.GetDeviceAddress());
     config.SetWpsInfo(wps);
+    config.SetNetId(group.GetNetworkId());
+    groupManager.AddOrUpdateGroup(group);
     p2pStateMachine.savedP2pConfig = config;
 
     p2pStateMachine.SwitchState(&p2pStateMachine.p2pInvitationReceivedState);

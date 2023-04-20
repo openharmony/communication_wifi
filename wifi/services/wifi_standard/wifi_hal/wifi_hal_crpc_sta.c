@@ -915,6 +915,8 @@ int RpcGetConnectSignalInfo(RpcServer *server, Context *context)
         WriteInt(context, info.rxrate);
         WriteInt(context, info.noise);
         WriteInt(context, info.frequency);
+        WriteInt(context, info.txPackets);
+        WriteInt(context, info.rxPackets);
     }
     WriteEnd(context);
     return HAL_SUCCESS;

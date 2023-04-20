@@ -42,8 +42,6 @@
 #define P2P_SERVICE_DISC_REQ_THREE 3
 #define P2P_SERVICE_DISC_REQ_FOUR 4
 #define P2P_SERVICE_DISC_REQ_FIVE 5
-#define WPA_CB_SCAN_FAILED 1
-#define WPA_CB_SCAN_OVER_OK 2
 #define WPA_CB_CONNECTED 1
 #define WPA_CB_DISCONNECTED 2
 #define WPS_EVENT_PBC_OVERLAP "WPS-OVERLAP-DETECTED PBC session overlap"
@@ -614,9 +612,13 @@ static void WpaCallBackFunc(const char *p)
         return;
     }
     if (strncmp(p, WPA_EVENT_SCAN_RESULTS, strlen(WPA_EVENT_SCAN_RESULTS)) == 0) {
-        WifiHalCbNotifyScanEnd(WPA_CB_SCAN_OVER_OK);
+#ifndef HDI_INTERFACE_SUPPORT
+        WifiHalCbNotifyScanEnd(STA_CB_SCAN_OVER_OK);
+#endif
     } else if (strncmp(p, WPA_EVENT_SCAN_FAILED, strlen(WPA_EVENT_SCAN_FAILED)) == 0) {
-        WifiHalCbNotifyScanEnd(WPA_CB_SCAN_FAILED);
+#ifndef HDI_INTERFACE_SUPPORT
+        WifiHalCbNotifyScanEnd(STA_CB_SCAN_FAILED);
+#endif
     } else if (strncmp(p, WPA_EVENT_CONNECTED, strlen(WPA_EVENT_CONNECTED)) == 0) { /* Connection notification */
         char *pid = strstr(p, "id=");
         char *pMacPos = strstr(p, "Connection to ");
@@ -656,7 +658,6 @@ static void WpaCallBackFunc(const char *p)
     } else {
         WpaCallBackFuncTwo(p);
     }
-    return;
 }
 
 static int MyWpaCtrlPending(struct wpa_ctrl *ctrl)

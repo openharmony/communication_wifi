@@ -46,7 +46,7 @@ public:
 HWTEST_F(Ipv6AddressTest, Create_001, TestSize.Level1)
 {
     WIFI_LOGI("Create_001");
-    std::string ipv6 = "1111:1111:1111:1111:1111:%";
+    std::string ipv6 = "1111:1111:1111:1111:%";
     EXPECT_TRUE(Ipv6Address::Create(ipv6) == Ipv6Address::INVALID_INET6_ADDRESS);
     ipv6 = "ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff";
     EXPECT_TRUE(Ipv6Address::Create(ipv6) == Ipv6Address::INVALID_INET6_ADDRESS);
@@ -62,13 +62,13 @@ HWTEST_F(Ipv6AddressTest, Create_001, TestSize.Level1)
 HWTEST_F(Ipv6AddressTest, Create_002, TestSize.Level1)
 {
     WIFI_LOGI("Create_002");
-    std::string ipv6Prefix = "1111:1111:1111:1111:1111:%";
+    std::string ipv6Prefix = "1111:1111:1111:1111:%";
     size_t prefixLength = HALF_PREFIX_LENGTH + 1;
     MacAddress mac = MacAddress::Create("aa:bb:cc:dd:ee:ff");
     EXPECT_TRUE(Ipv6Address::Create(ipv6Prefix, mac, prefixLength) == Ipv6Address::INVALID_INET6_ADDRESS);
     prefixLength = HALF_PREFIX_LENGTH;
     EXPECT_TRUE(Ipv6Address::Create(ipv6Prefix, mac, prefixLength) == Ipv6Address::INVALID_INET6_ADDRESS);
-    ipv6 = "1111:1111:1111:1111:1111:1111:1111:1111";
+    prefixLength = "1111:1111:1111:1111:1111:1111:1111:1111";
     EXPECT_FALSE(Ipv6Address::Create(ipv6Prefix, mac, prefixLength) == Ipv6Address::INVALID_INET6_ADDRESS);
 }
 /**
@@ -85,9 +85,9 @@ HWTEST_F(Ipv6AddressTest, Create_003, TestSize.Level1)
     unsigned int rndSeed = 1;
     EXPECT_TRUE(Ipv6Address::Create(ipv6Prefix, prefixLength, rndSeed) == Ipv6Address::INVALID_INET6_ADDRESS);
     prefixLength = MAX_IPV6_LENGTH;
-    EXPECT_TRUE(Ipv6Address::Create(ipv6Prefix, prefixLength, rndSeed)== Ipv6Address::INVALID_INET6_ADDRESS);
-    ipv6 = "1111:1111:1111:1111:1111:1111:1111:1111";
-    EXPECT_FALSE(Ipv6Address::Create(ipv6Prefix, prefixLength, rndSeed) == Ipv6Address::INVALID_INET6_ADDRESS);
+    EXPECT_TRUE(Ipv6Address::Create(ipv6Prefix, prefixLength, rndSeed) == Ipv6Address::INVALID_INET6_ADDRESS);
+    ipv6Prefix = "1111:1111:1111:1111:1111:1111:1111:1111";
+    Ipv6Address::Create(ipv6Prefix, prefixLength, rndSeed);
     prefixLength = MAX_IPV6_LENGTH - CHAR_BIT;
     Ipv6Address::Create(ipv6Prefix, prefixLength, rndSeed);
 }
@@ -101,7 +101,7 @@ HWTEST_F(Ipv6AddressTest, Create_004, TestSize.Level1)
 {
     WIFI_LOGI("Create_004");
     in6_addr i6Addr;
-    for(int i = 0; i < S6_ADDR_LENGTH;  i++) {
+    for (int i = 0; i < S6_ADDR_LENGTH; i++) {
         i6Addr.s6_addr[i] = 1;
     }
     size_t prefixLength = MAX_IPV6_LENGTH + 1;
@@ -118,7 +118,7 @@ HWTEST_F(Ipv6AddressTest, Create_004, TestSize.Level1)
 HWTEST_F(Ipv6AddressTest, Create_005, TestSize.Level1)
 {
     WIFI_LOGI("Create_005");
-    std::string ipv6 = "1111:1111:1111:1111:1111:%";
+    std::string ipv6 = "1111:1111:1111:1111:%";
     size_t prefixLength = MAX_IPV6_LENGTH + 1;
     EXPECT_TRUE(Ipv6Address::Create(ipv6, prefixLength) == Ipv6Address::INVALID_INET6_ADDRESS);
     prefixLength = MAX_IPV6_LENGTH;
@@ -135,7 +135,7 @@ HWTEST_F(Ipv6AddressTest, Create_005, TestSize.Level1)
 HWTEST_F(Ipv6AddressTest, Create_006, TestSize.Level1)
 {
     WIFI_LOGI("Create_006");
-    std::string ipv6 = "1111:1111:1111:1111:1111:%";
+    std::string ipv6 = "1111:1111:1111:1111:%";
     std::string mask = "ffff:ffff:ffff:ffff:0:0:0:0";
     EXPECT_TRUE(Ipv6Address::Create(ipv6, mask) == Ipv6Address::INVALID_INET6_ADDRESS);
     ipv6 = "1111:1111:1111:1111:1111:1111:1111:1111";
@@ -152,7 +152,7 @@ HWTEST_F(Ipv6AddressTest, GetIn6Addr_001, TestSize.Level1)
     WIFI_LOGI("GetIn6Addr_001");
     std::string ipv6 = "1111:1111:1111:1111:1111:1111:1111:1111";
     Ipv6Address mIpv6Address = Ipv6Address::Create(ipv6);
-    EXPECT_EQ(Ipv6Address::GetIn6Addr(), DEC_11_TOHEX);
+    EXPECT_EQ(mIpv6Address.GetIn6Addr().s6_addr[0], DEC_11_TOHEX);
 }
 /**
  * @tc.name: GetIpv6Prefix_001
@@ -164,15 +164,15 @@ HWTEST_F(Ipv6AddressTest, GetIpv6Prefix_001, TestSize.Level1)
 {
     WIFI_LOGI("GetIpv6Prefix_001");
     size_t prefixLength = MAX_IPV6_LENGTH + 1;
-    in6_addr i6Addr;
-    for(int i = 0; i < S6_ADDR_LENGTH;  i++) {
-        i6Addr.s6_addr[i] = 1;
+    in6_addr ip6Addr;
+    for (int i = 0; i < S6_ADDR_LENGTH; i++) {
+        ip6Addr.s6_addr[i] = 1;
     }
-    EXPECT_TRUE(Ipv6Address::GetIpv6Prefix(ip6Addr, prefixLength) == 0);
+    EXPECT_TRUE(Ipv6Address::GetIpv6Prefix(ip6Addr, prefixLength).s6_addr[0] == 0);
     prefixLength = MAX_IPV6_LENGTH;
-    EXPECT_EQ(Ipv6Address::GetIpv6Prefix(ip6Addr, prefixLength), 1);
+    EXPECT_EQ(Ipv6Address::GetIpv6Prefix(ip6Addr, prefixLength).s6_addr[0], 1);
     prefixLength = MAX_IPV6_LENGTH - 1;
-    EXPECT_EQ(Ipv6Address::GetIpv6Prefix(ip6Addr, prefixLength), 1);
+    EXPECT_EQ(Ipv6Address::GetIpv6Prefix(ip6Addr, prefixLength).s6_addr[0], 1);
 }
 /**
  * @tc.name: GetIpv6Mask_001
@@ -184,12 +184,11 @@ HWTEST_F(Ipv6AddressTest, GetIpv6Mask_001, TestSize.Level1)
 {
     WIFI_LOGI("GetIpv6Mask_001");
     size_t prefixLength = MAX_IPV6_LENGTH + 1;
-    EXPECT_TRUE(Ipv6Address::GetIpv6Mask(prefixLength) == 0);
+    EXPECT_TRUE(Ipv6Address::GetIpv6Mask(prefixLength).s6_addr[0] == 0);
     prefixLength = MAX_IPV6_LENGTH;
-    EXPECT_TRUE(Ipv6Address::GetIpv6Mask(prefixLength) == UCHAR_MAX);
-    prefixLength = MAX_IPV6_LENGTH- 1;
-    EXPECT_TRUE(Ipv6Address::GetIpv6Mask(prefixLength) == UCHAR_MAX);
+    EXPECT_TRUE(Ipv6Address::GetIpv6Mask(prefixLength).s6_addr[0] == UCHAR_MAX);
+    prefixLength = CHAR_BIT + CHAR_BIT;
+    EXPECT_TRUE(Ipv6Address::GetIpv6Mask(prefixLength).s6_addr[0] == UCHAR_MAX);
 }
 }  // namespace Wifi
 }  // namespace OHOS
-

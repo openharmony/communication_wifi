@@ -18,7 +18,7 @@
 #include "wifi_logger.h"
 
 DEFINE_WIFILOG_DHCP_LABEL("Ipv4AddressTest");
-using namespace testing::ext;
+using ::testing::ext::TestSize;
 
 namespace OHOS {
 namespace Wifi {
@@ -42,7 +42,7 @@ public:
  * @tc.type: FUNC
  * @tc.require: issue
 */
-HWTEST_F(Ipv6AddressTest, Create_001, TestSize.Level1)
+HWTEST_F(Ipv4AddressTest, Create_001, TestSize.Level1)
 {
     WIFI_LOGI("Create_001");
     std::string ipv4 = "192.168.15";
@@ -60,16 +60,16 @@ HWTEST_F(Ipv6AddressTest, Create_001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require: issue
 */
-HWTEST_F(Ipv6AddressTest, Create_002, TestSize.Level1)
+HWTEST_F(Ipv4AddressTest, Create_002, TestSize.Level1)
 {
     WIFI_LOGI("Create_002");
     std::string ipv4 = "192.168.15";
     std::string mask = "255.255";
     EXPECT_TRUE(Ipv4Address::Create(ipv4, mask) == Ipv4Address::INVALID_INET_ADDRESS);
     mask = "255.255.255.0";
-    EXPECT_TRUE(Ipv4Address::Create(ipv4, prefixLength) == Ipv4Address::INVALID_INET_ADDRESS);
+    EXPECT_TRUE(Ipv4Address::Create(ipv4, mask) == Ipv4Address::INVALID_INET_ADDRESS);
     ipv4 = "192.168.15.23";
-    Ipv4Address::Create(ipv4, prefixLength);
+    Ipv4Address::Create(ipv4, mask);
 }
 /**
  * @tc.name: Create_003
@@ -77,7 +77,7 @@ HWTEST_F(Ipv6AddressTest, Create_002, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require: issue
 */
-HWTEST_F(Ipv6AddressTest, Create_003, TestSize.Level1)
+HWTEST_F(Ipv4AddressTest, Create_003, TestSize.Level1)
 {
     WIFI_LOGI("Create_003");
     in_addr ipv4;
@@ -92,13 +92,13 @@ HWTEST_F(Ipv6AddressTest, Create_003, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require: issue
 */
-HWTEST_F(Ipv6AddressTest, GetAddressWithInet_001, TestSize.Level1)
+HWTEST_F(Ipv4AddressTest, GetAddressWithInet_001, TestSize.Level1)
 {
     WIFI_LOGI("GetAddressWithInet_001");
     std::string ipv4 = "192.168.3.144";
     size_t prefixLength = EIGHT;
     Ipv4Address mIpv4Address = Ipv4Address::Create(ipv4, prefixLength);
-    EXPECT_TRUE(Ipv4Address::GetAddressWithInet().s_addr == IP_TEST);
+    EXPECT_TRUE(mIpv4Address.GetAddressWithInet().s_addr == IP_TEST);
 }
 /**
  * @tc.name: GetMaskWithString_001
@@ -106,13 +106,13 @@ HWTEST_F(Ipv6AddressTest, GetAddressWithInet_001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require: issue
 */
-HWTEST_F(Ipv6AddressTest, GetAddressWithInet_001, TestSize.Level1)
+HWTEST_F(Ipv4AddressTest, GetMaskWithString_001, TestSize.Level1)
 {
-    WIFI_LOGI("GetAddressWithInet_001");
+    WIFI_LOGI("GetMaskWithString_001");
     std::string ipv4 = "192.168.3.144";
     size_t prefixLength = EIGHT;
     Ipv4Address mIpv4Address = Ipv4Address::Create(ipv4, prefixLength);
-    EXPECT_TRUE(Ipv4Address::GetMaskWithString()== "255.0.0.0");
+    EXPECT_TRUE(mIpv4Address.GetMaskWithString()== "255.0.0.0");
 }
 /**
  * @tc.name: GetNetworkAddressWithString_001
@@ -120,27 +120,41 @@ HWTEST_F(Ipv6AddressTest, GetAddressWithInet_001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require: issue
 */
-HWTEST_F(Ipv6AddressTest, GetNetworkAddressWithString_001, TestSize.Level1)
+HWTEST_F(Ipv4AddressTest, GetNetworkAddressWithString_001, TestSize.Level1)
 {
     WIFI_LOGI("GetNetworkAddressWithString_001");
     std::string ipv4 = "192.168.3.144";
     size_t prefixLength = EIGHT;
     Ipv4Address mIpv4Address = Ipv4Address::Create(ipv4, prefixLength);
-    EXPECT_TRUE(Ipv4Address::GetNetworkAddressWithString() == "192.0.0.0");
+    EXPECT_TRUE(mIpv4Address.GetNetworkAddressWithString() == "192.0.0.0");
 }
 /**
- * @tc.name: GetNetwork_001
- * @tc.desc: GetNetwork() 
+ * @tc.name: GetHostAddressWithString_001
+ * @tc.desc: GetHostAddressWithString()
  * @tc.type: FUNC
  * @tc.require: issue
 */
-HWTEST_F(Ipv6AddressTest, GetNetwork_001, TestSize.Level1)
+HWTEST_F(Ipv4AddressTest, GetHostAddressWithString_001, TestSize.Level1)
+{
+    WIFI_LOGI("GetNetworkAddressWithString_001");
+    std::string ipv4 = "192.168.3.144";
+    size_t prefixLength = EIGHT;
+    Ipv4Address mIpv4Address = Ipv4Address::Create(ipv4, prefixLength);
+    EXPECT_TRUE(mIpv4Address.GetHostAddressWithString() == "0.168.3.144");
+}
+/**
+ * @tc.name: GetNetwork_001
+ * @tc.desc: GetNetwork()
+ * @tc.type: FUNC
+ * @tc.require: issue
+*/
+HWTEST_F(Ipv4AddressTest, GetNetwork_001, TestSize.Level1)
 {
     WIFI_LOGI("GetNetwork_001");
     std::string ipv4 = "192.168.3.144";
     size_t prefixLength = EIGHT;
     Ipv4Address mIpv4Address = Ipv4Address::Create(ipv4, prefixLength);
-    EXPECT_TRUE(Ipv4Address::GetNetwork() == "192.168.3.144/8");
+    EXPECT_TRUE(mIpv4Address.GetNetwork() == "192.168.3.144/8");
 }
 }  // namespace Wifi
 }  // namespace OHOS

@@ -47,6 +47,7 @@ ohos_unittest("toolkit_unittest") {
     "dhcpd_interface_test.cpp",
     "http_request_test.cpp",
     "if_config_test.cpp",
+    "ipv4_address_test.cpp",
     "ipv6_address_test.cpp",
     "mac_address_test.cpp",
     "raw_socket_test.cpp",

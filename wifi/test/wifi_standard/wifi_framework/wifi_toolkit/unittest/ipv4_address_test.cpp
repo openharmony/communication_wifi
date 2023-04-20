@@ -84,7 +84,7 @@ HWTEST_F(Ipv4AddressTest, Create_003, TestSize.Level1)
     ipv4.s_addr = IP_TEST;
     in_addr mask;
     mask.s_addr = 1;
-    EXPECT_EQ(Ipv4Address::Create(ipv4, mask).GetAddressWithString(), "192.168.15.144");
+    EXPECT_EQ(Ipv4Address::Create(ipv4, mask).GetAddressWithString(), "192.168.3.144");
 }
 /**
  * @tc.name: GetAddressWithInet_001

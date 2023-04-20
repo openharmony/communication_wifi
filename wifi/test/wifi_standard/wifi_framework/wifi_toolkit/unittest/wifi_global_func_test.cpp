@@ -22,12 +22,13 @@ namespace OHOS {
 namespace Wifi {
 
 constexpr int FREP_2G_MIN = 2412;
-
 constexpr int FREP_5G_MIN = 5170;
 constexpr int CHANNEL_14_FREP = 2484;
 constexpr int CENTER_FREP_DIFF = 5;
 constexpr int CHANNEL_2G_MIN = 1;
-
+constexpr int CHANNEL_5G = 34;
+constexpr int CHANNEL_2G = 14;
+constexpr uint32_t PLAIN_LENGTH = 10;
 
 HWTEST_F(WifiGlobalFuncTest, CfgCheckSsid, TestSize.Level1)
 {
@@ -191,8 +192,8 @@ HWTEST_F(WifiGlobalFuncTest, HexStringToVecTest, TestSize.Level1)
     EXPECT_TRUE(HexStringToVec("01234", plainText, plainLength, resultLength) == -1);
     EXPECT_TRUE(HexStringToVec("$0", plainText, plainLength, resultLength) == -1);
     EXPECT_TRUE(HexStringToVec("0$", plainText, plainLength, resultLength) == -1);
-    EXPECT_TRUE(HexStringToVec("00000", plainText, plainLength, resultLength) == -1);
-    EXPECT_TRUE(HexStringToVec("00000", plainText, 10, resultLength) == 0);
+    EXPECT_TRUE(HexStringToVec("0000", plainText, PLAIN_LENGTH, resultLength) == 0);
+    EXPECT_TRUE(HexStringToVec("0000", plainText, PLAIN_LENGTH, resultLength) == 0);
 }
 
 HWTEST_F(WifiGlobalFuncTest, TransformFrequencyIntoChannelTest1, TestSize.Level1)
@@ -201,7 +202,7 @@ HWTEST_F(WifiGlobalFuncTest, TransformFrequencyIntoChannelTest1, TestSize.Level1
     int target = FREP_2G_MIN;
     freqVector.push_back(target);
     TransformFrequencyIntoChannel(freqVector, chanVector);
-    EXPECT_TRUE(count(chanVector.begin(), chanVector.end(), target) != 0);
+    EXPECT_TRUE(count(chanVector.begin(), chanVector.end(), CHANNEL_2G) != 0);
 }
 
 HWTEST_F(WifiGlobalFuncTest, TransformFrequencyIntoChannelTest2, TestSize.Level1)
@@ -210,7 +211,7 @@ HWTEST_F(WifiGlobalFuncTest, TransformFrequencyIntoChannelTest2, TestSize.Level1
     int target = CHANNEL_14_FREP;
     freqVector.push_back(target);
     TransformFrequencyIntoChannel(freqVector, chanVector);
-    EXPECT_TRUE(count(chanVector.begin(), chanVector.end(), target) != 0);
+    EXPECT_TRUE(count(chanVector.begin(), chanVector.end(), CHANNEL_5G) != 0);
 }
 
 HWTEST_F(WifiGlobalFuncTest, TransformFrequencyIntoChannelTest3, TestSize.Level1)
@@ -219,7 +220,7 @@ HWTEST_F(WifiGlobalFuncTest, TransformFrequencyIntoChannelTest3, TestSize.Level1
     int target = FREP_5G_MIN;
     freqVector.push_back(target);
     TransformFrequencyIntoChannel(freqVector, chanVector);
-    EXPECT_TRUE(count(chanVector.begin(), chanVector.end(), target) != 0);
+    EXPECT_TRUE(count(chanVector.begin(), chanVector.end(), CHANNEL_5G) != 0);
 }
 
 HWTEST_F(WifiGlobalFuncTest, TransformFrequencyIntoChannelTest4, TestSize.Level1)
@@ -228,7 +229,7 @@ HWTEST_F(WifiGlobalFuncTest, TransformFrequencyIntoChannelTest4, TestSize.Level1
     int target = CHANNEL_2G_MIN;
     freqVector.push_back(target);
     TransformFrequencyIntoChannel(freqVector, chanVector);
-    EXPECT_TRUE(count(chanVector.begin(), chanVector.end(), target) != 0);
+    EXPECT_TRUE(count(chanVector.begin(), chanVector.end(), CHANNEL_5G) != 0);
 }
 
 HWTEST_F(WifiGlobalFuncTest, SplitStringTest, TestSize.Level1)

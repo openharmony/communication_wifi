@@ -87,7 +87,7 @@ HWTEST_F(Ipv6AddressTest, Create_003, TestSize.Level1)
     prefixLength = MAX_IPV6_LENGTH;
     EXPECT_TRUE(Ipv6Address::Create(ipv6Prefix, prefixLength, rndSeed) == Ipv6Address::INVALID_INET6_ADDRESS);
     ipv6Prefix = "1111:1111:1111:1111:1111:1111:1111:1111";
-    EXPECT_TRUE(Ipv6Address::Create(ipv6Prefix, prefixLength, rndSeed) == Ipv6Address::INVALID_INET6_ADDRESS);
+    EXPECT_FALSE(Ipv6Address::Create(ipv6Prefix, prefixLength, rndSeed) == Ipv6Address::INVALID_INET6_ADDRESS);
     prefixLength = MAX_IPV6_LENGTH - CHAR_BIT;
     Ipv6Address::Create(ipv6Prefix, prefixLength, rndSeed);
 }

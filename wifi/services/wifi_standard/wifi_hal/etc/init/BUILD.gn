@@ -61,12 +61,10 @@ if (defined(ohos_lite)) {
 
   ohos_prebuilt_etc("hostapd.conf") {
     source = "hostapd.conf"
-    if (wifi_feature_non_hdf_driver) {
-      if ("${CONFIG_CTRL_IFACE}" == "unix") {
-        source = "default_conf/unix_socket/hostapd.conf"
-      } else {
-        source = "default_conf/udp_socket/hostapd.conf"
-      }
+    if ("${CONFIG_CTRL_IFACE}" == "unix") {
+      source = "default_conf/unix_socket/hostapd.conf"
+    } else {
+      source = "default_conf/udp_socket/hostapd.conf"
     }
     relative_install_dir = "wifi"
     part_name = "wifi"

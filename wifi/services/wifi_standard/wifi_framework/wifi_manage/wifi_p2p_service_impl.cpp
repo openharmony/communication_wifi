@@ -738,7 +738,8 @@ ErrCode WifiP2pServiceImpl::QueryP2pServices(std::vector<WifiP2pServiceInfo> &se
     return pService->QueryP2pServices(services);
 }
 
-ErrCode WifiP2pServiceImpl::RegisterCallBack(const sptr<IWifiP2pCallback> &callback)
+ErrCode WifiP2pServiceImpl::RegisterCallBack(const sptr<IWifiP2pCallback> &callback,
+    const std::vector<std::string> &event)
 {
     WIFI_LOGI("WifiP2pServiceImpl::RegisterCallBack!");
     WifiInternalEventDispatcher::GetInstance().SetSingleP2pCallback(callback);

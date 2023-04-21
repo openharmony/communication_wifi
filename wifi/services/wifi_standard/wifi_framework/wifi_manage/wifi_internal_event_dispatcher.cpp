@@ -19,6 +19,7 @@
 #include "wifi_errcode.h"
 #include "wifi_common_event_helper.h"
 #include "wifi_common_util.h"
+#include "wifi_permission_utils.h"
 #ifdef FEATURE_APP_FROZEN
 #include "suspend_manager_client.h"
 #endif
@@ -27,6 +28,66 @@ DEFINE_WIFILOG_LABEL("WifiInternalEventDispatcher");
 
 namespace OHOS {
 namespace Wifi {
+CallbackEventPermissionMap g_CallbackEventPermissionMap = {
+    { WIFI_CBK_MSG_STATE_CHANGE,
+        std::make_pair(std::bind(WifiPermissionUtils::VerifyGetWifiInfoPermission),
+        "ohos.permission.GET_WIFI_INFO") },
+    { WIFI_CBK_MSG_CONNECTION_CHANGE,
+        std::make_pair(std::bind(WifiPermissionUtils::VerifyGetWifiInfoPermission),
+        "ohos.permission.GET_WIFI_INFO") },
+    { WIFI_CBK_MSG_SCAN_STATE_CHANGE,
+        std::make_pair(std::bind(WifiPermissionUtils::VerifyGetWifiInfoPermission),
+        "ohos.permission.GET_WIFI_INFO") },
+    { WIFI_CBK_MSG_RSSI_CHANGE,
+        std::make_pair(std::bind(WifiPermissionUtils::VerifyGetWifiInfoPermission),
+        "ohos.permission.GET_WIFI_INFO") },
+    { WIFI_CBK_MSG_DEVICE_CONFIG_CHANGE,
+        std::make_pair(std::bind(WifiPermissionUtils::VerifyGetWifiInfoPermission),
+        "ohos.permission.GET_WIFI_INFO") },
+    { WIFI_CBK_MSG_HOTSPOT_STATE_CHANGE,
+        std::make_pair(std::bind(WifiPermissionUtils::VerifyGetWifiInfoPermission),
+        "ohos.permission.GET_WIFI_INFO") },
+    { WIFI_CBK_MSG_HOTSPOT_STATE_JOIN,
+        std::make_pair(std::bind(WifiPermissionUtils::VerifyManageWifiHotspotPermission),
+        "ohos.permission.MANAGE_WIFI_HOTSPOT") },
+    { WIFI_CBK_MSG_HOTSPOT_STATE_LEAVE,
+        std::make_pair(std::bind(WifiPermissionUtils::VerifyManageWifiHotspotPermission),
+        "ohos.permission.MANAGE_WIFI_HOTSPOT") },
+    { WIFI_CBK_MSG_P2P_STATE_CHANGE,
+        std::make_pair(std::bind(WifiPermissionUtils::VerifyGetWifiInfoPermission),
+        "ohos.permission.GET_WIFI_INFO") },
+    { WIFI_CBK_MSG_CONNECT_CHANGE,
+        std::make_pair(std::bind(WifiPermissionUtils::VerifyGetWifiInfoPermission),
+        "ohos.permission.GET_WIFI_INFO") },
+    { WIFI_CBK_MSG_THIS_DEVICE_CHANGE,
+        std::make_pair(std::bind(WifiPermissionUtils::VerifyGetWifiInfoPermission),
+        "ohos.permission.GET_WIFI_INFO") },
+    { WIFI_CBK_MSG_THIS_DEVICE_CHANGE,
+        std::make_pair(std::bind(WifiPermissionUtils::VerifyGetWifiDirectDevicePermission),
+            "ohos.permission.LOCATION") },
+    { WIFI_CBK_MSG_THIS_DEVICE_CHANGE,
+        std::make_pair(std::bind(WifiPermissionUtils::VerifyGetWifiInfoInternalPermission),
+            "ohos.permission.GET_WIFI_INFO_INTERNAL") },
+    { WIFI_CBK_MSG_PERSISTENT_GROUPS_CHANGE,
+        std::make_pair(std::bind(WifiPermissionUtils::VerifyGetWifiInfoPermission),
+        "ohos.permission.GET_WIFI_INFO") },
+    { WIFI_CBK_MSG_PEER_CHANGE,
+        std::make_pair(std::bind(WifiPermissionUtils::VerifyGetWifiInfoPermission),
+        "ohos.permission.GET_WIFI_INFO") },
+    { WIFI_CBK_MSG_PEER_CHANGE,
+        std::make_pair(std::bind(WifiPermissionUtils::VerifyGetWifiDirectDevicePermission),
+        "ohos.permission.LOCATION") },
+    { WIFI_CBK_MSG_PEER_CHANGE,
+        std::make_pair(std::bind(WifiPermissionUtils::VerifyGetWifiInfoInternalPermission),
+        "ohos.permission.GET_WIFI_INFO_INTERNAL") },
+    { WIFI_CBK_MSG_DISCOVERY_CHANGE,
+        std::make_pair(std::bind(WifiPermissionUtils::VerifyGetWifiInfoPermission),
+        "ohos.permission.GET_WIFI_INFO") },
+    { WIFI_CBK_MSG_STREAM_DIRECTION,
+        std::make_pair(std::bind(WifiPermissionUtils::VerifyWifiConnectionPermission),
+        "ohos.permission.MANAGE_WIFI_CONNECTION") },
+};
+
 WifiInternalEventDispatcher &WifiInternalEventDispatcher::GetInstance()
 {
     static WifiInternalEventDispatcher gWifiEventBroadcast;
@@ -52,23 +113,41 @@ int WifiInternalEventDispatcher::SendSystemNotifyMsg() /* parameters */
     return 0;
 }
 
-int WifiInternalEventDispatcher::AddStaCallback(
-    const sptr<IRemoteObject> &remote, const sptr<IWifiDeviceCallBack> &callback, int pid)
+ErrCode WifiInternalEventDispatcher::AddStaCallback(
+    const sptr<IRemoteObject> &remote, const sptr<IWifiDeviceCallBack> &callback, int pid, const std::string &eventName)
 {
     WIFI_LOGD("WifiInternalEventDispatcher::AddStaCallback, remote!");
     if (remote == nullptr || callback == nullptr) {
         WIFI_LOGE("remote object is null!");
-        return 1;
+        return WIFI_OPT_INVALID_PARAM;
     }
-    WifiCallingInfo callbackInfo;
-    callbackInfo.callingUid = GetCallingUid();
-    callbackInfo.callingPid = pid;
-    WIFI_LOGI("%{public}s, add uid: %{public}d, pid: %{public}d", __func__, callbackInfo.callingUid,
-        callbackInfo.callingPid);
+    
+    auto eventIter = g_staCallBackNameEventIdMap.find(eventName);
+    if (eventIter == g_staCallBackNameEventIdMap.end()) {
+        WIFI_LOGE("%{public}s, Not find callback event, eventName:%{public}s", __func__, eventName.c_str());
+        return WIFI_OPT_NOT_SUPPORTED;
+    }
+    
+    if (!VerifyRegisterCallbackPermission(eventIter->second)) {
+        WIFI_LOGE("%{public}s, VerifyRegisterCallbackPermission denied!", __func__);
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+
     std::unique_lock<std::mutex> lock(mStaCallbackMutex);
+    auto iter = mStaCallBackInfo.find(remote);
+    if (iter != mStaCallBackInfo.end()) {
+        (iter->second).regCallBackEventId.emplace(eventIter->second);
+        WIFI_LOGI("%{public}s, add callback event:%{public}d", __func__, eventIter->second);
+    } else {
+        WifiCallingInfo &callbackInfo = mStaCallBackInfo[remote];
+        callbackInfo.callingUid = GetCallingUid();
+        callbackInfo.callingPid = pid;
+        callbackInfo.regCallBackEventId.emplace(eventIter->second);
+        WIFI_LOGI("%{public}s, add uid: %{public}d, pid: %{public}d, callback event:%{public}d", __func__,
+            callbackInfo.callingUid, callbackInfo.callingPid, eventIter->second);
+    }
     mStaCallbacks[remote] = callback;
-    mStaCallBackInfo[remote] = callbackInfo;
-    return 0;
+    return WIFI_OPT_SUCCESS;
 }
 
 int WifiInternalEventDispatcher::RemoveStaCallback(const sptr<IRemoteObject> &remote)
@@ -85,7 +164,8 @@ int WifiInternalEventDispatcher::RemoveStaCallback(const sptr<IRemoteObject> &re
     return 0;
 }
 
-int WifiInternalEventDispatcher::SetSingleStaCallback(const sptr<IWifiDeviceCallBack> &callback)
+int WifiInternalEventDispatcher::SetSingleStaCallback(const sptr<IWifiDeviceCallBack> &callback,
+    const std::string &eventName)
 {
     mStaSingleCallback = callback;
     return 0;
@@ -107,23 +187,41 @@ bool WifiInternalEventDispatcher::HasStaRemote(const sptr<IRemoteObject> &remote
     return false;
 }
 
-int WifiInternalEventDispatcher::AddScanCallback(
-    const sptr<IRemoteObject> &remote, const sptr<IWifiScanCallback> &callback, int pid)
+ErrCode WifiInternalEventDispatcher::AddScanCallback(
+    const sptr<IRemoteObject> &remote, const sptr<IWifiScanCallback> &callback, int pid, const std::string &eventName)
 {
     WIFI_LOGD("WifiInternalEventDispatcher::AddCallbackClient!");
     if (remote == nullptr || callback == nullptr) {
         WIFI_LOGE("remote object is null!");
-        return 1;
+        return WIFI_OPT_INVALID_PARAM;
     }
-    WifiCallingInfo callbackInfo;
-    callbackInfo.callingUid = GetCallingUid();
-    callbackInfo.callingPid = pid;
-    WIFI_LOGI("%{public}s, add uid: %{public}d, pid: %{public}d", __func__, callbackInfo.callingUid,
-        callbackInfo.callingPid);
+    
+    auto eventIter = g_staCallBackNameEventIdMap.find(eventName);
+    if (eventIter == g_staCallBackNameEventIdMap.end()) {
+        WIFI_LOGE("%{public}s, Not find callback event, eventName:%{public}s", __func__, eventName.c_str());
+        return WIFI_OPT_NOT_SUPPORTED;
+    }
+    
+    if (!VerifyRegisterCallbackPermission(eventIter->second)) {
+        WIFI_LOGE("%{public}s, VerifyRegisterCallbackPermission denied!", __func__);
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+
     std::unique_lock<std::mutex> lock(mScanCallbackMutex);
+    auto iter = mScanCallBackInfo.find(remote);
+    if (iter != mScanCallBackInfo.end()) {
+        (iter->second).regCallBackEventId.emplace(eventIter->second);
+        WIFI_LOGI("%{public}s, add callback event:%{public}d", __func__, eventIter->second);
+    } else {
+        WifiCallingInfo &callbackInfo = mScanCallBackInfo[remote];
+        callbackInfo.callingUid = GetCallingUid();
+        callbackInfo.callingPid = pid;
+        callbackInfo.regCallBackEventId.emplace(eventIter->second);
+        WIFI_LOGI("%{public}s, add uid: %{public}d, pid: %{public}d, callback event:%{public}d", __func__,
+            callbackInfo.callingUid, callbackInfo.callingPid, eventIter->second);
+    }
     mScanCallbacks[remote] = callback;
-    mScanCallBackInfo[remote] = callbackInfo;
-    return 0;
+    return WIFI_OPT_SUCCESS;
 }
 
 int WifiInternalEventDispatcher::RemoveScanCallback(const sptr<IRemoteObject> &remote)
@@ -140,7 +238,8 @@ int WifiInternalEventDispatcher::RemoveScanCallback(const sptr<IRemoteObject> &r
     return 0;
 }
 
-int WifiInternalEventDispatcher::SetSingleScanCallback(const sptr<IWifiScanCallback> &callback)
+int WifiInternalEventDispatcher::SetSingleScanCallback(const sptr<IWifiScanCallback> &callback,
+    const std::string &eventName)
 {
     mScanSingleCallback = callback;
     return 0;
@@ -162,24 +261,47 @@ bool WifiInternalEventDispatcher::HasScanRemote(const sptr<IRemoteObject> &remot
     return false;
 }
 
-int WifiInternalEventDispatcher::AddHotspotCallback(
-    const sptr<IRemoteObject> &remote, const sptr<IWifiHotspotCallback> &callback, int id)
+ErrCode WifiInternalEventDispatcher::AddHotspotCallback(
+    const sptr<IRemoteObject> &remote, const sptr<IWifiHotspotCallback> &callback, const std::string &eventName, int id)
 {
     WIFI_LOGD("WifiInternalEventDispatcher::AddHotspotCallback, id:%{public}d", id);
     if (remote == nullptr || callback == nullptr) {
         WIFI_LOGE("remote object is null!");
-        return 1;
+        return WIFI_OPT_INVALID_PARAM;
     }
+
+    auto eventIter = g_apCallBackNameEventIdMap.find(eventName);
+    if (eventIter == g_apCallBackNameEventIdMap.end()) {
+        WIFI_LOGE("%{public}s, Not find callback event, eventName:%{public}s", __func__, eventName.c_str());
+        return WIFI_OPT_NOT_SUPPORTED;
+    }
+    
+    if (!VerifyRegisterCallbackPermission(eventIter->second)) {
+        WIFI_LOGE("%{public}s, VerifyRegisterCallbackPermission denied!", __func__);
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+
     std::unique_lock<std::mutex> lock(mHotspotCallbackMutex);
     auto iter = mHotspotCallbacks.find(id);
     if (iter != mHotspotCallbacks.end()) {
         (iter->second)[remote] = callback;
-        return 0;
+        auto itr = mHotspotCallbackInfo[id].find(remote);
+        if (itr != mHotspotCallbackInfo[id].end()) {
+            (itr->second).emplace(eventIter->second);
+            WIFI_LOGI("%{public}s, add callback event:%{public}d, id:%{public}d", __func__, eventIter->second, id);
+            return WIFI_OPT_SUCCESS;
+        }
+        mHotspotCallbackInfo[id].insert({remote, {eventIter->second}});
+        WIFI_LOGI("%{public}s, add new callback event:%{public}d, id:%{public}d", __func__, eventIter->second, id);
+        return WIFI_OPT_SUCCESS;
     }
-    HotspotCallbackMapType hotspotCallback;
+
+    HotspotCallbackMapType &hotspotCallback = mHotspotCallbacks[id];
     hotspotCallback[remote] = callback;
-    mHotspotCallbacks[id] = hotspotCallback;
-    return 0;
+    HotspotCallbackInfo &hotspotCallbackInfo = mHotspotCallbackInfo[id];
+    hotspotCallbackInfo[remote] = {eventIter->second};
+    WIFI_LOGI("%{public}s, add ap callback event:%{public}d, id:%{public}d", __func__, eventIter->second, id);
+    return WIFI_OPT_SUCCESS;
 }
 
 int WifiInternalEventDispatcher::RemoveHotspotCallback(const sptr<IRemoteObject> &remote, int id)
@@ -191,6 +313,7 @@ int WifiInternalEventDispatcher::RemoveHotspotCallback(const sptr<IRemoteObject>
             auto item = iter->second.find(remote);
             if (item != iter->second.end()) {
                 iter->second.erase(item);
+                mHotspotCallbackInfo[id].erase(mHotspotCallbackInfo[id].find(remote));
                 WIFI_LOGD("hotspot is is %{public}d WifiInternalEventDispatcher::RemoveHotspotCallback!", id);
             }
         }
@@ -249,17 +372,36 @@ bool WifiInternalEventDispatcher::HasP2pRemote(const sptr<IRemoteObject> &remote
     return false;
 }
 
-int WifiInternalEventDispatcher::AddP2pCallback(
-    const sptr<IRemoteObject> &remote, const sptr<IWifiP2pCallback> &callback)
+ErrCode WifiInternalEventDispatcher::AddP2pCallback(
+    const sptr<IRemoteObject> &remote, const sptr<IWifiP2pCallback> &callback, const std::string &eventName)
 {
     WIFI_LOGD("WifiInternalEventDispatcher::AddP2pCallback!");
     if (remote == nullptr || callback == nullptr) {
         WIFI_LOGE("remote object is null!");
-        return 1;
+        return WIFI_OPT_INVALID_PARAM;
     }
+
+    auto eventIter = g_p2pCallBackNameEventIdMap.find(eventName);
+    if (eventIter == g_p2pCallBackNameEventIdMap.end()) {
+        WIFI_LOGE("%{public}s, Not find callback event, eventName:%{public}s", __func__, eventName.c_str());
+        return WIFI_OPT_NOT_SUPPORTED;
+    }
+    
+    if (!VerifyRegisterCallbackPermission(eventIter->second)) {
+        WIFI_LOGE("%{public}s, VerifyRegisterCallbackPermission denied!", __func__);
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+
     std::unique_lock<std::mutex> lock(mP2pCallbackMutex);
+    auto iter = mP2pCallbackInfo.find(remote);
+    if (iter != mP2pCallbackInfo.end()) {
+        (iter->second).emplace(eventIter->second);
+    } else {
+        mP2pCallbackInfo[remote] = {eventIter->second};
+    }
     mP2pCallbacks[remote] = callback;
-    return 0;
+    WIFI_LOGI("%{public}s, add p2p callback event:%{public}d", __func__, eventIter->second);
+    return WIFI_OPT_SUCCESS;
 }
 
 int WifiInternalEventDispatcher::RemoveP2pCallback(const sptr<IRemoteObject> &remote)
@@ -269,6 +411,7 @@ int WifiInternalEventDispatcher::RemoveP2pCallback(const sptr<IRemoteObject> &re
         auto iter = mP2pCallbacks.find(remote);
         if (iter != mP2pCallbacks.end()) {
             mP2pCallbacks.erase(iter);
+            mP2pCallbackInfo.erase(mP2pCallbackInfo.find(remote));
             WIFI_LOGD("WifiInternalEventDispatcher::RemoveP2pCallback!");
         }
     }
@@ -391,15 +534,20 @@ void WifiInternalEventDispatcher::InvokeScanCallbacks(const WifiEventCallbackMsg
             continue;
         }
         WIFI_LOGI("InvokeScanCallbacks, msg.msgCode: %{public}d", msg.msgCode);
+        auto remote = itr->first;
         bool isFrozen = false;
 #ifdef FEATURE_APP_FROZEN
-        auto remote = itr->first;
         int uid = mScanCallBackInfo[remote].callingUid;
         int pid = mScanCallBackInfo[remote].callingPid;
         isFrozen = SuspendManager::SuspendManagerClient::GetInstance().IsAppFrozen(pid, uid);
         WIFI_LOGI("Check calling APP is frozen, uid: %{public}d, pid: %{public}d, isFrozen: %{public}d",
             uid, pid, isFrozen);
 #endif
+        if (mScanCallBackInfo[remote].regCallBackEventId.count(msg.msgCode) == 0) {
+            WIFI_LOGI("InvokeScanCallbacks, Not registered callback event! msg.msgCode:%{public}d", msg.msgCode);
+            continue;
+        }
+
         switch (msg.msgCode) {
             case WIFI_CBK_MSG_SCAN_STATE_CHANGE:
                 if (isFrozen == false) {
@@ -424,15 +572,20 @@ void WifiInternalEventDispatcher::InvokeDeviceCallbacks(const WifiEventCallbackM
             continue;
         }
         WIFI_LOGI("InvokeDeviceCallbacks, msg.msgCode: %{public}d", msg.msgCode);
+        auto remote = itr->first;
         bool isFrozen = false;
 #ifdef FEATURE_APP_FROZEN
-        auto remote = itr->first;
         int uid = mStaCallBackInfo[remote].callingUid;
         int pid = mStaCallBackInfo[remote].callingPid;
         isFrozen = SuspendManager::SuspendManagerClient::GetInstance().IsAppFrozen(pid, uid);
         WIFI_LOGI("Check calling APP is frozen, uid: %{public}d, pid: %{public}d, isFrozen: %{public}d",
             uid, pid, isFrozen);
 #endif
+        if (mStaCallBackInfo[remote].regCallBackEventId.count(msg.msgCode) == 0) {
+            WIFI_LOGI("InvokeDeviceCallbacks, Not registered callback event! msg.msgCode:%{public}d", msg.msgCode);
+            continue;
+        }
+
         switch (msg.msgCode) {
             case WIFI_CBK_MSG_STATE_CHANGE:
                 callback->OnWifiStateChanged(msg.msgData);
@@ -473,6 +626,11 @@ void WifiInternalEventDispatcher::InvokeHotspotCallbacks(const WifiEventCallback
         for (itr = callbacks.begin(); itr != callbacks.end(); itr++) {
             auto callback = itr->second;
             if (callback == nullptr) {
+                continue;
+            }
+            auto remote = itr->first;
+            if (mHotspotCallbackInfo[msg.id][remote].count(msg.msgCode) == 0) {
+                WIFI_LOGI("InvokeHotspotCallbacks, Not registered callback event! msg.msgCode:%{public}d", msg.msgCode);
                 continue;
             }
             switch (msg.msgCode) {
@@ -525,6 +683,11 @@ void WifiInternalEventDispatcher::InvokeP2pCallbacks(const WifiEventCallbackMsg 
     P2pCallbackMapType::iterator itr;
     for (itr = callbacks.begin(); itr != callbacks.end(); itr++) {
         auto callback = itr->second;
+        auto remote = itr->first;
+        if (mP2pCallbackInfo[remote].count(msg.msgCode) == 0) {
+            WIFI_LOGI("InvokeP2pCallbacks, Not registered callback event! msg.msgCode:%{public}d", msg.msgCode);
+            continue;
+        }
         if (callback != nullptr) {
             SendP2pCallbackMsg(callback, msg);
         }
@@ -674,6 +837,30 @@ void WifiInternalEventDispatcher::Run(WifiInternalEventDispatcher &instance)
         }
     }
     return;
+}
+
+bool WifiInternalEventDispatcher::VerifyRegisterCallbackPermission(int callbackEventId)
+{
+    std::pair<CallbackEventPermissionMap::iterator, CallbackEventPermissionMap::iterator>
+        pr = g_CallbackEventPermissionMap.equal_range(callbackEventId);
+    bool hasPermission = true;
+    for (auto itr = pr.first; itr != pr.second; ++itr) {
+        auto verifyPermissionFunc = itr->second.first;
+        int result = verifyPermissionFunc();
+        auto permissionName = itr->second.second;
+        if (permissionName.compare("ohos.permission.GET_WIFI_INFO_INTERNAL") == 0) {
+            if (result == PERMISSION_GRANTED) {
+                return true;
+            }
+            WIFI_LOGE("%{public}s, No permission register callback! event:%{public}d", __func__, itr->first);
+        } else {
+            if (result != PERMISSION_GRANTED) {
+                hasPermission = false;
+                WIFI_LOGE("%{public}s, No permission register callback! event:%{public}d", __func__, itr->first);
+            }
+        }
+    }
+    return hasPermission;
 }
 }  // namespace Wifi
 }  // namespace OHOS

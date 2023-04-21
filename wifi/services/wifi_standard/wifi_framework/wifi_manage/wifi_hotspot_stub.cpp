@@ -353,8 +353,16 @@ void WifiHotspotStub::OnRegisterCallBack(
             WIFI_LOGI("create new WifiHotspotCallbackProxy!");
         }
 
+        int eventNum = data.ReadInt32();
+        std::vector<std::string> event;
+        if (eventNum > 0) {
+            for (int i = 0; i < eventNum; ++i) {
+                event.emplace_back(data.ReadString());
+            }
+        }
+
         if (mSingleCallback) {
-            ret = RegisterCallBack(callback_);
+            ret = RegisterCallBack(callback_, event);
         } else {
             if (deathRecipient_ == nullptr) {
                 deathRecipient_ = new (std::nothrow) WifiHotspotDeathRecipient();
@@ -363,7 +371,10 @@ void WifiHotspotStub::OnRegisterCallBack(
                 WIFI_LOGD("AddDeathRecipient!");
             }
             if (callback_ != nullptr) {
-                WifiInternalEventDispatcher::GetInstance().AddHotspotCallback(remote, callback_, m_id);
+                for (auto &eventName : event) {
+                    ret = WifiInternalEventDispatcher::GetInstance().AddHotspotCallback(remote, callback_, eventName,
+                        m_id);
+                }
             }
         }
     } while (0);

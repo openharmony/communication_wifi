@@ -51,6 +51,8 @@ public:
     void OnDeviceConfigChanged(OHOS::Wifi::ConfigChange value) override;
 
     OHOS::sptr<OHOS::IRemoteObject> AsObject() override;
+
+    static std::vector<std::string> deviceCallbackEvent;
 };
 
 class WifiCScanEventCallback : public OHOS::Wifi::IWifiScanCallback {
@@ -65,6 +67,8 @@ public:
     void OnWifiScanStateChanged(int state) override;
 
     OHOS::sptr<OHOS::IRemoteObject> AsObject() override;
+
+    static std::vector<std::string> scanCallbackEvent;
 };
 
 class WifiCHotspotEventCallback : public OHOS::Wifi::IWifiHotspotCallback {
@@ -83,6 +87,8 @@ public:
     void OnHotspotStaLeave(const OHOS::Wifi::StationInfo &info) override;
 
     OHOS::sptr<OHOS::IRemoteObject> AsObject() override;
+
+    static std::vector<std::string> hotspotCallbackEvent;
 };
 
 class WifiP2pCEventCallback : public OHOS::Wifi::IWifiP2pCallback {
@@ -145,17 +151,18 @@ public:
 
 class EventManager {
 public:
-    EventManager();
+    EventManager() {}
 
-    virtual ~EventManager() {
-    }
-
-    static EventManager& GetInstance();
+    virtual ~EventManager() {}
 
     bool AddEventCallback(WifiEvent *cb);
 
     void RemoveEventCallback(WifiEvent *cb);
 
+    WifiErrorCode RegisterDeviceEvent(const std::vector<std::string> &event);
+    WifiErrorCode RegisterScanEvent(const std::vector<std::string> &event);
+    WifiErrorCode RegisterHotspotEvent(const std::vector<std::string> &event);
+    WifiErrorCode RegisterP2PEvent(const std::vector<std::string> &event);
     WifiErrorCode RegisterWifiEvents();
 
     bool IsEventRegistered();
@@ -165,9 +172,22 @@ public:
     std::set<WifiEvent*> GetEventCallBacks();
 
     void Init();
+
+    void SetP2PCallbackEvent(OHOS::sptr<WifiP2pCEventCallback> &sptr, const std::string &eventName);
+
+    void RemoveP2PCallbackEvent(const std::string &eventName);
+
+    std::set<std::string>& GetP2PCallbackEvent();
+
+    OHOS::sptr<WifiP2pCEventCallback> GetP2PCallbackPtr();
+
+    static EventManager& GetInstance();
+
 private:
     static std::set<WifiEvent*> m_setEventCallback;
     static bool m_isEventRegistered;
+    std::set<std::string> p2pRegisteredCallbackEvent;
+    OHOS::sptr<WifiP2pCEventCallback> sptrP2PCallback = nullptr;
     OHOS::Wifi::WifiAbilityStatusChange* mSaStatusListener;
 };
 #endif

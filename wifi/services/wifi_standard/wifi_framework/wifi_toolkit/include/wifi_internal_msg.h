@@ -16,6 +16,7 @@
 #ifndef OHOS_WIFI_INTERNAL_MSG_H
 #define OHOS_WIFI_INTERNAL_MSG_H
 
+#include <unordered_set>
 #include "wifi_ap_msg.h"
 #include "wifi_hid2d_msg.h"
 #include "wifi_msg.h"
@@ -215,6 +216,7 @@ struct InterScanInfo {
 struct WifiCallingInfo {
     int callingUid;
     int callingPid;
+    std::unordered_set<int> regCallBackEventId;
 };
 
 struct SingleAppForbid {

@@ -18,6 +18,7 @@
 #include "wifi_permission_helper.h"
 #include "wifi_errcode.h"
 #include "wifi_common_event_helper.h"
+#include "wifi_common_util.h"
 
 DEFINE_WIFILOG_LABEL("WifiInternalEventDispatcher");
 
@@ -48,8 +49,15 @@ int WifiInternalEventDispatcher::SendSystemNotifyMsg() /* parameters */
     return 0;
 }
 
-int WifiInternalEventDispatcher::SetSingleStaCallback(const std::shared_ptr<IWifiDeviceCallBack> &callback)
+int WifiInternalEventDispatcher::SetSingleStaCallback(const std::shared_ptr<IWifiDeviceCallBack> &callback,
+    const std::string &eventName)
 {
+    auto iter = g_staCallBackNameEventIdMap.find(eventName);
+    if (iter == g_staCallBackNameEventIdMap.end()) {
+        WIFI_LOGE("SetSingleStaCallback: Not find event! eventName:%{public}s", eventName.c_str());
+        return 1;
+    }
+    mStaSingleCallbackEvent.emplace(iter->second);
     mStaSingleCallback = callback;
     return 0;
 }
@@ -59,8 +67,20 @@ std::shared_ptr<IWifiDeviceCallBack> WifiInternalEventDispatcher::GetSingleStaCa
     return mStaSingleCallback;
 }
 
-int WifiInternalEventDispatcher::SetSingleScanCallback(const std::shared_ptr<IWifiScanCallback> &callback)
+std::unordered_set<int>& WifiInternalEventDispatcher::GetStaSingleCallbackEvent()
 {
+    return mStaSingleCallbackEvent;
+}
+
+int WifiInternalEventDispatcher::SetSingleScanCallback(const std::shared_ptr<IWifiScanCallback> &callback,
+    const std::string &eventName)
+{
+    auto iter = g_staCallBackNameEventIdMap.find(eventName);
+    if (iter == g_staCallBackNameEventIdMap.end()) {
+        WIFI_LOGE("SetSingleScanCallback: Not find event! eventName:%{public}s", eventName.c_str());
+        return 1;
+    }
+    mScanSingleCallbackEvent.emplace(iter->second);
     mScanSingleCallback = callback;
     return 0;
 }
@@ -68,6 +88,11 @@ int WifiInternalEventDispatcher::SetSingleScanCallback(const std::shared_ptr<IWi
 std::shared_ptr<IWifiScanCallback> WifiInternalEventDispatcher::GetSingleScanCallback() const
 {
     return mScanSingleCallback;
+}
+
+std::unordered_set<int>& WifiInternalEventDispatcher::GetScanSingleCallbackEvent()
+{
+    return mScanSingleCallbackEvent;
 }
 
 int WifiInternalEventDispatcher::AddBroadCastMsg(const WifiEventCallbackMsg &msg)
@@ -116,6 +141,12 @@ void WifiInternalEventDispatcher::DealStaCallbackMsg(
             break;
     }
 
+    auto staSingleCallbackEvent = instance.GetStaSingleCallbackEvent();
+    if (staSingleCallbackEvent.count(msg.msgData) == 0) {
+        WIFI_LOGI("WifiInternalEventDispatcher:: Not registered callback event! msg.msgCode:%{public}d", msg.msgCode);
+        return;
+    }
+
     auto callback = instance.GetSingleStaCallback();
     if (callback != nullptr) {
         switch (msg.msgCode) {
@@ -154,6 +185,12 @@ void WifiInternalEventDispatcher::DealScanCallbackMsg(
         default:
             WIFI_LOGI("UnKnown msgcode %{public}d", msg.msgCode);
             break;
+    }
+
+    auto scanSingleCallbackEvent = instance.GetScanSingleCallbackEvent();
+    if (scanSingleCallbackEvent.count(msg.msgData) == 0) {
+        WIFI_LOGI("WifiInternalEventDispatcher:: Not registered callback event! msg.msgCode:%{public}d", msg.msgCode);
+        return;
     }
 
     auto callback = instance.GetSingleScanCallback();

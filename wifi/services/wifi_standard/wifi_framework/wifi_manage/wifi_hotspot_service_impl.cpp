@@ -559,7 +559,8 @@ bool WifiHotspotServiceImpl::IsApServiceRunning()
     return true;
 }
 
-ErrCode WifiHotspotServiceImpl::RegisterCallBack(const sptr<IWifiHotspotCallback> &callback)
+ErrCode WifiHotspotServiceImpl::RegisterCallBack(const sptr<IWifiHotspotCallback> &callback,
+    const std::vector<std::string> &event)
 {
     WIFI_LOGI("current ap service is %{public}d %{public}s", m_id, __func__);
     if (WifiPermissionUtils::VerifyWifiConnectionPermission() == PERMISSION_DENIED) {

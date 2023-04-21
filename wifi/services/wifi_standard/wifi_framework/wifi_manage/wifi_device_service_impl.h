@@ -133,9 +133,10 @@ public:
     ErrCode GetCountryCode(std::string &countryCode) override;
 
 #ifdef OHOS_ARCH_LITE
-    ErrCode RegisterCallBack(const std::shared_ptr<IWifiDeviceCallBack> &callback) override;
+    ErrCode RegisterCallBack(const std::shared_ptr<IWifiDeviceCallBack> &callback,
+        const std::vector<std::string> &event) override;
 #else
-    ErrCode RegisterCallBack(const sptr<IWifiDeviceCallBack> &callback) override;
+    ErrCode RegisterCallBack(const sptr<IWifiDeviceCallBack> &callback, const std::vector<std::string> &event) override;
 #endif
 
     ErrCode GetSignalLevel(const int &rssi, const int &band, int &level) override;

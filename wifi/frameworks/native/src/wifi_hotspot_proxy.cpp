@@ -600,7 +600,8 @@ ErrCode WifiHotspotProxy::GetValidChannels(BandType band, std::vector<int32_t> &
     return WIFI_OPT_SUCCESS;
 }
 
-ErrCode WifiHotspotProxy::RegisterCallBack(const sptr<IWifiHotspotCallback> &callback)
+ErrCode WifiHotspotProxy::RegisterCallBack(const sptr<IWifiHotspotCallback> &callback,
+    const std::vector<std::string> &event)
 {
     WIFI_LOGD("WifiHotspotProxy::RegisterCallBack!");
     MessageParcel data;
@@ -617,7 +618,13 @@ ErrCode WifiHotspotProxy::RegisterCallBack(const sptr<IWifiHotspotCallback> &cal
         WIFI_LOGE("WifiHotspotProxy::RegisterCallBack WriteDate fail, write callback.");
         return WIFI_OPT_FAILED;
     }
-
+    int eventNum = event.size();
+    data.WriteInt32(eventNum);
+    if (eventNum > 0) {
+        for (auto &eventName : event) {
+            data.WriteString(eventName);
+        }
+    }
     int error = Remote()->SendRequest(WIFI_SVR_CMD_REGISTER_HOTSPOT_CALLBACK, data, reply, option);
     if (error != ERR_NONE) {
         WIFI_LOGE("WifiHotspotProxy::RegisterCallBack failed, error code is %{public}d ", error);

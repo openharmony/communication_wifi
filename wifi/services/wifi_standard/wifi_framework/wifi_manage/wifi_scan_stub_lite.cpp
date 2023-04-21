@@ -258,7 +258,17 @@ int WifiScanStub::OnRegisterCallBack(uint32_t code, IpcIo *req, IpcIo *reply)
 
     callback_ = std::make_shared<WifiScanCallbackProxy>(&sid);
     WIFI_LOGD("create new WifiScanCallbackProxy!");
-    ret = RegisterCallBack(callback_);
+    size_t size;
+    int eventNum = 0;
+    (void)ReadInt32(req, &eventNum);
+    std::vector<std::string> event;
+    if (eventNum > 0) {
+        for (int i = 0; i < eventNum; ++i) {
+            event.emplace_back((char *)ReadString(req, &size));
+        }
+    }
+
+    ret = RegisterCallBack(callback_, event);
 
     (void)WriteInt32(reply, 0);
     (void)WriteInt32(reply, ret);

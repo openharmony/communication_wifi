@@ -211,9 +211,10 @@ public:
      * @return ErrCode - operation result
      */
 #ifdef OHOS_ARCH_LITE
-    ErrCode RegisterCallBack(const std::shared_ptr<IWifiDeviceCallBack> &callback) override;
+    ErrCode RegisterCallBack(const std::shared_ptr<IWifiDeviceCallBack> &callback,
+        const std::vector<std::string> &event) override;
 #else
-    ErrCode RegisterCallBack(const sptr<IWifiDeviceCallBack> &callback) override;
+    ErrCode RegisterCallBack(const sptr<IWifiDeviceCallBack> &callback, const std::vector<std::string> &event) override;
 #endif
 
     /**

@@ -614,9 +614,17 @@ void WifiDeviceStub::OnRegisterCallBack(uint32_t code, MessageParcel &data, Mess
         }
 
         int pid = data.ReadInt32();
+        int eventNum = data.ReadInt32();
+        std::vector<std::string> event;
+        if (eventNum > 0) {
+            for (int i = 0; i < eventNum; ++i) {
+                event.emplace_back(data.ReadString());
+            }
+        }
         WIFI_LOGD("%{public}s, get pid: %{public}d", __func__, pid);
+
         if (mSingleCallback) {
-            ret = RegisterCallBack(callback_);
+            ret = RegisterCallBack(callback_, event);
         } else {
             if (deathRecipient_ == nullptr) {
                 deathRecipient_ = new (std::nothrow) WifiDeviceDeathRecipient();
@@ -625,9 +633,10 @@ void WifiDeviceStub::OnRegisterCallBack(uint32_t code, MessageParcel &data, Mess
                 WIFI_LOGD("AddDeathRecipient!");
             }
             if (callback_ != nullptr) {
-                WifiInternalEventDispatcher::GetInstance().AddStaCallback(remote, callback_, pid);
+                for (auto &eventName : event) {
+                    ret = WifiInternalEventDispatcher::GetInstance().AddStaCallback(remote, callback_, pid, eventName);
+                }
             }
-            ret = WIFI_OPT_SUCCESS;
         }
     } while (0);
     reply.WriteInt32(0);

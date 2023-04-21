@@ -131,11 +131,14 @@ public:
 
     void Register(const napi_env& env, const std::string& type, napi_value handler);
     void Unregister(const napi_env& env, const std::string& type, napi_value handler);
+    ErrCode RegisterDeviceEvents(const std::vector<std::string> &event);
+    ErrCode RegisterScanEvents(const std::vector<std::string> &event);
+    ErrCode RegisterHotspotEvents(const std::vector<std::string> &event);
+    ErrCode RegisterP2PEvents(const std::vector<std::string> &event);
 
 private:
-    ErrCode RegisterWifiEvents(int32_t sysCap);
+    ErrCode RegisterWifiEvents(int32_t sysCap, const std::string& type);
     bool IsEventSupport(const std::string& type);
-    int CheckPermission(const std::string& eventType);
     void DeleteRegisterObj(const napi_env& env, std::vector<RegObj>& vecRegObjs, napi_value& handler);
     void DeleteAllRegisterObj(const napi_env& env, std::vector<RegObj>& vecRegObjs);
     WifiNapiAbilityStatusChange* mSaStatusListener;

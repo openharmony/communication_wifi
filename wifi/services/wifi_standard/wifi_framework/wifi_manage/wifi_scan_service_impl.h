@@ -60,9 +60,10 @@ public:
     ErrCode IsWifiClosedScan(bool &bOpen) override;
     ErrCode GetScanInfoList(std::vector<WifiScanInfo> &result) override;
 #ifdef OHOS_ARCH_LITE
-    ErrCode RegisterCallBack(const std::shared_ptr<IWifiScanCallback> &callback) override;
+    ErrCode RegisterCallBack(const std::shared_ptr<IWifiScanCallback> &callback,
+        const std::vector<std::string> &event) override;
 #else
-    ErrCode RegisterCallBack(const sptr<IWifiScanCallback> &callback) override;
+    ErrCode RegisterCallBack(const sptr<IWifiScanCallback> &callback, const std::vector<std::string> &event) override;
 #endif
     ErrCode GetSupportedFeatures(long &features) override;
 #ifndef OHOS_ARCH_LITE

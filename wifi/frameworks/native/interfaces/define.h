@@ -176,6 +176,29 @@
 #define WIFI_CBK_MSG_CFG_CHANGE 0x4009
 #define WIFI_CBK_MSG_MAX_INVALID_P2P 0x4FFF /* P2P invalid value */
 
+/* -----------Callback event name define-------------- */
+#define EVENT_STA_POWER_STATE_CHANGE "wifiStateChange"
+#define EVENT_STA_CONN_STATE_CHANGE "wifiConnectionChange"
+#define EVENT_STA_RSSI_STATE_CHANGE "wifiRssiChange"
+#define EVENT_STA_WPS_STATE_CHANGE "wifiWpsStateChange"
+#define EVENT_STREAM_CHANGE "streamChange"
+#define EVENT_STA_DEVICE_CONFIG_CHANGE "deviceConfigChange"
+#define EVENT_STA_SCAN_STATE_CHANGE "wifiScanStateChange" /*  STA*/
+
+#define EVENT_HOTSPOT_STATE_CHANGE "hotspotStateChange"
+#define EVENT_HOTSPOT_STA_JOIN "hotspotStaJoin"
+#define EVENT_HOTSPOT_STA_LEAVE "hotspotStaLeave" /* AP */
+
+#define EVENT_P2P_STATE_CHANGE "p2pStateChange"
+#define EVENT_P2P_PERSISTENT_GROUP_CHANGE "p2pPersistentGroupChange"
+#define EVENT_P2P_DEVICE_STATE_CHANGE "p2pDeviceChange"
+#define EVENT_P2P_PEER_DEVICE_CHANGE "p2pPeerDeviceChange"
+#define EVENT_P2P_SERVICES_CHANGE "p2pServicesChange"
+#define EVENT_P2P_CONN_STATE_CHANGE "p2pConnectionChange"
+#define EVENT_P2P_DISCOVERY_CHANGE "p2pDiscoveryChange"
+#define EVENT_P2P_ACTION_RESULT "p2pActionResult"
+#define EVENT_P2P_CONFIG_CHANGE "p2pConfigChange" /* P2P */
+
 /* -----------Feature service name-------------- */
 #define WIFI_SERVICE_STA "StaService"     /* STA */
 #define WIFI_SERVICE_AP "ApService"       /* AP */

@@ -221,12 +221,12 @@ public:
     }
 
     void ScanFail()
-    {   
+    {
+        EXPECT_CALL(WifiSettings::GetInstance(), GetThermalLevel()).WillRepeatedly(Return(FOUR));
         EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_))
             .WillOnce(Return(1))
             .WillOnce(Return(0));
         EXPECT_CALL(WifiSettings::GetInstance(), GetAppPackageName())
-            .WillOnce(Return("wlan0"))
             .WillRepeatedly(Return(""));
         pScanService->scanStartedFlag = true;
         EXPECT_TRUE(pScanService->Scan(true) == WIFI_OPT_FAILED);
@@ -239,6 +239,7 @@ public:
     {
         EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_)).WillRepeatedly(Return(true));
         EXPECT_CALL(WifiSettings::GetInstance(), GetThermalLevel()).WillRepeatedly(Return(1));
+        EXPECT_CALL(WifiSettings::GetInstance(), GetAppPackageName()).WillOnce(Return(""));
         pScanService->scanStartedFlag = true;
         WifiScanParams params;
         params.band = SCAN_BAND_BOTH_WITH_DFS;
@@ -255,6 +256,7 @@ public:
 
     void ScanWithParamFail2()
     {
+        EXPECT_CALL(WifiSettings::GetInstance(), GetAppPackageName()).WillOnce(Return(""));
         pScanService->scanStartedFlag = true;
         WifiScanParams params;
         params.band = -1;
@@ -263,6 +265,7 @@ public:
 
     void ScanWithParamFail3()
     {
+        EXPECT_CALL(WifiSettings::GetInstance(), GetAppPackageName()).WillOnce(Return(""));
         pScanService->scanStartedFlag = true;
         WifiScanParams params;
         params.band = SCAN_BAND_UNSPECIFIED;
@@ -272,6 +275,7 @@ public:
     void ScanWithParamFail4()
     {
         EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_)).WillRepeatedly(Return(false));
+        EXPECT_CALL(WifiSettings::GetInstance(), GetAppPackageName()).WillOnce(Return(""));
         pScanService->scanStartedFlag = true;
         WifiScanParams params;
         params.band = SCAN_BAND_UNSPECIFIED;
@@ -694,6 +698,7 @@ public:
         pScanService->scanControlInfo.scanIntervalList.push_back(mode);
         EXPECT_CALL(WifiSettings::GetInstance(), GetScreenState()).WillRepeatedly(Return(1));
         EXPECT_CALL(WifiSettings::GetInstance(), GetAppPackageName()).WillOnce(Return(""));
+        EXPECT_CALL(WifiSettings::GetInstance(), GetWhetherToAllowNetworkSwitchover()).Times(AtLeast(0));
         pScanService->SystemScanProcess(true);
     }
 
@@ -706,7 +711,8 @@ public:
 
     void StartSystemTimerScanFail1()
     {
-        EXPECT_CALL(WifiSettings::GetInstance(), GetAppPackageName()).WillOnce(Return("wlan0"));
+        EXPECT_CALL(WifiSettings::GetInstance(), GetAppPackageName()).WillOnce(Return(""));
+        EXPECT_CALL(WifiSettings::GetInstance(), GetThermalLevel()).WillRepeatedly(Return(FOUR));
         pScanService->staStatus = 0;
         pScanService->StartSystemTimerScan(true);
     }
@@ -716,6 +722,7 @@ public:
         EXPECT_CALL(WifiSettings::GetInstance(), GetAppPackageName()).WillOnce(Return(""));
         EXPECT_CALL(WifiSettings::GetInstance(), GetWhetherToAllowNetworkSwitchover()).Times(AtLeast(0));
         pScanService->lastSystemScanTime = 1;
+        pScanService->systemScanIntervalMode->ScanIntervalMode.interval = 1;
         pScanService->StartSystemTimerScan(true);
     }
 
@@ -723,6 +730,7 @@ public:
     {
         EXPECT_CALL(WifiSettings::GetInstance(), GetAppPackageName()).WillOnce(Return(""));
         EXPECT_CALL(WifiSettings::GetInstance(), GetWhetherToAllowNetworkSwitchover()).Times(AtLeast(0));
+        pScanService->systemScanIntervalMode->ScanIntervalMode.interval = 0x0fffffff;
         pScanService->lastSystemScanTime = 0;
         pScanService->StartSystemTimerScan(false);
     }
@@ -732,7 +740,7 @@ public:
         EXPECT_CALL(WifiSettings::GetInstance(), GetAppPackageName()).WillOnce(Return(""));
         EXPECT_CALL(WifiSettings::GetInstance(), GetWhetherToAllowNetworkSwitchover()).Times(AtLeast(0));
         pScanService->lastSystemScanTime = 1;
-        pScanService->systemScanIntervalMode.scanIntervalMode.interval = 0;
+        pScanService->systemScanIntervalMode->ScanIntervalMode.interval = 1;
         pScanService->StartSystemTimerScan(false);
     }
 
@@ -1744,29 +1752,29 @@ public:
         int channelUtilization = 10;
         std::vector<int> freqVector = {11, 51, -1, 69, 138, 92, 184, 366, 618};
         EXPECT_TRUE(count(freqVector.begin(), freqVector.end(),
-			WifiMaxThroughput(0, false, WifiChannelWidth::WIDTH_160MHZ, 0, 0, channelUtilization)) != 0);
+            WifiMaxThroughput(0, false, WifiChannelWidth::WIDTH_160MHZ, 0, 0, channelUtilization)) != 0);
         EXPECT_TRUE(count(freqVector.begin(), freqVector.end(),
-			WifiMaxThroughput(1, false, WifiChannelWidth::WIDTH_160MHZ, 0, 0, channelUtilization)) !=0);	
+            WifiMaxThroughput(1, false, WifiChannelWidth::WIDTH_160MHZ, 0, 0, channelUtilization)) !=0);	
         EXPECT_TRUE(count(freqVector.begin(), freqVector.end(),
-			WifiMaxThroughput(4, false, WifiChannelWidth::WIDTH_20MHZ, 0, 0, channelUtilization)) !=0 );
+            WifiMaxThroughput(4, false, WifiChannelWidth::WIDTH_20MHZ, 0, 0, channelUtilization)) !=0 );
         EXPECT_TRUE(count(freqVector.begin(), freqVector.end(),
-			WifiMaxThroughput(4, false, WifiChannelWidth::WIDTH_40MHZ, 0, 0, channelUtilization)) != 0);
+            WifiMaxThroughput(4, false, WifiChannelWidth::WIDTH_40MHZ, 0, 0, channelUtilization)) != 0);
         EXPECT_TRUE(count(freqVector.begin(), freqVector.end(),
-			WifiMaxThroughput(5, false, WifiChannelWidth::WIDTH_20MHZ, 0, 0, channelUtilization)) != 92);
+            WifiMaxThroughput(5, false, WifiChannelWidth::WIDTH_20MHZ, 0, 0, channelUtilization)) != 92);
         EXPECT_TRUE(count(freqVector.begin(), freqVector.end(),
-			WifiMaxThroughput(5, false, WifiChannelWidth::WIDTH_40MHZ, 0, 0, channelUtilization)) != 0);
+            WifiMaxThroughput(5, false, WifiChannelWidth::WIDTH_40MHZ, 0, 0, channelUtilization)) != 0);
         EXPECT_TRUE(count(freqVector.begin(), freqVector.end(),
-			WifiMaxThroughput(5, false, WifiChannelWidth::WIDTH_80MHZ, 0, 0, channelUtilization)) != 0);
+            WifiMaxThroughput(5, false, WifiChannelWidth::WIDTH_80MHZ, 0, 0, channelUtilization)) != 0);
         EXPECT_TRUE(count(freqVector.begin(), freqVector.end(),
-			WifiMaxThroughput(5, false, WifiChannelWidth::WIDTH_INVALID, 0, 0, channelUtilization)) != 0);
+            WifiMaxThroughput(5, false, WifiChannelWidth::WIDTH_INVALID, 0, 0, channelUtilization)) != 0);
         EXPECT_TRUE(count(freqVector.begin(), freqVector.end(),
-			WifiMaxThroughput(6, true, WifiChannelWidth::WIDTH_20MHZ, 0, 0, channelUtilization))!= 0);
+            WifiMaxThroughput(6, true, WifiChannelWidth::WIDTH_20MHZ, 0, 0, channelUtilization))!= 0);
         EXPECT_TRUE(count(freqVector.begin(), freqVector.end(),
-			WifiMaxThroughput(6, true, WifiChannelWidth::WIDTH_40MHZ, 0, 0, channelUtilization)) != 0);
+            WifiMaxThroughput(6, true, WifiChannelWidth::WIDTH_40MHZ, 0, 0, channelUtilization)) != 0);
         EXPECT_TRUE(count(freqVector.begin(), freqVector.end(),
-			WifiMaxThroughput(6, true, WifiChannelWidth::WIDTH_80MHZ, 0, 0, channelUtilization)) != 0);
+            WifiMaxThroughput(6, true, WifiChannelWidth::WIDTH_80MHZ, 0, 0, channelUtilization)) != 0);
         EXPECT_TRUE(count(freqVector.begin(), freqVector.end(),
-			WifiMaxThroughput(6, true, WifiChannelWidth::WIDTH_INVALID, 0, 0, channelUtilization)) != 0);
+            WifiMaxThroughput(6, true, WifiChannelWidth::WIDTH_INVALID, 0, 0, channelUtilization)) != 0);
     }
 };
 

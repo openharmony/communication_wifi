@@ -163,10 +163,6 @@ int CopyConfigFile(const char* configName)
         LOGE("snprintf_s dest dir failed.");
         return HAL_FAILURE;
     }
-    if (access(buf, F_OK) != -1) {
-        LOGI("Configure file %{public}s is exist.", buf);
-        return HAL_SUCCESS;
-    }
     char path[PATH_NUM][BUFF_SIZE] = {"/system/etc/wifi/", "/vendor/etc/wifi/"};
     for (int i = 0; i != PATH_NUM; ++i) {
         if (strcat_s(path[i], sizeof(path[i]), configName) != EOK) {
@@ -176,7 +172,7 @@ int CopyConfigFile(const char* configName)
         if (access(path[i], F_OK) != -1) {
             char cmd[BUFF_SIZE] = {0};
             if (snprintf_s(cmd, sizeof(cmd), sizeof(cmd) - 1,
-                "cp %s %s/wpa_supplicant/", path[i], CONFIG_ROOR_DIR) < 0) {
+                "cp -f %s %s/wpa_supplicant/", path[i], CONFIG_ROOR_DIR) < 0) {
                 LOGE("snprintf_s cp cmd failed.");
                 return HAL_FAILURE;
             }

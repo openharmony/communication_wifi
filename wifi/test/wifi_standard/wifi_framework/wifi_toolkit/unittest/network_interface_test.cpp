@@ -38,7 +38,7 @@ public:
 class BaseAddressTest : public BaseAddress {
 public:
     BaseAddressTest(const std::string ip, BaseAddress::FamilyType familyType)
-        : BaseAddress(ip, 1 , familyType)
+        : BaseAddress(ip, 1, familyType)
     {
         WIFI_LOGI("BaseAddressTest constructor");
     }

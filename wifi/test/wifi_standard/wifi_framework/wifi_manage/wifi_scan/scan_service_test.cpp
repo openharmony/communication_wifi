@@ -37,6 +37,7 @@ constexpr int FREQ_5_GHZ = 5200;
 constexpr int TWO = 2;
 constexpr int FOUR = 4;
 constexpr int FAILEDNUM = 6;
+constexpr int STANDER = 5;
 constexpr int STATUS = 17;
 constexpr int MAX_SCAN_CONFIG = 10000;
 constexpr int INVAL = 0x0fffff;
@@ -1755,27 +1756,27 @@ public:
         EXPECT_TRUE(count(freqVector.begin(), freqVector.end(),
             WifiMaxThroughput(0, false, WifiChannelWidth::WIDTH_160MHZ, 0, 0, channelUtilization)) != 0);
         EXPECT_TRUE(count(freqVector.begin(), freqVector.end(),
-            WifiMaxThroughput(1, false, WifiChannelWidth::WIDTH_160MHZ, 0, 0, channelUtilization)) != 0);	
+            WifiMaxThroughput(1, false, WifiChannelWidth::WIDTH_160MHZ, 0, 0, channelUtilization)) != 0);
         EXPECT_TRUE(count(freqVector.begin(), freqVector.end(),
-            WifiMaxThroughput(4, false, WifiChannelWidth::WIDTH_20MHZ, 0, 0, channelUtilization)) != 0 );
+            WifiMaxThroughput(FOUR, false, WifiChannelWidth::WIDTH_20MHZ, 0, 0, channelUtilization)) != 0);
         EXPECT_TRUE(count(freqVector.begin(), freqVector.end(),
-            WifiMaxThroughput(4, false, WifiChannelWidth::WIDTH_40MHZ, 0, 0, channelUtilization)) != 0);
+            WifiMaxThroughput(FOUR, false, WifiChannelWidth::WIDTH_40MHZ, 0, 0, channelUtilization)) != 0);
         EXPECT_TRUE(count(freqVector.begin(), freqVector.end(),
-            WifiMaxThroughput(5, false, WifiChannelWidth::WIDTH_20MHZ, 0, 0, channelUtilization)) != 0);
+            WifiMaxThroughput(STANDER, false, WifiChannelWidth::WIDTH_20MHZ, 0, 0, channelUtilization)) != 0);
         EXPECT_TRUE(count(freqVector.begin(), freqVector.end(),
-            WifiMaxThroughput(5, false, WifiChannelWidth::WIDTH_40MHZ, 0, 0, channelUtilization)) != 0);
+            WifiMaxThroughput(STANDER, false, WifiChannelWidth::WIDTH_40MHZ, 0, 0, channelUtilization)) != 0);
         EXPECT_TRUE(count(freqVector.begin(), freqVector.end(),
-            WifiMaxThroughput(5, false, WifiChannelWidth::WIDTH_80MHZ, 0, 0, channelUtilization)) != 0);
+            WifiMaxThroughput(STANDER, false, WifiChannelWidth::WIDTH_80MHZ, 0, 0, channelUtilization)) != 0);
         EXPECT_TRUE(count(freqVector.begin(), freqVector.end(),
-            WifiMaxThroughput(5, false, WifiChannelWidth::WIDTH_INVALID, 0, 0, channelUtilization)) != 0);
+            WifiMaxThroughput(STANDER, false, WifiChannelWidth::WIDTH_INVALID, 0, 0, channelUtilization)) != 0);
         EXPECT_TRUE(count(freqVector.begin(), freqVector.end(),
-            WifiMaxThroughput(6, true, WifiChannelWidth::WIDTH_20MHZ, 0, 0, channelUtilization))!= 0);
+            WifiMaxThroughput(FAILEDNUM, true, WifiChannelWidth::WIDTH_20MHZ, 0, 0, channelUtilization))!= 0);
         EXPECT_TRUE(count(freqVector.begin(), freqVector.end(),
-            WifiMaxThroughput(6, true, WifiChannelWidth::WIDTH_40MHZ, 0, 0, channelUtilization)) != 0);
+            WifiMaxThroughput(FAILEDNUM, true, WifiChannelWidth::WIDTH_40MHZ, 0, 0, channelUtilization)) != 0);
         EXPECT_TRUE(count(freqVector.begin(), freqVector.end(),
-            WifiMaxThroughput(6, true, WifiChannelWidth::WIDTH_80MHZ, 0, 0, channelUtilization)) != 0);
+            WifiMaxThroughput(FAILEDNUM, true, WifiChannelWidth::WIDTH_80MHZ, 0, 0, channelUtilization)) != 0);
         EXPECT_TRUE(count(freqVector.begin(), freqVector.end(),
-            WifiMaxThroughput(6, true, WifiChannelWidth::WIDTH_INVALID, 0, 0, channelUtilization)) != 0);
+            WifiMaxThroughput(FAILEDNUM, true, WifiChannelWidth::WIDTH_INVALID, 0, 0, channelUtilization)) != 0);
     }
 };
 

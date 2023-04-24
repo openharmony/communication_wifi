@@ -403,7 +403,7 @@ public:
     void StoreRequestScanConfigFail()
     {
         ScanConfig scanConfig;
-        InterScanConfig interConfig;	
+        InterScanConfig interConfig;
         pScanService->scanConfigMap.clear();
         pScanService->scanConfigStoreIndex = MAX_SCAN_CONFIG;
         EXPECT_TRUE(pScanService->StoreRequestScanConfig(scanConfig, interConfig) == 0);
@@ -1755,13 +1755,13 @@ public:
         EXPECT_TRUE(count(freqVector.begin(), freqVector.end(),
             WifiMaxThroughput(0, false, WifiChannelWidth::WIDTH_160MHZ, 0, 0, channelUtilization)) != 0);
         EXPECT_TRUE(count(freqVector.begin(), freqVector.end(),
-            WifiMaxThroughput(1, false, WifiChannelWidth::WIDTH_160MHZ, 0, 0, channelUtilization)) !=0);	
+            WifiMaxThroughput(1, false, WifiChannelWidth::WIDTH_160MHZ, 0, 0, channelUtilization)) != 0);	
         EXPECT_TRUE(count(freqVector.begin(), freqVector.end(),
-            WifiMaxThroughput(4, false, WifiChannelWidth::WIDTH_20MHZ, 0, 0, channelUtilization)) !=0 );
+            WifiMaxThroughput(4, false, WifiChannelWidth::WIDTH_20MHZ, 0, 0, channelUtilization)) != 0 );
         EXPECT_TRUE(count(freqVector.begin(), freqVector.end(),
             WifiMaxThroughput(4, false, WifiChannelWidth::WIDTH_40MHZ, 0, 0, channelUtilization)) != 0);
         EXPECT_TRUE(count(freqVector.begin(), freqVector.end(),
-            WifiMaxThroughput(5, false, WifiChannelWidth::WIDTH_20MHZ, 0, 0, channelUtilization)) != 92);
+            WifiMaxThroughput(5, false, WifiChannelWidth::WIDTH_20MHZ, 0, 0, channelUtilization)) != 0);
         EXPECT_TRUE(count(freqVector.begin(), freqVector.end(),
             WifiMaxThroughput(5, false, WifiChannelWidth::WIDTH_40MHZ, 0, 0, channelUtilization)) != 0);
         EXPECT_TRUE(count(freqVector.begin(), freqVector.end(),

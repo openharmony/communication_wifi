@@ -1948,7 +1948,7 @@ HWTEST_F(StaStateMachineTest, StartConnectToNetworkFali3, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require: issue
 */
-HWTEST_F(StaStateMachineTest, StartConnectToNetworkFali4, TestSize.Level1)
+HWTEST_F(StaStateMachineTest, StartConnectToNetworkFail4, TestSize.Level1)
 {
     StartConnectToNetworkFail4();
 }

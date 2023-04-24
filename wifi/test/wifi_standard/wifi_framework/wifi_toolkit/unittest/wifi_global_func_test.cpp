@@ -228,6 +228,7 @@ HWTEST_F(WifiGlobalFuncTest, TransformFrequencyIntoChannelTest4, TestSize.Level1
     std::vector<int> freqVector, chanVector;
     int target = CHANNEL_2G_MIN;
     freqVector.push_back(target);
+    freqVector.push_back(FREP_5G_MIN);
     TransformFrequencyIntoChannel(freqVector, chanVector);
     EXPECT_TRUE(count(chanVector.begin(), chanVector.end(), CHANNEL_5G) != 0);
 }

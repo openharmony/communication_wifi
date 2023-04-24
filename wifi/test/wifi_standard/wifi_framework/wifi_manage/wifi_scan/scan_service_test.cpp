@@ -722,7 +722,7 @@ public:
         EXPECT_CALL(WifiSettings::GetInstance(), GetAppPackageName()).WillOnce(Return(""));
         EXPECT_CALL(WifiSettings::GetInstance(), GetWhetherToAllowNetworkSwitchover()).Times(AtLeast(0));
         pScanService->lastSystemScanTime = 1;
-        pScanService->systemScanIntervalMode->ScanIntervalMode.interval = 1;
+        pScanService->systemScanIntervalMode->scanIntervalMode.interval = 1;
         pScanService->StartSystemTimerScan(true);
     }
 
@@ -730,8 +730,8 @@ public:
     {
         EXPECT_CALL(WifiSettings::GetInstance(), GetAppPackageName()).WillOnce(Return(""));
         EXPECT_CALL(WifiSettings::GetInstance(), GetWhetherToAllowNetworkSwitchover()).Times(AtLeast(0));
+        pScanService->lastSystemScanTime = 1;
         pScanService->systemScanIntervalMode->ScanIntervalMode.interval = 0x0fffffff;
-        pScanService->lastSystemScanTime = 0;
         pScanService->StartSystemTimerScan(false);
     }
 
@@ -740,7 +740,7 @@ public:
         EXPECT_CALL(WifiSettings::GetInstance(), GetAppPackageName()).WillOnce(Return(""));
         EXPECT_CALL(WifiSettings::GetInstance(), GetWhetherToAllowNetworkSwitchover()).Times(AtLeast(0));
         pScanService->lastSystemScanTime = 1;
-        pScanService->systemScanIntervalMode->ScanIntervalMode.interval = 1;
+        pScanService->systemScanIntervalMode->scanIntervalMode.interval = 1;
         pScanService->StartSystemTimerScan(false);
     }
 
@@ -1952,7 +1952,12 @@ HWTEST_F(ScanServiceTest, StoreRequestScanConfigSuccess, TestSize.Level1)
 {
     StoreRequestScanConfigSuccess();
 }
-
+/**
+ * @tc.name: StoreRequestScanConfigFail
+ * @tc.desc: StoreRequestScanConfig()
+ * @tc.type: FUNC
+ * @tc.require: issue
+*/
 HWTEST_F(ScanServiceTest, StoreRequestScanConfigFail, TestSize.Level1)
 {
     StoreRequestScanConfigFail();
@@ -2112,7 +2117,12 @@ HWTEST_F(ScanServiceTest, SystemScanProcessSuccess2, TestSize.Level1)
 {
     SystemScanProcessSuccess2();
 }
-
+/**
+ * @tc.name: SystemScanProcessSuccess3
+ * @tc.desc: SystemScanProcessSuccess()
+ * @tc.type: FUNC
+ * @tc.require: issue
+*/
 HWTEST_F(ScanServiceTest, SystemScanProcessSuccess3, TestSize.Level1)
 {
     SystemScanProcessSuccess3();
@@ -2127,17 +2137,32 @@ HWTEST_F(ScanServiceTest, StartSystemTimerScanFail1, TestSize.Level1)
 {
     StartSystemTimerScanFail1();
 }
-
+/**
+ * @tc.name: StartSystemTimerScanFail2
+ * @tc.desc: StartSystemTimerScan()
+ * @tc.type: FUNC
+ * @tc.require: issue
+*/
 HWTEST_F(ScanServiceTest, StartSystemTimerScanFail2, TestSize.Level1)
 {
     StartSystemTimerScanFail2();
 }
-
+/**
+ * @tc.name: StartSystemTimerScanFail3
+ * @tc.desc: StartSystemTimerScan()
+ * @tc.type: FUNC
+ * @tc.require: issue
+*/
 HWTEST_F(ScanServiceTest, StartSystemTimerScanFail3, TestSize.Level1)
 {
     StartSystemTimerScanFail3();
 }
-
+/**
+ * @tc.name: StartSystemTimerScanFail4
+ * @tc.desc: StartSystemTimerScan()
+ * @tc.type: FUNC
+ * @tc.require: issue
+*/
 HWTEST_F(ScanServiceTest, StartSystemTimerScanFail4, TestSize.Level1)
 {
     StartSystemTimerScanFail4();
@@ -2157,12 +2182,22 @@ HWTEST_F(ScanServiceTest, HandleDisconnectedScanTimeoutSuccess, TestSize.Level1)
 {
     HandleDisconnectedScanTimeoutSuccess();
 }
-
+/**
+ * @tc.name: HandleDisconnectedScanTimeoutFail1
+ * @tc.desc: HandleDisconnectedScanTimeout()
+ * @tc.type: FUNC
+ * @tc.require: issue
+*/
 HWTEST_F(ScanServiceTest, HandleDisconnectedScanTimeoutFail1, TestSize.Level1)
 {
     HandleDisconnectedScanTimeoutFail1();
 }
-
+/**
+ * @tc.name: HandleDisconnectedScanTimeoutFail2
+ * @tc.desc: HandleDisconnectedScanTimeout()
+ * @tc.type: FUNC
+ * @tc.require: issue
+*/
 HWTEST_F(ScanServiceTest, HandleDisconnectedScanTimeoutFail2, TestSize.Level1)
 {
     HandleDisconnectedScanTimeoutFail2();
@@ -2652,7 +2687,12 @@ HWTEST_F(ScanServiceTest, HandleMovingFreezeChangedTest, TestSize.Level1)
 {
     HandleMovingFreezeChangedTest();
 }
-
+/**
+ * @tc.name: WifiMaxThroughputTest
+ * @tc.desc: WifiMaxThroughputTest
+ * @tc.type: FUNC
+ * @tc.require: issue
+*/
 HWTEST_F(ScanServiceTest, WifiMaxThroughputTest, TestSize.Level1)
 {
     WifiMaxThroughputTest();

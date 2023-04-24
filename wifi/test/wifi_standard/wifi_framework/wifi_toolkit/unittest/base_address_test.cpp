@@ -39,7 +39,8 @@ public:
 
 class BaseAddressSubClass : public BaseAddress {
 public:
-    BaseAddressSubClass() : BaseAddress("192.168.1.8", 1 , FamilyType::FAMILY_UNSPEC) {
+    BaseAddressSubClass() : BaseAddress("192.168.1.8", 1 , FamilyType::FAMILY_UNSPEC)
+    {
         WIFI_LOGI("BaseAddressSubClass constructor");
     }
 

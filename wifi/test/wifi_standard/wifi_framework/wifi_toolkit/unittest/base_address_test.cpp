@@ -19,8 +19,8 @@
 #include "ipv6_address.h"
 #include "base_address.h"
 #include "wifi_logger.h"
-DEFINE_WIFILOG_DHCP_LABEL("BaseAddressTest");
 
+DEFINE_WIFILOG_DHCP_LABEL("BaseAddressTest");
 using namespace testing::ext;
 
 namespace OHOS {
@@ -57,7 +57,7 @@ public:
 */
 HWTEST_F(BaseAddressTest, DumpTest, TestSize.Level1)
 {
-    WIFI_LOGI("BaseAddressTest enter");
+    WIFI_LOGI("DumpTest enter");
     Ipv4Address ip = Ipv4Address::Create("10.0.0.1", "255.255.255.0");
     ip.Dump();
     Ipv6Address ipv6 = Ipv6Address::Create("fe80::47b1:fa81:b33e:ea6b/64");

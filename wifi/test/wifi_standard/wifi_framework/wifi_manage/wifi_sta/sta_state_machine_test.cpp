@@ -396,8 +396,8 @@ public:
         msg.SetParam1(1);
         msg.SetParam2(0);
         EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _))
-            .WillOnce(AtLeast(1))
-            .WillOnce(AtLeast(0));
+            .WillOnce(Return(1))
+            .WillOnce(Return(0));
         pStaStateMachine->linkedInfo.networkId = 0;
         pStaStateMachine->DealConnectToUserSelectedNetwork(&msg);
         pStaStateMachine->DealConnectToUserSelectedNetwork(&msg);
@@ -511,16 +511,16 @@ public:
     void DealStartWpsCmdFail1()
     {
         EXPECT_CALL(WifiStaHalInterface::GetInstance(), ClearDeviceConfig())
-            .WillOnce(Return(WIFI_IDL_OPT_FAILED))	
-            .WillOnce(Return(WIFI_IDL_OPT_OK))	
+            .WillOnce(Return(WIFI_IDL_OPT_FAILED))
+            .WillOnce(Return(WIFI_IDL_OPT_OK))
             .WillOnce(Return(WIFI_IDL_OPT_OK));
-        EXPECT_CALL(WifiManager::GetInstance(), DealWpsChanged(_, _)).Times(Atleast(0));
+        EXPECT_CALL(WifiManager::GetInstance(), DealWpsChanged(_, _)).Times(AtLeast(0));
         pStaStateMachine->wpsState = SetupMethod::KEYPAD;
         InternalMessage msg;
         msg.SetParam1(static_cast<int>(SetupMethod::INVALID));
         pStaStateMachine->DealStartWpsCmd(&msg);
         pStaStateMachine->DealStartWpsCmd(&msg);
-        pStaStateMachine->wpsState = SetupMethod::INVALID;
+        pStaStateMachine->wpsState = SetupMethod::DISPLAY;
         pStaStateMachine->DealStartWpsCmd(&msg);
     }
 
@@ -1511,7 +1511,6 @@ public:
         EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_)).WillOnce(Return(0));
         pStaStateMachine->ReUpdateNetLinkInfo();
     }
-
 };
 
 HWTEST_F(StaStateMachineTest, DealConnectTimeOutCmd, TestSize.Level1)
@@ -1733,7 +1732,12 @@ HWTEST_F(StaStateMachineTest, DealConnectToUserSelectedNetworkFail, TestSize.Lev
 {
     DealConnectToUserSelectedNetworkFail();
 }
-
+/**
+ * @tc.name: DealConnectToUserSelectedNetworkFail1
+ * @tc.desc: DealConnectToUserSelectedNetwork()
+ * @tc.type: FUNC
+ * @tc.require: issue
+*/
 HWTEST_F(StaStateMachineTest, DealConnectToUserSelectedNetworkFail1, TestSize.Level1)
 {
     DealConnectToUserSelectedNetworkFail1();
@@ -1797,6 +1801,16 @@ HWTEST_F(StaStateMachineTest, DealReassociateCmdFail2, TestSize.Level1)
 HWTEST_F(StaStateMachineTest, DealStartWpsCmdSuccess, TestSize.Level1)
 {
     DealStartWpsCmdSuccess();
+}
+/**
+ * @tc.name: DealStartWpsCmdFail1
+ * @tc.desc: DealStartWpsCmd()
+ * @tc.type: FUNC
+ * @tc.require: issue
+*/
+HWTEST_F(StaStateMachineTest, DealStartWpsCmdFail1, TestSize.Level1)
+{
+    DealStartWpsCmdFail1();
 }
 
 HWTEST_F(StaStateMachineTest, StartWpsModeSuccess1, TestSize.Level1)
@@ -1936,7 +1950,7 @@ HWTEST_F(StaStateMachineTest, StartConnectToNetworkFali3, TestSize.Level1)
 */
 HWTEST_F(StaStateMachineTest, StartConnectToNetworkFali4, TestSize.Level1)
 {
-    StartConnectToNetworkFali4();
+    StartConnectToNetworkFail4();
 }
 
 HWTEST_F(StaStateMachineTest, SetRandomMacSuccess1, TestSize.Level1)

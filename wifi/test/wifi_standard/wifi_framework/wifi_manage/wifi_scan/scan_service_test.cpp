@@ -39,6 +39,7 @@ constexpr int FOUR = 4;
 constexpr int FAILEDNUM = 6;
 constexpr int STATUS = 17;
 constexpr int MAX_SCAN_CONFIG = 10000;
+constexpr int INVAL = 0x0fffff;
 
 class ScanServiceTest : public testing::Test {
 public:
@@ -731,7 +732,7 @@ public:
         EXPECT_CALL(WifiSettings::GetInstance(), GetAppPackageName()).WillOnce(Return(""));
         EXPECT_CALL(WifiSettings::GetInstance(), GetWhetherToAllowNetworkSwitchover()).Times(AtLeast(0));
         pScanService->lastSystemScanTime = 1;
-        pScanService->systemScanIntervalMode.scanIntervalMode.interval = 0x0fffffff;
+        pScanService->systemScanIntervalMode.scanIntervalMode.interval = INVAL;
         pScanService->StartSystemTimerScan(false);
     }
 

@@ -50,14 +50,13 @@ ohos_unittest("toolkit_unittest") {
     "ipv4_address_test.cpp",
     "ipv6_address_test.cpp",
     "mac_address_test.cpp",
+    "network_interface_test.cpp",
     "raw_socket_test.cpp",
     "wifi_config_file_test.cpp",
     "wifi_encryption_util_test.cpp",
     "wifi_global_func_test.cpp",
     "wifi_ip_tools_test.cpp",
     "wifi_log_helper_test.cpp",
-    "wifi_network_interface_test.cpp",
-    "wifi_network_test.cpp",
   ]
 
   include_dirs = [

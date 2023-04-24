@@ -722,7 +722,7 @@ public:
         EXPECT_CALL(WifiSettings::GetInstance(), GetAppPackageName()).WillOnce(Return(""));
         EXPECT_CALL(WifiSettings::GetInstance(), GetWhetherToAllowNetworkSwitchover()).Times(AtLeast(0));
         pScanService->lastSystemScanTime = 1;
-        pScanService->systemScanIntervalMode->scanIntervalMode.interval = 1;
+        pScanService->systemScanIntervalMode.scanIntervalMode.interval = 1;
         pScanService->StartSystemTimerScan(true);
     }
 
@@ -731,7 +731,7 @@ public:
         EXPECT_CALL(WifiSettings::GetInstance(), GetAppPackageName()).WillOnce(Return(""));
         EXPECT_CALL(WifiSettings::GetInstance(), GetWhetherToAllowNetworkSwitchover()).Times(AtLeast(0));
         pScanService->lastSystemScanTime = 1;
-        pScanService->systemScanIntervalMode->ScanIntervalMode.interval = 0x0fffffff;
+        pScanService->systemScanIntervalMode.scanIntervalMode.interval = 0x0fffffff;
         pScanService->StartSystemTimerScan(false);
     }
 
@@ -740,7 +740,7 @@ public:
         EXPECT_CALL(WifiSettings::GetInstance(), GetAppPackageName()).WillOnce(Return(""));
         EXPECT_CALL(WifiSettings::GetInstance(), GetWhetherToAllowNetworkSwitchover()).Times(AtLeast(0));
         pScanService->lastSystemScanTime = 1;
-        pScanService->systemScanIntervalMode->scanIntervalMode.interval = 1;
+        pScanService->systemScanIntervalMode.scanIntervalMode.interval = 1;
         pScanService->StartSystemTimerScan(false);
     }
 

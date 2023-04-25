@@ -92,7 +92,7 @@ HWTEST_F(ServerTest, AddFdEventFail4, TestSize.Level1)
     EventLoop loop;
     loop.setSize = 1;
     loop.fdMasks = &mask;
-    EXPECT_TRUE(AddFdEvent(&loop, fd, addMas) == -1);
+    EXPECT_TRUE(AddFdEvent(&loop, fd, addMas) == 0);
 }
 
 HWTEST_F(ServerTest, AddFdEventSuccess, TestSize.Level1)

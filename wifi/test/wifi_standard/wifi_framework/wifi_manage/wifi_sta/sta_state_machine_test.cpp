@@ -396,8 +396,7 @@ public:
         msg.SetParam1(1);
         msg.SetParam2(0);
         EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _))
-            .WillOnce(Return(1))
-            .WillOnce(Return(0));
+            .WillRepeatedly(Return(1));
         pStaStateMachine->linkedInfo.networkId = 0;
         pStaStateMachine->DealConnectToUserSelectedNetwork(&msg);
         pStaStateMachine->DealConnectToUserSelectedNetwork(&msg);

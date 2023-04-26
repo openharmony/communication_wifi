@@ -1134,7 +1134,7 @@ static void GetInfoElems(int length, int end, char *srcBuf, ScanInfo *pcmd)
     if (infoElemsTemp == NULL) {
         return;
     }
-    while (remainingLength > 1) {
+    while (remainingLength > 1 && start < length) {
         if (srcBuf[start] == '[') {
             ++start;
             infoElemsTemp[infoElemsSize].id = atoi(srcBuf + start);
@@ -1181,7 +1181,7 @@ static void GetInfoElems(int length, int end, char *srcBuf, ScanInfo *pcmd)
 }
 #endif
 
-static int DelScanInfoLine(ScanInfo *pcmd, char *srcBuf, int length)
+int DelScanInfoLine(ScanInfo *pcmd, char *srcBuf, int length)
 {
     int columnIndex = 0;
     int start = 0;

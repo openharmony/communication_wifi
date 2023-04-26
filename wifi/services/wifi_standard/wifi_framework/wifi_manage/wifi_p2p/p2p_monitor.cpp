@@ -407,10 +407,13 @@ void P2pMonitor::WpaEventInvitationReceived(const IdlP2pInvitationInfo &recvInfo
     group.AddClientDevice(device);
 
     WifiP2pDevice owner;
-    owner.SetDeviceAddress(recvInfo.goDeviceAddress);
+    if (recvInfo.goDeviceAddress.empty()) {
+        owner.SetDeviceAddress(recvInfo.srcAddress);
+    } else {
+        owner.SetDeviceAddress(recvInfo.goDeviceAddress);
+    }
     WIFI_LOGD("owner mac: %{private}s, persistentNetworkId:%{public}d.",
-        owner.GetDeviceAddress().c_str(),
-        recvInfo.persistentNetworkId);
+        owner.GetDeviceAddress().c_str(), recvInfo.persistentNetworkId);
     /**
      * If owner addr is empty, a NET ID is required, indicating a persistent group invitation.
      * After receiving the message, the state machine determines the case.

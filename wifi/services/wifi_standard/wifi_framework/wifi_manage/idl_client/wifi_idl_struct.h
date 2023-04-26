@@ -91,8 +91,11 @@ struct WifiWpaSignalInfo {
     int rxrate;
     int noise;
     int frequency;
+    int txPackets;
+    int rxPackets;
 
-    WifiWpaSignalInfo() : signal(0), txrate(0), rxrate(0), noise(0), frequency(0)
+    WifiWpaSignalInfo() : signal(0), txrate(0), rxrate(0), noise(0), frequency(0),
+        txPackets(0), rxPackets(0)
     {}
 
     ~WifiWpaSignalInfo()

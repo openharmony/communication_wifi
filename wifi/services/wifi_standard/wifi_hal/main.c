@@ -24,6 +24,7 @@
 #include "wifi_hal_crpc_server.h"
 #include "wifi_hal_p2p_interface.h"
 #include "wifi_hal_sta_interface.h"
+#include "wifi_hdi_sta_impl.h"
 #include "wifi_hostapd_hal.h"
 #include "wifi_log.h"
 
@@ -101,10 +102,15 @@ int main(void)
     signal(SIGINT, SignalExit);
     signal(SIGTERM, SignalExit);
     signal(SIGPIPE, SIG_IGN);
-
+#ifdef HDI_INTERFACE_SUPPORT
+    HdiStaInit();
+#endif
     SendStartNotify();
     RunRpcLoop(server);
     /* stop wpa_supplicant, hostapd, and other resources */
+#ifdef HDI_INTERFACE_SUPPORT
+    HdiStaUnInit();
+#endif
     ForceStop();
     for (int id = 0; id < AP_MAX_INSTANCE; id++) {
         StopSoftAp(id);

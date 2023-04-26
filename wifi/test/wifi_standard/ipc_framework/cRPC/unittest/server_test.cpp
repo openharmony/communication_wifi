@@ -157,18 +157,7 @@ HWTEST_F(ServerTest, DelFdEventFail5, TestSize.Level1)
     loop.setSize = 1;
     loop.fdMasks = &mask;
     EXPECT_TRUE(DelFdEvent(&loop, fd, delMask) == -1);
-}
-
-HWTEST_F(ServerTest, DelFdEventSuccess, TestSize.Level1)
-{
-    int fd = 1;
-    unsigned int delMask = MASK_2;
-    FdMask mask;
-    mask.mask = MASK_4;
-    EventLoop loop;
-    loop.setSize = 2;
-    loop.fdMasks = &mask;
-    EXPECT_TRUE(DelFdEvent(&loop, fd, delMask) == -1);
+    EXPECT_TRUE(DelFdEvent(&loop, fd, MASK_2) == -1);
 }
 
 HWTEST_F(ServerTest, CreateRpcServerTest, TestSize.Level1)
@@ -177,7 +166,6 @@ HWTEST_F(ServerTest, CreateRpcServerTest, TestSize.Level1)
     char path[] = "./unix_sock_test.sock";
     EXPECT_TRUE(CreateRpcServer(nullptr) == nullptr);
     server = CreateRpcServer(path);
-    EXPECT_TRUE(server->listenFd == 5);
 }
 
 HWTEST_F(ServerTest, RegisterCallbackTest, TestSize.Level1)

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,23 +12,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#ifdef HDI_INTERFACE_SUPPORT
+#ifndef OHOS_HDI_UTIL_H
+#define OHOS_HDI_UTIL_H
 
-#ifndef OHOS_WIFI_COMMON_DEF_H
-#define OHOS_WIFI_COMMON_DEF_H
+#include "wifi_hdi_define.h"
+#include "wifi_hdi_struct.h"
+#include "wifi_hdi_common.h"
+#include "v1_1/wlan_types.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#define CONFIG_ROOR_DIR "/data/service/el1/public/wifi"
+int Get80211ElemsFromIE(const uint8_t *start, size_t len, struct HdiElems *elems,
+    int show);
 
-#ifndef MAC2STR
-#define MAC2STR(a) (a)[0], (a)[1], (a)[2], (a)[3], (a)[4], (a)[5]
-#define MACSTR "%02x:%02x:%02x:%02x:%02x:%02x"
-#endif
+int GetScanResultText(const struct HdfWifiScanResultExt *scanResults,
+    struct HdiElems *elems, char* buff, int buffLen);
 
 #ifdef __cplusplus
 }
 #endif
-
+#endif
 #endif

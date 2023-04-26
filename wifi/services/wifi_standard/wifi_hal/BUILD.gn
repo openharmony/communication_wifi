@@ -23,9 +23,11 @@ if (defined(ohos_lite)) {
 local_base_sources = [
   "common/wifi_hal_common_func.c",
   "hdi/src/wifi_hdi_ap_impl.c",
+  "hdi/src/wifi_hdi_common.c",
   "hdi/src/wifi_hdi_p2p_impl.c",
   "hdi/src/wifi_hdi_proxy.c",
   "hdi/src/wifi_hdi_sta_impl.c",
+  "hdi/src/wifi_hdi_util.c",
   "main.c",
   "wifi_hal_adapter.c",
   "wifi_hal_ap_interface.c",

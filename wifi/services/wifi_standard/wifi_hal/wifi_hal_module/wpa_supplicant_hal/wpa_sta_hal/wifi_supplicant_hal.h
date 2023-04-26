@@ -124,6 +124,8 @@ void ReleaseWifiStaInterface(int staNo);
 WifiWpaStaInterface *TraversalWifiStaInterface(void);
 int GetStaInterfaceNo(const char *ifName);
 
+int DelScanInfoLine(ScanInfo *pcmd, char *srcBuf, int length);
+
 #ifdef __cplusplus
 }
 #endif

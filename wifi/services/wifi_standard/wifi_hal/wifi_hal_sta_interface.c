@@ -20,6 +20,7 @@
 #include "wifi_hal_module_manage.h"
 #ifdef HDI_INTERFACE_SUPPORT
 #include "wifi_hdi_proxy.h"
+#include "wifi_hdi_sta_impl.h"
 #endif
 #include "wifi_log.h"
 #include "wifi_supplicant_hal.h"
@@ -136,6 +137,10 @@ WifiErrorNo Start(void)
         LOGE("[STA] Start hdi failed!");
         return WIFI_HAL_FAILED;
     }
+    if (RegisterHdiStaCallbackEvent() != WIFI_HAL_SUCCESS) {
+        LOGE("[STA] Start RegisterHdiStaCallbackEvent failed!");
+        return WIFI_HAL_FAILED;
+    }
 #endif
     LOGI("Start wifi successfully");
     return WIFI_HAL_SUCCESS;
@@ -149,6 +154,7 @@ WifiErrorNo Stop(void)
         LOGE("[Ap] Stop hdi failed!");
         return WIFI_HAL_FAILED;
     }
+    UnRegisterHdiStaCallbackEvent();
 #endif
     WifiErrorNo err = StopWpaAndWpaHal(0);
     if (err == WIFI_HAL_FAILED) {
@@ -167,6 +173,7 @@ WifiErrorNo ForceStop(void)
         LOGE("[Ap] Stop hdi failed!");
         return WIFI_HAL_FAILED;
     }
+    UnRegisterHdiStaCallbackEvent();
 #endif
     WifiWpaStaInterface *p = TraversalWifiStaInterface();
     while (p != NULL) {
@@ -244,6 +251,9 @@ WifiErrorNo RequestToSupplicant(const unsigned char *buf, int32_t bufSize)
 WifiErrorNo StartScan(const ScanSettings *settings)
 {
     LOGD("Ready to start scan with param.");
+#ifdef HDI_INTERFACE_SUPPORT
+    int ret = HdiStartScan(settings);
+#else
     WifiWpaStaInterface *pStaIfc = GetWifiStaInterface(0);
     if (pStaIfc == NULL) {
         return WIFI_HAL_SUPPLICANT_NOT_INIT;
@@ -253,6 +263,7 @@ WifiErrorNo StartScan(const ScanSettings *settings)
         LOGE("StartScan failed! ret=%{public}d", ret);
         return WIFI_HAL_FAILED;
     }
+#endif
     if (ret == WIFI_HAL_SCAN_BUSY) {
         LOGD("StartScan return scan busy");
         return WIFI_HAL_SCAN_BUSY;
@@ -267,11 +278,15 @@ WifiErrorNo GetScanInfos(ScanInfo *results, int *size)
     if (results == NULL || size == NULL || *size == 0) {
         return WIFI_HAL_SUCCESS;
     }
+#ifdef HDI_INTERFACE_SUPPORT
+    int ret = GetHdiScanInfos(results, size);
+#else
     WifiWpaStaInterface *pStaIfc = GetWifiStaInterface(0);
     if (pStaIfc == NULL) {
         return WIFI_HAL_SUPPLICANT_NOT_INIT;
     }
     int ret = pStaIfc->wpaCliCmdScanInfo(pStaIfc, results, size);
+#endif
     if (ret < 0) {
         LOGE("GetScanInfos failed! ret=%{public}d", ret);
         return WIFI_HAL_FAILED;
@@ -864,11 +879,15 @@ WifiErrorNo GetConnectSignalInfo(const char *endBssid, WpaSignalInfo *info)
         return WIFI_HAL_FAILED;
     }
     LOGD("GetConnectSignalInfo()");
+#ifdef HDI_INTERFACE_SUPPORT
+    int ret = GetHdiSignalInfo(info);
+#else
     WifiWpaStaInterface *pStaIfc = GetWifiStaInterface(0);
     if (pStaIfc == NULL) {
         return WIFI_HAL_SUPPLICANT_NOT_INIT;
     }
     int ret = pStaIfc->wpaCliCmdGetSignalInfo(pStaIfc, info);
+#endif
     if (ret < 0) {
         LOGE("WpaCliCmdGetSignalInfo failed! ret=%{public}d", ret);
         return WIFI_HAL_FAILED;

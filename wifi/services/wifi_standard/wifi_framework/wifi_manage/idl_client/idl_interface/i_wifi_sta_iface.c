@@ -837,6 +837,8 @@ WifiErrorNo GetConnectSignalInfo(const char *endBssid, WpaSignalInfo *info)
         ReadInt(context, &info->rxrate);
         ReadInt(context, &info->noise);
         ReadInt(context, &info->frequency);
+        ReadInt(context, &info->txPackets);
+        ReadInt(context, &info->rxPackets);
     }
     ReadClientEnd(client);
     UnlockRpcClient(client);

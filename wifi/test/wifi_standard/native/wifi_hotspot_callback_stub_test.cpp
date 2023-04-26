@@ -116,7 +116,7 @@ HWTEST_F(WifiHotspotCallbackStubTest, OnRemoteRequest_001, TestSize.Level1)
     uint32_t code = 0;
     pWifiHotspot->SetRemoteDied(true);
     EXPECT_TRUE(pWifiHotspot->IsRemoteDied());
-    EXPECT_TRUE(pWifiHotspot->OnRemoteRequest(code, data, reply, option) == -1);
+    EXPECT_TRUE(pWifiHotspot->OnRemoteRequest(code, data, reply, option) == WIFI_OPT_FAILED);
 }
 /**
  * @tc.name: OnRemoteRequest_002

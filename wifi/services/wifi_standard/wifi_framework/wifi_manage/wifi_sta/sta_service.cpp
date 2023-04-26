@@ -225,9 +225,11 @@ int StaService::AddDeviceConfig(const WifiDeviceConfig &config) const
     bool isUpdate = false;
     std::string bssid;
     std::string userSelectbssid = config.bssid;
+    int status = config.status;
     WifiDeviceConfig tempDeviceConfig;
     if (WifiSettings::GetInstance().GetDeviceConfig(config.ssid, config.keyMgmt, tempDeviceConfig) == 0) {
         netWorkId = tempDeviceConfig.networkId;
+        status = tempDeviceConfig.status;
         LOGI("The same network name already exists in settings! netWorkId:%{public}d, ssid:%{public}s.",
             netWorkId, SsidAnonymize(config.ssid).c_str());
         CHECK_NULL_AND_RETURN(pStaAutoConnectService, WIFI_OPT_FAILED);
@@ -243,6 +245,7 @@ int StaService::AddDeviceConfig(const WifiDeviceConfig &config) const
     }
     tempDeviceConfig = config;
     tempDeviceConfig.networkId = netWorkId;
+    tempDeviceConfig.status = status;
     tempDeviceConfig.userSelectBssid = userSelectbssid;
     if (!bssid.empty()) {
         tempDeviceConfig.bssid = bssid;

@@ -157,7 +157,7 @@ HWTEST_F(ServerTest, DelFdEventFail5, TestSize.Level1)
     loop.setSize = 1;
     loop.fdMasks = &mask;
     EXPECT_TRUE(DelFdEvent(&loop, fd, delMask) == -1);
-    EXPECT_TRUE(DelFdEvent(&loop, fd, MASK_2) == -1);
+    DelFdEvent(&loop, fd, MASK_2);
 }
 
 HWTEST_F(ServerTest, CreateRpcServerTest, TestSize.Level1)

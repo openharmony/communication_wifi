@@ -13,6 +13,12 @@
  * limitations under the License.
  */
 
+import ConfigData from '../Utils/ConfigData';
+
+/*
+ ** index of page, not useful in wifi test
+ */
+
 @Entry
 @Component
 struct Index {
@@ -21,12 +27,12 @@ struct Index {
   build() {
     Row() {
       Column() {
-        Text(this.message)
-          .fontSize(50)
-          .fontWeight(FontWeight.Bold)
+        Text( this.message )
+          .fontSize( 50 )
+          .fontWeight( FontWeight.Bold )
       }
-      .width('100%')
+      .width( ConfigData.WH_100_100 )
     }
-    .height('100%')
+    .height( ConfigData.WH_100_100 )
   }
 }

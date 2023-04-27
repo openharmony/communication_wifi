@@ -12,11 +12,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import ComponentConfig from './componentConfig';
 
+// @ts-nocheck
+
+import ComponentConfig from './componentConfig';
+import ConfigData from '../Utils/ConfigData';
 /**
- * ImageAnimator component
+ * ImageAnimator component Of WiFi test
  */
+
 @Component
 export default struct ImageAnimatorComponent {
   private imageWidth: number | Resource = 0
@@ -26,57 +30,57 @@ export default struct ImageAnimatorComponent {
   build() {
     Column() {
       ImageAnimator()
-      .images([
-        {
-          src: '../MainAbility/res/image/hdpi/ic_loading01.png',
-          duration: ComponentConfig.DURATION_TIME,
-          width: this.whtl,
-          height: this.whtl,
-          top: this.whtl,
-          left: this.whtl
-        }, {
-          src: '../MainAbility/res/image/hdpi/ic_loading02.png',
-          duration: ComponentConfig.DURATION_TIME,
-          width: this.whtl,
-          height: this.whtl,
-          top: this.whtl,
-          left: this.whtl
-        }, {
-          src: '../MainAbility/res/image/hdpi/ic_loading03.png',
-          duration: ComponentConfig.DURATION_TIME,
-          width: this.whtl,
-          height: this.whtl,
-          top: this.whtl,
-          left: this.whtl
-        }, {
-          src: '../MainAbility/res/image/hdpi/ic_loading04.png',
-          duration: ComponentConfig.DURATION_TIME,
-          width: this.whtl,
-          height: this.whtl,
-          top: this.whtl,
-          left: this.whtl
-        }, {
-          src: '../MainAbility/res/image/hdpi/ic_loading05.png',
-          duration: ComponentConfig.DURATION_TIME,
-          width: this.whtl,
-          height: this.whtl,
-          top: this.whtl,
-          left: this.whtl
-        }, {
-          src: '../MainAbility/res/image/hdpi/ic_loading06.png',
-          duration: ComponentConfig.DURATION_TIME,
-          width: this.whtl,
-          height: this.whtl,
-          top: this.whtl,
-          left: this.whtl
-        }])
-      .width(this.imageWidth)
-      .height(this.imageHeight)
-      .iterations(-1)
-      .fixedSize(true)
-      .reverse(true)
-      .fillMode(FillMode.None)
-      .state(AnimationStatus.Running)
+        .images( [
+          {
+            src : '../MainAbility/res/image/hdpi/ic_loading01.png' ,
+            duration : ComponentConfig.DURATION_TIME ,
+            width : this.whtl ,
+            height : this.whtl ,
+            top : this.whtl ,
+            left : this.whtl
+          }, {
+            src : '../MainAbility/res/image/hdpi/ic_loading02.png' ,
+            duration : ComponentConfig.DURATION_TIME ,
+            width : this.whtl ,
+            height : this.whtl ,
+            top : this.whtl ,
+            left : this.whtl
+          }, {
+            src : '../MainAbility/res/image/hdpi/ic_loading03.png' ,
+            duration : ComponentConfig.DURATION_TIME ,
+            width : this.whtl ,
+            height : this.whtl ,
+            top : this.whtl ,
+            left : this.whtl
+          }, {
+            src : '../MainAbility/res/image/hdpi/ic_loading04.png' ,
+            duration : ComponentConfig.DURATION_TIME ,
+            width : this.whtl ,
+            height : this.whtl ,
+            top : this.whtl ,
+            left : this.whtl
+          }, {
+            src : '../MainAbility/res/image/hdpi/ic_loading05.png' ,
+            duration : ComponentConfig.DURATION_TIME ,
+            width : this.whtl ,
+            height : this.whtl ,
+            top : this.whtl ,
+            left : this.whtl
+          }, {
+            src : '../MainAbility/res/image/hdpi/ic_loading06.png' ,
+            duration : ComponentConfig.DURATION_TIME ,
+            width : this.whtl ,
+            height : this.whtl ,
+            top : this.whtl ,
+            left : this.whtl
+          } ] )
+        .width( this.imageWidth )
+        .height( this.imageHeight )
+        .iterations( - 1 )
+        .fixedSize( true )
+        .reverse( true )
+        .fillMode( FillMode.None )
+        .state( AnimationStatus.Running )
     }
   }
 }

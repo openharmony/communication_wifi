@@ -12,45 +12,49 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-// @ts-nocheck
-/**
- * Test-ListItem
- */
 
+// @ts-nocheck
+import ConfigData from '../Utils/ConfigData';
 import { TestData } from '../MainAbility/model/testData'
+
+/**
+ * Test-ListItem component of wifi test
+ */
 
 @Component
 export struct TestListItem {
   private testItem: TestData
+
   build() {
-    Navigator({ target: this.testItem.url }) {
-      Flex({ justifyContent: FlexAlign.Start, alignItems: ItemAlign.Center }) {
+    Navigator( { target : this.testItem.url } ) {
+      Flex( { justifyContent : FlexAlign.Start , alignItems : ItemAlign.Center } ) {
         Row() {
-          Image(this.testItem.image)
-            .objectFit(ImageFit.Contain)
-            .autoResize(false)
-            .height(60)
-            .width(60)
+          Image( this.testItem.image )
+            .objectFit( ImageFit.Contain )
+            .autoResize( false )
+            .height( 60 )
+            .width( 60 )
         }
-        .backgroundColor($r("app.color.white"))
-//        .margin({ right: 20 })
-        .width("30%")
-        Text(this.testItem.name)
-          .fontSize(20)
-          .flexGrow(1)
-          .margin({ left: 12 })
-          .width("45%")
-        Text(this.testItem.detail)
-          .fontSize(17)
-          .margin({ left: 10 ,right: 5})
-          .width("45%")
+        .backgroundColor( $r( "app.color.white" ) )
+
+        .width( ConfigData.WH_30_100 )
+
+        Text( this.testItem.name )
+          .fontSize( 20 )
+          .flexGrow( 1 )
+          .margin( { left : 12 } )
+          .width( ConfigData.WH_45_100 )
+        Text( this.testItem.detail )
+          .fontSize( 17 )
+          .margin( { left : 10 , right : 5 } )
+          .width( ConfigData.WH_45_100 )
       }
-      .height(85)
+      .height( 85 )
     }
-    .params({ testId: this.testItem })
-    .margin({ right: 10, left: 10, top: 10 })
-    .padding({left: 15, right: 15})
-    .borderRadius(10)
-    .backgroundColor($r("app.color.white"))
+    .params( { testId : this.testItem } )
+    .margin( { right : 10 , left : 10 , top : 10 } )
+    .padding( { left : 15 , right : 15 } )
+    .borderRadius( 10 )
+    .backgroundColor( $r( "app.color.white" ) )
   }
 }

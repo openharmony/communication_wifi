@@ -14,21 +14,23 @@
  */
 
 // @ts-nocheck
+
 import { TestData } from '../MainAbility/model/testData'
 import { TestList } from './testList';
-
-
+import ConfigData from '../Utils/ConfigData';
 /**
  * Benchmark-Test Of Wifi test
  */
+
 @Component
 export struct BenchmarkTest {
   private testItems: TestData[]
+
   build() {
     Column() {
-      TestList({
-        testItems: this.testItems
-      })
+      TestList( {
+        testItems : this.testItems
+      } )
     }
   }
 }

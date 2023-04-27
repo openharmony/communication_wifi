@@ -13,62 +13,68 @@
  * limitations under the License.
  */
 
+// @ts-nocheck
+
 import wifi from '@ohos.wifi'
+import ConfigData from '../Utils/ConfigData';
+/**
+ * PswDialog page of WiFi test
+ */
 
 @CustomDialog
 export struct PswDialog {
   @Link scanInfo: wifi.WifiScanInfo
   private psw: string = ''
   private controller: CustomDialogController
-  private action: (scanInfo, psw) => void
+  private action: ( scanInfo , psw ) => void
 
   build() {
     Column() {
-      Text(this.scanInfo.ssid)
-        .fontSize(20)
-        .width('95%')
-      TextInput({ placeholder: 'input password' })
-        .key('input')
-        .type(InputType.Password)
-        .placeholderColor(Color.Gray)
-        .fontSize(19)
-        .margin({ top: 15 })
-        .width('95%')
-        .onChange((value: string) => {
+      Text( this.scanInfo.ssid )
+        .fontSize( 20 )
+        .width( ConfigData.WH_95_100 )
+      TextInput( { placeholder : 'input password' } )
+        .key( 'input' )
+        .type( InputType.Password )
+        .placeholderColor( Color.Gray )
+        .fontSize( 19 )
+        .margin( { top : 15 } )
+        .width( ConfigData.WH_95_100 )
+        .onChange( ( value: string ) => {
           this.psw = value
-        })
+        } )
       Row() {
         Button() {
-          Text($r('app.string.sure'))
-            .fontColor(Color.Blue)
-            .fontSize(17)
+          Text( $r( 'app.string.sure' ) )
+            .fontColor( Color.Blue )
+            .fontSize( 17 )
         }
-        .layoutWeight(7)
-        .backgroundColor(Color.White)
-        .margin(5)
-        .onClick(() => {
+        .layoutWeight( 7 )
+        .backgroundColor( Color.White )
+        .margin( 5 )
+        .onClick( () => {
           this.controller.close()
-          this.action(this.scanInfo, this.psw)
-        })
+          this.action( this.scanInfo , this.psw )
+        } )
 
         Text()
-          .width(1).height(35)
-          .backgroundColor('#8F8F8F')
+          .width( 1 ).height( 35 )
+          .backgroundColor( '#8F8F8F' )
         Button() {
-          Text($r('app.string.cancel'))
-            .fontColor(Color.Red)
-            .fontSize(17)
+          Text( $r( 'app.string.cancel' ) )
+            .fontColor( Color.Red )
+            .fontSize( 17 )
         }
-        .layoutWeight(7)
-        .backgroundColor(Color.White)
-        .margin(5)
-        .onClick(() => {
+        .layoutWeight( 7 )
+        .backgroundColor( Color.White )
+        .margin( 5 )
+        .onClick( () => {
           this.controller.close()
-        })
+        } )
       }
-      .width('100%')
-      .margin({ top: '3%' })
+      .width( ConfigData.WH_100_100 )
+      .margin( { top : ConfigData.WH_3_100 } )
     }
-    .padding(15)
+    .padding( 15 )
   }
 }

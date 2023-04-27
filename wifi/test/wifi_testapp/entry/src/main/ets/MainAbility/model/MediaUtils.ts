@@ -13,9 +13,7 @@
  * limitations under the License.
  */
 
-/*
- mediaUtils of wifi test
- */
+// @ts-nocheck
 
 import image from '@ohos.multimedia.image'
 import fileio from '@ohos.fileio'
@@ -23,6 +21,10 @@ import prompt from '@ohos.prompt'
 import mediaLibrary from '@ohos.multimedia.mediaLibrary'
 import DateTimeUtil from './DateTimeUtil'
 import Logger from './Logger'
+
+/**
+ * mediaUtils of wifi test
+ */
 
 const TAG: string = '[MediaUtils]'
 

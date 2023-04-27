@@ -13,11 +13,9 @@
  * limitations under the License.
  */
 
-/*
- homepage of wifi test
- */
+// @ts-nocheck
 
-import { Category, TestData } from '../MainAbility/model/testData'
+import { Category , TestData } from '../MainAbility/model/testData'
 import { initTestData } from '../MainAbility/model/testDataModels'
 import { MainPageTitle } from '../Component/mainPageTitle';
 import { ManualApiTest } from '../Component/manualApiTestComponent';
@@ -26,36 +24,47 @@ import { AutoTest } from '../Component/autoTest';
 import { BenchmarkTest } from '../Component/benchmarkTest';
 import screenshot from '@ohos.screenshot'
 import image from '@ohos.multimedia.image'
-
+import ConfigData from '../Utils/ConfigData';
 import MediaUtils from '../MainAbility/model/MediaUtils'
 import Logger from '../MainAbility/model/Logger'
+
 const TAG = '[Screenshot]'
+
+/**
+ * homepage of wifi test
+ */
+
 @Component
 struct TestCategory {
   private testItems: TestData[]
+
   build() {
     Stack() {
       Tabs() {
         TabContent() {
-          ManualApiTest({ testItems: this.testItems.filter(item => (item.category === Category.API)) })
-        }.tabBar($r("app.string.api"))
+          ManualApiTest( { testItems : this.testItems.filter( item => ( item.category === Category.API ) ) } )
+        }.tabBar( $r( "app.string.api" ) )
 
         TabContent() {
-          AutoTest({ testItems: this.testItems.filter(item => (item.category === Category.AutoTest)) })
-        }.tabBar($r("app.string.autotest"))
+          AutoTest( { testItems : this.testItems.filter( item => ( item.category === Category.AutoTest ) ) } )
+        }.tabBar( $r( "app.string.autotest" ) )
 
         TabContent() {
-          ManualSceneTest({ testItems: this.testItems.filter(item => (item.category === Category.Scenario)) })
-        }.tabBar($r("app.string.scenario"))
+          ManualSceneTest( { testItems : this.testItems.filter( item => ( item.category === Category.Scenario ) ) } )
+        }.tabBar( $r( "app.string.scenario" ) )
 
         TabContent() {
-          BenchmarkTest ({ testItems: this.testItems.filter(item => (item.category === Category.BenchMark)) })
-        }.tabBar($r("app.string.benchmark"))
+          BenchmarkTest( { testItems : this.testItems.filter( item => ( item.category === Category.BenchMark ) ) } )
+        }.tabBar( $r( "app.string.benchmark" ) )
+
+        TabContent() {
+          BenchmarkTest( { testItems : this.testItems.filter( item => ( item.category === Category.Stress ) ) } )
+        }.tabBar( $r( "app.string.stress" ) )
       }
-      .barWidth("80%")
-      .barHeight(60)
-      .barMode(BarMode.Scrollable)
-      .backgroundColor($r("app.color.white"))
+      .barWidth( ConfigData.WH_80_100 )
+      .barHeight( 60 )
+      .barMode( BarMode.Scrollable )
+      .backgroundColor( $r( "app.color.white" ) )
     }
   }
 }
@@ -67,20 +76,20 @@ struct TestCategory {
 @Component
 struct HomePage {
   private testItems: TestData[] = initTestData()
+
   build() {
     Column() {
       MainPageTitle()
-      Stack({ alignContent: Alignment.TopEnd }) {
-        TestCategory({ testItems: this.testItems })
-        Image($r('app.media.Switch'))
-          .height(30)
-          .width(30)
-          .margin({ top: 15, right: 10 })
-          .onClick(() => {
-
-          })
+      Stack( { alignContent : Alignment.TopEnd } ) {
+        TestCategory( { testItems : this.testItems } )
+        Image( $r( 'app.media.Switch' ) )
+          .height( 30 )
+          .width( 30 )
+          .margin( { top : 15 , right : 10 } )
+          .onClick( () => {
+          } )
       }
-      .height('100%')
+      .height( ConfigData.WH_100_100 )
     }
   }
 }

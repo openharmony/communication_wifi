@@ -73,7 +73,7 @@ static void OnWpaConnectionRejectMock(int status)
 {
     LOGI("OnWpaConnectionRejectMock");
 }
-//AP
+
 static void OnStaJoinOrLeaveMock(const WifiApConnectionNofify &info)
 {
     LOGI("OnStaJoinOrLeaveMock");
@@ -83,7 +83,7 @@ static void OnApEnableOrDisableMock(int state)
 {
     LOGI("OnApEnableOrDisableMock");
 }
-//P2P
+
 static void OnConnectSupplicantMock(int status)
 {
     LOGI("OnConnectSupplicantMock");
@@ -132,16 +132,6 @@ static void OnGroupFormationSuccessMock()
 static void OnGroupFormationFailureMock(const std::string &reason)
 {
     LOGI("OnGroupFormationFailureMock");
-}
-
-static void OnGroupStartedMock(const IdlP2pGroupInfo &info)
-{
-    LOGI("OnGroupStartedMock");
-}
-
-static void OnGroupRemovedMock(const std::string &groupIfName, bool isGo)
-{
-    LOGI("OnGroupRemovedMock");
 }
 
 static void OnProvisionDiscoveryPbcRequestMock(const std::string &address)
@@ -332,10 +322,10 @@ HWTEST_F(WifiIdlInnerInterfaceTest, OnApEnableOrDisableTest, TestSize.Level1)
     LOGI("OnApEnableOrDisableTest enter");
     int status = 1;
     int id = 1;
-    OnApEnableOrDisable(status, id);
     IWifiApMonitorEventCallback callback;
     RegisterApCallbackMock(&callback);
     WifiApHalInterface::GetInstance().RegisterApEvent(callback);
+    OnApEnableOrDisable(status, id);
     UnRegisterApCallbackMock(&callback);
     WifiApHalInterface::GetInstance().RegisterApEvent(callback);
     OnApEnableOrDisable(status, id);
@@ -628,6 +618,8 @@ HWTEST_F(WifiIdlInnerInterfaceTest, OnP2pGroupRemovedTest, TestSize.Level1)
     LOGI("OnP2pGroupRemovedTest enter");
     char *groupIf = nullptr;
     int isGo = 1;
+    OnP2pGroupRemoved(groupIf, isGo);
+    char groupIfName[] = "P2pGroupRemoved";
     P2pHalCallback callback;
     RegisterP2pCallbackMock(&callback);
     WifiP2PHalInterface::GetInstance().RegisterP2pCallback(callback);

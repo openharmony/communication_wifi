@@ -14,6 +14,6 @@
  */
 
 export default class BaseModel {
-    constructor() {
-    }
+  constructor() {
+  }
 }

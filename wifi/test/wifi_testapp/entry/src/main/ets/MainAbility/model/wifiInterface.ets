@@ -15,739 +15,1184 @@
 
 // @ts-nocheck
 
-/**
- *Wifi api Test Page Of wifi test
- */
-
 import prompt from '@system.prompt';
 import Router from '@system.router';
 import wifi from '@ohos.wifi';
+import ConfigData from "../../Utils/ConfigData"
+import LogData from "../../Utils/LogData"
+import MessageData from "../../Utils/MessageData"
+
+/**
+ * Wifi api Test Page Of wifi test
+ */
 
 const PAGE_URI_WIFI_FOUND_MODE = '../subManualApiTest/subWifiTest/wifiFound';
 
 let wifiEnable = false
+
 export function testEnableWifi(): string {
-  let message = ($r('app.string.testEnableWifi'));
-  if (wifiEnable) {
-    message = ($r('app.string.wifi_enable'));
-  } else {
-    let ret = wifi.enableWifi();
-    if (ret) {
-      message ="WiFi使能执行结果：" + ret
+  try {
+    let message = ( MessageData.testEnableWifi );
+    console.log( LogData.testEnableWifi_StartLog )
+    if ( wifiEnable ) {
+      message = ( MessageData.testIsActive )
     } else {
-      message ="使能结果：" + ret + "\n"
-      message +="WiFi已打开或打开失败,请确认"
+      let ret = wifi.enableWifi();
+      if ( ret ) {
+        message = ( MessageData.testWifiEnableResult ) + ret
+      } else {
+        message = ( MessageData.testEnableResult ) + ret + "\n"
+        message += ( MessageData.testWifiEnableMaybe )
+      }
+      wifiEnable = true;
+      AppStorage.SetOrCreate( 'wifiIsOn' , wifiEnable );
     }
-    wifiEnable = true;
-    AppStorage.SetOrCreate('wifiIsOn', wifiEnable);
+    prompt.showToast( { message : message } )
+    console.log( LogData.testEnableWifi_EndLog )
+    return message
+  } catch( e ) {
+    console.log( `Failed to testEnableWifi. message: ${ e.message }, code: ${ e.code }` )
+    let message = `Failed to testEnableWifi. message: ${ e.message }, code: ${ e.code }`
+    prompt.showToast( { message : message } )
+    return message
   }
-  prompt.showToast({ message: message })
-  return message
 }
 
 export function testDisableWifi(): string {
-  let message = ($r('app.string.testDisableWifi'));
-  if (!wifiEnable) {
-    message =  ($r('app.string.wifi_disEnable'));
-  } else {
-    let ret = wifi.disableWifi();
-    if (ret) {
-      message ="WiFi去使能执行结果："+ ret
+  try {
+    let message = ( MessageData.testDisableWifi );
+    console.log( LogData.testDisableWifi_StartLog )
+    if ( !wifiEnable ) {
+      message = ( LogData.testIsInactive );
     } else {
-      message = "去使能结果："+ ret + "\n"
-      message += "WiFi已关闭或关闭失败,请确认"
+      let ret = wifi.disableWifi();
+      if ( ret ) {
+        message = ( MessageData.testWifiDisableResult ) + ret
+      } else {
+        message = ( MessageData.testDisableResult ) + ret + "\n"
+        message += ( MessageData.testWifiDisableMaybe )
+      }
+      wifiEnable = false;
+      AppStorage.SetOrCreate( 'wifiIsOn' , wifiEnable );
     }
-    wifiEnable = false;
-    AppStorage.SetOrCreate('wifiIsOn', wifiEnable);
+    prompt.showToast( { message : message } )
+    console.log( LogData.testDisableWifi_EndLog )
+    return message
+  } catch( e ) {
+    console.log( `Failed to testDisableWifi. message: ${ e.message }, code: ${ e.code }` )
+    let message = `Failed to testDisableWifi. message: ${ e.message }, code: ${ e.code }`
+    prompt.showToast( { message : message } )
+    return message
   }
-  prompt.showToast({ message: message })
-  return message
 }
 
 export function testIsWifiActive(): string {
-  let message = ($r('app.string.testIsWifiActive'));
-//  if (!wifiEnable) {
-//    message = 'WIFI还未使能';
-//  } else {
-  let ret = wifi.isWifiActive();
-  if(ret){
-    wifiEnable =true
-  }else{
-    wifiEnable =false
+  try {
+    let message = ( MessageData.testIsActive );
+    console.log( LogData.testIsWifiActive_StartLog )
+    let ret = wifi.isWifiActive();
+    if ( ret ) {
+      wifiEnable = true
+    } else {
+      wifiEnable = false
+    }
+    message = ( MessageData.testIsActiveResult ) + ret
+    prompt.showToast( { message : message } )
+    console.log( LogData.testIsWifiActive_EndLog )
+    return message
+  } catch( e ) {
+    console.log( `Failed to testIsWifiActive. message: ${ e.message }, code: ${ e.code }` )
+    let message = `Failed to testIsWifiActive. message: ${ e.message }, code: ${ e.code }`
+    prompt.showToast( { message : message } )
+    return message
   }
-  message = "wifi使能结果为："+ ret
-//  }
-  prompt.showToast({ message: message })
-  return message
 }
 
 export function testScan(): string {
-  let message = ($r('app.string.testScan'))
-  if (!wifiEnable) {
-    message = ($r('app.string.wifi_disEnable'));
-  } else {
-    let ret = wifi.scan()
-    message = "scan: " + ret
-    //    Router.push({ uri: PAGE_URI_WIFI_FOUND_MODE });
-    prompt.showToast({ message: message })
+  try {
+    let message = ( MessageData.testScan )
+    console.log( LogData.testScan_StartLog )
+    if ( !wifiEnable ) {
+      message = ( MessageData.testIsInactive );
+    } else {
+      let ret = wifi.scan()
+      message = ( MessageData.testScanResult ) + ret
+      prompt.showToast( { message : message } )
+    }
+    prompt.showToast( { message : message } )
+    console.log( LogData.testScan_EndLog )
+    return message
+  } catch( e ) {
+    console.log( `Failed to testScan. message: ${ e.message }, code: ${ e.code }` )
+    let message = `Failed to testScan. message: ${ e.message }, code: ${ e.code }`
+    prompt.showToast( { message : message } )
+    return message
   }
-  prompt.showToast({ message: message })
-  return message
+}
+
+export function testForcibleScan(): string {
+  try {
+    let message = ( MessageData.testForcibleScan )
+    console.log( LogData.testForcibleScan_StartLog )
+    let ret = wifi.scan()
+    message = ( MessageData.testForcibleScanResult ) + ret
+    prompt.showToast( { message : message } )
+    console.log( LogData.testForcibleScan_EndLog )
+    return message
+  } catch( e ) {
+    console.log( `Failed to testForcibleScan. message: ${ e.message }, code: ${ e.code }` )
+    let message = `Failed to testForcibleScan. message: ${ e.message }, code: ${ e.code }`
+    prompt.showToast( { message : message } )
+    return message
+  }
 }
 
 export function testGetScanInfosPromise(): string {
-  let message = ($r('app.string.testGetScanInfosPromise'))
-  if (!wifiEnable) {
-    message = ($r('app.string.wifi_disEnable'));
-  } else {
-    wifi.getScanInfos().then(result => {
-      let len = Object.keys(result).length;
-      console.log("wifi received scan info: -" + len);
-      for (let i = 0; i < len; ++i) {
-        console.info("ssid: " + result[i].ssid);
-        console.info("bssid: " + result[i].bssid);
-        console.info("capabilities: " + result[i].capabilities);
-        console.info("securityType: " + result[i].securityType);
-        console.info("rssi: " + result[i].rssi);
-        console.info("band: " + result[i].band);
-        console.info("frequency: " + result[i].frequency);
-        console.info("channelWidth: " + result[i].channelWidth);
-        console.info("timestamp: " + result[i].timestamp);
-      }
-      console.info("getScanInfos promise successful")
-      message = "WifiScanInfo: " + JSON.stringify(result)
-      prompt.showToast({ message: message })
-    });
+  try {
+    let message = ( MessageData.testGetScanInfosPromise )
+    console.log( LogData.testGetScanInfosPromise_StartLog )
+    if ( !wifiEnable ) {
+      message = ( MessageData.testIsInactive );
+    } else {
+      wifi.getScanInfos().then( result => {
+        let len = Object.keys( result ).length;
+        console.log( LogData.testGetScanInfos_infoLog + len );
+        for ( let i = 0 ; i < len ; ++i ) {
+          console.log( "ssid: " + result[i].ssid );
+          console.log( "bssid: " + result[i].bssid );
+          console.log( "capabilities: " + result[i].capabilities );
+          console.log( "securityType: " + result[i].securityType );
+          console.log( "rssi: " + result[i].rssi );
+          console.log( "band: " + result[i].band );
+          console.log( "frequency: " + result[i].frequency );
+          console.log( "channelWidth: " + result[i].channelWidth );
+          console.log( "timestamp: " + result[i].timestamp );
+        }
+        console.log( LogData.testGetScanInfosPromise_successfulLog )
+        message = ( MessageData.testGetScanInfo ) + JSON.stringify( result )
+        prompt.showToast( { message : message } )
+        console.log( LogData.testGetScanInfosPromise_EndLog )
+      } ).catch( error => {
+        console.log( "testGetScanInfosPromise error:" + error )
+      } )
+    }
+    prompt.showToast( { message : message } )
+    return message
+  } catch( e ) {
+    console.log( `Failed to testGetScanInfosPromise. message: ${ e.message }, code: ${ e.code }` )
+    let message = `Failed to testGetScanInfosPromise. message: ${ e.message }, code: ${ e.code }`
+    prompt.showToast( { message : message } )
+    return message
   }
-  prompt.showToast({ message: message })
-  return message
 }
 
 export function testGetScanInfosCallback(): string {
-  let message = ($r('app.string.testGetScanInfosCallback'))
-  if (!wifiEnable) {
-    message =($r('app.string.wifi_disEnable'));
-  } else {
-    wifi.getScanInfos((err, result) => {
-      if (err) {
-        console.error("get scan info error");
-        return;
-      }
-      let len = Object.keys(result).length;
-      console.log("wifi received scan info: " + len);
-      for (let i = 0; i < len; ++i) {
-        console.info("ssid: " + result[i].ssid);
-        console.info("bssid: " + result[i].bssid);
-        console.info("capabilities: " + result[i].capabilities);
-        console.info("securityType: " + result[i].securityType);
-        console.info("rssi: " + result[i].rssi);
-        console.info("band: " + result[i].band);
-        console.info("frequency: " + result[i].frequency);
-        console.info("channelWidth: " + result[i].channelWidth);
-        console.info("timestamp: " + result[i].timestamp);
-      }
-      console.info("getScanInfos callback successful")
-      message = "WifiScanInfo: " + JSON.stringify(result)
-      let getScanInfoMessage = JSON.stringify(result)
-      AppStorage.SetOrCreate("getScanInfoMessage",getScanInfoMessage)
-      prompt.showToast({ message: message })
-    });
+  try {
+    let message = ( MessageData.testGetScanInfosCallback )
+    console.log( LogData.testGetScanInfosCallback_StartLog )
+    if ( !wifiEnable ) {
+      message = ( MessageData.testIsInactive );
+    } else {
+      wifi.getScanInfos( ( err , result ) => {
+        if ( err ) {
+          console.error( "get scan info error" );
+          return;
+        }
+        let len = Object.keys( result ).length;
+        console.log( LogData.testGetScanInfos_infoLog + len )
+        for ( let i = 0 ; i < len ; ++i ) {
+          console.log( "ssid: " + result[i].ssid );
+          console.log( "bssid: " + result[i].bssid );
+          console.log( "capabilities: " + result[i].capabilities );
+          console.log( "securityType: " + result[i].securityType );
+          console.log( "rssi: " + result[i].rssi );
+          console.log( "band: " + result[i].band );
+          console.log( "frequency: " + result[i].frequency );
+          console.log( "channelWidth: " + result[i].channelWidth );
+          console.log( "timestamp: " + result[i].timestamp );
+        }
+        console.log( LogData.testGetScanInfosCallback_successfulLog )
+        message = ( MessageData.testGetScanInfo ) + JSON.stringify( result )
+        let getScanInfoMessage = JSON.stringify( result )
+        AppStorage.SetOrCreate( "getScanInfoMessage" , getScanInfoMessage )
+        prompt.showToast( { message : message } )
+        console.log( LogData.testGetScanInfosCallback_EndLog )
+      } );
+    }
+    prompt.showToast( { message : message } )
+    return message
+  } catch( e ) {
+    console.log( `Failed to testGetScanInfosCallback. message: ${ e.message }, code: ${ e.code }` )
+    let message = `Failed to testGetScanInfosCallback. message: ${ e.message }, code: ${ e.code }`
+    prompt.showToast( { message : message } )
+    return message
   }
-  prompt.showToast({ message: message })
-  return message
 }
 
+//TODO: 设备调试时候需要打开
+//let ssid = "TP-LINK_6365"
+//let bssid = "6C:B1:58:75:63:65"
+//let preSharedKey = "kaihong123"
+//let isHiddenSsid = false
+//let securityType = 3
+//let creatorUid = 1
+//let disableReason = 0
+//let netId = 0
+//let randomMacType = 0
+//let randomMacAddr = "08:fb:ea:1b:38:aa"
+//let ipType = 1
+//let staticIp_ipAddress = 3232235880
+//let staticIp_gateway = 3232235777
+//let staticIp_dnsServers = 3716386629
+//let staticIp_domains = [ "0", "1", "2" ]
+//
+//let staticIp = {
+//  ipAddress : staticIp_ipAddress ,
+//  gateway : staticIp_gateway ,
+//  dnsServers : staticIp_dnsServers ,
+//  domains : staticIp_domains
+//}
+//
+//let wifiDeviceConfig = {
+//  ssid : ssid ,
+//  bssid : bssid ,
+//  preSharedKey : preSharedKey ,
+//  isHiddenSsid : isHiddenSsid ,
+//  securityType : securityType ,
+//  creatorUid : creatorUid ,
+//  disableReason : disableReason ,
+//  netId : netId ,
+//  randomMacType : randomMacType ,
+//  randomMacAddr : randomMacAddr ,
+//  ipType : ipType ,
+//  staticIp : staticIp
+//}
+//AppStorage.SetOrCreate( "wifiDeviceConfig" , wifiDeviceConfig )
+
 export function testAddDeviceConfigPromise(): string {
-  let message = ($r('app.string.testAddDeviceConfigPromise'))
-  let ssid = AppStorage.Get("ssid")
-  let bssid = AppStorage.Get("bssid")
-  let preSharedKey = AppStorage.Get("preSharedKey")
-  let isHiddenSsid = AppStorage.Get("isHiddenSsid")
-  let securityType = AppStorage.Get("securityType")
-  let creatorUid = AppStorage.Get("creatorUid")
-  let disableReason = AppStorage.Get("disableReason")
-  let netId = AppStorage.Get("netId")
-  let randomMacType = AppStorage.Get("randomMacType")
-  let randomMacAddr = AppStorage.Get("randomMacAddr")
-  let ipType = AppStorage.Get("ipType")
-  let staticIp_ipAddress = AppStorage.Get("staticIp_ipAddress")
-  let staticIp_gateway = AppStorage.Get("staticIp_gateway")
-  let staticIp_dnsServers = AppStorage.Get("staticIp_dnsServers")
-  let staticIp_domains = AppStorage.Get("staticIp_domains")
-  let staticIp = {
-    ipAddress: staticIp_ipAddress,
-    gateway: staticIp_gateway,
-    dnsServers: staticIp_dnsServers,
-    domains: staticIp_domains
+  try {
+    let message = ( MessageData.testAddDeviceConfigPromise )
+    console.log( LogData.testAddDeviceConfigPromise_StartLog )
+    let ssid = AppStorage.Get( "ssid" )
+    let bssid = AppStorage.Get( "bssid" )
+    let preSharedKey = AppStorage.Get( "preSharedKey" )
+    let isHiddenSsid = AppStorage.Get( "isHiddenSsid" )
+    let securityType = AppStorage.Get( "securityType" )
+    let creatorUid = AppStorage.Get( "creatorUid" )
+    let disableReason = AppStorage.Get( "disableReason" )
+    let netId = AppStorage.Get( "netId" )
+    let randomMacType = AppStorage.Get( "randomMacType" )
+    let randomMacAddr = AppStorage.Get( "randomMacAddr" )
+    let ipType = AppStorage.Get( "ipType" )
+    let staticIp_ipAddress = AppStorage.Get( "staticIp_ipAddress" )
+    let staticIp_gateway = AppStorage.Get( "staticIp_gateway" )
+    let staticIp_dnsServers = AppStorage.Get( "staticIp_dnsServers" )
+    let staticIp_domains = AppStorage.Get( "staticIp_domains" )
+
+    //TODO: 设备调试时候需要打开
+    //    let ssid = "TP-LINK_6365"
+    //    let bssid = "6C:B1:58:75:63:65"
+    //    let preSharedKey = "kaihong123"
+    //    let isHiddenSsid = false
+    //    let securityType = 3
+    //    let creatorUid = 1
+    //    let disableReason = 0
+    //    let netId = 0
+    //    let randomMacType = 0
+    //    let randomMacAddr = "08:fb:ea:1b:38:aa"
+    //    let ipType = 1
+    //    let staticIp_ipAddress = 3232235880
+    //    let staticIp_gateway = 3232235777
+    //    let staticIp_dnsServers = 3716386629
+    //    let staticIp_domains = ["0","1","2"]
+    let staticIp = {
+      ipAddress : staticIp_ipAddress ,
+      gateway : staticIp_gateway ,
+      dnsServers : staticIp_dnsServers ,
+      domains : staticIp_domains
+    }
+    let wifiDeviceConfig = {
+      ssid : ssid ,
+      bssid : bssid ,
+      preSharedKey : preSharedKey ,
+      isHiddenSsid : isHiddenSsid ,
+      securityType : securityType ,
+      creatorUid : creatorUid ,
+      disableReason : disableReason ,
+      netId : netId ,
+      randomMacType : randomMacType ,
+      randomMacAddr : randomMacAddr ,
+      ipType : ipType ,
+      staticIp : staticIp
+    }
+    AppStorage.SetOrCreate( "wifiDeviceConfig" , wifiDeviceConfig )
+    if ( !wifiEnable ) {
+      message = ( MessageData.testIsInactive );
+    } else {
+      wifi.addDeviceConfig( wifiDeviceConfig ).then( result => {
+        //  @returns Returns {@code networkId} if the configuration is added; returns {@code -1} otherwise.
+        console.log( LogData.testAddDeviceConfigPromise_successfulLog )
+        console.log( LogData.testAddDeviceConfigLog + result )
+        message = ( MessageData.testAddDeviceConfig ) + result
+        prompt.showToast( { message : message } )
+        console.log( LogData.testAddDeviceConfigPromise_EndLog )
+      } ).catch( error => {
+        console.log( "testAddDeviceConfigPromise error:" + error );
+      } )
+    }
+    prompt.showToast( { message : message } )
+    return message
+  } catch( e ) {
+    console.log( `Failed to testAddDeviceConfigPromise. message: ${ e.message }, code: ${ e.code }` )
+    let message = `Failed to testAddDeviceConfigPromise. message: ${ e.message }, code: ${ e.code }`
+    prompt.showToast( { message : message } )
+    return message
   }
-  let wifiDeviceConfig = {
-    ssid: ssid,
-    bssid: bssid,
-    preSharedKey: preSharedKey,
-    isHiddenSsid: isHiddenSsid,
-    securityType: securityType,
-    creatorUid: creatorUid,
-    disableReason: disableReason,
-    netId: netId,
-    randomMacType: randomMacType,
-    randomMacAddr: randomMacAddr,
-    ipType: ipType,
-    staticIp: staticIp
-  }
-  AppStorage.SetOrCreate("wifiDeviceConfig",wifiDeviceConfig)
-  if (!wifiEnable) {
-    message = ($r('app.string.wifi_disEnable'));
-  } else {
-    wifi.addDeviceConfig(wifiDeviceConfig).then(result => {
-//  @returns Returns {@code networkId} if the configuration is added; returns {@code -1} otherwise.
-      console.info("addDeviceConfig promise successful")
-      message = "addDeviceConfig: " + result
-      prompt.showToast({ message: message })
-    });
-  }
-  prompt.showToast({ message: message })
-  return message
 }
 
 export function testAddDeviceConfigCallback(): string {
-  let message = ($r('app.string.testAddDeviceConfigCallback'))
-  if (!wifiEnable) {
-    message = ($r('app.string.wifi_disEnable'));
-  } else {
-    let wifiDeviceConfig =AppStorage.Get("wifiDeviceConfig")
-    wifi.addDeviceConfig(wifiDeviceConfig, (err, result) => {
-//  @returns Returns {@code networkId} if the configuration is added; returns {@code -1} otherwise.
-      if (err) {
-        console.error("addDeviceConfigCallback error:" + err);
-        return;
-      }
-      console.info("addDeviceConfig Callback successful")
-      message = "addDeviceConfig: " + result
-      prompt.showToast({ message: message })
-    });
+  try {
+    let message = ( MessageData.testAddDeviceConfigCallback )
+    console.log( LogData.testAddDeviceConfigCallback_StartLog )
+
+    //TODO: 设备调试时候需要打开
+    //  let ssid = AppStorage.Get("ssid")
+    //  let bssid = AppStorage.Get("bssid")
+    //  let preSharedKey = AppStorage.Get("preSharedKey")
+    //  let isHiddenSsid = AppStorage.Get("isHiddenSsid")
+    //  let securityType = AppStorage.Get("securityType")
+    //  let creatorUid = AppStorage.Get("creatorUid")
+    //  let disableReason = AppStorage.Get("disableReason")
+    //  let netId = AppStorage.Get("netId")
+    //  let randomMacType = AppStorage.Get("randomMacType")
+    //  let randomMacAddr = AppStorage.Get("randomMacAddr")
+    //  let ipType = AppStorage.Get("ipType")
+    //  let staticIp_ipAddress = AppStorage.Get("staticIp_ipAddress")
+    //  let staticIp_gateway = AppStorage.Get("staticIp_gateway")
+    //  let staticIp_dnsServers = AppStorage.Get("staticIp_dnsServers")
+    //  let staticIp_domains = AppStorage.Get("staticIp_domains")
+    //  let staticIp = {
+    //    ipAddress: staticIp_ipAddress,
+    //    gateway: staticIp_gateway,
+    //    dnsServers: staticIp_dnsServers,
+    //    domains: staticIp_domains
+    //  }
+    //  let wifiDeviceConfig = {
+    //    ssid: ssid,
+    //    bssid: bssid,
+    //    preSharedKey: preSharedKey,
+    //    isHiddenSsid: isHiddenSsid,
+    //    securityType: securityType,
+    //    creatorUid: creatorUid,
+    //    disableReason: disableReason,
+    //    netId: netId,
+    //    randomMacType: randomMacType,
+    //    randomMacAddr: randomMacAddr,
+    //    ipType: ipType,
+    //    staticIp: staticIp
+    //  }
+    AppStorage.SetOrCreate( "wifiDeviceConfig" , wifiDeviceConfig )
+
+    if ( !wifiEnable ) {
+      message = ( MessageData.testIsInactive )
+    } else {
+      let wifiDeviceConfig = AppStorage.Get( "wifiDeviceConfig" )
+      wifi.addDeviceConfig( wifiDeviceConfig , ( err , result ) => {
+        //  @returns Returns {@code networkId} if the configuration is added; returns {@code -1} otherwise.
+        if ( err ) {
+          console.error( "addDeviceConfigCallback error:" + err );
+          return;
+        }
+        console.log( LogData.testAddDeviceConfigCallback_successfulLog )
+        console.log( LogData.testAddDeviceConfigLog + result )
+        message = ( MessageData.testAddDeviceConfig ) + result
+        prompt.showToast( { message : message } )
+        console.log( LogData.testAddDeviceConfigCallback_EndLog )
+      } );
+    }
+    prompt.showToast( { message : message } )
+    return message
+  } catch( e ) {
+    console.log( `Failed to testAddDeviceConfigCallback. message: ${ e.message }, code: ${ e.code }` )
+    let message = `Failed to testAddDeviceConfigCallback. message: ${ e.message }, code: ${ e.code }`
+    prompt.showToast( { message : message } )
+    return message
   }
-  prompt.showToast({ message: message })
-  return message
 }
 
 export function testAddUntrustedConfigPromise(): string {
-  let message =  ($r('app.string.testAddUntrustedConfigPromise'))
-  if (!wifiEnable) {
-    message = ($r('app.string.wifi_disEnable'));
-  } else {
-    let wifiDeviceConfig =AppStorage.Get("wifiDeviceConfig")
-    wifi.addUntrustedConfig(wifiDeviceConfig).then(result => {
-//  @returns Returns {@code true} if the untrusted hotspot configuration is added, returns {@code false} otherwise.
-      console.info("addUntrustedConfig: " + result)
-      console.info("addUntrustedConfig promise successful")
-      message = "addUntrustedConfig: " + result
-      prompt.showToast({ message: message })
-    })
+  try {
+    let message = ( MessageData.testAddUntrustedConfigPromise )
+    console.log( LogData.testAddUntrustedConfigPromise_StartLog )
+    if ( !wifiEnable ) {
+      message = ( MessageData.testIsInactive )
+    } else {
+      let wifiDeviceConfig = AppStorage.Get( "wifiDeviceConfig" )
+      wifi.addUntrustedConfig( wifiDeviceConfig ).then( result => {
+        //  @returns Returns {@code true} if the untrusted hotspot configuration is added, returns {@code false} otherwise.
+        console.log( LogData.testAddUntrustedConfigPromise_successfulLog )
+        console.log( LogData.testAddUntrustedConfigLog + result )
+        message = ( MessageData.testAddUntrustedConfig ) + result
+        prompt.showToast( { message : message } )
+        console.log( LogData.testAddUntrustedConfigPromise_EndLog )
+      } ).catch( error => {
+        console.log( "testAddUntrustedConfigPromise error:" + error )
+      } )
+    }
+    prompt.showToast( { message : message } )
+    return message
+  } catch( e ) {
+    console.log( `Failed to testAddUntrustedConfigPromise. message: ${ e.message }, code: ${ e.code }` )
+    let message = `Failed to testAddUntrustedConfigPromise. message: ${ e.message }, code: ${ e.code }`
+    prompt.showToast( { message : message } )
+    return message
   }
-  prompt.showToast({ message: message })
-  return message
 }
 
 export function testAddUntrustedConfigCallback(): string {
-  let message =  ($r('app.string.testAddUntrustedConfigCallback'))
-  if (!wifiEnable) {
-    message =($r('app.string.wifi_disEnable'));
-  } else {
-    let wifiDeviceConfig =AppStorage.Get("wifiDeviceConfig")
-    wifi.addUntrustedConfig(wifiDeviceConfig, (err, result) => {
-//  @returns Returns {@code true} if the untrusted hotspot configuration is added, returns {@code false} otherwise.
-      if (err) {
-        console.error("AddUntrustedConfigCallback error");
-        return;
-      }
-      console.info("addUntrustedConfig: " + result)
-      console.info("addUntrustedConfig Callback successful")
-      message = "addUntrustedConfig: " + result
-      prompt.showToast({ message: message })
-    })
+  try {
+    let message = ( MessageData.testAddUntrustedConfigCallback )
+    console.log( LogData.testAddUntrustedConfigCallback_StartLog )
+    if ( !wifiEnable ) {
+      message = ( MessageData.testIsInactive )
+    } else {
+      let wifiDeviceConfig = AppStorage.Get( "wifiDeviceConfig" )
+      wifi.addUntrustedConfig( wifiDeviceConfig , ( err , result ) => {
+        //  @returns Returns {@code true} if the untrusted hotspot configuration is added, returns {@code false} otherwise.
+        if ( err ) {
+          console.error( "AddUntrustedConfigCallback error" );
+          return;
+        }
+        console.log( LogData.testAddUntrustedConfigCallback_successfulLog )
+        console.log( LogData.testAddUntrustedConfigLog + result )
+        message = ( MessageData.testAddUntrustedConfig ) + result
+        prompt.showToast( { message : message } )
+        console.log( LogData.testAddUntrustedConfigCallback_EndLog )
+      } )
+    }
+    prompt.showToast( { message : message } )
+    return message
+  } catch( e ) {
+    console.log( `Failed to testAddUntrustedConfigCallback. message: ${ e.message }, code: ${ e.code }` )
+    let message = `Failed to testAddUntrustedConfigCallback. message: ${ e.message }, code: ${ e.code }`
+    prompt.showToast( { message : message } )
+    return message
   }
-  prompt.showToast({ message: message })
-  return message
 }
 
 export function testRemoveUntrustedConfigPromise(): string {
-  let message = ($r('app.string.testRemoveUntrustedConfigPromise'))
-  if (!wifiEnable) {
-    message = ($r('app.string.wifi_disEnable'))
-  } else {
-    let wifiDeviceConfig =AppStorage.Get("wifiDeviceConfig")
-    wifi.removeUntrustedConfig(wifiDeviceConfig).then(result => {
-//  @returns Returns {@code true} if the untrusted hotspot configuration is removed, returns {@code false} otherwise.
-      console.info("removeUntrustedConfig: " + result)
-      console.info("removeUntrustedConfig promise successful")
-      message = "removeUntrustedConfig: "+ result
-      prompt.showToast({ message: message })
-    })
+  try {
+    let message = ( MessageData.testRemoveUntrustedConfigPromise )
+    console.log( LogData.testRemoveUntrustedConfigPromise_StartLog )
+    if ( !wifiEnable ) {
+      message = ( MessageData.testIsInactive )
+    } else {
+      let wifiDeviceConfig = AppStorage.Get( "wifiDeviceConfig" )
+      wifi.removeUntrustedConfig( wifiDeviceConfig ).then( result => {
+        //  @returns Returns {@code true} if the untrusted hotspot configuration is removed, returns {@code false} otherwise.
+        console.log( LogData.testRemoveUntrustedConfigLog + result )
+        console.log( LogData.testRemoveUntrustedConfigPromise_successfulLog )
+        message = ( MessageData.testRemoveUntrustedConfig ) + result
+        prompt.showToast( { message : message } )
+        console.log( LogData.testRemoveUntrustedConfigPromise_EndLog )
+      } ).catch( error => {
+        console.log( "testRemoveUntrustedConfigPromise error:" + error )
+      } )
+    }
+    prompt.showToast( { message : message } )
+    return message
+  } catch( e ) {
+    console.log( `Failed to testRemoveUntrustedConfigPromise. message: ${ e.message }, code: ${ e.code }` )
+    let message = `Failed to testRemoveUntrustedConfigPromise. message: ${ e.message }, code: ${ e.code }`
+    prompt.showToast( { message : message } )
+    return message
   }
-  prompt.showToast({ message: message })
-  return message
 }
 
 export function testRemoveUntrustedConfigCallback(): string {
-  let message = ($r('app.string.testRemoveUntrustedConfigCallback'))
-  if (!wifiEnable) {
-    message =($r('app.string.wifi_disEnable'));
-  } else {
-    let wifiDeviceConfig =AppStorage.Get("wifiDeviceConfig")
-    wifi.removeUntrustedConfig(wifiDeviceConfig, (err, result) => {
-//  @returns Returns {@code true} if the untrusted hotspot configuration is removed, returns {@code false} otherwise.
-      if (err) {
-        console.error("removeUntrustedConfigCallback error");
-        return;
-      }
-      console.info("removeUntrustedConfig: " + result)
-      console.info("removeUntrustedConfig Callback successful")
-      message = "removeUntrustedConfig: " + result
-      prompt.showToast({ message: message })
-    })
+  try {
+    let message = ( MessageData.testRemoveUntrustedConfigCallback )
+    console.log( LogData.testRemoveUntrustedConfigCallback_StartLog )
+    if ( !wifiEnable ) {
+      message = ( MessageData.testIsInactive )
+    } else {
+      let wifiDeviceConfig = AppStorage.Get( "wifiDeviceConfig" )
+      wifi.removeUntrustedConfig( wifiDeviceConfig , ( err , result ) => {
+        //  @returns Returns {@code true} if the untrusted hotspot configuration is removed, returns {@code false} otherwise.
+        if ( err ) {
+          console.error( "removeUntrustedConfigCallback error" );
+          return;
+        }
+        console.log( LogData.testRemoveUntrustedConfigLog + result )
+        console.log( LogData.testRemoveUntrustedConfigCallback_successfulLog )
+        message = ( MessageData.testRemoveUntrustedConfig ) + result
+        prompt.showToast( { message : message } )
+        console.log( LogData.testRemoveUntrustedConfigCallback_EndLog )
+      } )
+    }
+    prompt.showToast( { message : message } )
+    return message
+  } catch( e ) {
+    console.log( `Failed to testRemoveUntrustedConfigCallback. message: ${ e.message }, code: ${ e.code }` )
+    let message = `Failed to testRemoveUntrustedConfigCallback. message: ${ e.message }, code: ${ e.code }`
+    prompt.showToast( { message : message } )
+    return message
   }
-  prompt.showToast({ message: message })
-  return message
 }
 
 export function testConnectToNetwork(): string {
-  let message = ($r('app.string.testConnectToNetwork'))
-  let networkId = AppStorage.Get("networkId")
-  if (!wifiEnable) {
-    message = ($r('app.string.wifi_disEnable'));
-  } else {
-    let ret = wifi.connectToNetwork(networkId)
-    message = "ConnectToNetwork: " + ret
+  try {
+    let message = ( MessageData.testConnectToNetwork )
+    console.log( LogData.testConnectToNetwork_StartLog )
+    let networkId = AppStorage.Get( "networkId" )
+    if ( !wifiEnable ) {
+      message = ( MessageData.testIsInactive )
+    } else {
+      let ret = wifi.connectToNetwork( networkId )
+      message = "ConnectToNetwork: " + ret
+    }
+    prompt.showToast( { message : message } )
+    console.log( LogData.testConnectToNetwork_EndLog )
+    return message
+  } catch( e ) {
+    console.log( `Failed to testConnectToNetwork. message: ${ e.message }, code: ${ e.code }` )
+    let message = `Failed to testConnectToNetwork. message: ${ e.message }, code: ${ e.code }`
+    prompt.showToast( { message : message } )
+    return message
   }
-  prompt.showToast({ message: message })
-  return message
 }
 
 export function testConnectToDevice(): string {
-  let message =  ($r('app.string.testConnectToDevice'))
-  if (!wifiEnable) {
-    message = ($r('app.string.wifi_disEnable'));
-  } else {
-    let wifiDeviceConfig =AppStorage.Get("wifiDeviceConfig")
-    let ret = wifi.connectToDevice(wifiDeviceConfig)
-    message = "ConnectToDevice: " + ret
+  try {
+    let message = ( MessageData.testConnectToDevice )
+    console.log( LogData.testConnectToDevice_StartLog )
+    if ( !wifiEnable ) {
+      message = ( MessageData.testIsInactive )
+    } else {
+      let wifiDeviceConfig = AppStorage.Get( "wifiDeviceConfig" )
+      let ret = wifi.connectToDevice( wifiDeviceConfig )
+      message = "ConnectToDevice: " + ret
+    }
+    prompt.showToast( { message : message } )
+    console.log( LogData.testConnectToDevice_EndLog )
+    return message
+  } catch( e ) {
+    console.log( `Failed to testConnectToDevice. message: ${ e.message }, code: ${ e.code }` )
+    let message = `Failed to testConnectToDevice. message: ${ e.message }, code: ${ e.code }`
+    prompt.showToast( { message : message } )
+    return message
   }
-  prompt.showToast({ message: message })
-  return message
 }
 
 export function testDisconnect(): string {
-  let message = ($r('app.string.testDisconnect'))
-  if (!wifiEnable) {
-    message = ($r('app.string.wifi_disEnable'));
-  } else {
-    let ret = wifi.disconnect()
-    message = "disconnect: " + ret
+  try {
+    let message = ( MessageData.testDisconnect )
+    console.log( LogData.testDisconnect_StartLog )
+    if ( !wifiEnable ) {
+      message = ( MessageData.testIsInactive )
+    } else {
+      let ret = wifi.disconnect()
+      message = "disconnect: " + ret
+    }
+    prompt.showToast( { message : message } )
+    console.log( LogData.testDisconnect_EndLog )
+    return message
+  } catch( e ) {
+    console.log( `Failed to testDisconnect. message: ${ e.message }, code: ${ e.code }` )
+    let message = `Failed to testDisconnect. message: ${ e.message }, code: ${ e.code }`
+    prompt.showToast( { message : message } )
+    return message
   }
-  prompt.showToast({ message: message })
-  return message
 }
 
 export function testGetSignalLevel(): string {
-  let message = ($r('app.string.testDisconnect'))
-  if (!wifiEnable) {
-    message = ($r('app.string.wifi_disEnable'));
-  } else {
-    let rssi = AppStorage.Get("rssi")
-    let band = AppStorage.Get("band")
-    let number = wifi.getSignalLevel(rssi, band)
-    message = "getSignalLevel is: " + number
+  try {
+    let message = ( MessageData.testGetSignalLevel )
+    console.log( LogData.testGetSignalLevel_StartLog )
+    if ( !wifiEnable ) {
+      message = ( MessageData.testIsInactive )
+    } else {
+      let rssi = AppStorage.Get( "rssi" )
+      let band = AppStorage.Get( "band" )
+      let number = wifi.getSignalLevel( rssi , band )
+      message = "getSignalLevel is: " + number
+    }
+    prompt.showToast( { message : message } )
+    console.log( LogData.testGetSignalLevel_EndLog )
+    return message
+  } catch( e ) {
+    console.log( `Failed to testGetSignalLevel. message: ${ e.message }, code: ${ e.code }` )
+    let message = `Failed to testGetSignalLevel. message: ${ e.message }, code: ${ e.code }`
+    prompt.showToast( { message : message } )
+    return message
   }
-  prompt.showToast({ message: message })
-  return message
 }
 
 export function testGetLinkedInfoPromise(): string {
-  let message = ($r('app.string.testGetLinkedInfoPromise'))
-  if (!wifiEnable) {
-    message = ($r('app.string.wifi_disEnable'));
-  } else {
-    wifi.getLinkedInfo().then(data => {
-      console.info("getLinkedInfoPromise test successful")
-      message = "get wifi linked info: "+ JSON.stringify(data)
-      console.info("get wifi linked info: " + JSON.stringify(data));
-    }).catch(error => {
-      console.info("get linked info error");
-    });
+  try {
+    let message = ( MessageData.testGetLinkedInfoPromise )
+    console.log( LogData.testGetLinkedInfoPromise_StartLog );
+    if ( !wifiEnable ) {
+      message = ( MessageData.testIsInactive )
+    } else {
+      wifi.getLinkedInfo().then( data => {
+        console.log( LogData.testGetLinkedInfoPromise_successful )
+        message = "get wifi linked info: " + JSON.stringify( data )
+        console.log( "get wifi linked info: " + JSON.stringify( data ) );
+        prompt.showToast( { message : message } )
+        console.log( LogData.testGetLinkedInfoPromise_EndLog );
+      } ).catch( error => {
+        console.log( "get linked info error" );
+        console.log( "error:" + error )
+      } );
+    }
+    prompt.showToast( { message : message } )
+    return message
+  } catch( e ) {
+    console.log( `Failed to testGetLinkedInfoPromise. message: ${ e.message }, code: ${ e.code }` )
+    let message = `Failed to testGetLinkedInfoPromise. message: ${ e.message }, code: ${ e.code }`
+    prompt.showToast( { message : message } )
+    return message
   }
-  prompt.showToast({ message: message })
-  return message
 }
 
 export function testGetLinkedInfoCallback(): string {
-  let message =  ($r('app.string.testGetLinkedInfoCallback'))
-  if (!wifiEnable) {
-    message = ($r('app.string.wifi_disEnable'));
-  } else {
-    wifi.getLinkedInfo((err, data) => {
-      if (err) {
-        console.error("get linked info error");
-        message = "get linked info error"
-        prompt.showToast({ message: message })
-      }
-      console.info("getLinkedInfoCallback test successful")
-      console.info("get wifi linked info: " + JSON.stringify(data));
-      message = "get wifi linked info: " + JSON.stringify(data)
-      let linkedInfoMessage = JSON.stringify(data)
-      AppStorage.SetOrCreate("linkedInfoMessage", linkedInfoMessage)
-      let rssi =data.rssi
-      let band =data.band
-      let networkId =data.networkId
-      AppStorage.SetOrCreate("rssi",rssi)
-      AppStorage.SetOrCreate("band",band)
-      AppStorage.SetOrCreate("networkId",networkId)
-      prompt.showToast({ message: message })
-    });
+  try {
+    let message = ( MessageData.testGetLinkedInfoCallback )
+    console.log( LogData.testGetLinkedInfoCallback_StartLog );
+    if ( !wifiEnable ) {
+      message = ( MessageData.testIsInactive )
+    } else {
+      wifi.getLinkedInfo( ( err , data ) => {
+        if ( err ) {
+          console.error( "get linked info error" );
+          message = "get linked info error"
+          prompt.showToast( { message : message } )
+        }
+        console.log( LogData.testGetLinkedInfoCallback_successful )
+        console.log( "get wifi linked info: " + JSON.stringify( data ) );
+        message = "get wifi linked info: " + JSON.stringify( data )
+        let linkedInfoMessage = JSON.stringify( data )
+        AppStorage.SetOrCreate( "linkedInfoMessage" , linkedInfoMessage )
+        let rssi = data.rssi
+        let band = data.band
+        let networkId = data.networkId
+        AppStorage.SetOrCreate( "rssi" , rssi )
+        AppStorage.SetOrCreate( "band" , band )
+        AppStorage.SetOrCreate( "networkId" , networkId )
+        prompt.showToast( { message : message } )
+        console.log( LogData.testGetLinkedInfoCallback_EndLog );
+      } )
+    }
+    prompt.showToast( { message : message } )
+    return message
+  } catch( e ) {
+    console.log( `Failed to testGetLinkedInfoCallback. message: ${ e.message }, code: ${ e.code }` )
+    let message = `Failed to testGetLinkedInfoCallback. message: ${ e.message }, code: ${ e.code }`
+    prompt.showToast( { message : message } )
+    return message
   }
-  prompt.showToast({ message: message })
-  return message
 }
 
 export function testIsConnected(): string {
-  let message = ($r('app.string.testIsConnected'))
-  if(!wifiEnable){
-    message =($r('app.string.wifi_disEnable'));
-  }else {
-    let ret = wifi.isConnected()
-    message = "isConnected: " + ret
+  try {
+    let message = ( MessageData.testIsConnected )
+    console.log( LogData.testIsConnected_StartLog );
+    if ( !wifiEnable ) {
+      message = ( MessageData.testIsInactive );
+    } else {
+      let ret = wifi.isConnected()
+      message = "isConnected: " + ret
+    }
+    prompt.showToast( { message : message } )
+    console.log( LogData.testIsConnected_EndLog );
+    return message
+  } catch( e ) {
+    console.log( `Failed to testIsConnected. message: ${ e.message }, code: ${ e.code }` )
+    let message = `Failed to testIsConnected. message: ${ e.message }, code: ${ e.code }`
+    prompt.showToast( { message : message } )
+    return message
   }
-  prompt.showToast({ message: message })
-  return message
 }
 
 export function testGetSupportedFeatures(): string {
-  let message = ($r('app.string.testGetSupportedFeatures'))
-  if(!wifiEnable){
-    message =($r('app.string.wifi_disEnable'));
-  }else {
-    let ret = wifi.getSupportedFeatures()
-    message = "GetSupportedFeatures: " + ret
+  try {
+    let message = ( MessageData.testGetSupportedFeatures )
+    console.log( LogData.testGetSupportedFeatures_StartLog );
+    if ( !wifiEnable ) {
+      message = ( MessageData.testIsInactive );
+    } else {
+      let ret = wifi.getSupportedFeatures()
+      message = "GetSupportedFeatures: " + ret
+    }
+    prompt.showToast( { message : message } )
+    console.log( LogData.testGetSupportedFeatures_EndLog );
+    return message
+  } catch( e ) {
+    console.log( `Failed to testGetSupportedFeatures. message: ${ e.message }, code: ${ e.code }` )
+    let message = `Failed to testGetSupportedFeatures. message: ${ e.message }, code: ${ e.code }`
+    prompt.showToast( { message : message } )
+    return message
   }
-  prompt.showToast({ message: message })
-  return message
 }
 
 export function testIsFeatureSupported(): string {
-  let message = ($r('app.string.testIsFeatureSupported'))
-  if(!wifiEnable){
-    message =($r('app.string.wifi_disEnable'));
-  }else {
-    let featureId = AppStorage.Get("featureId")
-    let ret = wifi.isFeatureSupported(featureId)
-    message = "isFeatureSupported: " + ret
+  try {
+    let message = ( MessageData.testIsFeatureSupported )
+    console.log( LogData.testIsFeatureSupported_StartLog );
+    if ( !wifiEnable ) {
+      message = ( MessageData.testIsInactive );
+    } else {
+      let featureId = AppStorage.Get( "featureId" )
+      let ret = wifi.isFeatureSupported( featureId )
+      message = "isFeatureSupported: " + ret
+    }
+    prompt.showToast( { message : message } )
+    console.log( LogData.testIsFeatureSupported_EndLog );
+    return message
+  } catch( e ) {
+    console.log( `Failed to testIsFeatureSupported. message: ${ e.message }, code: ${ e.code }` )
+    let message = `Failed to testIsFeatureSupported. message: ${ e.message }, code: ${ e.code }`
+    prompt.showToast( { message : message } )
+    return message
   }
-  prompt.showToast({ message: message })
-  return message
 }
 
 export function testGetDeviceMacAddress(): string {
-  let message = ($r('app.string.testGetDeviceMacAddress'))
-  if(!wifiEnable){
-    message =($r('app.string.wifi_disEnable'));
-  }else {
-    let macAddress = wifi.getDeviceMacAddress()
-    message ="macAddress: "+ macAddress
+  try {
+    let message = ( MessageData.testGetDeviceMacAddress )
+    console.log( LogData.testGetDeviceMacAddress_StartLog );
+    if ( !wifiEnable ) {
+      message = ( MessageData.testIsInactive );
+    } else {
+      let macAddress = wifi.getDeviceMacAddress()
+      message = "macAddress: " + macAddress
+    }
+    prompt.showToast( { message : message } )
+    console.log( LogData.testGetDeviceMacAddress_EndLog );
+    return message
+  } catch( e ) {
+    console.log( `Failed to testGetDeviceMacAddress. message: ${ e.message }, code: ${ e.code }` )
+    let message = `Failed to testGetDeviceMacAddress. message: ${ e.message }, code: ${ e.code }`
+    prompt.showToast( { message : message } )
+    return message
   }
-  prompt.showToast({ message: message })
-  return message
 }
 
 export function testGetIpInfo(): string {
-  let message = ($r('app.string.testGetIpInfo'))
-  if(!wifiEnable){
-    message =($r('app.string.wifi_disEnable'));
-  }else {
-    let IpInfo = wifi.getIpInfo()
-    message ="IpInfo: " + JSON.stringify(IpInfo)
-    let ipInfoMessage = message
-    AppStorage.SetOrCreate("ipInfoMessage", ipInfoMessage)
+  try {
+    let message = ( MessageData.testGetIpInfo )
+    console.log( LogData.testGetIpInfo_StartLog );
+    if ( !wifiEnable ) {
+      message = ( MessageData.testIsInactive );
+    } else {
+      let IpInfo = wifi.getIpInfo()
+      message = "IpInfo: " + JSON.stringify( IpInfo )
+      let ipInfoMessage = message
+      AppStorage.SetOrCreate( "ipInfoMessage" , ipInfoMessage )
+    }
+    prompt.showToast( { message : message } )
+    console.log( LogData.testGetIpInfo_EndLog );
+    return message
+  } catch( e ) {
+    console.log( `Failed to testGetIpInfo. message: ${ e.message }, code: ${ e.code }` )
+    let message = `Failed to testGetIpInfo. message: ${ e.message }, code: ${ e.code }`
+    prompt.showToast( { message : message } )
+    return message
   }
-  prompt.showToast({ message: message })
-  return message
 }
 
 export function testGetCountryCode(): string {
-  let message =($r('app.string.testGetCountryCode'))
-  if(!wifiEnable){
-    message =($r('app.string.wifi_disEnable'));
-  }else {
-    let ret = wifi.getCountryCode()
-    message = "CountryCode is: " + ret
+  try {
+    let message = ( MessageData.testGetCountryCode )
+    console.log( LogData.testGetCountryCode_StartLog );
+    if ( !wifiEnable ) {
+      message = ( MessageData.testIsInactive );
+    } else {
+      let ret = wifi.getCountryCode()
+      message = "CountryCode is: " + ret
+    }
+    prompt.showToast( { message : message } )
+    console.log( LogData.testGetCountryCode_EndLog );
+    return message
+  } catch( e ) {
+    console.log( `Failed to testGetCountryCode. message: ${ e.message }, code: ${ e.code }` )
+    let message = `Failed to testGetCountryCode. message: ${ e.message }, code: ${ e.code }`
+    prompt.showToast( { message : message } )
+    return message
   }
-  prompt.showToast({ message: message })
-  return message
 }
 
 export function testReassociate(): string {
-  let message = ($r('app.string.testReassociate'))
-  if(!wifiEnable){
-    message =($r('app.string.wifi_disEnable'));
-  }else {
-    let ret = wifi.reassociate()
-    message ="reassociate is: "+ ret
+  try {
+    let message = ( MessageData.testReassociate )
+    console.log( LogData.testReassociate_StartLog );
+    if ( !wifiEnable ) {
+      message = ( MessageData.testIsInactive );
+    } else {
+      let ret = wifi.reassociate()
+      message = "reassociate is: " + ret
+    }
+    prompt.showToast( { message : message } )
+    console.log( LogData.testReassociate_EndLog );
+    return message
+  } catch( e ) {
+    console.log( `Failed to testReassociate. message: ${ e.message }, code: ${ e.code }` )
+    let message = `Failed to testReassociate. message: ${ e.message }, code: ${ e.code }`
+    prompt.showToast( { message : message } )
+    return message
   }
-  prompt.showToast({ message: message })
-  return message
 }
 
 export function testReConnect(): string {
-  let message = ($r('app.string.testReConnect'))
-  if(!wifiEnable){
-    message =($r('app.string.wifi_disEnable'));
-  }else {
-    let ret = wifi.reconnect()
-    message = "reConnect is: " + ret
+  try {
+    let message = ( MessageData.testReConnect )
+    console.log( LogData.testReConnect_StartLog );
+    if ( !wifiEnable ) {
+      message = ( MessageData.testIsInactive );
+    } else {
+      let ret = wifi.reconnect()
+      message = "reConnect is: " + ret
+    }
+    prompt.showToast( { message : message } )
+    console.log( LogData.testReConnect_EndLog );
+    return message
+  } catch( e ) {
+    console.log( `Failed to testReConnect. message: ${ e.message }, code: ${ e.code }` )
+    let message = `Failed to testReConnect. message: ${ e.message }, code: ${ e.code }`
+    prompt.showToast( { message : message } )
+    return message
   }
-  prompt.showToast({ message: message })
-  return message
 }
 
 export function testGetDeviceConfigs() {
-  let message = ($r('app.string.testGetDeviceConfigs'))
-  if(!wifiEnable){
-    message =($r('app.string.wifi_disEnable'));
-  }else {
-    let array = wifi.getDeviceConfigs()
-    message =($r('app.string.getDeviceConfigs')) + array
-    let getDeviceConfigsMessage = array
-    AppStorage.SetOrCreate("getDeviceConfigsMessage",getDeviceConfigsMessage)
+  try {
+    let message = ( MessageData.testGetDeviceConfigs )
+    console.log( LogData.testGetDeviceConfigs_StartLog );
+    if ( !wifiEnable ) {
+      message = ( MessageData.testIsInactive );
+    } else {
+      let array = wifi.getDeviceConfigs()
+      message = "DeviceConfigs is: " + JSON.stringify( array )
+      let getDeviceConfigsMessage = JSON.stringify( array )
+      AppStorage.SetOrCreate( "getDeviceConfigsMessage" , getDeviceConfigsMessage )
+    }
+    prompt.showToast( { message : message } )
+    console.log( LogData.testGetDeviceConfigs_EndLog );
+    return message
+  } catch( e ) {
+    console.log( `Failed to testGetDeviceConfigs. message: ${ e.message }, code: ${ e.code }` )
+    let message = `Failed to testGetDeviceConfigs. message: ${ e.message }, code: ${ e.code }`
+    prompt.showToast( { message : message } )
+    return message
   }
-  prompt.showToast({ message: message })
-  return message
 }
 
 export function testUpdateNetwork() {
-  let message = ($r('app.string.testUpdateNetwork'))
-  if(!wifiEnable){
-    message =($r('app.string.wifi_disEnable'));
-  }else {
-    let wifiDeviceConfig = AppStorage.Get("wifiDeviceConfig")
-    let ret = wifi.updateNetwork(wifiDeviceConfig)
-    message ="updateNetwork: " + ret
+  try {
+    let message = ( MessageData.testUpdateNetwork )
+    console.log( LogData.testUpdateNetwork_StartLog );
+    if ( !wifiEnable ) {
+      message = ( MessageData.testIsInactive );
+    } else {
+      let wifiDeviceConfig = AppStorage.Get( "wifiDeviceConfig" )
+      let ret = wifi.updateNetwork( wifiDeviceConfig )
+      message = "updateNetwork: " + ret
+    }
+    prompt.showToast( { message : message } )
+    console.log( LogData.testUpdateNetwork_EndLog );
+    return message
+  } catch( e ) {
+    console.log( `Failed to testUpdateNetwork. message: ${ e.message }, code: ${ e.code }` )
+    let message = `Failed to testUpdateNetwork. message: ${ e.message }, code: ${ e.code }`
+    prompt.showToast( { message : message } )
+    return message
   }
-  prompt.showToast({ message: message })
-  return message
 }
 
 export function testDisableNetwork() {
-  let message = ($r('app.string.testDisableNetwork'))
-  if(!wifiEnable){
-    message =($r('app.string.wifi_disEnable'));
-  }else {
-    let netId = AppStorage.Get("netId")
-    let ret = wifi.disableNetwork(netId)
-    message = "disableNetwork: " + ret
+  try {
+    let message = ( MessageData.testDisableNetwork )
+    console.log( LogData.testDisableNetwork_StartLog );
+    if ( !wifiEnable ) {
+      message = ( MessageData.testIsInactive );
+    } else {
+      let netId = AppStorage.Get( "netId" )
+      let ret = wifi.disableNetwork( netId )
+      message = "disableNetwork: " + ret
+    }
+    prompt.showToast( { message : message } )
+    console.log( LogData.testDisableNetwork_EndLog );
+    return message
+  } catch( e ) {
+    console.log( `Failed to testDisableNetwork. message: ${ e.message }, code: ${ e.code }` )
+    let message = `Failed to testDisableNetwork. message: ${ e.message }, code: ${ e.code }`
+    prompt.showToast( { message : message } )
+    return message
   }
-  prompt.showToast({ message: message })
-  return message
 }
 
 export function testRemoveAllNetwork() {
-  let message = ($r('app.string.testRemoveAllNetwork'))
-  if(!wifiEnable){
-    message =($r('app.string.wifi_disEnable'));
-  }else {
-    let ret = wifi.removeAllNetwork()
-    message ="removeAllNetwork: " + ret
+  try {
+    let message = ( MessageData.testRemoveAllNetwork )
+    console.log( LogData.testRemoveAllNetwork_StartLog );
+    if ( !wifiEnable ) {
+      message = ( MessageData.testIsInactive );
+    } else {
+      let ret = wifi.removeAllNetwork()
+      message = "removeAllNetwork: " + ret
+    }
+    prompt.showToast( { message : message } )
+    console.log( LogData.testRemoveAllNetwork_EndLog );
+    return message
+  } catch( e ) {
+    console.log( `Failed to testRemoveAllNetwork. message: ${ e.message }, code: ${ e.code }` )
+    let message = `Failed to testRemoveAllNetwork. message: ${ e.message }, code: ${ e.code }`
+    prompt.showToast( { message : message } )
+    return message
   }
-  prompt.showToast({ message: message })
-  return message
 }
 
 export function testRemoveDevice() {
-  let message = ($r('app.string.testRemoveDevice'))
-  if(!wifiEnable){
-    message =($r('app.string.wifi_disEnable'));
-  }else {
-    let id = AppStorage.Get("id")
-    let ret = wifi.removeDevice(id)
-    message ="removeDevice: " + ret
+  try {
+    let message = ( MessageData.testRemoveDevice )
+    console.log( LogData.testRemoveDevice_StartLog );
+    if ( !wifiEnable ) {
+      message = ( MessageData.testIsInactive );
+    } else {
+      let id = AppStorage.Get( "id" )
+      let ret = wifi.removeDevice( id )
+      message = "removeDevice: " + ret
+    }
+    prompt.showToast( { message : message } )
+    console.log( LogData.testRemoveDevice_EndLog );
+    return message
+  } catch( e ) {
+    console.log( `Failed to testRemoveDevice. message: ${ e.message }, code: ${ e.code }` )
+    let message = `Failed to testRemoveDevice. message: ${ e.message }, code: ${ e.code }`
+    prompt.showToast( { message : message } )
+    return message
   }
-  prompt.showToast({ message: message })
-  return message
 }
 
+
 let wifiStateChange = false
+
 export function testOnWifiStateChange(): string {
-  let message = ($r('app.string.testOnWifiStateChange'))
-  console.log("testOnWifiStateChange test");
-//  if(!wifiEnable){
-//    message =($r('app.string.wifi_disEnable'));
-//    return message
-//  }
-  if (wifiStateChange) {
-    wifi.off("wifiStateChange", () => {
-      prompt.showToast({ message: ($r('app.string.offWifiStateChange')) })
-    })
-    message = ($r('app.string.offWifiStateChangeTest'))
-  } else {
-    wifi.on("wifiStateChange", (number) => {
-      let wifiStateMessage = ""
-      switch (number) {
-        case 0:
-          wifiStateMessage = "inactive";
-          break;
-        case 1:
-          wifiStateMessage = "active";
-          break;
-        case 2:
-          wifiStateMessage = "activating";
-          break;
-        case 3:
-          wifiStateMessage = "de-activating";
-          break;
-        default:
-          wifiStateMessage = '未知状态';
-          break;
-      }
-      prompt.showToast({ message: "wifi状态: " + wifiStateMessage })
-    })
-    message = ($r('app.string.onWifiStateChangeTest'))
-    prompt.showToast({ message: message })
+  try {
+    let message = ( MessageData.testOnWifiStateChange )
+    console.log( LogData.testOnWifiStateChange_StartLog );
+    if ( wifiStateChange ) {
+      wifi.off( "wifiStateChange" , () => {
+        prompt.showToast( { message : ( MessageData.offWifiStateChange ) } )
+      } )
+      message = ( MessageData.offWifiStateChangeTest )
+    } else {
+      wifi.on( "wifiStateChange" , ( number ) => {
+        let wifiStateMessage = ""
+        switch ( number ) {
+          case 0:
+            wifiStateMessage = "inactive";
+            break;
+          case 1:
+            wifiStateMessage = "active";
+            break;
+          case 2:
+            wifiStateMessage = "activating";
+            break;
+          case 3:
+            wifiStateMessage = "de-activating";
+            break;
+          default:
+            wifiStateMessage = '未知状态';
+            break;
+        }
+        prompt.showToast( { message : "wifi状态: " + wifiStateMessage } )
+        console.log( LogData.testOnWifiStateChange_EndLog );
+      } )
+      message = ( onWifiStateChange.onWifiStateChangeTest )
+      prompt.showToast( { message : message } )
+    }
+    wifiStateChange = !wifiStateChange
+    return message
+  } catch( e ) {
+    console.log( `Failed to testOnWifiStateChange. message: ${ e.message }, code: ${ e.code }` )
+    let message = `Failed to testOnWifiStateChange. message: ${ e.message }, code: ${ e.code }`
+    prompt.showToast( { message : message } )
+    return message
   }
-  wifiStateChange = !wifiStateChange
-  return message
 }
 
 let wifiConnectionChange = false
+
 export function testOnWifiConnectionChange(): string {
-  let message =  ($r('app.string.testOnWifiConnectionChange'))
-  console.log("testOnWifiConnectionChange test");
-  if(!wifiEnable){
-    message =($r('app.string.wifi_disEnable'));
+  try {
+    let message = ( MessageData.testOnWifiConnectionChange )
+    console.log( LogData.testOnWifiConnectionChange_StartLog );
+    if ( !wifiEnable ) {
+      message = ( MessageData.testIsInactive );
+      return message
+    }
+    if ( wifiConnectionChange ) {
+      wifi.off( "wifiConnectionChange" , () => {
+        prompt.showToast( { message : ( MessageData.offWifiConnectionChange ) } )
+      } )
+      message = ( MessageData.offWifiConnectionChangeTest )
+    } else {
+      wifi.on( "wifiConnectionChange" , ( number ) => {
+        let wifiConnectionMessage = ""
+        switch ( number ) {
+          case 0:
+            wifiConnectionMessage = "disconnected";
+            break;
+          case 1:
+            wifiConnectionMessage = "connected";
+            break;
+          default:
+            wifiConnectionMessage = '未知状态';
+            break;
+        }
+        prompt.showToast( { message : "连接状态: " + wifiConnectionMessage } )
+        console.log( LogData.testOnWifiConnectionChange_EndLog );
+      } )
+      message = ( MessageData.onP2pConnectionChangeTest )
+      prompt.showToast( { message : message } )
+    }
+    wifiConnectionChange = !wifiConnectionChange
+    return message
+  } catch( e ) {
+    console.log( `Failed to testOnWifiConnectionChange. message: ${ e.message }, code: ${ e.code }` )
+    let message = `Failed to testOnWifiConnectionChange. message: ${ e.message }, code: ${ e.code }`
+    prompt.showToast( { message : message } )
     return message
   }
-  if (wifiConnectionChange) {
-    wifi.off("wifiConnectionChange", () => {
-      prompt.showToast({ message: ($r('app.string.offWifiConnectionChange')) })
-    })
-    message = ($r('app.string.offWifiConnectionChangeTest'))
-  } else {
-    wifi.on("wifiConnectionChange", (number) => {
-      let wifiConnectionMessage = ""
-      switch (number) {
-        case 0:
-          wifiConnectionMessage = "disconnected";
-          break;
-        case 1:
-          wifiConnectionMessage = "connected";
-          break;
-        default:
-          wifiConnectionMessage = '未知状态';
-          break;
-      }
-      prompt.showToast({ message:"连接状态: " + wifiConnectionMessage })
-    })
-    message =  ($r('app.string.onWifiConnectionChangeTest'))
-    prompt.showToast({ message: message })
-  }
-  wifiConnectionChange = !wifiConnectionChange
-  return message
 }
 
 let wifiScanStateChange = false
+
 export function testOnWifiScanStateChange(): string {
-  let message = ($r('app.string.testOnWifiScanStateChange'))
-  console.log("testOnWifiScanStateChange test");
-  if(!wifiEnable){
-    message =($r('app.string.wifi_disEnable'));
+  try {
+    let message = ( MessageData.testOnWifiScanStateChange )
+    console.log( LogData.testOnWifiScanStateChange_StartLog );
+    if ( !wifiEnable ) {
+      message = ( MessageData.testIsInactive );
+      return message
+    }
+    if ( wifiScanStateChange ) {
+      wifi.off( "wifiScanStateChange" , () => {
+        prompt.showToast( { message : ( MessageData.offWifiScanStateChange ) } )
+      } )
+      message = ( MessageData.offWifiScanStateChangeTest )
+    } else {
+      wifi.on( "wifiScanStateChange" , ( number ) => {
+        let wifiScanStateMessage = ""
+        switch ( number ) {
+          case 0:
+            wifiScanStateMessage = "scan fail";
+            break;
+          case 1:
+            wifiScanStateMessage = "scan success";
+            break;
+          default:
+            wifiScanStateMessage = '未知状态';
+            break;
+        }
+        prompt.showToast( { message : "scan状态: " + wifiScanStateMessage } )
+        console.log( LogData.testOnWifiScanStateChange_EndLog );
+      } )
+      message = ( MessageData.onWifiScanStateChangeTest )
+      prompt.showToast( { message : message } )
+    }
+    wifiScanStateChange = !wifiScanStateChange
+    return message
+  } catch( e ) {
+    console.log( `Failed to testOnWifiScanStateChange. message: ${ e.message }, code: ${ e.code }` )
+    let message = `Failed to testOnWifiScanStateChange. message: ${ e.message }, code: ${ e.code }`
+    prompt.showToast( { message : message } )
     return message
   }
-  if (wifiScanStateChange) {
-    wifi.off("wifiScanStateChange", () => {
-      prompt.showToast({ message: ($r('app.string.offWifiScanStateChange')) })
-    })
-    message = ($r('app.string.offWifiScanStateChangeTest'))
-  } else {
-    wifi.on("wifiScanStateChange", (number) => {
-      let wifiScanStateMessage = ""
-      switch (number) {
-        case 0:
-          wifiScanStateMessage = "scan fail";
-          break;
-        case 1:
-          wifiScanStateMessage = "scan success";
-          break;
-        default:
-          wifiScanStateMessage = '未知状态';
-          break;
-      }
-      prompt.showToast({ message:"scan状态: " + wifiScanStateMessage })
-    })
-    message = ($r('app.string.onWifiScanStateChangeTest'))
-    prompt.showToast({ message: message })
-  }
-  wifiScanStateChange = !wifiScanStateChange
-  return message
 }
 
 let wifiRssiChange = false
+
 export function testOnWifiRssiChange(): string {
-  let message = ($r('app.string.testOnWifiRssiChange'))
-  console.log("testOnWifiRssiChange test");
-  if(!wifiEnable){
-    message =($r('app.string.wifi_disEnable'));
+  try {
+    let message = ( $r( 'app.string.testOnWifiRssiChange' ) )
+    console.log( LogData.testOnWifiRssiChange_StartLog );
+    if ( !wifiEnable ) {
+      message = ( MessageData.testIsInactive );
+      return message
+    }
+    if ( wifiRssiChange ) {
+      wifi.off( "wifiRssiChange" , () => {
+        prompt.showToast( { message : ( $r( 'app.string.offWifiRssiChange' ) ) } )
+      } )
+      message = "关闭RSSI状态变化事件"
+    } else {
+      wifi.on( "wifiRssiChange" , ( number ) => {
+        prompt.showToast( { message : "rssi: " + number } )
+      } )
+      message = "打开注册RSSI状态变化"
+      console.log( LogData.testOnWifiRssiChange_EndLog );
+      prompt.showToast( { message : message } )
+    }
+    wifiRssiChange = !wifiRssiChange
+    return message
+  } catch( e ) {
+    console.log( `Failed to testOnWifiRssiChange. message: ${ e.message }, code: ${ e.code }` )
+    let message = `Failed to testOnWifiRssiChange. message: ${ e.message }, code: ${ e.code }`
+    prompt.showToast( { message : message } )
     return message
   }
-  if (wifiRssiChange) {
-    wifi.off("wifiRssiChange", () => {
-      prompt.showToast({ message: ($r('app.string.offWifiRssiChange')) })
-    })
-    message = ($r('app.string.offWifiRssiChangeTest'))
-  } else {
-    wifi.on("wifiRssiChange", (number) => {
-      prompt.showToast({ message:"rssi: " + number })
-    })
-    message = ($r('app.string.onWifiRssiChangeTest'))
-    prompt.showToast({ message: message })
-  }
-  wifiRssiChange = !wifiRssiChange
-  return message
 }
 
-let streamChange =false
-export function testOnStreamChange(){
-  let message = ($r('app.string.testOnStreamChange'))
-  console.log("testOnStreamChange test");
-  if(!wifiEnable){
-    message =($r('app.string.wifi_disEnable'));
+let streamChange = false
+
+export function testOnStreamChange() {
+  try {
+    let message = ( MessageData.testOnStreamChange )
+    console.log( LogData.testOnStreamChange_StartLog );
+    if ( !wifiEnable ) {
+      message = ( MessageData.testIsInactive );
+      return message
+    }
+    if ( streamChange ) {
+      wifi.off( "streamChange" , () => {
+        prompt.showToast( { message : ( MessageData.offStreamChange ) } )
+      } )
+      message = MessageData.offStreamChangeTest
+    } else {
+      wifi.on( "streamChange" , ( number ) => {
+        let streamChangeMessage = ""
+        switch ( number ) {
+          case 0:
+            streamChangeMessage = "stream none";
+            break;
+          case 1:
+            streamChangeMessage = "stream down";
+            break;
+          case 2:
+            streamChangeMessage = "stream up";
+            break;
+          case 3:
+            streamChangeMessage = "stream bidirectional";
+            break;
+          default:
+            streamChangeMessage = '未知状态';
+            break;
+        }
+        prompt.showToast( { message : "stream状态: " + streamChangeMessage } )
+        console.log( LogData.testOnStreamChange_EndLog );
+      } )
+      message = ( MessageData.onStreamChangeTest )
+      prompt.showToast( { message : message } )
+    }
+    streamChange = !streamChange
+    return message
+  } catch( e ) {
+    console.log( `Failed to testOnStreamChange. message: ${ e.message }, code: ${ e.code }` )
+    let message = `Failed to testOnStreamChange. message: ${ e.message }, code: ${ e.code }`
+    prompt.showToast( { message : message } )
     return message
   }
-  if (streamChange) {
-    wifi.off("streamChange", () => {
-      prompt.showToast({ message: ($r('app.string.offStreamChange')) })
-    })
-    message = ($r('app.string.offStreamChangeTest'))
-  } else {
-    wifi.on("streamChange", (number) => {
-      let streamChangeMessage = ""
-      switch (number) {
-        case 0:
-          streamChangeMessage = "stream none";
-          break;
-        case 1:
-          streamChangeMessage = "stream down";
-          break;
-        case 2:
-          streamChangeMessage = "stream up";
-          break;
-        case 3:
-          streamChangeMessage = "stream bidirectional";
-          break;
-        default:
-          streamChangeMessage = '未知状态';
-          break;
-      }
-      prompt.showToast({ message:"stream状态: "+ streamChangeMessage })
-    })
-    message = ($r('app.string.onStreamChangeTest'))
-    prompt.showToast({ message: message })
-  }
-  streamChange = !streamChange
-  return message
 }

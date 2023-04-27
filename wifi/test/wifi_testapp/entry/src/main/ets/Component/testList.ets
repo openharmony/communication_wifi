@@ -12,29 +12,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 // @ts-nocheck
-/**
- * Test-List
- */
+
 import { TestData } from '../MainAbility/model/testData'
 import { TestListItem } from './testListItems';
+import ConfigData from '../Utils/ConfigData';
+/**
+ * Test-List component page of wifi test
+ */
 
 @Component
 export struct TestList {
   private testItems: TestData[]
+
   build() {
     Column() {
       List() {
-        ForEach(this.testItems, item => {
+        ForEach( this.testItems , item => {
           ListItem() {
-            TestListItem({
-              testItem: item
-            })
+            TestListItem( {
+              testItem : item
+            } )
           }
-        }, item => item.id.toString())
+        } , item => item.id.toString() )
       }
-      .height('93%')
-      .backgroundColor($r("app.color.lead"))
+      .height( ConfigData.WH_93_100 )
+      .backgroundColor( $r( "app.color.lead" ) )
     }
   }
 }

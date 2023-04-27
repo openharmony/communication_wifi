@@ -13,15 +13,21 @@
  * limitations under the License.
  */
 
-export enum Category  {
-  All,
-  API,
-  Scenario,
-  AutoTest,
-  BenchMark
+/**
+ * test Data of wifi test
+ */
+
+export enum Category {
+  All ,
+  API ,
+  Scenario ,
+  AutoTest ,
+  BenchMark ,
+  Stress
 }
 
 let NextId = 0;
+
 export class TestData {
   id: string;
   name: string;
@@ -30,8 +36,8 @@ export class TestData {
   image: Resource
   category: Category;
 
-  constructor(name: string, detail: string, url: string, image: Resource, category: Category) {
-    this.id = `${ NextId++ }`;
+  constructor( name: string , detail: string , url: string , image: Resource , category: Category ) {
+    this.id = `${ NextId ++ }`;
     this.name = name;
     this.url = url;
     this.detail = detail;
@@ -40,12 +46,12 @@ export class TestData {
   }
 }
 
-export enum CaseCategory  {
-  Wifi,
-  WifiManager,
-  Hotspot,
-  HotspotManager,
-  P2p,
+export enum CaseCategory {
+  Wifi ,
+  WifiManager ,
+  Hotspot ,
+  HotspotManager ,
+  P2p ,
   P2pManager
 }
 
@@ -58,8 +64,8 @@ export class TestApi {
   result: string;
   category: CaseCategory;
 
-  constructor(name: string, detail: string, method: string, api: any, result: string, category: CaseCategory) {
-    this.id = `${ NextId++ }`;
+  constructor( name: string , detail: string , method: string , api: any , result: string , category: CaseCategory ) {
+    this.id = `${ NextId ++ }`;
     this.name = name;
     this.detail = detail;
     this.method = method;
@@ -70,15 +76,15 @@ export class TestApi {
 }
 
 export enum AutoCategory {
-  WifiAuto,
-  WifiManagerAuto,
-  HotspotAuto,
-  HotspotManagerAuto,
-  P2pAuto,
+  WifiAuto ,
+  WifiManagerAuto ,
+  HotspotAuto ,
+  HotspotManagerAuto ,
+  P2pAuto ,
   P2pManagerAuto
 }
 
-export class TestAuto{
+export class TestAuto {
   id: string;
   name: string;
   detail: string;
@@ -88,8 +94,8 @@ export class TestAuto{
   result: string;
   category: AutoCategory;
 
-  constructor(name: string, detail: string, method: string , api:any ,result: string, category: AutoCategory) {
-    this.id = `${ NextId++ }`;
+  constructor( name: string , detail: string , method: string , api: any , result: string , category: AutoCategory ) {
+    this.id = `${ NextId ++ }`;
     this.name = name;
     this.detail = detail;
     this.method = method;
@@ -100,15 +106,15 @@ export class TestAuto{
 }
 
 export enum ScenarioCategory {
-  WifiScanScenario,
-  WifiManagerScanScenario,
-  HotspotCreateScenario,
-  HotspotManagerCreateScenario,
-  P2pConnectScenario,
-  P2pManagerConnectScenario,
+  WifiScanScenario ,
+  WifiManagerScanScenario ,
+  HotspotCreateScenario ,
+  HotspotManagerCreateScenario ,
+  P2pConnectScenario ,
+  P2pManagerConnectScenario ,
 }
 
-export class TestScenario{
+export class TestScenario {
   id: string;
   name: string;
   detail: string;
@@ -118,8 +124,8 @@ export class TestScenario{
   result: string;
   category: ScenarioCategory;
 
-  constructor(name: string, detail: string, method: string , api:any ,result: string, category: ScenarioCategory) {
-    this.id = `${ NextId++ }`;
+  constructor( name: string , detail: string , method: string , api: any , result: string , category: ScenarioCategory ) {
+    this.id = `${ NextId ++ }`;
     this.name = name;
     this.detail = detail;
     this.method = method;
@@ -130,15 +136,15 @@ export class TestScenario{
 }
 
 export enum BenchmarkCategory {
-  WifiBenchmark,
-  WifiManagerBenchmark,
-  HotspotBenchmark,
-  HotspotManagerBenchmark,
-  P2pBenchmark,
-  P2pManagerBenchmark,
+  WifiBenchmark ,
+  WifiManagerBenchmark ,
+  HotspotBenchmark ,
+  HotspotManagerBenchmark ,
+  P2pBenchmark ,
+  P2pManagerBenchmark ,
 }
 
-export class TestBenchmark{
+export class TestBenchmark {
   id: string;
   name: string;
   detail: string;
@@ -148,8 +154,8 @@ export class TestBenchmark{
   result: string;
   category: BenchmarkCategory;
 
-  constructor(name: string, detail: string, method: string , api:any ,result: string, category: BenchmarkCategory) {
-    this.id = `${ NextId++ }`;
+  constructor( name: string , detail: string , method: string , api: any , result: string , category: BenchmarkCategory ) {
+    this.id = `${ NextId ++ }`;
     this.name = name;
     this.detail = detail;
     this.method = method;
@@ -158,3 +164,34 @@ export class TestBenchmark{
     this.category = category;
   }
 }
+
+export enum StressCategory {
+  WifiStress ,
+  WifiManagerStress ,
+  HotspotStress ,
+  HotspotManagerStress ,
+  P2pStress ,
+  P2pManagerStress ,
+}
+
+export class TestStress {
+  id: string;
+  name: string;
+  detail: string;
+  method: string;
+  api: any;
+  image: Resource;
+  result: string;
+  category: BenchmarkCategory;
+
+  constructor( name: string , detail: string , method: string , api: any , result: string , category: BenchmarkCategory ) {
+    this.id = `${ NextId ++ }`;
+    this.name = name;
+    this.detail = detail;
+    this.method = method;
+    this.api = api;
+    this.result = result;
+    this.category = category;
+  }
+}
+

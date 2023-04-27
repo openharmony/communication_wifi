@@ -15,19 +15,27 @@
     "pages/subAutoTest/hotspotManagerAutoTest",
     "pages/subAutoTest/p2pAutoTest",
     "pages/subAutoTest/p2pManagerAutoTest",
-
-    "pages/subScenarioTest/wifiScanScenarioTest",
-    "pages/subScenarioTest/wifiManagerScanScenarioTest",
+    "pages/subScenarioTest/wifiConnectScenarioTest",
+    "pages/subScenarioTest/wifiManagerConnectScenarioTest",
     "pages/subScenarioTest/hotspotCreateScenarioTest",
     "pages/subScenarioTest/hotspotManagerCreateScenarioTest",
     "pages/subScenarioTest/p2pConnectScenarioTest",
     "pages/subScenarioTest/p2pManagerConnectScenarioTest",
+    "pages/subBenchmarkTest/wifiBenchmarkTest",
+    "pages/subBenchmarkTest/wifiManagerBenchmarkTest",
+    "pages/subBenchmarkTest/hotspotBenchmarkTest",
+    "pages/subBenchmarkTest/hotspotManagerBenchmarkTest",
+    "pages/subBenchmarkTest/p2pBenchmarkTest",
+    "pages/subBenchmarkTest/p2pManagerBenchmarkTest",
 
-    "pages/subBenchmarkTest/wifiFoundBenchmarkTest",
-    "pages/subBenchmarkTest/wifiManagerFoundBenchmarkTest",
-    "pages/subBenchmarkTest/hotspotConnectBenchmarkTest",
-    "pages/subBenchmarkTest/hotspotManagerConnectBenchmarkTest",
-    "pages/subBenchmarkTest/p2pConnectBenchmarkTest",
-    "pages/subBenchmarkTest/p2pManagerConnectBenchmarkTest"
+    "pages/subStressTest/wifiStressTest",
+    "pages/subStressTest/wifiManagerStressTest",
+    "pages/subStressTest/hotspotStressTest",
+    "pages/subStressTest/hotspotManagerStressTest",
+    "pages/subStressTest/p2pStressTest",
+    "pages/subStressTest/p2pManagerStressTest",
+
+    "pages/subManualApiTest/subWifiTest/Login",
+    "pages/subManualApiTest/subWifiTest/wifiFound"
   ]
 }

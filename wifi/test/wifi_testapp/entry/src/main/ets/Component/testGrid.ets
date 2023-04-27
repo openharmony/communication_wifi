@@ -13,11 +13,15 @@
  * limitations under the License.
  */
 
+// @ts-nocheck
+
 import { TestData } from '../MainAbility/model/testData'
 import { TestGridItem } from './testGridItem'
+import ConfigData from '../Utils/ConfigData';
 /**
- * TestGrid
+ * TestGrid component page of wifi test
  */
+
 @Component
 export struct TestGrid {
   private testItems: TestData[]
@@ -25,27 +29,27 @@ export struct TestGrid {
   private heightValue: number
 
   aboutToAppear() {
-    var rows = Math.round(this.testItems.length / 2);
-    this.gridRowTemplate = '1fr '.repeat(rows);
+    var rows = Math.round( this.testItems.length / 2 );
+    this.gridRowTemplate = '1fr '.repeat( rows );
     this.heightValue = rows * 192 - 8;
   }
 
   build() {
     Scroll() {
       Grid() {
-        ForEach(this.testItems, (item: TestData) => {
+        ForEach( this.testItems , ( item: TestData ) => {
           GridItem() {
-            TestGridItem({ testItem: item })
+            TestGridItem( { testItem : item } )
           }
-        }, (item: TestData) => item.id.toString())
+        } , ( item: TestData ) => item.id.toString() )
       }
-      .rowsTemplate(this.gridRowTemplate)
-      .columnsTemplate('1fr 1fr')
-      .columnsGap(8)
-      .rowsGap(8)
-      .height(this.heightValue)
+      .rowsTemplate( this.gridRowTemplate )
+      .columnsTemplate( '1fr 1fr' )
+      .columnsGap( 8 )
+      .rowsGap( 8 )
+      .height( this.heightValue )
     }
-    .scrollBar(BarState.Off)
-    .padding({ left: 16, right: 16 })
+    .scrollBar( BarState.Off )
+    .padding( { left : 16 , right : 16 } )
   }
 }

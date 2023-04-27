@@ -13,9 +13,8 @@
  * limitations under the License.
  */
 
-/*
-  wifiFound of wifi test
- */
+// @ts-nocheck
+import ConfigData from '../../../Utils/ConfigData';
 import prompt from '@ohos.prompt'
 import Logger from '../../../MainAbility/model/Logger'
 import { PswDialog } from '../../../Component/pswDialog'
@@ -23,20 +22,25 @@ import { WifiModel } from '../../../MainAbility/model/wifiTestModel'
 import { WifiView } from '../../../Component/wifiView'
 import WifiDataSource from '../../../Component/basicDataSource'
 import wifi from '@ohos.wifi'
-const TAG = 'AvailableWiFi'
+
+const TAG = 'AvailableWifi'
 let self = null
+
+/*
+  wifiFound Page of wifi test
+ */
 
 @Entry
 @Component
-export struct AvailableWifi {
+struct AvailableWifi {
   private wifiModel = new WifiModel()
   private linkedInfo: any = null
-  @StorageLink('wifiList') @Watch('wifiListRefresh') wifiList: Array<wifi.WifiScanInfo> = []
+  @StorageLink( 'wifiList' ) @Watch( 'wifiListRefresh' ) wifiList: Array<wifi.WifiScanInfo> = []
   @State wifiDataResource: WifiDataSource = new WifiDataSource(this.wifiList)
   @State scanInfo: wifi.WifiScanInfo = undefined
   private pswDialogController: CustomDialogController = new CustomDialogController({
-    builder: PswDialog({ scanInfo: $scanInfo, action: this.onAccept }),
-    autoCancel: true
+    builder : PswDialog( { scanInfo : $scanInfo , action : this.onAccept } ) ,
+    autoCancel : true
   })
 
   build() {
@@ -44,44 +48,44 @@ export struct AvailableWifi {
     List() {
       ListItem() {
         Row() {
-          Text($r('app.string.available_wlan'))
-            .fontSize(22)
-            .layoutWeight(1)
+          Text( $r( 'app.string.available_wlan' ) )
+            .fontSize( 22 )
+            .layoutWeight( 1 )
         }
-        .width('100%')
+        .width( ConfigData.WH_100_100 )
       }
 
-      LazyForEach(this.wifiDataResource, (item, index) => {
+      LazyForEach( this.wifiDataResource , ( item , index ) => {
         ListItem() {
-          WifiView({ wifi: item })
+          WifiView( { wifi : item } )
         }
-	.key('Wifi' + index)
-        .onClick(() => {
-          Logger.info(TAG, 'wifi click')
+        .key( 'Wifi' + index )
+        .onClick( () => {
+          Logger.info( TAG , 'wifi click' )
           this.scanInfo = item
-          if (this.linkedInfo !== null && item.ssid === this.linkedInfo.ssid) {
-            prompt.showToast({ message: 'this wifi is connected' })
+          if ( this.linkedInfo !== null && item.ssid === this.linkedInfo.ssid ) {
+            prompt.showToast( { message : 'this wifi is connected' } )
             return
           }
-          if (item.securityType === 0 || item.securityType === 1) {
-            this.wifiModel.connectNetwork(item, '')
+          if ( item.securityType === 0 || item.securityType === 1 ) {
+            this.wifiModel.connectNetwork( item , '' )
             return
           }
           this.pswDialogController.open()
-        })
-      }, item => JSON.stringify(item))
+        } )
+      } , item => JSON.stringify( item ) )
     }
-    .width('100%')
-    .height('100%')
-    .padding({ left: 16, right: 16 })
-    .layoutWeight(1)
-    .divider({ strokeWidth: 1, color: Color.Gray, startMargin: 10, endMargin: 10 })
-    .margin({ top: 10 })
+    .width( ConfigData.WH_100_100 )
+    .height( ConfigData.WH_100_100 )
+    .padding( { left : 16 , right : 16 } )
+    .layoutWeight( 1 )
+    .divider( { strokeWidth : 1 , color : Color.Gray , startMargin : 10 , endMargin : 10 } )
+    .margin( { top : 10 } )
   }
 
-  onAccept(scanInfo, psw) {
-    Logger.info(TAG, 'connect wifi')
-    self.wifiModel.connectNetwork(scanInfo, psw)
+  onAccept( scanInfo , psw ) {
+    Logger.info( TAG , 'connect wifi' )
+    self.wifiModel.connectNetwork( scanInfo , psw )
   }
 
   aboutToAppear() {

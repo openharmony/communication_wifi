@@ -41,6 +41,8 @@ constexpr int STANDER = 5;
 constexpr int STATUS = 17;
 constexpr int MAX_SCAN_CONFIG = 10000;
 constexpr int INVAL = 0x0fffff;
+constexpr int MAX_THROUGH = -90;
+
 
 class ScanServiceTest : public testing::Test {
 public:
@@ -1752,11 +1754,11 @@ public:
     void WifiMaxThroughputTest()
     {
         int channelUtilization = 10;
-        std::vector<int> freqVector = {11, 51, -1, 69, 138, 92, 184, 366, 618};
+        std::vector<int> freqVector = {11, 51, -1, 69, 138, 92, 184, 366, 618, 0};
         EXPECT_TRUE(count(freqVector.begin(), freqVector.end(),
             WifiMaxThroughput(0, false, WifiChannelWidth::WIDTH_160MHZ, 0, 0, channelUtilization)) != 0);
         EXPECT_TRUE(count(freqVector.begin(), freqVector.end(),
-            WifiMaxThroughput(1, false, WifiChannelWidth::WIDTH_160MHZ, 0, 0, channelUtilization)) != 0);
+            WifiMaxThroughput(1, false, WifiChannelWidth::WIDTH_160MHZ, MAX_THROUGH, 1, channelUtilization)) != 0);
         EXPECT_TRUE(count(freqVector.begin(), freqVector.end(),
             WifiMaxThroughput(FOUR, false, WifiChannelWidth::WIDTH_20MHZ, 0, 0, channelUtilization)) != 0);
         EXPECT_TRUE(count(freqVector.begin(), freqVector.end(),
@@ -1778,6 +1780,63 @@ public:
         EXPECT_TRUE(count(freqVector.begin(), freqVector.end(),
             WifiMaxThroughput(FAILEDNUM, true, WifiChannelWidth::WIDTH_INVALID, 0, 0, channelUtilization)) != 0);
     }
+
+    void IsPackageInTrustListTest()
+    {
+        EXPECT_TRUE(pScanService->IsPackageInTrustList("123456|", 0, "123456") == true);
+        EXPECT_TRUE(pScanService->IsPackageInTrustList("123456|", 0, "1234") == true);
+    }
+
+    void AllowScanByMovingFreezeTest1()
+    {
+        pScanService->scanTrustMode = true;
+        pScanService->scanTrustSceneIds.insert(-1);
+        EXPECT_TRUE(pScanService->AllowScanByMovingFreeze() == true);
+    }
+
+    void AllowScanByMovingFreezeTest2()
+    {
+        pScanService->isAbsFreezeState = true;
+        pScanService->isAbsFreezeScaned = false;
+        EXPECT_TRUE(pScanService->AllowScanByMovingFreeze() == true);
+        pScanService->isAbsFreezeScaned = true;
+        EXPECT_TRUE(pScanService->AllowScanByMovingFreeze() == false);
+    }
+
+    void AllowExternCustomSceneCheckTest1()
+    {
+         std::map<int, time_t> customIter
+        customIter.insert(std::pair<int, int>(SCAN_SCENE_ALL, 0));
+        auto customIters = customIter.begin();
+        ScanIntervalMode mode;
+        mode.scanScene = SCAN_SCENE_ALL;
+        mode.scanMode = ScanMode::SYSTEM_TIMER_SCAN;
+        mode.isSingle = true;
+        mode.interval = 1;
+        mode.intervalMode = IntervalMode::INTERVAL_FIXED;
+        pScanService->scanControlInfo.scanIntervalList.push_back(mode);
+        EXPECT_TRUE(pScanService->AllowExternCustomSceneCheck(customIters, 0, ScanMode::SYSTEM_TIMER_SCAN) == true);
+        pScanService->scanControlInfo.scanIntervalList.push_back(mode);
+        EXPECT_TRUE(pScanService->AllowExternCustomSceneCheck(customIters, 0, ScanMode::SYSTEM_TIMER_SCAN) == false);
+    }
+
+    void AllowExternCustomSceneCheckTest2()
+    {
+        std::map<int, time_t> customIter
+        customIter.insert(std::pair<int, int>(SCAN_SCENE_ALL, 0));
+        auto customIters = customIter.begin();
+        ScanIntervalMode mode;
+        mode.scanScene = SCAN_SCENE_ALL;
+        mode.scanMode = ScanMode::SYSTEM_TIMER_SCAN;
+        mode.isSingle = true;
+        mode.interval = 1;
+        mode.intervalMode = IntervalMode::INTERVAL_FIXED;
+        pScanService->scanControlInfo.scanIntervalList.push_back(mode);
+        EXPECT_TRUE(pScanService->AllowExternCustomSceneCheck(customIters, 0, ScanMode::SYSTEM_TIMER_SCAN) == true);
+        pScanService->scanControlInfo.scanIntervalList.push_back(mode);
+        EXPECT_TRUE(pScanService->AllowExternCustomSceneCheck(customIters, 0, ScanMode::SYSTEM_TIMER_SCAN) == false);
+    }
+
 };
 
 HWTEST_F(ScanServiceTest, InitScanServiceSuccess1, TestSize.Level1)
@@ -2698,6 +2757,56 @@ HWTEST_F(ScanServiceTest, HandleMovingFreezeChangedTest, TestSize.Level1)
 HWTEST_F(ScanServiceTest, WifiMaxThroughputTest, TestSize.Level1)
 {
     WifiMaxThroughputTest();
+}
+/**
+ * @tc.name: IsPackageInTrustListTest
+ * @tc.desc: IsPackageInTrustList()
+ * @tc.type: FUNC
+ * @tc.require: issue
+*/
+HWTEST_F(ScanServiceTest, IsPackageInTrustListTest, TestSize.Level1)
+{
+    IsPackageInTrustListTest();
+}
+/**
+ * @tc.name: AllowScanByMovingFreeze_001
+ * @tc.desc: AllowScanByMovingFreeze()
+ * @tc.type: FUNC
+ * @tc.require: issue
+*/
+HWTEST_F(ScanServiceTest, AllowScanByMovingFreeze_001, TestSize.Level1)
+{
+    AllowScanByMovingFreezeTest1();
+}
+/**
+ * @tc.name: AllowScanByMovingFreeze_002
+ * @tc.desc: AllowScanByMovingFreeze()
+ * @tc.type: FUNC
+ * @tc.require: issue
+*/
+HWTEST_F(ScanServiceTest, AllowScanByMovingFreeze_002, TestSize.Level1)
+{
+    AllowScanByMovingFreezeTest2();
+}
+/**
+ * @tc.name: AllowExternCustomSceneCheck_001
+ * @tc.desc: WifiMaxThroughputTest()
+ * @tc.type: FUNC
+ * @tc.require: issue
+*/
+HWTEST_F(ScanServiceTest, AllowExternCustomSceneCheck_001, TestSize.Level1)
+{
+    AllowExternCustomSceneCheckTest1();
+}
+/**
+ * @tc.name: AllowExternCustomSceneCheck_002
+ * @tc.desc: AllowExternCustomSceneCheck()
+ * @tc.type: FUNC
+ * @tc.require: issue
+*/
+HWTEST_F(ScanServiceTest, AllowExternCustomSceneCheck_002, TestSize.Level1)
+{
+    AllowExternCustomSceneCheckTest2();
 }
 } // namespace Wifi
 } // namespace OHOS

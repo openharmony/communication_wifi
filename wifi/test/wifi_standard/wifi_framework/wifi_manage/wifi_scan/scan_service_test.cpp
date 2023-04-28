@@ -1838,7 +1838,6 @@ public:
         pScanService->scanControlInfo.scanIntervalList.push_back(mode);
         EXPECT_TRUE(pScanService->AllowExternCustomSceneCheck(customIters, 0, ScanMode::SYSTEM_TIMER_SCAN) == false);
     }
-
 };
 
 HWTEST_F(ScanServiceTest, InitScanServiceSuccess1, TestSize.Level1)

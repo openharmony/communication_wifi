@@ -13,41 +13,47 @@
  * limitations under the License.
  */
 
+// @ts-nocheck
+
 import { TestData } from '../MainAbility/model/testData'
+import ConfigData from '../Utils/ConfigData';
 /**
- * Test-ImageDisplay
+ * Test-ImageDisplay page of wifi test
  */
+
 @Component
 export struct TestImageDisplay {
   private testItem: TestData
+
   build() {
-    Stack({ alignContent: Alignment.BottomStart }) {
-      Flex({ alignItems: ItemAlign.Start }) {
+    Stack( { alignContent : Alignment.BottomStart } ) {
+      Flex( { alignItems : ItemAlign.Start } ) {
         Stack() {
-          Image(this.testItem.image)
-            .height(80)
-            .width(80)
-            .margin({left: 10, bottom: 10})
+          Image( this.testItem.image )
+            .height( 80 )
+            .width( 80 )
+            .margin( { left : 10 , bottom : 10 } )
         }
-        .width("20%")
+        .width( ConfigData.WH_20_100 )
+
         Column() {
-          Text(this.testItem.name)
-            .fontSize(26)
-            .fontWeight(500)
+          Text( this.testItem.name )
+            .fontSize( 26 )
+            .fontWeight( 500 )
               //            .textAlign(Start)
-            .margin({ left: 26, top: 10 })
-            .width("90%")
-          Text(this.testItem.detail)
-            .fontSize(18)
-            .fontWeight(500)
-            .margin({ top: 8 })
-            .width("80%")
+            .margin( { left : 26 , top : 10 } )
+            .width( ConfigData.WH_90_100 )
+          Text( this.testItem.detail )
+            .fontSize( 18 )
+            .fontWeight( 500 )
+            .margin( { top : 8 } )
+            .width( ConfigData.WH_80_100 )
         }
-        .width("80%")
-        .padding({left: 20})
+        .width( ConfigData.WH_80_100 )
+        .padding( { left : 20 } )
       }
     }
-    .backgroundColor('#FFedf2f5')
-    .height(160)
+    .backgroundColor( '#FFedf2f5' )
+    .height( 160 )
   }
 }

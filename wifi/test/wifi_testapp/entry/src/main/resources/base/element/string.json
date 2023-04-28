@@ -31,7 +31,8 @@
     {
       "name": "MainAbility2_label",
       "value": "label"
-    },    {
+    },
+    {
       "name": "MainAbility3_desc",
       "value": "description"
     },
@@ -82,6 +83,10 @@
     {
       "name": "benchmark",
       "value": "性能测试"
+    },
+    {
+      "name": "stress",
+      "value": "压力测试"
     },
     {
       "name": "test_title",
@@ -156,6 +161,14 @@
       "value": "Connected"
     },
     {
+      "name": "create_room",
+      "value": "create room"
+    },
+    {
+      "name": "send_message",
+      "value": "send message"
+    },
+    {
       "name": "about",
       "value": "About"
     },
@@ -205,7 +218,7 @@
     },
     {
       "name": "wifi_direct",
-      "value": "WiFi-Direct Feature:"
+      "value": "Wifi-Direct Feature:"
     },
     {
       "name": "soft_ap",
@@ -213,7 +226,7 @@
     },
     {
       "name": "wifi_aware",
-      "value": "WiFi Aware Feature:"
+      "value": "Wifi Aware Feature:"
     },
     {
       "name": "encryption",
@@ -223,38 +236,69 @@
       "name": "open",
       "value": "open"
     },
-
     {
       "name": "wifi_enable",
       "value": "wifi已经使能"
+    },
+    {
+      "name": "testEnableWifi_Start",
+      "value": "testEnableWifi Start----------"
+    },
+    {
+      "name": "testEnableWifi_End",
+      "value": "testEnableWifi End----------"
+    },
+    {
+      "name": "enableWifi_result",
+      "value": "使能结果: "
     },
     {
       "name": "wifi_disEnable",
       "value": "WIFI还未使能"
     },
     {
+      "name": "testDisableWifi_Start",
+      "value": "testDisableWifi Start----------"
+    },
+    {
+      "name": "testDisableWifi_End",
+      "value": "testDisableWifi End----------"
+    },
+    {
+      "name": "disableWifi_result",
+      "value": "去使能结果: "
+    },
+    {
       "name": "wifi_enable_result",
-      "value": "WiFi使能执行结果："
+      "value": "Wifi使能执行结果："
     },
     {
       "name": "wifi_disEnable_result",
-      "value": "WiFi去使能执行结果："
+      "value": "Wifi去使能执行结果："
     },
     {
       "name": "wifi_enable_confirm",
-      "value": "WiFi已打开或打开失败,请确认"
+      "value": "Wifi已打开或打开失败,请确认"
     },
     {
-      "name": "wifi_disEnable_confirm" ,
-      "value": "WiFi已关闭或关闭失败,请确认"
+      "name": "wifi_disEnable_confirm",
+      "value": "Wifi已关闭或关闭失败,请确认"
     },
     {
       "name": "wifi_IsActive",
       "value": "wifi使能结果为："
     },
     {
+      "name": "testIsWifiActive_Start",
+      "value": "testIsWifiActive Start----------"
+    },
+    {
+      "name": "testIsWifiActive_End",
+      "value": "testDisableWifi End----------"
+    },
+    {
       "name": "testEnableWifi",
-      "value": "enableWiFi test"
+      "value": "enableWifi test"
     },
     {
       "name": "testDisableWifi",
@@ -269,12 +313,36 @@
       "value": "scan test"
     },
     {
+      "name": "testScan_Start",
+      "value": "testScan Start----------"
+    },
+    {
+      "name": "testScan_End",
+      "value": "testScan End----------"
+    },
+    {
       "name": "scan",
       "value": "scan: "
     },
     {
+      "name": "testForcibleScan_Start",
+      "value": "testForcibleScan Start----------"
+    },
+    {
+      "name": "testForcibleScan_End",
+      "value": "testForcibleScan End----------"
+    },
+    {
       "name": "testGetScanInfosPromise",
       "value": "getScanInfosPromise test"
+    },
+    {
+      "name": "testGetScanInfosPromise_Start",
+      "value": "testGetScanInfosPromise Start----------"
+    },
+    {
+      "name": "testGetScanInfosPromise_End",
+      "value": "testGetScanInfosPromise End----------"
     },
     {
       "name": "testGetScanInfosPromise_successful",
@@ -289,6 +357,14 @@
       "value": "getScanInfosCallback test"
     },
     {
+      "name": "testGetScanInfosCallback_Start",
+      "value": "testGetScanInfosCallback Start----------"
+    },
+    {
+      "name": "testGetScanInfosCallback_End",
+      "value": "testGetScanInfosCallback End----------"
+    },
+    {
       "name": "testGetScanInfosCallback_successful",
       "value": "getScanInfos callback successful"
     },
@@ -299,6 +375,14 @@
     {
       "name": "testAddDeviceConfigPromise",
       "value": "addDeviceConfigPromise test"
+    },
+    {
+      "name": "testAddDeviceConfigPromise_Start",
+      "value": "testAddDeviceConfigPromise Start----------"
+    },
+    {
+      "name": "testAddDeviceConfigPromise_End",
+      "value": "testAddDeviceConfigPromise End----------"
     },
     {
       "name": "testAddDeviceConfigPromise_successful",
@@ -313,6 +397,14 @@
       "value": "addDeviceConfigCallback test"
     },
     {
+      "name": "testAddDeviceConfigCallback_Start",
+      "value": "testAddDeviceConfigCallback Start----------"
+    },
+    {
+      "name": "testAddDeviceConfigCallback_End",
+      "value": "testAddDeviceConfigCallback End----------"
+    },
+    {
       "name": "testAddDeviceConfigCallback_successful",
       "value": "addDeviceConfig Callback successful"
     },
@@ -323,6 +415,14 @@
     {
       "name": "testAddUntrustedConfigPromise",
       "value": "addUntrustedConfigPromise test"
+    },
+    {
+      "name": "testAddUntrustedConfigPromise_Start",
+      "value": "testAddUntrustedConfigPromise Start----------"
+    },
+    {
+      "name": "testAddUntrustedConfigPromise_End",
+      "value": "testAddUntrustedConfigPromise End----------"
     },
     {
       "name": "testAddUntrustedConfigPromise_successful",
@@ -337,6 +437,14 @@
       "value": "addUntrustedConfigCallback test"
     },
     {
+      "name": "testAddUntrustedConfigCallback_Start",
+      "value": "testAddUntrustedConfigCallback Start----------"
+    },
+    {
+      "name": "testAddUntrustedConfigCallback_End",
+      "value": "testAddUntrustedConfigCallback End----------"
+    },
+    {
       "name": "testAddUntrustedConfigCallback_successful",
       "value": "addUntrustedConfig Callback successful"
     },
@@ -347,6 +455,14 @@
     {
       "name": "testRemoveUntrustedConfigPromise",
       "value": "removeUntrustedConfigPromise test"
+    },
+    {
+      "name": "testRemoveUntrustedConfigPromise_Start",
+      "value": "testRemoveUntrustedConfigPromise Start----------"
+    },
+    {
+      "name": "testRemoveUntrustedConfigPromise_End",
+      "value": "testRemoveUntrustedConfigPromise End----------"
     },
     {
       "name": "testRemoveUntrustedConfigPromise_successful",
@@ -361,6 +477,14 @@
       "value": "removeUntrustedConfigCallback test"
     },
     {
+      "name": "testRemoveUntrustedConfigCallback_Start",
+      "value": "testRemoveUntrustedConfigCallback Start----------"
+    },
+    {
+      "name": "testRemoveUntrustedConfigCallback_End",
+      "value": "testRemoveUntrustedConfigCallback End----------"
+    },
+    {
       "name": "testRemoveUntrustedConfigCallback_successful",
       "value": "removeUntrustedConfig Callback successful"
     },
@@ -373,12 +497,28 @@
       "value": "connectToNetwork test"
     },
     {
+      "name": "testConnectToNetwork_Start",
+      "value": "testConnectToNetwork Start----------"
+    },
+    {
+      "name": "testConnectToNetwork_End",
+      "value": "testConnectToNetwork End----------"
+    },
+    {
       "name": "connectToNetwork",
       "value": "ConnectToNetwork: "
     },
     {
       "name": "testConnectToDevice",
       "value": "connectToDevice test"
+    },
+    {
+      "name": "testConnectToDevice_Start",
+      "value": "testConnectToDevice Start----------"
+    },
+    {
+      "name": "testConnectToDevice_End",
+      "value": "testConnectToDevice End----------"
     },
     {
       "name": "connectToDevice",
@@ -389,12 +529,28 @@
       "value": "disconnect test"
     },
     {
+      "name": "testDisconnect_Start",
+      "value": "testDisconnect Start----------"
+    },
+    {
+      "name": "testDisconnect_End",
+      "value": "testDisconnect End----------"
+    },
+    {
       "name": "disconnect",
       "value": "disconnect: "
     },
     {
       "name": "testGetSignalLevel",
       "value": "getSignalLevel test"
+    },
+    {
+      "name": "testGetSignalLevel_Start",
+      "value": "testGetSignalLevel Start----------"
+    },
+    {
+      "name": "testGetSignalLevel_End",
+      "value": "testGetSignalLevel End----------"
     },
     {
       "name": "getSignalLevel",
@@ -405,6 +561,14 @@
       "value": "getLinkedInfoPromise test"
     },
     {
+      "name": "testGetLinkedInfoPromise_Start",
+      "value": "testGetLinkedInfoPromise Start----------"
+    },
+    {
+      "name": "testGetLinkedInfoPromise_End",
+      "value": "testGetLinkedInfoPromise End----------"
+    },
+    {
       "name": "testGetLinkedInfoPromise_successful",
       "value": "getLinkedInfoPromise test successful"
     },
@@ -412,10 +576,17 @@
       "name": "getLinkedInfoPromise",
       "value": "get wifi linked info: "
     },
-
     {
       "name": "testGetLinkedInfoCallback",
       "value": "getLinkedInfoCallback test"
+    },
+    {
+      "name": "testGetLinkedInfoCallback_Start",
+      "value": "testGetLinkedInfoCallback Start----------"
+    },
+    {
+      "name": "testGetLinkedInfoCallback_End",
+      "value": "testGetLinkedInfoCallback End----------"
     },
     {
       "name": "testGetLinkedInfoCallback_successful",
@@ -430,12 +601,28 @@
       "value": "isConnected test"
     },
     {
+      "name": "testIsConnected_Start",
+      "value": "testIsConnected Start----------"
+    },
+    {
+      "name": "testIsConnected_End",
+      "value": "testIsConnected End----------"
+    },
+    {
       "name": "isConnected",
       "value": "isConnected: "
     },
     {
       "name": "testGetSupportedFeatures",
       "value": "getSupportedFeatures test"
+    },
+    {
+      "name": "testGetSupportedFeatures_Start",
+      "value": "testGetSupportedFeatures Start----------"
+    },
+    {
+      "name": "testGetSupportedFeatures_End",
+      "value": "testGetSupportedFeatures End----------"
     },
     {
       "name": "getSupportedFeatures",
@@ -446,12 +633,28 @@
       "value": "isFeatureSupported test"
     },
     {
+      "name": "testIsFeatureSupported_Start",
+      "value": "testIsFeatureSupported Start----------"
+    },
+    {
+      "name": "testIsFeatureSupported_End",
+      "value": "testIsFeatureSupported End----------"
+    },
+    {
       "name": "isFeatureSupported",
       "value": "isFeatureSupported: "
     },
     {
       "name": "testGetDeviceMacAddress",
       "value": "getDeviceMacAddress test"
+    },
+    {
+      "name": "testGetDeviceMacAddress_Start",
+      "value": "testGetDeviceMacAddress Start----------"
+    },
+    {
+      "name": "testGetDeviceMacAddress_End",
+      "value": "testGetDeviceMacAddress End----------"
     },
     {
       "name": "getDeviceMacAddress",
@@ -462,12 +665,28 @@
       "value": "getIpInfo test"
     },
     {
+      "name": "testGetIpInfo_Start",
+      "value": "testGetIpInfo Start----------"
+    },
+    {
+      "name": "testGetIpInfo_End",
+      "value": "testGetIpInfo End----------"
+    },
+    {
       "name": "getIpInfo",
       "value": "IpInfo: "
     },
     {
       "name": "testGetCountryCode",
       "value": "getCountryCode test"
+    },
+    {
+      "name": "testGetCountryCode_Start",
+      "value": "testGetCountryCode Start----------"
+    },
+    {
+      "name": "testGetCountryCode_End",
+      "value": "testGetCountryCode End----------"
     },
     {
       "name": "getCountryCode",
@@ -478,12 +697,28 @@
       "value": "reAssociate test"
     },
     {
+      "name": "testReassociate_Start",
+      "value": "testReassociate Start----------"
+    },
+    {
+      "name": "testReassociate_End",
+      "value": "testReassociate End----------"
+    },
+    {
       "name": "reassociate",
       "value": "reassociate is: "
     },
     {
       "name": "testReConnect",
       "value": "reConnect test"
+    },
+    {
+      "name": "testReConnect_Start",
+      "value": "testReConnect Start----------"
+    },
+    {
+      "name": "testReConnect_End",
+      "value": "testReConnect End----------"
     },
     {
       "name": "reconnect",
@@ -494,12 +729,28 @@
       "value": "getDeviceConfigs test"
     },
     {
+      "name": "testGetDeviceConfigs_Start",
+      "value": "testGetDeviceConfigs Start----------"
+    },
+    {
+      "name": "testGetDeviceConfigs_End",
+      "value": "testGetDeviceConfigs End----------"
+    },
+    {
       "name": "getDeviceConfigs",
       "value": "DeviceConfigs is: "
     },
     {
       "name": "testUpdateNetwork",
       "value": "updateNetwork test"
+    },
+    {
+      "name": "testUpdateNetwork_Start",
+      "value": "testUpdateNetwork Start----------"
+    },
+    {
+      "name": "testUpdateNetwork_End",
+      "value": "testUpdateNetwork End----------"
     },
     {
       "name": "updateNetwork",
@@ -510,12 +761,28 @@
       "value": "disableNetWork test"
     },
     {
+      "name": "testDisableNetwork_Start",
+      "value": "testDisableNetwork Start----------"
+    },
+    {
+      "name": "testDisableNetwork_End",
+      "value": "testDisableNetwork End----------"
+    },
+    {
       "name": "disableNetwork",
       "value": "disableNetwork: "
     },
     {
       "name": "testRemoveAllNetwork",
       "value": "removeAllNetwork test"
+    },
+    {
+      "name": "testRemoveAllNetwork_Start",
+      "value": "testRemoveAllNetwork Start----------"
+    },
+    {
+      "name": "testRemoveAllNetwork_End",
+      "value": "testRemoveAllNetwork End----------"
     },
     {
       "name": "removeAllNetwork",
@@ -526,12 +793,28 @@
       "value": "removeDevice test"
     },
     {
+      "name": "testRemoveDevice_Start",
+      "value": "testRemoveDevice Start----------"
+    },
+    {
+      "name": "testRemoveDevice_End",
+      "value": "testRemoveDevice End----------"
+    },
+    {
       "name": "removeDevice",
       "value": "removeDevice: "
     },
     {
       "name": "testOnWifiStateChange",
       "value": "onWifiStateChange test"
+    },
+    {
+      "name": "testOnWifiStateChange_Start",
+      "value": "testOnWifiStateChange Start----------"
+    },
+    {
+      "name": "testOnWifiStateChange_End",
+      "value": "testOnWifiStateChange End----------"
     },
     {
       "name": "offWifiStateChange",
@@ -558,6 +841,14 @@
       "value": "onWifiConnectionChange test"
     },
     {
+      "name": "testOnWifiConnectionChange_Start",
+      "value": "testOnWifiConnectionChange Start----------"
+    },
+    {
+      "name": "testOnWifiConnectionChange_End",
+      "value": "testOnWifiConnectionChange End----------"
+    },
+    {
       "name": "offWifiConnectionChange",
       "value": "on.wifiConnectionChange监听已关闭"
     },
@@ -580,6 +871,14 @@
     {
       "name": "testOnWifiScanStateChange",
       "value": "onWifiScanStateChange test"
+    },
+    {
+      "name": "testOnWifiScanStateChange_Start",
+      "value": "testOnWifiConnectionChange Start----------"
+    },
+    {
+      "name": "testOnWifiScanStateChange_End",
+      "value": "testOnWifiConnectionChange End----------"
     },
     {
       "name": "offWifiScanStateChange",
@@ -606,6 +905,14 @@
       "value": "onWifiRssiChange test"
     },
     {
+      "name": "testOnWifiRssiChange_Start",
+      "value": "testOnWifiRssiChange Start----------"
+    },
+    {
+      "name": "testOnWifiRssiChange_End",
+      "value": "testOnWifiRssiChange End----------"
+    },
+    {
       "name": "offWifiRssiChange",
       "value": "on.wifiRssiChange监听已关闭"
     },
@@ -630,6 +937,14 @@
       "value": "onStreamChange test"
     },
     {
+      "name": "testOnStreamChange_Start",
+      "value": "testOnStreamChange Start----------"
+    },
+    {
+      "name": "testOnStreamChange_End",
+      "value": "testOnStreamChange End----------"
+    },
+    {
       "name": "offStreamChange",
       "value": "on.streamChange监听已关闭"
     },
@@ -649,10 +964,17 @@
       "name": "streamChange",
       "value": "stream状态: "
     },
-
     {
       "name": "testEnableHotspot",
       "value": "enableHotspot test"
+    },
+    {
+      "name": "testEnableHotspot_Start",
+      "value": "testEnableHotspot start--------------"
+    },
+    {
+      "name": "testEnableHotspot_End",
+      "value": "testEnableHotspot End--------------"
     },
     {
       "name": "hotspot_enable",
@@ -675,7 +997,7 @@
       "value": "热点已打开或打开失败,请确认"
     },
     {
-      "name": "hotspot_disEnable_confirm" ,
+      "name": "hotspot_disEnable_confirm",
       "value": "热点已关闭或关闭失败,请确认"
     },
     {
@@ -687,12 +1009,36 @@
       "value": "disableHotspot test"
     },
     {
+      "name": "testDisableHotspot_Start",
+      "value": "testDisableHotspot start--------------"
+    },
+    {
+      "name": "testDisableHotspot_End",
+      "value": "testDisableHotspot End--------------"
+    },
+    {
       "name": "testIsHotspotActive",
       "value": "isHotspotActive test"
     },
     {
+      "name": "testIsHostActive_Start",
+      "value": "testIsHostActive start--------------"
+    },
+    {
+      "name": "testIsHostActive_End",
+      "value": "testIsHostActive End--------------"
+    },
+    {
       "name": "testIsHotspotDualBandSupported",
       "value": "isHotspotDualBandSupported test"
+    },
+    {
+      "name": "testIsHotspotDualBandSupported_Start",
+      "value": "testIsHotspotDualBandSupported start--------------"
+    },
+    {
+      "name": "testIsHotspotDualBandSupported_End",
+      "value": "testIsHotspotDualBandSupported End--------------"
     },
     {
       "name": "isHotspotDualBandSupported",
@@ -703,12 +1049,28 @@
       "value": "SetHotspotConfig test"
     },
     {
+      "name": "testSetHotspotConfig_Start",
+      "value": "testSetHotspotConfig start--------------"
+    },
+    {
+      "name": "testSetHotspotConfig_End",
+      "value": "testSetHotspotConfig End--------------"
+    },
+    {
       "name": "setHotspotConfig",
       "value": "SetHotspotConfig: "
     },
     {
       "name": "testGetHotspotConfig",
       "value": "getHotspotConfig test"
+    },
+    {
+      "name": "testGetHotspotConfig_Start",
+      "value": "testGetHotspotConfig start--------------"
+    },
+    {
+      "name": "testGetHotspotConfig_End",
+      "value": "testGetHotspotConfig End--------------"
     },
     {
       "name": "getHotspotConfig",
@@ -719,12 +1081,28 @@
       "value": "GetStations test"
     },
     {
+      "name": "testGetStations_Start",
+      "value": "testGetStations start--------------"
+    },
+    {
+      "name": "testGetStations_End",
+      "value": "testGetStations End--------------"
+    },
+    {
       "name": "getStations",
       "value": "GetStations: "
     },
     {
       "name": "testOnHotspotStateChange",
       "value": "onHotspotStateChange test"
+    },
+    {
+      "name": "testOnHotspotStateChange_Start",
+      "value": "testOnHotspotStateChange start--------------"
+    },
+    {
+      "name": "testOnHotspotStateChange_End",
+      "value": "testOnHotspotStateChange End--------------"
     },
     {
       "name": "offHotspotStateChange",
@@ -746,10 +1124,17 @@
       "name": "hotspotStateChange",
       "value": "状态为: "
     },
-
     {
       "name": "testOnHotspotStaJoin",
       "value": "onHotspotStaJoin test"
+    },
+    {
+      "name": "testOnHotspotStaJoin_Start",
+      "value": "testOnHotspotStaJoin start--------------"
+    },
+    {
+      "name": "testOnHotspotStaJoin_End",
+      "value": "testOnHotspotStaJoin End--------------"
     },
     {
       "name": "offHotspotStaJoin",
@@ -776,6 +1161,14 @@
       "value": "onHotspotStaLeave test"
     },
     {
+      "name": "testOnHotspotStaLeave_Start",
+      "value": "testOnHotspotStaLeave start--------------"
+    },
+    {
+      "name": "testOnHotspotStaLeave_End",
+      "value": "testOnHotspotStaLeave End--------------"
+    },
+    {
       "name": "offHotspotStaLeave",
       "value": "on.hotspotStaLeave监听已关闭"
     },
@@ -795,13 +1188,20 @@
       "name": "hotspotStaLeave",
       "value": "状态为: "
     },
-
     {
       "name": "testGetP2pLinkedInfoPromise",
       "value": "getP2pLinkedInfoPromise test"
     },
     {
-      "name": "testGetP2pLinkedInfoPromise_successful",
+      "name": "testGetP2pLinkedInfoPromise_Start",
+      "value": "testGetP2pLinkedInfoPromise Start----------"
+    },
+    {
+      "name": "testGetP2pLinkedInfoPromise_End",
+      "value": "testGetP2pLinkedInfoPromise End----------"
+    },
+    {
+      "name": "getP2pLinkedInfoPromise_successful",
       "value": "getP2pLinkedInfoPromise successful"
     },
     {
@@ -813,12 +1213,20 @@
       "value": "getP2pLinkedInfoCallback test"
     },
     {
+      "name": "testGetP2pLinkedInfoCallback_Start",
+      "value": "testGetP2pLinkedInfoCallback Start----------"
+    },
+    {
+      "name": "testGetP2pLinkedInfoCallback_End",
+      "value": "testGetP2pLinkedInfoCallback End----------"
+    },
+    {
       "name": "getP2pLinkedInfoCallback_error",
       "value": "getP2pLinkedInfoCallback error"
     },
     {
       "name": "getP2pLinkedInfoCallback_successful",
-      "value": "getP2pLinkedInfoCallback successful: "
+      "value": "getP2pLinkedInfoCallback successful "
     },
     {
       "name": "getP2pLinkedInfoCallback",
@@ -827,6 +1235,14 @@
     {
       "name": "testGetCurrentGroupPromise",
       "value": "getCurrentGroupPromise test"
+    },
+    {
+      "name": "testGetCurrentGroupPromise_Start",
+      "value": "testGetCurrentGroupPromise Start----------"
+    },
+    {
+      "name": "testGetCurrentGroupPromise_End",
+      "value": "testGetCurrentGroupPromise End----------"
     },
     {
       "name": "testGetCurrentGroupPromise_successful",
@@ -841,12 +1257,20 @@
       "value": "getCurrentGroupCallback test"
     },
     {
+      "name": "testGetCurrentGroupCallback_Start",
+      "value": "testGetCurrentGroupCallback Start----------"
+    },
+    {
+      "name": "testGetCurrentGroupCallback_End",
+      "value": "testGetCurrentGroupCallback End----------"
+    },
+    {
       "name": "testCurrentGroupCallback_error",
       "value": "testCurrentGroupCallback error"
     },
     {
       "name": "getCurrentGroupCallback_successful",
-      "value": "getCurrentGroupCallback successful: "
+      "value": "getCurrentGroupCallback successful"
     },
     {
       "name": "getCurrentGroupCallback",
@@ -857,8 +1281,16 @@
       "value": "getP2pPeerDevicesPromise test: "
     },
     {
+      "name": "testGetP2pPeerDevicesPromise_Start",
+      "value": "testGetP2pPeerDevicesPromise Start----------"
+    },
+    {
+      "name": "testGetP2pPeerDevicesPromise_End",
+      "value": "testGetP2pPeerDevicesPromise End----------"
+    },
+    {
       "name": "getP2pPeerDevicesPromise_successful",
-      "value": "getP2pPeerDevicesPromise successful: "
+      "value": "getP2pPeerDevicesPromise successful"
     },
     {
       "name": "getP2pPeerDevicesPromise",
@@ -867,6 +1299,14 @@
     {
       "name": "testGetP2pPeerDevicesCallback",
       "value": "getP2pPeerDevicesCallback test: "
+    },
+    {
+      "name": "testGetP2pPeerDevicesCallback_Start",
+      "value": "testGetP2pPeerDevicesCallback Start----------"
+    },
+    {
+      "name": "testGetP2pPeerDevicesCallback_End",
+      "value": "testGetP2pPeerDevicesCallback End----------"
     },
     {
       "name": "getP2pPeerDevicesCallback_error",
@@ -885,12 +1325,28 @@
       "value": "createGroup test"
     },
     {
+      "name": "testCreateGroup_Start",
+      "value": "testCreateGroup Start----------"
+    },
+    {
+      "name": "testCreateGroup_End",
+      "value": "testCreateGroup End----------"
+    },
+    {
       "name": "createGroup",
       "value": "createGroup: "
     },
     {
       "name": "testRemoveGroup",
       "value": "removeGroup test"
+    },
+    {
+      "name": "testRemoveGroup_Start",
+      "value": "testRemoveGroup Start----------"
+    },
+    {
+      "name": "testRemoveGroup_End",
+      "value": "testRemoveGroup End----------"
     },
     {
       "name": "removeGroup",
@@ -901,12 +1357,28 @@
       "value": "P2pConnect test"
     },
     {
+      "name": "testP2pConnect_Start",
+      "value": "testP2pConnect Start----------"
+    },
+    {
+      "name": "testP2pConnect_End",
+      "value": "testP2pConnect End----------"
+    },
+    {
       "name": "p2pConnect",
       "value": "p2pConnect: "
     },
     {
       "name": "testP2pCancelConnect",
       "value": "p2pCancelConnect test"
+    },
+    {
+      "name": "testP2pCancelConnect_Start",
+      "value": "testP2pCancelConnect Start----------"
+    },
+    {
+      "name": "testP2pCancelConnect_End",
+      "value": "testP2pCancelConnect End----------"
     },
     {
       "name": "p2pCancelConnect",
@@ -917,12 +1389,28 @@
       "value": "startDiscoverDevices test"
     },
     {
+      "name": "testStartDiscoverDevices_Start",
+      "value": "testStartDiscoverDevices Start----------"
+    },
+    {
+      "name": "testStartDiscoverDevices_End",
+      "value": "testStartDiscoverDevices End----------"
+    },
+    {
       "name": "startDiscoverDevices",
       "value": "startDiscoverDevices: "
     },
     {
       "name": "testStopDiscoverDevices",
       "value": "stopDiscoverDevices test"
+    },
+    {
+      "name": "testStopDiscoverDevices_Start",
+      "value": "testStopDiscoverDevices Start----------"
+    },
+    {
+      "name": "testStopDiscoverDevices_End",
+      "value": "testStopDiscoverDevices End----------"
     },
     {
       "name": "stopDiscoverDevices",
@@ -933,16 +1421,32 @@
       "value": "deletePersistentGroup test"
     },
     {
+      "name": "testDeletePersistentGroup_Start",
+      "value": "testDeletePersistentGroup Start----------"
+    },
+    {
+      "name": "testDeletePersistentGroup_End",
+      "value": "testDeletePersistentGroup End----------"
+    },
+    {
       "name": "deletePersistentGroup",
-      "value":"deletePersistentGroup: "
+      "value": "deletePersistentGroup: "
     },
     {
       "name": "testSetDeviceName",
       "value": "setDeviceName test"
     },
     {
+      "name": "testSetDeviceName_Start",
+      "value": "testSetDeviceName Start----------"
+    },
+    {
+      "name": "testSetDeviceName_End",
+      "value": "testSetDeviceName End----------"
+    },
+    {
       "name": "setDeviceName",
-      "value":"setDeviceName: "
+      "value": "setDeviceName: "
     },
     {
       "name": "testOnP2pStateChange",
@@ -951,6 +1455,14 @@
     {
       "name": "testOnP2pStateChange_test",
       "value": "testOnP2pStateChange test"
+    },
+    {
+      "name": "testOnP2pStateChange_Start",
+      "value": "testOnP2pStateChange Start----------"
+    },
+    {
+      "name": "testOnP2pStateChange_End",
+      "value": "testOnP2pStateChange End----------"
     },
     {
       "name": "offP2pStateChange",
@@ -981,6 +1493,14 @@
       "value": "testOnP2pConnectionChange test"
     },
     {
+      "name": "testOnP2pConnectionChange_Start",
+      "value": "testOnP2pConnectionChange Start----------"
+    },
+    {
+      "name": "testOnP2pConnectionChange_End",
+      "value": "testOnP2pConnectionChange End----------"
+    },
+    {
       "name": "offP2pConnectionChange",
       "value": "on.P2pConnectionChange监听已关闭"
     },
@@ -994,7 +1514,7 @@
     },
     {
       "name": "onP2pConnectionChangeTest",
-      "value": "打开注册WLAN连接状态变化"
+      "value": "打开注册p2p连接状态变化"
     },
     {
       "name": "P2pConnectionChange",
@@ -1003,6 +1523,14 @@
     {
       "name": "testOnP2pDeviceChange",
       "value": "OnP2pDeviceChange test"
+    },
+    {
+      "name": "testOnP2pDeviceChange_Start",
+      "value": "testOnP2pDeviceChange Start----------"
+    },
+    {
+      "name": "testOnP2pDeviceChange_End",
+      "value": "testOnP2pDeviceChange End----------"
     },
     {
       "name": "testOnP2pDeviceChange_test",
@@ -1022,7 +1550,7 @@
     },
     {
       "name": "onP2pDeviceChangeTest",
-      "value": "打开注册WLAN连接状态变化"
+      "value": "打开注册p2p设备连接状态变化"
     },
     {
       "name": "P2pDeviceChange",
@@ -1031,6 +1559,14 @@
     {
       "name": "testOnP2pPeerDeviceChange",
       "value": "OnP2pPeerDeviceChange test"
+    },
+    {
+      "name": "testOnP2pPeerDeviceChange_Start",
+      "value": "testOnP2pPeerDeviceChange Start----------"
+    },
+    {
+      "name": "testOnP2pPeerDeviceChange_End",
+      "value": "testOnP2pPeerDeviceChange End----------"
     },
     {
       "name": "testOnP2pPeerDeviceChange_test",
@@ -1061,6 +1597,14 @@
       "value": "OnP2pPersistentGroupChange test"
     },
     {
+      "name": "testOnP2pPersistentGroupChange_Start",
+      "value": "testOnP2pPersistentGroupChange Start----------"
+    },
+    {
+      "name": "testOnP2pPersistentGroupChange_End",
+      "value": "testOnP2pPersistentGroupChange End----------"
+    },
+    {
       "name": "testOnP2pPersistentGroupChange_test",
       "value": "testOnP2pPersistentGroupChange test"
     },
@@ -1087,6 +1631,14 @@
     {
       "name": "testOnP2pDiscoveryChange",
       "value": "OnP2pDiscoveryChange test"
+    },
+    {
+      "name": "testOnP2pDiscoveryChange_Start",
+      "value": "testOnP2pDiscoveryChange Start----------"
+    },
+    {
+      "name": "testOnP2pDiscoveryChange_End",
+      "value": "testOnP2pDiscoveryChange End----------"
     },
     {
       "name": "testOnP2pDiscoveryChange_test",

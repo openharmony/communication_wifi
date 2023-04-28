@@ -1,0 +1,217 @@
+/**
+ * Copyright (c) 2022 Shenzhen Kaihong Digital Industry Development Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+import wifi from '@ohos.wifi';
+import router from '@ohos.router';
+import { resolveIP } from '../../../Utils/Util'
+import socket from '@ohos.net.socket';
+import Logger from '../../../MainAbility/model/Logger'
+
+const TAG: string = '[Login]'
+
+let localAddr = {
+  address : resolveIP( wifi.getIpInfo().ipAddress ) ,
+  family : 1 ,
+  port : 9090
+}
+let oppositeAddr = {
+  address : '' ,
+  family : 1 ,
+  port : 0
+}
+let loginCount = 0
+
+let udp = socket.constructUDPSocketInstance()
+
+@Entry
+@Component
+struct Login {
+  @State login_feng: boolean = false
+  @State login_wen: boolean = false
+  @State user: string = ''
+  @State roomDialog: boolean = false
+  @State confirmDialog: boolean = false
+  @State ipDialog: boolean = true
+  @State txtDialog: boolean = true
+  @State warnDialog: boolean = false
+  @State warnText: string = ''
+  @State roomNumber: string = ''
+  @State receiveMsg: string = '待接收数据'
+
+  bindOption() {
+    let bindOption = udp.bind( localAddr );
+    bindOption.then( () => {
+      Logger.info( TAG , 'bind success' )
+      this.receiveMsg = "绑定成功"
+    } ).catch( err => {
+      Logger.info( TAG , 'bind fail' )
+    } )
+    udp.on( 'message' , data => {
+      Logger.info( TAG , `data:${ JSON.stringify( data ) }` )
+      let buffer = data.message
+      let dataView = new DataView(buffer)
+      Logger.info( TAG , `length = ${ dataView.byteLength }` )
+      let str = ""
+      for ( let i = 0 ;i < dataView.byteLength ; ++i ) {
+        let c = String.fromCharCode( dataView.getUint8( i ) )
+        if ( c != "\n" ) {
+          str += c
+        }
+      }
+      if ( str == 'ok' ) {
+        router.clear()
+        loginCount += 1
+        router.push( {
+          url : 'pages/Index' ,
+          params : { address : oppositeAddr.address , port : oppositeAddr.port , loginCount : loginCount }
+        } )
+      }
+      else {
+        this.receiveMsg = str
+        this.confirmDialog = true
+      }
+    } )
+  }
+
+  build() {
+    Stack( { alignContent : Alignment.Center } ) {
+      Column() {
+        Text( $r( 'app.string.MainAbility_label' ) )
+          .width( '100%' )
+          .height( 50 )
+          .backgroundColor( '#0D9FFB' )
+          .textAlign( TextAlign.Start )
+          .fontSize( 25 )
+          .padding( { left : 10 } )
+          .fontColor( Color.White )
+          .fontWeight( FontWeight.Bold )
+        if ( !this.ipDialog ) {
+          Column() {
+            Image( this.login_feng ? $r( 'app.color.blue' ) : $r( 'app.color.moon' ) )
+              .width( 100 )
+              .height( 100 )
+              .objectFit( ImageFit.Fill )
+            Text( '用户名：' + this.user ).fontSize( 25 ).margin( { top : 50 } )
+
+            Button() {
+              Text( $r( 'app.string.create_room' ) ).fontSize( 25 ).fontColor( Color.White )
+            }
+            .width( '150' )
+            .height( 50 )
+            .margin( { top : 30 } )
+            .type( ButtonType.Capsule )
+            .onClick( () => {
+              this.roomDialog = true
+              this.bindOption()
+            } )
+          }.width( '90%' ).margin( { top : 100 } )
+        }
+
+        if ( this.ipDialog ) {
+          Column() {
+            Text( '本地IP：' + localAddr.address )
+              .fontSize( 25 )
+              .margin( { top : 10 } )
+            TextInput( { placeholder : '请输入对端ip' } )
+              .width( 200 )
+              .fontSize( 25 )
+              .margin( { top : 10 } )
+              .onChange( ( value: string ) => {
+                oppositeAddr.address = value
+                oppositeAddr.port = 9090
+              } )
+
+            if ( this.warnDialog ) {
+              Text( this.warnText )
+                .width( 200 )
+                .fontSize( 10 )
+                .fontColor( Color.Red ).margin( { top : 5 } )
+            }
+            Button( $r( 'app.string.confirm' ) )
+              .fontColor( Color.Black )
+              .height( 50 )
+              .width( 100 )
+              .fontSize( 25 )
+              .margin( { bottom : 10 } )
+              .onClick( () => {
+                if ( oppositeAddr.address === '' ) {
+                  this.warnDialog = true
+                  this.warnText = '请先输入对端IP'
+                } else {
+                  this.bindOption()
+                  this.txtDialog = true
+                  Logger.debug( TAG , `peer ip=${ oppositeAddr.address }` )
+                  Logger.debug( TAG , `peer port=${ oppositeAddr.port }` )
+                  Logger.debug( TAG , `peer port=${ localAddr.port }` )
+                }
+              } )
+              .backgroundColor( 0xffffff )
+
+            Button( $r( 'app.string.send_message' ) )
+              .fontColor( Color.Black )
+              .height( 50 )
+              .width( 100 )
+              .fontSize( 25 )
+              .margin( { bottom : 10 } )
+              .onClick( () => {
+                {
+                  //发送数据
+                  udp.send( {
+                    data : 'online' ,
+                    address : oppositeAddr
+                  } ).then( data => {
+                    Logger.info( TAG , `send sucess : ${ data }` )
+                  } ).catch( function( err ) {
+                    Logger.info( TAG , `TAG,send : ${ JSON.stringify( err ) }` )
+                  } )
+
+                  Logger.debug( TAG , `send peer ip=${ oppositeAddr.address }` )
+                  Logger.debug( TAG , `send peer port=${ oppositeAddr.port }` )
+                  Logger.debug( TAG , `send peer port=${ localAddr.port }` )
+                }
+              } )
+              .backgroundColor( 0xffffff )
+          }
+          .width( '80%' )
+          .height( 200 )
+          .margin( { top : '10%' } )
+          .backgroundColor( Color.White )
+          .border( { radius : 10 , width : 3 } )
+        }
+
+        if ( this.txtDialog ) {
+          Column() {
+            Text( '接收本地IP：' + localAddr.address )
+              .fontSize( 25 )
+              .margin( { top : 10 } )
+
+            Text( this.receiveMsg )
+              .width( 200 )
+              .fontSize( 25 )
+              .fontColor( Color.Red ).margin( { top : 5 } )
+
+
+          }
+          .width( '80%' )
+          .height( 200 )
+          .margin( { top : '10%' } )
+          .backgroundColor( Color.White )
+          .border( { radius : 10 , width : 3 } )
+        }
+
+      }.width( '100%' ).height( '100%' )
+    }
+  }
+}

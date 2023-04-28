@@ -37,13 +37,13 @@ struct Index {
                top: 20
              })
              .backgroundColor('#0D9FFB')
-             .width('35%')
-             .height('5%')
+             .width(ConfigData.WH_35_100)
+             .height(ConfigData.WH_5_100)
              .onClick(()=>{
              })
            }
-             .width('100%')
+             .width(ConfigData.WH_100_100)
          }
-             .height('100%')
+             .height(ConfigData.WH_100_100)
    }
  }

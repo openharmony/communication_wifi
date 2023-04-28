@@ -14,9 +14,7 @@
  */
 
 // @ts-nocheck
-/**
- * hotspot Test Page Of Wifi test
- */
+
 import { PageTitle } from '../../Component/pageTitle';
 import { TestImageDisplay } from '../../Component/testImageDisplay';
 import { ContentTable } from '../../Component/contentTable';
@@ -27,115 +25,122 @@ import { initHotspotManagerApIData } from '../../MainAbility/model/testDataModel
 import { TestData } from '../../MainAbility/model/testData'
 import { FilterTable } from '../../Component/filterTable';
 
+/**
+ * hotspotManager Test Page Of Wifi test
+ */
+
 @Entry
 @Component
-struct Index {
+struct hotspotManagerInterfaceTest {
   @State showList: boolean = true;
   private testItem: TestData = Router.getParams().testId;
   @State message: string = "";
-  @StorageLink('hotspotStateManagerMessage') hotspotStateManagerMessage: string = "";
-  @StorageLink('getStationsManagerMessage') getStationsManagerMessage: string = "";
-  @StorageLink('getHotspotConfigManagerMessage') getHotspotConfigManagerMessage: string = "";
-  @StorageLink('hotspotStaJoinManagerMessage') hotspotStaJoinManagerMessage: string = "";
-  @StorageLink('hotspotStaLeaveManagerMessage') hotspotStaLeaveManagerMessage: string = "";
+  @StorageLink( 'hotspotStateManagerMessage' ) hotspotStateManagerMessage: string = "";
+  @StorageLink( 'getStationsManagerMessage' ) getStationsManagerMessage: string = "";
+  @StorageLink( 'getHotspotConfigManagerMessage' ) getHotspotConfigManagerMessage: string = "";
+  @StorageLink( 'hotspotStaJoinManagerMessage' ) hotspotStaJoinManagerMessage: string = "";
+  @StorageLink( 'hotspotStaLeaveManagerMessage' ) hotspotStaLeaveManagerMessage: string = "";
+
   aboutToAppear() {
 
   }
 
   init() {
-    console.log("init-----------")
+    console.log( "init-----------" )
   }
 
   build() {
     Column() {
-      Stack({ alignContent: Alignment.TopStart }) {
-        TestImageDisplay({ testItem: this.testItem })
-        PageTitle({ testItem: this.testItem })
+      Stack( { alignContent : Alignment.TopStart } ) {
+        TestImageDisplay( { testItem : this.testItem } )
+        PageTitle( { testItem : this.testItem } )
       }
 
-      Stack().height("0.5vp").backgroundColor("#000000");
+      Stack().height( "0.5vp" ).backgroundColor( "#000000" );
       Column() {
         Row() {
-          Text("热点IP")
-            .fontSize("18vp")
-            .height(60)
-            .width("20%")
-            .padding({ left: 10 })
-          TextInput({ text: this.peripheralDeviceId, placeholder: "input peripheral deviceId." })
-            .fontSize("18vp")
-            .onChange((strInput) => {
+          Text( "热点IP" )
+            .fontSize( "18vp" )
+            .height( 60 )
+            .width( ConfigData.WH_20_100 )
+            .padding( { left : 10 } )
+          TextInput( { text : this.peripheralDeviceId , placeholder : "input peripheral deviceId." } )
+            .fontSize( "18vp" )
+            .onChange( ( strInput ) => {
               this.peripheralDeviceId = strInput;
-              AppStorage.SetOrCreate("peripheralDeviceId", strInput)
-            })
-            .width("65%")
-          Image($r('app.media.Switch'))
-            .height(40)
-            .width(40)
-            .padding({ top: 10, bottom: 10, left: 2 })
-            .onClick(() => {
+              AppStorage.SetOrCreate( "peripheralDeviceId" , strInput )
+            } )
+            .width( ConfigData.WH_65_100 )
+          Image( $r( 'app.media.Switch' ) )
+            .height( 40 )
+            .width( 40 )
+            .padding( { top : 10 , bottom : 10 , left : 2 } )
+            .onClick( () => {
               this.showList = !this.showList;
-            })
+            } )
         }
-        .margin({ top: "10vp", left: "20vp", right: "20vp" })
-        .alignItems(VerticalAlign.Center)
-        .backgroundColor($r("app.color.white"))
-        .width("100%")
-        .height(60)
+        .margin( { top : "10vp" , left : "20vp" , right : "20vp" } )
+        .alignItems( VerticalAlign.Center )
+        .backgroundColor( $r( "app.color.white" ) )
+        .width( ConfigData.WH_100_100 )
+        .height( 60 )
       }
-      .align(Alignment.TopStart)
+      .align( Alignment.TopStart )
 
-      if (this.showList) {
+      if ( this.showList ) {
         Column() {
-          Scroll(){
-            Column(){
+          Scroll() {
+            Column() {
               //              Text("当前配置:")
               //                .fontSize("17vp")
               //                .margin({ top: "5vp", left: "10vp" })
               //                .textAlign(TextAlign.Start)
-              //                .width("100%")
-              Text("热点状态:" + this.hotspotStateManagerMessage)
-                .fontSize("17vp")
-                .margin({ top: "5vp", left: "15vp" })
-                .textAlign(TextAlign.Start)
-                .width("90%")
-              Text("热点配置:" + this.getHotspotConfigManagerMessage)
-                .fontSize("17vp")
-                .margin({ top: "5vp", left: "15vp" })
-                .textAlign(TextAlign.Start)
-                .width("90%")
-              Text("连接设备:" + this.getStationsManagerMessage)
-                .fontSize("17vp")
-                .margin({ top: "5vp", left: "15vp"  })
-                .textAlign(TextAlign.Start)
-                .width("90%")
-              Text("加入状态:" + this.hotspotStaJoinManagerMessage)
-                .fontSize("17vp")
-                .margin({ top: "5vp", left: "15vp" })
-                .textAlign(TextAlign.Start)
-                .width("90%")
-              Text("离开状态:" + this.hotspotStaLeaveManagerMessage)
-                .fontSize("17vp")
-                .margin({ top: "5vp", left: "15vp" })
-                .textAlign(TextAlign.Start)
-                .width("90%")
+              //                .width(ConfigData.WH_100_100)
+              Text( "热点状态:" + this.hotspotStateManagerMessage )
+                .fontSize( "17vp" )
+                .margin( { top : "5vp" , left : "15vp" } )
+                .textAlign( TextAlign.Start )
+                .width( ConfigData.WH_90_100 )
+              Text( "热点配置:" + this.getHotspotConfigManagerMessage )
+                .fontSize( "17vp" )
+                .margin( { top : "5vp" , left : "15vp" } )
+                .textAlign( TextAlign.Start )
+                .width( ConfigData.WH_90_100 )
+              Text( "连接设备:" + this.getStationsManagerMessage )
+                .fontSize( "17vp" )
+                .margin( { top : "5vp" , left : "15vp" } )
+                .textAlign( TextAlign.Start )
+                .width( ConfigData.WH_90_100 )
+              Text( "加入状态:" + this.hotspotStaJoinManagerMessage )
+                .fontSize( "17vp" )
+                .margin( { top : "5vp" , left : "15vp" } )
+                .textAlign( TextAlign.Start )
+                .width( ConfigData.WH_90_100 )
+              Text( "离开状态:" + this.hotspotStaLeaveManagerMessage )
+                .fontSize( "17vp" )
+                .margin( { top : "5vp" , left : "15vp" } )
+                .textAlign( TextAlign.Start )
+                .width( ConfigData.WH_90_100 )
             }
-            .width("100%")
+            .width( ConfigData.WH_100_100 )
           }
-          .scrollBarWidth(10)
-          .scrollBar(BarState.Auto)
+          .scrollBarWidth( 10 )
+          .scrollBar( BarState.Auto )
         }
-        .height(100)
-        .width("95%")
-        .backgroundColor($r("sys.color.ohos_id_color_foreground_contrary"))
+        .height( 100 )
+        .width( ConfigData.WH_95_100 )
+        .backgroundColor( $r( "sys.color.ohos_id_color_foreground_contrary" ) )
 
-        ContentTable({ testItem: this.testItem, apiItems: initHotspotManagerApIData() })
+        ContentTable( {
+          testItem : this.testItem , apiItems : initHotspotManagerApIData()
+        } )
       } else {
-        FilterTable({ testItem: this.testItem })
+        FilterTable( { testItem : this.testItem } )
       }
 
     }
-    .alignItems(HorizontalAlign.Center)
-    .backgroundColor($r("app.color.lead"))
-    .height("100%")
+    .alignItems( HorizontalAlign.Center )
+    .backgroundColor( $r( "app.color.lead" ) )
+    .height( ConfigData.WH_100_100 )
   }
 }

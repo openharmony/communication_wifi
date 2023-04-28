@@ -13,22 +13,26 @@
  * limitations under the License.
  */
 
-/*
- * BaseSettingsController Of Wifi test
- */
+// @ts-nocheck
 
 import ISettingsController from './ISettingsController'
 
-export default abstract class BaseSettingsController implements ISettingsController {
+/**
+ * BaseSettingsController Of Wifi test
+ */
+
+export default abstract
+
+class BaseSettingsController implements ISettingsController {
   protected getComponent: () => any;
 
-/**
-  * Bind component.
-  */
-  bindComponent(component: any): ISettingsController{
+  /**
+   * Bind component.
+   */
+  bindComponent(component: any): ISettingsController {
     this.getComponent = () => component;
 
-// set default property values by component
+    // set default property values by component
     for (var key in this) {
       if (key in component) {
         this[key] = component[key];
@@ -38,11 +42,11 @@ export default abstract class BaseSettingsController implements ISettingsControl
     return this;
   }
 
-/**
- * Bind component's properties, note that only basic types can be transported.
- * Type like Resource may meet unexpected error.
- * If you want to transport resource string or color, ets. AppStorage is suggested @StorageLink.
- */
+  /**
+   * Bind component's properties, note that only basic types can be transported.
+   * Type like Resource may meet unexpected error.
+   * If you want to transport resource string or color, ets. AppStorage is suggested @StorageLink.
+   */
   bindProperties(componentProperties: string[], controllerProperties?: string[]): ISettingsController {
     for (let i = 0; i < componentProperties.length; i++) {
       this.defineBoundProperty(componentProperties[i], controllerProperties ? controllerProperties[i] : componentProperties[i]);
@@ -51,29 +55,29 @@ export default abstract class BaseSettingsController implements ISettingsControl
   }
 
   /**
-    * Initialize data.
-    */
+   * Initialize data.
+   */
   initData(): ISettingsController {
     return this;
   };
 
   /**
-    * Subscribe listeners.
-    */
+   * Subscribe listeners.
+   */
   subscribe(): ISettingsController {
     return this;
   };
 
   /**
-    * Unsubscribe listeners.
-    */
+   * Unsubscribe listeners.
+   */
   unsubscribe(): ISettingsController {
     return this;
   };
 
   /**
-    * Define bound properties.
-    */
+   * Define bound properties.
+   */
   private defineBoundProperty(componentProperty: string, controllerProperty: string): void {
     let __v = this[controllerProperty];
 

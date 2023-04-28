@@ -13,10 +13,13 @@
  * limitations under the License.
  */
 
-/*
- logger of wifi test
- */
+// @ts-nocheck
+
 import hilog from '@ohos.hilog'
+
+/*
+ * logger of wifi test
+ */
 
 class Logger {
   private domain: number

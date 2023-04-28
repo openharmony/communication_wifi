@@ -12,23 +12,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 // @ts-nocheck
 
 import { TestData } from '../MainAbility/model/testData'
 import { TestList } from './testList';
-
-
+import ConfigData from '../Utils/ConfigData';
 /**
  * Manual-Api Test Of Wifi test
  */
+
 @Component
 export struct ManualApiTest {
   private testItems: TestData[]
+
   build() {
     Column() {
-      TestList({
-        testItems: this.testItems
-      })
+      TestList( {
+        testItems : this.testItems
+      } )
     }
   }
 }

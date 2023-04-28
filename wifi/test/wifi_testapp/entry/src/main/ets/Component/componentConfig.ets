@@ -13,11 +13,16 @@
  * limitations under the License.
  */
 
+// @ts-nocheck
+
 /**
  *  ConfigComponent Page Of Wifi test
  */
+
 export class ComponentConfig {
   WH_100_100 = '100%';
+  WH_10_100 = '10%';
+  WH_20_100 = '20%';
   WH_30_100 = '30%';
   WH_33_100 = '33%';
   WH_35_100 = '35%';
@@ -25,6 +30,9 @@ export class ComponentConfig {
   WH_45_100 = '45%';
   WH_50_100 = '50%';
   WH_55_100 = '55%';
+  WH_60_100 = '60%';
+  WH_70_100 = '70%';
+  WH_80_100 = '80%';
   WH_83_100 = '83%';
   WH_90_100 = '90%';
 

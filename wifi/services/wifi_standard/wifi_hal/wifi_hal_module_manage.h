@@ -64,6 +64,14 @@ ModuleManageRetCode StartModule(const char *moduleName, const char *startCmd);
  */
 ModuleManageRetCode StopModule(const char *moduleName, bool isHostapd);
 
+/**
+ * @Description Get started service.
+ *
+ * @return ModuleManageRetCode
+ */
+
+ModuleInfo *GetStartedModule(void);
+
 #ifdef __cplusplus
 }
 #endif

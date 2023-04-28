@@ -1784,7 +1784,7 @@ public:
     void IsPackageInTrustListTest()
     {
         EXPECT_TRUE(pScanService->IsPackageInTrustList("123456|", 0, "123456") == true);
-        EXPECT_TRUE(pScanService->IsPackageInTrustList("123456|", 0, "1234") == true);
+        EXPECT_TRUE(pScanService->IsPackageInTrustList("123456|", 0, "1234") == false);
     }
 
     void AllowScanByMovingFreezeTest1()
@@ -1805,7 +1805,7 @@ public:
 
     void AllowExternCustomSceneCheckTest1()
     {
-         std::map<int, time_t> customIter
+        std::map<int, time_t> customIter;
         customIter.insert(std::pair<int, int>(SCAN_SCENE_ALL, 0));
         auto customIters = customIter.begin();
         ScanIntervalMode mode;
@@ -1813,6 +1813,7 @@ public:
         mode.scanMode = ScanMode::SYSTEM_TIMER_SCAN;
         mode.isSingle = true;
         mode.interval = 1;
+        mode.count = 0;
         mode.intervalMode = IntervalMode::INTERVAL_FIXED;
         pScanService->scanControlInfo.scanIntervalList.push_back(mode);
         EXPECT_TRUE(pScanService->AllowExternCustomSceneCheck(customIters, 0, ScanMode::SYSTEM_TIMER_SCAN) == true);
@@ -1822,14 +1823,15 @@ public:
 
     void AllowExternCustomSceneCheckTest2()
     {
-        std::map<int, time_t> customIter
+        std::map<int, time_t> customIter;
         customIter.insert(std::pair<int, int>(SCAN_SCENE_ALL, 0));
         auto customIters = customIter.begin();
         ScanIntervalMode mode;
         mode.scanScene = SCAN_SCENE_ALL;
         mode.scanMode = ScanMode::SYSTEM_TIMER_SCAN;
-        mode.isSingle = true;
+        mode.isSingle = false;
         mode.interval = 1;
+        mode.count = 0;
         mode.intervalMode = IntervalMode::INTERVAL_FIXED;
         pScanService->scanControlInfo.scanIntervalList.push_back(mode);
         EXPECT_TRUE(pScanService->AllowExternCustomSceneCheck(customIters, 0, ScanMode::SYSTEM_TIMER_SCAN) == true);

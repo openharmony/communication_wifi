@@ -111,82 +111,6 @@ static void SignalExit(int sig)
     return;
 }
 
-// static void RestartWpaSuppilicant(ModuleInfo *p)
-// {
-//     if (p == NULL) {
-//         return;
-//     }
-
-//     if (p->referenceCount > 1) {
-//         if (Stop() != WIFI_HAL_SUCCESS) {
-//             LOGE("Sta stop failed.");
-//         }
-//         if (P2pStop() != WIFI_HAL_SUCCESS) {
-//             LOGE("P2p stop failed.");
-//         }
-
-//         usleep(SLEEP_TIME_US);
-
-//         if (Start() != WIFI_HAL_SUCCESS) {
-//             LOGE("Sta restart failed.");
-//         }
-//         if (P2pStart() != WIFI_HAL_SUCCESS) {
-//             LOGE("P2p restart failed.");
-//         }
-//     } else {
-//         if (Stop() != WIFI_HAL_SUCCESS) {
-//             LOGE("Sta stop failed.");
-//         }
-//         usleep(SLEEP_TIME_US);
-//         if (Start() != WIFI_HAL_SUCCESS) {
-//             LOGE("Sta restart failed.");
-//         }
-//     }
-// }
-
-// static void RestartSoftAp(ModuleInfo *p)
-// {
-//     if (p == NULL) {
-//         return;
-//     }
-
-//     int apCount = p->referenceCount;
-//     int stopCount = 0;
-//     while (stopCount < apCount) {
-//         if (StopSoftAp(stopCount) != WIFI_HAL_SUCCESS) {
-//             LOGE("Ap instance %{public}d stop failed.", stopCount);
-//         }
-//         stopCount += 1;
-//     }
-//     usleep(SLEEP_TIME_US);
-
-//     int startCount = 0;
-//     while (startCount < apCount) {
-//         if (StartSoftAp(startCount) != WIFI_HAL_SUCCESS) {
-//             LOGE("Ap instance %{public}d restart failed.", startCount); 
-//         }
-//         startCount += 1;
-//     }
-// }
-
-// static void SignalChildExit(int sig)
-// {
-//     return;
-//     // LOGI("Caught child process stop signal %{public}d", sig);
-//     // ModuleInfo *p = NULL;
-//     // p = GetStartedModule();
-//     // if (p == NULL) {
-//     //     LOGI("No wpa process need to restart.");
-//     //     return;
-//     // }
-
-//     // if (strcmp(p->szModuleName, WPA_SUPPLICANT_NAME) == 0) {
-//     //     RestartWpaSuppilicant(p);
-//     // } else if (strcmp(p->szModuleName, WPA_HOSTAPD_NAME) == 0) {
-//     //     RestartSoftAp(p);
-//     // }
-// }
-
 int main(void)
 {
     LOGI("Wifi hal service starting...");
@@ -208,7 +132,7 @@ int main(void)
     signal(SIGINT, SignalExit);
     signal(SIGTERM, SignalExit);
     signal(SIGPIPE, SIG_IGN);
-    // signal(SIGCHLD, SignalChildExit);
+
 #ifdef HDI_INTERFACE_SUPPORT
     HdiStaInit();
 #endif

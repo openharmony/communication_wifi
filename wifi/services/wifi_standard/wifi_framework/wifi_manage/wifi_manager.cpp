@@ -34,6 +34,7 @@
 #include "wifi_settings.h"
 #include "define.h"
 #include "wifi_config_center.h"
+#include "wifi_common_def.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -283,6 +284,8 @@ int WifiManager::Init()
          */
         AutoStartScanService();
     }
+
+    InitPidfile();
     return 0;
 }
 
@@ -709,6 +712,49 @@ void WifiManager::DealScanInfoNotify(std::vector<InterScanInfo> &results)
 
 void WifiManager::DealStoreScanInfoEvent(std::vector<InterScanInfo> &results)
 {
+}
+
+void WifiManager::InitPidfile()
+{
+    char pidFile[DIR_MAX_LENGTH] = {0, };
+    int n = snprintf_s(pidFile, DIR_MAX_LENGTH, DIR_MAX_LENGTH - 1, "%s/%s.pid", CONFIG_ROOR_DIR, WIFI_MANAGGER_PID_NAME);
+    if (n < 0) {
+        LOGE("InitPidfile: construct pidFile name failed.");
+        return;
+    }
+    unlink(pidFile);
+
+    pid_t pid = getpid();
+    char buf[PID_MAX_LENGTH] = {0};
+    if (snprintf_s(buf, PID_MAX_LENGTH, PID_MAX_LENGTH - 1, "%d", pid) < 0) {
+        LOGE("InitPidfile: pidFile:%{public}s failed, snprintf_s error:%{public}d!", pidFile, errno);
+        return;
+    }
+
+    int fd;
+    if ((fd = open(pidFile, O_WRONLY | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH)) < 0) {
+        LOGE("InitPidfile: open pidFile:%{public}s error:%{public}d!", pidFile, errno);
+        return;
+    }
+
+    ssize_t bytes;
+    if ((bytes = write(fd, buf, strlen(buf))) <= 0) {
+        LOGE("InitPidfile failed, write pidFile:%{public}s error:%{public}d, bytes:%{public}zd!",
+            pidFile, errno, bytes);
+        close(fd);
+        return;
+    }
+    LOGI("InitPidfile: buf:%{public}s write pidFile:%{public}s, bytes:%{public}zd!", buf, pidFile, bytes);
+    close(fd);
+
+    if (chdir(CONFIG_ROOR_DIR) != 0) {
+        LOGE("InitPidfile failed, chdir pidDir:%{public}s error:%{public}d!", CONFIG_ROOR_DIR, errno);
+        return;
+    }
+
+    umask(DEFAULT_UMASK_VALUE);
+    chmod(pidFile, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+    return;
 }
 
 #ifdef FEATURE_AP_SUPPORT

@@ -38,6 +38,7 @@ extern "C" {
 #define WIFI_NAME_MAX_LENGTH 256
 
 #define WPA_SUPPLICANT_NAME "wpa_supplicant"
+#define WPA_HOSTAPD_NAME "hostapd"
 
 #define HAL_SUCCESS 0
 #define HAL_FAILURE (-1)

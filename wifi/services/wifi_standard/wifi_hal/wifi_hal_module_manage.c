@@ -218,6 +218,19 @@ int StopModuleInternal(const char *moduleName, pid_t processId, bool isHostapd)
     return StopModuleInternalCheckProcess(moduleName, processId);
 }
 
+ModuleInfo *GetStartedModule(void)
+{
+    ModuleInfo *p = g_halModuleList;
+    while (p != NULL) {
+        if (p->referenceCount > 0) {
+            break;
+        } else {
+            p = p->next;
+        }
+    }
+    return p;
+}
+
 ModuleInfo *FindModule(const char *moduleName)
 {
     if (moduleName == NULL) {

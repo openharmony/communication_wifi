@@ -25,6 +25,7 @@
 #include "wifi_log.h"
 #include "wifi_wpa_hal.h"
 #include "wifi_hostapd_hal.h"
+#include "wifi_hal_define.h"
 
 #undef LOG_TAG
 #define LOG_TAG "WifiHalApInterface"
@@ -33,7 +34,6 @@
 #define ABLE_AP_WAIT_MS 50000
 #define WIFI_MULTI_CMD_MAX_LEN 1024
 #define IFCAE_NAME_LEN 256
-static const char *g_serviceName = "hostapd";
 
 WifiErrorNo StartSoftAp(int id)
 {
@@ -81,7 +81,7 @@ WifiErrorNo StartHostapd(void)
     int onceMove = 0;
     int sumMove = 0;
     onceMove = snprintf_s(p, WIFI_MULTI_CMD_MAX_LEN - sumMove,
-        WIFI_MULTI_CMD_MAX_LEN - sumMove -1, "%s", g_serviceName);
+        WIFI_MULTI_CMD_MAX_LEN - sumMove -1, "%s", WPA_HOSTAPD_NAME);
     if (onceMove < 0) {
         return WIFI_HAL_FAILED;
     }
@@ -104,7 +104,7 @@ WifiErrorNo StartHostapd(void)
         p = p + onceMove;
         sumMove = sumMove + onceMove;
     }
-    ModuleManageRetCode ret = StartModule(g_serviceName, startCmd);
+    ModuleManageRetCode ret = StartModule(WPA_HOSTAPD_NAME, startCmd);
     if (ret == MM_SUCCESS) {
         return WIFI_HAL_SUCCESS;
     }
@@ -155,7 +155,7 @@ WifiErrorNo StopSoftAp(int id)
 WifiErrorNo StopHostapd(void)
 {
     ModuleManageRetCode ret;
-    ret = StopModule(g_serviceName, true);
+    ret = StopModule(WPA_HOSTAPD_NAME, true);
     if (ret == MM_FAILED) {
         LOGE("stop hostapd failed!");
         return WIFI_HAL_FAILED;

@@ -23,6 +23,8 @@
 #include <condition_variable>
 #include <functional>
 
+#include <sys/stat.h>
+#include <fcntl.h>
 #include "define.h"
 #include "wifi_internal_msg.h"
 #include "sta_service_callback.h"
@@ -208,6 +210,7 @@ private:
     static void CheckAndStartSta(void);
     static void AutoStartServiceThread(void);
 
+    void InitPidfile(void);
 private:
     std::thread mCloseServiceThread;
     std::mutex mMutex;

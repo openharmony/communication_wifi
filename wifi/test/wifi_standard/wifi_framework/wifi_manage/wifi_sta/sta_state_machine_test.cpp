@@ -39,6 +39,7 @@ using ::testing::ext::TestSize;
 
 namespace OHOS {
 namespace Wifi {
+constexpr int FAILEDNUM = 3;
 class StaStateMachineTest : public testing::Test {
 public:
     static void SetUpTestCase() {}
@@ -1242,12 +1243,66 @@ public:
 
     void ApRoamingStateExeMsgFail()
     {
+        InternalMessage msg;
+        msg.SetMessageName(WIFI_SVR_CMD_STA_ERROR);
         EXPECT_FALSE(pStaStateMachine->pApRoamingState->ExecuteStateMsg(nullptr));
+        EXPECT_FALSE(pStaStateMachine->pApRoamingState->ExecuteStateMsg(&msg));
     }
 
     void ConnectToNetworkProcessSuccess()
     {
         pStaStateMachine->wpsState = SetupMethod::DISPLAY;
+        EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _)).WillRepeatedly(Return(-1));
+        WifiIdlGetDeviceConfig config;
+        config.value = "hmwifi";
+        EXPECT_CALL(WifiStaHalInterface::GetInstance(), GetDeviceConfig(_))
+            .WillRepeatedly(DoAll(SetArgReferee<0>(config), Return(WIFI_IDL_OPT_FAILED)));
+        EXPECT_CALL(WifiSettings::GetInstance(), AddWpsDeviceConfig(_));
+        EXPECT_CALL(WifiSettings::GetInstance(), SyncDeviceConfig());
+        EXPECT_CALL(WifiSettings::GetInstance(), SetWifiState(_)).Times(AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_)).Times(AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_)).Times(AtLeast(0));
+        InternalMessage msg;
+        pStaStateMachine->ConnectToNetworkProcess(&msg);
+    }
+
+    void ConnectToNetworkProcessSuccess1()
+    {
+        pStaStateMachine->wpsState = SetupMethod::PBC;
+        EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _)).WillRepeatedly(Return(-1));
+        WifiIdlGetDeviceConfig config;
+        config.value = "hmwifi";
+        EXPECT_CALL(WifiStaHalInterface::GetInstance(), GetDeviceConfig(_))
+            .WillRepeatedly(DoAll(SetArgReferee<0>(config), Return(WIFI_IDL_OPT_FAILED)));
+        EXPECT_CALL(WifiSettings::GetInstance(), AddWpsDeviceConfig(_));
+        EXPECT_CALL(WifiSettings::GetInstance(), SyncDeviceConfig());
+        EXPECT_CALL(WifiSettings::GetInstance(), SetWifiState(_)).Times(AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_)).Times(AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_)).Times(AtLeast(0));
+        InternalMessage msg;
+        pStaStateMachine->ConnectToNetworkProcess(&msg);
+    }
+
+    void ConnectToNetworkProcessSuccess2()
+    {
+        pStaStateMachine->wpsState = SetupMethod::KEYPAD;
+        EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _)).WillRepeatedly(Return(-1));
+        WifiIdlGetDeviceConfig config;
+        config.value = "hmwifi";
+        EXPECT_CALL(WifiStaHalInterface::GetInstance(), GetDeviceConfig(_))
+            .WillRepeatedly(DoAll(SetArgReferee<0>(config), Return(WIFI_IDL_OPT_OK)));
+        EXPECT_CALL(WifiSettings::GetInstance(), AddWpsDeviceConfig(_));
+        EXPECT_CALL(WifiSettings::GetInstance(), SyncDeviceConfig());
+        EXPECT_CALL(WifiSettings::GetInstance(), SetWifiState(_)).Times(AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_)).Times(AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_)).Times(AtLeast(0));
+        InternalMessage msg;
+        pStaStateMachine->ConnectToNetworkProcess(&msg);
+    }
+
+    void ConnectToNetworkProcessSuccess3()
+    {
+        pStaStateMachine->wpsState = SetupMethod::INVALID;
         EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _)).WillRepeatedly(Return(-1));
         WifiIdlGetDeviceConfig config;
         config.value = "hmwifi";
@@ -1403,21 +1458,21 @@ public:
     }
     void OnNetManagerRestartSuccess()
     {
-        int state = static_cast<int>(WifiState::ENABLED);
-        EXPECT_CALL(WifiSettings::GetInstance(), SetWifiState(state)).WillRepeatedly(Return(-1));
+        EXPECT_CALL(WifiSettings::GetInstance(), GetWifiState()).WillRepeatedly(Return(1));
         pStaStateMachine->OnNetManagerRestart();
     }
 
     void OnNetManagerRestartFail()
     {
-        int state = static_cast<int>(WifiState::DISABLED);
-        EXPECT_CALL(WifiSettings::GetInstance(), SetWifiState(state)).WillRepeatedly(Return(-1));
+        EXPECT_CALL(WifiSettings::GetInstance(), GetWifiState()).WillRepeatedly(Return(FAILEDNUM));
         pStaStateMachine->OnNetManagerRestart();
     }
 
     void ReUpdateNetSupplierInfoSuccess()
     {
         sptr<NetManagerStandard::NetSupplierInfo> supplierInfo;
+        pStaStateMachine->linkedInfo.detailedState = DetailedState::NOTWORKING;
+        pStaStateMachine->linkedInfo.connState = ConnState::CONNECTED;
         pStaStateMachine->ReUpdateNetSupplierInfo(supplierInfo);
     }
 
@@ -1435,6 +1490,9 @@ public:
 
     void DealNetworkCheckFail()
     {
+        InternalMessage msg;
+        pStaStateMachine->pNetcheck = nullptr;
+        pStaStateMachine->DealNetworkCheck(&msg);
         pStaStateMachine->DealNetworkCheck(nullptr);
     }
 
@@ -1504,9 +1562,8 @@ public:
 
     void ReUpdateNetLinkInfoTest()
     {
-        WifiLinkedInfo linkedInfo;
-        linkedInfo.detailedState = DetailedState::NOTWORKING;
-        linkedInfo.connState = ConnState::CONNECTED;
+        pStaStateMachine->linkedInfo.detailedState = DetailedState::NOTWORKING;
+        pStaStateMachine->linkedInfo.connState = ConnState::CONNECTED;
         EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_)).WillOnce(Return(0));
         pStaStateMachine->ReUpdateNetLinkInfo();
     }
@@ -2210,6 +2267,36 @@ HWTEST_F(StaStateMachineTest, ApRoamingStateExeMsgFail, TestSize.Level1)
 HWTEST_F(StaStateMachineTest, ConnectToNetworkProcessSuccess, TestSize.Level1)
 {
     ConnectToNetworkProcessSuccess();
+}
+/**
+ * @tc.name: ConnectToNetworkProcessSuccess1
+ * @tc.desc: ConnectToNetworkProcess()
+ * @tc.type: FUNC
+ * @tc.require: issue
+*/
+HWTEST_F(StaStateMachineTest, ConnectToNetworkProcessSuccess1, TestSize.Level1)
+{
+    ConnectToNetworkProcessSuccess1();
+}
+/**
+ * @tc.name: ConnectToNetworkProcessSuccess2
+ * @tc.desc: ConnectToNetworkProcess()
+ * @tc.type: FUNC
+ * @tc.require: issue
+*/
+HWTEST_F(StaStateMachineTest, ConnectToNetworkProcessSuccess2, TestSize.Level1)
+{
+    ConnectToNetworkProcessSuccess2();
+}
+/**
+ * @tc.name: ConnectToNetworkProcessSuccess3
+ * @tc.desc: ConnectToNetworkProcess()
+ * @tc.type: FUNC
+ * @tc.require: issue
+*/
+HWTEST_F(StaStateMachineTest, ConnectToNetworkProcessSuccess3, TestSize.Level1)
+{
+    ConnectToNetworkProcessSuccess3();
 }
 
 HWTEST_F(StaStateMachineTest, ConnectToNetworkProcessFail, TestSize.Level1)

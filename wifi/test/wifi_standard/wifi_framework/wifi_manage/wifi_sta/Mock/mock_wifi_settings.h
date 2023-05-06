@@ -73,6 +73,7 @@ public:
     virtual int GetCandidateConfig(const int uid, const int &networkId, WifiDeviceConfig &config) = 0;
     virtual int GetAllCandidateConfig(const int uid, std::vector<WifiDeviceConfig> &configs) = 0;
     virtual int GetValidChannels(ChannelsTable &channelsInfo) = 0;
+    virtual int GetWifiState() = 0;
 };
 
 class WifiSettings : public MockWifiSettings {
@@ -128,6 +129,7 @@ public:
     MOCK_METHOD3(GetCandidateConfig, int(const int uid, const int &networkId, WifiDeviceConfig &config));
     MOCK_METHOD2(GetAllCandidateConfig, int(const int uid, std::vector<WifiDeviceConfig> &configs));
     MOCK_METHOD1(GetValidChannels, int(ChannelsTable &channelsInfo));
+    MOCK_METHOD0(GetWifiState, int());
 };
 }  // namespace OHOS
 }  // namespace Wifi

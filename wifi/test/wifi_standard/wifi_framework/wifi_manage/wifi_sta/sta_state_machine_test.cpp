@@ -1457,27 +1457,27 @@ public:
     }
     void OnNetManagerRestartSuccess()
     {
-        EXPECT_CALL(WifiSettings::GetInstance(), GetWifiState(state)).WillRepeatedly(Return(1));
+        EXPECT_CALL(WifiSettings::GetInstance(), GetWifiState()).WillRepeatedly(Return(1));
         pStaStateMachine->OnNetManagerRestart();
     }
 
     void OnNetManagerRestartFail()
     {
-        EXPECT_CALL(WifiSettings::GetInstance(), GetWifiState(state)).WillRepeatedly(Return(3));
+        EXPECT_CALL(WifiSettings::GetInstance(), GetWifiState()).WillRepeatedly(Return(3));
         pStaStateMachine->OnNetManagerRestart();
     }
 
     void ReUpdateNetSupplierInfoSuccess()
     {
         sptr<NetManagerStandard::NetSupplierInfo> supplierInfo;
+        pStaStateMachine->linkedInfo.detailedState = DetailedState::NOTWORKING;
+        pStaStateMachine->linkedInfo.connState = ConnState::CONNECTED;
         pStaStateMachine->ReUpdateNetSupplierInfo(supplierInfo);
     }
 
     void ReUpdateNetSupplierInfoFail()
     {
         sptr<NetManagerStandard::NetSupplierInfo> supplierInfo;
-        pStaStateMachine->linkedInfo.detailedState = DetailedState::NOTWORKING;
-        pStaStateMachine->linkedInfo.connState = ConnState::CONNECTED;
         pStaStateMachine->ReUpdateNetSupplierInfo(supplierInfo);
     }
 
@@ -1490,7 +1490,7 @@ public:
     void DealNetworkCheckFail()
     {
         InternalMessage msg;
-		pStaStateMachine->pNetcheck = nullptr;
+        pStaStateMachine->pNetcheck = nullptr;
         pStaStateMachine->DealNetworkCheck(&msg);
         pStaStateMachine->DealNetworkCheck(nullptr);
     }

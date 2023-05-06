@@ -39,6 +39,7 @@ using ::testing::ext::TestSize;
 
 namespace OHOS {
 namespace Wifi {
+constexpr int FAILEDNUM = 3;
 class StaStateMachineTest : public testing::Test {
 public:
     static void SetUpTestCase() {}
@@ -1463,7 +1464,7 @@ public:
 
     void OnNetManagerRestartFail()
     {
-        EXPECT_CALL(WifiSettings::GetInstance(), GetWifiState()).WillRepeatedly(Return(3));
+        EXPECT_CALL(WifiSettings::GetInstance(), GetWifiState()).WillRepeatedly(Return(FAILEDNUM));
         pStaStateMachine->OnNetManagerRestart();
     }
 

@@ -38,8 +38,6 @@
 #define INVALID_PID (-1)
 #define WIFI_SERVICE_NAME "wifi_manager_se"
 
-const int SLEEP_TIME_US = 1000 * 500; // 100ms
-
 pid_t GetPID(const char *pidFile)
 {
     struct stat sb;

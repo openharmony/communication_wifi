@@ -262,4 +262,31 @@ void UnRegisterHdiStaCallbackEvent()
     pthread_mutex_unlock(&g_hdiMutex);
 }
 
+static const uint32_t MAC_ADDR_INDEX_0 = 0;
+static const uint32_t MAC_ADDR_INDEX_1 = 1;
+static const uint32_t MAC_ADDR_INDEX_2 = 2;
+static const uint32_t MAC_ADDR_INDEX_3 = 3;
+static const uint32_t MAC_ADDR_INDEX_4 = 4;
+static const uint32_t MAC_ADDR_INDEX_5 = 5;
+static const uint32_t MAC_ADDR_INDEX_SIZE = 6;
+
+WifiErrorNo SetAssocMacAddr(const unsigned char *mac, int lenMac)
+{
+    LOGI("SetAssocMacAddr enter.");
+    WifiHdiProxy proxy = GetHdiProxy(PROTOCOL_80211_IFTYPE_AP);
+    CHECK_HDI_PROXY_AND_RETURN(proxy, WIFI_HAL_FAILED);
+
+    unsigned char mac_bin[MAC_ADDR_INDEX_SIZE];
+    sscanf((char *)mac, "%2hhx:%2hhx:%2hhx:%2hhx:%2hhx:%2hhx",
+           &mac_bin[MAC_ADDR_INDEX_0], &mac_bin[MAC_ADDR_INDEX_1], &mac_bin[MAC_ADDR_INDEX_2],
+           &mac_bin[MAC_ADDR_INDEX_3], &mac_bin[MAC_ADDR_INDEX_4], &mac_bin[MAC_ADDR_INDEX_5]);
+
+    int32_t ret = proxy.wlanObj->SetMacAddress(proxy.wlanObj, proxy.feature, mac_bin, MAC_ADDR_INDEX_SIZE);
+    if (ret != HDF_SUCCESS) {
+        LOGE("SetAssocMacAddr failed: %{public}d", ret);
+    }
+
+    return (ret == 0) ? WIFI_HAL_SUCCESS : WIFI_HAL_FAILED;
+}
+
 #endif

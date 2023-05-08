@@ -392,6 +392,7 @@ struct WifiStoreRandomMac {
     std::string keyMgmt;
     std::string peerBssid;
     std::string randomMac;
+    std::string preSharedKey;
 };
 }  // namespace Wifi
 }  // namespace OHOS

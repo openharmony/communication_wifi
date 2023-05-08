@@ -1244,7 +1244,7 @@ ErrCode StaStateMachine::StartConnectToNetwork(int networkId)
     return WIFI_OPT_SUCCESS;
 }
 
-void StaStateMachine::MacAddressGenerate(std::string &strMac)
+void StaStateMachine::MacAddressGenerate(WifiStoreRandomMac &randomMacInfo)
 {
     LOGI("enter MacAddressGenerate\n");
     constexpr int arraySize = 4;
@@ -1256,7 +1256,8 @@ void StaStateMachine::MacAddressGenerate(std::string &strMac)
     constexpr int octBase = 8;
     int ret = 0;
     char strMacTmp[arraySize] = {0};
-    srand(static_cast<unsigned int>(time(nullptr)));
+    unsigned int seed = static_cast<unsigned int>(time(nullptr) + std::hash<std::string>{}(randomMacInfo.peerBssid) + std::hash<std::string>{}(randomMacInfo.preSharedKey));
+    srand(seed);
     for (int i = 0; i < macBitSize; i++) {
         if (i != firstBit) {
             ret = sprintf_s(strMacTmp, arraySize, "%x", rand() % hexBase);
@@ -1266,9 +1267,9 @@ void StaStateMachine::MacAddressGenerate(std::string &strMac)
         if (ret == -1) {
             LOGE("StaStateMachine::MacAddressGenerate failed, sprintf_s return -1!\n");
         }
-        strMac += strMacTmp;
+        randomMacInfo.randomMac += strMacTmp;
         if ((i % two) != 0 && (i != lastBit)) {
-            strMac.append(":");
+            randomMacInfo.randomMac.append(":");
         }
     }
 }
@@ -1309,6 +1310,7 @@ bool StaStateMachine::SetRandomMac(int networkId)
                 (ComparedKeymgmt(scanInfo.capabilities, deviceConfig.keyMgmt))) {
                 randomMacInfo.ssid = scanInfo.ssid;
                 randomMacInfo.keyMgmt = deviceConfig.keyMgmt;
+                randomMacInfo.preSharedKey = deviceConfig.preSharedKey;
                 randomMacInfo.peerBssid = scanInfo.bssid;
                 break;
             }
@@ -1319,7 +1321,7 @@ bool StaStateMachine::SetRandomMac(int networkId)
         }
 
         /* Sets the MAC address of WifiSettings. */
-        MacAddressGenerate(randomMacInfo.randomMac);
+        MacAddressGenerate(randomMacInfo);
         WifiSettings::GetInstance().AddRandomMac(randomMacInfo);
         currentMac = randomMacInfo.randomMac;
     }

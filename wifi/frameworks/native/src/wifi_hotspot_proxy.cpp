@@ -30,6 +30,7 @@ static sptr<WifiHotspotCallbackStub> g_wifiHotspotCallbackStub =
 WifiHotspotProxy::WifiHotspotProxy(const sptr<IRemoteObject> &impl)
     : IRemoteProxy<IWifiHotspot>(impl), mRemoteDied(false), remote_(nullptr), deathRecipient_(nullptr)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     if (impl) {
         if (!impl->IsProxyObject()) {
             WIFI_LOGW("not proxy object!");

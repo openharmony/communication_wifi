@@ -26,6 +26,10 @@
 #include "wifi_log.h"
 #include "wifi_p2p_hal.h"
 #include "wifi_wpa_common.h"
+#include "wifi_hal_sta_interface.h"
+#include "wifi_hal_ap_interface.h"
+#include "wifi_hal_p2p_interface.h"
+#include "wifi_hal_module_manage.h"
 
 #undef LOG_TAG
 #define LOG_TAG "WifiWpaHal"
@@ -682,6 +686,71 @@ static int MyWpaCtrlPending(struct wpa_ctrl *ctrl)
     return 1;
 }
 
+static void StopWpaSuppilicant(ModuleInfo *p)
+{
+    if (p == NULL) {
+        return;
+    }
+    LOGI("p->referenceCount = %{public}d.", p->referenceCount);
+    if (p->referenceCount > 1) {
+        if (P2pStop() != WIFI_HAL_SUCCESS) {
+            LOGE("P2p stop failed.");
+        }
+        if (Stop() != WIFI_HAL_SUCCESS) {
+            LOGE("Sta stop failed.");
+        }
+    } else {
+        if (Stop() != WIFI_HAL_SUCCESS) {
+            LOGE("Sta stop failed.");
+        }
+    }
+}
+
+static void StopWpaSoftAp(ModuleInfo *p)
+{
+    if (p == NULL) {
+        return;
+    }
+
+    int apCount = p->referenceCount;
+    int stopCount = 0;
+    while (stopCount < apCount) {
+        if (StopSoftAp(stopCount) != WIFI_HAL_SUCCESS) {
+            LOGE("Ap instance %{public}d stop failed.", stopCount);
+        }
+        stopCount += 1;
+    }
+}
+
+static void *RecoverWifiProcess(void *arg)
+{
+    ModuleInfo *p = NULL;
+    p = GetStartedModule();
+    if (p == NULL) {
+        LOGI("No wpa process need to recover.");
+        return NULL;
+    }
+
+    if (strcmp(p->szModuleName, WPA_SUPPLICANT_NAME) == 0) {
+        StopWpaSuppilicant(p);
+    } else if (strcmp(p->szModuleName, WPA_HOSTAPD_NAME) == 0) {
+        StopWpaSoftAp(p);
+    }
+
+    exit(0);
+    return NULL;
+}
+
+static void RecoverWifiThread(void)
+{
+    LOGI("wpa process stoped, ready to recover it!");
+    pthread_t tid;
+    if (pthread_create(&tid, NULL, RecoverWifiProcess, NULL) != 0) {
+        LOGE("create wpa restart thread failed!");
+    }
+    pthread_detach(tid);
+}
+
 static void *WpaReceiveCallback(void *arg)
 {
     if (arg == NULL) {
@@ -725,6 +794,8 @@ static void *WpaReceiveCallback(void *arg)
             p++;
         }
         if (strncmp(p, WPA_EVENT_TERMINATING, strlen(WPA_EVENT_TERMINATING)) == 0) {
+            LOGI("=====================WPA_EVENT_TERMINATING=======================");
+            RecoverWifiThread();
             break;
         }
         char *iface = strstr(buf, "IFNAME=");
@@ -747,7 +818,7 @@ static void *WpaReceiveCallback(void *arg)
     }
     free(buf);
     buf = NULL;
-    LOGI("=====================thread exist=======================");
+    LOGI("=====================thread exit=======================");
     return NULL;
 }
 

@@ -115,6 +115,10 @@ ohos_unittest("wifi_hal_unittest") {
     external_deps += [ "drivers_interface_wlan:libwlan_proxy_1.1" ]
   }
 
+  if (wifi_feature_is_random_mac_supported) {
+    defines += [ "RANDOM_MAC_SUPPORT" ]
+  }
+
   configs = [ ":module_private_config" ]
 
   part_name = "wifi"

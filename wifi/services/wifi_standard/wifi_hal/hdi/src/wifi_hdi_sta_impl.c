@@ -262,6 +262,7 @@ void UnRegisterHdiStaCallbackEvent()
     pthread_mutex_unlock(&g_hdiMutex);
 }
 
+#ifdef RANDOM_MAC_SUPPORT
 static const uint32_t MAC_ADDR_INDEX_0 = 0;
 static const uint32_t MAC_ADDR_INDEX_1 = 1;
 static const uint32_t MAC_ADDR_INDEX_2 = 2;
@@ -288,5 +289,6 @@ WifiErrorNo SetAssocMacAddr(const unsigned char *mac, int lenMac)
 
     return (ret == 0) ? WIFI_HAL_SUCCESS : WIFI_HAL_FAILED;
 }
+#endif
 
 #endif

@@ -75,6 +75,7 @@ WifiErrorNo RegisterHdiStaCallbackEvent();
  */
 void UnRegisterHdiStaCallbackEvent();
 
+#ifdef RANDOM_MAC_SUPPORT
 /**
  * @Description Set RandomMac to hdi.
  *
@@ -83,6 +84,7 @@ void UnRegisterHdiStaCallbackEvent();
  * @return WifiErrorNo - operation result
  */
 WifiErrorNo SetAssocMacAddr(const unsigned char *mac, int lenMac);
+#endif
 
 #ifdef __cplusplus
 }

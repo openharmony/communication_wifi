@@ -37,6 +37,7 @@ static sptr<WifiScanCallbackStub> g_wifiScanCallbackStub =
 WifiScanProxy::WifiScanProxy(const sptr<IRemoteObject> &remote) : IRemoteProxy<IWifiScan>(remote),
     mRemoteDied(false), remote_(nullptr), deathRecipient_(nullptr)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     if (remote) {
         if (!remote->IsProxyObject()) {
             WIFI_LOGW("not proxy object!");
@@ -57,7 +58,7 @@ WifiScanProxy::WifiScanProxy(const sptr<IRemoteObject> &remote) : IRemoteProxy<I
 
 WifiScanProxy::~WifiScanProxy()
 {
-    WIFI_LOGI("enter ~WifiP2pProxy!");
+    WIFI_LOGI("enter ~WifiScanProxy!");
     RemoveDeathRecipient();
 }
 

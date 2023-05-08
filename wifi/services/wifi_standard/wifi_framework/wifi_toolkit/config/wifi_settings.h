@@ -424,6 +424,15 @@ public:
     bool AddRandomMac(WifiStoreRandomMac &randomMacInfo);
 
     /**
+     * @Description remove random mac address
+     *
+     * @param ssid - ssid string
+     * @param randomMac - randmon mac address string
+     * @return int - 1 success
+     */
+    bool RemoveRandomMac(const std::string &ssid, const std::string &randomMac);
+    
+    /**
      * @Description Save the country code
      *
      * @param countryCode - input country code

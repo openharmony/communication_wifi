@@ -88,10 +88,16 @@ if (defined(ohos_lite)) {
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/log/",
       "//foundation/systemabilitymgr/samgr/adapter/interfaces/innerkits/include",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/include",
-      "$DHCP_ROOT_DIR/interfaces/inner_api/include",
-      "$DHCP_ROOT_DIR/services/mgr_service/include",
       "$WIFI_ROOT_DIR/interfaces/innerkits",
       "$WIFI_ROOT_DIR/utils/inc",
+    ]
+  }
+
+  config("wifi_exported_header_files") {
+    visibility = [ ":*" ]
+    include_dirs = [
+      "$WIFI_ROOT_DIR/interfaces/kits/c",
+      "$WIFI_ROOT_DIR/interfaces/inner_api",
     ]
   }
 
@@ -122,7 +128,7 @@ if (defined(ohos_lite)) {
       ":wifi_sdk_header",
     ]
 
-    external_deps = [ "ipc:ipc_core" ]
+    external_deps = [ "ipc:ipc_single" ]
   }
 
   ohos_source_set("wifi_hotspot_proxy_impl") {
@@ -138,7 +144,7 @@ if (defined(ohos_lite)) {
       ":wifi_sdk_header",
     ]
 
-    external_deps = [ "ipc:ipc_core" ]
+    external_deps = [ "ipc:ipc_single" ]
   }
 
   ohos_source_set("wifi_scan_proxy_impl") {
@@ -153,7 +159,7 @@ if (defined(ohos_lite)) {
       ":wifi_sdk_header",
     ]
 
-    external_deps = [ "ipc:ipc_core" ]
+    external_deps = [ "ipc:ipc_single" ]
   }
 
   ohos_source_set("wifi_p2p_proxy_impl") {
@@ -168,7 +174,7 @@ if (defined(ohos_lite)) {
       ":wifi_sdk_header",
     ]
 
-    external_deps = [ "ipc:ipc_core" ]
+    external_deps = [ "ipc:ipc_single" ]
   }
 
   ohos_shared_library("wifi_sdk") {
@@ -206,14 +212,14 @@ if (defined(ohos_lite)) {
       ":wifi_p2p_proxy_impl",
       ":wifi_scan_proxy_impl",
       "$WIFI_ROOT_DIR/utils:wifi_utils",
-      "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog",
-      "//foundation/systemabilitymgr/samgr/interfaces/innerkits/samgr_proxy:samgr_proxy",
       "//third_party/bounds_checking_function:libsec_shared",
     ]
 
     external_deps = [
       "c_utils:utils",
-      "ipc:ipc_core",
+      "hiviewdfx_hilog_native:libhilog",
+      "ipc:ipc_single",
+      "samgr:samgr_proxy",
     ]
 
     defines = [ "AP_INSTANCE_MAX_NUM=$wifi_feature_with_ap_num" ]
@@ -235,5 +241,7 @@ if (defined(ohos_lite)) {
 
     part_name = "wifi"
     subsystem_name = "communication"
+    public_configs = [ ":wifi_exported_header_files" ]
+    innerapi_tags = [ "platformsdk" ]
   }
 }

@@ -115,7 +115,10 @@ if (defined(ohos_lite)) {
       "//third_party/wpa_supplicant/wpa_supplicant-2.9_standard:wpa_client",
     ]
 
-    external_deps = [ "c_utils:utils" ]
+    external_deps = [ 
+      "c_utils:utils",
+      "hiviewdfx_hilog_native:libhilog"
+    ]
 
     defines = [
       "AP_INTF=\"$wifi_feature_with_ap_intf\"",

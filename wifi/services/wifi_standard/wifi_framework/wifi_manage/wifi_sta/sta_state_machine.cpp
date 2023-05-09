@@ -33,7 +33,7 @@
 #endif // OHOS_ARCH_LITE
 
 #ifndef OHOS_WIFI_STA_TEST
-#include "dhcp_service.h"
+#include "dhcp_service_api.h"
 #else
 #include "mock_dhcp_service.h"
 #endif
@@ -124,8 +124,12 @@ ErrCode StaStateMachine::InitStaStateMachine()
     SetFirstState(pInitState);
     StartStateMachine();
     InitStaSMHandleMap();
-
+#ifndef OHOS_WIFI_STA_TEST
+    pDhcpService = DhcpServiceApi::GetInstance().get();
+#else
     pDhcpService = new (std::nothrow) DhcpService();
+#endif
+
     if (pDhcpService == nullptr) {
         WIFI_LOGE("pDhcpServer is null\n");
         return WIFI_OPT_FAILED;

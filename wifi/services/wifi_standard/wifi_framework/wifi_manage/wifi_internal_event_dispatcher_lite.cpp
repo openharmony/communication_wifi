@@ -41,6 +41,7 @@ int WifiInternalEventDispatcher::Init()
     /* first init system notify service client here ! */
 
     mBroadcastThread = std::thread(WifiInternalEventDispatcher::Run, std::ref(*this));
+    pthread_setname_np(mBroadcastThread.native_handle(), "InnerDisThread");
     return 0;
 }
 

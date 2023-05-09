@@ -92,28 +92,15 @@
                     "//foundation/communication/wifi/wifi/services/wifi_standard/wifi_hal:wifi_hal"
                 ]
             },
-            "inner_kits": [
+            "inner_api": [
                 {
                     "header" : {
-                        "header_base": "//foundation/communication/wifi/wifi/interfaces/kits/c",
+                        "header_base": "//foundation/communication/wifi/wifi/interfaces/",
                         "header_files": [
-                            "wifi_device.h",
-                            "wifi_hotspot.h",
-                            "wifi_p2p.h",
-                            "wifi_hid2d.h"
-                        ]
-                    },
-                    "name" : "//foundation/communication/wifi/wifi/frameworks/native:wifi_sdk"
-                },
-                {
-                    "header" : {
-                        "header_base": "//foundation/communication/wifi/wifi/frameworks/native/include",
-                        "header_files": [
-                            "wifi_device.h",
-                            "wifi_hotspot.h",
-                            "wifi_p2p.h",
-                            "wifi_scan.h",
-                            "wifi_hid2d.h"
+                             "kits/c/wifi_device.h",
+                            "kits/c/wifi_hotspot.h",
+                            "kits/c/wifi_p2p.h",
+                            "kits/c/wifi_hid2d.h"
                         ]
                     },
                     "name" : "//foundation/communication/wifi/wifi/frameworks/native:wifi_sdk"

@@ -46,18 +46,16 @@ ohos_shared_library("wifi") {
     "src/wifi_napi_p2p.cpp",
     "src/wifi_napi_utils.cpp",
   ]
-  deps = [
-    "$WIFI_ROOT_DIR/frameworks/native:wifi_sdk",
-    "${ability_runtime_path}/frameworks/native/appkit:app_context",
-    "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog",
-    "//foundation/arkui/napi:ace_napi",
-  ]
+  deps = [ "$WIFI_ROOT_DIR/frameworks/native:wifi_sdk" ]
 
   external_deps = [
+    "ability_runtime:app_context",
     "access_token:libaccesstoken_sdk",
     "bundle_framework:appexecfwk_base",
     "c_utils:utils",
+    "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
+    "napi:ace_napi",
     "samgr:samgr_proxy",
   ]
 
@@ -92,16 +90,14 @@ ohos_shared_library("wifiext") {
     "src/wifi_napi_errcode.cpp",
     "src/wifi_napi_utils.cpp",
   ]
-  deps = [
-    "$WIFI_ROOT_DIR/frameworks/native:wifi_sdk",
-    "${ability_runtime_path}/frameworks/native/appkit:app_context",
-    "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog",
-    "//foundation/arkui/napi:ace_napi",
-  ]
+  deps = [ "$WIFI_ROOT_DIR/frameworks/native:wifi_sdk" ]
 
   external_deps = [
+    "ability_runtime:app_context",
     "bundle_framework:appexecfwk_base",
     "c_utils:utils",
+    "hiviewdfx_hilog_native:libhilog",
+    "napi:ace_napi",
   ]
 
   if (wifi_feature_with_ap_extension) {
@@ -145,20 +141,18 @@ ohos_shared_library("wifi_native_js") {
     "src/wifi_napi_p2p.cpp",
     "src/wifi_napi_utils.cpp",
   ]
-  deps = [
-    "$WIFI_ROOT_DIR/frameworks/native:wifi_sdk",
-    "${ability_runtime_path}/frameworks/native/appkit:app_context",
-    "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog",
-    "//foundation/arkui/napi:ace_napi",
-  ]
+  deps = [ "$WIFI_ROOT_DIR/frameworks/native:wifi_sdk" ]
 
   defines = [ "ENABLE_NAPI_COMPATIBLE" ]
 
   external_deps = [
+    "ability_runtime:app_context",
     "access_token:libaccesstoken_sdk",
     "bundle_framework:appexecfwk_base",
     "c_utils:utils",
+    "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
+    "napi:ace_napi",
     "samgr:samgr_proxy",
   ]
 
@@ -198,18 +192,16 @@ ohos_shared_library("wifimanager") {
     "src/wifi_napi_p2p.cpp",
     "src/wifi_napi_utils.cpp",
   ]
-  deps = [
-    "$WIFI_ROOT_DIR/frameworks/native:wifi_sdk",
-    "${ability_runtime_path}/frameworks/native/appkit:app_context",
-    "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog",
-    "//foundation/arkui/napi:ace_napi",
-  ]
+  deps = [ "$WIFI_ROOT_DIR/frameworks/native:wifi_sdk" ]
   defines = [ "ENABLE_NAPI_WIFI_MANAGER" ]
   external_deps = [
+    "ability_runtime:app_context",
     "access_token:libaccesstoken_sdk",
     "bundle_framework:appexecfwk_base",
     "c_utils:utils",
+    "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
+    "napi:ace_napi",
     "samgr:samgr_proxy",
   ]
   relative_install_dir = "module"
@@ -243,19 +235,17 @@ ohos_shared_library("wifimanagerext") {
     "src/wifi_napi_errcode.cpp",
     "src/wifi_napi_utils.cpp",
   ]
-  deps = [
-    "$WIFI_ROOT_DIR/frameworks/native:wifi_sdk",
-    "${ability_runtime_path}/frameworks/native/appkit:app_context",
-    "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog",
-    "//foundation/arkui/napi:ace_napi",
-  ]
+  deps = [ "$WIFI_ROOT_DIR/frameworks/native:wifi_sdk" ]
   defines = [ "ENABLE_NAPI_WIFI_MANAGER" ]
   if (wifi_feature_with_ap_extension) {
     defines += [ "FEATURE_AP_EXTENSION" ]
   }
   external_deps = [
+    "ability_runtime:app_context",
     "bundle_framework:appexecfwk_base",
     "c_utils:utils",
+    "hiviewdfx_hilog_native:libhilog",
+    "napi:ace_napi",
   ]
 
   relative_install_dir = "module"

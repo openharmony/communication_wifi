@@ -51,9 +51,6 @@ local_base_include_dirs = [
   "//commonlibrary/c_utils/base/include",
   "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
   "$WIFI_ROOT_DIR/frameworks/native/interfaces",
-  "$DHCP_ROOT_DIR/interfaces/inner_api/interfaces",
-  "$DHCP_ROOT_DIR/interfaces/inner_api/include",
-  "$DHCP_ROOT_DIR/services/mgr_service/include",
   "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
   "$WIFI_ROOT_DIR/services/wifi_standard/include",
 ]
@@ -100,11 +97,7 @@ if (defined(ohos_lite)) {
       "//base/security/certificate_manager/interfaces/innerkits/cert_manager_standard/main/include",
     ]
 
-    deps = [
-      "$DHCP_ROOT_DIR/services/mgr_service:dhcp_manager_service",
-      "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog",
-      "//base/security/certificate_manager/interfaces/innerkits/cert_manager_standard/main:cert_manager_sdk",
-    ]
+    deps = []
 
     defines = [ "AP_INSTANCE_MAX_NUM=$wifi_feature_with_ap_num" ]
     if (wifi_feature_with_encryption) {
@@ -114,10 +107,16 @@ if (defined(ohos_lite)) {
     external_deps = [
       "ability_base:want",
       "c_utils:utils",
+      "certificate_manager:cert_manager_sdk",
       "common_event_service:cesfwk_innerkits",
+      "dhcp:dhcp_manager_service",
       "eventhandler:libeventhandler",
+      "hiviewdfx_hilog_native:libhilog",
       "huks:libhukssdk",
     ]
+
+    public_deps = [ "$DHCP_ROOT_DIR/services/mgr_service:dhcp_manager_service" ]
+
     if (wifi_feature_with_encryption) {
       external_deps += [ "huks:libhukssdk" ]
     }

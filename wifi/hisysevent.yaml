@@ -36,3 +36,15 @@ WIFI_EVENT_RECEIVED:
   __BASE: {type: STATISTIC, level: MINOR, tag: PowerStats, desc: Wifi event}
   EVENT_TYPE: {type: STRING, desc: Event type}
   VALUE: {type: INT32, desc: Event value}
+
+# Wi-Fi band event received
+WIFI_BAND:
+  __BASE: {type: STATISTIC, level: MINOR, tag: PowerStats, desc: Wifi band}
+  BAND: {type: INT32, desc: band info} # 1->2.4G, 2->5G, default 0 Auto
+
+# Wi-Fi signal event received
+WIFI_SIGNAL:
+  __BASE: {type: STATISTIC, level: MINOR, tag: PowerStats, desc: Wifi signal event}
+  DIRECTION: {type: INT32, desc: wifi signal data in or data out} # 0->UP,1->DOWN,2->UPDOWN,3->NONE
+  TXPACKETS: {type: INT32, desc: wifi signal tx packets}
+  RXPACKETS: {type: INT32, desc: wifi signal rx packets}

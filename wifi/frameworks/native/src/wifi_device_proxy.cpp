@@ -640,7 +640,6 @@ ErrCode WifiDeviceProxy::ConnectToNetwork(int networkId, bool isCandidate)
     if (exception) {
         return WIFI_OPT_FAILED;
     }
-    WriteWifiConnectionHiSysEvent(WifiConnectionType::CONNECT, GetBundleName());
     return ErrCode(reply.ReadInt32());
 }
 
@@ -667,7 +666,6 @@ ErrCode WifiDeviceProxy::ConnectToDevice(const WifiDeviceConfig &config)
     if (exception) {
         return WIFI_OPT_FAILED;
     }
-    WriteWifiConnectionHiSysEvent(WifiConnectionType::CONNECT, GetBundleName());
     return ErrCode(reply.ReadInt32());
 }
 
@@ -723,7 +721,6 @@ ErrCode WifiDeviceProxy::ReConnect()
     if (exception) {
         return WIFI_OPT_FAILED;
     }
-    WriteWifiConnectionHiSysEvent(WifiConnectionType::CONNECT, GetBundleName());
     return ErrCode(reply.ReadInt32());
 }
 
@@ -749,7 +746,6 @@ ErrCode WifiDeviceProxy::ReAssociate(void)
     if (exception) {
         return WIFI_OPT_FAILED;
     }
-    WriteWifiConnectionHiSysEvent(WifiConnectionType::CONNECT, GetBundleName());
     return ErrCode(reply.ReadInt32());
 }
 
@@ -775,7 +771,6 @@ ErrCode WifiDeviceProxy::Disconnect(void)
     if (exception) {
         return WIFI_OPT_FAILED;
     }
-    WriteWifiConnectionHiSysEvent(WifiConnectionType::DISCONNECT, GetBundleName());
     return ErrCode(reply.ReadInt32());
 }
 

@@ -245,6 +245,7 @@ int WifiManager::Init()
         return -1;
     }
     mCloseServiceThread = std::thread(WifiManager::DealCloseServiceMsg, std::ref(*this));
+    pthread_setname_np(mCloseServiceThread.native_handle(), "WifiCloseThread");
     
 #ifndef OHOS_ARCH_LITE
     if (screenEventSubscriber_ == nullptr) {
@@ -276,6 +277,7 @@ int WifiManager::Init()
     if (WifiConfigCenter::GetInstance().GetStaLastRunState()) { /* Automatic startup upon startup */
         WIFI_LOGI("AutoStartServiceThread");
         std::thread startStaSrvThread(WifiManager::AutoStartServiceThread);
+        pthread_setname_np(startStaSrvThread.native_handle(), "AutoStartThread");
         startStaSrvThread.detach();
     } else {
         /**

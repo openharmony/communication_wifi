@@ -783,6 +783,7 @@ static int WpaCliConnect(WifiWpaInterface *p)
         LOGE("Create monitor thread failed!");
         return -1;
     }
+    pthread_setname_np(p->tid, "WpaCBThread");
     LOGI("Wpa connect finish.");
     return 0;
 }

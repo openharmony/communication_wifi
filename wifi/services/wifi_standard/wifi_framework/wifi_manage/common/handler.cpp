@@ -51,6 +51,7 @@ bool Handler::InitialHandler()
         return false;
     }
     LOGI("pthread_create ret: %{public}d\n", ret);
+    pthread_setname_np(handleThread, "RunHandleThread");
     return true;
 }
 

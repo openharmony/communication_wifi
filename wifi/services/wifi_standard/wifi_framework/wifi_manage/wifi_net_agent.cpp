@@ -198,6 +198,7 @@ void WifiNetAgent::OnStaMachineUpdateNetLinkInfo(const std::string &strIp, const
     const std::string &strGateWay, const std::string &strDns, const std::string &strBakDns)
 {
     std::thread([ip = strIp, mask = strMask, gateWay = strGateWay, dns = strDns, bakDns = strBakDns, this]() {
+        pthread_setname_np(pthread_self(), "OnLinkInfoThread");
         UpdateNetLinkInfo(ip, mask, gateWay, dns, bakDns);
     }).detach();
 }
@@ -205,6 +206,7 @@ void WifiNetAgent::OnStaMachineUpdateNetLinkInfo(const std::string &strIp, const
 void WifiNetAgent::OnStaMachineUpdateNetSupplierInfo(const sptr<NetManagerStandard::NetSupplierInfo> &netSupplierInfo)
 {
     std::thread([netInfo = netSupplierInfo, this]() {
+        pthread_setname_np(pthread_self(), "OnSuppThread");
         UpdateNetSupplierInfo(netInfo);
     }).detach();
 }
@@ -212,6 +214,7 @@ void WifiNetAgent::OnStaMachineUpdateNetSupplierInfo(const sptr<NetManagerStanda
 void WifiNetAgent::OnStaMachineWifiStart(const StaServiceCallback &callback)
 {
     std::thread([cb = callback, this]() {
+        pthread_setname_np(pthread_self(), "OnStartThread");
         RegisterNetSupplier();
         RegisterNetSupplierCallback(cb);
     }).detach();
@@ -221,6 +224,7 @@ void WifiNetAgent::OnStaMachineNetManagerRestart(const sptr<NetManagerStandard::
     const StaServiceCallback &callback)
 {
     std::thread([cb = callback, supplierInfo = netSupplierInfo, this]() {
+        pthread_setname_np(pthread_self(), "OnReStartThread");
         RegisterNetSupplier();
         RegisterNetSupplierCallback(cb);
         WifiLinkedInfo linkedInfo;

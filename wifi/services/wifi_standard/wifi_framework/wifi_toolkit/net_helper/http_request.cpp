@@ -351,6 +351,7 @@ int HttpRequest::GetIPFromUrl()
 
         int iRlt = -1;
         std::thread getHost = std::thread(&GetHostThread, pData);
+        pthread_setname_np(getHost.native_handle(), "GetHostThread");
         getHost.detach();
 
         bool bTimeOut = false;

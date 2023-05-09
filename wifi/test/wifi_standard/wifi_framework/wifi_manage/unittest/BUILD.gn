@@ -101,7 +101,7 @@ ohos_unittest("manager_unittest") {
     "common_event_service:cesfwk_innerkits",
     "eventhandler:libeventhandler",
     "hiviewdfx_hilog_native:libhilog",
-    "ipc:ipc_core",
+    "ipc:ipc_single",
     "netmanager_base:net_conn_manager_if",
   ]
 

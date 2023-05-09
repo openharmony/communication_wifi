@@ -131,10 +131,12 @@ ohos_unittest("mock_wifi_hal_service") {
   deps = [
     "$WIFI_ROOT_DIR/services/wifi_standard/ipc_framework/cRPC:crpc_server",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit:wifi_toolkit",
-    "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog",
   ]
 
-  external_deps = [ "c_utils:utils" ]
+  external_deps = [
+    "c_utils:utils",
+    "hiviewdfx_hilog_native:libhilog",
+  ]
 
   cflags_cc = [ "-fno-rtti" ]
 

@@ -42,6 +42,7 @@ constexpr int STATUS = 17;
 constexpr int MAX_SCAN_CONFIG = 10000;
 constexpr int INVAL = 0x0fffff;
 constexpr int MAX_THROUGH = -90;
+constexpr int TIMES_TAMP = 1000;
 
 
 class ScanServiceTest : public testing::Test {
@@ -603,7 +604,7 @@ public:
         EXPECT_CALL(WifiManager::GetInstance(), DealScanInfoNotify(_));
         std::vector<InterScanInfo> scanInfoList;
         InterScanInfo interScanInfo;
-        interScanInfo.timestamp = 1000;
+        interScanInfo.timestamp = TIMES_TAMP;
         scanInfoList.push_back(interScanInfo);
         pScanService->pnoScanStartTime = 0;
         pScanService->HandlePnoScanInfo(scanInfoList);
@@ -1431,7 +1432,7 @@ public:
     void AllowExternScanByIntervalModeSuccess()
     {
         ScanIntervalMode mode;
-        mode.scanScene = 0;
+        mode.scanScene = 1;
         mode.scanMode = ScanMode::SYSTEM_TIMER_SCAN;
         mode.isSingle = false;
         pScanService->scanControlInfo.scanIntervalList.push_back(mode);

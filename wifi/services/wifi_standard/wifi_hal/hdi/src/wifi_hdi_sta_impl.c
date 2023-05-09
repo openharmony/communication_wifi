@@ -274,7 +274,7 @@ static const uint32_t MAC_ADDR_INDEX_SIZE = 6;
 WifiErrorNo SetAssocMacAddr(const unsigned char *mac, int lenMac)
 {
     LOGI("SetAssocMacAddr enter.");
-    WifiHdiProxy proxy = GetHdiProxy(PROTOCOL_80211_IFTYPE_AP);
+    WifiHdiProxy proxy = GetHdiProxy(PROTOCOL_80211_IFTYPE_STATION);
     CHECK_HDI_PROXY_AND_RETURN(proxy, WIFI_HAL_FAILED);
 
     unsigned char mac_bin[MAC_ADDR_INDEX_SIZE];

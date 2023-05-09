@@ -1391,14 +1391,75 @@ public:
         EXPECT_EQ(pScanService->AllowScanDuringCustomScene(scanMode), false);
     }
 
-    void AllowExternScanByIntervalMode()
+    void AllowExternScanByIntervalModeFail1()
     {
-        pScanService->AllowExternScanByIntervalMode(0, 0, ScanMode::SYS_FOREGROUND_SCAN);
+        pScanService->scanTrustMode = true;
+        pScanService->scanTrustSceneIds.emplace(0);
+        EXPECT_EQ(pScanService->AllowExternScanByIntervalMode(0, 0, ScanMode::SYSTEM_TIMER_SCAN), true);
+    }
+
+    void AllowExternScanByIntervalModeFail2()
+    {
+        ScanIntervalMode mode;
+        mode.scanScene = 0;
+        mode.scanMode = ScanMode::SYSTEM_TIMER_SCAN;
+        mode.isSingle = true;
+        mode.interval = 1;
+        mode.count = 0;
+        mode.intervalMode = IntervalMode::INTERVAL_FIXED;
+        pScanService->scanControlInfo.scanIntervalList.push_back(mode);
+        pScanService->scanControlInfo.scanIntervalList.push_back(mode);
+        pScanService->scanTrustMode = false;
+        EXPECT_EQ(pScanService->AllowExternScanByIntervalMode(0, 0, ScanMode::SYSTEM_TIMER_SCAN), false);
+    }
+
+    void AllowExternScanByIntervalModeFail3()
+    {
+        ScanIntervalMode mode;
+        mode.scanScene = 0;
+        mode.scanMode = ScanMode::SYSTEM_TIMER_SCAN;
+        mode.isSingle = false;
+        mode.interval = 1;
+        mode.count = 0;
+        mode.intervalMode = IntervalMode::INTERVAL_FIXED;
+        pScanService->scanControlInfo.scanIntervalList.push_back(mode);
+        pScanService->scanControlInfo.scanIntervalList.push_back(mode);
+        pScanService->scanTrustMode = false;
+        EXPECT_EQ(pScanService->AllowExternScanByIntervalMode(0, 0, ScanMode::SYSTEM_TIMER_SCAN), false);
+    }
+
+    void AllowExternScanByIntervalModeSuccess()
+    {
+        ScanIntervalMode mode;
+        mode.scanScene = 0;
+        mode.scanMode = ScanMode::SYSTEM_TIMER_SCAN;
+        mode.isSingle = false;
+        pScanService->scanControlInfo.scanIntervalList.push_back(mode);
+        pScanService->scanTrustMode = false;
+        EXPECT_EQ(pScanService->AllowExternScanByIntervalMode(0, 0, ScanMode::SYSTEM_TIMER_SCAN), true);
+    }
+
+    void AllowExternScanByIntervalModeSuccess1()
+    {
+        pScanService->scanTrustMode = false;
+        pScanService->scanTrustSceneIds.emplace(0);
+        EXPECT_EQ(pScanService->AllowExternScanByIntervalMode(0, 0, ScanMode::SYSTEM_TIMER_SCAN), true);
     }
 
     void AllowExternScanByCustomSceneSuccess()
     {
-        pScanService->AllowExternScanByCustomScene(0, ScanMode::SYS_FOREGROUND_SCAN);
+        pScanService->customSceneTimeMap.emplace(1, 0);
+        pScanService->scanTrustMode = true;
+        pScanService->scanTrustSceneIds.emplace(1);
+        EXPECT_EQ(pScanService->AllowExternScanByCustomScene(0, ScanMode::SYS_FOREGROUND_SCAN), true);
+    }
+
+    void AllowExternScanByCustomSceneSuccess1()
+    {
+        pScanService->customSceneTimeMap.emplace(1, 0);
+        pScanService->scanTrustMode = false;
+        pScanService->scanTrustSceneIds.emplace(1);
+        EXPECT_EQ(pScanService->AllowExternScanByCustomScene(0, ScanMode::SYS_FOREGROUND_SCAN), true);
     }
 
     void PnoScanByIntervalSuccess1()
@@ -2574,15 +2635,75 @@ HWTEST_F(ScanServiceTest, AllowScanDuringCustomSceneFail3, TestSize.Level1)
 {
     AllowScanDuringCustomSceneFail3();
 }
-
-HWTEST_F(ScanServiceTest, AllowExternScanByIntervalMode, TestSize.Level1)
+/**
+ * @tc.name: AllowExternScanByIntervalMode_001
+ * @tc.desc: AllowExternScanByIntervalMode()
+ * @tc.type: FUNC
+ * @tc.require: issue
+*/
+HWTEST_F(ScanServiceTest, AllowExternScanByIntervalMode_001, TestSize.Level1)
 {
-    AllowExternScanByIntervalMode();
+    AllowExternScanByIntervalModeFail1();
 }
-
-HWTEST_F(ScanServiceTest, AllowExternScanByCustomSceneSuccess, TestSize.Level1)
+/**
+ * @tc.name: AllowExternScanByIntervalMode_002
+ * @tc.desc: AllowExternScanByIntervalMode()
+ * @tc.type: FUNC
+ * @tc.require: issue
+*/
+HWTEST_F(ScanServiceTest, AllowExternScanByIntervalMode_002, TestSize.Level1)
+{
+    AllowExternScanByIntervalModeFail2();
+}
+/**
+ * @tc.name: AllowExternScanByIntervalMode_003
+ * @tc.desc: AllowExternScanByIntervalMode()
+ * @tc.type: FUNC
+ * @tc.require: issue
+*/
+HWTEST_F(ScanServiceTest, AllowExternScanByIntervalMode_003, TestSize.Level1)
+{
+    AllowExternScanByIntervalModeFail3();
+}
+/**
+ * @tc.name: AllowExternScanByIntervalMode_004
+ * @tc.desc: AllowExternScanByIntervalMode()
+ * @tc.type: FUNC
+ * @tc.require: issue
+*/
+HWTEST_F(ScanServiceTest, AllowExternScanByIntervalMode_004, TestSize.Level1)
+{
+    AllowExternScanByIntervalModeSuccess();
+}
+/**
+ * @tc.name: AllowExternScanByIntervalMode_005
+ * @tc.desc: AllowExternScanByIntervalMode()
+ * @tc.type: FUNC
+ * @tc.require: issue
+*/
+HWTEST_F(ScanServiceTest, AllowExternScanByIntervalMode_005, TestSize.Level1)
+{
+    AllowExternScanByIntervalModeSuccess1();
+}
+/**
+ * @tc.name: AllowExternScanByCustomScene_001
+ * @tc.desc: AllowExternScanByCustomScene()
+ * @tc.type: FUNC
+ * @tc.require: issue
+*/
+HWTEST_F(ScanServiceTest, AllowExternScanByCustomScene_001, TestSize.Level1)
 {
     AllowExternScanByCustomSceneSuccess();
+}
+/**
+ * @tc.name: AllowExternScanByCustomScene_002
+ * @tc.desc: AllowExternScanByCustomScene()
+ * @tc.type: FUNC
+ * @tc.require: issue
+*/
+HWTEST_F(ScanServiceTest, AllowExternScanByCustomScene_002, TestSize.Level1)
+{
+    AllowExternScanByCustomSceneSuccess1();
 }
 
 HWTEST_F(ScanServiceTest, PnoScanByIntervalSuccess1, TestSize.Level1)

@@ -57,7 +57,7 @@ bool WifiNetAgent::RegisterNetSupplier()
     return false;
 }
 
-bool WifiNetAgent::RegisterNetSupplierCallback(const StaServiceCallback &callback)
+bool WifiNetAgent::RegisterNetSupplierCallback()
 {
     TimeStats timeStats(__func__);
     WIFI_LOGI("Enter RegisterNetSupplierCallback.");
@@ -67,7 +67,7 @@ bool WifiNetAgent::RegisterNetSupplierCallback(const StaServiceCallback &callbac
         return false;
     }
 
-    sptr<NetConnCallback> pNetConnCallback = (std::make_unique<NetConnCallback>(callback)).release();
+    sptr<NetConnCallback> pNetConnCallback = (std::make_unique<NetConnCallback>()).release();
     if (pNetConnCallback == nullptr) {
         WIFI_LOGE("pNetConnCallback is null\n");
         return false;
@@ -211,30 +211,31 @@ void WifiNetAgent::OnStaMachineUpdateNetSupplierInfo(const sptr<NetManagerStanda
     }).detach();
 }
 
-void WifiNetAgent::OnStaMachineWifiStart(const StaServiceCallback &callback)
+void WifiNetAgent::OnStaMachineWifiStart()
 {
-    std::thread([cb = callback, this]() {
+    std::thread([this]() {
         pthread_setname_np(pthread_self(), "OnStartThread");
         RegisterNetSupplier();
-        RegisterNetSupplierCallback(cb);
+        RegisterNetSupplierCallback();
     }).detach();
 }
 
-void WifiNetAgent::OnStaMachineNetManagerRestart(const sptr<NetManagerStandard::NetSupplierInfo> &netSupplierInfo,
-    const StaServiceCallback &callback)
+void WifiNetAgent::OnStaMachineNetManagerRestart(const sptr<NetManagerStandard::NetSupplierInfo> &netSupplierInfo)
 {
-    std::thread([cb = callback, supplierInfo = netSupplierInfo, this]() {
+    std::thread([supplierInfo = netSupplierInfo, this]() {
         pthread_setname_np(pthread_self(), "OnReStartThread");
         RegisterNetSupplier();
-        RegisterNetSupplierCallback(cb);
+        RegisterNetSupplierCallback();
         WifiLinkedInfo linkedInfo;
         WifiSettings::GetInstance().GetLinkedInfo(linkedInfo);
         if ((linkedInfo.detailedState == DetailedState::NOTWORKING)
             && (linkedInfo.connState == ConnState::CONNECTED)) {
+#ifndef OHOS_ARCH_LITE
             if (supplierInfo != nullptr) {
                 TimeStats timeStats("Call UpdateNetSupplierInfo");
                 UpdateNetSupplierInfo(supplierInfo);
             }
+#endif
             IpInfo wifiIpInfo;
             WifiSettings::GetInstance().GetIpInfo(wifiIpInfo);
             std::string ipAddress = IpTools::ConvertIpv4Address(wifiIpInfo.ipAddress);
@@ -247,9 +248,8 @@ void WifiNetAgent::OnStaMachineNetManagerRestart(const sptr<NetManagerStandard::
     }).detach();
 }
 
-WifiNetAgent::NetConnCallback::NetConnCallback(const StaServiceCallback &callback)
+WifiNetAgent::NetConnCallback::NetConnCallback()
 {
-    staCallback = callback;
 }
 
 WifiNetAgent::NetConnCallback::~NetConnCallback()

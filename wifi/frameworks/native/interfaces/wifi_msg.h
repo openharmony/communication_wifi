@@ -139,6 +139,9 @@ struct WifiLinkedInfo {
     int maxSupportedRxLinkSpeed;
     int maxSupportedTxLinkSpeed;
     WifiChannelWidth channelWidth; /* curr ap channel width */
+    int lastPacketDirection;
+    int lastRxPackets;
+    int lastTxPackets;
     WifiLinkedInfo()
     {
         networkId = INVALID_NETWORK_ID;
@@ -161,6 +164,9 @@ struct WifiLinkedInfo {
         maxSupportedRxLinkSpeed = 0;
         maxSupportedTxLinkSpeed = 0;
         channelWidth = WifiChannelWidth::WIDTH_INVALID;
+        lastPacketDirection = 0;
+        lastRxPackets = 0;
+        lastTxPackets = 0;
     }
 };
 

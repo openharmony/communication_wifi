@@ -206,6 +206,9 @@ void StaStateMachine::InitWifiLinkedInfo()
     linkedInfo.portalUrl = "";
     linkedInfo.detailedState = DetailedState::DISCONNECTED;
     linkedInfo.channelWidth = WifiChannelWidth::WIDTH_INVALID;
+    linkedInfo.lastPacketDirection = 0;
+    linkedInfo.lastRxPackets = 0;
+    linkedInfo.lastTxPackets = 0;
 }
 
 void StaStateMachine::InitLastWifiLinkedInfo()
@@ -228,6 +231,9 @@ void StaStateMachine::InitLastWifiLinkedInfo()
     lastLinkedInfo.snr = 0;
     linkedInfo.isDataRestricted = 0;
     linkedInfo.portalUrl = "";
+    lastLinkedInfo.lastPacketDirection = 0;
+    lastLinkedInfo.lastRxPackets = 0;
+    lastLinkedInfo.lastTxPackets = 0;
     lastLinkedInfo.detailedState = DetailedState::DISCONNECTED;
 }
 
@@ -421,7 +427,7 @@ void StaStateMachine::StartWifiProcess()
         }
 #ifndef OHOS_ARCH_LITE
         WIFI_LOGI("Register netsupplier");
-        WifiNetAgent::GetInstance().OnStaMachineWifiStart(staCallback);
+        WifiNetAgent::GetInstance().OnStaMachineWifiStart();
 #endif
         /* Initialize Connection Information. */
         InitWifiLinkedInfo();
@@ -752,7 +758,27 @@ void StaStateMachine::DealSignalPollResult(InternalMessage *msg)
          linkedInfo.maxSupportedTxLinkSpeed);
     WifiSettings::GetInstance().SaveLinkedInfo(linkedInfo);
     ConvertFreqToChannel();
+    DealSignalPacketChanged(signalInfo.txPackets, signalInfo.rxPackets);
     StartTimer(static_cast<int>(CMD_SIGNAL_POLL), STA_SIGNAL_POLL_DELAY);
+}
+
+void StaStateMachine::DealSignalPacketChanged(int txPackets, int rxPackets)
+{
+    int send = txPackets - linkedInfo.lastTxPackets;
+    int received = rxPackets - linkedInfo.lastRxPackets;
+    int direction = 0;
+    if (send > 0) {
+        direction |= 1;
+    }
+    if (received > 0) {
+        direction |= 1 << 1;
+    }
+    if (direction != linkedInfo.lastPacketDirection) {
+        WriteWifiSignalHiSysEvent(direction, txPackets, rxPackets);
+    }
+    linkedInfo.lastPacketDirection = direction;
+    linkedInfo.lastRxPackets = rxPackets;
+    linkedInfo.lastTxPackets = txPackets;
 }
 
 void StaStateMachine::ConvertFreqToChannel()
@@ -762,6 +788,7 @@ void StaStateMachine::ConvertFreqToChannel()
         LOGE("GetDeviceConfig failed!");
         return;
     }
+    int lastBand = linkedInfo.band;
     config.frequency = linkedInfo.frequency;
     if (linkedInfo.frequency >= FREQ_2G_MIN && linkedInfo.frequency <= FREQ_2G_MAX) {
         config.band = linkedInfo.band = static_cast<int>(BandType::BAND_2GHZ);
@@ -771,6 +798,9 @@ void StaStateMachine::ConvertFreqToChannel()
     } else if (linkedInfo.frequency >= FREQ_5G_MIN && linkedInfo.frequency <= FREQ_5G_MAX) {
         config.band = linkedInfo.band = static_cast<int>(BandType::BAND_5GHZ);
         config.channel = (linkedInfo.frequency - FREQ_5G_MIN) / CENTER_FREQ_DIFF + CHANNEL_5G_MIN;
+    }
+    if (lastBand != linkedInfo.band) {
+        WriteWifiBandHiSysEvent(linkedInfo.band);
     }
     WifiSettings::GetInstance().AddDeviceConfig(config);
     return;
@@ -782,6 +812,7 @@ void StaStateMachine::OnConnectFailed(int networkId)
     SaveLinkstate(ConnState::DISCONNECTED, DetailedState::FAILED);
     staCallback.OnStaConnChanged(OperateResState::CONNECT_ENABLE_NETWORK_FAILED, linkedInfo);
     staCallback.OnStaConnChanged(OperateResState::DISCONNECT_DISCONNECTED, linkedInfo);
+    WriteWifiConnectionHiSysEvent(WifiConnectionType::DISCONNECT, "");
 }
 
 void StaStateMachine::DealConnectToUserSelectedNetwork(InternalMessage *msg)
@@ -842,6 +873,7 @@ void StaStateMachine::DealConnectTimeOutCmd(InternalMessage *msg)
     WifiSettings::GetInstance().SaveLinkedInfo(linkedInfo);
     staCallback.OnStaConnChanged(OperateResState::CONNECT_CONNECTING_TIMEOUT, linkedInfo);
     staCallback.OnStaConnChanged(OperateResState::DISCONNECT_DISCONNECTED, linkedInfo);
+    WriteWifiConnectionHiSysEvent(WifiConnectionType::DISCONNECT, "");
 }
 
 void StaStateMachine::DealConnectionEvent(InternalMessage *msg)
@@ -928,6 +960,7 @@ void StaStateMachine::DealDisconnectEvent(InternalMessage *msg)
     }
     /* Callback result to InterfaceService. */
     staCallback.OnStaConnChanged(OperateResState::DISCONNECT_DISCONNECTED, linkedInfo);
+    WriteWifiConnectionHiSysEvent(WifiConnectionType::DISCONNECT, "");
     SwitchState(pSeparatedState);
     return;
 }
@@ -950,11 +983,13 @@ void StaStateMachine::DealWpaLinkFailEvent(InternalMessage *msg)
         SaveLinkstate(ConnState::DISCONNECTED, DetailedState::CONNECTION_FULL);
         staCallback.OnStaConnChanged(OperateResState::CONNECT_CONNECTION_FULL, linkedInfo);
         staCallback.OnStaConnChanged(OperateResState::DISCONNECT_DISCONNECTED, linkedInfo);
+        WriteWifiConnectionHiSysEvent(WifiConnectionType::DISCONNECT, "");
     } else if (msg->GetMessageName() == WIFI_SVR_CMD_STA_WPA_ASSOC_REJECT_EVENT) {
         DisableNetwork(targetNetworkId);
         SaveLinkstate(ConnState::DISCONNECTED, DetailedState::CONNECTION_REJECT);
         staCallback.OnStaConnChanged(OperateResState::CONNECT_CONNECTION_REJECT, linkedInfo);
         staCallback.OnStaConnChanged(OperateResState::DISCONNECT_DISCONNECTED, linkedInfo);
+        WriteWifiConnectionHiSysEvent(WifiConnectionType::DISCONNECT, "");
     }
 }
 
@@ -2071,6 +2106,7 @@ void StaStateMachine::SetWifiLinkedInfo(int networkId)
                 lastLinkedInfo.detailedState = DetailedState::OBTAINING_IPADDR;
             }
         }
+        WriteWifiBandHiSysEvent(linkedInfo.band);
     }
 }
 
@@ -2160,6 +2196,7 @@ void StaStateMachine::DhcpResultNotify::OnSuccess(int status, const std::string 
         pStaStateMachine->SaveLinkstate(ConnState::CONNECTED, DetailedState::CONNECTED);
         pStaStateMachine->staCallback.OnStaConnChanged(
             OperateResState::CONNECT_AP_CONNECTED, pStaStateMachine->linkedInfo);
+        WriteWifiConnectionHiSysEvent(WifiConnectionType::CONNECT, "");
         /* Delay to wait for the network adapter information to take effect. */
         constexpr int NETCHECK_DELAY_TIME = 2000; // 2000 ms
         pStaStateMachine->StartTimer(static_cast<int>(CMD_START_NETCHECK), NETCHECK_DELAY_TIME);
@@ -2197,6 +2234,7 @@ void StaStateMachine::DhcpResultNotify::OnFailed(int status, const std::string &
         pStaStateMachine->SaveLinkstate(ConnState::DISCONNECTED, DetailedState::OBTAINING_IPADDR_FAIL);
         pStaStateMachine->staCallback.OnStaConnChanged(OperateResState::DISCONNECT_DISCONNECTED,
             pStaStateMachine->linkedInfo);
+        WriteWifiConnectionHiSysEvent(WifiConnectionType::DISCONNECT, "");
     }
     pStaStateMachine->getIpFailNum++;
 }
@@ -2261,7 +2299,7 @@ void StaStateMachine::OnNetManagerRestart(void)
     if (state != static_cast<int>(WifiState::ENABLED)) {
         return;
     }
-    WifiNetAgent::GetInstance().OnStaMachineNetManagerRestart(NetSupplierInfo, staCallback);
+    WifiNetAgent::GetInstance().OnStaMachineNetManagerRestart(NetSupplierInfo);
 }
 
 void StaStateMachine::ReUpdateNetSupplierInfo(sptr<NetManagerStandard::NetSupplierInfo> supplierInfo)

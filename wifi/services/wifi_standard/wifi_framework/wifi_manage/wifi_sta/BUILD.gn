@@ -67,7 +67,6 @@ if (defined(ohos_lite)) {
     ]
 
     deps = [
-      "$DHCP_ROOT_DIR/services/mgr_service:dhcp_manager_service",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage:wifi_service_base",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/idl_client:wifi_idl_client",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit:wifi_toolkit",
@@ -76,6 +75,7 @@ if (defined(ohos_lite)) {
       "//third_party/bounds_checking_function:libsec_shared",
     ]
 
+    external_deps = [ "dhcp:dhcp_manager_service" ]
     configs -= [ "//build/lite/config:language_cpp" ]
     cflags_cc = [
       "-std=c++17",

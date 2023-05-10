@@ -565,6 +565,11 @@ private:
      */
     void ConvertFreqToChannel();
     /**
+     * @Description : send packet direction to hisysevent
+     *
+     */
+    void DealSignalPacketChanged(int txPackets, int rxPackets);
+    /**
      * @Description  Connect to selected network.
      *
      * @param  msg - Message body received by the state machine[in]

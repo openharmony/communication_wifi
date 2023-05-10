@@ -50,5 +50,16 @@ void WriteWifiEventReceivedHiSysEvent(const std::string& eventType, int value)
 {
     WriteEvent("WIFI_EVENT_RECEIVED", "EVENT_TYPE", eventType, "VALUE", value);
 }
+
+void WriteWifiBandHiSysEvent(int band)
+{
+    WriteEvent("WIFI_BAND", "BAND", band);
+}
+
+void WriteWifiSignalHiSysEvent(int direction, int txPackets, int rxPackets)
+{
+    WriteEvent("WIFI_SIGNAL", "DIRECTION", direction, "TXPACKETS", txPackets, "RXPACKETS", rxPackets);
+}
+
 }  // namespace Wifi
 }  // namespace OHOS

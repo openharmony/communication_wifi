@@ -59,22 +59,22 @@
         Get5GHzChannelList;
         RegisterWifiEvent;
         UnRegisterWifiEvent;
-    extern "C++" {
-        "OHOS::Wifi::WifiDevice::GetInstance(int)";
-        "OHOS::Wifi::WifiScan::GetInstance(int)";
-        "OHOS::Wifi::WifiHotspot::GetInstance(int, int)";
-        "OHOS::Wifi::WifiP2p::GetInstance(int)";
-        OHOS::Wifi::WifiP2pLinkedInfo::*;
-        OHOS::Wifi::WifiP2pDevice::*;
-        "OHOS::Wifi::WifiAbilityStatusChange::Init(int)";
-        VTT?for?OHOS::Wifi::WifiAbilityStatusChange;
-        OHOS::Wifi::WifiP2pGroupInfo::*;
-        OHOS::Wifi::WifiP2pConfig::*;
-        "OHOS::Wifi::WifiAbilityStatusChange::OnRemoveSystemAbility(int, std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&)";
-        "OHOS::Wifi::WifiAbilityStatusChange::OnAddSystemAbility(int, std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&)";
-        "non-virtual thunk to OHOS::Wifi::WifiAbilityStatusChange::OnRemoveSystemAbility(int, std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&)";
-        "non-virtual thunk to OHOS::Wifi::WifiAbilityStatusChange::OnAddSystemAbility(int, std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&)";
-    };
+        extern "C++" {
+            "OHOS::Wifi::WifiDevice::GetInstance(int)";
+            "OHOS::Wifi::WifiScan::GetInstance(int)";
+            "OHOS::Wifi::WifiHotspot::GetInstance(int, int)";
+            "OHOS::Wifi::WifiP2p::GetInstance(int)";
+            OHOS::Wifi::WifiP2pLinkedInfo::*;
+            OHOS::Wifi::WifiP2pDevice::*;
+            "OHOS::Wifi::WifiAbilityStatusChange::Init(int)";
+            VTT?for?OHOS::Wifi::WifiAbilityStatusChange;
+            OHOS::Wifi::WifiP2pGroupInfo::*;
+            OHOS::Wifi::WifiP2pConfig::*;
+            "OHOS::Wifi::WifiAbilityStatusChange::OnRemoveSystemAbility(int, std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&)";
+            "OHOS::Wifi::WifiAbilityStatusChange::OnAddSystemAbility(int, std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&)";
+            "non-virtual thunk to OHOS::Wifi::WifiAbilityStatusChange::OnRemoveSystemAbility(int, std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&)";
+            "non-virtual thunk to OHOS::Wifi::WifiAbilityStatusChange::OnAddSystemAbility(int, std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&)";
+        };
     local:
         *;
 };

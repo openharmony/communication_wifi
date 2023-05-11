@@ -94,7 +94,7 @@ StaStateMachine::~StaStateMachine()
     ParsePointer(pGetIpState);
     ParsePointer(pLinkedState);
     ParsePointer(pApRoamingState);
-    if (pDhcpService != nullptr) {
+    if (pDhcpService.get() != nullptr) {
         if (currentTpType == IPTYPE_IPV4) {
             pDhcpService->StopDhcpClient(IF_NAME, false);
         } else {

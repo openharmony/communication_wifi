@@ -102,9 +102,9 @@ StaStateMachine::~StaStateMachine()
         }
 
         pDhcpService->RemoveDhcpResult(pDhcpResultNotify);
+        pDhcpService.reset(nullptr);
     }
     ParsePointer(pDhcpResultNotify);
-    ParsePointer(pDhcpService);
     ParsePointer(pNetcheck);
 }
 
@@ -125,12 +125,12 @@ ErrCode StaStateMachine::InitStaStateMachine()
     StartStateMachine();
     InitStaSMHandleMap();
 #ifndef OHOS_WIFI_STA_TEST
-    pDhcpService = DhcpServiceApi::GetInstance().get();
+    pDhcpService = DhcpServiceApi::GetInstance();
 #else
-    pDhcpService = new (std::nothrow) DhcpService();
+    pDhcpService = std::make_unique<DhcpService>();
 #endif
 
-    if (pDhcpService == nullptr) {
+    if (pDhcpService.get() == nullptr) {
         WIFI_LOGE("pDhcpServer is null\n");
         return WIFI_OPT_FAILED;
     }

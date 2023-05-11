@@ -165,7 +165,6 @@ RpcClient *CreateRpcClient(const char *path)
     pthread_cond_init(&client->lockCond, NULL);
     int ret = pthread_create(&client->threadId, NULL, RpcClientThreadDeal, client);
     if (ret) {
-        pthread_setname_np(client->threadId, "RpcClientThread");
         pthread_cond_destroy(&client->condW);
         pthread_mutex_destroy(&client->mutex);
         pthread_cond_destroy(&client->lockCond);
@@ -176,6 +175,7 @@ RpcClient *CreateRpcClient(const char *path)
         client = NULL;
         return NULL;
     }
+    pthread_setname_np(client->threadId, "RpcClientThread");
     signal(SIGPIPE, SIG_IGN);
     return client;
 }

@@ -31,6 +31,7 @@ if (defined(ohos_lite)) {
     ]
 
     include_dirs = [
+      "$WIFI_ROOT_DIR/interfaces/inner_api",
       "$WIFI_ROOT_DIR/frameworks/native/include",
       "$WIFI_ROOT_DIR/frameworks/native/interfaces",
       "$WIFI_ROOT_DIR/frameworks/native/c_adapter/inc",
@@ -81,6 +82,7 @@ if (defined(ohos_lite)) {
       "//foundation/arkui/ace_engine/frameworks/base/utils",
       "//foundation/arkui/ace_engine/frameworks",
       "//foundation/systemabilitymgr/samgr/interfaces/innerkits/samgr_proxy/include",
+      "$WIFI_ROOT_DIR/interfaces/inner_api",
       "$WIFI_ROOT_DIR/frameworks/native/include",
       "$WIFI_ROOT_DIR/frameworks/native/interfaces",
       "$WIFI_ROOT_DIR/frameworks/native/c_adapter/inc",
@@ -90,14 +92,6 @@ if (defined(ohos_lite)) {
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/include",
       "$WIFI_ROOT_DIR/interfaces/innerkits",
       "$WIFI_ROOT_DIR/utils/inc",
-    ]
-  }
-
-  config("wifi_exported_header_files") {
-    visibility = [ ":*" ]
-    include_dirs = [
-      "$WIFI_ROOT_DIR/interfaces/kits/c",
-      "$WIFI_ROOT_DIR/interfaces/inner_api",
     ]
   }
 
@@ -239,9 +233,11 @@ if (defined(ohos_lite)) {
       ":wifi_sdk_header",
     ]
 
+    public_configs = [ ":wifi_sdk_header" ]
+
     part_name = "wifi"
     subsystem_name = "communication"
-    public_configs = [ ":wifi_exported_header_files" ]
     innerapi_tags = [ "platformsdk" ]
+    version_script = "libwifi_sdk.map"
   }
 }

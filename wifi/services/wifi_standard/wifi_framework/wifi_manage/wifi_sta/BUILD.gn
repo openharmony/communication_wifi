@@ -36,6 +36,7 @@ local_base_sources = [
 
 local_base_include_dirs = [
   "$WIFI_ROOT_DIR/services/wifi_standard/sdk/include",
+  "$WIFI_ROOT_DIR/interfaces/inner_api",
   "$WIFI_ROOT_DIR/frameworks/native/interfaces",
   "$WIFI_ROOT_DIR/services/wifi_standard/ipc_framework/interface",
   "$WIFI_ROOT_DIR/services/wifi_standard/ipc_framework/cRPC/include",

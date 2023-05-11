@@ -45,6 +45,7 @@ if (defined(ohos_lite)) {
     ]
 
     include_dirs = [
+      "$WIFI_ROOT_DIR/interfaces/inner_api",
       "$WIFI_ROOT_DIR/frameworks/native/include",
       "$WIFI_ROOT_DIR/frameworks/native/interfaces",
       "$WIFI_ROOT_DIR/services/wifi_standard/ipc_framework/cRPC/include",
@@ -106,6 +107,7 @@ if (defined(ohos_lite)) {
     ]
 
     include_dirs = [
+      "$WIFI_ROOT_DIR/interfaces/inner_api",
       "$WIFI_ROOT_DIR/frameworks/native/include",
       "$WIFI_ROOT_DIR/frameworks/native/interfaces",
       "$WIFI_ROOT_DIR/services/wifi_standard/ipc_framework/cRPC/include",
@@ -154,6 +156,7 @@ if (defined(ohos_lite)) {
       "//foundation/arkui/ace_engine/frameworks/base/utils",
       "//foundation/arkui/ace_engine/frameworks",
       "//foundation/systemabilitymgr/safwk/interfaces/innerkits/safwk/",
+      "$WIFI_ROOT_DIR/interfaces/inner_api",
       "$WIFI_ROOT_DIR/frameworks/native/interfaces",
       "$WIFI_ROOT_DIR/services/wifi_standard/ipc_framework/cRPC/include",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/include",

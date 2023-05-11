@@ -96,12 +96,7 @@
                 {
                     "header" : {
                         "header_base": "//foundation/communication/wifi/wifi/interfaces/",
-                        "header_files": [
-                            "kits/c/wifi_device.h",
-                            "kits/c/wifi_hotspot.h",
-                            "kits/c/wifi_p2p.h",
-                            "kits/c/wifi_hid2d.h"
-                        ]
+                        "header_files": [ ]
                     },
                     "name" : "//foundation/communication/wifi/wifi/frameworks/native:wifi_sdk"
                 }

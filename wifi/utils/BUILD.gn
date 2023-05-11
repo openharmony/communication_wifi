@@ -17,6 +17,7 @@ if (defined(ohos_lite)) {
 
   shared_library("wifi_utils") {
     include_dirs = [
+      "$WIFI_ROOT_DIR/interfaces/inner_api",
       "$WIFI_ROOT_DIR/frameworks/native/interfaces",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/log",
       "$WIFI_ROOT_DIR/utils/inc",
@@ -54,6 +55,7 @@ if (defined(ohos_lite)) {
     install_enable = true
     include_dirs = [
       "$WIFI_ROOT_DIR/utils/inc",
+      "$WIFI_ROOT_DIR/interfaces/inner_api",
       "$WIFI_ROOT_DIR/frameworks/native/interfaces",
       "//base/hiviewdfx/hisysevent/interfaces/native/innerkits/hisysevent/include",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/log",

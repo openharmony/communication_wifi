@@ -334,7 +334,7 @@ public:
     int GetNetId() const;
     void SetPassphrase(const std::string &newPassphrase);
     const std::string &GetPassphrase() const;
-    void SetGroupOwnerIntent(int intent);
+    void SetGroupOwnerIntent(int goIntent);
     int GetGroupOwnerIntent() const;
     void SetGroupName(const std::string &setGroupName);
     const std::string &GetGroupName() const;

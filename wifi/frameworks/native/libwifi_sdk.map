@@ -81,6 +81,14 @@
             "OHOS::Wifi::WifiAbilityStatusChange::OnAddSystemAbility(int, std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&)";
             "non-virtual thunk to OHOS::Wifi::WifiAbilityStatusChange::OnRemoveSystemAbility(int, std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&)";
             "non-virtual thunk to OHOS::Wifi::WifiAbilityStatusChange::OnAddSystemAbility(int, std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&)";
+            "OHOS::Wifi::IpStrToArray(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&, unsigned int*)";
+            "OHOS::Wifi::IpArrayToStr(unsigned int const*)";
+            OHOS::Wifi::WifiDeviceCallBackStub::*;
+            OHOS::Wifi::WifiHotspotCallbackStub::*;
+            "OHOS::Wifi::WifiEapConfig::Phase2MethodToStr(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&, int const&)";
+            "OHOS::Wifi::WifiEapConfig::Phase2MethodFromStr(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&)";
+            OHOS::Wifi::WifiP2pCallbackStub::*;
+            OHOS::Wifi::WifiScanCallbackStub::*;
         };
     local:
         *;

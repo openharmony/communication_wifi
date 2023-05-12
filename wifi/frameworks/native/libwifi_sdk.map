@@ -70,6 +70,13 @@
             VTT?for?OHOS::Wifi::WifiAbilityStatusChange;
             OHOS::Wifi::WifiP2pGroupInfo::*;
             OHOS::Wifi::WifiP2pConfig::*;
+            OHOS::Wifi::WifiP2pServiceInfo::*;
+            OHOS::Wifi::WifiP2pWfdInfo::*;
+            OHOS::Wifi::WpsInfo::*;
+            OHOS::Wifi::WifiP2pConfigInternal::*;
+            OHOS::Wifi::WifiP2pServiceRequest::*;
+            OHOS::Wifi::WifiP2pServiceResponse::*;
+            OHOS::Wifi::P2pVendorConfig::*;
             "OHOS::Wifi::WifiAbilityStatusChange::OnRemoveSystemAbility(int, std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&)";
             "OHOS::Wifi::WifiAbilityStatusChange::OnAddSystemAbility(int, std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&)";
             "non-virtual thunk to OHOS::Wifi::WifiAbilityStatusChange::OnRemoveSystemAbility(int, std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&)";

@@ -129,7 +129,6 @@ ErrCode StaStateMachine::InitStaStateMachine()
 #else
     pDhcpService = std::make_unique<DhcpService>();
 #endif
-
     if (pDhcpService.get() == nullptr) {
         WIFI_LOGE("pDhcpServer is null\n");
         return WIFI_OPT_FAILED;

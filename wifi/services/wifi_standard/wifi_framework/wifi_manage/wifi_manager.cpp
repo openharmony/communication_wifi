@@ -112,6 +112,10 @@ void WifiManager::ForceStopWifi(void)
     if (pService == nullptr || (pService->DisableWifi() != WIFI_OPT_SUCCESS)) {
         WIFI_LOGE("service is null or disable wifi failed.");
         WifiConfigCenter::GetInstance().SetWifiMidState(WifiOprMidState::CLOSED);
+        WifiEventCallbackMsg cbMsg;
+        cbMsg.msgCode = WIFI_CBK_MSG_STATE_CHANGE;
+        cbMsg.msgData = static_cast<int>(WifiState::UNKNOWN);
+        WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
         WifiServiceManager::GetInstance().UnloadService(WIFI_SERVICE_STA);
         return;
     }
@@ -352,6 +356,10 @@ void WifiManager::CloseStaService(void)
     WifiServiceManager::GetInstance().UnloadService(WIFI_SERVICE_STA);
     WifiConfigCenter::GetInstance().SetWifiMidState(WifiOprMidState::CLOSED);
     WifiConfigCenter::GetInstance().SetWifiStaCloseTime();
+    WifiEventCallbackMsg cbMsg;
+    cbMsg.msgCode = WIFI_CBK_MSG_STATE_CHANGE;
+    cbMsg.msgData = static_cast<int>(WifiState::DISABLED);
+    WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
     #ifndef OHOS_ARCH_LITE
     WifiSaLoadManager::GetInstance().UnloadWifiSa(WIFI_DEVICE_ABILITY_ID);
     WifiSaLoadManager::GetInstance().UnloadWifiSa(WIFI_SCAN_ABILITY_ID);
@@ -505,15 +513,13 @@ void WifiManager::DealStaCloseRes(OperateResState state)
     }
     if (state == OperateResState::CLOSE_WIFI_FAILED) {
         WIFI_LOGI("DealStaCloseRes: broadcast wifi close failed event!");
+        ForceStopWifi();
         cbMsg.msgData = static_cast<int>(WifiState::UNKNOWN);
         WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
-        ForceStopWifi();
     }
     if (WifiConfigCenter::GetInstance().GetAirplaneModeState() == 1) {
         WifiConfigCenter::GetInstance().SetWifiStateWhenAirplaneMode(false);
     }
-    cbMsg.msgData = static_cast<int>(WifiState::DISABLED);
-    WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
     CheckAndStopScanService();
     WifiManager::GetInstance().PushServiceCloseMsg(WifiCloseServiceCode::STA_SERVICE_CLOSE);
     return;

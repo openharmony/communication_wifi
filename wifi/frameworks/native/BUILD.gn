@@ -82,6 +82,7 @@ if (defined(ohos_lite)) {
       "//foundation/arkui/ace_engine/frameworks/base/utils",
       "//foundation/arkui/ace_engine/frameworks",
       "//foundation/systemabilitymgr/samgr/interfaces/innerkits/samgr_proxy/include",
+      "$WIFI_ROOT_DIR/interfaces/kits/c",
       "$WIFI_ROOT_DIR/interfaces/inner_api",
       "$WIFI_ROOT_DIR/frameworks/native/include",
       "$WIFI_ROOT_DIR/frameworks/native/interfaces",

@@ -29,6 +29,7 @@
 #include "scan_common.h"
 #include "scan_monitor.h"
 #include "scan_state_machine.h"
+#include "scan_standby_listerner.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -280,7 +281,9 @@ private:
     bool isAbsFreezeState;                           /* absolute freeze state. */
     bool isAbsFreezeScaned;                          /* scanned in freeze state. */
     int scanResultBackup;                            /* scan result backup. */
-
+#ifndef OHOS_ARCH_LITE
+    StandByListerner standByListerner;         /* standby Listerner*/
+#endif
     /**
      * @Description Obtains the frequency of a specified band.
      *

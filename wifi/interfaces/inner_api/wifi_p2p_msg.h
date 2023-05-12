@@ -87,8 +87,8 @@ enum class P2pConnectedState {
 enum class P2pWfdInfoType {
     WFD_SOURCE = 0x00,
     PRIMARY_SINK = 0x01,
-    SECONDARY_SINK= 0x10,
-    SOURCE_OR_PRIMARY_SINK= 0x11
+    SECONDARY_SINK = 0x10,
+    SOURCE_OR_PRIMARY_SINK = 0x11
 };
 enum class P2pDeviceType {
     DEVICE_TYPE = 0x3,

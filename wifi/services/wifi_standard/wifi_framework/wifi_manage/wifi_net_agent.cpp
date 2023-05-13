@@ -33,16 +33,13 @@ using namespace NetManagerStandard;
 
 WifiNetAgent::WifiNetAgent()
 {
-    WIFI_LOGE("%{public}s WifiNetAgent()", __func__);
     netConnEventHandler_ = std::make_shared<WifiNetConnEventHandler>(netConnEventRunner_);
 }
 WifiNetAgent::~WifiNetAgent()
 {
     if (netConnEventHandler_) {
-        WIFI_LOGE("%{public}s netConnEventHandler_.reset(nullptr)", __func__);
         netConnEventHandler_.reset();
     }
-    WIFI_LOGE("%{public}s ~WifiNetAgent()", __func__);
 }
 
 bool WifiNetAgent::RegisterNetSupplier()
@@ -207,64 +204,36 @@ bool WifiNetAgent::AddRoute(const std::string interface, const std::string ipAdd
 void WifiNetAgent::OnStaMachineUpdateNetLinkInfo(const std::string &strIp, const std::string &strMask,
     const std::string &strGateWay, const std::string &strDns, const std::string &strBakDns)
 {
-    char th_name[256];
-    pthread_getname_np(pthread_self(), th_name, sizeof(th_name));
-    WIFI_LOGE("%{public}s, WifiNetAgentStart th_name:%{public}s", __func__, th_name);
     if (netConnEventHandler_) {
         netConnEventHandler_->PostSyncTask([this, ip = strIp, mask = strMask, gateWay = strGateWay, dns = strDns, bakDns = strBakDns]() {
-            char thread_name[256];
-            pthread_getname_np(pthread_self(), thread_name, sizeof(thread_name));
-            WIFI_LOGE("%{public}s, WifiNetAgentStart PostSyncTask %{public}s ip:%{public}s mask:%{public}s gateway:%{public}s dns:%{public}s bakDns:%{public}s",
-                __func__, thread_name, ip.c_str(), mask.c_str(), gateWay.c_str(), dns.c_str(), bakDns.c_str());
             this->UpdateNetLinkInfo(ip, mask, gateWay, dns, bakDns);
-            WIFI_LOGE("%{public}s, WifiNetAgentStart PostSyncTask end %{public}s", __func__, thread_name);
         });
     }
 }
 
 void WifiNetAgent::OnStaMachineUpdateNetSupplierInfo(const sptr<NetManagerStandard::NetSupplierInfo> &netSupplierInfo)
 {
-    char th_name[256];
-    pthread_getname_np(pthread_self(), th_name, sizeof(th_name));
-    WIFI_LOGE("%{public}s, WifiNetAgentStart th_name:%{public}s", __func__, th_name);
     if (netConnEventHandler_) {
         netConnEventHandler_->PostSyncTask([this, netInfo = netSupplierInfo]() {
-            char thread_name[256];
-            pthread_getname_np(pthread_self(), thread_name, sizeof(thread_name));
-            WIFI_LOGE("%{public}s, WifiNetAgentStart PostSyncTask %{public}s", __func__, thread_name);
            this->UpdateNetSupplierInfo(netInfo);
-           WIFI_LOGE("%{public}s, WifiNetAgentStart PostSyncTask end %{public}s", __func__, thread_name);
         });
     }
 }
 
 void WifiNetAgent::OnStaMachineWifiStart()
 {
-    char th_name[256];
-    pthread_getname_np(pthread_self(), th_name, sizeof(th_name));
-    WIFI_LOGE("%{public}s, WifiNetAgentStart th_name:%{public}s", __func__, th_name);
     if (netConnEventHandler_) {
         netConnEventHandler_->PostSyncTask([this]() {
-            char thread_name[256];
-            pthread_getname_np(pthread_self(), thread_name, sizeof(thread_name));
-            WIFI_LOGE("%{public}s, WifiNetAgentStart PostSyncTask %{public}s", __func__, thread_name);
             this->RegisterNetSupplier();
             this->RegisterNetSupplierCallback();
-            WIFI_LOGE("%{public}s, WifiNetAgentStart PostSyncTask end %{public}s", __func__, thread_name);
         });
     }
 }
 
 void WifiNetAgent::OnStaMachineNetManagerRestart(const sptr<NetManagerStandard::NetSupplierInfo> &netSupplierInfo)
 {
-    char th_name[256];
-    pthread_getname_np(pthread_self(), th_name, sizeof(th_name));
-    WIFI_LOGE("%{public}s, WifiNetAgentStart th_name:%{public}s", __func__, th_name);
     if (netConnEventHandler_) {
         netConnEventHandler_->PostSyncTask([this, supplierInfo = netSupplierInfo]() {
-            char thread_name[256];
-            pthread_getname_np(pthread_self(), thread_name, sizeof(thread_name));
-            WIFI_LOGE("%{public}s, WifiNetAgentStart PostSyncTask %{public}s", __func__, thread_name);
             this->RegisterNetSupplier();
             this->RegisterNetSupplierCallback();
             WifiLinkedInfo linkedInfo;
@@ -286,7 +255,6 @@ void WifiNetAgent::OnStaMachineNetManagerRestart(const sptr<NetManagerStandard::
                 std::string secondDns = IpTools::ConvertIpv4Address(wifiIpInfo.secondDns);
                 this->UpdateNetLinkInfo(ipAddress, netmask, gateway, primaryDns, secondDns);
             }
-            WIFI_LOGE("%{public}s, WifiNetAgentStart PostSyncTask end %{public}s", __func__, thread_name);
         });
     }
 }

@@ -15,6 +15,7 @@
 
 #include "sta_state_machine.h"
 #include <cstdio>
+#include <net/if.h>
 #include "if_config.h"
 #include "ip_tools.h"
 #include "log_helper.h"

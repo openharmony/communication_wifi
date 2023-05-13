@@ -39,5 +39,5 @@ void WifiNetConnEventHandler::RemoveAsyncTask(const std::string &name)
 {
     AppExecFwk::EventHandler::RemoveTask(name);
 }
-} // namespace NetManagerStandard
+} // namespace Wifi
 } // namespace OHOS

@@ -358,6 +358,7 @@ if (defined(ohos_lite)) {
       "wifi_internal_event_dispatcher.cpp",
       "wifi_manager.cpp",
       "wifi_net_agent.cpp",
+      "wifi_net_conn_event_handler.cpp",
       "wifi_service_manager.cpp",
     ]
 
@@ -378,6 +379,7 @@ if (defined(ohos_lite)) {
       "access_token:libaccesstoken_sdk",
       "access_token:libtokenid_sdk",
       "bundle_framework:appexecfwk_base",
+      "eventhandler:libeventhandler",
       "c_utils:utils",
       "huks:libhukssdk",
       "ipc:ipc_core",

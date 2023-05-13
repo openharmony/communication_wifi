@@ -15,7 +15,6 @@
 
 #include "sta_state_machine.h"
 #include <cstdio>
-#include <net/if.h>
 #include "if_config.h"
 #include "ip_tools.h"
 #include "log_helper.h"
@@ -1211,68 +1210,10 @@ void StaStateMachine::DealStartRoamCmd(InternalMessage *msg)
     SwitchState(pApRoamingState);
 }
 
-void UpLink()
-{
-    std::string ifName = "wlan0";
-    struct ifreq ifr;
-    if (memset_s(&ifr, sizeof(ifr), 0, sizeof(ifr)) != EOK ||
-        strcpy_s(ifr.ifr_name, sizeof(ifr.ifr_name), ifName.c_str()) != EOK) {
-        LOGE("ccntoInit the ifreq struct failed!");
-        return;
-    }
-    int fd = socket(AF_INET, SOCK_DGRAM, 0);
-    if (fd < 0) {
-        LOGE("ccntoget mac addr socket error");
-        return;
-    }
-
-    ifr.ifr_flags |= IFF_UP;
-    if (ioctl(fd, SIOCSIFFLAGS, &ifr) < 0) {
-        LOGE("ccntoget mac addr ioctl SIOCGIFHWADDR error");
-        close(fd);
-        return;
-    }
-
-    close(fd);
-}
-
-void DownLink()
-{
-    std::string ifName = "wlan0";
-    struct ifreq ifr;
-    if (memset_s(&ifr, sizeof(ifr), 0, sizeof(ifr)) != EOK ||
-        strcpy_s(ifr.ifr_name, sizeof(ifr.ifr_name), ifName.c_str()) != EOK) {
-        LOGE("ccntoInit the ifreq struct failed!");
-        return;
-    }
-    int fd = socket(AF_INET, SOCK_DGRAM, 0);
-    if (fd < 0) {
-        LOGE("ccntoget mac addr socket error");
-        return;
-    }
-
-    ifr.ifr_flags &= ~IFF_UP;
-    if (ioctl(fd, SIOCSIFFLAGS, &ifr) < 0) {
-        LOGE("ccntoget mac addr ioctl SIOCGIFHWADDR error");
-        close(fd);
-        return;
-    }
-
-    close(fd);
-}
-
 ErrCode StaStateMachine::StartConnectToNetwork(int networkId)
 {
     targetNetworkId = networkId;
     SetRandomMac(targetNetworkId);
-    usleep(1000000);
-    LOGE("ccnto after DownLink!");
-    DownLink();
-    LOGE("ccnto after DownLink!");
-    usleep(1000000);
-    LOGE("ccnto UpLink!");
-    UpLink();
-    usleep(1000000);
 
     WifiDeviceConfig deviceConfig;
     if (WifiSettings::GetInstance().GetDeviceConfig(networkId, deviceConfig) != 0) {

@@ -33,10 +33,20 @@ using namespace NetManagerStandard;
 
 WifiNetAgent::WifiNetAgent()
 {
-    netConnEventHandler_ = std::make_shared<WifiNetConnEventHandler>(netConnEventRunner_);
+    netConnEventRunner_ = AppExecFwk::EventRunner::Create(NET_CONN_MANAGER_WORK_THREAD);
+    if (netConnEventRunner_) {
+        netConnEventHandler_ = std::make_shared<WifiNetConnEventHandler>(netConnEventRunner_);
+    } else {
+        WIFI_LOGE("Create event runner failed.");
+    }
 }
 WifiNetAgent::~WifiNetAgent()
 {
+    if (netConnEventRunner_) {
+        netConnEventRunner_->Stop();
+        netConnEventRunner_.reset();
+    }
+
     if (netConnEventHandler_) {
         netConnEventHandler_.reset();
     }

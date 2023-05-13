@@ -29,12 +29,12 @@ DEFINE_WIFILOG_LABEL("WifiNetAgent");
 
 namespace OHOS {
 namespace Wifi {
-constexpr const char *NET_CONN_MANAGER_WORK_THREAD = "WIFI_NET_CONN_MGR_WORK_THREAD";
+constexpr const char *WIFI_NET_CONN_MGR_WORK_THREAD = "WIFI_NET_CONN_MGR_WORK_THREAD";
 using namespace NetManagerStandard;
 
 WifiNetAgent::WifiNetAgent()
 {
-    netConnEventRunner_ = AppExecFwk::EventRunner::Create(NET_CONN_MANAGER_WORK_THREAD);
+    netConnEventRunner_ = AppExecFwk::EventRunner::Create(WIFI_NET_CONN_MGR_WORK_THREAD);
     if (netConnEventRunner_) {
         netConnEventHandler_ = std::make_shared<WifiNetConnEventHandler>(netConnEventRunner_);
     } else {

@@ -14,7 +14,9 @@
  */
 
 #ifdef HDI_INTERFACE_SUPPORT
-
+#include <net/if.h>
+#include <sys/ioctl.h>
+#include <sys/socket.h>
 #include <pthread.h>
 #include "securec.h"
 #include "v1_1/iwlan_callback.h"
@@ -271,9 +273,39 @@ static const uint32_t MAC_ADDR_INDEX_4 = 4;
 static const uint32_t MAC_ADDR_INDEX_5 = 5;
 static const uint32_t MAC_ADDR_INDEX_SIZE = 6;
 
+void UpDownLink(int flag)
+{
+    struct ifreq ifr;
+    if (memset_s(&ifr, sizeof(ifr), 0, sizeof(ifr)) != EOK ||
+        strcpy_s(ifr.ifr_name, sizeof(ifr.ifr_name), "wlan0") != EOK) {
+        LOGE("ccntoInit the ifreq struct failed!");
+        return;
+    }
+    int fd = socket(AF_INET, SOCK_DGRAM, 0);
+    if (fd < 0) {
+        LOGE("ccntoget mac addr socket error");
+        return;
+    }
+
+    if (flag == 1) {
+        ifr.ifr_flags |= IFF_UP;
+    } else {
+        ifr.ifr_flags &= ~IFF_UP;
+    }
+
+    if (ioctl(fd, SIOCSIFFLAGS, &ifr) < 0) {
+        LOGE("ccntoget mac addr ioctl SIOCGIFHWADDR error");
+        close(fd);
+        return;
+    }
+
+    close(fd);
+}
+
 WifiErrorNo SetAssocMacAddr(const unsigned char *mac, int lenMac)
 {
     LOGI("SetAssocMacAddr enter.");
+    UpDownLink(0);
     WifiHdiProxy proxy = GetHdiProxy(PROTOCOL_80211_IFTYPE_STATION);
     CHECK_HDI_PROXY_AND_RETURN(proxy, WIFI_HAL_FAILED);
 
@@ -286,7 +318,7 @@ WifiErrorNo SetAssocMacAddr(const unsigned char *mac, int lenMac)
     if (ret != HDF_SUCCESS) {
         LOGE("SetAssocMacAddr failed: %{public}d", ret);
     }
-
+    UpDownLink(1);
     return (ret == 0) ? WIFI_HAL_SUCCESS : WIFI_HAL_FAILED;
 }
 #endif

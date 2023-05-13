@@ -216,7 +216,8 @@ void WifiNetAgent::OnStaMachineUpdateNetLinkInfo(const std::string &strIp, const
     const std::string &strGateWay, const std::string &strDns, const std::string &strBakDns)
 {
     if (netConnEventHandler_) {
-        netConnEventHandler_->PostSyncTask([this, ip = strIp, mask = strMask, gateWay = strGateWay, dns = strDns, bakDns = strBakDns]() {
+        netConnEventHandler_->PostSyncTask(
+            [this, ip = strIp, mask = strMask, gateWay = strGateWay, dns = strDns, bakDns = strBakDns]() {
             this->UpdateNetLinkInfo(ip, mask, gateWay, dns, bakDns);
         });
     }

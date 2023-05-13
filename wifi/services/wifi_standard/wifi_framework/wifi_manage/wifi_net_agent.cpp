@@ -29,6 +29,7 @@ DEFINE_WIFILOG_LABEL("WifiNetAgent");
 
 namespace OHOS {
 namespace Wifi {
+constexpr const char *NET_CONN_MANAGER_WORK_THREAD = "WIFI_NET_CONN_MGR_WORK_THREAD";
 using namespace NetManagerStandard;
 
 WifiNetAgent::WifiNetAgent()

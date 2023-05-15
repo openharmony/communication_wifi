@@ -14,8 +14,8 @@
  */
 
 #include "../../../interfaces/kits/c/wifi_device.h"
-#include "../../include/wifi_device.h"
-#include "../../include/wifi_scan.h"
+#include "../../../interfaces/inner_api/wifi_device.h"
+#include "../../../interfaces/inner_api/wifi_scan.h"
 #include "../../../interfaces/kits/c/wifi_scan_info.h"
 #include "../../../interfaces/kits/c/wifi_device_config.h"
 #include "wifi_logger.h"

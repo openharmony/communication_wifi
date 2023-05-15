@@ -261,6 +261,7 @@ static int HostapdCliConnect(int id)
         LOGE("Create hostapd monitor thread failed!");
         return -1;
     }
+    pthread_setname_np(g_hostapdHalDevInfo[id].hostapdHalDev->tid, "HostapdCBThread");
     return 0;
 }
 

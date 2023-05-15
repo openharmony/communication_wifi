@@ -33,7 +33,7 @@
 #endif // OHOS_ARCH_LITE
 
 #ifndef OHOS_WIFI_STA_TEST
-#include "dhcp_service.h"
+#include "dhcp_service_api.h"
 #else
 #include "mock_dhcp_service.h"
 #endif
@@ -94,7 +94,7 @@ StaStateMachine::~StaStateMachine()
     ParsePointer(pGetIpState);
     ParsePointer(pLinkedState);
     ParsePointer(pApRoamingState);
-    if (pDhcpService != nullptr) {
+    if (pDhcpService.get() != nullptr) {
         if (currentTpType == IPTYPE_IPV4) {
             pDhcpService->StopDhcpClient(IF_NAME, false);
         } else {
@@ -102,9 +102,9 @@ StaStateMachine::~StaStateMachine()
         }
 
         pDhcpService->RemoveDhcpResult(pDhcpResultNotify);
+        pDhcpService.reset(nullptr);
     }
     ParsePointer(pDhcpResultNotify);
-    ParsePointer(pDhcpService);
     ParsePointer(pNetcheck);
 }
 
@@ -124,9 +124,12 @@ ErrCode StaStateMachine::InitStaStateMachine()
     SetFirstState(pInitState);
     StartStateMachine();
     InitStaSMHandleMap();
-
-    pDhcpService = new (std::nothrow) DhcpService();
-    if (pDhcpService == nullptr) {
+#ifndef OHOS_WIFI_STA_TEST
+    pDhcpService = DhcpServiceApi::GetInstance();
+#else
+    pDhcpService = std::make_unique<DhcpService>();
+#endif
+    if (pDhcpService.get() == nullptr) {
         WIFI_LOGE("pDhcpServer is null\n");
         return WIFI_OPT_FAILED;
     }
@@ -1279,7 +1282,7 @@ ErrCode StaStateMachine::StartConnectToNetwork(int networkId)
     return WIFI_OPT_SUCCESS;
 }
 
-void StaStateMachine::MacAddressGenerate(std::string &strMac)
+void StaStateMachine::MacAddressGenerate(WifiStoreRandomMac &randomMacInfo)
 {
     LOGI("enter MacAddressGenerate\n");
     constexpr int arraySize = 4;
@@ -1291,7 +1294,8 @@ void StaStateMachine::MacAddressGenerate(std::string &strMac)
     constexpr int octBase = 8;
     int ret = 0;
     char strMacTmp[arraySize] = {0};
-    srand(static_cast<unsigned int>(time(nullptr)));
+    unsigned int seed = static_cast<unsigned int>(time(nullptr) + std::hash<std::string>{}(randomMacInfo.peerBssid) + std::hash<std::string>{}(randomMacInfo.preSharedKey));
+    srand(seed);
     for (int i = 0; i < macBitSize; i++) {
         if (i != firstBit) {
             ret = sprintf_s(strMacTmp, arraySize, "%x", rand() % hexBase);
@@ -1301,9 +1305,9 @@ void StaStateMachine::MacAddressGenerate(std::string &strMac)
         if (ret == -1) {
             LOGE("StaStateMachine::MacAddressGenerate failed, sprintf_s return -1!\n");
         }
-        strMac += strMacTmp;
+        randomMacInfo.randomMac += strMacTmp;
         if ((i % two) != 0 && (i != lastBit)) {
-            strMac.append(":");
+            randomMacInfo.randomMac.append(":");
         }
     }
 }
@@ -1344,6 +1348,7 @@ bool StaStateMachine::SetRandomMac(int networkId)
                 (ComparedKeymgmt(scanInfo.capabilities, deviceConfig.keyMgmt))) {
                 randomMacInfo.ssid = scanInfo.ssid;
                 randomMacInfo.keyMgmt = deviceConfig.keyMgmt;
+                randomMacInfo.preSharedKey = deviceConfig.preSharedKey;
                 randomMacInfo.peerBssid = scanInfo.bssid;
                 break;
             }
@@ -1354,7 +1359,7 @@ bool StaStateMachine::SetRandomMac(int networkId)
         }
 
         /* Sets the MAC address of WifiSettings. */
-        MacAddressGenerate(randomMacInfo.randomMac);
+        MacAddressGenerate(randomMacInfo);
         WifiSettings::GetInstance().AddRandomMac(randomMacInfo);
         currentMac = randomMacInfo.randomMac;
     }

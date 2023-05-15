@@ -40,6 +40,10 @@ using ::testing::ext::TestSize;
 namespace OHOS {
 namespace Wifi {
 constexpr int FAILEDNUM = 3;
+static const std::string RANDOMMAC_SSID = "testwifi";
+static const std::string RANDOMMAC_PASSWORD = "testwifi";
+static const std::string RANDOMMAC_BSSID = "01:23:45:67:89:a0";
+
 class StaStateMachineTest : public testing::Test {
 public:
     static void SetUpTestCase() {}
@@ -805,8 +809,12 @@ public:
     {
         WifiDeviceConfig deviceConfig;
         deviceConfig.wifiPrivacySetting = WifiPrivacyConfig::RANDOMMAC;
-        std::string strMac = "hmwifi";
-        pStaStateMachine->MacAddressGenerate(strMac);
+        WifiStoreRandomMac randomMacInfo;
+        randomMacInfo.ssid = RANDOMMAC_SSID;
+        randomMacInfo.keyMgmt = KEY_MGMT_WEP;
+        randomMacInfo.preSharedKey = RANDOMMAC_PASSWORD;
+        randomMacInfo.peerBssid = RANDOMMAC_BSSID;
+        pStaStateMachine->MacAddressGenerate(randomMacInfo);
         EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _))
             .WillRepeatedly(DoAll(SetArgReferee<1>(deviceConfig), Return(-1)));
         EXPECT_CALL(WifiSettings::GetInstance(), GetMacAddress(_)).Times(AtLeast(0)).WillOnce(Return(0));

@@ -16,7 +16,7 @@
 #include "../../../interfaces/kits/c/wifi_hotspot.h"
 #include "../../../interfaces/kits/c/wifi_hotspot_config.h"
 #include "../../../interfaces/kits/c/wifi_device_config.h"
-#include "../../include/wifi_hotspot.h"
+#include "../../../interfaces/inner_api/wifi_hotspot.h"
 #include "wifi_logger.h"
 #include "wifi_c_utils.h"
 #include "ip_tools.h"

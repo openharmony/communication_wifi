@@ -19,7 +19,7 @@
 #include "wifip2pimpl_fuzzer.h"
 #include "wifi_fuzz_common_func.h"
 #include "../../../../../../frameworks/native/src/wifi_p2p_impl.h"
-#include "../../../../../../frameworks/native/include/wifi_p2p.h"
+#include "../../../../../../interfaces/inner_api/wifi_p2p.h"
 
 namespace OHOS {
 namespace Wifi {

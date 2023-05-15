@@ -172,6 +172,7 @@ ErrCode StaNetworkCheck::InitNetCheckThread()
         WIFI_LOGE("In StaNetworkCheck start NetCheck thread failed!\n");
         return ErrCode::WIFI_OPT_FAILED;
     }
+    pthread_setname_np(pDealNetCheckThread->native_handle(), "NetCheckThread");
     return ErrCode::WIFI_OPT_SUCCESS;
 }
 

@@ -277,6 +277,7 @@ int WifiSettings::RemoveDevice(int networkId)
                 LOGD("uninstall cert %{public}s success", iter->second.wifiEapConfig.clientCert.c_str());
             }
         }
+        RemoveRandomMac(iter->second.ssid, iter->second.macAddress);
         mWifiDeviceConfig.erase(iter);
     }
     return 0;
@@ -686,6 +687,23 @@ bool WifiSettings::AddRandomMac(WifiStoreRandomMac &randomMacInfo)
     mSavedWifiStoreRandomMac.SetValue(mWifiStoreRandomMac);
     mSavedWifiStoreRandomMac.SaveConfig();
     return isConnected;
+}
+
+bool WifiSettings::RemoveRandomMac(const std::string &ssid, const std::string &randomMac)
+{
+    std::unique_lock<std::mutex> lock(mStaMutex);
+
+    for(auto it = mWifiStoreRandomMac.begin(); it != mWifiStoreRandomMac.end(); it++) {
+        if(it->ssid == ssid && it->randomMac == randomMac) {
+            mWifiStoreRandomMac.erase(it);
+
+            mSavedWifiStoreRandomMac.SetValue(mWifiStoreRandomMac);
+            mSavedWifiStoreRandomMac.SaveConfig();
+            return true;
+        }
+    }
+
+    return false;
 }
 
 int WifiSettings::SetCountryCode(const std::string &countryCode)

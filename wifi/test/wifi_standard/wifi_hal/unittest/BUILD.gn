@@ -92,7 +92,6 @@ ohos_unittest("wifi_hal_unittest") {
 
   deps = [
     "$WIFI_ROOT_DIR/services/wifi_standard/ipc_framework/cRPC:crpc_server",
-    "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
   ]
@@ -113,6 +112,10 @@ ohos_unittest("wifi_hal_unittest") {
   if (wifi_feature_is_hdi_supported) {
     defines += [ "HDI_INTERFACE_SUPPORT" ]
     external_deps += [ "drivers_interface_wlan:libwlan_proxy_1.1" ]
+  }
+
+  if (wifi_feature_is_random_mac_supported) {
+    defines += [ "RANDOM_MAC_SUPPORT" ]
   }
 
   configs = [ ":module_private_config" ]

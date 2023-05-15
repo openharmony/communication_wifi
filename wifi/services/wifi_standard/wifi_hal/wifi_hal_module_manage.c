@@ -145,6 +145,7 @@ int StartModuleInternal(const char *moduleName, const char *startCmd, pid_t *pPr
             LOGE("Create wpa thread failed!");
             return HAL_FAILURE;
         }
+        pthread_setname_np(tid, "WpaMainThread");
         pthread_join(tid, NULL);
         exit(0);
     } else {

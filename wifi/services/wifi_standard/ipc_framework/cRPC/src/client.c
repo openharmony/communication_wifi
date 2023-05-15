@@ -175,6 +175,7 @@ RpcClient *CreateRpcClient(const char *path)
         client = NULL;
         return NULL;
     }
+    pthread_setname_np(client->threadId, "RpcClientThread");
     signal(SIGPIPE, SIG_IGN);
     return client;
 }

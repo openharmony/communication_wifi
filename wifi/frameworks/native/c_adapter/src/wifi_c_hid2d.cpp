@@ -14,7 +14,7 @@
  */
 
 #include "../../../interfaces/kits/c/wifi_hid2d.h"
-#include "../../include/wifi_hid2d.h"
+#include "../../../interfaces/inner_api/wifi_hid2d.h"
 #include "define.h"
 #include "wifi_logger.h"
 #include "wifi_c_utils.h"

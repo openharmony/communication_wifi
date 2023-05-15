@@ -31,6 +31,7 @@ if (defined(ohos_lite)) {
     ]
 
     include_dirs = [
+      "$WIFI_ROOT_DIR/interfaces/inner_api",
       "$WIFI_ROOT_DIR/frameworks/native/include",
       "$WIFI_ROOT_DIR/frameworks/native/interfaces",
       "$WIFI_ROOT_DIR/frameworks/native/c_adapter/inc",
@@ -81,6 +82,7 @@ if (defined(ohos_lite)) {
       "//foundation/arkui/ace_engine/frameworks/base/utils",
       "//foundation/arkui/ace_engine/frameworks",
       "//foundation/systemabilitymgr/samgr/interfaces/innerkits/samgr_proxy/include",
+      "$WIFI_ROOT_DIR/interfaces/inner_api",
       "$WIFI_ROOT_DIR/frameworks/native/include",
       "$WIFI_ROOT_DIR/frameworks/native/interfaces",
       "$WIFI_ROOT_DIR/frameworks/native/c_adapter/inc",
@@ -88,8 +90,6 @@ if (defined(ohos_lite)) {
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/log/",
       "//foundation/systemabilitymgr/samgr/adapter/interfaces/innerkits/include",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/include",
-      "$DHCP_ROOT_DIR/interfaces/inner_api/include",
-      "$DHCP_ROOT_DIR/services/mgr_service/include",
       "$WIFI_ROOT_DIR/interfaces/innerkits",
       "$WIFI_ROOT_DIR/utils/inc",
     ]
@@ -122,7 +122,7 @@ if (defined(ohos_lite)) {
       ":wifi_sdk_header",
     ]
 
-    external_deps = [ "ipc:ipc_core" ]
+    external_deps = [ "ipc:ipc_single" ]
   }
 
   ohos_source_set("wifi_hotspot_proxy_impl") {
@@ -138,7 +138,7 @@ if (defined(ohos_lite)) {
       ":wifi_sdk_header",
     ]
 
-    external_deps = [ "ipc:ipc_core" ]
+    external_deps = [ "ipc:ipc_single" ]
   }
 
   ohos_source_set("wifi_scan_proxy_impl") {
@@ -153,7 +153,7 @@ if (defined(ohos_lite)) {
       ":wifi_sdk_header",
     ]
 
-    external_deps = [ "ipc:ipc_core" ]
+    external_deps = [ "ipc:ipc_single" ]
   }
 
   ohos_source_set("wifi_p2p_proxy_impl") {
@@ -168,7 +168,7 @@ if (defined(ohos_lite)) {
       ":wifi_sdk_header",
     ]
 
-    external_deps = [ "ipc:ipc_core" ]
+    external_deps = [ "ipc:ipc_single" ]
   }
 
   ohos_shared_library("wifi_sdk") {
@@ -206,14 +206,14 @@ if (defined(ohos_lite)) {
       ":wifi_p2p_proxy_impl",
       ":wifi_scan_proxy_impl",
       "$WIFI_ROOT_DIR/utils:wifi_utils",
-      "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog",
-      "//foundation/systemabilitymgr/samgr/interfaces/innerkits/samgr_proxy:samgr_proxy",
       "//third_party/bounds_checking_function:libsec_shared",
     ]
 
     external_deps = [
       "c_utils:utils",
-      "ipc:ipc_core",
+      "hiviewdfx_hilog_native:libhilog",
+      "ipc:ipc_single",
+      "samgr:samgr_proxy",
     ]
 
     defines = [ "AP_INSTANCE_MAX_NUM=$wifi_feature_with_ap_num" ]
@@ -233,7 +233,11 @@ if (defined(ohos_lite)) {
       ":wifi_sdk_header",
     ]
 
+    public_configs = [ ":wifi_sdk_header" ]
+
     part_name = "wifi"
     subsystem_name = "communication"
+    innerapi_tags = [ "platformsdk" ]
+    version_script = "libwifi_sdk.map"
   }
 }

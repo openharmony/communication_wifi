@@ -36,6 +36,7 @@ local_base_sources = [
 
 local_base_include_dirs = [
   "$WIFI_ROOT_DIR/services/wifi_standard/sdk/include",
+  "$WIFI_ROOT_DIR/interfaces/inner_api",
   "$WIFI_ROOT_DIR/frameworks/native/interfaces",
   "$WIFI_ROOT_DIR/services/wifi_standard/ipc_framework/interface",
   "$WIFI_ROOT_DIR/services/wifi_standard/ipc_framework/cRPC/include",
@@ -50,9 +51,6 @@ local_base_include_dirs = [
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/idl_client/idl_interface",
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta/net_conf",
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta",
-  "$DHCP_ROOT_DIR/services/mgr_service/include",
-  "$DHCP_ROOT_DIR/interfaces/inner_api/include",
-  "$DHCP_ROOT_DIR/interfaces/inner_api/interfaces",
   "$WIFI_ROOT_DIR/utils/inc",
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage",
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common",
@@ -67,6 +65,8 @@ if (defined(ohos_lite)) {
     include_dirs += [
       "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits",
       "//third_party/bounds_checking_function/include",
+      "$DHCP_ROOT_DIR/interfaces/inner_api/include",
+      "$DHCP_ROOT_DIR/interfaces/inner_api/interfaces",
     ]
 
     deps = [
@@ -120,7 +120,6 @@ if (defined(ohos_lite)) {
     ]
 
     deps = [
-      "$DHCP_ROOT_DIR/services/mgr_service:dhcp_manager_service",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage:wifi_manager_service",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/idl_client:wifi_idl_client",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common:wifi_common_service",
@@ -130,8 +129,9 @@ if (defined(ohos_lite)) {
 
     external_deps = [
       "c_utils:utils",
+      "dhcp:dhcp_manager_service",
       "hiviewdfx_hilog_native:libhilog",
-      "ipc:ipc_core",
+      "ipc:ipc_single",
       "netmanager_base:net_conn_manager_if",
       "samgr:samgr_proxy",
     ]

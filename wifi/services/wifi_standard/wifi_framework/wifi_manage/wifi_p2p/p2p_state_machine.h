@@ -21,7 +21,7 @@
 #include "p2p_monitor.h"
 #include "wifi_p2p_service_manager.h"
 #include "i_dhcp_result_notify.h"
-#include "dhcp_service.h"
+#include "dhcp_service_api.h"
 #include "dhcpd_interface.h"
 #include "authorizing_negotiation_request_state.h"
 #include "group_formed_state.h"

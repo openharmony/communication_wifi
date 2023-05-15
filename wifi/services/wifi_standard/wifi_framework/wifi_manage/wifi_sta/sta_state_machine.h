@@ -726,7 +726,7 @@ private:
     bool isRoam;
     WifiLinkedInfo linkedInfo;
     WifiLinkedInfo lastLinkedInfo;
-    IDhcpService *pDhcpService;
+    std::unique_ptr<IDhcpService> pDhcpService;
     DhcpResultNotify *pDhcpResultNotify;
     StaNetworkCheck *pNetcheck;
 

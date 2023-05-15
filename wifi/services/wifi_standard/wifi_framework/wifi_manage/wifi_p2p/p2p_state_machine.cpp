@@ -123,7 +123,7 @@ void P2pStateMachine::Initialize()
     SetFirstState(&p2pDisabledState);
     StartStateMachine();
 
-    pDhcpService.reset(new (std::nothrow) DhcpService());
+    pDhcpService = DhcpServiceApi::GetInstance();
     if (pDhcpService.get() == nullptr) {
         WIFI_LOGW("pDhcpService Initialize failed.");
     }

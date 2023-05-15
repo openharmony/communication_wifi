@@ -17,7 +17,7 @@
 #include <arpa/inet.h>
 #include <netinet/in.h>
 #include "dhcp_define.h"
-#include "dhcp_service.h"
+#include "dhcp_service_api.h"
 #include "network_interface.h"
 #include "wifi_global_func.h"
 #include "wifi_logger.h"
@@ -62,7 +62,7 @@ bool DhcpdInterface::SetDhcpEventFunc(const std::string &ifaceName, IDhcpResultN
 bool DhcpdInterface::StartDhcpServer(const std::string &ifaceName, Ipv4Address &ipv4, Ipv6Address &ipv6, bool isIpV4)
 {
     if (mDhcpService == nullptr) {
-        mDhcpService = std::make_unique<DhcpService>();
+        mDhcpService = DhcpServiceApi::GetInstance();
         if (mDhcpService == nullptr) {
             return false;
         }

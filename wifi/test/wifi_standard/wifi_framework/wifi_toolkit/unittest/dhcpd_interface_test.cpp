@@ -19,7 +19,6 @@
 #include <cstdint>
 #include "securec.h"
 #include "wifi_logger.h"
-#include "dhcp_service.h"
 
 DEFINE_WIFILOG_DHCP_LABEL("DhcpdInterfaceTest");
 

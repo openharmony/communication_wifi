@@ -33,7 +33,7 @@
 #endif // OHOS_ARCH_LITE
 
 #ifndef OHOS_WIFI_STA_TEST
-#include "dhcp_service.h"
+#include "dhcp_service_api.h"
 #else
 #include "mock_dhcp_service.h"
 #endif
@@ -94,7 +94,7 @@ StaStateMachine::~StaStateMachine()
     ParsePointer(pGetIpState);
     ParsePointer(pLinkedState);
     ParsePointer(pApRoamingState);
-    if (pDhcpService != nullptr) {
+    if (pDhcpService.get() != nullptr) {
         if (currentTpType == IPTYPE_IPV4) {
             pDhcpService->StopDhcpClient(IF_NAME, false);
         } else {
@@ -102,9 +102,9 @@ StaStateMachine::~StaStateMachine()
         }
 
         pDhcpService->RemoveDhcpResult(pDhcpResultNotify);
+        pDhcpService.reset(nullptr);
     }
     ParsePointer(pDhcpResultNotify);
-    ParsePointer(pDhcpService);
     ParsePointer(pNetcheck);
 }
 
@@ -124,9 +124,12 @@ ErrCode StaStateMachine::InitStaStateMachine()
     SetFirstState(pInitState);
     StartStateMachine();
     InitStaSMHandleMap();
-
-    pDhcpService = new (std::nothrow) DhcpService();
-    if (pDhcpService == nullptr) {
+#ifndef OHOS_WIFI_STA_TEST
+    pDhcpService = DhcpServiceApi::GetInstance();
+#else
+    pDhcpService = std::make_unique<DhcpService>();
+#endif
+    if (pDhcpService.get() == nullptr) {
         WIFI_LOGE("pDhcpServer is null\n");
         return WIFI_OPT_FAILED;
     }

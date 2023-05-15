@@ -70,6 +70,7 @@ bool IfConfig::AsyncExecuteCommand(const std::string& cmd)
 {
     std::thread t(
         [cmd]() {
+            pthread_setname_np(pthread_self(), "ExecCmdThread");
             FILE *fp = nullptr;
             char buffer[RECEIVE_BUFFER_LEN];
             if ((fp = popen(cmd.c_str(), "r")) != nullptr) {

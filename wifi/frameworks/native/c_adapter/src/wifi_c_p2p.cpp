@@ -16,7 +16,7 @@
 #include "../../../interfaces/kits/c/wifi_p2p.h"
 #include "../../../interfaces/kits/c/wifi_hid2d.h"
 #include "wifi_logger.h"
-#include "../../../frameworks/native/include/wifi_p2p.h"
+#include "../../../interfaces/inner_api/wifi_p2p.h"
 #include "wifi_c_utils.h"
 #include "wifi_common_util.h"
 #include "../../src/wifi_sa_event.h"

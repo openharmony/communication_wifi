@@ -22,6 +22,7 @@ if (defined(ohos_lite)) {
 config("wifi_fw_common_header") {
   include_dirs = [
     "idl_interface",
+    "$WIFI_ROOT_DIR/interfaces/inner_api",
     "$WIFI_ROOT_DIR/frameworks/native/interfaces",
     "$WIFI_ROOT_DIR/services/wifi_standard/sdk/include",
     "$WIFI_ROOT_DIR/services/wifi_standard/ipc_framework/cRPC/include",

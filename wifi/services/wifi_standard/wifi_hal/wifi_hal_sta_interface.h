@@ -193,7 +193,7 @@ WifiErrorNo GetFrequencies(int32_t band, int *frequencies, int32_t *size);
  * @param lenMac - Mac Address array size.
  * @return WifiErrorNo
  */
-WifiErrorNo SetAssocMacAddr(const unsigned char *mac, int lenMac);
+WifiErrorNo WEAK_FUNC SetAssocMacAddr(const unsigned char *mac, int lenMac);
 
 /**
  * @Description Sets the MAC address for Wi-Fi scanning.

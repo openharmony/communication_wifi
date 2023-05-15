@@ -28,6 +28,7 @@ declare_args() {
   wifi_feature_with_app_frozen = false
   wifi_feature_non_seperate_p2p = false
   wifi_feature_non_hdf_driver = false
+  wifi_feature_is_random_mac_supported = false
   if (defined(global_parts_info) &&
       defined(global_parts_info.resourceschedule_efficiency_manager)) {
     wifi_feature_with_app_frozen = true

@@ -670,7 +670,7 @@ private:
      *
      * @param strMac - Randomly generated MAC address[out]
      */
-    void MacAddressGenerate(std::string &strMac);
+    void MacAddressGenerate(WifiStoreRandomMac &randomMacInfo);
     /**
      * @Description  Compare the encryption mode of the current network with that of the network in the scanning result.
      *

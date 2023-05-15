@@ -127,6 +127,10 @@ if (defined(ohos_lite)) {
       external_deps += [ "drivers_interface_wlan:libwlan_proxy_1.1" ]
     }
 
+    if (wifi_feature_is_random_mac_supported) {
+      defines += [ "RANDOM_MAC_SUPPORT" ]
+    }
+
     if ("${CONFIG_CTRL_IFACE}" == "unix") {
       defines += [ "WPA_CTRL_IFACE_UNIX" ]
     }

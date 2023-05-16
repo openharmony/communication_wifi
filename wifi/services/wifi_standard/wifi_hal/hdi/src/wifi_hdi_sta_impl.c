@@ -305,12 +305,17 @@ void UpDownLink(int flag)
 WifiErrorNo SetAssocMacAddr(const unsigned char *mac, int lenMac)
 {
     LOGI("SetAssocMacAddr enter.");
+    if (strlen((const char *)mac) != WIFI_MAC_LENGTH || lenMac != WIFI_MAC_LENGTH) {
+        LOGE("Mac size not correct! mac len %{public}zu, request lenMac %{public}d", strlen((const char *)mac), lenMac);
+        return WIFI_HAL_FAILED;
+    }
+
     UpDownLink(0);
     WifiHdiProxy proxy = GetHdiProxy(PROTOCOL_80211_IFTYPE_STATION);
     CHECK_HDI_PROXY_AND_RETURN(proxy, WIFI_HAL_FAILED);
 
     unsigned char mac_bin[MAC_ADDR_INDEX_SIZE];
-    sscanf((char *)mac, "%2hhx:%2hhx:%2hhx:%2hhx:%2hhx:%2hhx",
+    sscanf_s((char *)mac, "%2hhx:%2hhx:%2hhx:%2hhx:%2hhx:%2hhx",
            &mac_bin[MAC_ADDR_INDEX_0], &mac_bin[MAC_ADDR_INDEX_1], &mac_bin[MAC_ADDR_INDEX_2],
            &mac_bin[MAC_ADDR_INDEX_3], &mac_bin[MAC_ADDR_INDEX_4], &mac_bin[MAC_ADDR_INDEX_5]);
 

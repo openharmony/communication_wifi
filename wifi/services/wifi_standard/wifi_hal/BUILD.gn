@@ -198,7 +198,7 @@ if (defined(ohos_lite)) {
 
     cflags_cc = [ "-fno-rtti" ]
     cflags = [ "-Wno-deprecated-non-prototype" ]
-    install_images = [ "system" ]
+    install_images = [ "updater" ]
     part_name = "wifi"
     subsystem_name = "communication"
   }

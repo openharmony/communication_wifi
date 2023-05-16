@@ -153,7 +153,6 @@ if (defined(ohos_lite)) {
     install_enable = true
     sources = local_base_sources
 
-    symlink_target_name = [ "wifi_hal_service" ]
     include_dirs = local_base_include_dirs
     include_dirs += [
       "//commonlibrary/c_utils/base/include",
@@ -163,23 +162,30 @@ if (defined(ohos_lite)) {
       "//drivers/peripheral/wlan/interfaces/include/",
     ]
 
+    symlink_target_name = [ "wifi_hal_service" ]
     deps = [
       "$WIFI_ROOT_DIR/services/wifi_standard/ipc_framework/cRPC:crpc_server",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_hal/etc/init:etc",
-      "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog",
       "//third_party/wpa_supplicant/wpa_supplicant-2.9_standard:wpa_client",
     ]
 
-    external_deps = [ "c_utils:utils" ]
+    external_deps = [
+      "c_utils:utils",
+      "hiviewdfx_hilog_native:libhilog",
+    ]
 
     defines = [
       "AP_INTF=\"$wifi_feature_with_ap_intf\"",
       "AP_NUM=$wifi_feature_with_ap_num",
     ]
-    defines += [ "OHOS_EUPDATER" ]
+
     if (wifi_feature_is_hdi_supported) {
       defines += [ "HDI_INTERFACE_SUPPORT" ]
       external_deps += [ "drivers_interface_wlan:libwlan_proxy_1.1" ]
+    }
+
+    if (wifi_feature_is_random_mac_supported) {
+      defines += [ "RANDOM_MAC_SUPPORT" ]
     }
 
     if ("${CONFIG_CTRL_IFACE}" == "unix") {
@@ -192,7 +198,7 @@ if (defined(ohos_lite)) {
 
     cflags_cc = [ "-fno-rtti" ]
     cflags = [ "-Wno-deprecated-non-prototype" ]
-    install_images = [ "updater" ]
+    install_images = [ "system" ]
     part_name = "wifi"
     subsystem_name = "communication"
   }

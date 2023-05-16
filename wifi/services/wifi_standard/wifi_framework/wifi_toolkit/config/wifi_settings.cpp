@@ -277,7 +277,7 @@ int WifiSettings::RemoveDevice(int networkId)
                 LOGD("uninstall cert %{public}s success", iter->second.wifiEapConfig.clientCert.c_str());
             }
         }
-        RemoveRandomMac(iter->second.ssid, iter->second.macAddress);
+        RemoveRandomMac(iter->second.bssid, iter->second.macAddress);
         mWifiDeviceConfig.erase(iter);
     }
     return 0;
@@ -656,6 +656,14 @@ int WifiSettings::ReloadStaRandomMac()
     return 0;
 }
 
+const static uint32_t COMPARE_MAC_OFFSET = 2;
+const static uint32_t COMPARE_MAC_LENGTH = 17 - 4;
+
+bool CompareMac(const std::string &mac1, const std::string &mac2)
+{
+    return memcmp(mac1.c_str() + COMPARE_MAC_OFFSET, mac2.c_str() + COMPARE_MAC_OFFSET, COMPARE_MAC_LENGTH) == 0;
+}
+
 bool WifiSettings::AddRandomMac(WifiStoreRandomMac &randomMacInfo)
 {
     std::unique_lock<std::mutex> lock(mStaMutex);
@@ -667,10 +675,10 @@ bool WifiSettings::AddRandomMac(WifiStoreRandomMac &randomMacInfo)
             randomMacInfo.randomMac = ele.randomMac;
             isConnected = true;
             break;
-        } else if (randomMacInfo.peerBssid == ele.peerBssid && (randomMacInfo.keyMgmt == ele.keyMgmt) &&
+        } else if (CompareMac(randomMacInfo.peerBssid, ele.peerBssid) && (randomMacInfo.keyMgmt == ele.keyMgmt) &&
                    (randomMacInfo.keyMgmt == "NONE")) {
             isConnected = false;
-        } else if (randomMacInfo.peerBssid == ele.peerBssid && (randomMacInfo.keyMgmt == ele.keyMgmt) &&
+        } else if (CompareMac(randomMacInfo.peerBssid, ele.peerBssid) && (randomMacInfo.keyMgmt == ele.keyMgmt) &&
                    (randomMacInfo.keyMgmt != "NONE")) {
             ele.ssid = randomMacInfo.ssid;
             randomMacInfo.randomMac = ele.randomMac;
@@ -689,12 +697,12 @@ bool WifiSettings::AddRandomMac(WifiStoreRandomMac &randomMacInfo)
     return isConnected;
 }
 
-bool WifiSettings::RemoveRandomMac(const std::string &ssid, const std::string &randomMac)
+bool WifiSettings::RemoveRandomMac(const std::string &bssid, const std::string &randomMac)
 {
     std::unique_lock<std::mutex> lock(mStaMutex);
 
     for(auto it = mWifiStoreRandomMac.begin(); it != mWifiStoreRandomMac.end(); it++) {
-        if(it->ssid == ssid && it->randomMac == randomMac) {
+        if(CompareMac(it->peerBssid, bssid) && it->randomMac == randomMac) {
             mWifiStoreRandomMac.erase(it);
 
             mSavedWifiStoreRandomMac.SetValue(mWifiStoreRandomMac);

@@ -25,7 +25,7 @@
 #include "i_net_conn_service.h"
 #include "net_all_capabilities.h"
 #include "net_supplier_callback_base.h"
-
+#include "wifi_net_conn_event_handler.h"
 #include "wifi_internal_msg.h"
 #include "sta_service_callback.h"
 #include "wifi_log.h"
@@ -144,6 +144,8 @@ public:
 
 private:
     uint32_t supplierId;
+    std::shared_ptr<AppExecFwk::EventRunner> netConnEventRunner_ = nullptr;
+    std::shared_ptr<WifiNetConnEventHandler> netConnEventHandler_ = nullptr;
 };
 } // namespace Wifi
 } // namespace OHOS

@@ -15,7 +15,6 @@
 
 #include "wifi_net_agent.h"
 #include <cinttypes>
-#include <thread>
 #include "inet_addr.h"
 #include "ip_tools.h"
 #include "iservice_registry.h"
@@ -30,10 +29,29 @@ DEFINE_WIFILOG_LABEL("WifiNetAgent");
 
 namespace OHOS {
 namespace Wifi {
+constexpr const char *WIFI_NET_CONN_MGR_WORK_THREAD = "WIFI_NET_CONN_MGR_WORK_THREAD";
 using namespace NetManagerStandard;
 
-WifiNetAgent::WifiNetAgent() = default;
-WifiNetAgent::~WifiNetAgent() = default;
+WifiNetAgent::WifiNetAgent()
+{
+    netConnEventRunner_ = AppExecFwk::EventRunner::Create(WIFI_NET_CONN_MGR_WORK_THREAD);
+    if (netConnEventRunner_) {
+        netConnEventHandler_ = std::make_shared<WifiNetConnEventHandler>(netConnEventRunner_);
+    } else {
+        WIFI_LOGE("Create event runner failed.");
+    }
+}
+WifiNetAgent::~WifiNetAgent()
+{
+    if (netConnEventRunner_) {
+        netConnEventRunner_->Stop();
+        netConnEventRunner_.reset();
+    }
+
+    if (netConnEventHandler_) {
+        netConnEventHandler_.reset();
+    }
+}
 
 bool WifiNetAgent::RegisterNetSupplier()
 {
@@ -197,55 +215,60 @@ bool WifiNetAgent::AddRoute(const std::string interface, const std::string ipAdd
 void WifiNetAgent::OnStaMachineUpdateNetLinkInfo(const std::string &strIp, const std::string &strMask,
     const std::string &strGateWay, const std::string &strDns, const std::string &strBakDns)
 {
-    std::thread([ip = strIp, mask = strMask, gateWay = strGateWay, dns = strDns, bakDns = strBakDns, this]() {
-        pthread_setname_np(pthread_self(), "OnLinkInfoThread");
-        UpdateNetLinkInfo(ip, mask, gateWay, dns, bakDns);
-    }).detach();
+    if (netConnEventHandler_) {
+        netConnEventHandler_->PostSyncTask(
+            [this, ip = strIp, mask = strMask, gateWay = strGateWay, dns = strDns, bakDns = strBakDns]() {
+            this->UpdateNetLinkInfo(ip, mask, gateWay, dns, bakDns);
+        });
+    }
 }
 
 void WifiNetAgent::OnStaMachineUpdateNetSupplierInfo(const sptr<NetManagerStandard::NetSupplierInfo> &netSupplierInfo)
 {
-    std::thread([netInfo = netSupplierInfo, this]() {
-        pthread_setname_np(pthread_self(), "OnSuppThread");
-        UpdateNetSupplierInfo(netInfo);
-    }).detach();
+    if (netConnEventHandler_) {
+        netConnEventHandler_->PostSyncTask([this, netInfo = netSupplierInfo]() {
+           this->UpdateNetSupplierInfo(netInfo);
+        });
+    }
 }
 
 void WifiNetAgent::OnStaMachineWifiStart()
 {
-    std::thread([this]() {
-        pthread_setname_np(pthread_self(), "OnStartThread");
-        RegisterNetSupplier();
-        RegisterNetSupplierCallback();
-    }).detach();
+    if (netConnEventHandler_) {
+        netConnEventHandler_->PostSyncTask([this]() {
+            this->RegisterNetSupplier();
+            this->RegisterNetSupplierCallback();
+        });
+    }
 }
 
 void WifiNetAgent::OnStaMachineNetManagerRestart(const sptr<NetManagerStandard::NetSupplierInfo> &netSupplierInfo)
 {
-    std::thread([supplierInfo = netSupplierInfo, this]() {
-        pthread_setname_np(pthread_self(), "OnReStartThread");
-        RegisterNetSupplier();
-        RegisterNetSupplierCallback();
-        WifiLinkedInfo linkedInfo;
-        WifiSettings::GetInstance().GetLinkedInfo(linkedInfo);
-        if ((linkedInfo.detailedState == DetailedState::NOTWORKING)
-            && (linkedInfo.connState == ConnState::CONNECTED)) {
+    if (netConnEventHandler_) {
+        netConnEventHandler_->PostSyncTask([this, supplierInfo = netSupplierInfo]() {
+            this->RegisterNetSupplier();
+            this->RegisterNetSupplierCallback();
+            WifiLinkedInfo linkedInfo;
+            WifiSettings::GetInstance().GetLinkedInfo(linkedInfo);
+            if ((linkedInfo.detailedState == DetailedState::NOTWORKING)
+                && (linkedInfo.connState == ConnState::CONNECTED)) {
 #ifndef OHOS_ARCH_LITE
-            if (supplierInfo != nullptr) {
-                TimeStats timeStats("Call UpdateNetSupplierInfo");
-                UpdateNetSupplierInfo(supplierInfo);
-            }
+                if (supplierInfo != nullptr) {
+                    TimeStats timeStats("Call UpdateNetSupplierInfo");
+                    this->UpdateNetSupplierInfo(supplierInfo);
+                }
 #endif
-            IpInfo wifiIpInfo;
-            WifiSettings::GetInstance().GetIpInfo(wifiIpInfo);
-            std::string ipAddress = IpTools::ConvertIpv4Address(wifiIpInfo.ipAddress);
-            std::string gateway = IpTools::ConvertIpv4Address(wifiIpInfo.gateway);
-            std::string netmask = IpTools::ConvertIpv4Address(wifiIpInfo.netmask);
-            std::string primaryDns = IpTools::ConvertIpv4Address(wifiIpInfo.primaryDns);
-            std::string secondDns = IpTools::ConvertIpv4Address(wifiIpInfo.secondDns);
-            UpdateNetLinkInfo(ipAddress, netmask, gateway, primaryDns, secondDns);
-        }
-    }).detach();
+                IpInfo wifiIpInfo;
+                WifiSettings::GetInstance().GetIpInfo(wifiIpInfo);
+                std::string ipAddress = IpTools::ConvertIpv4Address(wifiIpInfo.ipAddress);
+                std::string gateway = IpTools::ConvertIpv4Address(wifiIpInfo.gateway);
+                std::string netmask = IpTools::ConvertIpv4Address(wifiIpInfo.netmask);
+                std::string primaryDns = IpTools::ConvertIpv4Address(wifiIpInfo.primaryDns);
+                std::string secondDns = IpTools::ConvertIpv4Address(wifiIpInfo.secondDns);
+                this->UpdateNetLinkInfo(ipAddress, netmask, gateway, primaryDns, secondDns);
+            }
+        });
+    }
 }
 
 WifiNetAgent::NetConnCallback::NetConnCallback()

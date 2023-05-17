@@ -195,7 +195,7 @@ if (defined(ohos_lite)) {
     if (wifi_feature_non_seperate_p2p) {
       defines += [ "NON_SEPERATE_P2P" ]
     }
-
+    defines += [ "OHOS_EUPDATER" ]
     cflags_cc = [ "-fno-rtti" ]
     cflags = [ "-Wno-deprecated-non-prototype" ]
     install_images = [ "updater" ]

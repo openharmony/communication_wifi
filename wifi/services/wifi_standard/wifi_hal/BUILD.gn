@@ -205,8 +205,8 @@ if (defined(ohos_lite)) {
 }
 
 group("wifi_hal") {
-  deps = [
-    ":wifi_hal_service",
-    ":wifi_hal_service_updater",
-  ]
+  deps = [ ":wifi_hal_service" ]
+  if (!defined(ohos_lite)) {
+    deps += [ ":wifi_hal_service_updater" ]
+  }
 }

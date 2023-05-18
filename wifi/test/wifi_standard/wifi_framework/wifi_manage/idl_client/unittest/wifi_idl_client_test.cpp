@@ -35,7 +35,6 @@ constexpr int BIT2 = 4;
 constexpr int TEN = 4;
 constexpr int MAX_TIME = 65546;
 
-
 HWTEST_F(WifiIdlClientTest, StartWifiTest, TestSize.Level1)
 {
     EXPECT_TRUE(mClient.StartWifi() == WIFI_IDL_OPT_OK);

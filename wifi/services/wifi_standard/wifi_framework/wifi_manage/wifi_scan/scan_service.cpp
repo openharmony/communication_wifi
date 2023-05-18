@@ -668,7 +668,7 @@ bool ScanService::StoreFullScanInfo(
     for (auto storedIter = storeInfoList.begin(); storedIter != storeInfoList.end(); ++storedIter) {
         bool find = false;
         for (auto iter = results.begin(); iter != results.end(); ++iter) {
-            if (iter->bssid == storedIter->bssid) {
+            if (iter->bssid == storedIter->bssid && iter->ssid == storedIter->ssid) {
                 find = true;
                 break;
             }

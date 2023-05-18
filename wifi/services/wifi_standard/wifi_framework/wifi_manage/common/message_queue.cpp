@@ -51,7 +51,7 @@ bool MessageQueue::AddMessageToQueue(InternalMessage *message, int64_t handleTim
         return false;
     }
 
-    LOGI("MessageQueue::AddMessageToQueue, msg: %{public}d, timestamp:%" PRIu64 "\n",
+    LOGI("MessageQueue::AddMessageToQueue, msg: %{public}d, timestamp:%" PRId64 "\n",
         message->GetMessageName(), handleTime);
 
     if (mNeedQuit) {

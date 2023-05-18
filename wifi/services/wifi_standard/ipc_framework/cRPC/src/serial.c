@@ -97,7 +97,7 @@ int WriteInt64(Context *context, int64_t iData)
     }
 
     char szTmp[TMP_CHAR_LEN] = {0};
-    if (snprintf_s(szTmp, sizeof(szTmp), sizeof(szTmp) - 1, "%" PRIu64 "%c", iData, context->cSplit) < 0) {
+    if (snprintf_s(szTmp, sizeof(szTmp), sizeof(szTmp) - 1, "%" PRId64 "%c", iData, context->cSplit) < 0) {
         return -1;
     }
     return ContextAppendWrite(context, szTmp, strlen(szTmp));

@@ -627,7 +627,7 @@ bool ScanService::StoreFullScanInfo(
 {
     WIFI_LOGI("Enter ScanService::StoreFullScanInfo.\n");
     /* Filtering result. */
-    WIFI_LOGI("scanConfig.scanTime is %" PRIu64 ".\n", scanConfig.scanTime);
+    WIFI_LOGI("scanConfig.scanTime is %" PRId64 ".\n", scanConfig.scanTime);
     WIFI_LOGI("Receive %{public}d scan results.\n", (int)(scanInfoList.size()));
     if (scanInfoList.size() == 0) {
         /* Don't overwrite ScanInfoList */
@@ -883,7 +883,7 @@ void ScanService::HandlePnoScanInfo(std::vector<InterScanInfo> &scanInfoList)
             WIFI_LOGI("InterScanInfo.capabilities is %{public}s.\n", iter->capabilities.c_str());
             WIFI_LOGI("InterScanInfo.frequency is %{public}d.\n", iter->frequency);
             WIFI_LOGI("InterScanInfo.rssi is %{public}d.\n", iter->rssi);
-            WIFI_LOGI("InterScanInfo.timestamp is %" PRIu64 ".\n", iter->timestamp);
+            WIFI_LOGI("InterScanInfo.timestamp is %" PRId64 ".\n", iter->timestamp);
         }
     }
 

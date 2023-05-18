@@ -48,7 +48,7 @@ public:
     explicit ThermalLevelSubscriber(const OHOS::EventFwk::CommonEventSubscribeInfo &subscriberInfo)
         : CommonEventSubscriber(subscriberInfo) {}
     virtual ~ThermalLevelSubscriber() {};
-    virtual void OnReceiveEvent(const OHOS::EventFwk::CommonEventData &data) override;
+    void OnReceiveEvent(const OHOS::EventFwk::CommonEventData &data) override;
 };
 #endif
 #ifdef OHOS_ARCH_LITE

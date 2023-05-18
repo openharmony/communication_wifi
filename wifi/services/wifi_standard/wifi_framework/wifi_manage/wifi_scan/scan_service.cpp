@@ -98,6 +98,11 @@ bool ScanService::InitScanService(const IScanSerivceCallbacks &scanSerivceCallba
         WIFI_LOGE("InitScanMonitor failed.\n");
         return false;
     }
+#ifndef OHOS_ARCH_LITE
+    if (standByListerner.Init()) {
+        WIFI_LOGE("standByListerner Init failed.");
+    }
+#endif
 
     if ((WifiStaHalInterface::GetInstance().GetSupportFrequencies(SCAN_BAND_24_GHZ, freqs2G) != WIFI_IDL_OPT_OK) ||
         (WifiStaHalInterface::GetInstance().GetSupportFrequencies(SCAN_BAND_5_GHZ, freqs5G) != WIFI_IDL_OPT_OK) ||
@@ -140,6 +145,9 @@ bool ScanService::InitScanService(const IScanSerivceCallbacks &scanSerivceCallba
 void ScanService::UnInitScanService()
 {
     WIFI_LOGI("Enter ScanService::UnInitScanService.\n");
+#ifndef OHOS_ARCH_LITE
+    standByListerner.Unit();
+#endif
     pScanMonitor->UnInitScanMonitor();
     pScanStateMachine->StopTimer(static_cast<int>(SYSTEM_SCAN_TIMER));
     pScanStateMachine->StopTimer(static_cast<int>(DISCONNECTED_SCAN_TIMER));
@@ -339,6 +347,13 @@ ErrCode ScanService::DisableScan(bool disable)
 bool ScanService::SingleScan(ScanConfig &scanConfig)
 {
     WIFI_LOGI("Enter ScanService::SingleScan.\n");
+
+#ifndef OHOS_ARCH_LITE
+    if (!standByListerner.AllowScan()) {
+        WIFI_LOGE("Scan not allowed when device in standby state.\n");
+        return WIFI_OPT_FAILED;
+    }
+#endif
 
     GetAllowBandFreqsControlInfo(scanConfig.scanBand, scanConfig.scanFreqs);
     if ((scanConfig.scanBand == SCAN_BAND_UNSPECIFIED) && (scanConfig.scanFreqs.empty())) {

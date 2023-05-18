@@ -434,10 +434,10 @@ napi_value Off(napi_env env, napi_callback_info cbinfo) {
         WIFI_NAPI_RETURN(env, false, WIFI_OPT_INVALID_PARAM, 0);
     }
 
+    napi_valuetype handler = napi_undefined;
     if (argc >= requireArgcWithCb) {
-        napi_valuetype handler = napi_undefined;
         napi_typeof(env, argv[1], &handler);
-        if (handler != napi_function) {
+        if (handler != napi_function && handler != napi_null) {
             WIFI_LOGI("second argv != napi_function");
             WIFI_NAPI_RETURN(env, false, WIFI_OPT_INVALID_PARAM, 0);
         }
@@ -446,7 +446,11 @@ napi_value Off(napi_env env, napi_callback_info cbinfo) {
     char type[64] = {0};
     size_t typeLen = 0;
     napi_get_value_string_utf8(env, argv[0], type, sizeof(type), &typeLen);
-    EventRegister::GetInstance().Unregister(env, type, argc >= requireArgcWithCb ? argv[1] : nullptr);
+    if (argc >= requireArgcWithCb && handler != napi_null) {
+        EventRegister::GetInstance().Unregister(env, type, argv[1]);
+    } else {
+        EventRegister::GetInstance().Unregister(env, type, nullptr);
+    }
     napi_value result = nullptr;
     napi_get_undefined(env, &result);
     return result;

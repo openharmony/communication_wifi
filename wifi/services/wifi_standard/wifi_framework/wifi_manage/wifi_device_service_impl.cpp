@@ -102,7 +102,7 @@ void WifiDeviceServiceImpl::SigHandler(int sig)
     WIFI_LOGI("[Sta] Recv SIG: %{public}d\n", sig);
     switch (sig) {
         case SIGUSR1:
-            if (IsProcessNeedToRestart()) {
+            if (isServiceStart) {
                 StaServiceCallback cb = WifiManager::GetInstance().GetStaCallback();
                 if (cb.OnStaCloseRes != nullptr) {
                     cb.OnStaCloseRes(OperateResState::CLOSE_WIFI_SUCCEED);
@@ -808,8 +808,15 @@ ErrCode WifiDeviceServiceImpl::ConnectToNetwork(int networkId, bool isCandidate)
     if (isCandidate) {
         int uid = 0;
         if (CheckCallingUid(uid) != WIFI_OPT_SUCCESS) {
-            WIFI_LOGE("CheckCallingUid failed!");
+            WIFI_LOGE("ConnectToNetwork CheckCallingUid failed!");
             return WIFI_OPT_INVALID_PARAM;
+        }
+        WifiLinkedInfo linkedInfo;
+        WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
+        if (linkedInfo.connState == ConnState::CONNECTING || linkedInfo.connState == ConnState::CONNECTED) {
+            bool isSame = linkedInfo.networkId == networkId;
+            WIFI_LOGE("ConnectToNetwork isCandidate isConnected isSame:%{public}s!", isSame ? "true" : "false");
+            return isSame ? WIFI_OPT_SUCCESS : WIFI_OPT_FAILED;
         }
         return pService->ConnectToCandidateConfig(uid, networkId);
     }

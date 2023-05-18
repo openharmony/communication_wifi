@@ -22,15 +22,13 @@ namespace OHOS {
 namespace Wifi {
 WifiIdlClient mClient;
 int FAILNUMS = 10;
-int flag = 1;
 class WifiIdlClientTest : public testing::Test {
 public:
     static void SetUpTestCase()
     {
-        while(FAILNUMS--) {
-            flag = mClient.InitClient();
-            if(flag == 0)
-                break;
+        while (FAILNUMS--) {
+            if (mClient.InitClient() == 0)
+                FAILNUMS = 0;
         }
     }
     static void TearDownTestCase()

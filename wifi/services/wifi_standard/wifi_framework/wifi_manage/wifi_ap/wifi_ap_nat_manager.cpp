@@ -148,7 +148,7 @@ bool WifiApNatManager::WriteDataToFile(const std::string &fileName, const std::s
 {
     std::ofstream outf(fileName, std::ios::out);
     if (!outf) {
-        WIFI_LOGE("write content [%publics] to file [%publics] failed. error: %{public}d.",
+        WIFI_LOGE("write content [%{public}s] to file [%{public}s] failed. error: %{public}d.",
             content.c_str(), fileName.c_str(), errno);
         return false;
     }

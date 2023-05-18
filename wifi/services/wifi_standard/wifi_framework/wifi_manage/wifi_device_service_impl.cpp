@@ -814,7 +814,7 @@ ErrCode WifiDeviceServiceImpl::ConnectToNetwork(int networkId, bool isCandidate)
         WifiLinkedInfo linkedInfo;
         WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
         if (linkedInfo.connState == ConnState::CONNECTED) {
-            bool isSame = linkInfo.networkId == networkId;
+            bool isSame = linkedInfo.networkId == networkId;
             WIFI_LOGE("ConnectToNetwork isCandidate isConnected isSame:%{public}s!", isSame ? "true" : "false");
             return isSame ? WIFI_OPT_SUCCESS : WIFI_OPT_FAILED;
         }

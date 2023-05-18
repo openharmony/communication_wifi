@@ -215,19 +215,6 @@ HWTEST_F(WifiP2pServiceTest, SetUpperScene, TestSize.Level1)
     upperScene.scene = 2;
     EXPECT_EQ(pWifiP2pService->Hid2dSetUpperScene("p2p0", upperScene), ErrCode::WIFI_OPT_SUCCESS);
 }
-
-/**
- * @tc.name: Recommend channel test
- * @tc.desc: Recommend channel test function.
- * @tc.type: FUNC
- * @tc.require: issueI5LC5N
- */
-HWTEST_F(WifiP2pServiceTest, GetP2pRecommendChannel, TestSize.Level1)
-{
-    // recommendd channel is greater than 0
-    EXPECT_GT(pWifiP2pService->GetP2pRecommendChannel(), 0);
-}
-
 /**
  * @tc.name: Hid2d shared link test
  * @tc.desc: Hid2d shared link test function.

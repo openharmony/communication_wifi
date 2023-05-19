@@ -101,12 +101,18 @@ const WifiP2pDevice &WifiP2pServiceRequestList::GetDevice() const
 bool WifiP2pServiceRequestList::ParseTlvs2ReqList(const std::vector<unsigned char> &tlvs)
 {
     std::size_t leftLength = tlvs.size();
+    std::size_t vectorLenth = leftLength;
     std::size_t headLength = SERVICE_TLV_LENGTH_SIZE + PROTOCOL_SIZE + TRANSACTION_ID_SIZE;
     std::size_t pos = 0;
     while (leftLength > 0) {
         if (leftLength < headLength) {
             WIFI_LOGW("Failed to format input tlv packet!");
             return false;
+        }
+
+        if (pos >= vectorLenth - 1) {
+            WIFI_LOGW("pos is overflow!");
+            break;
         }
         unsigned short length = tlvs[pos] + (tlvs[pos + 1] << CHAR_BIT);
         unsigned short dataLength = length - PROTOCOL_SIZE - TRANSACTION_ID_SIZE;

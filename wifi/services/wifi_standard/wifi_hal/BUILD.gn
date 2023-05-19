@@ -17,6 +17,7 @@ if (defined(ohos_lite)) {
 } else {
   import("//build/ohos.gni")
   import("//foundation/communication/wifi/wifi/wifi.gni")
+  import("//third_party/wpa_supplicant/wpa_supplicant-2.9_standard/wpa.gni")
 }
 
 local_base_sources = [
@@ -124,7 +125,12 @@ if (defined(ohos_lite)) {
       external_deps += [ "drivers_interface_wlan:libwlan_proxy_1.0" ]
     }
 
-    if (product_name == "rk3568") {
+
+    if ("${CONFIG_CTRL_IFACE}" == "unix") {
+      defines += [ "WPA_CTRL_IFACE_UNIX" ]
+    }
+
+    if (wifi_feature_non_seperate_p2p) {
       defines += [ "NON_SEPERATE_P2P" ]
     }
 

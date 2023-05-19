@@ -29,11 +29,22 @@
 #define LOG_TAG "WifiHalStaInterface"
 
 #ifdef NON_SEPERATE_P2P
+#ifdef WPA_CTRL_IFACE_UNIX
+#define START_CMD "wpa_supplicant -c"CONFIG_ROOR_DIR"/wpa_supplicant/wpa_supplicant.conf"\
+    " -g@abstract:"CONFIG_ROOR_DIR"/sockets/wpa/wlan0"
+#else
 #define START_CMD "wpa_supplicant -iglan0 -g"CONFIG_ROOR_DIR"/sockets/wpa"\
     " -m"CONFIG_ROOR_DIR"/wpa_supplicant/p2p_supplicant.conf"
+#endif // WPA_CTRL_IFACE_UNIX
+
+#else // NON_SEPERATE_P2P
+#ifdef WPA_CTRL_IFACE_UNIX
+#define START_CMD "wpa_supplicant -c"CONFIG_ROOR_DIR"/wpa_supplicant/wpa_supplicant.conf"\
+    " -g@abstract:"CONFIG_ROOR_DIR"/sockets/wpa/wlan0"
 #else
 #define START_CMD "wpa_supplicant -iglan0 -g"CONFIG_ROOR_DIR"/sockets/wpa"
-#endif
+#endif // WPA_CTRL_IFACE_UNIX
+#endif // NON_SEPERATE_P2P
 
 static WifiErrorNo AddWpaIface(int staNo)
 {

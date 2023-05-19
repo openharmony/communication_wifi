@@ -60,15 +60,11 @@ public:
 
 HWTEST_F(WifiP2PMsgTest, isSessionAvailableTest, TestSize.Level1)
 {
-    EXPECT_FALSE(pWifiP2pWfdInfo->isSessionAvailable());
-}
-
-HWTEST_F(WifiP2PMsgTest, setSessionAvailableTest, TestSize.Level1)
-{
     bool enabled = true;
     pWifiP2pWfdInfo->setSessionAvailable(enabled);
     enabled = false;
     pWifiP2pWfdInfo->setSessionAvailable(enabled);
+    EXPECT_FALSE(pWifiP2pWfdInfo->isSessionAvailable());
 }
 
 HWTEST_F(WifiP2PMsgTest, AddClientDeviceTest, TestSize.Level1)
@@ -103,8 +99,10 @@ HWTEST_F(WifiP2PMsgTest, IsContainsDeviceTest, TestSize.Level1)
 HWTEST_F(WifiP2PMsgTest, WifiP2pServiceRequestTest, TestSize.Level1)
 {
     std::vector<unsigned char> query;
+    std::vector<unsigned char> ret;
     pWifiP2pServiceRequest->SetQuery(query);
-    pWifiP2pServiceRequest->GetTlv();
+    ret = pWifiP2pServiceRequest->GetTlv();
+	EXPECT_TRUE(count(ret.begin(), ret.end(), 0x00) != 0);
     query.push_back(0x00);
     query.push_back(0x00);
     pWifiP2pServiceRequest->SetQuery(query);

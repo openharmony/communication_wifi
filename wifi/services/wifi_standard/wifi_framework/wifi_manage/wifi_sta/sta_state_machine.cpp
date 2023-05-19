@@ -2159,7 +2159,6 @@ void StaStateMachine::DhcpResultNotify::OnSuccess(int status, const std::string 
     WifiSettings::GetInstance().GetIpInfo(ipInfo);
     if (!((IpTools::ConvertIpv4Address(result.strYourCli) == ipInfo.ipAddress) &&
         (IpTools::ConvertIpv4Address(result.strRouter1) == ipInfo.gateway))) {
-        result.strDns2 = WifiSettings::GetInstance().GetStrDnsBak();
         if (result.iptype == 0) {
             ipInfo.ipAddress = IpTools::ConvertIpv4Address(result.strYourCli);
             ipInfo.gateway = IpTools::ConvertIpv4Address(result.strRouter1);

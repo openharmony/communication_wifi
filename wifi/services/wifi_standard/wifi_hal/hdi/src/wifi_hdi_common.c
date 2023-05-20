@@ -443,6 +443,7 @@ int HdiConvertIeRsn(const uint8_t *rsnIe, size_t rsnIeLen,
             LOGI("ie count botch (pairwise), count %{public}u left %{public}u", count, left);
             return -1;
         }
+        data->hasPairwise = 1;
         for (i = 0; i < count; i++) {
             data->pairwiseCipher |= HdiRsnIdToCipherSuite(pos);
             pos += HDI_SELECTOR_LEN;

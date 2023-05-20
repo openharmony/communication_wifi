@@ -1098,7 +1098,7 @@ ErrCode WifiDeviceServiceImpl::RegisterCallBack(const sptr<IWifiDeviceCallBack> 
         return WIFI_OPT_PERMISSION_DENIED;
     }
 
-    for (auto &eventName : event) {
+    for (const auto &eventName : event) {
         WifiInternalEventDispatcher::GetInstance().SetSingleStaCallback(callback, eventName);
     }
     return WIFI_OPT_SUCCESS;

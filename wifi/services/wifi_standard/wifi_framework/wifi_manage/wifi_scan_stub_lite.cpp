@@ -264,7 +264,7 @@ int WifiScanStub::OnRegisterCallBack(uint32_t code, IpcIo *req, IpcIo *reply)
     std::vector<std::string> event;
     if (eventNum > 0) {
         for (int i = 0; i < eventNum; ++i) {
-            event.emplace_back((char *)ReadString(req, &size));
+            event.emplace_back(reinterpret_cast<char *>(ReadString(req, &size)));
         }
     }
 

@@ -236,7 +236,7 @@ ErrCode WifiScanServiceImpl::RegisterCallBack(const sptr<IWifiScanCallback> &cal
 #endif
 {
     WIFI_LOGI("WifiScanServiceImpl::RegisterCallBack!");
-    for (auto &eventName : event) {
+    for (const auto &eventName : event) {
         WifiInternalEventDispatcher::GetInstance().SetSingleScanCallback(callback, eventName);
     }
     return WIFI_OPT_SUCCESS;

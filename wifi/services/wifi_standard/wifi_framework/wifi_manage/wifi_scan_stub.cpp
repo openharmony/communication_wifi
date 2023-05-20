@@ -244,7 +244,7 @@ int WifiScanStub::OnRegisterCallBack(uint32_t code, MessageParcel &data, Message
                 WIFI_LOGD("AddDeathRecipient!");
             }
             if (callback_ != nullptr) {
-                for (auto &eventName : event) {
+                for (const auto &eventName : event) {
                     ret = WifiInternalEventDispatcher::GetInstance().AddScanCallback(remote, callback_, pid, eventName);
                 }
             }

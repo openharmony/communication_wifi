@@ -354,7 +354,7 @@ public:
     {
         wpsInfo.SetWpsMethod(WpsMethod::WPS_METHOD_INVALID);
     }
-    WifiP2pConfigInternal(WifiP2pConfig config): WifiP2pConfig(config)
+    explicit WifiP2pConfigInternal(WifiP2pConfig config): WifiP2pConfig(config)
     {
         wpsInfo.SetWpsMethod(WpsMethod::WPS_METHOD_INVALID);
     }
@@ -467,7 +467,9 @@ public:
     WifiP2pServiceInfo()
         : mDeviceAddress("00:00:00:00:00:00"), mProtocolType(P2pServicerProtocolType::SERVICE_TYPE_VENDOR_SPECIFIC)
     {}
-    explicit WifiP2pServiceInfo(std::vector<std::string> queryList) : mQueryList(queryList)
+    explicit WifiP2pServiceInfo(std::vector<std::string> queryList)
+        : mQueryList(queryList),
+          mProtocolType(P2pServicerProtocolType::SERVICE_TYPE_VENDOR_SPECIFIC)
     {}
     ~WifiP2pServiceInfo()
     {}

@@ -371,7 +371,7 @@ void WifiHotspotStub::OnRegisterCallBack(
                 WIFI_LOGD("AddDeathRecipient!");
             }
             if (callback_ != nullptr) {
-                for (auto &eventName : event) {
+                for (const auto &eventName : event) {
                     ret = WifiInternalEventDispatcher::GetInstance().AddHotspotCallback(remote, callback_, eventName,
                         m_id);
                 }

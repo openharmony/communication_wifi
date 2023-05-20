@@ -468,8 +468,8 @@ public:
         : mDeviceAddress("00:00:00:00:00:00"), mProtocolType(P2pServicerProtocolType::SERVICE_TYPE_VENDOR_SPECIFIC)
     {}
     explicit WifiP2pServiceInfo(std::vector<std::string> queryList)
-        : mQueryList(queryList),
-          mProtocolType(P2pServicerProtocolType::SERVICE_TYPE_VENDOR_SPECIFIC)
+        : mProtocolType(P2pServicerProtocolType::SERVICE_TYPE_VENDOR_SPECIFIC),
+          mQueryList(queryList)
     {}
     ~WifiP2pServiceInfo()
     {}

@@ -40,6 +40,13 @@ public:
     static bool IsSystemAppByToken();
 
     /**
+     * @Description Verify whether the app is native process
+     *
+     * @return bool - true : native process
+     */
+    static bool IsNativeProcess();
+
+    /**
      * @Description Initialize the rights of the simulated app
      *
      * @param pid - define the app's process id

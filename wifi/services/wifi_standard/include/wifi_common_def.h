@@ -25,6 +25,7 @@ extern "C" {
 #define DIR_MAX_LENGTH          256
 #define PID_MAX_LENGTH          32
 #define DEFAULT_UMASK_VALUE     027
+#define MAX_READ_EVENT_SIZE     512
 
 #ifndef MAC2STR
 #define MAC2STR(a) (a)[0], (a)[1], (a)[2], (a)[3], (a)[4], (a)[5]

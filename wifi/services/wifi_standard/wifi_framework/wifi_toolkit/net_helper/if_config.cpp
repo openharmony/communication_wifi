@@ -280,7 +280,7 @@ bool IfConfig::CheckIfaceValid(const std::string& ifname)
     }
     for (ifni = ifidxs; !(ifni->if_index == 0 && ifni->if_name == nullptr); ifni++) {
         if ((ifni->if_name != nullptr) &&
-            strncmp(ifni->if_name, ifname.c_str(), strlen(ifni->if_name)) == 0) {
+            strcmp(ifni->if_name, ifname.c_str()) == 0) {
             if_freenameindex(ifidxs);
             return true;
         }

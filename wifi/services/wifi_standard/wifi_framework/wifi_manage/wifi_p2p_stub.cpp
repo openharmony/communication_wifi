@@ -24,7 +24,7 @@ DEFINE_WIFILOG_P2P_LABEL("WifiP2pStub");
 
 namespace OHOS {
 namespace Wifi {
-WifiP2pStub::WifiP2pStub() : callback_(nullptr), mSingleCallback(false)
+WifiP2pStub::WifiP2pStub() : mSingleCallback(false)
 {
     InitHandleMap();
 }
@@ -564,11 +564,6 @@ void WifiP2pStub::ReadWifiP2pConfigData(MessageParcel &data, WifiP2pConfig &conf
     config.SetGroupOwnerIntent(data.ReadInt32());
 }
 
-sptr<IWifiP2pCallback> WifiP2pStub::GetCallback() const
-{
-    return callback_;
-}
-
 void WifiP2pStub::OnRegisterCallBack(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
@@ -580,7 +575,7 @@ void WifiP2pStub::OnRegisterCallBack(uint32_t code, MessageParcel &data, Message
             break;
         }
 
-        callback_ = iface_cast<IWifiP2pCallback>(remote);
+        sptr<IWifiP2pCallback> callback_ = iface_cast<IWifiP2pCallback>(remote);
         if (callback_ == nullptr) {
             callback_ = new (std::nothrow) WifiP2pCallbackProxy(remote);
             WIFI_LOGI("create new `WifiP2pCallbackProxy`!");

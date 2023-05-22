@@ -33,9 +33,9 @@
 namespace OHOS {
 namespace Wifi {
 const std::string SYSTEM_COMMAND_IP = "/system/bin/ip";
-const int SYSTEM_COMMAND_ERR = -1;
-const int SYSTEM_NOT_EXECUTED = 127;
+const int EXECVE_EXT_COMMAND = 127;
 const int RECEIVE_BUFFER_LEN = 64;
+const int MAX_COMMAND_ARG = 32;
 #ifdef OHOS_ARCH_LITE
 const std::string SYSTEM_COMMAND_NDC = "/system/bin/ndc";
 const std::string IFNAME = "wlan0";
@@ -55,52 +55,60 @@ IfConfig::IfConfig()
 IfConfig::~IfConfig()
 {}
 
-bool IfConfig::SyncExecuteCommand(const std::string& cmd)
-{
-    int ret = system(cmd.c_str());
-    if (ret == SYSTEM_COMMAND_ERR || ret == SYSTEM_NOT_EXECUTED) {
-        LOGE("exec failed. cmd: %{private}s, error:%{public}d", cmd.c_str(), errno);
-        return false;
-    }
-    LOGI("Exec cmd end - sync");
-    return true;
-}
-
-bool IfConfig::AsyncExecuteCommand(const std::string& cmd)
-{
-    std::thread t(
-        [cmd]() {
-            pthread_setname_np(pthread_self(), "ExecCmdThread");
-            FILE *fp = nullptr;
-            char buffer[RECEIVE_BUFFER_LEN];
-            if ((fp = popen(cmd.c_str(), "r")) != nullptr) {
-                while (fgets(buffer, sizeof(buffer), fp) != nullptr) {
-                    LOGD("exec cmd receive: %{public}s", buffer);
-                }
-                pclose(fp);
-            } else {
-                LOGE("exec cmd popen error!");
-            }
-            LOGI("Exec cmd end - async");
-        }
-    );
-    t.detach();
-    return true;
-}
-
 /**
  * @Description : Execute script commands
  * @Return success:true failed:false
  */
 bool IfConfig::ExecCommand(const std::vector<std::string> &vecCommandArg)
 {
-    std::string command;
-    for (auto iter : vecCommandArg) {
-        command += iter;
-        command += " ";
+    int argvSize = vecCommandArg.size();
+    if (argvSize > MAX_COMMAND_ARG) {
+        LOGE("IfConfig ExecCommand vecCommandArg size invalid.");
+        return false;
     }
-    LOGD("Exec cmd start: [%s]", command.c_str());
-    return AsyncExecuteCommand(command);
+    std::thread t(
+        [vecCommandArg, argvSize]() {
+            int fd[2] = {0};
+            if (pipe(fd) < 0) {
+                LOGE("ifconfig create pipe failed.");
+                return;
+            }
+            int pid = fork();
+            if (pid == -1) {
+                LOGE("ifconfig fork child process failed.");
+                return;
+            }
+            if (pid == 0) {
+                const char *execveStr[MAX_COMMAND_ARG];
+                int i = 0;
+                for (i = 0; i < argvSize && i < MAX_COMMAND_ARG; i++) {
+                    execveStr[i] = vecCommandArg[i].c_str();
+                }
+                execveStr[i] = nullptr;
+                char *env[] = {nullptr};
+                close(fd[0]);
+                dup2(fd[1], STDOUT_FILENO);
+                close(fd[1]);
+                if (execve(vecCommandArg[0].c_str(), (char *const*)execveStr, env) < 0) {
+                    LOGE("execve %{public}s failed.", vecCommandArg[0].c_str());
+                }
+                _exit(EXECVE_EXT_COMMAND);
+            }
+            close(fd[1]);
+            FILE *fp = fdopen(fd[0], "r");
+            if (fp == nullptr) {
+                LOGE("ifconfig fdopen failed.");
+                return;
+            }
+            char buffer[RECEIVE_BUFFER_LEN];
+            while (fgets(buffer, sizeof(buffer), fp) != nullptr) {
+                LOGD("exec cmd receive: %{public}s", buffer);
+            }
+            fclose(fp);
+        }
+    );
+    t.detach();
+    return true;
 }
 
 /**
@@ -232,7 +240,6 @@ void IfConfig::SetProxy(
             ipRouteCmd.clear();
             ipRouteCmd.push_back("export");
             ipRouteCmd.push_back("http_proxy=" + proxy + ":" + port);
-            ExecCommand(ipRouteCmd);
         }
 
         // Bypass proxy
@@ -240,7 +247,6 @@ void IfConfig::SetProxy(
             ipRouteCmd.clear();
             ipRouteCmd.push_back("export");
             ipRouteCmd.push_back("no_proxy=" + noProxys);
-            ExecCommand(ipRouteCmd);
         }
     }
     return;

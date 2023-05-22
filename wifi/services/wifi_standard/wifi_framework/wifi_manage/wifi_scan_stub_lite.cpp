@@ -20,6 +20,7 @@
 #include "wifi_logger.h"
 #include "wifi_msg.h"
 #include "wifi_scan_callback_proxy.h"
+#include "wifi_common_def.h"
 
 DEFINE_WIFILOG_SCAN_LABEL("WifiScanStubLite");
 
@@ -262,7 +263,7 @@ int WifiScanStub::OnRegisterCallBack(uint32_t code, IpcIo *req, IpcIo *reply)
     int eventNum = 0;
     (void)ReadInt32(req, &eventNum);
     std::vector<std::string> event;
-    if (eventNum > 0) {
+    if (eventNum > 0 && eventNum <= MAX_READ_EVENT_SIZE) {
         for (int i = 0; i < eventNum; ++i) {
             event.emplace_back((char *)ReadString(req, &size));
         }

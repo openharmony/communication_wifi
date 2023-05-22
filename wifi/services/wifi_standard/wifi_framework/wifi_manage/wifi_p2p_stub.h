@@ -41,9 +41,6 @@ public:
 
     virtual ErrCode MonitorCfgChange(void) = 0;
 
-protected:
-    sptr<IWifiP2pCallback> GetCallback() const;
-
 private:
     void InitHandleMap(void);
     void OnEnableP2p(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
@@ -99,7 +96,6 @@ private:
 
 private:
     HandleFuncMap handleFuncMap;
-    sptr<IWifiP2pCallback> callback_;
     sptr<IRemoteObject::DeathRecipient> deathRecipient_;
     bool mSingleCallback;
 };

@@ -73,23 +73,6 @@ public:
 
 private:
     /**
-     * @Description : Use synchronous mode to execute the command, the current thread will be blocked
-     *    until the command execution is complete.
-     *
-     * @param cmd - command
-     * @return bool - true: success, false: failed
-     */
-    bool SyncExecuteCommand(const std::string& cmd);
-
-    /**
-     * @Description : Start a new thread to execute the command, the current thread will not be blocked
-     *
-     * @param cmd - command
-     * @return bool - true: success, false: failed
-     */
-    bool AsyncExecuteCommand(const std::string& cmd);
-
-    /**
      * @Description : Check if the interface name is valid
      */
     bool CheckIfaceValid(const std::string& ifname);

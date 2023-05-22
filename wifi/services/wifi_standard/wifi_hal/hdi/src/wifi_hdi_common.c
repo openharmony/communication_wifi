@@ -515,6 +515,7 @@ char* HdiGetIeTxt(char *pos, char *end, const char *proto,
                     const uint8_t *ie, size_t ieLen)
 {
     struct HdiIeData data;
+    char *start;
     int ret;
 
     ret = HdiTxtPrintf(pos, end - pos, "[%s-", proto);
@@ -532,6 +533,7 @@ char* HdiGetIeTxt(char *pos, char *end, const char *proto,
         return pos;
     }
 
+    start = pos;
     if (data.keyMgmt & HDI_KEY_MGMT) {
         HDI_HANDLE_CIPHER_POS_INFO(ret, pos, end, "+", "%sEAP");
     }

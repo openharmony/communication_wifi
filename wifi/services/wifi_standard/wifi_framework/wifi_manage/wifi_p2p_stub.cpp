@@ -18,6 +18,7 @@
 #include "wifi_internal_event_dispatcher.h"
 #include "wifi_p2p_callback_proxy.h"
 #include "wifi_p2p_death_recipient.h"
+#include "wifi_common_def.h"
 
 DEFINE_WIFILOG_P2P_LABEL("WifiP2pStub");
 
@@ -587,7 +588,7 @@ void WifiP2pStub::OnRegisterCallBack(uint32_t code, MessageParcel &data, Message
 
         int eventNum = data.ReadInt32();
         std::vector<std::string> event;
-        if (eventNum > 0) {
+        if (eventNum > 0 && eventNum <= MAX_READ_EVENT_SIZE) {
             for (int i = 0; i < eventNum; ++i) {
                 event.emplace_back(data.ReadString());
             }

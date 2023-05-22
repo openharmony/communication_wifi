@@ -21,6 +21,7 @@
 #include "wifi_internal_event_dispatcher.h"
 #include "wifi_device_death_recipient.h"
 #include "wifi_common_util.h"
+#include "wifi_common_def.h"
 
 DEFINE_WIFILOG_LABEL("WifiDeviceStub");
 
@@ -616,7 +617,7 @@ void WifiDeviceStub::OnRegisterCallBack(uint32_t code, MessageParcel &data, Mess
         int pid = data.ReadInt32();
         int eventNum = data.ReadInt32();
         std::vector<std::string> event;
-        if (eventNum > 0) {
+        if (eventNum > 0 && eventNum <= MAX_READ_EVENT_SIZE) {
             for (int i = 0; i < eventNum; ++i) {
                 event.emplace_back(data.ReadString());
             }

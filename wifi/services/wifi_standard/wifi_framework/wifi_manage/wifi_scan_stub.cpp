@@ -25,7 +25,7 @@ DEFINE_WIFILOG_SCAN_LABEL("WifiScanStub");
 
 namespace OHOS {
 namespace Wifi {
-WifiScanStub::WifiScanStub() : callback_(nullptr), mSingleCallback(false)
+WifiScanStub::WifiScanStub() : mSingleCallback(false)
 {
     InitHandleMap();
 }
@@ -66,11 +66,6 @@ int WifiScanStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessagePar
         }
         return (this->*(iter->second))(code, data, reply, option);
     }
-}
-
-sptr<IWifiScanCallback> WifiScanStub::GetCallback() const
-{
-    return callback_;
 }
 
 int WifiScanStub::OnSetScanControlInfo(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
@@ -218,7 +213,7 @@ int WifiScanStub::OnRegisterCallBack(uint32_t code, MessageParcel &data, Message
             break;
         }
 
-        callback_ = iface_cast<IWifiScanCallback>(remote);
+        sptr<IWifiScanCallback> callback_ = iface_cast<IWifiScanCallback>(remote);
         if (callback_ == nullptr) {
             callback_ = new (std::nothrow) WifiScanCallbackProxy(remote);
             WIFI_LOGI("create new `WifiScanCallbackProxy`!");

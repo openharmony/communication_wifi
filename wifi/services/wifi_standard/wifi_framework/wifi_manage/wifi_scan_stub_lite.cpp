@@ -25,7 +25,7 @@ DEFINE_WIFILOG_SCAN_LABEL("WifiScanStubLite");
 
 namespace OHOS {
 namespace Wifi {
-WifiScanStub::WifiScanStub() : callback_(nullptr)
+WifiScanStub::WifiScanStub()
 {}
 
 WifiScanStub::~WifiScanStub()
@@ -96,11 +96,6 @@ int WifiScanStub::OnRemoteRequest(uint32_t code, IpcIo *req, IpcIo *reply)
         }
     }
     return ret;
-}
-
-std::shared_ptr<IWifiScanCallback> WifiScanStub::GetCallback() const
-{
-    return callback_;
 }
 
 int WifiScanStub::OnSetScanControlInfo(uint32_t code, IpcIo *req, IpcIo *reply)
@@ -256,7 +251,7 @@ int WifiScanStub::OnRegisterCallBack(uint32_t code, IpcIo *req, IpcIo *reply)
         return ret;
     }
 
-    callback_ = std::make_shared<WifiScanCallbackProxy>(&sid);
+    std::shared_ptr<IWifiScanCallback> callback_ = std::make_shared<WifiScanCallbackProxy>(&sid);
     WIFI_LOGD("create new WifiScanCallbackProxy!");
     size_t size;
     int eventNum = 0;

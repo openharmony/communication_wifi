@@ -60,6 +60,17 @@ bool WifiAuthCenter::IsSystemAppByToken() {
     }
     return true;
 }
+bool WifiAuthCenter::IsNativeProcess()
+{
+    uint32_t tokenId = IPCSkeleton::GetCallingTokenID();
+    Security::AccessToken::ATokenTypeEnum callingType =
+        Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(tokenId);
+    if (callingType == Security::AccessToken::TOKEN_NATIVE) {
+        return true;
+    }
+    WIFI_LOGE("The caller tokenId:%{public}d, callingType:%{public}d is not a native process.", tokenId, callingType);
+    return false;
+}
 #endif
 
 int WifiAuthCenter::InitPermission(const int &pid, const int &uid)

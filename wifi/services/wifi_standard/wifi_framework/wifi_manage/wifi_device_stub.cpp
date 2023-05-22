@@ -633,7 +633,7 @@ void WifiDeviceStub::OnRegisterCallBack(uint32_t code, MessageParcel &data, Mess
                 WIFI_LOGD("AddDeathRecipient!");
             }
             if (callback_ != nullptr) {
-                for (auto &eventName : event) {
+                for (const auto &eventName : event) {
                     ret = WifiInternalEventDispatcher::GetInstance().AddStaCallback(remote, callback_, pid, eventName);
                 }
             }

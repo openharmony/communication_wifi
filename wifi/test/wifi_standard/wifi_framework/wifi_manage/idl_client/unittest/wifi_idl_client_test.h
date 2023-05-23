@@ -27,8 +27,9 @@ public:
     static void SetUpTestCase()
     {
         while (g_failnums--) {
-            if (mClient.InitClient() == 0)
+            if (mClient.InitClient() == 0) {
                 g_failnums = 0;
+            }
         }
     }
     static void TearDownTestCase()

@@ -5,6 +5,7 @@
                 "name":1121,
                 "libpath":"libwifi_hotspot_ability.z.so",
                 "run-on-create":false,
+                "auto-restart":true,
                 "distributed":false,
                 "dump-level":1
             }

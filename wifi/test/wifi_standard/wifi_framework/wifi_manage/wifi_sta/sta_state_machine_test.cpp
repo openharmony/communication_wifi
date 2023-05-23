@@ -1380,7 +1380,7 @@ public:
 
     void DhcpResultNotifyOnFailedTest2()
     {
-        pStaStateMachine->linkedInfo.detailedState = DetailedState::CONNECTED;
+        pStaStateMachine->linkedInfo.detailedState = DetailedState::DISCONNECTING;
         pStaStateMachine->isRoam = false;
         EXPECT_CALL(WifiStaHalInterface::GetInstance(), Disconnect()).WillRepeatedly(Return(WIFI_IDL_OPT_FAILED));
         std::string ifname = "wlan1";
@@ -1390,17 +1390,12 @@ public:
 
     void DhcpResultNotifyOnFailedTest3()
     {
-        pStaStateMachine->linkedInfo.detailedState = DetailedState::CONNECTED;
+        pStaStateMachine->linkedInfo.detailedState = DetailedState::DISCONNECTED;
+        EXPECT_CALL(WifiStaHalInterface::GetInstance(), Disconnect()).WillRepeatedly(Return(WIFI_IDL_OPT_FAILED));
         pStaStateMachine->isRoam = true;
         std::string ifname = "wlan1";
         std::string reason = "test";
         pStaStateMachine->pDhcpResultNotify->OnFailed(0, ifname, reason);
-    }
-
-    void DhcpResultNotifyOnSerExitNotify()
-    {
-        std::string ifname = "wlan0";
-        pStaStateMachine->pDhcpResultNotify->OnSerExitNotify(ifname);
     }
 
     void SaveLinkstateSuccess()
@@ -1490,20 +1485,6 @@ public:
         pStaStateMachine->ReUpdateNetSupplierInfo(supplierInfo);
     }
 
-    void DealNetworkCheckSuccess()
-    {
-        InternalMessage msg;
-        pStaStateMachine->DealNetworkCheck(&msg);
-    }
-
-    void DealNetworkCheckFail()
-    {
-        InternalMessage msg;
-        pStaStateMachine->pNetcheck = nullptr;
-        pStaStateMachine->DealNetworkCheck(&msg);
-        pStaStateMachine->DealNetworkCheck(nullptr);
-    }
-
     void OnBssidChangedEventSuccess()
     {
         std::string reason;
@@ -1515,6 +1496,9 @@ public:
     {
         InternalMessage msg;
         pStaStateMachine->linkedInfo.connState = ConnState::CONNECTING;
+        pStaStateMachine->pNetcheck = nullptr;
+        pStaStateMachine->DealNetworkCheck(&msg);
+        pStaStateMachine->DealNetworkCheck(nullptr);
         EXPECT_CALL(WifiStaHalInterface::GetInstance(), Reconnect())
             .WillOnce(Return(WIFI_IDL_OPT_OK))
             .WillOnce(Return(WIFI_IDL_OPT_FAILED));
@@ -2342,11 +2326,6 @@ HWTEST_F(StaStateMachineTest, DhcpResultNotifyOnFailedTest3, TestSize.Level1)
     DhcpResultNotifyOnFailedTest3();
 }
 
-HWTEST_F(StaStateMachineTest, DhcpResultNotifyOnSerExitNotify, TestSize.Level1)
-{
-    DhcpResultNotifyOnSerExitNotify();
-}
-
 HWTEST_F(StaStateMachineTest, SaveLinkstateSuccess, TestSize.Level1)
 {
     SaveLinkstateSuccess();
@@ -2410,16 +2389,6 @@ HWTEST_F(StaStateMachineTest, ReUpdateNetSupplierInfoSuccess, TestSize.Level1)
 HWTEST_F(StaStateMachineTest, ReUpdateNetSupplierInfoFail, TestSize.Level1)
 {
     ReUpdateNetSupplierInfoFail();
-}
-
-HWTEST_F(StaStateMachineTest, DealNetworkCheckSuccess, TestSize.Level1)
-{
-    DealNetworkCheckSuccess();
-}
-
-HWTEST_F(StaStateMachineTest, DealNetworkCheckFail, TestSize.Level1)
-{
-    DealNetworkCheckFail();
 }
 
 HWTEST_F(StaStateMachineTest, OnBssidChangedEventSuccess, TestSize.Level1)

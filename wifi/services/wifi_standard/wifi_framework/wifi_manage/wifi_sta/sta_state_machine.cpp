@@ -1294,7 +1294,11 @@ void StaStateMachine::MacAddressGenerate(WifiStoreRandomMac &randomMacInfo)
     constexpr int octBase = 8;
     int ret = 0;
     char strMacTmp[arraySize] = {0};
-    unsigned int seed = static_cast<unsigned int>(time(nullptr) + std::hash<std::string>{}(randomMacInfo.peerBssid) + std::hash<std::string>{}(randomMacInfo.preSharedKey));
+    unsigned int seed = static_cast<unsigned int>(time(nullptr));
+    seed += static_cast<unsigned int>(std::hash<std::string>{}(randomMacInfo.peerBssid));
+    seed += static_cast<unsigned int>(std::hash<std::string>{}(randomMacInfo.preSharedKey));
+    seed += (uint64_t)randomMacInfo.peerBssid.c_str();
+    seed += (uint64_t)randomMacInfo.preSharedKey.c_str();
     srand(seed);
     for (int i = 0; i < macBitSize; i++) {
         if (i != firstBit) {

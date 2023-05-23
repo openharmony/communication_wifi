@@ -102,7 +102,7 @@ HWTEST_F(WifiP2PMsgTest, WifiP2pServiceRequestTest, TestSize.Level1)
     std::vector<unsigned char> ret;
     pWifiP2pServiceRequest->SetQuery(query);
     ret = pWifiP2pServiceRequest->GetTlv();
-	EXPECT_TRUE(count(ret.begin(), ret.end(), 0x00) != 0);
+    EXPECT_TRUE(count(ret.begin(), ret.end(), 0x00) != 0);
     query.push_back(0x00);
     query.push_back(0x00);
     pWifiP2pServiceRequest->SetQuery(query);

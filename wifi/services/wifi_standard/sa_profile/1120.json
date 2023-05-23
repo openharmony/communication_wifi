@@ -5,6 +5,7 @@
                 "name":1120,
                 "libpath":"libwifi_device_ability.z.so",
                 "run-on-create":false,
+                "auto-restart":true,
                 "distributed":false,
                 "dump-level":1
             }

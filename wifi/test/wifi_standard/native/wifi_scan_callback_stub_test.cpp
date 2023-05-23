@@ -74,17 +74,6 @@ HWTEST_F(WifiScanCallbackStubTest, OnWifiScanStateChangedTest, TestSize.Level1)
     pWifiScan->OnWifiScanStateChanged(state);
 }
 
-HWTEST_F(WifiScanCallbackStubTest, SetRemoteDiedTest, TestSize.Level1)
-{
-    bool val = true;
-    pWifiScan->SetRemoteDied(val);
-}
-
-HWTEST_F(WifiScanCallbackStubTest, IsRemoteDiedTest, TestSize.Level1)
-{
-    pWifiScan->IsRemoteDied();
-}
-
 HWTEST_F(WifiScanCallbackStubTest, RegisterCallBackTest, TestSize.Level1)
 {
     sptr<IWifiScanCallback> userCallback =  new (std::nothrow) IWifiScanCallbackMock();

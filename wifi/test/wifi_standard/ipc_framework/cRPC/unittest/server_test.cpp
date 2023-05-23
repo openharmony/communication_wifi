@@ -48,17 +48,13 @@ HWTEST_F(ServerTest, CreateEventLoopTest, TestSize.Level1)
     EXPECT_TRUE(CreateEventLoop(-1) == nullptr);
 }
 
-HWTEST_F(ServerTest, StopEventLoopTest, TestSize.Level1)
-{
-    EventLoop loop;
-    StopEventLoop(nullptr);
-    StopEventLoop(&loop);
-}
-
 HWTEST_F(ServerTest, AddFdEventFail, TestSize.Level1)
 {
     int fd = 0;
     unsigned int addMas = 0x01;
+    EventLoop loop;
+    StopEventLoop(nullptr);
+    StopEventLoop(&loop);
     EXPECT_TRUE(AddFdEvent(nullptr, fd, addMas) == -1);
 }
 

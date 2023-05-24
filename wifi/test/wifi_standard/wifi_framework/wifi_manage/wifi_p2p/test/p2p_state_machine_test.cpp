@@ -713,11 +713,10 @@ HWTEST_F(P2pStateMachineTest, StartDhcpServer, TestSize.Level1)
 
 HWTEST_F(P2pStateMachineTest, DhcpResultNotifyOnSuccess, TestSize.Level1)
 {
-    EXPECT_CALL(WifiP2PHalInterface::GetInstance(), RemoveNetwork(_))
-        .WillRepeatedly(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
+    int status = 1;
     std::string ifName("ifName");
     DhcpResult result;
-    WarpDhcpResultNotifyOnSuccess(1, ifName, result);
+    WarpDhcpResultNotifyOnSuccess(status, ifName, result);
 }
 
 HWTEST_F(P2pStateMachineTest, DhcpResultNotifyOnFailed, TestSize.Level1)

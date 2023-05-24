@@ -56,7 +56,8 @@
             "wifi_feature_with_app_frozen",
             "wifi_feature_non_seperate_p2p",
             "wifi_feature_non_hdf_driver",
-            "wifi_feature_is_random_mac_supported"
+            "wifi_feature_is_random_mac_supported",
+            "wifi_feature_with_sched_scan_control_enable"
         ],
         "adapted_system_type": [
             "standard"

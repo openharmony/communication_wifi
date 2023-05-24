@@ -269,6 +269,13 @@ HWTEST_F(ApService_test, GetSupportedPowerModelSuccess, TestSize.Level1)
     EXPECT_EQ(ErrCode::WIFI_OPT_SUCCESS, pApService->GetSupportedPowerModel(setPowerModelList));
 }
 
+HWTEST_F(ApService_test, GetPowerModelSuccess, TestSize.Level1)
+{
+    PowerModel model = PowerModel::SLEEPING;
+    EXPECT_CALL(WifiSettings::GetInstance(), GetPowerModel(_, _)).WillOnce(Return(0));
+    EXPECT_EQ(ErrCode::WIFI_OPT_SUCCESS, pApService->GetPowerModel(model));
+}
+
 HWTEST_F(ApService_test, SetPowerModelSuccess, TestSize.Level1)
 {
     PowerModel model = PowerModel::SLEEPING;

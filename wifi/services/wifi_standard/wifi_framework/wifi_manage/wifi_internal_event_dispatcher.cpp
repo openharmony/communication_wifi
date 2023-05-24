@@ -87,6 +87,9 @@ CallbackEventPermissionMap g_CallbackEventPermissionMap = {
         std::make_pair(std::bind(WifiPermissionUtils::VerifyWifiConnectionPermission),
         "ohos.permission.MANAGE_WIFI_CONNECTION") },
     { WIFI_CBK_MSG_WPS_STATE_CHANGE,
+        std::make_pair(std::bind(WifiPermissionUtils::VerifyGetWifiInfoPermission),
+        "ohos.permission.GET_WIFI_INFO") },
+    { WIFI_CBK_MSG_WPS_STATE_CHANGE,
         std::make_pair(std::bind(WifiPermissionUtils::VerifyGetWifiInfoInternalPermission),
         "ohos.permission.GET_WIFI_INFO_INTERNAL") },
 };

@@ -281,6 +281,7 @@ private:
     bool isAbsFreezeState;                           /* absolute freeze state. */
     bool isAbsFreezeScaned;                          /* scanned in freeze state. */
     int scanResultBackup;                            /* scan result backup. */
+    int64_t lastScanResultsAvailableTime;            /* scan results available time */
 #ifndef OHOS_ARCH_LITE
     StandByListerner standByListerner;         /* standby Listerner*/
 #endif
@@ -754,7 +755,12 @@ private:
      * @return true: allow, false: not allowed.
      */
     bool AllowScanByDisableScanCtrl();
-
+    /**
+    * @Description Determines whether scanning is allowed by sched strategy scan control.
+    *
+    * @return true: allow, false: not allowed.
+    */
+    bool AllowScanBySchedStrategy();
     /**
      * @Description Determines whether scanning is allowed in movingfreeze mode.
      *

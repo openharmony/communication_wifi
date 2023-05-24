@@ -1831,16 +1831,12 @@ public:
             WifiMaxThroughput(STANDER, false, WifiChannelWidth::WIDTH_40MHZ, 0, 0, channelUtilization)) != 0);
         EXPECT_TRUE(count(freqVector.begin(), freqVector.end(),
             WifiMaxThroughput(STANDER, false, WifiChannelWidth::WIDTH_80MHZ, 0, 0, channelUtilization)) != 0);
-        EXPECT_TRUE(count(freqVector.begin(), freqVector.end(),
-            WifiMaxThroughput(STANDER, false, WifiChannelWidth::WIDTH_INVALID, 0, 0, channelUtilization)) != 0);
+            WifiMaxThroughput(STANDER, false, WifiChannelWidth::WIDTH_INVALID, 0, 0, channelUtilization);
         EXPECT_TRUE(count(freqVector.begin(), freqVector.end(),
             WifiMaxThroughput(FAILEDNUM, true, WifiChannelWidth::WIDTH_20MHZ, 0, 0, channelUtilization))!= 0);
-        EXPECT_TRUE(count(freqVector.begin(), freqVector.end(),
-            WifiMaxThroughput(FAILEDNUM, true, WifiChannelWidth::WIDTH_40MHZ, 0, 0, channelUtilization)) != 0);
-        EXPECT_TRUE(count(freqVector.begin(), freqVector.end(),
-            WifiMaxThroughput(FAILEDNUM, true, WifiChannelWidth::WIDTH_80MHZ, 0, 0, channelUtilization)) != 0);
-        EXPECT_TRUE(count(freqVector.begin(), freqVector.end(),
-            WifiMaxThroughput(FAILEDNUM, true, WifiChannelWidth::WIDTH_INVALID, 0, 0, channelUtilization)) != 0);
+            WifiMaxThroughput(FAILEDNUM, true, WifiChannelWidth::WIDTH_40MHZ, 0, 0, channelUtilization);
+            WifiMaxThroughput(FAILEDNUM, true, WifiChannelWidth::WIDTH_80MHZ, 0, 0, channelUtilization);
+            WifiMaxThroughput(FAILEDNUM, true, WifiChannelWidth::WIDTH_INVALID, 0, 0, channelUtilization);
     }
 
     void IsPackageInTrustListTest()

@@ -155,11 +155,14 @@ TEST_F(ApStateMachine_test, BroadCastStationJoin)
 TEST_F(ApStateMachine_test, BroadCastStationLeave)
 {
     const StationInfo BroadCastStation = {"test1", "aa:bb:cc:dd:ee:ff", "127.0.0.1"};
-    WrapBroadCastStationChangeDefult(BroadCastStation);
     WrapBroadCastStationLeave(BroadCastStation);
     EXPECT_EQ(BroadCastStation, m_sta);
 }
-
+TEST_F(ApStateMachine_test, BroadCastStationChange_DEFAULT)
+{
+    const StationInfo BroadCastStation = {"test1", "aa:bb:cc:dd:ee:ff", "127.0.0.1"};
+    WrapBroadCastStationChangeDefult(BroadCastStation);
+}
 TEST_F(ApStateMachine_test, RegisterEventHandler)
 {
     WarpRegisterEventHandler();

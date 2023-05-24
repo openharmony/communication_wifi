@@ -77,7 +77,7 @@ public:
     {
         EXPECT_CALL(*pMockStaService, InitStaService(_)).WillRepeatedly(Return(WIFI_OPT_FAILED));
         EXPECT_CALL(*pMockStaService, EnableWifi()).WillRepeatedly(Return(WIFI_OPT_SUCCESS));
-        pStaInterface->EnableWifi();
+        EXPECT_TRUE(pStaInterface->EnableWifi() == WIFI_OPT_FAILED);
     }
 
     void EnableWifiFail2()

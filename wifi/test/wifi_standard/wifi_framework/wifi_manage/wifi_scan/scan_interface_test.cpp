@@ -64,6 +64,29 @@ HWTEST_F(ScanInterfaceTest, GCreateDestroy, TestSize.Level1)
     Destroy(p);
 }
 
+HWTEST_F(ScanInterfaceTest, InitTest, TestSize.Level1)
+{
+    std::vector<int32_t> band_2G_channel = { 1, 2, 3, 4, 5, 6, 7 };
+    std::vector<int32_t> band_5G_channel = { 149, 168, 169 };
+    ChannelsTable temp = { { BandType::BAND_2GHZ, band_2G_channel }, { BandType::BAND_5GHZ, band_5G_channel } };
+    EXPECT_CALL(WifiSettings::GetInstance(), GetSupportHwPnoFlag()).Times(AtLeast(1));
+    EXPECT_CALL(WifiSupplicantHalInterface::GetInstance(), RegisterSupplicantEventCallback(_)).Times(AtLeast(1));
+    EXPECT_CALL(WifiStaHalInterface::GetInstance(), GetSupportFrequencies(_, _)).Times(AtLeast(1));
+    EXPECT_CALL(WifiSettings::GetInstance(), GetValidChannels(_))
+        .WillOnce(DoAll(SetArgReferee<0>(temp), Return(0)));
+    EXPECT_CALL(WifiSettings::GetInstance(), GetScanControlInfo(_)).Times(AtLeast(1));
+    EXPECT_CALL(WifiManager::GetInstance(), DealScanOpenRes()).Times(AtLeast(0));
+    EXPECT_CALL(WifiSupplicantHalInterface::GetInstance(), UnRegisterSupplicantEventCallback()).Times(AtLeast(1));
+    EXPECT_CALL(WifiSettings::GetInstance(), GetWhetherToAllowNetworkSwitchover()).Times(AtLeast(0));
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_)).Times(AtLeast(0));
+    EXPECT_CALL(WifiSettings::GetInstance(), GetAppPackageName()).WillRepeatedly(Return(""));
+    EXPECT_CALL(WifiSettings::GetInstance(), ReloadTrustListPolicies())
+        .WillRepeatedly(Return(refVecTrustList));
+    EXPECT_CALL(WifiSettings::GetInstance(), ReloadMovingFreezePolicy())
+        .WillRepeatedly(Return(defaultValue));
+    pScanInterface->Init();
+}
+
 HWTEST_F(ScanInterfaceTest, UnInitTest, TestSize.Level1)
 {
     pScanInterface->UnInit();

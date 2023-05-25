@@ -144,10 +144,61 @@ if (defined(ohos_lite)) {
 
     cflags_cc = [ "-fno-rtti" ]
     cflags = [ "-Wno-deprecated-non-prototype" ]
-    install_images = [
-      "system",
-      "updater",
+    install_images = [ "system" ]
+    part_name = "wifi"
+    subsystem_name = "communication"
+  }
+
+  ohos_executable("wifi_hal_service_updater") {
+    install_enable = true
+    sources = local_base_sources
+
+    include_dirs = local_base_include_dirs
+    include_dirs += [
+      "//commonlibrary/c_utils/base/include",
+      "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
+      "//third_party/wpa_supplicant/wpa_supplicant-2.9_standard/src/",
+      "//third_party/bounds_checking_function/include/",
+      "//drivers/peripheral/wlan/interfaces/include/",
     ]
+
+    symlink_target_name = [ "wifi_hal_service" ]
+    deps = [
+      "$WIFI_ROOT_DIR/services/wifi_standard/ipc_framework/cRPC:crpc_server",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_hal/etc/init:etc",
+      "//third_party/wpa_supplicant/wpa_supplicant-2.9_standard:wpa_client_updater",
+    ]
+
+    external_deps = [
+      "c_utils:utils",
+      "hiviewdfx_hilog_native:libhilog",
+    ]
+
+    defines = [
+      "AP_INTF=\"$wifi_feature_with_ap_intf\"",
+      "AP_NUM=$wifi_feature_with_ap_num",
+    ]
+
+    if (wifi_feature_is_hdi_supported) {
+      defines += [ "HDI_INTERFACE_SUPPORT" ]
+      external_deps += [ "drivers_interface_wlan:libwlan_proxy_1.1" ]
+    }
+
+    if (wifi_feature_is_random_mac_supported) {
+      defines += [ "RANDOM_MAC_SUPPORT" ]
+    }
+
+    if ("${CONFIG_CTRL_IFACE}" == "unix") {
+      defines += [ "WPA_CTRL_IFACE_UNIX" ]
+    }
+
+    if (wifi_feature_non_seperate_p2p) {
+      defines += [ "NON_SEPERATE_P2P" ]
+    }
+    defines += [ "OHOS_EUPDATER" ]
+    cflags_cc = [ "-fno-rtti" ]
+    cflags = [ "-Wno-deprecated-non-prototype" ]
+    install_images = [ "updater" ]
     part_name = "wifi"
     subsystem_name = "communication"
   }
@@ -155,4 +206,7 @@ if (defined(ohos_lite)) {
 
 group("wifi_hal") {
   deps = [ ":wifi_hal_service" ]
+  if (!defined(ohos_lite)) {
+    deps += [ ":wifi_hal_service_updater" ]
+  }
 }

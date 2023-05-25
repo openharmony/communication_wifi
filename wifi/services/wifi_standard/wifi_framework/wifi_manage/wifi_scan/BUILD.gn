@@ -110,7 +110,7 @@ if (defined(ohos_lite)) {
       "common_event_service:cesfwk_innerkits",
       "hiviewdfx_hilog_native:libhilog",
     ]
-    
+
     defines = []
     if (wifi_feature_with_sched_scan_control_enable) {
       include_dirs += [ "//foundation/resourceschedule/efficiency_manager/interfaces/innerkits/component_scheduler/client/include" ]

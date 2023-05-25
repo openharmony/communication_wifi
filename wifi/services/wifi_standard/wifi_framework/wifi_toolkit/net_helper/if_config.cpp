@@ -89,7 +89,7 @@ bool IfConfig::ExecCommand(const std::vector<std::string> &vecCommandArg)
                 close(fd[0]);
                 dup2(fd[1], STDOUT_FILENO);
                 close(fd[1]);
-                /*last member of execveStr should be nullptr*/
+                /* last member of execveStr should be nullptr */
                 if (execve(vecCommandArg[0].c_str(), (char *const*)execveStr, env) < 0) {
                     LOGE("execve %{public}s failed.", vecCommandArg[0].c_str());
                 }

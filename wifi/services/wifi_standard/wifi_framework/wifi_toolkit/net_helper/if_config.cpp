@@ -79,15 +79,11 @@ bool IfConfig::ExecCommand(const std::vector<std::string> &vecCommandArg)
                 return;
             }
             if (pid == 0) {
-                const char *execveStr[MAX_COMMAND_ARG];
+                const char *execveStr[MAX_COMMAND_ARG] = {nullptr};
                 int i = 0;
                 for (i = 0; i < argvSize && i < MAX_COMMAND_ARG; i++) {
                     execveStr[i] = vecCommandArg[i].c_str();
                 }
-                if (i < MAX_COMMAND_ARG) {
-                    execveStr[i] = nullptr;
-                }
-
                 char *env[] = {nullptr};
                 close(fd[0]);
                 dup2(fd[1], STDOUT_FILENO);

@@ -90,7 +90,9 @@ ohos_unittest("wifi_scan_unittest") {
   ]
   defines = [ "AP_INSTANCE_MAX_NUM=$wifi_feature_with_ap_num" ]
   external_deps = [
+    "ability_base:want",
     "c_utils:utils",
+    "common_event_service:cesfwk_innerkits",
     "hiviewdfx_hilog_native:libhilog",
   ]
   part_name = "wifi"

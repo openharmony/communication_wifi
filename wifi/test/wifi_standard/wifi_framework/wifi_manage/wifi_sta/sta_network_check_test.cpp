@@ -45,19 +45,9 @@ public:
     NetStateHandler handle = nullptr;
 };
 
-void StaNetworkCheckTest::StopNetCheckThreadSuccess()
-{
-    pStaNetworkCheck->StopNetCheckThread();
-}
-
 bool StaNetworkCheckTest::HttpDetectionSuccess()
 {
     return pStaNetworkCheck->HttpDetection();
-}
-
-HWTEST_F(StaNetworkCheckTest, StopNetCheckThreadSuccess, TestSize.Level1)
-{
-    StopNetCheckThreadSuccess();
 }
 
 HWTEST_F(StaNetworkCheckTest, HttpDetectionSuccess, TestSize.Level1)

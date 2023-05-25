@@ -20,19 +20,24 @@
 
 namespace OHOS {
 namespace Wifi {
+WifiIdlClient mClient;
+int g_failnums = 10;
 class WifiIdlClientTest : public testing::Test {
 public:
     static void SetUpTestCase()
-    {}
+    {
+        while (g_failnums--) {
+            if (mClient.InitClient() == 0) {
+                g_failnums = 0;
+            }
+        }
+    }
     static void TearDownTestCase()
     {}
     virtual void SetUp()
     {}
     virtual void TearDown()
     {}
-
-public:
-    WifiIdlClient mClient;
 };
 }  // namespace Wifi
 }  // namespace OHOS

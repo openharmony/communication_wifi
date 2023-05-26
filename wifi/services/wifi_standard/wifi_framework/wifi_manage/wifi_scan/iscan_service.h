@@ -18,6 +18,7 @@
 #include "wifi_errcode.h"
 #include "wifi_msg.h"
 #include "iscan_service_callbacks.h"
+#include "ienhance_service.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -112,6 +113,13 @@ public:
      * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
      */
     virtual ErrCode RegisterScanCallbacks(const IScanSerivceCallbacks &scanSerivceCallbacks) = 0;
+    /**
+     * @Description Set EnhanceService to Scan Service.
+     *
+     * @param enhanceService IEnhanceService object
+     * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
+     */
+    virtual ErrCode SetEnhanceService(IEnhanceService *enhanceService) = 0;
 };
 }  // namespace Wifi
 }  // namespace OHOS

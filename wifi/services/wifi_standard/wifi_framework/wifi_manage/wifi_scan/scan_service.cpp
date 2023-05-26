@@ -49,8 +49,7 @@ ScanService::ScanService()
       scanTrustMode(false),
       isAbsFreezeState(false),
       isAbsFreezeScaned(false),
-      scanResultBackup(-1),
-      lastScanResultsAvailableTime(0)
+      scanResultBackup(-1)
 {}
 
 ScanService::~ScanService()
@@ -161,6 +160,11 @@ void ScanService::UnInitScanService()
 void ScanService::RegisterScanCallbacks(const IScanSerivceCallbacks &iScanSerivceCallbacks)
 {
     mScanSerivceCallbacks = iScanSerivceCallbacks;
+}
+
+void ScanService::SetEnhanceService(IEnhanceService* enhanceService)
+{
+    mEnhanceService = enhanceService;
 }
 
 void ScanService::HandleScanStatusReport(ScanStatusReport &scanStatusReport)
@@ -601,8 +605,11 @@ void ScanService::HandleCommonScanInfo(
     }
     struct timespec times = {0, 0};
     clock_gettime(CLOCK_MONOTONIC, &times);
-    lastScanResultsAvailableTime = static_cast<int64_t>(times.tv_sec) * SECOND_TO_MICRO_SECOND +
+    int64_t availableTime = static_cast<int64_t>(times.tv_sec) * SECOND_TO_MICRO_SECOND +
         times.tv_nsec / SECOND_TO_MILLI_SECOND;
+    if (mEnhanceService != nullptr) {
+        mEnhanceService->SetEnhanceParam(availableTime);
+    }
     /* Send the scanning result to the module registered for listening. */
     ScanInfoHandlerMap::iterator handleIter = scanInfoHandlerMap.begin();
     for (; handleIter != scanInfoHandlerMap.end(); ++handleIter) {
@@ -1183,10 +1190,13 @@ ErrCode ScanService::AllowExternScan()
         WIFI_LOGW("extern scan not allow by disable scan control.");
         return WIFI_OPT_FAILED;
     }
-    if (!AllowScanBySchedStrategy()) {
-        WIFI_LOGW("extern scan not allow by sched strategy.");
-        return WIFI_OPT_FAILED;
+    if (mEnhanceService != nullptr) {
+        if (!mEnhanceService->AllowScanBySchedStrategy()) {
+            WIFI_LOGW("extern scan not allow by sched strategy.");
+            return WIFI_OPT_FAILED;
+        }
     }
+    
     WIFI_LOGI("extern scan has allowed");
     return WIFI_OPT_SUCCESS;
 }
@@ -2245,45 +2255,6 @@ bool ScanService::AllowScanByDisableScanCtrl()
 {
     std::unique_lock<std::mutex> lock(scanControlInfoMutex);
     return !disableScanFlag;
-}
-
-bool ScanService::AllowScanBySchedStrategy()
-{
-    WIFI_LOGI("Enter ScanService::AllowScanBySchedStrategy.");
-#ifdef WIFI_SCHED_SCAN_CONTROL_ENALE
-    sptr<ComponentScheduler::ScanStrategy> strategy = nullptr;
-    int ret = OHOS::ComponentScheduler::ComponentSchedClient::GetInstance().GetScanStrategy(GetBundleName(),
-        GetCallingUid(), ComponentScheduler::ScanStrategy::ScanType::SCAN_TYPE_WIFI, strategy);
-    if (ret != 0 || strategy == nullptr) {
-        WIFI_LOGW("GetScanStrategy fail: %{public}d.", ret);
-        return true;
-    }
-
-    WIFI_LOGI("GetScanStrategy return mode: %{public}d.", strategy->GetMode());
-    if (strategy->GetMode() == 0) {
-        return true;
-    }
-
-    if (strategy->GetMode() < 0) {
-        WIFI_LOGE("ComponentSchedClient don't allow scan.");
-        return false;
-    }
-
-    if (strategy->GetTimeStamp() < lastScanResultsAvailableTime) {
-        struct timespec times = {0, 0};
-        clock_gettime(CLOCK_MONOTONIC, &times);
-        int64_t currTime =
-            static_cast<int64_t>(times.tv_sec) * SECOND_TO_MICRO_SECOND + times.tv_nsec / SECOND_TO_MILLI_SECOND;
-        int64_t sinceLastScanTime = currTime - lastScanResultsAvailableTime;
-        if (sinceLastScanTime > strategy->GetMode()) {
-            return true;
-        }
-        WIFI_LOGE("sinceLastScanTime:%{public}llu is less than GetMode:%{public}d, don't allow scan.",
-            sinceLastScanTime, strategy->GetMode());
-        return false;
-    }
-#endif
-    return true;
 }
 
 bool ScanService::AllowScanByMovingFreeze()

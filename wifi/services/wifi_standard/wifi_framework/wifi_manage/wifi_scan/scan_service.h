@@ -30,6 +30,7 @@
 #include "scan_monitor.h"
 #include "scan_state_machine.h"
 #include "scan_standby_listerner.h"
+#include "ienhance_service.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -229,7 +230,13 @@ public:
      *
      */
     virtual void SetStaCurrentTime();
-
+    /**
+     * @Description Set EnhanceService to Scan Service.
+     *
+     * @param enhanceService IEnhanceService object
+     * @return void
+     */
+    virtual void SetEnhanceService(IEnhanceService* enhanceService);
 private:
     using ScanConfigMap = std::map<int, StoreScanConfig>;
     using ScanInfoHandlerMap = std::map<std::string, ScanInfoHandler>;
@@ -281,7 +288,7 @@ private:
     bool isAbsFreezeState;                           /* absolute freeze state. */
     bool isAbsFreezeScaned;                          /* scanned in freeze state. */
     int scanResultBackup;                            /* scan result backup. */
-    int64_t lastScanResultsAvailableTime;            /* scan results available time */
+    IEnhanceService *mEnhanceService;                /* EnhanceService handle */
 #ifndef OHOS_ARCH_LITE
     StandByListerner standByListerner;         /* standby Listerner*/
 #endif
@@ -755,12 +762,6 @@ private:
      * @return true: allow, false: not allowed.
      */
     bool AllowScanByDisableScanCtrl();
-    /**
-    * @Description Determines whether scanning is allowed by sched strategy scan control.
-    *
-    * @return true: allow, false: not allowed.
-    */
-    bool AllowScanBySchedStrategy();
     /**
      * @Description Determines whether scanning is allowed in movingfreeze mode.
      *

@@ -14,6 +14,7 @@
  */
 
 #ifdef HDI_INTERFACE_SUPPORT
+#include <unistd.h>
 #include <net/if.h>
 #include <sys/ioctl.h>
 #include <sys/socket.h>
@@ -314,7 +315,6 @@ WifiErrorNo SetAssocMacAddr(const unsigned char *mac, int lenMac)
         return WIFI_HAL_FAILED;
     }
 
-    UpDownLink(0);
     WifiHdiProxy proxy = GetHdiProxy(PROTOCOL_80211_IFTYPE_STATION);
     CHECK_HDI_PROXY_AND_RETURN(proxy, WIFI_HAL_FAILED);
 
@@ -322,11 +322,12 @@ WifiErrorNo SetAssocMacAddr(const unsigned char *mac, int lenMac)
     int32_t ret = sscanf_s((char *)mac, "%2hhx:%2hhx:%2hhx:%2hhx:%2hhx:%2hhx",
            &mac_bin[MAC_ADDR_INDEX_0], &mac_bin[MAC_ADDR_INDEX_1], &mac_bin[MAC_ADDR_INDEX_2],
            &mac_bin[MAC_ADDR_INDEX_3], &mac_bin[MAC_ADDR_INDEX_4], &mac_bin[MAC_ADDR_INDEX_5]);
-    if (ret != EOK) {
+    if (ret <= EOK) {
         LOGE("SetAssocMacAddr parse mac failed: %{public}d", ret);
         return WIFI_HAL_FAILED;
     }
-
+    
+    UpDownLink(0);
     ret = proxy.wlanObj->SetMacAddress(proxy.wlanObj, proxy.feature, mac_bin, MAC_ADDR_INDEX_SIZE);
     if (ret != HDF_SUCCESS) {
         LOGE("SetAssocMacAddr failed: %{public}d", ret);

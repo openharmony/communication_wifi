@@ -1362,9 +1362,12 @@ bool StaStateMachine::SetRandomMac(int networkId)
             return false;
         }
 
-        /* Sets the MAC address of WifiSettings. */
-        MacAddressGenerate(randomMacInfo);
-        WifiSettings::GetInstance().AddRandomMac(randomMacInfo);
+        WifiSettings::GetInstance().GetRandomMac(randomMacInfo);
+        if (randomMacInfo.randomMac.empty()) {
+            /* Sets the MAC address of WifiSettings. */
+            MacAddressGenerate(randomMacInfo);
+            WifiSettings::GetInstance().AddRandomMac(randomMacInfo);
+        }
         currentMac = randomMacInfo.randomMac;
     }
 

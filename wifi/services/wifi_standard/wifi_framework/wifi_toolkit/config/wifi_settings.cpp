@@ -148,6 +148,7 @@ int WifiSettings::Init()
     InitScanControlInfo();
     ReloadTrustListPolicies();
     ReloadMovingFreezePolicy();
+    ReloadStaRandomMac();
 #ifdef FEATURE_ENCRYPTION_SUPPORT
     SetUpHks();
 #endif
@@ -697,20 +698,29 @@ bool WifiSettings::AddRandomMac(WifiStoreRandomMac &randomMacInfo)
     return isConnected;
 }
 
+bool WifiSettings::GetRandomMac(WifiStoreRandomMac &randomMacInfo)
+{
+    std::unique_lock<std::mutex> lock(mStaMutex);
+    for (auto &item : mWifiStoreRandomMac) {
+        if (CompareMac(item.peerBssid, randomMacInfo.peerBssid) && item.ssid == randomMacInfo.ssid) {
+            randomMacInfo.randomMac = item.randomMac;
+            return true;
+        }
+    }
+    return false;
+}
+
 bool WifiSettings::RemoveRandomMac(const std::string &bssid, const std::string &randomMac)
 {
     std::unique_lock<std::mutex> lock(mStaMutex);
-
-    for(auto it = mWifiStoreRandomMac.begin(); it != mWifiStoreRandomMac.end(); it++) {
-        if(CompareMac(it->peerBssid, bssid) && it->randomMac == randomMac) {
+    for (auto it = mWifiStoreRandomMac.begin(); it != mWifiStoreRandomMac.end(); it++) {
+        if (CompareMac(it->peerBssid, bssid) && it->randomMac == randomMac) {
             mWifiStoreRandomMac.erase(it);
-
             mSavedWifiStoreRandomMac.SetValue(mWifiStoreRandomMac);
             mSavedWifiStoreRandomMac.SaveConfig();
             return true;
         }
     }
-
     return false;
 }
 

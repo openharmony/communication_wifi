@@ -483,7 +483,7 @@ void WifiDeviceStub::OnRegisterCallBack(uint32_t code, IpcIo *req, IpcIo *reply)
         return;
     }
 
-    callback_ = std::make_shared<WifiDeviceCallBackProxy>(&sid);
+    std::shared_ptr<IWifiDeviceCallBack> callback_ = std::make_shared<WifiDeviceCallBackProxy>(&sid);
     WIFI_LOGD("create new WifiDeviceCallbackProxy!");
     ret = RegisterCallBack(callback_);
 

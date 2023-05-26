@@ -32,8 +32,6 @@ public:
 
     bool IsSingleCallback() const;
     void SetSingleCallback(const bool isSingleCallback);
-protected:
-    sptr<IWifiScanCallback> GetCallback() const;
 
 private:
     int OnSetScanControlInfo(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
@@ -44,9 +42,7 @@ private:
     int OnRegisterCallBack(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
     int OnGetSupportedFeatures(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
 
-    sptr<IWifiScanCallback> callback_;
     sptr<IRemoteObject::DeathRecipient> deathRecipient_;
-
     bool mSingleCallback;
 };
 }  // namespace Wifi

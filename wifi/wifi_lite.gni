@@ -26,5 +26,4 @@ declare_args() {
   wifi_feature_with_auth_disable = false
   wifi_feature_with_dhcp_disable = false
   wifi_feature_is_hdi_supported = false
-  wifi_feature_with_sched_scan_control_enable = false
 }

@@ -867,6 +867,8 @@ static int SetWifiConfigValueSecond(WifiConfig &item, const std::string &key, co
         item.preLoadP2p = (std::stoi(value) != 0); /* 0 -> false 1 -> true */
     } else if (key == "preLoadAware") {
         item.preLoadAware = (std::stoi(value) != 0); /* 0 -> false 1 -> true */
+    } else if (key == "preLoadEnhance") {
+        item.preLoadEnhance = (std::stoi(value) != 0); /* 0 -> false 1 -> true */
     } else if (key == "supportHwPnoFlag") {
         item.supportHwPnoFlag = std::stoi(value);
     } else if (key == "minRssi2Dot4Ghz") {

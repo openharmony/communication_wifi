@@ -424,6 +424,14 @@ public:
     bool AddRandomMac(WifiStoreRandomMac &randomMacInfo);
 
     /**
+     * @Description Get random mac address
+     *
+     * @param randomMacInfo - randmon mac address info
+     * @return int - 0 success
+     */
+    bool GetRandomMac(WifiStoreRandomMac &randomMacInfo);
+
+    /**
      * @Description remove random mac address
      *
      * @param bssid - bssid string

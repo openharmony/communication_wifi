@@ -179,11 +179,6 @@ if (defined(ohos_lite)) {
       "AP_NUM=$wifi_feature_with_ap_num",
     ]
 
-    if (wifi_feature_is_hdi_supported) {
-      defines += [ "HDI_INTERFACE_SUPPORT" ]
-      external_deps += [ "drivers_interface_wlan:libwlan_proxy_1.1" ]
-    }
-
     if (wifi_feature_is_random_mac_supported) {
       defines += [ "RANDOM_MAC_SUPPORT" ]
     }

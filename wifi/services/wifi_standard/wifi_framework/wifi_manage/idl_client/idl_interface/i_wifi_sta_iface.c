@@ -26,7 +26,7 @@
 
 #undef LOG_TAG
 #define LOG_TAG "WifiIdlStaIface"
-#define EVENT_MAX_NUM 8
+#define EVENT_MAX_NUM 11
 
 static IWifiEventCallback g_wifiStaEventCallback = {0};
 void SetWifiEventCallback(IWifiEventCallback callback)

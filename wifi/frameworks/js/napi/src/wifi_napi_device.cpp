@@ -835,6 +835,7 @@ static void LinkedInfoToJs(const napi_env& env, WifiLinkedInfo& linkedInfo, napi
     SetValueInt32(env, "rxLinkSpeed", static_cast<int>(linkedInfo.rxLinkSpeed), result);
     SetValueInt32(env, "linkSpeed", static_cast<int>(linkedInfo.txLinkSpeed), result);
     SetValueInt32(env, "channelWidth", static_cast<int>(linkedInfo.channelWidth), result);
+    SetValueInt32(env, "detailedState", static_cast<int>(linkedInfo.detailedState), result);
 }
 
 /* This interface has not been fully implemented */

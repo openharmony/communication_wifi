@@ -142,6 +142,7 @@ struct WifiLinkedInfo {
     int lastPacketDirection;
     int lastRxPackets;
     int lastTxPackets;
+    int retryedConnCount;
     WifiLinkedInfo()
     {
         networkId = INVALID_NETWORK_ID;
@@ -167,6 +168,7 @@ struct WifiLinkedInfo {
         lastPacketDirection = 0;
         lastRxPackets = 0;
         lastTxPackets = 0;
+        retryedConnCount = 0;
     }
 };
 
@@ -423,6 +425,7 @@ struct WifiDeviceConfig {
     time_t lastConnectTime;
     int numRebootsSinceLastUse;
     int numAssociation;
+    int connFailedCount;
     /* save select mac address */
     std::string userSelectBssid;
     WifiIpConfig wifiIpConfig;

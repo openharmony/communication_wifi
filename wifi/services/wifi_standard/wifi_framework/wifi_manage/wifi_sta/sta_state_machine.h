@@ -648,6 +648,11 @@ private:
      */
     void DealWpaLinkFailEvent(InternalMessage *msg);
     /**
+     * @Description  try to connect the saved network for three times
+     *@Return true: try to reconnect  fail: try max
+     */
+    bool DealReconnectSavedNetwork();
+    /**
      * @Description  Wps mode is ON
      *
      * @param msg - Message body received by the state machine[in]

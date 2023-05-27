@@ -45,6 +45,7 @@ ErrCode StaSavedDeviceAppraisal::DeviceAppraisals(
 {
     WIFI_LOGI("Enter StaSavedDeviceAppraisal::DeviceAppraisals.\n");
     int highestScore = 0;
+    int lowestPriority = 1;
     int sign = 0;
     InterScanInfo scanInfoElected;
     scanInfoElected.rssi = VALUE_LIMIT_MIN_RSSI;
@@ -66,7 +67,21 @@ ErrCode StaSavedDeviceAppraisal::DeviceAppraisals(
         WIFI_LOGI("The device networkId:%{public}d ssid:%{public}s score:%{public}d rssi:%{public}d.",
             device.networkId, SsidAnonymize(scanInfo.ssid).c_str(), score, scanInfo.rssi);
 
-        if (score > highestScore || (score == highestScore && scanInfo.rssi > scanInfoElected.rssi)) {
+        bool higherPriority = score > highestScore || 
+            (score == highestScore && scanInfo.rssi > scanInfoElected.rssi);
+        if (lowestPriority == 0) {
+            if (device.connFailedCount >= MAX_RETRY_COUNT) {
+                higherPriority = false;
+            }
+        } else {
+            if (device.connFailedCount < MAX_RETRY_COUNT) {
+                higherPriority = true;
+            }
+        }
+        if (device.connFailedCount < MAX_RETRY_COUNT) {
+            lowestPriority = 0;
+        }
+        if (higherPriority) {
             highestScore = score;
             scanInfoElected.rssi = scanInfo.rssi;
             electedDevice = device;

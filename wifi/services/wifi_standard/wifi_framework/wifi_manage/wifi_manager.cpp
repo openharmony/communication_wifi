@@ -311,7 +311,7 @@ void WifiManager::Exit()
         UnRegisterScreenEvent();
     }
     if (lpScreenTimer_ != nullptr) {
-        lpScreenTimer_->Shutdown(false);
+        lpScreenTimer_->Shutdown(true);
         lpScreenTimer_ = nullptr;
     }
 #endif

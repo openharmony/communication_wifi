@@ -13,8 +13,11 @@
 
 if (defined(ohos_lite)) {
   import("//build/lite/config/component/lite_component.gni")
+  import("//third_party/wpa_supplicant/wpa_supplicant-2.9_standard/wpa.gni")
 } else {
   import("//build/ohos.gni")
+  import("//foundation/communication/wifi/wifi/wifi.gni")
+  import("//third_party/wpa_supplicant/wpa_supplicant-2.9_standard/wpa.gni")
 }
 
 group("etc") {
@@ -30,7 +33,11 @@ group("etc") {
 
 if (defined(ohos_lite)) {
   copy("wpa_supplicant.conf") {
-    sources = [ "wpa_supplicant.conf" ]
+    if ("${CONFIG_CTRL_IFACE}" == "unix") {
+      sources = [ "unix_socket/wpa_supplicant.conf" ]
+    } else {
+      sources = [ "udp_socket/wpa_supplicant.conf" ]
+    }
     outputs = [ "$root_out_dir/system/etc/wifi/wpa_supplicant.conf" ]
   }
 } else {
@@ -42,7 +49,11 @@ if (defined(ohos_lite)) {
   }
 
   ohos_prebuilt_etc("wpa_supplicant.conf") {
-    source = "wpa_supplicant.conf"
+    if ("${CONFIG_CTRL_IFACE}" == "unix") {
+      source = "unix_socket/wpa_supplicant.conf"
+    } else {
+      source = "udp_socket/wpa_supplicant.conf"
+    }
     relative_install_dir = "wifi"
     part_name = "wifi"
     subsystem_name = "communication"
@@ -50,8 +61,10 @@ if (defined(ohos_lite)) {
 
   ohos_prebuilt_etc("hostapd.conf") {
     source = "hostapd.conf"
-    if (product_name == "rk3568") {
-      source = "default_conf/hostapd.conf"
+    if ("${CONFIG_CTRL_IFACE}" == "unix") {
+      source = "default_conf/unix_socket/hostapd.conf"
+    } else {
+      source = "default_conf/udp_socket/hostapd.conf"
     }
     relative_install_dir = "wifi"
     part_name = "wifi"
@@ -59,7 +72,11 @@ if (defined(ohos_lite)) {
   }
 
   ohos_prebuilt_etc("p2p_supplicant.conf") {
-    source = "p2p_supplicant.conf"
+    if ("${CONFIG_CTRL_IFACE}" == "unix") {
+      source = "unix_socket/p2p_supplicant.conf"
+    } else {
+      source = "udp_socket/p2p_supplicant.conf"
+    }
     relative_install_dir = "wifi"
     part_name = "wifi"
     subsystem_name = "communication"

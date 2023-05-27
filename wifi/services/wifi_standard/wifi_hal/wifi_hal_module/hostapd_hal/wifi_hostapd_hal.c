@@ -52,6 +52,8 @@ WifiHostapdHalDeviceInfo g_hostapdHalDevInfo[] = {
 #define WIFI_DEFAULT_CFG "hostapd.conf"
 #define HOSTAPD_DEFAULT_CFG CONFIG_ROOR_DIR"/wpa_supplicant/"WIFI_DEFAULT_CFG
 #define HOSTAPD_DEFAULT_UDPPORT "127.0.0.1:9877"
+#define HOSTAPD_CTRL_INTERFACE CONFIG_ROOR_DIR"/sockets/wpa/wlan0"
+
 WifiHostapdHalDeviceInfo g_hostapdHalDevInfo[] = {
     {AP_2G_MAIN_INSTANCE, NULL, WIFI_DEFAULT_CFG, HOSTAPD_DEFAULT_CFG, HOSTAPD_DEFAULT_UDPPORT}
 };
@@ -215,6 +217,11 @@ void GetDestPort(char *destPort, size_t len, int id)
     strcpy_s(destPort, len, g_hostapdHalDevInfo[id].udpPort);
 }
 
+void GetCtrlInterface(char *ctrl_path, size_t len, int id)
+{
+    strcpy_s(ctrl_path, len, HOSTAPD_CTRL_INTERFACE);
+}
+
 static int HostapdCliConnect(int id)
 {
     if (g_hostapdHalDevInfo[id].hostapdHalDev == NULL) {
@@ -226,8 +233,12 @@ static int HostapdCliConnect(int id)
         return 0;
     }
     int retryCount = 20;
-    char ifname[BUFFER_SIZE_64] = {0};
+    char ifname[BUFFER_SIZE_128] = {0};
+#ifdef WPA_CTRL_IFACE_UNIX
+    GetCtrlInterface(ifname, sizeof(ifname), id);
+#else
     GetDestPort(ifname, sizeof(ifname), id);
+#endif
     while (retryCount-- > 0) {
         int ret = InitHostapdCtrl(ifname, id);
         if (ret == 0) {

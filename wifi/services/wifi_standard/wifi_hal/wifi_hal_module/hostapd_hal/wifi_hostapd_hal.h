@@ -35,6 +35,7 @@ extern "C" {
 #define FAIL_LENGTH 4
 #define UNKNOWN_COMMAND_LENGTH 15
 #define REQUEST_FAILED (-2)
+#define BUFFER_SIZE_128 128
 #define BUFFER_SIZE_64 64
 #define BUFFER_SIZE_32 32
 #define BUFFER_SIZE_16 16

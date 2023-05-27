@@ -110,7 +110,11 @@ int InitWpaCtrl(WpaCtrl *pCtrl, const char *ifname)
     }
     int flag = 0;
     do {
+#ifdef WPA_CTRL_IFACE_UNIX
+        pCtrl->pRecv = wpa_ctrl_open(ifname);
+#else
         pCtrl->pRecv = wpa_ctrl_open("global");
+#endif
         if (pCtrl->pRecv == NULL) {
             LOGE("open wpa control recv interface failed!");
             break;
@@ -119,7 +123,11 @@ int InitWpaCtrl(WpaCtrl *pCtrl, const char *ifname)
             LOGE("attach monitor interface failed!");
             break;
         }
+#ifdef WPA_CTRL_IFACE_UNIX
+        pCtrl->pSend = wpa_ctrl_open(ifname);
+#else
         pCtrl->pSend = wpa_ctrl_open("global");
+#endif
         if (pCtrl->pSend == NULL) {
             LOGE("open wpa control send interface failed!");
             break;

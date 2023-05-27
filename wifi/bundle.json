@@ -65,30 +65,35 @@
         "ram": "",
         "deps": {
             "components": [
-                "ipc",
-                "ces_standard",
-                "hiviewdfx_hilog_native",
-                "hisysevent_native",
                 "ability_base",
                 "ability_runtime",
                 "bundle_framework",
                 "c_utils",
                 "access_token",
-                "comment_event_service",
+                "ces_standard",
+                "common_event_service",
                 "dhcp",
                 "drivers_interface_wlan",
+                "efficiency_manager",
                 "eventhandler",
-                "napi",
+                "hiviewdfx_hilog_native",
+                "hisysevent_native",
+                "hicollie_native",
+                "ipc",
+                "netmanager_base",
+                "certificate_manager",
+                "samgr",
+                "huks",
                 "safwk",
-                "netmanager_base"
+                "napi"
             ],
             "third_party": [
                 "wpa_supplicant",
                 "node",
                 "bounds_checking_function",
                 "googletest",
-                "wpa_supplicant-2.9",
-                "openssl"
+                "openssl",
+                "wpa_supplicant-2.9"
             ]
         },
         "build": {

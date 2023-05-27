@@ -138,9 +138,12 @@ ohos_shared_library("WifiHalVendorTest") {
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_hal",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_hal/common",
   ]
-  deps = [ "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog" ]
+  deps = []
 
-  external_deps = [ "c_utils:utils" ]
+  external_deps = [
+    "c_utils:utils",
+    "hiviewdfx_hilog_native:libhilog",
+  ]
 
   part_name = "wifi"
   subsystem_name = "communication"

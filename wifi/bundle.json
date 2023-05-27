@@ -69,6 +69,17 @@
                 "ces_standard",
                 "hiviewdfx_hilog_native",
                 "hisysevent_native",
+                "ability_base",
+                "ability_runtime",
+                "bundle_framework",
+                "c_utils",
+                "access_token",
+                "comment_event_service",
+                "dhcp",
+                "drivers_interface_wlan",
+                "eventhandler",
+                "napi",
+                "safwk",
                 "netmanager_base"
             ],
             "third_party": [
@@ -76,6 +87,7 @@
                 "node",
                 "bounds_checking_function",
                 "googletest",
+                "wpa_supplicant-2.9",
                 "openssl"
             ]
         },

@@ -17,6 +17,7 @@ if (defined(ohos_lite)) {
 } else {
   import("//build/ohos.gni")
   import("//foundation/communication/wifi/wifi/wifi.gni")
+  import("//third_party/wpa_supplicant/wpa_supplicant-2.9_standard/wpa.gni")
 }
 
 local_base_sources = [
@@ -126,6 +127,10 @@ if (defined(ohos_lite)) {
 
     if (product_name == "rk3568") {
       defines += [ "NON_SEPERATE_P2P" ]
+    }
+
+    if ("${CONFIG_CTRL_IFACE}" == "unix") {
+      defines += [ "WPA_CTRL_IFACE_UNIX" ]
     }
 
     cflags_cc = [ "-fno-rtti" ]

@@ -45,27 +45,23 @@ WifiHotspotImpl::~WifiHotspotImpl()
 bool WifiHotspotImpl::Init(int id)
 {
     instId = id;
-    WifiSaLoadManager::GetInstance().LoadWifiSa(systemAbilityId_);
     return GetWifiHotspotProxy();
 }
 
 bool WifiHotspotImpl::GetWifiHotspotProxy(void)
 {
+    WifiSaLoadManager::GetInstance().LoadWifiSa(systemAbilityId_);
+
     if (IsRemoteDied() == false) {
         return true;
     }
 
-    WIFI_LOGI("GetWifiHotspotProxy, get new sa from remote!");
     sptr<ISystemAbilityManager> sa_mgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (sa_mgr == nullptr) {
         WIFI_LOGE("failed to get SystemAbilityManager");
         return false;
     }
-    auto objectSA = sa_mgr->CheckSystemAbility(systemAbilityId_);
-    if (objectSA == nullptr) {
-        WIFI_LOGI("GetWifiHotspotProxy, load sa from remote again!");
-        WifiSaLoadManager::GetInstance().LoadWifiSa(systemAbilityId_);
-    }
+
     sptr<IRemoteObject> object = sa_mgr->GetSystemAbility(systemAbilityId_);
     if (object == nullptr) {
         WIFI_LOGE("failed to get hotspot mgr");

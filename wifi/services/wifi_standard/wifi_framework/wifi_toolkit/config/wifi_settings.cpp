@@ -278,7 +278,6 @@ int WifiSettings::RemoveDevice(int networkId)
                 LOGD("uninstall cert %{public}s success", iter->second.wifiEapConfig.clientCert.c_str());
             }
         }
-        RemoveRandomMac(iter->second.bssid, iter->second.macAddress);
         mWifiDeviceConfig.erase(iter);
     }
     return 0;

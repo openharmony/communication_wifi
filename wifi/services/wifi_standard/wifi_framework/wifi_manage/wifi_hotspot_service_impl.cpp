@@ -385,6 +385,8 @@ ErrCode WifiHotspotServiceImpl::EnableHotspot(const ServiceType type)
     if (errCode != WIFI_OPT_SUCCESS) {
         WifiConfigCenter::GetInstance().SetApMidState(WifiOprMidState::OPENING, WifiOprMidState::CLOSED, m_id);
         WifiServiceManager::GetInstance().UnloadService(WIFI_SERVICE_AP, m_id);
+    } else {
+        WifiManager::GetInstance().ShutdownUnloadApSaTimer();
     }
     return errCode;
 }

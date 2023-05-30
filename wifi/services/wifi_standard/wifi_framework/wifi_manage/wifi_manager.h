@@ -115,6 +115,7 @@ public:
      */
     IScanSerivceCallbacks GetScanCallback(void);
 
+    void ShutdownUnloadStaSaTimer(void);
 #ifdef FEATURE_AP_SUPPORT
     /**
      * @Description Get the ap callback object.
@@ -122,6 +123,8 @@ public:
      * @return IApServiceCallbacks - return mApCallback
      */
     IApServiceCallbacks GetApCallback(void);
+
+    void ShutdownUnloadApSaTimer(void);
 #endif
 
 #ifdef FEATURE_P2P_SUPPORT
@@ -131,6 +134,8 @@ public:
      * @return IP2pServiceCallbacks - return mP2pCallback
      */
     IP2pServiceCallbacks GetP2pCallback(void);
+
+    void ShutdownUnloadP2PSaTimer(void);
 #endif
 
     /**
@@ -165,12 +170,15 @@ private:
     InitStatus GetInitStatus();
     static void DealCloseServiceMsg(WifiManager &manager);
     static void CloseStaService(void);
+    static void UnloadStaSaTimerCallback();
 #ifdef FEATURE_AP_SUPPORT
     static void CloseApService(int id = 0);
+    static void UnloadHotspotSaTimerCallback();
 #endif
     static void CloseScanService(void);
 #ifdef FEATURE_P2P_SUPPORT
     static void CloseP2pService(void);
+    static void UnloadP2PSaTimerCallback();
 #endif
     static void DealStaOpenRes(OperateResState state);
     static void DealStaCloseRes(OperateResState state);
@@ -218,12 +226,24 @@ private:
     std::deque<WifiCloseServiceCode> mEventQue;
     StaServiceCallback mStaCallback;
     IScanSerivceCallbacks mScanCallback;
+#ifndef OHOS_ARCH_LITE
+    static std::unique_ptr<Utils::Timer> lpUnloadStaSaTimer;
+    static std::mutex unloadStaSaTimerMutex;
+#endif
 #ifdef FEATURE_AP_SUPPORT
     IApServiceCallbacks mApCallback;
+#ifndef OHOS_ARCH_LITE
+    static std::unique_ptr<Utils::Timer> lpUnloadHotspotSaTimer;
+    static std::mutex unloadHotspotSaTimerMutex;
+#endif
 #endif
 #ifdef FEATURE_P2P_SUPPORT
     IP2pServiceCallbacks mP2pCallback;
     static WifiCfgMonitorEventCallback cfgMonitorCallback;
+#ifndef OHOS_ARCH_LITE
+    static std::unique_ptr<Utils::Timer> lpUnloadP2PSaTimer;
+    static std::mutex unloadP2PSaTimerMutex;
+#endif
 #endif
 #ifndef OHOS_ARCH_LITE
     void RegisterScreenEvent();

@@ -157,6 +157,8 @@ ErrCode WifiP2pServiceImpl::EnableP2p(void)
     if (ret != WIFI_OPT_SUCCESS) {
         WifiConfigCenter::GetInstance().SetP2pMidState(WifiOprMidState::OPENING, WifiOprMidState::CLOSED);
         WifiServiceManager::GetInstance().UnloadService(WIFI_SERVICE_P2P);
+    } else {
+        WifiManager::GetInstance().ShutdownUnloadP2PSaTimer();
     }
     return ret;
 }

@@ -42,6 +42,8 @@ DEFINE_WIFILOG_LABEL("WifiManager");
 int WifiManager::mCloseApIndex = 0;
 #ifndef OHOS_ARCH_LITE
 const uint32_t TIMEOUT_SCREEN_EVENT = 3000;
+const uint32_t TIMEOUT_UNLOAD_WIFI_SA = 5 * 60 * 1000;
+using TimeOutCallback = std::function<void()>;
 #endif
 
 WifiManager &WifiManager::GetInstance()
@@ -254,7 +256,6 @@ int WifiManager::Init()
 #ifndef OHOS_ARCH_LITE
     if (screenEventSubscriber_ == nullptr) {
         lpScreenTimer_ = std::make_unique<Utils::Timer>("WifiManager");
-        using TimeOutCallback = std::function<void()>;
         TimeOutCallback timeoutCallback = std::bind(&WifiManager::RegisterScreenEvent, this);
         if (lpScreenTimer_ != nullptr) {
             lpScreenTimer_->Setup();
@@ -352,6 +353,32 @@ InitStatus WifiManager::GetInitStatus()
     return mInitStatus;
 }
 
+#ifndef OHOS_ARCH_LITE
+std::unique_ptr<Utils::Timer> WifiManager::lpUnloadStaSaTimer = nullptr;
+std::mutex WifiManager::unloadStaSaTimerMutex{};
+void WifiManager::UnloadStaSaTimerCallback()
+{
+    WifiSaLoadManager::GetInstance().UnloadWifiSa(WIFI_DEVICE_ABILITY_ID);
+    WifiSaLoadManager::GetInstance().UnloadWifiSa(WIFI_SCAN_ABILITY_ID);
+    WifiSaLoadManager::GetInstance().UnloadWifiSa(WIFI_P2P_ABILITY_ID);
+    if (static_cast<int>(ApState::AP_STATE_CLOSED) == WifiConfigCenter::GetInstance().GetHotspotState(0)) {
+        WifiSaLoadManager::GetInstance().UnloadWifiSa(WIFI_HOTSPOT_ABILITY_ID);
+    }
+    WifiManager::GetInstance().ShutdownUnloadStaSaTimer();
+}
+
+void WifiManager::ShutdownUnloadStaSaTimer(void)
+{
+    std::unique_lock<std::mutex> lock(unloadStaSaTimerMutex);
+    if (lpUnloadStaSaTimer != nullptr) {
+        lpUnloadStaSaTimer->Shutdown(true);
+        lpUnloadStaSaTimer = nullptr;
+        WIFI_LOGI("ShutdownUnloadStaSaTimer success!");
+    }
+    return;
+}
+#endif
+
 void WifiManager::CloseStaService(void)
 {
     WIFI_LOGI("close sta service");
@@ -363,17 +390,42 @@ void WifiManager::CloseStaService(void)
     cbMsg.msgData = static_cast<int>(WifiState::DISABLED);
     WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
     #ifndef OHOS_ARCH_LITE
-    WifiSaLoadManager::GetInstance().UnloadWifiSa(WIFI_DEVICE_ABILITY_ID);
-    WifiSaLoadManager::GetInstance().UnloadWifiSa(WIFI_SCAN_ABILITY_ID);
-    WifiSaLoadManager::GetInstance().UnloadWifiSa(WIFI_P2P_ABILITY_ID);
-    if (static_cast<int>(ApState::AP_STATE_CLOSED) == WifiConfigCenter::GetInstance().GetHotspotState(0)) {
-        WifiSaLoadManager::GetInstance().UnloadWifiSa(WIFI_HOTSPOT_ABILITY_ID);
+    std::unique_lock<std::mutex> lock(unloadStaSaTimerMutex);
+    if (lpUnloadStaSaTimer == nullptr) {
+        lpUnloadStaSaTimer = std::make_unique<Utils::Timer>("WifiManager");
+        TimeOutCallback timeoutCallback = std::bind(WifiManager::UnloadStaSaTimerCallback);
+        if (lpUnloadStaSaTimer != nullptr) {
+            lpUnloadStaSaTimer->Setup();
+            lpUnloadStaSaTimer->Register(timeoutCallback, TIMEOUT_UNLOAD_WIFI_SA, true);
+        }
     }
     #endif
     return;
 }
 
 #ifdef FEATURE_AP_SUPPORT
+
+#ifndef OHOS_ARCH_LITE
+std::unique_ptr<Utils::Timer> WifiManager::lpUnloadHotspotSaTimer = nullptr;
+std::mutex WifiManager::unloadHotspotSaTimerMutex{};
+void WifiManager::UnloadHotspotSaTimerCallback()
+{
+    WifiSaLoadManager::GetInstance().UnloadWifiSa(WIFI_HOTSPOT_ABILITY_ID);
+    WifiManager::GetInstance().ShutdownUnloadApSaTimer();
+}
+
+void WifiManager::ShutdownUnloadApSaTimer(void)
+{
+    std::unique_lock<std::mutex> lock(unloadHotspotSaTimerMutex);
+    if (lpUnloadHotspotSaTimer != nullptr) {
+        lpUnloadHotspotSaTimer->Shutdown(true);
+        lpUnloadHotspotSaTimer = nullptr;
+        WIFI_LOGI("ShutdownUnloadApSaTimer success!");
+    }
+    return;
+}
+#endif
+
 void WifiManager::CloseApService(int id)
 {
     WIFI_LOGI("close %{public}d ap service", id);
@@ -386,7 +438,15 @@ void WifiManager::CloseApService(int id)
     cbMsg.id = id;
     WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
     #ifndef OHOS_ARCH_LITE
-    WifiSaLoadManager::GetInstance().UnloadWifiSa(WIFI_HOTSPOT_ABILITY_ID);
+    std::unique_lock<std::mutex> lock(unloadHotspotSaTimerMutex);
+    if (lpUnloadHotspotSaTimer == nullptr) {
+        lpUnloadHotspotSaTimer = std::make_unique<Utils::Timer>("WifiManager");
+        TimeOutCallback timeoutCallback = std::bind(WifiManager::UnloadHotspotSaTimerCallback);
+        if (lpUnloadHotspotSaTimer != nullptr) {
+            lpUnloadHotspotSaTimer->Setup();
+            lpUnloadHotspotSaTimer->Register(timeoutCallback, TIMEOUT_UNLOAD_WIFI_SA, true);
+        }
+    }
     #endif
     return;
 }
@@ -401,6 +461,28 @@ void WifiManager::CloseScanService(void)
 }
 
 #ifdef FEATURE_P2P_SUPPORT
+
+#ifndef OHOS_ARCH_LITE
+std::unique_ptr<Utils::Timer> WifiManager::lpUnloadP2PSaTimer = nullptr;
+std::mutex WifiManager::unloadP2PSaTimerMutex{};
+void WifiManager::UnloadP2PSaTimerCallback()
+{
+    WifiSaLoadManager::GetInstance().UnloadWifiSa(WIFI_P2P_ABILITY_ID);
+    WifiManager::GetInstance().ShutdownUnloadP2PSaTimer();
+}
+
+void WifiManager::ShutdownUnloadP2PSaTimer(void)
+{
+    std::unique_lock<std::mutex> lock(unloadP2PSaTimerMutex);
+    if (lpUnloadP2PSaTimer != nullptr) {
+        lpUnloadP2PSaTimer->Shutdown(true);
+        lpUnloadP2PSaTimer = nullptr;
+        WIFI_LOGI("ShutdownUnloadP2PSaTimer success!");
+    }
+    return;
+}
+#endif
+
 void WifiManager::CloseP2pService(void)
 {
     WIFI_LOGD("close p2p service");
@@ -412,7 +494,15 @@ void WifiManager::CloseP2pService(void)
     cbMsg.msgData = static_cast<int>(P2pState::P2P_STATE_CLOSED);
     WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
     #ifndef OHOS_ARCH_LITE
-    WifiSaLoadManager::GetInstance().UnloadWifiSa(WIFI_P2P_ABILITY_ID);
+    std::unique_lock<std::mutex> lock(unloadP2PSaTimerMutex);
+    if (lpUnloadP2PSaTimer == nullptr) {
+        lpUnloadP2PSaTimer = std::make_unique<Utils::Timer>("WifiManager");
+        TimeOutCallback timeoutCallback = std::bind(WifiManager::UnloadP2PSaTimerCallback);
+        if (lpUnloadP2PSaTimer != nullptr) {
+            lpUnloadP2PSaTimer->Setup();
+            lpUnloadP2PSaTimer->Register(timeoutCallback, TIMEOUT_UNLOAD_WIFI_SA, true);
+        }
+    }
     #endif
     return;
 }

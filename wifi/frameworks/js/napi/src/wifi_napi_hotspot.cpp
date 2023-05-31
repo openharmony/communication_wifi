@@ -96,7 +96,7 @@ static bool IsSecTypeSupported(int secType)
     return g_mapSecTypeToKeyMgmt.find(SecTypeJs(secType)) != g_mapSecTypeToKeyMgmt.end();
 }
 
-static void ClearJsLastException()
+static void ClearJsLastException(const napi_env& env)
 {
     bool isPendingException = false;
     napi_is_exception_pending(env, &isPendingException);

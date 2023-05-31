@@ -152,6 +152,12 @@ public:
 
 #ifdef FEATURE_AP_SUPPORT
     /**
+     * @Description set hotspots config
+     *
+     * @return true false
+     */
+    bool ApServiceSetHotspotConfig(const HotspotConfig &config, int id);
+    /**
      * @Description Get the Ap Service Inst object
      *
      * @return IApService* - ap service pointer, if ap not supported, nullptr is returned

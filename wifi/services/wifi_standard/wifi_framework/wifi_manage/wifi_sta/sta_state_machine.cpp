@@ -13,8 +13,10 @@
  * limitations under the License.
  */
 
-#include "sta_state_machine.h"
 #include <cstdio>
+#include <chrono>
+#include <random>
+#include "sta_state_machine.h"
 #include "if_config.h"
 #include "ip_tools.h"
 #include "log_helper.h"
@@ -1294,17 +1296,15 @@ void StaStateMachine::MacAddressGenerate(WifiStoreRandomMac &randomMacInfo)
     constexpr int octBase = 8;
     int ret = 0;
     char strMacTmp[arraySize] = {0};
-    unsigned int seed = static_cast<unsigned int>(time(nullptr));
-    seed += static_cast<unsigned int>(std::hash<std::string>{}(randomMacInfo.peerBssid));
-    seed += static_cast<unsigned int>(std::hash<std::string>{}(randomMacInfo.preSharedKey));
-    seed += (uint64_t)randomMacInfo.peerBssid.c_str();
-    seed += (uint64_t)randomMacInfo.preSharedKey.c_str();
-    srand(seed);
+    std::mt19937_64 gen(std::chrono::high_resolution_clock::now().time_since_epoch().count()
+        + std::hash<std::string>{}(randomMacInfo.peerBssid) + std::hash<std::string>{}(randomMacInfo.preSharedKey));
     for (int i = 0; i < macBitSize; i++) {
         if (i != firstBit) {
-            ret = sprintf_s(strMacTmp, arraySize, "%x", rand() % hexBase);
+            std::uniform_int_distribution<> distribution(0, hexBase - 1);
+            ret = sprintf_s(strMacTmp, arraySize, "%x", distribution(gen));
         } else {
-            ret = sprintf_s(strMacTmp, arraySize, "%x", two * (rand() % octBase));
+            std::uniform_int_distribution<> distribution(0, octBase - 1);
+            ret = sprintf_s(strMacTmp, arraySize, "%x", two * distribution(gen));
         }
         if (ret == -1) {
             LOGE("StaStateMachine::MacAddressGenerate failed, sprintf_s return -1!\n");

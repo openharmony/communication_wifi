@@ -157,6 +157,7 @@ bool WifiConfigCenter::IsLoadStabak()
 
 WifiOprMidState WifiConfigCenter::GetApMidState(int id)
 {
+    std::unique_lock<std::mutex> lock(mApMutex);
     auto iter = mApMidState.find(id);
     if (iter != mApMidState.end()) {
         return iter->second.load();
@@ -168,6 +169,7 @@ WifiOprMidState WifiConfigCenter::GetApMidState(int id)
 
 bool WifiConfigCenter::SetApMidState(WifiOprMidState expState, WifiOprMidState state, int id)
 {
+    std::unique_lock<std::mutex> lock(mApMutex);
     auto iter = mApMidState.find(id);
     if (iter != mApMidState.end()) {
         return iter->second.compare_exchange_strong(expState, state);
@@ -180,6 +182,7 @@ bool WifiConfigCenter::SetApMidState(WifiOprMidState expState, WifiOprMidState s
 
 void WifiConfigCenter::SetApMidState(WifiOprMidState state, int id)
 {
+    std::unique_lock<std::mutex> lock(mApMutex);
     auto ret = mApMidState.emplace(id, state);
     if (!ret.second) {
         mApMidState[id] = state;

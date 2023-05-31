@@ -182,7 +182,6 @@ NO_SANITIZE("cfi") napi_value SetHotspotConfig(napi_env env, napi_callback_info 
 
     ErrCode ret = WIFI_OPT_FAILED;
     HotspotConfig config;
-
     if (GetHotspotconfigFromJs(env, argv[0], config)) {
         ClearJsLastException(env);
         ret = wifiHotspotPtr->SetHotspotConfig(config);

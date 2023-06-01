@@ -276,7 +276,7 @@ ErrCode WifiDeviceServiceImpl::EnableWifi()
 #ifdef FEATURE_P2P_SUPPORT
 #ifndef OHOS_ARCH_LITE
     WifiSaLoadManager::GetInstance().LoadWifiSa(WIFI_P2P_ABILITY_ID);
-    WifiManager::GetInstance().ShutdownUnloadP2PSaTimer();
+    WifiManager::GetInstance().UnRegisterUnloadP2PSaTimer();
 #endif
     sptr<WifiP2pServiceImpl> p2pService = WifiP2pServiceImpl::GetInstance();
     if (p2pService != nullptr && p2pService->EnableP2p() != WIFI_OPT_SUCCESS) {
@@ -286,7 +286,7 @@ ErrCode WifiDeviceServiceImpl::EnableWifi()
 #endif
 
     WifiSettings::GetInstance().SyncWifiConfig();
-    WifiManager::GetInstance().ShutdownUnloadStaSaTimer();
+    WifiManager::GetInstance().UnRegisterUnloadStaSaTimer();
     return WIFI_OPT_SUCCESS;
 }
 

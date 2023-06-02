@@ -653,6 +653,11 @@ private:
      */
     bool DealReconnectSavedNetwork();
     /**
+     * @Description  set sta connect failed count
+     *@Return void
+     */
+    void DealSetStaConnectFailedCount(int count, bool set);
+    /**
      * @Description  Wps mode is ON
      *
      * @param msg - Message body received by the state machine[in]

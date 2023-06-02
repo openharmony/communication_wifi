@@ -216,11 +216,11 @@ void StaAutoConnectService::ConnectElectedDevice(WifiDeviceConfig &electedDevice
         currentConnectedNetwork.detailedState == DetailedState::CONNECTION_TIMEOUT ||
         currentConnectedNetwork.detailedState == DetailedState::FAILED ||
         currentConnectedNetwork.detailedState == DetailedState::PASSWORD_ERROR ||
-        currentConnectedNetwork.detailedState == DetailedState::CONNECTION_FULL
+        currentConnectedNetwork.detailedState == DetailedState::CONNECTION_FULL ||
         currentConnectedNetwork.detailedState == DetailedState::CONNECTION_REJECT) {
         pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_CONNECT_SAVED_NETWORK,
             electedDevice.networkId,
-            NETWORK_SELECTED_FOR_CONNECTION_MANAGEMENT);
+            NETWORK_SELECTED_BY_AUTO);
         WIFI_LOGI("connectTo save networkId: %{public}d, preShareKey len: %{public}d.\n",
             electedDevice.networkId, (int)electedDevice.preSharedKey.length());
     } else {

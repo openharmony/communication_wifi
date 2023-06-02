@@ -478,6 +478,27 @@ int WifiSettings::SetWifiP2pGroupInfo(const std::vector<WifiP2pGroupInfo> &group
     return 0;
 }
 
+int WifiSettings::IncreaseDeviceConnFailedCount(const std::string &index, const int &indexType, int count)
+{
+    std::unique_lock<std::mutex> lock(mConfigMutex);
+    if (indexType == DEVICE_CONFIG_INDEX_SSID) {
+        for (auto iter = mWifiDeviceConfig.begin(); iter != mWifiDeviceConfig.end(); iter++) {
+            if (iter->second.ssid == index) {
+                iter->second.connFailedCount += count;
+                return 0;
+            }
+        }
+    } else {
+        for (auto iter = mWifiDeviceConfig.begin(); iter != mWifiDeviceConfig.end(); iter++) {
+            if (iter->second.bssid == index) {
+                iter->second.connFailedCount += count;
+                return 0;
+            }
+        }
+    }
+    return -1;
+}
+
 int WifiSettings::SetDeviceConnFailedCount(const std::string &index, const int &indexType, int count)
 {
     std::unique_lock<std::mutex> lock(mConfigMutex);

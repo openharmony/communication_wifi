@@ -829,9 +829,8 @@ void StaStateMachine::DealConnectToUserSelectedNetwork(InternalMessage *msg)
     }
 
     int networkId = msg->GetParam1();
-    int connectType = msg->GetParam2();
-
-    if (connectType != NETWORK_SELECTED_BY_RETRY) {
+    int connTriggerMode = msg->GetParam2();
+    if (connTriggerMode != NETWORK_SELECTED_BY_RETRY) {
         linkedInfo.retryedConnCount = 0;
     }
 
@@ -859,7 +858,7 @@ void StaStateMachine::DealConnectToUserSelectedNetwork(InternalMessage *msg)
     }
 
     /* Sets network status. */
-    WifiSettings::GetInstance().EnableNetwork(networkId, connectType == NETWORK_SELECTED_BY_THE_USER);
+    WifiSettings::GetInstance().EnableNetwork(networkId, connTriggerMode == NETWORK_SELECTED_BY_USER);
     WifiSettings::GetInstance().SetDeviceAfterConnect(networkId);
     WifiSettings::GetInstance().SetDeviceState(networkId, (int)WifiDeviceConfigStatus::ENABLED, false);
 }
@@ -875,9 +874,8 @@ void StaStateMachine::DealConnectTimeOutCmd(InternalMessage *msg)
         WIFI_LOGE("Currently connected and do not process timeout.\n");
         return;
     }
-    if (DealReconnectSavedNetwork()) {
-        return;
-    }
+    linkedInfo.retryedConnCount++;
+    DealSetStaConnectFailedCount(1, false);
 
     WifiSettings::GetInstance().SetConnectTimeoutBssid(linkedInfo.bssid);
     InitWifiLinkedInfo();
@@ -985,6 +983,7 @@ void StaStateMachine::DealWpaLinkFailEvent(InternalMessage *msg)
         return;
     }
 
+    DealSetStaConnectFailedCount(1, false);
     if (msg->GetMessageName() != WIFI_SVR_CMD_STA_WPA_PASSWD_WRONG_EVENT &&
         DealReconnectSavedNetwork()) {
         return;
@@ -1013,22 +1012,31 @@ void StaStateMachine::DealWpaLinkFailEvent(InternalMessage *msg)
 
 bool StaStateMachine::DealReconnectSavedNetwork()
 {
-    WifiDeviceConfig config;
-    int ret = WifiSettings::GetInstance().GetDeviceConfig(targetNetworkId, config);
-    if (ret != 0) {
-        WIFI_LOGW("DealConnectTimeOutCmd get device[%{public}d] config failed.\n", targetNetworkId);
-        return false;
-    }
     linkedInfo.retryedConnCount++;
-    WifiSettings::GetInstance().SetDeviceConnFailedCount(config.bssid, DEVICE_CONFIG_INDEX_BSSID,
-        linkedInfo.retryedConnCount);
-    if (linkedInfo.retryedConnCount <= MAX_RETRY_COUNT) {
+    if (linkedInfo.retryedConnCount < MAX_RETRY_COUNT) {
         SendMessage(WIFI_SVR_CMD_STA_CONNECT_SAVED_NETWORK,
             targetNetworkId, NETWORK_SELECTED_BY_RETRY);
         WIFI_LOGW("DealConnectTimeOutCmd retry connect to saved network.\n");
         return true;
     }
     return false;
+}
+
+void StaStateMachine::DealSetStaConnectFailedCount(int count, bool set)
+{
+    WifiDeviceConfig config;
+    int ret = WifiSettings::GetInstance().GetDeviceConfig(targetNetworkId, config);
+    if (ret != 0) {
+        WIFI_LOGW("DealConnectTimeOutCmd get device[%{public}d] config failed.\n", targetNetworkId);
+        return;
+    }
+    if (set) {
+        WifiSettings::GetInstance().SetDeviceConnFailedCount(config.bssid, DEVICE_CONFIG_INDEX_BSSID,
+            count);
+    } else {
+        WifiSettings::GetInstance().IncreaseDeviceConnFailedCount(config.bssid, DEVICE_CONFIG_INDEX_BSSID,
+            count);
+    }
 }
 
 void StaStateMachine::DealReConnectCmd(InternalMessage *msg)
@@ -1044,12 +1052,15 @@ void StaStateMachine::DealReConnectCmd(InternalMessage *msg)
     }
 
     if (WifiStaHalInterface::GetInstance().Reconnect() == WIFI_IDL_OPT_OK) {
+        DealSetStaConnectFailedCount(0, true);
         WIFI_LOGI("StaStateMachine ReConnect successfully!");
         /* Callback result to InterfaceService */
         staCallback.OnStaConnChanged(OperateResState::CONNECT_CONNECTING, linkedInfo);
         StopTimer(static_cast<int>(CMD_NETWORK_CONNECT_TIMEOUT));
         StartTimer(static_cast<int>(CMD_NETWORK_CONNECT_TIMEOUT), STA_NETWORK_CONNECTTING_DELAY);
     } else {
+        linkedInfo.retryedConnCount++;
+        DealSetStaConnectFailedCount(1, false);
         WIFI_LOGE("ReConnect failed!");
     }
 }
@@ -2241,8 +2252,7 @@ void StaStateMachine::DhcpResultNotify::OnSuccess(int status, const std::string 
         /* Delay to wait for the network adapter information to take effect. */
         constexpr int NETCHECK_DELAY_TIME = 2000; // 2000 ms
         pStaStateMachine->StartTimer(static_cast<int>(CMD_START_NETCHECK), NETCHECK_DELAY_TIME);
-        WifiSettings::GetInstance().SetDeviceConnFailedCount(pStaStateMachine->linkedInfo.bssid,
-            DEVICE_CONFIG_INDEX_BSSID, 0);
+        pStaStateMachine->DealSetStaConnectFailedCount(0, true);
     }
     pStaStateMachine->getIpSucNum++;
 

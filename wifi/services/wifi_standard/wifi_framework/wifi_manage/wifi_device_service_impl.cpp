@@ -183,14 +183,14 @@ void WifiDeviceServiceImpl::OnStop()
         UnRegisterAppRemoved();
     }
     if (lpTimer_ != nullptr) {
-        lpTimer_->Shutdown(true);
+        lpTimer_->Shutdown(false);
         lpTimer_ = nullptr;
     }
     if (thermalLevelSubscriber_ != nullptr) {
         UnRegisterThermalLevel();
     }
     if (lpThermalTimer_ != nullptr) {
-        lpThermalTimer_->Shutdown(true);
+        lpThermalTimer_->Shutdown(false);
         lpThermalTimer_ = nullptr;
     }
 #endif

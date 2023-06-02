@@ -58,8 +58,10 @@ private:
      * @param device - Saved device.(in)
      * @param info - Connection information.(in)
      * @param score - score points.(out)
+     * @param flip - flip the score when failed cout > MAX_RETRY_COUNT
      */
-    void AppraiseDeviceQuality(int &score, InterScanInfo &scanInfo, WifiDeviceConfig &device, WifiLinkedInfo &info);
+    void AppraiseDeviceQuality(int &score, InterScanInfo &scanInfo, WifiDeviceConfig &device,
+        WifiLinkedInfo &info, bool flip);
     /**
      * @Description  Signal strength converted to grids.
      *
@@ -77,6 +79,16 @@ private:
      * @Return success: true; failed: false
      */
     bool Whether5GDevice(int frequency);
+    /**
+     * @Description  check select higher priority wifi.
+     *
+     * @param score(int)
+     * @param lastScore(int)
+     * @param rssi(int)
+     * @param selectedRssi(int)
+     * @Return success: true; failed: false
+     */
+    bool CheckHigherPriority(int score, int lastScore, int rssi, int selectedRssi);
 };
 }  // namespace Wifi
 }  // namespace OHOS

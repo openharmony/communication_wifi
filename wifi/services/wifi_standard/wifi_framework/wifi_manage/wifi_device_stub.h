@@ -70,6 +70,7 @@ private:
     void OnRemoveCandidateConfig(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnIsBandTypeSupported(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnGet5GHzChannelList(uint32_t code, MessageParcel &data, MessageParcel &reply);
+    void OnGetDisconnectedReason(uint32_t code, MessageParcel &data, MessageParcel &reply);
 
 private:
     void ReadWifiDeviceConfig(MessageParcel &data, WifiDeviceConfig &config);

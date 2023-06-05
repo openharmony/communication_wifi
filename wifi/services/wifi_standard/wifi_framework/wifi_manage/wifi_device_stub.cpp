@@ -71,6 +71,7 @@ void WifiDeviceStub::InitHandleMap()
     handleFuncMap[WIFI_SVR_CMD_REMOVE_CANDIDATE_CONFIG] = &WifiDeviceStub::OnRemoveCandidateConfig;
     handleFuncMap[WIFI_SVR_CMD_GET_BANDTYPE_SUPPORTED] = &WifiDeviceStub::OnIsBandTypeSupported;
     handleFuncMap[WIFI_SVR_CMD_GET_5G_CHANNELLIST] = &WifiDeviceStub::OnGet5GHzChannelList;
+    handleFuncMap[WIFI_SVR_CMD_GET_DISCONNECTED_REASON] = &WifiDeviceStub::OnGetDisconnectedReason;
     return;
 }
 
@@ -744,6 +745,20 @@ void WifiDeviceStub::OnGet5GHzChannelList(uint32_t code, MessageParcel &data, Me
         for (unsigned int i = 0; i < size; ++i) {
             reply.WriteInt32(channelList[i]);
         }
+    }
+    return;
+}
+
+void WifiDeviceStub::OnGetDisconnectedReason(uint32_t code, MessageParcel &data, MessageParcel &reply)
+{
+    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+    std::vector<int> channelList;
+    DisconnectedReason reason = DisconnectedReason::DISC_REASON_DEFAULT;
+    ErrCode ret = GetDisconnectedReason(reason);
+    reply.WriteInt32(0);
+    reply.WriteInt32(ret);
+    if (ret == WIFI_OPT_SUCCESS) {
+        reply.WriteInt32((int)reason);
     }
     return;
 }

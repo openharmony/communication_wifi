@@ -243,6 +243,14 @@ public:
     ErrCode GetLinkedInfo(WifiLinkedInfo &info) override;
 
     /**
+     * @Description Obtains the disconnected reason
+     *
+     * @param reason - DisconnectedReason object
+     * @return ErrCode - operation result
+     */
+    ErrCode GetDisconnectedReason(DisconnectedReason &reason) override;
+
+    /**
      * @Description Obtaining DHCP Request Information
      *
      * @param info - IpInfo object

@@ -183,6 +183,15 @@ public:
     virtual ErrCode GetLinkedInfo(WifiLinkedInfo &info) = 0;
 
     /**
+     * @Description Obtains the disconnected reason
+     *
+     * @param reason - DisconnectedReason object
+     * @return ErrCode - operation result
+     * @since 10
+     */
+    virtual ErrCode GetDisconnectedReason(DisconnectedReason &reason) = 0;
+
+    /**
      * @Description Set the country code.
      *
      * @param countryCode - country code

@@ -1037,8 +1037,12 @@ ErrCode WifiDeviceServiceImpl::GetLinkedInfo(WifiLinkedInfo &info)
     return WIFI_OPT_SUCCESS;
 }
 
-ErrCode WifiDeviceServiceImpl::GetDisconnectedReason(DisconnectedReason  &reason)
+ErrCode WifiDeviceServiceImpl::GetDisconnectedReason(DisconnectedReason &reason)
 {
+    if (!WifiAuthCenter::IsSystemAppByToken()) {
+        WIFI_LOGE("GetDisconnectedReason:NOT System APP, PERMISSION_DENIED!");
+        return WIFI_OPT_NON_SYSTEMAPP;
+    }
     if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("GetDisconnectedReason:VerifyGetWifiInfoPermission() PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;

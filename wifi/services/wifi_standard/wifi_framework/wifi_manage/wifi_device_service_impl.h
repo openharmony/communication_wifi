@@ -126,6 +126,8 @@ public:
 
     ErrCode GetLinkedInfo(WifiLinkedInfo &info) override;
 
+    ErrCode GetDisconnectedReason(DisconnectedReason &reason) override;
+
     ErrCode GetIpInfo(IpInfo &info) override;
 
     ErrCode SetCountryCode(const std::string &countryCode) override;

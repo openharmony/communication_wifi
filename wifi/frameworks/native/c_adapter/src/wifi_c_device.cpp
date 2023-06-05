@@ -343,6 +343,20 @@ NO_SANITIZE("cfi") WifiErrorCode GetLinkedInfo(WifiLinkedInfo *result)
     return GetCErrorCode(ret);
 }
 
+NO_SANITIZE("cfi") WifiErrorCode GetDisconnectedReason(DisconnectedReason *result)
+{
+    CHECK_PTR_RETURN(wifiDevicePtr, ERROR_WIFI_NOT_AVAILABLE);
+    CHECK_PTR_RETURN(result, ERROR_WIFI_INVALID_ARGS);
+    OHOS::Wifi::DisconnectedReason reason;
+    OHOS::Wifi::ErrCode ret = wifiDevicePtr->GetDisconnectedReason(reason);
+    if (ret == OHOS::Wifi::WIFI_OPT_SUCCESS) {
+        *result = (DisconnectedReason)reason;
+    } else {
+        WIFI_LOGE("GetDisconnectedReason failed:%{public}d", ret);
+    }
+    return GetCErrorCode(ret);
+}
+
 NO_SANITIZE("cfi") WifiErrorCode GetDeviceMacAddress(unsigned char *result)
 {
     CHECK_PTR_RETURN(wifiDevicePtr, ERROR_WIFI_NOT_AVAILABLE);

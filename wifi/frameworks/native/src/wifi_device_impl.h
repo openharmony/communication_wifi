@@ -189,6 +189,14 @@ public:
     ErrCode GetLinkedInfo(WifiLinkedInfo &info) override;
 
     /**
+     * @Description Obtains the disconnected reason information
+     *
+     * @param reason - DisconnectedReason object
+     * @return ErrCode - operation result
+     */
+    ErrCode GetDisconnectedReason(DisconnectedReason &reason) override;
+
+    /**
      * @Description Set the Country Code
      *
      * @param countryCode - country code

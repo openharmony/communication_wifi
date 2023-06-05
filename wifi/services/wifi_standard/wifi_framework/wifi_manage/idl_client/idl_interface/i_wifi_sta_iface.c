@@ -26,7 +26,20 @@
 
 #undef LOG_TAG
 #define LOG_TAG "WifiIdlStaIface"
-#define EVENT_MAX_NUM 11
+
+static int g_staCallbackEvents[] = {
+    WIFI_IDL_CBK_CMD_FAILURE,
+    WIFI_IDL_CBK_CMD_STARTED,
+    WIFI_IDL_CBK_CMD_STOPED,
+    WIFI_IDL_CBK_CMD_CONNECT_CHANGED,
+    WIFI_IDL_CBK_CMD_BSSID_CHANGED,
+    WIFI_IDL_CBK_CMD_WPA_STATE_CHANGEM,
+    WIFI_IDL_CBK_CMD_SSID_WRONG_KEY,
+    WIFI_IDL_CBK_CMD_WPS_OVERLAP,
+    WIFI_IDL_CBK_CMD_WPS_TIME_OUT,
+    WIFI_IDL_CBK_CMD_WPS_CONNECTION_FULL,
+    WIFI_IDL_CBK_CMD_WPS_CONNECTION_REJECT
+};
 
 static IWifiEventCallback g_wifiStaEventCallback = {0};
 void SetWifiEventCallback(IWifiEventCallback callback)
@@ -589,33 +602,9 @@ WifiErrorNo StopPnoScan(void)
     return result;
 }
 
-static int CheckRegisterEvent(int *events, int size)
-{
-    int staEvents[] = {
-        WIFI_IDL_CBK_CMD_FAILURE,
-        WIFI_IDL_CBK_CMD_STARTED,
-        WIFI_IDL_CBK_CMD_STOPED,
-        WIFI_IDL_CBK_CMD_CONNECT_CHANGED,
-        WIFI_IDL_CBK_CMD_BSSID_CHANGED,
-        WIFI_IDL_CBK_CMD_WPA_STATE_CHANGEM,
-        WIFI_IDL_CBK_CMD_SSID_WRONG_KEY,
-        WIFI_IDL_CBK_CMD_WPS_OVERLAP,
-        WIFI_IDL_CBK_CMD_WPS_TIME_OUT,
-        WIFI_IDL_CBK_CMD_WPS_CONNECTION_FULL,
-        WIFI_IDL_CBK_CMD_WPS_CONNECTION_REJECT
-    };
-    int max = sizeof(staEvents) / sizeof(staEvents[0]);
-    int num = 0;
-    for (; num < max && num < size; ++num) {
-        events[num] = staEvents[num];
-    }
-    return num;
-}
-
 WifiErrorNo RegisterStaEventCallback(IWifiEventCallback callback)
 {
-    int events[EVENT_MAX_NUM];
-    int num = CheckRegisterEvent(events, EVENT_MAX_NUM);
+    int num = sizeof(g_staCallbackEvents) / sizeof(g_staCallbackEvents[0]);
     RpcClient *client = GetStaRpcClient();
     LockRpcClient(client);
     Context *context = client->context;
@@ -627,7 +616,7 @@ WifiErrorNo RegisterStaEventCallback(IWifiEventCallback callback)
     }
     WriteInt(context, num);
     for (int i = 0; i < num; ++i) {
-        WriteInt(context, events[i]);
+        WriteInt(context, g_staCallbackEvents[i]);
     }
     WriteEnd(context);
     if (RpcClientCall(client, "RegisterStaEventCallback") != WIFI_IDL_OPT_OK) {

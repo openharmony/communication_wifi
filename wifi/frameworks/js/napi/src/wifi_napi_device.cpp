@@ -835,7 +835,6 @@ static void LinkedInfoToJs(const napi_env& env, WifiLinkedInfo& linkedInfo, napi
     SetValueInt32(env, "rxLinkSpeed", static_cast<int>(linkedInfo.rxLinkSpeed), result);
     SetValueInt32(env, "linkSpeed", static_cast<int>(linkedInfo.txLinkSpeed), result);
     SetValueInt32(env, "channelWidth", static_cast<int>(linkedInfo.channelWidth), result);
-    SetValueInt32(env, "detailedState", static_cast<int>(linkedInfo.detailedState), result);
 }
 
 /* This interface has not been fully implemented */
@@ -869,6 +868,21 @@ NO_SANITIZE("cfi") napi_value GetLinkedInfo(napi_env env, napi_callback_info inf
     size_t nonCallbackArgNum = 0;
     asyncContext->sysCap = SYSCAP_WIFI_STA;
     return DoAsyncWork(env, asyncContext, argc, argv, nonCallbackArgNum);
+}
+
+NO_SANITIZE("cfi") napi_value GetDisconnectedReason(napi_env env, napi_callback_info info)
+{
+    TRACE_FUNC_CALL;
+    WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_CORE);
+    DisconnectedReason reason = DisconnectedReason::DISC_REASON_DEFAULT;
+    ErrCode ret = wifiDevicePtr->GetDisconnectedReason(reason);
+    if (ret != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("GetDisconnectedReason failed:%{public}d", ret);
+        WIFI_NAPI_ASSERT(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_STA);
+    }
+    napi_value value;
+    napi_create_int32(env, static_cast<int>(reason), &value);
+    return value;
 }
 
 NO_SANITIZE("cfi") napi_value RemoveDevice(napi_env env, napi_callback_info info)

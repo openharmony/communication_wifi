@@ -1380,7 +1380,7 @@ bool StaStateMachine::SetRandomMac(int networkId)
         LOGI("Check MacAddress successfully.\n");
         if (lastMac != currentMac) {
             if (WifiStaHalInterface::GetInstance().SetConnectMacAddr(currentMac) != WIFI_IDL_OPT_OK) {
-                LOGE("set Mac [%s] failed.\n", currentMac.c_str());
+                LOGE("set Mac [%{public}s] failed.\n", MacAnonymize(currentMac).c_str());
                 return false;
             }
         }

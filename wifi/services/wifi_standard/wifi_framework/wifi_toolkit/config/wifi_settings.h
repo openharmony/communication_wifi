@@ -444,13 +444,21 @@ public:
     bool AddRandomMac(WifiStoreRandomMac &randomMacInfo);
 
     /**
+     * @Description Get random mac address
+     *
+     * @param randomMacInfo - randmon mac address info
+     * @return int - 0 success
+     */
+    bool GetRandomMac(WifiStoreRandomMac &randomMacInfo);
+
+    /**
      * @Description remove random mac address
      *
-     * @param ssid - ssid string
+     * @param bssid - bssid string
      * @param randomMac - randmon mac address string
      * @return int - 1 success
      */
-    bool RemoveRandomMac(const std::string &ssid, const std::string &randomMac);
+    bool RemoveRandomMac(const std::string &bssid, const std::string &randomMac);
     
     /**
      * @Description Save the country code

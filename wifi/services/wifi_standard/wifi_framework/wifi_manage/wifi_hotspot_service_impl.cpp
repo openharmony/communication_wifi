@@ -190,16 +190,10 @@ ErrCode WifiHotspotServiceImpl::SetHotspotConfig(const HotspotConfig &config)
         return WIFI_OPT_INVALID_PARAM;
     }
 
-    if (!IsApServiceRunning()) {
+    if (!IsApServiceRunning() ||
+        WifiServiceManager::GetInstance().ApServiceSetHotspotConfig(config, m_id) == false) {
         WifiConfigCenter::GetInstance().SetHotspotConfig(config, m_id);
         WifiSettings::GetInstance().SyncHotspotConfig();
-    } else {
-        IApService *pService = WifiServiceManager::GetInstance().GetApServiceInst(m_id);
-        if (pService == nullptr) {
-            WIFI_LOGE("Instance %{public}d get hotspot service is null!", m_id);
-            return WIFI_OPT_AP_NOT_OPENED;
-        }
-        return pService->SetHotspotConfig(config);
     }
     return WIFI_OPT_SUCCESS;
 }
@@ -385,6 +379,8 @@ ErrCode WifiHotspotServiceImpl::EnableHotspot(const ServiceType type)
     if (errCode != WIFI_OPT_SUCCESS) {
         WifiConfigCenter::GetInstance().SetApMidState(WifiOprMidState::OPENING, WifiOprMidState::CLOSED, m_id);
         WifiServiceManager::GetInstance().UnloadService(WIFI_SERVICE_AP, m_id);
+    } else {
+        WifiManager::GetInstance().UnRegisterUnloadApSaTimer();
     }
     return errCode;
 }

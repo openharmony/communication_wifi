@@ -553,6 +553,7 @@ public:
     int SetP2pDeviceName(const std::string &deviceName);
 
 private:
+    std::mutex mApMutex;
     std::atomic<WifiOprMidState> mStaMidState;
     std::map<int, std::atomic<WifiOprMidState>> mApMidState;
     std::atomic<WifiOprMidState> mP2pMidState;

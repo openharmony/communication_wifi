@@ -21,6 +21,7 @@
 #include "wifi_errcode.h"
 #include "wifi_logger.h"
 #include "wifi_msg.h"
+#include "wifi_common_def.h"
 
 DEFINE_WIFILOG_LABEL("WifiDeviceStubLite");
 
@@ -487,13 +488,13 @@ void WifiDeviceStub::OnRegisterCallBack(uint32_t code, IpcIo *req, IpcIo *reply)
         return;
     }
 
-    callback_ = std::make_shared<WifiDeviceCallBackProxy>(&sid);
+    std::shared_ptr<IWifiDeviceCallBack> callback_ = std::make_shared<WifiDeviceCallBackProxy>(&sid);
     WIFI_LOGD("create new WifiDeviceCallbackProxy!");
     size_t size;
     int eventNum = 0;
     (void)ReadInt32(req, &eventNum);
     std::vector<std::string> event;
-    if (eventNum > 0) {
+    if (eventNum > 0 && eventNum <= MAX_READ_EVENT_SIZE) {
         for (int i = 0; i < eventNum; ++i) {
             event.emplace_back((char *)ReadString(req, &size));
         }

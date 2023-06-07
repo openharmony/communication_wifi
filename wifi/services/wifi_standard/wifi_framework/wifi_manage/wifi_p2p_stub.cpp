@@ -18,12 +18,13 @@
 #include "wifi_internal_event_dispatcher.h"
 #include "wifi_p2p_callback_proxy.h"
 #include "wifi_p2p_death_recipient.h"
+#include "wifi_common_def.h"
 
 DEFINE_WIFILOG_P2P_LABEL("WifiP2pStub");
 
 namespace OHOS {
 namespace Wifi {
-WifiP2pStub::WifiP2pStub() : callback_(nullptr), mSingleCallback(false)
+WifiP2pStub::WifiP2pStub() : mSingleCallback(false)
 {
     InitHandleMap();
 }
@@ -563,11 +564,6 @@ void WifiP2pStub::ReadWifiP2pConfigData(MessageParcel &data, WifiP2pConfig &conf
     config.SetGroupOwnerIntent(data.ReadInt32());
 }
 
-sptr<IWifiP2pCallback> WifiP2pStub::GetCallback() const
-{
-    return callback_;
-}
-
 void WifiP2pStub::OnRegisterCallBack(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
@@ -579,7 +575,7 @@ void WifiP2pStub::OnRegisterCallBack(uint32_t code, MessageParcel &data, Message
             break;
         }
 
-        callback_ = iface_cast<IWifiP2pCallback>(remote);
+        sptr<IWifiP2pCallback> callback_ = iface_cast<IWifiP2pCallback>(remote);
         if (callback_ == nullptr) {
             callback_ = new (std::nothrow) WifiP2pCallbackProxy(remote);
             WIFI_LOGI("create new `WifiP2pCallbackProxy`!");
@@ -587,7 +583,7 @@ void WifiP2pStub::OnRegisterCallBack(uint32_t code, MessageParcel &data, Message
 
         int eventNum = data.ReadInt32();
         std::vector<std::string> event;
-        if (eventNum > 0) {
+        if (eventNum > 0 && eventNum <= MAX_READ_EVENT_SIZE) {
             for (int i = 0; i < eventNum; ++i) {
                 event.emplace_back(data.ReadString());
             }
@@ -603,7 +599,7 @@ void WifiP2pStub::OnRegisterCallBack(uint32_t code, MessageParcel &data, Message
                 WIFI_LOGD("AddDeathRecipient!");
             }
             if (callback_ != nullptr) {
-                for (auto &eventName : event) {
+                for (const auto &eventName : event) {
                     ret = WifiInternalEventDispatcher::GetInstance().AddP2pCallback(remote, callback_, eventName);
                 }
             }

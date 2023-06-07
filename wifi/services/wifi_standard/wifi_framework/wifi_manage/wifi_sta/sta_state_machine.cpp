@@ -13,8 +13,10 @@
  * limitations under the License.
  */
 
-#include "sta_state_machine.h"
 #include <cstdio>
+#include <chrono>
+#include <random>
+#include "sta_state_machine.h"
 #include "if_config.h"
 #include "ip_tools.h"
 #include "log_helper.h"
@@ -213,6 +215,7 @@ void StaStateMachine::InitWifiLinkedInfo()
     linkedInfo.lastRxPackets = 0;
     linkedInfo.lastTxPackets = 0;
     linkedInfo.retryedConnCount = 0;
+    linkedInfo.discReason = DisconnectedReason::DISC_REASON_DEFAULT;
 }
 
 void StaStateMachine::InitLastWifiLinkedInfo()
@@ -848,6 +851,7 @@ void StaStateMachine::DealConnectToUserSelectedNetwork(InternalMessage *msg)
     }
 
     /* Save connection information. */
+    SaveDiscReason(DisconnectedReason::DISC_REASON_DEFAULT);
     SaveLinkstate(ConnState::CONNECTING, DetailedState::CONNECTING);
     /* Callback result to InterfaceService. */
     staCallback.OnStaConnChanged(OperateResState::CONNECT_CONNECTING, linkedInfo);
@@ -879,6 +883,7 @@ void StaStateMachine::DealConnectTimeOutCmd(InternalMessage *msg)
 
     WifiSettings::GetInstance().SetConnectTimeoutBssid(linkedInfo.bssid);
     InitWifiLinkedInfo();
+    SaveDiscReason(DisconnectedReason::DISC_REASON_DEFAULT);
     SaveLinkstate(ConnState::DISCONNECTED, DetailedState::CONNECTION_TIMEOUT);
     WifiSettings::GetInstance().SaveLinkedInfo(linkedInfo);
     staCallback.OnStaConnChanged(OperateResState::CONNECT_CONNECTING_TIMEOUT, linkedInfo);
@@ -993,16 +998,19 @@ void StaStateMachine::DealWpaLinkFailEvent(InternalMessage *msg)
     InitWifiLinkedInfo();
     WifiSettings::GetInstance().SaveLinkedInfo(linkedInfo);
     if (msg->GetMessageName() == WIFI_SVR_CMD_STA_WPA_PASSWD_WRONG_EVENT) {
+        SaveDiscReason(DisconnectedReason::DISC_REASON_WRONG_PWD);
         SaveLinkstate(ConnState::DISCONNECTED, DetailedState::PASSWORD_ERROR);
         staCallback.OnStaConnChanged(OperateResState::CONNECT_PASSWORD_WRONG, linkedInfo);
     } else if (msg->GetMessageName() == WIFI_SVR_CMD_STA_WPA_FULL_CONNECT_EVENT) {
         DisableNetwork(targetNetworkId);
+        SaveDiscReason(DisconnectedReason::DISC_REASON_CONNECTION_FULL);
         SaveLinkstate(ConnState::DISCONNECTED, DetailedState::CONNECTION_FULL);
         staCallback.OnStaConnChanged(OperateResState::CONNECT_CONNECTION_FULL, linkedInfo);
         staCallback.OnStaConnChanged(OperateResState::DISCONNECT_DISCONNECTED, linkedInfo);
         WriteWifiConnectionHiSysEvent(WifiConnectionType::DISCONNECT, "");
     } else if (msg->GetMessageName() == WIFI_SVR_CMD_STA_WPA_ASSOC_REJECT_EVENT) {
         DisableNetwork(targetNetworkId);
+        SaveDiscReason(DisconnectedReason::DISC_REASON_DEFAULT);
         SaveLinkstate(ConnState::DISCONNECTED, DetailedState::CONNECTION_REJECT);
         staCallback.OnStaConnChanged(OperateResState::CONNECT_CONNECTION_REJECT, linkedInfo);
         staCallback.OnStaConnChanged(OperateResState::DISCONNECT_DISCONNECTED, linkedInfo);
@@ -1340,13 +1348,15 @@ void StaStateMachine::MacAddressGenerate(WifiStoreRandomMac &randomMacInfo)
     constexpr int octBase = 8;
     int ret = 0;
     char strMacTmp[arraySize] = {0};
-    unsigned int seed = static_cast<unsigned int>(time(nullptr) + std::hash<std::string>{}(randomMacInfo.peerBssid) + std::hash<std::string>{}(randomMacInfo.preSharedKey));
-    srand(seed);
+    std::mt19937_64 gen(std::chrono::high_resolution_clock::now().time_since_epoch().count()
+        + std::hash<std::string>{}(randomMacInfo.peerBssid) + std::hash<std::string>{}(randomMacInfo.preSharedKey));
     for (int i = 0; i < macBitSize; i++) {
         if (i != firstBit) {
-            ret = sprintf_s(strMacTmp, arraySize, "%x", rand() % hexBase);
+            std::uniform_int_distribution<> distribution(0, hexBase - 1);
+            ret = sprintf_s(strMacTmp, arraySize, "%x", distribution(gen));
         } else {
-            ret = sprintf_s(strMacTmp, arraySize, "%x", two * (rand() % octBase));
+            std::uniform_int_distribution<> distribution(0, octBase - 1);
+            ret = sprintf_s(strMacTmp, arraySize, "%x", two * distribution(gen));
         }
         if (ret == -1) {
             LOGE("StaStateMachine::MacAddressGenerate failed, sprintf_s return -1!\n");
@@ -1404,9 +1414,12 @@ bool StaStateMachine::SetRandomMac(int networkId)
             return false;
         }
 
-        /* Sets the MAC address of WifiSettings. */
-        MacAddressGenerate(randomMacInfo);
-        WifiSettings::GetInstance().AddRandomMac(randomMacInfo);
+        WifiSettings::GetInstance().GetRandomMac(randomMacInfo);
+        if (randomMacInfo.randomMac.empty()) {
+            /* Sets the MAC address of WifiSettings. */
+            MacAddressGenerate(randomMacInfo);
+            WifiSettings::GetInstance().AddRandomMac(randomMacInfo);
+        }
         currentMac = randomMacInfo.randomMac;
     }
 
@@ -1419,7 +1432,7 @@ bool StaStateMachine::SetRandomMac(int networkId)
         LOGI("Check MacAddress successfully.\n");
         if (lastMac != currentMac) {
             if (WifiStaHalInterface::GetInstance().SetConnectMacAddr(currentMac) != WIFI_IDL_OPT_OK) {
-                LOGE("set Mac [%s] failed.\n", currentMac.c_str());
+                LOGE("set Mac [%{public}s] failed.\n", MacAnonymize(currentMac).c_str());
                 return false;
             }
         }
@@ -1781,6 +1794,7 @@ void StaStateMachine::GetIpState::GoInState()
 {
     WIFI_LOGI("GetIpState GoInState function.");
 #ifdef WIFI_DHCP_DISABLED
+    SaveDiscReason(DisconnectedReason::DISC_REASON_DEFAULT);
     SaveLinkstate(ConnState::CONNECTED, DetailedState::WORKING);
     staCallback.OnStaConnChanged(OperateResState::CONNECT_NETWORK_ENABLED, linkedInfo);
     SwitchState(pLinkedState);
@@ -2245,6 +2259,7 @@ void StaStateMachine::DhcpResultNotify::OnSuccess(int status, const std::string 
         pStaStateMachine->getIpSucNum, pStaStateMachine->isRoam);
     pStaStateMachine->OnDhcpResultNotifyEvent(true);
     if (pStaStateMachine->getIpSucNum == 0 || pStaStateMachine->isRoam) {
+        pStaStateMachine->SaveDiscReason(DisconnectedReason::DISC_REASON_DEFAULT);
         pStaStateMachine->SaveLinkstate(ConnState::CONNECTED, DetailedState::CONNECTED);
         pStaStateMachine->staCallback.OnStaConnChanged(
             OperateResState::CONNECT_AP_CONNECTED, pStaStateMachine->linkedInfo);
@@ -2298,6 +2313,12 @@ void StaStateMachine::DhcpResultNotify::OnSerExitNotify(const std::string &ifnam
 }
 
 /* ------------------ state machine Comment function ----------------- */
+void StaStateMachine::SaveDiscReason(DisconnectedReason discReason)
+{
+    linkedInfo.discReason = discReason;
+    WifiSettings::GetInstance().SaveLinkedInfo(linkedInfo);
+}
+
 void StaStateMachine::SaveLinkstate(ConnState state, DetailedState detailState)
 {
     linkedInfo.connState = state;

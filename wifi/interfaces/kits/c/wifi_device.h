@@ -198,6 +198,16 @@ WifiErrorCode Disconnect(void);
 WifiErrorCode GetLinkedInfo(WifiLinkedInfo *result);
 
 /**
+ * @brief Obtains information about the disconnected reason
+ *
+ * @param result Indicates the information about the  disconnected reason
+ * @return Returns {@link WIFI_SUCCESS} if get the sta disconnected reason success; returns an error
+ * code defined in {@link WifiErrorCode} otherwise.
+ * @since 10
+ */
+WifiErrorCode GetDisconnectedReason(DisconnectedReason *result);
+
+/**
  * @brief Obtains the MAC address of this device.
  *
  * @param result Indicates the MAC address of this device. It is a char array whose length is 6.

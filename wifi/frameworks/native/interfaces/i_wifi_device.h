@@ -237,6 +237,14 @@ public:
     virtual ErrCode GetLinkedInfo(WifiLinkedInfo &info) = 0;
 
     /**
+     * @Description Obtains the disconnected reason
+     *
+     * @param reason - DisconnectedReason object
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode GetDisconnectedReason(DisconnectedReason &reason) = 0;
+
+    /**
      * @Description Obtaining DHCP Request Information
      *
      * @param info - IpInfo object

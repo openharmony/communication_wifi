@@ -20,12 +20,13 @@
 #include "wifi_scan_callback_proxy.h"
 #include "wifi_internal_event_dispatcher.h"
 #include "wifi_scan_death_recipient.h"
+#include "wifi_common_def.h"
 
 DEFINE_WIFILOG_SCAN_LABEL("WifiScanStub");
 
 namespace OHOS {
 namespace Wifi {
-WifiScanStub::WifiScanStub() : callback_(nullptr), mSingleCallback(false)
+WifiScanStub::WifiScanStub() : mSingleCallback(false)
 {
     InitHandleMap();
 }
@@ -66,11 +67,6 @@ int WifiScanStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessagePar
         }
         return (this->*(iter->second))(code, data, reply, option);
     }
-}
-
-sptr<IWifiScanCallback> WifiScanStub::GetCallback() const
-{
-    return callback_;
 }
 
 int WifiScanStub::OnSetScanControlInfo(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
@@ -218,7 +214,7 @@ int WifiScanStub::OnRegisterCallBack(uint32_t code, MessageParcel &data, Message
             break;
         }
 
-        callback_ = iface_cast<IWifiScanCallback>(remote);
+        sptr<IWifiScanCallback> callback_ = iface_cast<IWifiScanCallback>(remote);
         if (callback_ == nullptr) {
             callback_ = new (std::nothrow) WifiScanCallbackProxy(remote);
             WIFI_LOGI("create new `WifiScanCallbackProxy`!");
@@ -227,7 +223,7 @@ int WifiScanStub::OnRegisterCallBack(uint32_t code, MessageParcel &data, Message
         int pid = data.ReadInt32();
         int eventNum = data.ReadInt32();
         std::vector<std::string> event;
-        if (eventNum > 0) {
+        if (eventNum > 0 && eventNum <= MAX_READ_EVENT_SIZE) {
             for (int i = 0; i < eventNum; ++i) {
                 event.emplace_back(data.ReadString());
             }
@@ -244,7 +240,7 @@ int WifiScanStub::OnRegisterCallBack(uint32_t code, MessageParcel &data, Message
                 WIFI_LOGD("AddDeathRecipient!");
             }
             if (callback_ != nullptr) {
-                for (auto &eventName : event) {
+                for (const auto &eventName : event) {
                     ret = WifiInternalEventDispatcher::GetInstance().AddScanCallback(remote, callback_, pid, eventName);
                 }
             }

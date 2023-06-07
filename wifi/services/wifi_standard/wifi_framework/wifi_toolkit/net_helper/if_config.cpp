@@ -81,7 +81,7 @@ bool IfConfig::ExecCommand(const std::vector<std::string> &vecCommandArg)
             if (pid == 0) {
                 const char *execveStr[MAX_COMMAND_ARG];
                 int i = 0;
-                for (i = 0; i < argvSize && i < MAX_COMMAND_ARG; i++) {
+                for (i = 0; i < argvSize && i < (MAX_COMMAND_ARG - 1); i++) {
                     execveStr[i] = vecCommandArg[i].c_str();
                 }
                 execveStr[i] = nullptr;
@@ -89,6 +89,7 @@ bool IfConfig::ExecCommand(const std::vector<std::string> &vecCommandArg)
                 close(fd[0]);
                 dup2(fd[1], STDOUT_FILENO);
                 close(fd[1]);
+                /* last member of execveStr should be nullptr */
                 if (execve(vecCommandArg[0].c_str(), (char *const*)execveStr, env) < 0) {
                     LOGE("execve %{public}s failed.", vecCommandArg[0].c_str());
                 }
@@ -286,7 +287,7 @@ bool IfConfig::CheckIfaceValid(const std::string& ifname)
     }
     for (ifni = ifidxs; !(ifni->if_index == 0 && ifni->if_name == nullptr); ifni++) {
         if ((ifni->if_name != nullptr) &&
-            strncmp(ifni->if_name, ifname.c_str(), strlen(ifni->if_name)) == 0) {
+            strcmp(ifni->if_name, ifname.c_str()) == 0) {
             if_freenameindex(ifidxs);
             return true;
         }

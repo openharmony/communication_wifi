@@ -62,7 +62,6 @@ bool WifiDeviceImpl::Init()
     client_ = deviceProxy;
     return true;
 #else
-    WifiSaLoadManager::GetInstance().LoadWifiSa(systemAbilityId_);
     return GetWifiDeviceProxy();
 #endif
 }
@@ -72,21 +71,18 @@ bool WifiDeviceImpl::GetWifiDeviceProxy()
 #ifdef OHOS_ARCH_LITE
     return (client_ != nullptr);
 #else
+    WifiSaLoadManager::GetInstance().LoadWifiSa(systemAbilityId_);
+
     if (IsRemoteDied() == false) {
         return true;
     }
 
-    WIFI_LOGI("GetWifiDeviceProxy, get new sa from remote!");
     sptr<ISystemAbilityManager> sa_mgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (sa_mgr == nullptr) {
         WIFI_LOGE("failed to get SystemAbilityManager");
         return false;
     }
-    auto objectSA = sa_mgr->CheckSystemAbility(systemAbilityId_);
-    if (objectSA == nullptr) {
-        WIFI_LOGI("GetWifiDeviceProxy, load sa from remote again!");
-        WifiSaLoadManager::GetInstance().LoadWifiSa(systemAbilityId_);
-    }
+
     sptr<IRemoteObject> object = sa_mgr->GetSystemAbility(systemAbilityId_);
     if (object == nullptr) {
         WIFI_LOGE("failed to get DEVICE_SERVICE");
@@ -254,6 +250,12 @@ ErrCode WifiDeviceImpl::GetLinkedInfo(WifiLinkedInfo &info)
 {
     RETURN_IF_FAIL(GetWifiDeviceProxy());
     return client_->GetLinkedInfo(info);
+}
+
+ErrCode WifiDeviceImpl::GetDisconnectedReason(DisconnectedReason &reason)
+{
+    RETURN_IF_FAIL(GetWifiDeviceProxy());
+    return client_->GetDisconnectedReason(reason);
 }
 
 ErrCode WifiDeviceImpl::GetIpInfo(IpInfo &info)

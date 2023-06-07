@@ -20,6 +20,8 @@
 #include "wifi_errcode.h"
 #include "wifi_internal_event_dispatcher.h"
 #include "wifi_hotspot_death_recipient.h"
+#include "wifi_common_def.h"
+
 DEFINE_WIFILOG_HOTSPOT_LABEL("WifiHotspotStub");
 
 namespace OHOS {
@@ -355,7 +357,7 @@ void WifiHotspotStub::OnRegisterCallBack(
 
         int eventNum = data.ReadInt32();
         std::vector<std::string> event;
-        if (eventNum > 0) {
+        if (eventNum > 0 && eventNum <= MAX_READ_EVENT_SIZE) {
             for (int i = 0; i < eventNum; ++i) {
                 event.emplace_back(data.ReadString());
             }
@@ -371,7 +373,7 @@ void WifiHotspotStub::OnRegisterCallBack(
                 WIFI_LOGD("AddDeathRecipient!");
             }
             if (callback_ != nullptr) {
-                for (auto &eventName : event) {
+                for (const auto &eventName : event) {
                     ret = WifiInternalEventDispatcher::GetInstance().AddHotspotCallback(remote, callback_, eventName,
                         m_id);
                 }

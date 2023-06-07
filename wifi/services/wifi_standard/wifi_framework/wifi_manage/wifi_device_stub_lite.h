@@ -76,7 +76,6 @@ private:
 
 private:
     HandleFuncMap handleFuncMap_;
-    std::shared_ptr<IWifiDeviceCallBack> callback_;
 };
 }  // namespace Wifi
 }  // namespace OHOS

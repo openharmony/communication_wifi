@@ -454,6 +454,7 @@ private:
      * @param networkId - the nerworkId of network which is saved in the WifiLinkedInfo.(in)
      */
     void SetWifiLinkedInfo(int networkId);
+
     /**
      * @Description  Save the current connected state into WifiLinkedInfo.
      *
@@ -461,6 +462,14 @@ private:
      * @param detailState - the current detail state of StaStateMachine.(in)
      */
     void SaveLinkstate(ConnState state, DetailedState detailState);
+
+    /**
+     * @Description  Save the disconnected reason.
+     *
+     * @param discReason - disconnected reason(in)
+     */
+    void SaveDiscReason(DisconnectedReason discReason);
+
     /**
      * @Description  Translate frequency to band(2.4G or 5G).
      *

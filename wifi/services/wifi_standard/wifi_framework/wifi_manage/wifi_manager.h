@@ -73,6 +73,22 @@ public:
     virtual ~ScreenEventSubscriber() {};
     void OnReceiveEvent(const OHOS::EventFwk::CommonEventData &data) override;
 };
+
+class WifiTimer {
+public:
+    using TimerCallback = std::function<void()>;
+    static constexpr uint32_t DEFAULT_TIMEROUT = 10000;
+    static WifiTimer *GetInstance(void);
+
+    WifiTimer();
+    ~WifiTimer();
+
+    ErrCode Register(const TimerCallback &callback, uint32_t &outTimerId, uint32_t interval = DEFAULT_TIMEROUT);
+    void UnRegister(uint32_t timerId);
+
+private:
+    std::unique_ptr<Utils::Timer> timer_{nullptr};
+};
 #endif
 
 class WifiManager {
@@ -115,6 +131,7 @@ public:
      */
     IScanSerivceCallbacks GetScanCallback(void);
 
+    void UnRegisterUnloadStaSaTimer(void);
 #ifdef FEATURE_AP_SUPPORT
     /**
      * @Description Get the ap callback object.
@@ -122,6 +139,8 @@ public:
      * @return IApServiceCallbacks - return mApCallback
      */
     IApServiceCallbacks GetApCallback(void);
+
+    void UnRegisterUnloadApSaTimer(void);
 #endif
 
 #ifdef FEATURE_P2P_SUPPORT
@@ -131,6 +150,8 @@ public:
      * @return IP2pServiceCallbacks - return mP2pCallback
      */
     IP2pServiceCallbacks GetP2pCallback(void);
+
+    void UnRegisterUnloadP2PSaTimer(void);
 #endif
 
     /**
@@ -165,12 +186,15 @@ private:
     InitStatus GetInitStatus();
     static void DealCloseServiceMsg(WifiManager &manager);
     static void CloseStaService(void);
+    static void UnloadStaSaTimerCallback();
 #ifdef FEATURE_AP_SUPPORT
     static void CloseApService(int id = 0);
+    static void UnloadHotspotSaTimerCallback();
 #endif
     static void CloseScanService(void);
 #ifdef FEATURE_P2P_SUPPORT
     static void CloseP2pService(void);
+    static void UnloadP2PSaTimerCallback();
 #endif
     static void DealStaOpenRes(OperateResState state);
     static void DealStaCloseRes(OperateResState state);
@@ -218,18 +242,30 @@ private:
     std::deque<WifiCloseServiceCode> mEventQue;
     StaServiceCallback mStaCallback;
     IScanSerivceCallbacks mScanCallback;
+#ifndef OHOS_ARCH_LITE
+    static uint32_t unloadStaSaTimerId;
+    static std::mutex unloadStaSaTimerMutex;
+#endif
 #ifdef FEATURE_AP_SUPPORT
     IApServiceCallbacks mApCallback;
+#ifndef OHOS_ARCH_LITE
+    static uint32_t unloadHotspotSaTimerId;
+    static std::mutex unloadHotspotSaTimerMutex;
+#endif
 #endif
 #ifdef FEATURE_P2P_SUPPORT
     IP2pServiceCallbacks mP2pCallback;
     static WifiCfgMonitorEventCallback cfgMonitorCallback;
+#ifndef OHOS_ARCH_LITE
+    static uint32_t unloadP2PSaTimerId;
+    static std::mutex unloadP2PSaTimerMutex;
+#endif
 #endif
 #ifndef OHOS_ARCH_LITE
     void RegisterScreenEvent();
     void UnRegisterScreenEvent();
     std::shared_ptr<ScreenEventSubscriber> screenEventSubscriber_ = nullptr;
-    std::unique_ptr<Utils::Timer> lpScreenTimer_ = nullptr;
+    uint32_t screenTimerId{0};
 #endif
     InitStatus mInitStatus;
     long mSupportedFeatures;

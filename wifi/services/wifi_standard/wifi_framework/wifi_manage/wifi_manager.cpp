@@ -28,6 +28,7 @@
 #include "common_event_manager.h"
 #include "common_event_support.h"
 #include "wifi_sa_manager.h"
+#include "common_timer_errors.h"
 #endif
 #include "wifi_sta_hal_interface.h"
 #include "wifi_service_manager.h"
@@ -42,6 +43,8 @@ DEFINE_WIFILOG_LABEL("WifiManager");
 int WifiManager::mCloseApIndex = 0;
 #ifndef OHOS_ARCH_LITE
 const uint32_t TIMEOUT_SCREEN_EVENT = 3000;
+const uint32_t TIMEOUT_UNLOAD_WIFI_SA = 5 * 60 * 1000;
+using TimeOutCallback = std::function<void()>;
 #endif
 
 WifiManager &WifiManager::GetInstance()
@@ -253,15 +256,9 @@ int WifiManager::Init()
     
 #ifndef OHOS_ARCH_LITE
     if (screenEventSubscriber_ == nullptr) {
-        lpScreenTimer_ = std::make_unique<Utils::Timer>("WifiManager");
-        using TimeOutCallback = std::function<void()>;
         TimeOutCallback timeoutCallback = std::bind(&WifiManager::RegisterScreenEvent, this);
-        if (lpScreenTimer_ != nullptr) {
-            lpScreenTimer_->Setup();
-            lpScreenTimer_->Register(timeoutCallback, TIMEOUT_SCREEN_EVENT, true);
-        } else {
-            WIFI_LOGE("lpScreenTimer_ is nullptr");
-        }
+        WifiTimer::GetInstance()->Register(timeoutCallback, screenTimerId, TIMEOUT_SCREEN_EVENT);
+        WIFI_LOGI("RegisterScreenEvent success! screenTimerId:%{public}u", screenTimerId);
     }
 #endif
     mInitStatus = INIT_OK;
@@ -310,10 +307,8 @@ void WifiManager::Exit()
     if (screenEventSubscriber_ != nullptr) {
         UnRegisterScreenEvent();
     }
-    if (lpScreenTimer_ != nullptr) {
-        lpScreenTimer_->Shutdown(false);
-        lpScreenTimer_ = nullptr;
-    }
+    WIFI_LOGI("UnRegisterScreenEvent, screenTimerId:%{public}u", screenTimerId);
+    WifiTimer::GetInstance()->UnRegister(screenTimerId);
 #endif
     return;
 }
@@ -352,6 +347,30 @@ InitStatus WifiManager::GetInitStatus()
     return mInitStatus;
 }
 
+#ifndef OHOS_ARCH_LITE
+uint32_t WifiManager::unloadStaSaTimerId{0};
+std::mutex WifiManager::unloadStaSaTimerMutex{};
+void WifiManager::UnloadStaSaTimerCallback()
+{
+    WifiSaLoadManager::GetInstance().UnloadWifiSa(WIFI_DEVICE_ABILITY_ID);
+    WifiSaLoadManager::GetInstance().UnloadWifiSa(WIFI_SCAN_ABILITY_ID);
+    WifiSaLoadManager::GetInstance().UnloadWifiSa(WIFI_P2P_ABILITY_ID);
+    if (static_cast<int>(ApState::AP_STATE_CLOSED) == WifiConfigCenter::GetInstance().GetHotspotState(0)) {
+        WifiSaLoadManager::GetInstance().UnloadWifiSa(WIFI_HOTSPOT_ABILITY_ID);
+    }
+    WifiManager::GetInstance().UnRegisterUnloadStaSaTimer();
+}
+
+void WifiManager::UnRegisterUnloadStaSaTimer(void)
+{
+    WIFI_LOGI("UnRegisterUnloadStaSaTimer! unloadStaSaTimerId:%{public}u", unloadStaSaTimerId);
+    std::unique_lock<std::mutex> lock(unloadStaSaTimerMutex);
+    WifiTimer::GetInstance()->UnRegister(unloadStaSaTimerId);
+    unloadStaSaTimerId = 0;
+    return;
+}
+#endif
+
 void WifiManager::CloseStaService(void)
 {
     WIFI_LOGI("close sta service");
@@ -363,17 +382,37 @@ void WifiManager::CloseStaService(void)
     cbMsg.msgData = static_cast<int>(WifiState::DISABLED);
     WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
     #ifndef OHOS_ARCH_LITE
-    WifiSaLoadManager::GetInstance().UnloadWifiSa(WIFI_DEVICE_ABILITY_ID);
-    WifiSaLoadManager::GetInstance().UnloadWifiSa(WIFI_SCAN_ABILITY_ID);
-    WifiSaLoadManager::GetInstance().UnloadWifiSa(WIFI_P2P_ABILITY_ID);
-    if (static_cast<int>(ApState::AP_STATE_CLOSED) == WifiConfigCenter::GetInstance().GetHotspotState(0)) {
-        WifiSaLoadManager::GetInstance().UnloadWifiSa(WIFI_HOTSPOT_ABILITY_ID);
+    std::unique_lock<std::mutex> lock(unloadStaSaTimerMutex);
+    if (unloadStaSaTimerId == 0) {
+        TimeOutCallback timeoutCallback = std::bind(WifiManager::UnloadStaSaTimerCallback);
+        WifiTimer::GetInstance()->Register(timeoutCallback, unloadStaSaTimerId, TIMEOUT_UNLOAD_WIFI_SA);
+        WIFI_LOGI("RegisterUnloadStaSaTimer success! unloadStaSaTimerId:%{public}u", unloadStaSaTimerId);
     }
     #endif
     return;
 }
 
 #ifdef FEATURE_AP_SUPPORT
+
+#ifndef OHOS_ARCH_LITE
+uint32_t WifiManager::unloadHotspotSaTimerId{0};
+std::mutex WifiManager::unloadHotspotSaTimerMutex{};
+void WifiManager::UnloadHotspotSaTimerCallback()
+{
+    WifiSaLoadManager::GetInstance().UnloadWifiSa(WIFI_HOTSPOT_ABILITY_ID);
+    WifiManager::GetInstance().UnRegisterUnloadApSaTimer();
+}
+
+void WifiManager::UnRegisterUnloadApSaTimer(void)
+{
+    WIFI_LOGI("UnRegisterUnloadApSaTimer! unloadHotspotSaTimerId:%{public}u", unloadHotspotSaTimerId);
+    std::unique_lock<std::mutex> lock(unloadHotspotSaTimerMutex);
+    WifiTimer::GetInstance()->UnRegister(unloadHotspotSaTimerId);
+    unloadHotspotSaTimerId = 0;
+    return;
+}
+#endif
+
 void WifiManager::CloseApService(int id)
 {
     WIFI_LOGI("close %{public}d ap service", id);
@@ -386,7 +425,12 @@ void WifiManager::CloseApService(int id)
     cbMsg.id = id;
     WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
     #ifndef OHOS_ARCH_LITE
-    WifiSaLoadManager::GetInstance().UnloadWifiSa(WIFI_HOTSPOT_ABILITY_ID);
+    std::unique_lock<std::mutex> lock(unloadHotspotSaTimerMutex);
+    if (unloadHotspotSaTimerId == 0) {
+        TimeOutCallback timeoutCallback = std::bind(WifiManager::UnloadHotspotSaTimerCallback);
+        WifiTimer::GetInstance()->Register(timeoutCallback, unloadHotspotSaTimerId, TIMEOUT_UNLOAD_WIFI_SA);
+        WIFI_LOGI("RegisterUnloadHotspotSaTimer success! unloadHotspotSaTimerId:%{public}u", unloadHotspotSaTimerId);
+    }
     #endif
     return;
 }
@@ -401,6 +445,26 @@ void WifiManager::CloseScanService(void)
 }
 
 #ifdef FEATURE_P2P_SUPPORT
+
+#ifndef OHOS_ARCH_LITE
+uint32_t WifiManager::unloadP2PSaTimerId{0};
+std::mutex WifiManager::unloadP2PSaTimerMutex{};
+void WifiManager::UnloadP2PSaTimerCallback()
+{
+    WifiSaLoadManager::GetInstance().UnloadWifiSa(WIFI_P2P_ABILITY_ID);
+    WifiManager::GetInstance().UnRegisterUnloadP2PSaTimer();
+}
+
+void WifiManager::UnRegisterUnloadP2PSaTimer(void)
+{
+    WIFI_LOGI("UnRegisterUnloadP2PSaTimer! unloadP2PSaTimerId:%{public}u", unloadP2PSaTimerId);
+    std::unique_lock<std::mutex> lock(unloadP2PSaTimerMutex);
+    WifiTimer::GetInstance()->UnRegister(unloadP2PSaTimerId);
+    unloadP2PSaTimerId = 0;
+    return;
+}
+#endif
+
 void WifiManager::CloseP2pService(void)
 {
     WIFI_LOGD("close p2p service");
@@ -412,7 +476,12 @@ void WifiManager::CloseP2pService(void)
     cbMsg.msgData = static_cast<int>(P2pState::P2P_STATE_CLOSED);
     WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
     #ifndef OHOS_ARCH_LITE
-    WifiSaLoadManager::GetInstance().UnloadWifiSa(WIFI_P2P_ABILITY_ID);
+    std::unique_lock<std::mutex> lock(unloadP2PSaTimerMutex);
+    if (unloadP2PSaTimerId == 0) {
+        TimeOutCallback timeoutCallback = std::bind(WifiManager::UnloadP2PSaTimerCallback);
+        WifiTimer::GetInstance()->Register(timeoutCallback, unloadP2PSaTimerId, TIMEOUT_UNLOAD_WIFI_SA);
+        WIFI_LOGI("RegisterUnloadP2PSaTimer success! unloadP2PSaTimerId:%{public}u", unloadP2PSaTimerId);
+    }
     #endif
     return;
 }
@@ -789,6 +858,7 @@ void WifiManager::DealApStateChanged(ApState state, int id)
     WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
     if (state == ApState::AP_STATE_IDLE) {
         mCloseApIndex = id;
+        WifiConfigCenter::GetInstance().SetApMidState(WifiOprMidState::CLOSING, id);
         WifiManager::GetInstance().PushServiceCloseMsg(WifiCloseServiceCode::AP_SERVICE_CLOSE);
     }
     if (state == ApState::AP_STATE_STARTED) {
@@ -1045,6 +1115,57 @@ void ScreenEventSubscriber::OnReceiveEvent(const OHOS::EventFwk::CommonEventData
         return;
     }
     WIFI_LOGW("ScreenEventSubscriber::OnReceiveEvent, screen state: %{public}d.", screenState);
+}
+
+WifiTimer *WifiTimer::GetInstance()
+{
+    static WifiTimer instance;
+    return &instance;
+}
+
+WifiTimer::WifiTimer() : timer_(std::make_unique<Utils::Timer>("WifiManagerTimer"))
+{
+    timer_->Setup();
+}
+
+WifiTimer::~WifiTimer()
+{
+    if (timer_) {
+        timer_->Shutdown(true);
+    }
+}
+
+ErrCode WifiTimer::Register(const TimerCallback &callback, uint32_t &outTimerId, uint32_t interval)
+{
+    if (timer_ == nullptr) {
+        WIFI_LOGE("timer_ is nullptr");
+        return WIFI_OPT_FAILED;
+    }
+
+    uint32_t ret = timer_->Register(callback, interval, true);
+    if (ret == Utils::TIMER_ERR_DEAL_FAILED) {
+        WIFI_LOGE("Register timer failed");
+        return WIFI_OPT_FAILED;
+    }
+
+    outTimerId = ret;
+    return WIFI_OPT_SUCCESS;
+}
+
+void WifiTimer::UnRegister(uint32_t timerId)
+{
+    if (timerId == 0) {
+        WIFI_LOGE("timerId is 0, no register timer");
+        return;
+    }
+
+    if (timer_ == nullptr) {
+        WIFI_LOGE("timer_ is nullptr");
+        return;
+    }
+
+    timer_->Unregister(timerId);
+    return;
 }
 #endif
 }  // namespace Wifi

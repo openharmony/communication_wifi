@@ -20,12 +20,13 @@
 #include "wifi_logger.h"
 #include "wifi_msg.h"
 #include "wifi_scan_callback_proxy.h"
+#include "wifi_common_def.h"
 
 DEFINE_WIFILOG_SCAN_LABEL("WifiScanStubLite");
 
 namespace OHOS {
 namespace Wifi {
-WifiScanStub::WifiScanStub() : callback_(nullptr)
+WifiScanStub::WifiScanStub()
 {}
 
 WifiScanStub::~WifiScanStub()
@@ -96,11 +97,6 @@ int WifiScanStub::OnRemoteRequest(uint32_t code, IpcIo *req, IpcIo *reply)
         }
     }
     return ret;
-}
-
-std::shared_ptr<IWifiScanCallback> WifiScanStub::GetCallback() const
-{
-    return callback_;
 }
 
 int WifiScanStub::OnSetScanControlInfo(uint32_t code, IpcIo *req, IpcIo *reply)
@@ -256,15 +252,15 @@ int WifiScanStub::OnRegisterCallBack(uint32_t code, IpcIo *req, IpcIo *reply)
         return ret;
     }
 
-    callback_ = std::make_shared<WifiScanCallbackProxy>(&sid);
+    std::shared_ptr<IWifiScanCallback> callback_ = std::make_shared<WifiScanCallbackProxy>(&sid);
     WIFI_LOGD("create new WifiScanCallbackProxy!");
     size_t size;
     int eventNum = 0;
     (void)ReadInt32(req, &eventNum);
     std::vector<std::string> event;
-    if (eventNum > 0) {
+    if (eventNum > 0 && eventNum <= MAX_READ_EVENT_SIZE) {
         for (int i = 0; i < eventNum; ++i) {
-            event.emplace_back((char *)ReadString(req, &size));
+            event.emplace_back(reinterpret_cast<char *>(ReadString(req, &size)));
         }
     }
 

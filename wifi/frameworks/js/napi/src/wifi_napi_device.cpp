@@ -870,6 +870,21 @@ NO_SANITIZE("cfi") napi_value GetLinkedInfo(napi_env env, napi_callback_info inf
     return DoAsyncWork(env, asyncContext, argc, argv, nonCallbackArgNum);
 }
 
+NO_SANITIZE("cfi") napi_value GetDisconnectedReason(napi_env env, napi_callback_info info)
+{
+    TRACE_FUNC_CALL;
+    WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_CORE);
+    DisconnectedReason reason = DisconnectedReason::DISC_REASON_DEFAULT;
+    ErrCode ret = wifiDevicePtr->GetDisconnectedReason(reason);
+    if (ret != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("GetDisconnectedReason failed:%{public}d", ret);
+        WIFI_NAPI_ASSERT(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_STA);
+    }
+    napi_value value;
+    napi_create_int32(env, static_cast<int>(reason), &value);
+    return value;
+}
+
 NO_SANITIZE("cfi") napi_value RemoveDevice(napi_env env, napi_callback_info info)
 {
     TRACE_FUNC_CALL;

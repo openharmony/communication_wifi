@@ -363,8 +363,6 @@ int HdiConvertIe(const uint8_t *hdiIe, size_t wpaIeLen,
 
     if (left >= HDI_POS_SECOND) {
         data->capabilities = HdiGetBe16(pos);
-        pos += HDI_POS_SECOND;
-        left -= HDI_POS_SECOND;
     }
     return 0;
 }
@@ -445,8 +443,7 @@ int HdiConvertIeRsn(const uint8_t *rsnIe, size_t rsnIeLen,
             LOGI("ie count botch (pairwise), count %{public}u left %{public}u", count, left);
             return -1;
         }
-        if (count)
-            data->hasPairwise = 1;
+        data->hasPairwise = 1;
         for (i = 0; i < count; i++) {
             data->pairwiseCipher |= HdiRsnIdToCipherSuite(pos);
             pos += HDI_SELECTOR_LEN;
@@ -493,8 +490,6 @@ int HdiConvertIeRsn(const uint8_t *rsnIe, size_t rsnIeLen,
         } else {
             data->numPmkid = numPmkid;
             data->pmkid = pos;
-            pos += data->numPmkid * HDI_PMKID_LEN;
-            left -= data->numPmkid * HDI_PMKID_LEN;
         }
     }
 

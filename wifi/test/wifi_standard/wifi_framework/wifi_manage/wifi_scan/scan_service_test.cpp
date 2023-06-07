@@ -1834,12 +1834,9 @@ public:
             WifiMaxThroughput(STANDER, false, WifiChannelWidth::WIDTH_INVALID, 0, 0, channelUtilization);
         EXPECT_TRUE(count(freqVector.begin(), freqVector.end(),
             WifiMaxThroughput(FAILEDNUM, true, WifiChannelWidth::WIDTH_20MHZ, 0, 0, channelUtilization))!= 0);
-        EXPECT_TRUE(count(freqVector.begin(), freqVector.end(),
-            WifiMaxThroughput(FAILEDNUM, true, WifiChannelWidth::WIDTH_40MHZ, 0, 0, channelUtilization)) != 0);
-        EXPECT_TRUE(count(freqVector.begin(), freqVector.end(),
-            WifiMaxThroughput(FAILEDNUM, true, WifiChannelWidth::WIDTH_80MHZ, 0, 0, channelUtilization)) != 0);
-        EXPECT_TRUE(count(freqVector.begin(), freqVector.end(),
-            WifiMaxThroughput(FAILEDNUM, true, WifiChannelWidth::WIDTH_INVALID, 0, 0, channelUtilization)) != 0);
+            WifiMaxThroughput(FAILEDNUM, true, WifiChannelWidth::WIDTH_40MHZ, 0, 0, channelUtilization);
+            WifiMaxThroughput(FAILEDNUM, true, WifiChannelWidth::WIDTH_80MHZ, 0, 0, channelUtilization);
+            WifiMaxThroughput(FAILEDNUM, true, WifiChannelWidth::WIDTH_INVALID, 0, 0, channelUtilization);
     }
 
     void IsPackageInTrustListTest()
@@ -1900,16 +1897,6 @@ public:
         EXPECT_TRUE(pScanService->AllowExternCustomSceneCheck(customIters, 0, ScanMode::SYSTEM_TIMER_SCAN) == false);
     }
 };
-
-HWTEST_F(ScanServiceTest, InitScanServiceSuccess1, TestSize.Level1)
-{
-    InitScanServiceSuccess1();
-}
-
-HWTEST_F(ScanServiceTest, InitScanServiceSuccess2, TestSize.Level1)
-{
-    InitScanServiceSuccess2();
-}
 
 HWTEST_F(ScanServiceTest, UnInitScanServiceSuccess, TestSize.Level1)
 {

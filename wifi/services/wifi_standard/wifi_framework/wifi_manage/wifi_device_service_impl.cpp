@@ -183,14 +183,14 @@ void WifiDeviceServiceImpl::OnStop()
         UnRegisterAppRemoved();
     }
     if (lpTimer_ != nullptr) {
-        lpTimer_->Shutdown(false);
+        lpTimer_->Shutdown(true);
         lpTimer_ = nullptr;
     }
     if (thermalLevelSubscriber_ != nullptr) {
         UnRegisterThermalLevel();
     }
     if (lpThermalTimer_ != nullptr) {
-        lpThermalTimer_->Shutdown(false);
+        lpThermalTimer_->Shutdown(true);
         lpThermalTimer_ = nullptr;
     }
 #endif
@@ -276,6 +276,7 @@ ErrCode WifiDeviceServiceImpl::EnableWifi()
 #ifdef FEATURE_P2P_SUPPORT
 #ifndef OHOS_ARCH_LITE
     WifiSaLoadManager::GetInstance().LoadWifiSa(WIFI_P2P_ABILITY_ID);
+    WifiManager::GetInstance().UnRegisterUnloadP2PSaTimer();
 #endif
     sptr<WifiP2pServiceImpl> p2pService = WifiP2pServiceImpl::GetInstance();
     if (p2pService != nullptr && p2pService->EnableP2p() != WIFI_OPT_SUCCESS) {
@@ -285,6 +286,7 @@ ErrCode WifiDeviceServiceImpl::EnableWifi()
 #endif
 
     WifiSettings::GetInstance().SyncWifiConfig();
+    WifiManager::GetInstance().UnRegisterUnloadStaSaTimer();
     return WIFI_OPT_SUCCESS;
 }
 
@@ -1035,6 +1037,35 @@ ErrCode WifiDeviceServiceImpl::GetLinkedInfo(WifiLinkedInfo &info)
     return WIFI_OPT_SUCCESS;
 }
 
+ErrCode WifiDeviceServiceImpl::GetDisconnectedReason(DisconnectedReason &reason)
+{
+    if (!WifiAuthCenter::IsSystemAppByToken()) {
+        WIFI_LOGE("GetDisconnectedReason:NOT System APP, PERMISSION_DENIED!");
+        return WIFI_OPT_NON_SYSTEMAPP;
+    }
+    if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("GetDisconnectedReason:VerifyGetWifiInfoPermission() PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+    if (WifiPermissionUtils::VerifyGetWifiConfigPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("GetDisconnectedReason:VerifyGetWifiConfigPermission() PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+
+    if (!IsStaServiceRunning()) {
+        return WIFI_OPT_STA_NOT_OPENED;
+    }
+    WifiLinkedInfo info;
+    WifiConfigCenter::GetInstance().GetLinkedInfo(info);
+    WIFI_LOGI("%{public}s, connState=%{public}d, detailedState=%{public}d, disReason=%{public}d",
+        __func__, info.connState, info.detailedState, reason);
+    if (info.connState == ConnState::CONNECTING || info.connState == ConnState::CONNECTED) {
+        return WIFI_OPT_FAILED;
+    }
+    reason = info.discReason;
+    return WIFI_OPT_SUCCESS;
+}
+
 ErrCode WifiDeviceServiceImpl::GetIpInfo(IpInfo &info)
 {
     if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
@@ -1098,7 +1129,7 @@ ErrCode WifiDeviceServiceImpl::RegisterCallBack(const sptr<IWifiDeviceCallBack> 
         return WIFI_OPT_PERMISSION_DENIED;
     }
 
-    for (auto &eventName : event) {
+    for (const auto &eventName : event) {
         WifiInternalEventDispatcher::GetInstance().SetSingleStaCallback(callback, eventName);
     }
     return WIFI_OPT_SUCCESS;

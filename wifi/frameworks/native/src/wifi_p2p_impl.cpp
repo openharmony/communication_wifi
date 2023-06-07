@@ -39,28 +39,24 @@ WifiP2pImpl::~WifiP2pImpl()
 
 bool WifiP2pImpl::Init(void)
 {
-    WifiSaLoadManager::GetInstance().LoadWifiSa(systemAbilityId_);
     return GetWifiP2pProxy();
 }
 
 
 bool WifiP2pImpl::GetWifiP2pProxy(void)
 {
+    WifiSaLoadManager::GetInstance().LoadWifiSa(systemAbilityId_);
+
     if (IsRemoteDied() == false) {
         return true;
     }
 
-    WIFI_LOGI("GetWifiP2pProxy, get new sa from remote!");
     sptr<ISystemAbilityManager> sa_mgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (sa_mgr == nullptr) {
         WIFI_LOGE("failed to get SystemAbilityManager");
         return false;
     }
-    auto objectSA = sa_mgr->CheckSystemAbility(systemAbilityId_);
-    if (objectSA == nullptr) {
-        WIFI_LOGI("GetWifiP2pProxy, load sa from remote again!");
-        WifiSaLoadManager::GetInstance().LoadWifiSa(systemAbilityId_);
-    }
+
     sptr<IRemoteObject> object = sa_mgr->GetSystemAbility(systemAbilityId_);
     if (object == nullptr) {
         WIFI_LOGE("failed to get P2P_SERVICE");

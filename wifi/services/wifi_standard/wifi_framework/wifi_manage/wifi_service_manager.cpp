@@ -266,6 +266,27 @@ IScanService *WifiServiceManager::GetScanServiceInst()
 }
 
 #ifdef FEATURE_AP_SUPPORT
+bool WifiServiceManager::ApServiceSetHotspotConfig(const HotspotConfig &config, int id)
+{
+    WIFI_LOGI("WifiServiceManager::GetApServiceInst");
+    std::unique_lock<std::mutex> lock(mApMutex);
+    if (mApServiceHandle.handle == nullptr) {
+        WIFI_LOGE("Get ap service instance handle is null.");
+        return false;
+    }
+
+    auto findInstance = [this, id]() -> IApService* {
+        auto it = mApServiceHandle.pService.find(id);
+        return (it != mApServiceHandle.pService.end()) ? it->second : nullptr;
+    };
+    IApService *service = (IApService *)findInstance();
+    if (service == nullptr) {
+        service = mApServiceHandle.create(id);
+        mApServiceHandle.pService[id] = service;
+    }
+    return service->SetHotspotConfig(config);
+}
+
 IApService *WifiServiceManager::GetApServiceInst(int id)
 {
     WIFI_LOGI("WifiServiceManager::GetApServiceInst");

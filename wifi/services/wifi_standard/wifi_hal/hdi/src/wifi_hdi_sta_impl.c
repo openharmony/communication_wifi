@@ -288,12 +288,6 @@ void UpDownLink(int flag)
         return;
     }
 
-    if (ioctl(fd, SIOCGIFFLAGS, &ifr) != 0) {
-        LOGE("ioctl failed, error:%{public}d", errno);
-        close(fd);
-        return;
-    }
-
     if (flag == 1) {
         ifr.ifr_flags |= IFF_UP;
     } else {

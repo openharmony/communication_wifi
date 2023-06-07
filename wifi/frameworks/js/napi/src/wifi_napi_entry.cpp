@@ -121,6 +121,19 @@ static napi_value GroupOwnerBandInit(napi_env env)
     return groupOwnerBand;
 }
 
+static napi_value DisconnectedReasonInit(napi_env env)
+{
+    napi_value reason = nullptr;
+    napi_create_object(env, &reason);
+    SetNamedPropertyByInteger(env, reason,
+        static_cast<int>(DisconnectedReason::DISC_REASON_DEFAULT), "DISC_REASON_DEFAULT");
+    SetNamedPropertyByInteger(env, reason,
+        static_cast<int>(DisconnectedReason::DISC_REASON_WRONG_PWD), "DISC_REASON_WRONG_PWD");
+    SetNamedPropertyByInteger(env, reason,
+        static_cast<int>(DisconnectedReason::DISC_REASON_CONNECTION_FULL), "DISC_REASON_CONNECTION_FULL");
+    return reason;
+}
+
 #ifdef ENABLE_NAPI_WIFI_MANAGER
 static napi_value Phase2MethodInit(napi_env env)
 {
@@ -211,6 +224,7 @@ static napi_value PropertyValueInit(napi_env env, napi_value exports)
     napi_value p2pConnStateObj = P2pConnStateInit(env);
     napi_value P2pDeviceStatusObj = P2pDeviceStatusInit(env);
     napi_value groupOwnerBandObj = GroupOwnerBandInit(env);
+    napi_value disconnectedReasonObj = DisconnectedReasonInit(env);
 #ifdef ENABLE_NAPI_WIFI_MANAGER
     napi_value phase2MethodObj = Phase2MethodInit(env);
     napi_value WifiChannelWidthObj = WifiChannelWidthInit(env);
@@ -233,6 +247,7 @@ static napi_value PropertyValueInit(napi_env env, napi_value exports)
         DECLARE_NAPI_PROPERTY("P2pConnectState", p2pConnStateObj),
         DECLARE_NAPI_PROPERTY("P2pDeviceStatus", P2pDeviceStatusObj),
         DECLARE_NAPI_PROPERTY("GroupOwnerBand", groupOwnerBandObj),
+        DECLARE_NAPI_PROPERTY("DisconnectedReason", disconnectedReasonObj),
     };
     napi_define_properties(env, exports, sizeof(exportFuncs) / sizeof(napi_property_descriptor), exportFuncs);
     return exports;
@@ -268,6 +283,7 @@ static napi_value Init(napi_env env, napi_value exports) {
         DECLARE_NAPI_FUNCTION("reassociate", ReAssociate),
         DECLARE_NAPI_FUNCTION("getIpInfo", GetIpInfo),
         DECLARE_NAPI_FUNCTION("getLinkedInfo", GetLinkedInfo),
+        DECLARE_NAPI_FUNCTION("getDisconnectedReason", GetDisconnectedReason),
         DECLARE_NAPI_FUNCTION("removeDevice", RemoveDevice),
         DECLARE_NAPI_FUNCTION("removeDeviceConfig", RemoveDevice),
         DECLARE_NAPI_FUNCTION("removeAllNetwork", RemoveAllNetwork),

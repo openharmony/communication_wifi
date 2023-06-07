@@ -107,6 +107,18 @@ typedef struct {
     /** Device config change */
     void (*OnDeviceConfigChange)(ConfigChange state);
 } WifiEvent;
+
+typedef enum {
+    /* Default reason */
+    DISC_REASON_DEFAULT = 0,
+
+    /* Password is wrong */
+    DISC_REASON_WRONG_PWD = 1,
+
+    /* The number of router's connection reaches the maximum number limit */
+    DISC_REASON_CONNECTION_FULL = 2
+} DisconnectedReason;
+
 #ifdef __cplusplus
 }
 #endif

@@ -114,6 +114,17 @@ enum ConnState {
     UNKNOWN
 };
 
+enum class DisconnectedReason {
+    /* Default reason */
+    DISC_REASON_DEFAULT = 0,
+
+    /* Password is wrong */
+    DISC_REASON_WRONG_PWD = 1,
+
+    /* The number of router's connection reaches the maximum number limit */
+    DISC_REASON_CONNECTION_FULL = 2
+};
+
 struct WifiLinkedInfo {
     int networkId;
     std::string ssid;
@@ -135,6 +146,7 @@ struct WifiLinkedInfo {
     std::string portalUrl;
     SupplicantState supplicantState; /* wpa_supplicant state */
     DetailedState detailedState;     /* connection state */
+    DisconnectedReason discReason;   /* disconnection reason */
     int wifiStandard;                /* wifi standard */
     int maxSupportedRxLinkSpeed;
     int maxSupportedTxLinkSpeed;
@@ -160,6 +172,7 @@ struct WifiLinkedInfo {
         isDataRestricted = 0;
         supplicantState = SupplicantState::INVALID;
         detailedState = DetailedState::INVALID;
+        discReason = DisconnectedReason::DISC_REASON_DEFAULT;
         wifiStandard = 0;
         maxSupportedRxLinkSpeed = 0;
         maxSupportedTxLinkSpeed = 0;

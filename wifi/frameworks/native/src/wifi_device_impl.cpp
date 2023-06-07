@@ -252,6 +252,12 @@ ErrCode WifiDeviceImpl::GetLinkedInfo(WifiLinkedInfo &info)
     return client_->GetLinkedInfo(info);
 }
 
+ErrCode WifiDeviceImpl::GetDisconnectedReason(DisconnectedReason &reason)
+{
+    RETURN_IF_FAIL(GetWifiDeviceProxy());
+    return client_->GetDisconnectedReason(reason);
+}
+
 ErrCode WifiDeviceImpl::GetIpInfo(IpInfo &info)
 {
     RETURN_IF_FAIL(GetWifiDeviceProxy());

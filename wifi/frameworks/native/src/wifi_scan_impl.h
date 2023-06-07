@@ -101,6 +101,7 @@ public:
 private:
     bool GetWifiScanProxy(void);
     int systemAbilityId_;
+    std::mutex mutex_;
 #ifdef OHOS_ARCH_LITE
     IWifiScan *client_;
 #else

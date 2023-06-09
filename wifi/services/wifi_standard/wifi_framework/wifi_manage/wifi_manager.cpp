@@ -501,6 +501,7 @@ void WifiManager::DealStaOpenRes(OperateResState state)
     }
     cbMsg.msgData = static_cast<int>(WifiState::ENABLED);
     WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
+    AutoStartEnhanceService();
     CheckAndStartScanService();
 }
 

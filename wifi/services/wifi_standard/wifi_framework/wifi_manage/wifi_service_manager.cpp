@@ -45,9 +45,11 @@ int WifiServiceManager::Init()
 #endif
     mStaServiceHandle.Clear();
     mScanServiceHandle.Clear();
+    mEnhanceServiceHandle.Clear();
 #ifdef OHOS_ARCH_LITE
     mServiceDllMap.insert(std::make_pair(WIFI_SERVICE_STA, "libwifi_sta_service.so"));
     mServiceDllMap.insert(std::make_pair(WIFI_SERVICE_SCAN, "libwifi_scan_service.so"));
+    mServiceDllMap.insert(std::make_pair(WIFI_SERVICE_ENHANCE, "libwifi_enhance_service.z.so"));
 #ifdef FEATURE_AP_SUPPORT
     mServiceDllMap.insert(std::make_pair(WIFI_SERVICE_AP, "libwifi_ap_service.so"));
 #endif
@@ -58,6 +60,7 @@ int WifiServiceManager::Init()
 #else
     mServiceDllMap.insert(std::make_pair(WIFI_SERVICE_STA, "libwifi_sta_service.z.so"));
     mServiceDllMap.insert(std::make_pair(WIFI_SERVICE_SCAN, "libwifi_scan_service.z.so"));
+    mServiceDllMap.insert(std::make_pair(WIFI_SERVICE_ENHANCE, "libwifi_enhance_service.z.so"));
 #ifdef FEATURE_AP_SUPPORT
     mServiceDllMap.insert(std::make_pair(WIFI_SERVICE_AP, "libwifi_ap_service.z.so"));
 #endif
@@ -209,6 +212,33 @@ int WifiServiceManager::LoadP2pService(const std::string &dlname, bool bCreate)
 }
 #endif
 
+int WifiServiceManager::LoadEnhanceService(const std::string &dlname, bool bCreate)
+{
+    WIFI_LOGI("WifiServiceManager::LoadEnhanceService");
+    std::unique_lock<std::mutex> lock(mEnhanceMutex);
+    if (mEnhanceServiceHandle.handle != nullptr) {
+        WIFI_LOGE("WifiServiceManager::handle is not null: %{public}s", dlname.c_str());
+        return 0;
+    }
+    mEnhanceServiceHandle.handle = dlopen(dlname.c_str(), RTLD_LAZY);
+    if (mEnhanceServiceHandle.handle == nullptr) {
+        WIFI_LOGE("dlopen %{public}s failed: %{public}s!", dlname.c_str(), dlerror());
+        return -1;
+    }
+    mEnhanceServiceHandle.create = (IEnhanceService *(*)()) dlsym(mEnhanceServiceHandle.handle, "Create");
+    mEnhanceServiceHandle.destroy = (void *(*)(IEnhanceService *))dlsym(mEnhanceServiceHandle.handle, "Destroy");
+    if (mEnhanceServiceHandle.create == nullptr || mEnhanceServiceHandle.destroy == nullptr) {
+        WIFI_LOGE("%{public}s dlsym Create or Destroy failed!", dlname.c_str());
+        dlclose(mEnhanceServiceHandle.handle);
+        mEnhanceServiceHandle.Clear();
+        return -1;
+    }
+    if (bCreate) {
+        mEnhanceServiceHandle.pService = mEnhanceServiceHandle.create();
+    }
+    return 0;
+}
+
 int WifiServiceManager::CheckAndEnforceService(const std::string &name, bool bCreate)
 {
     WIFI_LOGD("WifiServiceManager::CheckAndEnforceService name: %{public}s", name.c_str());
@@ -234,6 +264,9 @@ int WifiServiceManager::CheckAndEnforceService(const std::string &name, bool bCr
         return LoadP2pService(dlname, bCreate);
     }
 #endif
+    if (name == WIFI_SERVICE_ENHANCE) {
+        return LoadEnhanceService(dlname, bCreate);
+    }
     return -1;
 }
 
@@ -328,6 +361,20 @@ IP2pService *WifiServiceManager::GetP2pServiceInst()
     return mP2pServiceHandle.pService;
 }
 #endif
+
+IEnhanceService *WifiServiceManager::GetEnhanceServiceInst()
+{
+    WIFI_LOGI("WifiServiceManager::GetEnhanceServiceInst");
+    std::unique_lock<std::mutex> lock(mEnhanceMutex);
+    if (mEnhanceServiceHandle.handle == nullptr) {
+        WIFI_LOGE("WifiServiceManager, Enhance handle is null");
+        return nullptr;
+    }
+    if (mEnhanceServiceHandle.pService == nullptr) {
+        mEnhanceServiceHandle.pService = mEnhanceServiceHandle.create();
+    }
+    return mEnhanceServiceHandle.pService;
+}
 
 NO_SANITIZE("cfi") int WifiServiceManager::UnloadStaService(bool bPreLoad)
 {
@@ -424,6 +471,25 @@ NO_SANITIZE("cfi") int WifiServiceManager::UnloadP2pService(bool bPreLoad)
 }
 #endif
 
+NO_SANITIZE("cfi") int WifiServiceManager::UnloadEnhanceService(bool bPreLoad)
+{
+    WIFI_LOGI("WifiServiceManager::UnloadEnhanceService");
+    std::unique_lock<std::mutex> lock(mEnhanceMutex);
+    if (mEnhanceServiceHandle.handle == nullptr) {
+        WIFI_LOGE("WifiServiceManager::UnloadEnhanceService handle is null");
+        return 0;
+    }
+    if (mEnhanceServiceHandle.pService != nullptr) {
+        mEnhanceServiceHandle.destroy(mEnhanceServiceHandle.pService);
+        mEnhanceServiceHandle.pService = nullptr;
+    }
+    if (!bPreLoad) {
+        dlclose(mEnhanceServiceHandle.handle);
+        mEnhanceServiceHandle.Clear();
+    }
+    return 0;
+}
+
 int WifiServiceManager::UnloadService(const std::string &name, int id)
 {
     bool bPreLoad = WifiSettings::GetInstance().IsModulePreLoad(name);
@@ -444,6 +510,9 @@ int WifiServiceManager::UnloadService(const std::string &name, int id)
         return UnloadP2pService(bPreLoad);
     }
 #endif
+    if (name == WIFI_SERVICE_ENHANCE) {
+        return UnloadEnhanceService(bPreLoad);
+    }
     return -1;
 }
 

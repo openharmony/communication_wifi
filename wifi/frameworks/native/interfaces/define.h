@@ -206,7 +206,7 @@
 #define WIFI_SERVICE_P2P "P2pService"     /* P2P */
 #define WIFI_SERVICE_SCAN "ScanService"   /* SCAN */
 #define WIFI_SERVICE_AWARE "AwareService" /* AWARE */
-
+#define WIFI_SERVICE_ENHANCE "EnhanceService" /* ENHANCE */
 /* ---------Feature service ability id */
 #ifdef OHOS_ARCH_LITE
 #define WIFI_DEVICE_ABILITY_ID 1120

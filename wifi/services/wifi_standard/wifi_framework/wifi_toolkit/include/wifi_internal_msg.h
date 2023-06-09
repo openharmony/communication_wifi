@@ -311,6 +311,7 @@ struct WifiConfig {
     bool preLoadAp;
     bool preLoadP2p;
     bool preLoadAware;
+    bool preLoadEnhance;
     bool supportHwPnoFlag;
     int minRssi2Dot4Ghz;
     int minRssi5Ghz;

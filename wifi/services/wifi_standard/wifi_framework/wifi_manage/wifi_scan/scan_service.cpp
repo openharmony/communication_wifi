@@ -162,6 +162,11 @@ void ScanService::RegisterScanCallbacks(const IScanSerivceCallbacks &iScanSerivc
     mScanSerivceCallbacks = iScanSerivceCallbacks;
 }
 
+void ScanService::SetEnhanceService(IEnhanceService* enhanceService)
+{
+    mEnhanceService = enhanceService;
+}
+
 void ScanService::HandleScanStatusReport(ScanStatusReport &scanStatusReport)
 {
     WIFI_LOGI("Enter ScanService::HandleScanStatusReport.\n");
@@ -598,7 +603,13 @@ void ScanService::HandleCommonScanInfo(
             scanConfigMap.erase(*reqIter);
         }
     }
-
+    struct timespec times = {0, 0};
+    clock_gettime(CLOCK_MONOTONIC, &times);
+    int64_t availableTime = static_cast<int64_t>(times.tv_sec) * SECOND_TO_MICRO_SECOND +
+        times.tv_nsec / SECOND_TO_MILLI_SECOND;
+    if (mEnhanceService != nullptr) {
+        mEnhanceService->SetEnhanceParam(availableTime);
+    }
     /* Send the scanning result to the module registered for listening. */
     ScanInfoHandlerMap::iterator handleIter = scanInfoHandlerMap.begin();
     for (; handleIter != scanInfoHandlerMap.end(); ++handleIter) {
@@ -1179,7 +1190,13 @@ ErrCode ScanService::AllowExternScan()
         WIFI_LOGW("extern scan not allow by disable scan control.");
         return WIFI_OPT_FAILED;
     }
-
+    if (mEnhanceService != nullptr) {
+        if (!mEnhanceService->AllowScanBySchedStrategy()) {
+            WIFI_LOGW("extern scan not allow by sched strategy.");
+            return WIFI_OPT_FAILED;
+        }
+    }
+    
     WIFI_LOGI("extern scan has allowed");
     return WIFI_OPT_SUCCESS;
 }

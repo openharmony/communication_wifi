@@ -231,6 +231,7 @@ private:
     static void AutoStartP2pService(void);
 #endif
     static void AutoStartScanService(void);
+    static void AutoStartEnhanceService(void);
     static void CheckAndStartSta(void);
     static void AutoStartServiceThread(void);
 

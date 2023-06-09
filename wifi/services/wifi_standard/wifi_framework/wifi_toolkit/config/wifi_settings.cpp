@@ -1494,6 +1494,8 @@ bool WifiSettings::IsModulePreLoad(const std::string &name)
         return mWifiConfig.preLoadP2p;
     } else if (name == WIFI_SERVICE_AWARE) {
         return mWifiConfig.preLoadAware;
+    } else if (name == WIFI_SERVICE_ENHANCE) {
+        return mWifiConfig.preLoadEnhance;
     } else {
         return false;
     }

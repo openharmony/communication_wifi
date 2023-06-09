@@ -285,6 +285,7 @@ int WifiManager::Init()
          * The sta service automatically starts upon startup. After the sta
          * service is started, the scanning is directly started.
          */
+        AutoStartEnhanceService();
         AutoStartScanService();
     }
 
@@ -569,6 +570,7 @@ void WifiManager::DealStaOpenRes(OperateResState state)
     }
     cbMsg.msgData = static_cast<int>(WifiState::ENABLED);
     WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
+    AutoStartEnhanceService();
     CheckAndStartScanService();
 }
 
@@ -698,11 +700,44 @@ void WifiManager::CheckAndStartScanService(void)
             WIFI_LOGE("init scan service failed, ret %{public}d!", static_cast<int>(errCode));
             break;
         }
+        IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
+        if (pEnhanceService == nullptr) {
+            WIFI_LOGE("Create %{public}s service failed!", WIFI_SERVICE_ENHANCE);
+            break;
+        }
+        errCode = pService->SetEnhanceService(pEnhanceService);
+        if (errCode != WIFI_OPT_SUCCESS) {
+            WIFI_LOGE("SetEnhanceService failed, ret %{public}d!", static_cast<int>(errCode));
+            break;
+        }
     } while (0);
     if (errCode != WIFI_OPT_SUCCESS) {
         WifiConfigCenter::GetInstance().SetScanMidState(WifiOprMidState::OPENING, WifiOprMidState::CLOSED);
         WifiServiceManager::GetInstance().UnloadService(WIFI_SERVICE_SCAN);
     }
+    return;
+}
+
+void WifiManager::AutoStartEnhanceService(void)
+{
+    WIFI_LOGI("AutoStartEnhanceService start");
+    ErrCode errCode = WIFI_OPT_FAILED;
+    do {
+        if (WifiServiceManager::GetInstance().CheckAndEnforceService(WIFI_SERVICE_ENHANCE) < 0) {
+            WIFI_LOGE("Load %{public}s service failed!", WIFI_SERVICE_ENHANCE);
+            break;
+        }
+        IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
+        if (pEnhanceService == nullptr) {
+            WIFI_LOGE("Create %{public}s service failed!", WIFI_SERVICE_ENHANCE);
+            break;
+        }
+        errCode = pEnhanceService->Init();
+        if (errCode != WIFI_OPT_SUCCESS) {
+            WIFI_LOGE("init Enhance service failed, ret %{public}d!", static_cast<int>(errCode));
+            break;
+        }
+    } while (0);
     return;
 }
 

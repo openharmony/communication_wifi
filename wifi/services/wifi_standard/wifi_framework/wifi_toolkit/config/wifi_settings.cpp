@@ -62,9 +62,10 @@ WifiSettings::~WifiSettings()
     SyncDeviceConfig();
     SyncHotspotConfig();
     SyncBlockList();
-    SyncWifiConfig();
     SyncWifiP2pGroupInfoConfig();
     SyncP2pVendorConfig();
+    std::unique_lock<std::mutex> lock(mWifiConfigMutex);
+    SyncWifiConfig();
 }
 
 void WifiSettings::InitWifiConfig()
@@ -186,7 +187,9 @@ bool WifiSettings::GetScanAlwaysState() const
 int WifiSettings::SetScanAlwaysState(bool isActive)
 {
     mScanAlwaysActive = isActive;
+    std::unique_lock<std::mutex> lock(mWifiConfigMutex);
     mWifiConfig.scanAlwaysSwitch = isActive;
+    SyncWifiConfig();
     return 0;
 }
 
@@ -1005,6 +1008,7 @@ int WifiSettings::GetP2pConnectedState()
 
 int WifiSettings::GetSignalLevel(const int &rssi, const int &band)
 {
+    std::unique_lock<std::mutex> lock(mWifiConfigMutex);
     int level = 0;
     do {
         if (band == static_cast<int>(BandType::BAND_2GHZ)) {
@@ -1254,29 +1258,35 @@ int WifiSettings::SyncWifiConfig()
     return mSavedWifiConfig.SaveConfig();
 }
 
-bool WifiSettings::GetCanUseStaWhenAirplaneMode()
+int WifiSettings::GetOperatorWifiType()
 {
-    return mWifiConfig.staAirplaneMode;
+    std::unique_lock<std::mutex> lock(mWifiConfigMutex);
+    return mWifiConfig.operatorWifiType;
 }
 
-int WifiSettings::SetCanUseStaWhenAirplaneMode(bool bCan)
+int WifiSettings::SetOperatorWifiType(int type)
 {
-    mWifiConfig.staAirplaneMode = bCan;
+    std::unique_lock<std::mutex> lock(mWifiConfigMutex);
+    mWifiConfig.operatorWifiType = type;
+    SyncWifiConfig();
     return 0;
 }
 
 bool WifiSettings::GetCanOpenStaWhenAirplaneMode()
 {
+    std::unique_lock<std::mutex> lock(mWifiConfigMutex);
     return mWifiConfig.canOpenStaWhenAirplane;
 }
 
 bool WifiSettings::GetStaLastRunState()
 {
+    std::unique_lock<std::mutex> lock(mWifiConfigMutex);
     return mWifiConfig.staLastState;
 }
 
 int WifiSettings::SetStaLastRunState(bool bRun)
 {
+    std::unique_lock<std::mutex> lock(mWifiConfigMutex);
     mWifiConfig.staLastState = bRun;
     SyncWifiConfig();
     return 0;
@@ -1284,17 +1294,21 @@ int WifiSettings::SetStaLastRunState(bool bRun)
 
 int WifiSettings::GetDhcpIpType()
 {
+    std::unique_lock<std::mutex> lock(mWifiConfigMutex);
     return mWifiConfig.dhcpIpType;
 }
 
 int WifiSettings::SetDhcpIpType(int dhcpIpType)
 {
+    std::unique_lock<std::mutex> lock(mWifiConfigMutex);
     mWifiConfig.dhcpIpType = dhcpIpType;
+    SyncWifiConfig();
     return 0;
 }
 
 std::string WifiSettings::GetDefaultWifiInterface()
 {
+    std::unique_lock<std::mutex> lock(mWifiConfigMutex);
     return mWifiConfig.defaultWifiInterface;
 }
 
@@ -1315,7 +1329,7 @@ void WifiSettings::SetAirplaneModeState(const int &state)
 
 int WifiSettings::GetAirplaneModeState() const
 {
-    return mAirplaneModeState;
+    return mAirplaneModeState.load();
 }
 
 void WifiSettings::SetAppRunningState(ScanMode appRunMode)
@@ -1374,116 +1388,147 @@ int WifiSettings::GetNoChargerPlugModeState() const
 
 int WifiSettings::SetWhetherToAllowNetworkSwitchover(bool bSwitch)
 {
+    std::unique_lock<std::mutex> lock(mWifiConfigMutex);
     mWifiConfig.whetherToAllowNetworkSwitchover = bSwitch;
+    SyncWifiConfig();
     return 0;
 }
 
 bool WifiSettings::GetWhetherToAllowNetworkSwitchover()
 {
+    std::unique_lock<std::mutex> lock(mWifiConfigMutex);
     return mWifiConfig.whetherToAllowNetworkSwitchover;
 }
 
 int WifiSettings::SetScoretacticsScoreSlope(const int &score)
 {
+    std::unique_lock<std::mutex> lock(mWifiConfigMutex);
     mWifiConfig.scoretacticsScoreSlope = score;
+    SyncWifiConfig();
     return 0;
 }
 
 int WifiSettings::GetScoretacticsScoreSlope()
 {
+    std::unique_lock<std::mutex> lock(mWifiConfigMutex);
     return mWifiConfig.scoretacticsScoreSlope;
 }
 
 int WifiSettings::SetScoretacticsInitScore(const int &score)
 {
+    std::unique_lock<std::mutex> lock(mWifiConfigMutex);
     mWifiConfig.scoretacticsInitScore = score;
+    SyncWifiConfig();
     return 0;
 }
 
 int WifiSettings::GetScoretacticsInitScore()
 {
+    std::unique_lock<std::mutex> lock(mWifiConfigMutex);
     return mWifiConfig.scoretacticsInitScore;
 }
 
 int WifiSettings::SetScoretacticsSameBssidScore(const int &score)
 {
+    std::unique_lock<std::mutex> lock(mWifiConfigMutex);
     mWifiConfig.scoretacticsSameBssidScore = score;
+    SyncWifiConfig();
     return 0;
 }
 
 int WifiSettings::GetScoretacticsSameBssidScore()
 {
+    std::unique_lock<std::mutex> lock(mWifiConfigMutex);
     return mWifiConfig.scoretacticsSameBssidScore;
 }
 
 int WifiSettings::SetScoretacticsSameNetworkScore(const int &score)
 {
+    std::unique_lock<std::mutex> lock(mWifiConfigMutex);
     mWifiConfig.scoretacticsSameNetworkScore = score;
+    SyncWifiConfig();
     return 0;
 }
 
 int WifiSettings::GetScoretacticsSameNetworkScore()
 {
+    std::unique_lock<std::mutex> lock(mWifiConfigMutex);
     return mWifiConfig.scoretacticsSameNetworkScore;
 }
 
 int WifiSettings::SetScoretacticsFrequency5GHzScore(const int &score)
 {
+    std::unique_lock<std::mutex> lock(mWifiConfigMutex);
     mWifiConfig.scoretacticsFrequency5GHzScore = score;
+    SyncWifiConfig();
     return 0;
 }
 
 int WifiSettings::GetScoretacticsFrequency5GHzScore()
 {
+    std::unique_lock<std::mutex> lock(mWifiConfigMutex);
     return mWifiConfig.scoretacticsFrequency5GHzScore;
 }
 
 int WifiSettings::SetScoretacticsLastSelectionScore(const int &score)
 {
+    std::unique_lock<std::mutex> lock(mWifiConfigMutex);
     mWifiConfig.scoretacticsLastSelectionScore = score;
+    SyncWifiConfig();
     return 0;
 }
 
 int WifiSettings::GetScoretacticsLastSelectionScore()
 {
+    std::unique_lock<std::mutex> lock(mWifiConfigMutex);
     return mWifiConfig.scoretacticsLastSelectionScore;
 }
 
 int WifiSettings::SetScoretacticsSecurityScore(const int &score)
 {
+    std::unique_lock<std::mutex> lock(mWifiConfigMutex);
     mWifiConfig.scoretacticsSecurityScore = score;
+    SyncWifiConfig();
     return 0;
 }
 
 int WifiSettings::GetScoretacticsSecurityScore()
 {
+    std::unique_lock<std::mutex> lock(mWifiConfigMutex);
     return mWifiConfig.scoretacticsSecurityScore;
 }
 
 int WifiSettings::SetScoretacticsNormalScore(const int &score)
 {
+    std::unique_lock<std::mutex> lock(mWifiConfigMutex);
     mWifiConfig.scoretacticsNormalScore = score;
+    SyncWifiConfig();
     return 0;
 }
 
 int WifiSettings::GetScoretacticsNormalScore()
 {
+    std::unique_lock<std::mutex> lock(mWifiConfigMutex);
     return mWifiConfig.scoretacticsNormalScore;
 }
 
 int WifiSettings::SetSavedDeviceAppraisalPriority(const int &priority)
 {
+    std::unique_lock<std::mutex> lock(mWifiConfigMutex);
     mWifiConfig.savedDeviceAppraisalPriority = priority;
+    SyncWifiConfig();
     return 0;
 }
 
 int WifiSettings::GetSavedDeviceAppraisalPriority()
 {
+    std::unique_lock<std::mutex> lock(mWifiConfigMutex);
     return mWifiConfig.savedDeviceAppraisalPriority;
 }
 
 bool WifiSettings::IsModulePreLoad(const std::string &name)
 {
+    std::unique_lock<std::mutex> lock(mWifiConfigMutex);
     if (name == WIFI_SERVICE_STA) {
         return mWifiConfig.preLoadSta;
     } else if (name == WIFI_SERVICE_SCAN) {
@@ -1503,26 +1548,31 @@ bool WifiSettings::IsModulePreLoad(const std::string &name)
 
 bool WifiSettings::GetSupportHwPnoFlag()
 {
+    std::unique_lock<std::mutex> lock(mWifiConfigMutex);
     return mWifiConfig.supportHwPnoFlag;
 }
 
 int WifiSettings::GetMinRssi2Dot4Ghz()
 {
+    std::unique_lock<std::mutex> lock(mWifiConfigMutex);
     return mWifiConfig.minRssi2Dot4Ghz;
 }
 
 int WifiSettings::GetMinRssi5Ghz()
 {
+    std::unique_lock<std::mutex> lock(mWifiConfigMutex);
     return mWifiConfig.minRssi5Ghz;
 }
 
-std::string WifiSettings::GetStrDnsBak() const
+std::string WifiSettings::GetStrDnsBak()
 {
+    std::unique_lock<std::mutex> lock(mWifiConfigMutex);
     return mWifiConfig.strDnsBak;
 }
 
-bool WifiSettings::IsLoadStabak() const
+bool WifiSettings::IsLoadStabak()
 {
+    std::unique_lock<std::mutex> lock(mWifiConfigMutex);
     return mWifiConfig.isLoadStabak;
 }
 

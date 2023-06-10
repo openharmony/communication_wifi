@@ -103,6 +103,8 @@ void WifiHotspotMgrServiceImpl::OnStart()
     mState = ServiceRunningState::STATE_RUNNING;
     WIFI_LOGI("Start ap service!");
     WifiManager::GetInstance().AddSupportedFeatures(WifiFeatures::WIFI_FEATURE_MOBILE_HOTSPOT);
+    // Get airplane mode by datashare
+    WifiManager::GetInstance().GetAirplaneModeByDatashare(WIFI_HOTSPOT_ABILITY_ID);
 }
 
 void WifiHotspotMgrServiceImpl::OnStop()

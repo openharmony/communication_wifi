@@ -347,6 +347,7 @@ if (defined(ohos_lite)) {
     }
     install_enable = true
     sources = [
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/common/wifi_datashare_utils.cpp",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/common/wifi_permission_helper.cpp",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/common/wifi_permission_utils.cpp",
       "wifi_auth_center.cpp",
@@ -370,11 +371,15 @@ if (defined(ohos_lite)) {
 
     external_deps = [
       "ability_base:want",
+      "ability_base:zuri",
+      "ability_runtime:ability_manager",
       "access_token:libaccesstoken_sdk",
       "access_token:libtokenid_sdk",
       "bundle_framework:appexecfwk_base",
       "c_utils:utils",
       "common_event_service:cesfwk_innerkits",
+      "data_share:datashare_common",
+      "data_share:datashare_consumer",
       "eventhandler:libeventhandler",
       "hiviewdfx_hilog_native:libhilog",
       "huks:libhukssdk",

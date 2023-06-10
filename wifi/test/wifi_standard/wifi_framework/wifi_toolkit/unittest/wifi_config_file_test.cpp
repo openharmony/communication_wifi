@@ -38,7 +38,7 @@ HWTEST_F(WifiConfigFileTest, SaveValueCheck, TestSize.Level1)
     WifiConfig tmp;
     tmp.defaultWifiInterface = "abcd";
     tmp.scanAlwaysSwitch = true;
-    tmp.staAirplaneMode = true;
+    tmp.operatorWifiType = static_cast<int>(OperatorWifiType::INITIAL_TYPE);
     tmp.staLastState = true;
     tmp.savedDeviceAppraisalPriority = PRIORITY_1;
     tmp.scoretacticsScoreSlope = SCORE_SLOPE;
@@ -60,7 +60,7 @@ HWTEST_F(WifiConfigFileTest, SaveValueCheck, TestSize.Level1)
     WifiConfig ldCfg = vec[0];
     EXPECT_EQ(tmp.defaultWifiInterface, ldCfg.defaultWifiInterface);
     EXPECT_EQ(tmp.scanAlwaysSwitch, ldCfg.scanAlwaysSwitch);
-    EXPECT_EQ(tmp.staAirplaneMode, ldCfg.staAirplaneMode);
+    EXPECT_EQ(tmp.operatorWifiType, ldCfg.operatorWifiType);
     EXPECT_EQ(tmp.staLastState, ldCfg.staLastState);
     EXPECT_EQ(tmp.savedDeviceAppraisalPriority, ldCfg.savedDeviceAppraisalPriority);
     EXPECT_EQ(tmp.scoretacticsScoreSlope, ldCfg.scoretacticsScoreSlope);

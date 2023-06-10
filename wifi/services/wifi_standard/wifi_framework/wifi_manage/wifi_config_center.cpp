@@ -289,9 +289,14 @@ int WifiConfigCenter::GetP2pState()
     return WifiSettings::GetInstance().GetP2pState();
 }
 
-bool WifiConfigCenter::GetCanUseStaWhenAirplaneMode()
+int WifiConfigCenter::GetOperatorWifiType()
 {
-    return WifiSettings::GetInstance().GetCanUseStaWhenAirplaneMode();
+    return WifiSettings::GetInstance().GetOperatorWifiType();
+}
+
+int WifiConfigCenter::SetOperatorWifiType(int type)
+{
+    return WifiSettings::GetInstance().SetOperatorWifiType(type);
 }
 
 bool WifiConfigCenter::GetCanOpenStaWhenAirplaneMode()
@@ -301,7 +306,7 @@ bool WifiConfigCenter::GetCanOpenStaWhenAirplaneMode()
 
 bool WifiConfigCenter::GetWifiStateWhenAirplaneMode()
 {
-    return mWifiOpenedWhenAirplane;
+    return mWifiOpenedWhenAirplane.load();
 }
 
 void WifiConfigCenter::SetWifiStateWhenAirplaneMode(bool bState)

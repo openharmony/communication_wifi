@@ -1184,6 +1184,21 @@ public:
      */
     uint64_t GetThreadStartTime(void) const;
 
+    /**
+     * @Description Save the last disconnected reason
+     *
+     * @param discReason - discReason
+     */
+    void SaveDisconnectedReason(DisconnectedReason discReason);
+
+    /**
+     * @Description Get the last disconnected reason
+     *
+     * @param discReason - discReason
+     * @return int - 0 success
+     */
+    int GetDisconnectedReason(DisconnectedReason &discReason);
+
 private:
     WifiSettings();
     void InitWifiConfig();

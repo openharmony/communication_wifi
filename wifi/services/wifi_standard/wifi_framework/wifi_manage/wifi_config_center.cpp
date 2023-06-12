@@ -399,7 +399,7 @@ int WifiConfigCenter::SetP2pDeviceName(const std::string &deviceName)
     return WifiSettings::GetInstance().SetP2pDeviceName(deviceName);
 }
 
-int GetDisconnectedReason(DisconnectedReason &discReason)
+int WifiConfigCenter::GetDisconnectedReason(DisconnectedReason &discReason)
 {
     return WifiSettings::GetInstance().GetDisconnectedReason(discReason);
 }

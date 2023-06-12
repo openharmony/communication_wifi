@@ -262,7 +262,7 @@ if (defined(ohos_lite)) {
       "bundle_framework:appexecfwk_base",
       "c_utils:utils",
       "common_event_service:cesfwk_innerkits",
-      "hicollie_native:libhicollie",
+      "hicollie:libhicollie",
       "hiviewdfx_hilog_native:libhilog",
       "huks:libhukssdk",
       "ipc:ipc_single",

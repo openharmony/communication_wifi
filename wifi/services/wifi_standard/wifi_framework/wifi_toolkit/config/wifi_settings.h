@@ -1184,6 +1184,21 @@ public:
      */
     uint64_t GetThreadStartTime(void) const;
 
+    /**
+     * @Description Save the last disconnected reason
+     *
+     * @param discReason - discReason
+     */
+    void SaveDisconnectedReason(DisconnectedReason discReason);
+
+    /**
+     * @Description Get the last disconnected reason
+     *
+     * @param discReason - discReason
+     * @return int - 0 success
+     */
+    int GetDisconnectedReason(DisconnectedReason &discReason);
+
 private:
     WifiSettings();
     void InitWifiConfig();
@@ -1236,6 +1251,7 @@ private:
     std::pair<std::string, int> mBssidToTimeoutTime;
     std::map<int, PowerModel> powerModel;
     int mHotspotIdleTimeout;
+    DisconnectedReason mLastDiscReason;
 
     std::mutex mStaMutex;
     std::mutex mApMutex;

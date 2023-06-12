@@ -551,6 +551,14 @@ public:
      */
     int SetP2pDeviceName(const std::string &deviceName);
 
+    /**
+     * @Description get the last disconnected reason
+     *
+     * @param discReason - discReason
+     * @return int - 0 success
+     */
+    int GetDisconnectedReason(DisconnectedReason &discReason);
+
 private:
     std::mutex mApMutex;
     std::atomic<WifiOprMidState> mStaMidState;

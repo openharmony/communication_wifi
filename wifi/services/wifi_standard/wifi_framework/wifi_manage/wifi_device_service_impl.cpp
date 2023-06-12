@@ -1068,12 +1068,12 @@ ErrCode WifiDeviceServiceImpl::GetDisconnectedReason(DisconnectedReason &reason)
     }
     WifiLinkedInfo info;
     WifiConfigCenter::GetInstance().GetLinkedInfo(info);
-    WIFI_LOGI("%{public}s, connState=%{public}d, detailedState=%{public}d, disReason=%{public}d",
-        __func__, info.connState, info.detailedState, reason);
+    WIFI_LOGI("%{public}s, connState=%{public}d, detailedState=%{public}d",
+        __func__, info.connState, info.detailedState);
     if (info.connState == ConnState::CONNECTING || info.connState == ConnState::CONNECTED) {
         return WIFI_OPT_FAILED;
     }
-    reason = info.discReason;
+    WifiConfigCenter::GetInstance().GetLinkedInfo(reason);
     return WIFI_OPT_SUCCESS;
 }
 

@@ -146,7 +146,6 @@ struct WifiLinkedInfo {
     std::string portalUrl;
     SupplicantState supplicantState; /* wpa_supplicant state */
     DetailedState detailedState;     /* connection state */
-    DisconnectedReason discReason;   /* disconnection reason */
     int wifiStandard;                /* wifi standard */
     int maxSupportedRxLinkSpeed;
     int maxSupportedTxLinkSpeed;
@@ -172,7 +171,6 @@ struct WifiLinkedInfo {
         isDataRestricted = 0;
         supplicantState = SupplicantState::INVALID;
         detailedState = DetailedState::INVALID;
-        discReason = DisconnectedReason::DISC_REASON_DEFAULT;
         wifiStandard = 0;
         maxSupportedRxLinkSpeed = 0;
         maxSupportedTxLinkSpeed = 0;

@@ -49,6 +49,7 @@ WifiSettings::WifiSettings()
       mFreezeModeState(MODE_STATE_CLOSE),
       mNoChargerPlugModeState(MODE_STATE_CLOSE),
       mHotspotIdleTimeout(HOTSPOT_IDLE_TIMEOUT_INTERVAL_MS),
+      mLastDiscReason(DisconnectedReason::DISC_REASON_DEFAULT),
       explicitGroup(false)
 {
     mHotspotState[0] = static_cast<int>(ApState::AP_STATE_CLOSED);
@@ -1691,6 +1692,17 @@ bool WifiSettings::GetThreadStatusFlag(void) const
 uint64_t WifiSettings::GetThreadStartTime(void) const
 {
     return mThreadStartTime;
+}
+
+void WifiSettings::SaveDisconnectedReason(DisconnectedReason discReason)
+{
+    mLastDiscReason = discReason;
+}
+
+int WifiSettings::SaveDisconnectedReason(DisconnectedReason &discReason)
+{
+    discReason = mLastDiscReason;
+    return 0;
 }
 }  // namespace Wifi
 }  // namespace OHOS

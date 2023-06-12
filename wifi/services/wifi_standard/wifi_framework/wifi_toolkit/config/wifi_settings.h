@@ -1236,6 +1236,7 @@ private:
     std::pair<std::string, int> mBssidToTimeoutTime;
     std::map<int, PowerModel> powerModel;
     int mHotspotIdleTimeout;
+    DisconnectedReason mLastDiscReason;
 
     std::mutex mStaMutex;
     std::mutex mApMutex;

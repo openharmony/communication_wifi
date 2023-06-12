@@ -214,7 +214,6 @@ void StaStateMachine::InitWifiLinkedInfo()
     linkedInfo.lastPacketDirection = 0;
     linkedInfo.lastRxPackets = 0;
     linkedInfo.lastTxPackets = 0;
-    linkedInfo.discReason = DisconnectedReason::DISC_REASON_DEFAULT;
 }
 
 void StaStateMachine::InitLastWifiLinkedInfo()
@@ -957,7 +956,6 @@ void StaStateMachine::DealDisconnectEvent(InternalMessage *msg)
 #endif
     /* Initialize connection information. */
     InitWifiLinkedInfo();
-    linkedInfo.discReason = lastLinkedInfo.discReason;
     if (lastLinkedInfo.detailedState == DetailedState::CONNECTING) {
         linkedInfo.networkId = lastLinkedInfo.networkId;
         linkedInfo.ssid = lastLinkedInfo.ssid;
@@ -2267,9 +2265,7 @@ void StaStateMachine::DhcpResultNotify::OnSerExitNotify(const std::string &ifnam
 /* ------------------ state machine Comment function ----------------- */
 void StaStateMachine::SaveDiscReason(DisconnectedReason discReason)
 {
-    linkedInfo.discReason = discReason;
-    lastLinkedInfo.discReason = discReason;
-    WifiSettings::GetInstance().SaveLinkedInfo(linkedInfo);
+    WifiSettings::GetInstance().SaveDisconnectedReason(discReason);
 }
 
 void StaStateMachine::SaveLinkstate(ConnState state, DetailedState detailState)

@@ -1073,7 +1073,7 @@ ErrCode WifiDeviceServiceImpl::GetDisconnectedReason(DisconnectedReason &reason)
     if (info.connState == ConnState::CONNECTING || info.connState == ConnState::CONNECTED) {
         return WIFI_OPT_FAILED;
     }
-    WifiConfigCenter::GetInstance().GetLinkedInfo(reason);
+    WifiConfigCenter::GetInstance().GetDisconnectedReason(reason);
     return WIFI_OPT_SUCCESS;
 }
 

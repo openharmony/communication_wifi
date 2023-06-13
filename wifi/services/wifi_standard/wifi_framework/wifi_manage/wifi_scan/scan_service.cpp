@@ -49,7 +49,8 @@ ScanService::ScanService()
       scanTrustMode(false),
       isAbsFreezeState(false),
       isAbsFreezeScaned(false),
-      scanResultBackup(-1)
+      scanResultBackup(-1),
+      mEnhanceService(nullptr)
 {}
 
 ScanService::~ScanService()

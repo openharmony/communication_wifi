@@ -25,6 +25,7 @@
 #include "wifi_hdi_proxy.h"
 #include "wifi_log.h"
 #include "wifi_hal_callback.h"
+#include "stub_collector.h"
 #include "wifi_hdi_util.h"
 #include "wifi_supplicant_hal.h"
 
@@ -259,6 +260,19 @@ void UnRegisterHdiStaCallbackEvent()
         g_hdiScanResults = NULL;
     }
     if (g_hdiWanCallbackObj != NULL) {
+        WifiHdiProxy proxy = GetHdiProxy(PROTOCOL_80211_IFTYPE_STATION);
+        if (proxy.wlanObj == NULL || proxy.feature == NULL) {
+            pthread_mutex_unlock(&g_hdiMutex);
+            LOGE("Hdi proxy is NULL!");
+            return;
+        }
+        int32_t ret = proxy.wlanObj->UnregisterEventCallback(proxy.wlanObj, g_hdiWanCallbackObj, "wlan0");
+        if (ret != 0) {
+            LOGE("Hdi UnregisterEventCallback failed ret:%{public}d", ret);
+            pthread_mutex_unlock(&g_hdiMutex);
+            return;
+        }
+        StubCollectorRemoveObject(IWLANCALLBACK_INTERFACE_DESC, g_hdiWanCallbackObj);
         free(g_hdiWanCallbackObj);
         g_hdiWanCallbackObj = NULL;
     }

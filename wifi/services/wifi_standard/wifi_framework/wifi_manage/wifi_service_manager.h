@@ -28,6 +28,7 @@
 #ifdef FEATURE_P2P_SUPPORT
 #include "ip2p_service.h"
 #endif
+#include "ienhance_service.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -107,7 +108,23 @@ struct P2pServiceHandle {
     }
 };
 #endif
-
+struct EnhanceServiceHandle {
+    void *handle;
+    IEnhanceService *(*create)();
+    void *(*destroy)(IEnhanceService *);
+    IEnhanceService *pService;
+    EnhanceServiceHandle() : handle(nullptr), create(nullptr), destroy(nullptr), pService(nullptr)
+    {}
+    ~EnhanceServiceHandle()
+    {}
+    void Clear()
+    {
+        handle = nullptr;
+        create = nullptr;
+        destroy = nullptr;
+        pService = nullptr;
+    }
+};
 class WifiServiceManager {
 public:
     WifiServiceManager();
@@ -173,7 +190,12 @@ public:
      */
     IP2pService *GetP2pServiceInst(void);
 #endif
-
+    /**
+     * @Description Get the Enhance Service Inst object
+     *
+     * @return IEnhanceService* - Enhance service pointer, if Enhance not supported, nullptr is returned
+     */
+    IEnhanceService *GetEnhanceServiceInst(void);
     /**
      * @Description unload a feature service
      *
@@ -203,12 +225,14 @@ private:
     int LoadP2pService(const std::string &dlname, bool bCreate);
     int UnloadP2pService(bool bPreLoad);
 #endif
-
+    int LoadEnhanceService(const std::string &dlname, bool bCreate);
+    int UnloadEnhanceService(bool bPreLoad);
 private:
     std::mutex mStaMutex;
     std::mutex mScanMutex;
     std::mutex mP2pMutex;
     std::mutex mApMutex;
+    std::mutex mEnhanceMutex;
     std::unordered_map<std::string, std::string> mServiceDllMap;
     StaServiceHandle mStaServiceHandle;
     ScanServiceHandle mScanServiceHandle;
@@ -218,6 +242,7 @@ private:
 #ifdef FEATURE_P2P_SUPPORT
     P2pServiceHandle mP2pServiceHandle;
 #endif
+    EnhanceServiceHandle mEnhanceServiceHandle;
 };
 } // namespace Wifi
 } // namespace OHOS

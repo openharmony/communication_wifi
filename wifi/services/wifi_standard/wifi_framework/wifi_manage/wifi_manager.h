@@ -74,6 +74,14 @@ public:
     void OnReceiveEvent(const OHOS::EventFwk::CommonEventData &data) override;
 };
 
+class AirplaneModeEventSubscriber : public OHOS::EventFwk::CommonEventSubscriber {
+public:
+    explicit AirplaneModeEventSubscriber(const OHOS::EventFwk::CommonEventSubscribeInfo &subscriberInfo)
+        : CommonEventSubscriber(subscriberInfo) {}
+    virtual ~AirplaneModeEventSubscriber() {};
+    void OnReceiveEvent(const OHOS::EventFwk::CommonEventData &eventData) override;
+};
+
 class WifiTimer {
 public:
     using TimerCallback = std::function<void()>;
@@ -172,6 +180,9 @@ public:
     static WifiManager &GetInstance();
 
     void RegisterCfgMonitorCallback(WifiCfgMonitorEventCallback callback);
+    void GetAirplaneModeByDatashare(int systemAbilityId);
+    void DealOpenAirplaneModeEvent();
+    void DealCloseAirplaneModeEvent();
 
 private:
     void PushServiceCloseMsg(WifiCloseServiceCode code);
@@ -226,11 +237,17 @@ private:
     static void DealConfigChanged(CfgType type, char* data, int dataLen);
 #endif
     static void AutoStartStaService(void);
+    static void AutoStopStaService(void);
     static void ForceStopWifi(void);
+#ifdef FEATURE_AP_SUPPORT
+    static void AutoStopApService(void);
+#endif
 #ifdef FEATURE_P2P_SUPPORT
     static void AutoStartP2pService(void);
+    static void AutoStopP2pService(void);
 #endif
     static void AutoStartScanService(void);
+    static void AutoStartEnhanceService(void);
     static void CheckAndStartSta(void);
     static void AutoStartServiceThread(void);
 
@@ -266,6 +283,10 @@ private:
     void UnRegisterScreenEvent();
     std::shared_ptr<ScreenEventSubscriber> screenEventSubscriber_ = nullptr;
     uint32_t screenTimerId{0};
+    void RegisterAirplaneModeEvent();
+    void UnRegisterAirplaneModeEvent();
+    std::shared_ptr<AirplaneModeEventSubscriber> airplaneModeEventSubscriber_ = nullptr;
+    uint32_t airplaneModeTimerId{0};
 #endif
     InitStatus mInitStatus;
     long mSupportedFeatures;

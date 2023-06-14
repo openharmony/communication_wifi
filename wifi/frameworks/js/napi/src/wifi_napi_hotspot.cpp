@@ -129,7 +129,9 @@ static bool GetHotspotconfigFromJs(const napi_env& env, const napi_value& object
         config.SetChannel(AP_CHANNEL_5G_DEFAULT);
     }
     value = 0;
-    JsObjectToString(env, object, "preSharedKey", NAPI_MAX_STR_LENT, str); // 64: max length
+    if (!JsObjectToString(env, object, "preSharedKey", NAPI_MAX_STR_LENT, str)) { // 64: max length
+        return false;
+    }
     ClearJsLastException(env);
     config.SetPreSharedKey(str);
     JsObjectToInt(env, object, "maxConn", value);

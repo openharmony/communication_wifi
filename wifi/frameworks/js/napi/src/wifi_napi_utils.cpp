@@ -68,14 +68,17 @@ napi_value JsObjectToString(const napi_env& env, const napi_value& object,
 
         napi_get_named_property(env, object, fieldStr, &field);
         NAPI_CALL(env, napi_typeof(env, field, &valueType));
-        NAPI_ASSERT(env, valueType == napi_string, "Wrong argument type. String expected.");
+        if (valueType != napi_string) {
+            WIFI_LOGE("Wrong argument type. String expected.");
+            return NULL;
+        }
         if (bufLen <= 0) {
-            goto error;
+            return NULL;
         }
         char *buf = (char *)malloc(bufLen);
         if (buf == nullptr) {
             WIFI_LOGE("Js object to str malloc failed");
-            goto error;
+            return NULL;
         }
         (void)memset_s(buf, bufLen, 0, bufLen);
         size_t result = 0;
@@ -90,9 +93,8 @@ napi_value JsObjectToString(const napi_env& env, const napi_value& object,
         buf = nullptr;
     } else {
         WIFI_LOGW("Js obj to str no property: %{public}s", fieldStr);
+        return NULL;
     }
-
-error:
     return UndefinedNapiValue(env);
 }
 

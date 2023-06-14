@@ -346,6 +346,26 @@ public:
     int SetWifiP2pGroupInfo(const std::vector<WifiP2pGroupInfo> &groups);
 
     /**
+     * @brief increase sta connected failed count
+     *
+     * @param index - bssid string or ssid string
+     * @param indexType - index type 0:ssid 1:bssid
+     * @param count - the increase count to set
+     * @return int - 0 success; -1 not find the device config
+     */
+    int IncreaseDeviceConnFailedCount(const std::string &index, const int &indexType, int count);
+
+    /**
+     * @brief set sta connected failed count
+     *
+     * @param index - bssid string or ssid string
+     * @param indexType - index type 0:ssid 1:bssid
+     * @param count - the count to set
+     * @return int - 0 success; -1 not find the device config
+     */
+    int SetDeviceConnFailedCount(const std::string &index, const int &indexType, int count);
+
+    /**
      * @Description Delete a WifiP2pGroupInfo node
      *
      * @return int

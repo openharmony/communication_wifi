@@ -126,6 +126,8 @@ public:
 
     ErrCode GetLinkedInfo(WifiLinkedInfo &info) override;
 
+    ErrCode GetDisconnectedReason(DisconnectedReason &reason) override;
+
     ErrCode GetIpInfo(IpInfo &info) override;
 
     ErrCode SetCountryCode(const std::string &countryCode) override;
@@ -195,8 +197,8 @@ private:
     static sptr<WifiDeviceServiceImpl> g_instance;
     std::shared_ptr<AppEventSubscriber> eventSubscriber_ = nullptr;
     std::shared_ptr<ThermalLevelSubscriber> thermalLevelSubscriber_ = nullptr;
-    std::unique_ptr<Utils::Timer> lpTimer_ = nullptr;
-    std::unique_ptr<Utils::Timer> lpThermalTimer_ = nullptr;
+    uint32_t appEventTimerId{0};
+    uint32_t thermalTimerId{0};
 #endif
     static std::mutex g_instanceLock;
     static bool isServiceStart;

@@ -60,7 +60,6 @@ bool WifiScanImpl::Init()
     client_ = scanProxy;
     return true;
 #else
-    WifiSaLoadManager::GetInstance().LoadWifiSa(systemAbilityId_);
     return GetWifiScanProxy();
 #endif
 }
@@ -70,21 +69,18 @@ bool WifiScanImpl::GetWifiScanProxy(void)
 #ifdef OHOS_ARCH_LITE
     return (client_ != nullptr);
 #else
+    WifiSaLoadManager::GetInstance().LoadWifiSa(systemAbilityId_);
+
     if (IsRemoteDied() == false) {
         return true;
     }
 
-    WIFI_LOGI("GetWifiScanProxy, get new sa from remote!");
     sptr<ISystemAbilityManager> sa_mgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (sa_mgr == nullptr) {
         WIFI_LOGE("failed to get SystemAbilityManager");
         return false;
     }
-    auto objectSA = sa_mgr->CheckSystemAbility(systemAbilityId_);
-    if (objectSA == nullptr) {
-        WIFI_LOGI("GetWifiScanProxy, load sa from remote again!");
-        WifiSaLoadManager::GetInstance().LoadWifiSa(systemAbilityId_);
-    }
+
     sptr<IRemoteObject> object = sa_mgr->GetSystemAbility(systemAbilityId_);
     if (object == nullptr) {
         WIFI_LOGE("failed to get SCAN_SERVICE");
@@ -104,30 +100,35 @@ bool WifiScanImpl::GetWifiScanProxy(void)
 
 ErrCode WifiScanImpl::SetScanControlInfo(const ScanControlInfo &info)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     RETURN_IF_FAIL(GetWifiScanProxy());
     return client_->SetScanControlInfo(info);
 }
 
 ErrCode WifiScanImpl::Scan()
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     RETURN_IF_FAIL(GetWifiScanProxy());
     return client_->Scan();
 }
 
 ErrCode WifiScanImpl::AdvanceScan(const WifiScanParams &params)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     RETURN_IF_FAIL(GetWifiScanProxy());
     return client_->AdvanceScan(params);
 }
 
 ErrCode WifiScanImpl::IsWifiClosedScan(bool &bOpen)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     RETURN_IF_FAIL(GetWifiScanProxy());
     return client_->IsWifiClosedScan(bOpen);
 }
 
 ErrCode WifiScanImpl::GetScanInfoList(std::vector<WifiScanInfo> &result)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     RETURN_IF_FAIL(GetWifiScanProxy());
     return client_->GetScanInfoList(result);
 }
@@ -139,18 +140,21 @@ ErrCode WifiScanImpl::RegisterCallBack(const std::shared_ptr<IWifiScanCallback> 
 ErrCode WifiScanImpl::RegisterCallBack(const sptr<IWifiScanCallback> &callback, const std::vector<std::string> &event)
 #endif
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     RETURN_IF_FAIL(GetWifiScanProxy());
     return client_->RegisterCallBack(callback, event);
 }
 
 ErrCode WifiScanImpl::GetSupportedFeatures(long &features)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     RETURN_IF_FAIL(GetWifiScanProxy());
     return client_->GetSupportedFeatures(features);
 }
 
 bool WifiScanImpl::IsFeatureSupported(long feature)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     RETURN_IF_FAIL(GetWifiScanProxy());
     long tmpFeatures = 0;
     if (client_->GetSupportedFeatures(tmpFeatures) != WIFI_OPT_SUCCESS) {

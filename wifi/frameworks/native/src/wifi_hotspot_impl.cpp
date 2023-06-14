@@ -45,27 +45,23 @@ WifiHotspotImpl::~WifiHotspotImpl()
 bool WifiHotspotImpl::Init(int id)
 {
     instId = id;
-    WifiSaLoadManager::GetInstance().LoadWifiSa(systemAbilityId_);
     return GetWifiHotspotProxy();
 }
 
 bool WifiHotspotImpl::GetWifiHotspotProxy(void)
 {
+    WifiSaLoadManager::GetInstance().LoadWifiSa(systemAbilityId_);
+
     if (IsRemoteDied() == false) {
         return true;
     }
 
-    WIFI_LOGI("GetWifiHotspotProxy, get new sa from remote!");
     sptr<ISystemAbilityManager> sa_mgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (sa_mgr == nullptr) {
         WIFI_LOGE("failed to get SystemAbilityManager");
         return false;
     }
-    auto objectSA = sa_mgr->CheckSystemAbility(systemAbilityId_);
-    if (objectSA == nullptr) {
-        WIFI_LOGI("GetWifiHotspotProxy, load sa from remote again!");
-        WifiSaLoadManager::GetInstance().LoadWifiSa(systemAbilityId_);
-    }
+
     sptr<IRemoteObject> object = sa_mgr->GetSystemAbility(systemAbilityId_);
     if (object == nullptr) {
         WIFI_LOGE("failed to get hotspot mgr");
@@ -97,90 +93,105 @@ bool WifiHotspotImpl::GetWifiHotspotProxy(void)
 
 ErrCode WifiHotspotImpl::IsHotspotActive(bool &isActive)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     RETURN_IF_FAIL(GetWifiHotspotProxy());
     return client_->IsHotspotActive(isActive);
 }
 
 ErrCode WifiHotspotImpl::IsHotspotDualBandSupported(bool &isSupported)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     RETURN_IF_FAIL(GetWifiHotspotProxy());
     return client_->IsHotspotDualBandSupported(isSupported);
 }
 
 ErrCode WifiHotspotImpl::GetHotspotState(int &state)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     RETURN_IF_FAIL(GetWifiHotspotProxy());
     return client_->GetHotspotState(state);
 }
 
 ErrCode WifiHotspotImpl::GetHotspotConfig(HotspotConfig &config)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     RETURN_IF_FAIL(GetWifiHotspotProxy());
     return client_->GetHotspotConfig(config);
 }
 
 ErrCode WifiHotspotImpl::SetHotspotConfig(const HotspotConfig &config)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     RETURN_IF_FAIL(GetWifiHotspotProxy());
     return client_->SetHotspotConfig(config);
 }
 
 ErrCode WifiHotspotImpl::SetHotspotIdleTimeout(int time)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     RETURN_IF_FAIL(client_);
     return client_->SetHotspotIdleTimeout(time);
 }
 
 ErrCode WifiHotspotImpl::GetStationList(std::vector<StationInfo> &result)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     RETURN_IF_FAIL(GetWifiHotspotProxy());
     return client_->GetStationList(result);
 }
 
 ErrCode WifiHotspotImpl::DisassociateSta(const StationInfo &info)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     RETURN_IF_FAIL(GetWifiHotspotProxy());
     return client_->DisassociateSta(info);
 }
 
 ErrCode WifiHotspotImpl::EnableHotspot(const ServiceType type)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     RETURN_IF_FAIL(GetWifiHotspotProxy());
     return client_->EnableHotspot(type);
 }
 
 ErrCode WifiHotspotImpl::DisableHotspot(const ServiceType type)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     RETURN_IF_FAIL(GetWifiHotspotProxy());
     return client_->DisableHotspot(type);
 }
 
 ErrCode WifiHotspotImpl::GetBlockLists(std::vector<StationInfo> &infos)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     RETURN_IF_FAIL(GetWifiHotspotProxy());
     return client_->GetBlockLists(infos);
 }
 
 ErrCode WifiHotspotImpl::AddBlockList(const StationInfo &info)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     RETURN_IF_FAIL(GetWifiHotspotProxy());
     return client_->AddBlockList(info);
 }
 
 ErrCode WifiHotspotImpl::DelBlockList(const StationInfo &info)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     RETURN_IF_FAIL(GetWifiHotspotProxy());
     return client_->DelBlockList(info);
 }
 
 ErrCode WifiHotspotImpl::GetValidBands(std::vector<BandType> &bands)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     RETURN_IF_FAIL(GetWifiHotspotProxy());
     return client_->GetValidBands(bands);
 }
 
 ErrCode WifiHotspotImpl::GetValidChannels(BandType band, std::vector<int32_t> &validchannels)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     RETURN_IF_FAIL(GetWifiHotspotProxy());
     return client_->GetValidChannels(band, validchannels);
 }
@@ -188,18 +199,21 @@ ErrCode WifiHotspotImpl::GetValidChannels(BandType band, std::vector<int32_t> &v
 ErrCode WifiHotspotImpl::RegisterCallBack(const sptr<IWifiHotspotCallback> &callback,
     const std::vector<std::string> &event)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     RETURN_IF_FAIL(GetWifiHotspotProxy());
     return client_->RegisterCallBack(callback, event);
 }
 
 ErrCode WifiHotspotImpl::GetSupportedFeatures(long &features)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     RETURN_IF_FAIL(GetWifiHotspotProxy());
     return client_->GetSupportedFeatures(features);
 }
 
 bool WifiHotspotImpl::IsFeatureSupported(long feature)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     RETURN_IF_FAIL(GetWifiHotspotProxy());
     long tmpFeatures = 0;
     if (client_->GetSupportedFeatures(tmpFeatures) != WIFI_OPT_SUCCESS) {
@@ -210,18 +224,21 @@ bool WifiHotspotImpl::IsFeatureSupported(long feature)
 
 ErrCode WifiHotspotImpl::GetSupportedPowerModel(std::set<PowerModel>& setPowerModelList)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     RETURN_IF_FAIL(GetWifiHotspotProxy());
     return client_->GetSupportedPowerModel(setPowerModelList);
 }
 
 ErrCode WifiHotspotImpl::GetPowerModel(PowerModel& model)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     RETURN_IF_FAIL(GetWifiHotspotProxy());
     return client_->GetPowerModel(model);
 }
 
 ErrCode WifiHotspotImpl::SetPowerModel(const PowerModel& model)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     RETURN_IF_FAIL(GetWifiHotspotProxy());
     return client_->SetPowerModel(model);
 }

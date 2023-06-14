@@ -62,11 +62,10 @@ ErrCode StaSavedDeviceAppraisal::DeviceAppraisals(
         }
 
         int score = 0;
-        AppraiseDeviceQuality(score, scanInfo, device, info);
+        AppraiseDeviceQuality(score, scanInfo, device, info, device.connFailedCount >= MAX_RETRY_COUNT);
         WIFI_LOGI("The device networkId:%{public}d ssid:%{public}s score:%{public}d rssi:%{public}d.",
             device.networkId, SsidAnonymize(scanInfo.ssid).c_str(), score, scanInfo.rssi);
-
-        if (score > highestScore || (score == highestScore && scanInfo.rssi > scanInfoElected.rssi)) {
+        if (CheckHigherPriority(score, highestScore, scanInfo.rssi, scanInfoElected.rssi)) {
             highestScore = score;
             scanInfoElected.rssi = scanInfo.rssi;
             electedDevice = device;
@@ -115,8 +114,8 @@ bool StaSavedDeviceAppraisal::WhetherSkipDevice(WifiDeviceConfig &device)
     return false;
 }
 
-void StaSavedDeviceAppraisal::AppraiseDeviceQuality(
-    int &score, InterScanInfo &scanInfo, WifiDeviceConfig &device, WifiLinkedInfo &info)
+void StaSavedDeviceAppraisal::AppraiseDeviceQuality(int &score, InterScanInfo &scanInfo,
+    WifiDeviceConfig &device, WifiLinkedInfo &info, bool flip)
 {
     WIFI_LOGI("Enter StaSavedDeviceAppraisal::AppraiseDeviceQuality.\n");
     int rssi = scanInfo.rssi;
@@ -182,6 +181,10 @@ void StaSavedDeviceAppraisal::AppraiseDeviceQuality(
         score += safetyDeviceScore;
         WIFI_LOGI("security score is %{public}d.\n", safetyDeviceScore);
     }
+
+    if (flip) { // lowest priority ssid, filp the score
+        score = 0 - score;
+    }
 }
 
 bool StaSavedDeviceAppraisal::Whether5GDevice(int frequency)
@@ -205,6 +208,25 @@ int StaSavedDeviceAppraisal::CalculateSignalBars(int rssi, int signalBars)
         float outputRange = (signalBars - 1);
         return static_cast<int>(static_cast<float>(rssi - VALUE_LIMIT_MIN_RSSI) * outputRange / inputRange);
     }
+}
+
+bool StaSavedDeviceAppraisal::CheckHigherPriority(int score, int lastScore, int rssi, int selectedRssi)
+{
+    bool higerPriority = false;
+    if (lastScore == 0) {
+        higerPriority = true; // first higerPriority
+    } else if (lastScore > 0) {
+        higerPriority = score > lastScore || // compare score, if equal then compare rssi
+            (score == lastScore && rssi > selectedRssi);
+    } else {
+        if (score >= 0) {
+            higerPriority = true; // > 0 higher priority
+        } else {
+            higerPriority = score < lastScore || // both low priority then compare score
+                (score == lastScore && rssi > selectedRssi);
+        }
+    }
+    return higerPriority;
 }
 }  // namespace Wifi
 }  // namespace OHOS

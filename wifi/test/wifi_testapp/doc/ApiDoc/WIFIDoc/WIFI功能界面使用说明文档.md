@@ -27,7 +27,6 @@ Wifi配置信息包括:
 >| disableReason |        number        |                    0                    | 禁用原因。 **系统接口：** 此接口为系统接口。       |
 >|     netId     |        number        |                    0                    | 分配的网络ID。 **系统接口：** 此接口为系统接口。   |
 >| randomMacType |        number        |                    0                    | 随机MAC类型。 **系统接口：** 此接口为系统接口。    |
->| randomMacAddr |        string        |            08:fb:ea:1b:38:aa            | 随机MAC地址。 **系统接口：** 此接口为系统接口。    |
 >|    ipType     |      **IpType**      |                    1                    | IP地址类型。 **系统接口：** 此接口为系统接口。     |
 >|   staticIp    |     **IpConfig**     | ipAddress；gateway；dnsServers；domains | 静态IP配置信息。 **系统接口：** 此接口为系统接口。 |
 >

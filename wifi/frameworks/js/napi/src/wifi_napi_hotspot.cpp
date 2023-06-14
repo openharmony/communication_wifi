@@ -96,14 +96,26 @@ static bool IsSecTypeSupported(int secType)
     return g_mapSecTypeToKeyMgmt.find(SecTypeJs(secType)) != g_mapSecTypeToKeyMgmt.end();
 }
 
+static void ClearJsLastException(const napi_env& env)
+{
+    bool isPendingException = false;
+    napi_is_exception_pending(env, &isPendingException);
+    if (isPendingException) {
+        napi_value lastException = nullptr;
+        napi_get_and_clear_last_exception(env, &lastException);
+    }
+}
+
 static bool GetHotspotconfigFromJs(const napi_env& env, const napi_value& object, HotspotConfig& config)
 {
     std::string str = "";
     int value = 0;
     JsObjectToString(env, object, "ssid", NAPI_MAX_STR_LENT, str); // 33: ssid max length is 32 + '\0'
+    ClearJsLastException(env);
     config.SetSsid(str);
     str = "";
     JsObjectToInt(env, object, "securityType", value);
+    ClearJsLastException(env);
     if (!IsSecTypeSupported(value)) {
         WIFI_LOGE("securityType is not supported: %{public}d", value);
         return false;
@@ -111,17 +123,23 @@ static bool GetHotspotconfigFromJs(const napi_env& env, const napi_value& object
     config.SetSecurityType(GetKeyMgmtFromJsSecurityType(value));
     value = 0;
     JsObjectToInt(env, object, "band", value);
+    ClearJsLastException(env);
     config.SetBand(BandType(value)); // 1: 2.4G, 2: 5G
     if (config.GetBand() == BandType::BAND_5GHZ) {
         config.SetChannel(AP_CHANNEL_5G_DEFAULT);
     }
     value = 0;
-    JsObjectToString(env, object, "preSharedKey", NAPI_MAX_STR_LENT, str); // 64: max length
+    if (!JsObjectToString(env, object, "preSharedKey", NAPI_MAX_STR_LENT, str)) { // 64: max length
+        return false;
+    }
+    ClearJsLastException(env);
     config.SetPreSharedKey(str);
     JsObjectToInt(env, object, "maxConn", value);
+    ClearJsLastException(env);
     config.SetMaxConn(value);
     value = 0;
     JsObjectToInt(env, object, "channel", value);
+    ClearJsLastException(env);
     if (value == 0) {
         value = (int)AP_CHANNEL_DEFAULT;
     }
@@ -167,6 +185,7 @@ NO_SANITIZE("cfi") napi_value SetHotspotConfig(napi_env env, napi_callback_info 
     ErrCode ret = WIFI_OPT_FAILED;
     HotspotConfig config;
     if (GetHotspotconfigFromJs(env, argv[0], config)) {
+        ClearJsLastException(env);
         ret = wifiHotspotPtr->SetHotspotConfig(config);
         if (ret != WIFI_OPT_SUCCESS) {
             WIFI_LOGE("Set hotspot config error: %{public}d", ret);

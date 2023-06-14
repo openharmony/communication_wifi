@@ -213,7 +213,7 @@ ErrCode StaService::ConnectToCandidateConfig(const int uid, const int networkId)
     }
 
     pStaAutoConnectService->EnableOrDisableBssid(config.bssid, true, 0);
-    pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_CONNECT_SAVED_NETWORK, networkId, NETWORK_SELECTED_BY_THE_USER);
+    pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_CONNECT_SAVED_NETWORK, networkId, NETWORK_SELECTED_BY_USER);
     return WIFI_OPT_SUCCESS;
 }
 
@@ -347,7 +347,7 @@ ErrCode StaService::ConnectToDevice(const WifiDeviceConfig &config) const
         return WIFI_OPT_FAILED;
     }
     LOGI("StaService::ConnectToDevice, netWorkId: %{public}d", netWorkId);
-    pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_CONNECT_NETWORK, netWorkId, NETWORK_SELECTED_BY_THE_USER);
+    pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_CONNECT_NETWORK, netWorkId, NETWORK_SELECTED_BY_USER);
     return WIFI_OPT_SUCCESS;
 }
 
@@ -363,7 +363,7 @@ ErrCode StaService::ConnectToNetwork(int networkId) const
     CHECK_NULL_AND_RETURN(pStaStateMachine, WIFI_OPT_FAILED);
     LOGI("StaService::ConnectToNetwork, ssid = %{public}s.", SsidAnonymize(config.ssid).c_str());
     pStaAutoConnectService->EnableOrDisableBssid(config.bssid, true, 0);
-    pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_CONNECT_SAVED_NETWORK, networkId, NETWORK_SELECTED_BY_THE_USER);
+    pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_CONNECT_SAVED_NETWORK, networkId, NETWORK_SELECTED_BY_USER);
     return WIFI_OPT_SUCCESS;
 }
 

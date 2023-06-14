@@ -44,6 +44,7 @@ napi_value ReConnect(napi_env env, napi_callback_info info);
 napi_value ReAssociate(napi_env env, napi_callback_info info);
 napi_value GetIpInfo(napi_env env, napi_callback_info info);
 napi_value GetLinkedInfo(napi_env env, napi_callback_info info);
+napi_value GetDisconnectedReason(napi_env env, napi_callback_info info);
 napi_value RemoveDevice(napi_env env, napi_callback_info info);
 napi_value RemoveAllNetwork(napi_env env, napi_callback_info info);
 napi_value DisableNetwork(napi_env env, napi_callback_info info);

@@ -100,8 +100,13 @@ ErrCode WifiP2pServiceImpl::CheckCanEnableP2p(void)
         WIFI_LOGE("EnableP2p:VerifySetWifiInfoPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
-    if (WifiConfigCenter::GetInstance().GetAirplaneModeState() == 1) {
-        WIFI_LOGW("current airplane mode and can not use p2p, open failed!");
+    /**
+     * when airplane mode opened, if the config "can_open_sta_when_airplanemode"
+     * opened, then can open sta; other, return forbid.
+     */
+    if (WifiConfigCenter::GetInstance().GetAirplaneModeState() == MODE_STATE_OPEN &&
+        !WifiConfigCenter::GetInstance().GetCanOpenStaWhenAirplaneMode()) {
+        WIFI_LOGI("current airplane mode and can not use p2p, open failed!");
         return WIFI_OPT_FORBID_AIRPLANE;
     }
     if (WifiConfigCenter::GetInstance().GetPowerSavingModeState() == 1) {
@@ -157,6 +162,8 @@ ErrCode WifiP2pServiceImpl::EnableP2p(void)
     if (ret != WIFI_OPT_SUCCESS) {
         WifiConfigCenter::GetInstance().SetP2pMidState(WifiOprMidState::OPENING, WifiOprMidState::CLOSED);
         WifiServiceManager::GetInstance().UnloadService(WIFI_SERVICE_P2P);
+    } else {
+        WifiManager::GetInstance().UnRegisterUnloadP2PSaTimer();
     }
     return ret;
 }

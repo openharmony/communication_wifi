@@ -20,7 +20,12 @@
 extern "C" {
 #endif
 
+#ifdef OHOS_EUPDATER
+#define CONFIG_ROOR_DIR "/tmp/service/el1/public/wifi"
+#else
 #define CONFIG_ROOR_DIR "/data/service/el1/public/wifi"
+#endif // OHOS_EUPDATER
+
 #define WIFI_MANAGGER_PID_NAME "wifi_mgr_pid"
 #define DIR_MAX_LENGTH          256
 #define PID_MAX_LENGTH          32

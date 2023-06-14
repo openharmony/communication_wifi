@@ -228,7 +228,7 @@ void StaSavedDeviceAppraisalTest::AppraiseDeviceQualitySuccess1()
     EXPECT_CALL(WifiSettings::GetInstance(), GetSignalLevel(_, _)).Times(AtLeast(0));
     EXPECT_CALL(WifiSettings::GetInstance(), GetUserLastSelectedNetworkId()).Times(AtLeast(1)).WillOnce(Return(0));
     EXPECT_CALL(WifiSettings::GetInstance(), GetUserLastSelectedNetworkTimeVal()).Times(AtLeast(1));
-    pStaSavedDeviceAppraisal->AppraiseDeviceQuality(score, scanInfo, deviceConfig, info);
+    pStaSavedDeviceAppraisal->AppraiseDeviceQuality(score, scanInfo, deviceConfig, info, false);
 }
 
 void StaSavedDeviceAppraisalTest::AppraiseDeviceQualitySuccess2()
@@ -246,7 +246,7 @@ void StaSavedDeviceAppraisalTest::AppraiseDeviceQualitySuccess2()
     EXPECT_CALL(WifiSettings::GetInstance(), GetSignalLevel(_, _)).Times(AtLeast(0));
     EXPECT_CALL(WifiSettings::GetInstance(), GetUserLastSelectedNetworkId()).Times(AtLeast(1)).WillOnce(Return(0));
     EXPECT_CALL(WifiSettings::GetInstance(), GetUserLastSelectedNetworkTimeVal()).Times(AtLeast(1));
-    pStaSavedDeviceAppraisal->AppraiseDeviceQuality(score, scanInfo, deviceConfig, info);
+    pStaSavedDeviceAppraisal->AppraiseDeviceQuality(score, scanInfo, deviceConfig, info, false);
 }
 
 void StaSavedDeviceAppraisalTest::AppraiseDeviceQualitySuccess3()
@@ -264,7 +264,7 @@ void StaSavedDeviceAppraisalTest::AppraiseDeviceQualitySuccess3()
     EXPECT_CALL(WifiSettings::GetInstance(), GetSignalLevel(_, _)).Times(AtLeast(0));
     EXPECT_CALL(WifiSettings::GetInstance(), GetUserLastSelectedNetworkId()).Times(AtLeast(1)).WillOnce(Return(0));
     EXPECT_CALL(WifiSettings::GetInstance(), GetUserLastSelectedNetworkTimeVal()).Times(AtLeast(1));
-    pStaSavedDeviceAppraisal->AppraiseDeviceQuality(score, scanInfo, deviceConfig, info);
+    pStaSavedDeviceAppraisal->AppraiseDeviceQuality(score, scanInfo, deviceConfig, info, false);
 }
 
 void StaSavedDeviceAppraisalTest::AppraiseDeviceQualitySuccess4()
@@ -283,25 +283,25 @@ void StaSavedDeviceAppraisalTest::AppraiseDeviceQualitySuccess4()
     EXPECT_CALL(WifiSettings::GetInstance(), GetSignalLevel(_, _)).Times(AtLeast(0));
     EXPECT_CALL(WifiSettings::GetInstance(), GetUserLastSelectedNetworkId()).Times(AtLeast(1)).WillOnce(Return(0));
     EXPECT_CALL(WifiSettings::GetInstance(), GetUserLastSelectedNetworkTimeVal()).Times(AtLeast(1));
-    pStaSavedDeviceAppraisal->AppraiseDeviceQuality(score, scanInfo, deviceConfig, info);
+    pStaSavedDeviceAppraisal->AppraiseDeviceQuality(score, scanInfo, deviceConfig, info, false);
     EXPECT_CALL(WifiSettings::GetInstance(), GetSignalLevel(_, _)).Times(AtLeast(0));
     EXPECT_CALL(WifiSettings::GetInstance(), GetUserLastSelectedNetworkId()).Times(AtLeast(1)).WillOnce(Return(1));
     EXPECT_CALL(WifiSettings::GetInstance(), GetUserLastSelectedNetworkTimeVal()).Times(AtLeast(1));
-    pStaSavedDeviceAppraisal->AppraiseDeviceQuality(score, scanInfo, deviceConfig, info);
+    pStaSavedDeviceAppraisal->AppraiseDeviceQuality(score, scanInfo, deviceConfig, info, false);
     EXPECT_CALL(WifiSettings::GetInstance(), GetSignalLevel(_, _)).Times(AtLeast(0));
     EXPECT_CALL(WifiSettings::GetInstance(), GetUserLastSelectedNetworkId()).Times(AtLeast(1)).WillOnce(Return(-1));
     EXPECT_CALL(WifiSettings::GetInstance(), GetUserLastSelectedNetworkTimeVal()).Times(AtLeast(1));
-    pStaSavedDeviceAppraisal->AppraiseDeviceQuality(score, scanInfo, deviceConfig, info);
+    pStaSavedDeviceAppraisal->AppraiseDeviceQuality(score, scanInfo, deviceConfig, info, false);
     info.detailedState = DetailedState::FAILED;
     EXPECT_CALL(WifiSettings::GetInstance(), GetSignalLevel(_, _)).Times(AtLeast(0));
     EXPECT_CALL(WifiSettings::GetInstance(), GetUserLastSelectedNetworkId()).Times(AtLeast(1)).WillOnce(Return(-1));
     EXPECT_CALL(WifiSettings::GetInstance(), GetUserLastSelectedNetworkTimeVal()).Times(AtLeast(1));
-    pStaSavedDeviceAppraisal->AppraiseDeviceQuality(score, scanInfo, deviceConfig, info);
+    pStaSavedDeviceAppraisal->AppraiseDeviceQuality(score, scanInfo, deviceConfig, info, false);
     info.bssid = "00:11:22:33:44:55";
     EXPECT_CALL(WifiSettings::GetInstance(), GetSignalLevel(_, _)).Times(AtLeast(0));
     EXPECT_CALL(WifiSettings::GetInstance(), GetUserLastSelectedNetworkId()).Times(AtLeast(1)).WillOnce(Return(-1));
     EXPECT_CALL(WifiSettings::GetInstance(), GetUserLastSelectedNetworkTimeVal()).Times(AtLeast(1));
-    pStaSavedDeviceAppraisal->AppraiseDeviceQuality(score, scanInfo, deviceConfig, info);
+    pStaSavedDeviceAppraisal->AppraiseDeviceQuality(score, scanInfo, deviceConfig, info, false);
 }
 
 void StaSavedDeviceAppraisalTest::WhetherSkipDeviceSuccess1()

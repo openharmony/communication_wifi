@@ -134,22 +134,17 @@ void WifiDeviceServiceImpl::OnStart()
     WIFI_LOGI("Start sta service!");
     WifiManager::GetInstance();
 #ifndef OHOS_ARCH_LITE
+    // Get airplane mode by datashare
+    WifiManager::GetInstance().GetAirplaneModeByDatashare(WIFI_DEVICE_ABILITY_ID);
+
     if (eventSubscriber_ == nullptr) {
-        lpTimer_ = std::make_unique<Utils::Timer>("WifiDeviceServiceImpl");
         TimeOutCallback timeoutCallback = std::bind(&WifiDeviceServiceImpl::RegisterAppRemoved, this);
-        if (lpTimer_ != nullptr) {
-            lpTimer_->Setup();
-            lpTimer_->Register(timeoutCallback, TIMEOUT_APP_EVENT, true);
-        } else {
-            WIFI_LOGE("lpTimer_ is nullptr!");
-        }
+        WifiTimer::GetInstance()->Register(timeoutCallback, appEventTimerId, TIMEOUT_APP_EVENT);
     }
 
     if (thermalLevelSubscriber_ == nullptr) {
-        lpThermalTimer_ = std::make_unique<Utils::Timer>("WifiDeviceServiceImpl");
         TimeOutCallback timeoutCallback = std::bind(&WifiDeviceServiceImpl::RegisterThermalLevel, this);
-        lpThermalTimer_->Setup();
-        lpThermalTimer_->Register(timeoutCallback, TIMEOUT_THERMAL_EVENT, true);
+        WifiTimer::GetInstance()->Register(timeoutCallback, thermalTimerId, TIMEOUT_THERMAL_EVENT);
     }
 
     StartWatchdog();
@@ -182,17 +177,13 @@ void WifiDeviceServiceImpl::OnStop()
     if (eventSubscriber_ != nullptr) {
         UnRegisterAppRemoved();
     }
-    if (lpTimer_ != nullptr) {
-        lpTimer_->Shutdown(false);
-        lpTimer_ = nullptr;
-    }
+    WifiTimer::GetInstance()->UnRegister(appEventTimerId);
+
     if (thermalLevelSubscriber_ != nullptr) {
         UnRegisterThermalLevel();
     }
-    if (lpThermalTimer_ != nullptr) {
-        lpThermalTimer_->Shutdown(false);
-        lpThermalTimer_ = nullptr;
-    }
+    WifiTimer::GetInstance()->UnRegister(thermalTimerId);
+
 #endif
     WIFI_LOGI("Stop sta service!");
 }
@@ -276,6 +267,7 @@ ErrCode WifiDeviceServiceImpl::EnableWifi()
 #ifdef FEATURE_P2P_SUPPORT
 #ifndef OHOS_ARCH_LITE
     WifiSaLoadManager::GetInstance().LoadWifiSa(WIFI_P2P_ABILITY_ID);
+    WifiManager::GetInstance().UnRegisterUnloadP2PSaTimer();
 #endif
     sptr<WifiP2pServiceImpl> p2pService = WifiP2pServiceImpl::GetInstance();
     if (p2pService != nullptr && p2pService->EnableP2p() != WIFI_OPT_SUCCESS) {
@@ -285,6 +277,19 @@ ErrCode WifiDeviceServiceImpl::EnableWifi()
 #endif
 
     WifiSettings::GetInstance().SyncWifiConfig();
+    WifiManager::GetInstance().UnRegisterUnloadStaSaTimer();
+    if (WifiConfigCenter::GetInstance().GetOperatorWifiType() ==
+        static_cast<int>(OperatorWifiType::USER_OPEN_WIFI_IN_AIRPLANEMODE)) {
+        WIFI_LOGI("EnableWifi, user opened wifi in airplane mode!");
+        return WIFI_OPT_SUCCESS;
+    }
+
+    int operatorWifiType = static_cast<int>(OperatorWifiType::USER_OPEN_WIFI_IN_NO_AIRPLANEMODE);
+    if (WifiConfigCenter::GetInstance().GetAirplaneModeState() == MODE_STATE_OPEN) {
+        operatorWifiType = static_cast<int>(OperatorWifiType::USER_OPEN_WIFI_IN_AIRPLANEMODE);
+        WIFI_LOGI("EnableWifi, current airplane mode is opened, user open wifi!");
+    }
+    WifiConfigCenter::GetInstance().SetOperatorWifiType(operatorWifiType);
     return WIFI_OPT_SUCCESS;
 }
 
@@ -337,6 +342,14 @@ ErrCode WifiDeviceServiceImpl::DisableWifi()
         WifiConfigCenter::GetInstance().SetWifiMidState(WifiOprMidState::CLOSING, WifiOprMidState::RUNNING);
     } else {
         WifiConfigCenter::GetInstance().SetStaLastRunState(false);
+        WifiManager::GetInstance().GetAirplaneModeByDatashare(WIFI_DEVICE_ABILITY_ID);
+        if (WifiConfigCenter::GetInstance().GetOperatorWifiType() ==
+            static_cast<int>(OperatorWifiType::USER_OPEN_WIFI_IN_AIRPLANEMODE) &&
+            WifiConfigCenter::GetInstance().GetAirplaneModeState() == MODE_STATE_OPEN) {
+                WifiConfigCenter::GetInstance().SetOperatorWifiType(
+                    static_cast<int>(OperatorWifiType::USER_CLOSE_WIFI_IN_AIRPLANEMODE));
+                WIFI_LOGI("EnableWifi, current airplane mode is opened, user close wifi!");
+        }
     }
     return ret;
 }
@@ -1035,6 +1048,35 @@ ErrCode WifiDeviceServiceImpl::GetLinkedInfo(WifiLinkedInfo &info)
     return WIFI_OPT_SUCCESS;
 }
 
+ErrCode WifiDeviceServiceImpl::GetDisconnectedReason(DisconnectedReason &reason)
+{
+    if (!WifiAuthCenter::IsSystemAppByToken()) {
+        WIFI_LOGE("GetDisconnectedReason:NOT System APP, PERMISSION_DENIED!");
+        return WIFI_OPT_NON_SYSTEMAPP;
+    }
+    if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("GetDisconnectedReason:VerifyGetWifiInfoPermission() PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+    if (WifiPermissionUtils::VerifyGetWifiConfigPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("GetDisconnectedReason:VerifyGetWifiConfigPermission() PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+
+    if (!IsStaServiceRunning()) {
+        return WIFI_OPT_STA_NOT_OPENED;
+    }
+    WifiLinkedInfo info;
+    WifiConfigCenter::GetInstance().GetLinkedInfo(info);
+    WIFI_LOGI("%{public}s, connState=%{public}d, detailedState=%{public}d",
+        __func__, info.connState, info.detailedState);
+    if (info.connState == ConnState::CONNECTING || info.connState == ConnState::CONNECTED) {
+        return WIFI_OPT_FAILED;
+    }
+    WifiConfigCenter::GetInstance().GetDisconnectedReason(reason);
+    return WIFI_OPT_SUCCESS;
+}
+
 ErrCode WifiDeviceServiceImpl::GetIpInfo(IpInfo &info)
 {
     if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
@@ -1179,12 +1221,12 @@ ErrCode WifiDeviceServiceImpl::CheckCanEnableWifi(void)
     }
 
     /**
-     * when airplane mode opened, if the config "can_use_sta_when_airplanemode"
+     * when airplane mode opened, if the config "can_open_sta_when_airplanemode"
      * opened, then can open sta; other, return forbid.
      */
-    if (!WifiConfigCenter::GetInstance().GetCanOpenStaWhenAirplaneMode() &&
-        WifiConfigCenter::GetInstance().GetAirplaneModeState() == 1 &&
-        !WifiConfigCenter::GetInstance().GetCanUseStaWhenAirplaneMode()) {
+    WifiManager::GetInstance().GetAirplaneModeByDatashare(WIFI_DEVICE_ABILITY_ID);
+    if (WifiConfigCenter::GetInstance().GetAirplaneModeState() == MODE_STATE_OPEN &&
+        !WifiConfigCenter::GetInstance().GetCanOpenStaWhenAirplaneMode()) {
         WIFI_LOGI("current airplane mode and can not use sta, open failed!");
         return WIFI_OPT_FORBID_AIRPLANE;
     }

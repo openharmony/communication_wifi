@@ -114,6 +114,17 @@ enum ConnState {
     UNKNOWN
 };
 
+enum class DisconnectedReason {
+    /* Default reason */
+    DISC_REASON_DEFAULT = 0,
+
+    /* Password is wrong */
+    DISC_REASON_WRONG_PWD = 1,
+
+    /* The number of router's connection reaches the maximum number limit */
+    DISC_REASON_CONNECTION_FULL = 2
+};
+
 struct WifiLinkedInfo {
     int networkId;
     std::string ssid;
@@ -142,6 +153,7 @@ struct WifiLinkedInfo {
     int lastPacketDirection;
     int lastRxPackets;
     int lastTxPackets;
+    int retryedConnCount;
     WifiLinkedInfo()
     {
         networkId = INVALID_NETWORK_ID;
@@ -167,6 +179,7 @@ struct WifiLinkedInfo {
         lastPacketDirection = 0;
         lastRxPackets = 0;
         lastTxPackets = 0;
+        retryedConnCount = 0;
     }
 };
 
@@ -423,6 +436,7 @@ struct WifiDeviceConfig {
     time_t lastConnectTime;
     int numRebootsSinceLastUse;
     int numAssociation;
+    int connFailedCount;
     /* save select mac address */
     std::string userSelectBssid;
     WifiIpConfig wifiIpConfig;

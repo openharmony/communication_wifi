@@ -65,7 +65,7 @@ public:
     virtual int GetScoretacticsFrequency5GHzScore() = 0;
     virtual int GetScoretacticsLastSelectionScore() = 0;
     virtual int GetScoretacticsSecurityScore() = 0;
-    virtual std::string GetStrDnsBak() const = 0;
+    virtual std::string GetStrDnsBak() = 0;
     virtual int GetScanInfoList(std::vector<WifiScanInfo> &results) = 0;
     virtual std::string GetConnectTimeoutBssid() = 0;
     virtual int SetConnectTimeoutBssid(std::string &bssid) = 0;
@@ -121,7 +121,7 @@ public:
     MOCK_METHOD0(GetScoretacticsFrequency5GHzScore, int());
     MOCK_METHOD0(GetScoretacticsLastSelectionScore, int());
     MOCK_METHOD0(GetScoretacticsSecurityScore, int());
-    MOCK_CONST_METHOD0(GetStrDnsBak, std::string());
+    MOCK_METHOD0(GetStrDnsBak, std::string());
     MOCK_METHOD1(GetScanInfoList, int(std::vector<WifiScanInfo> &results));
     MOCK_METHOD0(GetConnectTimeoutBssid, std::string());
     MOCK_METHOD1(SetConnectTimeoutBssid, int(std::string &bssid));

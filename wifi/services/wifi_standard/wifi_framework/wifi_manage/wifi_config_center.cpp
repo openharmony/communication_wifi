@@ -157,6 +157,7 @@ bool WifiConfigCenter::IsLoadStabak()
 
 WifiOprMidState WifiConfigCenter::GetApMidState(int id)
 {
+    std::unique_lock<std::mutex> lock(mApMutex);
     auto iter = mApMidState.find(id);
     if (iter != mApMidState.end()) {
         return iter->second.load();
@@ -168,6 +169,7 @@ WifiOprMidState WifiConfigCenter::GetApMidState(int id)
 
 bool WifiConfigCenter::SetApMidState(WifiOprMidState expState, WifiOprMidState state, int id)
 {
+    std::unique_lock<std::mutex> lock(mApMutex);
     auto iter = mApMidState.find(id);
     if (iter != mApMidState.end()) {
         return iter->second.compare_exchange_strong(expState, state);
@@ -180,6 +182,7 @@ bool WifiConfigCenter::SetApMidState(WifiOprMidState expState, WifiOprMidState s
 
 void WifiConfigCenter::SetApMidState(WifiOprMidState state, int id)
 {
+    std::unique_lock<std::mutex> lock(mApMutex);
     auto ret = mApMidState.emplace(id, state);
     if (!ret.second) {
         mApMidState[id] = state;
@@ -286,9 +289,14 @@ int WifiConfigCenter::GetP2pState()
     return WifiSettings::GetInstance().GetP2pState();
 }
 
-bool WifiConfigCenter::GetCanUseStaWhenAirplaneMode()
+int WifiConfigCenter::GetOperatorWifiType()
 {
-    return WifiSettings::GetInstance().GetCanUseStaWhenAirplaneMode();
+    return WifiSettings::GetInstance().GetOperatorWifiType();
+}
+
+int WifiConfigCenter::SetOperatorWifiType(int type)
+{
+    return WifiSettings::GetInstance().SetOperatorWifiType(type);
 }
 
 bool WifiConfigCenter::GetCanOpenStaWhenAirplaneMode()
@@ -298,7 +306,7 @@ bool WifiConfigCenter::GetCanOpenStaWhenAirplaneMode()
 
 bool WifiConfigCenter::GetWifiStateWhenAirplaneMode()
 {
-    return mWifiOpenedWhenAirplane;
+    return mWifiOpenedWhenAirplane.load();
 }
 
 void WifiConfigCenter::SetWifiStateWhenAirplaneMode(bool bState)
@@ -389,6 +397,11 @@ int WifiConfigCenter::GetNoChargerPlugModeState() const
 int WifiConfigCenter::SetP2pDeviceName(const std::string &deviceName)
 {
     return WifiSettings::GetInstance().SetP2pDeviceName(deviceName);
+}
+
+int WifiConfigCenter::GetDisconnectedReason(DisconnectedReason &discReason)
+{
+    return WifiSettings::GetInstance().GetDisconnectedReason(discReason);
 }
 }  // namespace Wifi
 }  // namespace OHOS

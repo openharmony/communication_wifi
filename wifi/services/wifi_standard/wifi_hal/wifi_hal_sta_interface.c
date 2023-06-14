@@ -150,11 +150,11 @@ WifiErrorNo Stop(void)
 {
     LOGI("Ready to Stop wifi");
 #ifdef HDI_INTERFACE_SUPPORT
+    UnRegisterHdiStaCallbackEvent();
     if (HdiStop() != WIFI_HAL_SUCCESS) {
         LOGE("[Ap] Stop hdi failed!");
         return WIFI_HAL_FAILED;
     }
-    UnRegisterHdiStaCallbackEvent();
 #endif
     WifiErrorNo err = StopWpaAndWpaHal(0);
     if (err == WIFI_HAL_FAILED) {

@@ -50,6 +50,7 @@
         ConnectToDevice;
         Disconnect;
         GetLinkedInfo;
+        GetDisconnectedReason;
         GetDeviceMacAddress;
         AdvanceScan;
         GetIpInfo;

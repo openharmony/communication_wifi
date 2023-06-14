@@ -62,7 +62,6 @@ bool WifiDeviceImpl::Init()
     client_ = deviceProxy;
     return true;
 #else
-    WifiSaLoadManager::GetInstance().LoadWifiSa(systemAbilityId_);
     return GetWifiDeviceProxy();
 #endif
 }
@@ -72,21 +71,18 @@ bool WifiDeviceImpl::GetWifiDeviceProxy()
 #ifdef OHOS_ARCH_LITE
     return (client_ != nullptr);
 #else
+    WifiSaLoadManager::GetInstance().LoadWifiSa(systemAbilityId_);
+
     if (IsRemoteDied() == false) {
         return true;
     }
 
-    WIFI_LOGI("GetWifiDeviceProxy, get new sa from remote!");
     sptr<ISystemAbilityManager> sa_mgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (sa_mgr == nullptr) {
         WIFI_LOGE("failed to get SystemAbilityManager");
         return false;
     }
-    auto objectSA = sa_mgr->CheckSystemAbility(systemAbilityId_);
-    if (objectSA == nullptr) {
-        WIFI_LOGI("GetWifiDeviceProxy, load sa from remote again!");
-        WifiSaLoadManager::GetInstance().LoadWifiSa(systemAbilityId_);
-    }
+
     sptr<IRemoteObject> object = sa_mgr->GetSystemAbility(systemAbilityId_);
     if (object == nullptr) {
         WIFI_LOGE("failed to get DEVICE_SERVICE");
@@ -108,174 +104,209 @@ bool WifiDeviceImpl::GetWifiDeviceProxy()
 
 ErrCode WifiDeviceImpl::EnableWifi()
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     RETURN_IF_FAIL(GetWifiDeviceProxy());
     return client_->EnableWifi();
 }
 
 ErrCode WifiDeviceImpl::DisableWifi()
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     RETURN_IF_FAIL(GetWifiDeviceProxy());
     return client_->DisableWifi();
 }
 
 ErrCode WifiDeviceImpl::InitWifiProtect(const WifiProtectType &protectType, const std::string &protectName)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     RETURN_IF_FAIL(GetWifiDeviceProxy());
     return client_->InitWifiProtect(protectType, protectName);
 }
 
 ErrCode WifiDeviceImpl::GetWifiProtectRef(const WifiProtectMode &protectMode, const std::string &protectName)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     RETURN_IF_FAIL(GetWifiDeviceProxy());
     return client_->GetWifiProtectRef(protectMode, protectName);
 }
 
 ErrCode WifiDeviceImpl::PutWifiProtectRef(const std::string &protectName)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     RETURN_IF_FAIL(GetWifiDeviceProxy());
     return client_->PutWifiProtectRef(protectName);
 }
 
 ErrCode WifiDeviceImpl::RemoveCandidateConfig(int networkId)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     RETURN_IF_FAIL(GetWifiDeviceProxy());
     return client_->RemoveCandidateConfig(networkId);
 }
 
 ErrCode WifiDeviceImpl::RemoveCandidateConfig(const WifiDeviceConfig &config)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     RETURN_IF_FAIL(GetWifiDeviceProxy());
     return client_->RemoveCandidateConfig(config);
 }
 
 ErrCode WifiDeviceImpl::AddDeviceConfig(const WifiDeviceConfig &config, int &result, bool isCandidate)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     RETURN_IF_FAIL(GetWifiDeviceProxy());
     return client_->AddDeviceConfig(config, result, isCandidate);
 }
 
 ErrCode WifiDeviceImpl::UpdateDeviceConfig(const WifiDeviceConfig &config, int &result)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     RETURN_IF_FAIL(GetWifiDeviceProxy());
     return client_->UpdateDeviceConfig(config, result);
 }
 
 ErrCode WifiDeviceImpl::RemoveDevice(int networkId)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     RETURN_IF_FAIL(GetWifiDeviceProxy());
     return client_->RemoveDevice(networkId);
 }
 
 ErrCode WifiDeviceImpl::RemoveAllDevice()
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     RETURN_IF_FAIL(GetWifiDeviceProxy());
     return client_->RemoveAllDevice();
 }
 
 ErrCode WifiDeviceImpl::GetDeviceConfigs(std::vector<WifiDeviceConfig> &result, bool isCandidate)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     RETURN_IF_FAIL(GetWifiDeviceProxy());
     return client_->GetDeviceConfigs(result, isCandidate);
 }
 
 ErrCode WifiDeviceImpl::EnableDeviceConfig(int networkId, bool attemptEnable)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     RETURN_IF_FAIL(GetWifiDeviceProxy());
     return client_->EnableDeviceConfig(networkId, attemptEnable);
 }
 
 ErrCode WifiDeviceImpl::DisableDeviceConfig(int networkId)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     RETURN_IF_FAIL(GetWifiDeviceProxy());
     return client_->DisableDeviceConfig(networkId);
 }
 
 ErrCode WifiDeviceImpl::ConnectToNetwork(int networkId, bool isCandidate)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     RETURN_IF_FAIL(GetWifiDeviceProxy());
     return client_->ConnectToNetwork(networkId, isCandidate);
 }
 
 ErrCode WifiDeviceImpl::ConnectToDevice(const WifiDeviceConfig &config)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     RETURN_IF_FAIL(GetWifiDeviceProxy());
     return client_->ConnectToDevice(config);
 }
 
 ErrCode WifiDeviceImpl::IsConnected(bool &isConnected)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     RETURN_IF_FAIL(GetWifiDeviceProxy());
     return client_->IsConnected(isConnected);
 }
 
 ErrCode WifiDeviceImpl::ReConnect()
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     RETURN_IF_FAIL(GetWifiDeviceProxy());
     return client_->ReConnect();
 }
 
 ErrCode WifiDeviceImpl::ReAssociate()
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     RETURN_IF_FAIL(GetWifiDeviceProxy());
     return client_->ReAssociate();
 }
 
 ErrCode WifiDeviceImpl::Disconnect()
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     RETURN_IF_FAIL(GetWifiDeviceProxy());
     return client_->Disconnect();
 }
 
 ErrCode WifiDeviceImpl::StartWps(const WpsConfig &config)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     RETURN_IF_FAIL(GetWifiDeviceProxy());
     return client_->StartWps(config);
 }
 
 ErrCode WifiDeviceImpl::CancelWps()
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     RETURN_IF_FAIL(GetWifiDeviceProxy());
     return client_->CancelWps();
 }
 
 ErrCode WifiDeviceImpl::IsWifiActive(bool &bActive)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     RETURN_IF_FAIL(GetWifiDeviceProxy());
     return client_->IsWifiActive(bActive);
 }
 
 ErrCode WifiDeviceImpl::GetWifiState(int &state)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     RETURN_IF_FAIL(GetWifiDeviceProxy());
     return client_->GetWifiState(state);
 }
 
 ErrCode WifiDeviceImpl::GetLinkedInfo(WifiLinkedInfo &info)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     RETURN_IF_FAIL(GetWifiDeviceProxy());
     return client_->GetLinkedInfo(info);
 }
 
+ErrCode WifiDeviceImpl::GetDisconnectedReason(DisconnectedReason &reason)
+{
+    RETURN_IF_FAIL(GetWifiDeviceProxy());
+    return client_->GetDisconnectedReason(reason);
+}
+
 ErrCode WifiDeviceImpl::GetIpInfo(IpInfo &info)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     RETURN_IF_FAIL(GetWifiDeviceProxy());
     return client_->GetIpInfo(info);
 }
 
 ErrCode WifiDeviceImpl::SetCountryCode(const std::string &countryCode)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     RETURN_IF_FAIL(GetWifiDeviceProxy());
     return client_->SetCountryCode(countryCode);
 }
 
 ErrCode WifiDeviceImpl::GetCountryCode(std::string &countryCode)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     RETURN_IF_FAIL(GetWifiDeviceProxy());
     return client_->GetCountryCode(countryCode);
 }
 
 ErrCode WifiDeviceImpl::GetSignalLevel(const int &rssi, const int &band, int &level)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     RETURN_IF_FAIL(GetWifiDeviceProxy());
     return client_->GetSignalLevel(rssi, band, level);
 }
@@ -288,18 +319,21 @@ ErrCode WifiDeviceImpl::RegisterCallBack(const sptr<IWifiDeviceCallBack> &callba
     const std::vector<std::string> &event)
 #endif
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     RETURN_IF_FAIL(GetWifiDeviceProxy());
     return client_->RegisterCallBack(callback, event);
 }
 
 ErrCode WifiDeviceImpl::GetSupportedFeatures(long &features)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     RETURN_IF_FAIL(GetWifiDeviceProxy());
     return client_->GetSupportedFeatures(features);
 }
 
 ErrCode WifiDeviceImpl::IsFeatureSupported(long feature, bool &isSupported)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     RETURN_IF_FAIL(GetWifiDeviceProxy());
     long tmpFeatures = 0;
     isSupported = false;
@@ -313,24 +347,28 @@ ErrCode WifiDeviceImpl::IsFeatureSupported(long feature, bool &isSupported)
 
 ErrCode WifiDeviceImpl::GetDeviceMacAddress(std::string &result)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     RETURN_IF_FAIL(GetWifiDeviceProxy());
     return client_->GetDeviceMacAddress(result);
 }
 
 ErrCode WifiDeviceImpl::IsBandTypeSupported(int bandType, bool &supported)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     RETURN_IF_FAIL(GetWifiDeviceProxy());
     return client_->IsBandTypeSupported(bandType, supported);
 }
 
 ErrCode WifiDeviceImpl::Get5GHzChannelList(std::vector<int> &result)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     RETURN_IF_FAIL(GetWifiDeviceProxy());
     return client_->Get5GHzChannelList(result);
 }
 
 bool WifiDeviceImpl::SetLowLatencyMode(bool enabled)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     RETURN_IF_FAIL(GetWifiDeviceProxy());
     return client_->SetLowLatencyMode(enabled);
 }

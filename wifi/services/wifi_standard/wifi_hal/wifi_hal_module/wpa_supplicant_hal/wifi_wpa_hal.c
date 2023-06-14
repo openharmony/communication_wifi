@@ -594,7 +594,8 @@ static void WpaCallBackFuncTwo(const char *p)
         WifiHalCbNotifyWpsOverlap(1);
     } else if (strncmp(p, WPS_EVENT_TIMEOUT, strlen(WPS_EVENT_TIMEOUT)) == 0) {
         WifiHalCbNotifyWpsTimeOut(1);
-    } else if (strncmp(p, WPA_EVENT_AUTH_REJECT, strlen(WPA_EVENT_AUTH_REJECT)) == 0) {
+    } else if (strncmp(p, WPA_EVENT_AUTH_REJECT, strlen(WPA_EVENT_AUTH_REJECT)) == 0 ||
+        strncmp(p, WPA_EVENT_ASSOC_REJECT, strlen(WPA_EVENT_ASSOC_REJECT)) == 0) { /* connection full */
         char *connectionStatus = strstr(p, "status_code=");
         if (connectionStatus != NULL) {
             connectionStatus += strlen("status_code=");

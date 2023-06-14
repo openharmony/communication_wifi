@@ -214,6 +214,8 @@ void StaStateMachine::InitWifiLinkedInfo()
     linkedInfo.lastPacketDirection = 0;
     linkedInfo.lastRxPackets = 0;
     linkedInfo.lastTxPackets = 0;
+    linkedInfo.retryedConnCount = 0;
+    linkedInfo.discReason = DisconnectedReason::DISC_REASON_DEFAULT;
 }
 
 void StaStateMachine::InitLastWifiLinkedInfo()

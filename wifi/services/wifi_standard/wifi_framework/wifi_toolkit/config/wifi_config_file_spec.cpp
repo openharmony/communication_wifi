@@ -779,7 +779,7 @@ template<>
 void ClearTClass<WifiConfig>(WifiConfig &item)
 {
     item.scanAlwaysSwitch = false;
-    item.staAirplaneMode = false;
+    item.operatorWifiType = static_cast<int>(OperatorWifiType::INITIAL_TYPE);
     item.canOpenStaWhenAirplane = false;
     item.staLastState = false;
     item.savedDeviceAppraisalPriority = PRIORITY_1;
@@ -819,8 +819,8 @@ static int SetWifiConfigValueFirst(WifiConfig &item, const std::string &key, con
 {
     if (key == "scanAlwaysSwitch") {
         item.scanAlwaysSwitch = (std::stoi(value) != 0); /* 0 -> false 1 -> true */
-    } else if (key == "staAirplaneMode") {
-        item.staAirplaneMode = (std::stoi(value) != 0); /* 0 -> false 1 -> true */
+    } else if (key == "operatorWifiType") {
+        item.operatorWifiType = std::stoi(value);
     } else if (key == "canOpenStaWhenAirplane") {
         item.canOpenStaWhenAirplane = (std::stoi(value) != 0);
     } else if (key == "staLastState") {
@@ -867,6 +867,8 @@ static int SetWifiConfigValueSecond(WifiConfig &item, const std::string &key, co
         item.preLoadP2p = (std::stoi(value) != 0); /* 0 -> false 1 -> true */
     } else if (key == "preLoadAware") {
         item.preLoadAware = (std::stoi(value) != 0); /* 0 -> false 1 -> true */
+    } else if (key == "preLoadEnhance") {
+        item.preLoadEnhance = (std::stoi(value) != 0); /* 0 -> false 1 -> true */
     } else if (key == "supportHwPnoFlag") {
         item.supportHwPnoFlag = std::stoi(value);
     } else if (key == "minRssi2Dot4Ghz") {
@@ -926,7 +928,7 @@ std::string OutTClassString<WifiConfig>(WifiConfig &item)
     std::ostringstream ss;
     ss << "    " <<"<WifiConfig>" << std::endl;
     ss << "    " <<"scanAlwaysSwitch=" << item.scanAlwaysSwitch << std::endl; /* bool false->0 true->1 */
-    ss << "    " <<"staAirplaneMode=" << item.staAirplaneMode << std::endl;
+    ss << "    " <<"operatorWifiType=" << item.operatorWifiType << std::endl;
     ss << "    " <<"canOpenStaWhenAirplane=" << item.canOpenStaWhenAirplane << std::endl;
     ss << "    " <<"staLastState=" << item.staLastState << std::endl;
     ss << "    " <<"savedDeviceAppraisalPriority=" << item.savedDeviceAppraisalPriority << std::endl;

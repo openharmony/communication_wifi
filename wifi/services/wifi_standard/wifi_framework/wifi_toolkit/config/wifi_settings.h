@@ -755,20 +755,19 @@ public:
     int SyncWifiConfig();
 
     /**
-     * @Description Get the config whether permit to use wifi when airplane mode opened
+     * @Description Get operator wifi state
      *
-     * @return true - can use
-     * @return false - cannot use
+     * @return type - enum OperatorWifiType
      */
-    bool GetCanUseStaWhenAirplaneMode();
+    int GetOperatorWifiType();
 
     /**
-     * @Description Set the config whether permit to use wifi when airplane mode opened
+     * @Description Set operator wifi state
      *
-     * @param bCan - true / false
+     * @param type - enum OperatorWifiType
      * @return int - 0 success
      */
-    int SetCanUseStaWhenAirplaneMode(bool bCan);
+    int SetOperatorWifiType(int type);
 
     /**
      * @Description Get the config whether can open sta when airplane mode opened
@@ -1106,13 +1105,13 @@ public:
      *
      * @return string - dns
      */
-    std::string GetStrDnsBak() const;
+    std::string GetStrDnsBak();
     /**
      * @Description Obtaining Whether to Load the Configuration of the Standby STA.
      *
      * @return bool - Indicates whether to load the configuration of the standby STA.
      */
-    bool IsLoadStabak() const;
+    bool IsLoadStabak();
 
     /**
      * @Description set the device name
@@ -1205,6 +1204,21 @@ public:
      */
     uint64_t GetThreadStartTime(void) const;
 
+    /**
+     * @Description Save the last disconnected reason
+     *
+     * @param discReason - discReason
+     */
+    void SaveDisconnectedReason(DisconnectedReason discReason);
+
+    /**
+     * @Description Get the last disconnected reason
+     *
+     * @param discReason - discReason
+     * @return int - 0 success
+     */
+    int GetDisconnectedReason(DisconnectedReason &discReason);
+
 private:
     WifiSettings();
     void InitWifiConfig();
@@ -1247,7 +1261,7 @@ private:
     time_t mLastSelectedTimeVal; /* last selected time */
     int mScreenState;            /* 1 MODE_STATE_OPEN, 2 MODE_STATE_CLOSE */
     int mThermalLevel;           /* 1 COOL, 2 NORMAL, 3 WARM, 4 HOT, 5 OVERHEATED, 6 WARNING, 7 EMERGENCY */
-    int mAirplaneModeState;      /* 1 on 2 off */
+    std::atomic<int> mAirplaneModeState;      /* 1 on 2 off */
     ScanMode mAppRunningModeState; /* 0 app for 1 app back 2 sys for 3 sys back */
     int mPowerSavingModeState;   /* 1 on 2 off */
     std::string mAppPackageName;
@@ -1257,12 +1271,14 @@ private:
     std::pair<std::string, int> mBssidToTimeoutTime;
     std::map<int, PowerModel> powerModel;
     int mHotspotIdleTimeout;
+    DisconnectedReason mLastDiscReason;
 
     std::mutex mStaMutex;
     std::mutex mApMutex;
     std::mutex mConfigMutex;
     std::mutex mInfoMutex;
     std::mutex mP2pMutex;
+    std::mutex mWifiConfigMutex;
 
     std::atomic_flag deviceConfigLoadFlag = ATOMIC_FLAG_INIT;
 

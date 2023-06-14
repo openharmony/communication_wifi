@@ -349,6 +349,7 @@ public:
 private:
     bool GetWifiDeviceProxy(void);
     int systemAbilityId_;
+    std::mutex mutex_;
 #ifdef OHOS_ARCH_LITE
     IWifiDevice *client_;
 #else

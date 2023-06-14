@@ -392,20 +392,19 @@ public:
     int GetP2pState();
 
     /**
-     * @Description Get the config whether permit to use wifi when airplane mode opened
+     * @Description Get operator wifi state
      *
-     * @return true - can use
-     * @return false - cannot use
+     * @return type - enum OperatorWifiType
      */
-    bool GetCanUseStaWhenAirplaneMode();
+    int GetOperatorWifiType();
 
     /**
-     * @Description Set the config whether permit to use wifi when airplane mode opened
+     * @Description Set operator wifi state
      *
-     * @param bCan - true / false
+     * @param type - enum OperatorWifiType
      * @return int - 0 success
      */
-    int SetCanUseStaWhenAirplaneMode(bool bCan);
+    int SetOperatorWifiType(int type);
 
     /**
      * @Description Get the config whether can open sta when airplane mode opened
@@ -552,6 +551,14 @@ public:
      */
     int SetP2pDeviceName(const std::string &deviceName);
 
+    /**
+     * @Description get the last disconnected reason
+     *
+     * @param discReason - discReason
+     * @return int - 0 success
+     */
+    int GetDisconnectedReason(DisconnectedReason &discReason);
+
 private:
     std::mutex mApMutex;
     std::atomic<WifiOprMidState> mStaMidState;
@@ -560,7 +567,7 @@ private:
     std::atomic<WifiOprMidState> mScanMidState;
     /* Time interval for disabling and re-enabling the STA */
     std::chrono::steady_clock::time_point mWifiCloseTime;
-    bool mWifiOpenedWhenAirplane;
+    std::atomic<bool> mWifiOpenedWhenAirplane;
 };
 } // namespace Wifi
 } // namespace OHOS

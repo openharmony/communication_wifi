@@ -117,7 +117,13 @@ public:
      * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
      */
     ErrCode RegisterScanCallbacks(const IScanSerivceCallbacks &scanSerivceCallbacks);
-
+    /**
+     * @Description Set EnhanceService to Scan Service.
+     *
+     * @param enhanceService IEnhanceService object
+     * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
+     */
+    ErrCode SetEnhanceService(IEnhanceService* enhanceService);
 private:
     ScanService *pScanService;
     IScanSerivceCallbacks mScanSerivceCallbacks;

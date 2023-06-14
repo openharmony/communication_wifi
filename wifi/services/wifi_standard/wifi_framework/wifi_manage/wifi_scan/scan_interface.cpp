@@ -162,5 +162,13 @@ ErrCode ScanInterface::RegisterScanCallbacks(const IScanSerivceCallbacks &scanSe
     mScanSerivceCallbacks = scanSerivceCallbacks;
     return WIFI_OPT_SUCCESS;
 }
+
+ErrCode ScanInterface::SetEnhanceService(IEnhanceService *enhanceService)
+{
+    WIFI_LOGI("Enter ScanInterface::SetEnhanceService\n");
+    CHECK_NULL_AND_RETURN(pScanService, WIFI_OPT_FAILED);
+    pScanService->SetEnhanceService(enhanceService);
+    return WIFI_OPT_SUCCESS;
+}
 }  // namespace Wifi
 }  // namespace OHOS

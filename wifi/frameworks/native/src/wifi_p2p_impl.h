@@ -388,6 +388,7 @@ private:
     bool GetWifiP2pProxy(void);
     int systemAbilityId_;
     sptr<IWifiP2p> client_;
+    std::mutex mutex_;
 };
 }  // namespace Wifi
 }  // namespace OHOS

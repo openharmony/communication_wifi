@@ -281,10 +281,20 @@ enum class DhcpIpType { /* dhcp IP type: ipv4 ipv6 mix */
     DHCP_IPTYPE_MIX,
 };
 
+enum class OperatorWifiType {
+    USER_OPEN_WIFI_IN_NO_AIRPLANEMODE,      /* User open Wifi in non-airplane mode */
+    USER_CLOSE_WIFI_IN_NO_AIRPLANEMODE,     /* User clsoe Wifi in non-airplane mode */
+    USER_OPEN_WIFI_IN_AIRPLANEMODE,         /* User open Wifi in airplane mode */
+    USER_CLOSE_WIFI_IN_AIRPLANEMODE,        /* User close Wifi in airplane mode */
+    OPEN_WIFI_DUE_TO_AIRPLANEMODE_CLOSED,   /* Open Wifi due to airplane mode closed */
+    CLOSE_WIFI_DUE_TO_AIRPLANEMODE_OPENED,  /* Close Wifi due to airplane mode opened */
+    INITIAL_TYPE,                            /* initial type */
+};
+
 /* wifi config store */
 struct WifiConfig {
     bool scanAlwaysSwitch; /* scan always switch */
-    bool staAirplaneMode; /* when open airplane mode, whether close sta */
+    int operatorWifiType; /* operator wifi type */
     bool canOpenStaWhenAirplane; /* if airplane is opened, whether can open sta */
     /**
      * last sta service state, when service started, power
@@ -311,6 +321,7 @@ struct WifiConfig {
     bool preLoadAp;
     bool preLoadP2p;
     bool preLoadAware;
+    bool preLoadEnhance;
     bool supportHwPnoFlag;
     int minRssi2Dot4Ghz;
     int minRssi5Ghz;
@@ -328,8 +339,8 @@ struct WifiConfig {
     WifiConfig()
     {
         scanAlwaysSwitch = false;
-        staAirplaneMode = false;
-        canOpenStaWhenAirplane = false;
+        operatorWifiType = static_cast<int>(OperatorWifiType::INITIAL_TYPE);
+        canOpenStaWhenAirplane = true;
         staLastState = false;
         savedDeviceAppraisalPriority = PRIORITY_1;
         scoretacticsScoreSlope = SCORE_SLOPE;

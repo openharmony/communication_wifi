@@ -51,7 +51,8 @@ enum class BandType {
     BAND_2GHZ = 1, /* 2.4GHz */
     BAND_5GHZ = 2, /* 5GHz */
     BAND_6GHZ = 3, /* 6GHz */
-    BAND_ANY = 4, /* Dual-mode frequency band */
+    BAND_60GHZ = 4, /* 60GHz */
+    BAND_ANY = 5, /* Dual-mode frequency band */
 };
 
 enum class PowerModel {

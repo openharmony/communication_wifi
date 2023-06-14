@@ -207,10 +207,11 @@ static napi_value WifiBandTypeInit(napi_env env)
 {
     napi_value bandType = nullptr;
     napi_create_object(env, &bandType);
-    SetNamedPropertyByInteger(env, bandType, static_cast<int>(BandTypeJS::BAND_NONE), "BAND_NONE");
-    SetNamedPropertyByInteger(env, bandType, static_cast<int>(BandTypeJS::BAND_2GHZ), "BAND_2GHZ");
-    SetNamedPropertyByInteger(env, bandType, static_cast<int>(BandTypeJS::BAND_5GHZ), "BAND_5GHZ");
-    SetNamedPropertyByInteger(env, bandType, static_cast<int>(BandTypeJS::BAND_6GHZ), "BAND_6GHZ");
+    SetNamedPropertyByInteger(env, bandType, static_cast<int>(WifiBandTypeJS::BAND_NONE), "WIFI_BAND_NONE");
+    SetNamedPropertyByInteger(env, bandType, static_cast<int>(WifiBandTypeJS::BAND_2GHZ), "WIFI_BAND_2G");
+    SetNamedPropertyByInteger(env, bandType, static_cast<int>(WifiBandTypeJS::BAND_5GHZ), "WIFI_BAND_5G");
+    SetNamedPropertyByInteger(env, bandType, static_cast<int>(WifiBandTypeJS::BAND_6GHZ), "WIFI_BAND_6G");
+    SetNamedPropertyByInteger(env, bandType, static_cast<int>(WifiBandTypeJS::BAND_60GHZ), "WIFI_BAND_60G");
     return bandType;
 }
 #endif
@@ -238,7 +239,7 @@ static napi_value PropertyValueInit(napi_env env, napi_value exports)
         DECLARE_NAPI_PROPERTY("WifiChannelWidth", WifiChannelWidthObj),
         DECLARE_NAPI_PROPERTY("EapMethod", EapMethodObj),
         DECLARE_NAPI_PROPERTY("WifiStandard", WifiStandardObj),
-        DECLARE_NAPI_PROPERTY("BandType", bandTypeObj),
+        DECLARE_NAPI_PROPERTY("WifiBandType", bandTypeObj),
 #endif
         DECLARE_NAPI_PROPERTY("SuppState", suppStateObj),
         DECLARE_NAPI_PROPERTY("WifiSecurityType", securityTypeObj),

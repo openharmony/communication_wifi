@@ -257,7 +257,7 @@ public:
     }
 };
 
-bool DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)
+bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
 {
     MessageParcel datas;
     datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN);
@@ -287,7 +287,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     if (size == 0 || size > OHOS::Wifi::FOO_MAX_LEN) {
         return 0;
     }
-    uint8_t* ch = (uint8_t *)malloc(size + 1);
+    char* ch = (char *)malloc(size + 1);
     if (ch == nullptr) {
         return 0;
     }

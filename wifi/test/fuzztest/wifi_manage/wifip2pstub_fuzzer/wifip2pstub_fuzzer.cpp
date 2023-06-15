@@ -139,6 +139,11 @@ public:
         return WIFI_OPT_SUCCESS;
     }
 
+    ErrCode GetP2pConnectedStatus(int &status) override
+    {
+        return WIFI_OPT_SUCCESS;
+    }
+
     ErrCode GetP2pDiscoverStatus(int &status) override
     {
         return WIFI_OPT_SUCCESS;
@@ -225,6 +230,11 @@ public:
         return WIFI_OPT_SUCCESS;
     }
 
+    ErrCode Hid2dRemoveGcGroup(const std::string& gcIfName) override
+    {
+	    return WIFI_OPT_SUCCESS;
+    }
+
     ErrCode Hid2dGetChannelListFor5G(std::vector<int>& vecChannelList) override
     {
         return WIFI_OPT_SUCCESS;
@@ -253,7 +263,7 @@ public:
     }
 };
 
-void OnEnableP2pTest(const char* data, size_t size)
+void DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)
 {
     MessageParcel datas;
     datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN);
@@ -262,16 +272,10 @@ void OnEnableP2pTest(const char* data, size_t size)
     MessageParcel reply;
     MessageOption option;
     pWifiP2pStub->OnRemoteRequest(WIFI_SVR_CMD_P2P_ENABLE, datas, reply, option);
-}
-
-bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
-{
-    OnEnableP2pTest();
     return true;
+
 }
 
-};
-};
 
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
@@ -289,9 +293,23 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     if (size == 0 || size > OHOS::Wifi::FOO_MAX_LEN) {
         return 0;
     }
-
-    OHOS::Wifi::DoSomethingInterestingWithMyAPI(ch, size);
+    char* ch = (char *)malloc(size + 1);
+    if (ch == nullptr) {
+        return 0;
+    }
+	
+    (void)memset_s(ch, size + 1, 0x00, size + 1);
+    if (memcpy_s(ch, size, data, size) != EOK) {
+        free(ch);
+        ch = nullptr;
+        return 0;
+    }
+	
+    OHOS::DoSomethingInterestingWithMyAPI(ch, size);
+    free(ch);
+    ch = nullptr;
     return 0;
+
 }
-
-
+}
+}

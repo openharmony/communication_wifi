@@ -162,11 +162,12 @@ enum class ConnStateJs {
     UNKNOWN /* Failed to set up the Wi-Fi connection */
 };
 
-enum class BandTypeJS {
+enum class WifiBandTypeJS {
     BAND_NONE = 0, /* unknown */
     BAND_2GHZ = 1, /* 2.4GHz */
     BAND_5GHZ = 2, /* 5GHz */
-    BAND_6GHZ = 3, /* GGHz */
+    BAND_6GHZ = 3, /* 6GHz */
+    BAND_60GHZ = 4, /* 60GHz */
 };
 
 enum class SuppStateJs {

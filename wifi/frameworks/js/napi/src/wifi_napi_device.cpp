@@ -1208,7 +1208,7 @@ NO_SANITIZE("cfi") napi_value IsBandTypeSupported(napi_env env, napi_callback_in
     WIFI_NAPI_ASSERT(env, valueType == napi_number, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_STA);
     int bandType = 1;
     napi_get_value_int32(env, argv[0], &bandType);
-    WIFI_NAPI_ASSERT(env, bandType > (int)BandTypeJS::BAND_NONE && bandType <= (int)BandTypeJS::BAND_6GHZ,
+    WIFI_NAPI_ASSERT(env, bandType > (int)WifiBandTypeJS::BAND_NONE && bandType <= (int)WifiBandTypeJS::BAND_60GHZ,
         WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_STA);
     bool supported = false;
     ErrCode ret = wifiDevicePtr->IsBandTypeSupported(bandType, supported);

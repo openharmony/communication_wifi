@@ -27,8 +27,7 @@ namespace OHOS {
 namespace Wifi {
 constexpr size_t FOO_MAX_LEN = 1024;
 constexpr size_t U32_AT_SIZE = 4;
-const std::u16string FORMMGR_INTERFACE_TOKEN = u"ohos.wifi.IWifi.IWifiP2pService";
-std::shared_ptr<WifiP2pStub> pWifiP2pStub = std::make_shared<WifiP2pStubTest>();
+const std::u16string FORMMGR_INTERFACE_TOKEN = u"ohos.wifi.IWifiP2pService";
 
 class WifiP2pStubTest : public WifiP2pStub {
 public:
@@ -144,11 +143,6 @@ public:
         return WIFI_OPT_SUCCESS;
     }
 
-    ErrCode GetP2pDiscoverStatus(int &status) override
-    {
-        return WIFI_OPT_SUCCESS;
-    }
-
     ErrCode QueryP2pDevices(std::vector<WifiP2pDevice> &devices) override
     {
         return WIFI_OPT_SUCCESS;
@@ -232,7 +226,7 @@ public:
 
     ErrCode Hid2dRemoveGcGroup(const std::string& gcIfName) override
     {
-	    return WIFI_OPT_SUCCESS;
+        return WIFI_OPT_SUCCESS;
     }
 
     ErrCode Hid2dGetChannelListFor5G(std::vector<int>& vecChannelList) override
@@ -263,7 +257,7 @@ public:
     }
 };
 
-void DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)
+bool DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)
 {
     MessageParcel datas;
     datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN);
@@ -271,9 +265,9 @@ void DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)
     datas.RewindRead(0);
     MessageParcel reply;
     MessageOption option;
+    std::shared_ptr<WifiP2pStub> pWifiP2pStub = std::make_shared<WifiP2pStubTest>();
     pWifiP2pStub->OnRemoteRequest(WIFI_SVR_CMD_P2P_ENABLE, datas, reply, option);
     return true;
-
 }
 
 
@@ -293,7 +287,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     if (size == 0 || size > OHOS::Wifi::FOO_MAX_LEN) {
         return 0;
     }
-    char* ch = (char *)malloc(size + 1);
+    uint8_t* ch = (uint8_t *)malloc(size + 1);
     if (ch == nullptr) {
         return 0;
     }
@@ -304,12 +298,11 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
         ch = nullptr;
         return 0;
     }
-	
-    OHOS::DoSomethingInterestingWithMyAPI(ch, size);
+
+    OHOS::Wifi::DoSomethingInterestingWithMyAPI(ch, size);
     free(ch);
     ch = nullptr;
     return 0;
-
 }
 }
 }

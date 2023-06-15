@@ -87,6 +87,7 @@ void WifiScanServiceImpl::OnStart()
     mState = ServiceRunningState::STATE_RUNNING;
     WIFI_LOGI("Start scan service!");
     WifiManager::GetInstance();
+    WifiManager::GetInstance().StartUnloadStaSaTimer();
 }
 
 void WifiScanServiceImpl::OnStop()

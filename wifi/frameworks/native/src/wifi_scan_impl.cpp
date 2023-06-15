@@ -60,27 +60,24 @@ bool WifiScanImpl::Init()
     client_ = scanProxy;
     return true;
 #else
-    return GetWifiScanProxy();
+    return true;
 #endif
 }
 
-bool WifiScanImpl::GetWifiScanProxy(void)
+bool WifiScanImpl::GetWifiScanProxy()
 {
 #ifdef OHOS_ARCH_LITE
     return (client_ != nullptr);
 #else
     WifiSaLoadManager::GetInstance().LoadWifiSa(systemAbilityId_);
-
     if (IsRemoteDied() == false) {
         return true;
     }
-
     sptr<ISystemAbilityManager> sa_mgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (sa_mgr == nullptr) {
         WIFI_LOGE("failed to get SystemAbilityManager");
         return false;
     }
-
     sptr<IRemoteObject> object = sa_mgr->GetSystemAbility(systemAbilityId_);
     if (object == nullptr) {
         WIFI_LOGE("failed to get SCAN_SERVICE");

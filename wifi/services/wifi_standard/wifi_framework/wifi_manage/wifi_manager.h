@@ -139,7 +139,8 @@ public:
      */
     IScanSerivceCallbacks GetScanCallback(void);
 
-    void UnRegisterUnloadStaSaTimer(void);
+    void StopUnloadStaSaTimer(void);
+    void StartUnloadStaSaTimer(void);
 #ifdef FEATURE_AP_SUPPORT
     /**
      * @Description Get the ap callback object.
@@ -148,7 +149,8 @@ public:
      */
     IApServiceCallbacks GetApCallback(void);
 
-    void UnRegisterUnloadApSaTimer(void);
+    void StopUnloadApSaTimer(void);
+    void StartUnloadApSaTimer(void);
 #endif
 
 #ifdef FEATURE_P2P_SUPPORT
@@ -159,7 +161,8 @@ public:
      */
     IP2pServiceCallbacks GetP2pCallback(void);
 
-    void UnRegisterUnloadP2PSaTimer(void);
+    void StopUnloadP2PSaTimer(void);
+    void StartUnloadP2PSaTimer(void);
 #endif
 
     /**

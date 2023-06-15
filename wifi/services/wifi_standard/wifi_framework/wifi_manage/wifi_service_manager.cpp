@@ -19,6 +19,7 @@
 #include "define.h"
 #include "wifi_settings.h"
 #include "wifi_common_util.h"
+#include "wifi_manager.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -120,6 +121,7 @@ int WifiServiceManager::LoadStaService(const std::string &dlname, bool bCreate)
     if (bCreate) {
         mStaServiceHandle.pService = mStaServiceHandle.create();
     }
+    WifiManager::GetInstance().StopUnloadStaSaTimer();
     return 0;
 }
 
@@ -147,6 +149,7 @@ int WifiServiceManager::LoadScanService(const std::string &dlname, bool bCreate)
     if (bCreate) {
         mScanServiceHandle.pService = mScanServiceHandle.create();
     }
+    WifiManager::GetInstance().StopUnloadStaSaTimer();
     return 0;
 }
 
@@ -179,6 +182,7 @@ int WifiServiceManager::LoadApService(const std::string &dlname, bool bCreate)
             mApServiceHandle.pService[0] = service;
         }
     }
+    WifiManager::GetInstance().StopUnloadApSaTimer();
     return 0;
 }
 #endif
@@ -208,6 +212,7 @@ int WifiServiceManager::LoadP2pService(const std::string &dlname, bool bCreate)
     if (bCreate) {
         mP2pServiceHandle.pService = mP2pServiceHandle.create();
     }
+    WifiManager::GetInstance().StopUnloadP2PSaTimer();
     return 0;
 }
 #endif

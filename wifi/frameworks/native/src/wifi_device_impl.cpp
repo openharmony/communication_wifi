@@ -62,7 +62,7 @@ bool WifiDeviceImpl::Init()
     client_ = deviceProxy;
     return true;
 #else
-    return GetWifiDeviceProxy();
+    return true;
 #endif
 }
 
@@ -72,17 +72,14 @@ bool WifiDeviceImpl::GetWifiDeviceProxy()
     return (client_ != nullptr);
 #else
     WifiSaLoadManager::GetInstance().LoadWifiSa(systemAbilityId_);
-
     if (IsRemoteDied() == false) {
         return true;
     }
-
     sptr<ISystemAbilityManager> sa_mgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (sa_mgr == nullptr) {
         WIFI_LOGE("failed to get SystemAbilityManager");
         return false;
     }
-
     sptr<IRemoteObject> object = sa_mgr->GetSystemAbility(systemAbilityId_);
     if (object == nullptr) {
         WIFI_LOGE("failed to get DEVICE_SERVICE");

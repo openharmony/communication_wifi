@@ -1290,7 +1290,7 @@ void WifiDeviceServiceImpl::SaBasicDump(std::string& result)
         ss << "  Connection.bssid: " << MacAnonymize(linkedInfo.bssid) << "\n";
         ss << "  Connection.rssi: " << linkedInfo.rssi << "\n";
 
-        enum {BAND_2GHZ = 1, BAND_5GHZ = 2, BAND_6GHZ = 3, BAND_ANY = 4};
+        enum {BAND_2GHZ = 1, BAND_5GHZ = 2, BAND_6GHZ = 3, BAND_60GHZ = 4, BAND_ANY = 5};
         auto funcStrBand = [](int band) {
             std::string retStr;
             switch (band) {
@@ -1305,6 +1305,9 @@ void WifiDeviceServiceImpl::SaBasicDump(std::string& result)
                     break;
                 case BAND_6GHZ:
                     retStr = "6GHz";
+                    break;
+                case BAND_60GHZ:
+                    retStr = "60GHz";
                     break;
                 default:
                     retStr = "unknown band";

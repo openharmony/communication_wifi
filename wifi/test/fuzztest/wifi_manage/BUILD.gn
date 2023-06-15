@@ -16,7 +16,5 @@ group("fuzztest") {
   testonly = true
   deps = []
 
-  deps += [
-    "wifip2pstub_fuzzer:WifiP2pStubFuzzTest",
-  ]
+  deps += [ "wifip2pstub_fuzzer:WifiP2pStubFuzzTest" ]
 }

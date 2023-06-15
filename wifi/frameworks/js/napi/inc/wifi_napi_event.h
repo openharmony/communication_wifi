@@ -118,11 +118,13 @@ class EventRegister {
 public:
     EventRegister()
     {
-        mSaStatusListener = new WifiNapiAbilityStatusChange();
-        mSaStatusListener->Init(WIFI_DEVICE_ABILITY_ID);
-        mSaStatusListener->Init(WIFI_SCAN_ABILITY_ID);
-        mSaStatusListener->Init(WIFI_HOTSPOT_ABILITY_ID);
-        mSaStatusListener->Init(WIFI_P2P_ABILITY_ID);
+        if (mSaStatusListener == nullptr) {
+            mSaStatusListener = new WifiNapiAbilityStatusChange();
+            mSaStatusListener->Init(WIFI_DEVICE_ABILITY_ID);
+            mSaStatusListener->Init(WIFI_SCAN_ABILITY_ID);
+            mSaStatusListener->Init(WIFI_HOTSPOT_ABILITY_ID);
+            mSaStatusListener->Init(WIFI_P2P_ABILITY_ID);
+        }
     }
     ~EventRegister() {
     }

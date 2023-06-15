@@ -456,15 +456,27 @@ void WifiManager::UnloadStaSaTimerCallback()
     if (static_cast<int>(ApState::AP_STATE_CLOSED) == WifiConfigCenter::GetInstance().GetHotspotState(0)) {
         WifiSaLoadManager::GetInstance().UnloadWifiSa(WIFI_HOTSPOT_ABILITY_ID);
     }
-    WifiManager::GetInstance().UnRegisterUnloadStaSaTimer();
+    WifiManager::GetInstance().StopUnloadStaSaTimer();
 }
 
-void WifiManager::UnRegisterUnloadStaSaTimer(void)
+void WifiManager::StopUnloadStaSaTimer(void)
 {
-    WIFI_LOGI("UnRegisterUnloadStaSaTimer! unloadStaSaTimerId:%{public}u", unloadStaSaTimerId);
+    WIFI_LOGI("StopUnloadStaSaTimer! unloadStaSaTimerId:%{public}u", unloadStaSaTimerId);
     std::unique_lock<std::mutex> lock(unloadStaSaTimerMutex);
     WifiTimer::GetInstance()->UnRegister(unloadStaSaTimerId);
     unloadStaSaTimerId = 0;
+    return;
+}
+
+void WifiManager::StartUnloadStaSaTimer(void)
+{
+    WIFI_LOGI("StartUnloadStaSaTimer! unloadStaSaTimerId:%{public}u", unloadStaSaTimerId);
+    std::unique_lock<std::mutex> lock(unloadStaSaTimerMutex);
+    if (unloadStaSaTimerId == 0) {
+        TimeOutCallback timeoutCallback = std::bind(WifiManager::UnloadStaSaTimerCallback);
+        WifiTimer::GetInstance()->Register(timeoutCallback, unloadStaSaTimerId, TIMEOUT_UNLOAD_WIFI_SA);
+        WIFI_LOGI("StartUnloadStaSaTimer success! unloadStaSaTimerId:%{public}u", unloadStaSaTimerId);
+    }
     return;
 }
 #endif
@@ -484,12 +496,7 @@ void WifiManager::CloseStaService(void)
         WIFI_LOGI("airplaneMode not close sta SA!");
         return;
     }
-    std::unique_lock<std::mutex> lock(unloadStaSaTimerMutex);
-    if (unloadStaSaTimerId == 0) {
-        TimeOutCallback timeoutCallback = std::bind(WifiManager::UnloadStaSaTimerCallback);
-        WifiTimer::GetInstance()->Register(timeoutCallback, unloadStaSaTimerId, TIMEOUT_UNLOAD_WIFI_SA);
-        WIFI_LOGI("RegisterUnloadStaSaTimer success! unloadStaSaTimerId:%{public}u", unloadStaSaTimerId);
-    }
+    WifiManager::GetInstance().StartUnloadStaSaTimer();
     #endif
     return;
 }
@@ -502,15 +509,27 @@ std::mutex WifiManager::unloadHotspotSaTimerMutex{};
 void WifiManager::UnloadHotspotSaTimerCallback()
 {
     WifiSaLoadManager::GetInstance().UnloadWifiSa(WIFI_HOTSPOT_ABILITY_ID);
-    WifiManager::GetInstance().UnRegisterUnloadApSaTimer();
+    WifiManager::GetInstance().StopUnloadApSaTimer();
 }
 
-void WifiManager::UnRegisterUnloadApSaTimer(void)
+void WifiManager::StopUnloadApSaTimer(void)
 {
-    WIFI_LOGI("UnRegisterUnloadApSaTimer! unloadHotspotSaTimerId:%{public}u", unloadHotspotSaTimerId);
+    WIFI_LOGI("StopUnloadApSaTimer! unloadHotspotSaTimerId:%{public}u", unloadHotspotSaTimerId);
     std::unique_lock<std::mutex> lock(unloadHotspotSaTimerMutex);
     WifiTimer::GetInstance()->UnRegister(unloadHotspotSaTimerId);
     unloadHotspotSaTimerId = 0;
+    return;
+}
+
+void WifiManager::StartUnloadApSaTimer(void)
+{
+    WIFI_LOGI("StartUnloadApSaTimer! unloadHotspotSaTimerId:%{public}u", unloadHotspotSaTimerId);
+    std::unique_lock<std::mutex> lock(unloadHotspotSaTimerMutex);
+    if (unloadHotspotSaTimerId == 0) {
+        TimeOutCallback timeoutCallback = std::bind(WifiManager::UnloadHotspotSaTimerCallback);
+        WifiTimer::GetInstance()->Register(timeoutCallback, unloadHotspotSaTimerId, TIMEOUT_UNLOAD_WIFI_SA);
+        WIFI_LOGI("RegisterUnloadHotspotSaTimer success! unloadHotspotSaTimerId:%{public}u", unloadHotspotSaTimerId);
+    }
     return;
 }
 #endif
@@ -531,12 +550,7 @@ void WifiManager::CloseApService(int id)
         WIFI_LOGI("airplaneMode not close ap SA!");
         return;
     }
-    std::unique_lock<std::mutex> lock(unloadHotspotSaTimerMutex);
-    if (unloadHotspotSaTimerId == 0) {
-        TimeOutCallback timeoutCallback = std::bind(WifiManager::UnloadHotspotSaTimerCallback);
-        WifiTimer::GetInstance()->Register(timeoutCallback, unloadHotspotSaTimerId, TIMEOUT_UNLOAD_WIFI_SA);
-        WIFI_LOGI("RegisterUnloadHotspotSaTimer success! unloadHotspotSaTimerId:%{public}u", unloadHotspotSaTimerId);
-    }
+    WifiManager::GetInstance().StartUnloadApSaTimer();
     #endif
     return;
 }
@@ -558,15 +572,27 @@ std::mutex WifiManager::unloadP2PSaTimerMutex{};
 void WifiManager::UnloadP2PSaTimerCallback()
 {
     WifiSaLoadManager::GetInstance().UnloadWifiSa(WIFI_P2P_ABILITY_ID);
-    WifiManager::GetInstance().UnRegisterUnloadP2PSaTimer();
+    WifiManager::GetInstance().StopUnloadP2PSaTimer();
 }
 
-void WifiManager::UnRegisterUnloadP2PSaTimer(void)
+void WifiManager::StopUnloadP2PSaTimer(void)
 {
-    WIFI_LOGI("UnRegisterUnloadP2PSaTimer! unloadP2PSaTimerId:%{public}u", unloadP2PSaTimerId);
+    WIFI_LOGI("StopUnloadP2PSaTimer! unloadP2PSaTimerId:%{public}u", unloadP2PSaTimerId);
     std::unique_lock<std::mutex> lock(unloadP2PSaTimerMutex);
     WifiTimer::GetInstance()->UnRegister(unloadP2PSaTimerId);
     unloadP2PSaTimerId = 0;
+    return;
+}
+
+void WifiManager::StartUnloadP2PSaTimer(void)
+{
+    WIFI_LOGI("StartUnloadP2PSaTimer! unloadP2PSaTimerId:%{public}u", unloadP2PSaTimerId);
+    std::unique_lock<std::mutex> lock(unloadP2PSaTimerMutex);
+    if (unloadP2PSaTimerId == 0) {
+        TimeOutCallback timeoutCallback = std::bind(WifiManager::UnloadP2PSaTimerCallback);
+        WifiTimer::GetInstance()->Register(timeoutCallback, unloadP2PSaTimerId, TIMEOUT_UNLOAD_WIFI_SA);
+        WIFI_LOGI("StartUnloadP2PSaTimer success! unloadP2PSaTimerId:%{public}u", unloadP2PSaTimerId);
+    }
     return;
 }
 #endif
@@ -586,12 +612,7 @@ void WifiManager::CloseP2pService(void)
         WIFI_LOGI("airplaneMode not close p2p SA!");
         return;
     }
-    std::unique_lock<std::mutex> lock(unloadP2PSaTimerMutex);
-    if (unloadP2PSaTimerId == 0) {
-        TimeOutCallback timeoutCallback = std::bind(WifiManager::UnloadP2PSaTimerCallback);
-        WifiTimer::GetInstance()->Register(timeoutCallback, unloadP2PSaTimerId, TIMEOUT_UNLOAD_WIFI_SA);
-        WIFI_LOGI("RegisterUnloadP2PSaTimer success! unloadP2PSaTimerId:%{public}u", unloadP2PSaTimerId);
-    }
+    WifiManager::GetInstance().StartUnloadP2PSaTimer();
     #endif
     return;
 }
@@ -1343,7 +1364,7 @@ void WifiManager::DealCloseAirplaneModeEvent()
             if (unloadStaSaTimerId == 0) {
                 TimeOutCallback timeoutCallback = std::bind(WifiManager::UnloadStaSaTimerCallback);
                 WifiTimer::GetInstance()->Register(timeoutCallback, unloadStaSaTimerId, TIMEOUT_UNLOAD_WIFI_SA);
-                WIFI_LOGI("RegisterUnloadStaSaTimer success! unloadStaSaTimerId:%{public}u", unloadStaSaTimerId);
+                WIFI_LOGI("StartUnloadStaSaTimer success! unloadStaSaTimerId:%{public}u", unloadStaSaTimerId);
             }
         }
 #ifdef FEATURE_P2P_SUPPORT
@@ -1352,7 +1373,7 @@ void WifiManager::DealCloseAirplaneModeEvent()
             if (unloadP2PSaTimerId == 0) {
                 TimeOutCallback timeoutCallback = std::bind(WifiManager::UnloadP2PSaTimerCallback);
                 WifiTimer::GetInstance()->Register(timeoutCallback, unloadP2PSaTimerId, TIMEOUT_UNLOAD_WIFI_SA);
-                WIFI_LOGI("RegisterUnloadP2PSaTimer success! unloadP2PSaTimerId:%{public}u", unloadP2PSaTimerId);
+                WIFI_LOGI("StartUnloadP2PSaTimer success! unloadP2PSaTimerId:%{public}u", unloadP2PSaTimerId);
             }
         }
 #endif

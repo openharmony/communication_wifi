@@ -105,6 +105,7 @@ void WifiHotspotMgrServiceImpl::OnStart()
     WifiManager::GetInstance().AddSupportedFeatures(WifiFeatures::WIFI_FEATURE_MOBILE_HOTSPOT);
     // Get airplane mode by datashare
     WifiManager::GetInstance().GetAirplaneModeByDatashare(WIFI_HOTSPOT_ABILITY_ID);
+    WifiManager::GetInstance().StartUnloadApSaTimer();
 }
 
 void WifiHotspotMgrServiceImpl::OnStop()

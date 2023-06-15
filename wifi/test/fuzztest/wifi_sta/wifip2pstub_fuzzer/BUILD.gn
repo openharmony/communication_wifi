@@ -15,13 +15,12 @@
 import("//build/config/features.gni")
 import("//build/test.gni")
 import("//foundation/communication/wifi/wifi/wifi.gni")
-module_output_path = "wifi/wifi_manage"
+module_output_path = "wifi/wifi_sta"
 
 ##############################fuzztest##########################################
 ohos_fuzztest("WifiP2pStubFuzzTest") {
   module_out_path = module_output_path
-  fuzz_config_file =
-      "$WIFI_ROOT_DIR/test/fuzztest/wifi_manage/wifip2pstub_fuzzer"
+  fuzz_config_file = "$WIFI_ROOT_DIR/test/fuzztest/wifi_sta/wifip2pstub_fuzzer"
 
   include_dirs = [
     "$WIFI_ROOT_DIR/interfaces/inner_api",

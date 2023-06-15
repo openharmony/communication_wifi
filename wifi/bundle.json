@@ -103,7 +103,6 @@
                 }
             ],
             "test": [
-                "//foundation/communication/wifi/wifi/test/fuzztest/wifi_manage:fuzztest",
                 "//foundation/communication/wifi/wifi/test/fuzztest/wifi_sta:fuzztest",
                 "//foundation/communication/wifi/wifi/test/wifi_standard/wifi_framework/wifi_manage/wifi_scan:unittest",
                 "//foundation/communication/wifi/wifi/test/wifi_standard/wifi_framework/wifi_manage/wifi_sta:unittest",

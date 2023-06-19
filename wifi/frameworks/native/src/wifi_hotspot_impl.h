@@ -220,7 +220,7 @@ public:
     bool IsRemoteDied(void);
 
 private:
-    bool GetWifiHotspotProxy(void);
+    bool GetWifiHotspotProxy();
     int systemAbilityId_;
     std::mutex mutex_;
     int instId;

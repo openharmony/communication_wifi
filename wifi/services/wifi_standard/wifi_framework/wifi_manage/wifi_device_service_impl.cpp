@@ -146,7 +146,7 @@ void WifiDeviceServiceImpl::OnStart()
         TimeOutCallback timeoutCallback = std::bind(&WifiDeviceServiceImpl::RegisterThermalLevel, this);
         WifiTimer::GetInstance()->Register(timeoutCallback, thermalTimerId, TIMEOUT_THERMAL_EVENT);
     }
-
+    WifiManager::GetInstance().StartUnloadStaSaTimer();
     StartWatchdog();
 #endif
 }
@@ -267,7 +267,7 @@ ErrCode WifiDeviceServiceImpl::EnableWifi()
 #ifdef FEATURE_P2P_SUPPORT
 #ifndef OHOS_ARCH_LITE
     WifiSaLoadManager::GetInstance().LoadWifiSa(WIFI_P2P_ABILITY_ID);
-    WifiManager::GetInstance().UnRegisterUnloadP2PSaTimer();
+    WifiManager::GetInstance().StopUnloadP2PSaTimer();
 #endif
     sptr<WifiP2pServiceImpl> p2pService = WifiP2pServiceImpl::GetInstance();
     if (p2pService != nullptr && p2pService->EnableP2p() != WIFI_OPT_SUCCESS) {
@@ -277,7 +277,7 @@ ErrCode WifiDeviceServiceImpl::EnableWifi()
 #endif
 
     WifiSettings::GetInstance().SyncWifiConfig();
-    WifiManager::GetInstance().UnRegisterUnloadStaSaTimer();
+    WifiManager::GetInstance().StopUnloadStaSaTimer();
     if (WifiConfigCenter::GetInstance().GetOperatorWifiType() ==
         static_cast<int>(OperatorWifiType::USER_OPEN_WIFI_IN_AIRPLANEMODE)) {
         WIFI_LOGI("EnableWifi, user opened wifi in airplane mode!");

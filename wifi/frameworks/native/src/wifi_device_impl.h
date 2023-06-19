@@ -347,7 +347,7 @@ public:
     bool IsRemoteDied(void);
 
 private:
-    bool GetWifiDeviceProxy(void);
+    bool GetWifiDeviceProxy();
     int systemAbilityId_;
     std::mutex mutex_;
 #ifdef OHOS_ARCH_LITE

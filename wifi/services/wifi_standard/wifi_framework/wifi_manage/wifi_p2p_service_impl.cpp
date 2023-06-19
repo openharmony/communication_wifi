@@ -72,6 +72,7 @@ void WifiP2pServiceImpl::OnStart()
     mState = ServiceRunningState::STATE_RUNNING;
     WIFI_LOGI("Start p2p service!");
     WifiManager::GetInstance().AddSupportedFeatures(WifiFeatures::WIFI_FEATURE_P2P);
+    WifiManager::GetInstance().StartUnloadP2PSaTimer();
 }
 
 void WifiP2pServiceImpl::OnStop()
@@ -163,7 +164,7 @@ ErrCode WifiP2pServiceImpl::EnableP2p(void)
         WifiConfigCenter::GetInstance().SetP2pMidState(WifiOprMidState::OPENING, WifiOprMidState::CLOSED);
         WifiServiceManager::GetInstance().UnloadService(WIFI_SERVICE_P2P);
     } else {
-        WifiManager::GetInstance().UnRegisterUnloadP2PSaTimer();
+        WifiManager::GetInstance().StopUnloadP2PSaTimer();
     }
     return ret;
 }

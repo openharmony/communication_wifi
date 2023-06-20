@@ -33,8 +33,9 @@ const std::u16string FORMMGR_INTERFACE_TOKEN = u"ohos.wifi.IWifiP2pService";
 
 class WifiP2pStubFuzzTest : public WifiP2pStub {
 public:
-    WifiP2pStubTest() = default;
-    virtual ~WifiP2pStubTest() = default;
+    WifiP2pStubFuzzTest() = default;
+    virtual ~WifiP2pStubFuzzTest() = default;
+
     ErrCode MonitorCfgChange() override
     {
         return WIFI_OPT_SUCCESS;

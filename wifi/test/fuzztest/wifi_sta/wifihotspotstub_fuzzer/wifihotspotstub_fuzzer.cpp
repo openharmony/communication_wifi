@@ -160,7 +160,7 @@ void OnGetSupportedFeaturesTest(const uint8_t* data, size_t size)
 
 bool DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)
 {
-    uint32_t code = U32_AT(data) % MAP_NUMS + WIFI_SVR_CMD_ENABLE_WIFI_AP;
+    uint32_t code = U32_AT(data) % MAP_HOTSPOT_NUMS + WIFI_SVR_CMD_ENABLE_WIFI_AP;
     MessageParcel datas;
     datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN);
     datas.WriteInt32(0);

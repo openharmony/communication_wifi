@@ -31,11 +31,11 @@ constexpr size_t MAP_HOTSPOT_NUMS = 21;
 
 const std::u16string FORMMGR_INTERFACE_TOKEN = u"ohos.wifi.IWifiP2pService";
 
-class WifiHotSpotStubFuzzTest : public WifiP2pStub {
+class WifiHotSpotStubFuzzTest : public WifiHotspotStub {
 public:
-    WifiHotSpotStubTest() = default;
+    WifiHotSpotStubFuzzTest() = default;
 
-    virtual WifiHotSpotStubTest() = default;
+    virtual ~WifiHotSpotStubFuzzTest() = default;
 
     ErrCode IsHotspotActive(bool &bActive) override
     {

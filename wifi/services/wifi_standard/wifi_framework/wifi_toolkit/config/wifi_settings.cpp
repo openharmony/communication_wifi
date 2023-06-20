@@ -1741,7 +1741,7 @@ void WifiSettings::SaveDisconnectedReason(DisconnectedReason discReason)
     mLastDiscReason = discReason;
 }
 
-int WifiSettings::GetDisconnectedReason(DisconnectedReason &discReason)
+int WifiSettings::GetDisconnectedReason(DisconnectedReason &discReason) const
 {
     discReason = mLastDiscReason;
     return 0;

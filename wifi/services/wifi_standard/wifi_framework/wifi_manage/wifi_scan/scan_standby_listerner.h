@@ -34,7 +34,7 @@ public:
         onStandbyChangedEvent = callBack;
     }
     virtual ~StandBySubscriber() {};
-    void OnReceiveEvent(const OHOS::EventFwk::CommonEventData &data) override;
+    void OnReceiveEvent(const OHOS::EventFwk::CommonEventData &event) override;
 private:
     std::function<void(bool, bool)> onStandbyChangedEvent;
 };

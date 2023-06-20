@@ -752,7 +752,6 @@ void WifiDeviceStub::OnGet5GHzChannelList(uint32_t code, MessageParcel &data, Me
 void WifiDeviceStub::OnGetDisconnectedReason(uint32_t code, MessageParcel &data, MessageParcel &reply)
 {
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
-    std::vector<int> channelList;
     DisconnectedReason reason = DisconnectedReason::DISC_REASON_DEFAULT;
     ErrCode ret = GetDisconnectedReason(reason);
     reply.WriteInt32(0);

@@ -149,6 +149,7 @@ void OnGetSupportedFeaturesTest(const uint8_t* data, size_t size)
 {
     MessageParcel datas;
     datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN);
+    datas.WriteInt32(0);
     datas.WriteBuffer(data, size);
     datas.RewindRead(0);
     MessageParcel reply;

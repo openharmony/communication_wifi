@@ -27,6 +27,7 @@ namespace OHOS {
 namespace Wifi {
 constexpr size_t FOO_MAX_LEN = 1024;
 constexpr size_t U32_AT_SIZE = 4;
+constexpr size_t MAP_P2P_NUMS = 41;
 const std::u16string FORMMGR_INTERFACE_TOKEN = u"ohos.wifi.IWifiP2pService";
 
 class WifiP2pStubTest : public WifiP2pStub {
@@ -257,19 +258,39 @@ public:
     }
 };
 
-bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
+uint32_t GetU32Data(const char* ptr)
+{
+    return (ptr[0] << 24) | (ptr[1] << 16) | (ptr[2] << 8) | (ptr[3]);
+}
+
+void OnGetSupportedFeaturesTest(const char* data, size_t size)
 {
     MessageParcel datas;
     datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN);
+    datas.WriteInt32(0);
+    datas.WriteBuffer(data, size);
+    datas.RewindRead(0);
+    MessageParcel reply;
+    MessageOption option;
+    std::shared_ptr<WifiHotspotStub> pWifiP2pStub = std::make_shared<WifiHotSpotStubTest>();
+    pWifiP2pStub->OnRemoteRequest(WIFI_SVR_CMD_GET_SUPPORTED_FEATURES, datas, reply, option);
+}
+
+bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
+{
+    uint32_t code = GetU32Data(data) % MAP_P2P_NUMS + WIFI_SVR_CMD_P2P_ENABLE;
+    MessageParcel datas;
+    datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN);
+    datas.WriteInt32(0);
     datas.WriteBuffer(data, size);
     datas.RewindRead(0);
     MessageParcel reply;
     MessageOption option;
     std::shared_ptr<WifiP2pStub> pWifiP2pStub = std::make_shared<WifiP2pStubTest>();
-    pWifiP2pStub->OnRemoteRequest(WIFI_SVR_CMD_P2P_ENABLE, datas, reply, option);
+	OnGetSupportedFeaturesTest(data, size);
+    pWifiP2pStub->OnRemoteRequest(code, datas, reply, option);
     return true;
 }
-
 
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)

@@ -163,7 +163,7 @@ int CopyConfigFile(const char* configName)
         LOGE("snprintf_s dest dir failed.");
         return HAL_FAILURE;
     }
-    char path[PATH_NUM][BUFF_SIZE] = {"/vendor/etc/wifi/", "/system/etc/wifi/"};
+    char path[PATH_NUM][BUFF_SIZE] = {"/system/etc/wifi/", "/vendor/etc/wifi/"};
     for (int i = 0; i != PATH_NUM; ++i) {
         if (strcat_s(path[i], sizeof(path[i]), configName) != EOK) {
             LOGE("strcat_s failed.");

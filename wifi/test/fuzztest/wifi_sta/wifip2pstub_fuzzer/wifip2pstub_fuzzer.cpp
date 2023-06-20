@@ -14,6 +14,7 @@
  */
 
 #include "wifip2pstub_fuzzer.h"
+#include "wifi_fuzz_common_func.h"
 
 #include <cstddef>
 #include <cstdint>
@@ -30,7 +31,7 @@ constexpr size_t U32_AT_SIZE = 4;
 constexpr size_t MAP_P2P_NUMS = 41;
 const std::u16string FORMMGR_INTERFACE_TOKEN = u"ohos.wifi.IWifiP2pService";
 
-class WifiP2pStubTest : public WifiP2pStub {
+class WifiP2pStubFuzzTest : public WifiP2pStub {
 public:
     WifiP2pStubTest() = default;
     virtual ~WifiP2pStubTest() = default;
@@ -258,12 +259,7 @@ public:
     }
 };
 
-uint32_t GetU32Data(const char* ptr)
-{
-    return (ptr[0] << 24) | (ptr[1] << 16) | (ptr[2] << 8) | (ptr[3]);
-}
-
-void OnGetSupportedFeaturesTest(const char* data, size_t size)
+void OnGetSupportedFeaturesTest(const uint8_t* data, size_t size)
 {
     MessageParcel datas;
     datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN);
@@ -272,13 +268,13 @@ void OnGetSupportedFeaturesTest(const char* data, size_t size)
     datas.RewindRead(0);
     MessageParcel reply;
     MessageOption option;
-    std::shared_ptr<WifiP2pStub> pWifiP2pStub = std::make_shared<WifiP2pStubTest>();
+    std::shared_ptr<WifiP2pStub> pWifiP2pStub = std::make_shared<WifiP2pStubFuzzTest>();
     pWifiP2pStub->OnRemoteRequest(WIFI_SVR_CMD_GET_SUPPORTED_FEATURES, datas, reply, option);
 }
 
-bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
+bool DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)
 {
-    uint32_t code = GetU32Data(data) % MAP_P2P_NUMS + WIFI_SVR_CMD_P2P_ENABLE;
+    uint32_t code = U32_AT(data) % MAP_P2P_NUMS + WIFI_SVR_CMD_P2P_ENABLE;
     MessageParcel datas;
     datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN);
     datas.WriteInt32(0);
@@ -286,8 +282,8 @@ bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
     datas.RewindRead(0);
     MessageParcel reply;
     MessageOption option;
-    std::shared_ptr<WifiP2pStub> pWifiP2pStub = std::make_shared<WifiP2pStubTest>();
-	OnGetSupportedFeaturesTest(data, size);
+    std::shared_ptr<WifiP2pStub> pWifiP2pStub = std::make_shared<WifiP2pStubFuzzTest>();
+    OnGetSupportedFeaturesTest(data, size);
     pWifiP2pStub->OnRemoteRequest(code, datas, reply, option);
     return true;
 }
@@ -308,21 +304,8 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     if (size == 0 || size > OHOS::Wifi::FOO_MAX_LEN) {
         return 0;
     }
-    char* ch = reinterpret_cast<char*>(malloc(size + 1));
-    if (ch == nullptr) {
-        return 0;
-    }
-	
-    (void)memset_s(ch, size + 1, 0x00, size + 1);
-    if (memcpy_s(ch, size, data, size) != EOK) {
-        free(ch);
-        ch = nullptr;
-        return 0;
-    }
 
-    OHOS::Wifi::DoSomethingInterestingWithMyAPI(ch, size);
-    free(ch);
-    ch = nullptr;
+    OHOS::Wifi::DoSomethingInterestingWithMyAPI(data, size);
     return 0;
 }
 }

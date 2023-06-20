@@ -14,6 +14,7 @@
  */
 
 #include "wifihotspotstub_fuzzer.h"
+#include "wifi_fuzz_common_func.h"
 
 #include <cstddef>
 #include <cstdint>
@@ -144,12 +145,7 @@ public:
     }
 };
 
-uint32_t GetU32Data(const char* ptr)
-{
-    return (ptr[0] << 24) | (ptr[1] << 16) | (ptr[2] << 8) | (ptr[3]);
-}
-
-void OnGetSupportedFeaturesTest(const char* data, size_t size)
+void OnGetSupportedFeaturesTest(const uint8_t* data, size_t size)
 {
     MessageParcel datas;
     datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN);
@@ -161,9 +157,9 @@ void OnGetSupportedFeaturesTest(const char* data, size_t size)
     pWifiHotspotStub->OnRemoteRequest(WIFI_SVR_CMD_GET_SUPPORTED_FEATURES, datas, reply, option);
 }
 
-bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
+bool DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)
 {
-    uint32_t code = GetU32Data(data) % MAP_NUMS + WIFI_SVR_CMD_ENABLE_WIFI_AP;
+    uint32_t code = U32_AT(data) % MAP_NUMS + WIFI_SVR_CMD_ENABLE_WIFI_AP;
     MessageParcel datas;
     datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN);
     datas.WriteInt32(0);
@@ -194,21 +190,8 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     if (size == 0 || size > OHOS::Wifi::FOO_MAX_LEN) {
         return 0;
     }
-    char* ch = reinterpret_cast<char*>(malloc(size + 1));
-    if (ch == nullptr) {
-        return 0;
-    }
-	
-    (void)memset_s(ch, size + 1, 0x00, size + 1);
-    if (memcpy_s(ch, size, data, size) != EOK) {
-        free(ch);
-        ch = nullptr;
-        return 0;
-    }
 
-    OHOS::Wifi::DoSomethingInterestingWithMyAPI(ch, size);
-    free(ch);
-    ch = nullptr;
+    OHOS::Wifi::DoSomethingInterestingWithMyAPI(data, size);
     return 0;
 }
 }

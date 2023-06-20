@@ -272,7 +272,7 @@ void OnGetSupportedFeaturesTest(const char* data, size_t size)
     datas.RewindRead(0);
     MessageParcel reply;
     MessageOption option;
-    std::shared_ptr<WifiHotspotStub> pWifiP2pStub = std::make_shared<WifiHotSpotStubTest>();
+    std::shared_ptr<WifiP2pStub> pWifiP2pStub = std::make_shared<WifiP2pStubTest>();
     pWifiP2pStub->OnRemoteRequest(WIFI_SVR_CMD_GET_SUPPORTED_FEATURES, datas, reply, option);
 }
 
@@ -308,7 +308,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     if (size == 0 || size > OHOS::Wifi::FOO_MAX_LEN) {
         return 0;
     }
-    char* ch = (char *)malloc(size + 1);
+    char* ch = reinterpret_cast<char*>(malloc(size + 1));
     if (ch == nullptr) {
         return 0;
     }

@@ -13,12 +13,12 @@
  * limitations under the License.
  */
 
-#include "wifip2pstub_fuzzer.h"
+#include "wifihotspotstub_fuzzer.h"
 
 #include <cstddef>
 #include <cstdint>
 
-#include "wifi_p2p_stub.h"
+#include "wifi_hotspot_stub.h"
 #include "message_parcel.h"
 #include "securec.h"
 #include "define.h"
@@ -27,15 +27,15 @@ namespace OHOS {
 namespace Wifi {
 constexpr size_t FOO_MAX_LEN = 1024;
 constexpr size_t U32_AT_SIZE = 4;
-constexpr size_t MAP_NUMS = 21;
+constexpr size_t MAP_HOTSPOT_NUMS = 21;
 
 const std::u16string FORMMGR_INTERFACE_TOKEN = u"ohos.wifi.IWifiP2pService";
 
-class WifiHotSpotStubTest : public WifiP2pStub {
+class WifiHotSpotStubFuzzTest : public WifiP2pStub {
 public:
-    WifiP2pStubTest() = default;
+    WifiHotSpotStubTest() = default;
 
-    virtual ~WifiP2pStubTest() = default;
+    virtual WifiHotSpotStubTest() = default;
 
     ErrCode IsHotspotActive(bool &bActive) override
     {
@@ -138,7 +138,7 @@ public:
         return WIFI_OPT_SUCCESS;
     }
 
-    bool IsRemoteDied()
+    bool IsRemoteDied() override
     {
         return true;
     }
@@ -151,15 +151,14 @@ uint32_t GetU32Data(const char* ptr)
 
 void OnGetSupportedFeaturesTest(const char* data, size_t size)
 {
-    uint32_t code = GetU32Data(data) % MAP_NUMS + WIFI_SVR_CMD_ENABLE_WIFI_AP;
     MessageParcel datas;
     datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN);
     datas.WriteBuffer(data, size);
     datas.RewindRead(0);
     MessageParcel reply;
     MessageOption option;
-    std::shared_ptr<WifiHotspotStub> pWifiHotspotStub = std::make_shared<WifiHotSpotStubTest>();
-    pWifiHotspotStub->OnRemoteRequest(WIFI_SVR_CMD_P2P_ENABLE, datas, reply, option);
+    std::shared_ptr<WifiHotspotStub> pWifiHotspotStub = std::make_shared<WifiHotSpotStubFuzzTest>();
+    pWifiHotspotStub->OnRemoteRequest(WIFI_SVR_CMD_GET_SUPPORTED_FEATURES, datas, reply, option);
 }
 
 bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
@@ -172,8 +171,8 @@ bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
     datas.RewindRead(0);
     MessageParcel reply;
     MessageOption option;
-    std::shared_ptr<WifiHotspotStub> pWifiHotspotStub = std::make_shared<WifiP2pStubTest>();
-	OnGetSupportedFeaturesTest(data, size);
+    std::shared_ptr<WifiHotspotStub> pWifiHotspotStub = std::make_shared<WifiHotSpotStubFuzzTest>();
+    OnGetSupportedFeaturesTest(data, size);
     pWifiHotspotStub->OnRemoteRequest(code, datas, reply, option);
     return true;
 }
@@ -195,7 +194,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     if (size == 0 || size > OHOS::Wifi::FOO_MAX_LEN) {
         return 0;
     }
-    char* ch = (char *)malloc(size + 1);
+    char* ch = reinterpret_cast<char*>(malloc(size + 1));
     if (ch == nullptr) {
         return 0;
     }

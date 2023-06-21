@@ -372,6 +372,7 @@ struct WifiConfig {
         fourthRssiLevel5G = RSSI_LEVEL_4_5G;
         strDnsBak = "8.8.8.8";
         isLoadStabak = true;
+        preLoadEnhance = false;
     }
 };
 

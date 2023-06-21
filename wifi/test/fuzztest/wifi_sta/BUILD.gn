@@ -32,5 +32,6 @@ group("fuzztest") {
     "reconnect_fuzzer:ReConnectFuzzTest",
     "wifihotspotstub_fuzzer:WifiHotSpotStubFuzzTest",
     "wifip2pstub_fuzzer:WifiP2pStubFuzzTest",
+    "wifiscanstub_fuzzer:WifiScanStubFuzzTest",
   ]
 }

@@ -463,6 +463,7 @@ struct WifiDeviceConfig {
         lastConnectTime = -1;
         numRebootsSinceLastUse = 0;
         numAssociation = 0;
+        connFailedCount = 0;
     }
 };
 

@@ -1217,7 +1217,7 @@ public:
      * @param discReason - discReason
      * @return int - 0 success
      */
-    int GetDisconnectedReason(DisconnectedReason &discReason);
+    int GetDisconnectedReason(DisconnectedReason &discReason) const;
 
 private:
     WifiSettings();

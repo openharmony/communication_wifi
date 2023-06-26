@@ -30,6 +30,7 @@
 #include "wifi_supplicant_hal_interface.h"
 #include "wifi_hisysevent.h"
 #ifndef OHOS_ARCH_LITE
+#include <dlfcn.h>
 #include "iservice_registry.h"
 #include "system_ability_definition.h"
 #endif // OHOS_ARCH_LITE
@@ -901,6 +902,9 @@ void StaStateMachine::DealConnectionEvent(InternalMessage *msg)
     WifiSettings::GetInstance().SetDeviceAfterConnect(targetNetworkId);
     WifiSettings::GetInstance().SetDeviceState(targetNetworkId, (int)WifiDeviceConfigStatus::ENABLED, false);
     WifiSettings::GetInstance().SyncDeviceConfig();
+#ifndef OHOS_ARCH_LITE
+    SaveWifiConfigForUpdate(targetNetworkId);
+#endif
     /* Stop clearing the Wpa_blocklist. */
     StopTimer(static_cast<int>(WPA_BLOCK_LIST_CLEAR_EVENT));
     ConnectToNetworkProcess(msg);
@@ -2402,6 +2406,36 @@ void StaStateMachine::ReUpdateNetLinkInfo(void)
         std::string secondDns = IpTools::ConvertIpv4Address(wifiIpInfo.secondDns);
         WifiNetAgent::GetInstance().UpdateNetLinkInfo(ipAddress, netmask, gateway, primaryDns, secondDns);
     }
+}
+
+void StaStateMachine::SaveWifiConfigForUpdate(const int &networkId)
+{
+    WIFI_LOGI("Enter SaveWifiConfigForUpdate.");
+    constexpr const char *WIFI_UPDATE_LIB = "libwifi_config_update.z.so";
+    constexpr const char *SAVE_WIFI_CONFIG_FOR_UPDATE = "SaveWifiConfiguration";
+    auto wifiUpdateLib = dlopen(WIFI_UPDATE_LIB, RTLD_LAZY);
+    if (wifiUpdateLib == nullptr) {
+        WIFI_LOGE("dlopen fail: %{public}.", WIFI_UPDATE_LIB);
+        return; 
+    }
+    WifiDeviceConfig config;
+    if (WifiSettings::GetInstance().GetDeviceConfig(networkId) == -1) {
+        WIFI_LOGE("SaveWifiConfigForUpdate, get current config failed.");
+        dlclose(wifiUpdateLib);
+        wifiUpdateLib = nullptr;
+        return;
+    }
+    auto saveFunc = (void(*)(const std::string&, const std::string&, const std::string&))dlsym(
+        wifiUpdateLib, SAVE_WIFI_CONFIG_FOR_UPDATE);
+    if (saveFunc == nullptr) {
+        WIFI_LOGE("SaveWifiConfigForUpdate, saveFunc is nullptr.");
+        dlclose(wifiUpdateLib);
+        wifiUpdateLib = nullptr;
+        return;
+    }
+    saveFunc(config.ssid, config.keyMgmt, config.preSharedKey);
+    dlclose(wifiUpdateLib);
+    wifiUpdateLib = nullptr;
 }
 
 StaStateMachine::SystemAbilityStatusChangeListener::SystemAbilityStatusChangeListener(StaStateMachine &stateMachine)

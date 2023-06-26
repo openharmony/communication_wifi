@@ -2415,11 +2415,11 @@ void StaStateMachine::SaveWifiConfigForUpdate(const int &networkId)
     constexpr const char *SAVE_WIFI_CONFIG_FOR_UPDATE = "SaveWifiConfiguration";
     auto wifiUpdateLib = dlopen(WIFI_UPDATE_LIB, RTLD_LAZY);
     if (wifiUpdateLib == nullptr) {
-        WIFI_LOGE("dlopen fail: %{public}.", WIFI_UPDATE_LIB);
+        WIFI_LOGE("dlopen fail: %{public}s.", WIFI_UPDATE_LIB);
         return; 
     }
     WifiDeviceConfig config;
-    if (WifiSettings::GetInstance().GetDeviceConfig(networkId) == -1) {
+    if (WifiSettings::GetInstance().GetDeviceConfig(networkId, config) == -1) {
         WIFI_LOGE("SaveWifiConfigForUpdate, get current config failed.");
         dlclose(wifiUpdateLib);
         wifiUpdateLib = nullptr;

@@ -597,7 +597,7 @@ void WifiDeviceStub::OnRegisterCallBack(uint32_t code, MessageParcel &data, Mess
             WIFI_LOGW("Failed to ReadRemoteObject!");
             break;
         }
-        callback_ = iface_cast<IWifiDeviceCallBack>(remote);
+        sptr<IWifiDeviceCallBack> callback_ = iface_cast<IWifiDeviceCallBack>(remote);
         if (callback_ == nullptr) {
             callback_ = new (std::nothrow) WifiDeviceCallBackProxy(remote);
             WIFI_LOGI("create new WifiDeviceCallBackProxy!");

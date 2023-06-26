@@ -77,7 +77,6 @@ private:
 
 private:
     HandleFuncMap handleFuncMap;
-    sptr<IWifiDeviceCallBack> callback_;
     sptr<IRemoteObject::DeathRecipient> deathRecipient_;
     bool mSingleCallback;
 };

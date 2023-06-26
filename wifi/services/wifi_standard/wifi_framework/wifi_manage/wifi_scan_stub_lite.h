@@ -30,9 +30,6 @@ public:
 
     virtual int OnRemoteRequest(uint32_t code, IpcIo *req, IpcIo *reply);
 
-protected:
-    std::shared_ptr<IWifiScanCallback> GetCallback() const;
-
 private:
     int CheckInterfaceToken(uint32_t code, IpcIo *req);
     int OnSetScanControlInfo(uint32_t code, IpcIo *req, IpcIo *reply);
@@ -42,8 +39,6 @@ private:
     int OnGetScanInfoList(uint32_t code, IpcIo *req, IpcIo *reply);
     int OnRegisterCallBack(uint32_t code, IpcIo *req, IpcIo *reply);
     int OnGetSupportedFeatures(uint32_t code, IpcIo *req, IpcIo *reply);
-
-    std::shared_ptr<IWifiScanCallback> callback_;
 };
 }  // namespace Wifi
 }  // namespace OHOS

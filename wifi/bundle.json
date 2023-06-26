@@ -59,7 +59,8 @@
             "wifi_feature_is_random_mac_supported"
         ],
         "adapted_system_type": [
-            "small,standard"
+            "small",
+            "standard"
         ],
         "rom": "",
         "ram": "",

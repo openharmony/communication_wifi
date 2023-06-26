@@ -43,6 +43,8 @@ void WifiScanStub::InitHandleMap()
     handleFuncMap[WIFI_SVR_CMD_GET_SCAN_INFO_LIST] = &WifiScanStub::OnGetScanInfoList;
     handleFuncMap[WIFI_SVR_CMD_REGISTER_SCAN_CALLBACK] = &WifiScanStub::OnRegisterCallBack;
     handleFuncMap[WIFI_SVR_CMD_GET_SUPPORTED_FEATURES] = &WifiScanStub::OnGetSupportedFeatures;
+    handleFuncMap[WIFI_SVR_CMD_SET_WIFI_SCAN_ONLY] = &WifiScanStub::OnSetScanOnlyAvailable;
+    handleFuncMap[WIFI_SVR_CMD_GET_WIFI_SCAN_ONLY] = &WifiScanStub::OnGetScanOnlyAvailable;
 }
 
 int WifiScanStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
@@ -276,6 +278,29 @@ bool WifiScanStub::IsSingleCallback() const
 void WifiScanStub::SetSingleCallback(const bool isSingleCallback)
 {
     mSingleCallback = true;
+}
+
+int WifiScanStub::OnSetScanOnlyAvailable(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
+{
+    WIFI_LOGI("In WifiScanStub::OnSetScanOnlyAvailable");
+    bool enabled = data.ReadBool();
+    WIFI_LOGI("In WifiScanStub::OnSetScanOnlyAvailable enabled is %{public}d",enabled);
+    reply.WriteInt32(0);
+    reply.WriteBool(SetScanOnlyAvailable(enabled));
+    return 0;
+}
+
+int WifiScanStub::OnGetScanOnlyAvailable(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
+{
+    WIFI_LOGI("In WifiScanStub::OnGetScanOnlyAvailable");
+    bool state = false;
+    ErrCode ret = GetScanOnlyAvailable(state);
+    reply.WriteInt32(0);
+    reply.WriteInt32(ret);
+    if (ret == WIFI_OPT_SUCCESS) {
+        reply.WriteBool(state);
+    }
+    return 0;
 }
 }  // namespace Wifi
 }  // namespace OHOS

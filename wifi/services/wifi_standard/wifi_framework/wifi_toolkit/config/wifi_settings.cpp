@@ -50,6 +50,7 @@ WifiSettings::WifiSettings()
       mNoChargerPlugModeState(MODE_STATE_CLOSE),
       mHotspotIdleTimeout(HOTSPOT_IDLE_TIMEOUT_INTERVAL_MS),
       mLastDiscReason(DisconnectedReason::DISC_REASON_DEFAULT),
+      mLocationState(MODE_STATE_OPEN),
       explicitGroup(false)
 {
     mHotspotState[0] = static_cast<int>(ApState::AP_STATE_CLOSED);
@@ -1746,5 +1747,32 @@ int WifiSettings::GetDisconnectedReason(DisconnectedReason &discReason) const
     discReason = mLastDiscReason;
     return 0;
 }
+int WifiSettings::GetLocationState() const
+{
+    return mLocationState;
+}
+
+void WifiSettings::SetLocationState(const int &state)
+{
+    mLocationState = state;
+}
+
+
+void WifiSettings::SetScanOnlySwitchState(const int &state)
+{
+    mWifiConfig.scanOnlySwitch = state;
+    SyncWifiConfig();
+}
+
+int WifiSettings::GetScanOnlySwitchState() const
+{
+    return mWifiConfig.scanOnlySwitch;
+}
+
+bool WifiSettings::CheckScanOnlyAvailable() const
+{
+    return GetScanOnlySwitchState() && (MODE_STATE_OPEN == mLocationState) && (MODE_STATE_CLOSE == mAirplaneModeState);
+}
+
 }  // namespace Wifi
 }  // namespace OHOS

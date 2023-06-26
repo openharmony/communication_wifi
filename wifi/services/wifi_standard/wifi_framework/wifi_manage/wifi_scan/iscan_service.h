@@ -120,6 +120,24 @@ public:
      * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
      */
     virtual ErrCode SetEnhanceService(IEnhanceService *enhanceService) = 0;
+    /**
+     * @Description  OpenScanOnly
+     *
+     * @Output: Return operating results to Interface Service after open wifi scan only
+               successfully through callback function instead of returning
+               result immediately.
+     * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
+     */
+    virtual ErrCode OpenScanOnly() = 0;
+    /**
+     * @Description  CloseScanOnly
+     *
+     * @Output: Return operating results to Interface Service after close wifi scan only
+               successfully through callback function instead of returning
+               result immediately.
+     * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
+     */
+    virtual ErrCode CloseScanOnly() = 0;
 };
 }  // namespace Wifi
 }  // namespace OHOS

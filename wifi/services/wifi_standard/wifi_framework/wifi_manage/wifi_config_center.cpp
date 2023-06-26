@@ -403,5 +403,19 @@ int WifiConfigCenter::GetDisconnectedReason(DisconnectedReason &discReason)
 {
     return WifiSettings::GetInstance().GetDisconnectedReason(discReason);
 }
+
+WifiOprMidState WifiConfigCenter::GetWifiScanOnlyMidState()
+{
+    return mStaScanOnlyMidState.load();
+}
+
+bool WifiConfigCenter::SetWifiScanOnlyMidState(WifiOprMidState expState, WifiOprMidState state)
+{
+    return mStaScanOnlyMidState.compare_exchange_strong(expState, state);
+}
+void WifiConfigCenter::SetWifiScanOnlyMidState(WifiOprMidState state)
+{
+    mStaScanOnlyMidState = state;
+}
 }  // namespace Wifi
 }  // namespace OHOS

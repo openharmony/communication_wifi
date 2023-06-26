@@ -97,6 +97,18 @@ public:
      * @return bool - true: service is died, false: service is not died.
      */
     bool IsRemoteDied(void);
+    /**
+     * @Description SetScanOnlyAvailable.
+     *
+     * @return ErrCode - operation result
+     */
+    ErrCode SetScanOnlyAvailable(bool bScanOnlyAvailable) override;
+    /**
+     * @Description GetScanOnlyAvailable.
+     *
+     * @return ErrCode - operation result
+     */
+    ErrCode GetScanOnlyAvailable(bool &bScanOnlyAvailable) override;
 
 private:
     bool GetWifiScanProxy();

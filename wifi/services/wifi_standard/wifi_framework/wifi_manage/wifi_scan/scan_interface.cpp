@@ -170,5 +170,27 @@ ErrCode ScanInterface::SetEnhanceService(IEnhanceService *enhanceService)
     pScanService->SetEnhanceService(enhanceService);
     return WIFI_OPT_SUCCESS;
 }
+
+ErrCode ScanInterface::OpenScanOnly()
+{
+    WIFI_LOGI("Enter ScanInterface::OpenScanOnly.\n");
+    if (pScanService->OpenScanOnly() != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("OpenScanOnly failed.\n");
+        CloseScanOnly();
+        return WIFI_OPT_FAILED;
+    }
+    return WIFI_OPT_SUCCESS;
+}
+
+ErrCode ScanInterface::CloseScanOnly()
+{
+    LOGI("Enter ScanInterface::CloseScanOnly.\n");
+    CHECK_NULL_AND_RETURN(pScanService, WIFI_OPT_FAILED);
+    if (pScanService->CloseScanOnly() != WIFI_OPT_SUCCESS) {
+        LOGE("CloseScanOnly failed.\n");
+        return WIFI_OPT_FAILED;
+    }
+    return WIFI_OPT_SUCCESS;
+}
 }  // namespace Wifi
 }  // namespace OHOS

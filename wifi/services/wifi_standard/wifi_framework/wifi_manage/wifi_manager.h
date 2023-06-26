@@ -82,6 +82,14 @@ public:
     void OnReceiveEvent(const OHOS::EventFwk::CommonEventData &eventData) override;
 };
 
+class LocationEventSubscriber : public OHOS::EventFwk::CommonEventSubscriber {
+public:
+    explicit LocationEventSubscriber(const OHOS::EventFwk::CommonEventSubscribeInfo &subscriberInfo)
+        : CommonEventSubscriber(subscriberInfo) {}
+    virtual ~LocationEventSubscriber() {};
+    void OnReceiveEvent(const OHOS::EventFwk::CommonEventData &eventData) override;
+};
+
 class WifiTimer {
 public:
     using TimerCallback = std::function<void()>;
@@ -223,6 +231,8 @@ private:
     static void DealScanFinished(int state);
     static void DealScanInfoNotify(std::vector<InterScanInfo> &results);
     static void DealStoreScanInfoEvent(std::vector<InterScanInfo> &results);
+    static void DealOpenScanOnlyRes(OperateResState state);
+    static void DealCloseScanOnlyRes(OperateResState state);
 #ifdef FEATURE_AP_SUPPORT
     static void DealApStateChanged(ApState bState, int id = 0);
     static void DealApGetStaJoin(const StationInfo &info, int id = 0);
@@ -290,10 +300,15 @@ private:
     void UnRegisterAirplaneModeEvent();
     std::shared_ptr<AirplaneModeEventSubscriber> airplaneModeEventSubscriber_ = nullptr;
     uint32_t airplaneModeTimerId{0};
+    void RegisterLocationEvent();
+    void UnRegisterLocationEvent();
+    std::shared_ptr<LocationEventSubscriber> locationEventSubscriber_ = nullptr;
+    uint32_t locationTimerId{0};
 #endif
     InitStatus mInitStatus;
     long mSupportedFeatures;
     static int mCloseApIndex;
+    static bool bOpenScanOnlyOnStart;
 };
 } // namespace Wifi
 } // namespace OHOS

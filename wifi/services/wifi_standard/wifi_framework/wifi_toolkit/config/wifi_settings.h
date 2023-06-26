@@ -1219,6 +1219,39 @@ public:
      */
     int GetDisconnectedReason(DisconnectedReason &discReason) const;
 
+    /**
+     * @Description Set the Location State
+     *
+     * @param state - 1 on; 2 off
+     */
+    void SetLocationState(const int &state);
+
+    /**
+     * @Description Get the Location State
+     *
+     * @return int - 1 on; 2 off
+     */
+    int GetLocationState() const;
+    /**
+     * @Description Set the Scan Only Switch State
+     *
+     * @param state - 1 on; 2 off
+     */
+    void SetScanOnlySwitchState(const int &state);
+
+    /**
+     * @Description Get the Scan Only Switch State
+     *
+     * @return int - 1 on; 2 off
+     */
+    int GetScanOnlySwitchState() const;
+    /**
+     * @Description Get the Scan Only Whether Available
+     *
+     * @return int - 1 on; 2 off
+     */
+    bool CheckScanOnlyAvailable() const;
+
 private:
     WifiSettings();
     void InitWifiConfig();
@@ -1272,6 +1305,7 @@ private:
     std::map<int, PowerModel> powerModel;
     int mHotspotIdleTimeout;
     DisconnectedReason mLastDiscReason;
+    int mLocationState;            /* 1 MODE_STATE_OPEN, 2 MODE_STATE_CLOSE */
 
     std::mutex mStaMutex;
     std::mutex mApMutex;

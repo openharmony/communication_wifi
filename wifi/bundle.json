@@ -84,7 +84,9 @@
                 "napi",
                 "netmanager_base",
                 "safwk",
-                "samgr"
+                "samgr",
+                "data_share",
+                "hdf_core"
             ],
             "third_party": [
                 "bounds_checking_function",

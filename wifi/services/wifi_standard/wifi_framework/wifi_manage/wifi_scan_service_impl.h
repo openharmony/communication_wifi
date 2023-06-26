@@ -59,6 +59,8 @@ public:
     ErrCode AdvanceScan(const WifiScanParams &params) override;
     ErrCode IsWifiClosedScan(bool &bOpen) override;
     ErrCode GetScanInfoList(std::vector<WifiScanInfo> &result) override;
+    ErrCode SetScanOnlyAvailable(bool bScanOnlyAvailable) override;
+    ErrCode GetScanOnlyAvailable(bool &bScanOnlyAvailable) override;
 #ifdef OHOS_ARCH_LITE
     ErrCode RegisterCallBack(const std::shared_ptr<IWifiScanCallback> &callback,
         const std::vector<std::string> &event) override;
@@ -75,6 +77,9 @@ private:
     bool Init();
     bool IsScanServiceRunning();
     static void SaBasicDump(std::string& result);
+    ErrCode OpenScanOnlyAvailable();
+    ErrCode CloseScanOnlyAvailable();
+    void CheckAndStartScanService();
 
 private:
 #ifdef OHOS_ARCH_LITE

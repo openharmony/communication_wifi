@@ -122,6 +122,7 @@ if (defined(ohos_lite)) {
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/idl_client/idl_interface",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_scan",
+      "$DHCP_ROOT_DIR/services/mgr_service/include",
       "$DHCP_ROOT_DIR/interfaces/inner_api/include",
       "$DHCP_ROOT_DIR/interfaces/inner_api/interfaces",
       "$WIFI_ROOT_DIR/utils/inc",
@@ -214,7 +215,10 @@ if (defined(ohos_lite)) {
       ":wifi_manager_service_header",
     ]
 
-    deps = []
+    deps = [
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/idl_client:wifi_idl_client",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit:wifi_toolkit",
+    ]
 
     external_deps = [
       "ability_base:want",
@@ -362,9 +366,11 @@ if (defined(ohos_lite)) {
 
     deps = [
       "$WIFI_ROOT_DIR/services/wifi_standard/etc/init:etc",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/idl_client:wifi_idl_client",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit:wifi_toolkit",
       "$WIFI_ROOT_DIR/utils:wifi_utils",
       "//foundation/communication/netmanager_base/services/netmanagernative:netsys_native_manager",
+      "//foundation/systemabilitymgr/safwk/interfaces/innerkits/safwk:system_ability_fwk",
     ]
 
     configs = [ ":wifi_manager_service_header" ]

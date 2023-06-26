@@ -34,6 +34,7 @@
 #include "wifi_permission_utils.h"
 #include "wifi_scan_callback_proxy.h"
 #include "wifi_service_manager.h"
+#include "wifi_sta_hal_interface.h"
 
 DEFINE_WIFILOG_SCAN_LABEL("WifiScanServiceImpl");
 namespace OHOS {
@@ -151,6 +152,16 @@ ErrCode WifiScanServiceImpl::Scan()
         }
     }
 
+    if (WifiConfigCenter::GetInstance().GetWifiMidState() != WifiOprMidState::RUNNING) {
+        if ((!WifiSettings::GetInstance().CheckScanOnlyAvailable()) && (WifiConfigCenter::GetInstance().GetWifiScanOnlyMidState() == WifiOprMidState::RUNNING)) {
+            CloseScanOnlyAvailable();
+            return WIFI_OPT_SCAN_NOT_OPENED;
+        }
+        if ((WifiSettings::GetInstance().CheckScanOnlyAvailable()) && (WifiConfigCenter::GetInstance().GetWifiScanOnlyMidState() != WifiOprMidState::RUNNING)) {
+            OpenScanOnlyAvailable();
+        }
+    }
+    
     if (!IsScanServiceRunning()) {
         return WIFI_OPT_SCAN_NOT_OPENED;
     }
@@ -226,6 +237,177 @@ ErrCode WifiScanServiceImpl::GetScanInfoList(std::vector<WifiScanInfo> &result)
 
     WifiConfigCenter::GetInstance().GetScanInfoList(result);
     return WIFI_OPT_SUCCESS;
+}
+
+ErrCode WifiScanServiceImpl::SetScanOnlyAvailable(bool bScanOnlyAvailable)
+{
+    WIFI_LOGI("current WifiScanServiceImpl::SetScanOnlyAvailable");
+    if (!WifiAuthCenter::IsSystemAppByToken()) {
+        WIFI_LOGE("EnableWifi:NOT System APP, PERMISSION_DENIED!");
+        return WIFI_OPT_NON_SYSTEMAPP;
+    }
+    if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("SetScanOnlyAvailable:VerifyGetWifiInfoPermission() PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+    WifiSettings::GetInstance().SetScanOnlySwitchState(bScanOnlyAvailable);
+    if(bScanOnlyAvailable) {
+        return OpenScanOnlyAvailable();
+    }
+    else {
+        return CloseScanOnlyAvailable();
+    }
+    return WIFI_OPT_SUCCESS;
+}
+
+ErrCode WifiScanServiceImpl::GetScanOnlyAvailable(bool &bScanOnlyAvailable)
+{
+    WIFI_LOGI("current WifiScanServiceImpl::SetScanOnlyAvailable");
+    if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("GetScanOnlyAvailable:VerifyGetWifiInfoPermission() PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+
+    bScanOnlyAvailable = WifiSettings::GetInstance().GetScanOnlySwitchState();
+    return WIFI_OPT_SUCCESS;
+}
+
+ErrCode WifiScanServiceImpl::OpenScanOnlyAvailable()
+{
+    WIFI_LOGI("WifiScanServiceImpl OpenScanOnlyAvailable");
+    bool bCheckScanOnlyAvailable = WifiSettings::GetInstance().CheckScanOnlyAvailable();
+    if (!bCheckScanOnlyAvailable) {
+        return WIFI_OPT_FAILED;
+    }
+   
+    WifiOprMidState curState = WifiConfigCenter::GetInstance().GetWifiScanOnlyMidState();
+    WIFI_LOGI("current wifi scan only state is %{public}d", static_cast<int>(curState));
+    if (curState != WifiOprMidState::CLOSED) {
+        if (curState == WifiOprMidState::CLOSING) { /* when current wifi is closing, return */
+            return WIFI_OPT_FAILED;
+        } else {
+            return WIFI_OPT_SUCCESS;
+        }
+    }
+
+    if (WifiOprMidState::RUNNING == WifiConfigCenter::GetInstance().GetWifiMidState()) {
+        WifiConfigCenter::GetInstance().SetWifiScanOnlyMidState(WifiOprMidState::RUNNING);
+        return WIFI_OPT_SUCCESS;
+    }
+    
+    WifiConfigCenter::GetInstance().SetWifiScanOnlyMidState( WifiOprMidState::OPENING);
+    CheckAndStartScanService();
+    int res = WifiStaHalInterface::GetInstance().StartWifi();
+    if (res != static_cast<int>(WIFI_IDL_OPT_OK)) {
+        WIFI_LOGE("Start Wpa failed");
+        return WIFI_OPT_FAILED;
+    }
+    IScanService *pService = WifiServiceManager::GetInstance().GetScanServiceInst();
+    if (pService == nullptr) {
+        WifiConfigCenter::GetInstance().SetWifiScanOnlyMidState(WifiOprMidState::CLOSED);
+        return WIFI_OPT_FAILED;
+    }         
+    ErrCode ret = pService->OpenScanOnly();
+    if (ret != WIFI_OPT_SUCCESS) {
+        WifiConfigCenter::GetInstance().SetWifiScanOnlyMidState(WifiOprMidState::CLOSED);
+        return WIFI_OPT_FAILED;
+    }
+    WifiConfigCenter::GetInstance().SetWifiScanOnlyMidState(WifiOprMidState::RUNNING);
+
+    return WIFI_OPT_SUCCESS;
+}
+
+ErrCode WifiScanServiceImpl::CloseScanOnlyAvailable()
+{
+    WIFI_LOGI("WifiScanServiceImpl CloseScanOnlyAvailable");
+    WifiOprMidState curState = WifiConfigCenter::GetInstance().GetWifiScanOnlyMidState();
+    WIFI_LOGI("current wifi scan only state is %{public}d", static_cast<int>(curState));
+    if (curState != WifiOprMidState::RUNNING) {  
+        if (curState == WifiOprMidState::OPENING) { /* when current wifi is opening, return */
+            return WIFI_OPT_FAILED;
+        } else {
+            return WIFI_OPT_SUCCESS;
+        }
+    }
+    
+    if (WifiOprMidState::RUNNING == WifiConfigCenter::GetInstance().GetWifiMidState()) {
+        WifiConfigCenter::GetInstance().SetWifiScanOnlyMidState(WifiOprMidState::CLOSED);
+        return WIFI_OPT_SUCCESS;
+    }
+
+    if (!WifiConfigCenter::GetInstance().SetWifiScanOnlyMidState(curState, WifiOprMidState::CLOSING)) {
+        WIFI_LOGI("set wifi scan only mid state opening failed!");
+        return WIFI_OPT_FAILED;
+    }
+    
+    do {
+        int res = WifiStaHalInterface::GetInstance().StopWifi();
+        if (res != static_cast<int>(WIFI_IDL_OPT_OK)) {
+            WIFI_LOGE("Stop Wpa failed");
+            break;
+        }
+    } while (false);
+    
+    IScanService *pService = WifiServiceManager::GetInstance().GetScanServiceInst();
+    if (pService == nullptr) {
+        WifiConfigCenter::GetInstance().SetWifiScanOnlyMidState(WifiOprMidState::CLOSED);
+        return WIFI_OPT_SUCCESS;
+    } 
+                
+    ErrCode ret = pService->CloseScanOnly();
+    if (ret != WIFI_OPT_SUCCESS) {
+        WIFI_LOGI("set wifi scan only mid state RUNNING");
+        WifiConfigCenter::GetInstance().SetWifiScanOnlyMidState(WifiOprMidState::UNKNOWN);
+    } else {
+        WIFI_LOGI("set wifi scan only mid state closed");
+        WifiConfigCenter::GetInstance().SetWifiScanOnlyMidState(WifiOprMidState::CLOSED);
+    }
+
+    return WIFI_OPT_SUCCESS;
+}
+
+void WifiScanServiceImpl::CheckAndStartScanService(void)
+{
+    WifiOprMidState scanState = WifiConfigCenter::GetInstance().GetScanMidState();
+    WIFI_LOGI("CheckAndStartScanService scanState: %{public}d", static_cast<int>(scanState));
+    if (scanState != WifiOprMidState::CLOSED) {
+        IScanService *pService = WifiServiceManager::GetInstance().GetScanServiceInst();
+        if (pService != nullptr) {
+            pService->OnClientModeStatusChanged(static_cast<int>(OperateResState::DISCONNECT_DISCONNECTED));
+        }
+        return;
+    }
+    if (!WifiConfigCenter::GetInstance().SetScanMidState(scanState, WifiOprMidState::OPENING)) {
+        WIFI_LOGW("Failed to set scan mid state opening!");
+        return;
+    }
+    ErrCode errCode = WIFI_OPT_FAILED;
+    do {
+        if (WifiServiceManager::GetInstance().CheckAndEnforceService(WIFI_SERVICE_SCAN) < 0) {
+            WIFI_LOGE("Load %{public}s service failed!", WIFI_SERVICE_SCAN);
+            break;
+        }
+        IScanService *pService = WifiServiceManager::GetInstance().GetScanServiceInst();
+        if (pService == nullptr) {
+            WIFI_LOGE("Create %{public}s service failed!", WIFI_SERVICE_SCAN);
+            break;
+        }
+        errCode = pService->RegisterScanCallbacks(WifiManager::GetInstance().GetScanCallback());
+        if (errCode != WIFI_OPT_SUCCESS) {
+            WIFI_LOGE("Register scan service callback failed!");
+            break;
+        }
+        errCode = pService->Init();
+        if (errCode != WIFI_OPT_SUCCESS) {
+            WIFI_LOGE("init scan service failed, ret %{public}d!", static_cast<int>(errCode));
+            break;
+        }
+    } while (0);
+    if (errCode != WIFI_OPT_SUCCESS) {
+        WifiConfigCenter::GetInstance().SetScanMidState(WifiOprMidState::OPENING, WifiOprMidState::CLOSED);
+        WifiServiceManager::GetInstance().UnloadService(WIFI_SERVICE_SCAN);
+    }
+    return;
 }
 
 #ifdef OHOS_ARCH_LITE

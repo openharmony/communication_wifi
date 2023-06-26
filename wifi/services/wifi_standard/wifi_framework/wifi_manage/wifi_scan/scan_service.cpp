@@ -2309,6 +2309,20 @@ bool ScanService::IsPackageInTrustList(const std::string &trustList, int sceneId
     return bFind;
 }
 
+ErrCode ScanService::OpenScanOnly() const
+{
+    WIFI_LOGI("Enter ScanService::OpenScanOnly.\n");
+    mScanSerivceCallbacks.OnOpenScanOnlyRes(OperateResState::OPEN_SCAN_ONLY_SUCCEED);
+    return WIFI_OPT_SUCCESS;
+}
+
+ErrCode ScanService::CloseScanOnly() const
+{
+    WIFI_LOGI("Enter ScanService::CloseScanOnly.\n");
+    mScanSerivceCallbacks.OnCloseScanOnlyRes(OperateResState::CLOSE_SCAN_ONLY_SUCCEED);
+    return WIFI_OPT_SUCCESS;
+}
+
 int CalculateBitPerTone(int snrDb)
 {
     int bitPerTone;

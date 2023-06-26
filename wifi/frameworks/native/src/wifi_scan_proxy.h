@@ -106,6 +106,19 @@ public:
      * @return bool - true: service is died, false: service is not died.
      */
     bool IsRemoteDied(void) override;
+    /**
+     * @Description SetScanOnlyAvailable.
+     *
+     * @return ErrCode - operation result
+     */
+    ErrCode SetScanOnlyAvailable(bool bScanOnlyAvailable) override;
+
+    /**
+     * @Description GetScanAlways Whether Available.
+     *
+     * @return ErrCode - operation result
+     */
+    ErrCode GetScanOnlyAvailable(bool &bScanOnlyAvailable) override;
 
 #ifdef OHOS_ARCH_LITE
     void OnRemoteDied(void);

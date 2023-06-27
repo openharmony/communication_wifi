@@ -326,9 +326,16 @@ ErrCode WifiHotspotServiceImpl::CheckCanEnableHotspot(const ServiceType type)
 
     WifiOprMidState curState = WifiConfigCenter::GetInstance().GetWifiMidState();
     if (curState != WifiOprMidState::CLOSED) {
+#ifdef WIFI_FEATURE_STA_AP_EXCLUSION
+        auto ret = DisableWifi();
+        if (ret != WIFI_OPT_SUCCESS) {
+            return WIFI_OPT_STA_AP_EXCLUSION_STA_CLOSE_FAILED;
+        }
+#else
         WIFI_LOGI("current wifi state is %{public}d, please close sta first!",
             static_cast<int>(curState));
         return WIFI_OPT_NOT_SUPPORTED;
+#endif
     }
     return WIFI_OPT_SUCCESS;
 }
@@ -742,5 +749,55 @@ bool WifiHotspotServiceImpl::IsRemoteDied(void)
 {
     return false;
 }
+
+#ifdef WIFI_FEATURE_STA_AP_EXCLUSION
+ErrCode WifiHotspotServiceImpl::DisableWifi()
+{
+    WifiOprMidState curState = WifiConfigCenter::GetInstance().GetWifiMidState();
+    if (curState != WifiOprMidState::RUNNING) {
+        WIFI_LOGI("current wifi state is %{public}d", static_cast<int>(curState));
+        if (curState == WifiOprMidState::OPENING) { /* when current wifi is opening, return */
+            return WIFI_OPT_CLOSE_FAIL_WHEN_OPENING;
+        } else {
+            return WIFI_OPT_CLOSE_SUCC_WHEN_CLOSED;
+        }
+    }
+
+#ifdef FEATURE_P2P_SUPPORT
+    sptr<WifiP2pServiceImpl> p2pService = WifiP2pServiceImpl::GetInstance();
+    if (p2pService != nullptr && p2pService->DisableP2p() != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("Disable P2p failed!");
+        return WIFI_OPT_FAILED;
+    }
+#endif
+
+    if (!WifiConfigCenter::GetInstance().SetWifiMidState(curState, WifiOprMidState::CLOSING)) {
+        WIFI_LOGI("set wifi mid state opening failed! may be other activity has been operated");
+        return WIFI_OPT_CLOSE_SUCC_WHEN_CLOSED;
+    }
+    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst();
+    if (pService == nullptr) {
+        WifiConfigCenter::GetInstance().SetWifiMidState(WifiOprMidState::CLOSED);
+        WifiServiceManager::GetInstance().UnloadService(WIFI_SERVICE_STA);
+        return WIFI_OPT_SUCCESS;
+    }
+    ErrCode ret = pService->DisableWifi();
+    if (ret != WIFI_OPT_SUCCESS) {
+        WifiConfigCenter::GetInstance().SetWifiMidState(WifiOprMidState::CLOSING, WifiOprMidState::RUNNING);
+    } else {
+        WifiConfigCenter::GetInstance().SetStaLastRunState(false);
+        WifiManager::GetInstance().GetAirplaneModeByDatashare(WIFI_DEVICE_ABILITY_ID);
+        if (WifiConfigCenter::GetInstance().GetOperatorWifiType() ==
+            static_cast<int>(OperatorWifiType::USER_OPEN_WIFI_IN_AIRPLANEMODE) &&
+            WifiConfigCenter::GetInstance().GetAirplaneModeState() == MODE_STATE_OPEN) {
+                WifiConfigCenter::GetInstance().SetOperatorWifiType(
+                    static_cast<int>(OperatorWifiType::USER_CLOSE_WIFI_IN_AIRPLANEMODE));
+                WIFI_LOGI("EnableWifi, current airplane mode is opened, user close wifi!");
+        }
+    }
+    sleep(1);
+    return ret;
+}
+#endif
 }  // namespace Wifi
 }  // namespace OHOS

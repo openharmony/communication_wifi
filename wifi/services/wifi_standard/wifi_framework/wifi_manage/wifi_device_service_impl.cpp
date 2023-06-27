@@ -223,11 +223,18 @@ ErrCode WifiDeviceServiceImpl::EnableWifi()
     }
 
 #ifdef FEATURE_AP_SUPPORT
-    curState = WifiConfigCenter::GetInstance().GetApMidState(0);
-    if (curState != WifiOprMidState::CLOSED) {
+    WifiOprMidState apState = WifiConfigCenter::GetInstance().GetApMidState(0);
+    if (apState != WifiOprMidState::CLOSED) {
+#ifdef WIFI_FEATURE_STA_AP_EXCLUSION
+        auto ret = DisableHotspot();
+        if (ret != WIFI_OPT_SUCCESS) {
+            return WIFI_OPT_STA_AP_EXCLUSION_AP_CLOSE_FAILED;
+        }
+#else
         WIFI_LOGW("current ap state is %{public}d, please close SoftAp first!",
             static_cast<int>(curState));
         return WIFI_OPT_NOT_SUPPORTED;
+#endif
     }
 #endif
 
@@ -328,7 +335,7 @@ ErrCode WifiDeviceServiceImpl::DisableWifi()
 #endif
 
     if (!WifiConfigCenter::GetInstance().SetWifiMidState(curState, WifiOprMidState::CLOSING)) {
-        WIFI_LOGI("set wifi mid state opening failed! may be other activity has been operated");
+        WIFI_LOGI("set wifi mid state opening failed! may be other app has been operated");
         return WIFI_OPT_CLOSE_SUCC_WHEN_CLOSED;
     }
     IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst();
@@ -1377,6 +1384,38 @@ ErrCode WifiDeviceServiceImpl::Get5GHzChannelList(std::vector<int> &result)
     
     return WIFI_OPT_SUCCESS;
 }
+
+#ifdef WIFI_FEATURE_STA_AP_EXCLUSION
+ErrCode WifiDeviceServiceImpl::DisableHotspot()
+{
+    WIFI_LOGI("enter disableHotspot");
+    WifiOprMidState curState = WifiConfigCenter::GetInstance().GetApMidState(0);
+    if (curState != WifiOprMidState::RUNNING) {
+        WIFI_LOGE("current ap state is %{public}d", static_cast<int>(curState));
+        if (curState == WifiOprMidState::OPENING) { /* when ap is opening, return */
+            return WIFI_OPT_CLOSE_FAIL_WHEN_OPENING;
+        } else {
+            return WIFI_OPT_CLOSE_SUCC_WHEN_CLOSED;
+        }
+    }
+    if (!WifiConfigCenter::GetInstance().SetApMidState(curState, WifiOprMidState::CLOSING, 0)) {
+        WIFI_LOGI("set ap mid state closing failed! may be other app has been operated");
+        return WIFI_OPT_CLOSE_SUCC_WHEN_CLOSED;
+    }
+    IApService *apService = WifiServiceManager::GetInstance().GetApServiceInst(0);
+    if (apService == nullptr) {
+        WIFI_LOGE("ap service instant 0 is null");
+        return WIFI_OPT_AP_NOT_OPENED;
+    }
+    auto ret = apService->DisableHotspot();
+    if (ret != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("apService disable hotspot failed");
+        return ret;
+    }
+    sleep(1);
+    return WIFI_OPT_SUCCESS;
+}
+#endif
 
 #ifndef OHOS_ARCH_LITE
 int32_t WifiDeviceServiceImpl::Dump(int32_t fd, const std::vector<std::u16string>& args)

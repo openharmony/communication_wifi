@@ -180,6 +180,9 @@ private:
     void UnRegisterAppRemoved();
     void RegisterThermalLevel();
     void UnRegisterThermalLevel();
+#ifdef WIFI_FEATURE_STA_AP_EXCLUSION
+    ErrCode DisableHotspot();
+#endif
 #endif
 
 private:

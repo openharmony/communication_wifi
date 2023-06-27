@@ -772,7 +772,7 @@ ErrCode WifiHotspotServiceImpl::DisableWifi()
 #endif
 
     if (!WifiConfigCenter::GetInstance().SetWifiMidState(curState, WifiOprMidState::CLOSING)) {
-        WIFI_LOGI("set wifi mid state opening failed! may be other activity has been operated");
+        WIFI_LOGI("set wifi mid state opening failed! may be other app has been operated");
         return WIFI_OPT_CLOSE_SUCC_WHEN_CLOSED;
     }
     IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst();

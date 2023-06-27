@@ -119,7 +119,9 @@ if (defined(ohos_lite)) {
       "hiviewdfx_hilog_native:libhilog",
       "huks:libhukssdk",
     ]
+
     public_deps = []
+    
     if (wifi_feature_with_encryption) {
       external_deps += [ "huks:libhukssdk" ]
     }

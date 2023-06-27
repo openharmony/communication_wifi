@@ -786,7 +786,6 @@ static bool isNumber(std::string &str)
 
 ErrCode WifiHotspotServiceImpl::CfgCheckIpAddress(const std::string &ipAddress)
 {
-
     if (ipAddress.empty()) {
         WIFI_LOGI("CfgCheckIpAddress ipAddress is empty.");
         return ErrCode::WIFI_OPT_SUCCESS;

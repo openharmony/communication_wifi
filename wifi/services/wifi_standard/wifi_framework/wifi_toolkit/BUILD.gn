@@ -120,8 +120,6 @@ if (defined(ohos_lite)) {
       "huks:libhukssdk",
     ]
 
-    public_deps = [ "$DHCP_ROOT_DIR/services/mgr_service:dhcp_manager_service" ]
-
     if (wifi_feature_with_encryption) {
       external_deps += [ "huks:libhukssdk" ]
     }

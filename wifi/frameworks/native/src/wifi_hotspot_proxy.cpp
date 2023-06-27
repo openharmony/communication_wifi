@@ -204,6 +204,7 @@ ErrCode WifiHotspotProxy::GetHotspotConfig(HotspotConfig &result)
     readStr = reply.ReadCString();
     result.SetPreSharedKey((readStr != nullptr) ? readStr : "");
     result.SetMaxConn(reply.ReadInt32());
+    result.SetIpAddress(reply.ReadString());
 
     return WIFI_OPT_SUCCESS;
 }
@@ -228,6 +229,7 @@ ErrCode WifiHotspotProxy::SetHotspotConfig(const HotspotConfig &config)
     data.WriteInt32(config.GetChannel());
     data.WriteCString(config.GetPreSharedKey().c_str());
     data.WriteInt32(config.GetMaxConn());
+    data.WriteString(config.GetIpAddress());
     int error = Remote()->SendRequest(WIFI_SVR_CMD_SETAPCONFIG_WIFI, data, reply, option);
     if (error != ERR_NONE) {
         WIFI_LOGE("Set Attr(%{public}d) failed", WIFI_SVR_CMD_SETAPCONFIG_WIFI);

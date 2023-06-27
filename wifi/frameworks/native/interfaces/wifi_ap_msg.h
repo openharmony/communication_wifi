@@ -124,6 +124,16 @@ struct HotspotConfig {
         return maxConn;
     }
 
+    inline void SetIpAddress(const std::string &newIpAddress)
+    {
+        ipAddress = newIpAddress;
+    }
+
+    inline const std::string &GetIpAddress() const
+    {
+        return ipAddress;
+    }
+
 private:
     std::string ssid;         /* Hotspot name, The string length range is 1~32 */
     std::string preSharedKey; /* Hotspot password ,The string length range is 8~63 */
@@ -131,6 +141,7 @@ private:
     BandType band;
     int32_t channel;
     int32_t maxConn;
+    std::string ipAddress;    /* Hotspot IP address of the dhcp server */
 };
 
 struct StationInfo {

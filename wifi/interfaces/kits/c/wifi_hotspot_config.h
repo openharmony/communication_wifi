@@ -95,6 +95,8 @@ typedef struct {
     int channelNum;
     /** Key. For its length, see {@link WIFI_MAX_SSID_LEN}. */
     char preSharedKey[WIFI_MAX_KEY_LEN];
+    /* dhcp server ipv4 address  */
+    char ipAddress[WIFI_MAX_IPV4_LEN];
 } HotspotConfig;
 
 /**

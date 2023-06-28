@@ -86,7 +86,8 @@
                 "safwk",
                 "samgr",
                 "data_share",
-                "hdf_core"
+                "hdf_core",
+                "hicollie"
             ],
             "third_party": [
                 "bounds_checking_function",

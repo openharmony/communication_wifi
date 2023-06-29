@@ -21,12 +21,13 @@
 #include "wifi_internal_event_dispatcher.h"
 #include "wifi_hotspot_death_recipient.h"
 #include "wifi_common_def.h"
-#include "dhcp_define.h"
 
 DEFINE_WIFILOG_HOTSPOT_LABEL("WifiHotspotStub");
 
 namespace OHOS {
 namespace Wifi {
+constexpr std::string DHCP_IP_V4_DEFAULT = "192.168.62.2";
+
 WifiHotspotStub::WifiHotspotStub():mSingleCallback(false)
 {
     InitHandleMap();
@@ -145,7 +146,7 @@ void WifiHotspotStub::OnGetHotspotConfig(
         reply.WriteCString(hotspotConfig.GetPreSharedKey().c_str());
         reply.WriteInt32(hotspotConfig.GetMaxConn());
         if (hotspotConfig.GetIpAddress().empty()) {
-            reply.WriteString(IP_V4_DEFAULT);
+            reply.WriteString(DHCP_IP_V4_DEFAULT);
         } else {
             reply.WriteString(hotspotConfig.GetIpAddress());
         }

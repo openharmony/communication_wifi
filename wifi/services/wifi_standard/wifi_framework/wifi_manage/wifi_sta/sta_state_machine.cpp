@@ -2425,7 +2425,7 @@ void StaStateMachine::SaveWifiConfigForUpdate(const int &networkId)
         wifiUpdateLib = nullptr;
         return;
     }
-    auto saveFunc = (void(*)(const std::string&, const std::string&, const std::string&))dlsym(
+    auto saveFunc = (void(*)(const char*, const char*, const char*))dlsym(
         wifiUpdateLib, SAVE_WIFI_CONFIG_FOR_UPDATE);
     if (saveFunc == nullptr) {
         WIFI_LOGE("SaveWifiConfigForUpdate, saveFunc is nullptr.");
@@ -2433,7 +2433,7 @@ void StaStateMachine::SaveWifiConfigForUpdate(const int &networkId)
         wifiUpdateLib = nullptr;
         return;
     }
-    saveFunc(config.ssid, config.keyMgmt, config.preSharedKey);
+    saveFunc(config.ssid.c_str(), config.keyMgmt.c_str(), config.preSharedKey.c_str());
     dlclose(wifiUpdateLib);
     wifiUpdateLib = nullptr;
 }

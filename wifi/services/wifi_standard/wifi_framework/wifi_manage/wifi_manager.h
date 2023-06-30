@@ -153,6 +153,15 @@ public:
     void StartUnloadApSaTimer(void);
 #endif
 
+#ifdef WIFI_FEATURE_STA_AP_EXCLUSION
+    bool GetStaApExclusionFlag(WifiCloseServiceCode type = WifiCloseServiceCode::STA_SERVICE_CLOSE);
+    void SetStaApExclusionFlag(WifiCloseServiceCode type, bool isExclusion);
+    void SignalDisableHotspot();
+    void SignalDisableWifi();
+    ErrCode TimeWaitDisableHotspot();
+    ErrCode TimeWaitDisableWifi();
+#endif
+
 #ifdef FEATURE_P2P_SUPPORT
     /**
      * @Description Get the p2p callback object.
@@ -268,6 +277,18 @@ private:
 #endif
 #ifdef FEATURE_AP_SUPPORT
     IApServiceCallbacks mApCallback;
+#ifdef WIFI_FEATURE_STA_AP_EXCLUSION
+    std::atomic<bool> mDisableStaByExclusion {false};
+    std::atomic<bool> mDisableApByExclusion {false};
+
+    std::condition_variable mDisableStaStatusCondtion;
+    std::mutex mDisableStaStatusMutex;
+    bool mDisableStaStatus {false};
+
+    std::condition_variable mDisableApStatusCondtion;
+    std::mutex mDisableApStatusMutex;
+    bool mDisableApStatus {false};
+#endif
 #ifndef OHOS_ARCH_LITE
     static uint32_t unloadHotspotSaTimerId;
     static std::mutex unloadHotspotSaTimerMutex;

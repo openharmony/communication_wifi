@@ -534,12 +534,89 @@ void WifiManager::StartUnloadApSaTimer(void)
 }
 #endif
 
+#ifdef WIFI_FEATURE_STA_AP_EXCLUSION
+bool WifiManager::GetStaApExclusionFlag(WifiCloseServiceCode type)
+{
+    if (type == WifiCloseServiceCode::STA_SERVICE_CLOSE) {
+        return WifiManager::mDisableStaByExclusion.load();
+    } else if (type == WifiCloseServiceCode::AP_SERVICE_CLOSE) {
+        return WifiManager::mDisableApByExclusion.load();
+    } else {
+        return false;
+    }
+}
+
+void WifiManager::SetStaApExclusionFlag(WifiCloseServiceCode type, bool isExclusion)
+{
+    if (type == WifiCloseServiceCode::STA_SERVICE_CLOSE) {
+        WifiManager::mDisableStaByExclusion.store(isExclusion);
+    } else if (type == WifiCloseServiceCode::AP_SERVICE_CLOSE) {
+        WifiManager::mDisableApByExclusion.store(isExclusion);
+    } else {
+        return;
+    }
+}
+
+void WifiManager::SignalDisableHotspot()
+{
+    if (WifiManager::mDisableApByExclusion.load()) {
+        LOGI("wake up thread waiting for DisbleHotspot by Exclusion");
+        std::unique_lock<std::mutex> lock(WifiManager::disableApFlagMutex);
+        WifiManager::WifiManager::disableApFlag = true;
+        WifiManager::mDisableApStatusCondtion.notify_one();
+        WifiManager::mDisableApByExclusion.store(false);
+    }
+}
+
+void WifiManager::SignalDisableWifi()
+{
+    if (WifiManager::mDisableStaByExclusion.load()) {
+        LOGI("wake up thread waiting for DisableWifi by Exclusion");
+        std::unique_lock<std::mutex> lock(WifiManager::disableStaFlagMutex);
+        WifiManager::WifiManager::disableStaFlag = true;
+        WifiManager::mDisableStaStatusCondtion.notify_one();
+        WifiManager::mDisableStaByExclusion.load(false);
+    }
+}
+
+Errcode WifiManager::TimeWaitDisableHotspot()
+{
+    LOGI("enter function WifiManager::TimeWaitDisableHotspot");
+    std::unique_lock<std::mutex> lock(WifiManager::disableApFlagMutex);
+    while(!WifiManager::disableApFlag) {
+        if (WifiManager::mDisableApStatusCondtion.wait_for(lock, std::chrono::seconds(1)) == std::cv_status::timeout) {
+            WIFI_LOGE("get disableHotspot ops status timeout.");
+            return WIFI_OPT_FAILED;
+        }
+    }
+    WifiManager::disableApFlag = false;
+    return WIFI_OPT_SUCCESS;
+}
+
+ErrCode WifiManager::TimeWaitDisableWifi()
+{
+    LOGI("enter function WifiManager::TimeWaitDisableWifi");
+    std::unique_lock<std::mutex> lock(WifiManager::disableStaFlagMutex);
+    while(!WifiManager::disableStaFlag) {
+        if (WifiManager::mDisableStaStatusCondtion.wait_for(lock, std::chrono::seconds(1)) == std::cv_status::timeout) {
+            WIFI_LOGE("get disableWifi ops status timeout.");
+            return WIFI_OPT_FAILED;
+        }
+    }
+    WifiManager::disableStaFlag = false;
+    return WIFI_OPT_SUCCESS;
+}
+#endif
+
 void WifiManager::CloseApService(int id)
 {
     WIFI_LOGI("close %{public}d ap service", id);
     WifiServiceManager::GetInstance().UnloadService(WIFI_SERVICE_AP, id);
     WifiConfigCenter::GetInstance().SetApMidState(WifiOprMidState::CLOSED, id);
     WifiSettings::GetInstance().SetHotspotState(static_cast<int>(ApState::AP_STATE_CLOSED), id);
+#ifdef WIFI_FEATURE_STA_AP_EXCLUSION
+    SignalDisableHotspot();
+#endif
     WifiEventCallbackMsg cbMsg;
     cbMsg.msgCode = WIFI_CBK_MSG_HOTSPOT_STATE_CHANGE;
     cbMsg.msgData = static_cast<int>(ApState::AP_STATE_CLOSED);
@@ -724,6 +801,9 @@ void WifiManager::DealStaCloseRes(OperateResState state)
         WifiConfigCenter::GetInstance().SetWifiStateWhenAirplaneMode(false);
     }
     CheckAndStopScanService();
+#ifdef WIFI_FEATUE_STA_AP_EXCLUSION
+    SignalDisableWifi();
+#endif
     WifiManager::GetInstance().PushServiceCloseMsg(WifiCloseServiceCode::STA_SERVICE_CLOSE);
     return;
 }

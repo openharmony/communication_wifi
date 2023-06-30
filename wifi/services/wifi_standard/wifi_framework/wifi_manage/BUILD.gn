@@ -425,6 +425,10 @@ if (defined(ohos_lite)) {
       defines += [ "FEATURE_AP_EXTENSION" ]
     }
 
+    if (wifi_feature_sta_ap_exclusion) {
+      defines += [ "WIFI_FEATURE_STA_AP_EXCLUSION" ]
+    }
+
     part_name = "wifi"
     subsystem_name = "communication"
   }

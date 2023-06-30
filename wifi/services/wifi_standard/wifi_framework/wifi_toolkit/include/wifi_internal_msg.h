@@ -335,6 +335,7 @@ struct WifiConfig {
     int fourthRssiLevel5G;
     std::string strDnsBak;
     bool isLoadStabak;
+    std::string realMacAddress;
 
     WifiConfig()
     {
@@ -373,6 +374,7 @@ struct WifiConfig {
         strDnsBak = "8.8.8.8";
         isLoadStabak = true;
         preLoadEnhance = false;
+        realMacAddress = "";
     }
 };
 

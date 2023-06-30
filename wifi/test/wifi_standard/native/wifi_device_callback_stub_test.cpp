@@ -16,6 +16,7 @@
 #include <gmock/gmock.h>
 #include "wifi_device_callback_stub.h"
 #include "wifi_logger.h"
+#include "wifi_manager_service_ipc_interface_code.h"
 
 using ::testing::_;
 using ::testing::AtLeast;
@@ -114,7 +115,7 @@ HWTEST_F(WifiDeviceCallBackStubTest, OnRemoteRequestTest1, TestSize.Level1)
 HWTEST_F(WifiDeviceCallBackStubTest, OnRemoteRequestTest2, TestSize.Level1)
 {
     WIFI_LOGI("OnRemoteRequestTest2 enter");
-    uint32_t code = WIFI_CBK_CMD_STATE_CHANGE;
+    uint32_t code = static_cast<uint32_t>(DevInterfaceCode::WIFI_CBK_CMD_STATE_CHANGE);
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
@@ -135,7 +136,7 @@ HWTEST_F(WifiDeviceCallBackStubTest, OnRemoteRequestTest2, TestSize.Level1)
 HWTEST_F(WifiDeviceCallBackStubTest, OnRemoteRequestTest3, TestSize.Level1)
 {
     WIFI_LOGI("OnRemoteRequestTest3 enter");
-    uint32_t code = WIFI_CBK_CMD_CONNECTION_CHANGE;
+    uint32_t code = static_cast<uint32_t>(DevInterfaceCode::WIFI_CBK_CMD_CONNECTION_CHANGE);
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
@@ -155,7 +156,7 @@ HWTEST_F(WifiDeviceCallBackStubTest, OnRemoteRequestTest3, TestSize.Level1)
 HWTEST_F(WifiDeviceCallBackStubTest, OnRemoteRequestTest4, TestSize.Level1)
 {
     WIFI_LOGI("OnRemoteRequestTest4 enter");
-    uint32_t code = WIFI_CBK_CMD_RSSI_CHANGE;
+    uint32_t code = static_cast<uint32_t>(DevInterfaceCode::WIFI_CBK_CMD_RSSI_CHANGE);
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
@@ -175,7 +176,7 @@ HWTEST_F(WifiDeviceCallBackStubTest, OnRemoteRequestTest4, TestSize.Level1)
 HWTEST_F(WifiDeviceCallBackStubTest, OnRemoteRequestTest5, TestSize.Level1)
 {
     WIFI_LOGI("OnRemoteRequestTest5 enter");
-    uint32_t code = WIFI_CBK_CMD_WPS_STATE_CHANGE;
+    uint32_t code = static_cast<uint32_t>(DevInterfaceCode::WIFI_CBK_CMD_WPS_STATE_CHANGE);
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
@@ -195,7 +196,7 @@ HWTEST_F(WifiDeviceCallBackStubTest, OnRemoteRequestTest5, TestSize.Level1)
 HWTEST_F(WifiDeviceCallBackStubTest, OnRemoteRequestTest6, TestSize.Level1)
 {
     WIFI_LOGI("OnRemoteRequestTest6 enter");
-    uint32_t code = WIFI_CBK_CMD_STREAM_DIRECTION;
+    uint32_t code = static_cast<uint32_t>(DevInterfaceCode::WIFI_CBK_CMD_STREAM_DIRECTION);
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
@@ -215,7 +216,7 @@ HWTEST_F(WifiDeviceCallBackStubTest, OnRemoteRequestTest6, TestSize.Level1)
 HWTEST_F(WifiDeviceCallBackStubTest, OnRemoteRequestTest7, TestSize.Level1)
 {
     WIFI_LOGI("OnRemoteRequestTest7 enter");
-    uint32_t code = WIFI_CBK_CMD_DEVICE_CONFIG_CHANGE;
+    uint32_t code = static_cast<uint32_t>(DevInterfaceCode::WIFI_CBK_CMD_DEVICE_CONFIG_CHANGE);
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;

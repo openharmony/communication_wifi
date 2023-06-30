@@ -14,6 +14,7 @@
  */
 #include "wifi_device_callback_stub_lite.h"
 #include "define.h"
+#include "wifi_manager_service_ipc_interface_code.h"
 #include "wifi_logger.h"
 #include "wifi_msg.h"
 #include "wifi_errcode.h"
@@ -62,27 +63,27 @@ int WifiDeviceCallBackStub::OnRemoteRequest(uint32_t code, IpcIo *data)
         return ret;
     }
     switch (code) {
-        case WIFI_CBK_CMD_STATE_CHANGE: {
+        case static_cast<uint32_t>(DevInterfaceCode::WIFI_CBK_CMD_STATE_CHANGE): {
             ret = RemoteOnWifiStateChanged(code, data);
             break;
         }
-        case WIFI_CBK_CMD_CONNECTION_CHANGE: {
+        case static_cast<uint32_t>(DevInterfaceCode::WIFI_CBK_CMD_CONNECTION_CHANGE): {
             ret = RemoteOnWifiConnectionChanged(code, data);
             break;
         }
-        case WIFI_CBK_CMD_RSSI_CHANGE: {
+        case static_cast<uint32_t>(DevInterfaceCode::WIFI_CBK_CMD_RSSI_CHANGE): {
             ret = RemoteOnWifiRssiChanged(code, data);
             break;
         }
-        case WIFI_CBK_CMD_WPS_STATE_CHANGE: {
+        case static_cast<uint32_t>(DevInterfaceCode::WIFI_CBK_CMD_WPS_STATE_CHANGE): {
             ret = RemoteOnWifiWpsStateChanged(code, data);
             break;
         }
-        case WIFI_CBK_CMD_STREAM_DIRECTION: {
+        case static_cast<uint32_t>(DevInterfaceCode::WIFI_CBK_CMD_STREAM_DIRECTION): {
             ret = RemoteOnStreamChanged(code, data);
             break;
         }
-        case WIFI_CBK_CMD_DEVICE_CONFIG_CHANGE: {
+        case static_cast<uint32_t>(DevInterfaceCode::WIFI_CBK_CMD_DEVICE_CONFIG_CHANGE): {
             ret = RemoteOnDeviceConfigChanged(code, data);
             break;
         }

@@ -22,6 +22,7 @@
 #include "wifi_device_death_recipient.h"
 #include "wifi_common_util.h"
 #include "wifi_common_def.h"
+#include "wifi_manager_service_ipc_interface_code.h"
 
 DEFINE_WIFILOG_LABEL("WifiDeviceStub");
 
@@ -35,43 +36,74 @@ WifiDeviceStub::WifiDeviceStub() : mSingleCallback(false)
 WifiDeviceStub::~WifiDeviceStub()
 {}
 
+void WifiDeviceStub::InitHandleMapEx()
+{
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_DERVICE_MAC_ADD)] =
+        &WifiDeviceStub::OnGetDeviceMacAdd;
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_IS_WIFI_CONNECTED)] =
+        &WifiDeviceStub::OnIsWifiConnected;
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_SET_LOW_LATENCY_MODE)] =
+        &WifiDeviceStub::OnSetLowLatencyMode;
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_REMOVE_CANDIDATE_CONFIG)] =
+        &WifiDeviceStub::OnRemoveCandidateConfig;
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_BANDTYPE_SUPPORTED)] =
+        &WifiDeviceStub::OnIsBandTypeSupported;
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_5G_CHANNELLIST)] =
+        &WifiDeviceStub::OnGet5GHzChannelList;
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_DISCONNECTED_REASON)] =
+        &WifiDeviceStub::OnGetDisconnectedReason;
+    return;
+}
+
 void WifiDeviceStub::InitHandleMap()
 {
-    handleFuncMap[WIFI_SVR_CMD_ENABLE_WIFI] = &WifiDeviceStub::OnEnableWifi;
-    handleFuncMap[WIFI_SVR_CMD_DISABLE_WIFI] = &WifiDeviceStub::OnDisableWifi;
-    handleFuncMap[WIFI_SVR_CMD_INIT_WIFI_PROTECT] = &WifiDeviceStub::OnInitWifiProtect;
-    handleFuncMap[WIFI_SVR_CMD_GET_WIFI_PROTECT] = &WifiDeviceStub::OnGetWifiProtectRef;
-    handleFuncMap[WIFI_SVR_CMD_PUT_WIFI_PROTECT] = &WifiDeviceStub::OnPutWifiProtectRef;
-    handleFuncMap[WIFI_SVR_CMD_ADD_DEVICE_CONFIG] = &WifiDeviceStub::OnAddDeviceConfig;
-    handleFuncMap[WIFI_SVR_CMD_UPDATE_DEVICE_CONFIG] = &WifiDeviceStub::OnUpdateDeviceConfig;
-    handleFuncMap[WIFI_SVR_CMD_REMOVE_DEVICE_CONFIG] = &WifiDeviceStub::OnRemoveDevice;
-    handleFuncMap[WIFI_SVR_CMD_REMOVE_ALL_DEVICE_CONFIG] = &WifiDeviceStub::OnRemoveAllDevice;
-    handleFuncMap[WIFI_SVR_CMD_GET_DEVICE_CONFIGS] = &WifiDeviceStub::OnGetDeviceConfigs;
-    handleFuncMap[WIFI_SVR_CMD_ENABLE_DEVICE] = &WifiDeviceStub::OnEnableDeviceConfig;
-    handleFuncMap[WIFI_SVR_CMD_DISABLE_DEVICE] = &WifiDeviceStub::OnDisableDeviceConfig;
-    handleFuncMap[WIFI_SVR_CMD_CONNECT_TO] = &WifiDeviceStub::OnConnectTo;
-    handleFuncMap[WIFI_SVR_CMD_CONNECT2_TO] = &WifiDeviceStub::OnConnect2To;
-    handleFuncMap[WIFI_SVR_CMD_RECONNECT] = &WifiDeviceStub::OnReConnect;
-    handleFuncMap[WIFI_SVR_CMD_REASSOCIATE] = &WifiDeviceStub::OnReAssociate;
-    handleFuncMap[WIFI_SVR_CMD_DISCONNECT] = &WifiDeviceStub::OnDisconnect;
-    handleFuncMap[WIFI_SVR_CMD_START_WPS] = &WifiDeviceStub::OnStartWps;
-    handleFuncMap[WIFI_SVR_CMD_CANCEL_WPS] = &WifiDeviceStub::OnCancelWps;
-    handleFuncMap[WIFI_SVR_CMD_IS_WIFI_ACTIVE] = &WifiDeviceStub::OnIsWifiActive;
-    handleFuncMap[WIFI_SVR_CMD_GET_WIFI_STATE] = &WifiDeviceStub::OnGetWifiState;
-    handleFuncMap[WIFI_SVR_CMD_GET_LINKED_INFO] = &WifiDeviceStub::OnGetLinkedInfo;
-    handleFuncMap[WIFI_SVR_CMD_GET_DHCP_INFO] = &WifiDeviceStub::OnGetIpInfo;
-    handleFuncMap[WIFI_SVR_CMD_SET_COUNTRY_CODE] = &WifiDeviceStub::OnSetCountryCode;
-    handleFuncMap[WIFI_SVR_CMD_GET_COUNTRY_CODE] = &WifiDeviceStub::OnGetCountryCode;
-    handleFuncMap[WIFI_SVR_CMD_REGISTER_CALLBACK_CLIENT] = &WifiDeviceStub::OnRegisterCallBack;
-    handleFuncMap[WIFI_SVR_CMD_GET_SIGNAL_LEVEL] = &WifiDeviceStub::OnGetSignalLevel;
-    handleFuncMap[WIFI_SVR_CMD_GET_SUPPORTED_FEATURES] = &WifiDeviceStub::OnGetSupportedFeatures;
-    handleFuncMap[WIFI_SVR_CMD_GET_DERVICE_MAC_ADD] = &WifiDeviceStub::OnGetDeviceMacAdd;
-    handleFuncMap[WIFI_SVR_CMD_IS_WIFI_CONNECTED] = &WifiDeviceStub::OnIsWifiConnected;
-    handleFuncMap[WIFI_SVR_CMD_SET_LOW_LATENCY_MODE] = &WifiDeviceStub::OnSetLowLatencyMode;
-    handleFuncMap[WIFI_SVR_CMD_REMOVE_CANDIDATE_CONFIG] = &WifiDeviceStub::OnRemoveCandidateConfig;
-    handleFuncMap[WIFI_SVR_CMD_GET_BANDTYPE_SUPPORTED] = &WifiDeviceStub::OnIsBandTypeSupported;
-    handleFuncMap[WIFI_SVR_CMD_GET_5G_CHANNELLIST] = &WifiDeviceStub::OnGet5GHzChannelList;
-    handleFuncMap[WIFI_SVR_CMD_GET_DISCONNECTED_REASON] = &WifiDeviceStub::OnGetDisconnectedReason;
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_ENABLE_WIFI)] = &WifiDeviceStub::OnEnableWifi;
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_DISABLE_WIFI)] = &WifiDeviceStub::OnDisableWifi;
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_INIT_WIFI_PROTECT)] =
+        &WifiDeviceStub::OnInitWifiProtect;
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_WIFI_PROTECT)] =
+        &WifiDeviceStub::OnGetWifiProtectRef;
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_PUT_WIFI_PROTECT)] =
+        &WifiDeviceStub::OnPutWifiProtectRef;
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_ADD_DEVICE_CONFIG)] =
+        &WifiDeviceStub::OnAddDeviceConfig;
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_UPDATE_DEVICE_CONFIG)] =
+        &WifiDeviceStub::OnUpdateDeviceConfig;
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_REMOVE_DEVICE_CONFIG)] =
+        &WifiDeviceStub::OnRemoveDevice;
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_REMOVE_ALL_DEVICE_CONFIG)] =
+        &WifiDeviceStub::OnRemoveAllDevice;
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_DEVICE_CONFIGS)] =
+        &WifiDeviceStub::OnGetDeviceConfigs;
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_ENABLE_DEVICE)] =
+        &WifiDeviceStub::OnEnableDeviceConfig;
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_DISABLE_DEVICE)] =
+        &WifiDeviceStub::OnDisableDeviceConfig;
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_CONNECT_TO)] = &WifiDeviceStub::OnConnectTo;
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_CONNECT2_TO)] = &WifiDeviceStub::OnConnect2To;
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_RECONNECT)] = &WifiDeviceStub::OnReConnect;
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_REASSOCIATE)] = &WifiDeviceStub::OnReAssociate;
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_DISCONNECT)] = &WifiDeviceStub::OnDisconnect;
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_START_WPS)] = &WifiDeviceStub::OnStartWps;
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_CANCEL_WPS)] = &WifiDeviceStub::OnCancelWps;
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_IS_WIFI_ACTIVE)] =
+        &WifiDeviceStub::OnIsWifiActive;
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_WIFI_STATE)] =
+        &WifiDeviceStub::OnGetWifiState;
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_LINKED_INFO)] =
+        &WifiDeviceStub::OnGetLinkedInfo;
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_DHCP_INFO)] = &WifiDeviceStub::OnGetIpInfo;
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_SET_COUNTRY_CODE)] =
+        &WifiDeviceStub::OnSetCountryCode;
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_COUNTRY_CODE)] =
+        &WifiDeviceStub::OnGetCountryCode;
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_REGISTER_CALLBACK_CLIENT)] =
+        &WifiDeviceStub::OnRegisterCallBack;
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_SIGNAL_LEVEL)] =
+        &WifiDeviceStub::OnGetSignalLevel;
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_SUPPORTED_FEATURES)] =
+        &WifiDeviceStub::OnGetSupportedFeatures;
+    InitHandleMapEx();
     return;
 }
 

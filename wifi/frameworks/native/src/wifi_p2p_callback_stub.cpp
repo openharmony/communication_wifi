@@ -15,6 +15,7 @@
 
 #include "wifi_p2p_callback_stub.h"
 #include "define.h"
+#include "wifi_manager_service_ipc_interface_code.h"
 #include "wifi_errcode.h"
 #include "wifi_hisysevent.h"
 #include "wifi_logger.h"
@@ -33,15 +34,24 @@ WifiP2pCallbackStub::~WifiP2pCallbackStub()
 
 void WifiP2pCallbackStub::InitHandleMap()
 {
-    handleFuncMap[WIFI_CBK_CMD_P2P_STATE_CHANGE] = &WifiP2pCallbackStub::RemoteOnP2pStateChanged;
-    handleFuncMap[WIFI_CBK_CMD_PERSISTENT_GROUPS_CHANGE] = &WifiP2pCallbackStub::RemoteOnP2pPersistentGroupsChanged;
-    handleFuncMap[WIFI_CBK_CMD_THIS_DEVICE_CHANGE] = &WifiP2pCallbackStub::RemoteOnP2pThisDeviceChanged;
-    handleFuncMap[WIFI_CBK_CMD_PEER_CHANGE] = &WifiP2pCallbackStub::RemoteOnP2pPeersChanged;
-    handleFuncMap[WIFI_CBK_CMD_SERVICE_CHANGE] = &WifiP2pCallbackStub::RemoteOnP2pServicesChanged;
-    handleFuncMap[WIFI_CBK_CMD_CONNECT_CHANGE] = &WifiP2pCallbackStub::RemoteOnP2pConnectionChanged;
-    handleFuncMap[WIFI_CBK_CMD_DISCOVERY_CHANGE] = &WifiP2pCallbackStub::RemoteOnP2pDiscoveryChanged;
-    handleFuncMap[WIFI_CBK_CMD_P2P_ACTION_RESULT] = &WifiP2pCallbackStub::RemoteOnP2pActionResult;
-    handleFuncMap[WIFI_CBK_CMD_CFG_CHANGE] = &WifiP2pCallbackStub::RemoteOnConfigChanged;
+    handleFuncMap[static_cast<uint32_t>(P2PInterfaceCode::WIFI_CBK_CMD_P2P_STATE_CHANGE)] =
+        &WifiP2pCallbackStub::RemoteOnP2pStateChanged;
+    handleFuncMap[static_cast<uint32_t>(P2PInterfaceCode::WIFI_CBK_CMD_PERSISTENT_GROUPS_CHANGE)] =
+        &WifiP2pCallbackStub::RemoteOnP2pPersistentGroupsChanged;
+    handleFuncMap[static_cast<uint32_t>(P2PInterfaceCode::WIFI_CBK_CMD_THIS_DEVICE_CHANGE)] =
+        &WifiP2pCallbackStub::RemoteOnP2pThisDeviceChanged;
+    handleFuncMap[static_cast<uint32_t>(P2PInterfaceCode::WIFI_CBK_CMD_PEER_CHANGE)] =
+        &WifiP2pCallbackStub::RemoteOnP2pPeersChanged;
+    handleFuncMap[static_cast<uint32_t>(P2PInterfaceCode::WIFI_CBK_CMD_SERVICE_CHANGE)] =
+        &WifiP2pCallbackStub::RemoteOnP2pServicesChanged;
+    handleFuncMap[static_cast<uint32_t>(P2PInterfaceCode::WIFI_CBK_CMD_CONNECT_CHANGE)] =
+        &WifiP2pCallbackStub::RemoteOnP2pConnectionChanged;
+    handleFuncMap[static_cast<uint32_t>(P2PInterfaceCode::WIFI_CBK_CMD_DISCOVERY_CHANGE)] =
+        &WifiP2pCallbackStub::RemoteOnP2pDiscoveryChanged;
+    handleFuncMap[static_cast<uint32_t>(P2PInterfaceCode::WIFI_CBK_CMD_P2P_ACTION_RESULT)] =
+        &WifiP2pCallbackStub::RemoteOnP2pActionResult;
+    handleFuncMap[static_cast<uint32_t>(P2PInterfaceCode::WIFI_CBK_CMD_CFG_CHANGE)] =
+        &WifiP2pCallbackStub::RemoteOnConfigChanged;
     return;
 }
 

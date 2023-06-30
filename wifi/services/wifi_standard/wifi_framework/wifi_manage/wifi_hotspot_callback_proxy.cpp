@@ -15,6 +15,7 @@
 
 #include "wifi_hotspot_callback_proxy.h"
 #include "wifi_logger.h"
+#include "wifi_manager_service_ipc_interface_code.h"
 
 DEFINE_WIFILOG_HOTSPOT_LABEL("WifiHotspotCallbackProxy");
 
@@ -36,9 +37,11 @@ void WifiHotspotCallbackProxy::OnHotspotStateChanged(int state)
     }
     data.WriteInt32(0);
     data.WriteInt32(state);
-    int error = Remote()->SendRequest(WIFI_CBK_CMD_HOTSPOT_STATE_CHANGE, data, reply, option);
+    int error = Remote()->SendRequest(static_cast<uint32_t>(HotspotInterfaceCode::WIFI_CBK_CMD_HOTSPOT_STATE_CHANGE),
+        data, reply, option);
     if (error != ERR_NONE) {
-        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d", WIFI_CBK_CMD_HOTSPOT_STATE_CHANGE, error);
+        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d",
+            static_cast<int32_t>(HotspotInterfaceCode::WIFI_CBK_CMD_HOTSPOT_STATE_CHANGE), error);
         return;
     }
     int exception = reply.ReadInt32();
@@ -63,9 +66,11 @@ void WifiHotspotCallbackProxy::OnHotspotStaJoin(const StationInfo &info)
     data.WriteCString(info.deviceName.c_str());
     data.WriteCString(info.bssid.c_str());
     data.WriteCString(info.ipAddr.c_str());
-    int error = Remote()->SendRequest(WIFI_CBK_CMD_HOTSPOT_STATE_JOIN, data, reply, option);
+    int error = Remote()->SendRequest(static_cast<uint32_t>(HotspotInterfaceCode::WIFI_CBK_CMD_HOTSPOT_STATE_JOIN),
+        data, reply, option);
     if (error != ERR_NONE) {
-        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d", WIFI_CBK_CMD_HOTSPOT_STATE_JOIN, error);
+        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d",
+            static_cast<int32_t>(HotspotInterfaceCode::WIFI_CBK_CMD_HOTSPOT_STATE_JOIN), error);
         return;
     }
     int exception = reply.ReadInt32();
@@ -89,9 +94,11 @@ void WifiHotspotCallbackProxy::OnHotspotStaLeave(const StationInfo &info)
     data.WriteCString(info.deviceName.c_str());
     data.WriteCString(info.bssid.c_str());
     data.WriteCString(info.ipAddr.c_str());
-    int error = Remote()->SendRequest(WIFI_CBK_CMD_HOTSPOT_STATE_LEAVE, data, reply, option);
+    int error = Remote()->SendRequest(static_cast<uint32_t>(HotspotInterfaceCode::WIFI_CBK_CMD_HOTSPOT_STATE_LEAVE),
+        data, reply, option);
     if (error != ERR_NONE) {
-        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d", WIFI_CBK_CMD_HOTSPOT_STATE_LEAVE, error);
+        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d",
+            static_cast<int32_t>(HotspotInterfaceCode::WIFI_CBK_CMD_HOTSPOT_STATE_LEAVE), error);
         return;
     }
     int exception = reply.ReadInt32();

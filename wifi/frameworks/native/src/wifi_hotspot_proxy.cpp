@@ -20,6 +20,7 @@
 #include "wifi_hisysevent.h"
 #include "wifi_hotspot_callback_stub.h"
 #include "wifi_logger.h"
+#include "wifi_manager_service_ipc_interface_code.h"
 
 DEFINE_WIFILOG_HOTSPOT_LABEL("WifiHotspotProxy");
 namespace OHOS {
@@ -85,9 +86,11 @@ ErrCode WifiHotspotProxy::IsHotspotActive(bool &isActive)
         return WIFI_OPT_FAILED;
     }
     data.WriteInt32(0);
-    int error = Remote()->SendRequest(WIFI_SVR_CMD_IS_HOTSPOT_ACTIVE, data, reply, option);
+    int error = Remote()->SendRequest(static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_IS_HOTSPOT_ACTIVE), data,
+        reply, option);
     if (error != ERR_NONE) {
-        WIFI_LOGE("Set Attr(%{public}d) failed", WIFI_SVR_CMD_IS_HOTSPOT_ACTIVE);
+        WIFI_LOGE("Set Attr(%{public}d) failed",
+            static_cast<int32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_IS_HOTSPOT_ACTIVE));
         return WIFI_OPT_FAILED;
     }
     int exception = reply.ReadInt32();
@@ -116,9 +119,11 @@ ErrCode WifiHotspotProxy::IsHotspotDualBandSupported(bool &isSupported)
         return WIFI_OPT_FAILED;
     }
     data.WriteInt32(0);
-    int error = Remote()->SendRequest(WIFI_SVR_CMD_IS_HOTSPOT_DUAL_BAND_SUPPORTED, data, reply, option);
+    int error = Remote()->SendRequest(
+        static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_IS_HOTSPOT_DUAL_BAND_SUPPORTED), data, reply, option);
     if (error != ERR_NONE) {
-        WIFI_LOGE("Set Attr(%{public}d) failed", WIFI_SVR_CMD_IS_HOTSPOT_DUAL_BAND_SUPPORTED);
+        WIFI_LOGE("Set Attr(%{public}d) failed",
+            static_cast<int32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_IS_HOTSPOT_DUAL_BAND_SUPPORTED));
         return WIFI_OPT_FAILED;
     }
     int exception = reply.ReadInt32();
@@ -148,9 +153,11 @@ ErrCode WifiHotspotProxy::GetHotspotState(int &state)
         return WIFI_OPT_FAILED;
     }
     data.WriteInt32(0);
-    int error = Remote()->SendRequest(WIFI_SVR_CMD_GETAPSTATE_WIFI, data, reply, option);
+    int error = Remote()->SendRequest(static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_GETAPSTATE_WIFI), data,
+        reply, option);
     if (error != ERR_NONE) {
-        WIFI_LOGE("Set Attr(%{public}d) failed", WIFI_SVR_CMD_GETAPSTATE_WIFI);
+        WIFI_LOGE("Set Attr(%{public}d) failed",
+            static_cast<int32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_GETAPSTATE_WIFI));
         return WIFI_OPT_FAILED;
     }
 
@@ -181,9 +188,11 @@ ErrCode WifiHotspotProxy::GetHotspotConfig(HotspotConfig &result)
         return WIFI_OPT_FAILED;
     }
     data.WriteInt32(0);
-    int error = Remote()->SendRequest(WIFI_SVR_CMD_GET_HOTSPOT_CONFIG, data, reply, option);
+    int error = Remote()->SendRequest(static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_GET_HOTSPOT_CONFIG),
+        data, reply, option);
     if (error != ERR_NONE) {
-        WIFI_LOGE("Set Attr(%{public}d) failed", WIFI_SVR_CMD_GET_HOTSPOT_CONFIG);
+        WIFI_LOGE("Set Attr(%{public}d) failed",
+            static_cast<int32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_GET_HOTSPOT_CONFIG));
         return WIFI_OPT_FAILED;
     }
 
@@ -228,9 +237,12 @@ ErrCode WifiHotspotProxy::SetHotspotConfig(const HotspotConfig &config)
     data.WriteInt32(config.GetChannel());
     data.WriteCString(config.GetPreSharedKey().c_str());
     data.WriteInt32(config.GetMaxConn());
-    int error = Remote()->SendRequest(WIFI_SVR_CMD_SETAPCONFIG_WIFI, data, reply, option);
+    data.WriteString(config.GetIpAddress());
+    int error = Remote()->SendRequest(static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_SETAPCONFIG_WIFI),
+        data, reply, option);
     if (error != ERR_NONE) {
-        WIFI_LOGE("Set Attr(%{public}d) failed", WIFI_SVR_CMD_SETAPCONFIG_WIFI);
+        WIFI_LOGE("Set Attr(%{public}d) failed",
+            static_cast<int32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_SETAPCONFIG_WIFI));
         return WIFI_OPT_FAILED;
     }
 
@@ -256,9 +268,11 @@ ErrCode WifiHotspotProxy::SetHotspotIdleTimeout(int time)
     }
     data.WriteInt32(0);
     data.WriteInt32(time);
-    int error = Remote()->SendRequest(WIFI_SVR_CMD_SETTIMEOUT_AP, data, reply, option);
+    int error = Remote()->SendRequest(static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_SETTIMEOUT_AP),
+        data, reply, option);
     if (error != ERR_NONE) {
-        WIFI_LOGE("Set Attr(%{private}d) failed,error code is %{private}d", WIFI_SVR_CMD_SETTIMEOUT_AP, error);
+        WIFI_LOGE("Set Attr(%{private}d) failed,error code is %{private}d",
+            static_cast<int32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_SETTIMEOUT_AP), error);
         return WIFI_OPT_FAILED;
     }
 
@@ -288,9 +302,11 @@ ErrCode WifiHotspotProxy::GetStationList(std::vector<StationInfo> &result)
         return WIFI_OPT_FAILED;
     }
     data.WriteInt32(0);
-    int error = Remote()->SendRequest(WIFI_SVR_CMD_GET_STATION_LIST, data, reply, option);
+    int error = Remote()->SendRequest(static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_GET_STATION_LIST), data,
+        reply, option);
     if (error != ERR_NONE) {
-        WIFI_LOGE("Set Attr(%{public}d) failed", WIFI_SVR_CMD_GET_STATION_LIST);
+        WIFI_LOGE("Set Attr(%{public}d) failed",
+            static_cast<int32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_GET_STATION_LIST));
         return WIFI_OPT_FAILED;
     }
 
@@ -339,9 +355,11 @@ ErrCode WifiHotspotProxy::DisassociateSta(const StationInfo &info)
     data.WriteCString(info.deviceName.c_str());
     data.WriteCString(info.bssid.c_str());
     data.WriteCString(info.ipAddr.c_str());
-    int error = Remote()->SendRequest(WIFI_SVR_CMD_DISCONNECT_STA, data, reply, option);
+    int error = Remote()->SendRequest(static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_DISCONNECT_STA), data,
+        reply, option);
     if (error != ERR_NONE) {
-        WIFI_LOGE("Set Attr(%{public}d) failed", WIFI_SVR_CMD_DISCONNECT_STA);
+        WIFI_LOGE("Set Attr(%{public}d) failed",
+            static_cast<int32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_DISCONNECT_STA));
         return WIFI_OPT_FAILED;
     }
 
@@ -363,9 +381,11 @@ ErrCode WifiHotspotProxy::EnableHotspot(const ServiceType type)
     }
     data.WriteInt32(0);
     data.WriteInt32(static_cast<int>(type));
-    int error = Remote()->SendRequest(WIFI_SVR_CMD_ENABLE_WIFI_AP, data, reply, option);
+    int error = Remote()->SendRequest(static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_ENABLE_WIFI_AP), data,
+        reply, option);
     if (error != ERR_NONE) {
-        WIFI_LOGE("Set Attr(%{public}d) failed", WIFI_SVR_CMD_ENABLE_WIFI_AP);
+        WIFI_LOGE("Set Attr(%{public}d) failed",
+            static_cast<int32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_ENABLE_WIFI_AP));
         return WIFI_OPT_FAILED;
     }
 
@@ -392,9 +412,11 @@ ErrCode WifiHotspotProxy::DisableHotspot(const ServiceType type)
     }
     data.WriteInt32(0);
     data.WriteInt32(static_cast<int>(type));
-    int error = Remote()->SendRequest(WIFI_SVR_CMD_DISABLE_WIFI_AP, data, reply, option);
+    int error = Remote()->SendRequest(static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_DISABLE_WIFI_AP), data,
+        reply, option);
     if (error != ERR_NONE) {
-        WIFI_LOGE("Set Attr(%{public}d) failed", WIFI_SVR_CMD_DISABLE_WIFI_AP);
+        WIFI_LOGE("Set Attr(%{public}d) failed",
+            static_cast<int32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_DISABLE_WIFI_AP));
         return WIFI_OPT_FAILED;
     }
 
@@ -421,9 +443,11 @@ ErrCode WifiHotspotProxy::GetBlockLists(std::vector<StationInfo> &infos)
         return WIFI_OPT_FAILED;
     }
     data.WriteInt32(0);
-    int error = Remote()->SendRequest(WIFI_SVR_CMD_GET_BLOCK_LISTS, data, reply, option);
+    int error = Remote()->SendRequest(static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_GET_BLOCK_LISTS), data,
+        reply, option);
     if (error != ERR_NONE) {
-        WIFI_LOGE("Set Attr(%{public}d) failed", WIFI_SVR_CMD_GET_BLOCK_LISTS);
+        WIFI_LOGE("Set Attr(%{public}d) failed",
+            static_cast<int32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_GET_BLOCK_LISTS));
         return WIFI_OPT_FAILED;
     }
 
@@ -473,9 +497,11 @@ ErrCode WifiHotspotProxy::AddBlockList(const StationInfo &info)
     data.WriteCString(info.deviceName.c_str());
     data.WriteCString(info.bssid.c_str());
     data.WriteCString(info.ipAddr.c_str());
-    int error = Remote()->SendRequest(WIFI_SVR_CMD_ADD_BLOCK_LIST, data, reply, option);
+    int error = Remote()->SendRequest(static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_ADD_BLOCK_LIST), data,
+        reply, option);
     if (error != ERR_NONE) {
-        WIFI_LOGE("Set Attr(%{public}d) failed", WIFI_SVR_CMD_ADD_BLOCK_LIST);
+        WIFI_LOGE("Set Attr(%{public}d) failed",
+            static_cast<int32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_ADD_BLOCK_LIST));
         return WIFI_OPT_FAILED;
     }
 
@@ -503,9 +529,11 @@ ErrCode WifiHotspotProxy::DelBlockList(const StationInfo &info)
     data.WriteCString(info.deviceName.c_str());
     data.WriteCString(info.bssid.c_str());
     data.WriteCString(info.ipAddr.c_str());
-    int error = Remote()->SendRequest(WIFI_SVR_CMD_DEL_BLOCK_LIST, data, reply, option);
+    int error = Remote()->SendRequest(static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_DEL_BLOCK_LIST), data,
+        reply, option);
     if (error != ERR_NONE) {
-        WIFI_LOGE("Set Attr(%{public}d) failed", WIFI_SVR_CMD_DEL_BLOCK_LIST);
+        WIFI_LOGE("Set Attr(%{public}d) failed",
+            static_cast<int32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_DEL_BLOCK_LIST));
         return WIFI_OPT_FAILED;
     }
 
@@ -530,9 +558,11 @@ ErrCode WifiHotspotProxy::GetValidBands(std::vector<BandType> &bands)
         return WIFI_OPT_FAILED;
     }
     data.WriteInt32(0);
-    int error = Remote()->SendRequest(WIFI_SVR_CMD_GET_VALID_BANDS, data, reply, option);
+    int error = Remote()->SendRequest(static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_GET_VALID_BANDS), data,
+        reply, option);
     if (error != ERR_NONE) {
-        WIFI_LOGE("Set Attr(%{public}d) failed", WIFI_SVR_CMD_GET_VALID_BANDS);
+        WIFI_LOGE("Set Attr(%{public}d) failed",
+            static_cast<int32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_GET_VALID_BANDS));
         return WIFI_OPT_FAILED;
     }
 
@@ -573,9 +603,11 @@ ErrCode WifiHotspotProxy::GetValidChannels(BandType band, std::vector<int32_t> &
     }
     data.WriteInt32(0);
     data.WriteInt32((int)band);
-    int error = Remote()->SendRequest(WIFI_SVR_CMD_GET_VALID_CHANNELS, data, reply, option);
+    int error = Remote()->SendRequest(static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_GET_VALID_CHANNELS),
+        data, reply, option);
     if (error != ERR_NONE) {
-        WIFI_LOGE("Set Attr(%{public}d) failed", WIFI_SVR_CMD_GET_VALID_CHANNELS);
+        WIFI_LOGE("Set Attr(%{public}d) failed",
+            static_cast<int32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_GET_VALID_CHANNELS));
         return WIFI_OPT_FAILED;
     }
 
@@ -626,7 +658,8 @@ ErrCode WifiHotspotProxy::RegisterCallBack(const sptr<IWifiHotspotCallback> &cal
             data.WriteString(eventName);
         }
     }
-    int error = Remote()->SendRequest(WIFI_SVR_CMD_REGISTER_HOTSPOT_CALLBACK, data, reply, option);
+    int error = Remote()->SendRequest(
+        static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_REGISTER_HOTSPOT_CALLBACK), data, reply, option);
     if (error != ERR_NONE) {
         WIFI_LOGE("WifiHotspotProxy::RegisterCallBack failed, error code is %{public}d ", error);
         return WIFI_OPT_FAILED;
@@ -652,9 +685,11 @@ ErrCode WifiHotspotProxy::GetSupportedFeatures(long &features)
         return WIFI_OPT_FAILED;
     }
     data.WriteInt32(0);
-    int error = Remote()->SendRequest(WIFI_SVR_CMD_GET_SUPPORTED_FEATURES, data, reply, option);
+    int error = Remote()->SendRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_SUPPORTED_FEATURES),
+        data, reply, option);
     if (error != ERR_NONE) {
-        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d", WIFI_SVR_CMD_GET_SUPPORTED_FEATURES, error);
+        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d",
+            static_cast<int32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_SUPPORTED_FEATURES), error);
         return ErrCode(error);
     }
     int exception = reply.ReadInt32();
@@ -684,9 +719,11 @@ ErrCode WifiHotspotProxy::GetSupportedPowerModel(std::set<PowerModel>& setPowerM
         return WIFI_OPT_FAILED;
     }
     data.WriteInt32(0);
-    int error = Remote()->SendRequest(WIFI_SVR_CMD_GET_SUPPORTED_POWER_MODEL, data, reply, option);
+    int error = Remote()->SendRequest(
+        static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_GET_SUPPORTED_POWER_MODEL), data, reply, option);
     if (error != ERR_NONE) {
-        WIFI_LOGE("Set Attr(%{public}d) failed", WIFI_SVR_CMD_GET_SUPPORTED_POWER_MODEL);
+        WIFI_LOGE("Set Attr(%{public}d) failed",
+            static_cast<int32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_GET_SUPPORTED_POWER_MODEL));
         return WIFI_OPT_FAILED;
     }
 
@@ -726,9 +763,11 @@ ErrCode WifiHotspotProxy::GetPowerModel(PowerModel& model)
         return WIFI_OPT_FAILED;
     }
     data.WriteInt32(0);
-    int error = Remote()->SendRequest(WIFI_SVR_CMD_GET_POWER_MODEL, data, reply, option);
+    int error = Remote()->SendRequest(static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_GET_POWER_MODEL), data,
+        reply, option);
     if (error != ERR_NONE) {
-        WIFI_LOGE("Set Attr(%{public}d) failed", WIFI_SVR_CMD_GET_POWER_MODEL);
+        WIFI_LOGE("Set Attr(%{public}d) failed",
+            static_cast<int32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_GET_POWER_MODEL));
         return WIFI_OPT_FAILED;
     }
 
@@ -759,9 +798,11 @@ ErrCode WifiHotspotProxy::SetPowerModel(const PowerModel& model)
     }
     data.WriteInt32(0);
     data.WriteInt32(static_cast<int>(model));
-    int error = Remote()->SendRequest(WIFI_SVR_CMD_SET_POWER_MODEL, data, reply, option);
+    int error = Remote()->SendRequest(static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_SET_POWER_MODEL), data,
+        reply, option);
     if (error != ERR_NONE) {
-        WIFI_LOGE("Set Attr(%{public}d) failed", WIFI_SVR_CMD_SET_POWER_MODEL);
+        WIFI_LOGE("Set Attr(%{public}d) failed",
+            static_cast<int32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_SET_POWER_MODEL));
         return WIFI_OPT_FAILED;
     }
 

@@ -15,6 +15,7 @@
 
 #include "wifi_scan_proxy.h"
 #include "define.h"
+#include "wifi_manager_service_ipc_interface_code.h"
 #include "ipc_skeleton.h"
 #include "rpc_errno.h"
 #include "serializer.h"
@@ -105,17 +106,17 @@ static int IpcCallback(void *owner, int code, IpcIo *reply)
     }
 
     switch (data->funcId) {
-        case WIFI_SVR_CMD_IS_SCAN_ALWAYS_ACTIVE: {
+        case static_cast<uint32_t>(ScanInterfaceCode::WIFI_SVR_CMD_IS_SCAN_ALWAYS_ACTIVE): {
             (void)ReadBool(reply, (bool *)data->variable);
             break;
         }
-        case WIFI_SVR_CMD_GET_SUPPORTED_FEATURES: {
+        case static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_SUPPORTED_FEATURES): {
             int64_t features = 0;
             (void)ReadInt64(reply, &features);
             *((long *)data->variable) = features;
             break;
         }
-        case WIFI_SVR_CMD_GET_SCAN_INFO_LIST: {
+        case static_cast<uint32_t>(ScanInterfaceCode::WIFI_SVR_CMD_GET_SCAN_INFO_LIST): {
             data->retCode = ParseScanInfos(reply, *((std::vector<WifiScanInfo> *)data->variable));
             break;
         }
@@ -231,10 +232,12 @@ ErrCode WifiScanProxy::SetScanControlInfo(const ScanControlInfo &info)
         (void)WriteInt32(&request, iter2->count);
     }
 
-    owner.funcId = WIFI_SVR_CMD_SET_SCAN_CONTROL_INFO;
-    int error = remote_->Invoke(remote_, WIFI_SVR_CMD_SET_SCAN_CONTROL_INFO, &request, &owner, IpcCallback);
+    owner.funcId = static_cast<int32_t>(ScanInterfaceCode::WIFI_SVR_CMD_SET_SCAN_CONTROL_INFO);
+    int error = remote_->Invoke(remote_, static_cast<int32_t>(ScanInterfaceCode::WIFI_SVR_CMD_SET_SCAN_CONTROL_INFO),
+        &request, &owner, IpcCallback);
     if (error != EC_SUCCESS) {
-        WIFI_LOGW("Set Attr(%{public}d) failed", WIFI_SVR_CMD_SET_SCAN_CONTROL_INFO);
+        WIFI_LOGW("Set Attr(%{public}d) failed",
+            static_cast<int32_t>(ScanInterfaceCode::WIFI_SVR_CMD_SET_SCAN_CONTROL_INFO));
         return WIFI_OPT_FAILED;
     }
 
@@ -263,10 +266,11 @@ ErrCode WifiScanProxy::Scan()
     }
     (void)WriteInt32(&request, 0);
 
-    owner.funcId = WIFI_SVR_CMD_FULL_SCAN;
-    int error = remote_->Invoke(remote_, WIFI_SVR_CMD_FULL_SCAN, &request, &owner, IpcCallback);
+    owner.funcId = static_cast<int32_t>(ScanInterfaceCode::WIFI_SVR_CMD_FULL_SCAN);
+    int error = remote_->Invoke(remote_, static_cast<int32_t>(ScanInterfaceCode::WIFI_SVR_CMD_FULL_SCAN),
+        &request, &owner, IpcCallback);
     if (error != EC_SUCCESS) {
-        WIFI_LOGW("Set Attr(%{public}d) failed", WIFI_SVR_CMD_FULL_SCAN);
+        WIFI_LOGW("Set Attr(%{public}d) failed", static_cast<int32_t>(ScanInterfaceCode::WIFI_SVR_CMD_FULL_SCAN));
         return WIFI_OPT_FAILED;
     }
 
@@ -302,10 +306,12 @@ ErrCode WifiScanProxy::AdvanceScan(const WifiScanParams &params)
     }
     (void)WriteUint32(&request, params.band);
 
-    owner.funcId = WIFI_SVR_CMD_SPECIFIED_PARAMS_SCAN;
-    int error = remote_->Invoke(remote_, WIFI_SVR_CMD_SPECIFIED_PARAMS_SCAN, &request, &owner, IpcCallback);
+    owner.funcId = static_cast<int32_t>(ScanInterfaceCode::WIFI_SVR_CMD_SPECIFIED_PARAMS_SCAN);
+    int error = remote_->Invoke(remote_, static_cast<int32_t>(ScanInterfaceCode::WIFI_SVR_CMD_SPECIFIED_PARAMS_SCAN),
+        &request, &owner,  IpcCallback);
     if (error != EC_SUCCESS) {
-        WIFI_LOGW("Set Attr(%{public}d) failed", WIFI_SVR_CMD_SPECIFIED_PARAMS_SCAN);
+        WIFI_LOGW("Set Attr(%{public}d) failed",
+            static_cast<int32_t>(ScanInterfaceCode::WIFI_SVR_CMD_SPECIFIED_PARAMS_SCAN));
         return WIFI_OPT_FAILED;
     }
 
@@ -335,10 +341,12 @@ ErrCode WifiScanProxy::IsWifiClosedScan(bool &bOpen)
     }
     (void)WriteInt32(&request, 0);
     owner.variable = &bOpen;
-    owner.funcId = WIFI_SVR_CMD_IS_SCAN_ALWAYS_ACTIVE;
-    int error = remote_->Invoke(remote_, WIFI_SVR_CMD_IS_SCAN_ALWAYS_ACTIVE, &request, &owner, IpcCallback);
+    owner.funcId = static_cast<int32_t>(ScanInterfaceCode::WIFI_SVR_CMD_IS_SCAN_ALWAYS_ACTIVE);
+    int error = remote_->Invoke(remote_, static_cast<int32_t>(ScanInterfaceCode::WIFI_SVR_CMD_IS_SCAN_ALWAYS_ACTIVE),
+        &request, &owner, IpcCallback);
     if (error != EC_SUCCESS) {
-        WIFI_LOGW("Set Attr(%{public}d) failed", WIFI_SVR_CMD_IS_SCAN_ALWAYS_ACTIVE);
+        WIFI_LOGW("Set Attr(%{public}d) failed",
+            static_cast<int32_t>(ScanInterfaceCode::WIFI_SVR_CMD_IS_SCAN_ALWAYS_ACTIVE));
         return WIFI_OPT_FAILED;
     }
 
@@ -367,10 +375,12 @@ ErrCode WifiScanProxy::GetScanInfoList(std::vector<WifiScanInfo> &result)
     }
     (void)WriteInt32(&request, 0);
     owner.variable = &result;
-    owner.funcId = WIFI_SVR_CMD_GET_SCAN_INFO_LIST;
-    int error = remote_->Invoke(remote_, WIFI_SVR_CMD_GET_SCAN_INFO_LIST, &request, &owner, IpcCallback);
+    owner.funcId = static_cast<int32_t>(ScanInterfaceCode::WIFI_SVR_CMD_GET_SCAN_INFO_LIST);
+    int error = remote_->Invoke(remote_, static_cast<int32_t>(ScanInterfaceCode::WIFI_SVR_CMD_GET_SCAN_INFO_LIST),
+        &request, &owner, IpcCallback);
     if (error != EC_SUCCESS) {
-        WIFI_LOGW("Set Attr(%{public}d) failed", WIFI_SVR_CMD_GET_SCAN_INFO_LIST);
+        WIFI_LOGW("Set Attr(%{public}d) failed",
+            static_cast<int32_t>(ScanInterfaceCode::WIFI_SVR_CMD_GET_SCAN_INFO_LIST));
         return WIFI_OPT_FAILED;
     }
 
@@ -415,8 +425,9 @@ ErrCode WifiScanProxy::RegisterCallBack(const std::shared_ptr<IWifiScanCallback>
             (void)WriteString(&request, eventName.c_str());
         }
     }
-    owner.funcId = WIFI_SVR_CMD_REGISTER_SCAN_CALLBACK;
-    int error = remote_->Invoke(remote_, WIFI_SVR_CMD_REGISTER_SCAN_CALLBACK, &request, &owner, IpcCallback);
+    owner.funcId = static_cast<int32_t>(ScanInterfaceCode::WIFI_SVR_CMD_REGISTER_SCAN_CALLBACK);
+    int error = remote_->Invoke(remote_, static_cast<int32_t>(ScanInterfaceCode::WIFI_SVR_CMD_REGISTER_SCAN_CALLBACK),
+        &request, &owner, IpcCallback);
     if (error != EC_SUCCESS) {
         WIFI_LOGE("RegisterCallBack failed, error code is %{public}d", error);
         return WIFI_OPT_FAILED;
@@ -448,10 +459,12 @@ ErrCode WifiScanProxy::GetSupportedFeatures(long &features)
     }
     (void)WriteInt32(&request, 0);
     owner.variable = &features;
-    owner.funcId = WIFI_SVR_CMD_GET_SUPPORTED_FEATURES;
-    int error = remote_->Invoke(remote_, WIFI_SVR_CMD_GET_SUPPORTED_FEATURES, &request, &owner, IpcCallback);
+    owner.funcId = static_cast<int32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_SUPPORTED_FEATURES);
+    int error = remote_->Invoke(remote_, static_cast<int32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_SUPPORTED_FEATURES),
+        &request, &owner, IpcCallback);
     if (error != EC_SUCCESS) {
-        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d", WIFI_SVR_CMD_GET_SUPPORTED_FEATURES, error);
+        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d",
+            static_cast<int32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_SUPPORTED_FEATURES), error);
         return ErrCode(error);
     }
 

@@ -33,9 +33,6 @@ public:
     virtual sptr<IRemoteObject> GetWifiRemote(int id) = 0;
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.wifi.IWifiHotspotMgr");
-    enum Code {
-        WIFI_MGR_GET_HOTSPOT_SERVICE = 0,
-    };
 };
 }  // namespace Wifi
 }  // namespace OHOS

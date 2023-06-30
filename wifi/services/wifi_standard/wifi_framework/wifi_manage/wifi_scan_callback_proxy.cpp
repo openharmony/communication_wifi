@@ -16,6 +16,7 @@
 #include "wifi_scan_callback_proxy.h"
 #include "wifi_logger.h"
 #include "define.h"
+#include "wifi_manager_service_ipc_interface_code.h"
 #include "wifi_internal_event_dispatcher.h"
 
 DEFINE_WIFILOG_SCAN_LABEL("WifiScanCallbackProxy");
@@ -40,7 +41,8 @@ void WifiScanCallbackProxy::OnWifiScanStateChanged(int state)
     }
     data.WriteInt32(0);
     data.WriteInt32(state);
-    int error = Remote()->SendRequest(WIFI_CBK_CMD_SCAN_STATE_CHANGE, data, reply, option);
+    int error = Remote()->SendRequest(static_cast<uint32_t>(ScanInterfaceCode::WIFI_CBK_CMD_SCAN_STATE_CHANGE),
+        data, reply, option);
     switch (error) {
         case NO_ERROR:
             WIFI_LOGD("OnWifiScanStateChanged callback succeeded!");

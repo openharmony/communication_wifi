@@ -14,6 +14,7 @@
  */
 #include "wifi_p2p_proxy.h"
 #include "define.h"
+#include "wifi_manager_service_ipc_interface_code.h"
 #include "wifi_logger.h"
 #include "wifi_p2p_callback_stub.h"
 
@@ -82,9 +83,11 @@ ErrCode WifiP2pProxy::EnableP2p(void)
         return WIFI_OPT_FAILED;
     }
     data.WriteInt32(0);
-    int error = Remote()->SendRequest(WIFI_SVR_CMD_P2P_ENABLE, data, reply, option);
+    int error = Remote()->SendRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_ENABLE), data, reply,
+        option);
     if (error != ERR_NONE) {
-        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d", WIFI_SVR_CMD_P2P_ENABLE, error);
+        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d",
+            static_cast<int32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_ENABLE), error);
         return WIFI_OPT_FAILED;
     }
     int exception = reply.ReadInt32();
@@ -108,9 +111,11 @@ ErrCode WifiP2pProxy::DisableP2p(void)
         return WIFI_OPT_FAILED;
     }
     data.WriteInt32(0);
-    int error = Remote()->SendRequest(WIFI_SVR_CMD_P2P_DISABLE, data, reply, option);
+    int error = Remote()->SendRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_DISABLE), data, reply,
+        option);
     if (error != ERR_NONE) {
-        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d", WIFI_SVR_CMD_P2P_DISABLE, error);
+        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d",
+            static_cast<int32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_DISABLE), error);
         return WIFI_OPT_FAILED;
     }
 
@@ -135,9 +140,11 @@ ErrCode WifiP2pProxy::DiscoverDevices(void)
         return WIFI_OPT_FAILED;
     }
     data.WriteInt32(0);
-    int error = Remote()->SendRequest(WIFI_SVR_CMD_P2P_DISCOVER_DEVICES, data, reply, option);
+    int error = Remote()->SendRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_DISCOVER_DEVICES), data,
+        reply, option);
     if (error != ERR_NONE) {
-        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d", WIFI_SVR_CMD_P2P_DISCOVER_DEVICES, error);
+        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d",
+            static_cast<int32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_DISCOVER_DEVICES), error);
         return WIFI_OPT_FAILED;
     }
 
@@ -162,10 +169,11 @@ ErrCode WifiP2pProxy::StopDiscoverDevices(void)
         return WIFI_OPT_FAILED;
     }
     data.WriteInt32(0);
-    int error = Remote()->SendRequest(WIFI_SVR_CMD_P2P_STOP_DISCOVER_DEVICES, data, reply, option);
+    int error = Remote()->SendRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_STOP_DISCOVER_DEVICES),
+        data, reply, option);
     if (error != ERR_NONE) {
-        WIFI_LOGE(
-            "Set Attr(%{public}d) failed,error code is %{public}d", WIFI_SVR_CMD_P2P_STOP_DISCOVER_DEVICES, error);
+        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d",
+            static_cast<int32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_STOP_DISCOVER_DEVICES), error);
         return WIFI_OPT_FAILED;
     }
 
@@ -190,9 +198,11 @@ ErrCode WifiP2pProxy::DiscoverServices(void)
         return WIFI_OPT_FAILED;
     }
     data.WriteInt32(0);
-    int error = Remote()->SendRequest(WIFI_SVR_CMD_P2P_DISCOVER_SERVICES, data, reply, option);
+    int error = Remote()->SendRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_DISCOVER_SERVICES), data,
+        reply, option);
     if (error != ERR_NONE) {
-        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d", WIFI_SVR_CMD_P2P_DISCOVER_SERVICES, error);
+        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d",
+            static_cast<int32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_DISCOVER_SERVICES), error);
         return WIFI_OPT_FAILED;
     }
 
@@ -217,10 +227,11 @@ ErrCode WifiP2pProxy::StopDiscoverServices(void)
         return WIFI_OPT_FAILED;
     }
     data.WriteInt32(0);
-    int error = Remote()->SendRequest(WIFI_SVR_CMD_P2P_STOP_DISCOVER_SERVICES, data, reply, option);
+    int error = Remote()->SendRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_STOP_DISCOVER_SERVICES),
+        data, reply, option);
     if (error != ERR_NONE) {
-        WIFI_LOGE(
-            "Set Attr(%{public}d) failed,error code is %{public}d", WIFI_SVR_CMD_P2P_STOP_DISCOVER_SERVICES, error);
+        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d",
+            static_cast<int32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_STOP_DISCOVER_SERVICES), error);
         return WIFI_OPT_FAILED;
     }
 
@@ -246,9 +257,11 @@ ErrCode WifiP2pProxy::RequestService(const WifiP2pDevice &device, const WifiP2pS
     }
     data.WriteInt32(0);
     WriteWifiP2pServiceRequest(data, device, request);
-    int error = Remote()->SendRequest(WIFI_SVR_CMD_P2P_REQUEST_SERVICES, data, reply, option);
+    int error = Remote()->SendRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_REQUEST_SERVICES), data,
+        reply, option);
     if (error != ERR_NONE) {
-        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d", WIFI_SVR_CMD_P2P_REQUEST_SERVICES, error);
+        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d",
+            static_cast<int32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_REQUEST_SERVICES), error);
         return WIFI_OPT_FAILED;
     }
 
@@ -274,9 +287,11 @@ ErrCode WifiP2pProxy::PutLocalP2pService(const WifiP2pServiceInfo &srvInfo)
     }
     data.WriteInt32(0);
     WriteWifiP2pServiceInfo(data, srvInfo);
-    int error = Remote()->SendRequest(WIFI_SVR_CMD_P2P_PUT_LOCAL_SERVICES, data, reply, option);
+    int error = Remote()->SendRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_PUT_LOCAL_SERVICES),
+        data, reply, option);
     if (error != ERR_NONE) {
-        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d", WIFI_SVR_CMD_P2P_PUT_LOCAL_SERVICES, error);
+        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d",
+            static_cast<int32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_PUT_LOCAL_SERVICES), error);
         return WIFI_OPT_FAILED;
     }
 
@@ -302,10 +317,11 @@ ErrCode WifiP2pProxy::DeleteLocalP2pService(const WifiP2pServiceInfo &srvInfo)
     }
     data.WriteInt32(0);
     WriteWifiP2pServiceInfo(data, srvInfo);
-    int error = Remote()->SendRequest(WIFI_SVR_CMD_P2P_DELETE_LOCAL_SERVICES, data, reply, option);
+    int error = Remote()->SendRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_DELETE_LOCAL_SERVICES),
+        data, reply, option);
     if (error != ERR_NONE) {
-        WIFI_LOGE(
-            "Set Attr(%{public}d) failed,error code is %{public}d", WIFI_SVR_CMD_P2P_DELETE_LOCAL_SERVICES, error);
+        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d",
+            static_cast<int32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_DELETE_LOCAL_SERVICES), error);
         return WIFI_OPT_FAILED;
     }
 
@@ -332,9 +348,11 @@ ErrCode WifiP2pProxy::StartP2pListen(int period, int interval)
     data.WriteInt32(0);
     data.WriteInt32(period);
     data.WriteInt32(interval);
-    int error = Remote()->SendRequest(WIFI_SVR_CMD_P2P_START_LISTEN, data, reply, option);
+    int error = Remote()->SendRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_START_LISTEN), data,
+        reply, option);
     if (error != ERR_NONE) {
-        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d", WIFI_SVR_CMD_P2P_START_LISTEN, error);
+        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d",
+            static_cast<int32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_START_LISTEN), error);
         return WIFI_OPT_FAILED;
     }
 
@@ -359,9 +377,11 @@ ErrCode WifiP2pProxy::StopP2pListen(void)
         return WIFI_OPT_FAILED;
     }
     data.WriteInt32(0);
-    int error = Remote()->SendRequest(WIFI_SVR_CMD_P2P_STOP_LISTEN, data, reply, option);
+    int error = Remote()->SendRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_STOP_LISTEN), data,
+        reply, option);
     if (error != ERR_NONE) {
-        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d", WIFI_SVR_CMD_P2P_STOP_LISTEN, error);
+        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d",
+            static_cast<int32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_STOP_LISTEN), error);
         return WIFI_OPT_FAILED;
     }
 
@@ -387,9 +407,11 @@ ErrCode WifiP2pProxy::CreateGroup(const WifiP2pConfig &config)
     }
     data.WriteInt32(0);
     WriteWifiP2pConfigData(data, config);
-    int error = Remote()->SendRequest(WIFI_SVR_CMD_P2P_CREATE_GROUP, data, reply, option);
+    int error = Remote()->SendRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_CREATE_GROUP), data,
+        reply, option);
     if (error != ERR_NONE) {
-        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d", WIFI_SVR_CMD_P2P_CREATE_GROUP, error);
+        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d",
+            static_cast<int32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_CREATE_GROUP), error);
         return WIFI_OPT_FAILED;
     }
 
@@ -414,9 +436,11 @@ ErrCode WifiP2pProxy::RemoveGroup()
         return WIFI_OPT_FAILED;
     }
     data.WriteInt32(0);
-    int error = Remote()->SendRequest(WIFI_SVR_CMD_P2P_REMOVE_GROUP, data, reply, option);
+    int error = Remote()->SendRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_REMOVE_GROUP), data,
+        reply, option);
     if (error != ERR_NONE) {
-        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d", WIFI_SVR_CMD_P2P_REMOVE_GROUP, error);
+        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d",
+            static_cast<int32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_REMOVE_GROUP), error);
         return WIFI_OPT_FAILED;
     }
     int exception = reply.ReadInt32();
@@ -441,9 +465,11 @@ ErrCode WifiP2pProxy::DeleteGroup(const WifiP2pGroupInfo &group)
     }
     data.WriteInt32(0);
     WriteWifiP2pGroupData(data, group);
-    int error = Remote()->SendRequest(WIFI_SVR_CMD_P2P_DELETE_GROUP, data, reply, option);
+    int error = Remote()->SendRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_DELETE_GROUP), data,
+        reply, option);
     if (error != ERR_NONE) {
-        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d", WIFI_SVR_CMD_P2P_DELETE_GROUP, error);
+        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d",
+            static_cast<int32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_DELETE_GROUP), error);
         return WIFI_OPT_FAILED;
     }
     int exception = reply.ReadInt32();
@@ -612,9 +638,11 @@ ErrCode WifiP2pProxy::P2pConnect(const WifiP2pConfig &config)
     }
     data.WriteInt32(0);
     WriteWifiP2pConfigData(data, config);
-    int error = Remote()->SendRequest(WIFI_SVR_CMD_P2P_CONNECT, data, reply, option);
+    int error = Remote()->SendRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_CONNECT), data, reply,
+        option);
     if (error != ERR_NONE) {
-        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d", WIFI_SVR_CMD_P2P_CONNECT, error);
+        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d",
+            static_cast<int32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_CONNECT), error);
         return WIFI_OPT_FAILED;
     }
 
@@ -639,9 +667,11 @@ ErrCode WifiP2pProxy::P2pCancelConnect()
         return WIFI_OPT_FAILED;
     }
     data.WriteInt32(0);
-    int error = Remote()->SendRequest(WIFI_SVR_CMD_P2P_CANCEL_CONNECT, data, reply, option);
+    int error = Remote()->SendRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_CANCEL_CONNECT), data,
+        reply, option);
     if (error != ERR_NONE) {
-        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d", WIFI_SVR_CMD_P2P_CANCEL_CONNECT, error);
+        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d",
+            static_cast<int32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_CANCEL_CONNECT), error);
         return WIFI_OPT_FAILED;
     }
 
@@ -666,9 +696,11 @@ ErrCode WifiP2pProxy::QueryP2pLinkedInfo(WifiP2pLinkedInfo &linkedInfo)
         return WIFI_OPT_FAILED;
     }
     data.WriteInt32(0);
-    int error = Remote()->SendRequest(WIFI_SVR_CMD_P2P_QUERY_INFO, data, reply, option);
+    int error = Remote()->SendRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_QUERY_INFO), data, reply,
+        option);
     if (error != ERR_NONE) {
-        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d", WIFI_SVR_CMD_P2P_QUERY_INFO, error);
+        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d",
+            static_cast<int32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_QUERY_INFO), error);
         return WIFI_OPT_FAILED;
     }
 
@@ -702,9 +734,11 @@ ErrCode WifiP2pProxy::GetCurrentGroup(WifiP2pGroupInfo &group)
         return WIFI_OPT_FAILED;
     }
     data.WriteInt32(0);
-    int error = Remote()->SendRequest(WIFI_SVR_CMD_P2P_GET_CURRENT_GROUP, data, reply, option);
+    int error = Remote()->SendRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_GET_CURRENT_GROUP), data,
+        reply, option);
     if (error != ERR_NONE) {
-        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d", WIFI_SVR_CMD_P2P_GET_CURRENT_GROUP, error);
+        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d",
+            static_cast<int32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_GET_CURRENT_GROUP), error);
         return WIFI_OPT_FAILED;
     }
 
@@ -734,9 +768,11 @@ ErrCode WifiP2pProxy::GetP2pEnableStatus(int &status)
         return WIFI_OPT_FAILED;
     }
     data.WriteInt32(0);
-    int error = Remote()->SendRequest(WIFI_SVR_CMD_P2P_GET_ENABLE_STATUS, data, reply, option);
+    int error = Remote()->SendRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_GET_ENABLE_STATUS), data,
+        reply, option);
     if (error != ERR_NONE) {
-        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d", WIFI_SVR_CMD_P2P_GET_ENABLE_STATUS, error);
+        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d",
+            static_cast<int32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_GET_ENABLE_STATUS), error);
         return WIFI_OPT_FAILED;
     }
 
@@ -766,9 +802,11 @@ ErrCode WifiP2pProxy::GetP2pDiscoverStatus(int &status)
         return WIFI_OPT_FAILED;
     }
     data.WriteInt32(0);
-    int error = Remote()->SendRequest(WIFI_SVR_CMD_P2P_GET_DISCOVER_STATUS, data, reply, option);
+    int error = Remote()->SendRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_GET_DISCOVER_STATUS),
+        data, reply, option);
     if (error != ERR_NONE) {
-        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d", WIFI_SVR_CMD_P2P_GET_DISCOVER_STATUS, error);
+        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d",
+            static_cast<int32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_GET_DISCOVER_STATUS), error);
         return WIFI_OPT_FAILED;
     }
 
@@ -798,9 +836,11 @@ ErrCode WifiP2pProxy::GetP2pConnectedStatus(int &status)
         return WIFI_OPT_FAILED;
     }
     data.WriteInt32(0);
-    int error = Remote()->SendRequest(WIFI_SVR_CMD_P2P_GET_CONNECTED_STATUS, data, reply, option);
+    int error = Remote()->SendRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_GET_CONNECTED_STATUS),
+        data, reply, option);
     if (error != ERR_NONE) {
-        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d", WIFI_SVR_CMD_P2P_GET_CONNECTED_STATUS, error);
+        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d",
+            static_cast<int32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_GET_CONNECTED_STATUS), error);
         return WIFI_OPT_FAILED;
     }
 
@@ -830,9 +870,11 @@ ErrCode WifiP2pProxy::QueryP2pDevices(std::vector<WifiP2pDevice> &devices)
         return WIFI_OPT_FAILED;
     }
     data.WriteInt32(0);
-    int error = Remote()->SendRequest(WIFI_SVR_CMD_P2P_QUERY_DEVICES, data, reply, option);
+    int error = Remote()->SendRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_QUERY_DEVICES), data,
+        reply, option);
     if (error != ERR_NONE) {
-        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d", WIFI_SVR_CMD_P2P_QUERY_DEVICES, error);
+        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d",
+            static_cast<int32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_QUERY_DEVICES), error);
         return WIFI_OPT_FAILED;
     }
 
@@ -873,9 +915,11 @@ ErrCode WifiP2pProxy::QueryP2pLocalDevice(WifiP2pDevice &device)
         return WIFI_OPT_FAILED;
     }
     data.WriteInt32(0);
-    int error = Remote()->SendRequest(WIFI_SVR_CMD_P2P_QUERY_LOCAL_DEVICE, data, reply, option);
+    int error = Remote()->SendRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_QUERY_LOCAL_DEVICE),
+        data, reply, option);
     if (error != ERR_NONE) {
-        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d", WIFI_SVR_CMD_P2P_QUERY_LOCAL_DEVICE, error);
+        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d",
+            static_cast<int32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_QUERY_LOCAL_DEVICE), error);
         return WIFI_OPT_FAILED;
     }
 
@@ -905,9 +949,11 @@ ErrCode WifiP2pProxy::QueryP2pGroups(std::vector<WifiP2pGroupInfo> &groups)
         return WIFI_OPT_FAILED;
     }
     data.WriteInt32(0);
-    int error = Remote()->SendRequest(WIFI_SVR_CMD_P2P_QUERY_GROUPS, data, reply, option);
+    int error = Remote()->SendRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_QUERY_GROUPS), data,
+        reply, option);
     if (error != ERR_NONE) {
-        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d", WIFI_SVR_CMD_P2P_QUERY_GROUPS, error);
+        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d",
+            static_cast<int32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_QUERY_GROUPS), error);
         return WIFI_OPT_FAILED;
     }
 
@@ -948,9 +994,11 @@ ErrCode WifiP2pProxy::QueryP2pServices(std::vector<WifiP2pServiceInfo> &services
         return WIFI_OPT_FAILED;
     }
     data.WriteInt32(0);
-    int error = Remote()->SendRequest(WIFI_SVR_CMD_P2P_QUERY_SERVICES, data, reply, option);
+    int error = Remote()->SendRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_QUERY_SERVICES), data,
+        reply, option);
     if (error != ERR_NONE) {
-        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d", WIFI_SVR_CMD_P2P_QUERY_SERVICES, error);
+        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d",
+            static_cast<int32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_QUERY_SERVICES), error);
         return WIFI_OPT_FAILED;
     }
 
@@ -992,9 +1040,11 @@ ErrCode WifiP2pProxy::SetP2pDeviceName(const std::string &deviceName)
     }
     data.WriteInt32(0);
     data.WriteString(deviceName);
-    int error = Remote()->SendRequest(WIFI_SVR_CMD_P2P_SET_DEVICE_NAME, data, reply, option);
+    int error = Remote()->SendRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_SET_DEVICE_NAME), data,
+        reply, option);
     if (error != ERR_NONE) {
-        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d", WIFI_SVR_CMD_P2P_SET_DEVICE_NAME, error);
+        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d",
+            static_cast<int32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_SET_DEVICE_NAME), error);
         return WIFI_OPT_FAILED;
     }
 
@@ -1026,9 +1076,11 @@ ErrCode WifiP2pProxy::SetP2pWfdInfo(const WifiP2pWfdInfo &wfdInfo)
     data.WriteInt32(wfdInfo.GetDeviceInfo());
     data.WriteInt32(wfdInfo.GetCtrlPort());
     data.WriteInt32(wfdInfo.GetMaxThroughput());
-    int error = Remote()->SendRequest(WIFI_SVR_CMD_P2P_SET_WFD_INFO, data, reply, option);
+    int error = Remote()->SendRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_SET_WFD_INFO), data,
+        reply, option);
     if (error != ERR_NONE) {
-        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d", WIFI_SVR_CMD_P2P_SET_WFD_INFO, error);
+        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d",
+            static_cast<int32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_SET_WFD_INFO), error);
         return WIFI_OPT_FAILED;
     }
 
@@ -1075,7 +1127,8 @@ ErrCode WifiP2pProxy::RegisterCallBack(const sptr<IWifiP2pCallback> &callback, c
             data.WriteString(eventName);
         }
     }
-    int error = Remote()->SendRequest(WIFI_SVR_CMD_P2P_REGISTER_CALLBACK, data, reply, option);
+    int error = Remote()->SendRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_REGISTER_CALLBACK), data,
+        reply, option);
     if (error != ERR_NONE) {
         WIFI_LOGE("RegisterCallBack failed, error code is %{public}d", error);
         return WIFI_OPT_FAILED;
@@ -1102,9 +1155,11 @@ ErrCode WifiP2pProxy::GetSupportedFeatures(long &features)
         return WIFI_OPT_FAILED;
     }
     data.WriteInt32(0);
-    int error = Remote()->SendRequest(WIFI_SVR_CMD_GET_SUPPORTED_FEATURES, data, reply, option);
+    int error = Remote()->SendRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_SUPPORTED_FEATURES),
+        data, reply, option);
     if (error != ERR_NONE) {
-        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d", WIFI_SVR_CMD_GET_SUPPORTED_FEATURES, error);
+        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d",
+            static_cast<int32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_SUPPORTED_FEATURES), error);
         return ErrCode(error);
     }
     int exception = reply.ReadInt32();
@@ -1135,9 +1190,11 @@ ErrCode WifiP2pProxy::Hid2dRequestGcIp(const std::string& gcMac, std::string& ip
     }
     data.WriteInt32(0);
     data.WriteCString(gcMac.c_str());
-    int error = Remote()->SendRequest(WIFI_SVR_CMD_P2P_HID2D_APPLY_IP, data, reply, option);
+    int error = Remote()->SendRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_HID2D_APPLY_IP), data,
+        reply, option);
     if (error != ERR_NONE) {
-        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d", WIFI_SVR_CMD_P2P_HID2D_APPLY_IP, error);
+        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d",
+            static_cast<int32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_HID2D_APPLY_IP), error);
         return WIFI_OPT_FAILED;
     }
     int exception = reply.ReadInt32();
@@ -1167,10 +1224,11 @@ ErrCode WifiP2pProxy::Hid2dSharedlinkIncrease()
         return WIFI_OPT_FAILED;
     }
     data.WriteInt32(0);
-    int error = Remote()->SendRequest(WIFI_SVR_CMD_P2P_HID2D_SHARED_LINK_INCREASE, data, reply, option);
+    int error = Remote()->SendRequest(
+        static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_HID2D_SHARED_LINK_INCREASE), data, reply, option);
     if (error != ERR_NONE) {
         WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d",
-            WIFI_SVR_CMD_P2P_HID2D_SHARED_LINK_INCREASE, error);
+            static_cast<int32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_HID2D_SHARED_LINK_INCREASE), error);
         return WIFI_OPT_FAILED;
     }
     int exception = reply.ReadInt32();
@@ -1194,10 +1252,11 @@ ErrCode WifiP2pProxy::Hid2dSharedlinkDecrease()
         return WIFI_OPT_FAILED;
     }
     data.WriteInt32(0);
-    int error = Remote()->SendRequest(WIFI_SVR_CMD_P2P_HID2D_SHARED_LINK_DECREASE, data, reply, option);
+    int error = Remote()->SendRequest(
+        static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_HID2D_SHARED_LINK_DECREASE), data, reply, option);
     if (error != ERR_NONE) {
         WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d",
-            WIFI_SVR_CMD_P2P_HID2D_SHARED_LINK_DECREASE, error);
+            static_cast<int32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_HID2D_SHARED_LINK_DECREASE), error);
         return WIFI_OPT_FAILED;
     }
     int exception = reply.ReadInt32();
@@ -1225,10 +1284,11 @@ ErrCode WifiP2pProxy::Hid2dCreateGroup(const int frequency, FreqType type)
     data.WriteInt32(0);
     data.WriteInt32(frequency);
     data.WriteInt32(static_cast<int>(type));
-    int error = Remote()->SendRequest(WIFI_SVR_CMD_P2P_HID2D_CREATE_GROUP, data, reply, option);
+    int error = Remote()->SendRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_HID2D_CREATE_GROUP),
+        data, reply, option);
     if (error != ERR_NONE) {
         WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d",
-            WIFI_SVR_CMD_P2P_HID2D_CREATE_GROUP, error);
+            static_cast<int32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_HID2D_CREATE_GROUP), error);
         return WIFI_OPT_FAILED;
     }
     int exception = reply.ReadInt32();
@@ -1255,10 +1315,11 @@ ErrCode WifiP2pProxy::Hid2dRemoveGcGroup(const std::string& gcIfName)
     }
     data.WriteInt32(0);
     data.WriteCString(gcIfName.c_str());
-    int error = Remote()->SendRequest(WIFI_SVR_CMD_P2P_HID2D_REMOVE_GC_GROUP, data, reply, option);
+    int error = Remote()->SendRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_HID2D_REMOVE_GC_GROUP),
+        data, reply, option);
     if (error != ERR_NONE) {
         WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d",
-            WIFI_SVR_CMD_P2P_HID2D_REMOVE_GC_GROUP, error);
+            static_cast<int32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_HID2D_REMOVE_GC_GROUP), error);
         return WIFI_OPT_FAILED;
     }
     int exception = reply.ReadInt32();
@@ -1289,10 +1350,11 @@ ErrCode WifiP2pProxy::Hid2dConnect(const Hid2dConnectConfig& config)
     data.WriteCString(config.GetPreSharedKey().c_str());
     data.WriteInt32(config.GetFrequency());
     data.WriteInt32(static_cast<int>(config.GetDhcpMode()));
-    int error = Remote()->SendRequest(WIFI_SVR_CMD_P2P_HID2D_CONNECT, data, reply, option);
+    int error = Remote()->SendRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_HID2D_CONNECT), data,
+        reply, option);
     if (error != ERR_NONE) {
         WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d",
-            WIFI_SVR_CMD_P2P_HID2D_CONNECT, error);
+            static_cast<int32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_HID2D_CONNECT), error);
         return WIFI_OPT_FAILED;
     }
     int exception = reply.ReadInt32();
@@ -1320,10 +1382,11 @@ ErrCode WifiP2pProxy::Hid2dConfigIPAddr(const std::string& ifName, const IpAddrI
     data.WriteCString(ipInfo.ip.c_str());
     data.WriteCString(ipInfo.gateway.c_str());
     data.WriteCString(ipInfo.netmask.c_str());
-    int error = Remote()->SendRequest(WIFI_SVR_CMD_P2P_HID2D_CONFIG_IP, data, reply, option);
+    int error = Remote()->SendRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_HID2D_CONFIG_IP), data,
+        reply, option);
     if (error != ERR_NONE) {
         WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d",
-            WIFI_SVR_CMD_P2P_HID2D_CONFIG_IP, error);
+            static_cast<int32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_HID2D_CONFIG_IP), error);
         return WIFI_OPT_FAILED;
     }
     int exception = reply.ReadInt32();
@@ -1348,10 +1411,11 @@ ErrCode WifiP2pProxy::Hid2dReleaseIPAddr(const std::string& ifName)
     }
     data.WriteInt32(0);
     data.WriteCString(ifName.c_str());
-    int error = Remote()->SendRequest(WIFI_SVR_CMD_P2P_HID2D_RELEASE_IP, data, reply, option);
+    int error = Remote()->SendRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_HID2D_RELEASE_IP), data,
+        reply, option);
     if (error != ERR_NONE) {
         WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d",
-            WIFI_SVR_CMD_P2P_HID2D_RELEASE_IP, error);
+            static_cast<int32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_HID2D_RELEASE_IP), error);
         return WIFI_OPT_FAILED;
     }
     int exception = reply.ReadInt32();
@@ -1381,10 +1445,11 @@ ErrCode WifiP2pProxy::Hid2dGetRecommendChannel(const RecommendChannelRequest& re
     data.WriteInt32(request.localIfMode);
     data.WriteInt32(request.prefBand);
     data.WriteInt32(static_cast<int>(request.prefBandwidth));
-    int error = Remote()->SendRequest(WIFI_SVR_CMD_GET_P2P_RECOMMENDED_CHANNEL, data, reply, option);
+    int error = Remote()->SendRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_GET_P2P_RECOMMENDED_CHANNEL),
+        data, reply, option);
     if (error != ERR_NONE) {
         WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d",
-            WIFI_SVR_CMD_GET_P2P_RECOMMENDED_CHANNEL, error);
+            static_cast<int32_t>(P2PInterfaceCode::WIFI_SVR_CMD_GET_P2P_RECOMMENDED_CHANNEL), error);
         return ErrCode(error);
     }
     int exception = reply.ReadInt32();
@@ -1418,9 +1483,11 @@ ErrCode WifiP2pProxy::Hid2dGetChannelListFor5G(std::vector<int>& vecChannelList)
         return WIFI_OPT_FAILED;
     }
     data.WriteInt32(0);
-    int error = Remote()->SendRequest(WIFI_SVR_CMD_GET_5G_CHANNEL_LIST, data, reply, option);
+    int error = Remote()->SendRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_GET_5G_CHANNEL_LIST), data,
+        reply, option);
     if (error != ERR_NONE) {
-        WIFI_LOGW("Set Attr(%{public}d) failed", WIFI_SVR_CMD_GET_5G_CHANNEL_LIST);
+        WIFI_LOGW("Set Attr(%{public}d) failed",
+            static_cast<int32_t>(P2PInterfaceCode::WIFI_SVR_CMD_GET_5G_CHANNEL_LIST));
         return WIFI_OPT_FAILED;
     }
     int exception = reply.ReadInt32();
@@ -1465,9 +1532,11 @@ ErrCode WifiP2pProxy::Hid2dGetSelfWifiCfgInfo(SelfCfgType cfgType,
     }
     data.WriteInt32(0);
     data.WriteInt32(static_cast<int>(cfgType));
-    int error = Remote()->SendRequest(WIFI_SVR_CMD_GET_SELF_WIFI_CFG, data, reply, option);
+    int error = Remote()->SendRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_GET_SELF_WIFI_CFG), data,
+        reply, option);
     if (error != ERR_NONE) {
-        WIFI_LOGW("Set Attr(%{public}d) failed", WIFI_SVR_CMD_GET_SELF_WIFI_CFG);
+        WIFI_LOGW("Set Attr(%{public}d) failed",
+            static_cast<int32_t>(P2PInterfaceCode::WIFI_SVR_CMD_GET_SELF_WIFI_CFG));
         return WIFI_OPT_FAILED;
     }
     int exception = reply.ReadInt32();
@@ -1516,9 +1585,11 @@ ErrCode WifiP2pProxy::Hid2dSetPeerWifiCfgInfo(PeerCfgType cfgType,
     data.WriteInt32(static_cast<int>(cfgType));
     data.WriteInt32(setDataValidLen);
     data.WriteBuffer(cfgData, setDataValidLen);
-    int error = Remote()->SendRequest(WIFI_SVR_CMD_SET_PEER_WIFI_CFG, data, reply, option);
+    int error = Remote()->SendRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_SET_PEER_WIFI_CFG), data,
+        reply, option);
     if (error != ERR_NONE) {
-        WIFI_LOGW("Set Attr(%{public}d) failed", WIFI_SVR_CMD_SET_PEER_WIFI_CFG);
+        WIFI_LOGW("Set Attr(%{public}d) failed",
+            static_cast<int32_t>(P2PInterfaceCode::WIFI_SVR_CMD_SET_PEER_WIFI_CFG));
         return WIFI_OPT_FAILED;
     }
     int exception = reply.ReadInt32();
@@ -1547,9 +1618,10 @@ ErrCode WifiP2pProxy::Hid2dSetUpperScene(const std::string& ifName, const Hid2dU
     data.WriteUint32(scene.scene);
     data.WriteInt32(scene.fps);
     data.WriteUint32(scene.bw);
-    int error = Remote()->SendRequest(WIFI_SVR_CMD_SET_UPPER_SCENE, data, reply, option);
+    int error = Remote()->SendRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_SET_UPPER_SCENE), data,
+        reply, option);
     if (error != ERR_NONE) {
-        WIFI_LOGW("Set Attr(%{public}d) failed", WIFI_SVR_CMD_SET_UPPER_SCENE);
+        WIFI_LOGW("Set Attr(%{public}d) failed", static_cast<int32_t>(P2PInterfaceCode::WIFI_SVR_CMD_SET_UPPER_SCENE));
         return WIFI_OPT_FAILED;
     }
     int exception = reply.ReadInt32();

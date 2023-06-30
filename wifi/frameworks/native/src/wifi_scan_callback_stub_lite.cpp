@@ -15,6 +15,7 @@
 
 #include "wifi_scan_callback_stub.h"
 #include "define.h"
+#include "wifi_manager_service_ipc_interface_code.h"
 #include "wifi_errcode.h"
 #include "wifi_logger.h"
 #include "wifi_msg.h"
@@ -55,7 +56,7 @@ int WifiScanCallbackStub::OnRemoteRequest(uint32_t code, IpcIo *data)
         return ret;
     }
     switch (code) {
-        case WIFI_CBK_CMD_SCAN_STATE_CHANGE: {
+        case static_cast<uint32_t>(ScanInterfaceCode::WIFI_CBK_CMD_SCAN_STATE_CHANGE): {
             WIFI_LOGD("OnRemoteRequest code:%{public}u", code);
             ret = RemoteOnWifiScanStateChanged(code, data);
             break;

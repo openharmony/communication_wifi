@@ -21,6 +21,7 @@
 #include "securec.h"
 #include "wifi_logger.h"
 #include "wifi_errcode.h"
+#include "wifi_manager_service_ipc_interface_code.h"
 
 using ::testing::Return;
 using ::testing::ext::TestSize;
@@ -183,7 +184,7 @@ HWTEST_F(WifiHotspotCallbackStubTest, OnHotspotStateChanged_001, TestSize.Level1
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
-    uint32_t code = WIFI_CBK_CMD_HOTSPOT_STATE_CHANGE;
+    uint32_t code = static_cast<uint32_t>(HotspotInterfaceCode::WIFI_CBK_CMD_HOTSPOT_STATE_CHANGE);
     if (!data.WriteInterfaceToken(IWifiHotspotCallback::GetDescriptor())) {
         return;
     }
@@ -209,7 +210,7 @@ HWTEST_F(WifiHotspotCallbackStubTest, OnHotspotStaJoin_001, TestSize.Level1)
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
-    uint32_t code = WIFI_CBK_CMD_HOTSPOT_STATE_JOIN;
+    uint32_t code = static_cast<uint32_t>(HotspotInterfaceCode::WIFI_CBK_CMD_HOTSPOT_STATE_JOIN);
     if (!data.WriteInterfaceToken(IWifiHotspotCallback::GetDescriptor())) {
         return;
     }
@@ -234,7 +235,7 @@ HWTEST_F(WifiHotspotCallbackStubTest, OnHotspotStaLeave_001, TestSize.Level1)
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
-    uint32_t code = WIFI_CBK_CMD_HOTSPOT_STATE_LEAVE;
+    uint32_t code = static_cast<uint32_t>(HotspotInterfaceCode::WIFI_CBK_CMD_HOTSPOT_STATE_LEAVE);
     if (!data.WriteInterfaceToken(IWifiHotspotCallback::GetDescriptor())) {
         return;
     }

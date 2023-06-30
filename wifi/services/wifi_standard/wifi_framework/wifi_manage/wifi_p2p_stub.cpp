@@ -19,6 +19,7 @@
 #include "wifi_p2p_callback_proxy.h"
 #include "wifi_p2p_death_recipient.h"
 #include "wifi_common_def.h"
+#include "wifi_manager_service_ipc_interface_code.h"
 
 DEFINE_WIFILOG_P2P_LABEL("WifiP2pStub");
 
@@ -32,50 +33,95 @@ WifiP2pStub::WifiP2pStub() : mSingleCallback(false)
 WifiP2pStub::~WifiP2pStub()
 {}
 
+void WifiP2pStub::InitHandleMapEx()
+{
+    handleFuncMap[static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_REGISTER_CALLBACK)] =
+        &WifiP2pStub::OnRegisterCallBack;
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_SUPPORTED_FEATURES)] =
+        &WifiP2pStub::OnGetSupportedFeatures;
+    handleFuncMap[static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_SET_DEVICE_NAME)] =
+        &WifiP2pStub::OnSetP2pDeviceName;
+    handleFuncMap[static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_SET_WFD_INFO)] =
+        &WifiP2pStub::OnSetP2pWfdInfo;
+    handleFuncMap[static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_HID2D_APPLY_IP)] =
+        &WifiP2pStub::OnHid2dRequestGcIp;
+    handleFuncMap[static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_HID2D_SHARED_LINK_INCREASE)] =
+        &WifiP2pStub::OnHid2dSharedlinkIncrease;
+    handleFuncMap[static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_HID2D_SHARED_LINK_DECREASE)] =
+        &WifiP2pStub::OnHid2dSharedlinkDecrease;
+    handleFuncMap[static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_HID2D_CREATE_GROUP)] =
+        &WifiP2pStub::OnHid2dCreateGroup;
+    handleFuncMap[static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_HID2D_REMOVE_GC_GROUP)] =
+        &WifiP2pStub::OnHid2dRemoveGcGroup;
+    handleFuncMap[static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_HID2D_CONNECT)] =
+        &WifiP2pStub::OnHid2dConnect;
+    handleFuncMap[static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_HID2D_CONFIG_IP)] =
+        &WifiP2pStub::OnHid2dConfigIPAddr;
+    handleFuncMap[static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_HID2D_RELEASE_IP)] =
+        &WifiP2pStub::OnHid2dReleaseIPAddr;
+    handleFuncMap[static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_GET_P2P_RECOMMENDED_CHANNEL)] =
+        &WifiP2pStub::OnHid2dGetRecommendChannel;
+    handleFuncMap[static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_GET_5G_CHANNEL_LIST)] =
+        &WifiP2pStub::OnHid2dGetChannelListFor5G;
+    handleFuncMap[static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_GET_SELF_WIFI_CFG)] =
+        &WifiP2pStub::OnHid2dGetSelfWifiCfgInfo;
+    handleFuncMap[static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_SET_PEER_WIFI_CFG)] =
+        &WifiP2pStub::OnHid2dSetPeerWifiCfgInfo;
+    handleFuncMap[static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_QUERY_LOCAL_DEVICE)] =
+        &WifiP2pStub::OnQueryP2pLocalDevice;
+    handleFuncMap[static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_SET_UPPER_SCENE)] =
+        &WifiP2pStub::OnHid2dSetUpperScene;
+    return;
+}
+
 void WifiP2pStub::InitHandleMap()
 {
-    handleFuncMap[WIFI_SVR_CMD_P2P_ENABLE] = &WifiP2pStub::OnEnableP2p;
-    handleFuncMap[WIFI_SVR_CMD_P2P_DISABLE] = &WifiP2pStub::OnDisableP2p;
-    handleFuncMap[WIFI_SVR_CMD_P2P_DISCOVER_DEVICES] = &WifiP2pStub::OnDiscoverDevices;
-    handleFuncMap[WIFI_SVR_CMD_P2P_STOP_DISCOVER_DEVICES] = &WifiP2pStub::OnStopDiscoverDevices;
-    handleFuncMap[WIFI_SVR_CMD_P2P_DISCOVER_SERVICES] = &WifiP2pStub::OnDiscoverServices;
-    handleFuncMap[WIFI_SVR_CMD_P2P_STOP_DISCOVER_SERVICES] = &WifiP2pStub::OnStopDiscoverServices;
-    handleFuncMap[WIFI_SVR_CMD_P2P_REQUEST_SERVICES] = &WifiP2pStub::OnRequestService;
-    handleFuncMap[WIFI_SVR_CMD_P2P_PUT_LOCAL_SERVICES] = &WifiP2pStub::OnPutLocalP2pService;
-    handleFuncMap[WIFI_SVR_CMD_P2P_DELETE_LOCAL_SERVICES] = &WifiP2pStub::OnDeleteLocalP2pService;
-    handleFuncMap[WIFI_SVR_CMD_P2P_START_LISTEN] = &WifiP2pStub::OnStartP2pListen;
-    handleFuncMap[WIFI_SVR_CMD_P2P_STOP_LISTEN] = &WifiP2pStub::OnStopP2pListen;
-    handleFuncMap[WIFI_SVR_CMD_P2P_CREATE_GROUP] = &WifiP2pStub::OnCreateGroup;
-    handleFuncMap[WIFI_SVR_CMD_P2P_REMOVE_GROUP] = &WifiP2pStub::OnRemoveGroup;
-    handleFuncMap[WIFI_SVR_CMD_P2P_DELETE_GROUP] = &WifiP2pStub::OnDeleteGroup;
-    handleFuncMap[WIFI_SVR_CMD_P2P_CONNECT] = &WifiP2pStub::OnP2pConnect;
-    handleFuncMap[WIFI_SVR_CMD_P2P_CANCEL_CONNECT] = &WifiP2pStub::OnP2pCancelConnect;
-    handleFuncMap[WIFI_SVR_CMD_P2P_QUERY_INFO] = &WifiP2pStub::OnQueryP2pLinkedInfo;
-    handleFuncMap[WIFI_SVR_CMD_P2P_GET_CURRENT_GROUP] = &WifiP2pStub::OnGetCurrentGroup;
-    handleFuncMap[WIFI_SVR_CMD_P2P_GET_ENABLE_STATUS] = &WifiP2pStub::OnGetP2pEnableStatus;
-    handleFuncMap[WIFI_SVR_CMD_P2P_GET_DISCOVER_STATUS] = &WifiP2pStub::OnGetP2pDiscoverStatus;
-    handleFuncMap[WIFI_SVR_CMD_P2P_GET_CONNECTED_STATUS] = &WifiP2pStub::OnGetP2pConnectedStatus;
-    handleFuncMap[WIFI_SVR_CMD_P2P_QUERY_DEVICES] = &WifiP2pStub::OnQueryP2pDevices;
-    handleFuncMap[WIFI_SVR_CMD_P2P_QUERY_GROUPS] = &WifiP2pStub::OnQueryP2pGroups;
-    handleFuncMap[WIFI_SVR_CMD_P2P_QUERY_SERVICES] = &WifiP2pStub::OnQueryP2pServices;
-    handleFuncMap[WIFI_SVR_CMD_P2P_REGISTER_CALLBACK] = &WifiP2pStub::OnRegisterCallBack;
-    handleFuncMap[WIFI_SVR_CMD_GET_SUPPORTED_FEATURES] = &WifiP2pStub::OnGetSupportedFeatures;
-    handleFuncMap[WIFI_SVR_CMD_P2P_SET_DEVICE_NAME] = &WifiP2pStub::OnSetP2pDeviceName;
-    handleFuncMap[WIFI_SVR_CMD_P2P_SET_WFD_INFO] = &WifiP2pStub::OnSetP2pWfdInfo;
-    handleFuncMap[WIFI_SVR_CMD_P2P_HID2D_APPLY_IP] = &WifiP2pStub::OnHid2dRequestGcIp;
-    handleFuncMap[WIFI_SVR_CMD_P2P_HID2D_SHARED_LINK_INCREASE] = &WifiP2pStub::OnHid2dSharedlinkIncrease;
-    handleFuncMap[WIFI_SVR_CMD_P2P_HID2D_SHARED_LINK_DECREASE] = &WifiP2pStub::OnHid2dSharedlinkDecrease;
-    handleFuncMap[WIFI_SVR_CMD_P2P_HID2D_CREATE_GROUP] = &WifiP2pStub::OnHid2dCreateGroup;
-    handleFuncMap[WIFI_SVR_CMD_P2P_HID2D_REMOVE_GC_GROUP] = &WifiP2pStub::OnHid2dRemoveGcGroup;
-    handleFuncMap[WIFI_SVR_CMD_P2P_HID2D_CONNECT] = &WifiP2pStub::OnHid2dConnect;
-    handleFuncMap[WIFI_SVR_CMD_P2P_HID2D_CONFIG_IP] = &WifiP2pStub::OnHid2dConfigIPAddr;
-    handleFuncMap[WIFI_SVR_CMD_P2P_HID2D_RELEASE_IP] = &WifiP2pStub::OnHid2dReleaseIPAddr;
-    handleFuncMap[WIFI_SVR_CMD_GET_P2P_RECOMMENDED_CHANNEL] = &WifiP2pStub::OnHid2dGetRecommendChannel;
-    handleFuncMap[WIFI_SVR_CMD_GET_5G_CHANNEL_LIST] = &WifiP2pStub::OnHid2dGetChannelListFor5G;
-    handleFuncMap[WIFI_SVR_CMD_GET_SELF_WIFI_CFG] = &WifiP2pStub::OnHid2dGetSelfWifiCfgInfo;
-    handleFuncMap[WIFI_SVR_CMD_SET_PEER_WIFI_CFG] = &WifiP2pStub::OnHid2dSetPeerWifiCfgInfo;
-    handleFuncMap[WIFI_SVR_CMD_P2P_QUERY_LOCAL_DEVICE] = &WifiP2pStub::OnQueryP2pLocalDevice;
-    handleFuncMap[WIFI_SVR_CMD_SET_UPPER_SCENE] = &WifiP2pStub::OnHid2dSetUpperScene;
+    handleFuncMap[static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_ENABLE)] = &WifiP2pStub::OnEnableP2p;
+    handleFuncMap[static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_DISABLE)] = &WifiP2pStub::OnDisableP2p;
+    handleFuncMap[static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_DISCOVER_DEVICES)] =
+        &WifiP2pStub::OnDiscoverDevices;
+    handleFuncMap[static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_STOP_DISCOVER_DEVICES)] =
+        &WifiP2pStub::OnStopDiscoverDevices;
+    handleFuncMap[static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_DISCOVER_SERVICES)] =
+        &WifiP2pStub::OnDiscoverServices;
+    handleFuncMap[static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_STOP_DISCOVER_SERVICES)] =
+        &WifiP2pStub::OnStopDiscoverServices;
+    handleFuncMap[static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_REQUEST_SERVICES)] =
+        &WifiP2pStub::OnRequestService;
+    handleFuncMap[static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_PUT_LOCAL_SERVICES)] =
+        &WifiP2pStub::OnPutLocalP2pService;
+    handleFuncMap[static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_DELETE_LOCAL_SERVICES)] =
+        &WifiP2pStub::OnDeleteLocalP2pService;
+    handleFuncMap[static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_START_LISTEN)] =
+        &WifiP2pStub::OnStartP2pListen;
+    handleFuncMap[static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_STOP_LISTEN)] =
+        &WifiP2pStub::OnStopP2pListen;
+    handleFuncMap[static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_CREATE_GROUP)] =
+        &WifiP2pStub::OnCreateGroup;
+    handleFuncMap[static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_REMOVE_GROUP)] =
+        &WifiP2pStub::OnRemoveGroup;
+    handleFuncMap[static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_DELETE_GROUP)] =
+        &WifiP2pStub::OnDeleteGroup;
+    handleFuncMap[static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_CONNECT)] = &WifiP2pStub::OnP2pConnect;
+    handleFuncMap[static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_CANCEL_CONNECT)] =
+        &WifiP2pStub::OnP2pCancelConnect;
+    handleFuncMap[static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_QUERY_INFO)] =
+        &WifiP2pStub::OnQueryP2pLinkedInfo;
+    handleFuncMap[static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_GET_CURRENT_GROUP)] =
+        &WifiP2pStub::OnGetCurrentGroup;
+    handleFuncMap[static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_GET_ENABLE_STATUS)] =
+        &WifiP2pStub::OnGetP2pEnableStatus;
+    handleFuncMap[static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_GET_DISCOVER_STATUS)] =
+        &WifiP2pStub::OnGetP2pDiscoverStatus;
+    handleFuncMap[static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_GET_CONNECTED_STATUS)] =
+        &WifiP2pStub::OnGetP2pConnectedStatus;
+    handleFuncMap[static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_QUERY_DEVICES)] =
+        &WifiP2pStub::OnQueryP2pDevices;
+    handleFuncMap[static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_QUERY_GROUPS)] =
+        &WifiP2pStub::OnQueryP2pGroups;
+    handleFuncMap[static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_QUERY_SERVICES)] =
+        &WifiP2pStub::OnQueryP2pServices;
+    InitHandleMapEx();
     return;
 }
 

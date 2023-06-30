@@ -724,10 +724,10 @@ private:
 
     /**
      * @Description save wificonfig for update mode.
-     * 
+     *
      * @param networkId - current connected networkId;
      */
-    void SaveWifiConfigForUpdate(const int &networkId);
+    void SaveWifiConfigForUpdate(int networkId);
 #endif // OHOS_ARCH_LITE
 
 private:

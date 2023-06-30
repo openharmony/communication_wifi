@@ -577,6 +577,7 @@ void ClearTClass<HotspotConfig>(HotspotConfig &item)
     item.SetBand(BandType::BAND_NONE);
     item.SetChannel(0);
     item.SetMaxConn(0);
+    item.SetIpAddress("");
     return;
 }
 
@@ -638,6 +639,8 @@ int SetTClassKeyValue<HotspotConfig>(HotspotConfig &item, const std::string &key
         item.SetChannel(std::stoi(value));
     } else if (key == "maxConn") {
         item.SetMaxConn(std::stoi(value));
+    } else if (key == "ipAddress") {
+        item.SetIpAddress(value);
     } else {
         LOGE("Invalid config key value");
         errorKeyValue++;
@@ -675,6 +678,7 @@ std::string OutTClassString<HotspotConfig>(HotspotConfig &item)
     ss << "    " <<"band=" << static_cast<int>(item.GetBand()) << std::endl;
     ss << "    " <<"channel=" << item.GetChannel() << std::endl;
     ss << "    " <<"maxConn=" << item.GetMaxConn() << std::endl;
+    ss << "    " <<"ipAddress=" << item.GetIpAddress() << std::endl;
     ss << "    " <<"</HotspotConfig>" << std::endl;
     return ss.str();
 }

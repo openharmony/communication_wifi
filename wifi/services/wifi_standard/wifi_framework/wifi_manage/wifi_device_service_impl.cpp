@@ -1402,18 +1402,20 @@ ErrCode WifiDeviceServiceImpl::DisableHotspot()
         WIFI_LOGI("set ap mid state closing failed! may be other app has been operated");
         return WIFI_OPT_CLOSE_SUCC_WHEN_CLOSED;
     }
+    WifiManager::GetInstance().SetStaApExclusionFlag(WifiCloseServiceCode::AP_SERVICE_CLOSE, true);
     IApService *apService = WifiServiceManager::GetInstance().GetApServiceInst(0);
     if (apService == nullptr) {
         WIFI_LOGE("ap service instant 0 is null");
+        WifiManager::GetInstance().SetStaApExclusionFlag(WifiCloseServiceCode::AP_SERVICE_CLOSE, false);
         return WIFI_OPT_AP_NOT_OPENED;
     }
     auto ret = apService->DisableHotspot();
     if (ret != WIFI_OPT_SUCCESS) {
+        WifiManager::GetInstance().SetStaApExclusionFlag(WifiCloseServiceCode::AP_SERVICE_CLOSE, false);
         WIFI_LOGE("apService disable hotspot failed");
         return ret;
     }
-    sleep(1);
-    return WIFI_OPT_SUCCESS;
+    return WifiManager::GetInstance().TimeWaitDisableHotspot();
 }
 #endif
 

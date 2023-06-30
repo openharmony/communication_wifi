@@ -775,6 +775,7 @@ ErrCode WifiHotspotServiceImpl::DisableWifi()
         WIFI_LOGI("set wifi mid state opening failed! may be other activity has been operated");
         return WIFI_OPT_CLOSE_SUCC_WHEN_CLOSED;
     }
+    WifiManager::GetInstance().SetStaApExclusionFlag(WifiCloseServiceCode::STA_SERVICE_CLOSE, true);
     IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst();
     if (pService == nullptr) {
         WifiConfigCenter::GetInstance().SetWifiMidState(WifiOprMidState::CLOSED);
@@ -784,6 +785,8 @@ ErrCode WifiHotspotServiceImpl::DisableWifi()
     ErrCode ret = pService->DisableWifi();
     if (ret != WIFI_OPT_SUCCESS) {
         WifiConfigCenter::GetInstance().SetWifiMidState(WifiOprMidState::CLOSING, WifiOprMidState::RUNNING);
+        WifiManager::GetInstance().SetStaApExclusionFlag(WifiCloseServiceCode::STA_SERVICE_CLOSE, false);
+        return ret;
     } else {
         WifiConfigCenter::GetInstance().SetStaLastRunState(false);
         WifiManager::GetInstance().GetAirplaneModeByDatashare(WIFI_DEVICE_ABILITY_ID);
@@ -795,8 +798,7 @@ ErrCode WifiHotspotServiceImpl::DisableWifi()
                 WIFI_LOGI("EnableWifi, current airplane mode is opened, user close wifi!");
         }
     }
-    sleep(1);
-    return ret;
+    return WifiManager::GetInstance().TimeWaitDisableWifi();
 }
 #endif
 }  // namespace Wifi

@@ -36,52 +36,6 @@ constexpr int MAX_AP_CONN = 32;
 constexpr int MAX_CONFIGS_NUM = 1000;
 
 /**
- * @Description Check valid ssid config
- *
- * @param cfg - HotspotConfig
- * @return ErrCode - WIFI_OPT_SUCCESS or others
- */
-ErrCode CfgCheckSsid(const HotspotConfig &cfg);
-
-/**
- * @Description Check valid psk config
- *
- * @param cfg - HotspotConfig
- * @return ErrCode - WIFI_OPT_SUCCESS or others
- */
-ErrCode CfgCheckPsk(const HotspotConfig &cfg);
-
-/**
- * @Description Check valid band config
- *
- * @param cfg - HotspotConfig
- * @param bandsFromCenter - vector of BandType
- * @return ErrCode - WIFI_OPT_SUCCESS or others
- */
-ErrCode CfgCheckBand(const HotspotConfig &cfg, std::vector<BandType> &bandsFromCenter);
-
-/**
- * @Description Check valid channel config
- *
- * @param cfg - HotspotConfig
- * @param channInfoFromCenter - ChannelsTable object
- * @return ErrCode - WIFI_OPT_SUCCESS or others
- */
-ErrCode CfgCheckChannel(const HotspotConfig &cfg, ChannelsTable &channInfoFromCenter);
-
-/**
- * @Description Check valid hotspot config
- *
- * @param cfg - HotspotConfig
- * @param cfgFromCenter - Get HotspotConfig from config center
- * @param bandsFromCenter - vector of BandType
- * @param channInfoFromCenter - ChannelsTable object
- * @return ErrCode - WIFI_OPT_SUCCESS or others
- */
-ErrCode IsValidHotspotConfig(const HotspotConfig &cfg, const HotspotConfig &cfgFromCenter,
-    std::vector<BandType> &bandsFromCenter, ChannelsTable &channInfoFromCenter);
-
-/**
  * @Description Get a random string
  *
  * @param len - Random string length

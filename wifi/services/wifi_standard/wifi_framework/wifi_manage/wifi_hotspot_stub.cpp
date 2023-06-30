@@ -26,7 +26,7 @@ DEFINE_WIFILOG_HOTSPOT_LABEL("WifiHotspotStub");
 
 namespace OHOS {
 namespace Wifi {
-constexpr std::string DHCP_IP_V4_DEFAULT = "192.168.62.2";
+const std::string DHCP_IP_V4_DEFAULT = "192.168.62.2";
 
 WifiHotspotStub::WifiHotspotStub():mSingleCallback(false)
 {

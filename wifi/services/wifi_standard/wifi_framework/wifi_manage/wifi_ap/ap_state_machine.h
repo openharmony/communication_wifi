@@ -129,11 +129,11 @@ public:
 
     /**
      * @Description  Enable dhcp server.
-     * @param None
+     * @param ipAddress - HotspotConfig dhcp server address
      * @return true - success
      * @return false - fail
      */
-    bool StartDhcpServer();
+    bool StartDhcpServer(const std::string &ipAddress);
 
     /**
      * @Description  Get the Station List object.

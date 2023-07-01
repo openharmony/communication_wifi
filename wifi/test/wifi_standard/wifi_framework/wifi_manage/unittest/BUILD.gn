@@ -65,17 +65,13 @@ ohos_unittest("manager_unittest") {
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/idl_client/idl_interface",
     "$WIFI_ROOT_DIR/services/wifi_standard/ipc_framework/cRPC/include",
     "//commonlibrary/c_utils/base/include",
-    "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
     "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
     "//base/notification/common_event_service/cesfwk/innerkits/include",
     "//base/notification/common_event_service/cesfwk/kits/native/include",
     "//foundation/appexecfwk/adapter/interfaces/innerkits/appexecfwk_base/include",
     "//base/security/access_token/interfaces/innerkits/accesstoken/include",
-    "//foundation/communication/netmanager_base/services/netmanagernative/include/netsys",
     "$WIFI_ROOT_DIR/utils/inc",
     "//foundation/systemabilitymgr/samgr/interfaces/innerkits/samgr_proxy/include",
-    "//foundation/communication/netmanager_base/frameworks/native/netmanagernative",
-    "//foundation/communication/netmanager_base/interfaces/innerkits/netmanagernative/include",
     "$WIFI_ROOT_DIR/services/wifi_standard/include",
   ]
 
@@ -84,7 +80,6 @@ ohos_unittest("manager_unittest") {
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/idl_client:wifi_idl_client",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit:wifi_toolkit",
     "$WIFI_ROOT_DIR/utils:wifi_utils",
-    "//foundation/communication/netmanager_base/services/netmanagernative:netsys_native_manager",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
   ]
@@ -108,6 +103,7 @@ ohos_unittest("manager_unittest") {
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_single",
     "netmanager_base:net_conn_manager_if",
+    "netmanager_base:net_native_manager_if",
   ]
 
   defines = []

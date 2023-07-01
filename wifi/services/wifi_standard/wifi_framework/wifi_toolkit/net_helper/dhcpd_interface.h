@@ -52,10 +52,12 @@ public:
      * @param ifaceName - Network Interface
      * @param ipv4 - The ipv4 address of interface
      * @param ipv6 - The ipv6 address of interface
+     * @param ipAddress - The dhcp server address
      * @param isIpV4 - Is an ipv4 network
      * @return true: success   false: fail
      */
-    bool StartDhcpServer(const std::string &ifaceName, Ipv4Address &ipv4, Ipv6Address &ipv6, bool isIpV4 = true);
+    bool StartDhcpServer(const std::string &ifaceName, Ipv4Address &ipv4, Ipv6Address &ipv6,
+        const std::string &ipAddress = "", bool isIpV4 = true);
 
     /**
      * @Description Stop the DHCP server.
@@ -88,10 +90,11 @@ private:
     bool SetDhcpIpRange(const std::string &ifaceName);
     bool CompareSubNet(
         const std::vector<Ipv4Address> &vecIpAddr, const struct in_addr &input, const struct in_addr &mask) const;
-    Ipv4Address AssignIpAddrV4(const std::vector<Ipv4Address> &vecIpAddr, const std::string &mask) const;
+    Ipv4Address AssignIpAddrV4(const std::vector<Ipv4Address> &vecIpAddr, const std::string &mask,
+        const std::string &ipAddress) const;
     Ipv6Address AssignIpAddrV6(const std::vector<Ipv6Address> &vecIpAddr);
     bool AssignIpAddr(Ipv4Address &ipv4, Ipv6Address &ipv6, const std::vector<Ipv4Address> &vecIpv4Addr,
-        const std::vector<Ipv6Address> &vecIpv6Addr, bool isIpV4);
+        const std::vector<Ipv6Address> &vecIpv6Addr, const std::string &ipAddress, bool isIpV4);
     bool ApplyIpAddress(const std::string &ifaceName, const Ipv4Address &ipv4, const Ipv6Address &ipv6);
 
 private:

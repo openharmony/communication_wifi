@@ -348,7 +348,7 @@ public:
     static Phase2Method Phase2MethodFromStr(const std::string& str);
 };
 
-enum class ConfigureProxyMethod { AUTOCONFIGUE, MANUALCONFIGUE, CLOSED };
+enum class ConfigureProxyMethod { CLOSED, AUTOCONFIGUE, MANUALCONFIGUE };
 
 class AutoProxyConfig {
 public:

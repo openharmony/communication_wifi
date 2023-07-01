@@ -74,6 +74,7 @@ ohos_shared_library("wifi_ap_service") {
 
   external_deps = [
     "c_utils:utils",
+    "dhcp:dhcp_manager_service",
     "hiviewdfx_hilog_native:libhilog",
   ]
 

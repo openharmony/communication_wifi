@@ -111,7 +111,6 @@ static bool GetHotspotconfigFromJs(const napi_env& env, const napi_value& object
     std::string str = "";
     int value = 0;
     JsObjectToString(env, object, "ssid", NAPI_MAX_STR_LENT, str); // 33: ssid max length is 32 + '\0'
-    ClearJsLastException(env);
     config.SetSsid(str);
     str = "";
     JsObjectToInt(env, object, "securityType", value);
@@ -132,7 +131,6 @@ static bool GetHotspotconfigFromJs(const napi_env& env, const napi_value& object
     if (!JsObjectToString(env, object, "preSharedKey", NAPI_MAX_STR_LENT, str)) { // 64: max length
         return false;
     }
-    ClearJsLastException(env);
     config.SetPreSharedKey(str);
     JsObjectToInt(env, object, "maxConn", value);
     ClearJsLastException(env);
@@ -144,6 +142,9 @@ static bool GetHotspotconfigFromJs(const napi_env& env, const napi_value& object
         value = (int)AP_CHANNEL_DEFAULT;
     }
     config.SetChannel(value);
+    str = "";
+    JsObjectToString(env, object, "ipAddress", NAPI_MAX_IPV4_LEN, str); // 16: ipv4 max length is 15 + '\0'
+    config.SetIpAddress(str);
     return true;
 }
 
@@ -202,6 +203,7 @@ static void HotspotconfigToJs(const napi_env& env, HotspotConfig& cppConfig, nap
     SetValueUtf8String(env, "preSharedKey", cppConfig.GetPreSharedKey().c_str(), result);
     SetValueInt32(env, "maxConn", cppConfig.GetMaxConn(), result);
     SetValueInt32(env, "channel", cppConfig.GetChannel(), result);
+    SetValueUtf8String(env, "ipAddress", cppConfig.GetIpAddress(), result);
 }
 
 NO_SANITIZE("cfi") napi_value GetHotspotConfig(napi_env env, napi_callback_info info)

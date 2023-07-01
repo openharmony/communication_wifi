@@ -65,11 +65,10 @@ public:
     /**
      * Update link information
      *
-     * @param supplierId network unique identity id returned after network registration
-     * @param netLinkInfo network link data information
+     * @param wifiIpInfo wifi network link data information
+     * @param wifiProxyConfig wifi network link proxy information
      */
-    void UpdateNetLinkInfo(const std::string &ip, const std::string &mask, const std::string &gateWay,
-        const std::string &strDns, const std::string &strBakDns);
+    void UpdateNetLinkInfo(IpInfo &wifiIpInfo, WifiProxyConfig &wifiProxyConfig);
 
     /**
      * Add route
@@ -83,10 +82,10 @@ public:
     /**
      * Add OnStaMachineUpdateNetLinkInfo
      *
-     * @param DhcpResult dhcp result info
+     * @param wifiIpInfo wifi network link data information
+     * @param wifiProxyConfig wifi network link proxy information
      */
-    void OnStaMachineUpdateNetLinkInfo(const std::string &strIp, const std::string &strMask,
-        const std::string &strGateWay, const std::string &strDns, const std::string &strBakDns);
+    void OnStaMachineUpdateNetLinkInfo(IpInfo &wifiIpInfo, WifiProxyConfig &wifiProxyConfig);
 
     /**
      * Add OnStaMachineUpdateNetSupplierInfo
@@ -141,6 +140,9 @@ public:
     private:
         void LogNetCaps(const std::string &ident, const std::set<NetManagerStandard::NetCap> &netCaps) const;
     };
+private:
+    void CreateNetLinkInfo(sptr<NetManagerStandard::NetLinkInfo> &netLinkInfo, IpInfo &wifiIpInfo,
+        WifiProxyConfig &wifiProxyConfig);
 
 private:
     uint32_t supplierId;

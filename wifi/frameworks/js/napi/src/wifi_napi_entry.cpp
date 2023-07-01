@@ -214,6 +214,17 @@ static napi_value WifiBandTypeInit(napi_env env)
     SetNamedPropertyByInteger(env, bandType, static_cast<int>(WifiBandTypeJS::BAND_60GHZ), "WIFI_BAND_60G");
     return bandType;
 }
+
+static napi_value ProxyMethodInit(napi_env env)
+{
+    napi_value proxyMethod = nullptr;
+    napi_create_object(env, &proxyMethod);
+    SetNamedPropertyByInteger(env, proxyMethod, static_cast<int>(ConfigureProxyMethod::CLOSED), "METHOD_NONE");
+    SetNamedPropertyByInteger(env, proxyMethod, static_cast<int>(ConfigureProxyMethod::AUTOCONFIGUE), "METHOD_AUTO");
+    SetNamedPropertyByInteger(env, proxyMethod,
+        static_cast<int>(ConfigureProxyMethod::MANUALCONFIGUE), "METHOD_MANUAL");
+    return proxyMethod;
+}
 #endif
 
 static napi_value PropertyValueInit(napi_env env, napi_value exports)
@@ -232,6 +243,7 @@ static napi_value PropertyValueInit(napi_env env, napi_value exports)
     napi_value EapMethodObj = EapMethodInit(env);
     napi_value WifiStandardObj = WifiStandardInit(env);
     napi_value bandTypeObj = WifiBandTypeInit(env);
+    napi_value proxyMethodObj = ProxyMethodInit(env);
 #endif
     napi_property_descriptor exportFuncs[] = {
 #ifdef ENABLE_NAPI_WIFI_MANAGER
@@ -240,6 +252,7 @@ static napi_value PropertyValueInit(napi_env env, napi_value exports)
         DECLARE_NAPI_PROPERTY("EapMethod", EapMethodObj),
         DECLARE_NAPI_PROPERTY("WifiStandard", WifiStandardObj),
         DECLARE_NAPI_PROPERTY("WifiBandType", bandTypeObj),
+        DECLARE_NAPI_PROPERTY("ProxyMethod", proxyMethodObj),
 #endif
         DECLARE_NAPI_PROPERTY("SuppState", suppStateObj),
         DECLARE_NAPI_PROPERTY("WifiSecurityType", securityTypeObj),

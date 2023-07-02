@@ -2401,30 +2401,11 @@ void StaStateMachine::ReUpdateNetLinkInfo(void)
 void StaStateMachine::SaveWifiConfigForUpdate(int networkId)
 {
     WIFI_LOGI("Enter SaveWifiConfigForUpdate.");
-    constexpr const char *wifiConfigUpdate = "libwifi_config_update.z.so";
-    constexpr const char *saveWifiConfig = "SaveWifiConfiguration";
-    auto wifiUpdateLib = dlopen(wifiConfigUpdate, RTLD_LAZY);
-    if (wifiUpdateLib == nullptr) {
-        WIFI_LOGE("dlopen fail: %{public}s.", wifiConfigUpdate);
-        return;
-    }
     WifiDeviceConfig config;
     if (WifiSettings::GetInstance().GetDeviceConfig(networkId, config) == -1) {
         WIFI_LOGE("SaveWifiConfigForUpdate, get current config failed.");
-        dlclose(wifiUpdateLib);
-        wifiUpdateLib = nullptr;
         return;
     }
-    auto saveFunc = (void(*)(const char*, const char*, const char*))dlsym(wifiUpdateLib, saveWifiConfig);
-    if (saveFunc == nullptr) {
-        WIFI_LOGE("SaveWifiConfigForUpdate, saveFunc is nullptr.");
-        dlclose(wifiUpdateLib);
-        wifiUpdateLib = nullptr;
-        return;
-    }
-    saveFunc(config.ssid.c_str(), config.keyMgmt.c_str(), config.preSharedKey.c_str());
-    dlclose(wifiUpdateLib);
-    wifiUpdateLib = nullptr;
 }
 
 StaStateMachine::SystemAbilityStatusChangeListener::SystemAbilityStatusChangeListener(StaStateMachine &stateMachine)

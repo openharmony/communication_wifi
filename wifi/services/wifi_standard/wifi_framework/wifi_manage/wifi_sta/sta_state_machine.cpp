@@ -2401,12 +2401,12 @@ void StaStateMachine::ReUpdateNetLinkInfo(void)
 void StaStateMachine::SaveWifiConfigForUpdate(int networkId)
 {
     WIFI_LOGI("Enter SaveWifiConfigForUpdate.");
-    constexpr const char *WIFI_UPDATE_LIB = "libwifi_config_update.z.so";
-    constexpr const char *SAVE_WIFI_CONFIG_FOR_UPDATE = "SaveWifiConfiguration";
-    auto wifiUpdateLib = dlopen(WIFI_UPDATE_LIB, RTLD_LAZY);
+    constexpr const char *wifiConfigUpdate = "libwifi_config_update.z.so";
+    constexpr const char *saveWifiConfig = "SaveWifiConfiguration";
+    auto wifiUpdateLib = dlopen(wifiConfigUpdate, RTLD_LAZY);
     if (wifiUpdateLib == nullptr) {
-        WIFI_LOGE("dlopen fail: %{public}s.", WIFI_UPDATE_LIB);
-        return; 
+        WIFI_LOGE("dlopen fail: %{public}s.", wifiConfigUpdate);
+        return;
     }
     WifiDeviceConfig config;
     if (WifiSettings::GetInstance().GetDeviceConfig(networkId, config) == -1) {
@@ -2415,8 +2415,7 @@ void StaStateMachine::SaveWifiConfigForUpdate(int networkId)
         wifiUpdateLib = nullptr;
         return;
     }
-    auto saveFunc = (void(*)(const char*, const char*, const char*))dlsym(
-        wifiUpdateLib, SAVE_WIFI_CONFIG_FOR_UPDATE);
+    auto saveFunc = (void(*)(const char*, const char*, const char*))dlsym(wifiUpdateLib, saveWifiConfig);
     if (saveFunc == nullptr) {
         WIFI_LOGE("SaveWifiConfigForUpdate, saveFunc is nullptr.");
         dlclose(wifiUpdateLib);

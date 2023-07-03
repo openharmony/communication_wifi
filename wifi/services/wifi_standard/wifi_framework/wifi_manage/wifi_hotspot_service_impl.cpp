@@ -19,7 +19,6 @@
 #include "wifi_permission_utils.h"
 #include "wifi_global_func.h"
 #include "wifi_auth_center.h"
-#include "wifi_config_center.h"
 #include "wifi_manager.h"
 #include "wifi_service_manager.h"
 #include "wifi_internal_event_dispatcher.h"
@@ -814,5 +813,118 @@ ErrCode WifiHotspotServiceImpl::DisableWifi()
     }
 }
 #endif
+ErrCode WifiHotspotServiceImpl::CfgCheckSsid(const HotspotConfig &cfg)
+{
+    if (cfg.GetSsid().length() < MIN_SSID_LEN || cfg.GetSsid().length() > MAX_SSID_LEN) {
+        LOGE("Config ssid length is invalid!");
+        return ErrCode::WIFI_OPT_INVALID_PARAM;
+    }
+    return ErrCode::WIFI_OPT_SUCCESS;
+}
+
+ErrCode WifiHotspotServiceImpl::CfgCheckPsk(const HotspotConfig &cfg)
+{
+    size_t len = cfg.GetPreSharedKey().length();
+    if (len < MIN_PSK_LEN || len > MAX_PSK_LEN) {
+        LOGE("PreSharedKey length error! invalid len: %{public}zu", len);
+        return ErrCode::WIFI_OPT_INVALID_PARAM;
+    }
+    return ErrCode::WIFI_OPT_SUCCESS;
+}
+
+ErrCode WifiHotspotServiceImpl::CfgCheckBand(const HotspotConfig &cfg, std::vector<BandType> &bandsFromCenter)
+{
+    for (auto it = bandsFromCenter.begin(); it != bandsFromCenter.end(); ++it) {
+        if (cfg.GetBand() == *it) {
+            return ErrCode::WIFI_OPT_SUCCESS;
+        }
+    }
+    LOGE("Hotspot config band is invalid!");
+    return ErrCode::WIFI_OPT_INVALID_PARAM;
+}
+
+ErrCode WifiHotspotServiceImpl::CfgCheckChannel(const HotspotConfig &cfg, ChannelsTable &channInfoFromCenter)
+{
+    std::vector<int32_t> channels = channInfoFromCenter[static_cast<BandType>(cfg.GetBand())];
+    auto it = find(channels.begin(), channels.end(), cfg.GetChannel());
+    return ((it == channels.end()) ? ErrCode::WIFI_OPT_INVALID_PARAM : ErrCode::WIFI_OPT_SUCCESS);
+}
+
+static bool isNumber(std::string &str)
+{
+    return !str.empty() && (str.find_first_not_of("0123456789") == std::string::npos);
+}
+
+ErrCode WifiHotspotServiceImpl::CfgCheckIpAddress(const std::string &ipAddress)
+{
+    if (ipAddress.empty()) {
+        WIFI_LOGI("CfgCheckIpAddress ipAddress is empty.");
+        return ErrCode::WIFI_OPT_SUCCESS;
+    }
+    std::vector<std::string> list{};
+    SplitString(ipAddress, ".", list);
+
+    if (list.size() != MAX_IPV4_SPLIT_LEN) {
+        WIFI_LOGE("CfgCheckIpAddress split size invalid.");
+        return ErrCode::WIFI_OPT_INVALID_PARAM;
+    }
+
+    for (auto str : list) {
+        if (!isNumber(str) || stoi(str) > MAX_IPV4_VALUE || stoi(str) < 0) {
+            WIFI_LOGE("CfgCheckIpAddress stoi failed.");
+            return ErrCode::WIFI_OPT_INVALID_PARAM;
+        }
+    }
+
+    std::vector ips = {"0.0.0.0", "255.255.255.255", "127.0.0.0"};
+    if (std::find(ips.begin(), ips.end(), ipAddress) != ips.end()) {
+        WIFI_LOGE("CfgCheckIpAddress unused ip range.");
+        return ErrCode::WIFI_OPT_INVALID_PARAM;
+    }
+
+    return ErrCode::WIFI_OPT_SUCCESS;
+}
+
+ErrCode WifiHotspotServiceImpl::IsValidHotspotConfig(const HotspotConfig &cfg, const HotspotConfig &cfgFromCenter,
+    std::vector<BandType> &bandsFromCenter, ChannelsTable &channInfoFromCenter)
+{
+    if (CfgCheckIpAddress(cfg.GetIpAddress()) == ErrCode::WIFI_OPT_INVALID_PARAM) {
+        return ErrCode::WIFI_OPT_INVALID_PARAM;
+    }
+
+    if (CfgCheckSsid(cfg) == ErrCode::WIFI_OPT_INVALID_PARAM) {
+        return ErrCode::WIFI_OPT_INVALID_PARAM;
+    }
+
+    if (cfg.GetSecurityType() == KeyMgmt::NONE) {
+        if (cfg.GetPreSharedKey().length() > 0) {
+            LOGE("Open hotspot PreSharedKey length is non-zero error!");
+            return ErrCode::WIFI_OPT_INVALID_PARAM;
+        }
+    } else if (cfg.GetSecurityType() == KeyMgmt::WPA_PSK || cfg.GetSecurityType() == KeyMgmt::WPA2_PSK) {
+        if (CfgCheckPsk(cfg) == ErrCode::WIFI_OPT_INVALID_PARAM) {
+            return ErrCode::WIFI_OPT_INVALID_PARAM;
+        }
+    } else {
+        LOGE("Hotspot securityType is not supported!");
+        return ErrCode::WIFI_OPT_INVALID_PARAM;
+    }
+
+    if (cfg.GetBand() != cfgFromCenter.GetBand()) {
+        if (CfgCheckBand(cfg, bandsFromCenter) == ErrCode::WIFI_OPT_INVALID_PARAM) {
+            return ErrCode::WIFI_OPT_INVALID_PARAM;
+        }
+    }
+
+    LOGD("Config channel is: %{public}d", cfg.GetChannel());
+    if (cfg.GetChannel() != cfgFromCenter.GetChannel()) {
+        if (CfgCheckChannel(cfg, channInfoFromCenter) == ErrCode::WIFI_OPT_INVALID_PARAM) {
+            LOGE("Config channel is invalid!");
+            return ErrCode::WIFI_OPT_INVALID_PARAM;
+        }
+    }
+
+    return ErrCode::WIFI_OPT_SUCCESS;
+}
 }  // namespace Wifi
 }  // namespace OHOS

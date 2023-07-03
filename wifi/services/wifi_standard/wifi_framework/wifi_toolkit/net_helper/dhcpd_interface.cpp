@@ -59,7 +59,8 @@ bool DhcpdInterface::SetDhcpEventFunc(const std::string &ifaceName, IDhcpResultN
     return (mDhcpService->GetDhcpSerProExit(ifaceName, pResultNotify) == DHCP_OPT_SUCCESS);
 }
 
-bool DhcpdInterface::StartDhcpServer(const std::string &ifaceName, Ipv4Address &ipv4, Ipv6Address &ipv6, bool isIpV4)
+bool DhcpdInterface::StartDhcpServer(const std::string &ifaceName, Ipv4Address &ipv4, Ipv6Address &ipv6,
+    const std::string &ipAddress, bool isIpV4)
 {
     if (mDhcpService == nullptr) {
         mDhcpService = DhcpServiceApi::GetInstance();
@@ -75,7 +76,7 @@ bool DhcpdInterface::StartDhcpServer(const std::string &ifaceName, Ipv4Address &
     }
 
     // set ap interface to bind an ip address
-    if (!AssignIpAddr(mBindIpv4, mBindIpv6, vecIpv4Addr, vecIpv6Addr, isIpV4)) {
+    if (!AssignIpAddr(mBindIpv4, mBindIpv6, vecIpv4Addr, vecIpv6Addr, ipAddress, isIpV4)) {
         WIFI_LOGE("Assign ip address for interface failed!");
         return false;
     }
@@ -233,10 +234,10 @@ bool DhcpdInterface::ApplyIpAddress(const std::string &ifaceName, const Ipv4Addr
 }
 
 bool DhcpdInterface::AssignIpAddr(Ipv4Address &ipv4, Ipv6Address &ipv6, const std::vector<Ipv4Address> &vecIpv4Addr,
-    const std::vector<Ipv6Address> &vecIpv6Addr, bool isIpV4)
+    const std::vector<Ipv6Address> &vecIpv6Addr, const std::string &ipAddress, bool isIpV4)
 {
     if (isIpV4) {
-        ipv4 = AssignIpAddrV4(vecIpv4Addr, IP_V4_MASK);
+        ipv4 = AssignIpAddrV4(vecIpv4Addr, IP_V4_MASK, ipAddress);
         if (ipv4 == Ipv4Address::INVALID_INET_ADDRESS) {
             WIFI_LOGE("Failed to allocate the IP address.");
             return false;
@@ -280,7 +281,8 @@ bool DhcpdInterface::CompareSubNet(
     return false;
 }
 
-Ipv4Address DhcpdInterface::AssignIpAddrV4(const std::vector<Ipv4Address> &vecIpAddr, const std::string &mask) const
+Ipv4Address DhcpdInterface::AssignIpAddrV4(const std::vector<Ipv4Address> &vecIpAddr, const std::string &mask,
+    const std::string &ipAddress) const
 {
     struct in_addr maskAddr = {INADDR_ANY};
     if (inet_aton(mask.c_str(), &maskAddr) == 0) {
@@ -288,8 +290,9 @@ Ipv4Address DhcpdInterface::AssignIpAddrV4(const std::vector<Ipv4Address> &vecIp
         return Ipv4Address::INVALID_INET_ADDRESS;
     }
     struct in_addr initAddr = {INADDR_ANY};
-    if (inet_aton(IP_V4_DEFAULT.c_str(), &initAddr) == 0) {
-        WIFI_LOGE("convert default ipaddress failed![%s].", IP_V4_DEFAULT.c_str());
+    std::string destIpAddress = ipAddress.empty() ? IP_V4_DEFAULT: ipAddress;
+    if (inet_aton(destIpAddress.c_str(), &initAddr) == 0) {
+        WIFI_LOGE("convert default ipaddress failed![%s].", destIpAddress.c_str());
         return Ipv4Address::INVALID_INET_ADDRESS;
     }
     struct in_addr tmpAddr = {INADDR_ANY};

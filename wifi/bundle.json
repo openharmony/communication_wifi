@@ -1,10 +1,10 @@
 {
-    "name": "@ohos/wifi",
+    "name": "connectivity_wifi",
     "version": "3.1.0",
     "description": "The WLAN module provides basic WLAN functions, peer-to-peer (P2P) connection, and WLAN notification, enabling your application to communicate with other devices through a WLAN.",
     "homePage": "https://gitee.com/openharmony",
     "license": "Apache License 2.0",
-    "repository": "https://gitee.com/openharmony/connectivity_wifi",
+    "repository": "https://gitee.com/openharmony/communication_wifi",
     "domain": "os",
     "language": "",
     "publishAs": "code-segment",

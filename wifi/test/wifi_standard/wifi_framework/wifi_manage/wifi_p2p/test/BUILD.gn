@@ -141,7 +141,7 @@ ohos_unittest("wifi_p2p_test") {
   external_deps = [
     "c_utils:utils",
     "dhcp:dhcp_manager_service",
-    "hiviewdfx_hilog_native:libhilog",
+    "hilog:libhilog",
     "ipc:ipc_single",
     "netmanager_base:net_conn_manager_if",
   ]

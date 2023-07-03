@@ -100,7 +100,7 @@ ohos_unittest("manager_unittest") {
     "data_share:datashare_common",
     "data_share:datashare_consumer",
     "eventhandler:libeventhandler",
-    "hiviewdfx_hilog_native:libhilog",
+    "hilog:libhilog",
     "ipc:ipc_single",
     "netmanager_base:net_conn_manager_if",
     "netmanager_base:net_native_manager_if",

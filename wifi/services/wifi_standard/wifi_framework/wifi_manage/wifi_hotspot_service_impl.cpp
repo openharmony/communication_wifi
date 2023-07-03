@@ -429,6 +429,18 @@ ErrCode WifiHotspotServiceImpl::DisableHotspot(const ServiceType type)
     if (ret != WIFI_OPT_SUCCESS) {
         WifiConfigCenter::GetInstance().SetApMidState(WifiOprMidState::CLOSING, WifiOprMidState::RUNNING, m_id);
     }
+#ifdef WIFI_FEATURE_STA_AP_EXCLUSION
+    // resume wifi if closed by exclusion scene.
+    sleep(1);
+    if (WifiConfigCenter::GetInstance().GetStaLastRunState()) {
+        IStaService *pStaService = WifiServiceManager::GetInstance().GetStaServiceInst();
+        if (pStaService == nullptr) {
+            WIFI_LOGE("get sta service inst failed");
+            return;
+        }
+        pStaService->EnableWifi();
+    }
+#endif
     return ret;
 }
 
@@ -778,6 +790,7 @@ ErrCode WifiHotspotServiceImpl::DisableWifi()
     WifiManager::GetInstance().SetStaApExclusionFlag(WifiCloseServiceCode::STA_SERVICE_CLOSE, true);
     IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst();
     if (pService == nullptr) {
+        WifiManager::GetInstance().SetStaApExclusionFlag(WifiCloseServiceCode::STA_SERVICE_CLOSE, false);
         WifiConfigCenter::GetInstance().SetWifiMidState(WifiOprMidState::CLOSED);
         WifiServiceManager::GetInstance().UnloadService(WIFI_SERVICE_STA);
         return WIFI_OPT_SUCCESS;
@@ -788,7 +801,7 @@ ErrCode WifiHotspotServiceImpl::DisableWifi()
         WifiManager::GetInstance().SetStaApExclusionFlag(WifiCloseServiceCode::STA_SERVICE_CLOSE, false);
         return ret;
     } else {
-        WifiConfigCenter::GetInstance().SetStaLastRunState(false);
+        //WifiConfigCenter::GetInstance().SetStaLastRunState(false);
         WifiManager::GetInstance().GetAirplaneModeByDatashare(WIFI_DEVICE_ABILITY_ID);
         if (WifiConfigCenter::GetInstance().GetOperatorWifiType() ==
             static_cast<int>(OperatorWifiType::USER_OPEN_WIFI_IN_AIRPLANEMODE) &&
@@ -797,8 +810,8 @@ ErrCode WifiHotspotServiceImpl::DisableWifi()
                     static_cast<int>(OperatorWifiType::USER_CLOSE_WIFI_IN_AIRPLANEMODE));
                 WIFI_LOGI("EnableWifi, current airplane mode is opened, user close wifi!");
         }
+        return WifiManager::GetInstance().TimeWaitDisableWifi();
     }
-    return WifiManager::GetInstance().TimeWaitDisableWifi();
 }
 #endif
 }  // namespace Wifi

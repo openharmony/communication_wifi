@@ -238,6 +238,22 @@ public:
      */
     virtual void SetEnhanceService(IEnhanceService* enhanceService);
     /**
+     * @Description  StartWpa
+     *
+     * @Output: Return operating results to Interface Service after start wpa
+               successfully.
+     * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
+     */
+    virtual ErrCode StartWpa();
+    /**
+     * @Description  CloseWpa
+     *
+     * @Output: Return operating results to Interface Service after close wpa
+               successfully.
+     * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
+     */
+    virtual ErrCode CloseWpa();
+    /**
      * @Description  OpenScanOnly
      *
      * @Output: Return operating results to Interface Service after enable wifi scan only

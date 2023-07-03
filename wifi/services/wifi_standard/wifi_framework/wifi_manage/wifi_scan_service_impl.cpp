@@ -152,16 +152,6 @@ ErrCode WifiScanServiceImpl::Scan()
         }
     }
 
-    if (WifiConfigCenter::GetInstance().GetWifiMidState() != WifiOprMidState::RUNNING) {
-        if ((!WifiSettings::GetInstance().CheckScanOnlyAvailable()) && (WifiConfigCenter::GetInstance().GetWifiScanOnlyMidState() == WifiOprMidState::RUNNING)) {
-            CloseScanOnlyAvailable();
-            return WIFI_OPT_SCAN_NOT_OPENED;
-        }
-        if ((WifiSettings::GetInstance().CheckScanOnlyAvailable()) && (WifiConfigCenter::GetInstance().GetWifiScanOnlyMidState() != WifiOprMidState::RUNNING)) {
-            OpenScanOnlyAvailable();
-        }
-    }
-    
     if (!IsScanServiceRunning()) {
         return WIFI_OPT_SCAN_NOT_OPENED;
     }
@@ -241,13 +231,13 @@ ErrCode WifiScanServiceImpl::GetScanInfoList(std::vector<WifiScanInfo> &result)
 
 ErrCode WifiScanServiceImpl::SetScanOnlyAvailable(bool bScanOnlyAvailable)
 {
-    WIFI_LOGI("current WifiScanServiceImpl::SetScanOnlyAvailable");
+    WIFI_LOGI("WifiScanServiceImpl::SetScanOnlyAvailable");
     if (!WifiAuthCenter::IsSystemAppByToken()) {
-        WIFI_LOGE("EnableWifi:NOT System APP, PERMISSION_DENIED!");
+        WIFI_LOGE("SetScanOnlyAvailable:NOT System APP, PERMISSION_DENIED!");
         return WIFI_OPT_NON_SYSTEMAPP;
     }
-    if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
-        WIFI_LOGE("SetScanOnlyAvailable:VerifyGetWifiInfoPermission() PERMISSION_DENIED!");
+    if (WifiPermissionUtils::VerifySetWifiInfoPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("SetScanOnlyAvailable:VerifySetWifiInfoPermission() PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
     WifiSettings::GetInstance().SetScanOnlySwitchState(bScanOnlyAvailable);
@@ -275,8 +265,7 @@ ErrCode WifiScanServiceImpl::GetScanOnlyAvailable(bool &bScanOnlyAvailable)
 ErrCode WifiScanServiceImpl::OpenScanOnlyAvailable()
 {
     WIFI_LOGI("WifiScanServiceImpl OpenScanOnlyAvailable");
-    bool bCheckScanOnlyAvailable = WifiSettings::GetInstance().CheckScanOnlyAvailable();
-    if (!bCheckScanOnlyAvailable) {
+    if (!WifiSettings::GetInstance().CheckScanOnlyAvailable() || !WifiManager::GetInstance().GetLocationModeByDatashare(WIFI_SCAN_ABILITY_ID)) {
         return WIFI_OPT_FAILED;
     }
    
@@ -296,7 +285,7 @@ ErrCode WifiScanServiceImpl::OpenScanOnlyAvailable()
     }
     
     WifiConfigCenter::GetInstance().SetWifiScanOnlyMidState( WifiOprMidState::OPENING);
-    CheckAndStartScanService();
+    WifiManager::GetInstance().CheckAndStartScanService();
     int res = WifiStaHalInterface::GetInstance().StartWifi();
     if (res != static_cast<int>(WIFI_IDL_OPT_OK)) {
         WIFI_LOGE("Start Wpa failed");
@@ -340,13 +329,10 @@ ErrCode WifiScanServiceImpl::CloseScanOnlyAvailable()
         return WIFI_OPT_FAILED;
     }
     
-    do {
-        int res = WifiStaHalInterface::GetInstance().StopWifi();
-        if (res != static_cast<int>(WIFI_IDL_OPT_OK)) {
-            WIFI_LOGE("Stop Wpa failed");
-            break;
-        }
-    } while (false);
+    int res = WifiStaHalInterface::GetInstance().StopWifi();
+    if (res != static_cast<int>(WIFI_IDL_OPT_OK)) {
+        WIFI_LOGE("Stop Wpa failed");
+    }
     
     IScanService *pService = WifiServiceManager::GetInstance().GetScanServiceInst();
     if (pService == nullptr) {
@@ -364,50 +350,6 @@ ErrCode WifiScanServiceImpl::CloseScanOnlyAvailable()
     }
 
     return WIFI_OPT_SUCCESS;
-}
-
-void WifiScanServiceImpl::CheckAndStartScanService(void)
-{
-    WifiOprMidState scanState = WifiConfigCenter::GetInstance().GetScanMidState();
-    WIFI_LOGI("CheckAndStartScanService scanState: %{public}d", static_cast<int>(scanState));
-    if (scanState != WifiOprMidState::CLOSED) {
-        IScanService *pService = WifiServiceManager::GetInstance().GetScanServiceInst();
-        if (pService != nullptr) {
-            pService->OnClientModeStatusChanged(static_cast<int>(OperateResState::DISCONNECT_DISCONNECTED));
-        }
-        return;
-    }
-    if (!WifiConfigCenter::GetInstance().SetScanMidState(scanState, WifiOprMidState::OPENING)) {
-        WIFI_LOGW("Failed to set scan mid state opening!");
-        return;
-    }
-    ErrCode errCode = WIFI_OPT_FAILED;
-    do {
-        if (WifiServiceManager::GetInstance().CheckAndEnforceService(WIFI_SERVICE_SCAN) < 0) {
-            WIFI_LOGE("Load %{public}s service failed!", WIFI_SERVICE_SCAN);
-            break;
-        }
-        IScanService *pService = WifiServiceManager::GetInstance().GetScanServiceInst();
-        if (pService == nullptr) {
-            WIFI_LOGE("Create %{public}s service failed!", WIFI_SERVICE_SCAN);
-            break;
-        }
-        errCode = pService->RegisterScanCallbacks(WifiManager::GetInstance().GetScanCallback());
-        if (errCode != WIFI_OPT_SUCCESS) {
-            WIFI_LOGE("Register scan service callback failed!");
-            break;
-        }
-        errCode = pService->Init();
-        if (errCode != WIFI_OPT_SUCCESS) {
-            WIFI_LOGE("init scan service failed, ret %{public}d!", static_cast<int>(errCode));
-            break;
-        }
-    } while (0);
-    if (errCode != WIFI_OPT_SUCCESS) {
-        WifiConfigCenter::GetInstance().SetScanMidState(WifiOprMidState::OPENING, WifiOprMidState::CLOSED);
-        WifiServiceManager::GetInstance().UnloadService(WIFI_SERVICE_SCAN);
-    }
-    return;
 }
 
 #ifdef OHOS_ARCH_LITE

@@ -2309,6 +2309,26 @@ bool ScanService::IsPackageInTrustList(const std::string &trustList, int sceneId
     return bFind;
 }
 
+ErrCode ScanService::StartWpa()
+{
+    WIFI_LOGI("Enter ScanService::StartWpa.\n");
+    int res = WifiStaHalInterface::GetInstance().StartWifi();
+    if (res != static_cast<int>(WIFI_IDL_OPT_OK)) {
+        return WIFI_OPT_FAILED;
+    }
+    return WIFI_OPT_SUCCESS;
+}
+
+ErrCode ScanService::CloseWpa()
+{
+    WIFI_LOGI("Enter ScanService::CloseWpa.\n");
+    int res = WifiStaHalInterface::GetInstance().StopWifi();
+    if (res != static_cast<int>(WIFI_IDL_OPT_OK)) {
+        return WIFI_OPT_FAILED;
+    }
+    return WIFI_OPT_SUCCESS;
+}
+
 ErrCode ScanService::OpenScanOnly() const
 {
     WIFI_LOGI("Enter ScanService::OpenScanOnly.\n");

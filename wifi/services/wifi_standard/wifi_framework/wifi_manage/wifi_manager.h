@@ -194,6 +194,8 @@ public:
     void GetAirplaneModeByDatashare(int systemAbilityId);
     void DealOpenAirplaneModeEvent();
     void DealCloseAirplaneModeEvent();
+    bool GetLocationModeByDatashare(int systemAbilityId);
+    static void CheckAndStartScanService(void);
 
 private:
     void PushServiceCloseMsg(WifiCloseServiceCode code);
@@ -224,7 +226,6 @@ private:
     static void DealWpsChanged(WpsStartState state, const int pinCode);
     static void DealStreamChanged(StreamDirection direction);
     static void DealRssiChanged(int rssi);
-    static void CheckAndStartScanService(void);
     static void CheckAndStopScanService(void);
     static void DealScanOpenRes(void);
     static void DealScanCloseRes(void);
@@ -251,6 +252,8 @@ private:
 #endif
     static void AutoStartStaService(void);
     static void AutoStopStaService(void);
+    static void AutoStartScanOnly(void);
+    static void AutoStopScanOnly(void);
     static void ForceStopWifi(void);
 #ifdef FEATURE_AP_SUPPORT
     static void AutoStopApService(void);
@@ -308,7 +311,6 @@ private:
     InitStatus mInitStatus;
     long mSupportedFeatures;
     static int mCloseApIndex;
-    static bool bOpenScanOnlyOnStart;
 };
 } // namespace Wifi
 } // namespace OHOS

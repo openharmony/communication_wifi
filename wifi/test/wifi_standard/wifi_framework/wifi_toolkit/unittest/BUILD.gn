@@ -84,7 +84,7 @@ ohos_unittest("toolkit_unittest") {
   external_deps = [
     "c_utils:utils",
     "dhcp:dhcp_manager_service",
-    "hiviewdfx_hilog_native:libhilog",
+    "hilog:libhilog",
   ]
   if (wifi_feature_with_encryption) {
     external_deps += [ "huks:libhukssdk" ]

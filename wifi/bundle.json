@@ -4,7 +4,7 @@
     "description": "The WLAN module provides basic WLAN functions, peer-to-peer (P2P) connection, and WLAN notification, enabling your application to communicate with other devices through a WLAN.",
     "homePage": "https://gitee.com/openharmony",
     "license": "Apache License 2.0",
-    "repository": "https://gitee.com/openharmony/communication_wifi",
+    "repository": "https://gitee.com/openharmony/connectivity_wifi",
     "domain": "os",
     "language": "",
     "publishAs": "code-segment",
@@ -32,17 +32,17 @@
         }
     ],
     "segment": {
-        "destPath": "foundation/communication/wifi/wifi"
+        "destPath": "foundation/communication/wifi"
     },
     "component": {
         "name": "wifi",
-        "subsystem": "communication",
+        "subsystem": "connectivity",
         "syscap": [
             "SystemCapability.Communication.WiFi.STA",
-            "SystemCapability.Communication.WiFi.AP.Core",
             "SystemCapability.Communication.WiFi.P2P",
             "SystemCapability.Communication.WiFi.Core",
-            "SystemCapability.Communication.WiFi.AP.Extension = false"
+            "SystemCapability.Communication.WiFi.AP.Core",
+            "SystemCapability.Communication.WiFi.AP.Extension"
         ],
         "features": [
             "wifi_feature_with_p2p",
@@ -59,6 +59,7 @@
             "wifi_feature_is_random_mac_supported"
         ],
         "adapted_system_type": [
+            "small",
             "standard"
         ],
         "rom": "",

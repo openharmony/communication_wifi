@@ -436,7 +436,7 @@ ErrCode WifiHotspotServiceImpl::DisableHotspot(const ServiceType type)
         IStaService *pStaService = WifiServiceManager::GetInstance().GetStaServiceInst();
         if (pStaService == nullptr) {
             WIFI_LOGE("get sta service inst failed");
-            return;
+            return WIFI_OPT_FAILED;
         }
         pStaService->EnableWifi();
     }

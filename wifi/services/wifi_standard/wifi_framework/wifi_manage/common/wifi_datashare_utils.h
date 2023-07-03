@@ -32,6 +32,9 @@ namespace {
 constexpr const char *SETTINGS_DATASHARE_URL_AIRPLANE_MODE =
     "datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?Proxy=true&key=airplane_mode";
 constexpr const char *SETTINGS_DATASHARE_KEY_AIRPLANE_MODE = "settings.telephony.airplanemode";
+constexpr const char *SETTINGS_DATASHARE_URI_LOCATION_MODE =
+    "datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?Proxy=true&key=location_enable";
+constexpr const char *SETTINGS_DATASHARE_KEY_LOCATION_MODE = "location_switch_enable";
 }
 
 class WifiDataShareHelperUtils final {

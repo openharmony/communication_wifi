@@ -79,7 +79,6 @@ private:
     static void SaBasicDump(std::string& result);
     ErrCode OpenScanOnlyAvailable();
     ErrCode CloseScanOnlyAvailable();
-    void CheckAndStartScanService();
 
 private:
 #ifdef OHOS_ARCH_LITE

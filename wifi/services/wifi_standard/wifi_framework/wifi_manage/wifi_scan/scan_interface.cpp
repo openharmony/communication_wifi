@@ -171,6 +171,26 @@ ErrCode ScanInterface::SetEnhanceService(IEnhanceService *enhanceService)
     return WIFI_OPT_SUCCESS;
 }
 
+ErrCode ScanInterface::StartWpa()
+{
+    WIFI_LOGI("Enter ScanInterface::StartWpa.\n");
+    if (pScanService->StartWpa() != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("StartWpa failed.\n");
+        return WIFI_OPT_FAILED;
+    }
+    return WIFI_OPT_SUCCESS;
+}
+
+ErrCode ScanInterface::CloseWpa()
+{
+    WIFI_LOGI("Enter ScanInterface::CloseWpa.\n");
+    if (pScanService->CloseWpa() != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("CloseWpa failed.\n");
+        return WIFI_OPT_FAILED;
+    }
+    return WIFI_OPT_SUCCESS;
+}
+
 ErrCode ScanInterface::OpenScanOnly()
 {
     WIFI_LOGI("Enter ScanInterface::OpenScanOnly.\n");

@@ -30,6 +30,7 @@
 #include "wifi_supplicant_hal_interface.h"
 #include "wifi_hisysevent.h"
 #ifndef OHOS_ARCH_LITE
+#include <dlfcn.h>
 #include "iservice_registry.h"
 #include "system_ability_definition.h"
 #endif // OHOS_ARCH_LITE
@@ -901,6 +902,9 @@ void StaStateMachine::DealConnectionEvent(InternalMessage *msg)
     WifiSettings::GetInstance().SetDeviceAfterConnect(targetNetworkId);
     WifiSettings::GetInstance().SetDeviceState(targetNetworkId, (int)WifiDeviceConfigStatus::ENABLED, false);
     WifiSettings::GetInstance().SyncDeviceConfig();
+#ifndef OHOS_ARCH_LITE
+    SaveWifiConfigForUpdate(targetNetworkId);
+#endif
     /* Stop clearing the Wpa_blocklist. */
     StopTimer(static_cast<int>(WPA_BLOCK_LIST_CLEAR_EVENT));
     ConnectToNetworkProcess(msg);
@@ -2391,6 +2395,16 @@ void StaStateMachine::ReUpdateNetLinkInfo(void)
         WifiDeviceConfig config;
         WifiSettings::GetInstance().GetDeviceConfig(linkedInfo.networkId, config);
         WifiNetAgent::GetInstance().UpdateNetLinkInfo(wifiIpInfo, config.wifiProxyconfig);
+    }
+}
+
+void StaStateMachine::SaveWifiConfigForUpdate(int networkId)
+{
+    WIFI_LOGI("Enter SaveWifiConfigForUpdate.");
+    WifiDeviceConfig config;
+    if (WifiSettings::GetInstance().GetDeviceConfig(networkId, config) == -1) {
+        WIFI_LOGE("SaveWifiConfigForUpdate, get current config failed.");
+        return;
     }
 }
 

@@ -1,5 +1,5 @@
 {
-    "name": "communication",
+    "name": "@ohos/wifi",
     "version": "3.1.0",
     "description": "The WLAN module provides basic WLAN functions, peer-to-peer (P2P) connection, and WLAN notification, enabling your application to communicate with other devices through a WLAN.",
     "homePage": "https://gitee.com/openharmony",
@@ -84,7 +84,10 @@
                 "napi",
                 "netmanager_base",
                 "safwk",
-                "samgr"
+                "samgr",
+                "data_share",
+                "hdf_core",
+                "hicollie"
             ],
             "third_party": [
                 "bounds_checking_function",

@@ -48,7 +48,7 @@ public:
         std::string ifaceName = "wlan0";
         Ipv4Address ipv4(Ipv4Address::INVALID_INET_ADDRESS);
         Ipv6Address ipv6(Ipv6Address::INVALID_INET6_ADDRESS);
-        pDhcpdInterface->StartDhcpServer(ifaceName, ipv4, ipv6, isIpV4);
+        pDhcpdInterface->StartDhcpServer(ifaceName, ipv4, ipv6, "", isIpV4);
     }
 public:
     std::unique_ptr<DhcpdInterface> pDhcpdInterface;

@@ -27,6 +27,8 @@ DEFINE_WIFILOG_HOTSPOT_LABEL("WifiHotspotStub");
 
 namespace OHOS {
 namespace Wifi {
+const std::string DHCP_IP_V4_DEFAULT = "192.168.62.2";
+
 WifiHotspotStub::WifiHotspotStub():mSingleCallback(false)
 {
     InitHandleMap();
@@ -164,6 +166,11 @@ void WifiHotspotStub::OnGetHotspotConfig(
         reply.WriteInt32(hotspotConfig.GetChannel());
         reply.WriteCString(hotspotConfig.GetPreSharedKey().c_str());
         reply.WriteInt32(hotspotConfig.GetMaxConn());
+        if (hotspotConfig.GetIpAddress().empty()) {
+            reply.WriteString(DHCP_IP_V4_DEFAULT);
+        } else {
+            reply.WriteString(hotspotConfig.GetIpAddress());
+        }
     }
 
     return;
@@ -180,6 +187,7 @@ void WifiHotspotStub::OnSetApConfigWifi(uint32_t code, MessageParcel &data, Mess
     config.SetChannel(data.ReadInt32());
     const char *preSharedKeyRead = data.ReadCString();
     config.SetMaxConn(data.ReadInt32());
+    config.SetIpAddress(data.ReadString());
     if (ssidRead == nullptr || preSharedKeyRead == nullptr) {
         ret = WIFI_OPT_INVALID_PARAM;
     } else {

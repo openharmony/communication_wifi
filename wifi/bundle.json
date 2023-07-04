@@ -32,17 +32,17 @@
         }
     ],
     "segment": {
-        "destPath": "foundation/communication/wifi"
+        "destPath": "foundation/communication/wifi/wifi"
     },
     "component": {
         "name": "wifi",
-        "subsystem": "connectivity",
+        "subsystem": "communication",
         "syscap": [
             "SystemCapability.Communication.WiFi.STA",
+            "SystemCapability.Communication.WiFi.AP.Core",
             "SystemCapability.Communication.WiFi.P2P",
             "SystemCapability.Communication.WiFi.Core",
-            "SystemCapability.Communication.WiFi.AP.Core",
-            "SystemCapability.Communication.WiFi.AP.Extension"
+            "SystemCapability.Communication.WiFi.AP.Extension = false"
         ],
         "features": [
             "wifi_feature_with_p2p",
@@ -59,7 +59,6 @@
             "wifi_feature_is_random_mac_supported"
         ],
         "adapted_system_type": [
-            "small",
             "standard"
         ],
         "rom": "",

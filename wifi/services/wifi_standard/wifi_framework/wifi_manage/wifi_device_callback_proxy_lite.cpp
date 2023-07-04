@@ -15,6 +15,7 @@
 
 #include "wifi_device_callback_proxy.h"
 #include "define.h"
+#include "wifi_manager_service_ipc_interface_code.h"
 #include "ipc_skeleton.h"
 #include "rpc_errno.h"
 #include "wifi_logger.h"
@@ -49,9 +50,11 @@ void WifiDeviceCallBackProxy::OnWifiStateChanged(int state)
     MessageOption option;
     MessageOptionInit(&option);
     option.flags = TF_OP_ASYNC;
-    int ret = SendRequest(sid_, WIFI_CBK_CMD_STATE_CHANGE, &data, &reply, option, nullptr);
+    int ret = SendRequest(sid_, static_cast<uint32_t>(DevInterfaceCode::WIFI_CBK_CMD_STATE_CHANGE), &data, &reply,
+        option, nullptr);
     if (ret != ERR_NONE) {
-        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d", WIFI_CBK_CMD_STATE_CHANGE, ret);
+        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d",
+            static_cast<int32_t>(DevInterfaceCode::WIFI_CBK_CMD_STATE_CHANGE), ret);
     }
 }
 
@@ -92,9 +95,11 @@ void WifiDeviceCallBackProxy::OnWifiConnectionChanged(int state, const WifiLinke
     MessageOption option;
     MessageOptionInit(&option);
     option.flags = TF_OP_ASYNC;
-    int ret = SendRequest(sid_, WIFI_CBK_CMD_CONNECTION_CHANGE, &data, &reply, option, nullptr);
+    int ret = SendRequest(sid_, static_cast<uint32_t>(DevInterfaceCode::WIFI_CBK_CMD_CONNECTION_CHANGE), &data, &reply,
+        option, nullptr);
     if (ret != ERR_NONE) {
-        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d", WIFI_CBK_CMD_CONNECTION_CHANGE, ret);
+        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d",
+            static_cast<int32_t>(DevInterfaceCode::WIFI_CBK_CMD_CONNECTION_CHANGE), ret);
     }
 }
 
@@ -115,9 +120,11 @@ void WifiDeviceCallBackProxy::OnWifiRssiChanged(int rssi)
     MessageOption option;
     MessageOptionInit(&option);
     option.flags = TF_OP_ASYNC;
-    int ret = SendRequest(sid_, WIFI_CBK_CMD_RSSI_CHANGE, &data, &reply, option, nullptr);
+    int ret = SendRequest(sid_, static_cast<uint32_t>(DevInterfaceCode::WIFI_CBK_CMD_RSSI_CHANGE), &data, &reply,
+        option, nullptr);
     if (ret != ERR_NONE) {
-        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d", WIFI_CBK_CMD_RSSI_CHANGE, ret);
+        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d",
+            static_cast<int32_t>(DevInterfaceCode::WIFI_CBK_CMD_RSSI_CHANGE), ret);
     }
 }
 
@@ -139,9 +146,11 @@ void WifiDeviceCallBackProxy::OnWifiWpsStateChanged(int state, const std::string
     MessageOption option;
     MessageOptionInit(&option);
     option.flags = TF_OP_ASYNC;
-    int ret = SendRequest(sid_, WIFI_CBK_CMD_WPS_STATE_CHANGE, &data, &reply, option, nullptr);
+    int ret = SendRequest(sid_, static_cast<uint32_t>(DevInterfaceCode::WIFI_CBK_CMD_WPS_STATE_CHANGE), &data, &reply,
+        option, nullptr);
     if (ret != ERR_NONE) {
-        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d", WIFI_CBK_CMD_WPS_STATE_CHANGE, ret);
+        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d",
+            static_cast<int32_t>(DevInterfaceCode::WIFI_CBK_CMD_WPS_STATE_CHANGE), ret);
     }
 }
 
@@ -162,9 +171,11 @@ void WifiDeviceCallBackProxy::OnStreamChanged(int direction)
     MessageOption option;
     MessageOptionInit(&option);
     option.flags = TF_OP_ASYNC;
-    int ret = SendRequest(sid_, WIFI_CBK_CMD_STREAM_DIRECTION, &data, &reply, option, nullptr);
+    int ret = SendRequest(sid_, static_cast<uint32_t>(DevInterfaceCode::WIFI_CBK_CMD_STREAM_DIRECTION), &data, &reply,
+        option, nullptr);
     if (ret != ERR_NONE) {
-        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d", WIFI_CBK_CMD_STREAM_DIRECTION, ret);
+        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d",
+            static_cast<int32_t>(DevInterfaceCode::WIFI_CBK_CMD_STREAM_DIRECTION), ret);
     }
 }
 
@@ -185,9 +196,11 @@ void WifiDeviceCallBackProxy::OnDeviceConfigChanged(ConfigChange state)
     MessageOption option;
     MessageOptionInit(&option);
     option.flags = TF_OP_ASYNC;
-    int ret = SendRequest(sid_, WIFI_CBK_CMD_DEVICE_CONFIG_CHANGE, &data, &reply, option, nullptr);
+    int ret = SendRequest(sid_, static_cast<uint32_t>(DevInterfaceCode::WIFI_CBK_CMD_DEVICE_CONFIG_CHANGE), &data,
+        &reply, option, nullptr);
     if (ret != ERR_NONE) {
-        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d", WIFI_CBK_CMD_DEVICE_CONFIG_CHANGE, ret);
+        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d",
+            static_cast<int32_t>(DevInterfaceCode::WIFI_CBK_CMD_DEVICE_CONFIG_CHANGE), ret);
     }
 }
 }  // namespace Wifi

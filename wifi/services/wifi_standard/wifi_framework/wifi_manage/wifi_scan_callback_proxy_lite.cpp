@@ -15,6 +15,7 @@
 
 #include "wifi_scan_callback_proxy.h"
 #include "define.h"
+#include "wifi_manager_service_ipc_interface_code.h"
 #include "ipc_skeleton.h"
 #include "rpc_errno.h"
 #include "wifi_logger.h"
@@ -47,7 +48,8 @@ void WifiScanCallbackProxy::OnWifiScanStateChanged(int state)
     MessageOption option;
     MessageOptionInit(&option);
     option.flags = TF_OP_ASYNC;
-    int ret = SendRequest(sid_, WIFI_CBK_CMD_SCAN_STATE_CHANGE, &data, &reply, option, nullptr);
+    int ret = SendRequest(sid_, static_cast<uint32_t>(ScanInterfaceCode::WIFI_CBK_CMD_SCAN_STATE_CHANGE), &data, &reply,
+        option, nullptr);
     switch (ret) {
         case ERR_NONE:
             WIFI_LOGD("OnWifiScanStateChanged callback succeeded!");

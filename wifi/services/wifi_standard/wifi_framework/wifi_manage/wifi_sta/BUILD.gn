@@ -130,7 +130,7 @@ if (defined(ohos_lite)) {
     external_deps = [
       "c_utils:utils",
       "dhcp:dhcp_manager_service",
-      "hiviewdfx_hilog_native:libhilog",
+      "hilog:libhilog",
       "ipc:ipc_single",
       "netmanager_base:net_conn_manager_if",
       "samgr:samgr_proxy",

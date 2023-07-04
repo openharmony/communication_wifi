@@ -213,6 +213,7 @@ ErrCode WifiHotspotProxy::GetHotspotConfig(HotspotConfig &result)
     readStr = reply.ReadCString();
     result.SetPreSharedKey((readStr != nullptr) ? readStr : "");
     result.SetMaxConn(reply.ReadInt32());
+    result.SetIpAddress(reply.ReadString());
 
     return WIFI_OPT_SUCCESS;
 }

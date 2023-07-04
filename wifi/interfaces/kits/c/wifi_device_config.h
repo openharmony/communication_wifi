@@ -90,6 +90,12 @@
 #define DEVICE_NAME_LEN 128
 
 /**
+ * @brief Indicates the maximum length of a ipv4 address.
+ *
+ */
+#define WIFI_MAX_IPV4_LEN 16
+
+/**
  * @brief Enumerates Wi-Fi security types.
  *
  * @since 7

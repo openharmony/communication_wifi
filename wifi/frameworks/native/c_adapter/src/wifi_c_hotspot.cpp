@@ -96,7 +96,14 @@ static WifiErrorCode GetHotspotConfigFromC(const HotspotConfig *config, OHOS::Wi
     hotspotConfig.SetSecurityType(GetKeyMgmtFromSecurityType(config->securityType));
     hotspotConfig.SetBand(OHOS::Wifi::BandType(config->band));
     hotspotConfig.SetChannel(config->channelNum);
+    if (strnlen(config->preSharedKey, WIFI_MAX_KEY_LEN) == WIFI_MAX_KEY_LEN) {
+        return ERROR_WIFI_INVALID_ARGS;
+    }
     hotspotConfig.SetPreSharedKey(config->preSharedKey);
+    if (strnlen(config->ipAddress, WIFI_MAX_IPV4_LEN) == WIFI_MAX_IPV4_LEN) {
+        return ERROR_WIFI_INVALID_ARGS;
+    }
+    hotspotConfig.SetIpAddress(config->ipAddress);
     return WIFI_SUCCESS;
 }
 
@@ -112,6 +119,10 @@ static WifiErrorCode GetHotspotConfigFromCpp(const OHOS::Wifi::HotspotConfig& ho
     result->channelNum = hotspotConfig.GetChannel();
     if (memcpy_s(result->preSharedKey, WIFI_MAX_KEY_LEN,
         hotspotConfig.GetPreSharedKey().c_str(), hotspotConfig.GetPreSharedKey().size() + 1) != EOK) {
+        return ERROR_WIFI_UNKNOWN;
+    }
+    if (memcpy_s(result->ipAddress, WIFI_MAX_IPV4_LEN,
+        hotspotConfig.GetIpAddress().c_str(), hotspotConfig.GetIpAddress().size() + 1) != EOK) {
         return ERROR_WIFI_UNKNOWN;
     }
     return WIFI_SUCCESS;

@@ -22,6 +22,7 @@
 #include "message_parcel.h"
 #include "securec.h"
 #include "define.h"
+#include "wifi_manager_service_ipc_interface_code.h"
 #include "wifi_log.h"
 
 namespace OHOS {
@@ -79,8 +80,10 @@ void RemoteRequestSetScanControlInfo(const char* data, size_t size) // 1 WIFI_SV
     datas.RewindRead(0);
     MessageParcel reply;
     MessageOption option;
-    int result = pWifiScanStub->OnRemoteRequest(WIFI_SVR_CMD_SET_SCAN_CONTROL_INFO, datas, reply, option);
-    LOGI("wifiscanstub_fuzzer OnRemoteRequest(0x%{public}x %{public}d)", WIFI_SVR_CMD_SET_SCAN_CONTROL_INFO, result);
+    int result = pWifiScanStub->OnRemoteRequest(
+        static_cast<uint32_t>(ScanInterfaceCode::WIFI_SVR_CMD_SET_SCAN_CONTROL_INFO), datas, reply, option);
+    LOGI("wifiscanstub_fuzzer OnRemoteRequest(0x%{public}x %{public}d)",
+        static_cast<int32_t>(ScanInterfaceCode::WIFI_SVR_CMD_SET_SCAN_CONTROL_INFO), result);
 }
 
 void RemoteRequestFullScan(const char* data, size_t size) // 2 WIFI_SVR_CMD_FULL_SCAN
@@ -92,8 +95,10 @@ void RemoteRequestFullScan(const char* data, size_t size) // 2 WIFI_SVR_CMD_FULL
     datas.RewindRead(0);
     MessageParcel reply;
     MessageOption option;
-    int result = pWifiScanStub->OnRemoteRequest(WIFI_SVR_CMD_FULL_SCAN, datas, reply, option);
-    LOGI("wifiscanstub_fuzzer OnRemoteRequest(0x%{public}x %{public}d)", WIFI_SVR_CMD_FULL_SCAN, result);
+    int result = pWifiScanStub->OnRemoteRequest(
+        static_cast<uint32_t>(ScanInterfaceCode::WIFI_SVR_CMD_FULL_SCAN), datas, reply, option);
+    LOGI("wifiscanstub_fuzzer OnRemoteRequest(0x%{public}x %{public}d)",
+        static_cast<int32_t>(ScanInterfaceCode::WIFI_SVR_CMD_FULL_SCAN), result);
 }
 
 void RemoteRequestSpecifiedParamsScan(const char* data, size_t size) // 3 WIFI_SVR_CMD_SPECIFIED_PARAMS_SCAN
@@ -105,8 +110,10 @@ void RemoteRequestSpecifiedParamsScan(const char* data, size_t size) // 3 WIFI_S
     datas.RewindRead(0);
     MessageParcel reply;
     MessageOption option;
-    int result = pWifiScanStub->OnRemoteRequest(WIFI_SVR_CMD_SPECIFIED_PARAMS_SCAN, datas, reply, option);
-    LOGI("wifiscanstub_fuzzer OnRemoteRequest(0x%{public}x %{public}d)", WIFI_SVR_CMD_SPECIFIED_PARAMS_SCAN, result);
+    int result = pWifiScanStub->OnRemoteRequest(
+        static_cast<uint32_t>(ScanInterfaceCode::WIFI_SVR_CMD_SPECIFIED_PARAMS_SCAN), datas, reply, option);
+    LOGI("wifiscanstub_fuzzer OnRemoteRequest(0x%{public}x %{public}d)",
+        static_cast<int32_t>(ScanInterfaceCode::WIFI_SVR_CMD_SPECIFIED_PARAMS_SCAN), result);
 }
 
 void RemoteRequestIsScanAlwaysActive(const char* data, size_t size) // 4 WIFI_SVR_CMD_IS_SCAN_ALWAYS_ACTIVE
@@ -118,8 +125,10 @@ void RemoteRequestIsScanAlwaysActive(const char* data, size_t size) // 4 WIFI_SV
     datas.RewindRead(0);
     MessageParcel reply;
     MessageOption option;
-    int result = pWifiScanStub->OnRemoteRequest(WIFI_SVR_CMD_IS_SCAN_ALWAYS_ACTIVE, datas, reply, option);
-    LOGI("wifiscanstub_fuzzer OnRemoteRequest(0x%{public}x %{public}d)", WIFI_SVR_CMD_IS_SCAN_ALWAYS_ACTIVE, result);
+    int result = pWifiScanStub->OnRemoteRequest(
+        static_cast<uint32_t>(ScanInterfaceCode::WIFI_SVR_CMD_IS_SCAN_ALWAYS_ACTIVE), datas, reply, option);
+    LOGI("wifiscanstub_fuzzer OnRemoteRequest(0x%{public}x %{public}d)",
+        static_cast<int32_t>(ScanInterfaceCode::WIFI_SVR_CMD_IS_SCAN_ALWAYS_ACTIVE), result);
 }
 
 void RemoteRequestGetScanInfoList(const char* data, size_t size) // 5 WIFI_SVR_CMD_GET_SCAN_INFO_LIST
@@ -131,8 +140,10 @@ void RemoteRequestGetScanInfoList(const char* data, size_t size) // 5 WIFI_SVR_C
     datas.RewindRead(0);
     MessageParcel reply;
     MessageOption option;
-    int result = pWifiScanStub->OnRemoteRequest(WIFI_SVR_CMD_GET_SCAN_INFO_LIST, datas, reply, option);
-    LOGI("wifiscanstub_fuzzer OnRemoteRequest(0x%{public}x %{public}d)", WIFI_SVR_CMD_GET_SCAN_INFO_LIST, result);
+    int result = pWifiScanStub->OnRemoteRequest(
+        static_cast<uint32_t>(ScanInterfaceCode::WIFI_SVR_CMD_GET_SCAN_INFO_LIST), datas, reply, option);
+    LOGI("wifiscanstub_fuzzer OnRemoteRequest(0x%{public}x %{public}d)",
+        static_cast<int32_t>(ScanInterfaceCode::WIFI_SVR_CMD_GET_SCAN_INFO_LIST), result);
 }
 
 void RemoteRequestRegisterCallBack(const char* data, size_t size) // 6 WIFI_SVR_CMD_REGISTER_SCAN_CALLBACK
@@ -144,8 +155,10 @@ void RemoteRequestRegisterCallBack(const char* data, size_t size) // 6 WIFI_SVR_
     datas.RewindRead(0);
     MessageParcel reply;
     MessageOption option;
-    int result = pWifiScanStub->OnRemoteRequest(WIFI_SVR_CMD_REGISTER_SCAN_CALLBACK, datas, reply, option);
-    LOGI("wifiscanstub_fuzzer OnRemoteRequest(0x%{public}x %{public}d)", WIFI_SVR_CMD_REGISTER_SCAN_CALLBACK, result);
+    int result = pWifiScanStub->OnRemoteRequest(
+        static_cast<uint32_t>(ScanInterfaceCode::WIFI_SVR_CMD_REGISTER_SCAN_CALLBACK), datas, reply, option);
+    LOGI("wifiscanstub_fuzzer OnRemoteRequest(0x%{public}x %{public}d)",
+        static_cast<int32_t>(ScanInterfaceCode::WIFI_SVR_CMD_REGISTER_SCAN_CALLBACK), result);
 }
 
 void RemoteRequestGetSupportedFeatures(const char* data, size_t size) // 7 WIFI_SVR_CMD_GET_SUPPORTED_FEATURES
@@ -157,8 +170,11 @@ void RemoteRequestGetSupportedFeatures(const char* data, size_t size) // 7 WIFI_
     datas.RewindRead(0);
     MessageParcel reply;
     MessageOption option;
-    int result = pWifiScanStub->OnRemoteRequest(WIFI_SVR_CMD_GET_SUPPORTED_FEATURES, datas, reply, option);
-    LOGI("wifiscanstub_fuzzer OnRemoteRequest(0x%{public}x %{public}d)", WIFI_SVR_CMD_GET_SUPPORTED_FEATURES, result);
+    int result =
+        pWifiScanStub->OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_SUPPORTED_FEATURES),
+        datas, reply, option);
+    LOGI("wifiscanstub_fuzzer OnRemoteRequest(0x%{public}x %{public}d)",
+        static_cast<int32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_SUPPORTED_FEATURES), result);
 }
 
 bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)

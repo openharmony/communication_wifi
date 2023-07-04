@@ -21,6 +21,7 @@
 #include "wifi_internal_event_dispatcher.h"
 #include "wifi_hotspot_death_recipient.h"
 #include "wifi_common_def.h"
+#include "wifi_manager_service_ipc_interface_code.h"
 
 DEFINE_WIFILOG_HOTSPOT_LABEL("WifiHotspotStub");
 
@@ -43,26 +44,46 @@ WifiHotspotStub::~WifiHotspotStub()
 
 void WifiHotspotStub::InitHandleMap()
 {
-    handleFuncMap[WIFI_SVR_CMD_IS_HOTSPOT_ACTIVE] = &WifiHotspotStub::OnIsHotspotActive;
-    handleFuncMap[WIFI_SVR_CMD_GETAPSTATE_WIFI] = &WifiHotspotStub::OnGetApStateWifi;
-    handleFuncMap[WIFI_SVR_CMD_GET_HOTSPOT_CONFIG] = &WifiHotspotStub::OnGetHotspotConfig;
-    handleFuncMap[WIFI_SVR_CMD_SETAPCONFIG_WIFI] = &WifiHotspotStub::OnSetApConfigWifi;
-    handleFuncMap[WIFI_SVR_CMD_GET_STATION_LIST] = &WifiHotspotStub::OnGetStationList;
-    handleFuncMap[WIFI_SVR_CMD_ENABLE_WIFI_AP] = &WifiHotspotStub::OnEnableWifiAp;
-    handleFuncMap[WIFI_SVR_CMD_DISABLE_WIFI_AP] = &WifiHotspotStub::OnDisableWifiAp;
-    handleFuncMap[WIFI_SVR_CMD_ADD_BLOCK_LIST] = &WifiHotspotStub::OnAddBlockList;
-    handleFuncMap[WIFI_SVR_CMD_DEL_BLOCK_LIST] = &WifiHotspotStub::OnDelBlockList;
-    handleFuncMap[WIFI_SVR_CMD_GET_BLOCK_LISTS] = &WifiHotspotStub::OnGetBlockLists;
-    handleFuncMap[WIFI_SVR_CMD_DISCONNECT_STA] = &WifiHotspotStub::OnDisassociateSta;
-    handleFuncMap[WIFI_SVR_CMD_GET_VALID_BANDS] = &WifiHotspotStub::OnGetValidBands;
-    handleFuncMap[WIFI_SVR_CMD_GET_VALID_CHANNELS] = &WifiHotspotStub::OnGetValidChannels;
-    handleFuncMap[WIFI_SVR_CMD_REGISTER_HOTSPOT_CALLBACK] = &WifiHotspotStub::OnRegisterCallBack;
-    handleFuncMap[WIFI_SVR_CMD_GET_SUPPORTED_FEATURES] = &WifiHotspotStub::OnGetSupportedFeatures;
-    handleFuncMap[WIFI_SVR_CMD_GET_SUPPORTED_POWER_MODEL] = &WifiHotspotStub::OnGetSupportedPowerModel;
-    handleFuncMap[WIFI_SVR_CMD_GET_POWER_MODEL] = &WifiHotspotStub::OnGetPowerModel;
-    handleFuncMap[WIFI_SVR_CMD_SET_POWER_MODEL] = &WifiHotspotStub::OnSetPowerModel;
-    handleFuncMap[WIFI_SVR_CMD_IS_HOTSPOT_DUAL_BAND_SUPPORTED] = &WifiHotspotStub::OnIsHotspotDualBandSupported;
-    handleFuncMap[WIFI_SVR_CMD_SETTIMEOUT_AP] = &WifiHotspotStub::OnSetApIdleTimeout;
+    handleFuncMap[static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_IS_HOTSPOT_ACTIVE)] =
+        &WifiHotspotStub::OnIsHotspotActive;
+    handleFuncMap[static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_GETAPSTATE_WIFI)] =
+        &WifiHotspotStub::OnGetApStateWifi;
+    handleFuncMap[static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_GET_HOTSPOT_CONFIG)] =
+        &WifiHotspotStub::OnGetHotspotConfig;
+    handleFuncMap[static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_SETAPCONFIG_WIFI)] =
+        &WifiHotspotStub::OnSetApConfigWifi;
+    handleFuncMap[static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_GET_STATION_LIST)] =
+        &WifiHotspotStub::OnGetStationList;
+    handleFuncMap[static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_ENABLE_WIFI_AP)] =
+        &WifiHotspotStub::OnEnableWifiAp;
+    handleFuncMap[static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_DISABLE_WIFI_AP)] =
+        &WifiHotspotStub::OnDisableWifiAp;
+    handleFuncMap[static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_ADD_BLOCK_LIST)] =
+        &WifiHotspotStub::OnAddBlockList;
+    handleFuncMap[static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_DEL_BLOCK_LIST)] =
+        &WifiHotspotStub::OnDelBlockList;
+    handleFuncMap[static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_GET_BLOCK_LISTS)] =
+        &WifiHotspotStub::OnGetBlockLists;
+    handleFuncMap[static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_DISCONNECT_STA)] =
+        &WifiHotspotStub::OnDisassociateSta;
+    handleFuncMap[static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_GET_VALID_BANDS)] =
+        &WifiHotspotStub::OnGetValidBands;
+    handleFuncMap[static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_GET_VALID_CHANNELS)] =
+        &WifiHotspotStub::OnGetValidChannels;
+    handleFuncMap[static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_REGISTER_HOTSPOT_CALLBACK)] =
+        &WifiHotspotStub::OnRegisterCallBack;
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_SUPPORTED_FEATURES)] =
+        &WifiHotspotStub::OnGetSupportedFeatures;
+    handleFuncMap[static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_GET_SUPPORTED_POWER_MODEL)] =
+        &WifiHotspotStub::OnGetSupportedPowerModel;
+    handleFuncMap[static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_GET_POWER_MODEL)] =
+        &WifiHotspotStub::OnGetPowerModel;
+    handleFuncMap[static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_SET_POWER_MODEL)] =
+        &WifiHotspotStub::OnSetPowerModel;
+    handleFuncMap[static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_IS_HOTSPOT_DUAL_BAND_SUPPORTED)] =
+        &WifiHotspotStub::OnIsHotspotDualBandSupported;
+    handleFuncMap[static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_SETTIMEOUT_AP)] =
+        &WifiHotspotStub::OnSetApIdleTimeout;
     return;
 }
 

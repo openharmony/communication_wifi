@@ -36,6 +36,7 @@ public:
 
 private:
     void InitHandleMap();
+    void InitHandleMapEx(void);
     void OnEnableWifi(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnDisableWifi(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnInitWifiProtect(uint32_t code, MessageParcel &data, MessageParcel &reply);

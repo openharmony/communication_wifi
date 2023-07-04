@@ -17,6 +17,7 @@
 #include "wifi_logger.h"
 #include "wifi_msg.h"
 #include "define.h"
+#include "wifi_manager_service_ipc_interface_code.h"
 #include "wifi_scan_callback_proxy.h"
 #include "wifi_internal_event_dispatcher.h"
 #include "wifi_scan_death_recipient.h"
@@ -36,13 +37,19 @@ WifiScanStub::~WifiScanStub()
 
 void WifiScanStub::InitHandleMap()
 {
-    handleFuncMap[WIFI_SVR_CMD_SET_SCAN_CONTROL_INFO] = &WifiScanStub::OnSetScanControlInfo;
-    handleFuncMap[WIFI_SVR_CMD_FULL_SCAN] = &WifiScanStub::OnScan;
-    handleFuncMap[WIFI_SVR_CMD_SPECIFIED_PARAMS_SCAN] = &WifiScanStub::OnScanByParams;
-    handleFuncMap[WIFI_SVR_CMD_IS_SCAN_ALWAYS_ACTIVE] = &WifiScanStub::OnIsWifiClosedScan;
-    handleFuncMap[WIFI_SVR_CMD_GET_SCAN_INFO_LIST] = &WifiScanStub::OnGetScanInfoList;
-    handleFuncMap[WIFI_SVR_CMD_REGISTER_SCAN_CALLBACK] = &WifiScanStub::OnRegisterCallBack;
-    handleFuncMap[WIFI_SVR_CMD_GET_SUPPORTED_FEATURES] = &WifiScanStub::OnGetSupportedFeatures;
+    handleFuncMap[static_cast<uint32_t>(ScanInterfaceCode::WIFI_SVR_CMD_SET_SCAN_CONTROL_INFO)] =
+        &WifiScanStub::OnSetScanControlInfo;
+    handleFuncMap[static_cast<uint32_t>(ScanInterfaceCode::WIFI_SVR_CMD_FULL_SCAN)] = &WifiScanStub::OnScan;
+    handleFuncMap[static_cast<uint32_t>(ScanInterfaceCode::WIFI_SVR_CMD_SPECIFIED_PARAMS_SCAN)] =
+        &WifiScanStub::OnScanByParams;
+    handleFuncMap[static_cast<uint32_t>(ScanInterfaceCode::WIFI_SVR_CMD_IS_SCAN_ALWAYS_ACTIVE)] =
+        &WifiScanStub::OnIsWifiClosedScan;
+    handleFuncMap[static_cast<uint32_t>(ScanInterfaceCode::WIFI_SVR_CMD_GET_SCAN_INFO_LIST)] =
+        &WifiScanStub::OnGetScanInfoList;
+    handleFuncMap[static_cast<uint32_t>(ScanInterfaceCode::WIFI_SVR_CMD_REGISTER_SCAN_CALLBACK)] =
+        &WifiScanStub::OnRegisterCallBack;
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_SUPPORTED_FEATURES)] =
+        &WifiScanStub::OnGetSupportedFeatures;
 }
 
 int WifiScanStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)

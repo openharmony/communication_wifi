@@ -16,6 +16,7 @@
 #include "wifi_p2p_callback_proxy.h"
 #include "wifi_logger.h"
 #include "define.h"
+#include "wifi_manager_service_ipc_interface_code.h"
 #include "wifi_internal_event_dispatcher.h"
 
 DEFINE_WIFILOG_P2P_LABEL("WifiP2pCallbackProxy");
@@ -40,9 +41,11 @@ void WifiP2pCallbackProxy::OnP2pStateChanged(int state)
     }
     data.WriteInt32(0);
     data.WriteInt32(state);
-    int error = Remote()->SendRequest(WIFI_CBK_CMD_P2P_STATE_CHANGE, data, reply, option);
+    int error = Remote()->SendRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_CBK_CMD_P2P_STATE_CHANGE), data,
+        reply, option);
     if (error != ERR_NONE) {
-        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d", WIFI_CBK_CMD_P2P_STATE_CHANGE, error);
+        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d",
+            static_cast<int32_t>(P2PInterfaceCode::WIFI_CBK_CMD_P2P_STATE_CHANGE), error);
         return;
     }
     int exception = reply.ReadInt32();
@@ -63,9 +66,11 @@ void WifiP2pCallbackProxy::OnP2pPersistentGroupsChanged(void)
         return;
     }
     data.WriteInt32(0);
-    int error = Remote()->SendRequest(WIFI_CBK_CMD_PERSISTENT_GROUPS_CHANGE, data, reply, option);
+    int error = Remote()->SendRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_CBK_CMD_PERSISTENT_GROUPS_CHANGE),
+        data, reply, option);
     if (error != ERR_NONE) {
-        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d", WIFI_CBK_CMD_PERSISTENT_GROUPS_CHANGE, error);
+        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d",
+            static_cast<int32_t>(P2PInterfaceCode::WIFI_CBK_CMD_PERSISTENT_GROUPS_CHANGE), error);
         return;
     }
     int exception = reply.ReadInt32();
@@ -103,9 +108,11 @@ void WifiP2pCallbackProxy::OnP2pThisDeviceChanged(const WifiP2pDevice &device)
     }
     data.WriteInt32(0);
     WriteWifiP2pDeviceData(data, device);
-    int error = Remote()->SendRequest(WIFI_CBK_CMD_THIS_DEVICE_CHANGE, data, reply, option);
+    int error = Remote()->SendRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_CBK_CMD_THIS_DEVICE_CHANGE), data,
+        reply, option);
     if (error != ERR_NONE) {
-        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d", WIFI_CBK_CMD_THIS_DEVICE_CHANGE, error);
+        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d",
+            static_cast<int32_t>(P2PInterfaceCode::WIFI_CBK_CMD_THIS_DEVICE_CHANGE), error);
         return;
     }
     int exception = reply.ReadInt32();
@@ -131,9 +138,11 @@ void WifiP2pCallbackProxy::OnP2pPeersChanged(const std::vector<WifiP2pDevice> &d
     for (int i = 0; i < size; ++i) {
         WriteWifiP2pDeviceData(data, devices[i]);
     }
-    int error = Remote()->SendRequest(WIFI_CBK_CMD_PEER_CHANGE, data, reply, option);
+    int error = Remote()->SendRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_CBK_CMD_PEER_CHANGE), data, reply,
+        option);
     if (error != ERR_NONE) {
-        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d", WIFI_CBK_CMD_PEER_CHANGE, error);
+        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d",
+            static_cast<int32_t>(P2PInterfaceCode::WIFI_CBK_CMD_PEER_CHANGE), error);
         return;
     }
     int exception = reply.ReadInt32();
@@ -166,9 +175,11 @@ void WifiP2pCallbackProxy::OnP2pServicesChanged(const std::vector<WifiP2pService
             data.WriteCString((*it).c_str());
         }
     }
-    int error = Remote()->SendRequest(WIFI_CBK_CMD_SERVICE_CHANGE, data, reply, option);
+    int error = Remote()->SendRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_CBK_CMD_SERVICE_CHANGE), data, reply,
+        option);
     if (error != ERR_NONE) {
-        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d", WIFI_CBK_CMD_SERVICE_CHANGE, error);
+        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d",
+            static_cast<int32_t>(P2PInterfaceCode::WIFI_CBK_CMD_SERVICE_CHANGE), error);
         return;
     }
     int exception = reply.ReadInt32();
@@ -192,9 +203,11 @@ void WifiP2pCallbackProxy::OnP2pConnectionChanged(const WifiP2pLinkedInfo &info)
     data.WriteInt32(static_cast<int>(info.GetConnectState()));
     data.WriteBool(info.IsGroupOwner());
     data.WriteCString(info.GetGroupOwnerAddress().c_str());
-    int error = Remote()->SendRequest(WIFI_CBK_CMD_CONNECT_CHANGE, data, reply, option);
+    int error = Remote()->SendRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_CBK_CMD_CONNECT_CHANGE), data, reply,
+        option);
     if (error != ERR_NONE) {
-        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d", WIFI_CBK_CMD_CONNECT_CHANGE, error);
+        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d",
+            static_cast<int32_t>(P2PInterfaceCode::WIFI_CBK_CMD_CONNECT_CHANGE), error);
         return;
     }
     int exception = reply.ReadInt32();
@@ -216,9 +229,11 @@ void WifiP2pCallbackProxy::OnP2pDiscoveryChanged(bool isChange)
     }
     data.WriteInt32(0);
     data.WriteBool(isChange);
-    int error = Remote()->SendRequest(WIFI_CBK_CMD_DISCOVERY_CHANGE, data, reply, option);
+    int error = Remote()->SendRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_CBK_CMD_DISCOVERY_CHANGE), data,
+        reply, option);
     if (error != ERR_NONE) {
-        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d", WIFI_CBK_CMD_DISCOVERY_CHANGE, error);
+        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d",
+            static_cast<int32_t>(P2PInterfaceCode::WIFI_CBK_CMD_DISCOVERY_CHANGE), error);
         return;
     }
     int exception = reply.ReadInt32();
@@ -241,9 +256,11 @@ void WifiP2pCallbackProxy::OnP2pActionResult(P2pActionCallback action, ErrCode c
     data.WriteInt32(0);
     data.WriteInt32(static_cast<int>(action));
     data.WriteInt32(static_cast<int>(code));
-    int error = Remote()->SendRequest(WIFI_CBK_CMD_P2P_ACTION_RESULT, data, reply, option);
+    int error = Remote()->SendRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_CBK_CMD_P2P_ACTION_RESULT), data,
+        reply, option);
     if (error != ERR_NONE) {
-        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d", WIFI_CBK_CMD_P2P_ACTION_RESULT, error);
+        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d",
+            static_cast<int32_t>(P2PInterfaceCode::WIFI_CBK_CMD_P2P_ACTION_RESULT), error);
         return;
     }
     int exception = reply.ReadInt32();
@@ -267,9 +284,11 @@ void WifiP2pCallbackProxy::OnConfigChanged(CfgType type, char* cfgData, int data
     data.WriteInt32(static_cast<int>(type));
     data.WriteInt32(dataLen);
     data.WriteBuffer(cfgData, dataLen);
-    int error = Remote()->SendRequest(WIFI_CBK_CMD_CFG_CHANGE, data, reply, option);
+    int error = Remote()->SendRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_CBK_CMD_CFG_CHANGE), data, reply,
+        option);
     if (error != ERR_NONE) {
-        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d", WIFI_CBK_CMD_CFG_CHANGE, error);
+        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d",
+            static_cast<int32_t>(P2PInterfaceCode::WIFI_CBK_CMD_CFG_CHANGE), error);
         return;
     }
     int exception = reply.ReadInt32();

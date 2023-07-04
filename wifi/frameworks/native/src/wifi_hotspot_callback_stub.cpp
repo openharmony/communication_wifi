@@ -15,6 +15,7 @@
 
 #include "wifi_hotspot_callback_stub.h"
 #include "define.h"
+#include "wifi_manager_service_ipc_interface_code.h"
 #include "wifi_hisysevent.h"
 #include "wifi_logger.h"
 #include "wifi_msg.h"
@@ -44,15 +45,15 @@ int WifiHotspotCallbackStub::OnRemoteRequest(
     }
     int ret = -1;
     switch (code) {
-        case WIFI_CBK_CMD_HOTSPOT_STATE_CHANGE: {
+        case static_cast<uint32_t>(HotspotInterfaceCode::WIFI_CBK_CMD_HOTSPOT_STATE_CHANGE): {
             ret = RemoteOnHotspotStateChanged(code, data, reply);
             break;
         }
-        case WIFI_CBK_CMD_HOTSPOT_STATE_JOIN: {
+        case static_cast<uint32_t>(HotspotInterfaceCode::WIFI_CBK_CMD_HOTSPOT_STATE_JOIN): {
             ret = RemoteOnHotspotStaJoin(code, data, reply);
             break;
         }
-        case WIFI_CBK_CMD_HOTSPOT_STATE_LEAVE: {
+        case static_cast<uint32_t>(HotspotInterfaceCode::WIFI_CBK_CMD_HOTSPOT_STATE_LEAVE): {
             ret = RemoteOnHotspotStaLeave(code, data, reply);
             break;
         }

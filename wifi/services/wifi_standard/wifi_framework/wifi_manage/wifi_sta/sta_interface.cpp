@@ -53,13 +53,12 @@ ErrCode StaInterface::EnableWifi()
             WIFI_LOGE("New StaService failed.\n");
             return WIFI_OPT_FAILED;
         }
-    }
-
-    if (pStaService->InitStaService(staCallback) != WIFI_OPT_SUCCESS) {
-        WIFI_LOGE("InitStaService failed.\n");
-        delete pStaService;
-        pStaService = nullptr;
-        return WIFI_OPT_FAILED;
+        if (pStaService->InitStaService(staCallback) != WIFI_OPT_SUCCESS) {
+            WIFI_LOGE("InitStaService failed.\n");
+            delete pStaService;
+            pStaService = nullptr;
+            return WIFI_OPT_FAILED;
+        }
     }
 
     if (pStaService->EnableWifi() != WIFI_OPT_SUCCESS) {

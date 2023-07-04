@@ -47,7 +47,7 @@ public:
      *
      * @return true if register success else return false;
      */
-    bool RegisterNetSupplierCallback(const StaServiceCallback &callback);
+    bool RegisterNetSupplierCallback();
 
     /**
      * Cancel the registration information to the network management
@@ -98,18 +98,16 @@ public:
     /**
      * Add OnStaMachineWifiStart
      *
-     * @param callback callback
+     * @param
      */
-    void OnStaMachineWifiStart(const StaServiceCallback &callback);
+    void OnStaMachineWifiStart();
 
     /**
      * Add OnStaMachineNetManagerRestart
      *
      * @param netSupplierInfo net Supplier Info
-     * @param callback callback
      */
-    void OnStaMachineNetManagerRestart(const sptr<NetManagerStandard::NetSupplierInfo> &netSupplierInfo,
-        const StaServiceCallback &callback);
+    void OnStaMachineNetManagerRestart(const sptr<NetManagerStandard::NetSupplierInfo> &netSupplierInfo);
 public:
     class NetConnCallback : public NetManagerStandard::NetSupplierCallbackBase {
     public:
@@ -117,7 +115,7 @@ public:
          * @Description : Construct a new NetConn object
          *
          */
-        explicit NetConnCallback(const StaServiceCallback &callback);
+        explicit NetConnCallback();
 
         /**
          * @Description : Destroy the NetConn object
@@ -141,8 +139,6 @@ public:
         int32_t ReleaseNetwork(const std::string &ident, const std::set<NetManagerStandard::NetCap> &netCaps) override;
     private:
         void LogNetCaps(const std::string &ident, const std::set<NetManagerStandard::NetCap> &netCaps) const;
-    private:
-        StaServiceCallback staCallback;
     };
 
 private:

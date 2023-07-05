@@ -1192,8 +1192,8 @@ ErrCode WifiDeviceServiceImpl::GetDeviceMacAddress(std::string &result)
     if (!IsStaServiceRunning()) {
         return WIFI_OPT_STA_NOT_OPENED;
     }
-
-    WifiConfigCenter::GetInstance().GetMacAddress(result);
+    
+    WifiSettings::GetInstance().GetRealMacAddress(result);
     return WIFI_OPT_SUCCESS;
 }
 

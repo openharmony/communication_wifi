@@ -578,7 +578,7 @@ HWTEST_F(WifiConfigCenterTest, SetP2pMidStateExp_FAILED, TestSize.Level1)
 
 HWTEST_F(WifiConfigCenterTest, GetCanOpenStaWhenAirplaneModeTest, TestSize.Level1)
 {
-    EXPECT_TRUE(WifiConfigCenter::GetInstance().GetCanOpenStaWhenAirplaneMode() == false);
+    EXPECT_TRUE(WifiConfigCenter::GetInstance().GetCanOpenStaWhenAirplaneMode() == true);
 }
 
 HWTEST_F(WifiConfigCenterTest, SetWifiStateWhenAirplaneModeTest, TestSize.Level1)

@@ -17,11 +17,14 @@
 #define OHOS_WIFI_HOTSPOT_SERVICE_IMPL_H
 
 #include "wifi_ap_msg.h"
+#include "wifi_config_center.h"
 #include "wifi_errcode.h"
 #include "wifi_hotspot_stub.h"
 
 namespace OHOS {
 namespace Wifi {
+constexpr int MAX_IPV4_SPLIT_LEN = 4;
+constexpr int MAX_IPV4_VALUE = 255;
 class WifiHotspotServiceImpl : public WifiHotspotStub {
 public:
     WifiHotspotServiceImpl();
@@ -200,6 +203,60 @@ public:
      * @return bool - true: service is died, false: service is not died.
      */
     bool IsRemoteDied(void) override;
+
+    /**
+     * @Description Check valid ssid config
+     *
+     * @param cfg - HotspotConfig
+     * @return ErrCode - WIFI_OPT_SUCCESS or others
+     */
+    ErrCode CfgCheckSsid(const HotspotConfig &cfg);
+
+    /**
+     * @Description Check valid psk config
+     *
+     * @param cfg - HotspotConfig
+     * @return ErrCode - WIFI_OPT_SUCCESS or others
+     */
+    ErrCode CfgCheckPsk(const HotspotConfig &cfg);
+
+    /**
+     * @Description Check valid band config
+     *
+     * @param cfg - HotspotConfig
+     * @param bandsFromCenter - vector of BandType
+     * @return ErrCode - WIFI_OPT_SUCCESS or others
+     */
+    ErrCode CfgCheckBand(const HotspotConfig &cfg, std::vector<BandType> &bandsFromCenter);
+
+    /**
+     * @Description Check valid channel config
+     *
+     * @param cfg - HotspotConfig
+     * @param channInfoFromCenter - ChannelsTable object
+     * @return ErrCode - WIFI_OPT_SUCCESS or others
+     */
+    ErrCode CfgCheckChannel(const HotspotConfig &cfg, ChannelsTable &channInfoFromCenter);
+
+    /**
+     * @Description Check dhcp server ip address
+     *
+     * @param ipAddress - string
+     * @return ErrCode - WIFI_OPT_SUCCESS or others
+     */
+    ErrCode CfgCheckIpAddress(const std::string &ipAddress);
+
+    /**
+     * @Description Check valid hotspot config
+     *
+     * @param cfg - HotspotConfig
+     * @param cfgFromCenter - Get HotspotConfig from config center
+     * @param bandsFromCenter - vector of BandType
+     * @param channInfoFromCenter - ChannelsTable object
+     * @return ErrCode - WIFI_OPT_SUCCESS or others
+     */
+    ErrCode IsValidHotspotConfig(const HotspotConfig &cfg, const HotspotConfig &cfgFromCenter,
+        std::vector<BandType> &bandsFromCenter, ChannelsTable &channInfoFromCenter);
 
 private:
     ErrCode CheckCanEnableHotspot(const ServiceType type);

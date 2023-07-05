@@ -28,6 +28,7 @@
 #include "stub_collector.h"
 #include "wifi_hdi_util.h"
 #include "wifi_supplicant_hal.h"
+#include "wifi_common_def.h"
 
 #undef LOG_TAG
 #define LOG_TAG "WifiHdiStaImpl"
@@ -67,13 +68,18 @@ int32_t HdiScanResultsCallback(struct IWlanCallback *self, uint32_t event,
         return WIFI_HAL_FAILED;
     }
     char buff[1024] = {0};
+    char bssid[WIFI_BSSID_LENGTH] = {0};
     int buffLen = 1024;
     for (size_t i = 0; i < scanResults->resLen && i < WIFI_IDL_GET_MAX_SCAN_INFO; i++) {
         struct HdfWifiScanResultExt *scanResult = &scanResults->res[i];
         struct HdiElems elems;
         Get80211ElemsFromIE((const uint8_t*)scanResult->ie, scanResult->ieLen, &elems, 1);
         if (elems.ssidLen == 0) {
-            LOGE("HdiScanResultsCallback ssid empty.");
+            if (sprintf_s(bssid, sizeof(bssid), MACSTR, MAC2STR(scanResult->bssid)) < 0) {
+                LOGE("HdiScanResultsCallback ssid empty.");
+                continue;
+            }
+            LOGE("HdiScanResultsCallback ssid empty. bssid:%{public}s", bssid);
             continue;
         }
         buffLen = 1024;
@@ -88,6 +94,8 @@ int32_t HdiScanResultsCallback(struct IWlanCallback *self, uint32_t event,
             LOGE("HdiScanResultsCallback DelScanInfoLine failed.");
             continue;
         }
+        LOGD("HdiScanResultsCallback bssid:%{public}s, ssid:%{public}s", g_hdiScanResults[g_hdiScanResultsCount].bssid,
+            g_hdiScanResults[g_hdiScanResultsCount].ssid);
         g_hdiScanResultsCount++;
     }
     

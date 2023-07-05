@@ -1114,6 +1114,22 @@ public:
     bool IsLoadStabak();
 
     /**
+     * @Description Set the real mac address
+     *
+     * @param macAddress - the real mac address
+     * @return int - 0 success
+     */
+    int SetRealMacAddress(const std::string &macAddress);
+
+    /**
+     * @Description Get the real mac address
+     *
+     * @param macAddress - the real mac address
+     * @return int - 0 success
+     */
+    int GetRealMacAddress(std::string &macAddress);
+
+    /**
      * @Description set the device name
      *
      * @param deviceName - device name

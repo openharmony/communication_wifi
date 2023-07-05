@@ -445,6 +445,25 @@ public:
      */
     int SetStaLastRunState(bool bRun);
 
+#ifdef WIFI_FEATURE_STA_AP_EXCLUSION
+    /**
+     * @Description Get Ap Last running state
+     *
+     * @param id - ap service inst id
+     * @return bool - true running state
+     */
+    bool GetApLastRunState(const int id = 0);
+
+    /**
+     * @Description Set Ap last running state
+     *
+     * @param bExpectd - true / false
+     * @param bRun - true / false
+     * @param id - ap service inst id
+     * @return bool - true success
+     */
+    bool SetApLastRunState(bool bExpectd, bool bRun, const int id = 0);
+#endif
     /**
      * @Description Set current phone screen state
      *
@@ -568,6 +587,10 @@ private:
     /* Time interval for disabling and re-enabling the STA */
     std::chrono::steady_clock::time_point mWifiCloseTime;
     std::atomic<bool> mWifiOpenedWhenAirplane;
+#ifdef WIFI_FEATURE_STA_AP_EXCLUSION
+    std::mutex mApLastRunStateMutex;
+    std::map<int, std::atomic<bool>> mApLastRunState;
+#endif
 };
 } // namespace Wifi
 } // namespace OHOS

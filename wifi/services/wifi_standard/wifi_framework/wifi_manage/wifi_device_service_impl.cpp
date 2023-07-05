@@ -357,6 +357,13 @@ ErrCode WifiDeviceServiceImpl::DisableWifi()
                     static_cast<int>(OperatorWifiType::USER_CLOSE_WIFI_IN_AIRPLANEMODE));
                 WIFI_LOGI("EnableWifi, current airplane mode is opened, user close wifi!");
         }
+#ifdef WIFI_FEATURE_STA_AP_EXCLUSION
+        if (WifiConfigCenter::GetInstance().GetApLastRunState()) {
+            std::thread startApSrvThread(WifiManager::ExclusionAutoStartApService);
+            pthread_setname_np(startApSrvThread.native_handle(), "ExclusionApAutoStartThread");
+            startApSrvThread.detach();
+        }
+#endif
     }
     return ret;
 }

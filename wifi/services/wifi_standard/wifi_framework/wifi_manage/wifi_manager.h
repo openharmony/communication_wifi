@@ -151,15 +151,70 @@ public:
 
     void StopUnloadApSaTimer(void);
     void StartUnloadApSaTimer(void);
-#endif
-
 #ifdef WIFI_FEATURE_STA_AP_EXCLUSION
+    /**
+     * @Description Get Sta&Ap Exclusion flag
+     *
+     * @param type - service type
+     * @return bool - return true if sta or ap service closed by sta&ap exclusion
+     */
     bool GetStaApExclusionFlag(WifiCloseServiceCode type = WifiCloseServiceCode::STA_SERVICE_CLOSE);
+
+    /**
+     * @Description Set Sta&Ap Exclusion flag
+     *
+     * @param type - service type
+     * @param isExclusion - true / false
+     */
     void SetStaApExclusionFlag(WifiCloseServiceCode type, bool isExclusion);
+
+    /**
+     * @Description wakeup thread blocked by getting DisableHotspot asynchronous operation result
+     *
+     */
     void SignalDisableHotspot();
+
+    /**
+     * @Description wakeup thread blocked by getting DisableWifi asynchronous operation result
+     *
+     */
     void SignalDisableWifi();
+
+    /**
+     * @Description blocked for seconds until DisableHotspot asynchronous operation complete
+     * or timeout
+     *
+     * @returns ErrCode - return errCode
+     */
     ErrCode TimeWaitDisableHotspot();
+
+    /**
+     * @Description blocked for seconds until DisableWifi asynchronous operation complete
+     * or timeout
+     *
+     * @returns ErrCode - return errCode
+     */
     ErrCode TimeWaitDisableWifi();
+
+    /**
+     * @Description auto start Ap service if ap last run state is true
+     *
+     */
+    static void ExclusionAutoStartApService(void);
+
+    /**
+     * @Description auto start Sta service if ap last run state is true
+     *
+     */
+    static void ExclusionAutoStartStaService(void);
+
+    /**
+     * @Description check before enable wifi
+     *
+     * @returns ErrCode - return errCode
+     */
+    static ErrCode CheckCanEnableWifi();
+#endif
 #endif
 
 #ifdef FEATURE_P2P_SUPPORT

@@ -311,6 +311,11 @@ if (defined(ohos_lite)) {
       defines += [ "WIFI_FEATURE_STA_AP_EXCLUSION" ]
     }
 
+    if (wifi_feature_with_p2p) {
+      defines += [ "FEATURE_P2P_SUPPORT" ]
+      deps += [ ":wifi_p2p_service_impl" ]
+    }
+
     if (wifi_feature_with_ap_extension) {
       defines += [ "FEATURE_AP_EXTENSION" ]
     }

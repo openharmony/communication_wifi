@@ -28,6 +28,12 @@
 #include "wifi_logger.h"
 #include "wifi_common_util.h"
 
+#ifdef WIFI_FEATURE_STA_AP_EXCLUSION
+#ifdef FEATURE_P2P_SUPPORT
+#include "wifi_p2p_service_impl.h"
+#endif
+#endif
+
 DEFINE_WIFILOG_HOTSPOT_LABEL("WifiHotspotServiceImpl");
 
 namespace OHOS {
@@ -430,15 +436,12 @@ ErrCode WifiHotspotServiceImpl::DisableHotspot(const ServiceType type)
         WifiConfigCenter::GetInstance().SetApMidState(WifiOprMidState::CLOSING, WifiOprMidState::RUNNING, m_id);
     }
 #ifdef WIFI_FEATURE_STA_AP_EXCLUSION
-    // resume wifi if closed by exclusion scene.
-    sleep(1);
+    // resume sta if closed in exclusion scene.
+    WifiConfigCenter::GetInstance().SetApLastRunState(true, false, m_id);
     if (WifiConfigCenter::GetInstance().GetStaLastRunState()) {
-        IStaService *pStaService = WifiServiceManager::GetInstance().GetStaServiceInst();
-        if (pStaService == nullptr) {
-            WIFI_LOGE("get sta service inst failed");
-            return WIFI_OPT_FAILED;
-        }
-        pStaService->EnableWifi();
+            std::thread startStaSrvThread(WifiManager::ExclusionAutoStartStaService);
+            pthread_setname_np(startStaSrvThread.native_handle(), "ExclusionAutoStartStaThread");
+            startStaSrvThread.detach();
     }
 #endif
     return ret;
@@ -801,7 +804,6 @@ ErrCode WifiHotspotServiceImpl::DisableWifi()
         WifiManager::GetInstance().SetStaApExclusionFlag(WifiCloseServiceCode::STA_SERVICE_CLOSE, false);
         return ret;
     } else {
-        //WifiConfigCenter::GetInstance().SetStaLastRunState(false);
         WifiManager::GetInstance().GetAirplaneModeByDatashare(WIFI_DEVICE_ABILITY_ID);
         if (WifiConfigCenter::GetInstance().GetOperatorWifiType() ==
             static_cast<int>(OperatorWifiType::USER_OPEN_WIFI_IN_AIRPLANEMODE) &&

@@ -50,9 +50,9 @@ void WifiScanStub::InitHandleMap()
         &WifiScanStub::OnRegisterCallBack;
     handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_SUPPORTED_FEATURES)] =
         &WifiScanStub::OnGetSupportedFeatures;
-    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_SET_WIFI_SCAN_ONLY)] = 
+    handleFuncMap[static_cast<uint32_t>(ScanInterfaceCode::WIFI_SVR_CMD_SET_WIFI_SCAN_ONLY)] = 
         &WifiScanStub::OnSetScanOnlyAvailable;
-    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_WIFI_SCAN_ONLY)] = 
+    handleFuncMap[static_cast<uint32_t>(ScanInterfaceCode::WIFI_SVR_CMD_GET_WIFI_SCAN_ONLY)] = 
         &WifiScanStub::OnGetScanOnlyAvailable;
 }
 

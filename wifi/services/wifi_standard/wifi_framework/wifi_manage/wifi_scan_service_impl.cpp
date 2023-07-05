@@ -241,11 +241,10 @@ ErrCode WifiScanServiceImpl::SetScanOnlyAvailable(bool bScanOnlyAvailable)
         return WIFI_OPT_PERMISSION_DENIED;
     }
     WifiSettings::GetInstance().SetScanOnlySwitchState(bScanOnlyAvailable);
-    if(bScanOnlyAvailable) {
-        return OpenScanOnlyAvailable();
-    }
-    else {
-        return CloseScanOnlyAvailable();
+    if (bScanOnlyAvailable) {
+        OpenScanOnlyAvailable();
+    } else {
+        CloseScanOnlyAvailable();
     }
     return WIFI_OPT_SUCCESS;
 }

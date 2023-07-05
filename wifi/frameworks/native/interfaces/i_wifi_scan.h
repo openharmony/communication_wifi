@@ -79,7 +79,7 @@ public:
      * @return ErrCode - operation result
      */
     virtual ErrCode GetScanInfoList(std::vector<WifiScanInfo> &result) = 0;
-        /**
+    /**
      * @Description SetScanOnlyAvailable.
      *
      * @return ErrCode - operation result

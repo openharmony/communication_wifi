@@ -585,7 +585,8 @@ void StaStateMachine::StopWifiProcess()
     InitWifiLinkedInfo();
     WifiSettings::GetInstance().SaveLinkedInfo(linkedInfo);
     
-    if (WifiOprMidState::RUNNING == WifiConfigCenter::GetInstance().GetWifiScanOnlyMidState() || WifiStaHalInterface::GetInstance().StopWifi() == WIFI_IDL_OPT_OK) {
+    if (WifiOprMidState::RUNNING == WifiConfigCenter::GetInstance().GetWifiScanOnlyMidState() \
+        || WifiStaHalInterface::GetInstance().StopWifi() == WIFI_IDL_OPT_OK) {
         /* Callback result to InterfaceService. */
         WifiSettings::GetInstance().SetWifiState(static_cast<int>(WifiState::DISABLED));
         staCallback.OnStaCloseRes(OperateResState::CLOSE_WIFI_SUCCEED);

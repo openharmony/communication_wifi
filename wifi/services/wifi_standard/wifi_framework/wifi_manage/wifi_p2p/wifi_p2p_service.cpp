@@ -348,7 +348,7 @@ int WifiP2pService::GetP2pRecommendChannel(void)
         const int RADAR_CHANNEL_MIN = 50;
         const int RADAR_CHANNEL_MAX = 64;
         channel = FrequencyToChannel(linkedInfo.frequency);
-        if (linkedInfo.band == static_cast<int>(BandType::BAND_5GHZ) && 
+        if (linkedInfo.band == static_cast<int>(BandType::BAND_5GHZ) &&
             (channel < RADAR_CHANNEL_MIN || channel > RADAR_CHANNEL_MAX)) {
             WIFI_LOGI("Recommend linked channel: %{public}d", channel);
             return channel;

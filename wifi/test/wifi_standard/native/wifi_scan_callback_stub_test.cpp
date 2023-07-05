@@ -20,6 +20,7 @@
 #include <cstdint>
 #include "securec.h"
 #include "wifi_logger.h"
+#include "wifi_manager_service_ipc_interface_code.h"
 
 using ::testing::Return;
 using ::testing::ext::TestSize;
@@ -96,7 +97,7 @@ HWTEST_F(WifiScanCallbackStubTest, OnRemoteRequestTest, TestSize.Level1)
 HWTEST_F(WifiScanCallbackStubTest, OnRemoteRequestTest1, TestSize.Level1)
 {
     WIFI_LOGI("OnRemoteRequestTest1 ENTER");
-    uint32_t code = WIFI_CBK_CMD_SCAN_STATE_CHANGE;
+    uint32_t code = static_cast<uint32_t>(ScanInterfaceCode::WIFI_CBK_CMD_SCAN_STATE_CHANGE);
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;

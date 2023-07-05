@@ -23,6 +23,7 @@
 #include "message_parcel.h"
 #include "securec.h"
 #include "define.h"
+#include "wifi_manager_service_ipc_interface_code.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -155,12 +156,14 @@ void OnGetSupportedFeaturesTest(const uint8_t* data, size_t size)
     MessageParcel reply;
     MessageOption option;
     std::shared_ptr<WifiHotspotStub> pWifiHotspotStub = std::make_shared<WifiHotSpotStubFuzzTest>();
-    pWifiHotspotStub->OnRemoteRequest(WIFI_SVR_CMD_GET_SUPPORTED_FEATURES, datas, reply, option);
+    pWifiHotspotStub->OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_SUPPORTED_FEATURES),
+        datas, reply, option);
 }
 
 bool DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)
 {
-    uint32_t code = U32_AT(data) % MAP_HOTSPOT_NUMS + WIFI_SVR_CMD_ENABLE_WIFI_AP;
+    uint32_t code = U32_AT(data) % MAP_HOTSPOT_NUMS +
+        static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_ENABLE_WIFI_AP);
     MessageParcel datas;
     datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN);
     datas.WriteInt32(0);

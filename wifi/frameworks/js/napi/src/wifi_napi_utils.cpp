@@ -85,7 +85,6 @@ napi_value JsObjectToString(const napi_env& env, const napi_value& object,
         if (napi_get_value_string_utf8(env, field, buf, bufLen, &result) != napi_ok) {
             free(buf);
             buf = nullptr;
-            napi_throw_error(env, NULL, "get string value error");
             return NULL;
         }
         fieldRef = buf;

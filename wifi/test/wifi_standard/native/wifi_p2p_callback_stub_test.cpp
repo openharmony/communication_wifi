@@ -16,6 +16,7 @@
 #include <gmock/gmock.h>
 #include "wifi_logger.h"
 #include "wifi_p2p_callback_stub.h"
+#include "wifi_manager_service_ipc_interface_code.h"
 
 using ::testing::_;
 using ::testing::AtLeast;
@@ -139,7 +140,7 @@ HWTEST_F(WifiP2pCallbackStubTest, OnRemoteRequestTest2, TestSize.Level1)
 HWTEST_F(WifiP2pCallbackStubTest, RemoteOnP2pStateChangedTest, TestSize.Level1)
 {
     WIFI_LOGI("RemoteOnP2pStateChangedTest enter");
-    uint32_t code = WIFI_CBK_CMD_P2P_STATE_CHANGE;
+    uint32_t code = static_cast<uint32_t>(P2PInterfaceCode::WIFI_CBK_CMD_P2P_STATE_CHANGE);
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
@@ -160,7 +161,7 @@ HWTEST_F(WifiP2pCallbackStubTest, RemoteOnP2pStateChangedTest, TestSize.Level1)
 HWTEST_F(WifiP2pCallbackStubTest, RemoteOnP2pPersistentGroupsChangedTest, TestSize.Level1)
 {
     WIFI_LOGI("RemoteOnP2pPersistentGroupsChangedTest enter");
-    uint32_t code = WIFI_CBK_CMD_PERSISTENT_GROUPS_CHANGE;
+    uint32_t code = static_cast<uint32_t>(P2PInterfaceCode::WIFI_CBK_CMD_PERSISTENT_GROUPS_CHANGE);
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
@@ -180,7 +181,7 @@ HWTEST_F(WifiP2pCallbackStubTest, RemoteOnP2pPersistentGroupsChangedTest, TestSi
 HWTEST_F(WifiP2pCallbackStubTest, RemoteOnP2pThisDeviceChangedTest, TestSize.Level1)
 {
     WIFI_LOGI("RemoteOnP2pThisDeviceChangedTest enter");
-    uint32_t code = WIFI_CBK_CMD_THIS_DEVICE_CHANGE;
+    uint32_t code = static_cast<uint32_t>(P2PInterfaceCode::WIFI_CBK_CMD_THIS_DEVICE_CHANGE);
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
@@ -200,7 +201,7 @@ HWTEST_F(WifiP2pCallbackStubTest, RemoteOnP2pThisDeviceChangedTest, TestSize.Lev
 HWTEST_F(WifiP2pCallbackStubTest, RemoteOnP2pPeersChangedTest, TestSize.Level1)
 {
     WIFI_LOGI("RemoteOnP2pPeersChangedTest enter");
-    uint32_t code = WIFI_CBK_CMD_PEER_CHANGE;
+    uint32_t code = static_cast<uint32_t>(P2PInterfaceCode::WIFI_CBK_CMD_PEER_CHANGE);
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
@@ -222,7 +223,7 @@ HWTEST_F(WifiP2pCallbackStubTest, RemoteOnP2pPeersChangedTest, TestSize.Level1)
 HWTEST_F(WifiP2pCallbackStubTest, RemoteOnP2pPeersChangedTest2, TestSize.Level1)
 {
     WIFI_LOGI("RemoteOnP2pPeersChangedTest2 enter");
-    uint32_t code = WIFI_CBK_CMD_PEER_CHANGE;
+    uint32_t code = static_cast<uint32_t>(P2PInterfaceCode::WIFI_CBK_CMD_PEER_CHANGE);
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
@@ -237,7 +238,7 @@ HWTEST_F(WifiP2pCallbackStubTest, RemoteOnP2pPeersChangedTest2, TestSize.Level1)
 HWTEST_F(WifiP2pCallbackStubTest, RemoteOnP2pServicesChangedTest, TestSize.Level1)
 {
     WIFI_LOGI("RemoteOnP2pServicesChangedTest enter");
-    uint32_t code = WIFI_CBK_CMD_SERVICE_CHANGE;
+    uint32_t code = static_cast<uint32_t>(P2PInterfaceCode::WIFI_CBK_CMD_SERVICE_CHANGE);
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
@@ -259,7 +260,7 @@ HWTEST_F(WifiP2pCallbackStubTest, RemoteOnP2pServicesChangedTest, TestSize.Level
 HWTEST_F(WifiP2pCallbackStubTest, RemoteOnP2pServicesChangedTest2, TestSize.Level1)
 {
     WIFI_LOGI("RemoteOnP2pServicesChangedTest2 enter");
-    uint32_t code = WIFI_CBK_CMD_SERVICE_CHANGE;
+    uint32_t code = static_cast<uint32_t>(P2PInterfaceCode::WIFI_CBK_CMD_SERVICE_CHANGE);
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
@@ -274,7 +275,7 @@ HWTEST_F(WifiP2pCallbackStubTest, RemoteOnP2pServicesChangedTest2, TestSize.Leve
 HWTEST_F(WifiP2pCallbackStubTest, RemoteOnP2pConnectionChangedTest, TestSize.Level1)
 {
     WIFI_LOGI("RemoteOnP2pConnectionChangedTest enter");
-    uint32_t code = WIFI_CBK_CMD_CONNECT_CHANGE;
+    uint32_t code = static_cast<uint32_t>(P2PInterfaceCode::WIFI_CBK_CMD_CONNECT_CHANGE);
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
@@ -294,7 +295,7 @@ HWTEST_F(WifiP2pCallbackStubTest, RemoteOnP2pConnectionChangedTest, TestSize.Lev
 HWTEST_F(WifiP2pCallbackStubTest, RemoteOnP2pDiscoveryChangedTest, TestSize.Level1)
 {
     WIFI_LOGI("RemoteOnP2pDiscoveryChangedTest enter");
-    uint32_t code = WIFI_CBK_CMD_DISCOVERY_CHANGE;
+    uint32_t code = static_cast<uint32_t>(P2PInterfaceCode::WIFI_CBK_CMD_DISCOVERY_CHANGE);
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
@@ -314,7 +315,7 @@ HWTEST_F(WifiP2pCallbackStubTest, RemoteOnP2pDiscoveryChangedTest, TestSize.Leve
 HWTEST_F(WifiP2pCallbackStubTest, RemoteOnP2pActionResultTest, TestSize.Level1)
 {
     WIFI_LOGI("RemoteOnP2pActionResultTest enter");
-    uint32_t code = WIFI_CBK_CMD_P2P_ACTION_RESULT;
+    uint32_t code = static_cast<uint32_t>(P2PInterfaceCode::WIFI_CBK_CMD_P2P_ACTION_RESULT);
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
@@ -334,7 +335,7 @@ HWTEST_F(WifiP2pCallbackStubTest, RemoteOnP2pActionResultTest, TestSize.Level1)
 HWTEST_F(WifiP2pCallbackStubTest, RemoteOnConfigChangedTest, TestSize.Level1)
 {
     WIFI_LOGI("RemoteOnConfigChangedTest enter");
-    uint32_t code = WIFI_CBK_CMD_CFG_CHANGE;
+    uint32_t code = static_cast<uint32_t>(P2PInterfaceCode::WIFI_CBK_CMD_CFG_CHANGE);
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
@@ -349,7 +350,7 @@ HWTEST_F(WifiP2pCallbackStubTest, RemoteOnConfigChangedTest, TestSize.Level1)
 HWTEST_F(WifiP2pCallbackStubTest, RemoteOnConfigChangedTest1, TestSize.Level1)
 {
     WIFI_LOGI("RemoteOnConfigChangedTest1 enter");
-    uint32_t code = WIFI_CBK_CMD_CFG_CHANGE;
+    uint32_t code = static_cast<uint32_t>(P2PInterfaceCode::WIFI_CBK_CMD_CFG_CHANGE);
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
@@ -365,7 +366,7 @@ HWTEST_F(WifiP2pCallbackStubTest, RemoteOnConfigChangedTest1, TestSize.Level1)
 HWTEST_F(WifiP2pCallbackStubTest, RemoteOnConfigChangedTest2, TestSize.Level1)
 {
     WIFI_LOGI("RemoteOnConfigChangedTest2 enter");
-    uint32_t code = WIFI_CBK_CMD_CFG_CHANGE;
+    uint32_t code = static_cast<uint32_t>(P2PInterfaceCode::WIFI_CBK_CMD_CFG_CHANGE);
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;

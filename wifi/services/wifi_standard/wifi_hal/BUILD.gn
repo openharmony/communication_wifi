@@ -120,7 +120,7 @@ if (defined(ohos_lite)) {
       "hdf_core:libhdf_ipc_adapter",
       "hdf_core:libhdi",
       "hdf_core:libpub_utils",
-      "hiviewdfx_hilog_native:libhilog",
+      "hilog:libhilog",
     ]
 
     defines = [
@@ -177,7 +177,7 @@ if (defined(ohos_lite)) {
       "hdf_core:libhdf_ipc_adapter",
       "hdf_core:libhdi",
       "hdf_core:libpub_utils",
-      "hiviewdfx_hilog_native:libhilog",
+      "hilog:libhilog",
     ]
 
     defines = [

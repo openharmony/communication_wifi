@@ -211,7 +211,7 @@ if (defined(ohos_lite)) {
 
     external_deps = [
       "c_utils:utils",
-      "hiviewdfx_hilog_native:libhilog",
+      "hilog:libhilog",
       "ipc:ipc_single",
       "samgr:samgr_proxy",
     ]

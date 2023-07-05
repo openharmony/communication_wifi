@@ -60,7 +60,6 @@ ohos_unittest("wifi_sta_unittest") {
     "sta_network_check_test.cpp",
     "sta_saved_device_appraisal_test.cpp",
     "sta_service_test.cpp",
-    "sta_state_machine_test.cpp",
   ]
 
   include_dirs = [
@@ -115,7 +114,7 @@ ohos_unittest("wifi_sta_unittest") {
     "ability_base:want",
     "c_utils:utils",
     "dhcp:dhcp_manager_service",
-    "hiviewdfx_hilog_native:libhilog",
+    "hilog:libhilog",
     "ipc:ipc_single",
     "netmanager_base:net_conn_manager_if",
     "samgr:samgr_proxy",

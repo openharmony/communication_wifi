@@ -387,6 +387,11 @@ public:
      */
     int GetLinkedInfo(WifiLinkedInfo& linkedInfo);
 
+    /**
+     * @Description Reupdate net link info
+     */
+    void ReUpdateNetLinkInfo(void);
+
 #ifndef OHOS_ARCH_LITE
 private:
     class SystemAbilityStatusChangeListener : public OHOS::SystemAbilityStatusChangeStub {
@@ -718,9 +723,11 @@ private:
     void ReUpdateNetSupplierInfo(sptr<NetManagerStandard::NetSupplierInfo> supplierInfo);
 
     /**
-     * @Description Reupdate net link inf
+     * @Description save wificonfig for update mode.
+     *
+     * @param networkId - current connected networkId;
      */
-    void ReUpdateNetLinkInfo(void);
+    void SaveWifiConfigForUpdate(int networkId);
 #endif // OHOS_ARCH_LITE
 
 private:

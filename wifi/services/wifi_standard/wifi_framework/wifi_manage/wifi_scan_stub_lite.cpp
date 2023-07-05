@@ -15,6 +15,7 @@
 
 #include "wifi_scan_stub_lite.h"
 #include "define.h"
+#include "wifi_manager_service_ipc_interface_code.h"
 #include "ipc_skeleton.h"
 #include "rpc_errno.h"
 #include "wifi_logger.h"
@@ -64,31 +65,31 @@ int WifiScanStub::OnRemoteRequest(uint32_t code, IpcIo *req, IpcIo *reply)
 
     int ret = -1;
     switch (code) {
-        case WIFI_SVR_CMD_SET_SCAN_CONTROL_INFO: {
+        case static_cast<uint32_t>(ScanInterfaceCode::WIFI_SVR_CMD_SET_SCAN_CONTROL_INFO): {
             ret = OnSetScanControlInfo(code, req, reply);
             break;
         }
-        case WIFI_SVR_CMD_FULL_SCAN: {
+        case static_cast<uint32_t>(ScanInterfaceCode::WIFI_SVR_CMD_FULL_SCAN): {
             ret = OnScan(code, req, reply);
             break;
         }
-        case WIFI_SVR_CMD_SPECIFIED_PARAMS_SCAN: {
+        case static_cast<uint32_t>(ScanInterfaceCode::WIFI_SVR_CMD_SPECIFIED_PARAMS_SCAN): {
             ret = OnScanByParams(code, req, reply);
             break;
         }
-        case WIFI_SVR_CMD_IS_SCAN_ALWAYS_ACTIVE: {
+        case static_cast<uint32_t>(ScanInterfaceCode::WIFI_SVR_CMD_IS_SCAN_ALWAYS_ACTIVE): {
             ret = OnIsWifiClosedScan(code, req, reply);
             break;
         }
-        case WIFI_SVR_CMD_GET_SCAN_INFO_LIST: {
+        case static_cast<uint32_t>(ScanInterfaceCode::WIFI_SVR_CMD_GET_SCAN_INFO_LIST): {
             ret = OnGetScanInfoList(code, req, reply);
             break;
         }
-        case WIFI_SVR_CMD_REGISTER_SCAN_CALLBACK: {
+        case static_cast<uint32_t>(ScanInterfaceCode::WIFI_SVR_CMD_REGISTER_SCAN_CALLBACK): {
             ret = OnRegisterCallBack(code, req, reply);
             break;
         }
-        case WIFI_SVR_CMD_GET_SUPPORTED_FEATURES: {
+        case static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_SUPPORTED_FEATURES): {
             ret = OnGetSupportedFeatures(code, req, reply);
             break;
         }

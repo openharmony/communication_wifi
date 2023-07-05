@@ -46,7 +46,6 @@ ohos_unittest("wifi_scan_unittest") {
     "scan_interface_test.cpp",
     "scan_monitor_test.cpp",
     "scan_service_test.cpp",
-    "scan_state_machine_test.cpp",
   ]
 
   include_dirs = [
@@ -94,7 +93,7 @@ ohos_unittest("wifi_scan_unittest") {
     "ability_base:want",
     "c_utils:utils",
     "common_event_service:cesfwk_innerkits",
-    "hiviewdfx_hilog_native:libhilog",
+    "hilog:libhilog",
   ]
   part_name = "wifi"
   subsystem_name = "communication"

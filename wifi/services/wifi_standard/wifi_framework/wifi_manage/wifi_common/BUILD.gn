@@ -41,7 +41,7 @@ ohos_shared_library("wifi_common_service") {
 
   external_deps = [
     "c_utils:utils",
-    "hiviewdfx_hilog_native:libhilog",
+    "hilog:libhilog",
   ]
 
   part_name = "wifi"

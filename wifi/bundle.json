@@ -77,8 +77,8 @@
                 "efficiency_manager",
                 "eventhandler",
                 "hicollie_native",
-                "hisysevent_native",
-                "hiviewdfx_hilog_native",
+                "hisysevent",
+                "hilog",
                 "huks",
                 "ipc",
                 "napi",
@@ -86,7 +86,8 @@
                 "safwk",
                 "samgr",
                 "data_share",
-                "hdf_core"
+                "hdf_core",
+                "hicollie"
             ],
             "third_party": [
                 "bounds_checking_function",

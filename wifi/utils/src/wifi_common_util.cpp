@@ -145,7 +145,7 @@ errno_t MacStrToArray(const std::string& strMac, unsigned char mac[WIFI_MAC_LEN]
     constexpr int bitWidth = 4;
     char *ptr = nullptr;
     char *p = strtok_s(tempArray, ":", &ptr);
-    while (p != nullptr) {
+    while ((p != nullptr) && (idx < WIFI_MAC_LEN)) {
         mac[idx++] = (ConvertStrChar(*p) << bitWidth) | ConvertStrChar(*(p + 1));
         p = strtok_s(nullptr, ":", &ptr);
     }

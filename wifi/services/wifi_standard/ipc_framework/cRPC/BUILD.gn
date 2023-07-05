@@ -87,7 +87,7 @@ if (defined(ohos_lite)) {
     deps = []
     external_deps = [
       "c_utils:utils",
-      "hiviewdfx_hilog_native:libhilog",
+      "hilog:libhilog",
     ]
     subsystem_name = "communication"
     part_name = "wifi"
@@ -105,7 +105,7 @@ if (defined(ohos_lite)) {
     deps = []
     external_deps = [
       "c_utils:utils",
-      "hiviewdfx_hilog_native:libhilog",
+      "hilog:libhilog",
     ]
     subsystem_name = "communication"
     part_name = "wifi"

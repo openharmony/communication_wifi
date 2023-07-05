@@ -349,6 +349,47 @@ napi_value ConfigStaticIp(const napi_env& env, const napi_value& object, WifiDev
     return CreateInt32(env);
 }
 
+ErrCode ProcessProxyConfig(const napi_env& env, const napi_value& object, WifiDeviceConfig& cppConfig)
+{
+    bool hasProperty = false;
+    NAPI_CALL_BASE(env, napi_has_named_property(env, object, "proxyConfig", &hasProperty), {});
+    ErrCode ret = WIFI_OPT_SUCCESS;
+    if (hasProperty) {
+        napi_value proxyConfig;
+        napi_get_named_property(env, object, "proxyConfig", &proxyConfig);
+        int proxyConfigMethod = static_cast<int>(ConfigureProxyMethod::CLOSED);
+        JsObjectToInt(env, proxyConfig, "proxyMethod", proxyConfigMethod);
+        cppConfig.wifiProxyconfig.configureMethod = ConfigureProxyMethod::CLOSED;
+        switch (ConfigureProxyMethod(proxyConfigMethod)) {
+            case ConfigureProxyMethod::AUTOCONFIGUE:
+                cppConfig.wifiProxyconfig.configureMethod = ConfigureProxyMethod::AUTOCONFIGUE;
+                JsObjectToString(env, proxyConfig, "pacWebAddress", NAPI_MAX_STR_LENT,
+                    cppConfig.wifiProxyconfig.autoProxyConfig.pacWebAddress);
+                ret = WIFI_OPT_NOT_SUPPORTED;
+                break;
+            case ConfigureProxyMethod::MANUALCONFIGUE:
+                cppConfig.wifiProxyconfig.configureMethod = ConfigureProxyMethod::MANUALCONFIGUE;
+                JsObjectToString(env, proxyConfig, "serverHostName", NAPI_MAX_STR_LENT,
+                    cppConfig.wifiProxyconfig.manualProxyConfig.serverHostName);
+                JsObjectToString(env, proxyConfig, "exclusionObjects", NAPI_MAX_STR_LENT,
+                    cppConfig.wifiProxyconfig.manualProxyConfig.exclusionObjectList);
+                JsObjectToInt(env, proxyConfig, "serverPort", cppConfig.wifiProxyconfig.manualProxyConfig.serverPort);
+                if (cppConfig.wifiProxyconfig.manualProxyConfig.serverPort < 0) {
+                    ret = WIFI_OPT_INVALID_PARAM;
+                }
+                break;
+            case ConfigureProxyMethod::CLOSED:
+                WIFI_LOGI("ProcessProxyConfig, configureMethod is closed.");
+                break;
+            default:
+                WIFI_LOGE("ProcessProxyConfig, configureMethod %{public}d is not supported.", proxyConfigMethod);
+                ret = WIFI_OPT_INVALID_PARAM;
+        }
+    }
+
+    return ret;
+}
+
 static napi_value JsObjToDeviceConfig(const napi_env& env, const napi_value& object, WifiDeviceConfig& cppConfig)
 {
     JsObjectToString(env, object, "ssid", NAPI_MAX_STR_LENT, cppConfig.ssid); /* ssid max length is 32 + '\0' */
@@ -380,7 +421,10 @@ static napi_value JsObjToDeviceConfig(const napi_env& env, const napi_value& obj
             return UndefinedNapiValue(env);
         }
     }
-
+    ErrCode ret = ProcessProxyConfig(env, object, cppConfig);
+    if (ret != WIFI_OPT_SUCCESS) {
+        WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_STA);
+    }
     if (SecTypeJs(type) == SecTypeJs::SEC_TYPE_EAP) {
         return ProcessEapConfig(env, object, cppConfig);
     }

@@ -18,6 +18,7 @@
 #include "message_option.h"
 #include "message_parcel.h"
 #include "wifi_logger.h"
+#include "wifi_manager_service_ipc_interface_code.h"
 
 DEFINE_WIFILOG_HOTSPOT_LABEL("WifiHotspotMgrProxy");
 namespace OHOS {
@@ -32,7 +33,8 @@ sptr<IRemoteObject> WifiHotspotMgrProxy::GetWifiRemote(int id)
         return nullptr;
     }
     data.WriteInt32(id);
-    int error = Remote()->SendRequest(WIFI_MGR_GET_HOTSPOT_SERVICE, data, reply, option);
+    int error = Remote()->SendRequest(static_cast<uint32_t>(HotspotInterfaceCode::WIFI_MGR_GET_HOTSPOT_SERVICE), data,
+        reply, option);
     if (error != ERR_NONE) {
         WIFI_LOGE("Get remote object id %{public}d failed,error code is %{public}d", id, error);
         return nullptr;

@@ -58,6 +58,7 @@ ErrCode ApService::SetHotspotConfig(const HotspotConfig &cfg) const
     msg->AddIntMessageBody(static_cast<int>(cfg.GetBand()));
     msg->AddIntMessageBody(cfg.GetChannel());
     msg->AddIntMessageBody(cfg.GetMaxConn());
+    msg->AddStringMessageBody(cfg.GetIpAddress());
     m_ApStateMachine.SendMessage(msg);
     return ErrCode::WIFI_OPT_SUCCESS;
 }

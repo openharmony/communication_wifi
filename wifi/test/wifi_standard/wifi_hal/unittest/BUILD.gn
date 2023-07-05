@@ -107,7 +107,7 @@ ohos_unittest("wifi_hal_unittest") {
     "hdf_core:libhdf_ipc_adapter",
     "hdf_core:libhdi",
     "hdf_core:libpub_utils",
-    "hiviewdfx_hilog_native:libhilog",
+    "hilog:libhilog",
   ]
 
   defines = [ "AP_INTF=\"$wifi_feature_with_ap_intf\"" ]
@@ -145,7 +145,7 @@ ohos_shared_library("WifiHalVendorTest") {
 
   external_deps = [
     "c_utils:utils",
-    "hiviewdfx_hilog_native:libhilog",
+    "hilog:libhilog",
   ]
 
   part_name = "wifi"

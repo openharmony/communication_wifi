@@ -87,7 +87,7 @@ ohos_unittest("idl_client_unittest") {
 
   external_deps = [
     "c_utils:utils",
-    "hiviewdfx_hilog_native:libhilog",
+    "hilog:libhilog",
   ]
   configs = [ ":module_private_config" ]
 
@@ -132,7 +132,7 @@ ohos_unittest("mock_wifi_hal_service") {
 
   external_deps = [
     "c_utils:utils",
-    "hiviewdfx_hilog_native:libhilog",
+    "hilog:libhilog",
   ]
 
   cflags_cc = [ "-fno-rtti" ]

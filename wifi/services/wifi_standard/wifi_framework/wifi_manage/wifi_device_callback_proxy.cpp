@@ -16,6 +16,7 @@
 #include "wifi_device_callback_proxy.h"
 #include "wifi_logger.h"
 #include "define.h"
+#include "wifi_manager_service_ipc_interface_code.h"
 
 DEFINE_WIFILOG_LABEL("WifiDeviceCallBackProxy");
 
@@ -37,9 +38,11 @@ void WifiDeviceCallBackProxy::OnWifiStateChanged(int state)
     }
     data.WriteInt32(0);
     data.WriteInt32(state);
-    int error = Remote()->SendRequest(WIFI_CBK_CMD_STATE_CHANGE, data, reply, option);
+    int error = Remote()->SendRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_CBK_CMD_STATE_CHANGE), data, reply,
+        option);
     if (error != ERR_NONE) {
-        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d", WIFI_CBK_CMD_STATE_CHANGE, error);
+        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d",
+            static_cast<int32_t>(DevInterfaceCode::WIFI_CBK_CMD_STATE_CHANGE), error);
         return;
     }
     int exception = reply.ReadInt32();
@@ -81,9 +84,11 @@ void WifiDeviceCallBackProxy::OnWifiConnectionChanged(int state, const WifiLinke
     data.WriteString(info.portalUrl);
     data.WriteInt32((int)info.supplicantState);
     data.WriteInt32((int)info.detailedState);
-    int error = Remote()->SendRequest(WIFI_CBK_CMD_CONNECTION_CHANGE, data, reply, option);
+    int error = Remote()->SendRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_CBK_CMD_CONNECTION_CHANGE), data,
+        reply, option);
     if (error != ERR_NONE) {
-        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d", WIFI_CBK_CMD_CONNECTION_CHANGE, error);
+        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d",
+            static_cast<int32_t>(DevInterfaceCode::WIFI_CBK_CMD_CONNECTION_CHANGE), error);
         return;
     }
     int exception = reply.ReadInt32();
@@ -105,9 +110,11 @@ void WifiDeviceCallBackProxy::OnWifiRssiChanged(int rssi)
     }
     data.WriteInt32(0);
     data.WriteInt32(rssi);
-    int error = Remote()->SendRequest(WIFI_CBK_CMD_RSSI_CHANGE, data, reply, option);
+    int error = Remote()->SendRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_CBK_CMD_RSSI_CHANGE), data, reply,
+        option);
     if (error != ERR_NONE) {
-        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d", WIFI_CBK_CMD_RSSI_CHANGE, error);
+        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d",
+            static_cast<int32_t>(DevInterfaceCode::WIFI_CBK_CMD_RSSI_CHANGE), error);
         return;
     }
     int exception = reply.ReadInt32();
@@ -130,9 +137,11 @@ void WifiDeviceCallBackProxy::OnWifiWpsStateChanged(int state, const std::string
     data.WriteInt32(0);
     data.WriteInt32(state);
     data.WriteCString(pinCode.c_str());
-    int error = Remote()->SendRequest(WIFI_CBK_CMD_WPS_STATE_CHANGE, data, reply, option);
+    int error = Remote()->SendRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_CBK_CMD_WPS_STATE_CHANGE), data,
+        reply, option);
     if (error != ERR_NONE) {
-        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d", WIFI_CBK_CMD_WPS_STATE_CHANGE, error);
+        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d",
+            static_cast<int32_t>(DevInterfaceCode::WIFI_CBK_CMD_WPS_STATE_CHANGE), error);
         return;
     }
     int exception = reply.ReadInt32();
@@ -154,9 +163,11 @@ void WifiDeviceCallBackProxy::OnStreamChanged(int direction)
     }
     data.WriteInt32(0);
     data.WriteInt32(direction);
-    int error = Remote()->SendRequest(WIFI_CBK_CMD_STREAM_DIRECTION, data, reply, option);
+    int error = Remote()->SendRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_CBK_CMD_STREAM_DIRECTION), data,
+        reply, option);
     if (error != ERR_NONE) {
-        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d", WIFI_CBK_CMD_STREAM_DIRECTION, error);
+        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d",
+            static_cast<int32_t>(DevInterfaceCode::WIFI_CBK_CMD_STREAM_DIRECTION), error);
         return;
     }
     int exception = reply.ReadInt32();
@@ -178,9 +189,11 @@ void WifiDeviceCallBackProxy::OnDeviceConfigChanged(ConfigChange value)
     }
     data.WriteInt32(0);
     data.WriteInt32((int)value);
-    int error = Remote()->SendRequest(WIFI_CBK_CMD_DEVICE_CONFIG_CHANGE, data, reply, option);
+    int error = Remote()->SendRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_CBK_CMD_DEVICE_CONFIG_CHANGE), data,
+        reply, option);
     if (error != ERR_NONE) {
-        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d", WIFI_CBK_CMD_DEVICE_CONFIG_CHANGE, error);
+        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d",
+            static_cast<int32_t>(DevInterfaceCode::WIFI_CBK_CMD_DEVICE_CONFIG_CHANGE), error);
         return;
     }
     int exception = reply.ReadInt32();

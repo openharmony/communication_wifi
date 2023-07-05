@@ -31,6 +31,7 @@
 #include "wifi_hisysevent.h"
 #include "wifi_config_center.h"
 #ifndef OHOS_ARCH_LITE
+#include <dlfcn.h>
 #include "iservice_registry.h"
 #include "system_ability_definition.h"
 #endif // OHOS_ARCH_LITE
@@ -909,6 +910,9 @@ void StaStateMachine::DealConnectionEvent(InternalMessage *msg)
     WifiSettings::GetInstance().SetDeviceAfterConnect(targetNetworkId);
     WifiSettings::GetInstance().SetDeviceState(targetNetworkId, (int)WifiDeviceConfigStatus::ENABLED, false);
     WifiSettings::GetInstance().SyncDeviceConfig();
+#ifndef OHOS_ARCH_LITE
+    SaveWifiConfigForUpdate(targetNetworkId);
+#endif
     /* Stop clearing the Wpa_blocklist. */
     StopTimer(static_cast<int>(WPA_BLOCK_LIST_CLEAR_EVENT));
     ConnectToNetworkProcess(msg);
@@ -1815,15 +1819,6 @@ void StaStateMachine::GetIpState::GoInState()
         assignMethod = config.wifiIpConfig.assignMethod;
     }
 
-    if (config.wifiProxyconfig.configureMethod == ConfigureProxyMethod::MANUALCONFIGUE) {
-        std::string hostName = config.wifiProxyconfig.manualProxyConfig.serverHostName;
-        std::string noProxys = config.wifiProxyconfig.manualProxyConfig.exclusionObjectList;
-        std::string port = std::to_string(config.wifiProxyconfig.manualProxyConfig.serverPort);
-        if (!hostName.empty()) {
-            IfConfig::GetInstance().SetProxy(true, hostName, port, noProxys, "");
-        }
-    }
-
     if (assignMethod == AssignIpMethod::STATIC) {
         pStaStateMachine->currentTpType = config.wifiIpConfig.staticIpAddress.ipAddress.address.family;
         if (!pStaStateMachine->ConfigStaticIpAddress(config.wifiIpConfig.staticIpAddress)) {
@@ -2253,8 +2248,9 @@ void StaStateMachine::DhcpResultNotify::OnSuccess(int status, const std::string 
                 IpAnonymize(result.strRouter1).c_str(), IpAnonymize(result.strDns1).c_str(),
                 IpAnonymize(result.strDns2).c_str());
             WIFI_LOGI("On dhcp success update net linke info");
-            WifiNetAgent::GetInstance().OnStaMachineUpdateNetLinkInfo(result.strYourCli, result.strSubnet,
-                result.strRouter1, result.strDns1, result.strDns2);
+            WifiDeviceConfig config;
+            WifiSettings::GetInstance().GetDeviceConfig(pStaStateMachine->linkedInfo.networkId, config);
+            WifiNetAgent::GetInstance().OnStaMachineUpdateNetLinkInfo(ipInfo, config.wifiProxyconfig);
 #endif
         }
 #ifdef OHOS_ARCH_LITE
@@ -2397,18 +2393,26 @@ void StaStateMachine::ReUpdateNetSupplierInfo(sptr<NetManagerStandard::NetSuppli
 
 void StaStateMachine::ReUpdateNetLinkInfo(void)
 {
-    LOGI("ReUpdateNetLinkInfo()");
     WifiLinkedInfo linkedInfo;
     WifiSettings::GetInstance().GetLinkedInfo(linkedInfo);
+    LOGI("ReUpdateNetLinkInfo, detailedState:%{public}d, connState:%{public}d",
+        linkedInfo.detailedState, linkedInfo.connState);
     if ((linkedInfo.detailedState == DetailedState::NOTWORKING) && (linkedInfo.connState == ConnState::CONNECTED)) {
         IpInfo wifiIpInfo;
         WifiSettings::GetInstance().GetIpInfo(wifiIpInfo);
-        std::string ipAddress = IpTools::ConvertIpv4Address(wifiIpInfo.ipAddress);
-        std::string gateway = IpTools::ConvertIpv4Address(wifiIpInfo.gateway);
-        std::string netmask = IpTools::ConvertIpv4Address(wifiIpInfo.netmask);
-        std::string primaryDns = IpTools::ConvertIpv4Address(wifiIpInfo.primaryDns);
-        std::string secondDns = IpTools::ConvertIpv4Address(wifiIpInfo.secondDns);
-        WifiNetAgent::GetInstance().UpdateNetLinkInfo(ipAddress, netmask, gateway, primaryDns, secondDns);
+        WifiDeviceConfig config;
+        WifiSettings::GetInstance().GetDeviceConfig(linkedInfo.networkId, config);
+        WifiNetAgent::GetInstance().UpdateNetLinkInfo(wifiIpInfo, config.wifiProxyconfig);
+    }
+}
+
+void StaStateMachine::SaveWifiConfigForUpdate(int networkId)
+{
+    WIFI_LOGI("Enter SaveWifiConfigForUpdate.");
+    WifiDeviceConfig config;
+    if (WifiSettings::GetInstance().GetDeviceConfig(networkId, config) == -1) {
+        WIFI_LOGE("SaveWifiConfigForUpdate, get current config failed.");
+        return;
     }
 }
 

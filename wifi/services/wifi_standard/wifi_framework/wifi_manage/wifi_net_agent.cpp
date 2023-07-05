@@ -15,6 +15,7 @@
 
 #include "wifi_net_agent.h"
 #include <cinttypes>
+#include <algorithm>
 #include "inet_addr.h"
 #include "ip_tools.h"
 #include "iservice_registry.h"
@@ -127,8 +128,7 @@ void WifiNetAgent::UpdateNetSupplierInfo(const sptr<NetManagerStandard::NetSuppl
     WIFI_LOGI("Update network result:%{public}d", result);
 }
 
-void WifiNetAgent::UpdateNetLinkInfo(const std::string &ip, const std::string &mask, const std::string &gateWay,
-    const std::string &strDns, const std::string &strBakDns)
+void WifiNetAgent::UpdateNetLinkInfo(IpInfo &wifiIpInfo, WifiProxyConfig &wifiProxyConfig)
 {
     TimeStats timeStats(__func__);
     WIFI_LOGI("Enter UpdateNetLinkInfo.");
@@ -139,43 +139,7 @@ void WifiNetAgent::UpdateNetLinkInfo(const std::string &ip, const std::string &m
     }
 
     sptr<NetManagerStandard::NetLinkInfo> netLinkInfo = (std::make_unique<NetManagerStandard::NetLinkInfo>()).release();
-    netLinkInfo->ifaceName_ = "wlan0";
-
-    unsigned int prefixLength = IpTools::GetMaskLength(mask);
-    sptr<NetManagerStandard::INetAddr> netAddr = (std::make_unique<NetManagerStandard::INetAddr>()).release();
-    netAddr->type_ = NetManagerStandard::INetAddr::IPV4;
-    netAddr->family_ = NetManagerStandard::INetAddr::IPV4;
-    netAddr->address_ = ip;
-    netAddr->netMask_ = mask;
-    netAddr->prefixlen_ = prefixLength;
-    netLinkInfo->netAddrList_.push_back(*netAddr);
-
-    sptr<NetManagerStandard::INetAddr> dns = (std::make_unique<NetManagerStandard::INetAddr>()).release();
-    dns->type_ = NetManagerStandard::INetAddr::IPV4;
-    dns->family_ = NetManagerStandard::INetAddr::IPV4;
-    dns->address_ = strDns;
-    netLinkInfo->dnsList_.push_back(*dns);
-    dns->address_ = strBakDns;
-    netLinkInfo->dnsList_.push_back(*dns);
-
-    sptr<NetManagerStandard::Route> route = (std::make_unique<NetManagerStandard::Route>()).release();
-    route->iface_ = "wlan0";
-    route->destination_.type_ = NetManagerStandard::INetAddr::IPV4;
-    route->destination_.address_ = "0.0.0.0";
-    route->gateway_.address_ = gateWay;
-    netLinkInfo->routeList_.push_back(*route);
-
-    sptr<NetManagerStandard::Route> localRoute = (std::make_unique<NetManagerStandard::Route>()).release();
-    unsigned int ipInt = IpTools::ConvertIpv4Address(ip);
-    unsigned int maskInt = IpTools::ConvertIpv4Address(mask);
-    std::string strLocalRoute = IpTools::ConvertIpv4Address(ipInt & maskInt);
-    localRoute->iface_ = route->iface_;
-    localRoute->destination_.type_ = NetManagerStandard::INetAddr::IPV4;
-    localRoute->destination_.address_ = strLocalRoute;
-    localRoute->destination_.prefixlen_ = prefixLength;
-    localRoute->gateway_.address_ = "0.0.0.0";
-    netLinkInfo->routeList_.push_back(*localRoute);
-
+    CreateNetLinkInfo(netLinkInfo, wifiIpInfo, wifiProxyConfig);
     int32_t result = netManager->UpdateNetLinkInfo(supplierId, netLinkInfo);
     WIFI_LOGI("UpdateNetLinkInfo result:%{public}d", result);
 }
@@ -212,14 +176,11 @@ bool WifiNetAgent::AddRoute(const std::string interface, const std::string ipAdd
     return true;
 }
 
-void WifiNetAgent::OnStaMachineUpdateNetLinkInfo(const std::string &strIp, const std::string &strMask,
-    const std::string &strGateWay, const std::string &strDns, const std::string &strBakDns)
+void WifiNetAgent::OnStaMachineUpdateNetLinkInfo(IpInfo &wifiIpInfo, WifiProxyConfig &wifiProxyConfig)
 {
     if (netConnEventHandler_) {
         netConnEventHandler_->PostSyncTask(
-            [this, ip = strIp, mask = strMask, gateWay = strGateWay, dns = strDns, bakDns = strBakDns]() {
-            this->UpdateNetLinkInfo(ip, mask, gateWay, dns, bakDns);
-        });
+            [this, &wifiIpInfo, &wifiProxyConfig]() { this->UpdateNetLinkInfo(wifiIpInfo, wifiProxyConfig); });
     }
 }
 
@@ -260,15 +221,69 @@ void WifiNetAgent::OnStaMachineNetManagerRestart(const sptr<NetManagerStandard::
 #endif
                 IpInfo wifiIpInfo;
                 WifiSettings::GetInstance().GetIpInfo(wifiIpInfo);
-                std::string ipAddress = IpTools::ConvertIpv4Address(wifiIpInfo.ipAddress);
-                std::string gateway = IpTools::ConvertIpv4Address(wifiIpInfo.gateway);
-                std::string netmask = IpTools::ConvertIpv4Address(wifiIpInfo.netmask);
-                std::string primaryDns = IpTools::ConvertIpv4Address(wifiIpInfo.primaryDns);
-                std::string secondDns = IpTools::ConvertIpv4Address(wifiIpInfo.secondDns);
-                this->UpdateNetLinkInfo(ipAddress, netmask, gateway, primaryDns, secondDns);
+                WifiDeviceConfig config;
+                WifiSettings::GetInstance().GetDeviceConfig(linkedInfo.networkId, config);
+                this->UpdateNetLinkInfo(wifiIpInfo, config.wifiProxyconfig);
             }
         });
     }
+}
+
+void WifiNetAgent::CreateNetLinkInfo(sptr<NetManagerStandard::NetLinkInfo> &netLinkInfo, IpInfo &wifiIpInfo,
+    WifiProxyConfig &wifiProxyConfig)
+{
+    netLinkInfo->ifaceName_ = "wlan0";
+
+    unsigned int prefixLength = IpTools::GetMaskLength(IpTools::ConvertIpv4Address(wifiIpInfo.netmask));
+    sptr<NetManagerStandard::INetAddr> netAddr = (std::make_unique<NetManagerStandard::INetAddr>()).release();
+    netAddr->type_ = NetManagerStandard::INetAddr::IPV4;
+    netAddr->family_ = NetManagerStandard::INetAddr::IPV4;
+    netAddr->address_ = IpTools::ConvertIpv4Address(wifiIpInfo.ipAddress);
+    netAddr->netMask_ = IpTools::ConvertIpv4Address(wifiIpInfo.netmask);
+    netAddr->prefixlen_ = prefixLength;
+    netLinkInfo->netAddrList_.push_back(*netAddr);
+
+    sptr<NetManagerStandard::INetAddr> dns = (std::make_unique<NetManagerStandard::INetAddr>()).release();
+    dns->type_ = NetManagerStandard::INetAddr::IPV4;
+    dns->family_ = NetManagerStandard::INetAddr::IPV4;
+    dns->address_ = IpTools::ConvertIpv4Address(wifiIpInfo.primaryDns);
+    netLinkInfo->dnsList_.push_back(*dns);
+    dns->address_ = IpTools::ConvertIpv4Address(wifiIpInfo.secondDns);
+    netLinkInfo->dnsList_.push_back(*dns);
+
+    sptr<NetManagerStandard::Route> route = (std::make_unique<NetManagerStandard::Route>()).release();
+    route->iface_ = "wlan0";
+    route->destination_.type_ = NetManagerStandard::INetAddr::IPV4;
+    route->destination_.address_ = "0.0.0.0";
+    route->gateway_.address_ = IpTools::ConvertIpv4Address(wifiIpInfo.gateway);
+    netLinkInfo->routeList_.push_back(*route);
+
+    sptr<NetManagerStandard::Route> localRoute = (std::make_unique<NetManagerStandard::Route>()).release();
+    std::string strLocalRoute = IpTools::ConvertIpv4Address(wifiIpInfo.ipAddress & wifiIpInfo.netmask);
+    localRoute->iface_ = route->iface_;
+    localRoute->destination_.type_ = NetManagerStandard::INetAddr::IPV4;
+    localRoute->destination_.address_ = strLocalRoute;
+    localRoute->destination_.prefixlen_ = prefixLength;
+    localRoute->gateway_.address_ = "0.0.0.0";
+    netLinkInfo->routeList_.push_back(*localRoute);
+
+    if (wifiProxyConfig.configureMethod == ConfigureProxyMethod::AUTOCONFIGUE) {
+        /* Automatic proxy is not supported */
+    } else if (wifiProxyConfig.configureMethod == ConfigureProxyMethod::MANUALCONFIGUE) {
+        std::vector<std::string> exclusionList;
+        wifiProxyConfig.manualProxyConfig.GetExclusionObjectList(exclusionList);
+        std::list<std::string> tmpExclusionList;
+        std::copy_if(exclusionList.begin(), exclusionList.end(), std::back_inserter(tmpExclusionList),
+            [](const std::string &str) { return !str.empty(); } );
+        netLinkInfo->httpProxy_.SetHost(std::move(wifiProxyConfig.manualProxyConfig.serverHostName));
+        netLinkInfo->httpProxy_.SetPort(wifiProxyConfig.manualProxyConfig.serverPort);
+        netLinkInfo->httpProxy_.SetExclusionList(tmpExclusionList);
+    } else {
+        netLinkInfo->httpProxy_.SetHost("");
+        netLinkInfo->httpProxy_.SetPort(0);
+    }
+
+    return;
 }
 
 WifiNetAgent::NetConnCallback::NetConnCallback()

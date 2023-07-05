@@ -280,6 +280,8 @@ int StaService::AddDeviceConfig(const WifiDeviceConfig &config) const
     /* Add the new network to WifiSettings. */
     WifiSettings::GetInstance().AddDeviceConfig(tempDeviceConfig);
     WifiSettings::GetInstance().SyncDeviceConfig();
+    /* update net link proxy info */
+    pStaStateMachine->ReUpdateNetLinkInfo();
     ConfigChange changeType = isUpdate ? ConfigChange::CONFIG_UPDATE : ConfigChange::CONFIG_ADD;
     NotifyDeviceConfigChange(changeType);
     return netWorkId;

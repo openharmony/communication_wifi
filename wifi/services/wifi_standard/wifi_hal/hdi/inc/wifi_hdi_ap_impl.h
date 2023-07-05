@@ -24,6 +24,7 @@ extern "C" {
 WifiErrorNo GetValidFrequenciesForBand(int32_t band, int *frequencies, int32_t *size, int id);
 WifiErrorNo WifiSetPowerModel(const int mode, int id);
 WifiErrorNo WifiGetPowerModel(int* mode, int id);
+WifiErrorNo HdiSetCountryCode(const char* code, int id);
 #ifdef __cplusplus
 }
 #endif

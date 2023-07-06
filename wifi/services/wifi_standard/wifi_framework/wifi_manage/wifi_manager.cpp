@@ -298,7 +298,7 @@ void WifiManager::ExclusionAutoStartApService(void)
             continue;
         }
         if (!WifiConfigCenter::GetInstance().SetApMidState(apState, WifiOprMidState::OPENING)) {
-            WIFI_LOGE("set ap mid state opening failed! may be other activity has been operated");
+            WIFI_LOGE("set ap mid state opening failed! may be other app has been operated");
             ++tryTimes;
             continue;
         }

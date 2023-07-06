@@ -266,7 +266,7 @@ private:
     static void StationsInfoDump(std::string& result);
     static void SigHandler(int sig);
     static bool IsProcessNeedToRestart();
-#ifdef WIFI_FEATURE_STA_AP_EXCLUSION
+#ifdef FEATURE_STA_AP_EXCLUSION
     ErrCode DisableWifi();
 #endif
 

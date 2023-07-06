@@ -151,7 +151,7 @@ public:
 
     void StopUnloadApSaTimer(void);
     void StartUnloadApSaTimer(void);
-#ifdef WIFI_FEATURE_STA_AP_EXCLUSION
+#ifdef FEATURE_STA_AP_EXCLUSION
     /**
      * @Description Get Sta&Ap Exclusion flag
      *
@@ -332,7 +332,7 @@ private:
 #endif
 #ifdef FEATURE_AP_SUPPORT
     IApServiceCallbacks mApCallback;
-#ifdef WIFI_FEATURE_STA_AP_EXCLUSION
+#ifdef FEATURE_STA_AP_EXCLUSION
     std::atomic<bool> mDisableStaByExclusion {false};
     std::atomic<bool> mDisableApByExclusion {false};
 

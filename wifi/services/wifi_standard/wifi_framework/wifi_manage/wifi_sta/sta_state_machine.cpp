@@ -430,6 +430,11 @@ void StaStateMachine::StartWifiProcess()
         std::string mac;
         if ((WifiStaHalInterface::GetInstance().GetStaDeviceMacAddress(mac)) == WIFI_IDL_OPT_OK) {
             WifiSettings::GetInstance().SetMacAddress(mac);
+            std::string realMacAddress;
+            WifiSettings::GetInstance().GetRealMacAddress(realMacAddress);
+            if (realMacAddress.empty()) {
+                WifiSettings::GetInstance().SetRealMacAddress(mac);
+            }
         } else {
             WIFI_LOGI("GetStaDeviceMacAddress failed!");
         }

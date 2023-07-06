@@ -46,7 +46,9 @@ int WifiManager::mCloseApIndex = 0;
 const uint32_t TIMEOUT_SCREEN_EVENT = 3000;
 const uint32_t TIMEOUT_AIRPLANE_MODE_EVENT = 3000;
 const uint32_t TIMEOUT_UNLOAD_WIFI_SA = 5 * 60 * 1000;
+#ifdef FEATURE_STA_AP_EXCLUSION
 const uint32_t TIMEOUT_STA_AP_DISABLE_SECONDS = 5;
+#endif
 using TimeOutCallback = std::function<void()>;
 #endif
 

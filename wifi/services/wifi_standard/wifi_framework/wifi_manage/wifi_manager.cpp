@@ -200,7 +200,7 @@ void WifiManager::AutoStartServiceThread(void)
 }
 
 #ifdef FEATURE_AP_SUPPORT
-#ifdef WIFI_FEATURE_STA_AP_EXCLUSION
+#ifdef FEATURE_STA_AP_EXCLUSION
 void WifiManager::ExclusionAutoStartStaService(void)
 {
     int tryTimes = 0;
@@ -392,7 +392,7 @@ void WifiManager::AutoStopApService(void)
             WIFI_LOGE("service disable ap failed, ret %{public}d!", static_cast<int>(ret));
             WifiConfigCenter::GetInstance().SetApMidState(WifiOprMidState::CLOSING, WifiOprMidState::RUNNING, 0);
         }
-#ifdef WIFI_FEATURE_STA_AP_EXCLUSION
+#ifdef FEATURE_STA_AP_EXCLUSION
         else {
             WifiConfigCenter::GetInstance().SetApLastRunState(true, false);
         }
@@ -710,7 +710,7 @@ void WifiManager::StartUnloadApSaTimer(void)
 }
 #endif
 
-#ifdef WIFI_FEATURE_STA_AP_EXCLUSION
+#ifdef FEATURE_STA_AP_EXCLUSION
 bool WifiManager::GetStaApExclusionFlag(WifiCloseServiceCode type)
 {
     if (type == WifiCloseServiceCode::STA_SERVICE_CLOSE) {
@@ -799,7 +799,7 @@ void WifiManager::CloseApService(int id)
     WifiServiceManager::GetInstance().UnloadService(WIFI_SERVICE_AP, id);
     WifiConfigCenter::GetInstance().SetApMidState(WifiOprMidState::CLOSED, id);
     WifiSettings::GetInstance().SetHotspotState(static_cast<int>(ApState::AP_STATE_CLOSED), id);
-#ifdef WIFI_FEATURE_STA_AP_EXCLUSION
+#ifdef FEATURE_STA_AP_EXCLUSION
     WifiManager::GetInstance().SignalDisableHotspot();
 #endif
     WifiEventCallbackMsg cbMsg;
@@ -982,7 +982,7 @@ void WifiManager::DealStaCloseRes(OperateResState state)
         cbMsg.msgData = static_cast<int>(WifiState::UNKNOWN);
         WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
     }
-#ifdef WIFI_FEATURE_STA_AP_EXCLUSION
+#ifdef FEATURE_STA_AP_EXCLUSION
     WifiManager::GetInstance().SignalDisableWifi();
 #endif
     if (WifiConfigCenter::GetInstance().GetAirplaneModeState() == MODE_STATE_OPEN) {
@@ -1292,7 +1292,7 @@ void WifiManager::DealApStateChanged(ApState state, int id)
         WifiManager::GetInstance().PushServiceCloseMsg(WifiCloseServiceCode::AP_SERVICE_CLOSE);
     }
     if (state == ApState::AP_STATE_STARTED) {
-#ifdef WIFI_FEATURE_STA_AP_EXCLUSION
+#ifdef FEATURE_STA_AP_EXCLUSION
         WifiConfigCenter::GetInstance().SetApLastRunState(false, true, id);
 #endif
         WifiConfigCenter::GetInstance().SetApMidState(WifiOprMidState::OPENING, WifiOprMidState::RUNNING, id);

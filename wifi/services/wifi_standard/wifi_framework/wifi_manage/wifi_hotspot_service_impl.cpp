@@ -27,7 +27,7 @@
 #include "wifi_logger.h"
 #include "wifi_common_util.h"
 
-#ifdef WIFI_FEATURE_STA_AP_EXCLUSION
+#ifdef FEATURE_STA_AP_EXCLUSION
 #ifdef FEATURE_P2P_SUPPORT
 #include "wifi_p2p_service_impl.h"
 #endif
@@ -331,7 +331,7 @@ ErrCode WifiHotspotServiceImpl::CheckCanEnableHotspot(const ServiceType type)
 
     WifiOprMidState curState = WifiConfigCenter::GetInstance().GetWifiMidState();
     if (curState != WifiOprMidState::CLOSED) {
-#ifdef WIFI_FEATURE_STA_AP_EXCLUSION
+#ifdef FEATURE_STA_AP_EXCLUSION
         auto ret = DisableWifi();
         if (ret != WIFI_OPT_SUCCESS) {
             return WIFI_OPT_STA_AP_EXCLUSION_STA_CLOSE_FAILED;
@@ -434,7 +434,7 @@ ErrCode WifiHotspotServiceImpl::DisableHotspot(const ServiceType type)
     if (ret != WIFI_OPT_SUCCESS) {
         WifiConfigCenter::GetInstance().SetApMidState(WifiOprMidState::CLOSING, WifiOprMidState::RUNNING, m_id);
     }
-#ifdef WIFI_FEATURE_STA_AP_EXCLUSION
+#ifdef FEATURE_STA_AP_EXCLUSION
     // resume sta if closed in exclusion scene.
     WifiConfigCenter::GetInstance().SetApLastRunState(true, false, m_id);
     if (WifiConfigCenter::GetInstance().GetStaLastRunState()) {
@@ -764,7 +764,7 @@ bool WifiHotspotServiceImpl::IsRemoteDied(void)
     return false;
 }
 
-#ifdef WIFI_FEATURE_STA_AP_EXCLUSION
+#ifdef FEATURE_STA_AP_EXCLUSION
 ErrCode WifiHotspotServiceImpl::DisableWifi()
 {
     WifiOprMidState curState = WifiConfigCenter::GetInstance().GetWifiMidState();

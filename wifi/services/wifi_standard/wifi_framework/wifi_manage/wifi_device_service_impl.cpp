@@ -225,7 +225,7 @@ ErrCode WifiDeviceServiceImpl::EnableWifi()
 #ifdef FEATURE_AP_SUPPORT
     WifiOprMidState apState = WifiConfigCenter::GetInstance().GetApMidState(0);
     if (apState != WifiOprMidState::CLOSED) {
-#ifdef WIFI_FEATURE_STA_AP_EXCLUSION
+#ifdef FEATURE_STA_AP_EXCLUSION
         auto ret = DisableHotspot();
         if (ret != WIFI_OPT_SUCCESS) {
             return WIFI_OPT_STA_AP_EXCLUSION_AP_CLOSE_FAILED;
@@ -357,7 +357,7 @@ ErrCode WifiDeviceServiceImpl::DisableWifi()
                     static_cast<int>(OperatorWifiType::USER_CLOSE_WIFI_IN_AIRPLANEMODE));
                 WIFI_LOGI("EnableWifi, current airplane mode is opened, user close wifi!");
         }
-#ifdef WIFI_FEATURE_STA_AP_EXCLUSION
+#ifdef FEATURE_STA_AP_EXCLUSION
         if (WifiConfigCenter::GetInstance().GetApLastRunState()) {
             std::thread startApSrvThread(WifiManager::ExclusionAutoStartApService);
             pthread_setname_np(startApSrvThread.native_handle(), "ExclusionApAutoStartThread");
@@ -1392,7 +1392,7 @@ ErrCode WifiDeviceServiceImpl::Get5GHzChannelList(std::vector<int> &result)
     return WIFI_OPT_SUCCESS;
 }
 
-#ifdef WIFI_FEATURE_STA_AP_EXCLUSION
+#ifdef FEATURE_STA_AP_EXCLUSION
 ErrCode WifiDeviceServiceImpl::DisableHotspot()
 {
     WIFI_LOGI("enter disableHotspot");

@@ -236,7 +236,7 @@ if (defined(ohos_lite)) {
     }
 
     if (wifi_feature_sta_ap_exclusion) {
-      defines += [ "WIFI_FEATURE_STA_AP_EXCLUSION" ]
+      defines += [ "FEATURE_STA_AP_EXCLUSION" ]
     }
 
     deps = [
@@ -300,7 +300,7 @@ if (defined(ohos_lite)) {
     ]
 
     if (wifi_feature_sta_ap_exclusion) {
-      defines += [ "WIFI_FEATURE_STA_AP_EXCLUSION" ]
+      defines += [ "FEATURE_STA_AP_EXCLUSION" ]
     }
 
     if (wifi_feature_with_p2p) {
@@ -423,7 +423,7 @@ if (defined(ohos_lite)) {
     }
 
     if (wifi_feature_sta_ap_exclusion) {
-      defines += [ "WIFI_FEATURE_STA_AP_EXCLUSION" ]
+      defines += [ "FEATURE_STA_AP_EXCLUSION" ]
     }
 
     part_name = "wifi"

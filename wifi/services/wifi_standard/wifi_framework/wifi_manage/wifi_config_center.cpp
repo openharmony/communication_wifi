@@ -34,7 +34,7 @@ WifiConfigCenter::WifiConfigCenter()
     mP2pMidState = WifiOprMidState::CLOSED;
     mScanMidState = WifiOprMidState::CLOSED;
     mWifiOpenedWhenAirplane = false;
-#ifdef WIFI_FEATURE_STA_AP_EXCLUSION
+#ifdef FEATURE_STA_AP_EXCLUSION
     mApLastRunState.emplace(0, false);
 #endif
 }
@@ -327,7 +327,7 @@ int WifiConfigCenter::SetStaLastRunState(bool bRun)
     return WifiSettings::GetInstance().SetStaLastRunState(bRun);
 }
 
-#ifdef WIFI_FEATURE_STA_AP_EXCLUSION
+#ifdef FEATURE_STA_AP_EXCLUSION
 bool WifiConfigCenter::GetApLastRunState(const int id)
 {
     //return WifiSettings::GetInstance().GetStaLastRunState();

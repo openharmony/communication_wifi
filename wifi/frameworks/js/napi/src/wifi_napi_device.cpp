@@ -1308,6 +1308,7 @@ NO_SANITIZE("cfi") napi_value SetScanOnlyAvailable(napi_env env, napi_callback_i
     ErrCode ret = wifiScanPtr->SetScanOnlyAvailable(bScanOnlyAvailableStatus);
     if (ret != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("Set wifi scanOnlyAvailable fail: %{public}d", ret);
+        WIFI_NAPI_ASSERT(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_CORE);
     }
 
     napi_value result;
@@ -1322,6 +1323,7 @@ NO_SANITIZE("cfi") napi_value GetScanOnlyAvailable(napi_env env, napi_callback_i
     ErrCode ret = wifiScanPtr->GetScanOnlyAvailable(bScanOnlyAvailableStatus);
     if (ret != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("Get wifi scanOnlyAvailable fail: %{public}d", ret);
+        WIFI_NAPI_ASSERT(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_CORE);
     }
 
     napi_value result;

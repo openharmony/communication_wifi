@@ -41,9 +41,7 @@ enum ErrCode {
     WIFI_OPT_P2P_ERR_INTENT,
     WIFI_OPT_P2P_ERR_SIZE_NW_NAME,
     WIFI_OPT_MOVING_FREEZE_CTRL,      /* moving freeze scanning control */
-    WIFI_OPT_NON_SYSTEMAPP,           /* not system app denied */
-    WIFI_OPT_STA_AP_EXCLUSION_STA_CLOSE_FAILED, /* sta close failure in STA_AP_EXCLUSION scene */
-    WIFI_OPT_STA_AP_EXCLUSION_AP_CLOSE_FAILED   /* ap close failure in STA_AP_EXCLUSION scene */
+    WIFI_OPT_NON_SYSTEMAPP           /* not system app denied */
 };
 }  // namespace Wifi
 }  // namespace OHOS

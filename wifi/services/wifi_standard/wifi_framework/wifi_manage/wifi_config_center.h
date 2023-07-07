@@ -445,25 +445,6 @@ public:
      */
     int SetStaLastRunState(bool bRun);
 
-#ifdef FEATURE_STA_AP_EXCLUSION
-    /**
-     * @Description Get Ap Last running state
-     *
-     * @param id - ap service inst id
-     * @return bool - true running state
-     */
-    bool GetApLastRunState(const int id = 0);
-
-    /**
-     * @Description Set Ap last running state
-     *
-     * @param bExpectd - true / false
-     * @param bRun - true / false
-     * @param id - ap service inst id
-     * @return bool - true success
-     */
-    bool SetApLastRunState(bool bExpectd, bool bRun, const int id = 0);
-#endif
     /**
      * @Description Set current phone screen state
      *

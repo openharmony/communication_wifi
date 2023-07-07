@@ -34,9 +34,6 @@ WifiConfigCenter::WifiConfigCenter()
     mP2pMidState = WifiOprMidState::CLOSED;
     mScanMidState = WifiOprMidState::CLOSED;
     mWifiOpenedWhenAirplane = false;
-#ifdef FEATURE_STA_AP_EXCLUSION
-    mApLastRunState.emplace(0, false);
-#endif
 }
 
 WifiConfigCenter::~WifiConfigCenter()
@@ -326,33 +323,6 @@ int WifiConfigCenter::SetStaLastRunState(bool bRun)
 {
     return WifiSettings::GetInstance().SetStaLastRunState(bRun);
 }
-
-#ifdef FEATURE_STA_AP_EXCLUSION
-bool WifiConfigCenter::GetApLastRunState(const int id)
-{
-    //return WifiSettings::GetInstance().GetStaLastRunState();
-    std::unique_lock<std::mutex> lock(mApLastRunStateMutex);
-    auto iter = mApLastRunState.find(id);
-    if (iter != mApLastRunState.end()) {
-        return iter->second.load();
-    } else {
-        mApLastRunState.emplace(id, false);
-        return mApLastRunState[id].load();
-    }
-}
-
-bool WifiConfigCenter::SetApLastRunState(bool bExpectRun, bool bRun, const int id)
-{
-    std::unique_lock<std::mutex> lock(mApLastRunStateMutex);
-    auto iter = mApLastRunState.find(id);
-    if (iter != mApLastRunState.end()) {
-        return iter->second.compare_exchange_strong(bExpectRun, bRun);
-    } else {
-        mApLastRunState.emplace(id, bRun);
-        return true;
-    }
-}
-#endif
 
 void WifiConfigCenter::SetScreenState(const int &state)
 {

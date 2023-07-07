@@ -96,6 +96,12 @@
 #define WIFI_MAX_IPV4_LEN 16
 
 /**
+ * @brief Indicates the maximum length of IPV ADDRESS.
+ *
+ */
+#define DEVICE_IPV6_MAX_LEN 128
+
+/**
  * @brief Enumerates Wi-Fi security types.
  *
  * @since 7
@@ -245,5 +251,17 @@ typedef struct {
     unsigned int serverAddress;
     int leaseDuration;
 } IpInfo;
+
+/* DHCP IpV6Info */
+typedef struct {
+    char linkIpV6Address[DEVICE_IPV6_MAX_LEN];
+    char globalIpV6Address[DEVICE_IPV6_MAX_LEN];
+    char randGlobalIpV6Address[DEVICE_IPV6_MAX_LEN];
+    char gateway[DEVICE_IPV6_MAX_LEN];
+    char netmask[DEVICE_IPV6_MAX_LEN];
+    char primaryDns[DEVICE_IPV6_MAX_LEN];
+    char secondDns[DEVICE_IPV6_MAX_LEN];
+} IpV6Info;
+
 #endif // WIFI_LITE_WIFI_DEVICE_CONFIG_H
 /** @} */

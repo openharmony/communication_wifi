@@ -342,6 +342,7 @@ struct WifiConfig {
     std::string strDnsBak;
     bool isLoadStabak;
     bool scanOnlySwitch;
+    std::string realMacAddress;
 
     WifiConfig()
     {
@@ -381,6 +382,7 @@ struct WifiConfig {
         isLoadStabak = true;
         preLoadEnhance = false;
         scanOnlySwitch = false;
+        realMacAddress = "";
     }
 };
 

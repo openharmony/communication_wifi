@@ -817,6 +817,7 @@ void ClearTClass<WifiConfig>(WifiConfig &item)
     item.strDnsBak = "8.8.8.8";
     item.isLoadStabak = true;
     item.scanOnlySwitch = false;
+    item.realMacAddress = "";
     return;
 }
 
@@ -902,6 +903,8 @@ static int SetWifiConfigValueSecond(WifiConfig &item, const std::string &key, co
         item.isLoadStabak = (std::stoi(value) != 0);
     } else if (key == "scanOnlySwitch") {
         item.scanOnlySwitch  = (std::stoi(value) != 0); /* 0 -> false 1 -> true */
+    } else if (key == "realMacAddress") {
+        item.realMacAddress = value;
     } else {
         return -1;
     }
@@ -969,6 +972,7 @@ std::string OutTClassString<WifiConfig>(WifiConfig &item)
     ss << "    " <<"strDnsBak=" << item.strDnsBak << std::endl;
     ss << "    " <<"isLoadStabak=" << item.isLoadStabak << std::endl;
     ss << "    " <<"scanOnlySwitch=" << item.scanOnlySwitch << std::endl;
+    ss << "    " <<"realMacAddress=" << item.realMacAddress << std::endl;
     ss << "    " <<"</WifiConfig>" << std::endl;
     return ss.str();
 }

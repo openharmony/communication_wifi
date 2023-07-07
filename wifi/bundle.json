@@ -76,7 +76,6 @@
                 "drivers_interface_wlan",
                 "efficiency_manager",
                 "eventhandler",
-                "hicollie_native",
                 "hisysevent",
                 "hilog",
                 "huks",
@@ -91,7 +90,7 @@
             ],
             "third_party": [
                 "bounds_checking_function",
-                "wpa_supplicant-2.9"
+                "wpa_supplicant"
             ]
         },
         "build": {

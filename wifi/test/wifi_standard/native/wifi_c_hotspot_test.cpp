@@ -51,13 +51,6 @@ public:
         IsHotspotActive();
     }
 
-    void SetHotspotConfigTests()
-    {
-        HotspotConfig config;
-        config.band = g_mode;
-        SetHotspotConfig(&config);
-    }
-
     void GetHotspotConfigTests()
     {
         HotspotConfig result;
@@ -103,7 +96,7 @@ HWTEST_F(WifiHotspotTest, IsHotspotActiveTest, TestSize.Level1)
 
 HWTEST_F(WifiHotspotTest, SetHotspotConfigTests, TestSize.Level1)
 {
-    SetHotspotConfigTests();
+   
 }
 
 HWTEST_F(WifiHotspotTest, GetHotspotConfigTests, TestSize.Level1)

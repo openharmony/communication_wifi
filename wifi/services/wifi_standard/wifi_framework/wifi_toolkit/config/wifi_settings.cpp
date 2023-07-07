@@ -1619,6 +1619,21 @@ bool WifiSettings::IsLoadStabak()
     return mWifiConfig.isLoadStabak;
 }
 
+int WifiSettings::SetRealMacAddress(const std::string &macAddress)
+{
+    std::unique_lock<std::mutex> lock(mWifiConfigMutex);
+    mWifiConfig.realMacAddress = macAddress;
+    SyncWifiConfig();
+    return 0;
+}
+
+int WifiSettings::GetRealMacAddress(std::string &macAddress)
+{
+    std::unique_lock<std::mutex> lock(mWifiConfigMutex);
+    macAddress = mWifiConfig.realMacAddress;
+    return 0;
+}
+
 int WifiSettings::SetP2pDeviceName(const std::string &deviceName)
 {
     std::unique_lock<std::mutex> lock(mP2pMutex);

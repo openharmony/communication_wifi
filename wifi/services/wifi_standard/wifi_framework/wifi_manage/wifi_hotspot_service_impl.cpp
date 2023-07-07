@@ -297,24 +297,13 @@ ErrCode WifiHotspotServiceImpl::DisassociateSta(const StationInfo &info)
     return pService->DisconnetStation(info);
 }
 
-int WifiHotspotServiceImpl::CheckOperHotspotSwitchPermission(const ServiceType type)
-{
-#ifdef FEATURE_AP_EXTENSION
-    return (type == ServiceType::WIFI_EXT) ? WifiPermissionUtils::VerifyManageWifiHotspotExtPermission() :
-        WifiPermissionUtils::VerifyManageWifiHotspotPermission();
-#else
-    return (type == ServiceType::WIFI_EXT) ? PERMISSION_DENIED :
-        WifiPermissionUtils::VerifyManageWifiHotspotPermission();
-#endif
-}
-
 ErrCode WifiHotspotServiceImpl::CheckCanEnableHotspot(const ServiceType type)
 {
     if (!WifiAuthCenter::IsSystemAppByToken()) {
         WIFI_LOGE("EnableHotspot:NOT System APP, PERMISSION_DENIED!");
         return WIFI_OPT_NON_SYSTEMAPP;
     }
-    if (CheckOperHotspotSwitchPermission(type) == PERMISSION_DENIED) {
+    if (WifiManager::GetInstance().CheckOperHotspotSwitchPermission(type) == PERMISSION_DENIED) {
         WIFI_LOGE("EnableHotspot:VerifyManageWifiHotspotPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
@@ -332,10 +321,7 @@ ErrCode WifiHotspotServiceImpl::CheckCanEnableHotspot(const ServiceType type)
     WifiOprMidState curState = WifiConfigCenter::GetInstance().GetWifiMidState();
     if (curState != WifiOprMidState::CLOSED) {
 #ifdef FEATURE_STA_AP_EXCLUSION
-        auto ret = DisableWifi();
-        if (ret != WIFI_OPT_SUCCESS) {
-            return WIFI_OPT_STA_AP_EXCLUSION_STA_CLOSE_FAILED;
-        }
+        return WifiManager::GetInstance().DisableWifi(true);
 #else
         WIFI_LOGI("current wifi state is %{public}d, please close sta first!",
             static_cast<int>(curState));
@@ -400,50 +386,8 @@ ErrCode WifiHotspotServiceImpl::EnableHotspot(const ServiceType type)
 
 ErrCode WifiHotspotServiceImpl::DisableHotspot(const ServiceType type)
 {
-    WIFI_LOGI("current ap service is %{public}d %{public}s", m_id, __func__);
-    if (!WifiAuthCenter::IsSystemAppByToken()) {
-        WIFI_LOGE("DisableHotspot:NOT System APP, PERMISSION_DENIED!");
-        return WIFI_OPT_NON_SYSTEMAPP;
-    }
-    if (CheckOperHotspotSwitchPermission(type) == PERMISSION_DENIED) {
-        WIFI_LOGE("EnableHotspot:VerifyManageWifiHotspotPermission PERMISSION_DENIED!");
-        return WIFI_OPT_PERMISSION_DENIED;
-    }
-
-    WifiOprMidState curState = WifiConfigCenter::GetInstance().GetApMidState(m_id);
-    if (curState != WifiOprMidState::RUNNING) {
-        WIFI_LOGI("current ap state is %{public}d", static_cast<int>(curState));
-        if (curState == WifiOprMidState::OPENING) { /* when ap is opening, return */
-            return WIFI_OPT_CLOSE_FAIL_WHEN_OPENING;
-        } else {
-            return WIFI_OPT_CLOSE_SUCC_WHEN_CLOSED;
-        }
-    }
-    if (!WifiConfigCenter::GetInstance().SetApMidState(curState, WifiOprMidState::CLOSING, m_id)) {
-        WIFI_LOGI("set ap mid state closing failed! may be other activity has been operated");
-        return WIFI_OPT_CLOSE_SUCC_WHEN_CLOSED;
-    }
-    IApService *pService = WifiServiceManager::GetInstance().GetApServiceInst(m_id);
-    if (pService == nullptr) {
-        WIFI_LOGE("Instance %{public}d get hotspot service is null!", m_id);
-        WifiConfigCenter::GetInstance().SetApMidState(WifiOprMidState::CLOSED, m_id);
-        WifiServiceManager::GetInstance().UnloadService(WIFI_SERVICE_AP, m_id);
-        return WIFI_OPT_SUCCESS;
-    }
-    ErrCode ret = pService->DisableHotspot();
-    if (ret != WIFI_OPT_SUCCESS) {
-        WifiConfigCenter::GetInstance().SetApMidState(WifiOprMidState::CLOSING, WifiOprMidState::RUNNING, m_id);
-    }
-#ifdef FEATURE_STA_AP_EXCLUSION
-    // resume sta if closed in exclusion scene.
-    WifiConfigCenter::GetInstance().SetApLastRunState(true, false, m_id);
-    if (WifiConfigCenter::GetInstance().GetStaLastRunState()) {
-            std::thread startStaSrvThread(WifiManager::ExclusionAutoStartStaService);
-            pthread_setname_np(startStaSrvThread.native_handle(), "ExclusionAutoStartStaThread");
-            startStaSrvThread.detach();
-    }
-#endif
-    return ret;
+    // marked bPassiveClosed false
+    return WifiManager::GetInstance().DisableHotspot(false, type, m_id);
 }
 
 ErrCode WifiHotspotServiceImpl::AddBlockList(const StationInfo &info)
@@ -764,57 +708,6 @@ bool WifiHotspotServiceImpl::IsRemoteDied(void)
     return false;
 }
 
-#ifdef FEATURE_STA_AP_EXCLUSION
-ErrCode WifiHotspotServiceImpl::DisableWifi()
-{
-    WifiOprMidState curState = WifiConfigCenter::GetInstance().GetWifiMidState();
-    if (curState != WifiOprMidState::RUNNING) {
-        WIFI_LOGI("current wifi state is %{public}d", static_cast<int>(curState));
-        if (curState == WifiOprMidState::OPENING) { /* when current wifi is opening, return */
-            return WIFI_OPT_CLOSE_FAIL_WHEN_OPENING;
-        } else {
-            return WIFI_OPT_CLOSE_SUCC_WHEN_CLOSED;
-        }
-    }
-
-#ifdef FEATURE_P2P_SUPPORT
-    sptr<WifiP2pServiceImpl> p2pService = WifiP2pServiceImpl::GetInstance();
-    if (p2pService != nullptr && p2pService->DisableP2p() != WIFI_OPT_SUCCESS) {
-        WIFI_LOGE("Disable P2p failed!");
-        return WIFI_OPT_FAILED;
-    }
-#endif
-
-    if (!WifiConfigCenter::GetInstance().SetWifiMidState(curState, WifiOprMidState::CLOSING)) {
-        WIFI_LOGI("set wifi mid state opening failed! may be other app has been operated");
-        return WIFI_OPT_CLOSE_SUCC_WHEN_CLOSED;
-    }
-    WifiManager::GetInstance().SetStaApExclusionFlag(WifiCloseServiceCode::STA_SERVICE_CLOSE, true);
-    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst();
-    if (pService == nullptr) {
-        WifiManager::GetInstance().SetStaApExclusionFlag(WifiCloseServiceCode::STA_SERVICE_CLOSE, false);
-        WifiConfigCenter::GetInstance().SetWifiMidState(WifiOprMidState::CLOSED);
-        WifiServiceManager::GetInstance().UnloadService(WIFI_SERVICE_STA);
-        return WIFI_OPT_SUCCESS;
-    }
-    ErrCode ret = pService->DisableWifi();
-    if (ret != WIFI_OPT_SUCCESS) {
-        WifiConfigCenter::GetInstance().SetWifiMidState(WifiOprMidState::CLOSING, WifiOprMidState::RUNNING);
-        WifiManager::GetInstance().SetStaApExclusionFlag(WifiCloseServiceCode::STA_SERVICE_CLOSE, false);
-        return ret;
-    } else {
-        WifiManager::GetInstance().GetAirplaneModeByDatashare(WIFI_DEVICE_ABILITY_ID);
-        if (WifiConfigCenter::GetInstance().GetOperatorWifiType() ==
-            static_cast<int>(OperatorWifiType::USER_OPEN_WIFI_IN_AIRPLANEMODE) &&
-            WifiConfigCenter::GetInstance().GetAirplaneModeState() == MODE_STATE_OPEN) {
-                WifiConfigCenter::GetInstance().SetOperatorWifiType(
-                    static_cast<int>(OperatorWifiType::USER_CLOSE_WIFI_IN_AIRPLANEMODE));
-                WIFI_LOGI("EnableWifi, current airplane mode is opened, user close wifi!");
-        }
-        return WifiManager::GetInstance().TimeWaitDisableWifi();
-    }
-}
-#endif
 ErrCode WifiHotspotServiceImpl::CfgCheckSsid(const HotspotConfig &cfg)
 {
     if (cfg.GetSsid().length() < MIN_SSID_LEN || cfg.GetSsid().length() > MAX_SSID_LEN) {

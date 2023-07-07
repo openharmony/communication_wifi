@@ -195,25 +195,8 @@ public:
      * @returns ErrCode - return errCode
      */
     ErrCode TimeWaitDisableWifi();
-
-    /**
-     * @Description auto start Ap service if ap last run state is true
-     *
-     */
-    static void ExclusionAutoStartApService(void);
-
-    /**
-     * @Description auto start Sta service if ap last run state is true
-     *
-     */
-    static void ExclusionAutoStartStaService(void);
-
-    /**
-     * @Description check before enable wifi
-     *
-     * @returns ErrCode - return errCode
-     */
-    static ErrCode CheckCanEnableWifi();
+    void ResetDisableStaStatus();
+    void ResetDisableApStatus();
 #endif
 #endif
 
@@ -250,6 +233,14 @@ public:
     void GetAirplaneModeByDatashare(int systemAbilityId);
     void DealOpenAirplaneModeEvent();
     void DealCloseAirplaneModeEvent();
+    ErrCode DisableWifi(bool bPassiveClosed = false);
+    ErrCode DisableHotspot(bool bPassiveClosed = false,
+                           const ServiceType type = ServiceType::DEFAULT,
+                           const int id = 0);
+    int CheckOperHotspotSwitchPermission(const ServiceType type);
+#ifdef FEATURE_STA_AP_EXCLUSION
+    static void ResumeStaIfPassiveClosed(void);
+#endif
 
 private:
     void PushServiceCloseMsg(WifiCloseServiceCode code);

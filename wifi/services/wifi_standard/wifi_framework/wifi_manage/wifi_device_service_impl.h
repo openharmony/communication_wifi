@@ -181,9 +181,6 @@ private:
     void RegisterThermalLevel();
     void UnRegisterThermalLevel();
 #endif
-#ifdef FEATURE_STA_AP_EXCLUSION
-    ErrCode DisableHotspot();
-#endif
 
 private:
     static constexpr int MAX_PRESHAREDKEY_LEN = 63;

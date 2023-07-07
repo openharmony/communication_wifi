@@ -397,6 +397,22 @@ public:
     int SaveIpInfo(const IpInfo &info);
 
     /**
+     * @Description Get the dhcp ipv6info
+     *
+     * @param info - output IpV6Info struct
+     * @return int - 0 success
+     */
+    int GetIpV6Info(IpV6Info &info);
+
+    /**
+     * @Description Save dhcp inV6fo
+     *
+     * @param info - input IpV6Info struct
+     * @return int - 0 success
+     */
+    int SaveIpV6Info(const IpV6Info &info);
+
+    /**
      * @Description Get current link info
      *
      * @param info - output WifiLinkedInfo struct
@@ -1259,6 +1275,7 @@ private:
     WifiP2pLinkedInfo mWifiP2pInfo;
     std::map<int, WifiDeviceConfig> mWifiDeviceConfig;
     IpInfo mWifiIpInfo;
+    IpV6Info mWifiIpV6Info;
     WifiLinkedInfo mWifiLinkedInfo;
     std::string mMacAddress;
     std::string mCountryCode;

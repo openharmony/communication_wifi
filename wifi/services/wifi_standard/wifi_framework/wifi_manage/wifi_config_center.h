@@ -568,10 +568,6 @@ private:
     /* Time interval for disabling and re-enabling the STA */
     std::chrono::steady_clock::time_point mWifiCloseTime;
     std::atomic<bool> mWifiOpenedWhenAirplane;
-#ifdef FEATURE_STA_AP_EXCLUSION
-    std::mutex mApLastRunStateMutex;
-    std::map<int, std::atomic<bool>> mApLastRunState;
-#endif
 };
 } // namespace Wifi
 } // namespace OHOS

@@ -75,4 +75,20 @@ WifiErrorNo WifiGetPowerModel(int* mode, int id)
     LOGI("Get power mode: %{public}d", *mode);
     return (ret == 0) ? WIFI_HAL_SUCCESS : WIFI_HAL_FAILED;
 }
+
+WifiErrorNo HdiSetCountryCode(const char* code, int id)
+{
+    if (code == NULL) {
+        LOGE("Instance %{public}d %{public}s code is null.", id, __func__);
+        return WIFI_HAL_FAILED;
+    }
+    LOGI("Instance %{public}d %{public}s: %{public}s", id, __func__, code);
+    WifiHdiProxy proxy = GetHdiProxy(PROTOCOL_80211_IFTYPE_AP);
+    CHECK_HDI_PROXY_AND_RETURN(proxy, WIFI_HAL_FAILED);
+    int32_t ret = proxy.wlanObj->SetCountryCode(proxy.wlanObj, proxy.feature, code, (uint32_t)strlen(code));
+    if (ret != 0) {
+        LOGE("Set country code failed: %{public}d", ret);
+    }
+    return (ret == 0) ? WIFI_HAL_SUCCESS : WIFI_HAL_FAILED;
+}
 #endif

@@ -235,9 +235,11 @@ public:
     void DealOpenAirplaneModeEvent();
     void DealCloseAirplaneModeEvent();
     ErrCode DisableWifi(bool bPassiveClosed = false);
+#ifndef OHOS_ARCH_LITE
     ErrCode DisableHotspot(bool bPassiveClosed = false,
                            const ServiceType type = ServiceType::DEFAULT,
                            const int id = 0);
+#endif
     int CheckOperHotspotSwitchPermission(const ServiceType type);
 #ifdef FEATURE_STA_AP_EXCLUSION
     static void ResumeStaIfPassiveClosed(void);

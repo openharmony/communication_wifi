@@ -420,8 +420,7 @@ void StaStateMachine::StartWifiProcess()
     int res;
     if (WifiOprMidState::RUNNING == WifiConfigCenter::GetInstance().GetWifiScanOnlyMidState()) {
         res = static_cast<int>(WIFI_IDL_OPT_OK);
-    }
-    else {
+    } else {
         res = WifiStaHalInterface::GetInstance().StartWifi();
     }
     

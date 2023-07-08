@@ -423,9 +423,11 @@ ErrCode WifiScanProxy::SetScanOnlyAvailable(bool bScanOnlyAvailable)
     }
     data.WriteInt32(0);
     data.WriteBool(bScanOnlyAvailable);
-    int error = Remote()->SendRequest(static_cast<uint32_t>(ScanInterfaceCode::WIFI_SVR_CMD_SET_WIFI_SCAN_ONLY), data, reply, option);
+    int error = Remote()->SendRequest(static_cast<uint32_t>(ScanInterfaceCode::WIFI_SVR_CMD_SET_WIFI_SCAN_ONLY), 
+        data, reply, option);
     if (error != ERR_NONE) {
-        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d", ScanInterfaceCode::WIFI_SVR_CMD_SET_WIFI_SCAN_ONLY, error);
+        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d", 
+            static_cast<int32_t>(ScanInterfaceCode::WIFI_SVR_CMD_SET_WIFI_SCAN_ONLY), error);
         return WIFI_OPT_FAILED;
     }
 
@@ -449,9 +451,11 @@ ErrCode WifiScanProxy::GetScanOnlyAvailable(bool &bScanOnlyAvailable)
         return WIFI_OPT_FAILED;
     }
     data.WriteInt32(0);
-    int error = Remote()->SendRequest(static_cast<uint32_t>(ScanInterfaceCode::WIFI_SVR_CMD_GET_WIFI_SCAN_ONLY), data, reply, option);
+    int error = Remote()->SendRequest(static_cast<uint32_t>(ScanInterfaceCode::WIFI_SVR_CMD_GET_WIFI_SCAN_ONLY), 
+        data, reply, option);
     if (error != ERR_NONE) {
-        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d", ScanInterfaceCode::WIFI_SVR_CMD_GET_WIFI_SCAN_ONLY, error);
+        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d", 
+            static_cast<int32_t>(ScanInterfaceCode::WIFI_SVR_CMD_GET_WIFI_SCAN_ONLY), error);
         return WIFI_OPT_FAILED;
     }
     int exception = reply.ReadInt32();

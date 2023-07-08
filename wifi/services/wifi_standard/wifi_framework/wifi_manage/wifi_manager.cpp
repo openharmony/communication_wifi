@@ -1659,6 +1659,7 @@ ErrCode WifiManager::DisableWifi(bool bPassiveClosed)
     return ret;
 }
 
+#ifndef OHOS_ARCH_LITE
 ErrCode WifiManager::DisableHotspot(bool bPassiveClosed, const ServiceType type, const int id)
 {
     WIFI_LOGI("current ap service is %{public}d %{public}s", id, __func__);
@@ -1723,6 +1724,7 @@ ErrCode WifiManager::DisableHotspot(bool bPassiveClosed, const ServiceType type,
 #endif
     return ret;
 }
+#endif
 
 int WifiManager::CheckOperHotspotSwitchPermission(const ServiceType type)
 {

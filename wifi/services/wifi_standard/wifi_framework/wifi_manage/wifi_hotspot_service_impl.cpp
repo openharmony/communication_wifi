@@ -27,12 +27,6 @@
 #include "wifi_logger.h"
 #include "wifi_common_util.h"
 
-#ifdef FEATURE_STA_AP_EXCLUSION
-#ifdef FEATURE_P2P_SUPPORT
-#include "wifi_p2p_service_impl.h"
-#endif
-#endif
-
 DEFINE_WIFILOG_HOTSPOT_LABEL("WifiHotspotServiceImpl");
 
 namespace OHOS {

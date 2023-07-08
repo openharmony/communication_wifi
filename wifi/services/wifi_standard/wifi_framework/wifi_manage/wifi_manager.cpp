@@ -1682,7 +1682,7 @@ ErrCode WifiManager::DisableHotspot(bool bPassiveClosed, const ServiceType type,
         }
     }
     if (!WifiConfigCenter::GetInstance().SetApMidState(curState, WifiOprMidState::CLOSING, id)) {
-        WIFI_LOGI("set ap mid state closing failed! may be other activity has been operated");
+        WIFI_LOGI("set ap mid state closing failed! may be other app has been operated");
         return WIFI_OPT_CLOSE_SUCC_WHEN_CLOSED;
     }
     IApService *pService = WifiServiceManager::GetInstance().GetApServiceInst(id);

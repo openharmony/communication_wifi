@@ -363,7 +363,7 @@ if (defined(ohos_lite)) {
     deps = [
       "$WIFI_ROOT_DIR/services/wifi_standard/etc/init:etc",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit:wifi_toolkit",
-      "$WIFI_ROOT_DIR/utils:wifi_utils"
+      "$WIFI_ROOT_DIR/utils:wifi_utils",
     ]
 
     configs = [ ":wifi_manager_service_header" ]

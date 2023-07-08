@@ -291,9 +291,8 @@ void WifiScanStub::SetSingleCallback(const bool isSingleCallback)
 
 int WifiScanStub::OnSetScanOnlyAvailable(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
-    WIFI_LOGI("In WifiScanStub::OnSetScanOnlyAvailable");
     bool enabled = data.ReadBool();
-    WIFI_LOGI("In WifiScanStub::OnSetScanOnlyAvailable enabled is %{public}d",enabled);
+    WIFI_LOGI("In WifiScanStub::OnSetScanOnlyAvailable enabled is %{public}d", enabled);
     reply.WriteInt32(0);
     reply.WriteBool(SetScanOnlyAvailable(enabled));
     return 0;

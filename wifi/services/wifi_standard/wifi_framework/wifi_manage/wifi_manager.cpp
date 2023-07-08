@@ -37,13 +37,6 @@
 #include "define.h"
 #include "wifi_config_center.h"
 #include "wifi_common_def.h"
-#include "wifi_device_service_impl.h"
-#ifndef OHOS_ARCH_LITE
-#ifdef FEATURE_STA_AP_EXCLUSION
-#include "wifi_hotspot_mgr_service_impl.h"
-#include "wifi_hotspot_service_impl.h"
-#endif
-#endif
 
 namespace OHOS {
 namespace Wifi {
@@ -55,6 +48,14 @@ const uint32_t TIMEOUT_AIRPLANE_MODE_EVENT = 3000;
 const uint32_t TIMEOUT_UNLOAD_WIFI_SA = 5 * 60 * 1000;
 #ifdef FEATURE_STA_AP_EXCLUSION
 const uint32_t TIMEOUT_STA_AP_DISABLE_SECONDS = 5;
+bool WifiManager::mDisableStaStatus = false;
+bool WifiManager::mDisableApStatus = false;
+std::condition_variable WifiManager::mDisableStaStatusCondtion;
+std::mutex WifiManager::mDisableStaStatusMutex;
+std::condition_variable WifiManager::mDisableApStatusCondtion;
+std::mutex WifiManager::mDisableApStatusMutex;
+std::atomic<bool> WifiManager::mDisableStaByExclusion = false;
+std::atomic<bool> WifiManager::mDisableApByExclusion = false;
 #endif
 using TimeOutCallback = std::function<void()>;
 #endif
@@ -1581,15 +1582,17 @@ void WifiTimer::UnRegister(uint32_t timerId)
 #ifdef FEATURE_STA_AP_EXCLUSION
 ErrCode WifiManager::DisableWifi()
 {
-    auto pServiceImpl = WifiDeviceServiceImpl::GetInstance();
-    if (pServiceImpl == nullptr) {
-        WIFI_LOGE("get device service impl falid!");
-        return WIFI_OPT_FAILED;
+    ErrCode ret = WIFI_OPT_FAILED;
+    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst();
+    if (pService == nullptr) {
+        WIFI_LOGE("Create %{public}s service failed!", WIFI_SERVICE_STA);
+        return ret;
     }
-    WifiManager::GetInstance().SetStaApExclusionFlag(WifiCloseServiceCode::STA_SERVICE_CLOSE, true);
-    ErrCode ret = pServiceImpl->DisableWifi();
+
+    SetStaApExclusionFlag(WifiCloseServiceCode::STA_SERVICE_CLOSE, true);
+    ret = pService->DisableWifi();
     if (ret != WIFI_OPT_SUCCESS && ret != WIFI_OPT_CLOSE_SUCC_WHEN_CLOSED) {
-        WifiManager::GetInstance().SetStaApExclusionFlag(WifiCloseServiceCode::STA_SERVICE_CLOSE, false);
+        SetStaApExclusionFlag(WifiCloseServiceCode::STA_SERVICE_CLOSE, false);
         return ret;
     } else {
         ResetDisableStaStatus();
@@ -1604,30 +1607,24 @@ ErrCode WifiManager::DisableWifi()
 #ifdef FEATURE_STA_AP_EXCLUSION
 ErrCode WifiManager::DisableHotspot(const ServiceType type, const int id)
 {
-    auto pServiceMgrImpl = WifiHotspotMgrServiceImpl::GetInstance();
-    if (pServiceMgrImpl == nullptr) {
-        WIFI_LOGE("get hotspot service mgr failed.");
-        return WIFI_OPT_FAILED;
+    ErrCode ret = WIFI_OPT_FAILED;
+    IApService *pService = WifiServiceManager::GetInstance().GetApServiceInst();
+    if (pService == nullptr) {
+        WIFI_LOGE("DisableHotspot, Instance get hotspot service is null!");
+        WifiConfigCenter::GetInstance().SetApMidState(WifiOprMidState::CLOSED, 0);
+        WifiServiceManager::GetInstance().UnloadService(WIFI_SERVICE_AP, 0);
+        return ret; 
     }
-    auto pServiceObj = pServiceMgrImpl->GetWifiRemote(0);
-    if (pServiceObj == nullptr) {
-        WIFI_LOGE("get remote object failed.");
-        return WIFI_OPT_FAILED;
-    }
-    auto pApServiceImpl = iface_cast<WifiHotspotServiceImpl>(pServiceObj);
-    if (pApServiceImpl == nullptr) {
-        WIFI_LOGE("get hotspot service impl failed.");
-        return WIFI_OPT_FAILED;
-    }
-    WifiManager::GetInstance().SetStaApExclusionFlag(WifiCloseServiceCode::AP_SERVICE_CLOSE, true);
-    ErrCode ret = pApServiceImpl->DisableHotspot();
-    if (ret != WIFI_OPT_SUCCESS && ret != WIFI_OPT_CLOSE_SUCC_WHEN_CLOSED) {
-        WifiManager::GetInstance().SetStaApExclusionFlag(WifiCloseServiceCode::AP_SERVICE_CLOSE, false);
+
+    ret = pService->DisableHotspot();
+    if (ret != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("service disable ap failed, ret %{public}d!", static_cast<int>(ret));
+        WifiConfigCenter::GetInstance().SetApMidState(WifiOprMidState::CLOSING, WifiOprMidState::RUNNING, 0);
         return ret;
     }
     ResetDisableApStatus();
     // ap is passive closed by sta&ap exclusion, need timed wait
-    return WifiManager::GetInstance().TimeWaitDisableHotspot();
+    return TimeWaitDisableHotspot();
 }
 #endif
 #endif

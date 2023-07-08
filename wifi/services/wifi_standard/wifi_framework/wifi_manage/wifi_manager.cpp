@@ -1715,8 +1715,8 @@ ErrCode WifiManager::DisableHotspot(bool bPassiveClosed, const ServiceType type,
     } else {
         // ap is active closed, auto start sta service if sta last running state is true
         if (WifiConfigCenter::GetInstance().GetStaLastRunState()) {
-                std::thread startStaSrvThread(WifiManager::AutoStartStaService);
-                pthread_setname_np(startStaSrvThread.native_handle(), "ExclusionAutoStartStaThread");
+                std::thread startStaSrvThread(WifiManager::ResumeStaIfPassiveClosed);
+                pthread_setname_np(startStaSrvThread.native_handle(), "ResumeStaIfPassiveClosedThread");
                 startStaSrvThread.detach();
         }
     }
@@ -1735,6 +1735,7 @@ int WifiManager::CheckOperHotspotSwitchPermission(const ServiceType type)
 #endif
 }
 
+#ifdef FEATURE_STA_AP_EXCLUSION
 void WifiManager::ResumeStaIfPassiveClosed(void)
 {
     int tryTimes = 0;
@@ -1746,5 +1747,6 @@ void WifiManager::ResumeStaIfPassiveClosed(void)
         ++tryTimes;
     }
 }
+#endif
 }  // namespace Wifi
 }  // namespace OHOS

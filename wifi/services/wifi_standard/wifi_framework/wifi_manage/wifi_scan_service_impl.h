@@ -23,13 +23,10 @@
 #include "wifi_scan_stub.h"
 #include "iremote_object.h"
 #endif
+#include "wifi_common.h"
 
 namespace OHOS {
 namespace Wifi {
-enum ServiceRunningState {
-    STATE_NOT_START,
-    STATE_RUNNING
-};
 
 #ifdef OHOS_ARCH_LITE
 class WifiScanServiceImpl : public WifiScanStub {

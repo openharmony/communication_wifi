@@ -22,14 +22,10 @@
 #include "wifi_errcode.h"
 #include "wifi_hotspot_mgr_stub.h"
 #include "wifi_hotspot_stub.h"
+#include "wifi_common.h"
 
 namespace OHOS {
 namespace Wifi {
-enum ServiceRunningState {
-    STATE_NOT_START,
-    STATE_RUNNING
-};
-
 class WifiHotspotMgrServiceImpl : public SystemAbility, public WifiHotspotMgrStub {
     DECLARE_SYSTEM_ABILITY(WifiHotspotMgrServiceImpl);
 public:

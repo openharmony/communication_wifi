@@ -260,6 +260,7 @@ public:
 
 private:
     ErrCode CheckCanEnableHotspot(const ServiceType type);
+    int CheckOperHotspotSwitchPermission(const ServiceType type);
     bool IsApServiceRunning();
     static void ConfigInfoDump(std::string& result);
     static void StationsInfoDump(std::string& result);

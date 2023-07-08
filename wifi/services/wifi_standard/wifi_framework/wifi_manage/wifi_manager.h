@@ -29,6 +29,7 @@
 #include "wifi_internal_msg.h"
 #include "sta_service_callback.h"
 #include "iscan_service_callbacks.h"
+#include "wifi_errcode.h"
 #ifdef FEATURE_AP_SUPPORT
 #include "i_ap_service_callbacks.h"
 #endif

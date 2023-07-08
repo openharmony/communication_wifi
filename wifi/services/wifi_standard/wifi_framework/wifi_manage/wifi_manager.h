@@ -167,7 +167,7 @@ public:
      * @param type - service type
      * @param isExclusion - true / false
      */
-    void SetStaApExclusionFlag(WifiCloseServiceCode type, bool isExclusion);
+    static void SetStaApExclusionFlag(WifiCloseServiceCode type, bool isExclusion);
 
     /**
      * @Description wakeup thread blocked by getting DisableHotspot asynchronous operation result
@@ -181,23 +181,7 @@ public:
      */
     void SignalDisableWifi();
 
-    /**
-     * @Description blocked for seconds until DisableHotspot asynchronous operation complete
-     * or timeout
-     *
-     * @returns ErrCode - return errCode
-     */
-    ErrCode TimeWaitDisableHotspot();
-
-    /**
-     * @Description blocked for seconds until DisableWifi asynchronous operation complete
-     * or timeout
-     *
-     * @returns ErrCode - return errCode
-     */
-    ErrCode TimeWaitDisableWifi();
-    void ResetDisableStaStatus();
-    void ResetDisableApStatus();
+    
 #endif
 #endif
 
@@ -234,16 +218,32 @@ public:
     void GetAirplaneModeByDatashare(int systemAbilityId);
     void DealOpenAirplaneModeEvent();
     void DealCloseAirplaneModeEvent();
-    ErrCode DisableWifi();
+    
 #ifndef OHOS_ARCH_LITE
-    ErrCode DisableHotspot(const ServiceType type = ServiceType::DEFAULT,
-                           const int id = 0);
-#endif
-
 #ifdef FEATURE_STA_AP_EXCLUSION
+    static ErrCode DisableHotspot(const ServiceType type = ServiceType::DEFAULT,
+                           const int id = 0);
+    static ErrCode DisableWifi();
     static void ResumeStaIfPassiveClosed(void);
-#endif
+    /**
+     * @Description blocked for seconds until DisableHotspot asynchronous operation complete
+     * or timeout
+     *
+     * @returns ErrCode - return errCode
+     */
+    static ErrCode TimeWaitDisableHotspot();
 
+    /**
+     * @Description blocked for seconds until DisableWifi asynchronous operation complete
+     * or timeout
+     *
+     * @returns ErrCode - return errCode
+     */
+    static ErrCode TimeWaitDisableWifi();
+    static void ResetDisableStaStatus();
+    static void ResetDisableApStatus();
+#endif    
+#endif
 private:
     void PushServiceCloseMsg(WifiCloseServiceCode code);
     void InitStaCallback(void);
@@ -326,16 +326,16 @@ private:
 #ifdef FEATURE_AP_SUPPORT
     IApServiceCallbacks mApCallback;
 #ifdef FEATURE_STA_AP_EXCLUSION
-    std::atomic<bool> mDisableStaByExclusion {false};
-    std::atomic<bool> mDisableApByExclusion {false};
+    static std::atomic<bool> mDisableStaByExclusion;
+    static std::atomic<bool> mDisableApByExclusion;
 
-    std::condition_variable mDisableStaStatusCondtion;
-    std::mutex mDisableStaStatusMutex;
-    bool mDisableStaStatus {false};
+    static std::condition_variable mDisableStaStatusCondtion;
+    static std::mutex mDisableStaStatusMutex;
+    static bool mDisableStaStatus;
 
-    std::condition_variable mDisableApStatusCondtion;
-    std::mutex mDisableApStatusMutex;
-    bool mDisableApStatus {false};
+    static std::condition_variable mDisableApStatusCondtion;
+    static std::mutex mDisableApStatusMutex;
+    static bool mDisableApStatus;
 #endif
 #ifndef OHOS_ARCH_LITE
     static uint32_t unloadHotspotSaTimerId;

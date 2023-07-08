@@ -358,12 +358,6 @@ if (defined(ohos_lite)) {
       "wifi_net_agent.cpp",
       "wifi_net_conn_event_handler.cpp",
       "wifi_service_manager.cpp",
-      "wifi_device_service_impl.cpp",
-      "wifi_device_stub.cpp",
-      "wifi_hotspot_mgr_service_impl.cpp",
-      "wifi_hotspot_mgr_stub.cpp",
-      "wifi_hotspot_service_impl.cpp",
-      "wifi_hotspot_stub.cpp",
     ]
 
     deps = [
@@ -393,7 +387,6 @@ if (defined(ohos_lite)) {
       "netmanager_base:net_native_manager_if",
       "safwk:system_ability_fwk",
       "samgr:samgr_proxy",
-      "hicollie:libhicollie",
     ]
     if (wifi_feature_with_encryption) {
       external_deps += [ "huks:libhukssdk" ]

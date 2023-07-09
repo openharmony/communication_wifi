@@ -25,6 +25,11 @@
 
 namespace OHOS {
 namespace Wifi {
+enum ServiceRunningState {
+    STATE_NOT_START,
+    STATE_RUNNING
+};
+
 class WifiHotspotMgrServiceImpl : public SystemAbility, public WifiHotspotMgrStub {
     DECLARE_SYSTEM_ABILITY(WifiHotspotMgrServiceImpl);
 public:

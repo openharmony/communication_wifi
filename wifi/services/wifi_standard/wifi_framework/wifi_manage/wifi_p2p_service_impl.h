@@ -24,6 +24,7 @@
 
 namespace OHOS {
 namespace Wifi {
+enum ServiceRunningState { STATE_NOT_START, STATE_RUNNING };
 class WifiP2pServiceImpl : public SystemAbility, public WifiP2pStub {
     DECLARE_SYSTEM_ABILITY(WifiP2pServiceImpl);
 

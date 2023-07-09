@@ -21,7 +21,6 @@
 #include "system_ability.h"
 #include "wifi_p2p_stub.h"
 #include "iremote_object.h"
-#include "wifi_common.h"
 
 namespace OHOS {
 namespace Wifi {

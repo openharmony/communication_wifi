@@ -23,7 +23,6 @@
 #include "wifi_scan_stub.h"
 #include "iremote_object.h"
 #endif
-#include "wifi_common.h"
 
 namespace OHOS {
 namespace Wifi {

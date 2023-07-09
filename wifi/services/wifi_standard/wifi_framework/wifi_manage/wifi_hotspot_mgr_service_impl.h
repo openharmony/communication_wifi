@@ -22,7 +22,6 @@
 #include "wifi_errcode.h"
 #include "wifi_hotspot_mgr_stub.h"
 #include "wifi_hotspot_stub.h"
-#include "wifi_common.h"
 
 namespace OHOS {
 namespace Wifi {

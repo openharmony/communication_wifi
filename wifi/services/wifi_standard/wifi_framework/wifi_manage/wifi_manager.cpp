@@ -1617,7 +1617,7 @@ ErrCode WifiManager::DisableHotspot(const ServiceType type, const int id)
     }
 
     ret = pService->DisableHotspot();
-    if (ret != WIFI_OPT_SUCCESS) {
+    if (ret != WIFI_OPT_SUCCESS && ret != WIFI_OPT_CLOSE_SUCC_WHEN_CLOSED) {
         WIFI_LOGE("service disable ap failed, ret %{public}d!", static_cast<int>(ret));
         WifiConfigCenter::GetInstance().SetApMidState(WifiOprMidState::CLOSING, WifiOprMidState::RUNNING, 0);
         return ret;

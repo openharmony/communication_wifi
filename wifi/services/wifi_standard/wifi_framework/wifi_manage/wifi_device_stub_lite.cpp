@@ -453,6 +453,25 @@ void WifiDeviceStub::OnGetIpInfo(uint32_t code, IpcIo *req, IpcIo *reply)
     }
 }
 
+void WifiDeviceStub::OnGetIpV6Info(uint32_t code, IpcIo *req, IpcIo *reply)
+{
+    WIFI_LOGD("run %{public}s code %{public}u", __func__, code);
+    IpV6Info info;
+    ErrCode ret = GetIpV6Info(info);
+    (void)WriteInt32(reply, 0);
+    (void)WriteInt32(reply, ret);
+
+    if (ret == WIFI_OPT_SUCCESS) {
+        (void)WriteString(reply, info.linkIpV6Address.c_str());
+        (void)WriteString(reply, info.globalIpV6Address.c_str());
+        (void)WriteString(reply, info.randGlobalIpV6Address.c_str());
+        (void)WriteString(reply, info.gateway.c_str());
+        (void)WriteString(reply, info.netmask.c_str());
+        (void)WriteString(reply, info.primaryDns.c_str());
+        (void)WriteString(reply, info.secondDns.c_str());
+    }
+}
+
 void WifiDeviceStub::OnSetCountryCode(uint32_t code, IpcIo *req, IpcIo *reply)
 {
     WIFI_LOGD("run %{public}s code %{public}u", __func__, code);
@@ -639,6 +658,8 @@ void WifiDeviceStub::InitHandleMap()
     handleFuncMap_[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_LINKED_INFO)] =
         &WifiDeviceStub::OnGetLinkedInfo;
     handleFuncMap_[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_DHCP_INFO)] = &WifiDeviceStub::OnGetIpInfo;
+    handleFuncMap_[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_DHCP_IPV6INFO)] =
+        &WifiDeviceStub::OnGetIpV6Info;
     handleFuncMap_[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_SET_COUNTRY_CODE)] =
         &WifiDeviceStub::OnSetCountryCode;
     handleFuncMap_[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_COUNTRY_CODE)] =

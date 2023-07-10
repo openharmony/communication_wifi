@@ -171,6 +171,14 @@ public:
     int GetIpInfo(IpInfo &info);
 
     /**
+     * @Description Get the dhcp inV6fo
+     *
+     * @param info - output IpV6Info struct
+     * @return int - 0 success
+     */
+    int GetIpV6Info(IpV6Info &info);
+
+    /**
      * @Description Get current link info
      *
      * @param info - output WifiLinkedInfo struct

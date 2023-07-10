@@ -532,28 +532,6 @@ struct IpInfo {
         leaseDuration = 0;
     }
 };
-
-/* DHCP IpV6Info */
-struct IpV6Info {
-    std::string linkIpV6Address;
-    std::string globalIpV6Address;
-    std::string randGlobalIpV6Address;
-    std::string gateway;
-    std::string netmask;
-    std::string primaryDns;
-    std::string secondDns;
-
-    IpV6Info()
-    {
-        linkIpV6Address = "";
-        globalIpV6Address = "";
-        randGlobalIpV6Address = "";
-        gateway = "";
-        netmask = "";
-        primaryDns = "";
-        secondDns = "";
-    }
-};
 }  // namespace Wifi
 }  // namespace OHOS
 #endif

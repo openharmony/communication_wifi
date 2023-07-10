@@ -46,6 +46,17 @@ int WifiManager::mCloseApIndex = 0;
 const uint32_t TIMEOUT_SCREEN_EVENT = 3000;
 const uint32_t TIMEOUT_AIRPLANE_MODE_EVENT = 3000;
 const uint32_t TIMEOUT_UNLOAD_WIFI_SA = 5 * 60 * 1000;
+#ifdef FEATURE_STA_AP_EXCLUSION
+const uint32_t TIMEOUT_STA_AP_DISABLE_SECONDS = 5;
+bool WifiManager::mDisableStaStatus = false;
+bool WifiManager::mDisableApStatus = false;
+std::condition_variable WifiManager::mDisableStaStatusCondtion;
+std::mutex WifiManager::mDisableStaStatusMutex;
+std::condition_variable WifiManager::mDisableApStatusCondtion;
+std::mutex WifiManager::mDisableApStatusMutex;
+std::atomic<bool> WifiManager::mDisableStaByExclusion = false;
+std::atomic<bool> WifiManager::mDisableApByExclusion = false;
+#endif
 using TimeOutCallback = std::function<void()>;
 #endif
 
@@ -534,12 +545,110 @@ void WifiManager::StartUnloadApSaTimer(void)
 }
 #endif
 
+#ifdef FEATURE_STA_AP_EXCLUSION
+bool WifiManager::GetStaApExclusionFlag(WifiCloseServiceCode type)
+{
+    if (type == WifiCloseServiceCode::STA_SERVICE_CLOSE) {
+        return mDisableStaByExclusion.load();
+    } else if (type == WifiCloseServiceCode::AP_SERVICE_CLOSE) {
+        return mDisableApByExclusion.load();
+    } else {
+        return false;
+    }
+}
+
+void WifiManager::SetStaApExclusionFlag(WifiCloseServiceCode type, bool isExclusion)
+{
+    if (type == WifiCloseServiceCode::STA_SERVICE_CLOSE) {
+        mDisableStaByExclusion.store(isExclusion);
+    } else if (type == WifiCloseServiceCode::AP_SERVICE_CLOSE) {
+        mDisableApByExclusion.store(isExclusion);
+    } else {
+        return;
+    }
+}
+
+void WifiManager::SignalDisableHotspot()
+{
+    bool isApExclusion = mDisableApByExclusion.load();
+    if (isApExclusion) {
+        LOGI("wake up thread waiting for DisbleHotspot by Exclusion");
+        std::unique_lock<std::mutex> lock(mDisableApStatusMutex);
+        mDisableApStatus = true;
+        mDisableApByExclusion.compare_exchange_strong(isApExclusion, false);
+        mDisableApStatusCondtion.notify_one();
+    } else {
+        LOGI("no need signal.");
+    }
+}
+
+void WifiManager::SignalDisableWifi()
+{
+    LOGI("enter function WifiManager::SignalDisableWifi");
+    bool isStaExclusion = mDisableStaByExclusion.load();
+    if (isStaExclusion) {
+        LOGI("wake up thread waiting for DisableWifi by Exclusion");
+        std::unique_lock<std::mutex> lock(mDisableStaStatusMutex);
+        mDisableStaStatus = true;
+        mDisableApByExclusion.compare_exchange_strong(isStaExclusion, false);
+        mDisableStaStatusCondtion.notify_one();
+    } else {
+        LOGI("no need signal.");
+    }
+}
+
+ErrCode WifiManager::TimeWaitDisableHotspot()
+{
+    LOGI("enter function WifiManager::TimeWaitDisableHotspot");
+    std::unique_lock<std::mutex> lock(mDisableApStatusMutex);
+    while(!mDisableApStatus) {
+        if (mDisableApStatusCondtion.wait_for(lock,
+            std::chrono::seconds(TIMEOUT_STA_AP_DISABLE_SECONDS)) == std::cv_status::timeout) {
+            WIFI_LOGE("get disableHotspot ops status timeout.");
+            return WIFI_OPT_FAILED;
+        }
+    }
+    mDisableApStatus = false;
+    return WIFI_OPT_SUCCESS;
+}
+
+ErrCode WifiManager::TimeWaitDisableWifi()
+{
+    LOGI("enter function WifiManager::TimeWaitDisableWifi");
+    std::unique_lock<std::mutex> lock(mDisableStaStatusMutex);
+    while(!mDisableStaStatus) {
+        if (mDisableStaStatusCondtion.wait_for(lock,
+            std::chrono::seconds(TIMEOUT_STA_AP_DISABLE_SECONDS)) == std::cv_status::timeout) {
+            WIFI_LOGE("get disableWifi ops status timeout.");
+            return WIFI_OPT_FAILED;
+        }
+    }
+    mDisableStaStatus = false;
+    return WIFI_OPT_SUCCESS;
+}
+
+void WifiManager::ResetDisableStaStatus()
+{
+    std::unique_lock<std::mutex> lock(mDisableStaStatusMutex);
+    mDisableStaStatus = false;
+}
+
+void WifiManager::ResetDisableApStatus()
+{
+    std::unique_lock<std::mutex> lock(mDisableApStatusMutex);
+    mDisableApStatus = false;
+}
+#endif
+
 void WifiManager::CloseApService(int id)
 {
     WIFI_LOGI("close %{public}d ap service", id);
     WifiServiceManager::GetInstance().UnloadService(WIFI_SERVICE_AP, id);
     WifiConfigCenter::GetInstance().SetApMidState(WifiOprMidState::CLOSED, id);
     WifiSettings::GetInstance().SetHotspotState(static_cast<int>(ApState::AP_STATE_CLOSED), id);
+#ifdef FEATURE_STA_AP_EXCLUSION
+    WifiManager::GetInstance().SignalDisableHotspot();
+#endif
     WifiEventCallbackMsg cbMsg;
     cbMsg.msgCode = WIFI_CBK_MSG_HOTSPOT_STATE_CHANGE;
     cbMsg.msgData = static_cast<int>(ApState::AP_STATE_CLOSED);
@@ -720,6 +829,9 @@ void WifiManager::DealStaCloseRes(OperateResState state)
         cbMsg.msgData = static_cast<int>(WifiState::UNKNOWN);
         WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
     }
+#ifdef FEATURE_STA_AP_EXCLUSION
+    WifiManager::GetInstance().SignalDisableWifi();
+#endif
     if (WifiConfigCenter::GetInstance().GetAirplaneModeState() == MODE_STATE_OPEN) {
         WifiConfigCenter::GetInstance().SetWifiStateWhenAirplaneMode(false);
     }
@@ -1464,6 +1576,118 @@ void WifiTimer::UnRegister(uint32_t timerId)
 
     timer_->Unregister(timerId);
     return;
+}
+#endif
+
+#ifdef FEATURE_STA_AP_EXCLUSION
+ErrCode WifiManager::DisableWifi()
+{
+    ErrCode ret = WIFI_OPT_FAILED;
+    WifiOprMidState curState = WifiConfigCenter::GetInstance().GetWifiMidState();
+    if (curState != WifiOprMidState::RUNNING) {
+        WIFI_LOGI("current wifi state is %{public}d", static_cast<int>(curState));
+        if (curState == WifiOprMidState::OPENING) { /* when current wifi is opening, return */
+            return WIFI_OPT_CLOSE_FAIL_WHEN_OPENING;
+        } else {
+            return WIFI_OPT_CLOSE_SUCC_WHEN_CLOSED;
+        }
+    }
+#ifdef FEATURE_P2P_SUPPORT
+    IP2pService *p2pService = WifiServiceManager::GetInstance().GetP2pServiceInst();
+    if (p2pService != nullptr && p2pService->DisableP2p() != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("Disable P2p failed!");
+        return ret;
+    }
+#endif
+    if (!WifiConfigCenter::GetInstance().SetWifiMidState(curState, WifiOprMidState::CLOSING)) {
+        WIFI_LOGI("set wifi mid state opening failed! may be other app has been operated");
+        return WIFI_OPT_CLOSE_SUCC_WHEN_CLOSED;
+    }
+    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst();
+    if (pService == nullptr) {
+        WifiConfigCenter::GetInstance().SetWifiMidState(WifiOprMidState::CLOSED);
+        WifiServiceManager::GetInstance().UnloadService(WIFI_SERVICE_STA);
+        return WIFI_OPT_SUCCESS;
+    }
+    SetStaApExclusionFlag(WifiCloseServiceCode::STA_SERVICE_CLOSE, true);
+    ret = pService->DisableWifi();
+    if (ret != WIFI_OPT_SUCCESS) {
+        SetStaApExclusionFlag(WifiCloseServiceCode::STA_SERVICE_CLOSE, false);
+        WifiConfigCenter::GetInstance().SetWifiMidState(WifiOprMidState::CLOSING, WifiOprMidState::RUNNING);
+        return ret;
+    } else {
+        // passive closed need not set sta last running state false
+        WifiManager::GetInstance().GetAirplaneModeByDatashare(WIFI_DEVICE_ABILITY_ID);
+        if (WifiConfigCenter::GetInstance().GetOperatorWifiType() ==
+                static_cast<int>(OperatorWifiType::USER_OPEN_WIFI_IN_AIRPLANEMODE) &&
+            WifiConfigCenter::GetInstance().GetAirplaneModeState() == MODE_STATE_OPEN) {
+            WifiConfigCenter::GetInstance().SetOperatorWifiType(
+                static_cast<int>(OperatorWifiType::USER_CLOSE_WIFI_IN_AIRPLANEMODE));
+            WIFI_LOGI("EnableWifi, current airplane mode is opened, user close wifi!");
+        }
+    }
+
+    ResetDisableStaStatus();
+    // wlan is passive closed by sta&ap exclusion, need timed wait
+    return TimeWaitDisableWifi();
+}
+#endif
+
+#ifndef OHOS_ARCH_LITE
+#ifdef FEATURE_STA_AP_EXCLUSION
+ErrCode WifiManager::DisableHotspot(const int id)
+{
+    ErrCode ret = WIFI_OPT_FAILED;
+    WifiOprMidState curState = WifiConfigCenter::GetInstance().GetApMidState(id);
+    if (curState != WifiOprMidState::RUNNING) {
+        WIFI_LOGI("current ap state is %{public}d", static_cast<int>(curState));
+        if (curState == WifiOprMidState::OPENING) { /* when ap is opening, return */
+            return WIFI_OPT_CLOSE_FAIL_WHEN_OPENING;
+        } else {
+            return WIFI_OPT_CLOSE_SUCC_WHEN_CLOSED;
+        }
+    }
+    if (!WifiConfigCenter::GetInstance().SetApMidState(curState, WifiOprMidState::CLOSING, id)) {
+        WIFI_LOGI("set ap mid state closing failed! may be other app has been operated");
+        return WIFI_OPT_CLOSE_SUCC_WHEN_CLOSED;
+    }
+    IApService *pService = WifiServiceManager::GetInstance().GetApServiceInst(id);
+    if (pService == nullptr) {
+        WIFI_LOGE("Instance %{public}d get hotspot service is null!", id);
+        WifiConfigCenter::GetInstance().SetApMidState(WifiOprMidState::CLOSED, id);
+        WifiServiceManager::GetInstance().UnloadService(WIFI_SERVICE_AP, id);
+        return WIFI_OPT_SUCCESS;
+    }
+    SetStaApExclusionFlag(WifiCloseServiceCode::AP_SERVICE_CLOSE, true);
+    ret = pService->DisableHotspot();
+    if (ret != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("service disable ap failed, ret %{public}d!", static_cast<int>(ret));
+        SetStaApExclusionFlag(WifiCloseServiceCode::AP_SERVICE_CLOSE, false);
+        WifiConfigCenter::GetInstance().SetApMidState(WifiOprMidState::CLOSING, WifiOprMidState::RUNNING, 0);
+        return ret;
+    }
+
+    ResetDisableApStatus();
+    // ap is passive closed by sta&ap exclusion, need timed wait
+    return TimeWaitDisableHotspot();
+}
+#endif
+#endif
+
+#ifdef FEATURE_STA_AP_EXCLUSION
+void WifiManager::ResumeStaIfPassiveClosed(void)
+{
+    int tryTimes = 0;
+    const int sleepTime = 2;
+    const int maxTryTimes = 5;
+    while (tryTimes < maxTryTimes) {
+        sleep(sleepTime);
+#ifdef FEATURE_P2P_SUPPORT
+        WifiManager::AutoStartP2pService();
+#endif
+        WifiManager::AutoStartStaService();
+        ++tryTimes;
+    }
 }
 #endif
 }  // namespace Wifi

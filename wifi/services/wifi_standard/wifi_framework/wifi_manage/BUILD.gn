@@ -239,6 +239,10 @@ if (defined(ohos_lite)) {
       defines += [ "FEATURE_AP_SUPPORT" ]
     }
 
+    if (wifi_feature_sta_ap_exclusion) {
+      defines += [ "FEATURE_STA_AP_EXCLUSION" ]
+    }
+
     deps = [
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit:wifi_toolkit",
       "$WIFI_ROOT_DIR/utils:wifi_utils",
@@ -298,6 +302,10 @@ if (defined(ohos_lite)) {
       "FEATURE_AP_SUPPORT",
       "AP_INSTANCE_MAX_NUM=$wifi_feature_with_ap_num",
     ]
+
+    if (wifi_feature_sta_ap_exclusion) {
+      defines += [ "FEATURE_STA_AP_EXCLUSION" ]
+    }
 
     if (wifi_feature_with_ap_extension) {
       defines += [ "FEATURE_AP_EXTENSION" ]
@@ -411,6 +419,10 @@ if (defined(ohos_lite)) {
 
     if (wifi_feature_with_ap_extension) {
       defines += [ "FEATURE_AP_EXTENSION" ]
+    }
+
+    if (wifi_feature_sta_ap_exclusion) {
+      defines += [ "FEATURE_STA_AP_EXCLUSION" ]
     }
 
     part_name = "wifi"

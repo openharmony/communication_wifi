@@ -29,6 +29,7 @@
 #include "wifi_internal_msg.h"
 #include "sta_service_callback.h"
 #include "iscan_service_callbacks.h"
+#include "wifi_errcode.h"
 #ifdef FEATURE_AP_SUPPORT
 #include "i_ap_service_callbacks.h"
 #endif
@@ -159,6 +160,37 @@ public:
 
     void StopUnloadApSaTimer(void);
     void StartUnloadApSaTimer(void);
+#ifdef FEATURE_STA_AP_EXCLUSION
+    /**
+     * @Description Get Sta&Ap Exclusion flag
+     *
+     * @param type - service type
+     * @return bool - return true if sta or ap service closed by sta&ap exclusion
+     */
+    bool GetStaApExclusionFlag(WifiCloseServiceCode type = WifiCloseServiceCode::STA_SERVICE_CLOSE);
+
+    /**
+     * @Description Set Sta&Ap Exclusion flag
+     *
+     * @param type - service type
+     * @param isExclusion - true / false
+     */
+    static void SetStaApExclusionFlag(WifiCloseServiceCode type, bool isExclusion);
+
+    /**
+     * @Description wakeup thread blocked by getting DisableHotspot asynchronous operation result
+     *
+     */
+    void SignalDisableHotspot();
+
+    /**
+     * @Description wakeup thread blocked by getting DisableWifi asynchronous operation result
+     *
+     */
+    void SignalDisableWifi();
+
+    
+#endif
 #endif
 
 #ifdef FEATURE_P2P_SUPPORT
@@ -196,7 +228,31 @@ public:
     void DealCloseAirplaneModeEvent();
     bool GetLocationModeByDatashare(int systemAbilityId);
     static void CheckAndStartScanService(void);
+    
+#ifndef OHOS_ARCH_LITE
+#ifdef FEATURE_STA_AP_EXCLUSION
+    static ErrCode DisableHotspot(const int id = 0);
+    static ErrCode DisableWifi();
+    static void ResumeStaIfPassiveClosed(void);
+    /**
+     * @Description blocked for seconds until DisableHotspot asynchronous operation complete
+     * or timeout
+     *
+     * @returns ErrCode - return errCode
+     */
+    static ErrCode TimeWaitDisableHotspot();
 
+    /**
+     * @Description blocked for seconds until DisableWifi asynchronous operation complete
+     * or timeout
+     *
+     * @returns ErrCode - return errCode
+     */
+    static ErrCode TimeWaitDisableWifi();
+    static void ResetDisableStaStatus();
+    static void ResetDisableApStatus();
+#endif    
+#endif
 private:
     void PushServiceCloseMsg(WifiCloseServiceCode code);
     void InitStaCallback(void);
@@ -281,6 +337,18 @@ private:
 #endif
 #ifdef FEATURE_AP_SUPPORT
     IApServiceCallbacks mApCallback;
+#ifdef FEATURE_STA_AP_EXCLUSION
+    static std::atomic<bool> mDisableStaByExclusion;
+    static std::atomic<bool> mDisableApByExclusion;
+
+    static std::condition_variable mDisableStaStatusCondtion;
+    static std::mutex mDisableStaStatusMutex;
+    static bool mDisableStaStatus;
+
+    static std::condition_variable mDisableApStatusCondtion;
+    static std::mutex mDisableApStatusMutex;
+    static bool mDisableApStatus;
+#endif
 #ifndef OHOS_ARCH_LITE
     static uint32_t unloadHotspotSaTimerId;
     static std::mutex unloadHotspotSaTimerMutex;

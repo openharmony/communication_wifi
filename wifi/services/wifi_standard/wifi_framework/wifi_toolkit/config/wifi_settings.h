@@ -1235,6 +1235,26 @@ public:
      */
     int GetDisconnectedReason(DisconnectedReason &discReason) const;
 
+    /**
+     * @Description Set the Scan Only Switch State
+     *
+     * @param state - 1 on; 2 off
+     */
+    void SetScanOnlySwitchState(const int &state);
+
+    /**
+     * @Description Get the Scan Only Switch State
+     *
+     * @return int - 1 on; 2 off
+     */
+    int GetScanOnlySwitchState();
+    /**
+     * @Description Get the Scan Only Whether Available
+     *
+     * @return int - 1 on; 2 off
+     */
+    bool CheckScanOnlyAvailable();
+
 private:
     WifiSettings();
     void InitWifiConfig();

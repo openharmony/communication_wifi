@@ -29,6 +29,7 @@
 #include "wifi_sta_hal_interface.h"
 #include "wifi_supplicant_hal_interface.h"
 #include "wifi_hisysevent.h"
+#include "wifi_config_center.h"
 #ifndef OHOS_ARCH_LITE
 #include <dlfcn.h>
 #include "iservice_registry.h"
@@ -416,7 +417,13 @@ void StaStateMachine::StartWifiProcess()
 {
     WifiSettings::GetInstance().SetWifiState(static_cast<int>(WifiState::ENABLING));
     staCallback.OnStaOpenRes(OperateResState::OPEN_WIFI_OPENING);
-    int res = WifiStaHalInterface::GetInstance().StartWifi();
+    int res;
+    if (WifiOprMidState::RUNNING == WifiConfigCenter::GetInstance().GetWifiScanOnlyMidState()) {
+        res = static_cast<int>(WIFI_IDL_OPT_OK);
+    } else {
+        res = WifiStaHalInterface::GetInstance().StartWifi();
+    }
+    
     if (res == static_cast<int>(WIFI_IDL_OPT_OK)) {
         WIFI_LOGI("Start wifi successfully!");
         if (WifiStaHalInterface::GetInstance().WpaAutoConnect(false) != WIFI_IDL_OPT_OK) {
@@ -581,8 +588,9 @@ void StaStateMachine::StopWifiProcess()
     /* clear connection information. */
     InitWifiLinkedInfo();
     WifiSettings::GetInstance().SaveLinkedInfo(linkedInfo);
-
-    if (WifiStaHalInterface::GetInstance().StopWifi() == WIFI_IDL_OPT_OK) {
+    
+    if (WifiOprMidState::RUNNING == WifiConfigCenter::GetInstance().GetWifiScanOnlyMidState() \
+        || WifiStaHalInterface::GetInstance().StopWifi() == WIFI_IDL_OPT_OK) {
         /* Callback result to InterfaceService. */
         WifiSettings::GetInstance().SetWifiState(static_cast<int>(WifiState::DISABLED));
         staCallback.OnStaCloseRes(OperateResState::CLOSE_WIFI_SUCCEED);

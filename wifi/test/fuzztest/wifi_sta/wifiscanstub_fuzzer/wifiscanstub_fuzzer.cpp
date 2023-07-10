@@ -68,6 +68,14 @@ public:
     {
         return WIFI_OPT_SUCCESS;
     }
+    ErrCode SetScanOnlyAvailable(bool bScanOnlyAvailable) override
+    {
+        return WIFI_OPT_SUCCESS;
+    }
+    ErrCode GetScanOnlyAvailable(bool &bScanOnlyAvailable) override
+    {
+        return WIFI_OPT_SUCCESS;
+    }
 };
 
 std::shared_ptr<WifiScanStub> pWifiScanStub = std::make_shared<WifiScanStubTest>();

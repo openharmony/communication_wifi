@@ -84,6 +84,20 @@ public:
      * @return bool - true if supported, false if unsupported
      */
     virtual bool IsFeatureSupported(long feature) = 0;
+
+    /**
+     * @Description SetScanOnlyAvailable.
+     *
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode SetScanOnlyAvailable(bool bScanOnlyAvailable) = 0;
+
+    /**
+     * @Description GetScanOnly Whether Available.
+     *
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode GetScanOnlyAvailable(bool &bScanOnlyAvailable) = 0;
 };
 }  // namespace Wifi
 }  // namespace OHOS

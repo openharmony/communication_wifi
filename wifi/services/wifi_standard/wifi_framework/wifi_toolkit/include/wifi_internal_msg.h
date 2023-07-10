@@ -104,6 +104,12 @@ enum class OperateResState {
     CONNECT_OBTAINING_IP_FAILED,       /* obtain ip FAILED */
     CONNECT_ASSOCIATING,
     CONNECT_ASSOCIATED,
+    OPEN_SCAN_ONLY_OPENING,                  /* open scan only opening */
+    OPEN_SCAN_ONLY_SUCCEED,                 /* open scan only succeed */
+    OPEN_SCAN_ONLY_FAILED,                  /* open scan only failed */
+    CLOSE_SCAN_ONLY_CLOSING,                /* close scan only closing */
+    CLOSE_SCAN_ONLY_SUCCEED,                /* close scan only succeed */
+    CLOSE_SCAN_ONLY_FAILED,                 /* close scan only failed */
 };
 
 /* is wps connected to a network */
@@ -335,6 +341,7 @@ struct WifiConfig {
     int fourthRssiLevel5G;
     std::string strDnsBak;
     bool isLoadStabak;
+    bool scanOnlySwitch;
     std::string realMacAddress;
 
     WifiConfig()
@@ -374,6 +381,7 @@ struct WifiConfig {
         strDnsBak = "8.8.8.8";
         isLoadStabak = true;
         preLoadEnhance = false;
+        scanOnlySwitch = false;
         realMacAddress = "";
     }
 };

@@ -32,7 +32,7 @@
         }
     ],
     "segment": {
-        "destPath": "foundation/communication/wifi/wifi"
+        "destPath": "foundation/communication/wifi"
     },
     "component": {
         "name": "wifi",
@@ -60,6 +60,7 @@
             "wifi_feature_sta_ap_exclusion"
         ],
         "adapted_system_type": [
+            "small",
             "standard"
         ],
         "rom": "",

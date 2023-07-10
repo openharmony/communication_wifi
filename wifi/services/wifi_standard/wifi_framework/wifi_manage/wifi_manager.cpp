@@ -1682,6 +1682,9 @@ void WifiManager::ResumeStaIfPassiveClosed(void)
     const int maxTryTimes = 5;
     while (tryTimes < maxTryTimes) {
         sleep(sleepTime);
+#ifdef FEATURE_P2P_SUPPORT
+        WifiManager::AutoStartP2pService();
+#endif
         WifiManager::AutoStartStaService();
         ++tryTimes;
     }

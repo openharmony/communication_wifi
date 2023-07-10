@@ -59,7 +59,6 @@ private:
     void OnGetWifiState(uint32_t code, IpcIo *req, IpcIo *reply);
     void OnGetLinkedInfo(uint32_t code, IpcIo *req, IpcIo *reply);
     void OnGetIpInfo(uint32_t code, IpcIo *req, IpcIo *reply);
-    void OnGetIpV6Info(uint32_t code, IpcIo *req, IpcIo *reply);
     void OnSetCountryCode(uint32_t code, IpcIo *req, IpcIo *reply);
     void OnGetCountryCode(uint32_t code, IpcIo *req, IpcIo *reply);
     void OnRegisterCallBack(uint32_t code, IpcIo *req, IpcIo *reply);

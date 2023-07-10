@@ -287,13 +287,6 @@ ErrCode WifiDeviceImpl::GetIpInfo(IpInfo &info)
     return client_->GetIpInfo(info);
 }
 
-ErrCode WifiDeviceImpl::GetIpV6Info(IpV6Info &info)
-{
-    std::lock_guard<std::mutex> lock(mutex_);
-    RETURN_IF_FAIL(GetWifiDeviceProxy());
-    return client_->GetIpV6Info(info);
-}
-
 ErrCode WifiDeviceImpl::SetCountryCode(const std::string &countryCode)
 {
     std::lock_guard<std::mutex> lock(mutex_);

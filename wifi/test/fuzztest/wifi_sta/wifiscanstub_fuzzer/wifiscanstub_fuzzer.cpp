@@ -14,6 +14,7 @@
  */
 
 #include "wifiscanstub_fuzzer.h"
+#include "wifi_fuzz_common_func.h"
 
 #include <cstddef>
 #include <cstdint>
@@ -28,7 +29,8 @@
 namespace OHOS {
 namespace Wifi {
 constexpr size_t FOO_MAX_LEN = 1024;
-constexpr size_t U32_ZERO_SIZE = 0;
+constexpr size_t U32_AT_SIZE = 4;
+constexpr size_t MAP_SCAN_NUMS = 31;
 const std::u16string FORMMGR_INTERFACE_TOKEN = u"ohos.wifi.IWifiScan";
 
 class WifiScanStubTest : public WifiScanStub {
@@ -78,8 +80,7 @@ public:
     }
 };
 
-std::shared_ptr<WifiScanStub> pWifiScanStub = std::make_shared<WifiScanStubTest>();
-void RemoteRequestSetScanControlInfo(const char* data, size_t size) // 1 WIFI_SVR_CMD_SET_SCAN_CONTROL_INFO
+void OnGetSupportedFeaturesTest(const uint8_t* data, size_t size)
 {
     MessageParcel datas;
     datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN);
@@ -88,128 +89,46 @@ void RemoteRequestSetScanControlInfo(const char* data, size_t size) // 1 WIFI_SV
     datas.RewindRead(0);
     MessageParcel reply;
     MessageOption option;
-    int result = pWifiScanStub->OnRemoteRequest(
-        static_cast<uint32_t>(ScanInterfaceCode::WIFI_SVR_CMD_SET_SCAN_CONTROL_INFO), datas, reply, option);
-    LOGI("wifiscanstub_fuzzer OnRemoteRequest(0x%{public}x %{public}d)",
-        static_cast<int32_t>(ScanInterfaceCode::WIFI_SVR_CMD_SET_SCAN_CONTROL_INFO), result);
-}
-
-void RemoteRequestFullScan(const char* data, size_t size) // 2 WIFI_SVR_CMD_FULL_SCAN
-{
-    MessageParcel datas;
-    datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN);
-    datas.WriteInt32(0);
-    datas.WriteBuffer(data, size);
-    datas.RewindRead(0);
-    MessageParcel reply;
-    MessageOption option;
-    int result = pWifiScanStub->OnRemoteRequest(
-        static_cast<uint32_t>(ScanInterfaceCode::WIFI_SVR_CMD_FULL_SCAN), datas, reply, option);
-    LOGI("wifiscanstub_fuzzer OnRemoteRequest(0x%{public}x %{public}d)",
-        static_cast<int32_t>(ScanInterfaceCode::WIFI_SVR_CMD_FULL_SCAN), result);
-}
-
-void RemoteRequestSpecifiedParamsScan(const char* data, size_t size) // 3 WIFI_SVR_CMD_SPECIFIED_PARAMS_SCAN
-{
-    MessageParcel datas;
-    datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN);
-    datas.WriteInt32(0);
-    datas.WriteBuffer(data, size);
-    datas.RewindRead(0);
-    MessageParcel reply;
-    MessageOption option;
-    int result = pWifiScanStub->OnRemoteRequest(
-        static_cast<uint32_t>(ScanInterfaceCode::WIFI_SVR_CMD_SPECIFIED_PARAMS_SCAN), datas, reply, option);
-    LOGI("wifiscanstub_fuzzer OnRemoteRequest(0x%{public}x %{public}d)",
-        static_cast<int32_t>(ScanInterfaceCode::WIFI_SVR_CMD_SPECIFIED_PARAMS_SCAN), result);
-}
-
-void RemoteRequestIsScanAlwaysActive(const char* data, size_t size) // 4 WIFI_SVR_CMD_IS_SCAN_ALWAYS_ACTIVE
-{
-    MessageParcel datas;
-    datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN);
-    datas.WriteInt32(0);
-    datas.WriteBuffer(data, size);
-    datas.RewindRead(0);
-    MessageParcel reply;
-    MessageOption option;
-    int result = pWifiScanStub->OnRemoteRequest(
-        static_cast<uint32_t>(ScanInterfaceCode::WIFI_SVR_CMD_IS_SCAN_ALWAYS_ACTIVE), datas, reply, option);
-    LOGI("wifiscanstub_fuzzer OnRemoteRequest(0x%{public}x %{public}d)",
-        static_cast<int32_t>(ScanInterfaceCode::WIFI_SVR_CMD_IS_SCAN_ALWAYS_ACTIVE), result);
-}
-
-void RemoteRequestGetScanInfoList(const char* data, size_t size) // 5 WIFI_SVR_CMD_GET_SCAN_INFO_LIST
-{
-    MessageParcel datas;
-    datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN);
-    datas.WriteInt32(0);
-    datas.WriteBuffer(data, size);
-    datas.RewindRead(0);
-    MessageParcel reply;
-    MessageOption option;
-    int result = pWifiScanStub->OnRemoteRequest(
-        static_cast<uint32_t>(ScanInterfaceCode::WIFI_SVR_CMD_GET_SCAN_INFO_LIST), datas, reply, option);
-    LOGI("wifiscanstub_fuzzer OnRemoteRequest(0x%{public}x %{public}d)",
-        static_cast<int32_t>(ScanInterfaceCode::WIFI_SVR_CMD_GET_SCAN_INFO_LIST), result);
-}
-
-void RemoteRequestRegisterCallBack(const char* data, size_t size) // 6 WIFI_SVR_CMD_REGISTER_SCAN_CALLBACK
-{
-    MessageParcel datas;
-    datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN);
-    datas.WriteInt32(0);
-    datas.WriteBuffer(data, size);
-    datas.RewindRead(0);
-    MessageParcel reply;
-    MessageOption option;
-    int result = pWifiScanStub->OnRemoteRequest(
-        static_cast<uint32_t>(ScanInterfaceCode::WIFI_SVR_CMD_REGISTER_SCAN_CALLBACK), datas, reply, option);
-    LOGI("wifiscanstub_fuzzer OnRemoteRequest(0x%{public}x %{public}d)",
-        static_cast<int32_t>(ScanInterfaceCode::WIFI_SVR_CMD_REGISTER_SCAN_CALLBACK), result);
-}
-
-void RemoteRequestGetSupportedFeatures(const char* data, size_t size) // 7 WIFI_SVR_CMD_GET_SUPPORTED_FEATURES
-{
-    MessageParcel datas;
-    datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN);
-    datas.WriteInt32(0);
-    datas.WriteBuffer(data, size);
-    datas.RewindRead(0);
-    MessageParcel reply;
-    MessageOption option;
-    int result =
-        pWifiScanStub->OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_SUPPORTED_FEATURES),
+    std::shared_ptr<WifiScanStub> pWifiScanStub = std::make_shared<WifiScanStubTest>();
+    pWifiScanStub->OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_SUPPORTED_FEATURES),
         datas, reply, option);
-    LOGI("wifiscanstub_fuzzer OnRemoteRequest(0x%{public}x %{public}d)",
-        static_cast<int32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_SUPPORTED_FEATURES), result);
 }
 
-bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
+bool DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)
 {
-    RemoteRequestSetScanControlInfo(data, size);
-    RemoteRequestFullScan(data, size);
-    RemoteRequestSpecifiedParamsScan(data, size);
-    RemoteRequestIsScanAlwaysActive(data, size);
-    RemoteRequestGetScanInfoList(data, size);
-    RemoteRequestRegisterCallBack(data, size);
-    RemoteRequestGetSupportedFeatures(data, size);
+    uint32_t code = U32_AT(data) % MAP_SCAN_NUMS + static_cast<uint32_t>(ScanInterfaceCode::WIFI_SVR_CMD_FULL_SCAN);
+    LOGI("wifiscanstub_fuzzer code(0x%{public}x)", code); // code[0x1004, 0x101E]
+    MessageParcel datas;
+    datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN);
+    datas.WriteInt32(0);
+    datas.WriteBuffer(data, size);
+    datas.RewindRead(0);
+    MessageParcel reply;
+    MessageOption option;
+    std::shared_ptr<WifiScanStub> pWifiScanStub = std::make_shared<WifiScanStubTest>();
+    OnGetSupportedFeaturesTest(data, size);
+    pWifiScanStub->OnRemoteRequest(code, datas, reply, option);
     return true;
 }
 
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
+    /* Run your code on data */
     if (data == nullptr) {
-        LOGE("LLVMFuzzerTestOneInput data is null, size:%{public}zu", size);
         return 0;
     }
 
-    if (size <= U32_ZERO_SIZE || size > OHOS::Wifi::FOO_MAX_LEN) {
-        LOGE("LLVMFuzzerTestOneInput size invalid parameter, size:%{public}zu", size);
+    if (size < OHOS::Wifi::U32_AT_SIZE) {
         return 0;
     }
-    OHOS::Wifi::DoSomethingInterestingWithMyAPI((const char*)data, size);
+
+    /* Validate the length of size */
+    if (size == 0 || size > OHOS::Wifi::FOO_MAX_LEN) {
+        return 0;
+    }
+
+    OHOS::Wifi::DoSomethingInterestingWithMyAPI(data, size);
     return 0;
 }
 }

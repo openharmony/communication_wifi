@@ -29,14 +29,12 @@ namespace OHOS {
 namespace Wifi {
 constexpr size_t FOO_MAX_LEN = 1024;
 constexpr size_t U32_AT_SIZE = 4;
-constexpr size_t MAP_HOTSPOT_NUMS = 21;
-
+constexpr size_t MAP_HOTSPOT_NUMS = 22;
 const std::u16string FORMMGR_INTERFACE_TOKEN = u"ohos.wifi.IWifiHotspotService";
 
 class WifiHotSpotStubFuzzTest : public WifiHotspotStub {
 public:
     WifiHotSpotStubFuzzTest() = default;
-
     virtual ~WifiHotSpotStubFuzzTest() = default;
 
     ErrCode IsHotspotActive(bool &bActive) override

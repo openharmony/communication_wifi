@@ -253,14 +253,6 @@ public:
     virtual ErrCode GetIpInfo(IpInfo &info) = 0;
 
     /**
-     * @Description Obtaining DHCP Request Information
-     *
-     * @param info - IpV6Info object
-     * @return ErrCode - operation result
-     */
-    virtual ErrCode GetIpV6Info(IpV6Info &info) = 0;
-
-    /**
      * @Description Set the Country Code
      *
      * @param countryCode - country code

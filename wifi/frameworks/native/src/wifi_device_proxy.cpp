@@ -1099,44 +1099,6 @@ ErrCode WifiDeviceProxy::GetIpInfo(IpInfo &info)
     return WIFI_OPT_SUCCESS;
 }
 
-ErrCode WifiDeviceProxy::GetIpV6Info(IpV6Info &info)
-{
-    if (mRemoteDied) {
-        WIFI_LOGE("failed to `%{public}s`,remote service is died!", __func__);
-        return WIFI_OPT_FAILED;
-    }
-    MessageOption option;
-    MessageParcel data, reply;
-    if (!data.WriteInterfaceToken(GetDescriptor())) {
-        WIFI_LOGE("Write interface token error: %{public}s", __func__);
-        return WIFI_OPT_FAILED;
-    }
-    data.WriteInt32(0);
-    int error = Remote()->SendRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_DHCP_IPV6INFO),
-        data, reply, option);
-    if (error != ERR_NONE) {
-        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d",
-            static_cast<int32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_DHCP_IPV6INFO), error);
-        return WIFI_OPT_FAILED;
-    }
-    int exception = reply.ReadInt32();
-    if (exception) {
-        return WIFI_OPT_FAILED;
-    }
-    int ret = reply.ReadInt32();
-    if (ret != WIFI_OPT_SUCCESS) {
-        return ErrCode(ret);
-    }
-    info.linkIpV6Address = reply.ReadString();
-    info.globalIpV6Address = reply.ReadString();
-    info.randGlobalIpV6Address = reply.ReadString();
-    info.gateway = reply.ReadString();
-    info.netmask = reply.ReadString();
-    info.primaryDns = reply.ReadString();
-    info.secondDns = reply.ReadString();
-    return WIFI_OPT_SUCCESS;
-}
-
 ErrCode WifiDeviceProxy::SetCountryCode(const std::string &countryCode)
 {
     if (mRemoteDied) {

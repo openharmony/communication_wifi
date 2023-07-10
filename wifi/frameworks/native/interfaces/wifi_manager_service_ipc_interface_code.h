@@ -54,7 +54,6 @@ enum class  DevInterfaceCode {
     WIFI_SVR_CMD_GET_BANDTYPE_SUPPORTED = 0x1029,    /* get taget bandtype supported */
     WIFI_SVR_CMD_GET_5G_CHANNELLIST = 0x1030,        /* get 5g channellist */
     WIFI_SVR_CMD_GET_DISCONNECTED_REASON = 0x1031,   /* get disconnect reason */
-    WIFI_SVR_CMD_GET_DHCP_IPV6INFO = 0x1032,         /* get dhcp IPV6 info */
     /* 新增WIFI_SVR_CMD_类code，请在此下方添加 */
 
     /* 以下CALL BACK类code，不需要进行权限校验 */

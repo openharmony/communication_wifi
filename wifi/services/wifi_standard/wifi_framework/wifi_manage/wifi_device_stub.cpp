@@ -103,8 +103,6 @@ void WifiDeviceStub::InitHandleMap()
         &WifiDeviceStub::OnGetSignalLevel;
     handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_SUPPORTED_FEATURES)] =
         &WifiDeviceStub::OnGetSupportedFeatures;
-    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_DHCP_IPV6INFO)] =
-        &WifiDeviceStub::OnGetIpV6Info;
     InitHandleMapEx();
     return;
 }
@@ -603,25 +601,6 @@ void WifiDeviceStub::OnGetIpInfo(uint32_t code, MessageParcel &data, MessageParc
         reply.WriteInt32(info.secondDns);
         reply.WriteInt32(info.serverIp);
         reply.WriteInt32(info.leaseDuration);
-    }
-    return;
-}
-
-void WifiDeviceStub::OnGetIpV6Info(uint32_t code, MessageParcel &data, MessageParcel &reply)
-{
-    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
-    IpV6Info info;
-    ErrCode ret = GetIpV6Info(info);
-    reply.WriteInt32(0);
-    reply.WriteInt32(ret);
-    if (ret == WIFI_OPT_SUCCESS) {
-        reply.WriteString(info.linkIpV6Address);
-        reply.WriteString(info.globalIpV6Address);
-        reply.WriteString(info.randGlobalIpV6Address);
-        reply.WriteString(info.gateway);
-        reply.WriteString(info.netmask);
-        reply.WriteString(info.primaryDns);
-        reply.WriteString(info.secondDns);
     }
     return;
 }

@@ -278,14 +278,6 @@ public:
     ErrCode GetIpInfo(IpInfo &info) override;
 
     /**
-     * @Description Obtaining ipV6 Request Information
-     *
-     * @param info - IpInfo object
-     * @return ErrCode - operation result
-     */
-    ErrCode GetIpV6Info(IpV6Info &info) override;
-
-    /**
      * @Description Reconnect to the currently active network
      *
      * @return ErrCode - operation result

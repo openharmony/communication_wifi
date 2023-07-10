@@ -559,12 +559,34 @@ public:
      */
     int GetDisconnectedReason(DisconnectedReason &discReason);
 
+    /**
+     * @Description Get current scan only state
+     *
+     * @return WifiOprMidState - which can be a CLOSED/CLOSING/OPENING/RUNNING/UNKNOWN
+     */
+    WifiOprMidState GetWifiScanOnlyMidState();
+
+    /**
+     * @Description Force to set current scan only state
+     *
+     * @param state - want to set state
+     */
+    bool SetWifiScanOnlyMidState(WifiOprMidState expState, WifiOprMidState state);
+
+    /**
+     * @Description Set current scan only state
+     *
+     * @param state - want to set state
+     */
+    void SetWifiScanOnlyMidState(WifiOprMidState state);
+
 private:
     std::mutex mApMutex;
     std::atomic<WifiOprMidState> mStaMidState;
     std::map<int, std::atomic<WifiOprMidState>> mApMidState;
     std::atomic<WifiOprMidState> mP2pMidState;
     std::atomic<WifiOprMidState> mScanMidState;
+    std::atomic<WifiOprMidState> mStaScanOnlyMidState;
     /* Time interval for disabling and re-enabling the STA */
     std::chrono::steady_clock::time_point mWifiCloseTime;
     std::atomic<bool> mWifiOpenedWhenAirplane;

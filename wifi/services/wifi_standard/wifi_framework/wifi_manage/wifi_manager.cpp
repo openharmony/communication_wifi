@@ -45,6 +45,7 @@ int WifiManager::mCloseApIndex = 0;
 #ifndef OHOS_ARCH_LITE
 const uint32_t TIMEOUT_SCREEN_EVENT = 3000;
 const uint32_t TIMEOUT_AIRPLANE_MODE_EVENT = 3000;
+const uint32_t TIMEOUT_LOCATION_EVENT = 3000;
 const uint32_t TIMEOUT_UNLOAD_WIFI_SA = 5 * 60 * 1000;
 #ifdef FEATURE_STA_AP_EXCLUSION
 const uint32_t TIMEOUT_STA_AP_DISABLE_SECONDS = 5;
@@ -128,7 +129,7 @@ void WifiManager::AutoStopStaService(void)
         if (!WifiConfigCenter::GetInstance().SetWifiMidState(staState, WifiOprMidState::CLOSING)) {
             return;
         }
-        
+
         IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst();
         if (pService == nullptr) {
             WIFI_LOGE("AutoStopStaService, Instance get sta service is null!");
@@ -136,7 +137,7 @@ void WifiManager::AutoStopStaService(void)
             WifiServiceManager::GetInstance().UnloadService(WIFI_SERVICE_STA);
             return;
         }
-        
+
         ErrCode ret = pService->DisableWifi();
         if (ret != WIFI_OPT_SUCCESS) {
             WIFI_LOGE("service disable sta failed, ret %{public}d!", static_cast<int>(ret));
@@ -148,6 +149,81 @@ void WifiManager::AutoStopStaService(void)
         }
     }
     return;
+}
+
+void WifiManager::AutoStartScanOnly(void)
+{
+    if (!WifiSettings::GetInstance().CheckScanOnlyAvailable() ||
+        !WifiManager::GetInstance().GetLocationModeByDatashare(WIFI_SCAN_ABILITY_ID)) {
+        WIFI_LOGI("No need to StartScanOnly, return");
+        return;
+    }
+
+    WifiOprMidState curState = WifiConfigCenter::GetInstance().GetWifiScanOnlyMidState();
+    WIFI_LOGI("Wifi scan only state is %{public}d", static_cast<int>(curState));
+    
+    if (curState != WifiOprMidState::CLOSED) {
+        WIFI_LOGI("scanOnly state is not closed, return");
+        return;
+    }
+
+    if (WifiOprMidState::RUNNING == WifiConfigCenter::GetInstance().GetWifiMidState()) {
+        WifiConfigCenter::GetInstance().SetWifiScanOnlyMidState(WifiOprMidState::RUNNING);
+        return;
+    }
+
+    WifiConfigCenter::GetInstance().SetWifiScanOnlyMidState(WifiOprMidState::OPENING);
+    CheckAndStartScanService();
+    IScanService *pService = WifiServiceManager::GetInstance().GetScanServiceInst();
+    if (pService == nullptr) {
+        WIFI_LOGE("[AutoStartScanOnly] scan service is null.");
+        WifiConfigCenter::GetInstance().SetWifiScanOnlyMidState(WifiOprMidState::CLOSED);
+        return;
+    }
+    ErrCode ret = pService->StartWpa();
+    if (ret != static_cast<int>(WIFI_IDL_OPT_OK)) {
+        WIFI_LOGE("Start Wpa failed");
+    }
+    ret = pService->OpenScanOnly();
+    if (ret != WIFI_OPT_SUCCESS) {
+        WifiConfigCenter::GetInstance().SetWifiScanOnlyMidState(WifiOprMidState::CLOSED);
+        return;
+    }
+    WifiConfigCenter::GetInstance().SetWifiScanOnlyMidState(WifiOprMidState::RUNNING);
+}
+
+void WifiManager::AutoStopScanOnly(void)
+{
+    WifiOprMidState curState = WifiConfigCenter::GetInstance().GetWifiScanOnlyMidState();
+    WIFI_LOGI("current wifi scan only state is %{public}d", static_cast<int>(curState));
+    if (curState != WifiOprMidState::RUNNING) {
+        return;
+    }
+
+    if (WifiOprMidState::RUNNING == WifiConfigCenter::GetInstance().GetWifiMidState()) {
+        WifiConfigCenter::GetInstance().SetWifiScanOnlyMidState(WifiOprMidState::CLOSED);
+        return;
+    }
+
+    if (!WifiConfigCenter::GetInstance().SetWifiScanOnlyMidState(curState, WifiOprMidState::CLOSING)) {
+        WIFI_LOGI("set wifi scan only mid state opening failed!");
+        return;
+    }
+
+    IScanService *pService = WifiServiceManager::GetInstance().GetScanServiceInst();
+    if (pService == nullptr) {
+        WifiConfigCenter::GetInstance().SetWifiScanOnlyMidState(WifiOprMidState::CLOSED);
+        return;
+    }
+    ErrCode ret = pService->CloseWpa();
+    if (ret != static_cast<int>(WIFI_IDL_OPT_OK)) {
+        WIFI_LOGE("Stop Wpa failed");
+    }
+    ret = pService->CloseScanOnly();
+    if (ret == WIFI_OPT_SUCCESS) {
+        WIFI_LOGD("set wifi scan only mid state closed");
+        WifiConfigCenter::GetInstance().SetWifiScanOnlyMidState(WifiOprMidState::CLOSED);
+    }
 }
 
 void WifiManager::ForceStopWifi(void)
@@ -362,6 +438,11 @@ int WifiManager::Init()
         WifiTimer::GetInstance()->Register(timeoutCallback, airplaneModeTimerId, TIMEOUT_AIRPLANE_MODE_EVENT);
         WIFI_LOGI("RegisterAirplaneModeEvent success! airplaneModeTimerId:%{public}u", airplaneModeTimerId);
     }
+    if (locationEventSubscriber_ == nullptr) {
+        TimeOutCallback timeoutCallback = std::bind(&WifiManager::RegisterLocationEvent, this);
+        WifiTimer::GetInstance()->Register(timeoutCallback, locationTimerId, TIMEOUT_LOCATION_EVENT);
+        WIFI_LOGI("RegisterLocationEvent success! locationTimerId:%{public}u", locationTimerId);
+    }
 #endif
     mInitStatus = INIT_OK;
     InitStaCallback();
@@ -388,7 +469,34 @@ int WifiManager::Init()
          * service is started, the scanning is directly started.
          */
         AutoStartEnhanceService();
-        AutoStartScanService();
+#ifndef OHOS_ARCH_LITE
+        WifiSaLoadManager::GetInstance().LoadWifiSa(WIFI_SCAN_ABILITY_ID);
+#endif
+        if ((WifiSettings::GetInstance().CheckScanOnlyAvailable() &&
+            WifiManager::GetInstance().GetLocationModeByDatashare(WIFI_SCAN_ABILITY_ID)) ||
+            WifiConfigCenter::GetInstance().IsScanAlwaysActive()) {
+            CheckAndStartScanService();
+            IScanService *pService = WifiServiceManager::GetInstance().GetScanServiceInst();
+            if (pService != nullptr) {
+                int res = pService->StartWpa();
+                if (res != static_cast<int>(WIFI_IDL_OPT_OK)) {
+                    WIFI_LOGE("Start Wpa failed");
+                    if (WifiSettings::GetInstance().CheckScanOnlyAvailable() &&
+                        WifiManager::GetInstance().GetLocationModeByDatashare(WIFI_SCAN_ABILITY_ID)) {
+                        WifiConfigCenter::GetInstance().SetWifiScanOnlyMidState(WifiOprMidState::CLOSED);
+                    }
+                }
+                if (WifiSettings::GetInstance().CheckScanOnlyAvailable() &&
+                    WifiManager::GetInstance().GetLocationModeByDatashare(WIFI_SCAN_ABILITY_ID)) {
+                    WifiConfigCenter::GetInstance().SetWifiScanOnlyMidState(WifiOprMidState::RUNNING);
+                }
+            }
+        }
+#ifndef OHOS_ARCH_LITE
+        else {
+            WifiSaLoadManager::GetInstance().UnloadWifiSa(WIFI_SCAN_ABILITY_ID);
+        }
+#endif
     }
 
     InitPidfile();
@@ -505,6 +613,10 @@ void WifiManager::CloseStaService(void)
     #ifndef OHOS_ARCH_LITE
     if (WifiConfigCenter::GetInstance().GetAirplaneModeState() == MODE_STATE_OPEN) {
         WIFI_LOGI("airplaneMode not close sta SA!");
+        return;
+    }
+    if (WifiOprMidState::RUNNING == WifiConfigCenter::GetInstance().GetWifiScanOnlyMidState()) {
+        WIFI_LOGI("scanonly not close sta SA!");
         return;
     }
     WifiManager::GetInstance().StartUnloadStaSaTimer();
@@ -811,6 +923,11 @@ void WifiManager::DealStaOpenRes(OperateResState state)
     WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
     AutoStartEnhanceService();
     CheckAndStartScanService();
+
+    if (WifiSettings::GetInstance().CheckScanOnlyAvailable() &&
+        WifiManager::GetInstance().GetLocationModeByDatashare(WIFI_SCAN_ABILITY_ID)) {
+        WifiConfigCenter::GetInstance().SetWifiScanOnlyMidState(WifiOprMidState::RUNNING);
+    }
 }
 
 void WifiManager::DealStaCloseRes(OperateResState state)
@@ -835,7 +952,10 @@ void WifiManager::DealStaCloseRes(OperateResState state)
     if (WifiConfigCenter::GetInstance().GetAirplaneModeState() == MODE_STATE_OPEN) {
         WifiConfigCenter::GetInstance().SetWifiStateWhenAirplaneMode(false);
     }
-    CheckAndStopScanService();
+    if (WifiOprMidState::RUNNING != WifiConfigCenter::GetInstance().GetWifiScanOnlyMidState()) {
+        WIFI_LOGI("DealStaCloseRes: wifi scan only state is not running,to CheckAndStopScanService!");
+        CheckAndStopScanService();
+    }
     WifiManager::GetInstance().PushServiceCloseMsg(WifiCloseServiceCode::STA_SERVICE_CLOSE);
     return;
 }
@@ -1027,6 +1147,8 @@ void WifiManager::InitScanCallback(void)
     mScanCallback.OnScanFinishEvent = DealScanFinished;
     mScanCallback.OnScanInfoEvent = DealScanInfoNotify;
     mScanCallback.OnStoreScanInfoEvent = DealStoreScanInfoEvent;
+    mScanCallback.OnOpenScanOnlyRes = DealOpenScanOnlyRes;
+    mScanCallback.OnCloseScanOnlyRes = DealCloseScanOnlyRes;
 }
 
 IScanSerivceCallbacks WifiManager::GetScanCallback()
@@ -1110,7 +1232,30 @@ void WifiManager::InitPidfile()
     chmod(pidFile, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
     return;
 }
+void WifiManager::DealOpenScanOnlyRes(OperateResState state)
+{
+    WIFI_LOGI("WifiManager::DealOpenScanOnlyRes");
+    if (state == OperateResState::OPEN_SCAN_ONLY_SUCCEED) {
+        WifiConfigCenter::GetInstance().SetWifiScanOnlyMidState(WifiOprMidState::RUNNING);
+    }
+    return;
+}
 
+void WifiManager::DealCloseScanOnlyRes(OperateResState state)
+{
+    WIFI_LOGI("DealCloseScanOnlyRes State:%{public}d", WifiConfigCenter::GetInstance().GetWifiScanOnlyMidState());
+    if (state == OperateResState::CLOSE_SCAN_ONLY_SUCCEED) {
+        if (WifiOprMidState::RUNNING == WifiConfigCenter::GetInstance().GetWifiMidState()) {
+            WIFI_LOGI("WifiManager::DealCloseScanOnlyRes wifi is on");
+        } else {
+            WIFI_LOGI("WifiManager::DealCloseScanOnlyRes wifi is off");
+            CheckAndStopScanService();
+            WifiManager::GetInstance().PushServiceCloseMsg(WifiCloseServiceCode::STA_SERVICE_CLOSE);
+        }
+        WifiConfigCenter::GetInstance().SetWifiScanOnlyMidState(WifiOprMidState::CLOSED);
+    }
+    return;
+}
 #ifdef FEATURE_AP_SUPPORT
 void WifiManager::InitApCallback(void)
 {
@@ -1446,6 +1591,7 @@ void WifiManager::DealOpenAirplaneModeEvent()
     }
 
     AutoStopStaService();
+    AutoStopScanOnly();
 #ifdef FEATURE_P2P_SUPPORT
     AutoStopP2pService();
 #endif
@@ -1490,6 +1636,7 @@ void WifiManager::DealCloseAirplaneModeEvent()
         }
 #endif
     }
+    AutoStartScanOnly();
 #ifdef FEATURE_AP_SUPPORT
     if (WifiConfigCenter::GetInstance().GetHotspotState() == static_cast<int>(ApState::AP_STATE_CLOSED)) {
         std::unique_lock<std::mutex> lock(unloadHotspotSaTimerMutex);
@@ -1525,6 +1672,60 @@ void WifiManager::GetAirplaneModeByDatashare(int systemAbilityId)
         WifiConfigCenter::GetInstance().SetAirplaneModeState(MODE_STATE_OPEN);
     }
     return;
+}
+
+bool WifiManager::GetLocationModeByDatashare(int systemAbilityId)
+{
+    WIFI_LOGI("GetLocationModeByDatashare, systemAbilityId:%{public}d", systemAbilityId);
+    auto datashareHelper = std::make_shared<WifiDataShareHelperUtils>(systemAbilityId);
+    if (datashareHelper == nullptr) {
+        WIFI_LOGE("GetLocationModeByDatashare, datashareHelper is nullprt!");
+        return false;
+    }
+
+    std::string locationMode;
+    Uri uri(SETTINGS_DATASHARE_URI_LOCATION_MODE);
+    int ret = datashareHelper->Query(uri, SETTINGS_DATASHARE_KEY_LOCATION_MODE, locationMode);
+    if (ret != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("GetLocationModeByDatashare, Query locationMode fail!");
+        return false;
+    }
+
+    WIFI_LOGI("GetLocationModeByDatashare, locationMode:%{public}s", locationMode.c_str());
+    return (locationMode.compare("1") == 0);
+}
+
+void WifiManager::RegisterLocationEvent()
+{
+    OHOS::EventFwk::MatchingSkills matchingSkills;
+    matchingSkills.AddEvent(OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_LOCATION_MODE_STATE_CHANGED);
+    EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
+    locationEventSubscriber_ = std::make_shared<LocationEventSubscriber>(subscriberInfo);
+    if (!EventFwk::CommonEventManager::SubscribeCommonEvent(locationEventSubscriber_)) {
+        WIFI_LOGE("LocationEvent SubscribeCommonEvent() failed");
+    } else {
+        WIFI_LOGI("LocationEvent SubscribeCommonEvent() OK");
+    }
+}
+
+void WifiManager::UnRegisterLocationEvent()
+{
+    if (!EventFwk::CommonEventManager::UnSubscribeCommonEvent(locationEventSubscriber_)) {
+        WIFI_LOGE("LocationEvent UnSubscribeCommonEvent() failed");
+    } else {
+        WIFI_LOGI("LocationEvent UnSubscribeCommonEvent() OK");
+    }
+    locationEventSubscriber_ = nullptr;
+}
+
+void LocationEventSubscriber::OnReceiveEvent(const OHOS::EventFwk::CommonEventData &data)
+{
+    std::string action = data.GetWant().GetAction();
+    WIFI_LOGI("LocationEventSubscriber::OnReceiveEvent: %{public}s.", action.c_str());
+
+    if (action == OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_LOCATION_MODE_STATE_CHANGED) {
+        WIFI_LOGI("LocationEventSubscriber::OnReceiveEvent COMMON_EVENT_LOCATION_MODE_STATE_CHANGED.");
+    }
 }
 
 WifiTimer *WifiTimer::GetInstance()

@@ -79,6 +79,19 @@ public:
      * @return ErrCode - operation result
      */
     virtual ErrCode GetScanInfoList(std::vector<WifiScanInfo> &result) = 0;
+    /**
+     * @Description SetScanOnlyAvailable.
+     *
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode SetScanOnlyAvailable(bool bScanOnlyAvailable) = 0;
+
+    /**
+     * @Description GetScanOnly Whether Available.
+     *
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode GetScanOnlyAvailable(bool &bScanOnlyAvailable) = 0;
 
 #ifdef OHOS_ARCH_LITE
     virtual ErrCode RegisterCallBack(const std::shared_ptr<IWifiScanCallback> &callback,

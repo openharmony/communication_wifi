@@ -164,5 +164,19 @@ bool WifiScanImpl::IsRemoteDied(void)
 {
     return (client_ == nullptr) ? true : client_->IsRemoteDied();
 }
+
+ErrCode WifiScanImpl::SetScanOnlyAvailable(bool bScanOnlyAvailable)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    RETURN_IF_FAIL(GetWifiScanProxy());
+    return client_->SetScanOnlyAvailable(bScanOnlyAvailable);
+}
+
+ErrCode WifiScanImpl::GetScanOnlyAvailable(bool &bScanOnlyAvailable)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    RETURN_IF_FAIL(GetWifiScanProxy());
+    return client_->GetScanOnlyAvailable(bScanOnlyAvailable);
+}
 }  // namespace Wifi
 }  // namespace OHOS

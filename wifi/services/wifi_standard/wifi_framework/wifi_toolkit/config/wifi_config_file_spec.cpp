@@ -816,6 +816,7 @@ void ClearTClass<WifiConfig>(WifiConfig &item)
     item.fourthRssiLevel5G = RSSI_LEVEL_4_5G;
     item.strDnsBak = "8.8.8.8";
     item.isLoadStabak = true;
+    item.scanOnlySwitch = false;
     item.realMacAddress = "";
     return;
 }
@@ -900,6 +901,8 @@ static int SetWifiConfigValueSecond(WifiConfig &item, const std::string &key, co
         item.strDnsBak = value;
     } else if (key == "isLoadStabak") {
         item.isLoadStabak = (std::stoi(value) != 0);
+    } else if (key == "scanOnlySwitch") {
+        item.scanOnlySwitch  = (std::stoi(value) != 0); /* 0 -> false 1 -> true */
     } else if (key == "realMacAddress") {
         item.realMacAddress = value;
     } else {
@@ -968,6 +971,7 @@ std::string OutTClassString<WifiConfig>(WifiConfig &item)
     ss << "    " <<"fourthRssiLevel5G=" << item.fourthRssiLevel5G << std::endl;
     ss << "    " <<"strDnsBak=" << item.strDnsBak << std::endl;
     ss << "    " <<"isLoadStabak=" << item.isLoadStabak << std::endl;
+    ss << "    " <<"scanOnlySwitch=" << item.scanOnlySwitch << std::endl;
     ss << "    " <<"realMacAddress=" << item.realMacAddress << std::endl;
     ss << "    " <<"</WifiConfig>" << std::endl;
     return ss.str();

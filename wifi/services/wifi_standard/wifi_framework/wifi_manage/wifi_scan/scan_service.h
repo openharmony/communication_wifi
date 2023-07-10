@@ -237,6 +237,41 @@ public:
      * @return void
      */
     virtual void SetEnhanceService(IEnhanceService* enhanceService);
+    /**
+     * @Description  StartWpa
+     *
+     * @Output: Return operating results to Interface Service after start wpa
+               successfully.
+     * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
+     */
+    virtual ErrCode StartWpa();
+    /**
+     * @Description  CloseWpa
+     *
+     * @Output: Return operating results to Interface Service after close wpa
+               successfully.
+     * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
+     */
+    virtual ErrCode CloseWpa();
+    /**
+     * @Description  OpenScanOnly
+     *
+     * @Output: Return operating results to Interface Service after enable wifi scan only
+               successfully through callback function instead of returning
+               result immediately.
+     * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
+     */
+    virtual ErrCode OpenScanOnly() const;
+    /**
+     * @Description  CloseScanOnly
+     *
+     * @Output: Return operating results to Interface Service after close wifi scan only
+               successfully through callback function instead of returning
+               result immediately.
+     * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
+     */
+    virtual ErrCode CloseScanOnly() const;
+
 private:
     using ScanConfigMap = std::map<int, StoreScanConfig>;
     using ScanInfoHandlerMap = std::map<std::string, ScanInfoHandler>;

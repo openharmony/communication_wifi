@@ -84,6 +84,7 @@ public:
      * @return bool - true if supported, false if unsupported
      */
     virtual bool IsFeatureSupported(long feature) = 0;
+
     /**
      * @Description SetScanOnlyAvailable.
      *

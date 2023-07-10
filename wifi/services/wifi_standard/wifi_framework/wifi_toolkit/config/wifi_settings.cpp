@@ -1771,13 +1771,13 @@ void WifiSettings::SetScanOnlySwitchState(const int &state)
 
 int WifiSettings::GetScanOnlySwitchState()
 {
-   std::unique_lock<std::mutex> lock(mWifiConfigMutex);
+    std::unique_lock<std::mutex> lock(mWifiConfigMutex);
     return mWifiConfig.scanOnlySwitch;
 }
 
 bool WifiSettings::CheckScanOnlyAvailable()
 {
-   std::unique_lock<std::mutex> lock(mWifiConfigMutex);
+    std::unique_lock<std::mutex> lock(mWifiConfigMutex);
     return mWifiConfig.scanOnlySwitch && (MODE_STATE_CLOSE == mAirplaneModeState);
 }
 

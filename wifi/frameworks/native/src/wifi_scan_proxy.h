@@ -106,6 +106,7 @@ public:
      * @return bool - true: service is died, false: service is not died.
      */
     bool IsRemoteDied(void) override;
+
     /**
      * @Description SetScanOnlyAvailable.
      *

@@ -231,7 +231,7 @@ ErrCode WifiScanServiceImpl::GetScanInfoList(std::vector<WifiScanInfo> &result)
 
 ErrCode WifiScanServiceImpl::SetScanOnlyAvailable(bool bScanOnlyAvailable)
 {
-    WIFI_LOGI("WifiScanServiceImpl::SetScanOnlyAvailable");
+    WIFI_LOGD("WifiScanServiceImpl::SetScanOnlyAvailable");
     if (!WifiAuthCenter::IsSystemAppByToken()) {
         WIFI_LOGE("SetScanOnlyAvailable:NOT System APP, PERMISSION_DENIED!");
         return WIFI_OPT_NON_SYSTEMAPP;
@@ -255,7 +255,7 @@ ErrCode WifiScanServiceImpl::SetScanOnlyAvailable(bool bScanOnlyAvailable)
 
 ErrCode WifiScanServiceImpl::GetScanOnlyAvailable(bool &bScanOnlyAvailable)
 {
-    WIFI_LOGI("current WifiScanServiceImpl::SetScanOnlyAvailable");
+    WIFI_LOGD("WifiScanServiceImpl::GetScanOnlyAvailable");
     if (!WifiAuthCenter::IsSystemAppByToken()) {
         WIFI_LOGE("GetScanOnlyAvailable: NOT System APP, PERMISSION_DENIED!");
         return WIFI_OPT_NON_SYSTEMAPP;
@@ -264,7 +264,7 @@ ErrCode WifiScanServiceImpl::GetScanOnlyAvailable(bool &bScanOnlyAvailable)
         WIFI_LOGE("GetScanOnlyAvailable:VerifyGetWifiInfoPermission() PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
-    if (WifiPermissionUtils::VerifySetWifiConfigPermission() == PERMISSION_DENIED) {
+    if (WifiPermissionUtils::VerifyGetWifiConfigPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("GetScanOnlyAvailable:VerifySetWifiConfigPermission() PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
@@ -307,7 +307,7 @@ ErrCode WifiScanServiceImpl::OpenScanOnlyAvailable()
     if (pService == nullptr) {
         WifiConfigCenter::GetInstance().SetWifiScanOnlyMidState(WifiOprMidState::CLOSED);
         return WIFI_OPT_FAILED;
-    }         
+    }
     ErrCode ret = pService->OpenScanOnly();
     if (ret != WIFI_OPT_SUCCESS) {
         WifiConfigCenter::GetInstance().SetWifiScanOnlyMidState(WifiOprMidState::CLOSED);
@@ -322,7 +322,7 @@ ErrCode WifiScanServiceImpl::CloseScanOnlyAvailable()
 {
     WifiOprMidState curState = WifiConfigCenter::GetInstance().GetWifiScanOnlyMidState();
     WIFI_LOGI("current wifi scan only state is %{public}d", static_cast<int>(curState));
-    if (curState != WifiOprMidState::RUNNING) {  
+    if (curState != WifiOprMidState::RUNNING) {
         if (curState == WifiOprMidState::OPENING) { /* when current wifi is opening, return */
             return WIFI_OPT_FAILED;
         } else {
@@ -349,8 +349,8 @@ ErrCode WifiScanServiceImpl::CloseScanOnlyAvailable()
     if (pService == nullptr) {
         WifiConfigCenter::GetInstance().SetWifiScanOnlyMidState(WifiOprMidState::CLOSED);
         return WIFI_OPT_SUCCESS;
-    } 
-                
+    }
+
     ErrCode ret = pService->CloseScanOnly();
     if (ret != WIFI_OPT_SUCCESS) {
         WIFI_LOGI("set wifi scan only mid state RUNNING");

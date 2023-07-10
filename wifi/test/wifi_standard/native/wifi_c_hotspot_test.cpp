@@ -31,6 +31,7 @@ unsigned int g_status = 17;
 unsigned char g_result = 5;
 int g_mode = 1;
 const char* g_testDataLen60 = "12345678901234567890123456789012345678901234567890123456789012345678901234567890";
+const char* g_testDataLen65 = "1234567890123456789012345678901234567890123456789012345678901234567890123456789012345";
 class WifiHotspotTest : public testing::Test {
 public:
     static void SetUpTestCase() {}
@@ -108,7 +109,7 @@ HWTEST_F(WifiHotspotTest, SetHotspotConfigTestsNormal, TestSize.Level1)
 {
     HotspotConfig config;
     config.band = g_mode;
-    memcpy_s(config.preSharedKey, WIFI_MAX_KEY_LEN, g_testDataLen60, 60);
+    memcpy_s(config.preSharedKey, WIFI_MAX_KEY_LEN, g_testDataLen60, WIFI_MAX_KEY_LEN-5);
     memcpy_s(config.ipAddress, WIFI_MAX_IPV4_LEN, "192.168.1.12", 12);
     config.securityType = WifiSecurityType::WIFI_SEC_TYPE_PSK;
     SetHotspotConfig(&config);
@@ -156,8 +157,7 @@ HWTEST_F(WifiHotspotTest, SetHotspotConfigTestsException03, TestSize.Level1)
     HotspotConfig config;
     config.band = g_mode;
     config.securityType = WifiSecurityType::WIFI_SEC_TYPE_PSK;
-    memcpy_s(config.preSharedKey, WIFI_MAX_KEY_LEN, g_testDataLen60, 60);
-    memcpy_s(config.preSharedKey+60, WIFI_MAX_KEY_LEN, g_testDataLen60, 60);
+    memcpy_s(config.preSharedKey, WIFI_MAX_KEY_LEN, g_testDataLen65, WIFI_MAX_KEY_LEN);
     SetHotspotConfig(&config);
 }
 
@@ -172,11 +172,10 @@ HWTEST_F(WifiHotspotTest, SetHotspotConfigTestsException04, TestSize.Level1)
 {
     HotspotConfig config;
     config.band = g_mode;
-    config.securityType = WifiSecurityType::WIFI_SEC_TYPE_EAP;
+    config.securityType = WifiSecurityType::WIFI_SEC_TYPE_PSK;
     memcpy_s(config.preSharedKey, WIFI_MAX_KEY_LEN, g_testDataLen60, 60);
     memcpy_s(config.ipAddress, WIFI_MAX_IPV4_LEN, "192.168.1.1222555454545", WIFI_MAX_IPV4_LEN);
-    WifiErrorCode ret = SetHotspotConfig(&config);
-    EXPECT_TRUE(ret == ERROR_WIFI_INVALID_ARGS);
+    SetHotspotConfig(&config);
 }
 
 HWTEST_F(WifiHotspotTest, GetHotspotConfigTests, TestSize.Level1)

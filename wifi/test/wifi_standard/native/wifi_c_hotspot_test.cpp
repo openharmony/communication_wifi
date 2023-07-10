@@ -112,7 +112,8 @@ HWTEST_F(WifiHotspotTest, SetHotspotConfigTestsNormal, TestSize.Level1)
     memcpy_s(config.ipAddress, WIFI_MAX_IPV4_LEN, "192.168.1.12", 12);
     config.securityType = WifiSecurityType::WIFI_SEC_TYPE_PSK;
     WifiErrorCode ret = SetHotspotConfig(&config);
-    EXPECT_TRUE(ret == WIFI_SUCCESS);
+    // GTEST_LOG_(INFO) << "SetHotspotConfigTestsNormal ret====" << ret;
+    EXPECT_TRUE(ret == WIFI_SUCCESS); // 结果不对暂时注释 
 }
 
 /**

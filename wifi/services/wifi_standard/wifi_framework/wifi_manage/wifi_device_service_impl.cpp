@@ -223,11 +223,19 @@ ErrCode WifiDeviceServiceImpl::EnableWifi()
     }
 
 #ifdef FEATURE_AP_SUPPORT
-    curState = WifiConfigCenter::GetInstance().GetApMidState(0);
-    if (curState != WifiOprMidState::CLOSED) {
+    WifiOprMidState apState = WifiConfigCenter::GetInstance().GetApMidState(0);
+    if (apState != WifiOprMidState::CLOSED) {
+#ifdef FEATURE_STA_AP_EXCLUSION
+        // support Sta&Ap exclusion
+        errCode = WifiManager::GetInstance().DisableHotspot();
+        if (errCode != WIFI_OPT_SUCCESS && errCode != WIFI_OPT_CLOSE_SUCC_WHEN_CLOSED) {
+            return errCode;
+        }
+#else
         WIFI_LOGW("current ap state is %{public}d, please close SoftAp first!",
             static_cast<int>(curState));
         return WIFI_OPT_NOT_SUPPORTED;
+#endif
     }
 #endif
 

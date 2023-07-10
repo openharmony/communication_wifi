@@ -221,8 +221,7 @@ public:
     
 #ifndef OHOS_ARCH_LITE
 #ifdef FEATURE_STA_AP_EXCLUSION
-    static ErrCode DisableHotspot(const ServiceType type = ServiceType::DEFAULT,
-                           const int id = 0);
+    static ErrCode DisableHotspot(const int id = 0);
     static ErrCode DisableWifi();
     static void ResumeStaIfPassiveClosed(void);
     /**

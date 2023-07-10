@@ -228,7 +228,7 @@ ErrCode WifiDeviceServiceImpl::EnableWifi()
 #ifdef FEATURE_STA_AP_EXCLUSION
         // support Sta&Ap exclusion
         errCode = WifiManager::GetInstance().DisableHotspot();
-        if (errCode != WIFI_OPT_SUCCESS) {
+        if (errCode != WIFI_OPT_SUCCESS && errCode != WIFI_OPT_CLOSE_SUCC_WHEN_CLOSED) {
             return errCode;
         }
 #else

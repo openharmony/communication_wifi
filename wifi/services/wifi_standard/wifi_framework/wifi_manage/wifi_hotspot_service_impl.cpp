@@ -326,7 +326,11 @@ ErrCode WifiHotspotServiceImpl::CheckCanEnableHotspot(const ServiceType type)
     WifiOprMidState curState = WifiConfigCenter::GetInstance().GetWifiMidState();
     if (curState != WifiOprMidState::CLOSED) {
 #ifdef FEATURE_STA_AP_EXCLUSION
-        return WifiManager::GetInstance().DisableWifi();
+        ErrCode ret = WifiManager::GetInstance().DisableWifi();
+        if (ret == WIFI_OPT_CLOSE_SUCC_WHEN_CLOSED) {
+            return WIFI_OPT_SUCCESS;
+        }
+        return ret;
 #else
         WIFI_LOGI("current wifi state is %{public}d, please close sta first!",
             static_cast<int>(curState));

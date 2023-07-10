@@ -325,9 +325,17 @@ ErrCode WifiHotspotServiceImpl::CheckCanEnableHotspot(const ServiceType type)
 
     WifiOprMidState curState = WifiConfigCenter::GetInstance().GetWifiMidState();
     if (curState != WifiOprMidState::CLOSED) {
+#ifdef FEATURE_STA_AP_EXCLUSION
+        ErrCode ret = WifiManager::GetInstance().DisableWifi();
+        if (ret == WIFI_OPT_CLOSE_SUCC_WHEN_CLOSED) {
+            return WIFI_OPT_SUCCESS;
+        }
+        return ret;
+#else
         WIFI_LOGI("current wifi state is %{public}d, please close sta first!",
             static_cast<int>(curState));
         return WIFI_OPT_NOT_SUPPORTED;
+#endif
     }
     return WIFI_OPT_SUCCESS;
 }
@@ -421,6 +429,14 @@ ErrCode WifiHotspotServiceImpl::DisableHotspot(const ServiceType type)
     if (ret != WIFI_OPT_SUCCESS) {
         WifiConfigCenter::GetInstance().SetApMidState(WifiOprMidState::CLOSING, WifiOprMidState::RUNNING, m_id);
     }
+#ifdef FEATURE_STA_AP_EXCLUSION
+    // Only when sta is passive closed, last running state is true.
+    if (WifiConfigCenter::GetInstance().GetStaLastRunState()) {
+        std::thread startStaSrvThread(WifiManager::ResumeStaIfPassiveClosed);
+        pthread_setname_np(startStaSrvThread.native_handle(), "ResumeStaIfPassiveClosedThread");
+        startStaSrvThread.detach();
+    }
+#endif
     return ret;
 }
 

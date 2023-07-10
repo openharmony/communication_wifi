@@ -50,9 +50,9 @@ void WifiScanStub::InitHandleMap()
         &WifiScanStub::OnRegisterCallBack;
     handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_SUPPORTED_FEATURES)] =
         &WifiScanStub::OnGetSupportedFeatures;
-    handleFuncMap[static_cast<uint32_t>(ScanInterfaceCode::WIFI_SVR_CMD_SET_WIFI_SCAN_ONLY)] = 
+    handleFuncMap[static_cast<uint32_t>(ScanInterfaceCode::WIFI_SVR_CMD_SET_WIFI_SCAN_ONLY)] =
         &WifiScanStub::OnSetScanOnlyAvailable;
-    handleFuncMap[static_cast<uint32_t>(ScanInterfaceCode::WIFI_SVR_CMD_GET_WIFI_SCAN_ONLY)] = 
+    handleFuncMap[static_cast<uint32_t>(ScanInterfaceCode::WIFI_SVR_CMD_GET_WIFI_SCAN_ONLY)] =
         &WifiScanStub::OnGetScanOnlyAvailable;
 }
 
@@ -289,7 +289,8 @@ void WifiScanStub::SetSingleCallback(const bool isSingleCallback)
     mSingleCallback = true;
 }
 
-int WifiScanStub::OnSetScanOnlyAvailable(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
+int WifiScanStub::OnSetScanOnlyAvailable(
+    uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
     bool enabled = data.ReadBool();
     WIFI_LOGI("In WifiScanStub::OnSetScanOnlyAvailable enabled is %{public}d", enabled);
@@ -298,7 +299,8 @@ int WifiScanStub::OnSetScanOnlyAvailable(uint32_t code, MessageParcel &data, Mes
     return 0;
 }
 
-int WifiScanStub::OnGetScanOnlyAvailable(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
+int WifiScanStub::OnGetScanOnlyAvailable(
+    uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
     WIFI_LOGI("In WifiScanStub::OnGetScanOnlyAvailable");
     bool state = false;

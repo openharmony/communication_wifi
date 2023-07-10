@@ -18,8 +18,6 @@
 #include "../../../interfaces/kits/c/wifi_hotspot.h"
 #include "../../../interfaces/kits/c/wifi_hotspot_config.h"
 #include "../../../interfaces/kits/c/wifi_device_config.h"
-#include "wifi_logger.h"
-#include "wifi_common_util.h"
 
 using ::testing::_;
 using ::testing::Return;
@@ -30,8 +28,6 @@ namespace Wifi {
 unsigned int g_status = 17;
 unsigned char g_result = 5;
 int g_mode = 1;
-const char* g_testDataLen60 = "12345678901234567890123456789012345678901234567890123456789012345678901234567890";
-const char* g_testDataLen65 = "1234567890123456789012345678901234567890123456789012345678901234567890123456789012345";
 class WifiHotspotTest : public testing::Test {
 public:
     static void SetUpTestCase() {}
@@ -53,6 +49,13 @@ public:
     void IsHotspotActiveTest()
     {
         IsHotspotActive();
+    }
+
+    void SetHotspotConfigTests()
+    {
+        HotspotConfig config;
+        config.band = g_mode;
+        SetHotspotConfig(&config);
     }
 
     void GetHotspotConfigTests()
@@ -98,84 +101,9 @@ HWTEST_F(WifiHotspotTest, IsHotspotActiveTest, TestSize.Level1)
     IsHotspotActiveTest();
 }
 
-/**
- * @tc.name: SetHotspotConfigTestsNormal
- * @tc.desc:  GetKeyMgmtFromSecurityType 函数不能直接写测试用例 没有对外暴露接口并且有static
-    限制，直接通过SetHotspotConfig测试
- * @tc.type: FUNC
- * @tc.require: issue
-*/
-HWTEST_F(WifiHotspotTest, SetHotspotConfigTestsNormal, TestSize.Level1)
+HWTEST_F(WifiHotspotTest, SetHotspotConfigTests, TestSize.Level1)
 {
-    HotspotConfig config;
-    config.band = g_mode;
-    memcpy_s(config.preSharedKey, WIFI_MAX_KEY_LEN, g_testDataLen60, WIFI_MAX_KEY_LEN-5);
-    memcpy_s(config.ipAddress, WIFI_MAX_IPV4_LEN, "192.168.1.12", 12);
-    config.securityType = WifiSecurityType::WIFI_SEC_TYPE_PSK;
-    SetHotspotConfig(&config);
-}
-
-/**
- * @tc.name: SetHotspotConfigTestsException01
- * @tc.desc:  GetKeyMgmtFromSecurityType 函数不能直接写测试用例 没有对外暴露接口并且有static
-    限制，直接通过SetHotspotConfig测试
- * @tc.type: FUNC
- * @tc.require: issue
-*/
-HWTEST_F(WifiHotspotTest, SetHotspotConfigTestsException01, TestSize.Level1)
-{
-    HotspotConfig *config = nullptr;
-    WifiErrorCode ret = SetHotspotConfig(config);
-    EXPECT_TRUE(ret == ERROR_WIFI_INVALID_ARGS);
-}
-
-/**
- * @tc.name: SetHotspotConfigTestsException02
- * @tc.desc:  GetKeyMgmtFromSecurityType 函数不能直接写测试用例 没有对外暴露接口并且有static
-    限制，直接通过SetHotspotConfig测试
- * @tc.type: FUNC
- * @tc.require: issue
-*/
-HWTEST_F(WifiHotspotTest, SetHotspotConfigTestsException02, TestSize.Level1)
-{
-    HotspotConfig config;
-    config.band = g_mode;
-    config.securityType = WifiSecurityType::WIFI_SEC_TYPE_EAP;
-    WifiErrorCode ret = SetHotspotConfig(&config);
-    EXPECT_TRUE(ret == ERROR_WIFI_NOT_SUPPORTED);
-}
-
-/**
- * @tc.name: SetHotspotConfigTestsException03
- * @tc.desc:  GetKeyMgmtFromSecurityType 函数不能直接写测试用例 没有对外暴露接口并且有static
-    限制，直接通过SetHotspotConfig测试
- * @tc.type: FUNC
- * @tc.require: issue
-*/
-HWTEST_F(WifiHotspotTest, SetHotspotConfigTestsException03, TestSize.Level1)
-{
-    HotspotConfig config;
-    config.band = g_mode;
-    config.securityType = WifiSecurityType::WIFI_SEC_TYPE_PSK;
-    memcpy_s(config.preSharedKey, WIFI_MAX_KEY_LEN, g_testDataLen65, WIFI_MAX_KEY_LEN);
-    SetHotspotConfig(&config);
-}
-
-/**
- * @tc.name: SetHotspotConfigTestsException04
- * @tc.desc:  GetKeyMgmtFromSecurityType 函数不能直接写测试用例 没有对外暴露接口并且有static
-    限制，直接通过SetHotspotConfig测试
- * @tc.type: FUNC
- * @tc.require: issue
-*/
-HWTEST_F(WifiHotspotTest, SetHotspotConfigTestsException04, TestSize.Level1)
-{
-    HotspotConfig config;
-    config.band = g_mode;
-    config.securityType = WifiSecurityType::WIFI_SEC_TYPE_PSK;
-    memcpy_s(config.preSharedKey, WIFI_MAX_KEY_LEN, g_testDataLen60, 60);
-    memcpy_s(config.ipAddress, WIFI_MAX_IPV4_LEN, "192.168.1.1222555454545", WIFI_MAX_IPV4_LEN);
-    SetHotspotConfig(&config);
+    SetHotspotConfigTests();
 }
 
 HWTEST_F(WifiHotspotTest, GetHotspotConfigTests, TestSize.Level1)

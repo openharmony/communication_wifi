@@ -13,9 +13,9 @@
  * limitations under the License.
  */
 
-#ifndef WIFI_FUZZ_P2P_STUB_H
-#define WIFI_FUZZ_P2P_STUB_H
+#ifndef WIFI_FUZZ_DEVICE_STUB_H
+#define WIFI_FUZZ_DEVICE_STUB_H
 
-#define FUZZ_PROJECT_NAME "wifip2pstub_fuzzer"
+#define FUZZ_PROJECT_NAME "wifidevicestub_fuzzer"
 
 #endif

@@ -838,6 +838,18 @@ static void IpInfoToJsObj(const napi_env& env, IpInfo& ipInfo, napi_value& resul
     SetValueUnsignedInt32(env, "leaseDuration", ipInfo.leaseDuration, result);
 }
 
+static void IpV6InfoToJsObj(const napi_env& env, IpV6Info& ipInfo, napi_value& result)
+{
+    napi_create_object(env, &result);
+    SetValueUtf8String(env, "linkIpV6Address", ipInfo.linkIpV6Address, result);
+    SetValueUtf8String(env, "globalIpV6Address", ipInfo.globalIpV6Address, result);
+    SetValueUtf8String(env, "randGlobalIpV6Address", ipInfo.randGlobalIpV6Address, result);
+    SetValueUtf8String(env, "gateway", ipInfo.gateway, result);
+    SetValueUtf8String(env, "netmask", ipInfo.netmask, result);
+    SetValueUtf8String(env, "primaryDNS", ipInfo.primaryDns, result);
+    SetValueUtf8String(env, "secondDNS", ipInfo.secondDns, result);
+}
+
 NO_SANITIZE("cfi") napi_value GetIpInfo(napi_env env, napi_callback_info info)
 {
     TRACE_FUNC_CALL;
@@ -851,6 +863,22 @@ NO_SANITIZE("cfi") napi_value GetIpInfo(napi_env env, napi_callback_info info)
     }
     WIFI_NAPI_ASSERT(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_STA);
     IpInfoToJsObj(env, ipInfo, result);
+    return result;
+}
+
+NO_SANITIZE("cfi") napi_value GetIpV6Info(napi_env env, napi_callback_info info)
+{
+    TRACE_FUNC_CALL;
+    WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
+
+    IpV6Info ipInfo;
+    napi_value result;
+    ErrCode ret = wifiDevicePtr->GetIpV6Info(ipInfo);
+    if (ret != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("Get ip info fail: %{public}d", ret);
+    }
+    WIFI_NAPI_ASSERT(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_STA);
+    IpV6InfoToJsObj(env, ipInfo, result);
     return result;
 }
 

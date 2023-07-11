@@ -581,6 +581,8 @@ void StaStateMachine::StopWifiProcess()
 
     IpInfo ipInfo;
     WifiSettings::GetInstance().SaveIpInfo(ipInfo);
+    IpV6Info ipV6Info;
+    WifiSettings::GetInstance().SaveIpV6Info(ipV6Info);
 #ifdef OHOS_ARCH_LITE
     IfConfig::GetInstance().FlushIpAddr(IF_NAME, IPTYPE_IPV4);
 #endif
@@ -975,6 +977,8 @@ void StaStateMachine::DealDisconnectEvent(InternalMessage *msg)
 
     IpInfo ipInfo;
     WifiSettings::GetInstance().SaveIpInfo(ipInfo);
+    IpV6Info ipV6Info;
+    WifiSettings::GetInstance().SaveIpV6Info(ipV6Info);
 #ifdef OHOS_ARCH_LITE
     IfConfig::GetInstance().FlushIpAddr(IF_NAME, IPTYPE_IPV4);
 #endif
@@ -1841,10 +1845,10 @@ void StaStateMachine::GetIpState::GoInState()
         LOGI("GetIpState get dhcp result, isRoam=%{public}d, clientRunStatus=%{public}d.",
             pStaStateMachine->isRoam, dhcpInfo.clientRunStatus);
         pStaStateMachine->currentTpType = static_cast<int>(WifiSettings::GetInstance().GetDhcpIpType());
-        if (pStaStateMachine->currentTpType == IPTYPE_IPV6) {
-            dhcpRet = pStaStateMachine->pDhcpService->StartDhcpClient(IF_NAME, true);
-        } else {
+        if (pStaStateMachine->currentTpType == IPTYPE_IPV4) {
             dhcpRet = pStaStateMachine->pDhcpService->StartDhcpClient(IF_NAME, false);
+        } else {
+            dhcpRet = pStaStateMachine->pDhcpService->StartDhcpClient(IF_NAME, true);
         }
         if ((dhcpRet != 0) || (pStaStateMachine->pDhcpService->GetDhcpResult(
             IF_NAME, pStaStateMachine->pDhcpResultNotify, DHCP_TIME) != 0)) {
@@ -2262,29 +2266,46 @@ void StaStateMachine::DhcpResultNotify::OnSuccess(int status, const std::string 
         IfConfig::GetInstance().SetIfDnsAndRoute(result, result.iptype);
 #endif
     }
-
-    WIFI_LOGI("DhcpResultNotify::OnSuccess, getIpSucNum=%{public}d, isRoam=%{public}d",
-        pStaStateMachine->getIpSucNum, pStaStateMachine->isRoam);
-    pStaStateMachine->OnDhcpResultNotifyEvent(true);
-    if (pStaStateMachine->getIpSucNum == 0 || pStaStateMachine->isRoam) {
-        pStaStateMachine->SaveDiscReason(DisconnectedReason::DISC_REASON_DEFAULT);
-        pStaStateMachine->SaveLinkstate(ConnState::CONNECTED, DetailedState::CONNECTED);
-        pStaStateMachine->staCallback.OnStaConnChanged(
-            OperateResState::CONNECT_AP_CONNECTED, pStaStateMachine->linkedInfo);
-        WriteWifiConnectionHiSysEvent(WifiConnectionType::CONNECT, "");
-        /* Delay to wait for the network adapter information to take effect. */
-        constexpr int NETCHECK_DELAY_TIME = 2000; // 2000 ms
-        pStaStateMachine->StartTimer(static_cast<int>(CMD_START_NETCHECK), NETCHECK_DELAY_TIME);
-        pStaStateMachine->DealSetStaConnectFailedCount(0, true);
+    
+    if (result.iptype == 1) {
+        IpV6Info v6info;
+        v6info.linkIpV6Address = "";
+        v6info.globalIpV6Address = result.strYourCli;
+        v6info.randGlobalIpV6Address = "";
+        v6info.gateway = result.strRouter1;
+        v6info.netmask = result.strSubnet;
+        v6info.primaryDns = result.strDns1;
+        v6info.secondDns = "";
+        WifiSettings::GetInstance().SaveIpV6Info(v6info);
+        WIFI_LOGI("IpV6Info::addr=%{private}s, gateway=%{private}s, mask=%{private}s, dns=%{private}s",
+            v6info.globalIpV6Address.c_str(), v6info.gateway.c_str(), v6info.netmask.c_str(),
+            v6info.primaryDns.c_str());
     }
-    pStaStateMachine->getIpSucNum++;
 
-    WIFI_LOGI("DhcpResultNotify::OnSuccess, stop dhcp client");
-    if (pStaStateMachine->pDhcpService != nullptr) {
-        if (pStaStateMachine->currentTpType == IPTYPE_IPV6) {
-            pStaStateMachine->pDhcpService->StopDhcpClient(IF_NAME, true);
-        } else {
-            pStaStateMachine->pDhcpService->StopDhcpClient(IF_NAME, false);
+    if (result.iptype == 0) {
+        WIFI_LOGI("DhcpResultNotify::OnSuccess, getIpSucNum=%{public}d, isRoam=%{public}d",
+            pStaStateMachine->getIpSucNum, pStaStateMachine->isRoam);
+        pStaStateMachine->OnDhcpResultNotifyEvent(true);
+        if (pStaStateMachine->getIpSucNum == 0 || pStaStateMachine->isRoam) {
+            pStaStateMachine->SaveDiscReason(DisconnectedReason::DISC_REASON_DEFAULT);
+            pStaStateMachine->SaveLinkstate(ConnState::CONNECTED, DetailedState::CONNECTED);
+            pStaStateMachine->staCallback.OnStaConnChanged(
+                OperateResState::CONNECT_AP_CONNECTED, pStaStateMachine->linkedInfo);
+            WriteWifiConnectionHiSysEvent(WifiConnectionType::CONNECT, "");
+            /* Delay to wait for the network adapter information to take effect. */
+            constexpr int NETCHECK_DELAY_TIME = 2000; // 2000 ms
+            pStaStateMachine->StartTimer(static_cast<int>(CMD_START_NETCHECK), NETCHECK_DELAY_TIME);
+            pStaStateMachine->DealSetStaConnectFailedCount(0, true);
+        }
+        pStaStateMachine->getIpSucNum++;
+
+        WIFI_LOGI("DhcpResultNotify::OnSuccess, stop dhcp client");
+        if (pStaStateMachine->pDhcpService != nullptr) {
+            if (pStaStateMachine->currentTpType == IPTYPE_IPV6) {
+                pStaStateMachine->pDhcpService->StopDhcpClient(IF_NAME, true);
+            } else {
+                pStaStateMachine->pDhcpService->StopDhcpClient(IF_NAME, false);
+            }
         }
     }
     return;

@@ -146,6 +146,10 @@ public:
     {
         return WIFI_OPT_SUCCESS;
     }
+    ErrCode GetIpV6Info(IpV6Info &info) override
+    {
+        return WIFI_OPT_SUCCESS;
+    }
     ErrCode SetCountryCode(const std::string &countryCode) override
     {
         return WIFI_OPT_SUCCESS;

@@ -168,6 +168,59 @@ int IpTools::GetMaskLength(std::string mask)
     return netMask;
 }
 
+/**
+    * @Description : Obtains the length based on the subnet mask.
+    *
+    * @param mask - The mask.[in]
+    * @return int
+*/
+int IpTools::GetIPV6MaskLength(std::string ip)
+{
+    constexpr int32_t LENGTH_8 = 8;
+    constexpr int32_t LENGTH_7 = 7;
+    constexpr int32_t LENGTH_6 = 6;
+    constexpr int32_t LENGTH_5 = 5;
+    constexpr int32_t LENGTH_4 = 4;
+    constexpr int32_t LENGTH_3 = 3;
+    constexpr int32_t LENGTH_2 = 2;
+    constexpr int32_t LENGTH_1 = 1;
+    if (ip.empty()) {
+        return 0;
+    }
+    in6_addr addr{};
+    inet_pton(AF_INET6, ip.c_str(), &addr);
+    int32_t prefixLen = 0;
+    for (int32_t i = 0; i < BITS_16; ++i) {
+        if (addr.s6_addr[i] == 0xFF) {
+            prefixLen += LENGTH_8;
+        } else if (addr.s6_addr[i] == 0xFE) {
+            prefixLen += LENGTH_7;
+            break;
+        } else if (addr.s6_addr[i] == 0xFC) {
+            prefixLen += LENGTH_6;
+            break;
+        } else if (addr.s6_addr[i] == 0xF8) {
+            prefixLen += LENGTH_5;
+            break;
+        } else if (addr.s6_addr[i] == 0xF0) {
+            prefixLen += LENGTH_4;
+            break;
+        } else if (addr.s6_addr[i] == 0xE0) {
+            prefixLen += LENGTH_3;
+            break;
+        } else if (addr.s6_addr[i] == 0xC0) {
+            prefixLen += LENGTH_2;
+            break;
+        } else if (addr.s6_addr[i] == 0x80) {
+            prefixLen += LENGTH_1;
+            break;
+        } else {
+            break;
+        }
+    }
+    return prefixLen;
+}
+
 void IpTools::GetExclusionObjectList(const std::string &exclusionObjectList, std::vector<std::string> &exclusionList)
 {
     std::string tmpExclusionList = exclusionObjectList;

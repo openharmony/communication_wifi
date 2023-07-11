@@ -274,6 +274,14 @@ public:
     virtual ErrCode GetIpInfo(IpInfo &info) = 0;
 
     /**
+     * @Description Obtaining ip Request Information
+     *
+     * @param info - IpV6Info object
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode GetIpV6Info(IpV6Info &info) = 0;
+
+    /**
      * @Description Reconnect to the currently active network
      *
      * @return ErrCode - operation result

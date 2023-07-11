@@ -259,6 +259,14 @@ public:
     ErrCode GetIpInfo(IpInfo &info) override;
 
     /**
+     * @Description Obtaining DHCP IPV6 Request Information
+     *
+     * @param info - IpV6Info object
+     * @return ErrCode - operation result
+     */
+    ErrCode GetIpV6Info(IpV6Info &info) override;
+
+    /**
      * @Description Set the Country Code
      *
      * @param countryCode - country code

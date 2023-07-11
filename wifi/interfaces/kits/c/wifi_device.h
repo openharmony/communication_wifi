@@ -239,6 +239,15 @@ WifiErrorCode AdvanceScan(WifiScanParams *params);
  */
 WifiErrorCode GetIpInfo(IpInfo *info);
 
+/*
+ * @brief get the ipV6 address.
+ *
+ * @return Returns {@link WIFI_SUCCESS} if the IP is got; returns an error code defined
+ * in {@link WifiErrorCode} otherwise.
+ * @since 7
+ */
+WifiErrorCode GetIpV6Info(IpV6Info *info);
+
 /**
  * @brief Obtains the signal level indicated by a specified received signal strength indicator (RSSI) and frequency
  * band.

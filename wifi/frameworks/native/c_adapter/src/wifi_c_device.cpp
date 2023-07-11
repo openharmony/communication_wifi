@@ -411,6 +411,56 @@ NO_SANITIZE("cfi") WifiErrorCode GetIpInfo(IpInfo *info)
     return GetCErrorCode(ret);
 }
 
+static OHOS::Wifi::ErrCode GetIpV6InfoFromCpp(const OHOS::Wifi::IpV6Info& ipInfo, IpV6Info *result)
+{
+    CHECK_PTR_RETURN(result, OHOS::Wifi::WIFI_OPT_INVALID_PARAM);
+    if (memcpy_s(result->linkIpV6Address, DEVICE_IPV6_MAX_LEN, ipInfo.linkIpV6Address.c_str(),
+        ipInfo.linkIpV6Address.size() + 1) != EOK) {
+        return OHOS::Wifi::WIFI_OPT_FAILED;
+    }
+    if (memcpy_s(result->globalIpV6Address, DEVICE_IPV6_MAX_LEN, ipInfo.globalIpV6Address.c_str(),
+        ipInfo.globalIpV6Address.size() + 1) != EOK) {
+        return OHOS::Wifi::WIFI_OPT_FAILED;
+    }
+    if (memcpy_s(result->randGlobalIpV6Address, DEVICE_IPV6_MAX_LEN, ipInfo.randGlobalIpV6Address.c_str(),
+        ipInfo.randGlobalIpV6Address.size() + 1) != EOK) {
+        return OHOS::Wifi::WIFI_OPT_FAILED;
+    }
+    if (memcpy_s(result->gateway, DEVICE_IPV6_MAX_LEN, ipInfo.gateway.c_str(),
+        ipInfo.gateway.size() + 1) != EOK) {
+        return OHOS::Wifi::WIFI_OPT_FAILED;
+    }
+    if (memcpy_s(result->netmask, DEVICE_IPV6_MAX_LEN, ipInfo.netmask.c_str(),
+        ipInfo.netmask.size() + 1) != EOK) {
+        return OHOS::Wifi::WIFI_OPT_FAILED;
+    }
+    if (memcpy_s(result->primaryDns, DEVICE_IPV6_MAX_LEN, ipInfo.primaryDns.c_str(),
+        ipInfo.primaryDns.size() + 1) != EOK) {
+        return OHOS::Wifi::WIFI_OPT_FAILED;
+    }
+    if (memcpy_s(result->secondDns, DEVICE_IPV6_MAX_LEN, ipInfo.secondDns.c_str(),
+        ipInfo.secondDns.size() + 1) != EOK) {
+        return OHOS::Wifi::WIFI_OPT_FAILED;
+    }
+    return OHOS::Wifi::WIFI_OPT_SUCCESS;
+}
+
+NO_SANITIZE("cfi") WifiErrorCode GetIpV6Info(IpV6Info *info)
+{
+    CHECK_PTR_RETURN(wifiDevicePtr, ERROR_WIFI_NOT_AVAILABLE);
+    CHECK_PTR_RETURN(info, ERROR_WIFI_INVALID_ARGS);
+    OHOS::Wifi::IpV6Info ipInfo;
+    OHOS::Wifi::ErrCode ret = wifiDevicePtr->GetIpV6Info(ipInfo);
+    if (ret == OHOS::Wifi::WIFI_OPT_SUCCESS) {
+        OHOS::Wifi::ErrCode retValue = GetIpV6InfoFromCpp(ipInfo, info);
+        if (retValue != OHOS::Wifi::WIFI_OPT_SUCCESS) {
+            WIFI_LOGE("Get ip info from cpp error!");
+            ret = retValue;
+        }
+    }
+    return GetCErrorCode(ret);
+}
+
 NO_SANITIZE("cfi") int GetSignalLevel(int rssi, int band)
 {
     CHECK_PTR_RETURN(wifiDevicePtr, ERROR_WIFI_NOT_AVAILABLE);

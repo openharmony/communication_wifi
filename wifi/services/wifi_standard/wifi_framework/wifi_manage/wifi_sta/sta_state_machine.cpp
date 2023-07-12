@@ -420,7 +420,7 @@ void StaStateMachine::StartWifiProcess()
         }
 #ifndef OHOS_ARCH_LITE
         WIFI_LOGI("Register netsupplier");
-        WifiNetAgent::GetInstance().OnStaMachineWifiStart(staCallback);
+        WifiNetAgent::GetInstance().OnStaMachineWifiStart();
 #endif
         /* Initialize Connection Information. */
         InitWifiLinkedInfo();
@@ -765,7 +765,6 @@ void StaStateMachine::ConvertFreqToChannel()
         config.band = linkedInfo.band = static_cast<int>(BandType::BAND_5GHZ);
         config.channel = (linkedInfo.frequency - FREQ_5G_MIN) / CENTER_FREQ_DIFF + CHANNEL_5G_MIN;
     }
-
     WifiSettings::GetInstance().AddDeviceConfig(config);
     WifiSettings::GetInstance().SyncDeviceConfig();
     return;
@@ -2234,7 +2233,7 @@ void StaStateMachine::OnNetManagerRestart(void)
     if (state != static_cast<int>(WifiState::ENABLED)) {
         return;
     }
-    WifiNetAgent::GetInstance().OnStaMachineNetManagerRestart(NetSupplierInfo, staCallback);
+    WifiNetAgent::GetInstance().OnStaMachineNetManagerRestart(NetSupplierInfo);
 }
 
 void StaStateMachine::ReUpdateNetSupplierInfo(sptr<NetManagerStandard::NetSupplierInfo> supplierInfo)

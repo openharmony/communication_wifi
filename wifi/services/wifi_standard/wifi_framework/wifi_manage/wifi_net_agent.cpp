@@ -58,13 +58,13 @@ bool WifiNetAgent::RegisterNetSupplier()
 {
     TimeStats timeStats(__func__);
     WIFI_LOGI("Enter RegisterNetSupplier.");
-    auto& netManager = NetConnClient::GetInstance();
 
     std::string ident = "wifi";
     using NetManagerStandard::NetBearType;
     using NetManagerStandard::NetCap;
     std::set<NetCap> netCaps {NetCap::NET_CAPABILITY_INTERNET};
-    int32_t result = netManager.RegisterNetSupplier(NetBearType::BEARER_WIFI, ident, netCaps, supplierId);
+    int32_t result = NetConnClient::GetInstance().RegisterNetSupplier(NetBearType::BEARER_WIFI,
+                                                                      ident, netCaps, supplierId);
     if (result == NETMANAGER_SUCCESS) {
         WIFI_LOGI("Register NetSupplier successful");
         return true;
@@ -77,15 +77,13 @@ bool WifiNetAgent::RegisterNetSupplierCallback()
 {
     TimeStats timeStats(__func__);
     WIFI_LOGI("Enter RegisterNetSupplierCallback.");
-    auto& netManager = NetConnClient::GetInstance();
-
     sptr<NetConnCallback> pNetConnCallback = (std::make_unique<NetConnCallback>()).release();
     if (pNetConnCallback == nullptr) {
         WIFI_LOGE("pNetConnCallback is null\n");
         return false;
     }
 
-    int32_t result = netManager.RegisterNetSupplierCallback(supplierId, pNetConnCallback);
+    int32_t result = NetConnClient::GetInstance().RegisterNetSupplierCallback(supplierId, pNetConnCallback);
     if (result == NETMANAGER_SUCCESS) {
         WIFI_LOGI("Register NetSupplierCallback successful");
         return true;
@@ -98,8 +96,7 @@ void WifiNetAgent::UnregisterNetSupplier()
 {
     TimeStats timeStats(__func__);
     WIFI_LOGI("Enter UnregisterNetSupplier.");
-    auto& netManager = NetConnClient::GetInstance();
-    int32_t result = netManager.UnregisterNetSupplier(supplierId);
+    int32_t result = NetConnClient::GetInstance().UnregisterNetSupplier(supplierId);
     WIFI_LOGI("Unregister network result:%{public}d", result);
 }
 
@@ -107,8 +104,7 @@ void WifiNetAgent::UpdateNetSupplierInfo(const sptr<NetManagerStandard::NetSuppl
 {
     TimeStats timeStats(__func__);
     WIFI_LOGI("Enter UpdateNetSupplierInfo.");
-    auto& netManager = NetConnClient::GetInstance();
-    int32_t result = netManager.UpdateNetSupplierInfo(supplierId, netSupplierInfo);
+    int32_t result = NetConnClient::GetInstance().UpdateNetSupplierInfo(supplierId, netSupplierInfo);
     WIFI_LOGI("Update network result:%{public}d", result);
 }
 
@@ -116,11 +112,10 @@ void WifiNetAgent::UpdateNetLinkInfo(IpInfo &wifiIpInfo, WifiProxyConfig &wifiPr
 {
     TimeStats timeStats(__func__);
     WIFI_LOGI("Enter UpdateNetLinkInfo.");
-    auto& netManager = NetConnClient::GetInstance();
 
     sptr<NetManagerStandard::NetLinkInfo> netLinkInfo = (std::make_unique<NetManagerStandard::NetLinkInfo>()).release();
     CreateNetLinkInfo(netLinkInfo, wifiIpInfo, wifiProxyConfig);
-    int32_t result = netManager.UpdateNetLinkInfo(supplierId, netLinkInfo);
+    int32_t result = NetConnClient::GetInstance().UpdateNetLinkInfo(supplierId, netLinkInfo);
     WIFI_LOGI("UpdateNetLinkInfo result:%{public}d", result);
 }
 

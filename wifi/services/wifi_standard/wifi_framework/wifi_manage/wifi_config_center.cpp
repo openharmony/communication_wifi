@@ -422,5 +422,14 @@ void WifiConfigCenter::SetWifiScanOnlyMidState(WifiOprMidState state)
 {
     mStaScanOnlyMidState = state;
 }
+int WifiConfigCenter::GetStaApExclusionType()
+{
+    return WifiSettings::GetInstance().GetStaApExclusionType();
+}
+
+int WifiConfigCenter::SetStaApExclusionType(int type)
+{
+    return WifiSettings::GetInstance().SetStaApExclusionType(type);
+}
 }  // namespace Wifi
 }  // namespace OHOS

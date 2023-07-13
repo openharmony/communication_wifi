@@ -587,7 +587,7 @@ static void WpaCallBackFuncTwo(const char *p)
             WifiHalCbNotifyWpaStateChange(atoi(pstate));
         }
     } else if (strncmp(p, WPA_EVENT_TEMP_DISABLED, strlen(WPA_EVENT_TEMP_DISABLED)) == 0) { /* Wrong Key */
-        if (strstr(p, "reason=WRONG_KEY") != NULL) {
+        if (strstr(p, "reason=WRONG_KEY") != NULL || strstr(p, "reason=AUTH_FAILED") != NULL) {
             WifiHalCbNotifyWrongKey(1);
         }
     } else if (strncmp(p, WPS_EVENT_PBC_OVERLAP, strlen(WPS_EVENT_PBC_OVERLAP)) == 0) { /* wps_pbc_overlap */

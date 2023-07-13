@@ -138,6 +138,12 @@ enum class Ant {
     NETWORK_ANT_INVALID = 16
 };
 
+enum class AutoStartOrStopServiceReason {
+    AUTO_START_UPON_STARTUP = 0,    /* auto-start upon startup */
+    AIRPLANE_MODE,                  /* airplane mode */
+    STA_AP_EXCLUSION,               /* sta and ap exclusion */
+};
+
 struct InterScanInfo {
     std::string bssid;
     std::string ssid;
@@ -297,6 +303,13 @@ enum class OperatorWifiType {
     INITIAL_TYPE,                            /* initial type */
 };
 
+enum class StaApExclusionType {
+    USER_OPEN_WIFI_AUTO_STOP_AP,      /* User open wifi auto stop ap */
+    USER_OPEN_AP_AUTO_STOP_WIFI,      /* User open ap auto stop wifi */
+    USER_CLOSE_AP_AUTO_START_WIFI,    /* User close ap auto start wifi */
+    INITIAL_TYPE,                     /* initial type */
+};
+
 /* wifi config store */
 struct WifiConfig {
     bool scanAlwaysSwitch; /* scan always switch */
@@ -343,6 +356,7 @@ struct WifiConfig {
     bool isLoadStabak;
     bool scanOnlySwitch;
     std::string realMacAddress;
+    int staApExclusionType;
 
     WifiConfig()
     {
@@ -383,6 +397,7 @@ struct WifiConfig {
         preLoadEnhance = false;
         scanOnlySwitch = false;
         realMacAddress = "";
+        staApExclusionType = static_cast<int>(StaApExclusionType::INITIAL_TYPE);
     }
 };
 

@@ -349,10 +349,11 @@ WifiErrorCode RegisterWifiEvent(WifiEvent *event) {
         return ERROR_WIFI_UNKNOWN;
     }
     if (!EventManager::GetInstance().IsEventRegistered()) {
-        if (EventManager::GetInstance().RegisterWifiEvents() != WIFI_SUCCESS) {
+        if (EventManager::GetInstance().RegisterWifiEvents() == WIFI_SUCCESS) {
+            EventManager::GetInstance().SetIsEventRegistrated(true);
+        } else {
             WIFI_LOGE("Wifi event register failed!");
         }
-        EventManager::GetInstance().SetIsEventRegistrated(true);
     }
     return WIFI_SUCCESS;
 }

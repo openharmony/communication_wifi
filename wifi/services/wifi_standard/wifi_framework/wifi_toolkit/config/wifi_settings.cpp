@@ -1795,5 +1795,19 @@ bool WifiSettings::CheckScanOnlyAvailable()
     return mWifiConfig.scanOnlySwitch && (MODE_STATE_CLOSE == mAirplaneModeState);
 }
 
+int WifiSettings::GetStaApExclusionType()
+{
+    std::unique_lock<std::mutex> lock(mWifiConfigMutex);
+    return mWifiConfig.staApExclusionType;
+}
+
+int WifiSettings::SetStaApExclusionType(int type)
+{
+    std::unique_lock<std::mutex> lock(mWifiConfigMutex);
+    mWifiConfig.staApExclusionType = type;
+    SyncWifiConfig();
+    return 0;
+}
+
 }  // namespace Wifi
 }  // namespace OHOS

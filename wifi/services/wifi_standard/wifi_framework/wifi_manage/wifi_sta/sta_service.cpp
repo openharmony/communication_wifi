@@ -281,7 +281,7 @@ int StaService::AddDeviceConfig(const WifiDeviceConfig &config) const
     WifiSettings::GetInstance().AddDeviceConfig(tempDeviceConfig);
     WifiSettings::GetInstance().SyncDeviceConfig();
     /* update net link proxy info */
-    pStaStateMachine->ReUpdateNetLinkInfo();
+    pStaStateMachine->ReUpdateNetLinkInfo(tempDeviceConfig);
     ConfigChange changeType = isUpdate ? ConfigChange::CONFIG_UPDATE : ConfigChange::CONFIG_ADD;
     NotifyDeviceConfigChange(changeType);
     return netWorkId;

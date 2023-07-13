@@ -1557,7 +1557,8 @@ public:
         pStaStateMachine->linkedInfo.detailedState = DetailedState::NOTWORKING;
         pStaStateMachine->linkedInfo.connState = ConnState::CONNECTED;
         EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_)).WillOnce(Return(0));
-        pStaStateMachine->ReUpdateNetLinkInfo();
+        WifiDeviceConfig config;
+        pStaStateMachine->ReUpdateNetLinkInfo(config);
     }
 };
 

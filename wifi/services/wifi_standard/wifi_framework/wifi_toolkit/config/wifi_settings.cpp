@@ -1318,13 +1318,13 @@ int WifiSettings::SyncWifiConfig()
 int WifiSettings::GetOperatorWifiType()
 {
     std::unique_lock<std::mutex> lock(mWifiConfigMutex);
-    return mWifiConfig.operatorWifiType;
+    return mWifiConfig.staAirplaneMode;
 }
 
 int WifiSettings::SetOperatorWifiType(int type)
 {
     std::unique_lock<std::mutex> lock(mWifiConfigMutex);
-    mWifiConfig.operatorWifiType = type;
+    mWifiConfig.staAirplaneMode = type;
     SyncWifiConfig();
     return 0;
 }

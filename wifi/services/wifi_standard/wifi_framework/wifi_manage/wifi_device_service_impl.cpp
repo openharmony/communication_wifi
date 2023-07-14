@@ -291,13 +291,12 @@ ErrCode WifiDeviceServiceImpl::EnableWifi()
         return WIFI_OPT_SUCCESS;
     }
 
-    int operatorWifiType = static_cast<int>(OperatorWifiType::USER_OPEN_WIFI_IN_NO_AIRPLANEMODE);
+    int staAirplaneMode = static_cast<int>(OperatorWifiType::USER_OPEN_WIFI_IN_NO_AIRPLANEMODE);
     if (WifiConfigCenter::GetInstance().GetAirplaneModeState() == MODE_STATE_OPEN) {
-        operatorWifiType = static_cast<int>(OperatorWifiType::USER_OPEN_WIFI_IN_AIRPLANEMODE);
+        staAirplaneMode = static_cast<int>(OperatorWifiType::USER_OPEN_WIFI_IN_AIRPLANEMODE);
         WIFI_LOGI("EnableWifi, current airplane mode is opened, user open wifi!");
     }
-    WifiConfigCenter::GetInstance().SetOperatorWifiType(operatorWifiType);
-    WifiConfigCenter::GetInstance().SetStaApExclusionType(static_cast<int>(StaApExclusionType::INITIAL_TYPE));
+    WifiConfigCenter::GetInstance().SetOperatorWifiType(staAirplaneMode);
     return WIFI_OPT_SUCCESS;
 }
 

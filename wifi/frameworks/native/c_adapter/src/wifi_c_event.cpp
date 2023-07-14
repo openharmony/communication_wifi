@@ -345,14 +345,17 @@ std::set<WifiEvent*> GetEventCallBacks() {
 
 WifiErrorCode RegisterWifiEvent(WifiEvent *event) {
     WIFI_LOGI("Register wifi event");
-    if (!EventManager::GetInstance().IsEventRegistered()) {
-        if (EventManager::GetInstance().RegisterWifiEvents() != WIFI_SUCCESS) {
-            WIFI_LOGE("Wifi event register failed!");
-            return ERROR_WIFI_UNKNOWN;
-        }
-        EventManager::GetInstance().SetIsEventRegistrated(true);
+    if (!EventManager::GetInstance().AddEventCallback(event)) {
+        return ERROR_WIFI_UNKNOWN;
     }
-    return EventManager::GetInstance().AddEventCallback(event) ? WIFI_SUCCESS : ERROR_WIFI_INVALID_ARGS;
+    if (!EventManager::GetInstance().IsEventRegistered()) {
+        if (EventManager::GetInstance().RegisterWifiEvents() == WIFI_SUCCESS) {
+            EventManager::GetInstance().SetIsEventRegistrated(true);
+        } else {
+            WIFI_LOGE("Wifi event register failed!");
+        }
+    }
+    return WIFI_SUCCESS;
 }
 
 WifiErrorCode UnRegisterWifiEvent(WifiEvent *event) {

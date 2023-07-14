@@ -313,7 +313,7 @@ enum class StaApExclusionType {
 /* wifi config store */
 struct WifiConfig {
     bool scanAlwaysSwitch; /* scan always switch */
-    int operatorWifiType; /* operator wifi type */
+    int staAirplaneMode; /* operator wifi type */
     bool canOpenStaWhenAirplane; /* if airplane is opened, whether can open sta */
     /**
      * last sta service state, when service started, power
@@ -361,7 +361,7 @@ struct WifiConfig {
     WifiConfig()
     {
         scanAlwaysSwitch = false;
-        operatorWifiType = static_cast<int>(OperatorWifiType::INITIAL_TYPE);
+        staAirplaneMode = static_cast<int>(OperatorWifiType::INITIAL_TYPE);
         canOpenStaWhenAirplane = true;
         staLastState = false;
         savedDeviceAppraisalPriority = PRIORITY_1;

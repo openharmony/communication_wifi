@@ -116,8 +116,8 @@ ErrCode WifiManager::AutoStartStaService(AutoStartOrStopServiceReason reason)
         return errCode;
     }
 
+    StopUnloadStaSaTimer();
     if (reason == AutoStartOrStopServiceReason::STA_AP_EXCLUSION) {
-        StopUnloadStaSaTimer();
         if (WifiConfigCenter::GetInstance().GetOperatorWifiType() ==
             static_cast<int>(OperatorWifiType::USER_OPEN_WIFI_IN_AIRPLANEMODE)) {
             WIFI_LOGI("EnableWifi, user opened wifi in airplane mode!");
@@ -357,9 +357,7 @@ ErrCode WifiManager::AutoStartApService(AutoStartOrStopServiceReason reason)
         return errCode;
     }
 
-    if (reason == AutoStartOrStopServiceReason::STA_AP_EXCLUSION) {
-        StopUnloadApSaTimer();
-    }
+    StopUnloadApSaTimer();
     return WIFI_OPT_SUCCESS;
 }
 
@@ -454,9 +452,7 @@ ErrCode WifiManager::AutoStartP2pService(AutoStartOrStopServiceReason reason)
         return ret;
     }
 
-    if (reason == AutoStartOrStopServiceReason::STA_AP_EXCLUSION) {
-        StopUnloadP2PSaTimer();
-    }
+    StopUnloadP2PSaTimer();
     return WIFI_OPT_SUCCESS;
 }
 
@@ -569,7 +565,14 @@ int WifiManager::Init()
         WifiManager::GetInstance().Exit();
         return -1;
     }
-    if (WifiConfigCenter::GetInstance().GetStaLastRunState()) { /* Automatic startup upon startup */
+    if (WifiConfigCenter::GetInstance().GetStaLastRunState()
+        || (WifiConfigCenter::GetInstance().GetStaApExclusionType()
+            == static_cast<int>(StaApExclusionType::USER_OPEN_AP_AUTO_STOP_WIFI)
+            && WifiConfigCenter::GetInstance().GetApMidState() == WifiOprMidState::CLOSED)) { /* Automatic startup upon startup */
+        if (WifiConfigCenter::GetInstance().GetStaApExclusionType()
+            == static_cast<int>(StaApExclusionType::USER_OPEN_AP_AUTO_STOP_WIFI)) {
+            WifiConfigCenter::GetInstance().SetStaApExclusionType(static_cast<int>(StaApExclusionType::INITIAL_TYPE));
+        }
         WIFI_LOGI("AutoStartServiceThread");
         std::thread startStaSrvThread(WifiManager::AutoStartServiceThread,
             AutoStartOrStopServiceReason::AUTO_START_UPON_STARTUP);
@@ -849,6 +852,11 @@ void WifiManager::CloseP2pService(void)
     }
     WifiManager::GetInstance().StartUnloadP2PSaTimer();
     #endif
+    WifiOprMidState staState = WifiConfigCenter::GetInstance().GetWifiMidState();
+    WIFI_LOGI("CloseP2pService, current sta state:%{public}d", staState);
+    if (staState == WifiOprMidState::OPENING || staState == WifiOprMidState::RUNNING) {
+        WifiManager::GetInstance().AutoStartP2pService(AutoStartOrStopServiceReason::TYRTO_ENABLE_P2P_WHEN_WIFI_OPENED);
+    }
     return;
 }
 #endif
@@ -933,6 +941,13 @@ void WifiManager::DealStaOpenRes(OperateResState state)
     if (WifiConfigCenter::GetInstance().GetAirplaneModeState() == MODE_STATE_OPEN) {
         WifiConfigCenter::GetInstance().SetWifiStateWhenAirplaneMode(true);
     }
+#ifdef FEATURE_P2P_SUPPORT
+    WifiOprMidState p2pState = WifiConfigCenter::GetInstance().GetP2pMidState();
+    WIFI_LOGI("DealStaOpenRes, current p2p state:%{public}d", p2pState);
+    if (p2pState == WifiOprMidState::CLOSED) {
+        WifiManager::GetInstance().AutoStartP2pService(AutoStartOrStopServiceReason::TYRTO_ENABLE_P2P_WHEN_WIFI_OPENED);
+    }
+#endif
     cbMsg.msgData = static_cast<int>(WifiState::ENABLED);
     WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
     AutoStartEnhanceService();

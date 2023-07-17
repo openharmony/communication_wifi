@@ -588,6 +588,21 @@ public:
      */
     void SetWifiScanOnlyMidState(WifiOprMidState state);
 
+    /**
+     * @Description Get sta ap exclusion type
+     *
+     * @return type - enum StaApExclusionType
+     */
+    int GetStaApExclusionType();
+
+    /**
+     * @Description Set sta ap exclusion type
+     *
+     * @param type - enum StaApExclusionType
+     * @return int - 0 success
+     */
+    int SetStaApExclusionType(int type);
+
 private:
     std::mutex mApMutex;
     std::atomic<WifiOprMidState> mStaMidState;

@@ -278,6 +278,7 @@ static void ProcessEapTlsConfig(const napi_env& env, const napi_value& object, W
         sizeof(eapConfig.certPassword) - 1) != EOK) {
         WIFI_LOGE("ProcessEapTlsConfig strcpy_s failed!");
     }
+    std::string().swap(certPassword);
     eapConfig.certEntry = JsObjectToU8Vector(env, object, "certEntry");
 }
 

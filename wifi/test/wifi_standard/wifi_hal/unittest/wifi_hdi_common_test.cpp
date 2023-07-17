@@ -15,15 +15,16 @@
 #include "wifi_hdi_common.h"
 #include "wifi_hdi_util.h"
 #include "wifi_hdi_sta_impl.h"
-
 #include "securec.h"
 #include "mock_wpa_ctrl.h"
-#include "wifi_hal_crpc_server.h"
-#include "wifi_hal_common_func.h"
-#include "wifi_log.h"
 
+#include <gmock/gmock.h>
+#include <gtest/gtest.h>
 
-using namespace testing::ext;
+using ::testing::_;
+using ::testing::Return;
+using ::testing::ext::TestSize;
+
 
 namespace OHOS {
 namespace Wifi {
@@ -50,16 +51,16 @@ HWTEST_F(WifiHdiCommonTest, HdiGetIeTest, TestSize.Level1)
 HWTEST_F(WifiHdiCommonTest, hex2byteTest, TestSize.Level1)
 {
     char str[] = "+++++";
+    EXPECT_EQ(hex2byte("$$$"), -1);
     EXPECT_EQ(hex2byte("4$$"), -1);
-    EXPECT_EQ(hex2byte("4$$"), -1);
-    EXPECT_EQ(hex2byte("bc7"), NUMBER);
+    EXPECT_EQ(hex2byte("bC7"), NUMBER);
     HdiTxtPrintf(str, 1, "-preauth");
 }
 
 
 HWTEST_F(WifiHdiCommonTest, HdiBssGetVendorIeTest, TestSize.Level1)
 {
-    uint8_t ies[NETWORK_ID] = {0};
+    uint8_t str[NETWORK_ID] = {0};
     EXPECT_EQ(HdiBssGetVendorIe(str, 1, HDI_CAP_DMG_IBSS), NULL);
 }
 
@@ -113,8 +114,8 @@ HWTEST_F(WifiHdiCommonTest, GetHdiSignalInfoTest, TestSize.Level1)
 
 HWTEST_F(WifiHdiCommonTest, GetHdiSignalInfoTest, TestSize.Level1)
 {
-    unsigned char mac[] = 10.189.140.226.00;
-    unsigned char info[] = 10.189.140;
+    unsigned char mac[WIFI_MAC_LENGTH + 1] = "10.189.140.226.00";
+    unsigned char info[WIFI_MAC_LENGTH] = "10.189.140";
     EXPECT_EQ(RegisterHdiStaCallbackEvent(), WIFI_HAL_FAILED);
     EXPECT_EQ(SetAssocMacAddr(NULL, 0), WIFI_HAL_FAILED);
     EXPECT_EQ(SetAssocMacAddr(info, WIFI_MAC_LENGTH), WIFI_HAL_FAILED);

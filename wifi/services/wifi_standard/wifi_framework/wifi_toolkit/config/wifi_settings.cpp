@@ -1318,13 +1318,13 @@ int WifiSettings::SyncWifiConfig()
 int WifiSettings::GetOperatorWifiType()
 {
     std::unique_lock<std::mutex> lock(mWifiConfigMutex);
-    return mWifiConfig.operatorWifiType;
+    return mWifiConfig.staAirplaneMode;
 }
 
 int WifiSettings::SetOperatorWifiType(int type)
 {
     std::unique_lock<std::mutex> lock(mWifiConfigMutex);
-    mWifiConfig.operatorWifiType = type;
+    mWifiConfig.staAirplaneMode = type;
     SyncWifiConfig();
     return 0;
 }
@@ -1793,6 +1793,20 @@ bool WifiSettings::CheckScanOnlyAvailable()
 {
     std::unique_lock<std::mutex> lock(mWifiConfigMutex);
     return mWifiConfig.scanOnlySwitch && (MODE_STATE_CLOSE == mAirplaneModeState);
+}
+
+int WifiSettings::GetStaApExclusionType()
+{
+    std::unique_lock<std::mutex> lock(mWifiConfigMutex);
+    return mWifiConfig.staApExclusionType;
+}
+
+int WifiSettings::SetStaApExclusionType(int type)
+{
+    std::unique_lock<std::mutex> lock(mWifiConfigMutex);
+    mWifiConfig.staApExclusionType = type;
+    SyncWifiConfig();
+    return 0;
 }
 
 }  // namespace Wifi

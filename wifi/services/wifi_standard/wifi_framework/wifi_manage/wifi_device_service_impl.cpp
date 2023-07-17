@@ -226,9 +226,8 @@ ErrCode WifiDeviceServiceImpl::EnableWifi()
     WifiOprMidState apState = WifiConfigCenter::GetInstance().GetApMidState(0);
     if (apState != WifiOprMidState::CLOSED) {
 #ifdef FEATURE_STA_AP_EXCLUSION
-        // support Sta&Ap exclusion
-        errCode = WifiManager::GetInstance().DisableHotspot();
-        if (errCode != WIFI_OPT_SUCCESS && errCode != WIFI_OPT_CLOSE_SUCC_WHEN_CLOSED) {
+        errCode = WifiManager::GetInstance().AutoStopApService(AutoStartOrStopServiceReason::STA_AP_EXCLUSION);
+        if (errCode != WIFI_OPT_CLOSE_SUCC_WHEN_CLOSED) {
             return errCode;
         }
 #else
@@ -292,12 +291,12 @@ ErrCode WifiDeviceServiceImpl::EnableWifi()
         return WIFI_OPT_SUCCESS;
     }
 
-    int operatorWifiType = static_cast<int>(OperatorWifiType::USER_OPEN_WIFI_IN_NO_AIRPLANEMODE);
+    int staAirplaneMode = static_cast<int>(OperatorWifiType::USER_OPEN_WIFI_IN_NO_AIRPLANEMODE);
     if (WifiConfigCenter::GetInstance().GetAirplaneModeState() == MODE_STATE_OPEN) {
-        operatorWifiType = static_cast<int>(OperatorWifiType::USER_OPEN_WIFI_IN_AIRPLANEMODE);
+        staAirplaneMode = static_cast<int>(OperatorWifiType::USER_OPEN_WIFI_IN_AIRPLANEMODE);
         WIFI_LOGI("EnableWifi, current airplane mode is opened, user open wifi!");
     }
-    WifiConfigCenter::GetInstance().SetOperatorWifiType(operatorWifiType);
+    WifiConfigCenter::GetInstance().SetOperatorWifiType(staAirplaneMode);
     return WIFI_OPT_SUCCESS;
 }
 
@@ -329,9 +328,12 @@ ErrCode WifiDeviceServiceImpl::DisableWifi()
 
 #ifdef FEATURE_P2P_SUPPORT
     sptr<WifiP2pServiceImpl> p2pService = WifiP2pServiceImpl::GetInstance();
-    if (p2pService != nullptr && p2pService->DisableP2p() != WIFI_OPT_SUCCESS) {
-        WIFI_LOGE("Disable P2p failed!");
-        return WIFI_OPT_FAILED;
+    if (p2pService != nullptr) {
+        ErrCode errCode = p2pService->DisableP2p();
+        if (errCode != WIFI_OPT_SUCCESS && errCode != WIFI_OPT_CLOSE_SUCC_WHEN_CLOSED) {
+            WIFI_LOGE("Disable P2p failed!");
+            return WIFI_OPT_FAILED;
+        }
     }
 #endif
 

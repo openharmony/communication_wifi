@@ -128,13 +128,13 @@ ErrCode WifiInternalEventDispatcher::AddStaCallback(
         WIFI_LOGE("remote object is null!");
         return WIFI_OPT_INVALID_PARAM;
     }
-    
+
     auto eventIter = g_staCallBackNameEventIdMap.find(eventName);
     if (eventIter == g_staCallBackNameEventIdMap.end()) {
         WIFI_LOGE("%{public}s, Not find callback event, eventName:%{public}s", __func__, eventName.c_str());
         return WIFI_OPT_NOT_SUPPORTED;
     }
-    
+
     if (!VerifyRegisterCallbackPermission(eventIter->second)) {
         WIFI_LOGE("%{public}s, VerifyRegisterCallbackPermission denied!", __func__);
         return WIFI_OPT_PERMISSION_DENIED;
@@ -202,13 +202,13 @@ ErrCode WifiInternalEventDispatcher::AddScanCallback(
         WIFI_LOGE("remote object is null!");
         return WIFI_OPT_INVALID_PARAM;
     }
-    
+
     auto eventIter = g_staCallBackNameEventIdMap.find(eventName);
     if (eventIter == g_staCallBackNameEventIdMap.end()) {
         WIFI_LOGE("%{public}s, Not find callback event, eventName:%{public}s", __func__, eventName.c_str());
         return WIFI_OPT_NOT_SUPPORTED;
     }
-    
+
     if (!VerifyRegisterCallbackPermission(eventIter->second)) {
         WIFI_LOGE("%{public}s, VerifyRegisterCallbackPermission denied!", __func__);
         return WIFI_OPT_PERMISSION_DENIED;
@@ -282,7 +282,7 @@ ErrCode WifiInternalEventDispatcher::AddHotspotCallback(
         WIFI_LOGE("%{public}s, Not find callback event, eventName:%{public}s", __func__, eventName.c_str());
         return WIFI_OPT_NOT_SUPPORTED;
     }
-    
+
     if (!VerifyRegisterCallbackPermission(eventIter->second)) {
         WIFI_LOGE("%{public}s, VerifyRegisterCallbackPermission denied!", __func__);
         return WIFI_OPT_PERMISSION_DENIED;
@@ -393,7 +393,7 @@ ErrCode WifiInternalEventDispatcher::AddP2pCallback(
         WIFI_LOGE("%{public}s, Not find callback event, eventName:%{public}s", __func__, eventName.c_str());
         return WIFI_OPT_NOT_SUPPORTED;
     }
-    
+
     if (!VerifyRegisterCallbackPermission(eventIter->second)) {
         WIFI_LOGE("%{public}s, VerifyRegisterCallbackPermission denied!", __func__);
         return WIFI_OPT_PERMISSION_DENIED;
@@ -546,7 +546,7 @@ void WifiInternalEventDispatcher::InvokeScanCallbacks(const WifiEventCallbackMsg
 #ifdef FEATURE_APP_FROZEN
         int uid = mScanCallBackInfo[remote].callingUid;
         int pid = mScanCallBackInfo[remote].callingPid;
-        isFrozen = SuspendManager::SuspendManagerClient::GetInstance().IsAppFrozen(pid, uid);
+        isFrozen = SuspendManager::SuspendManagerClient::GetInstance().GetAppHardwareProxyStatus(pid, uid);
         WIFI_LOGI("Check calling APP is frozen, uid: %{public}d, pid: %{public}d, isFrozen: %{public}d",
             uid, pid, isFrozen);
 #endif
@@ -584,7 +584,7 @@ void WifiInternalEventDispatcher::InvokeDeviceCallbacks(const WifiEventCallbackM
 #ifdef FEATURE_APP_FROZEN
         int uid = mStaCallBackInfo[remote].callingUid;
         int pid = mStaCallBackInfo[remote].callingPid;
-        isFrozen = SuspendManager::SuspendManagerClient::GetInstance().IsAppFrozen(pid, uid);
+        isFrozen = SuspendManager::SuspendManagerClient::GetInstance().GetAppHardwareProxyStatus(pid, uid);
         WIFI_LOGI("Check calling APP is frozen, uid: %{public}d, pid: %{public}d, isFrozen: %{public}d",
             uid, pid, isFrozen);
 #endif

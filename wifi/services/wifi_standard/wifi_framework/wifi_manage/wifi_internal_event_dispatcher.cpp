@@ -547,7 +547,7 @@ void WifiInternalEventDispatcher::InvokeScanCallbacks(const WifiEventCallbackMsg
         int uid = mScanCallBackInfo[remote].callingUid;
         int pid = mScanCallBackInfo[remote].callingPid;
         isFrozen = SuspendManager::SuspendManagerClient::GetInstance().GetAppHardwareProxyStatus(pid, uid);
-        WIFI_LOGI("Check calling APP is frozen, uid: %{public}d, pid: %{public}d, isFrozen: %{public}d",
+        WIFI_LOGI("Check calling APP is hardwareProxied, uid: %{public}d, pid: %{public}d, hardwareProxied: %{public}d",
             uid, pid, isFrozen);
 #endif
         if (mScanCallBackInfo[remote].regCallBackEventId.count(msg.msgCode) == 0) {
@@ -585,7 +585,7 @@ void WifiInternalEventDispatcher::InvokeDeviceCallbacks(const WifiEventCallbackM
         int uid = mStaCallBackInfo[remote].callingUid;
         int pid = mStaCallBackInfo[remote].callingPid;
         isFrozen = SuspendManager::SuspendManagerClient::GetInstance().GetAppHardwareProxyStatus(pid, uid);
-        WIFI_LOGI("Check calling APP is frozen, uid: %{public}d, pid: %{public}d, isFrozen: %{public}d",
+        WIFI_LOGI("Check calling APP is hardwareProxied, uid: %{public}d, pid: %{public}d, hardwareProxied: %{public}d",
             uid, pid, isFrozen);
 #endif
         if (mStaCallBackInfo[remote].regCallBackEventId.count(msg.msgCode) == 0) {

@@ -129,7 +129,7 @@ HWTEST_F(WifiHalApInterfaceTest, StartHostapdHalTest, TestSize.Level1)
     EXPECT_TRUE(StartHostapdHal(-1) == WIFI_HAL_FAILED);
 }
 
-HWTEST_F(WifiHalApInterfaceTest, StartHostapdHalTest, TestSize.Level1)
+HWTEST_F(WifiHalApInterfaceTest, P2pHalCbServiceDiscoveryResponseTest, TestSize.Level1)
 {
     P2pServDiscRespInfo info;
     P2pServDiscReqInfo infos;

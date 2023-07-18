@@ -20,10 +20,12 @@
 #include "securec.h"
 #include "../../../interfaces/kits/c/wifi_hid2d.h"
 #include "../../../interfaces/kits/c/wifi_device.h"
+#include "wifi_logger.h"
 
 using ::testing::_;
 using ::testing::Return;
 using ::testing::ext::TestSize;
+DEFINE_WIFILOG_LABEL("WifiCHid2dStubTest");
 
 namespace OHOS {
 namespace Wifi {
@@ -70,8 +72,9 @@ HWTEST_F(WifiHid2dTest, Hid2dRemoveGcGroupTests, TestSize.Level1)
 
 HWTEST_F(WifiHid2dTest, Hid2dConnectTests, TestSize.Level1)
 {
-    Hid2dConnectConfig *config;
-    Hid2dConnect(config);
+    WIFI_LOGI("Hid2dConnectTests enter");
+    Hid2dConnectConfig config;
+    Hid2dConnect(&config);
 }
 
 HWTEST_F(WifiHid2dTest, Hid2dConfigIPAddrTests, TestSize.Level1)
@@ -92,9 +95,10 @@ HWTEST_F(WifiHid2dTest, Hid2dReleaseIPAddrTests, TestSize.Level1)
 
 HWTEST_F(WifiHid2dTest, Hid2dGetRecommendChannelTests, TestSize.Level1)
 {
-    RecommendChannelRequest *request = nullptr;
-    RecommendChannelResponse *response = nullptr;
-    Hid2dGetRecommendChannel(request, response);
+    WIFI_LOGI("Hid2dGetRecommendChannelTests enter");
+    RecommendChannelRequest request;
+    RecommendChannelResponse response;
+    Hid2dGetRecommendChannel(&request, &response);
 }
 
 HWTEST_F(WifiHid2dTest, Hid2dGetChannelListFor5GTests, TestSize.Level1)
@@ -106,10 +110,11 @@ HWTEST_F(WifiHid2dTest, Hid2dGetChannelListFor5GTests, TestSize.Level1)
 
 HWTEST_F(WifiHid2dTest, Hid2dGetSelfWifiCfgInfoTests, TestSize.Level1)
 {
+    WIFI_LOGI("Hid2dGetSelfWifiCfgInfoTests enter");
     SelfCfgType cfgType = SelfCfgType::TYPE_OF_GET_SELF_CONFIG;
     char cfgData[CFG_DATA_MAX_BYTES];
-    int* getDatValidLen = nullptr;
-    Hid2dGetSelfWifiCfgInfo(cfgType, cfgData, getDatValidLen);
+    int getDatValidLen = 0;
+    Hid2dGetSelfWifiCfgInfo(cfgType, cfgData, &getDatValidLen);
 }
 
 HWTEST_F(WifiHid2dTest, Hid2dSetPeerWifiCfgInfoTests, TestSize.Level1)

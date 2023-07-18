@@ -31,7 +31,8 @@ constexpr int MAX_DEC = 10;
 constexpr int MAX_HEX = 16;
 constexpr int BUFFER_SIZE = 32;
 constexpr int HALF_PREFIX_LENGTH = 64;
-
+constexpr int MASK_FILTER = 0x7;
+#define DEFAULT_IPV6_ANY_INIT_ADDR "::"
 const Ipv6Address Ipv6Address::INVALID_INET6_ADDRESS(std::string("ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff"),
     MAX_IPV6_PREFIX_LENGTH);
 
@@ -180,6 +181,35 @@ std::string Ipv6Address::GetPrefix() const
     inet_ntop(AF_INET6, &ipv6Prefix, ipv6PrefixBuf, INET6_ADDRSTRLEN);
     std::string prefixStr = ipv6PrefixBuf;
     return prefixStr;
+}
+
+std::string Ipv6Address::GetPrefixByAddr(const std::string &ipv6Addr, unsigned int prefixLen)
+{
+    if (prefixLen >= MAX_IPV6_PREFIX_LENGTH) {
+        return ipv6Addr;
+    }
+
+    in6_addr ipv6AddrBuf = IN6ADDR_ANY_INIT;
+    inet_pton(AF_INET6, ipv6Addr.c_str(), &ipv6AddrBuf);
+
+    char buf[INET6_ADDRSTRLEN] = {0};
+    if (inet_ntop(AF_INET6, &ipv6AddrBuf, buf, INET6_ADDRSTRLEN) == nullptr) {
+        return ipv6Addr;
+    }
+
+    in6_addr ipv6Prefix = IN6ADDR_ANY_INIT;
+    uint32_t byteIndex = prefixLen / CHAR_BIT;
+    if (memset_s(ipv6Prefix.s6_addr, sizeof(ipv6Prefix.s6_addr), 0, sizeof(ipv6Prefix.s6_addr)) != EOK ||
+        memcpy_s(ipv6Prefix.s6_addr, sizeof(ipv6Prefix.s6_addr), &ipv6AddrBuf, byteIndex) != EOK) {
+        return DEFAULT_IPV6_ANY_INIT_ADDR;
+    }
+    uint32_t bitOffset = prefixLen & MASK_FILTER;
+    if ((bitOffset != 0) && (byteIndex < INET_ADDRSTRLEN)) {
+        ipv6Prefix.s6_addr[byteIndex] = ipv6AddrBuf.s6_addr[byteIndex] & (0xff00 >> bitOffset);
+    }
+    char ipv6PrefixBuf[INET6_ADDRSTRLEN] = {0};
+    inet_ntop(AF_INET6, &ipv6Prefix, ipv6PrefixBuf, INET6_ADDRSTRLEN);
+    return ipv6PrefixBuf;
 }
 
 struct in6_addr Ipv6Address::GetIpv6Prefix(struct in6_addr &ip6Addr, size_t prefixLength)

@@ -18,6 +18,8 @@
 #include <cstdint>
 #include "securec.h"
 #include "../../../interfaces/kits/c/wifi_device.h"
+#include "wifi_logger.h"
+#include "mock_wifi_c_device.h"
 
 using ::testing::_;
 using ::testing::AtLeast;
@@ -29,6 +31,7 @@ using ::testing::SetArgReferee;
 using ::testing::StrEq;
 using ::testing::TypedEq;
 using ::testing::ext::TestSize;
+DEFINE_WIFILOG_LABEL("WifiCDeviceStubTest");
 
 namespace OHOS {
 namespace Wifi {
@@ -114,6 +117,57 @@ public:
         EXPECT_TRUE(AddDeviceConfig(&config, &result) != WIFI_SUCCESS);
     }
 
+    void AddDeviceConfigFail2()
+    {
+        WIFI_LOGI("AddDeviceConfigFail2 enter");
+        int result = 0;
+        WifiDeviceConfig config;
+        if (strcpy_s(config.ssid, sizeof(config.ssid), "1networkId1networkId1networkId12") != EOK) {
+            WIFI_LOGE("AddDeviceConfigFail2 strcpy_s ssid Fail!");
+            return;
+        }
+
+        if (memcpy_s(config.bssid, WIFI_MAC_LEN, BSSID, WIFI_MAC_LEN - 1) != EOK) {
+            WIFI_LOGE("AddDeviceConfigFail2 memcpy_s bssid Fail!");
+            return;
+        }
+
+        if (strcpy_s(config.preSharedKey, sizeof(config.preSharedKey), "12345678") != EOK) {
+            WIFI_LOGE("AddDeviceConfigFail2 strcpy_s preSharedKey Fail!");
+            return;
+        }
+        config.securityType = TYPE_OPEN;
+        config.netId = NETWORK_ID;
+        config.freq = FREQUENCY;
+        EXPECT_TRUE(AddDeviceConfig(&config, &result) != WIFI_SUCCESS);
+    }
+
+    void AddDeviceConfigFail3()
+    {
+        WIFI_LOGI("AddDeviceConfigFail3 enter");
+        int result = 0;
+        WifiDeviceConfig config;
+        if (strcpy_s(config.ssid, sizeof(config.ssid), "networkId") != EOK) {
+            WIFI_LOGE("AddDeviceConfigFail3 strcpy_s ssid Fail!");
+            return;
+        }
+
+        if (memcpy_s(config.bssid, WIFI_MAC_LEN, BSSID, WIFI_MAC_LEN - 1) != EOK) {
+            WIFI_LOGE("AddDeviceConfigFail3 memcpy_s bssid Fail!");
+            return;
+        }
+
+        if (strcpy_s(config.preSharedKey, sizeof(config.preSharedKey),
+            "1234567892123456789212345678921234567892123456789212345678921234") != EOK) {
+            WIFI_LOGE("AddDeviceConfigFail3 strcpy_s preSharedKey Fail!");
+            return;
+        }
+        config.securityType = TYPE_OPEN;
+        config.netId = NETWORK_ID;
+        config.freq = FREQUENCY;
+        EXPECT_TRUE(AddDeviceConfig(&config, &result) != WIFI_SUCCESS);
+    }
+
     void GetDeviceConfigsSuccess()
     {
         unsigned int mSize = 0;
@@ -132,6 +186,32 @@ public:
         result.securityType = TYPE_OPEN;
         result.netId = NETWORK_ID;
         result.freq = FREQUENCY;
+        EXPECT_TRUE(GetDeviceConfigs(&result, &mSize) != WIFI_SUCCESS);
+    }
+
+    void GetDeviceConfigsFail()
+    {
+        WIFI_LOGI("GetDeviceConfigsFail enter");
+        unsigned int mSize = 0;
+        WifiDeviceConfig result;
+        if (strcpy_s(result.ssid, sizeof(result.ssid), "networkId") != EOK) {
+            WIFI_LOGE("GetDeviceConfigsFail strcpy_s ssid Fail!");
+            return;
+        }
+
+        if (memcpy_s(result.bssid, WIFI_MAC_LEN, BSSID, WIFI_MAC_LEN - 1) != EOK) {
+            WIFI_LOGE("GetDeviceConfigsFail memcpy_s bssid Fail!");
+            return;
+        }
+
+        if (strcpy_s(result.preSharedKey, sizeof(result.preSharedKey), "12345678") != EOK) {
+            WIFI_LOGE("GetDeviceConfigsFail strcpy_s preSharedKey Fail!");
+            return;
+        }
+        result.securityType = TYPE_OPEN;
+        result.netId = NETWORK_ID;
+        result.freq = FREQUENCY;
+        EXPECT_CALL(WifiCDevice::GetInstance(), GetDeviceConfigs(_, _)).WillRepeatedly(Return(WIFI_OPT_SUCCESS));
         EXPECT_TRUE(GetDeviceConfigs(&result, &mSize) != WIFI_SUCCESS);
     }
 
@@ -171,6 +251,29 @@ public:
         }
 
         if (strcpy_s(config.preSharedKey, sizeof(config.preSharedKey), "12345678") != EOK) {
+            return;
+        }
+        config.netId = NETWORK_ID;
+        config.freq = FREQUENCY;
+        EXPECT_TRUE(ConnectToDevice(&config) != WIFI_SUCCESS);
+    }
+
+    void ConnectToDeviceFail()
+    {
+        WIFI_LOGI("ConnectToDeviceFail enter");
+        WifiDeviceConfig config;
+        if (strcpy_s(config.ssid, sizeof(config.ssid), "1networkId1networkId1networkId12") != EOK) {
+            WIFI_LOGE("ConnectToDeviceFail strcpy_s ssid Fail!");
+            return;
+        }
+
+        if (memcpy_s(config.bssid, WIFI_MAC_LEN, BSSID, WIFI_MAC_LEN - 1) != EOK) {
+            WIFI_LOGE("ConnectToDeviceFail memcpy_s bssid Fail!");
+            return;
+        }
+
+        if (strcpy_s(config.preSharedKey, sizeof(config.preSharedKey), "12345678") != EOK) {
+            WIFI_LOGE("ConnectToDeviceFail strcpy_s preSharedKey Fail!");
             return;
         }
         config.netId = NETWORK_ID;
@@ -270,9 +373,24 @@ HWTEST_F(WifiCDeviceTest, AddDeviceConfigSuccess, TestSize.Level1)
     AddDeviceConfigSuccess();
 }
 
+HWTEST_F(WifiCDeviceTest, AddDeviceConfigFail2, TestSize.Level1)
+{
+    AddDeviceConfigFail2();
+}
+
+HWTEST_F(WifiCDeviceTest, AddDeviceConfigFail3, TestSize.Level1)
+{
+    AddDeviceConfigFail3();
+}
+
 HWTEST_F(WifiCDeviceTest, GetDeviceConfigsSuccess, TestSize.Level1)
 {
     GetDeviceConfigsSuccess();
+}
+
+HWTEST_F(WifiCDeviceTest, GetDeviceConfigsFail, TestSize.Level1)
+{
+    GetDeviceConfigsFail();
 }
 
 HWTEST_F(WifiCDeviceTest, RemoveDeviceSuccess, TestSize.Level1)
@@ -298,6 +416,11 @@ HWTEST_F(WifiCDeviceTest, ConnectToSuccess, TestSize.Level1)
 HWTEST_F(WifiCDeviceTest, ConnectToDeviceSuccess, TestSize.Level1)
 {
     ConnectToDeviceSuccess();
+}
+
+HWTEST_F(WifiCDeviceTest, ConnectToDeviceFail, TestSize.Level1)
+{
+    ConnectToDeviceFail();
 }
 
 HWTEST_F(WifiCDeviceTest, DisconnectSuccess, TestSize.Level1)

@@ -176,7 +176,7 @@ HWTEST_F(WifiHalChipInterfaceTest, GetIfaceTest, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require: issue
 */
-HWTEST_F(WifiHalChipInterfaceTest,ConvertErrorCodeTest, TestSize.Level1)
+HWTEST_F(WifiHalChipInterfaceTest, ConvertErrorCodeTest, TestSize.Level1)
 {
     EXPECT_EQ(ConvertErrorCode(HalVendorError::HAL_VENDOR_SUCCESS), WIFI_HAL_SUCCESS);
     EXPECT_EQ(ConvertErrorCode(HalVendorError::HAL_VENDOR_ERROR_UNKNOWN), WIFI_HAL_VENDOR_UNKNOWN);

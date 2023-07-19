@@ -93,7 +93,7 @@ if (defined(ohos_lite)) {
     part_name = "wifi"
   }
 
-  ohos_shared_library("crpc_client") {
+  ohos_static_library("crpc_client") {
     sources = crpc_client_sources
     include_dirs = [
       "include",
@@ -109,6 +109,18 @@ if (defined(ohos_lite)) {
     ]
     subsystem_name = "communication"
     part_name = "wifi"
+  }
+
+  ohos_static_library("crpc_client_updater") {
+    install_enable = true
+    sources = [ "./src/client_updater.c" ]
+    include_dirs = [ "include" ]
+    cflags_cc = [ "-fno-rtti" ]
+    ldflags = [ "-fPIC" ]
+    deps = [ ":crpc_client" ]
+    subsystem_name = "communication"
+    part_name = "wifi"
+    install_images = [ "updater" ]
   }
 }
 

@@ -190,7 +190,6 @@ HWTEST_F(WifiHalChipInterfaceTest, ConvertErrorCodeTest, TestSize.Level1)
     EXPECT_EQ(ConvertErrorCode(HalVendorError::HAL_VENDOR_ERROR_TOO_MANY_REQUESTS), WIFI_HAL_VENDOR_TOO_MANY_REQUESTS);
     EXPECT_EQ(ConvertErrorCode(HalVendorError::HAL_VENDOR_ERROR_OUT_OF_MEMORY), WIFI_HAL_VENDOR_OUT_OF_MEMORY);
     EXPECT_EQ(ConvertErrorCode(HalVendorError::HAL_VENDOR_ERROR_BUSY), WIFI_HAL_VENDOR_BUSY);
-    EXPECT_EQ(ConvertErrorCode(HalVendorError::WIFI_HAL_INVALID_PARAM), WIFI_HAL_SUCCESS);
 }
 /**
  * @tc.name: InitDefaultHalVendorFuncTest

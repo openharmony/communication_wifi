@@ -25,7 +25,7 @@ void Register(OnTransactPtr handle)
 
 int OnTransact(Context *context)
 {
-    if (g_onTransactPtr == NULL) {
+    if (g_onTransactPtr != NULL) {
         return g_onTransactPtr(context);
     }
     return -1;

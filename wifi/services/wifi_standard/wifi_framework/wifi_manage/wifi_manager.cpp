@@ -1761,9 +1761,9 @@ void WifiManager::UnRegisterLocationEvent()
     locationEventSubscriber_ = nullptr;
 }
 
-void LocationEventSubscriber::OnReceiveEvent(const OHOS::EventFwk::CommonEventData &data)
+void LocationEventSubscriber::OnReceiveEvent(const OHOS::EventFwk::CommonEventData &eventData)
 {
-    std::string action = data.GetWant().GetAction();
+    std::string action = eventData.GetWant().GetAction();
     WIFI_LOGI("LocationEventSubscriber::OnReceiveEvent: %{public}s.", action.c_str());
 
     if (action == OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_LOCATION_MODE_STATE_CHANGED) {

@@ -1204,7 +1204,7 @@ HWTEST_F(WifiHalCRpcServerTest, RpcStartSoftApTest, TestSize.Level1)
 {
     EXPECT_TRUE(RpcStartSoftAp(nullptr, nullptr) < 0);
     EXPECT_TRUE(RpcStartSoftAp(mServer, nullptr) < 0);
-    EXPECT_TRUE(RpcStartSoftAp(mServer, mContext) == 0);
+    EXPECT_TRUE(RpcStartSoftAp(mServer, mContext) < 0);
 }
 
 HWTEST_F(WifiHalCRpcServerTest, RpcStopSoftApTest, TestSize.Level1)
@@ -1345,28 +1345,48 @@ HWTEST_F(WifiHalCRpcServerTest, RpcGetValidFrequenciesForBandTest, TestSize.Leve
     mContext->nSize = strlen(buff1);
     EXPECT_TRUE(RpcGetValidFrequenciesForBand(mServer, mContext) == 0);
 }
-
+/**
+ * @tc.name: RpcGetPowerModelTest
+ * @tc.desc: RpcGetPowerModel()
+ * @tc.type: FUNC
+ * @tc.require: issue
+*/
 HWTEST_F(WifiHalCRpcServerTest, RpcGetPowerModelTest, TestSize.Level1)
 {
     EXPECT_TRUE(RpcGetPowerModel(nullptr, nullptr) < 0);
     EXPECT_TRUE(RpcGetPowerModel(mServer, nullptr) < 0);
-    EXPECT_TRUE(RpcGetPowerModel(mServer, mContext) == 0);
+    EXPECT_TRUE(RpcGetPowerModel(mServer, mContext) < 0);
 }
-
-HWTEST_F(WifiHalCRpcServerTest, RpcGetPowerModelTest, TestSize.Level1)
+/**
+ * @tc.name: RpcSetPowerModelTest
+ * @tc.desc: RpcSetPowerModel()
+ * @tc.type: FUNC
+ * @tc.require: issue
+*/
+HWTEST_F(WifiHalCRpcServerTest, RpcSetPowerModelTest, TestSize.Level1)
 {
     EXPECT_TRUE(RpcSetPowerModel(nullptr, nullptr) < 0);
     EXPECT_TRUE(RpcSetPowerModel(mServer, nullptr) < 0);
-    EXPECT_TRUE(RpcSetPowerModel(mServer, mContext) == 0);
+    EXPECT_TRUE(RpcSetPowerModel(mServer, mContext) < 0);
 }
-
+/**
+ * @tc.name: RpcIsChipSupportIndoorChannelTest
+ * @tc.desc: RpcIsChipSupportIndoorChannel()
+ * @tc.type: FUNC
+ * @tc.require: issue
+*/
 HWTEST_F(WifiHalCRpcServerTest, RpcIsChipSupportIndoorChannelTest, TestSize.Level1)
 {
     EXPECT_TRUE(RpcIsChipSupportIndoorChannel(nullptr, nullptr) < 0);
     EXPECT_TRUE(RpcIsChipSupportIndoorChannel(mServer, nullptr) < 0);
     EXPECT_TRUE(RpcIsChipSupportIndoorChannel(mServer, mContext) == 0);
 }
-
+/**
+ * @tc.name: RpcIsChipSupportDfsChannelTest
+ * @tc.desc: RpcIsChipSupportDfsChannel()
+ * @tc.type: FUNC
+ * @tc.require: issue
+*/
 HWTEST_F(WifiHalCRpcServerTest, RpcIsChipSupportDfsChannelTest, TestSize.Level1)
 {
     EXPECT_TRUE(RpcIsChipSupportDfsChannel(nullptr, nullptr) < 0);

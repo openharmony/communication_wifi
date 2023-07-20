@@ -29,7 +29,7 @@ namespace OHOS {
 namespace Wifi {
 const std::string DHCP_IP_V4_DEFAULT = "192.168.62.2";
 
-WifiHotspotStub::WifiHotspotStub():mSingleCallback(false)
+WifiHotspotStub::WifiHotspotStub():mSingleCallback(false), m_id(0)
 {
     InitHandleMap();
 }

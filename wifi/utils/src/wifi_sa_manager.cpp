@@ -43,8 +43,12 @@ ErrCode WifiSaLoadManager::LoadWifiSa(int32_t systemAbilityId)
         return WIFI_OPT_FAILED;
     }
 
-    auto wifiSaLoadCallback = sptr<WifiSaLoadCallback>(new WifiSaLoadCallback());
-    int32_t ret = samgr->LoadSystemAbility(systemAbilityId, wifiSaLoadCallback);
+    sptr<WifiSaLoadCallback> loadCallback = new (std::nothrow) WifiSaLoadCallback();
+    if (loadCallback == nullptr) {
+        WIFI_LOGE("%{public}s: wifi sa load callback failed!", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    int32_t ret = samgr->LoadSystemAbility(systemAbilityId, loadCallback);
     if (ret != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("%{public}s: Failed to load system ability, SA Id = [%{public}d], ret = [%{public}d].",
             __func__, systemAbilityId, ret);

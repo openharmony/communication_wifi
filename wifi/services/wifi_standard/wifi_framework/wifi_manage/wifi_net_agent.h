@@ -66,9 +66,10 @@ public:
      * Update link information
      *
      * @param wifiIpInfo wifi network link data information
+     * @param wifiIpV6Info wifi network link IPV6 data information
      * @param wifiProxyConfig wifi network link proxy information
      */
-    void UpdateNetLinkInfo(IpInfo &wifiIpInfo, WifiProxyConfig &wifiProxyConfig);
+    void UpdateNetLinkInfo(IpInfo &wifiIpInfo, IpV6Info &wifiIpV6Info, WifiProxyConfig &wifiProxyConfig);
 
     /**
      * Add route
@@ -83,9 +84,10 @@ public:
      * Add OnStaMachineUpdateNetLinkInfo
      *
      * @param wifiIpInfo wifi network link data information
+     * @param wifiIpV6Info wifi ipv6 network link data information
      * @param wifiProxyConfig wifi network link proxy information
      */
-    void OnStaMachineUpdateNetLinkInfo(IpInfo &wifiIpInfo, WifiProxyConfig &wifiProxyConfig);
+    void OnStaMachineUpdateNetLinkInfo(IpInfo &wifiIpInfo, IpV6Info &wifiIpV6Info, WifiProxyConfig &wifiProxyConfig);
 
     /**
      * Add OnStaMachineUpdateNetSupplierInfo
@@ -142,8 +144,19 @@ public:
     };
 private:
     void CreateNetLinkInfo(sptr<NetManagerStandard::NetLinkInfo> &netLinkInfo, IpInfo &wifiIpInfo,
-        WifiProxyConfig &wifiProxyConfig);
+        IpV6Info &wifiIpV6Info, WifiProxyConfig &wifiProxyConfig);
 
+    void SetNetLinkIPInfo(sptr<NetManagerStandard::NetLinkInfo> &netLinkInfo, IpInfo &wifiIpInfo,
+        IpV6Info &wifiIpV6Info);
+
+    void SetNetLinkRouteInfo(sptr<NetManagerStandard::NetLinkInfo> &netLinkInfo, IpInfo &wifiIpInfo,
+        IpV6Info &wifiIpV6Info);
+
+    void SetNetLinkLocalRouteInfo(sptr<NetManagerStandard::NetLinkInfo> &netLinkInfo, IpInfo &wifiIpInfo,
+        IpV6Info &wifiIpV6Info);
+
+    void SetNetLinkDnsInfo(sptr<NetManagerStandard::NetLinkInfo> &netLinkInfo, IpInfo &wifiIpInfo,
+        IpV6Info &wifiIpV6Info);
 private:
     uint32_t supplierId;
     std::shared_ptr<AppExecFwk::EventRunner> netConnEventRunner_ = nullptr;

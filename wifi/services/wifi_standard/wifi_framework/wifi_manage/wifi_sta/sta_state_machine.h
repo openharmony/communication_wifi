@@ -323,6 +323,12 @@ public:
         */
         void OnSerExitNotify(const std::string& ifname) override;
 
+        void TryToCloseDhcpClient(int iptype);
+
+        void TryToSaveIpV4Result(IpInfo &ipInfo, IpV6Info &ipv6Info, DhcpResult &result);
+
+        void TryToSaveIpV6Result(IpInfo &ipInfo, IpV6Info &ipv6Info, DhcpResult &result);
+
     private:
         StaStateMachine *pStaStateMachine;
     };

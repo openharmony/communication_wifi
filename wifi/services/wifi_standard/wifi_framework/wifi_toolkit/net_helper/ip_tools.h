@@ -109,6 +109,14 @@ public:
     static int GetMaskLength(std::string mask);
 
     /**
+     * @Description : Obtains the length based on the subnet mask.
+     *
+     * @param mask - The mask.[in]
+     * @return int
+     */
+    static int GetIPV6MaskLength(std::string mask);
+
+    /**
      * @Description : Resolving Web Sites Bypassing Agents.
      *
      * @param exclusionObjectList - Website list, separated by commas(,).[in]

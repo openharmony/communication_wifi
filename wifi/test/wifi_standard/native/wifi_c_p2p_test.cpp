@@ -16,9 +16,12 @@
 #include <gtest/gtest.h>
 #include "../../../interfaces/kits/c/wifi_p2p.h"
 #include "../../../interfaces/kits/c/wifi_hid2d.h"
+#include "securec.h"
+#include "wifi_logger.h"
 
 using ::testing::Return;
 using ::testing::ext::TestSize;
+DEFINE_WIFILOG_LABEL("WifiCP2PStubTest");
 
 namespace OHOS {
 namespace Wifi {
@@ -150,10 +153,25 @@ HWTEST_F(WifiP2pTest, QueryP2pDevicesTests, TestSize.Level1)
 
 HWTEST_F(WifiP2pTest, QueryP2pLocalDeviceTests, TestSize.Level1)
 {
+    WIFI_LOGI("QueryP2pLocalDeviceTests enter");
     WifiP2pDevice deviceInfo;
     deviceInfo.supportWpsConfigMethods = 1;
     deviceInfo.deviceCapabilitys = 1;
     deviceInfo.groupCapabilitys = 1;
+    if (strcpy_s(deviceInfo.deviceName, sizeof(deviceInfo.deviceName), "device") != EOK) {
+        WIFI_LOGE("QueryP2pLocalDeviceTests strcpy_s deviceName Fail!");
+        return;
+    }
+
+    if (strcpy_s(deviceInfo.primaryDeviceType, sizeof(deviceInfo.primaryDeviceType), "10-0050F204-1") != EOK) {
+        WIFI_LOGE("QueryP2pLocalDeviceTests strcpy_s primaryDeviceType Fail!");
+        return;
+    }
+
+    if (strcpy_s(deviceInfo.secondaryDeviceType, sizeof(deviceInfo.secondaryDeviceType), "10-0050F204-2") != EOK) {
+        WIFI_LOGE("QueryP2pLocalDeviceTests strcpy_s secondaryDeviceType Fail!");
+        return;
+    }
     QueryP2pLocalDevice(&deviceInfo);
 }
 

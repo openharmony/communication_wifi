@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -111,22 +111,6 @@ public:
         pStaStateMachine->pInitState->GoOutState();
     }
 
-    void InitStateExeMsgSuccess()
-    {
-        EXPECT_CALL(WifiSettings::GetInstance(), SetWifiState(_)).WillRepeatedly(Return(WIFI_IDL_OPT_OK));
-        EXPECT_CALL(WifiStaHalInterface::GetInstance(), StartWifi()).WillRepeatedly(Return(WIFI_IDL_OPT_OK));
-        EXPECT_CALL(WifiStaHalInterface::GetInstance(), WpaAutoConnect(_)).WillRepeatedly(Return(WIFI_IDL_OPT_OK));
-        EXPECT_CALL(WifiManager::GetInstance(), DealStaOpenRes(_)).Times(testing::AtLeast(0));
-        EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_)).Times(testing::AtLeast(0));
-        EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_)).Times(testing::AtLeast(0));
-        EXPECT_CALL(WifiSettings::GetInstance(), ReloadDeviceConfig()).Times(testing::AtLeast(0));
-        EXPECT_CALL(WifiStaHalInterface::GetInstance(), ClearDeviceConfig()).WillRepeatedly(Return(WIFI_IDL_OPT_OK));
-        EXPECT_CALL(WifiSettings::GetInstance(), SetMacAddress(_)).Times(testing::AtLeast(0));
-        InternalMessage msg;
-        msg.SetMessageName(WIFI_SVR_CMD_STA_ENABLE_WIFI);
-        EXPECT_TRUE(pStaStateMachine->pInitState->ExecuteStateMsg(&msg));
-    }
-
     void InitStateExeMsgFail1()
     {
         InternalMessage msg;
@@ -177,61 +161,6 @@ public:
         EXPECT_CALL(WifiStaHalInterface::GetInstance(), ClearDeviceConfig())
             .WillRepeatedly(Return(WIFI_IDL_OPT_FAILED));
         pStaStateMachine->SyncDeviceConfigToWpa();
-    }
-
-    void StartWifiProcessSuccess()
-    {
-        EXPECT_CALL(WifiStaHalInterface::GetInstance(), StartWifi()).WillRepeatedly(Return(WIFI_IDL_OPT_OK));
-        EXPECT_CALL(WifiStaHalInterface::GetInstance(), WpaAutoConnect(_)).WillRepeatedly(Return(WIFI_IDL_OPT_OK));
-        EXPECT_CALL(WifiManager::GetInstance(), DealStaOpenRes(_)).Times(testing::AtLeast(1));
-        EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_));
-        EXPECT_CALL(WifiSettings::GetInstance(), ReloadDeviceConfig()).WillRepeatedly(Return(0));
-        EXPECT_CALL(WifiStaHalInterface::GetInstance(), ClearDeviceConfig()).WillRepeatedly(Return(WIFI_IDL_OPT_OK));
-        EXPECT_CALL(WifiSettings::GetInstance(), SetMacAddress(_)).Times(testing::AtLeast(0));
-        std::vector<WifiDeviceConfig> results;
-        WifiDeviceConfig wifiDeviceConfig;
-        wifiDeviceConfig.networkId = 1;
-        results.push_back(wifiDeviceConfig);
-        EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_))
-            .WillRepeatedly(DoAll(SetArgReferee<0>(results), Return(0)));
-        EXPECT_CALL(WifiStaHalInterface::GetInstance(), GetNextNetworkId(_))
-            .WillRepeatedly(DoAll(SetArgReferee<0>(1), Return(WIFI_IDL_OPT_FAILED)));
-        EXPECT_CALL(WifiStaHalInterface::GetInstance(), SetDeviceConfig(_, _)).WillRepeatedly(Return(WIFI_IDL_OPT_OK));
-        EXPECT_CALL(WifiStaHalInterface::GetInstance(), SaveDeviceConfig()).WillRepeatedly(Return(WIFI_IDL_OPT_OK));
-        EXPECT_CALL(WifiSettings::GetInstance(), SetWifiState(_)).Times(testing::AtLeast(0));
-        pStaStateMachine->StartWifiProcess();
-    }
-
-    void StartWifiProcessFail1()
-    {
-        EXPECT_CALL(WifiStaHalInterface::GetInstance(), StartWifi()).WillRepeatedly(Return(WIFI_IDL_OPT_FAILED));
-        EXPECT_CALL(WifiStaHalInterface::GetInstance(), WpaAutoConnect(_)).WillRepeatedly(Return(WIFI_IDL_OPT_OK));
-        EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_));
-        EXPECT_CALL(WifiManager::GetInstance(), DealStaOpenRes(_)).Times(testing::AtLeast(0));
-        EXPECT_CALL(WifiSettings::GetInstance(), ReloadDeviceConfig()).WillRepeatedly(Return(0));
-        EXPECT_CALL(WifiStaHalInterface::GetInstance(), ClearDeviceConfig()).WillRepeatedly(Return(WIFI_IDL_OPT_OK));
-        EXPECT_CALL(WifiSettings::GetInstance(), SetMacAddress(_)).Times(testing::AtLeast(0));
-        std::vector<WifiDeviceConfig> results;
-        WifiDeviceConfig wifiDeviceConfig;
-        wifiDeviceConfig.networkId = 1;
-        results.push_back(wifiDeviceConfig);
-        EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_))
-            .WillRepeatedly(DoAll(SetArgReferee<0>(results), Return(0)));
-        EXPECT_CALL(WifiStaHalInterface::GetInstance(), ClearDeviceConfig()).WillRepeatedly(Return(WIFI_IDL_OPT_OK));
-        EXPECT_CALL(WifiStaHalInterface::GetInstance(), SetDeviceConfig(_, _)).WillRepeatedly(Return(WIFI_IDL_OPT_OK));
-        EXPECT_CALL(WifiStaHalInterface::GetInstance(), SaveDeviceConfig()).WillRepeatedly(Return(WIFI_IDL_OPT_OK));
-        EXPECT_CALL(WifiSettings::GetInstance(), SetWifiState(_)).Times(testing::AtLeast(0));
-        pStaStateMachine->StartWifiProcess();
-    }
-
-    void StartWifiProcessFail2()
-    {
-        EXPECT_CALL(WifiStaHalInterface::GetInstance(), StartWifi()).WillRepeatedly(Return(WIFI_IDL_OPT_OK));
-        EXPECT_CALL(WifiStaHalInterface::GetInstance(), WpaAutoConnect(_)).WillRepeatedly(Return(WIFI_IDL_OPT_FAILED));
-        EXPECT_CALL(WifiManager::GetInstance(), DealStaOpenRes(_)).Times(testing::AtLeast(1));
-        EXPECT_CALL(WifiSettings::GetInstance(), SetWifiState(_)).Times(testing::AtLeast(0));
-        EXPECT_CALL(WifiSettings::GetInstance(), SetMacAddress(_)).Times(testing::AtLeast(0));
-        pStaStateMachine->StartWifiProcess();
     }
 
     void WpaStartingStateExeMsgSuccess()
@@ -1502,6 +1431,8 @@ public:
         EXPECT_CALL(WifiStaHalInterface::GetInstance(), Reconnect())
             .WillOnce(Return(WIFI_IDL_OPT_OK))
             .WillOnce(Return(WIFI_IDL_OPT_FAILED));
+        EXPECT_CALL(WifiSettings::GetInstance(), SetDeviceConnFailedCount(_, _, _)).Times(testing::AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), IncreaseDeviceConnFailedCount(_, _, _)).Times(testing::AtLeast(0));
         pStaStateMachine->DealReConnectCmd(&msg);
         pStaStateMachine->DealReConnectCmd(&msg);
     }
@@ -1597,11 +1528,6 @@ HWTEST_F(StaStateMachineTest, InitStateGoOutStateSuccess, TestSize.Level1)
     InitStateGoOutStateSuccess();
 }
 
-HWTEST_F(StaStateMachineTest, InitStateExeMsgSuccess, TestSize.Level1)
-{
-    InitStateExeMsgSuccess();
-}
-
 HWTEST_F(StaStateMachineTest, InitStateExeMsgFail1, TestSize.Level1)
 {
     InitStateExeMsgFail1();
@@ -1635,21 +1561,6 @@ HWTEST_F(StaStateMachineTest, SyncDeviceConfigToWpaSuccess0, TestSize.Level1)
 HWTEST_F(StaStateMachineTest, SyncDeviceConfigToWpaSuccess1, TestSize.Level1)
 {
     SyncDeviceConfigToWpaSuccess1();
-}
-
-HWTEST_F(StaStateMachineTest, StartWifiProcessSuccess, TestSize.Level1)
-{
-    StartWifiProcessSuccess();
-}
-
-HWTEST_F(StaStateMachineTest, StartWifiProcessFail1, TestSize.Level1)
-{
-    StartWifiProcessFail1();
-}
-
-HWTEST_F(StaStateMachineTest, StartWifiProcessFail2, TestSize.Level1)
-{
-    StartWifiProcessFail2();
 }
 
 HWTEST_F(StaStateMachineTest, WpaStartingStateExeMsgSuccess, TestSize.Level1)

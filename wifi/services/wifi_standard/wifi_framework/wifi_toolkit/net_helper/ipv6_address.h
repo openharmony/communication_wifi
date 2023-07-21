@@ -162,6 +162,14 @@ public:
     std::string GetPrefix() const;
 
     /**
+     * @Description  obtain the IPv6 address prefix in character format.
+     *
+     * @param None
+     * @return string of theIPv6 address prefix.
+     */
+    static std::string GetPrefixByAddr(const std::string &ipv6Addr, unsigned int prefixLen);
+
+    /**
      * @Description  Obtain the description of the network where the
                      current IP address is located, for example,
                      fe80:1234::1/10.

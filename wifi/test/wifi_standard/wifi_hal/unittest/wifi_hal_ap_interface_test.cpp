@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 #include "wifi_hal_ap_interface_test.h"
+#include "wifi_hal_callback.h"
 #include "securec.h"
 #include "wifi_log.h"
 #include "wifi_hal_ap_interface.h"
@@ -61,6 +62,7 @@ HWTEST_F(WifiHalApInterfaceTest, SetHostapdConfigTest, TestSize.Level1)
     StrSafeCopy(config.preSharedKey, sizeof(config.preSharedKey), "adc123456");
     config.preSharedKeyLen = strlen(config.preSharedKey);
     EXPECT_TRUE(SetHostapdConfig(&config, 0) == WIFI_HAL_SUCCESS);
+    EXPECT_TRUE(SetHostapdConfig(&config, -1) == WIFI_HAL_HOSTAPD_NOT_INIT);
 }
 
 HWTEST_F(WifiHalApInterfaceTest, SetMacFilterTest, TestSize.Level1)
@@ -111,7 +113,30 @@ HWTEST_F(WifiHalApInterfaceTest, GetValidFrequenciesForBandTest, TestSize.Level1
 
 HWTEST_F(WifiHalApInterfaceTest, StopSoftApTest, TestSize.Level1)
 {
-    EXPECT_TRUE(StopSoftAp(0) == WIFI_HAL_SUCCESS);
+    EXPECT_TRUE(StopSoftAp(0) == WIFI_HAL_FAILED);
+    EXPECT_TRUE(StopSoftAp(-1) == WIFI_HAL_FAILED);
+}
+
+HWTEST_F(WifiHalApInterfaceTest, StartSoftApTest, TestSize.Level1)
+{
+    EXPECT_TRUE(StartSoftAp(-1) == WIFI_HAL_HOSTAPD_NOT_INIT);
+    EXPECT_TRUE(StartSoftAp(0) == WIFI_HAL_SUCCESS);
+}
+
+HWTEST_F(WifiHalApInterfaceTest, StartHostapdHalTest, TestSize.Level1)
+{
+    EXPECT_TRUE(StartHostapdHal(0) == WIFI_HAL_SUCCESS);
+    EXPECT_TRUE(StartHostapdHal(-1) == WIFI_HAL_FAILED);
+}
+
+HWTEST_F(WifiHalApInterfaceTest, P2pHalCbServiceDiscoveryResponseTest, TestSize.Level1)
+{
+    P2pServDiscRespInfo info;
+    P2pServDiscReqInfo infos;
+    EXPECT_TRUE(StopHostapd() == WIFI_HAL_SUCCESS);
+    P2pHalCbServiceDiscoveryResponse(NULL);
+    P2pHalCbServiceDiscoveryResponse(&info);
+    P2pHalCbServDiscReq(&infos);
 }
 }  // namespace Wifi
 }  // namespace OHOS

@@ -55,7 +55,10 @@ ohos_unittest("native_unittest") {
     "//third_party/googletest/googletest/include",
     "$WIFI_ROOT_DIR/utils/inc",
   ]
-
+  ldflags = [
+    "-fPIC",
+    "--coverage",
+  ]
   deps = [
     "$WIFI_ROOT_DIR/frameworks/native:wifi_sdk",
     "$WIFI_ROOT_DIR/utils:wifi_utils",

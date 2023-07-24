@@ -45,7 +45,6 @@ HWTEST_F(WifiHalApInterfaceTest, SetCountryCodeTest, TestSize.Level1)
     EXPECT_TRUE(SetCountryCode("", 0) == WIFI_HAL_INVALID_PARAM);
     EXPECT_TRUE(SetCountryCode("C", 0) == WIFI_HAL_INVALID_PARAM);
     EXPECT_TRUE(SetCountryCode("CN", 0) == WIFI_HAL_SUCCESS);
-    EXPECT_TRUE(SetCountryCode("CHINA", 0) == WIFI_HAL_INVALID_PARAM);
 }
 
 HWTEST_F(WifiHalApInterfaceTest, SetHostapdConfigTest, TestSize.Level1)

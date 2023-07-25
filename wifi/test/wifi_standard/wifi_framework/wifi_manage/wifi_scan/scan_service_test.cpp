@@ -1114,6 +1114,17 @@ public:
         EXPECT_EQ(true, pScanService->IsExternScanning());
     }
 
+    void IsScanningWithParamTest()
+    {
+        StoreScanConfig storeScanConfig;
+        storeScanConfig.scanningWithParamFlag = true;
+        pScanService->scanConfigMap.emplace(0, storeScanConfig);
+        EXPECT_EQ(true, pScanService->IsScanningWithParam());
+
+        pScanService->scanConfigMap.clear();
+        EXPECT_EQ(false, pScanService->IsScanningWithParam());
+    }
+
     void IsExternScanningFail()
     {
         StoreScanConfig storeScanConfig;
@@ -1394,8 +1405,8 @@ public:
 
     void AllowExternScanByIntervalModeFail1()
     {
-        pScanService->scanTrustMode = true;
-        pScanService->scanTrustSceneIds.emplace(0);
+        pScanService->SetScanTrustMode();
+        pScanService->AddScanTrustSceneId(0);
         EXPECT_EQ(pScanService->AllowExternScanByIntervalMode(0, 0, ScanMode::SYSTEM_TIMER_SCAN), true);
     }
 
@@ -1843,6 +1854,42 @@ public:
     {
         EXPECT_TRUE(pScanService->IsPackageInTrustList("123456|", 0, "123456") == true);
         EXPECT_TRUE(pScanService->IsPackageInTrustList("123456|", 0, "1234") == false);
+    }
+
+    void StartWpaSuccessTest()
+    {
+        EXPECT_CALL(WifiStaHalInterface::GetInstance(), StartWifi()).WillOnce(Return(WIFI_IDL_OPT_OK));
+        EXPECT_TRUE(pScanService->StartWpa() == WIFI_OPT_SUCCESS);
+    }
+
+    void StartWpaFailTest()
+    {
+        EXPECT_CALL(WifiStaHalInterface::GetInstance(), StartWifi()).WillOnce(Return(WIFI_IDL_OPT_FAILED));
+        EXPECT_TRUE(pScanService->StartWpa() == WIFI_OPT_FAILED);
+    }
+
+    void CloseWpaSuccessTest()
+    {
+        EXPECT_CALL(WifiStaHalInterface::GetInstance(), StopWifi()).WillOnce(Return(WIFI_IDL_OPT_OK));
+        EXPECT_TRUE(pScanService->CloseWpa() == WIFI_OPT_SUCCESS);
+    }
+
+    void CloseWpaFailTest()
+    {
+        EXPECT_CALL(WifiStaHalInterface::GetInstance(), StopWifi()).WillOnce(Return(WIFI_IDL_OPT_FAILED));
+        EXPECT_TRUE(pScanService->CloseWpa() == WIFI_OPT_FAILED);
+    }
+
+    void SetScanTrustModeTest()
+    {
+        pScanService->SetScanTrustMode();
+        EXPECT_EQ(pScanService->scanTrustMode, true);
+    }
+
+    void ResetToNonTrustModeTest()
+    {
+        pScanService->ResetToNonTrustMode();
+        EXPECT_EQ(pScanService->scanTrustMode, false);
     }
 
     void AllowScanByMovingFreezeTest1()
@@ -2916,6 +2963,41 @@ HWTEST_F(ScanServiceTest, AllowExternCustomSceneCheck_001, TestSize.Level1)
 HWTEST_F(ScanServiceTest, AllowExternCustomSceneCheck_002, TestSize.Level1)
 {
     AllowExternCustomSceneCheckTest2();
+}
+
+HWTEST_F(ScanServiceTest, StartWpa_001, TestSize.Level1)
+{
+    StartWpaSuccessTest();
+}
+
+HWTEST_F(ScanServiceTest, StartWpa_002, TestSize.Level1)
+{
+    StartWpaFailTest();
+}
+
+HWTEST_F(ScanServiceTest, CloseWpa_001, TestSize.Level1)
+{
+    CloseWpaSuccessTest();
+}
+
+HWTEST_F(ScanServiceTest, CloseWpa_002, TestSize.Level1)
+{
+    CloseWpaFailTest();
+}
+
+HWTEST_F(ScanServiceTest, SetScanTrustMode_001, TestSize.Level1)
+{
+    SetScanTrustModeTest();
+}
+
+HWTEST_F(ScanServiceTest, ResetToNonTrustMode_001, TestSize.Level1)
+{
+    ResetToNonTrustModeTest();
+}
+
+HWTEST_F(ScanServiceTest, IsScanningWithParam_001, TestSize.Level1)
+{
+    IsScanningWithParamTest();
 }
 } // namespace Wifi
 } // namespace OHOS

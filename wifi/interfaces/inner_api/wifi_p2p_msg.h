@@ -20,6 +20,7 @@
 #include <vector>
 #include <climits>
 #include "securec.h"
+#include "wifi_common_msg.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -131,7 +132,6 @@ enum class P2pGroupCapability {
 };
 
 enum class GroupOwnerBand { GO_BAND_AUTO, GO_BAND_2GHZ, GO_BAND_5GHZ };
-
 const int MAX_WFD_SUBELEMS = 12;
 const char DeviceInfoSubelemLenHex[] = {"0006"};
 class WifiP2pWfdInfo {
@@ -168,6 +168,7 @@ public:
         : deviceName(""),
           networkName(""),
           mDeviceAddress(""),
+          deviceAddressType(REAL_DEVICE_ADDRESS),
           primaryDeviceType(""),
           secondaryDeviceType(""),
           status(P2pDeviceStatus::PDS_UNAVAILABLE),
@@ -183,6 +184,8 @@ public:
     const std::string &GetNetworkName() const;
     void SetDeviceAddress(const std::string &deviceAddress);
     const std::string &GetDeviceAddress() const;
+    void SetDeviceAddressType(int devAddressType);
+    int GetDeviceAddressType() const;
     void SetPrimaryDeviceType(const std::string &setPrimaryDeviceType);
     const std::string &GetPrimaryDeviceType() const;
     void SetSecondaryDeviceType(const std::string &deviceType);
@@ -212,6 +215,7 @@ private:
     std::string deviceName; /* the value range is 0 to 32 characters. */
     std::string networkName; /* oper_ssid of peer device */
     std::string mDeviceAddress; /* the device MAC address, the length is 17 characters. */
+    int deviceAddressType; /* the device MAC address type */
     std::string primaryDeviceType;
     std::string secondaryDeviceType;
     P2pDeviceStatus status;
@@ -310,6 +314,7 @@ class WifiP2pConfig {
 public:
     WifiP2pConfig()
         : mDeviceAddress(""),
+          deviceAddressType(REAL_DEVICE_ADDRESS),
           goBand(GroupOwnerBand::GO_BAND_AUTO),
           netId(-1),
           passphrase(""),
@@ -318,6 +323,7 @@ public:
     {}
     WifiP2pConfig(const WifiP2pConfig &config)
         : mDeviceAddress(config.GetDeviceAddress()),
+          deviceAddressType(config.GetDeviceAddressType()),
           goBand(config.GetGoBand()),
           netId(config.GetNetId()),
           passphrase(config.GetPassphrase()),
@@ -328,6 +334,8 @@ public:
     {}
     void SetDeviceAddress(const std::string &deviceAddress);
     const std::string &GetDeviceAddress() const;
+    void SetDeviceAddressType(int addressAddrType);
+    int GetDeviceAddressType() const;
     void SetGoBand(GroupOwnerBand setGoBand);
     GroupOwnerBand GetGoBand() const;
     void SetNetId(int setNetId);
@@ -341,6 +349,7 @@ public:
 
 private:
     std::string mDeviceAddress; /* the device MAC address, the length is 17 characters. */
+    int deviceAddressType; /* the device MAC address type */
     GroupOwnerBand goBand;
     int netId; /* network id, when -2 means persistent and -1 means temporary, else need >= 0 */
     std::string passphrase; /* the value ranges from 8 to 63. */

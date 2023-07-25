@@ -23,6 +23,7 @@
 #include <mutex>
 #include <algorithm>
 #include "wifi_common_def.h"
+#include "wifi_common_msg.h"
 #include "wifi_config_file_impl.h"
 constexpr int RANDOM_STR_LEN = 6;
 constexpr int MSEC = 1000;
@@ -66,6 +67,16 @@ enum class ThermalLevel {
     WARNING = 5,
     EMERGENCY = 6,
 };
+
+#ifdef SUPPORT_RANDOM_MAC_ADDR
+enum class WifiMacAddrInfoType {
+    WIFI_SCANINFO_MACADDR_INFO = 0,
+    WIFI_DEVICE_CONFIG_MACADDR_INFO = 1,
+    HOTSPOT_MACADDR_INFO = 2,
+    P2P_MACADDR_INFO = 3,
+    INVALID_MACADDR_INFO
+};
+#endif
 
 class WifiSettings {
 public:
@@ -1285,7 +1296,48 @@ public:
      * @return int - 0 success
      */
     int SetStaApExclusionType(int type);
-
+#ifdef SUPPORT_RANDOM_MAC_ADDR
+    /**
+     * @Description generate a MAC address
+     *
+     * @param peerBssid - real MAC address[in]
+     * @param randomMacAddr - random MAC address[out]
+     */
+    void GenerateRandomMacAddress(std::string peerBssid, std::string &randomMacAddr);
+    /**
+     * @Description save a MAC address pair
+     *
+     * @param type - MAC address type[in]
+     * @param realMacAddr - real MAC address[in]
+     * @return bool - false fail to save the MAC address, true success to save the MAC address
+     */
+    bool StoreWifiMacAddrPairInfo(WifiMacAddrInfoType type, const std::string &realMacAddr);
+    /**
+     * @Description add a MAC address pair
+     *
+     * @param type - MAC address type[in]
+     * @param macAddrInfo - MAC address info[in]
+     * @param randomMacAddr - random MAC address[out]
+     * @return int - 0 success
+     */
+    int AddMacAddrPairs(WifiMacAddrInfoType type, const WifiMacAddrInfo &macAddrInfo, std::string randomMacAddr);
+    /**
+     * @Description remove a MAC address pair
+     *
+     * @param type - MAC address type[in]
+     * @param macAddrInfo - MAC address info[in]
+     * @return int - 0 success
+     */
+    int RemoveMacAddrPairs(WifiMacAddrInfoType type, const WifiMacAddrInfo &macAddrInfo);
+    /**
+     * @Description query a MAC address pair
+     *
+     * @param type - MAC address type[in]
+     * @param macAddrInfo - MAC address info[in]
+     * @return std::string - an empty string indicates failure  
+     */
+    std::string GetMacAddrPairs(WifiMacAddrInfoType type, const WifiMacAddrInfo &macAddrInfo);
+#endif
 private:
     WifiSettings();
     void InitWifiConfig();
@@ -1341,6 +1393,12 @@ private:
     int mHotspotIdleTimeout;
     DisconnectedReason mLastDiscReason;
 
+    std::map<WifiMacAddrInfo, std::string> mWifiScanMacAddrPair;
+    std::map<WifiMacAddrInfo, std::string> mDeviceConfigMacAddrPair;
+    std::map<WifiMacAddrInfo, std::string> mHotspotMacAddrPair;
+    std::map<WifiMacAddrInfo, std::string> mP2pMacAddrPair;
+
+    std::mutex mMacAddrPairMutex;
     std::mutex mStaMutex;
     std::mutex mApMutex;
     std::mutex mConfigMutex;

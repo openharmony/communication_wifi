@@ -57,7 +57,8 @@
             "wifi_feature_non_seperate_p2p",
             "wifi_feature_non_hdf_driver",
             "wifi_feature_is_random_mac_supported",
-            "wifi_feature_sta_ap_exclusion"
+            "wifi_feature_sta_ap_exclusion",
+            "wifi_feature_with_random_mac_addr"
         ],
         "adapted_system_type": [
             "small",

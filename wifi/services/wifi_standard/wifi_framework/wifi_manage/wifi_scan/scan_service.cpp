@@ -170,7 +170,7 @@ void ScanService::SetEnhanceService(IEnhanceService* enhanceService)
 
 void ScanService::HandleScanStatusReport(ScanStatusReport &scanStatusReport)
 {
-    WIFI_LOGI("Enter ScanService::HandleScanStatusReport.\n");
+    WIFI_LOGI("Enter ScanService::HandleScanStatusReport, status:%{public}d", scanStatusReport.status);
 
     switch (scanStatusReport.status) {
         case SCAN_STARTED_STATUS: {
@@ -653,6 +653,9 @@ bool ScanService::StoreFullScanInfo(
         }
         WifiScanInfo scanInfo;
         scanInfo.bssid = iter->bssid;
+    #ifdef SUPPORT_RANDOM_MAC_ADDR
+        scanInfo.bssidType = REAL_DEVICE_ADDRESS;
+    #endif
         scanInfo.ssid = iter->ssid;
         scanInfo.capabilities = iter->capabilities;
         scanInfo.frequency = iter->frequency;
@@ -686,6 +689,9 @@ bool ScanService::StoreFullScanInfo(
             }
         }
         if (!find) {
+        #ifdef SUPPORT_RANDOM_MAC_ADDR
+            WifiSettings::GetInstance().StoreWifiMacAddrPairInfo(WifiMacAddrInfoType::WIFI_SCANINFO_MACADDR_INFO, storedIter->bssid);
+        #endif
             results.push_back(*storedIter);
         }
         WifiSettings::GetInstance().UpdateLinkedChannelWidth(storedIter->bssid, storedIter->channelWidth);

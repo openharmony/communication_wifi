@@ -1208,7 +1208,7 @@ ErrCode WifiDeviceProxy::GetIpInfo(IpInfo &info)
     return ErrCode(owner.retCode);
 }
 
-ErrCode WifiDeviceProxy::GetIpV6Info(IpV6Info &info)
+ErrCode WifiDeviceProxy::GetIpv6Info(IpV6Info &info)
 {
     if (remoteDied_ || remote_ == nullptr) {
         WIFI_LOGE("failed to %{public}s, remoteDied_: %{public}d, remote_: %{public}d",

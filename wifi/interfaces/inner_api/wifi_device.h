@@ -279,7 +279,7 @@ public:
      * @param info - IpV6Info object
      * @return ErrCode - operation result
      */
-    virtual ErrCode GetIpV6Info(IpV6Info &info) = 0;
+    virtual ErrCode GetIpv6Info(IpV6Info &info) = 0;
 
     /**
      * @Description Reconnect to the currently active network

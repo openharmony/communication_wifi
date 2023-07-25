@@ -283,7 +283,7 @@ public:
      * @param info - IpInfo object
      * @return ErrCode - operation result
      */
-    ErrCode GetIpV6Info(IpV6Info &info) override;
+    ErrCode GetIpv6Info(IpV6Info &info) override;
 
     /**
      * @Description Reconnect to the currently active network

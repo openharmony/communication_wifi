@@ -610,7 +610,7 @@ void WifiDeviceStub::OnGetIpV6Info(uint32_t code, MessageParcel &data, MessagePa
 {
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
     IpV6Info info;
-    ErrCode ret = GetIpV6Info(info);
+    ErrCode ret = GetIpv6Info(info);
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
     if (ret == WIFI_OPT_SUCCESS) {

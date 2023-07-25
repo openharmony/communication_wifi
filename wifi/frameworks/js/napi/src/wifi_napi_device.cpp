@@ -867,14 +867,14 @@ NO_SANITIZE("cfi") napi_value GetIpInfo(napi_env env, napi_callback_info info)
     return result;
 }
 
-NO_SANITIZE("cfi") napi_value GetIpV6Info(napi_env env, napi_callback_info info)
+NO_SANITIZE("cfi") napi_value GetIpv6Info(napi_env env, napi_callback_info info)
 {
     TRACE_FUNC_CALL;
     WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
 
     IpV6Info ipInfo;
     napi_value result;
-    ErrCode ret = wifiDevicePtr->GetIpV6Info(ipInfo);
+    ErrCode ret = wifiDevicePtr->GetIpv6Info(ipInfo);
     if (ret != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("Get ip info fail: %{public}d", ret);
     }

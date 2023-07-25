@@ -445,12 +445,12 @@ static OHOS::Wifi::ErrCode GetIpV6InfoFromCpp(const OHOS::Wifi::IpV6Info& ipInfo
     return OHOS::Wifi::WIFI_OPT_SUCCESS;
 }
 
-NO_SANITIZE("cfi") WifiErrorCode GetIpV6Info(IpV6Info *info)
+NO_SANITIZE("cfi") WifiErrorCode GetIpv6Info(IpV6Info *info)
 {
     CHECK_PTR_RETURN(wifiDevicePtr, ERROR_WIFI_NOT_AVAILABLE);
     CHECK_PTR_RETURN(info, ERROR_WIFI_INVALID_ARGS);
     OHOS::Wifi::IpV6Info ipInfo;
-    OHOS::Wifi::ErrCode ret = wifiDevicePtr->GetIpV6Info(ipInfo);
+    OHOS::Wifi::ErrCode ret = wifiDevicePtr->GetIpv6Info(ipInfo);
     if (ret == OHOS::Wifi::WIFI_OPT_SUCCESS) {
         OHOS::Wifi::ErrCode retValue = GetIpV6InfoFromCpp(ipInfo, info);
         if (retValue != OHOS::Wifi::WIFI_OPT_SUCCESS) {

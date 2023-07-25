@@ -1096,14 +1096,14 @@ ErrCode WifiDeviceServiceImpl::GetIpInfo(IpInfo &info)
     return WIFI_OPT_SUCCESS;
 }
 
-ErrCode WifiDeviceServiceImpl::GetIpV6Info(IpV6Info &info)
+ErrCode WifiDeviceServiceImpl::GetIpv6Info(IpV6Info &info)
 {
     if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
-        WIFI_LOGE("GetIpV6Info:VerifyGetWifiInfoPermission() PERMISSION_DENIED!");
+        WIFI_LOGE("GetIpv6Info:VerifyGetWifiInfoPermission() PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
 
-    WifiConfigCenter::GetInstance().GetIpV6Info(info);
+    WifiConfigCenter::GetInstance().GetIpv6Info(info);
     return WIFI_OPT_SUCCESS;
 }
 

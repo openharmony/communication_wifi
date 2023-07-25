@@ -221,7 +221,7 @@ void WifiNetAgent::OnStaMachineNetManagerRestart(const sptr<NetManagerStandard::
                 IpInfo wifiIpInfo;
                 WifiSettings::GetInstance().GetIpInfo(wifiIpInfo);
                 IpV6Info wifiIpV6Info;
-                WifiSettings::GetInstance().GetIpV6Info(wifiIpV6Info);
+                WifiSettings::GetInstance().GetIpv6Info(wifiIpV6Info);
                 WifiDeviceConfig config;
                 WifiSettings::GetInstance().GetDeviceConfig(linkedInfo.networkId, config);
                 this->UpdateNetLinkInfo(wifiIpInfo, wifiIpV6Info, config.wifiProxyconfig);

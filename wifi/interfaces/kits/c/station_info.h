@@ -52,6 +52,8 @@ typedef struct {
     char *name;
     /** MAC address. For its length, see {@link WIFI_MAC_LEN}. */
     unsigned char macAddress[WIFI_MAC_LEN];
+    /* bssid type. */
+    int macAddressType;
     /** IP address of the station */
     unsigned int ipAddress;
     unsigned short disconnectedReason;

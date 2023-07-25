@@ -21,6 +21,7 @@
 #include <vector>
 #include <cstdint>
 #include <ctime>
+#include "wifi_common_msg.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -114,6 +115,7 @@ struct WifiScanParams {
 struct WifiScanInfo {
     std::string bssid;
     std::string ssid;
+    int bssidType; /* bssid type. */
     /**
      * Network performance, including authentication,
      * key management, and encryption mechanisms
@@ -135,6 +137,7 @@ struct WifiScanInfo {
     int maxSupportedTxLinkSpeed;
     WifiScanInfo()
     {
+        bssidType = REAL_DEVICE_ADDRESS;
         frequency = 0;
         band = 0;
         channelWidth = WifiChannelWidth::WIDTH_INVALID;

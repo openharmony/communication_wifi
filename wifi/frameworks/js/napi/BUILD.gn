@@ -47,7 +47,13 @@ ohos_shared_library("wifi") {
     "src/wifi_napi_p2p.cpp",
     "src/wifi_napi_utils.cpp",
   ]
+
   deps = [ "$WIFI_ROOT_DIR/frameworks/native:wifi_sdk" ]
+
+  defines = []
+  if (wifi_feature_with_random_mac_addr) {
+    defines += [ "SUPPORT_RANDOM_MAC_ADDR" ]
+  }
 
   external_deps = [
     "ability_runtime:app_context",
@@ -102,8 +108,13 @@ ohos_shared_library("wifiext") {
     "napi:ace_napi",
   ]
 
+  defines = []
   if (wifi_feature_with_ap_extension) {
-    defines = [ "FEATURE_AP_EXTENSION" ]
+    defines += [ "FEATURE_AP_EXTENSION" ]
+  }
+
+  if (wifi_feature_with_random_mac_addr) {
+    defines += [ "SUPPORT_RANDOM_MAC_ADDR" ]
   }
 
   relative_install_dir = "module"
@@ -147,6 +158,10 @@ ohos_shared_library("wifi_native_js") {
   deps = [ "$WIFI_ROOT_DIR/frameworks/native:wifi_sdk" ]
 
   defines = [ "ENABLE_NAPI_COMPATIBLE" ]
+
+  if (wifi_feature_with_random_mac_addr) {
+    defines += [ "SUPPORT_RANDOM_MAC_ADDR" ]
+  }
 
   external_deps = [
     "ability_runtime:app_context",
@@ -198,6 +213,11 @@ ohos_shared_library("wifimanager") {
   ]
   deps = [ "$WIFI_ROOT_DIR/frameworks/native:wifi_sdk" ]
   defines = [ "ENABLE_NAPI_WIFI_MANAGER" ]
+
+  if (wifi_feature_with_random_mac_addr) {
+    defines += [ "SUPPORT_RANDOM_MAC_ADDR" ]
+  }
+
   external_deps = [
     "ability_runtime:app_context",
     "access_token:libaccesstoken_sdk",
@@ -244,6 +264,9 @@ ohos_shared_library("wifimanagerext") {
   defines = [ "ENABLE_NAPI_WIFI_MANAGER" ]
   if (wifi_feature_with_ap_extension) {
     defines += [ "FEATURE_AP_EXTENSION" ]
+  }
+  if (wifi_feature_with_random_mac_addr) {
+    defines += [ "SUPPORT_RANDOM_MAC_ADDR" ]
   }
   external_deps = [
     "ability_runtime:app_context",

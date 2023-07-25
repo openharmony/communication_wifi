@@ -39,6 +39,7 @@ typedef enum GroupOwnerBand {
 
 typedef struct WifiP2pConfig {
     unsigned char devAddr[COMMON_MAC_LEN]; /* the device MAC address */
+    int bssidType; /* bssid type */
     GroupOwnerBand goBand;
     int netId; /* network id, when -2 means persistent and -1 means temporary, else need >= 0 */
     char passphrase[PASSPHRASE_LENGTH]; /* the value ranges from 8 to 63. */
@@ -86,6 +87,7 @@ typedef struct WifiP2pWfdInfo {
 typedef struct WifiP2pDevice {
     char deviceName[P2P_NAME_LENGTH]; /* the value range is 0 to 32 characters. */
     unsigned char devAddr[COMMON_MAC_LEN]; /* the device MAC address */
+    int bssidType; /* bssid type. */
     char primaryDeviceType[DEVICE_TYPE_LENGTH];
     char secondaryDeviceType[DEVICE_TYPE_LENGTH];
     P2pDeviceStatus status;

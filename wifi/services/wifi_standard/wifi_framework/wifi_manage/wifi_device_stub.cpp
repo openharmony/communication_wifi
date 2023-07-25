@@ -243,6 +243,9 @@ void WifiDeviceStub::ReadWifiDeviceConfig(MessageParcel &data, WifiDeviceConfig 
     config.networkId = data.ReadInt32();
     config.status = data.ReadInt32();
     config.bssid = data.ReadString();
+#ifdef SUPPORT_RANDOM_MAC_ADDR
+    config.bssidType = data.ReadInt32();
+#endif
     config.ssid = data.ReadString();
     config.band = data.ReadInt32();
     config.channel = data.ReadInt32();
@@ -308,6 +311,9 @@ void WifiDeviceStub::WriteWifiDeviceConfig(MessageParcel &reply, const WifiDevic
     reply.WriteInt32(config.networkId);
     reply.WriteInt32(config.status);
     reply.WriteString(config.bssid);
+#ifdef SUPPORT_RANDOM_MAC_ADDR
+    reply.WriteInt32(config.bssidType);
+#endif
     reply.WriteString(config.ssid);
     reply.WriteInt32(config.band);
     reply.WriteInt32(config.channel);

@@ -89,6 +89,9 @@ static void ConvertConfigCToCpp(const WifiP2pConfig* config, OHOS::Wifi::WifiP2p
 {
     CHECK_PTR_RETURN_VOID(config);
     cppConfig.SetDeviceAddress(OHOS::Wifi::MacArrayToStr(config->devAddr));
+#ifdef SUPPORT_RANDOM_MAC_ADDR
+    cppConfig.SetDeviceAddressType(config->bssidType);
+#endif
     cppConfig.SetGoBand(OHOS::Wifi::GroupOwnerBand(static_cast<int>(config->goBand)));
     cppConfig.SetNetId(config->netId);
     cppConfig.SetPassphrase(config->passphrase);

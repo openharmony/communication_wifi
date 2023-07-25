@@ -26,6 +26,9 @@ static void DeviceInfoToJs(const napi_env& env, const WifiP2pDevice& device, nap
 {
     SetValueUtf8String(env, "deviceName", device.GetDeviceName().c_str(), result);
     SetValueUtf8String(env, "deviceAddress", device.GetDeviceAddress().c_str(), result);
+#ifdef SUPPORT_RANDOM_MAC_ADDR
+    SetValueInt32(env, "deviceAddressType", device.GetDeviceAddressType(), result);
+#endif
     SetValueUtf8String(env, "primaryDeviceType", device.GetPrimaryDeviceType().c_str(), result);
     SetValueInt32(env, "deviceStatus", static_cast<int>(device.GetP2pDeviceStatus()), result);
     SetValueInt32(env, "groupCapabilitys", device.GetGroupCapabilitys(), result);

@@ -33,6 +33,8 @@ public:
     virtual WifiErrorNo StartPnoScan(const WifiPnoScanParam &scanParam) = 0;
     virtual WifiErrorNo StopPnoScan(void) = 0;
     virtual WifiErrorNo GetSupportFrequencies(int band, std::vector<int> &frequencies) = 0;
+    virtual WifiErrorNo StartWifi() = 0;
+    virtual WifiErrorNo StopWifi() = 0;
 };
 
 class WifiStaHalInterface : public MockWifiStaHalInterface {
@@ -45,6 +47,8 @@ public:
     MOCK_METHOD1(StartPnoScan, WifiErrorNo(const WifiPnoScanParam &scanParam));
     MOCK_METHOD0(StopPnoScan, WifiErrorNo(void));
     MOCK_METHOD2(GetSupportFrequencies, WifiErrorNo(int band, std::vector<int> &frequencies));
+    MOCK_METHOD0(StartWifi, WifiErrorNo());
+    MOCK_METHOD0(StopWifi, WifiErrorNo());
 };
 }  // namespace Wifi
 }  // namespace OHOS

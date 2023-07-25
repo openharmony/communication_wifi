@@ -244,10 +244,12 @@ ErrCode WifiHotspotServiceImpl::GetStationList(std::vector<StationInfo> &result)
             return WIFI_OPT_PERMISSION_DENIED;
         }
 
+    #ifndef SUPPORT_RANDOM_MAC_ADDR
         if (WifiPermissionUtils::VerifyGetScanInfosPermission() == PERMISSION_DENIED) {
             WIFI_LOGE("GetStationList:VerifyGetScanInfosPermission PERMISSION_DENIED!");
             return WIFI_OPT_PERMISSION_DENIED;
         }
+    #endif
 
         if (WifiPermissionUtils::VerifyManageWifiHotspotPermission() == PERMISSION_DENIED) {
             WIFI_LOGE("GetStationList:VerifyManageWifiHotspotPermission PERMISSION_DENIED!");
@@ -265,7 +267,25 @@ ErrCode WifiHotspotServiceImpl::GetStationList(std::vector<StationInfo> &result)
         WIFI_LOGE("Instance %{public}d get hotspot service is null!", m_id);
         return WIFI_OPT_AP_NOT_OPENED;
     }
-    return pService->GetStationList(result);
+    ErrCode errCode = pService->GetStationList(result);
+#ifdef SUPPORT_RANDOM_MAC_ADDR
+    if (WifiPermissionUtils::VerifyGetWifiPeersMacPermission() == PERMISSION_DENIED) {
+        WIFI_LOGI("GetStationList: GET_WIFI_PEERS_MAC PERMISSION_DENIED");
+        for (auto iter = result.begin(); iter != result.end(); ++iter) {
+            WifiMacAddrInfo macAddrInfo;
+            macAddrInfo.bssid = iter->bssid;
+            macAddrInfo.bssidType = iter->bssidType;
+            std::string randomMacAddr =
+                WifiSettings::GetInstance().GetMacAddrPairs(WifiMacAddrInfoType::HOTSPOT_MACADDR_INFO, macAddrInfo);
+            if (!randomMacAddr.empty() &&
+                (macAddrInfo.bssidType == REAL_DEVICE_ADDRESS)) {
+                iter->bssid = randomMacAddr;
+                iter->bssidType = RANDOM_DEVICE_ADDRESS;
+            }
+        }
+    }
+#endif
+    return errCode;
 }
 
 ErrCode WifiHotspotServiceImpl::DisassociateSta(const StationInfo &info)

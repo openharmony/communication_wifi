@@ -104,6 +104,11 @@ if (defined(ohos_lite)) {
       "$WIFI_ROOT_DIR/utils:wifi_utils",
     ]
 
+    defines = []
+    if (wifi_feature_with_random_mac_addr) {
+      defines += [ "SUPPORT_RANDOM_MAC_ADDR" ]
+    }
+
     external_deps = [
       "ability_base:want",
       "c_utils:utils",

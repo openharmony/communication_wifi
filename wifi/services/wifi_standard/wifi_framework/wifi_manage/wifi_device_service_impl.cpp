@@ -43,6 +43,8 @@
 #include "xcollie/watchdog.h"
 #include "wifi_sa_manager.h"
 #include "define.h"
+#include "wifi_settings.h"
+#include "mac_address.h"
 #endif
 DEFINE_WIFILOG_LABEL("WifiDeviceServiceImpl");
 namespace OHOS {
@@ -583,7 +585,32 @@ ErrCode WifiDeviceServiceImpl::AddDeviceConfig(const WifiDeviceConfig &config, i
     if (!IsStaServiceRunning()) {
         return WIFI_OPT_STA_NOT_OPENED;
     }
-
+    WifiDeviceConfig updateConfig = config;
+#ifdef SUPPORT_RANDOM_MAC_ADDR
+    WifiMacAddrInfo macAddrInfo;
+    macAddrInfo.bssid = config.bssid;
+    macAddrInfo.bssidType = config.bssidType;
+    std::string macAddr =
+        WifiSettings::GetInstance().GetMacAddrPairs(WifiMacAddrInfoType::WIFI_DEVICE_CONFIG_MACADDR_INFO, macAddrInfo);
+    if (macAddr.empty()) {
+        std::string randomMac;
+        WifiSettings::GetInstance().GenerateRandomMacAddress(config.bssid, randomMac);
+        WifiSettings::GetInstance().AddMacAddrPairs(WifiMacAddrInfoType::WIFI_DEVICE_CONFIG_MACADDR_INFO, macAddrInfo, randomMac);
+        WIFI_LOGI("add a new record, bssid:%{public}s, bssidType:%{public}d, randomMac:%{public}s",
+            config.bssid.c_str(), config.bssidType, randomMac.c_str());
+    } else {
+        WIFI_LOGI("the record is exists, bssid:%{public}s, bssidType:%{public}d, randomMac:%{public}s",
+            config.bssid.c_str(), config.bssidType, macAddr.c_str());
+        /* random MAC address are translated into real MAC address */
+        if (!config.bssid.empty() &&
+            config.bssidType == RANDOM_DEVICE_ADDRESS) {
+            updateConfig.bssid = macAddr;
+            updateConfig.bssidType = REAL_DEVICE_ADDRESS;
+            WIFI_LOGI("after the record is updated, bssid:%{public}s, bssidType:%{public}d, randomMac:%{public}s",
+                updateConfig.bssid.c_str(), updateConfig.bssidType, macAddr.c_str());
+        }
+    }
+#endif
     IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst();
     if (pService == nullptr) {
         return WIFI_OPT_STA_NOT_OPENED;
@@ -595,10 +622,10 @@ ErrCode WifiDeviceServiceImpl::AddDeviceConfig(const WifiDeviceConfig &config, i
             WIFI_LOGE("CheckCallingUid failed!");
             return WIFI_OPT_INVALID_PARAM;
         }
-        return pService->AddCandidateConfig(uid, config, result);
+        return pService->AddCandidateConfig(uid, updateConfig, result);
     }
 
-    int retNetworkId = pService->AddDeviceConfig(config);
+    int retNetworkId = pService->AddDeviceConfig(updateConfig);
     if (retNetworkId < 0) {
         return WIFI_OPT_FAILED;
     }
@@ -711,10 +738,12 @@ ErrCode WifiDeviceServiceImpl::GetDeviceConfigs(std::vector<WifiDeviceConfig> &r
             return WIFI_OPT_PERMISSION_DENIED;
         }
 
+    #ifndef SUPPORT_RANDOM_MAC_ADDR
         if (WifiPermissionUtils::VerifyGetScanInfosPermission() == PERMISSION_DENIED) {
             WIFI_LOGE("GetDeviceConfigs:VerifyGetWifiInfoPermission() PERMISSION_DENIED!");
             return WIFI_OPT_PERMISSION_DENIED;
         }
+    #endif
 
         if (!isCandidate) {
             if (WifiPermissionUtils::VerifyGetWifiConfigPermission() == PERMISSION_DENIED) {
@@ -875,12 +904,38 @@ ErrCode WifiDeviceServiceImpl::ConnectToDevice(const WifiDeviceConfig &config)
         WIFI_LOGE("ConnectToDevice: sta service is not running!");
         return WIFI_OPT_STA_NOT_OPENED;
     }
+    WifiDeviceConfig updateConfig = config;
+#ifdef SUPPORT_RANDOM_MAC_ADDR
+    if (MacAddress::IsValidMac(config.bssid)) {
+        WifiMacAddrInfo macAddrInfo;
+        macAddrInfo.bssid = config.bssid;
+        macAddrInfo.bssidType = config.bssidType;
+        std::string randomMacAddr =
+            WifiSettings::GetInstance().GetMacAddrPairs(WifiMacAddrInfoType::WIFI_DEVICE_CONFIG_MACADDR_INFO, macAddrInfo);
+        if (!randomMacAddr.empty()) {
+            WIFI_LOGE("abnormal data, bssid:%{public}s, bssidType:%{public}d",
+                macAddrInfo.bssid.c_str(), macAddrInfo.bssidType);
+            return WIFI_OPT_INVALID_PARAM;
+        } else {
+            WIFI_LOGI("find the record, bssid:%{public}s, bssidType:%{public}d, randomMac:%{public}s",
+                config.bssid.c_str(), config.bssidType, randomMacAddr.c_str());
+            /* random MAC address are translated into real MAC address */
+            if (config.bssidType == RANDOM_DEVICE_ADDRESS) {
+                updateConfig.bssid = randomMacAddr;
+                updateConfig.bssidType = REAL_DEVICE_ADDRESS;
+                WIFI_LOGI("after the record is updated, bssid:%{public}s, bssidType:%{public}d, randomMac:%{public}s",
+                    updateConfig.bssid.c_str(), updateConfig.bssidType, randomMacAddr.c_str());
+            }
+        }
+    }
+#endif
+
     IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst();
     if (pService == nullptr) {
         WIFI_LOGE("ConnectToNetwork: pService is nullptr!");
         return WIFI_OPT_STA_NOT_OPENED;
     }
-    return pService->ConnectToDevice(config);
+    return pService->ConnectToDevice(updateConfig);
 }
 
 ErrCode WifiDeviceServiceImpl::IsConnected(bool &isConnected)

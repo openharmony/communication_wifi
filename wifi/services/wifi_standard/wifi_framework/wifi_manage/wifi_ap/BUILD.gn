@@ -91,6 +91,10 @@ ohos_shared_library("wifi_ap_service") {
     defines += [ "WIFI_DHCP_DISABLED" ]
   }
 
+  if (wifi_feature_with_random_mac_addr) {
+    defines += [ "SUPPORT_RANDOM_MAC_ADDR" ]
+  }
+
   part_name = "wifi"
   subsystem_name = "communication"
 }

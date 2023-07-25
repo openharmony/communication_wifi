@@ -400,6 +400,8 @@ struct WifiDeviceConfig {
     std::string bssid;
     /* network name */
     std::string ssid;
+    /* bssid type. */
+    int bssidType;
     int band;
     int channel;
     int frequency;
@@ -448,6 +450,7 @@ struct WifiDeviceConfig {
     {
         networkId = INVALID_NETWORK_ID;
         status = static_cast<int>(WifiDeviceConfigStatus::DISABLED);
+        bssidType = REAL_DEVICE_ADDRESS;
         band = 0;
         channel = 0;
         frequency = 0;

@@ -83,6 +83,9 @@ NO_SANITIZE("cfi") WifiErrorCode GetScanInfoList(WifiScanInfo *result, unsigned 
             WIFI_LOGE("Scan info convert bssid error!");
             return ERROR_WIFI_UNKNOWN;
         }
+    #ifdef SUPPORT_RANDOM_MAC_ADDR
+        result->bssidType = vecScanInfos[i].bssidType;
+    #endif
         result->securityType = static_cast<int>(vecScanInfos[i].securityType);
         result->rssi = vecScanInfos[i].rssi;
         result->band = vecScanInfos[i].band;
@@ -188,6 +191,10 @@ static OHOS::Wifi::ErrCode ConvertDeviceConfigFromCpp(const OHOS::Wifi::WifiDevi
         WIFI_LOGE("device config convert bssid error!");
         return OHOS::Wifi::WIFI_OPT_FAILED;
     }
+#ifdef SUPPORT_RANDOM_MAC_ADDR
+    result->bssidType = deviceConfig.bssidType;
+#endif
+
     if (memcpy_s(result->preSharedKey, WIFI_MAX_KEY_LEN, deviceConfig.preSharedKey.c_str(), WIFI_MAX_KEY_LEN) != EOK) {
         return OHOS::Wifi::WIFI_OPT_FAILED;
     }

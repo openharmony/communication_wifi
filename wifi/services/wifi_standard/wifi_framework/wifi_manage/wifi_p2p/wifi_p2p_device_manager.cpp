@@ -14,6 +14,7 @@
  */
 #include "wifi_p2p_device_manager.h"
 #include "wifi_logger.h"
+#include "wifi_settings.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -92,6 +93,7 @@ bool WifiP2pDeviceManager::UpdateDeviceSupplicantInf(const WifiP2pDevice &device
     for (auto it = p2pDevices.begin(); it != p2pDevices.end(); it++) {
         if (*it == device) {
             it->SetDeviceName(device.GetDeviceName());
+            it->SetDeviceAddressType(REAL_DEVICE_ADDRESS);
             it->SetPrimaryDeviceType(device.GetPrimaryDeviceType());
             it->SetSecondaryDeviceType(device.GetSecondaryDeviceType());
             it->SetWpsConfigMethod(device.GetWpsConfigMethod());
@@ -100,6 +102,9 @@ bool WifiP2pDeviceManager::UpdateDeviceSupplicantInf(const WifiP2pDevice &device
             return true;
         }
     }
+#ifdef SUPPORT_RANDOM_MAC_ADDR
+    WifiSettings::GetInstance().StoreWifiMacAddrPairInfo(WifiMacAddrInfoType::P2P_MACADDR_INFO, device.GetDeviceAddress());
+#endif
     /* add its if not found . be careful of the return value */
     p2pDevices.push_back(device);
     return true;

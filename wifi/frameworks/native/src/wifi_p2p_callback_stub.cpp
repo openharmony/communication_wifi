@@ -198,6 +198,9 @@ void WifiP2pCallbackStub::ReadWifiP2pDeviceData(MessageParcel &data, WifiP2pDevi
 {
     device.SetDeviceName(data.ReadString());
     device.SetDeviceAddress(data.ReadString());
+#ifdef SUPPORT_RANDOM_MAC_ADDR
+    device.SetDeviceAddressType(data.ReadInt32());
+#endif
     device.SetPrimaryDeviceType(data.ReadString());
     device.SetSecondaryDeviceType(data.ReadString());
     device.SetP2pDeviceStatus(static_cast<P2pDeviceStatus>(data.ReadInt32()));

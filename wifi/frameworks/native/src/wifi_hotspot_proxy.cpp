@@ -331,6 +331,9 @@ ErrCode WifiHotspotProxy::GetStationList(std::vector<StationInfo> &result)
         info.deviceName = (readStr != nullptr) ? readStr : "";
         readStr = reply.ReadCString();
         info.bssid = (readStr != nullptr) ? readStr : "";
+    #ifdef SUPPORT_RANDOM_MAC_ADDR
+        info.bssidType = reply.ReadInt32();
+    #endif
         readStr = reply.ReadCString();
         info.ipAddr = (readStr != nullptr) ? readStr : "";
         result.emplace_back(info);

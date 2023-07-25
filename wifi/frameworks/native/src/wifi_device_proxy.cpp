@@ -1099,7 +1099,7 @@ ErrCode WifiDeviceProxy::GetIpInfo(IpInfo &info)
     return WIFI_OPT_SUCCESS;
 }
 
-ErrCode WifiDeviceProxy::GetIpV6Info(IpV6Info &info)
+ErrCode WifiDeviceProxy::GetIpv6Info(IpV6Info &info)
 {
     if (mRemoteDied) {
         WIFI_LOGE("failed to `%{public}s`,remote service is died!", __func__);

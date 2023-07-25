@@ -147,14 +147,14 @@ TEST_F(ApStateMachine_test, OnApStateChange)
 
 TEST_F(ApStateMachine_test, BroadCastStationJoin)
 {
-    const StationInfo BroadCastStation = {"test1", "aa:bb:cc:dd:ee:ff", "127.0.0.1"};
+    const StationInfo BroadCastStation = {"test1", "aa:bb:cc:dd:ee:ff", 1, "127.0.0.1"};
     WrapBroadCastStationJoin(BroadCastStation);
     EXPECT_EQ(BroadCastStation, m_sta);
 }
 
 TEST_F(ApStateMachine_test, BroadCastStationLeave)
 {
-    const StationInfo BroadCastStation = {"test1", "aa:bb:cc:dd:ee:ff", "127.0.0.1"};
+    const StationInfo BroadCastStation = {"test1", "aa:bb:cc:dd:ee:ff", 1, "127.0.0.1"};
     WrapBroadCastStationChangeDefult(BroadCastStation);
     WrapBroadCastStationLeave(BroadCastStation);
     EXPECT_EQ(BroadCastStation, m_sta);

@@ -246,7 +246,7 @@ WifiErrorCode GetIpInfo(IpInfo *info);
  * in {@link WifiErrorCode} otherwise.
  * @since 7
  */
-WifiErrorCode GetIpV6Info(IpV6Info *info);
+WifiErrorCode GetIpv6Info(IpV6Info *info);
 
 /**
  * @brief Obtains the signal level indicated by a specified received signal strength indicator (RSSI) and frequency

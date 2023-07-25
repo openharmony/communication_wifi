@@ -146,7 +146,7 @@ public:
     {
         return WIFI_OPT_SUCCESS;
     }
-    ErrCode GetIpV6Info(IpV6Info &info) override
+    ErrCode GetIpv6Info(IpV6Info &info) override
     {
         return WIFI_OPT_SUCCESS;
     }

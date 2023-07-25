@@ -145,11 +145,12 @@ ErrCode WifiScanServiceImpl::Scan()
             WIFI_LOGE("Scan:VerifySetWifiInfoPermission PERMISSION_DENIED!");
             return WIFI_OPT_PERMISSION_DENIED;
         }
-
+    #ifndef SUPPORT_RANDOM_MAC_ADDR
         if (WifiPermissionUtils::VerifyGetScanInfosPermission() == PERMISSION_DENIED) {
             WIFI_LOGE("Scan:VerifyGetScanInfosPermission PERMISSION_DENIED!");
             return WIFI_OPT_PERMISSION_DENIED;
         }
+    #endif
     }
 
     if (!IsScanServiceRunning()) {
@@ -217,15 +218,33 @@ ErrCode WifiScanServiceImpl::GetScanInfoList(std::vector<WifiScanInfo> &result)
             WIFI_LOGE("GetScanInfoList:VerifyGetWifiInfoPermission PERMISSION_DENIED!");
             return WIFI_OPT_PERMISSION_DENIED;
         }
-
+    #ifndef SUPPORT_RANDOM_MAC_ADDR
         if ((WifiPermissionUtils::VerifyGetScanInfosPermission() == PERMISSION_DENIED) &&
             (WifiPermissionUtils::VerifyGetWifiPeersMacPermission() == PERMISSION_DENIED)) {
             WIFI_LOGE("GetScanInfoList:GET_WIFI_PEERS_MAC && LOCATION PERMISSION_DENIED!");
             return WIFI_OPT_PERMISSION_DENIED;
         }
+    #endif
     }
 
     WifiConfigCenter::GetInstance().GetScanInfoList(result);
+#ifdef SUPPORT_RANDOM_MAC_ADDR
+    if (WifiPermissionUtils::VerifyGetWifiPeersMacPermission() == PERMISSION_DENIED) {
+        WIFI_LOGI("GetScanInfoList: GET_WIFI_PEERS_MAC PERMISSION_DENIED");
+        for (auto iter = result.begin(); iter != result.end(); ++iter) {
+            WifiMacAddrInfo macAddrInfo;
+            macAddrInfo.bssid = iter->bssid;
+            macAddrInfo.bssidType = iter->bssidType;
+            std::string randomMacAddr =
+                WifiSettings::GetInstance().GetMacAddrPairs(WifiMacAddrInfoType::WIFI_SCANINFO_MACADDR_INFO, macAddrInfo);
+            if (!randomMacAddr.empty() &&
+                (macAddrInfo.bssidType == REAL_DEVICE_ADDRESS)) {
+                iter->bssid = randomMacAddr;
+                iter->bssidType = RANDOM_DEVICE_ADDRESS;
+            }
+        }
+    }
+#endif
     return WIFI_OPT_SUCCESS;
 }
 

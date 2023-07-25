@@ -118,6 +118,16 @@ void WifiP2pDevice::SetPrimaryDeviceType(const std::string &setPrimaryDeviceType
     primaryDeviceType = setPrimaryDeviceType;
 }
 
+void WifiP2pDevice::SetDeviceAddressType(int devAddressType)
+{
+    deviceAddressType = devAddressType;
+}
+
+int WifiP2pDevice::GetDeviceAddressType() const
+{
+    return deviceAddressType;
+}
+
 const std::string &WifiP2pDevice::GetPrimaryDeviceType() const
 {
     return primaryDeviceType;
@@ -450,6 +460,16 @@ void WifiP2pConfig::SetDeviceAddress(const std::string &deviceAddress)
 const std::string &WifiP2pConfig::GetDeviceAddress() const
 {
     return mDeviceAddress;
+}
+
+void WifiP2pConfig::SetDeviceAddressType(int devAddressType)
+{
+    deviceAddressType = devAddressType;
+}
+
+int WifiP2pConfig::GetDeviceAddressType() const
+{
+    return deviceAddressType;
 }
 
 void WifiP2pConfig::SetGoBand(GroupOwnerBand setGoBand)

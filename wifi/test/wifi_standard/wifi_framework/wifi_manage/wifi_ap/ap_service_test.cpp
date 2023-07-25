@@ -36,6 +36,7 @@ namespace Wifi {
 const StationInfo staInfo = {
     "test_deviceName",
     "AA:BB:CC:DD:EE:FF",
+    1,
     "127.0.0.1",
 };
 

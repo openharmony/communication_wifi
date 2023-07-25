@@ -39,16 +39,19 @@ const std::string Mac = "AA:BB:CC:DD:EE:FF";
 static StationInfo staInfo = {
     "test_deviceName",
     Mac.c_str(),
+    1, 
     "127.0.0.1",
 };
 StationInfo value1 = {
     "test_deviceName",
     "AA:BB:CC:DD:EE:FF",
+    1, 
     "127.0.0.2",
 };
 StationInfo value2 = {
     "test_deviceName",
     "AA:BB:CC:DD:EE:FF",
+    1, 
     "127.0.0.3",
 };
 class ApStationsManager_test : public testing::Test {
@@ -163,6 +166,7 @@ HWTEST_F(ApStationsManager_test, StationLeave, TestSize.Level1)
     StationInfo value3 = {
         "test_deviceName",
         "DA:BB:CC:DD:EE:FF",
+        1, 
         "127.0.0.3",
     };
     std::vector<StationInfo> valueList;
@@ -182,6 +186,7 @@ HWTEST_F(ApStationsManager_test, StationLeave1, TestSize.Level1)
     StationInfo value3 = {
         "test_deviceName",
         "DA:BB:CC:DD:EE:FF",
+        1, 
         "127.0.0.3",
     };
     valueList.push_back(value2);
@@ -199,6 +204,7 @@ HWTEST_F(ApStationsManager_test, StationLeave2, TestSize.Level1)
     StationInfo value3 = {
         "test_deviceName",
         "DA:BB:CC:DD:EE:FF",
+        1, 
         "127.0.0.3",
     };
     valueList.push_back(value3);
@@ -219,6 +225,7 @@ HWTEST_F(ApStationsManager_test, StationJoin1, TestSize.Level1)
     StationInfo value3 = {
         "test_deviceName",
         "AA:BB:CC:DD:EE:FF",
+        1, 
         "127.0.0.4",
     };
     valueList.push_back(value2);
@@ -234,6 +241,7 @@ HWTEST_F(ApStationsManager_test, StationJoin2, TestSize.Level1)
     StationInfo value3 = {
         "test_deviceName",
         "DA:BB:CC:DD:EE:FF",
+        1, 
         "127.0.0.4",
     };
     valueList.push_back(value1);
@@ -250,6 +258,7 @@ HWTEST_F(ApStationsManager_test, StationJoin3, TestSize.Level1)
     StationInfo value3 = {
         "test_deviceName",
         "AA:BB:CC:DD:EE:FF",
+        1, 
         "127.0.0.4",
     };
     valueList.push_back(value2);
@@ -266,6 +275,7 @@ HWTEST_F(ApStationsManager_test, StationJoin4, TestSize.Level1)
     StationInfo value3 = {
         "test_deviceName",
         "AA:BB:CC:DD:EE:FF",
+        1, 
         "127.0.0.4",
     };
     valueList.push_back(value1);
@@ -282,6 +292,7 @@ HWTEST_F(ApStationsManager_test, StationJoin5, TestSize.Level1)
     StationInfo value3 = {
         OHOS::Wifi::GETTING_INFO,
         "AA:BB:CC:DD:EE:FF",
+        1, 
         OHOS::Wifi::GETTING_INFO,
     };
     valueList.push_back(value1);

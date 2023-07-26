@@ -281,6 +281,8 @@ ErrCode WifiHotspotServiceImpl::GetStationList(std::vector<StationInfo> &result)
                 (macAddrInfo.bssidType == REAL_DEVICE_ADDRESS)) {
                 iter->bssid = randomMacAddr;
                 iter->bssidType = RANDOM_DEVICE_ADDRESS;
+                WIFI_LOGI("the record is updated, bssid:%{private}s, bssidType:%{public}d",
+                    iter->bssid.c_str(), iter->bssidType);
             }
         }
     }

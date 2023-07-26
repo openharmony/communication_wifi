@@ -237,6 +237,8 @@ ErrCode WifiScanServiceImpl::GetScanInfoList(std::vector<WifiScanInfo> &result)
             macAddrInfo.bssidType = iter->bssidType;
             std::string randomMacAddr =
                 WifiSettings::GetInstance().GetMacAddrPairs(WifiMacAddrInfoType::WIFI_SCANINFO_MACADDR_INFO, macAddrInfo);
+            WIFI_LOGI("bssid:%{private}s, bssidType:%{public}d, randomMacAddr:%{private}s",
+                macAddrInfo.bssid.c_str(), macAddrInfo.bssidType, randomMacAddr.c_str());
             if (!randomMacAddr.empty() &&
                 (macAddrInfo.bssidType == REAL_DEVICE_ADDRESS)) {
                 iter->bssid = randomMacAddr;

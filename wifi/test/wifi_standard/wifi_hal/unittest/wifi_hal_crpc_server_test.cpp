@@ -401,6 +401,7 @@ HWTEST_F(WifiHalCRpcServerTest, RpcNotifyClearTest, TestSize.Level1)
 HWTEST_F(WifiHalCRpcServerTest, RpcGetWifiChipTest, TestSize.Level1)
 {
     EXPECT_TRUE(RpcGetWifiChip(nullptr, nullptr) < 0);
+    EXPECT_TRUE(RpcGetWifiChip(mServer, nullptr) < 0);
     char buff[] = "N\tGetWifiChip\tadsgfsd\t";
     mContext->oneProcess = buff;
     mContext->nPos = strlen("N\tGetWifiChip\t");
@@ -416,6 +417,7 @@ HWTEST_F(WifiHalCRpcServerTest, RpcGetWifiChipTest, TestSize.Level1)
 HWTEST_F(WifiHalCRpcServerTest, RpcGetWifiChipIdsTest, TestSize.Level1)
 {
     EXPECT_TRUE(RpcGetWifiChipIds(nullptr, nullptr) < 0);
+    EXPECT_TRUE(RpcGetWifiChipIds(mServer, nullptr) < 0);
     char buff[] = "N\tGetWifiChipIds\tx\t";
     mContext->oneProcess = buff;
     mContext->nPos = strlen("N\tGetWifiChipIds\t");
@@ -431,12 +433,14 @@ HWTEST_F(WifiHalCRpcServerTest, RpcGetWifiChipIdsTest, TestSize.Level1)
 HWTEST_F(WifiHalCRpcServerTest, RpcGetChipIdTest, TestSize.Level1)
 {
     EXPECT_TRUE(RpcGetChipId(nullptr, nullptr) < 0);
+    EXPECT_TRUE(RpcGetChipId(mServer, nullptr) < 0);
     EXPECT_TRUE(RpcGetChipId(mServer, mContext) == 0);
 }
 
 HWTEST_F(WifiHalCRpcServerTest, RpcCreateIfaceTest, TestSize.Level1)
 {
     EXPECT_TRUE(RpcCreateIface(nullptr, nullptr) < 0);
+    EXPECT_TRUE(RpcCreateIface(mServer, nullptr) < 0);
     char buff[] = "N\tCreateIface\tfdshajkdsghk\t";
     mContext->oneProcess = buff;
     mContext->nPos = strlen("N\tCreateIface\t");
@@ -452,6 +456,7 @@ HWTEST_F(WifiHalCRpcServerTest, RpcCreateIfaceTest, TestSize.Level1)
 HWTEST_F(WifiHalCRpcServerTest, RpcGetIfaceTest, TestSize.Level1)
 {
     EXPECT_TRUE(RpcGetIface(nullptr, nullptr) < 0);
+    EXPECT_TRUE(RpcGetIface(mServer, nullptr) < 0);
     char buff[] = "N\tGetIface\twlan0";
     mContext->oneProcess = buff;
     mContext->nPos = strlen("N\tGetIface\t");
@@ -472,6 +477,7 @@ HWTEST_F(WifiHalCRpcServerTest, RpcGetIfaceTest, TestSize.Level1)
 HWTEST_F(WifiHalCRpcServerTest, RpcGetIfaceNamesTest, TestSize.Level1)
 {
     EXPECT_TRUE(RpcGetIfaceNames(nullptr, nullptr) < 0);
+    EXPECT_TRUE(RpcGetIfaceNames(mServer, nullptr) < 0);
     char buff[] = "N\tGetIfaceNames\tasdgf\tasdgf\t";
     mContext->oneProcess = buff;
     mContext->nPos = strlen("N\tGetIfaceNames\t");
@@ -492,6 +498,7 @@ HWTEST_F(WifiHalCRpcServerTest, RpcGetIfaceNamesTest, TestSize.Level1)
 HWTEST_F(WifiHalCRpcServerTest, RpcRemoveIfaceTest, TestSize.Level1)
 {
     EXPECT_TRUE(RpcRemoveIface(nullptr, nullptr) < 0);
+    EXPECT_TRUE(RpcRemoveIface(mServer, nullptr) < 0);
     char buff[] = "N\tRemoveIface\twlan0";
     mContext->oneProcess = buff;
     mContext->nPos = strlen("N\tRemoveIface\t");
@@ -512,12 +519,14 @@ HWTEST_F(WifiHalCRpcServerTest, RpcRemoveIfaceTest, TestSize.Level1)
 HWTEST_F(WifiHalCRpcServerTest, RpcGetCapabilitiesTest, TestSize.Level1)
 {
     EXPECT_TRUE(RpcGetCapabilities(nullptr, nullptr) < 0);
+    EXPECT_TRUE(RpcGetCapabilities(mServer, nullptr) < 0);
     EXPECT_TRUE(RpcGetCapabilities(mServer, mContext) == 0);
 }
 
 HWTEST_F(WifiHalCRpcServerTest, RpcGetSupportedComboModesTest, TestSize.Level1)
 {
     EXPECT_TRUE(RpcGetSupportedComboModes(nullptr, nullptr) < 0);
+    EXPECT_TRUE(RpcGetSupportedComboModes(mServer, nullptr) < 0);
     char buff[] = "N\tGetSupportedComboModes\tasdgds\t";
     mContext->oneProcess = buff;
     mContext->nPos = strlen("N\tGetSupportedComboModes\t");
@@ -533,6 +542,7 @@ HWTEST_F(WifiHalCRpcServerTest, RpcGetSupportedComboModesTest, TestSize.Level1)
 HWTEST_F(WifiHalCRpcServerTest, RpcConfigComboModesTest, TestSize.Level1)
 {
     EXPECT_TRUE(RpcConfigComboModes(nullptr, nullptr) < 0);
+    EXPECT_TRUE(RpcConfigComboModes(mServer, nullptr) < 0);
     char buff[] = "N\tConfigComboModes\tasdgds\t";
     mContext->oneProcess = buff;
     mContext->nPos = strlen("N\tConfigComboModes\t");
@@ -548,12 +558,14 @@ HWTEST_F(WifiHalCRpcServerTest, RpcConfigComboModesTest, TestSize.Level1)
 HWTEST_F(WifiHalCRpcServerTest, RpcGetComboModesTest, TestSize.Level1)
 {
     EXPECT_TRUE(RpcGetComboModes(nullptr, nullptr) < 0);
+    EXPECT_TRUE(RpcGetComboModes(mServer, nullptr) < 0);
     EXPECT_TRUE(RpcGetComboModes(mServer, mContext) == 0);
 }
 
 HWTEST_F(WifiHalCRpcServerTest, RpcRequestFirmwareDebugDumpTest, TestSize.Level1)
 {
     EXPECT_TRUE(RpcRequestFirmwareDebugDump(nullptr, nullptr) < 0);
+    EXPECT_TRUE(RpcRequestFirmwareDebugDump(mServer, nullptr) < 0);
     char buff[] = "N\tRequestFirmwareDebugDump\tasdgds\t";
     mContext->oneProcess = buff;
     mContext->nPos = strlen("N\tRequestFirmwareDebugDump\t");
@@ -1392,6 +1404,63 @@ HWTEST_F(WifiHalCRpcServerTest, RpcIsChipSupportDfsChannelTest, TestSize.Level1)
     EXPECT_TRUE(RpcIsChipSupportDfsChannel(nullptr, nullptr) < 0);
     EXPECT_TRUE(RpcIsChipSupportDfsChannel(mServer, nullptr) < 0);
     EXPECT_TRUE(RpcIsChipSupportDfsChannel(mServer, mContext) == 0);
+}
+/**
+ * @tc.name: RpcIsChipSupportDbdcTest
+ * @tc.desc: RpcIsChipSupportDbdc()
+ * @tc.type: FUNC
+ * @tc.require: issue
+*/
+HWTEST_F(WifiHalCRpcServerTest, RpcIsChipSupportDbdcTest, TestSize.Level1)
+{
+    EXPECT_TRUE(RpcIsChipSupportDbdc(nullptr, nullptr) < 0);
+    EXPECT_TRUE(RpcIsChipSupportDbdc(mServer, nullptr) < 0);
+    EXPECT_TRUE(RpcIsChipSupportDbdc(mServer, mContext) == 0);
+}
+/**
+ * @tc.name: RpcIsChipSupportCsaTest
+ * @tc.desc: RpcIsChipSupportCsa()
+ * @tc.type: FUNC
+ * @tc.require: issue
+*/
+HWTEST_F(WifiHalCRpcServerTest, RpcIsChipSupportCsaTest, TestSize.Level1)
+{
+    EXPECT_TRUE(RpcIsChipSupportCsa(nullptr, nullptr) < 0);
+    EXPECT_TRUE(RpcIsChipSupportCsa(mServer, nullptr) < 0);
+    EXPECT_TRUE(RpcIsChipSupportCsa(mServer, mContext) == 0);
+}
+/**
+ * @tc.name: RpcIsChipSupportRadarDetectTest
+ * @tc.desc: RpcIsChipSupportRadarDetect()
+ * @tc.type: FUNC
+ * @tc.require: issue
+*/
+HWTEST_F(WifiHalCRpcServerTest, RpcIsChipSupportRadarDetectTest, TestSize.Level1)
+{
+    EXPECT_TRUE(RpcIsChipSupportRadarDetect(nullptr, nullptr) < 0);
+    EXPECT_TRUE(RpcIsChipSupportRadarDetect(mServer, nullptr) < 0);
+    EXPECT_TRUE(RpcIsChipSupportRadarDetect(mServer, mContext) == 0);
+}
+/**
+ * @tc.name: RpcSetSuspendModeTest
+ * @tc.desc: RpcSetSuspendMode()
+ * @tc.type: FUNC
+ * @tc.require: issue
+*/
+HWTEST_F(WifiHalCRpcServerTest, RpcSetSuspendModeTest, TestSize.Level1)
+{
+    EXPECT_TRUE(RpcSetSuspendMode(nullptr, nullptr) < 0);
+    EXPECT_TRUE(RpcSetSuspendMode(mServer, nullptr) < 0);
+    char buff[] = "N\tRpcSetSuspendMode\tx\t";
+    mContext->oneProcess = buff;
+    mContext->nPos = strlen("N\tRpcSetSuspendMode\t");
+    mContext->nSize = strlen(buff);
+    EXPECT_TRUE(RpcSetSuspendMode(mServer, mContext) < 0);
+    char buff1[] = "N\tRpcSetSuspendMode\t1\t";
+    mContext->oneProcess = buff1;
+    mContext->nPos = strlen("N\tRpcSetSuspendMode\t");
+    mContext->nSize = strlen(buff1);
+    EXPECT_TRUE(RpcSetSuspendMode(mServer, mContext) == 0);
 }
 }  // namespace Wifi
 }  // namespace OHOS

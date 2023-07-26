@@ -264,7 +264,7 @@ public:
      * @param info - IpV6Info object
      * @return ErrCode - operation result
      */
-    ErrCode GetIpV6Info(IpV6Info &info) override;
+    ErrCode GetIpv6Info(IpV6Info &info) override;
 
     /**
      * @Description Set the Country Code

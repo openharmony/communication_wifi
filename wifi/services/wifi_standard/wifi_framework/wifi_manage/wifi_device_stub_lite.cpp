@@ -457,7 +457,7 @@ void WifiDeviceStub::OnGetIpV6Info(uint32_t code, IpcIo *req, IpcIo *reply)
 {
     WIFI_LOGD("run %{public}s code %{public}u", __func__, code);
     IpV6Info info;
-    ErrCode ret = GetIpV6Info(info);
+    ErrCode ret = GetIpv6Info(info);
     (void)WriteInt32(reply, 0);
     (void)WriteInt32(reply, ret);
 

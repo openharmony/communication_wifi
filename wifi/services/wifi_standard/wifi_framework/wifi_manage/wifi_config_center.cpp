@@ -130,9 +130,9 @@ int WifiConfigCenter::GetIpInfo(IpInfo &info)
     return WifiSettings::GetInstance().GetIpInfo(info);
 }
 
-int WifiConfigCenter::GetIpV6Info(IpV6Info &info)
+int WifiConfigCenter::GetIpv6Info(IpV6Info &info)
 {
-    return WifiSettings::GetInstance().GetIpV6Info(info);
+    return WifiSettings::GetInstance().GetIpv6Info(info);
 }
 
 int WifiConfigCenter::GetLinkedInfo(WifiLinkedInfo &info)

@@ -130,7 +130,7 @@ public:
 
     ErrCode GetIpInfo(IpInfo &info) override;
 
-    ErrCode GetIpV6Info(IpV6Info &info) override;
+    ErrCode GetIpv6Info(IpV6Info &info) override;
 
     ErrCode SetCountryCode(const std::string &countryCode) override;
 

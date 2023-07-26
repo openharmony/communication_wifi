@@ -413,7 +413,7 @@ public:
      * @param info - output IpV6Info struct
      * @return int - 0 success
      */
-    int GetIpV6Info(IpV6Info &info);
+    int GetIpv6Info(IpV6Info &info);
 
     /**
      * @Description Save dhcp inV6fo

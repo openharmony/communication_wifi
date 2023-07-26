@@ -655,7 +655,7 @@ int WifiSettings::SaveIpInfo(const IpInfo &info)
     return 0;
 }
 
-int WifiSettings::GetIpV6Info(IpV6Info &info)
+int WifiSettings::GetIpv6Info(IpV6Info &info)
 {
     std::unique_lock<std::mutex> lock(mInfoMutex);
     info = mWifiIpV6Info;

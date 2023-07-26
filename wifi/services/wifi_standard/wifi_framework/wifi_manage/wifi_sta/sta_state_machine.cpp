@@ -2236,7 +2236,7 @@ void StaStateMachine::DhcpResultNotify::OnSuccess(int status, const std::string 
     IpInfo ipInfo;
     WifiSettings::GetInstance().GetIpInfo(ipInfo);
     IpV6Info ipv6Info;
-    WifiSettings::GetInstance().GetIpV6Info(ipv6Info);
+    WifiSettings::GetInstance().GetIpv6Info(ipv6Info);
     TryToSaveIpV4Result(ipInfo, ipv6Info, result);
     TryToSaveIpV6Result(ipInfo, ipv6Info, result);
     TryToCloseDhcpClient(result.iptype);
@@ -2449,7 +2449,7 @@ void StaStateMachine::ReUpdateNetLinkInfo(const WifiDeviceConfig &config)
         IpInfo wifiIpInfo;
         WifiSettings::GetInstance().GetIpInfo(wifiIpInfo);
         IpV6Info wifiIpV6Info;
-        WifiSettings::GetInstance().GetIpV6Info(wifiIpV6Info);
+        WifiSettings::GetInstance().GetIpv6Info(wifiIpV6Info);
         WifiDeviceConfig config;
         WifiSettings::GetInstance().GetDeviceConfig(linkedInfo.networkId, config);
         WifiNetAgent::GetInstance().UpdateNetLinkInfo(wifiIpInfo, wifiIpV6Info, config.wifiProxyconfig);

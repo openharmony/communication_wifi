@@ -230,6 +230,9 @@ static void StationInfoToJsArray(const napi_env& env, const std::vector<StationI
 
     SetValueUtf8String(env, "name", StationInfo[idx].deviceName.c_str(), result);
     SetValueUtf8String(env, "macAddress", StationInfo[idx].bssid.c_str(), result);
+#ifdef SUPPORT_RANDOM_MAC_ADDR
+    SetValueInt32(env, "macAddressType", StationInfo[idx].bssidType, result);
+#endif
     SetValueUtf8String(env, "ipAddress", StationInfo[idx].ipAddr.c_str(), result);
     napi_status status = napi_set_element(env, arrayResult, idx, result);
     if (status != napi_ok) {

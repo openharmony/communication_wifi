@@ -183,6 +183,8 @@ typedef struct WifiDeviceConfig {
     char ssid[WIFI_MAX_SSID_LEN];
     /** Basic service set ID (BSSID). For its length, see {@link WIFI_MAC_LEN}. */
     unsigned char bssid[WIFI_MAC_LEN];
+    /* bssid type. */
+    int bssidType;
     /** Key. For its length, see {@link WIFI_MAX_KEY_LEN}. */
     char preSharedKey[WIFI_MAX_KEY_LEN];
     /** Security type. It is defined in {@link WifiSecurityType}. */

@@ -147,6 +147,7 @@ private:
 struct StationInfo {
     std::string deviceName; /* Device name */
     std::string bssid;      /* Device Mac */
+    int bssidType; /* bssid type */
     std::string ipAddr;     /* Device IP address */
 };
 }  // namespace Wifi

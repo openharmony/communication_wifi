@@ -761,9 +761,9 @@ static int WpaCliCmdScan(WifiWpaStaInterface *this, const ScanSettings *settings
     int res = 0;
     if (settings != NULL) {
         if (settings->scanStyle == SCAN_TYPE_PNO && settings->isStartPnoScan) {
-            res = snprintf_s(pcmd, len, len - 1, "IFNAME=%s set pno 1", this->ifname);
+            res = snprintf_s(pcmd, len, len - 1, "IFNAME=%s SET PNO 1", this->ifname);
         } else if (settings->scanStyle == SCAN_TYPE_PNO && !settings->isStartPnoScan) {
-            res = snprintf_s(pcmd, len, len - 1, "IFNAME=%s set pno 0", this->ifname);
+            res = snprintf_s(pcmd, len, len - 1, "IFNAME=%s SET PNO 0", this->ifname);
         } else {
             res = snprintf_s(pcmd, len, len - 1, "IFNAME=%s SCAN", this->ifname);
         }
@@ -775,7 +775,7 @@ static int WpaCliCmdScan(WifiWpaStaInterface *this, const ScanSettings *settings
     }
     pos += res;
     if (settings != NULL && ConcatScanSetting(settings, pcmd + pos, len - pos) < 0) {
-        LOGE("snprintf scan settings error");
+        LOGE("ConcatScanSetting return failed!");
         free(pcmd);
         return -1;
     }

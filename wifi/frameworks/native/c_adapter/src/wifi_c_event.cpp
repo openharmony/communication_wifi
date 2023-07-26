@@ -30,6 +30,7 @@
 #include "../../src/wifi_sa_event.h"
 DEFINE_WIFILOG_LABEL("WifiCEvent");
 std::set<WifiEvent*> GetEventCallBacks();
+std::unique_ptr<OHOS::Wifi::WifiScan> g_wifiScanPtr = nullptr;
 
 std::vector<std::string> WifiCDeviceEventCallback::deviceCallbackEvent = {
     EVENT_STA_CONN_STATE_CHANGE,
@@ -196,12 +197,11 @@ WifiErrorCode EventManager::RegisterScanEvent(const std::vector<std::string> &ev
         WIFI_LOGE("Register scan event is empty!");
         return ERROR_WIFI_UNKNOWN;
     }
-    std::unique_ptr<WifiScan> wifiScanPtr = WifiScan::GetInstance(WIFI_SCAN_ABILITY_ID);
-    if (wifiScanPtr == nullptr) {
+    if (g_wifiScanPtr == nullptr) {
         WIFI_LOGE("Register scan event get instance failed!");
         return ERROR_WIFI_UNKNOWN;
     }
-    ErrCode ret = wifiScanPtr->RegisterCallBack(wifiCScanCallback, event);
+    ErrCode ret = g_wifiScanPtr->RegisterCallBack(wifiCScanCallback, event);
     if (ret != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("Register scan event failed!");
         return ERROR_WIFI_UNKNOWN;
@@ -333,6 +333,13 @@ void EventManager::Init()
         mSaStatusListener->Init(WIFI_HOTSPOT_ABILITY_ID);
         mSaStatusListener->Init(WIFI_P2P_ABILITY_ID);
     }
+
+    g_wifiScanPtr = OHOS::Wifi::WifiScan::GetInstance(WIFI_SCAN_ABILITY_ID);
+    if (g_wifiScanPtr == nullptr) {
+        WIFI_LOGE("init scan event get instance failed!");
+        return;
+    }
+
     return;
 }
 
@@ -345,14 +352,17 @@ std::set<WifiEvent*> GetEventCallBacks() {
 
 WifiErrorCode RegisterWifiEvent(WifiEvent *event) {
     WIFI_LOGI("Register wifi event");
-    if (!EventManager::GetInstance().IsEventRegistered()) {
-        if (EventManager::GetInstance().RegisterWifiEvents() != WIFI_SUCCESS) {
-            WIFI_LOGE("Wifi event register failed!");
-            return ERROR_WIFI_UNKNOWN;
-        }
-        EventManager::GetInstance().SetIsEventRegistrated(true);
+    if (!EventManager::GetInstance().AddEventCallback(event)) {
+        return ERROR_WIFI_UNKNOWN;
     }
-    return EventManager::GetInstance().AddEventCallback(event) ? WIFI_SUCCESS : ERROR_WIFI_INVALID_ARGS;
+    if (!EventManager::GetInstance().IsEventRegistered()) {
+        if (EventManager::GetInstance().RegisterWifiEvents() == WIFI_SUCCESS) {
+            EventManager::GetInstance().SetIsEventRegistrated(true);
+        } else {
+            WIFI_LOGE("Wifi event register failed!");
+        }
+    }
+    return WIFI_SUCCESS;
 }
 
 WifiErrorCode UnRegisterWifiEvent(WifiEvent *event) {

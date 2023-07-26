@@ -2438,13 +2438,14 @@ void StaStateMachine::ReUpdateNetSupplierInfo(sptr<NetManagerStandard::NetSuppli
     }
 }
 
-void StaStateMachine::ReUpdateNetLinkInfo(void)
+void StaStateMachine::ReUpdateNetLinkInfo(const WifiDeviceConfig &config)
 {
     WifiLinkedInfo linkedInfo;
     WifiSettings::GetInstance().GetLinkedInfo(linkedInfo);
     LOGI("ReUpdateNetLinkInfo, detailedState:%{public}d, connState:%{public}d",
         linkedInfo.detailedState, linkedInfo.connState);
-    if ((linkedInfo.detailedState == DetailedState::NOTWORKING) && (linkedInfo.connState == ConnState::CONNECTED)) {
+    if ((linkedInfo.detailedState == DetailedState::NOTWORKING) && (linkedInfo.connState == ConnState::CONNECTED)
+        && (linkedInfo.ssid == config.ssid) && (linkedInfo.bssid == config.bssid)) {
         IpInfo wifiIpInfo;
         WifiSettings::GetInstance().GetIpInfo(wifiIpInfo);
         IpV6Info wifiIpV6Info;

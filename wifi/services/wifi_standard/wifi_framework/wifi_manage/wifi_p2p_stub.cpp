@@ -542,6 +542,9 @@ void WifiP2pStub::WriteWifiP2pDeviceData(MessageParcel &reply, const WifiP2pDevi
 {
     reply.WriteString(device.GetDeviceName());
     reply.WriteString(device.GetDeviceAddress());
+#ifdef SUPPORT_RANDOM_MAC_ADDR
+    reply.WriteInt32(static_cast<int>(device.GetDeviceAddressType()));
+#endif
     reply.WriteString(device.GetPrimaryDeviceType());
     reply.WriteString(device.GetSecondaryDeviceType());
     reply.WriteInt32(static_cast<int>(device.GetP2pDeviceStatus()));
@@ -603,6 +606,9 @@ void WifiP2pStub::WriteWifiP2pGroupData(MessageParcel &reply, const WifiP2pGroup
 void WifiP2pStub::ReadWifiP2pConfigData(MessageParcel &data, WifiP2pConfig &config)
 {
     config.SetDeviceAddress(data.ReadString());
+#ifdef SUPPORT_RANDOM_MAC_ADDR
+    config.SetDeviceAddressType(data.ReadInt32());
+#endif
     config.SetPassphrase(data.ReadString());
     config.SetGroupName(data.ReadString());
     config.SetGoBand(static_cast<GroupOwnerBand>(data.ReadInt32()));

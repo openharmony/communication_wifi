@@ -244,10 +244,12 @@ ErrCode WifiHotspotServiceImpl::GetStationList(std::vector<StationInfo> &result)
             return WIFI_OPT_PERMISSION_DENIED;
         }
 
+    #ifndef SUPPORT_RANDOM_MAC_ADDR
         if (WifiPermissionUtils::VerifyGetScanInfosPermission() == PERMISSION_DENIED) {
             WIFI_LOGE("GetStationList:VerifyGetScanInfosPermission PERMISSION_DENIED!");
             return WIFI_OPT_PERMISSION_DENIED;
         }
+    #endif
 
         if (WifiPermissionUtils::VerifyManageWifiHotspotPermission() == PERMISSION_DENIED) {
             WIFI_LOGE("GetStationList:VerifyManageWifiHotspotPermission PERMISSION_DENIED!");
@@ -265,7 +267,25 @@ ErrCode WifiHotspotServiceImpl::GetStationList(std::vector<StationInfo> &result)
         WIFI_LOGE("Instance %{public}d get hotspot service is null!", m_id);
         return WIFI_OPT_AP_NOT_OPENED;
     }
-    return pService->GetStationList(result);
+    ErrCode errCode = pService->GetStationList(result);
+#ifdef SUPPORT_RANDOM_MAC_ADDR
+    if (WifiPermissionUtils::VerifyGetWifiPeersMacPermission() == PERMISSION_DENIED) {
+        WIFI_LOGI("GetStationList: GET_WIFI_PEERS_MAC PERMISSION_DENIED");
+        for (auto iter = result.begin(); iter != result.end(); ++iter) {
+            WifiMacAddrInfo macAddrInfo;
+            macAddrInfo.bssid = iter->bssid;
+            macAddrInfo.bssidType = iter->bssidType;
+            std::string randomMacAddr =
+                WifiSettings::GetInstance().GetMacAddrPairs(WifiMacAddrInfoType::HOTSPOT_MACADDR_INFO, macAddrInfo);
+            if (!randomMacAddr.empty() &&
+                (macAddrInfo.bssidType == REAL_DEVICE_ADDRESS)) {
+                iter->bssid = randomMacAddr;
+                iter->bssidType = RANDOM_DEVICE_ADDRESS;
+            }
+        }
+    }
+#endif
+    return errCode;
 }
 
 ErrCode WifiHotspotServiceImpl::DisassociateSta(const StationInfo &info)
@@ -322,21 +342,6 @@ ErrCode WifiHotspotServiceImpl::CheckCanEnableHotspot(const ServiceType type)
         WIFI_LOGI("current power saving mode and can not use ap, open failed!");
         return WIFI_OPT_FORBID_POWSAVING;
     }
-
-    WifiOprMidState curState = WifiConfigCenter::GetInstance().GetWifiMidState();
-    if (curState != WifiOprMidState::CLOSED) {
-#ifdef FEATURE_STA_AP_EXCLUSION
-        ErrCode ret = WifiManager::GetInstance().DisableWifi();
-        if (ret == WIFI_OPT_CLOSE_SUCC_WHEN_CLOSED) {
-            return WIFI_OPT_SUCCESS;
-        }
-        return ret;
-#else
-        WIFI_LOGI("current wifi state is %{public}d, please close sta first!",
-            static_cast<int>(curState));
-        return WIFI_OPT_NOT_SUPPORTED;
-#endif
-    }
     return WIFI_OPT_SUCCESS;
 }
 
@@ -346,6 +351,23 @@ ErrCode WifiHotspotServiceImpl::EnableHotspot(const ServiceType type)
     ErrCode errCode = CheckCanEnableHotspot(type);
     if (errCode != WIFI_OPT_SUCCESS) {
         return errCode;
+    }
+
+    WifiOprMidState staState = WifiConfigCenter::GetInstance().GetWifiMidState();
+    if (staState != WifiOprMidState::CLOSED) {
+#ifdef FEATURE_STA_AP_EXCLUSION
+#ifdef FEATURE_P2P_SUPPORT
+        WifiManager::GetInstance().AutoStopP2pService(AutoStartOrStopServiceReason::STA_AP_EXCLUSION);
+#endif
+        errCode = WifiManager::GetInstance().AutoStopStaService(AutoStartOrStopServiceReason::STA_AP_EXCLUSION);
+        if (errCode != WIFI_OPT_CLOSE_SUCC_WHEN_CLOSED) {
+            return errCode;
+        }
+#else
+        WIFI_LOGI("current wifi state is %{public}d, please close sta first!",
+            static_cast<int>(curState));
+        return WIFI_OPT_NOT_SUPPORTED;
+#endif
     }
 
     WifiOprMidState curState = WifiConfigCenter::GetInstance().GetApMidState(m_id);
@@ -389,6 +411,7 @@ ErrCode WifiHotspotServiceImpl::EnableHotspot(const ServiceType type)
         WifiServiceManager::GetInstance().UnloadService(WIFI_SERVICE_AP, m_id);
     } else {
         WifiManager::GetInstance().StopUnloadApSaTimer();
+        WifiConfigCenter::GetInstance().SetStaApExclusionType(static_cast<int>(StaApExclusionType::INITIAL_TYPE));
     }
     return errCode;
 }
@@ -428,16 +451,16 @@ ErrCode WifiHotspotServiceImpl::DisableHotspot(const ServiceType type)
     ErrCode ret = pService->DisableHotspot();
     if (ret != WIFI_OPT_SUCCESS) {
         WifiConfigCenter::GetInstance().SetApMidState(WifiOprMidState::CLOSING, WifiOprMidState::RUNNING, m_id);
+        return ret;
     }
 #ifdef FEATURE_STA_AP_EXCLUSION
-    // Only when sta is passive closed, last running state is true.
-    if (WifiConfigCenter::GetInstance().GetStaLastRunState()) {
-        std::thread startStaSrvThread(WifiManager::ResumeStaIfPassiveClosed);
-        pthread_setname_np(startStaSrvThread.native_handle(), "ResumeStaIfPassiveClosedThread");
-        startStaSrvThread.detach();
+    if (WifiConfigCenter::GetInstance().GetStaApExclusionType()
+        == static_cast<int>(StaApExclusionType::USER_OPEN_AP_AUTO_STOP_WIFI)) {
+        WifiConfigCenter::GetInstance().SetStaApExclusionType(
+            static_cast<int>(StaApExclusionType::USER_CLOSE_AP_AUTO_START_WIFI));
     }
 #endif
-    return ret;
+    return WIFI_OPT_SUCCESS;
 }
 
 ErrCode WifiHotspotServiceImpl::AddBlockList(const StationInfo &info)

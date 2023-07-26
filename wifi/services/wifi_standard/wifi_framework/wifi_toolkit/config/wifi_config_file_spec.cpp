@@ -783,7 +783,7 @@ template<>
 void ClearTClass<WifiConfig>(WifiConfig &item)
 {
     item.scanAlwaysSwitch = false;
-    item.operatorWifiType = static_cast<int>(OperatorWifiType::INITIAL_TYPE);
+    item.staAirplaneMode = static_cast<int>(OperatorWifiType::INITIAL_TYPE);
     item.canOpenStaWhenAirplane = false;
     item.staLastState = false;
     item.savedDeviceAppraisalPriority = PRIORITY_1;
@@ -818,6 +818,7 @@ void ClearTClass<WifiConfig>(WifiConfig &item)
     item.isLoadStabak = true;
     item.scanOnlySwitch = false;
     item.realMacAddress = "";
+    item.staApExclusionType = static_cast<int>(StaApExclusionType::INITIAL_TYPE);
     return;
 }
 
@@ -825,8 +826,8 @@ static int SetWifiConfigValueFirst(WifiConfig &item, const std::string &key, con
 {
     if (key == "scanAlwaysSwitch") {
         item.scanAlwaysSwitch = (std::stoi(value) != 0); /* 0 -> false 1 -> true */
-    } else if (key == "operatorWifiType") {
-        item.operatorWifiType = std::stoi(value);
+    } else if (key == "staAirplaneMode") {
+        item.staAirplaneMode = std::stoi(value);
     } else if (key == "canOpenStaWhenAirplane") {
         item.canOpenStaWhenAirplane = (std::stoi(value) != 0);
     } else if (key == "staLastState") {
@@ -905,6 +906,8 @@ static int SetWifiConfigValueSecond(WifiConfig &item, const std::string &key, co
         item.scanOnlySwitch  = (std::stoi(value) != 0); /* 0 -> false 1 -> true */
     } else if (key == "realMacAddress") {
         item.realMacAddress = value;
+    } else if (key == "staApExclusionType") {
+        item.staApExclusionType = std::stoi(value);
     } else {
         return -1;
     }
@@ -938,7 +941,7 @@ std::string OutTClassString<WifiConfig>(WifiConfig &item)
     std::ostringstream ss;
     ss << "    " <<"<WifiConfig>" << std::endl;
     ss << "    " <<"scanAlwaysSwitch=" << item.scanAlwaysSwitch << std::endl; /* bool false->0 true->1 */
-    ss << "    " <<"operatorWifiType=" << item.operatorWifiType << std::endl;
+    ss << "    " <<"staAirplaneMode=" << item.staAirplaneMode << std::endl;
     ss << "    " <<"canOpenStaWhenAirplane=" << item.canOpenStaWhenAirplane << std::endl;
     ss << "    " <<"staLastState=" << item.staLastState << std::endl;
     ss << "    " <<"savedDeviceAppraisalPriority=" << item.savedDeviceAppraisalPriority << std::endl;
@@ -973,6 +976,7 @@ std::string OutTClassString<WifiConfig>(WifiConfig &item)
     ss << "    " <<"isLoadStabak=" << item.isLoadStabak << std::endl;
     ss << "    " <<"scanOnlySwitch=" << item.scanOnlySwitch << std::endl;
     ss << "    " <<"realMacAddress=" << item.realMacAddress << std::endl;
+    ss << "    " <<"staApExclusionType=" << item.staApExclusionType << std::endl;
     ss << "    " <<"</WifiConfig>" << std::endl;
     return ss.str();
 }

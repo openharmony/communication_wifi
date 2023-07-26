@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -74,6 +74,8 @@ public:
     virtual int GetAllCandidateConfig(const int uid, std::vector<WifiDeviceConfig> &configs) = 0;
     virtual int GetValidChannels(ChannelsTable &channelsInfo) = 0;
     virtual int GetWifiState() = 0;
+    virtual int SetDeviceConnFailedCount(const std::string &index, const int &indexType, int count) = 0;
+    virtual int IncreaseDeviceConnFailedCount(const std::string &index, const int &indexType, int count) = 0;
 };
 
 class WifiSettings : public MockWifiSettings {
@@ -130,6 +132,8 @@ public:
     MOCK_METHOD2(GetAllCandidateConfig, int(const int uid, std::vector<WifiDeviceConfig> &configs));
     MOCK_METHOD1(GetValidChannels, int(ChannelsTable &channelsInfo));
     MOCK_METHOD0(GetWifiState, int());
+    MOCK_METHOD3(SetDeviceConnFailedCount, int(const std::string &index, const int &indexType, int count));
+    MOCK_METHOD3(IncreaseDeviceConnFailedCount, int(const std::string &index, const int &indexType, int count));
 };
 }  // namespace OHOS
 }  // namespace Wifi

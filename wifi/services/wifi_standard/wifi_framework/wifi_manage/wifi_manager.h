@@ -147,7 +147,9 @@ public:
      * @return IScanSerivceCallbacks - return mScanCallback
      */
     IScanSerivceCallbacks GetScanCallback(void);
-
+    
+    ErrCode AutoStartStaService(AutoStartOrStopServiceReason reason);
+    ErrCode AutoStopStaService(AutoStartOrStopServiceReason reason);
     void StopUnloadStaSaTimer(void);
     void StartUnloadStaSaTimer(void);
 #ifdef FEATURE_AP_SUPPORT
@@ -158,39 +160,10 @@ public:
      */
     IApServiceCallbacks GetApCallback(void);
 
+    ErrCode AutoStartApService(AutoStartOrStopServiceReason reason);
+    ErrCode AutoStopApService(AutoStartOrStopServiceReason reason);
     void StopUnloadApSaTimer(void);
     void StartUnloadApSaTimer(void);
-#ifdef FEATURE_STA_AP_EXCLUSION
-    /**
-     * @Description Get Sta&Ap Exclusion flag
-     *
-     * @param type - service type
-     * @return bool - return true if sta or ap service closed by sta&ap exclusion
-     */
-    bool GetStaApExclusionFlag(WifiCloseServiceCode type = WifiCloseServiceCode::STA_SERVICE_CLOSE);
-
-    /**
-     * @Description Set Sta&Ap Exclusion flag
-     *
-     * @param type - service type
-     * @param isExclusion - true / false
-     */
-    static void SetStaApExclusionFlag(WifiCloseServiceCode type, bool isExclusion);
-
-    /**
-     * @Description wakeup thread blocked by getting DisableHotspot asynchronous operation result
-     *
-     */
-    void SignalDisableHotspot();
-
-    /**
-     * @Description wakeup thread blocked by getting DisableWifi asynchronous operation result
-     *
-     */
-    void SignalDisableWifi();
-
-    
-#endif
 #endif
 
 #ifdef FEATURE_P2P_SUPPORT
@@ -201,6 +174,8 @@ public:
      */
     IP2pServiceCallbacks GetP2pCallback(void);
 
+    ErrCode AutoStartP2pService(AutoStartOrStopServiceReason reason);
+    ErrCode AutoStopP2pService(AutoStartOrStopServiceReason reason);
     void StopUnloadP2PSaTimer(void);
     void StartUnloadP2PSaTimer(void);
 #endif
@@ -228,31 +203,7 @@ public:
     void DealCloseAirplaneModeEvent();
     bool GetLocationModeByDatashare(int systemAbilityId);
     static void CheckAndStartScanService(void);
-    
-#ifndef OHOS_ARCH_LITE
-#ifdef FEATURE_STA_AP_EXCLUSION
-    static ErrCode DisableHotspot(const int id = 0);
-    static ErrCode DisableWifi();
-    static void ResumeStaIfPassiveClosed(void);
-    /**
-     * @Description blocked for seconds until DisableHotspot asynchronous operation complete
-     * or timeout
-     *
-     * @returns ErrCode - return errCode
-     */
-    static ErrCode TimeWaitDisableHotspot();
 
-    /**
-     * @Description blocked for seconds until DisableWifi asynchronous operation complete
-     * or timeout
-     *
-     * @returns ErrCode - return errCode
-     */
-    static ErrCode TimeWaitDisableWifi();
-    static void ResetDisableStaStatus();
-    static void ResetDisableApStatus();
-#endif    
-#endif
 private:
     void PushServiceCloseMsg(WifiCloseServiceCode code);
     void InitStaCallback(void);
@@ -306,22 +257,13 @@ private:
     static void DealP2pActionResult(P2pActionCallback action, ErrCode code);
     static void DealConfigChanged(CfgType type, char* data, int dataLen);
 #endif
-    static void AutoStartStaService(void);
-    static void AutoStopStaService(void);
     static void AutoStartScanOnly(void);
     static void AutoStopScanOnly(void);
     static void ForceStopWifi(void);
-#ifdef FEATURE_AP_SUPPORT
-    static void AutoStopApService(void);
-#endif
-#ifdef FEATURE_P2P_SUPPORT
-    static void AutoStartP2pService(void);
-    static void AutoStopP2pService(void);
-#endif
     static void AutoStartScanService(void);
     static void AutoStartEnhanceService(void);
-    static void CheckAndStartSta(void);
-    static void AutoStartServiceThread(void);
+    static void CheckAndStartSta(AutoStartOrStopServiceReason reason);
+    static void AutoStartServiceThread(AutoStartOrStopServiceReason reason);
 
     void InitPidfile(void);
 private:
@@ -337,18 +279,6 @@ private:
 #endif
 #ifdef FEATURE_AP_SUPPORT
     IApServiceCallbacks mApCallback;
-#ifdef FEATURE_STA_AP_EXCLUSION
-    static std::atomic<bool> mDisableStaByExclusion;
-    static std::atomic<bool> mDisableApByExclusion;
-
-    static std::condition_variable mDisableStaStatusCondtion;
-    static std::mutex mDisableStaStatusMutex;
-    static bool mDisableStaStatus;
-
-    static std::condition_variable mDisableApStatusCondtion;
-    static std::mutex mDisableApStatusMutex;
-    static bool mDisableApStatus;
-#endif
 #ifndef OHOS_ARCH_LITE
     static uint32_t unloadHotspotSaTimerId;
     static std::mutex unloadHotspotSaTimerMutex;

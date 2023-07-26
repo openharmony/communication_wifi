@@ -20,6 +20,7 @@
 #include "wifi_global_func.h"
 #include "wifi_log.h"
 #include "wifi_config_country_freqs.h"
+#include <random>
 #ifdef FEATURE_ENCRYPTION_SUPPORT
 #include "wifi_encryption_util.h"
 #endif
@@ -902,10 +903,24 @@ int WifiSettings::ManageStation(const StationInfo &info, int mode, int id)
         } else {
             mConnectStationInfo.emplace(std::make_pair(info.bssid, info));
         }
+    #ifdef SUPPORT_RANDOM_MAC_ADDR
+        WifiSettings::GetInstance().StoreWifiMacAddrPairInfo(WifiMacAddrInfoType::HOTSPOT_MACADDR_INFO, info.bssid);
+    #endif
     } else if (MODE_DEL == mode) {
         if (iter != mConnectStationInfo.end()) {
             mConnectStationInfo.erase(iter);
         }
+    #ifdef SUPPORT_RANDOM_MAC_ADDR
+        WifiMacAddrInfo randomMacAddrInfo;
+        randomMacAddrInfo.bssid = info.bssid;
+        randomMacAddrInfo.bssidType = RANDOM_DEVICE_ADDRESS;
+        WifiSettings::GetInstance().RemoveMacAddrPairs(WifiMacAddrInfoType::HOTSPOT_MACADDR_INFO, randomMacAddrInfo);
+
+        WifiMacAddrInfo realMacAddrInfo;
+        realMacAddrInfo.bssid = info.bssid;
+        realMacAddrInfo.bssidType = REAL_DEVICE_ADDRESS;
+        WifiSettings::GetInstance().RemoveMacAddrPairs(WifiMacAddrInfoType::HOTSPOT_MACADDR_INFO, realMacAddrInfo);
+    #endif
     } else {
         return -1;
     }
@@ -1318,13 +1333,13 @@ int WifiSettings::SyncWifiConfig()
 int WifiSettings::GetOperatorWifiType()
 {
     std::unique_lock<std::mutex> lock(mWifiConfigMutex);
-    return mWifiConfig.operatorWifiType;
+    return mWifiConfig.staAirplaneMode;
 }
 
 int WifiSettings::SetOperatorWifiType(int type)
 {
     std::unique_lock<std::mutex> lock(mWifiConfigMutex);
-    mWifiConfig.operatorWifiType = type;
+    mWifiConfig.staAirplaneMode = type;
     SyncWifiConfig();
     return 0;
 }
@@ -1795,5 +1810,191 @@ bool WifiSettings::CheckScanOnlyAvailable()
     return mWifiConfig.scanOnlySwitch && (MODE_STATE_CLOSE == mAirplaneModeState);
 }
 
+int WifiSettings::GetStaApExclusionType()
+{
+    std::unique_lock<std::mutex> lock(mWifiConfigMutex);
+    return mWifiConfig.staApExclusionType;
+}
+
+int WifiSettings::SetStaApExclusionType(int type)
+{
+    std::unique_lock<std::mutex> lock(mWifiConfigMutex);
+    mWifiConfig.staApExclusionType = type;
+    SyncWifiConfig();
+    return 0;
+}
+#ifdef SUPPORT_RANDOM_MAC_ADDR
+static std::string GetPairMacAddress(std::map<WifiMacAddrInfo,
+    std::string>& macAddrInfoMap, const WifiMacAddrInfo &macAddrInfo)
+{
+    auto iter = macAddrInfoMap.find(macAddrInfo);
+    if (iter != macAddrInfoMap.end()) {
+        LOGI("find the record, realMacAddr:%{public}s, bssidType:%{public}d, randomMacAddr:%{public}s",
+            macAddrInfo.bssid.c_str(), macAddrInfo.bssidType, iter->second.c_str());
+        return iter->second;
+    }
+    return "";
+}
+
+static void InsertMacAddrPairs(std::map<WifiMacAddrInfo,
+    std::string>& macAddrInfoMap, const WifiMacAddrInfo &macAddrInfo, std::string& randomMacAddr)
+{
+    auto iter = macAddrInfoMap.find(macAddrInfo);
+    if (iter != macAddrInfoMap.end()) {
+        LOGI("find the record, realMacAddr:%{public}s, bssidType:%{public}d, randomMacAddr:%{public}s",
+            macAddrInfo.bssid.c_str(), macAddrInfo.bssidType, randomMacAddr.c_str());
+        return;
+    } else {
+        macAddrInfoMap.insert(std::make_pair(macAddrInfo, randomMacAddr));
+    }
+}
+
+static void DelMacAddrPairs(std::map<WifiMacAddrInfo, std::string>& macAddrInfoMap, const WifiMacAddrInfo &macAddrInfo)
+{
+    auto iter = macAddrInfoMap.find(macAddrInfo);
+    if (iter != macAddrInfoMap.end()) {
+        if (iter->second.empty()) {
+            LOGI("invalid record, bssid:%{public}s, bssidType:%{public}d",
+                iter->first.bssid.c_str(), iter->first.bssidType);
+        } else {
+            LOGI("find the record, realMacAddr:%{public}s, bssidType:%{public}d, randomMacAddr:%{public}s",
+                macAddrInfo.bssid.c_str(), macAddrInfo.bssidType, iter->second.c_str());
+        }
+        macAddrInfoMap.erase(iter);
+    }
+}
+
+void WifiSettings::GenerateRandomMacAddress(std::string peerBssid, std::string &randomMacAddr)
+{
+    LOGI("enter GenerateRandomMacAddress");
+    constexpr int arraySize = 4;
+    constexpr int macBitSize = 12;
+    constexpr int firstBit = 1;
+    constexpr int lastBit = 11;
+    constexpr int two = 2;
+    constexpr int hexBase = 16;
+    constexpr int octBase = 8;
+    int ret = 0;
+    char strMacTmp[arraySize] = {0};
+    std::mt19937_64 gen(std::chrono::high_resolution_clock::now().time_since_epoch().count()
+        + std::hash<std::string>{}(peerBssid));
+    for (int i = 0; i < macBitSize; i++) {
+        if (i != firstBit) {
+            std::uniform_int_distribution<> distribution(0, hexBase - 1);
+            ret = sprintf_s(strMacTmp, arraySize, "%x", distribution(gen));
+        } else {
+            std::uniform_int_distribution<> distribution(0, octBase - 1);
+            ret = sprintf_s(strMacTmp, arraySize, "%x", two * distribution(gen));
+        }
+        if (ret == -1) {
+            LOGE("GenerateRandomMacAddress failed, sprintf_s return -1!");
+        }
+        randomMacAddr += strMacTmp;
+        if ((i % two) != 0 && (i != lastBit)) {
+            randomMacAddr.append(":");
+        }
+    }
+    LOGI("exit GenerateRandomMacAddress, randomMacAddr:%{public}s", randomMacAddr.c_str());
+}
+
+bool WifiSettings::StoreWifiMacAddrPairInfo(WifiMacAddrInfoType type, const std::string &realMacAddr)
+{
+    if (realMacAddr.empty()) {
+        LOGE("invalid mac address");
+        return false;
+    }
+
+    if (type >= WifiMacAddrInfoType::INVALID_MACADDR_INFO) {
+        LOGE("invalid mac address");
+        return false;
+    }
+    std::string randomMacAddr;
+    WifiSettings::GetInstance().GenerateRandomMacAddress(realMacAddr, randomMacAddr);
+    WifiMacAddrInfo realMacAddrInfo;
+    realMacAddrInfo.bssid = realMacAddr;
+    realMacAddrInfo.bssidType = REAL_DEVICE_ADDRESS;
+    WifiSettings::GetInstance().AddMacAddrPairs(type, realMacAddrInfo, randomMacAddr);
+
+    WifiMacAddrInfo randomMacAddrInfo;
+    randomMacAddrInfo.bssid = randomMacAddr;
+    randomMacAddrInfo.bssidType = RANDOM_DEVICE_ADDRESS;
+    WifiSettings::GetInstance().AddMacAddrPairs(type, randomMacAddrInfo, realMacAddr);
+    return true;
+}
+
+int WifiSettings::AddMacAddrPairs(WifiMacAddrInfoType type,
+    const WifiMacAddrInfo &macAddrInfo, std::string randomMacAddr)
+{
+    if ((type >= WifiMacAddrInfoType::INVALID_MACADDR_INFO) || macAddrInfo.bssid.empty()) {
+        LOGE("invalid parameter, type:%{public}d, bssid:%{public}s", type, macAddrInfo.bssid.c_str());
+        return -1;
+    }
+    LOGI("add a mac address pair, type:%{public}d, bssid:%{public}s, bssidType:%{public}d, randomMacAddr:%{public}s",
+        type, macAddrInfo.bssid.c_str(), macAddrInfo.bssidType, randomMacAddr.c_str());
+    std::unique_lock<std::mutex> lock(mMacAddrPairMutex);
+    switch (type) {
+        case WifiMacAddrInfoType::WIFI_SCANINFO_MACADDR_INFO:
+            InsertMacAddrPairs(mWifiScanMacAddrPair, macAddrInfo, randomMacAddr);
+            break;
+        case WifiMacAddrInfoType::WIFI_DEVICE_CONFIG_MACADDR_INFO:
+            InsertMacAddrPairs(mDeviceConfigMacAddrPair, macAddrInfo, randomMacAddr);
+            break;
+        case WifiMacAddrInfoType::HOTSPOT_MACADDR_INFO:
+            InsertMacAddrPairs(mHotspotMacAddrPair, macAddrInfo, randomMacAddr);
+            break;
+        case WifiMacAddrInfoType::P2P_MACADDR_INFO:
+            InsertMacAddrPairs(mP2pMacAddrPair, macAddrInfo, randomMacAddr);
+            break;
+        default:
+            LOGE("invalid mac address type, type:%{public}d", type);
+            return -1;
+    }
+    return 0;
+}
+
+int WifiSettings::RemoveMacAddrPairs(WifiMacAddrInfoType type, const WifiMacAddrInfo &macAddrInfo)
+{
+    std::unique_lock<std::mutex> lock(mMacAddrPairMutex);
+    switch (type) {
+        case WifiMacAddrInfoType::WIFI_SCANINFO_MACADDR_INFO:
+            DelMacAddrPairs(mWifiScanMacAddrPair, macAddrInfo);
+            break;
+        case WifiMacAddrInfoType::WIFI_DEVICE_CONFIG_MACADDR_INFO:
+            DelMacAddrPairs(mDeviceConfigMacAddrPair, macAddrInfo);
+            break;
+        case WifiMacAddrInfoType::HOTSPOT_MACADDR_INFO:
+            DelMacAddrPairs(mHotspotMacAddrPair, macAddrInfo);
+            break;
+        case WifiMacAddrInfoType::P2P_MACADDR_INFO:
+            DelMacAddrPairs(mP2pMacAddrPair, macAddrInfo);
+            break;
+        default:
+            LOGE("invalid mac address type, type:%{public}d", type);
+            return -1;
+    }
+    return 0;
+}
+
+std::string WifiSettings::GetMacAddrPairs(WifiMacAddrInfoType type, const WifiMacAddrInfo &macAddrInfo)
+{
+    LOGI("AddMacAddrPairs, type:%{public}d, bssid:%{public}s, bssidType:%{public}d",
+        type, macAddrInfo.bssid.c_str(), macAddrInfo.bssidType);
+    std::unique_lock<std::mutex> lock(mMacAddrPairMutex);
+    switch (type) {
+        case WifiMacAddrInfoType::WIFI_SCANINFO_MACADDR_INFO:
+            return GetPairMacAddress(mWifiScanMacAddrPair, macAddrInfo);
+        case WifiMacAddrInfoType::WIFI_DEVICE_CONFIG_MACADDR_INFO:
+            return GetPairMacAddress(mDeviceConfigMacAddrPair, macAddrInfo);
+        case WifiMacAddrInfoType::HOTSPOT_MACADDR_INFO:
+            return GetPairMacAddress(mHotspotMacAddrPair, macAddrInfo);
+        case WifiMacAddrInfoType::P2P_MACADDR_INFO:
+            return GetPairMacAddress(mP2pMacAddrPair, macAddrInfo);
+        default:
+            LOGE("invalid mac address type, type:%{public}d", type);
+            return "";
+    }
+    return "";
+}
+#endif
 }  // namespace Wifi
 }  // namespace OHOS

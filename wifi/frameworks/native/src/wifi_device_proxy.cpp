@@ -248,6 +248,9 @@ void WifiDeviceProxy::WriteDeviceConfig(const WifiDeviceConfig &config, MessageP
     data.WriteInt32(config.networkId);
     data.WriteInt32(config.status);
     data.WriteString(config.bssid);
+#ifdef SUPPORT_RANDOM_MAC_ADDR
+    data.WriteInt32(config.bssidType);
+#endif
     data.WriteString(config.ssid);
     data.WriteInt32(config.band);
     data.WriteInt32(config.channel);
@@ -509,6 +512,9 @@ void WifiDeviceProxy::ParseDeviceConfigs(MessageParcel &reply, std::vector<WifiD
         config.networkId = reply.ReadInt32();
         config.status = reply.ReadInt32();
         config.bssid = reply.ReadString();
+    #ifdef SUPPORT_RANDOM_MAC_ADDR
+        config.bssidType = reply.ReadInt32();
+    #endif
         config.ssid = reply.ReadString();
         config.band = reply.ReadInt32();
         config.channel = reply.ReadInt32();

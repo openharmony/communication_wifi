@@ -63,6 +63,8 @@ typedef struct {
     char ssid[WIFI_MAX_SSID_LEN];
     /** Basic service set ID (BSSID). For its length, see {@link WIFI_MAC_LEN}. */
     unsigned char bssid[WIFI_MAC_LEN];
+    /* address type */
+    int bssidType;
     /** Security type. For details, see {@link WifiSecurityType}. */
     int securityType;
     /** Received signal strength indicator (RSSI) */

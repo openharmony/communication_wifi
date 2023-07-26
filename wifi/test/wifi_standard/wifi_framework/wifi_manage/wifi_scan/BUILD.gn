@@ -46,6 +46,7 @@ ohos_unittest("wifi_scan_unittest") {
     "scan_interface_test.cpp",
     "scan_monitor_test.cpp",
     "scan_service_test.cpp",
+    "scan_state_machine_test.cpp",
   ]
 
   include_dirs = [
@@ -79,6 +80,10 @@ ohos_unittest("wifi_scan_unittest") {
     "//third_party/googletest/googletest/include",
     "$WIFI_ROOT_DIR/services/wifi_standard/include",
     "$WIFI_ROOT_DIR/utils/inc",
+  ]
+  ldflags = [
+    "-fPIC",
+    "--coverage",
   ]
   deps = [
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage:wifi_manager_service",

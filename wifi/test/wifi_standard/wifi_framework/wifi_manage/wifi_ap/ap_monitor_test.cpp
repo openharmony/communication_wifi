@@ -33,6 +33,7 @@ const std::string Mac = "AA:BB:CC:DD:EE:FF";
 StationInfo staInfo = {
     "test_deviceName",
     Mac.c_str(),
+    1,
     "127.0.0.1",
 };
 const int AP_ENABLE = 109;

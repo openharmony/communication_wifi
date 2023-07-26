@@ -15,12 +15,38 @@
 
 #ifndef OHOS_WIFI_COMMON_MSG_H
 #define OHOS_WIFI_COMMON_MSG_H
+#include <string>
 
 namespace OHOS {
 namespace Wifi {
 enum class ServiceType {
     DEFAULT = 0,
     WIFI_EXT = 1,
+};
+
+constexpr int RANDOM_DEVICE_ADDRESS = 0;
+constexpr int REAL_DEVICE_ADDRESS = 1;
+
+struct WifiMacAddrInfo {
+    std::string bssid; /* mac address */
+    int bssidType; /* mac address type */
+    bool operator == (const WifiMacAddrInfo& mac)
+    {
+        if ((bssid == mac.bssid) && (bssidType == mac.bssidType)) {
+            return true;
+        }
+        return false;
+    }
+    bool operator < (const WifiMacAddrInfo& mac) const
+    {
+        return bssid < mac.bssid;
+    }
+    WifiMacAddrInfo& operator = (const WifiMacAddrInfo& mac)
+    {
+        bssid = mac.bssid;
+        bssidType = mac.bssidType;
+        return *this;
+    }
 };
 }  // namespace Wifi
 }  // namespace OHOS

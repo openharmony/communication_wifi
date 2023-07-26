@@ -42,6 +42,19 @@ static napi_value SuppStateInit(napi_env env)
     return suppState;
 }
 
+#ifdef SUPPORT_RANDOM_MAC_ADDR
+static napi_value DeviceAddressTypeInit(napi_env env)
+{
+    napi_value addressType = nullptr;
+    napi_create_object(env, &addressType);
+    SetNamedPropertyByInteger(env, addressType,
+        static_cast<int>(AddressTypeJs::ADDR_TYPE_RANDOM_DEVICE_ADDRESS), "RANDOM_DEVICE_ADDRESS");
+    SetNamedPropertyByInteger(env, addressType,
+        static_cast<int>(AddressTypeJs::ADDR_TYPE_REAL_DEVICE_ADDRESS), "REAL_DEVICE_ADDRESS");
+    return addressType;
+}
+#endif
+
 static napi_value SecurityTypeInit(napi_env env)
 {
     napi_value securityType = nullptr;
@@ -231,6 +244,9 @@ static napi_value PropertyValueInit(napi_env env, napi_value exports)
 {
     napi_value suppStateObj = SuppStateInit(env);
     napi_value securityTypeObj = SecurityTypeInit(env);
+#ifdef SUPPORT_RANDOM_MAC_ADDR
+    napi_value deviceAddressTypeObj = DeviceAddressTypeInit(env);
+#endif
     napi_value ipTypeObj = IpTypeInit(env);
     napi_value connStateObj = ConnStateInit(env);
     napi_value p2pConnStateObj = P2pConnStateInit(env);
@@ -256,6 +272,9 @@ static napi_value PropertyValueInit(napi_env env, napi_value exports)
 #endif
         DECLARE_NAPI_PROPERTY("SuppState", suppStateObj),
         DECLARE_NAPI_PROPERTY("WifiSecurityType", securityTypeObj),
+#ifdef SUPPORT_RANDOM_MAC_ADDR
+        DECLARE_NAPI_PROPERTY("DeviceAddressType", deviceAddressTypeObj),
+#endif
         DECLARE_NAPI_PROPERTY("IpType", ipTypeObj),
         DECLARE_NAPI_PROPERTY("ConnState", connStateObj),
         DECLARE_NAPI_PROPERTY("P2pConnectState", p2pConnStateObj),

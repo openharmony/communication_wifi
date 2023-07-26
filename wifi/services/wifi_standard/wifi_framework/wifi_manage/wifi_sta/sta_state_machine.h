@@ -396,7 +396,7 @@ public:
     /**
      * @Description Reupdate net link info
      */
-    void ReUpdateNetLinkInfo(void);
+    void ReUpdateNetLinkInfo(const WifiDeviceConfig &config);
 
 #ifndef OHOS_ARCH_LITE
 private:

@@ -74,18 +74,21 @@ void WifiHalCRpcServerAddTest::TearDown()
 HWTEST_F(WifiHalCRpcServerAddTest, RpcP2pStartTest, TestSize.Level1)
 {
     EXPECT_TRUE(RpcP2pStart(nullptr, nullptr) < 0);
+    EXPECT_TRUE(RpcP2pStart(mServer, nullptr) < 0);
     EXPECT_TRUE(RpcP2pStart(mServer, mContext) == 0);
 }
 
 HWTEST_F(WifiHalCRpcServerAddTest, RpcP2pStopTest, TestSize.Level1)
 {
     EXPECT_TRUE(RpcP2pStop(nullptr, nullptr) < 0);
+    EXPECT_TRUE(RpcP2pStop(mServer, nullptr) < 0);
     EXPECT_TRUE(RpcP2pStop(mServer, mContext) == 0);
 }
 
 HWTEST_F(WifiHalCRpcServerAddTest, RpcP2pSetRandomMacTest, TestSize.Level1)
 {
     EXPECT_TRUE(RpcP2pSetRandomMac(nullptr, nullptr) < 0);
+    EXPECT_TRUE(RpcP2pSetRandomMac(mServer, nullptr) < 0);
     char buff[] = "N\tP2pSetRandomMac\t1";
     mContext->oneProcess = buff;
     mContext->nPos = strlen("N\tP2pSetRandomMac\t");
@@ -101,6 +104,7 @@ HWTEST_F(WifiHalCRpcServerAddTest, RpcP2pSetRandomMacTest, TestSize.Level1)
 HWTEST_F(WifiHalCRpcServerAddTest, RpcP2pSetDeviceNameTest, TestSize.Level1)
 {
     EXPECT_TRUE(RpcP2pSetDeviceName(nullptr, nullptr) < 0);
+    EXPECT_TRUE(RpcP2pSetDeviceName(mServer, nullptr) < 0);
     char buff[] = "N\tP2pSetDeviceName\tp2p_device_name";
     mContext->oneProcess = buff;
     mContext->nPos = strlen("N\tP2pSetDeviceName\t");
@@ -116,6 +120,7 @@ HWTEST_F(WifiHalCRpcServerAddTest, RpcP2pSetDeviceNameTest, TestSize.Level1)
 HWTEST_F(WifiHalCRpcServerAddTest, RpcP2pSetSsidPostfixNameTest, TestSize.Level1)
 {
     EXPECT_TRUE(RpcP2pSetSsidPostfixName(nullptr, nullptr) < 0);
+    EXPECT_TRUE(RpcP2pSetSsidPostfixName(mServer, nullptr) < 0);
     char buff[] = "N\tP2pSetSsidPostfixName\tp2p_postfix_name";
     mContext->oneProcess = buff;
     mContext->nPos = strlen("N\tP2pSetSsidPostfixName\t");
@@ -131,6 +136,7 @@ HWTEST_F(WifiHalCRpcServerAddTest, RpcP2pSetSsidPostfixNameTest, TestSize.Level1
 HWTEST_F(WifiHalCRpcServerAddTest, RpcP2pSetWpsDeviceTypeTest, TestSize.Level1)
 {
     EXPECT_TRUE(RpcP2pSetWpsDeviceType(nullptr, nullptr) < 0);
+    EXPECT_TRUE(RpcP2pSetWpsDeviceType(mServer, nullptr) < 0);
     char buff[] = "N\tP2pSetWpsDeviceType\tp2p_device_type";
     mContext->oneProcess = buff;
     mContext->nPos = strlen("N\tP2pSetWpsDeviceType\t");
@@ -146,6 +152,7 @@ HWTEST_F(WifiHalCRpcServerAddTest, RpcP2pSetWpsDeviceTypeTest, TestSize.Level1)
 HWTEST_F(WifiHalCRpcServerAddTest, RpcP2pSetWpsConfigMethodsTest, TestSize.Level1)
 {
     EXPECT_TRUE(RpcP2pSetWpsConfigMethods(nullptr, nullptr) < 0);
+    EXPECT_TRUE(RpcP2pSetWpsConfigMethods(mServer, nullptr) < 0);
     char buff[] = "N\tP2pSetWpsConfigMethods\tp2p_config_methods";
     mContext->oneProcess = buff;
     mContext->nPos = strlen("N\tP2pSetWpsConfigMethods\t");
@@ -161,6 +168,7 @@ HWTEST_F(WifiHalCRpcServerAddTest, RpcP2pSetWpsConfigMethodsTest, TestSize.Level
 HWTEST_F(WifiHalCRpcServerAddTest, RpcP2pGetDeviceAddressTest, TestSize.Level1)
 {
     EXPECT_TRUE(RpcP2pGetDeviceAddress(nullptr, nullptr) < 0);
+    EXPECT_TRUE(RpcP2pGetDeviceAddress(mServer, nullptr) < 0);
     char buff[] = "N\tP2pGetDeviceAddress\t17";
     mContext->oneProcess = buff;
     mContext->nPos = strlen("N\tP2pGetDeviceAddress\t");
@@ -181,24 +189,28 @@ HWTEST_F(WifiHalCRpcServerAddTest, RpcP2pGetDeviceAddressTest, TestSize.Level1)
 HWTEST_F(WifiHalCRpcServerAddTest, RpcP2pFlushTest, TestSize.Level1)
 {
     EXPECT_TRUE(RpcP2pFlush(nullptr, nullptr) < 0);
+    EXPECT_TRUE(RpcP2pFlush(mServer, nullptr) < 0);
     EXPECT_TRUE(RpcP2pFlush(mServer, mContext) == 0);
 }
 
 HWTEST_F(WifiHalCRpcServerAddTest, RpcP2pFlushServiceTest, TestSize.Level1)
 {
     EXPECT_TRUE(RpcP2pFlushService(nullptr, nullptr) < 0);
+    EXPECT_TRUE(RpcP2pFlushService(mServer, nullptr) < 0);
     EXPECT_TRUE(RpcP2pFlushService(mServer, mContext) == 0);
 }
 
 HWTEST_F(WifiHalCRpcServerAddTest, RpcP2pSaveConfigTest, TestSize.Level1)
 {
     EXPECT_TRUE(RpcP2pSaveConfig(nullptr, nullptr) < 0);
+    EXPECT_TRUE(RpcP2pSaveConfig(mServer, nullptr) < 0);
     EXPECT_TRUE(RpcP2pSaveConfig(mServer, mContext) == 0);
 }
 
 HWTEST_F(WifiHalCRpcServerAddTest, RpcP2pSetupWpsPbcTest, TestSize.Level1)
 {
     EXPECT_TRUE(RpcP2pSetupWpsPbc(nullptr, nullptr) < 0);
+    EXPECT_TRUE(RpcP2pSetupWpsPbc(mServer, nullptr) < 0);
     char buff[] = "N\tP2pSetupWpsPbc\tp2p-dev-wlan0\t00:00:00:00:00:00";
     mContext->oneProcess = buff;
     mContext->nPos = strlen("N\tP2pSetupWpsPbc\t");
@@ -214,6 +226,7 @@ HWTEST_F(WifiHalCRpcServerAddTest, RpcP2pSetupWpsPbcTest, TestSize.Level1)
 HWTEST_F(WifiHalCRpcServerAddTest, RpcP2pSetupWpsPinTest, TestSize.Level1)
 {
     EXPECT_TRUE(RpcP2pSetupWpsPin(nullptr, nullptr) < 0);
+    EXPECT_TRUE(RpcP2pSetupWpsPin(mServer, nullptr) < 0);
     char buff[] = "N\tP2pSetupWpsPiN\tp2p-dev-wlan0\t00:00:00:00:00:00\t123456789\t8\t";
     mContext->oneProcess = buff;
     mContext->nPos = strlen("N\tP2pSetupWpsPiN\t");
@@ -229,6 +242,7 @@ HWTEST_F(WifiHalCRpcServerAddTest, RpcP2pSetupWpsPinTest, TestSize.Level1)
 HWTEST_F(WifiHalCRpcServerAddTest, RpcP2pRemoveNetworkTest, TestSize.Level1)
 {
     EXPECT_TRUE(RpcP2pRemoveNetwork(nullptr, nullptr) < 0);
+    EXPECT_TRUE(RpcP2pRemoveNetwork(mServer, nullptr) < 0);
     char buff[] = "N\tP2pRemoveNetwork\t1";
     mContext->oneProcess = buff;
     mContext->nPos = strlen("N\tP2pRemoveNetwork\t");
@@ -244,12 +258,14 @@ HWTEST_F(WifiHalCRpcServerAddTest, RpcP2pRemoveNetworkTest, TestSize.Level1)
 HWTEST_F(WifiHalCRpcServerAddTest, RpcP2pListNetworksTest, TestSize.Level1)
 {
     EXPECT_TRUE(RpcP2pListNetworks(nullptr, nullptr) < 0);
+    EXPECT_TRUE(RpcP2pListNetworks(mServer, nullptr) < 0);
     EXPECT_TRUE(RpcP2pListNetworks(mServer, mContext) == 0);
 }
 
 HWTEST_F(WifiHalCRpcServerAddTest, RpcP2pSetGroupMaxIdleTest, TestSize.Level1)
 {
     EXPECT_TRUE(RpcP2pSetGroupMaxIdle(nullptr, nullptr) < 0);
+    EXPECT_TRUE(RpcP2pSetGroupMaxIdle(mServer, nullptr) < 0);
     char buff[] = "N\tP2pSetGroupMaxIdle\tp2p-dev-wlan0\t1";
     mContext->oneProcess = buff;
     mContext->nPos = strlen("N\tP2pSetGroupMaxIdle\t");
@@ -265,6 +281,7 @@ HWTEST_F(WifiHalCRpcServerAddTest, RpcP2pSetGroupMaxIdleTest, TestSize.Level1)
 HWTEST_F(WifiHalCRpcServerAddTest, RpcP2pSetPowerSaveTest, TestSize.Level1)
 {
     EXPECT_TRUE(RpcP2pSetPowerSave(nullptr, nullptr) < 0);
+    EXPECT_TRUE(RpcP2pSetPowerSave(mServer, nullptr) < 0);
     char buff[] = "N\tP2pSetPowerSave\tp2p-dev-wlan0\t1";
     mContext->oneProcess = buff;
     mContext->nPos = strlen("N\tP2pSetPowerSave\t");
@@ -280,6 +297,7 @@ HWTEST_F(WifiHalCRpcServerAddTest, RpcP2pSetPowerSaveTest, TestSize.Level1)
 HWTEST_F(WifiHalCRpcServerAddTest, RpcP2pSetWfdEnableTest, TestSize.Level1)
 {
     EXPECT_TRUE(RpcP2pSetWfdEnable(nullptr, nullptr) < 0);
+    EXPECT_TRUE(RpcP2pSetWfdEnable(mServer, nullptr) < 0);
     char buff[] = "N\tP2pSetWfdEnable\t1";
     mContext->oneProcess = buff;
     mContext->nPos = strlen("N\tP2pSetWfdEnable\t");
@@ -295,6 +313,7 @@ HWTEST_F(WifiHalCRpcServerAddTest, RpcP2pSetWfdEnableTest, TestSize.Level1)
 HWTEST_F(WifiHalCRpcServerAddTest, RpcP2pSetWfdDeviceConfigTest, TestSize.Level1)
 {
     EXPECT_TRUE(RpcP2pSetWfdDeviceConfig(nullptr, nullptr) < 0);
+    EXPECT_TRUE(RpcP2pSetWfdDeviceConfig(mServer, nullptr) < 0);
     char buff[] = "N\tP2pSetWfdDeviceConfig\tp2p_device_config";
     mContext->oneProcess = buff;
     mContext->nPos = strlen("N\tP2pSetWfdDeviceConfig\t");
@@ -310,6 +329,7 @@ HWTEST_F(WifiHalCRpcServerAddTest, RpcP2pSetWfdDeviceConfigTest, TestSize.Level1
 HWTEST_F(WifiHalCRpcServerAddTest, RpcP2pStartFindTest, TestSize.Level1)
 {
     EXPECT_TRUE(RpcP2pStartFind(nullptr, nullptr) < 0);
+    EXPECT_TRUE(RpcP2pStartFind(mServer, nullptr) < 0);
     char buff[] = "N\tP2pStartFind\t120";
     mContext->oneProcess = buff;
     mContext->nPos = strlen("N\tP2pStartFind\t");
@@ -325,12 +345,14 @@ HWTEST_F(WifiHalCRpcServerAddTest, RpcP2pStartFindTest, TestSize.Level1)
 HWTEST_F(WifiHalCRpcServerAddTest, RpcP2pStopFindTest, TestSize.Level1)
 {
     EXPECT_TRUE(RpcP2pStopFind(nullptr, nullptr) < 0);
+    EXPECT_TRUE(RpcP2pStopFind(mServer, nullptr) < 0);
     EXPECT_TRUE(RpcP2pStopFind(mServer, mContext) == 0);
 }
 
 HWTEST_F(WifiHalCRpcServerAddTest, RpcP2pSetExtListenTest, TestSize.Level1)
 {
     EXPECT_TRUE(RpcP2pSetExtListen(nullptr, nullptr) < 0);
+    EXPECT_TRUE(RpcP2pSetExtListen(mServer, nullptr) < 0);
     char buff[] = "N\tP2pSetExtListeN\t0\t0\t0";
     mContext->oneProcess = buff;
     mContext->nPos = strlen("N\tP2pSetExtListeN\t");
@@ -346,6 +368,7 @@ HWTEST_F(WifiHalCRpcServerAddTest, RpcP2pSetExtListenTest, TestSize.Level1)
 HWTEST_F(WifiHalCRpcServerAddTest, RpcP2pSetListenChannelTest, TestSize.Level1)
 {
     EXPECT_TRUE(RpcP2pSetListenChannel(nullptr, nullptr) < 0);
+    EXPECT_TRUE(RpcP2pSetListenChannel(mServer, nullptr) < 0);
     char buff[] = "N\tP2pSetListenChannel\t0\t0";
     mContext->oneProcess = buff;
     mContext->nPos = strlen("N\tP2pSetListenChannel\t");
@@ -361,6 +384,7 @@ HWTEST_F(WifiHalCRpcServerAddTest, RpcP2pSetListenChannelTest, TestSize.Level1)
 HWTEST_F(WifiHalCRpcServerAddTest, RpcP2pConnectTest, TestSize.Level1)
 {
     EXPECT_TRUE(RpcP2pConnect(nullptr, nullptr) < 0);
+    EXPECT_TRUE(RpcP2pConnect(mServer, nullptr) < 0);
     char buff[] = "N\tP2pConnect\t0\t0\t0\t0\t00:00:00:00:00:00\t12345678";
     mContext->oneProcess = buff;
     mContext->nPos = strlen("N\tP2pConnect\t");
@@ -381,12 +405,14 @@ HWTEST_F(WifiHalCRpcServerAddTest, RpcP2pConnectTest, TestSize.Level1)
 HWTEST_F(WifiHalCRpcServerAddTest, RpcP2pCancelConnectTest, TestSize.Level1)
 {
     EXPECT_TRUE(RpcP2pCancelConnect(nullptr, nullptr) < 0);
+    EXPECT_TRUE(RpcP2pCancelConnect(mServer, nullptr) < 0);
     EXPECT_TRUE(RpcP2pCancelConnect(mServer, mContext) == 0);
 }
 
 HWTEST_F(WifiHalCRpcServerAddTest, RpcP2pProvisionDiscoveryTest, TestSize.Level1)
 {
     EXPECT_TRUE(RpcP2pProvisionDiscovery(nullptr, nullptr) < 0);
+    EXPECT_TRUE(RpcP2pProvisionDiscovery(mServer, nullptr) < 0);
     char buff[] = "N\tP2pProvisionDiscovery\t00:00:00:00:00:00\t1";
     mContext->oneProcess = buff;
     mContext->nPos = strlen("N\tP2pProvisionDiscovery\t");
@@ -402,6 +428,7 @@ HWTEST_F(WifiHalCRpcServerAddTest, RpcP2pProvisionDiscoveryTest, TestSize.Level1
 HWTEST_F(WifiHalCRpcServerAddTest, RpcP2pAddGroupTest, TestSize.Level1)
 {
     EXPECT_TRUE(RpcP2pAddGroup(nullptr, nullptr) < 0);
+    EXPECT_TRUE(RpcP2pAddGroup(mServer, nullptr) < 0);
     char buff[] = "N\tP2pAddGroup\t0\t1\t0";
     mContext->oneProcess = buff;
     mContext->nPos = strlen("N\tP2pAddGroup\t");
@@ -417,6 +444,7 @@ HWTEST_F(WifiHalCRpcServerAddTest, RpcP2pAddGroupTest, TestSize.Level1)
 HWTEST_F(WifiHalCRpcServerAddTest, RpcP2pRemoveGroupTest, TestSize.Level1)
 {
     EXPECT_TRUE(RpcP2pRemoveGroup(nullptr, nullptr) < 0);
+    EXPECT_TRUE(RpcP2pRemoveGroup(mServer, nullptr) < 0);
     char buff[] = "N\tP2pRemoveGroup\tp2p-dev-wlan0";
     mContext->oneProcess = buff;
     mContext->nPos = strlen("N\tP2pRemoveGroup\t");
@@ -432,6 +460,7 @@ HWTEST_F(WifiHalCRpcServerAddTest, RpcP2pRemoveGroupTest, TestSize.Level1)
 HWTEST_F(WifiHalCRpcServerAddTest, RpcP2pInviteTest, TestSize.Level1)
 {
     EXPECT_TRUE(RpcP2pInvite(nullptr, nullptr) < 0);
+    EXPECT_TRUE(RpcP2pInvite(mServer, nullptr) < 0);
     char buff[] = "N\tP2pInvite\t0\tp2p-dev-wlan0";
     mContext->oneProcess = buff;
     mContext->nPos = strlen("N\tP2pInvite\t");
@@ -447,6 +476,7 @@ HWTEST_F(WifiHalCRpcServerAddTest, RpcP2pInviteTest, TestSize.Level1)
 HWTEST_F(WifiHalCRpcServerAddTest, RpcP2pReinvokeTest, TestSize.Level1)
 {
     EXPECT_TRUE(RpcP2pReinvoke(nullptr, nullptr) < 0);
+    EXPECT_TRUE(RpcP2pReinvoke(mServer, nullptr) < 0);
     char buff[] = "N\tP2pReinvoke\t0\t00:00:00:00:00:00";
     mContext->oneProcess = buff;
     mContext->nPos = strlen("N\tP2pReinvoke\t");
@@ -462,6 +492,7 @@ HWTEST_F(WifiHalCRpcServerAddTest, RpcP2pReinvokeTest, TestSize.Level1)
 HWTEST_F(WifiHalCRpcServerAddTest, RpcP2pGetGroupCapabilityTest, TestSize.Level1)
 {
     EXPECT_TRUE(RpcP2pGetGroupCapability(nullptr, nullptr) < 0);
+    EXPECT_TRUE(RpcP2pGetGroupCapability(mServer, nullptr) < 0);
     char buff[] = "N\tP2pGetGroupCapability\t00:00:00:00:00:00";
     mContext->oneProcess = buff;
     mContext->nPos = strlen("N\tP2pGetGroupCapability\t");
@@ -477,6 +508,7 @@ HWTEST_F(WifiHalCRpcServerAddTest, RpcP2pGetGroupCapabilityTest, TestSize.Level1
 HWTEST_F(WifiHalCRpcServerAddTest, RpcP2pAddServiceTest, TestSize.Level1)
 {
     EXPECT_TRUE(RpcP2pAddService(nullptr, nullptr) < 0);
+    EXPECT_TRUE(RpcP2pAddService(mServer, nullptr) < 0);
     char buff[] = "N\tP2pAddService\tx\t0\tservice_name";
     mContext->oneProcess = buff;
     mContext->nPos = strlen("N\tP2pAddService\t");
@@ -507,6 +539,7 @@ HWTEST_F(WifiHalCRpcServerAddTest, RpcP2pAddServiceTest, TestSize.Level1)
 HWTEST_F(WifiHalCRpcServerAddTest, RpcP2pRemoveServiceTest, TestSize.Level1)
 {
     EXPECT_TRUE(RpcP2pRemoveService(nullptr, nullptr) < 0);
+    EXPECT_TRUE(RpcP2pRemoveService(mServer, nullptr) < 0);
     char buff[] = "N\tP2pRemoveService\tx\t0\tservice_name";
     mContext->oneProcess = buff;
     mContext->nPos = strlen("N\tP2pRemoveService\t");
@@ -537,6 +570,7 @@ HWTEST_F(WifiHalCRpcServerAddTest, RpcP2pRemoveServiceTest, TestSize.Level1)
 HWTEST_F(WifiHalCRpcServerAddTest, RpcP2pReqServiceDiscoveryTest, TestSize.Level1)
 {
     EXPECT_TRUE(RpcP2pReqServiceDiscovery(nullptr, nullptr) < 0);
+    EXPECT_TRUE(RpcP2pReqServiceDiscovery(mServer, nullptr) < 0);
     char buff[] = "N\tP2pReqServiceDiscovery\t00:00:00:00:00:00\tdiscover message";
     mContext->oneProcess = buff;
     mContext->nPos = strlen("N\tP2pReqServiceDiscovery\t");
@@ -552,6 +586,7 @@ HWTEST_F(WifiHalCRpcServerAddTest, RpcP2pReqServiceDiscoveryTest, TestSize.Level
 HWTEST_F(WifiHalCRpcServerAddTest, RpcP2pCancelServiceDiscoveryTest, TestSize.Level1)
 {
     EXPECT_TRUE(RpcP2pCancelServiceDiscovery(nullptr, nullptr) < 0);
+    EXPECT_TRUE(RpcP2pCancelServiceDiscovery(mServer, nullptr) < 0);
     char buff[] = "N\tP2pCancelServiceDiscovery\tdiscover message";
     mContext->oneProcess = buff;
     mContext->nPos = strlen("N\tP2pCancelServiceDiscovery\t");
@@ -567,6 +602,7 @@ HWTEST_F(WifiHalCRpcServerAddTest, RpcP2pCancelServiceDiscoveryTest, TestSize.Le
 HWTEST_F(WifiHalCRpcServerAddTest, RpcP2pSetMiracastTypeTest, TestSize.Level1)
 {
     EXPECT_TRUE(RpcP2pSetMiracastType(nullptr, nullptr) < 0);
+    EXPECT_TRUE(RpcP2pSetMiracastType(mServer, nullptr) < 0);
     char buff[] = "N\tP2pSetMiracastType\tx\t";
     mContext->oneProcess = buff;
     mContext->nPos = strlen("N\tP2pSetMiracastType\t");
@@ -582,6 +618,7 @@ HWTEST_F(WifiHalCRpcServerAddTest, RpcP2pSetMiracastTypeTest, TestSize.Level1)
 HWTEST_F(WifiHalCRpcServerAddTest, RpcP2pRespServerDiscoveryTest, TestSize.Level1)
 {
     EXPECT_TRUE(RpcP2pRespServerDiscovery(nullptr, nullptr) < 0);
+    EXPECT_TRUE(RpcP2pRespServerDiscovery(mServer, nullptr) < 0);
     char buff[] = "N\tP2pRespServerDiscovery\t0\t0\t00:00:00:00:00:00\ttlvs message";
     mContext->oneProcess = buff;
     mContext->nPos = strlen("N\tP2pRespServerDiscovery\t");
@@ -597,6 +634,7 @@ HWTEST_F(WifiHalCRpcServerAddTest, RpcP2pRespServerDiscoveryTest, TestSize.Level
 HWTEST_F(WifiHalCRpcServerAddTest, RpcP2pSetServDiscExternalTest, TestSize.Level1)
 {
     EXPECT_TRUE(RpcP2pSetServDiscExternal(nullptr, nullptr) < 0);
+    EXPECT_TRUE(RpcP2pSetServDiscExternal(mServer, nullptr) < 0);
     char buff[] = "N\tP2pSetServDiscExternal\tx\t";
     mContext->oneProcess = buff;
     mContext->nPos = strlen("N\tP2pSetServDiscExternal\t");
@@ -612,6 +650,7 @@ HWTEST_F(WifiHalCRpcServerAddTest, RpcP2pSetServDiscExternalTest, TestSize.Level
 HWTEST_F(WifiHalCRpcServerAddTest, RpcP2pSetPersistentReconnectTest, TestSize.Level1)
 {
     EXPECT_TRUE(RpcP2pSetPersistentReconnect(nullptr, nullptr) < 0);
+    EXPECT_TRUE(RpcP2pSetPersistentReconnect(mServer, nullptr) < 0);
     char buff[] = "N\tP2pSetPersistentReconnect\tx\t";
     mContext->oneProcess = buff;
     mContext->nPos = strlen("N\tP2pSetPersistentReconnect\t");

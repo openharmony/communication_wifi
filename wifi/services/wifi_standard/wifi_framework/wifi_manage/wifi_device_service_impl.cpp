@@ -593,8 +593,7 @@ ErrCode WifiDeviceServiceImpl::AddDeviceConfig(const WifiDeviceConfig &config, i
     std::string macAddr =
         WifiSettings::GetInstance().GetMacAddrPairs(WifiMacAddrInfoType::WIFI_DEVICE_CONFIG_MACADDR_INFO, macAddrInfo);
     if (macAddr.empty()) {
-        WIFI_LOGI("bssid:%{private}s, bssidType:%{public}d, randomMac:%{private}s",
-            config.bssid.c_str(), config.bssidType, macAddr.c_str());
+        WIFI_LOGI("bssid:%{private}s, bssidType:%{public}d", config.bssid.c_str(), config.bssidType);
     } else {
         WIFI_LOGI("the record is exists, bssid:%{private}s, bssidType:%{public}d, randomMac:%{private}s",
             config.bssid.c_str(), config.bssidType, macAddr.c_str());
@@ -603,8 +602,8 @@ ErrCode WifiDeviceServiceImpl::AddDeviceConfig(const WifiDeviceConfig &config, i
             config.bssidType == RANDOM_DEVICE_ADDRESS) {
             updateConfig.bssid = macAddr;
             updateConfig.bssidType = REAL_DEVICE_ADDRESS;
-            WIFI_LOGI("the record is updated, bssid:%{private}s, bssidType:%{public}d, randomMac:%{private}s",
-                updateConfig.bssid.c_str(), updateConfig.bssidType, macAddr.c_str());
+            WIFI_LOGI("the record is updated, bssid:%{private}s, bssidType:%{public}d",
+                updateConfig.bssid.c_str(), updateConfig.bssidType);
         }
     }
 #endif

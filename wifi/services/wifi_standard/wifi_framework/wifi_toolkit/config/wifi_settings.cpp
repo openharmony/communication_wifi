@@ -1832,6 +1832,8 @@ static std::string GetPairMacAddress(std::map<WifiMacAddrInfo,
         LOGI("find the record, realMacAddr:%{private}s, bssidType:%{public}d, randomMacAddr:%{private}s",
             macAddrInfo.bssid.c_str(), macAddrInfo.bssidType, iter->second.c_str());
         return iter->second;
+    } else {
+        LOGW("record not found.");
     }
     return "";
 }
@@ -1841,7 +1843,7 @@ static void InsertMacAddrPairs(std::map<WifiMacAddrInfo,
 {
     auto iter = macAddrInfoMap.find(macAddrInfo);
     if (iter != macAddrInfoMap.end()) {
-        LOGI("the record is exist, realMacAddr:%{private}s, bssidType:%{public}d, randomMacAddr:%{private}s",
+        LOGI("find the record, realMacAddr:%{private}s, bssidType:%{public}d, randomMacAddr:%{private}s",
             macAddrInfo.bssid.c_str(), macAddrInfo.bssidType, randomMacAddr.c_str());
         return;
     } else {

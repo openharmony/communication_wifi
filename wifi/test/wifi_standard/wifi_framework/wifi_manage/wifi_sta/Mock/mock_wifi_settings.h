@@ -76,6 +76,11 @@ public:
     virtual int GetWifiState() = 0;
     virtual int SetDeviceConnFailedCount(const std::string &index, const int &indexType, int count) = 0;
     virtual int IncreaseDeviceConnFailedCount(const std::string &index, const int &indexType, int count) = 0;
+    virtual int SaveIpV6Info(const IpV6Info &info) = 0;
+    virtual int GetIpV6Info(IpV6Info &info) = 0;
+    virtual int SetRealMacAddress(const std::string &macAddress) = 0;
+    virtual int GetRealMacAddress(std::string &macAddress) = 0;
+    virtual int GetScoretacticsNormalScore() = 0;
 };
 
 class WifiSettings : public MockWifiSettings {
@@ -134,6 +139,11 @@ public:
     MOCK_METHOD0(GetWifiState, int());
     MOCK_METHOD3(SetDeviceConnFailedCount, int(const std::string &index, const int &indexType, int count));
     MOCK_METHOD3(IncreaseDeviceConnFailedCount, int(const std::string &index, const int &indexType, int count));
+    MOCK_METHOD1(SaveIpV6Info, int(const IpV6Info &info));
+    MOCK_METHOD1(GetIpV6Info, int(IpV6Info &info));
+    MOCK_METHOD1(SetRealMacAddress, int(const std::string &macAddress));
+    MOCK_METHOD1(GetRealMacAddress, int(std::string &macAddress));
+    MOCK_METHOD0(GetScoretacticsNormalScore, int());
 };
 }  // namespace OHOS
 }  // namespace Wifi

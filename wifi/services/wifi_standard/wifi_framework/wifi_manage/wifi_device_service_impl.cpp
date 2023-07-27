@@ -594,7 +594,7 @@ ErrCode WifiDeviceServiceImpl::AddDeviceConfig(const WifiDeviceConfig &config, i
         WifiSettings::GetInstance().GetMacAddrPairs(WifiMacAddrInfoType::WIFI_DEVICE_CONFIG_MACADDR_INFO, macAddrInfo);
     if (macAddr.empty()) {
         WIFI_LOGI("bssid:%{private}s, bssidType:%{public}d, randomMac:%{private}s",
-            config.bssid.c_str(), config.bssidType, randomMac.c_str());
+            config.bssid.c_str(), config.bssidType, macAddr.c_str());
     } else {
         WIFI_LOGI("the record is exists, bssid:%{private}s, bssidType:%{public}d, randomMac:%{private}s",
             config.bssid.c_str(), config.bssidType, macAddr.c_str());

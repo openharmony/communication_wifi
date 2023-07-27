@@ -1334,9 +1334,15 @@ public:
      *
      * @param type - MAC address type[in]
      * @param macAddrInfo - MAC address info[in]
-     * @return std::string - an empty string indicates failure  
+     * @return std::string - an empty string indicates failure
      */
     std::string GetMacAddrPairs(WifiMacAddrInfoType type, const WifiMacAddrInfo &macAddrInfo);
+    /**
+     * @Description print MAC address pair
+     *
+     * @param type - MAC address type[in]
+     */
+    void PrintMacAddrPairs(WifiMacAddrInfoType type);
 #endif
 private:
     WifiSettings();

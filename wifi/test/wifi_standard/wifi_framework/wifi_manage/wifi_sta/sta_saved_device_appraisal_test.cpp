@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -19,7 +19,6 @@
 #include "wifi_errcode.h"
 #include "wifi_internal_msg.h"
 #include "wifi_msg.h"
-
 #include "mock_wifi_settings.h"
 #include "mock_device_appraisal.h"
 
@@ -57,6 +56,7 @@ public:
         EXPECT_CALL(WifiSettings::GetInstance(), GetScoretacticsFrequency5GHzScore()).Times(AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), GetScoretacticsLastSelectionScore()).Times(AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), GetScoretacticsSecurityScore()).Times(AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), GetScoretacticsNormalScore()).Times(AtLeast(0));
         pStaSavedDeviceAppraisal = std::make_unique<StaSavedDeviceAppraisal>(false);
     }
     virtual void TearDown()
@@ -439,7 +439,6 @@ HWTEST_F(StaSavedDeviceAppraisalTest, WhetherSkipDeviceFail2, TestSize.Level1)
 {
     WhetherSkipDeviceFail2();
 }
-
 
 HWTEST_F(StaSavedDeviceAppraisalTest, CalculateSignalBarsSuccess1, TestSize.Level1)
 {

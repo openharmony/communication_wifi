@@ -526,8 +526,8 @@ ErrCode WifiP2pServiceImpl::P2pConnect(const WifiP2pConfig &config)
             if (config.GetDeviceAddressType() == RANDOM_DEVICE_ADDRESS) {
                 updateConfig.SetDeviceAddress(randomMacAddr);
                 updateConfig.SetDeviceAddressType(REAL_DEVICE_ADDRESS);
-                WIFI_LOGI("the record is updated, bssid:%{private}s, bssidType:%{public}d, randomMac:%{private}s",
-                    updateConfig.GetDeviceAddress().c_str(), updateConfig.GetDeviceAddressType(), randomMacAddr.c_str());
+                WIFI_LOGI("the record is updated, bssid:%{private}s, bssidType:%{public}d",
+                    updateConfig.GetDeviceAddress().c_str(), updateConfig.GetDeviceAddressType());
             }
         }
     } else {

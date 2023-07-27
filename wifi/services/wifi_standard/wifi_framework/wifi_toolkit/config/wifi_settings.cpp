@@ -1927,12 +1927,13 @@ bool WifiSettings::StoreWifiMacAddrPairInfo(WifiMacAddrInfoType type, const std:
     WifiMacAddrInfo realMacAddrInfo;
     realMacAddrInfo.bssid = realMacAddr;
     realMacAddrInfo.bssidType = REAL_DEVICE_ADDRESS;
-    WifiSettings::GetInstance().AddMacAddrPairs(type, realMacAddrInfo, randomMacAddr);
-
-    WifiMacAddrInfo randomMacAddrInfo;
-    randomMacAddrInfo.bssid = randomMacAddr;
-    randomMacAddrInfo.bssidType = RANDOM_DEVICE_ADDRESS;
-    WifiSettings::GetInstance().AddMacAddrPairs(type, randomMacAddrInfo, realMacAddr);
+    int ret = WifiSettings::GetInstance().AddMacAddrPairs(type, realMacAddrInfo, randomMacAddr);
+    if (ret == 0) {
+        WifiMacAddrInfo randomMacAddrInfo;
+        randomMacAddrInfo.bssid = randomMacAddr;
+        randomMacAddrInfo.bssidType = RANDOM_DEVICE_ADDRESS;
+        WifiSettings::GetInstance().AddMacAddrPairs(type, randomMacAddrInfo, realMacAddr);
+    }
     return true;
 }
 

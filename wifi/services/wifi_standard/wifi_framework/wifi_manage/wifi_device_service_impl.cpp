@@ -909,7 +909,7 @@ ErrCode WifiDeviceServiceImpl::ConnectToDevice(const WifiDeviceConfig &config)
         macAddrInfo.bssidType = config.bssidType;
         std::string randomMacAddr =
             WifiSettings::GetInstance().GetMacAddrPairs(WifiMacAddrInfoType::WIFI_DEVICE_CONFIG_MACADDR_INFO, macAddrInfo);
-        if (!randomMacAddr.empty()) {
+        if (randomMacAddr.empty()) {
             WIFI_LOGE("abnormal data, bssid:%{private}s, bssidType:%{public}d",
                 macAddrInfo.bssid.c_str(), macAddrInfo.bssidType);
             return WIFI_OPT_INVALID_PARAM;

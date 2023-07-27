@@ -1841,11 +1841,13 @@ static void InsertMacAddrPairs(std::map<WifiMacAddrInfo,
 {
     auto iter = macAddrInfoMap.find(macAddrInfo);
     if (iter != macAddrInfoMap.end()) {
-        LOGI("find the record, realMacAddr:%{private}s, bssidType:%{public}d, randomMacAddr:%{private}s",
+        LOGI("the record is exist, realMacAddr:%{private}s, bssidType:%{public}d, randomMacAddr:%{private}s",
             macAddrInfo.bssid.c_str(), macAddrInfo.bssidType, randomMacAddr.c_str());
         return;
     } else {
         macAddrInfoMap.insert(std::make_pair(macAddrInfo, randomMacAddr));
+        LOGI("add a mac address pair, type:%{public}d, bssid:%{private}s, bssidType:%{public}d, randomMacAddr:%{private}s",
+            type, macAddrInfo.bssid.c_str(), macAddrInfo.bssidType, randomMacAddr.c_str());
     }
 }
 
@@ -1940,8 +1942,6 @@ int WifiSettings::AddMacAddrPairs(WifiMacAddrInfoType type,
             type, macAddrInfo.bssid.c_str());
         return -1;
     }
-    LOGI("add a mac address pair, type:%{public}d, bssid:%{private}s, bssidType:%{public}d, randomMacAddr:%{private}s",
-        type, macAddrInfo.bssid.c_str(), macAddrInfo.bssidType, randomMacAddr.c_str());
     std::unique_lock<std::mutex> lock(mMacAddrPairMutex);
     switch (type) {
         case WifiMacAddrInfoType::WIFI_SCANINFO_MACADDR_INFO:
@@ -1960,7 +1960,6 @@ int WifiSettings::AddMacAddrPairs(WifiMacAddrInfoType type,
             LOGE("invalid mac address type, type:%{public}d", type);
             return -1;
     }
-    WifiSettings::GetInstance().PrintMacAddrPairs(type);
     return 0;
 }
 
@@ -1984,7 +1983,6 @@ int WifiSettings::RemoveMacAddrPairs(WifiMacAddrInfoType type, const WifiMacAddr
             LOGE("invalid mac address type, type:%{public}d", type);
             return -1;
     }
-    WifiSettings::GetInstance().PrintMacAddrPairs(type);
     return 0;
 }
 

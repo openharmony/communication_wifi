@@ -1848,8 +1848,8 @@ static void InsertMacAddrPairs(std::map<WifiMacAddrInfo,
         return;
     } else {
         macAddrInfoMap.insert(std::make_pair(macAddrInfo, randomMacAddr));
-        LOGI("add a mac address pair, type:%{public}d, bssid:%{private}s, bssidType:%{public}d, randomMacAddr:%{private}s",
-            type, macAddrInfo.bssid.c_str(), macAddrInfo.bssidType, randomMacAddr.c_str());
+        LOGI("add a mac address pair, bssid:%{private}s, bssidType:%{public}d, randomMacAddr:%{private}s",
+            macAddrInfo.bssid.c_str(), macAddrInfo.bssidType, randomMacAddr.c_str());
     }
 }
 

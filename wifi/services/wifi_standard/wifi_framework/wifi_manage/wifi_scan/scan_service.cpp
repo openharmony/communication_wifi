@@ -66,6 +66,10 @@ ScanService::~ScanService()
         delete pScanStateMachine;
         pScanStateMachine = nullptr;
     }
+    WifiSettings::GetInstance().ClearScanInfoList();
+#ifdef SUPPORT_RANDOM_MAC_ADDR
+    WifiSettings::GetInstance().ClearMacAddrPairs(WifiMacAddrInfoType::WIFI_SCANINFO_MACADDR_INFO);
+#endif
 }
 
 bool ScanService::InitScanService(const IScanSerivceCallbacks &scanSerivceCallbacks)

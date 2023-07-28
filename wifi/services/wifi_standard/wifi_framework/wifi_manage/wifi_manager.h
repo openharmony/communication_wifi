@@ -100,7 +100,8 @@ public:
     WifiTimer();
     ~WifiTimer();
 
-    ErrCode Register(const TimerCallback &callback, uint32_t &outTimerId, uint32_t interval = DEFAULT_TIMEROUT);
+    ErrCode Register(
+        const TimerCallback &callback, uint32_t &outTimerId, uint32_t interval = DEFAULT_TIMEROUT, bool once = true);
     void UnRegister(uint32_t timerId);
 
 private:
@@ -241,6 +242,8 @@ private:
     static void DealStoreScanInfoEvent(std::vector<InterScanInfo> &results);
     static void DealOpenScanOnlyRes(OperateResState state);
     static void DealCloseScanOnlyRes(OperateResState state);
+    static void DealAirplaneExceptionWhenStaOpen(void);
+    static void DealAirplaneExceptionWhenStaClose(void);
 #ifdef FEATURE_AP_SUPPORT
     static void DealApStateChanged(ApState bState, int id = 0);
     static void DealApGetStaJoin(const StationInfo &info, int id = 0);

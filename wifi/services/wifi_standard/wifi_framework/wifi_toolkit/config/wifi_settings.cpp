@@ -1950,9 +1950,6 @@ int WifiSettings::AddMacAddrPairs(WifiMacAddrInfoType type,
         case WifiMacAddrInfoType::WIFI_SCANINFO_MACADDR_INFO:
             InsertMacAddrPairs(mWifiScanMacAddrPair, macAddrInfo, randomMacAddr);
             break;
-        case WifiMacAddrInfoType::WIFI_DEVICE_CONFIG_MACADDR_INFO:
-            InsertMacAddrPairs(mDeviceConfigMacAddrPair, macAddrInfo, randomMacAddr);
-            break;
         case WifiMacAddrInfoType::HOTSPOT_MACADDR_INFO:
             InsertMacAddrPairs(mHotspotMacAddrPair, macAddrInfo, randomMacAddr);
             break;
@@ -1972,9 +1969,6 @@ int WifiSettings::RemoveMacAddrPairs(WifiMacAddrInfoType type, const WifiMacAddr
     switch (type) {
         case WifiMacAddrInfoType::WIFI_SCANINFO_MACADDR_INFO:
             DelMacAddrPairs(mWifiScanMacAddrPair, macAddrInfo);
-            break;
-        case WifiMacAddrInfoType::WIFI_DEVICE_CONFIG_MACADDR_INFO:
-            DelMacAddrPairs(mDeviceConfigMacAddrPair, macAddrInfo);
             break;
         case WifiMacAddrInfoType::HOTSPOT_MACADDR_INFO:
             DelMacAddrPairs(mHotspotMacAddrPair, macAddrInfo);
@@ -1997,8 +1991,6 @@ std::string WifiSettings::GetMacAddrPairs(WifiMacAddrInfoType type, const WifiMa
     switch (type) {
         case WifiMacAddrInfoType::WIFI_SCANINFO_MACADDR_INFO:
             return GetPairMacAddress(mWifiScanMacAddrPair, macAddrInfo);
-        case WifiMacAddrInfoType::WIFI_DEVICE_CONFIG_MACADDR_INFO:
-            return GetPairMacAddress(mDeviceConfigMacAddrPair, macAddrInfo);
         case WifiMacAddrInfoType::HOTSPOT_MACADDR_INFO:
             return GetPairMacAddress(mHotspotMacAddrPair, macAddrInfo);
         case WifiMacAddrInfoType::P2P_MACADDR_INFO:
@@ -2016,9 +2008,6 @@ void WifiSettings::PrintMacAddrPairs(WifiMacAddrInfoType type)
     switch (type) {
         case WifiMacAddrInfoType::WIFI_SCANINFO_MACADDR_INFO:
             PrintPairMacAddress(mWifiScanMacAddrPair);
-            break;
-        case WifiMacAddrInfoType::WIFI_DEVICE_CONFIG_MACADDR_INFO:
-            PrintPairMacAddress(mDeviceConfigMacAddrPair);
             break;
         case WifiMacAddrInfoType::HOTSPOT_MACADDR_INFO:
             PrintPairMacAddress(mHotspotMacAddrPair);

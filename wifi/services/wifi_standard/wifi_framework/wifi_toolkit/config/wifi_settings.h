@@ -68,15 +68,12 @@ enum class ThermalLevel {
     EMERGENCY = 6,
 };
 
-#ifdef SUPPORT_RANDOM_MAC_ADDR
 enum class WifiMacAddrInfoType {
     WIFI_SCANINFO_MACADDR_INFO = 0,
-    WIFI_DEVICE_CONFIG_MACADDR_INFO = 1,
-    HOTSPOT_MACADDR_INFO = 2,
-    P2P_MACADDR_INFO = 3,
+    HOTSPOT_MACADDR_INFO = 1,
+    P2P_MACADDR_INFO = 2,
     INVALID_MACADDR_INFO
 };
-#endif
 
 class WifiSettings {
 public:

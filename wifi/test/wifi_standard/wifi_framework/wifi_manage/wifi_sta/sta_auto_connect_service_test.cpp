@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -196,7 +196,7 @@ void StaAutoConnectServiceTest::InitAutoConnectService()
     EXPECT_CALL(WifiSettings::GetInstance(), GetExternDeviceAppraisalPriority()).Times(AtLeast(0));
     EXPECT_CALL(WifiSettings::GetInstance(), ReloadDeviceConfig()).Times(AtLeast(0));
     EXPECT_CALL(WifiStaHalInterface::GetInstance(), ClearDeviceConfig()).Times(AtLeast(0));
-
+    EXPECT_CALL(WifiSettings::GetInstance(), GetScoretacticsNormalScore()).Times(AtLeast(0));
     EXPECT_CALL(WifiStaHalInterface::GetInstance(), GetRoamingCapabilities(_))
         .WillRepeatedly(DoAll(SetArgReferee<0>(capability), Return(WIFI_IDL_OPT_OK)));
 

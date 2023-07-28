@@ -591,23 +591,20 @@ ErrCode WifiDeviceServiceImpl::AddDeviceConfig(const WifiDeviceConfig &config, i
     macAddrInfo.bssid = config.bssid;
     macAddrInfo.bssidType = config.bssidType;
     std::string macAddr =
-        WifiSettings::GetInstance().GetMacAddrPairs(WifiMacAddrInfoType::WIFI_DEVICE_CONFIG_MACADDR_INFO, macAddrInfo);
+        WifiSettings::GetInstance().GetMacAddrPairs(WifiMacAddrInfoType::WIFI_SCANINFO_MACADDR_INFO, macAddrInfo);
     if (macAddr.empty()) {
-        std::string randomMac;
-        WifiSettings::GetInstance().GenerateRandomMacAddress(config.bssid, randomMac);
-        WifiSettings::GetInstance().AddMacAddrPairs(WifiMacAddrInfoType::WIFI_DEVICE_CONFIG_MACADDR_INFO, macAddrInfo, randomMac);
-        WIFI_LOGI("add a new record, bssid:%{public}s, bssidType:%{public}d, randomMac:%{public}s",
-            config.bssid.c_str(), config.bssidType, randomMac.c_str());
+        WIFI_LOGW("record not found, bssid:%{private}s, bssidType:%{public}d",
+            config.bssid.c_str(), config.bssidType);
     } else {
-        WIFI_LOGI("the record is exists, bssid:%{public}s, bssidType:%{public}d, randomMac:%{public}s",
+        WIFI_LOGI("the record is exists, bssid:%{private}s, bssidType:%{public}d, randomMac:%{private}s",
             config.bssid.c_str(), config.bssidType, macAddr.c_str());
         /* random MAC address are translated into real MAC address */
         if (!config.bssid.empty() &&
             config.bssidType == RANDOM_DEVICE_ADDRESS) {
             updateConfig.bssid = macAddr;
             updateConfig.bssidType = REAL_DEVICE_ADDRESS;
-            WIFI_LOGI("after the record is updated, bssid:%{public}s, bssidType:%{public}d, randomMac:%{public}s",
-                updateConfig.bssid.c_str(), updateConfig.bssidType, macAddr.c_str());
+            WIFI_LOGI("the record is updated, bssid:%{private}s, bssidType:%{public}d",
+                updateConfig.bssid.c_str(), updateConfig.bssidType);
         }
     }
 #endif
@@ -911,19 +908,18 @@ ErrCode WifiDeviceServiceImpl::ConnectToDevice(const WifiDeviceConfig &config)
         macAddrInfo.bssid = config.bssid;
         macAddrInfo.bssidType = config.bssidType;
         std::string randomMacAddr =
-            WifiSettings::GetInstance().GetMacAddrPairs(WifiMacAddrInfoType::WIFI_DEVICE_CONFIG_MACADDR_INFO, macAddrInfo);
-        if (!randomMacAddr.empty()) {
-            WIFI_LOGE("abnormal data, bssid:%{public}s, bssidType:%{public}d",
+            WifiSettings::GetInstance().GetMacAddrPairs(WifiMacAddrInfoType::WIFI_SCANINFO_MACADDR_INFO, macAddrInfo);
+        if (randomMacAddr.empty()) {
+            WIFI_LOGW("record not found, bssid:%{private}s, bssidType:%{public}d",
                 macAddrInfo.bssid.c_str(), macAddrInfo.bssidType);
-            return WIFI_OPT_INVALID_PARAM;
         } else {
-            WIFI_LOGI("find the record, bssid:%{public}s, bssidType:%{public}d, randomMac:%{public}s",
+            WIFI_LOGI("find the record, bssid:%{private}s, bssidType:%{public}d, randomMac:%{private}s",
                 config.bssid.c_str(), config.bssidType, randomMacAddr.c_str());
             /* random MAC address are translated into real MAC address */
             if (config.bssidType == RANDOM_DEVICE_ADDRESS) {
                 updateConfig.bssid = randomMacAddr;
                 updateConfig.bssidType = REAL_DEVICE_ADDRESS;
-                WIFI_LOGI("after the record is updated, bssid:%{public}s, bssidType:%{public}d, randomMac:%{public}s",
+                WIFI_LOGI("the record is updated, bssid:%{private}s, bssidType:%{public}d, randomMac:%{private}s",
                     updateConfig.bssid.c_str(), updateConfig.bssidType, randomMacAddr.c_str());
             }
         }

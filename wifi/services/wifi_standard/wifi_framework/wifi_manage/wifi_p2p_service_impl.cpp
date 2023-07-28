@@ -516,20 +516,22 @@ ErrCode WifiP2pServiceImpl::P2pConnect(const WifiP2pConfig &config)
         std::string randomMacAddr =
             WifiSettings::GetInstance().GetMacAddrPairs(WifiMacAddrInfoType::P2P_MACADDR_INFO, macAddrInfo);
         if (randomMacAddr.empty()) {
-            WIFI_LOGE("abnormal data, bssid:%{public}s, bssidType:%{public}d",
+            WIFI_LOGE("abnormal data, bssid:%{private}s, bssidType:%{public}d",
                 macAddrInfo.bssid.c_str(), macAddrInfo.bssidType);
             return WIFI_OPT_INVALID_PARAM;
         } else {
-            WIFI_LOGI("find the record, bssid:%{public}s, bssidType:%{public}d, randomMac:%{public}s",
+            WIFI_LOGI("find the record, bssid:%{private}s, bssidType:%{public}d, randomMac:%{private}s",
                 config.GetDeviceAddress().c_str(), config.GetDeviceAddressType(), randomMacAddr.c_str());
             /* random MAC address are translated into real MAC address */
             if (config.GetDeviceAddressType() == RANDOM_DEVICE_ADDRESS) {
                 updateConfig.SetDeviceAddress(randomMacAddr);
                 updateConfig.SetDeviceAddressType(REAL_DEVICE_ADDRESS);
-                WIFI_LOGI("after the record is updated, bssid:%{public}s, bssidType:%{public}d, randomMac:%{public}s",
-                    updateConfig.GetDeviceAddress().c_str(), updateConfig.GetDeviceAddressType(), randomMacAddr.c_str());
+                WIFI_LOGI("the record is updated, bssid:%{private}s, bssidType:%{public}d",
+                    updateConfig.GetDeviceAddress().c_str(), updateConfig.GetDeviceAddressType());
             }
         }
+    } else {
+        WIFI_LOGW("invalid mac address");
     }
 #endif
 
@@ -647,6 +649,8 @@ ErrCode WifiP2pServiceImpl::GetCurrentGroup(WifiP2pGroupInfo &group)
                     (clientMacAddrInfo.bssidType == REAL_DEVICE_ADDRESS)) {
                     iter->SetDeviceAddress(clientRandomMacAddr);
                     iter->SetDeviceAddressType(RANDOM_DEVICE_ADDRESS);
+                    WIFI_LOGI("the record is updated, bssid:%{private}s, bssidType:%{public}d",
+                        iter->GetDeviceAddress().c_str(), iter->GetDeviceAddressType());
                 }
             }
             group.SetClientDevices(vecClientDevice);
@@ -737,6 +741,8 @@ ErrCode WifiP2pServiceImpl::QueryP2pDevices(std::vector<WifiP2pDevice> &devices)
                 (macAddrInfo.bssidType == REAL_DEVICE_ADDRESS)) {
                 iter->SetDeviceAddress(randomMacAddr);
                 iter->SetDeviceAddressType(RANDOM_DEVICE_ADDRESS);
+                WIFI_LOGI("the record is updated, bssid:%{private}s, bssidType:%{public}d",
+                    iter->GetDeviceAddress().c_str(), iter->GetDeviceAddressType());
             }
         }
     }
@@ -835,6 +841,8 @@ ErrCode WifiP2pServiceImpl::QueryP2pGroups(std::vector<WifiP2pGroupInfo> &groups
                         (clientMacAddrInfo.bssidType == REAL_DEVICE_ADDRESS)) {
                         iter->SetDeviceAddress(clientRandomMacAddr);
                         iter->SetDeviceAddressType(RANDOM_DEVICE_ADDRESS);
+                        WIFI_LOGI("the record is updated, bssid:%{private}s, bssidType:%{public}d",
+                            iter->GetDeviceAddress().c_str(), iter->GetDeviceAddressType());
                     }
                 }
                 group->SetClientDevices(vecClientDevice);

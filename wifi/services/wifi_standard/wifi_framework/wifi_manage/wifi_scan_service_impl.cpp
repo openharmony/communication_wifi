@@ -53,9 +53,9 @@ sptr<WifiScanServiceImpl> WifiScanServiceImpl::GetInstance()
         std::lock_guard<std::mutex> autoLock(g_instanceLock);
         if (g_instance == nullptr) {
 #ifdef OHOS_ARCH_LITE
-            auto service = std::make_shared<WifiScanServiceImpl>();
+            std::shared_ptr<WifiScanServiceImpl> service = std::make_shared<WifiScanServiceImpl>();
 #else
-            auto service = new (std::nothrow) WifiScanServiceImpl;
+            sptr<WifiScanServiceImpl> service = new (std::nothrow) WifiScanServiceImpl;
 #endif
             g_instance = service;
         }

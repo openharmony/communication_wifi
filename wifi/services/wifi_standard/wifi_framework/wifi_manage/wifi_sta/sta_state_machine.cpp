@@ -582,7 +582,7 @@ void StaStateMachine::StopWifiProcess()
     IpInfo ipInfo;
     WifiSettings::GetInstance().SaveIpInfo(ipInfo);
     IpV6Info ipV6Info;
-    WifiSettings::GetInstance().SaveIpv6Info(ipV6Info);
+    WifiSettings::GetInstance().SaveIpV6Info(ipV6Info);
 #ifdef OHOS_ARCH_LITE
     IfConfig::GetInstance().FlushIpAddr(IF_NAME, IPTYPE_IPV4);
 #endif
@@ -978,7 +978,7 @@ void StaStateMachine::DealDisconnectEvent(InternalMessage *msg)
     IpInfo ipInfo;
     WifiSettings::GetInstance().SaveIpInfo(ipInfo);
     IpV6Info ipV6Info;
-    WifiSettings::GetInstance().SaveIpv6Info(ipV6Info);
+    WifiSettings::GetInstance().SaveIpV6Info(ipV6Info);
 #ifdef OHOS_ARCH_LITE
     IfConfig::GetInstance().FlushIpAddr(IF_NAME, IPTYPE_IPV4);
 #endif
@@ -2289,7 +2289,7 @@ void StaStateMachine::DhcpResultNotify::TryToSaveIpV6Result(IpInfo &ipInfo, IpV6
         ipv6Info.netmask = result.strSubnet;
         ipv6Info.primaryDns = result.strDns1;
         ipv6Info.secondDns = result.strDns2;
-        WifiSettings::GetInstance().SaveIpv6Info(ipv6Info);
+        WifiSettings::GetInstance().SaveIpV6Info(ipv6Info);
         WIFI_LOGI("V6Info::addr=%{private}s, gateway=%{private}s, mask=%{private}s, dns=%{private}s, dns2=%{private}s",
             ipv6Info.globalIpV6Address.c_str(), ipv6Info.gateway.c_str(), ipv6Info.netmask.c_str(),
             ipv6Info.primaryDns.c_str(), ipv6Info.secondDns.c_str());

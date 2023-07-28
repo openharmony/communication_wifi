@@ -421,7 +421,7 @@ public:
      * @param info - input IpV6Info struct
      * @return int - 0 success
      */
-    int SaveIpv6Info(const IpV6Info &info);
+    int SaveIpV6Info(const IpV6Info &info);
 
     /**
      * @Description Get current link info

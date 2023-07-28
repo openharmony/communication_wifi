@@ -356,9 +356,6 @@ ErrCode WifiHotspotServiceImpl::EnableHotspot(const ServiceType type)
     WifiOprMidState staState = WifiConfigCenter::GetInstance().GetWifiMidState();
     if (staState != WifiOprMidState::CLOSED) {
 #ifdef FEATURE_STA_AP_EXCLUSION
-#ifdef FEATURE_P2P_SUPPORT
-        WifiManager::GetInstance().AutoStopP2pService(AutoStartOrStopServiceReason::STA_AP_EXCLUSION);
-#endif
         errCode = WifiManager::GetInstance().AutoStopStaService(AutoStartOrStopServiceReason::STA_AP_EXCLUSION);
         if (errCode != WIFI_OPT_CLOSE_SUCC_WHEN_CLOSED) {
             return errCode;

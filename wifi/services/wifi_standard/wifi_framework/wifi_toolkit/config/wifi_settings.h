@@ -68,15 +68,12 @@ enum class ThermalLevel {
     EMERGENCY = 6,
 };
 
-#ifdef SUPPORT_RANDOM_MAC_ADDR
 enum class WifiMacAddrInfoType {
     WIFI_SCANINFO_MACADDR_INFO = 0,
-    WIFI_DEVICE_CONFIG_MACADDR_INFO = 1,
-    HOTSPOT_MACADDR_INFO = 2,
-    P2P_MACADDR_INFO = 3,
+    HOTSPOT_MACADDR_INFO = 1,
+    P2P_MACADDR_INFO = 2,
     INVALID_MACADDR_INFO
 };
-#endif
 
 class WifiSettings {
 public:
@@ -1334,9 +1331,15 @@ public:
      *
      * @param type - MAC address type[in]
      * @param macAddrInfo - MAC address info[in]
-     * @return std::string - an empty string indicates failure  
+     * @return std::string - an empty string indicates failure
      */
     std::string GetMacAddrPairs(WifiMacAddrInfoType type, const WifiMacAddrInfo &macAddrInfo);
+    /**
+     * @Description print MAC address pair
+     *
+     * @param type - MAC address type[in]
+     */
+    void PrintMacAddrPairs(WifiMacAddrInfoType type);
 #endif
 private:
     WifiSettings();

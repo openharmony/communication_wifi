@@ -139,7 +139,12 @@ public:
      * @return int - 0 success
      */
     int SaveScanInfoList(const std::vector<WifiScanInfo> &results);
-
+    /**
+     * @Description Clear scan results
+     *
+     * @return int - 0 success
+     */
+    int ClearScanInfoList();
     /**
      * @Description UpdateLinkedChannelWidth
      *
@@ -1340,6 +1345,13 @@ public:
      * @param type - MAC address type[in]
      */
     void PrintMacAddrPairs(WifiMacAddrInfoType type);
+    /**
+         * @Description Clear MAC address pair
+     *
+     * @param type - MAC address type[in]
+     * @return std::string - an empty string indicates failure  
+     */
+    void ClearMacAddrPairs(WifiMacAddrInfoType type);
 #endif
 private:
     WifiSettings();

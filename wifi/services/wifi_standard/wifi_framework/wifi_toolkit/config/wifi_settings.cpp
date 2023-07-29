@@ -202,6 +202,13 @@ int WifiSettings::SaveScanInfoList(const std::vector<WifiScanInfo> &results)
     return 0;
 }
 
+int WifiSettings::ClearScanInfoList()
+{
+    std::unique_lock<std::mutex> lock(mInfoMutex);
+    mWifiScanInfoList.clear();
+    return 0;
+}
+
 int WifiSettings::GetScanInfoList(std::vector<WifiScanInfo> &results)
 {
     struct timespec clkTime = {0, 0};
@@ -2019,6 +2026,26 @@ void WifiSettings::PrintMacAddrPairs(WifiMacAddrInfoType type)
             LOGE("invalid mac address type, type:%{public}d", type);
             break;
     }
+}
+
+void WifiSettings::ClearMacAddrPairs(WifiMacAddrInfoType type)
+{
+    LOGI("ClearMacAddrPairs, type:%{public}d", type);
+    std::unique_lock<std::mutex> lock(mMacAddrPairMutex);
+    switch (type) {
+        case WifiMacAddrInfoType::WIFI_SCANINFO_MACADDR_INFO:
+            mWifiScanMacAddrPair.clear();
+            break;
+        case WifiMacAddrInfoType::HOTSPOT_MACADDR_INFO:
+            mHotspotMacAddrPair.clear();
+            break;
+        case WifiMacAddrInfoType::P2P_MACADDR_INFO:
+            mP2pMacAddrPair.clear();
+            break;
+        default:
+            LOGE("invalid mac address type, type:%{public}d", type);
+    }
+    return;
 }
 #endif
 }  // namespace Wifi

@@ -19,6 +19,7 @@ ohos_shared_library("wifi_ap_service") {
     cfi = true
     boundary_sanitize = true
     cfi_cross_dso = true
+    debug = false
   }
   install_enable = true
   sources = [

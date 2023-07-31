@@ -139,14 +139,14 @@ void WifiDeviceServiceImpl::OnStart()
     // Get airplane mode by datashare
     WifiManager::GetInstance().GetAirplaneModeByDatashare(WIFI_DEVICE_ABILITY_ID);
 
-    if (eventSubscriber_ == nullptr) {
+    if (eventSubscriber_ == nullptr && appEventTimerId == 0) {
         TimeOutCallback timeoutCallback = std::bind(&WifiDeviceServiceImpl::RegisterAppRemoved, this);
-        WifiTimer::GetInstance()->Register(timeoutCallback, appEventTimerId, TIMEOUT_APP_EVENT);
+        WifiTimer::GetInstance()->Register(timeoutCallback, appEventTimerId, TIMEOUT_APP_EVENT, false);
     }
 
-    if (thermalLevelSubscriber_ == nullptr) {
+    if (thermalLevelSubscriber_ == nullptr && thermalTimerId == 0) {
         TimeOutCallback timeoutCallback = std::bind(&WifiDeviceServiceImpl::RegisterThermalLevel, this);
-        WifiTimer::GetInstance()->Register(timeoutCallback, thermalTimerId, TIMEOUT_THERMAL_EVENT);
+        WifiTimer::GetInstance()->Register(timeoutCallback, thermalTimerId, TIMEOUT_THERMAL_EVENT, false);
     }
     WifiManager::GetInstance().StartUnloadStaSaTimer();
     StartWatchdog();
@@ -179,12 +179,10 @@ void WifiDeviceServiceImpl::OnStop()
     if (eventSubscriber_ != nullptr) {
         UnRegisterAppRemoved();
     }
-    WifiTimer::GetInstance()->UnRegister(appEventTimerId);
 
     if (thermalLevelSubscriber_ != nullptr) {
         UnRegisterThermalLevel();
     }
-    WifiTimer::GetInstance()->UnRegister(thermalTimerId);
 
 #endif
     WIFI_LOGI("Stop sta service!");
@@ -293,12 +291,12 @@ ErrCode WifiDeviceServiceImpl::EnableWifi()
         return WIFI_OPT_SUCCESS;
     }
 
-    int staAirplaneMode = static_cast<int>(OperatorWifiType::USER_OPEN_WIFI_IN_NO_AIRPLANEMODE);
+    int operatorWifiType = static_cast<int>(OperatorWifiType::USER_OPEN_WIFI_IN_NO_AIRPLANEMODE);
     if (WifiConfigCenter::GetInstance().GetAirplaneModeState() == MODE_STATE_OPEN) {
-        staAirplaneMode = static_cast<int>(OperatorWifiType::USER_OPEN_WIFI_IN_AIRPLANEMODE);
+        operatorWifiType = static_cast<int>(OperatorWifiType::USER_OPEN_WIFI_IN_AIRPLANEMODE);
         WIFI_LOGI("EnableWifi, current airplane mode is opened, user open wifi!");
     }
-    WifiConfigCenter::GetInstance().SetOperatorWifiType(staAirplaneMode);
+    WifiConfigCenter::GetInstance().SetOperatorWifiType(operatorWifiType);
     return WIFI_OPT_SUCCESS;
 }
 
@@ -355,13 +353,14 @@ ErrCode WifiDeviceServiceImpl::DisableWifi()
     } else {
         WifiConfigCenter::GetInstance().SetStaLastRunState(false);
         WifiManager::GetInstance().GetAirplaneModeByDatashare(WIFI_DEVICE_ABILITY_ID);
+        int operatorWifiType = static_cast<int>(OperatorWifiType::USER_CLOSE_WIFI_IN_NO_AIRPLANEMODE);
         if (WifiConfigCenter::GetInstance().GetOperatorWifiType() ==
             static_cast<int>(OperatorWifiType::USER_OPEN_WIFI_IN_AIRPLANEMODE) &&
             WifiConfigCenter::GetInstance().GetAirplaneModeState() == MODE_STATE_OPEN) {
-                WifiConfigCenter::GetInstance().SetOperatorWifiType(
-                    static_cast<int>(OperatorWifiType::USER_CLOSE_WIFI_IN_AIRPLANEMODE));
-                WIFI_LOGI("EnableWifi, current airplane mode is opened, user close wifi!");
+                operatorWifiType = static_cast<int>(OperatorWifiType::USER_CLOSE_WIFI_IN_AIRPLANEMODE);
+                WIFI_LOGI("DisableWifi, current airplane mode is opened, user close wifi!");
         }
+        WifiConfigCenter::GetInstance().SetOperatorWifiType(operatorWifiType);
     }
     return ret;
 }
@@ -1479,6 +1478,7 @@ void WifiDeviceServiceImpl::RegisterAppRemoved()
         WIFI_LOGE("AppEvent SubscribeCommonEvent() failed");
     } else {
         WIFI_LOGI("AppEvent SubscribeCommonEvent() OK");
+        WifiTimer::GetInstance()->UnRegister(appEventTimerId);
     }
 }
 
@@ -1502,6 +1502,7 @@ void WifiDeviceServiceImpl::RegisterThermalLevel()
         WIFI_LOGE("THERMAL_LEVEL_CHANGED SubscribeCommonEvent() failed");
     } else {
         WIFI_LOGI("THERMAL_LEVEL_CHANGED SubscribeCommonEvent() OK");
+        WifiTimer::GetInstance()->UnRegister(thermalTimerId);
     }
 }
 

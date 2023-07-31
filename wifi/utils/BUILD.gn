@@ -51,6 +51,7 @@ if (defined(ohos_lite)) {
       cfi = true
       boundary_sanitize = true
       cfi_cross_dso = true
+      debug = false
     }
     install_enable = true
     include_dirs = [

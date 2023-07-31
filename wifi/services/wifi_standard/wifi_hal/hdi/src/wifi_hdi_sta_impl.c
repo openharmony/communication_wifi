@@ -79,7 +79,7 @@ int32_t HdiScanResultsCallback(struct IWlanCallback *self, uint32_t event,
                 LOGE("HdiScanResultsCallback ssid empty.");
                 continue;
             }
-            LOGE("HdiScanResultsCallback ssid empty. bssid:%{public}s", bssid);
+            LOGE("HdiScanResultsCallback ssid empty. bssid:%{private}s", bssid);
             continue;
         }
         buffLen = 1024;
@@ -94,7 +94,7 @@ int32_t HdiScanResultsCallback(struct IWlanCallback *self, uint32_t event,
             LOGE("HdiScanResultsCallback DelScanInfoLine failed.");
             continue;
         }
-        LOGD("HdiScanResultsCallback bssid:%{public}s, ssid:%{public}s", g_hdiScanResults[g_hdiScanResultsCount].bssid,
+        LOGD("HdiScanResultsCallback bssid:%{private}s, ssid:%{private}s", g_hdiScanResults[g_hdiScanResultsCount].bssid,
             g_hdiScanResults[g_hdiScanResultsCount].ssid);
         g_hdiScanResultsCount++;
     }

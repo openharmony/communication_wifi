@@ -108,6 +108,14 @@ StaStateMachine::~StaStateMachine()
         pDhcpService->RemoveDhcpResult(pDhcpResultNotify);
         pDhcpService.reset(nullptr);
     }
+#ifndef OHOS_ARCH_LITE
+    auto samgrProxy = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    if (samgrProxy != NULL && statusChangeListener_ != NULL) {
+        int32_t ret = samgrProxy->UnSubscribeSystemAbility(COMM_NET_CONN_MANAGER_SYS_ABILITY_ID,
+            statusChangeListener_);
+        LOGI("UnSubscribeSystemAbility COMM_NET_CONN_MANAGER_SYS_ABILITY_ID result:%{public}d", ret);
+    }
+#endif
     ParsePointer(pDhcpResultNotify);
     ParsePointer(pNetcheck);
 }

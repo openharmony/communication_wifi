@@ -353,14 +353,17 @@ ErrCode WifiDeviceServiceImpl::DisableWifi()
     } else {
         WifiConfigCenter::GetInstance().SetStaLastRunState(false);
         WifiManager::GetInstance().GetAirplaneModeByDatashare(WIFI_DEVICE_ABILITY_ID);
-        int operatorWifiType = static_cast<int>(OperatorWifiType::USER_CLOSE_WIFI_IN_NO_AIRPLANEMODE);
         if (WifiConfigCenter::GetInstance().GetOperatorWifiType() ==
-            static_cast<int>(OperatorWifiType::USER_OPEN_WIFI_IN_AIRPLANEMODE) &&
-            WifiConfigCenter::GetInstance().GetAirplaneModeState() == MODE_STATE_OPEN) {
-                operatorWifiType = static_cast<int>(OperatorWifiType::USER_CLOSE_WIFI_IN_AIRPLANEMODE);
+            static_cast<int>(OperatorWifiType::USER_OPEN_WIFI_IN_AIRPLANEMODE)) {
+            if (WifiConfigCenter::GetInstance().GetAirplaneModeState() == MODE_STATE_OPEN) {
+                WifiConfigCenter::GetInstance().SetOperatorWifiType(
+                    static_cast<int>(OperatorWifiType::USER_CLOSE_WIFI_IN_AIRPLANEMODE));
                 WIFI_LOGI("DisableWifi, current airplane mode is opened, user close wifi!");
+            }
+        } else {
+            WifiConfigCenter::GetInstance().SetOperatorWifiType(
+                static_cast<int>(OperatorWifiType::USER_CLOSE_WIFI_IN_NO_AIRPLANEMODE));
         }
-        WifiConfigCenter::GetInstance().SetOperatorWifiType(operatorWifiType);
     }
     return ret;
 }

@@ -363,6 +363,7 @@ if (defined(ohos_lite)) {
       cfi = true
       boundary_sanitize = true
       cfi_cross_dso = true
+      debug = false
     }
     install_enable = true
     sources = [
@@ -453,6 +454,7 @@ if (defined(ohos_lite)) {
       cfi = true
       boundary_sanitize = true
       cfi_cross_dso = true
+      debug = false
     }
     install_enable = true
     deps = [
@@ -470,6 +472,7 @@ if (defined(ohos_lite)) {
       cfi = true
       boundary_sanitize = true
       cfi_cross_dso = true
+      debug = false
     }
     install_enable = true
     deps = [
@@ -487,6 +490,7 @@ if (defined(ohos_lite)) {
       cfi = true
       boundary_sanitize = true
       cfi_cross_dso = true
+      debug = false
     }
     install_enable = true
     deps = [
@@ -504,6 +508,7 @@ if (defined(ohos_lite)) {
       cfi = true
       boundary_sanitize = true
       cfi_cross_dso = true
+      debug = false
     }
     install_enable = true
     deps = [

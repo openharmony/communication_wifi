@@ -197,6 +197,7 @@ if (defined(ohos_lite)) {
       cfi = true
       boundary_sanitize = true
       cfi_cross_dso = true
+      debug = false
       blocklist = "../wifi_frameworks_sdk_block.txt"
     }
     install_enable = true

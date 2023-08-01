@@ -54,8 +54,6 @@ public:
     virtual int SetDhcpIpType(int dhcpIpType) = 0;
     virtual int SetWhetherToAllowNetworkSwitchover(bool bSwitch) = 0;
     virtual bool GetWhetherToAllowNetworkSwitchover() = 0;
-    virtual int AddWpsDeviceConfig(const WifiDeviceConfig &config) = 0;
-
     virtual int GetSavedDeviceAppraisalPriority() = 0;
     virtual int GetExternDeviceAppraisalPriority() = 0;
     virtual int GetScoretacticsScoreSlope() = 0;
@@ -117,8 +115,6 @@ public:
     MOCK_METHOD1(SetDhcpIpType, int(int dhcpIpType));
     MOCK_METHOD1(SetWhetherToAllowNetworkSwitchover, int(bool bSwitch));
     MOCK_METHOD0(GetWhetherToAllowNetworkSwitchover, bool());
-    MOCK_METHOD1(AddWpsDeviceConfig, int(const WifiDeviceConfig &config));
-
     MOCK_METHOD0(GetSavedDeviceAppraisalPriority, int());
     MOCK_METHOD0(GetExternDeviceAppraisalPriority, int());
     MOCK_METHOD0(GetScoretacticsScoreSlope, int());

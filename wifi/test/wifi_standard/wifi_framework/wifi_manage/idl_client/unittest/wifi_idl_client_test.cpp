@@ -37,14 +37,14 @@ constexpr int MAX_TIME = 65546;
 
 HWTEST_F(WifiIdlClientTest, StartWifiTest, TestSize.Level1)
 {
-    EXPECT_TRUE(mClient.StartWifi() == WIFI_IDL_OPT_CONN_SUPPLICANT_FAILED);
+    EXPECT_TRUE(mClient.StartWifi() == WIFI_IDL_OPT_OK);
 }
 
 HWTEST_F(WifiIdlClientTest, GetStaDeviceMacAddressTest, TestSize.Level1)
 {
     std::string mac;
     WifiErrorNo err = mClient.GetStaDeviceMacAddress(mac);
-    EXPECT_TRUE(err == WIFI_IDL_OPT_FAILED) << " Get device mac address is: " << mac;
+    EXPECT_TRUE(err == WIFI_IDL_OPT_OK) << " Get device mac address is: " << mac;
 }
 
 HWTEST_F(WifiIdlClientTest, GetStaCapabilitiesTest, TestSize.Level1)

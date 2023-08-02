@@ -88,6 +88,7 @@ void WifiP2pGroupManager::UpdateWpaGroup(const WifiP2pGroupInfo &group)
         if (*it == group) {
             WifiP2pDevice owner = it->GetOwner();
             owner.SetDeviceAddress(group.GetOwner().GetDeviceAddress());
+            owner.SetDeviceAddressType(group.GetOwner().GetDeviceAddressType());
             it->SetOwner(owner);
             it->SetGroupName(group.GetGroupName());
             return;

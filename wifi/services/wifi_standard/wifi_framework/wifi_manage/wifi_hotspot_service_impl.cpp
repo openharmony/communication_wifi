@@ -739,6 +739,7 @@ void WifiHotspotServiceImpl::StationsInfoDump(std::string& result)
             ++idx;
             ss << "  Station[" << idx << "].deviceName: " << each.deviceName << "\n";
             ss << "  Station[" << idx << "].bssid: " << MacAnonymize(each.bssid) << "\n";
+            ss << "  Station[" << idx << "].bssidType: " << each.bssidType << "\n";
             ss << "  Station[" << idx << "].ipAddr: " << IpAnonymize(each.ipAddr) << "\n";
             ss << "\n";
         }
@@ -756,6 +757,7 @@ void WifiHotspotServiceImpl::StationsInfoDump(std::string& result)
             ++idx;
             ss << "  BlockStation[" << idx << "].deviceName: " << each.deviceName << "\n";
             ss << "  BlockStation[" << idx << "].bssid: " << MacAnonymize(each.bssid) << "\n";
+            ss << "  BlockStation[" << idx << "].bssidType: " << each.bssidType << "\n";
             ss << "  BlockStation[" << idx << "].ipAddr: " << IpAnonymize(each.ipAddr) << "\n";
             ss << "\n";
         }

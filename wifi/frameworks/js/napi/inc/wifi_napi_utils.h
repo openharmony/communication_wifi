@@ -140,14 +140,12 @@ enum class SecTypeJs {
 #endif
 };
 
-#ifdef SUPPORT_RANDOM_MAC_ADDR
 enum class AddressTypeJs {
     /* random mac address */
     ADDR_TYPE_RANDOM_DEVICE_ADDRESS = 0,
     /* real mac address */
     ADDR_TYPE_REAL_DEVICE_ADDRESS = 1
 };
-#endif
 
 enum class EapMethodJs {
     EAP_NONE = 0,

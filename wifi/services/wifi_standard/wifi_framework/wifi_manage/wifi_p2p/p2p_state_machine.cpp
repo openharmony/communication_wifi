@@ -468,20 +468,25 @@ P2pConfigErrCode P2pStateMachine::IsConfigUnusable(const WifiP2pConfigInternal &
     constexpr unsigned NETWORK_NAME_MAX_LENGTH = 32;
     constexpr int GROUP_OWNER_MAX_INTENT = 15;
     if (config.GetDeviceAddress().empty()) {
+        WIFI_LOGE("P2pStateMachine::IsConfigUnusable: address is empty");
         return P2pConfigErrCode::MAC_EMPTY;
     }
     if (!MacAddress::IsValidMac(config.GetDeviceAddress().c_str())) {
+        WIFI_LOGE("P2pStateMachine::IsConfigUnusable: invalid mac address");
         return P2pConfigErrCode::ERR_MAC_FORMAT;
     }
     WifiP2pDevice device = deviceManager.GetDevices(config.GetDeviceAddress());
     if (!device.IsValid()) {
+        WIFI_LOGE("P2pStateMachine::IsConfigUnusable: failed to get device");
         return P2pConfigErrCode::MAC_NOT_FOUND;
     }
     if (config.GetGroupOwnerIntent() < AUTO_GROUP_OWNER_VALUE ||
         config.GetGroupOwnerIntent() > GROUP_OWNER_MAX_INTENT) {
+        WIFI_LOGE("P2pStateMachine::IsConfigUnusable: invalid groupOwnerIntent");
         return P2pConfigErrCode::ERR_INTENT;
     }
     if (config.GetGroupName().length() > NETWORK_NAME_MAX_LENGTH) {
+        WIFI_LOGE("P2pStateMachine::IsConfigUnusable: invalid group name");
         return P2pConfigErrCode::ERR_SIZE_NW_NAME;
     }
     return P2pConfigErrCode::SUCCESS;

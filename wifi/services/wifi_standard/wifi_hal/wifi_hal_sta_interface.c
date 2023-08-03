@@ -252,7 +252,7 @@ WifiErrorNo StartScan(const ScanSettings *settings)
 {
     LOGD("Ready to start scan with param.");
 #ifdef HDI_INTERFACE_SUPPORT
-    int ret = HdiStartScan(settings);
+    return HdiStartScan(settings);
 #else
     WifiWpaStaInterface *pStaIfc = GetWifiStaInterface(0);
     if (pStaIfc == NULL) {
@@ -263,13 +263,13 @@ WifiErrorNo StartScan(const ScanSettings *settings)
         LOGE("StartScan failed! ret=%{public}d", ret);
         return WIFI_HAL_FAILED;
     }
-#endif
     if (ret == WIFI_HAL_SCAN_BUSY) {
         LOGD("StartScan return scan busy");
         return WIFI_HAL_SCAN_BUSY;
     }
     LOGD("StartScan successfully!");
     return WIFI_HAL_SUCCESS;
+#endif
 }
 
 WifiErrorNo GetScanInfos(ScanInfo *results, int *size)

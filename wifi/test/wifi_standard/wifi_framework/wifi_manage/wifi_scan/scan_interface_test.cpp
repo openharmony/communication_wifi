@@ -40,6 +40,7 @@ public:
     {}
     void SetUp() override
     {
+        EXPECT_CALL(WifiSettings::GetInstance(), ClearScanInfoList()).Times(AtLeast(0));
         pScanInterface = std::make_unique<ScanInterface>();
         pScanInterface->pScanService = new MockScanService();
         pScanInterface->mScanSerivceCallbacks = WifiManager::GetInstance().GetScanCallback();

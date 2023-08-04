@@ -699,8 +699,6 @@ std::mutex WifiManager::unloadStaSaTimerMutex{};
 void WifiManager::UnloadStaSaTimerCallback()
 {
     WifiSaLoadManager::GetInstance().UnloadWifiSa(WIFI_DEVICE_ABILITY_ID);
-    WifiSaLoadManager::GetInstance().UnloadWifiSa(WIFI_SCAN_ABILITY_ID);
-    WifiSaLoadManager::GetInstance().UnloadWifiSa(WIFI_P2P_ABILITY_ID);
     if (static_cast<int>(ApState::AP_STATE_CLOSED) == WifiConfigCenter::GetInstance().GetHotspotState(0)) {
         WifiSaLoadManager::GetInstance().UnloadWifiSa(WIFI_HOTSPOT_ABILITY_ID);
     }
@@ -1091,6 +1089,37 @@ void WifiManager::DealRssiChanged(int rssi)
     WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
     return;
 }
+
+#ifndef OHOS_ARCH_LITE
+uint32_t WifiManager::unloadScanSaTimerId{0};
+std::mutex WifiManager::unloadScanSaTimerMutex{};
+void WifiManager::UnloadScanSaTimerCallback()
+{
+    WifiSaLoadManager::GetInstance().UnloadWifiSa(WIFI_SCAN_ABILITY_ID);
+    WifiManager::GetInstance().StopUnloadScanSaTimer();
+}
+
+void WifiManager::StopUnloadScanSaTimer(void)
+{
+    WIFI_LOGI("StopUnloadScanSaTimer! unloadScanSaTimerId:%{public}u", unloadScanSaTimerId);
+    std::unique_lock<std::mutex> lock(unloadScanSaTimerMutex);
+    WifiTimer::GetInstance()->UnRegister(unloadScanSaTimerId);
+    unloadScanSaTimerId = 0;
+    return;
+}
+
+void WifiManager::StartUnloadScanSaTimer(void)
+{
+    WIFI_LOGI("StartUnloadScanSaTimer! unloadScanSaTimerId:%{public}u", unloadScanSaTimerId);
+    std::unique_lock<std::mutex> lock(unloadScanSaTimerMutex);
+    if (unloadScanSaTimerId == 0) {
+        TimeOutCallback timeoutCallback = std::bind(WifiManager::UnloadScanSaTimerCallback);
+        WifiTimer::GetInstance()->Register(timeoutCallback, unloadScanSaTimerId, TIMEOUT_UNLOAD_WIFI_SA);
+        WIFI_LOGI("StartUnloadScanSaTimer success! unloadScanSaTimerId:%{public}u", unloadScanSaTimerId);
+    }
+    return;
+}
+#endif
 
 void WifiManager::CheckAndStartScanService(void)
 {

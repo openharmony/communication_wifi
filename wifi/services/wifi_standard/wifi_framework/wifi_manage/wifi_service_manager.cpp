@@ -219,7 +219,7 @@ int WifiServiceManager::LoadP2pService(const std::string &dlname, bool bCreate)
 
 int WifiServiceManager::LoadEnhanceService(const std::string &dlname, bool bCreate)
 {
-    WIFI_LOGI("WifiServiceManager::LoadEnhanceService");
+    WIFI_LOGD("WifiServiceManager::LoadEnhanceService");
     std::unique_lock<std::mutex> lock(mEnhanceMutex);
     if (mEnhanceServiceHandle.handle != nullptr) {
         WIFI_LOGE("WifiServiceManager::handle is not null: %{public}s", dlname.c_str());
@@ -277,7 +277,7 @@ int WifiServiceManager::CheckAndEnforceService(const std::string &name, bool bCr
 
 IStaService *WifiServiceManager::GetStaServiceInst()
 {
-    WIFI_LOGI("WifiServiceManager::GetStaServiceInst");
+    WIFI_LOGD("WifiServiceManager::GetStaServiceInst");
     std::unique_lock<std::mutex> lock(mStaMutex);
     if (mStaServiceHandle.handle == nullptr) {
         WIFI_LOGE("WifiServiceManager, Sta handle is null");
@@ -291,7 +291,7 @@ IStaService *WifiServiceManager::GetStaServiceInst()
 
 IScanService *WifiServiceManager::GetScanServiceInst()
 {
-    WIFI_LOGI("WifiServiceManager::GetScanServiceInst");
+    WIFI_LOGD("WifiServiceManager::GetScanServiceInst");
     std::unique_lock<std::mutex> lock(mScanMutex);
     if (mScanServiceHandle.handle == nullptr) {
         WIFI_LOGE("WifiServiceManager, Scan handle is null");
@@ -306,7 +306,7 @@ IScanService *WifiServiceManager::GetScanServiceInst()
 #ifdef FEATURE_AP_SUPPORT
 bool WifiServiceManager::ApServiceSetHotspotConfig(const HotspotConfig &config, int id)
 {
-    WIFI_LOGI("WifiServiceManager::GetApServiceInst");
+    WIFI_LOGD("WifiServiceManager::GetApServiceInst");
     std::unique_lock<std::mutex> lock(mApMutex);
     if (mApServiceHandle.handle == nullptr) {
         WIFI_LOGE("Get ap service instance handle is null.");
@@ -327,7 +327,7 @@ bool WifiServiceManager::ApServiceSetHotspotConfig(const HotspotConfig &config, 
 
 IApService *WifiServiceManager::GetApServiceInst(int id)
 {
-    WIFI_LOGI("WifiServiceManager::GetApServiceInst");
+    WIFI_LOGD("WifiServiceManager::GetApServiceInst");
     std::unique_lock<std::mutex> lock(mApMutex);
     if (mApServiceHandle.handle == nullptr) {
         WIFI_LOGE("Get ap service instance handle is null.");
@@ -354,7 +354,7 @@ IApService *WifiServiceManager::GetApServiceInst(int id)
 #ifdef FEATURE_P2P_SUPPORT
 IP2pService *WifiServiceManager::GetP2pServiceInst()
 {
-    WIFI_LOGI("WifiServiceManager::GetP2pServiceInst");
+    WIFI_LOGD("WifiServiceManager::GetP2pServiceInst");
     std::unique_lock<std::mutex> lock(mP2pMutex);
     if (mP2pServiceHandle.handle == nullptr) {
         WIFI_LOGE("WifiServiceManager, P2p handle is null");
@@ -369,7 +369,7 @@ IP2pService *WifiServiceManager::GetP2pServiceInst()
 
 IEnhanceService *WifiServiceManager::GetEnhanceServiceInst()
 {
-    WIFI_LOGI("WifiServiceManager::GetEnhanceServiceInst");
+    WIFI_LOGD("WifiServiceManager::GetEnhanceServiceInst");
     std::unique_lock<std::mutex> lock(mEnhanceMutex);
     if (mEnhanceServiceHandle.handle == nullptr) {
         WIFI_LOGE("WifiServiceManager, Enhance handle is null");

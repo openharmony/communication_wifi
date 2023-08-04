@@ -250,7 +250,7 @@ void WifiNetAgent::SetNetLinkIPInfo(sptr<NetManagerStandard::NetLinkInfo> &netLi
     netAddr->prefixlen_ = prefixLength;
     netLinkInfo->netAddrList_.push_back(*netAddr);
 
-    LOGI("SetNetLinkIPInfo %{public}s", wifiIpV6Info.globalIpV6Address.c_str());
+    LOGD("SetNetLinkIPInfo %{public}s", wifiIpV6Info.globalIpV6Address.c_str());
     if (!wifiIpV6Info.globalIpV6Address.empty()) {
         sptr<NetManagerStandard::INetAddr> netIpv6Addr = (std::make_unique<NetManagerStandard::INetAddr>()).release();
         netIpv6Addr->type_ = NetManagerStandard::INetAddr::IPV6;
@@ -272,7 +272,7 @@ void WifiNetAgent::SetNetLinkDnsInfo(sptr<NetManagerStandard::NetLinkInfo> &netL
     netLinkInfo->dnsList_.push_back(*dns);
     dns->address_ = IpTools::ConvertIpv4Address(wifiIpInfo.secondDns);
     netLinkInfo->dnsList_.push_back(*dns);
-    LOGI("SetNetLinkDnsInfo %{public}s", wifiIpV6Info.primaryDns.c_str());
+    LOGD("SetNetLinkDnsInfo %{public}s", wifiIpV6Info.primaryDns.c_str());
     if (!wifiIpV6Info.primaryDns.empty()) {
         sptr<NetManagerStandard::INetAddr> ipv6dns = (std::make_unique<NetManagerStandard::INetAddr>()).release();
         ipv6dns->type_ = NetManagerStandard::INetAddr::IPV6;
@@ -293,7 +293,7 @@ void WifiNetAgent::SetNetLinkRouteInfo(sptr<NetManagerStandard::NetLinkInfo> &ne
     route->destination_.address_ = "0.0.0.0";
     route->gateway_.address_ = IpTools::ConvertIpv4Address(wifiIpInfo.gateway);
     netLinkInfo->routeList_.push_back(*route);
-    LOGI("SetNetLinkRouteInfo %{public}s", wifiIpV6Info.gateway.c_str());
+    LOGD("SetNetLinkRouteInfo %{public}s", wifiIpV6Info.gateway.c_str());
     if (!wifiIpV6Info.gateway.empty()) {
         sptr<NetManagerStandard::Route> ipv6route = (std::make_unique<NetManagerStandard::Route>()).release();
         ipv6route->iface_ = "wlan0";

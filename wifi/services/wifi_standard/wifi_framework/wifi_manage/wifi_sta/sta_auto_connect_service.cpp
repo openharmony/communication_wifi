@@ -155,7 +155,7 @@ void StaAutoConnectService::GetBlockedBssids(std::vector<std::string> &blockedBs
     for (auto iter = blockedBssidMap.begin(); iter != blockedBssidMap.end(); ++iter) {
         blockedBssids.push_back(iter->first);
     }
-    WIFI_LOGI("StaAutoConnectService::GetBlockedBssids, blockedBssids count: %{public}d.",
+    WIFI_LOGD("StaAutoConnectService::GetBlockedBssids, blockedBssids count: %{public}d.",
         (int)blockedBssids.size());
     return;
 }
@@ -369,7 +369,7 @@ bool StaAutoConnectService::RoamingSelection(
 {
     for (auto scanInfo : availableScanInfos) {
         if (info.connState == ConnState::CONNECTED && scanInfo.ssid == info.ssid && scanInfo.bssid != info.bssid) {
-            WIFI_LOGI("Discover roaming networks.\n");
+            WIFI_LOGD("Discover roaming networks.\n");
             if (RoamingEncryptionModeCheck(electedDevice, scanInfo, info)) {
                 return true;
             }
@@ -401,18 +401,18 @@ bool StaAutoConnectService::RoamingEncryptionModeCheck(
             mgmt = "NONE";
         }
         if (mgmt == network.keyMgmt) {
-            WIFI_LOGI("The Current network bssid %{public}s signal strength is %{public}d",
+            WIFI_LOGD("The Current network bssid %{public}s signal strength is %{public}d",
                 MacAnonymize(info.bssid).c_str(), info.rssi);
-            WIFI_LOGI("The Roaming network bssid %{public}s signal strength is %{public}d",
+            WIFI_LOGD("The Roaming network bssid %{public}s signal strength is %{public}d",
                 MacAnonymize(scanInfo.bssid).c_str(), scanInfo.rssi);
             int rssi = scanInfo.rssi - info.rssi;
             if (rssi > MIN_ROAM_RSSI_DIFF) {
-                WIFI_LOGI("Roming network rssi - Current network rssi > 6.");
+                WIFI_LOGD("Roming network rssi - Current network rssi > 6.");
                 electedDevice.ssid = scanInfo.ssid;
                 electedDevice.bssid = scanInfo.bssid;
                 return true;
             } else {
-                WIFI_LOGE("Roming network rssi - Current network rssi < 6.");
+                WIFI_LOGD("Roming network rssi - Current network rssi < 6.");
             }
         } else {
             WIFI_LOGE("The encryption mode does not match.\n");
@@ -582,20 +582,20 @@ void StaAutoConnectService::GetAvailableScanInfos(std::vector<InterScanInfo> &av
 
         auto itr = find(blockedBssids.begin(), blockedBssids.end(), scanInfo.bssid);
         if (itr != blockedBssids.end()) { /* Skip Blocklist Network */
-            WIFI_LOGI("Skip blocklistedBssid network, ssid: %{public}s.\n", SsidAnonymize(scanInfo.ssid).c_str());
+            WIFI_LOGD("Skip blocklistedBssid network, ssid: %{public}s.\n", SsidAnonymize(scanInfo.ssid).c_str());
             continue;
         }
 
         /* Skipping networks with weak signals */
         if (scanInfo.frequency < MIN_5GHZ_BAND_FREQUENCY) {
             if (scanInfo.rssi <= MIN_RSSI_VALUE_24G) {
-                WIFI_LOGI("Skip network %{public}s with low 2.4G signals %{public}d.\n",
+                WIFI_LOGD("Skip network %{public}s with low 2.4G signals %{public}d.\n",
                     SsidAnonymize(scanInfo.ssid).c_str(), scanInfo.rssi);
                 continue;
             }
         } else {
             if (scanInfo.rssi <= MIN_RSSI_VALUE_5G) {
-                WIFI_LOGI("Skip network %{public}s with low 5G signals %{public}d.\n",
+                WIFI_LOGD("Skip network %{public}s with low 5G signals %{public}d.\n",
                     SsidAnonymize(scanInfo.ssid).c_str(), scanInfo.rssi);
                 continue;
             }

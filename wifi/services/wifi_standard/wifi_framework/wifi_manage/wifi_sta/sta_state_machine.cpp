@@ -673,7 +673,7 @@ bool StaStateMachine::LinkState::ExecuteStateMsg(InternalMessage *msg)
     if (msg == nullptr) {
         return false;
     }
-    LOGI("LinkState ExecuteStateMsg function:msgName=[%{public}d].\n", msg->GetMessageName());
+    LOGD("LinkState ExecuteStateMsg function:msgName=[%{public}d].\n", msg->GetMessageName());
     auto iter = pStaStateMachine->staSmHandleFuncMap.find(msg->GetMessageName());
     if (iter != pStaStateMachine->staSmHandleFuncMap.end()) {
         (pStaStateMachine->*(iter->second))(msg);
@@ -719,7 +719,7 @@ int setRssi(int rssi)
 
 void StaStateMachine::DealSignalPollResult(InternalMessage *msg)
 {
-    LOGI("enter DealSignalPollResult.\n");
+    LOGD("enter DealSignalPollResult.\n");
     if (msg == nullptr) {
         LOGE("InternalMessage msg is null.");
         return;
@@ -848,7 +848,7 @@ void StaStateMachine::OnConnectFailed(int networkId)
 
 void StaStateMachine::DealConnectToUserSelectedNetwork(InternalMessage *msg)
 {
-    LOGI("enter DealConnectToUserSelectedNetwork.\n");
+    LOGD("enter DealConnectToUserSelectedNetwork.\n");
     if (msg == nullptr) {
         LOGE("msg is null.\n");
         return;
@@ -1356,7 +1356,7 @@ ErrCode StaStateMachine::StartConnectToNetwork(int networkId)
 
     if (WifiStaHalInterface::GetInstance().SaveDeviceConfig() != WIFI_IDL_OPT_OK) {
         /* OHOS's wpa don't support save command, so don't judge as failure */
-        LOGE("SaveDeviceConfig() failed!");
+        LOGD("SaveDeviceConfig() failed!");
     }
 
     StopTimer(static_cast<int>(CMD_NETWORK_CONNECT_TIMEOUT));
@@ -1366,7 +1366,7 @@ ErrCode StaStateMachine::StartConnectToNetwork(int networkId)
 
 void StaStateMachine::MacAddressGenerate(WifiStoreRandomMac &randomMacInfo)
 {
-    LOGI("enter MacAddressGenerate\n");
+    LOGD("enter MacAddressGenerate\n");
     constexpr int arraySize = 4;
     constexpr int macBitSize = 12;
     constexpr int firstBit = 1;
@@ -1414,7 +1414,7 @@ bool StaStateMachine::ComparedKeymgmt(const std::string scanInfoKeymgmt, const s
 
 bool StaStateMachine::SetRandomMac(int networkId)
 {
-    LOGI("enter SetRandomMac.\n");
+    LOGD("enter SetRandomMac.\n");
     WifiDeviceConfig deviceConfig;
     if (WifiSettings::GetInstance().GetDeviceConfig(networkId, deviceConfig) != 0) {
         LOGE("SetRandomMac : GetDeviceConfig failed!\n");
@@ -1457,7 +1457,7 @@ bool StaStateMachine::SetRandomMac(int networkId)
     }
 
     if (MacAddress::IsValidMac(currentMac.c_str())) {
-        LOGI("Check MacAddress successfully.\n");
+        LOGD("Check MacAddress successfully.\n");
         if (lastMac != currentMac) {
             if (WifiStaHalInterface::GetInstance().SetConnectMacAddr(currentMac) != WIFI_IDL_OPT_OK) {
                 LOGE("set Mac [%{public}s] failed.\n", MacAnonymize(currentMac).c_str());
@@ -1635,7 +1635,7 @@ bool StaStateMachine::ApLinkedState::ExecuteStateMsg(InternalMessage *msg)
         return false;
     }
 
-    WIFI_LOGI("ApLinkedState-msgCode=%{public}d received.\n", msg->GetMessageName());
+    WIFI_LOGD("ApLinkedState-msgCode=%{public}d received.\n", msg->GetMessageName());
     bool ret = NOT_EXECUTED;
     switch (msg->GetMessageName()) {
         /* The current state of StaStateMachine transfers to SeparatingState when
@@ -1850,7 +1850,7 @@ void StaStateMachine::GetIpState::GoInState()
         int dhcpRet = 0;
         DhcpServiceInfo dhcpInfo;
         pStaStateMachine->pDhcpService->GetDhcpInfo(IF_NAME, dhcpInfo);
-        LOGI("GetIpState get dhcp result, isRoam=%{public}d, clientRunStatus=%{public}d.",
+        LOGD("GetIpState get dhcp result, isRoam=%{public}d, clientRunStatus=%{public}d.",
             pStaStateMachine->isRoam, dhcpInfo.clientRunStatus);
         pStaStateMachine->currentTpType = static_cast<int>(WifiSettings::GetInstance().GetDhcpIpType());
         if (pStaStateMachine->currentTpType == IPTYPE_IPV4) {
@@ -2028,7 +2028,7 @@ bool StaStateMachine::LinkedState::ExecuteStateMsg(InternalMessage *msg)
             break;
         }
         default:
-            WIFI_LOGE("NOT handle this event!");
+            WIFI_LOGD("NOT handle this event!");
             break;
     }
 
@@ -2098,7 +2098,7 @@ void StaStateMachine::ConnectToNetworkProcess(InternalMessage *msg)
         lastNetworkId, MacAnonymize(bssid).c_str());
     WifiDeviceConfig deviceConfig;
     int result = WifiSettings::GetInstance().GetDeviceConfig(lastNetworkId, deviceConfig);
-    WIFI_LOGI("Device config networkId = %{public}d", deviceConfig.networkId);
+    WIFI_LOGD("Device config networkId = %{public}d", deviceConfig.networkId);
 
     if (result == 0 && deviceConfig.bssid == bssid) {
         LOGI("Device Configuration already exists.");
@@ -2198,7 +2198,7 @@ void StaStateMachine::SetWifiLinkedInfo(int networkId)
 
 void StaStateMachine::DealNetworkCheck(InternalMessage *msg)
 {
-    LOGI("enter DealNetworkCheck.\n");
+    LOGD("enter DealNetworkCheck.\n");
     if (msg == nullptr) {
         LOGE("InternalMessage msg is null.");
         return;
@@ -2223,14 +2223,14 @@ StaStateMachine::DhcpResultNotify::~DhcpResultNotify()
 
 void StaStateMachine::DhcpResultNotify::OnSuccess(int status, const std::string &ifname, DhcpResult &result)
 {
-    LOGI("Enter Sta DhcpResultNotify::OnSuccess. ifname=[%{public}s] status=[%{public}d]\n",
+    LOGD("Enter Sta DhcpResultNotify::OnSuccess. ifname=[%{public}s] status=[%{public}d]\n",
         ifname.c_str(), status);
 
     if ((pStaStateMachine->linkedInfo.detailedState == DetailedState::DISCONNECTING) ||
         (pStaStateMachine->linkedInfo.detailedState == DetailedState::DISCONNECTED)) {
         return;
     }
-    WIFI_LOGI("iptype=%{public}d, ip=%{public}s, gateway=%{public}s, \
+    WIFI_LOGD("iptype=%{public}d, ip=%{public}s, gateway=%{public}s, \
         subnet=%{public}s, serverAddress=%{public}s, leaseDuration=%{public}d.",
         result.iptype,
         IpAnonymize(result.strYourCli).c_str(),
@@ -2238,7 +2238,7 @@ void StaStateMachine::DhcpResultNotify::OnSuccess(int status, const std::string 
         IpAnonymize(result.strSubnet).c_str(),
         IpAnonymize(result.strServer).c_str(),
         result.uLeaseTime);
-    WIFI_LOGI("strDns1=%{public}s, strDns2=%{public}s", IpAnonymize(result.strDns1).c_str(),
+    WIFI_LOGD("strDns1=%{public}s, strDns2=%{public}s", IpAnonymize(result.strDns1).c_str(),
         IpAnonymize(result.strDns2).c_str());
 
     IpInfo ipInfo;
@@ -2269,7 +2269,7 @@ void StaStateMachine::DhcpResultNotify::TryToSaveIpV4Result(IpInfo &ipInfo, IpV6
                 (result.strVendor.find("ANDROID_METERED") == std::string::npos) ? 0 : 1;
             WifiSettings::GetInstance().SaveLinkedInfo(pStaStateMachine->linkedInfo);
 #ifndef OHOS_ARCH_LITE
-            WIFI_LOGI("Update NetLink info, strYourCli=%{public}s, strSubnet=%{public}s, \
+            WIFI_LOGD("Update NetLink info, strYourCli=%{public}s, strSubnet=%{public}s, \
                 strRouter1=%{public}s, strDns1=%{public}s, strDns2=%{public}s",
                 IpAnonymize(result.strYourCli).c_str(), IpAnonymize(result.strSubnet).c_str(),
                 IpAnonymize(result.strRouter1).c_str(), IpAnonymize(result.strDns1).c_str(),

@@ -155,7 +155,7 @@ void StaNetworkCheck::RunNetCheckThreadFunc()
         if (!isExitNetCheckThread) {
             std::unique_lock<std::mutex> lck(mMutex);
             if (mCondition_timeout.wait_for(lck, std::chrono::milliseconds(timeoutMs)) == std::cv_status::timeout) {
-                LOGI("mCondition_timeout timeout.\n");
+                LOGD("mCondition_timeout timeout.\n");
             } else {
                 LOGI("Wake up, break the loop.\n");
                 isExited = true;

@@ -333,10 +333,9 @@ void EventManager::Init()
         mSaStatusListener->Init(WIFI_HOTSPOT_ABILITY_ID);
         mSaStatusListener->Init(WIFI_P2P_ABILITY_ID);
     }
-
-    g_wifiScanPtr = OHOS::Wifi::WifiScan::GetInstance(WIFI_SCAN_ABILITY_ID);
     if (g_wifiScanPtr == nullptr) {
-        WIFI_LOGE("init scan event get instance failed!");
+        g_wifiScanPtr = OHOS::Wifi::WifiScan::GetInstance(WIFI_SCAN_ABILITY_ID);
+        WIFI_LOGE("scan ptr is null, create new instance");
         return;
     }
 

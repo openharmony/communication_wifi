@@ -50,6 +50,7 @@ public:
     virtual void SetAppRunningState(ScanMode appRunMode) = 0;
     virtual int SetWhetherToAllowNetworkSwitchover(bool bSwitch) = 0;
     virtual int GetValidChannels(ChannelsTable &channelsInfo) = 0;
+    virtual int ClearScanInfoList() = 0;
 };
 
 class WifiSettings : public MockWifiSettings {
@@ -79,6 +80,7 @@ public:
     MOCK_METHOD1(SetAppRunningState, void(ScanMode appRunMode));
     MOCK_METHOD1(SetWhetherToAllowNetworkSwitchover, int(bool bSwitch));
     MOCK_METHOD1(GetValidChannels, int(ChannelsTable &channelsInfo));
+    MOCK_METHOD0(ClearScanInfoList, int());
 };
 }  // namespace Wifi
 }  // namespace OHOS

@@ -100,7 +100,8 @@ public:
     WifiTimer();
     ~WifiTimer();
 
-    ErrCode Register(const TimerCallback &callback, uint32_t &outTimerId, uint32_t interval = DEFAULT_TIMEROUT);
+    ErrCode Register(
+        const TimerCallback &callback, uint32_t &outTimerId, uint32_t interval = DEFAULT_TIMEROUT, bool once = true);
     void UnRegister(uint32_t timerId);
 
 private:
@@ -152,6 +153,8 @@ public:
     ErrCode AutoStopStaService(AutoStartOrStopServiceReason reason);
     void StopUnloadStaSaTimer(void);
     void StartUnloadStaSaTimer(void);
+    void StopUnloadScanSaTimer(void);
+    void StartUnloadScanSaTimer(void);
 #ifdef FEATURE_AP_SUPPORT
     /**
      * @Description Get the ap callback object.
@@ -218,6 +221,7 @@ private:
     static void DealCloseServiceMsg(WifiManager &manager);
     static void CloseStaService(void);
     static void UnloadStaSaTimerCallback();
+    static void UnloadScanSaTimerCallback();
 #ifdef FEATURE_AP_SUPPORT
     static void CloseApService(int id = 0);
     static void UnloadHotspotSaTimerCallback();
@@ -241,6 +245,8 @@ private:
     static void DealStoreScanInfoEvent(std::vector<InterScanInfo> &results);
     static void DealOpenScanOnlyRes(OperateResState state);
     static void DealCloseScanOnlyRes(OperateResState state);
+    static void DealAirplaneExceptionWhenStaOpen(void);
+    static void DealAirplaneExceptionWhenStaClose(void);
 #ifdef FEATURE_AP_SUPPORT
     static void DealApStateChanged(ApState bState, int id = 0);
     static void DealApGetStaJoin(const StationInfo &info, int id = 0);
@@ -276,6 +282,8 @@ private:
 #ifndef OHOS_ARCH_LITE
     static uint32_t unloadStaSaTimerId;
     static std::mutex unloadStaSaTimerMutex;
+    static uint32_t unloadScanSaTimerId;
+    static std::mutex unloadScanSaTimerMutex;
 #endif
 #ifdef FEATURE_AP_SUPPORT
     IApServiceCallbacks mApCallback;

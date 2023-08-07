@@ -139,10 +139,10 @@ enum class Ant {
 };
 
 enum class AutoStartOrStopServiceReason {
-    AUTO_START_UPON_STARTUP = 0,        /* auto-start upon startup */
-    AIRPLANE_MODE,                      /* airplane mode */
-    STA_AP_EXCLUSION,                   /* sta and ap exclusion */
-    TYRTO_ENABLE_P2P_WHEN_WIFI_OPENED,  /* Try to enable the p2p service again, when the wifi is opened */
+    AUTO_START_UPON_STARTUP = 0,                /* auto-start upon startup */
+    AIRPLANE_MODE,                              /* airplane mode */
+    STA_AP_EXCLUSION,                           /* sta and ap exclusion */
+    TRYTO_OPERATE_P2P_WHEN_STA_STATE_CHANGE,    /* Try to operate p2p service again, when the sta state change */
 };
 
 struct InterScanInfo {

@@ -35,6 +35,7 @@
 
 #define WIFI_IDL_GET_MAX_SCAN_INFO 256 /* Maximum number of scan infos obtained at a time */
 struct IWlanCallback* g_hdiWanCallbackObj = NULL;
+static pthread_mutex_t g_hdiCallbackMutex;
 ScanInfo* g_hdiScanResults = NULL;
 int g_hdiScanResultsCount = 0;
 static pthread_mutex_t g_hdiMutex;
@@ -42,11 +43,13 @@ static pthread_mutex_t g_hdiMutex;
 void HdiStaInit()
 {
     pthread_mutex_init(&g_hdiMutex, NULL);
+    pthread_mutex_init(&g_hdiCallbackMutex, NULL);
 }
 
 void HdiStaUnInit()
 {
     pthread_mutex_destroy(&g_hdiMutex);
+    pthread_mutex_destroy(&g_hdiCallbackMutex);
 }
 
 int32_t HdiScanResultsCallback(struct IWlanCallback *self, uint32_t event,
@@ -54,9 +57,14 @@ int32_t HdiScanResultsCallback(struct IWlanCallback *self, uint32_t event,
 {
     pthread_mutex_lock(&g_hdiMutex);
     g_hdiScanResultsCount = 0;
-    if (g_hdiScanResults == NULL || scanResults == NULL || ifName == NULL) {
+    if (g_hdiScanResults == NULL) {
         pthread_mutex_unlock(&g_hdiMutex);
-        LOGE("HdiScanResultsCallback param invalid.");
+        LOGE("HdiScanResultsCallback param invalid. g_hdiScanResults is null!");
+        return WIFI_HAL_FAILED;
+    }
+    if (scanResults == NULL || ifName == NULL) {
+        pthread_mutex_unlock(&g_hdiMutex);
+        LOGE("HdiScanResultsCallback param invalid. scanResults or ifName is null!");
         WifiHalCbNotifyScanEnd(STA_CB_SCAN_FAILED);
         return WIFI_HAL_FAILED;
     }
@@ -79,7 +87,7 @@ int32_t HdiScanResultsCallback(struct IWlanCallback *self, uint32_t event,
                 LOGE("HdiScanResultsCallback ssid empty.");
                 continue;
             }
-            LOGE("HdiScanResultsCallback ssid empty. bssid:%{public}s", bssid);
+            LOGE("HdiScanResultsCallback ssid empty. bssid:%{private}s", bssid);
             continue;
         }
         buffLen = 1024;
@@ -94,7 +102,7 @@ int32_t HdiScanResultsCallback(struct IWlanCallback *self, uint32_t event,
             LOGE("HdiScanResultsCallback DelScanInfoLine failed.");
             continue;
         }
-        LOGD("HdiScanResultsCallback bssid:%{public}s, ssid:%{public}s", g_hdiScanResults[g_hdiScanResultsCount].bssid,
+        LOGD("HdiScanResultsCallback bssid:%{private}s, ssid:%{private}s", g_hdiScanResults[g_hdiScanResultsCount].bssid,
             g_hdiScanResults[g_hdiScanResultsCount].ssid);
         g_hdiScanResultsCount++;
     }
@@ -152,7 +160,7 @@ finish:
         free(scan.ssids);
         scan.ssids = NULL;
     }
-
+    LOGI("HdiStartScan end. ret: %{public}d", ret);
     return (ret == 0) ? WIFI_HAL_SUCCESS : WIFI_HAL_FAILED;
 }
 
@@ -210,38 +218,9 @@ WifiErrorNo GetHdiSignalInfo(WpaSignalInfo *info)
     return (ret == 0) ? 0 : -1;
 }
 
-
-WifiErrorNo RegisterHdiStaCallbackEvent()
+static WifiErrorNo InitHdiScanResults()
 {
-    LOGI("RegisterHdiStaCallbackEvent enter.");
     pthread_mutex_lock(&g_hdiMutex);
-    if (g_hdiWanCallbackObj != NULL) {
-        LOGI("RegisterHdiStaCallbackEvent already register.");
-        pthread_mutex_unlock(&g_hdiMutex);
-        return WIFI_HAL_SUCCESS;
-    }
-    g_hdiWanCallbackObj = (struct IWlanCallback*)malloc(sizeof(struct IWlanCallback));
-    if (g_hdiWanCallbackObj == NULL) {
-        pthread_mutex_unlock(&g_hdiMutex);
-        LOGE("g_hdiWanCallbackObj malloc failed.");
-        return WIFI_HAL_FAILED;
-    }
-    g_hdiWanCallbackObj->ResetDriverResult = NULL;
-    g_hdiWanCallbackObj->ScanResult = NULL;
-    g_hdiWanCallbackObj->WifiNetlinkMessage = NULL;
-    g_hdiWanCallbackObj->ScanResults = HdiScanResultsCallback;
-    WifiHdiProxy proxy = GetHdiProxy(PROTOCOL_80211_IFTYPE_STATION);
-    if (proxy.wlanObj == NULL || proxy.feature == NULL) {
-        pthread_mutex_unlock(&g_hdiMutex);
-        LOGE("Hdi proxy is NULL!");
-        return WIFI_HAL_FAILED;
-    }
-    int32_t ret = proxy.wlanObj->RegisterEventCallback(proxy.wlanObj, g_hdiWanCallbackObj, "wlan0");
-    if (ret != 0) {
-        pthread_mutex_unlock(&g_hdiMutex);
-        LOGE("Hdi RegisterEventCallback failed ret:%{public}d", ret);
-        return WIFI_HAL_FAILED;
-    }
     g_hdiScanResultsCount = 0;
     g_hdiScanResults = (struct ScanInfo*)malloc(WIFI_IDL_GET_MAX_SCAN_INFO * sizeof(struct ScanInfo));
     if (g_hdiScanResults == NULL) {
@@ -259,32 +238,77 @@ WifiErrorNo RegisterHdiStaCallbackEvent()
     return WIFI_HAL_SUCCESS;
 }
 
-void UnRegisterHdiStaCallbackEvent()
+WifiErrorNo RegisterHdiStaCallbackEvent()
 {
-    LOGI("UnRegisterHdiStaCallbackEvent enter.");
+    LOGI("RegisterHdiStaCallbackEvent enter.");
+    pthread_mutex_lock(&g_hdiCallbackMutex);
+    if (g_hdiWanCallbackObj != NULL) {
+        LOGI("RegisterHdiStaCallbackEvent already register.");
+        pthread_mutex_unlock(&g_hdiCallbackMutex);
+        return WIFI_HAL_SUCCESS;
+    }
+    g_hdiWanCallbackObj = (struct IWlanCallback*)malloc(sizeof(struct IWlanCallback));
+    if (g_hdiWanCallbackObj == NULL) {
+        pthread_mutex_unlock(&g_hdiCallbackMutex);
+        LOGE("g_hdiWanCallbackObj malloc failed.");
+        return WIFI_HAL_FAILED;
+    }
+    g_hdiWanCallbackObj->ResetDriverResult = NULL;
+    g_hdiWanCallbackObj->ScanResult = NULL;
+    g_hdiWanCallbackObj->WifiNetlinkMessage = NULL;
+    g_hdiWanCallbackObj->ScanResults = HdiScanResultsCallback;
+    WifiHdiProxy proxy = GetHdiProxy(PROTOCOL_80211_IFTYPE_STATION);
+    if (proxy.wlanObj == NULL || proxy.feature == NULL) {
+        pthread_mutex_unlock(&g_hdiCallbackMutex);
+        LOGE("Hdi proxy is NULL!");
+        return WIFI_HAL_FAILED;
+    }
+    int32_t ret = proxy.wlanObj->RegisterEventCallback(proxy.wlanObj, g_hdiWanCallbackObj, "wlan0");
+    if (ret != 0) {
+        pthread_mutex_unlock(&g_hdiCallbackMutex);
+        LOGE("Hdi RegisterEventCallback failed ret:%{public}d", ret);
+        return WIFI_HAL_FAILED;
+    }
+    pthread_mutex_unlock(&g_hdiCallbackMutex);
+
+    return InitHdiScanResults();
+}
+
+static void ClearHdiScanResults()
+{
     pthread_mutex_lock(&g_hdiMutex);
+    g_hdiScanResultsCount = 0;
     if (g_hdiScanResults != NULL) {
         free(g_hdiScanResults);
         g_hdiScanResults = NULL;
     }
+    pthread_mutex_unlock(&g_hdiMutex);
+    return;
+}
+
+void UnRegisterHdiStaCallbackEvent()
+{
+    LOGI("UnRegisterHdiStaCallbackEvent enter.");
+    ClearHdiScanResults();
+    pthread_mutex_lock(&g_hdiCallbackMutex);
     if (g_hdiWanCallbackObj != NULL) {
         WifiHdiProxy proxy = GetHdiProxy(PROTOCOL_80211_IFTYPE_STATION);
         if (proxy.wlanObj == NULL || proxy.feature == NULL) {
-            pthread_mutex_unlock(&g_hdiMutex);
+            pthread_mutex_unlock(&g_hdiCallbackMutex);
             LOGE("Hdi proxy is NULL!");
             return;
         }
         int32_t ret = proxy.wlanObj->UnregisterEventCallback(proxy.wlanObj, g_hdiWanCallbackObj, "wlan0");
         if (ret != 0) {
             LOGE("Hdi UnregisterEventCallback failed ret:%{public}d", ret);
-            pthread_mutex_unlock(&g_hdiMutex);
+            pthread_mutex_unlock(&g_hdiCallbackMutex);
             return;
         }
         StubCollectorRemoveObject(IWLANCALLBACK_INTERFACE_DESC, g_hdiWanCallbackObj);
         free(g_hdiWanCallbackObj);
         g_hdiWanCallbackObj = NULL;
     }
-    pthread_mutex_unlock(&g_hdiMutex);
+    pthread_mutex_unlock(&g_hdiCallbackMutex);
 }
 
 #ifdef RANDOM_MAC_SUPPORT

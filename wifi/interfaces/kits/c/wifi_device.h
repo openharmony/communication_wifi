@@ -287,7 +287,7 @@ WifiErrorCode IsBandTypeSupported(int bandType, bool *supported);
 * @param result - get result vector of int
 * @return ErrCode - operation result
 */
-WifiErrorCode Get5GHzChannelList(int *result);
+WifiErrorCode Get5GHzChannelList(int *result, int *size);
 
 /**
  * @brief Registers a callback for a specified Wi-Fi event.

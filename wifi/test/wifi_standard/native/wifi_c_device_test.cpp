@@ -43,6 +43,7 @@ constexpr int RSSI = 2;
 constexpr int TYPE_OPEN = 0;
 constexpr unsigned char BSSID[WIFI_MAC_LEN] = "test1";
 constexpr int BAND = 2;
+constexpr int ZERO = 0;
 
 class WifiCDeviceTest : public testing::Test {
 public:
@@ -336,6 +337,25 @@ public:
         int band = BAND;
         EXPECT_EQ(GetSignalLevel(rssi, band), -1);
     }
+
+    void SetLowLatencyModeTest()
+    {
+        EXPECT_TRUE(SetLowLatencyMode(true) == WIFI_SUCCESS);
+        EXPECT_TRUE(SetLowLatencyMode(false) == WIFI_SUCCESS);
+    }
+
+    void IsBandTypeSupportedTest()
+    {
+        bool supported = false;
+        EXPECT_TRUE(IsBandTypeSupported(BAND, &supported) != WIFI_SUCCESS);
+    }
+
+    void Get5GHzChannelListTest()
+    {
+        int result = ZERO;
+        int size = ZERO;
+        EXPECT_TRUE(Get5GHzChannelList(&result, &size) != WIFI_SUCCESS);
+    }
 };
 
 HWTEST_F(WifiCDeviceTest, EnableWifiSuccess, TestSize.Level1)
@@ -451,6 +471,21 @@ HWTEST_F(WifiCDeviceTest, GetIpInfoSuccess, TestSize.Level1)
 HWTEST_F(WifiCDeviceTest, GetSignalLevelSuccess, TestSize.Level1)
 {
     GetSignalLevelSuccess();
+}
+
+HWTEST_F(WifiCDeviceTest, SetLowLatencyModeTest, TestSize.Level1)
+{
+    SetLowLatencyModeTest();
+}
+
+HWTEST_F(WifiCDeviceTest, IsBandTypeSupportedTest, TestSize.Level1)
+{
+    IsBandTypeSupportedTest();
+}
+
+HWTEST_F(WifiCDeviceTest, Get5GHzChannelListTest, TestSize.Level1)
+{
+    Get5GHzChannelListTest();
 }
 } // namespace Wifi
 } // namespace OHOS

@@ -19,9 +19,9 @@
         "name": "default",
         "material": {
           "certpath": "C:\\Users\\kaihong\\.ohos\\config\\openharmony\\auto_ohos_default_kaihong.sample.wifitest.cer",
-          "storePassword": "0000001BC25EC24903EDD260E090B3462E4956CAE8C2742F7202A1DCADF83565ED85C9D177060AE47B5522",
+          "storePassword": "0000001BA241473C90A825CB41480027D18FA6CF3640ABD0F2220314E6F250D4FB17ED05A0C0B39781957C",
           "keyAlias": "debugKey",
-          "keyPassword": "0000001B4064A1924A38D9945F735D46069085207EBE8E4D3C68309C787874055C17FD9BAC06EB0CB5FD22",
+          "keyPassword": "0000001B31D2FEB1E86B08E01A2D1E525B62283A49A604A4549114E2C35BF9EC1BDD4785E78E659E077314",
           "profile": "C:\\Users\\kaihong\\.ohos\\config\\openharmony\\auto_ohos_default_kaihong.sample.wifitest.p7b",
           "signAlg": "SHA256withECDSA",
           "storeFile": "C:\\Users\\kaihong\\.ohos\\config\\openharmony\\auto_ohos_default_kaihong.sample.wifitest.p12"

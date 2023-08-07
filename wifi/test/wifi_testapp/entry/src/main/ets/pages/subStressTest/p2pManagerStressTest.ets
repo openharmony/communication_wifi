@@ -19,13 +19,37 @@ import prompt from '@ohos.prompt';
 import { PageTitle } from '../../Component/pageTitle';
 import { TestImageDisplay } from '../../Component/testImageDisplay';
 import { StressContentTable } from '../../Component/stressContentTable';
-import Router from '@system.router';
+import router from '@system.router';
 import ConfigData from '../../Utils/ConfigData';
 import LogUtil from '../../Utils/LogUtil';
 import { initP2pManagerStressData } from '../../MainAbility/model/stressTestDataModels'
 import { TestData } from '../../MainAbility/model/testData'
+import wifi from '@ohos.wifi';
+import { resolveIP } from '../../Utils/Util'
+import socket from '@ohos.net.socket';
+import Logger from '../../MainAbility/model/Logger'
+import http from '@ohos.net.http'
+import request from '@ohos.request'
+import resourceManager from '@ohos.resourceManager'
+import featureAbility from '@ohos.ability.featureAbility'
+
+const TAG: string = '[Stress]'
 
 const G_NAME = 'DaYu200'
+
+let localAddr = {
+  address : resolveIP( wifi.getIpInfo().ipAddress ) ,
+  family : 1 ,
+  port : 9090
+}
+let oppositeAddr = {
+  address : '' ,
+  family : 1 ,
+  port : 0
+}
+let loginCount = 0
+
+let udp = socket.constructUDPSocketInstance()
 
 /**
  * P2pManager StressTest Page of Wifi Test
@@ -35,29 +59,28 @@ const G_NAME = 'DaYu200'
 @Component
 struct P2pManagerStressTest {
   @State showList: boolean = false;
-  private testItem: TestData = Router.getParams().testId;
+  @State showListItems: boolean = false;
+  @State showListItem: boolean = false;
+  private testItem: TestData = router.getParams().testId;
   @State message: string = "";
-  @StorageLink( 'setLocalNameRet' ) setLocalNameRet: boolean = false;
-  @StorageLink( 'setScanModeRet' ) setScanModeRet: boolean = false;
   @State deviceId: string = '';
   @State currentClick: number = - 1;
-  @State deviceAddress: string = '6c:96:d7:3d:87:6f';
-  @State netId: number = - 2 ;
-  @State passphrase: string = "12345678" ;
-  @State groupName: string = "testGroup"
-  @State goBand: number = 0 ;
-  @State devName: string = "test"
-  @State staticIp_domains: Array<string> = [ "0", "1", "2" ] ;
+  @State deviceAddressManager: string = '6c:96:d7:3d:87:6f';
+  @State netIdManager: number = - 2 ;
+  @State passphraseManager: string = "12345678" ;
+  @State groupNameManager: string = "testGroup"
+  @State goBandManager: number = 0 ;
+  @State devNameManager: string = "MyTestDevice"
   @StorageLink( 'stressNumber' ) stressNumber: number = 0 ;
   @StorageLink( 'stressTime' ) stressTime: number = 0;
 
   aboutToAppear() {
-    AppStorage.SetOrCreate( "deviceAddress" , this.deviceAddress )
-    AppStorage.SetOrCreate( "netId" , this.netId )
-    AppStorage.SetOrCreate( "passphrase" , this.passphrase )
-    AppStorage.SetOrCreate( "groupName" , this.groupName )
-    AppStorage.SetOrCreate( "goBand" , this.goBand )
-    AppStorage.SetOrCreate( "devName" , this.devName )
+    AppStorage.SetOrCreate( "deviceAddressManager" , this.deviceAddressManager )
+    AppStorage.SetOrCreate( "netIdManager" , this.netIdManager )
+    AppStorage.SetOrCreate( "passphraseManager" , this.passphraseManager )
+    AppStorage.SetOrCreate( "groupNameManager" , this.groupNameManager )
+    AppStorage.SetOrCreate( "goBandManager" , this.goBandManager )
+    AppStorage.SetOrCreate( "devNameManager" , this.devNameManager )
   }
 
   init() {
@@ -102,7 +125,7 @@ struct P2pManagerStressTest {
       .align( Alignment.Start )
 
       if ( this.showList ) {
-        //        WifiDeviceSetting()
+        p2pManagerSetting()
       } else {
         Column() {
           Scroll() {
@@ -122,21 +145,567 @@ struct P2pManagerStressTest {
                 .margin( { top : "5vp" , left : "15vp" } )
                 .textAlign( TextAlign.Start )
                 .width( ConfigData.WH_90_100 )
+
+              Flex( { alignItems : ItemAlign.Center , justifyContent : FlexAlign.SpaceBetween } ) {
+                Button( { type : ButtonType.Normal , stateEffect : true } ) {
+                  Text( '传输数据' ).fontSize( "20vp" ).fontColor( 0xffffff ).margin( { left : 2 , right : 2 } )
+                }
+                .borderRadius( 8 )
+                .backgroundColor( $r( "app.color.blue" ) )
+                .width( 100 )
+                .height( 60 )
+                .margin( { top : "5vp" , left : "10vp" , bottom : "5vp" } )
+                .align( Alignment.Start )
+                .onClick( async( event: ClickEvent ) => {
+                  this.showListItems = true
+                  this.showListItem = false
+                } )
+
+                Button( { type : ButtonType.Normal , stateEffect : true } ) {
+                  Row() {
+                    Text( '上传下载' ).fontSize( "20vp" ).fontColor( 0xffffff ).margin( { left : 2 , right : 2 } )
+                  }.alignItems( VerticalAlign.Center )
+                }
+                .borderRadius( 8 )
+                .backgroundColor( $r( "app.color.blue" ) )
+                .width( 100 )
+                .height( 60 )
+                .margin( { top : "5vp" , left : "10vp" , right : "10vp" , bottom : "5vp" } )
+                .align( Alignment.Center )
+                .onClick( async( event: ClickEvent ) => {
+                  this.showListItem = true
+                  this.showListItems = false
+                } )
+
+                Button( { type : ButtonType.Normal , stateEffect : true } ) {
+                  Row() {
+                    Text( '返回接口' ).fontSize( "20vp" ).fontColor( 0xffffff ).margin( { left : 2 , right : 2 } )
+                  }.alignItems( VerticalAlign.Bottom )
+                }
+                .borderRadius( 8 )
+                .backgroundColor( $r( "app.color.blue" ) )
+                .width( 100 )
+                .height( 60 )
+                .margin( { top : "5vp" , right : "10vp" , bottom : "5vp" } )
+                .align( Alignment.End )
+                .onClick( async( event: ClickEvent ) => {
+                  this.showListItem = false
+                  this.showListItems = false
+                } )
+              }
+              .backgroundColor( $r( "sys.color.ohos_id_color_sub_background" ) )
+              .width( ConfigData.WH_100_100 )
             }
             .width( ConfigData.WH_100_100 )
           }
           .scrollBarWidth( 10 )
           .scrollBar( BarState.Auto )
         }
-        .height( 100 )
+        .height( 130 )
         .width( ConfigData.WH_95_100 )
         .backgroundColor( $r( "sys.color.ohos_id_color_foreground_contrary" ) )
 
-        StressContentTable( { testItem : this.testItem , apiItems : initP2pManagerStressData() } )
+        if ( this.showListItems == true && this.showListItem == false ) {
+          socketTest()
+        } else if ( this.showListItems == false && this.showListItem == true ) {
+          upDownLoad()
+        } else {
+          StressContentTable( { testItem : this.testItem , apiItems : initP2pManagerStressData() } )
+        }
       }
     }
     .alignItems( HorizontalAlign.Center )
     .backgroundColor( $r( "app.color.lead" ) )
     .height( ConfigData.WH_100_100 )
   }
+}
+
+@Component
+struct p2pManagerSetting {
+  @State deviceAddressManager: string = '6c:96:d7:3d:87:6f';
+  @State netIdManager: number = - 2 ;
+  @State passphraseManager: string = "12345678" ;
+  @State groupNameManager: string = "testGroup"
+  @State goBandManager: number = 0 ;
+  @State devNameManager: string = "MyTestDevice"
+
+  aboutToAppear() {
+    AppStorage.SetOrCreate( "deviceAddressManager" , this.deviceAddressManager )
+    AppStorage.SetOrCreate( "netIdManager" , this.netIdManager )
+    AppStorage.SetOrCreate( "passphraseManager" , this.passphraseManager )
+    AppStorage.SetOrCreate( "groupNameManager" , this.groupNameManager )
+    AppStorage.SetOrCreate( "goBandManager" , this.goBandManager )
+    AppStorage.SetOrCreate( "devNameManager" , this.devNameManager )
+  }
+
+  build() {
+    Column() {
+      Row() {
+        Text( "deviceAddressManager:" ).fontSize( 16 ).width( 120 )
+        TextInput( { text : this.deviceAddressManager , placeholder : '6c:96:d7:3d:87:6f' } )
+          .fontSize( "15vp" )
+          .onChange( ( strInput ) => {
+            this.deviceAddressManager = strInput;
+            //判断合法性
+            if ( strInput.length >= 1 ) {
+              AppStorage.SetOrCreate( 'deviceAddressManager' , strInput );
+            }
+          } )
+          .width( ConfigData.WH_80_100 )
+          .borderRadius( 1 )
+      }
+      .backgroundColor( $r( "app.color.moon" ) )
+      .padding( 5 )
+      .justifyContent( FlexAlign.Start )
+      .alignItems( VerticalAlign.Center )
+
+      Column() {
+        Stack().height( "0.25vp" ).backgroundColor( "#000000" );
+        Column() {
+          Row() {
+            Text( "netIdManager:" ).fontSize( 15 ).width( 60 );
+            TextInput( { text : this.netIdManager , placeholder : "-2" } )
+              .fontSize( "15vp" )
+              .onChange( ( strInput ) => {
+                this.netIdManager = strInput;
+                //判断合法性
+                if ( strInput.length >= 1 ) {
+                  AppStorage.SetOrCreate( 'netIdManager' , strInput );
+                }
+              } )
+              .width( ConfigData.WH_80_100 )
+              .borderRadius( 1 )
+          }
+          .padding( 5 )
+          .justifyContent( FlexAlign.Start )
+          .alignItems( VerticalAlign.Center )
+          .backgroundColor( $r( "app.color.spring" ) )
+
+          Row() {
+            Text( "passphraseManager:" ).fontSize( 15 ).width( 100 );
+            TextInput( { text : this.passphraseManager , placeholder : "input passphrase" } )
+              .fontSize( "15vp" )
+              .onChange( ( strInput ) => {
+                this.passphraseManager = strInput;
+                if ( strInput.length >= 1 ) {
+                  AppStorage.SetOrCreate( 'passphraseManager' , strInput );
+                }
+              } )
+              .width( ConfigData.WH_80_100 )
+              .borderRadius( 1 )
+          }
+          .backgroundColor( $r( "app.color.spring" ) )
+          .padding( 5 )
+          .justifyContent( FlexAlign.Start )
+          .alignItems( VerticalAlign.Center )
+
+          Row() {
+            Text( "groupNameManager:" ).fontSize( 15 ).width( 100 );
+            TextInput( { text : this.groupNameManager , placeholder : "testGroup" } )
+              .fontSize( "15vp" )
+              .onChange( ( strInput ) => {
+                this.groupNameManager = strInput;
+                if ( strInput.length >= 1 ) {
+                  AppStorage.SetOrCreate( 'groupNameManager' , strInput );
+                }
+              } )
+              .width( ConfigData.WH_80_100 )
+              .borderRadius( 1 )
+          }
+          .backgroundColor( $r( "app.color.spring" ) )
+          .padding( 5 )
+          .justifyContent( FlexAlign.Start )
+          .alignItems( VerticalAlign.Center )
+
+          Row() {
+            Text( "goBandManager:" ).fontSize( 15 ).width( 80 );
+            TextInput( { text : this.goBandManager , placeholder : "0" } )
+              .fontSize( "15vp" )
+              .onChange( ( strInput ) => {
+                this.goBandManager = strInput;
+                if ( strInput.length >= 1 ) {
+                  AppStorage.SetOrCreate( 'goBandManager' , strInput );
+                }
+              } )
+              .width( ConfigData.WH_80_100 )
+              .borderRadius( 1 )
+          }
+          .backgroundColor( $r( "app.color.spring" ) )
+          .padding( 5 )
+          .justifyContent( FlexAlign.Start )
+          .alignItems( VerticalAlign.Center )
+
+          Row() {
+            Text( "devNameManager:" ).fontSize( 15 ).width( 100 );
+            TextInput( { text : this.devNameManager , placeholder : "MyTestDevice" } )
+              .fontSize( "15vp" )
+              .onChange( ( strInput ) => {
+                this.devNameManager = strInput;
+                if ( strInput.length >= 1 ) {
+                  AppStorage.SetOrCreate( 'devNameManager' , strInput );
+                }
+              } )
+              .width( ConfigData.WH_80_100 )
+              .borderRadius( 1 )
+          }
+          .backgroundColor( $r( "app.color.spring" ) )
+          .padding( 5 )
+          .justifyContent( FlexAlign.Start )
+          .alignItems( VerticalAlign.Center )
+        }
+
+        Stack().height( "0.25vp" ).backgroundColor( "#000000" );
+      }
+    }
+  }
+}
+
+@Component
+struct socketTest {
+  @State login_feng: boolean = false
+  @State login_wen: boolean = false
+  @State user: string = ''
+  @State roomDialog: boolean = false
+  @State confirmDialog: boolean = false
+  @State ipDialog: boolean = true
+  @State txtDialog: boolean = true
+  @State warnDialog: boolean = false
+  @State warnText: string = ''
+  @State roomNumber: string = ''
+  @State bindMsg: string = "未绑定"
+  @State receiveMsg: string = '待接收数据'
+
+  bindOption() {
+    let bindOption = udp.bind( localAddr )
+    bindOption.then( () => {
+      Logger.info( TAG , 'bind success' )
+      this.bindMsg = "绑定成功"
+    } ).catch( err => {
+      Logger.info( TAG , 'bind fail' + err )
+      this.bindMsg = "绑定失败"
+    } )
+    udp.on( 'message' , data => {
+      Logger.info( TAG , `data:${ JSON.stringify( data ) }` )
+      let buffer = data.message
+      let dataView = new DataView(buffer)
+      Logger.info( TAG , `length = ${ dataView.byteLength }` )
+      let str = ""
+      for ( let i = 0 ;i < dataView.byteLength ; ++i ) {
+        let c = String.fromCharCode( dataView.getUint8( i ) )
+        if ( c != "\n" ) {
+          str += c
+        }
+      }
+//      if ( str == 'ok' ) {
+//        router.clear()
+//        loginCount += 1
+//        router.push( {
+//          url : 'pages/Index' ,
+//          params : { address : oppositeAddr.address , port : oppositeAddr.port , loginCount : loginCount }
+//        } )
+//      }
+//      else {
+        this.receiveMsg = str
+        this.confirmDialog = true
+//      }
+    } )
+  }
+
+  build() {
+    Stack( { alignContent : Alignment.Center } ) {
+      Column() {
+//        if ( !this.ipDialog ) {
+//          Column() {
+//            Image( this.login_feng ? $r( 'app.color.blue' ) : $r( 'app.color.moon' ) )
+//              .width( 100 )
+//              .height( 100 )
+//              .objectFit( ImageFit.Fill )
+//            Text( '用户名：' + this.user ).fontSize( 25 ).margin( { top : 50 } )
+//
+//            Button() {
+//              Text( $r( 'app.string.create_room' ) ).fontSize( 25 ).fontColor( Color.White )
+//            }
+//            .width( '150' )
+//            .height( 50 )
+//            .margin( { top : 30 } )
+//            .type( ButtonType.Capsule )
+//            .onClick( () => {
+//              this.roomDialog = true
+//              this.bindOption()
+//            } )
+//          }.width( '90%' ).margin( { top : 100 } )
+//        }
+
+        if ( this.ipDialog ) {
+          Column() {
+            Text( '本地IP：' + localAddr.address )
+              .fontSize( 25 )
+              .margin( { top : 10 } )
+            TextInput( { placeholder : '请输入对端ip' } )
+              .width( 200 )
+              .fontSize( 25 )
+              .margin( { top : 10 } )
+              .onChange( ( value: string ) => {
+                oppositeAddr.address = value
+                oppositeAddr.port = 9090
+              } )
+
+            if ( this.warnDialog ) {
+              Text( this.warnText )
+                .width( 200 )
+                .fontSize( 10 )
+                .fontColor( Color.Red ).margin( { top : 5 } )
+            }
+            Row() {
+              Button( $r( 'app.string.confirm' ) )
+                .fontColor( Color.Black )
+                .height( 40 )
+                .width( 130 )
+                .fontSize( 25 )
+                .margin( { bottom : 10 } )
+                .onClick( () => {
+                  if ( oppositeAddr.address === '' ) {
+                    this.warnDialog = true
+                    this.warnText = '请先输入对端IP'
+                  } else {
+                    this.bindOption()
+                    this.txtDialog = true
+                    Logger.debug( TAG , `peer ip=${ oppositeAddr.address }` )
+                    Logger.debug( TAG , `peer port=${ oppositeAddr.port }` )
+                    Logger.debug( TAG , `peer port=${ localAddr.port }` )
+                  }
+                } )
+                .backgroundColor( 0xffffff )
+
+              Button( $r( 'app.string.send_message' ) )
+                .fontColor( Color.Black )
+                .height( 40 )
+                .width( 130 )
+                .fontSize( 25 )
+                .margin( { bottom : 10 } )
+                .onClick( () => {
+                  {
+                    //发送数据
+                    udp.send( {
+                      data : '1' , //online
+                      address : oppositeAddr
+                    } ).then( data => {
+                      Logger.info( TAG , `send sucess : ${ data }` )
+                    } ).catch( function( err ) {
+                      Logger.info( TAG , `TAG,send : ${ JSON.stringify( err ) }` )
+                    } )
+
+                    Logger.debug( TAG , `send peer ip=${ oppositeAddr.address }` )
+                    Logger.debug( TAG , `send peer port=${ oppositeAddr.port }` )
+                    Logger.debug( TAG , `send peer port=${ localAddr.port }` )
+                  }
+                } )
+                .backgroundColor( 0xffffff )
+            }
+            Text( this.bindMsg )
+              .width( 200 )
+              .fontSize( 25 )
+              .fontColor( Color.Red ).margin( { top : 5 } )
+          }
+          .width( '80%' )
+          .height( 200 )
+          .margin( { top : '3%' } )
+          .backgroundColor( Color.White )
+          .border( { radius : 10 , width : 3 } )
+        }
+
+        if ( this.txtDialog ) {
+          Column() {
+            Text( '接收本地IP：' + localAddr.address )
+              .fontSize( 25 )
+              .margin( { top : 10 } )
+
+            Text( this.receiveMsg )
+              .width( 200 )
+              .fontSize( 25 )
+              .fontColor( Color.Red ).margin( { top : 5 } )
+
+          }
+          .width( '80%' )
+          .height( 180 )
+          .margin( { top : '3%' } )
+          .backgroundColor( Color.White )
+          .border( { radius : 10 , width : 3 } )
+        }
+
+      }.width( '100%' ).height( '100%' )
+    }
+  }
+}
+
+@Component
+struct upDownLoad {
+  @State receivedSize: number = 0
+  @State totalSize: number = 0
+  @State message: string = ''
+  @State files: Array<string> = []
+  @State uploads: Array<string> = []
+  private downloadConfig = {
+    url : 'http://192.168.62.127:8000' ,
+    filePath : ""
+  }
+  handlerClickButton = () => {
+    featureAbility.terminateSelf()
+  }
+
+  aboutToAppear() {
+    Logger.info( TAG , `enter Index aboutToAppear` )
+    featureAbility.getContext()
+      .requestPermissionsFromUser( [ 'ohos.permission.INTERNET' ] , 2 , ( result ) => {
+        Logger.info( TAG , `grantPermission,requestPermissionsFromUser,result.requestCode=${ result }` )
+      } )
+    this.files.push( "http://192.168.62.127:8000" )
+    let httpRequest = http.createHttp()
+    httpRequest.request(
+      'http://192.168.0.123/?tpl=list&folders-filter=&recursive' ,
+      {
+        method : http.RequestMethod.GET ,
+        header : {
+          'Content-Type' : 'text/plain'
+        }
+      } , ( err , data ) => {
+      Logger.info( TAG , `error = ${ JSON.stringify( err ) }` )
+      if ( !err ) {
+        Logger.info( TAG , `data = ${ JSON.stringify( data ) }` )
+        let result: string = data.result.toString()
+        Logger.info( TAG , `Result = ${ result }` )
+
+        let tempFiles = result.split( '\r\n' )
+        for ( let i = 0 ; i < tempFiles.length ; i ++ ) {
+          let splitFiles = tempFiles[i].split( '//' )[1].split( '/' )
+          Logger.info( TAG , `splitFiles = ${ JSON.stringify( splitFiles ) }` )
+          if ( splitFiles.indexOf( 'upload' ) === - 1 ) {
+            this.files.push( tempFiles[i] )
+          }
+        }
+        Logger.info( TAG , `files = ${ JSON.stringify( this.files ) }` )
+      } else {
+        Logger.info( TAG , `error: ${ JSON.stringify( err ) }` )
+        httpRequest.destroy()
+      }
+    } )
+  }
+
+  build() {
+    Column() {
+      Scroll() {
+        Column() {
+          Text( $r( 'app.string.choice_download_file' ) )
+            .fontSize( 25 )
+            .alignSelf( ItemAlign.Start )
+            .margin( { top : 20 , left : 10 } )
+          ForEach( this.files , ( item , index ) => {
+            Divider()
+              .margin( { top : 20 } )
+            Row() {
+              Text( item )
+                .fontSize( 25 )
+                .constraintSize( { maxWidth : '75%' } )
+                .fontWeight( FontWeight.Bold )
+                .margin( { top : 20 , left : 10 } )
+              Blank()
+
+              Button( $r( 'app.string.click_download' ) )
+                .margin( { top : 20 , right : 10 } )
+                .onClick( async() => {
+                  let fileindex = 1;
+                  setInterval( () => {
+                    //                    let resourceManage = await resourceManager.getResourceManager()
+                    //                    let downloadSuccess = await resourceManage.getString($r('app.string.download_success').id)
+                    this.downloadConfig.url = item
+                    Logger.info( TAG , `downloadConfig.url = ${ JSON.stringify( this.downloadConfig.url ) }` )
+                    this.downloadConfig.filePath = `/data/storage/el2/base/haps/entry/cache/ ${
+                    item.split( '//' )[1].split( '/' )[1] + fileindex }`
+                    //                    /data/storage/el2/base/haps/entry/cache/
+                    fileindex += 1
+                    Logger.info( TAG , `downloadConfig.filePath = ${ JSON.stringify( this.downloadConfig.filePath ) }` )
+                    request.download( this.downloadConfig , ( err , downloadTask ) => {
+                      Logger.info( TAG , `download enter` )
+                      if ( err ) {
+                        Logger.info( TAG , `download err = ${ JSON.stringify( err ) }` )
+                        return
+                      }
+                      Logger.info( TAG , `download data = ${ JSON.stringify( downloadTask ) }` )
+
+                      Logger.info( TAG , `download end` )
+                    } )
+                  } , 1000 )
+
+                } )
+            }
+            .width( '100%' )
+          } )
+          Button( $r( 'app.string.upload_page' ) )
+            .fontSize( 30 )
+            .width( 180 )
+            .height( 50 )
+            .margin( { top : 30 } )
+            .key( 'uploadBtn' )
+            .onClick( () => {
+              router.push( {
+                url : 'pages/Upload' ,
+                params : { uploads : this.uploads }
+              } )
+            } )
+
+        }
+        .width( '100%' )
+      }
+      .constraintSize( { maxHeight : '87%' } )
+
+      if ( this.receivedSize !== 0 && this.totalSize !== 0 && this.files.length > 0 ) {
+        Row() {
+          Text( $r( 'app.string.download_progress' ) )
+            .fontSize( 25 )
+            .fontWeight( FontWeight.Bold )
+            .margin( { left : 10 } )
+          Progress( { value : this.receivedSize , total : this.totalSize , type : ProgressType.Capsule } )
+            .color( Color.Grey )
+            .width( '40%' )
+            .height( 10 )
+            .margin( { left : 10 } )
+          Text( `${ JSON.stringify( Math.floor( this.receivedSize / this.totalSize * 100 ) ) }%` )
+            .margin( { left : 10 } )
+        }
+        .margin( { top : 10 } )
+        .alignSelf( ItemAlign.Center )
+      }
+    }
+  }
+}
+
+export function testFunc( func ) {
+  let start = new Date().getTime()
+  switch ( func ) {
+    case testSetDeviceName: {
+      func( "MyTestDevice" )
+    }
+      break;
+    default: {
+      func()
+    }
+      break;
+  }
+  let end = new Date().getTime()
+  console.log( "开始:" + Number( start ) + "ms" )
+  console.log( "结束:" + Number( end ) + "ms" )
+
+  console.log( "花费:" + Number( end - start ) + "ms" )
+  let message = ""
+  message += "花费:" + Number( end - start ) + "ms" + "\n"
+  message += "开始:" + Number( start ) + "ms; " + "结束:" + Number( end ) + "ms" + "\n"
+  return message
+}
+
+function sleep( time ) {
+  return new Promise(( resolve , reject ) => {
+    setTimeout( () => {
+      resolve()
+    } , time * 1000 )
+  })
 }

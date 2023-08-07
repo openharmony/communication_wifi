@@ -24,20 +24,18 @@ import LogUtil from '../../Utils/LogUtil';
 import { initP2pApiData } from '../../MainAbility/model/testDataModels'
 import { TestData } from '../../MainAbility/model/testData'
 
-const G_MAC = '6c:96:d7:3d:87:6f'
-
 /**
- * p2p Test Page Of Wifi test
+ * p2pManager Test Page Of Wifi test
  */
 
 @Component
-struct p2pSetting {
+struct p2pManagerSetting {
   @State deviceAddressManager: string = '6c:96:d7:3d:87:6f';
   @State netIdManager: number = - 2 ;
   @State passphraseManager: string = "12345678" ;
   @State groupNameManager: string = "testGroup"
   @State goBandManager: number = 0 ;
-  @State devNameManager: string = "test"
+  @State devNameManager: string = "MyTestDevice"
 
   aboutToAppear() {
     AppStorage.SetOrCreate( "deviceAddressManager" , this.deviceAddressManager )
@@ -146,8 +144,8 @@ struct p2pSetting {
           .alignItems( VerticalAlign.Center )
 
           Row() {
-            Text( "devNameManager:" ).fontSize( 15 ).width( 60 );
-            TextInput( { text : this.devNameManager , placeholder : "test" } )
+            Text( "devNameManager:" ).fontSize( 15 ).width( 100 );
+            TextInput( { text : this.devNameManager , placeholder : "MyTestDevice" } )
               .fontSize( "15vp" )
               .onChange( ( strInput ) => {
                 this.devNameManager = strInput;
@@ -176,8 +174,6 @@ struct P2pManagerInterfaceTest {
   @State showList: boolean = false;
   private testItem: TestData = Router.getParams().testId;
   @State message: string = "";
-  @StorageLink( 'setLocalNameRet' ) setLocalNameRet: boolean = false;
-  @StorageLink( 'setScanModeRet' ) setScanModeRet: boolean = false;
   @State deviceId: string = '';
   @State currentClick: number = - 1;
   @StorageLink( 'pairedDeviceId' ) pairedDeviceId: string = '';
@@ -187,10 +183,15 @@ struct P2pManagerInterfaceTest {
   @State groupNameManager: string = "testGroup"
   @State goBandManager: number = 0 ;
   @State devNameManager: string = "test"
+  @State connectedIp: sting = "192.168.1.107"
   @StorageLink( 'p2pStateManagerMessage' ) p2pStateManagerMessage: string = "";
+  @StorageLink( 'p2pDeviceManagerMessage' ) p2pDeviceManagerMessage: string = "";
+  @StorageLink( 'p2pLinkStateManagerMessage' ) p2pLinkStateManagerMessage: string = "";
   @StorageLink( 'p2pLinkManagerMessage' ) p2pLinkManagerMessage: string = "";
+  @StorageLink( 'p2pPeerDeviceManagerMessage' ) p2pPeerDeviceManagerMessage: string = "";
+  @StorageLink( 'p2pPeerDeviceManagerMessages' ) p2pPeerDeviceManagerMessages: string = "";
+  @StorageLink( 'p2pDiscoveryManagerMessage' ) p2pDiscoveryManagerMessage: string = "";
   @StorageLink( 'p2pGroupManagerMessage' ) p2pGroupManagerMessage: string = "";
-  @StorageLink( 'p2pDevicManagereMessage' ) p2pDeviceManagerMessage: string = "";
 
   aboutToAppear() {
     AppStorage.SetOrCreate( "deviceAddressManager" , this.deviceAddressManager )
@@ -223,7 +224,7 @@ struct P2pManagerInterfaceTest {
             .width( ConfigData.WH_28_100 )
             .align( Alignment.Start )
 
-          TextInput( { text : this.pairedMac , placeholder : "请输入即将连接的设备MAC" } )
+          TextInput( { text : this.connectedIp , placeholder : "192.168.1.107" } )
             .height( 40 )
             .borderStyle( BorderStyle.Dashed )
             .backgroundColor( $r( "app.color.white" ) )
@@ -244,17 +245,27 @@ struct P2pManagerInterfaceTest {
       .align( Alignment.TopStart )
 
       if ( this.showList ) {
-        p2pSetting()
+        p2pManagerSetting()
       } else {
         Column() {
           Scroll() {
             Column() {
-              //              Text("当前配置:")
-              //                .fontSize("17vp")
-              //                .margin({ top: "5vp", left: "10vp" })
-              //                .textAlign(TextAlign.Start)
-              //                .width(ConfigData.WH_100_100)
               Text( "开关结果:" + this.p2pStateManagerMessage )
+                .fontSize( "17vp" )
+                .margin( { top : "5vp" , left : "15vp" } )
+                .textAlign( TextAlign.Start )
+                .width( ConfigData.WH_90_100 )
+              Text( "本机信息:" + this.p2pDeviceManagerMessage )
+                .fontSize( "17vp" )
+                .margin( { top : "5vp" , left : "15vp" } )
+                .textAlign( TextAlign.Start )
+                .width( ConfigData.WH_90_100 )
+              Text( "发现信息:" + this.p2pDiscoveryManagerMessage )
+                .fontSize( "17vp" )
+                .margin( { top : "5vp" , left : "15vp" } )
+                .textAlign( TextAlign.Start )
+                .width( ConfigData.WH_90_100 )
+              Text( "连接状态:" + this.p2pLinkStateManagerMessage )
                 .fontSize( "17vp" )
                 .margin( { top : "5vp" , left : "15vp" } )
                 .textAlign( TextAlign.Start )
@@ -264,12 +275,17 @@ struct P2pManagerInterfaceTest {
                 .margin( { top : "5vp" , left : "15vp" } )
                 .textAlign( TextAlign.Start )
                 .width( ConfigData.WH_90_100 )
-              Text( "组信息:" + this.p2pGroupManagerMessage )
+              Text( "对端设备:" + this.p2pPeerDeviceManagerMessage )
                 .fontSize( "17vp" )
                 .margin( { top : "5vp" , left : "15vp" } )
                 .textAlign( TextAlign.Start )
                 .width( ConfigData.WH_90_100 )
-              Text( "对端信息:" + this.p2pDeviceManagerMessage )
+              Text( "对端设备[]:" + this.p2pPeerDeviceManagerMessages )
+                .fontSize( "17vp" )
+                .margin( { top : "5vp" , left : "15vp" } )
+                .textAlign( TextAlign.Start )
+                .width( ConfigData.WH_90_100 )
+              Text( "组信息:" + this.p2pGroupManagerMessage )
                 .fontSize( "17vp" )
                 .margin( { top : "5vp" , left : "15vp" } )
                 .textAlign( TextAlign.Start )
@@ -285,7 +301,6 @@ struct P2pManagerInterfaceTest {
         .backgroundColor( $r( "sys.color.ohos_id_color_foreground_contrary" ) )
 
         ContentTable( { testItem : this.testItem , apiItems : initP2pApiData() } )
-
       }
     }
     .alignItems( HorizontalAlign.Center )
@@ -293,5 +308,4 @@ struct P2pManagerInterfaceTest {
     .height( ConfigData.WH_100_100 )
   }
 }
-
 

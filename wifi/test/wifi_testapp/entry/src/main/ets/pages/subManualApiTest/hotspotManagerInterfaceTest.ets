@@ -23,7 +23,7 @@ import ConfigData from '../../Utils/ConfigData';
 import LogUtil from '../../Utils/LogUtil';
 import { initHotspotManagerApIData } from '../../MainAbility/model/testDataModels'
 import { TestData } from '../../MainAbility/model/testData'
-import { FilterTable } from '../../Component/filterTable';
+import { FilterTableManager } from '../../Component/filterTableManager';
 
 /**
  * hotspotManager Test Page Of Wifi test
@@ -35,6 +35,12 @@ struct hotspotManagerInterfaceTest {
   @State showList: boolean = true;
   private testItem: TestData = Router.getParams().testId;
   @State message: string = "";
+  @State h_ssid1: string = "testApp1";
+  @State h_securityType1: number = 3;
+  @State h_band1: number = 2;
+  @State h_preSharedKey1: string = "12345678";
+  @State h_maxConn1: number = 3 ;
+  @State h_channel1: number = 36 ;
   @StorageLink( 'hotspotStateManagerMessage' ) hotspotStateManagerMessage: string = "";
   @StorageLink( 'getStationsManagerMessage' ) getStationsManagerMessage: string = "";
   @StorageLink( 'getHotspotConfigManagerMessage' ) getHotspotConfigManagerMessage: string = "";
@@ -42,7 +48,12 @@ struct hotspotManagerInterfaceTest {
   @StorageLink( 'hotspotStaLeaveManagerMessage' ) hotspotStaLeaveManagerMessage: string = "";
 
   aboutToAppear() {
-
+    AppStorage.SetOrCreate( "h_ssid1" , this.h_ssid1 )
+    AppStorage.SetOrCreate( "h_securityType1" , this.h_securityType1 )
+    AppStorage.SetOrCreate( "h_band1" , this.h_band1 )
+    AppStorage.SetOrCreate( "h_preSharedKey1" , this.h_preSharedKey1 )
+    AppStorage.SetOrCreate( "h_maxConn1" , this.h_maxConn1 )
+    AppStorage.SetOrCreate( "h_channel1" , this.h_channel1 )
   }
 
   init() {
@@ -135,7 +146,7 @@ struct hotspotManagerInterfaceTest {
           testItem : this.testItem , apiItems : initHotspotManagerApIData()
         } )
       } else {
-        FilterTable( { testItem : this.testItem } )
+        FilterTableManager( { testItem : this.testItem } )
       }
 
     }
@@ -144,3 +155,4 @@ struct hotspotManagerInterfaceTest {
     .height( ConfigData.WH_100_100 )
   }
 }
+

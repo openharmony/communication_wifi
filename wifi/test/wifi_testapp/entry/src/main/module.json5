@@ -91,6 +91,9 @@
       },
       {
         "name": "ohos.permission.GET_WIFI_INFO_INTERNAL"
+      },
+      {
+        "name": "ohos.permission.INTERNET"
       }
     ]
   }

@@ -40,6 +40,21 @@ struct P2pAutoTest {
   @State changeIndex: number = - 1
   //  @State autoTextMessage: string ="None";
   @StorageLink( "p2pAutoTestMessage" ) p2pAutoTestMessage: string = ""
+  @State deviceAddress: string = '6c:96:d7:3d:87:6f';
+  @State netId: number = - 2 ;
+  @State passphrase: string = "12345678" ;
+  @State groupName: string = "testGroup"
+  @State goBand: number = 0 ;
+  @State deviceName: string = "MyTestDevice"
+
+  aboutToAppear() {
+    AppStorage.SetOrCreate( "deviceAddress" , this.deviceAddress )
+    AppStorage.SetOrCreate( "netId" , this.netId )
+    AppStorage.SetOrCreate( "passphrase" , this.passphrase )
+    AppStorage.SetOrCreate( "groupName" , this.groupName )
+    AppStorage.SetOrCreate( "goBand" , this.goBand )
+    AppStorage.SetOrCreate( "deviceName" , this.deviceName )
+  }
 
   build() {
     Column() {
@@ -131,7 +146,7 @@ struct P2pAutoTest {
             for ( let m = 0 ; m < Interface.length ; m ++ ) {
               p2pAutoTestMessage += P2pAutoTestCase[m]["api"]( ... Interface[m].para ) + "\n"
               self.changeIndex = m
-              await sleep( 1 )
+              await sleep( 2 )
               AppStorage.SetOrCreate( "p2pAutoTestMessage" , p2pAutoTestMessage )
             }
           }

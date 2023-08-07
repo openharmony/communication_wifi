@@ -38,6 +38,21 @@ struct p2pManagerConnectScenarioTest {
   private testItem: TestData = router.getParams().testId;
   @State changeIndex: number = - 1
   @StorageLink( "p2pManagerConnectScenarioMessage" ) p2pManagerConnectScenarioMessage: string = ""
+  @State deviceAddressManager: string = '6c:96:d7:3d:87:6f';
+  @State netIdManager: number = - 2 ;
+  @State passphraseManager: string = "12345678" ;
+  @State groupNameManager: string = "testGroup"
+  @State goBandManager: number = 0 ;
+  @State devNameManager: string = "MyTestDevice"
+
+  aboutToAppear() {
+    AppStorage.SetOrCreate( "deviceAddressManager" , this.deviceAddressManager )
+    AppStorage.SetOrCreate( "netIdManager" , this.netIdManager )
+    AppStorage.SetOrCreate( "passphraseManager" , this.passphraseManager )
+    AppStorage.SetOrCreate( "groupNameManager" , this.groupNameManager )
+    AppStorage.SetOrCreate( "goBandManager" , this.goBandManager )
+    AppStorage.SetOrCreate( "devNameManager" , this.devNameManager )
+  }
 
   build() {
     Column() {
@@ -114,13 +129,13 @@ struct p2pManagerConnectScenarioTest {
           .margin( { top : "15vp" , left : "20vp" } )
           .align( Alignment.Start )
           .onClick( async( event: ClickEvent ) => {
-            prompt.showToast( { message : '开始wifi发现场景测试' } )
+            prompt.showToast( { message : '开始p2p连接场景测试' } )
 
             let self = this
             let p2pManagerConnectScenarioMessage = ""
 
             //拼装数组
-            var hotspotManagerScenarioArray = []
+            var hotspotManagerScenarioArray = [ { name : "testSetDeviceNameManager" , para : [ "MyTestDevice" ] } ]
             let Interface = P2pManagerConnectScenarioTestCase.map( i => {
               let para = hotspotManagerScenarioArray.some( itm => itm.name === i.api.name ) ? hotspotManagerScenarioArray.find( itm => itm.name === i.api.name ).para : []
               return { name : i.api.name , para }
@@ -154,19 +169,63 @@ struct p2pManagerConnectScenarioTest {
             let self = this
             //            const arr = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
             let p2pManagerConnectScenarioMessage = ""
-            // 停止Wifi发现
-            p2pManagerConnectScenarioMessage += BrInterface.testStopBluetoothDiscovery() + "\n"
-            console.log( "testStopBluetoothDiscovery success" )
-            //            self.changeIndex = arr[8]
+            // 停止发现设备
+            p2pManagerConnectScenarioMessage += P2pManagerInterface.testStopDiscoverP2pDevicesManager() + "\n"
+            console.log( "testStopDiscoverP2pDevicesManager success" )
             await sleep( 1 )
-            //关闭注册状态变化
-            p2pManagerConnectScenarioMessage += BrInterface.testOnStateChange() + "\n"
-            console.log( "testOffStateChange success" )
+            AppStorage.SetOrCreate( "p2pManagerConnectScenarioMessage" , p2pManagerConnectScenarioMessage )
+
+            //取消P2P连接
+            p2pManagerConnectScenarioMessage += P2pManagerInterface.testP2pCancelConnectManager() + "\n"
+            console.log( "testP2pCancelConnectManager success" )
             await sleep( 1 )
-            //关Wifi
-            p2pManagerConnectScenarioMessage += BrInterface.testDisableBluetooth() + "\n"
-            console.log( "testDisableBluetooth success" )
-            //            self.changeIndex = arr[9]
+            AppStorage.SetOrCreate( "p2pManagerConnectScenarioMessage" , p2pManagerConnectScenarioMessage )
+
+            //移除群组
+            p2pManagerConnectScenarioMessage += P2pManagerInterface.testRemoveP2pGroupManager() + "\n"
+            console.log( "testRemoveP2pGroupManager success" )
+            await sleep( 1 )
+            AppStorage.SetOrCreate( "p2pManagerConnectScenarioMessage" , p2pManagerConnectScenarioMessage )
+
+            //删除永久组
+            p2pManagerConnectScenarioMessage += P2pManagerInterface.testDeletePersistentP2pGroupManager() + "\n"
+            console.log( "testDeletePersistentP2pGroupManager success" )
+            await sleep( 1 )
+            AppStorage.SetOrCreate( "p2pManagerConnectScenarioMessage" , p2pManagerConnectScenarioMessage )
+
+            //关闭P2P开关状态改变事件
+            p2pManagerConnectScenarioMessage += P2pManagerInterface.testOnP2pStateChangeManager() + "\n"
+            console.log( "testOffP2pStateChangeManager success" )
+            await sleep( 1 )
+            AppStorage.SetOrCreate( "p2pManagerConnectScenarioMessage" , p2pManagerConnectScenarioMessage )
+
+            //关闭P2P连接状态改变事件
+            p2pManagerConnectScenarioMessage += P2pManagerInterface.testOnP2pConnectionChangeManager() + "\n"
+            console.log( "testOffP2pConnectionChangeManager success" )
+            await sleep( 1 )
+            AppStorage.SetOrCreate( "p2pManagerConnectScenarioMessage" , p2pManagerConnectScenarioMessage )
+
+            //关闭P2P设备状态改变事件
+            p2pManagerConnectScenarioMessage += P2pManagerInterface.testOnP2pDeviceChangeManager() + "\n"
+            console.log( "testOffP2pDeviceChangeManager success" )
+            await sleep( 1 )
+            AppStorage.SetOrCreate( "p2pManagerConnectScenarioMessage" , p2pManagerConnectScenarioMessage )
+
+            //关闭P2P对端设备状态改变事件
+            p2pManagerConnectScenarioMessage += P2pManagerInterface.testOnP2pPeerDeviceChangeManager() + "\n"
+            console.log( "testOffP2pPeerDeviceChangeManager success" )
+            await sleep( 1 )
+            AppStorage.SetOrCreate( "p2pManagerConnectScenarioMessage" , p2pManagerConnectScenarioMessage )
+
+            //关闭P2P永久组状态改变事件
+            p2pManagerConnectScenarioMessage += P2pManagerInterface.testOnP2pPersistentGroupChangeManager() + "\n"
+            console.log( "testOffP2pPersistentGroupChangeManager success" )
+            await sleep( 1 )
+            AppStorage.SetOrCreate( "p2pManagerConnectScenarioMessage" , p2pManagerConnectScenarioMessage )
+
+            //关闭发现设备状态改变事件
+            p2pManagerConnectScenarioMessage += P2pManagerInterface.testOnP2pDiscoveryChangeManager() + "\n"
+            console.log( "testOffP2pDiscoveryChangeManager success" )
             await sleep( 1 )
             AppStorage.SetOrCreate( "p2pManagerConnectScenarioMessage" , p2pManagerConnectScenarioMessage )
           } )

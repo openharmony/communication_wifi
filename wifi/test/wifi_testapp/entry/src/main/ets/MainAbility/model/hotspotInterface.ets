@@ -127,18 +127,19 @@ export function testSetHotspotConfig(): string {
   try {
     let message = ( MessageData.testSetHotspotConfig )
     console.log( LogData.testSetHotspotConfig_StartLog )
-    let ssid = "testApp"
+    let ssid = "abc"
     let securityType = 3
-    let band = 1;
+    let band = 2;
     let preSharedKey = "12345678"
     let maxConn = 3
-    let channel = 6
+    let channel = 36
     // TODO: 设备调试时候需要打开
-    //  let ssid1 =AppStorage.Get("ssid1")
-    //  let securityType1=AppStorage.Get("securityTpye1")
-    //  let band1 = AppStorage.Get("band1")
-    //  let preSharedKey1 = AppStorage.Get("preSharedKey1")
-    //  let maxConn1 = AppStorage.Get("maxConn1")
+    ssid = AppStorage.Get( "h_ssid" )
+    //    let securityType=AppStorage.Get("h_securityType")
+    //    let band = AppStorage.Get("h_band")
+    //    preSharedKey = AppStorage.Get("h_preSharedKey")
+    //    let maxConn = AppStorage.Get("h_maxConn")
+    //    let channel = AppStorage.Get("h_channel")
     let hotspotConfigs = {
       ssid : ssid ,
       securityType : securityType ,

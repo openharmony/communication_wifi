@@ -36,7 +36,7 @@ const TAG = '[Screenshot]'
 
 @Component
 struct TestCategory {
-  private testItems: TestData[]
+ private testItems: TestData[]
 
   build() {
     Stack() {

@@ -26,8 +26,7 @@ import MessageData from "../../Utils/MessageData"
  * Wifi api Test Page Of wifi test
  */
 
-const PAGE_URI_WIFI_FOUND_MODE = '../subManualApiTest/subWifiTest/wifiFound';
-
+const PAGE_URI_WIFI_FOUND_MODE = 'pages/subManualApiTest/subWifiTest/wifiFound';
 let wifiEnable = false
 
 export function testEnableWifi(): string {
@@ -117,6 +116,7 @@ export function testScan(): string {
     } else {
       let ret = wifi.scan()
       message = ( MessageData.testScanResult ) + ret
+      Router.push( { uri : PAGE_URI_WIFI_FOUND_MODE } );
       prompt.showToast( { message : message } )
     }
     prompt.showToast( { message : message } )
@@ -273,21 +273,21 @@ export function testAddDeviceConfigPromise(): string {
   try {
     let message = ( MessageData.testAddDeviceConfigPromise )
     console.log( LogData.testAddDeviceConfigPromise_StartLog )
-    let ssid = AppStorage.Get( "ssid" )
-    let bssid = AppStorage.Get( "bssid" )
-    let preSharedKey = AppStorage.Get( "preSharedKey" )
-    let isHiddenSsid = AppStorage.Get( "isHiddenSsid" )
-    let securityType = AppStorage.Get( "securityType" )
-    let creatorUid = AppStorage.Get( "creatorUid" )
-    let disableReason = AppStorage.Get( "disableReason" )
-    let netId = AppStorage.Get( "netId" )
-    let randomMacType = AppStorage.Get( "randomMacType" )
-    let randomMacAddr = AppStorage.Get( "randomMacAddr" )
-    let ipType = AppStorage.Get( "ipType" )
-    let staticIp_ipAddress = AppStorage.Get( "staticIp_ipAddress" )
-    let staticIp_gateway = AppStorage.Get( "staticIp_gateway" )
-    let staticIp_dnsServers = AppStorage.Get( "staticIp_dnsServers" )
-    let staticIp_domains = AppStorage.Get( "staticIp_domains" )
+    let ssid = AppStorage.Get( "w_ssid" )
+    let bssid = AppStorage.Get( "w_bssid" )
+    let preSharedKey = AppStorage.Get( "w_preSharedKey" )
+    let isHiddenSsid = AppStorage.Get( "w_isHiddenSsid" )
+    let securityType = AppStorage.Get( "w_securityType" )
+    let creatorUid = AppStorage.Get( "w_creatorUid" )
+    let disableReason = AppStorage.Get( "w_disableReason" )
+    let netId = AppStorage.Get( "w_netId" )
+    let randomMacType = AppStorage.Get( "w_randomMacType" )
+    let randomMacAddr = AppStorage.Get( "w_randomMacAddr" )
+    let ipType = AppStorage.Get( "w_ipType" )
+    let staticIp_ipAddress = AppStorage.Get( "w_staticIp_ipAddress" )
+    let staticIp_gateway = AppStorage.Get( "w_staticIp_gateway" )
+    let staticIp_dnsServers = AppStorage.Get( "w_staticIp_dnsServers" )
+    let staticIp_domains = AppStorage.Get( "w_staticIp_domains" )
 
     //TODO: 设备调试时候需要打开
     //    let ssid = "TP-LINK_6365"
@@ -356,47 +356,47 @@ export function testAddDeviceConfigCallback(): string {
     console.log( LogData.testAddDeviceConfigCallback_StartLog )
 
     //TODO: 设备调试时候需要打开
-    //  let ssid = AppStorage.Get("ssid")
-    //  let bssid = AppStorage.Get("bssid")
-    //  let preSharedKey = AppStorage.Get("preSharedKey")
-    //  let isHiddenSsid = AppStorage.Get("isHiddenSsid")
-    //  let securityType = AppStorage.Get("securityType")
-    //  let creatorUid = AppStorage.Get("creatorUid")
-    //  let disableReason = AppStorage.Get("disableReason")
-    //  let netId = AppStorage.Get("netId")
-    //  let randomMacType = AppStorage.Get("randomMacType")
-    //  let randomMacAddr = AppStorage.Get("randomMacAddr")
-    //  let ipType = AppStorage.Get("ipType")
-    //  let staticIp_ipAddress = AppStorage.Get("staticIp_ipAddress")
-    //  let staticIp_gateway = AppStorage.Get("staticIp_gateway")
-    //  let staticIp_dnsServers = AppStorage.Get("staticIp_dnsServers")
-    //  let staticIp_domains = AppStorage.Get("staticIp_domains")
-    //  let staticIp = {
-    //    ipAddress: staticIp_ipAddress,
-    //    gateway: staticIp_gateway,
-    //    dnsServers: staticIp_dnsServers,
-    //    domains: staticIp_domains
-    //  }
-    //  let wifiDeviceConfig = {
-    //    ssid: ssid,
-    //    bssid: bssid,
-    //    preSharedKey: preSharedKey,
-    //    isHiddenSsid: isHiddenSsid,
-    //    securityType: securityType,
-    //    creatorUid: creatorUid,
-    //    disableReason: disableReason,
-    //    netId: netId,
-    //    randomMacType: randomMacType,
-    //    randomMacAddr: randomMacAddr,
-    //    ipType: ipType,
-    //    staticIp: staticIp
-    //  }
+    let ssid = AppStorage.Get( "w_ssid" )
+    let bssid = AppStorage.Get( "w_bssid" )
+    let preSharedKey = AppStorage.Get( "w_preSharedKey" )
+    let isHiddenSsid = AppStorage.Get( "w_isHiddenSsid" )
+    let securityType = AppStorage.Get( "w_securityType" )
+    let creatorUid = AppStorage.Get( "w_creatorUid" )
+    let disableReason = AppStorage.Get( "w_disableReason" )
+    let netId = AppStorage.Get( "w_netId" )
+    let randomMacType = AppStorage.Get( "w_randomMacType" )
+    let randomMacAddr = AppStorage.Get( "w_randomMacAddr" )
+    let ipType = AppStorage.Get( "w_ipType" )
+    let staticIp_ipAddress = AppStorage.Get( "w_staticIp_ipAddress" )
+    let staticIp_gateway = AppStorage.Get( "w_staticIp_gateway" )
+    let staticIp_dnsServers = AppStorage.Get( "w_staticIp_dnsServers" )
+    let staticIp_domains = AppStorage.Get( "w_staticIp_domains" )
+    let staticIp = {
+      ipAddress : staticIp_ipAddress ,
+      gateway : staticIp_gateway ,
+      dnsServers : staticIp_dnsServers ,
+      domains : staticIp_domains
+    }
+    let wifiDeviceConfig = {
+      ssid : ssid ,
+      bssid : bssid ,
+      preSharedKey : preSharedKey ,
+      isHiddenSsid : isHiddenSsid ,
+      securityType : securityType ,
+      creatorUid : creatorUid ,
+      disableReason : disableReason ,
+      netId : netId ,
+      randomMacType : randomMacType ,
+      randomMacAddr : randomMacAddr ,
+      ipType : ipType ,
+      staticIp : staticIp
+    }
     AppStorage.SetOrCreate( "wifiDeviceConfig" , wifiDeviceConfig )
 
     if ( !wifiEnable ) {
       message = ( MessageData.testIsInactive )
     } else {
-      let wifiDeviceConfig = AppStorage.Get( "wifiDeviceConfig" )
+//      let wifiDeviceConfig = AppStorage.Get( "wifiDeviceConfig" )
       wifi.addDeviceConfig( wifiDeviceConfig , ( err , result ) => {
         //  @returns Returns {@code networkId} if the configuration is added; returns {@code -1} otherwise.
         if ( err ) {
@@ -544,7 +544,8 @@ export function testConnectToNetwork(): string {
   try {
     let message = ( MessageData.testConnectToNetwork )
     console.log( LogData.testConnectToNetwork_StartLog )
-    let networkId = AppStorage.Get( "networkId" )
+    //testGetLinkedInfoCallback()获取的，可能也是wifiDeviceConfig中的netId
+    let networkId = AppStorage.Get( "w_networkId" )
     if ( !wifiEnable ) {
       message = ( MessageData.testIsInactive )
     } else {
@@ -605,29 +606,6 @@ export function testDisconnect(): string {
   }
 }
 
-export function testGetSignalLevel(): string {
-  try {
-    let message = ( MessageData.testGetSignalLevel )
-    console.log( LogData.testGetSignalLevel_StartLog )
-    if ( !wifiEnable ) {
-      message = ( MessageData.testIsInactive )
-    } else {
-      let rssi = AppStorage.Get( "rssi" )
-      let band = AppStorage.Get( "band" )
-      let number = wifi.getSignalLevel( rssi , band )
-      message = "getSignalLevel is: " + number
-    }
-    prompt.showToast( { message : message } )
-    console.log( LogData.testGetSignalLevel_EndLog )
-    return message
-  } catch( e ) {
-    console.log( `Failed to testGetSignalLevel. message: ${ e.message }, code: ${ e.code }` )
-    let message = `Failed to testGetSignalLevel. message: ${ e.message }, code: ${ e.code }`
-    prompt.showToast( { message : message } )
-    return message
-  }
-}
-
 export function testGetLinkedInfoPromise(): string {
   try {
     let message = ( MessageData.testGetLinkedInfoPromise )
@@ -677,9 +655,9 @@ export function testGetLinkedInfoCallback(): string {
         let rssi = data.rssi
         let band = data.band
         let networkId = data.networkId
-        AppStorage.SetOrCreate( "rssi" , rssi )
-        AppStorage.SetOrCreate( "band" , band )
-        AppStorage.SetOrCreate( "networkId" , networkId )
+        AppStorage.SetOrCreate( "w_rssi" , rssi )
+        AppStorage.SetOrCreate( "w_band" , band )
+        AppStorage.SetOrCreate( "w_networkId" , networkId )
         prompt.showToast( { message : message } )
         console.log( LogData.testGetLinkedInfoCallback_EndLog );
       } )
@@ -689,6 +667,30 @@ export function testGetLinkedInfoCallback(): string {
   } catch( e ) {
     console.log( `Failed to testGetLinkedInfoCallback. message: ${ e.message }, code: ${ e.code }` )
     let message = `Failed to testGetLinkedInfoCallback. message: ${ e.message }, code: ${ e.code }`
+    prompt.showToast( { message : message } )
+    return message
+  }
+}
+
+export function testGetSignalLevel(): string {
+  try {
+    let message = ( MessageData.testGetSignalLevel )
+    console.log( LogData.testGetSignalLevel_StartLog )
+    if ( !wifiEnable ) {
+      message = ( MessageData.testIsInactive )
+    } else {
+      //testGetLinkedInfoCallback()获取的
+      let rssi = AppStorage.Get( "w_rssi" )
+      let band = AppStorage.Get( "w_band" )
+      let number = wifi.getSignalLevel( rssi , band )
+      message = "getSignalLevel is: " + number
+    }
+    prompt.showToast( { message : message } )
+    console.log( LogData.testGetSignalLevel_EndLog )
+    return message
+  } catch( e ) {
+    console.log( `Failed to testGetSignalLevel. message: ${ e.message }, code: ${ e.code }` )
+    let message = `Failed to testGetSignalLevel. message: ${ e.message }, code: ${ e.code }`
     prompt.showToast( { message : message } )
     return message
   }
@@ -743,7 +745,7 @@ export function testIsFeatureSupported(): string {
     if ( !wifiEnable ) {
       message = ( MessageData.testIsInactive );
     } else {
-      let featureId = AppStorage.Get( "featureId" )
+      let featureId = AppStorage.Get( "w_featureId" )
       let ret = wifi.isFeatureSupported( featureId )
       message = "isFeatureSupported: " + ret
     }
@@ -917,7 +919,7 @@ export function testDisableNetwork() {
     if ( !wifiEnable ) {
       message = ( MessageData.testIsInactive );
     } else {
-      let netId = AppStorage.Get( "netId" )
+      let netId = AppStorage.Get( "w_netId" )
       let ret = wifi.disableNetwork( netId )
       message = "disableNetwork: " + ret
     }
@@ -960,7 +962,8 @@ export function testRemoveDevice() {
     if ( !wifiEnable ) {
       message = ( MessageData.testIsInactive );
     } else {
-      let id = AppStorage.Get( "id" )
+      //testGetLinkedInfoCallback()获取的，可能也是wifiDeviceConfig中的netId
+      let id = AppStorage.Get( "w_networkId" )
       let ret = wifi.removeDevice( id )
       message = "removeDevice: " + ret
     }
@@ -1010,7 +1013,7 @@ export function testOnWifiStateChange(): string {
         prompt.showToast( { message : "wifi状态: " + wifiStateMessage } )
         console.log( LogData.testOnWifiStateChange_EndLog );
       } )
-      message = ( onWifiStateChange.onWifiStateChangeTest )
+      message = ( MessageData.onWifiStateChangeTest )
       prompt.showToast( { message : message } )
     }
     wifiStateChange = !wifiStateChange

@@ -286,7 +286,7 @@ export struct ContentTable {
   })
 
   onCancel() {
-    console.log( '取消' )
+    console.log( '取消1' )
   }
 
   onAccept( text: string ) {

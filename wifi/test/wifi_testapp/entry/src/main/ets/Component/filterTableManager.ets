@@ -16,38 +16,39 @@
 // @ts-nocheck
 
 import { TestData , TestApi } from '../MainAbility/model/testData'
-import { initHotspotApIData } from '../MainAbility/model/testDataModels'
+import { initHotspotManagerApIData } from '../MainAbility/model/testDataModels'
 import ConfigData from '../Utils/ConfigData';
+
 /**
- * FilterTable Of WiFi test
+ * FilterTable Manager Of WiFi test
  */
 
 @Component
-export struct FilterTable {
+export struct FilterTableManager {
   private testItem: TestData
-  @State apiItems: TestApi[] = initHotspotApIData()
+  @State apiItems: TestApi[] = initHotspotManagerApIData()
   @State changeIndex: number = - 1
   // input ble scan parameters:
   /*ScanFilter*/
   @State cbxBleScanFilter: boolean = false;
-  @State h_ssid: string = "testApp1";
-  @State h_securityType: number = 3;
-  @State h_band: number = 2;
-  @State h_preSharedKey: string = "12345678";
-  @State h_maxConn: number = 3 ;
-  @State h_channel: number = 36 ;
+  @State h_ssid1: string = "testApp1";
+  @State h_securityType1: number = 3;
+  @State h_band1: number = 2;
+  @State h_preSharedKey1: string = "12345678";
+  @State h_maxConn1: number = 3 ;
+  @State h_channel1: number = 36 ;
 
   getCurrentState( index: number ) {
     return this.apiItems[index].result
   }
 
   aboutToAppear() {
-    AppStorage.SetOrCreate( "h_ssid" , this.h_ssid )
-    AppStorage.SetOrCreate( "h_securityType" , this.h_securityType )
-    AppStorage.SetOrCreate( "h_band" , this.h_band )
-    AppStorage.SetOrCreate( "h_preSharedKey" , this.h_preSharedKey )
-    AppStorage.SetOrCreate( "h_maxConn" , this.h_maxConn )
-    AppStorage.SetOrCreate( "h_channel" , this.h_channel )
+    AppStorage.SetOrCreate( "h_ssid1" , this.h_ssid1 )
+    AppStorage.SetOrCreate( "h_securityType1" , this.h_securityType1 )
+    AppStorage.SetOrCreate( "h_band1" , this.h_band1 )
+    AppStorage.SetOrCreate( "h_preSharedKey1" , this.h_preSharedKey1 )
+    AppStorage.SetOrCreate( "h_maxConn1" , this.h_maxConn1 )
+    AppStorage.SetOrCreate( "h_channel1" , this.h_channel1 )
   }
 
   build() {
@@ -57,11 +58,11 @@ export struct FilterTable {
           Column() {
             Row() {
               Text( "ssid" ).fontSize( "17vp" ).width( 60 );
-              TextInput( { text : this.h_ssid , placeholder : "testApp1" } )
+              TextInput( { text : this.h_ssid1 , placeholder : "testApp123" } )
                 .fontSize( "15vp" )
                 .onChange( ( strInput ) => {
-                  this.h_ssid = strInput;
-                  AppStorage.SetOrCreate( "h_ssid" , this.h_ssid );
+                  this.h_ssid1 = strInput;
+                  AppStorage.SetOrCreate( "h_ssid1" , this.h_ssid1 );
                 } )
                 .width( ConfigData.WH_80_100 )
                 .borderRadius( 1 )
@@ -72,11 +73,11 @@ export struct FilterTable {
 
             Row() {
               Text( "securityType" ).fontSize( 17 ).width( 110 );
-              TextInput( { text : this.h_securityType , placeholder : "3" } )
+              TextInput( { text : this.h_securityType1 , placeholder : "3" } )
                 .fontSize( "15vp" )
                 .onChange( ( strInput ) => {
-                  this.h_securityType = Number( strInput );
-                  AppStorage.SetOrCreate( 'h_securityType' , this.h_securityType );
+                  this.h_securityType1 = Number( strInput );
+                  AppStorage.SetOrCreate( 'h_securityType1' , this.h_securityType1 );
                 } )
                 .width( ConfigData.WH_80_100 )
                 .borderRadius( 1 )
@@ -101,7 +102,7 @@ export struct FilterTable {
                   .width( ConfigData.WH_80_100 )
                   .onSelect( ( index: number ) => {
                     console.log( "Select:" + index )
-                    AppStorage.SetOrCreate( 'h_maxConn' , index );
+                    AppStorage.SetOrCreate( 'h_maxConn1' , index );
                   } )
               }
               .width( ConfigData.WH_80_100 )
@@ -112,11 +113,11 @@ export struct FilterTable {
 
             Row() {
               Text( "band" ).fontSize( 17 ).width( 60 );
-              TextInput( { text : this.h_band , placeholder : "2" } )
+              TextInput( { text : this.h_band1 , placeholder : "2" } )
                 .fontSize( "15vp" )
                 .onChange( ( strInput ) => {
-                  this.h_band = Number( strInput );
-                  AppStorage.SetOrCreate( 'h_band' , this.h_band );
+                  this.h_band1 = Number( strInput );
+                  AppStorage.SetOrCreate( 'h_band1' , this.h_band1 );
                 } )
                 .width( ConfigData.WH_80_100 )
                 .borderRadius( 1 )
@@ -128,11 +129,11 @@ export struct FilterTable {
 
             Row() {
               Text( "preSharedKey" ).fontSize( 17 ).width( 120 )
-              TextInput( { text : this.h_preSharedKey , placeholder : "12345678" } )
+              TextInput( { text : this.h_preSharedKey1 , placeholder : "12345678" } )
                 .fontSize( "17vp" )
                 .onChange( ( strInput ) => {
-                  this.h_preSharedKey = strInput;
-                  AppStorage.SetOrCreate( 'h_preSharedKey' , this.h_preSharedKey );
+                  this.h_preSharedKey1 = strInput;
+                  AppStorage.SetOrCreate( 'h_preSharedKey1' , this.h_preSharedKey1 );
                 } )
                 .width( ConfigData.WH_80_100 )
             }
@@ -142,11 +143,11 @@ export struct FilterTable {
 
             Row() {
               Text( "channel" ).fontSize( 17 ).width( 120 )
-              TextInput( { text : this.h_channel , placeholder : "36" } )
+              TextInput( { text : this.h_channel1 , placeholder : "36" } )
                 .fontSize( "17vp" )
                 .onChange( ( strInput ) => {
-                  this.h_channel = Number( strInput );
-                  AppStorage.SetOrCreate( 'h_channel' , this.h_channel );
+                  this.h_channel1 = Number( strInput );
+                  AppStorage.SetOrCreate( 'h_channel1' , this.h_channel1 );
                 } )
                 .width( ConfigData.WH_80_100 )
             }

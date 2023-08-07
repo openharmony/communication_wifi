@@ -22,15 +22,15 @@ import ConfigData from '../Utils/ConfigData';
  */
 
 @CustomDialog
-export struct PswDialog {
-  @Link scanInfo: wifi.WifiScanInfo
+export struct P2pPswDialog {
+  @Link p2pScanInfo: wifi.WifiP2pDevice
   private psw: string = ''
   private controller: CustomDialogController
-  private action: ( scanInfo , psw ) => void
+  private action: ( p2pScanInfo , psw  ) => void
 
   build() {
     Column() {
-      Text( this.scanInfo.ssid )
+      Text( this.p2pScanInfo.deviceName )
         .fontSize( 20 )
         .width( ConfigData.WH_95_100 )
       TextInput( { placeholder : 'input password' } )
@@ -54,7 +54,7 @@ export struct PswDialog {
         .margin( 5 )
         .onClick( () => {
           this.controller.close()
-          this.action( this.scanInfo , this.psw )
+          this.action( this.p2pScanInfo , this.psw )
         } )
 
         Text()
@@ -78,4 +78,3 @@ export struct PswDialog {
     .padding( 15 )
   }
 }
-

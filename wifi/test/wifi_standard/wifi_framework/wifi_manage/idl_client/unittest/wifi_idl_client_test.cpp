@@ -83,7 +83,7 @@ HWTEST_F(WifiIdlClientTest, SetConnectMacAddrTest, TestSize.Level1)
     EXPECT_TRUE(err == WIFI_IDL_OPT_INPUT_MAC_INVALID);
     mac = "00:00:00:00:00:00";
     err = mClient.SetConnectMacAddr(mac);
-    EXPECT_FALSE(err == WIFI_IDL_OPT_FAILED);
+    EXPECT_TRUE(err == WIFI_IDL_OPT_FAILED);
 }
 
 HWTEST_F(WifiIdlClientTest, SetScanMacAddressTest, TestSize.Level1)

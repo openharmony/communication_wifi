@@ -1373,7 +1373,7 @@ public:
         EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_)).Times(AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), GetStrDnsBak()).Times(AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), SaveIpV6Info(_)).Times(testing::AtLeast(0));
-        EXPECT_CALL(WifiSettings::GetInstance(), GetIpV6Info(_)).Times(testing::AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), GetIpv6Info(_)).Times(testing::AtLeast(0));
         std::string ifname = "wlan0";
         DhcpResult result;
         result.strYourCli = "192.168.0.0";
@@ -1390,7 +1390,7 @@ public:
         pStaStateMachine->getIpFailNum = 1;
         EXPECT_CALL(WifiStaHalInterface::GetInstance(), Disconnect()).WillRepeatedly(Return(WIFI_IDL_OPT_FAILED));
         EXPECT_CALL(WifiSettings::GetInstance(), SaveIpV6Info(_)).Times(testing::AtLeast(0));
-        EXPECT_CALL(WifiSettings::GetInstance(), GetIpV6Info(_)).Times(testing::AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), GetIpv6Info(_)).Times(testing::AtLeast(0));
         std::string ifname = "wlan0";
         std::string reason = "test";
         pStaStateMachine->pDhcpResultNotify->OnFailed(0, ifname, reason);
@@ -1402,7 +1402,7 @@ public:
         pStaStateMachine->isRoam = false;
         EXPECT_CALL(WifiStaHalInterface::GetInstance(), Disconnect()).WillRepeatedly(Return(WIFI_IDL_OPT_FAILED));
         EXPECT_CALL(WifiSettings::GetInstance(), SaveIpV6Info(_)).Times(testing::AtLeast(0));
-        EXPECT_CALL(WifiSettings::GetInstance(), GetIpV6Info(_)).Times(testing::AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), GetIpv6Info(_)).Times(testing::AtLeast(0));
         std::string ifname = "wlan1";
         std::string reason = "test";
         pStaStateMachine->pDhcpResultNotify->OnFailed(0, ifname, reason);

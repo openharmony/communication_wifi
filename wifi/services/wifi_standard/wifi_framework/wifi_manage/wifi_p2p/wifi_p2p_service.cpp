@@ -344,16 +344,18 @@ int WifiP2pService::GetP2pRecommendChannel(void)
     int COMMON_USING_5G_CHANNEL = 149;
     WifiLinkedInfo linkedInfo;
     WifiSettings::GetInstance().GetLinkedInfo(linkedInfo);
-    if (linkedInfo.connState == CONNECTED && linkedInfo.band == static_cast<int>(BandType::BAND_5GHZ)) {
-        const int RADAR_CHANNEL_MIN = 50;
-        const int RADAR_CHANNEL_MAX = 64;
+    if (linkedInfo.connState == CONNECTED) {
         channel = FrequencyToChannel(linkedInfo.frequency);
-        if (channel < RADAR_CHANNEL_MIN || channel > RADAR_CHANNEL_MAX) {
-            WIFI_LOGI("Recommend linked channel: %{public}d", channel);
-            return channel;
+        if (linkedInfo.band == static_cast<int>(BandType::BAND_5GHZ)) {
+            const int RADAR_CHANNEL_MIN = 50;
+            const int RADAR_CHANNEL_MAX = 64;
+            if (channel < RADAR_CHANNEL_MIN || channel > RADAR_CHANNEL_MAX) {
+                WIFI_LOGI("Recommend linked channel: %{public}d", channel);
+                return channel;
+            }
+            // when connectted 5g sta whith radar channel then recommend channel on 36. 
+            COMMON_USING_5G_CHANNEL = 36;
         }
-        // when connectted 5g sta whith radar channel then recommend channel on 36. 
-        COMMON_USING_5G_CHANNEL = 36;
     }
 
     ChannelsTable channels;

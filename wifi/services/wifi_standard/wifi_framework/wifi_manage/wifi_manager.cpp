@@ -1282,6 +1282,11 @@ void ScreenEventSubscriber::OnReceiveEvent(const OHOS::EventFwk::CommonEventData
     WIFI_LOGW("ScreenEventSubscriber::OnReceiveEvent, screen state: %{public}d.", screenState);
 }
 
+ScreenEventSubscriber::~ScreenEventSubscriber()
+{
+    WIFI_LOGI("ScreenEventSubscriber::~ScreenEventSubscriber");
+}
+
 void WifiManager::RegisterAirplaneModeEvent()
 {
     OHOS::EventFwk::MatchingSkills matchingSkills;

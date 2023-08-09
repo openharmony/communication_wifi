@@ -353,7 +353,7 @@ int WifiP2pService::GetP2pRecommendChannel(void)
                 WIFI_LOGI("Recommend linked channel: %{public}d", channel);
                 return channel;
             }
-            // when connectted 5g sta whith radar channel then recommend channel on 36. 
+            // when connectted 5g sta whith radar channel then recommend channel on 36.
             COMMON_USING_5G_CHANNEL = 36;
         }
     }

@@ -277,9 +277,7 @@ ErrCode WifiScanProxy::GetScanInfoList(std::vector<WifiScanInfo> &result)
     for (int i = 0; i < tmpsize; ++i) {
         WifiScanInfo info;
         info.bssid = reply.ReadString();
-    #ifdef SUPPORT_RANDOM_MAC_ADDR
         info.bssidType = reply.ReadInt32();
-    #endif
         info.ssid = reply.ReadString();
         info.capabilities = reply.ReadString();
         info.frequency = reply.ReadInt32();

@@ -398,10 +398,10 @@ struct WifiDeviceConfig {
     int status;
     /* mac address */
     std::string bssid;
-    /* network name */
-    std::string ssid;
     /* bssid type. */
     int bssidType;
+    /* network name */
+    std::string ssid;
     int band;
     int channel;
     int frequency;

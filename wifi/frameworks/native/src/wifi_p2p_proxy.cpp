@@ -535,6 +535,7 @@ void WifiP2pProxy::WriteWifiP2pDeviceData(MessageParcel &data, const WifiP2pDevi
 {
     data.WriteString(device.GetDeviceName());
     data.WriteString(device.GetDeviceAddress());
+    data.WriteInt32(device.GetDeviceAddressType());
     data.WriteString(device.GetPrimaryDeviceType());
     data.WriteString(device.GetSecondaryDeviceType());
     data.WriteInt32(static_cast<int>(device.GetP2pDeviceStatus()));
@@ -551,9 +552,7 @@ void WifiP2pProxy::ReadWifiP2pDeviceData(MessageParcel &reply, WifiP2pDevice &de
 {
     device.SetDeviceName(reply.ReadString());
     device.SetDeviceAddress(reply.ReadString());
-#ifdef SUPPORT_RANDOM_MAC_ADDR
     device.SetDeviceAddressType(reply.ReadInt32());
-#endif
     device.SetPrimaryDeviceType(reply.ReadString());
     device.SetSecondaryDeviceType(reply.ReadString());
     device.SetP2pDeviceStatus(static_cast<P2pDeviceStatus>(reply.ReadInt32()));
@@ -619,9 +618,7 @@ void WifiP2pProxy::ReadWifiP2pGroupData(MessageParcel &reply, WifiP2pGroupInfo &
 void WifiP2pProxy::WriteWifiP2pConfigData(MessageParcel &data, const WifiP2pConfig &config) const
 {
     data.WriteString(config.GetDeviceAddress());
-#ifdef SUPPORT_RANDOM_MAC_ADDR
-    data.WriteInt32(static_cast<int>(config.GetDeviceAddressType()));
-#endif
+    data.WriteInt32(config.GetDeviceAddressType());
     data.WriteString(config.GetPassphrase());
     data.WriteString(config.GetGroupName());
     data.WriteInt32(static_cast<int>(config.GetGoBand()));

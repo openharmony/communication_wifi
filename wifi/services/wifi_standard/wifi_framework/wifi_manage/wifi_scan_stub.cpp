@@ -191,9 +191,7 @@ int WifiScanStub::OnGetScanInfoList(uint32_t code, MessageParcel &data, MessageP
     reply.WriteInt32(size);
     for (unsigned int i = 0; i < size; ++i) {
         reply.WriteString(result[i].bssid);
-    #ifdef SUPPORT_RANDOM_MAC_ADDR
-        reply.WriteInt32(static_cast<int>(result[i].bssidType));
-    #endif
+        reply.WriteInt32(result[i].bssidType);
         reply.WriteString(result[i].ssid);
         reply.WriteString(result[i].capabilities);
         reply.WriteInt32(result[i].frequency);

@@ -331,9 +331,7 @@ ErrCode WifiHotspotProxy::GetStationList(std::vector<StationInfo> &result)
         info.deviceName = (readStr != nullptr) ? readStr : "";
         readStr = reply.ReadCString();
         info.bssid = (readStr != nullptr) ? readStr : "";
-    #ifdef SUPPORT_RANDOM_MAC_ADDR
         info.bssidType = reply.ReadInt32();
-    #endif
         readStr = reply.ReadCString();
         info.ipAddr = (readStr != nullptr) ? readStr : "";
         result.emplace_back(info);
@@ -358,6 +356,7 @@ ErrCode WifiHotspotProxy::DisassociateSta(const StationInfo &info)
     data.WriteInt32(0);
     data.WriteCString(info.deviceName.c_str());
     data.WriteCString(info.bssid.c_str());
+    data.WriteInt32(info.bssidType);
     data.WriteCString(info.ipAddr.c_str());
     int error = Remote()->SendRequest(static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_DISCONNECT_STA), data,
         reply, option);
@@ -477,6 +476,7 @@ ErrCode WifiHotspotProxy::GetBlockLists(std::vector<StationInfo> &infos)
         info.deviceName = (readStr != nullptr) ? readStr : "";
         readStr = reply.ReadCString();
         info.bssid = (readStr != nullptr) ? readStr : "";
+        info.bssidType = reply.ReadInt32();
         readStr = reply.ReadCString();
         info.ipAddr = (readStr != nullptr) ? readStr : "";
         infos.push_back(info);
@@ -500,6 +500,7 @@ ErrCode WifiHotspotProxy::AddBlockList(const StationInfo &info)
     data.WriteInt32(0);
     data.WriteCString(info.deviceName.c_str());
     data.WriteCString(info.bssid.c_str());
+    data.WriteInt32(info.bssidType);
     data.WriteCString(info.ipAddr.c_str());
     int error = Remote()->SendRequest(static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_ADD_BLOCK_LIST), data,
         reply, option);
@@ -532,6 +533,7 @@ ErrCode WifiHotspotProxy::DelBlockList(const StationInfo &info)
     data.WriteInt32(0);
     data.WriteCString(info.deviceName.c_str());
     data.WriteCString(info.bssid.c_str());
+    data.WriteInt32(info.bssidType);
     data.WriteCString(info.ipAddr.c_str());
     int error = Remote()->SendRequest(static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_DEL_BLOCK_LIST), data,
         reply, option);

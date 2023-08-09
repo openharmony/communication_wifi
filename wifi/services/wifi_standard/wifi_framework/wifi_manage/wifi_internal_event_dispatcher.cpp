@@ -74,9 +74,11 @@ CallbackEventPermissionMap g_CallbackEventPermissionMap = {
     { WIFI_CBK_MSG_PEER_CHANGE,
         std::make_pair(std::bind(WifiPermissionUtils::VerifyGetWifiInfoPermission),
         "ohos.permission.GET_WIFI_INFO") },
+#ifndef SUPPORT_RANDOM_MAC_ADDR
     { WIFI_CBK_MSG_PEER_CHANGE,
         std::make_pair(std::bind(WifiPermissionUtils::VerifyGetWifiDirectDevicePermission),
         "ohos.permission.LOCATION") },
+#endif
     { WIFI_CBK_MSG_PEER_CHANGE,
         std::make_pair(std::bind(WifiPermissionUtils::VerifyGetWifiInfoInternalPermission),
         "ohos.permission.GET_WIFI_INFO_INTERNAL") },

@@ -148,9 +148,7 @@ static ErrCode NativeScanInfosToJsObj(const napi_env& env,
         napi_create_object(env, &eachObj);
         SetValueUtf8String(env, "ssid", each.ssid.c_str(), eachObj);
         SetValueUtf8String(env, "bssid", each.bssid.c_str(), eachObj);
-    #ifdef SUPPORT_RANDOM_MAC_ADDR
         SetValueInt32(env, "bssidType", each.bssidType, eachObj);
-    #endif
         SetValueUtf8String(env, "capabilities", each.capabilities.c_str(), eachObj);
         SetValueInt32(env, "securityType", static_cast<int>(SecurityTypeNativeToJs(each.securityType)), eachObj);
         SetValueInt32(env, "rssi", each.rssi, eachObj);
@@ -398,10 +396,10 @@ static napi_value JsObjToDeviceConfig(const napi_env& env, const napi_value& obj
 {
     JsObjectToString(env, object, "ssid", NAPI_MAX_STR_LENT, cppConfig.ssid); /* ssid max length is 32 + '\0' */
     JsObjectToString(env, object, "bssid", NAPI_MAX_STR_LENT, cppConfig.bssid); /* max bssid length: 18 */
-#ifdef SUPPORT_RANDOM_MAC_ADDR
+    cppConfig.bssidType = RANDOM_DEVICE_ADDRESS;
     JsObjectToInt(env, object, "bssidType", cppConfig.bssidType);
-#endif
-    WIFI_LOGE("JsObjToDeviceConfig, bssid length: %{public}d.", static_cast<int>(cppConfig.bssid.length()));
+    WIFI_LOGE("JsObjToDeviceConfig, bssid length: %{public}d, bssidType: %{public}d",
+        static_cast<int>(cppConfig.bssid.length()), cppConfig.bssidType);
     JsObjectToString(env, object, "preSharedKey", NAPI_MAX_STR_LENT, cppConfig.preSharedKey);
     JsObjectToBool(env, object, "isHiddenSsid", cppConfig.hiddenSSID);
     int type = static_cast<int>(SecTypeJs::SEC_TYPE_INVALID);
@@ -1111,9 +1109,7 @@ static void DeviceConfigToJsArray(const napi_env& env, std::vector<WifiDeviceCon
     napi_create_object(env, &result);
     SetValueUtf8String(env, "ssid", vecDeviceConfigs[idx].ssid.c_str(), result);
     SetValueUtf8String(env, "bssid", vecDeviceConfigs[idx].bssid.c_str(), result);
-#ifdef SUPPORT_RANDOM_MAC_ADDR
     SetValueInt32(env, "bssidType", static_cast<int>(vecDeviceConfigs[idx].bssidType), result);
-#endif
     SetValueUtf8String(env, "preSharedKey", vecDeviceConfigs[idx].preSharedKey.c_str(), result);
     SetValueBool(env, "isHiddenSsid", vecDeviceConfigs[idx].hiddenSSID, result);
     SetValueInt32(env, "securityType",

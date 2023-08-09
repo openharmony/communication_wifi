@@ -15,6 +15,8 @@
 #include "wifi_p2p_device_manager.h"
 #include "wifi_logger.h"
 #include "wifi_settings.h"
+#include "wifi_permission_utils.h"
+#include "wifi_log.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -24,14 +26,19 @@ void WifiP2pDeviceManager::Initialize()
 bool WifiP2pDeviceManager::AddDevice(const WifiP2pDevice &device)
 {
     if (!device.IsValid()) {
+        LOGE("WifiP2pDeviceManager::AddDevice: invalid address");
         return false;
     }
     std::unique_lock<std::mutex> lock(deviceMutex);
     for (auto it = p2pDevices.begin(); it != p2pDevices.end(); it++) {
         if (*it == device) {
+            LOGE("WifiP2pDeviceManager::AddDevice: device is existed");
             return false;
         }
     }
+    LOGI("add a device: name:%{private}s, address:%{private}s, addressType:%{public}d",
+        device.GetDeviceName().c_str(), device.GetDeviceAddress().c_str(),
+        device.GetDeviceAddressType());
     p2pDevices.push_back(device);
     return true;
 }
@@ -42,6 +49,7 @@ bool WifiP2pDeviceManager::RemoveDevice(const std::string &deviceAddress)
     for (auto it = p2pDevices.begin(); it != p2pDevices.end(); it++) {
         if (it->GetDeviceAddress() == deviceAddress) {
             p2pDevices.erase(it);
+            LOGI("remove a device: address:%{private}s", deviceAddress.c_str());
             return true;
         }
     }
@@ -58,6 +66,7 @@ int WifiP2pDeviceManager::ClearAll()
     std::unique_lock<std::mutex> lock(deviceMutex);
     int num = p2pDevices.size();
     p2pDevices.clear();
+    LOGI("WifiP2pDeviceManager::ClearAll: clear all address");
     return num;
 }
 
@@ -71,6 +80,7 @@ int WifiP2pDeviceManager::GetDevicesList(std::vector<WifiP2pDevice> &devices)
 bool WifiP2pDeviceManager::UpdateDevice(const WifiP2pDevice &device)
 {
     if (!device.IsValid()) {
+        LOGE("WifiP2pDeviceManager::UpdateDevice: invalid address");
         return false;
     }
     std::unique_lock<std::mutex> lock(deviceMutex);
@@ -87,6 +97,7 @@ bool WifiP2pDeviceManager::UpdateDevice(const WifiP2pDevice &device)
 bool WifiP2pDeviceManager::UpdateDeviceSupplicantInf(const WifiP2pDevice &device)
 {
     if (!device.IsValid()) {
+        LOGE("WifiP2pDeviceManager::UpdateDeviceSupplicantInf: invalid address");
         return false;
     }
     std::unique_lock<std::mutex> lock(deviceMutex);
@@ -102,17 +113,39 @@ bool WifiP2pDeviceManager::UpdateDeviceSupplicantInf(const WifiP2pDevice &device
             return true;
         }
     }
+    WifiP2pDevice updateDevice = device;
 #ifdef SUPPORT_RANDOM_MAC_ADDR
     WifiSettings::GetInstance().StoreWifiMacAddrPairInfo(WifiMacAddrInfoType::P2P_MACADDR_INFO, device.GetDeviceAddress());
+    if (WifiPermissionUtils::VerifyGetWifiPeersMacPermission() == PERMISSION_DENIED) {
+        WifiMacAddrInfo macAddrInfo;
+        macAddrInfo.bssid = updateDevice.GetDeviceAddress();
+        macAddrInfo.bssidType = updateDevice.GetDeviceAddressType();
+        std::string randomMacAddr =
+            WifiSettings::GetInstance().GetMacAddrPairs(WifiMacAddrInfoType::P2P_MACADDR_INFO, macAddrInfo);
+        if (randomMacAddr.empty()) {
+            LOGW("no record found, bssid:%{private}s, bssidType:%{public}d",
+                macAddrInfo.bssid.c_str(), macAddrInfo.bssidType);
+        } else {
+            LOGI("find the record, bssid:%{private}s, bssidType:%{public}d, randomMac:%{private}s",
+                updateDevice.GetDeviceAddress().c_str(), updateDevice.GetDeviceAddressType(), randomMacAddr.c_str());
+            if (updateDevice.GetDeviceAddressType() == REAL_DEVICE_ADDRESS) {
+                updateDevice.SetDeviceAddress(randomMacAddr);
+                updateDevice.SetDeviceAddressType(RANDOM_DEVICE_ADDRESS);
+                LOGI("the record is updated, bssid:%{private}s, bssidType:%{public}d",
+                    updateDevice.GetDeviceAddress().c_str(), updateDevice.GetDeviceAddressType());
+            }
+        }
+    }
 #endif
     /* add its if not found . be careful of the return value */
-    p2pDevices.push_back(device);
+    p2pDevices.push_back(updateDevice);
     return true;
 }
 
 bool WifiP2pDeviceManager::UpdateDeviceGroupCap(const std::string &deviceAddress, uint32_t cap)
 {
     if (deviceAddress.empty()) {
+        LOGE("WifiP2pDeviceManager::UpdateDeviceGroupCap: invalid address");
         return false;
     }
     std::unique_lock<std::mutex> lock(deviceMutex);
@@ -128,6 +161,7 @@ bool WifiP2pDeviceManager::UpdateDeviceGroupCap(const std::string &deviceAddress
 bool WifiP2pDeviceManager::UpdateDeviceGroupCap(const WifiP2pDevice &device)
 {
     if (!device.IsValid()) {
+        LOGE("WifiP2pDeviceManager::UpdateDeviceGroupCap: invalid address");
         return false;
     }
 
@@ -137,6 +171,7 @@ bool WifiP2pDeviceManager::UpdateDeviceGroupCap(const WifiP2pDevice &device)
 bool WifiP2pDeviceManager::UpdateDeviceStatus(const std::string &deviceAddress, P2pDeviceStatus status)
 {
     if (deviceAddress.empty()) {
+        LOGE("WifiP2pDeviceManager::UpdateDeviceStatus: invalid address");
         return false;
     }
 
@@ -153,6 +188,7 @@ bool WifiP2pDeviceManager::UpdateDeviceStatus(const std::string &deviceAddress, 
 bool WifiP2pDeviceManager::UpdateDeviceStatus(const WifiP2pDevice &device)
 {
     if (!device.IsValid()) {
+        LOGE("WifiP2pDeviceManager::UpdateDeviceStatus: invalid address");
         return false;
     }
 

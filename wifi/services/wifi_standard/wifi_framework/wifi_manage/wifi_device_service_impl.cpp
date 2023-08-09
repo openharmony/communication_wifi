@@ -906,6 +906,10 @@ ErrCode WifiDeviceServiceImpl::ConnectToDevice(const WifiDeviceConfig &config)
     WifiDeviceConfig updateConfig = config;
 #ifdef SUPPORT_RANDOM_MAC_ADDR
     if (MacAddress::IsValidMac(config.bssid)) {
+        if (config.bssidType > REAL_DEVICE_ADDRESS) {
+            WIFI_LOGE("invalid bssidType:%{public}d", config.bssidType);
+            return WIFI_OPT_INVALID_PARAM;
+        }
         WifiMacAddrInfo macAddrInfo;
         macAddrInfo.bssid = config.bssid;
         macAddrInfo.bssidType = config.bssidType;

@@ -39,10 +39,10 @@ using ::testing::ext::TestSize;
 
 namespace OHOS {
 namespace Wifi {
-constexpr int FAILEDNUM = 3;
 static const std::string RANDOMMAC_SSID = "testwifi";
 static const std::string RANDOMMAC_PASSWORD = "testwifi";
 static const std::string RANDOMMAC_BSSID = "01:23:45:67:89:a0";
+constexpr int FAILEDNUM = 3;
 
 class StaStateMachineTest : public testing::Test {
 public:

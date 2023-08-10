@@ -328,7 +328,7 @@ TimeStats::~TimeStats()
 
 int FrequencyToChannel(int freq)
 {
-    WIFI_LOGI("FrequencyToChannel: %{public}d", freq);
+    WIFI_LOGD("FrequencyToChannel: %{public}d", freq);
     int channel = INVALID_FREQ_OR_CHANNEL;
     if (freq >= FREQ_2G_MIN && freq <= FREQ_2G_MAX) {
         channel = (freq - FREQ_2G_MIN) / CENTER_FREQ_DIFF + CHANNEL_2G_MIN;

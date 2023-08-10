@@ -98,7 +98,7 @@ void Handler::GetAndDistributeMessage()
             LOGE("GetNextMessage null.\n");
             continue;
         }
-        LOGI("Handler get message: %{public}d\n", msg->GetMessageName());
+        LOGD("Handler get message: %{public}d\n", msg->GetMessageName());
         WifiSettings::GetInstance().SetThreadStatusFlag(true);
         DistributeMessage(msg);
         MessageManage::GetInstance().ReclaimMsg(msg);

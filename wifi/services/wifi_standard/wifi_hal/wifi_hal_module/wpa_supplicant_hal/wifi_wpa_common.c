@@ -153,7 +153,7 @@ int WpaCliCmd(const char *cmd, char *buf, size_t bufLen)
         return -1;
     }
     size_t len = bufLen - 1;
-    LOGI("wpa_ctrl_request -> cmd: %{private}s", cmd);
+    LOGD("wpa_ctrl_request -> cmd: %{private}s", cmd);
     int ret = wpa_ctrl_request(ctrl->pSend, cmd, strlen(cmd), buf, &len, NULL);
     if (ret == WPA_CMD_RETURN_TIMEOUT) {
         LOGE("[%{private}s] command timed out.", cmd);
@@ -163,7 +163,7 @@ int WpaCliCmd(const char *cmd, char *buf, size_t bufLen)
         return -1;
     }
     buf[len] = '\0';
-    LOGI("wpa_ctrl_request -> buf: %{private}s", buf);
+    LOGD("wpa_ctrl_request -> buf: %{private}s", buf);
     if (strncmp(buf, "FAIL\n", strlen("FAIL\n")) == 0 ||
         strncmp(buf, "UNKNOWN COMMAND\n", strlen("UNKNOWN COMMAND\n")) == 0) {
         LOGE("%{private}s request success, but response %{public}s", cmd, buf);

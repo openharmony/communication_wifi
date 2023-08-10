@@ -177,7 +177,7 @@ void WifiInternalEventDispatcher::DealStaCallbackMsg(
 void WifiInternalEventDispatcher::DealScanCallbackMsg(
     WifiInternalEventDispatcher &instance, const WifiEventCallbackMsg &msg)
 {
-    WIFI_LOGI("WifiInternalEventDispatcher:: Deal Scan Event Callback Msg: %{public}d", msg.msgCode);
+    WIFI_LOGD("WifiInternalEventDispatcher:: Deal Scan Event Callback Msg: %{public}d", msg.msgCode);
 
     switch (msg.msgCode) {
         case WIFI_CBK_MSG_SCAN_STATE_CHANGE:

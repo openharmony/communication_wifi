@@ -185,6 +185,7 @@ bool DhcpdInterface::GetConnectedStationInfo(const std::string &ifaceName, std::
         StationInfo info;
         info.deviceName = tmp[DHCP_LEASE_HOSTNAME_POS];
         info.bssid = mac;
+        info.bssidType = REAL_DEVICE_ADDRESS;
         info.ipAddr = tmp[DHCP_LEASE_IP_ADDR_POS];
         result.insert(std::make_pair(info.bssid, info));
     }

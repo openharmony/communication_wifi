@@ -149,7 +149,7 @@ int WifiServiceManager::LoadScanService(const std::string &dlname, bool bCreate)
     if (bCreate) {
         mScanServiceHandle.pService = mScanServiceHandle.create();
     }
-    WifiManager::GetInstance().StopUnloadStaSaTimer();
+    WifiManager::GetInstance().StopUnloadScanSaTimer();
     return 0;
 }
 

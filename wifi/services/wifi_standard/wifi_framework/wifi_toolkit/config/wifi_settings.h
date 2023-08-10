@@ -75,6 +75,13 @@ enum class WifiMacAddrInfoType {
     INVALID_MACADDR_INFO
 };
 
+enum WifiMacAddrErrCode {
+    WIFI_MACADDR_OPER_SUCCESS = 0,
+    WIFI_MACADDR_HAS_EXISTED = 1,
+    WIFI_MACADDR_INVALID_PARAM = 2,
+    WIFI_MACADDR_BUTT
+};
+
 class WifiSettings {
 public:
     ~WifiSettings();
@@ -1320,9 +1327,9 @@ public:
      * @param type - MAC address type[in]
      * @param macAddrInfo - MAC address info[in]
      * @param randomMacAddr - random MAC address[out]
-     * @return int - 0 success
+     * @return WifiMacAddrErrCode - 0 success
      */
-    int AddMacAddrPairs(WifiMacAddrInfoType type, const WifiMacAddrInfo &macAddrInfo, std::string randomMacAddr);
+    WifiMacAddrErrCode AddMacAddrPairs(WifiMacAddrInfoType type, const WifiMacAddrInfo &macAddrInfo, std::string randomMacAddr);
     /**
      * @Description remove a MAC address pair
      *

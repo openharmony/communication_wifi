@@ -45,6 +45,7 @@ void WifiBroadCastHelper::Show(const WifiP2pDevice &v)
     WIFI_LOGI("    -WifiP2pDevice:");
     WIFI_LOGI("       DeviceName:%{private}s", v.GetDeviceName().c_str());
     WIFI_LOGI("       DeviceAddress:%{private}s", v.GetDeviceAddress().c_str());
+    WIFI_LOGI("       DeviceAddressType:%{public}d", v.GetDeviceAddressType());
     WIFI_LOGI("       PrimaryDeviceType:%{public}s", v.GetPrimaryDeviceType().c_str());
     WIFI_LOGI("       SecondaryDeviceType:%{public}s", v.GetSecondaryDeviceType().c_str());
     WIFI_LOGI("       P2pDeviceStatus:%{public}d", v.GetP2pDeviceStatus());

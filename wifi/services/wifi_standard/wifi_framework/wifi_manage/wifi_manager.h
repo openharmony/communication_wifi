@@ -71,7 +71,7 @@ class ScreenEventSubscriber : public OHOS::EventFwk::CommonEventSubscriber {
 public:
     explicit ScreenEventSubscriber(const OHOS::EventFwk::CommonEventSubscribeInfo &subscriberInfo)
         : CommonEventSubscriber(subscriberInfo) {}
-    virtual ~ScreenEventSubscriber() {};
+    virtual ~ScreenEventSubscriber();
     void OnReceiveEvent(const OHOS::EventFwk::CommonEventData &data) override;
 };
 
@@ -153,6 +153,8 @@ public:
     ErrCode AutoStopStaService(AutoStartOrStopServiceReason reason);
     void StopUnloadStaSaTimer(void);
     void StartUnloadStaSaTimer(void);
+    void StopUnloadScanSaTimer(void);
+    void StartUnloadScanSaTimer(void);
 #ifdef FEATURE_AP_SUPPORT
     /**
      * @Description Get the ap callback object.
@@ -219,6 +221,7 @@ private:
     static void DealCloseServiceMsg(WifiManager &manager);
     static void CloseStaService(void);
     static void UnloadStaSaTimerCallback();
+    static void UnloadScanSaTimerCallback();
 #ifdef FEATURE_AP_SUPPORT
     static void CloseApService(int id = 0);
     static void UnloadHotspotSaTimerCallback();
@@ -279,6 +282,8 @@ private:
 #ifndef OHOS_ARCH_LITE
     static uint32_t unloadStaSaTimerId;
     static std::mutex unloadStaSaTimerMutex;
+    static uint32_t unloadScanSaTimerId;
+    static std::mutex unloadScanSaTimerMutex;
 #endif
 #ifdef FEATURE_AP_SUPPORT
     IApServiceCallbacks mApCallback;

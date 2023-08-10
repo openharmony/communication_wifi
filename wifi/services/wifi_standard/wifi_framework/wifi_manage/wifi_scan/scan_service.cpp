@@ -657,9 +657,7 @@ bool ScanService::StoreFullScanInfo(
         }
         WifiScanInfo scanInfo;
         scanInfo.bssid = iter->bssid;
-    #ifdef SUPPORT_RANDOM_MAC_ADDR
         scanInfo.bssidType = REAL_DEVICE_ADDRESS;
-    #endif
         scanInfo.ssid = iter->ssid;
         scanInfo.capabilities = iter->capabilities;
         scanInfo.frequency = iter->frequency;

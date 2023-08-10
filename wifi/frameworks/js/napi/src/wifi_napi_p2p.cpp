@@ -26,9 +26,7 @@ static void DeviceInfoToJs(const napi_env& env, const WifiP2pDevice& device, nap
 {
     SetValueUtf8String(env, "deviceName", device.GetDeviceName().c_str(), result);
     SetValueUtf8String(env, "deviceAddress", device.GetDeviceAddress().c_str(), result);
-#ifdef SUPPORT_RANDOM_MAC_ADDR
     SetValueInt32(env, "deviceAddressType", device.GetDeviceAddressType(), result);
-#endif
     SetValueUtf8String(env, "primaryDeviceType", device.GetPrimaryDeviceType().c_str(), result);
     SetValueInt32(env, "deviceStatus", static_cast<int>(device.GetP2pDeviceStatus()), result);
     SetValueInt32(env, "groupCapabilitys", device.GetGroupCapabilitys(), result);
@@ -306,16 +304,21 @@ NO_SANITIZE("cfi") napi_value SetDeviceName(napi_env env, napi_callback_info inf
 static void JsObjToP2pConfig(const napi_env& env, const napi_value& object, WifiP2pConfig& config)
 {
     std::string address = "";
+    int bssidType = RANDOM_DEVICE_ADDRESS;
     int netId = -1;
     std::string passphrase = "";
     std::string groupName = "";
     int band = static_cast<int>(GroupOwnerBand::GO_BAND_AUTO);
     JsObjectToString(env, object, "deviceAddress", WIFI_STR_MAC_LENGTH + 1, address);
+    JsObjectToInt(env, object, "deviceAddressType", bssidType);
+    WIFI_LOGI("JsObjToP2pConfig, bssid length: %{public}d, bssidType: %{public}d",
+        static_cast<int>(address.length()), bssidType);
     JsObjectToInt(env, object, "netId", netId);
     JsObjectToString(env, object, "passphrase", MAX_PASSPHRASE_LENGTH + 1, passphrase);
     JsObjectToString(env, object, "groupName", DEVICE_NAME_LENGTH + 1, groupName);
     JsObjectToInt(env, object, "goBand", band);
     config.SetDeviceAddress(address);
+    config.SetDeviceAddressType(bssidType);
     config.SetNetId(netId);
     config.SetPassphrase(passphrase);
     config.SetGroupName(groupName);

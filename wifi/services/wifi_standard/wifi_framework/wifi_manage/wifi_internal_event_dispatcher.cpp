@@ -146,13 +146,13 @@ ErrCode WifiInternalEventDispatcher::AddStaCallback(
     auto iter = mStaCallBackInfo.find(remote);
     if (iter != mStaCallBackInfo.end()) {
         (iter->second).regCallBackEventId.emplace(eventIter->second);
-        WIFI_LOGI("%{public}s, add callback event:%{public}d", __func__, eventIter->second);
+        WIFI_LOGD("%{public}s, add callback event:%{public}d", __func__, eventIter->second);
     } else {
         WifiCallingInfo &callbackInfo = mStaCallBackInfo[remote];
         callbackInfo.callingUid = GetCallingUid();
         callbackInfo.callingPid = pid;
         callbackInfo.regCallBackEventId.emplace(eventIter->second);
-        WIFI_LOGI("%{public}s, add uid: %{public}d, pid: %{public}d, callback event:%{public}d", __func__,
+        WIFI_LOGD("%{public}s, add uid: %{public}d, pid: %{public}d, callback event:%{public}d", __func__,
             callbackInfo.callingUid, callbackInfo.callingPid, eventIter->second);
     }
     mStaCallbacks[remote] = callback;
@@ -220,13 +220,13 @@ ErrCode WifiInternalEventDispatcher::AddScanCallback(
     auto iter = mScanCallBackInfo.find(remote);
     if (iter != mScanCallBackInfo.end()) {
         (iter->second).regCallBackEventId.emplace(eventIter->second);
-        WIFI_LOGI("%{public}s, add callback event:%{public}d", __func__, eventIter->second);
+        WIFI_LOGD("%{public}s, add callback event:%{public}d", __func__, eventIter->second);
     } else {
         WifiCallingInfo &callbackInfo = mScanCallBackInfo[remote];
         callbackInfo.callingUid = GetCallingUid();
         callbackInfo.callingPid = pid;
         callbackInfo.regCallBackEventId.emplace(eventIter->second);
-        WIFI_LOGI("%{public}s, add uid: %{public}d, pid: %{public}d, callback event:%{public}d", __func__,
+        WIFI_LOGD("%{public}s, add uid: %{public}d, pid: %{public}d, callback event:%{public}d", __func__,
             callbackInfo.callingUid, callbackInfo.callingPid, eventIter->second);
     }
     mScanCallbacks[remote] = callback;
@@ -507,7 +507,7 @@ void WifiInternalEventDispatcher::DealStaCallbackMsg(
 void WifiInternalEventDispatcher::DealScanCallbackMsg(
     WifiInternalEventDispatcher &instance, const WifiEventCallbackMsg &msg)
 {
-    WIFI_LOGI("WifiInternalEventDispatcher:: Deal Scan Event Callback Msg: %{public}d", msg.msgCode);
+    WIFI_LOGD("WifiInternalEventDispatcher:: Deal Scan Event Callback Msg: %{public}d", msg.msgCode);
 
     switch (msg.msgCode) {
         case WIFI_CBK_MSG_SCAN_STATE_CHANGE:
@@ -580,18 +580,18 @@ void WifiInternalEventDispatcher::InvokeDeviceCallbacks(const WifiEventCallbackM
         if (callback == nullptr) {
             continue;
         }
-        WIFI_LOGI("InvokeDeviceCallbacks, msg.msgCode: %{public}d", msg.msgCode);
+        WIFI_LOGD("InvokeDeviceCallbacks, msg.msgCode: %{public}d", msg.msgCode);
         auto remote = itr->first;
         bool isFrozen = false;
 #ifdef FEATURE_APP_FROZEN
         int uid = mStaCallBackInfo[remote].callingUid;
         int pid = mStaCallBackInfo[remote].callingPid;
         isFrozen = SuspendManager::SuspendManagerClient::GetInstance().GetAppHardwareProxyStatus(pid, uid);
-        WIFI_LOGI("Check calling APP is hardwareProxied, uid: %{public}d, pid: %{public}d, hardwareProxied: %{public}d",
+        WIFI_LOGD("Check calling APP is hardwareProxied, uid: %{public}d, pid: %{public}d, hardwareProxied: %{public}d",
             uid, pid, isFrozen);
 #endif
         if (mStaCallBackInfo[remote].regCallBackEventId.count(msg.msgCode) == 0) {
-            WIFI_LOGI("InvokeDeviceCallbacks, Not registered callback event! msg.msgCode:%{public}d", msg.msgCode);
+            WIFI_LOGD("InvokeDeviceCallbacks, Not registered callback event! msg.msgCode:%{public}d", msg.msgCode);
             continue;
         }
 

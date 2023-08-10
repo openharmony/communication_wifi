@@ -51,7 +51,7 @@ bool MessageQueue::AddMessageToQueue(InternalMessage *message, int64_t handleTim
         return false;
     }
 
-    LOGI("MessageQueue::AddMessageToQueue, msg: %{public}d, timestamp:%" PRId64 "\n",
+    LOGD("MessageQueue::AddMessageToQueue, msg: %{public}d, timestamp:%" PRId64 "\n",
         message->GetMessageName(), handleTime);
 
     if (mNeedQuit) {
@@ -72,12 +72,12 @@ bool MessageQueue::AddMessageToQueue(InternalMessage *message, int64_t handleTim
         std::unique_lock<std::mutex> lck(mMtxQueue);
         InternalMessage *pTop = pMessageQueue;
         if (pTop == nullptr || handleTime == 0 || handleTime <= pTop->GetHandleTime()) {
-            LOGI("Add the message in the head of queue.");
+            LOGD("Add the message in the head of queue.");
             message->SetNextMsg(pTop);
             pMessageQueue = message;
             mNeedWakeup = mIsBlocked;
         } else {
-            LOGI("Insert the message in the middle of the queue.");
+            LOGD("Insert the message in the middle of the queue.");
             InternalMessage *pPrev = nullptr;
             InternalMessage *pCurrent = pTop;
             /* Inserts messages in the middle of the queue based on the execution time. */
@@ -93,7 +93,7 @@ bool MessageQueue::AddMessageToQueue(InternalMessage *message, int64_t handleTim
         }
     }
 
-    LOGI("Add message needWakeup: %{public}d", static_cast<int>(mNeedWakeup));
+    LOGD("Add message needWakeup: %{public}d", static_cast<int>(mNeedWakeup));
     if (mNeedWakeup) {
         std::unique_lock<std::mutex> lck(mMtxBlock);
         mIsBlocked = false;
@@ -133,7 +133,7 @@ bool MessageQueue::DeleteMessageFromQueue(int messageName)
 
 InternalMessage *MessageQueue::GetNextMessage()
 {
-    LOGI("MessageQueue::GetNextMessage");
+    LOGD("MessageQueue::GetNextMessage");
     int nextBlockTime = 0;
 
     while (!mNeedQuit) {
@@ -150,7 +150,7 @@ InternalMessage *MessageQueue::GetNextMessage()
             InternalMessage *curMsg = pMessageQueue;
             mIsBlocked = true;
             if (curMsg != nullptr) {
-                LOGI("Message queue is not empty.");
+                LOGD("Message queue is not empty.");
                 if (nowTime < curMsg->GetHandleTime()) {
                     /* The execution time of the first message is not reached.
                         The remaining time is blocked here. */
@@ -160,7 +160,7 @@ InternalMessage *MessageQueue::GetNextMessage()
                     mIsBlocked = false;
                     pMessageQueue = curMsg->GetNextMsg();
                     curMsg->SetNextMsg(nullptr);
-                    LOGI("Get queue message: %{public}d", curMsg->GetMessageName());
+                    LOGD("Get queue message: %{public}d", curMsg->GetMessageName());
                     return curMsg;
                 }
             } else {
@@ -171,11 +171,11 @@ InternalMessage *MessageQueue::GetNextMessage()
 
         std::unique_lock<std::mutex> lck(mMtxBlock); // mCvQueue lock
         if (mIsBlocked && (!mNeedQuit)) {
-            LOGI("mCvQueue wait_for: %{public}d", nextBlockTime);
+            LOGD("mCvQueue wait_for: %{public}d", nextBlockTime);
             if (mCvQueue.wait_for(lck, std::chrono::milliseconds(nextBlockTime)) == std::cv_status::timeout) {
-                LOGI("mCvQueue wake up, reason: cv_status::timeout: %{public}d", nextBlockTime);
+                LOGD("mCvQueue wake up, reason: cv_status::timeout: %{public}d", nextBlockTime);
             } else {
-                LOGI("mCvQueue is wake up.");
+                LOGD("mCvQueue is wake up.");
             }
         }
         mIsBlocked = false;

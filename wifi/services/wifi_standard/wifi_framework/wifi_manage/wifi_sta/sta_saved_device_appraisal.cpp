@@ -43,7 +43,7 @@ StaSavedDeviceAppraisal::~StaSavedDeviceAppraisal()
 ErrCode StaSavedDeviceAppraisal::DeviceAppraisals(
     WifiDeviceConfig &electedDevice, std::vector<InterScanInfo> &scanInfos, WifiLinkedInfo &info)
 {
-    WIFI_LOGI("Enter StaSavedDeviceAppraisal::DeviceAppraisals.\n");
+    WIFI_LOGD("Enter StaSavedDeviceAppraisal::DeviceAppraisals.\n");
     int highestScore = 0;
     int sign = 0;
     InterScanInfo scanInfoElected;
@@ -53,7 +53,7 @@ ErrCode StaSavedDeviceAppraisal::DeviceAppraisals(
         WifiDeviceConfig device;
         if (WifiSettings::GetInstance().GetDeviceConfig(scanInfo.bssid, DEVICE_CONFIG_INDEX_BSSID, device) != 0 &&
             WifiSettings::GetInstance().GetDeviceConfig(scanInfo.ssid, DEVICE_CONFIG_INDEX_SSID, device) != 0) {
-            WIFI_LOGI("Skip unsaved ssid Network %{public}s.", SsidAnonymize(scanInfo.ssid).c_str());
+            WIFI_LOGD("Skip unsaved ssid Network %{public}s.", SsidAnonymize(scanInfo.ssid).c_str());
             continue;
         }
 
@@ -63,16 +63,16 @@ ErrCode StaSavedDeviceAppraisal::DeviceAppraisals(
 
         int score = 0;
         AppraiseDeviceQuality(score, scanInfo, device, info, device.connFailedCount >= MAX_RETRY_COUNT);
-        WIFI_LOGI("The device networkId:%{public}d ssid:%{public}s score:%{public}d rssi:%{public}d.",
+        WIFI_LOGD("The device networkId:%{public}d ssid:%{public}s score:%{public}d rssi:%{public}d.",
             device.networkId, SsidAnonymize(scanInfo.ssid).c_str(), score, scanInfo.rssi);
         if (CheckHigherPriority(score, highestScore, scanInfo.rssi, scanInfoElected.rssi)) {
             highestScore = score;
             scanInfoElected.rssi = scanInfo.rssi;
             electedDevice = device;
             sign = 1;
-            WIFI_LOGI("set highestScore: %{public}d, ssid: %{public}s", highestScore, SsidAnonymize(device.ssid).c_str());
+            WIFI_LOGD("set highestScore: %{public}d, ssid: %{public}s", highestScore, SsidAnonymize(device.ssid).c_str());
         } else {
-            WIFI_LOGI("The config %{public}s is ignored!\n", MacAnonymize(scanInfo.ssid).c_str());
+            WIFI_LOGD("The config %{public}s is ignored!\n", MacAnonymize(scanInfo.ssid).c_str());
         }
     }
     if (sign == 1) {
@@ -117,24 +117,24 @@ bool StaSavedDeviceAppraisal::WhetherSkipDevice(WifiDeviceConfig &device)
 void StaSavedDeviceAppraisal::AppraiseDeviceQuality(int &score, InterScanInfo &scanInfo,
     WifiDeviceConfig &device, WifiLinkedInfo &info, bool flip)
 {
-    WIFI_LOGI("Enter StaSavedDeviceAppraisal::AppraiseDeviceQuality.\n");
+    WIFI_LOGD("Enter StaSavedDeviceAppraisal::AppraiseDeviceQuality.\n");
     int rssi = scanInfo.rssi;
     /* Converts a signal to a grid number */
     int signalStrength = CalculateSignalBars(rssi, MAX_SIGNAL_BAR_NUM);
     /* Signal strength score */
     score += signalBaseScore + signalStrength * signalScorePerLevel;
-    WIFI_LOGI("signalstrength score is %{public}d.\n", score);
+    WIFI_LOGD("signalstrength score is %{public}d.\n", score);
 
     /* 5 GHz frequency band: bonus point */
     if (Whether5GDevice(scanInfo.frequency)) {
         score += frequency5GHzScore;
-        WIFI_LOGI("5G score is %{public}d.\n", frequency5GHzScore);
+        WIFI_LOGD("5G score is %{public}d.\n", frequency5GHzScore);
     }
 
     /* normal device config: bonus point */
     if (device.uid == WIFI_INVALID_UID) {
         score += normalDeviceScore;
-        WIFI_LOGI("normal score is %{public}d.\n", normalDeviceScore);
+        WIFI_LOGD("normal score is %{public}d.\n", normalDeviceScore);
     }
 
     /* Bonus points for last user selection */
@@ -198,7 +198,7 @@ bool StaSavedDeviceAppraisal::Whether5GDevice(int frequency)
 
 int StaSavedDeviceAppraisal::CalculateSignalBars(int rssi, int signalBars)
 {
-    WIFI_LOGI("Enter StaSavedDeviceAppraisal CalculateSignalBars");
+    WIFI_LOGD("Enter StaSavedDeviceAppraisal CalculateSignalBars");
     if (rssi <= VALUE_LIMIT_MIN_RSSI) {
         return 0;
     } else if (rssi >= VALUE_LIMIT_MAX_RSSI) {

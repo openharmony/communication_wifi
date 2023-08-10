@@ -77,7 +77,7 @@ WifiManager::~WifiManager()
 ErrCode WifiManager::AutoStartStaService(AutoStartOrStopServiceReason reason)
 {
     WifiOprMidState staState = WifiConfigCenter::GetInstance().GetWifiMidState();
-    WIFI_LOGI("AutoStartStaService, current sta state:%{public}d, reason:%{public}d", staState, reason);
+    WIFI_LOGD("AutoStartStaService, current sta state:%{public}d, reason:%{public}d", staState, reason);
     if (staState != WifiOprMidState::CLOSED) {
         if (staState == WifiOprMidState::CLOSING) {
             return WIFI_OPT_OPEN_FAIL_WHEN_CLOSING;
@@ -87,7 +87,7 @@ ErrCode WifiManager::AutoStartStaService(AutoStartOrStopServiceReason reason)
     }
     
     if (!WifiConfigCenter::GetInstance().SetWifiMidState(staState, WifiOprMidState::OPENING)) {
-        WIFI_LOGI("AutoStartStaService, set wifi mid state opening failed!");
+        WIFI_LOGD("AutoStartStaService, set wifi mid state opening failed!");
         return WIFI_OPT_OPEN_SUCC_WHEN_OPENED;
     }
     ErrCode errCode = WIFI_OPT_FAILED;
@@ -948,7 +948,7 @@ StaServiceCallback WifiManager::GetStaCallback()
 
 void WifiManager::DealStaOpenRes(OperateResState state)
 {
-    WIFI_LOGI("Enter DealStaOpenRes: %{public}d", static_cast<int>(state));
+    WIFI_LOGD("Enter DealStaOpenRes: %{public}d", static_cast<int>(state));
     WifiEventCallbackMsg cbMsg;
     cbMsg.msgCode = WIFI_CBK_MSG_STATE_CHANGE;
     if (state == OperateResState::OPEN_WIFI_OPENING) {
@@ -995,7 +995,7 @@ void WifiManager::DealStaOpenRes(OperateResState state)
 
 void WifiManager::DealStaCloseRes(OperateResState state)
 {
-    WIFI_LOGI("Enter DealStaCloseRes: %{public}d", static_cast<int>(state));
+    WIFI_LOGD("Enter DealStaCloseRes: %{public}d", static_cast<int>(state));
     WifiEventCallbackMsg cbMsg;
     cbMsg.msgCode = WIFI_CBK_MSG_STATE_CHANGE;
     if (state == OperateResState::CLOSE_WIFI_CLOSING) {
@@ -1840,7 +1840,7 @@ void WifiManager::GetAirplaneModeByDatashare(int systemAbilityId)
         return;
     }
 
-    WIFI_LOGI("GetAirplaneModeByDatashare, airplaneMode:%{public}s", airplaneMode.c_str());
+    WIFI_LOGD("GetAirplaneModeByDatashare, airplaneMode:%{public}s", airplaneMode.c_str());
     if (airplaneMode.compare("1") == 0) {
         WifiConfigCenter::GetInstance().SetAirplaneModeState(MODE_STATE_OPEN);
     }
@@ -1849,7 +1849,7 @@ void WifiManager::GetAirplaneModeByDatashare(int systemAbilityId)
 
 bool WifiManager::GetLocationModeByDatashare(int systemAbilityId)
 {
-    WIFI_LOGI("GetLocationModeByDatashare, systemAbilityId:%{public}d", systemAbilityId);
+    WIFI_LOGD("GetLocationModeByDatashare, systemAbilityId:%{public}d", systemAbilityId);
     auto datashareHelper = std::make_shared<WifiDataShareHelperUtils>(systemAbilityId);
     if (datashareHelper == nullptr) {
         WIFI_LOGE("GetLocationModeByDatashare, datashareHelper is nullprt!");
@@ -1864,7 +1864,7 @@ bool WifiManager::GetLocationModeByDatashare(int systemAbilityId)
         return false;
     }
 
-    WIFI_LOGI("GetLocationModeByDatashare, locationMode:%{public}s", locationMode.c_str());
+    WIFI_LOGD("GetLocationModeByDatashare, locationMode:%{public}s", locationMode.c_str());
     return (locationMode.compare("1") == 0);
 }
 
@@ -1887,7 +1887,7 @@ void WifiManager::UnRegisterLocationEvent()
     if (!EventFwk::CommonEventManager::UnSubscribeCommonEvent(locationEventSubscriber_)) {
         WIFI_LOGE("LocationEvent UnSubscribeCommonEvent() failed");
     } else {
-        WIFI_LOGI("LocationEvent UnSubscribeCommonEvent() OK");
+        WIFI_LOGD("LocationEvent UnSubscribeCommonEvent() OK");
     }
     locationEventSubscriber_ = nullptr;
 }
@@ -1895,10 +1895,10 @@ void WifiManager::UnRegisterLocationEvent()
 void LocationEventSubscriber::OnReceiveEvent(const OHOS::EventFwk::CommonEventData &eventData)
 {
     std::string action = eventData.GetWant().GetAction();
-    WIFI_LOGI("LocationEventSubscriber::OnReceiveEvent: %{public}s.", action.c_str());
+    WIFI_LOGD("LocationEventSubscriber::OnReceiveEvent: %{public}s.", action.c_str());
 
     if (action == OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_LOCATION_MODE_STATE_CHANGED) {
-        WIFI_LOGI("LocationEventSubscriber::OnReceiveEvent COMMON_EVENT_LOCATION_MODE_STATE_CHANGED.");
+        WIFI_LOGD("LocationEventSubscriber::OnReceiveEvent COMMON_EVENT_LOCATION_MODE_STATE_CHANGED.");
     }
 }
 

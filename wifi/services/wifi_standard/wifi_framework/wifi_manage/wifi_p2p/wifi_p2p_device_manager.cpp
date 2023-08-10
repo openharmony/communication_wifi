@@ -97,7 +97,7 @@ bool WifiP2pDeviceManager::UpdateDevice(const WifiP2pDevice &device)
 bool WifiP2pDeviceManager::UpdateDeviceSupplicantInf(const WifiP2pDevice &device)
 {
     if (!device.IsValid()) {
-        LOGE("WifiP2pDeviceManager::UpdateDeviceSupplicantInf: invalid address");
+        LOGE("UpdateDeviceSupplicantInf: invalid address");
         return false;
     }
     std::unique_lock<std::mutex> lock(deviceMutex);
@@ -117,6 +117,7 @@ bool WifiP2pDeviceManager::UpdateDeviceSupplicantInf(const WifiP2pDevice &device
 #ifdef SUPPORT_RANDOM_MAC_ADDR
     WifiSettings::GetInstance().StoreWifiMacAddrPairInfo(WifiMacAddrInfoType::P2P_MACADDR_INFO, device.GetDeviceAddress());
     if (WifiPermissionUtils::VerifyGetWifiPeersMacPermission() == PERMISSION_DENIED) {
+        LOGI("UpdateDeviceSupplicantInf: GET_WIFI_PEERS_MAC PERMISSION_DENIED");
         WifiMacAddrInfo macAddrInfo;
         macAddrInfo.bssid = updateDevice.GetDeviceAddress();
         macAddrInfo.bssidType = updateDevice.GetDeviceAddressType();

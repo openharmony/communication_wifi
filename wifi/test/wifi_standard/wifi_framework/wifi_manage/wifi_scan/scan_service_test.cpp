@@ -2062,7 +2062,7 @@ public:
     {
         std::map<int, time_t> customIter;
         ScanForbidMode scanForbidMode;
-        scanForbidMode.scanScene = MIN_SCAN_INTERVAL;
+        scanForbidMode.scanScene = SCAN_SCENE_SCANNING;
         scanForbidMode.scanMode = ScanMode::SYS_FOREGROUND_SCAN;
         pScanService->scanControlInfo.scanForbidList.push_back(scanForbidMode);
         time_t now = time(nullptr);
@@ -2075,7 +2075,7 @@ public:
     {
         std::map<int, time_t> customIter;
         ScanForbidMode scanForbidMode;
-        scanForbidMode.scanScene = MIN_SCAN_INTERVAL;
+        scanForbidMode.scanScene = SCAN_SCENE_SCANNING;
         scanForbidMode.scanMode = ScanMode::SYS_FOREGROUND_SCAN;
         scanForbidMode.forbidCount = -1;
         scanForbidMode.forbidTime = 0;
@@ -2083,14 +2083,14 @@ public:
         time_t now = time(nullptr);
         customIter.emplace(SCAN_SCENE_SCANNING, now);
         auto customIters = customIter.begin();
-        EXPECT_TRUE(pScanService->AllowCustomSceneCheck(customIters, ScanMode::SYSTEM_TIMER_SCAN) == true);
+        EXPECT_TRUE(pScanService->AllowCustomSceneCheck(customIters, ScanMode::SYS_FOREGROUND_SCAN) == true);
     }
 
     void AllowCustomSceneCheckTest4()
     {
         std::map<int, time_t> customIter;
         ScanForbidMode scanForbidMode;
-        scanForbidMode.scanScene = MIN_SCAN_INTERVAL;
+        scanForbidMode.scanScene = SCAN_SCENE_SCANNING;
         scanForbidMode.scanMode = ScanMode::SYS_FOREGROUND_SCAN;
         scanForbidMode.forbidCount = 1;
         scanForbidMode.forbidTime = STATUS;
@@ -2099,7 +2099,7 @@ public:
         customIter.emplace(SCAN_SCENE_SCANNING, now);
         pScanService->customSceneForbidCount = STATUS;
         auto customIters = customIter.begin();
-        EXPECT_TRUE(pScanService->AllowCustomSceneCheck(customIters, ScanMode::SYSTEM_TIMER_SCAN) == true);
+        EXPECT_TRUE(pScanService->AllowCustomSceneCheck(customIters, ScanMode::SYS_FOREGROUND_SCAN) == true);
     }
 };
 

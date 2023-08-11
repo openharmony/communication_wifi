@@ -116,27 +116,6 @@ bool WifiP2pDeviceManager::UpdateDeviceSupplicantInf(const WifiP2pDevice &device
     WifiP2pDevice updateDevice = device;
 #ifdef SUPPORT_RANDOM_MAC_ADDR
     WifiSettings::GetInstance().StoreWifiMacAddrPairInfo(WifiMacAddrInfoType::P2P_MACADDR_INFO, device.GetDeviceAddress());
-    if (WifiPermissionUtils::VerifyGetWifiPeersMacPermission() == PERMISSION_DENIED) {
-        LOGI("UpdateDeviceSupplicantInf: GET_WIFI_PEERS_MAC PERMISSION_DENIED");
-        WifiMacAddrInfo macAddrInfo;
-        macAddrInfo.bssid = updateDevice.GetDeviceAddress();
-        macAddrInfo.bssidType = updateDevice.GetDeviceAddressType();
-        std::string randomMacAddr =
-            WifiSettings::GetInstance().GetMacAddrPairs(WifiMacAddrInfoType::P2P_MACADDR_INFO, macAddrInfo);
-        if (randomMacAddr.empty()) {
-            LOGW("no record found, bssid:%{private}s, bssidType:%{public}d",
-                macAddrInfo.bssid.c_str(), macAddrInfo.bssidType);
-        } else {
-            LOGI("find the record, bssid:%{private}s, bssidType:%{public}d, randomMac:%{private}s",
-                updateDevice.GetDeviceAddress().c_str(), updateDevice.GetDeviceAddressType(), randomMacAddr.c_str());
-            if (updateDevice.GetDeviceAddressType() == REAL_DEVICE_ADDRESS) {
-                updateDevice.SetDeviceAddress(randomMacAddr);
-                updateDevice.SetDeviceAddressType(RANDOM_DEVICE_ADDRESS);
-                LOGI("the record is updated, bssid:%{private}s, bssidType:%{public}d",
-                    updateDevice.GetDeviceAddress().c_str(), updateDevice.GetDeviceAddressType());
-            }
-        }
-    }
 #endif
     /* add its if not found . be careful of the return value */
     p2pDevices.push_back(updateDevice);

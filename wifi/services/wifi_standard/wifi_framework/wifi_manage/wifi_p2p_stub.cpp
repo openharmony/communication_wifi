@@ -630,6 +630,7 @@ void WifiP2pStub::OnRegisterCallBack(uint32_t code, MessageParcel &data, Message
             WIFI_LOGI("create new `WifiP2pCallbackProxy`!");
         }
 
+        int pid = data.ReadInt32();
         int eventNum = data.ReadInt32();
         std::vector<std::string> event;
         if (eventNum > 0 && eventNum <= MAX_READ_EVENT_SIZE) {
@@ -637,6 +638,7 @@ void WifiP2pStub::OnRegisterCallBack(uint32_t code, MessageParcel &data, Message
                 event.emplace_back(data.ReadString());
             }
         }
+        WIFI_LOGD("%{public}s, get pid: %{public}d", __func__, pid);
 
         if (mSingleCallback) {
             ret = RegisterCallBack(callback_, event);
@@ -649,7 +651,7 @@ void WifiP2pStub::OnRegisterCallBack(uint32_t code, MessageParcel &data, Message
             }
             if (callback_ != nullptr) {
                 for (const auto &eventName : event) {
-                    ret = WifiInternalEventDispatcher::GetInstance().AddP2pCallback(remote, callback_, eventName);
+                    ret = WifiInternalEventDispatcher::GetInstance().AddP2pCallback(remote, callback_, pid, eventName);
                 }
             }
         }

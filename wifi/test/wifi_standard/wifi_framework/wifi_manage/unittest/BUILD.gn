@@ -122,6 +122,7 @@ ohos_unittest("manager_unittest") {
     "FEATURE_AP_SUPPORT",
     "AP_INSTANCE_MAX_NUM=$wifi_feature_with_ap_num",
   ]
+  defines += [ "SUPPORT_RANDOM_MAC_ADDR" ]
   configs = [ ":module_private_config" ]
 
   # Do not modify the permission configuration of the unit test

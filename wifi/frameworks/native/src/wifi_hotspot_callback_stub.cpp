@@ -83,6 +83,7 @@ int WifiHotspotCallbackStub::RemoteOnHotspotStaJoin(uint32_t code, MessageParcel
     info.deviceName = (readStr != nullptr) ? readStr : "";
     readStr = data.ReadCString();
     info.bssid = (readStr != nullptr) ? readStr : "";
+    info.bssidType = data.ReadInt32();
     readStr = data.ReadCString();
     info.ipAddr = (readStr != nullptr) ? readStr : "";
     OnHotspotStaJoin(info);

@@ -17,6 +17,7 @@
 #include "wifi_manager_service_ipc_interface_code.h"
 #include "wifi_logger.h"
 #include "wifi_p2p_callback_stub.h"
+#include "wifi_common_util.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -1123,6 +1124,8 @@ ErrCode WifiP2pProxy::RegisterCallBack(const sptr<IWifiP2pCallback> &callback, c
         WIFI_LOGE("RegisterCallBack WriteRemoteObject failed!");
         return WIFI_OPT_FAILED;
     }
+    int pid = GetCallingPid();
+    data.WriteInt32(pid);
     int eventNum = event.size();
     data.WriteInt32(eventNum);
     if (eventNum > 0) {

@@ -23,6 +23,11 @@
 #ifdef FEATURE_APP_FROZEN
 #include "suspend_manager_client.h"
 #endif
+#ifdef SUPPORT_RANDOM_MAC_ADDR
+#include "wifi_p2p_msg.h"
+#include "wifi_common_msg.h"
+#include "wifi_settings.h"
+#endif
 
 DEFINE_WIFILOG_LABEL("WifiInternalEventDispatcher");
 
@@ -382,7 +387,7 @@ bool WifiInternalEventDispatcher::HasP2pRemote(const sptr<IRemoteObject> &remote
 }
 
 ErrCode WifiInternalEventDispatcher::AddP2pCallback(
-    const sptr<IRemoteObject> &remote, const sptr<IWifiP2pCallback> &callback, const std::string &eventName)
+    const sptr<IRemoteObject> &remote, const sptr<IWifiP2pCallback> &callback, int pid, const std::string &eventName)
 {
     WIFI_LOGD("WifiInternalEventDispatcher::AddP2pCallback!");
     if (remote == nullptr || callback == nullptr) {
@@ -404,9 +409,14 @@ ErrCode WifiInternalEventDispatcher::AddP2pCallback(
     std::unique_lock<std::mutex> lock(mP2pCallbackMutex);
     auto iter = mP2pCallbackInfo.find(remote);
     if (iter != mP2pCallbackInfo.end()) {
-        (iter->second).emplace(eventIter->second);
+        (iter->second).regCallBackEventId.emplace(eventIter->second);
     } else {
-        mP2pCallbackInfo[remote] = {eventIter->second};
+        WifiCallingInfo &callbackInfo = mP2pCallbackInfo[remote];
+        callbackInfo.callingUid = GetCallingUid();
+        callbackInfo.callingPid = pid;
+        callbackInfo.regCallBackEventId.emplace(eventIter->second);
+        WIFI_LOGE("%{public}s, add uid: %{public}d, pid: %{public}d, callback event: %{public}d",
+            __func__, callbackInfo.callingUid, callbackInfo.callingPid, eventIter->second);
     }
     mP2pCallbacks[remote] = callback;
     WIFI_LOGI("%{public}s, add p2p callback event:%{public}d", __func__, eventIter->second);
@@ -693,12 +703,14 @@ void WifiInternalEventDispatcher::InvokeP2pCallbacks(const WifiEventCallbackMsg 
     for (itr = callbacks.begin(); itr != callbacks.end(); itr++) {
         auto callback = itr->second;
         auto remote = itr->first;
-        if (mP2pCallbackInfo[remote].count(msg.msgCode) == 0) {
+        if (mP2pCallbackInfo[remote].regCallBackEventId.count(msg.msgCode) == 0) {
             WIFI_LOGI("InvokeP2pCallbacks, Not registered callback event! msg.msgCode:%{public}d", msg.msgCode);
             continue;
         }
+        int pid = mP2pCallbackInfo[remote].callingPid;
+        int uid = mP2pCallbackInfo[remote].callingUid;
         if (callback != nullptr) {
-            SendP2pCallbackMsg(callback, msg);
+            SendP2pCallbackMsg(callback, msg, pid, uid);
         }
     }
 }
@@ -718,9 +730,35 @@ void WifiInternalEventDispatcher::SendConfigChangeEvent(sptr<IWifiP2pCallback> &
     cfgInfo = nullptr;
 }
 
-void WifiInternalEventDispatcher::SendP2pCallbackMsg(sptr<IWifiP2pCallback> &callback, const WifiEventCallbackMsg &msg)
+void WifiInternalEventDispatcher::updateP2pDeviceMacAddress(std::vector<WifiP2pDevice> &device)
+{
+    for (auto iter = device.begin(); iter != device.end(); ++iter) {
+        WifiMacAddrInfo macAddrInfo;
+        macAddrInfo.bssid = iter->GetDeviceAddress();
+        macAddrInfo.bssidType = iter->GetDeviceAddressType();
+        std::string randomMacAddr =
+            WifiSettings::GetInstance().GetMacAddrPairs(WifiMacAddrInfoType::P2P_MACADDR_INFO, macAddrInfo);
+        if (randomMacAddr.empty()) {
+            WIFI_LOGW("no record found, bssid:%{private}s, bssidType:%{public}d",
+                macAddrInfo.bssid.c_str(), macAddrInfo.bssidType);
+        } else {
+            WIFI_LOGD("find the record, bssid:%{private}s, bssidType:%{public}d, randomMac:%{private}s",
+                iter->GetDeviceAddress().c_str(), iter->GetDeviceAddressType(), randomMacAddr.c_str());
+            if (iter->GetDeviceAddressType() == REAL_DEVICE_ADDRESS) {
+                iter->SetDeviceAddress(randomMacAddr);
+                iter->SetDeviceAddressType(RANDOM_DEVICE_ADDRESS);
+                WIFI_LOGD("the record is updated, bssid:%{private}s, bssidType:%{public}d",
+                    iter->GetDeviceAddress().c_str(), iter->GetDeviceAddressType());
+            }
+        }
+    }
+}
+
+void WifiInternalEventDispatcher::SendP2pCallbackMsg(sptr<IWifiP2pCallback> &callback, const WifiEventCallbackMsg &msg,
+    int pid, int uid)
 {
     if (callback == nullptr) {
+        WIFI_LOGE("%{private}s: callback is null", __func__);
         return;
     }
 
@@ -735,8 +773,22 @@ void WifiInternalEventDispatcher::SendP2pCallbackMsg(sptr<IWifiP2pCallback> &cal
             callback->OnP2pThisDeviceChanged(msg.p2pDevice);
             break;
         case WIFI_CBK_MSG_PEER_CHANGE:
-            callback->OnP2pPeersChanged(msg.device);
-            break;
+            {
+            #ifdef SUPPORT_RANDOM_MAC_ADDR
+                if ((pid != 0) && (uid != 0)) {
+                    std::vector<WifiP2pDevice> deviceVec = msg.device;
+                    if (WifiPermissionUtils::VerifyGetWifiPeersMacPermission(pid, uid) == PERMISSION_DENIED) {
+                        WIFI_LOGD("%{public}s: GET_WIFI_PEERS_MAC PERMISSION_DENIED, pid: %{public}d, uid: %{public}d",
+                            __func__, pid, uid);
+                        updateP2pDeviceMacAddress(deviceVec);
+                    }
+                    callback->OnP2pPeersChanged(deviceVec);
+                }
+            #else
+                callback->OnP2pPeersChanged(msg.device);
+            #endif
+                break;
+            }
         case WIFI_CBK_MSG_SERVICE_CHANGE:
             callback->OnP2pServicesChanged(msg.serviceInfo);
             break;
@@ -766,7 +818,7 @@ void WifiInternalEventDispatcher::DealP2pCallbackMsg(
 
     auto callback = instance.GetSingleP2pCallback();
     if (callback != nullptr) {
-        SendP2pCallbackMsg(callback, msg);
+        SendP2pCallbackMsg(callback, msg, 0, 0);
     }
     instance.InvokeP2pCallbacks(msg);
     return;

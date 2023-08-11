@@ -1170,7 +1170,7 @@ public:
         std::vector<int> freqs;
         freqs.push_back(FREQ_5_GHZ);
         time_t now = time(nullptr);
-        ScanBandType scanBand = BAND_5GHZ_SCAN;
+        ScanBandType scanBand = SCAN_BAND_5_GHZ;
         ScanForbidMode scanForbidMode;
         scanForbidMode.scanScene = SCAN_SCENE_CONNECTED;
         scanForbidMode.scanMode = ScanMode::BAND_5GHZ_SCAN;
@@ -1334,7 +1334,7 @@ public:
         pScanService->scanTrustSceneIds.emplace(1);
         ScanForbidMode forbidMode;
         forbidMode.scanScene = SCAN_SCENE_SCREEN_OFF;
-        forbidMode.scanMode = ScanMode::APP_FOREGROUND_SCAN;;
+        forbidMode.scanMode = ScanMode::APP_FOREGROUND_SCAN;
         pScanService->scanControlInfo.scanForbidList.push_back(forbidMode);
         EXPECT_EQ(pScanService->AllowScanDuringScreenOff(scanMode), true);
     }
@@ -2051,7 +2051,7 @@ public:
         ScanForbidMode scanForbidMode;
         scanForbidMode.scanScene = SCAN_SCENE_SCANNING;
         scanForbidMode.scanMode = ScanMode::SYS_FOREGROUND_SCAN;
-        pScanService->scanControlInfo.scanIntervalList.push_back(scanForbidMode);
+        pScanService->scanControlInfo.scanForbidList.push_back(scanForbidMode);
         time_t now = time(nullptr);
         customIter.emplace(SCAN_SCENE_SCANNING, now);
         auto customIters = customIter.begin();
@@ -2064,7 +2064,7 @@ public:
         ScanForbidMode scanForbidMode;
         scanForbidMode.scanScene = MIN_SCAN_INTERVAL;
         scanForbidMode.scanMode = ScanMode::SYS_FOREGROUND_SCAN;
-        pScanService->scanControlInfo.scanIntervalList.push_back(scanForbidMode);
+        pScanService->scanControlInfo.scanForbidList.push_back(scanForbidMode);
         time_t now = time(nullptr);
         customIter.emplace(SCAN_SCENE_SCANNING, now);
         auto customIters = customIter.begin();
@@ -2079,7 +2079,7 @@ public:
         scanForbidMode.scanMode = ScanMode::SYS_FOREGROUND_SCAN;
         scanForbidMode.forbidCount = -1;
         scanForbidMode.forbidTime = 0;
-        pScanService->scanControlInfo.scanIntervalList.push_back(scanForbidMode);
+        pScanService->scanControlInfo.scanForbidList.push_back(scanForbidMode);
         time_t now = time(nullptr);
         customIter.emplace(SCAN_SCENE_SCANNING, now);
         auto customIters = customIter.begin();
@@ -2094,7 +2094,7 @@ public:
         scanForbidMode.scanMode = ScanMode::SYS_FOREGROUND_SCAN;
         scanForbidMode.forbidCount = 1;
         scanForbidMode.forbidTime = STATUS;
-        pScanService->scanControlInfo.scanIntervalList.push_back(scanForbidMode);
+        pScanService->scanControlInfo.scanForbidList.push_back(scanForbidMode);
         time_t now = time(nullptr);
         customIter.emplace(SCAN_SCENE_SCANNING, now);
         pScanService->customSceneForbidCount = STATUS;
@@ -3225,7 +3225,7 @@ HWTEST_F(ScanServiceTest, GetAllowBandFreqsControlInfoSuccess2, TestSize.Level1)
 */
 HWTEST_F(ScanServiceTest, AllowScanDuringScreenOffSuccess1, TestSize.Level1)
 {
-    AllowScanDuringScreenOffSuccess1();AllowScanDuringScreenOffSuccess
+    AllowScanDuringScreenOffSuccess1();
 }
 /**
  * @tc.name: GetAllowBandFreqsControlInfoSuccess2

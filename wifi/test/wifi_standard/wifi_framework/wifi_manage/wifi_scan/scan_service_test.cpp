@@ -1138,6 +1138,47 @@ public:
         std::vector<int> freqs;
         freqs.push_back(FREQ_2_DOT_4_GHZ);
         ScanBandType scanBand = SCAN_BAND_24_GHZ;
+        ScanForbidMode scanForbidMode, forbidMode;
+        scanForbidMode.scanScene = SCAN_SCENE_ALL;
+        scanForbidMode.scanMode = ScanMode::BAND_24GHZ_SCAN;
+        forbidMode.scanScene = SCAN_SCENE_ALL;
+        forbidMode.scanMode = ScanMode::BAND_5GHZ_SCAN;
+        pScanService->scanControlInfo.scanForbidList.push_back(scanForbidMode);
+        pScanService->scanControlInfo.scanForbidList.push_back(forbidMode);
+        pScanService->GetAllowBandFreqsControlInfo(scanBand, freqs);
+    }
+
+    void GetAllowBandFreqsControlInfoSuccess1()
+    {
+        std::vector<int> freqs;
+        freqs.push_back(FREQ_2_DOT_4_GHZ);
+        time_t now = time(nullptr);
+        ScanBandType scanBand = SCAN_BAND_24_GHZ;
+        ScanForbidMode scanForbidMode;
+        scanForbidMode.scanScene = SCAN_SCENE_CONNECTED;
+        scanForbidMode.scanMode = ScanMode::BAND_24GHZ_SCAN;
+        scanForbidMode.forbidTime = 0;
+        scanForbidMode.forbidCount = 0;
+        pScanService->scanControlInfo.scanForbidList.push_back(scanForbidMode);
+        pScanService->customSceneTimeMap.emplace(SCAN_SCENE_CONNECTED, now);
+        pScanService->staStatus = static_cast<int>(OperateResState::CONNECT_AP_CONNECTED);
+        pScanService->GetAllowBandFreqsControlInfo(scanBand, freqs);
+    }
+
+    void GetAllowBandFreqsControlInfoSuccess2()
+    {
+        std::vector<int> freqs;
+        freqs.push_back(FREQ_5_GHZ);
+        time_t now = time(nullptr);
+        ScanBandType scanBand = BAND_5GHZ_SCAN;
+        ScanForbidMode scanForbidMode;
+        scanForbidMode.scanScene = SCAN_SCENE_CONNECTED;
+        scanForbidMode.scanMode = ScanMode::BAND_5GHZ_SCAN;
+        scanForbidMode.forbidTime = 0;
+        scanForbidMode.forbidCount = 0;
+        pScanService->scanControlInfo.scanForbidList.push_back(scanForbidMode);
+        pScanService->customSceneTimeMap.emplace(SCAN_SCENE_CONNECTED, now);
+        pScanService->staStatus = static_cast<int>(OperateResState::CONNECT_AP_CONNECTED);
         pScanService->GetAllowBandFreqsControlInfo(scanBand, freqs);
     }
 
@@ -1266,6 +1307,38 @@ public:
         EXPECT_EQ(pScanService->AllowScanDuringScreenOff(scanMode), true);
     }
 
+    void AllowScanDuringScreenOffSuccess1()
+    {
+        ScanMode scanMode = ScanMode::SYS_FOREGROUND_SCAN;
+        pScanService->SetScanTrustMode();
+        pScanService->scanTrustSceneIds.emplace(0);
+        EXPECT_EQ(pScanService->AllowScanDuringScreenOff(scanMode), true);
+    }
+
+    void AllowScanDuringScreenOffSuccess2()
+    {
+        ScanMode scanMode = ScanMode::SYS_FOREGROUND_SCAN;
+        pScanService->SetScanTrustMode();
+        pScanService->scanTrustSceneIds.emplace(1);
+        ScanForbidMode forbidMode;
+        forbidMode.scanScene = SCAN_SCENE_SCANNING;
+        forbidMode.scanMode = scanMode;
+        pScanService->scanControlInfo.scanForbidList.push_back(forbidMode);
+        EXPECT_EQ(pScanService->AllowScanDuringScreenOff(scanMode), true);
+    }
+
+    void AllowScanDuringScreenOffSuccess3()
+    {
+        ScanMode scanMode = ScanMode::SYS_FOREGROUND_SCAN;
+        pScanService->ResetToNonTrustMode();
+        pScanService->scanTrustSceneIds.emplace(1);
+        ScanForbidMode forbidMode;
+        forbidMode.scanScene = SCAN_SCENE_SCREEN_OFF;
+        forbidMode.scanMode = ScanMode::APP_FOREGROUND_SCAN;;
+        pScanService->scanControlInfo.scanForbidList.push_back(forbidMode);
+        EXPECT_EQ(pScanService->AllowScanDuringScreenOff(scanMode), true);
+    }
+
     void AllowScanDuringScreenOffFail1()
     {
         ScanMode scanMode = ScanMode::SYS_FOREGROUND_SCAN;
@@ -1342,6 +1415,34 @@ public:
     void AllowScanDuringCustomSceneSuccess()
     {
         ScanMode scanMode = ScanMode::SYS_FOREGROUND_SCAN;
+        EXPECT_EQ(pScanService->AllowScanDuringCustomScene(scanMode), true);
+    }
+
+    void AllowScanDuringCustomSceneSuccess1()
+    {
+        const int staScene = 0;
+        ScanMode scanMode = ScanMode::SYS_FOREGROUND_SCAN;
+        time_t now = time(nullptr);
+        if (now < 0) {
+            return;
+        }
+        pScanService->customSceneTimeMap.emplace(staScene, now);
+        pScanService->SetScanTrustMode();
+        pScanService->scanTrustSceneIds.emplace(0);
+        EXPECT_EQ(pScanService->AllowScanDuringCustomScene(scanMode), true);
+    }
+
+    void AllowScanDuringCustomSceneSuccess2()
+    {
+        const int staScene = 0;
+        ScanMode scanMode = ScanMode::SYS_FOREGROUND_SCAN;
+        time_t now = time(nullptr);
+        if (now < 0) {
+            return;
+        }
+        pScanService->customSceneTimeMap.emplace(staScene, now);
+        pScanService->SetScanTrustMode();
+        pScanService->scanTrustSceneIds.emplace(1);
         EXPECT_EQ(pScanService->AllowScanDuringCustomScene(scanMode), true);
     }
 
@@ -1942,6 +2043,63 @@ public:
         EXPECT_TRUE(pScanService->AllowExternCustomSceneCheck(customIters, 0, ScanMode::SYSTEM_TIMER_SCAN) == true);
         pScanService->scanControlInfo.scanIntervalList.push_back(mode);
         EXPECT_TRUE(pScanService->AllowExternCustomSceneCheck(customIters, 0, ScanMode::SYSTEM_TIMER_SCAN) == false);
+    }
+
+    void AllowCustomSceneCheckTest1()
+    {
+        std::map<int, time_t> customIter;
+        ScanForbidMode scanForbidMode;
+        scanForbidMode.scanScene = SCAN_SCENE_SCANNING;
+        scanForbidMode.scanMode = ScanMode::SYS_FOREGROUND_SCAN;
+        pScanService->scanControlInfo.scanIntervalList.push_back(scanForbidMode);
+        time_t now = time(nullptr);
+        customIter.emplace(SCAN_SCENE_SCANNING, now);
+        auto customIters = customIter.begin();
+        EXPECT_TRUE(pScanService->AllowCustomSceneCheck(customIters, ScanMode::SYSTEM_TIMER_SCAN) == true);
+    }
+
+    void AllowCustomSceneCheckTest2()
+    {
+        std::map<int, time_t> customIter;
+        ScanForbidMode scanForbidMode;
+        scanForbidMode.scanScene = MIN_SCAN_INTERVAL;
+        scanForbidMode.scanMode = ScanMode::SYS_FOREGROUND_SCAN;
+        pScanService->scanControlInfo.scanIntervalList.push_back(scanForbidMode);
+        time_t now = time(nullptr);
+        customIter.emplace(SCAN_SCENE_SCANNING, now);
+        auto customIters = customIter.begin();
+        EXPECT_TRUE(pScanService->AllowCustomSceneCheck(customIters, ScanMode::SYSTEM_TIMER_SCAN) == true);
+    }
+
+    void AllowCustomSceneCheckTest3()
+    {
+        std::map<int, time_t> customIter;
+        ScanForbidMode scanForbidMode;
+        scanForbidMode.scanScene = MIN_SCAN_INTERVAL;
+        scanForbidMode.scanMode = ScanMode::SYS_FOREGROUND_SCAN;
+        scanForbidMode.forbidCount = -1;
+        scanForbidMode.forbidTime = 0;
+        pScanService->scanControlInfo.scanIntervalList.push_back(scanForbidMode);
+        time_t now = time(nullptr);
+        customIter.emplace(SCAN_SCENE_SCANNING, now);
+        auto customIters = customIter.begin();
+        EXPECT_TRUE(pScanService->AllowCustomSceneCheck(customIters, ScanMode::SYSTEM_TIMER_SCAN) == true);
+    }
+
+    void AllowCustomSceneCheckTest4()
+    {
+        std::map<int, time_t> customIter;
+        ScanForbidMode scanForbidMode;
+        scanForbidMode.scanScene = MIN_SCAN_INTERVAL;
+        scanForbidMode.scanMode = ScanMode::SYS_FOREGROUND_SCAN;
+        scanForbidMode.forbidCount = 1;
+        scanForbidMode.forbidTime = STATUS;
+        pScanService->scanControlInfo.scanIntervalList.push_back(scanForbidMode);
+        time_t now = time(nullptr);
+        customIter.emplace(SCAN_SCENE_SCANNING, now);
+        pScanService->customSceneForbidCount = STATUS;
+        auto customIters = customIter.begin();
+        EXPECT_TRUE(pScanService->AllowCustomSceneCheck(customIters, ScanMode::SYSTEM_TIMER_SCAN) == true);
     }
 };
 
@@ -2998,6 +3156,116 @@ HWTEST_F(ScanServiceTest, ResetToNonTrustMode_001, TestSize.Level1)
 HWTEST_F(ScanServiceTest, IsScanningWithParam_001, TestSize.Level1)
 {
     IsScanningWithParamTest();
+}
+/**
+ * @tc.name: AllowCustomSceneCheck_001
+ * @tc.desc: AllowCustomSceneCheck()
+ * @tc.type: FUNC
+ * @tc.require: issue
+*/
+HWTEST_F(ScanServiceTest, AllowCustomSceneCheck_001, TestSize.Level1)
+{
+    AllowCustomSceneCheckTest1();
+}
+/**
+ * @tc.name: AllowCustomSceneCheck_002
+ * @tc.desc: AllowCustomSceneCheck()
+ * @tc.type: FUNC
+ * @tc.require: issue
+*/
+HWTEST_F(ScanServiceTest, AllowCustomSceneCheck_002, TestSize.Level1)
+{
+    AllowCustomSceneCheckTest2();
+}
+/**
+ * @tc.name: AllowCustomSceneCheck_003
+ * @tc.desc: AllowCustomSceneCheck()
+ * @tc.type: FUNC
+ * @tc.require: issue
+*/
+HWTEST_F(ScanServiceTest, AllowCustomSceneCheck_003, TestSize.Level1)
+{
+    AllowCustomSceneCheckTest3();
+}
+/**
+ * @tc.name: AllowCustomSceneCheck_004
+ * @tc.desc: AllowCustomSceneCheck()
+ * @tc.type: FUNC
+ * @tc.require: issue
+*/
+HWTEST_F(ScanServiceTest, AllowCustomSceneCheck_004, TestSize.Level1)
+{
+    AllowCustomSceneCheckTest4();
+}
+/**
+ * @tc.name: GetAllowBandFreqsControlInfoSuccess1
+ * @tc.desc: GetAllowBandFreqsControlInfo()
+ * @tc.type: FUNC
+ * @tc.require: issue
+*/
+HWTEST_F(ScanServiceTest, GetAllowBandFreqsControlInfoSuccess1, TestSize.Level1)
+{
+    GetAllowBandFreqsControlInfoSuccess1();
+}
+/**
+ * @tc.name: GetAllowBandFreqsControlInfoSuccess2
+ * @tc.desc: GetAllowBandFreqsControlInfo()
+ * @tc.type: FUNC
+ * @tc.require: issue
+*/
+HWTEST_F(ScanServiceTest, GetAllowBandFreqsControlInfoSuccess2, TestSize.Level1)
+{
+    GetAllowBandFreqsControlInfoSuccess2();
+}
+/**
+ * @tc.name: GetAllowBandFreqsControlInfoSuccess2
+ * @tc.desc: GetAllowBandFreqsControlInfo()
+ * @tc.type: FUNC
+ * @tc.require: issue
+*/
+HWTEST_F(ScanServiceTest, AllowScanDuringScreenOffSuccess1, TestSize.Level1)
+{
+    AllowScanDuringScreenOffSuccess1();AllowScanDuringScreenOffSuccess
+}
+/**
+ * @tc.name: GetAllowBandFreqsControlInfoSuccess2
+ * @tc.desc: GetAllowBandFreqsControlInfo()
+ * @tc.type: FUNC
+ * @tc.require: issue
+*/
+HWTEST_F(ScanServiceTest, AllowScanDuringScreenOffSuccess2, TestSize.Level1)
+{
+    AllowScanDuringScreenOffSuccess2();
+}
+/**
+ * @tc.name: GetAllowBandFreqsControlInfoSuccess2
+ * @tc.desc: GetAllowBandFreqsControlInfo()
+ * @tc.type: FUNC
+ * @tc.require: issue
+*/
+HWTEST_F(ScanServiceTest, AllowScanDuringScreenOffSuccess3, TestSize.Level1)
+{
+    AllowScanDuringScreenOffSuccess3();
+}
+/**
+ * @tc.name: AllowScanDuringCustomSceneSuccess2
+ * @tc.desc: AllowScanDuringCustomScene()
+ * @tc.type: FUNC
+ * @tc.require: issue
+*/
+HWTEST_F(ScanServiceTest, AllowScanDuringCustomSceneSuccess1, TestSize.Level1)
+{
+    AllowScanDuringCustomSceneSuccess1();
+}
+/**
+ * @tc.name: AllowScanDuringCustomSceneSuccess2
+ * @tc.desc: AllowScanDuringCustomScene()
+ * @tc.type: FUNC
+ * @tc.require: issue
+*/
+HWTEST_F(ScanServiceTest, AllowScanDuringCustomSceneSuccess2, TestSize.Level1)
+{
+    AllowScanDuringCustomSceneSuccess2();
 }
 } // namespace Wifi
 } // namespace OHOS

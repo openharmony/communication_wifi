@@ -93,6 +93,68 @@ HWTEST_F(DhcpdInterfaceTest, StartDhcpServer_001, TestSize.Level1)
     StartDhcpServerTest();
 }
 /**
+ * @tc.name: StartDhcpServer_002
+ * @tc.desc: StartDhcpServer with name hava p2p
+ * @tc.type: FUNC
+ * @tc.require: issue
+*/
+HWTEST_F(DhcpdInterfaceTest, StartDhcpServer_002, TestSize.Level1)
+{
+    WIFI_LOGI("StartDhcpServer_002 enter");
+    std::string ifaceName = "p2p";
+    bool isIpV4 = false;
+    Ipv4Address ipv4(Ipv4Address::INVALID_INET_ADDRESS);
+    Ipv6Address ipv6(Ipv6Address::INVALID_INET6_ADDRESS);
+    pDhcpdInterface->StartDhcpServer(ifaceName, ipv4, ipv6, "", isIpV4);
+}
+/**
+ * @tc.name: StartDhcpServer_003
+ * @tc.desc: StartDhcpServer with ipAddress fail
+ * @tc.type: FUNC
+ * @tc.require: issue
+*/
+HWTEST_F(DhcpdInterfaceTest, StartDhcpServer_003, TestSize.Level1)
+{
+    WIFI_LOGI("StartDhcpServer_003 enter");
+    bool isIpV4 = true;
+    std::string ifaceName = "wlan0";
+    Ipv4Address ipv4(Ipv4Address::INVALID_INET_ADDRESS);
+    Ipv6Address ipv6(Ipv6Address::INVALID_INET6_ADDRESS);
+    std::string ipAddress = "10";
+    pDhcpdInterface->StartDhcpServer(ifaceName, ipv4, ipv6, ipAddress, isIpV4);
+}
+/**
+ * @tc.name: StartDhcpServer_004
+ * @tc.desc: StartDhcpServer with ipAddress succeed
+ * @tc.type: FUNC
+ * @tc.require: issue
+*/
+HWTEST_F(DhcpdInterfaceTest, StartDhcpServer_004, TestSize.Level1)
+{
+    WIFI_LOGI("StartDhcpServer_004 enter");
+    bool isIpV4 = true;
+    std::string ifaceName = "wlan0";
+    Ipv4Address ipv4(Ipv4Address::INVALID_INET_ADDRESS);
+    Ipv6Address ipv6(Ipv6Address::INVALID_INET6_ADDRESS);
+    std::string ipAddress = "192.168.62.0";
+    pDhcpdInterface->StartDhcpServer(ifaceName, ipv4, ipv6, ipAddress, isIpV4);
+}
+/**
+ * @tc.name: StartDhcpServer_005
+ * @tc.desc: StartDhcpServer wifh ipAddress fail
+ * @tc.type: FUNC
+ * @tc.require: issue
+*/
+HWTEST_F(DhcpdInterfaceTest, StartDhcpServer_005, TestSize.Level1)
+{
+    WIFI_LOGI("StartDhcpServer_005 enter");
+    bool isIpV4 = true;
+    std::string ifaceName = "p2p";
+    Ipv4Address ipv4(Ipv4Address::INVALID_INET_ADDRESS);
+    Ipv6Address ipv6(Ipv6Address::INVALID_INET6_ADDRESS);
+    pDhcpdInterface->StartDhcpServer(ifaceName, ipv4, ipv6, "", isIpV4);
+}
+/**
  * @tc.name: SetDhcpEventFunc_001
  * @tc.desc: SetDhcpEventFunc with  pResultNotify == nullptr
  * @tc.type: FUNC
@@ -202,6 +264,8 @@ HWTEST_F(DhcpdInterfaceTest, StopDhcpServer_001, TestSize.Level1)
     EXPECT_FALSE(pDhcpdInterface->StopDhcpServer(ifaceName));
     ifaceName = "wlan0";
     EXPECT_FALSE(pDhcpdInterface->StopDhcpServer(ifaceName));
+    StartDhcpServerTest();
+    EXPECT_TRUE(pDhcpdInterface->StopDhcpServer(ifaceName));
 }
 }  // namespace Wifi
 }  // namespace OHOS

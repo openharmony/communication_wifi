@@ -47,7 +47,7 @@ using ScanCallbackInfo = std::map<sptr<IRemoteObject>, WifiCallingInfo>;
 using HotspotCallbackMapType = std::map<sptr<IRemoteObject>, sptr<IWifiHotspotCallback>>;
 using HotspotCallbackInfo = std::map<sptr<IRemoteObject>, std::unordered_set<int>>;
 using P2pCallbackMapType = std::map<sptr<IRemoteObject>, sptr<IWifiP2pCallback>>;
-using P2pCallbackInfo = std::map<sptr<IRemoteObject>, std::unordered_set<int>>;
+using P2pCallbackInfo = std::map<sptr<IRemoteObject>, WifiCallingInfo>;
 using CallbackEventPermissionMap = std::multimap<int, std::pair<std::function<int()>, std::string>>;
 
 class WifiInternalEventDispatcher {
@@ -115,7 +115,7 @@ public:
     sptr<IWifiHotspotCallback> GetSingleHotspotCallback(int id) const;
     int RemoveHotspotCallback(const sptr<IRemoteObject> &remote, int id = 0);
     bool HasHotspotRemote(const sptr<IRemoteObject> &remote, int id = 0);
-    ErrCode AddP2pCallback(const sptr<IRemoteObject> &remote, const sptr<IWifiP2pCallback> &callback,
+    ErrCode AddP2pCallback(const sptr<IRemoteObject> &remote, const sptr<IWifiP2pCallback> &callback, int pid,
         const std::string &eventName);
     int SetSingleP2pCallback(const sptr<IWifiP2pCallback> &callback);
     sptr<IWifiP2pCallback> GetSingleP2pCallback() const;
@@ -132,7 +132,9 @@ private:
     static void DealScanCallbackMsg(WifiInternalEventDispatcher &pInstance, const WifiEventCallbackMsg &msg);
     static void DealHotspotCallbackMsg(WifiInternalEventDispatcher &pInstance, const WifiEventCallbackMsg &msg);
     static void DealP2pCallbackMsg(WifiInternalEventDispatcher &pInstance, const WifiEventCallbackMsg &msg);
-    static void SendP2pCallbackMsg(sptr<IWifiP2pCallback> &callback, const WifiEventCallbackMsg &msg);
+    static void SendP2pCallbackMsg(sptr<IWifiP2pCallback> &callback, const WifiEventCallbackMsg &msg,
+        int pid, int uid);
+    static void updateP2pDeviceMacAddress(std::vector<WifiP2pDevice> &device);
     static void PublishConnStateChangedEvent(int state, const WifiLinkedInfo &info);
     static void PublishWifiStateChangedEvent(int state);
     static void PublishRssiValueChangedEvent(int state);

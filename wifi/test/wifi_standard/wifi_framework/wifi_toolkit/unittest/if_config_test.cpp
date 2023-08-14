@@ -35,6 +35,22 @@ public:
     {}
 };
 /**
+ * @tc.name: ExecCommand
+ * @tc.desc: test with overSize
+ * @tc.type: FUNC
+ * @tc.require: issue
+*/
+HWTEST_F(IfconfigTest, ExecCommand, TestSize.Level1)
+{
+    WIFI_LOGI("ExecCommand enter");
+    std::vector<std::string> ipRouteCmd;
+    ipRouteCmd.clear();
+    for(int i = 0;i < 33;i++){
+        ipRouteCmd.push_back("addr");
+    }
+    EXPECT_FALSE(IfConfig::GetInstance().ExecCommand(ipRouteCmd));
+}
+/**
  * @tc.name: AddIpAddr_001
  * @tc.desc: test with error ifName
  * @tc.type: FUNC
@@ -62,6 +78,22 @@ HWTEST_F(IfconfigTest, AddIpAddr_002, TestSize.Level1)
     std::string ipAddr = "";
     std::string mask = "";
     int ipType = static_cast<int>(IpType::IPTYPE_IPV6);
+    IfConfig::GetInstance().AddIpAddr(ifName, ipAddr, mask, ipType);
+}
+}
+/**
+ * @tc.name: AddIpAddr_003
+ * @tc.desc: test with IpType IPTYPE_IPV4
+ * @tc.type: FUNC
+ * @tc.require: issue
+*/
+HWTEST_F(IfconfigTest, AddIpAddr_003, TestSize.Level1)
+{
+    WIFI_LOGI("AddIpAddr_003");
+    std::string ifName = "wlan0";
+    std::string ipAddr = "";
+    std::string mask = "";
+    int ipType = static_cast<int>(IpType::IPTYPE_IPV4);
     IfConfig::GetInstance().AddIpAddr(ifName, ipAddr, mask, ipType);
 }
 /**

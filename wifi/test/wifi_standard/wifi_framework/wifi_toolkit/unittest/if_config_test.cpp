@@ -80,7 +80,6 @@ HWTEST_F(IfconfigTest, AddIpAddr_002, TestSize.Level1)
     int ipType = static_cast<int>(IpType::IPTYPE_IPV6);
     IfConfig::GetInstance().AddIpAddr(ifName, ipAddr, mask, ipType);
 }
-}
 /**
  * @tc.name: AddIpAddr_003
  * @tc.desc: test with IpType IPTYPE_IPV4

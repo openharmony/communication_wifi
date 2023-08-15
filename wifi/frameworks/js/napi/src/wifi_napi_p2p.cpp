@@ -21,7 +21,7 @@ namespace OHOS {
 namespace Wifi {
 DEFINE_WIFILOG_LABEL("WifiNAPIP2p");
 
-std::unique_ptr<WifiP2p> wifiP2pPtr = WifiP2p::GetInstance(WIFI_P2P_ABILITY_ID);
+std::shared_ptr<WifiP2p> wifiP2pPtr = WifiP2p::GetInstance(WIFI_P2P_ABILITY_ID);
 static void DeviceInfoToJs(const napi_env& env, const WifiP2pDevice& device, napi_value& result)
 {
     SetValueUtf8String(env, "deviceName", device.GetDeviceName().c_str(), result);

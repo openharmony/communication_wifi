@@ -24,11 +24,9 @@ namespace OHOS {
 namespace Wifi {
 class WifiScan {
 public:
-    static std::unique_ptr<WifiScan> CreateWifiScan(int system_ability_id);
-    static std::unique_ptr<WifiScan> GetInstance(int system_ability_id);
+    static std::shared_ptr<WifiScan> GetInstance(int system_ability_id);
 
-    virtual ~WifiScan()
-    {}
+    virtual ~WifiScan();
 
     /**
      * @Description Set the Scan Control Info object

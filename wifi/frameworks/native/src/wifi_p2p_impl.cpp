@@ -31,14 +31,15 @@ namespace Wifi {
         }                                             \
     } while (0)
 
-WifiP2pImpl::WifiP2pImpl(int systemAbilityId) : systemAbilityId_(systemAbilityId), client_(nullptr)
+WifiP2pImpl::WifiP2pImpl() : client_(nullptr)
 {}
 
 WifiP2pImpl::~WifiP2pImpl()
 {}
 
-bool WifiP2pImpl::Init(void)
+bool WifiP2pImpl::Init(int systemAbilityId)
 {
+    systemAbilityId_ = systemAbilityId;
     return true;
 }
 

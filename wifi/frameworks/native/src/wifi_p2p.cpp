@@ -20,28 +20,12 @@ DEFINE_WIFILOG_P2P_LABEL("WifiP2p");
 
 namespace OHOS {
 namespace Wifi {
-NO_SANITIZE("cfi") std::unique_ptr<WifiP2p> WifiP2p::CreateWifiP2p(int systemAbilityId)
+NO_SANITIZE("cfi") std::shared_ptr<WifiP2p> WifiP2p::GetInstance(int systemAbilityId)
 {
-    std::unique_ptr<WifiP2pImpl> impl = std::make_unique<WifiP2pImpl>(systemAbilityId);
-    if (impl != nullptr) {
-        if (impl->Init()) {
-            WIFI_LOGI("new p2p successfully!");
-            return impl;
-        }
-    }
-
-    WIFI_LOGE("new wifi p2p failed");
-    return nullptr;
-}
-
-NO_SANITIZE("cfi") std::unique_ptr<WifiP2p> WifiP2p::GetInstance(int systemAbilityId)
-{
-    std::unique_ptr<WifiP2pImpl> impl = std::make_unique<WifiP2pImpl>(systemAbilityId);
-    if (impl != nullptr) {
-        if (impl->Init()) {
-            WIFI_LOGI("init p2p successfully!");
-            return impl;
-        }
+    std::shared_ptr<WifiP2pImpl> impl = DelayedSingleton<WifiP2pImpl>::GetInstance();
+    if (impl && impl->Init(systemAbilityId)) {
+        WIFI_LOGI("init p2p successfully!");
+        return impl;
     }
 
     WIFI_LOGE("new wifi p2p failed");
@@ -49,6 +33,8 @@ NO_SANITIZE("cfi") std::unique_ptr<WifiP2p> WifiP2p::GetInstance(int systemAbili
 }
 
 WifiP2p::~WifiP2p()
-{}
+{
+    DelayedSingleton<WifiP2pImpl>::DestroyInstance();
+}
 }  // namespace Wifi
 }  // namespace OHOS

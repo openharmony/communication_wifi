@@ -45,7 +45,7 @@ HWTEST_F(IfconfigTest, ExecCommand, TestSize.Level1)
     WIFI_LOGI("ExecCommand enter");
     std::vector<std::string> ipRouteCmd;
     ipRouteCmd.clear();
-    for(int i = 0;i < 33;i++){
+    for (int i = 0; i < 33; i++) {
         ipRouteCmd.push_back("addr");
     }
     EXPECT_FALSE(IfConfig::GetInstance().ExecCommand(ipRouteCmd));

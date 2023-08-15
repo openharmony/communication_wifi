@@ -34,7 +34,7 @@ namespace Wifi {
         }                                             \
     } while (0)
 
-WifiScanImpl::WifiScanImpl(int systemAbilityId) : systemAbilityId_(systemAbilityId), client_(nullptr)
+WifiScanImpl::WifiScanImpl() : client_(nullptr)
 {}
 
 WifiScanImpl::~WifiScanImpl()
@@ -44,7 +44,7 @@ WifiScanImpl::~WifiScanImpl()
 #endif
 }
 
-bool WifiScanImpl::Init()
+bool WifiScanImpl::Init(int systemAbilityId)
 {
 #ifdef OHOS_ARCH_LITE
     WifiScanProxy *scanProxy = WifiScanProxy::GetInstance();
@@ -60,6 +60,7 @@ bool WifiScanImpl::Init()
     client_ = scanProxy;
     return true;
 #else
+    systemAbilityId_ = systemAbilityId;
     return true;
 #endif
 }

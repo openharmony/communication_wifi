@@ -23,7 +23,7 @@
 constexpr int INVALID_VALUE = -1;
 
 DEFINE_WIFILOG_LABEL("WifiCP2P");
-std::unique_ptr<OHOS::Wifi::WifiP2p> wifiP2pPtr = OHOS::Wifi::WifiP2p::GetInstance(WIFI_P2P_ABILITY_ID);
+std::shared_ptr<OHOS::Wifi::WifiP2p> wifiP2pPtr = OHOS::Wifi::WifiP2p::GetInstance(WIFI_P2P_ABILITY_ID);
 
 NO_SANITIZE("cfi") WifiErrorCode EnableP2p()
 {

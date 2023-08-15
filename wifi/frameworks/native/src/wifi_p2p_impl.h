@@ -15,6 +15,7 @@
 #ifndef OHOS_WIFI_P2P_IMPL_H
 #define OHOS_WIFI_P2P_IMPL_H
 
+#include "singleton.h"
 #include "wifi_p2p.h"
 #include "wifi_p2p_proxy.h"
 #include "wifi_hid2d.h"
@@ -22,11 +23,10 @@
 namespace OHOS {
 namespace Wifi {
 class WifiP2pImpl : public WifiP2p, public Hid2d {
-public:
-    explicit WifiP2pImpl(int systemAbilityId);
-    ~WifiP2pImpl();
+    DECLARE_DELAYED_SINGLETON(WifiP2pImpl)
 
-    bool Init(void);
+public:
+    bool Init(int systemAbilityId);
 
     /**
      * @Description Enabling the P2P Mode

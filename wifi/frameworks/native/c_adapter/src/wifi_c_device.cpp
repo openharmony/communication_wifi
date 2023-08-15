@@ -31,8 +31,8 @@ static std::map<WifiSecurityType, std::string> g_secTypeKeyMgmtMap = {
     {WIFI_SEC_TYPE_SAE, "SAE"},
 };
 
-std::unique_ptr<OHOS::Wifi::WifiDevice> wifiDevicePtr = OHOS::Wifi::WifiDevice::GetInstance(WIFI_DEVICE_ABILITY_ID);
-std::unique_ptr<OHOS::Wifi::WifiScan> wifiScanPtr = OHOS::Wifi::WifiScan::GetInstance(WIFI_SCAN_ABILITY_ID);
+std::shared_ptr<OHOS::Wifi::WifiDevice> wifiDevicePtr = OHOS::Wifi::WifiDevice::GetInstance(WIFI_DEVICE_ABILITY_ID);
+std::shared_ptr<OHOS::Wifi::WifiScan> wifiScanPtr = OHOS::Wifi::WifiScan::GetInstance(WIFI_SCAN_ABILITY_ID);
 
 NO_SANITIZE("cfi") WifiErrorCode EnableWifi()
 {

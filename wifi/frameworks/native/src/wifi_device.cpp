@@ -21,28 +21,12 @@ DEFINE_WIFILOG_LABEL("WifiDevice");
 
 namespace OHOS {
 namespace Wifi {
-NO_SANITIZE("cfi") std::unique_ptr<WifiDevice> WifiDevice::CreateWifiDevice(int systemAbilityId)
+NO_SANITIZE("cfi") std::shared_ptr<WifiDevice> WifiDevice::GetInstance(int systemAbilityId)
 {
-    std::unique_ptr<WifiDeviceImpl> device = std::make_unique<WifiDeviceImpl>(systemAbilityId);
-    if (device != nullptr) {
-        if (device->Init()) {
-            WIFI_LOGI("new device successfully!");
-            return device;
-        }
-    }
-
-    WIFI_LOGE("new wifi device failed");
-    return nullptr;
-}
-
-NO_SANITIZE("cfi") std::unique_ptr<WifiDevice> WifiDevice::GetInstance(int systemAbilityId)
-{
-    std::unique_ptr<WifiDeviceImpl> device = std::make_unique<WifiDeviceImpl>(systemAbilityId);
-    if (device != nullptr) {
-        if (device->Init()) {
-            WIFI_LOGI("init successfully!");
-            return device;
-        }
+    std::shared_ptr<WifiDeviceImpl> device = DelayedSingleton<WifiDeviceImpl>::GetInstance();
+    if (device && device->Init(systemAbilityId)) {
+        WIFI_LOGI("init successfully!");
+        return device;
     }
 
     WIFI_LOGE("new wifi device failed");
@@ -50,6 +34,8 @@ NO_SANITIZE("cfi") std::unique_ptr<WifiDevice> WifiDevice::GetInstance(int syste
 }
 
 WifiDevice::~WifiDevice()
-{}
+{
+    DelayedSingleton<WifiDeviceImpl>::DestroyInstance();
+}
 }  // namespace Wifi
 }  // namespace OHOS

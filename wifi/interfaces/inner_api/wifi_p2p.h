@@ -24,8 +24,7 @@ namespace OHOS {
 namespace Wifi {
 class WifiP2p {
 public:
-    static std::unique_ptr<WifiP2p> CreateWifiP2p(int system_ability_id);
-    static std::unique_ptr<WifiP2p> GetInstance(int system_ability_id);
+    static std::shared_ptr<WifiP2p> GetInstance(int system_ability_id);
 
     virtual ~WifiP2p();
 

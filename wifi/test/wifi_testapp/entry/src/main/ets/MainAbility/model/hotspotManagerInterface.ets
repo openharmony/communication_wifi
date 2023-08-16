@@ -36,6 +36,7 @@ export function testEnableHotspotManager() {
       message = "热点已经使能"
     } else {
       wifiManager.enableHotspot()
+      //      enableHotspot的返回值为void
       message = "热点使能执行结果：true"
       //    if(ret){
       //      message ="热点使能执行结果：" + ret;
@@ -63,6 +64,7 @@ export function testDisableHotspotManager() {
       message = '热点还未使能';
     } else {
       wifiManager.disableHotspot();
+      //      disableHotspot的返回值为void
       message = "热点去使能执行结果：true"
       //    if (ret) {
       //      message = "热点去使能执行结果：" + ret;
@@ -121,18 +123,18 @@ export function testIsHostActiveManager(): string {
 export function testSetHotspotConfigManager(): string {
   try {
     let message = "SetHotspotConfig test"
-    let ssid = "testApp"
+    let ssid = "testApp123"
     let securityType = 3
     let band = 1;
     let preSharedKey = "12345678"
     let maxConn = 3
     let channel = 6
     // TODO: 设备调试时候需要打开
-    //  let ssid1 =AppStorage.Get("ssid1")
-    //  let securityType1=AppStorage.Get("securityTpye1")
-    //  let band1 = AppStorage.Get("band1")
-    //  let preSharedKey1 = AppStorage.Get("preSharedKey1")
-    //  let maxConn1 = AppStorage.Get("maxConn1")
+    ssid = AppStorage.Get( "h_ssid1" )
+    //  let securityType=AppStorage.Get("h_securityType1")
+    //  let band = AppStorage.Get("h_band1")
+    //  let preSharedKey = AppStorage.Get("h_preSharedKey1")
+    //  let maxConn = AppStorage.Get("h_maxConn1")
     let config = {
       ssid : ssid ,
       securityType : securityType ,
@@ -142,7 +144,9 @@ export function testSetHotspotConfigManager(): string {
       channel : channel
     }
     let ret = wifiManager.setHotspotConfig( config )
-    message = "SetHotspotConfig is " + ret
+    //      setHotspotConfig的返回值为void
+    //    message = "SetHotspotConfig is " + ret
+    message = "SetHotspotConfig 调用成功"
     prompt.showToast( { message : message } )
     return message
   } catch( err ) {

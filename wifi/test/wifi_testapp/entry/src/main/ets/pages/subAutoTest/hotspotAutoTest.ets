@@ -39,6 +39,21 @@ struct HotspotAutoTest {
   @State changeIndex: number = - 1
   //  @State autoTextMessage: string ="None";
   @StorageLink( "hotspotAutoTestMessage" ) hotspotAutoTestMessage: string = ""
+  @State h_ssid: string = "testApp1";
+  @State h_securityType: number = 3;
+  @State h_band: number = 2;
+  @State h_preSharedKey: string = "12345678";
+  @State h_maxConn: number = 3 ;
+  @State h_channel: number = 36 ;
+
+  aboutToAppear() {
+    AppStorage.SetOrCreate( "h_ssid" , this.h_ssid )
+    AppStorage.SetOrCreate( "h_securityType" , this.h_securityType )
+    AppStorage.SetOrCreate( "h_band" , this.h_band )
+    AppStorage.SetOrCreate( "h_preSharedKey" , this.h_preSharedKey )
+    AppStorage.SetOrCreate( "h_maxConn" , this.h_maxConn )
+    AppStorage.SetOrCreate( "h_channel" , this.h_channel )
+  }
 
   build() {
     Column() {
@@ -119,8 +134,9 @@ struct HotspotAutoTest {
           let hotspotAutoTestMessage = ""
 
           //拼装数组
-          let hotspotAutoArray = [ { name : "testSetLocalName" , para : [ "DaYuBlue" ] },
-                                   { name : "testSetBluetoothScanMode" , para : [ 4, 0 ] } ]
+          let hotspotAutoArray = [ /*{ name : "testSetLocalName" , para : [ "DaYuBlue" ] },
+                                   { name : "testSetBluetoothScanMode" , para : [ 4, 0 ] } */
+          ]
           let Interface = HotspotAutoTestCase.map( i => {
             let para = hotspotAutoArray.some( itm => itm.name === i.api.name ) ? hotspotAutoArray.find( itm => itm.name === i.api.name ).para : []
             return { name : i.api.name , para }

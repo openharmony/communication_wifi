@@ -38,38 +38,42 @@ struct WifiManagerAutoTest {
   @State changeIndex: number = - 1
   //  @State autoTextMessage: string ="None";
   @StorageLink( "wifiManagerAutoTestMessage" ) wifiManagerAutoTestMessage: string = ""
-  private ssid1 = "TP-LINK_6365";
-  private bssid1 = "6C:B1:58:75:63:65";
-  private preSharedKey1 = "kaihong123";
-  private isHiddenSsid1 = "false";
-  @State securityType1: number = 3
-  @State creatorUid1: string = "1";
-  @State disableReason1: number = 0;
-  @State netId1: number = 0 ;
-  @State randomMacType1: number = 0 ;
-  @State randomMacAddr1: string = "08:fb:ea:1b:38:aa"
-  @State ipType1: number = 1 ;
-  @State staticIp_ipAddress1: number = 3232235880 ;
-  @State staticIp_gateway1: number = 3232235777 ;
-  @State staticIp_dnsServers1: number = 3716386629 ;
-  @State staticIp_domains1: Array<string> = [ "0", "1", "2" ] ;
+  @State w_ssid1: string = "TP-LINK_6365";
+  @State w_bssid1: string = "6C:B1:58:75:63:65";
+  @State w_preSharedKey1: string = "kaihong123";
+  @State w_isHiddenSsid1: boolean = false;
+  @State w_securityType1: number = 3;
+  @State w_creatorUid1: number = 1;
+  @State w_disableReason1: number = 0;
+  @State w_netId1: number = 0 ;
+  @State w_randomMacType1: number = 0 ;
+  @State w_randomMacAddr1: string = "08:fb:ea:1b:38:aa"
+  @State w_ipType1: number = 1 ;
+  @State w_staticIp_ipAddress1: number = 3232235880 ;
+  @State w_staticIp_gateway1: number = 3232235777 ;
+  @State w_staticIp_dnsServers1: number = 3716386629 ;
+  @State w_staticIp_domains1: Array<string> = [ "0", "1", "2" ] ;
+  @State w_networkId1: number = 0 ;
+  @State w_featureId1: number = 1 ;
 
   aboutToAppear() {
-    AppStorage.SetOrCreate( 'ssid1' , this.ssid1 );
-    AppStorage.SetOrCreate( 'bssid1' , this.bssid1 );
-    AppStorage.SetOrCreate( 'preSharedKey1' , this.preSharedKey1 );
-    AppStorage.SetOrCreate( 'isHiddenSsid1' , this.isHiddenSsid1 );
-    AppStorage.SetOrCreate( 'securityType1' , this.securityType1 );
-    AppStorage.SetOrCreate( 'creatorUid1' , this.creatorUid1 );
-    AppStorage.SetOrCreate( 'disableReason1' , this.disableReason1 );
-    AppStorage.SetOrCreate( 'netId1' , this.netId1 );
-    AppStorage.SetOrCreate( 'randomMacType1' , this.randomMacType1 );
-    AppStorage.SetOrCreate( 'randomMacAddr1' , this.randomMacAddr1 );
-    AppStorage.SetOrCreate( 'ipType1' , this.ipType1 );
-    AppStorage.SetOrCreate( 'staticIp_ipAddress1' , this.staticIp_ipAddress1 );
-    AppStorage.SetOrCreate( 'staticIp_gateway1' , this.staticIp_gateway1 );
-    AppStorage.SetOrCreate( 'staticIp_dnsServers1' , this.staticIp_dnsServers1 );
-    AppStorage.SetOrCreate( 'staticIp_domains1' , this.staticIp_domains1 );
+    AppStorage.SetOrCreate( 'w_ssid1' , this.w_ssid1 );
+    AppStorage.SetOrCreate( 'w_bssid1' , this.w_bssid1 );
+    AppStorage.SetOrCreate( 'w_preSharedKey1' , this.w_preSharedKey1 );
+    AppStorage.SetOrCreate( 'w_isHiddenSsid1' , this.w_isHiddenSsid1 );
+    AppStorage.SetOrCreate( 'w_securityType1' , this.w_securityType1 );
+    AppStorage.SetOrCreate( 'w_creatorUid1' , this.w_creatorUid1 );
+    AppStorage.SetOrCreate( 'w_disableReason1' , this.w_disableReason1 );
+    AppStorage.SetOrCreate( 'w_netId1' , this.w_netId1 );
+    AppStorage.SetOrCreate( 'w_randomMacType1' , this.w_randomMacType1 );
+    AppStorage.SetOrCreate( 'w_randomMacAddr1' , this.w_randomMacAddr1 );
+    AppStorage.SetOrCreate( 'w_ipType1' , this.w_ipType1 );
+    AppStorage.SetOrCreate( 'w_staticIp_ipAddress1' , this.w_staticIp_ipAddress1 );
+    AppStorage.SetOrCreate( 'w_staticIp_gateway1' , this.w_staticIp_gateway1 );
+    AppStorage.SetOrCreate( 'w_staticIp_dnsServers1' , this.w_staticIp_dnsServers1 );
+    AppStorage.SetOrCreate( 'w_staticIp_domains1' , this.w_staticIp_domains1 );
+    AppStorage.SetOrCreate( 'w_networkId1' , this.w_networkId1 );
+    AppStorage.SetOrCreate( 'w_featureId1' , this.w_featureId1 );
   }
 
   build() {
@@ -151,8 +155,7 @@ struct WifiManagerAutoTest {
           let wifiManagerAutoTestMessage = ""
 
           //拼装数组
-          let wifiManagerAutoArray = [ { name : "testSetLocalName" , para : [ "DaYuBlue" ] },
-                                       { name : "testSetBluetoothScanMode" , para : [ 4, 0 ] } ]
+          let wifiManagerAutoArray = []
           let Interface = WifiManagerAutoTestCase.map( i => {
             let para = wifiManagerAutoArray.some( itm => itm.name === i.api.name ) ? wifiManagerAutoArray.find( itm => itm.name === i.api.name ).para : []
             return { name : i.api.name , para }

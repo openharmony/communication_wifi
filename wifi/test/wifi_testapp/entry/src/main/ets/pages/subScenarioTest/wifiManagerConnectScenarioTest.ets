@@ -39,6 +39,43 @@ struct wifiManagerConnectScenarioTest {
   private testItem: TestData = router.getParams().testId;
   @State changeIndex: number = - 1
   @StorageLink( "wifiManagerConnectScenarioMessage" ) wifiManagerConnectScenarioMessage: string = ""
+  @State w_ssid1: string = "TP-LINK_6365";
+  @State w_bssid1: string = "6C:B1:58:75:63:65";
+  @State w_preSharedKey1: string = "kaihong123";
+  @State w_isHiddenSsid1: boolean = false;
+  @State w_securityType1: number = 3;
+  @State w_creatorUid1: number = 1 ;
+  @State w_disableReason1: number = 0;
+  @State w_netId1: number = 0 ;
+  @State w_randomMacType1: number = 0 ;
+  @State w_randomMacAddr1: string = "08:fb:ea:1b:38:aa"
+  @State w_ipType1: number = 1 ;
+  @State w_staticIp_ipAddress1: number = 3232235880 ;
+  @State w_staticIp_gateway1: number = 3232235777 ;
+  @State w_staticIp_dnsServers1: number = 3716386629 ;
+  @State w_staticIp_domains1: Array<string> = [ "0", "1", "2" ] ;
+  @State w_networkId1: number = 0 ;
+  @State w_featureId1: number = 1 ;
+
+  aboutToAppear() {
+    AppStorage.SetOrCreate( 'w_ssid1' , this.w_ssid1 );
+    AppStorage.SetOrCreate( 'w_bssid1' , this.w_bssid1 );
+    AppStorage.SetOrCreate( 'w_preSharedKey1' , this.w_preSharedKey1 );
+    AppStorage.SetOrCreate( 'w_isHiddenSsid1' , this.w_isHiddenSsid1 );
+    AppStorage.SetOrCreate( 'w_securityType1' , this.w_securityType1 );
+    AppStorage.SetOrCreate( 'w_creatorUid1' , this.w_creatorUid1 );
+    AppStorage.SetOrCreate( 'w_disableReason1' , this.w_disableReason1 );
+    AppStorage.SetOrCreate( 'w_netId1' , this.w_netId1 );
+    AppStorage.SetOrCreate( 'w_randomMacType1' , this.w_randomMacType1 );
+    AppStorage.SetOrCreate( 'w_randomMacAddr1' , this.w_randomMacAddr1 );
+    AppStorage.SetOrCreate( 'w_ipType1' , this.w_ipType1 );
+    AppStorage.SetOrCreate( 'w_staticIp_ipAddress1' , this.w_staticIp_ipAddress1 );
+    AppStorage.SetOrCreate( 'w_staticIp_gateway1' , this.w_staticIp_gateway1 );
+    AppStorage.SetOrCreate( 'w_staticIp_dnsServers1' , this.w_staticIp_dnsServers1 );
+    AppStorage.SetOrCreate( 'w_staticIp_domains1' , this.w_staticIp_domains1 );
+    AppStorage.SetOrCreate( 'w_networkId1' , this.w_networkId1 );
+    AppStorage.SetOrCreate( 'w_featureId1' , this.w_featureId1 );
+  }
 
   build() {
     Column() {

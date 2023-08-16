@@ -109,7 +109,7 @@ struct p2pSetting {
 
           Row() {
             Text( "groupName:" ).fontSize( 15 ).width( 100 );
-            TextInput( { text : this.characteristicUUID , placeholder : "testGroup" } )
+            TextInput( { text : this.groupName , placeholder : "testGroup" } )
               .fontSize( "15vp" )
               .onChange( ( strInput ) => {
                 this.groupName = strInput;
@@ -146,7 +146,7 @@ struct p2pSetting {
 
           Row() {
             Text( "deviceName:" ).fontSize( 15 ).width( 100 );
-            TextInput( { text : this.deviceName , placeholder : "descriptor deviceName" } )
+            TextInput( { text : this.deviceName , placeholder : "MyTestDevice" } )
               .fontSize( "15vp" )
               .onChange( ( strInput ) => {
                 this.deviceName = strInput;
@@ -175,7 +175,6 @@ struct P2pInterfaceTest {
   @State showList: boolean = false;
   private testItem: TestData = Router.getParams().testId;
   @State message: string = "";
-  @State isConnection: boolean = false;
   @State deviceId: string = '';
   @State currentClick: number = - 1;
   @State pairPinCode: string = '';
@@ -185,11 +184,16 @@ struct P2pInterfaceTest {
   @State passphrase: string = "12345678" ;
   @State groupName: string = "testGroup"
   @State goBand: number = 0 ;
-  @State deviceName: string = "test"
+  @State deviceName: string = "MyTestDevice"
+  @State connectedIp: sting = "192.168.1.107"
   @StorageLink( 'p2pStateMessage' ) p2pStateMessage: string = "";
-  @StorageLink( 'p2pLinkMessage' ) p2pLinkMessage: string = "";
-  @StorageLink( 'p2pGroupMessage' ) p2pGroupMessage: string = "";
   @StorageLink( 'p2pDeviceMessage' ) p2pDeviceMessage: string = "";
+  @StorageLink( 'p2pLinkStateMessage' ) p2pLinkStateMessage: string = "";
+  @StorageLink( 'p2pLinkMessage' ) p2pLinkMessage: string = "";
+  @StorageLink( 'p2pPeerDeviceMessage' ) p2pPeerDeviceMessage: string = "";
+  @StorageLink( 'p2pPeerDeviceMessages' ) p2pPeerDeviceMessages: string = "";
+  @StorageLink( 'p2pDiscoveryMessage' ) p2pDiscoveryMessage: string = "";
+  @StorageLink( 'p2pGroupMessage' ) p2pGroupMessage: string = "";
 
   aboutToAppear() {
     AppStorage.SetOrCreate( "deviceAddress" , this.deviceAddress )
@@ -222,7 +226,7 @@ struct P2pInterfaceTest {
             .width( ConfigData.WH_28_100 )
             .align( Alignment.Start )
 
-          TextInput( { text : this.pairedMac , placeholder : "请输入即将连接的设备MAC" } )
+          TextInput( { text : this.connectedIp , placeholder : "192.168.1.107" } )
             .height( 40 )
             .borderStyle( BorderStyle.Dashed )
             .backgroundColor( $r( "app.color.white" ) )
@@ -248,12 +252,22 @@ struct P2pInterfaceTest {
         Column() {
           Scroll() {
             Column() {
-              //              Text("当前配置:")
-              //                .fontSize("17vp")
-              //                .margin({ top: "5vp", left: "10vp" })
-              //                .textAlign(TextAlign.Start)
-              //                .width(ConfigData.WH_100_100)
               Text( "开关结果:" + this.p2pStateMessage )
+                .fontSize( "17vp" )
+                .margin( { top : "5vp" , left : "15vp" } )
+                .textAlign( TextAlign.Start )
+                .width( ConfigData.WH_90_100 )
+              Text( "本机信息:" + this.p2pDeviceMessage )
+                .fontSize( "17vp" )
+                .margin( { top : "5vp" , left : "15vp" } )
+                .textAlign( TextAlign.Start )
+                .width( ConfigData.WH_90_100 )
+              Text( "发现信息:" + this.p2pDiscoveryMessage )
+                .fontSize( "17vp" )
+                .margin( { top : "5vp" , left : "15vp" } )
+                .textAlign( TextAlign.Start )
+                .width( ConfigData.WH_90_100 )
+              Text( "连接状态:" + this.p2pLinkStateMessage )
                 .fontSize( "17vp" )
                 .margin( { top : "5vp" , left : "15vp" } )
                 .textAlign( TextAlign.Start )
@@ -263,12 +277,17 @@ struct P2pInterfaceTest {
                 .margin( { top : "5vp" , left : "15vp" } )
                 .textAlign( TextAlign.Start )
                 .width( ConfigData.WH_90_100 )
-              Text( "组信息:" + this.p2pGroupMessage )
+              Text( "对端设备:" + this.p2pPeerDeviceMessage )
                 .fontSize( "17vp" )
                 .margin( { top : "5vp" , left : "15vp" } )
                 .textAlign( TextAlign.Start )
                 .width( ConfigData.WH_90_100 )
-              Text( "对端信息:" + this.p2pDeviceMessage )
+              Text( "对端设备[]:" + this.p2pPeerDeviceMessages )
+                .fontSize( "17vp" )
+                .margin( { top : "5vp" , left : "15vp" } )
+                .textAlign( TextAlign.Start )
+                .width( ConfigData.WH_90_100 )
+              Text( "组信息:" + this.p2pGroupMessage )
                 .fontSize( "17vp" )
                 .margin( { top : "5vp" , left : "15vp" } )
                 .textAlign( TextAlign.Start )

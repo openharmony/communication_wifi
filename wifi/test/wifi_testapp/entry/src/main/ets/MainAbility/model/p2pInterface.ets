@@ -21,7 +21,7 @@ import wifi from '@ohos.wifi';
 import ConfigData from "../../Utils/ConfigData"
 import LogData from "../../Utils/LogData"
 import MessageData from "../../Utils/MessageData"
-
+const PAGE_URI_P2P_FOUND_MODE = 'pages/subManualApiTest/subP2pTest/p2pFound';
 /**
  * p2p Test Page Of Wifi test
  */
@@ -35,9 +35,10 @@ export function testGetP2pLinkedInfoPromise(): string {
       console.log( "getP2pLinkedInfoPromise: " + JSON.stringify( wifiP2pLinkedInfo ) )
       message = "getP2pLinkedInfoPromise: " + JSON.stringify( wifiP2pLinkedInfo )
       console.log( LogData.testGetP2pLinkedInfoPromise_EndLog );
+      AppStorage.SetOrCreate("p2pLinkMessage",message)
       prompt.showToast( { message : message } )
     } ).catch( error => {
-      console( "testGetP2pLinkedInfoPromise error :" + error )
+      console.log( "testGetP2pLinkedInfoPromise error :" + error )
     } )
     prompt.showToast( { message : message } )
     return message
@@ -62,6 +63,7 @@ export function testGetP2pLinkedInfoCallback(): string {
       console.log( LogData.getP2pLinkedInfoCallback_successfulLog )
       console.log( "getP2pLinkedInfoCallback: " + JSON.stringify( WifiP2pLinkedInfo ) )
       message = "getP2pLinkedInfoCallback: " + JSON.stringify( WifiP2pLinkedInfo )
+      AppStorage.SetOrCreate("p2pLinkMessage",message)
       console.log( LogData.testGetP2pLinkedInfoCallback_EndLog );
       prompt.showToast( { message : message } )
     } )
@@ -83,10 +85,11 @@ export function testGetCurrentGroupPromise(): string {
       console.log( LogData.testGetCurrentGroupPromise_successfulLog );
       console.log( "getCurrentGroupPromise: " + JSON.stringify( WifiP2pGroupInfo ) )
       message = "getCurrentGroupPromise: " + JSON.stringify( WifiP2pGroupInfo )
+      AppStorage.SetOrCreate("p2pGroupMessage",message)
       console.log( LogData.testGetCurrentGroupPromise_EndLog );
       prompt.showToast( { message : message } )
     } ).catch( error => {
-      console( "testGetCurrentGroupPromise error :" + error )
+      console.log( "testGetCurrentGroupPromise error :" + error )
     } )
     prompt.showToast( { message : message } )
     return message
@@ -111,6 +114,7 @@ export function testGetCurrentGroupCallback(): string {
       console.log( LogData.getCurrentGroupCallback_successfulLog )
       console.log( "getCurrentGroupCallback: " + JSON.stringify( WifiP2pGroupInfo ) )
       message = "getCurrentGroupCallback: " + JSON.stringify( WifiP2pGroupInfo )
+      AppStorage.SetOrCreate("p2pGroupMessage",message)
       console.log( LogData.testGetCurrentGroupCallback_EndLog );
       prompt.showToast( { message : message } )
     } )
@@ -132,10 +136,11 @@ export function testGetP2pPeerDevicesPromise() {
       console.log( $r( "app.string.getP2pPeerDevicesPromise_successful" ) );
       console.log( "getP2pPeerDevicesPromise: " + JSON.stringify( WifiP2pDevice ) )
       message = "getP2pPeerDevicesPromise: " + JSON.stringify( WifiP2pDevice )
+      AppStorage.SetOrCreate("p2pPeerDeviceMessages",message)
       console.log( LogData.testGetP2pPeerDevicesPromise_EndLog );
       prompt.showToast( { message : message } )
     } ).catch( error => {
-      console( "testGetP2pPeerDevicesPromise error :" + error )
+      console.log( "testGetP2pPeerDevicesPromise error :" + error )
     } )
     prompt.showToast( { message : message } )
     return message
@@ -160,6 +165,7 @@ export function testGetP2pPeerDevicesCallback() {
       console.log( LogData.getP2pPeerDevicesCallback_successfulLog );
       console.log( "getP2pPeerDevicesCallback: " + JSON.stringify( WifiP2pDevice ) )
       message = "getP2pPeerDevicesCallback: " + JSON.stringify( WifiP2pDevice )
+      AppStorage.SetOrCreate("p2pPeerDeviceMessages",message)
       console.log( LogData.testGetP2pPeerDevicesCallback_EndLog );
       prompt.showToast( { message : message } )
       let len = Object.keys( WifiP2pDevice ).length;
@@ -276,6 +282,7 @@ export function testStartDiscoverDevices(): string {
     console.log( LogData.testStartDiscoverDevices_StartLog );
     let ret = wifi.startDiscoverDevices()
     message = "startDiscoverDevices: " + ret
+    Router.push( { uri : PAGE_URI_P2P_FOUND_MODE } );
     prompt.showToast( { message : message } )
     console.log( LogData.testStartDiscoverDevices_EndLog );
     return message
@@ -376,6 +383,7 @@ export function testOnP2pStateChange(): string {
             p2pStateMessage = '未知状态';
             break;
         }
+        AppStorage.SetOrCreate("p2pStateMessage",p2pStateMessage)
         prompt.showToast( { message : "状态: " + p2pStateMessage } )
         console.log( LogData.testOnP2pStateChange_EndLog );
       } )
@@ -422,6 +430,7 @@ export function testOnP2pConnectionChange(): string {
         let groupOwnerAddr = WifiP2pLinkedInfo.groupOwnerAddr
         message = "Info : " + p2pConnectionMessage + ",isGroupOwner: " + isGroupOwner + ",groupOwnerAddr: " + groupOwnerAddr
         prompt.showToast( { message : message } )
+        AppStorage.SetOrCreate("p2pLinkStateMessage",message)
         console.log( LogData.testOnP2pConnectionChange_EndLog )
       } )
       message = ( MessageData.onP2pConnectionChangeTest )
@@ -450,7 +459,6 @@ export function testOnP2pDeviceChange(): string {
       message = ( MessageData.offP2pDeviceChangeTest )
     } else {
       wifi.on( "p2pDeviceChange" , ( data ) => {
-        //      let p2pDeviceChangeMessage =""
         let p2pDeviceStatusMessage = ""
         let deviceName = data.deviceName
         let deviceAddress = data.deviceAddress
@@ -483,6 +491,7 @@ export function testOnP2pDeviceChange(): string {
         "primaryDeviceType: " + primaryDeviceType + "\n" +
         "deviceStatus: " + p2pDeviceStatusMessage + "\n" +
         "groupCapabilitys: " + groupCapabilitys + "\n"
+        AppStorage.SetOrCreate("p2pDeviceMessage",message)
         prompt.showToast( { message : message } )
         console.log( LogData.testOnP2pDeviceChange_EndLog )
       } )
@@ -515,6 +524,7 @@ export function testOnP2pPeerDeviceChange(): string {
         let p2pPeerDeviceChangeMessage = ""
         console.log( "WifiP2pDevice: " + JSON.stringify( data ) )
         p2pPeerDeviceChangeMessage = "WifiP2pDevice: " + JSON.stringify( data )
+        AppStorage.SetOrCreate("p2pPeerDeviceMessage",p2pPeerDeviceChangeMessage)
         prompt.showToast( { message : "状态 " + p2pPeerDeviceChangeMessage } )
         console.log( LogData.testOnP2pPeerDeviceChange_EndLog )
       } )
@@ -590,6 +600,7 @@ export function testOnP2pDiscoveryChange(): string {
             break;
         }
         prompt.showToast( { message : "发现状态：" + p2pDiscoveryChangeMessage } )
+        AppStorage.SetOrCreate("p2pDiscoveryMessage",p2pDiscoveryChangeMessage)
         console.log( LogData.testOnP2pDiscoveryChange_EndLog )
       } )
       message = ( MessageData.onP2pDiscoveryChangeTest )

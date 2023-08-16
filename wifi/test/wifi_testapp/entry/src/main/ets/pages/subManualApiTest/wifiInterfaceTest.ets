@@ -33,49 +33,53 @@ const G_NAME = 'DaYu200'
 
 @Component
 struct WifiDeviceSetting {
-  private ssid = "TP-LINK_6365";
-  private bssid = "6C:B1:58:75:63:65";
-  private preSharedKey = "kaihong123";
-  private isHiddenSsid = false;
-  @State securityType: number = 3
-  @State creatorUid: number = 1;
-  @State disableReason: number = 0;
-  @State netId: number = 100 ;
-  @State randomMacType: number = 0 ;
-  @State randomMacAddr: string = "08:fb:ea:1b:38:aa"
-  @State ipType: number = 1 ;
-  @State staticIp_ipAddress: number = 3232235880 ;
-  @State staticIp_gateway: number = 3232235777 ;
-  @State staticIp_dnsServers: number = 3716386629 ;
-  @State staticIp_domains: Array<string> = [ "0", "1", "2" ] ;
+  @State w_ssid: string = "TP-LINK_6365"; //TP-LINK_6365
+  @State w_bssid: string = "6C:B1:58:75:63:65"; //6C:B1:58:75:63:65
+  @State w_preSharedKey: string = "kaihong123"; //kaihong123
+  @State w_isHiddenSsid: boolean = false;
+  @State w_securityType: number = 3
+  @State w_creatorUid: number = 1;
+  @State w_disableReason: number = 0;
+  @State w_netId: number = 100 ;
+  @State w_randomMacType: number = 0 ;
+  @State w_randomMacAddr: string = "08:fb:ea:1b:38:aa"
+  @State w_ipType: number = 1 ;
+  @State w_staticIp_ipAddress: number = 3232235880 ;
+  @State w_staticIp_gateway: number = 3232235777 ;
+  @State w_staticIp_dnsServers: number = 3716386629 ;
+  @State w_staticIp_domains: Array<string> = [ "0", "1", "2" ] ;
+  @State w_networkId: number = 0 ; // id,netId,networkId是一个值嘛？
+  @State w_featureId: number = 1 ;
 
   aboutToAppear() {
-    AppStorage.SetOrCreate( 'ssid' , this.ssid );
-    AppStorage.SetOrCreate( 'bssid' , this.bssid );
-    AppStorage.SetOrCreate( 'preSharedKey' , this.preSharedKey );
-    AppStorage.SetOrCreate( 'isHiddenSsid' , this.isHiddenSsid );
-    AppStorage.SetOrCreate( 'securityType' , this.securityType );
-    AppStorage.SetOrCreate( 'creatorUid' , this.creatorUid );
-    AppStorage.SetOrCreate( 'disableReason' , this.disableReason );
-    AppStorage.SetOrCreate( 'netId' , this.netId );
-    AppStorage.SetOrCreate( 'randomMacType' , this.randomMacType );
-    AppStorage.SetOrCreate( 'randomMacAddr' , this.randomMacAddr );
-    AppStorage.SetOrCreate( 'ipType' , this.ipType );
-    AppStorage.SetOrCreate( 'staticIp_ipAddress' , this.staticIp_ipAddress );
-    AppStorage.SetOrCreate( 'staticIp_gateway' , this.staticIp_gateway );
-    AppStorage.SetOrCreate( 'staticIp_dnsServers' , this.staticIp_dnsServers );
-    AppStorage.SetOrCreate( 'staticIp_domains' , this.staticIp_domains );
+    AppStorage.SetOrCreate( 'w_ssid' , this.w_ssid );
+    AppStorage.SetOrCreate( 'w_bssid' , this.w_bssid );
+    AppStorage.SetOrCreate( 'w_preSharedKey' , this.w_preSharedKey );
+    AppStorage.SetOrCreate( 'w_isHiddenSsid' , this.w_isHiddenSsid );
+    AppStorage.SetOrCreate( 'w_securityType' , this.w_securityType );
+    AppStorage.SetOrCreate( 'w_creatorUid' , this.w_creatorUid );
+    AppStorage.SetOrCreate( 'w_disableReason' , this.w_disableReason );
+    AppStorage.SetOrCreate( 'w_netId' , this.w_netId );
+    AppStorage.SetOrCreate( 'w_randomMacType' , this.w_randomMacType );
+    AppStorage.SetOrCreate( 'w_randomMacAddr' , this.w_randomMacAddr );
+    AppStorage.SetOrCreate( 'w_ipType' , this.w_ipType );
+    AppStorage.SetOrCreate( 'w_staticIp_ipAddress' , this.w_staticIp_ipAddress );
+    AppStorage.SetOrCreate( 'w_staticIp_gateway' , this.w_staticIp_gateway );
+    AppStorage.SetOrCreate( 'w_staticIp_dnsServers' , this.w_staticIp_dnsServers );
+    AppStorage.SetOrCreate( 'w_staticIp_domains' , this.w_staticIp_domains );
+    AppStorage.SetOrCreate( 'w_networkId' , this.w_networkId );
+    AppStorage.SetOrCreate( 'w_featureId' , this.w_featureId );
   }
 
   build() {
     Column() {
       Row() {
         Text( "ssid:" ).fontSize( "17vp" ).width( 70 )
-        TextInput( { text : this.ssid , placeholder : "TP-LINK_6365" } )
+        TextInput( { text : this.w_ssid , placeholder : "TP-LINK_6365" } ) //TP-LINK_6365
           .fontSize( "15vp" )
           .onChange( ( strInput ) => {
-            this.ssid = strInput;
-            AppStorage.SetOrCreate( 'ssid' , strInput );
+            this.w_ssid = strInput;
+            AppStorage.SetOrCreate( 'w_ssid' , this.w_ssid );
           } )
           .width( ConfigData.WH_80_100 )
           .borderRadius( 1 )
@@ -91,11 +95,11 @@ struct WifiDeviceSetting {
           Column() {
             Row() {
               Text( "bssid:" ).fontSize( "15vp" ).width( 60 );
-              TextInput( { text : this.bssid , placeholder : "6c:b1:58:75:63:67" } )
+              TextInput( { text : this.w_bssid , placeholder : "6c:b1:58:75:63:67" } )
                 .fontSize( "15vp" )
                 .onChange( ( strInput ) => {
-                  this.bssid = strInput;
-                  AppStorage.SetOrCreate( 'bssid' , strInput );
+                  this.w_bssid = strInput;
+                  AppStorage.SetOrCreate( 'w_bssid' , this.w_bssid );
                 } )
                 .width( ConfigData.WH_80_100 )
                 .borderRadius( 1 )
@@ -107,11 +111,11 @@ struct WifiDeviceSetting {
 
             Row() {
               Text( "preSharedKey:" ).fontSize( "15vp" ).width( 110 );
-              TextInput( { text : this.preSharedKey , placeholder : "kaihong123" } )
+              TextInput( { text : this.w_preSharedKey , placeholder : "kaihong123" } ) //kaihong123
                 .fontSize( "15vp" )
                 .onChange( ( strInput ) => {
-                  this.preSharedKey = strInput;
-                  AppStorage.SetOrCreate( 'preSharedKey' , strInput );
+                  this.w_preSharedKey = strInput;
+                  AppStorage.SetOrCreate( 'w_preSharedKey' , this.w_preSharedKey );
                 } )
                 .width( ConfigData.WH_80_100 )
                 .borderRadius( 1 )
@@ -123,13 +127,13 @@ struct WifiDeviceSetting {
 
             Row() {
               Text( "isHiddenSsid:" ).fontSize( 15 ).width( 110 );
-              TextInput( { text : this.isHiddenSsid , placeholder : "false" } )
+              TextInput( { text : this.w_isHiddenSsid , placeholder : "false" } )
                 .fontSize( "15vp" )
                 .onChange( ( strInput ) => {
-                  this.isHiddenSsid = strInput;
+                  this.w_isHiddenSsid = strInput;
                   //判断合法性
                   if ( strInput.length >= 1 ) {
-                    AppStorage.SetOrCreate( 'isHiddenSsid' , strInput );
+                    AppStorage.SetOrCreate( 'w_isHiddenSsid' , this.w_isHiddenSsid );
                   }
                 } )
                 .width( ConfigData.WH_80_100 )
@@ -150,7 +154,8 @@ struct WifiDeviceSetting {
                   { value : 'WIFI_SEC_TYPE_PSK' },
                   { value : 'WIFI_SEC_TYPE_SAE' }
                 ] )
-                  .selected( 3 )
+                  .size(2)
+                  .selected( 0 )
                   .value( 'WIFI_SEC_TYPE_PSK' )
                   .font( { size : 17 } )
                   .selectedOptionFont( { size : 17 } )
@@ -158,8 +163,8 @@ struct WifiDeviceSetting {
                   .width( ConfigData.WH_80_100 )
                   .onSelect( ( index: number ) => {
                     console.log( "Select:" + index )
-                    this.securityType = index;
-                    AppStorage.SetOrCreate( 'securityType' , index );
+                    this.w_securityType = index;
+                    AppStorage.SetOrCreate( 'w_securityType' , this.w_securityType );
                   } )
               }
               .width( ConfigData.WH_80_100 )
@@ -172,13 +177,13 @@ struct WifiDeviceSetting {
 
             Row() {
               Text( "creatorUid:" ).fontSize( 15 ).width( 100 );
-              TextInput( { text : this.creatorUid , placeholder : "1" } )
+              TextInput( { text : this.w_creatorUid , placeholder : "1" } )
                 .fontSize( "15vp" )
                 .onChange( ( strInput ) => {
-                  this.creatorUid = strInput;
+                  this.w_creatorUid = Number(strInput);
                   //判断合法性
                   if ( strInput.length >= 1 ) {
-                    AppStorage.SetOrCreate( 'creatorUid' , strInput );
+                    AppStorage.SetOrCreate( 'w_creatorUid' , this.w_creatorUid );
                   }
                 } )
                 .width( ConfigData.WH_80_100 )
@@ -191,13 +196,13 @@ struct WifiDeviceSetting {
 
             Row() {
               Text( "disableReason:" ).fontSize( 15 ).width( 120 );
-              TextInput( { text : this.disableReason , placeholder : "0" } )
+              TextInput( { text : this.w_disableReason , placeholder : "0" } )
                 .fontSize( "15vp" )
                 .onChange( ( strInput ) => {
-                  this.disableReason = strInput;
+                  this.w_disableReason = strInput;
                   //判断合法性
                   if ( strInput.length >= 1 ) {
-                    AppStorage.SetOrCreate( 'disableReason' , strInput );
+                    AppStorage.SetOrCreate( 'w_disableReason' , this.w_disableReason );
                   }
                 } )
                 .width( ConfigData.WH_80_100 )
@@ -210,13 +215,13 @@ struct WifiDeviceSetting {
 
             Row() {
               Text( "netId:" ).fontSize( 15 ).width( 60 );
-              TextInput( { text : this.netId , placeholder : "100" } )
+              TextInput( { text : this.w_netId , placeholder : "100" } )
                 .fontSize( "15vp" )
                 .onChange( ( strInput ) => {
-                  this.netId = strInput;
+                  this.w_netId = strInput;
                   //判断合法性
                   if ( strInput.length >= 1 ) {
-                    AppStorage.SetOrCreate( 'netId' , strInput );
+                    AppStorage.SetOrCreate( 'w_netId' , this.w_netId );
                   }
                 } )
                 .width( ConfigData.WH_80_100 )
@@ -229,12 +234,12 @@ struct WifiDeviceSetting {
 
             Row() {
               Text( "randomMacType:" ).fontSize( 15 ).width( 140 );
-              TextInput( { text : this.randomMacType , placeholder : "0" } )
+              TextInput( { text : this.w_randomMacType , placeholder : "0" } )
                 .fontSize( "15vp" )
                 .onChange( ( strInput ) => {
-                  this.randomMacType = strInput;
+                  this.w_randomMacType = strInput;
                   if ( strInput.length >= 1 ) {
-                    AppStorage.SetOrCreate( 'randomMacType' , strInput );
+                    AppStorage.SetOrCreate( 'w_randomMacType' , this.w_randomMacType );
                   }
                 } )
                 .width( ConfigData.WH_80_100 )
@@ -247,12 +252,12 @@ struct WifiDeviceSetting {
 
             Row() {
               Text( "randomMacAddr:" ).fontSize( 15 ).width( 140 );
-              TextInput( { text : this.randomMacAddr , placeholder : "08:fb:ea:1b:38:aa" } )
+              TextInput( { text : this.w_randomMacAddr , placeholder : "08:fb:ea:1b:38:aa" } )
                 .fontSize( "15vp" )
                 .onChange( ( strInput ) => {
-                  this.randomMacAddr = strInput;
+                  this.w_randomMacAddr = strInput;
                   if ( strInput.length >= 1 ) {
-                    AppStorage.SetOrCreate( 'randomMacAddr' , strInput );
+                    AppStorage.SetOrCreate( 'w_randomMacAddr' , this.w_randomMacAddr );
                   }
                 } )
                 .width( ConfigData.WH_80_100 )
@@ -265,12 +270,12 @@ struct WifiDeviceSetting {
 
             Row() {
               Text( "ipType:" ).fontSize( 15 ).width( 60 );
-              TextInput( { text : this.ipType , placeholder : "1" } ) //DHCP
+              TextInput( { text : this.w_ipType , placeholder : "1" } ) //DHCP
                 .fontSize( "15vp" )
                 .onChange( ( strInput ) => {
-                  this.ipType = strInput;
+                  this.w_ipType = strInput;
                   if ( strInput.length >= 1 ) {
-                    AppStorage.SetOrCreate( 'ipType' , strInput );
+                    AppStorage.SetOrCreate( 'w_ipType' , this.w_ipType );
                   }
                 } )
                 .width( ConfigData.WH_80_100 )
@@ -283,12 +288,12 @@ struct WifiDeviceSetting {
 
             Row() {
               Text( "staticIp_ipAddress:" ).fontSize( 15 ).width( 135 );
-              TextInput( { text : this.staticIp_ipAddress , placeholder : "3232235880" } )
+              TextInput( { text : this.w_staticIp_ipAddress , placeholder : "3232235880" } )
                 .fontSize( "15vp" )
                 .onChange( ( strInput ) => {
-                  this.staticIp_ipAddress = strInput;
+                  this.w_staticIp_ipAddress = strInput;
                   if ( strInput.length >= 1 ) {
-                    AppStorage.SetOrCreate( 'staticIp_ipAddress' , strInput );
+                    AppStorage.SetOrCreate( 'w_staticIp_ipAddress' , this.w_staticIp_ipAddress );
                   }
                 } )
                 .width( ConfigData.WH_80_100 )
@@ -301,12 +306,12 @@ struct WifiDeviceSetting {
 
             Row() {
               Text( "staticIp_gateway:" ).fontSize( 15 ).width( 130 );
-              TextInput( { text : this.staticIp_gateway , placeholder : "3232235777" } )
+              TextInput( { text : this.w_staticIp_gateway , placeholder : "3232235777" } )
                 .fontSize( "15vp" )
                 .onChange( ( strInput ) => {
-                  this.staticIp_gateway = strInput;
+                  this.w_staticIp_gateway = strInput;
                   if ( strInput.length >= 1 ) {
-                    AppStorage.SetOrCreate( 'staticIp_gateway' , strInput );
+                    AppStorage.SetOrCreate( 'w_staticIp_gateway' , this.w_staticIp_gateway );
                   }
                 } )
                 .width( ConfigData.WH_80_100 )
@@ -319,12 +324,12 @@ struct WifiDeviceSetting {
 
             Row() {
               Text( "staticIp_dnsServers:" ).fontSize( 15 ).width( 140 );
-              TextInput( { text : this.staticIp_dnsServers , placeholder : "3716386629" } )
+              TextInput( { text : this.w_staticIp_dnsServers , placeholder : "3716386629" } )
                 .fontSize( "15vp" )
                 .onChange( ( strInput ) => {
-                  this.staticIp_dnsServers = strInput;
+                  this.w_staticIp_dnsServers = strInput;
                   if ( strInput.length >= 1 ) {
-                    AppStorage.SetOrCreate( 'staticIp_dnsServers' , strInput );
+                    AppStorage.SetOrCreate( 'w_staticIp_dnsServers' , this.w_staticIp_dnsServers );
                   }
                 } )
                 .width( ConfigData.WH_80_100 )
@@ -337,12 +342,12 @@ struct WifiDeviceSetting {
 
             Row() {
               Text( "staticIp_domains:" ).fontSize( 15 ).width( 125 );
-              TextInput( { text : this.staticIp_domains , placeholder : [ "0", "1", "2" ] } )
+              TextInput( { text : this.w_staticIp_domains , placeholder : [ "0", "1", "2" ] } )
                 .fontSize( "15vp" )
                 .onChange( ( strInput ) => {
-                  this.staticIp_domains = strInput;
+                  this.w_staticIp_domains = strInput;
                   if ( strInput.length >= 1 ) {
-                    AppStorage.SetOrCreate( 'staticIp_domains' , strInput );
+                    AppStorage.SetOrCreate( 'w_staticIp_domains' , this.w_staticIp_domains );
                   }
                 } )
                 .width( ConfigData.WH_80_100 )
@@ -370,47 +375,49 @@ struct WifiInterfaceTest {
   @State showList: boolean = false;
   private testItem: TestData = Router.getParams().testId;
   @State message: string = "";
-  @StorageLink( 'setLocalNameRet' ) setLocalNameRet: boolean = false;
-  @StorageLink( 'setScanModeRet' ) setScanModeRet: boolean = false;
   @State deviceId: string = '';
   @State currentClick: number = - 1;
   @StorageLink( 'pairedMac' ) pairedMac: string = "32:32:235:878";
-  private ssid = "TP-LINK_6365";
-  private bssid = "6C:B1:58:75:63:65";
-  private preSharedKey = "kaihong123";
-  private isHiddenSsid = false;
-  @State securityType: number = 3
-  @State creatorUid: number = 1;
-  @State disableReason: number = 0;
-  @State netId: number = 100 ;
-  @State randomMacType: number = 0 ;
-  @State randomMacAddr: string = "08:fb:ea:1b:38:aa"
-  @State ipType: number = 1 ;
-  @State staticIp_ipAddress: number = 3232235880 ;
-  @State staticIp_gateway: number = 3232235777 ;
-  @State staticIp_dnsServers: number = 3716386629 ;
-  @State staticIp_domains: Array<string> = [ "0", "1", "2" ] ;
+  @State w_ssid: string = "TP-LINK_6365"; //TP-LINK_6365
+  @State w_bssid: string = "6C:B1:58:75:63:65"; //6C:B1:58:75:63:65
+  @State w_preSharedKey: string = "kaihong123"; //kaihong123
+  @State w_isHiddenSsid: boolean = false;
+  @State w_securityType: number = 3
+  @State w_creatorUid: number = 1;
+  @State w_disableReason: number = 0;
+  @State w_netId: number = 100 ;
+  @State w_randomMacType: number = 0 ;
+  @State w_randomMacAddr: string = "08:fb:ea:1b:38:aa"
+  @State w_ipType: number = 1 ;
+  @State w_staticIp_ipAddress: number = 3232235880 ;
+  @State w_staticIp_gateway: number = 3232235777 ;
+  @State w_staticIp_dnsServers: number = 3716386629 ;
+  @State w_staticIp_domains: Array<string> = [ "0", "1", "2" ] ;
+  @State w_networkId: number = 0 ; // id,netId,networkId是一个值嘛？
+  @State w_featureId: number = 1 ;
   @StorageLink( 'linkedInfoMessage' ) linkedInfoMessage: string = '';
   @StorageLink( 'ipInfoMessage' ) ipInfoMessage: string = '';
   @StorageLink( 'getDeviceConfigsMessage' ) getDeviceConfigsMessage: string = '';
   @StorageLink( 'getScanInfoMessage' ) getScanInfoMessage: string = '';
 
   aboutToAppear() {
-    AppStorage.SetOrCreate( 'ssid' , this.ssid );
-    AppStorage.SetOrCreate( 'bssid' , this.bssid );
-    AppStorage.SetOrCreate( 'preSharedKey' , this.preSharedKey );
-    AppStorage.SetOrCreate( 'isHiddenSsid' , this.isHiddenSsid );
-    AppStorage.SetOrCreate( 'securityType' , this.securityType );
-    AppStorage.SetOrCreate( 'creatorUid' , this.creatorUid );
-    AppStorage.SetOrCreate( 'disableReason' , this.disableReason );
-    AppStorage.SetOrCreate( 'netId' , this.netId );
-    AppStorage.SetOrCreate( 'randomMacType' , this.randomMacType );
-    AppStorage.SetOrCreate( 'randomMacAddr' , this.randomMacAddr );
-    AppStorage.SetOrCreate( 'ipType' , this.ipType );
-    AppStorage.SetOrCreate( 'staticIp_ipAddress' , this.staticIp_ipAddress );
-    AppStorage.SetOrCreate( 'staticIp_gateway' , this.staticIp_gateway );
-    AppStorage.SetOrCreate( 'staticIp_dnsServers' , this.staticIp_dnsServers );
-    AppStorage.SetOrCreate( 'staticIp_domains' , this.staticIp_domains );
+    AppStorage.SetOrCreate( 'w_ssid' , this.w_ssid );
+    AppStorage.SetOrCreate( 'w_bssid' , this.w_bssid );
+    AppStorage.SetOrCreate( 'w_preSharedKey' , this.w_preSharedKey );
+    AppStorage.SetOrCreate( 'w_isHiddenSsid' , this.w_isHiddenSsid );
+    AppStorage.SetOrCreate( 'w_securityType' , this.w_securityType );
+    AppStorage.SetOrCreate( 'w_creatorUid' , this.w_creatorUid );
+    AppStorage.SetOrCreate( 'w_disableReason' , this.w_disableReason );
+    AppStorage.SetOrCreate( 'w_netId' , this.w_netId );
+    AppStorage.SetOrCreate( 'w_randomMacType' , this.w_randomMacType );
+    AppStorage.SetOrCreate( 'w_randomMacAddr' , this.w_randomMacAddr );
+    AppStorage.SetOrCreate( 'w_ipType' , this.w_ipType );
+    AppStorage.SetOrCreate( 'w_staticIp_ipAddress' , this.w_staticIp_ipAddress );
+    AppStorage.SetOrCreate( 'w_staticIp_gateway' , this.w_staticIp_gateway );
+    AppStorage.SetOrCreate( 'w_staticIp_dnsServers' , this.w_staticIp_dnsServers );
+    AppStorage.SetOrCreate( 'w_staticIp_domains' , this.w_staticIp_domains );
+    AppStorage.SetOrCreate( 'w_networkId' , this.w_networkId );
+    AppStorage.SetOrCreate( 'w_featureId' , this.w_featureId );
   }
 
   init() {

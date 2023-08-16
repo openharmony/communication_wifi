@@ -14,85 +14,160 @@
  */
 
 // @ts-nocheck
-import ConfigData from '../../../Utils/ConfigData';
-import prompt from '@ohos.prompt'
-import Logger from '../../../MainAbility/model/Logger'
-import { PswDialog } from '../../../Component/pswDialog'
-import { WifiModel } from '../../../MainAbility/model/wifiTestModel'
-import { WifiView } from '../../../Component/wifiView'
-import WifiDataSource from '../../../Component/basicDataSource'
+
+import featureAbility from '@ohos.ability.featureAbility'
 import wifi from '@ohos.wifi'
+import { AvailableWifi } from '../../../Component/availableWifi'
+import Logger from '../../../MainAbility/model/Logger'
+import { TitleBar } from '../../../Component/titleBar'
+import { WifiModel } from '../../../MainAbility/model/wifiModel'
 
-const TAG = 'AvailableWifi'
-let self = null
-
-/*
-  wifiFound Page of wifi test
+const TAG = 'wifiFound'
+const PERMISSION_NAME: string = 'ohos.permission.LOCATION'
+/**
+ * wifi Found Test Page Of Wifi test
  */
-
 @Entry
 @Component
-struct AvailableWifi {
-  private wifiModel = new WifiModel()
-  private linkedInfo: any = null
-  @StorageLink( 'wifiList' ) @Watch( 'wifiListRefresh' ) wifiList: Array<wifi.WifiScanInfo> = []
-  @State wifiDataResource: WifiDataSource = new WifiDataSource(this.wifiList)
-  @State scanInfo: wifi.WifiScanInfo = undefined
-  private pswDialogController: CustomDialogController = new CustomDialogController({
-    builder : PswDialog( { scanInfo : $scanInfo , action : this.onAccept } ) ,
-    autoCancel : true
-  })
+struct WifiFound {
+  private wifiModel: WifiModel = new WifiModel()
+  private testItem: string = "Wlan扫描"
+  private linkedInfo: any = {
+    ssid : "" ,
+    bssid : "" ,
+    networkId : 0 ,
+    rssi : 0 ,
+    band : 0
+  }
+  @State wifiList: Array<any> = []
+  @State isLinked: boolean = false
+  @State isSwitchOn: boolean = false
 
-  build() {
-
-    List() {
-      ListItem() {
-        Row() {
-          Text( $r( 'app.string.available_wlan' ) )
-            .fontSize( 22 )
-            .layoutWeight( 1 )
-        }
-        .width( ConfigData.WH_100_100 )
+  scan() {
+    this.wifiModel.getScanInfos( ( result ) => {
+      if ( this.isSwitchOn ) {
+        this.wifiList = result
+        setTimeout( () => {
+          this.scan()
+        } , 2000 )
       }
-
-      LazyForEach( this.wifiDataResource , ( item , index ) => {
-        ListItem() {
-          WifiView( { wifi : item } )
-        }
-        .key( 'Wifi' + index )
-        .onClick( () => {
-          Logger.info( TAG , 'wifi click' )
-          this.scanInfo = item
-          if ( this.linkedInfo !== null && item.ssid === this.linkedInfo.ssid ) {
-            prompt.showToast( { message : 'this wifi is connected' } )
-            return
-          }
-          if ( item.securityType === 0 || item.securityType === 1 ) {
-            this.wifiModel.connectNetwork( item , '' )
-            return
-          }
-          this.pswDialogController.open()
-        } )
-      } , item => JSON.stringify( item ) )
-    }
-    .width( ConfigData.WH_100_100 )
-    .height( ConfigData.WH_100_100 )
-    .padding( { left : 16 , right : 16 } )
-    .layoutWeight( 1 )
-    .divider( { strokeWidth : 1 , color : Color.Gray , startMargin : 10 , endMargin : 10 } )
-    .margin( { top : 10 } )
+    } )
   }
 
-  onAccept( scanInfo , psw ) {
-    Logger.info( TAG , 'connect wifi' )
-    self.wifiModel.connectNetwork( scanInfo , psw )
+  getLinkedInfo() {
+    wifi.getLinkedInfo( ( err , linkedInfo ) => {
+      if ( err ) {
+        Logger.error( TAG , `getLinkedInfo err: ${ JSON.stringify( err ) }` )
+        return
+      }
+      Logger.info( TAG , `linkedInfo: ${ JSON.stringify( linkedInfo ) }` )
+      if ( linkedInfo === null || linkedInfo.bssid === '' ) {
+        this.isLinked = false
+        this.linkedInfo = {
+          ssid : "" ,
+          bssid : "" ,
+          networkId : 0 ,
+          rssi : 0 ,
+          band : 0
+        }
+        return
+      }
+      this.isLinked = true
+      this.linkedInfo = linkedInfo
+    } )
+  }
+
+  addListener() {
+    wifi.on( 'wifiConnectionChange' , state => {
+      Logger.info( TAG , `wifiConnectionChange: ${ state }` )
+      this.getLinkedInfo()
+    } )
+    wifi.on( 'wifiStateChange' , state => {
+      Logger.info( TAG , `wifiStateLisener state: ${ state }` )
+      this.wifiList = []
+      if ( state === 1 ) { // 1: wifi is enable, 0:wifi is disable
+        wifi.scan()
+        this.scan()
+      }
+    } )
   }
 
   aboutToAppear() {
-    self = this
+    let context = featureAbility.getContext()
+    context.requestPermissionsFromUser( [ PERMISSION_NAME ] , 3 , function( result ) {
+      Logger.info( TAG , `wifi grantPermission,requestPermissionsFromUser,result.requestCode: ${ result }` )
+    } )
+    if ( wifi.isWifiActive() ) {
+      Logger.info( TAG , 'wifi is active' )
+      this.isSwitchOn = true
+      wifi.scan()
+      this.scan()
+      this.getLinkedInfo()
+    }
+    this.addListener()
   }
 
-  wifiListRefresh() {
-    this.wifiDataResource = new WifiDataSource(this.wifiList)
+  build() {
+    Column() {
+      Stack( { alignContent : Alignment.TopStart } ) {
+        TitleBar({ testItem : this.testItem } )
+      }
+
+      Row() {
+        Text( $r( 'app.string.wlan' ) )
+          .fontSize( 22 )
+          .fontWeight( FontWeight.Bold )
+          .layoutWeight( 1 )
+          .align(Alignment.TopStart)
+        Column() {
+          Toggle( { type : ToggleType.Switch , isOn : this.isSwitchOn } )
+            .onChange( ( isOn: boolean ) => {
+              Logger.info( TAG , `wifi swtich is: ${ isOn }` )
+              this.wifiList = []
+              if ( isOn ) {
+                this.isSwitchOn = true
+                wifi.enableWifi()
+                wifi.scan()
+                this.scan()
+                return
+              }
+              this.isSwitchOn = false
+              this.isLinked = false
+              wifi.disconnect()
+              wifi.disableWifi()
+            } )
+        }
+      }
+      .width( '95%' )
+
+      if ( this.isLinked ) {
+        Text( $r( 'app.string.wlanIsConnected' ) )
+          .fontSize( 22 )
+          .width( '95%' )
+          .align(Alignment.TopStart)
+        Row() {
+          Text( this.linkedInfo.ssid )
+            .fontSize( 20 )
+            .fontColor( Color.Black )
+            .layoutWeight( 1 )
+          Text( $r( 'app.string.wlanIsConnected' ) )
+            .fontSize( 18 )
+            .fontColor( Color.Black )
+        }
+        .width( '95%' )
+        .padding( 10 )
+        .margin( 10 )
+        .border( { radius : 15 , color : Color.Gray , width : 1 } )
+        .backgroundColor( Color.White )
+      }
+      AvailableWifi( { wifiList : this.wifiList , linkedInfo : this.linkedInfo } )
+    }
+    .size( { width : '100%' , height : '100%' } )
+    .backgroundColor( '#F5F5F5' )
+  }
+
+  aboutToDisappear() {
+    wifi.off( 'wifiConnectionChange' )
+    wifi.off( 'wifiStateChange' )
   }
 }

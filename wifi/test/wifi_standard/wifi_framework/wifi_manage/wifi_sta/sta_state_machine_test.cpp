@@ -2537,7 +2537,7 @@ HWTEST_F(StaStateMachineTest, ReUpdateNetLinkInfoTest, TestSize.Level1)
 */
 HWTEST_F(StaStateMachineTest, ReUpdateNetLinkInfoTest1, TestSize.Level1)
 {
-    ReUpdateNetLinkInfoTest1();DealSignalPollResultTest
+    ReUpdateNetLinkInfoTest1();
 }
 /**
  * @tc.name: DealSignalPollResultTest

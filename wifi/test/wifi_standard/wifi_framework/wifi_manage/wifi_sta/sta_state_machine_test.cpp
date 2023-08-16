@@ -43,6 +43,8 @@ static const std::string RANDOMMAC_SSID = "testwifi";
 static const std::string RANDOMMAC_PASSWORD = "testwifi";
 static const std::string RANDOMMAC_BSSID = "01:23:45:67:89:a0";
 constexpr int FAILEDNUM = 3;
+constexpr int FAILEDNUM = 3;
+
 
 class StaStateMachineTest : public testing::Test {
 public:
@@ -390,6 +392,8 @@ public:
         pStaStateMachine->linkedInfo.networkId = -1;
         pStaStateMachine->linkedInfo.connState = ConnState::CONNECTED;
         pStaStateMachine->DealConnectToUserSelectedNetwork(&msg);
+        pStaStateMachine->linkedInfo.connState = ConnState::SCANNING;
+        pStaStateMachine->DealConnectToUserSelectedNetwork(&msg);
     }
 
     void DealConnectToUserSelectedNetworkFail1()
@@ -411,11 +415,26 @@ public:
     {
         InternalMessage msg;
         msg.SetParam1(1);
-        msg.SetParam2(0);
+        msg.SetParam2(2);
         EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _))
-            .WillRepeatedly(Return(1));
+            .WillOnce(Return(1))
+            .WillRepeatedly(Return(0));
         pStaStateMachine->linkedInfo.networkId = 0;
         pStaStateMachine->DealConnectToUserSelectedNetwork(&msg);
+        pStaStateMachine->DealConnectToUserSelectedNetwork(&msg);
+    }
+
+    void DealConnectToUserSelectedNetworkFai2()
+    {
+        InternalMessage msg;
+        msg.SetParam1(1);
+        msg.SetParam2(0);
+        pStaStateMachine->linkedInfo.networkId = 1;
+        pStaStateMachine->linkedInfo.connState = ConnState::CONNECTING;
+        pStaStateMachine->linkedInfo.detailedState = DetailedState::NOTWORKING;
+        EXPECT_CALL(WifiSettings::GetInstance(), EnableNetwork(_, _)).Times(AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), SetDeviceState(_, _, _)).Times(AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_)).Times(testing::AtLeast(0));
         pStaStateMachine->DealConnectToUserSelectedNetwork(&msg);
     }
 
@@ -430,8 +449,11 @@ public:
 
     void DealConnectTimeOutCmdFail()
     {
+        InternalMessage msg;
         EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_)).Times(testing::AtLeast(0));
+        pStaStateMachine->linkedInfo.connState == ConnState::CONNECTED;
         pStaStateMachine->DealConnectTimeOutCmd(nullptr);
+        pStaStateMachine->DealConnectTimeOutCmd(&msg);
     }
 
     void DealDisconnectEventSuccess1()
@@ -474,6 +496,7 @@ public:
         InternalMessage msg;
         msg.SetMessageName(WIFI_SVR_CMD_STA_WPA_PASSWD_WRONG_EVENT);
         pStaStateMachine->DealWpaLinkFailEvent(&msg);
+        pStaStateMachine->DealWpaLinkFailEvent(nullptr);
     }
 
     void DealWpaWrongPskEventFail2()
@@ -1446,10 +1469,15 @@ public:
 
     void ConvertFreqToChannelTest()
     {
+        EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _)).WillOnce(Return(1));
+        pStaStateMachine->ConvertFreqToChannel();
         EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _)).Times(AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), AddDeviceConfig(_)).Times(AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), SyncDeviceConfig()).Times(AtLeast(0));
         pStaStateMachine->linkedInfo.frequency = FREQ_2G_MIN;
+        pStaStateMachine->ConvertFreqToChannel();
+
+        pStaStateMachine->linkedInfo.frequency = FREQ_2G_MAX;
         pStaStateMachine->ConvertFreqToChannel();
 
         pStaStateMachine->linkedInfo.frequency = CHANNEL_14_FREQ;
@@ -1550,6 +1578,14 @@ public:
 
     void DealConnectionEventFail()
     {
+        EXPECT_CALL(WifiSettings::GetInstance(), SetDeviceAfterConnect(_)).Times(testing::AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), SetDeviceState(_, _, _)).Times(testing::AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), SyncDeviceConfig()).Times(testing::AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_));
+        EXPECT_CALL(WifiSettings::GetInstance(), SetUserLastSelectedNetworkId(_)).Times(testing::AtLeast(0));
+        pStaStateMachine->wpsState = SetupMethod::LABEL;
+        InternalMessage msg;
+        pStaStateMachine->DealConnectionEvent(&msg);
         pStaStateMachine->DealConnectionEvent(nullptr);
     }
 
@@ -1578,9 +1614,41 @@ public:
     {
         pStaStateMachine->linkedInfo.detailedState = DetailedState::NOTWORKING;
         pStaStateMachine->linkedInfo.connState = ConnState::CONNECTED;
+        pStaStateMachine->linkedInfo.bssid = RANDOMMAC_BSSID;
+        pStaStateMachine->linkedInfo.ssid = RANDOMMAC_SSID;
+        EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_)).WillRepeatedly(Return(0));
+        WifiDeviceConfig config;
+        config.bssid = RANDOMMAC_BSSID;
+        config.ssid = RANDOMMAC_SSID;
+        pStaStateMachine->ReUpdateNetLinkInfo(config);
+    }
+
+    void ReUpdateNetLinkInfoTest1()
+    {
+        pStaStateMachine->linkedInfo.detailedState = DetailedState::NOTWORKING;
+        pStaStateMachine->linkedInfo.connState = ConnState::CONNECTED;
         EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_)).WillRepeatedly(Return(0));
         WifiDeviceConfig config;
         pStaStateMachine->ReUpdateNetLinkInfo(config);
+    }
+
+    void DealSignalPollResultTest()
+    {
+        InternalMessage msg
+        pStaStateMachine->DealSignalPollResult(nullptr);
+        pStaStateMachine->DealSignalPollResult(&msg);
+        pStaStateMachine->linkedInfo.lastTxPackets = 1;
+        pStaStateMachine->linkedInfo.lastRxPackets = 1;
+        pStaStateMachine->linkedInfo.lastPacketDirection = 1;
+        pStaStateMachine->DealSignalPacketChanged(0, 0);
+    }
+
+    void DealSignalPacketChangedTest()
+    {
+        pStaStateMachine->linkedInfo.lastTxPackets = -1;
+        pStaStateMachine->linkedInfo.lastRxPackets = -1;
+        pStaStateMachine->linkedInfo.lastPacketDirection = 1;
+        pStaStateMachine->DealSignalPacketChanged(0, 0);
     }
 };
 
@@ -1802,6 +1870,16 @@ HWTEST_F(StaStateMachineTest, DealConnectToUserSelectedNetworkSuccess, TestSize.
 HWTEST_F(StaStateMachineTest, DealConnectToUserSelectedNetworkFail, TestSize.Level1)
 {
     DealConnectToUserSelectedNetworkFail();
+}
+/**
+ * @tc.name: DealConnectToUserSelectedNetworkFai2
+ * @tc.desc: DealConnectToUserSelectedNetwork()
+ * @tc.type: FUNC
+ * @tc.require: issue
+*/
+HWTEST_F(StaStateMachineTest, DealConnectToUserSelectedNetworkFai2, TestSize.Level1)
+{
+    DealConnectToUserSelectedNetworkFai2();
 }
 /**
  * @tc.name: DealConnectToUserSelectedNetworkFail1
@@ -2452,6 +2530,16 @@ HWTEST_F(StaStateMachineTest, ComparedKeymgmtTest, TestSize.Level1)
 HWTEST_F(StaStateMachineTest, ReUpdateNetLinkInfoTest, TestSize.Level1)
 {
     ReUpdateNetLinkInfoTest();
+}
+/**
+ * @tc.name: ReUpdateNetLinkInfoTest1
+ * @tc.desc: ReUpdateNetLinkInfo()
+ * @tc.type: FUNC
+ * @tc.require: issue
+*/
+HWTEST_F(StaStateMachineTest, ReUpdateNetLinkInfoTest1, TestSize.Level1)
+{
+    ReUpdateNetLinkInfoTest1();
 }
 } // namespace Wifi
 } // namespace OHOS

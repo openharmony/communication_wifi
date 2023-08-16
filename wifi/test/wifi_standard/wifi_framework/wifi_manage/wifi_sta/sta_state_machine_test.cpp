@@ -413,7 +413,7 @@ public:
     {
         InternalMessage msg;
         msg.SetParam1(1);
-        msg.SetParam2(2);
+        msg.SetParam2(1);
         EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _))
             .WillOnce(Return(1))
             .WillRepeatedly(Return(0));

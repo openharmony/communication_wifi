@@ -97,5 +97,44 @@ HWTEST_F(HttpRequestTest, HttpGet_004, TestSize.Level1)
     std::string strResponse = "";
     EXPECT_TRUE(pHttpRequest->HttpGet(strUrl, strResponse) == -1);
 }
+/**
+ * @tc.name: HttpGet_005
+ * @tc.desc: test GetHostAddrFromUrl error
+ * @tc.type: FUNC
+ * @tc.require: issue
+*/
+HWTEST_F(HttpRequestTest, HttpGet_005, TestSize.Level1)
+{
+    WIFI_LOGI("HttpGet_005");
+    std::string strUrl = "http://192.168.62.0:-10";
+    std::string strResponse = "";
+    EXPECT_TRUE(pHttpRequest->HttpGet(strUrl, strResponse) == -1);
+}
+/**
+ * @tc.name: HttpGet_006
+ * @tc.desc: test GetHostAddrFromUrl error
+ * @tc.type: FUNC
+ * @tc.require: issue
+*/
+HWTEST_F(HttpRequestTest, HttpGet_006, TestSize.Level1)
+{
+    WIFI_LOGI("HttpGet_006");
+    std::string strUrl = "http://:10";
+    std::string strResponse = "";
+    EXPECT_TRUE(pHttpRequest->HttpGet(strUrl, strResponse) == -1);
+}
+/**
+ * @tc.name: HttpPost_001
+ * @tc.desc: test GetHostAddrFromUrl error
+ * @tc.type: FUNC
+ * @tc.require: issue
+*/
+HWTEST_F(HttpRequestTest, HttpPost_001, TestSize.Level1)
+{
+    WIFI_LOGI("HttpPost_001");
+    std::string strUrl = "http://192.168.62.0:10";
+    std::string strResponse = "";
+    EXPECT_TRUE(pHttpRequest->HttpPost(strUrl, "", strResponse) == -1);
+}
 }  // namespace Wifi
 }  // namespace OHOS

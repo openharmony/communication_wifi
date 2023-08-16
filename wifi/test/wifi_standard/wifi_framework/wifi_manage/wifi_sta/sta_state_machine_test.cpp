@@ -43,8 +43,6 @@ static const std::string RANDOMMAC_SSID = "testwifi";
 static const std::string RANDOMMAC_PASSWORD = "testwifi";
 static const std::string RANDOMMAC_BSSID = "01:23:45:67:89:a0";
 constexpr int FAILEDNUM = 3;
-constexpr int FAILEDNUM = 3;
-
 
 class StaStateMachineTest : public testing::Test {
 public:
@@ -451,7 +449,7 @@ public:
     {
         InternalMessage msg;
         EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_)).Times(testing::AtLeast(0));
-        pStaStateMachine->linkedInfo.connState == ConnState::CONNECTED;
+        pStaStateMachine->linkedInfo.connState = ConnState::CONNECTED;
         pStaStateMachine->DealConnectTimeOutCmd(nullptr);
         pStaStateMachine->DealConnectTimeOutCmd(&msg);
     }
@@ -1634,7 +1632,7 @@ public:
 
     void DealSignalPollResultTest()
     {
-        InternalMessage msg
+        InternalMessage msg;
         pStaStateMachine->DealSignalPollResult(nullptr);
         pStaStateMachine->DealSignalPollResult(&msg);
         pStaStateMachine->linkedInfo.lastTxPackets = 1;
@@ -2539,7 +2537,27 @@ HWTEST_F(StaStateMachineTest, ReUpdateNetLinkInfoTest, TestSize.Level1)
 */
 HWTEST_F(StaStateMachineTest, ReUpdateNetLinkInfoTest1, TestSize.Level1)
 {
-    ReUpdateNetLinkInfoTest1();
+    ReUpdateNetLinkInfoTest1();DealSignalPollResultTest
+}
+/**
+ * @tc.name: DealSignalPollResultTest
+ * @tc.desc: DealSignalPollResult()
+ * @tc.type: FUNC
+ * @tc.require: issue
+*/
+HWTEST_F(StaStateMachineTest, DealSignalPollResultTest, TestSize.Level1)
+{
+    DealSignalPollResultTest();
+}
+/**
+ * @tc.name: DealSignalPacketChangedTest
+ * @tc.desc: DealSignalPacketChanged()
+ * @tc.type: FUNC
+ * @tc.require: issue
+*/
+HWTEST_F(StaStateMachineTest, DealSignalPacketChangedTest, TestSize.Level1)
+{
+    DealSignalPacketChangedTest();
 }
 } // namespace Wifi
 } // namespace OHOS

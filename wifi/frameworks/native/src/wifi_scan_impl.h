@@ -16,17 +16,16 @@
 #ifndef OHOS_WIFI_SCAN_IMPL
 #define OHOS_WIFI_SCAN_IMPL
 
-#include "singleton.h"
 #include "wifi_scan.h"
 #include "wifi_scan_proxy.h"
 
 namespace OHOS {
 namespace Wifi {
 class WifiScanImpl : public Wifi::WifiScan {
-    DECLARE_DELAYED_SINGLETON(WifiScanImpl)
-
 public:
-    bool Init(int systemAbilityId);
+    explicit WifiScanImpl(int systemAbilityId);
+    ~WifiScanImpl();
+    bool Init();
 
     /**
      * @Description Set the Scan Control Info object

@@ -23,7 +23,7 @@
 
 namespace OHOS {
 namespace Wifi {
-    static std::shared_ptr<WifiP2p> WifiP2pPtr = WifiP2p::GetInstance(WIFI_P2P_ABILITY_ID);
+    static std::unique_ptr<WifiP2p> WifiP2pPtr = WifiP2p::GetInstance(WIFI_P2P_ABILITY_ID);
     void RequestServiceTest(const uint8_t* data, size_t size)
     {
         WifiP2pDevice device;

@@ -22,12 +22,28 @@ DEFINE_WIFILOG_LABEL("Hid2d");
 
 namespace OHOS {
 namespace Wifi {
-NO_SANITIZE("cfi") std::shared_ptr<Hid2d> Hid2d::GetInstance(int systemAbilityId)
+NO_SANITIZE("cfi") std::unique_ptr<Hid2d> Hid2d::CreateWifiHid2d(int systemAbilityId)
 {
-    std::shared_ptr<WifiP2pImpl> impl = DelayedSingleton<WifiP2pImpl>::GetInstance();
-    if (impl && impl->Init(systemAbilityId)) {
-        WIFI_LOGI("init hid2d successfully!");
-        return impl;
+    std::unique_ptr<WifiP2pImpl> impl = std::make_unique<WifiP2pImpl>(systemAbilityId);
+    if (impl != nullptr) {
+        if (impl->Init()) {
+            WIFI_LOGI("new hid2d successfully!");
+            return impl;
+        }
+    }
+
+    WIFI_LOGE("new wifi hid2d failed");
+    return nullptr;
+}
+
+NO_SANITIZE("cfi") std::unique_ptr<Hid2d> Hid2d::GetInstance(int systemAbilityId)
+{
+    std::unique_ptr<WifiP2pImpl> impl = std::make_unique<WifiP2pImpl>(systemAbilityId);
+    if (impl != nullptr) {
+        if (impl->Init()) {
+            WIFI_LOGI("init hid2d successfully!");
+            return impl;
+        }
     }
 
     WIFI_LOGE("new wifi hid2d failed");
@@ -35,8 +51,6 @@ NO_SANITIZE("cfi") std::shared_ptr<Hid2d> Hid2d::GetInstance(int systemAbilityId
 }
 
 Hid2d::~Hid2d()
-{
-    DelayedSingleton<WifiP2pImpl>::DestroyInstance();
-}
+{}
 }  // namespace Wifi
 }  // namespace OHOS

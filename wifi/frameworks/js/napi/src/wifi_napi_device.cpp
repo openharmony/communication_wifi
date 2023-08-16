@@ -25,8 +25,8 @@ namespace Wifi {
 DEFINE_WIFILOG_LABEL("WifiNAPIDevice");
 static constexpr int DEFAULT_INVALID_VALUE = -1;
 
-std::shared_ptr<WifiDevice> wifiDevicePtr = WifiDevice::GetInstance(WIFI_DEVICE_ABILITY_ID);
-std::shared_ptr<WifiScan> wifiScanPtr = WifiScan::GetInstance(WIFI_SCAN_ABILITY_ID);
+std::unique_ptr<WifiDevice> wifiDevicePtr = WifiDevice::GetInstance(WIFI_DEVICE_ABILITY_ID);
+std::unique_ptr<WifiScan> wifiScanPtr = WifiScan::GetInstance(WIFI_SCAN_ABILITY_ID);
 
 NO_SANITIZE("cfi") napi_value EnableWifi(napi_env env, napi_callback_info info)
 {

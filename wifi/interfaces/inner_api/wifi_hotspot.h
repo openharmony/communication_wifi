@@ -27,7 +27,9 @@ namespace OHOS {
 namespace Wifi {
 class WifiHotspot {
 public:
-    static std::shared_ptr<WifiHotspot> GetInstance(int system_ability_id, int id = 0);
+    static std::unique_ptr<WifiHotspot> CreateWifiHotspot(int system_ability_id, int id = 0);
+
+    static std::unique_ptr<WifiHotspot> GetInstance(int system_ability_id, int id = 0);
 
     virtual ~WifiHotspot();
 

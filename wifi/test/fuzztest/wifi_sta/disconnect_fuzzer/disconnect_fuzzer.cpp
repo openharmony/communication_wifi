@@ -18,7 +18,7 @@
 
 namespace OHOS {
 namespace Wifi {
-    std::shared_ptr<WifiDevice> devicePtr = WifiDevice::GetInstance(WIFI_DEVICE_ABILITY_ID);
+    std::unique_ptr<WifiDevice> devicePtr = WifiDevice::GetInstance(WIFI_DEVICE_ABILITY_ID);
     bool DisconnectFuzzerTest(const uint8_t* data, size_t size)
     {
         if (devicePtr == nullptr) {

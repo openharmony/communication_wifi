@@ -22,7 +22,7 @@ namespace OHOS {
 namespace Wifi {
 DEFINE_WIFILOG_LABEL("WifiExtNAPIHotspot");
 
-std::shared_ptr<WifiHotspot> GetHotspotInstance()
+std::unique_ptr<WifiHotspot> GetHotspotInstance()
 {
     return WifiHotspot::GetInstance(WIFI_HOTSPOT_ABILITY_ID);
 }
@@ -30,7 +30,7 @@ std::shared_ptr<WifiHotspot> GetHotspotInstance()
 NO_SANITIZE("cfi") napi_value EnableHotspot(napi_env env, napi_callback_info info)
 {
     TRACE_FUNC_CALL;
-    std::shared_ptr<WifiHotspot> hotspot = GetHotspotInstance();
+    std::unique_ptr<WifiHotspot> hotspot = GetHotspotInstance();
     WIFI_NAPI_ASSERT(env, hotspot != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_AP_EXT);
     ErrCode ret = hotspot->EnableHotspot(ServiceType::WIFI_EXT);
     if (ret != WIFI_OPT_SUCCESS) {
@@ -42,7 +42,7 @@ NO_SANITIZE("cfi") napi_value EnableHotspot(napi_env env, napi_callback_info inf
 NO_SANITIZE("cfi") napi_value DisableHotspot(napi_env env, napi_callback_info info)
 {
     TRACE_FUNC_CALL;
-    std::shared_ptr<WifiHotspot> hotspot = GetHotspotInstance();
+    std::unique_ptr<WifiHotspot> hotspot = GetHotspotInstance();
     WIFI_NAPI_ASSERT(env, hotspot != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_AP_EXT);
     ErrCode ret = hotspot->DisableHotspot(ServiceType::WIFI_EXT);
     if (ret != WIFI_OPT_SUCCESS) {
@@ -82,7 +82,7 @@ NO_SANITIZE("cfi") napi_value GetSupportedPowerModel(napi_env env, napi_callback
 
     asyncContext->executeFunc = [&](void* data) -> void {
         PowerModelListAsyncContext *context = static_cast<PowerModelListAsyncContext *>(data);
-        std::shared_ptr<WifiHotspot> hotspot = GetHotspotInstance();
+        std::unique_ptr<WifiHotspot> hotspot = GetHotspotInstance();
         if (hotspot == nullptr) {
             WIFI_LOGE("hotspot instance is null.");
             return;
@@ -118,7 +118,7 @@ NO_SANITIZE("cfi") napi_value GetPowerModel(napi_env env, napi_callback_info inf
 
     asyncContext->executeFunc = [&](void* data) -> void {
         PowerModelAsyncContext *context = static_cast<PowerModelAsyncContext *>(data);
-        std::shared_ptr<WifiHotspot> hotspot = GetHotspotInstance();
+        std::unique_ptr<WifiHotspot> hotspot = GetHotspotInstance();
         if (hotspot == nullptr) {
             WIFI_LOGE("hotspot instance is null.");
             return;
@@ -153,7 +153,7 @@ NO_SANITIZE("cfi") napi_value SetPowerModel(napi_env env, napi_callback_info inf
 
     int model = -1;
     napi_get_value_int32(env, argv[0], &model);
-    std::shared_ptr<WifiHotspot> hotspot = GetHotspotInstance();
+    std::unique_ptr<WifiHotspot> hotspot = GetHotspotInstance();
     WIFI_NAPI_ASSERT(env, hotspot != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_AP_EXT);
     ErrCode ret = hotspot->SetPowerModel(static_cast<PowerModel>(model));
     if (ret != WIFI_OPT_SUCCESS) {

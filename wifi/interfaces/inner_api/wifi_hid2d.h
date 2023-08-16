@@ -24,7 +24,8 @@ namespace OHOS {
 namespace Wifi {
 class Hid2d {
 public:
-    static std::shared_ptr<Hid2d> GetInstance(int system_ability_id);
+    static std::unique_ptr<Hid2d> CreateWifiHid2d(int system_ability_id);
+    static std::unique_ptr<Hid2d> GetInstance(int system_ability_id);
 
     virtual ~Hid2d();
 

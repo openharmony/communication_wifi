@@ -22,40 +22,17 @@ DEFINE_WIFILOG_HOTSPOT_LABEL("WifiHotspot");
 
 namespace OHOS {
 namespace Wifi {
-NO_SANITIZE("cfi") std::unique_ptr<WifiHotspot> WifiHotspot::CreateWifiHotspot(int systemAbilityId, int id)
+NO_SANITIZE("cfi") std::shared_ptr<WifiHotspot> WifiHotspot::GetInstance(int systemAbilityId, int id)
 {
     if (id >= AP_INSTANCE_MAX_NUM) {
         WIFI_LOGE("the max obj id is %{public}d, current id is %{public}d", AP_INSTANCE_MAX_NUM, id);
         return nullptr;
     }
 
-    std::unique_ptr<WifiHotspotImpl> hotspot = std::make_unique<WifiHotspotImpl>(systemAbilityId);
-    if (hotspot != nullptr) {
-        if (hotspot->Init(id)) {
-            WIFI_LOGI("ap obj id:%{public}d succeeded", id);
-            return hotspot;
-        }
-        WIFI_LOGE("init wifi hotspot id:%{public}d failed", id);
-    }
-
-    WIFI_LOGE("new wifi hotspot id:%{public}d failed, sa id:%{public}d", id, systemAbilityId);
-    return nullptr;
-}
-
-NO_SANITIZE("cfi") std::unique_ptr<WifiHotspot> WifiHotspot::GetInstance(int systemAbilityId, int id)
-{
-    if (id >= AP_INSTANCE_MAX_NUM) {
-        WIFI_LOGE("the max obj id is %{public}d, current id is %{public}d", AP_INSTANCE_MAX_NUM, id);
-        return nullptr;
-    }
-
-    std::unique_ptr<WifiHotspotImpl> hotspot = std::make_unique<WifiHotspotImpl>(systemAbilityId);
-    if (hotspot != nullptr) {
-        if (hotspot->Init(id)) {
-            WIFI_LOGI("ap obj id:%{public}d succeeded", id);
-            return hotspot;
-        }
-        WIFI_LOGE("init wifi hotspot id:%{public}d failed", id);
+    std::shared_ptr<WifiHotspotImpl> hotspot = DelayedSingleton<WifiHotspotImpl>::GetInstance();
+    if (hotspot && hotspot->Init(systemAbilityId, id)) {
+        WIFI_LOGI("ap obj id:%{public}d succeeded, sa id:%{public}d", id, systemAbilityId);
+        return hotspot;
     }
 
     WIFI_LOGE("new wifi hotspot id:%{public}d failed, sa id:%{public}d", id, systemAbilityId);
@@ -63,6 +40,8 @@ NO_SANITIZE("cfi") std::unique_ptr<WifiHotspot> WifiHotspot::GetInstance(int sys
 }
 
 WifiHotspot::~WifiHotspot()
-{}
+{
+    DelayedSingleton<WifiHotspotImpl>::DestroyInstance();
+}
 }  // namespace Wifi
 }  // namespace OHOS

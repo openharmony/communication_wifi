@@ -36,7 +36,7 @@ namespace Wifi {
         }                                             \
     } while (0)
 
-WifiDeviceImpl::WifiDeviceImpl(int systemAbilityId) : systemAbilityId_(systemAbilityId), client_(nullptr)
+WifiDeviceImpl::WifiDeviceImpl() : client_(nullptr)
 {}
 
 WifiDeviceImpl::~WifiDeviceImpl()
@@ -46,7 +46,7 @@ WifiDeviceImpl::~WifiDeviceImpl()
 #endif
 }
 
-bool WifiDeviceImpl::Init()
+bool WifiDeviceImpl::Init(int systemAbilityId)
 {
 #ifdef OHOS_ARCH_LITE
     WifiDeviceProxy *deviceProxy = WifiDeviceProxy::GetInstance();
@@ -62,6 +62,7 @@ bool WifiDeviceImpl::Init()
     client_ = deviceProxy;
     return true;
 #else
+    systemAbilityId_ = systemAbilityId;
     return true;
 #endif
 }

@@ -24,7 +24,7 @@ namespace OHOS {
 namespace Wifi {
 DEFINE_WIFILOG_LABEL("WifiNAPIHotspot");
 
-std::unique_ptr<WifiHotspot> wifiHotspotPtr = WifiHotspot::GetInstance(WIFI_HOTSPOT_ABILITY_ID);
+std::shared_ptr<WifiHotspot> wifiHotspotPtr = WifiHotspot::GetInstance(WIFI_HOTSPOT_ABILITY_ID);
 
 std::map<SecTypeJs, KeyMgmt> g_mapSecTypeToKeyMgmt = {
     {SecTypeJs::SEC_TYPE_OPEN, KeyMgmt::NONE},

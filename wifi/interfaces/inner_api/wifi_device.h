@@ -23,9 +23,7 @@ namespace OHOS {
 namespace Wifi {
 class WifiDevice {
 public:
-    static std::unique_ptr<WifiDevice> CreateWifiDevice(int system_ability_id);
-
-    static std::unique_ptr<WifiDevice> GetInstance(int system_ability_id);
+    static std::shared_ptr<WifiDevice> GetInstance(int system_ability_id);
 
     virtual ~WifiDevice();
 

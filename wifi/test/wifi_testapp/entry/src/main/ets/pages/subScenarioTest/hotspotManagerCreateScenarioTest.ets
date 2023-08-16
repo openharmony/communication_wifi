@@ -38,6 +38,21 @@ struct hotspotManagerCreateScenarioTest {
   private testItem: TestData = router.getParams().testId;
   @State changeIndex: number = - 1
   @StorageLink( "hotspotManagerCreateScenarioMessage" ) hotspotManagerCreateScenarioMessage: string = ""
+  @State h_ssid1: string = "testApp1";
+  @State h_securityType1: number = 3;
+  @State h_band1: number = 2;
+  @State h_preSharedKey1: string = "12345678";
+  @State h_maxConn1: number = 3 ;
+  @State h_channel1: number = 36 ;
+
+  aboutToAppear() {
+    AppStorage.SetOrCreate( "h_ssid1" , this.h_ssid1 )
+    AppStorage.SetOrCreate( "h_securityType1" , this.h_securityType1 )
+    AppStorage.SetOrCreate( "h_band1" , this.h_band1 )
+    AppStorage.SetOrCreate( "h_preSharedKey1" , this.h_preSharedKey1 )
+    AppStorage.SetOrCreate( "h_maxConn1" , this.h_maxConn1 )
+    AppStorage.SetOrCreate( "h_channel1" , this.h_channel1 )
+  }
 
   build() {
     Column() {

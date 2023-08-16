@@ -34,8 +34,9 @@
     "pages/subStressTest/hotspotManagerStressTest",
     "pages/subStressTest/p2pStressTest",
     "pages/subStressTest/p2pManagerStressTest",
-
-    "pages/subManualApiTest/subWifiTest/Login",
-    "pages/subManualApiTest/subWifiTest/wifiFound"
+    "pages/subManualApiTest/subWifiTest/login",
+    "pages/subManualApiTest/subWifiTest/about",
+    "pages/subManualApiTest/subWifiTest/wifiFound",
+    "pages/subManualApiTest/subP2pTest/p2pFound"
   ]
 }

@@ -34,7 +34,9 @@ let oppositeAddr = {
 let loginCount = 0
 
 let udp = socket.constructUDPSocketInstance()
-
+/**
+ * login Test Page Of Wifi test
+ */
 @Entry
 @Component
 struct Login {
@@ -56,7 +58,7 @@ struct Login {
       Logger.info( TAG , 'bind success' )
       this.receiveMsg = "绑定成功"
     } ).catch( err => {
-      Logger.info( TAG , 'bind fail' )
+      Logger.info( TAG , 'bind fail' + err )
     } )
     udp.on( 'message' , data => {
       Logger.info( TAG , `data:${ JSON.stringify( data ) }` )

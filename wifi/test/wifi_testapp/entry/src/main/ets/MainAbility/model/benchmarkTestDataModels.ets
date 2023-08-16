@@ -175,8 +175,6 @@ import {
 
 import wifi from '@ohos.wifi';
 
-p
-
 /**
  * benchmarkTest DataModel of wifi test
  */

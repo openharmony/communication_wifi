@@ -19,29 +19,33 @@ import prompt from '@system.prompt';
 import Router from '@system.router';
 import wifiManager from '@ohos.wifiManager';
 import ConfigData from "../../Utils/ConfigData"
-import LogData from "../../Utils/LogData"
-import MessageData from "../../Utils/MessageData"
+import LogDataManager from "../../Utils/LogDataManager"
+import MessageDataManager from "../../Utils/MessageDataManager"
 
 /**
  * WifiManager api Test Page Of wifi test
  */
-
+const PAGE_URI_WIFI_FOUND_MODE = 'pages/subManualApiTest/subWifiTest/wifiFound';
 let wifiManagerEnable = false
 
 export function testEnableWifiManager() {
   try {
-    let message = ( $r( 'app.string.testEnableWifi' ) )
+    let message = ( MessageDataManager.testEnableWifi );
+    console.log( LogDataManager.testEnableWifiManager_StartLog )
     if ( wifiManagerEnable ) {
-      message = "wifi已经使能"
+      message = ( MessageDataManager.testIsActive )
     } else {
       let ret = wifiManager.enableWifi();
-      if ( ret ) {
-        message = "Wifi已打开或打开失败,请确认"
-      }
+      //enableWifi返回值为void,无法判断
+      //      if ( ret ) {
+      //        message = "Wifi已打开或打开失败,请确认"
+      //      }
+      message = ( MessageDataManager.testWifiEnableMaybe )
       wifiManagerEnable = true;
       AppStorage.SetOrCreate( 'wifiManagerIsOn' , wifiManagerEnable );
     }
     prompt.showToast( { message : message } )
+    console.log( LogDataManager.testEnableWifi_EndLo )
     return message
   } catch( e ) {
     console.log( `Failed to testEnableWifiManager. message: ${ e.message }, code: ${ e.code }` )
@@ -53,18 +57,22 @@ export function testEnableWifiManager() {
 
 export function testDisableWifiManager() {
   try {
-    let message = "disableWifi test"
+    let message = ( MessageDataManager.testDisableWifi );
+    console.log( LogDataManager.testDisableWifiManager_StartLog )
     if ( !wifiManagerEnable ) {
-      message = 'WIFI还未使能';
+      message = ( MessageDataManager.testIsInactive )
     } else {
       let ret = wifiManager.disableWifi();
-      if ( ret ) {
-        message += "Wifi已关闭或关闭失败,请确认"
-      }
+      //disableWifi返回值为void,无法判断
+      //      if ( ret ) {
+      //        message = "Wifi已关闭或关闭失败,请确认"
+      //      }
+      message = ( MessageDataManager.testWifiDisableMaybe )
       wifiManagerEnable = false;
       AppStorage.SetOrCreate( 'wifiManagerIsOn' , wifiManagerEnable );
     }
     prompt.showToast( { message : message } )
+    console.log( LogDataManager.testDisableWifiManager_EndLog )
     return message
   } catch( e ) {
     console.log( `Failed to testDisableWifiManager. message: ${ e.message }, code: ${ e.code }` )
@@ -76,16 +84,17 @@ export function testDisableWifiManager() {
 
 export function testIsWifiActiveManager() {
   try {
-    let message = "isWifiActive test"
+    let message = ( MessageDataManager.testIsActive );
+    console.log( LogDataManager.testIsWifiActiveManager_StartLog )
     let ret = wifiManager.isWifiActive();
     if ( ret ) {
       wifiManagerEnable = true
     } else {
       wifiManagerEnable = false
     }
-    message = "wifi使能结果为：" + ret;
-    //  }
+    message = ( MessageDataManager.testIsActiveResult ) + ret
     prompt.showToast( { message : message } )
+    console.log( LogDataManager.testIsWifiActiveManager_EndLog )
     return message
   } catch( e ) {
     console.log( `Failed to testIsWifiActiveManager. message: ${ e.message }, code: ${ e.code }` )
@@ -97,16 +106,20 @@ export function testIsWifiActiveManager() {
 
 export function testScanManager() {
   try {
-    let message = "scan test"
+    let message = ( MessageDataManager.testScan )
+    console.log( LogDataManager.testScanManager_StartLog )
     if ( !wifiManagerEnable ) {
-      message = 'WIFI还未使能';
+      message = ( MessageDataManager.testIsInactive )
     } else {
       let ret = wifiManager.scan()
-      message = "scan: " + ret
-      //    Router.push({ uri: PAGE_URI_WIFI_FOUND_MODE });
+      //scan返回值为void
+      //      message = ( MessageDataManager.testScanResult ) + ret
+      message = "scan 调用成功"
+      Router.push( { uri : PAGE_URI_WIFI_FOUND_MODE } );
       prompt.showToast( { message : message } )
     }
     prompt.showToast( { message : message } )
+    console.log( LogDataManager.testScanManager_EndLog )
     return message
   } catch( e ) {
     console.log( `Failed to testScanManager. message: ${ e.message }, code: ${ e.code }` )
@@ -118,13 +131,14 @@ export function testScanManager() {
 
 export function testGetScanInfoListManager() {
   try {
-    let message = "getScanInfoList test"
-    console.log( "testGetScanInfoListManager start---------" );
+    let message = ( MessageDataManager.testGetScanInfoList )
+    console.log( LogDataManager.testGetScanInfoListManager_StartLog );
     let ret = wifiManager.getScanInfoList()
     message = "扫描结果为：" + JSON.stringify( ret )
-    let getScanInfoManagerMessage = ret
+    console.log( "扫描结果为：" + JSON.stringify( ret ) );
+    let getScanInfoManagerMessage = JSON.stringify( ret )
     AppStorage.SetOrCreate( "getScanInfoManagerMessage" , getScanInfoManagerMessage )
-    console.log( "testGetScanInfoListManager end---------" );
+    console.log( LogDataManager.testGetScanInfoListManager_EndLog );
     prompt.showToast( { message : message } )
     return message
   } catch( e ) {
@@ -135,64 +149,65 @@ export function testGetScanInfoListManager() {
   }
 }
 
-
-let ssid1 = "TP-LINK_6365"
-let bssid1 = "6C:B1:58:75:63:65"
-let preSharedKey1 = "kaihong123"
-let isHiddenSsid1 = false
-let securityType1 = 3
-let creatorUid1 = 1
-let disableReason1 = 0
-let netId1 = 0
-let randomMacType1 = 0
-let randomMacAddr1 = "08:fb:ea:1b:38:aa"
-let ipType1 = 1
-let staticIp_ipAddress1 = 3232235880
-let staticIp_gateway1 = 3232235777
-let staticIp_dnsServers1 = 3716386629
-let staticIp_domains1 = [ "0", "1", "2" ]
-
-let staticIp1 = {
-  ipAddress : staticIp_ipAddress1 ,
-  gateway : staticIp_gateway1 ,
-  dnsServers : staticIp_dnsServers1 ,
-  domains : staticIp_domains1
-}
-
-let wifiDeviceConfigManager = {
-  ssid : ssid1 ,
-  bssid : bssid1 ,
-  preSharedKey : preSharedKey1 ,
-  isHiddenSsid : isHiddenSsid1 ,
-  securityType : securityType1 ,
-  creatorUid : creatorUid1 ,
-  disableReason : disableReason1 ,
-  netId : netId1 ,
-  randomMacType : randomMacType1 ,
-  randomMacAddr : randomMacAddr1 ,
-  ipType : ipType1 ,
-  staticIp : staticIp1
-}
-AppStorage.SetOrCreate( "wifiDeviceConfigManager" , wifiDeviceConfigManager )
+//TODO: 设备调试时候需要打开
+//let ssid1 = "TP-LINK_6365"
+//let bssid1 = "6C:B1:58:75:63:65"
+//let preSharedKey1 = "kaihong123"
+//let isHiddenSsid1 = false
+//let securityType1 = 3
+//let creatorUid1 = 1
+//let disableReason1 = 0
+//let netId1 = 0
+//let randomMacType1 = 0
+//let randomMacAddr1 = "08:fb:ea:1b:38:aa"
+//let ipType1 = 1
+//let staticIp_ipAddress1 = 3232235880
+//let staticIp_gateway1 = 3232235777
+//let staticIp_dnsServers1 = 3716386629
+//let staticIp_domains1 = [ "0", "1", "2" ]
+//
+//let staticIp1 = {
+//  ipAddress : staticIp_ipAddress1 ,
+//  gateway : staticIp_gateway1 ,
+//  dnsServers : staticIp_dnsServers1 ,
+//  domains : staticIp_domains1
+//}
+//
+//let wifiDeviceConfigManager = {
+//  ssid : ssid1 ,
+//  bssid : bssid1 ,
+//  preSharedKey : preSharedKey1 ,
+//  isHiddenSsid : isHiddenSsid1 ,
+//  securityType : securityType1 ,
+//  creatorUid : creatorUid1 ,
+//  disableReason : disableReason1 ,
+//  netId : netId1 ,
+//  randomMacType : randomMacType1 ,
+//  randomMacAddr : randomMacAddr1 ,
+//  ipType : ipType1 ,
+//  staticIp : staticIp1
+//}
+//AppStorage.SetOrCreate( "wifiDeviceConfigManager" , wifiDeviceConfigManager )
 
 export function testAddDeviceConfigManagerPromise() {
   try {
-    let message = "addDeviceConfigPromise test"
-    let ssid1: string = AppStorage.Get( "ssidManager1" )
-    let bssid1: string = AppStorage.Get( "bssidManager1" )
-    let preSharedKey1: string = AppStorage.Get( "preSharedKeyManager1" )
-    let isHiddenSsid1: boolean = AppStorage.Get( "isHiddenSsidManager1" )
-    let securityType1 = AppStorage.Get( "securityTypeManager1" )
-    let creatorUid1 = AppStorage.Get( "creatorUidManager1" )
-    let disableReason1 = AppStorage.Get( "disableReasonManager1" )
-    let netId1 = AppStorage.Get( "netIdManager1" )
-    let randomMacType1 = AppStorage.Get( "randomMacTypeManager1" )
-    let randomMacAddr1 = AppStorage.Get( "randomMacAddrManager1" )
-    let ipType1 = AppStorage.Get( "ipTypeManager1" )
-    let staticIp_ipAddress1 = AppStorage.Get( "staticIp_ipAddressManager1" )
-    let staticIp_gateway1 = AppStorage.Get( "staticIp_gatewayManager1" )
-    let staticIp_dnsServers1 = AppStorage.Get( "staticIp_dnsServersManager1" )
-    let staticIp_domains1 = AppStorage.Get( "staticIp_domainsManager1" )
+    let message = ( MessageDataManager.testAddDeviceConfigPromise )
+    console.log( LogDataManager.testAddDeviceConfigPromiseManager_StartLog )
+    let ssid1: string = AppStorage.Get( "w_ssid1" )
+    let bssid1: string = AppStorage.Get( "w_bssid1" )
+    let preSharedKey1: string = AppStorage.Get( "w_preSharedKey1" )
+    let isHiddenSsid1: boolean = AppStorage.Get( "w_isHiddenSsid1" )
+    let securityType1 = AppStorage.Get( "w_securityType1" )
+    let creatorUid1 = AppStorage.Get( "w_creatorUid1" )
+    let disableReason1 = AppStorage.Get( "w_disableReason1" )
+    let netId1 = AppStorage.Get( "w_netId1" )
+    let randomMacType1 = AppStorage.Get( "w_randomMacType1" )
+    let randomMacAddr1 = AppStorage.Get( "w_randomMacAddr1" )
+    let ipType1 = AppStorage.Get( "w_ipType1" )
+    let staticIp_ipAddress1 = AppStorage.Get( "w_staticIp_ipAddress1" )
+    let staticIp_gateway1 = AppStorage.Get( "w_staticIp_gateway1" )
+    let staticIp_dnsServers1 = AppStorage.Get( "w_staticIp_dnsServers1" )
+    let staticIp_domains1 = AppStorage.Get( "w_staticIp_domains1" )
     let staticIp1 = {
       ipAddress : staticIp_ipAddress1 ,
       gateway : staticIp_gateway1 ,
@@ -215,15 +230,18 @@ export function testAddDeviceConfigManagerPromise() {
     }
     AppStorage.SetOrCreate( "wifiDeviceConfigManager" , wifiDeviceConfigManager )
     if ( !wifiManagerEnable ) {
-      message = "WIFI还未使能";
+      message = ( MessageDataManager.testIsInactive );
     } else {
       wifiManager.addDeviceConfig( wifiDeviceConfigManager ).then( result => {
         //  @returns Returns {@code networkId} if the configuration is added; returns {@code -1} otherwise.
-        message = "addDeviceConfig: " + result
+        console.log( LogDataManager.testAddDeviceConfigPromiseManager_successfulLog )
+        console.log( LogDataManager.testAddDeviceConfigManagerLog + result )
+        message = ( MessageDataManager.testAddDeviceConfig ) + result
         prompt.showToast( { message : message } )
-      } ).catch(err=>{
-        console.log("testAddDeviceConfigManagerPromise error:"+err)
-      })
+        console.log( LogDataManager.testAddDeviceConfigPromiseManager_EndLog )
+      } ).catch( err => {
+        console.log( "testAddDeviceConfigManagerPromise error:" + err )
+      } )
     }
     prompt.showToast( { message : message } )
     return message
@@ -237,20 +255,61 @@ export function testAddDeviceConfigManagerPromise() {
 
 export function testAddDeviceConfigManagerCallback() {
   try {
-    let message = "addDeviceConfigCallback test"
+    let message = ( MessageDataManager.testAddDeviceConfigCallback )
+    console.log( LogDataManager.testAddDeviceConfigCallbackManager_StartLog )
+
+    //TODO: 设备调试时候需要打开
+        let ssid1: string = AppStorage.Get( "w_ssid1" )
+        let bssid1: string = AppStorage.Get( "w_bssid1" )
+        let preSharedKey1: string = AppStorage.Get( "w_preSharedKey1" )
+        let isHiddenSsid1: boolean = AppStorage.Get( "w_isHiddenSsid1" )
+        let securityType1 = AppStorage.Get( "w_securityType1" )
+        let creatorUid1 = AppStorage.Get( "w_creatorUid1" )
+        let disableReason1 = AppStorage.Get( "w_disableReason1" )
+        let netId1 = AppStorage.Get( "w_netId1" )
+        let randomMacType1 = AppStorage.Get( "w_randomMacType1" )
+        let randomMacAddr1 = AppStorage.Get( "w_randomMacAddr1" )
+        let ipType1 = AppStorage.Get( "w_ipType1" )
+        let staticIp_ipAddress1 = AppStorage.Get( "w_staticIp_ipAddress1" )
+        let staticIp_gateway1 = AppStorage.Get( "w_staticIp_gateway1" )
+        let staticIp_dnsServers1 = AppStorage.Get( "w_staticIp_dnsServers1" )
+        let staticIp_domains1 = AppStorage.Get( "w_staticIp_domains1" )
+        let staticIp1 = {
+          ipAddress : staticIp_ipAddress1 ,
+          gateway : staticIp_gateway1 ,
+          dnsServers : staticIp_dnsServers1 ,
+          domains : staticIp_domains1
+        }
+        let wifiDeviceConfigManager = {
+          ssid : ssid1 ,
+          bssid : bssid1 ,
+          preSharedKey : preSharedKey1 ,
+          isHiddenSsid : isHiddenSsid1 ,
+          securityType : securityType1 ,
+          creatorUid : creatorUid1 ,
+          disableReason : disableReason1 ,
+          netId : netId1 ,
+          randomMacType : randomMacType1 ,
+          randomMacAddr : randomMacAddr1 ,
+          ipType : ipType1 ,
+          staticIp : staticIp1
+        }
+        AppStorage.SetOrCreate( "wifiDeviceConfigManager" , wifiDeviceConfigManager )
     if ( !wifiManagerEnable ) {
-      message = "WIFI还未使能";
+      message = ( MessageDataManager.testIsInactive )
     } else {
-      let wifiDeviceConfigManager = AppStorage.Get( "wifiDeviceConfigManager" )
+//      let wifiDeviceConfigManager = AppStorage.Get( "wifiDeviceConfigManager" )
       wifiManager.addDeviceConfig( wifiDeviceConfigManager , ( err , result ) => {
         //  @returns Returns {@code networkId} if the configuration is added; returns {@code -1} otherwise.
         if ( err ) {
           console.error( "addDeviceConfigCallback error:" + err );
           return;
         }
-        message = "getScanInfos callback successful"
-        message = "addDeviceConfig: " + result
+        console.log( LogDataManager.testAddDeviceConfigCallbackManager_successfulLog )
+        console.log( LogDataManager.testAddDeviceConfigManagerLog + result )
+        message = ( MessageDataManager.testAddDeviceConfig ) + result
         prompt.showToast( { message : message } )
+        console.log( LogDataManager.testAddDeviceConfigCallbackManager_EndLog )
       } );
     }
     prompt.showToast( { message : message } )
@@ -265,19 +324,22 @@ export function testAddDeviceConfigManagerCallback() {
 
 export function testAddCandidateConfigManagerPromise() {
   try {
-    let message = "AddCandidateConfigPromise test"
+    let message = ( MessageDataManager.testAddCandidateConfigPromise )
+    console.log( LogDataManager.testAddCandidateConfigPromiseManager_StartLog );
     if ( !wifiManagerEnable ) {
-      message = "WIFI还未使能";
+      message = ( MessageDataManager.testIsInactive )
     } else {
       let wifiDeviceConfigManager = AppStorage.Get( "wifiDeviceConfigManager" )
       wifiManager.addCandidateConfig( wifiDeviceConfigManager ).then( result => {
-        //  @returns Returns {@code true} if the untrusted hotspot configuration is added, returns {@code false} otherwise.
-        console.log( "addCandidateConfig: " + result )
-        message = "addCandidateConfig: " + result
+        //  @returns Returns {@code true} if the Candidate hotspot configuration is added, returns {@code false} otherwise.
+        console.log( LogDataManager.testAddCandidateConfigPromiseManager_successfulLog )
+        console.log( LogDataManager.testAddCandidateConfigManagerLog + result )
+        message = ( MessageDataManager.testAddCandidateConfig + result )
         prompt.showToast( { message : message } )
-      } ).catch(err=>{
-        console.log("testAddCandidateConfigManagerPromise err:"+err)
-      })
+        console.log( LogDataManager.testAddCandidateConfigPromiseManager_EndLog )
+      } ).catch( err => {
+        console.log( "testAddCandidateConfigManagerPromise err:" + err )
+      } )
     }
     prompt.showToast( { message : message } )
     return message
@@ -291,20 +353,23 @@ export function testAddCandidateConfigManagerPromise() {
 
 export function testAddCandidateConfigManagerCallback() {
   try {
-    let message = "AddCandidateConfigCallback test"
+    let message = ( MessageDataManager.testAddCandidateConfigCallback )
+    console.log( LogDataManager.testAddCandidateConfigCallbackManager_StartLog )
     if ( !wifiManagerEnable ) {
-      message = "WIFI还未使能";
+      message = ( MessageDataManager.testIsInactive )
     } else {
       let wifiDeviceConfigManager = AppStorage.Get( "wifiDeviceConfigManager" )
       wifiManager.addCandidateConfig( wifiDeviceConfigManager , ( err , result ) => {
-        //  @returns Returns {@code true} if the untrusted hotspot configuration is added, returns {@code false} otherwise.
+        //  @returns Returns {@code true} if the Candidate hotspot configuration is added, returns {@code false} otherwise.
         if ( err ) {
           console.error( "addCandidateConfigCallback error" );
           return;
         }
-        console.log( "addCandidateConfig: " + result )
-        message = "addCandidateConfig: " + result
+        console.log( LogDataManager.testAddCandidateConfigCallbackManager_successfulLog )
+        console.log( LogDataManager.testAddCandidateConfigManagerLog + result )
+        message = ( MessageDataManager.testAddCandidateConfig + result )
         prompt.showToast( { message : message } )
+        console.log( LogDataManager.testAddCandidateConfigCallbackManager_EndLog )
       } )
     }
     prompt.showToast( { message : message } )
@@ -319,19 +384,22 @@ export function testAddCandidateConfigManagerCallback() {
 
 export function testRemoveCandidateConfigManagerPromise() {
   try {
-    let message = "RemoveCandidateConfigPromise test"
+    let message = ( MessageDataManager.testRemoveCandidateConfigPromise )
+    console.log( LogDataManager.testRemoveCandidateConfigPromiseManager_StartLog )
     if ( !wifiManagerEnable ) {
-      message = "WIFI还未使能";
+      message = ( MessageDataManager.testIsInactive );
     } else {
-      let networkId: number = AppStorage.Get( "networkId" )
+      let networkId: number = AppStorage.Get( "w_networkId1" )
       wifiManager.removeCandidateConfig( networkId ).then( result => {
-        //  @returns Returns {@code true} if the untrusted hotspot configuration is removed, returns {@code false} otherwise.
-        console.log( "removeCandidateConfig: " + result )
-        message = "removeCandidateConfig: " + result
+        //  @returns Returns {@code true} if the Candidate hotspot configuration is removed, returns {@code false} otherwise.
+        console.log( LogDataManager.testRemoveCandidateConfigPromiseManager_successfulLog )
+        console.log( LogDataManager.testRemoveCandidateConfigManagerLog + result )
+        message = MessageDataManager.testRemoveCandidateConfig + result
         prompt.showToast( { message : message } )
-      } ).catch(err=>{
-        console.log("testRemoveCandidateConfigManagerPromise err:"+err)
-      })
+        console.log( LogDataManager.testRemoveCandidateConfigPromiseManager_EndLog )
+      } ).catch( err => {
+        console.log( "testRemoveCandidateConfigManagerPromise err:" + err )
+      } )
     }
     prompt.showToast( { message : message } )
     return message
@@ -345,20 +413,23 @@ export function testRemoveCandidateConfigManagerPromise() {
 
 export function testRemoveCandidateConfigManagerCallback() {
   try {
-    let message = "removeUntrustedConfigCallback test"
+    let message = ( MessageDataManager.testRemoveCandidateConfigCallback )
+    console.log( LogDataManager.testRemoveCandidateConfigCallbackManager_StartLog )
     if ( !wifiManagerEnable ) {
-      message = "WIFI还未使能";
+      message = ( MessageDataManager.testIsInactive );
     } else {
-      let networkId: number = AppStorage.Get( "networkId" )
+      let networkId: number = AppStorage.Get( "w_networkId1" )
       wifiManager.removeCandidateConfig( networkId , ( err , result ) => {
-        //  @returns Returns {@code true} if the untrusted hotspot configuration is removed, returns {@code false} otherwise.
+        //  @returns Returns {@code true} if the Candidate hotspot configuration is removed, returns {@code false} otherwise.
         if ( err ) {
           console.error( "removeCandidateConfigCallback error" );
           return;
         }
-        console.log( "removeCandidateConfig: " + result )
-        message = "removeCandidateConfig: " + result
+        console.log( LogDataManager.testRemoveCandidateConfigCallbackManager_successfulLog )
+        console.log( LogDataManager.testRemoveCandidateConfigManagerLog + result )
+        message = ( MessageDataManager.testRemoveCandidateConfig + result )
         prompt.showToast( { message : message } )
+        console.log( LogDataManager.testRemoveCandidateConfigCallbackManager_EndLog )
       } )
     }
     prompt.showToast( { message : message } )
@@ -373,10 +444,13 @@ export function testRemoveCandidateConfigManagerCallback() {
 
 export function testGetCandidateConfigsManager() {
   try {
-    let message = "GetCandidateConfigs test"
+    let message = ( MessageDataManager.testGetCandidateConfigs )
+    console.log( LogDataManager.testGetCandidateConfigsManager_StartLog )
     let ret = wifiManager.getCandidateConfigs()
     message = "候选配置：" + JSON.stringify( ret )
+    console.log( "候选配置：" + JSON.stringify( ret ) );
     prompt.showToast( { message : message } )
+    console.log( LogDataManager.testGetCandidateConfigsManager_EndLog )
     return message
   } catch( e ) {
     console.log( `Failed to testGetCandidateConfigsManager. message: ${ e.message }, code: ${ e.code }` )
@@ -388,15 +462,20 @@ export function testGetCandidateConfigsManager() {
 
 export function testConnectToCandidateConfigManager() {
   try {
-    let message = "ConnectToCandidateConfig test"
-    let networkId = AppStorage.Get( "networkId" )
+    let message = ( MessageDataManager.testConnectToCandidateConfig )
+    console.log( LogDataManager.testConnectToCandidateConfigManager_StartLog )
+    let networkId = AppStorage.Get( "w_networkId1" )
     if ( !wifiManagerEnable ) {
-      message = "WIFI还未使能";
+      message = ( MessageDataManager.testIsInactive );
     } else {
       let ret = wifiManager.connectToCandidateConfig( networkId )
-      message = "connectToCandidateConfig: " + ret
+      //      connectToCandidateConfig的返回值为void，无法判断
+      //      message = "connectToCandidateConfig: " + ret
+      message = "connectToCandidateConfig 调用成功"
+      console.log( "connectToCandidateConfig 调用成功" )
     }
     prompt.showToast( { message : message } )
+    console.log( LogDataManager.testConnectToCandidateConfigManager_EndLog )
     return message
   } catch( e ) {
     console.log( `Failed to testConnectToCandidateConfigManager. message: ${ e.message }, code: ${ e.code }` )
@@ -408,15 +487,20 @@ export function testConnectToCandidateConfigManager() {
 
 export function testConnectToNetworkManager() {
   try {
-    let message = "connectToNetwork test"
-    let networkId: number = AppStorage.Get( "networkId" )
+    let message = ( MessageDataManager.testConnectToNetwork )
+    console.log( LogDataManager.testConnectToNetworkManager_StartLog )
+    let networkId: number = AppStorage.Get( "w_networkId1" )
     if ( !wifiManagerEnable ) {
-      message = "WIFI还未使能";
+      message = ( MessageDataManager.testIsInactive );
     } else {
       let ret = wifiManager.connectToNetwork( networkId )
-      message = "ConnectToNetwork: " + ret
+      //      connectToNetwork的返回值为void，无法判断
+      //      message = "ConnectToNetwork: " + ret
+      message = "ConnectToNetwork 调用成功"
+      console.log( "connectToCandidateConfig 调用成功" )
     }
     prompt.showToast( { message : message } )
+    console.log( LogDataManager.testConnectToNetworkManager_EndLog )
     return message
   } catch( e ) {
     console.log( `Failed to testConnectToNetworkManager. message: ${ e.message }, code: ${ e.code }` )
@@ -428,15 +512,20 @@ export function testConnectToNetworkManager() {
 
 export function testConnectToDeviceManager() {
   try {
-    let message = "connectToDevice test"
+    let message = ( MessageDataManager.testConnectToDevice )
+    console.log( LogDataManager.testConnectToDeviceManager_StartLog )
     if ( !wifiManagerEnable ) {
-      message = "WIFI还未使能";
+      message = ( MessageDataManager.testIsInactive );
     } else {
-      let wifiDeviceConfig = AppStorage.Get( "wifiDeviceConfig" )
-      let ret = wifiManager.connectToDevice( wifiDeviceConfig )
-      message = "ConnectToDevice:" + ret
+      let wifiDeviceConfigManager = AppStorage.Get( "wifiDeviceConfigManager" )
+      let ret = wifiManager.connectToDevice( wifiDeviceConfigManager )
+      //      connectToDevice的返回值为void，无法判断
+      //      message = "ConnectToDevice:" + ret
+      message = "connectToDevice 调用成功"
+      console.log( "connectToDevice 调用成功" )
     }
     prompt.showToast( { message : message } )
+    console.log( LogDataManager.testConnectToNetworkManager_EndLog )
     return message
   } catch( e ) {
     console.log( `Failed to testConnectToDeviceManager. message: ${ e.message }, code: ${ e.code }` )
@@ -448,14 +537,19 @@ export function testConnectToDeviceManager() {
 
 export function testDisconnectManager() {
   try {
-    let message = "disconnect test"
+    let message = ( MessageDataManager.testDisconnect )
+    console.log( LogDataManager.testDisconnectManager_StartLog )
     if ( !wifiManagerEnable ) {
-      message = "WIFI还未使能";
+      message = ( MessageDataManager.testIsInactive );
     } else {
       let ret = wifiManager.disconnect()
-      message = "disconnect: " + ret
+      //      disconnect的返回值为void
+      //      message = "disconnect: " + ret
+      message = "disconnect 调用成功"
+      console.log( "disconnect 调用成功" )
     }
     prompt.showToast( { message : message } )
+    console.log( LogDataManager.testDisconnectManager_EndLog )
     return message
   } catch( e ) {
     console.log( `Failed to testDisconnectManager. message: ${ e.message }, code: ${ e.code }` )
@@ -467,16 +561,19 @@ export function testDisconnectManager() {
 
 export function testGetSignalLevelManager() {
   try {
-    let message = "getSignalLevel test"
+    let message = ( MessageDataManager.testGetSignalLevel )
+    console.log( LogDataManager.testGetSignalLevelManager_StartLog )
     if ( !wifiManagerEnable ) {
-      message = "WIFI还未使能";
+      message = ( MessageDataManager.testIsInactive )
     } else {
-      let rssi: number = AppStorage.Get( "rssi" )
-      let band: number = AppStorage.Get( "band" )
+      let rssi: number = AppStorage.Get( "w_rssi1" )
+      let band: number = AppStorage.Get( "w_band1" )
       let number = wifiManager.getSignalLevel( rssi , band )
       message = "getSignalLevel is: " + number
+      console.log( "getSignalLevel is: " + number )
     }
     prompt.showToast( { message : message } )
+    console.log( LogDataManager.testGetSignalLevelManager_EndLog )
     return message
   } catch( e ) {
     console.log( `Failed to testGetSignalLevelManager. message: ${ e.message }, code: ${ e.code }` )
@@ -488,14 +585,19 @@ export function testGetSignalLevelManager() {
 
 export function testGetLinkedInfoManagerPromise() {
   try {
-    let message = "getLinkedInfoPromise test"
+    let message = ( MessageDataManager.testGetLinkedInfoPromise )
+    console.log( LogDataManager.testGetLinkedInfoPromiseManager_StartLog );
     if ( !wifiManagerEnable ) {
-      message = "WIFI还未使能";
+      message = ( MessageDataManager.testIsInactive )
     } else {
       wifiManager.getLinkedInfo().then( data => {
+        console.log( LogDataManager.testGetLinkedInfoPromiseManager_successfulLog )
+        message = "get wifi linked info: " + JSON.stringify( data )
         console.log( "get wifi linked info: " + JSON.stringify( data ) );
+        prompt.showToast( { message : message } )
+        console.log( LogDataManager.testGetLinkedInfoPromiseManager_EndLog );
       } ).catch( error => {
-        console.log( "get linked info error:"+error );
+        console.log( "get linked info error:" + error );
       } );
     }
     prompt.showToast( { message : message } )
@@ -510,9 +612,10 @@ export function testGetLinkedInfoManagerPromise() {
 
 export function testGetLinkedInfoManagerCallback() {
   try {
-    let message = "getLinkedInfoCallback test"
+    let message = ( MessageDataManager.testGetLinkedInfoCallback )
+    console.log( LogDataManager.testGetLinkedInfoCallbackManager_StartLog );
     if ( !wifiManagerEnable ) {
-      message = "WIFI还未使能";
+      message = ( MessageDataManager.testIsInactive )
     } else {
       wifiManager.getLinkedInfo( ( err , data ) => {
         if ( err ) {
@@ -520,6 +623,7 @@ export function testGetLinkedInfoManagerCallback() {
           message = "get linked info error"
           prompt.showToast( { message : message } )
         }
+        console.log( LogDataManager.testGetLinkedInfoCallbackManager_successfulLog )
         console.log( "get wifi linked info: " + JSON.stringify( data ) );
         message = "get wifi linked info: " + JSON.stringify( data )
         let linkedInfoManagerMessage = JSON.stringify( data )
@@ -527,10 +631,11 @@ export function testGetLinkedInfoManagerCallback() {
         let rssi = data.rssi
         let band = data.band
         let networkId = data.networkId
-        AppStorage.SetOrCreate( "rssi" , rssi )
-        AppStorage.SetOrCreate( "band" , band )
-        AppStorage.SetOrCreate( "networkId" , networkId )
+        AppStorage.SetOrCreate( "w_rssi1" , rssi )
+        AppStorage.SetOrCreate( "w_band1" , band )
+        AppStorage.SetOrCreate( "w_networkId1" , networkId )
         prompt.showToast( { message : message } )
+        console.log( LogDataManager.testGetLinkedInfoCallbackManager_EndLog );
       } );
     }
     prompt.showToast( { message : message } )
@@ -545,14 +650,16 @@ export function testGetLinkedInfoManagerCallback() {
 
 export function testIsConnectedManager() {
   try {
-    let message = " IsConnected test "
+    let message = ( MessageDataManager.testIsConnected )
+    console.log( LogDataManager.testIsConnectedManager_StartLog );
     if ( !wifiManagerEnable ) {
-      message = "WIFI还未使能";
+      message = ( MessageDataManager.testIsInactive );
     } else {
       let ret = wifiManager.isConnected()
       message = "isConnected: " + ret
     }
     prompt.showToast( { message : message } )
+    console.log( LogDataManager.testIsConnectedManager_EndLog );
     return message
   } catch( e ) {
     console.log( `Failed to testIsConnectedManager. message: ${ e.message }, code: ${ e.code }` )
@@ -564,14 +671,16 @@ export function testIsConnectedManager() {
 
 export function testGetSupportedFeaturesManager() {
   try {
-    let message = "getSupportedFeatures test"
+    let message = ( MessageDataManager.testGetSupportedFeatures )
+    console.log( LogDataManager.testGetSupportedFeaturesManager_StartLog );
     if ( !wifiManagerEnable ) {
-      message = "WIFI还未使能";
+      message = ( MessageDataManager.testIsInactive );
     } else {
       let ret = wifiManager.getSupportedFeatures()
       message = "GetSupportedFeatures: " + ret
     }
     prompt.showToast( { message : message } )
+    console.log( LogDataManager.testGetSupportedFeaturesManager_EndLog );
     return message
   } catch( e ) {
     console.log( `Failed to testGetSupportedFeaturesManager. message: ${ e.message }, code: ${ e.code }` )
@@ -583,15 +692,17 @@ export function testGetSupportedFeaturesManager() {
 
 export function testIsFeatureSupportedManager() {
   try {
-    let message = "isFeatureSupported test"
+    let message = ( MessageDataManager.testIsFeatureSupported )
+    console.log( LogDataManager.testIsFeatureSupportedManager_StartLog );
     if ( !wifiManagerEnable ) {
-      message = "WIFI还未使能";
+      message = ( MessageDataManager.testIsInactive )
     } else {
-      let featureId = AppStorage.Get( "featureId" )
+      let featureId = AppStorage.Get( "w_featureId1" )
       let ret = wifiManager.isFeatureSupported( featureId )
       message = "isFeatureSupported: " + ret
     }
     prompt.showToast( { message : message } )
+    console.log( LogDataManager.testGetSupportedFeaturesManager_EndLog )
     return message
   } catch( e ) {
     console.log( `Failed to testIsFeatureSupportedManager. message: ${ e.message }, code: ${ e.code }` )
@@ -603,14 +714,16 @@ export function testIsFeatureSupportedManager() {
 
 export function testGetDeviceMacAddressManager() {
   try {
-    let message = "GetDeviceMacAddress test"
+    let message = ( MessageDataManager.testGetDeviceMacAddress )
+    console.log( LogDataManager.testGetDeviceMacAddressManager_StartLog )
     if ( !wifiManagerEnable ) {
-      message = "WIFI还未使能";
+      message = ( MessageDataManager.testIsInactive );
     } else {
       let macAddress = wifiManager.getDeviceMacAddress()
       message = "macAddress: " + macAddress
     }
     prompt.showToast( { message : message } )
+    console.log( LogDataManager.testGetDeviceMacAddressManager_EndLog );
     return message
   } catch( e ) {
     console.log( `Failed to testGetDeviceMacAddressManager. message: ${ e.message }, code: ${ e.code }` )
@@ -622,9 +735,10 @@ export function testGetDeviceMacAddressManager() {
 
 export function testGetIpInfoManager() {
   try {
-    let message = "getIpInfo test"
+    let message = ( MessageDataManager.testGetIpInfo )
+    console.log( LogDataManager.testGetIpInfoManager_StartLog );
     if ( !wifiManagerEnable ) {
-      message = "WIFI还未使能";
+      message = ( MessageDataManager.testIsInactive );
     } else {
       let IpInfo = wifiManager.getIpInfo()
       message = "IpInfo: " + JSON.stringify( IpInfo )
@@ -632,6 +746,7 @@ export function testGetIpInfoManager() {
       AppStorage.SetOrCreate( "ipInfoManagerMessage" , ipInfoManagerMessage )
     }
     prompt.showToast( { message : message } )
+    console.log( LogDataManager.testGetIpInfoManager_EndLog );
     return message
   } catch( e ) {
     console.log( `Failed to testGetIpInfoManager. message: ${ e.message }, code: ${ e.code }` )
@@ -643,14 +758,16 @@ export function testGetIpInfoManager() {
 
 export function testGetCountryCodeManager() {
   try {
-    let message = "getCountryCode test"
+    let message = ( MessageDataManager.testGetCountryCode )
+    console.log( LogDataManager.testGetCountryCodeManager_StartLog );
     if ( !wifiManagerEnable ) {
-      message = "WIFI还未使能";
+      message = ( MessageDataManager.testIsInactive )
     } else {
       let ret = wifiManager.getCountryCode()
       message = "CountryCode is: " + ret
     }
     prompt.showToast( { message : message } )
+    console.log( LogDataManager.testGetCountryCodeManager_EndLog );
     return message
   } catch( e ) {
     console.log( `Failed to testGetCountryCodeManager. message: ${ e.message }, code: ${ e.code }` )
@@ -662,14 +779,18 @@ export function testGetCountryCodeManager() {
 
 export function testReassociateManager() {
   try {
-    let message = "reassociate test"
+    let message = ( MessageDataManager.testReassociate )
+    console.log( LogDataManager.testReassociateManager_StartLog );
     if ( !wifiManagerEnable ) {
-      message = "WIFI还未使能";
+      message = ( MessageDataManager.testIsInactive );
     } else {
       let ret = wifiManager.reassociate()
-      message = "reassociate is: " + ret
+      //      reassociate的返回值为void
+      //      message = "reassociate is: " + ret
+      message = "reassociate 调用成功"
     }
     prompt.showToast( { message : message } )
+    console.log( LogDataManager.testReassociateManager_EndLog );
     return message
   } catch( e ) {
     console.log( `Failed to testReassociateManager. message: ${ e.message }, code: ${ e.code }` )
@@ -681,14 +802,18 @@ export function testReassociateManager() {
 
 export function testReconnectManager() {
   try {
-    let message = "reConnect test"
+    let message = ( MessageDataManager.testReConnect )
+    console.log( LogDataManager.testReConnectManager_StartLog );
     if ( !wifiManagerEnable ) {
-      message = "WIFI还未使能";
+      message = ( MessageDataManager.testIsInactive )
     } else {
       let ret = wifiManager.reconnect()
-      message = " reConnect is: " + ret
+      //      reconnect的返回值为void
+      //      message = " reConnect is: " + ret
+      message = "reconnect 调用成功"
     }
     prompt.showToast( { message : message } )
+    console.log( LogDataManager.testReConnectManager_EndLog );
     return message
   } catch( e ) {
     console.log( `Failed to testReconnectManager. message: ${ e.message }, code: ${ e.code }` )
@@ -700,16 +825,18 @@ export function testReconnectManager() {
 
 export function testGetDeviceConfigsManager() {
   try {
-    let message = "getDeviceConfigs test "
+    let message = ( MessageDataManager.testGetDeviceConfigs )
+    console.log( LogDataManager.testGetDeviceConfigsManager_StartLog );
     if ( !wifiManagerEnable ) {
-      message = "WIFI还未使能";
+      message = ( MessageDataManager.testIsInactive );
     } else {
       let array = wifiManager.getDeviceConfigs()
-      message = " DeviceConfigs is " + array
-      let getDeviceConfigsManagerMessage = array
+      message = " DeviceConfigs is " + JSON.stringify( array )
+      let getDeviceConfigsManagerMessage = JSON.stringify( array )
       AppStorage.SetOrCreate( "getDeviceConfigsManagerMessage" , getDeviceConfigsManagerMessage )
     }
     prompt.showToast( { message : message } )
+    console.log( LogDataManager.testGetDeviceConfigsManager_EndLog );
     return message
   } catch( e ) {
     console.log( `Failed to testGetDeviceConfigsManager. message: ${ e.message }, code: ${ e.code }` )
@@ -721,15 +848,17 @@ export function testGetDeviceConfigsManager() {
 
 export function testUpdateDeviceConfigManager() {
   try {
-    let message = "updateNetwork test"
+    let message = ( MessageDataManager.testUpdateNetwork )
+    console.log( LogDataManager.testUpdateNetworkManager_StartLog );
     if ( !wifiManagerEnable ) {
-      message = "WIFI还未使能";
+      message = ( MessageDataManager.testIsInactive );
     } else {
-      let wifiDeviceConfig = AppStorage.Get( "wifiDeviceConfig" )
-      let ret = wifiManager.updateDeviceConfig( wifiDeviceConfig )
+      let wifiDeviceConfigManager = AppStorage.Get( "wifiDeviceConfigManager" )
+      let ret = wifiManager.updateDeviceConfig( wifiDeviceConfigManager )
       message = "updateNetwork: " + ret
     }
     prompt.showToast( { message : message } )
+    console.log( LogDataManager.testUpdateNetworkManager_EndLog );
     return message
   } catch( e ) {
     console.log( `Failed to testUpdateDeviceConfigManager. message: ${ e.message }, code: ${ e.code }` )
@@ -741,15 +870,19 @@ export function testUpdateDeviceConfigManager() {
 
 export function testDisableDeviceConfigManager() {
   try {
-    let message = "disableNetWork test"
+    let message = ( MessageDataManager.testDisableNetwork )
+    console.log( LogDataManager.testDisableNetworkManager_StartLog );
     if ( !wifiManagerEnable ) {
-      message = "WIFI还未使能";
+      message = ( MessageDataManager.testIsInactive );
     } else {
-      let networkId = AppStorage.Get( "networkId" )
+      let networkId = AppStorage.Get( "w_networkId1" )
       let ret = wifiManager.disableDeviceConfig( networkId )
-      message = "disableNetwork: " + ret
+      //      disableDeviceConfig的返回值为void
+      //      message = "disableNetwork: " + ret
+      message = "disableNetwork 调用成功"
     }
     prompt.showToast( { message : message } )
+    console.log( LogDataManager.testDisableNetworkManager_EndLog );
     return message
   } catch( e ) {
     console.log( `Failed to testDisableDeviceConfigManager. message: ${ e.message }, code: ${ e.code }` )
@@ -761,14 +894,18 @@ export function testDisableDeviceConfigManager() {
 
 export function testRemoveAllDeviceConfigsManager() {
   try {
-    let message = "removeAllNetwork test"
+    let message = ( MessageDataManager.testRemoveAllNetwork )
+    console.log( LogDataManager.testRemoveAllNetworkManager_StartLog );
     if ( !wifiManagerEnable ) {
-      message = "WIFI还未使能";
+      message = ( MessageDataManager.testIsInactive );
     } else {
       let ret = wifiManager.removeAllDeviceConfigs()
-      message = "removeAllNetwork: " + ret
+      //      removeAllDeviceConfigs的返回值为void
+      //      message = "removeAllNetwork: " + ret
+      message = "removeAllDeviceConfigs 调用成功"
     }
     prompt.showToast( { message : message } )
+    console.log( LogDataManager.testRemoveAllNetworkManager_EndLog );
     return message
   } catch( e ) {
     console.log( `Failed to testRemoveAllDeviceConfigsManager. message: ${ e.message }, code: ${ e.code }` )
@@ -780,15 +917,19 @@ export function testRemoveAllDeviceConfigsManager() {
 
 export function testRemoveDeviceConfigManager() {
   try {
-    let message = "removeDevice test"
+    let message = ( MessageDataManager.testRemoveDevice )
+    console.log( LogDataManager.testRemoveDeviceManager_StartLog );
     if ( !wifiManagerEnable ) {
-      message = "WIFI还未使能";
+      message = ( MessageDataManager.testIsInactive );
     } else {
-      let networkId = AppStorage.Get( "networkId" )
+      let networkId = AppStorage.Get( "w_networkId1" )
       let ret = wifiManager.removeDeviceConfig( networkId )
-      message = "removeDevice " + ret
+      //      removeDeviceConfig的返回值为void
+      //      message = "removeDevice " + ret
+      message = "removeDeviceConfig 调用成功"
     }
     prompt.showToast( { message : message } )
+    console.log( LogDataManager.testRemoveDeviceManager_EndLog );
     return message
   } catch( e ) {
     console.log( `Failed to testRemoveDeviceConfigManager. message: ${ e.message }, code: ${ e.code }` )
@@ -803,11 +944,7 @@ let wifiStateChangeManager = false
 export function testOnWifiStateChangeManager() {
   try {
     let message = "onWifiStateChange test"
-    console.log( "testOnWifiStateChange test" );
-    //  if(!wifiManagerEnable){
-    //    message ="WIFI还未使能";
-    //    return message
-    //  }
+    console.log( LogDataManager.testOnWifiStateChangeManager_StartLog );
     if ( wifiStateChangeManager ) {
       wifiManager.off( "wifiStateChange" , () => {
         prompt.showToast( { message : "on.WifiStateChange监听已关闭" } )
@@ -834,6 +971,7 @@ export function testOnWifiStateChangeManager() {
             break;
         }
         prompt.showToast( { message : "状态:" + wifiStateMessage } )
+        console.log( LogDataManager.testOnWifiStateChangeManager_EndLog );
       } )
       message = "打开注册WLAN状态变化"
       prompt.showToast( { message : message } )
@@ -853,9 +991,9 @@ let wifiConnectionChangeManager = false
 export function testOnWifiConnectionChangeManager() {
   try {
     let message = "OnWifiConnectionChange test"
-    console.log( "testOnWifiConnectionChange test" );
+    console.log( LogDataManager.testOnWifiConnectionChangeManager_StartLog );
     if ( !wifiManagerEnable ) {
-      message = "WIFI还未使能";
+      message = ( MessageDataManager.testIsInactive );
       return message
     }
     if ( wifiConnectionChangeManager ) {
@@ -878,6 +1016,7 @@ export function testOnWifiConnectionChangeManager() {
             break;
         }
         prompt.showToast( { message : "状态: " + wifiConnectionMessage } )
+        console.log( LogDataManager.testOnWifiConnectionChangeManager_EndLog );
       } )
       message = "打开注册WLAN连接状态变化"
       prompt.showToast( { message : message } )
@@ -897,9 +1036,9 @@ let wifiScanStateChangeManager = false
 export function testOnWifiScanStateChangeManager() {
   try {
     let message = "OnWifiScanStateChange test"
-    console.log( "testOnWifiScanStateChange test" );
+    console.log( LogDataManager.testOnWifiScanStateChangeManager_StartLog );
     if ( !wifiManagerEnable ) {
-      message = "WIFI还未使能";
+      message = ( MessageDataManager.testIsInactive );
       return message
     }
     if ( wifiScanStateChangeManager ) {
@@ -922,6 +1061,7 @@ export function testOnWifiScanStateChangeManager() {
             break;
         }
         prompt.showToast( { message : "状态: " + wifiScanStateMessage } )
+        console.log( LogDataManager.testOnWifiScanStateChangeManager_EndLog );
       } )
       message = "打开注册扫描状态变化"
       prompt.showToast( { message : message } )
@@ -941,9 +1081,9 @@ let wifiRssiChangeManager = false
 export function testOnWifiRssiChangeManager() {
   try {
     let message = "OnWifiRssiChange test"
-    console.log( "testOnWifiRssiChange test" );
+    console.log( LogDataManager.testOnWifiRssiChangeManager_StartLog );
     if ( !wifiManagerEnable ) {
-      message = "WIFI还未使能";
+      message = ( MessageDataManager.testIsInactive );
       return message
     }
     if ( wifiRssiChangeManager ) {
@@ -956,6 +1096,7 @@ export function testOnWifiRssiChangeManager() {
         prompt.showToast( { message : "rssi: " + number } )
       } )
       message = "打开注册RSSI状态变化"
+      console.log( LogDataManager.testOnWifiRssiChangeManager_EndLog );
       prompt.showToast( { message : message } )
     }
     wifiRssiChangeManager = !wifiRssiChangeManager
@@ -973,9 +1114,9 @@ let streamChangeManager = false
 export function testOnStreamChangeManager() {
   try {
     let message = "onStreamChange test"
-    console.log( "testOnStreamChange test" );
+    console.log( LogDataManager.testOnStreamChangeManager_StartLog );
     if ( !wifiManagerEnable ) {
-      message = "WIFI还未使能";
+      message = ( MessageDataManager.testIsInactive );
       return message
     }
     if ( streamChangeManager ) {
@@ -1004,6 +1145,7 @@ export function testOnStreamChangeManager() {
             break;
         }
         prompt.showToast( { message : "状态:" + streamChangeMessage } )
+        console.log( LogDataManager.testOnStreamChangeManager_EndLog );
       } )
       message = "打开注册流变化"
       prompt.showToast( { message : message } )
@@ -1022,10 +1164,11 @@ let deviceConfigChange = false
 
 export function testOnDeviceConfigChangeManager() {
   try {
-    let message = "onDeviceConfigChange test"
+    let message = "OnDeviceConfigChange test"
+    console.log( LogDataManager.testOnDeviceConfigChangeManager_StartLog );
     console.log( "testOnDeviceConfigChange test" );
     if ( !wifiManagerEnable ) {
-      message = "WIFI还未使能";
+      message = ( MessageDataManager.testIsInactive );
       return message
     }
     if ( deviceConfigChange ) {
@@ -1051,6 +1194,7 @@ export function testOnDeviceConfigChangeManager() {
             break;
         }
         prompt.showToast( { message : "状态:" + deviceConfigMessage } )
+        console.log( LogDataManager.testOnDeviceConfigChangeManager_EndLog );
       } )
       message = "打开注册设备配置变化"
       prompt.showToast( { message : message } )

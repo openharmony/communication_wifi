@@ -137,8 +137,12 @@
       "value": "正在搜索…"
     },
     {
-      "name": "entry_MainAbility",
-      "value": "eTSWLAN"
+      "name": "entry_wifi_MainAbility",
+      "value": "wifi扫描结果"
+    },
+    {
+      "name": "entry_p2p_MainAbility",
+      "value": "p2p扫描结果"
     },
     {
       "name": "description_mainability",
@@ -147,6 +151,10 @@
     {
       "name": "sure",
       "value": "Sure"
+    },
+    {
+      "name":"router_uri",
+      "value": "跳转"
     },
     {
       "name": "wlan",
@@ -166,75 +174,79 @@
     },
     {
       "name": "send_message",
-      "value": "send message"
+      "value": "发送"
     },
     {
       "name": "about",
-      "value": "About"
+      "value": "关于"
     },
     {
       "name": "ip_address",
-      "value": "IP address:"
+      "value": "IP地址:"
     },
     {
       "name": "gate_way",
-      "value": "Gateway:"
+      "value": "网关:"
     },
     {
       "name": "net_mask",
-      "value": "Netmask:"
+      "value": "掩码:"
     },
     {
       "name": "primary_dns",
-      "value": "Primary Dns IP address:"
+      "value": "主DNS服务器:"
     },
     {
       "name": "second_dns",
-      "value": "Second DNS IP address:"
+      "value": "备DNS服务器:"
     },
     {
       "name": "server_ip",
-      "value": "DHCP server IP:"
+      "value": "DHCP服务端ip:"
     },
     {
       "name": "lease_duration",
-      "value": "IP address lease duration:"
+      "value": "IP地址租用时长:"
     },
     {
       "name": "country_code",
-      "value": "Country code:"
+      "value": "国家码:"
     },
     {
       "name": "infrastructure_feature",
-      "value": "Infrastructure Feature:"
+      "value": "基础结构模式特性:"
     },
     {
       "name": "ghz_feature",
-      "value": "5 GHz Feature:"
+      "value": "5 GHz 宽带特性:"
     },
     {
       "name": "gas_anqp_feature",
-      "value": "GAS/ANQP Feature:"
+      "value": "GAS/ANQP特性:"
     },
     {
       "name": "wifi_direct",
-      "value": "Wifi-Direct Feature:"
+      "value": "WiFi-Direct特性:"
     },
     {
       "name": "soft_ap",
-      "value": "Soft AP Feature:"
+      "value": "Soft AP特性:"
     },
     {
       "name": "wifi_aware",
-      "value": "Wifi Aware Feature:"
+      "value": "WiFi Aware组网特性:"
     },
     {
       "name": "encryption",
-      "value": "encrypted"
+      "value": "加密"
+    },
+    {
+      "name": "useful",
+      "value": "可用"
     },
     {
       "name": "open",
-      "value": "open"
+      "value": "开放"
     },
     {
       "name": "wifi_enable",
@@ -531,6 +543,22 @@
     {
       "name": "testDisconnect_Start",
       "value": "testDisconnect Start----------"
+    },
+    {
+      "name": "choice_download_file",
+      "value": "请选择需要下载的文件"
+    },
+    {
+      "name": "upload_page",
+      "value": "上传"
+    },
+    {
+      "name": "click_download",
+      "value": "点击下载"
+    },
+    {
+      "name": "download_progress",
+      "value": "下载进度："
     },
     {
       "name": "testDisconnect_End",
@@ -1663,6 +1691,18 @@
     {
       "name": "p2pDiscoveryChange",
       "value": "状态为: "
+    },
+    {
+      "name": "wlanIsConnected",
+      "value": "已连接"
+    },
+    {
+      "name": "wlan_available",
+      "value": "可用WLAN"
+    },
+    {
+      "name": "p2p_available",
+      "value": "可用p2p"
     }
   ]
 }

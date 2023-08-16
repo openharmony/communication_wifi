@@ -29,8 +29,8 @@ using namespace std;
 
 namespace OHOS {
 namespace Wifi {
-std::shared_ptr<WifiDevice> ptrWifiDevice = WifiDevice::GetInstance(WIFI_DEVICE_ABILITY_ID);
-std::shared_ptr<WifiScan> ptrWifiScan = WifiScan::GetInstance(WIFI_SCAN_ABILITY_ID);
+std::unique_ptr<WifiDevice> ptrWifiDevice = WifiDevice::GetInstance(WIFI_DEVICE_ABILITY_ID);
+std::unique_ptr<WifiScan> ptrWifiScan = WifiScan::GetInstance(WIFI_SCAN_ABILITY_ID);
 
 const int MAX_ARGS = 16;
 const int BAND_2GHZ = 1;

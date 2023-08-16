@@ -24,7 +24,7 @@
 
 DEFINE_WIFILOG_LABEL("WifiCHotspot");
 
-std::shared_ptr<OHOS::Wifi::WifiHotspot> hotspotPtr = OHOS::Wifi::WifiHotspot::GetInstance(WIFI_HOTSPOT_ABILITY_ID);
+std::unique_ptr<OHOS::Wifi::WifiHotspot> hotspotPtr = OHOS::Wifi::WifiHotspot::GetInstance(WIFI_HOTSPOT_ABILITY_ID);
 
 NO_SANITIZE("cfi") WifiErrorCode EnableHotspot()
 {

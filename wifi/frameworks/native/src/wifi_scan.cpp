@@ -24,21 +24,32 @@ DEFINE_WIFILOG_SCAN_LABEL("WifiScan");
 
 namespace OHOS {
 namespace Wifi {
-NO_SANITIZE("cfi") std::shared_ptr<WifiScan> WifiScan::GetInstance(int systemAbilityId)
+NO_SANITIZE("cfi") std::unique_ptr<WifiScan> WifiScan::CreateWifiScan(int systemAbilityId)
 {
-    std::shared_ptr<WifiScanImpl> pImpl = DelayedSingleton<WifiScanImpl>::GetInstance();
-    if (pImpl && pImpl->Init(systemAbilityId)) {
-        WIFI_LOGI("succeeded");
-        return pImpl;
+    std::unique_ptr<WifiScanImpl> pImpl = std::make_unique<WifiScanImpl>(systemAbilityId);
+    if (pImpl != nullptr) {
+        if (pImpl->Init()) {
+            WIFI_LOGI("succeeded");
+            return (pImpl);
+        }
     }
 
     WIFI_LOGE("new wifi WifiScan failed");
     return nullptr;
 }
 
-WifiScan::~WifiScan()
+NO_SANITIZE("cfi") std::unique_ptr<WifiScan> WifiScan::GetInstance(int systemAbilityId)
 {
-    DelayedSingleton<WifiScanImpl>::DestroyInstance();
+    std::unique_ptr<WifiScanImpl> pImpl = std::make_unique<WifiScanImpl>(systemAbilityId);
+    if (pImpl != nullptr) {
+        if (pImpl->Init()) {
+            WIFI_LOGI("succeeded");
+            return pImpl;
+        }
+    }
+
+    WIFI_LOGE("new wifi WifiScan failed");
+    return nullptr;
 }
 }  // namespace Wifi
 }  // namespace OHOS

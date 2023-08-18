@@ -23,7 +23,7 @@ import ConfigData from '../Utils/ConfigData';
 
 @CustomDialog
 export struct PswDialog {
-  @Link scanInfo: wifi.WifiScanInfo
+  private scanInfo: any = null
   private psw: string = ''
   private controller: CustomDialogController
   private action: ( scanInfo , psw ) => void
@@ -61,7 +61,7 @@ export struct PswDialog {
           .width( 1 ).height( 35 )
           .backgroundColor( '#8F8F8F' )
         Button() {
-          Text( $r( 'app.string.router_uri' ) )
+          Text( $r( 'app.string.cancel' ) )
             .fontColor( Color.Red )
             .fontSize( 17 )
         }

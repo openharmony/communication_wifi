@@ -39,7 +39,7 @@ struct WifiFound {
     rssi : 0 ,
     band : 0
   }
-  @State wifiList: Array<any> = []
+  private wifiList: Array<any> = []
   @State isLinked: boolean = false
   @State isSwitchOn: boolean = false
 

@@ -61,7 +61,7 @@ export struct PswDialog {
           .width( 1 ).height( 35 )
           .backgroundColor( '#8F8F8F' )
         Button() {
-          Text( $r( 'app.string.cancel' ) )
+          Text( $r( 'app.string.router_uri' ) )
             .fontColor( Color.Red )
             .fontSize( 17 )
         }
@@ -78,3 +78,4 @@ export struct PswDialog {
     .padding( 15 )
   }
 }
+

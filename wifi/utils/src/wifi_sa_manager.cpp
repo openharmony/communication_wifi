@@ -34,7 +34,7 @@ WifiSaLoadManager& WifiSaLoadManager::GetInstance()
 
 ErrCode WifiSaLoadManager::LoadWifiSa(int32_t systemAbilityId)
 {
-    WIFI_LOGI("%{public}s enter, systemAbilityId = [%{public}d] loading", __func__, systemAbilityId);
+    WIFI_LOGD("%{public}s enter, systemAbilityId = [%{public}d] loading", __func__, systemAbilityId);
     InitLoadState();
     sptr<ISystemAbilityManager> samgr =
         SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
@@ -111,7 +111,7 @@ void WifiSaLoadManager::LoadSystemAbilityFail()
 void WifiSaLoadCallback::OnLoadSystemAbilitySuccess(
     int32_t systemAbilityId, const sptr<IRemoteObject> &remoteObject)
 {
-    WIFI_LOGI("WifiSaLoadManager Load SA success, systemAbilityId = [%{public}d]", systemAbilityId);
+    WIFI_LOGD("WifiSaLoadManager Load SA success, systemAbilityId = [%{public}d]", systemAbilityId);
     WifiSaLoadManager::GetInstance().LoadSystemAbilitySuccess();
 }
 

@@ -183,6 +183,8 @@ bool P2pEnabledState::ProcessDeviceFoundEvt(InternalMessage &msg) const
     if (deviceManager.GetThisDevice() == device) {
         return EXECUTED;
     }
+    WIFI_LOGI("ProcessDeviceFoundEvt, address:%{private}s, addressType:%{public}d",
+        device.GetDeviceAddress().c_str(), device.GetDeviceAddressType());
     deviceManager.UpdateDeviceSupplicantInf(device);
     p2pStateMachine.BroadcastP2pPeersChanged();
     return EXECUTED;
@@ -195,6 +197,8 @@ bool P2pEnabledState::ProcessDeviceLostEvt(InternalMessage &msg) const
         WIFI_LOGE("Failed to obtain device information.");
         return EXECUTED;
     }
+    WIFI_LOGI("ProcessDeviceLostEvt, address:%{private}s, addressType:%{public}d",
+        device.GetDeviceAddress().c_str(), device.GetDeviceAddressType());
     if (deviceManager.RemoveDevice(device.GetDeviceAddress())) {
         p2pStateMachine.BroadcastP2pPeersChanged();
     }

@@ -71,7 +71,7 @@ class ScreenEventSubscriber : public OHOS::EventFwk::CommonEventSubscriber {
 public:
     explicit ScreenEventSubscriber(const OHOS::EventFwk::CommonEventSubscribeInfo &subscriberInfo)
         : CommonEventSubscriber(subscriberInfo) {}
-    virtual ~ScreenEventSubscriber() {};
+    virtual ~ScreenEventSubscriber();
     void OnReceiveEvent(const OHOS::EventFwk::CommonEventData &data) override;
 };
 

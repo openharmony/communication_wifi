@@ -99,6 +99,20 @@ HWTEST_F(WifiIpToolsTest, GetMaskLengthTest, TestSize.Level1)
     EXPECT_EQ(IpTools::GetMaskLength("255.0.0.0"), 8);
 }
 
+HWTEST_F(WifiIpToolsTest, GetIPV6MaskLengthTest, TestSize.Level1)
+{
+    EXPECT_EQ(IpTools::GetIPV6MaskLength(""), 0);
+    EXPECT_EQ(IpTools::GetIPV6MaskLength("ff00:0000:0000:0000:0000:0000:0000:0000"), 8);
+    EXPECT_EQ(IpTools::GetIPV6MaskLength("fe00:0000:0000:0000:0000:0000:0000:0000"), 7);
+    EXPECT_EQ(IpTools::GetIPV6MaskLength("fc00:0000:0000:0000:0000:0000:0000:0000"), 6);
+    EXPECT_EQ(IpTools::GetIPV6MaskLength("f800:0000:0000:0000:0000:0000:0000:0000"), 5);
+    EXPECT_EQ(IpTools::GetIPV6MaskLength("f000:0000:0000:0000:0000:0000:0000:0000"), 4);
+    EXPECT_EQ(IpTools::GetIPV6MaskLength("e000:0000:0000:0000:0000:0000:0000:0000"), 3);
+    EXPECT_EQ(IpTools::GetIPV6MaskLength("c000:0000:0000:0000:0000:0000:0000:0000"), 2);
+    EXPECT_EQ(IpTools::GetIPV6MaskLength("8000:0000:0000:0000:0000:0000:0000:0000"), 1);
+    EXPECT_EQ(IpTools::GetIPV6MaskLength("0000:0000:0000:0000:0000:0000:0000:0000"), 0);
+}
+
 HWTEST_F(WifiIpToolsTest, GetExclusionObjectListTest, TestSize.Level1)
 {
     std::string str = "a,b,c";

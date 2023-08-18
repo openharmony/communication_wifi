@@ -37,8 +37,18 @@ struct WifiMacAddrInfo {
         }
         return false;
     }
+    bool operator != (const WifiMacAddrInfo& mac)
+    {
+        if ((bssid != mac.bssid) || (bssidType != mac.bssidType)) {
+            return true;
+        }
+        return false;
+    }
     bool operator < (const WifiMacAddrInfo& mac) const
     {
+        if (bssid == mac.bssid) {
+            return bssidType < mac.bssidType;
+        }
         return bssid < mac.bssid;
     }
     WifiMacAddrInfo& operator = (const WifiMacAddrInfo& mac)

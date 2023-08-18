@@ -23,6 +23,7 @@ namespace Wifi {
 namespace {
 constexpr const char *SETTINGS_DATASHARE_URI =
     "datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?Proxy=true";
+constexpr const char *SETTINGS_DATA_EXT_URI = "datashare:///com.ohos.settingsdata.DataAbility";
 constexpr const char *SETTINGS_DATA_COLUMN_KEYWORD = "KEYWORD";
 constexpr const char *SETTINGS_DATA_COLUMN_VALUE = "VALUE";
 }
@@ -47,7 +48,7 @@ std::shared_ptr<DataShare::DataShareHelper> WifiDataShareHelperUtils::WifiCreate
     }
 
     WIFI_LOGI("WifiCreateDataShareHelper creator. systemAbilityId:%{public}d", systemAbilityId);
-    return DataShare::DataShareHelper::Creator(remote, SETTINGS_DATASHARE_URI);
+    return DataShare::DataShareHelper::Creator(remote, SETTINGS_DATASHARE_URI, SETTINGS_DATA_EXT_URI);
 }
 
 ErrCode WifiDataShareHelperUtils::Query(Uri &uri, const std::string &key, std::string &value)

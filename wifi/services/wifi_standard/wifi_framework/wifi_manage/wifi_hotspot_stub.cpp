@@ -215,6 +215,7 @@ void WifiHotspotStub::OnGetStationList(uint32_t code, MessageParcel &data, Messa
         for (int i = 0; i < size; i++) {
             reply.WriteCString(result[i].deviceName.c_str());
             reply.WriteCString(result[i].bssid.c_str());
+            reply.WriteInt32(result[i].bssidType);
             reply.WriteCString(result[i].ipAddr.c_str());
         }
     }
@@ -229,12 +230,15 @@ void WifiHotspotStub::OnDisassociateSta(uint32_t code, MessageParcel &data, Mess
     StationInfo info;
     const char *deviceNameRead = data.ReadCString();
     const char *bssidRead = data.ReadCString();
+    const int bssidTypeRead = data.ReadInt32();
     const char *ipAddrRead = data.ReadCString();
     if (deviceNameRead == nullptr || bssidRead == nullptr || ipAddrRead == nullptr) {
+        WIFI_LOGE("failed to read data, %{public}s", __func__);
         ret = WIFI_OPT_INVALID_PARAM;
     } else {
         info.deviceName = deviceNameRead;
         info.bssid = bssidRead;
+        info.bssidType = bssidTypeRead;
         info.ipAddr = ipAddrRead;
         ret = DisassociateSta(info);
     }
@@ -310,12 +314,15 @@ void WifiHotspotStub::OnAddBlockList(uint32_t code, MessageParcel &data, Message
     StationInfo info;
     const char *deviceNameRead = data.ReadCString();
     const char *bssidRead = data.ReadCString();
+    const int bssidTypeRead = data.ReadInt32();
     const char *ipAddrRead = data.ReadCString();
     if (deviceNameRead == nullptr || bssidRead == nullptr || ipAddrRead == nullptr) {
+        WIFI_LOGE("failed to read data, %{public}s", __func__);
         ret = WIFI_OPT_INVALID_PARAM;
     } else {
         info.deviceName = deviceNameRead;
         info.bssid = bssidRead;
+        info.bssidType = bssidTypeRead;
         info.ipAddr = ipAddrRead;
         ret = AddBlockList(info);
     }
@@ -332,12 +339,15 @@ void WifiHotspotStub::OnDelBlockList(uint32_t code, MessageParcel &data, Message
     StationInfo info;
     const char *deviceNameRead = data.ReadCString();
     const char *bssidRead = data.ReadCString();
+    const int bssidTypeRead = data.ReadInt32();
     const char *ipAddrRead = data.ReadCString();
     if (deviceNameRead == nullptr || bssidRead == nullptr || ipAddrRead == nullptr) {
+        WIFI_LOGE("failed to read data, %{public}s", __func__);
         ret = WIFI_OPT_INVALID_PARAM;
     } else {
         info.deviceName = deviceNameRead;
         info.bssid = bssidRead;
+        info.bssidType = bssidTypeRead;
         info.ipAddr = ipAddrRead;
         ret = DelBlockList(info);
     }
@@ -360,6 +370,7 @@ void WifiHotspotStub::OnGetBlockLists(uint32_t code, MessageParcel &data, Messag
         for (int i = 0; i < size; i++) {
             reply.WriteCString(infos[i].deviceName.c_str());
             reply.WriteCString(infos[i].bssid.c_str());
+            reply.WriteInt32(infos[i].bssidType);
             reply.WriteCString(infos[i].ipAddr.c_str());
         }
     }

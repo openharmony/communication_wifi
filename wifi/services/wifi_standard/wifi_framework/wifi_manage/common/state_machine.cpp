@@ -542,7 +542,7 @@ void StateMachineHandler::PerformSwitchState(State *msgProcessedState, InternalM
     State *targetState = pTargetState;
     if (targetState != nullptr) {
         if (pFirstState != nullptr) {
-            LOGI("StateMachineHandler::PerformSwitchState, Switch %{public}s -->> %{public}s",
+            LOGD("StateMachineHandler::PerformSwitchState, Switch %{public}s -->> %{public}s",
                 pFirstState->GetStateName().c_str(), targetState->GetStateName().c_str());
         }
         while (true) {

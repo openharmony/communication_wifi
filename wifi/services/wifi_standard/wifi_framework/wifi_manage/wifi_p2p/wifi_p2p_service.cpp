@@ -227,8 +227,8 @@ ErrCode WifiP2pService::GetP2pConnectedStatus(int &status)
 
 ErrCode WifiP2pService::QueryP2pDevices(std::vector<WifiP2pDevice> &devices)
 {
-    WIFI_LOGI("QueryP2pDevices");
-    deviceManager.GetDevicesList(devices);
+    int size = deviceManager.GetDevicesList(devices);
+    WIFI_LOGI("QueryP2pDevices, size:%{}d", size);
     return ErrCode::WIFI_OPT_SUCCESS;
 }
 
@@ -341,14 +341,20 @@ int WifiP2pService::GetP2pRecommendChannel(void)
     WIFI_LOGI("GetP2pRecommendChannel");
 
     int channel = 0; // 0 is invalid channel
-    
+    int COMMON_USING_5G_CHANNEL = 149;
     WifiLinkedInfo linkedInfo;
     WifiSettings::GetInstance().GetLinkedInfo(linkedInfo);
     if (linkedInfo.connState == CONNECTED) {
         channel = FrequencyToChannel(linkedInfo.frequency);
         if (linkedInfo.band == static_cast<int>(BandType::BAND_5GHZ)) {
-            WIFI_LOGI("Recommend linked channel: %{public}d", channel);
-            return channel;
+            const int RADAR_CHANNEL_MIN = 50;
+            const int RADAR_CHANNEL_MAX = 64;
+            if (channel < RADAR_CHANNEL_MIN || channel > RADAR_CHANNEL_MAX) {
+                WIFI_LOGI("Recommend linked channel: %{public}d", channel);
+                return channel;
+            }
+            // when connectted 5g sta whith radar channel then recommend channel on 36.
+            COMMON_USING_5G_CHANNEL = 36;
         }
     }
 
@@ -359,7 +365,6 @@ int WifiP2pService::GetP2pRecommendChannel(void)
         vec5GChannels = channels[BandType::BAND_5GHZ];
     }
 
-    const int COMMON_USING_5G_CHANNEL = 149;
     const int COMMON_USING_2G_CHANNEL = 6;
     if (!vec5GChannels.empty()) {
         auto it = std::find(vec5GChannels.begin(), vec5GChannels.end(), COMMON_USING_5G_CHANNEL);

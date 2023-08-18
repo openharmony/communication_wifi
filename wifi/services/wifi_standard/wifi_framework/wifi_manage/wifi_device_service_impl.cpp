@@ -163,7 +163,7 @@ void WifiDeviceServiceImpl::StartWatchdog(void)
         if ((WifiSettings::GetInstance().GetThreadStatusFlag()) && (interval > WATCHDOG_INTERVAL_MS)) {
             WIFI_LOGE("watchdog happened, thread need restart");
         } else {
-            WIFI_LOGI("thread work normally");
+            WIFI_LOGD("thread work normally");
         }
     };
     HiviewDFX::Watchdog::GetInstance().RunPeriodicalTask("WifiDeviceServiceImpl", taskFunc,
@@ -906,6 +906,10 @@ ErrCode WifiDeviceServiceImpl::ConnectToDevice(const WifiDeviceConfig &config)
     WifiDeviceConfig updateConfig = config;
 #ifdef SUPPORT_RANDOM_MAC_ADDR
     if (MacAddress::IsValidMac(config.bssid)) {
+        if (config.bssidType > REAL_DEVICE_ADDRESS) {
+            WIFI_LOGE("invalid bssidType:%{public}d", config.bssidType);
+            return WIFI_OPT_INVALID_PARAM;
+        }
         WifiMacAddrInfo macAddrInfo;
         macAddrInfo.bssid = config.bssid;
         macAddrInfo.bssidType = config.bssidType;
@@ -1102,9 +1106,9 @@ ErrCode WifiDeviceServiceImpl::GetLinkedInfo(WifiLinkedInfo &info)
         info.macAddress = "";
     }
 
-    WIFI_LOGI("GetLinkedInfo, networkId=%{public}d, ssid=%{public}s, rssi=%{public}d, frequency=%{public}d",
+    WIFI_LOGD("GetLinkedInfo, networkId=%{public}d, ssid=%{public}s, rssi=%{public}d, frequency=%{public}d",
               info.networkId, SsidAnonymize(info.ssid).c_str(), info.rssi, info.frequency);
-    WIFI_LOGI("GetLinkedInfo, connState=%{public}d, supplicantState=%{public}d, detailedState=%{public}d,\
+    WIFI_LOGD("GetLinkedInfo, connState=%{public}d, supplicantState=%{public}d, detailedState=%{public}d,\
      wifiStandard=%{public}d RxMaxSpeed=%{public}d TxmaxSpeed=%{public}d rxSpeed=%{public}d txSpeed=%{public}d",
               info.connState, info.supplicantState, info.detailedState, info.wifiStandard,
               info.maxSupportedRxLinkSpeed, info.maxSupportedTxLinkSpeed, info.rxLinkSpeed, info.txLinkSpeed);

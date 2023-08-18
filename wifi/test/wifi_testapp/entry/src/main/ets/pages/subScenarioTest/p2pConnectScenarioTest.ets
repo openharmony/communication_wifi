@@ -36,6 +36,21 @@ struct p2pConnectScenarioTest {
   private testItem: TestData = router.getParams().testId;
   @State changeIndex: number = - 1
   @StorageLink( "p2pConnectScenarioMessage" ) p2pConnectScenarioMessage: string = ""
+  @State deviceAddress: string = '6c:96:d7:3d:87:6f';
+  @State netId: number = - 2 ;
+  @State passphrase: string = "12345678" ;
+  @State groupName: string = "testGroup"
+  @State goBand: number = 0 ;
+  @State deviceName: string = "MyTestDevice"
+
+  aboutToAppear() {
+    AppStorage.SetOrCreate( "deviceAddress" , this.deviceAddress )
+    AppStorage.SetOrCreate( "netId" , this.netId )
+    AppStorage.SetOrCreate( "passphrase" , this.passphrase )
+    AppStorage.SetOrCreate( "groupName" , this.groupName )
+    AppStorage.SetOrCreate( "goBand" , this.goBand )
+    AppStorage.SetOrCreate( "deviceName" , this.deviceName )
+  }
 
   build() {
     Column() {
@@ -112,13 +127,13 @@ struct p2pConnectScenarioTest {
           .margin( { top : "15vp" , left : "20vp" } )
           .align( Alignment.Start )
           .onClick( async( event: ClickEvent ) => {
-            prompt.showToast( { message : '开始wifi发现场景测试' } )
+            prompt.showToast( { message : '开始p2p连接场景测试' } )
 
             let self = this
             let p2pConnectScenarioMessage = ""
 
             //拼装数组
-            var hotspotScenarioArray = []
+            var hotspotScenarioArray = [ { name : "testSetDeviceName" , para : [ "MyTestDevice" ] } ]
             let Interface = P2pConnectScenarioTestCase.map( i => {
               let para = hotspotScenarioArray.some( itm => itm.name === i.api.name ) ? hotspotScenarioArray.find( itm => itm.name === i.api.name ).para : []
               return { name : i.api.name , para }
@@ -152,19 +167,63 @@ struct p2pConnectScenarioTest {
             let self = this
             //            const arr = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
             let p2pConnectScenarioMessage = ""
-            // 停止Wifi发现
-            p2pConnectScenarioMessage += BrInterface.testStopBluetoothDiscovery() + "\n"
-            console.log( "testStopBluetoothDiscovery success" )
-            //            self.changeIndex = arr[8]
+            // 停止发现设备
+            p2pConnectScenarioMessage += P2pInterface.testStopDiscoverDevices() + "\n"
+            console.log( "testStopDiscoverDevices success" )
             await sleep( 1 )
-            //关闭注册状态变化
-            p2pConnectScenarioMessage += BrInterface.testOnStateChange() + "\n"
-            console.log( "testOffStateChange success" )
+            AppStorage.SetOrCreate( "p2pConnectScenarioMessage" , p2pConnectScenarioMessage )
+
+            //取消P2P连接
+            p2pConnectScenarioMessage += P2pInterface.testP2pCancelConnect() + "\n"
+            console.log( "testP2pCancelConnect success" )
             await sleep( 1 )
-            //关Wifi
-            p2pConnectScenarioMessage += BrInterface.testDisableBluetooth() + "\n"
-            console.log( "testDisableBluetooth success" )
-            //            self.changeIndex = arr[9]
+            AppStorage.SetOrCreate( "p2pConnectScenarioMessage" , p2pConnectScenarioMessage )
+
+            //移除群组
+            p2pConnectScenarioMessage += P2pInterface.testRemoveGroup() + "\n"
+            console.log( "testRemoveGroup success" )
+            await sleep( 1 )
+            AppStorage.SetOrCreate( "p2pConnectScenarioMessage" , p2pConnectScenarioMessage )
+
+            //删除永久组
+            p2pConnectScenarioMessage += P2pInterface.testDeletePersistentGroup() + "\n"
+            console.log( "testDeletePersistentGroup success" )
+            await sleep( 1 )
+            AppStorage.SetOrCreate( "p2pConnectScenarioMessage" , p2pConnectScenarioMessage )
+
+            //关闭P2P开关状态改变事件
+            p2pConnectScenarioMessage += P2pInterface.testOnP2pStateChange() + "\n"
+            console.log( "testOffP2pStateChange success" )
+            await sleep( 1 )
+            AppStorage.SetOrCreate( "p2pConnectScenarioMessage" , p2pConnectScenarioMessage )
+
+            //关闭P2P连接状态改变事件
+            p2pConnectScenarioMessage += P2pInterface.testOnP2pConnectionChange() + "\n"
+            console.log( "testOffP2pConnectionChange success" )
+            await sleep( 1 )
+            AppStorage.SetOrCreate( "p2pConnectScenarioMessage" , p2pConnectScenarioMessage )
+
+            //关闭P2P设备状态改变事件
+            p2pConnectScenarioMessage += P2pInterface.testOnP2pDeviceChange() + "\n"
+            console.log( "testOffP2pDeviceChange success" )
+            await sleep( 1 )
+            AppStorage.SetOrCreate( "p2pConnectScenarioMessage" , p2pConnectScenarioMessage )
+
+            //关闭P2P对端设备状态改变事件
+            p2pConnectScenarioMessage += P2pInterface.testOnP2pPeerDeviceChange() + "\n"
+            console.log( "testOffP2pPeerDeviceChange success" )
+            await sleep( 1 )
+            AppStorage.SetOrCreate( "p2pConnectScenarioMessage" , p2pConnectScenarioMessage )
+
+            //关闭P2P永久组状态改变事件
+            p2pConnectScenarioMessage += P2pInterface.testOnP2pPersistentGroupChange() + "\n"
+            console.log( "testOffP2pPersistentGroupChange success" )
+            await sleep( 1 )
+            AppStorage.SetOrCreate( "p2pConnectScenarioMessage" , p2pConnectScenarioMessage )
+
+            //关闭发现设备状态改变事件
+            p2pConnectScenarioMessage += P2pInterface.testOnP2pDiscoveryChange() + "\n"
+            console.log( "testOffP2pDiscoveryChange success" )
             await sleep( 1 )
             AppStorage.SetOrCreate( "p2pConnectScenarioMessage" , p2pConnectScenarioMessage )
           } )

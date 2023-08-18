@@ -155,6 +155,34 @@ HWTEST_F(Ipv6AddressTest, GetIn6Addr_001, TestSize.Level1)
     EXPECT_EQ(mIpv6Address.GetIn6Addr().s6_addr[0], DEC_11_TOHEX);
 }
 /**
+ * @tc.name: GetPrefix_001
+ * @tc.desc: GetPrefix
+ * @tc.type: FUNC
+ * @tc.require: issue
+*/
+HWTEST_F(Ipv6AddressTest, GetPrefix_001, TestSize.Level1)
+{
+    WIFI_LOGI("GetPrefix_001");
+    std::string ipv6 = "1111:1111:1111:1111:1111:1111:1111:1111";
+    Ipv6Address mIpv6Address = Ipv6Address::Create(ipv6);
+    EXPECT_EQ(mIpv6Address.GetPrefix(), ipv6);
+}
+/**
+ * @tc.name: GetPrefixByAddr_001
+ * @tc.desc: GetPrefixByAddr
+ * @tc.type: FUNC
+ * @tc.require: issue
+*/
+HWTEST_F(Ipv6AddressTest, GetPrefixByAddr_001, TestSize.Level1)
+{
+    WIFI_LOGI("GetPrefixByAddr_001");
+    size_t prefixLength = MAX_IPV6_LENGTH + 1;
+    std::string ipv6 = "0101:0101:0101:0101:0101:0101:0101:0101";
+    EXPECT_EQ(Ipv6Address::GetPrefixByAddr(ipv6, prefixLength), ipv6);
+    prefixLength = MAX_IPV6_LENGTH - 112;
+    EXPECT_EQ(Ipv6Address::GetPrefixByAddr(ipv6, prefixLength), "101::");
+}
+/**
  * @tc.name: GetIpv6Prefix_001
  * @tc.desc: GetIpv6Prefix(struct in6_addr &ip6Addr, size_t prefixLength)
  * @tc.type: FUNC

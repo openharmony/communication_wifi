@@ -39,17 +39,19 @@ public:
     /**
      * @Description Start scan Wifi
      *
+     * @param compatible - indicates whether compatibility is maintained
      * @return ErrCode - operation result
      */
-    virtual ErrCode Scan() override;
+    virtual ErrCode Scan(bool compatible) override;
 
     /**
      * @Description Obtain the scanning result
      *
      * @param result - Get result venctor of WifiScanInfo
+     * @param compatible - indicates whether compatibility is maintained
      * @return ErrCode - operation result
      */
-    virtual ErrCode GetScanInfoList(std::vector<WifiScanInfo> &result) override;
+    virtual ErrCode GetScanInfoList(std::vector<WifiScanInfo> &result, bool compatible) override;
 
 #ifdef OHOS_ARCH_LITE
     virtual ErrCode RegisterCallBack(const std::shared_ptr<IWifiScanCallback> &callback,

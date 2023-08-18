@@ -111,10 +111,12 @@ export function testGetCurrentGroupCallback(): string {
         console.error( 'failed to get current group: ' + JSON.stringify( err ) );
         return message;
       }
+      let p2pLinkedDeviceName =WifiP2pGroupInfo.ownerInfo.deviceName
       console.log( LogData.getCurrentGroupCallback_successfulLog )
       console.log( "getCurrentGroupCallback: " + JSON.stringify( WifiP2pGroupInfo ) )
       message = "getCurrentGroupCallback: " + JSON.stringify( WifiP2pGroupInfo )
       AppStorage.SetOrCreate("p2pGroupMessage",message)
+      AppStorage.SetOrCreate("p2pLinkedDeviceName",p2pLinkedDeviceName)
       console.log( LogData.testGetCurrentGroupCallback_EndLog );
       prompt.showToast( { message : message } )
     } )
@@ -417,10 +419,10 @@ export function testOnP2pConnectionChange(): string {
         let p2pConnectionMessage = ""
         switch ( connectState ) {
           case 0:
-            p2pConnectionMessage = "DISCONNECTED!";
+            p2pConnectionMessage = "未连接";
             break;
           case 1:
-            p2pConnectionMessage = "CONNECTED！";
+            p2pConnectionMessage = "已连接";
             break;
           default:
             p2pConnectionMessage = '未知状态';
@@ -430,6 +432,7 @@ export function testOnP2pConnectionChange(): string {
         let groupOwnerAddr = WifiP2pLinkedInfo.groupOwnerAddr
         message = "Info : " + p2pConnectionMessage + ",isGroupOwner: " + isGroupOwner + ",groupOwnerAddr: " + groupOwnerAddr
         prompt.showToast( { message : message } )
+        AppStorage.SetOrCreate("p2pConnectState",connectState)
         AppStorage.SetOrCreate("p2pLinkStateMessage",message)
         console.log( LogData.testOnP2pConnectionChange_EndLog )
       } )

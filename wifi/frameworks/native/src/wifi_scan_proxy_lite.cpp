@@ -247,7 +247,7 @@ ErrCode WifiScanProxy::SetScanControlInfo(const ScanControlInfo &info)
     return ErrCode(owner.retCode);
 }
 
-ErrCode WifiScanProxy::Scan()
+ErrCode WifiScanProxy::Scan(bool compatible)
 {
     if (remoteDied_ || remote_ == nullptr) {
         WIFI_LOGE("failed to %{public}s, remoteDied_: %{public}d, remote_: %{public}d",
@@ -356,7 +356,7 @@ ErrCode WifiScanProxy::IsWifiClosedScan(bool &bOpen)
     return ErrCode(owner.retCode);
 }
 
-ErrCode WifiScanProxy::GetScanInfoList(std::vector<WifiScanInfo> &result)
+ErrCode WifiScanProxy::GetScanInfoList(std::vector<WifiScanInfo> &result, bool compatible)
 {
     if (remoteDied_ || remote_ == nullptr) {
         WIFI_LOGE("failed to %{public}s, remoteDied_: %{public}d, remote_: %{public}d",

@@ -55,10 +55,10 @@ public:
 #endif
 
     ErrCode SetScanControlInfo(const ScanControlInfo &info) override;
-    ErrCode Scan() override;
+    ErrCode Scan(bool compatible) override;
     ErrCode AdvanceScan(const WifiScanParams &params) override;
     ErrCode IsWifiClosedScan(bool &bOpen) override;
-    ErrCode GetScanInfoList(std::vector<WifiScanInfo> &result) override;
+    ErrCode GetScanInfoList(std::vector<WifiScanInfo> &result, bool compatible) override;
     ErrCode SetScanOnlyAvailable(bool bScanOnlyAvailable) override;
     ErrCode GetScanOnlyAvailable(bool &bScanOnlyAvailable) override;
 #ifdef OHOS_ARCH_LITE

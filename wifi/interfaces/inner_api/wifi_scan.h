@@ -39,17 +39,19 @@ public:
     /**
      * @Description Start scan Wifi
      *
+     * @param compatible - indicates whether compatibility is maintained
      * @return ErrCode - operation result
      */
-    virtual ErrCode Scan() = 0;
+    virtual ErrCode Scan(bool compatible = true) = 0;
 
     /**
      * @Description Obtain the scanning result
      *
      * @param result - Get result vector of WifiScanInfo
+     * @param compatible - indicates whether compatibility is maintained
      * @return ErrCode - operation result
      */
-    virtual ErrCode GetScanInfoList(std::vector<WifiScanInfo> &result) = 0;
+    virtual ErrCode GetScanInfoList(std::vector<WifiScanInfo> &result, bool compatible = true) = 0;
 
     /**
      * @Description Start scan with specified params

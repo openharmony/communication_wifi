@@ -211,12 +211,10 @@ int WifiSettings::ClearScanInfoList()
 
 int WifiSettings::GetScanInfoList(std::vector<WifiScanInfo> &results)
 {
-    struct timespec clkTime = {0, 0};
-    clock_gettime(CLOCK_MONOTONIC, &clkTime);
-    int64_t curr = static_cast<int64_t>(clkTime.tv_sec) * MSEC * MSEC + clkTime.tv_nsec / MSEC; /* us */
     std::unique_lock<std::mutex> lock(mInfoMutex);
     for (auto iter = mWifiScanInfoList.begin(); iter != mWifiScanInfoList.end(); ++iter) {
-        if (iter->timestamp + WIFI_GET_SCAN_INFO_VALID_TIMESTAMP * MSEC * MSEC < curr) {
+        if (iter->disappearCount >= WIFI_DISAPPEAR_TIMES) {
+            mWifiScanInfoList.erase(iter);
             continue;
         }
         results.push_back(*iter);

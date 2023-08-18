@@ -826,6 +826,9 @@ void WifiManager::CloseScanService(void)
     WIFI_LOGI("close scan service");
     WifiServiceManager::GetInstance().UnloadService(WIFI_SERVICE_SCAN);
     WifiConfigCenter::GetInstance().SetScanMidState(WifiOprMidState::CLOSED);
+    #ifndef OHOS_ARCH_LITE
+    WifiManager::GetInstance().StartUnloadScanSaTimer();
+    #endif
     return;
 }
 

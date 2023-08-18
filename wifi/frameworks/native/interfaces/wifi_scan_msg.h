@@ -135,6 +135,7 @@ struct WifiScanInfo {
     int wifiStandard;
     int maxSupportedRxLinkSpeed;
     int maxSupportedTxLinkSpeed;
+    int disappearCount;
     WifiScanInfo()
     {
         bssidType = REAL_DEVICE_ADDRESS;

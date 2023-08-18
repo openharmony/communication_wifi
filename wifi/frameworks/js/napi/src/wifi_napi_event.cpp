@@ -27,6 +27,10 @@ namespace OHOS {
 namespace Wifi {
 DEFINE_WIFILOG_LABEL("WifiNAPIEvent");
 constexpr uint32_t INVALID_REF_COUNT = 0xff;
+std::shared_ptr<WifiDevice> g_wifiStaPtr = WifiDevice::GetInstance(WIFI_DEVICE_ABILITY_ID);
+std::shared_ptr<WifiScan> g_wifiScanPtr = WifiScan::GetInstance(WIFI_SCAN_ABILITY_ID);
+std::shared_ptr<WifiHotspot> g_wifiHotspotPtr = WifiHotspot::GetInstance(WIFI_HOTSPOT_ABILITY_ID);
+std::shared_ptr<WifiP2p> g_wifiP2pPtr = WifiP2p::GetInstance(WIFI_P2P_ABILITY_ID);
 
 static std::set<std::string> g_supportEventList = {
     EVENT_STA_POWER_STATE_CHANGE,
@@ -80,7 +84,7 @@ void NapiEvent::EventNotify(AsyncEventData *asyncEvent)
     uint32_t refCount = INVALID_REF_COUNT;
     napi_reference_ref(asyncEvent->env, asyncEvent->callbackRef, &refCount);
     work->data = asyncEvent;
-    WIFI_LOGI("event notify, env: %{private}p, callbackRef: %{private}p, refCount: %{public}d",
+    WIFI_LOGD("event notify, env: %{private}p, callbackRef: %{private}p, refCount: %{public}d",
         asyncEvent->env, asyncEvent->callbackRef, refCount);
     uv_queue_work(
         loop,
@@ -88,7 +92,7 @@ void NapiEvent::EventNotify(AsyncEventData *asyncEvent)
         [](uv_work_t* work) {},
         [](uv_work_t* work, int status) {
             AsyncEventData *asyncData = static_cast<AsyncEventData*>(work->data);
-            WIFI_LOGI("uv_queue_work, env: %{private}p, status: %{public}d", asyncData->env, status);
+            WIFI_LOGD("uv_queue_work, env: %{private}p, status: %{public}d", asyncData->env, status);
             napi_value handler = nullptr;
             napi_handle_scope scope = nullptr;
             napi_value jsEvent = nullptr;
@@ -106,7 +110,7 @@ void NapiEvent::EventNotify(AsyncEventData *asyncEvent)
             napi_value undefine;
             napi_get_undefined(asyncData->env, &undefine);
             jsEvent = asyncData->packResult();
-            WIFI_LOGI("Push event to js, env: %{private}p, ref : %{private}p", asyncData->env, &asyncData->callbackRef);
+            WIFI_LOGD("Push event to js, env: %{private}p, ref : %{private}p", asyncData->env, &asyncData->callbackRef);
             if (napi_call_function(asyncData->env, nullptr, handler, 1, &jsEvent, &undefine) != napi_ok) {
                 WIFI_LOGE("Report event to Js failed");
             }
@@ -114,7 +118,7 @@ void NapiEvent::EventNotify(AsyncEventData *asyncEvent)
         EXIT:
             napi_close_handle_scope(asyncData->env, scope);
             napi_reference_unref(asyncData->env, asyncData->callbackRef, &refCount);
-            WIFI_LOGI("uv_queue_work unref, env: %{private}p, callbackRef: %{private}p, refCount: %{public}d",
+            WIFI_LOGD("uv_queue_work unref, env: %{private}p, callbackRef: %{private}p, refCount: %{public}d",
                 asyncData->env, asyncData->callbackRef, refCount);
             if (refCount == 0) {
                 napi_delete_reference(asyncData->env, asyncData->callbackRef);
@@ -140,6 +144,7 @@ napi_value NapiEvent::CreateResult(const napi_env& env, const StationInfo& info)
     napi_create_object(env, &result);
     SetValueUtf8String(env, "name", info.deviceName, result);
     SetValueUtf8String(env, "macAddress", info.bssid, result);
+    SetValueInt32(env, "macAddressType", info.bssidType, result);
     SetValueUtf8String(env, "ipAddress", info.ipAddr, result);
     return result;
 }
@@ -150,6 +155,7 @@ napi_value NapiEvent::CreateResult(const napi_env& env, const WifiP2pDevice& dev
     napi_create_object(env, &result);
     SetValueUtf8String(env, "deviceName", device.GetDeviceName(), result);
     SetValueUtf8String(env, "deviceAddress", device.GetDeviceAddress(), result);
+    SetValueInt32(env, "deviceAddressType", device.GetDeviceAddressType(), result);
     SetValueUtf8String(env, "primaryDeviceType", device.GetPrimaryDeviceType(), result);
     SetValueInt32(env, "devStatus", static_cast<int>(device.GetP2pDeviceStatus()), result);
     SetValueInt32(env, "groupCapability", device.GetGroupCapabilitys(), result);
@@ -486,12 +492,11 @@ ErrCode EventRegister::RegisterDeviceEvents(const std::vector<std::string> &even
         WIFI_LOGE("Register sta event is empty!");
         return WIFI_OPT_FAILED;
     }
-    std::unique_ptr<WifiDevice> wifiStaPtr = WifiDevice::GetInstance(WIFI_DEVICE_ABILITY_ID);
-    if (wifiStaPtr == nullptr) {
+    if (g_wifiStaPtr == nullptr) {
         WIFI_LOGE("Register sta event get instance failed!");
         return WIFI_OPT_FAILED;
     }
-    ErrCode ret = wifiStaPtr->RegisterCallBack(wifiDeviceCallback, event);
+    ErrCode ret = g_wifiStaPtr->RegisterCallBack(wifiDeviceCallback, event);
     if (ret != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("Register sta event failed!");
         return ret;
@@ -505,12 +510,11 @@ ErrCode EventRegister::RegisterScanEvents(const std::vector<std::string> &event)
         WIFI_LOGE("Register scan event is empty!");
         return WIFI_OPT_FAILED;
     }
-    std::unique_ptr<WifiScan> wifiScanPtr = WifiScan::GetInstance(WIFI_SCAN_ABILITY_ID);
-    if (wifiScanPtr == nullptr) {
+    if (g_wifiScanPtr == nullptr) {
         WIFI_LOGE("Register scan event get instance failed!");
         return WIFI_OPT_FAILED;
     }
-    ErrCode ret = wifiScanPtr->RegisterCallBack(wifiScanCallback, event);
+    ErrCode ret = g_wifiScanPtr->RegisterCallBack(wifiScanCallback, event);
     if (ret != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("Register scan event failed!");
         return ret;
@@ -524,12 +528,11 @@ ErrCode EventRegister::RegisterHotspotEvents(const std::vector<std::string> &eve
         WIFI_LOGE("Register hotspot event is empty!");
         return WIFI_OPT_FAILED;
     }
-    std::unique_ptr<WifiHotspot> wifiHotspotPtr = WifiHotspot::GetInstance(WIFI_HOTSPOT_ABILITY_ID);
-    if (wifiHotspotPtr == nullptr) {
+    if (g_wifiHotspotPtr == nullptr) {
         WIFI_LOGE("Register hotspot event get instance failed!");
         return WIFI_OPT_FAILED;
     }
-    ErrCode ret = wifiHotspotPtr->RegisterCallBack(wifiHotspotCallback, event);
+    ErrCode ret = g_wifiHotspotPtr->RegisterCallBack(wifiHotspotCallback, event);
     if (ret != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("Register hotspot event failed!");
         return ret;
@@ -543,12 +546,11 @@ ErrCode EventRegister::RegisterP2PEvents(const std::vector<std::string> &event)
         WIFI_LOGE("Register p2p event is empty!");
         return WIFI_OPT_FAILED;
     }
-    std::unique_ptr<WifiP2p> wifiP2pPtr = WifiP2p::GetInstance(WIFI_P2P_ABILITY_ID);
-    if (wifiP2pPtr == nullptr) {
+    if (g_wifiP2pPtr == nullptr) {
         WIFI_LOGE("Register p2p event get instance failed!");
         return WIFI_OPT_FAILED;
     }
-    ErrCode ret = wifiP2pPtr->RegisterCallBack(wifiP2pCallback, event);
+    ErrCode ret = g_wifiP2pPtr->RegisterCallBack(wifiP2pCallback, event);
     if (ret != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("Register p2p event failed!");
         return ret;

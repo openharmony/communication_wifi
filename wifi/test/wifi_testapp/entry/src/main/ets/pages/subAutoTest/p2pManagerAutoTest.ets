@@ -40,6 +40,21 @@ struct P2pManagerAutoTest {
   @State changeIndex: number = - 1
   //  @State autoTextMessage: string ="None";
   @StorageLink( "p2pManagerAutoTestMessage" ) p2pManagerAutoTestMessage: string = ""
+  @State deviceAddressManager: string = '6c:96:d7:3d:87:6f';
+  @State netIdManager: number = - 2 ;
+  @State passphraseManager: string = "12345678" ;
+  @State groupNameManager: string = "testGroup"
+  @State goBandManager: number = 0 ;
+  @State devNameManager: string = "MyTestDevice"
+
+  aboutToAppear() {
+    AppStorage.SetOrCreate( "deviceAddressManager" , this.deviceAddressManager )
+    AppStorage.SetOrCreate( "netIdManager" , this.netIdManager )
+    AppStorage.SetOrCreate( "passphraseManager" , this.passphraseManager )
+    AppStorage.SetOrCreate( "groupNameManager" , this.groupNameManager )
+    AppStorage.SetOrCreate( "goBandManager" , this.goBandManager )
+    AppStorage.SetOrCreate( "devNameManager" , this.devNameManager )
+  }
 
   build() {
     Column() {
@@ -120,19 +135,18 @@ struct P2pManagerAutoTest {
           let p2pManagerAutoTestMessage = ""
 
           //拼装数组
-          let p2pManagerAutoArray = [ { name : "testSetLocalName" , para : [ "DaYuBlue" ] },
-                                      { name : "testSetBluetoothScanMode" , para : [ 4, 0 ] } ]
-          let Interface = P2pAutoTestCase.map( i => {
-            let para = p2pAutoArray.some( itm => itm.name === i.api.name ) ? p2pAutoArray.find( itm => itm.name === i.api.name ).para : []
+          let p2pManagerAutoArray = [ { name : "testSetDeviceNameManager" , para : [ "MyTestDevice" ] } ]
+          let Interface = P2pManagerAutoTestCase.map( i => {
+            let para = p2pManagerAutoArray.some( itm => itm.name === i.api.name ) ? p2pManagerAutoArray.find( itm => itm.name === i.api.name ).para : []
             return { name : i.api.name , para }
           } )
 
           //循环调用
           async function forLoop() {
             for ( let m = 0 ; m < Interface.length ; m ++ ) {
-              p2pManagerAutoTestMessage += P2pAutoTestCase[m]["api"]( ... Interface[m].para ) + "\n"
+              p2pManagerAutoTestMessage += P2pManagerAutoTestCase[m]["api"]( ... Interface[m].para ) + "\n"
               self.changeIndex = m
-              await sleep( 1 )
+              await sleep( 2 )
               AppStorage.SetOrCreate( "p2pManagerAutoTestMessage" , p2pManagerAutoTestMessage )
             }
           }

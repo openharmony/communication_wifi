@@ -16,7 +16,7 @@
 // @ts-nocheck
 
 import { TestData , TestApi } from '../MainAbility/model/testData'
-import { initWifiApiData } from '../MainAbility/model/testDataModels'
+import { initHotspotApIData } from '../MainAbility/model/testDataModels'
 import ConfigData from '../Utils/ConfigData';
 /**
  * FilterTable Of WiFi test
@@ -25,23 +25,29 @@ import ConfigData from '../Utils/ConfigData';
 @Component
 export struct FilterTable {
   private testItem: TestData
-  @State apiItems: TestApi[] = initWifiApiData()
+  @State apiItems: TestApi[] = initHotspotApIData()
   @State changeIndex: number = - 1
   // input ble scan parameters:
   /*ScanFilter*/
   @State cbxBleScanFilter: boolean = false;
-  @State ssid: string = "testApp";
-  @State securityType: number = 3;
-  @State band: number = 2;
-  @State preSharedKey: string = "12345678";
-  @State maxConn: number = 32 ;
-  @State channel: number = 6 ;
+  @State h_ssid: string = "testApp1";
+  @State h_securityType: number = 3;
+  @State h_band: number = 2;
+  @State h_preSharedKey: string = "12345678";
+  @State h_maxConn: number = 3 ;
+  @State h_channel: number = 36 ;
 
   getCurrentState( index: number ) {
     return this.apiItems[index].result
   }
 
   aboutToAppear() {
+    AppStorage.SetOrCreate( "h_ssid" , this.h_ssid )
+    AppStorage.SetOrCreate( "h_securityType" , this.h_securityType )
+    AppStorage.SetOrCreate( "h_band" , this.h_band )
+    AppStorage.SetOrCreate( "h_preSharedKey" , this.h_preSharedKey )
+    AppStorage.SetOrCreate( "h_maxConn" , this.h_maxConn )
+    AppStorage.SetOrCreate( "h_channel" , this.h_channel )
   }
 
   build() {
@@ -51,11 +57,11 @@ export struct FilterTable {
           Column() {
             Row() {
               Text( "ssid" ).fontSize( "17vp" ).width( 60 );
-              TextInput( { text : this.ssid , placeholder : "testApp" } )
+              TextInput( { text : this.h_ssid , placeholder : "testApp1" } )
                 .fontSize( "15vp" )
                 .onChange( ( strInput ) => {
-                  this.ssid = strInput;
-                  AppStorage.SetOrCreate( "ssid" , strInput );
+                  this.h_ssid = strInput;
+                  AppStorage.SetOrCreate( "h_ssid" , this.h_ssid );
                 } )
                 .width( ConfigData.WH_80_100 )
                 .borderRadius( 1 )
@@ -66,11 +72,11 @@ export struct FilterTable {
 
             Row() {
               Text( "securityType" ).fontSize( 17 ).width( 110 );
-              TextInput( { text : this.securityType , placeholder : "3" } )
+              TextInput( { text : this.h_securityType , placeholder : "3" } )
                 .fontSize( "15vp" )
                 .onChange( ( strInput ) => {
-                  this.securityType = strInput;
-                  AppStorage.SetOrCreate( 'securityType' , strInput );
+                  this.h_securityType = Number( strInput );
+                  AppStorage.SetOrCreate( 'h_securityType' , this.h_securityType );
                 } )
                 .width( ConfigData.WH_80_100 )
                 .borderRadius( 1 )
@@ -83,19 +89,19 @@ export struct FilterTable {
               Text( "maxConn" ).fontSize( 17 ).width( 80 )
               Column() {
                 Select( [
-                  { value : '8' },
-                  { value : '16' },
-                  { value : '32' }
+                  { value : '1' },
+                  { value : '2' },
+                  { value : '3' }
                 ] )
                   .selected( 2 )
-                  .value( '32' )
+                  .value( '3' )
                   .font( { size : 17 } )
                   .selectedOptionFont( { size : 17 } )
                   .optionFont( { size : 15 } )
                   .width( ConfigData.WH_80_100 )
                   .onSelect( ( index: number ) => {
                     console.log( "Select:" + index )
-                    AppStorage.SetOrCreate( 'maxConn' , index );
+                    AppStorage.SetOrCreate( 'h_maxConn' , index );
                   } )
               }
               .width( ConfigData.WH_80_100 )
@@ -106,11 +112,11 @@ export struct FilterTable {
 
             Row() {
               Text( "band" ).fontSize( 17 ).width( 60 );
-              TextInput( { text : this.band , placeholder : "1" } )
+              TextInput( { text : this.h_band , placeholder : "2" } )
                 .fontSize( "15vp" )
                 .onChange( ( strInput ) => {
-                  this.band = strInput;
-                  AppStorage.SetOrCreate( 'band' , strInput );
+                  this.h_band = Number( strInput );
+                  AppStorage.SetOrCreate( 'h_band' , this.h_band );
                 } )
                 .width( ConfigData.WH_80_100 )
                 .borderRadius( 1 )
@@ -122,11 +128,11 @@ export struct FilterTable {
 
             Row() {
               Text( "preSharedKey" ).fontSize( 17 ).width( 120 )
-              TextInput( { text : this.preSharedKey , placeholder : "12345678" } )
+              TextInput( { text : this.h_preSharedKey , placeholder : "12345678" } )
                 .fontSize( "17vp" )
                 .onChange( ( strInput ) => {
-                  this.preSharedKey = strInput;
-                  AppStorage.SetOrCreate( 'preSharedKey' , strInput );
+                  this.h_preSharedKey = strInput;
+                  AppStorage.SetOrCreate( 'h_preSharedKey' , this.h_preSharedKey );
                 } )
                 .width( ConfigData.WH_80_100 )
             }
@@ -136,11 +142,11 @@ export struct FilterTable {
 
             Row() {
               Text( "channel" ).fontSize( 17 ).width( 120 )
-              TextInput( { text : this.channel , placeholder : "6" } )
+              TextInput( { text : this.h_channel , placeholder : "36" } )
                 .fontSize( "17vp" )
                 .onChange( ( strInput ) => {
-                  this.channel = strInput;
-                  AppStorage.SetOrCreate( 'channel' , strInput );
+                  this.h_channel = Number( strInput );
+                  AppStorage.SetOrCreate( 'h_channel' , this.h_channel );
                 } )
                 .width( ConfigData.WH_80_100 )
             }

@@ -25,6 +25,7 @@ import MessageData from "../../Utils/MessageData"
 /**
  * p2pManager Test Page Of Wifi test
  */
+const PAGE_URI_P2P_FOUND_MODE = 'pages/subManualApiTest/subP2pTest/p2pFound';
 
 export function testGetP2pLinkedInfoManagerPromise(): string {
   try {
@@ -34,7 +35,7 @@ export function testGetP2pLinkedInfoManagerPromise(): string {
       message = "getP2pLinkedInfoPromise: " + JSON.stringify( wifiP2pLinkedInfo )
       prompt.showToast( { message : message } )
     } ).catch( error => {
-      console( "testGetP2pLinkedInfoManagerPromise error :" + error )
+      console.log( "testGetP2pLinkedInfoManagerPromise error :" + error )
     } )
     prompt.showToast( { message : message } )
     return message
@@ -76,7 +77,7 @@ export function testGetCurrentP2pGroupManagerPromise(): string {
       message = "getCurrentGroupPromise: " + JSON.stringify( WifiP2pGroupInfo )
       prompt.showToast( { message : message } )
     } ).catch( error => {
-      console( "testGetCurrentP2pGroupManagerPromise error :" + error )
+      console.log( "testGetCurrentP2pGroupManagerPromise error :" + error )
     } )
     prompt.showToast( { message : message } )
     return message
@@ -118,7 +119,7 @@ export function testGetP2pPeerDevicesManagerPromise() {
       message = "getP2pPeerDevicesPromise: " + JSON.stringify( WifiP2pDevice )
       prompt.showToast( { message : message } )
     } ).catch( error => {
-      console( "testGetP2pPeerDevicesManagerPromise error :" + error )
+      console.log( "testGetP2pPeerDevicesManagerPromise error :" + error )
     } )
     prompt.showToast( { message : message } )
     return message
@@ -160,7 +161,7 @@ export function testGetP2pLocalDeviceManagerPromise() {
       message = "getP2pLocalDevicePromise: " + JSON.stringify( WifiP2pDevice )
       prompt.showToast( { message : message } )
     } ).catch( error => {
-      console( "testGetP2pLocalDeviceManagerPromise error :" + error )
+      console.log( "testGetP2pLocalDeviceManagerPromise error :" + error )
     } )
     prompt.showToast( { message : message } )
     return message
@@ -211,7 +212,9 @@ export function testCreateP2pGroupManager(): string {
     }
     AppStorage.SetOrCreate( "wifiP2pConfigManager" , wifiP2pConfigManager )
     let ret = wifiManager.createP2pGroup( wifiP2pConfigManager )
-    message = "createGroup: " + ret
+    //      createP2pGroup的返回值为void
+    //    message = "createGroup: " + ret
+    message = "createP2pGroup 调用成功"
     return message
   } catch( error ) {
     console.log( `Failed to testCreateP2pGroupManager. message: ${ error.message }, code: ${ error.code }` )
@@ -241,7 +244,9 @@ export function testP2pConnectManager(): string {
     let message = "P2pConnect test"
     let wifiP2pConfigManager = AppStorage.Get( "wifiP2pConfigManager" )
     let ret = wifiManager.p2pConnect( wifiP2pConfigManager )
-    message = "p2pConnect: " + ret
+    //      p2pConnect的返回值为void
+    //    message = "p2pConnect: " + ret
+    message = "p2pConnect 调用成功"
     prompt.showToast( { message : message } )
     return message
   } catch( error ) {
@@ -256,7 +261,9 @@ export function testP2pCancelConnectManager(): string {
   try {
     let message = "p2pCancelConnect test"
     let ret = wifiManager.p2pCancelConnect()
-    message = "p2pCancelConnect: " + ret
+    //      p2pCancelConnect的返回值为void
+    //    message = "p2pCancelConnect: " + ret
+    message = "p2pCancelConnect 调用成功"
     prompt.showToast( { message : message } )
     return message
   } catch( error ) {
@@ -271,7 +278,10 @@ export function testStartDiscoverP2pDevicesManager(): string {
   try {
     let message = "startDiscoverDevices test"
     let ret = wifiManager.startDiscoverP2pDevices()
-    message = "startDiscoverDevices: " + ret
+    //      startDiscoverP2pDevices的返回值为void
+    //    message = "startDiscoverDevices: " + ret
+    message = "startDiscoverP2pDevices 调用成功"
+    Router.push( { uri : PAGE_URI_P2P_FOUND_MODE } );
     prompt.showToast( { message : message } )
     return message
   } catch( error ) {
@@ -286,7 +296,9 @@ export function testStopDiscoverP2pDevicesManager(): string {
   try {
     let message = "stopDiscoverDevices test"
     let ret = wifiManager.stopDiscoverP2pDevices()
-    message = "stopDiscoverDevices: " + ret
+    //      stopDiscoverP2pDevices的返回值为void
+    //    message = "stopDiscoverDevices: " + ret
+    message = "stopDiscoverP2pDevices 调用成功"
     prompt.showToast( { message : message } )
     return message
   } catch( error ) {
@@ -302,7 +314,9 @@ export function testDeletePersistentP2pGroupManager(): string {
     let message = "deletePersistentGroup test"
     let netId = AppStorage.Get( "netIdManager" )
     let ret = wifiManager.deletePersistentP2pGroup( netId )
-    message = "deletePersistentGroup: " + ret
+    //      deletePersistentP2pGroup的返回值为void
+    //    message = "deletePersistentGroup: " + ret
+    message = "deletePersistentP2pGroup 调用成功"
     prompt.showToast( { message : message } )
     return message
   } catch( error ) {
@@ -360,7 +374,9 @@ export function testSetP2pDeviceNameManager(): string {
     let message = "setDeviceName test"
     let devName = AppStorage.Get( "devNameManager" )
     let ret = wifiManager.setP2pDeviceName( devName )
-    message = "setDeviceName: " + ret
+    //      setP2pDeviceName的返回值为void
+    //    message = "setDeviceName: " + ret
+    message = "setP2pDeviceName 调用成功"
     prompt.showToast( { message : message } )
     return message
   } catch( error ) {
@@ -479,7 +495,6 @@ export function testOnP2pDeviceChangeManager(): string {
       message = "关闭P2P设备状态改变事件"
     } else {
       wifiManager.on( "p2pDeviceChange" , ( data ) => {
-        //      let p2pDeviceChangeMessage =""
         let p2pDeviceStatusMessage = ""
         let deviceName = data.deviceName
         let deviceAddress = data.deviceAddress

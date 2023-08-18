@@ -31,8 +31,8 @@ static std::map<WifiSecurityType, std::string> g_secTypeKeyMgmtMap = {
     {WIFI_SEC_TYPE_SAE, "SAE"},
 };
 
-std::unique_ptr<OHOS::Wifi::WifiDevice> wifiDevicePtr = OHOS::Wifi::WifiDevice::GetInstance(WIFI_DEVICE_ABILITY_ID);
-std::unique_ptr<OHOS::Wifi::WifiScan> wifiScanPtr = OHOS::Wifi::WifiScan::GetInstance(WIFI_SCAN_ABILITY_ID);
+std::shared_ptr<OHOS::Wifi::WifiDevice> wifiDevicePtr = OHOS::Wifi::WifiDevice::GetInstance(WIFI_DEVICE_ABILITY_ID);
+std::shared_ptr<OHOS::Wifi::WifiScan> wifiScanPtr = OHOS::Wifi::WifiScan::GetInstance(WIFI_SCAN_ABILITY_ID);
 
 NO_SANITIZE("cfi") WifiErrorCode EnableWifi()
 {
@@ -83,9 +83,7 @@ NO_SANITIZE("cfi") WifiErrorCode GetScanInfoList(WifiScanInfo *result, unsigned 
             WIFI_LOGE("Scan info convert bssid error!");
             return ERROR_WIFI_UNKNOWN;
         }
-    #ifdef SUPPORT_RANDOM_MAC_ADDR
         result->bssidType = vecScanInfos[i].bssidType;
-    #endif
         result->securityType = static_cast<int>(vecScanInfos[i].securityType);
         result->rssi = vecScanInfos[i].rssi;
         result->band = vecScanInfos[i].band;
@@ -160,6 +158,7 @@ static OHOS::Wifi::ErrCode ConvertDeviceConfigFromC(
     } else {
         deviceConfig.bssid = OHOS::Wifi::MacArrayToStr(config->bssid);
     }
+    deviceConfig.bssidType = config->bssidType;
     if (strnlen(config->preSharedKey, WIFI_MAX_KEY_LEN) == WIFI_MAX_KEY_LEN) {
         return OHOS::Wifi::WIFI_OPT_INVALID_PARAM;
     }
@@ -191,10 +190,7 @@ static OHOS::Wifi::ErrCode ConvertDeviceConfigFromCpp(const OHOS::Wifi::WifiDevi
         WIFI_LOGE("device config convert bssid error!");
         return OHOS::Wifi::WIFI_OPT_FAILED;
     }
-#ifdef SUPPORT_RANDOM_MAC_ADDR
     result->bssidType = deviceConfig.bssidType;
-#endif
-
     if (memcpy_s(result->preSharedKey, WIFI_MAX_KEY_LEN, deviceConfig.preSharedKey.c_str(), WIFI_MAX_KEY_LEN) != EOK) {
         return OHOS::Wifi::WIFI_OPT_FAILED;
     }

@@ -88,7 +88,10 @@ void WifiScanServiceImpl::OnStart()
     mState = ServiceRunningState::STATE_RUNNING;
     WIFI_LOGI("Start scan service!");
     WifiManager::GetInstance();
-    WifiManager::GetInstance().StartUnloadScanSaTimer();
+    WifiOprMidState scanState = WifiConfigCenter::GetInstance().GetScanMidState();
+    if (scanState == WifiOprMidState::CLOSED) {
+        WifiManager::GetInstance().StartUnloadScanSaTimer();
+    }
 }
 
 void WifiScanServiceImpl::OnStop()

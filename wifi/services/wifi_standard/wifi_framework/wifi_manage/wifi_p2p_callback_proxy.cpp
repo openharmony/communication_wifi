@@ -84,9 +84,7 @@ void WifiP2pCallbackProxy::WriteWifiP2pDeviceData(MessageParcel &data, const Wif
 {
     data.WriteString(device.GetDeviceName());
     data.WriteString(device.GetDeviceAddress());
-#ifdef SUPPORT_RANDOM_MAC_ADDR
-    data.WriteInt32(static_cast<int>(device.GetDeviceAddressType()));
-#endif
+    data.WriteInt32(device.GetDeviceAddressType());
     data.WriteString(device.GetPrimaryDeviceType());
     data.WriteString(device.GetSecondaryDeviceType());
     data.WriteInt32(static_cast<int>(device.GetP2pDeviceStatus()));

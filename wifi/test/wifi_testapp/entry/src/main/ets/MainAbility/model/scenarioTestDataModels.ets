@@ -571,96 +571,8 @@ export const HotspotManagerCreateScenarioTestCase: [] = [
 
 export const P2pConnectScenarioTestCase: [] = [
   {
-    'name' : '获取P2P连接信息Callback' ,
-    'detail' : '1' ,
-    'method' : 'getP2pLinkedInfo' ,
-    'api' : testGetP2pLinkedInfoCallback ,
-    'result' : 'None' ,
-    'category' : ScenarioCategory.P2pConnectScenario
-  },
-  {
-    'name' : '获取P2P当前组信息Callback' ,
-    'detail' : '2' ,
-    'method' : 'getCurrentGroup' ,
-    'api' : testGetCurrentGroupCallback ,
-    'result' : 'None' ,
-    'category' : ScenarioCategory.P2pConnectScenario
-  },
-  {
-    'name' : '获取P2P对端设备列表信息Callback' ,
-    'detail' : '3' ,
-    'method' : 'getP2pPeerDevices' ,
-    'api' : testGetP2pPeerDevicesCallback ,
-    'result' : 'None' ,
-    'category' : ScenarioCategory.P2pConnectScenario
-  },
-  {
-    'name' : '创建群组' ,
-    'detail' : '4' ,
-    'method' : 'createGroup' ,
-    'api' : testCreateGroup ,
-    'result' : 'None' ,
-    'category' : ScenarioCategory.P2pConnectScenario
-  },
-  {
-    'name' : '移除群组' ,
-    'detail' : '5' ,
-    'method' : 'removeGroup' ,
-    'api' : testRemoveGroup ,
-    'result' : 'None' ,
-    'category' : ScenarioCategory.P2pConnectScenario
-  },
-  {
-    'name' : '执行P2P连接' ,
-    'detail' : '6' ,
-    'method' : 'p2pConnect' ,
-    'api' : testP2pConnect ,
-    'result' : 'None' ,
-    'category' : ScenarioCategory.P2pConnectScenario
-  },
-  {
-    'name' : '取消P2P连接' ,
-    'detail' : '7' ,
-    'method' : 'p2pCancelConnect' ,
-    'api' : testP2pCancelConnect ,
-    'result' : 'None' ,
-    'category' : ScenarioCategory.P2pConnectScenario
-  },
-  {
-    'name' : '开始发现设备' ,
-    'detail' : '8' ,
-    'method' : 'startDiscoverDevices' ,
-    'api' : testStartDiscoverDevices ,
-    'result' : 'None' ,
-    'category' : ScenarioCategory.P2pConnectScenario
-  },
-  {
-    'name' : '停止发现设备' ,
-    'detail' : '9' ,
-    'method' : 'stopDiscoverDevices' ,
-    'api' : testStopDiscoverDevices ,
-    'result' : 'None' ,
-    'category' : ScenarioCategory.P2pConnectScenario
-  },
-  {
-    'name' : '删除永久组' ,
-    'detail' : '10' ,
-    'method' : 'deletePersistentGroup' ,
-    'api' : testDeletePersistentGroup ,
-    'result' : 'None' ,
-    'category' : ScenarioCategory.P2pConnectScenario
-  },
-  {
-    'name' : '设置设备名称' ,
-    'detail' : '11' ,
-    'method' : 'setDeviceName' ,
-    'api' : testSetDeviceName ,
-    'result' : 'None' ,
-    'category' : ScenarioCategory.P2pConnectScenario
-  },
-  {
     'name' : '注册P2P开关状态改变事件' ,
-    'detail' : '12' ,
+    'detail' : '1' ,
     'method' : 'On.P2pStateChange' ,
     'api' : testOnP2pStateChange ,
     'result' : 'None' ,
@@ -668,7 +580,7 @@ export const P2pConnectScenarioTestCase: [] = [
   },
   {
     'name' : '注册P2P连接状态改变事件' ,
-    'detail' : '13' ,
+    'detail' : '2' ,
     'method' : 'On.P2pConnectionChange' ,
     'api' : testOnP2pConnectionChange ,
     'result' : 'None' ,
@@ -676,7 +588,7 @@ export const P2pConnectScenarioTestCase: [] = [
   },
   {
     'name' : '注册P2P设备状态改变事件' ,
-    'detail' : '14' ,
+    'detail' : '3' ,
     'method' : 'On.p2pDeviceChange' ,
     'api' : testOnP2pDeviceChange ,
     'result' : 'None' ,
@@ -684,7 +596,7 @@ export const P2pConnectScenarioTestCase: [] = [
   },
   {
     'name' : '注册P2P对端设备状态改变事件' ,
-    'detail' : '15' ,
+    'detail' : '4' ,
     'method' : 'On.p2pPeerDeviceChange' ,
     'api' : testOnP2pPeerDeviceChange ,
     'result' : 'None' ,
@@ -692,7 +604,7 @@ export const P2pConnectScenarioTestCase: [] = [
   },
   {
     'name' : '注册P2P永久组状态改变事件' ,
-    'detail' : '16' ,
+    'detail' : '5' ,
     'method' : 'On.p2pPersistentGroupChange' ,
     'api' : testOnP2pPersistentGroupChange ,
     'result' : 'None' ,
@@ -700,9 +612,65 @@ export const P2pConnectScenarioTestCase: [] = [
   },
   {
     'name' : '注册发现设备状态改变事件' ,
-    'detail' : '17' ,
+    'detail' : '6' ,
     'method' : 'On.p2pDiscoveryChange' ,
     'api' : testOnP2pDiscoveryChange ,
+    'result' : 'None' ,
+    'category' : ScenarioCategory.P2pConnectScenario
+  },
+  {
+    'name' : '设置设备名称' ,
+    'detail' : '7' ,
+    'method' : 'setDeviceName' ,
+    'api' : testSetDeviceName ,
+    'result' : 'None' ,
+    'category' : ScenarioCategory.P2pConnectScenario
+  },
+  {
+    'name' : '创建群组' ,
+    'detail' : '8' ,
+    'method' : 'createGroup' ,
+    'api' : testCreateGroup ,
+    'result' : 'None' ,
+    'category' : ScenarioCategory.P2pConnectScenario
+  },
+  {
+    'name' : '开始发现设备' ,
+    'detail' : '9' ,
+    'method' : 'startDiscoverDevices' ,
+    'api' : testStartDiscoverDevices ,
+    'result' : 'None' ,
+    'category' : ScenarioCategory.P2pConnectScenario
+  },
+  {
+    'name' : '执行P2P连接' ,
+    'detail' : '10' ,
+    'method' : 'p2pConnect' ,
+    'api' : testP2pConnect ,
+    'result' : 'None' ,
+    'category' : ScenarioCategory.P2pConnectScenario
+  },
+  {
+    'name' : '获取P2P连接信息Callback' ,
+    'detail' : '11' ,
+    'method' : 'getP2pLinkedInfo' ,
+    'api' : testGetP2pLinkedInfoCallback ,
+    'result' : 'None' ,
+    'category' : ScenarioCategory.P2pConnectScenario
+  },
+  {
+    'name' : '获取P2P当前组信息Callback' ,
+    'detail' : '12' ,
+    'method' : 'getCurrentGroup' ,
+    'api' : testGetCurrentGroupCallback ,
+    'result' : 'None' ,
+    'category' : ScenarioCategory.P2pConnectScenario
+  },
+  {
+    'name' : '获取P2P对端设备列表信息Callback' ,
+    'detail' : '13' ,
+    'method' : 'getP2pPeerDevices' ,
+    'api' : testGetP2pPeerDevicesCallback ,
     'result' : 'None' ,
     'category' : ScenarioCategory.P2pConnectScenario
   },
@@ -710,67 +678,66 @@ export const P2pConnectScenarioTestCase: [] = [
 
 export const P2pManagerConnectScenarioTestCase: [] = [
   {
-    'name' : '获取P2P连接信息Callback' ,
+    'name' : '注册P2P开关状态改变事件' ,
     'detail' : '1' ,
-    'method' : 'getP2pLinkedInfo' ,
-    'api' : testGetP2pLinkedInfoManagerCallback ,
+    'method' : 'On.P2pStateChange' ,
+    'api' : testOnP2pStateChangeManager ,
     'result' : 'None' ,
     'category' : ScenarioCategory.P2pManagerConnectScenario
   },
   {
-    'name' : '获取P2P当前组信息Callback' ,
+    'name' : '注册P2P连接状态改变事件' ,
     'detail' : '2' ,
-    'method' : 'getCurrentGroup' ,
-    'api' : testGetCurrentP2pGroupManagerCallback ,
+    'method' : 'On.P2pConnectionChange' ,
+    'api' : testOnP2pConnectionChangeManager ,
     'result' : 'None' ,
     'category' : ScenarioCategory.P2pManagerConnectScenario
   },
   {
-    'name' : '获取P2P对端设备列表信息Callback' ,
+    'name' : '注册P2P设备状态改变事件' ,
     'detail' : '3' ,
-    'method' : 'getP2pPeerDevices' ,
-    'api' : testGetP2pPeerDevicesManagerCallback ,
+    'method' : 'On.p2pDeviceChange' ,
+    'api' : testOnP2pDeviceChangeManager ,
     'result' : 'None' ,
     'category' : ScenarioCategory.P2pManagerConnectScenario
   },
   {
-    'name' : '获取P2P对端设备列表信息Callback' ,
+    'name' : '注册P2P对端设备状态改变事件' ,
     'detail' : '4' ,
-    'method' : 'getP2pPeerDevices' ,
-    'api' : testGetP2pLocalDeviceManagerCallback ,
+    'method' : 'On.p2pPeerDeviceChange' ,
+    'api' : testOnP2pPeerDeviceChangeManager ,
     'result' : 'None' ,
     'category' : ScenarioCategory.P2pManagerConnectScenario
   },
-
+  {
+    'name' : '注册P2P永久组状态改变事件' ,
+    'detail' : '5' ,
+    'method' : 'On.p2pPersistentGroupChange' ,
+    'api' : testOnP2pPersistentGroupChangeManager ,
+    'result' : 'None' ,
+    'category' : ScenarioCategory.P2pManagerConnectScenario
+  },
+  {
+    'name' : '注册发现设备状态改变事件' ,
+    'detail' : '6' ,
+    'method' : 'On.p2pDiscoveryChange' ,
+    'api' : testOnP2pDiscoveryChangeManager ,
+    'result' : 'None' ,
+    'category' : ScenarioCategory.P2pManagerConnectScenario
+  },
+  {
+    'name' : '设置设备名称' ,
+    'detail' : '7' ,
+    'method' : 'SetP2pDeviceName' ,
+    'api' : testSetP2pDeviceNameManager ,
+    'result' : 'None' ,
+    'category' : ScenarioCategory.P2pManagerConnectScenario
+  },
   {
     'name' : '创建群组' ,
-    'detail' : '5' ,
+    'detail' : '8' ,
     'method' : 'createGroup' ,
     'api' : testCreateP2pGroupManager ,
-    'result' : 'None' ,
-    'category' : ScenarioCategory.P2pManagerConnectScenario
-  },
-  {
-    'name' : '移除群组' ,
-    'detail' : '6' ,
-    'method' : 'removeGroup' ,
-    'api' : testRemoveP2pGroupManager ,
-    'result' : 'None' ,
-    'category' : ScenarioCategory.P2pManagerConnectScenario
-  },
-  {
-    'name' : '执行P2P连接' ,
-    'detail' : '7' ,
-    'method' : 'p2pConnect' ,
-    'api' : testP2pConnectManager ,
-    'result' : 'None' ,
-    'category' : ScenarioCategory.P2pManagerConnectScenario
-  },
-  {
-    'name' : '取消P2P连接' ,
-    'detail' : '8' ,
-    'method' : 'p2pCancelConnect' ,
-    'api' : testP2pCancelConnectManager ,
     'result' : 'None' ,
     'category' : ScenarioCategory.P2pManagerConnectScenario
   },
@@ -783,82 +750,50 @@ export const P2pManagerConnectScenarioTestCase: [] = [
     'category' : ScenarioCategory.P2pManagerConnectScenario
   },
   {
-    'name' : '停止发现设备' ,
+    'name' : '执行P2P连接' ,
     'detail' : '10' ,
-    'method' : 'stopDiscoverDevices' ,
-    'api' : testStopDiscoverP2pDevicesManager ,
+    'method' : 'p2pConnect' ,
+    'api' : testP2pConnectManager ,
     'result' : 'None' ,
     'category' : ScenarioCategory.P2pManagerConnectScenario
   },
   {
-    'name' : '删除永久组' ,
+    'name' : '获取P2P连接信息Callback' ,
     'detail' : '11' ,
-    'method' : 'deletePersistentGroup' ,
-    'api' : testDeletePersistentP2pGroupManager ,
+    'method' : 'getP2pLinkedInfo' ,
+    'api' : testGetP2pLinkedInfoManagerCallback ,
+    'result' : 'None' ,
+    'category' : ScenarioCategory.P2pManagerConnectScenario
+  },
+  {
+    'name' : '获取P2P当前组信息Callback' ,
+    'detail' : '12' ,
+    'method' : 'getCurrentGroup' ,
+    'api' : testGetCurrentP2pGroupManagerCallback ,
+    'result' : 'None' ,
+    'category' : ScenarioCategory.P2pManagerConnectScenario
+  },
+  {
+    'name' : '获取P2P对端设备列表信息Callback' ,
+    'detail' : '13' ,
+    'method' : 'getP2pPeerDevices' ,
+    'api' : testGetP2pPeerDevicesManagerCallback ,
+    'result' : 'None' ,
+    'category' : ScenarioCategory.P2pManagerConnectScenario
+  },
+  {
+    'name' : '获取P2P本地设备列表信息Callback' ,
+    'detail' : '14' ,
+    'method' : 'getP2pPeerDevices' ,
+    'api' : testGetP2pLocalDeviceManagerCallback ,
     'result' : 'None' ,
     'category' : ScenarioCategory.P2pManagerConnectScenario
   },
   {
     'name' : '获取创建的所有P2P群组信息Callback' ,
-    'detail' : '12' ,
-    'method' : 'deletePersistentGroup' ,
-    'api' : testGetP2pGroupsManagerCallback ,
-    'result' : 'None' ,
-    'category' : ScenarioCategory.P2pManagerConnectScenario
-  },
-  {
-    'name' : '设置设备名称' ,
-    'detail' : '13' ,
-    'method' : 'deletePersistentGroup' ,
-    'api' : testSetP2pDeviceNameManager ,
-    'result' : 'None' ,
-    'category' : ScenarioCategory.P2pManagerConnectScenario
-  },
-  {
-    'name' : '注册P2P开关状态改变事件' ,
-    'detail' : '14' ,
-    'method' : 'On.P2pStateChange' ,
-    'api' : testOnP2pStateChangeManager ,
-    'result' : 'None' ,
-    'category' : ScenarioCategory.P2pManagerConnectScenario
-  },
-  {
-    'name' : '注册P2P连接状态改变事件' ,
     'detail' : '15' ,
-    'method' : 'On.P2pConnectionChange' ,
-    'api' : testOnP2pConnectionChangeManager ,
-    'result' : 'None' ,
-    'category' : ScenarioCategory.P2pManagerConnectScenario
-  },
-  {
-    'name' : '注册P2P设备状态改变事件' ,
-    'detail' : '16' ,
-    'method' : 'On.p2pDeviceChange' ,
-    'api' : testOnP2pDeviceChangeManager ,
-    'result' : 'None' ,
-    'category' : ScenarioCategory.P2pManagerConnectScenario
-  },
-  {
-    'name' : '注册P2P对端设备状态改变事件' ,
-    'detail' : '17' ,
-    'method' : 'On.p2pPeerDeviceChange' ,
-    'api' : testOnP2pPeerDeviceChangeManager ,
-    'result' : 'None' ,
-    'category' : ScenarioCategory.P2pManagerConnectScenario
-  },
-  {
-    'name' : '注册P2P永久组状态改变事件' ,
-    'detail' : '18' ,
-    'method' : 'On.p2pPersistentGroupChange' ,
-    'api' : testOnP2pPersistentGroupChangeManager ,
-    'result' : 'None' ,
-    'category' : ScenarioCategory.P2pManagerConnectScenario
-  },
-  {
-    'name' : '注册发现设备状态改变事件' ,
-    'detail' : '19' ,
-    'method' : 'On.p2pDiscoveryChange' ,
-    'api' : testOnP2pDiscoveryChangeManager ,
+    'method' : 'GetP2pGroupsManagerCallback' ,
+    'api' : testGetP2pGroupsManagerCallback ,
     'result' : 'None' ,
     'category' : ScenarioCategory.P2pManagerConnectScenario
   },

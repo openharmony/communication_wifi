@@ -27,6 +27,7 @@ WifiManager配置信息包括：
 >| disableReason |        number        |                    0                    | 禁用原因。 **系统接口：** 此接口为系统接口。               |
 >|     netId     |        number        |                    0                    | 分配的网络ID。 **系统接口：** 此接口为系统接口。           |
 >| randomMacType |        number        |                    0                    | 随机MAC类型。 **系统接口：** 此接口为系统接口。            |
+>| randomMacAddr |        string        |            xx:xx:xx:xx:xx:xx            | 随机MAC地址。 **系统接口：** 此接口为系统接口。            |
 >|    ipType     |      **IpType**      |                    1                    | IP地址类型。 **系统接口：** 此接口为系统接口。             |
 >|   staticIp    |     **IpConfig**     | ipAddress；gateway；dnsServers；domains | 静态IP配置信息。 **系统接口：** 此接口为系统接口。         |
 >|  eapConfig9+  |  **WifiEapConfig**   |                                         | 可扩展身份验证协议配置。 **系统接口：** 此接口为系统接口。 |

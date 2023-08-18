@@ -657,9 +657,7 @@ bool ScanService::StoreFullScanInfo(
         }
         WifiScanInfo scanInfo;
         scanInfo.bssid = iter->bssid;
-    #ifdef SUPPORT_RANDOM_MAC_ADDR
         scanInfo.bssidType = REAL_DEVICE_ADDRESS;
-    #endif
         scanInfo.ssid = iter->ssid;
         scanInfo.capabilities = iter->capabilities;
         scanInfo.frequency = iter->frequency;
@@ -1327,7 +1325,7 @@ ErrCode ScanService::AllowPnoScan()
 
 ErrCode ScanService::AllowScanByType(ScanType scanType)
 {
-    LOGI("Enter ScanService::AllowScanByType, scanType: %{public}d.", scanType);
+    LOGD("Enter ScanService::AllowScanByType, scanType: %{public}d.", scanType);
 
     ErrCode allScanResult = WIFI_OPT_SUCCESS;
     switch (scanType) {
@@ -1431,7 +1429,7 @@ ErrCode ScanService::ApplyTrustListPolicy(ScanType scanType)
 
 ErrCode ScanService::ApplyScanPolices(ScanType type)
 {
-    LOGI("Enter ScanService::ApplyScanPolices, type: %{public}d", type);
+    LOGD("Enter ScanService::ApplyScanPolices, type: %{public}d", type);
     /* Obtains app parameters and scenario status parameters. */
     auto appPackageName = WifiSettings::GetInstance().GetAppPackageName();
     auto trustListPolicies = WifiSettings::GetInstance().ReloadTrustListPolicies();
@@ -1856,8 +1854,6 @@ bool ScanService::AllowScanDuringStaScene(int staScene, ScanMode scanMode)
     }
     std::unique_lock<std::mutex> lock(scanControlInfoMutex);
     for (auto iter = scanControlInfo.scanForbidList.begin(); iter != scanControlInfo.scanForbidList.end(); ++iter) {
-        WIFI_LOGI("now - staCurrentTime:%{public}d, iter->forbidTime:%{public}d", int(now - staCurrentTime),
-            iter->forbidTime);
         /* forbid scan mode found in scan scene. */
         if (iter->scanScene == staScene && iter->scanMode == scanMode) {
             /* forbidCount=0 and forbidTime=0, directly forbid scan. */
@@ -2270,7 +2266,7 @@ bool ScanService::AllowScanByDisableScanCtrl()
 
 bool ScanService::AllowScanByMovingFreeze()
 {
-    LOGI("Enter ScanService::AllowScanByMovingFreeze.\n");
+    LOGD("Enter ScanService::AllowScanByMovingFreeze.\n");
 
     /* moving freeze trust mode. */
     bool isTrustListMode = IsScanTrustMode();
@@ -2375,7 +2371,7 @@ int CalculateAirTimeFraction(int channelUtilization, int channelWidthFactor)
         airTimeFraction *= airTimeFraction;
         airTimeFraction /= MAX_CHANNEL_UTILIZATION;
     }
-    WIFI_LOGI("airTime20: %{public}d airTime: %{public}d", airTimeFraction20MHZ, airTimeFraction);
+    WIFI_LOGD("airTime20: %{public}d airTime: %{public}d", airTimeFraction20MHZ, airTimeFraction);
     return airTimeFraction;
 }
 

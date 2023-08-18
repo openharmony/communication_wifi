@@ -41,38 +41,42 @@ struct WifiAutoTest {
   @State changeIndex: number = - 1
   //  @State autoTextMessage: string ="None";
   @StorageLink( "wifiAutoTestMessage" ) wifiAutoTestMessage: string = ""
-  private ssid = "TP-LINK_6365";
-  private bssid = "6C:B1:58:75:63:65";
-  private preSharedKey = "kaihong123";
-  private isHiddenSsid = false;
-  @State securityType: number = 3
-  @State creatorUid: number = 1;
-  @State disableReason: number = 0;
-  @State netId: number = 100 ;
-  @State randomMacType: number = 0 ;
-  @State randomMacAddr: string = "08:fb:ea:1b:38:aa"
-  @State ipType: number = 1 ;
-  @State staticIp_ipAddress: number = 3232235880 ;
-  @State staticIp_gateway: number = 3232235777 ;
-  @State staticIp_dnsServers: number = 3716386629 ;
-  @State staticIp_domains: Array<string> = [ "0", "1", "2" ] ;
+  @State w_ssid: string = "TP-LINK_6365";
+  @State w_bssid: string = "6C:B1:58:75:63:65";
+  @State w_preSharedKey: string = "kaihong123";
+  @State w_isHiddenSsid: boolean = false;
+  @State w_securityType: number = 3
+  @State w_creatorUid: number = 1;
+  @State w_disableReason: number = 0;
+  @State w_netId: number = 100 ;
+  @State w_randomMacType: number = 0 ;
+  @State w_randomMacAddr: string = "08:fb:ea:1b:38:aa"
+  @State w_ipType: number = 1 ;
+  @State w_staticIp_ipAddress: number = 3232235880 ;
+  @State w_staticIp_gateway: number = 3232235777 ;
+  @State w_staticIp_dnsServers: number = 3716386629 ;
+  @State w_staticIp_domains: Array<string> = [ "0", "1", "2" ] ;
+  @State w_networkId: number = 0 ; // id,netId,networkId是一个值嘛？
+  @State w_featureId: number = 1 ;
 
   aboutToAppear() {
-    AppStorage.SetOrCreate( 'ssid' , this.ssid );
-    AppStorage.SetOrCreate( 'bssid' , this.bssid );
-    AppStorage.SetOrCreate( 'preSharedKey' , this.preSharedKey );
-    AppStorage.SetOrCreate( 'isHiddenSsid' , this.isHiddenSsid );
-    AppStorage.SetOrCreate( 'securityType' , this.securityType );
-    AppStorage.SetOrCreate( 'creatorUid' , this.creatorUid );
-    AppStorage.SetOrCreate( 'disableReason' , this.disableReason );
-    AppStorage.SetOrCreate( 'netId' , this.netId );
-    AppStorage.SetOrCreate( 'randomMacType' , this.randomMacType );
-    AppStorage.SetOrCreate( 'randomMacAddr' , this.randomMacAddr );
-    AppStorage.SetOrCreate( 'ipType' , this.ipType );
-    AppStorage.SetOrCreate( 'staticIp_ipAddress' , this.staticIp_ipAddress );
-    AppStorage.SetOrCreate( 'staticIp_gateway' , this.staticIp_gateway );
-    AppStorage.SetOrCreate( 'staticIp_dnsServers' , this.staticIp_dnsServers );
-    AppStorage.SetOrCreate( 'staticIp_domains' , this.staticIp_domains );
+    AppStorage.SetOrCreate( 'w_ssid' , this.w_ssid );
+    AppStorage.SetOrCreate( 'w_bssid' , this.w_bssid );
+    AppStorage.SetOrCreate( 'w_preSharedKey' , this.w_preSharedKey );
+    AppStorage.SetOrCreate( 'w_isHiddenSsid' , this.w_isHiddenSsid );
+    AppStorage.SetOrCreate( 'w_securityType' , this.w_securityType );
+    AppStorage.SetOrCreate( 'w_creatorUid' , this.w_creatorUid );
+    AppStorage.SetOrCreate( 'w_disableReason' , this.w_disableReason );
+    AppStorage.SetOrCreate( 'w_netId' , this.w_netId );
+    AppStorage.SetOrCreate( 'w_randomMacType' , this.w_randomMacType );
+    AppStorage.SetOrCreate( 'w_randomMacAddr' , this.w_randomMacAddr );
+    AppStorage.SetOrCreate( 'w_ipType' , this.w_ipType );
+    AppStorage.SetOrCreate( 'w_staticIp_ipAddress' , this.w_staticIp_ipAddress );
+    AppStorage.SetOrCreate( 'w_staticIp_gateway' , this.w_staticIp_gateway );
+    AppStorage.SetOrCreate( 'w_staticIp_dnsServers' , this.w_staticIp_dnsServers );
+    AppStorage.SetOrCreate( 'w_staticIp_domains' , this.w_staticIp_domains );
+    AppStorage.SetOrCreate( 'w_networkId' , this.w_networkId );
+    AppStorage.SetOrCreate( 'w_featureId' , this.w_featureId );
   }
 
   build() {
@@ -165,7 +169,7 @@ struct WifiAutoTest {
           //循环调用
           async function forLoop() {
             for ( let m = 0 ; m < Interface.length ; m ++ ) {
-              wifiAutoTestMessage = WifiAutoTestCase[m]["api"]( ... Interface[m].para )
+              wifiAutoTestMessage += WifiAutoTestCase[m]["api"]( ... Interface[m].para ) + "\n"
               self.changeIndex = m
               await sleep( 2 )
               AppStorage.SetOrCreate( "wifiAutoTestMessage" , wifiAutoTestMessage )

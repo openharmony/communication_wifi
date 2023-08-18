@@ -53,6 +53,7 @@ void ApMonitor::OnStaJoinOrLeave(const WifiApConnectionNofify &cbInfo)
 {
     StationInfo info;
     info.bssid = cbInfo.mac;
+    info.bssidType = REAL_DEVICE_ADDRESS;
     info.deviceName = GETTING_INFO;
     info.ipAddr = GETTING_INFO;
     int event = cbInfo.type;

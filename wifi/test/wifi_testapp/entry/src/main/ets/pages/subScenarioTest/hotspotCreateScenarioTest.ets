@@ -38,6 +38,21 @@ struct hotspotCreateScenarioTest {
   private testItem: TestData = router.getParams().testId;
   @State changeIndex: number = - 1
   @StorageLink( "hotspotCreateScenarioMessage" ) hotspotCreateScenarioMessage: string = ""
+  @State h_ssid: string = "testApp1";
+  @State h_securityType: number = 3;
+  @State h_band: number = 2;
+  @State h_preSharedKey: string = "12345678";
+  @State h_maxConn: number = 3 ;
+  @State h_channel: number = 36 ;
+
+  aboutToAppear() {
+    AppStorage.SetOrCreate( "h_ssid" , this.h_ssid )
+    AppStorage.SetOrCreate( "h_securityType" , this.h_securityType )
+    AppStorage.SetOrCreate( "h_band" , this.h_band )
+    AppStorage.SetOrCreate( "h_preSharedKey" , this.h_preSharedKey )
+    AppStorage.SetOrCreate( "h_maxConn" , this.h_maxConn )
+    AppStorage.SetOrCreate( "h_channel" , this.h_channel )
+  }
 
   build() {
     Column() {
@@ -105,7 +120,9 @@ struct hotspotCreateScenarioTest {
       Column() {
         Flex( { alignItems : ItemAlign.Center , justifyContent : FlexAlign.SpaceBetween } ) {
           Button( { type : ButtonType.Normal , stateEffect : true } ) {
-            Text( '场景测试开始' ).fontSize( "24vp" ).fontColor( 0xffffff ).margin( { left : 5 , right : 5 } )
+            Row() {
+              Text( '场景测试开始' ).fontSize( "24vp" ).fontColor( 0xffffff ).margin( { left : 5 , right : 5 } )
+            }.alignItems( VerticalAlign.Center )
           }
           .borderRadius( 8 )
           .backgroundColor( $r( "app.color.blue" ) )

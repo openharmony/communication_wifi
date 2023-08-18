@@ -24,125 +24,15 @@
 #include "securec.h"
 #include "define.h"
 #include "wifi_manager_service_ipc_interface_code.h"
+#include "wifi_hotspot_service_impl.h"
+#include "wifi_log.h"
 
 namespace OHOS {
 namespace Wifi {
-constexpr size_t FOO_MAX_LEN = 1024;
-constexpr size_t U32_AT_SIZE = 4;
+constexpr size_t U32_AT_SIZE_ZERO = 0;
 constexpr size_t MAP_HOTSPOT_NUMS = 22;
 const std::u16string FORMMGR_INTERFACE_TOKEN = u"ohos.wifi.IWifiHotspotService";
-
-class WifiHotSpotStubFuzzTest : public WifiHotspotStub {
-public:
-    WifiHotSpotStubFuzzTest() = default;
-    virtual ~WifiHotSpotStubFuzzTest() = default;
-
-    ErrCode IsHotspotActive(bool &bActive) override
-    {
-        return WIFI_OPT_SUCCESS;
-    }
-
-    ErrCode IsHotspotDualBandSupported(bool &isSupported) override
-    {
-        return WIFI_OPT_SUCCESS;
-    }
-
-    ErrCode GetHotspotConfig(HotspotConfig &config) override
-    {
-        return WIFI_OPT_SUCCESS;
-    }
-
-    ErrCode GetHotspotState(int &state) override
-    {
-        return WIFI_OPT_SUCCESS;
-    }
-
-    ErrCode SetHotspotConfig(const HotspotConfig &config) override
-    {
-        return WIFI_OPT_SUCCESS;
-    }
-
-    ErrCode SetHotspotIdleTimeout(int time) override
-    {
-        return WIFI_OPT_SUCCESS;
-    }
-
-    ErrCode GetStationList(std::vector<StationInfo> &result) override
-    {
-        return WIFI_OPT_SUCCESS;
-    }
-
-    ErrCode DisassociateSta(const StationInfo &info) override
-    {
-        return WIFI_OPT_SUCCESS;
-    }
-
-    ErrCode EnableHotspot(const ServiceType type = ServiceType::DEFAULT) override
-    {
-        return WIFI_OPT_SUCCESS;
-    }
-
-    ErrCode DisableHotspot(const ServiceType type = ServiceType::DEFAULT) override
-    {
-        return WIFI_OPT_SUCCESS;
-    }
-
-    ErrCode GetBlockLists(std::vector<StationInfo> &infos) override
-    {
-        return WIFI_OPT_SUCCESS;
-    }
-
-    ErrCode AddBlockList(const StationInfo &info) override
-    {
-        return WIFI_OPT_SUCCESS;
-    }
-
-    ErrCode DelBlockList(const StationInfo &info) override
-    {
-        return WIFI_OPT_SUCCESS;
-    }
-
-    ErrCode GetValidBands(std::vector<BandType> &bands) override
-    {
-        return WIFI_OPT_SUCCESS;
-    }
-
-    ErrCode GetValidChannels(BandType band, std::vector<int32_t> &validchannels) override
-    {
-        return WIFI_OPT_SUCCESS;
-    }
-
-    ErrCode RegisterCallBack(const sptr<IWifiHotspotCallback> &callback,
-        const std::vector<std::string> &event) override
-    {
-        return WIFI_OPT_SUCCESS;
-    }
-
-    ErrCode GetSupportedFeatures(long &features) override
-    {
-        return WIFI_OPT_SUCCESS;
-    }
-
-    ErrCode GetSupportedPowerModel(std::set<PowerModel>& setPowerModelList) override
-    {
-        return WIFI_OPT_SUCCESS;
-    }
-
-    ErrCode GetPowerModel(PowerModel& model) override
-    {
-        return WIFI_OPT_SUCCESS;
-    }
-
-    ErrCode SetPowerModel(const PowerModel& model) override
-    {
-        return WIFI_OPT_SUCCESS;
-    }
-
-    bool IsRemoteDied() override
-    {
-        return true;
-    }
-};
+std::shared_ptr<WifiHotspotStub> pWifiHotspotStub = std::make_shared<WifiHotspotServiceImpl>();
 
 void OnGetSupportedFeaturesTest(const uint8_t* data, size_t size)
 {
@@ -153,7 +43,6 @@ void OnGetSupportedFeaturesTest(const uint8_t* data, size_t size)
     datas.RewindRead(0);
     MessageParcel reply;
     MessageOption option;
-    std::shared_ptr<WifiHotspotStub> pWifiHotspotStub = std::make_shared<WifiHotSpotStubFuzzTest>();
     pWifiHotspotStub->OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_SUPPORTED_FEATURES),
         datas, reply, option);
 }
@@ -162,6 +51,7 @@ bool DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)
 {
     uint32_t code = U32_AT(data) % MAP_HOTSPOT_NUMS +
         static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_ENABLE_WIFI_AP);
+    LOGI("wifihotspotstub_fuzzer code(0x%{public}x) size(%{public}zu)", code, size);
     MessageParcel datas;
     datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN);
     datas.WriteInt32(0);
@@ -169,30 +59,17 @@ bool DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)
     datas.RewindRead(0);
     MessageParcel reply;
     MessageOption option;
-    std::shared_ptr<WifiHotspotStub> pWifiHotspotStub = std::make_shared<WifiHotSpotStubFuzzTest>();
-    OnGetSupportedFeaturesTest(data, size);
     pWifiHotspotStub->OnRemoteRequest(code, datas, reply, option);
+    OnGetSupportedFeaturesTest(data, size);
     return true;
 }
-
 
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
-    /* Run your code on data */
-    if (data == nullptr) {
+    if ((data == nullptr) || (size <= OHOS::Wifi::U32_AT_SIZE_ZERO)) {
         return 0;
     }
-
-    if (size < OHOS::Wifi::U32_AT_SIZE) {
-        return 0;
-    }
-
-    /* Validate the length of size */
-    if (size == 0 || size > OHOS::Wifi::FOO_MAX_LEN) {
-        return 0;
-    }
-
     OHOS::Wifi::DoSomethingInterestingWithMyAPI(data, size);
     return 0;
 }

@@ -30,7 +30,11 @@
 #include "../../src/wifi_sa_event.h"
 DEFINE_WIFILOG_LABEL("WifiCEvent");
 std::set<WifiEvent*> GetEventCallBacks();
-std::unique_ptr<OHOS::Wifi::WifiScan> g_wifiScanPtr = nullptr;
+std::shared_ptr<OHOS::Wifi::WifiDevice> g_wifiStaPtr = OHOS::Wifi::WifiDevice::GetInstance(WIFI_DEVICE_ABILITY_ID);
+std::shared_ptr<OHOS::Wifi::WifiScan> g_wifiScanPtr = OHOS::Wifi::WifiScan::GetInstance(WIFI_SCAN_ABILITY_ID);
+std::shared_ptr<OHOS::Wifi::WifiP2p> g_wifiP2pPtr = OHOS::Wifi::WifiP2p::GetInstance(WIFI_P2P_ABILITY_ID);
+std::shared_ptr<OHOS::Wifi::WifiHotspot> g_wifiHotspotPtr =
+    OHOS::Wifi::WifiHotspot::GetInstance(WIFI_HOTSPOT_ABILITY_ID);
 
 std::vector<std::string> WifiCDeviceEventCallback::deviceCallbackEvent = {
     EVENT_STA_CONN_STATE_CHANGE,
@@ -177,12 +181,11 @@ WifiErrorCode EventManager::RegisterDeviceEvent(const std::vector<std::string> &
         WIFI_LOGE("Register sta event is empty!");
         return ERROR_WIFI_UNKNOWN;
     }
-    std::unique_ptr<WifiDevice> wifiStaPtr = WifiDevice::GetInstance(WIFI_DEVICE_ABILITY_ID);
-    if (wifiStaPtr == nullptr) {
+    if (g_wifiStaPtr == nullptr) {
         WIFI_LOGE("Register sta event get instance failed!");
         return ERROR_WIFI_UNKNOWN;
     }
-    ErrCode ret = wifiStaPtr->RegisterCallBack(wifiCDeviceCallback, event);
+    ErrCode ret = g_wifiStaPtr->RegisterCallBack(wifiCDeviceCallback, event);
     if (ret != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("Register sta event failed!");
         return ERROR_WIFI_UNKNOWN;
@@ -216,12 +219,11 @@ WifiErrorCode EventManager::RegisterHotspotEvent(const std::vector<std::string> 
         WIFI_LOGE("Register hotspot event is empty!");
         return ERROR_WIFI_UNKNOWN;
     }
-    std::unique_ptr<WifiHotspot> wifiHotspotPtr = WifiHotspot::GetInstance(WIFI_HOTSPOT_ABILITY_ID);
-    if (wifiHotspotPtr == nullptr) {
+    if (g_wifiHotspotPtr == nullptr) {
         WIFI_LOGE("Register hotspot event get instance failed!");
         return ERROR_WIFI_UNKNOWN;
     }
-    ErrCode ret = wifiHotspotPtr->RegisterCallBack(wifiCHotspotCallback, event);
+    ErrCode ret = g_wifiHotspotPtr->RegisterCallBack(wifiCHotspotCallback, event);
     if (ret != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("Register hotspot event failed!");
         return ERROR_WIFI_UNKNOWN;
@@ -236,8 +238,7 @@ WifiErrorCode EventManager::RegisterP2PEvent(const std::vector<std::string> &eve
         WIFI_LOGE("Register p2p event is empty!");
         return ERROR_WIFI_UNKNOWN;
     }
-    std::unique_ptr<WifiP2p> wifiP2pPtr = WifiP2p::GetInstance(WIFI_P2P_ABILITY_ID);
-    if (wifiP2pPtr == nullptr) {
+    if (g_wifiP2pPtr == nullptr) {
         WIFI_LOGE("Register p2p event get instance failed!");
         return ERROR_WIFI_UNKNOWN;
     }
@@ -246,7 +247,7 @@ WifiErrorCode EventManager::RegisterP2PEvent(const std::vector<std::string> &eve
         WIFI_LOGE("Register p2p event get p2p callback ptr failed!");
         return ERROR_WIFI_UNKNOWN;
     }
-    ErrCode ret = wifiP2pPtr->RegisterCallBack(sptrP2PCallback, event);
+    ErrCode ret = g_wifiP2pPtr->RegisterCallBack(sptrP2PCallback, event);
     if (ret != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("Register p2p event failed!");
         return ERROR_WIFI_UNKNOWN;
@@ -333,12 +334,6 @@ void EventManager::Init()
         mSaStatusListener->Init(WIFI_HOTSPOT_ABILITY_ID);
         mSaStatusListener->Init(WIFI_P2P_ABILITY_ID);
     }
-    if (g_wifiScanPtr == nullptr) {
-        g_wifiScanPtr = OHOS::Wifi::WifiScan::GetInstance(WIFI_SCAN_ABILITY_ID);
-        WIFI_LOGE("scan ptr is null, create new instance");
-        return;
-    }
-
     return;
 }
 

@@ -320,7 +320,7 @@ int OnTransact(RpcServer *server, Context *context)
     if (ret < 0) {
         return HAL_FAILURE;
     }
-    LOGI("run %{public}s", func);
+    LOGD("run %{public}s", func);
     Rpcfunc pFunc = GetRpcFunc(func);
     if (pFunc == NULL) {
         LOGD("unsupported function[%{public}s]", func);

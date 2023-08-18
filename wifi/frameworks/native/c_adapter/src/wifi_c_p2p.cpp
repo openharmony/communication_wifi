@@ -23,7 +23,7 @@
 constexpr int INVALID_VALUE = -1;
 
 DEFINE_WIFILOG_LABEL("WifiCP2P");
-std::unique_ptr<OHOS::Wifi::WifiP2p> wifiP2pPtr = OHOS::Wifi::WifiP2p::GetInstance(WIFI_P2P_ABILITY_ID);
+std::shared_ptr<OHOS::Wifi::WifiP2p> wifiP2pPtr = OHOS::Wifi::WifiP2p::GetInstance(WIFI_P2P_ABILITY_ID);
 
 NO_SANITIZE("cfi") WifiErrorCode EnableP2p()
 {
@@ -89,9 +89,7 @@ static void ConvertConfigCToCpp(const WifiP2pConfig* config, OHOS::Wifi::WifiP2p
 {
     CHECK_PTR_RETURN_VOID(config);
     cppConfig.SetDeviceAddress(OHOS::Wifi::MacArrayToStr(config->devAddr));
-#ifdef SUPPORT_RANDOM_MAC_ADDR
     cppConfig.SetDeviceAddressType(config->bssidType);
-#endif
     cppConfig.SetGoBand(OHOS::Wifi::GroupOwnerBand(static_cast<int>(config->goBand)));
     cppConfig.SetNetId(config->netId);
     cppConfig.SetPassphrase(config->passphrase);
@@ -118,6 +116,7 @@ static void ConvertP2PDeviceCToCpp(const WifiP2pDevice& p2pDevice, OHOS::Wifi::W
 {
     cppDevice.SetDeviceName(p2pDevice.deviceName);
     cppDevice.SetDeviceAddress(OHOS::Wifi::MacArrayToStr(p2pDevice.devAddr));
+    cppDevice.SetDeviceAddressType(p2pDevice.bssidType);
     cppDevice.SetPrimaryDeviceType(p2pDevice.primaryDeviceType);
     cppDevice.SetSecondaryDeviceType(p2pDevice.secondaryDeviceType);
     cppDevice.SetP2pDeviceStatus(OHOS::Wifi::P2pDeviceStatus(static_cast<int>(p2pDevice.status)));
@@ -194,6 +193,7 @@ static OHOS::Wifi::ErrCode ConvertP2PDeviceCppToC(const OHOS::Wifi::WifiP2pDevic
         WIFI_LOGE("Mac str to array failed!");
         return OHOS::Wifi::WIFI_OPT_FAILED;
     }
+    p2pDevice->bssidType = cppDevice.GetDeviceAddressType();
     if (memcpy_s(p2pDevice->primaryDeviceType, DEVICE_TYPE_LENGTH,
         cppDevice.GetPrimaryDeviceType().c_str(), cppDevice.GetPrimaryDeviceType().size() + 1) != EOK) {
         WIFI_LOGE("memcpy_s primary device type failed!");

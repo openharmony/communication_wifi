@@ -17,6 +17,7 @@
 
 #include <string>
 #include <vector>
+#include "singleton.h"
 #include "i_wifi_device.h"
 #include "i_wifi_device_callback.h"
 #include "refbase.h"
@@ -27,11 +28,10 @@
 namespace OHOS {
 namespace Wifi {
 class WifiDeviceImpl : public WifiDevice {
-public:
-    explicit WifiDeviceImpl(int systemAbilityId);
-    ~WifiDeviceImpl();
+    DECLARE_DELAYED_SINGLETON(WifiDeviceImpl)
 
-    bool Init();
+public:
+    bool Init(int systemAbilityId);
 
     /**
      * @Description Turn on Wi-Fi

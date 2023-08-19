@@ -28,6 +28,7 @@
 #include "sta_define.h"
 #include "wifi_errcode.h"
 #include "wifi_log.h"
+#include "arp_checker.h"
 
 #define DEFAULT_PORTAL_HTTPS_URL ""
 
@@ -36,7 +37,7 @@ namespace Wifi {
 class StaNetworkCheck {
     FRIEND_GTEST(StaNetworkCheck);
 public:
-    explicit StaNetworkCheck(NetStateHandler handle);
+    explicit StaNetworkCheck(NetStateHandler nethandle, ArpStateHandler arpHandle, DnsStateHandler dnsHandle);
     virtual ~StaNetworkCheck();
     /**
      * @Description : Start NetCheck thread
@@ -65,6 +66,8 @@ public:
 private:
     std::thread *pDealNetCheckThread;
     NetStateHandler netStateHandler;
+    ArpStateHandler arpStateHandler;
+    DnsStateHandler dnsStateHandler;
     std::atomic<StaNetState> lastNetState;
 
     /**
@@ -85,6 +88,7 @@ private:
     std::atomic<bool> isStopNetCheck;
     std::atomic<bool> isExitNetCheckThread;
     std::atomic<bool> isExited;
+    ArpChecker arpChecker;
 };
 }  // namespace Wifi
 }  // namespace OHOS

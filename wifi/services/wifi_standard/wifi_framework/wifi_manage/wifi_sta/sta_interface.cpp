@@ -283,5 +283,16 @@ ErrCode StaInterface::SetSuspendMode(bool mode)
     }
     return WIFI_OPT_SUCCESS;
 }
+
+ErrCode StaInterface::OnSystemAbilityChanged(int systemAbilityid, bool add)
+{
+    LOGI("Enter StaInterface::OnSystemAbilityChanged, id[%{public}d], mode=[%{public}d]!",
+        systemAbilityid, add);
+    if (pStaService->OnSystemAbilityChanged(systemAbilityid, add) != WIFI_OPT_SUCCESS) {
+        LOGE("OnSystemAbilityChanged() failed!");
+        return WIFI_OPT_FAILED;
+    }
+    return WIFI_OPT_SUCCESS;
+}
 }  // namespace Wifi
 }  // namespace OHOS

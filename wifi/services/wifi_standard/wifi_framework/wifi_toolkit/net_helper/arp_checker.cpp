@@ -30,7 +30,20 @@ namespace OHOS {
 namespace Wifi {
 constexpr int MAX_LENGTH = 1500;
 
-ArpChecker::ArpChecker(std::string& ifname, std::string& hwAddr, std::string& ipAddr)
+ArpChecker::ArpChecker()
+{
+    
+}
+
+ArpChecker::~ArpChecker()
+{
+    if (!socketCreated) {
+        return;
+    }
+    rawSocket_.Close();
+}
+
+void ArpChecker::Start(std::string& ifname, std::string& hwAddr, std::string& ipAddr)
 {
     uint8_t mac[ETH_ALEN + sizeof(uint32_t)];
     if (sscanf_s(hwAddr.c_str(), "%02x:%02x:%02x:%02x:%02x:%02x",
@@ -40,7 +53,12 @@ ArpChecker::ArpChecker(std::string& ifname, std::string& hwAddr, std::string& ip
             LOGE("ArpChecker memset fail");
         }
     }
-    rawSocket_.CreateSocket(ifname.c_str(), ETH_P_ARP);
+    if (rawSocket_.CreateSocket(ifname.c_str(), ETH_P_ARP) != OPT_SUCC)
+    {
+        LOGE("ArpChecker CreateSocket failed");
+        socketCreated = false;
+        return;
+    }
     inet_aton(ipAddr.c_str(), &localIpAddr_);
     if (memcpy_s(localHwAddr_, ETH_ALEN, mac, ETH_ALEN) != EOK) {
         LOGE("ArpChecker memcpy fail");
@@ -48,15 +66,24 @@ ArpChecker::ArpChecker(std::string& ifname, std::string& hwAddr, std::string& ip
     if (memset_s(l2Broadcast_, ETH_ALEN, 0xFF, ETH_ALEN) != EOK) {
         LOGE("ArpChecker memset fail");
     }
+    socketCreated = true;
 }
 
-ArpChecker::~ArpChecker()
+void ArpChecker::Stop()
 {
+    if (!socketCreated) {
+        return;
+    }
     rawSocket_.Close();
+    socketCreated = false;
 }
 
 bool ArpChecker::DoArp(int& timeoutMillis, std::string& targetIp, bool& isFillSenderIp)
 {
+    if (!socketCreated) {
+        LOGE("ArpChecker DoArp failed, socket not created");
+        return false;
+    }
     struct in_addr destIp;
     struct ArpPacket arpPacket;
 

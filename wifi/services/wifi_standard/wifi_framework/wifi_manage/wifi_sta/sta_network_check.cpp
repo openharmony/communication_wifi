@@ -28,11 +28,13 @@ constexpr int NET_ERR_BAD_REQUEST = 400;
 constexpr int NET_ERR_REDIRECT_CLASS_MAX = 399;
 constexpr int NET_ERR_REQUEST_ERROR_CLASS_MAX = 499;
 
-StaNetworkCheck::StaNetworkCheck(NetStateHandler handle)
+StaNetworkCheck::StaNetworkCheck(NetStateHandler nethandle, ArpStateHandler arpHandle, DnsStateHandler dnsHandle)
 {
     WIFI_LOGI("StaNetworkCheck constructor\n");
     pDealNetCheckThread = nullptr;
-    netStateHandler = handle;
+    netStateHandler = nethandle;
+    arpStateHandler = arpHandle;
+    dnsStateHandler = dnsHandle;
     lastNetState = NETWORK_STATE_UNKNOWN;
     isStopNetCheck = true;
     isExitNetCheckThread = false;
@@ -187,6 +189,7 @@ void StaNetworkCheck::SignalNetCheckThread()
     WIFI_LOGI("enter SignalNetCheckThread!\n");
     lastNetState = NETWORK_STATE_UNKNOWN;
     isStopNetCheck = false;
+    arpChecker.Start();
     mCondition.notify_one();
 }
 

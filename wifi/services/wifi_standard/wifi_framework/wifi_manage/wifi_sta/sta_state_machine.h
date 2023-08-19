@@ -559,6 +559,18 @@ private:
      */
     void HandleNetCheckResult(StaNetState netState, const std::string portalUrl);
     /**
+     * @Description  the process of handling arp check results.
+     *
+     * @param netState - the state of arp
+     */
+    void HandleArpCheckResult(ArpState arpState);
+    /**
+     * @Description  the process of handling dns check results.
+     *
+     * @param netState - the state of dns
+     */
+    void HandleDnsCheckResult(DnsState dnsState, const std::string dnsServer);
+    /**
      * @Description  Remove all device configurations before enabling WPS.
      *
      */

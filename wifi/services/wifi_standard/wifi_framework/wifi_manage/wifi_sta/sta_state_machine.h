@@ -20,10 +20,6 @@
 #include <fstream>
 #include <vector>
 
-#ifndef OHOS_ARCH_LITE
-#include "system_ability_status_change_stub.h"
-#endif // OHOS_ARCH_LITE
-
 #include "wifi_internal_msg.h"
 #include "wifi_log.h"
 #include "wifi_errcode.h"
@@ -398,21 +394,10 @@ public:
      */
     void ReUpdateNetLinkInfo(const WifiDeviceConfig &config);
 
-#ifndef OHOS_ARCH_LITE
-private:
-    class SystemAbilityStatusChangeListener : public OHOS::SystemAbilityStatusChangeStub {
-    public:
-        explicit SystemAbilityStatusChangeListener(StaStateMachine &stateMachine);
-        ~SystemAbilityStatusChangeListener() = default;
-        void OnAddSystemAbility(int32_t systemAbilityId, const std::string &deviceId) override;
-        void OnRemoveSystemAbility(int32_t systemAbilityId, const std::string &deviceId) override;
-
-    private:
-        StaStateMachine &stateMachine_;
-        bool hasSARemoved_ = false;
-    };
-#endif // OHOS_ARCH_LITE
-
+    /**
+     * @Description On netmanager restart.
+     */
+    void OnNetManagerRestart(void);
 private:
     /**
      * @Description  Destruct state.
@@ -720,10 +705,6 @@ private:
      */
     void SubscribeSystemAbilityChanged(void);
     /**
-     * @Description On netmanager restart.
-     */
-    void OnNetManagerRestart(void);
-    /**
      * @Description Reupdate net supplier info
      */
     void ReUpdateNetSupplierInfo(sptr<NetManagerStandard::NetSupplierInfo> supplierInfo);
@@ -741,7 +722,6 @@ private:
     StaServiceCallback staCallback;
 #ifndef OHOS_ARCH_LITE
     sptr<NetManagerStandard::NetSupplierInfo> NetSupplierInfo;
-    sptr<ISystemAbilityStatusChange> statusChangeListener_;
 #endif
 
     int lastNetworkId;

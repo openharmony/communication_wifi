@@ -1804,6 +1804,9 @@ void AirplaneModeEventSubscriber::OnReceiveEvent(const OHOS::EventFwk::CommonEve
 void WifiManager::DealOpenAirplaneModeEvent()
 {
     WifiConfigCenter::GetInstance().SetAirplaneModeState(MODE_STATE_OPEN);
+#ifdef FEATURE_AP_SUPPORT
+    AutoStopApService(AutoStartOrStopServiceReason::AIRPLANE_MODE);
+#endif
     if (WifiConfigCenter::GetInstance().GetOperatorWifiType() ==
         static_cast<int>(OperatorWifiType::USER_OPEN_WIFI_IN_AIRPLANEMODE)) {
             WIFI_LOGI("DealOpenAirplaneModeEvent, user opened sta in airplane mode, ignore openairplanemode event!");
@@ -1812,9 +1815,6 @@ void WifiManager::DealOpenAirplaneModeEvent()
 
     AutoStopStaService(AutoStartOrStopServiceReason::AIRPLANE_MODE);
     AutoStopScanOnly();
-#ifdef FEATURE_AP_SUPPORT
-    AutoStopApService(AutoStartOrStopServiceReason::AIRPLANE_MODE);
-#endif
 }
 
 void WifiManager::DealCloseAirplaneModeEvent()

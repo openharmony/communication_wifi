@@ -62,7 +62,17 @@ NO_SANITIZE("cfi") napi_value Scan(napi_env env, napi_callback_info info)
 {
     TRACE_FUNC_CALL;
     WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
-    ErrCode ret = wifiScanPtr->Scan();
+    bool compatible = true;
+    ErrCode ret = wifiScanPtr->Scan(compatible);
+    WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_STA);
+}
+
+NO_SANITIZE("cfi") napi_value StartScan(napi_env env, napi_callback_info info)
+{
+    TRACE_FUNC_CALL;
+    WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
+    bool compatible = false;
+    ErrCode ret = wifiScanPtr->Scan(compatible);
     WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_STA);
 }
 
@@ -185,7 +195,44 @@ NO_SANITIZE("cfi") napi_value GetScanInfos(napi_env env, napi_callback_info info
     asyncContext->executeFunc = [&](void* data) -> void {
         ScanInfoAsyncContext *context = static_cast<ScanInfoAsyncContext *>(data);
         TRACE_FUNC_CALL_NAME("wifiScanPtr->GetScanInfoList");
-        context->errorCode = wifiScanPtr->GetScanInfoList(context->vecScanInfos);
+        bool compatible = true;
+        context->errorCode = wifiScanPtr->GetScanInfoList(context->vecScanInfos, compatible);
+        WIFI_LOGI("GetScanInfoList, size: %{public}zu", context->vecScanInfos.size());
+    };
+
+    asyncContext->completeFunc = [&](void* data) -> void {
+        ScanInfoAsyncContext *context = static_cast<ScanInfoAsyncContext *>(data);
+        napi_create_array_with_length(context->env, context->vecScanInfos.size(), &context->result);
+        if (context->errorCode == WIFI_OPT_SUCCESS) {
+            context->errorCode = NativeScanInfosToJsObj(context->env, context->vecScanInfos, context->result);
+        }
+        WIFI_LOGI("Push scan info list to client");
+    };
+
+    size_t nonCallbackArgNum = 0;
+    asyncContext->sysCap = SYSCAP_WIFI_STA;
+    return DoAsyncWork(env, asyncContext, argc, argv, nonCallbackArgNum);
+}
+
+NO_SANITIZE("cfi") napi_value GetScanInfoResults(napi_env env, napi_callback_info info)
+{
+    TRACE_FUNC_CALL;
+    size_t argc = 2;
+    napi_value argv[argc];
+    napi_value thisVar = nullptr;
+    void *data = nullptr;
+    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, &data));
+    WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
+
+    ScanInfoAsyncContext *asyncContext = new ScanInfoAsyncContext(env);
+    WIFI_NAPI_ASSERT(env, asyncContext != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
+    napi_create_string_latin1(env, "getScanInfos", NAPI_AUTO_LENGTH, &asyncContext->resourceName);
+
+    asyncContext->executeFunc = [&](void* data) -> void {
+        ScanInfoAsyncContext *context = static_cast<ScanInfoAsyncContext *>(data);
+        TRACE_FUNC_CALL_NAME("wifiScanPtr->GetScanInfoList");
+        bool compatible = false;
+        context->errorCode = wifiScanPtr->GetScanInfoList(context->vecScanInfos, compatible);
         WIFI_LOGI("GetScanInfoList, size: %{public}zu", context->vecScanInfos.size());
     };
 
@@ -207,8 +254,31 @@ NO_SANITIZE("cfi") napi_value GetScanResults(napi_env env, napi_callback_info in
 {
     TRACE_FUNC_CALL;
     WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
+    bool compatible = true;
     std::vector<WifiScanInfo> scanInfos;
-    ErrCode ret = wifiScanPtr->GetScanInfoList(scanInfos);
+    ErrCode ret = wifiScanPtr->GetScanInfoList(scanInfos, compatible);
+    if (ret != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("GetScanInfoList return fail: %{public}d", ret);
+    }
+
+    WIFI_NAPI_ASSERT(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_STA);
+    WIFI_LOGI("GetScanInfoList, size: %{public}zu", scanInfos.size());
+    napi_value arrayResult;
+    napi_create_array_with_length(env, scanInfos.size(), &arrayResult);
+    ret = NativeScanInfosToJsObj(env, scanInfos, arrayResult);
+    if (ret != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("NativeScanInfosToJsObj return fail: %{public}d", ret);
+    }
+    return arrayResult;
+}
+
+NO_SANITIZE("cfi") napi_value GetScanInfoList(napi_env env, napi_callback_info info)
+{
+    TRACE_FUNC_CALL;
+    WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
+    bool compatible = false;
+    std::vector<WifiScanInfo> scanInfos;
+    ErrCode ret = wifiScanPtr->GetScanInfoList(scanInfos, compatible);
     if (ret != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("GetScanInfoList return fail: %{public}d", ret);
     }

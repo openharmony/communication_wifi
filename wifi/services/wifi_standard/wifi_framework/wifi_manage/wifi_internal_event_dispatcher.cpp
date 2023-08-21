@@ -739,16 +739,16 @@ void WifiInternalEventDispatcher::updateP2pDeviceMacAddress(std::vector<WifiP2pD
         std::string randomMacAddr =
             WifiSettings::GetInstance().GetMacAddrPairs(WifiMacAddrInfoType::P2P_MACADDR_INFO, macAddrInfo);
         if (randomMacAddr.empty()) {
-            WIFI_LOGW("no record found, bssid:%{private}s, bssidType:%{public}d",
-                macAddrInfo.bssid.c_str(), macAddrInfo.bssidType);
+            WIFI_LOGW("%{public}s: no record found, bssid:%{private}s, bssidType:%{public}d",
+                __func__, macAddrInfo.bssid.c_str(), macAddrInfo.bssidType);
         } else {
-            WIFI_LOGD("find the record, bssid:%{private}s, bssidType:%{public}d, randomMac:%{private}s",
-                iter->GetDeviceAddress().c_str(), iter->GetDeviceAddressType(), randomMacAddr.c_str());
+            WIFI_LOGD("%{public}s: find the record, bssid:%{private}s, bssidType:%{public}d, randomMac:%{private}s",
+                __func__, iter->GetDeviceAddress().c_str(), iter->GetDeviceAddressType(), randomMacAddr.c_str());
             if (iter->GetDeviceAddressType() == REAL_DEVICE_ADDRESS) {
                 iter->SetDeviceAddress(randomMacAddr);
                 iter->SetDeviceAddressType(RANDOM_DEVICE_ADDRESS);
-                WIFI_LOGD("the record is updated, bssid:%{private}s, bssidType:%{public}d",
-                    iter->GetDeviceAddress().c_str(), iter->GetDeviceAddressType());
+                WIFI_LOGD("%{public}s: the record is updated, bssid:%{private}s, bssidType:%{public}d",
+                    __func__, iter->GetDeviceAddress().c_str(), iter->GetDeviceAddressType());
             }
         }
     }
@@ -758,7 +758,7 @@ void WifiInternalEventDispatcher::SendP2pCallbackMsg(sptr<IWifiP2pCallback> &cal
     int pid, int uid)
 {
     if (callback == nullptr) {
-        WIFI_LOGE("%{private}s: callback is null", __func__);
+        WIFI_LOGE("%{public}s: callback is null", __func__);
         return;
     }
 
@@ -774,6 +774,7 @@ void WifiInternalEventDispatcher::SendP2pCallbackMsg(sptr<IWifiP2pCallback> &cal
             break;
         case WIFI_CBK_MSG_PEER_CHANGE:
             {
+                WIFI_LOGD("%{public}s pid: %{public}d, uid: %{public}d", __func__, pid, uid);
             #ifdef SUPPORT_RANDOM_MAC_ADDR
                 if ((pid != 0) && (uid != 0)) {
                     std::vector<WifiP2pDevice> deviceVec = msg.device;

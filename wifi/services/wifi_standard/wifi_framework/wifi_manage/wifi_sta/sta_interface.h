@@ -209,6 +209,14 @@ public:
      * @return WifiErrorNo
      */
     virtual ErrCode SetSuspendMode(bool mode) override;
+
+    /**
+     * @Description systemabilitychanged
+     *
+     * @param add: true for setup, false for shutdown.
+     * @return WifiErrorNo
+     */
+    virtual ErrCode OnSystemAbilityChanged(int systemAbilityid, bool add) override;
 private:
     StaServiceCallback staCallback;
     StaService *pStaService;

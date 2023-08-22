@@ -406,26 +406,28 @@ HWTEST_F(WifiHalWpaStaTest, WpaCliCmdGetSignalInfoTest, TestSize.Level1)
 HWTEST_F(WifiHalWpaStaTest, WpaCliCmdScanInfoTest, TestSize.Level1)
 {
     ScanInfo pcmd;
+    int size = 10;
     MockEraseSupportedCmd("SCAN_RESULTS");
-    EXPECT_TRUE(mInterface->WpaCliCmdScanInfo(nullptr, nullptr, nullptr) < 0);
-    EXPECT_TRUE(mInterface->WpaCliCmdScanInfo(mInterface, nullptr, nullptr) < 0);
-    EXPECT_TRUE(mInterface->WpaCliCmdScanInfo(mInterface, &pcmd, nullptr) < 0);
-    EXPECT_TRUE(mInterface->WpaCliCmdScanInfo(mInterface, &pcmd, 0) < 0);
-    MockSetWpaExpectCmdResponse("STA_AUTOCONNECT", "FAIL\n");
-    EXPECT_TRUE(mInterface->WpaCliCmdScanInfo(mInterface, &pcmd, 0) < 0);
-    MockSetWpaExpectCmdResponse("STA_AUTOCONNECT", "OK");
-    EXPECT_TRUE(mInterface->WpaCliCmdScanInfo(mInterface, &pcmd, 0) == 0);
+    ASSERT_TRUE(memset_s(&pcmd, sizeof(pcmd), 0, sizeof(pcmd)) == EOK);
+    EXPECT_TRUE(mInterface->wpaCliCmdScanInfo(nullptr, nullptr, nullptr) < 0);
+    EXPECT_TRUE(mInterface->wpaCliCmdScanInfo(mInterface, nullptr, nullptr) < 0);
+    EXPECT_TRUE(mInterface->wpaCliCmdScanInfo(mInterface, &pcmd, nullptr) < 0);
+    EXPECT_TRUE(mInterface->wpaCliCmdScanInfo(mInterface, &pcmd, 0) < 0);
+    MockSetWpaExpectCmdResponse("SCAN_RESULTS", "FAIL\n");
+    EXPECT_TRUE(mInterface->wpaCliCmdScanInfo(mInterface, &pcmd, &size) < 0);
+    MockSetWpaExpectCmdResponse("SCAN_RESULTS", "OK");
+    EXPECT_TRUE(mInterface->wpaCliCmdScanInfo(mInterface, &pcmd, &size) == 0);
 }
 
 HWTEST_F(WifiHalWpaStaTest, WpaCliCmdWpaSetSuspendModeTest, TestSize.Level1)
 {
     MockEraseSupportedCmd("DRIVER SETSUSPENDMODE");
-    EXPECT_TRUE(mInterface->WpaCliCmdWpaSetSuspendMode(nullptr, 0) < 0);
-    EXPECT_TRUE(mInterface->WpaCliCmdWpaSetSuspendMode(mInterface, 0) < 0);
+    EXPECT_TRUE(mInterface->wpaCliCmdWpaSetSuspendMode(nullptr, true) < 0);
+    EXPECT_TRUE(mInterface->wpaCliCmdWpaSetSuspendMode(mInterface, true) == 0);
     MockSetWpaExpectCmdResponse("DRIVER SETSUSPENDMODE", "FAIL\n");
-    EXPECT_TRUE(mInterface->WpaCliCmdWpaSetSuspendMode(mInterface, 0) < 0);
+    EXPECT_TRUE(mInterface->wpaCliCmdWpaSetSuspendMode(mInterface, true) == 0);
     MockSetWpaExpectCmdResponse("DRIVER SETSUSPENDMODE", "OK");
-    EXPECT_TRUE(mInterface->WpaCliCmdWpaSetSuspendMode(mInterface, 0) == 0);
+    EXPECT_TRUE(mInterface->wpaCliCmdWpaSetSuspendMode(mInterface, true) == 0);
 }
 }  // namespace Wifi
 }  // namespace OHOS

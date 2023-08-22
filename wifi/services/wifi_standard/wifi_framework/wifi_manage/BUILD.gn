@@ -42,6 +42,7 @@ if (defined(ohos_lite)) {
       "wifi_scan_service_impl.cpp",
       "wifi_scan_stub_lite.cpp",
       "wifi_service_manager.cpp",
+      "wifi_system_ability_listerner.cpp",
     ]
 
     include_dirs = [
@@ -378,6 +379,7 @@ if (defined(ohos_lite)) {
       "wifi_net_agent.cpp",
       "wifi_net_conn_event_handler.cpp",
       "wifi_service_manager.cpp",
+      "wifi_system_ability_listerner.cpp",
     ]
 
     deps = [

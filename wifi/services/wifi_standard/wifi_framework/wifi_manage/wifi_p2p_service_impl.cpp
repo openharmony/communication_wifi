@@ -31,6 +31,7 @@
 #include "wifi_service_manager.h"
 #include "wifi_global_func.h"
 #include "mac_address.h"
+
 DEFINE_WIFILOG_P2P_LABEL("WifiP2pServiceImpl");
 
 namespace OHOS {
@@ -282,6 +283,10 @@ ErrCode WifiP2pServiceImpl::DiscoverServices(void)
 ErrCode WifiP2pServiceImpl::StopDiscoverServices(void)
 {
     WIFI_LOGI("StopDiscoverServices");
+    if (!WifiAuthCenter::IsNativeProcess()) {
+        WIFI_LOGE("StopDiscoverServices:NOT NATIVE PROCESS, PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
     if (!IsP2pServiceRunning()) {
         WIFI_LOGE("P2pService is not running!");
         return WIFI_OPT_P2P_NOT_OPENED;
@@ -319,6 +324,10 @@ ErrCode WifiP2pServiceImpl::RequestService(const WifiP2pDevice &device, const Wi
 ErrCode WifiP2pServiceImpl::PutLocalP2pService(const WifiP2pServiceInfo &srvInfo)
 {
     WIFI_LOGI("PutLocalP2pService, service name is [%{public}s]", srvInfo.GetServiceName().c_str());
+    if (WifiPermissionUtils::VerifyGetWifiInfoInternalPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("PutLocalP2pService:VerifyGetWifiInfoInternalPermission PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
     if (!IsP2pServiceRunning()) {
         WIFI_LOGE("P2pService is not running!");
         return WIFI_OPT_P2P_NOT_OPENED;
@@ -335,6 +344,10 @@ ErrCode WifiP2pServiceImpl::PutLocalP2pService(const WifiP2pServiceInfo &srvInfo
 ErrCode WifiP2pServiceImpl::DeleteLocalP2pService(const WifiP2pServiceInfo &srvInfo)
 {
     WIFI_LOGI("DeleteLocalP2pService, service name is [%{public}s]", srvInfo.GetServiceName().c_str());
+    if (WifiPermissionUtils::VerifyGetWifiInfoInternalPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("DeleteLocalP2pService:VerifyGetWifiInfoInternalPermission PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
     if (!IsP2pServiceRunning()) {
         WIFI_LOGE("P2pService is not running!");
         return WIFI_OPT_P2P_NOT_OPENED;
@@ -480,8 +493,8 @@ ErrCode WifiP2pServiceImpl::DeleteGroup(const WifiP2pGroupInfo &group)
 
 ErrCode WifiP2pServiceImpl::P2pConnect(const WifiP2pConfig &config)
 {
-    WIFI_LOGI("P2pConnect device address [%{private}s], addressType: %{public}d",
-        config.GetDeviceAddress().c_str(), config.GetDeviceAddressType());
+    WIFI_LOGI("P2pConnect device address [%{private}s], addressType: %{public}d], pid:%{public}d, uid:%{public}d",
+        config.GetDeviceAddress().c_str(), config.GetDeviceAddressType(), GetCallingPid(), GetCallingUid());
     if (WifiPermissionUtils::VerifyGetWifiInfoInternalPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("P2pConnect:VerifyGetWifiInfoInternalPermission PERMISSION_DENIED!");
 
@@ -515,7 +528,8 @@ ErrCode WifiP2pServiceImpl::P2pConnect(const WifiP2pConfig &config)
 #ifdef SUPPORT_RANDOM_MAC_ADDR
     if (MacAddress::IsValidMac(config.GetDeviceAddress())) {
         if (config.GetDeviceAddressType() > REAL_DEVICE_ADDRESS) {
-            WIFI_LOGE("invalid bssidType:%{public}d", config.GetDeviceAddressType());
+            WIFI_LOGE("%{public}s: invalid bssidType:%{public}d",
+                __func__, config.GetDeviceAddressType());
             return WIFI_OPT_INVALID_PARAM;
         }
         WifiMacAddrInfo macAddrInfo;
@@ -527,14 +541,14 @@ ErrCode WifiP2pServiceImpl::P2pConnect(const WifiP2pConfig &config)
             WIFI_LOGW("no record found, bssid:%{private}s, bssidType:%{public}d",
                 macAddrInfo.bssid.c_str(), macAddrInfo.bssidType);
         } else {
-            WIFI_LOGI("find the record, bssid:%{private}s, bssidType:%{public}d, randomMac:%{private}s",
-                config.GetDeviceAddress().c_str(), config.GetDeviceAddressType(), randomMacAddr.c_str());
+            WIFI_LOGI("%{public}s: find the record, bssid:%{private}s, bssidType:%{public}d, randomMac:%{private}s",
+                __func__, config.GetDeviceAddress().c_str(), config.GetDeviceAddressType(), randomMacAddr.c_str());
             /* random MAC address are translated into real MAC address */
             if (config.GetDeviceAddressType() == RANDOM_DEVICE_ADDRESS) {
                 updateConfig.SetDeviceAddress(randomMacAddr);
                 updateConfig.SetDeviceAddressType(REAL_DEVICE_ADDRESS);
-                WIFI_LOGI("the record is updated, bssid:%{private}s, bssidType:%{public}d",
-                    updateConfig.GetDeviceAddress().c_str(), updateConfig.GetDeviceAddressType());
+                WIFI_LOGI("%{public}s: the record is updated, bssid:%{private}s, bssidType:%{public}d",
+                    __func__, updateConfig.GetDeviceAddress().c_str(), updateConfig.GetDeviceAddressType());
             }
         }
     } else {
@@ -573,7 +587,8 @@ ErrCode WifiP2pServiceImpl::P2pCancelConnect()
 
 ErrCode WifiP2pServiceImpl::QueryP2pLinkedInfo(WifiP2pLinkedInfo &linkedInfo)
 {
-    WIFI_LOGI("QueryP2pLinkedInfo group owner address [%{private}s]", linkedInfo.GetGroupOwnerAddress().c_str());
+    WIFI_LOGI("QueryP2pLinkedInfo group owner address:%{private}s, pid: %{public}d, uid: %{public}d",
+        linkedInfo.GetGroupOwnerAddress().c_str(), GetCallingPid(), GetCallingUid());
     if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("QueryP2pLinkedInfo:VerifyGetWifiInfoPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
@@ -603,7 +618,7 @@ ErrCode WifiP2pServiceImpl::QueryP2pLinkedInfo(WifiP2pLinkedInfo &linkedInfo)
 
 ErrCode WifiP2pServiceImpl::GetCurrentGroup(WifiP2pGroupInfo &group)
 {
-    WIFI_LOGI("GetCurrentGroup");
+    WIFI_LOGI("GetCurrentGroup pid: %{public}d, uid: %{public}d", GetCallingPid(), GetCallingUid());
 
     if (WifiPermissionUtils::VerifyGetWifiInfoInternalPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("GetCurrentGroup:VerifyGetWifiInfoInternalPermission PERMISSION_DENIED!");
@@ -633,7 +648,7 @@ ErrCode WifiP2pServiceImpl::GetCurrentGroup(WifiP2pGroupInfo &group)
     ErrCode errCode = pService->GetCurrentGroup(group);
 #ifdef SUPPORT_RANDOM_MAC_ADDR
     if (WifiPermissionUtils::VerifyGetWifiPeersMacPermission() == PERMISSION_DENIED) {
-        WIFI_LOGI("GetCurrentGroup: GET_WIFI_PEERS_MAC PERMISSION_DENIED");
+        WIFI_LOGI("%{public}s: GET_WIFI_PEERS_MAC PERMISSION_DENIED", __func__);
         WifiMacAddrInfo ownMacAddrInfo;
         WifiP2pDevice owner = group.GetOwner();
         ownMacAddrInfo.bssid = owner.GetDeviceAddress();
@@ -656,8 +671,8 @@ ErrCode WifiP2pServiceImpl::GetCurrentGroup(WifiP2pGroupInfo &group)
                     (clientMacAddrInfo.bssidType == REAL_DEVICE_ADDRESS)) {
                     iter->SetDeviceAddress(clientRandomMacAddr);
                     iter->SetDeviceAddressType(RANDOM_DEVICE_ADDRESS);
-                    WIFI_LOGI("the record is updated, bssid:%{private}s, bssidType:%{public}d",
-                        iter->GetDeviceAddress().c_str(), iter->GetDeviceAddressType());
+                    WIFI_LOGI("%{public}s: the record is updated, bssid:%{private}s, bssidType:%{public}d",
+                        __func__, iter->GetDeviceAddress().c_str(), iter->GetDeviceAddressType());
                 }
             }
             group.SetClientDevices(vecClientDevice);
@@ -670,6 +685,10 @@ ErrCode WifiP2pServiceImpl::GetCurrentGroup(WifiP2pGroupInfo &group)
 ErrCode WifiP2pServiceImpl::GetP2pEnableStatus(int &status)
 {
     WIFI_LOGI("GetP2pEnableStatus");
+    if (!WifiAuthCenter::IsNativeProcess()) {
+        WIFI_LOGE("GetP2pEnableStatus:NOT NATIVE PROCESS, PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
     status = WifiConfigCenter::GetInstance().GetP2pState();
     return WIFI_OPT_SUCCESS;
 }
@@ -677,6 +696,10 @@ ErrCode WifiP2pServiceImpl::GetP2pEnableStatus(int &status)
 ErrCode WifiP2pServiceImpl::GetP2pDiscoverStatus(int &status)
 {
     WIFI_LOGI("GetP2pDiscoverStatus");
+    if (WifiPermissionUtils::VerifyGetWifiInfoInternalPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("GetP2pDiscoverStatus:VerifyGetWifiInfoInternalPermission PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
     if (!IsP2pServiceRunning()) {
         WIFI_LOGE("P2pService is not running!");
         return WIFI_OPT_P2P_NOT_OPENED;
@@ -693,6 +716,10 @@ ErrCode WifiP2pServiceImpl::GetP2pDiscoverStatus(int &status)
 ErrCode WifiP2pServiceImpl::GetP2pConnectedStatus(int &status)
 {
     WIFI_LOGI("GetP2pConnectedStatus");
+    if (!WifiAuthCenter::IsNativeProcess()) {
+        WIFI_LOGE("GetP2pConnectedStatus:NOT NATIVE PROCESS, PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
     if (!IsP2pServiceRunning()) {
         WIFI_LOGE("P2pService is not running!");
         return WIFI_OPT_P2P_NOT_OPENED;
@@ -737,8 +764,8 @@ ErrCode WifiP2pServiceImpl::QueryP2pDevices(std::vector<WifiP2pDevice> &devices)
     ErrCode errCode = pService->QueryP2pDevices(devices);
 #ifdef SUPPORT_RANDOM_MAC_ADDR
     if (WifiPermissionUtils::VerifyGetWifiPeersMacPermission() == PERMISSION_DENIED) {
-        WIFI_LOGI("QueryP2pDevices: GET_WIFI_PEERS_MAC PERMISSION_DENIED, size: %{public}zu",
-            devices.size());
+        WIFI_LOGI("%{public}s: GET_WIFI_PEERS_MAC PERMISSION_DENIED, size: %{public}zu",
+            __func__, devices.size());
         for (auto iter = devices.begin(); iter != devices.end(); ++iter) {
             WifiMacAddrInfo macAddrInfo;
             macAddrInfo.bssid = iter->GetDeviceAddress();
@@ -749,8 +776,8 @@ ErrCode WifiP2pServiceImpl::QueryP2pDevices(std::vector<WifiP2pDevice> &devices)
                 (macAddrInfo.bssidType == REAL_DEVICE_ADDRESS)) {
                 iter->SetDeviceAddress(randomMacAddr);
                 iter->SetDeviceAddressType(RANDOM_DEVICE_ADDRESS);
-                WIFI_LOGI("the record is updated, bssid:%{private}s, bssidType:%{public}d",
-                    iter->GetDeviceAddress().c_str(), iter->GetDeviceAddressType());
+                WIFI_LOGI("%{public}s: the record is updated, bssid:%{private}s, bssidType:%{public}d",
+                    __func__, iter->GetDeviceAddress().c_str(), iter->GetDeviceAddressType());
             }
         }
     }
@@ -824,7 +851,7 @@ ErrCode WifiP2pServiceImpl::QueryP2pGroups(std::vector<WifiP2pGroupInfo> &groups
     ErrCode errCode = pService->QueryP2pGroups(groups);
 #ifdef SUPPORT_RANDOM_MAC_ADDR
     if (WifiPermissionUtils::VerifyGetWifiPeersMacPermission() == PERMISSION_DENIED) {
-        WIFI_LOGI("QueryP2pGroups: GET_WIFI_PEERS_MAC PERMISSION_DENIED");
+        WIFI_LOGI("%{public}s: GET_WIFI_PEERS_MAC PERMISSION_DENIED", __func__);
         for (auto group = groups.begin(); group != groups.end(); ++group) {
             WifiMacAddrInfo ownMacAddrInfo;
             WifiP2pDevice owner = group->GetOwner();
@@ -849,8 +876,8 @@ ErrCode WifiP2pServiceImpl::QueryP2pGroups(std::vector<WifiP2pGroupInfo> &groups
                         (clientMacAddrInfo.bssidType == REAL_DEVICE_ADDRESS)) {
                         iter->SetDeviceAddress(clientRandomMacAddr);
                         iter->SetDeviceAddressType(RANDOM_DEVICE_ADDRESS);
-                        WIFI_LOGI("the record is updated, bssid:%{private}s, bssidType:%{public}d",
-                            iter->GetDeviceAddress().c_str(), iter->GetDeviceAddressType());
+                        WIFI_LOGI("%{public}s: the record is updated, bssid:%{private}s, bssidType:%{public}d",
+                            __func__, iter->GetDeviceAddress().c_str(), iter->GetDeviceAddressType());
                     }
                 }
                 group->SetClientDevices(vecClientDevice);
@@ -864,6 +891,10 @@ ErrCode WifiP2pServiceImpl::QueryP2pGroups(std::vector<WifiP2pGroupInfo> &groups
 ErrCode WifiP2pServiceImpl::QueryP2pServices(std::vector<WifiP2pServiceInfo> &services)
 {
     WIFI_LOGI("QueryP2pServices");
+    if (WifiPermissionUtils::VerifyGetWifiInfoInternalPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("QueryP2pServices:VerifyGetWifiInfoInternalPermission PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
     if (!IsP2pServiceRunning()) {
         WIFI_LOGE("P2pService is not running!");
         return WIFI_OPT_P2P_NOT_OPENED;
@@ -946,6 +977,10 @@ ErrCode WifiP2pServiceImpl::SetP2pDeviceName(const std::string &deviceName)
 ErrCode WifiP2pServiceImpl::SetP2pWfdInfo(const WifiP2pWfdInfo &wfdInfo)
 {
     WIFI_LOGI("SetP2pWfdInfo");
+    if (WifiPermissionUtils::VerifyGetWifiInfoInternalPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("SetP2pWfdInfo:VerifyGetWifiInfoInternalPermission PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
     if (!IsP2pServiceRunning()) {
         WIFI_LOGE("P2pService is not running!");
         return WIFI_OPT_P2P_NOT_OPENED;
@@ -961,6 +996,10 @@ ErrCode WifiP2pServiceImpl::SetP2pWfdInfo(const WifiP2pWfdInfo &wfdInfo)
 ErrCode WifiP2pServiceImpl::Hid2dRequestGcIp(const std::string& gcMac, std::string& ipAddr)
 {
     WIFI_LOGI("Hid2dRequestGcIp");
+    if (!WifiAuthCenter::IsNativeProcess()) {
+        WIFI_LOGE("Hid2dRequestGcIp:NOT NATIVE PROCESS, PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
     if (!IsP2pServiceRunning()) {
         WIFI_LOGE("P2pService is not runing!");
         return WIFI_OPT_P2P_NOT_OPENED;
@@ -976,6 +1015,10 @@ ErrCode WifiP2pServiceImpl::Hid2dRequestGcIp(const std::string& gcMac, std::stri
 ErrCode WifiP2pServiceImpl::Hid2dSharedlinkIncrease()
 {
     WIFI_LOGI("Hid2dSharedlinkIncrease");
+    if (!WifiAuthCenter::IsNativeProcess()) {
+        WIFI_LOGE("Hid2dSharedlinkIncrease:NOT NATIVE PROCESS, PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
     int status = static_cast<int>(P2pConnectedState::P2P_DISCONNECTED);
     ErrCode ret = GetP2pConnectedStatus(status);
     if (ret != WIFI_OPT_SUCCESS) {
@@ -998,6 +1041,10 @@ ErrCode WifiP2pServiceImpl::Hid2dSharedlinkIncrease()
 ErrCode WifiP2pServiceImpl::Hid2dSharedlinkDecrease()
 {
     WIFI_LOGI("Hid2dSharedlinkDecrease");
+    if (!WifiAuthCenter::IsNativeProcess()) {
+        WIFI_LOGE("Hid2dSharedlinkDecrease:NOT NATIVE PROCESS, PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
     if (!IsP2pServiceRunning()) {
         WIFI_LOGE("P2pService is not runing!");
         return WIFI_OPT_P2P_NOT_OPENED;
@@ -1073,7 +1120,7 @@ ErrCode WifiP2pServiceImpl::Hid2dConfigIPAddr(const std::string& ifName, const I
     WIFI_LOGI("Hid2dConfigIPAddr, ifName: %{public}s", ifName.c_str());
     if (!WifiAuthCenter::IsNativeProcess()) {
         WIFI_LOGE("Hid2dConfigIPAddr:NOT NATIVE PROCESS, PERMISSION_DENIED!");
-        return WIFI_OPT_NON_SYSTEMAPP;
+        return WIFI_OPT_PERMISSION_DENIED;
     }
     IfConfig::GetInstance().AddIpAddr(ifName, ipInfo.ip, ipInfo.netmask, IpType::IPTYPE_IPV4);
     WifiNetAgent::GetInstance().AddRoute(ifName, ipInfo.ip, IpTools::GetMaskLength(ipInfo.netmask));
@@ -1083,6 +1130,10 @@ ErrCode WifiP2pServiceImpl::Hid2dConfigIPAddr(const std::string& ifName, const I
 ErrCode WifiP2pServiceImpl::Hid2dReleaseIPAddr(const std::string& ifName)
 {
     WIFI_LOGI("Hid2dReleaseIPAddr");
+    if (!WifiAuthCenter::IsNativeProcess()) {
+        WIFI_LOGE("Hid2dReleaseIPAddr:NOT NATIVE PROCESS, PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
     IfConfig::GetInstance().FlushIpAddr(ifName, IpType::IPTYPE_IPV4);
     return WIFI_OPT_SUCCESS;
 }
@@ -1091,6 +1142,10 @@ ErrCode WifiP2pServiceImpl::Hid2dGetRecommendChannel(const RecommendChannelReque
     RecommendChannelResponse& response)
 {
     WIFI_LOGI("Hid2dGetRecommendChannel");
+    if (!WifiAuthCenter::IsNativeProcess()) {
+        WIFI_LOGE("Hid2dGetRecommendChannel:NOT NATIVE PROCESS, PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
     if (!IsP2pServiceRunning()) {
         WIFI_LOGE("P2pService is not runing!");
         return WIFI_OPT_P2P_NOT_OPENED;
@@ -1111,6 +1166,10 @@ ErrCode WifiP2pServiceImpl::Hid2dGetRecommendChannel(const RecommendChannelReque
 ErrCode WifiP2pServiceImpl::Hid2dGetChannelListFor5G(std::vector<int>& vecChannelList)
 {
     WIFI_LOGI("Hid2dGetChannelListFor5G");
+    if (!WifiAuthCenter::IsNativeProcess()) {
+        WIFI_LOGE("Hid2dGetChannelListFor5G:NOT NATIVE PROCESS, PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
     ChannelsTable channels;
     WifiSettings::GetInstance().GetValidChannels(channels);
     if (channels.find(BandType::BAND_5GHZ) != channels.end()) {
@@ -1133,6 +1192,10 @@ ErrCode WifiP2pServiceImpl::Hid2dGetSelfWifiCfgInfo(SelfCfgType cfgType,
     char cfgData[CFG_DATA_MAX_BYTES], int* getDatValidLen)
 {
     WIFI_LOGI("Hid2dGetSelfWifiCfgInfo");
+    if (!WifiAuthCenter::IsNativeProcess()) {
+        WIFI_LOGE("Hid2dGetSelfWifiCfgInfo:NOT NATIVE PROCESS, PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
     if (!IsP2pServiceRunning()) {
         WIFI_LOGE("P2pService is not runing!");
         return WIFI_OPT_P2P_NOT_OPENED;
@@ -1150,6 +1213,10 @@ ErrCode WifiP2pServiceImpl::Hid2dSetPeerWifiCfgInfo(PeerCfgType cfgType,
     char cfgData[CFG_DATA_MAX_BYTES], int setDataValidLen)
 {
     WIFI_LOGI("Hid2dSetPeerWifiCfgInfo");
+    if (!WifiAuthCenter::IsNativeProcess()) {
+        WIFI_LOGE("Hid2dSetPeerWifiCfgInfo:NOT NATIVE PROCESS, PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
     if (!IsP2pServiceRunning()) {
         WIFI_LOGE("P2pService is not runing!");
         return WIFI_OPT_P2P_NOT_OPENED;
@@ -1166,6 +1233,10 @@ ErrCode WifiP2pServiceImpl::Hid2dSetPeerWifiCfgInfo(PeerCfgType cfgType,
 ErrCode WifiP2pServiceImpl::Hid2dSetUpperScene(const std::string& ifName, const Hid2dUpperScene& scene)
 {
     WIFI_LOGI("Hid2dSetUpperScene");
+    if (!WifiAuthCenter::IsNativeProcess()) {
+        WIFI_LOGE("Hid2dSetUpperScene:NOT NATIVE PROCESS, PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
     if (!IsP2pServiceRunning()) {
         WIFI_LOGE("P2pService is not runing!");
         return WIFI_OPT_P2P_NOT_OPENED;

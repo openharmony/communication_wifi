@@ -42,6 +42,7 @@ constexpr int MODE_UPDATE = 2;
 constexpr int WIFI_GET_SCAN_INFO_VALID_TIMESTAMP = 180;
 /* Hotspot idle status auto close timeout 10min. */
 constexpr int HOTSPOT_IDLE_TIMEOUT_INTERVAL_MS = 10 * 60 * 1000;
+constexpr int WIFI_DISAPPEAR_TIMES = 3;
 
 
 constexpr char DEVICE_CONFIG_FILE_PATH[] = CONFIG_ROOR_DIR"/device_config.conf";

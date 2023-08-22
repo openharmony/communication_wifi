@@ -161,7 +161,7 @@ HWTEST_F(WifiHalWpaStaTest, WpaCliCmdSaveConfigTest, TestSize.Level1)
 
 HWTEST_F(WifiHalWpaStaTest, WpaCliCmdSetNetworkTest, TestSize.Level1)
 {
-    EXPECT_TRUE(mInterface->wpaCliCmdSetNetwork(nullptr) < 0);
+    EXPECT_TRUE(mInterface->wpaCliCmdSetNetwork(nullptr, nullptr) < 0);
     EXPECT_TRUE(mInterface->wpaCliCmdSetNetwork(mInterface, nullptr) < 0);
     WpaSetNetworkArgv argv;
     ASSERT_TRUE(memset_s(&argv, sizeof(argv), 0, sizeof(argv)) == EOK);

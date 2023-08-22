@@ -1147,8 +1147,12 @@ void WifiManager::OnSystemAbilityChanged(int systemAbilityId, bool add)
         case COMMON_EVENT_SERVICE_ID: {
             if (add) {
                 RegisterScreenEvent();
+                RegisterAirplaneModeEvent();
+                RegisterLocationEvent();
             } else {
                 UnRegisterScreenEvent();
+                UnRegisterAirplaneModeEvent();
+                UnRegisterLocationEvent();
             }
             break;
         }
@@ -1760,6 +1764,10 @@ ScreenEventSubscriber::~ScreenEventSubscriber()
 
 void WifiManager::RegisterAirplaneModeEvent()
 {
+    std::unique_lock<std::mutex> lock(airplaneModeEventMutex);
+    if (airplaneModeEventSubscriber_) {
+        return;
+    }
     OHOS::EventFwk::MatchingSkills matchingSkills;
     matchingSkills.AddEvent(OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_AIRPLANE_MODE_CHANGED);
     EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
@@ -1775,6 +1783,10 @@ void WifiManager::RegisterAirplaneModeEvent()
 
 void WifiManager::UnRegisterAirplaneModeEvent()
 {
+    std::unique_lock<std::mutex> lock(airplaneModeEventMutex);
+    if (!airplaneModeEventSubscriber_) {
+        return;
+    }
     if (!EventFwk::CommonEventManager::UnSubscribeCommonEvent(airplaneModeEventSubscriber_)) {
         WIFI_LOGE("AirplaneModeEvent UnSubscribeCommonEvent() failed");
     } else {
@@ -1915,6 +1927,10 @@ bool WifiManager::GetLocationModeByDatashare(int systemAbilityId)
 
 void WifiManager::RegisterLocationEvent()
 {
+    std::unique_lock<std::mutex> lock(locationEventMutex);
+    if (locationEventSubscriber_) {
+        return;
+    }
     OHOS::EventFwk::MatchingSkills matchingSkills;
     matchingSkills.AddEvent(OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_LOCATION_MODE_STATE_CHANGED);
     EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
@@ -1929,6 +1945,10 @@ void WifiManager::RegisterLocationEvent()
 
 void WifiManager::UnRegisterLocationEvent()
 {
+    std::unique_lock<std::mutex> lock(locationEventMutex);
+    if (!locationEventSubscriber_) {
+        return;
+    }
     if (!EventFwk::CommonEventManager::UnSubscribeCommonEvent(locationEventSubscriber_)) {
         WIFI_LOGE("LocationEvent UnSubscribeCommonEvent() failed");
     } else {

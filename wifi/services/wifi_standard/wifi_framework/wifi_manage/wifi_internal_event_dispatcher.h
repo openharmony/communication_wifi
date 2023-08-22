@@ -98,13 +98,13 @@ public:
 
     static WifiInternalEventDispatcher &GetInstance();
     ErrCode AddStaCallback(const sptr<IRemoteObject> &remote, const sptr<IWifiDeviceCallBack> &callback, int pid,
-        const std::string &eventName);
+        const std::string &eventName, int tokenId);
     int SetSingleStaCallback(const sptr<IWifiDeviceCallBack> &callback, const std::string &eventName);
     sptr<IWifiDeviceCallBack> GetSingleStaCallback() const;
     int RemoveStaCallback(const sptr<IRemoteObject> &remote);
     bool HasStaRemote(const sptr<IRemoteObject> &remote);
     ErrCode AddScanCallback(const sptr<IRemoteObject> &remote, const sptr<IWifiScanCallback> &callback, int pid,
-        const std::string &eventName);
+        const std::string &eventName, int tokenId);
     int SetSingleScanCallback(const sptr<IWifiScanCallback> &callback, const std::string &eventName);
     sptr<IWifiScanCallback> GetSingleScanCallback() const;
     int RemoveScanCallback(const sptr<IRemoteObject> &remote);
@@ -116,7 +116,7 @@ public:
     int RemoveHotspotCallback(const sptr<IRemoteObject> &remote, int id = 0);
     bool HasHotspotRemote(const sptr<IRemoteObject> &remote, int id = 0);
     ErrCode AddP2pCallback(const sptr<IRemoteObject> &remote, const sptr<IWifiP2pCallback> &callback, int pid,
-        const std::string &eventName);
+        const std::string &eventName, int tokenId);
     int SetSingleP2pCallback(const sptr<IWifiP2pCallback> &callback);
     sptr<IWifiP2pCallback> GetSingleP2pCallback() const;
     int RemoveP2pCallback(const sptr<IRemoteObject> &remote);
@@ -133,7 +133,7 @@ private:
     static void DealHotspotCallbackMsg(WifiInternalEventDispatcher &pInstance, const WifiEventCallbackMsg &msg);
     static void DealP2pCallbackMsg(WifiInternalEventDispatcher &pInstance, const WifiEventCallbackMsg &msg);
     static void SendP2pCallbackMsg(sptr<IWifiP2pCallback> &callback, const WifiEventCallbackMsg &msg,
-        int pid, int uid);
+        int pid, int uid, int tokenId);
     static void updateP2pDeviceMacAddress(std::vector<WifiP2pDevice> &device);
     static void PublishConnStateChangedEvent(int state, const WifiLinkedInfo &info);
     static void PublishWifiStateChangedEvent(int state);

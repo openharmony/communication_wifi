@@ -235,6 +235,7 @@ int WifiScanStub::OnRegisterCallBack(uint32_t code, MessageParcel &data, Message
         }
 
         int pid = data.ReadInt32();
+        int tokenId = data.ReadInt32();
         int eventNum = data.ReadInt32();
         std::vector<std::string> event;
         if (eventNum > 0 && eventNum <= MAX_READ_EVENT_SIZE) {
@@ -242,7 +243,7 @@ int WifiScanStub::OnRegisterCallBack(uint32_t code, MessageParcel &data, Message
                 event.emplace_back(data.ReadString());
             }
         }
-        WIFI_LOGD("%{public}s, get pid: %{public}d", __func__, pid);
+        WIFI_LOGD("%{public}s, get pid: %{public}d, tokenId: %{public}d", __func__, pid, tokenId);
         
         if (mSingleCallback) {
             ret = RegisterCallBack(callback_, event);
@@ -255,7 +256,7 @@ int WifiScanStub::OnRegisterCallBack(uint32_t code, MessageParcel &data, Message
             }
             if (callback_ != nullptr) {
                 for (const auto &eventName : event) {
-                    ret = WifiInternalEventDispatcher::GetInstance().AddScanCallback(remote, callback_, pid, eventName);
+                    ret = WifiInternalEventDispatcher::GetInstance().AddScanCallback(remote, callback_, pid, eventName, tokenId);
                 }
             }
         }

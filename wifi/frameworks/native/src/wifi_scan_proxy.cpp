@@ -341,6 +341,8 @@ ErrCode WifiScanProxy::RegisterCallBack(const sptr<IWifiScanCallback> &callback,
 
     int pid = GetCallingPid();
     data.WriteInt32(pid);
+    int tokenId = GetCallingTokenId();
+    data.WriteInt32(tokenId);
     int eventNum = event.size();
     data.WriteInt32(eventNum);
     if (eventNum > 0) {
@@ -348,7 +350,8 @@ ErrCode WifiScanProxy::RegisterCallBack(const sptr<IWifiScanCallback> &callback,
             data.WriteString(eventName);
         }
     }
-    WIFI_LOGD("%{public}s, calling uid: %{public}d, pid: %{public}d", __func__, GetCallingUid(), pid);
+    WIFI_LOGD("%{public}s, calling uid: %{public}d, pid: %{public}d, tokenId: %{public}d",
+        __func__, GetCallingUid(), pid, tokenId);
     int error = Remote()->SendRequest(static_cast<uint32_t>(ScanInterfaceCode::WIFI_SVR_CMD_REGISTER_SCAN_CALLBACK),
         data, reply, option);
     if (error != ERR_NONE) {

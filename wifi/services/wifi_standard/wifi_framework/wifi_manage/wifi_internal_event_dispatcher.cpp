@@ -128,7 +128,8 @@ int WifiInternalEventDispatcher::SendSystemNotifyMsg() /* parameters */
 }
 
 ErrCode WifiInternalEventDispatcher::AddStaCallback(
-    const sptr<IRemoteObject> &remote, const sptr<IWifiDeviceCallBack> &callback, int pid, const std::string &eventName)
+    const sptr<IRemoteObject> &remote, const sptr<IWifiDeviceCallBack> &callback, int pid,
+    const std::string &eventName, int tokenId)
 {
     WIFI_LOGD("WifiInternalEventDispatcher::AddStaCallback, remote!");
     if (remote == nullptr || callback == nullptr) {
@@ -156,9 +157,11 @@ ErrCode WifiInternalEventDispatcher::AddStaCallback(
         WifiCallingInfo &callbackInfo = mStaCallBackInfo[remote];
         callbackInfo.callingUid = GetCallingUid();
         callbackInfo.callingPid = pid;
+        callbackInfo.callingTokenId = tokenId;
         callbackInfo.regCallBackEventId.emplace(eventIter->second);
-        WIFI_LOGD("%{public}s, add uid: %{public}d, pid: %{public}d, callback event:%{public}d", __func__,
-            callbackInfo.callingUid, callbackInfo.callingPid, eventIter->second);
+        WIFI_LOGD("%{public}s, add uid: %{public}d, pid: %{public}d, callback event:%{public}d, tokenId: %{public}d",
+            __func__, callbackInfo.callingUid, callbackInfo.callingPid,
+            eventIter->second, callbackInfo.callingTokenId);
     }
     mStaCallbacks[remote] = callback;
     return WIFI_OPT_SUCCESS;
@@ -202,7 +205,8 @@ bool WifiInternalEventDispatcher::HasStaRemote(const sptr<IRemoteObject> &remote
 }
 
 ErrCode WifiInternalEventDispatcher::AddScanCallback(
-    const sptr<IRemoteObject> &remote, const sptr<IWifiScanCallback> &callback, int pid, const std::string &eventName)
+    const sptr<IRemoteObject> &remote, const sptr<IWifiScanCallback> &callback, int pid,
+    const std::string &eventName, int tokenId)
 {
     WIFI_LOGD("WifiInternalEventDispatcher::AddCallbackClient!");
     if (remote == nullptr || callback == nullptr) {
@@ -230,9 +234,11 @@ ErrCode WifiInternalEventDispatcher::AddScanCallback(
         WifiCallingInfo &callbackInfo = mScanCallBackInfo[remote];
         callbackInfo.callingUid = GetCallingUid();
         callbackInfo.callingPid = pid;
+        callbackInfo.callingTokenId = tokenId;
         callbackInfo.regCallBackEventId.emplace(eventIter->second);
-        WIFI_LOGD("%{public}s, add uid: %{public}d, pid: %{public}d, callback event:%{public}d", __func__,
-            callbackInfo.callingUid, callbackInfo.callingPid, eventIter->second);
+        WIFI_LOGD("%{public}s, add uid: %{public}d, pid: %{public}d, callback event:%{public}d, tokenId: %{public}d",
+            __func__, callbackInfo.callingUid, callbackInfo.callingPid,
+            eventIter->second, callbackInfo.callingTokenId);
     }
     mScanCallbacks[remote] = callback;
     return WIFI_OPT_SUCCESS;
@@ -387,7 +393,8 @@ bool WifiInternalEventDispatcher::HasP2pRemote(const sptr<IRemoteObject> &remote
 }
 
 ErrCode WifiInternalEventDispatcher::AddP2pCallback(
-    const sptr<IRemoteObject> &remote, const sptr<IWifiP2pCallback> &callback, int pid, const std::string &eventName)
+    const sptr<IRemoteObject> &remote, const sptr<IWifiP2pCallback> &callback, int pid,
+    const std::string &eventName, int tokenId)
 {
     WIFI_LOGD("WifiInternalEventDispatcher::AddP2pCallback!");
     if (remote == nullptr || callback == nullptr) {
@@ -414,9 +421,11 @@ ErrCode WifiInternalEventDispatcher::AddP2pCallback(
         WifiCallingInfo &callbackInfo = mP2pCallbackInfo[remote];
         callbackInfo.callingUid = GetCallingUid();
         callbackInfo.callingPid = pid;
+        callbackInfo.callingTokenId = tokenId;
         callbackInfo.regCallBackEventId.emplace(eventIter->second);
-        WIFI_LOGE("%{public}s, add uid: %{public}d, pid: %{public}d, callback event: %{public}d",
-            __func__, callbackInfo.callingUid, callbackInfo.callingPid, eventIter->second);
+        WIFI_LOGI("%{public}s, add uid: %{public}d, pid: %{public}d, callback event: %{public}d, tokenId: %{public}d",
+            __func__, callbackInfo.callingUid, callbackInfo.callingPid,
+            eventIter->second, callbackInfo.callingTokenId);
     }
     mP2pCallbacks[remote] = callback;
     WIFI_LOGI("%{public}s, add p2p callback event:%{public}d", __func__, eventIter->second);
@@ -709,8 +718,9 @@ void WifiInternalEventDispatcher::InvokeP2pCallbacks(const WifiEventCallbackMsg 
         }
         int pid = mP2pCallbackInfo[remote].callingPid;
         int uid = mP2pCallbackInfo[remote].callingUid;
+        int tokenId = mP2pCallbackInfo[remote].callingTokenId;
         if (callback != nullptr) {
-            SendP2pCallbackMsg(callback, msg, pid, uid);
+            SendP2pCallbackMsg(callback, msg, pid, uid, tokenId);
         }
     }
 }
@@ -755,7 +765,7 @@ void WifiInternalEventDispatcher::updateP2pDeviceMacAddress(std::vector<WifiP2pD
 }
 
 void WifiInternalEventDispatcher::SendP2pCallbackMsg(sptr<IWifiP2pCallback> &callback, const WifiEventCallbackMsg &msg,
-    int pid, int uid)
+    int pid, int uid, int tokenId)
 {
     if (callback == nullptr) {
         WIFI_LOGE("%{public}s: callback is null", __func__);
@@ -778,7 +788,7 @@ void WifiInternalEventDispatcher::SendP2pCallbackMsg(sptr<IWifiP2pCallback> &cal
             #ifdef SUPPORT_RANDOM_MAC_ADDR
                 if ((pid != 0) && (uid != 0)) {
                     std::vector<WifiP2pDevice> deviceVec = msg.device;
-                    if (WifiPermissionUtils::VerifyGetWifiPeersMacPermission(pid, uid) == PERMISSION_DENIED) {
+                    if (WifiPermissionUtils::VerifyGetWifiPeersMacPermissionEx(pid, uid, tokenId) == PERMISSION_DENIED) {
                         WIFI_LOGD("%{public}s: GET_WIFI_PEERS_MAC PERMISSION_DENIED, pid: %{public}d, uid: %{public}d",
                             __func__, pid, uid);
                         updateP2pDeviceMacAddress(deviceVec);
@@ -819,7 +829,7 @@ void WifiInternalEventDispatcher::DealP2pCallbackMsg(
 
     auto callback = instance.GetSingleP2pCallback();
     if (callback != nullptr) {
-        SendP2pCallbackMsg(callback, msg, 0, 0);
+        SendP2pCallbackMsg(callback, msg, 0, 0, 0);
     }
     instance.InvokeP2pCallbacks(msg);
     return;

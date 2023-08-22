@@ -639,7 +639,7 @@ void WifiP2pStub::OnRegisterCallBack(uint32_t code, MessageParcel &data, Message
                 event.emplace_back(data.ReadString());
             }
         }
-        WIFI_LOGD("%{public}s, get pid: %{public}d, tokenId: %{public}d", __func__, pid, tokenId);
+        WIFI_LOGD("%{public}s, get pid: %{public}d, tokenId: %{private}d", __func__, pid, tokenId);
 
         if (mSingleCallback) {
             ret = RegisterCallBack(callback_, event);

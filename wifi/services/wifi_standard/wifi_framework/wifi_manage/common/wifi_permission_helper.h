@@ -69,19 +69,7 @@ public:
      * @param uid - User ID.[in]
      * @return int
      */
-    static int VerifyPermission(const std::string &permissionName, const int &pid, const int &uid);
-
-    /**
-     * @Description : Verify Permission.
-     *
-     * @param permissionName - Permission name.[in]
-     * @param pid - Process ID.[in]
-     * @param uid - User ID.[in]
-     * @param tokenId - token ID.[in]
-     * @return int
-     */
-    static int VerifyPermissionEx(const std::string &permissionName, const int &pid,
-        const int &uid, const int &tokenId);
+    static int VerifyPermission(const std::string &permissionName, const int &pid, const int &uid, const int &tokenId);
 
     /**
      * @Description : Verify Set Wifi Information Permission.

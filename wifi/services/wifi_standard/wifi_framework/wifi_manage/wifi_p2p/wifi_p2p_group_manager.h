@@ -186,6 +186,7 @@ public:
     inline void SetCurrentGroup(const WifiP2pGroupInfo &group)
     {
         currentGroup = group;
+        AddMacAddrPairInfo(group);
         RefreshCurrentGroupFromGroups();
     }
 
@@ -193,7 +194,16 @@ public:
     {
         return currentGroup;
     }
-
+#ifdef SUPPORT_RANDOM_MAC_ADDR
+    /**
+     * @Description - add mac address information
+     */
+    void AddMacAddrPairInfo(const WifiP2pGroupInfo &group);
+    /**
+     * @Description - remove mac address information
+     */
+    void RemoveMacAddrPairInfo(const WifiP2pGroupInfo &group);
+#endif
 private:
     /**
      * @Description - Synchronize from the current group to all registry groups.

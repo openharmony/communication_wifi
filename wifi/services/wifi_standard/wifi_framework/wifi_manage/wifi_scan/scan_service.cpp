@@ -670,6 +670,7 @@ bool ScanService::StoreFullScanInfo(
         scanInfo.features = iter->features;
         scanInfo.timestamp = iter->timestamp;
         scanInfo.band = iter->band;
+        scanInfo.disappearCount = 0;
         scanInfo.maxSupportedRxLinkSpeed = GetWifiMaxSupportedMaxSpeed(*iter, MAX_RX_SPATIAL_STREAMS);
         scanInfo.maxSupportedTxLinkSpeed = GetWifiMaxSupportedMaxSpeed(*iter, MAX_TX_SPATIAL_STREAMS);
         iter->GetWifiStandard(scanInfo.wifiStandard);
@@ -681,12 +682,15 @@ bool ScanService::StoreFullScanInfo(
     if (ret != 0) {
         WIFI_LOGW("GetScanInfoList return error. \n");
     }
-
+    for (auto iter = results.begin(); iter != results.end(); ++iter) {
+        iter->disappearCount++;
+    }
     for (auto storedIter = storeInfoList.begin(); storedIter != storeInfoList.end(); ++storedIter) {
         bool find = false;
         for (auto iter = results.begin(); iter != results.end(); ++iter) {
             if (iter->bssid == storedIter->bssid && iter->ssid == storedIter->ssid) {
                 find = true;
+                iter->disappearCount = 0;
                 break;
             }
         }

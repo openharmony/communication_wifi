@@ -166,20 +166,26 @@ int WifiPermissionHelper::VerifyPermission(const std::string &permissionName, co
     auto callerToken = IPCSkeleton::GetCallingTokenID();
     auto tokenType = Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(callerToken);
     if (tokenType == Security::AccessToken::ATokenTypeEnum::TOKEN_NATIVE) {
+        LOGI("callerToken=0x%{public}x has permission_name=%{public}s, pid=0x%{public}x, type=%{public}d",
+            callerToken, permissionName.c_str(), pid, tokenType);
         return PERMISSION_GRANTED;
     }
 
     if (tokenType == Security::AccessToken::ATokenTypeEnum::TOKEN_HAP) {
         int result = Security::AccessToken::AccessTokenKit::VerifyAccessToken(callerToken, permissionName);
         if (result == Security::AccessToken::PermissionState::PERMISSION_GRANTED) {
+            LOGI("callerToken=0x%{public}x has permission_name=%{public}s, pid=0x%{public}x, type=%{public}d",
+                callerToken, permissionName.c_str(), pid, tokenType);
             return PERMISSION_GRANTED;
         }
  
-        LOGI("callerToken=0x%{public}x has no permission_name=%{public}s", pid, permissionName.c_str());
+        LOGI("callerToken=0x%{public}x has no permission_name=%{public}s, pid=0x%{public}x, type=%{public}d",
+            callerToken, permissionName.c_str(), pid, tokenType);
         return PERMISSION_DENIED;
     }
 
-    LOGE("callerToken=0x%{public}x has invalid token type=%{public}d", pid, tokenType);
+    LOGE("callerToken=0x%{public}x has invalid token, pid=0x%{public}x, type=%{public}d",
+        callerToken, pid, tokenType);
     return PERMISSION_DENIED;
 #endif
 }

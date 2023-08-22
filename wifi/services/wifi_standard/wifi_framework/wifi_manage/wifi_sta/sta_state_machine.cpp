@@ -32,8 +32,6 @@
 #include "wifi_config_center.h"
 #ifndef OHOS_ARCH_LITE
 #include <dlfcn.h>
-#include "iservice_registry.h"
-#include "system_ability_definition.h"
 #endif // OHOS_ARCH_LITE
 
 #ifndef OHOS_WIFI_STA_TEST
@@ -76,9 +74,6 @@ StaStateMachine::StaStateMachine()
       pLinkedState(nullptr),
       pApRoamingState(nullptr)
 {
-#ifndef OHOS_ARCH_LITE
-    SubscribeSystemAbilityChanged();
-#endif // OHOS_ARCH_LITE
 }
 
 StaStateMachine::~StaStateMachine()
@@ -108,14 +103,6 @@ StaStateMachine::~StaStateMachine()
         pDhcpService->RemoveDhcpResult(pDhcpResultNotify);
         pDhcpService.reset(nullptr);
     }
-#ifndef OHOS_ARCH_LITE
-    auto samgrProxy = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-    if (samgrProxy != NULL && statusChangeListener_ != NULL) {
-        int32_t ret = samgrProxy->UnSubscribeSystemAbility(COMM_NET_CONN_MANAGER_SYS_ABILITY_ID,
-            statusChangeListener_);
-        LOGI("UnSubscribeSystemAbility COMM_NET_CONN_MANAGER_SYS_ABILITY_ID result:%{public}d", ret);
-    }
-#endif
     ParsePointer(pDhcpResultNotify);
     ParsePointer(pNetcheck);
 }
@@ -2411,18 +2398,6 @@ void StaStateMachine::SetOperationalMode(int mode)
 }
 
 #ifndef OHOS_ARCH_LITE
-void StaStateMachine::SubscribeSystemAbilityChanged(void)
-{
-    auto samgrProxy = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-    statusChangeListener_ = new (std::nothrow) SystemAbilityStatusChangeListener(*this);
-    if (samgrProxy == nullptr || statusChangeListener_ == nullptr) {
-        LOGE("samgrProxy or statusChangeListener_ is nullptr");
-        return;
-    }
-    int32_t ret = samgrProxy->SubscribeSystemAbility(COMM_NET_CONN_MANAGER_SYS_ABILITY_ID, statusChangeListener_);
-    LOGI("SubscribeSystemAbility COMM_NET_CONN_MANAGER_SYS_ABILITY_ID result:%{public}d", ret);
-}
-
 void StaStateMachine::OnNetManagerRestart(void)
 {
     LOGI("OnNetManagerRestart()");
@@ -2471,31 +2446,6 @@ void StaStateMachine::SaveWifiConfigForUpdate(int networkId)
     if (WifiSettings::GetInstance().GetDeviceConfig(networkId, config) == -1) {
         WIFI_LOGE("SaveWifiConfigForUpdate, get current config failed.");
         return;
-    }
-}
-
-StaStateMachine::SystemAbilityStatusChangeListener::SystemAbilityStatusChangeListener(StaStateMachine &stateMachine)
-    : stateMachine_(stateMachine){};
-
-void StaStateMachine::SystemAbilityStatusChangeListener::OnAddSystemAbility(int32_t systemAbilityId,
-                                                                            const std::string &deviceId)
-{
-    LOGI("OnAddSystemAbility() systemAbilityId:%{public}d", systemAbilityId);
-    if (systemAbilityId == COMM_NET_CONN_MANAGER_SYS_ABILITY_ID) {
-        if (!hasSARemoved_) {
-            return;
-        }
-        hasSARemoved_ = false;
-        stateMachine_.OnNetManagerRestart();
-    }
-}
-
-void StaStateMachine::SystemAbilityStatusChangeListener::OnRemoveSystemAbility(int32_t systemAbilityId,
-                                                                               const std::string &deviceId)
-{
-    LOGI("OnRemoveSystemAbility() systemAbilityId:%{public}d", systemAbilityId);
-    if (systemAbilityId == COMM_NET_CONN_MANAGER_SYS_ABILITY_ID) {
-        hasSARemoved_ = true;
     }
 }
 #endif // OHOS_ARCH_LITE

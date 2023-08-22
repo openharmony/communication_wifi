@@ -60,6 +60,7 @@ WifiManager &WifiManager::GetInstance()
             if (gWifiManager.Init() != 0) {
                 WIFI_LOGE("Failed to `WifiManager::Init` !");
             }
+            gWifiManager.InitSubscribeListener();
         }
     }
 
@@ -632,6 +633,14 @@ int WifiManager::Init()
     return 0;
 }
 
+void WifiManager::InitSubscribeListener()
+{
+#ifndef OHOS_ARCH_LITE
+    SubscribeSystemAbility(COMM_NET_CONN_MANAGER_SYS_ABILITY_ID);
+    SubscribeSystemAbility(COMMON_EVENT_SERVICE_ID);
+#endif
+}
+
 void WifiManager::Exit()
 {
     WIFI_LOGI("[WifiManager] Exit.");
@@ -1120,6 +1129,34 @@ void WifiManager::StartUnloadScanSaTimer(void)
     return;
 }
 #endif
+
+void WifiManager::OnSystemAbilityChanged(int systemAbilityId, bool add)
+{
+#ifndef OHOS_ARCH_LITE
+    switch (systemAbilityId) {
+        case COMM_NET_CONN_MANAGER_SYS_ABILITY_ID: {
+            if (!add) {
+                break;
+            }
+            IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst();
+            if (pService != nullptr) {
+                pService->OnSystemAbilityChanged(systemAbilityId, add);
+            }
+            break;
+        }
+        case COMMON_EVENT_SERVICE_ID: {
+            if (add) {
+                RegisterScreenEvent();
+            } else {
+                UnRegisterScreenEvent();
+            }
+            break;
+        }
+        default:
+            break;
+    }
+#endif
+}
 
 void WifiManager::CheckAndStartScanService(void)
 {
@@ -1641,6 +1678,10 @@ void WifiManager::RegisterCfgMonitorCallback(WifiCfgMonitorEventCallback callbac
 #ifndef OHOS_ARCH_LITE
 void WifiManager::RegisterScreenEvent()
 {
+    std::unique_lock<std::mutex> lock(screenEventMutex);
+    if (screenEventSubscriber_) {
+        return;
+    }
     OHOS::EventFwk::MatchingSkills matchingSkills;
     matchingSkills.AddEvent(OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON);
     matchingSkills.AddEvent(OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF);
@@ -1656,6 +1697,10 @@ void WifiManager::RegisterScreenEvent()
 
 void WifiManager::UnRegisterScreenEvent()
 {
+    std::unique_lock<std::mutex> lock(screenEventMutex);
+    if (!screenEventSubscriber_) {
+        return;
+    }
     if (!EventFwk::CommonEventManager::UnSubscribeCommonEvent(screenEventSubscriber_)) {
         WIFI_LOGE("ScreenEvent UnSubscribeCommonEvent() failed");
     } else {
@@ -1759,6 +1804,9 @@ void AirplaneModeEventSubscriber::OnReceiveEvent(const OHOS::EventFwk::CommonEve
 void WifiManager::DealOpenAirplaneModeEvent()
 {
     WifiConfigCenter::GetInstance().SetAirplaneModeState(MODE_STATE_OPEN);
+#ifdef FEATURE_AP_SUPPORT
+    AutoStopApService(AutoStartOrStopServiceReason::AIRPLANE_MODE);
+#endif
     if (WifiConfigCenter::GetInstance().GetOperatorWifiType() ==
         static_cast<int>(OperatorWifiType::USER_OPEN_WIFI_IN_AIRPLANEMODE)) {
             WIFI_LOGI("DealOpenAirplaneModeEvent, user opened sta in airplane mode, ignore openairplanemode event!");
@@ -1767,9 +1815,6 @@ void WifiManager::DealOpenAirplaneModeEvent()
 
     AutoStopStaService(AutoStartOrStopServiceReason::AIRPLANE_MODE);
     AutoStopScanOnly();
-#ifdef FEATURE_AP_SUPPORT
-    AutoStopApService(AutoStartOrStopServiceReason::AIRPLANE_MODE);
-#endif
 }
 
 void WifiManager::DealCloseAirplaneModeEvent()

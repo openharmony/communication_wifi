@@ -64,6 +64,7 @@ void WifiHalWpaStaTest::TearDownTestCase()
 
 HWTEST_F(WifiHalWpaStaTest, WpaCliCmdStatusTest, TestSize.Level1)
 {
+    EXPECT_TRUE(mInterface->wpaCliCmdStatus(nullptr, nullptr) < 0);
     EXPECT_TRUE(mInterface->wpaCliCmdStatus(mInterface, nullptr) < 0);
     MockEraseSupportedCmd("STATUS");
     WpaHalCmdStatus status;
@@ -100,6 +101,7 @@ HWTEST_F(WifiHalWpaStaTest, WpaCliCmdStatusTest, TestSize.Level1)
 HWTEST_F(WifiHalWpaStaTest, WpaCliCmdAddNetworksTest, TestSize.Level1)
 {
     MockEraseSupportedCmd("ADD_NETWORK");
+    EXPECT_TRUE(mInterface->wpaCliCmdAddNetworks(nullptr) < 0);
     EXPECT_TRUE(mInterface->wpaCliCmdAddNetworks(mInterface) < 0);
     MockSetWpaExpectCmdResponse("ADD_NETWORK", "1");
     int ret = mInterface->wpaCliCmdAddNetworks(mInterface);
@@ -109,6 +111,7 @@ HWTEST_F(WifiHalWpaStaTest, WpaCliCmdAddNetworksTest, TestSize.Level1)
 HWTEST_F(WifiHalWpaStaTest, WpaCliCmdReconnectTest, TestSize.Level1)
 {
     MockEraseSupportedCmd("RECONNECT");
+    EXPECT_TRUE(mInterface->wpaCliCmdReconnect(nullptr) < 0);
     EXPECT_TRUE(mInterface->wpaCliCmdReconnect(mInterface) < 0);
     MockSetWpaExpectCmdResponse("RECONNECT", "FAIL\n");
     EXPECT_TRUE(mInterface->wpaCliCmdReconnect(mInterface) < 0);
@@ -122,6 +125,7 @@ HWTEST_F(WifiHalWpaStaTest, WpaCliCmdReconnectTest, TestSize.Level1)
 HWTEST_F(WifiHalWpaStaTest, WpaCliCmdReassociateTest, TestSize.Level1)
 {
     MockEraseSupportedCmd("REASSOCIATE");
+    EXPECT_TRUE(mInterface->wpaCliCmdReassociate(nullptr) < 0);
     EXPECT_TRUE(mInterface->wpaCliCmdReassociate(mInterface) < 0);
     MockSetWpaExpectCmdResponse("REASSOCIATE", "FAIL\n");
     EXPECT_TRUE(mInterface->wpaCliCmdReassociate(mInterface) < 0);
@@ -134,6 +138,7 @@ HWTEST_F(WifiHalWpaStaTest, WpaCliCmdDisconnectTest, TestSize.Level1)
 {
     MockEraseSupportedCmd("DISCONNECT");
     EXPECT_TRUE(mInterface->wpaCliCmdDisconnect(mInterface) < 0);
+    EXPECT_TRUE(mInterface->wpaCliCmdDisconnect(nullptr) < 0);
     MockSetWpaExpectCmdResponse("DISCONNECT", "FAIL\n");
     EXPECT_TRUE(mInterface->wpaCliCmdDisconnect(mInterface) < 0);
     MockSetWpaExpectCmdResponse("DISCONNECT", "OK");
@@ -146,6 +151,7 @@ HWTEST_F(WifiHalWpaStaTest, WpaCliCmdDisconnectTest, TestSize.Level1)
 HWTEST_F(WifiHalWpaStaTest, WpaCliCmdSaveConfigTest, TestSize.Level1)
 {
     MockEraseSupportedCmd("SAVE_CONFIG");
+    EXPECT_TRUE(mInterface->wpaCliCmdSaveConfig(nullptr) < 0);
     EXPECT_TRUE(mInterface->wpaCliCmdSaveConfig(mInterface) < 0);
     MockSetWpaExpectCmdResponse("SAVE_CONFIG", "FAIL\n");
     EXPECT_TRUE(mInterface->wpaCliCmdSaveConfig(mInterface) < 0);
@@ -155,6 +161,7 @@ HWTEST_F(WifiHalWpaStaTest, WpaCliCmdSaveConfigTest, TestSize.Level1)
 
 HWTEST_F(WifiHalWpaStaTest, WpaCliCmdSetNetworkTest, TestSize.Level1)
 {
+    EXPECT_TRUE(mInterface->wpaCliCmdSetNetwork(nullptr) < 0);
     EXPECT_TRUE(mInterface->wpaCliCmdSetNetwork(mInterface, nullptr) < 0);
     WpaSetNetworkArgv argv;
     ASSERT_TRUE(memset_s(&argv, sizeof(argv), 0, sizeof(argv)) == EOK);
@@ -176,6 +183,7 @@ HWTEST_F(WifiHalWpaStaTest, WpaCliCmdSetNetworkTest, TestSize.Level1)
 HWTEST_F(WifiHalWpaStaTest, WpaCliCmdEnableNetworkTest, TestSize.Level1)
 {
     MockEraseSupportedCmd("ENABLE_NETWORK");
+    EXPECT_TRUE(mInterface->wpaCliCmdEnableNetwork(nullptr, 0) < 0);
     EXPECT_TRUE(mInterface->wpaCliCmdEnableNetwork(mInterface, 0) < 0);
     MockSetWpaExpectCmdResponse("ENABLE_NETWORK", "FAIL\n");
     EXPECT_TRUE(mInterface->wpaCliCmdEnableNetwork(mInterface, 0) < 0);
@@ -186,6 +194,7 @@ HWTEST_F(WifiHalWpaStaTest, WpaCliCmdEnableNetworkTest, TestSize.Level1)
 HWTEST_F(WifiHalWpaStaTest, WpaCliCmdSelectNetworkTest, TestSize.Level1)
 {
     MockEraseSupportedCmd("SELECT_NETWORK");
+    EXPECT_TRUE(mInterface->wpaCliCmdSelectNetwork(nullptr, 0) < 0);
     EXPECT_TRUE(mInterface->wpaCliCmdSelectNetwork(mInterface, 0) < 0);
     MockSetWpaExpectCmdResponse("SELECT_NETWORK", "FAIL\n");
     EXPECT_TRUE(mInterface->wpaCliCmdSelectNetwork(mInterface, 0) < 0);
@@ -196,6 +205,7 @@ HWTEST_F(WifiHalWpaStaTest, WpaCliCmdSelectNetworkTest, TestSize.Level1)
 HWTEST_F(WifiHalWpaStaTest, WpaCliCmdDisableNetworkTest, TestSize.Level1)
 {
     MockEraseSupportedCmd("DISABLE_NETWORK");
+    EXPECT_TRUE(mInterface->wpaCliCmdDisableNetwork(nullptr, 0) < 0);
     EXPECT_TRUE(mInterface->wpaCliCmdDisableNetwork(mInterface, 0) < 0);
     MockSetWpaExpectCmdResponse("DISABLE_NETWORK", "FAIL\n");
     EXPECT_TRUE(mInterface->wpaCliCmdDisableNetwork(mInterface, 0) < 0);
@@ -206,6 +216,7 @@ HWTEST_F(WifiHalWpaStaTest, WpaCliCmdDisableNetworkTest, TestSize.Level1)
 HWTEST_F(WifiHalWpaStaTest, WpaCliCmdRemoveNetworkTest, TestSize.Level1)
 {
     MockEraseSupportedCmd("REMOVE_NETWORK");
+    EXPECT_TRUE(mInterface->wpaCliCmdRemoveNetwork(nullptr, 0) < 0);
     EXPECT_TRUE(mInterface->wpaCliCmdRemoveNetwork(mInterface, 0) < 0);
     MockSetWpaExpectCmdResponse("REMOVE_NETWORK", "FAIL\n");
     EXPECT_TRUE(mInterface->wpaCliCmdRemoveNetwork(mInterface, 0) < 0);
@@ -217,9 +228,11 @@ HWTEST_F(WifiHalWpaStaTest, WpaCliCmdRemoveNetworkTest, TestSize.Level1)
 
 HWTEST_F(WifiHalWpaStaTest, WpaCliCmdGetNetworkTest, TestSize.Level1)
 {
+    EXPECT_TRUE(mInterface->wpaCliCmdGetNetwork(nullptr, nullptr, nullptr, 0) < 0);
     EXPECT_TRUE(mInterface->wpaCliCmdGetNetwork(mInterface, nullptr, nullptr, 0) < 0);
     WpaGetNetworkArgv argv;
     ASSERT_TRUE(memset_s(&argv, sizeof(argv), 0, sizeof(argv)) == EOK);
+    EXPECT_TRUE(mInterface->wpaCliCmdGetNetwork(mInterface, &argv, nullptr, 0) < 0);
     char getBuffer[256] = {0};
     MockEraseSupportedCmd("GET_NETWORK");
     EXPECT_TRUE(mInterface->wpaCliCmdGetNetwork(mInterface, &argv, getBuffer, sizeof(getBuffer)) < 0);
@@ -230,6 +243,7 @@ HWTEST_F(WifiHalWpaStaTest, WpaCliCmdGetNetworkTest, TestSize.Level1)
 
 HWTEST_F(WifiHalWpaStaTest, WpaCliCmdWpsPbcTest, TestSize.Level1)
 {
+    EXPECT_TRUE(mInterface->wpaCliCmdWpsPbc(nullptr, nullptr) < 0);
     EXPECT_TRUE(mInterface->wpaCliCmdWpsPbc(mInterface, nullptr) == 0);
     WpaWpsPbcArgv argv;
     ASSERT_TRUE(memset_s(&argv, sizeof(argv), 0, sizeof(argv)) == EOK);
@@ -253,8 +267,10 @@ HWTEST_F(WifiHalWpaStaTest, WpaCliCmdWpsPbcTest, TestSize.Level1)
 
 HWTEST_F(WifiHalWpaStaTest, WpaCliCmdWpsPinTest, TestSize.Level1)
 {
+    EXPECT_TRUE(mInterface->wpaCliCmdWpsPin(nullptr, nullptr, nullptr) < 0);
     EXPECT_TRUE(mInterface->wpaCliCmdWpsPin(mInterface, nullptr, nullptr) < 0);
     WpaWpsPinArgv argv;
+    EXPECT_TRUE(mInterface->wpaCliCmdWpsPin(mInterface, &argv, nullptr) < 0);
     ASSERT_TRUE(memset_s(&argv, sizeof(argv), 0, sizeof(argv)) == EOK);
     int pinCode = 0;
     MockEraseSupportedCmd("WPS_PIN");
@@ -272,6 +288,7 @@ HWTEST_F(WifiHalWpaStaTest, WpaCliCmdWpsPinTest, TestSize.Level1)
 HWTEST_F(WifiHalWpaStaTest, WpaCliCmdWpsCancelTest, TestSize.Level1)
 {
     MockEraseSupportedCmd("WPS_CANCEL");
+    EXPECT_TRUE(mInterface->wpaCliCmdWpsCancel(nullptr) < 0);
     EXPECT_TRUE(mInterface->wpaCliCmdWpsCancel(mInterface) < 0);
     MockSetWpaExpectCmdResponse("WPS_CANCEL", "FAIL\n");
     EXPECT_TRUE(mInterface->wpaCliCmdWpsCancel(mInterface) < 0);
@@ -282,6 +299,7 @@ HWTEST_F(WifiHalWpaStaTest, WpaCliCmdWpsCancelTest, TestSize.Level1)
 HWTEST_F(WifiHalWpaStaTest, WpaCliCmdPowerSaveTest, TestSize.Level1)
 {
     MockEraseSupportedCmd("SET");
+    EXPECT_TRUE(mInterface->wpaCliCmdPowerSave(nullptr, 0) < 0);
     EXPECT_TRUE(mInterface->wpaCliCmdPowerSave(mInterface, 0) < 0);
     MockSetWpaExpectCmdResponse("SET", "FAIL\n");
     EXPECT_TRUE(mInterface->wpaCliCmdPowerSave(mInterface, 0) < 0);
@@ -292,6 +310,7 @@ HWTEST_F(WifiHalWpaStaTest, WpaCliCmdPowerSaveTest, TestSize.Level1)
 
 HWTEST_F(WifiHalWpaStaTest, WpaCliCmdSetCountryCodeTest, TestSize.Level1)
 {
+    EXPECT_TRUE(mInterface->wpaCliCmdSetCountryCode(nullptr, nullptr) < 0);
     EXPECT_TRUE(mInterface->wpaCliCmdSetCountryCode(mInterface, nullptr) < 0);
     MockEraseSupportedCmd("SET");
     EXPECT_TRUE(mInterface->wpaCliCmdSetCountryCode(mInterface, "CN") < 0);
@@ -303,6 +322,7 @@ HWTEST_F(WifiHalWpaStaTest, WpaCliCmdSetCountryCodeTest, TestSize.Level1)
 
 HWTEST_F(WifiHalWpaStaTest, WpaCliCmdGetCountryCodeTest, TestSize.Level1)
 {
+    EXPECT_TRUE(mInterface->wpaCliCmdGetCountryCode(nullptr, nullptr, 0) < 0);
     EXPECT_TRUE(mInterface->wpaCliCmdGetCountryCode(mInterface, nullptr, 0) < 0);
     char countryCode[3] = {0};
     int codeSize = 3;
@@ -318,6 +338,7 @@ HWTEST_F(WifiHalWpaStaTest, WpaCliCmdGetCountryCodeTest, TestSize.Level1)
 HWTEST_F(WifiHalWpaStaTest, WpaCliCmdSetAutoConnectTest, TestSize.Level1)
 {
     MockEraseSupportedCmd("STA_AUTOCONNECT");
+    EXPECT_TRUE(mInterface->wpaCliCmdSetAutoConnect(nullptr, 0) < 0);
     EXPECT_TRUE(mInterface->wpaCliCmdSetAutoConnect(mInterface, 0) < 0);
     MockSetWpaExpectCmdResponse("STA_AUTOCONNECT", "FAIL\n");
     EXPECT_TRUE(mInterface->wpaCliCmdSetAutoConnect(mInterface, 0) < 0);
@@ -327,12 +348,15 @@ HWTEST_F(WifiHalWpaStaTest, WpaCliCmdSetAutoConnectTest, TestSize.Level1)
 
 HWTEST_F(WifiHalWpaStaTest, WpaCliCmdWpaBlockListClearTest, TestSize.Level1)
 {
+    EXPECT_TRUE(mInterface->wpaCliCmdWpaBlockListClear(nullptr) < 0);
     EXPECT_TRUE(mInterface->wpaCliCmdWpaBlockListClear(mInterface) < 0);
 }
 
 HWTEST_F(WifiHalWpaStaTest, WpaCliCmdListNetworksTest, TestSize.Level1)
 {
+    EXPECT_TRUE(mInterface->wpaCliCmdListNetworks(nullptr, nullptr, nullptr) < 0);
     EXPECT_TRUE(mInterface->wpaCliCmdListNetworks(mInterface, nullptr, nullptr) < 0);
+    EXPECT_TRUE(mInterface->wpaCliCmdListNetworks(mInterface, nullptr, 0) < 0);
     WifiNetworkInfo a[256];
     ASSERT_TRUE(memset_s(a, sizeof(a), 0, sizeof(a)) == EOK);
     int size = 256;
@@ -361,6 +385,7 @@ HWTEST_F(WifiHalWpaStaTest, WpaCliCmdListNetworksTest, TestSize.Level1)
 
 HWTEST_F(WifiHalWpaStaTest, WpaCliCmdGetSignalInfoTest, TestSize.Level1)
 {
+    EXPECT_TRUE(mInterface->wpaCliCmdGetSignalInfo(nullptr, nullptr) < 0);
     EXPECT_TRUE(mInterface->wpaCliCmdGetSignalInfo(mInterface, nullptr) < 0);
     WpaSignalInfo info;
     ASSERT_TRUE(memset_s(&info, sizeof(info), 0, sizeof(info)) == EOK);
@@ -377,5 +402,31 @@ HWTEST_F(WifiHalWpaStaTest, WpaCliCmdGetSignalInfoTest, TestSize.Level1)
     EXPECT_TRUE(info.noise == 128);
     EXPECT_TRUE(info.frequency == 5555);
 }
+
+HWTEST_F(WifiHalWpaStaTest, WpaCliCmdScanInfoTest, TestSize.Level1)
+{
+    ScanInfo pcmd;
+    MockEraseSupportedCmd("SCAN_RESULTS");
+    EXPECT_TRUE(mInterface->WpaCliCmdScanInfo(nullptr, nullptr, nullptr) < 0);
+    EXPECT_TRUE(mInterface->WpaCliCmdScanInfo(mInterface, nullptr, nullptr) < 0);
+    EXPECT_TRUE(mInterface->WpaCliCmdScanInfo(mInterface, &pcmd, nullptr) < 0);
+    EXPECT_TRUE(mInterface->WpaCliCmdScanInfo(mInterface, &pcmd, 0) < 0);
+    MockSetWpaExpectCmdResponse("STA_AUTOCONNECT", "FAIL\n");
+    EXPECT_TRUE(mInterface->WpaCliCmdScanInfo(mInterface, &pcmd, 0) < 0);
+    MockSetWpaExpectCmdResponse("STA_AUTOCONNECT", "OK");
+    EXPECT_TRUE(mInterface->WpaCliCmdScanInfo(mInterface, &pcmd, 0) == 0);
+}
+
+HWTEST_F(WifiHalWpaStaTest, WpaCliCmdWpaSetSuspendModeTest, TestSize.Level1)
+{
+    MockEraseSupportedCmd("DRIVER SETSUSPENDMODE");
+    EXPECT_TRUE(mInterface->WpaCliCmdWpaSetSuspendMode(nullptr, 0) < 0);
+    EXPECT_TRUE(mInterface->WpaCliCmdWpaSetSuspendMode(mInterface, 0) < 0);
+    MockSetWpaExpectCmdResponse("DRIVER SETSUSPENDMODE", "FAIL\n");
+    EXPECT_TRUE(mInterface->WpaCliCmdWpaSetSuspendMode(mInterface, 0) < 0);
+    MockSetWpaExpectCmdResponse("DRIVER SETSUSPENDMODE", "OK");
+    EXPECT_TRUE(mInterface->WpaCliCmdWpaSetSuspendMode(mInterface, 0) == 0);
+}
 }  // namespace Wifi
 }  // namespace OHOS
+

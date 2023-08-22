@@ -16,10 +16,10 @@
 #include <gtest/gtest.h>
 #include "securec.h"
 #include "wifi_logger.h"
+#include "wifi_p2p.h"
 
 using ::testing::Return;
 using ::testing::ext::TestSize;
-DEFINE_WIFILOG_LABEL("WifiCP2PStubTest");
 
 namespace OHOS {
 namespace Wifi {

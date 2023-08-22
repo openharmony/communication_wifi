@@ -281,6 +281,8 @@ private:
     std::thread mCloseServiceThread;
     std::mutex mMutex;
     std::mutex screenEventMutex;
+    std::mutex airplaneModeEventMutex;
+    std::mutex locationEventMutex;
     std::condition_variable mCondition;
     std::deque<WifiCloseServiceCode> mEventQue;
     StaServiceCallback mStaCallback;

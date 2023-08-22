@@ -180,9 +180,11 @@ int WifiScanStub::OnIsWifiClosedScan(uint32_t code, MessageParcel &data, Message
 
 int WifiScanStub::OnGetScanInfoList(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
-    WIFI_LOGD("run OnGetScanInfoList code %{public}u, datasize %{public}zu", code, data.GetRawDataSize());
+    bool compatible = data.ReadBool();
+    WIFI_LOGD("run OnGetScanInfoList code %{public}u, datasize %{public}zu, compatible:%{public}d",
+        code, data.GetRawDataSize(), compatible);
     std::vector<WifiScanInfo> result;
-    ErrCode ret = GetScanInfoList(result);
+    ErrCode ret = GetScanInfoList(result, compatible);
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
     if (ret != WIFI_OPT_SUCCESS) {
@@ -243,7 +245,7 @@ int WifiScanStub::OnRegisterCallBack(uint32_t code, MessageParcel &data, Message
                 event.emplace_back(data.ReadString());
             }
         }
-        WIFI_LOGD("%{public}s, get pid: %{public}d, tokenId: %{public}d", __func__, pid, tokenId);
+        WIFI_LOGD("%{public}s, get pid: %{public}d, tokenId: %{private}d", __func__, pid, tokenId);
         
         if (mSingleCallback) {
             ret = RegisterCallBack(callback_, event);

@@ -2213,8 +2213,16 @@ void StaStateMachine::DhcpResultNotify::OnSuccess(int status, const std::string 
     LOGD("Enter Sta DhcpResultNotify::OnSuccess. ifname=[%{public}s] status=[%{public}d]\n",
         ifname.c_str(), status);
 
-    if ((pStaStateMachine->linkedInfo.detailedState == DetailedState::DISCONNECTING) ||
-        (pStaStateMachine->linkedInfo.detailedState == DetailedState::DISCONNECTED)) {
+    if ((pStaStateMachine->linkedInfo.connState != ConnState::CONNECTED) &&
+        (pStaStateMachine->linkedInfo.detailedState != DetailedState::OBTAINING_IPADDR)) {
+        WIFI_LOGI("not in connected or in obtain ip address, need stop dhcp client");
+        if (pStaStateMachine->pDhcpResultNotify != nullptr) {
+            if (pStaStateMachine->currentTpType == IPTYPE_IPV6) {
+                pStaStateMachine->pDhcpService->StopDhcpClient(IF_NAME, true);
+            } else {
+                pStaStateMachine->pDhcpService->StopDhcpClient(IF_NAME, false);
+            }
+        }
         return;
     }
     WIFI_LOGD("iptype=%{public}d, ip=%{public}s, gateway=%{public}s, \

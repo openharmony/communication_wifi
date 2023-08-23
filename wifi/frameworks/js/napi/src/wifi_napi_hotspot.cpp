@@ -28,7 +28,7 @@ std::shared_ptr<WifiHotspot> wifiHotspotPtr = WifiHotspot::GetInstance(WIFI_HOTS
 
 std::map<SecTypeJs, KeyMgmt> g_mapSecTypeToKeyMgmt = {
     {SecTypeJs::SEC_TYPE_OPEN, KeyMgmt::NONE},
-    {SecTypeJs::SEC_TYPE_PSK, KeyMgmt::WPA_PSK},
+    {SecTypeJs::SEC_TYPE_PSK, KeyMgmt::WPA2_PSK},
 };
 
 NO_SANITIZE("cfi") napi_value EnableHotspot(napi_env env, napi_callback_info info)

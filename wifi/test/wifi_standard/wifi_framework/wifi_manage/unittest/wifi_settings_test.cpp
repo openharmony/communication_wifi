@@ -1,0 +1,519 @@
+/*
+ * Copyright (C) 2023 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+#include <gtest/gtest.h>
+#include <gmock/gmock.h>
+#include <cstddef>
+#include <cstdint>
+#include "securec.h"
+#include "wifi_settings.h"
+#include "wifi_logger.h"
+
+using ::testing::_;
+using ::testing::AtLeast;
+using ::testing::DoAll;
+using ::testing::Eq;
+using ::testing::Ref;
+using ::testing::Return;
+using ::testing::SetArgReferee;
+using ::testing::StrEq;
+using ::testing::TypedEq;
+using ::testing::ext::TestSize;
+DEFINE_WIFILOG_LABEL("WifiSettingsTest");
+
+namespace OHOS {
+namespace Wifi {
+constexpr int NETWORK_ID = 15;
+constexpr int TYPE = 0;
+constexpr int SCORE = 0;
+constexpr int STATE = 0;
+constexpr int UID = 0;
+constexpr int ZERO = 0;
+constexpr int TIME = 0;
+constexpr int WIFI_OPT_SUCCESS = 0;
+constexpr int WIFI_OPT_RETURN = -1;
+constexpr int MIN_RSSI_2DOT_4GHZ = -80;
+constexpr int MIN_RSSI_5GZ = -77;
+class WifiSettingsTest : public testing::Test {
+public:
+    static void SetUpTestCase() {}
+    static void TearDownTestCase() {}
+    virtual void SetUp() {}
+    virtual void TearDown() {}
+};
+
+HWTEST_F(WifiSettingsTest, ClearScanInfoListTest, TestSize.Level1)
+{
+    WIFI_LOGE("ClearScanInfoListTest enter!");
+    int result = WifiSettings::GetInstance().ClearScanInfoList();
+    WIFI_LOGE("ClearScanInfoListTest result(%{public}d)", result);
+    EXPECT_EQ(result, WIFI_OPT_SUCCESS);
+}
+
+HWTEST_F(WifiSettingsTest, SetWifiLinkedStandardAndMaxSpeedTest, TestSize.Level1)
+{
+    WIFI_LOGE("SetWifiLinkedStandardAndMaxSpeedTest enter!");
+    WifiLinkedInfo linkInfo;
+    int result = WifiSettings::GetInstance().SetWifiLinkedStandardAndMaxSpeed(linkInfo);
+    WIFI_LOGE("SetWifiLinkedStandardAndMaxSpeedTest result(%{public}d)", result);
+    EXPECT_EQ(result, WIFI_OPT_SUCCESS);
+}
+
+HWTEST_F(WifiSettingsTest, ClearDeviceConfigTest, TestSize.Level1)
+{
+    WIFI_LOGE("ClearDeviceConfigTest enter!");
+    WifiSettings::GetInstance().ClearDeviceConfig();
+}
+
+HWTEST_F(WifiSettingsTest, GetDeviceConfig2Test, TestSize.Level1)
+{
+    WIFI_LOGE("GetDeviceConfig2Test enter!");
+    int networkId = ZERO;
+    WifiDeviceConfig config;
+    int result = WifiSettings::GetInstance().GetDeviceConfig(networkId, config);
+    WIFI_LOGE("GetDeviceConfig2Test result(%{public}d)", result);
+    EXPECT_EQ(result, WIFI_OPT_RETURN);
+}
+
+HWTEST_F(WifiSettingsTest, GetDeviceConfig3Test, TestSize.Level1)
+{
+    WIFI_LOGE("GetDeviceConfig3Test enter!");
+    std::string ssid;
+    std::string keymgmt;
+    WifiDeviceConfig config;
+    int result = WifiSettings::GetInstance().GetDeviceConfig(ssid, keymgmt, config);
+    WIFI_LOGE("GetDeviceConfig3Test result(%{public}d)", result);
+    EXPECT_EQ(result, WIFI_OPT_RETURN);
+}
+
+HWTEST_F(WifiSettingsTest, SetDeviceStateTest, TestSize.Level1)
+{
+    WIFI_LOGE("SetDeviceStateTest enter!");
+    int result = WifiSettings::GetInstance().SetDeviceState(NETWORK_ID, STATE, true);
+    WIFI_LOGE("SetDeviceStateTest result(%{public}d)", result);
+    EXPECT_EQ(result, WIFI_OPT_RETURN);
+}
+
+HWTEST_F(WifiSettingsTest, SetDeviceAfterConnectTest, TestSize.Level1)
+{
+    WIFI_LOGE("SetDeviceAfterConnectTest enter!");
+    int result = WifiSettings::GetInstance().SetDeviceAfterConnect(NETWORK_ID);
+    WIFI_LOGE("SetDeviceAfterConnectTest result(%{public}d)", result);
+    EXPECT_EQ(result, WIFI_OPT_RETURN);
+}
+
+HWTEST_F(WifiSettingsTest, GetCandidateConfigTest, TestSize.Level1)
+{
+    WIFI_LOGE("GetCandidateConfigTest enter!");
+    WifiDeviceConfig config;
+    int result = WifiSettings::GetInstance().GetCandidateConfig(UID, NETWORK_ID, config);
+    WIFI_LOGE("GetCandidateConfigTest result(%{public}d)", result);
+    EXPECT_EQ(result, WIFI_OPT_RETURN);
+}
+
+HWTEST_F(WifiSettingsTest, GetAllCandidateConfigTest, TestSize.Level1)
+{
+    WIFI_LOGE("GetAllCandidateConfigTest enter!");
+    std::vector<WifiDeviceConfig> configs;
+    int result = WifiSettings::GetInstance().GetAllCandidateConfig(UID, configs);
+    WIFI_LOGE("GetAllCandidateConfigTest result(%{public}d)", result);
+    EXPECT_EQ(result, WIFI_OPT_RETURN);
+}
+
+HWTEST_F(WifiSettingsTest, IncreaseDeviceConnFailedCountTest, TestSize.Level1)
+{
+    WIFI_LOGE("IncreaseDeviceConnFailedCountTest enter!");
+    std::string index;
+    int indexType = ZERO;
+    int count = ZERO;
+    int result = WifiSettings::GetInstance().IncreaseDeviceConnFailedCount(index, indexType, count);
+    WIFI_LOGE("IncreaseDeviceConnFailedCountTest result(%{public}d)", result);
+    EXPECT_EQ(result, WIFI_OPT_RETURN);
+}
+
+HWTEST_F(WifiSettingsTest, SetDeviceConnFailedCountTest, TestSize.Level1)
+{
+    WIFI_LOGE("SetDeviceConnFailedCountTest enter!");
+    std::string index;
+    int indexType = ZERO;
+    int count = ZERO;
+    int result = WifiSettings::GetInstance().SetDeviceConnFailedCount(index, indexType, count);
+    WIFI_LOGE("SetDeviceConnFailedCountTest result(%{public}d)", result);
+    EXPECT_EQ(result, WIFI_OPT_RETURN);
+}
+
+HWTEST_F(WifiSettingsTest, AddRandomMacTest, TestSize.Level1)
+{
+    WIFI_LOGE("AddRandomMacTest enter!");
+    WifiStoreRandomMac randomMacInfo;
+    bool result = WifiSettings::GetInstance().AddRandomMac(randomMacInfo);
+    WIFI_LOGE("AddRandomMacTest result(%{public}d)", result);
+    EXPECT_FALSE(result);
+}
+
+HWTEST_F(WifiSettingsTest, GetRandomMacTest, TestSize.Level1)
+{
+    WIFI_LOGE("GetRandomMacTest enter!");
+    WifiStoreRandomMac randomMacInfo;
+    bool result = WifiSettings::GetInstance().GetRandomMac(randomMacInfo);
+    WIFI_LOGE("GetRandomMacTest result(%{public}d)", result);
+    EXPECT_TRUE(result);
+}
+
+HWTEST_F(WifiSettingsTest, RemoveRandomMacTest, TestSize.Level1)
+{
+    WIFI_LOGE("RemoveRandomMacTest enter!");
+    std::string bssid;
+    std::string randomMac;
+    bool result = WifiSettings::GetInstance().RemoveRandomMac(bssid, randomMac);
+    WIFI_LOGE("RemoveRandomMacTest result(%{public}d)", result);
+    EXPECT_TRUE(result);
+}
+
+HWTEST_F(WifiSettingsTest, SetHotspotIdleTimeoutTest, TestSize.Level1)
+{
+    WIFI_LOGE("SetHotspotIdleTimeoutTest enter!");
+    int result = WifiSettings::GetInstance().SetHotspotIdleTimeout(TIME);
+    WIFI_LOGE("SetHotspotIdleTimeoutTest result(%{public}d)", result);
+    EXPECT_EQ(result, WIFI_OPT_SUCCESS);
+}
+
+HWTEST_F(WifiSettingsTest, GetHotspotIdleTimeoutTest, TestSize.Level1)
+{
+    WIFI_LOGE("GetHotspotIdleTimeoutTest enter!");
+    int result = WifiSettings::GetInstance().GetHotspotIdleTimeout();
+    WIFI_LOGE("GetHotspotIdleTimeoutTest result(%{public}d)", result);
+    EXPECT_EQ(result, WIFI_OPT_SUCCESS);
+}
+
+HWTEST_F(WifiSettingsTest, FindConnStationTest, TestSize.Level1)
+{
+    WIFI_LOGE("FindConnStationTest enter!");
+    StationInfo info;
+    int id = ZERO;
+    int result = WifiSettings::GetInstance().FindConnStation(info, id);
+    WIFI_LOGE("FindConnStationTest result(%{public}d)", result);
+    EXPECT_EQ(result, WIFI_OPT_RETURN);
+}
+
+HWTEST_F(WifiSettingsTest, SetPowerModelTest, TestSize.Level1)
+{
+    WIFI_LOGE("SetPowerModelTest enter!");
+    int id = ZERO;
+    int result = WifiSettings::GetInstance().SetPowerModel(PowerModel::GENERAL, id);
+    WIFI_LOGE("SetPowerModelTest result(%{public}d)", result);
+    EXPECT_EQ(result, WIFI_OPT_SUCCESS);
+}
+
+HWTEST_F(WifiSettingsTest, GetPowerModelTest, TestSize.Level1)
+{
+    WIFI_LOGE("GetPowerModelTest enter!");
+    PowerModel model;
+    int result = WifiSettings::GetInstance().GetPowerModel(model, ZERO);
+    WIFI_LOGE("GetPowerModelTest result(%{public}d)", result);
+    EXPECT_EQ(result, WIFI_OPT_SUCCESS);
+}
+
+HWTEST_F(WifiSettingsTest, SetP2pConnectedStateTest, TestSize.Level1)
+{
+    WIFI_LOGE("SetP2pConnectedStateTest enter!");
+    int result = WifiSettings::GetInstance().SetP2pConnectedState(STATE);
+    WIFI_LOGE("SetP2pConnectedStateTest result(%{public}d)", result);
+    EXPECT_EQ(result, WIFI_OPT_SUCCESS);
+}
+
+HWTEST_F(WifiSettingsTest, UpdateLinkedChannelWidthTest, TestSize.Level1)
+{
+    WIFI_LOGE("UpdateLinkedChannelWidthTest enter!");
+    std::string bssid;
+    WifiSettings::GetInstance().UpdateLinkedChannelWidth(bssid, WifiChannelWidth::WIDTH_80MHZ);
+}
+
+HWTEST_F(WifiSettingsTest, GetUserLastSelectedNetworkTimeValTest, TestSize.Level1)
+{
+    WIFI_LOGE("GetUserLastSelectedNetworkTimeValTest enter!");
+    WifiSettings::GetInstance().GetUserLastSelectedNetworkTimeVal();
+}
+
+HWTEST_F(WifiSettingsTest, GetOperatorWifiTypeTest, TestSize.Level1)
+{
+    WIFI_LOGE("GetOperatorWifiTypeTest enter!");
+    int result = WifiSettings::GetInstance().GetOperatorWifiType();
+    WIFI_LOGE("GetOperatorWifiTypeTest result(%{public}d)", result);
+    EXPECT_EQ(result, WIFI_OPT_SUCCESS);
+}
+
+HWTEST_F(WifiSettingsTest, SetOperatorWifiTypeTest, TestSize.Level1)
+{
+    WIFI_LOGE("SetOperatorWifiTypeTest enter!");
+    int result = WifiSettings::GetInstance().SetOperatorWifiType(TYPE);
+    WIFI_LOGE("SetOperatorWifiTypeTest result(%{public}d)", result);
+    EXPECT_EQ(result, WIFI_OPT_SUCCESS);
+}
+
+HWTEST_F(WifiSettingsTest, GetDefaultWifiInterfaceTest, TestSize.Level1)
+{
+    WIFI_LOGE("GetDefaultWifiInterfaceTest enter!");
+    WifiSettings::GetInstance().GetDefaultWifiInterface();
+}
+
+HWTEST_F(WifiSettingsTest, SetWhetherToAllowNetworkSwitchoverTest, TestSize.Level1)
+{
+    WIFI_LOGE("SetWhetherToAllowNetworkSwitchoverTest enter!");
+    int result = WifiSettings::GetInstance().SetWhetherToAllowNetworkSwitchover(true);
+    WIFI_LOGE("SetWhetherToAllowNetworkSwitchoverTest result(%{public}d)", result);
+    EXPECT_EQ(result, WIFI_OPT_SUCCESS);
+}
+
+HWTEST_F(WifiSettingsTest, GetWhetherToAllowNetworkSwitchoverTest, TestSize.Level1)
+{
+    WIFI_LOGE("GetWhetherToAllowNetworkSwitchoverTest enter!");
+    bool result = WifiSettings::GetInstance().GetWhetherToAllowNetworkSwitchover();
+    WIFI_LOGE("GetWhetherToAllowNetworkSwitchoverTest result(%{public}d)", result);
+    EXPECT_TRUE(result);
+}
+
+HWTEST_F(WifiSettingsTest, SetScoretacticsInitScoreTest, TestSize.Level1)
+{
+    WIFI_LOGE("SetScoretacticsInitScoreTest enter!");
+    int result = WifiSettings::GetInstance().SetScoretacticsInitScore(SCORE);
+    WIFI_LOGE("SetScoretacticsInitScoreTest result(%{public}d)", result);
+    EXPECT_EQ(result, WIFI_OPT_SUCCESS);
+}
+
+HWTEST_F(WifiSettingsTest, GetScoretacticsInitScoreTest, TestSize.Level1)
+{
+    WIFI_LOGE("GetScoretacticsInitScoreTest enter!");
+    int result = WifiSettings::GetInstance().GetScoretacticsInitScore();
+    WIFI_LOGE("GetScoretacticsInitScoreTest result(%{public}d)", result);
+    EXPECT_EQ(result, WIFI_OPT_SUCCESS);
+}
+
+HWTEST_F(WifiSettingsTest, SetScoretacticsNormalScoreTest, TestSize.Level1)
+{
+    WIFI_LOGE("SetScoretacticsNormalScoreTest enter!");
+    int result = WifiSettings::GetInstance().SetScoretacticsNormalScore(SCORE);
+    WIFI_LOGE("SetScoretacticsNormalScoreTest result(%{public}d)", result);
+    EXPECT_EQ(result, WIFI_OPT_SUCCESS);
+}
+
+HWTEST_F(WifiSettingsTest, GetScoretacticsNormalScoreTest, TestSize.Level1)
+{
+    WIFI_LOGE("GetScoretacticsNormalScoreTest enter!");
+    int result = WifiSettings::GetInstance().GetScoretacticsNormalScore();
+    WIFI_LOGE("GetScoretacticsNormalScoreTest result(%{public}d)", result);
+    EXPECT_EQ(result, WIFI_OPT_SUCCESS);
+}
+
+HWTEST_F(WifiSettingsTest, IsModulePreLoadTest, TestSize.Level1)
+{
+    WIFI_LOGE("IsModulePreLoadTest enter!");
+    bool result = WifiSettings::GetInstance().IsModulePreLoad("StaService");
+    WIFI_LOGE("IsModulePreLoadTest result(%{public}d)", result);
+    EXPECT_FALSE(result);
+}
+
+HWTEST_F(WifiSettingsTest, GetSupportHwPnoFlagTest, TestSize.Level1)
+{
+    WIFI_LOGE("GetSupportHwPnoFlagTest enter!");
+    bool result = WifiSettings::GetInstance().GetSupportHwPnoFlag();
+    WIFI_LOGE("GetSupportHwPnoFlagTest result(%{public}d)", result);
+    EXPECT_TRUE(result);
+}
+
+HWTEST_F(WifiSettingsTest, GetMinRssi2Dot4GhzTest, TestSize.Level1)
+{
+    WIFI_LOGE("GetMinRssi2Dot4GhzTest enter!");
+    int result = WifiSettings::GetInstance().GetMinRssi2Dot4Ghz();
+    WIFI_LOGE("GetMinRssi2Dot4GhzTest result(%{public}d)", result);
+    EXPECT_EQ(result, MIN_RSSI_2DOT_4GHZ);
+}
+
+HWTEST_F(WifiSettingsTest, GetMinRssi5GhzTest, TestSize.Level1)
+{
+    WIFI_LOGE("GetMinRssi5GhzTest enter!");
+    int result = WifiSettings::GetInstance().GetMinRssi5Ghz();
+    WIFI_LOGE("GetMinRssi5GhzTest result(%{public}d)", result);
+    EXPECT_EQ(result, MIN_RSSI_5GZ);
+}
+
+HWTEST_F(WifiSettingsTest, GetStrDnsBakTest, TestSize.Level1)
+{
+    WIFI_LOGE("GetStrDnsBakTest enter!");
+    WifiSettings::GetInstance().GetStrDnsBak();
+}
+ 
+HWTEST_F(WifiSettingsTest, IsLoadStabakTest, TestSize.Level1)
+{
+    WIFI_LOGE("IsLoadStabakTest enter!");
+    bool result = WifiSettings::GetInstance().IsLoadStabak();
+    WIFI_LOGE("IsLoadStabakTest result(%{public}d)", result);
+    EXPECT_TRUE(result);
+}
+
+HWTEST_F(WifiSettingsTest, SetRealMacAddressTest, TestSize.Level1)
+{
+    WIFI_LOGE("SetRealMacAddressTest enter!");
+    std::string macAddress;
+    int result = WifiSettings::GetInstance().SetRealMacAddress(macAddress);
+    WIFI_LOGE("SetRealMacAddressTest result(%{public}d)", result);
+    EXPECT_EQ(result, WIFI_OPT_SUCCESS);
+}
+
+HWTEST_F(WifiSettingsTest, GetRealMacAddressTest, TestSize.Level1)
+{
+    WIFI_LOGE("GetRealMacAddressTest enter!");
+    std::string macAddress;
+    int result = WifiSettings::GetInstance().GetRealMacAddress(macAddress);
+    WIFI_LOGE("GetRealMacAddressTest result(%{public}d)", result);
+    EXPECT_EQ(result, WIFI_OPT_SUCCESS);
+}
+
+HWTEST_F(WifiSettingsTest, GetConnectTimeoutBssidTest, TestSize.Level1)
+{
+    WIFI_LOGE("GetConnectTimeoutBssidTest enter!");
+    WifiSettings::GetInstance().GetConnectTimeoutBssid();
+}
+
+HWTEST_F(WifiSettingsTest, SetConnectTimeoutBssidTest, TestSize.Level1)
+{
+    WIFI_LOGE("SetConnectTimeoutBssidTest enter!");
+    std::string bssid;
+    int result = WifiSettings::GetInstance().SetConnectTimeoutBssid(bssid);
+    WIFI_LOGE("SetConnectTimeoutBssidTest result(%{public}d)", result);
+    EXPECT_EQ(result, WIFI_OPT_SUCCESS);
+}
+
+HWTEST_F(WifiSettingsTest, SetDefaultFrequenciesByCountryBandTest, TestSize.Level1)
+{
+    WIFI_LOGE("SetDefaultFrequenciesByCountryBandTest enter!");
+    std::vector<int> frequencies;
+    WifiSettings::GetInstance().SetDefaultFrequenciesByCountryBand(BandType::BAND_2GHZ, frequencies);
+}
+
+HWTEST_F(WifiSettingsTest, SetThermalLevelTest, TestSize.Level1)
+{
+    WIFI_LOGE("SetThermalLevelTest enter!");
+    WifiSettings::GetInstance().SetThermalLevel(ZERO);
+}
+
+HWTEST_F(WifiSettingsTest, GetThermalLevelTest, TestSize.Level1)
+{
+    WIFI_LOGE("GetThermalLevelTest enter!");
+    int result = WifiSettings::GetInstance().GetThermalLevel();
+    WIFI_LOGE("GetThermalLevelTest result(%{public}d)", result);
+    EXPECT_EQ(result, WIFI_OPT_SUCCESS);
+}
+
+HWTEST_F(WifiSettingsTest, GetThreadStatusFlagTest, TestSize.Level1)
+{
+    WIFI_LOGE("GetThreadStatusFlagTest enter!");
+    bool result = WifiSettings::GetInstance().GetThreadStatusFlag();
+    WIFI_LOGE("GetThreadStatusFlagTest result(%{public}d)", result);
+    EXPECT_FALSE(result);
+}
+
+HWTEST_F(WifiSettingsTest, GetThreadStartTimeTest, TestSize.Level1)
+{
+    WIFI_LOGE("GetThreadStartTimeTest enter!");
+    WifiSettings::GetInstance().GetThreadStartTime();
+}
+
+HWTEST_F(WifiSettingsTest, GetDisconnectedReasonTest, TestSize.Level1)
+{
+    WIFI_LOGE("GetDisconnectedReasonTest enter!");
+    DisconnectedReason discReason;
+    int result = WifiSettings::GetInstance().GetDisconnectedReason(discReason);
+    WIFI_LOGE("GetDisconnectedReasonTest result(%{public}d)", result);
+    EXPECT_EQ(result, WIFI_OPT_SUCCESS);
+}
+
+HWTEST_F(WifiSettingsTest, SetScanOnlySwitchStateTest, TestSize.Level1)
+{
+    WIFI_LOGE("SetScanOnlySwitchStateTest enter!");
+    WifiSettings::GetInstance().SetScanOnlySwitchState(STATE);
+}
+
+HWTEST_F(WifiSettingsTest, GetScanOnlySwitchStateTest, TestSize.Level1)
+{
+    WIFI_LOGE("GetScanOnlySwitchStateTest enter!");
+    int result = WifiSettings::GetInstance().GetScanOnlySwitchState();
+    WIFI_LOGE("GetScanOnlySwitchStateTest result(%{public}d)", result);
+    EXPECT_EQ(result, WIFI_OPT_SUCCESS);
+}
+
+HWTEST_F(WifiSettingsTest, CheckScanOnlyAvailableTest, TestSize.Level1)
+{
+    WIFI_LOGE("CheckScanOnlyAvailableTest enter!");
+    bool result = WifiSettings::GetInstance().CheckScanOnlyAvailable();
+    WIFI_LOGE("CheckScanOnlyAvailableTest result(%{public}d)", result);
+    EXPECT_FALSE(result);
+}
+
+HWTEST_F(WifiSettingsTest, GetStaApExclusionTypeTest, TestSize.Level1)
+{
+    WIFI_LOGE("GetStaApExclusionTypeTest enter!");
+    int result = WifiSettings::GetInstance().GetStaApExclusionType();
+    WIFI_LOGE("GetStaApExclusionTypeTest result(%{public}d)", result);
+    EXPECT_EQ(result, WIFI_OPT_SUCCESS);
+}
+
+HWTEST_F(WifiSettingsTest, SetStaApExclusionTypeTest, TestSize.Level1)
+{
+    WIFI_LOGE("SetStaApExclusionTypeTest enter!");
+    int result = WifiSettings::GetInstance().SetStaApExclusionType(TYPE);
+    WIFI_LOGE("SetStaApExclusionTypeTest result(%{public}d)", result);
+    EXPECT_EQ(result, WIFI_OPT_SUCCESS);
+}
+
+HWTEST_F(WifiSettingsTest, StoreWifiMacAddrPairInfoTest, TestSize.Level1)
+{
+    WIFI_LOGE("StoreWifiMacAddrPairInfoTest enter!");
+    std::string realMacAddr;
+    bool result = WifiSettings::GetInstance().StoreWifiMacAddrPairInfo(WifiMacAddrInfoType::WIFI_SCANINFO_MACADDR_INFO,
+        realMacAddr);
+    WIFI_LOGE("StoreWifiMacAddrPairInfoTest result(%{public}d)", result);
+    EXPECT_FALSE(result);
+}
+
+HWTEST_F(WifiSettingsTest, RemoveMacAddrPairsTest, TestSize.Level1)
+{
+    WIFI_LOGE("RemoveMacAddrPairsTest enter!");
+    WifiMacAddrInfo macAddrInfo;
+    int result = WifiSettings::GetInstance().RemoveMacAddrPairs(WifiMacAddrInfoType::WIFI_SCANINFO_MACADDR_INFO,
+        macAddrInfo);
+    WIFI_LOGE("RemoveMacAddrPairsTest result(%{public}d)", result);
+    EXPECT_EQ(result, WIFI_OPT_SUCCESS);
+}
+
+HWTEST_F(WifiSettingsTest, GetMacAddrPairsTest, TestSize.Level1)
+{
+    WIFI_LOGE("GetMacAddrPairsTest enter!");
+    WifiMacAddrInfo macAddrInfo;
+    WifiSettings::GetInstance().GetMacAddrPairs(WifiMacAddrInfoType::WIFI_SCANINFO_MACADDR_INFO, macAddrInfo);
+}
+
+HWTEST_F(WifiSettingsTest, PrintMacAddrPairsTest, TestSize.Level1)
+{
+    WIFI_LOGE("PrintMacAddrPairsTest enter!");
+    WifiSettings::GetInstance().PrintMacAddrPairs(WifiMacAddrInfoType::WIFI_SCANINFO_MACADDR_INFO);
+}
+
+HWTEST_F(WifiSettingsTest, ClearMacAddrPairsTest, TestSize.Level1)
+{
+    WIFI_LOGE("ClearMacAddrPairsTest enter!");
+    WifiSettings::GetInstance().ClearMacAddrPairs(WifiMacAddrInfoType::WIFI_SCANINFO_MACADDR_INFO);
+}
+}  // namespace Wifi
+}  // namespace OHOS

@@ -58,7 +58,7 @@ NO_SANITIZE("cfi") WifiErrorCode IsHotspotDualBandSupported(bool &isSupported)
 /* Others type is not support for AP */
 static std::map<WifiSecurityType, OHOS::Wifi::KeyMgmt> g_mapSecTypeToKeyMgmt = {
     {WifiSecurityType::WIFI_SEC_TYPE_OPEN, OHOS::Wifi::KeyMgmt::NONE},
-    {WifiSecurityType::WIFI_SEC_TYPE_PSK, OHOS::Wifi::KeyMgmt::WPA_PSK},
+    {WifiSecurityType::WIFI_SEC_TYPE_PSK, OHOS::Wifi::KeyMgmt::WPA2_PSK},
 };
 
 static OHOS::Wifi::KeyMgmt GetKeyMgmtFromSecurityType(int secType)

@@ -155,14 +155,14 @@ std::vector<uint8_t> JsObjectToU8Vector(const napi_env& env, const napi_value& o
 {
     bool hasProperty = false;
     NAPI_CALL_BASE(env, napi_has_named_property(env, object, fieldStr, &hasProperty), {});
-    napi_value fielValue;
-    if (!hasProperty || napi_get_named_property(env, object, fieldStr, &fielValue) != napi_ok) {
+    napi_value fieldValue;
+    if (!hasProperty || napi_get_named_property(env, object, fieldStr, &fieldValue) != napi_ok) {
         WIFI_LOGW("JsObjectToU8Vector, Js to U8Vector no property: %{public}s", fieldStr);
         return {};
     }
 
     bool isTypedArray = false;
-    if (napi_is_typedarray(env, fielValue, &isTypedArray) != napi_ok || !isTypedArray) {
+    if (napi_is_typedarray(env, fieldValue, &isTypedArray) != napi_ok || !isTypedArray) {
         WIFI_LOGW("JsObjectToU8Vector, property is not typedarray: %{public}s", fieldStr);
         return {};
     }
@@ -171,7 +171,7 @@ std::vector<uint8_t> JsObjectToU8Vector(const napi_env& env, const napi_value& o
     size_t offset = 0;
     napi_typedarray_type type;
     napi_value buffer = nullptr;
-    NAPI_CALL_BASE(env, napi_get_typedarray_info(env, fielValue, &type, &length, nullptr, &buffer, &offset), {});
+    NAPI_CALL_BASE(env, napi_get_typedarray_info(env, fieldValue, &type, &length, nullptr, &buffer, &offset), {});
     if (type != napi_uint8_array || buffer == nullptr) {
         WIFI_LOGW("JsObjectToU8Vector, %{public}s, buffer is nullptr: %{public}d",
             fieldStr, (int)(buffer == nullptr));

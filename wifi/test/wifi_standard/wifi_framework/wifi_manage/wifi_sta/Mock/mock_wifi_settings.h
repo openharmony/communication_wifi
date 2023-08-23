@@ -79,6 +79,7 @@ public:
     virtual int SetRealMacAddress(const std::string &macAddress) = 0;
     virtual int GetRealMacAddress(std::string &macAddress) = 0;
     virtual int GetScoretacticsNormalScore() = 0;
+    virtual int SetWifiLinkedStandardAndMaxSpeed(WifiLinkedInfo &linkInfo) = 0;
 };
 
 class WifiSettings : public MockWifiSettings {
@@ -140,6 +141,7 @@ public:
     MOCK_METHOD1(SetRealMacAddress, int(const std::string &macAddress));
     MOCK_METHOD1(GetRealMacAddress, int(std::string &macAddress));
     MOCK_METHOD0(GetScoretacticsNormalScore, int());
+    MOCK_METHOD1(SetWifiLinkedStandardAndMaxSpeed, int(WifiLinkedInfo &linkInfo));
 };
 }  // namespace OHOS
 }  // namespace Wifi

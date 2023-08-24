@@ -229,7 +229,6 @@ struct InterScanInfo {
 struct WifiCallingInfo {
     int callingUid;
     int callingPid;
-    int callingTokenId;
     std::unordered_set<int> regCallBackEventId;
 };
 

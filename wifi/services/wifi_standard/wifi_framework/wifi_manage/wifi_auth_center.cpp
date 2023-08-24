@@ -166,14 +166,6 @@ int WifiAuthCenter::VerifyGetWifiPeersMacPermission(const int &pid, const int &u
     return WifiPermissionHelper::VerifyGetWifiPeersMacPermission(pid, uid);
 }
 
-int WifiAuthCenter::VerifyGetWifiPeersMacPermissionEx(const int &pid, const int &uid, const int &tokenId)
-{
-    if (g_permissinAlwaysGrant) {
-        return PERMISSION_GRANTED;
-    }
-    return WifiPermissionHelper::VerifyGetWifiPeersMacPermissionEx(pid, uid, tokenId);
-}
-
 int WifiAuthCenter::VerifyGetWifiInfoInternalPermission(const int &pid, const int &uid)
 {
     if (g_permissinAlwaysGrant) {

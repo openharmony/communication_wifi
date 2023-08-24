@@ -283,11 +283,6 @@ int GetCallingUid()
     return IPCSkeleton::GetCallingUid();
 }
 
-int GetCallingTokenId()
-{
-    return IPCSkeleton::GetCallingTokenID();
-}
-
 bool IsForegroundApp(const int uid)
 {
     using namespace OHOS::AppExecFwk;

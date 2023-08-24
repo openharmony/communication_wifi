@@ -228,7 +228,7 @@ ErrCode WifiP2pService::GetP2pConnectedStatus(int &status)
 ErrCode WifiP2pService::QueryP2pDevices(std::vector<WifiP2pDevice> &devices)
 {
     int size = deviceManager.GetDevicesList(devices);
-    WIFI_LOGI("QueryP2pDevices, size:%{public}d", size);
+    WIFI_LOGI("QueryP2pDevices, size:%{}d", size);
     return ErrCode::WIFI_OPT_SUCCESS;
 }
 

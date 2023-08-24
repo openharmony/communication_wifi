@@ -76,7 +76,7 @@ int WifiPermissionUtils::VerifyGetWifiInfoInternalPermission()
     return PERMISSION_GRANTED;
 }
 
-int WifiPermissionUtils::VerifyGetWifiPeersMacPermissionEx(const int &pid, const int &uid, const int &tokenId)
+int WifiPermissionUtils::VerifyGetWifiPeersMacPermission(const int &pid, const int &uid)
 {
     return PERMISSION_GRANTED;
 }
@@ -146,9 +146,9 @@ int WifiPermissionUtils::VerifyGetWifiPeersMacPermission()
         IPCSkeleton::GetCallingPid(), IPCSkeleton::GetCallingUid());
 }
 
-int WifiPermissionUtils::VerifyGetWifiPeersMacPermissionEx(const int &pid, const int &uid, const int &tokenId)
+int WifiPermissionUtils::VerifyGetWifiPeersMacPermission(const int &pid, const int &uid)
 {
-    return WifiAuthCenter::GetInstance().VerifyGetWifiPeersMacPermissionEx(pid, uid, tokenId);
+    return WifiAuthCenter::GetInstance().VerifyGetWifiPeersMacPermission(pid, uid);
 }
 
 int WifiPermissionUtils::VerifyGetWifiInfoInternalPermission()

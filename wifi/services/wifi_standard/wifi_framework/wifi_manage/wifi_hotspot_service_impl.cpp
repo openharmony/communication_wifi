@@ -270,7 +270,7 @@ ErrCode WifiHotspotServiceImpl::GetStationList(std::vector<StationInfo> &result)
     ErrCode errCode = pService->GetStationList(result);
 #ifdef SUPPORT_RANDOM_MAC_ADDR
     if (WifiPermissionUtils::VerifyGetWifiPeersMacPermission() == PERMISSION_DENIED) {
-        WIFI_LOGI("%{public}s: GET_WIFI_PEERS_MAC PERMISSION_DENIED", __func__);
+        WIFI_LOGI("GetStationList: GET_WIFI_PEERS_MAC PERMISSION_DENIED");
         for (auto iter = result.begin(); iter != result.end(); ++iter) {
             WifiMacAddrInfo macAddrInfo;
             macAddrInfo.bssid = iter->bssid;
@@ -281,8 +281,8 @@ ErrCode WifiHotspotServiceImpl::GetStationList(std::vector<StationInfo> &result)
                 (macAddrInfo.bssidType == REAL_DEVICE_ADDRESS)) {
                 iter->bssid = randomMacAddr;
                 iter->bssidType = RANDOM_DEVICE_ADDRESS;
-                WIFI_LOGI("%{public}s: the record is updated, bssid:%{private}s, bssidType:%{public}d",
-                    __func__, iter->bssid.c_str(), iter->bssidType);
+                WIFI_LOGI("the record is updated, bssid:%{private}s, bssidType:%{public}d",
+                    iter->bssid.c_str(), iter->bssidType);
             }
         }
     }

@@ -178,7 +178,7 @@ HWTEST_F(WifiPermissionHelperTest, VerifyPermission001, TestSize.Level1)
 {
     WIFI_LOGI("VerifyPermission001 enter");
     std::string permissionName = "ohos.permission.GET_WIFI_INFO";
-    EXPECT_TRUE(pWifiPermissionHelper->VerifyPermission(permissionName, pid, uid) == PERMISSION_DENIED);
+    EXPECT_TRUE(pWifiPermissionHelper->VerifyPermission(permissionName, pid, uid, 0) == PERMISSION_DENIED);
 }
 /**
  * @tc.name: VerifyAllPermission001

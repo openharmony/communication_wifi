@@ -158,44 +158,55 @@ IsGranted WifiPermissionHelper::MockVerifyPermission(const std::string &permissi
     return PERMISSION_GRANTED;
 }
 
-int WifiPermissionHelper::VerifyPermission(const std::string &permissionName, const int &pid, const int &uid)
+int WifiPermissionHelper::VerifyPermission(const std::string &permissionName, const int &pid,
+    const int &uid, const int &tokenId)
 {
 #ifdef OHOS_ARCH_LITE
     return PERMISSION_GRANTED;
 #else
-    auto callerToken = IPCSkeleton::GetCallingTokenID();
+    Security::AccessToken::AccessTokenID callerToken = 0;
+    if (tokenId == 0) {
+        callerToken = IPCSkeleton::GetCallingTokenID();
+    } else {
+        callerToken = (Security::AccessToken::AccessTokenID)tokenId;
+    }
     auto tokenType = Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(callerToken);
     if (tokenType == Security::AccessToken::ATokenTypeEnum::TOKEN_NATIVE) {
+        LOGI("callerToken=0x%{public}x has permission_name=%{public}s, pid=0x%{public}x, type=%{public}d",
+            callerToken, permissionName.c_str(), pid, tokenType);
         return PERMISSION_GRANTED;
     }
 
     if (tokenType == Security::AccessToken::ATokenTypeEnum::TOKEN_HAP) {
         int result = Security::AccessToken::AccessTokenKit::VerifyAccessToken(callerToken, permissionName);
         if (result == Security::AccessToken::PermissionState::PERMISSION_GRANTED) {
+            LOGI("callerToken=0x%{public}x has permission_name=%{public}s, pid=0x%{public}x, type=%{public}d",
+                callerToken, permissionName.c_str(), pid, tokenType);
             return PERMISSION_GRANTED;
         }
  
-        LOGI("callerToken=0x%{public}x has no permission_name=%{public}s", pid, permissionName.c_str());
+        LOGI("callerToken=0x%{public}x has no permission_name=%{public}s, pid=0x%{public}x, type=%{public}d",
+            callerToken, permissionName.c_str(), pid, tokenType);
         return PERMISSION_DENIED;
     }
 
-    LOGE("callerToken=0x%{public}x has invalid token type=%{public}d", pid, tokenType);
+    LOGE("callerToken=0x%{public}x has invalid token, pid=0x%{public}x, type=%{public}d",
+        callerToken, pid, tokenType);
     return PERMISSION_DENIED;
 #endif
 }
 
 int WifiPermissionHelper::VerifySetWifiInfoPermission(const int &pid, const int &uid)
 {
-    if (VerifyPermission("ohos.permission.SET_WIFI_INFO", pid, uid) == PERMISSION_DENIED) {
+    if (VerifyPermission("ohos.permission.SET_WIFI_INFO", pid, uid, 0) == PERMISSION_DENIED) {
         return PERMISSION_DENIED;
     }
-
     return PERMISSION_GRANTED;
 }
 
 int WifiPermissionHelper::VerifyGetWifiInfoPermission(const int &pid, const int &uid)
 {
-    if (VerifyPermission("ohos.permission.GET_WIFI_INFO", pid, uid) == PERMISSION_DENIED) {
+    if (VerifyPermission("ohos.permission.GET_WIFI_INFO", pid, uid, 0) == PERMISSION_DENIED) {
         return PERMISSION_DENIED;
     }
     return PERMISSION_GRANTED;
@@ -203,7 +214,7 @@ int WifiPermissionHelper::VerifyGetWifiInfoPermission(const int &pid, const int 
 
 int WifiPermissionHelper::VerifySetWifiConfigPermission(const int &pid, const int &uid)
 {
-    if (VerifyPermission("ohos.permission.SET_WIFI_CONFIG", pid, uid) == PERMISSION_DENIED) {
+    if (VerifyPermission("ohos.permission.SET_WIFI_CONFIG", pid, uid, 0) == PERMISSION_DENIED) {
         return PERMISSION_DENIED;
     }
     return PERMISSION_GRANTED;
@@ -211,7 +222,7 @@ int WifiPermissionHelper::VerifySetWifiConfigPermission(const int &pid, const in
 
 int WifiPermissionHelper::VerifyGetWifiConfigPermission(const int &pid, const int &uid)
 {
-    if (VerifyPermission("ohos.permission.GET_WIFI_CONFIG", pid, uid) == PERMISSION_DENIED) {
+    if (VerifyPermission("ohos.permission.GET_WIFI_CONFIG", pid, uid, 0) == PERMISSION_DENIED) {
         return PERMISSION_DENIED;
     }
     return PERMISSION_GRANTED;
@@ -219,7 +230,7 @@ int WifiPermissionHelper::VerifyGetWifiConfigPermission(const int &pid, const in
 
 int WifiPermissionHelper::VerifyGetScanInfosPermission(const int &pid, const int &uid)
 {
-    if (VerifyPermission("ohos.permission.LOCATION", pid, uid) == PERMISSION_DENIED) {
+    if (VerifyPermission("ohos.permission.LOCATION", pid, uid, 0) == PERMISSION_DENIED) {
         return PERMISSION_DENIED;
     }
     return PERMISSION_GRANTED;
@@ -227,7 +238,7 @@ int WifiPermissionHelper::VerifyGetScanInfosPermission(const int &pid, const int
 
 int WifiPermissionHelper::VerifyGetWifiLocalMacPermission(const int &pid, const int &uid)
 {
-    if (VerifyPermission("ohos.permission.GET_WIFI_LOCAL_MAC", pid, uid) == PERMISSION_DENIED) {
+    if (VerifyPermission("ohos.permission.GET_WIFI_LOCAL_MAC", pid, uid, 0) == PERMISSION_DENIED) {
         return PERMISSION_DENIED;
     }
     return PERMISSION_GRANTED;
@@ -235,7 +246,7 @@ int WifiPermissionHelper::VerifyGetWifiLocalMacPermission(const int &pid, const 
 
 int WifiPermissionHelper::VerifyWifiConnectionPermission(const int &pid, const int &uid)
 {
-    if (VerifyPermission("ohos.permission.MANAGE_WIFI_CONNECTION", pid, uid) == PERMISSION_DENIED) {
+    if (VerifyPermission("ohos.permission.MANAGE_WIFI_CONNECTION", pid, uid, 0) == PERMISSION_DENIED) {
         return PERMISSION_DENIED;
     }
     return PERMISSION_GRANTED;
@@ -243,7 +254,7 @@ int WifiPermissionHelper::VerifyWifiConnectionPermission(const int &pid, const i
 
 int WifiPermissionHelper::VerifyGetWifiDirectDevicePermission(const int &pid, const int &uid)
 {
-    if (VerifyPermission("ohos.permission.LOCATION", pid, uid) == PERMISSION_DENIED) {
+    if (VerifyPermission("ohos.permission.LOCATION", pid, uid, 0) == PERMISSION_DENIED) {
         return PERMISSION_DENIED;
     }
     return PERMISSION_GRANTED;
@@ -251,7 +262,7 @@ int WifiPermissionHelper::VerifyGetWifiDirectDevicePermission(const int &pid, co
 
 int WifiPermissionHelper::VerifyManageWifiHotspotPermission(const int &pid, const int &uid)
 {
-    if (VerifyPermission("ohos.permission.MANAGE_WIFI_HOTSPOT", pid, uid) == PERMISSION_DENIED) {
+    if (VerifyPermission("ohos.permission.MANAGE_WIFI_HOTSPOT", pid, uid, 0) == PERMISSION_DENIED) {
         return PERMISSION_DENIED;
     }
     return PERMISSION_GRANTED;
@@ -259,7 +270,15 @@ int WifiPermissionHelper::VerifyManageWifiHotspotPermission(const int &pid, cons
 
 int WifiPermissionHelper::VerifyGetWifiPeersMacPermission(const int &pid, const int &uid)
 {
-    if (VerifyPermission("ohos.permission.GET_WIFI_PEERS_MAC", pid, uid) == PERMISSION_DENIED) {
+    if (VerifyPermission("ohos.permission.GET_WIFI_PEERS_MAC", pid, uid, 0) == PERMISSION_DENIED) {
+        return PERMISSION_DENIED;
+    }
+    return PERMISSION_GRANTED;
+}
+
+int WifiPermissionHelper::VerifyGetWifiPeersMacPermissionEx(const int &pid, const int &uid, const int &tokenId)
+{
+    if (VerifyPermission("ohos.permission.GET_WIFI_PEERS_MAC", pid, uid, tokenId) == PERMISSION_DENIED) {
         return PERMISSION_DENIED;
     }
     return PERMISSION_GRANTED;
@@ -267,7 +286,7 @@ int WifiPermissionHelper::VerifyGetWifiPeersMacPermission(const int &pid, const 
 
 int WifiPermissionHelper::VerifyGetWifiInfoInternalPermission(const int &pid, const int &uid)
 {
-    if (VerifyPermission("ohos.permission.GET_WIFI_INFO_INTERNAL", pid, uid) == PERMISSION_DENIED) {
+    if (VerifyPermission("ohos.permission.GET_WIFI_INFO_INTERNAL", pid, uid, 0) == PERMISSION_DENIED) {
         return PERMISSION_DENIED;
     }
     return PERMISSION_GRANTED;
@@ -275,7 +294,7 @@ int WifiPermissionHelper::VerifyGetWifiInfoInternalPermission(const int &pid, co
 
 int WifiPermissionHelper::VerifyManageWifiHotspotExtPermission(const int &pid, const int &uid)
 {
-    if (VerifyPermission("ohos.permission.MANAGE_WIFI_HOTSPOT_EXT", pid, uid) == PERMISSION_DENIED) {
+    if (VerifyPermission("ohos.permission.MANAGE_WIFI_HOTSPOT_EXT", pid, uid, 0) == PERMISSION_DENIED) {
         return PERMISSION_DENIED;
     }
     return PERMISSION_GRANTED;

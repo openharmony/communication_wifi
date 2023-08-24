@@ -33,7 +33,7 @@ public:
     static int VerifyManageWifiHotspotPermission();
     static int VerifyGetWifiPeersMacPermission();
     static int VerifyGetWifiInfoInternalPermission();
-    static int VerifyGetWifiPeersMacPermission(const int &pid, const int &uid);
+    static int VerifyGetWifiPeersMacPermissionEx(const int &pid, const int &uid, const int &tokenId);
     static int VerifyManageWifiHotspotExtPermission();
 };
 }  // namespace Wifi

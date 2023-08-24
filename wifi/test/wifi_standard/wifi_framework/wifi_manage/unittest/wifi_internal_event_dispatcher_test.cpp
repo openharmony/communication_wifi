@@ -82,7 +82,7 @@ HWTEST_F(WifiInternalEventDispatcherTest, AddStaCallbackFail, TestSize.Level1)
     sptr<IWifiDeviceCallBack> callback;
     int pid = 0;
     EXPECT_EQ(3, WifiInternalEventDispatcher::GetInstance().AddStaCallback(remote, callback, pid,
-        EVENT_STA_POWER_STATE_CHANGE));
+        EVENT_STA_POWER_STATE_CHANGE, 0));
 }
 
 HWTEST_F(WifiInternalEventDispatcherTest, RemoveStaCallbackFail, TestSize.Level1)
@@ -115,7 +115,7 @@ HWTEST_F(WifiInternalEventDispatcherTest, AddScanCallback, TestSize.Level1)
     sptr<IWifiScanCallback> callback;
     int pid = 0;
     EXPECT_EQ(WIFI_OPT_INVALID_PARAM, WifiInternalEventDispatcher::GetInstance().AddScanCallback(remote, callback, pid,
-        EVENT_STA_SCAN_STATE_CHANGE));
+        EVENT_STA_SCAN_STATE_CHANGE, 0));
 }
 
 HWTEST_F(WifiInternalEventDispatcherTest, RemoveScanCallback, TestSize.Level1)
@@ -188,7 +188,7 @@ HWTEST_F(WifiInternalEventDispatcherTest, AddP2pCallbackFail, TestSize.Level1)
 {
     sptr<IRemoteObject> remote;
     sptr<IWifiP2pCallback> callback;
-    EXPECT_EQ(3, WifiInternalEventDispatcher::GetInstance().AddP2pCallback(remote, callback, 123, EVENT_P2P_STATE_CHANGE));
+    EXPECT_EQ(3, WifiInternalEventDispatcher::GetInstance().AddP2pCallback(remote, callback, 123, EVENT_P2P_STATE_CHANGE, 0));
 }
 
 HWTEST_F(WifiInternalEventDispatcherTest, RemoveP2pCallbackFail, TestSize.Level1)

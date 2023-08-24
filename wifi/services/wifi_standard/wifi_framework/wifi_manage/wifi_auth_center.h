@@ -156,6 +156,16 @@ public:
     int VerifyGetWifiPeersMacPermission(const int &pid, const int &uid);
 
     /**
+     * @Description : Get wifi peers mac Permission.
+     *
+     * @param pid - Process ID.[in]
+     * @param uid - User ID.[in]
+     * @param tokenId - Token ID.[in]
+     * @return int - PERMISSION_DENIED or PERMISSION_GRANTED
+     */
+    int VerifyGetWifiPeersMacPermissionEx(const int &pid, const int &uid, const int &tokenId);
+
+    /**
      * @Description : Get wifi internal wifi info Permission.
      *
      * @param pid - Process ID.[in]

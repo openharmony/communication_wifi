@@ -42,15 +42,16 @@ class ArpChecker {
 public:
     ArpChecker();
     ~ArpChecker();
-    void Start(std::string& ifname, std::string& hwAddr, std::string& ipAddr);
+    void Start(std::string& ifname, std::string& hwAddr, std::string& ipAddr, std::string& gateway);
     void Stop();
-    bool DoArp(int& timeoutMillis, std::string& targetIp, bool& isFillSenderIp);
+    bool DoArpCheck(int timeoutMillis, bool isFillSenderIp);
 private:
     RawSocket rawSocket_;
     bool socketCreated;
-    struct in_addr localIpAddr_;
-    uint8_t localHwAddr_[ETH_ALEN];
-    uint8_t l2Broadcast_[ETH_ALEN];
+    struct in_addr localIpAddr;
+    struct in_addr gatewayIpAddr;
+    uint8_t localMacAddr[ETH_ALEN];
+    uint8_t l2Broadcast[ETH_ALEN];
 };
 }
 }

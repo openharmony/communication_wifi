@@ -29,6 +29,7 @@
 #include "wifi_errcode.h"
 #include "wifi_log.h"
 #include "arp_checker.h"
+#include "dns_checker.h"
 
 #define DEFAULT_PORTAL_HTTPS_URL ""
 
@@ -89,6 +90,8 @@ private:
     std::atomic<bool> isExitNetCheckThread;
     std::atomic<bool> isExited;
     ArpChecker arpChecker;
+    DnsChecker dnsChecker;
+    std::chrono::steady_clock::time_point lastArpDnsCheckTime;
 };
 }  // namespace Wifi
 }  // namespace OHOS

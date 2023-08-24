@@ -32,19 +32,18 @@ constexpr int MAX_LENGTH = 1500;
 
 ArpChecker::ArpChecker()
 {
-    
 }
 
 ArpChecker::~ArpChecker()
 {
-    if (!socketCreated) {
-        return;
-    }
-    rawSocket_.Close();
+    Stop();
 }
 
-void ArpChecker::Start(std::string& ifname, std::string& hwAddr, std::string& ipAddr)
+void ArpChecker::Start(std::string& ifname, std::string& hwAddr, std::string& ipAddr, std::string& gateway)
 {
+    if (socketCreated) {
+        Stop();
+    }
     uint8_t mac[ETH_ALEN + sizeof(uint32_t)];
     if (sscanf_s(hwAddr.c_str(), "%02x:%02x:%02x:%02x:%02x:%02x",
         &mac[0], &mac[1], &mac[2], &mac[3], &mac[4], &mac[5]) != ETH_ALEN) {
@@ -53,19 +52,19 @@ void ArpChecker::Start(std::string& ifname, std::string& hwAddr, std::string& ip
             LOGE("ArpChecker memset fail");
         }
     }
-    if (rawSocket_.CreateSocket(ifname.c_str(), ETH_P_ARP) != OPT_SUCC)
-    {
+    if (rawSocket_.CreateSocket(ifname.c_str(), ETH_P_ARP) != 0) {
         LOGE("ArpChecker CreateSocket failed");
         socketCreated = false;
         return;
     }
-    inet_aton(ipAddr.c_str(), &localIpAddr_);
-    if (memcpy_s(localHwAddr_, ETH_ALEN, mac, ETH_ALEN) != EOK) {
+    inet_aton(ipAddr.c_str(), &localIpAddr);
+    if (memcpy_s(localMacAddr, ETH_ALEN, mac, ETH_ALEN) != EOK) {
         LOGE("ArpChecker memcpy fail");
     }
-    if (memset_s(l2Broadcast_, ETH_ALEN, 0xFF, ETH_ALEN) != EOK) {
+    if (memset_s(l2Broadcast, ETH_ALEN, 0xFF, ETH_ALEN) != EOK) {
         LOGE("ArpChecker memset fail");
     }
+    inet_aton(gateway.c_str(), &gatewayIpAddr);
     socketCreated = true;
 }
 
@@ -78,41 +77,38 @@ void ArpChecker::Stop()
     socketCreated = false;
 }
 
-bool ArpChecker::DoArp(int& timeoutMillis, std::string& targetIp, bool& isFillSenderIp)
+bool ArpChecker::DoArpCheck(int timeoutMillis, bool isFillSenderIp)
 {
     if (!socketCreated) {
-        LOGE("ArpChecker DoArp failed, socket not created");
+        LOGE("ArpChecker DoArpCheck failed, socket not created");
         return false;
     }
-    struct in_addr destIp;
     struct ArpPacket arpPacket;
 
-    inet_aton(targetIp.c_str(), &destIp);
     arpPacket.ar_hrd = htons(ARPHRD_ETHER);
     arpPacket.ar_pro = htons(ETH_P_IP);
     arpPacket.ar_hln = ETH_ALEN;
     arpPacket.ar_pln = IPV4_ALEN;
     arpPacket.ar_op = htons(ARPOP_REQUEST);
-    if (memcpy_s(arpPacket.ar_sha, ETH_ALEN, localHwAddr_, ETH_ALEN) != EOK) {
-        LOGE("DoArp memcpy fail");
+    if (memcpy_s(arpPacket.ar_sha, ETH_ALEN, localMacAddr, ETH_ALEN) != EOK) {
+        LOGE("DoArpCheck memcpy fail");
     }
     if (isFillSenderIp) {
-        if (memcpy_s(arpPacket.ar_spa, IPV4_ALEN, &localIpAddr_, sizeof(localIpAddr_)) != EOK) {
-            LOGE("DoArp memcpy fail");
+        if (memcpy_s(arpPacket.ar_spa, IPV4_ALEN, &localIpAddr, sizeof(localIpAddr)) != EOK) {
+            LOGE("DoArpCheck memcpy fail");
         }
     } else {
         if (memset_s(arpPacket.ar_spa, IPV4_ALEN, 0, IPV4_ALEN) != EOK) {
-            LOGE("DoArp memset fail");
+            LOGE("DoArpCheck memset fail");
         }
     }
     if (memset_s(arpPacket.ar_tha, ETH_ALEN, 0, ETH_ALEN) != EOK) {
-        LOGE("DoArp memset fail");
+        LOGE("DoArpCheck memset fail");
     }
-    if (memcpy_s(arpPacket.ar_tpa, IPV4_ALEN, &destIp, sizeof(destIp)) != EOK) {
-        LOGE("DoArp memcpy fail");
+    if (memcpy_s(arpPacket.ar_tpa, IPV4_ALEN, &gatewayIpAddr, sizeof(gatewayIpAddr)) != EOK) {
+        LOGE("DoArpCheck memcpy fail");
     }
-
-    if (rawSocket_.Send(reinterpret_cast<uint8_t *>(&arpPacket), sizeof(arpPacket), l2Broadcast_) != 0) {
+    if (rawSocket_.Send(reinterpret_cast<uint8_t *>(&arpPacket), sizeof(arpPacket), l2Broadcast) != 0) {
         LOGE("send arp fail");
         return false;
     }
@@ -131,8 +127,8 @@ bool ArpChecker::DoArp(int& timeoutMillis, std::string& targetIp, bool& isFillSe
                 respPacket->ar_hln == ETH_ALEN &&
                 respPacket->ar_pln == IPV4_ALEN &&
                 ntohs(respPacket->ar_op) == ARPOP_REPLY &&
-                memcmp(respPacket->ar_sha, localHwAddr_, ETH_ALEN) != 0 &&
-                memcmp(respPacket->ar_spa, &destIp, IPV4_ALEN) == 0) {
+                memcmp(respPacket->ar_sha, localMacAddr, ETH_ALEN) != 0 &&
+                memcmp(respPacket->ar_spa, &gatewayIpAddr, IPV4_ALEN) == 0) {
                 LOGE("doArp() return true");
                 return true;
             }

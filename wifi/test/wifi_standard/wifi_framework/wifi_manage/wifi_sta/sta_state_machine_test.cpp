@@ -55,7 +55,9 @@ public:
         pStaStateMachine->InitWifiLinkedInfo();
         pStaStateMachine->InitLastWifiLinkedInfo();
         NetStateHandler handle = nullptr;
-        pStaStateMachine->pNetcheck = new MockStaNetworkCheck(handle);
+        ArpStateHandler arpHandle = nullptr;
+        DnsStateHandler dnsHandle = nullptr;
+        pStaStateMachine->pNetcheck = new MockStaNetworkCheck(handle, arpHandle, dnsHandle);
         pStaStateMachine->RegisterStaServiceCallback(WifiManager::GetInstance().GetStaCallback());
     }
     virtual void TearDown()

@@ -15,6 +15,7 @@
 
 #include "sta_network_check.h"
 #include "wifi_logger.h"
+#include "wifi_settings.h"
 
 DEFINE_WIFILOG_LABEL("StaNetworkCheck");
 
@@ -27,6 +28,8 @@ constexpr int NET_ERR_BAD_REQUEST = 400;
 
 constexpr int NET_ERR_REDIRECT_CLASS_MAX = 399;
 constexpr int NET_ERR_REQUEST_ERROR_CLASS_MAX = 499;
+constexpr int MAX_ARP_DNS_CHECK_INTERVAL = 5;
+constexpr int MAX_ARP_DNS_CHECK_TIME = 2000;
 
 StaNetworkCheck::StaNetworkCheck(NetStateHandler nethandle, ArpStateHandler arpHandle, DnsStateHandler dnsHandle)
 {
@@ -39,6 +42,7 @@ StaNetworkCheck::StaNetworkCheck(NetStateHandler nethandle, ArpStateHandler arpH
     isStopNetCheck = true;
     isExitNetCheckThread = false;
     isExited = true;
+    lastArpDnsCheckTime = std::chrono::steady_clock::now();
 }
 
 StaNetworkCheck::~StaNetworkCheck()
@@ -151,6 +155,19 @@ void StaNetworkCheck::RunNetCheckThreadFunc()
             isExited = true;
             break;
         }
+        std::chrono::steady_clock::time_point current = std::chrono::steady_clock::now();
+        if (arpStateHandler && dnsStateHandler &&
+            static_cast<int>((lastArpDnsCheckTime - current).count()) >= MAX_ARP_DNS_CHECK_INTERVAL) {
+            if (!arpChecker.DoArpCheck(MAX_ARP_DNS_CHECK_TIME, true)) {
+                LOGI("RunNetCheckThreadFunc arp check failed.");
+                arpStateHandler(StaArpState::ARP_STATE_UNREACHABLE);
+            }
+            if (!dnsChecker.DoDnsCheck(MAX_ARP_DNS_CHECK_TIME)) {
+                LOGI("RunNetCheckThreadFunc dns check failed.");
+                dnsStateHandler(StaDnsState::DNS_STATE_UNREACHABLE);
+            }
+            lastArpDnsCheckTime = current;
+        }
         if (!HttpDetection()) {
             isStopNetCheck = true;
         }
@@ -187,9 +204,24 @@ void StaNetworkCheck::StopNetCheckThread()
 void StaNetworkCheck::SignalNetCheckThread()
 {
     WIFI_LOGI("enter SignalNetCheckThread!\n");
+    // get mac address
+    std::string macAddress;
+    WifiSettings::GetInstance().GetMacAddress(macAddress);
+    // get ip,gateway address
+    WifiLinkedInfo linkedInfo;
+    WifiSettings::GetInstance().GetLinkedInfo(linkedInfo);
+    std::string ipAddress = IpTools::ConvertIpv4Address(linkedInfo.ipAddress);
+    std::string ifname = "wlan0";
+    // get dns address
+    IpInfo ipinfo;
+    WifiSettings::GetInstance().GetIpInfo(ipinfo);
+    std::string priDns = IpTools::ConvertIpv4Address(ipinfo.primaryDns);
+    std::string secondDns = IpTools::ConvertIpv4Address(ipinfo.secondDns);
+    std::string gateway = IpTools::ConvertIpv4Address(ipinfo.gateway);
+    dnsChecker.Start(priDns, secondDns);
+    arpChecker.Start(ifname, macAddress, ipAddress, gateway);
     lastNetState = NETWORK_STATE_UNKNOWN;
     isStopNetCheck = false;
-    arpChecker.Start();
     mCondition.notify_one();
 }
 

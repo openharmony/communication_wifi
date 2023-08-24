@@ -1050,6 +1050,7 @@ void WifiManager::DealStaConnChanged(OperateResState state, const WifiLinkedInfo
             }
         }
     }
+
 #ifdef FEATURE_P2P_SUPPORT
     if (cfgMonitorCallback.onStaConnectionChange != nullptr) {
         cfgMonitorCallback.onStaConnectionChange(static_cast<int>(state));

@@ -69,7 +69,7 @@ public:
      * @param uid - User ID.[in]
      * @return int
      */
-    static int VerifyPermission(const std::string &permissionName, const int &pid, const int &uid);
+    static int VerifyPermission(const std::string &permissionName, const int &pid, const int &uid, const int &tokenId);
 
     /**
      * @Description : Verify Set Wifi Information Permission.
@@ -160,6 +160,16 @@ public:
      * @return int
      */
     static int VerifyGetWifiPeersMacPermission(const int &pid, const int &uid);
+
+    /**
+     * @Description : Verify get wifi peers mac Permission.
+     *
+     * @param pid - Process ID.[in]
+     * @param uid - User ID.[in]
+     * @param tokenId - Token ID.[in]
+     * @return int
+     */
+    static int VerifyGetWifiPeersMacPermissionEx(const int &pid, const int &uid, const int &tokenId);
 
     /**
      * @Description : Verify get internal wifi info Permission.

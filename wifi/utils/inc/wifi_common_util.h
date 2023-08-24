@@ -199,6 +199,13 @@ int GetCallingPid();
 int GetCallingUid();
 
 /**
+ * @Description get calling token id
+ *
+ * @return int - calling token id
+ */
+int GetCallingTokenId();
+
+/**
  * @Description Check uid the app is a foregroud app
  *
  * @param uid - Input uid

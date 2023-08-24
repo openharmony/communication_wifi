@@ -561,15 +561,15 @@ private:
     /**
      * @Description  the process of handling arp check results.
      *
-     * @param netState - the state of arp
+     * @param arpState - the state of arp proto(in)
      */
-    void HandleArpCheckResult(ArpState arpState);
+    void HandleArpCheckResult(StaArpState arpState);
     /**
-     * @Description  the process of handling dns check results.
+     * @Description  the process of handling network check results.
      *
-     * @param netState - the state of dns
+     * @param dnsState - the state of dns protol(in)
      */
-    void HandleDnsCheckResult(DnsState dnsState, const std::string dnsServer);
+    void HandleDnsCheckResult(StaDnsState dnsState);
     /**
      * @Description  Remove all device configurations before enabling WPS.
      *

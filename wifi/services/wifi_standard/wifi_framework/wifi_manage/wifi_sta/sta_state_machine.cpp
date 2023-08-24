@@ -149,10 +149,8 @@ ErrCode StaStateMachine::InitStaStateMachine()
     pNetcheck = new (std::nothrow)
         StaNetworkCheck(std::bind(&StaStateMachine::HandleNetCheckResult, this,
             std::placeholders::_1, std::placeholders::_2),
-        std::bind(&StaStateMachine::HandleArpCheckResult, this,
-            std::placeholders::_1),
-        std::bind(&StaStateMachine::HandleDnsCheckResult, this,
-            std::placeholders::_1, std::placeholders::_2));
+            std::bind(&StaStateMachine::HandleArpCheckResult, this, std::placeholders::_1),
+            std::bind(&StaStateMachine::HandleDnsCheckResult, this, std::placeholders::_1));
     if (pNetcheck == nullptr) {
         WIFI_LOGE("pNetcheck is null\n");
         return WIFI_OPT_FAILED;
@@ -1981,14 +1979,12 @@ void StaStateMachine::HandleNetCheckResult(StaNetState netState, const std::stri
     }
 }
 
-void StaStateMachine::HandleArpCheckResult(ArpState arpState)
+void StaStateMachine::HandleArpCheckResult(StaArpState arpState)
 {
-
 }
 
-void StaStateMachine::HandleDnsCheckResult(DnsState dnsState, const std::string dnsServer)
+void StaStateMachine::HandleDnsCheckResult(StaDnsState dnsState)
 {
-
 }
 
 /* --------------------------- state machine Connected State ------------------------------ */

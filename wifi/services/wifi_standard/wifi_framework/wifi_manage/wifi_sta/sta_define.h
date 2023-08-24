@@ -89,25 +89,19 @@ typedef enum EnumStaNetState {
     NETWORK_STATE_BUTT,
 } StaNetState;
 
-typedef enum EnumArpState {
-    NETWORK_STATE_UNKNOWN,
-    NETWORK_STATE_WORKING,
-    NETWORK_CHECK_PORTAL,
-    NETWORK_STATE_NOWORKING,
-    NETWORK_STATE_BUTT,
-} ArpState;
+typedef enum EnumStaArpState {
+    ARP_STATE_WORKING,
+    ARP_STATE_UNREACHABLE,
+} StaArpState;
 
-typedef enum EnumDnsState {
-    NETWORK_STATE_UNKNOWN,
-    NETWORK_STATE_WORKING,
-    NETWORK_CHECK_PORTAL,
-    NETWORK_STATE_NOWORKING,
-    NETWORK_STATE_BUTT,
-} DnsState;
+typedef enum EnumStaDnsState {
+    DNS_STATE_WORKING,
+    DNS_STATE_UNREACHABLE,
+} StaDnsState;
 
 using NetStateHandler = std::function<void(StaNetState netState, std::string portalUrl)>;
-using ArpStateHandler = std::function<void(ArpState arpState)>;
-using DnsStateHandler = std::function<void(DnsState dnsState, std::string dnsServer)>;
+using ArpStateHandler = std::function<void(StaArpState arpState)>;
+using DnsStateHandler = std::function<void(StaDnsState dnsState)>;
 }  // namespace Wifi
 }  // namespace OHOS
 #endif /* OHOS_STA_DEFINE_H */

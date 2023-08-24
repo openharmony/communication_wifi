@@ -28,10 +28,9 @@ constexpr int FOUR = 4;
 constexpr int FIVE = 5;
 constexpr int SIX = 6;
 constexpr int SEVEN = 7;
-constexpr int ETH_ALEN = 6;
 
 /* ETH_ALEN   Size of the MAC address binary data */
-constexpr size_t MAC_STRING_LENGTH = ETH_ALEN * 2 + (ETH_ALEN - 1); /* length of the string of mac address */
+constexpr size_t MAC_STRING_LENGTH = 6 * 2 + (6 - 1); /* length of the string of mac address */
 
 #ifndef MAC_LEN
 #define MAC_LEN 6

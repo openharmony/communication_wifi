@@ -42,7 +42,7 @@ public:
     {
         return WIFI_OPT_SUCCESS;
     }
-    ErrCode Scan() override
+    ErrCode Scan(bool compatible) override
     {
         return WIFI_OPT_SUCCESS;
     }
@@ -54,7 +54,7 @@ public:
     {
         return WIFI_OPT_SUCCESS;
     }
-    ErrCode GetScanInfoList(std::vector<WifiScanInfo> &result) override
+    ErrCode GetScanInfoList(std::vector<WifiScanInfo> &result, bool compatible) override
     {
         return WIFI_OPT_SUCCESS;
     }

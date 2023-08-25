@@ -350,7 +350,7 @@ ErrCode WifiScanProxy::RegisterCallBack(const sptr<IWifiScanCallback> &callback,
             data.WriteString(eventName);
         }
     }
-    WIFI_LOGD("%{public}s, calling uid: %{public}d, pid: %{public}d, tokenId: %{public}d",
+    WIFI_LOGD("%{public}s, calling uid: %{public}d, pid: %{public}d, tokenId: %{private}d",
         __func__, GetCallingUid(), pid, tokenId);
     int error = Remote()->SendRequest(static_cast<uint32_t>(ScanInterfaceCode::WIFI_SVR_CMD_REGISTER_SCAN_CALLBACK),
         data, reply, option);

@@ -159,7 +159,7 @@ ErrCode WifiInternalEventDispatcher::AddStaCallback(
         callbackInfo.callingPid = pid;
         callbackInfo.callingTokenId = tokenId;
         callbackInfo.regCallBackEventId.emplace(eventIter->second);
-        WIFI_LOGD("%{public}s, add uid: %{public}d, pid: %{public}d, callback event:%{public}d, tokenId: %{public}d",
+        WIFI_LOGD("%{public}s, add uid: %{public}d, pid: %{public}d, callback event:%{public}d, tokenId: %{private}d",
             __func__, callbackInfo.callingUid, callbackInfo.callingPid,
             eventIter->second, callbackInfo.callingTokenId);
     }
@@ -236,7 +236,7 @@ ErrCode WifiInternalEventDispatcher::AddScanCallback(
         callbackInfo.callingPid = pid;
         callbackInfo.callingTokenId = tokenId;
         callbackInfo.regCallBackEventId.emplace(eventIter->second);
-        WIFI_LOGD("%{public}s, add uid: %{public}d, pid: %{public}d, callback event:%{public}d, tokenId: %{public}d",
+        WIFI_LOGD("%{public}s, add uid: %{public}d, pid: %{public}d, callback event:%{public}d, tokenId: %{private}d",
             __func__, callbackInfo.callingUid, callbackInfo.callingPid,
             eventIter->second, callbackInfo.callingTokenId);
     }
@@ -423,7 +423,7 @@ ErrCode WifiInternalEventDispatcher::AddP2pCallback(
         callbackInfo.callingPid = pid;
         callbackInfo.callingTokenId = tokenId;
         callbackInfo.regCallBackEventId.emplace(eventIter->second);
-        WIFI_LOGI("%{public}s, add uid: %{public}d, pid: %{public}d, callback event: %{public}d, tokenId: %{public}d",
+        WIFI_LOGI("%{public}s, add uid: %{public}d, pid: %{public}d, callback event: %{public}d, tokenId: %{private}d",
             __func__, callbackInfo.callingUid, callbackInfo.callingPid,
             eventIter->second, callbackInfo.callingTokenId);
     }

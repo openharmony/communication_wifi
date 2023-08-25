@@ -1236,7 +1236,7 @@ ErrCode WifiDeviceProxy::RegisterCallBack(const sptr<IWifiDeviceCallBack> &callb
             data.WriteString(eventName);
         }
     }
-    WIFI_LOGD("%{public}s, calling uid: %{public}d, pid: %{public}d, tokenId: %{public}d",
+    WIFI_LOGD("%{public}s, calling uid: %{public}d, pid: %{public}d, tokenId: %{private}d",
         __func__, GetCallingUid(), pid, tokenId);
     int error = Remote()->SendRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_REGISTER_CALLBACK_CLIENT),
         data, reply, option);

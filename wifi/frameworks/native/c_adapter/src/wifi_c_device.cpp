@@ -60,7 +60,7 @@ NO_SANITIZE("cfi") int IsWifiActive()
 NO_SANITIZE("cfi") WifiErrorCode Scan()
 {
     CHECK_PTR_RETURN(wifiScanPtr, ERROR_WIFI_NOT_AVAILABLE);
-    return GetCErrorCode(wifiScanPtr->Scan());
+    return GetCErrorCode(wifiScanPtr->Scan(true));
 }
 
 NO_SANITIZE("cfi") WifiErrorCode GetScanInfoList(WifiScanInfo *result, unsigned int *size)
@@ -72,7 +72,7 @@ NO_SANITIZE("cfi") WifiErrorCode GetScanInfoList(WifiScanInfo *result, unsigned 
     }
 
     std::vector<OHOS::Wifi::WifiScanInfo> vecScanInfos;
-    OHOS::Wifi::ErrCode ret = wifiScanPtr->GetScanInfoList(vecScanInfos);
+    OHOS::Wifi::ErrCode ret = wifiScanPtr->GetScanInfoList(vecScanInfos, true);
     int vecSize = (int)vecScanInfos.size();
     for (int i = 0; i < vecSize && i < WIFI_SCAN_HOTSPOT_LIMIT; ++i) {
         if (memcpy_s(result->ssid, WIFI_MAX_SSID_LEN,

@@ -30,6 +30,7 @@
 #include "wifi_sa_manager.h"
 #include "common_timer_errors.h"
 #include "wifi_datashare_utils.h"
+#include "wifi_location_mode_observer.h"
 #endif
 #include "wifi_sta_hal_interface.h"
 #include "wifi_service_manager.h"
@@ -48,6 +49,8 @@ const uint32_t TIMEOUT_AIRPLANE_MODE_EVENT = 3000;
 const uint32_t TIMEOUT_LOCATION_EVENT = 3000;
 const uint32_t TIMEOUT_UNLOAD_WIFI_SA = 5 * 60 * 1000;
 using TimeOutCallback = std::function<void()>;
+
+static sptr<WifiLocationModeObserver> locationEventSubscriber_ = nullptr;
 #endif
 
 WifiManager &WifiManager::GetInstance()
@@ -198,7 +201,7 @@ ErrCode WifiManager::AutoStopStaService(AutoStartOrStopServiceReason reason)
 void WifiManager::AutoStartScanOnly(void)
 {
     if (!WifiSettings::GetInstance().CheckScanOnlyAvailable() ||
-        !WifiManager::GetInstance().GetLocationModeByDatashare(WIFI_SCAN_ABILITY_ID)) {
+        !WifiManager::GetInstance().GetLocationModeByDatashare()) {
         WIFI_LOGI("No need to StartScanOnly, return");
         return;
     }
@@ -603,7 +606,7 @@ int WifiManager::Init()
         WifiSaLoadManager::GetInstance().LoadWifiSa(WIFI_SCAN_ABILITY_ID);
 #endif
         if ((WifiSettings::GetInstance().CheckScanOnlyAvailable() &&
-            WifiManager::GetInstance().GetLocationModeByDatashare(WIFI_SCAN_ABILITY_ID)) ||
+            WifiManager::GetInstance().GetLocationModeByDatashare()) ||
             WifiConfigCenter::GetInstance().IsScanAlwaysActive()) {
             CheckAndStartScanService();
             IScanService *pService = WifiServiceManager::GetInstance().GetScanServiceInst();
@@ -612,12 +615,12 @@ int WifiManager::Init()
                 if (res != static_cast<int>(WIFI_IDL_OPT_OK)) {
                     WIFI_LOGE("Start Wpa failed");
                     if (WifiSettings::GetInstance().CheckScanOnlyAvailable() &&
-                        WifiManager::GetInstance().GetLocationModeByDatashare(WIFI_SCAN_ABILITY_ID)) {
+                        WifiManager::GetInstance().GetLocationModeByDatashare()) {
                         WifiConfigCenter::GetInstance().SetWifiScanOnlyMidState(WifiOprMidState::CLOSED);
                     }
                 }
                 if (WifiSettings::GetInstance().CheckScanOnlyAvailable() &&
-                    WifiManager::GetInstance().GetLocationModeByDatashare(WIFI_SCAN_ABILITY_ID)) {
+                    WifiManager::GetInstance().GetLocationModeByDatashare()) {
                     WifiConfigCenter::GetInstance().SetWifiScanOnlyMidState(WifiOprMidState::RUNNING);
                 }
             }
@@ -1000,7 +1003,7 @@ void WifiManager::DealStaOpenRes(OperateResState state)
     CheckAndStartScanService();
 
     if (WifiSettings::GetInstance().CheckScanOnlyAvailable() &&
-        WifiManager::GetInstance().GetLocationModeByDatashare(WIFI_SCAN_ABILITY_ID)) {
+        WifiManager::GetInstance().GetLocationModeByDatashare()) {
         WifiConfigCenter::GetInstance().SetWifiScanOnlyMidState(WifiOprMidState::RUNNING);
     }
 }
@@ -1420,7 +1423,7 @@ void WifiManager::DealAirplaneExceptionWhenStaOpen(void)
         AutoStartEnhanceService();
         CheckAndStartScanService();
         if (WifiSettings::GetInstance().CheckScanOnlyAvailable() &&
-            WifiManager::GetInstance().GetLocationModeByDatashare(WIFI_SCAN_ABILITY_ID)) {
+            WifiManager::GetInstance().GetLocationModeByDatashare()) {
             WifiConfigCenter::GetInstance().SetWifiScanOnlyMidState(WifiOprMidState::RUNNING);
         }
     }
@@ -1883,10 +1886,9 @@ void WifiManager::DealCloseAirplaneModeEvent()
     return;
 }
 
-void WifiManager::GetAirplaneModeByDatashare(int systemAbilityId)
+void WifiManager::GetAirplaneModeByDatashare()
 {
-    WIFI_LOGI("GetAirplaneModeByDatashare, systemAbilityId:%{public}d", systemAbilityId);
-    auto datashareHelper = std::make_shared<WifiDataShareHelperUtils>(systemAbilityId);
+    auto datashareHelper = DelayedSingleton<WifiDataShareHelperUtils>::GetInstance();
     if (datashareHelper == nullptr) {
         WIFI_LOGE("GetAirplaneModeByDatashare, datashareHelper is nullprt!");
         return;
@@ -1907,10 +1909,9 @@ void WifiManager::GetAirplaneModeByDatashare(int systemAbilityId)
     return;
 }
 
-bool WifiManager::GetLocationModeByDatashare(int systemAbilityId)
+bool WifiManager::GetLocationModeByDatashare()
 {
-    WIFI_LOGD("GetLocationModeByDatashare, systemAbilityId:%{public}d", systemAbilityId);
-    auto datashareHelper = std::make_shared<WifiDataShareHelperUtils>(systemAbilityId);
+    auto datashareHelper = DelayedSingleton<WifiDataShareHelperUtils>::GetInstance();
     if (datashareHelper == nullptr) {
         WIFI_LOGE("GetLocationModeByDatashare, datashareHelper is nullprt!");
         return false;
@@ -1934,39 +1935,43 @@ void WifiManager::RegisterLocationEvent()
     if (locationEventSubscriber_) {
         return;
     }
-    OHOS::EventFwk::MatchingSkills matchingSkills;
-    matchingSkills.AddEvent(OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_LOCATION_MODE_STATE_CHANGED);
-    EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
-    locationEventSubscriber_ = std::make_shared<LocationEventSubscriber>(subscriberInfo);
-    if (!EventFwk::CommonEventManager::SubscribeCommonEvent(locationEventSubscriber_)) {
-        WIFI_LOGE("LocationEvent SubscribeCommonEvent() failed");
-    } else {
-        WIFI_LOGI("LocationEvent SubscribeCommonEvent() OK");
-        WifiTimer::GetInstance()->UnRegister(locationTimerId);
+
+    auto datashareHelper = DelayedSingleton<WifiDataShareHelperUtils>::GetInstance();
+    if (datashareHelper == nullptr) {
+        WIFI_LOGE("LocationEvent datashareHelper is nullptr");
+        return;
     }
+    locationEventSubscriber_ = sptr<WifiLocationModeObserver>(new (std::nothrow)WifiLocationModeObserver());
+    Uri uri(SETTINGS_DATASHARE_URI_LOCATION_MODE);
+    datashareHelper->RegisterObserver(uri, locationEventSubscriber_);
 }
 
 void WifiManager::UnRegisterLocationEvent()
 {
     std::unique_lock<std::mutex> lock(locationEventMutex);
-    if (!locationEventSubscriber_) {
+    if (locationEventSubscriber_ == nullptr) {
+        WIFI_LOGE("UnRegisterLocationEvent locationEventSubscriber_ is nullptr");
         return;
     }
-    if (!EventFwk::CommonEventManager::UnSubscribeCommonEvent(locationEventSubscriber_)) {
-        WIFI_LOGE("LocationEvent UnSubscribeCommonEvent() failed");
-    } else {
-        WIFI_LOGD("LocationEvent UnSubscribeCommonEvent() OK");
+
+    auto datashareHelper = DelayedSingleton<WifiDataShareHelperUtils>::GetInstance();
+    if (datashareHelper == nullptr) {
+        WIFI_LOGE("UnRegisterLocationEvent datashareHelper is nullptr");
+        return;
     }
+    Uri uri(SETTINGS_DATASHARE_URI_LOCATION_MODE);
+    datashareHelper->UnRegisterObserver(uri, locationEventSubscriber_);
     locationEventSubscriber_ = nullptr;
 }
 
-void LocationEventSubscriber::OnReceiveEvent(const OHOS::EventFwk::CommonEventData &eventData)
+void WifiManager::DealLocationModeChangeEvent()
 {
-    std::string action = eventData.GetWant().GetAction();
-    WIFI_LOGD("LocationEventSubscriber::OnReceiveEvent: %{public}s.", action.c_str());
-
-    if (action == OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_LOCATION_MODE_STATE_CHANGED) {
-        WIFI_LOGD("LocationEventSubscriber::OnReceiveEvent COMMON_EVENT_LOCATION_MODE_STATE_CHANGED.");
+    if (WifiManager::GetInstance().GetLocationModeByDatashare()) {
+        WIFI_LOGI("DealLocationModeChangeEvent open");
+        WifiManager::GetInstance().AutoStartScanOnly();
+    } else {
+        WIFI_LOGI("DealLocationModeChangeEvent close");
+        WifiManager::GetInstance().AutoStopScanOnly();
     }
 }
 

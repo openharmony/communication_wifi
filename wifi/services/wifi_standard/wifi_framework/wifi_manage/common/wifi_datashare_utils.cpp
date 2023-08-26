@@ -14,6 +14,7 @@
  */
 
 #include <vector>
+#include "iremote_stub.h"
 #include "wifi_logger.h"
 #include "wifi_datashare_utils.h"
 DEFINE_WIFILOG_LABEL("WifiDataShareHelperUtils");
@@ -28,27 +29,24 @@ constexpr const char *SETTINGS_DATA_COLUMN_KEYWORD = "KEYWORD";
 constexpr const char *SETTINGS_DATA_COLUMN_VALUE = "VALUE";
 }
 
-WifiDataShareHelperUtils::WifiDataShareHelperUtils(int systemAbilityId)
+WifiDataShareHelperUtils::WifiDataShareHelperUtils()
 {
-    dataShareHelper_ = WifiCreateDataShareHelper(systemAbilityId);
+    dataShareHelper_ = WifiCreateDataShareHelper();
 }
 
-std::shared_ptr<DataShare::DataShareHelper> WifiDataShareHelperUtils::WifiCreateDataShareHelper(int systemAbilityId)
+std::shared_ptr<DataShare::DataShareHelper> WifiDataShareHelperUtils::WifiCreateDataShareHelper()
 {
-    sptr<ISystemAbilityManager> saManager = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-    if (saManager == nullptr) {
-        WIFI_LOGE("WifiCreateDataShareHelper GetSystemAbilityManager failed.");
-        return nullptr;
-    }
-
-    sptr<IRemoteObject> remote = saManager->GetSystemAbility(systemAbilityId);
+    auto remote = sptr<IWifiDataShareRemoteBroker>(new (std::nothrow) IRemoteStub<IWifiDataShareRemoteBroker>());
     if (remote == nullptr) {
-        WIFI_LOGE("WifiCreateDataShareHelper GetSystemAbility Service failed.");
+        WIFI_LOGE("%{public}s remote is nullptr", __func__);
         return nullptr;
     }
-
-    WIFI_LOGI("WifiCreateDataShareHelper creator. systemAbilityId:%{public}d", systemAbilityId);
-    return DataShare::DataShareHelper::Creator(remote, SETTINGS_DATASHARE_URI, SETTINGS_DATA_EXT_URI);
+    auto remoteObj = remote->AsObject();
+    if (remoteObj == nullptr) {
+        WIFI_LOGE("%{public}s remoteObj_ is nullptr", __func__);
+        return nullptr;
+    }
+    return DataShare::DataShareHelper::Creator(remoteObj, SETTINGS_DATASHARE_URI, SETTINGS_DATA_EXT_URI);
 }
 
 ErrCode WifiDataShareHelperUtils::Query(Uri &uri, const std::string &key, std::string &value)
@@ -78,6 +76,37 @@ ErrCode WifiDataShareHelperUtils::Query(Uri &uri, const std::string &key, std::s
     result->GetString(columnIndex, value);
     result->Close();
     WIFI_LOGI("WifiDataShareHelper query success,value[%{public}s]", value.c_str());
+    return WIFI_OPT_SUCCESS;
+}
+
+ErrCode WifiDataShareHelperUtils::RegisterObserver(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &observer)
+{
+    if (dataShareHelper_ == nullptr) {
+        WIFI_LOGE("WifiDataShareHelper %{public}s error, dataShareHelper_ is nullptr", __func__);
+        return WIFI_OPT_FAILED;
+    }
+
+    if (observer == nullptr) {
+        WIFI_LOGE("WifiDataShareHelper %{public}s error, observer is nullptr", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    dataShareHelper_->RegisterObserver(uri, observer);
+    return WIFI_OPT_SUCCESS;
+}
+
+ErrCode WifiDataShareHelperUtils::UnRegisterObserver(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &observer)
+{
+    if (dataShareHelper_ == nullptr) {
+        WIFI_LOGE("WifiDataShareHelper %{public}s error, dataShareHelper_ is nullptr", __func__);
+        return WIFI_OPT_FAILED;
+    }
+
+    if (observer == nullptr) {
+        WIFI_LOGE("WifiDataShareHelper %{public}s error, observer is nullptr", __func__);
+        return WIFI_OPT_FAILED;
+    }
+
+    dataShareHelper_->UnregisterObserver(uri, observer);
     return WIFI_OPT_SUCCESS;
 }
 

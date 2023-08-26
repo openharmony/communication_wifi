@@ -84,14 +84,6 @@ public:
     void OnReceiveEvent(const OHOS::EventFwk::CommonEventData &eventData) override;
 };
 
-class LocationEventSubscriber : public OHOS::EventFwk::CommonEventSubscriber {
-public:
-    explicit LocationEventSubscriber(const OHOS::EventFwk::CommonEventSubscribeInfo &subscriberInfo)
-        : CommonEventSubscriber(subscriberInfo) {}
-    virtual ~LocationEventSubscriber() {};
-    void OnReceiveEvent(const OHOS::EventFwk::CommonEventData &eventData) override;
-};
-
 class WifiTimer {
 public:
     using TimerCallback = std::function<void()>;
@@ -205,10 +197,11 @@ public:
     static WifiManager &GetInstance();
 
     void RegisterCfgMonitorCallback(WifiCfgMonitorEventCallback callback);
-    void GetAirplaneModeByDatashare(int systemAbilityId);
+    void GetAirplaneModeByDatashare();
     void DealOpenAirplaneModeEvent();
     void DealCloseAirplaneModeEvent();
-    bool GetLocationModeByDatashare(int systemAbilityId);
+    void DealLocationModeChangeEvent();
+    bool GetLocationModeByDatashare();
     static void CheckAndStartScanService(void);
 
 private:
@@ -319,7 +312,6 @@ private:
     uint32_t airplaneModeTimerId{0};
     void RegisterLocationEvent();
     void UnRegisterLocationEvent();
-    std::shared_ptr<LocationEventSubscriber> locationEventSubscriber_ = nullptr;
     uint32_t locationTimerId{0};
 #endif
     InitStatus mInitStatus;

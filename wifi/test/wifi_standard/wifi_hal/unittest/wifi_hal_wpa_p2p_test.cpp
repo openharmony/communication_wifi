@@ -776,4 +776,3 @@ HWTEST_F(WifiHalWpaP2pTest, WpaP2pCliCmdGetGroupConfigTest, TestSize.Level1)
 }
 }  // namespace Wifi
 }  // namespace OHOS
-GROUP_CONFIG_END_POS

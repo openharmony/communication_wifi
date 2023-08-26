@@ -102,11 +102,11 @@ ErrCode WifiScanImpl::SetScanControlInfo(const ScanControlInfo &info)
     return client_->SetScanControlInfo(info);
 }
 
-ErrCode WifiScanImpl::Scan()
+ErrCode WifiScanImpl::Scan(bool compatible)
 {
     std::lock_guard<std::mutex> lock(mutex_);
     RETURN_IF_FAIL(GetWifiScanProxy());
-    return client_->Scan();
+    return client_->Scan(compatible);
 }
 
 ErrCode WifiScanImpl::AdvanceScan(const WifiScanParams &params)
@@ -123,11 +123,11 @@ ErrCode WifiScanImpl::IsWifiClosedScan(bool &bOpen)
     return client_->IsWifiClosedScan(bOpen);
 }
 
-ErrCode WifiScanImpl::GetScanInfoList(std::vector<WifiScanInfo> &result)
+ErrCode WifiScanImpl::GetScanInfoList(std::vector<WifiScanInfo> &result, bool compatible)
 {
     std::lock_guard<std::mutex> lock(mutex_);
     RETURN_IF_FAIL(GetWifiScanProxy());
-    return client_->GetScanInfoList(result);
+    return client_->GetScanInfoList(result, compatible);
 }
 
 #ifdef OHOS_ARCH_LITE

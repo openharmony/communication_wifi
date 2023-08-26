@@ -138,9 +138,9 @@ ErrCode WifiScanServiceImpl::SetScanControlInfo(const ScanControlInfo &info)
     return WIFI_OPT_SUCCESS;
 }
 
-ErrCode WifiScanServiceImpl::Scan()
+ErrCode WifiScanServiceImpl::Scan(bool compatible)
 {
-    WIFI_LOGI("Scan");
+    WIFI_LOGI("Scan, compatible:%{public}d", compatible);
     if (WifiPermissionUtils::VerifyGetWifiInfoInternalPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("Scan:VerifyGetWifiInfoInternalPermission PERMISSION_DENIED!");
 
@@ -148,12 +148,12 @@ ErrCode WifiScanServiceImpl::Scan()
             WIFI_LOGE("Scan:VerifySetWifiInfoPermission PERMISSION_DENIED!");
             return WIFI_OPT_PERMISSION_DENIED;
         }
-    #ifndef SUPPORT_RANDOM_MAC_ADDR
-        if (WifiPermissionUtils::VerifyGetScanInfosPermission() == PERMISSION_DENIED) {
-            WIFI_LOGE("Scan:VerifyGetScanInfosPermission PERMISSION_DENIED!");
-            return WIFI_OPT_PERMISSION_DENIED;
+        if (compatible) {
+            if (WifiPermissionUtils::VerifyGetScanInfosPermission() == PERMISSION_DENIED) {
+                WIFI_LOGE("Scan:VerifyGetScanInfosPermission PERMISSION_DENIED!");
+                return WIFI_OPT_PERMISSION_DENIED;
+            }
         }
-    #endif
     }
 
     if (!IsScanServiceRunning()) {
@@ -211,9 +211,9 @@ ErrCode WifiScanServiceImpl::IsWifiClosedScan(bool &bOpen)
     return WIFI_OPT_SUCCESS;
 }
 
-ErrCode WifiScanServiceImpl::GetScanInfoList(std::vector<WifiScanInfo> &result)
+ErrCode WifiScanServiceImpl::GetScanInfoList(std::vector<WifiScanInfo> &result, bool compatible)
 {
-    WIFI_LOGI("GetScanInfoList");
+    WIFI_LOGI("GetScanInfoList, compatible:%{public}d", compatible);
 
     if (WifiPermissionUtils::VerifyGetWifiInfoInternalPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("GetScanInfoList:VerifyGetWifiInfoInternalPermission PERMISSION_DENIED!");
@@ -221,35 +221,37 @@ ErrCode WifiScanServiceImpl::GetScanInfoList(std::vector<WifiScanInfo> &result)
             WIFI_LOGE("GetScanInfoList:VerifyGetWifiInfoPermission PERMISSION_DENIED!");
             return WIFI_OPT_PERMISSION_DENIED;
         }
-    #ifndef SUPPORT_RANDOM_MAC_ADDR
-        if ((WifiPermissionUtils::VerifyGetScanInfosPermission() == PERMISSION_DENIED) &&
-            (WifiPermissionUtils::VerifyGetWifiPeersMacPermission() == PERMISSION_DENIED)) {
-            WIFI_LOGE("GetScanInfoList:GET_WIFI_PEERS_MAC && LOCATION PERMISSION_DENIED!");
-            return WIFI_OPT_PERMISSION_DENIED;
-        }
-    #endif
-    }
-
-    WifiConfigCenter::GetInstance().GetScanInfoList(result);
-#ifdef SUPPORT_RANDOM_MAC_ADDR
-    if (WifiPermissionUtils::VerifyGetWifiPeersMacPermission() == PERMISSION_DENIED) {
-        WIFI_LOGI("GetScanInfoList: GET_WIFI_PEERS_MAC PERMISSION_DENIED");
-        for (auto iter = result.begin(); iter != result.end(); ++iter) {
-            WifiMacAddrInfo macAddrInfo;
-            macAddrInfo.bssid = iter->bssid;
-            macAddrInfo.bssidType = iter->bssidType;
-            std::string randomMacAddr =
-                WifiSettings::GetInstance().GetMacAddrPairs(WifiMacAddrInfoType::WIFI_SCANINFO_MACADDR_INFO, macAddrInfo);
-            WIFI_LOGI("bssid:%{private}s, bssidType:%{public}d, randomMacAddr:%{private}s",
-                macAddrInfo.bssid.c_str(), macAddrInfo.bssidType, randomMacAddr.c_str());
-            if (!randomMacAddr.empty() &&
-                (macAddrInfo.bssidType == REAL_DEVICE_ADDRESS)) {
-                iter->bssid = randomMacAddr;
-                iter->bssidType = RANDOM_DEVICE_ADDRESS;
+        if (compatible) {
+            if ((WifiPermissionUtils::VerifyGetScanInfosPermission() == PERMISSION_DENIED) &&
+                (WifiPermissionUtils::VerifyGetWifiPeersMacPermission() == PERMISSION_DENIED)) {
+                WIFI_LOGE("GetScanInfoList:GET_WIFI_PEERS_MAC && LOCATION PERMISSION_DENIED!");
+                return WIFI_OPT_PERMISSION_DENIED;
             }
         }
     }
-#endif
+
+    WifiConfigCenter::GetInstance().GetScanInfoList(result);
+    if (!compatible) {
+    #ifdef SUPPORT_RANDOM_MAC_ADDR
+        if (WifiPermissionUtils::VerifyGetWifiPeersMacPermission() == PERMISSION_DENIED) {
+            WIFI_LOGI("GetScanInfoList: GET_WIFI_PEERS_MAC PERMISSION_DENIED");
+            for (auto iter = result.begin(); iter != result.end(); ++iter) {
+                WifiMacAddrInfo macAddrInfo;
+                macAddrInfo.bssid = iter->bssid;
+                macAddrInfo.bssidType = iter->bssidType;
+                std::string randomMacAddr =
+                    WifiSettings::GetInstance().GetMacAddrPairs(WifiMacAddrInfoType::WIFI_SCANINFO_MACADDR_INFO, macAddrInfo);
+                WIFI_LOGI("GetScanInfoList: bssid:%{private}s, bssidType:%{public}d, randomMacAddr:%{private}s",
+                    macAddrInfo.bssid.c_str(), macAddrInfo.bssidType, randomMacAddr.c_str());
+                if (!randomMacAddr.empty() &&
+                    (macAddrInfo.bssidType == REAL_DEVICE_ADDRESS)) {
+                    iter->bssid = randomMacAddr;
+                    iter->bssidType = RANDOM_DEVICE_ADDRESS;
+                }
+            }
+        }
+    #endif
+    }
     return WIFI_OPT_SUCCESS;
 }
 

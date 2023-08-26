@@ -130,7 +130,7 @@ ErrCode WifiScanProxy::SetScanControlInfo(const ScanControlInfo &info)
     return WIFI_OPT_SUCCESS;
 }
 
-ErrCode WifiScanProxy::Scan()
+ErrCode WifiScanProxy::Scan(bool compatible)
 {
     if (mRemoteDied) {
         WIFI_LOGW("failed to `%{public}s`,remote service is died!", __func__);
@@ -144,6 +144,7 @@ ErrCode WifiScanProxy::Scan()
         return WIFI_OPT_FAILED;
     }
     data.WriteInt32(0);
+    data.WriteBool(compatible);
     int error = Remote()->SendRequest(static_cast<uint32_t>(ScanInterfaceCode::WIFI_SVR_CMD_FULL_SCAN), data, reply,
         option);
     if (error != ERR_NONE) {
@@ -238,7 +239,7 @@ ErrCode WifiScanProxy::IsWifiClosedScan(bool &bOpen)
     return WIFI_OPT_SUCCESS;
 }
 
-ErrCode WifiScanProxy::GetScanInfoList(std::vector<WifiScanInfo> &result)
+ErrCode WifiScanProxy::GetScanInfoList(std::vector<WifiScanInfo> &result, bool compatible)
 {
     if (mRemoteDied) {
         WIFI_LOGW("failed to `%{public}s`,remote service is died!", __func__);
@@ -252,6 +253,7 @@ ErrCode WifiScanProxy::GetScanInfoList(std::vector<WifiScanInfo> &result)
         return WIFI_OPT_FAILED;
     }
     data.WriteInt32(0);
+    data.WriteBool(compatible);
     int error = Remote()->SendRequest(static_cast<uint32_t>(ScanInterfaceCode::WIFI_SVR_CMD_GET_SCAN_INFO_LIST), data,
         reply, option);
     if (error != ERR_NONE) {

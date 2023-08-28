@@ -1214,5 +1214,34 @@ HWTEST_F(WifiIdlClientTest, ReqWpaSetSuspendModeTest, TestSize.Level1)
     bool mode = true;
     mClient.ReqWpaSetSuspendMode(mode);
 }
+
+HWTEST_F(WifiIdlClientTest, QueryScanInfosTest, TestSize.Level1)
+{
+    std::vector<InterScanInfo> scanInfos;
+    mClient.QueryScanInfos(scanInfos);
+}
+
+HWTEST_F(WifiIdlClientTest, ReqRegisterSupplicantEventCallbackTest, TestSize.Level1)
+{
+    SupplicantEventCallback callback;
+    mClient.ReqRegisterSupplicantEventCallback(callback);
+}
+
+HWTEST_F(WifiIdlClientTest, ReqUnRegisterSupplicantEventCallbackTest, TestSize.Level1)
+{
+    mClient.ReqUnRegisterSupplicantEventCallback();
+}
+
+HWTEST_F(WifiIdlClientTest, ReqP2pGetDeviceAddressTest, TestSize.Level1)
+{
+    std::string deviceAddress = "10.26.120.74";
+    mClient.ReqP2pGetDeviceAddress(deviceAddress);
+}
+
+HWTEST_F(WifiIdlClientTest, ReqP2pListNetworksTest, TestSize.Level1)
+{
+    std::map<int, WifiP2pGroupInfo> mapGroups;
+    mClient.ReqP2pListNetworks(mapGroups);
+}
 }  // namespace Wifi
 }  // namespace OHOS

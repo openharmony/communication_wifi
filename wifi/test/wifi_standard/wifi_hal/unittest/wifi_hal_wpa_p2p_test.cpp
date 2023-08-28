@@ -716,5 +716,63 @@ HWTEST_F(WifiHalWpaP2pTest, GetWifiWpaP2pGroupInterfaceTest, TestSize.Level1)
     ReleaseWpaP2pGroupInterface("p2p-dev-wlan0");
     ReleaseWpaP2pGroupInterface("p2p-dev-wlan0");
 }
+
+HWTEST_F(WifiHalWpaP2pTest, WpaP2pCliCmdSetWpsSecDeviceTypeTest, TestSize.Level1)
+{
+    char type[] = "p2p_device_type";
+    EXPECT_TRUE(mInterface->wpaP2pCliCmdSetWpsSecDeviceType(nullptr, 0) != P2P_SUP_ERRCODE_SUCCESS);
+    EXPECT_TRUE(mInterface->wpaP2pCliCmdSetWpsSecDeviceType(mInterface, nullptr) != P2P_SUP_ERRCODE_SUCCESS);
+    MockEraseSupportedCmd("SET sec_device_type");
+    EXPECT_TRUE(mInterface->wpaP2pCliCmdSetWpsSecDeviceType(mInterface, type) == P2P_SUP_ERRCODE_SUCCESS);
+    MockSetWpaExpectCmdResponse("SET sec_device_type", "FAIL\n");
+    EXPECT_TRUE(mInterface->wpaP2pCliCmdSetWpsSecDeviceType(mInterface, type) == P2P_SUP_ERRCODE_SUCCESS);
+    MockSetWpaExpectCmdResponse("SET sec_device_type", "OK\n");
+    EXPECT_TRUE(mInterface->wpaP2pCliCmdSetWpsSecDeviceType(mInterface, type) == P2P_SUP_ERRCODE_SUCCESS);
+}
+
+HWTEST_F(WifiHalWpaP2pTest, wpaP2pCliCmdSetGroupConfigTest, TestSize.Level1)
+{
+    P2pWpaGroupConfigArgv argv;
+    argv.param = GROUP_CONFIG_END_POS;
+    ASSERT_TRUE(memset_s(&argv, sizeof(argv), 0, sizeof(argv)) == EOK);
+    EXPECT_TRUE(mInterface->wpaP2pCliCmdSetGroupConfig(nullptr, nullptr) != P2P_SUP_ERRCODE_SUCCESS);
+    EXPECT_TRUE(mInterface->wpaP2pCliCmdSetGroupConfig(mInterface, nullptr) != P2P_SUP_ERRCODE_SUCCESS);
+    MockEraseSupportedCmd("SET_NETWORK");
+    EXPECT_TRUE(mInterface->wpaP2pCliCmdSetGroupConfig(mInterface, &argv) != P2P_SUP_ERRCODE_SUCCESS);
+    MockSetWpaExpectCmdResponse("SET_NETWORK", "FAIL\n");
+    argv.param = GROUP_CONFIG_SSID;
+    EXPECT_TRUE(mInterface->wpaP2pCliCmdSetGroupConfig(mInterface, &argv) != P2P_SUP_ERRCODE_SUCCESS);
+    MockSetWpaExpectCmdResponse("SET_NETWORK", "OK\n");
+    argv.param = GROUP_CONFIG_BSSID;
+    EXPECT_TRUE(mInterface->wpaP2pCliCmdSetGroupConfig(mInterface, &argv) == P2P_SUP_ERRCODE_SUCCESS);
+}
+
+HWTEST_F(WifiHalWpaP2pTest, WpaP2pHid2dCliCmdConnectTest, TestSize.Level1)
+{
+    Hid2dConnectInfo info;
+    ASSERT_TRUE(memset_s(&info, sizeof(info), 0, sizeof(info)) == EOK);
+    EXPECT_TRUE(mInterface->wpaP2pCliCmdHid2dConnect(nullptr, nullptr) != P2P_SUP_ERRCODE_SUCCESS);
+    EXPECT_TRUE(mInterface->wpaP2pCliCmdHid2dConnect(mInterface, nullptr) != P2P_SUP_ERRCODE_SUCCESS);
+    MockEraseSupportedCmd("MAGICLINK");
+    EXPECT_TRUE(mInterface->wpaP2pCliCmdHid2dConnect(mInterface, &info) != P2P_SUP_ERRCODE_SUCCESS);
+    MockSetWpaExpectCmdResponse("MAGICLINK", "FAIL\n");
+    EXPECT_TRUE(mInterface->wpaP2pCliCmdHid2dConnect(mInterface, &info) != P2P_SUP_ERRCODE_SUCCESS);
+    MockSetWpaExpectCmdResponse("MAGICLINK", "OK\n");
+    EXPECT_TRUE(mInterface->wpaP2pCliCmdHid2dConnect(mInterface, &info) == P2P_SUP_ERRCODE_SUCCESS);
+}
+
+HWTEST_F(WifiHalWpaP2pTest, WpaP2pCliCmdGetGroupConfigTest, TestSize.Level1)
+{
+    P2pWpaGroupConfigArgv info;
+    ASSERT_TRUE(memset_s(&info, sizeof(info), 0, sizeof(info)) == EOK);
+    EXPECT_TRUE(mInterface->wpaP2pCliCmdGetGroupConfig(nullptr, nullptr) != P2P_SUP_ERRCODE_SUCCESS);
+    EXPECT_TRUE(mInterface->wpaP2pCliCmdGetGroupConfig(mInterface, nullptr) != P2P_SUP_ERRCODE_SUCCESS);
+    MockEraseSupportedCmd("GET_NETWORK");
+    EXPECT_TRUE(mInterface->wpaP2pCliCmdGetGroupConfig(mInterface, &info) != P2P_SUP_ERRCODE_SUCCESS);
+    MockSetWpaExpectCmdResponse("GET_NETWORK", "FAIL\n");
+    EXPECT_TRUE(mInterface->wpaP2pCliCmdGetGroupConfig(mInterface, &info) != P2P_SUP_ERRCODE_SUCCESS);
+    MockSetWpaExpectCmdResponse("GET_NETWORK", "OK\n");
+    EXPECT_TRUE(mInterface->wpaP2pCliCmdGetGroupConfig(mInterface, &info) == P2P_SUP_ERRCODE_SUCCESS);
+}
 }  // namespace Wifi
 }  // namespace OHOS

@@ -337,8 +337,8 @@ napi_value ConfigStaticIp(const napi_env& env, const napi_value& object, WifiDev
     const int DNS_NUM = 2;
     napi_get_named_property(env, staticIp, "dnsServers", &dnsServers);
     napi_get_array_length(env, dnsServers, &arrayLength);
-    if (arrayLength != DNS_NUM) {
-        WIFI_LOGE("ConfigStaticIp, It needs two dns servers.");
+    if (arrayLength == 0 || arrayLength > DNS_NUM) {
+        WIFI_LOGE("ConfigStaticIp, It needs dns servers or dns too much.");
         return UndefinedNapiValue(env);
     }
     napi_get_element(env, dnsServers, 0, &primaryDns);

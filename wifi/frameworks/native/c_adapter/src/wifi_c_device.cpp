@@ -166,6 +166,7 @@ static OHOS::Wifi::ErrCode ConvertDeviceConfigFromC(
     deviceConfig.keyMgmt = GetKeyMgmtBySecType(config->securityType);
     deviceConfig.networkId = config->netId;
     deviceConfig.frequency = config->freq;
+    deviceConfig.wifiPrivacySetting = OHOS::Wifi::WifiPrivacyConfig(config->randomMacType);
     /* wapiPskType is not support, don't verify now */
     if (config->ipType == DHCP) {
         deviceConfig.wifiIpConfig.assignMethod = OHOS::Wifi::AssignIpMethod::DHCP;
@@ -197,6 +198,7 @@ static OHOS::Wifi::ErrCode ConvertDeviceConfigFromCpp(const OHOS::Wifi::WifiDevi
     result->securityType = GetSecTypeByKeyMgmt(deviceConfig.keyMgmt);
     result->netId = deviceConfig.networkId;
     result->freq = deviceConfig.frequency;
+    result->randomMacType = static_cast<int>(deviceConfig.wifiPrivacySetting);
     /* wapiPskType is not support now */
     if (deviceConfig.wifiIpConfig.assignMethod == OHOS::Wifi::AssignIpMethod::DHCP) {
         result->ipType = DHCP;

@@ -479,7 +479,9 @@ static napi_value JsObjToDeviceConfig(const napi_env& env, const napi_value& obj
     /* "creatorUid" is not supported currently */
     /* "disableReason" is not supported currently */
     JsObjectToInt(env, object, "netId", cppConfig.networkId);
-    /* "randomMacType" is not supported currently */
+    int randomMacType = static_cast<int>(WifiPrivacyConfig::RANDOMMAC);
+    JsObjectToInt(env, object, "randomMacType", randomMacType);
+    cppConfig.wifiPrivacySetting = WifiPrivacyConfig(randomMacType);
     /* "randomMacAddr" is not supported currently */
     int ipType = static_cast<int>(AssignIpMethod::UNASSIGNED);
     JsObjectToInt(env, object, "ipType", ipType);
@@ -1188,8 +1190,7 @@ static void DeviceConfigToJsArray(const napi_env& env, std::vector<WifiDeviceCon
     /* not supported currently */
     SetValueInt32(env, "disableReason", DEFAULT_INVALID_VALUE, result);
     SetValueInt32(env, "netId", vecDeviceConfigs[idx].networkId, result);
-    /* not supported currently */
-    SetValueInt32(env, "randomMacType", DEFAULT_INVALID_VALUE, result);
+    SetValueInt32(env, "randomMacType", static_cast<int>(vecDeviceConfigs[idx].wifiPrivacySetting), result);
     /* not supported currently */
     SetValueUtf8String(env, "randomMacAddr", std::string("").c_str(), result);
     if (vecDeviceConfigs[idx].wifiIpConfig.assignMethod == AssignIpMethod::STATIC) {

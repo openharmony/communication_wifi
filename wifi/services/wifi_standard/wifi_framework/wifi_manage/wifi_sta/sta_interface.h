@@ -220,6 +220,7 @@ public:
 private:
     StaServiceCallback staCallback;
     StaService *pStaService;
+    std::mutex mutex;
 };
 }  // namespace Wifi
 }  // namespace OHOS

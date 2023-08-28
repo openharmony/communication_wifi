@@ -762,6 +762,11 @@ private:
     GetIpState *pGetIpState;
     LinkedState *pLinkedState;
     ApRoamingState *pApRoamingState;
+
+    /**
+     * @Description Replace empty dns
+     */
+    void ReplaceEmptyDns(DhcpResult *result);
 };
 }  // namespace Wifi
 }  // namespace OHOS

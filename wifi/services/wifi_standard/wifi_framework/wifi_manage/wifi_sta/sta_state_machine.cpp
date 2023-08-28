@@ -1410,6 +1410,7 @@ bool StaStateMachine::SetRandomMac(int networkId)
     std::string lastMac;
     std::string currentMac;
     if (deviceConfig.wifiPrivacySetting == WifiPrivacyConfig::DEVICEMAC) {
+        WifiSettings::GetInstance().GetRealMacAddress(currentMac);
     } else {
         WifiStoreRandomMac randomMacInfo;
         std::vector<WifiScanInfo> scanInfoList;
@@ -2116,13 +2117,18 @@ void StaStateMachine::ConnectToNetworkProcess(InternalMessage *msg)
     }
 
     std::string macAddr;
+    std::string realMacAddr;
     WifiSettings::GetInstance().GetMacAddress(macAddr);
+    WifiSettings::GetInstance().GetRealMacAddress(realMacAddr);
     linkedInfo.networkId = lastNetworkId;
     linkedInfo.bssid = bssid;
     linkedInfo.ssid = deviceConfig.ssid;
+    linkedInfo.macType = (macAddr == realMacAddr ?
+        static_cast<int>(WifiPrivacyConfig::DEVICEMAC) : static_cast<int>(WifiPrivacyConfig::RANDOMMAC));
     linkedInfo.macAddress = macAddr;
     linkedInfo.ifHiddenSSID = deviceConfig.hiddenSSID;
     lastLinkedInfo.bssid = bssid;
+    lastLinkedInfo.macType = static_cast<int>(deviceConfig.wifiPrivacySetting);
     lastLinkedInfo.macAddress = deviceConfig.macAddress;
     lastLinkedInfo.ifHiddenSSID = deviceConfig.hiddenSSID;
     SetWifiLinkedInfo(lastNetworkId);

@@ -212,11 +212,12 @@ int WifiSettings::ClearScanInfoList()
 int WifiSettings::GetScanInfoList(std::vector<WifiScanInfo> &results)
 {
     std::unique_lock<std::mutex> lock(mInfoMutex);
-    for (auto iter = mWifiScanInfoList.begin(); iter != mWifiScanInfoList.end(); ++iter) {
+    for (auto iter = mWifiScanInfoList.begin(); iter != mWifiScanInfoList.end(); ) {
         if (iter->disappearCount >= WIFI_DISAPPEAR_TIMES) {
-            mWifiScanInfoList.erase(iter);
+            iter = mWifiScanInfoList.erase(iter);
             continue;
         }
+        ++iter;
         results.push_back(*iter);
     }
     return 0;

@@ -120,7 +120,8 @@ ErrCode WifiP2pService::StopP2pListen()
 
 ErrCode WifiP2pService::CreateGroup(const WifiP2pConfig &config)
 {
-    WIFI_LOGI("CreateGroup");
+    WIFI_LOGI("CreateGroup name: %{private}s, address:%{private}s, addressType:%{public}d",
+        config.GetGroupName().c_str(), config.GetDeviceAddress().c_str(), config.GetDeviceAddressType());
     WifiP2pConfigInternal configInternal(config);
     WpsInfo wps;
     wps.SetWpsMethod(WpsMethod::WPS_METHOD_PBC);

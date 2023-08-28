@@ -201,6 +201,8 @@ typedef struct WifiDeviceConfig {
     IpConfig staticIp;
     /* 1 for hidden config */
     int isHiddenSsid;
+    /* randomMacType */
+    int randomMacType;
 } WifiDeviceConfig;
 
 /**

@@ -647,6 +647,12 @@ void P2pStateMachine::ChangeConnectedStatus(P2pConnectedState connectedState)
     WIFI_LOGI("ChangeConnectedStatus, connectedState: %{public}d", connectedState);
     WifiP2pLinkedInfo p2pInfo;
     WifiSettings::GetInstance().GetP2pInfo(p2pInfo);
+    P2pConnectedState curP2pConnectedState = p2pInfo.GetConnectState();
+    if (curP2pConnectedState == connectedState) {
+        WIFI_LOGD("The connection status is the same, ignore this status!");
+        return;
+    }
+
     p2pInfo.SetConnectState(connectedState);
     WifiSettings::GetInstance().SaveP2pInfo(p2pInfo);
     groupManager.SaveP2pInfo(p2pInfo);

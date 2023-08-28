@@ -50,7 +50,7 @@ const uint32_t TIMEOUT_LOCATION_EVENT = 3000;
 const uint32_t TIMEOUT_UNLOAD_WIFI_SA = 5 * 60 * 1000;
 using TimeOutCallback = std::function<void()>;
 
-static sptr<WifiLocationModeObserver> locationEventSubscriber_ = nullptr;
+static sptr<WifiLocationModeObserver> locationModeObserver_ = nullptr;
 #endif
 
 WifiManager &WifiManager::GetInstance()
@@ -563,7 +563,7 @@ int WifiManager::Init()
         WifiTimer::GetInstance()->Register(timeoutCallback, airplaneModeTimerId, TIMEOUT_AIRPLANE_MODE_EVENT, false);
         WIFI_LOGI("RegisterAirplaneModeEvent success! airplaneModeTimerId:%{public}u", airplaneModeTimerId);
     }
-    if (locationEventSubscriber_ == nullptr && locationTimerId == 0) {
+    if (locationModeObserver_ == nullptr && locationTimerId == 0) {
         TimeOutCallback timeoutCallback = std::bind(&WifiManager::RegisterLocationEvent, this);
         WifiTimer::GetInstance()->Register(timeoutCallback, locationTimerId, TIMEOUT_LOCATION_EVENT, false);
         WIFI_LOGI("RegisterLocationEvent success! locationTimerId:%{public}u", locationTimerId);
@@ -664,7 +664,7 @@ void WifiManager::Exit()
         UnRegisterAirplaneModeEvent();
     }
 
-    if (locationEventSubscriber_ != nullptr) {
+    if (locationModeObserver_ != nullptr) {
         UnRegisterLocationEvent();
     }
 #endif
@@ -1932,7 +1932,7 @@ bool WifiManager::GetLocationModeByDatashare()
 void WifiManager::RegisterLocationEvent()
 {
     std::unique_lock<std::mutex> lock(locationEventMutex);
-    if (locationEventSubscriber_) {
+    if (locationModeObserver_) {
         return;
     }
 
@@ -1941,16 +1941,16 @@ void WifiManager::RegisterLocationEvent()
         WIFI_LOGE("LocationEvent datashareHelper is nullptr");
         return;
     }
-    locationEventSubscriber_ = sptr<WifiLocationModeObserver>(new (std::nothrow)WifiLocationModeObserver());
+    locationModeObserver_ = sptr<WifiLocationModeObserver>(new (std::nothrow)WifiLocationModeObserver());
     Uri uri(SETTINGS_DATASHARE_URI_LOCATION_MODE);
-    datashareHelper->RegisterObserver(uri, locationEventSubscriber_);
+    datashareHelper->RegisterObserver(uri, locationModeObserver_);
 }
 
 void WifiManager::UnRegisterLocationEvent()
 {
     std::unique_lock<std::mutex> lock(locationEventMutex);
-    if (locationEventSubscriber_ == nullptr) {
-        WIFI_LOGE("UnRegisterLocationEvent locationEventSubscriber_ is nullptr");
+    if (locationModeObserver_ == nullptr) {
+        WIFI_LOGE("UnRegisterLocationEvent locationModeObserver_ is nullptr");
         return;
     }
 
@@ -1960,8 +1960,8 @@ void WifiManager::UnRegisterLocationEvent()
         return;
     }
     Uri uri(SETTINGS_DATASHARE_URI_LOCATION_MODE);
-    datashareHelper->UnRegisterObserver(uri, locationEventSubscriber_);
-    locationEventSubscriber_ = nullptr;
+    datashareHelper->UnRegisterObserver(uri, locationModeObserver_);
+    locationModeObserver_ = nullptr;
 }
 
 void WifiManager::DealLocationModeChangeEvent()

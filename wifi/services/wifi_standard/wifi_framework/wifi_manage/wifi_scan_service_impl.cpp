@@ -303,7 +303,7 @@ ErrCode WifiScanServiceImpl::OpenScanOnlyAvailable()
 {
     WIFI_LOGI("WifiScanServiceImpl OpenScanOnlyAvailable");
     if (!WifiSettings::GetInstance().CheckScanOnlyAvailable() ||
-        !WifiManager::GetInstance().GetLocationModeByDatashare(WIFI_SCAN_ABILITY_ID)) {
+        !WifiManager::GetInstance().GetLocationModeByDatashare()) {
         return WIFI_OPT_FAILED;
     }
    

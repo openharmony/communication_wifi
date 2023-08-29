@@ -18,6 +18,9 @@
 
 #include <memory>
 #include <utility>
+#include <singleton.h>
+
+#include "iremote_object.h"
 #include "datashare_helper.h"
 #include "datashare_predicates.h"
 #include "datashare_result_set.h"
@@ -37,17 +40,27 @@ constexpr const char *SETTINGS_DATASHARE_URI_LOCATION_MODE =
 constexpr const char *SETTINGS_DATASHARE_KEY_LOCATION_MODE = "location_switch_enable";
 }
 
-class WifiDataShareHelperUtils final {
+class WifiDataShareHelperUtils : DelayedSingleton<WifiDataShareHelperUtils> {
 public:
-    WifiDataShareHelperUtils(int systemAbilityId);
+    WifiDataShareHelperUtils();
     ~WifiDataShareHelperUtils() = default;
     ErrCode Query(Uri &uri, const std::string &key, std::string &value);
 
+    ErrCode RegisterObserver(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &observer);
+
+    ErrCode UnRegisterObserver(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &observer);
+
 private:
-    std::shared_ptr<DataShare::DataShareHelper> WifiCreateDataShareHelper(int systemAbilityId);
+    std::shared_ptr<DataShare::DataShareHelper> WifiCreateDataShareHelper();
 private:
     std::shared_ptr<DataShare::DataShareHelper> dataShareHelper_ = nullptr;
 };
+
+class IWifiDataShareRemoteBroker : public IRemoteBroker {
+public:
+    DECLARE_INTERFACE_DESCRIPTOR(u"ohos.wifi.IWifiScan");
+};
+
 }   // namespace Wifi
 }   // namespace OHOS
 #endif

@@ -335,7 +335,7 @@ ErrCode WifiHotspotServiceImpl::CheckCanEnableHotspot(const ServiceType type)
         return WIFI_OPT_PERMISSION_DENIED;
     }
 
-    WifiManager::GetInstance().GetAirplaneModeByDatashare(WIFI_HOTSPOT_ABILITY_ID);
+    WifiManager::GetInstance().GetAirplaneModeByDatashare();
     if (WifiConfigCenter::GetInstance().GetAirplaneModeState() == MODE_STATE_OPEN) {
         WIFI_LOGI("current airplane mode and can not use ap, open failed!");
         return WIFI_OPT_FORBID_AIRPLANE;

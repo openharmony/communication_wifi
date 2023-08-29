@@ -43,6 +43,8 @@ namespace OHOS {
 namespace Wifi {
 DEFINE_WIFILOG_LABEL("StaStateMachine");
 #define PBC_ANY_BSSID "any"
+#define FIRST_DNS "8.8.8.8"
+#define SECOND_DNS "180.76.76.76"
 StaStateMachine::StaStateMachine()
     : StateMachine("StaStateMachine"),
       lastNetworkId(INVALID_NETWORK_ID),
@@ -1889,6 +1891,31 @@ bool StaStateMachine::GetIpState::ExecuteStateMsg(InternalMessage *msg)
     return ret;
 }
 
+void StaStateMachine::ReplaceEmptyDns(DhcpResult *result)
+{
+    if (result == nullptr) {
+        WIFI_LOGE("Enter ReplaceEmptyDns::result is nullptr");
+        return;
+    }
+
+    if (result->strDns1.empty()) {
+        WIFI_LOGI("Enter ReplaceEmptyDns::dns1 is null");
+        if (result->strDns2 == FIRST_DNS) {
+            result->strDns1.assign(SECOND_DNS);
+        } else {
+            result->strDns1.assign(FIRST_DNS);
+        }
+    }
+    if (result->strDns2.empty()) {
+        WIFI_LOGI("Enter ReplaceEmptyDns::dns2 is null");
+        if (result->strDns1 == FIRST_DNS) {
+            result->strDns2.assign(SECOND_DNS);
+        } else {
+            result->strDns2.assign(FIRST_DNS);
+        }
+    }
+}
+
 /* --- state machine GetIp State functions ----- */
 bool StaStateMachine::ConfigStaticIpAddress(StaticIpAddress &staticIpAddress)
 {
@@ -1902,6 +1929,7 @@ bool StaStateMachine::ConfigStaticIpAddress(StaticIpAddress &staticIpAddress)
             result.strSubnet = staticIpAddress.GetIpv4Mask();
             result.strDns1 = staticIpAddress.dnsServer1.GetIpv4Address();
             result.strDns2 = staticIpAddress.dnsServer2.GetIpv4Address();
+            ReplaceEmptyDns(&result);
             pDhcpResultNotify->OnSuccess(1, IF_NAME, result);
             break;
         }

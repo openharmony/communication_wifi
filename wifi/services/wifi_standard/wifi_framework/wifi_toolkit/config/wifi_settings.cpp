@@ -205,6 +205,9 @@ int WifiSettings::SaveScanInfoList(const std::vector<WifiScanInfo> &results)
 int WifiSettings::ClearScanInfoList()
 {
     std::unique_lock<std::mutex> lock(mInfoMutex);
+#ifdef SUPPORT_RANDOM_MAC_ADDR
+    WifiSettings::GetInstance().ClearMacAddrPairs(WifiMacAddrInfoType::WIFI_SCANINFO_MACADDR_INFO);
+#endif
     mWifiScanInfoList.clear();
     return 0;
 }
@@ -214,6 +217,10 @@ int WifiSettings::GetScanInfoList(std::vector<WifiScanInfo> &results)
     std::unique_lock<std::mutex> lock(mInfoMutex);
     for (auto iter = mWifiScanInfoList.begin(); iter != mWifiScanInfoList.end(); ) {
         if (iter->disappearCount >= WIFI_DISAPPEAR_TIMES) {
+        #ifdef SUPPORT_RANDOM_MAC_ADDR
+            WifiSettings::GetInstance().RemoveMacAddrPairInfo(WifiMacAddrInfoType::WIFI_SCANINFO_MACADDR_INFO,
+                iter->bssid);
+        #endif
             iter = mWifiScanInfoList.erase(iter);
             continue;
         }
@@ -946,6 +953,9 @@ int WifiSettings::FindConnStation(const StationInfo &info, int id)
 int WifiSettings::ClearStationList(int id)
 {
     std::unique_lock<std::mutex> lock(mInfoMutex);
+#ifdef SUPPORT_RANDOM_MAC_ADDR
+    WifiSettings::GetInstance().ClearMacAddrPairs(WifiMacAddrInfoType::HOTSPOT_MACADDR_INFO);
+#endif
     mConnectStationInfo.clear();
     return 0;
 }
@@ -1865,8 +1875,8 @@ static void DelMacAddrPairs(std::map<WifiMacAddrInfo, std::string>& macAddrInfoM
     auto iter = macAddrInfoMap.find(macAddrInfo);
     if (iter != macAddrInfoMap.end()) {
         if (iter->second.empty()) {
-            LOGI("invalid record, bssid:%{private}s, bssidType:%{public}d",
-                iter->first.bssid.c_str(), iter->first.bssidType);
+            LOGI("%{public}s: invalid record, bssid:%{private}s, bssidType:%{public}d",
+                __func__, iter->first.bssid.c_str(), iter->first.bssidType);
         } else {
             LOGD("%{public}s: find the record, realMacAddr:%{private}s, bssidType:%{public}d, randomMacAddr:%{private}s",
                 __func__, macAddrInfo.bssid.c_str(), macAddrInfo.bssidType, iter->second.c_str());
@@ -1946,7 +1956,19 @@ bool WifiSettings::StoreWifiMacAddrPairInfo(WifiMacAddrInfoType type, const std:
     }
     return true;
 }
+void WifiSettings::RemoveMacAddrPairInfo(WifiMacAddrInfoType type, std::string bssid)
+{
+    LOGD("remove a mac address pair, type:%{public}d, bssid:%{private}s", type, bssid.c_str());
+    WifiMacAddrInfo realMacAddrInfo;
+    realMacAddrInfo.bssid = bssid;
+    realMacAddrInfo.bssidType = REAL_DEVICE_ADDRESS;
+    WifiSettings::GetInstance().RemoveMacAddrPairs(type, realMacAddrInfo);
 
+    WifiMacAddrInfo randomMacAddrInfo;
+    randomMacAddrInfo.bssid = bssid;
+    randomMacAddrInfo.bssidType = RANDOM_DEVICE_ADDRESS;
+    WifiSettings::GetInstance().RemoveMacAddrPairs(type, randomMacAddrInfo);
+}
 WifiMacAddrErrCode WifiSettings::AddMacAddrPairs(WifiMacAddrInfoType type,
     const WifiMacAddrInfo &macAddrInfo, std::string randomMacAddr)
 {
@@ -1972,6 +1994,8 @@ WifiMacAddrErrCode WifiSettings::AddMacAddrPairs(WifiMacAddrInfoType type,
 
 int WifiSettings::RemoveMacAddrPairs(WifiMacAddrInfoType type, const WifiMacAddrInfo &macAddrInfo)
 {
+    LOGD("remove a mac address pair, type:%{public}d, bssid:%{private}s, bssidType:%{public}d",
+        type, macAddrInfo.bssid.c_str(), macAddrInfo.bssidType);
     std::unique_lock<std::mutex> lock(mMacAddrPairMutex);
     switch (type) {
         case WifiMacAddrInfoType::WIFI_SCANINFO_MACADDR_INFO:

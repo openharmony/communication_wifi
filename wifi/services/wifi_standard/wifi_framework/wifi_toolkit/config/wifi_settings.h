@@ -1323,6 +1323,13 @@ public:
      */
     bool StoreWifiMacAddrPairInfo(WifiMacAddrInfoType type, const std::string &realMacAddr);
     /**
+     * @Description remove MAC address pair
+     *
+     * @param type - MAC address type[in]
+     * @param bssid - MAC address
+     */
+    void RemoveMacAddrPairInfo(WifiMacAddrInfoType type, std::string bssid);
+    /**
      * @Description add a MAC address pair
      *
      * @param type - MAC address type[in]
@@ -1354,7 +1361,7 @@ public:
      */
     void PrintMacAddrPairs(WifiMacAddrInfoType type);
     /**
-         * @Description Clear MAC address pair
+     * @Description Clear MAC address pair
      *
      * @param type - MAC address type[in]
      * @return std::string - an empty string indicates failure  

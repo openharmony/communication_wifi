@@ -137,7 +137,7 @@ void WifiDeviceServiceImpl::OnStart()
     WifiManager::GetInstance();
 #ifndef OHOS_ARCH_LITE
     // Get airplane mode by datashare
-    WifiManager::GetInstance().GetAirplaneModeByDatashare(WIFI_DEVICE_ABILITY_ID);
+    WifiManager::GetInstance().GetAirplaneModeByDatashare();
 
     if (eventSubscriber_ == nullptr && appEventTimerId == 0) {
         TimeOutCallback timeoutCallback = std::bind(&WifiDeviceServiceImpl::RegisterAppRemoved, this);
@@ -352,7 +352,7 @@ ErrCode WifiDeviceServiceImpl::DisableWifi()
         WifiConfigCenter::GetInstance().SetWifiMidState(WifiOprMidState::CLOSING, WifiOprMidState::RUNNING);
     } else {
         WifiConfigCenter::GetInstance().SetStaLastRunState(false);
-        WifiManager::GetInstance().GetAirplaneModeByDatashare(WIFI_DEVICE_ABILITY_ID);
+        WifiManager::GetInstance().GetAirplaneModeByDatashare();
         if (WifiConfigCenter::GetInstance().GetOperatorWifiType() ==
             static_cast<int>(OperatorWifiType::USER_OPEN_WIFI_IN_AIRPLANEMODE)) {
             if (WifiConfigCenter::GetInstance().GetAirplaneModeState() == MODE_STATE_OPEN) {
@@ -1304,7 +1304,7 @@ ErrCode WifiDeviceServiceImpl::CheckCanEnableWifi(void)
      * when airplane mode opened, if the config "can_open_sta_when_airplanemode"
      * opened, then can open sta; other, return forbid.
      */
-    WifiManager::GetInstance().GetAirplaneModeByDatashare(WIFI_DEVICE_ABILITY_ID);
+    WifiManager::GetInstance().GetAirplaneModeByDatashare();
     if (WifiConfigCenter::GetInstance().GetAirplaneModeState() == MODE_STATE_OPEN &&
         !WifiConfigCenter::GetInstance().GetCanOpenStaWhenAirplaneMode()) {
         WIFI_LOGI("current airplane mode and can not use sta, open failed!");

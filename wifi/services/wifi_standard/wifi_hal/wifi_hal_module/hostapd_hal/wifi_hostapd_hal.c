@@ -691,7 +691,7 @@ static int SetApInfo(HostapdConfig *info, int id)
     if (info->maxConn >= 0) {
         int wpaRet = SetApMaxConn(info->maxConn, id);
         retval = SetApMaxConnHw(info->maxConn, info->channel);
-        LOGE("SetApMaxConn:%{public}d  SetApMaxConnHw:%{public}d", wpaRet, retval);
+        LOGI("SetApMaxConn:%{public}d  SetApMaxConnHw:%{public}d", wpaRet, retval);
     }
 #endif
     return retval;

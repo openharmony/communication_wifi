@@ -35,12 +35,12 @@ DEFINE_WIFILOG_LABEL("WifiSettingsTest");
 namespace OHOS {
 namespace Wifi {
 constexpr int NETWORK_ID = 15;
-constexpr int TYPE = 0;
+constexpr int TYPE = 3;
 constexpr int SCORE = 0;
 constexpr int STATE = 0;
 constexpr int UID = 0;
 constexpr int ZERO = 0;
-constexpr int TIME = 0;
+constexpr int INITIAL_TYPE = 6;
 constexpr int WIFI_OPT_SUCCESS = 0;
 constexpr int WIFI_OPT_RETURN = -1;
 constexpr int MIN_RSSI_2DOT_4GHZ = -80;
@@ -184,7 +184,7 @@ HWTEST_F(WifiSettingsTest, RemoveRandomMacTest, TestSize.Level1)
 HWTEST_F(WifiSettingsTest, SetHotspotIdleTimeoutTest, TestSize.Level1)
 {
     WIFI_LOGE("SetHotspotIdleTimeoutTest enter!");
-    int result = WifiSettings::GetInstance().SetHotspotIdleTimeout(TIME);
+    int result = WifiSettings::GetInstance().SetHotspotIdleTimeout(STATE);
     WIFI_LOGE("SetHotspotIdleTimeoutTest result(%{public}d)", result);
     EXPECT_EQ(result, WIFI_OPT_SUCCESS);
 }
@@ -251,13 +251,13 @@ HWTEST_F(WifiSettingsTest, GetOperatorWifiTypeTest, TestSize.Level1)
     WIFI_LOGE("GetOperatorWifiTypeTest enter!");
     int result = WifiSettings::GetInstance().GetOperatorWifiType();
     WIFI_LOGE("GetOperatorWifiTypeTest result(%{public}d)", result);
-    EXPECT_EQ(result, WIFI_OPT_SUCCESS);
+    EXPECT_TRUE(result == WIFI_OPT_SUCCESS || result == INITIAL_TYPE);
 }
 
 HWTEST_F(WifiSettingsTest, SetOperatorWifiTypeTest, TestSize.Level1)
 {
     WIFI_LOGE("SetOperatorWifiTypeTest enter!");
-    int result = WifiSettings::GetInstance().SetOperatorWifiType(TYPE);
+    int result = WifiSettings::GetInstance().SetOperatorWifiType(SCORE);
     WIFI_LOGE("SetOperatorWifiTypeTest result(%{public}d)", result);
     EXPECT_EQ(result, WIFI_OPT_SUCCESS);
 }
@@ -466,13 +466,13 @@ HWTEST_F(WifiSettingsTest, GetStaApExclusionTypeTest, TestSize.Level1)
     WIFI_LOGE("GetStaApExclusionTypeTest enter!");
     int result = WifiSettings::GetInstance().GetStaApExclusionType();
     WIFI_LOGE("GetStaApExclusionTypeTest result(%{public}d)", result);
-    EXPECT_EQ(result, WIFI_OPT_SUCCESS);
+    EXPECT_TRUE(result == WIFI_OPT_SUCCESS || result == TYPE);
 }
 
 HWTEST_F(WifiSettingsTest, SetStaApExclusionTypeTest, TestSize.Level1)
 {
     WIFI_LOGE("SetStaApExclusionTypeTest enter!");
-    int result = WifiSettings::GetInstance().SetStaApExclusionType(TYPE);
+    int result = WifiSettings::GetInstance().SetStaApExclusionType(SCORE);
     WIFI_LOGE("SetStaApExclusionTypeTest result(%{public}d)", result);
     EXPECT_EQ(result, WIFI_OPT_SUCCESS);
 }

@@ -135,7 +135,7 @@ HWTEST_F(WifiP2pServiceRequestListTest, ParseTlvs2ReqList3, TestSize.Level1)
     EXPECT_TRUE(pWifiP2pServiceRequestList->ParseTlvs2ReqList(tlvList));
 }
 
-HWTEST_F(WifiP2pServiceRequestListTest, ParseTlvs2ReqList3, TestSize.Level1)
+HWTEST_F(WifiP2pServiceRequestListTest, ParseTlvs2ReqList4, TestSize.Level1)
 {
     std::vector<unsigned char> tlvList;
     tlvList.push_back(0x06);

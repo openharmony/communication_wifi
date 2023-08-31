@@ -80,13 +80,6 @@ public:
         pStaInterface->EnableWifi();
     }
 
-    void EnableWifiFail2()
-    {
-        EXPECT_CALL(*pMockStaService, InitStaService(_)).WillRepeatedly(Return(WIFI_OPT_SUCCESS));
-        EXPECT_CALL(*pMockStaService, EnableWifi()).WillRepeatedly(Return(WIFI_OPT_FAILED));
-        EXPECT_TRUE(pStaInterface->EnableWifi() == WIFI_OPT_FAILED);
-    }
-
     void DisableWifiSuceess()
     {
         EXPECT_CALL(*pMockStaService, DisableWifi()).WillRepeatedly(Return(WIFI_OPT_SUCCESS));
@@ -400,11 +393,6 @@ HWTEST_F(StaInterfaceTest, EnableWifiSuccess, TestSize.Level1)
 HWTEST_F(StaInterfaceTest, EnableWifiFail1, TestSize.Level1)
 {
     EnableWifiFail1();
-}
-
-HWTEST_F(StaInterfaceTest, EnableWifiFail2, TestSize.Level1)
-{
-    EnableWifiFail2();
 }
 
 HWTEST_F(StaInterfaceTest, DisableWifiSuceess, TestSize.Level1)

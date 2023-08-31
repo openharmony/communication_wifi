@@ -25,7 +25,6 @@ namespace OHOS {
 namespace Wifi {
 constexpr int MAX_IPV4_SPLIT_LEN = 4;
 constexpr int MAX_IPV4_VALUE = 255;
-constexpr int MAX_HOTSPOT_CONN = 64;
 class WifiHotspotServiceImpl : public WifiHotspotStub {
 public:
     WifiHotspotServiceImpl();

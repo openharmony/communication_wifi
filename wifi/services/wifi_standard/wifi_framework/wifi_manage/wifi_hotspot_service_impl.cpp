@@ -860,7 +860,10 @@ ErrCode WifiHotspotServiceImpl::IsValidHotspotConfig(const HotspotConfig &cfg, c
     if (CfgCheckIpAddress(cfg.GetIpAddress()) == ErrCode::WIFI_OPT_INVALID_PARAM) {
         return ErrCode::WIFI_OPT_INVALID_PARAM;
     }
-
+    if (cfg.GetMaxConn() <= 0 || cfg.GetMaxConn() > MAX_HOTSPOT_CONN) {
+        LOGE("Open hotspot maxConn is illegal %{public}d !", cfg.GetMaxConn());
+        return ErrCode::WIFI_OPT_INVALID_PARAM;
+    }
     if (CfgCheckSsid(cfg) == ErrCode::WIFI_OPT_INVALID_PARAM) {
         return ErrCode::WIFI_OPT_INVALID_PARAM;
     }

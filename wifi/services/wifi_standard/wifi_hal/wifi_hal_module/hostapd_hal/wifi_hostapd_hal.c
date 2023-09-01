@@ -21,6 +21,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#ifndef OHOS_ARCH_LITE
+#include <sys/ioctl.h>
+#include <linux/wireless.h>
+#endif
 #include "securec.h"
 #include "common/wpa_ctrl.h"
 #include "wifi_common_def.h"
@@ -53,6 +57,12 @@ WifiHostapdHalDeviceInfo g_hostapdHalDevInfo[] = {
 #define HOSTAPD_DEFAULT_CFG CONFIG_ROOR_DIR"/wpa_supplicant/"WIFI_DEFAULT_CFG
 #define HOSTAPD_DEFAULT_UDPPORT "127.0.0.1:9877"
 #define HOSTAPD_CTRL_INTERFACE CONFIG_ROOR_DIR"/sockets/wpa/wlan0"
+#define AP_SET_CFG_DELAY 500000
+#define SOFTAP_MAX_BUFFER_SIZE 4096
+#define IFNAMSIZ 16
+
+// from OSTAPD_DEFAULT_CFG CONFIG_ROOR_DIR"/wpa_supplicant/"WIFI_DEFAULT_CFG
+#define AP_IFNAME "wlan0"
 
 WifiHostapdHalDeviceInfo g_hostapdHalDevInfo[] = {
     {AP_2G_MAIN_INSTANCE, NULL, WIFI_DEFAULT_CFG, HOSTAPD_DEFAULT_CFG, HOSTAPD_DEFAULT_UDPPORT}
@@ -463,6 +473,176 @@ static int SetApBand(int band, int id)
     return WpaCtrlCommand(g_hostapdHalDevInfo[id].hostapdHalDev->ctrlConn, cmd, buf, sizeof(buf));
 }
 
+#ifndef OHOS_ARCH_LITE
+static int SendPrivateCmd(struct iwreq *wrq, struct iw_priv_args *privPtr, const char *fName,
+    int bufLen, int sock, char dataBuf[])
+{
+    int i, j, ret;
+    int cmd = 0;
+    int subCmd = 0;
+
+    if (wrq == NULL || privPtr == NULL || fName == NULL) {
+        return -1;
+    }
+    for (i = 0; i < wrq->u.data.length; i++) {
+        if (strncmp(privPtr[i].name, fName, strlen(fName)) == 0) {
+            cmd = (int)privPtr[i].cmd;
+            break;
+        }
+    }
+    if (i == wrq->u.data.length) {
+        LOGE("fName: %{public}s - function not supported", fName);
+        return -1;
+    }
+    if (cmd < SIOCDEVPRIVATE) {
+        for (j = 0; j < i; j++) {
+            if ((privPtr[j].set_args == privPtr[i].set_args) &&
+                (privPtr[j].get_args == privPtr[i].get_args) &&
+                (privPtr[j].name[0] == '\0')) {
+                break;
+            }
+        }
+        if (j == i) {
+            LOGE("fName: %{public}s - invalid private ioctl", fName);
+            return -1;
+        }
+        subCmd = cmd;
+        cmd = (int)privPtr[j].cmd;
+    }
+    wrq->ifr_name[IFNAMSIZ - 1] = '\0';
+    if ((bufLen == 0) && (*dataBuf != 0)) {
+        wrq->u.data.length = strlen(dataBuf) + 1;
+    } else {
+        wrq->u.data.length = (uint16_t)bufLen;
+    }
+    wrq->u.data.pointer = dataBuf;
+    wrq->u.data.flags = (uint16_t)subCmd;
+    ret = ioctl(sock, cmd, wrq);
+    LOGD("the data length is:%d, ret is %d", wrq->u.data.length, ret);
+    return ret;
+}
+
+static int SetCommandHwHisi(const char *iface, const char *fName, unsigned int bufLen, char dataBuf[])
+{
+    char buf[SOFTAP_MAX_BUFFER_SIZE] = { 0 };
+    struct iwreq wrq;
+    int ret;
+
+    if (iface == NULL || fName == NULL) {
+        LOGE("SetCommandHwHisi: iface or fName is null.");
+        return -1;
+    }
+
+    ret = strncpy_s(wrq.ifr_name, sizeof(wrq.ifr_name), iface, strlen(iface));
+    if (ret != EOK) {
+        LOGE("%{public}s strncpy_s wrq fail", __func__);
+        return -1;
+    }
+    wrq.ifr_name[IFNAMSIZ - 1] = '\0';
+    wrq.u.data.pointer = buf;
+    wrq.u.data.length = sizeof(buf) / sizeof(struct iw_priv_args);
+    wrq.u.data.flags = 0;
+    LOGD("the interface name is: %{public}s", wrq.ifr_name);
+
+    int sock = socket(AF_INET, SOCK_DGRAM, 0);
+    if (sock < 0) {
+        LOGE("Softap SetCommandHw - failed to open socket");
+        return -1;
+    }
+    ret = ioctl(sock, SIOCGIWPRIV, &wrq);
+    if (ret < 0) {
+        LOGE("SIOCGIPRIV failed: %{public}d", ret);
+        close(sock);
+        return ret;
+    }
+    struct iw_priv_args *privPtr = (struct iw_priv_args *)wrq.u.data.pointer;
+    ret = strncpy_s(wrq.ifr_name, sizeof(wrq.ifr_name), iface, strlen(iface));
+    if (ret != EOK) {
+        LOGE("%{public}s strncpy_s wrq fail", __func__);
+        close(sock);
+        return -1;
+    }
+    ret = SendPrivateCmd(&wrq, privPtr, fName, bufLen, sock, dataBuf);
+    close(sock);
+    return ret;
+}
+
+static int AddParam(unsigned int position, const char *cmd, const char *arg, char outDataBuf[], unsigned int outSize)
+{
+    if (position < 0) {
+        LOGE("%{public}s position < 0", __func__);
+        return position;
+    }
+    if (cmd == NULL || arg == NULL) {
+        LOGE("%{public}s cmd == NULL || arg == NULL", __func__);
+        return -1;
+    }
+    if ((unsigned int)(position + strlen(cmd) + strlen(arg) + 3) >= outSize) { // 3: for "=" "," and terminator
+        LOGE("%{public}s Command line is too big", __func__);
+        return -1;
+    }
+
+    int ret = sprintf_s(&outDataBuf[position], outSize - position, "%s=%s,", cmd, arg);
+    if (ret == -1) {
+        LOGE("%{public}s sprintf_s cmd fail", __func__);
+        return -1;
+    }
+    position += ret;
+    return position;
+}
+
+static int SetApMaxConnHw(int maxConn, int channel)
+{
+    char dataBuf[SOFTAP_MAX_BUFFER_SIZE] = { 0 };
+    if (memset_s(dataBuf, SOFTAP_MAX_BUFFER_SIZE, 0, SOFTAP_MAX_BUFFER_SIZE) != EOK) {
+        LOGE("SetApMaxConnHw  memset_s fail");
+        return -1;
+    }
+    int index = 0;
+    if ((index = AddParam(index, "ASCII_CMD", "AP_CFG", dataBuf, SOFTAP_MAX_BUFFER_SIZE)) == -1) {
+        LOGE("AddParam ASCII_CMD fail");
+        return -1;
+    }
+    char chann[10] = {0};
+    if (sprintf_s(chann, sizeof(chann), "%d", channel) == -1) {
+        LOGE("AddParam CHANNEL sprintf_s failed");
+        return -1;
+    }
+    if ((index = AddParam(index, "CHANNEL", chann, dataBuf, SOFTAP_MAX_BUFFER_SIZE)) == -1) {
+        LOGE("AddParam CHANNEL fail");
+        return -1;
+    }
+    char maxStaNum[10] = {0};
+    if (sprintf_s(maxStaNum, sizeof(maxStaNum), "%d", maxConn) == -1) {
+        LOGE("AddParam maxStaNum sprintf_s failed");
+        return -1;
+    }
+    if ((index = AddParam(index, "MAX_SCB", maxStaNum, dataBuf, SOFTAP_MAX_BUFFER_SIZE)) == -1) {
+        LOGE("AddParam MAX_SCB fail");
+        return -1;
+    }
+    if ((unsigned int)(index + 4) >= sizeof(dataBuf)) { // 4 : for "END" and terminator
+        LOGE("Command line is too big");
+        return -1;
+    }
+    int ret = sprintf_s(&dataBuf[index], sizeof(dataBuf) - index, "END");
+    if (ret == -1) {
+        LOGE("sprintf_s fail.");
+        return -1;
+    }
+    LOGD("the command is :%{public}s", dataBuf);
+
+    ret = SetCommandHwHisi(AP_IFNAME, "AP_SET_CFG", SOFTAP_MAX_BUFFER_SIZE, dataBuf);
+    if (ret) {
+        LOGE("SetSoftapHw - failed: %{public}d", ret);
+    } else {
+        LOGI("SetSoftapHw - Ok");
+        usleep(AP_SET_CFG_DELAY);
+    }
+    return ret;
+}
+#endif
+
 static int SetApMaxConn(int maxConn, int id)
 {
     char cmd[BUFSIZE_CMD] = {0};
@@ -507,11 +687,14 @@ static int SetApInfo(HostapdConfig *info, int id)
         LOGE("SetApChannel failed. retval %{public}d", retval);
         return retval;
     }
-    if (info->maxConn >= 0 && (retval = SetApMaxConn(info->maxConn, id)) != 0) {
-        LOGE("SetApMaxConn failed. retval %{public}d", retval);
-        return retval;
+#ifndef OHOS_ARCH_LITE
+    if (info->maxConn >= 0) {
+        int wpaRet = SetApMaxConn(info->maxConn, id);
+        retval = SetApMaxConnHw(info->maxConn, info->channel);
+        LOGI("SetApMaxConn:%{public}d  SetApMaxConnHw:%{public}d", wpaRet, retval);
     }
-    return 0;
+#endif
+    return retval;
 }
 
 static int DisableAp(int id)

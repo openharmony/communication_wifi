@@ -224,8 +224,8 @@ int WifiSettings::GetScanInfoList(std::vector<WifiScanInfo> &results)
             iter = mWifiScanInfoList.erase(iter);
             continue;
         }
-        ++iter;
         results.push_back(*iter);
+        ++iter;
     }
     return 0;
 }

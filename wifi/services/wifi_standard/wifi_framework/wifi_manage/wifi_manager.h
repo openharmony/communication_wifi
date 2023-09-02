@@ -70,17 +70,15 @@ struct WifiCfgMonitorEventCallback {
 #ifndef OHOS_ARCH_LITE
 class ScreenEventSubscriber : public OHOS::EventFwk::CommonEventSubscriber {
 public:
-    explicit ScreenEventSubscriber(const OHOS::EventFwk::CommonEventSubscribeInfo &subscriberInfo)
-        : CommonEventSubscriber(subscriberInfo) {}
+    explicit ScreenEventSubscriber(const OHOS::EventFwk::CommonEventSubscribeInfo &subscriberInfo);
     virtual ~ScreenEventSubscriber();
     void OnReceiveEvent(const OHOS::EventFwk::CommonEventData &data) override;
 };
 
 class AirplaneModeEventSubscriber : public OHOS::EventFwk::CommonEventSubscriber {
 public:
-    explicit AirplaneModeEventSubscriber(const OHOS::EventFwk::CommonEventSubscribeInfo &subscriberInfo)
-        : CommonEventSubscriber(subscriberInfo) {}
-    virtual ~AirplaneModeEventSubscriber() {};
+    explicit AirplaneModeEventSubscriber(const OHOS::EventFwk::CommonEventSubscribeInfo &subscriberInfo);
+    virtual ~AirplaneModeEventSubscriber();
     void OnReceiveEvent(const OHOS::EventFwk::CommonEventData &eventData) override;
 };
 

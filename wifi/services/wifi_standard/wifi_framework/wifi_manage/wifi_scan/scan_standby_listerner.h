@@ -18,6 +18,7 @@
 #ifndef OHOS_ARCH_LITE
 #include <string>
 #include <functional>
+#include <mutex>
 #include "common_event_manager.h"
 #include "common_event_data.h"
 #include "common_event_support.h"
@@ -29,11 +30,8 @@ namespace Wifi {
 class StandBySubscriber : public OHOS::EventFwk::CommonEventSubscriber {
 public:
     explicit StandBySubscriber(const OHOS::EventFwk::CommonEventSubscribeInfo &subscriberInfo,
-        std::function<void(bool, bool)> callBack) : CommonEventSubscriber(subscriberInfo)
-    {
-        onStandbyChangedEvent = callBack;
-    }
-    virtual ~StandBySubscriber() {};
+        std::function<void(bool, bool)> callBack);
+    virtual ~StandBySubscriber();
     void OnReceiveEvent(const OHOS::EventFwk::CommonEventData &event) override;
 private:
     std::function<void(bool, bool)> onStandbyChangedEvent;
@@ -72,6 +70,7 @@ public:
 private:
     static bool allowScan;
     std::shared_ptr<StandBySubscriber> standbySubscriber = nullptr;
+    std::mutex standyMutex;
 };
 }  // namespace Wifi
 }  // namespace OHOS

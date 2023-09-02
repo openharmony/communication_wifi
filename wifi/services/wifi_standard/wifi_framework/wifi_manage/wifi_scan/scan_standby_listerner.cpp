@@ -34,12 +34,17 @@ StandByListerner::~StandByListerner()
 
 bool StandByListerner::Init()
 {
+    std::unique_lock<std::mutex> lock(standyMutex);
+    if (standbySubscriber) {
+        return false;
+    }
     OHOS::EventFwk::MatchingSkills matchingSkills;
     matchingSkills.AddEvent(OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_DEVICE_IDLE_MODE_CHANGED);
     EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
     standbySubscriber = std::make_shared<StandBySubscriber>(subscriberInfo, OnStandbyStateChanged);
     if (!OHOS::EventFwk::CommonEventManager::SubscribeCommonEvent(standbySubscriber)) {
         WIFI_LOGE("fail to SubscribeCommonEvent");
+        standbySubscriber = nullptr;
     }
     return true;
 }
@@ -61,6 +66,18 @@ void StandByListerner::OnStandbyStateChanged(bool napped, bool sleeping)
 {
     WIFI_LOGI("OnStandbyStateChanged napped:%{public}d, sleeping:%{public}d", napped, sleeping);
     allowScan = !sleeping;
+}
+
+StandBySubscriber::StandBySubscriber(const OHOS::EventFwk::CommonEventSubscribeInfo &subscriberInfo,
+    std::function<void(bool, bool)> callBack) : CommonEventSubscriber(subscriberInfo)
+{
+    onStandbyChangedEvent = callBack;
+    WIFI_LOGI("StandBySubscriber enter");
+}
+
+StandBySubscriber::~StandBySubscriber()
+{
+    WIFI_LOGI("~StandBySubscriber enter");
 }
 
 void StandBySubscriber::OnReceiveEvent(const OHOS::EventFwk::CommonEventData &event)

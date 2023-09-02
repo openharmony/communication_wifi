@@ -16,6 +16,7 @@
 #ifndef OHOS_WIFI_DEVICE_SERVICE_IMPL_H
 #define OHOS_WIFI_DEVICE_SERVICE_IMPL_H
 
+#include <mutex>
 #include "wifi_errcode.h"
 #include "wifi_msg.h"
 #include "i_wifi_device_callback.h"
@@ -37,17 +38,15 @@ namespace Wifi {
 #ifndef OHOS_ARCH_LITE
 class AppEventSubscriber : public OHOS::EventFwk::CommonEventSubscriber {
 public:
-    explicit AppEventSubscriber(const OHOS::EventFwk::CommonEventSubscribeInfo &subscriberInfo)
-        : CommonEventSubscriber(subscriberInfo) {}
-    virtual ~AppEventSubscriber() {};
+    explicit AppEventSubscriber(const OHOS::EventFwk::CommonEventSubscribeInfo &subscriberInfo);
+    virtual ~AppEventSubscriber();
     virtual void OnReceiveEvent(const OHOS::EventFwk::CommonEventData &data) override;
 };
 
 class ThermalLevelSubscriber : public OHOS::EventFwk::CommonEventSubscriber {
 public:
-    explicit ThermalLevelSubscriber(const OHOS::EventFwk::CommonEventSubscribeInfo &subscriberInfo)
-        : CommonEventSubscriber(subscriberInfo) {}
-    virtual ~ThermalLevelSubscriber() {};
+    explicit ThermalLevelSubscriber(const OHOS::EventFwk::CommonEventSubscribeInfo &subscriberInfo);
+    virtual ~ThermalLevelSubscriber();
     void OnReceiveEvent(const OHOS::EventFwk::CommonEventData &data) override;
 };
 #endif
@@ -201,6 +200,8 @@ private:
     std::shared_ptr<ThermalLevelSubscriber> thermalLevelSubscriber_ = nullptr;
     uint32_t appEventTimerId{0};
     uint32_t thermalTimerId{0};
+    std::mutex appEventMutex;
+    std::mutex thermalEventMutex;
 #endif
     static std::mutex g_instanceLock;
     static bool isServiceStart;

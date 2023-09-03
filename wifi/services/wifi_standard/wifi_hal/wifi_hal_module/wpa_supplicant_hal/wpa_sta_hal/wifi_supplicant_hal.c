@@ -1336,6 +1336,24 @@ static int WpaCliCmdGetSignalInfo(WifiWpaStaInterface *this, WpaSignalInfo *info
     return 0;
 }
 
+/* mode： 0 - enabled, 1 - disabled. */
+static int WpaCliCmdWpaSetPowerMode(WifiWpaStaInterface *this, bool mode)
+{
+    LOGI("Enter WpaCliCmdWpaSetPowerMode, mode:%{public}d.", mode);
+    if (this == NULL) {
+        LOGE("WpaCliCmdWpaSetPowerMode, this is NULL.");
+        return -1;
+    }
+    char cmd[CMD_BUFFER_SIZE] = {0};
+    char buf[REPLY_BUF_SMALL_LENGTH] = {0};
+    if (snprintf_s(cmd, sizeof(cmd), sizeof(cmd) - 1, "IFNAME=%s DRIVER POWERMODE %d",
+        this->ifname, mode) < 0) {
+        LOGE("WpaCliCmdWpaSetPowerMode, snprintf_s err");
+        return -1;
+    }
+    return WpaCliCmd(cmd, buf, sizeof(buf));
+}
+
 static int WpaCliCmdWpaSetSuspendMode(WifiWpaStaInterface *this, bool mode)
 {
     LOGI("Enter WpaCliCmdWpaSetSuspendMode, mode:%{public}d.", mode);
@@ -1350,7 +1368,11 @@ static int WpaCliCmdWpaSetSuspendMode(WifiWpaStaInterface *this, bool mode)
         LOGE("WpaCliCmdWpaSetSuspendMode, snprintf_s err");
         return -1;
     }
-    return WpaCliCmd(cmd, buf, sizeof(buf));
+
+    if (WpaCliCmd(cmd, buf, sizeof(buf)) != 0) {
+        LOGE("WpaCliCmdWpaSetSuspendMode, WpaCliCmd return failed!");
+    }
+    return WpaCliCmdWpaSetPowerMode(this, mode == false);
 }
 
 WifiWpaStaInterface *GetWifiStaInterface(int staNo)

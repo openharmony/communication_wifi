@@ -117,6 +117,13 @@
                         "header_files": [ ]
                     },
                     "name" : "//foundation/communication/wifi/wifi/frameworks/native:wifi_sdk"
+                },
+                {
+                    "header" : {
+                        "header_base": "//foundation/communication/wifi/wifi/base/inner_api/",
+                        "header_files": [ ]
+                    },
+                    "name" : "//foundation/communication/wifi/wifi/base:wifi_base"
                 }
             ],
             "test": [

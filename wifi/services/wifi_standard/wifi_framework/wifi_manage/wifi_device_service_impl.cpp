@@ -1532,6 +1532,10 @@ void AppEventSubscriber::OnReceiveEvent(const OHOS::EventFwk::CommonEventData &d
     if (action == OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_PACKAGE_REMOVED) {
         auto wantTemp = data.GetWant();
         auto uid = wantTemp.GetIntParam(AppExecFwk::Constants::UID, -1);
+        if (uid == -1) {
+            WIFI_LOGE("%{public}s getPackage uid is illegal.", __func__);
+            return;
+        }
         WIFI_LOGI("Package removed of uid %{public}d.", uid);
         IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst();
         if (pService == nullptr) {

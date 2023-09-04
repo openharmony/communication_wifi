@@ -664,7 +664,7 @@ ErrCode WifiHotspotServiceImpl::SetPowerModel(const PowerModel& model)
 {
     WIFI_LOGI("SetPowerModel, m_id is %{public}d %{public}s", m_id, __func__);
     if (WifiPermissionUtils::VerifySetWifiInfoPermission() == PERMISSION_DENIED) {
-        WIFI_LOGE("GetPowerModel:VerifyGetWifiInfoPermission() PERMISSION_DENIED!");
+        WIFI_LOGE("SetPowerModel:VerifySetWifiInfoPermission() PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
 

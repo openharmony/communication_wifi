@@ -316,7 +316,7 @@ ErrCode WifiHotspotServiceImpl::DisassociateSta(const StationInfo &info)
 int WifiHotspotServiceImpl::CheckOperHotspotSwitchPermission(const ServiceType type)
 {
 #ifdef FEATURE_AP_EXTENSION
-    return (type == ServiceType::WIFI_EXT) ? WifiPermissionUtils::VerifyManageWifiHotspotExtPermission() :
+    return (type == ServiceType::WIFI_EXT) ? WifiPermissionUtils::VerifySetWifiInfoPermission() :
         WifiPermissionUtils::VerifyManageWifiHotspotPermission();
 #else
     return (type == ServiceType::WIFI_EXT) ? PERMISSION_DENIED :
@@ -662,7 +662,12 @@ ErrCode WifiHotspotServiceImpl::GetPowerModel(PowerModel& model)
 
 ErrCode WifiHotspotServiceImpl::SetPowerModel(const PowerModel& model)
 {
-    WIFI_LOGI("current ap service is %{public}d %{public}s", m_id, __func__);
+    WIFI_LOGI("SetPowerModel, m_id is %{public}d %{public}s", m_id, __func__);
+    if (WifiPermissionUtils::VerifySetWifiInfoPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("GetPowerModel:VerifyGetWifiInfoPermission() PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+
     if (!IsApServiceRunning()) {
         return WIFI_OPT_AP_NOT_OPENED;
     }

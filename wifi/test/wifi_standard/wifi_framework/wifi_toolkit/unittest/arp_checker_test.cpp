@@ -29,8 +29,10 @@ public:
     {
         std::string ifname = "network";
         std::string hwAddr = "192.168.3.6";
+        std::string gatewayAddr = "192.168.3.1";
         std::string ipAddr = "10.3.1";
-        pArpChecker = std::make_unique<ArpChecker>(ifname, hwAddr, ipAddr);
+        pArpChecker = std::make_unique<ArpChecker>();
+        pArpChecker->Start(ifname, hwAddr, ipAddr, gatewayAddr);
     }
     virtual void TearDown()
     {
@@ -46,7 +48,7 @@ HWTEST_F(ArpCheckerTest, DoArp_FAIL, TestSize.Level1)
     int timeoutMillis = 0;
     std::string targetIp = "192.168.3.66";
     bool isFillSenderIp = false;
-    EXPECT_TRUE(pArpChecker->DoArp(timeoutMillis, targetIp, isFillSenderIp) == false);
+    EXPECT_TRUE(pArpChecker->DoArpCheck(timeoutMillis, isFillSenderIp) == false);
 }
 }  // namespace Wifi
 }  // namespace OHOS

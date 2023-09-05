@@ -29,6 +29,7 @@ local_base_sources = [
   "net_helper/arp_checker.cpp",
   "net_helper/base_address.cpp",
   "net_helper/dhcpd_interface.cpp",
+  "net_helper/dns_checker.cpp",
   "net_helper/http_request.cpp",
   "net_helper/if_config.cpp",
   "net_helper/ip_tools.cpp",

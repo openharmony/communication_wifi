@@ -40,14 +40,18 @@ struct ArpPacket {
 
 class ArpChecker {
 public:
-    ArpChecker(std::string& ifname, std::string& hwAddr, std::string& ipAddr);
+    ArpChecker();
     ~ArpChecker();
-    bool DoArp(int& timeoutMillis, std::string& targetIp, bool& isFillSenderIp);
+    void Start(std::string& ifname, std::string& hwAddr, std::string& ipAddr, std::string& gateway);
+    void Stop();
+    bool DoArpCheck(int timeoutMillis, bool isFillSenderIp);
 private:
     RawSocket rawSocket_;
-    struct in_addr localIpAddr_;
-    uint8_t localHwAddr_[ETH_ALEN];
-    uint8_t l2Broadcast_[ETH_ALEN];
+    bool socketCreated;
+    struct in_addr localIpAddr;
+    struct in_addr gatewayIpAddr;
+    uint8_t localMacAddr[ETH_ALEN];
+    uint8_t l2Broadcast[ETH_ALEN];
 };
 }
 }

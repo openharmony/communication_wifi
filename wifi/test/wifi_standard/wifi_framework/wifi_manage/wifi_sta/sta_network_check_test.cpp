@@ -27,7 +27,7 @@ public:
     static void TearDownTestCase() {}
     virtual void SetUp()
     {
-        pStaNetworkCheck = std::make_unique<StaNetworkCheck>(handle);
+        pStaNetworkCheck = std::make_unique<StaNetworkCheck>(nethandle, arpHandle, dnsHandle);
         pStaNetworkCheck->InitNetCheckThread();
     }
     virtual void TearDown()
@@ -42,7 +42,9 @@ public:
 
 public:
     std::unique_ptr<StaNetworkCheck> pStaNetworkCheck;
-    NetStateHandler handle = nullptr;
+    NetStateHandler nethandle = nullptr;
+    ArpStateHandler arpHandle = nullptr;
+    DnsStateHandler dnsHandle = nullptr;
 };
 
 bool StaNetworkCheckTest::HttpDetectionSuccess()

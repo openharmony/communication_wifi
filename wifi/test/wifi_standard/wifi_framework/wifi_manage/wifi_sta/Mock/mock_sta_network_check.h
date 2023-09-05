@@ -23,7 +23,8 @@ namespace OHOS {
 namespace Wifi {
 class MockStaNetworkCheck : public StaNetworkCheck {
 public:
-    explicit MockStaNetworkCheck(NetStateHandler handle) : StaNetworkCheck(handle) {}
+    explicit MockStaNetworkCheck(NetStateHandler nethandle, ArpStateHandler arpHandle, DnsStateHandler dnsHandle)
+        : StaNetworkCheck(nethandle, arpHandle, dnsHandle) {}
     ~MockStaNetworkCheck() = default;
     ErrCode InitNetCheckThread() override;
     void SignalNetCheckThread() override;

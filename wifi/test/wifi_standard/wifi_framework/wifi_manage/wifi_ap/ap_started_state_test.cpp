@@ -32,6 +32,7 @@
 
 using ::testing::_;
 using ::testing::A;
+using ::testing::AtLeast;
 using ::testing::DoAll;
 using ::testing::Eq;
 using ::testing::Return;

@@ -556,6 +556,11 @@ private:
      */
     void HandleDnsCheckResult(StaDnsState dnsState);
     /**
+     * @Description  notification portal network.
+     *
+     */
+    void PublishPortalNetworkNotification();
+    /**
      * @Description  Remove all device configurations before enabling WPS.
      *
      */
@@ -748,6 +753,7 @@ private:
     int getIpSucNum;
     int getIpFailNum;
     bool isRoam;
+    int netNoWorkNum;
     WifiLinkedInfo linkedInfo;
     WifiLinkedInfo lastLinkedInfo;
     std::unique_ptr<IDhcpService> pDhcpService;

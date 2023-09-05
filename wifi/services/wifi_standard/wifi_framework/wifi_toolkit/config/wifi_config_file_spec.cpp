@@ -1311,5 +1311,37 @@ template <> std::string OutTClassString<WifiStoreRandomMac>(WifiStoreRandomMac &
     ss << "    " <<"<WifiStoreRandomMac>" << std::endl;
     return ss.str();
 }
+
+template <> void ClearTClass<WifiPortalConf>(WifiPortalConf &item)
+{
+    item.portalUri.clear();
+    return;
+}
+
+template <>
+int SetTClassKeyValue<WifiPortalConf>(WifiPortalConf &item, const std::string &key, const std::string &value)
+{
+    int errorKeyValue = 0;
+    if (key == "url") {
+        item.portalUri = value;
+    } else {
+        LOGE("Invalid config key value");
+        errorKeyValue++;
+    }
+    return errorKeyValue;
+}
+
+template <> std::string GetTClassName<WifiPortalConf>()
+{
+    return "WifiPortalConf";
+}
+
+template <> std::string OutTClassString<WifiPortalConf>(WifiPortalConf &item)
+{
+    std::ostringstream ss;
+    ss << "    " <<"<WifiPortalConf>" << std::endl;
+    ss << "    " <<"url=" << ValidateString(item.portalUri) << std::endl;
+    return ss.str();
+}
 }  // namespace Wifi
 }  // namespace OHOS

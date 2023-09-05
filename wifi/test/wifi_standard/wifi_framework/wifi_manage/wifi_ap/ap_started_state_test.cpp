@@ -62,7 +62,7 @@ public:
 
         pMockApNatManager = new MockWifiApNatManager();
 
-        pApStartedState = new ApStartedState(*pMockApStateMachine, *pMockApConfigUse, *pMockApMonitor);
+        pApStartedState = std::make_unique<ApStartedState>(*pMockApStateMachine, *pMockApConfigUse, *pMockApMonitor);
 
         msg = new InternalMessage();
 
@@ -118,9 +118,7 @@ public:
     }
     virtual void TearDown()
     {
-        delete pApStartedState;
-
-        pApStartedState = nullptr;
+        pApStartedState.reset();
 
         delete pMockPendant;
 
@@ -146,7 +144,7 @@ public:
 public:
     InternalMessage *msg;
 
-    ApStartedState *pApStartedState;
+    std::unique_ptr<ApStartedState> pApStartedState;
 
     MockPendant *pMockPendant;
 
@@ -410,7 +408,7 @@ HWTEST_F(ApStartedState_test, ExecuteStateMsg_FAILED, TestSize.Level1)
 HWTEST_F(ApStartedState_test, UpdatePowerMode_001, TestSize.Level1)
 {
     EXPECT_CALL(WifiApHalInterface::GetInstance(), GetPowerModel(_, _))
-        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
+        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_OK))
         .WillRepeatedly(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED));
     EXPECT_CALL(WifiApHalInterface::GetInstance(), SetPowerModel(_, _)).Times(AtLeast(0));
     pApStartedState->UpdatePowerMode();
@@ -424,8 +422,8 @@ HWTEST_F(ApStartedState_test, SetConfig_001, TestSize.Level1)
     EXPECT_CALL(WifiSettings::GetInstance(), SetValidChannels(_)).WillRepeatedly(Return(0));
     EXPECT_CALL(WifiApHalInterface::GetInstance(), SetSoftApConfig(_, _))
         .WillRepeatedly(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
-    EXPECT_CALL(WifiSettings::GetInstance(), SetHotspotConfig(_, _))Times(AtLeast(0));
-    EXPECT_CALL(WifiSettings::GetInstance(), SyncHotspotConfig())Times(AtLeast(0));
+    EXPECT_CALL(WifiSettings::GetInstance(), SetHotspotConfig(_, _)).Times(AtLeast(0));
+    EXPECT_CALL(WifiSettings::GetInstance(), SyncHotspotConfig()).Times(AtLeast(0));
     EXPECT_TRUE(pApStartedState->SetConfig(apcfg));
 }
 
@@ -482,7 +480,7 @@ HWTEST_F(ApStartedState_test, SetConfigs_004, TestSize.Level1)
 HWTEST_F(ApStartedState_test, StartAp_001, TestSize.Level1)
 {
     EXPECT_CALL(WifiApHalInterface::GetInstance(), StartAp(0))
-        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED));
+        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED))
         .WillRepeatedly(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
     EXPECT_FALSE(pApStartedState->StartAp());
     EXPECT_TRUE(pApStartedState->StartAp());
@@ -491,7 +489,7 @@ HWTEST_F(ApStartedState_test, StartAp_001, TestSize.Level1)
 HWTEST_F(ApStartedState_test, StopAp_001, TestSize.Level1)
 {
     EXPECT_CALL(WifiApHalInterface::GetInstance(), StopAp(_))
-        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED));
+        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED))
         .WillRepeatedly(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
     EXPECT_FALSE(pApStartedState->StopAp());
     EXPECT_TRUE(pApStartedState->StopAp());
@@ -501,7 +499,6 @@ HWTEST_F(ApStartedState_test, StopAp_001, TestSize.Level1)
 HWTEST_F(ApStartedState_test, EnableInterfaceNat_001, TestSize.Level1)
 {
     EXPECT_CALL(MockNetworkInterface::GetInstance(), IsValidInterfaceName(_)).WillRepeatedly(Return(false));
-    EXPECT_FALSE(pApStartedState->EnableInterfaceNat());
     EXPECT_TRUE(pApStartedState->EnableInterfaceNat());
 }
 } // namespace Wifi

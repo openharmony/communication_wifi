@@ -47,8 +47,8 @@ ErrCode WifiHotspotServiceImpl::IsHotspotActive(bool &bActive)
         WIFI_LOGE("IsHotspotActive:NOT System APP, PERMISSION_DENIED!");
         return WIFI_OPT_NON_SYSTEMAPP;
     }
-    if (WifiPermissionUtils::VerifyManageWifiHotspotPermission() == PERMISSION_DENIED) {
-        WIFI_LOGE("IsHotspotActive:VerifyManageWifiHotspotPermission PERMISSION_DENIED!");
+    if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("IsHotspotActive:VerifyGetWifiInfoPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
 
@@ -236,11 +236,6 @@ ErrCode WifiHotspotServiceImpl::GetStationList(std::vector<StationInfo> &result)
 
         if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
             WIFI_LOGE("GetStationList:VerifyGetWifiInfoPermission PERMISSION_DENIED!");
-            return WIFI_OPT_PERMISSION_DENIED;
-        }
-
-        if (WifiPermissionUtils::VerifyGetWifiLocalMacPermission() == PERMISSION_DENIED) {
-            WIFI_LOGE("GetStationList:VerifyGetWifiLocalMacPermission PERMISSION_DENIED!");
             return WIFI_OPT_PERMISSION_DENIED;
         }
 

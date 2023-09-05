@@ -1700,6 +1700,7 @@ void WifiManager::RegisterScreenEvent()
     screenEventSubscriber_ = std::make_shared<ScreenEventSubscriber>(subscriberInfo);
     if (!EventFwk::CommonEventManager::SubscribeCommonEvent(screenEventSubscriber_)) {
         WIFI_LOGE("ScreenEvent SubscribeCommonEvent() failed");
+        screenEventSubscriber_ = nullptr;
     } else {
         WIFI_LOGI("ScreenEvent SubscribeCommonEvent() OK");
         WifiTimer::GetInstance()->UnRegister(screenTimerId);
@@ -1764,9 +1765,15 @@ void ScreenEventSubscriber::OnReceiveEvent(const OHOS::EventFwk::CommonEventData
     WIFI_LOGW("ScreenEventSubscriber::OnReceiveEvent, screen state: %{public}d.", screenState);
 }
 
+ScreenEventSubscriber::ScreenEventSubscriber(const OHOS::EventFwk::CommonEventSubscribeInfo &subscriberInfo)
+    : CommonEventSubscriber(subscriberInfo)
+{
+    WIFI_LOGI("ScreenEventSubscriber enter");
+}
+
 ScreenEventSubscriber::~ScreenEventSubscriber()
 {
-    WIFI_LOGI("ScreenEventSubscriber::~ScreenEventSubscriber");
+    WIFI_LOGI("~ScreenEventSubscriber enter");
 }
 
 void WifiManager::RegisterAirplaneModeEvent()
@@ -1782,6 +1789,7 @@ void WifiManager::RegisterAirplaneModeEvent()
     airplaneModeEventSubscriber_ = std::make_shared<AirplaneModeEventSubscriber>(subscriberInfo);
     if (!EventFwk::CommonEventManager::SubscribeCommonEvent(airplaneModeEventSubscriber_)) {
         WIFI_LOGE("AirplaneModeEvent SubscribeCommonEvent() failed");
+        airplaneModeEventSubscriber_ = nullptr;
     } else {
         WIFI_LOGI("AirplaneModeEvent SubscribeCommonEvent() OK");
         WifiTimer::GetInstance()->UnRegister(airplaneModeTimerId);
@@ -1800,6 +1808,17 @@ void WifiManager::UnRegisterAirplaneModeEvent()
         WIFI_LOGI("AirplaneModeEvent UnSubscribeCommonEvent() OK");
     }
     airplaneModeEventSubscriber_ = nullptr;
+}
+
+AirplaneModeEventSubscriber::AirplaneModeEventSubscriber(const OHOS::EventFwk::CommonEventSubscribeInfo &subscriberInfo)
+        : CommonEventSubscriber(subscriberInfo)
+{
+    WIFI_LOGE("AirplaneModeEventSubscriber enter");
+}
+
+AirplaneModeEventSubscriber::~AirplaneModeEventSubscriber()
+{
+    WIFI_LOGE("~AirplaneModeEventSubscriber enter");
 }
 
 void AirplaneModeEventSubscriber::OnReceiveEvent(const OHOS::EventFwk::CommonEventData &eventData)

@@ -348,10 +348,55 @@ HWTEST_F(ApStartedState_test, ExecuteStateMsg_SUCCESS, TestSize.Level1)
 
 HWTEST_F(ApStartedState_test, ExecuteStateMsg_SUCCESS2, TestSize.Level1)
 {
+    msg->ClearMessageBody();
+    msg->SetMessageName(static_cast<int>(ApStatemachineEvent::CMD_UPDATE_HOTSPOTCONFIG_RESULT));
+    msg->AddStringMessageBody(apcfg.GetSsid());
+    msg->AddStringMessageBody(apcfg.GetPreSharedKey());
+    msg->AddIntMessageBody(static_cast<int>(apcfg.GetSecurityType()));
+    msg->AddIntMessageBody(static_cast<int>(apcfg.GetBand()));
+    msg->AddIntMessageBody(apcfg.GetChannel());
+    msg->AddIntMessageBody(apcfg.GetMaxConn());
+    msg->SetParam1(1);
+    msg->SetMessageName(static_cast<int>(ApStatemachineEvent::CMD_UPDATE_HOTSPOTCONFIG_RESULT));
+    EXPECT_TRUE(pApStartedState->ExecuteStateMsg(msg));
+    msg->SetParam1(0);
+    msg->SetMessageName(static_cast<int>(ApStatemachineEvent::CMD_UPDATE_HOTSPOTCONFIG_RESULT));
+    EXPECT_TRUE(pApStartedState->ExecuteStateMsg(msg));
+
+    msg->ClearMessageBody();
+    msg->SetMessageName(static_cast<int>(ApStatemachineEvent::CMD_ADD_BLOCK_LIST));
+    msg->AddStringMessageBody(apcfg.GetSsid());
+    msg->AddStringMessageBody(apcfg.GetPreSharedKey());
+    msg->AddIntMessageBody(static_cast<int>(apcfg.GetSecurityType()));
+    msg->AddIntMessageBody(static_cast<int>(apcfg.GetBand()));
+    msg->AddIntMessageBody(apcfg.GetChannel());
+    msg->AddIntMessageBody(apcfg.GetMaxConn());
+    EXPECT_CALL(WifiApHalInterface::GetInstance(), AddBlockByMac(Eq(staInfo.bssid), 0))
+        .WillRepeatedly(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
+    msg->ClearMessageBody();
+    msg->SetMessageName(static_cast<int>(ApStatemachineEvent::CMD_ADD_BLOCK_LIST));
+    msg->AddStringMessageBody(staInfo.deviceName);
+    msg->AddStringMessageBody(staInfo.bssid);
+    msg->AddStringMessageBody(staInfo.ipAddr);
+    EXPECT_TRUE(pApStartedState->ExecuteStateMsg(msg));
+
     msg->SetMessageName(static_cast<int>(ApStatemachineEvent::CMD_DEL_BLOCK_LIST));
     msg->AddStringMessageBody(staInfo.deviceName);
     msg->AddStringMessageBody(staInfo.bssid);
     msg->AddStringMessageBody(staInfo.ipAddr);
+    EXPECT_CALL(WifiApHalInterface::GetInstance(), DelBlockByMac(Eq(staInfo.bssid), 0))
+        .WillRepeatedly(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
+    EXPECT_TRUE(pApStartedState->ExecuteStateMsg(msg));
+    msg->SetMessageName(static_cast<int>(ApStatemachineEvent::CMD_STOP_HOTSPOT));
+    EXPECT_TRUE(pApStartedState->ExecuteStateMsg(msg));
+
+    msg->ClearMessageBody();
+    msg->SetMessageName(static_cast<int>(ApStatemachineEvent::CMD_DISCONNECT_STATION));
+    msg->AddStringMessageBody(staInfo.deviceName);
+    msg->AddStringMessageBody(staInfo.bssid);
+    msg->AddStringMessageBody(staInfo.ipAddr);
+    EXPECT_CALL(WifiApHalInterface::GetInstance(), DisconnectStaByMac(Eq(staInfo.bssid), 0))
+        .WillRepeatedly(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
     EXPECT_TRUE(pApStartedState->ExecuteStateMsg(msg));
 }
 

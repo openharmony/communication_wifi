@@ -989,6 +989,12 @@ ErrCode WifiDeviceServiceImpl::ReAssociate(void)
         WIFI_LOGE("ReAssociate:NOT System APP, PERMISSION_DENIED!");
         return WIFI_OPT_NON_SYSTEMAPP;
     }
+
+    if (WifiPermissionUtils::VerifySetWifiInfoPermission() == PERMISSION_DENIED) {
+            WIFI_LOGE("ReAssociate:VerifySetWifiInfoPermission PERMISSION_DENIED!");
+            return WIFI_OPT_PERMISSION_DENIED;
+    }
+
     if (WifiPermissionUtils::VerifyWifiConnectionPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("ReAssociate:VerifyWifiConnectionPermission() PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
@@ -1445,6 +1451,11 @@ ErrCode WifiDeviceServiceImpl::Get5GHzChannelList(std::vector<int> &result)
     }
 
     if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("WifiDeviceServiceImpl:Get5GHzChannelList() PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+
+    if (WifiPermissionUtils::VerifyGetWifiConfigPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("WifiDeviceServiceImpl:Get5GHzChannelList() PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }

@@ -686,6 +686,10 @@ private:
      */
     void SubscribeSystemAbilityChanged(void);
     /**
+     * @Description UnSubscribe system ability changed.
+     */
+    void UnSubscribeSystemAbilityChanged(void);
+    /**
      * @Description On netmanager restart.
      */
     void OnNetManagerRestart(void);

@@ -31,7 +31,7 @@
 #include "arp_checker.h"
 #include "dns_checker.h"
 
-#define DEFAULT_PORTAL_HTTPS_URL ""
+#define DEFAULT_PORTAL_HTTPS_URL "http://connectivitycheck.platform.hicloud.com/generate_204"
 
 namespace OHOS {
 namespace Wifi {

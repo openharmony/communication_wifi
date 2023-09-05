@@ -128,6 +128,22 @@ void WifiSettings::InitP2pVendorConfig()
     return;
 }
 
+int WifiSettings::ReloadPortalconf()
+{
+    if (mSavedPortal.LoadConfig() >= 0) {
+        std::vector<WifiPortalConf> tmp;
+        mSavedPortal.GetValue(tmp);
+        if (tmp.size() > 0) {
+            mPortalUri = tmp[0];
+        } else {
+            mPortalUri.portalUri = "test";
+        }
+    } else {
+        mPortalUri.portalUri = "test";
+    }
+    return 0;
+}
+
 int WifiSettings::Init()
 {
     mCountryCode = "CN";
@@ -143,6 +159,7 @@ int WifiSettings::Init()
     mTrustListPolicies.SetConfigFilePath(WIFI_TRUST_LIST_POLICY_FILE_PATH);
     mMovingFreezePolicy.SetConfigFilePath(WIFI_MOVING_FREEZE_POLICY_FILE_PATH);
     mSavedWifiStoreRandomMac.SetConfigFilePath(WIFI_STA_RANDOM_MAC_FILE_PATH);
+    mSavedPortal.SetConfigFilePath(PORTAL_CONFIG_FILE_PATH);
     InitWifiConfig();
     ReloadDeviceConfig();
     InitHotspotConfig();
@@ -152,6 +169,7 @@ int WifiSettings::Init()
     ReloadTrustListPolicies();
     ReloadMovingFreezePolicy();
     ReloadStaRandomMac();
+    ReloadPortalconf();
 #ifdef FEATURE_ENCRYPTION_SUPPORT
     SetUpHks();
 #endif
@@ -1830,6 +1848,11 @@ int WifiSettings::GetStaApExclusionType()
 {
     std::unique_lock<std::mutex> lock(mWifiConfigMutex);
     return mWifiConfig.staApExclusionType;
+}
+
+void WifiSettings::GetPortalUri(std::string &portalUri)
+{
+    portalUri = mPortalUri.portalUri;
 }
 
 int WifiSettings::SetStaApExclusionType(int type)

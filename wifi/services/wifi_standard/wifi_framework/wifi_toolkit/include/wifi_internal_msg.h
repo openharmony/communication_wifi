@@ -433,6 +433,10 @@ struct WifiStoreRandomMac {
     std::string randomMac;
     std::string preSharedKey;
 };
+
+struct WifiPortalConf {
+    std::string portalUri;
+};
 }  // namespace Wifi
 }  // namespace OHOS
 #endif

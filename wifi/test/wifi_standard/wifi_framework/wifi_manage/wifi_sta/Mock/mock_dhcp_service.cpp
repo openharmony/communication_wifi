@@ -133,5 +133,11 @@ int DhcpService::GetDhcpSerProExit(const std::string &ifname, IDhcpResultNotify 
     WIFI_LOGD("Enter DhcpService::[%{public}s].ifname:%{public}s", __FUNCTION__, ifname.c_str());
     return 0;
 }
+
+int DhcpService::UpdateDefaultConfigFile(const std::string leaseTime)
+{
+    WIFI_LOGD("Enter DhcpService::[%{public}s].", __FUNCTION__);
+    return 0;
+}
 } // namespace Wifi
 } // namespace OHOS

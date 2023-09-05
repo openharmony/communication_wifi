@@ -81,6 +81,9 @@ StaStateMachine::StaStateMachine()
 StaStateMachine::~StaStateMachine()
 {
     WIFI_LOGI("StaStateMachine::~StaStateMachine");
+#ifndef OHOS_ARCH_LITE
+    UnSubscribeSystemAbilityChanged();
+#endif // OHOS_ARCH_LITE
     StopHandlerThread();
     ParsePointer(pRootState);
     ParsePointer(pInitState);
@@ -2223,6 +2226,17 @@ void StaStateMachine::SubscribeSystemAbilityChanged(void)
         return;
     }
     int32_t ret = samgrProxy->SubscribeSystemAbility(COMM_NET_CONN_MANAGER_SYS_ABILITY_ID, statusChangeListener_);
+    LOGI("SubscribeSystemAbility COMM_NET_CONN_MANAGER_SYS_ABILITY_ID result:%{public}d", ret);
+}
+
+void StaStateMachine::UnSubscribeSystemAbilityChanged(void)
+{
+    auto samgrProxy = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    if (samgrProxy == nullptr || statusChangeListener_ == nullptr) {
+        LOGE("samgrProxy or statusChangeListener_ is nullptr");
+        return;
+    }
+    int32_t ret = samgrProxy->UnSubscribeSystemAbility(COMM_NET_CONN_MANAGER_SYS_ABILITY_ID, statusChangeListener_);
     LOGI("SubscribeSystemAbility COMM_NET_CONN_MANAGER_SYS_ABILITY_ID result:%{public}d", ret);
 }
 

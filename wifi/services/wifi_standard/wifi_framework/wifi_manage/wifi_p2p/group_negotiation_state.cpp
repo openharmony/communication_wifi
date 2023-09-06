@@ -77,13 +77,13 @@ bool GroupNegotiationState::ProcessGroupStartedEvt(InternalMessage &msg) const
         return EXECUTED;
     }
     group.SetP2pGroupStatus(P2pGroupStatus::GS_STARTED);
-    groupManager.SetCurrentGroup(group);
+    groupManager.SetCurrentGroup(WifiMacAddrInfoType::P2P_CURRENT_GROUP_MACADDR_INFO, group);
 
     if (groupManager.GetCurrentGroup().IsGroupOwner() &&
         MacAddress::IsValidMac(groupManager.GetCurrentGroup().GetOwner().GetDeviceAddress().c_str())) {
         deviceManager.GetThisDevice().SetP2pDeviceStatus(P2pDeviceStatus::PDS_CONNECTED);
         group.SetOwner(deviceManager.GetThisDevice());
-        groupManager.SetCurrentGroup(group);
+        groupManager.SetCurrentGroup(WifiMacAddrInfoType::P2P_CURRENT_GROUP_MACADDR_INFO, group);
     }
 
     if (groupManager.GetCurrentGroup().IsPersistent()) {
@@ -91,13 +91,13 @@ bool GroupNegotiationState::ProcessGroupStartedEvt(InternalMessage &msg) const
         const WifiP2pDevice &owner = groupManager.GetCurrentGroup().GetOwner();
         WifiP2pGroupInfo copy = groupManager.GetCurrentGroup();
         copy.SetNetworkId(groupManager.GetGroupNetworkId(owner, groupManager.GetCurrentGroup().GetGroupName()));
-        groupManager.SetCurrentGroup(copy);
+        groupManager.SetCurrentGroup(WifiMacAddrInfoType::P2P_CURRENT_GROUP_MACADDR_INFO, copy);
         groupManager.AddOrUpdateGroup(groupManager.GetCurrentGroup());
         p2pStateMachine.UpdatePersistentGroups();
     } else {
         WifiP2pGroupInfo copy = groupManager.GetCurrentGroup();
         copy.SetNetworkId(TEMPORARY_NET_ID);
-        groupManager.SetCurrentGroup(copy);
+        groupManager.SetCurrentGroup(WifiMacAddrInfoType::P2P_CURRENT_GROUP_MACADDR_INFO, copy);
     }
 
     if (groupManager.GetCurrentGroup().IsGroupOwner()) {
@@ -124,7 +124,7 @@ bool GroupNegotiationState::ProcessGroupStartedEvt(InternalMessage &msg) const
             device.SetP2pDeviceStatus(P2pDeviceStatus::PDS_CONNECTED);
             WifiP2pGroupInfo copy = groupManager.GetCurrentGroup();
             copy.SetOwner(device);
-            groupManager.SetCurrentGroup(copy);
+            groupManager.SetCurrentGroup(WifiMacAddrInfoType::P2P_CURRENT_GROUP_MACADDR_INFO, copy);
 
             deviceManager.UpdateDeviceStatus(owner.GetDeviceAddress(), P2pDeviceStatus::PDS_CONNECTED);
 

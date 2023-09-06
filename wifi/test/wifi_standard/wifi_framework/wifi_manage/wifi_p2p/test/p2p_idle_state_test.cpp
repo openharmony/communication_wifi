@@ -62,7 +62,7 @@ public:
         device.SetDeviceAddress("AA:BB:CC:DD:EE:FF");
         group.SetOwner(device);
         pP2pIdleState->groupManager.AddGroup(group);
-        pP2pIdleState->groupManager.SetCurrentGroup(group);
+        pP2pIdleState->groupManager.SetCurrentGroup(WifiMacAddrInfoType::P2P_CURRENT_GROUP_MACADDR_INFO, group);
     }
     void AddDeviceManager() const
     {

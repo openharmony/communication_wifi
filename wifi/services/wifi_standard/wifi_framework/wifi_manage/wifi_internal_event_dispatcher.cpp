@@ -747,7 +747,7 @@ void WifiInternalEventDispatcher::updateP2pDeviceMacAddress(std::vector<WifiP2pD
         macAddrInfo.bssid = iter->GetDeviceAddress();
         macAddrInfo.bssidType = iter->GetDeviceAddressType();
         std::string randomMacAddr =
-            WifiSettings::GetInstance().GetMacAddrPairs(WifiMacAddrInfoType::P2P_MACADDR_INFO, macAddrInfo);
+            WifiSettings::GetInstance().GetMacAddrPairs(WifiMacAddrInfoType::P2P_DEVICE_MACADDR_INFO, macAddrInfo);
         if (randomMacAddr.empty()) {
             WIFI_LOGW("%{public}s: no record found, bssid:%{private}s, bssidType:%{public}d",
                 __func__, macAddrInfo.bssid.c_str(), macAddrInfo.bssidType);
@@ -784,7 +784,8 @@ void WifiInternalEventDispatcher::SendP2pCallbackMsg(sptr<IWifiP2pCallback> &cal
             break;
         case WIFI_CBK_MSG_PEER_CHANGE:
             {
-                WIFI_LOGD("%{public}s pid: %{public}d, uid: %{public}d", __func__, pid, uid);
+                WIFI_LOGD("%{public}s pid: %{public}d, uid: %{public}d, tokenId: %{private}d",
+                    __func__, pid, uid, tokenId);
             #ifdef SUPPORT_RANDOM_MAC_ADDR
                 if ((pid != 0) && (uid != 0)) {
                     std::vector<WifiP2pDevice> deviceVec = msg.device;

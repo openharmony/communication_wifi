@@ -136,5 +136,18 @@ HWTEST_F(HttpRequestTest, HttpPost_001, TestSize.Level1)
     std::string strResponse = "";
     EXPECT_TRUE(pHttpRequest->HttpPost(strUrl, "", strResponse) == -1);
 }
+/**
+ * @tc.name: HttpPost_001
+ * @tc.desc: test HttpDataTransmit error
+ * @tc.type: FUNC
+ * @tc.require: issue
+*/
+HWTEST_F(HttpRequestTest, HttpDataTransmit_001, TestSize.Level1)
+{
+    WIFI_LOGI("HttpDataTransmit_001");
+    int iSockFd = 1;
+    pHttpRequest->httpHead = "Connection: Keep-Alive\r\n";
+    EXPECT_TRUE(pHttpRequest->HttpDataTransmit(iSockFd) == -1);
+}
 }  // namespace Wifi
 }  // namespace OHOS

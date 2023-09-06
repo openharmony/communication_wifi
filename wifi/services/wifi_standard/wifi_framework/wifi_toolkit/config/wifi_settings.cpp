@@ -1147,7 +1147,7 @@ int WifiSettings::GetApMaxConnNum()
 void WifiSettings::InitDefaultHotspotConfig()
 {
     HotspotConfig cfg;
-    cfg.SetSecurityType(KeyMgmt::WPA_PSK);
+    cfg.SetSecurityType(KeyMgmt::WPA2_PSK);
     cfg.SetBand(BandType::BAND_2GHZ);
     cfg.SetChannel(AP_CHANNEL_DEFAULT);
     cfg.SetMaxConn(GetApMaxConnNum());

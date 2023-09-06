@@ -146,20 +146,20 @@ HWTEST_F(HttpRequestTest, HttpDataTransmit_001, TestSize.Level1)
 {
     WIFI_LOGI("HttpDataTransmit_001");
     int iSockFd = 1;
-    pHttpRequest->httpHeads = "Connection: Keep-Alive\r\n";
+    pHttpRequest->httpHead = "Connection: Keep-Alive\r\n";
     EXPECT_TRUE(pHttpRequest->HttpDataTransmit(iSockFd) == -1);
 }
 /**
- * @tc.name: HttpPost_001
- * @tc.desc: test HttpDataTransmit error
+ * @tc.name: GetHostThread_001
+ * @tc.desc: test GetHostThread error
  * @tc.type: FUNC
  * @tc.require: issue
 */
-HWTEST_F(HttpRequestTest, HttpDataTransmit_001, TestSize.Level1)
+HWTEST_F(HttpRequestTest, GetHostThread_001, TestSize.Level1)
 {
     WIFI_LOGI("HttpDataTransmit_001");
     int iSockFd = 1;
-    pHttpRequest->httpHeads = "Connection: Keep-Alive\r\n";
+    pHttpRequest->httpHead = "Connection: Keep-Alive\r\n";
     EXPECT_TRUE(pHttpRequest->GetHostThread(iSockFd) == -1);
 }
 }  // namespace Wifi

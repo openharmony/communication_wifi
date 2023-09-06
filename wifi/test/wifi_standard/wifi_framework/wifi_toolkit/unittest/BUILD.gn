@@ -81,7 +81,10 @@ ohos_unittest("toolkit_unittest") {
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
   ]
-  defines = []
+  defines = [
+    "private = public",
+    "protected = public",
+  ]
   external_deps = [
     "c_utils:utils",
     "dhcp:dhcp_manager_service",

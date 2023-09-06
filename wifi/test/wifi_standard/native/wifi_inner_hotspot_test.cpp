@@ -201,7 +201,7 @@ HWTEST_F(WifiInnerHotspotTest, SetPowerModelTest, TestSize.Level1)
     EXPECT_TRUE(devicePtr != nullptr);
     ErrCode result = devicePtr->SetPowerModel(PowerModel::GENERAL);
     WIFI_LOGE("SetPowerModelTest result(0x%{public}x)", result);
-    EXPECT_TRUE(result, WIFI_OPT_AP_NOT_OPENED);
+    EXPECT_TRUE(result);
 }
 } // namespace Wifi
 } // namespace OHOS

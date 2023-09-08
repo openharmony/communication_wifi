@@ -35,7 +35,7 @@ StaService::StaService()
 
 StaService::~StaService()
 {
-    WIFI_LOGI("StaService::~StaService");
+    WIFI_LOGI("Enter ~StaService");
     if (pStaMonitor != nullptr) {
         pStaMonitor->UnInitStaMonitor();
         delete pStaMonitor;
@@ -55,7 +55,7 @@ StaService::~StaService()
 
 ErrCode StaService::InitStaService(const StaServiceCallback &callbacks)
 {
-    WIFI_LOGI("Enter StaService::InitStaService.\n");
+    WIFI_LOGI("Enter InitStaService.\n");
     pStaStateMachine = new (std::nothrow) StaStateMachine();
     if (pStaStateMachine == nullptr) {
         WIFI_LOGE("Alloc pStaStateMachine failed.\n");
@@ -135,7 +135,7 @@ ErrCode StaService::InitStaService(const StaServiceCallback &callbacks)
 
 ErrCode StaService::EnableWifi() const
 {
-    WIFI_LOGI("Enter StaService::EnableWifi.\n");
+    WIFI_LOGI("Enter EnableWifi.\n");
     CHECK_NULL_AND_RETURN(pStaStateMachine, WIFI_OPT_FAILED);
     pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_ENABLE_WIFI, STA_CONNECT_MODE);
     return WIFI_OPT_SUCCESS;
@@ -143,7 +143,7 @@ ErrCode StaService::EnableWifi() const
 
 ErrCode StaService::DisableWifi() const
 {
-    WIFI_LOGI("Enter StaService::DisableWifi.\n");
+    WIFI_LOGI("Enter DisableWifi.\n");
     CHECK_NULL_AND_RETURN(pStaStateMachine, WIFI_OPT_FAILED);
     pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_DISABLE_WIFI);
     return WIFI_OPT_SUCCESS;
@@ -151,7 +151,7 @@ ErrCode StaService::DisableWifi() const
 
 ErrCode StaService::AddCandidateConfig(const int uid, const WifiDeviceConfig &config, int& netWorkId) const
 {
-    LOGI("Enter StaService::AddCandidateConfig.\n");
+    LOGI("Enter AddCandidateConfig.\n");
 
     netWorkId = INVALID_NETWORK_ID;
     constexpr int UID_UNTRUSTED_CONFIG_LEN = 16;
@@ -163,7 +163,7 @@ ErrCode StaService::AddCandidateConfig(const int uid, const WifiDeviceConfig &co
     }
 
     if (config.keyMgmt == KEY_MGMT_NONE || config.keyMgmt == KEY_MGMT_WEP) {
-        LOGE("StaService::AddCandidateConfig unsupport open or wep key!");
+        LOGE("AddCandidateConfig unsupport open or wep key!");
         return WIFI_OPT_NOT_SUPPORTED;
     }
     WifiDeviceConfig tempDeviceConfig = config;
@@ -174,7 +174,7 @@ ErrCode StaService::AddCandidateConfig(const int uid, const WifiDeviceConfig &co
 
 ErrCode StaService::RemoveCandidateConfig(const int uid, const int networkId) const
 {
-    LOGD("Enter StaService::RemoveCandidateConfig.\n");
+    LOGD("Enter RemoveCandidateConfig.\n");
     WifiDeviceConfig config;
     if (WifiSettings::GetInstance().GetCandidateConfig(uid, networkId, config) == INVALID_NETWORK_ID) {
         LOGE("RemoveCandidateConfig-GetCandidateConfig no foud failed!");
@@ -187,7 +187,7 @@ ErrCode StaService::RemoveCandidateConfig(const int uid, const int networkId) co
 
 ErrCode StaService::RemoveAllCandidateConfig(const int uid) const
 {
-    LOGD("Enter StaService::RemoveAllCandidateConfig.\n");
+    LOGD("Enter RemoveAllCandidateConfig.\n");
     std::vector<WifiDeviceConfig> tempConfigs;
     WifiSettings::GetInstance().GetAllCandidateConfig(uid, tempConfigs);
     for (const auto &config : tempConfigs) {
@@ -200,15 +200,15 @@ ErrCode StaService::RemoveAllCandidateConfig(const int uid) const
 
 ErrCode StaService::ConnectToCandidateConfig(const int uid, const int networkId) const
 {
-    LOGI("Enter StaService::ConnectToCandidateConfig.\n");
+    LOGI("Enter ConnectToCandidateConfig.\n");
     WifiDeviceConfig config;
     if (WifiSettings::GetInstance().GetCandidateConfig(uid, networkId, config) == INVALID_NETWORK_ID) {
-        LOGE("StaService::ConnectToCandidateConfig:GetCandidateConfig is null!");
+        LOGE("ConnectToCandidateConfig:GetCandidateConfig is null!");
         return WIFI_OPT_FAILED;
     }
 
     if (config.keyMgmt == KEY_MGMT_NONE) {
-        LOGE("StaService::ConnectToCandidateConfig unsupport open or wep key!");
+        LOGE("ConnectToCandidateConfig unsupport open or wep key!");
         return WIFI_OPT_NOT_SUPPORTED;
     }
 
@@ -219,7 +219,7 @@ ErrCode StaService::ConnectToCandidateConfig(const int uid, const int networkId)
 
 int StaService::AddDeviceConfig(const WifiDeviceConfig &config) const
 {
-    LOGI("Enter StaService::AddDeviceConfig.\n");
+    LOGI("Enter AddDeviceConfig.\n");
     CHECK_NULL_AND_RETURN(pStaStateMachine, WIFI_OPT_FAILED);
     int netWorkId = INVALID_NETWORK_ID;
     bool isUpdate = false;
@@ -238,10 +238,10 @@ int StaService::AddDeviceConfig(const WifiDeviceConfig &config) const
         isUpdate = true;
     } else {
         if (WifiStaHalInterface::GetInstance().GetNextNetworkId(netWorkId) != WIFI_IDL_OPT_OK) {
-            LOGE("StaService::AddDeviceConfig GetNextNetworkId failed!");
+            LOGE("AddDeviceConfig GetNextNetworkId failed!");
             return INVALID_NETWORK_ID;
         }
-        LOGI("StaService::AddDeviceConfig alloc new id[%{public}d] succeed!", netWorkId);
+        LOGI("AddDeviceConfig alloc new id[%{public}d] succeed!", netWorkId);
     }
     tempDeviceConfig = config;
     tempDeviceConfig.networkId = netWorkId;
@@ -273,7 +273,7 @@ int StaService::AddDeviceConfig(const WifiDeviceConfig &config) const
     }
     /* Setting the network to wpa */
     if(pStaStateMachine->ConvertDeviceCfg(tempDeviceConfig) != WIFI_OPT_SUCCESS) {
-        LOGE("StaService::AddDeviceConfig ConvertDeviceCfg failed!");
+        LOGE("AddDeviceConfig ConvertDeviceCfg failed!");
         return INVALID_NETWORK_ID;
     }
 
@@ -294,7 +294,7 @@ int StaService::UpdateDeviceConfig(const WifiDeviceConfig &config) const
 
 ErrCode StaService::RemoveDevice(int networkId) const
 {
-    LOGI("Enter StaService::RemoveDevice, networkId = %{public}d.\n", networkId);
+    LOGI("Enter RemoveDevice, networkId = %{public}d.\n", networkId);
     /* Remove network configuration. */
     if (WifiStaHalInterface::GetInstance().RemoveDevice(networkId) != WIFI_IDL_OPT_OK) {
         LOGE("RemoveDeviceConfig() failed!");
@@ -319,7 +319,7 @@ ErrCode StaService::RemoveDevice(int networkId) const
 
 ErrCode StaService::RemoveAllDevice() const
 {
-    LOGI("Enter StaService::RemoveAllDevice.\n");
+    LOGI("Enter RemoveAllDevice.\n");
     if (WifiStaHalInterface::GetInstance().ClearDeviceConfig() == WIFI_IDL_OPT_OK) {
         LOGD("Remove all device config successfully!");
         if (WifiStaHalInterface::GetInstance().SaveDeviceConfig() != WIFI_IDL_OPT_OK) {
@@ -341,21 +341,21 @@ ErrCode StaService::RemoveAllDevice() const
 
 ErrCode StaService::ConnectToDevice(const WifiDeviceConfig &config) const
 {
-    LOGI("Enter StaService::ConnectToDevice, ssid = %{public}s.\n", SsidAnonymize(config.ssid).c_str());
+    LOGI("Enter ConnectToDevice, ssid = %{public}s.\n", SsidAnonymize(config.ssid).c_str());
     CHECK_NULL_AND_RETURN(pStaStateMachine, WIFI_OPT_FAILED);
     int netWorkId = AddDeviceConfig(config);
     if(netWorkId == INVALID_NETWORK_ID) {
-        LOGD("StaService::ConnectToDevice, AddDeviceConfig failed!");
+        LOGD("ConnectToDevice, AddDeviceConfig failed!");
         return WIFI_OPT_FAILED;
     }
-    LOGI("StaService::ConnectToDevice, netWorkId: %{public}d", netWorkId);
+    LOGI("ConnectToDevice, netWorkId: %{public}d", netWorkId);
     pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_CONNECT_NETWORK, netWorkId, NETWORK_SELECTED_BY_USER);
     return WIFI_OPT_SUCCESS;
 }
 
 ErrCode StaService::ConnectToNetwork(int networkId) const
 {
-    LOGI("Enter StaService::ConnectToNetwork, networkId is %{public}d.", networkId);
+    LOGI("Enter ConnectToNetwork, networkId is %{public}d.", networkId);
     WifiDeviceConfig config;
     if (WifiSettings::GetInstance().GetDeviceConfig(networkId, config) != 0) {
         LOGE("WifiDeviceConfig is null!");
@@ -363,7 +363,7 @@ ErrCode StaService::ConnectToNetwork(int networkId) const
     }
     CHECK_NULL_AND_RETURN(pStaAutoConnectService, WIFI_OPT_FAILED);
     CHECK_NULL_AND_RETURN(pStaStateMachine, WIFI_OPT_FAILED);
-    LOGI("StaService::ConnectToNetwork, ssid = %{public}s.", SsidAnonymize(config.ssid).c_str());
+    LOGI("ConnectToNetwork, ssid = %{public}s.", SsidAnonymize(config.ssid).c_str());
     pStaAutoConnectService->EnableOrDisableBssid(config.bssid, true, 0);
     pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_CONNECT_SAVED_NETWORK, networkId, NETWORK_SELECTED_BY_USER);
     return WIFI_OPT_SUCCESS;
@@ -371,7 +371,7 @@ ErrCode StaService::ConnectToNetwork(int networkId) const
 
 ErrCode StaService::ReAssociate() const
 {
-    WIFI_LOGI("Enter StaService::ReAssociate.\n");
+    WIFI_LOGI("Enter ReAssociate.\n");
     CHECK_NULL_AND_RETURN(pStaStateMachine, WIFI_OPT_FAILED);
     pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_REASSOCIATE_NETWORK);
     return WIFI_OPT_SUCCESS;
@@ -379,7 +379,7 @@ ErrCode StaService::ReAssociate() const
 
 ErrCode StaService::EnableDeviceConfig(int networkId, bool attemptEnable) const
 {
-    WIFI_LOGI("Enter StaService::EnableDeviceConfig, networkid is %{public}d", networkId);
+    WIFI_LOGI("Enter EnableDeviceConfig, networkid is %{public}d", networkId);
 
     /* Update wifi status. */
     if (WifiSettings::GetInstance().SetDeviceState(networkId, (int)WifiDeviceConfigStatus::ENABLED, attemptEnable) <
@@ -393,7 +393,7 @@ ErrCode StaService::EnableDeviceConfig(int networkId, bool attemptEnable) const
 
 ErrCode StaService::DisableDeviceConfig(int networkId) const
 {
-    WIFI_LOGI("Enter StaService::DisableDeviceConfig, networkid is %{public}d", networkId);
+    WIFI_LOGI("Enter DisableDeviceConfig, networkid is %{public}d", networkId);
 
     if (WifiSettings::GetInstance().SetDeviceState(networkId, (int)WifiDeviceConfigStatus::DISABLED) < 0) {
         WIFI_LOGE("Disable device config failed!");
@@ -405,7 +405,7 @@ ErrCode StaService::DisableDeviceConfig(int networkId) const
 
 ErrCode StaService::Disconnect() const
 {
-    WIFI_LOGI("Enter StaService::Disconnect.\n");
+    WIFI_LOGI("Enter Disconnect.\n");
     CHECK_NULL_AND_RETURN(pStaAutoConnectService, WIFI_OPT_FAILED);
     CHECK_NULL_AND_RETURN(pStaStateMachine, WIFI_OPT_FAILED);
     WifiLinkedInfo linkedInfo;
@@ -419,7 +419,7 @@ ErrCode StaService::Disconnect() const
 
 ErrCode StaService::StartWps(const WpsConfig &config) const
 {
-    WIFI_LOGI("Enter StaService::StartWps.\n");
+    WIFI_LOGI("Enter StartWps.\n");
     CHECK_NULL_AND_RETURN(pStaStateMachine, WIFI_OPT_FAILED);
     InternalMessage *msg = pStaStateMachine->CreateMessage();
     msg->SetMessageName(WIFI_SVR_CMD_STA_STARTWPS);
@@ -432,7 +432,7 @@ ErrCode StaService::StartWps(const WpsConfig &config) const
 
 ErrCode StaService::CancelWps() const
 {
-    WIFI_LOGI("Enter StaService::CanceltWps.\n");
+    WIFI_LOGI("Enter CanceltWps.\n");
     CHECK_NULL_AND_RETURN(pStaStateMachine, WIFI_OPT_FAILED);
     pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_CANCELWPS);
     return WIFI_OPT_SUCCESS;
@@ -440,7 +440,7 @@ ErrCode StaService::CancelWps() const
 
 ErrCode StaService::SetCountryCode(const std::string &countryCode) const
 {
-    LOGI("Enter StaService::SetCountryCode, countryCode=[%{public}s]!", countryCode.c_str());
+    LOGI("Enter SetCountryCode, countryCode=[%{public}s]!", countryCode.c_str());
     if (WifiSupplicantHalInterface::GetInstance().WpaSetCountryCode(countryCode) != WIFI_IDL_OPT_OK) {
         LOGE("WpaSetCountryCode() failed!");
         return WIFI_OPT_FAILED;
@@ -452,7 +452,7 @@ ErrCode StaService::SetCountryCode(const std::string &countryCode) const
 
 ErrCode StaService::AutoConnectService(const std::vector<InterScanInfo> &scanInfos)
 {
-    WIFI_LOGI("Enter StaService::AutoConnectService.\n");
+    WIFI_LOGI("Enter AutoConnectService.\n");
     CHECK_NULL_AND_RETURN(pStaAutoConnectService, WIFI_OPT_FAILED);
     pStaAutoConnectService->OnScanInfosReadyHandler(scanInfos);
     return WIFI_OPT_SUCCESS;
@@ -460,7 +460,7 @@ ErrCode StaService::AutoConnectService(const std::vector<InterScanInfo> &scanInf
 
 void StaService::RegisterStaServiceCallback(const StaServiceCallback &callbacks) const
 {
-    LOGI("Enter StaService::RegisterStaServiceCallback.");
+    LOGI("Enter RegisterStaServiceCallback.");
     if (pStaStateMachine == nullptr) {
         LOGE("pStaStateMachine is null.\n");
         return;
@@ -470,7 +470,7 @@ void StaService::RegisterStaServiceCallback(const StaServiceCallback &callbacks)
 
 ErrCode StaService::ReConnect() const
 {
-    WIFI_LOGI("Enter StaService::ReConnect.\n");
+    WIFI_LOGI("Enter ReConnect.\n");
     CHECK_NULL_AND_RETURN(pStaStateMachine, WIFI_OPT_FAILED);
     pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_RECONNECT_NETWORK);
     return WIFI_OPT_SUCCESS;
@@ -478,7 +478,7 @@ ErrCode StaService::ReConnect() const
 
 ErrCode StaService::SetSuspendMode(bool mode) const
 {
-    LOGI("Enter StaService::SetSuspendMode, mode=[%{public}d]!", mode);
+    LOGI("Enter SetSuspendMode, mode=[%{public}d]!", mode);
     if (WifiSupplicantHalInterface::GetInstance().WpaSetSuspendMode(mode) != WIFI_IDL_OPT_OK) {
         LOGE("WpaSetSuspendMode() failed!");
         return WIFI_OPT_FAILED;
@@ -499,7 +499,7 @@ void StaService::NotifyDeviceConfigChange(ConfigChange value) const
 
 ErrCode StaService::OnSystemAbilityChanged(int systemAbilityid, bool add)
 {
-    WIFI_LOGI("Enter StaService::OnSystemAbilityChanged.");
+    WIFI_LOGI("Enter OnSystemAbilityChanged.");
 #ifndef OHOS_ARCH_LITE
     CHECK_NULL_AND_RETURN(pStaStateMachine, WIFI_OPT_FAILED);
     if (systemAbilityid == COMM_NET_CONN_MANAGER_SYS_ABILITY_ID && add) {

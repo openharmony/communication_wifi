@@ -105,7 +105,6 @@ ohos_unittest("WifiApServiceTest") {
   defines = [
     "AP_INTF=\"$wifi_feature_with_ap_intf\"",
     "AP_INSTANCE_MAX_NUM=$wifi_feature_with_ap_num",
-    "private=public",
   ]
 
   if (wifi_feature_with_dhcp_disable) {

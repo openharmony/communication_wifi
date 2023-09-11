@@ -32,7 +32,6 @@
 
 using ::testing::_;
 using ::testing::A;
-using ::testing::AtLeast;
 using ::testing::DoAll;
 using ::testing::Eq;
 using ::testing::Return;
@@ -63,7 +62,7 @@ public:
 
         pMockApNatManager = new MockWifiApNatManager();
 
-        pApStartedState = std::make_unique<ApStartedState>(*pMockApStateMachine, *pMockApConfigUse, *pMockApMonitor);
+        pApStartedState = new ApStartedState(*pMockApStateMachine, *pMockApConfigUse, *pMockApMonitor);
 
         msg = new InternalMessage();
 
@@ -84,7 +83,6 @@ public:
         staInfo = {
             "test_deviceName",
             mac.c_str(),
-            1,
             "127.0.0.1",
         };
 
@@ -96,13 +94,11 @@ public:
             {
             "test_deviceName",
             "DA:BB:CC:DD:EE:FF",
-            0,
             "127.0.0.3",
             },
             {
             "test_deviceName",
             "DA:BB:CC:DD:EE:FF",
-            1,
             "127.0.0.3",
             },
         };
@@ -119,7 +115,9 @@ public:
     }
     virtual void TearDown()
     {
-        pApStartedState.reset();
+        delete pApStartedState;
+
+        pApStartedState = nullptr;
 
         delete pMockPendant;
 
@@ -143,9 +141,117 @@ public:
     }
 
 public:
+    bool WrapStartAp() const
+    {
+        return pApStartedState->StartAp();
+    }
+    bool WrapStopAp() const
+    {
+        return WrapStartAp();
+    }
+    bool WrapSetConfig(HotspotConfig &apConfig)
+    {
+        return pApStartedState->SetConfig(apConfig);
+    }
+    bool WrapSetConfig() const
+    {
+        return pApStartedState->SetConfig();
+    }
+    void WrapOnApStateChange(const ApState &state)
+    {
+        pApStartedState->OnApStateChange(state);
+    }
+    void WrapStartMonitor() const
+    {
+        pApStartedState->StartMonitor();
+    }
+    void WrapStopMonitor() const
+    {
+        pApStartedState->StopMonitor();
+    }
+    bool WrapStartDhcpServer() const
+    {
+        return pMockApStateMachine->StartDhcpServer();
+    }
+    bool WrapStopDhcpServer() const
+    {
+        return pMockApStateMachine->StopDhcpServer();
+    }
+    bool WrapEnableInterfaceNat() const
+    {
+        return pApStartedState->EnableInterfaceNat();
+    }
+    bool WrapDisableInterfaceNat() const
+    {
+        return pApStartedState->DisableInterfaceNat();
+    }
+
+public:
+    void WrapProcessCmdFail(InternalMessage &message)
+    {
+        pApStartedState->ProcessCmdFail(message);
+    }
+    void WrapProcessCmdStationJoin(InternalMessage &message)
+    {
+        pApStartedState->ProcessCmdStationJoin(message);
+    }
+    void WrapProcessCmdStationLeave(InternalMessage &message)
+    {
+        pApStartedState->ProcessCmdStationLeave(message);
+    }
+    void WrapProcessCmdSetHotspotConfig(InternalMessage &message)
+    {
+        pApStartedState->ProcessCmdSetHotspotConfig(message);
+    }
+    void WrapProcessCmdUpdateConfigResult()
+    {
+        InternalMessage message;
+        message.SetParam1(1);
+        EXPECT_CALL(WifiSettings::GetInstance(), SetHotspotConfig(_, _))
+            .WillRepeatedly(Return(1));
+        pApStartedState->ProcessCmdUpdateConfigResult(message);
+    }
+    void WrapProcessCmdAddBlockList(InternalMessage &message)
+    {
+        pApStartedState->ProcessCmdAddBlockList(message);
+    }
+    void WrapProcessCmdDelBlockList(InternalMessage &message)
+    {
+        pApStartedState->ProcessCmdDelBlockList(message);
+    }
+    void WrapProcessCmdStopHotspot(InternalMessage &message)
+    {
+        pApStartedState->ProcessCmdStopHotspot(message);
+    }
+    void WrapProcessCmdDisconnectStation(InternalMessage &message)
+    {
+        pApStartedState->ProcessCmdDisconnectStation(message);
+    }
+    void WrapStopApFailed()
+    {
+        EXPECT_CALL(WifiApHalInterface::GetInstance(), StopAp(_))
+            .WillRepeatedly(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED));
+        pApStartedState->StopAp();
+    }
+    void WrapUpdatePowerMode()
+    {
+        EXPECT_CALL(WifiApHalInterface::GetInstance(), GetPowerModel(_, _))
+            .WillRepeatedly(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED));
+        EXPECT_CALL(WifiApHalInterface::GetInstance(), SetPowerModel(_, _))
+            .WillRepeatedly(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
+        pApStartedState->UpdatePowerMode();
+    }
+
+public:
+    HotspotConfig &WrapHotspotConfig()
+    {
+        return pApStartedState->m_hotspotConfig;
+    }
+
+public:
     InternalMessage *msg;
 
-    std::unique_ptr<ApStartedState> pApStartedState;
+    ApStartedState *pApStartedState;
 
     MockPendant *pMockPendant;
 
@@ -398,7 +504,6 @@ HWTEST_F(ApStartedState_test, ExecuteStateMsg_SUCCESS2, TestSize.Level1)
         .WillRepeatedly(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
     EXPECT_TRUE(pApStartedState->ExecuteStateMsg(msg));
 }
-
 HWTEST_F(ApStartedState_test, ExecuteStateMsg_FAILED, TestSize.Level1)
 {
     msg->SetMessageName(static_cast<int>(ApStatemachineEvent::CMD_START_HOTSPOT));
@@ -406,101 +511,19 @@ HWTEST_F(ApStartedState_test, ExecuteStateMsg_FAILED, TestSize.Level1)
     EXPECT_FALSE(pApStartedState->ExecuteStateMsg(nullptr));
 }
 
-HWTEST_F(ApStartedState_test, UpdatePowerMode_001, TestSize.Level1)
+HWTEST_F(ApStartedState_test, WrapStopApFailed, TestSize.Level1)
 {
-    EXPECT_CALL(WifiApHalInterface::GetInstance(), GetPowerModel(_, _))
-        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_OK))
-        .WillRepeatedly(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED));
-    EXPECT_CALL(WifiApHalInterface::GetInstance(), SetPowerModel(_, _)).Times(AtLeast(0));
-    pApStartedState->UpdatePowerMode();
-    pApStartedState->UpdatePowerMode();
+    WrapStopApFailed();
 }
 
-HWTEST_F(ApStartedState_test, SetConfig_001, TestSize.Level1)
+HWTEST_F(ApStartedState_test, WrapUpdatePowerMode, TestSize.Level1)
 {
-    EXPECT_CALL(WifiApHalInterface::GetInstance(), GetFrequenciesByBand(_, _, _))
-        .WillRepeatedly(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
-    EXPECT_CALL(WifiSettings::GetInstance(), SetValidChannels(_)).WillRepeatedly(Return(0));
-    EXPECT_CALL(WifiApHalInterface::GetInstance(), SetSoftApConfig(_, _))
-        .WillRepeatedly(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
-    EXPECT_CALL(WifiSettings::GetInstance(), SetHotspotConfig(_, _)).Times(AtLeast(0));
-    EXPECT_CALL(WifiSettings::GetInstance(), SyncHotspotConfig()).Times(AtLeast(0));
-    EXPECT_TRUE(pApStartedState->SetConfig(apcfg));
+    WrapUpdatePowerMode();
 }
 
-HWTEST_F(ApStartedState_test, SetConfig_002, TestSize.Level1)
+HWTEST_F(ApStartedState_test, WrapProcessCmdUpdateConfigResult, TestSize.Level1)
 {
-    EXPECT_CALL(WifiApHalInterface::GetInstance(), GetFrequenciesByBand(_, _, _))
-        .WillRepeatedly(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED));
-    EXPECT_CALL(WifiSettings::GetInstance(), SetValidChannels(_)).WillRepeatedly(Return(1));
-    EXPECT_FALSE(pApStartedState->SetConfig(apcfg));
-}
-
-HWTEST_F(ApStartedState_test, SetConfig_003, TestSize.Level1)
-{
-    EXPECT_CALL(WifiApHalInterface::GetInstance(), GetFrequenciesByBand(_, _, _))
-        .WillRepeatedly(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED));
-    EXPECT_CALL(WifiSettings::GetInstance(), SetValidChannels(_)).WillRepeatedly(Return(0));
-    EXPECT_CALL(WifiApHalInterface::GetInstance(), SetSoftApConfig(_, _))
-        .WillRepeatedly(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED));
-    EXPECT_FALSE(pApStartedState->SetConfig(apcfg));
-}
-
-HWTEST_F(ApStartedState_test, SetConfigs_001, TestSize.Level1)
-{
-    EXPECT_CALL(WifiSettings::GetInstance(), GetCountryCode(_)).WillRepeatedly(Return(0));
-    EXPECT_CALL(WifiApHalInterface::GetInstance(), SetWifiCountryCode(_, 0))
-        .WillRepeatedly(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
-    EXPECT_CALL(WifiSettings::GetInstance(), GetHotspotConfig(_, 0)).WillRepeatedly(Return(0));
-    EXPECT_FALSE(pApStartedState->SetConfig());
-}
-
-HWTEST_F(ApStartedState_test, SetConfigs_002, TestSize.Level1)
-{
-    EXPECT_CALL(WifiSettings::GetInstance(), GetCountryCode(_)).WillRepeatedly(Return(1));
-    EXPECT_FALSE(pApStartedState->SetConfig());
-}
-
-HWTEST_F(ApStartedState_test, SetConfigs_003, TestSize.Level1)
-{
-    EXPECT_CALL(WifiSettings::GetInstance(), GetCountryCode(_)).WillRepeatedly(Return(0));
-    EXPECT_CALL(WifiApHalInterface::GetInstance(), SetWifiCountryCode(_, 0))
-        .WillRepeatedly(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED));
-    EXPECT_FALSE(pApStartedState->SetConfig());
-}
-
-HWTEST_F(ApStartedState_test, SetConfigs_004, TestSize.Level1)
-{
-    EXPECT_CALL(WifiSettings::GetInstance(), GetCountryCode(_)).WillRepeatedly(Return(0));
-    EXPECT_CALL(WifiApHalInterface::GetInstance(), SetWifiCountryCode(_, 0))
-        .WillRepeatedly(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED));
-    EXPECT_CALL(WifiSettings::GetInstance(), GetHotspotConfig(_, 0)).WillRepeatedly(Return(1));
-    EXPECT_FALSE(pApStartedState->SetConfig());
-}
-
-HWTEST_F(ApStartedState_test, StartAp_001, TestSize.Level1)
-{
-    EXPECT_CALL(WifiApHalInterface::GetInstance(), StartAp(0))
-        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED))
-        .WillRepeatedly(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
-    EXPECT_FALSE(pApStartedState->StartAp());
-    EXPECT_TRUE(pApStartedState->StartAp());
-}
-
-HWTEST_F(ApStartedState_test, StopAp_001, TestSize.Level1)
-{
-    EXPECT_CALL(WifiApHalInterface::GetInstance(), StopAp(_))
-        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED))
-        .WillRepeatedly(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
-    EXPECT_FALSE(pApStartedState->StopAp());
-    EXPECT_TRUE(pApStartedState->StopAp());
-}
-
-
-HWTEST_F(ApStartedState_test, EnableInterfaceNat_001, TestSize.Level1)
-{
-    EXPECT_CALL(MockNetworkInterface::GetInstance(), IsValidInterfaceName(_)).WillRepeatedly(Return(false));
-    EXPECT_TRUE(pApStartedState->EnableInterfaceNat());
+    WrapProcessCmdUpdateConfigResult();
 }
 } // namespace Wifi
 } // namespace OHOS

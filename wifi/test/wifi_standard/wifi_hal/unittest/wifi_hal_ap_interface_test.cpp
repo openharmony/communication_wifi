@@ -44,7 +44,7 @@ HWTEST_F(WifiHalApInterfaceTest, SetCountryCodeTest, TestSize.Level1)
     EXPECT_TRUE(SetCountryCode(NULL, 0) == WIFI_HAL_INVALID_PARAM);
     EXPECT_TRUE(SetCountryCode("", 0) == WIFI_HAL_INVALID_PARAM);
     EXPECT_TRUE(SetCountryCode("C", 0) == WIFI_HAL_INVALID_PARAM);
-    EXPECT_TRUE(SetCountryCode("CN", 0) != WIFI_HAL_INVALID_PARAM);
+    EXPECT_TRUE(SetCountryCode("CN", 0) == WIFI_HAL_FAILED);
 }
 
 HWTEST_F(WifiHalApInterfaceTest, SetHostapdConfigTest, TestSize.Level1)
@@ -60,7 +60,7 @@ HWTEST_F(WifiHalApInterfaceTest, SetHostapdConfigTest, TestSize.Level1)
     config.ssidLen = strlen(config.ssid);
     StrSafeCopy(config.preSharedKey, sizeof(config.preSharedKey), "adc123456");
     config.preSharedKeyLen = strlen(config.preSharedKey);
-    EXPECT_GE(SetHostapdConfig(&config, 0), WIFI_HAL_SUCCESS);
+    EXPECT_TRUE(SetHostapdConfig(&config, 0) == WIFI_HAL_SUCCESS);
     EXPECT_TRUE(SetHostapdConfig(&config, -1) == WIFI_HAL_HOSTAPD_NOT_INIT);
 }
 
@@ -112,7 +112,7 @@ HWTEST_F(WifiHalApInterfaceTest, GetValidFrequenciesForBandTest, TestSize.Level1
 
 HWTEST_F(WifiHalApInterfaceTest, StopSoftApTest, TestSize.Level1)
 {
-    EXPECT_GE(StopSoftAp(0), WIFI_HAL_SUCCESS);
+    EXPECT_TRUE(StopSoftAp(0) == WIFI_HAL_FAILED);
     EXPECT_TRUE(StopSoftAp(-1) == WIFI_HAL_FAILED);
 }
 

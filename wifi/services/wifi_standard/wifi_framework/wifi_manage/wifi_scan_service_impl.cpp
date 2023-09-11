@@ -153,6 +153,16 @@ ErrCode WifiScanServiceImpl::Scan(bool compatible)
                 WIFI_LOGE("Scan:VerifyGetScanInfosPermission PERMISSION_DENIED!");
                 return WIFI_OPT_PERMISSION_DENIED;
             }
+        } else {
+            if (!WifiAuthCenter::IsSystemAppByToken()) {
+                WIFI_LOGE("Scan:NOT System APP, PERMISSION_DENIED!");
+                return WIFI_OPT_NON_SYSTEMAPP;
+            }
+            
+            if (WifiPermissionUtils::VerifyWifiConnectionPermission() == PERMISSION_DENIED) {
+                WIFI_LOGE("Scan:VerifyGetScanInfosPermission PERMISSION_DENIED!");
+                return WIFI_OPT_PERMISSION_DENIED;
+            }
         }
     }
 

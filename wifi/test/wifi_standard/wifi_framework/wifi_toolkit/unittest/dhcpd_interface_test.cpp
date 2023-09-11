@@ -249,7 +249,7 @@ HWTEST_F(DhcpdInterfaceTest, GetConnectedStationInfo_003, TestSize.Level1)
     std::string ifaceName = "wlan0";
     std::map<std::string, StationInfo> result;
     StartDhcpServerTest();
-    EXPECT_FALSE(pDhcpdInterface->GetConnectedStationInfo(ifaceName, result));
+    EXPECT_TRUE(pDhcpdInterface->GetConnectedStationInfo(ifaceName, result));
 }
 /**
  * @tc.name: StopDhcpServer_001

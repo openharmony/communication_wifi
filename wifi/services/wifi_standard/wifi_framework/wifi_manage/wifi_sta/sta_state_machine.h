@@ -355,6 +355,12 @@ public:
      */
     void OnNetworkConnectionEvent(int networkId, std::string bssid);
     /**
+     * @Description  Disconnect events
+     *
+     * @param reason - the reason of wifi disconnection
+     */
+    void OnNetworkDisconnectEvent(int reason);
+    /**
      * @Description  Bssid change events
      *
      * @param reason: the reason of bssid changed(in)

@@ -371,7 +371,7 @@ ErrCode StaStateMachine::ConvertDeviceCfg(const WifiDeviceConfig &config) const
         /* for wep */
         idlConfig.authAlgorithms = 0x02;
     }
-
+    WriteWifiDeviceCfgHiSysEvent(config);
     for (int i = 0; i < MAX_WEPKEYS_SIZE; i++) {
         idlConfig.wepKeys[i] = config.wepKeys[i];
     }
@@ -1502,6 +1502,19 @@ void StaStateMachine::OnNetworkConnectionEvent(int networkId, std::string bssid)
     msg->SetParam1(networkId);
     msg->AddStringMessageBody(bssid);
     SendMessage(msg);
+}
+
+void StaStateMachine::OnNetworkDisconnectEvent(int reason)
+{
+    if (reason != static_cast<int>(DisconnectDetailReason::DEAUTH_STA_IS_LEFING)
+        && reason != static_cast<int>(DisconnectDetailReason::UNSPECIFIED)
+        && reason != static_cast<int>(DisconnectDetailReason::UNUSED)
+        && reason != static_cast<int>(DisconnectDetailReason::DISASSOC_STA_HAS_LEFT)) {
+            LOGE("connect exception.\n");
+            WriteWifiOperateStateHiSysEvent(static_cast<int>(WifiOperateType::STA_CONNECT),
+                static_cast<int>(WifiOperateState::STA_CONNECT_EXCEPTION));
+            WriteWifiAbnormalDisconnectHiSysEvent(reason);
+    }
 }
 
 void StaStateMachine::OnBssidChangedEvent(std::string reason, std::string bssid)

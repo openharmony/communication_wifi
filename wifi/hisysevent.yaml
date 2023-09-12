@@ -48,3 +48,48 @@ WIFI_SIGNAL:
   DIRECTION: {type: INT32, desc: wifi signal data in or data out} # 0->UP,1->DOWN,2->UPDOWN,3->NONE
   TXPACKETS: {type: INT32, desc: wifi signal tx packets}
   RXPACKETS: {type: INT32, desc: wifi signal rx packets}
+
+WIFI_ABDISCONNECT:
+  __BASE: {type: FAULT, level: MINOR, desc: Wifi abnormal disconnect}
+  ABNORMAL_DISCONNECT_REASON_CODE: {type: STRING, desc: error code}
+  AP_CONN_INFO: {type: STRING, desc: ap connection info}
+  AP_INFO: {type: STRING, desc: ap info}
+  IS_ACTIVE_DISCONNECT: {type: INT32, desc: is active disconnect}
+  PUBLIC_ESS_COUNT: {type: INT32, desc: public ess count}
+  SUB_ERROR_CODE: {type: STRING, desc: sub error code}
+
+WIFI_CHR_EVENT:
+  __BASE: {type: STATISTIC, level: MINOR, desc: Wifi chr event}
+  EVENT_NAME: {type: STRING, desc: event name}
+  EVENT_VALUE: {type: STRING, desc: event value}
+
+WIFI_KPI:
+  __BASE: {type: STATISTIC, level: MINOR, desc: Wifi kpi}
+  ABNORMAL_DISCONNECT_COUNT: {type: INT32, desc: Wifi abnormal disconnect count}
+  CONNECTED_COUNT: {type: INT32, desc: Wifi connect success count}
+  CONNECTED_DURATION: {type: INT32, desc: Wifi connect success duration}
+  CONNECTING_DURATION: {type: INT32, desc: Wifi connecting duration}
+  CONNECT_TOTAL_COUNT: {type: INT32, desc: Wifi connect total count}
+  DISCONNECT_CNT: {type: INT32, desc: Wifi disconnect count}
+  OPEN_COUNT: {type: INT32, desc: Wifi open count}
+  OPEN_SUCCESS_COUNT: {type: INT32, desc: Wifi open success count}
+  
+WIFI_KPI_SSID:
+  __BASE: {type: STATISTIC, level: MINOR, desc: Wifi KPI SSID}
+  ABNORMAL_DISCONNECT_COUNT: {type: INT32, desc: sum of abnormal disconnection}
+  APSSID: {type: STRING, desc: SSID of an AP}
+  ASSOC_COUNT: {type: INT32, desc: sum of association}
+  ASSOC_DURATION: {type: INT32, desc: duration of association}
+  ASSOC_REJECT_FULL_COUNT: {type: INT32, desc: sum of assoc reject access full}
+  ASSOC_SUCCESS_COUNT: {type: INT32, desc: sum of associated}
+  AUTH_COUNT: {type: INT32, desc: sum of authentication}
+  AUTH_DURATION: {type: INT32, desc: duration of authentication}
+  AUTH_SUCCESS_COUNT: {type: INT32, desc: sum of authenticated}
+  CONNECTED_COUNT: {type: INT32, desc: sum of connection successful}
+  CONNECTED_DURATION: {type: INT32, desc: duration of keep wifi connection}
+  CONNECTING_DURATION: {type: INT32, desc: duration of connecting period}
+  CONNECT_TOTAL_COUNT: {type: INT32, desc: sum of connection}
+  DHCP_DURATION: {type: INT32, desc: duration of dhcp}
+  DHCP_SUCCESS_COUNT: {type: INT32, desc: sum of dhcp successfully}
+  DISCONNECT_COUNT: {type: INT32, desc: sum of disconnection}
+  IP_DHCP_COUNT: {type: INT32, desc: sum of dhcp}

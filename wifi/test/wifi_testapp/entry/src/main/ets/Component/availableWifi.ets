@@ -16,12 +16,12 @@
 // @ts-nocheck
 
 import prompt from '@ohos.prompt'
-import Logger from '../MainAbility/model/Logger'
 import { PswDialog } from '../Component/pswDialog'
 import { WifiModel } from '../MainAbility/model/wifiModel'
 import { WifiView } from '../Component/wifiView'
+import wifi from '@ohos.wifi'
 
-const TAG = 'AvailableWiFi'
+const TAG = "[availableWiFi]"
 let self = null
 
 /**
@@ -30,17 +30,17 @@ let self = null
 
 @Component
 export struct AvailableWifi {
-  private wifiModel = new WifiModel()
-  @State wifiList: Array<any> = []
-  private linkedInfo: any = null
-  private selectIndex: number = -1
+  private wifiModel: WifiModel = new WifiModel()
+  @Prop wifiList:Array<wifi.WifiScanInfo>
+  @Prop linkedInfo: any
+  @State selectIndex: number = -1
   private pswDialogController: CustomDialogController = new CustomDialogController({
     builder: PswDialog({ scanInfo: this.wifiList[this.selectIndex], action: this.onAccept }),
     autoCancel: true
   })
 
   onAccept(scanInfo, psw) {
-    Logger.info(TAG, 'connect wifi')
+   console.log(TAG, 'connect wifi')
     self.wifiModel.connectNetwork(scanInfo, psw)
   }
 
@@ -64,7 +64,7 @@ export struct AvailableWifi {
             WifiView({ wifi: item })
           }
           .onClick(() => {
-            Logger.info(TAG, 'wifi click')
+           console.log(TAG, 'wifi click')
             this.selectIndex = index
             if (this.linkedInfo !== null && item.ssid === this.linkedInfo.ssid) {
               prompt.showToast({ message: 'this wifi is connected' })

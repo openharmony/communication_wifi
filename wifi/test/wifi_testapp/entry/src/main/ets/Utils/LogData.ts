@@ -22,7 +22,7 @@ export class LogData {
   testDisableWifi_EndLog = "testDisableWifi End----------"
   testIsWifiActive_StartLog = "testIsWifiActive Start----------"
   testIsWifiActive_EndLog = "testDisableWifi End----------"
-  testScan_StartLog = -"testScan Start----------"
+  testScan_StartLog = "testScan Start----------"
   testScan_EndLog = "testScan End----------"
   testForcibleScan_StartLog = "testForcibleScan Start----------"
   testForcibleScan_EndLog = "testForcibleScan End----------"

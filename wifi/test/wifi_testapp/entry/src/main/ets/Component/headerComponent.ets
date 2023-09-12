@@ -17,7 +17,7 @@
 
 import ConfigData from '../Utils/ConfigData';
 import Router from '@system.router';
-
+const TAG = "[headerComponent]"
 /**
  * head custom component Of WiFi test
  */
@@ -46,12 +46,12 @@ export default struct HeadTableComponent {
         if ( event.type === TouchType.Down ) {
           this.isTouch = true;
         } else {
-          console.log( "event.type /= TouchType.Down" )
+          console.log( TAG, "event.type /= TouchType.Down" )
         }
         if ( event.type === TouchType.Up ) {
           this.isTouch = false;
         } else {
-          console.log( "event.type /= TouchType.Up" )
+          console.log( TAG, "event.type /= TouchType.Up" )
         }
       } );
 

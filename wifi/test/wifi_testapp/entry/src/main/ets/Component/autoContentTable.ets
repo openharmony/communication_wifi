@@ -15,10 +15,10 @@
 
 // @ts-nocheck
 
-import { TestData , TestApi , TestAuto } from '../MainAbility/model/testData'
-import prompt from '@system.prompt';
+import { TestData , TestAuto } from '../MainAbility/model/testData'
 import ConfigData from '../Utils/ConfigData';
 
+const TAG = "[autoContentTable]"
 /**
  *  Auto Test ContentTable Component Page Of WIFI test
  */
@@ -79,11 +79,11 @@ export struct AutoContentTable {
 
   getCurrentState( index: number ) {
     if ( index <= this.changeIndex ) {
-      this.autoItemsX[index].result = 'pass';
+      this.autoItemsX[ index ].result = 'pass';
     } else {
-      console.log( "index > this.changeIndex" )
+      console.log( TAG, "index > this.changeIndex" )
     }
-    return this.autoItemsX[index].result
+    return this.autoItemsX[ index ].result
   }
 
   aboutToAppear(): void {

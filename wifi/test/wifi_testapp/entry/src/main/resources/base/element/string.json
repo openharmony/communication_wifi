@@ -89,6 +89,10 @@
       "value": "压力测试"
     },
     {
+      "name": "App",
+      "value": "应用测试"
+    },
+    {
       "name": "test_title",
       "value": "WIFI测试"
     },
@@ -1706,7 +1710,7 @@
     },
     {
       "name": "p2p_available",
-      "value": "可用p2p"
+      "value": "对等设备"
     }
   ]
 }

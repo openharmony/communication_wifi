@@ -16,7 +16,7 @@
 // @ts-nocheck
 
 import wifi from '@ohos.wifi'
-import ConfigData from '../Utils/ConfigData';
+const TAG = "[basicDataSource]"
 /**
  * BasicDataSource page of WiFi test
  */
@@ -34,20 +34,20 @@ class BasicDataSource implements IDataSource {
 
   registerDataChangeListener( listener: DataChangeListener ): void {
     if ( this.listeners.indexOf( listener ) < 0 ) {
-      console.log( 'add listener' )
+      console.log( TAG, 'add listener' )
       this.listeners.push( listener )
     } else {
-      console.log( 'indexOf(listener) >= 0' )
+      console.log( TAG, 'indexOf(listener) >= 0' )
     }
   }
 
   unregisterDataChangeListener( listener: DataChangeListener ): void {
     const pos = this.listeners.indexOf( listener );
     if ( pos >= 0 ) {
-      console.log( 'remove listener' )
+      console.log( TAG, 'remove listener' )
       this.listeners.splice( pos , 1 )
     } else {
-      console.log( 'pos < 0' )
+      console.log( TAG, 'pos < 0' )
     }
   }
 

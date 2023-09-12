@@ -429,6 +429,13 @@ ErrCode ProcessProxyConfig(const napi_env& env, const napi_value& object, WifiDe
     if (hasProperty) {
         napi_value proxyConfig;
         napi_get_named_property(env, object, "proxyConfig", &proxyConfig);
+        napi_valuetype valueType;
+        napi_typeof(env, proxyConfig, &valueType);
+        if (valueType == napi_null || valueType == napi_undefined) {
+            WIFI_LOGE("ProcessProxyConfig, proxyConfig is null.");
+            return ret;
+        }
+        
         int proxyConfigMethod = static_cast<int>(ConfigureProxyMethod::CLOSED);
         JsObjectToInt(env, proxyConfig, "proxyMethod", proxyConfigMethod);
         cppConfig.wifiProxyconfig.configureMethod = ConfigureProxyMethod::CLOSED;

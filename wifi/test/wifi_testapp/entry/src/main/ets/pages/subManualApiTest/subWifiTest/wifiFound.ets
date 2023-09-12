@@ -15,14 +15,12 @@
 
 // @ts-nocheck
 
-import featureAbility from '@ohos.ability.featureAbility'
 import wifi from '@ohos.wifi'
 import { AvailableWifi } from '../../../Component/availableWifi'
-import Logger from '../../../MainAbility/model/Logger'
-import { TitleBar } from '../../../Component/titleBar'
-import { WifiModel } from '../../../MainAbility/model/wifiModel'
 
-const TAG = 'wifiFound'
+import { TitleBar } from '../../../Component/titleBar'
+
+const TAG = '[wifiFound]'
 const PERMISSION_NAME: string = 'ohos.permission.LOCATION'
 /**
  * wifi Found Test Page Of Wifi test
@@ -30,37 +28,49 @@ const PERMISSION_NAME: string = 'ohos.permission.LOCATION'
 @Entry
 @Component
 struct WifiFound {
-  private wifiModel: WifiModel = new WifiModel()
   private testItem: string = "Wlan扫描"
-  private linkedInfo: any = {
+  @State linkedInfo: any = {
     ssid : "" ,
     bssid : "" ,
     networkId : 0 ,
     rssi : 0 ,
     band : 0
   }
-  private wifiList: Array<any> = []
+  @State wifiList: Array<wifi.WifiScanInfo> = []
   @State isLinked: boolean = false
   @State isSwitchOn: boolean = false
 
   scan() {
-    this.wifiModel.getScanInfos( ( result ) => {
-      if ( this.isSwitchOn ) {
-        this.wifiList = result
-        setTimeout( () => {
-          this.scan()
-        } , 2000 )
+    wifi.getScanInfos( ( err , result ) => {
+      if ( err ) {
+        console.log( TAG , `scan info err: ${ JSON.stringify( err ) }` )
       }
+      console.log( TAG , `scan info call back: ${ result.length }` )
+      for ( let i = 0 ; i < result.length ; ++i ) {
+        this.wifiList.push( {
+          ssid : result[ i ].ssid ,
+          bssid : result[ i ].bssid ,
+          securityType : result[ i ].securityType ,
+          rssi : result[ i ].rssi ,
+          band : result[ i ].band ,
+          frequency : result[ i ].frequency ,
+          timestamp : result[ i ].timestamp ,
+        } )
+      }
+      console.log( TAG , "wifiList:" + JSON.stringify( this.wifiList ) )
+      setTimeout( () => {
+        this.scan()
+      } , 2000 )
     } )
   }
 
   getLinkedInfo() {
     wifi.getLinkedInfo( ( err , linkedInfo ) => {
       if ( err ) {
-        Logger.error( TAG , `getLinkedInfo err: ${ JSON.stringify( err ) }` )
+        console.log( TAG , `getLinkedInfo err: ${ JSON.stringify( err ) }` )
         return
       }
-      Logger.info( TAG , `linkedInfo: ${ JSON.stringify( linkedInfo ) }` )
+      console.log( TAG , `linkedInfo: ${ JSON.stringify( linkedInfo ) }` )
       if ( linkedInfo === null || linkedInfo.bssid === '' ) {
         this.isLinked = false
         this.linkedInfo = {
@@ -79,11 +89,11 @@ struct WifiFound {
 
   addListener() {
     wifi.on( 'wifiConnectionChange' , state => {
-      Logger.info( TAG , `wifiConnectionChange: ${ state }` )
+      console.log( TAG , `wifiConnectionChange: ${ state }` )
       this.getLinkedInfo()
     } )
     wifi.on( 'wifiStateChange' , state => {
-      Logger.info( TAG , `wifiStateLisener state: ${ state }` )
+      console.log( TAG , `wifiStateLisener state: ${ state }` )
       this.wifiList = []
       if ( state === 1 ) { // 1: wifi is enable, 0:wifi is disable
         wifi.scan()
@@ -93,12 +103,12 @@ struct WifiFound {
   }
 
   aboutToAppear() {
-    let context = featureAbility.getContext()
-    context.requestPermissionsFromUser( [ PERMISSION_NAME ] , 3 , function( result ) {
-      Logger.info( TAG , `wifi grantPermission,requestPermissionsFromUser,result.requestCode: ${ result }` )
-    } )
+    // let context = featureAbility.getContext()
+    // context.requestPermissionsFromUser( [ PERMISSION_NAME ] , 3 , function( result ) {
+    //   console.log( TAG , `wifi grantPermission,requestPermissionsFromUser,result.requestCode: ${ result }` )
+    // } )
     if ( wifi.isWifiActive() ) {
-      Logger.info( TAG , 'wifi is active' )
+      console.log( TAG , 'wifi is active' )
       this.isSwitchOn = true
       wifi.scan()
       this.scan()
@@ -110,7 +120,7 @@ struct WifiFound {
   build() {
     Column() {
       Stack( { alignContent : Alignment.TopStart } ) {
-        TitleBar({ testItem : this.testItem } )
+        TitleBar( { testItem : this.testItem } )
       }
 
       Row() {
@@ -118,11 +128,11 @@ struct WifiFound {
           .fontSize( 22 )
           .fontWeight( FontWeight.Bold )
           .layoutWeight( 1 )
-          .align(Alignment.TopStart)
+          .align( Alignment.TopStart )
         Column() {
           Toggle( { type : ToggleType.Switch , isOn : this.isSwitchOn } )
             .onChange( ( isOn: boolean ) => {
-              Logger.info( TAG , `wifi swtich is: ${ isOn }` )
+              console.log( TAG , `wifi swtich is: ${ isOn }` )
               this.wifiList = []
               if ( isOn ) {
                 this.isSwitchOn = true
@@ -144,7 +154,7 @@ struct WifiFound {
         Text( $r( 'app.string.wlanIsConnected' ) )
           .fontSize( 22 )
           .width( '95%' )
-          .align(Alignment.TopStart)
+          .align( Alignment.TopStart )
         Row() {
           Text( this.linkedInfo.ssid )
             .fontSize( 20 )

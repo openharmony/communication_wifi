@@ -15,9 +15,7 @@
 
 // @ts-nocheck
 
-import Logger from '../MainAbility/model/Logger'
-
-const TAG: string = 'P2pView'
+const TAG = "[P2pView]"
 import ConfigData from '../Utils/ConfigData';
 import { testOnP2pConnectionChange , testGetCurrentGroupCallback } from '../MainAbility/model/p2pInterface'
 /**
@@ -33,15 +31,15 @@ export struct P2pView {
   @State isLock: boolean = true
 
   aboutToAppear() {
-    Logger.debug( TAG , `aboutToAppear ${ JSON.stringify( this.p2p ) }` )
+    console.log( TAG , `aboutToAppear ${ JSON.stringify( this.p2p ) }` )
     testOnP2pConnectionChange()
     testGetCurrentGroupCallback()
     this.p2pConnectState = AppStorage.Get( "p2pConnectState" )
     this.p2pLinkedDeviceName = AppStorage.Get( "p2pLinkedDeviceName" )
     if ( this.p2p ) {
-      console.log( "this.p2p is true" )
+      console.log( TAG , "this.p2p is true" )
     } else {
-      console.log( "this.p2p is false" )
+      console.log( TAG , "this.p2p is false" )
     }
   }
 

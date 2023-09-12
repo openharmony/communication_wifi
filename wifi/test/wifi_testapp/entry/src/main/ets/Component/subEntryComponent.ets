@@ -17,6 +17,7 @@
 
 import ConfigData from '../Utils/ConfigData';
 
+const TAG = "[subEntryComponent]"
 /**
  * Sub-Page Entry Component of wifi test
  */
@@ -27,7 +28,7 @@ export struct SubEntryComponent {
   private title: string | Resource;
   @State isTouched: boolean = false;
   private date: any = null;
-  private deviceId: any = null;
+  private deviceId: any = n
 
   build() {
     Navigator( { target : this.targetPage } ) {
@@ -64,12 +65,12 @@ export struct SubEntryComponent {
         if ( event.type === TouchType.Down ) {
           this.isTouched = true;
         } else {
-          console.log( "event.type /= TouchType.Down" )
+          console.log( TAG , "event.type /= TouchType.Down" )
         }
         if ( event.type === TouchType.Up ) {
           this.isTouched = false;
         } else {
-          console.log( "event.type /= TouchType.Up" )
+          console.log( TAG , "event.type /= TouchType.Up" )
         }
       } )
     }
@@ -122,24 +123,24 @@ export struct SubEntryComponentWithEndText {
       .width( ConfigData.WH_100_100 )
       .borderRadius( $r( 'app.float.radius_20' ) )
       .linearGradient( this.isTouched ? {
-        angle : 90 ,
-        direction : GradientDirection.Right ,
-        colors : [ [ $r( "app.color.DCEAF9" ), 0.0 ], [ $r( "app.color.FAFAFA" ), 1.0 ] ]
-      } : {
-        angle : 90 ,
-        direction : GradientDirection.Right ,
-        colors : [ [ $r( "sys.color.ohos_id_color_foreground_contrary" ), 1 ], [ $r( "sys.color.ohos_id_color_foreground_contrary" ), 1 ] ]
-      } )
+                                          angle : 90 ,
+                                          direction : GradientDirection.Right ,
+                                          colors : [ [ $r( "app.color.DCEAF9" ), 0.0 ], [ $r( "app.color.FAFAFA" ), 1.0 ] ]
+                                        } : {
+                                              angle : 90 ,
+                                              direction : GradientDirection.Right ,
+                                              colors : [ [ $r( "sys.color.ohos_id_color_foreground_contrary" ), 1 ], [ $r( "sys.color.ohos_id_color_foreground_contrary" ), 1 ] ]
+                                            } )
       .onTouch( ( event: TouchEvent ) => {
         if ( event.type === TouchType.Down ) {
           this.isTouched = true;
         } else {
-          console.log( "event.type /= TouchType.Down" )
+          console.log( TAG , "event.type /= TouchType.Down" )
         }
         if ( event.type === TouchType.Up ) {
           this.isTouched = false;
         } else {
-          console.log( "event.type /= TouchType.Up" )
+          console.log( TAG , "event.type /= TouchType.Up" )
         }
       } );
     }

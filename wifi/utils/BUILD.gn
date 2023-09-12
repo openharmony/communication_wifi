@@ -70,9 +70,7 @@ if (defined(ohos_lite)) {
       "src/wifi_sa_manager.cpp",
     ]
 
-    deps = [
-      "//third_party/jsoncpp:jsoncpp",
-    ]
+    deps = [ "//third_party/jsoncpp:jsoncpp" ]
 
     external_deps = [
       "ability_base:want",

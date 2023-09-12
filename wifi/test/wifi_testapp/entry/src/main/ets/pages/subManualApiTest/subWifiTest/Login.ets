@@ -17,9 +17,9 @@ import wifi from '@ohos.wifi';
 import router from '@ohos.router';
 import { resolveIP } from '../../../Utils/Util'
 import socket from '@ohos.net.socket';
-import Logger from '../../../MainAbility/model/Logger'
 
-const TAG: string = '[Login]'
+
+const TAG = '[login]'
 
 let localAddr = {
   address : resolveIP( wifi.getIpInfo().ipAddress ) ,
@@ -55,16 +55,16 @@ struct Login {
   bindOption() {
     let bindOption = udp.bind( localAddr );
     bindOption.then( () => {
-      Logger.info( TAG , 'bind success' )
+      console.log( TAG , 'bind success' )
       this.receiveMsg = "绑定成功"
     } ).catch( err => {
-      Logger.info( TAG , 'bind fail' + err )
+      console.log( TAG , 'bind fail' + err )
     } )
     udp.on( 'message' , data => {
-      Logger.info( TAG , `data:${ JSON.stringify( data ) }` )
+      console.log( TAG , `data:${ JSON.stringify( data ) }` )
       let buffer = data.message
       let dataView = new DataView(buffer)
-      Logger.info( TAG , `length = ${ dataView.byteLength }` )
+      console.log( TAG , `length = ${ dataView.byteLength }` )
       let str = ""
       for ( let i = 0 ;i < dataView.byteLength ; ++i ) {
         let c = String.fromCharCode( dataView.getUint8( i ) )
@@ -154,9 +154,9 @@ struct Login {
                 } else {
                   this.bindOption()
                   this.txtDialog = true
-                  Logger.debug( TAG , `peer ip=${ oppositeAddr.address }` )
-                  Logger.debug( TAG , `peer port=${ oppositeAddr.port }` )
-                  Logger.debug( TAG , `peer port=${ localAddr.port }` )
+                  console.log( TAG , `peer ip=${ oppositeAddr.address }` )
+                  console.log( TAG , `peer port=${ oppositeAddr.port }` )
+                  console.log( TAG , `peer port=${ localAddr.port }` )
                 }
               } )
               .backgroundColor( 0xffffff )
@@ -174,14 +174,14 @@ struct Login {
                     data : 'online' ,
                     address : oppositeAddr
                   } ).then( data => {
-                    Logger.info( TAG , `send sucess : ${ data }` )
+                    console.log( TAG , `send sucess : ${ data }` )
                   } ).catch( function( err ) {
-                    Logger.info( TAG , `TAG,send : ${ JSON.stringify( err ) }` )
+                    console.log( TAG , `TAG,send : ${ JSON.stringify( err ) }` )
                   } )
 
-                  Logger.debug( TAG , `send peer ip=${ oppositeAddr.address }` )
-                  Logger.debug( TAG , `send peer port=${ oppositeAddr.port }` )
-                  Logger.debug( TAG , `send peer port=${ localAddr.port }` )
+                  console.log( TAG , `send peer ip=${ oppositeAddr.address }` )
+                  console.log( TAG , `send peer port=${ oppositeAddr.port }` )
+                  console.log( TAG , `send peer port=${ localAddr.port }` )
                 }
               } )
               .backgroundColor( 0xffffff )

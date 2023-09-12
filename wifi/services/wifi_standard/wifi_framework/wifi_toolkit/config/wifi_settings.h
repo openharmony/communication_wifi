@@ -54,6 +54,7 @@ constexpr char WIFI_P2P_VENDOR_CONFIG_FILE_PATH[] = CONFIG_ROOR_DIR"/p2p_vendor_
 const std::string WIFI_TRUST_LIST_POLICY_FILE_PATH = CONFIG_ROOR_DIR"/trust_list_polices.conf";
 const std::string WIFI_MOVING_FREEZE_POLICY_FILE_PATH = CONFIG_ROOR_DIR"/moving_freeze_policy.conf";
 constexpr char WIFI_STA_RANDOM_MAC_FILE_PATH[] = CONFIG_ROOR_DIR"/sta_randomMac.conf";
+constexpr char PORTAL_CONFIG_FILE_PATH[] = "/system/etc/wifi/wifi_portal.conf";
 
 namespace OHOS {
 namespace Wifi {
@@ -472,6 +473,21 @@ public:
      */
     int ReloadStaRandomMac();
 
+    /**
+     * @Description reload portal conf
+     *
+     * @return int - 0 success
+     */
+    int ReloadPortalconf();
+
+    /**
+     * @Description Get portal uri
+     *
+     * @param portalUri - portal uri
+     * @return int - 0 success
+     */
+    void GetPortalUri(std::string &portalUri);
+    
     /**
      * @Description add random mac address
      *
@@ -1396,6 +1412,7 @@ private:
     WifiLinkedInfo mWifiLinkedInfo;
     std::string mMacAddress;
     std::string mCountryCode;
+    WifiPortalConf mPortalUri;
     std::map <int, std::atomic<int>> mHotspotState;
     std::map <int, HotspotConfig> mHotspotConfig;
     P2pVendorConfig mP2pVendorConfig;
@@ -1448,6 +1465,7 @@ private:
     WifiConfigFileImpl<MovingFreezePolicy> mMovingFreezePolicy;
     MovingFreezePolicy mFPolicy;
     WifiConfigFileImpl<WifiStoreRandomMac> mSavedWifiStoreRandomMac;
+    WifiConfigFileImpl<WifiPortalConf> mSavedPortal;
     bool explicitGroup;
     std::atomic_bool mThreadStatusFlag_ { false };
     std::atomic_uint64_t mThreadStartTime { 0 };

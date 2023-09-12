@@ -19,7 +19,7 @@
 #include <sys/time.h>
 #include "securec.h"
 #include "wifi_log.h"
-
+#include <netdb.h>
 #undef LOG_TAG
 #define LOG_TAG "OHWIFI_UTILS_HTTP_REQ"
 
@@ -239,7 +239,7 @@ int HttpRequest::HttpDataTransmit(const int &iSockFd)
         } else if (ret < 0) {
             /* Error */
             if (errno == EINTR || errno == EWOULDBLOCK || errno == EAGAIN) {
-                LOGE("HttpRequest::HttpDataTransmit recv not finish!\n");
+                LOGD("HttpRequest::HttpDataTransmit recv not finish!\n");
                 continue;
             } else {
                 LOGE("HttpRequest::HttpDataTransmit recv error! Error code: %{public}d", errno);
@@ -298,27 +298,32 @@ void GetHostThread(HostData* pThreadData)
         }
         ipOrDomain = pThreadData->strIpOrDomain;
     }
-    hostent *he = gethostbyname(ipOrDomain.c_str());
-    if (he == nullptr) {
-        {
-            std::unique_lock<std::mutex> lck(gMutex);
-            if (gHostDataSet.find(pThreadData) != gHostDataSet.end()) {
-                LOGD("GetHostThread delete.");
-                gHostDataSet.erase(pThreadData);
-                delete pThreadData;
-                pThreadData = nullptr;
-            }
-        }
-        LOGE("GetIPFromUrl Url is wrong. error message:[%s]\n", hstrerror(h_errno));
-    } else {
-        std::unique_lock<std::mutex> lck(gMutex);
-        in_addr **addr_list = (in_addr **)he->h_addr_list;
-        for (int i = 0; addr_list[i] != nullptr; i++) {
-            pThreadData->strIp = inet_ntoa(*addr_list[i]);
-        }
-        pThreadData->bIp = true;
-        pThreadData->mWait_timeout.notify_one();
+    LOGE("GetHostThread ipOrDomain is %{public}s.", ipOrDomain.c_str());
+    addrinfo *res = nullptr;
+    int status = getaddrinfo(ipOrDomain.c_str(), nullptr, nullptr, &res);
+    if (status < 0) {
+        LOGE("getaddrinfo errno %{public}d %{public}s", errno, strerror(errno));
+        return;
     }
+    
+    for (addrinfo *tmp = res; tmp != nullptr; tmp = tmp->ai_next) {
+        if (tmp->ai_family == AF_INET) {
+            auto addr = reinterpret_cast<sockaddr_in *>(tmp->ai_addr);
+            char ip[50] = {0};
+            inet_ntop(AF_INET, &addr->sin_addr, ip, sizeof(ip));
+            pThreadData->strIp = ip;
+        } else if (tmp->ai_family == AF_INET6) {
+            auto addr = reinterpret_cast<sockaddr_in6 *>(tmp->ai_addr);
+            char ip[200] = {0};
+            inet_ntop(AF_INET6, &addr->sin6_addr, ip, sizeof(ip));
+            pThreadData->strIp = ip;
+        }
+    }
+    freeaddrinfo(res);
+    LOGE("GetHostThread ipaddr is %{public}s.", pThreadData->strIp.c_str());
+
+    pThreadData->bIp = true;
+    pThreadData->mWait_timeout.notify_one();
     return;
 }
 

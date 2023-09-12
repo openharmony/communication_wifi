@@ -18,9 +18,8 @@
 import screenshot from '@ohos.screenshot'
 import image from '@ohos.multimedia.image'
 import MediaUtils from '../MainAbility/model/MediaUtils'
-import Logger from '../MainAbility/model/Logger'
 
-const TAG = '[Screenshot]'
+const TAG = "[mainPageTitle]"
 import ConfigData from '../Utils/ConfigData';
 /**
  * Main-Page Title Of WiFi test
@@ -48,18 +47,18 @@ export struct MainPageTitle {
         rotation : 0
       }
     } else {
-      console.log( "error-----" )
+      console.log( TAG , "error-----" )
     }
     try {
       screenshot.save( screenshotOptions , ( err , data: image.PixelMap ) => {
         if ( err ) {
-          Logger.info( TAG , `Failed to save the screenshot. Error:${ JSON.stringify( err ) }` )
+          console.log( TAG , `Failed to save the screenshot. Error:${ JSON.stringify( err ) }` )
         }
-        Logger.info( TAG , 'save callback' )
+        console.log( TAG , 'save callback' )
         MediaUtils.savePicture( data , getContext( this ) as any )
       } )
     } catch( err ) {
-      Logger.error( `save failed, code is ${ err.code }, message is ${ err.message }` )
+      console.log( TAG , `save failed, code is ${ err.code }, message is ${ err.message }` )
     }
   }
 
@@ -78,7 +77,7 @@ export struct MainPageTitle {
     //    .size({ width: 55, height: 55 })
     .margin( { left : 6 , right : 6 , top : 3 } )
     .onClick( () => {
-      console.log( '[Screenshot] onClick,screenshot' )
+      console.log( TAG , 'onClick,screenshot' )
       this.getScreen( isFullScreen )
     } )
 
@@ -101,59 +100,59 @@ export struct MainPageTitle {
         .borderRadius( this.myborderRadius )
         .borderColor( Color.Green )
         .gesture(
-        GestureGroup( GestureMode.Parallel ,
-        TapGesture( { count : 2 , fingers : 1 } )
-          .onAction( () => {
-            this.myborderWidth += 1
-          } ) ,
-        LongPressGesture( { fingers : 1 , repeat : true , duration : 1000 } )
-          .onAction( ( event: GestureEvent ) => {
-            this.colOpacity -= 0.1
-            if ( event.repeat ) {
-              this.count ++
-            }
-          } )
-          .onActionEnd( () => {
-            this.colOpacity = 1;
-            this.count = 0;
-          } ) ,
-        PanGesture( { fingers : 1 , direction : PanDirection.All , distance : 5.0 } )
-          .onActionStart( () => {
-            console.log( 'Pan start' )
-          } )
-          .onActionUpdate( ( event: GestureEvent ) => {
-            this.offsetY = event.offsetY;
-            this.offsetX = event.offsetX;
-          } )
-          .onActionEnd( () => {
-            console.log( 'Pan end' )
-          } ) ,
-        PinchGesture( { fingers : 2 , distance : 4 } )
-          .onActionStart( () => {
-            console.log( 'PinchGesture start' )
-          } )
-          .onActionUpdate( ( event: GestureEvent ) => {
-            this.myscale = event.scale
-            this.myborderRadius = 10
-          } )
-          .onActionEnd( () => {
-            console.log( 'PinchGesture end' )
-            this.getScreen( true );
-          } ) ,
-        RotationGesture( { fingers : 2 , angle : 2 } )
-          .onActionStart( () => {
-            console.log( 'RotationGesture start' )
-          } )
-          .onActionUpdate( ( event: GestureEvent ) => {
-            this.angle = event.angle
-          } )
-          .onActionEnd( () => {
-            console.log( 'RotationGesture end' )
-          } )
-        )
-          .onCancel( () => {
-            console.log( 'Parallel gesture canceled' )
-          } )
+          GestureGroup( GestureMode.Parallel ,
+            TapGesture( { count : 2 , fingers : 1 } )
+              .onAction( () => {
+                this.myborderWidth += 1
+              } ) ,
+            LongPressGesture( { fingers : 1 , repeat : true , duration : 1000 } )
+              .onAction( ( event: GestureEvent ) => {
+                this.colOpacity -= 0.1
+                if ( event.repeat ) {
+                  this.count ++
+                }
+              } )
+              .onActionEnd( () => {
+                this.colOpacity = 1;
+                this.count = 0;
+              } ) ,
+            PanGesture( { fingers : 1 , direction : PanDirection.All , distance : 5.0 } )
+              .onActionStart( () => {
+                console.log( TAG , 'Pan start' )
+              } )
+              .onActionUpdate( ( event: GestureEvent ) => {
+                this.offsetY = event.offsetY;
+                this.offsetX = event.offsetX;
+              } )
+              .onActionEnd( () => {
+                console.log( TAG , 'Pan end' )
+              } ) ,
+            PinchGesture( { fingers : 2 , distance : 4 } )
+              .onActionStart( () => {
+                console.log( TAG , 'PinchGesture start' )
+              } )
+              .onActionUpdate( ( event: GestureEvent ) => {
+                this.myscale = event.scale
+                this.myborderRadius = 10
+              } )
+              .onActionEnd( () => {
+                console.log( TAG , 'PinchGesture end' )
+                this.getScreen( true );
+              } ) ,
+            RotationGesture( { fingers : 2 , angle : 2 } )
+              .onActionStart( () => {
+                console.log( TAG , 'RotationGesture start' )
+              } )
+              .onActionUpdate( ( event: GestureEvent ) => {
+                this.angle = event.angle
+              } )
+              .onActionEnd( () => {
+                console.log( TAG , 'RotationGesture end' )
+              } )
+          )
+            .onCancel( () => {
+              console.log( TAG , 'Parallel gesture canceled' )
+            } )
         )
       }
       .layoutWeight( 1 )

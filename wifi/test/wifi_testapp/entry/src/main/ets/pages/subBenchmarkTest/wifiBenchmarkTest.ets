@@ -27,13 +27,13 @@ import ConfigData from "../../Utils/ConfigData"
 import wifi from '@ohos.wifi';
 import { resolveIP } from '../../Utils/Util'
 import socket from '@ohos.net.socket';
-import Logger from '../../MainAbility/model/Logger'
+
 import http from '@ohos.net.http'
 import request from '@ohos.request'
 import resourceManager from '@ohos.resourceManager'
 import featureAbility from '@ohos.ability.featureAbility'
 
-const TAG: string = '[Benchmark]'
+const TAG = '[Benchmark]'
 
 let localAddr = {
   address : resolveIP( wifi.getIpInfo().ipAddress ) ,
@@ -222,17 +222,17 @@ struct socketTest {
   bindOption() {
     let bindOption = udp.bind( localAddr )
     bindOption.then( () => {
-      Logger.info( TAG , 'bind success' )
+      console.log( TAG , 'bind success' )
       this.bindMsg = "绑定成功"
     } ).catch( err => {
-      Logger.info( TAG , 'bind fail' + err )
+      console.log( TAG , 'bind fail' + err )
       this.bindMsg = "绑定失败"
     } )
     udp.on( 'message' , data => {
-      Logger.info( TAG , `data:${ JSON.stringify( data ) }` )
+      console.log( TAG , `data:${ JSON.stringify( data ) }` )
       let buffer = data.message
       let dataView = new DataView(buffer)
-      Logger.info( TAG , `length = ${ dataView.byteLength }` )
+      console.log( TAG , `length = ${ dataView.byteLength }` )
       let str = ""
       for ( let i = 0 ;i < dataView.byteLength ; ++i ) {
         let c = String.fromCharCode( dataView.getUint8( i ) )
@@ -314,9 +314,9 @@ struct socketTest {
                   } else {
                     this.bindOption()
                     this.txtDialog = true
-                    Logger.debug( TAG , `peer ip=${ oppositeAddr.address }` )
-                    Logger.debug( TAG , `peer port=${ oppositeAddr.port }` )
-                    Logger.debug( TAG , `peer port=${ localAddr.port }` )
+                    console.log( TAG , `peer ip=${ oppositeAddr.address }` )
+                    console.log( TAG , `peer port=${ oppositeAddr.port }` )
+                    console.log( TAG , `peer port=${ localAddr.port }` )
                   }
                 } )
                 .backgroundColor( 0xffffff )
@@ -334,14 +334,14 @@ struct socketTest {
                       data : 'online' ,
                       address : oppositeAddr
                     } ).then( data => {
-                      Logger.info( TAG , `send sucess : ${ data }` )
+                      console.log( TAG , `send sucess : ${ data }` )
                     } ).catch( function( err ) {
-                      Logger.info( TAG , `TAG,send : ${ JSON.stringify( err ) }` )
+                      console.log( TAG , `TAG,send : ${ JSON.stringify( err ) }` )
                     } )
 
-                    Logger.debug( TAG , `send peer ip=${ oppositeAddr.address }` )
-                    Logger.debug( TAG , `send peer port=${ oppositeAddr.port }` )
-                    Logger.debug( TAG , `send peer port=${ localAddr.port }` )
+                    console.log( TAG , `send peer ip=${ oppositeAddr.address }` )
+                    console.log( TAG , `send peer port=${ oppositeAddr.port }` )
+                    console.log( TAG , `send peer port=${ localAddr.port }` )
                   }
                 } )
                 .backgroundColor( 0xffffff )
@@ -399,10 +399,10 @@ struct upDownLoad {
   }
 
   aboutToAppear() {
-    Logger.info( TAG , `enter Index aboutToAppear` )
+    console.log( TAG , `enter Index aboutToAppear` )
     featureAbility.getContext()
       .requestPermissionsFromUser( [ 'ohos.permission.INTERNET' ] , 2 , ( result ) => {
-        Logger.info( TAG , `grantPermission,requestPermissionsFromUser,result.requestCode=${ result }` )
+        console.log( TAG , `grantPermission,requestPermissionsFromUser,result.requestCode=${ result }` )
       } )
     this.files.push( "http://192.168.62.127:8000" )
     let httpRequest = http.createHttp()
@@ -414,23 +414,23 @@ struct upDownLoad {
           'Content-Type' : 'text/plain'
         }
       } , ( err , data ) => {
-      Logger.info( TAG , `error = ${ JSON.stringify( err ) }` )
+      console.log( TAG , `error = ${ JSON.stringify( err ) }` )
       if ( !err ) {
-        Logger.info( TAG , `data = ${ JSON.stringify( data ) }` )
+        console.log( TAG , `data = ${ JSON.stringify( data ) }` )
         let result: string = data.result.toString()
-        Logger.info( TAG , `Result = ${ result }` )
+        console.log( TAG , `Result = ${ result }` )
 
         let tempFiles = result.split( '\r\n' )
         for ( let i = 0 ; i < tempFiles.length ; i ++ ) {
           let splitFiles = tempFiles[i].split( '//' )[1].split( '/' )
-          Logger.info( TAG , `splitFiles = ${ JSON.stringify( splitFiles ) }` )
+          console.log( TAG , `splitFiles = ${ JSON.stringify( splitFiles ) }` )
           if ( splitFiles.indexOf( 'upload' ) === - 1 ) {
             this.files.push( tempFiles[i] )
           }
         }
-        Logger.info( TAG , `files = ${ JSON.stringify( this.files ) }` )
+        console.log( TAG , `files = ${ JSON.stringify( this.files ) }` )
       } else {
-        Logger.info( TAG , `error: ${ JSON.stringify( err ) }` )
+        console.log( TAG , `error: ${ JSON.stringify( err ) }` )
         httpRequest.destroy()
       }
     } )
@@ -463,21 +463,21 @@ struct upDownLoad {
                     //                    let resourceManage = await resourceManager.getResourceManager()
                     //                    let downloadSuccess = await resourceManage.getString($r('app.string.download_success').id)
                     this.downloadConfig.url = item
-                    Logger.info( TAG , `downloadConfig.url = ${ JSON.stringify( this.downloadConfig.url ) }` )
+                    console.log( TAG , `downloadConfig.url = ${ JSON.stringify( this.downloadConfig.url ) }` )
                     this.downloadConfig.filePath = `/data/storage/el2/base/haps/entry/cache/ ${
                     item.split( '//' )[1].split( '/' )[1] + fileindex }`
                     //                    /data/storage/el2/base/haps/entry/cache/
                     fileindex += 1
-                    Logger.info( TAG , `downloadConfig.filePath = ${ JSON.stringify( this.downloadConfig.filePath ) }` )
+                    console.log( TAG , `downloadConfig.filePath = ${ JSON.stringify( this.downloadConfig.filePath ) }` )
                     request.download( this.downloadConfig , ( err , downloadTask ) => {
-                      Logger.info( TAG , `download enter` )
+                      console.log( TAG , `download enter` )
                       if ( err ) {
-                        Logger.info( TAG , `download err = ${ JSON.stringify( err ) }` )
+                        console.log( TAG , `download err = ${ JSON.stringify( err ) }` )
                         return
                       }
-                      Logger.info( TAG , `download data = ${ JSON.stringify( downloadTask ) }` )
+                      console.log( TAG , `download data = ${ JSON.stringify( downloadTask ) }` )
 
-                      Logger.info( TAG , `download end` )
+                      console.log( TAG , `download end` )
                     } )
                   } , 1000 )
 

@@ -1317,6 +1317,21 @@ const p2pManagerTestCase: any[] = [
 const TestComposition: any[] = [
   {
     'name' : 'WIFI' ,
+    'detail' : 'wifi发现' ,
+    'url' : 'pages/subAppTest/wifiScanTest' ,
+    'image' : $r( 'app.media.wifi' ) ,
+    'category' : Category.App
+  },
+  {
+    'name' : 'p2p' ,
+    'detail' : 'p2p发现' ,
+    'url' : 'pages/subAppTest/p2pDiscoveryTest' ,
+    'image' : $r( 'app.media.WLAN' ) ,
+    'category' : Category.App
+  },
+
+  {
+    'name' : 'WIFI' ,
     'detail' : 'wifi测试' ,
     'url' : 'pages/subManualApiTest/wifiInterfaceTest' ,
     'image' : $r( 'app.media.wifi' ) ,

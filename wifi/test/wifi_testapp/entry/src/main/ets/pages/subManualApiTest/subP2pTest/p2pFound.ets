@@ -18,11 +18,10 @@
 import featureAbility from '@ohos.ability.featureAbility'
 import wifi from '@ohos.wifi'
 import { AvailableP2p } from '../../../Component/availableP2p'
-import Logger from '../../../MainAbility/model/Logger'
 import { P2pTitleBar } from '../../../Component/p2pTitleBar'
 import { P2pModel } from '../../../MainAbility/model/p2pModel'
 
-const TAG = 'p2pFound'
+const TAG = '[p2pFound]'
 const PERMISSION_P2P_NAME: string = 'ohos.permission.LOCATION'
 /**
  * p2p Found Test Page Of Wifi test
@@ -32,7 +31,7 @@ const PERMISSION_P2P_NAME: string = 'ohos.permission.LOCATION'
 struct P2pFound {
   private p2pModel: P2pModel = new P2pModel()
   private testItem: string = "p2p扫描"
-  private p2pLinkedInfo: any = {
+  @State p2pLinkedInfo: any = {
     deviceName : "" ,
     deviceAddress : "" ,
     groupOwnerAddr: "" ,
@@ -47,7 +46,7 @@ struct P2pFound {
     this.p2pModel.getP2pPeerDevices( ( result ) => {
       if ( this.p2pIsSwitchOn ) {
         this.p2pList = result
-        Logger.info( 'scan p2pList:' + JSON.stringify(this.p2pList ))
+        console.log( 'scan p2pList:' + JSON.stringify(this.p2pList ))
         setTimeout( () => {
           this.scan()
         } , 2000 )
@@ -58,10 +57,10 @@ struct P2pFound {
   getP2pLinkedInfo() {
     wifi.getP2pLinkedInfo( ( err , p2pLinkedInfo ) => {
       if ( err ) {
-        Logger.error( TAG , `getLinkedInfo err: ${ JSON.stringify( err ) }` )
+        console.log( TAG , `getLinkedInfo err: ${ JSON.stringify( err ) }` )
         return
       }
-      Logger.info( TAG , `p2pLinkedInfo: ${ JSON.stringify( p2pLinkedInfo ) }` )
+      console.log( TAG , `p2pLinkedInfo: ${ JSON.stringify( p2pLinkedInfo ) }` )
       if ( p2pLinkedInfo === null || p2pLinkedInfo.connectState === 0 ) {
         this.p2pIsLinked = false
         this.p2pLinkedInfo = {
@@ -81,11 +80,11 @@ struct P2pFound {
   addP2pListener() {
     wifi.on( 'p2pConnectionChange' , wifiP2pLinkedInfo => {
       let state =wifiP2pLinkedInfo.connectState
-      Logger.info( TAG , `p2pConnectionChange: ${ state }` )
+      console.log( TAG , `p2pConnectionChange: ${ state }` )
       this.getP2pLinkedInfo()
     } )
     wifi.on( 'p2pStateChange' , state => {
-      Logger.info( TAG , `p2pStateLisener state: ${ state }` )
+      console.log( TAG , `p2pStateLisener state: ${ state }` )
       this.p2pList = []
       if ( state === 1 ) { // 1: wifi is enable, 0:wifi is disable
         wifi.startDiscoverDevices()
@@ -95,12 +94,8 @@ struct P2pFound {
   }
 
   aboutToAppear() {
-    let context = featureAbility.getContext()
-    context.requestPermissionsFromUser( [ PERMISSION_P2P_NAME ] , 3 , function( result ) {
-      Logger.info( TAG , ` p2p grantPermission,requestPermissionsFromUser,result.requestCode: ${ result }` )
-    } )
     if ( wifi.isWifiActive() ) {
-      Logger.info( TAG , 'wifi is active' )
+      console.log( TAG , 'wifi is active' )
       this.p2pIsSwitchOn = true
       wifi.startDiscoverDevices()
       this.scan()
@@ -124,7 +119,7 @@ struct P2pFound {
         Column() {
           Toggle( { type : ToggleType.Switch , isOn : this.p2pIsSwitchOn } )
             .onChange( ( isOn: boolean ) => {
-              Logger.info( TAG , `wifi swtich is: ${ isOn }` )
+              console.log( TAG , `wifi swtich is: ${ isOn }` )
               this.p2pList = []
               if ( isOn ) {
                 this.p2pIsSwitchOn = true
@@ -142,26 +137,6 @@ struct P2pFound {
       }
       .width( '95%' )
 
-//      if ( this.p2pIsLinked ) {
-//        Text( $r( 'app.string.wlanIsConnected' ) )
-//          .fontSize( 22 )
-//          .width( '95%' )
-//          .align(Alignment.TopStart)
-//        Row() {
-//          Text( this.p2pLinkedInfo.deviceName )
-//            .fontSize( 20 )
-//            .fontColor( Color.Black )
-//            .layoutWeight( 1 )
-//          Text( $r( 'app.string.wlanIsConnected' ) )
-//            .fontSize( 18 )
-//            .fontColor( Color.Black )
-//        }
-//        .width( '95%' )
-//        .padding( 10 )
-//        .margin( 10 )
-//        .border( { radius : 15 , color : Color.Gray , width : 1 } )
-//        .backgroundColor( Color.White )
-//      }
       AvailableP2p( { p2pList : this.p2pList , p2pLinkedInfo : this.p2pLinkedInfo } )
     }
     .size( { width : '100%' , height : '100%' } )

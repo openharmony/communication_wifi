@@ -145,6 +145,14 @@ static bool GetHotspotconfigFromJs(const napi_env& env, const napi_value& object
     str = "";
     JsObjectToString(env, object, "ipAddress", NAPI_MAX_IPV4_LEN, str); // 16: ipv4 max length is 15 + '\0'
     config.SetIpAddress(str);
+    
+    value = 0;
+    JsObjectToInt(env, object, "leaseTime", value);
+    ClearJsLastException(env);
+    if (value < (int)DHCP_LEASE_TIME_MIN) {
+        value = (int)DHCP_LEASE_TIME;
+    }
+    config.SetLeaseTime(value);
     return true;
 }
 
@@ -204,6 +212,7 @@ static void HotspotconfigToJs(const napi_env& env, HotspotConfig& cppConfig, nap
     SetValueInt32(env, "maxConn", cppConfig.GetMaxConn(), result);
     SetValueInt32(env, "channel", cppConfig.GetChannel(), result);
     SetValueUtf8String(env, "ipAddress", cppConfig.GetIpAddress(), result);
+    SetValueInt32(env, "leaseTime", cppConfig.GetLeaseTime(), result);
 }
 
 NO_SANITIZE("cfi") napi_value GetHotspotConfig(napi_env env, napi_callback_info info)

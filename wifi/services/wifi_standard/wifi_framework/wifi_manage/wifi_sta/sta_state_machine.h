@@ -19,6 +19,7 @@
 #include <sys/types.h>
 #include <fstream>
 #include <vector>
+#include <atomic>
 
 #include "wifi_internal_msg.h"
 #include "wifi_log.h"
@@ -398,6 +399,14 @@ public:
      * @Description On netmanager restart.
      */
     void OnNetManagerRestart(void);
+    /**
+     * @Description init dhcp renewal thread
+     */
+    void InitDhcpRenewalThread(uint32_t leaseTime);
+    /**
+     * @Description dhcp renewal thread entry func
+     */
+    void RunDhcpRenewalThreadFunc(uint32_t leaseTime);
 private:
     /**
      * @Description  Destruct state.
@@ -767,7 +776,8 @@ private:
     GetIpState *pGetIpState;
     LinkedState *pLinkedState;
     ApRoamingState *pApRoamingState;
-
+    std::thread mDhcpRenewalThread;
+    std::atomic<bool> exitDhcpRewThread;
     /**
      * @Description Replace empty dns
      */

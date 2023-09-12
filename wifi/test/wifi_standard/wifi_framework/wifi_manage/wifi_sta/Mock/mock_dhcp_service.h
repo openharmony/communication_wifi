@@ -41,6 +41,7 @@ public:
     int SetDhcpRange(const std::string& ifname, const std::string& tagName);
     int GetLeases(const std::string& ifname, std::vector<std::string>& leases);
     int GetDhcpSerProExit(const std::string& ifname, IDhcpResultNotify *pResultNotify);
+    int UpdateDefaultConfigFile(const std::string leaseTime);
 };
 }  // namespace Wifi
 }  // namespace OHOS

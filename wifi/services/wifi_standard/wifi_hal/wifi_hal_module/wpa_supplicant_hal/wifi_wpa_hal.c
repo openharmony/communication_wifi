@@ -643,7 +643,18 @@ static void WpaCallBackFunc(const char *p)
             return;
         }
         pBssid += strlen("bssid=");
-        WifiHalCbNotifyConnectChanged(WPA_CB_DISCONNECTED, -1, pBssid);
+        char *reasonPos = strstr(p, "reason=");
+        char reason[WIFI_REASON_LENGTH] = {-1};
+        if (reasonPos != NULL) {
+            reasonPos += strlen("reason=");
+            char *reasonEnd = strchr(reasonPos, ' ');
+            if (reasonEnd != NULL) {
+                int reasonLen = reasonEnd - reasonPos;
+                reasonLen = reasonLen > WIFI_REASON_LENGTH ? WIFI_REASON_LENGTH : reasonLen;
+                (void)memcpy_s(reason, sizeof(reason), reasonPos, reasonLen);
+            }
+        }
+        WifiHalCbNotifyConnectChanged(WPA_CB_DISCONNECTED, atoi(reason), pBssid);
     /* bssid changed event */
     } else if (strncmp(p, WPA_EVENT_BSSID_CHANGED, strlen(WPA_EVENT_BSSID_CHANGED)) == 0) {
         LOGI("Reveive WPA_EVENT_BSSID_CHANGED notify event");

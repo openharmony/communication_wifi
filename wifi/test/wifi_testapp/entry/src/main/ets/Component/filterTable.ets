@@ -18,6 +18,8 @@
 import { TestData , TestApi } from '../MainAbility/model/testData'
 import { initHotspotApIData } from '../MainAbility/model/testDataModels'
 import ConfigData from '../Utils/ConfigData';
+
+const TAG = "[filterTable]"
 /**
  * FilterTable Of WiFi test
  */
@@ -34,11 +36,11 @@ export struct FilterTable {
   @State h_securityType: number = 3;
   @State h_band: number = 2;
   @State h_preSharedKey: string = "12345678";
-  @State h_maxConn: number = 3 ;
-  @State h_channel: number = 36 ;
+  @State h_maxConn: number = 3;
+  @State h_channel: number = 36;
 
   getCurrentState( index: number ) {
-    return this.apiItems[index].result
+    return this.apiItems[ index ].result
   }
 
   aboutToAppear() {
@@ -100,7 +102,7 @@ export struct FilterTable {
                   .optionFont( { size : 15 } )
                   .width( ConfigData.WH_80_100 )
                   .onSelect( ( index: number ) => {
-                    console.log( "Select:" + index )
+                    console.log( TAG , "Select:" + index )
                     AppStorage.SetOrCreate( 'h_maxConn' , index );
                   } )
               }

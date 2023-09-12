@@ -17,7 +17,6 @@
 
 import { TestData } from '../MainAbility/model/testData'
 import { TestGridItem } from './testGridItem'
-import ConfigData from '../Utils/ConfigData';
 /**
  * TestGrid component page of wifi test
  */

@@ -37,6 +37,8 @@
     "pages/subManualApiTest/subWifiTest/login",
     "pages/subManualApiTest/subWifiTest/about",
     "pages/subManualApiTest/subWifiTest/wifiFound",
-    "pages/subManualApiTest/subP2pTest/p2pFound"
+    "pages/subManualApiTest/subP2pTest/p2pFound",
+    "pages/subAppTest/wifiScanTest",
+    "pages/subAppTest/p2pDiscoveryTest"
   ]
 }

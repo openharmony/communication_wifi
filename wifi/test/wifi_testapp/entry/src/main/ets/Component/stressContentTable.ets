@@ -19,6 +19,7 @@ import ConfigData from '../Utils/ConfigData';
 import { TestData , TestApi } from '../MainAbility/model/testData'
 import prompt from '@system.prompt';
 
+const TAG = "[stressContentTable]"
 /**
  *  ContentTable Component Page Of Wifi test
  */
@@ -48,7 +49,7 @@ export struct GetProfileConnSateDialog {
         .margin( { top : 10 , bottom : 10 } )
       Select( this.getProfileList )
         .selected( this.currentClick )
-        .value( this.getProfileList[this.currentClick].value )
+        .value( this.getProfileList[ this.currentClick ].value )
         .font( { size : 20 } )
         .selectedOptionFont( { size : 20 } )
         .optionFont( { size : 17 } )
@@ -74,12 +75,12 @@ export struct GetProfileConnSateDialog {
             if ( true ) {
               let message = ""
               message = this.apiItem.api( this.currentClick , this.pairedMac )
-              this.apiItem.result = this.getProfileList[this.currentClick].value + "状态:" + message
-              console.log( "this.apiItem.result:" + this.apiItem.result )
+              this.apiItem.result = this.getProfileList[ this.currentClick ].value + "状态:" + message
+              console.log( TAG , "this.apiItem.result:" + this.apiItem.result )
             } else {
               let message = ""
-              this.apiItem.result = this.getProfileList[this.currentClick].value
-              console.log( "this.apiItem.result:" + this.apiItem.result )
+              this.apiItem.result = this.getProfileList[ this.currentClick ].value
+              console.log( TAG , "this.apiItem.result:" + this.apiItem.result )
             }
             this.controller.close()
             this.confirm( this.inputValue )
@@ -120,14 +121,14 @@ export struct SetScanModeDialog {
         .margin( { top : 10 , bottom : 10 } )
       Select( this.scanModeList )
         .selected( this.currentClick )
-        .value( this.scanModeList[this.currentClick].value )
+        .value( this.scanModeList[ this.currentClick ].value )
         .font( { size : 12 } )
         .selectedOptionFont( { size : 12 } )
         .optionFont( { size : 12 } )
         .height( 60 )
         .width( ConfigData.WH_90_100 )
         .onSelect( ( index: number ) => {
-          console.log( "Select:" + index )
+          console.log( TAG , "Select:" + index )
           this.currentClick = index
         } )
       TextInput( {
@@ -159,12 +160,12 @@ export struct SetScanModeDialog {
               let message = {}
               message = this.apiItem.api( this.currentClick , this.duration )
               //              this.apiItem.result = message.mod.toString() + message.duration.toString()
-              this.apiItem.result = "类型:" + this.scanModeList[message.mod].value + "延迟:" + message.duration.toString()
-              console.log( "this.apiItem.result:" + this.apiItem.result )
+              this.apiItem.result = "类型:" + this.scanModeList[ message.mod ].value + "延迟:" + message.duration.toString()
+              console.log( TAG , "this.apiItem.result:" + this.apiItem.result )
             } else {
               let message = ""
-              this.apiItem.result = this.scanModeList[this.currentClick].value
-              console.log( "this.apiItem.result:" + this.apiItem.result )
+              this.apiItem.result = this.scanModeList[ this.currentClick ].value
+              console.log( TAG , "this.apiItem.result:" + this.apiItem.result )
             }
             this.controller.close()
             this.confirm( this.inputValue )
@@ -244,7 +245,7 @@ export struct StressContentTable {
   @StorageLink( 'pairedMac' ) pairedMac: string = "";
   getProfileConnSateDialog: CustomDialogController = new CustomDialogController({
     builder : GetProfileConnSateDialog( {
-      hitText : "设置配置类型" ,
+      hitText : "请设置配置类型" ,
       cancel : this.onCancel ,
       confirm : this.onAccept ,
       textValue : $localName ,
@@ -258,7 +259,7 @@ export struct StressContentTable {
   })
   setScanModelDialog: CustomDialogController = new CustomDialogController({
     builder : SetScanModeDialog( {
-      hitText : "设置扫描模式" ,
+      hitText : "请设置扫描模式" ,
       cancel : this.onCancel ,
       confirm : this.onAccept ,
       textValue : $localName ,
@@ -352,12 +353,12 @@ export struct StressContentTable {
             this.currentIndex += 1;
             this.changeIndex = this.currentIndex;
             AppStorage.SetOrCreate( 'stressNumber' , indexNumber );
-            console.log( apiItem.method + "indexNumber is ------: " + indexNumber );
+            console.log( TAG , apiItem.method + "indexNumber is ------: " + indexNumber );
           }
           let EndTime = new Date().getTime()
-          console.log( "开始:" + Number( StartTime ) + "ms" )
-          console.log( "结束:" + Number( EndTime ) + "ms" )
-          console.log( "花费:" + Number( EndTime - StartTime ) + "ms" )
+          console.log( TAG , "开始:" + Number( StartTime ) + "ms" )
+          console.log( TAG , "结束:" + Number( EndTime ) + "ms" )
+          console.log( TAG , "花费:" + Number( EndTime - StartTime ) + "ms" )
           let stressTime = EndTime - StartTime
           AppStorage.SetOrCreate( 'stressTime' , stressTime );
         }
@@ -367,7 +368,7 @@ export struct StressContentTable {
   }
 
   getCurrentState( index: number ) {
-    return this.apiItems[index].result
+    return this.apiItems[ index ].result
   }
 
   build() {

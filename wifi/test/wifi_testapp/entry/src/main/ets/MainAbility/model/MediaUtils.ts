@@ -20,13 +20,13 @@ import fileio from '@ohos.fileio'
 import prompt from '@ohos.prompt'
 import mediaLibrary from '@ohos.multimedia.mediaLibrary'
 import DateTimeUtil from './DateTimeUtil'
-import Logger from './Logger'
+
 
 /**
  * mediaUtils of wifi test
  */
 
-const TAG: string = '[MediaUtils]'
+const TAG = "[MediaUtils]"
 
 class MediaUtils {
   async createAndGetFile(context: any) {
@@ -38,12 +38,12 @@ class MediaUtils {
     let name = `${dateTimeUtil.getDate()}_${dateTimeUtil.getTime()}`
     let displayName = `${info.prefix}${name}${info.suffix}`
     let publicPath = await mediaTest.getPublicDirectory(info.directory)
-    Logger.info(TAG, `publicPath = ${publicPath}`)
+    console.log(TAG, `publicPath = ${publicPath}`)
     return await mediaTest.createAsset(mediaLibrary.MediaType.IMAGE, displayName, publicPath)
   }
 
   async savePicture(data: image.PixelMap, context: any) {
-    Logger.info(TAG, `savePicture`)
+    console.log(TAG, `savePicture`)
     let packOpts: image.PackingOption = {
       format: "image/jpeg", quality: 100
     }
@@ -55,10 +55,10 @@ class MediaUtils {
     try {
       await fileio.write(fd, arrayBuffer)
     } catch (err) {
-      Logger.error(`write failed, code is ${err.code}, message is ${err.message}`)
+      console.log(`write failed, code is ${err.code}, message is ${err.message}`)
     }
     await fileAsset.close(fd)
-    Logger.info(TAG, `write done`)
+    console.log(TAG, `write done`)
     prompt.showToast({
       message: '图片保存成功', duration: 1000
     })

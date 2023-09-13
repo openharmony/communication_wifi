@@ -165,7 +165,7 @@ export function testAddDeviceConfigManagerPromise() {
         prompt.showToast( { message : message } )
         console.log( TAG , LogDataManager.testAddDeviceConfigPromiseManager_EndLog )
       } ).catch( err => {
-        console.log( TAG , "testAddDeviceConfigManagerPromise error:" + err )
+        console.log( TAG , "testAddDeviceConfigManagerPromise error:" + JSON.stringify( err ) )
       } )
     }
     prompt.showToast( { message : message } )
@@ -186,6 +186,7 @@ export function testAddDeviceConfigManagerCallback() {
       message = ( MessageDataManager.testIsInactive )
     } else {
       let wifiDeviceConfigManager = AppStorage.Get( "wifiDeviceConfigManager" )
+      console.log( TAG , "testAddDeviceConfigManagerCallback wifiDeviceConfigManager:" + JSON.stringify( wifiDeviceConfigManager ) )
       wifiManager.addDeviceConfig( wifiDeviceConfigManager , ( err , result ) => {
         //  @returns Returns {@code networkId} if the configuration is added; returns {@code -1} otherwise.
         if ( err ) {
@@ -225,7 +226,7 @@ export function testAddCandidateConfigManagerPromise() {
         prompt.showToast( { message : message } )
         console.log( TAG , LogDataManager.testAddCandidateConfigPromiseManager_EndLog )
       } ).catch( err => {
-        console.log( TAG , "testAddCandidateConfigManagerPromise err:" + err )
+        console.log( TAG , "testAddCandidateConfigManagerPromise err:" + JSON.stringify( err ) )
       } )
     }
     prompt.showToast( { message : message } )
@@ -246,6 +247,7 @@ export function testAddCandidateConfigManagerCallback() {
       message = ( MessageDataManager.testIsInactive )
     } else {
       let wifiDeviceConfigManager = AppStorage.Get( "wifiDeviceConfigManager" )
+      console.log( TAG , "testAddCandidateConfigManagerCallback wifiDeviceConfigManager:" + JSON.stringify( wifiDeviceConfigManager ) )
       wifiManager.addCandidateConfig( wifiDeviceConfigManager , ( err , result ) => {
         //  @returns Returns {@code true} if the Candidate hotspot configuration is added, returns {@code false} otherwise.
         if ( err ) {
@@ -285,7 +287,7 @@ export function testRemoveCandidateConfigManagerPromise() {
         prompt.showToast( { message : message } )
         console.log( TAG , LogDataManager.testRemoveCandidateConfigPromiseManager_EndLog )
       } ).catch( err => {
-        console.log( TAG , "testRemoveCandidateConfigManagerPromise err:" + err )
+        console.log( TAG , "testRemoveCandidateConfigManagerPromise err:" + JSON.stringify( err ) )
       } )
     }
     prompt.showToast( { message : message } )
@@ -483,8 +485,8 @@ export function testGetLinkedInfoManagerPromise() {
         console.log( TAG , "get wifi linked info: " + JSON.stringify( data ) );
         prompt.showToast( { message : message } )
         console.log( TAG , LogDataManager.testGetLinkedInfoPromiseManager_EndLog );
-      } ).catch( error => {
-        console.log( TAG , "get linked info error:" + error );
+      } ).catch( err => {
+        console.log( TAG , "get linked info error:" + JSON.stringify( err ) );
       } );
     }
     prompt.showToast( { message : message } )

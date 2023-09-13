@@ -165,7 +165,7 @@ InternalMessage *MessageQueue::GetNextMessage()
                 }
             } else {
                 /* If there's no message, check it every 30 seconds. */
-                nextBlockTime = TIME_INTERVAL;
+                nextBlockTime = WIFI_TIME_INTERVAL;
             }
         }
 

@@ -38,6 +38,7 @@
 #include "define.h"
 #include "wifi_config_center.h"
 #include "wifi_common_def.h"
+#include "wifi_hisysevent.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -969,6 +970,8 @@ void WifiManager::DealStaOpenRes(OperateResState state)
     if (state == OperateResState::OPEN_WIFI_OPENING) {
         cbMsg.msgData = static_cast<int>(WifiState::ENABLING);
         WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
+        WriteWifiOperateStateHiSysEvent(static_cast<int>(WifiOperateType::STA_OPEN),
+            static_cast<int>(WifiOperateState::STA_OPENING));
         return;
     }
     if ((state == OperateResState::OPEN_WIFI_FAILED) || (state == OperateResState::OPEN_WIFI_DISABLED)) {
@@ -991,6 +994,8 @@ void WifiManager::DealStaOpenRes(OperateResState state)
     WifiConfigCenter::GetInstance().SetStaLastRunState(true);
     cbMsg.msgData = static_cast<int>(WifiState::ENABLED);
     WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
+    WriteWifiOperateStateHiSysEvent(static_cast<int>(WifiOperateType::STA_OPEN),
+        static_cast<int>(WifiOperateState::STA_OPENED));
 #ifdef FEATURE_P2P_SUPPORT
     WifiOprMidState p2pState = WifiConfigCenter::GetInstance().GetP2pMidState();
     WIFI_LOGI("DealStaOpenRes, current p2p state:%{public}d", p2pState);
@@ -1065,7 +1070,44 @@ void WifiManager::DealStaConnChanged(OperateResState state, const WifiLinkedInfo
             }
         }
     }
-
+    switch (state) {
+        case OperateResState::CONNECT_CONNECTING:
+            WriteWifiOperateStateHiSysEvent(static_cast<int>(WifiOperateType::STA_CONNECT),
+                static_cast<int>(WifiOperateState::STA_CONNECTING));
+            break;
+        case OperateResState::CONNECT_AP_CONNECTED:
+            WriteWifiOperateStateHiSysEvent(static_cast<int>(WifiOperateType::STA_CONNECT),
+                static_cast<int>(WifiOperateState::STA_CONNECTED));
+            break;
+        case OperateResState::DISCONNECT_DISCONNECTED:
+            WriteWifiOperateStateHiSysEvent(static_cast<int>(WifiOperateType::STA_CONNECT),
+                static_cast<int>(WifiOperateState::STA_DISCONNECTED));
+            break;
+        case OperateResState::CONNECT_ASSOCIATING:
+            WriteWifiOperateStateHiSysEvent(static_cast<int>(WifiOperateType::STA_ASSOC),
+                static_cast<int>(WifiOperateState::STA_ASSOCIATING));
+            break;
+        case OperateResState::CONNECT_ASSOCIATED:
+            WriteWifiOperateStateHiSysEvent(static_cast<int>(WifiOperateType::STA_ASSOC),
+                static_cast<int>(WifiOperateState::STA_ASSOCIATED));
+            break;
+        case OperateResState::CONNECT_CONNECTION_FULL:
+            WriteWifiOperateStateHiSysEvent(static_cast<int>(WifiOperateType::STA_ASSOC),
+                static_cast<int>(WifiOperateState::STA_ASSOC_FULL_REJECT));
+            break;
+        case OperateResState::CONNECT_OBTAINING_IP:
+            WriteWifiOperateStateHiSysEvent(static_cast<int>(WifiOperateType::STA_DHCP),
+                static_cast<int>(WifiOperateState::STA_DHCP));
+            break;
+        default:
+            break;
+        }
+        if (info.connState == ConnState::AUTHENTICATING)
+        {
+            WriteWifiOperateStateHiSysEvent(static_cast<int>(WifiOperateType::STA_AUTH),
+                static_cast<int>(WifiOperateState::STA_AUTHING));
+        }
+        
 #ifdef FEATURE_P2P_SUPPORT
     if (cfgMonitorCallback.onStaConnectionChange != nullptr) {
         cfgMonitorCallback.onStaConnectionChange(static_cast<int>(state));

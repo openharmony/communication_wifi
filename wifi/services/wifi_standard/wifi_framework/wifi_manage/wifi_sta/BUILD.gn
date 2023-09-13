@@ -134,6 +134,8 @@ if (defined(ohos_lite)) {
     }
 
     external_deps = [
+      "ability_base:want",
+      "ability_runtime:ability_manager",
       "c_utils:utils",
       "dhcp:dhcp_manager_service",
       "hilog:libhilog",

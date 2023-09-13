@@ -19,6 +19,7 @@
 #include <sys/types.h>
 #include <fstream>
 #include <vector>
+#include <atomic>
 
 #include "wifi_internal_msg.h"
 #include "wifi_log.h"
@@ -354,6 +355,12 @@ public:
      */
     void OnNetworkConnectionEvent(int networkId, std::string bssid);
     /**
+     * @Description  Disconnect events
+     *
+     * @param reason - the reason of wifi disconnection
+     */
+    void OnNetworkDisconnectEvent(int reason);
+    /**
      * @Description  Bssid change events
      *
      * @param reason: the reason of bssid changed(in)
@@ -398,6 +405,14 @@ public:
      * @Description On netmanager restart.
      */
     void OnNetManagerRestart(void);
+    /**
+     * @Description init dhcp renewal thread
+     */
+    void InitDhcpRenewalThread(uint32_t leaseTime);
+    /**
+     * @Description dhcp renewal thread entry func
+     */
+    void RunDhcpRenewalThreadFunc(uint32_t leaseTime);
 private:
     /**
      * @Description  Destruct state.
@@ -555,6 +570,11 @@ private:
      * @param dnsState - the state of dns protol(in)
      */
     void HandleDnsCheckResult(StaDnsState dnsState);
+    /**
+     * @Description  notification portal network.
+     *
+     */
+    void PublishPortalNetworkNotification();
     /**
      * @Description  Remove all device configurations before enabling WPS.
      *
@@ -748,6 +768,7 @@ private:
     int getIpSucNum;
     int getIpFailNum;
     bool isRoam;
+    int netNoWorkNum;
     WifiLinkedInfo linkedInfo;
     WifiLinkedInfo lastLinkedInfo;
     std::unique_ptr<IDhcpService> pDhcpService;
@@ -767,7 +788,8 @@ private:
     GetIpState *pGetIpState;
     LinkedState *pLinkedState;
     ApRoamingState *pApRoamingState;
-
+    std::thread mDhcpRenewalThread;
+    std::atomic<bool> exitDhcpRewThread;
     /**
      * @Description Replace empty dns
      */

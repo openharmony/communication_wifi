@@ -578,6 +578,7 @@ void ClearTClass<HotspotConfig>(HotspotConfig &item)
     item.SetChannel(0);
     item.SetMaxConn(0);
     item.SetIpAddress("");
+    item.SetLeaseTime((int)DHCP_LEASE_TIME);
     return;
 }
 
@@ -641,6 +642,8 @@ int SetTClassKeyValue<HotspotConfig>(HotspotConfig &item, const std::string &key
         item.SetMaxConn(std::stoi(value));
     } else if (key == "ipAddress") {
         item.SetIpAddress(value);
+    }else if (key == "leaseTime") {
+        item.SetLeaseTime(std::stoi(value));
     } else {
         LOGE("Invalid config key value");
         errorKeyValue++;
@@ -679,6 +682,7 @@ std::string OutTClassString<HotspotConfig>(HotspotConfig &item)
     ss << "    " <<"channel=" << item.GetChannel() << std::endl;
     ss << "    " <<"maxConn=" << item.GetMaxConn() << std::endl;
     ss << "    " <<"ipAddress=" << item.GetIpAddress() << std::endl;
+    ss << "    " <<"leaseTime=" << static_cast<int>(item.GetLeaseTime()) << std::endl;
     ss << "    " <<"</HotspotConfig>" << std::endl;
     return ss.str();
 }
@@ -1309,6 +1313,38 @@ template <> std::string OutTClassString<WifiStoreRandomMac>(WifiStoreRandomMac &
     ss << "    " <<"peerBssid=" << item.peerBssid << std::endl;
     ss << "    " <<"randomMac=" << item.randomMac << std::endl;
     ss << "    " <<"<WifiStoreRandomMac>" << std::endl;
+    return ss.str();
+}
+
+template <> void ClearTClass<WifiPortalConf>(WifiPortalConf &item)
+{
+    item.portalUri.clear();
+    return;
+}
+
+template <>
+int SetTClassKeyValue<WifiPortalConf>(WifiPortalConf &item, const std::string &key, const std::string &value)
+{
+    int errorKeyValue = 0;
+    if (key == "url") {
+        item.portalUri = value;
+    } else {
+        LOGE("Invalid config key value");
+        errorKeyValue++;
+    }
+    return errorKeyValue;
+}
+
+template <> std::string GetTClassName<WifiPortalConf>()
+{
+    return "WifiPortalConf";
+}
+
+template <> std::string OutTClassString<WifiPortalConf>(WifiPortalConf &item)
+{
+    std::ostringstream ss;
+    ss << "    " <<"<WifiPortalConf>" << std::endl;
+    ss << "    " <<"url=" << ValidateString(item.portalUri) << std::endl;
     return ss.str();
 }
 }  // namespace Wifi

@@ -62,6 +62,9 @@ void WriteWifiBandHiSysEvent(int band);
 
 void WriteWifiSignalHiSysEvent(int direction, int txPackets, int rxPackets);
 
+void WriteWifiOperateStateHiSysEvent(int operateType, int operateState);
+
+void WriteWifiAbnormalDisconnectHiSysEvent(int errorCode);
 }  // namespace Wifi
 }  // namespace OHOS
 #endif

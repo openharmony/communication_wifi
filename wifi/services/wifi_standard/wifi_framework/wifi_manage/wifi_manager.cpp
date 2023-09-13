@@ -1074,7 +1074,6 @@ void WifiManager::DealStaConnChanged(OperateResState state, const WifiLinkedInfo
         case OperateResState::CONNECT_CONNECTING:
             WriteWifiOperateStateHiSysEvent(static_cast<int>(WifiOperateType::STA_CONNECT),
                 static_cast<int>(WifiOperateState::STA_CONNECTING));
-            WriteWifiConnectionInfoHiSysEvent(info);
             break;
         case OperateResState::CONNECT_AP_CONNECTED:
             WriteWifiOperateStateHiSysEvent(static_cast<int>(WifiOperateType::STA_CONNECT),

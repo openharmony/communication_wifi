@@ -89,11 +89,13 @@
                 "samgr",
                 "data_share",
                 "hdf_core",
-                "hicollie"
+                "hicollie",
+                "jsoncpp"
             ],
             "third_party": [
                 "bounds_checking_function",
-                "wpa_supplicant"
+                "wpa_supplicant",
+                "jsoncpp"
             ]
         },
         "build": {

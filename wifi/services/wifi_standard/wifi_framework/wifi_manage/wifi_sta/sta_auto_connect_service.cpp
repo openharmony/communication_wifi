@@ -33,7 +33,7 @@ StaAutoConnectService::StaAutoConnectService(StaStateMachine *staStateMachine)
 
 StaAutoConnectService::~StaAutoConnectService()
 {
-    WIFI_LOGI("Enter StaAutoConnectService::~StaAutoConnectService.\n");
+    WIFI_LOGI("Enter ~StaAutoConnectService.\n");
     if (pSavedDeviceAppraisal != nullptr) {
         delete pSavedDeviceAppraisal;
         pSavedDeviceAppraisal = nullptr;
@@ -42,7 +42,7 @@ StaAutoConnectService::~StaAutoConnectService()
 
 ErrCode StaAutoConnectService::InitAutoConnectService()
 {
-    WIFI_LOGI("Enter StaAutoConnectService::InitAutoConnectService.\n");
+    WIFI_LOGI("Enter InitAutoConnectService.\n");
 
     if (ObtainRoamCapFromFirmware()) {
         WIFI_LOGI("Succeeded in obtaining firmware roaming information.\n");
@@ -64,7 +64,7 @@ ErrCode StaAutoConnectService::InitAutoConnectService()
 
 void StaAutoConnectService::OnScanInfosReadyHandler(const std::vector<InterScanInfo> &scanInfos)
 {
-    WIFI_LOGI("Enter StaAutoConnectService::OnScanInfosReadyHandler.\n");
+    WIFI_LOGI("Enter OnScanInfosReadyHandler.\n");
     ClearOvertimeBlockedBssid(); /* Refreshing the BSSID Blocklist */
 
     WifiLinkedInfo info;
@@ -98,7 +98,7 @@ void StaAutoConnectService::OnScanInfosReadyHandler(const std::vector<InterScanI
 
 bool StaAutoConnectService::EnableOrDisableBssid(std::string bssid, bool enable, int reason)
 {
-    WIFI_LOGI("Enter StaAutoConnectService::EnableOrDisableBssid.\n");
+    WIFI_LOGI("Enter EnableOrDisableBssid.\n");
     if (bssid.empty()) {
         WIFI_LOGI("bssid is empty.\n");
         return false;
@@ -118,7 +118,7 @@ bool StaAutoConnectService::EnableOrDisableBssid(std::string bssid, bool enable,
 
 bool StaAutoConnectService::AddOrDelBlockedBssids(std::string bssid, bool enable, int reason)
 {
-    WIFI_LOGI("Enter StaAutoConnectService::AddOrDelBlockedBssids.\n");
+    WIFI_LOGI("Enter AddOrDelBlockedBssids.\n");
     if (enable) {
         if (blockedBssidMap.count(bssid) != 0) {
             /* Removed the BSSID from the blocklist When the BSSID is enabled. */
@@ -155,21 +155,20 @@ void StaAutoConnectService::GetBlockedBssids(std::vector<std::string> &blockedBs
     for (auto iter = blockedBssidMap.begin(); iter != blockedBssidMap.end(); ++iter) {
         blockedBssids.push_back(iter->first);
     }
-    WIFI_LOGD("StaAutoConnectService::GetBlockedBssids, blockedBssids count: %{public}d.",
-        (int)blockedBssids.size());
+    WIFI_LOGD("GetBlockedBssids, blockedBssids count: %{public}d.", (int)blockedBssids.size());
     return;
 }
 
 void StaAutoConnectService::ClearAllBlockedBssids()
 {
-    WIFI_LOGI("Enter StaAutoConnectService::ClearAllBlockedBssids.\n");
+    WIFI_LOGI("Enter ClearAllBlockedBssids.\n");
     blockedBssidMap.clear();
     return;
 }
 
 void StaAutoConnectService::ClearOvertimeBlockedBssid()
 {
-    WIFI_LOGI("Enter StaAutoConnectService::ClearOvertimeBlockedBssid.\n");
+    WIFI_LOGI("Enter ClearOvertimeBlockedBssid.\n");
     if (blockedBssidMap.empty()) {
         WIFI_LOGI("blockedBssidMap is empty !\n");
         return;
@@ -197,7 +196,7 @@ void StaAutoConnectService::ClearOvertimeBlockedBssid()
 
 void StaAutoConnectService::ConnectElectedDevice(WifiDeviceConfig &electedDevice)
 {
-    WIFI_LOGI("Enter StaAutoConnectService::ConnectElectedDevice.\n");
+    WIFI_LOGI("Enter ConnectElectedDevice.\n");
     if (electedDevice.bssid.empty()) {
         WIFI_LOGE("electedDevice bssid is empty.");
         return;
@@ -231,7 +230,7 @@ void StaAutoConnectService::ConnectElectedDevice(WifiDeviceConfig &electedDevice
 
 void StaAutoConnectService::SyncBlockedSsidFirmware()
 {
-    WIFI_LOGI("Enter StaAutoConnectService::SyncBlockedSsidFirmware.\n");
+    WIFI_LOGI("Enter SyncBlockedSsidFirmware.\n");
     if (!firmwareRoamFlag) {
         return;
     }
@@ -255,7 +254,7 @@ void StaAutoConnectService::SyncBlockedSsidFirmware()
 
 bool StaAutoConnectService::ObtainRoamCapFromFirmware()
 {
-    WIFI_LOGI("Enter StaAutoConnectService::ObtainRoamCapFromFirmware.\n");
+    WIFI_LOGI("Enter ObtainRoamCapFromFirmware.\n");
 
     unsigned int capabilities;
     if (WifiStaHalInterface::GetInstance().GetStaCapabilities(capabilities) == WIFI_IDL_OPT_OK) {
@@ -282,7 +281,7 @@ bool StaAutoConnectService::ObtainRoamCapFromFirmware()
 
 bool StaAutoConnectService::SetRoamBlockedBssidFirmware(const std::vector<std::string> &blocklistBssids) const
 {
-    WIFI_LOGI("Enter StaAutoConnectService::SetRoamBlockedBssidFirmware.\n");
+    WIFI_LOGI("Enter SetRoamBlockedBssidFirmware.\n");
     if (!firmwareRoamFlag) {
         return false;
     }
@@ -305,7 +304,7 @@ bool StaAutoConnectService::SetRoamBlockedBssidFirmware(const std::vector<std::s
 
 bool StaAutoConnectService::RegisterDeviceAppraisal(StaDeviceAppraisal *appraisal, int priority)
 {
-    WIFI_LOGI("Enter StaAutoConnectService::RegisterDeviceAppraisal.\n");
+    WIFI_LOGI("Enter RegisterDeviceAppraisal.\n");
     if (priority < 0 || priority >= MIN_APPRAISAL_PRIORITY) {
         WIFI_LOGE("Out of array range.\n");
         return false;
@@ -321,7 +320,7 @@ bool StaAutoConnectService::RegisterDeviceAppraisal(StaDeviceAppraisal *appraisa
 ErrCode StaAutoConnectService::AutoSelectDevice(WifiDeviceConfig &electedDevice,
     const std::vector<InterScanInfo> &scanInfos, std::vector<std::string> &blockedBssids, WifiLinkedInfo &info)
 {
-    WIFI_LOGI("Enter StaAutoConnectService::SelectNetwork.\n");
+    WIFI_LOGI("Enter SelectNetwork.\n");
     if (scanInfos.empty()) {
         WIFI_LOGE("scanInfo is empty.");
         return WIFI_OPT_FAILED;
@@ -482,7 +481,7 @@ bool StaAutoConnectService::AllowAutoSelectDevice(const std::vector<InterScanInf
 
 bool StaAutoConnectService::CurrentDeviceGoodEnough(const std::vector<InterScanInfo> &scanInfos, WifiLinkedInfo &info)
 {
-    WIFI_LOGI("Enter StaAutoConnectService::CurrentDeviceGoodEnough.\n");
+    WIFI_LOGI("Enter CurrentDeviceGoodEnough.\n");
 
     WifiDeviceConfig network;
 
@@ -534,7 +533,7 @@ bool StaAutoConnectService::CurrentDeviceGoodEnough(const std::vector<InterScanI
 
 bool StaAutoConnectService::WhetherDevice5GAvailable(const std::vector<InterScanInfo> &scanInfos)
 {
-    WIFI_LOGI("Enter StaAutoConnectService::WhetherDevice5GAvailable.\n");
+    WIFI_LOGI("Enter WhetherDevice5GAvailable.\n");
     for (auto scaninfo : scanInfos) {
         if (Whether5GDevice(scaninfo.frequency)) {
             return true;
@@ -564,7 +563,7 @@ bool StaAutoConnectService::Whether5GDevice(int frequency)
 void StaAutoConnectService::GetAvailableScanInfos(std::vector<InterScanInfo> &availableScanInfos,
     const std::vector<InterScanInfo> &scanInfos, std::vector<std::string> &blockedBssids, WifiLinkedInfo &info)
 {
-    WIFI_LOGI("Enter StaAutoConnectService::GetAvailableScanInfos.\n");
+    WIFI_LOGI("Enter GetAvailableScanInfos.\n");
     if (scanInfos.empty()) {
         return;
     }

@@ -17,7 +17,6 @@
 #define OHOS_WIFI_HISYSEVENT_H
 
 #include <string>
-#include "wifi_msg.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -64,10 +63,6 @@ void WriteWifiBandHiSysEvent(int band);
 void WriteWifiSignalHiSysEvent(int direction, int txPackets, int rxPackets);
 
 void WriteWifiOperateStateHiSysEvent(int operateType, int operateState);
-
-void WriteWifiConnectionInfoHiSysEvent(const WifiLinkedInfo &info);
-
-void WriteWifiDeviceCfgHiSysEvent(const WifiDeviceConfig &config);
 
 void WriteWifiAbnormalDisconnectHiSysEvent(int errorCode);
 }  // namespace Wifi

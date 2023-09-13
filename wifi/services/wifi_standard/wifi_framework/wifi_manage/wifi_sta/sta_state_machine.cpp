@@ -377,7 +377,7 @@ ErrCode StaStateMachine::ConvertDeviceCfg(const WifiDeviceConfig &config) const
         /* for wep */
         idlConfig.authAlgorithms = 0x02;
     }
-    WriteWifiDeviceCfgHiSysEvent(config);
+
     for (int i = 0; i < MAX_WEPKEYS_SIZE; i++) {
         idlConfig.wepKeys[i] = config.wepKeys[i];
     }

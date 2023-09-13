@@ -16,6 +16,7 @@
 #include "wifi_hisysevent.h"
 #include "hisysevent.h"
 #include "wifi_logger.h"
+#include "json/json.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -61,5 +62,44 @@ void WriteWifiSignalHiSysEvent(int direction, int txPackets, int rxPackets)
     WriteEvent("WIFI_SIGNAL", "DIRECTION", direction, "TXPACKETS", txPackets, "RXPACKETS", rxPackets);
 }
 
+void WriteWifiOperateStateHiSysEvent(int operateType, int operateState)
+{
+    Json::Value root;
+    Json::FastWriter writer;
+    root["OPERATE_TYPE"] = operateType;
+    root["OPERATE_STATE"] = operateState;
+    WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "WIFI_OPERATE_STATE", "EVENT_VALUE", writer.write(root));
+}
+
+void WriteWifiConnectionInfoHiSysEvent(const WifiLinkedInfo &info)
+{
+    Json::Value root;
+    Json::FastWriter writer;
+    root["WIFI_SSID"] = info.ssid;
+    root["WIFI_MAC"] = info.macAddress;
+    root["WIFI_LINKSPEED"] = info.linkSpeed;
+    root["WIFI_FREQ"] = info.frequency;
+    root["WIFI_BAND"] = info.band;
+    root["WIFI_IS_HIDDEN"] = info.ifHiddenSSID;
+    root["WIFI_RSSI"] = info.rssi;
+    WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "WIFI_CONNECTION_INFO", "EVENT_VALUE", writer.write(root));
+}
+
+void WriteWifiDeviceCfgHiSysEvent(const WifiDeviceConfig &config)
+{
+    Json::Value root;
+    Json::FastWriter writer;
+    root["WIFI_KEYMGMT"] = config.keyMgmt;
+    root["WIFI_EAP"] = config.wifiEapConfig.eap;
+    WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "WIFI_DEVICE_CONFIG_INFO", "EVENT_VALUE", writer.write(root));
+}
+
+void WriteWifiAbnormalDisconnectHiSysEvent(int errorCode)
+{
+    Json::Value root;
+    Json::FastWriter writer;
+    root["ERROR_CODE"] = errorCode;
+    WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "WIFI_ABNORMAL_DISCONNECT", "EVENT_VALUE", writer.write(root));
+}
 }  // namespace Wifi
 }  // namespace OHOS

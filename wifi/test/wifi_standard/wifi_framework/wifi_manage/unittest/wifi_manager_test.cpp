@@ -230,7 +230,7 @@ HWTEST_F(WifiManagerTest, DealCloseAirplaneModeEvent_002, TestSize.Level1)
 HWTEST_F(WifiManagerTest, GetLocationModeByDatashareTest, TestSize.Level1)
 {
     WIFI_LOGE("GetLocationModeByDatashareTest enter!");
-    bool result = wifiManager.GetLocationModeByDatashare(WIFI_DEVICE_ABILITY_ID);
+    bool result = wifiManager.GetLocationModeByDatashare();
     WIFI_LOGE("GetLocationModeByDatashareTest result(%{public}d)", result);
     EXPECT_FALSE(result);
 }

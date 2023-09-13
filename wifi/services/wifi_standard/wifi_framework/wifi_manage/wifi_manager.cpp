@@ -606,33 +606,25 @@ int WifiManager::Init()
 #ifndef OHOS_ARCH_LITE
         WifiSaLoadManager::GetInstance().LoadWifiSa(WIFI_SCAN_ABILITY_ID);
 #endif
-        if ((WifiSettings::GetInstance().CheckScanOnlyAvailable() &&
-            WifiManager::GetInstance().GetLocationModeByDatashare()) ||
-            WifiConfigCenter::GetInstance().IsScanAlwaysActive()) {
-            CheckAndStartScanService();
-            IScanService *pService = WifiServiceManager::GetInstance().GetScanServiceInst();
-            if (pService != nullptr) {
-                int res = pService->StartWpa();
-                if (res != static_cast<int>(WIFI_IDL_OPT_OK)) {
-                    WIFI_LOGE("Start Wpa failed");
-                    if (WifiSettings::GetInstance().CheckScanOnlyAvailable() &&
-                        WifiManager::GetInstance().GetLocationModeByDatashare()) {
-                        WifiConfigCenter::GetInstance().SetWifiScanOnlyMidState(WifiOprMidState::CLOSED);
-                    }
-                }
-                if (WifiSettings::GetInstance().CheckScanOnlyAvailable() &&
-                    WifiManager::GetInstance().GetLocationModeByDatashare()) {
-                    WifiConfigCenter::GetInstance().SetWifiScanOnlyMidState(WifiOprMidState::RUNNING);
-                }
-            }
-        }
+        CheckAndStartScanService();
+        IScanService *pService = WifiServiceManager::GetInstance().GetScanServiceInst();
+        if (pService != nullptr) {
+            int res = pService->StartWpa();
+            if (res != static_cast<int>(WIFI_IDL_OPT_OK)) {
+                WIFI_LOGE("Start Wpa failed");
+                WifiConfigCenter::GetInstance().SetWifiScanOnlyMidState(WifiOprMidState::CLOSED);
 #ifndef OHOS_ARCH_LITE
-        else {
-            WifiSaLoadManager::GetInstance().UnloadWifiSa(WIFI_SCAN_ABILITY_ID);
-        }
+                WifiSaLoadManager::GetInstance().UnloadWifiSa(WIFI_SCAN_ABILITY_ID);
 #endif
+            } else {
+                WifiConfigCenter::GetInstance().SetWifiScanOnlyMidState(WifiOprMidState::RUNNING);
+            }
+        } else {
+#ifndef OHOS_ARCH_LITE
+            WifiSaLoadManager::GetInstance().UnloadWifiSa(WIFI_SCAN_ABILITY_ID);
+#endif
+        }
     }
-
     InitPidfile();
     return 0;
 }

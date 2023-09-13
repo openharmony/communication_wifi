@@ -31,6 +31,7 @@
 #include "wifi_hisysevent.h"
 #include "wifi_config_center.h"
 #ifndef OHOS_ARCH_LITE
+#include "ability_manager_client.h"
 #include <dlfcn.h>
 #endif // OHOS_ARCH_LITE
 
@@ -45,6 +46,10 @@ DEFINE_WIFILOG_LABEL("StaStateMachine");
 #define PBC_ANY_BSSID "any"
 #define FIRST_DNS "8.8.8.8"
 #define SECOND_DNS "180.76.76.76"
+#define PORTAL_ACTION "ohos.want.action.viewData"
+#define PORTAL_ENTITY "entity.system.browsable"
+#define PORTAL_CHECK_TIME (10 * 60)
+#define PORTAL_MILLSECOND  1000
 StaStateMachine::StaStateMachine()
     : StateMachine("StaStateMachine"),
       lastNetworkId(INVALID_NETWORK_ID),
@@ -59,6 +64,7 @@ StaStateMachine::StaStateMachine()
       getIpSucNum(0),
       getIpFailNum(0),
       isRoam(false),
+      netNoWorkNum(0),
       pDhcpService(nullptr),
       pDhcpResultNotify(nullptr),
       pNetcheck(nullptr),
@@ -107,6 +113,12 @@ StaStateMachine::~StaStateMachine()
     }
     ParsePointer(pDhcpResultNotify);
     ParsePointer(pNetcheck);
+
+    exitDhcpRewThread.store(true);
+    if (mDhcpRenewalThread.joinable()) {
+        WIFI_LOGI("StaStateMachine::~StaStateMachine mDhcpRenewalThread join");
+        mDhcpRenewalThread.join();
+    }
 }
 
 /* ---------------------------Initialization functions------------------------------ */
@@ -1498,6 +1510,19 @@ void StaStateMachine::OnNetworkConnectionEvent(int networkId, std::string bssid)
     SendMessage(msg);
 }
 
+void StaStateMachine::OnNetworkDisconnectEvent(int reason)
+{
+    if (reason != static_cast<int>(DisconnectDetailReason::DEAUTH_STA_IS_LEFING)
+        && reason != static_cast<int>(DisconnectDetailReason::UNSPECIFIED)
+        && reason != static_cast<int>(DisconnectDetailReason::UNUSED)
+        && reason != static_cast<int>(DisconnectDetailReason::DISASSOC_STA_HAS_LEFT)) {
+            LOGE("connect exception.\n");
+            WriteWifiOperateStateHiSysEvent(static_cast<int>(WifiOperateType::STA_CONNECT),
+                static_cast<int>(WifiOperateState::STA_CONNECT_EXCEPTION));
+            WriteWifiAbnormalDisconnectHiSysEvent(reason);
+    }
+}
+
 void StaStateMachine::OnBssidChangedEvent(std::string reason, std::string bssid)
 {
     InternalMessage *msg = CreateMessage();
@@ -1985,6 +2010,24 @@ void StaStateMachine::HandleNetCheckResult(StaNetState netState, const std::stri
         SaveLinkstate(ConnState::CONNECTED, DetailedState::WORKING);
         staCallback.OnStaConnChanged(OperateResState::CONNECT_NETWORK_ENABLED, linkedInfo);
     } else if (netState == StaNetState::NETWORK_CHECK_PORTAL) {
+        WifiLinkedInfo linkedInfo;
+        GetLinkedInfo(linkedInfo);
+#ifndef OHOS_ARCH_LITE
+        if (linkedInfo.detailedState != DetailedState::CAPTIVE_PORTAL_CHECK) {
+            AAFwk::Want want;
+            std::string portalUri;
+            WifiSettings::GetInstance().GetPortalUri(portalUri);
+            WIFI_LOGI("portal uri is %{public}s\n", portalUri.c_str());
+            want.SetAction(PORTAL_ACTION);
+            want.SetUri(portalUri);
+            want.AddEntity(PORTAL_ENTITY);
+            OHOS::ErrCode err = AAFwk::AbilityManagerClient::GetInstance()->StartAbility(want);
+            if (err != ERR_OK) {
+                WIFI_LOGI("StartAbility is failed %{public}d", err);
+            }
+        }
+        StartTimer(static_cast<int>(CMD_START_NETCHECK), PORTAL_CHECK_TIME * PORTAL_MILLSECOND);
+#endif
         linkedInfo.portalUrl = portalUrl;
         SaveLinkstate(ConnState::CONNECTED, DetailedState::CAPTIVE_PORTAL_CHECK);
         staCallback.OnStaConnChanged(OperateResState::CONNECT_CHECK_PORTAL, linkedInfo);
@@ -1992,6 +2035,10 @@ void StaStateMachine::HandleNetCheckResult(StaNetState netState, const std::stri
         WIFI_LOGI("HandleNetCheckResult network state is notworking.\n");
         SaveLinkstate(ConnState::CONNECTED, DetailedState::NOTWORKING);
         staCallback.OnStaConnChanged(OperateResState::CONNECT_NETWORK_DISABLED, linkedInfo);
+        int delay = 1 << netNoWorkNum;
+        delay = delay > PORTAL_CHECK_TIME ? PORTAL_CHECK_TIME : delay;
+        netNoWorkNum++;
+        StartTimer(static_cast<int>(CMD_START_NETCHECK), delay * PORTAL_MILLSECOND);
     }
 }
 
@@ -2286,7 +2333,17 @@ void StaStateMachine::DhcpResultNotify::OnSuccess(int status, const std::string 
     WifiSettings::GetInstance().GetIpv6Info(ipv6Info);
     TryToSaveIpV4Result(ipInfo, ipv6Info, result);
     TryToSaveIpV6Result(ipInfo, ipv6Info, result);
-    TryToCloseDhcpClient(result.iptype);
+    WifiDeviceConfig config;
+    AssignIpMethod assignMethod = AssignIpMethod::DHCP;
+    int ret = WifiSettings::GetInstance().GetDeviceConfig(pStaStateMachine->linkedInfo.networkId, config);
+    if (ret == 0) {
+        assignMethod = config.wifiIpConfig.assignMethod;
+    }
+    if (assignMethod == AssignIpMethod::DHCP) {
+        TryToCloseDhcpClient(result.iptype);
+        pStaStateMachine->InitDhcpRenewalThread(result.uLeaseTime);
+    }
+
     return;
 }
 
@@ -2501,5 +2558,61 @@ void StaStateMachine::SaveWifiConfigForUpdate(int networkId)
     }
 }
 #endif // OHOS_ARCH_LITE
+
+void StaStateMachine::InitDhcpRenewalThread(uint32_t leaseTime)
+{
+    if (mDhcpRenewalThread.joinable()) {
+        WIFI_LOGI("InitDhcpRenewalThread() mDhcpRenewalThread joinable!");
+        exitDhcpRewThread.store(true);
+        mDhcpRenewalThread.join();
+    }
+    mDhcpRenewalThread = std::thread(&StaStateMachine::RunDhcpRenewalThreadFunc, this, leaseTime);
+    pthread_setname_np(mDhcpRenewalThread.native_handle(), "WifiDhcpRenewalThread");
+    WIFI_LOGI("InitDhcpRenewalThread() dhcp renewal thread created!");
+}
+
+void StaStateMachine::RunDhcpRenewalThreadFunc(uint32_t leaseTime)
+{
+    WIFI_LOGI("RunDhcpRenewalThreadFunc() enter leaseTime:%{public}d !", leaseTime);
+    if (leaseTime == 0) {
+        WIFI_LOGE("RunDhcpRenewalThreadFunc() leaseTime [%{public}d] invalid!", leaseTime);
+        return;
+    }
+    if (currentTpType == IPTYPE_IPV6) {
+        WIFI_LOGE("RunDhcpRenewalThreadFunc() iptype [%{public}d] no need renewal!", currentTpType);
+        return;
+    }
+    uint32_t waitTime = leaseTime / 2;
+    const uint32_t uSleepSec = 10;
+    uint32_t elapsedTime = 0;
+    exitDhcpRewThread.store(false);
+    while (!exitDhcpRewThread.load()) {
+
+        if (exitDhcpRewThread.load()) {
+            WIFI_LOGI("RunDhcpRenewalThreadFunc() exit!");
+            return;
+        }
+        WifiLinkedInfo linkedInfo;
+        GetLinkedInfo(linkedInfo);
+        if (linkedInfo.connState != ConnState::CONNECTED) {
+            WIFI_LOGE("RunDhcpRenewalThreadFunc() network is not connected, connState:%{public}d",
+                linkedInfo.connState);
+            return;
+        }
+        if (elapsedTime >= waitTime && pDhcpService != nullptr) {
+            int dhcpRet = pDhcpService->RenewDhcpClient(IF_NAME);
+            if ((dhcpRet != 0) || (pDhcpService->GetDhcpResult(IF_NAME, pDhcpResultNotify, DHCP_TIME) != 0)) {
+                WIFI_LOGE("RunDhcpRenewalThreadFunc() Dhcp renew failed.");
+            }
+            WIFI_LOGI("RunDhcpRenewalThreadFunc() Dhcp client renew success.");
+            return;
+        }
+        elapsedTime += uSleepSec;
+        WIFI_LOGI("RunDhcpRenewalThreadFunc() elapsedTime:%{public}d.", elapsedTime);
+        sleep(uSleepSec);
+    }
+
+    WIFI_LOGI("RunDhcpRenewalThreadFunc() end!");
+}
 } // namespace Wifi
 } // namespace OHOS

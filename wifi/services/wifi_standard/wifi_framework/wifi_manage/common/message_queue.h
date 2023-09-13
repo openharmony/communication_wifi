@@ -25,7 +25,7 @@
 namespace OHOS {
 namespace Wifi {
 #define TIME_USEC_1000 1000
-#define TIME_INTERVAL 30000
+#define WIFI_TIME_INTERVAL 30000
 class MessageQueue {
 public:
     /**

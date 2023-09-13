@@ -25,7 +25,7 @@ import { AppTest } from '../Component/appTest';
 import { BenchmarkTest } from '../Component/benchmarkTest';
 import ConfigData from '../Utils/ConfigData';
 
-const TAG = '[Screenshot]'
+const TAG = '[homePage]'
 
 /**
  * homepage of wifi test

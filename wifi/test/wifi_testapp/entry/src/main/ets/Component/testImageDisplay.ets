@@ -17,6 +17,7 @@
 
 import { TestData } from '../MainAbility/model/testData'
 import ConfigData from '../Utils/ConfigData';
+
 /**
  * Test-ImageDisplay page of wifi test
  */
@@ -40,7 +41,6 @@ export struct TestImageDisplay {
           Text( this.testItem.name )
             .fontSize( 26 )
             .fontWeight( 500 )
-              //            .textAlign(Start)
             .margin( { left : 26 , top : 10 } )
             .width( ConfigData.WH_90_100 )
           Text( this.testItem.detail )

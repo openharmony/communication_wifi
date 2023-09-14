@@ -20,7 +20,6 @@ import { TestImageDisplay } from '../../Component/testImageDisplay';
 import { ContentTable } from '../../Component/contentTable';
 import Router from '@system.router';
 import ConfigData from '../../Utils/ConfigData';
-import LogUtil from '../../Utils/LogUtil';
 import { initHotspotApIData } from '../../MainAbility/model/testDataModels'
 import { TestData } from '../../MainAbility/model/testData'
 import { FilterTable } from '../../Component/filterTable';
@@ -41,6 +40,7 @@ struct hotspotInterfaceTest {
   @State h_preSharedKey: string = "12345678";
   @State h_maxConn: number = 3 ;
   @State h_channel: number = 36 ;
+  @StorageLink( 'hotspotSsid' ) hotspotSsid: string = "";
   @StorageLink( 'hotspotStateMessage' ) hotspotStateMessage: string = "";
   @StorageLink( 'getStationsMessage' ) getStationsMessage: string = "";
   @StorageLink( 'getHotspotConfigMessage' ) getHotspotConfigMessage: string = "";
@@ -70,22 +70,22 @@ struct hotspotInterfaceTest {
       Stack().height( "0.5vp" ).backgroundColor( "#000000" );
       Column() {
         Row() {
-          Text( "热点IP" )
-            .fontSize( "18vp" )
+          Text( "本设备热点名:" )
+            .fontSize( "17vp" )
             .height( 60 )
-            .width( ConfigData.WH_20_100 )
-            .padding( { left : 10 } )
-          TextInput( { text : this.peripheralDeviceId , placeholder : "input peripheral deviceId." } )
-            .fontSize( "18vp" )
+            .width( ConfigData.WH_30_100 )
+          TextInput( { text : this.hotspotSsid , placeholder : "在右侧输入热点的配置" } )
+            .fontSize( "17vp" )
             .onChange( ( strInput ) => {
-              this.peripheralDeviceId = strInput;
-              AppStorage.SetOrCreate( "peripheralDeviceId" , strInput )
+              this.hotspotSsid = strInput;
+              AppStorage.SetOrCreate( "hotspotSsid" , strInput )
             } )
-            .width( ConfigData.WH_65_100 )
+            .width( ConfigData.WH_50_100 )
           Image( $r( 'app.media.Switch' ) )
             .height( 40 )
             .width( 40 )
             .padding( { top : 10 , bottom : 10 , left : 2 } )
+            .width( ConfigData.WH_15_100 )
             .onClick( () => {
               this.showList = !this.showList;
             } )

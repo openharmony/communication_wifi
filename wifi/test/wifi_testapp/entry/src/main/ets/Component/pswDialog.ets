@@ -23,7 +23,7 @@ import ConfigData from '../Utils/ConfigData';
 
 @CustomDialog
 export struct PswDialog {
-  @Link scanInfo: wifi.WifiScanInfo
+  @State scanInfo: any = null
   private psw: string = ''
   private controller: CustomDialogController
   private action: ( scanInfo , psw ) => void
@@ -33,8 +33,7 @@ export struct PswDialog {
       Text( this.scanInfo.ssid )
         .fontSize( 20 )
         .width( ConfigData.WH_95_100 )
-      TextInput( { placeholder : 'input password' } )
-        .key( 'input' )
+      TextInput( { placeholder : '请输入密码' } )
         .type( InputType.Password )
         .placeholderColor( Color.Gray )
         .fontSize( 19 )
@@ -44,6 +43,20 @@ export struct PswDialog {
           this.psw = value
         } )
       Row() {
+        Button() {
+          Text( $r( 'app.string.cancel' ) )
+            .fontColor( Color.Red )
+            .fontSize( 17 )
+        }
+        .layoutWeight( 7 )
+        .backgroundColor( Color.White )
+        .margin( 5 )
+        .onClick( () => {
+          this.controller.close()
+        } )
+        Text()
+          .width( 1 ).height( 35 )
+          .backgroundColor( '#8F8F8F' )
         Button() {
           Text( $r( 'app.string.sure' ) )
             .fontColor( Color.Blue )
@@ -55,21 +68,6 @@ export struct PswDialog {
         .onClick( () => {
           this.controller.close()
           this.action( this.scanInfo , this.psw )
-        } )
-
-        Text()
-          .width( 1 ).height( 35 )
-          .backgroundColor( '#8F8F8F' )
-        Button() {
-          Text( $r( 'app.string.router_uri' ) )
-            .fontColor( Color.Red )
-            .fontSize( 17 )
-        }
-        .layoutWeight( 7 )
-        .backgroundColor( Color.White )
-        .margin( 5 )
-        .onClick( () => {
-          this.controller.close()
         } )
       }
       .width( ConfigData.WH_100_100 )

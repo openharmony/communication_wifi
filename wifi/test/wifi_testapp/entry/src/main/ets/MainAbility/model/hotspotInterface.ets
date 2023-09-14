@@ -22,6 +22,7 @@ import ConfigData from "../../Utils/ConfigData"
 import LogData from "../../Utils/LogData"
 import MessageData from "../../Utils/MessageData"
 
+const TAG = "[hotspotInterface]"
 /**
  * hotspot Test Page Of Wifi test
  */
@@ -31,7 +32,7 @@ let hotspotEnable = false
 export function testEnableHotspot(): string {
   try {
     let message = ( MessageData.testEnableHotspot )
-    console.log( LogData.testEnableHotspot_StartLog )
+    console.log( TAG , LogData.testEnableHotspot_StartLog )
     if ( hotspotEnable ) {
       message = ( MessageData.hotspot_enable )
     } else {
@@ -46,10 +47,10 @@ export function testEnableHotspot(): string {
       AppStorage.SetOrCreate( 'hotspotIsOn' , hotspotEnable );
     }
     prompt.showToast( { message : message } )
-    console.log( LogData.testEnableHotspot_EndLog )
+    console.log( TAG , LogData.testEnableHotspot_EndLog )
     return message
   } catch( err ) {
-    console.log( `Failed to testEnableHotspot. message: ${ err.message }, code: ${ err.code }` )
+    console.log( TAG , `Failed to testEnableHotspot. message: ${ err.message }, code: ${ err.code }` )
     let message = `Failed to testEnableHotspot. message: ${ err.message }, code: ${ err.code }`
     prompt.showToast( { message : message } )
     return message
@@ -59,7 +60,7 @@ export function testEnableHotspot(): string {
 export function testDisableHotspot(): string {
   try {
     let message = ( MessageData.testDisableHotspot )
-    console.log( LogData.testDisableHotspot_StartLog )
+    console.log( TAG , LogData.testDisableHotspot_StartLog )
     if ( !hotspotEnable ) {
       message = ( MessageData.hotspot_disEnable )
     } else {
@@ -74,10 +75,10 @@ export function testDisableHotspot(): string {
       AppStorage.SetOrCreate( 'hotspotIsOn' , hotspotEnable );
     }
     prompt.showToast( { message : message } )
-    console.log( LogData.testDisableHotspot_EndLog )
+    console.log( TAG , LogData.testDisableHotspot_EndLog )
     return message
   } catch( err ) {
-    console.log( `Failed to testDisableHotspot. message: ${ err.message }, code: ${ err.code }` )
+    console.log( TAG , `Failed to testDisableHotspot. message: ${ err.message }, code: ${ err.code }` )
     let message = `Failed to testDisableHotspot. message: ${ err.message }, code: ${ err.code }`
     prompt.showToast( { message : message } )
     return message
@@ -87,14 +88,14 @@ export function testDisableHotspot(): string {
 export function testIsHotspotDualBandSupported(): string {
   try {
     let message = ( MessageData.testIsHotspotDualBandSupported )
-    console.log( LogData.testIsHotspotDualBandSupported_StartLog )
+    console.log( TAG , LogData.testIsHotspotDualBandSupported_StartLog )
     let ret = wifi.isHotspotDualBandSupported()
     message = "热点支持双频结果：" + ret
     prompt.showToast( { message : message } )
-    console.log( LogData.testIsHotspotDualBandSupported_EndLog )
+    console.log( TAG , LogData.testIsHotspotDualBandSupported_EndLog )
     return message
   } catch( err ) {
-    console.log( `Failed to testIsHotspotDualBandSupported. message: ${ err.message }, code: ${ err.code }` )
+    console.log( TAG , `Failed to testIsHotspotDualBandSupported. message: ${ err.message }, code: ${ err.code }` )
     let message = `Failed to testIsHotspotDualBandSupported. message: ${ err.message }, code: ${ err.code }`
     prompt.showToast( { message : message } )
     return message
@@ -104,7 +105,7 @@ export function testIsHotspotDualBandSupported(): string {
 export function testIsHostActive(): string {
   try {
     let message = ( MessageData.testIsHotspotActive )
-    console.log( LogData.testIsHostActive_StartLog )
+    console.log( TAG , LogData.testIsHostActive_StartLog )
     let ret = wifi.isHotspotActive()
     if ( ret ) {
       hotspotEnable = true
@@ -113,10 +114,10 @@ export function testIsHostActive(): string {
     }
     message = "热点使能结果为：" + ret
     prompt.showToast( { message : message } )
-    console.log( LogData.testIsHostActive_EndLog )
+    console.log( TAG , LogData.testIsHostActive_EndLog )
     return message
   } catch( err ) {
-    console.log( `Failed to testIsHostActive. message: ${ err.message }, code: ${ err.code }` )
+    console.log( TAG , `Failed to testIsHostActive. message: ${ err.message }, code: ${ err.code }` )
     let message = `Failed to testIsHostActive. message: ${ err.message }, code: ${ err.code }`
     prompt.showToast( { message : message } )
     return message
@@ -126,7 +127,7 @@ export function testIsHostActive(): string {
 export function testSetHotspotConfig(): string {
   try {
     let message = ( MessageData.testSetHotspotConfig )
-    console.log( LogData.testSetHotspotConfig_StartLog )
+    console.log( TAG , LogData.testSetHotspotConfig_StartLog )
     let ssid = "abc"
     let securityType = 3
     let band = 2;
@@ -151,10 +152,10 @@ export function testSetHotspotConfig(): string {
     let ret = wifi.setHotspotConfig( hotspotConfigs )
     message = "SetHotspotConfig: " + ret
     prompt.showToast( { message : message } )
-    console.log( LogData.testSetHotspotConfig_EndLog )
+    console.log( TAG , LogData.testSetHotspotConfig_EndLog )
     return message
   } catch( err ) {
-    console.log( `Failed to testSetHotspotConfig. message: ${ err.message }, code: ${ err.code }` )
+    console.log( TAG , `Failed to testSetHotspotConfig. message: ${ err.message }, code: ${ err.code }` )
     let message = `Failed to testSetHotspotConfig. message: ${ err.message }, code: ${ err.code }`
     prompt.showToast( { message : message } )
     return message
@@ -164,17 +165,17 @@ export function testSetHotspotConfig(): string {
 export function testGetHotspotConfig(): string {
   try {
     let message = ( MessageData.testGetHotspotConfig )
-    console.log( LogData.testGetHotspotConfig_StartLog )
+    console.log( TAG , LogData.testGetHotspotConfig_StartLog )
     let ret = wifi.getHotspotConfig()
     message = "HotspotConfig: " + JSON.stringify( ret )
-    console.log( "HotspotConfig is: " + JSON.stringify( ret ) )
+    console.log( TAG , "HotspotConfig is: " + JSON.stringify( ret ) )
     let getHotspotConfigMessage = JSON.stringify( ret )
     AppStorage.SetOrCreate( "getHotspotConfigMessage" , getHotspotConfigMessage )
     prompt.showToast( { message : message } )
-    console.log( LogData.testGetHotspotConfig_EndLog )
+    console.log( TAG , LogData.testGetHotspotConfig_EndLog )
     return message
   } catch( err ) {
-    console.log( `Failed to testGetHotspotConfig. message: ${ err.message }, code: ${ err.code }` )
+    console.log( TAG , `Failed to testGetHotspotConfig. message: ${ err.message }, code: ${ err.code }` )
     let message = `Failed to testGetHotspotConfig. message: ${ err.message }, code: ${ err.code }`
     prompt.showToast( { message : message } )
     return message
@@ -184,17 +185,17 @@ export function testGetHotspotConfig(): string {
 export function testGetStations(): string {
   try {
     let message = ( MessageData.testGetStations )
-    console.log( LogData.testGetStations_StartLog )
+    console.log( TAG , LogData.testGetStations_StartLog )
     let ret = wifi.getStations()
     message = "GetStations is: " + JSON.stringify( ret )
-    console.log( "GetStations is: " + JSON.stringify( ret ) )
+    console.log( TAG , "GetStations is: " + JSON.stringify( ret ) )
     let getStationsMessage = JSON.stringify( ret )
     AppStorage.SetOrCreate( "getStationsMessage" , getStationsMessage )
     prompt.showToast( { message : message } )
-    console.log( LogData.testGetStations_EndLog )
+    console.log( TAG , LogData.testGetStations_EndLog )
     return message
   } catch( err ) {
-    console.log( `Failed to testGetStations. message: ${ err.message }, code: ${ err.code }` )
+    console.log( TAG , `Failed to testGetStations. message: ${ err.message }, code: ${ err.code }` )
     let message = `Failed to testGetStations. message: ${ err.message }, code: ${ err.code }`
     prompt.showToast( { message : message } )
     return message
@@ -206,7 +207,7 @@ let hotspotStateChange = false
 export function testOnHotspotStateChange(): string {
   try {
     let message = ( MessageData.testOnHotspotStateChange )
-    console.log( "testOnHotspotStateChange test" );
+    console.log( TAG , "testOnHotspotStateChange test" );
     if ( hotspotStateChange ) {
       wifi.off( "hotspotStateChange" , () => {
         prompt.showToast( { message : ( MessageData.offHotspotStateChange ) } )
@@ -214,7 +215,7 @@ export function testOnHotspotStateChange(): string {
       message = MessageData.offHotspotStateChangeTest
     } else {
       wifi.on( "hotspotStateChange" , ( number ) => {
-        console.log( LogData.testOnHotspotStateChange_StartLog );
+        console.log( TAG , LogData.testOnHotspotStateChange_StartLog );
         let hotspotStateMessage = ""
         switch ( number ) {
           case 0:
@@ -235,7 +236,7 @@ export function testOnHotspotStateChange(): string {
         }
         prompt.showToast( { message : "状态为: " + hotspotStateMessage } )
         AppStorage.SetOrCreate( "hotspotStateMessage" , hotspotStateMessage )
-        console.log( LogData.testOnHotspotStateChange_EndLog );
+        console.log( TAG , LogData.testOnHotspotStateChange_EndLog );
       } )
       message = ( MessageData.onHotspotStateChangeTest )
       prompt.showToast( { message : message } )
@@ -243,7 +244,7 @@ export function testOnHotspotStateChange(): string {
     hotspotStateChange = !hotspotStateChange
     return message
   } catch( err ) {
-    console.log( `Failed to testOnHotspotStateChange. message: ${ err.message }, code: ${ err.code }` )
+    console.log( TAG , `Failed to testOnHotspotStateChange. message: ${ err.message }, code: ${ err.code }` )
     let message = `Failed to testOnHotspotStateChange. message: ${ err.message }, code: ${ err.code }`
     prompt.showToast( { message : message } )
     return message
@@ -255,7 +256,7 @@ let hotspotStaJoin = false
 export function testOnHotspotStaJoin() {
   try {
     let message = ( MessageData.testOnHotspotStaJoin )
-    console.log( " testOnHotspotStaJoin test " )
+    console.log( TAG , " testOnHotspotStaJoin test " )
     if ( hotspotStaJoin ) {
       wifi.off( "hotspotStaJoin" , () => {
         prompt.showToast( { message : MessageData.offHotspotStaJoin } )
@@ -263,12 +264,12 @@ export function testOnHotspotStaJoin() {
       message = ( MessageData.offHotspotStaJoinTest )
     } else {
       wifi.on( "hotspotStaJoin" , ( data ) => {
-        console.log( LogData.testOnHotspotStaJoin_StartLog );
+        console.log( TAG , LogData.testOnHotspotStaJoin_StartLog );
         let hotspotStaJoinMessage = "name:" + data.name + ";macAddress:" + data.macAddress + ";ipAddress:" + data.ipAddress
         message = "状态为: " + JSON.stringify( data )
         AppStorage.SetOrCreate( "hotspotStaJoinMessage" , message )
         prompt.showToast( { message : hotspotStaJoinMessage } )
-        console.log( LogData.testOnHotspotStaJoin_EndLog );
+        console.log( TAG , LogData.testOnHotspotStaJoin_EndLog );
       } )
       message = ( MessageData.onHotspotStaJoinTest )
       prompt.showToast( { message : message } )
@@ -276,7 +277,7 @@ export function testOnHotspotStaJoin() {
     hotspotStaJoin = !hotspotStaJoin
     return message
   } catch( err ) {
-    console.log( `Failed to testOnHotspotStaJoin. message: ${ err.message }, code: ${ err.code }` )
+    console.log( TAG , `Failed to testOnHotspotStaJoin. message: ${ err.message }, code: ${ err.code }` )
     let message = `Failed to testOnHotspotStaJoin. message: ${ err.message }, code: ${ err.code }`
     prompt.showToast( { message : message } )
     return message
@@ -288,7 +289,7 @@ let hotspotStaLeave = false
 export function testOnHotspotStaLeave() {
   try {
     let message = ( MessageData.testOnHotspotStaLeave )
-    console.log( " testOnHotspotStaLeave test " )
+    console.log( TAG , " testOnHotspotStaLeave test " )
     if ( hotspotStaLeave ) {
       wifi.off( "hotspotStaLeave" , () => {
         prompt.showToast( { message : MessageData.offHotspotStaLeave } )
@@ -296,12 +297,12 @@ export function testOnHotspotStaLeave() {
       message = ( MessageData.offHotspotStaLeaveTest )
     } else {
       wifi.on( "hotspotStaLeave" , ( data ) => {
-        console.log( LogData.testOnHotspotStaLeave_StartLog );
+        console.log( TAG , LogData.testOnHotspotStaLeave_StartLog );
         let hotspotStaLeaveMessage = "name:" + data.name + ";macAddress:" + data.macAddress + ";ipAddress:" + data.ipAddress
         message = "状态为: " + JSON.stringify( data )
         AppStorage.SetOrCreate( "hotspotStaLeaveMessage" , message )
         prompt.showToast( { message : hotspotStaLeaveMessage } )
-        console.log( LogData.testOnHotspotStaLeave_EndLog );
+        console.log( TAG , LogData.testOnHotspotStaLeave_EndLog );
       } )
       message = ( MessageData.onHotspotStaLeaveTest )
       prompt.showToast( { message : message } )
@@ -309,7 +310,7 @@ export function testOnHotspotStaLeave() {
     hotspotStaLeave = !hotspotStaLeave
     return message
   } catch( err ) {
-    console.log( `Failed to testOnHotspotStaLeave. message: ${ err.message }, code: ${ err.code }` )
+    console.log( TAG , `Failed to testOnHotspotStaLeave. message: ${ err.message }, code: ${ err.code }` )
     let message = `Failed to testOnHotspotStaLeave. message: ${ err.message }, code: ${ err.code }`
     prompt.showToast( { message : message } )
     return message

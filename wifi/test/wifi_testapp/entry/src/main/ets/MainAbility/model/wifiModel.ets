@@ -17,43 +17,42 @@
 
 import prompt from '@ohos.prompt'
 import wifi from '@ohos.wifi'
-import Logger from '../model/Logger'
 
 /**
  * WifiModel Page Of wifi test
  */
 
-const TAG: string = 'WifiModel'
+const TAG = "[wifiModel]"
 
 export class WifiModel {
   getScanInfos( callback ) {
-    Logger.info( TAG , 'scanWifi begin' )
+    console.log( TAG , 'scanWifi begin' )
     wifi.getScanInfos( ( err , result ) => {
       let wifiList = []
       if ( err ) {
-        Logger.info( TAG , `scan info err: ${ JSON.stringify( err ) }` )
+        console.log( TAG , `scan info err: ${ JSON.stringify( err ) }` )
         callback( wifiList )
         return
       }
-      Logger.info( TAG , `scan info call back: ${ result.length }` )
+      console.log( TAG , `scan info call back: ${ result.length }` )
       for ( let i = 0 ; i < result.length ; ++i ) {
         wifiList.push( {
-          ssid : result[i].ssid ,
-          bssid : result[i].bssid ,
-          securityType : result[i].securityType ,
-          rssi : result[i].rssi ,
-          band : result[i].band ,
-          frequency : result[i].frequency ,
-          timestamp : result[i].timestamp ,
+          ssid : result[ i ].ssid ,
+          bssid : result[ i ].bssid ,
+          securityType : result[ i ].securityType ,
+          rssi : result[ i ].rssi ,
+          band : result[ i ].band ,
+          frequency : result[ i ].frequency ,
+          timestamp : result[ i ].timestamp ,
         } )
       }
-      callback( wifiList )
+       callback( wifiList )
     } )
   }
 
   connectNetwork( scanInfo , psw ) {
     prompt.showToast( { message : 'connecting' } )
-    Logger.debug( TAG , `connectNetwork bssid=${ scanInfo.bssid }` )
+    console.log( TAG , `connectNetwork bssid=${ scanInfo.bssid }` )
     let deviceConfig: any = {
       ssid : scanInfo.ssid ,
       bssid : scanInfo.bssid ,
@@ -62,10 +61,10 @@ export class WifiModel {
       securityType : scanInfo.securityType
     }
     if ( wifi.connectToDevice( deviceConfig ) ) {
-      Logger.debug( TAG , `connectToDevice success` )
+      console.log( TAG , `connectToDevice success` )
       wifi.addDeviceConfig( deviceConfig )
     } else {
-      Logger.debug( TAG , `connectToDevice fail` )
+      console.log( TAG , `connectToDevice fail` )
     }
   }
 
@@ -73,8 +72,8 @@ export class WifiModel {
     let address: string = ip.toString()
     if ( address === '0' ) {
       return '00:00:000:000'
-    } else{
-      console.log(" address /= 0")
+    } else {
+      console.log( " address /= 0" )
     }
     address.substring( 0 , 2 )
     return `${ address.substring( 0 , 2 ) }:${ address.substring( 2 , 4 ) }:${ address.substring( 4 , 7 ) }:${ address.substring( 7 , 10 ) }`

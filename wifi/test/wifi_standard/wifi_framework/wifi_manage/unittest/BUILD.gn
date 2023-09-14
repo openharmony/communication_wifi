@@ -50,6 +50,7 @@ ohos_unittest("manager_unittest") {
     "wifi_config_center_test.cpp",
     "wifi_dumper_test.cpp",
     "wifi_internal_event_dispatcher_test.cpp",
+    "wifi_manager_test.cpp",
     "wifi_service_manager_test.cpp",
     "wifi_settings_test.cpp",
   ]
@@ -121,7 +122,11 @@ ohos_unittest("manager_unittest") {
     "samgr:samgr_proxy",
   ]
 
-  defines = []
+  defines = [
+    "private = public",
+    "protected = public",
+  ]
+
   if (wifi_feature_with_p2p) {
     defines += [ "FEATURE_P2P_SUPPORT" ]
   }

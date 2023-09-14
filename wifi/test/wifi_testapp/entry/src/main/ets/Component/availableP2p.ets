@@ -16,12 +16,12 @@
 // @ts-nocheck
 
 import prompt from '@ohos.prompt'
-import Logger from '../MainAbility/model/Logger'
 import { P2pPswDialog } from '../Component/p2pPswDialog'
 import { P2pModel } from '../MainAbility/model/p2pModel'
 import { P2pView } from '../Component/p2pView'
 import wifi from '@ohos.wifi'
-const TAG = 'AvailableP2p'
+
+const TAG = "[availableP2p]"
 let self = null
 
 /**
@@ -30,18 +30,18 @@ let self = null
 
 @Component
 export struct AvailableP2p {
-  private p2pModel = new P2pModel()
-  @State p2pList: Array<any> = []
-  private p2pLinkedInfo: any = null
+  private p2pModel: P2pModel = new P2pModel()
+  @Prop p2pList: Array<any>
+  @Prop p2pLinkedInfo: any
   private selectIndex: number = - 1
   private p2pPswDialogController: CustomDialogController = new CustomDialogController({
-    builder : P2pPswDialog( { p2pScanInfo : this.p2pList[this.selectIndex] , action : this.onAccept } ) ,
+    builder : P2pPswDialog( { p2pScanInfo : this.p2pList[ this.selectIndex ] , action : this.onAccept } ) ,
     autoCancel : true
   })
 
   onAccept( p2pScanInfo , psw ) {
-    Logger.info( TAG , 'connect p2p' )
-    self.p2pModel.connectP2p( p2pScanInfo , psw  )
+    console.log( TAG , 'connect p2p' )
+    self.p2pModel.connectP2p( p2pScanInfo , psw )
   }
 
   aboutToAppear() {
@@ -64,14 +64,14 @@ export struct AvailableP2p {
             P2pView( { p2p : item } )
           }
           .onClick( () => {
-            Logger.info( TAG , 'p2p click' )
+            console.log( TAG , 'p2p click' )
             this.selectIndex = index
             if ( this.p2pLinkedInfo !== null && item.deviceName === this.p2pLinkedInfo.deviceName ) {
               prompt.showToast( { message : 'this p2p is connected' } )
               return
             }
             this.p2pModel.connectP2p( item , '' )
-//            this.p2pPswDialogController.open()
+            //            this.p2pPswDialogController.open()
           } )
         } , item => JSON.stringify( item ) )
       }

@@ -18,6 +18,7 @@ import ConfigData from '../Utils/ConfigData';
 import { TestScenario } from '../MainAbility/model/testData'
 import prompt from '@system.prompt';
 
+const TAG = "[scenarioContentTable]"
 /**
  *  Scenario Test ContentTable Component Page Of Wifi test
  */
@@ -28,8 +29,6 @@ export struct ScenarioContentTable {
   private scenarioItemsX: TestScenario[]
   @Prop changeIndex: number;
   @State localName: string = 'DaYuBlue'
-  //  @State currentIndex: number = 1
-  //  @StorageLink('pairedMac') pairedMac: string = "";
 
   @Builder IngredientItem( scenarioItem: TestScenario , index: number ) {
     Stack() {
@@ -75,15 +74,15 @@ export struct ScenarioContentTable {
 
   getCurrentState( index: number ) {
     if ( index <= this.changeIndex ) {
-      this.scenarioItemsX[index].result = 'pass';
+      this.scenarioItemsX[ index ].result = 'pass';
     } else {
-      console.log( "index > this.changeIndex" )
+      console.log( TAG , "index > this.changeIndex" )
     }
-    return this.scenarioItemsX[index].result
+    return this.scenarioItemsX[ index ].result
   }
 
   aboutToAppear(): void {
-    console.log( "scenario组件构建完毕" )
+    console.log( TAG , "scenario组件构建完毕" )
     //初始化私有变量
     this.scenarioItemsX = this.scenarioItems
   }

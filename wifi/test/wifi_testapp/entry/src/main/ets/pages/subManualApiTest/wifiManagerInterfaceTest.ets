@@ -20,65 +20,54 @@ import { TestImageDisplay } from '../../Component/testImageDisplay';
 import { ContentTable } from '../../Component/contentTable';
 import Router from '@system.router';
 import ConfigData from '../../Utils/ConfigData';
-import LogUtil from '../../Utils/LogUtil';
 import { initWifiManagerApiData } from '../../MainAbility/model/testDataModels'
 import { TestData } from '../../MainAbility/model/testData'
+
+const TAG = '[WifiManager]'
 
 /**
  * wifiManager Test Page Of Wifi test
  */
 
-const G_NAME = 'DaYu200'
-
 @Component
 struct WifiManagerDeviceSetting {
-  private w_ssid1 = "TP-LINK_6365";
-  private w_bssid1 = "6C:B1:58:75:63:65";
-  private w_preSharedKey1 = "kaihong123";
-  private w_isHiddenSsid1 = "false";
-  @State w_securityType1: number = 3;
-  @State w_creatorUid1: number = 1;
-  @State w_disableReason1: number = 0;
-  @State w_netId1: number = 0 ;
-  @State w_randomMacType1: number = 0 ;
-  @State w_randomMacAddr1: string = "08:fb:ea:1b:38:aa"
-  @State w_ipType1: number = 1 ;
-  @State w_staticIp_ipAddress1: number = 3232235880 ;
-  @State w_staticIp_gateway1: number = 3232235777 ;
-  @State w_staticIp_dnsServers1: number = 3716386629 ;
-  @State w_staticIp_domains1: Array<string> = [ "0", "1", "2" ] ;
-  @State w_networkId1: number = 0 ;
-  @State w_featureId1: number = 1 ;
+  @StorageLink( 'w_networkIdM' ) w_networkIdM: number = 0; // id,netId,networkId是一个值嘛？
+  @StorageLink( 'w_featureIdM' ) w_featureIdM: number = 1;
+  @StorageLink( 'wifiDeviceConfigManager' ) wifiDeviceConfigManager: Object = {
+    ssid : String = "TP-LINK_6365" ,
+    bssid : String = "6C:B1:58:75:63:65" ,
+    preSharedKey : String = "kaihong123" ,
+    isHiddenSsid : Boolean = false ,
+    securityType : Number = 3 ,
+    creatorUid : Number = 1 ,
+    disableReason : Number = 0 ,
+    netId : Number = 1 ,
+    randomMacType : Number = 0 ,
+    randomMacAddr : String = "08:fb:ea:1b:38:aa" ,
+    ipType : Number = 1 ,
+    staticIp : {
+      ipAddress : Number = 3232235880 ,
+      gateway : Number = 3232235777 ,
+      dnsServers : Number = 3716386629 ,
+      domains : [] = [ "0", "1", "2" ] ,
+    }
+  }
 
   aboutToAppear() {
-    AppStorage.SetOrCreate( 'w_ssid1' , this.w_ssid1 );
-    AppStorage.SetOrCreate( 'w_bssid1' , this.w_bssid1 );
-    AppStorage.SetOrCreate( 'w_preSharedKey1' , this.w_preSharedKey1 );
-    AppStorage.SetOrCreate( 'w_isHiddenSsid1' , this.w_isHiddenSsid1 );
-    AppStorage.SetOrCreate( 'w_securityType1' , this.w_securityType1 );
-    AppStorage.SetOrCreate( 'w_creatorUid1' , this.w_creatorUid1 );
-    AppStorage.SetOrCreate( 'w_disableReason1' , this.w_disableReason1 );
-    AppStorage.SetOrCreate( 'w_netId1' , this.w_netId1 );
-    AppStorage.SetOrCreate( 'w_randomMacType1' , this.w_randomMacType1 );
-    AppStorage.SetOrCreate( 'w_randomMacAddr1' , this.w_randomMacAddr1 );
-    AppStorage.SetOrCreate( 'w_ipType1' , this.w_ipType1 );
-    AppStorage.SetOrCreate( 'w_staticIp_ipAddress1' , this.w_staticIp_ipAddress1 );
-    AppStorage.SetOrCreate( 'w_staticIp_gateway1' , this.w_taticIp_gateway1 );
-    AppStorage.SetOrCreate( 'w_staticIp_dnsServers1' , this.w_staticIp_dnsServers1 );
-    AppStorage.SetOrCreate( 'w_staticIp_domains1' , this.w_staticIp_domains1 );
-    AppStorage.SetOrCreate( 'w_networkId1' , this.w_networkId1 );
-    AppStorage.SetOrCreate( 'w_featureId1' , this.w_featureId1 );
+
   }
 
   build() {
     Column() {
       Row() {
-        Text( "ssid1:" ).fontSize( "17vp" ).width( 70 )
-        TextInput( { text : this.w_ssid1 , placeholder : "TP-LINK_6365" } )
+        Text( "ssidM:" ).fontSize( "17vp" ).width( 70 )
+        TextInput( { text : this.wifiDeviceConfigManager.ssid , placeholder : "TP-LINK_6365" } )
           .fontSize( "15vp" )
           .onChange( ( strInput ) => {
-            this.w_ssid1 = strInput;
-            AppStorage.SetOrCreate( 'w_ssid1' , strInput );
+            //判断合法性
+            if ( strInput.length >= 1 ) {
+              this.wifiDeviceConfigManager.ssid = strInput;
+            }
           } )
           .width( ConfigData.WH_80_100 )
           .borderRadius( 1 )
@@ -93,12 +82,14 @@ struct WifiManagerDeviceSetting {
           Stack().height( "0.25vp" ).backgroundColor( "#000000" );
           Column() {
             Row() {
-              Text( "bssid1:" ).fontSize( "15vp" ).width( 60 );
-              TextInput( { text : this.w_bssid1 , placeholder : "6c:b1:58:75:63:67" } )
+              Text( "bssidM:" ).fontSize( "15vp" ).width( 60 );
+              TextInput( { text : this.wifiDeviceConfigManager.bssid , placeholder : "6c:b1:58:75:63:67" } )
                 .fontSize( "15vp" )
                 .onChange( ( strInput ) => {
-                  this.w_bssid1 = strInput;
-                  AppStorage.SetOrCreate( 'w_bssid1' , strInput );
+                  //判断合法性
+                  if ( strInput.length >= 1 ) {
+                    this.wifiDeviceConfigManager.bssid = strInput;
+                  }
                 } )
                 .width( ConfigData.WH_80_100 )
                 .borderRadius( 1 )
@@ -109,30 +100,13 @@ struct WifiManagerDeviceSetting {
             .backgroundColor( $r( "app.color.spring" ) )
 
             Row() {
-              Text( "preSharedKey1:" ).fontSize( "15vp" ).width( 110 );
-              TextInput( { text : this.w_preSharedKey1 , placeholder : "kaihong123" } )
+              Text( "preSharedKeyM:" ).fontSize( "15vp" ).width( 110 );
+              TextInput( { text : this.wifiDeviceConfigManager.preSharedKey , placeholder : "kaihong123" } )
                 .fontSize( "15vp" )
                 .onChange( ( strInput ) => {
-                  this.w_preSharedKey1 = strInput;
-                  AppStorage.SetOrCreate( 'w_preSharedKey1' , strInput );
-                } )
-                .width( ConfigData.WH_80_100 )
-                .borderRadius( 1 )
-            }
-            .backgroundColor( $r( "app.color.spring" ) )
-            .padding( 5 )
-            .justifyContent( FlexAlign.Start )
-            .alignItems( VerticalAlign.Center )
-
-            Row() {
-              Text( "isHiddenSsid1:" ).fontSize( 15 ).width( 110 );
-              TextInput( { text : this.w_isHiddenSsid1 , placeholder : "false" } )
-                .fontSize( "15vp" )
-                .onChange( ( strInput ) => {
-                  this.w_isHiddenSsid1 = strInput;
                   //判断合法性
                   if ( strInput.length >= 1 ) {
-                    AppStorage.SetOrCreate( 'w_isHiddenSsid1' , strInput );
+                    this.wifiDeviceConfigManager.preSharedKey = strInput;
                   }
                 } )
                 .width( ConfigData.WH_80_100 )
@@ -144,7 +118,25 @@ struct WifiManagerDeviceSetting {
             .alignItems( VerticalAlign.Center )
 
             Row() {
-              Text( "securityType1:" ).fontSize( 15 ).width( 100 );
+              Text( "isHiddenSsidM:" ).fontSize( 15 ).width( 110 );
+              TextInput( { text : this.wifiDeviceConfigManager.w_isHiddenSsidM , placeholder : "false" } )
+                .fontSize( "15vp" )
+                .onChange( ( strInput ) => {
+                  //判断合法性
+                  if ( strInput.length >= 1 ) {
+                    this.wifiDeviceConfigManager.isHiddenSsid = strInput;
+                  }
+                } )
+                .width( ConfigData.WH_80_100 )
+                .borderRadius( 1 )
+            }
+            .backgroundColor( $r( "app.color.spring" ) )
+            .padding( 5 )
+            .justifyContent( FlexAlign.Start )
+            .alignItems( VerticalAlign.Center )
+
+            Row() {
+              Text( "securityTypeM:" ).fontSize( 15 ).width( 100 );
               Column() {
                 Select( [
                   { value : 'WIFI_SEC_TYPE_INVALID' },
@@ -160,9 +152,8 @@ struct WifiManagerDeviceSetting {
                   .optionFont( { size : 15 } )
                   .width( ConfigData.WH_80_100 )
                   .onSelect( ( index: number ) => {
-                    console.log( "Select:" + index )
-                    this.w_securityType1 = index;
-                    AppStorage.SetOrCreate( 'w_securityType1' , index );
+                    console.log( TAG , "Select:" + index )
+                    this.wifiDeviceConfigManager.securityType = index;
                   } )
               }
               .width( ConfigData.WH_80_100 )
@@ -174,14 +165,13 @@ struct WifiManagerDeviceSetting {
             .alignItems( VerticalAlign.Center )
 
             Row() {
-              Text( "creatorUid1:" ).fontSize( 15 ).width( 100 );
-              TextInput( { text : this.w_creatorUid1 , placeholder : "1" } )
+              Text( "creatorUidM:" ).fontSize( 15 ).width( 100 );
+              TextInput( { text : this.wifiDeviceConfigManager.creatorUid , placeholder : "1" } )
                 .fontSize( "15vp" )
                 .onChange( ( strInput ) => {
-                  this.w_creatorUid1 = Number(strInput);
                   //判断合法性
                   if ( strInput.length >= 1 ) {
-                    AppStorage.SetOrCreate( 'w_creatorUid1' , strInput );
+                    this.wifiDeviceConfigManager.creatorUid = Number( strInput );
                   }
                 } )
                 .width( ConfigData.WH_80_100 )
@@ -193,14 +183,13 @@ struct WifiManagerDeviceSetting {
             .alignItems( VerticalAlign.Center )
 
             Row() {
-              Text( "disableReason1:" ).fontSize( 15 ).width( 120 );
-              TextInput( { text : this.w_disableReason1 , placeholder : "0" } )
+              Text( "disableReasonM:" ).fontSize( 15 ).width( 120 );
+              TextInput( { text : this.wifiDeviceConfigManager.disableReason , placeholder : "0" } )
                 .fontSize( "15vp" )
                 .onChange( ( strInput ) => {
-                  this.w_disableReason1 = strInput;
                   //判断合法性
                   if ( strInput.length >= 1 ) {
-                    AppStorage.SetOrCreate( 'w_disableReason1' , strInput );
+                    this.wifiDeviceConfigManager.disableReason = Number( strInput );
                   }
                 } )
                 .width( ConfigData.WH_80_100 )
@@ -212,14 +201,13 @@ struct WifiManagerDeviceSetting {
             .alignItems( VerticalAlign.Center )
 
             Row() {
-              Text( "netId1:" ).fontSize( 15 ).width( 60 );
-              TextInput( { text : this.w_netId1 , placeholder : "0" } )
+              Text( "netIdM:" ).fontSize( 15 ).width( 60 );
+              TextInput( { text : this.wifiDeviceConfigManager.netId , placeholder : "1" } )
                 .fontSize( "15vp" )
                 .onChange( ( strInput ) => {
-                  this.w_netId1 = strInput;
                   //判断合法性
                   if ( strInput.length >= 1 ) {
-                    AppStorage.SetOrCreate( 'w_netId1' , strInput );
+                    this.wifiDeviceConfigManager.netId = Number( strInput );
                   }
                 } )
                 .width( ConfigData.WH_80_100 )
@@ -231,13 +219,13 @@ struct WifiManagerDeviceSetting {
             .alignItems( VerticalAlign.Center )
 
             Row() {
-              Text( "randomMacType1:" ).fontSize( 15 ).width( 140 );
-              TextInput( { text : this.w_randomMacType1 , placeholder : "0" } )
+              Text( "randomMacTypeM:" ).fontSize( 15 ).width( 140 );
+              TextInput( { text : this.wifiDeviceConfigManager.randomMacType , placeholder : "0" } )
                 .fontSize( "15vp" )
                 .onChange( ( strInput ) => {
-                  this.w_randomMacType1 = strInput;
+                  //判断合法性
                   if ( strInput.length >= 1 ) {
-                    AppStorage.SetOrCreate( 'w_randomMacType1' , strInput );
+                    this.wifiDeviceConfigManager.randomMacType = Number( strInput );
                   }
                 } )
                 .width( ConfigData.WH_80_100 )
@@ -249,13 +237,13 @@ struct WifiManagerDeviceSetting {
             .alignItems( VerticalAlign.Center )
 
             Row() {
-              Text( "randomMacAddr1:" ).fontSize( 15 ).width( 140 );
-              TextInput( { text : this.w_randomMacAddr1 , placeholder : "08:fb:ea:1b:38:aa" } )
+              Text( "randomMacAddrM:" ).fontSize( 15 ).width( 140 );
+              TextInput( { text : this.wifiDeviceConfigManager.randomMacAddr , placeholder : "08:fb:ea:1b:38:aa" } )
                 .fontSize( "15vp" )
                 .onChange( ( strInput ) => {
-                  this.w_randomMacAddr1 = strInput;
+                  //判断合法性
                   if ( strInput.length >= 1 ) {
-                    AppStorage.SetOrCreate( 'w_randomMacAddr1' , strInput );
+                    this.wifiDeviceConfigManager.randomMacAddr = strInput;
                   }
                 } )
                 .width( ConfigData.WH_80_100 )
@@ -267,13 +255,13 @@ struct WifiManagerDeviceSetting {
             .alignItems( VerticalAlign.Center )
 
             Row() {
-              Text( "ipType1:" ).fontSize( 15 ).width( 60 );
-              TextInput( { text : this.w_ipType1 , placeholder : "1" } ) //DHCP
+              Text( "ipTypeM:" ).fontSize( 15 ).width( 60 );
+              TextInput( { text : this.wifiDeviceConfigManager.IpType , placeholder : "1" } ) //DHCP
                 .fontSize( "15vp" )
                 .onChange( ( strInput ) => {
-                  this.w_ipType1 = strInput;
+                  //判断合法性
                   if ( strInput.length >= 1 ) {
-                    AppStorage.SetOrCreate( 'w_ipType1' , strInput );
+                    this.wifiDeviceConfigManager.IpType = Number( strInput );
                   }
                 } )
                 .width( ConfigData.WH_80_100 )
@@ -285,13 +273,13 @@ struct WifiManagerDeviceSetting {
             .alignItems( VerticalAlign.Center )
 
             Row() {
-              Text( "staticIp_ipAddress1:" ).fontSize( 15 ).width( 135 );
-              TextInput( { text : this.w_staticIp_ipAddress1 , placeholder : "3232235880" } )
+              Text( "staticIp_ipAddressM:" ).fontSize( 15 ).width( 135 );
+              TextInput( { text : this.wifiDeviceConfigManager.staticIp.ipAddress , placeholder : "3232235880" } )
                 .fontSize( "15vp" )
                 .onChange( ( strInput ) => {
-                  this.w_staticIp_ipAddress1 = strInput;
+                  //判断合法性
                   if ( strInput.length >= 1 ) {
-                    AppStorage.SetOrCreate( 'w_staticIp_ipAddress1' , strInput );
+                    this.wifiDeviceConfigManager.staticIp.ipAddress = Number( strInput );
                   }
                 } )
                 .width( ConfigData.WH_80_100 )
@@ -303,13 +291,13 @@ struct WifiManagerDeviceSetting {
             .alignItems( VerticalAlign.Center )
 
             Row() {
-              Text( "staticIp_gateway1:" ).fontSize( 15 ).width( 130 );
-              TextInput( { text : this.w_staticIp_gateway1 , placeholder : "3232235777" } )
+              Text( "staticIp_gatewayM:" ).fontSize( 15 ).width( 130 );
+              TextInput( { text : this.wifiDeviceConfigManager.staticIp.gateway , placeholder : "3232235777" } )
                 .fontSize( "15vp" )
                 .onChange( ( strInput ) => {
-                  this.w_staticIp_gateway1 = strInput;
+                  //判断合法性
                   if ( strInput.length >= 1 ) {
-                    AppStorage.SetOrCreate( 'w_staticIp_gateway1' , strInput );
+                    this.wifiDeviceConfigManager.staticIp.gateway = Number( strInput );
                   }
                 } )
                 .width( ConfigData.WH_80_100 )
@@ -321,13 +309,13 @@ struct WifiManagerDeviceSetting {
             .alignItems( VerticalAlign.Center )
 
             Row() {
-              Text( "staticIp_dnsServers1:" ).fontSize( 15 ).width( 140 );
-              TextInput( { text : this.w_staticIp_dnsServers1 , placeholder : "3716386629" } )
+              Text( "staticIp_dnsServersM:" ).fontSize( 15 ).width( 140 );
+              TextInput( { text : this.wifiDeviceConfigManager.staticIp.dnsServers , placeholder : "3716386629" } )
                 .fontSize( "15vp" )
                 .onChange( ( strInput ) => {
-                  this.w_staticIp_dnsServers1 = strInput;
+                  //判断合法性
                   if ( strInput.length >= 1 ) {
-                    AppStorage.SetOrCreate( 'w_staticIp_dnsServers1' , strInput );
+                    this.wifiDeviceConfigManager.staticIp.dnsServers = Number( strInput );
                   }
                 } )
                 .width( ConfigData.WH_80_100 )
@@ -339,13 +327,12 @@ struct WifiManagerDeviceSetting {
             .alignItems( VerticalAlign.Center )
 
             Row() {
-              Text( "staticIp_domains1:" ).fontSize( 15 ).width( 125 );
-              TextInput( { text : this.w_staticIp_domains1 , placeholder : "0" } )
+              Text( "staticIp_domainsM:" ).fontSize( 15 ).width( 125 );
+              TextInput( { text : this.wifiDeviceConfigManager.staticIp.domains , placeholder : "0" } )
                 .fontSize( "15vp" )
                 .onChange( ( strInput ) => {
-                  this.w_staticIp_domains1 = strInput;
                   if ( strInput.length >= 1 ) {
-                    AppStorage.SetOrCreate( 'w_staticIp_domains1' , strInput );
+                    this.wifiDeviceConfigManager.staticIp.domains = strInput;
                   }
                 } )
                 .width( ConfigData.WH_80_100 )
@@ -375,46 +362,35 @@ struct WifiManagerInterfaceTest {
   @State message: string = "";
   @State deviceId: string = '';
   @State currentClick: number = - 1;
-  @StorageLink( 'pairedMac' ) pairedMac: string = "32:32:235:878";
-  @State w_ssid1: string = "TP-LINK_6365"; //TP-LINK_6365
-  @State w_bssid1: string = "6C:B1:58:75:63:65"; //6C:B1:58:75:63:65
-  @State w_preSharedKey1: string = "kaihong123"; //kaihong123
-  @State w_securityType1: number = 3
-  @State w_creatorUid1: number = 1;
-  @State w_disableReason1: number = 0;
-  @State w_netId1: number = 0 ;
-  @State w_randomMacType1: number = 0 ;
-  @State w_randomMacAddr1: string = "08:fb:ea:1b:38:aa"
-  @State w_ipType1: number = 1 ;
-  @State w_staticIp_ipAddress1: number = 3232235880 ;
-  @State w_staticIp_gateway1: number = 3232235777 ;
-  @State w_staticIp_dnsServers1: number = 3716386629 ;
-  @State w_staticIp_domains1: Array<string> = [ "0", "1", "2" ] ;
-  @State w_networkId1: number = 0 ;
-  @State w_featureId1: number = 1 ;
+  @StorageLink( 'pairedSsidM' ) pairedSsidM: string = "";
+  @StorageLink( 'w_networkIdM' ) w_networkIdM: number = 0;
+  @StorageLink( 'w_featureIdM' ) w_featureIdM: number = 1;
   @StorageLink( 'ipInfoManagerMessage' ) ipInfoManagerMessage: string = '';
   @StorageLink( 'linkedInfoManagerMessage' ) linkedInfoManagerMessage: string = '';
   @StorageLink( 'getDeviceConfigsManagerMessage' ) getDeviceConfigsManagerMessage: string = '';
   @StorageLink( 'getScanInfoManagerMessage' ) getScanInfoManagerMessage: string = '';
+  @StorageLink( 'wifiDeviceConfigManager' ) wifiDeviceConfigManager: Object = {
+    ssid : String = "TP-LINK_6365" ,
+    bssid : String = "6C:B1:58:75:63:65" ,
+    preSharedKey : String = "kaihong123" ,
+    isHiddenSsid : Boolean = false ,
+    securityType : Number = 3 ,
+    creatorUid : Number = 1 ,
+    disableReason : Number = 0 ,
+    netId : Number = 100 ,
+    randomMacType : Number = 0 ,
+    randomMacAddr : String = "08:fb:ea:1b:38:aa" ,
+    ipType : Number = 1 ,
+    staticIp : {
+      ipAddress : Number = 3232235880 ,
+      gateway : Number = 3232235777 ,
+      dnsServers : Number = 3716386629 ,
+      domains : [] = [ "0", "1", "2" ] ,
+    }
+  }
 
   aboutToAppear() {
-    AppStorage.SetOrCreate( 'w_ssid1' , this.w_ssid1 );
-    AppStorage.SetOrCreate( 'w_bssid1' , this.w_bssid1 );
-    AppStorage.SetOrCreate( 'w_preSharedKey1' , this.w_preSharedKey1 );
-    AppStorage.SetOrCreate( 'w_isHiddenSsid1' , this.w_isHiddenSsid1 );
-    AppStorage.SetOrCreate( 'w_securityType1' , this.w_securityType1 );
-    AppStorage.SetOrCreate( 'w_creatorUid1' , this.w_creatorUid1 );
-    AppStorage.SetOrCreate( 'w_disableReason1' , this.w_disableReason1 );
-    AppStorage.SetOrCreate( 'w_netId1' , this.w_netId1 );
-    AppStorage.SetOrCreate( 'w_randomMacType1' , this.w_randomMacType1 );
-    AppStorage.SetOrCreate( 'w_randomMacAddr1' , this.w_randomMacAddr1 );
-    AppStorage.SetOrCreate( 'w_ipType1' , this.w_ipType1 );
-    AppStorage.SetOrCreate( 'w_staticIp_ipAddress1' , this.w_staticIp_ipAddress1 );
-    AppStorage.SetOrCreate( 'w_staticIp_gateway1' , this.w_staticIp_gateway1 );
-    AppStorage.SetOrCreate( 'w_staticIp_dnsServers1' , this.w_staticIp_dnsServers1 );
-    AppStorage.SetOrCreate( 'w_staticIp_domains1' , this.w_staticIp_domains1 );
-    AppStorage.SetOrCreate( 'w_networkId1' , this.w_networkId1 );
-    AppStorage.SetOrCreate( 'w_featureId1' , this.w_featureId1 );
+
   }
 
   init() {
@@ -431,14 +407,13 @@ struct WifiManagerInterfaceTest {
       Stack().height( "0.5vp" ).backgroundColor( "#000000" );
       Column() {
         Row() {
-          Text( "目标设备IP：" )
-            .fontSize( "20vp" )
+          Text( "已连接的WiFi:" )
+            .fontSize( "17vp" )
             .height( 40 )
-            .padding( { top : 5 } )
-            .width( ConfigData.WH_28_100 )
+            .width( ConfigData.WH_30_100 )
             .align( Alignment.Start )
 
-          TextInput( { text : this.pairedMac , placeholder : "请输入即将连接的设备MAC" } )
+          TextInput( { text : this.pairedSsidM , placeholder : "请在右侧输入WiFi的配置" } )
             .height( 40 )
             .borderStyle( BorderStyle.Dashed )
             .backgroundColor( $r( "app.color.white" ) )

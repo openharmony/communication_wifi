@@ -21,14 +21,11 @@ import { MainPageTitle } from '../Component/mainPageTitle';
 import { ManualApiTest } from '../Component/manualApiTestComponent';
 import { ManualSceneTest } from '../Component/manualSceneTest';
 import { AutoTest } from '../Component/autoTest';
+import { AppTest } from '../Component/appTest';
 import { BenchmarkTest } from '../Component/benchmarkTest';
-import screenshot from '@ohos.screenshot'
-import image from '@ohos.multimedia.image'
 import ConfigData from '../Utils/ConfigData';
-import MediaUtils from '../MainAbility/model/MediaUtils'
-import Logger from '../MainAbility/model/Logger'
 
-const TAG = '[Screenshot]'
+const TAG = '[homePage]'
 
 /**
  * homepage of wifi test
@@ -36,33 +33,37 @@ const TAG = '[Screenshot]'
 
 @Component
 struct TestCategory {
- private testItems: TestData[]
+  private testItems: TestData[]
 
   build() {
     Stack() {
       Tabs() {
         TabContent() {
-          ManualApiTest( { testItems : this.testItems.filter( item => ( item.category === Category.API ) ) } )
-        }.tabBar( $r( "app.string.api" ) )
+          AppTest( { testItems : this.testItems.filter( item => ( item.category === Category.App ) ) } )
+        }.tabBar( $r( "app.string.App" ) ).margin( { top : 20 } )
 
         TabContent() {
+          ManualApiTest( { testItems : this.testItems.filter( item => ( item.category === Category.API ) ) } )
+        }.tabBar( $r( "app.string.api" ) ).margin( { top : 20 } )
+        TabContent() {
           AutoTest( { testItems : this.testItems.filter( item => ( item.category === Category.AutoTest ) ) } )
-        }.tabBar( $r( "app.string.autotest" ) )
+        }.tabBar( $r( "app.string.autotest" ) ).margin( { top : 5 } )
 
         TabContent() {
           ManualSceneTest( { testItems : this.testItems.filter( item => ( item.category === Category.Scenario ) ) } )
-        }.tabBar( $r( "app.string.scenario" ) )
+        }.tabBar( $r( "app.string.scenario" ) ).margin( { top : 5 } )
 
         TabContent() {
           BenchmarkTest( { testItems : this.testItems.filter( item => ( item.category === Category.BenchMark ) ) } )
-        }.tabBar( $r( "app.string.benchmark" ) )
+        }.tabBar( $r( "app.string.benchmark" ) ).margin( { top : 5 } )
 
         TabContent() {
           BenchmarkTest( { testItems : this.testItems.filter( item => ( item.category === Category.Stress ) ) } )
-        }.tabBar( $r( "app.string.stress" ) )
+        }.tabBar( $r( "app.string.stress" ) ).margin( { top : 5 } )
       }
       .barWidth( ConfigData.WH_80_100 )
-      .barHeight( 60 )
+      .barHeight( "40vp" )
+      .align(Alignment.TopStart)
       .barMode( BarMode.Scrollable )
       .backgroundColor( $r( "app.color.white" ) )
     }
@@ -85,7 +86,7 @@ struct HomePage {
         Image( $r( 'app.media.Switch' ) )
           .height( 30 )
           .width( 30 )
-          .margin( { top : 15 , right : 10 } )
+          .margin( { top : 5 , right : 10 } )
           .onClick( () => {
           } )
       }

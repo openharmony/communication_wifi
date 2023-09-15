@@ -22,6 +22,7 @@
 #include "wifi_p2p_msg.h"
 #include "p2p_macro.h"
 #include "wifi_p2p_group_info_proxy.h"
+#include "wifi_common_msg.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -183,10 +184,10 @@ public:
         return currentGroup.IsClientDevicesEmpty();
     }
 
-    inline void SetCurrentGroup(const WifiP2pGroupInfo &group)
+    inline void SetCurrentGroup(WifiMacAddrInfoType type, const WifiP2pGroupInfo &group)
     {
         currentGroup = group;
-        AddMacAddrPairInfo(group);
+        AddMacAddrPairInfo(type, group);
         RefreshCurrentGroupFromGroups();
     }
 
@@ -197,12 +198,16 @@ public:
 #ifdef SUPPORT_RANDOM_MAC_ADDR
     /**
      * @Description - add mac address information
+     * @param type - the MAC address type
+     * @param group - P2P group information
      */
-    void AddMacAddrPairInfo(const WifiP2pGroupInfo &group);
+    void AddMacAddrPairInfo(WifiMacAddrInfoType type, const WifiP2pGroupInfo &group);
     /**
      * @Description - remove mac address information
+     * @param type - the MAC address type
+     * @param group - P2P group information
      */
-    void RemoveMacAddrPairInfo(const WifiP2pGroupInfo &group);
+    void RemoveMacAddrPairInfo(WifiMacAddrInfoType type, const WifiP2pGroupInfo &group);
 #endif
 private:
     /**

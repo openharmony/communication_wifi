@@ -49,7 +49,8 @@ public:
     {
         WifiP2pGroupInfo group;
         group.SetNetworkId(0);
-        pInvitationRequestState->groupManager.SetCurrentGroup(group);
+        pInvitationRequestState->groupManager.SetCurrentGroup(WifiMacAddrInfoType::P2P_CURRENT_GROUP_MACADDR_INFO,
+            group);
     }
     std::unique_ptr<InvitationRequestState> pInvitationRequestState;
     std::unique_ptr<MockP2pPendant> pMockP2pPendant;
@@ -91,7 +92,7 @@ HWTEST_F(InvitationRequestStateTest, ProcessInvitationResultEvt3, TestSize.Level
 {
     WifiP2pGroupInfo group;
     group.SetNetworkId(0);
-    groupManager.SetCurrentGroup(group);
+    groupManager.SetCurrentGroup(WifiMacAddrInfoType::P2P_CURRENT_GROUP_MACADDR_INFO, group);
     InternalMessage msg;
     msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_EVENT_INVITATION_RESULT));
     msg.SetParam1(8);

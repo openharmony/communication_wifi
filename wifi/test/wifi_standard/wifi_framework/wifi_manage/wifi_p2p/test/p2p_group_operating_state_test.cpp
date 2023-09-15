@@ -56,7 +56,8 @@ public:
         group.SetNetworkId(1);
         group.SetIsPersistent(true);
         pP2pGroupOperatingState->groupManager.AddGroup(group);
-        pP2pGroupOperatingState->groupManager.SetCurrentGroup(group);
+        pP2pGroupOperatingState->groupManager.SetCurrentGroup(WifiMacAddrInfoType::P2P_CURRENT_GROUP_MACADDR_INFO,
+            group);
     }
     void AddDeviceManager()
     {

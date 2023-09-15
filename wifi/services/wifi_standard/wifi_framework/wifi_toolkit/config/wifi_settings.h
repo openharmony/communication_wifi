@@ -70,13 +70,6 @@ enum class ThermalLevel {
     EMERGENCY = 6,
 };
 
-enum class WifiMacAddrInfoType {
-    WIFI_SCANINFO_MACADDR_INFO = 0,
-    HOTSPOT_MACADDR_INFO = 1,
-    P2P_MACADDR_INFO = 2,
-    INVALID_MACADDR_INFO
-};
-
 enum WifiMacAddrErrCode {
     WIFI_MACADDR_OPER_SUCCESS = 0,
     WIFI_MACADDR_HAS_EXISTED = 1,
@@ -1443,7 +1436,9 @@ private:
     std::map<WifiMacAddrInfo, std::string> mWifiScanMacAddrPair;
     std::map<WifiMacAddrInfo, std::string> mDeviceConfigMacAddrPair;
     std::map<WifiMacAddrInfo, std::string> mHotspotMacAddrPair;
-    std::map<WifiMacAddrInfo, std::string> mP2pMacAddrPair;
+    std::map<WifiMacAddrInfo, std::string> mP2pDeviceMacAddrPair;
+    std::map<WifiMacAddrInfo, std::string> mP2pGroupsInfoMacAddrPair;
+    std::map<WifiMacAddrInfo, std::string> mP2pCurrentgroupMacAddrPair;
 
     std::mutex mMacAddrPairMutex;
     std::mutex mStaMutex;

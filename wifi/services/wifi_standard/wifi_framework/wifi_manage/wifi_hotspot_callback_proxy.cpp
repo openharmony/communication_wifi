@@ -94,6 +94,7 @@ void WifiHotspotCallbackProxy::OnHotspotStaLeave(const StationInfo &info)
     data.WriteInt32(0);
     data.WriteCString(info.deviceName.c_str());
     data.WriteCString(info.bssid.c_str());
+    data.WriteInt32(info.bssidType);
     data.WriteCString(info.ipAddr.c_str());
     int error = Remote()->SendRequest(static_cast<uint32_t>(HotspotInterfaceCode::WIFI_CBK_CMD_HOTSPOT_STATE_LEAVE),
         data, reply, option);

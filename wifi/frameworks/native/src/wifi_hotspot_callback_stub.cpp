@@ -100,6 +100,7 @@ int WifiHotspotCallbackStub::RemoteOnHotspotStaLeave(uint32_t code, MessageParce
     info.deviceName = (readStr != nullptr) ? readStr : "";
     readStr = data.ReadCString();
     info.bssid = (readStr != nullptr) ? readStr : "";
+    info.bssidType = data.ReadInt32();
     readStr = data.ReadCString();
     info.ipAddr = (readStr != nullptr) ? readStr : "";
     OnHotspotStaLeave(info);

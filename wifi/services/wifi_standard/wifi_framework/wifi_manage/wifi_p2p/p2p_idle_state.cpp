@@ -245,7 +245,7 @@ bool P2pIdleState::ProcessGroupStartedEvt(InternalMessage &msg) const
         p2pStateMachine.UpdatePersistentGroups();
     }
     group.SetP2pGroupStatus(P2pGroupStatus::GS_STARTED);
-    p2pStateMachine.groupManager.SetCurrentGroup(group);
+    p2pStateMachine.groupManager.SetCurrentGroup(WifiMacAddrInfoType::P2P_CURRENT_GROUP_MACADDR_INFO, group);
     if (!p2pStateMachine.groupManager.GetCurrentGroup().IsGroupOwner()) {
         p2pStateMachine.StartDhcpClient();
 
@@ -255,7 +255,7 @@ bool P2pIdleState::ProcessGroupStartedEvt(InternalMessage &msg) const
             device.SetP2pDeviceStatus(owner.GetP2pDeviceStatus());
             WifiP2pGroupInfo copy = groupManager.GetCurrentGroup();
             copy.SetOwner(device);
-            groupManager.SetCurrentGroup(copy);
+            groupManager.SetCurrentGroup(WifiMacAddrInfoType::P2P_CURRENT_GROUP_MACADDR_INFO, copy);
 
             deviceManager.UpdateDeviceStatus(owner.GetDeviceAddress(), P2pDeviceStatus::PDS_CONNECTED);
 
@@ -268,7 +268,7 @@ bool P2pIdleState::ProcessGroupStartedEvt(InternalMessage &msg) const
         WifiP2pDevice owner = currGrp.GetOwner();
         owner.SetDeviceName(deviceManager.GetThisDevice().GetDeviceName());
         currGrp.SetOwner(owner);
-        p2pStateMachine.groupManager.SetCurrentGroup(currGrp);
+        p2pStateMachine.groupManager.SetCurrentGroup(WifiMacAddrInfoType::P2P_CURRENT_GROUP_MACADDR_INFO, currGrp);
         if (!p2pStateMachine.StartDhcpServer()) {
             WIFI_LOGE("Failed to start dhcp server.");
             p2pStateMachine.SendMessage(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_REMOVE_GROUP));

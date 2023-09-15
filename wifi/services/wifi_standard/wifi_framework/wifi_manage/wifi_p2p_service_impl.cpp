@@ -536,7 +536,7 @@ ErrCode WifiP2pServiceImpl::P2pConnect(const WifiP2pConfig &config)
         macAddrInfo.bssid = config.GetDeviceAddress();
         macAddrInfo.bssidType = config.GetDeviceAddressType();
         std::string randomMacAddr =
-            WifiSettings::GetInstance().GetMacAddrPairs(WifiMacAddrInfoType::P2P_MACADDR_INFO, macAddrInfo);
+            WifiSettings::GetInstance().GetMacAddrPairs(WifiMacAddrInfoType::P2P_DEVICE_MACADDR_INFO, macAddrInfo);
         if (randomMacAddr.empty()) {
             WIFI_LOGW("no record found, bssid:%{private}s, bssidType:%{public}d",
                 macAddrInfo.bssid.c_str(), macAddrInfo.bssidType);
@@ -654,7 +654,8 @@ ErrCode WifiP2pServiceImpl::GetCurrentGroup(WifiP2pGroupInfo &group)
         ownMacAddrInfo.bssid = owner.GetDeviceAddress();
         ownMacAddrInfo.bssidType = owner.GetDeviceAddressType();
         std::string ownRandomMacAddr =
-            WifiSettings::GetInstance().GetMacAddrPairs(WifiMacAddrInfoType::P2P_MACADDR_INFO, ownMacAddrInfo);
+            WifiSettings::GetInstance().GetMacAddrPairs(WifiMacAddrInfoType::P2P_CURRENT_GROUP_MACADDR_INFO,
+                ownMacAddrInfo);
         if (!ownRandomMacAddr.empty() && (ownMacAddrInfo.bssidType == REAL_DEVICE_ADDRESS)) {
             owner.SetDeviceAddress(ownRandomMacAddr);
             owner.SetDeviceAddressType(RANDOM_DEVICE_ADDRESS);
@@ -666,7 +667,8 @@ ErrCode WifiP2pServiceImpl::GetCurrentGroup(WifiP2pGroupInfo &group)
                 clientMacAddrInfo.bssid = iter->GetDeviceAddress();
                 clientMacAddrInfo.bssidType = iter->GetDeviceAddressType();
                 std::string clientRandomMacAddr =
-                    WifiSettings::GetInstance().GetMacAddrPairs(WifiMacAddrInfoType::P2P_MACADDR_INFO, clientMacAddrInfo);
+                    WifiSettings::GetInstance().GetMacAddrPairs(WifiMacAddrInfoType::P2P_CURRENT_GROUP_MACADDR_INFO,
+                        clientMacAddrInfo);
                 if (!clientRandomMacAddr.empty() &&
                     (clientMacAddrInfo.bssidType == REAL_DEVICE_ADDRESS)) {
                     iter->SetDeviceAddress(clientRandomMacAddr);
@@ -771,7 +773,7 @@ ErrCode WifiP2pServiceImpl::QueryP2pDevices(std::vector<WifiP2pDevice> &devices)
             macAddrInfo.bssid = iter->GetDeviceAddress();
             macAddrInfo.bssidType = iter->GetDeviceAddressType();
             std::string randomMacAddr =
-                WifiSettings::GetInstance().GetMacAddrPairs(WifiMacAddrInfoType::P2P_MACADDR_INFO, macAddrInfo);
+                WifiSettings::GetInstance().GetMacAddrPairs(WifiMacAddrInfoType::P2P_DEVICE_MACADDR_INFO, macAddrInfo);
             if (!randomMacAddr.empty() &&
                 (macAddrInfo.bssidType == REAL_DEVICE_ADDRESS)) {
                 iter->SetDeviceAddress(randomMacAddr);
@@ -858,7 +860,8 @@ ErrCode WifiP2pServiceImpl::QueryP2pGroups(std::vector<WifiP2pGroupInfo> &groups
             ownMacAddrInfo.bssid = owner.GetDeviceAddress();
             ownMacAddrInfo.bssidType = owner.GetDeviceAddressType();
             std::string ownRandomMacAddr =
-                WifiSettings::GetInstance().GetMacAddrPairs(WifiMacAddrInfoType::P2P_MACADDR_INFO, ownMacAddrInfo);
+                WifiSettings::GetInstance().GetMacAddrPairs(WifiMacAddrInfoType::P2P_GROUPSINFO_MACADDR_INFO,
+                    ownMacAddrInfo);
             if (!ownRandomMacAddr.empty() &&
                 (ownMacAddrInfo.bssidType == REAL_DEVICE_ADDRESS)) {
                 owner.SetDeviceAddress(ownRandomMacAddr);
@@ -871,7 +874,8 @@ ErrCode WifiP2pServiceImpl::QueryP2pGroups(std::vector<WifiP2pGroupInfo> &groups
                     clientMacAddrInfo.bssid = iter->GetDeviceAddress();
                     clientMacAddrInfo.bssidType = iter->GetDeviceAddressType();
                     std::string clientRandomMacAddr =
-                        WifiSettings::GetInstance().GetMacAddrPairs(WifiMacAddrInfoType::P2P_MACADDR_INFO, clientMacAddrInfo);
+                        WifiSettings::GetInstance().GetMacAddrPairs(WifiMacAddrInfoType::P2P_GROUPSINFO_MACADDR_INFO,
+                            clientMacAddrInfo);
                     if (!clientRandomMacAddr.empty() &&
                         (clientMacAddrInfo.bssidType == REAL_DEVICE_ADDRESS)) {
                         iter->SetDeviceAddress(clientRandomMacAddr);

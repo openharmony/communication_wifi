@@ -2009,21 +2009,24 @@ void StaStateMachine::HandleNetCheckResult(StaNetState netState, const std::stri
         /* Save connection information to WifiSettings. */
         SaveLinkstate(ConnState::CONNECTED, DetailedState::WORKING);
         staCallback.OnStaConnChanged(OperateResState::CONNECT_NETWORK_ENABLED, linkedInfo);
+        StartTimer(static_cast<int>(CMD_START_NETCHECK), PORTAL_CHECK_TIME * PORTAL_MILLSECOND);
     } else if (netState == StaNetState::NETWORK_CHECK_PORTAL) {
         WifiLinkedInfo linkedInfo;
         GetLinkedInfo(linkedInfo);
 #ifndef OHOS_ARCH_LITE
         if (linkedInfo.detailedState != DetailedState::CAPTIVE_PORTAL_CHECK) {
-            AAFwk::Want want;
             std::string portalUri;
             WifiSettings::GetInstance().GetPortalUri(portalUri);
             WIFI_LOGI("portal uri is %{public}s\n", portalUri.c_str());
-            want.SetAction(PORTAL_ACTION);
-            want.SetUri(portalUri);
-            want.AddEntity(PORTAL_ENTITY);
-            OHOS::ErrCode err = AAFwk::AbilityManagerClient::GetInstance()->StartAbility(want);
-            if (err != ERR_OK) {
-                WIFI_LOGI("StartAbility is failed %{public}d", err);
+            if (WifiSettings::GetInstance().GetDeviceProvisionState() == MODE_STATE_CLOSE) {
+                AAFwk::Want want;
+                want.SetAction(PORTAL_ACTION);
+                want.SetUri(portalUri);
+                want.AddEntity(PORTAL_ENTITY);
+                OHOS::ErrCode err = AAFwk::AbilityManagerClient::GetInstance()->StartAbility(want);
+                if (err != ERR_OK) {
+                    WIFI_LOGI("StartAbility is failed %{public}d", err);
+                }
             }
         }
         StartTimer(static_cast<int>(CMD_START_NETCHECK), PORTAL_CHECK_TIME * PORTAL_MILLSECOND);

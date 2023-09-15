@@ -38,6 +38,9 @@ constexpr const char *SETTINGS_DATASHARE_KEY_AIRPLANE_MODE = "settings.telephony
 constexpr const char *SETTINGS_DATASHARE_URI_LOCATION_MODE =
     "datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?Proxy=true&key=location_enable";
 constexpr const char *SETTINGS_DATASHARE_KEY_LOCATION_MODE = "location_switch_enable";
+constexpr const char *SETTINGS_DATASHARE_URI_DEVICE_PROVISIONED =
+    "datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?Proxy=true&key=device_provisioned";
+constexpr const char *SETTINGS_DATASHARE_KEY_DEVICE_PROVISIONED = "device_provisioned";
 }
 
 class WifiDataShareHelperUtils : DelayedSingleton<WifiDataShareHelperUtils> {

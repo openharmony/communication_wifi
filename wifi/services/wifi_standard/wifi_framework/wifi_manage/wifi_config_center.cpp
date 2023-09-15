@@ -431,5 +431,16 @@ int WifiConfigCenter::SetStaApExclusionType(int type)
 {
     return WifiSettings::GetInstance().SetStaApExclusionType(type);
 }
+
+void WifiConfigCenter::SetDeviceProvisionState(const int &state)
+{
+    WifiSettings::GetInstance().SetDeviceProvisionState(state);
+}
+
+int WifiConfigCenter::GetDeviceProvisionState() const
+{
+    return WifiSettings::GetInstance().GetDeviceProvisionState();
+}
+
 }  // namespace Wifi
 }  // namespace OHOS

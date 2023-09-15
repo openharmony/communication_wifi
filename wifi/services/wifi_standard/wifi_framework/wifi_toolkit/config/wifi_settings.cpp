@@ -1862,6 +1862,17 @@ int WifiSettings::SetStaApExclusionType(int type)
     SyncWifiConfig();
     return 0;
 }
+
+void WifiSettings::SetDeviceProvisionState(const int &state)
+{
+    mDeviceProvision = state;
+}
+
+int WifiSettings::GetDeviceProvisionState() const
+{
+    return mDeviceProvision;
+}
+
 #ifdef SUPPORT_RANDOM_MAC_ADDR
 static std::string GetPairMacAddress(std::map<WifiMacAddrInfo,
     std::string>& macAddrInfoMap, const WifiMacAddrInfo &macAddrInfo)

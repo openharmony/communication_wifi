@@ -138,7 +138,7 @@ void WifiDeviceServiceImpl::OnStart()
 #ifndef OHOS_ARCH_LITE
     // Get airplane mode by datashare
     WifiManager::GetInstance().GetAirplaneModeByDatashare();
-
+    WifiManager::GetInstance().GetDeviceProvisionByDatashare();
     if (eventSubscriber_ == nullptr && appEventTimerId == 0) {
         TimeOutCallback timeoutCallback = std::bind(&WifiDeviceServiceImpl::RegisterAppRemoved, this);
         WifiTimer::GetInstance()->Register(timeoutCallback, appEventTimerId, TIMEOUT_APP_EVENT, false);

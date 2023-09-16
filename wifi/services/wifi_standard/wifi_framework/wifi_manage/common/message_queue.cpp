@@ -145,7 +145,8 @@ InternalMessage *MessageQueue::GetNextMessage()
             return nullptr;
         }
 
-        int64_t nowTime = static_cast<int64_t>(curTime.tv_sec) * TIME_USEC_1000 + curTime.tv_usec / TIME_USEC_1000;
+        int64_t nowTime = static_cast<int64_t>(curTime.tv_sec) * TIME_USEC_1000 +
+            curTime.tv_nsec / (TIME_USEC_1000 * TIME_USEC_1000);
         {
             std::unique_lock<std::mutex> lck(mMtxQueue); // Data queue lock
             InternalMessage *curMsg = pMessageQueue;

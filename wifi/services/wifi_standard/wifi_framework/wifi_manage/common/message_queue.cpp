@@ -17,6 +17,7 @@
 #include <cinttypes>
 #include <sys/time.h>
 #include <thread>
+#include <time.h>
 #include "wifi_log.h"
 
 #undef LOG_TAG
@@ -138,13 +139,14 @@ InternalMessage *MessageQueue::GetNextMessage()
 
     while (!mNeedQuit) {
         /* Obtains the current time, accurate to milliseconds. */
-        struct timeval curTime = {0, 0};
-        if (gettimeofday(&curTime, nullptr) != 0) {
-            LOGE("gettimeofday failed.");
+        struct timespec curTime = {0};
+        if (clock_gettime(CLOCK_MONOTONIC, &curTime) != 0) {
+            LOGE("clock_gettime failed.");
             return nullptr;
         }
 
-        int64_t nowTime = static_cast<int64_t>(curTime.tv_sec) * TIME_USEC_1000 + curTime.tv_usec / TIME_USEC_1000;
+        int64_t nowTime = static_cast<int64_t>(curTime.tv_sec) * TIME_USEC_1000 +
+            curTime.tv_nsec / (TIME_USEC_1000 * TIME_USEC_1000);
         {
             std::unique_lock<std::mutex> lck(mMtxQueue); // Data queue lock
             InternalMessage *curMsg = pMessageQueue;

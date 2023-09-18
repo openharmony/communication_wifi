@@ -17,7 +17,6 @@
 #include <cinttypes>
 #include <sys/time.h>
 #include <thread>
-#include <time.h>
 #include "wifi_log.h"
 
 #undef LOG_TAG
@@ -139,7 +138,7 @@ InternalMessage *MessageQueue::GetNextMessage()
 
     while (!mNeedQuit) {
         /* Obtains the current time, accurate to milliseconds. */
-        struct timespec curTime = {0};
+        struct timespec curTime = {0, 0};
         if (clock_gettime(CLOCK_MONOTONIC, &curTime) != 0) {
             LOGE("clock_gettime failed.");
             return nullptr;

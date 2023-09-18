@@ -32,28 +32,18 @@ StandByListerner::StandByListerner()
 StandByListerner::~StandByListerner()
 {}
 
-bool StandByListerner::Init()
+void StandByListerner::Init()
 {
-    std::unique_lock<std::mutex> lock(standyMutex);
-    if (standbySubscriber) {
-        return false;
-    }
-    OHOS::EventFwk::MatchingSkills matchingSkills;
-    matchingSkills.AddEvent(OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_DEVICE_IDLE_MODE_CHANGED);
-    EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
-    standbySubscriber = std::make_shared<StandBySubscriber>(subscriberInfo, OnStandbyStateChanged);
-    if (!OHOS::EventFwk::CommonEventManager::SubscribeCommonEvent(standbySubscriber)) {
-        WIFI_LOGE("fail to SubscribeCommonEvent");
-        standbySubscriber = nullptr;
-    }
-    return true;
+    WIFI_LOGI("Enter StandByListerner::Init.\n");
+    RegisterStandByEvent();
+    return;
 }
 
 void StandByListerner::Unit()
 {
-    if (!OHOS::EventFwk::CommonEventManager::UnSubscribeCommonEvent(standbySubscriber)) {
-        WIFI_LOGE("fail to UnSubscribeCommonEvent");
-    }
+    WIFI_LOGI("Enter StandByListerner::Unit.\n");
+    UnRegisterStandByEvent();
+    return;
 }
 
 bool StandByListerner::AllowScan()
@@ -78,6 +68,40 @@ StandBySubscriber::StandBySubscriber(const OHOS::EventFwk::CommonEventSubscribeI
 StandBySubscriber::~StandBySubscriber()
 {
     WIFI_LOGI("~StandBySubscriber enter");
+}
+
+void StandByListerner::RegisterStandByEvent()
+{
+    std::unique_lock<std::mutex> lock(standByEventMutex);
+    if (standBySubscriber_) {
+        WIFI_LOGI("standBySubscriber_ already exist!");
+        return;
+    }
+    OHOS::EventFwk::MatchingSkills matchingSkills;
+    matchingSkills.AddEvent(OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_DEVICE_IDLE_MODE_CHANGED);
+    EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
+    standBySubscriber_ = std::make_shared<StandBySubscriber>(subscriberInfo, OnStandbyStateChanged);
+    if (!EventFwk::CommonEventManager::SubscribeCommonEvent(standBySubscriber_)) {
+        WIFI_LOGE("StandByEvent SubscribeCommonEvent() failed");
+        standBySubscriber_ = nullptr;
+    } else {
+        WIFI_LOGI("StandByEvent SubscribeCommonEvent() OK");
+    }
+}
+
+void StandByListerner::UnRegisterStandByEvent()
+{
+    std::unique_lock<std::mutex> lock(standByEventMutex);
+    if (!standBySubscriber_) {
+        WIFI_LOGI("standBySubscriber_ already nonexistent!");
+        return;
+    }
+    if (!EventFwk::CommonEventManager::UnSubscribeCommonEvent(standBySubscriber_)) {
+        WIFI_LOGE("StandByEvent UnSubscribeCommonEvent() failed");
+    } else {
+        WIFI_LOGI("StandByEvent UnSubscribeCommonEvent() OK");
+    }
+    standBySubscriber_ = nullptr;
 }
 
 void StandBySubscriber::OnReceiveEvent(const OHOS::EventFwk::CommonEventData &event)

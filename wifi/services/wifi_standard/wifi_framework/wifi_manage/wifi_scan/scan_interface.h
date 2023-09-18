@@ -17,6 +17,7 @@
 #define OHOS_WIFI_SCAN_INTERFACE_H
 
 #include <map>
+#include <mutex>
 #include "define.h"
 #include "iscan_service.h"
 #include "scan_service.h"
@@ -158,9 +159,18 @@ public:
      * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
      */
     ErrCode CloseScanOnly();
+    /**
+     * @Description  OnSystemAbilityChanged
+     *
+     * @param systemAbilityId system ability id
+     * @param add true or false
+     * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
+     */
+    ErrCode OnSystemAbilityChanged(int systemAbilityId, bool add);
 private:
     ScanService *pScanService;
     IScanSerivceCallbacks mScanSerivceCallbacks;
+    std::mutex mutex;
 };
 }  // namespace Wifi
 }  // namespace OHOS

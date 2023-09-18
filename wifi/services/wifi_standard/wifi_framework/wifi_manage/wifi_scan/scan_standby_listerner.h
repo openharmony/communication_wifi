@@ -44,9 +44,8 @@ public:
     /**
      * @Description  Initializing the StandByListerner.
      *
-     * @return success: true, failed: false
      */
-    bool Init();
+    void Init();
     /**
      * @Description Unit the StandByListerner.
      *
@@ -67,10 +66,21 @@ public:
      */
     static void OnStandbyStateChanged(bool napped, bool sleeping);
 
+    /**
+     * @Description register standby event
+     *
+     */
+    void RegisterStandByEvent();
+
+    /**
+     * @Description unregister standby event
+     *
+     */
+    void UnRegisterStandByEvent();
 private:
     static bool allowScan;
-    std::shared_ptr<StandBySubscriber> standbySubscriber = nullptr;
-    std::mutex standyMutex;
+    std::shared_ptr<StandBySubscriber> standBySubscriber_ = nullptr;
+    std::mutex standByEventMutex;
 };
 }  // namespace Wifi
 }  // namespace OHOS

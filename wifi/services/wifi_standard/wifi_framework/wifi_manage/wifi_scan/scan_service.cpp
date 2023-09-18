@@ -101,9 +101,7 @@ bool ScanService::InitScanService(const IScanSerivceCallbacks &scanSerivceCallba
         return false;
     }
 #ifndef OHOS_ARCH_LITE
-    if (standByListerner.Init()) {
-        WIFI_LOGE("standByListerner Init failed.");
-    }
+    standByListerner.Init();
 #endif
 
     if ((WifiStaHalInterface::GetInstance().GetSupportFrequencies(SCAN_BAND_24_GHZ, freqs2G) != WIFI_IDL_OPT_OK) ||
@@ -2347,6 +2345,26 @@ ErrCode ScanService::CloseScanOnly() const
 {
     WIFI_LOGI("Enter ScanService::CloseScanOnly.\n");
     mScanSerivceCallbacks.OnCloseScanOnlyRes(OperateResState::CLOSE_SCAN_ONLY_SUCCEED);
+    return WIFI_OPT_SUCCESS;
+}
+
+ErrCode ScanService::OnSystemAbilityChanged(int systemAbilityId, bool add)
+{
+    WIFI_LOGI("Enter ScanService::OnSystemAbilityChanged, id[%{public}d], mode=[%{public}d]!",
+        systemAbilityId, add);
+#ifndef OHOS_ARCH_LITE
+    if (systemAbilityId != COMMON_EVENT_SERVICE_ID) {
+        WIFI_LOGE("systemAbilityId param is error");
+        return WIFI_OPT_INVALID_PARAM;
+    }
+
+    if (add) {
+        standByListerner.RegisterStandByEvent();
+    } else {
+        standByListerner.UnRegisterStandByEvent();
+    }
+#endif
+
     return WIFI_OPT_SUCCESS;
 }
 

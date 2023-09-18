@@ -51,9 +51,14 @@ bool StandByListerner::Init()
 
 void StandByListerner::Unit()
 {
+    std::unique_lock<std::mutex> lock(standyMutex);
+    if (!standbySubscriber) {
+        return;
+    }
     if (!OHOS::EventFwk::CommonEventManager::UnSubscribeCommonEvent(standbySubscriber)) {
         WIFI_LOGE("fail to UnSubscribeCommonEvent");
     }
+    standbySubscriber = nullptr;
 }
 
 bool StandByListerner::AllowScan()

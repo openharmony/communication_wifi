@@ -34,21 +34,31 @@ StandByListerner::~StandByListerner()
 
 bool StandByListerner::Init()
 {
+    std::unique_lock<std::mutex> lock(standyMutex);
+    if (standbySubscriber) {
+        return false;
+    }
     OHOS::EventFwk::MatchingSkills matchingSkills;
     matchingSkills.AddEvent(OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_DEVICE_IDLE_MODE_CHANGED);
     EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
     standbySubscriber = std::make_shared<StandBySubscriber>(subscriberInfo, OnStandbyStateChanged);
     if (!OHOS::EventFwk::CommonEventManager::SubscribeCommonEvent(standbySubscriber)) {
         WIFI_LOGE("fail to SubscribeCommonEvent");
+        standbySubscriber = nullptr;
     }
     return true;
 }
 
 void StandByListerner::Unit()
 {
+    std::unique_lock<std::mutex> lock(standyMutex);
+    if (!standbySubscriber) {
+        return;
+    }
     if (!OHOS::EventFwk::CommonEventManager::UnSubscribeCommonEvent(standbySubscriber)) {
         WIFI_LOGE("fail to UnSubscribeCommonEvent");
     }
+    standbySubscriber = nullptr;
 }
 
 bool StandByListerner::AllowScan()

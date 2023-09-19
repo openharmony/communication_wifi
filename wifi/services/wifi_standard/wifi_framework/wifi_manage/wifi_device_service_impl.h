@@ -201,6 +201,8 @@ private:
     std::shared_ptr<ThermalLevelSubscriber> thermalLevelSubscriber_ = nullptr;
     uint32_t appEventTimerId{0};
     uint32_t thermalTimerId{0};
+    std::mutex appEventMutex;
+    std::mutex thermalEventMutex;
 #endif
     static std::mutex g_instanceLock;
     static bool isServiceStart;

@@ -275,10 +275,13 @@ private:
 private:
     std::thread mCloseServiceThread;
     std::mutex mMutex;
+    std::mutex screenEventMutex;
     std::condition_variable mCondition;
     std::deque<WifiCloseServiceCode> mEventQue;
     StaServiceCallback mStaCallback;
     IScanSerivceCallbacks mScanCallback;
+    std::mutex airplaneModeEventMutex;
+    std::mutex locationEventMutex;
 #ifndef OHOS_ARCH_LITE
     static uint32_t unloadStaSaTimerId;
     static std::mutex unloadStaSaTimerMutex;

@@ -45,9 +45,11 @@ constexpr int STA_DISABLED_MODE = 4;
 constexpr int CMD_NETWORK_CONNECT_TIMEOUT = 0X01;
 constexpr int CMD_SIGNAL_POLL = 0X02;
 constexpr int CMD_START_NETCHECK = 0X03;
+constexpr int CMD_START_GET_DHCP_IP_TIMEOUT = 0X04;
 
 constexpr int STA_NETWORK_CONNECTTING_DELAY = 20 * 1000;
 constexpr int STA_SIGNAL_POLL_DELAY = 3 * 1000;
+constexpr int STA_SIGNAL_START_GET_DHCP_IP_DELAY = 30 * 1000;
 
 /* pincode length */
 constexpr int PIN_CODE_LEN = 8;
@@ -731,6 +733,13 @@ private:
      * @param msg - Message body received by the state machine[in]
      */
     void DealNetworkCheck(InternalMessage *msg);
+
+    /**
+     * @Description : Deal get dhcp ip timeout.
+     *
+     * @param msg - Message body received by the state machine[in]
+     */
+    void DealGetDhcpIpTimeout(InternalMessage *msg);
 #ifndef OHOS_ARCH_LITE
     /**
      * @Description Subscribe system ability changed.

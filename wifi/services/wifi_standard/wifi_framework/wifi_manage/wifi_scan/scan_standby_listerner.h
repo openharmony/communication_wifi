@@ -72,6 +72,7 @@ public:
 private:
     static bool allowScan;
     std::shared_ptr<StandBySubscriber> standbySubscriber = nullptr;
+    std::mutex standyMutex;
 };
 }  // namespace Wifi
 }  // namespace OHOS

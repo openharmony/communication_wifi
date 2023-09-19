@@ -1479,12 +1479,17 @@ int32_t WifiDeviceServiceImpl::Dump(int32_t fd, const std::vector<std::u16string
 
 void WifiDeviceServiceImpl::RegisterAppRemoved()
 {
+    std::unique_lock<std::mutex> lock(appEventMutex);
+    if (eventSubscriber_) {
+        return;
+    }
     OHOS::EventFwk::MatchingSkills matchingSkills;
     matchingSkills.AddEvent(OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_PACKAGE_REMOVED);
     EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
     eventSubscriber_ = std::make_shared<AppEventSubscriber>(subscriberInfo);
     if (!EventFwk::CommonEventManager::SubscribeCommonEvent(eventSubscriber_)) {
         WIFI_LOGE("AppEvent SubscribeCommonEvent() failed");
+        eventSubscriber_ = nullptr;
     } else {
         WIFI_LOGI("AppEvent SubscribeCommonEvent() OK");
         WifiTimer::GetInstance()->UnRegister(appEventTimerId);
@@ -1493,6 +1498,10 @@ void WifiDeviceServiceImpl::RegisterAppRemoved()
 
 void WifiDeviceServiceImpl::UnRegisterAppRemoved()
 {
+    std::unique_lock<std::mutex> lock(appEventMutex);
+    if (!eventSubscriber_) {
+        return;
+    }
     if (!EventFwk::CommonEventManager::UnSubscribeCommonEvent(eventSubscriber_)) {
         WIFI_LOGE("AppEvent UnSubscribeCommonEvent() failed");
     } else {
@@ -1503,12 +1512,17 @@ void WifiDeviceServiceImpl::UnRegisterAppRemoved()
 
 void WifiDeviceServiceImpl::RegisterThermalLevel()
 {
+    std::unique_lock<std::mutex> lock(thermalEventMutex);
+    if (thermalLevelSubscriber_) {
+        return;
+    }
     OHOS::EventFwk::MatchingSkills matchingSkills;
     matchingSkills.AddEvent(OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_THERMAL_LEVEL_CHANGED);
     EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
     thermalLevelSubscriber_ = std::make_shared<ThermalLevelSubscriber>(subscriberInfo);
     if (!EventFwk::CommonEventManager::SubscribeCommonEvent(thermalLevelSubscriber_)) {
         WIFI_LOGE("THERMAL_LEVEL_CHANGED SubscribeCommonEvent() failed");
+        thermalLevelSubscriber_ = nullptr;
     } else {
         WIFI_LOGI("THERMAL_LEVEL_CHANGED SubscribeCommonEvent() OK");
         WifiTimer::GetInstance()->UnRegister(thermalTimerId);
@@ -1517,6 +1531,10 @@ void WifiDeviceServiceImpl::RegisterThermalLevel()
 
 void WifiDeviceServiceImpl::UnRegisterThermalLevel()
 {
+    std::unique_lock<std::mutex> lock(thermalEventMutex);
+    if (!thermalLevelSubscriber_) {
+        return;
+    }
     if (!EventFwk::CommonEventManager::UnSubscribeCommonEvent(thermalLevelSubscriber_)) {
         WIFI_LOGE("THERMAL_LEVEL_CHANGED UnSubscribeCommonEvent() failed");
     } else {

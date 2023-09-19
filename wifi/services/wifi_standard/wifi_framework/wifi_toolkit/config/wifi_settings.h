@@ -1315,6 +1315,20 @@ public:
      * @return int - 0 success
      */
     int SetStaApExclusionType(int type);
+    /**
+     * @Description Set the Device Provision State
+     *
+     * @param state - 1 open; 2 close
+     */
+    void SetDeviceProvisionState(const int &state);
+
+    /**
+     * @Description Get the Device Provision State
+     *
+     * @return int - 1 open; 2 close
+     */
+    int GetDeviceProvisionState() const;
+
 #ifdef SUPPORT_RANDOM_MAC_ADDR
     /**
      * @Description generate a MAC address
@@ -1422,6 +1436,7 @@ private:
     int mScreenState;            /* 1 MODE_STATE_OPEN, 2 MODE_STATE_CLOSE */
     int mThermalLevel;           /* 1 COOL, 2 NORMAL, 3 WARM, 4 HOT, 5 OVERHEATED, 6 WARNING, 7 EMERGENCY */
     std::atomic<int> mAirplaneModeState;      /* 1 on 2 off */
+    int mDeviceProvision;      /* 1 on 2 off */
     ScanMode mAppRunningModeState; /* 0 app for 1 app back 2 sys for 3 sys back */
     int mPowerSavingModeState;   /* 1 on 2 off */
     std::string mAppPackageName;

@@ -38,7 +38,7 @@ constexpr int MAX_TIME = 65546;
 HWTEST_F(WifiIdlClientTest, StartWifiTest, TestSize.Level1)
 {
     WifiErrorNo err = mClient.StartWifi();
-    EXPECT_TRUE(err == WIFI_IDL_OPT_CONN_SUPPLICANT_FAILED || err = WIFI_IDL_OPT_OK);
+    EXPECT_TRUE(err == WIFI_IDL_OPT_CONN_SUPPLICANT_FAILED || err == WIFI_IDL_OPT_OK);
 }
 
 HWTEST_F(WifiIdlClientTest, GetStaDeviceMacAddressTest, TestSize.Level1)
@@ -313,7 +313,7 @@ HWTEST_F(WifiIdlClientTest, ReqStartPnoScanTest, TestSize.Level1)
 HWTEST_F(WifiIdlClientTest, StopWifiTest, TestSize.Level1)
 {
     WifiErrorNo err = mClient.StopWifi();
-    EXPECT_TRUE(err == WIFI_IDL_OPT_FAILED || err = WIFI_IDL_OPT_OK);
+    EXPECT_TRUE(err == WIFI_IDL_OPT_FAILED || err == WIFI_IDL_OPT_OK);
 }
 
 HWTEST_F(WifiIdlClientTest, AddBlockByMacTest, TestSize.Level1)

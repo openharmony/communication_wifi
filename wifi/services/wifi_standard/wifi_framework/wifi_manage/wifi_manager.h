@@ -196,6 +196,7 @@ public:
 
     void RegisterCfgMonitorCallback(WifiCfgMonitorEventCallback callback);
     void GetAirplaneModeByDatashare();
+    void GetDeviceProvisionByDatashare();
     void DealOpenAirplaneModeEvent();
     void DealCloseAirplaneModeEvent();
     void DealLocationModeChangeEvent();
@@ -310,6 +311,8 @@ private:
     uint32_t airplaneModeTimerId{0};
     void RegisterLocationEvent();
     void UnRegisterLocationEvent();
+    void RegisterDeviceProvisionEvent();
+    void UnRegisterDeviceProvisionEvent();
     uint32_t locationTimerId{0};
 #endif
     InitStatus mInitStatus;

@@ -52,6 +52,7 @@ const uint32_t TIMEOUT_UNLOAD_WIFI_SA = 5 * 60 * 1000;
 using TimeOutCallback = std::function<void()>;
 
 static sptr<WifiLocationModeObserver> locationModeObserver_ = nullptr;
+static sptr<WifiDeviceProvisionObserver> deviceProvisionObserver_ = nullptr;
 #endif
 
 WifiManager &WifiManager::GetInstance()
@@ -554,6 +555,7 @@ int WifiManager::Init()
     pthread_setname_np(mCloseServiceThread.native_handle(), "WifiCloseThread");
     
 #ifndef OHOS_ARCH_LITE
+    RegisterDeviceProvisionEvent();
     if (screenEventSubscriber_ == nullptr && screenTimerId == 0) {
         TimeOutCallback timeoutCallback = std::bind(&WifiManager::RegisterScreenEvent, this);
         WifiTimer::GetInstance()->Register(timeoutCallback, screenTimerId, TIMEOUT_SCREEN_EVENT, false);
@@ -659,6 +661,9 @@ void WifiManager::Exit()
 
     if (locationModeObserver_ != nullptr) {
         UnRegisterLocationEvent();
+    }
+    if (deviceProvisionObserver_ != nullptr) {
+        UnRegisterDeviceProvisionEvent();
     }
 #endif
     return;
@@ -1886,7 +1891,6 @@ void WifiManager::DealOpenAirplaneModeEvent()
     }
 
     AutoStopStaService(AutoStartOrStopServiceReason::AIRPLANE_MODE);
-    AutoStopScanOnly();
 }
 
 void WifiManager::DealCloseAirplaneModeEvent()
@@ -1926,7 +1930,6 @@ void WifiManager::DealCloseAirplaneModeEvent()
         }
 #endif
     }
-    AutoStartScanOnly();
 #ifdef FEATURE_AP_SUPPORT
     if (WifiConfigCenter::GetInstance().GetHotspotState() == static_cast<int>(ApState::AP_STATE_CLOSED)) {
         std::unique_lock<std::mutex> lock(unloadHotspotSaTimerMutex);
@@ -1960,6 +1963,31 @@ void WifiManager::GetAirplaneModeByDatashare()
     if (airplaneMode.compare("1") == 0) {
         WifiConfigCenter::GetInstance().SetAirplaneModeState(MODE_STATE_OPEN);
     }
+    return;
+}
+
+void WifiManager::GetDeviceProvisionByDatashare()
+{
+    auto datashareHelper = DelayedSingleton<WifiDataShareHelperUtils>::GetInstance();
+    if (datashareHelper == nullptr) {
+        WIFI_LOGE("GetDeviceProvisionByDatashare, datashareHelper is nullprt!");
+        return;
+    }
+
+    std::string provision;
+    Uri uri(SETTINGS_DATASHARE_URI_DEVICE_PROVISIONED);
+    int ret = datashareHelper->Query(uri, SETTINGS_DATASHARE_KEY_DEVICE_PROVISIONED, provision);
+    if (ret != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("GetDeviceProvisionByDatashare, Query provision fail!");
+        return;
+    }
+
+    WIFI_LOGI("GetDeviceProvisionByDatashare, provision:%{public}s", provision.c_str());
+    if (provision.compare("1") == 0) {
+        WifiConfigCenter::GetInstance().SetDeviceProvisionState(MODE_STATE_CLOSE);
+        return;
+    }
+    WifiConfigCenter::GetInstance().SetDeviceProvisionState(MODE_STATE_OPEN);
     return;
 }
 
@@ -2016,6 +2044,41 @@ void WifiManager::UnRegisterLocationEvent()
     Uri uri(SETTINGS_DATASHARE_URI_LOCATION_MODE);
     datashareHelper->UnRegisterObserver(uri, locationModeObserver_);
     locationModeObserver_ = nullptr;
+}
+
+void WifiManager::RegisterDeviceProvisionEvent()
+{
+    if (deviceProvisionObserver_) {
+        return;
+    }
+
+    auto datashareHelper = DelayedSingleton<WifiDataShareHelperUtils>::GetInstance();
+    if (datashareHelper == nullptr) {
+        WIFI_LOGE("RegisterDeviceProvisionEvent datashareHelper is nullptr");
+        return;
+    }
+    WIFI_LOGI("RegisterDeviceProvisionEvent");
+    deviceProvisionObserver_ = sptr<WifiDeviceProvisionObserver>(new (std::nothrow)WifiDeviceProvisionObserver());
+    Uri uri(SETTINGS_DATASHARE_URI_DEVICE_PROVISIONED);
+    datashareHelper->RegisterObserver(uri, deviceProvisionObserver_);
+}
+
+void WifiManager::UnRegisterDeviceProvisionEvent()
+{
+    if (deviceProvisionObserver_ == nullptr) {
+        WIFI_LOGE("UnRegisterLocationEvent deviceProvisionObserver_ is nullptr");
+        return;
+    }
+
+    auto datashareHelper = DelayedSingleton<WifiDataShareHelperUtils>::GetInstance();
+    if (datashareHelper == nullptr) {
+        WIFI_LOGE("UnRegisterLocationEvent datashareHelper is nullptr");
+        return;
+    }
+    WIFI_LOGI("UnRegisterDeviceProvisionEvent");
+    Uri uri(SETTINGS_DATASHARE_URI_DEVICE_PROVISIONED);
+    datashareHelper->UnRegisterObserver(uri, deviceProvisionObserver_);
+    deviceProvisionObserver_ = nullptr;
 }
 
 void WifiManager::DealLocationModeChangeEvent()

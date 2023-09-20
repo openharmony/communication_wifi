@@ -271,6 +271,14 @@ public:
      * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
      */
     virtual ErrCode CloseScanOnly() const;
+    /**
+     * @Description OnSystemAbilityChanged
+     *
+     * @param systemAbilityId system ability id
+     * @param add true or false
+     * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_INVALID_PARAM
+     */
+    virtual ErrCode OnSystemAbilityChanged(int systemAbilityId, bool add);
 
 private:
     using ScanConfigMap = std::map<int, StoreScanConfig>;

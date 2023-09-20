@@ -25,6 +25,7 @@ ScanInterface::ScanInterface() : pScanService(nullptr)
 ScanInterface::~ScanInterface()
 {
     WIFI_LOGI("Enter ScanInterface::~ScanInterface.");
+    std::lock_guard<std::mutex> lock(mutex);
     if (pScanService != nullptr) {
         delete pScanService;
         pScanService = nullptr;
@@ -45,6 +46,7 @@ ErrCode ScanInterface::Init()
 {
     WIFI_LOGI("Enter ScanInterface::Init.\n");
 
+    std::lock_guard<std::mutex> lock(mutex);
     pScanService = new (std::nothrow)ScanService();
     if (pScanService == nullptr) {
         WIFI_LOGE("New ScanService failed.\n");
@@ -64,6 +66,7 @@ ErrCode ScanInterface::Init()
 ErrCode ScanInterface::UnInit()
 {
     WIFI_LOGI("Enter ScanInterface::UnInit.\n");
+    std::lock_guard<std::mutex> lock(mutex);
     CHECK_NULL_AND_RETURN(pScanService, WIFI_OPT_FAILED);
     pScanService->UnInitScanService();
     return WIFI_OPT_SUCCESS;
@@ -72,6 +75,7 @@ ErrCode ScanInterface::UnInit()
 ErrCode ScanInterface::Scan(bool externFlag)
 {
     WIFI_LOGI("Enter ScanInterface::Scan\n");
+    std::lock_guard<std::mutex> lock(mutex);
     CHECK_NULL_AND_RETURN(pScanService, WIFI_OPT_FAILED);
     return pScanService->Scan(externFlag);
 }
@@ -79,6 +83,7 @@ ErrCode ScanInterface::Scan(bool externFlag)
 ErrCode ScanInterface::ScanWithParam(const WifiScanParams &wifiScanParams)
 {
     WIFI_LOGI("Enter ScanInterface::ScanWithParam\n");
+    std::lock_guard<std::mutex> lock(mutex);
     CHECK_NULL_AND_RETURN(pScanService, WIFI_OPT_FAILED);
     return pScanService->ScanWithParam(wifiScanParams);
 }
@@ -86,6 +91,7 @@ ErrCode ScanInterface::ScanWithParam(const WifiScanParams &wifiScanParams)
 ErrCode ScanInterface::DisableScan(bool disable)
 {
     WIFI_LOGI("Enter ScanInterface::DisableScan, disable=%{public}d.", disable);
+    std::lock_guard<std::mutex> lock(mutex);
     CHECK_NULL_AND_RETURN(pScanService, WIFI_OPT_FAILED);
     return pScanService->DisableScan(disable);
 }
@@ -98,6 +104,7 @@ ErrCode ScanInterface::OnScreenStateChanged(int screenState)
         WIFI_LOGE("screenState param is error");
         return WIFI_OPT_INVALID_PARAM;
     }
+    std::lock_guard<std::mutex> lock(mutex);
     CHECK_NULL_AND_RETURN(pScanService, WIFI_OPT_FAILED);
     pScanService->HandleScreenStatusChanged();
     return WIFI_OPT_SUCCESS;
@@ -106,6 +113,7 @@ ErrCode ScanInterface::OnScreenStateChanged(int screenState)
 ErrCode ScanInterface::OnClientModeStatusChanged(int staStatus)
 {
     WIFI_LOGI("Enter ScanInterface::OnClientModeStatusChanged, staStatus=%{public}d.", staStatus);
+    std::lock_guard<std::mutex> lock(mutex);
     CHECK_NULL_AND_RETURN(pScanService, WIFI_OPT_FAILED);
     pScanService->HandleStaStatusChanged(staStatus);
     pScanService->SetStaCurrentTime();
@@ -121,6 +129,7 @@ ErrCode ScanInterface::OnAppRunningModeChanged(ScanMode appRunMode)
 ErrCode ScanInterface::OnMovingFreezeStateChange()
 {
     LOGI("Enter ScanInterface::OnMovingFreezeStateChange");
+    std::lock_guard<std::mutex> lock(mutex);
     CHECK_NULL_AND_RETURN(pScanService, WIFI_OPT_FAILED);
     pScanService->HandleMovingFreezeChanged();
     return WIFI_OPT_SUCCESS;
@@ -134,6 +143,7 @@ ErrCode ScanInterface::OnCustomControlStateChanged(int customScene, int customSc
         WIFI_LOGE("screenState param is error");
         return WIFI_OPT_INVALID_PARAM;
     }
+    std::lock_guard<std::mutex> lock(mutex);
     CHECK_NULL_AND_RETURN(pScanService, WIFI_OPT_FAILED);
     pScanService->HandleCustomStatusChanged(customScene, customSceneStatus);
     return WIFI_OPT_SUCCESS;
@@ -150,6 +160,7 @@ ErrCode ScanInterface::OnGetCustomSceneState(std::map<int, time_t>& sceneMap) co
 ErrCode ScanInterface::OnControlStrategyChanged()
 {
     WIFI_LOGI("Enter ScanInterface::OnControlStrategyChanged\n");
+    std::lock_guard<std::mutex> lock(mutex);
     CHECK_NULL_AND_RETURN(pScanService, WIFI_OPT_FAILED);
     pScanService->ClearScanControlValue();
     pScanService->GetScanControlInfo();
@@ -166,6 +177,7 @@ ErrCode ScanInterface::RegisterScanCallbacks(const IScanSerivceCallbacks &scanSe
 ErrCode ScanInterface::SetEnhanceService(IEnhanceService *enhanceService)
 {
     WIFI_LOGI("Enter ScanInterface::SetEnhanceService\n");
+    std::lock_guard<std::mutex> lock(mutex);
     CHECK_NULL_AND_RETURN(pScanService, WIFI_OPT_FAILED);
     pScanService->SetEnhanceService(enhanceService);
     return WIFI_OPT_SUCCESS;
@@ -174,6 +186,8 @@ ErrCode ScanInterface::SetEnhanceService(IEnhanceService *enhanceService)
 ErrCode ScanInterface::StartWpa()
 {
     WIFI_LOGI("Enter ScanInterface::StartWpa.\n");
+    std::lock_guard<std::mutex> lock(mutex);
+    CHECK_NULL_AND_RETURN(pScanService, WIFI_OPT_FAILED);
     if (pScanService->StartWpa() != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("StartWpa failed.\n");
         return WIFI_OPT_FAILED;
@@ -184,6 +198,8 @@ ErrCode ScanInterface::StartWpa()
 ErrCode ScanInterface::CloseWpa()
 {
     WIFI_LOGI("Enter ScanInterface::CloseWpa.\n");
+    std::lock_guard<std::mutex> lock(mutex);
+    CHECK_NULL_AND_RETURN(pScanService, WIFI_OPT_FAILED);
     if (pScanService->CloseWpa() != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("CloseWpa failed.\n");
         return WIFI_OPT_FAILED;
@@ -194,6 +210,8 @@ ErrCode ScanInterface::CloseWpa()
 ErrCode ScanInterface::OpenScanOnly()
 {
     WIFI_LOGI("Enter ScanInterface::OpenScanOnly.\n");
+    std::lock_guard<std::mutex> lock(mutex);
+    CHECK_NULL_AND_RETURN(pScanService, WIFI_OPT_FAILED);
     if (pScanService->OpenScanOnly() != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("OpenScanOnly failed.\n");
         CloseScanOnly();
@@ -205,6 +223,7 @@ ErrCode ScanInterface::OpenScanOnly()
 ErrCode ScanInterface::CloseScanOnly()
 {
     LOGI("Enter ScanInterface::CloseScanOnly.\n");
+    std::lock_guard<std::mutex> lock(mutex);
     CHECK_NULL_AND_RETURN(pScanService, WIFI_OPT_FAILED);
     if (pScanService->CloseScanOnly() != WIFI_OPT_SUCCESS) {
         LOGE("CloseScanOnly failed.\n");
@@ -212,5 +231,18 @@ ErrCode ScanInterface::CloseScanOnly()
     }
     return WIFI_OPT_SUCCESS;
 }
+
+ErrCode ScanInterface::OnSystemAbilityChanged(int systemAbilityId, bool add)
+{
+    WIFI_LOGI("Enter ScanInterface::OnSystemAbilityChanged.\n");
+    std::lock_guard<std::mutex> lock(mutex);
+    CHECK_NULL_AND_RETURN(pScanService, WIFI_OPT_FAILED);
+    if (pScanService->OnSystemAbilityChanged(systemAbilityId, add) != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("OnSystemAbilityChanged() failed!");
+        return WIFI_OPT_FAILED;
+    }
+    return WIFI_OPT_SUCCESS;
+}
+
 }  // namespace Wifi
 }  // namespace OHOS

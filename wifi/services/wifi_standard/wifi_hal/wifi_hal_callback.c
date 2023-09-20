@@ -91,7 +91,9 @@ void WifiHalCbNotifyBssidChanged(const char *reasonPos, const char *bssidPos)
     if (reasonEnd != NULL) {
         int reasonLen = reasonEnd - reasonPos;
         reasonLen = reasonLen > WIFI_REASON_LENGTH ? WIFI_REASON_LENGTH : reasonLen;
-        (void)memcpy_s(reason, sizeof(reason), reasonPos, reasonLen);
+        if (memcpy_s(reason, sizeof(reason), reasonPos, reasonLen) != EOK) {
+            LOGW("failed to copy the reason!");
+        }
     }
 
     LOGI("bssid changed event, reason: %{public}s, bssid = %{private}s", reason, bssidPos);
@@ -100,8 +102,12 @@ void WifiHalCbNotifyBssidChanged(const char *reasonPos, const char *bssidPos)
         LOGE("create callback message failed!");
         return;
     }
-    (void)memcpy_s(pCbkMsg->msg.bssidChangedMsg.reason, WIFI_REASON_LENGTH, reason, WIFI_REASON_LENGTH);
-    (void)memcpy_s(pCbkMsg->msg.bssidChangedMsg.bssid, WIFI_MAC_LENGTH + 1, bssidPos, WIFI_MAC_LENGTH + 1);
+    if (memcpy_s(pCbkMsg->msg.bssidChangedMsg.reason, WIFI_REASON_LENGTH, reason, WIFI_REASON_LENGTH) != EOK) {
+        LOGW("failed to copy the reason!");
+    }
+    if (memcpy_s(pCbkMsg->msg.bssidChangedMsg.bssid, WIFI_MAC_LENGTH + 1, bssidPos, WIFI_MAC_LENGTH + 1) != EOK) {
+        LOGW("failed to copy the bssid!");
+    }
     EmitEventCallbackMsg(pCbkMsg, WIFI_BSSID_CHANGED_NOTIFY_EVENT);
 }
 
@@ -588,9 +594,14 @@ void P2pHalCbServiceDiscoveryResponse(const P2pServDiscRespInfo *info)
             return;
         }
         pCbkMsg->msg.serverInfo.tlvs = (char *)calloc(len, sizeof(char));
-        if (pCbkMsg->msg.serverInfo.tlvs == NULL ||
-            strncpy_s(pCbkMsg->msg.serverInfo.tlvs, len, info->tlvs, len - 1) != EOK) {
+        if (pCbkMsg->msg.serverInfo.tlvs == NULL) {
+            free(pCbkMsg);
+            pCbkMsg = NULL;
+            return;
+        }
+        if (strncpy_s(pCbkMsg->msg.serverInfo.tlvs, len, info->tlvs, len - 1) != EOK) {
             free(pCbkMsg->msg.serverInfo.tlvs);
+            pCbkMsg->msg.serverInfo.tlvs = NULL;
             free(pCbkMsg);
             pCbkMsg = NULL;
             return;
@@ -654,9 +665,14 @@ void P2pHalCbServDiscReq(const P2pServDiscReqInfo *info)
             return;
         }
         pCbkMsg->msg.serDiscReqInfo.tlvs = (char *)calloc(len, sizeof(char));
-        if (pCbkMsg->msg.serDiscReqInfo.tlvs == NULL ||
-            strncpy_s(pCbkMsg->msg.serDiscReqInfo.tlvs, len, info->tlvs, len - 1) != EOK) {
+        if (pCbkMsg->msg.serDiscReqInfo.tlvs == NULL) {
+            free(pCbkMsg);
+            pCbkMsg = NULL;
+            return;
+        }
+        if (strncpy_s(pCbkMsg->msg.serDiscReqInfo.tlvs, len, info->tlvs, len - 1) != EOK) {
             free(pCbkMsg->msg.serDiscReqInfo.tlvs);
+            pCbkMsg->msg.serDiscReqInfo.tlvs = NULL;
             free(pCbkMsg);
             pCbkMsg = NULL;
             return;

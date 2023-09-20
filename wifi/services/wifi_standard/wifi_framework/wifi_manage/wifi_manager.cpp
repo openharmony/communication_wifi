@@ -1200,6 +1200,14 @@ void WifiManager::OnSystemAbilityChanged(int systemAbilityId, bool add)
                 UnRegisterAirplaneModeEvent();
                 UnRegisterLocationEvent();
             }
+
+            WIFI_LOGI("OnSystemAbilityChanged, id[%{public}d], mode=[%{public}d]!",
+                systemAbilityId, add);
+            IScanService *pService = WifiServiceManager::GetInstance().GetScanServiceInst();
+            if (pService != nullptr) {
+                pService->OnSystemAbilityChanged(systemAbilityId, add);
+            }
+
             break;
         }
         default:

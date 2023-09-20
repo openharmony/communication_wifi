@@ -154,6 +154,14 @@ public:
      * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
      */
     virtual ErrCode CloseScanOnly() = 0;
+    /**
+     * @Description  OnSystemAbilityChanged
+     *
+     * @param systemAbilityId system ability id
+     * @param add true or false
+     * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
+     */
+    virtual ErrCode OnSystemAbilityChanged(int systemAbilityId, bool add) = 0;
 };
 }  // namespace Wifi
 }  // namespace OHOS

@@ -293,7 +293,8 @@ void WifiNetAgent::SetNetLinkRouteInfo(sptr<NetManagerStandard::NetLinkInfo> &ne
     route->destination_.address_ = "0.0.0.0";
     route->gateway_.address_ = IpTools::ConvertIpv4Address(wifiIpInfo.gateway);
     netLinkInfo->routeList_.push_back(*route);
-    LOGD("SetNetLinkRouteInfo %{public}s", wifiIpV6Info.gateway.c_str());
+    LOGD("SetNetLinkRouteInfo: gateway %{public}s, address %{public}s",
+        wifiIpV6Info.gateway.c_str(), route->gateway_.address_.c_str());
     if (!wifiIpV6Info.gateway.empty()) {
         sptr<NetManagerStandard::Route> ipv6route = (std::make_unique<NetManagerStandard::Route>()).release();
         ipv6route->iface_ = "wlan0";

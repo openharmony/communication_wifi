@@ -15,9 +15,7 @@
 
 // @ts-nocheck
 
-import Logger from '../MainAbility/model/Logger'
-
-const TAG: string = 'WifiView'
+const TAG = "[wifiView]"
 import ConfigData from '../Utils/ConfigData';
 /**
  * WifiView Component of wifi test
@@ -25,25 +23,25 @@ import ConfigData from '../Utils/ConfigData';
 
 @Component
 export struct WifiView {
-  private wifi: any = null
+  @State wifi: any = null
   private securityString: Resource = $r( 'app.string.encryption' )
   @State isLock: boolean = true
 
   aboutToAppear() {
-    Logger.debug( TAG , `aboutToAppear ${ JSON.stringify( this.wifi ) }` )
+    console.log( TAG , `aboutToAppear ${ JSON.stringify( this.wifi ) }` )
     if ( this.wifi ) {
       if ( this.wifi.securityType ) {
         if ( this.wifi.securityType === 0 || this.wifi.securityType === 1 ) {
           this.securityString = $r( 'app.string.open' )
           this.isLock = false
         } else {
-          console.log( "this.wifi.securityType /= 0 && this.wifi.securityType /= 1" )
+          console.log( TAG , "this.wifi.securityType /= 0 && this.wifi.securityType /= 1" )
         }
       } else {
-        console.log( "this.wifi.securityType is false" )
+        console.log( TAG , "this.wifi.securityType is false" )
       }
     } else {
-      console.log( "this.wifi is false" )
+      console.log( TAG , "this.wifi is false" )
     }
   }
 

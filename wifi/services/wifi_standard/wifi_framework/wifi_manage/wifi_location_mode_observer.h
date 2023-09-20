@@ -29,6 +29,15 @@ public:
     void OnChange() override;
 };
 
+class WifiDeviceProvisionObserver : public AAFwk::DataAbilityObserverStub {
+public:
+    WifiDeviceProvisionObserver() = default;
+
+    ~WifiDeviceProvisionObserver() = default;
+
+    void OnChange() override;
+};
+
 }
 }
 #endif

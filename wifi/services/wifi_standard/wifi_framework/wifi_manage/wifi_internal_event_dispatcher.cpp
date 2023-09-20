@@ -19,6 +19,7 @@
 #include "wifi_errcode.h"
 #include "wifi_common_event_helper.h"
 #include "wifi_common_util.h"
+#include "wifi_auth_center.h"
 #include "wifi_permission_utils.h"
 #ifdef FEATURE_APP_FROZEN
 #include "suspend_manager_client.h"
@@ -33,6 +34,11 @@ DEFINE_WIFILOG_LABEL("WifiInternalEventDispatcher");
 
 namespace OHOS {
 namespace Wifi {
+std::set<std::int32_t> g_CallbackEventChkSysAppList = {
+    WIFI_CBK_MSG_HOTSPOT_STATE_JOIN,
+    WIFI_CBK_MSG_HOTSPOT_STATE_LEAVE,
+    WIFI_CBK_MSG_STREAM_DIRECTION };
+
 CallbackEventPermissionMap g_CallbackEventPermissionMap = {
     { WIFI_CBK_MSG_STATE_CHANGE,
         std::make_pair(std::bind(WifiPermissionUtils::VerifyGetWifiInfoPermission),
@@ -747,7 +753,7 @@ void WifiInternalEventDispatcher::updateP2pDeviceMacAddress(std::vector<WifiP2pD
         macAddrInfo.bssid = iter->GetDeviceAddress();
         macAddrInfo.bssidType = iter->GetDeviceAddressType();
         std::string randomMacAddr =
-            WifiSettings::GetInstance().GetMacAddrPairs(WifiMacAddrInfoType::P2P_MACADDR_INFO, macAddrInfo);
+            WifiSettings::GetInstance().GetMacAddrPairs(WifiMacAddrInfoType::P2P_DEVICE_MACADDR_INFO, macAddrInfo);
         if (randomMacAddr.empty()) {
             WIFI_LOGW("%{public}s: no record found, bssid:%{private}s, bssidType:%{public}d",
                 __func__, macAddrInfo.bssid.c_str(), macAddrInfo.bssidType);
@@ -784,7 +790,8 @@ void WifiInternalEventDispatcher::SendP2pCallbackMsg(sptr<IWifiP2pCallback> &cal
             break;
         case WIFI_CBK_MSG_PEER_CHANGE:
             {
-                WIFI_LOGD("%{public}s pid: %{public}d, uid: %{public}d", __func__, pid, uid);
+                WIFI_LOGD("%{public}s pid: %{public}d, uid: %{public}d, tokenId: %{private}d",
+                    __func__, pid, uid, tokenId);
             #ifdef SUPPORT_RANDOM_MAC_ADDR
                 if ((pid != 0) && (uid != 0)) {
                     std::vector<WifiP2pDevice> deviceVec = msg.device;
@@ -913,6 +920,13 @@ void WifiInternalEventDispatcher::Run(WifiInternalEventDispatcher &instance)
 
 bool WifiInternalEventDispatcher::VerifyRegisterCallbackPermission(int callbackEventId)
 {
+    if (g_CallbackEventChkSysAppList.find(callbackEventId) != g_CallbackEventChkSysAppList.end()) {
+        if (!WifiAuthCenter::IsSystemAppByToken()) {
+            WIFI_LOGE("VerifyRegisterCallbackPermission:NOT System APP, PERMISSION_DENIED!");
+            return false;
+        }
+    }
+
     std::pair<CallbackEventPermissionMap::iterator, CallbackEventPermissionMap::iterator>
         pr = g_CallbackEventPermissionMap.equal_range(callbackEventId);
     bool hasPermission = true;

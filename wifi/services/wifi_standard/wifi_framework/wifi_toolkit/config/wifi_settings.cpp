@@ -128,6 +128,22 @@ void WifiSettings::InitP2pVendorConfig()
     return;
 }
 
+int WifiSettings::ReloadPortalconf()
+{
+    if (mSavedPortal.LoadConfig() >= 0) {
+        std::vector<WifiPortalConf> tmp;
+        mSavedPortal.GetValue(tmp);
+        if (tmp.size() > 0) {
+            mPortalUri = tmp[0];
+        } else {
+            mPortalUri.portalUri = "test";
+        }
+    } else {
+        mPortalUri.portalUri = "test";
+    }
+    return 0;
+}
+
 int WifiSettings::Init()
 {
     mCountryCode = "CN";
@@ -143,6 +159,7 @@ int WifiSettings::Init()
     mTrustListPolicies.SetConfigFilePath(WIFI_TRUST_LIST_POLICY_FILE_PATH);
     mMovingFreezePolicy.SetConfigFilePath(WIFI_MOVING_FREEZE_POLICY_FILE_PATH);
     mSavedWifiStoreRandomMac.SetConfigFilePath(WIFI_STA_RANDOM_MAC_FILE_PATH);
+    mSavedPortal.SetConfigFilePath(PORTAL_CONFIG_FILE_PATH);
     InitWifiConfig();
     ReloadDeviceConfig();
     InitHotspotConfig();
@@ -152,6 +169,7 @@ int WifiSettings::Init()
     ReloadTrustListPolicies();
     ReloadMovingFreezePolicy();
     ReloadStaRandomMac();
+    ReloadPortalconf();
 #ifdef FEATURE_ENCRYPTION_SUPPORT
     SetUpHks();
 #endif
@@ -1147,7 +1165,7 @@ int WifiSettings::GetApMaxConnNum()
 void WifiSettings::InitDefaultHotspotConfig()
 {
     HotspotConfig cfg;
-    cfg.SetSecurityType(KeyMgmt::WPA_PSK);
+    cfg.SetSecurityType(KeyMgmt::WPA2_PSK);
     cfg.SetBand(BandType::BAND_2GHZ);
     cfg.SetChannel(AP_CHANNEL_DEFAULT);
     cfg.SetMaxConn(GetApMaxConnNum());
@@ -1832,6 +1850,11 @@ int WifiSettings::GetStaApExclusionType()
     return mWifiConfig.staApExclusionType;
 }
 
+void WifiSettings::GetPortalUri(std::string &portalUri)
+{
+    portalUri = mPortalUri.portalUri;
+}
+
 int WifiSettings::SetStaApExclusionType(int type)
 {
     std::unique_lock<std::mutex> lock(mWifiConfigMutex);
@@ -1839,6 +1862,17 @@ int WifiSettings::SetStaApExclusionType(int type)
     SyncWifiConfig();
     return 0;
 }
+
+void WifiSettings::SetDeviceProvisionState(const int &state)
+{
+    mDeviceProvision = state;
+}
+
+int WifiSettings::GetDeviceProvisionState() const
+{
+    return mDeviceProvision;
+}
+
 #ifdef SUPPORT_RANDOM_MAC_ADDR
 static std::string GetPairMacAddress(std::map<WifiMacAddrInfo,
     std::string>& macAddrInfoMap, const WifiMacAddrInfo &macAddrInfo)
@@ -1983,8 +2017,12 @@ WifiMacAddrErrCode WifiSettings::AddMacAddrPairs(WifiMacAddrInfoType type,
             return InsertMacAddrPairs(mWifiScanMacAddrPair, macAddrInfo, randomMacAddr);
         case WifiMacAddrInfoType::HOTSPOT_MACADDR_INFO:
             return InsertMacAddrPairs(mHotspotMacAddrPair, macAddrInfo, randomMacAddr);
-        case WifiMacAddrInfoType::P2P_MACADDR_INFO:
-            return InsertMacAddrPairs(mP2pMacAddrPair, macAddrInfo, randomMacAddr);
+        case WifiMacAddrInfoType::P2P_DEVICE_MACADDR_INFO:
+            return InsertMacAddrPairs(mP2pDeviceMacAddrPair, macAddrInfo, randomMacAddr);
+        case WifiMacAddrInfoType::P2P_GROUPSINFO_MACADDR_INFO:
+            return InsertMacAddrPairs(mP2pGroupsInfoMacAddrPair, macAddrInfo, randomMacAddr);
+        case WifiMacAddrInfoType::P2P_CURRENT_GROUP_MACADDR_INFO:
+            return InsertMacAddrPairs(mP2pCurrentgroupMacAddrPair, macAddrInfo, randomMacAddr);
         default:
             LOGE("%{public}s: invalid mac address type, type:%{public}d", __func__, type);
             break;
@@ -2004,8 +2042,14 @@ int WifiSettings::RemoveMacAddrPairs(WifiMacAddrInfoType type, const WifiMacAddr
         case WifiMacAddrInfoType::HOTSPOT_MACADDR_INFO:
             DelMacAddrPairs(mHotspotMacAddrPair, macAddrInfo);
             break;
-        case WifiMacAddrInfoType::P2P_MACADDR_INFO:
-            DelMacAddrPairs(mP2pMacAddrPair, macAddrInfo);
+        case WifiMacAddrInfoType::P2P_DEVICE_MACADDR_INFO:
+            DelMacAddrPairs(mP2pDeviceMacAddrPair, macAddrInfo);
+            break;
+        case WifiMacAddrInfoType::P2P_GROUPSINFO_MACADDR_INFO:
+            DelMacAddrPairs(mP2pGroupsInfoMacAddrPair, macAddrInfo);
+            break;
+        case WifiMacAddrInfoType::P2P_CURRENT_GROUP_MACADDR_INFO:
+            DelMacAddrPairs(mP2pCurrentgroupMacAddrPair, macAddrInfo);
             break;
         default:
             LOGE("%{public}s: invalid mac address type, type:%{public}d", __func__, type);
@@ -2024,8 +2068,12 @@ std::string WifiSettings::GetMacAddrPairs(WifiMacAddrInfoType type, const WifiMa
             return GetPairMacAddress(mWifiScanMacAddrPair, macAddrInfo);
         case WifiMacAddrInfoType::HOTSPOT_MACADDR_INFO:
             return GetPairMacAddress(mHotspotMacAddrPair, macAddrInfo);
-        case WifiMacAddrInfoType::P2P_MACADDR_INFO:
-            return GetPairMacAddress(mP2pMacAddrPair, macAddrInfo);
+        case WifiMacAddrInfoType::P2P_DEVICE_MACADDR_INFO:
+            return GetPairMacAddress(mP2pDeviceMacAddrPair, macAddrInfo);
+        case WifiMacAddrInfoType::P2P_GROUPSINFO_MACADDR_INFO:
+            return GetPairMacAddress(mP2pGroupsInfoMacAddrPair, macAddrInfo);
+        case WifiMacAddrInfoType::P2P_CURRENT_GROUP_MACADDR_INFO:
+            return GetPairMacAddress(mP2pCurrentgroupMacAddrPair, macAddrInfo);
         default:
             LOGE("%{public}s: invalid mac address type, type:%{public}d", __func__, type);
             return "";
@@ -2043,8 +2091,14 @@ void WifiSettings::PrintMacAddrPairs(WifiMacAddrInfoType type)
         case WifiMacAddrInfoType::HOTSPOT_MACADDR_INFO:
             PrintPairMacAddress(mHotspotMacAddrPair);
             break;
-        case WifiMacAddrInfoType::P2P_MACADDR_INFO:
-            PrintPairMacAddress(mP2pMacAddrPair);
+        case WifiMacAddrInfoType::P2P_DEVICE_MACADDR_INFO:
+            PrintPairMacAddress(mP2pDeviceMacAddrPair);
+            break;
+        case WifiMacAddrInfoType::P2P_GROUPSINFO_MACADDR_INFO:
+            PrintPairMacAddress(mP2pGroupsInfoMacAddrPair);
+            break;
+        case WifiMacAddrInfoType::P2P_CURRENT_GROUP_MACADDR_INFO:
+            PrintPairMacAddress(mP2pCurrentgroupMacAddrPair);
             break;
         default:
             LOGE("%{public}s: invalid mac address type, type:%{public}d", __func__, type);
@@ -2063,8 +2117,14 @@ void WifiSettings::ClearMacAddrPairs(WifiMacAddrInfoType type)
         case WifiMacAddrInfoType::HOTSPOT_MACADDR_INFO:
             mHotspotMacAddrPair.clear();
             break;
-        case WifiMacAddrInfoType::P2P_MACADDR_INFO:
-            mP2pMacAddrPair.clear();
+        case WifiMacAddrInfoType::P2P_DEVICE_MACADDR_INFO:
+            mP2pDeviceMacAddrPair.clear();
+            break;
+        case WifiMacAddrInfoType::P2P_GROUPSINFO_MACADDR_INFO:
+            mP2pGroupsInfoMacAddrPair.clear();
+            break;
+        case WifiMacAddrInfoType::P2P_CURRENT_GROUP_MACADDR_INFO:
+            mP2pCurrentgroupMacAddrPair.clear();
             break;
         default:
             LOGE("%{public}s: invalid mac address type, type:%{public}d", __func__, type);

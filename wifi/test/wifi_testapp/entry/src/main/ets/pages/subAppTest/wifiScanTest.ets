@@ -15,19 +15,20 @@
 
 // @ts-nocheck
 
-import wifi from '@ohos.wifi'
-import { AvailableWifi } from '../../../Component/availableWifi'
+import  wifi from '@ohos.wifi'
+import { AvailableWifi } from '../../Component/availableWifi'
+import { TitleBar } from '../../Component/titleBar'
+import { WifiModel } from '../../MainAbility/model/wifiModel'
 
-import { TitleBar } from '../../../Component/titleBar'
+const TAG = '[wifiScan]'
 
-const TAG = '[wifiFound]'
-const PERMISSION_NAME: string = 'ohos.permission.LOCATION'
 /**
  * wifi Found Test Page Of Wifi test
  */
 @Entry
 @Component
-struct WifiFound {
+struct WifiScan {
+  private wifiModel: WifiModel = new WifiModel()
   private testItem: string = "Wlan扫描"
   @State linkedInfo: any = {
     ssid : "" ,
@@ -57,7 +58,7 @@ struct WifiFound {
           timestamp : result[ i ].timestamp ,
         } )
       }
-      console.log( TAG , "wifiList:" + JSON.stringify( this.wifiList ) )
+      console.log( TAG , "wifiList:" + JSON.stringify(this.wifiList) )
       setTimeout( () => {
         this.scan()
       } , 2000 )
@@ -84,6 +85,7 @@ struct WifiFound {
       }
       this.isLinked = true
       this.linkedInfo = linkedInfo
+      console.log( "getLinkedInfo this.linkedInfo:" + this.linkedInfo );
     } )
   }
 
@@ -103,10 +105,6 @@ struct WifiFound {
   }
 
   aboutToAppear() {
-    // let context = featureAbility.getContext()
-    // context.requestPermissionsFromUser( [ PERMISSION_NAME ] , 3 , function( result ) {
-    //   console.log( TAG , `wifi grantPermission,requestPermissionsFromUser,result.requestCode: ${ result }` )
-    // } )
     if ( wifi.isWifiActive() ) {
       console.log( TAG , 'wifi is active' )
       this.isSwitchOn = true

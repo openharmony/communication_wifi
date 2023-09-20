@@ -166,7 +166,7 @@ bool P2pGroupOperatingState::ProcessGroupStartedEvt(const InternalMessage &msg) 
         }
     }
     group.SetP2pGroupStatus(P2pGroupStatus::GS_STARTED);
-    p2pStateMachine.groupManager.SetCurrentGroup(group);
+    p2pStateMachine.groupManager.SetCurrentGroup(WifiMacAddrInfoType::P2P_CURRENT_GROUP_MACADDR_INFO, group);
 
     if (groupManager.GetCurrentGroup().IsGroupOwner()) {
         if (!p2pStateMachine.StartDhcpServer()) {
@@ -197,7 +197,7 @@ bool P2pGroupOperatingState::ProcessGroupRemovedEvt(const InternalMessage &msg) 
         WifiP2pGroupInfo copy = groupManager.GetCurrentGroup();
         copy.SetP2pGroupStatus(P2pGroupStatus::GS_CREATED);
         copy.SetGoIpAddress(std::string(""));
-        groupManager.SetCurrentGroup(copy);
+        groupManager.SetCurrentGroup(WifiMacAddrInfoType::P2P_CURRENT_GROUP_MACADDR_INFO, copy);
         groupManager.StashGroups();
     }
     if (groupManager.GetCurrentGroup().GetInterface() == p2pStateMachine.p2pDevIface) {
@@ -223,7 +223,7 @@ bool P2pGroupOperatingState::ProcessGroupRemovedEvt(const InternalMessage &msg) 
         WIFI_LOGE("call P2pFlush() failed, ErrCode: %{public}d", static_cast<int>(ret));
     }
     WifiP2pGroupInfo invalidGroup;
-    groupManager.SetCurrentGroup(invalidGroup);
+    groupManager.SetCurrentGroup(WifiMacAddrInfoType::P2P_CURRENT_GROUP_MACADDR_INFO, invalidGroup);
     p2pStateMachine.SwitchState(&p2pStateMachine.p2pIdleState);
     return EXECUTED;
 }
@@ -271,7 +271,7 @@ bool P2pGroupOperatingState::ProcessCmdRemoveGroup(const InternalMessage &msg) c
             WIFI_LOGE("P2P group removal failed.");
             dhcpFunc();
             WifiP2pGroupInfo invalidGroup;
-            groupManager.SetCurrentGroup(invalidGroup);
+            groupManager.SetCurrentGroup(WifiMacAddrInfoType::P2P_CURRENT_GROUP_MACADDR_INFO, invalidGroup);
             p2pStateMachine.ChangeConnectedStatus(P2pConnectedState::P2P_DISCONNECTED);
             p2pStateMachine.SwitchState(&p2pStateMachine.p2pIdleState);
             p2pStateMachine.BroadcastActionResult(P2pActionCallback::RemoveGroup, WIFI_OPT_FAILED);

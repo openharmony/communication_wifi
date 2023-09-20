@@ -138,7 +138,7 @@ void WifiDeviceServiceImpl::OnStart()
 #ifndef OHOS_ARCH_LITE
     // Get airplane mode by datashare
     WifiManager::GetInstance().GetAirplaneModeByDatashare();
-
+    WifiManager::GetInstance().GetDeviceProvisionByDatashare();
     if (eventSubscriber_ == nullptr && appEventTimerId == 0) {
         TimeOutCallback timeoutCallback = std::bind(&WifiDeviceServiceImpl::RegisterAppRemoved, this);
         WifiTimer::GetInstance()->Register(timeoutCallback, appEventTimerId, TIMEOUT_APP_EVENT, false);
@@ -989,6 +989,12 @@ ErrCode WifiDeviceServiceImpl::ReAssociate(void)
         WIFI_LOGE("ReAssociate:NOT System APP, PERMISSION_DENIED!");
         return WIFI_OPT_NON_SYSTEMAPP;
     }
+
+    if (WifiPermissionUtils::VerifySetWifiInfoPermission() == PERMISSION_DENIED) {
+            WIFI_LOGE("ReAssociate:VerifySetWifiInfoPermission PERMISSION_DENIED!");
+            return WIFI_OPT_PERMISSION_DENIED;
+    }
+
     if (WifiPermissionUtils::VerifyWifiConnectionPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("ReAssociate:VerifyWifiConnectionPermission() PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
@@ -1449,6 +1455,11 @@ ErrCode WifiDeviceServiceImpl::Get5GHzChannelList(std::vector<int> &result)
         return WIFI_OPT_PERMISSION_DENIED;
     }
 
+    if (WifiPermissionUtils::VerifyGetWifiConfigPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("WifiDeviceServiceImpl:Get5GHzChannelList() PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+
     ChannelsTable channels;
     WifiSettings::GetInstance().GetValidChannels(channels);
     if (channels.find(BandType::BAND_5GHZ) != channels.end()) {
@@ -1498,6 +1509,10 @@ void WifiDeviceServiceImpl::RegisterAppRemoved()
 
 void WifiDeviceServiceImpl::UnRegisterAppRemoved()
 {
+    std::unique_lock<std::mutex> lock(appEventMutex);
+    if (!eventSubscriber_) {
+        return;
+    }
     if (!EventFwk::CommonEventManager::UnSubscribeCommonEvent(eventSubscriber_)) {
         WIFI_LOGE("AppEvent UnSubscribeCommonEvent() failed");
     } else {
@@ -1527,6 +1542,10 @@ void WifiDeviceServiceImpl::RegisterThermalLevel()
 
 void WifiDeviceServiceImpl::UnRegisterThermalLevel()
 {
+    std::unique_lock<std::mutex> lock(thermalEventMutex);
+    if (!thermalLevelSubscriber_) {
+        return;
+    }
     if (!EventFwk::CommonEventManager::UnSubscribeCommonEvent(thermalLevelSubscriber_)) {
         WIFI_LOGE("THERMAL_LEVEL_CHANGED UnSubscribeCommonEvent() failed");
     } else {
@@ -1553,6 +1572,10 @@ void AppEventSubscriber::OnReceiveEvent(const OHOS::EventFwk::CommonEventData &d
     if (action == OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_PACKAGE_REMOVED) {
         auto wantTemp = data.GetWant();
         auto uid = wantTemp.GetIntParam(AppExecFwk::Constants::UID, -1);
+        if (uid == -1) {
+            WIFI_LOGE("%{public}s getPackage uid is illegal.", __func__);
+            return;
+        }
         WIFI_LOGI("Package removed of uid %{public}d.", uid);
         IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst();
         if (pService == nullptr) {

@@ -20,10 +20,9 @@ import Router from '@system.router';
 import screenshot from '@ohos.screenshot'
 import image from '@ohos.multimedia.image'
 import MediaUtils from '../MainAbility/model/MediaUtils'
-import Logger from '../MainAbility/model/Logger'
 import ConfigData from '../Utils/ConfigData';
 
-const TAG = '[Screenshot]'
+const TAG = "[p2pTitleBar]"
 
 /**
  * Page-Title Of Wifi test
@@ -53,18 +52,18 @@ export struct P2pTitleBar {
         rotation : 0
       }
     } else {
-      console.log( "error -----------" )
+      console.log( TAG , "error -----------" )
     }
     try {
       screenshot.save( screenshotOptions , ( err , data: image.PixelMap ) => {
         if ( err ) {
-          Logger.info( TAG , `Failed to save the screenshot. Error:${ JSON.stringify( err ) }` )
+          console.log( TAG , `Failed to save the screenshot. Error:${ JSON.stringify( err ) }` )
         }
-        Logger.info( TAG , 'save callback' )
+        console.log( TAG , 'save callback' )
         MediaUtils.savePicture( data , getContext( this ) as any )
       } )
     } catch( err ) {
-      Logger.error( `save failed, code is ${ err.code }, message is ${ err.message }` )
+      console.log( TAG , `save failed, code is ${ err.code }, message is ${ err.message }` )
     }
   }
 
@@ -82,7 +81,7 @@ export struct P2pTitleBar {
     .width( ConfigData.WH_30_100 )
     .margin( { left : 3 , right : 3 , top : 2 } )
     .onClick( () => {
-      console.log( '[Screenshot] onClick,screenshot' )
+      console.log( TAG , '[Screenshot] onClick,screenshot' )
       this.getScreen( isFullScreen )
     } )
   }
@@ -138,40 +137,40 @@ export struct P2pTitleBar {
             } ) ,
           PanGesture( { fingers : 1 , direction : PanDirection.All , distance : 5.0 } )
             .onActionStart( () => {
-              console.log( 'Pan start' )
+              console.log( TAG , 'Pan start' )
             } )
             .onActionUpdate( ( event: GestureEvent ) => {
               this.offsetY = event.offsetY;
               this.offsetX = event.offsetX;
             } )
             .onActionEnd( () => {
-              console.log( 'Pan end' )
+              console.log( TAG , 'Pan end' )
             } ) ,
           PinchGesture( { fingers : 2 , distance : 4 } )
             .onActionStart( () => {
-              console.log( 'PinchGesture start' )
+              console.log( TAG , 'PinchGesture start' )
             } )
             .onActionUpdate( ( event: GestureEvent ) => {
               this.myscale = event.scale
               this.myborderRadius = 10
             } )
             .onActionEnd( () => {
-              console.log( 'PinchGesture end' )
+              console.log( TAG , 'PinchGesture end' )
               this.getScreen( true );
             } ) ,
           RotationGesture( { fingers : 2 , angle : 2 } )
             .onActionStart( () => {
-              console.log( 'RotationGesture start' )
+              console.log( TAG , 'RotationGesture start' )
             } )
             .onActionUpdate( ( event: GestureEvent ) => {
               this.angle = event.angle
             } )
             .onActionEnd( () => {
-              console.log( 'RotationGesture end' )
+              console.log( TAG , 'RotationGesture end' )
             } )
           )
             .onCancel( () => {
-              console.log( 'Parallel gesture canceled' )
+              console.log( TAG , 'Parallel gesture canceled' )
             } )
           )
         }

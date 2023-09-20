@@ -17,11 +17,12 @@
 
 import featureAbility from '@ohos.ability.featureAbility'
 import wifi from '@ohos.wifi'
-import { AvailableP2p } from '../../../Component/availableP2p'
-import { P2pTitleBar } from '../../../Component/p2pTitleBar'
-import { P2pModel } from '../../../MainAbility/model/p2pModel'
+import { AvailableP2p } from '../../Component/availableP2p'
 
-const TAG = '[p2pFound]'
+import { P2pTitleBar } from '../../Component/p2pTitleBar'
+import { P2pModel } from '../../MainAbility/model/p2pModel'
+
+const TAG = '[p2pScan]'
 const PERMISSION_P2P_NAME: string = 'ohos.permission.LOCATION'
 /**
  * p2p Found Test Page Of Wifi test

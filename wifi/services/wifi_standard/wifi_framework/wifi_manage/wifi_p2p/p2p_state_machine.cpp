@@ -690,7 +690,7 @@ bool P2pStateMachine::StartDhcpServer()
     SetWifiP2pInfoWhenGroupFormed(ipv4.GetAddressWithString());
     WifiP2pGroupInfo currGroup = groupManager.GetCurrentGroup();
     currGroup.SetGoIpAddress(ipv4.GetAddressWithString());
-    groupManager.SetCurrentGroup(currGroup);
+    groupManager.SetCurrentGroup(WifiMacAddrInfoType::P2P_CURRENT_GROUP_MACADDR_INFO, currGroup);
     if (!m_DhcpdInterface.SetDhcpEventFunc(groupManager.GetCurrentGroup().GetInterface(), pDhcpResultNotify.get())) {
         WIFI_LOGE("Set dhcp notify failed.");
     }
@@ -723,7 +723,7 @@ void P2pStateMachine::DhcpResultNotify::OnSuccess(int status, const std::string 
     p2pInfo.SetIsGroupOwnerAddress(result.strServer);
     WifiP2pGroupInfo currGroup = groupManager.GetCurrentGroup();
     currGroup.SetGoIpAddress(result.strServer);
-    groupManager.SetCurrentGroup(currGroup);
+    groupManager.SetCurrentGroup(WifiMacAddrInfoType::P2P_CURRENT_GROUP_MACADDR_INFO, currGroup);
     WifiSettings::GetInstance().SaveP2pInfo(p2pInfo);
     groupManager.SaveP2pInfo(p2pInfo);
     pP2pStateMachine->BroadcastP2pConnectionChanged();

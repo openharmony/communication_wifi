@@ -17,26 +17,26 @@
 
 import prompt from '@ohos.prompt'
 import wifi from '@ohos.wifi'
-import Logger from '../model/Logger'
+
 
 /**
  * P2pModel api Test Page Of wifi test
  */
 
-const TAG: string = 'P2pModel'
+const TAG = "[P2pModel]"
 
 export class P2pModel {
   getP2pPeerDevices( callback ) {
-    Logger.info( TAG , 'scanP2p begin' )
+    console.log( TAG , 'scanP2p begin' )
     try {
       wifi.getP2pPeerDevices( ( err , wifiP2pDevice ) => {
         let p2pList = []
         if ( err ) {
-          Logger.info( TAG , `scan p2p info err: ${ JSON.stringify( err ) }` )
+          console.log( TAG , `scan p2p info err: ${ JSON.stringify( err ) }` )
           callback( p2pList )
           return
         }
-        Logger.info( TAG , `scan p2p info call back: ` + JSON.stringify( wifiP2pDevice ) )
+        console.log( TAG , `scan p2p info call back: ` + JSON.stringify( wifiP2pDevice ) )
         let len = Object.keys( wifiP2pDevice ).length;
         for ( let i = 0 ; i < len ; ++i ) {
           p2pList.push( {
@@ -46,26 +46,26 @@ export class P2pModel {
             deviceStatus : wifiP2pDevice[i].deviceStatus ,
             groupCapabilitys : wifiP2pDevice[i].groupCapabilitys ,
           } )
-          Logger.info( TAG , 'wifiP2pDevice:' + JSON.stringify( wifiP2pDevice[i] ) )
-          Logger.info( TAG , 'p2pList:' + JSON.stringify( p2pList ) )
+          console.log( TAG , 'wifiP2pDevice:' + JSON.stringify( wifiP2pDevice[i] ) )
+          console.log( TAG , 'p2pList:' + JSON.stringify( p2pList ) )
         }
         callback( p2pList )
       } )
     } catch( error ) {
-      Logger.error( `Failed to testGetP2pPeerDevicesCallback. message: ${ error.message }, code: ${ error.code }` )
+      console.log( TAG , `Failed to testGetP2pPeerDevicesCallback. message: ${ error.message }, code: ${ error.code }` )
     }
   }
 
   getCurrentGroup( callback ) {
-    Logger.info( TAG , 'scanP2pGroup begin' )
+    console.log( TAG , 'scanP2pGroup begin' )
     wifi.getCurrentGroup( ( err , result ) => {
       let p2pGroupList = []
       if ( err ) {
-        Logger.info( TAG , `scan info err: ${ JSON.stringify( err ) }` )
+        console.log( TAG , `scan info err: ${ JSON.stringify( err ) }` )
         callback( p2pGroupList )
         return
       }
-      Logger.info( TAG , `scan info call back: ${ result.length }` )
+      console.log( TAG , `scan info call back: ${ result.length }` )
       for ( let i = 0 ; i < result.length ; ++i ) {
         p2pGroupList.push( {
           ownerInfo : result[i].ownerInfo ,
@@ -84,8 +84,8 @@ export class P2pModel {
 
   connectP2p( p2pScanInfo , wifiP2pGroupInfo) {
     prompt.showToast( { message : 'connecting' } )
-    Logger.debug( TAG , `connect deviceAddress=${ p2pScanInfo.deviceAddress }` )
-    Logger.info( TAG , `p2pScanInfo:` + JSON.stringify( p2pScanInfo ) )
+    console.log( TAG , `connect deviceAddress=${ p2pScanInfo.deviceAddress }` )
+    console.log( TAG , `p2pScanInfo:` + JSON.stringify( p2pScanInfo ) )
     let config = {
       deviceAddress : p2pScanInfo.deviceAddress ,
       netId : -2 ,
@@ -95,10 +95,10 @@ export class P2pModel {
     }
 
     if ( wifi.p2pConnect( config ) ) {
-      Logger.debug( TAG , `connectP2P success` )
+      console.log( TAG , `connectP2P success` )
       wifi.createGroup( config )
     } else {
-      Logger.debug( TAG , `connectP2P fail` )
+      console.log( TAG , `connectP2P fail` )
     }
   }
 

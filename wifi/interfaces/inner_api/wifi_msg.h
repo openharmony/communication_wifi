@@ -125,6 +125,39 @@ enum class DisconnectedReason {
     DISC_REASON_CONNECTION_FULL = 2
 };
 
+enum class WifiOperateType {
+    STA_OPEN,
+    STA_CLOSE,
+    STA_CONNECT,
+    STA_ASSOC,
+    STA_AUTH,
+    STA_DHCP
+};
+
+enum class WifiOperateState {
+    STA_OPENING,
+    STA_OPENED,
+    STA_CONNECTING,
+    STA_CONNECTED,
+    STA_CONNECT_EXCEPTION,
+    STA_DISCONNECTED,
+    STA_ASSOCIATING,
+    STA_ASSOCIATED,
+    STA_ASSOC_FULL_REJECT,
+    STA_AUTHING,
+    STA_AUTHED,
+    STA_DHCP,
+    STA_DHCP_SUCCESS,
+    STA_DISCONNECT,
+};
+
+enum class DisconnectDetailReason {
+    UNUSED = 0,
+    UNSPECIFIED = 1,
+    DEAUTH_STA_IS_LEFING = 3,
+    DISASSOC_STA_HAS_LEFT = 8
+};
+
 struct WifiLinkedInfo {
     int networkId;
     std::string ssid;

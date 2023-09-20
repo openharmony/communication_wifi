@@ -15,10 +15,9 @@
 
 // @ts-nocheck
 
-import Logger from '../MainAbility/model/Logger'
-
-const TAG: string = 'P2pView'
+const TAG = "[P2pView]"
 import ConfigData from '../Utils/ConfigData';
+import { testOnP2pConnectionChange , testGetCurrentGroupCallback } from '../MainAbility/model/p2pInterface'
 /**
  * P2pView Component of p2p test
  */
@@ -27,14 +26,20 @@ import ConfigData from '../Utils/ConfigData';
 export struct P2pView {
   private p2p: any = null
   private securityString: Resource = $r( 'app.string.useful' )
+  private p2pConnectState: number = 0
+  private p2pLinkedDeviceName: string = ""
   @State isLock: boolean = true
 
   aboutToAppear() {
-    Logger.debug( TAG , `aboutToAppear ${ JSON.stringify( this.p2p ) }` )
+    console.log( TAG , `aboutToAppear ${ JSON.stringify( this.p2p ) }` )
+    testOnP2pConnectionChange()
+    testGetCurrentGroupCallback()
+    this.p2pConnectState = AppStorage.Get( "p2pConnectState" )
+    this.p2pLinkedDeviceName = AppStorage.Get( "p2pLinkedDeviceName" )
     if ( this.p2p ) {
-      console.log( "this.p2p is true" )
+      console.log( TAG , "this.p2p is true" )
     } else {
-      console.log( "this.p2p is false" )
+      console.log( TAG , "this.p2p is false" )
     }
   }
 
@@ -48,10 +53,17 @@ export struct P2pView {
               .width( ConfigData.WH_100_100 )
           }
         }
-        Text( this.securityString )
-          .fontSize( 18 )
-          .fontColor( Color.Gray )
-          .width( ConfigData.WH_100_100 )
+        if ( this.p2pConnectState == 1 && this.p2pLinkedDeviceName == this.p2p.deviceName ) {
+          Text( this.securityString = $r( 'app.string.p2pConnected' ) )
+            .fontSize( 18 )
+            .fontColor( Color.Gray )
+            .width( ConfigData.WH_100_100 )
+        } else {
+          Text( this.securityString )
+            .fontSize( 18 )
+            .fontColor( Color.Gray )
+            .width( ConfigData.WH_100_100 )
+        }
       }
       .layoutWeight( 1 )
 

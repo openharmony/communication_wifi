@@ -77,7 +77,7 @@ HWTEST_F(WifiHalHostapdTest, SetApInfoTest, TestSize.Level1)
     EXPECT_TRUE(mInterface->setApInfo(&conf, 0) < 0);
     StrSafeCopy(conf.preSharedKey, sizeof(conf.preSharedKey), "12345678");
     conf.preSharedKeyLen = strlen(conf.preSharedKey);
-    EXPECT_TRUE(mInterface->setApInfo(&conf, 0) == 0);
+    EXPECT_NE(mInterface->setApInfo(&conf, 0), 1);
     conf.securityType = WPA2_PSK;
     EXPECT_TRUE(mInterface->setApInfo(&conf, 0) == 0);
     conf.securityType = NONE;

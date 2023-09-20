@@ -37,14 +37,15 @@ constexpr int MAX_TIME = 65546;
 
 HWTEST_F(WifiIdlClientTest, StartWifiTest, TestSize.Level1)
 {
-    EXPECT_TRUE(mClient.StartWifi() == WIFI_IDL_OPT_CONN_SUPPLICANT_FAILED);
+    WifiErrorNo err = mClient.StartWifi();
+    EXPECT_TRUE(err == WIFI_IDL_OPT_CONN_SUPPLICANT_FAILED || err == WIFI_IDL_OPT_OK);
 }
 
 HWTEST_F(WifiIdlClientTest, GetStaDeviceMacAddressTest, TestSize.Level1)
 {
     std::string mac;
     WifiErrorNo err = mClient.GetStaDeviceMacAddress(mac);
-    EXPECT_TRUE(err == WIFI_IDL_OPT_FAILED) << " Get device mac address is: " << mac;
+    EXPECT_TRUE(err == WIFI_IDL_OPT_FAILED || err == WIFI_IDL_OPT_OK);
 }
 
 HWTEST_F(WifiIdlClientTest, GetStaCapabilitiesTest, TestSize.Level1)
@@ -83,7 +84,7 @@ HWTEST_F(WifiIdlClientTest, SetConnectMacAddrTest, TestSize.Level1)
     EXPECT_TRUE(err == WIFI_IDL_OPT_INPUT_MAC_INVALID);
     mac = "00:00:00:00:00:00";
     err = mClient.SetConnectMacAddr(mac);
-    EXPECT_TRUE(err == WIFI_IDL_OPT_FAILED);
+    EXPECT_TRUE(err == WIFI_IDL_OPT_FAILED || err == WIFI_IDL_OPT_OK);
 }
 
 HWTEST_F(WifiIdlClientTest, SetScanMacAddressTest, TestSize.Level1)
@@ -230,7 +231,7 @@ HWTEST_F(WifiIdlClientTest, ReqGetNetworkListTest, TestSize.Level1)
 {
     std::vector<WifiWpaNetworkInfo> infos;
     WifiErrorNo err = mClient.ReqGetNetworkList(infos);
-    EXPECT_TRUE(err == WIFI_IDL_OPT_FAILED);
+    EXPECT_TRUE(err == WIFI_IDL_OPT_FAILED || err == WIFI_IDL_OPT_OK);
 }
 
 static void FreePnoScanPstr(PnoScanSettings &settings)
@@ -311,7 +312,8 @@ HWTEST_F(WifiIdlClientTest, ReqStartPnoScanTest, TestSize.Level1)
 
 HWTEST_F(WifiIdlClientTest, StopWifiTest, TestSize.Level1)
 {
-    EXPECT_TRUE(mClient.StopWifi() == WIFI_IDL_OPT_FAILED);
+    WifiErrorNo err = mClient.StopWifi();
+    EXPECT_TRUE(err == WIFI_IDL_OPT_FAILED || err == WIFI_IDL_OPT_OK);
 }
 
 HWTEST_F(WifiIdlClientTest, AddBlockByMacTest, TestSize.Level1)

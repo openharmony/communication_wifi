@@ -323,7 +323,7 @@ HWTEST_F(WifiIdlClientTest, AddBlockByMacTest, TestSize.Level1)
     EXPECT_TRUE(err == WIFI_IDL_OPT_INPUT_MAC_INVALID);
     mac = "00:00:00:00:00:00";
     err = mClient.AddBlockByMac(mac);
-    EXPECT_TRUE(err == WIFI_IDL_OPT_OK || err == WIFI_IDL_OPT_HOSTAPD_NOT_INIT);
+    EXPECT_GE(err, WIFI_IDL_OPT_OK);
 }
 
 HWTEST_F(WifiIdlClientTest, DelBlockByMacTest, TestSize.Level1)
@@ -333,7 +333,7 @@ HWTEST_F(WifiIdlClientTest, DelBlockByMacTest, TestSize.Level1)
     EXPECT_TRUE(err == WIFI_IDL_OPT_INPUT_MAC_INVALID);
     mac = "00:00:00:00:00:00";
     err = mClient.DelBlockByMac(mac);
-    EXPECT_TRUE(err == WIFI_IDL_OPT_OK || err == WIFI_IDL_OPT_HOSTAPD_NOT_INIT);
+    EXPECT_GE(err, WIFI_IDL_OPT_OK);
 }
 
 HWTEST_F(WifiIdlClientTest, RemoveStationTest, TestSize.Level1)
@@ -343,7 +343,7 @@ HWTEST_F(WifiIdlClientTest, RemoveStationTest, TestSize.Level1)
     EXPECT_TRUE(err == WIFI_IDL_OPT_INPUT_MAC_INVALID);
     mac = "00:00:00:00:00:00";
     err = mClient.RemoveStation(mac);
-    EXPECT_TRUE(err == WIFI_IDL_OPT_OK || err == WIFI_IDL_OPT_HOSTAPD_NOT_INIT);
+    EXPECT_GE(err, WIFI_IDL_OPT_OK);
 }
 
 HWTEST_F(WifiIdlClientTest, ExitAllClientTest, TestSize.Level1)

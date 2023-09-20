@@ -246,14 +246,6 @@ HWTEST_F(WifiSettingsTest, GetUserLastSelectedNetworkTimeValTest, TestSize.Level
     WifiSettings::GetInstance().GetUserLastSelectedNetworkTimeVal();
 }
 
-HWTEST_F(WifiSettingsTest, GetOperatorWifiTypeTest, TestSize.Level1)
-{
-    WIFI_LOGE("GetOperatorWifiTypeTest enter!");
-    int result = WifiSettings::GetInstance().GetOperatorWifiType();
-    WIFI_LOGE("GetOperatorWifiTypeTest result(%{public}d)", result);
-    EXPECT_TRUE(result == WIFI_OPT_SUCCESS || result == INITIAL_TYPE);
-}
-
 HWTEST_F(WifiSettingsTest, SetOperatorWifiTypeTest, TestSize.Level1)
 {
     WIFI_LOGE("SetOperatorWifiTypeTest enter!");

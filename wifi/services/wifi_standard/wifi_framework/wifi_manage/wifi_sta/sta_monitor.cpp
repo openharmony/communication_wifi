@@ -102,6 +102,7 @@ void StaMonitor::OnConnectChangedCallBack(int status, int networkId, const std::
         }
         case WPA_CB_DISCONNECTED: {
             pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_NETWORK_DISCONNECTION_EVENT);
+            pStaStateMachine->OnNetworkDisconnectEvent(networkId);
             break;
         }
         default:

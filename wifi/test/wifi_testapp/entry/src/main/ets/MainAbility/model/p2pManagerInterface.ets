@@ -22,6 +22,7 @@ import ConfigData from "../../Utils/ConfigData"
 import LogData from "../../Utils/LogData"
 import MessageData from "../../Utils/MessageData"
 
+const TAG = "[p2pManagerInterface]"
 /**
  * p2pManager Test Page Of Wifi test
  */
@@ -31,16 +32,16 @@ export function testGetP2pLinkedInfoManagerPromise(): string {
   try {
     let message = "getP2pLinkedInfoPromise test"
     wifiManager.getP2pLinkedInfo().then( wifiP2pLinkedInfo => {
-      console.log( "getP2pLinkedInfoPromise: " + JSON.stringify( wifiP2pLinkedInfo ) )
+      console.log( TAG , "getP2pLinkedInfoPromise: " + JSON.stringify( wifiP2pLinkedInfo ) )
       message = "getP2pLinkedInfoPromise: " + JSON.stringify( wifiP2pLinkedInfo )
       prompt.showToast( { message : message } )
     } ).catch( error => {
-      console.log( "testGetP2pLinkedInfoManagerPromise error :" + error )
+      console.log( TAG , "testGetP2pLinkedInfoManagerPromise error :" + error )
     } )
     prompt.showToast( { message : message } )
     return message
   } catch( error ) {
-    console.log( `Failed to testGetP2pLinkedInfoManagerPromise. message: ${ error.message }, code: ${ error.code }` )
+    console.log( TAG , `Failed to testGetP2pLinkedInfoManagerPromise. message: ${ error.message }, code: ${ error.code }` )
     let message = `Failed to testGetP2pLinkedInfoManagerPromise. message: ${ error.message }, code: ${ error.code }`
     prompt.showToast( { message : message } )
     return message
@@ -55,14 +56,14 @@ export function testGetP2pLinkedInfoManagerCallback(): string {
         console.error( "getP2pLinkedInfoCallback error" )
         return message;
       }
-      console.log( "getP2pLinkedInfoCallback: " + JSON.stringify( WifiP2pLinkedInfo ) )
+      console.log( TAG , "getP2pLinkedInfoCallback: " + JSON.stringify( WifiP2pLinkedInfo ) )
       message = "getP2pLinkedInfoCallback: " + JSON.stringify( WifiP2pLinkedInfo )
       prompt.showToast( { message : message } )
     } )
     prompt.showToast( { message : message } )
     return message
   } catch( error ) {
-    console.log( `Failed to testGetP2pLinkedInfoManagerCallback. message: ${ error.message }, code: ${ error.code }` )
+    console.log( TAG , `Failed to testGetP2pLinkedInfoManagerCallback. message: ${ error.message }, code: ${ error.code }` )
     let message = `Failed to testGetP2pLinkedInfoManagerCallback. message: ${ error.message }, code: ${ error.code }`
     prompt.showToast( { message : message } )
     return message
@@ -73,16 +74,16 @@ export function testGetCurrentP2pGroupManagerPromise(): string {
   try {
     let message = "getCurrentGroupPromise test"
     wifiManager.getCurrentP2pGroup().then( WifiP2pGroupInfo => {
-      console.log( "getCurrentGroupPromise: " + JSON.stringify( WifiP2pGroupInfo ) )
+      console.log( TAG , "getCurrentGroupPromise: " + JSON.stringify( WifiP2pGroupInfo ) )
       message = "getCurrentGroupPromise: " + JSON.stringify( WifiP2pGroupInfo )
       prompt.showToast( { message : message } )
     } ).catch( error => {
-      console.log( "testGetCurrentP2pGroupManagerPromise error :" + error )
+      console.log( TAG , "testGetCurrentP2pGroupManagerPromise error :" + error )
     } )
     prompt.showToast( { message : message } )
     return message
   } catch( error ) {
-    console.log( `Failed to testGetCurrentP2pGroupManagerPromise. message: ${ error.message }, code: ${ error.code }` )
+    console.log( TAG , `Failed to testGetCurrentP2pGroupManagerPromise. message: ${ error.message }, code: ${ error.code }` )
     let message = `Failed to testGetCurrentP2pGroupManagerPromise. message: ${ error.message }, code: ${ error.code }`
     prompt.showToast( { message : message } )
     return message
@@ -97,14 +98,14 @@ export function testGetCurrentP2pGroupManagerCallback(): string {
         console.error( "getCurrentGroupCallback error" )
         return message;
       }
-      console.log( "getCurrentGroupCallback: " + JSON.stringify( WifiP2pGroupInfo ) )
+      console.log( TAG , "getCurrentGroupCallback: " + JSON.stringify( WifiP2pGroupInfo ) )
       message = "getCurrentGroupCallback: " + JSON.stringify( WifiP2pGroupInfo )
       prompt.showToast( { message : message } )
     } )
     prompt.showToast( { message : message } )
     return message
   } catch( error ) {
-    console.log( `Failed to testGetCurrentP2pGroupManagerCallback. message: ${ error.message }, code: ${ error.code }` )
+    console.log( TAG , `Failed to testGetCurrentP2pGroupManagerCallback. message: ${ error.message }, code: ${ error.code }` )
     let message = `Failed to testGetCurrentP2pGroupManagerCallback. message: ${ error.message }, code: ${ error.code }`
     prompt.showToast( { message : message } )
     return message
@@ -115,16 +116,16 @@ export function testGetP2pPeerDevicesManagerPromise() {
   try {
     let message = "getP2pPeerDevicesPromise test"
     wifiManager.getP2pPeerDevices().then( WifiP2pDevice => {
-      console.log( "getP2pPeerDevicesPromise: " + JSON.stringify( WifiP2pDevice ) )
+      console.log( TAG , "getP2pPeerDevicesPromise: " + JSON.stringify( WifiP2pDevice ) )
       message = "getP2pPeerDevicesPromise: " + JSON.stringify( WifiP2pDevice )
       prompt.showToast( { message : message } )
     } ).catch( error => {
-      console.log( "testGetP2pPeerDevicesManagerPromise error :" + error )
+      console.log( TAG , "testGetP2pPeerDevicesManagerPromise error :" + error )
     } )
     prompt.showToast( { message : message } )
     return message
   } catch( error ) {
-    console.log( `Failed to testGetP2pPeerDevicesManagerPromise. message: ${ error.message }, code: ${ error.code }` )
+    console.log( TAG , `Failed to testGetP2pPeerDevicesManagerPromise. message: ${ error.message }, code: ${ error.code }` )
     let message = `Failed to testGetP2pPeerDevicesManagerPromise. message: ${ error.message }, code: ${ error.code }`
     prompt.showToast( { message : message } )
     return message
@@ -139,14 +140,14 @@ export function testGetP2pPeerDevicesManagerCallback() {
         console.error( "GetP2pPeerDevicesCallback error" )
         return message;
       }
-      console.log( "GetP2pPeerDevicesCallback: " + JSON.stringify( WifiP2pDevice ) )
+      console.log( TAG , "GetP2pPeerDevicesCallback: " + JSON.stringify( WifiP2pDevice ) )
       message = "GetP2pPeerDevicesCallback: " + JSON.stringify( WifiP2pDevice )
       prompt.showToast( { message : message } )
     } )
     prompt.showToast( { message : message } )
     return message
   } catch( error ) {
-    console.log( `Failed to testGetP2pPeerDevicesManagerCallback. message: ${ error.message }, code: ${ error.code }` )
+    console.log( TAG , `Failed to testGetP2pPeerDevicesManagerCallback. message: ${ error.message }, code: ${ error.code }` )
     let message = `Failed to testGetP2pPeerDevicesManagerCallback. message: ${ error.message }, code: ${ error.code }`
     prompt.showToast( { message : message } )
     return message
@@ -157,16 +158,16 @@ export function testGetP2pLocalDeviceManagerPromise() {
   try {
     let message = "getP2pLocalDevicePromise test"
     wifiManager.getP2pLocalDevice().then( WifiP2pDevice => {
-      console.log( "getP2pLocalDevicePromise: " + JSON.stringify( WifiP2pDevice ) )
+      console.log( TAG , "getP2pLocalDevicePromise: " + JSON.stringify( WifiP2pDevice ) )
       message = "getP2pLocalDevicePromise: " + JSON.stringify( WifiP2pDevice )
       prompt.showToast( { message : message } )
     } ).catch( error => {
-      console.log( "testGetP2pLocalDeviceManagerPromise error :" + error )
+      console.log( TAG , "testGetP2pLocalDeviceManagerPromise error :" + error )
     } )
     prompt.showToast( { message : message } )
     return message
   } catch( error ) {
-    console.log( `Failed to testGetP2pLocalDeviceManagerPromise. message: ${ error.message }, code: ${ error.code }` )
+    console.log( TAG , `Failed to testGetP2pLocalDeviceManagerPromise. message: ${ error.message }, code: ${ error.code }` )
     let message = `Failed to testGetP2pLocalDeviceManagerPromise. message: ${ error.message }, code: ${ error.code }`
     prompt.showToast( { message : message } )
     return message
@@ -181,14 +182,14 @@ export function testGetP2pLocalDeviceManagerCallback() {
         console.error( "getP2pLocalDeviceCallback error" )
         return message;
       }
-      console.log( "getP2pLocalDeviceCallback: " + JSON.stringify( WifiP2pDevice ) )
+      console.log( TAG , "getP2pLocalDeviceCallback: " + JSON.stringify( WifiP2pDevice ) )
       message = "getP2pLocalDeviceCallback: " + JSON.stringify( WifiP2pDevice )
       prompt.showToast( { message : message } )
     } )
     prompt.showToast( { message : message } )
     return message
   } catch( error ) {
-    console.log( `Failed to testGetP2pLocalDeviceManagerCallback. message: ${ error.message }, code: ${ error.code }` )
+    console.log( TAG , `Failed to testGetP2pLocalDeviceManagerCallback. message: ${ error.message }, code: ${ error.code }` )
     let message = `Failed to testGetP2pLocalDeviceManagerCallback. message: ${ error.message }, code: ${ error.code }`
     prompt.showToast( { message : message } )
     return message
@@ -217,7 +218,7 @@ export function testCreateP2pGroupManager(): string {
     message = "createP2pGroup 调用成功"
     return message
   } catch( error ) {
-    console.log( `Failed to testCreateP2pGroupManager. message: ${ error.message }, code: ${ error.code }` )
+    console.log( TAG , `Failed to testCreateP2pGroupManager. message: ${ error.message }, code: ${ error.code }` )
     let message = `Failed to testCreateP2pGroupManager. message: ${ error.message }, code: ${ error.code }`
     prompt.showToast( { message : message } )
     return message
@@ -232,7 +233,7 @@ export function testRemoveP2pGroupManager(): string {
     prompt.showToast( { message : message } )
     return message
   } catch( error ) {
-    console.log( `Failed to testRemoveP2pGroupManager. message: ${ error.message }, code: ${ error.code }` )
+    console.log( TAG , `Failed to testRemoveP2pGroupManager. message: ${ error.message }, code: ${ error.code }` )
     let message = `Failed to testRemoveP2pGroupManager. message: ${ error.message }, code: ${ error.code }`
     prompt.showToast( { message : message } )
     return message
@@ -250,7 +251,7 @@ export function testP2pConnectManager(): string {
     prompt.showToast( { message : message } )
     return message
   } catch( error ) {
-    console.log( `Failed to testP2pConnectManager. message: ${ error.message }, code: ${ error.code }` )
+    console.log( TAG , `Failed to testP2pConnectManager. message: ${ error.message }, code: ${ error.code }` )
     let message = `Failed to testP2pConnectManager. message: ${ error.message }, code: ${ error.code }`
     prompt.showToast( { message : message } )
     return message
@@ -267,7 +268,7 @@ export function testP2pCancelConnectManager(): string {
     prompt.showToast( { message : message } )
     return message
   } catch( error ) {
-    console.log( `Failed to testP2pCancelConnectManager. message: ${ error.message }, code: ${ error.code }` )
+    console.log( TAG , `Failed to testP2pCancelConnectManager. message: ${ error.message }, code: ${ error.code }` )
     let message = `Failed to testP2pCancelConnectManager. message: ${ error.message }, code: ${ error.code }`
     prompt.showToast( { message : message } )
     return message
@@ -285,7 +286,7 @@ export function testStartDiscoverP2pDevicesManager(): string {
     prompt.showToast( { message : message } )
     return message
   } catch( error ) {
-    console.log( `Failed to testStartDiscoverP2pDevicesManager. message: ${ error.message }, code: ${ error.code }` )
+    console.log( TAG , `Failed to testStartDiscoverP2pDevicesManager. message: ${ error.message }, code: ${ error.code }` )
     let message = `Failed to testStartDiscoverP2pDevicesManager. message: ${ error.message }, code: ${ error.code }`
     prompt.showToast( { message : message } )
     return message
@@ -302,7 +303,7 @@ export function testStopDiscoverP2pDevicesManager(): string {
     prompt.showToast( { message : message } )
     return message
   } catch( error ) {
-    console.log( `Failed to testStopDiscoverP2pDevicesManager. message: ${ error.message }, code: ${ error.code }` )
+    console.log( TAG , `Failed to testStopDiscoverP2pDevicesManager. message: ${ error.message }, code: ${ error.code }` )
     let message = `Failed to testStopDiscoverP2pDevicesManager. message: ${ error.message }, code: ${ error.code }`
     prompt.showToast( { message : message } )
     return message
@@ -320,7 +321,7 @@ export function testDeletePersistentP2pGroupManager(): string {
     prompt.showToast( { message : message } )
     return message
   } catch( error ) {
-    console.log( `Failed to testDeletePersistentP2pGroupManager. message: ${ error.message }, code: ${ error.code }` )
+    console.log( TAG , `Failed to testDeletePersistentP2pGroupManager. message: ${ error.message }, code: ${ error.code }` )
     let message = `Failed to testDeletePersistentP2pGroupManager. message: ${ error.message }, code: ${ error.code }`
     prompt.showToast( { message : message } )
     return message
@@ -331,16 +332,16 @@ export function testGetP2pGroupsManagerPromise() {
   try {
     let message = "getP2pGroupsPromise test"
     wifiManager.getP2pGroups().then( WifiP2pGroupInfo => {
-      console.log( "getP2pGroupsPromise: " + JSON.stringify( WifiP2pGroupInfo ) )
+      console.log( TAG , "getP2pGroupsPromise: " + JSON.stringify( WifiP2pGroupInfo ) )
       message = "getP2pGroupsPromise: " + JSON.stringify( WifiP2pGroupInfo )
       prompt.showToast( { message : message } )
     } ).catch( error => {
-      console.log( "testGetP2pGroupsManagerPromise error:" + error )
+      console.log( TAG , "testGetP2pGroupsManagerPromise error:" + error )
     } )
     prompt.showToast( { message : message } )
     return message
   } catch( error ) {
-    console.log( `Failed to testGetP2pGroupsManagerPromise. message: ${ error.message }, code: ${ error.code }` )
+    console.log( TAG , `Failed to testGetP2pGroupsManagerPromise. message: ${ error.message }, code: ${ error.code }` )
     let message = `Failed to testGetP2pGroupsManagerPromise. message: ${ error.message }, code: ${ error.code }`
     prompt.showToast( { message : message } )
     return message
@@ -355,14 +356,14 @@ export function testGetP2pGroupsManagerCallback() {
         console.error( "getP2pGroupsCallback error" )
         return message;
       }
-      console.log( "getP2pGroupsCallback: " + JSON.stringify( WifiP2pGroupInfo ) )
+      console.log( TAG , "getP2pGroupsCallback: " + JSON.stringify( WifiP2pGroupInfo ) )
       message = "getP2pGroupsCallback: " + JSON.stringify( WifiP2pGroupInfo )
       prompt.showToast( { message : message } )
     } )
     prompt.showToast( { message : message } )
     return message
   } catch( error ) {
-    console.log( `Failed to testGetP2pGroupsManagerCallback. message: ${ error.message }, code: ${ error.code }` )
+    console.log( TAG , `Failed to testGetP2pGroupsManagerCallback. message: ${ error.message }, code: ${ error.code }` )
     let message = `Failed to testGetP2pGroupsManagerCallback. message: ${ error.message }, code: ${ error.code }`
     prompt.showToast( { message : message } )
     return message
@@ -380,7 +381,7 @@ export function testSetP2pDeviceNameManager(): string {
     prompt.showToast( { message : message } )
     return message
   } catch( error ) {
-    console.log( `Failed to testSetP2pDeviceNameManager. message: ${ error.message }, code: ${ error.code }` )
+    console.log( TAG , `Failed to testSetP2pDeviceNameManager. message: ${ error.message }, code: ${ error.code }` )
     let message = `Failed to testSetP2pDeviceNameManager. message: ${ error.message }, code: ${ error.code }`
     prompt.showToast( { message : message } )
     return message
@@ -392,7 +393,7 @@ let p2pStateChange = false
 export function testOnP2pStateChangeManager(): string {
   try {
     let message = "OnP2pStateChange test"
-    console.log( "testOnP2pStateChange test" );
+    console.log( TAG , "testOnP2pStateChange test" );
     if ( p2pStateChange ) {
       wifiManager.off( "p2pStateChange" , () => {
         prompt.showToast( { message : "on.p2pStateChange监听已关闭" } )
@@ -430,7 +431,7 @@ export function testOnP2pStateChangeManager(): string {
     p2pStateChange = !p2pStateChange
     return message
   } catch( error ) {
-    console.log( `Failed to testOnP2pStateChangeManager. message: ${ error.message }, code: ${ error.code }` )
+    console.log( TAG , `Failed to testOnP2pStateChangeManager. message: ${ error.message }, code: ${ error.code }` )
     let message = `Failed to testOnP2pStateChangeManager. message: ${ error.message }, code: ${ error.code }`
     prompt.showToast( { message : message } )
     return message
@@ -442,7 +443,7 @@ let p2pConnectionChange = false
 export function testOnP2pConnectionChangeManager(): string {
   try {
     let message = "OnP2pConnectionChange test"
-    console.log( "testOnP2pConnectionChange test" );
+    console.log( TAG , "testOnP2pConnectionChange test" );
     if ( p2pConnectionChange ) {
       wifiManager.off( "p2pConnectionChange" , () => {
         prompt.showToast( { message : "on.P2pConnectionChange监听已关闭" } )
@@ -474,7 +475,7 @@ export function testOnP2pConnectionChangeManager(): string {
     p2pConnectionChange = !p2pConnectionChange
     return message
   } catch( error ) {
-    console.log( `Failed to testOnP2pConnectionChangeManager. message: ${ error.message }, code: ${ error.code }` )
+    console.log( TAG , `Failed to testOnP2pConnectionChangeManager. message: ${ error.message }, code: ${ error.code }` )
     let message = `Failed to testOnP2pConnectionChangeManager. message: ${ error.message }, code: ${ error.code }`
     prompt.showToast( { message : message } )
     return message
@@ -487,7 +488,7 @@ export function testOnP2pDeviceChangeManager(): string {
   try {
 
     let message = "OnP2pDeviceChange test"
-    console.log( "testOnP2pDeviceChange test" )
+    console.log( TAG , "testOnP2pDeviceChange test" )
     if ( p2pDeviceChange ) {
       wifiManager.off( "p2pDeviceChange" , () => {
         prompt.showToast( { message : "on.P2pDeviceChange监听已关闭" } )
@@ -521,7 +522,7 @@ export function testOnP2pDeviceChangeManager(): string {
             p2pDeviceStatusMessage = '未知状态';
             break;
         }
-        console.log( "info:" + JSON.stringify( data ) )
+        console.log( TAG , "info:" + JSON.stringify( data ) )
         message = "deviceName: " + deviceName + "\n" +
         "deviceAddress: " + deviceAddress + "\n" +
         "primaryDeviceType: " + primaryDeviceType + "\n" +
@@ -535,7 +536,7 @@ export function testOnP2pDeviceChangeManager(): string {
     p2pDeviceChange = !p2pDeviceChange
     return message
   } catch( error ) {
-    console.log( `Failed to testOnP2pDeviceChangeManager. message: ${ error.message }, code: ${ error.code }` )
+    console.log( TAG , `Failed to testOnP2pDeviceChangeManager. message: ${ error.message }, code: ${ error.code }` )
     let message = `Failed to testOnP2pDeviceChangeManager. message: ${ error.message }, code: ${ error.code }`
     prompt.showToast( { message : message } )
     return message
@@ -547,7 +548,7 @@ let p2pPeerDeviceChange = false
 export function testOnP2pPeerDeviceChangeManager(): string {
   try {
     let message = "OnP2pPeerDeviceChange test"
-    console.log( "testOnP2pPeerDeviceChange test" )
+    console.log( TAG , "testOnP2pPeerDeviceChange test" )
     if ( p2pPeerDeviceChange ) {
       wifiManager.off( "p2pPeerDeviceChange" , () => {
         prompt.showToast( { message : "on.p2pPeerDeviceChange监听已关闭" } )
@@ -556,7 +557,7 @@ export function testOnP2pPeerDeviceChangeManager(): string {
     } else {
       wifiManager.on( "p2pPeerDeviceChange" , ( data ) => {
         let p2pPeerDeviceChangeMessage = ""
-        console.log( "WifiP2pDevice: " + JSON.stringify( data ) )
+        console.log( TAG , "WifiP2pDevice: " + JSON.stringify( data ) )
         p2pPeerDeviceChangeMessage = "WifiP2pDevice: " + JSON.stringify( data )
         prompt.showToast( { message : "状态 " + p2pPeerDeviceChangeMessage } )
       } )
@@ -566,7 +567,7 @@ export function testOnP2pPeerDeviceChangeManager(): string {
     p2pPeerDeviceChange = !p2pPeerDeviceChange
     return message
   } catch( error ) {
-    console.log( `Failed to testOnP2pPeerDeviceChangeManager. message: ${ error.message }, code: ${ error.code }` )
+    console.log( TAG , `Failed to testOnP2pPeerDeviceChangeManager. message: ${ error.message }, code: ${ error.code }` )
     let message = `Failed to testOnP2pPeerDeviceChangeManager. message: ${ error.message }, code: ${ error.code }`
     prompt.showToast( { message : message } )
     return message
@@ -578,7 +579,7 @@ let p2pPersistentGroupChange = false
 export function testOnP2pPersistentGroupChangeManager(): string {
   try {
     let message = "OnP2pPersistentGroupChange test"
-    console.log( "testOnP2pPersistentGroupChange test" )
+    console.log( TAG , "testOnP2pPersistentGroupChange test" )
     if ( p2pPersistentGroupChange ) {
       wifiManager.off( "p2pPersistentGroupChange" , () => {
         prompt.showToast( { message : "on.p2pPersistentGroupChange监听已关闭" } )
@@ -587,7 +588,7 @@ export function testOnP2pPersistentGroupChangeManager(): string {
     } else {
       wifiManager.on( "p2pPersistentGroupChange" , ( data ) => {
         let p2pPersistentGroupChangeMessage = ""
-        console.log( "p2pPersistentGroupChange: " + data )
+        console.log( TAG , "p2pPersistentGroupChange: " + data )
         p2pPersistentGroupChangeMessage = "p2pPersistentGroupChange: " + data
         prompt.showToast( { message : "状态: " + p2pPersistentGroupChangeMessage } )
       } )
@@ -597,7 +598,7 @@ export function testOnP2pPersistentGroupChangeManager(): string {
     p2pPersistentGroupChange = !p2pPersistentGroupChange
     return message
   } catch( error ) {
-    console.log( `Failed to testOnP2pPersistentGroupChangeManager. message: ${ error.message }, code: ${ error.code }` )
+    console.log( TAG , `Failed to testOnP2pPersistentGroupChangeManager. message: ${ error.message }, code: ${ error.code }` )
     let message = `Failed to testOnP2pPersistentGroupChangeManager. message: ${ error.message }, code: ${ error.code }`
     prompt.showToast( { message : message } )
     return message
@@ -609,7 +610,7 @@ let p2pDiscoveryChange = false
 export function testOnP2pDiscoveryChangeManager(): string {
   try {
     let message = "OnP2pDiscoveryChange test"
-    console.log( "testOnP2pDiscoveryChange test" )
+    console.log( TAG , "testOnP2pDiscoveryChange test" )
     if ( p2pDiscoveryChange ) {
       wifiManager.off( "p2pDiscoveryChange" , () => {
         prompt.showToast( { message : "on.P2pDiscoveryChange监听已关闭" } )
@@ -638,7 +639,7 @@ export function testOnP2pDiscoveryChangeManager(): string {
     p2pDiscoveryChange = !p2pDiscoveryChange
     return message
   } catch( error ) {
-    console.log( `Failed to testOnP2pDiscoveryChangeManager. message: ${ error.message }, code: ${ error.code }` )
+    console.log( TAG , `Failed to testOnP2pDiscoveryChangeManager. message: ${ error.message }, code: ${ error.code }` )
     let message = `Failed to testOnP2pDiscoveryChangeManager. message: ${ error.message }, code: ${ error.code }`
     prompt.showToast( { message : message } )
     return message

@@ -81,7 +81,7 @@ public:
     {}
     void SetCurrentGroup(const WifiP2pGroupInfo &group)
     {
-        groupManager.SetCurrentGroup(group);
+        groupManager.SetCurrentGroup(WifiMacAddrInfoType::P2P_CURRENT_GROUP_MACADDR_INFO, group);
     }
     MockAuthorizingNegotiationRequestState &GetMockAuthorizingNegotiationRequestState()
     {

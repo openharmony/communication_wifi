@@ -25,5 +25,10 @@ void WifiLocationModeObserver::OnChange()
     WifiManager::GetInstance().DealLocationModeChangeEvent();
 }
 
+void WifiDeviceProvisionObserver::OnChange()
+{
+    WifiManager::GetInstance().GetDeviceProvisionByDatashare();
+}
+
 }
 }

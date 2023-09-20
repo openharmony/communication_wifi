@@ -54,6 +54,7 @@ constexpr char WIFI_P2P_VENDOR_CONFIG_FILE_PATH[] = CONFIG_ROOR_DIR"/p2p_vendor_
 const std::string WIFI_TRUST_LIST_POLICY_FILE_PATH = CONFIG_ROOR_DIR"/trust_list_polices.conf";
 const std::string WIFI_MOVING_FREEZE_POLICY_FILE_PATH = CONFIG_ROOR_DIR"/moving_freeze_policy.conf";
 constexpr char WIFI_STA_RANDOM_MAC_FILE_PATH[] = CONFIG_ROOR_DIR"/sta_randomMac.conf";
+constexpr char PORTAL_CONFIG_FILE_PATH[] = "/system/etc/wifi/wifi_portal.conf";
 
 namespace OHOS {
 namespace Wifi {
@@ -67,13 +68,6 @@ enum class ThermalLevel {
     OVERHEATED = 4,
     WARNING = 5,
     EMERGENCY = 6,
-};
-
-enum class WifiMacAddrInfoType {
-    WIFI_SCANINFO_MACADDR_INFO = 0,
-    HOTSPOT_MACADDR_INFO = 1,
-    P2P_MACADDR_INFO = 2,
-    INVALID_MACADDR_INFO
 };
 
 enum WifiMacAddrErrCode {
@@ -472,6 +466,21 @@ public:
      */
     int ReloadStaRandomMac();
 
+    /**
+     * @Description reload portal conf
+     *
+     * @return int - 0 success
+     */
+    int ReloadPortalconf();
+
+    /**
+     * @Description Get portal uri
+     *
+     * @param portalUri - portal uri
+     * @return int - 0 success
+     */
+    void GetPortalUri(std::string &portalUri);
+    
     /**
      * @Description add random mac address
      *
@@ -1306,6 +1315,20 @@ public:
      * @return int - 0 success
      */
     int SetStaApExclusionType(int type);
+    /**
+     * @Description Set the Device Provision State
+     *
+     * @param state - 1 open; 2 close
+     */
+    void SetDeviceProvisionState(const int &state);
+
+    /**
+     * @Description Get the Device Provision State
+     *
+     * @return int - 1 open; 2 close
+     */
+    int GetDeviceProvisionState() const;
+
 #ifdef SUPPORT_RANDOM_MAC_ADDR
     /**
      * @Description generate a MAC address
@@ -1396,6 +1419,7 @@ private:
     WifiLinkedInfo mWifiLinkedInfo;
     std::string mMacAddress;
     std::string mCountryCode;
+    WifiPortalConf mPortalUri;
     std::map <int, std::atomic<int>> mHotspotState;
     std::map <int, HotspotConfig> mHotspotConfig;
     P2pVendorConfig mP2pVendorConfig;
@@ -1412,6 +1436,7 @@ private:
     int mScreenState;            /* 1 MODE_STATE_OPEN, 2 MODE_STATE_CLOSE */
     int mThermalLevel;           /* 1 COOL, 2 NORMAL, 3 WARM, 4 HOT, 5 OVERHEATED, 6 WARNING, 7 EMERGENCY */
     std::atomic<int> mAirplaneModeState;      /* 1 on 2 off */
+    int mDeviceProvision;      /* 1 on 2 off */
     ScanMode mAppRunningModeState; /* 0 app for 1 app back 2 sys for 3 sys back */
     int mPowerSavingModeState;   /* 1 on 2 off */
     std::string mAppPackageName;
@@ -1426,7 +1451,9 @@ private:
     std::map<WifiMacAddrInfo, std::string> mWifiScanMacAddrPair;
     std::map<WifiMacAddrInfo, std::string> mDeviceConfigMacAddrPair;
     std::map<WifiMacAddrInfo, std::string> mHotspotMacAddrPair;
-    std::map<WifiMacAddrInfo, std::string> mP2pMacAddrPair;
+    std::map<WifiMacAddrInfo, std::string> mP2pDeviceMacAddrPair;
+    std::map<WifiMacAddrInfo, std::string> mP2pGroupsInfoMacAddrPair;
+    std::map<WifiMacAddrInfo, std::string> mP2pCurrentgroupMacAddrPair;
 
     std::mutex mMacAddrPairMutex;
     std::mutex mStaMutex;
@@ -1448,6 +1475,7 @@ private:
     WifiConfigFileImpl<MovingFreezePolicy> mMovingFreezePolicy;
     MovingFreezePolicy mFPolicy;
     WifiConfigFileImpl<WifiStoreRandomMac> mSavedWifiStoreRandomMac;
+    WifiConfigFileImpl<WifiPortalConf> mSavedPortal;
     bool explicitGroup;
     std::atomic_bool mThreadStatusFlag_ { false };
     std::atomic_uint64_t mThreadStartTime { 0 };

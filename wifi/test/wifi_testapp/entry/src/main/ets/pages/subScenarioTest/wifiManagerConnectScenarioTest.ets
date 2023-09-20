@@ -54,8 +54,8 @@ struct wifiManagerConnectScenarioTest {
   @State w_staticIp_gateway1: number = 3232235777 ;
   @State w_staticIp_dnsServers1: number = 3716386629 ;
   @State w_staticIp_domains1: Array<string> = [ "0", "1", "2" ] ;
-  @State w_networkId1: number = 0 ;
-  @State w_featureId1: number = 1 ;
+  @State w_networkIdM: number = 0 ;
+  @State w_featureIdM: number = 1 ;
 
   aboutToAppear() {
     AppStorage.SetOrCreate( 'w_ssid1' , this.w_ssid1 );
@@ -73,8 +73,8 @@ struct wifiManagerConnectScenarioTest {
     AppStorage.SetOrCreate( 'w_staticIp_gateway1' , this.w_staticIp_gateway1 );
     AppStorage.SetOrCreate( 'w_staticIp_dnsServers1' , this.w_staticIp_dnsServers1 );
     AppStorage.SetOrCreate( 'w_staticIp_domains1' , this.w_staticIp_domains1 );
-    AppStorage.SetOrCreate( 'w_networkId1' , this.w_networkId1 );
-    AppStorage.SetOrCreate( 'w_featureId1' , this.w_featureId1 );
+    AppStorage.SetOrCreate( 'w_networkIdM' , this.w_networkIdM );
+    AppStorage.SetOrCreate( 'w_featureIdM' , this.w_featureIdM );
   }
 
   build() {

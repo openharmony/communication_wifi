@@ -17,7 +17,7 @@
 
 import { TestData } from '../MainAbility/model/testData'
 import { TestList } from './testList';
-import ConfigData from '../Utils/ConfigData';
+
 /**
  * Manual-Api Test Of Wifi test
  */

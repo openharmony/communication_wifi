@@ -27,6 +27,15 @@ enum class ServiceType {
 constexpr int RANDOM_DEVICE_ADDRESS = 0;
 constexpr int REAL_DEVICE_ADDRESS = 1;
 
+enum class WifiMacAddrInfoType {
+    WIFI_SCANINFO_MACADDR_INFO     = 0,
+    HOTSPOT_MACADDR_INFO           = 1,
+    P2P_DEVICE_MACADDR_INFO        = 2,
+    P2P_GROUPSINFO_MACADDR_INFO    = 3,
+    P2P_CURRENT_GROUP_MACADDR_INFO = 4,
+    INVALID_MACADDR_INFO
+};
+
 struct WifiMacAddrInfo {
     std::string bssid; /* mac address */
     int bssidType; /* mac address type */

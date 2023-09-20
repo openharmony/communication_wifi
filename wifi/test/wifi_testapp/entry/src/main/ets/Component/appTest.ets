@@ -1,5 +1,5 @@
-/*
- * Copyright (C) 2023 Huawei Device Co., Ltd.
+/**
+ * Copyright (c) 2022 Shenzhen Kaihong Digital Industry Development Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,20 +12,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef OHOS_WIFI_SERVICE_MANAGER_TEST_H
-#define OHOS_WIFI_SERVICE_MANAGER_TEST_H
-#include <gtest/gtest.h>
-#include "wifi_service_manager.h"
 
-namespace OHOS {
-namespace Wifi {
-class WifiServiceManagerTest : public testing::Test {
-public:
-    static void SetUpTestCase() {}
-    static void TearDownTestCase() {}
-    virtual void SetUp() {}
-    virtual void TearDown() {}
-};
-}  // namespace Wifi
-}  // namespace OHOS
-#endif
+// @ts-nocheck
+
+import { TestData } from '../MainAbility/model/testData'
+import { TestList } from './testList';
+
+/**
+ * AppTest Of WIFI test
+ */
+
+@Component
+export struct AppTest {
+  private testItems: TestData[]
+
+  build() {
+    Column() {
+      TestList( {
+        testItems : this.testItems
+      } )
+    }
+  }
+}

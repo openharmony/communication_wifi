@@ -17,7 +17,6 @@
 
 import { TestData } from '../MainAbility/model/testData'
 import { TestList } from './testList';
-import ConfigData from '../Utils/ConfigData';
 /**
  * Benchmark-Test Of Wifi test
  */

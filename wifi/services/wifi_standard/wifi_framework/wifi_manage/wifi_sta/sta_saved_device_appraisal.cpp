@@ -37,13 +37,13 @@ StaSavedDeviceAppraisal::StaSavedDeviceAppraisal(bool supportFmRoamingFlag)
 {}
 StaSavedDeviceAppraisal::~StaSavedDeviceAppraisal()
 {
-    WIFI_LOGI("Enter StaSavedDeviceAppraisal::~StaSavedDeviceAppraisal.\n");
+    WIFI_LOGI("Enter ~StaSavedDeviceAppraisal.\n");
 }
 
 ErrCode StaSavedDeviceAppraisal::DeviceAppraisals(
     WifiDeviceConfig &electedDevice, std::vector<InterScanInfo> &scanInfos, WifiLinkedInfo &info)
 {
-    WIFI_LOGD("Enter StaSavedDeviceAppraisal::DeviceAppraisals.\n");
+    WIFI_LOGD("Enter DeviceAppraisals.\n");
     int highestScore = 0;
     int sign = 0;
     InterScanInfo scanInfoElected;
@@ -118,7 +118,7 @@ bool StaSavedDeviceAppraisal::WhetherSkipDevice(WifiDeviceConfig &device)
 void StaSavedDeviceAppraisal::AppraiseDeviceQuality(int &score, InterScanInfo &scanInfo,
     WifiDeviceConfig &device, WifiLinkedInfo &info, bool flip)
 {
-    WIFI_LOGD("Enter StaSavedDeviceAppraisal::AppraiseDeviceQuality.\n");
+    WIFI_LOGD("Enter AppraiseDeviceQuality.\n");
     int rssi = scanInfo.rssi;
     /* Converts a signal to a grid number */
     int signalStrength = CalculateSignalBars(rssi, MAX_SIGNAL_BAR_NUM);
@@ -199,7 +199,7 @@ bool StaSavedDeviceAppraisal::Whether5GDevice(int frequency)
 
 int StaSavedDeviceAppraisal::CalculateSignalBars(int rssi, int signalBars)
 {
-    WIFI_LOGD("Enter StaSavedDeviceAppraisal CalculateSignalBars");
+    WIFI_LOGD("Enter CalculateSignalBars");
     if (rssi <= VALUE_LIMIT_MIN_RSSI) {
         return 0;
     } else if (rssi >= VALUE_LIMIT_MAX_RSSI) {

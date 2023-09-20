@@ -19,6 +19,7 @@
 #include <sys/types.h>
 #include <fstream>
 #include <vector>
+#include <atomic>
 
 #include "wifi_internal_msg.h"
 #include "wifi_log.h"
@@ -44,9 +45,11 @@ constexpr int STA_DISABLED_MODE = 4;
 constexpr int CMD_NETWORK_CONNECT_TIMEOUT = 0X01;
 constexpr int CMD_SIGNAL_POLL = 0X02;
 constexpr int CMD_START_NETCHECK = 0X03;
+constexpr int CMD_START_GET_DHCP_IP_TIMEOUT = 0X04;
 
 constexpr int STA_NETWORK_CONNECTTING_DELAY = 20 * 1000;
 constexpr int STA_SIGNAL_POLL_DELAY = 3 * 1000;
+constexpr int STA_SIGNAL_START_GET_DHCP_IP_DELAY = 30 * 1000;
 
 /* pincode length */
 constexpr int PIN_CODE_LEN = 8;
@@ -354,6 +357,12 @@ public:
      */
     void OnNetworkConnectionEvent(int networkId, std::string bssid);
     /**
+     * @Description  Disconnect events
+     *
+     * @param reason - the reason of wifi disconnection
+     */
+    void OnNetworkDisconnectEvent(int reason);
+    /**
      * @Description  Bssid change events
      *
      * @param reason: the reason of bssid changed(in)
@@ -398,6 +407,14 @@ public:
      * @Description On netmanager restart.
      */
     void OnNetManagerRestart(void);
+    /**
+     * @Description init dhcp renewal thread
+     */
+    void InitDhcpRenewalThread(uint32_t leaseTime);
+    /**
+     * @Description dhcp renewal thread entry func
+     */
+    void RunDhcpRenewalThreadFunc(uint32_t leaseTime);
 private:
     /**
      * @Description  Destruct state.
@@ -556,6 +573,11 @@ private:
      */
     void HandleDnsCheckResult(StaDnsState dnsState);
     /**
+     * @Description  notification portal network.
+     *
+     */
+    void PublishPortalNetworkNotification();
+    /**
      * @Description  Remove all device configurations before enabling WPS.
      *
      */
@@ -711,6 +733,13 @@ private:
      * @param msg - Message body received by the state machine[in]
      */
     void DealNetworkCheck(InternalMessage *msg);
+
+    /**
+     * @Description : Deal get dhcp ip timeout.
+     *
+     * @param msg - Message body received by the state machine[in]
+     */
+    void DealGetDhcpIpTimeout(InternalMessage *msg);
 #ifndef OHOS_ARCH_LITE
     /**
      * @Description Subscribe system ability changed.
@@ -748,6 +777,7 @@ private:
     int getIpSucNum;
     int getIpFailNum;
     bool isRoam;
+    int netNoWorkNum;
     WifiLinkedInfo linkedInfo;
     WifiLinkedInfo lastLinkedInfo;
     std::unique_ptr<IDhcpService> pDhcpService;
@@ -767,7 +797,8 @@ private:
     GetIpState *pGetIpState;
     LinkedState *pLinkedState;
     ApRoamingState *pApRoamingState;
-
+    std::thread mDhcpRenewalThread;
+    std::atomic<bool> exitDhcpRewThread;
     /**
      * @Description Replace empty dns
      */

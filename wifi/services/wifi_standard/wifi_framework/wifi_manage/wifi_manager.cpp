@@ -38,6 +38,7 @@
 #include "define.h"
 #include "wifi_config_center.h"
 #include "wifi_common_def.h"
+#include "wifi_hisysevent.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -51,6 +52,7 @@ const uint32_t TIMEOUT_UNLOAD_WIFI_SA = 5 * 60 * 1000;
 using TimeOutCallback = std::function<void()>;
 
 static sptr<WifiLocationModeObserver> locationModeObserver_ = nullptr;
+static sptr<WifiDeviceProvisionObserver> deviceProvisionObserver_ = nullptr;
 #endif
 
 WifiManager &WifiManager::GetInstance()
@@ -553,6 +555,7 @@ int WifiManager::Init()
     pthread_setname_np(mCloseServiceThread.native_handle(), "WifiCloseThread");
     
 #ifndef OHOS_ARCH_LITE
+    RegisterDeviceProvisionEvent();
     if (screenEventSubscriber_ == nullptr && screenTimerId == 0) {
         TimeOutCallback timeoutCallback = std::bind(&WifiManager::RegisterScreenEvent, this);
         WifiTimer::GetInstance()->Register(timeoutCallback, screenTimerId, TIMEOUT_SCREEN_EVENT, false);
@@ -605,33 +608,25 @@ int WifiManager::Init()
 #ifndef OHOS_ARCH_LITE
         WifiSaLoadManager::GetInstance().LoadWifiSa(WIFI_SCAN_ABILITY_ID);
 #endif
-        if ((WifiSettings::GetInstance().CheckScanOnlyAvailable() &&
-            WifiManager::GetInstance().GetLocationModeByDatashare()) ||
-            WifiConfigCenter::GetInstance().IsScanAlwaysActive()) {
-            CheckAndStartScanService();
-            IScanService *pService = WifiServiceManager::GetInstance().GetScanServiceInst();
-            if (pService != nullptr) {
-                int res = pService->StartWpa();
-                if (res != static_cast<int>(WIFI_IDL_OPT_OK)) {
-                    WIFI_LOGE("Start Wpa failed");
-                    if (WifiSettings::GetInstance().CheckScanOnlyAvailable() &&
-                        WifiManager::GetInstance().GetLocationModeByDatashare()) {
-                        WifiConfigCenter::GetInstance().SetWifiScanOnlyMidState(WifiOprMidState::CLOSED);
-                    }
-                }
-                if (WifiSettings::GetInstance().CheckScanOnlyAvailable() &&
-                    WifiManager::GetInstance().GetLocationModeByDatashare()) {
-                    WifiConfigCenter::GetInstance().SetWifiScanOnlyMidState(WifiOprMidState::RUNNING);
-                }
-            }
-        }
+        CheckAndStartScanService();
+        IScanService *pService = WifiServiceManager::GetInstance().GetScanServiceInst();
+        if (pService != nullptr) {
+            int res = pService->StartWpa();
+            if (res != static_cast<int>(WIFI_IDL_OPT_OK)) {
+                WIFI_LOGE("Start Wpa failed");
+                WifiConfigCenter::GetInstance().SetWifiScanOnlyMidState(WifiOprMidState::CLOSED);
 #ifndef OHOS_ARCH_LITE
-        else {
-            WifiSaLoadManager::GetInstance().UnloadWifiSa(WIFI_SCAN_ABILITY_ID);
-        }
+                WifiSaLoadManager::GetInstance().UnloadWifiSa(WIFI_SCAN_ABILITY_ID);
 #endif
+            } else {
+                WifiConfigCenter::GetInstance().SetWifiScanOnlyMidState(WifiOprMidState::RUNNING);
+            }
+        } else {
+#ifndef OHOS_ARCH_LITE
+            WifiSaLoadManager::GetInstance().UnloadWifiSa(WIFI_SCAN_ABILITY_ID);
+#endif
+        }
     }
-
     InitPidfile();
     return 0;
 }
@@ -666,6 +661,9 @@ void WifiManager::Exit()
 
     if (locationModeObserver_ != nullptr) {
         UnRegisterLocationEvent();
+    }
+    if (deviceProvisionObserver_ != nullptr) {
+        UnRegisterDeviceProvisionEvent();
     }
 #endif
     return;
@@ -969,6 +967,8 @@ void WifiManager::DealStaOpenRes(OperateResState state)
     if (state == OperateResState::OPEN_WIFI_OPENING) {
         cbMsg.msgData = static_cast<int>(WifiState::ENABLING);
         WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
+        WriteWifiOperateStateHiSysEvent(static_cast<int>(WifiOperateType::STA_OPEN),
+            static_cast<int>(WifiOperateState::STA_OPENING));
         return;
     }
     if ((state == OperateResState::OPEN_WIFI_FAILED) || (state == OperateResState::OPEN_WIFI_DISABLED)) {
@@ -991,6 +991,8 @@ void WifiManager::DealStaOpenRes(OperateResState state)
     WifiConfigCenter::GetInstance().SetStaLastRunState(true);
     cbMsg.msgData = static_cast<int>(WifiState::ENABLED);
     WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
+    WriteWifiOperateStateHiSysEvent(static_cast<int>(WifiOperateType::STA_OPEN),
+        static_cast<int>(WifiOperateState::STA_OPENED));
 #ifdef FEATURE_P2P_SUPPORT
     WifiOprMidState p2pState = WifiConfigCenter::GetInstance().GetP2pMidState();
     WIFI_LOGI("DealStaOpenRes, current p2p state:%{public}d", p2pState);
@@ -1065,7 +1067,44 @@ void WifiManager::DealStaConnChanged(OperateResState state, const WifiLinkedInfo
             }
         }
     }
-
+    switch (state) {
+        case OperateResState::CONNECT_CONNECTING:
+            WriteWifiOperateStateHiSysEvent(static_cast<int>(WifiOperateType::STA_CONNECT),
+                static_cast<int>(WifiOperateState::STA_CONNECTING));
+            break;
+        case OperateResState::CONNECT_AP_CONNECTED:
+            WriteWifiOperateStateHiSysEvent(static_cast<int>(WifiOperateType::STA_CONNECT),
+                static_cast<int>(WifiOperateState::STA_CONNECTED));
+            break;
+        case OperateResState::DISCONNECT_DISCONNECTED:
+            WriteWifiOperateStateHiSysEvent(static_cast<int>(WifiOperateType::STA_CONNECT),
+                static_cast<int>(WifiOperateState::STA_DISCONNECTED));
+            break;
+        case OperateResState::CONNECT_ASSOCIATING:
+            WriteWifiOperateStateHiSysEvent(static_cast<int>(WifiOperateType::STA_ASSOC),
+                static_cast<int>(WifiOperateState::STA_ASSOCIATING));
+            break;
+        case OperateResState::CONNECT_ASSOCIATED:
+            WriteWifiOperateStateHiSysEvent(static_cast<int>(WifiOperateType::STA_ASSOC),
+                static_cast<int>(WifiOperateState::STA_ASSOCIATED));
+            break;
+        case OperateResState::CONNECT_CONNECTION_FULL:
+            WriteWifiOperateStateHiSysEvent(static_cast<int>(WifiOperateType::STA_ASSOC),
+                static_cast<int>(WifiOperateState::STA_ASSOC_FULL_REJECT));
+            break;
+        case OperateResState::CONNECT_OBTAINING_IP:
+            WriteWifiOperateStateHiSysEvent(static_cast<int>(WifiOperateType::STA_DHCP),
+                static_cast<int>(WifiOperateState::STA_DHCP));
+            break;
+        default:
+            break;
+        }
+        if (info.connState == ConnState::AUTHENTICATING)
+        {
+            WriteWifiOperateStateHiSysEvent(static_cast<int>(WifiOperateType::STA_AUTH),
+                static_cast<int>(WifiOperateState::STA_AUTHING));
+        }
+        
 #ifdef FEATURE_P2P_SUPPORT
     if (cfgMonitorCallback.onStaConnectionChange != nullptr) {
         cfgMonitorCallback.onStaConnectionChange(static_cast<int>(state));
@@ -1860,7 +1899,6 @@ void WifiManager::DealOpenAirplaneModeEvent()
     }
 
     AutoStopStaService(AutoStartOrStopServiceReason::AIRPLANE_MODE);
-    AutoStopScanOnly();
 }
 
 void WifiManager::DealCloseAirplaneModeEvent()
@@ -1900,7 +1938,6 @@ void WifiManager::DealCloseAirplaneModeEvent()
         }
 #endif
     }
-    AutoStartScanOnly();
 #ifdef FEATURE_AP_SUPPORT
     if (WifiConfigCenter::GetInstance().GetHotspotState() == static_cast<int>(ApState::AP_STATE_CLOSED)) {
         std::unique_lock<std::mutex> lock(unloadHotspotSaTimerMutex);
@@ -1934,6 +1971,31 @@ void WifiManager::GetAirplaneModeByDatashare()
     if (airplaneMode.compare("1") == 0) {
         WifiConfigCenter::GetInstance().SetAirplaneModeState(MODE_STATE_OPEN);
     }
+    return;
+}
+
+void WifiManager::GetDeviceProvisionByDatashare()
+{
+    auto datashareHelper = DelayedSingleton<WifiDataShareHelperUtils>::GetInstance();
+    if (datashareHelper == nullptr) {
+        WIFI_LOGE("GetDeviceProvisionByDatashare, datashareHelper is nullprt!");
+        return;
+    }
+
+    std::string provision;
+    Uri uri(SETTINGS_DATASHARE_URI_DEVICE_PROVISIONED);
+    int ret = datashareHelper->Query(uri, SETTINGS_DATASHARE_KEY_DEVICE_PROVISIONED, provision);
+    if (ret != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("GetDeviceProvisionByDatashare, Query provision fail!");
+        return;
+    }
+
+    WIFI_LOGI("GetDeviceProvisionByDatashare, provision:%{public}s", provision.c_str());
+    if (provision.compare("1") == 0) {
+        WifiConfigCenter::GetInstance().SetDeviceProvisionState(MODE_STATE_CLOSE);
+        return;
+    }
+    WifiConfigCenter::GetInstance().SetDeviceProvisionState(MODE_STATE_OPEN);
     return;
 }
 
@@ -1990,6 +2052,41 @@ void WifiManager::UnRegisterLocationEvent()
     Uri uri(SETTINGS_DATASHARE_URI_LOCATION_MODE);
     datashareHelper->UnRegisterObserver(uri, locationModeObserver_);
     locationModeObserver_ = nullptr;
+}
+
+void WifiManager::RegisterDeviceProvisionEvent()
+{
+    if (deviceProvisionObserver_) {
+        return;
+    }
+
+    auto datashareHelper = DelayedSingleton<WifiDataShareHelperUtils>::GetInstance();
+    if (datashareHelper == nullptr) {
+        WIFI_LOGE("RegisterDeviceProvisionEvent datashareHelper is nullptr");
+        return;
+    }
+    WIFI_LOGI("RegisterDeviceProvisionEvent");
+    deviceProvisionObserver_ = sptr<WifiDeviceProvisionObserver>(new (std::nothrow)WifiDeviceProvisionObserver());
+    Uri uri(SETTINGS_DATASHARE_URI_DEVICE_PROVISIONED);
+    datashareHelper->RegisterObserver(uri, deviceProvisionObserver_);
+}
+
+void WifiManager::UnRegisterDeviceProvisionEvent()
+{
+    if (deviceProvisionObserver_ == nullptr) {
+        WIFI_LOGE("UnRegisterLocationEvent deviceProvisionObserver_ is nullptr");
+        return;
+    }
+
+    auto datashareHelper = DelayedSingleton<WifiDataShareHelperUtils>::GetInstance();
+    if (datashareHelper == nullptr) {
+        WIFI_LOGE("UnRegisterLocationEvent datashareHelper is nullptr");
+        return;
+    }
+    WIFI_LOGI("UnRegisterDeviceProvisionEvent");
+    Uri uri(SETTINGS_DATASHARE_URI_DEVICE_PROVISIONED);
+    datashareHelper->UnRegisterObserver(uri, deviceProvisionObserver_);
+    deviceProvisionObserver_ = nullptr;
 }
 
 void WifiManager::DealLocationModeChangeEvent()

@@ -224,12 +224,16 @@ int InitHostapdCtrl(const char *ifname, int id)
 
 void GetDestPort(char *destPort, size_t len, int id)
 {
-    strcpy_s(destPort, len, g_hostapdHalDevInfo[id].udpPort);
+    if (strcpy_s(destPort, len, g_hostapdHalDevInfo[id].udpPort) != EOK) {
+        LOGW("failed to copy the destPort");
+    }
 }
 
 void GetCtrlInterface(char *ctrl_path, size_t len, int id)
 {
-    strcpy_s(ctrl_path, len, HOSTAPD_CTRL_INTERFACE);
+    if (strcpy_s(ctrl_path, len, HOSTAPD_CTRL_INTERFACE) != EOK) {
+        LOGW("failed to copy the ctrl_path");
+    }
 }
 
 static int HostapdCliConnect(int id)

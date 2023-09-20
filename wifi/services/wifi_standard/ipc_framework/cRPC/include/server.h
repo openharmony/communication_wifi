@@ -24,6 +24,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+#define MAX_EVENT_NODE_COUNT 100
 
 struct Node {
     Context *context;
@@ -44,7 +45,7 @@ typedef struct RpcServer {
     pthread_mutex_t mutex;
     int events[100];
     int nEvents;
-    struct EventNode eventNode[100];
+    struct EventNode eventNode[MAX_EVENT_NODE_COUNT];
     bool isHandlingMsg;
 } RpcServer;
 

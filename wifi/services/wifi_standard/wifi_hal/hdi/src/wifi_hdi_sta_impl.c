@@ -122,6 +122,10 @@ WifiErrorNo HdiStartScan(const ScanSettings *settings)
     if (settings->hiddenSsidSize > 0) {
         int size = settings->hiddenSsidSize * sizeof(struct HdfWifiDriverScanSsid);
         scan.ssids = (struct HdfWifiDriverScanSsid*)malloc(size);
+        if (scan.ssids == NULL) {
+            LOGE("failed to alloc!");
+            return WIFI_HAL_FAILED;
+        }
         if (memset_s(scan.ssids, size, 0, size) != EOK) {
             LOGE("HdiStartScan memset ssids failed.");
             ret = 1;
@@ -131,6 +135,9 @@ WifiErrorNo HdiStartScan(const ScanSettings *settings)
         for (size_t i = 0; i < scan.ssidsLen; i++) {
             scan.ssids[i].ssidLen = strlen(settings->hiddenSsid[i]);
             scan.ssids[i].ssid = (char*)malloc(scan.ssids[i].ssidLen + 1);
+            if (scan.ssids[i].ssid == NULL) {
+                continue;
+            }
             if (memset_s(scan.ssids[i].ssid, scan.ssids[i].ssidLen + 1, 0, scan.ssids[i].ssidLen + 1) != EOK) {
                 LOGE("HdiStartScan memset ssids failed.");
                 ret = 1;

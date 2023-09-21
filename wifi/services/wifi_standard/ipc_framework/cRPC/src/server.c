@@ -299,6 +299,9 @@ int RegisterCallback(RpcServer *server, int event, Context *context)
 
     int num = sizeof(server->eventNode) / sizeof(server->eventNode[0]);
     int pos = event % num;
+    if (pos >= MAX_EVENT_NODE_COUNT) {
+        return -1;
+    }
     server->eventNode[pos].event = event;
     struct Node *p = server->eventNode[pos].head;
     while (p != NULL && p->context->fd != context->fd) {
@@ -323,6 +326,9 @@ int UnRegisterCallback(RpcServer *server, int event, const Context *context)
 
     int num = sizeof(server->eventNode) / sizeof(server->eventNode[0]);
     int pos = event % num;
+    if (pos >= MAX_EVENT_NODE_COUNT) {
+        return -1;
+    }
     server->eventNode[pos].event = event;
     struct Node *p = server->eventNode[pos].head;
     struct Node *q = p;

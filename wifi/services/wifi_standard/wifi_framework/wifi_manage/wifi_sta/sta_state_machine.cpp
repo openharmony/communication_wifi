@@ -2607,13 +2607,15 @@ void StaStateMachine::RunDhcpRenewalThreadFunc(uint32_t leaseTime)
     int nextBlockTime = leaseTime / 2 * TIME_USEC_1000;
     while (!mNeedQuit) {
         std::unique_lock<std::mutex> lck(mMtxBlock);
-        WIFI_LOGI("RunDhcpRenewalThreadFunc mRenewalCondition wait_for:%{public}d", nextBlockTime);
-        if (mRenewalCondition.wait_for(lck, std::chrono::milliseconds(nextBlockTime)) == std::cv_status::timeout) {
-            WIFI_LOGI("RunDhcpRenewalThreadFunc mRenewalCondition wake up, timeout:%{public}d", nextBlockTime);
-            StartDhcpRenewal();
-            return;
-        } else {
-            WIFI_LOGI("RunDhcpRenewalThreadFunc mRenewalCondition is wake up.");
+        if (!mNeedQuit) {
+            WIFI_LOGI("RunDhcpRenewalThreadFunc mRenewalCondition wait_for:%{public}d", nextBlockTime);
+            if (mRenewalCondition.wait_for(lck, std::chrono::milliseconds(nextBlockTime)) == std::cv_status::timeout) {
+                WIFI_LOGI("RunDhcpRenewalThreadFunc mRenewalCondition wake up, timeout:%{public}d", nextBlockTime);
+                StartDhcpRenewal();
+                return;
+            } else {
+                WIFI_LOGI("RunDhcpRenewalThreadFunc mRenewalCondition is wake up.");
+            }
         }
     }
     WIFI_LOGI("RunDhcpRenewalThreadFunc Thread exit!");
@@ -2647,7 +2649,7 @@ void StaStateMachine::StartDhcpRenewal()
 void StaStateMachine::NotifyExitDhcpRenewalThread()
 {
     std::unique_lock<std::mutex> lck(mMtxBlock);
-    mNeedQuit = false;
+    mNeedQuit = true;
     mRenewalCondition.notify_one();
     WIFI_LOGI("RunDhcpRenewalThreadFunc notify_one exit.");
 }

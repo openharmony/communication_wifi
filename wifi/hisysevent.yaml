@@ -93,3 +93,85 @@ WIFI_KPI_SSID:
   DHCP_SUCCESS_COUNT: {type: INT32, desc: sum of dhcp successfully}
   DISCONNECT_COUNT: {type: INT32, desc: sum of disconnection}
   IP_DHCP_COUNT: {type: INT32, desc: sum of dhcp}
+
+CHIP_CALIBRATION_FAIL:
+  __BASE: {type: FAULT, level: MINOR, desc: calibration Fail Err event}
+  ERROR_CODE: {type: INT32, desc: ERROR_CODE}
+
+DSM_BUCK_PROTECTED:
+  __BASE: {type: FAULT, level: MINOR, desc: DSM_1103_BUCK}
+  CONTENT: {type: STRING, desc: fault message}
+  COUNT: {type: INT32, desc: report counts}
+  DESCRIPTION: {type: STRING, desc: description}
+  DEVICE_NAME: {type: STRING, desc: device name}
+  FAULT_PHENOMENON: {type: STRING, desc: fault_phenomenon}
+  IC_NAME: {type: STRING, desc: IC name}
+  MODUILE_NAME: {type: STRING, desc: module name}
+  NFF_THRESHOLD_DAYNFF: {type: INT32, desc: nff_threshold_day}
+  NFF_THRESHOLD_MONTHNFF: {type: INT32, desc: nff_threshold_month}
+  RUNNING_TEST_SWITCH: {type: INT32, desc: running_test_switch}
+
+DSM_MP_ONE_TWO_HALT:
+  __BASE: {type: FAULT, level: MINOR, desc: DSM_1102A_HALT}
+  CONTENT: {type: STRING, desc: fault message}
+  COUNT: {type: INT32, desc: report counts}
+  DESCRIPTION: {type: STRING, desc: description}
+  DEVICE_NAME: {type: STRING, desc: device name}
+  FAULT_PHENOMENON: {type: STRING, desc: fault_phenomenon}
+  IC_NAME: {type: STRING, desc: IC name}
+  MODUILE_NAME: {type: STRING, desc: module name}
+  NFF_THRESHOLD_DAYNFF: {type: INT32, desc: nff_threshold_day}
+  NFF_THRESHOLD_MONTHNFF: {type: INT32, desc: nff_threshold_month}
+  RUNNING_TEST_SWITCH: {type: INT32, desc: running_test_switch}
+
+DSM_WIFI_FEMERROR:
+  __BASE: {type: FAULT, level: MINOR, desc: DSM_WIFI_FEMERROR}
+  CONTENT: {type: STRING, desc: fault message}
+  COUNT: {type: INT32, desc: report counts}
+  DESCRIPTION: {type: STRING, desc: description}
+  DEVICE_NAME: {type: STRING, desc: device name}
+  FAULT_PHENOMENON: {type: STRING, desc: fault_phenomenon}
+  IC_NAME: {type: STRING, desc: IC name}
+  MODUILE_NAME: {type: STRING, desc: module name}
+  NFF_THRESHOLD_DAYNFF: {type: INT32, desc: nff_threshold_day}
+  NFF_THRESHOLD_MONTHNFF: {type: INT32, desc: nff_threshold_month}
+  RUNNING_TEST_SWITCH: {type: INT32, desc: running_test_switch}
+
+DSM_WIFI_LOAD_FIRMWARE:
+  __BASE: {type: FAULT, level: MINOR, desc: DSM_WIFI_LOAD_FIRMWARE}
+  CONTENT: {type: STRING, desc: fault message}
+  COUNT: {type: INT32, desc: report counts}
+  DESCRIPTION: {type: STRING, desc: description}
+  DEVICE_NAME: {type: STRING, desc: device name}
+  FAULT_PHENOMENON: {type: STRING, desc: fault_phenomenon}
+  IC_NAME: {type: STRING, desc: IC name}
+  MODUILE_NAME: {type: STRING, desc: module name}
+  NFF_THRESHOLD_DAYNFF: {type: INT32, desc: nff_threshold_day}
+  NFF_THRESHOLD_MONTHNFF: {type: INT32, desc: nff_threshold_month}
+  RUNNING_TEST_SWITCH: {type: INT32, desc: running_test_switch}
+
+DSM_WIFI_MODULE_INIT_ERROR:
+  __BASE: {type: FAULT, level: MINOR, desc: DSM_WIFI_MODULE_INIT_ERROR}
+  CONTENT: {type: STRING, desc: fault message}
+  COUNT: {type: INT32, desc: report counts}
+  DESCRIPTION: {type: STRING, desc: description}
+  DEVICE_NAME: {type: STRING, desc: device name}
+  FAULT_PHENOMENON: {type: STRING, desc: fault_phenomenon}
+  IC_NAME: {type: STRING, desc: IC name}
+  MODUILE_NAME: {type: STRING, desc: module name}
+  NFF_THRESHOLD_DAYNFF: {type: INT32, desc: nff_threshold_day}
+  NFF_THRESHOLD_MONTHNFF: {type: INT32, desc: nff_threshold_month}
+  RUNNING_TEST_SWITCH: {type: INT32, desc: running_test_switch}
+
+DSM_WIFI_PCIE_LINKDOWN:
+  __BASE: {type: FAULT, level: MINOR, desc: DSM_WIFI_PCIE_LINKDOWN}
+  CONTENT: {type: STRING, desc: fault message}
+  COUNT: {type: INT32, desc: report counts}
+  DESCRIPTION: {type: STRING, desc: description}
+  DEVICE_NAME: {type: STRING, desc: device name}
+  FAULT_PHENOMENON: {type: STRING, desc: fault_phenomenon}
+  IC_NAME: {type: STRING, desc: IC name}
+  MODUILE_NAME: {type: STRING, desc: module name}
+  NFF_THRESHOLD_DAYNFF: {type: INT32, desc: nff_threshold_day}
+  NFF_THRESHOLD_MONTHNFF: {type: INT32, desc: nff_threshold_month}
+  RUNNING_TEST_SWITCH: {type: INT32, desc: running_test_switch}

@@ -19,8 +19,6 @@
 #include <sys/types.h>
 #include <fstream>
 #include <vector>
-#include <atomic>
-#include <condition_variable>
 
 #include "wifi_internal_msg.h"
 #include "wifi_log.h"
@@ -408,24 +406,6 @@ public:
      * @Description On netmanager restart.
      */
     void OnNetManagerRestart(void);
-    /**
-     * @Description init dhcp renewal thread
-     */
-    void InitDhcpRenewalThread(uint32_t leaseTime);
-    /**
-     * @Description dhcp renewal thread entry func
-     */
-    void RunDhcpRenewalThreadFunc(uint32_t leaseTime);
-     /**
-     * @Description start dhcp renewal.
-     *
-     */
-    void StartDhcpRenewal();
-    /**
-     * @Description notify exit renewal thread.
-     *
-     */
-    void NotifyExitDhcpRenewalThread();
 private:
     /**
      * @Description  Destruct state.
@@ -808,10 +788,6 @@ private:
     GetIpState *pGetIpState;
     LinkedState *pLinkedState;
     ApRoamingState *pApRoamingState;
-    std::thread mDhcpRenewalThread;
-    std::atomic<bool> mNeedQuit;
-    std::mutex mMtxBlock;
-    std::condition_variable mRenewalCondition;
 
     /**
      * @Description Replace empty dns

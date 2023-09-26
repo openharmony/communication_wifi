@@ -80,8 +80,7 @@ StaStateMachine::StaStateMachine()
       pWpsState(nullptr),
       pGetIpState(nullptr),
       pLinkedState(nullptr),
-      pApRoamingState(nullptr),
-      mNeedQuit(false)
+      pApRoamingState(nullptr)
 {
 }
 
@@ -114,12 +113,6 @@ StaStateMachine::~StaStateMachine()
     }
     ParsePointer(pDhcpResultNotify);
     ParsePointer(pNetcheck);
-
-    NotifyExitDhcpRenewalThread();
-    if (mDhcpRenewalThread.joinable()) {
-        WIFI_LOGI("StaStateMachine::~StaStateMachine mDhcpRenewalThread join");
-        mDhcpRenewalThread.join();
-    }
 }
 
 /* ---------------------------Initialization functions------------------------------ */
@@ -2354,17 +2347,7 @@ void StaStateMachine::DhcpResultNotify::OnSuccess(int status, const std::string 
     WifiSettings::GetInstance().GetIpv6Info(ipv6Info);
     TryToSaveIpV4Result(ipInfo, ipv6Info, result);
     TryToSaveIpV6Result(ipInfo, ipv6Info, result);
-    WifiDeviceConfig config;
-    AssignIpMethod assignMethod = AssignIpMethod::DHCP;
-    int ret = WifiSettings::GetInstance().GetDeviceConfig(pStaStateMachine->linkedInfo.networkId, config);
-    if (ret == 0) {
-        assignMethod = config.wifiIpConfig.assignMethod;
-    }
-    if (assignMethod == AssignIpMethod::DHCP) {
-        TryToCloseDhcpClient(result.iptype);
-        pStaStateMachine->InitDhcpRenewalThread(result.uLeaseTime);
-    }
-
+    TryToCloseDhcpClient(result.iptype);
     return;
 }
 
@@ -2580,78 +2563,5 @@ void StaStateMachine::SaveWifiConfigForUpdate(int networkId)
     }
 }
 #endif // OHOS_ARCH_LITE
-
-void StaStateMachine::InitDhcpRenewalThread(uint32_t leaseTime)
-{
-    if (mDhcpRenewalThread.joinable()) {
-        WIFI_LOGI("InitDhcpRenewalThread mDhcpRenewalThread joinable!");
-        mDhcpRenewalThread.join();
-    }
- 
-    mDhcpRenewalThread = std::thread(&StaStateMachine::RunDhcpRenewalThreadFunc, this, leaseTime);
-    pthread_setname_np(mDhcpRenewalThread.native_handle(), "WifiDhcpRenewalThread");
-    WIFI_LOGI("InitDhcpRenewalThread dhcp renewal thread created!");
-}
-
-void StaStateMachine::RunDhcpRenewalThreadFunc(uint32_t leaseTime)
-{
-    WIFI_LOGI("RunDhcpRenewalThreadFunc enter leaseTime:%{public}d !", leaseTime);
-    if (leaseTime <= 0) {
-        WIFI_LOGE("RunDhcpRenewalThreadFunc leaseTime [%{public}d] invalid!", leaseTime);
-        return;
-    }
-    if (currentTpType == IPTYPE_IPV6) {
-        WIFI_LOGE("RunDhcpRenewalThreadFunc iptype [%{public}d] no need renewal!", currentTpType);
-        return;
-    }
-    int nextBlockTime = leaseTime / 2 * TIME_USEC_1000;
-    while (!mNeedQuit) {
-        std::unique_lock<std::mutex> lck(mMtxBlock);
-        if (!mNeedQuit) {
-            WIFI_LOGI("RunDhcpRenewalThreadFunc mRenewalCondition wait_for:%{public}d", nextBlockTime);
-            if (mRenewalCondition.wait_for(lck, std::chrono::milliseconds(nextBlockTime)) == std::cv_status::timeout) {
-                WIFI_LOGI("RunDhcpRenewalThreadFunc mRenewalCondition wake up, timeout:%{public}d", nextBlockTime);
-                StartDhcpRenewal();
-                return;
-            } else {
-                WIFI_LOGI("RunDhcpRenewalThreadFunc mRenewalCondition is wake up.");
-            }
-        }
-    }
-    WIFI_LOGI("RunDhcpRenewalThreadFunc Thread exit!");
-    mNeedQuit = false;
-    return;
-}
-
-void StaStateMachine::StartDhcpRenewal()
-{
-    WIFI_LOGI("RunDhcpRenewalThreadFunc enter StartDhcpRenewal!");
-    WifiLinkedInfo linkedInfo;
-    GetLinkedInfo(linkedInfo);
-    if (linkedInfo.connState != ConnState::CONNECTED) {
-        WIFI_LOGE("RunDhcpRenewalThreadFunc network is not connected, connState:%{public}d", linkedInfo.connState);
-        return;
-    }
-
-    if (pDhcpService == nullptr) {
-        WIFI_LOGE("RunDhcpRenewalThreadFunc pDhcpService is null!");
-        return;
-    }
-
-    int dhcpRet = pDhcpService->RenewDhcpClient(IF_NAME);
-    if ((dhcpRet != 0) || (pDhcpService->GetDhcpResult(IF_NAME, pDhcpResultNotify, DHCP_TIME) != 0)) {
-        WIFI_LOGE("RunDhcpRenewalThreadFunc Dhcp renew failed, dhcpRet:%{public}d", dhcpRet);
-    } else {
-        WIFI_LOGI("RunDhcpRenewalThreadFunc Dhcp renew success.");
-    }
-}
-
-void StaStateMachine::NotifyExitDhcpRenewalThread()
-{
-    std::unique_lock<std::mutex> lck(mMtxBlock);
-    mNeedQuit = true;
-    mRenewalCondition.notify_one();
-    WIFI_LOGI("RunDhcpRenewalThreadFunc notify_one exit.");
-}
 } // namespace Wifi
 } // namespace OHOS

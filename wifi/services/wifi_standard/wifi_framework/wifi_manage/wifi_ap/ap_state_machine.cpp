@@ -127,13 +127,13 @@ void ApStateMachine::BroadCastStationChange(const StationInfo &staInfo, ApStatem
     }
 }
 
-bool ApStateMachine::StartDhcpServer(const std::string &ipAddress, const int32_t &leaseTime)
+bool ApStateMachine::StartDhcpServer(const std::string &ipAddress)
 {
     WIFI_LOGI("Enter:StartDhcpServer");
 #ifndef WIFI_DHCP_DISABLED
     Ipv4Address ipv4(Ipv4Address::INVALID_INET_ADDRESS);
     Ipv6Address ipv6(Ipv6Address::INVALID_INET6_ADDRESS);
-    if (!m_DhcpdInterface.StartDhcpServer(IN_INTERFACE, ipv4, ipv6, ipAddress, true, leaseTime)) {
+    if (!m_DhcpdInterface.StartDhcpServer(IN_INTERFACE, ipv4, ipv6, ipAddress, true)) {
         WIFI_LOGE("start dhcpd fail.");
         return false;
     }

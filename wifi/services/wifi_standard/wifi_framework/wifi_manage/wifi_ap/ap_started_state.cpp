@@ -300,7 +300,7 @@ void ApStartedState::ProcessCmdSetHotspotConfig(InternalMessage &msg)
     m_hotspotConfig.SetChannel(msg.GetIntFromMessage());
     m_hotspotConfig.SetMaxConn(msg.GetIntFromMessage());
     m_hotspotConfig.SetIpAddress(msg.GetStringFromMessage());
-
+    m_hotspotConfig.SetLeaseTime(msg.GetIntFromMessage());
     if (SetConfig(m_hotspotConfig)) {
         WIFI_LOGI("SetSoftApConfig success.");
     } else {
@@ -318,7 +318,7 @@ void ApStartedState::ProcessCmdUpdateConfigResult(InternalMessage &msg) const
         }
 #ifndef WIFI_DHCP_DISABLED
         m_ApStateMachine.StopDhcpServer();
-        m_ApStateMachine.StartDhcpServer(m_hotspotConfig.GetIpAddress());
+        m_ApStateMachine.StartDhcpServer(m_hotspotConfig.GetIpAddress(), m_hotspotConfig.GetLeaseTime());
 #endif
     } else {
         m_ApStateMachine.SwitchState(&m_ApStateMachine.m_ApIdleState);

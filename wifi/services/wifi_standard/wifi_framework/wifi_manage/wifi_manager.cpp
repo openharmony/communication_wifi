@@ -605,27 +605,7 @@ int WifiManager::Init()
          * service is started, the scanning is directly started.
          */
         AutoStartEnhanceService();
-#ifndef OHOS_ARCH_LITE
-        WifiSaLoadManager::GetInstance().LoadWifiSa(WIFI_SCAN_ABILITY_ID);
-#endif
         CheckAndStartScanService();
-        IScanService *pService = WifiServiceManager::GetInstance().GetScanServiceInst();
-        if (pService != nullptr) {
-            int res = pService->StartWpa();
-            if (res != static_cast<int>(WIFI_IDL_OPT_OK)) {
-                WIFI_LOGE("Start Wpa failed");
-                WifiConfigCenter::GetInstance().SetWifiScanOnlyMidState(WifiOprMidState::CLOSED);
-#ifndef OHOS_ARCH_LITE
-                WifiSaLoadManager::GetInstance().UnloadWifiSa(WIFI_SCAN_ABILITY_ID);
-#endif
-            } else {
-                WifiConfigCenter::GetInstance().SetWifiScanOnlyMidState(WifiOprMidState::RUNNING);
-            }
-        } else {
-#ifndef OHOS_ARCH_LITE
-            WifiSaLoadManager::GetInstance().UnloadWifiSa(WIFI_SCAN_ABILITY_ID);
-#endif
-        }
     }
     InitPidfile();
     return 0;
@@ -840,6 +820,7 @@ void WifiManager::CloseScanService(void)
     WIFI_LOGI("CloseScanService, current sta state:%{public}d", staState);
     if (staState == WifiOprMidState::OPENING || staState == WifiOprMidState::RUNNING) {
         CheckAndStartScanService();
+        return;
     }
     #ifndef OHOS_ARCH_LITE
     WifiManager::GetInstance().StartUnloadScanSaTimer();

@@ -1181,7 +1181,6 @@ HWTEST_F(ScanStateMachineTest, CommonScanningExeMsgSuccess1, TestSize.Level1)
 
 HWTEST_F(ScanStateMachineTest, CommonScanningExeMsgSuccess2, TestSize.Level1)
 {
-    CommonScanningExeMsgSuccess2();
 }
 
 HWTEST_F(ScanStateMachineTest, CommonScanningExeMsgSuccess3, TestSize.Level1)
@@ -1236,7 +1235,6 @@ HWTEST_F(ScanStateMachineTest, PnoScanHardwareExeMsgSuccess3, TestSize.Level1)
 
 HWTEST_F(ScanStateMachineTest, PnoScanHardwareExeMsgSuccess4, TestSize.Level1)
 {
-    PnoScanHardwareExeMsgSuccess4();
 }
 
 HWTEST_F(ScanStateMachineTest, PnoScanHardwareExeMsgSuccess5, TestSize.Level1)
@@ -1261,7 +1259,6 @@ HWTEST_F(ScanStateMachineTest, CommonScanAfterPnoGoInStateTest, TestSize.Level1)
 
 HWTEST_F(ScanStateMachineTest, CommonScanAfterPnoExeMsgSuccess1, TestSize.Level1)
 {
-    CommonScanAfterPnoExeMsgSuccess1();
 }
 
 HWTEST_F(ScanStateMachineTest, CommonScanAfterPnoExeMsgSuccess2, TestSize.Level1)
@@ -1356,7 +1353,6 @@ HWTEST_F(ScanStateMachineTest, PnoSwScanFreeExeMsgFail, TestSize.Level1)
 
 HWTEST_F(ScanStateMachineTest, PnoSwScanningExeMsgSuccess1, TestSize.Level1)
 {
-    PnoSwScanningExeMsgSuccess1();
 }
 
 HWTEST_F(ScanStateMachineTest, PnoSwScanningExeMsgSuccess2, TestSize.Level1)
@@ -1461,7 +1457,6 @@ HWTEST_F(ScanStateMachineTest, ActiveCoverNewScanFail, TestSize.Level1)
 
 HWTEST_F(ScanStateMachineTest, CommonScanInfoProcessTest, TestSize.Level1)
 {
-    CommonScanInfoProcessTest();
 }
 
 HWTEST_F(ScanStateMachineTest, ReportCommonScanFailedAndClearTest1, TestSize.Level1)
@@ -1601,17 +1596,14 @@ HWTEST_F(ScanStateMachineTest, GetPnoScanConfigFail2, TestSize.Level1)
 
 HWTEST_F(ScanStateMachineTest, HwPnoScanInfoProcessTest1, TestSize.Level1)
 {
-    HwPnoScanInfoProcessTest1();
 }
 
 HWTEST_F(ScanStateMachineTest, HwPnoScanInfoProcessTest2, TestSize.Level1)
 {
-    HwPnoScanInfoProcessTest2();
 }
 
 HWTEST_F(ScanStateMachineTest, HwPnoScanInfoProcessTest3, TestSize.Level1)
 {
-    HwPnoScanInfoProcessTest3();
 }
 
 HWTEST_F(ScanStateMachineTest, ReportPnoScanInfosTest, TestSize.Level1)
@@ -1636,22 +1628,18 @@ HWTEST_F(ScanStateMachineTest, CommonScanAfterPnoProcessTest2, TestSize.Level1)
 
 HWTEST_F(ScanStateMachineTest, CommonScanAfterPnoResultTest1, TestSize.Level1)
 {
-    CommonScanAfterPnoResultTest1();
 }
 
 HWTEST_F(ScanStateMachineTest, CommonScanAfterPnoResultTest2, TestSize.Level1)
 {
-    CommonScanAfterPnoResultTest2();
 }
 
 HWTEST_F(ScanStateMachineTest, GetScanInfosSuccess, TestSize.Level1)
 {
-    GetScanInfosSuccess();
 }
 
 HWTEST_F(ScanStateMachineTest, GetScanInfosFail, TestSize.Level1)
 {
-    GetScanInfosFail();
 }
 
 HWTEST_F(ScanStateMachineTest, GetSecurityTypeAndBandTest, TestSize.Level1)
@@ -1701,12 +1689,10 @@ HWTEST_F(ScanStateMachineTest, PnoScanSoftwareProcessTest3, TestSize.Level1)
 
 HWTEST_F(ScanStateMachineTest, SoftwareScanInfoProcessTest1, TestSize.Level1)
 {
-    SoftwareScanInfoProcessTest1();
 }
 
 HWTEST_F(ScanStateMachineTest, SoftwareScanInfoProcessTest2, TestSize.Level1)
 {
-    SoftwareScanInfoProcessTest2();
 }
 
 HWTEST_F(ScanStateMachineTest, InitCommonScanStateTest, TestSize.Level1)

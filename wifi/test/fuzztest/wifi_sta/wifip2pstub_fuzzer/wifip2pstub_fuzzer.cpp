@@ -29,7 +29,7 @@
 
 namespace OHOS {
 namespace Wifi {
-constexpr size_t U32_AT_SIZE_ZERO = 0;
+constexpr size_t U32_AT_SIZE_ZERO = 4;
 constexpr size_t MAP_P2P_NUMS = 41;
 const std::u16string FORMMGR_INTERFACE_TOKEN = u"ohos.wifi.IWifiP2pService";
 sptr<WifiP2pStub> pWifiP2pStub = WifiP2pServiceImpl::GetInstance();

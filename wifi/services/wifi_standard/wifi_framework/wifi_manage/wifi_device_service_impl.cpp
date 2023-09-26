@@ -1500,7 +1500,6 @@ void WifiDeviceServiceImpl::RegisterAppRemoved()
     eventSubscriber_ = std::make_shared<AppEventSubscriber>(subscriberInfo);
     if (!EventFwk::CommonEventManager::SubscribeCommonEvent(eventSubscriber_)) {
         WIFI_LOGE("AppEvent SubscribeCommonEvent() failed");
-        eventSubscriber_ = nullptr;
     } else {
         WIFI_LOGI("AppEvent SubscribeCommonEvent() OK");
         WifiTimer::GetInstance()->UnRegister(appEventTimerId);
@@ -1533,7 +1532,6 @@ void WifiDeviceServiceImpl::RegisterThermalLevel()
     thermalLevelSubscriber_ = std::make_shared<ThermalLevelSubscriber>(subscriberInfo);
     if (!EventFwk::CommonEventManager::SubscribeCommonEvent(thermalLevelSubscriber_)) {
         WIFI_LOGE("THERMAL_LEVEL_CHANGED SubscribeCommonEvent() failed");
-        thermalLevelSubscriber_ = nullptr;
     } else {
         WIFI_LOGI("THERMAL_LEVEL_CHANGED SubscribeCommonEvent() OK");
         WifiTimer::GetInstance()->UnRegister(thermalTimerId);

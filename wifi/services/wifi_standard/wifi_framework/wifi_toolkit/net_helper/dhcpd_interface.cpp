@@ -60,7 +60,7 @@ bool DhcpdInterface::SetDhcpEventFunc(const std::string &ifaceName, IDhcpResultN
 }
 
 bool DhcpdInterface::StartDhcpServer(const std::string &ifaceName, Ipv4Address &ipv4, Ipv6Address &ipv6,
-    const std::string &ipAddress, bool isIpV4)
+    const std::string &ipAddress, bool isIpV4, const int32_t &leaseTime)
 {
     if (mDhcpService == nullptr) {
         mDhcpService = DhcpServiceApi::GetInstance();
@@ -89,6 +89,10 @@ bool DhcpdInterface::StartDhcpServer(const std::string &ifaceName, Ipv4Address &
 
     if (!SetDhcpIpRange(ifaceName)) {
         WIFI_LOGE("Set dhcp range ip address failed!");
+        return false;
+    }
+    if (!UpdateDefaultConfigFile(leaseTime)) {
+        WIFI_LOGE("UpdateDefaultConfigFile failed!");
         return false;
     }
     if (mDhcpService->StartDhcpServer(ifaceName) != 0) {
@@ -146,6 +150,17 @@ bool DhcpdInterface::SetDhcpIpRange(const std::string &ifaceName)
         range.strStartip.c_str(),
         range.strEndip.c_str());
     return true;
+}
+
+bool DhcpdInterface::UpdateDefaultConfigFile(const int32_t &leaseTime)
+{
+    if (mDhcpService == nullptr) {
+        WIFI_LOGE("UpdateDefaultConfigFile mDhcpService is nullptr!");
+        return false;
+    }
+    int result = mDhcpService->UpdateDefaultConfigFile(std::to_string(leaseTime));
+    WIFI_LOGI("UpdateDefaultConfigFile result:%{public}d", result);
+    return (result == 0) ? true : false;
 }
 
 bool DhcpdInterface::GetConnectedStationInfo(const std::string &ifaceName, std::map<std::string, StationInfo> &result)

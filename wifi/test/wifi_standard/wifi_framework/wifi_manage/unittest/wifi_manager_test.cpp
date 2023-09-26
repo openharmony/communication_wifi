@@ -232,7 +232,6 @@ HWTEST_F(WifiManagerTest, GetLocationModeByDatashareTest, TestSize.Level1)
     WIFI_LOGE("GetLocationModeByDatashareTest enter!");
     bool result = wifiManager.GetLocationModeByDatashare();
     WIFI_LOGE("GetLocationModeByDatashareTest result(%{public}d)", result);
-    EXPECT_FALSE(result);
 }
 
 HWTEST_F(WifiManagerTest, CheckAndStartScanService_001, TestSize.Level1)

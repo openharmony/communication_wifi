@@ -68,6 +68,7 @@ WifiHostapdHalDeviceInfo g_hostapdHalDevInfo[] = {
     {AP_2G_MAIN_INSTANCE, NULL, WIFI_DEFAULT_CFG, HOSTAPD_DEFAULT_CFG, HOSTAPD_DEFAULT_UDPPORT}
 };
 #endif
+#define HOSTAPD_CFG_VALUE_ON 1
 
 WifiHostapdHalDeviceInfo *GetWifiCfg(int *len)
 {
@@ -450,6 +451,28 @@ static int SetApChannel(int channel, int id)
     return WpaCtrlCommand(g_hostapdHalDevInfo[id].hostapdHalDev->ctrlConn, cmd, buf, sizeof(buf));
 }
 
+static int SetApWmm(int value, int id)
+{
+    char cmd[BUFSIZE_CMD] = {0};
+    char buf[BUFSIZE_REQUEST_SMALL] = {0};
+
+    if (sprintf_s(cmd, sizeof(cmd), "SET wmm_enabled %d", value) < 0) {
+        return -1;
+    }
+    return WpaCtrlCommand(g_hostapdHalDevInfo[id].hostapdHalDev->ctrlConn, cmd, buf, sizeof(buf));
+}
+
+static int SetAp80211n(int value, int id)
+{
+    char cmd[BUFSIZE_CMD] = {0};
+    char buf[BUFSIZE_REQUEST_SMALL] = {0};
+
+    if (sprintf_s(cmd, sizeof(cmd), "SET ieee80211n %d", value) < 0) {
+        return -1;
+    }
+    return WpaCtrlCommand(g_hostapdHalDevInfo[id].hostapdHalDev->ctrlConn, cmd, buf, sizeof(buf));
+}
+
 static int SetApBand(int band, int id)
 {
     char cmd[BUFSIZE_CMD] = {0};
@@ -686,6 +709,14 @@ static int SetApInfo(HostapdConfig *info, int id)
     if ((retval = SetApBand(info->band, id)) != 0) {
         LOGE("SetApBand failed. retval %{public}d", retval);
         return retval;
+    }
+    if ((retval = SetAp80211n(HOSTAPD_CFG_VALUE_ON, id)) != 0) {
+        // only log error
+        LOGE("SetAp80211n failed. retval %{public}d", retval);
+    }
+    if ((retval = SetApWmm(HOSTAPD_CFG_VALUE_ON, id)) != 0) {
+        // only log error
+        LOGE("SetApWmm failed. retval %{public}d", retval);
     }
     if ((retval = SetApChannel(info->channel, id)) != 0) {
         LOGE("SetApChannel failed. retval %{public}d", retval);

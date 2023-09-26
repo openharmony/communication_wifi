@@ -171,7 +171,6 @@ void WifiHotspotStub::OnGetHotspotConfig(
         } else {
             reply.WriteString(hotspotConfig.GetIpAddress());
         }
-        reply.WriteInt32(hotspotConfig.GetLeaseTime());
     }
 
     return;
@@ -189,7 +188,6 @@ void WifiHotspotStub::OnSetApConfigWifi(uint32_t code, MessageParcel &data, Mess
     const char *preSharedKeyRead = data.ReadCString();
     config.SetMaxConn(data.ReadInt32());
     config.SetIpAddress(data.ReadString());
-    config.SetLeaseTime(data.ReadInt32());
     if (ssidRead == nullptr || preSharedKeyRead == nullptr) {
         ret = WIFI_OPT_INVALID_PARAM;
     } else {

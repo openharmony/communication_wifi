@@ -25,8 +25,6 @@ namespace Wifi {
 #define AP_CHANNEL_DEFAULT 6
 #define AP_CHANNEL_5G_DEFAULT 149
 #define WIFI_BSSID_LENGTH 18
-#define DHCP_LEASE_TIME_MIN 60
-#define DHCP_LEASE_TIME 21600
 enum class ApState {
     AP_STATE_NONE = 0,
     AP_STATE_IDLE,
@@ -70,7 +68,6 @@ struct HotspotConfig {
         band = BandType::BAND_2GHZ;
         channel = AP_CHANNEL_DEFAULT;
         maxConn = -1;
-        leaseTime = DHCP_LEASE_TIME;
     }
 
     inline void SetSsid(const std::string &newSsid)
@@ -137,15 +134,6 @@ struct HotspotConfig {
         return ipAddress;
     }
 
-    inline void SetLeaseTime(int32_t newLeaseTime)
-    {
-        leaseTime = newLeaseTime;
-    }
-
-    inline int32_t GetLeaseTime() const
-    {
-        return leaseTime;
-    }
 private:
     std::string ssid;         /* Hotspot name, The string length range is 1~32 */
     std::string preSharedKey; /* Hotspot password ,The string length range is 8~63 */
@@ -154,7 +142,6 @@ private:
     int32_t channel;
     int32_t maxConn;
     std::string ipAddress;    /* Hotspot IP address of the dhcp server */
-    int32_t leaseTime;
 };
 
 struct StationInfo {

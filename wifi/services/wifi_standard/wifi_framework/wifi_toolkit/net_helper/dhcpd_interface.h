@@ -57,7 +57,7 @@ public:
      * @return true: success   false: fail
      */
     bool StartDhcpServer(const std::string &ifaceName, Ipv4Address &ipv4, Ipv6Address &ipv6,
-        const std::string &ipAddress = "", bool isIpV4 = true);
+        const std::string &ipAddress = "", bool isIpV4 = true, const int32_t &leaseTime = 0);
 
     /**
      * @Description Stop the DHCP server.
@@ -96,6 +96,7 @@ private:
     bool AssignIpAddr(Ipv4Address &ipv4, Ipv6Address &ipv6, const std::vector<Ipv4Address> &vecIpv4Addr,
         const std::vector<Ipv6Address> &vecIpv6Addr, const std::string &ipAddress, bool isIpV4);
     bool ApplyIpAddress(const std::string &ifaceName, const Ipv4Address &ipv4, const Ipv6Address &ipv6);
+    bool UpdateDefaultConfigFile(const int32_t &leaseTime);
 
 private:
     std::unique_ptr<IDhcpService> mDhcpService;

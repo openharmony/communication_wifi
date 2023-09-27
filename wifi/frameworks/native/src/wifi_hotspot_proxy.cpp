@@ -214,6 +214,7 @@ ErrCode WifiHotspotProxy::GetHotspotConfig(HotspotConfig &result)
     result.SetPreSharedKey((readStr != nullptr) ? readStr : "");
     result.SetMaxConn(reply.ReadInt32());
     result.SetIpAddress(reply.ReadString());
+    result.SetLeaseTime(reply.ReadInt32());
 
     return WIFI_OPT_SUCCESS;
 }
@@ -239,6 +240,7 @@ ErrCode WifiHotspotProxy::SetHotspotConfig(const HotspotConfig &config)
     data.WriteCString(config.GetPreSharedKey().c_str());
     data.WriteInt32(config.GetMaxConn());
     data.WriteString(config.GetIpAddress());
+    data.WriteInt32(config.GetLeaseTime());
     int error = Remote()->SendRequest(static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_SETAPCONFIG_WIFI),
         data, reply, option);
     if (error != ERR_NONE) {

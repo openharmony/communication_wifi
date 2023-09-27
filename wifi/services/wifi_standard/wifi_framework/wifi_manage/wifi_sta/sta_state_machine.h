@@ -40,11 +40,13 @@ constexpr int STA_CONNECT_MODE = 1;
 constexpr int STA_SCAN_ONLY_MODE = 2;
 constexpr int STA_CAN_ONLY_WITH_WIFI_OFF_MODE = 3;
 constexpr int STA_DISABLED_MODE = 4;
+constexpr int STA_RENEWAL_MIN_TIME = 120;
 
 constexpr int CMD_NETWORK_CONNECT_TIMEOUT = 0X01;
 constexpr int CMD_SIGNAL_POLL = 0X02;
 constexpr int CMD_START_NETCHECK = 0X03;
 constexpr int CMD_START_GET_DHCP_IP_TIMEOUT = 0X04;
+constexpr int CMD_START_RENEWAL_TIMEOUT = 0X05;
 
 constexpr int STA_NETWORK_CONNECTTING_DELAY = 20 * 1000;
 constexpr int STA_SIGNAL_POLL_DELAY = 3 * 1000;
@@ -406,6 +408,19 @@ public:
      * @Description On netmanager restart.
      */
     void OnNetManagerRestart(void);
+
+     /**
+     * @Description start dhcp renewal.
+     *
+     */
+    void StartDhcpRenewal();
+
+    /**
+     * @Description : Deal renewal timeout.
+     *
+     * @param msg - Message body received by the state machine[in]
+     */
+    void DealRenewalTimeout(InternalMessage *msg);
 private:
     /**
      * @Description  Destruct state.
@@ -788,7 +803,6 @@ private:
     GetIpState *pGetIpState;
     LinkedState *pLinkedState;
     ApRoamingState *pApRoamingState;
-
     /**
      * @Description Replace empty dns
      */

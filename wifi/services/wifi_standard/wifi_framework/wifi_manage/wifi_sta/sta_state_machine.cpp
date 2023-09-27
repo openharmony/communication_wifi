@@ -576,6 +576,7 @@ void StaStateMachine::StopWifiProcess()
     WifiSettings::GetInstance().SetWifiState(static_cast<int>(WifiState::DISABLING));
     staCallback.OnStaCloseRes(OperateResState::CLOSE_WIFI_CLOSING);
     StopTimer(static_cast<int>(CMD_SIGNAL_POLL));
+    StopTimer(static_cast<int>(CMD_START_RENEWAL_TIMEOUT));
     if (currentTpType == IPTYPE_IPV4) {
         pDhcpService->StopDhcpClient(IF_NAME, false);
     } else {
@@ -700,6 +701,7 @@ int StaStateMachine::InitStaSMHandleMap()
     staSmHandleFuncMap[WIFI_SVR_CMD_STA_WPA_ASSOC_REJECT_EVENT] = &StaStateMachine::DealWpaLinkFailEvent;
     staSmHandleFuncMap[CMD_START_NETCHECK] = &StaStateMachine::DealNetworkCheck;
     staSmHandleFuncMap[CMD_START_GET_DHCP_IP_TIMEOUT] = &StaStateMachine::DealGetDhcpIpTimeout;
+    staSmHandleFuncMap[CMD_START_RENEWAL_TIMEOUT] = &StaStateMachine::DealRenewalTimeout;
     return WIFI_OPT_SUCCESS;
 }
 
@@ -971,6 +973,7 @@ void StaStateMachine::DealDisconnectEvent(InternalMessage *msg)
 #endif
     StopTimer(static_cast<int>(CMD_SIGNAL_POLL));
     StopTimer(static_cast<int>(CMD_START_NETCHECK));
+    StopTimer(static_cast<int>(CMD_START_RENEWAL_TIMEOUT));
     pNetcheck->StopNetCheckThread();
     if (currentTpType == IPTYPE_IPV4) {
         pDhcpService->StopDhcpClient(IF_NAME, false);
@@ -2348,6 +2351,24 @@ void StaStateMachine::DhcpResultNotify::OnSuccess(int status, const std::string 
     TryToSaveIpV4Result(ipInfo, ipv6Info, result);
     TryToSaveIpV6Result(ipInfo, ipv6Info, result);
     TryToCloseDhcpClient(result.iptype);
+
+    WifiDeviceConfig config;
+    AssignIpMethod assignMethod = AssignIpMethod::DHCP;
+    int ret = WifiSettings::GetInstance().GetDeviceConfig(pStaStateMachine->linkedInfo.networkId, config);
+    if (ret == 0) {
+        assignMethod = config.wifiIpConfig.assignMethod;
+    }
+    LOGI("DhcpResultNotify OnSuccess, uLeaseTime=%{public}d %{public}d %{public}d", result.uLeaseTime, assignMethod,
+        pStaStateMachine->currentTpType);
+    if ((assignMethod == AssignIpMethod::DHCP) && (result.uLeaseTime > 0) &&
+        (pStaStateMachine->currentTpType != IPTYPE_IPV6)) {
+        if (result.uLeaseTime < STA_RENEWAL_MIN_TIME) {
+            result.uLeaseTime = STA_RENEWAL_MIN_TIME;
+        }
+        int64_t interval = result.uLeaseTime / 2 * TIME_USEC_1000; // s->ms
+        LOGI("StartTimer CMD_START_RENEWAL_TIMEOUT interval=%{public}lld", interval);
+        pStaStateMachine->StartTimer(static_cast<int>(CMD_START_RENEWAL_TIMEOUT), interval);
+    }
     return;
 }
 
@@ -2563,5 +2584,39 @@ void StaStateMachine::SaveWifiConfigForUpdate(int networkId)
     }
 }
 #endif // OHOS_ARCH_LITE
+
+void StaStateMachine::DealRenewalTimeout(InternalMessage *msg)
+{
+    if (msg == nullptr) {
+        LOGE("DealRenewalTimeout InternalMessage msg is null.");
+        return;
+    }
+    LOGI("DealRenewalTimeout StopTimer CMD_START_RENEWAL_TIMEOUT");
+    StopTimer(static_cast<int>(CMD_START_RENEWAL_TIMEOUT));
+    StartDhcpRenewal(); // start renewal
+}
+
+void StaStateMachine::StartDhcpRenewal()
+{
+    WIFI_LOGI("enter StartDhcpRenewal!");
+    WifiLinkedInfo linkedInfo;
+    GetLinkedInfo(linkedInfo);
+    if (linkedInfo.connState != ConnState::CONNECTED) {
+        WIFI_LOGE("StartDhcpRenewal network is not connected, connState:%{public}d", linkedInfo.connState);
+        return;
+    }
+
+    if (pDhcpService == nullptr) {
+        WIFI_LOGE("StartDhcpRenewal pDhcpService is null!");
+        return;
+    }
+
+    int dhcpRet = pDhcpService->RenewDhcpClient(IF_NAME);
+    if ((dhcpRet != 0) || (pDhcpService->GetDhcpResult(IF_NAME, pDhcpResultNotify, DHCP_TIME) != 0)) {
+        WIFI_LOGE("StartDhcpRenewal dhcp renew failed, dhcpRet:%{public}d", dhcpRet);
+    } else {
+        WIFI_LOGI("StartDhcpRenewal dhcp renew success.");
+    }
+}
 } // namespace Wifi
 } // namespace OHOS

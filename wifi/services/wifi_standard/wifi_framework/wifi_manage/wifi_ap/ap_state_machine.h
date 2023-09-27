@@ -130,10 +130,11 @@ public:
     /**
      * @Description  Enable dhcp server.
      * @param ipAddress - HotspotConfig dhcp server address
+     * @param leaseTime - HotspotConfig dhcp lease time
      * @return true - success
      * @return false - fail
      */
-    bool StartDhcpServer(const std::string &ipAddress);
+    bool StartDhcpServer(const std::string &ipAddress, const int32_t &leaseTime);
 
     /**
      * @Description  Get the Station List object.

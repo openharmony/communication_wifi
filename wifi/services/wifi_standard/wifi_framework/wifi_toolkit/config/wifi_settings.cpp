@@ -935,7 +935,8 @@ int WifiSettings::ManageStation(const StationInfo &info, int mode, int id)
             mConnectStationInfo.emplace(std::make_pair(info.bssid, info));
         }
     #ifdef SUPPORT_RANDOM_MAC_ADDR
-        WifiSettings::GetInstance().StoreWifiMacAddrPairInfo(WifiMacAddrInfoType::HOTSPOT_MACADDR_INFO, info.bssid);
+        WifiSettings::GetInstance().StoreWifiMacAddrPairInfo(WifiMacAddrInfoType::HOTSPOT_MACADDR_INFO,
+            info.bssid, "");
     #endif
     } else if (MODE_DEL == mode) {
         if (iter != mConnectStationInfo.end()) {
@@ -1962,7 +1963,8 @@ void WifiSettings::GenerateRandomMacAddress(std::string peerBssid, std::string &
     LOGD("exit GenerateRandomMacAddress, randomMacAddr:%{private}s", randomMacAddr.c_str());
 }
 
-bool WifiSettings::StoreWifiMacAddrPairInfo(WifiMacAddrInfoType type, const std::string &realMacAddr)
+bool WifiSettings::StoreWifiMacAddrPairInfo(WifiMacAddrInfoType type, const std::string &realMacAddr,
+    const std::string &randomAddr)
 {
     if (realMacAddr.empty()) {
         LOGE("StoreWifiMacAddrPairInfo: address is empty");
@@ -1975,9 +1977,13 @@ bool WifiSettings::StoreWifiMacAddrPairInfo(WifiMacAddrInfoType type, const std:
     }
 
     std::string randomMacAddr;
-    WifiSettings::GetInstance().GenerateRandomMacAddress(realMacAddr, randomMacAddr);
-    LOGI("%{public}s: type:%{public}d, address:%{private}s, randomMacAddr:%{private}s",
-        __func__, type, realMacAddr.c_str(), randomMacAddr.c_str());
+    if (randomAddr.empty()) {
+        WifiSettings::GetInstance().GenerateRandomMacAddress(realMacAddr, randomMacAddr);
+    } else {
+        randomMacAddr = randomAddr;
+    }
+    LOGI("%{public}s: type:%{public}d, address:%{private}s, randomAddr:%{private}s, randomMacAddr:%{private}s",
+        __func__, type, realMacAddr.c_str(), randomAddr.c_str(), randomMacAddr.c_str());
     WifiMacAddrInfo realMacAddrInfo;
     realMacAddrInfo.bssid = realMacAddr;
     realMacAddrInfo.bssidType = REAL_DEVICE_ADDRESS;
@@ -1990,9 +1996,35 @@ bool WifiSettings::StoreWifiMacAddrPairInfo(WifiMacAddrInfoType type, const std:
     }
     return true;
 }
+std::string WifiSettings::GetRandomMacAddr(WifiMacAddrInfoType type, std::string bssid)
+{
+    LOGD("%{public}s: query a random mac address, type:%{public}d, bssid:%{private}s",
+        __func__, type, bssid.c_str());
+    WifiMacAddrInfo realMacAddrInfo;
+    realMacAddrInfo.bssid = bssid;
+    realMacAddrInfo.bssidType = REAL_DEVICE_ADDRESS;
+    std::string randomMacAddr = WifiSettings::GetInstance().GetMacAddrPairs(type, realMacAddrInfo);
+    if (!randomMacAddr.empty()) {
+        LOGD("%{public}s: find the record, bssid:%{private}s, bssidType:%{public}d, randomMacAddr:%{private}s",
+            __func__, realMacAddrInfo.bssid.c_str(), realMacAddrInfo.bssidType, randomMacAddr.c_str());
+        return randomMacAddr;
+    } else {
+        WifiMacAddrInfo randomMacAddrInfo;
+        randomMacAddrInfo.bssid = bssid;
+        randomMacAddrInfo.bssidType = RANDOM_DEVICE_ADDRESS;
+        randomMacAddr = WifiSettings::GetInstance().GetMacAddrPairs(type, realMacAddrInfo);
+        if (!randomMacAddr.empty()) {
+            LOGD("%{public}s: find the record, bssid:%{private}s, bssidType:%{public}d, randomMacAddr:%{private}s",
+                __func__, randomMacAddrInfo.bssid.c_str(), randomMacAddrInfo.bssidType, randomMacAddr.c_str());
+            return randomMacAddr;
+        }
+    }
+    return "";
+}
 void WifiSettings::RemoveMacAddrPairInfo(WifiMacAddrInfoType type, std::string bssid)
 {
-    LOGD("remove a mac address pair, type:%{public}d, bssid:%{private}s", type, bssid.c_str());
+    LOGD("%{public}s: remove a mac address pair, type:%{public}d, bssid:%{private}s",
+        __func__, type, bssid.c_str());
     WifiMacAddrInfo realMacAddrInfo;
     realMacAddrInfo.bssid = bssid;
     realMacAddrInfo.bssidType = REAL_DEVICE_ADDRESS;

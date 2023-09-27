@@ -746,6 +746,7 @@ void WifiInternalEventDispatcher::SendConfigChangeEvent(sptr<IWifiP2pCallback> &
     cfgInfo = nullptr;
 }
 
+#ifdef SUPPORT_RANDOM_MAC_ADDR
 void WifiInternalEventDispatcher::updateP2pDeviceMacAddress(std::vector<WifiP2pDevice> &device)
 {
     for (auto iter = device.begin(); iter != device.end(); ++iter) {
@@ -769,6 +770,7 @@ void WifiInternalEventDispatcher::updateP2pDeviceMacAddress(std::vector<WifiP2pD
         }
     }
 }
+#endif
 
 void WifiInternalEventDispatcher::SendP2pCallbackMsg(sptr<IWifiP2pCallback> &callback, const WifiEventCallbackMsg &msg,
     int pid, int uid, int tokenId)

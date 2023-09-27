@@ -1342,9 +1342,19 @@ public:
      *
      * @param type - MAC address type[in]
      * @param realMacAddr - real MAC address[in]
+     * @param randomAddr - random MAC address[in]
      * @return bool - false fail to save the MAC address, true success to save the MAC address
      */
-    bool StoreWifiMacAddrPairInfo(WifiMacAddrInfoType type, const std::string &realMacAddr);
+    bool StoreWifiMacAddrPairInfo(WifiMacAddrInfoType type, const std::string &realMacAddr,
+        const std::string &randomAddr);
+    /**
+     * @Description get random MAC address
+     *
+     * @param type - MAC address type[in]
+     * @param bssid - MAC address
+     * @return std::string - random MAC address
+     */
+    std::string GetRandomMacAddr(WifiMacAddrInfoType type, std::string bssid);
     /**
      * @Description remove MAC address pair
      *

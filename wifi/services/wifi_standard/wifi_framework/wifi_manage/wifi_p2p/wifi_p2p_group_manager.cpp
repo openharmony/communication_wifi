@@ -94,7 +94,7 @@ int WifiP2pGroupManager::ClearAll()
     std::unique_lock<std::mutex> lock(groupMutex);
     int groupSize = groupsInfo.size();
 #ifdef SUPPORT_RANDOM_MAC_ADDR
-    WIFI_LOGD("%{public}s: clear all group", __func__);
+    WIFI_LOGD("%{public}s: clear all group, size:%{public}d", __func__, groupSize);
     for (auto iter = groupsInfo.begin(); iter != groupsInfo.end(); ++iter) {
         RemoveMacAddrPairInfo(WifiMacAddrInfoType::P2P_GROUPSINFO_MACADDR_INFO, *iter);
     }
@@ -288,21 +288,54 @@ void WifiP2pGroupManager::UpdateGroupsNetwork(std::map<int, WifiP2pGroupInfo> wp
 void WifiP2pGroupManager::AddMacAddrPairInfo(WifiMacAddrInfoType type, const WifiP2pGroupInfo &group)
 {
     WifiP2pDevice owner = group.GetOwner();
-    WIFI_LOGD("%{public}s add mac address, ownerName:%{private}s, address:%{private}s, type:%{public}d",
-        __func__, owner.GetDeviceName().c_str(),
+    WIFI_LOGD("%{public}s add mac address, type:%{public}d, GOName:%{private}s, addr:%{private}s, addrType:%{public}d",
+        __func__, type, owner.GetDeviceName().c_str(),
         owner.GetDeviceAddress().c_str(), owner.GetDeviceAddressType());
-    WifiSettings::GetInstance().StoreWifiMacAddrPairInfo(type, owner.GetDeviceAddress());
-    std::vector<WifiP2pDevice> clientVec = group.GetClientDevices();
-    for (auto iter = clientVec.begin(); iter != clientVec.end(); ++iter) {
-        WifiSettings::GetInstance().StoreWifiMacAddrPairInfo(type, iter->GetDeviceAddress());
+    if (type == WifiMacAddrInfoType::P2P_GROUPSINFO_MACADDR_INFO) {
+        std::string goRandomMacAddr = WifiSettings::GetInstance().GetRandomMacAddr(
+            WifiMacAddrInfoType::P2P_DEVICE_MACADDR_INFO, owner.GetDeviceAddress());
+        WifiSettings::GetInstance().StoreWifiMacAddrPairInfo(type, owner.GetDeviceAddress(), goRandomMacAddr);
+        std::vector<WifiP2pDevice> clientVec = group.GetClientDevices();
+        std::string gcRandomMacAddr;
+        for (auto iter = clientVec.begin(); iter != clientVec.end(); ++iter) {
+            gcRandomMacAddr = WifiSettings::GetInstance().GetRandomMacAddr(
+                WifiMacAddrInfoType::P2P_DEVICE_MACADDR_INFO, iter->GetDeviceAddress());
+            WifiSettings::GetInstance().StoreWifiMacAddrPairInfo(type, iter->GetDeviceAddress(), gcRandomMacAddr);
+        }
+    } else if (type == WifiMacAddrInfoType::P2P_CURRENT_GROUP_MACADDR_INFO) {
+        std::string goRandomMacAddr = WifiSettings::GetInstance().GetRandomMacAddr(
+            WifiMacAddrInfoType::P2P_DEVICE_MACADDR_INFO, owner.GetDeviceAddress());
+        if (!goRandomMacAddr.empty()) {
+            WifiSettings::GetInstance().StoreWifiMacAddrPairInfo(type, owner.GetDeviceAddress(), goRandomMacAddr);
+            std::vector<WifiP2pDevice> clientVec = group.GetClientDevices();
+            std::string gcRandomMacAddr;
+            for (auto iter = clientVec.begin(); iter != clientVec.end(); ++iter) {
+                gcRandomMacAddr = WifiSettings::GetInstance().GetRandomMacAddr(
+                    WifiMacAddrInfoType::P2P_DEVICE_MACADDR_INFO, iter->GetDeviceAddress());
+                WifiSettings::GetInstance().StoreWifiMacAddrPairInfo(type, iter->GetDeviceAddress(), gcRandomMacAddr);
+            }
+        } else {
+            goRandomMacAddr = WifiSettings::GetInstance().GetRandomMacAddr(
+                WifiMacAddrInfoType::P2P_GROUPSINFO_MACADDR_INFO, owner.GetDeviceAddress());
+            WifiSettings::GetInstance().StoreWifiMacAddrPairInfo(type, owner.GetDeviceAddress(), goRandomMacAddr);
+            std::vector<WifiP2pDevice> clientVec = group.GetClientDevices();
+            std::string gcRandomMacAddr;
+            for (auto iter = clientVec.begin(); iter != clientVec.end(); ++iter) {
+                gcRandomMacAddr = WifiSettings::GetInstance().GetRandomMacAddr(
+                    WifiMacAddrInfoType::P2P_GROUPSINFO_MACADDR_INFO, iter->GetDeviceAddress());
+                WifiSettings::GetInstance().StoreWifiMacAddrPairInfo(type, iter->GetDeviceAddress(), gcRandomMacAddr);
+            }
+        }
+    } else {
+        WIFI_LOGW("%{public}s invalid type:%{public}d", __func__, type);
     }
 }
 
 void WifiP2pGroupManager::RemoveMacAddrPairInfo(WifiMacAddrInfoType type, const WifiP2pGroupInfo &group)
 {
     WifiP2pDevice owner = group.GetOwner();
-    WIFI_LOGD("%{public}s remove mac address, ownerName:%{private}s, address:%{private}s, type:%{public}d",
-        __func__, owner.GetDeviceName().c_str(),
+    WIFI_LOGD("%{public}s del mac address, type:%{public}d, GOName:%{private}s, addr:%{private}s, addrType:%{public}d",
+        __func__, type, owner.GetDeviceName().c_str(),
         owner.GetDeviceAddress().c_str(), owner.GetDeviceAddressType());
     WifiMacAddrInfo macAddrInfo;
     macAddrInfo.bssid = owner.GetDeviceAddress();

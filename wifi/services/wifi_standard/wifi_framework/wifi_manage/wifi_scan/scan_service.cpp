@@ -691,7 +691,8 @@ bool ScanService::StoreFullScanInfo(
         }
         if (!find) {
         #ifdef SUPPORT_RANDOM_MAC_ADDR
-            WifiSettings::GetInstance().StoreWifiMacAddrPairInfo(WifiMacAddrInfoType::WIFI_SCANINFO_MACADDR_INFO, storedIter->bssid);
+            WifiSettings::GetInstance().StoreWifiMacAddrPairInfo(WifiMacAddrInfoType::WIFI_SCANINFO_MACADDR_INFO,
+                storedIter->bssid, "");
         #endif
             results.push_back(*storedIter);
         }

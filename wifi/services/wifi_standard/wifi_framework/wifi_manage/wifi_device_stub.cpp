@@ -135,6 +135,36 @@ int WifiDeviceStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageP
     return 0;
 }
 
+void WifiDeviceStub::RemoveDeathRecipient(void)
+{
+    WIFI_LOGI("enter RemoveDeathRecipient!");
+    std::lock_guard<std::mutex> lock(mutex_);
+    for (auto iter = remoteDeathMap.begin(); iter != remoteDeathMap.end(); ++iter) {
+        iter->first->RemoveDeathRecipient(iter->second);
+        remoteDeathMap.erase(iter);
+    }
+}
+
+void WifiDeviceStub::RemoveDeathRecipient(const wptr<IRemoteObject> &remoteObject)
+{
+    WIFI_LOGI("enter RemoveDeathRecipient, remoteObject: %{private}p!", &remoteObject);
+    std::lock_guard<std::mutex> lock(mutex_);
+    RemoteDeathMap::iterator iter = remoteDeathMap.find(remoteObject);
+    if (iter == remoteDeathMap.end()) {
+        WIFI_LOGW("not find remoteObject to deal!");
+    } else {
+        remoteObject->RemoveDeathRecipient(iter->second);
+        remoteDeathMap.erase(iter);
+        WIFI_LOGI("remove death recipient success!");
+    }
+}
+
+void WifiDeviceStub::OnRemoteDied(const wptr<IRemoteObject> &remoteObject)
+{
+    WIFI_LOGI("Remote is died! remoteObject: %{private}p", &remoteObject);
+    RemoveDeathRecipient(remoteObject);
+}
+
 void WifiDeviceStub::OnEnableWifi(uint32_t code, MessageParcel &data, MessageParcel &reply)
 {
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
@@ -684,8 +714,9 @@ void WifiDeviceStub::OnRegisterCallBack(uint32_t code, MessageParcel &data, Mess
             ret = RegisterCallBack(callback_, event);
         } else {
             if (deathRecipient_ == nullptr) {
-                deathRecipient_ = new (std::nothrow) WifiDeviceDeathRecipient();
+                deathRecipient_ = new (std::nothrow) WifiDeathRecipient(*this);
             }
+            remoteDeathMap.insert(remote, deathRecipient_);
             if ((remote->IsProxyObject()) && (!remote->AddDeathRecipient(deathRecipient_))) {
                 WIFI_LOGD("AddDeathRecipient!");
             }

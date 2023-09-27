@@ -30,6 +30,7 @@ public:
 
     using handleFunc = void (WifiDeviceStub::*)(uint32_t code, MessageParcel &data, MessageParcel &reply);
     using HandleFuncMap = std::map<int, handleFunc>;
+    using RemoteDeathMap = std::map<sptr<IRemoteObject>, sptr<IRemoteObject::DeathRecipient>>;
 
     virtual int OnRemoteRequest(
         uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) override;
@@ -73,6 +74,9 @@ private:
     void OnIsBandTypeSupported(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnGet5GHzChannelList(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnGetDisconnectedReason(uint32_t code, MessageParcel &data, MessageParcel &reply);
+    void OnRemoteDied(const wptr<IRemoteObject> &remoteObject);
+    void RemoveDeathRecipient(void);
+    void RemoveDeathRecipient(const wptr<IRemoteObject> &remoteObject);
 
 private:
     void ReadWifiDeviceConfig(MessageParcel &data, WifiDeviceConfig &config);
@@ -80,10 +84,25 @@ private:
     void WriteWifiDeviceConfig(MessageParcel &reply, const WifiDeviceConfig &config);
     void WriteIpAddress(MessageParcel &reply, const WifiIpAddress &address);
 
+    class WifiDeathRecipient : public IRemoteObject::DeathRecipient {
+    public:
+        explicit WifiDeathRecipient(WifiDeviceStub &client) : client_(client) {}
+        ~WifiDeathRecipient() override = default;
+        void OnRemoteDied(const wptr<IRemoteObject> &remote) override
+        {
+            client_.OnRemoteDied(remote);
+        }
+
+    private:
+        WifiDeviceStub &client_;
+    };
+
 private:
     HandleFuncMap handleFuncMap;
+    RemoteDeathMap remoteDeathMap;
     sptr<IRemoteObject::DeathRecipient> deathRecipient_;
     bool mSingleCallback;
+    std::mutex mutex_;
 };
 }  // namespace Wifi
 }  // namespace OHOS

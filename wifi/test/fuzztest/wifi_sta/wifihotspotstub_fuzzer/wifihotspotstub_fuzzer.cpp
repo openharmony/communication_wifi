@@ -29,7 +29,7 @@
 
 namespace OHOS {
 namespace Wifi {
-constexpr size_t U32_AT_SIZE_ZERO = 0;
+constexpr size_t U32_AT_SIZE_ZERO = 4;
 constexpr size_t MAP_HOTSPOT_NUMS = 22;
 const std::u16string FORMMGR_INTERFACE_TOKEN = u"ohos.wifi.IWifiHotspotService";
 std::shared_ptr<WifiHotspotStub> pWifiHotspotStub = std::make_shared<WifiHotspotServiceImpl>();

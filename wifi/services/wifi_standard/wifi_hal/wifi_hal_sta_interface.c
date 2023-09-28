@@ -316,6 +316,9 @@ WifiErrorNo GetNetworkList(WifiNetworkInfo *infos, int *size)
 WifiErrorNo StartPnoScan(const PnoScanSettings *settings)
 {
     LOGD("Ready to start pnoscan with param.");
+#ifdef HDI_INTERFACE_SUPPORT
+    return HdiStartPnoScan(settings);
+#else
     ScanSettings scanSettings;
     scanSettings.freqs = settings->freqs;
     scanSettings.freqSize = settings->freqSize;
@@ -339,11 +342,15 @@ WifiErrorNo StartPnoScan(const PnoScanSettings *settings)
     }
     LOGD("StartPnoScan successfully!");
     return WIFI_HAL_SUCCESS;
+#endif
 }
 
 WifiErrorNo StopPnoScan(void)
 {
     LOGD("Ready to stop pnoscan.");
+#ifdef HDI_INTERFACE_SUPPORT
+    return HdiStopPnoScan();
+#else
     ScanSettings scanSettings;
     scanSettings.scanStyle = SCAN_TYPE_PNO;
     scanSettings.isStartPnoScan = 0;
@@ -353,11 +360,12 @@ WifiErrorNo StopPnoScan(void)
     }
     int ret = pStaIfc->wpaCliCmdScan(pStaIfc, &scanSettings);
     if (ret < 0) {
-        LOGE("StartPnoScan failed! ret=%{public}d", ret);
+        LOGE("StopPnoScan failed! ret=%{public}d", ret);
         return WIFI_HAL_FAILED;
     }
-    LOGD("StartPnoScan successfully!");
+    LOGD("StopPnoScan successfully!");
     return WIFI_HAL_SUCCESS;
+#endif
 }
 
 WifiErrorNo Connect(int networkId)

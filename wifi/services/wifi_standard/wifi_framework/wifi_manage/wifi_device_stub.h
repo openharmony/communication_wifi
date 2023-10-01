@@ -74,9 +74,6 @@ private:
     void OnIsBandTypeSupported(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnGet5GHzChannelList(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnGetDisconnectedReason(uint32_t code, MessageParcel &data, MessageParcel &reply);
-    void OnRemoteDied(const wptr<IRemoteObject> &remoteObject);
-    void RemoveDeathRecipient(void);
-    void RemoveDeathRecipient(const wptr<IRemoteObject> &remoteObject);
 
 private:
     void ReadWifiDeviceConfig(MessageParcel &data, WifiDeviceConfig &config);
@@ -84,6 +81,7 @@ private:
     void WriteWifiDeviceConfig(MessageParcel &reply, const WifiDeviceConfig &config);
     void WriteIpAddress(MessageParcel &reply, const WifiIpAddress &address);
 
+#ifndef OHOS_ARCH_LITE
     class WifiDeathRecipient : public IRemoteObject::DeathRecipient {
     public:
         explicit WifiDeathRecipient(WifiDeviceStub &client) : client_(client) {}
@@ -97,12 +95,18 @@ private:
         WifiDeviceStub &client_;
     };
 
+    void OnRemoteDied(const wptr<IRemoteObject> &remoteObject);
+    void RemoveDeathRecipient(void);
+    void RemoveDeathRecipient(const wptr<IRemoteObject> &remoteObject);
+
+    RemoteDeathMap remoteDeathMap;
+    std::mutex mutex_;
+#endif
+
 private:
     HandleFuncMap handleFuncMap;
-    RemoteDeathMap remoteDeathMap;
     sptr<IRemoteObject::DeathRecipient> deathRecipient_;
     bool mSingleCallback;
-    std::mutex mutex_;
 };
 }  // namespace Wifi
 }  // namespace OHOS

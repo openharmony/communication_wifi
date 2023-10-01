@@ -828,6 +828,12 @@ WifiErrorNo GetConnectSignalInfo(const char *endBssid, WpaSignalInfo *info)
         ReadInt(context, &info->frequency);
         ReadInt(context, &info->txPackets);
         ReadInt(context, &info->rxPackets);
+        ReadInt(context, &info->snr);
+        ReadInt(context, &info->chload);
+        ReadInt(context, &info->ulDelay);
+        ReadInt(context, &info->txBytes);
+        ReadInt(context, &info->rxBytes);
+        ReadInt(context, &info->txFailed);
     }
     ReadClientEnd(client);
     UnlockRpcClient(client);

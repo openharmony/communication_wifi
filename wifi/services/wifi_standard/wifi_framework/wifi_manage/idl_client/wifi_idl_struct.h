@@ -93,9 +93,16 @@ struct WifiWpaSignalInfo {
     int frequency;
     int txPackets;
     int rxPackets;
+    int snr;
+    int chload;
+    int ulDelay;
+    int txBytes;
+    int rxBytes;
+    int txFailed;
 
     WifiWpaSignalInfo() : signal(0), txrate(0), rxrate(0), noise(0), frequency(0),
-        txPackets(0), rxPackets(0)
+        txPackets(0), rxPackets(0), snr(0), chload(0), ulDelay(0), txBytes(0), rxBytes(0),
+        txFailed(0)
     {}
 
     ~WifiWpaSignalInfo()

@@ -222,6 +222,12 @@ WifiErrorNo GetHdiSignalInfo(WpaSignalInfo *info)
     info->frequency = signalResult.associatedFreq;
     info->txPackets = signalResult.currentTxPackets;
     info->rxPackets = signalResult.currentRxPackets;
+    info->chload = signalResult.currentChload;
+    info->snr = signalResult.currentSnr;
+    info->ulDelay = signalResult.currentUlDelay;
+    info->txFailed = signalResult.currentTxFailed;
+    info->txBytes = signalResult.currentTxBytes;
+    info->rxBytes = signalResult.currentRxBytes;
     return (ret == 0) ? 0 : -1;
 }
 

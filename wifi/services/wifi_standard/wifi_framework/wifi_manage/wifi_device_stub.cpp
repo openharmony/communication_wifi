@@ -30,11 +30,17 @@ namespace OHOS {
 namespace Wifi {
 WifiDeviceStub::WifiDeviceStub() : mSingleCallback(false)
 {
+    WIFI_LOGI("enter WifiDeviceStub!");
     InitHandleMap();
 }
 
 WifiDeviceStub::~WifiDeviceStub()
-{}
+{
+    WIFI_LOGI("enter ~WifiDeviceStub!");
+#ifndef OHOS_ARCH_LITE
+    RemoveDeathRecipient();
+#endif
+}
 
 void WifiDeviceStub::InitHandleMapEx()
 {
@@ -135,6 +141,7 @@ int WifiDeviceStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageP
     return 0;
 }
 
+#ifndef OHOS_ARCH_LITE
 void WifiDeviceStub::RemoveDeathRecipient(void)
 {
     WIFI_LOGI("enter RemoveDeathRecipient!");
@@ -147,7 +154,7 @@ void WifiDeviceStub::RemoveDeathRecipient(void)
 
 void WifiDeviceStub::RemoveDeathRecipient(const wptr<IRemoteObject> &remoteObject)
 {
-    WIFI_LOGI("enter RemoveDeathRecipient, remoteObject: %{private}p!", &remoteObject);
+    WIFI_LOGI("RemoveDeathRecipient, remoteObject: %{private}p!", &remoteObject);
     std::lock_guard<std::mutex> lock(mutex_);
     RemoteDeathMap::iterator iter = remoteDeathMap.find(remoteObject);
     if (iter == remoteDeathMap.end()) {
@@ -161,9 +168,11 @@ void WifiDeviceStub::RemoveDeathRecipient(const wptr<IRemoteObject> &remoteObjec
 
 void WifiDeviceStub::OnRemoteDied(const wptr<IRemoteObject> &remoteObject)
 {
-    WIFI_LOGI("Remote is died! remoteObject: %{private}p", &remoteObject);
+    WIFI_LOGI("OnRemoteDied, Remote is died! remoteObject: %{private}p", &remoteObject);
+    WifiInternalEventDispatcher::GetInstance().RemoveStaCallback(remoteObject.promote());
     RemoveDeathRecipient(remoteObject);
 }
+#endif
 
 void WifiDeviceStub::OnEnableWifi(uint32_t code, MessageParcel &data, MessageParcel &reply)
 {
@@ -714,9 +723,13 @@ void WifiDeviceStub::OnRegisterCallBack(uint32_t code, MessageParcel &data, Mess
             ret = RegisterCallBack(callback_, event);
         } else {
             if (deathRecipient_ == nullptr) {
+#ifdef OHOS_ARCH_LITE
+                deathRecipient_ = new (std::nothrow) WifiDeviceDeathRecipient();
+#else
                 deathRecipient_ = new (std::nothrow) WifiDeathRecipient(*this);
+                remoteDeathMap.insert(remote, deathRecipient_);
+#endif
             }
-            remoteDeathMap.insert(remote, deathRecipient_);
             if ((remote->IsProxyObject()) && (!remote->AddDeathRecipient(deathRecipient_))) {
                 WIFI_LOGD("AddDeathRecipient!");
             }

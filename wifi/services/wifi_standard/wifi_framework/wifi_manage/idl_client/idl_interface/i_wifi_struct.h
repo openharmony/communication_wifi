@@ -187,6 +187,12 @@ typedef struct WpaSignalInfo {
     int frequency;
     int txPackets;
     int rxPackets;
+    int snr;
+    int chload;
+    int ulDelay;
+    int txBytes;
+    int rxBytes;
+    int txFailed;
 } WpaSignalInfo;
 
 typedef struct HostapdConfig {

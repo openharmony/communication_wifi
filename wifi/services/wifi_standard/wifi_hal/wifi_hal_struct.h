@@ -159,12 +159,18 @@ typedef struct WifiRoamCapability {
 
 typedef struct WpaSignalInfo {
     int signal; /* RSSI */
-    int txrate;
-    int rxrate;
+    int txrate; /* Bitrate */
+    int rxrate; /* Bitrate */
     int noise;
     int frequency;
     int txPackets;
     int rxPackets;
+    int snr;
+    int chload;
+    int ulDelay;
+    int txBytes;
+    int rxBytes;
+    int txFailed;
 } WpaSignalInfo;
 #ifdef __cplusplus
 }

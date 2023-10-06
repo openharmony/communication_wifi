@@ -96,8 +96,8 @@ private:
     };
 
     void OnRemoteDied(const wptr<IRemoteObject> &remoteObject);
-    void RemoveDeathRecipient(void);
-    void RemoveDeathRecipient(const wptr<IRemoteObject> &remoteObject);
+    void RemoveDeviceCbDeathRecipient(void);
+    void RemoveDeviceCbDeathRecipient(const wptr<IRemoteObject> &remoteObject);
 
     RemoteDeathMap remoteDeathMap;
     std::mutex mutex_;

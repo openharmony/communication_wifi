@@ -142,7 +142,7 @@ int WifiDeviceStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageP
 }
 
 #ifndef OHOS_ARCH_LITE
-void WifiDeviceStub::RemoveDeathRecipient(void)
+void WifiDeviceStub::RemoveDeviceCbDeathRecipient(void)
 {
     WIFI_LOGI("enter RemoveDeathRecipient!");
     std::lock_guard<std::mutex> lock(mutex_);
@@ -152,7 +152,7 @@ void WifiDeviceStub::RemoveDeathRecipient(void)
     }
 }
 
-void WifiDeviceStub::RemoveDeathRecipient(const wptr<IRemoteObject> &remoteObject)
+void WifiDeviceStub::RemoveDeviceCbDeathRecipient(const wptr<IRemoteObject> &remoteObject)
 {
     WIFI_LOGI("RemoveDeathRecipient, remoteObject: %{private}p!", &remoteObject);
     std::lock_guard<std::mutex> lock(mutex_);

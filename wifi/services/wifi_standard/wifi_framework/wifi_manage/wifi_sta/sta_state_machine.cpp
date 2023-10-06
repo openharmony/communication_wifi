@@ -726,11 +726,11 @@ void StaStateMachine::DealSignalPollResult(InternalMessage *msg)
     }
     WifiWpaSignalInfo signalInfo;
     WifiErrorNo ret = WifiStaHalInterface::GetInstance().GetConnectSignalInfo(linkedInfo.bssid, signalInfo);
-    if (ret != WIFI_OPT_SUCCESS) {
+    if (ret != WIFI_IDL_OPT_OK) {
         LOGE("GetConnectSignalInfo return fail: %{public}d.", ret);
         return;
     }
-    LOGI("DealSignalPollResult, bssid:%{public}, freq:%{public}d, rssi:%{public}d, noise:%{public}d, "
+    LOGI("DealSignalPollResult, bssid:%{public}s, freq:%{public}d, rssi:%{public}d, noise:%{public}d, "
         "chload:%{public}d, snr:%{public}d, ulDelay:%{public}d, txLinkSpeed:%{public}d, rxLinkSpeed:%{public}d, "
         "txBytes:%{public}d, rxBytes:%{public}d, txFailed:%{public}d, txPackets:%{public}d, rxPackets:%{public}d.",
         MacAnonymize(linkedInfo.bssid).c_str(), signalInfo.frequency, signalInfo.signal, signalInfo.noise,

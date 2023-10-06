@@ -30,15 +30,11 @@ namespace OHOS {
 namespace Wifi {
 WifiDeviceStub::WifiDeviceStub()
 {
-    WIFI_LOGE("WifiDeviceStub enter");
     InitHandleMap();
 }
 
 WifiDeviceStub::~WifiDeviceStub()
-{
-    WIFI_LOGE("~WifiDeviceStub enter");
-    RemoveDeathRecipient();
-}
+{}
 
 void WifiDeviceStub::ReadIpAddress(IpcIo *req, WifiIpAddress &address)
 {

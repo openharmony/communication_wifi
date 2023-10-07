@@ -38,7 +38,7 @@ WifiDeviceStub::~WifiDeviceStub()
 {
     WIFI_LOGI("enter ~WifiDeviceStub!");
 #ifndef OHOS_ARCH_LITE
-    RemoveDeathRecipient();
+    RemoveDeviceCbDeathRecipient();
 #endif
 }
 
@@ -156,7 +156,7 @@ void WifiDeviceStub::RemoveDeviceCbDeathRecipient(const wptr<IRemoteObject> &rem
 {
     WIFI_LOGI("RemoveDeathRecipient, remoteObject: %{private}p!", &remoteObject);
     std::lock_guard<std::mutex> lock(mutex_);
-    RemoteDeathMap::iterator iter = remoteDeathMap.find(remoteObject);
+    RemoteDeathMap::iterator iter = remoteDeathMap.find(remoteObject.promote());
     if (iter == remoteDeathMap.end()) {
         WIFI_LOGW("not find remoteObject to deal!");
     } else {
@@ -170,7 +170,7 @@ void WifiDeviceStub::OnRemoteDied(const wptr<IRemoteObject> &remoteObject)
 {
     WIFI_LOGI("OnRemoteDied, Remote is died! remoteObject: %{private}p", &remoteObject);
     WifiInternalEventDispatcher::GetInstance().RemoveStaCallback(remoteObject.promote());
-    RemoveDeathRecipient(remoteObject);
+    RemoveDeviceCbDeathRecipient(remoteObject);
 }
 #endif
 

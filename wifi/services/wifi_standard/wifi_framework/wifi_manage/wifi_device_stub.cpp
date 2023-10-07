@@ -727,7 +727,7 @@ void WifiDeviceStub::OnRegisterCallBack(uint32_t code, MessageParcel &data, Mess
                 deathRecipient_ = new (std::nothrow) WifiDeviceDeathRecipient();
 #else
                 deathRecipient_ = new (std::nothrow) WifiDeathRecipient(*this);
-                remoteDeathMap.insert(remote, deathRecipient_);
+                remoteDeathMap.insert(std::make_pair(remote, deathRecipient_));
 #endif
             }
             if ((remote->IsProxyObject()) && (!remote->AddDeathRecipient(deathRecipient_))) {

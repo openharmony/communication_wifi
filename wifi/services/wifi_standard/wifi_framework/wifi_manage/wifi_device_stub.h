@@ -30,6 +30,7 @@ public:
 
     using handleFunc = void (WifiDeviceStub::*)(uint32_t code, MessageParcel &data, MessageParcel &reply);
     using HandleFuncMap = std::map<int, handleFunc>;
+    using RemoteDeathMap = std::map<sptr<IRemoteObject>, sptr<IRemoteObject::DeathRecipient>>;
 
     virtual int OnRemoteRequest(
         uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) override;
@@ -79,6 +80,28 @@ private:
     void ReadIpAddress(MessageParcel &data, WifiIpAddress &address);
     void WriteWifiDeviceConfig(MessageParcel &reply, const WifiDeviceConfig &config);
     void WriteIpAddress(MessageParcel &reply, const WifiIpAddress &address);
+
+#ifndef OHOS_ARCH_LITE
+    class WifiDeathRecipient : public IRemoteObject::DeathRecipient {
+    public:
+        explicit WifiDeathRecipient(WifiDeviceStub &client) : client_(client) {}
+        ~WifiDeathRecipient() override = default;
+        void OnRemoteDied(const wptr<IRemoteObject> &remote) override
+        {
+            client_.OnRemoteDied(remote);
+        }
+
+    private:
+        WifiDeviceStub &client_;
+    };
+
+    void OnRemoteDied(const wptr<IRemoteObject> &remoteObject);
+    void RemoveDeviceCbDeathRecipient(void);
+    void RemoveDeviceCbDeathRecipient(const wptr<IRemoteObject> &remoteObject);
+
+    RemoteDeathMap remoteDeathMap;
+    std::mutex mutex_;
+#endif
 
 private:
     HandleFuncMap handleFuncMap;

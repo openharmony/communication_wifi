@@ -88,11 +88,14 @@ WifiDeviceServiceImpl::WifiDeviceServiceImpl()
     : SystemAbility(WIFI_DEVICE_ABILITY_ID, true), mPublishFlag(false), mState(ServiceRunningState::STATE_NOT_START)
 #endif
 {
+    WIFI_LOGI("enter WifiDeviceServiceImpl");
     isServiceStart = false;
 }
 
 WifiDeviceServiceImpl::~WifiDeviceServiceImpl()
-{}
+{
+    WIFI_LOGI("enter ~WifiDeviceServiceImpl");
+}
 
 bool WifiDeviceServiceImpl::IsProcessNeedToRestart()
 {

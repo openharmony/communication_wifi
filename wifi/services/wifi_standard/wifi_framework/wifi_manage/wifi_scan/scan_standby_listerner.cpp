@@ -83,7 +83,6 @@ void StandByListerner::RegisterStandByEvent()
     standBySubscriber_ = std::make_shared<StandBySubscriber>(subscriberInfo, OnStandbyStateChanged);
     if (!EventFwk::CommonEventManager::SubscribeCommonEvent(standBySubscriber_)) {
         WIFI_LOGE("StandByEvent SubscribeCommonEvent() failed");
-        standBySubscriber_ = nullptr;
     } else {
         WIFI_LOGI("StandByEvent SubscribeCommonEvent() OK");
     }
@@ -91,6 +90,7 @@ void StandByListerner::RegisterStandByEvent()
 
 void StandByListerner::UnRegisterStandByEvent()
 {
+    WIFI_LOGI("UnRegisterStandByEvent enter");
     std::unique_lock<std::mutex> lock(standByEventMutex);
     if (!standBySubscriber_) {
         WIFI_LOGI("standBySubscriber_ already nonexistent!");
@@ -101,7 +101,6 @@ void StandByListerner::UnRegisterStandByEvent()
     } else {
         WIFI_LOGI("StandByEvent UnSubscribeCommonEvent() OK");
     }
-    standBySubscriber_ = nullptr;
 }
 
 void StandBySubscriber::OnReceiveEvent(const OHOS::EventFwk::CommonEventData &event)

@@ -31,12 +31,13 @@ DEFINE_WIFILOG_LABEL("WifiNetAgent");
 
 namespace OHOS {
 namespace Wifi {
-constexpr const char *WIFI_NET_CONN_MGR_WORK_THREAD = "WIFI_NET_CONN_MGR_WORK_THREAD";
+//constexpr const char *WIFI_NET_CONN_MGR_WORK_THREAD = "WIFI_NET_CONN_MGR_WORK_THREAD";
 using namespace NetManagerStandard;
 
 WifiNetAgent::WifiNetAgent()
 {
-    netConnEventRunner_ = AppExecFwk::EventRunner::Create(WIFI_NET_CONN_MGR_WORK_THREAD);
+    netConnEventRunner_ = nullptr;
+    //netConnEventRunner_ = AppExecFwk::EventRunner::Create(WIFI_NET_CONN_MGR_WORK_THREAD);
     if (netConnEventRunner_) {
         netConnEventHandler_ = std::make_shared<WifiNetConnEventHandler>(netConnEventRunner_);
     } else {
@@ -59,6 +60,7 @@ bool WifiNetAgent::RegisterNetSupplier()
 {
     TimeStats timeStats(__func__);
     WIFI_LOGI("Enter RegisterNetSupplier.");
+    return 0;
 
     std::string ident = "wifi";
     using NetManagerStandard::NetBearType;
@@ -78,6 +80,8 @@ bool WifiNetAgent::RegisterNetSupplierCallback()
 {
     TimeStats timeStats(__func__);
     WIFI_LOGI("Enter RegisterNetSupplierCallback.");
+    return 0;
+
     sptr<NetConnCallback> pNetConnCallback = (std::make_unique<NetConnCallback>()).release();
     if (pNetConnCallback == nullptr) {
         WIFI_LOGE("pNetConnCallback is null\n");

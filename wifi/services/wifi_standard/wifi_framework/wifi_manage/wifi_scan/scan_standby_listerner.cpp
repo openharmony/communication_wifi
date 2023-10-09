@@ -44,7 +44,6 @@ bool StandByListerner::Init()
     standbySubscriber = std::make_shared<StandBySubscriber>(subscriberInfo, OnStandbyStateChanged);
     if (!OHOS::EventFwk::CommonEventManager::SubscribeCommonEvent(standbySubscriber)) {
         WIFI_LOGE("fail to SubscribeCommonEvent");
-        standbySubscriber = nullptr;
     }
     return true;
 }
@@ -58,7 +57,6 @@ void StandByListerner::Unit()
     if (!OHOS::EventFwk::CommonEventManager::UnSubscribeCommonEvent(standbySubscriber)) {
         WIFI_LOGE("fail to UnSubscribeCommonEvent");
     }
-    standbySubscriber = nullptr;
 }
 
 bool StandByListerner::AllowScan()

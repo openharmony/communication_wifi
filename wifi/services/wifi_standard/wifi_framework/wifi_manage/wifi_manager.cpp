@@ -1652,7 +1652,6 @@ void WifiManager::RegisterScreenEvent()
     screenEventSubscriber_ = std::make_shared<ScreenEventSubscriber>(subscriberInfo);
     if (!EventFwk::CommonEventManager::SubscribeCommonEvent(screenEventSubscriber_)) {
         WIFI_LOGE("ScreenEvent SubscribeCommonEvent() failed");
-        screenEventSubscriber_ = nullptr;
     } else {
         WIFI_LOGI("ScreenEvent SubscribeCommonEvent() OK");
         WifiTimer::GetInstance()->UnRegister(screenTimerId);
@@ -1670,7 +1669,6 @@ void WifiManager::UnRegisterScreenEvent()
     } else {
         WIFI_LOGI("ScreenEvent UnSubscribeCommonEvent() OK");
     }
-    screenEventSubscriber_ = nullptr;
 }
 
 void ScreenEventSubscriber::OnReceiveEvent(const OHOS::EventFwk::CommonEventData &data)
@@ -1735,7 +1733,6 @@ void WifiManager::RegisterAirplaneModeEvent()
     airplaneModeEventSubscriber_ = std::make_shared<AirplaneModeEventSubscriber>(subscriberInfo);
     if (!EventFwk::CommonEventManager::SubscribeCommonEvent(airplaneModeEventSubscriber_)) {
         WIFI_LOGE("AirplaneModeEvent SubscribeCommonEvent() failed");
-        airplaneModeEventSubscriber_ = nullptr;
     } else {
         WIFI_LOGI("AirplaneModeEvent SubscribeCommonEvent() OK");
         WifiTimer::GetInstance()->UnRegister(airplaneModeTimerId);
@@ -1753,7 +1750,6 @@ void WifiManager::UnRegisterAirplaneModeEvent()
     } else {
         WIFI_LOGI("AirplaneModeEvent UnSubscribeCommonEvent() OK");
     }
-    airplaneModeEventSubscriber_ = nullptr;
 }
 
 void AirplaneModeEventSubscriber::OnReceiveEvent(const OHOS::EventFwk::CommonEventData &eventData)
@@ -1898,7 +1894,6 @@ void WifiManager::RegisterLocationEvent()
     locationEventSubscriber_ = std::make_shared<LocationEventSubscriber>(subscriberInfo);
     if (!EventFwk::CommonEventManager::SubscribeCommonEvent(locationEventSubscriber_)) {
         WIFI_LOGE("LocationEvent SubscribeCommonEvent() failed");
-        locationEventSubscriber_ = nullptr;
     } else {
         WIFI_LOGI("LocationEvent SubscribeCommonEvent() OK");
         WifiTimer::GetInstance()->UnRegister(locationTimerId);
@@ -1916,7 +1911,6 @@ void WifiManager::UnRegisterLocationEvent()
     } else {
         WIFI_LOGD("LocationEvent UnSubscribeCommonEvent() OK");
     }
-    locationEventSubscriber_ = nullptr;
 }
 
 void LocationEventSubscriber::OnReceiveEvent(const OHOS::EventFwk::CommonEventData &eventData)

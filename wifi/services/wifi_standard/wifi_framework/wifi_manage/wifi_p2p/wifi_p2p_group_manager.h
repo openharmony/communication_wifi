@@ -187,7 +187,9 @@ public:
     inline void SetCurrentGroup(WifiMacAddrInfoType type, const WifiP2pGroupInfo &group)
     {
         currentGroup = group;
+#ifdef SUPPORT_RANDOM_MAC_ADDR
         AddMacAddrPairInfo(type, group);
+#endif
         RefreshCurrentGroupFromGroups();
     }
 

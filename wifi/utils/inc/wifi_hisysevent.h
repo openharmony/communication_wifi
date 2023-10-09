@@ -65,6 +65,8 @@ void WriteWifiSignalHiSysEvent(int direction, int txPackets, int rxPackets);
 void WriteWifiOperateStateHiSysEvent(int operateType, int operateState);
 
 void WriteWifiAbnormalDisconnectHiSysEvent(int errorCode);
+
+void WriteWifiConnectionInfoHiSysEvent(int networkId);
 }  // namespace Wifi
 }  // namespace OHOS
 #endif

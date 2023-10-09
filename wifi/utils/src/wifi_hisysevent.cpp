@@ -78,5 +78,13 @@ void WriteWifiAbnormalDisconnectHiSysEvent(int errorCode)
     root["ERROR_CODE"] = errorCode;
     WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "WIFI_ABNORMAL_DISCONNECT", "EVENT_VALUE", writer.write(root));
 }
+
+void WriteWifiConnectionInfoHiSysEvent(int networkId)
+{
+    Json::Value root;
+    Json::FastWriter writer;
+    root["NETWORK_ID"] = networkId;
+    WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "WIFI_CONNECTION_INFO", "EVENT_VALUE", writer.write(root));
+}
 }  // namespace Wifi
 }  // namespace OHOS

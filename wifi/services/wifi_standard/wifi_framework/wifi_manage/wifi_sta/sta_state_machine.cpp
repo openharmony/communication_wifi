@@ -859,6 +859,7 @@ void StaStateMachine::DealConnectToUserSelectedNetwork(InternalMessage *msg)
     if (connTriggerMode != NETWORK_SELECTED_BY_RETRY) {
         linkedInfo.retryedConnCount = 0;
     }
+    WriteWifiConnectionInfoHiSysEvent(networkId);
 
     if (networkId == linkedInfo.networkId) {
         if (linkedInfo.connState == ConnState::CONNECTED) {
@@ -1510,15 +1511,7 @@ void StaStateMachine::OnNetworkConnectionEvent(int networkId, std::string bssid)
 
 void StaStateMachine::OnNetworkDisconnectEvent(int reason)
 {
-    if (reason != static_cast<int>(DisconnectDetailReason::DEAUTH_STA_IS_LEFING)
-        && reason != static_cast<int>(DisconnectDetailReason::UNSPECIFIED)
-        && reason != static_cast<int>(DisconnectDetailReason::UNUSED)
-        && reason != static_cast<int>(DisconnectDetailReason::DISASSOC_STA_HAS_LEFT)) {
-            LOGE("connect exception.\n");
-            WriteWifiOperateStateHiSysEvent(static_cast<int>(WifiOperateType::STA_CONNECT),
-                static_cast<int>(WifiOperateState::STA_CONNECT_EXCEPTION));
-            WriteWifiAbnormalDisconnectHiSysEvent(reason);
-    }
+    WriteWifiAbnormalDisconnectHiSysEvent(reason);
 }
 
 void StaStateMachine::OnBssidChangedEvent(std::string reason, std::string bssid)

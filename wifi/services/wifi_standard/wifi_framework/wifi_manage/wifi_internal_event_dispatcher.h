@@ -134,7 +134,9 @@ private:
     static void DealP2pCallbackMsg(WifiInternalEventDispatcher &pInstance, const WifiEventCallbackMsg &msg);
     static void SendP2pCallbackMsg(sptr<IWifiP2pCallback> &callback, const WifiEventCallbackMsg &msg,
         int pid, int uid, int tokenId);
+#ifdef SUPPORT_RANDOM_MAC_ADDR
     static void updateP2pDeviceMacAddress(std::vector<WifiP2pDevice> &device);
+#endif
     static void PublishConnStateChangedEvent(int state, const WifiLinkedInfo &info);
     static void PublishWifiStateChangedEvent(int state);
     static void PublishRssiValueChangedEvent(int state);

@@ -473,7 +473,7 @@ HWTEST_F(WifiSettingsTest, StoreWifiMacAddrPairInfoTest, TestSize.Level1)
     WIFI_LOGE("StoreWifiMacAddrPairInfoTest enter!");
     std::string realMacAddr;
     bool result = WifiSettings::GetInstance().StoreWifiMacAddrPairInfo(WifiMacAddrInfoType::WIFI_SCANINFO_MACADDR_INFO,
-        realMacAddr);
+        realMacAddr, "");
     WIFI_LOGE("StoreWifiMacAddrPairInfoTest result(%{public}d)", result);
     EXPECT_FALSE(result);
 }

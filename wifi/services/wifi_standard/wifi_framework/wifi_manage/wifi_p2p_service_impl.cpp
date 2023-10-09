@@ -1058,11 +1058,9 @@ ErrCode WifiP2pServiceImpl::Hid2dSharedlinkDecrease()
         WIFI_LOGE("Get P2P service failed!");
         return WIFI_OPT_P2P_NOT_OPENED;
     }
-    if (pService->GetSharedLinkCount() == 0) {
-        WIFI_LOGI("Shared link count is already zero!");
-        return WIFI_OPT_SUCCESS;
+    if (pService->GetSharedLinkCount() > 0) {
+        pService->DecreaseSharedLink();
     }
-    pService->DecreaseSharedLink();
     if (pService->GetSharedLinkCount() == 0) {
         WIFI_LOGI("Shared link count == 0, remove group!");
         RemoveGroup();

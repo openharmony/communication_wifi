@@ -1520,7 +1520,6 @@ void WifiDeviceServiceImpl::UnRegisterAppRemoved()
     } else {
         WIFI_LOGI("AppEvent UnSubscribeCommonEvent() OK");
     }
-    eventSubscriber_ = nullptr;
 }
 
 void WifiDeviceServiceImpl::RegisterThermalLevel()
@@ -1552,7 +1551,6 @@ void WifiDeviceServiceImpl::UnRegisterThermalLevel()
     } else {
         WIFI_LOGI("THERMAL_LEVEL_CHANGED UnSubscribeCommonEvent() OK");
     }
-    thermalLevelSubscriber_ = nullptr;
 }
 
 AppEventSubscriber::AppEventSubscriber(const OHOS::EventFwk::CommonEventSubscribeInfo &subscriberInfo)

@@ -719,17 +719,23 @@ int setRssi(int rssi)
 
 void StaStateMachine::DealSignalPollResult(InternalMessage *msg)
 {
-    LOGD("enter DealSignalPollResult.\n");
+    LOGD("enter DealSignalPollResult.");
     if (msg == nullptr) {
-        LOGE("InternalMessage msg is null.");
+        LOGE("msg is nullptr.");
         return;
     }
     WifiWpaSignalInfo signalInfo;
-    WifiStaHalInterface::GetInstance().GetConnectSignalInfo(linkedInfo.bssid, signalInfo);
-    LOGI("DealSignalPollResult, signal:%{public}d, txLinkSpeed:%{public}d, rxLinkSpeed:%{public}d, "
-        "freq:%{public}d, noise:%{public}d.\n",
-        signalInfo.signal, signalInfo.txrate, signalInfo.rxrate, signalInfo.frequency,
-        signalInfo.noise);
+    WifiErrorNo ret = WifiStaHalInterface::GetInstance().GetConnectSignalInfo(linkedInfo.bssid, signalInfo);
+    if (ret != WIFI_IDL_OPT_OK) {
+        LOGE("GetConnectSignalInfo return fail: %{public}d.", ret);
+        return;
+    }
+    LOGI("DealSignalPollResult, bssid:%{public}s, freq:%{public}d, rssi:%{public}d, noise:%{public}d, "
+        "chload:%{public}d, snr:%{public}d, ulDelay:%{public}d, txLinkSpeed:%{public}d, rxLinkSpeed:%{public}d, "
+        "txBytes:%{public}d, rxBytes:%{public}d, txFailed:%{public}d, txPackets:%{public}d, rxPackets:%{public}d.",
+        MacAnonymize(linkedInfo.bssid).c_str(), signalInfo.frequency, signalInfo.signal, signalInfo.noise,
+        signalInfo.chload, signalInfo.snr, signalInfo.ulDelay, signalInfo.txrate, signalInfo.rxrate, signalInfo.txBytes,
+        signalInfo.rxBytes, signalInfo.txFailed, signalInfo.txPackets, signalInfo.rxPackets);
     if (signalInfo.signal > INVALID_RSSI_VALUE && signalInfo.signal < MAX_RSSI_VALUE) {
         if (signalInfo.signal > 0) {
             linkedInfo.rssi = setRssi((signalInfo.signal - SIGNAL_INFO));
@@ -737,8 +743,8 @@ void StaStateMachine::DealSignalPollResult(InternalMessage *msg)
             linkedInfo.rssi = setRssi(signalInfo.signal);
         }
         int currentSignalLevel = WifiSettings::GetInstance().GetSignalLevel(linkedInfo.rssi, linkedInfo.band);
-        LOGI("DealSignalPollResult, networkId:%{public}d, ssid:%{private}s, rssi:%{public}d, band:%{public}d, "
-            "connState:%{public}d, detailedState:%{public}d.\n",
+        LOGI("DealSignalPollResult, networkId:%{public}d, ssid:%{public}s, rssi:%{public}d, band:%{public}d, "
+            "connState:%{public}d, detailedState:%{public}d.",
             linkedInfo.networkId, SsidAnonymize(linkedInfo.ssid).c_str(), linkedInfo.rssi, linkedInfo.band,
             linkedInfo.connState, linkedInfo.detailedState);
         LOGI("DealSignalPollResult currentSignalLevel:%{public}d, lastSignalLevel:%{public}d.\n",
@@ -780,11 +786,11 @@ void StaStateMachine::DealSignalPollResult(InternalMessage *msg)
     if (signalInfo.frequency > 0) {
         linkedInfo.frequency = signalInfo.frequency;
     }
-    linkedInfo.snr = linkedInfo.rssi - signalInfo.noise;
+    linkedInfo.snr = signalInfo.snr;
     if (linkedInfo.wifiStandard == WIFI_MODE_UNDEFINED) {
         WifiSettings::GetInstance().SetWifiLinkedStandardAndMaxSpeed(linkedInfo);
     }
-    LOGI("DealSignalPollResult GetWifiStandard:%{public}d, bssid:%{public}s rxmax:%{public}d txmax:%{public}d.\n",
+    LOGI("DealSignalPollResult GetWifiStandard:%{public}d, bssid:%{public}s rxmax:%{public}d txmax:%{public}d.",
          linkedInfo.wifiStandard, MacAnonymize(linkedInfo.bssid).c_str(), linkedInfo.maxSupportedRxLinkSpeed,
          linkedInfo.maxSupportedTxLinkSpeed);
     WifiSettings::GetInstance().SaveLinkedInfo(linkedInfo);

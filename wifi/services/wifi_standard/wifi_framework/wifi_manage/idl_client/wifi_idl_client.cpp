@@ -741,6 +741,12 @@ WifiErrorNo WifiIdlClient::ReqGetConnectSignalInfo(const std::string &endBssid, 
         info.frequency = req.frequency;
         info.txPackets = req.txPackets;
         info.rxPackets = req.rxPackets;
+        info.snr = req.snr;
+        info.chload = req.chload;
+        info.ulDelay = req.ulDelay;
+        info.txBytes = req.txBytes;
+        info.rxBytes = req.rxBytes;
+        info.txFailed = req.txFailed;
     }
     return err;
 }

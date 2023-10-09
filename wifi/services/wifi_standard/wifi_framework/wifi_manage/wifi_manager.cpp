@@ -1750,7 +1750,6 @@ void WifiManager::UnRegisterScreenEvent()
     } else {
         WIFI_LOGI("ScreenEvent UnSubscribeCommonEvent() OK");
     }
-    screenEventSubscriber_ = nullptr;
 }
 
 void ScreenEventSubscriber::OnReceiveEvent(const OHOS::EventFwk::CommonEventData &data)
@@ -2034,7 +2033,6 @@ void WifiManager::UnRegisterLocationEvent()
     }
     Uri uri(SETTINGS_DATASHARE_URI_LOCATION_MODE);
     datashareHelper->UnRegisterObserver(uri, locationModeObserver_);
-    locationModeObserver_ = nullptr;
 }
 
 void WifiManager::RegisterDeviceProvisionEvent()
@@ -2069,7 +2067,6 @@ void WifiManager::UnRegisterDeviceProvisionEvent()
     WIFI_LOGI("UnRegisterDeviceProvisionEvent");
     Uri uri(SETTINGS_DATASHARE_URI_DEVICE_PROVISIONED);
     datashareHelper->UnRegisterObserver(uri, deviceProvisionObserver_);
-    deviceProvisionObserver_ = nullptr;
 }
 
 void WifiManager::DealLocationModeChangeEvent()

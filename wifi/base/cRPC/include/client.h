@@ -25,12 +25,6 @@ extern "C" {
 
 typedef struct RpcClient RpcClient;
 
-const int FD_CHECK_TIMEOUT = 1000;
-const int CLIENT_STATE_IDLE = 0;
-const int CLIENT_STATE_DEAL_REPLY = 1;
-const int CLIENT_STATE_EXIT = 2;
-const int TMP_BUFF_SIZE = 16;
-
 /*
  * RPC CLIENT
  * RPC client sends a request and wait for a response from the server,

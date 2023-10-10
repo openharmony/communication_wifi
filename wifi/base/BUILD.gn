@@ -20,7 +20,6 @@ if (defined(ohos_lite)) {
 }
 
 local_base_sources = [
-  "cRPC/src/rpc.cpp",
   "state_machine/src/handler.cpp",
   "state_machine/src/internal_message.cpp",
   "state_machine/src/message_queue.cpp",

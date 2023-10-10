@@ -57,7 +57,7 @@ public:
      * @return true: success   false: fail
      */
     bool StartDhcpServer(const std::string &ifaceName, Ipv4Address &ipv4, Ipv6Address &ipv6,
-        const std::string &ipAddress = "", bool isIpV4 = true, const int32_t &leaseTime = 0);
+        const std::string &ipAddress = "", bool isIpV4 = true, const int32_t &leaseTime = DHCP_LEASE_TIME);
 
     /**
      * @Description Stop the DHCP server.

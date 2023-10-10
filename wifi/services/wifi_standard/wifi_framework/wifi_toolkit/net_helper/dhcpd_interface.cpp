@@ -159,7 +159,7 @@ bool DhcpdInterface::UpdateDefaultConfigFile(const int32_t &leaseTime)
         return false;
     }
     int result = mDhcpService->UpdateDefaultConfigFile(std::to_string(leaseTime));
-    WIFI_LOGI("UpdateDefaultConfigFile result:%{public}d", result);
+    WIFI_LOGI("UpdateDefaultConfigFile leaseTime:%{public}d result:%{public}d", leaseTime, result);
     return (result == 0) ? true : false;
 }
 

@@ -114,6 +114,7 @@ if (defined(ohos_lite)) {
     part_name = "wifi"
     sources = [
       "src/wifi_device_impl.cpp",
+      "src/wifi_device_mgr_proxy.cpp",
       "src/wifi_device_proxy.cpp",
       "src/wifi_sa_event.cpp",
     ]
@@ -156,6 +157,7 @@ if (defined(ohos_lite)) {
     part_name = "wifi"
     sources = [
       "src/wifi_scan_impl.cpp",
+      "src/wifi_scan_mgr_proxy.cpp",
       "src/wifi_scan_proxy.cpp",
     ]
 
@@ -238,7 +240,10 @@ if (defined(ohos_lite)) {
       "samgr:samgr_proxy",
     ]
 
-    defines = [ "AP_INSTANCE_MAX_NUM=$wifi_feature_with_ap_num" ]
+    defines = [
+      "STA_INSTANCE_MAX_NUM=$wifi_feature_with_sta_num",
+      "AP_INSTANCE_MAX_NUM=$wifi_feature_with_ap_num",
+    ]
 
     if (wifi_feature_with_random_mac_addr) {
       defines += [ "SUPPORT_RANDOM_MAC_ADDR" ]

@@ -24,7 +24,7 @@ namespace OHOS {
 namespace Wifi {
 class WifiScan {
 public:
-    static std::shared_ptr<WifiScan> GetInstance(int system_ability_id);
+    static std::shared_ptr<WifiScan> GetInstance(int systemAbilityId, int instId = 0);
 
     virtual ~WifiScan();
 

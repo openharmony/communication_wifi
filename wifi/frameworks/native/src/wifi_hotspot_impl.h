@@ -19,7 +19,6 @@
 #include <cstdint>
 #include <set>
 #include <vector>
-#include "singleton.h"
 #include "i_wifi_hotspot.h"
 #include "i_wifi_hotspot_callback.h"
 #include "refbase.h"
@@ -31,9 +30,9 @@
 namespace OHOS {
 namespace Wifi {
 class WifiHotspotImpl : public WifiHotspot {
-    DECLARE_DELAYED_SINGLETON(WifiHotspotImpl)
-
 public:
+    WifiHotspotImpl();
+    virtual ~WifiHotspotImpl();
     /**
      * @Description init ap client.
      *

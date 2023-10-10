@@ -22,6 +22,7 @@
 #include "wifi_sa_manager.h"
 #endif
 #include "wifi_device_proxy.h"
+#include "wifi_device_mgr_proxy.h"
 #include "wifi_logger.h"
 
 DEFINE_WIFILOG_LABEL("WifiDeviceImpl");
@@ -36,7 +37,7 @@ namespace Wifi {
         }                                             \
     } while (0)
 
-WifiDeviceImpl::WifiDeviceImpl() : client_(nullptr)
+WifiDeviceImpl::WifiDeviceImpl() : systemAbilityId_(0), instId_(0), client_(nullptr)
 {}
 
 WifiDeviceImpl::~WifiDeviceImpl()
@@ -46,7 +47,7 @@ WifiDeviceImpl::~WifiDeviceImpl()
 #endif
 }
 
-bool WifiDeviceImpl::Init(int systemAbilityId)
+bool WifiDeviceImpl::Init(int systemAbilityId, int instId)
 {
 #ifdef OHOS_ARCH_LITE
     WifiDeviceProxy *deviceProxy = WifiDeviceProxy::GetInstance();
@@ -63,6 +64,7 @@ bool WifiDeviceImpl::Init(int systemAbilityId)
     return true;
 #else
     systemAbilityId_ = systemAbilityId;
+    instId_ = instId;
     return true;
 #endif
 }
@@ -76,24 +78,40 @@ bool WifiDeviceImpl::GetWifiDeviceProxy()
     if (IsRemoteDied() == false) {
         return true;
     }
+
     sptr<ISystemAbilityManager> sa_mgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (sa_mgr == nullptr) {
         WIFI_LOGE("failed to get SystemAbilityManager");
         return false;
     }
+
     sptr<IRemoteObject> object = sa_mgr->GetSystemAbility(systemAbilityId_);
     if (object == nullptr) {
         WIFI_LOGE("failed to get DEVICE_SERVICE");
         return false;
     }
 
-    client_ = iface_cast<IWifiDevice>(object);
-    if (client_ == nullptr) {
-        client_ = new (std::nothrow) WifiDeviceProxy(object);
+    sptr<IWifiDeviceMgr> deviceMgr = iface_cast<IWifiDeviceMgr>(object);
+    if (deviceMgr == nullptr) {
+        deviceMgr = new (std::nothrow) WifiDeviceMgrProxy(object);
+    }
+    if (deviceMgr == nullptr) {
+        WIFI_LOGE("wifi device init failed, %{public}d", systemAbilityId_);
+        return false;
     }
 
+    sptr<IRemoteObject> service = deviceMgr->GetWifiRemote(instId_);
+    if (service == nullptr) {
+        WIFI_LOGE("wifi device remote obj is null, %{public}d", instId_);
+        return false;
+    }
+
+    client_ = iface_cast<IWifiDevice>(service);
     if (client_ == nullptr) {
-        WIFI_LOGE("wifi device init failed. %{public}d", systemAbilityId_);
+        client_ = new (std::nothrow) WifiDeviceProxy(service);
+    }
+    if (client_ == nullptr) {
+        WIFI_LOGE("wifi device instId_ %{public}d init failed. %{public}d", instId_, systemAbilityId_);
         return false;
     }
     return true;

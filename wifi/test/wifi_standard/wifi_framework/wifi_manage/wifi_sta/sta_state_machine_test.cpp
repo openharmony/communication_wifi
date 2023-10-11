@@ -1540,6 +1540,12 @@ public:
         pStaStateMachine->OnBssidChangedEvent(reason, bssid);
     }
 
+    void OnNetworkDisconnectEventSuccess()
+    {
+        int reason = 0;
+        pStaStateMachine->OnNetworkDisconnectEvent(reason);
+    }
+
     void DealReConnectCmdSuccess()
     {
         InternalMessage msg;
@@ -2496,6 +2502,11 @@ HWTEST_F(StaStateMachineTest, ReUpdateNetSupplierInfoFail, TestSize.Level1)
 HWTEST_F(StaStateMachineTest, OnBssidChangedEventSuccess, TestSize.Level1)
 {
     OnBssidChangedEventSuccess();
+}
+
+HWTEST_F(StaStateMachineTest, OnNetworkDisconnectEventSuccess, TestSize.Level1)
+{
+    OnNetworkDisconnectEventSuccess();
 }
 
 HWTEST_F(StaStateMachineTest, DealReConnectCmdFail, TestSize.Level1)

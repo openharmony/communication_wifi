@@ -19,7 +19,7 @@
 #include "sta_define.h"
 #include "ista_service.h"
 #include "wifi_errcode.h"
-
+#include "define.h"
 namespace OHOS {
 namespace Wifi {
 class StaService;
@@ -217,6 +217,13 @@ public:
      * @return WifiErrorNo
      */
     virtual ErrCode OnSystemAbilityChanged(int systemAbilityid, bool add) override;
+    /**
+     * @Description Processes interface service screen change request.
+     *
+     * @param screenState screen state[in]
+     * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
+     */
+    virtual ErrCode OnScreenStateChanged(int screenState) override;
 private:
     StaServiceCallback staCallback;
     StaService *pStaService;

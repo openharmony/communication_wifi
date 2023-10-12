@@ -124,6 +124,7 @@ ohos_unittest("wifi_sta_unittest") {
     "hilog:libhilog",
     "ipc:ipc_single",
     "netmanager_base:net_conn_manager_if",
+    "netstack:http_client",
     "samgr:samgr_proxy",
   ]
   defines += [ "AP_INSTANCE_MAX_NUM=$wifi_feature_with_ap_num" ]

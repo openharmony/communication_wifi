@@ -217,6 +217,13 @@ public:
      * @return WifiErrorNo
      */
     virtual ErrCode OnSystemAbilityChanged(int systemAbilityid, bool add) = 0;
+    /**
+     * @Description Processes interface service screen change request.
+     *
+     * @param screenState screen state[in]
+     * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
+     */
+    virtual ErrCode OnScreenStateChanged(int screenState) = 0;
 };
 }  // namespace Wifi
 }  // namespace OHOS

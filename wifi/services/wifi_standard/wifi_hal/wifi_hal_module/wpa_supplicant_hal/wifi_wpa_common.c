@@ -17,6 +17,7 @@
 #include "wifi_wpa_hal.h"
 #include "wifi_hal_common_func.h"
 #include "wifi_log.h"
+#include "wifi_common_hal.h"
 #undef LOG_TAG
 #define LOG_TAG "WifiHalWpaCommon"
 
@@ -168,6 +169,17 @@ int WpaCliCmd(const char *cmd, char *buf, size_t bufLen)
         strncmp(buf, "UNKNOWN COMMAND\n", strlen("UNKNOWN COMMAND\n")) == 0) {
         LOGE("%{private}s request success, but response %{public}s", cmd, buf);
         return -1;
+    } else if (strncmp(buf, "OK\n", strlen("OK\n")) == 0) {
+        return 0;
+    } else {
+        LOGI("wpa_ctrl_request report to iwifi");
+        for (int i = 0; i <bufLen; i++) {
+            buf[i] = buf[i] == '\n' ? '*' : buf[i];
+        }
+        char *sep = "*";
+        char *retbuf = strtok(buf, sep);
+        retbuf = strtok(NULL, sep);
+        HalCallbackNotify(retbuf);
     }
     return 0;
 }

@@ -52,6 +52,39 @@ int RpcUnRegisterEventCallback(RpcServer *server, Context *context);
  */
 int RpcNotifyClear(RpcServer *server, Context *context);
 
+/**
+ * @Description Parse the context to obtain data. Call the corresponding function
+ *              NotifyClear and assemble the function to obtain data.
+ *
+ * @param server - Pointer to the global structure of the communication server.
+ * @param context - Pointer to the global communication context structure of the server.
+ * @return int - 0 Success, -1 Failed.
+ */
+
+int RpcGetCommonCmd(RpcServer *server, Context *context);
+
+/**
+ * @Description Parse the context to obtain data. Call the corresponding function
+ *              NotifyClear and assemble the function to obtain data.
+ *
+ * @param server - Pointer to the global structure of the communication server.
+ * @param context - Pointer to the global communication context structure of the server.
+ * @return int - 0 Success, -1 Failed.
+ */
+
+int RpcChbaStart(RpcServer *server, Context *context);
+
+/**
+ * @Description Parse the context to obtain data. Call the corresponding function
+ *              NotifyClear and assemble the function to obtain data.
+ *
+ * @param server - Pointer to the global structure of the communication server.
+ * @param context - Pointer to the global communication context structure of the server.
+ * @return int - 0 Success, -1 Failed.
+ */
+
+int RpcChbaStop(RpcServer *server, Context *context);
+
 #ifdef __cplusplus
 }
 #endif

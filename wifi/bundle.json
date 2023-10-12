@@ -90,7 +90,8 @@
                 "data_share",
                 "hdf_core",
                 "hicollie",
-                "jsoncpp"
+                "jsoncpp",
+                "netstack"
             ],
             "third_party": [
                 "bounds_checking_function",

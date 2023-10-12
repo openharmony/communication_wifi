@@ -1778,6 +1778,7 @@ void ScreenEventSubscriber::OnReceiveEvent(const OHOS::EventFwk::CommonEventData
         if (pService->SetSuspendMode(true) != WIFI_OPT_SUCCESS) {
             WIFI_LOGE("SetSuspendMode failed");
         }
+        pService->OnScreenStateChanged(MODE_STATE_CLOSE);
         return;
     }
 
@@ -1791,6 +1792,7 @@ void ScreenEventSubscriber::OnReceiveEvent(const OHOS::EventFwk::CommonEventData
         if (pService->SetSuspendMode(false) != WIFI_OPT_SUCCESS) {
             WIFI_LOGE("SetSuspendMode failed");
         }
+        pService->OnScreenStateChanged(MODE_STATE_OPEN);
         return;
     }
     WIFI_LOGW("ScreenEventSubscriber::OnReceiveEvent, screen state: %{public}d.", screenState);

@@ -224,7 +224,11 @@ public:
      * @return WifiErrorNo
      */
     virtual ErrCode OnSystemAbilityChanged(int systemAbilityid, bool add);
-
+    /**
+     * @Description Screen State (On/Off) Change Handler
+     *
+     */
+    virtual void HandleScreenStatusChanged(int screenState);
 private:
     void NotifyDeviceConfigChange(ConfigChange value) const;
 

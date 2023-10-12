@@ -135,6 +135,10 @@ public:
 
     ErrCode GetCountryCode(std::string &countryCode) override;
 
+    ErrCode SetAppFrozen(int uid, bool isFrozen) override;
+
+    ErrCode ResetAllFrozenApp() override;
+
 #ifdef OHOS_ARCH_LITE
     ErrCode RegisterCallBack(const std::shared_ptr<IWifiDeviceCallBack> &callback,
         const std::vector<std::string> &event) override;

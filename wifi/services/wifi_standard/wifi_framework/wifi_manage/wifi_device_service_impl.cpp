@@ -1553,6 +1553,26 @@ void WifiDeviceServiceImpl::UnRegisterThermalLevel()
     }
 }
 
+ErrCode WifiDeviceServiceImpl::SetAppFrozen(int uid, bool isFrozen)
+{
+    if (!WifiAuthCenter::IsNativeProcess()) {
+        WIFI_LOGE("SetAppFrozen:NOT NATIVE PROCESS, PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+    WifiInternalEventDispatcher::GetInstance().SetAppFrozen(uid, isFrozen);
+    return WIFI_OPT_SUCCESS;
+}
+
+ErrCode WifiDeviceServiceImpl::ResetAllFrozenApp()
+{
+    if (!WifiAuthCenter::IsNativeProcess()) {
+        WIFI_LOGE("ResetAllFrozenApp:NOT NATIVE PROCESS, PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+    WifiInternalEventDispatcher::GetInstance().ResetAllFrozenApp();
+    return WIFI_OPT_SUCCESS;
+}
+
 AppEventSubscriber::AppEventSubscriber(const OHOS::EventFwk::CommonEventSubscribeInfo &subscriberInfo)
     : CommonEventSubscriber(subscriberInfo)
 {

@@ -58,6 +58,10 @@ void WifiDeviceStub::InitHandleMapEx()
         &WifiDeviceStub::OnGet5GHzChannelList;
     handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_DISCONNECTED_REASON)] =
         &WifiDeviceStub::OnGetDisconnectedReason;
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_SET_FROZEN_APP)] =
+        &WifiDeviceStub::OnSetFrozenApp;
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_RESET_ALL_FROZEN_APP)] =
+        &WifiDeviceStub::OnResetAllFrozenApp;
     return;
 }
 
@@ -858,6 +862,26 @@ void WifiDeviceStub::OnGetDisconnectedReason(uint32_t code, MessageParcel &data,
     if (ret == WIFI_OPT_SUCCESS) {
         reply.WriteInt32((int)reason);
     }
+    return;
+}
+
+void WifiDeviceStub::OnSetFrozenApp(uint32_t code, MessageParcel& data, MessageParcel& reply)
+{
+    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+    int uid = data.ReadInt32();
+    bool frozen = data.ReadBool();
+    ErrCode ret = SetAppFrozen(uid, frozen);
+    reply.WriteInt32(0);
+    reply.WriteInt32(ret);
+    return;
+}
+
+void WifiDeviceStub::OnResetAllFrozenApp(uint32_t code, MessageParcel& data, MessageParcel& reply)
+{
+    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+    ErrCode ret = ResetAllFrozenApp();
+    reply.WriteInt32(0);
+    reply.WriteInt32(ret);
     return;
 }
 }  // namespace Wifi

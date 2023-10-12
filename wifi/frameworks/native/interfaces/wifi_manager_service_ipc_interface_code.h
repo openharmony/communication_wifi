@@ -55,6 +55,8 @@ enum class  DevInterfaceCode {
     WIFI_SVR_CMD_GET_5G_CHANNELLIST = 0x1030,        /* get 5g channellist */
     WIFI_SVR_CMD_GET_DISCONNECTED_REASON = 0x1031,   /* get disconnect reason */
     WIFI_SVR_CMD_GET_DHCP_IPV6INFO = 0x1032,         /* get dhcp IPV6 info */
+    WIFI_SVR_CMD_SET_FROZEN_APP = 0x1033,            /* set frozen app */
+    WIFI_SVR_CMD_RESET_ALL_FROZEN_APP = 0x1034,      /* reset all frozen app */
     /* 新增WIFI_SVR_CMD_类code，请在此下方添加 */
 
     /* 以下CALL BACK类code，不需要进行权限校验 */

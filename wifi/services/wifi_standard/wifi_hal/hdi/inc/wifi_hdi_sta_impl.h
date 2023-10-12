@@ -75,6 +75,13 @@ WifiErrorNo RegisterHdiStaCallbackEvent();
  */
 void UnRegisterHdiStaCallbackEvent();
 
+/**
+ * @Description release local resources is hdi remote died
+ *
+ * @return NONE
+ */
+void ReleaseLocalResources();
+
 #ifdef RANDOM_MAC_SUPPORT
 /**
  * @Description Set RandomMac to hdi.

@@ -173,7 +173,7 @@ int WpaCliCmd(const char *cmd, char *buf, size_t bufLen)
         return 0;
     } else {
         LOGI("wpa_ctrl_request report to iwifi");
-        for (int i = 0; i <bufLen; i++) {
+        for (int i = 0; i < bufLen; i++) {
             buf[i] = buf[i] == '\n' ? '*' : buf[i];
         }
         char *sep = "*";

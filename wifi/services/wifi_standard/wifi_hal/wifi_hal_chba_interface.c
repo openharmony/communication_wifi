@@ -132,7 +132,10 @@ WifiErrorNo ChbaStart(void)
     }
     g_hmlSupplicantConnectEvent = 1;
     char eventStr[25];
-    sprintf(eventStr, "P2P-CONNECTED status =%d", g_hmlSupplicantConnectEvent);
+    if (sprintf_s(eventStr, sizeof(eventStr), "P2P-CONNECTED status =%d", g_hmlSupplicantConnectEvent) < 0) {
+        LOGE("ChbaStop sprintf_s failed! ");
+        return WIFI_HAL_FAILED;
+    }
     HalCallbackNotify(eventStr);
     LOGD("Supplicant connect hml_wpa_supplicant success!");
     return WIFI_HAL_SUCCESS;
@@ -146,7 +149,10 @@ WifiErrorNo ChbaStop(void)
     }
     g_hmlSupplicantConnectEvent = 0;
     char eventStr[25];
-    sprintf(eventStr, "P2P-CONNECTED status =%d", g_hmlSupplicantConnectEvent);
+    if (sprintf_s(eventStr, sizeof(eventStr), "P2P-CONNECTED status =%d", g_hmlSupplicantConnectEvent) < 0) {
+        LOGE("ChbaStop sprintf_s failed! ");
+        return WIFI_HAL_FAILED;
+    }
     HalCallbackNotify(eventStr);
     return WIFI_HAL_SUCCESS;
 }

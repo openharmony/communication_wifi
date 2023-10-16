@@ -24,6 +24,16 @@
 
 #define NUMS_BAND 2
 
+#ifndef CHECK_AP_HDI_PROXY_AND_RETURN
+#define CHECK_AP_HDI_PROXY_AND_RETURN(isRemoteDied) \
+if (isRemoteDied) { \
+    if (HdiStart() != WIFI_HAL_SUCCESS) { \
+        LOGE("[AP] Start hdi failed!"); \
+        return WIFI_HAL_FAILED; \
+    } \
+}
+#endif
+
 static int32_t ConvertToNl80211Band(int32_t band)
 {
     return (band > 0 && band <= NUMS_BAND) ? (band - 1) : band;
@@ -35,6 +45,7 @@ WifiErrorNo GetValidFrequenciesForBand(int32_t band, int *frequencies, int32_t *
         LOGE("%{public}s frequencies or size is null.", __func__);
         return WIFI_HAL_FAILED;
     }
+    CHECK_AP_HDI_PROXY_AND_RETURN(IsHdiRemoteDied());
     WifiHdiProxy proxy = GetHdiProxy(PROTOCOL_80211_IFTYPE_AP);
     CHECK_HDI_PROXY_AND_RETURN(proxy, WIFI_HAL_FAILED);
     struct HdfWifiInfo wifiInfo;
@@ -54,6 +65,7 @@ WifiErrorNo GetValidFrequenciesForBand(int32_t band, int *frequencies, int32_t *
 WifiErrorNo WifiSetPowerModel(const int mode, int id)
 {
     LOGI("Instance %{public}d WifiSetPowerModel: %{public}d", id, mode);
+    CHECK_AP_HDI_PROXY_AND_RETURN(IsHdiRemoteDied());
     WifiHdiProxy proxy = GetHdiProxy(PROTOCOL_80211_IFTYPE_AP);
     CHECK_HDI_PROXY_AND_RETURN(proxy, WIFI_HAL_FAILED);
     int32_t ret = proxy.wlanObj->SetPowerMode(proxy.wlanObj, proxy.feature, mode);
@@ -66,6 +78,7 @@ WifiErrorNo WifiSetPowerModel(const int mode, int id)
 WifiErrorNo WifiGetPowerModel(int* mode, int id)
 {
     LOGI("Instance %{public}d WifiGetPowerModel", id);
+    CHECK_AP_HDI_PROXY_AND_RETURN(IsHdiRemoteDied());
     WifiHdiProxy proxy = GetHdiProxy(PROTOCOL_80211_IFTYPE_AP);
     CHECK_HDI_PROXY_AND_RETURN(proxy, WIFI_HAL_FAILED);
     int32_t ret = proxy.wlanObj->GetPowerMode(proxy.wlanObj, proxy.feature, (uint8_t *)mode);
@@ -83,6 +96,7 @@ WifiErrorNo HdiSetCountryCode(const char* code, int id)
         return WIFI_HAL_FAILED;
     }
     LOGI("Instance %{public}d %{public}s: %{public}s", id, __func__, code);
+    CHECK_AP_HDI_PROXY_AND_RETURN(IsHdiRemoteDied());
     WifiHdiProxy proxy = GetHdiProxy(PROTOCOL_80211_IFTYPE_AP);
     CHECK_HDI_PROXY_AND_RETURN(proxy, WIFI_HAL_FAILED);
     int32_t ret = proxy.wlanObj->SetCountryCode(proxy.wlanObj, proxy.feature, code, (uint32_t)strlen(code));

@@ -55,6 +55,7 @@ unsigned char WifiP2pServiceManager::GetTransId()
 
 bool WifiP2pServiceManager::AddLocalService(const WifiP2pServiceInfo &p2pSvrInfo)
 {
+    std::unique_lock<std::mutex> lock(serviceMutex);
     for (auto iter = localServicesInfo.begin(); iter != localServicesInfo.end(); ++iter) {
         if (iter->GetServicerProtocolType() == p2pSvrInfo.GetServicerProtocolType() &&
             iter->GetQueryList() == p2pSvrInfo.GetQueryList() &&
@@ -69,6 +70,7 @@ bool WifiP2pServiceManager::AddLocalService(const WifiP2pServiceInfo &p2pSvrInfo
 
 bool WifiP2pServiceManager::RemoveLocalService(const WifiP2pServiceInfo &p2pSvrInfo)
 {
+    std::unique_lock<std::mutex> lock(serviceMutex);
     for (auto iter = localServicesInfo.begin(); iter != localServicesInfo.end(); ++iter) {
         if (iter->GetServicerProtocolType() == p2pSvrInfo.GetServicerProtocolType() &&
             iter->GetQueryList() == p2pSvrInfo.GetQueryList() &&

@@ -200,6 +200,8 @@ if (defined(ohos_lite)) {
     sources = [
       "wifi_scan_callback_proxy.cpp",
       "wifi_scan_death_recipient.cpp",
+      "wifi_scan_mgr_service_impl.cpp",
+      "wifi_scan_mgr_stub.cpp",
       "wifi_scan_service_impl.cpp",
       "wifi_scan_stub.cpp",
     ]
@@ -212,7 +214,7 @@ if (defined(ohos_lite)) {
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/idl_client:wifi_idl_client",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit:wifi_toolkit",
     ]
-    defines = []
+    defines = [ "STA_INSTANCE_MAX_NUM=$wifi_feature_with_sta_num" ]
     if (wifi_feature_with_random_mac_addr) {
       defines += [ "SUPPORT_RANDOM_MAC_ADDR" ]
     }
@@ -231,6 +233,8 @@ if (defined(ohos_lite)) {
     sources = [
       "wifi_device_callback_proxy.cpp",
       "wifi_device_death_recipient.cpp",
+      "wifi_device_mgr_service_impl.cpp",
+      "wifi_device_mgr_stub.cpp",
       "wifi_device_service_impl.cpp",
       "wifi_device_stub.cpp",
     ]
@@ -239,7 +243,7 @@ if (defined(ohos_lite)) {
       ":wifi_manager_service_header",
     ]
 
-    defines = []
+    defines = [ "STA_INSTANCE_MAX_NUM=$wifi_feature_with_sta_num" ]
     if (wifi_feature_with_ap_num > 0) {
       defines += [ "FEATURE_AP_SUPPORT" ]
     }
@@ -417,6 +421,7 @@ if (defined(ohos_lite)) {
     }
     defines = [
       "FEATURE_AP_SUPPORT",
+      "STA_INSTANCE_MAX_NUM=$wifi_feature_with_sta_num",
       "AP_INSTANCE_MAX_NUM=$wifi_feature_with_ap_num",
     ]
 

@@ -22,7 +22,7 @@ namespace OHOS {
 namespace Wifi {
 NO_SANITIZE("cfi") std::shared_ptr<WifiP2p> WifiP2p::GetInstance(int systemAbilityId)
 {
-    std::shared_ptr<WifiP2pImpl> impl = DelayedSingleton<WifiP2pImpl>::GetInstance();
+    std::shared_ptr<WifiP2pImpl> impl = std::make_shared<WifiP2pImpl>();
     if (impl && impl->Init(systemAbilityId)) {
         WIFI_LOGI("init p2p successfully!");
         return impl;
@@ -33,8 +33,6 @@ NO_SANITIZE("cfi") std::shared_ptr<WifiP2p> WifiP2p::GetInstance(int systemAbili
 }
 
 WifiP2p::~WifiP2p()
-{
-    DelayedSingleton<WifiP2pImpl>::DestroyInstance();
-}
+{}
 }  // namespace Wifi
 }  // namespace OHOS

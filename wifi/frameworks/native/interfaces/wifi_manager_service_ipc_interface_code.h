@@ -19,6 +19,7 @@ namespace OHOS {
 namespace Wifi {
 /* SAID: 1120 */
 enum class  DevInterfaceCode {
+    WIFI_MGR_GET_DEVICE_SERVICE = 0,
     WIFI_SVR_CMD_ENABLE_WIFI = 0x1001,               /* open wifi */
     WIFI_SVR_CMD_DISABLE_WIFI = 0x1002,              /* close wifi */
     WIFI_SVR_CMD_ADD_DEVICE_CONFIG = 0x1006,         /* add a network config */
@@ -155,6 +156,7 @@ enum class  P2PInterfaceCode {
 
 /* SAID: 1124 */
 enum class  ScanInterfaceCode {
+    WIFI_MGR_GET_SCAN_SERVICE = 0,
     WIFI_SVR_CMD_FULL_SCAN = 0x1004,                 /* scan request */
     WIFI_SVR_CMD_SPECIFIED_PARAMS_SCAN = 0x1005,     /* scan with params request */
     WIFI_SVR_CMD_IS_SCAN_ALWAYS_ACTIVE = 0x1015,     /* whether set scan always */

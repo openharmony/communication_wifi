@@ -26,6 +26,7 @@ namespace Wifi {
 class WifiDeviceStub : public IRemoteStub<IWifiDevice> {
 public:
     WifiDeviceStub();
+    explicit WifiDeviceStub(int instId);
     virtual ~WifiDeviceStub();
 
     using handleFunc = void (WifiDeviceStub::*)(uint32_t code, MessageParcel &data, MessageParcel &reply);
@@ -107,6 +108,9 @@ private:
     HandleFuncMap handleFuncMap;
     sptr<IRemoteObject::DeathRecipient> deathRecipient_;
     bool mSingleCallback;
+
+protected:
+    int m_instId{0};
 };
 }  // namespace Wifi
 }  // namespace OHOS

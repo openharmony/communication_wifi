@@ -26,33 +26,21 @@
 
 namespace OHOS {
 namespace Wifi {
-enum ServiceRunningState {
-    STATE_NOT_START,
-    STATE_RUNNING
-};
-
 #ifdef OHOS_ARCH_LITE
-class WifiScanServiceImpl : public WifiScanStub {
-#else
-class WifiScanServiceImpl : public SystemAbility, public WifiScanStub {
-    DECLARE_SYSTEM_ABILITY(WifiScanServiceImpl);
+enum ServiceRunningState { STATE_NOT_START, STATE_RUNNING };
 #endif
 
+class WifiScanServiceImpl : public WifiScanStub {
 public:
     WifiScanServiceImpl();
-    virtual ~WifiScanServiceImpl();
-
 #ifdef OHOS_ARCH_LITE
     static std::shared_ptr<WifiScanServiceImpl> GetInstance();
-
     void OnStart();
     void OnStop();
 #else
-    static sptr<WifiScanServiceImpl> GetInstance();
-
-    void OnStart() override;
-    void OnStop() override;
+    explicit WifiScanServiceImpl(int instId);
 #endif
+    virtual ~WifiScanServiceImpl();
 
     ErrCode SetScanControlInfo(const ScanControlInfo &info) override;
     ErrCode Scan(bool compatible) override;
@@ -68,27 +56,21 @@ public:
     ErrCode RegisterCallBack(const sptr<IWifiScanCallback> &callback, const std::vector<std::string> &event) override;
 #endif
     ErrCode GetSupportedFeatures(long &features) override;
-#ifndef OHOS_ARCH_LITE
-    int32_t Dump(int32_t fd, const std::vector<std::u16string>& args) override;
-#endif
     bool IsRemoteDied(void) override;
+    static void SaBasicDump(std::string& result);
 
 private:
     bool Init();
     bool IsScanServiceRunning();
-    static void SaBasicDump(std::string& result);
     ErrCode OpenScanOnlyAvailable();
     ErrCode CloseScanOnlyAvailable();
 
 private:
 #ifdef OHOS_ARCH_LITE
-    static std::shared_ptr<WifiScanServiceImpl> g_instance;
-#else
-    static sptr<WifiScanServiceImpl> g_instance;
-#endif
     static std::mutex g_instanceLock;
-    bool mPublishFlag = false;
+    static std::shared_ptr<WifiScanServiceImpl> g_instance;
     ServiceRunningState mState;
+#endif
 };
 }  // namespace Wifi
 }  // namespace OHOS

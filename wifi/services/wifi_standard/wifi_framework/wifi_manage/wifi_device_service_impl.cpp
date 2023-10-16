@@ -16,11 +16,7 @@
 #include "wifi_device_service_impl.h"
 #include <algorithm>
 #include <chrono>
-#include <csignal>
 #include <unistd.h>
-#ifndef OHOS_ARCH_LITE
-#include <file_ex.h>
-#endif
 #include "wifi_permission_utils.h"
 #include "wifi_internal_msg.h"
 #include "wifi_auth_center.h"
@@ -29,97 +25,37 @@
 #include "wifi_internal_event_dispatcher_lite.h"
 #else
 #include "wifi_internal_event_dispatcher.h"
+#include "xcollie/watchdog.h"
+#include "wifi_sa_manager.h"
+#include "wifi_settings.h"
+#include "mac_address.h"
+#include "wifi_p2p_service_impl.h"
 #endif
 #include "wifi_manager.h"
 #include "wifi_service_manager.h"
 #include "wifi_protect_manager.h"
 #include "wifi_logger.h"
 #include "define.h"
-#include "wifi_dumper.h"
 #include "wifi_common_util.h"
 #include "wifi_protect_manager.h"
 #include "wifi_global_func.h"
-#ifndef OHOS_ARCH_LITE
-#include "xcollie/watchdog.h"
-#include "wifi_sa_manager.h"
-#include "define.h"
-#include "wifi_settings.h"
-#include "mac_address.h"
-#endif
+
 DEFINE_WIFILOG_LABEL("WifiDeviceServiceImpl");
 namespace OHOS {
 namespace Wifi {
-std::mutex WifiDeviceServiceImpl::g_instanceLock;
-bool WifiDeviceServiceImpl::isServiceStart = false;
 #ifdef OHOS_ARCH_LITE
-std::shared_ptr<WifiDeviceServiceImpl> WifiDeviceServiceImpl::g_instance;
+std::mutex WifiDeviceServiceImpl::g_instanceLock;
+std::shared_ptr<WifiDeviceServiceImpl> WifiDeviceServiceImpl::g_instance = nullptr;
 std::shared_ptr<WifiDeviceServiceImpl> WifiDeviceServiceImpl::GetInstance()
-#else
-const uint32_t TIMEOUT_APP_EVENT = 3000;
-const uint32_t TIMEOUT_THERMAL_EVENT = 3000;
-constexpr int32_t WATCHDOG_INTERVAL_MS = 10000;
-constexpr int32_t WATCHDOG_DELAY_MS = 15000;
-
-using TimeOutCallback = std::function<void()>;
-sptr<WifiDeviceServiceImpl> WifiDeviceServiceImpl::g_instance;
-const bool REGISTER_RESULT = SystemAbility::MakeAndRegisterAbility(WifiDeviceServiceImpl::GetInstance().GetRefPtr());
-
-sptr<WifiDeviceServiceImpl> WifiDeviceServiceImpl::GetInstance()
-#endif
 {
     if (g_instance == nullptr) {
         std::lock_guard<std::mutex> autoLock(g_instanceLock);
         if (g_instance == nullptr) {
-#ifdef OHOS_ARCH_LITE
             std::shared_ptr<WifiDeviceServiceImpl> service = std::make_shared<WifiDeviceServiceImpl>();
-#else
-            sptr<WifiDeviceServiceImpl> service = new (std::nothrow) WifiDeviceServiceImpl;
-#endif
             g_instance = service;
         }
     }
     return g_instance;
-}
-
-WifiDeviceServiceImpl::WifiDeviceServiceImpl()
-#ifdef OHOS_ARCH_LITE
-    : mPublishFlag(false), mState(ServiceRunningState::STATE_NOT_START)
-#else
-    : SystemAbility(WIFI_DEVICE_ABILITY_ID, true), mPublishFlag(false), mState(ServiceRunningState::STATE_NOT_START)
-#endif
-{
-    WIFI_LOGI("enter WifiDeviceServiceImpl");
-    isServiceStart = false;
-}
-
-WifiDeviceServiceImpl::~WifiDeviceServiceImpl()
-{
-    WIFI_LOGI("enter ~WifiDeviceServiceImpl");
-}
-
-bool WifiDeviceServiceImpl::IsProcessNeedToRestart()
-{
-    return WifiDeviceServiceImpl::isServiceStart;
-}
-
-void WifiDeviceServiceImpl::SigHandler(int sig)
-{
-    WIFI_LOGI("[Sta] Recv SIG: %{public}d\n", sig);
-    switch (sig) {
-        case SIGUSR1:
-            if (isServiceStart) {
-                StaServiceCallback cb = WifiManager::GetInstance().GetStaCallback();
-                if (cb.OnStaCloseRes != nullptr) {
-                    cb.OnStaCloseRes(OperateResState::CLOSE_WIFI_SUCCEED);
-                }
-                WIFI_LOGE("[Sta] --------------Abort process to restart!!!--------------\n");
-                abort();
-            }
-            break;
-
-        default:
-            break;
-    }
 }
 
 void WifiDeviceServiceImpl::OnStart()
@@ -128,20 +64,35 @@ void WifiDeviceServiceImpl::OnStart()
         WIFI_LOGW("Service has already started.");
         return;
     }
-    (void)signal(SIGUSR1, SigHandler);
-    if (!Init()) {
-        WIFI_LOGE("Failed to init service");
-        OnStop();
-        return;
-    }
-    isServiceStart = true;
+    
+    WifiManager::GetInstance();
     mState = ServiceRunningState::STATE_RUNNING;
     WIFI_LOGI("Start sta service!");
-    WifiManager::GetInstance();
+}
+
+void WifiDeviceServiceImpl::OnStop()
+{
+    mState = ServiceRunningState::STATE_NOT_START;
+    WIFI_LOGI("Stop sta service!");
+}
+#endif
+
+
+WifiDeviceServiceImpl::WifiDeviceServiceImpl()
+#ifdef OHOS_ARCH_LITE
+    : mState(ServiceRunningState::STATE_NOT_START)
+#endif
+{
+    WIFI_LOGI("enter WifiDeviceServiceImpl");
+}
+
 #ifndef OHOS_ARCH_LITE
-    // Get airplane mode by datashare
-    WifiManager::GetInstance().GetAirplaneModeByDatashare();
-    WifiManager::GetInstance().GetDeviceProvisionByDatashare();
+WifiDeviceServiceImpl::WifiDeviceServiceImpl(int instId) : WifiDeviceStub(instId)
+{
+    WIFI_LOGI("enter WifiDeviceServiceImpl");
+    using TimeOutCallback = std::function<void()>;
+    const uint32_t TIMEOUT_APP_EVENT = 3000;
+    const uint32_t TIMEOUT_THERMAL_EVENT = 3000;
     if (eventSubscriber_ == nullptr && appEventTimerId == 0) {
         TimeOutCallback timeoutCallback = std::bind(&WifiDeviceServiceImpl::RegisterAppRemoved, this);
         WifiTimer::GetInstance()->Register(timeoutCallback, appEventTimerId, TIMEOUT_APP_EVENT, false);
@@ -151,33 +102,12 @@ void WifiDeviceServiceImpl::OnStart()
         TimeOutCallback timeoutCallback = std::bind(&WifiDeviceServiceImpl::RegisterThermalLevel, this);
         WifiTimer::GetInstance()->Register(timeoutCallback, thermalTimerId, TIMEOUT_THERMAL_EVENT, false);
     }
-    WifiManager::GetInstance().StartUnloadStaSaTimer();
-    StartWatchdog();
-#endif
-}
-
-#ifndef OHOS_ARCH_LITE
-void WifiDeviceServiceImpl::StartWatchdog(void)
-{
-    auto taskFunc = [this]() {
-        uint64_t now = static_cast<uint64_t>(std::chrono::duration_cast<std::chrono::milliseconds>(
-        std::chrono::steady_clock::now().time_since_epoch()).count());
-        uint64_t interval = now - WifiSettings::GetInstance().GetThreadStartTime();
-        if ((WifiSettings::GetInstance().GetThreadStatusFlag()) && (interval > WATCHDOG_INTERVAL_MS)) {
-            WIFI_LOGE("watchdog happened, thread need restart");
-        } else {
-            WIFI_LOGD("thread work normally");
-        }
-    };
-    HiviewDFX::Watchdog::GetInstance().RunPeriodicalTask("WifiDeviceServiceImpl", taskFunc,
-        WATCHDOG_INTERVAL_MS, WATCHDOG_DELAY_MS);
 }
 #endif
 
-void WifiDeviceServiceImpl::OnStop()
+WifiDeviceServiceImpl::~WifiDeviceServiceImpl()
 {
-    mState = ServiceRunningState::STATE_NOT_START;
-    mPublishFlag = false;
+    WIFI_LOGI("enter ~WifiDeviceServiceImpl");
 #ifndef OHOS_ARCH_LITE
     if (eventSubscriber_ != nullptr) {
         UnRegisterAppRemoved();
@@ -186,26 +116,7 @@ void WifiDeviceServiceImpl::OnStop()
     if (thermalLevelSubscriber_ != nullptr) {
         UnRegisterThermalLevel();
     }
-
 #endif
-    WIFI_LOGI("Stop sta service!");
-}
-
-bool WifiDeviceServiceImpl::Init()
-{
-    if (!mPublishFlag) {
-#ifdef OHOS_ARCH_LITE
-        bool ret = true;
-#else
-        bool ret = Publish(WifiDeviceServiceImpl::GetInstance());
-#endif
-        if (!ret) {
-            WIFI_LOGE("Failed to publish sta service!");
-            return false;
-        }
-        mPublishFlag = true;
-    }
-    return true;
 }
 
 ErrCode WifiDeviceServiceImpl::EnableWifi()
@@ -1473,22 +1384,22 @@ ErrCode WifiDeviceServiceImpl::Get5GHzChannelList(std::vector<int> &result)
 }
 
 #ifndef OHOS_ARCH_LITE
-int32_t WifiDeviceServiceImpl::Dump(int32_t fd, const std::vector<std::u16string>& args)
+void WifiDeviceServiceImpl::StartWatchdog(void)
 {
-    WIFI_LOGI("Enter sta dump func.");
-    std::vector<std::string> vecArgs;
-    std::transform(args.begin(), args.end(), std::back_inserter(vecArgs), [](const std::u16string &arg) {
-        return Str16ToStr8(arg);
-    });
-
-    WifiDumper dumper;
-    std::string result;
-    dumper.DeviceDump(SaBasicDump, vecArgs, result);
-    if (!SaveStringToFd(fd, result)) {
-        WIFI_LOGE("WiFi device save string to fd failed.");
-        return ERR_OK;
-    }
-    return ERR_OK;
+    constexpr int32_t WATCHDOG_INTERVAL_MS = 10000;
+    constexpr int32_t WATCHDOG_DELAY_MS = 15000;
+    auto taskFunc = []() {
+        uint64_t now = static_cast<uint64_t>(std::chrono::duration_cast<std::chrono::milliseconds>(
+        std::chrono::steady_clock::now().time_since_epoch()).count());
+        uint64_t interval = now - WifiSettings::GetInstance().GetThreadStartTime();
+        if ((WifiSettings::GetInstance().GetThreadStatusFlag()) && (interval > WATCHDOG_INTERVAL_MS)) {
+            WIFI_LOGE("watchdog happened, thread need restart");
+        } else {
+            WIFI_LOGD("thread work normally");
+        }
+    };
+    HiviewDFX::Watchdog::GetInstance().RunPeriodicalTask("WifiDeviceServiceImpl", taskFunc,
+        WATCHDOG_INTERVAL_MS, WATCHDOG_DELAY_MS);
 }
 
 void WifiDeviceServiceImpl::RegisterAppRemoved()

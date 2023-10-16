@@ -34,6 +34,12 @@ WifiDeviceStub::WifiDeviceStub() : mSingleCallback(false)
     InitHandleMap();
 }
 
+WifiDeviceStub::WifiDeviceStub(int instId) : mSingleCallback(false), m_instId(instId)
+{
+    WIFI_LOGI("enter WifiDeviceStub!");
+    InitHandleMap();
+}
+
 WifiDeviceStub::~WifiDeviceStub()
 {
     WIFI_LOGI("enter ~WifiDeviceStub!");

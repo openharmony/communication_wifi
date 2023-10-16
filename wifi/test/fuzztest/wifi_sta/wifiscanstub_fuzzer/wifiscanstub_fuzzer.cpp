@@ -20,11 +20,13 @@
 #include <cstdint>
 
 #include "wifi_scan_stub.h"
+#include "wifi_scan_mgr_stub.h"
 #include "message_parcel.h"
 #include "securec.h"
 #include "define.h"
 #include "wifi_manager_service_ipc_interface_code.h"
 #include "wifi_scan_service_impl.h"
+#include "wifi_scan_mgr_service_impl.h"
 #include "wifi_log.h"
 
 namespace OHOS {
@@ -32,7 +34,23 @@ namespace Wifi {
 constexpr size_t U32_AT_SIZE_ZERO = 4;
 constexpr size_t MAP_SCAN_NUMS = 31;
 const std::u16string FORMMGR_INTERFACE_TOKEN = u"ohos.wifi.IWifiScan";
-sptr<WifiScanStub> pWifiScanStub = WifiScanServiceImpl::GetInstance();
+const std::u16string FORMMGR_INTERFACE_TOKEN_EX = u"ohos.wifi.IWifiScanMgr";
+sptr<WifiScanMgrStub> pWifiScanMgrStub = WifiScanMgrServiceImpl::GetInstance();
+std::map<int, sptr<IRemoteObject>> &scanServiceMgr = WifiScanMgrServiceImpl::GetInstance()->GetScanServiceMgr();
+sptr<WifiScanStub> pWifiScanStub = iface_cast<WifiScanServiceImpl>(scanServiceMgr[0]);
+
+bool DoSomethingInterestingWithMyAPIEx(const uint8_t* data, size_t size)
+{
+    uint32_t code = static_cast<uint32_t>(ScanInterfaceCode::WIFI_MGR_GET_SCAN_SERVICE);
+    MessageParcel datas;
+    datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN_EX);
+    datas.WriteInt32(0);
+    datas.RewindRead(0);
+    MessageParcel reply;
+    MessageOption option;
+    pWifiScanMgrStub->OnRemoteRequest(code, datas, reply, option);
+    return true;
+}
 
 void OnGetSupportedFeaturesTest(const uint8_t* data, size_t size)
 {
@@ -70,6 +88,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
         return 0;
     }
     OHOS::Wifi::DoSomethingInterestingWithMyAPI(data, size);
+    OHOS::Wifi::DoSomethingInterestingWithMyAPIEx(data, size);
     return 0;
 }
 }

@@ -61,8 +61,8 @@
         RegisterWifiEvent;
         UnRegisterWifiEvent;
         extern "C++" {
-            "OHOS::Wifi::WifiDevice::GetInstance(int)";
-            "OHOS::Wifi::WifiScan::GetInstance(int)";
+            "OHOS::Wifi::WifiDevice::GetInstance(int, int)";
+            "OHOS::Wifi::WifiScan::GetInstance(int, int)";
             "OHOS::Wifi::WifiHotspot::GetInstance(int, int)";
             "OHOS::Wifi::WifiP2p::GetInstance(int)";
             OHOS::Wifi::WifiP2pLinkedInfo::*;

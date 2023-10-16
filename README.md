@@ -10,7 +10,7 @@
 -   [Repositories Involved](#section1371113476307)
 
 ## Introduction<a name="section11660541593"></a>
-54564
+
 A wireless local area network \(WLAN\) uses the radio, infrared, or other technologies to transmit data between devices that are not physically connected with each other. It is widely applied in offices and public places where mobile devices are used.
 
 The WLAN module provides basic WLAN functions, peer-to-peer \(P2P\) connection, and WLAN notification, enabling your application to communicate with other devices through a WLAN.

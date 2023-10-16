@@ -724,6 +724,7 @@ static void DealeventCommonCbk(int event, Context *context)
 {
     WifiHalEventCallbackMsg *cbmsg = FrontCallbackMsg(event);
     if (cbmsg != NULL) {
+        LOGD("callback msg is %{public}s", cbmsg->msg.commsg.event);
         WriteStr(context, cbmsg->msg.commsg.event);
     }
 }

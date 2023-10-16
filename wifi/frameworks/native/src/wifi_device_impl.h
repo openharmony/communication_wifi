@@ -347,6 +347,22 @@ public:
     bool SetLowLatencyMode(bool enabled) override;
 
     /**
+     * @Description set frozen app
+     *
+     * @param uid - uid of frozen app
+     * @param isFrozen - is app frozen
+     * @return ErrCode - operation result
+     */
+    ErrCode SetAppFrozen(int uid, bool isFrozen) override;
+
+    /**
+     * @Description reset all frozen app
+     *
+     * @return ErrCode - operation result
+     */
+    ErrCode ResetAllFrozenApp() override;
+
+    /**
      * @Description Check whether service is died.
      *
      * @return bool - true: service is died, false: service is not died.

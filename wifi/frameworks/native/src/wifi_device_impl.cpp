@@ -396,6 +396,20 @@ bool WifiDeviceImpl::SetLowLatencyMode(bool enabled)
     return client_->SetLowLatencyMode(enabled);
 }
 
+ErrCode WifiDeviceImpl::SetAppFrozen(int uid, bool isFrozen)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    RETURN_IF_FAIL(GetWifiDeviceProxy());
+    return client_->SetAppFrozen(uid, isFrozen);
+}
+
+ErrCode WifiDeviceImpl::ResetAllFrozenApp()
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    RETURN_IF_FAIL(GetWifiDeviceProxy());
+    return client_->ResetAllFrozenApp();
+}
+
 bool WifiDeviceImpl::IsRemoteDied(void)
 {
     return (client_ == nullptr) ? true : client_->IsRemoteDied();

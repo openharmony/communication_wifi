@@ -353,6 +353,22 @@ public:
      */
     ErrCode Get5GHzChannelList(std::vector<int> &result) override;
 
+    /**
+     * @Description set frozen app
+     *
+     * @param uid - uid of frozen app
+     * @param isFrozen - is app frozen
+     * @return ErrCode - operation result
+     */
+    ErrCode SetAppFrozen(int uid, bool isFrozen) override;
+
+    /**
+     * @Description reset all frozen app
+     *
+     * @return ErrCode - operation result
+     */
+    ErrCode ResetAllFrozenApp() override;
+
 #ifdef OHOS_ARCH_LITE
     /**
     * @Description Handle remote object died event.

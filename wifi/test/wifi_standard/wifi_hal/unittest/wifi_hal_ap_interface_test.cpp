@@ -113,7 +113,7 @@ HWTEST_F(WifiHalApInterfaceTest, GetValidFrequenciesForBandTest, TestSize.Level1
 HWTEST_F(WifiHalApInterfaceTest, StopSoftApTest, TestSize.Level1)
 {
     EXPECT_GE(StopSoftAp(0), WIFI_HAL_SUCCESS);
-    EXPECT_GE(StopSoftAp(-1) == WIFI_HAL_SUCCESS);
+    EXPECT_GE(StopSoftAp(-1), WIFI_HAL_SUCCESS);
 }
 
 HWTEST_F(WifiHalApInterfaceTest, StartSoftApTest, TestSize.Level1)

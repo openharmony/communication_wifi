@@ -37,7 +37,7 @@ public:
      * @param callbacks - sta service callback
      * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
      */
-    virtual ErrCode InitStaService(const StaServiceCallback &callbacks);
+    virtual ErrCode InitStaService(const std::vector<StaServiceCallback> &callbacks);
     /**
      * @Description  Enable wifi
      *

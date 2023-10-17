@@ -35,6 +35,7 @@ typedef struct WifiHalRpcFunc {
 
 #define RPC_FUNC_NUM 10
 #define RPC_FUNCNAME_MAX_LEN 128
+#define WIFI_COM_STR_LENGTH 512
 
 /**
  * @Description Initialization the function table.
@@ -86,8 +87,13 @@ typedef struct WifiHalBssidChangedMsg {
     char bssid[WIFI_MAC_LENGTH + 1];
 } WifiHalBssidChangedMsg;
 
+typedef struct WifiHalCommonMsg {
+    char event[WIFI_COM_STR_LENGTH + 1];
+} WifiHalCommonMsg;
+
 typedef union WifiHalCallbackMsg {
     int scanStatus;
+    WifiHalCommonMsg commsg;
     WifiHalConnectMsg connMsg;
     WifiHalCbIFaceMsg ifMsg;
     P2pDeviceInfo deviceInfo;

@@ -102,6 +102,7 @@ if (defined(ohos_lite)) {
     include_dirs += [
       "//base/security/certificate_manager/frameworks/cert_manager_standard/main/common/include",
       "//base/security/certificate_manager/interfaces/innerkits/cert_manager_standard/main/include",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_country_code",
     ]
 
     deps = []

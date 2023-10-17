@@ -368,7 +368,7 @@ bool StaStateMachine::RootState::ExecuteStateMsg(InternalMessage *msg)
                 WIFI_LOGI("update wifi country code sucess, wifiCountryCode=%{public}s", wifiCountryCode.c_str());
                 break;
             }
-            WIFI_LOGI("update wifi country code fail, wifiCountryCode=%{public}s, ret=%{public}d",
+            WIFI_LOGE("update wifi country code fail, wifiCountryCode=%{public}s, ret=%{public}d",
                 wifiCountryCode.c_str(), result);
 #endif
             break;

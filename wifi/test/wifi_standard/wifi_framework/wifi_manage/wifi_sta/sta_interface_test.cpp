@@ -615,5 +615,23 @@ HWTEST_F(StaInterfaceTest, ReConnectFail, TestSize.Level1)
 {
     ReConnectFail();
 }
+
+HWTEST_F(StaInterfaceTest, OnScreenStateChangedSuccess1, TestSize.Level1)
+{
+    int screenState = MODE_STATE_OPEN;
+    EXPECT_EQ(WIFI_OPT_SUCCESS, pStaInterface->OnScreenStateChanged(screenState));
+}
+
+HWTEST_F(StaInterfaceTest, OnScreenStateChangedSuccess2, TestSize.Level1)
+{
+    int screenState = MODE_STATE_CLOSE;
+    EXPECT_EQ(WIFI_OPT_SUCCESS, pStaInterface->OnScreenStateChanged(screenState));
+}
+
+HWTEST_F(StaInterfaceTest, OnScreenStateChangedFail, TestSize.Level1)
+{
+    int screenState = 0;
+    EXPECT_EQ(WIFI_OPT_INVALID_PARAM, pStaInterface->OnScreenStateChanged(screenState));
+}
 } // namespace Wifi
 } // namespace OHOS

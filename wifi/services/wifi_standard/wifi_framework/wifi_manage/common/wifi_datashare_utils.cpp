@@ -17,6 +17,8 @@
 #include "iremote_stub.h"
 #include "wifi_logger.h"
 #include "wifi_datashare_utils.h"
+#include "wifi_logger.h"
+
 DEFINE_WIFILOG_LABEL("WifiDataShareHelperUtils");
 
 namespace OHOS {
@@ -76,6 +78,42 @@ ErrCode WifiDataShareHelperUtils::Query(Uri &uri, const std::string &key, std::s
     result->GetString(columnIndex, value);
     result->Close();
     WIFI_LOGI("WifiDataShareHelper query success,value[%{public}s]", value.c_str());
+    return WIFI_OPT_SUCCESS;
+}
+
+ErrCode WifiDataShareHelperUtils::Insert(Uri &uri, const std::string &key, const std::string &value)
+{
+    CHECK_NULL_AND_RETURN(dataShareHelper_, WIFI_OPT_FAILED);
+    DataShare::DataShareValuesBucket valuesBucket;
+    DataShare::DataShareValueObject keyObj(key);
+    DataShare::DataShareValueObject valueObj(value);
+    valuesBucket.Put(SETTINGS_DATA_COLUMN_KEYWORD, keyObj);
+    valuesBucket.Put(SETTINGS_DATA_COLUMN_VALUE, valueObj);
+    int result = dataShareHelper_->Insert(uri, valuesBucket);
+    if (result != DataShare::DATA_SHARE_NO_ERROR) {
+        WIFI_LOGE("WifiDataShareHelper insert failed, resultCode=%{public}d", result);
+        return WIFI_OPT_FAILED;
+    }
+    dataShareHelper_->NotifyChange(uri);
+    WIFI_LOGE("DataShareHelper insert success");
+    return WIFI_OPT_SUCCESS;
+}
+
+ErrCode WifiDataShareHelperUtils::Update(Uri &uri, const std::string &key, const std::string &value)
+{
+    CHECK_NULL_AND_RETURN(dataShareHelper_, WIFI_OPT_FAILED);
+    DataShare::DataShareValuesBucket valuesBucket;
+    DataShare::DataShareValueObject valueObj(value);
+    valuesBucket.Put(SETTINGS_DATA_COLUMN_VALUE, valueObj);
+    DataShare::DataSharePredicates predicates;
+    predicates.EqualTo(SETTINGS_DATA_COLUMN_KEYWORD, key);
+    int result = dataShareHelper_->Update(uri, predicates, valuesBucket);
+    if (result != DataShare::DATA_SHARE_NO_ERROR) {
+        WIFI_LOGE("WifiDataShareHelper update failed, resultCode=%{public}d", result);
+        return WIFI_OPT_FAILED;
+    }
+    dataShareHelper_->NotifyChange(uri);
+    WIFI_LOGE("DataShareHelper update success");
     return WIFI_OPT_SUCCESS;
 }
 

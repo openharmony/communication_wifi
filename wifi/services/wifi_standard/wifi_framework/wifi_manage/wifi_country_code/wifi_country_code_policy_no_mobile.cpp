@@ -39,16 +39,6 @@ ErrCode WifiCountryCodePolicyNoMobile::CalculateWifiCountryCode(std::string &wif
     return WIFI_OPT_SUCCESS;
 }
 
-WifiCountryCodePolicyNoMobile::WifiCcpCommonEventListener::WifiCcpCommonEventListener(
-    const OHOS::EventFwk::CommonEventSubscribeInfo &subscriberInfo,
-    WifiCountryCodePolicyNoMobile *wifiCountryCodePolicyNoMobile)
-    : CommonEventSubscriber(subscriberInfo), m_wifiCountryCodePolicyNoMobile(wifiCountryCodePolicyNoMobile)
-{}
-
-void WifiCountryCodePolicyNoMobile::WifiCcpCommonEventListener::OnReceiveEvent(
-    const OHOS::EventFwk::CommonEventData &eventData)
-{}
-
 /*
  * If two hotspots with the same number exist in the environment (with different country codes),
  * a hotspot may not be scanned in a single scan. When the country code is selected by comparing

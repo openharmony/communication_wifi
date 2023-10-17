@@ -56,27 +56,6 @@ public:
      */
     ErrCode CalculateWifiCountryCode(std::string &wifiCountryCode) override;
 private:
-    class WifiCcpCommonEventListener : public OHOS::EventFwk::CommonEventSubscriber {
-    public:
-        /**
-         * @Description WifiCcpCommonEventListener constructor
-         */
-        WifiCcpCommonEventListener(const OHOS::EventFwk::CommonEventSubscribeInfo &subscriberInfo,
-            WifiCountryCodePolicyNoMobile *wifiCountryCodePolicyNoMobile);
-
-        /**
-         * @Description WifiCcpCommonEventListener destructor
-         */
-        ~WifiCcpCommonEventListener() = default;
-
-        /**
-         * @Description on receive change event
-         *
-         * @param direction - event data
-         */
-        void OnReceiveEvent(const OHOS::EventFwk::CommonEventData &eventData) override;
-    };
-
     void Init();
     void HandleScanResultAction(int scanStatus);
     ErrCode StatisticCountryCodeFromScanResult(std::vector<BssidAndCountryCode> &scanInfoList);

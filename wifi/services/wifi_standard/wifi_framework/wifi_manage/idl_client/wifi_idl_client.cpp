@@ -534,7 +534,7 @@ WifiErrorNo WifiIdlClient::SetDeviceConfig(int networkId, const WifiIdlDeviceCon
     int num = 0;
     num += PushDeviceConfigString(conf + num, DEVICE_CONFIG_SSID, config.ssid);
     num += PushDeviceConfigString(conf + num, DEVICE_CONFIG_PSK, config.psk);
-    if (config.keyMgmt.find(KEY_MGMT_SAE) != std::string:npos) {
+    if (config.keyMgmt.find(KEY_MGMT_SAE) != std::string::npos) {
         num += PushDeviceConfigString(conf + num, DEVICE_CONFIG_SAE_PASSWD, config.psk);
     }
     if (config.keyMgmt == KEY_MGMT_NONE || config.keyMgmt == KEY_MGMT_WEP) {

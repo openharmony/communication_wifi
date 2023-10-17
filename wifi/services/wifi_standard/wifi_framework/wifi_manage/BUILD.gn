@@ -268,9 +268,9 @@ if (defined(ohos_lite)) {
     }
 
     deps = [
+      ":wifi_manager_service",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit:wifi_toolkit",
       "$WIFI_ROOT_DIR/utils:wifi_utils",
-      ":wifi_manager_service",
     ]
 
     if (wifi_feature_with_p2p) {
@@ -314,9 +314,9 @@ if (defined(ohos_lite)) {
     ]
 
     deps = [
+      ":wifi_manager_service",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit:wifi_toolkit",
       "$WIFI_ROOT_DIR/utils:wifi_utils",
-      ":wifi_manager_service",
     ]
 
     external_deps = [
@@ -396,6 +396,11 @@ if (defined(ohos_lite)) {
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/common/wifi_datashare_utils.cpp",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/common/wifi_permission_helper.cpp",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/common/wifi_permission_utils.cpp",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_country_code/wifi_country_code_manager.cpp",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_country_code/wifi_country_code_policy_base.cpp",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_country_code/wifi_country_code_policy_factory.cpp",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_country_code/wifi_country_code_policy_mobile.cpp",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_country_code/wifi_country_code_policy_no_mobile.cpp",
       "wifi_auth_center.cpp",
       "wifi_config_center.cpp",
       "wifi_dumper.cpp",
@@ -406,19 +411,14 @@ if (defined(ohos_lite)) {
       "wifi_net_conn_event_handler.cpp",
       "wifi_service_manager.cpp",
       "wifi_system_ability_listerner.cpp",
-      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_country_code/wifi_country_code_policy_base.cpp",
-      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_country_code/wifi_country_code_policy_no_mobile.cpp",
-      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_country_code/wifi_country_code_policy_mobile.cpp",
-      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_country_code/wifi_country_code_manager.cpp",
-      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_country_code/wifi_country_code_policy_factory.cpp",
     ]
 
     deps = [
       "$WIFI_ROOT_DIR/services/wifi_standard/etc/init:etc",
       "$WIFI_ROOT_DIR/services/wifi_standard/etc/param:etc",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/idl_client:wifi_idl_client",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit:wifi_toolkit",
       "$WIFI_ROOT_DIR/utils:wifi_utils",
-      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/idl_client:wifi_idl_client",
     ]
 
     configs = [ ":wifi_manager_service_header" ]
@@ -433,19 +433,19 @@ if (defined(ohos_lite)) {
       "bundle_framework:appexecfwk_base",
       "c_utils:utils",
       "common_event_service:cesfwk_innerkits",
+      "core_service:tel_core_service_api",
       "data_share:datashare_common",
       "data_share:datashare_consumer",
       "eventhandler:libeventhandler",
       "hilog:libhilog",
       "huks:libhukssdk",
+      "i18n:intl_util",
+      "init:libbegetutil",
       "ipc:ipc_single",
       "netmanager_base:net_conn_manager_if",
       "netmanager_base:net_native_manager_if",
       "safwk:system_ability_fwk",
       "samgr:samgr_proxy",
-      "core_service:tel_core_service_api",
-      "init:libbegetutil",
-      "i18n:intl_util",
     ]
     if (wifi_feature_with_encryption) {
       external_deps += [ "huks:libhukssdk" ]

@@ -91,7 +91,10 @@
                 "data_share",
                 "hdf_core",
                 "hicollie",
-                "jsoncpp"
+                "jsoncpp",
+		        "core_service",
+                "init",
+                "i18n"
             ],
             "third_party": [
                 "bounds_checking_function",

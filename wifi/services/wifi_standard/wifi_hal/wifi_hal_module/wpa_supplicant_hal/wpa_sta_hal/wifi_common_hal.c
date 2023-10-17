@@ -99,7 +99,7 @@ WifiWpaChbaInterface *GetWifiWpaChbaInterface()
     }
     g_wpaChbaInterface = (WifiWpaChbaInterface *)calloc(1, sizeof(WifiWpaChbaInterface));
     if (g_wpaChbaInterface == NULL) {
-        LOGE("alloc memory for hml interface failed!");
+        LOGE("alloc memory for chba interface failed!");
         return NULL;
     }
     strcpy_s(g_wpaChbaInterface->ifName, sizeof(g_wpaChbaInterface->ifName), "chba0");

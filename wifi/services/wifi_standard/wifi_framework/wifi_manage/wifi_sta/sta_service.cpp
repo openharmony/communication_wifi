@@ -18,6 +18,7 @@
 #include "sta_service_callback.h"
 #ifndef OHOS_ARCH_LITE
 #include "wifi_internal_event_dispatcher.h"
+#include "wifi_country_code_manager.h"
 #endif
 #include "wifi_logger.h"
 #include "wifi_settings.h"
@@ -25,7 +26,6 @@
 #include "wifi_supplicant_hal_interface.h"
 #include "wifi_cert_utils.h"
 #include "wifi_common_util.h"
-#include "wifi_country_code_manager.h"
 
 DEFINE_WIFILOG_LABEL("StaService");
 
@@ -140,11 +140,11 @@ ErrCode StaService::InitStaService(const std::vector<StaServiceCallback> &callba
 ErrCode StaService::EnableWifi()
 {
     WIFI_LOGI("Enter EnableWifi.\n");
-
+#ifndef OHOS_ARCH_LITE
     // notification of registration country code change
     m_staObserver = std::make_shared<WifiCountryCodeChangeObserver>(CLASS_NAME, *pStaStateMachine);
     WifiCountryCodeManager::GetInstance().RegisterWifiCountryCodeChangeListener(m_staObserver);
-
+#endif
     CHECK_NULL_AND_RETURN(pStaStateMachine, WIFI_OPT_FAILED);
     pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_ENABLE_WIFI, STA_CONNECT_MODE);
     return WIFI_OPT_SUCCESS;
@@ -153,10 +153,10 @@ ErrCode StaService::EnableWifi()
 ErrCode StaService::DisableWifi() const
 {
     WIFI_LOGI("Enter DisableWifi.\n");
-
+#ifndef OHOS_ARCH_LITE
     // deregistration country code change notification
     WifiCountryCodeManager::GetInstance().UnregisterWifiCountryCodeChangeListener(m_staObserver);
-
+#endif
     CHECK_NULL_AND_RETURN(pStaStateMachine, WIFI_OPT_FAILED);
     pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_DISABLE_WIFI);
     return WIFI_OPT_SUCCESS;
@@ -512,6 +512,7 @@ ErrCode StaService::OnSystemAbilityChanged(int systemAbilityid, bool add)
     return WIFI_OPT_SUCCESS;
 }
 
+#ifndef OHOS_ARCH_LITE
 ErrCode StaService::WifiCountryCodeChangeObserver::OnWifiCountryCodeChanged(const std::string &wifiCountryCode)
 {
     WIFI_LOGI("deal wifi country code changed, code=%{public}s", wifiCountryCode.c_str());
@@ -526,6 +527,7 @@ std::string StaService::WifiCountryCodeChangeObserver::GetListenerModuleName()
 {
     return m_listenerModuleName;
 }
+#endif
  
 void StaService::HandleScreenStatusChanged(int screenState)
 {

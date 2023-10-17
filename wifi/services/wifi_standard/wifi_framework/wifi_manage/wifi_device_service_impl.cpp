@@ -30,6 +30,7 @@
 #include "wifi_settings.h"
 #include "mac_address.h"
 #include "wifi_p2p_service_impl.h"
+#include "wifi_country_code_manager.h"
 #endif
 #include "wifi_manager.h"
 #include "wifi_service_manager.h"
@@ -39,7 +40,6 @@
 #include "wifi_common_util.h"
 #include "wifi_protect_manager.h"
 #include "wifi_global_func.h"
-#include "wifi_country_code_manager.h"
 
 DEFINE_WIFILOG_LABEL("WifiDeviceServiceImpl");
 namespace OHOS {
@@ -174,14 +174,14 @@ ErrCode WifiDeviceServiceImpl::EnableWifi()
             WIFI_LOGE("Register sta service callback failed!");
             break;
         }
-
+#ifndef OHOS_ARCH_LITE
         errCode = pService->RegisterStaServiceCallback(WifiCountryCodeManager::GetInstance().GetStaCallback());
         if (errCode != WIFI_OPT_SUCCESS) {
             WIFI_LOGE("wifiCountryCodeManager register sta service callback failed, ret=%{public}d!",
                 static_cast<int>(errCode));
             break;
         }
-
+#endif
         errCode = pService->EnableWifi();
         if (errCode != WIFI_OPT_SUCCESS) {
             WIFI_LOGE("service enable sta failed, ret %{public}d!", static_cast<int>(errCode));
@@ -1109,7 +1109,11 @@ ErrCode WifiDeviceServiceImpl::SetCountryCode(const std::string &countryCode)
     if (!IsStaServiceRunning()) {
         return WIFI_OPT_STA_NOT_OPENED;
     }
+#ifndef OHOS_ARCH_LITE
     return WifiCountryCodeManager::GetInstance().SetWifiCountryCodeFromExternal(countryCode);
+#else
+    return WIFI_OPT_SUCCESS;
+#endif
 }
 
 ErrCode WifiDeviceServiceImpl::GetCountryCode(std::string &countryCode)
@@ -1118,9 +1122,10 @@ ErrCode WifiDeviceServiceImpl::GetCountryCode(std::string &countryCode)
         WIFI_LOGE("GetCountryCode:VerifyGetWifiInfoPermission() PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
-
+#ifndef OHOS_ARCH_LITE
     WifiCountryCodeManager::GetInstance().GetWifiCountryCode(countryCode);
     WIFI_LOGI("GetCountryCode: country code is %{public}s", countryCode.c_str());
+#endif
     return WIFI_OPT_SUCCESS;
 }
 
@@ -1329,8 +1334,10 @@ void WifiDeviceServiceImpl::SaBasicDump(std::string& result)
     }
     result += "\n";
 
-    std::string cc;
+    std::string cc = "CN";
+#ifndef OHOS_ARCH_LITE
     WifiCountryCodeManager::GetInstance().GetWifiCountryCode(cc);
+#endif
     result.append("Country Code: ").append(cc);
     result += "\n";
 }

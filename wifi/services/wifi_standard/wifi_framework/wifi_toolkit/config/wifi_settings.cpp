@@ -24,7 +24,9 @@
 #ifdef FEATURE_ENCRYPTION_SUPPORT
 #include "wifi_encryption_util.h"
 #endif
+#ifdef OHOS_ARCH_LITE
 #include "wifi_country_code_define.h"
+#endif
 
 namespace OHOS {
 namespace Wifi {
@@ -817,6 +819,7 @@ bool WifiSettings::RemoveRandomMac(const std::string &bssid, const std::string &
     return false;
 }
 
+#ifdef OHOS_ARCH_LITE
 int WifiSettings::SetCountryCode(const std::string &countryCode)
 {
     std::unique_lock<std::mutex> lock(mStaMutex);
@@ -827,6 +830,7 @@ int WifiSettings::SetCountryCode(const std::string &countryCode)
     StrToUpper(m_countryCode);
     return 0;
 }
+#endif
 
 int WifiSettings::GetHotspotState(int id)
 {

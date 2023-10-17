@@ -17,8 +17,9 @@
 #include <iostream>
 #include <sstream>
 #include "wifi_log.h"
+#ifdef OHOS_ARCH_LITE
 #include "wifi_country_code_define.h"
-
+#endif
 #undef LOG_TAG
 #define LOG_TAG "WifiGlobalFunc"
 
@@ -303,6 +304,7 @@ bool IsValid5GHz(int freq)
     return freq > 4900 && freq < 5900;
 }
 
+#ifdef OHOS_ARCH_LITE
 bool IsValidCountryCode(const std::string &wifiCountryCode)
 {
     if (wifiCountryCode.empty()) {
@@ -339,6 +341,7 @@ bool ConvertMncToIso(int mnc, std::string &wifiCountryCode)
     }
     return false;
 }
+#endif
 
 std::string StrToUpper(const std::string &str)
 {

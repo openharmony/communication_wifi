@@ -36,11 +36,11 @@ ApService::~ApService()
 ErrCode ApService::EnableHotspot()
 {
     WIFI_LOGI("Instance %{public}d %{public}s", m_id, __func__);
-
+#ifndef OHOS_ARCH_LITE
     // notification of registration country code change
     m_apObserver = std::make_shared<WifiCountryCodeChangeObserver>(CLASS_NAME, m_ApStateMachine);
     WifiCountryCodeManager::GetInstance().RegisterWifiCountryCodeChangeListener(m_apObserver);
-
+#endif
     m_ApStateMachine.SendMessage(static_cast<int>(ApStatemachineEvent::CMD_START_HOTSPOT));
     return ErrCode::WIFI_OPT_SUCCESS;
 }
@@ -48,11 +48,11 @@ ErrCode ApService::EnableHotspot()
 ErrCode ApService::DisableHotspot() const
 {
     WIFI_LOGI("Instance %{public}d %{public}s", m_id, __func__);
-
+#ifndef OHOS_ARCH_LITE
     // deregistration country code change notification
     WifiCountryCodeManager::GetInstance()
         .UnregisterWifiCountryCodeChangeListener(m_apObserver);
-
+#endif
     m_ApStateMachine.SendMessage(static_cast<int>(ApStatemachineEvent::CMD_STOP_HOTSPOT));
     return ErrCode::WIFI_OPT_SUCCESS;
 }

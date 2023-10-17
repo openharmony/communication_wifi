@@ -31,6 +31,7 @@
 #include "common_timer_errors.h"
 #include "wifi_datashare_utils.h"
 #include "wifi_location_mode_observer.h"
+#include "wifi_country_code_manager.h"
 #endif
 #include "wifi_sta_hal_interface.h"
 #include "wifi_service_manager.h"
@@ -39,7 +40,6 @@
 #include "wifi_config_center.h"
 #include "wifi_common_def.h"
 #include "wifi_hisysevent.h"
-#include "wifi_country_code_manager.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -113,12 +113,14 @@ ErrCode WifiManager::AutoStartStaService(AutoStartOrStopServiceReason reason)
             WIFI_LOGE("Register sta service callback failed!");
             break;
         }
+#ifndef OHOS_ARCH_LITE
         errCode = pService->RegisterStaServiceCallback(WifiCountryCodeManager::GetInstance().GetStaCallback());
         if (errCode != WIFI_OPT_SUCCESS) {
             WIFI_LOGE("wifiCountryCodeManager register sta service callback failed, ret=%{public}d!",
                 static_cast<int>(errCode));
             break;
         }
+#endif
         errCode = pService->EnableWifi();
         if (errCode != WIFI_OPT_SUCCESS) {
             WIFI_LOGE("service enable sta failed, ret %{public}d!", static_cast<int>(errCode));
@@ -372,12 +374,14 @@ ErrCode WifiManager::AutoStartApService(AutoStartOrStopServiceReason reason)
             WIFI_LOGE("Register ap service callback failed!");
             break;
         }
+#ifndef OHOS_ARCH_LITE
         errCode = pService->RegisterApServiceCallbacks(WifiCountryCodeManager::GetInstance().GetApCallback());
         if (errCode != WIFI_OPT_SUCCESS) {
             WIFI_LOGE("WifiCountryCodeManager Register ap service callback failed! ret=%{public}d!",
                 static_cast<int>(errCode));
             break;
         }
+#endif
         errCode = pService->EnableHotspot();
         if (errCode != WIFI_OPT_SUCCESS) {
             WIFI_LOGE("service enable ap failed, ret %{public}d!", static_cast<int>(errCode));
@@ -544,11 +548,13 @@ void WifiManager::AutoStartScanService(void)
 
 int WifiManager::Init()
 {
+#ifndef OHOS_ARCH_LITE
     if (WifiCountryCodeManager::GetInstance().Init() < 0) {
         WIFI_LOGE("WifiCountryCodeManager Init failed!");
         mInitStatus = WIFI_COUNTRY_CODE_MANAGER_INIT_FAILED;
         return -1;
     }
+#endif
     if (WifiConfigCenter::GetInstance().Init() < 0) {
         WIFI_LOGE("WifiConfigCenter Init failed!");
         mInitStatus = CONFIG_CENTER_INIT_FAILED;

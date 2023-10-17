@@ -20,6 +20,7 @@
 #include "sta_auto_connect_service.h"
 #include "sta_monitor.h"
 #include "sta_state_machine.h"
+#include "i_wifi_country_code_change_listener.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -31,6 +32,7 @@ public:
     /**
      * @Description  Initialize StaService module.
      *
+     * @param callbacks - sta service callback
      * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
      */
     virtual ErrCode InitStaService(const StaServiceCallback &callbacks);
@@ -42,7 +44,7 @@ public:
                result immediately.
      * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
      */
-    virtual ErrCode EnableWifi() const;
+    virtual ErrCode EnableWifi();
     /**
      * @Description  Disable wifi
      *
@@ -179,12 +181,7 @@ public:
      * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
      */
     virtual ErrCode CancelWps() const;
-    /**
-     * @Description  Set country code
-     *
-     * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
-     */
-    virtual ErrCode SetCountryCode(const std::string &countryCode) const;
+
     /**
      * @Description  ConnectivityManager process scan results.
      *
@@ -199,7 +196,7 @@ public:
      *
      * @param callbacks - Callback function pointer storage structure
      */
-    virtual void RegisterStaServiceCallback(const StaServiceCallback &callbacks) const;
+    virtual void RegisterStaServiceCallback(const std::vector<StaServiceCallback> &callbacks) const;
 
     /**
      * @Description  Reconnect network
@@ -229,9 +226,20 @@ private:
     void NotifyDeviceConfigChange(ConfigChange value) const;
 
 private:
+    class WifiCountryCodeChangeObserver : public IWifiCountryCodeChangeListener {
+    public:
+        WifiCountryCodeChangeObserver(const std::string &name, StateMachine &stateMachineObj)
+            : IWifiCountryCodeChangeListener(name, stateMachineObj) {}
+        ~WifiCountryCodeChangeObserver() override = default;
+        ErrCode OnWifiCountryCodeChanged(const std::string &wifiCountryCode) override;
+        std::string GetListenerModuleName() override;
+        // StateMachine GetStateMachineObj() override;
+    };
+
     StaStateMachine *pStaStateMachine;
     StaMonitor *pStaMonitor;
     StaAutoConnectService *pStaAutoConnectService;
+    std::shared_ptr<IWifiCountryCodeChangeListener> m_staObserver;
 };
 }  // namespace Wifi
 }  // namespace OHOS

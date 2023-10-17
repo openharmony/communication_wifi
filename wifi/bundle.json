@@ -76,6 +76,7 @@
                 "c_utils",
                 "certificate_manager",
                 "common_event_service",
+                "core_service",
                 "dhcp",
                 "drivers_interface_wlan",
                 "efficiency_manager",
@@ -83,7 +84,9 @@
                 "hisysevent",
                 "hilog",
                 "huks",
+                "init",
                 "ipc",
+                "i18n",
                 "napi",
                 "netmanager_base",
                 "safwk",
@@ -92,9 +95,7 @@
                 "hdf_core",
                 "hicollie",
                 "jsoncpp",
-                "core_service",
-                "init",
-                "i18n"
+                "netstack"
             ],
             "third_party": [
                 "bounds_checking_function",

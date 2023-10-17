@@ -138,10 +138,10 @@ int WifiSettings::ReloadPortalconf()
         if (tmp.size() > 0) {
             mPortalUri = tmp[0];
         } else {
-            mPortalUri.portalUri = "test";
+            mPortalUri.portalHttpUrl = "test";
         }
     } else {
-        mPortalUri.portalUri = "test";
+        mPortalUri.portalHttpUrl = "test";
     }
     return 0;
 }
@@ -1855,9 +1855,12 @@ int WifiSettings::GetStaApExclusionType()
     return mWifiConfig.staApExclusionType;
 }
 
-void WifiSettings::GetPortalUri(std::string &portalUri)
+void WifiSettings::GetPortalUri(WifiPortalConf &urlInfo)
 {
-    portalUri = mPortalUri.portalUri;
+    urlInfo.portalHttpUrl = mPortalUri.portalHttpUrl;
+    urlInfo.portalHttpsUrl = mPortalUri.portalHttpsUrl;
+    urlInfo.portalBakHttpUrl = mPortalUri.portalBakHttpUrl;
+    urlInfo.portalBakHttpsUrl = mPortalUri.portalBakHttpsUrl;
 }
 
 int WifiSettings::SetStaApExclusionType(int type)

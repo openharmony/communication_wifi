@@ -146,6 +146,7 @@ if (defined(ohos_lite)) {
       "hilog:libhilog",
       "ipc:ipc_single",
       "netmanager_base:net_conn_manager_if",
+      "netstack:http_client",
       "samgr:samgr_proxy",
     ]
 

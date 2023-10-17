@@ -2010,19 +2010,21 @@ void StaStateMachine::HandleNetCheckResult(StaNetState netState, const std::stri
         /* Save connection information to WifiSettings. */
         SaveLinkstate(ConnState::CONNECTED, DetailedState::WORKING);
         staCallback.OnStaConnChanged(OperateResState::CONNECT_NETWORK_ENABLED, linkedInfo);
-        StartTimer(static_cast<int>(CMD_START_NETCHECK), PORTAL_CHECK_TIME * PORTAL_MILLSECOND);
+        if (portalFlag == true) {
+            WIFI_LOGD("portal network normal working need redetect for expired!");
+            StartTimer(static_cast<int>(CMD_START_NETCHECK), PORTAL_CHECK_TIME * PORTAL_MILLSECOND);
+        }
     } else if (netState == StaNetState::NETWORK_CHECK_PORTAL) {
         WifiLinkedInfo linkedInfo;
         GetLinkedInfo(linkedInfo);
+        portalFlag = true;
 #ifndef OHOS_ARCH_LITE
         if (linkedInfo.detailedState != DetailedState::CAPTIVE_PORTAL_CHECK) {
-            std::string portalUri;
-            WifiSettings::GetInstance().GetPortalUri(portalUri);
-            WIFI_LOGI("portal uri is %{public}s\n", portalUri.c_str());
+            WIFI_LOGI("portal uri is %{public}s\n", portalUrl.c_str());
             if (WifiSettings::GetInstance().GetDeviceProvisionState() == MODE_STATE_CLOSE) {
                 AAFwk::Want want;
                 want.SetAction(PORTAL_ACTION);
-                want.SetUri(portalUri);
+                want.SetUri(portalUrl);
                 want.AddEntity(PORTAL_ENTITY);
                 OHOS::ErrCode err = AAFwk::AbilityManagerClient::GetInstance()->StartAbility(want);
                 if (err != ERR_OK) {
@@ -2445,6 +2447,7 @@ void StaStateMachine::DhcpResultNotify::TryToCloseDhcpClient(int iptype)
         WriteWifiConnectionHiSysEvent(WifiConnectionType::CONNECT, "");
         /* Delay to wait for the network adapter information to take effect. */
         constexpr int NETCHECK_DELAY_TIME = 2000; // 2000 ms
+        pStaStateMachine->portalFlag = false;
         pStaStateMachine->StartTimer(static_cast<int>(CMD_START_NETCHECK), NETCHECK_DELAY_TIME);
         pStaStateMachine->DealSetStaConnectFailedCount(0, true);
     }

@@ -252,19 +252,6 @@ public:
         EXPECT_TRUE(pStaInterface->ConnectivityManager(scanInfos) == WIFI_OPT_FAILED);
     }
 
-    void SetCountryCodeSuceess()
-    {
-        std::string countryCode;
-        EXPECT_CALL(*pMockStaService, SetCountryCode(_)).WillRepeatedly(Return(WIFI_OPT_SUCCESS));
-        EXPECT_TRUE(pStaInterface->SetCountryCode(countryCode) == WIFI_OPT_SUCCESS);
-    }
-
-    void SetCountryCodeFail()
-    {
-        std::string countryCode;
-        EXPECT_CALL(*pMockStaService, SetCountryCode(_)).WillRepeatedly(Return(WIFI_OPT_FAILED));
-        EXPECT_TRUE(pStaInterface->SetCountryCode(countryCode) == WIFI_OPT_FAILED);
-    }
     void ConnectToCandidateConfigFail()
     {
         int uid = 1;
@@ -523,16 +510,6 @@ HWTEST_F(StaInterfaceTest, AutoConnectServiceSuceess, TestSize.Level1)
 HWTEST_F(StaInterfaceTest, AutoConnectServiceFail, TestSize.Level1)
 {
     AutoConnectServiceFail();
-}
-
-HWTEST_F(StaInterfaceTest, SetCountryCodeSuceess, TestSize.Level1)
-{
-    SetCountryCodeSuceess();
-}
-
-HWTEST_F(StaInterfaceTest, SetCountryCodeFail, TestSize.Level1)
-{
-    SetCountryCodeFail();
 }
 
 HWTEST_F(StaInterfaceTest, RegisterStaServiceCallbackSuceess, TestSize.Level1)

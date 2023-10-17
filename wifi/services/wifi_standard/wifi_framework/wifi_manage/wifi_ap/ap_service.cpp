@@ -19,10 +19,13 @@
 #include "wifi_logger.h"
 #include "wifi_settings.h"
 #include "wifi_ap_hal_interface.h"
+#include "wifi_country_code_manager.h"
 
 DEFINE_WIFILOG_HOTSPOT_LABEL("WifiApService");
 namespace OHOS {
 namespace Wifi {
+const std::string CLASS_NAME = "ApService";
+
 ApService::ApService(ApStateMachine &apStateMachine, int id)
     : m_ApStateMachine(apStateMachine), m_id(id)
 {}
@@ -30,9 +33,14 @@ ApService::ApService(ApStateMachine &apStateMachine, int id)
 ApService::~ApService()
 {}
 
-ErrCode ApService::EnableHotspot() const
+ErrCode ApService::EnableHotspot()
 {
     WIFI_LOGI("Instance %{public}d %{public}s", m_id, __func__);
+
+    // notification of registration country code change
+    m_apObserver = std::make_shared<WifiCountryCodeChangeObserver>(CLASS_NAME, m_ApStateMachine);
+    WifiCountryCodeManager::GetInstance().RegisterWifiCountryCodeChangeListener(m_apObserver);
+
     m_ApStateMachine.SendMessage(static_cast<int>(ApStatemachineEvent::CMD_START_HOTSPOT));
     return ErrCode::WIFI_OPT_SUCCESS;
 }
@@ -40,6 +48,11 @@ ErrCode ApService::EnableHotspot() const
 ErrCode ApService::DisableHotspot() const
 {
     WIFI_LOGI("Instance %{public}d %{public}s", m_id, __func__);
+
+    // deregistration country code change notification
+    WifiCountryCodeManager::GetInstance()
+        .UnregisterWifiCountryCodeChangeListener(m_apObserver);
+
     m_ApStateMachine.SendMessage(static_cast<int>(ApStatemachineEvent::CMD_STOP_HOTSPOT));
     return ErrCode::WIFI_OPT_SUCCESS;
 }
@@ -267,6 +280,21 @@ ErrCode ApService::SetPowerModel(const PowerModel& model)
     LOGI("SetPowerModel() succeed!");
     WifiSettings::GetInstance().SetPowerModel(model);
     return ErrCode::WIFI_OPT_SUCCESS;
+}
+
+ErrCode ApService::WifiCountryCodeChangeObserver::OnWifiCountryCodeChanged(const std::string &wifiCountryCode)
+{
+    WIFI_LOGI("deal wifi country code changed, code=%{public}s", wifiCountryCode.c_str());
+    InternalMessage *msg = m_stateMachineObj.CreateMessage();
+    msg->SetMessageName(static_cast<int>(ApStatemachineEvent::CMD_UPDATE_COUNTRY_CODE));
+    msg->AddStringMessageBody(wifiCountryCode);
+    m_stateMachineObj.SendMessage(msg);
+    return WIFI_OPT_SUCCESS;
+}
+ 
+std::string ApService::WifiCountryCodeChangeObserver::GetListenerModuleName()
+{
+    return m_listenerModuleName;
 }
 }  // namespace Wifi
 }  // namespace OHOS

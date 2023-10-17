@@ -22,8 +22,6 @@
 #include "wifi_msg.h"
 #include "wifi_settings.h"
 
-DEFINE_WIFILOG_LABEL("WifiCountryCodePolicyNoMobile");
-
 namespace OHOS {
 namespace Wifi {
 constexpr int MAX_SCAN_SAVED_SIZE = 3;

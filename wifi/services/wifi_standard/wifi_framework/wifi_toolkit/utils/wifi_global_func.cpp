@@ -14,7 +14,10 @@
  */
 #include "wifi_global_func.h"
 #include <algorithm>
+#include <iostream>
+#include <sstream>
 #include "wifi_log.h"
+#include "wifi_country_code_define.h"
 
 #undef LOG_TAG
 #define LOG_TAG "WifiGlobalFunc"
@@ -298,6 +301,68 @@ bool IsValid24GHz(int freq)
 bool IsValid5GHz(int freq)
 {
     return freq > 4900 && freq < 5900;
+}
+
+bool IsValidCountryCode(const std::string &wifiCountryCode)
+{
+    if (wifiCountryCode.empty()) {
+        return false;
+    }
+    for (size_t i = 0; i < std::size(MCC_TABLE); i++) {
+        if (strcasecmp(wifiCountryCode.c_str(), MCC_TABLE[i].iso) == 0) {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool ConvertMncToIso(int mnc, std::string &wifiCountryCode)
+{
+    int left = 0;
+    int right = std::size(MCC_TABLE) - 1;
+    if (MCC_TABLE[left].mnc > mnc || MCC_TABLE[right].mnc < mnc) {
+        return false;
+    }
+    while (left < right) {
+        int mid = (left + right) >> 1;
+        if (MCC_TABLE[mid].mnc < mnc) {
+            left = mid + 1;
+        } else if (MCC_TABLE[mid].mnc > mnc) {
+            right = mid - 1;
+        } else {
+            left = mid;
+        }
+        if (MCC_TABLE[left].mnc == mnc) {
+            wifiCountryCode = MCC_TABLE[left].iso;
+            return true;
+        }
+    }
+    return false;
+}
+
+std::string StrToUpper(const std::string &str)
+{
+    std::string capitalLetters = str;
+    std::for_each(std::begin(capitalLetters), std::end(capitalLetters), [](auto &c) {
+        c = std::toupper(c);
+    });
+    return capitalLetters;
+}
+
+int ConvertCharToInt(const char &c) {
+    int result = 0;
+    std::stringstream ss;
+    ss << c;
+    ss >> result;
+    return result;
+}
+
+int ConvertStringToInt(const std::string str) {
+    int result = 0;
+    std::stringstream ss;
+    ss << str;
+    ss >> result;
+    return result;
 }
 }  // namespace Wifi
 }  // namespace OHOS

@@ -349,7 +349,8 @@ std::string StrToUpper(const std::string &str)
     return capitalLetters;
 }
 
-int ConvertCharToInt(const char &c) {
+int ConvertCharToInt(const char &c)
+{
     int result = 0;
     std::stringstream ss;
     ss << c;
@@ -357,7 +358,8 @@ int ConvertCharToInt(const char &c) {
     return result;
 }
 
-int ConvertStringToInt(const std::string str) {
+int ConvertStringToInt(const std::string str)
+{
     int result = 0;
     std::stringstream ss;
     ss << str;

@@ -150,7 +150,11 @@ int WifiSettings::ReloadPortalconf()
 
 int WifiSettings::Init()
 {
+#ifndef OHOS_ARCH_LITE
     m_countryCode = DEFAULT_WIFI_COUNTRY_CODE;
+#else
+    m_countryCode = "CN";
+#endif
     InitSettingsNum();
 
     /* read ini config */

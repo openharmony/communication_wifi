@@ -115,13 +115,13 @@ ErrCode WifiManager::AutoStartStaService(AutoStartOrStopServiceReason reason)
         }
         errCode = pService->RegisterStaServiceCallback(WifiCountryCodeManager::GetInstance().GetStaCallback());
         if (errCode != WIFI_OPT_SUCCESS) {
-            WIFI_LOGE("wifiCountryCodeManager register sta service callback failed, ret %{public}d!",
+            WIFI_LOGE("wifiCountryCodeManager register sta service callback failed, ret=%{public}d!",
                 static_cast<int>(errCode));
             break;
         }
         errCode = pService->EnableWifi();
         if (errCode != WIFI_OPT_SUCCESS) {
-            WIFI_LOGE("service enable sta failed, ret=%{public}d!", static_cast<int>(errCode));
+            WIFI_LOGE("service enable sta failed, ret %{public}d!", static_cast<int>(errCode));
             break;
         }
     } while (0);

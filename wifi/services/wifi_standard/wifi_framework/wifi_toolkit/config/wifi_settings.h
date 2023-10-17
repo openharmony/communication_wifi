@@ -515,14 +515,6 @@ public:
     int SetCountryCode(const std::string &countryCode);
 
     /**
-     * @Description Get the country code
-     *
-     * @param countryCode - output country code
-     * @return int - 0 success
-     */
-    int GetCountryCode(std::string &countryCode);
-
-    /**
      * @Description Get current hotspot state
      *
      * @return int - the hotspot state, IDLE/STARTING/STARTED/CLOSING/CLOSED
@@ -1428,7 +1420,7 @@ private:
     IpV6Info mWifiIpV6Info;
     WifiLinkedInfo mWifiLinkedInfo;
     std::string mMacAddress;
-    std::string mCountryCode;
+    std::string m_countryCode;
     WifiPortalConf mPortalUri;
     std::map <int, std::atomic<int>> mHotspotState;
     std::map <int, HotspotConfig> mHotspotConfig;

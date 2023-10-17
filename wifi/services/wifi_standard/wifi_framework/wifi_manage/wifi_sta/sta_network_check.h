@@ -30,9 +30,13 @@
 #include "wifi_log.h"
 #include "arp_checker.h"
 #include "dns_checker.h"
+#include "wifi_internal_msg.h"
+#ifndef OHOS_ARCH_LITE
+#include "http_client_request.h"
+#include "http_client.h"
+#endif
 
-#define DEFAULT_PORTAL_HTTPS_URL "http://connectivitycheck.platform.hicloud.com/generate_204"
-
+#define HTTP_DETECTION_TIMEOUT 3000
 namespace OHOS {
 namespace Wifi {
 class StaNetworkCheck {
@@ -69,19 +73,36 @@ private:
     NetStateHandler netStateHandler;
     ArpStateHandler arpStateHandler;
     DnsStateHandler dnsStateHandler;
+    std::string httpUrl;
+    std::string httpsUrl;
+    int httpCodeNum;
+    int httpsCodeNum;
+    int httpResultLen;
+    int httpsResultLen;
     std::atomic<StaNetState> lastNetState;
-
+#ifndef OHOS_ARCH_LITE
     /**
      * @Description : Detect Internet ability
      *
      */
-    bool HttpDetection();
+    int HttpPortalDetection(const std::string& url);
+
+    void RegistHttpCallBack(std::shared_ptr<NetStack::HttpClient::HttpClientTask> task);
+#endif
     /**
      * @Description : NetCheck thread function
      *
      */
     void RunNetCheckThreadFunc();
+    /**
+     * @Description : check networktype by code function
+     *
+     */
+    void CheckResponseCode(std::string url, int codeNum, int codeLenNum);
 
+    void SetHttpResultInfo(std::string url, int codeNum, int codeLenNum);
+
+    void DnsDetection(std::string url);
 private:
     std::mutex mMutex;
     std::condition_variable mCondition;
@@ -89,9 +110,11 @@ private:
     std::atomic<bool> isStopNetCheck;
     std::atomic<bool> isExitNetCheckThread;
     std::atomic<bool> isExited;
+    std::atomic<int> detectResultNum;
     ArpChecker arpChecker;
     DnsChecker dnsChecker;
     std::chrono::steady_clock::time_point lastArpDnsCheckTime;
+    WifiPortalConf mUrlInfo;
 };
 }  // namespace Wifi
 }  // namespace OHOS

@@ -31,7 +31,6 @@
 namespace OHOS {
 namespace Wifi {
 
-const char* HOST = "connectivitycheck.platform.hicloud.com.";
 const int DNS_SERVER_PORT = 53;
 const int DNS_ADDRESS_TYPE = 1;
 
@@ -114,10 +113,16 @@ void DnsChecker::formatHostAdress(char* hostAddress, const char* host)
     *hostAddress++ = '\0';
 }
 
-bool DnsChecker::DoDnsCheck(int timeoutMillis)
+bool DnsChecker::DoDnsCheck(std::string url, int timeoutMillis)
 {
-    bool dnsValid = checkDnsValid(primaryDnsAddress, timeoutMillis) ||
-        checkDnsValid(secondDnsAddress, timeoutMillis);
+    LOGI("DoDnsCheck Enter.");
+    int len1 = url.find("/generate_204");
+    int len =  len1 - strlen("http://");
+    std::string host = url.substr(strlen("http://"), len);
+    host = host + ".";
+    LOGD("DoDnsCheck url=%{public}s", host.c_str());
+    bool dnsValid = checkDnsValid(host, primaryDnsAddress, timeoutMillis) ||
+        checkDnsValid(host, secondDnsAddress, timeoutMillis);
     if (!dnsValid) {
         LOGE("all dns can not work.");
     }
@@ -150,13 +155,14 @@ int DnsChecker::recvDnsData(char* buff, int size, int timeout)
     return nBytes < 0 ? 0 : nBytes;
 }
 
-bool DnsChecker::checkDnsValid(std::string dnsAddress, int timeoutMillis)
+bool DnsChecker::checkDnsValid(std::string host, std::string dnsAddress, int timeoutMillis)
 {
     if (!socketCreated) {
         LOGE("DnsChecker checkDnsValid failed, socket not created");
         return false;
     }
     if (dnsAddress.empty()) {
+        LOGE("DnsChecker dnsAddress is empty!");
         return false;
     }
     struct sockaddr_in dest;
@@ -169,7 +175,7 @@ bool DnsChecker::checkDnsValid(std::string dnsAddress, int timeoutMillis)
     dns->rd = 1;
     dns->qCount = htons(1);
     char* hostAddress = (char*)&buff[sizeof(struct DNS_HEADER)];
-    formatHostAdress(hostAddress, HOST);
+    formatHostAdress(hostAddress, host.c_str());
     struct QUESTION *qinfo = (struct QUESTION *)&buff[sizeof(struct DNS_HEADER) +
         (strlen((const char*)hostAddress) + 1)];
     qinfo->qtype = htons(DNS_ADDRESS_TYPE);
@@ -186,7 +192,7 @@ bool DnsChecker::checkDnsValid(std::string dnsAddress, int timeoutMillis)
         int readLen = recvDnsData(buff, sizeof(buff), leftMillis);
         if (readLen >= static_cast<int>(sizeof(struct DNS_HEADER))) {
             dns = (struct DNS_HEADER*)buff;
-            LOGD("dns recv ansCount:%{public}d", dns->ansCount);
+            LOGI("dns recv ansCount:%{public}d", dns->ansCount);
             return dns->ansCount > 0;
         }
         std::chrono::steady_clock::time_point current = std::chrono::steady_clock::now();

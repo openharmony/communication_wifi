@@ -559,7 +559,6 @@ private:
      * @param staticIpAddress- static ip address(in)
      */
     bool ConfigStaticIpAddress(StaticIpAddress &staticIpAddress);
-    int PortalHttpDetection();
     /**
      * @Description  the process of handling network check results.
      *
@@ -790,6 +789,7 @@ private:
     int getIpFailNum;
     bool isRoam;
     int netNoWorkNum;
+    bool portalFlag;
     WifiLinkedInfo linkedInfo;
     WifiLinkedInfo lastLinkedInfo;
     std::unique_ptr<IDhcpService> pDhcpService;

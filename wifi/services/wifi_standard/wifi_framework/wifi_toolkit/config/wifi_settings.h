@@ -479,7 +479,7 @@ public:
      * @param portalUri - portal uri
      * @return int - 0 success
      */
-    void GetPortalUri(std::string &portalUri);
+    void GetPortalUri(WifiPortalConf &urlInfo);
     
     /**
      * @Description add random mac address

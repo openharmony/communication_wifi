@@ -313,5 +313,19 @@ ErrCode StaInterface::OnSystemAbilityChanged(int systemAbilityid, bool add)
     }
     return WIFI_OPT_SUCCESS;
 }
+
+ErrCode StaInterface::OnScreenStateChanged(int screenState)
+{
+    WIFI_LOGI("Enter StaInterface::OnScreenStateChanged, screenState=%{public}d.", screenState);
+
+    if (screenState != MODE_STATE_OPEN && screenState != MODE_STATE_CLOSE) {
+        WIFI_LOGE("screenState param is error");
+        return WIFI_OPT_INVALID_PARAM;
+    }
+    std::lock_guard<std::mutex> lock(mutex);
+    CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
+    pStaService->HandleScreenStatusChanged(screenState);
+    return WIFI_OPT_SUCCESS;
+}
 }  // namespace Wifi
 }  // namespace OHOS

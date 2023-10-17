@@ -521,10 +521,27 @@ ErrCode StaService::WifiCountryCodeChangeObserver::OnWifiCountryCodeChanged(cons
     m_stateMachineObj.SendMessage(msg);
     return WIFI_OPT_SUCCESS;
 }
- 
+
 std::string StaService::WifiCountryCodeChangeObserver::GetListenerModuleName()
 {
     return m_listenerModuleName;
+}
+ 
+void StaService::HandleScreenStatusChanged(int screenState)
+{
+    WIFI_LOGI("Enter StaService::HandleScreenStatusChanged screenState:%{public}d.", screenState);
+#ifndef OHOS_ARCH_LITE
+    if (pStaStateMachine == nullptr) {
+        WIFI_LOGE("pStaStateMachine is null!");
+        return;
+    }
+    if (screenState == MODE_STATE_OPEN) {
+        pStaStateMachine->StartTimer(static_cast<int>(CMD_START_NETCHECK), 0);
+    } else {
+        pStaStateMachine->StopTimer(static_cast<int>(CMD_START_NETCHECK));
+    }
+#endif
+    return;
 }
 }  // namespace Wifi
 }  // namespace OHOS

@@ -268,10 +268,64 @@ void StaStateMachine::BuildStateTree()
     StatePlus(pWpaStoppingState, pRootState);
 }
 
-void StaStateMachine::RegisterStaServiceCallback(const StaServiceCallback &callbacks)
+void StaStateMachine::RegisterStaServiceCallback(const StaServiceCallback &callback)
 {
-    WIFI_LOGI("RegisterStaServiceCallback.");
-    staCallback = callbacks;
+    WIFI_LOGI("RegisterStaServiceCallback, callback module name: %{public}s", callback.callbackModuleName.c_str());
+    m_staCallback.insert(callback);
+}
+
+void StaStateMachine::InvokeOnStaOpenRes(OperateResState state)
+{
+    for (const auto &callBackItem : m_staCallback) {
+        if (callBackItem.OnStaOpenRes != nullptr) {
+            callBackItem.OnStaOpenRes(state);
+        }
+    }
+}
+
+void StaStateMachine::InvokeOnStaCloseRes(OperateResState state)
+{
+for (const auto &callBackItem : m_staCallback) {
+        if (callBackItem.OnStaCloseRes != nullptr) {
+            callBackItem.OnStaCloseRes(state);
+        }
+    }
+}
+
+void StaStateMachine::InvokeOnStaConnChanged(OperateResState state, const WifiLinkedInfo &info)
+{
+for (const auto &callBackItem : m_staCallback) {
+        if (callBackItem.OnStaConnChanged != nullptr) {
+            callBackItem.OnStaConnChanged(state, info);
+        }
+    }
+}
+
+void StaStateMachine::InvokeOnWpsChanged(OperateResState state, const int code)
+{
+for (const auto &callBackItem : m_staCallback) {
+        if (callBackItem.OnWpsChanged != nullptr) {
+            callBackItem.OnWpsChanged(state, code);
+        }
+    }
+}
+
+void StaStateMachine::InvokeOnStaStreamChanged(StreamDirection direction)
+{
+for (const auto &callBackItem : m_staCallback) {
+        if (callBackItem.OnStaStreamChanged != nullptr) {
+            callBackItem.OnStaStreamChanged(direction);
+        }
+    }
+}
+
+void StaStateMachine::InvokeOnStaRssiLevelChanged(int level)
+{
+for (const auto &callBackItem : m_staCallback) {
+        if (callBackItem.OnStaRssiLevelChanged != nullptr) {
+            callBackItem.OnStaRssiLevelChanged(direction);
+        }
+    }
 }
 
 /* --------------------------- state machine root state ------------------------------ */
@@ -299,7 +353,28 @@ bool StaStateMachine::RootState::ExecuteStateMsg(InternalMessage *msg)
         return false;
     }
 
-    WIFI_LOGI("RootState-msgCode=%{public}d not handled.\n", msg->GetMessageName());
+    WIFI_LOGI("RootState-msgCode=%{public}d is received.\n", msg->GetMessageName());
+    bool ret = NOT_EXECUTED;
+    switch (msg->GetMessageName()) {
+        case WIFI_CMD_UPDATE_COUNTRY_CODE: {
+            ret = EXECUTED;
+            std::string wifiCountryCode = msg->GetStringFromMessage();
+            if (wifiCountryCode.empty()) {
+                break;
+            }
+            WifiErrorNo result = WifiSupplicantHalInterface::GetInstance().WpaSetCountryCode(wifiCountryCode);
+            if (result == WifiErrorNo::WIFI_IDL_OPT_OK) {
+                WIFI_LOGI("update wifi country code sucess, wifiCountryCode=%{public}s", wifiCountryCode.c_str());
+                break;
+            }
+            WIFI_LOGI("update wifi country code fail, wifiCountryCode=%{public}s, ret=%{public}d",
+                wifiCountryCode.c_str(), result);
+            break;
+        }
+        default:
+            WIFI_LOGI("RootState-msgCode=%{public}d not handled.\n", msg->GetMessageName());
+            break;
+    }
     return true;
 }
 

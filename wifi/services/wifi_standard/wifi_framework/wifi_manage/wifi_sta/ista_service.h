@@ -181,12 +181,7 @@ public:
      * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
      */
     virtual ErrCode CancelWps() = 0;
-    /**
-     * @Description  Set country code
-     *
-     * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
-     */
-    virtual ErrCode SetCountryCode(const std::string &countryCode) = 0;
+
     /**
      * @Description  ConnectivityManager process scan results.
      *

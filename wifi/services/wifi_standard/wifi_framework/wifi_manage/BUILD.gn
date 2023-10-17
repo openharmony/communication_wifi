@@ -85,6 +85,8 @@ if (defined(ohos_lite)) {
     defines = [
       "OHOS_ARCH_LITE",
       "AP_INSTANCE_MAX_NUM=$wifi_feature_with_ap_num",
+      "FEATURE_AP_SUPPORT",
+      "FEATURE_STA_SUPPORT",
     ]
 
     if (wifi_feature_with_auth_disable) {

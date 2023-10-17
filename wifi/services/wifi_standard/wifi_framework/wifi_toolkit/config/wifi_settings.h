@@ -506,7 +506,7 @@ public:
      */
     bool RemoveRandomMac(const std::string &bssid, const std::string &randomMac);
 
-#ifdef OHOS_ARCH_LITE
+#ifndef OHOS_ARCH_LITE
     /**
      * @Description Save the country code
      *

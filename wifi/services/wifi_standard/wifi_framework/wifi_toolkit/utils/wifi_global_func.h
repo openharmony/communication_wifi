@@ -233,7 +233,7 @@ bool IsValid24GHz(int freq);
  */
 void TransformFrequencyIntoChannel(const std::vector<int> &freqVector, std::vector<int> &chanVector);
 
-#ifdef OHOS_ARCH_LITE
+#ifndef OHOS_ARCH_LITE
 /**
  * @Description Check whether the country code is valid.
  *

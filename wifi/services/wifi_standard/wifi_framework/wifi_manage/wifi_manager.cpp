@@ -352,12 +352,10 @@ ErrCode WifiManager::AutoStartApService(AutoStartOrStopServiceReason reason)
             return WIFI_OPT_OPEN_SUCC_WHEN_OPENED;
         }
     }
-
     if (!WifiConfigCenter::GetInstance().SetApMidState(apState, WifiOprMidState::OPENING, 0)) {
         WIFI_LOGI("AutoStartApService, set ap mid state opening failed!");
         return WIFI_OPT_OPEN_SUCC_WHEN_OPENED;
     }
-
     ErrCode errCode = WIFI_OPT_FAILED;
     do {
         if (WifiServiceManager::GetInstance().CheckAndEnforceService(WIFI_SERVICE_AP) < 0) {
@@ -393,7 +391,6 @@ ErrCode WifiManager::AutoStartApService(AutoStartOrStopServiceReason reason)
         WifiServiceManager::GetInstance().UnloadService(WIFI_SERVICE_AP, 0);
         return errCode;
     }
-
     StopUnloadApSaTimer();
     return WIFI_OPT_SUCCESS;
 }

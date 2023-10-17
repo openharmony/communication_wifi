@@ -11,8 +11,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build/ohos.gni")
-
 ## Install wifi.para to /system/etc/param/wifi.para
 ## Install wifi.para.dac to /system/etc/param/wifi.para.dac
 

@@ -509,7 +509,7 @@ static int WpaCliCmdSetCountryCode(WifiWpaStaInterface *this, const char *countr
     }
     char buf[REPLY_BUF_SMALL_LENGTH] = {0};
     char cmd[CMD_BUFFER_SIZE] = {0};
-    if (snprintf_s(cmd, sizeof(cmd), sizeof(cmd) - 1, "IFNAME=%s SET country %s", this->ifname, countryCode) < 0) {
+    if (snprintf_s(cmd, sizeof(cmd), sizeof(cmd) - 1, "IFNAME=%s DRIVER COUNTRY %s", this->ifname, countryCode) < 0) {
         LOGE("snprintf err");
         return -1;
     }

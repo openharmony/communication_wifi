@@ -24,6 +24,8 @@
 #ifdef FEATURE_ENCRYPTION_SUPPORT
 #include "wifi_encryption_util.h"
 #endif
+#include "wifi_country_code_define.h"
+
 namespace OHOS {
 namespace Wifi {
 WifiSettings &WifiSettings::GetInstance()
@@ -146,7 +148,7 @@ int WifiSettings::ReloadPortalconf()
 
 int WifiSettings::Init()
 {
-    mCountryCode = "CN";
+    m_countryCode = DEFAULT_WIFI_COUNTRY_CODE;
     InitSettingsNum();
 
     /* read ini config */
@@ -818,9 +820,11 @@ bool WifiSettings::RemoveRandomMac(const std::string &bssid, const std::string &
 int WifiSettings::SetCountryCode(const std::string &countryCode)
 {
     std::unique_lock<std::mutex> lock(mStaMutex);
-    std::string tmpCode = countryCode;
-    std::transform(countryCode.begin(), countryCode.end(), tmpCode.begin(), ::toupper);
-    mCountryCode = tmpCode;
+    if (strcasecmp(m_countryCode.c_str(), countryCode.c_str()) == 0) {
+        return 0;
+    }
+    m_countryCode = countryCode;
+    StrToUpper(m_countryCode);
     return 0;
 }
 
@@ -1770,7 +1774,7 @@ void WifiSettings::SetDefaultFrequenciesByCountryBand(const BandType band, std::
     }
 
     for (auto& item : g_countryDefaultFreqs) {
-        if (item.countryCode == countryCode && item.band == band) {
+        if (item.countryCode == m_countryCode && item.band == band) {
             frequencies = item.freqs;
         }
     }

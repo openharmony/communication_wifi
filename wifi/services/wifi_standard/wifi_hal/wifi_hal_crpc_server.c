@@ -193,6 +193,9 @@ static int InitRpcFuncMapCommon(void)
     ret += PushRpcFunc("RegisterEventCallback", RpcRegisterEventCallback);
     ret += PushRpcFunc("UnRegisterEventCallback", RpcUnRegisterEventCallback);
     ret += PushRpcFunc("NotifyClear", RpcNotifyClear);
+    ret += PushRpcFunc("GetCommonCmd", RpcGetCommonCmd);
+    ret += PushRpcFunc("ChbaStart", RpcChbaStart);
+    ret += PushRpcFunc("ChbaStop", RpcChbaStop);
     return ret;
 }
 
@@ -717,6 +720,27 @@ static void DealP2pCallback(int event, Context *context)
     return;
 }
 
+static void DealeventCommonCbk(int event, Context *context)
+{
+    WifiHalEventCallbackMsg *cbmsg = FrontCallbackMsg(event);
+    if (cbmsg != NULL) {
+        LOGD("callback msg is %{public}s", cbmsg->msg.commsg.event);
+        WriteStr(context, cbmsg->msg.commsg.event);
+    }
+}
+
+static void DealChbaCallback(int event, Context *context)
+{
+    switch (event) {
+        case WIFI_HAL_COMMON_EVENT:
+            DealeventCommonCbk(event, context);
+            break;
+        default:
+            break;
+    }
+    return;
+}
+
 /* Callback request */
 int OnCallbackTransact(const RpcServer *server, int event, Context *context)
 {
@@ -727,6 +751,7 @@ int OnCallbackTransact(const RpcServer *server, int event, Context *context)
     WriteInt(context, event);
     DealStaApCallback(event, context);
     DealP2pCallback(event, context);
+    DealChbaCallback(event, context);
     WriteEnd(context);
     return HAL_SUCCESS;
 }

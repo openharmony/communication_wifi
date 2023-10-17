@@ -10,6 +10,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 import("//build/ohos.gni")
 
 ## Install wifi.para to /system/etc/param/wifi.para
@@ -27,14 +28,14 @@ group("etc") {
 
 ohos_prebuilt_etc("wifi.para") {
   source = "wifi.para"
+  relative_install_dir = "param"
   part_name = "wifi"
   subsystem_name = "communication"
-  module_install_dir = "etc/param"
 }
 
 ohos_prebuilt_etc("wifi.para.dac") {
   source = "wifi.para.dac"
+  relative_install_dir = "param"
   part_name = "wifi"
   subsystem_name = "communication"
-  module_install_dir = "etc/param"
 }

@@ -15,8 +15,8 @@
 
 #include <vector>
 #include "iremote_stub.h"
-#include "wifi_logger.h"
 #include "wifi_datashare_utils.h"
+#include "wifi_log.h"
 #include "wifi_logger.h"
 
 DEFINE_WIFILOG_LABEL("WifiDataShareHelperUtils");

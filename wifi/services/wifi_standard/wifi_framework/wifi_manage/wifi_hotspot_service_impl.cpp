@@ -26,6 +26,7 @@
 #include "define.h"
 #include "wifi_logger.h"
 #include "wifi_common_util.h"
+#include "wifi_country_code_manager.h"
 
 DEFINE_WIFILOG_HOTSPOT_LABEL("WifiHotspotServiceImpl");
 
@@ -392,6 +393,12 @@ ErrCode WifiHotspotServiceImpl::EnableHotspot(const ServiceType type)
         errCode = pService->RegisterApServiceCallbacks(WifiManager::GetInstance().GetApCallback());
         if (errCode != WIFI_OPT_SUCCESS) {
             WIFI_LOGE("Register ap service callback failed!");
+            break;
+        }
+        errCode = pService->RegisterApServiceCallbacks(WifiCountryCodeManager::GetInstance().GetApCallback());
+        if (errCode != WIFI_OPT_SUCCESS) {
+            WIFI_LOGE("WifiCountryCodeManager Register ap service callback failed! ret=%{public}d!",
+                static_cast<int>(errCode));
             break;
         }
         errCode = pService->EnableHotspot();

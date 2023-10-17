@@ -39,6 +39,7 @@
 #include "wifi_common_util.h"
 #include "wifi_protect_manager.h"
 #include "wifi_global_func.h"
+#include "wifi_country_code_manager.h"
 
 DEFINE_WIFILOG_LABEL("WifiDeviceServiceImpl");
 namespace OHOS {
@@ -171,6 +172,13 @@ ErrCode WifiDeviceServiceImpl::EnableWifi()
         errCode = pService->RegisterStaServiceCallback(WifiManager::GetInstance().GetStaCallback());
         if (errCode != WIFI_OPT_SUCCESS) {
             WIFI_LOGE("Register sta service callback failed!");
+            break;
+        }
+
+        errCode = pService->RegisterStaServiceCallback(WifiCountryCodeManager::GetInstance().GetStaCallback());
+        if (errCode != WIFI_OPT_SUCCESS) {
+            WIFI_LOGE("wifiCountryCodeManager register sta service callback failed, ret=%{public}d!",
+                static_cast<int>(errCode));
             break;
         }
 
@@ -1101,12 +1109,7 @@ ErrCode WifiDeviceServiceImpl::SetCountryCode(const std::string &countryCode)
     if (!IsStaServiceRunning()) {
         return WIFI_OPT_STA_NOT_OPENED;
     }
-
-    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst();
-    if (pService == nullptr) {
-        return WIFI_OPT_STA_NOT_OPENED;
-    }
-    return pService->SetCountryCode(countryCode);
+    return WifiCountryCodeManager::GetInstance().SetWifiCountryCodeFromExternal(countryCode);
 }
 
 ErrCode WifiDeviceServiceImpl::GetCountryCode(std::string &countryCode)
@@ -1116,7 +1119,7 @@ ErrCode WifiDeviceServiceImpl::GetCountryCode(std::string &countryCode)
         return WIFI_OPT_PERMISSION_DENIED;
     }
 
-    WifiConfigCenter::GetInstance().GetCountryCode(countryCode);
+    WifiCountryCodeManager::GetInstance().GetWifiCountryCode(countryCode);
     WIFI_LOGI("GetCountryCode: country code is %{public}s", countryCode.c_str());
     return WIFI_OPT_SUCCESS;
 }
@@ -1327,7 +1330,7 @@ void WifiDeviceServiceImpl::SaBasicDump(std::string& result)
     result += "\n";
 
     std::string cc;
-    WifiConfigCenter::GetInstance().GetCountryCode(cc);
+    WifiCountryCodeManager::GetInstance().GetWifiCountryCode(cc);
     result.append("Country Code: ").append(cc);
     result += "\n";
 }

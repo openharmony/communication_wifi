@@ -828,13 +828,6 @@ int WifiSettings::SetCountryCode(const std::string &countryCode)
     return 0;
 }
 
-int WifiSettings::GetCountryCode(std::string &countryCode)
-{
-    std::unique_lock<std::mutex> lock(mStaMutex);
-    countryCode = mCountryCode;
-    return 0;
-}
-
 int WifiSettings::GetHotspotState(int id)
 {
     auto iter = mHotspotState.find(id);

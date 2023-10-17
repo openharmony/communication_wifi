@@ -92,7 +92,7 @@
                 "hdf_core",
                 "hicollie",
                 "jsoncpp",
-		        "core_service",
+                "core_service",
                 "init",
                 "i18n"
             ],

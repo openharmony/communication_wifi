@@ -165,6 +165,11 @@ typedef enum DeviceConfigType {
     DEVICE_CONFIG_EAP_CLIENT_CERT = 15,
     DEVICE_CONFIG_EAP_PRIVATE_KEY = 16,
     DEVICE_CONFIG_EAP_PHASE2METHOD = 17,
+    DEVICE_CONFIG_IEEE80211W = 18,
+    DEVICE_CONFIG_ALLOW_PROTOCOLS = 19,
+    DEVICE_CONFIG_GROUP_CIPHERS = 20,
+    DEVICE_CONFIG_PAIRWISE_CIPHERS = 21,
+    DEVICE_CONFIG_SAE_PASSWD = 22,
     /**
      * Number of network configuration parameters, which is used as the last
      * parameter.

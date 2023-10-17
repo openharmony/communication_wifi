@@ -372,6 +372,17 @@ ErrCode StaStateMachine::ConvertDeviceCfg(const WifiDeviceConfig &config) const
         idlConfig.authAlgorithms = 0x02;
     }
 
+    if (config.keyMgmt.find("SAE") != std::string::npos) {
+        idlConfig.allowedProtocols = 0x02; // RSN
+        idlConfig.allowedPairwiseCiphers = 0x2c; // CCMP|GCMP|GCMP-256
+        idlConfig.allowedGroupCiphers = 0x2c; // CCMP|GCMP|GCMP-256
+        if (config.keyMgmt.find("PSK") != std::string::npos) {
+            idlConfig.isRequirePmf = false;
+        } else {
+            idlConfig.isRequirePmf = true;
+        }
+    }
+
     for (int i = 0; i < MAX_WEPKEYS_SIZE; i++) {
         idlConfig.wepKeys[i] = config.wepKeys[i];
     }

@@ -136,7 +136,7 @@ WifiErrorNo ChbaStart(void)
         return WIFI_HAL_FAILED;
     }
     HalCallbackNotify(eventStr);
-    LOGD("Supplicant connect hml_wpa_supplicant success!");
+    LOGD("Supplicant connect chba_wpa_supplicant success!");
     return WIFI_HAL_SUCCESS;
 }
 

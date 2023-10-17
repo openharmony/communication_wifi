@@ -1827,10 +1827,10 @@ bool StaStateMachine::StaWpsState::ExecuteStateMsg(InternalMessage *msg)
             WIFI_LOGE("WPS has already started, start wps failed!");
             if (setup == SetupMethod::PBC) {
                 pStaStateMachine->InvokeOnWpsChanged(WpsStartState::PBC_STARTED_ALREADY,
-                                                           pStaStateMachine->pinCode);
-                } else if ((setup == SetupMethod::DISPLAY) || (setup == SetupMethod::KEYPAD)) {
+                    pStaStateMachine->pinCode);
+            } else if ((setup == SetupMethod::DISPLAY) || (setup == SetupMethod::KEYPAD)) {
                 pStaStateMachine->InvokeOnWpsChanged(WpsStartState::PIN_STARTED_ALREADY,
-                                                           pStaStateMachine->pinCode);
+                    pStaStateMachine->pinCode);
             }
             break;
         }
@@ -1839,7 +1839,7 @@ bool StaStateMachine::StaWpsState::ExecuteStateMsg(InternalMessage *msg)
             WIFI_LOGI("Wps PBC Overlap!");
             /* Callback InterfaceService that PBC is conflicting. */
             pStaStateMachine->InvokeOnWpsChanged(WpsStartState::START_PBC_FAILED_OVERLAP,
-                                                       pStaStateMachine->pinCode);
+                pStaStateMachine->pinCode);
             pStaStateMachine->SwitchState(pStaStateMachine->pSeparatedState);
             break;
         }

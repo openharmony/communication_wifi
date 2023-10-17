@@ -96,8 +96,21 @@ public:
      */
     ErrCode UnregisterWifiCountryCodeChangeListener(const std::shared_ptr<IWifiCountryCodeChangeListener> &listener);
 
+    /**
+     * @Description disable WifiCountryCodeManager construct
+     *
+     * @param WifiCountryCodeManager - WifiCountryCodeManager obj
+     */
     WifiCountryCodeManager(const WifiCountryCodeManager&) = delete;
+
+    /**
+     * @Description WifiCountryCodeManager deconstruct
+     */
     ~WifiCountryCodeManager();
+
+    /**
+     * @Description disable WifiCountryCodeManager equals sign opertaor
+     */
     WifiCountryCodeManager &operator=(const WifiCountryCodeManager &) = delete;
 private:
     class TelephoneNetworkSearchStateChangeListener : public OHOS::EventFwk::CommonEventSubscriber {
@@ -137,8 +150,9 @@ private:
     std::set<std::shared_ptr<IWifiCountryCodeChangeListener>, ListenerNameCmp> m_wifiCountryCodeChangeListeners;
     std::string m_wifiCountryCode = DEFAULT_WIFI_COUNTRY_CODE;
     std::shared_ptr<TelephoneNetworkSearchStateChangeListener> m_telephoneNetworkSearchStateChangeListener;
-    std::shared_ptr<IWifiCountryCodePolicy> &m_wifiCountryCodePolicy;
+    std::shared_ptr<IWifiCountryCodePolicy> m_wifiCountryCodePolicy;
 
+    WifiCountryCodeManager() = default;
     void SendCountryCodeChangeCommonEvent(const std::string &wifiCountryCode);
     ErrCode UpdateWifiCountryCode(const std::string &externalCode = "");
 #ifdef FEATURE_STA_SUPPORT

@@ -27,11 +27,13 @@ group("etc") {
 ohos_prebuilt_etc("wifi.para") {
   source = "wifi.para"
   part_name = "wifi"
+  subsystem_name = "communication"
   module_install_dir = "etc/param"
 }
 
 ohos_prebuilt_etc("wifi.para.dac") {
   source = "wifi.para.dac"
   part_name = "wifi"
+  subsystem_name = "communication"
   module_install_dir = "etc/param"
 }

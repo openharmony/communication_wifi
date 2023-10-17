@@ -24,21 +24,9 @@
 
 namespace OHOS {
 namespace Wifi {
-constexpr int MAX_SCAN_SAVED_SIZE = 3;
-constexpr int COUNTRY_CODE_INDEX_IN_REGION = 2;
-constexpr int FEATURE_RCV_AP_CONNECTED = 0;
-constexpr int FEATURE_RCV_SCAN_RESLUT = 1;
-constexpr int FEATURE_RCV_REGION_CHANGE = 2;
-constexpr int REGION_LEN = 3;
-constexpr unsigned int COUNTRY_CODE_EID = 7;
-constexpr unsigned long COUNTRY_CODE_LENGTH = 2;
-
 WifiCountryCodePolicyNoMobile::WifiCountryCodePolicyNoMobile(
     const std::bitset<WIFI_COUNTRY_CODE_POLICE_DEF_LEN> &wifiCountryCodePolicy)
-{
-    m_wifiCountryCodePolicy = wifiCountryCodePolicy;
-    Init();
-}
+{}
 
 WifiCountryCodePolicyNoMobile::~WifiCountryCodePolicyNoMobile()
 {}

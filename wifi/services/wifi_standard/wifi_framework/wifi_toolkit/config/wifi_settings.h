@@ -505,7 +505,8 @@ public:
      * @return int - 1 success
      */
     bool RemoveRandomMac(const std::string &bssid, const std::string &randomMac);
-    
+
+#ifdef OHOS_ARCH_LITE
     /**
      * @Description Save the country code
      *
@@ -513,6 +514,7 @@ public:
      * @return int - 0 success
      */
     int SetCountryCode(const std::string &countryCode);
+#endif
 
     /**
      * @Description Get current hotspot state

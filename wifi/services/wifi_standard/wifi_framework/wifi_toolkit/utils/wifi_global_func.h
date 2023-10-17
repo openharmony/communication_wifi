@@ -233,6 +233,7 @@ bool IsValid24GHz(int freq);
  */
 void TransformFrequencyIntoChannel(const std::vector<int> &freqVector, std::vector<int> &chanVector);
 
+#ifdef OHOS_ARCH_LITE
 /**
  * @Description Check whether the country code is valid.
  *
@@ -250,6 +251,7 @@ bool IsValidCountryCode(const std::string &wifiCountryCode);
  * @return false - convert fail
  */
 bool ConvertMncToIso(int mnc, std::string &wifiCountryCode);
+#endif
 
 /**
  * @Description Convert the letters to upper.

@@ -357,6 +357,7 @@ bool StaStateMachine::RootState::ExecuteStateMsg(InternalMessage *msg)
     bool ret = NOT_EXECUTED;
     switch (msg->GetMessageName()) {
         case WIFI_CMD_UPDATE_COUNTRY_CODE: {
+#ifndef OHOS_ARCH_LITE
             ret = EXECUTED;
             std::string wifiCountryCode = msg->GetStringFromMessage();
             if (wifiCountryCode.empty()) {
@@ -369,6 +370,7 @@ bool StaStateMachine::RootState::ExecuteStateMsg(InternalMessage *msg)
             }
             WIFI_LOGI("update wifi country code fail, wifiCountryCode=%{public}s, ret=%{public}d",
                 wifiCountryCode.c_str(), result);
+#endif
             break;
         }
         default:

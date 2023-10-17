@@ -20,7 +20,9 @@
 #include "sta_auto_connect_service.h"
 #include "sta_monitor.h"
 #include "sta_state_machine.h"
+#ifndef OHOS_ARCH_LITE
 #include "i_wifi_country_code_change_listener.h"
+#endif
 
 namespace OHOS {
 namespace Wifi {
@@ -230,6 +232,7 @@ private:
     void NotifyDeviceConfigChange(ConfigChange value) const;
 
 private:
+#ifndef OHOS_ARCH_LITE
     class WifiCountryCodeChangeObserver : public IWifiCountryCodeChangeListener {
     public:
         WifiCountryCodeChangeObserver(const std::string &name, StateMachine &stateMachineObj)
@@ -239,11 +242,11 @@ private:
         std::string GetListenerModuleName() override;
         // StateMachine GetStateMachineObj() override;
     };
-
+    std::shared_ptr<IWifiCountryCodeChangeListener> m_staObserver;
+#endif
     StaStateMachine *pStaStateMachine;
     StaMonitor *pStaMonitor;
     StaAutoConnectService *pStaAutoConnectService;
-    std::shared_ptr<IWifiCountryCodeChangeListener> m_staObserver;
 };
 }  // namespace Wifi
 }  // namespace OHOS

@@ -18,11 +18,9 @@
 
 #include <memory>
 #include <string>
-#ifndef OHOS_ARCH_LITE
 #include "common_event_manager.h"
 #include "common_event_support.h"
 #include "common_event_subscriber.h"
-#endif
 #include "i_wifi_country_code_change_listener.h"
 #include "i_wifi_country_code_policy.h"
 #ifdef FEATURE_AP_SUPPORT

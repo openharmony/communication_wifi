@@ -70,6 +70,7 @@ if (defined(ohos_lite)) {
       "//foundation/systemabilitymgr/samgr_lite/interfaces/innerkits/samgr",
       "//third_party/bounds_checking_function/include",
       "$WIFI_ROOT_DIR/services/wifi_standard/include",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_country_code",
     ]
 
     deps = [
@@ -128,6 +129,7 @@ if (defined(ohos_lite)) {
       "//foundation/systemabilitymgr/samgr_lite/interfaces/innerkits/registry",
       "//foundation/systemabilitymgr/samgr_lite/interfaces/innerkits/samgr",
       "//third_party/bounds_checking_function/include",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_country_code",
     ]
 
     deps = [
@@ -175,6 +177,7 @@ if (defined(ohos_lite)) {
       "//base/notification/common_event_service/interfaces/inner_api",
       "//base/security/access_token/interfaces/innerkits/accesstoken/include",
       "$WIFI_ROOT_DIR/services/wifi_standard/include",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_country_code",
     ]
   }
 
@@ -243,7 +246,11 @@ if (defined(ohos_lite)) {
       ":wifi_manager_service_header",
     ]
 
-    defines = [ "STA_INSTANCE_MAX_NUM=$wifi_feature_with_sta_num" ]
+    defines = [
+      "STA_INSTANCE_MAX_NUM=$wifi_feature_with_sta_num",
+      "FEATURE_STA_SUPPORT",
+    ]
+
     if (wifi_feature_with_ap_num > 0) {
       defines += [ "FEATURE_AP_SUPPORT" ]
     }
@@ -255,6 +262,7 @@ if (defined(ohos_lite)) {
     deps = [
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit:wifi_toolkit",
       "$WIFI_ROOT_DIR/utils:wifi_utils",
+      ":wifi_manager_service",
     ]
 
     if (wifi_feature_with_p2p) {
@@ -300,6 +308,7 @@ if (defined(ohos_lite)) {
     deps = [
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit:wifi_toolkit",
       "$WIFI_ROOT_DIR/utils:wifi_utils",
+      ":wifi_manager_service",
     ]
 
     external_deps = [
@@ -385,12 +394,19 @@ if (defined(ohos_lite)) {
       "wifi_net_conn_event_handler.cpp",
       "wifi_service_manager.cpp",
       "wifi_system_ability_listerner.cpp",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_country_code/wifi_country_code_policy_base.cpp",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_country_code/wifi_country_code_policy_no_mobile.cpp",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_country_code/wifi_country_code_policy_mobile.cpp",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_country_code/wifi_country_code_manager.cpp",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_country_code/wifi_country_code_policy_factory.cpp",
     ]
 
     deps = [
       "$WIFI_ROOT_DIR/services/wifi_standard/etc/init:etc",
+      "$WIFI_ROOT_DIR/services/wifi_standard/etc/param:etc",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit:wifi_toolkit",
       "$WIFI_ROOT_DIR/utils:wifi_utils",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/idl_client:wifi_idl_client",
     ]
 
     configs = [ ":wifi_manager_service_header" ]
@@ -415,12 +431,16 @@ if (defined(ohos_lite)) {
       "netmanager_base:net_native_manager_if",
       "safwk:system_ability_fwk",
       "samgr:samgr_proxy",
+      "core_service:tel_core_service_api",
+      "init:libbegetutil",
+      "i18n:intl_util",
     ]
     if (wifi_feature_with_encryption) {
       external_deps += [ "huks:libhukssdk" ]
     }
     defines = [
       "FEATURE_AP_SUPPORT",
+      "FEATURE_STA_SUPPORT",
       "STA_INSTANCE_MAX_NUM=$wifi_feature_with_sta_num",
       "AP_INSTANCE_MAX_NUM=$wifi_feature_with_ap_num",
     ]

@@ -301,7 +301,7 @@ for (const auto &callBackItem : m_staCallback) {
     }
 }
 
-void StaStateMachine::InvokeOnWpsChanged(OperateResState state, const int code)
+void StaStateMachine::InvokeOnWpsChanged(WpsStartState state, const int code)
 {
 for (const auto &callBackItem : m_staCallback) {
         if (callBackItem.OnWpsChanged != nullptr) {
@@ -323,7 +323,7 @@ void StaStateMachine::InvokeOnStaRssiLevelChanged(int level)
 {
 for (const auto &callBackItem : m_staCallback) {
         if (callBackItem.OnStaRssiLevelChanged != nullptr) {
-            callBackItem.OnStaRssiLevelChanged(direction);
+            callBackItem.OnStaRssiLevelChanged(level);
         }
     }
 }
@@ -356,7 +356,7 @@ bool StaStateMachine::RootState::ExecuteStateMsg(InternalMessage *msg)
     WIFI_LOGI("RootState-msgCode=%{public}d is received.\n", msg->GetMessageName());
     bool ret = NOT_EXECUTED;
     switch (msg->GetMessageName()) {
-        case WIFI_CMD_UPDATE_COUNTRY_CODE: {
+        case WIFI_SVR_CMD_UPDATE_COUNTRY_CODE: {
 #ifndef OHOS_ARCH_LITE
             ret = EXECUTED;
             std::string wifiCountryCode = msg->GetStringFromMessage();
@@ -498,7 +498,7 @@ void StaStateMachine::SyncDeviceConfigToWpa() const
 void StaStateMachine::StartWifiProcess()
 {
     WifiSettings::GetInstance().SetWifiState(static_cast<int>(WifiState::ENABLING));
-    InovkeOnStaOpenRes(OperateResState::OPEN_WIFI_OPENING);
+    InvokeOnStaOpenRes(OperateResState::OPEN_WIFI_OPENING);
     int res;
     if (WifiOprMidState::RUNNING == WifiConfigCenter::GetInstance().GetWifiScanOnlyMidState()) {
         res = static_cast<int>(WIFI_IDL_OPT_OK);
@@ -514,7 +514,7 @@ void StaStateMachine::StartWifiProcess()
 
         /* callback the InterfaceService that wifi is enabled successfully. */
         WifiSettings::GetInstance().SetWifiState(static_cast<int>(WifiState::ENABLED));
-        InvokeStaOpenRes(OperateResState::OPEN_WIFI_SUCCEED);
+        InvokeOnStaOpenRes(OperateResState::OPEN_WIFI_SUCCEED);
         /* Sets the MAC address of WifiSettings. */
         std::string mac;
         if ((WifiStaHalInterface::GetInstance().GetStaDeviceMacAddress(mac)) == WIFI_IDL_OPT_OK) {
@@ -1273,7 +1273,7 @@ void StaStateMachine::StartWpsMode(InternalMessage *msg)
         if (WifiStaHalInterface::GetInstance().StartWpsPinMode(wpsParam, pinCode) == WIFI_IDL_OPT_OK) {
             wpsState = wpsConfig.setup;
             /* Callback result to InterfaceService. */
-                InvokeOnWpsChanged(WpsStartState::START_AP_PIN_SUCCEED, pinCode);
+            InvokeOnWpsChanged(WpsStartState::START_AP_PIN_SUCCEED, pinCode);
             SwitchState(pWpsState);
         } else {
             LOGE("StartWpsPinMode() failed.");
@@ -1818,7 +1818,7 @@ bool StaStateMachine::StaWpsState::ExecuteStateMsg(InternalMessage *msg)
             /* Callback result to InterfaceService. */
             pStaStateMachine->SaveLinkstate(ConnState::CONNECTING, DetailedState::OBTAINING_IPADDR);
             pStaStateMachine->InvokeOnStaConnChanged(OperateResState::CONNECT_OBTAINING_IP,
-                                                           pStaStateMachine->linkedInfo);
+                pStaStateMachine->linkedInfo);
             pStaStateMachine->SwitchState(pStaStateMachine->pGetIpState);
             break;
         }

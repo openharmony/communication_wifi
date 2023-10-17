@@ -189,12 +189,7 @@ public:
      * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
      */
     virtual ErrCode ConnectivityManager(const std::vector<InterScanInfo> &scanInfos) override;
-    /**
-     * @Description  Set country code
-     *
-     * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
-     */
-    virtual ErrCode SetCountryCode(const std::string &countryCode) override;
+
     /**
      * @Description Register sta callback function
      *
@@ -218,7 +213,7 @@ public:
      */
     virtual ErrCode OnSystemAbilityChanged(int systemAbilityid, bool add) override;
 private:
-    StaServiceCallback staCallback;
+    std::vector<StaServiceCallback> m_staCallback;
     StaService *pStaService;
     std::mutex mutex;
 };

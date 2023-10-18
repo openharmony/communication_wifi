@@ -48,6 +48,16 @@ int SendComCmd(const char* sendcmd)
         LOGE("WpaCliCmd err");
         return -1;
     }
+    size_t bufLen = strlen(buf);
+    if (strncmp(cmd, "IFNAME=chba0 STATUS", strlen("IFNAME=chba0 STATUS")) == 0) {
+        for (int i = 0; i < bufLen; i++) {
+            buf[i] = buf[i] == '\n' ? '*' : buf[i];
+        }
+        char *sep = "*";
+        char *retbuf = strtok(buf, sep);
+        retbuf = strtok(NULL, sep);
+        HalCallbackNotify(retbuf);
+    }
     return 0;
 }
 

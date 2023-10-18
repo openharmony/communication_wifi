@@ -195,22 +195,6 @@ public:
     int GetMacAddress(std::string &macAddress);
 
     /**
-     * @Description Save the country code
-     *
-     * @param countryCode - input country code
-     * @return int - 0 success
-     */
-    int SetCountryCode(const std::string &countryCode);
-
-    /**
-     * @Description Get the country code
-     *
-     * @param countryCode - output country code
-     * @return int - 0 success
-     */
-    int GetCountryCode(std::string &countryCode);
-
-    /**
      * @Description Obtaining Whether to Load the Configuration of the Standby STA.
      *
      * @return bool - Indicates whether to load the configuration of the standby STA.

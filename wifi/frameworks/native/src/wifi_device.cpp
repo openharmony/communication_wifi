@@ -21,11 +21,18 @@ DEFINE_WIFILOG_LABEL("WifiDevice");
 
 namespace OHOS {
 namespace Wifi {
-NO_SANITIZE("cfi") std::shared_ptr<WifiDevice> WifiDevice::GetInstance(int systemAbilityId)
+NO_SANITIZE("cfi") std::shared_ptr<WifiDevice> WifiDevice::GetInstance(int systemAbilityId, int instId)
 {
-    std::shared_ptr<WifiDeviceImpl> device = DelayedSingleton<WifiDeviceImpl>::GetInstance();
-    if (device && device->Init(systemAbilityId)) {
-        WIFI_LOGI("init successfully!");
+#ifndef OHOS_ARCH_LITE
+    if (instId >= STA_INSTANCE_MAX_NUM) {
+        WIFI_LOGE("the max obj id is %{public}d, current id is %{public}d", STA_INSTANCE_MAX_NUM, instId);
+        return nullptr;
+    }
+#endif
+
+    std::shared_ptr<WifiDeviceImpl> device = std::make_shared<WifiDeviceImpl>();
+    if (device && device->Init(systemAbilityId, instId)) {
+        WIFI_LOGI("init device %{public}d successfully!", instId);
         return device;
     }
 
@@ -34,8 +41,6 @@ NO_SANITIZE("cfi") std::shared_ptr<WifiDevice> WifiDevice::GetInstance(int syste
 }
 
 WifiDevice::~WifiDevice()
-{
-    DelayedSingleton<WifiDeviceImpl>::DestroyInstance();
-}
+{}
 }  // namespace Wifi
 }  // namespace OHOS

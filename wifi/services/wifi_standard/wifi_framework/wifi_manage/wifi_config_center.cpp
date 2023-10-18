@@ -145,16 +145,6 @@ int WifiConfigCenter::GetMacAddress(std::string &macAddress)
     return WifiSettings::GetInstance().GetMacAddress(macAddress);
 }
 
-int WifiConfigCenter::SetCountryCode(const std::string &countryCode)
-{
-    return WifiSettings::GetInstance().SetCountryCode(countryCode);
-}
-
-int WifiConfigCenter::GetCountryCode(std::string &countryCode)
-{
-    return WifiSettings::GetInstance().GetCountryCode(countryCode);
-}
-
 bool WifiConfigCenter::IsLoadStabak()
 {
     return WifiSettings::GetInstance().IsLoadStabak();

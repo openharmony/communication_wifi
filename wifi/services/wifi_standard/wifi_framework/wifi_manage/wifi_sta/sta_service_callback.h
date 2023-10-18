@@ -17,12 +17,14 @@
 #define OHOS_STASERVICE_CALLBACK_H
 
 #include <functional>
+#include <string>
 #include "wifi_internal_msg.h"
 #include "wifi_msg.h"
 
 namespace OHOS {
 namespace Wifi {
 struct StaServiceCallback {
+    std::string callbackModuleName;
     std::function<void(OperateResState)> OnStaOpenRes;
     std::function<void(OperateResState)> OnStaCloseRes;
     std::function<void(OperateResState, const WifiLinkedInfo &)> OnStaConnChanged;

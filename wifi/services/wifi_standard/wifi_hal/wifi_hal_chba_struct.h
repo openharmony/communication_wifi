@@ -23,18 +23,18 @@ extern "C" {
 #endif
 
 #define MAC_SIZE 7
-#define HML_SSID_LEN 32
+#define CHBA_SSID_LEN 32
 #define PASSPHRASE_LEN 64
 #define BSSID_SIZE MAC_SIZE
 
 typedef enum ChbaSupplicantErrCode {
-    HML_SUP_ERRCODE_SUCCESS = 0,
-    HML_SUP_ERRCODE_FAILED = 1,
-    HML_SUP_ERRCODE_TIMEOUT = 2,
-    HML_SUP_ERRCODE_PBC_OVERLAP = 3,
-    HML_SUP_ERRCODE_UNKNOWN = 4,
-    HML_SUP_ERRCODE_INPUT_ERROR = 5,
-    HML_SUP_ERRCODE_INVALID = 0XFF,
+    CHBA_SUP_ERRCODE_SUCCESS = 0,
+    CHBA_SUP_ERRCODE_FAILED = 1,
+    CHBA_SUP_ERRCODE_TIMEOUT = 2,
+    CHBA_SUP_ERRCODE_PBC_OVERLAP = 3,
+    CHBA_SUP_ERRCODE_UNKNOWN = 4,
+    CHBA_SUP_ERRCODE_INPUT_ERROR = 5,
+    CHBA_SUP_ERRCODE_INVALID = 0XFF,
 } ChbaSupplicantErrCode;
 
 typedef struct ChbaConnNotifyInfo {
@@ -48,7 +48,7 @@ typedef struct ChbaConnNotifyInfo {
 } ChbaConnNotifyInfo;
 
 typedef struct ChbaConnectInfo {
-    int8_t ssid[HML_SSID_LEN + 1];
+    int8_t ssid[CHBA_SSID_LEN + 1];
     int8_t passphrase[PASSPHRASE_LEN + 1];
     uint8_t bssid[BSSID_SIZE];
     int32_t freq;

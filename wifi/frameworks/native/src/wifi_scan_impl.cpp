@@ -21,6 +21,7 @@
 #endif
 #include "wifi_logger.h"
 #include "wifi_scan_proxy.h"
+#include "wifi_scan_mgr_proxy.h"
 
 DEFINE_WIFILOG_SCAN_LABEL("WifiScanImpl");
 
@@ -34,7 +35,7 @@ namespace Wifi {
         }                                             \
     } while (0)
 
-WifiScanImpl::WifiScanImpl() : client_(nullptr)
+WifiScanImpl::WifiScanImpl() : systemAbilityId_(0), instId_(0), client_(nullptr)
 {}
 
 WifiScanImpl::~WifiScanImpl()
@@ -44,7 +45,7 @@ WifiScanImpl::~WifiScanImpl()
 #endif
 }
 
-bool WifiScanImpl::Init(int systemAbilityId)
+bool WifiScanImpl::Init(int systemAbilityId, int instId)
 {
 #ifdef OHOS_ARCH_LITE
     WifiScanProxy *scanProxy = WifiScanProxy::GetInstance();
@@ -61,6 +62,7 @@ bool WifiScanImpl::Init(int systemAbilityId)
     return true;
 #else
     systemAbilityId_ = systemAbilityId;
+    instId_ = instId;
     return true;
 #endif
 }
@@ -74,22 +76,40 @@ bool WifiScanImpl::GetWifiScanProxy()
     if (IsRemoteDied() == false) {
         return true;
     }
+
     sptr<ISystemAbilityManager> sa_mgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (sa_mgr == nullptr) {
         WIFI_LOGE("failed to get SystemAbilityManager");
         return false;
     }
+
     sptr<IRemoteObject> object = sa_mgr->GetSystemAbility(systemAbilityId_);
     if (object == nullptr) {
         WIFI_LOGE("failed to get SCAN_SERVICE");
         return false;
     }
-    client_ = iface_cast<OHOS::Wifi::IWifiScan>(object);
+
+    sptr<IWifiScanMgr> scanMgr = iface_cast<IWifiScanMgr>(object);
+    if (scanMgr == nullptr) {
+        scanMgr = new (std::nothrow) WifiScanMgrProxy(object);
+    }
+    if (scanMgr == nullptr) {
+        WIFI_LOGE("wifi scan init failed, %{public}d", systemAbilityId_);
+        return false;
+    }
+
+    sptr<IRemoteObject> service = scanMgr->GetWifiRemote(instId_);
+    if (service == nullptr) {
+        WIFI_LOGE("wifi scan remote obj is null, %{public}d", instId_);
+        return false;
+    }
+
+    client_ = iface_cast<OHOS::Wifi::IWifiScan>(service);
     if (client_ == nullptr) {
-        client_ = new (std::nothrow) WifiScanProxy(object);
+        client_ = new (std::nothrow) WifiScanProxy(service);
     }
     if (client_ == nullptr) {
-        WIFI_LOGE("wifi scan init failed. %{public}d", systemAbilityId_);
+        WIFI_LOGE("wifi scan instId_ %{public}d init failed. %{public}d", instId_, systemAbilityId_);
         return false;
     }
     return true;

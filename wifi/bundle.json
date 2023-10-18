@@ -48,6 +48,7 @@
             "wifi_feature_with_p2p",
             "wifi_feature_with_ap_intf",
             "wifi_feature_with_ap_num",
+            "wifi_feature_with_sta_num",
             "wifi_feature_with_auth_disable",
             "wifi_feature_with_dhcp_disable",
             "wifi_feature_with_encryption",
@@ -75,6 +76,7 @@
                 "c_utils",
                 "certificate_manager",
                 "common_event_service",
+                "core_service",
                 "dhcp",
                 "drivers_interface_wlan",
                 "efficiency_manager",
@@ -82,7 +84,9 @@
                 "hisysevent",
                 "hilog",
                 "huks",
+                "init",
                 "ipc",
+                "i18n",
                 "napi",
                 "netmanager_base",
                 "safwk",
@@ -90,7 +94,8 @@
                 "data_share",
                 "hdf_core",
                 "hicollie",
-                "jsoncpp"
+                "jsoncpp",
+                "netstack"
             ],
             "third_party": [
                 "bounds_checking_function",

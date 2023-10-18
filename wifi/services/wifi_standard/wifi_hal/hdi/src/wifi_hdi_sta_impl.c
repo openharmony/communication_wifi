@@ -34,6 +34,21 @@
 #define LOG_TAG "WifiHdiStaImpl"
 
 #define WIFI_IDL_GET_MAX_SCAN_INFO 256 /* Maximum number of scan infos obtained at a time */
+
+#ifndef CHECK_STA_HDI_PROXY_AND_RETURN
+#define CHECK_STA_HDI_PROXY_AND_RETURN(isRemoteDied) \
+if (isRemoteDied) { \
+    if (HdiStart() != WIFI_HAL_SUCCESS) { \
+        LOGE("[STA] Start hdi failed!"); \
+        return WIFI_HAL_FAILED; \
+    } \
+    if (RegisterHdiStaCallbackEvent() != WIFI_HAL_SUCCESS) { \
+        LOGE("[STA] RegisterHdiStaCallbackEvent failed!"); \
+        return WIFI_HAL_FAILED; \
+    } \
+}
+#endif
+
 struct IWlanCallback* g_hdiWanCallbackObj = NULL;
 static pthread_mutex_t g_hdiCallbackMutex;
 ScanInfo* g_hdiScanResults = NULL;
@@ -115,6 +130,7 @@ int32_t HdiScanResultsCallback(struct IWlanCallback *self, uint32_t event,
 WifiErrorNo HdiStartScan(const ScanSettings *settings)
 {
     LOGI("HdiStartScan enter.");
+    CHECK_STA_HDI_PROXY_AND_RETURN(IsHdiRemoteDied());
     int32_t ret = 0;
     WifiHdiProxy proxy = GetHdiProxy(PROTOCOL_80211_IFTYPE_STATION);
     CHECK_HDI_PROXY_AND_RETURN(proxy, WIFI_HAL_FAILED);
@@ -206,6 +222,7 @@ WifiErrorNo GetHdiSignalInfo(WpaSignalInfo *info)
     }
 
     LOGI("GetHdiSignalInfo enter.");
+    CHECK_STA_HDI_PROXY_AND_RETURN(IsHdiRemoteDied());
     int32_t ret = 0;
     WifiHdiProxy proxy = GetHdiProxy(PROTOCOL_80211_IFTYPE_STATION);
     CHECK_HDI_PROXY_AND_RETURN(proxy, WIFI_HAL_FAILED);
@@ -373,6 +390,7 @@ WifiErrorNo SetAssocMacAddr(const unsigned char *mac, int lenMac)
         return WIFI_HAL_FAILED;
     }
     LOGI("SetAssocMacAddr enter.");
+    CHECK_STA_HDI_PROXY_AND_RETURN(IsHdiRemoteDied());
     if (strlen((const char *)mac) != WIFI_MAC_LENGTH || lenMac != WIFI_MAC_LENGTH) {
         LOGE("Mac size not correct! mac len %{public}zu, request lenMac %{public}d", strlen((const char *)mac), lenMac);
         return WIFI_HAL_FAILED;
@@ -397,6 +415,17 @@ WifiErrorNo SetAssocMacAddr(const unsigned char *mac, int lenMac)
     }
     UpDownLink(1);
     return (ret == 0) ? WIFI_HAL_SUCCESS : WIFI_HAL_FAILED;
+}
+
+void ReleaseLocalResources()
+{
+    LOGI("ReleaseLocalResources enter.");
+    ClearHdiScanResults();
+    if (g_hdiWanCallbackObj != NULL) {
+        StubCollectorRemoveObject(IWLANCALLBACK_INTERFACE_DESC, g_hdiWanCallbackObj);
+        free(g_hdiWanCallbackObj);
+        g_hdiWanCallbackObj = NULL;
+    }
 }
 #endif
 

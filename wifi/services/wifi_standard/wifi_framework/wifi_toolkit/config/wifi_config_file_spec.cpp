@@ -1318,7 +1318,10 @@ template <> std::string OutTClassString<WifiStoreRandomMac>(WifiStoreRandomMac &
 
 template <> void ClearTClass<WifiPortalConf>(WifiPortalConf &item)
 {
-    item.portalUri.clear();
+    item.portalHttpUrl.clear();
+    item.portalHttpsUrl.clear();
+    item.portalBakHttpUrl.clear();
+    item.portalBakHttpsUrl.clear();
     return;
 }
 
@@ -1326,8 +1329,14 @@ template <>
 int SetTClassKeyValue<WifiPortalConf>(WifiPortalConf &item, const std::string &key, const std::string &value)
 {
     int errorKeyValue = 0;
-    if (key == "url") {
-        item.portalUri = value;
+    if (key == "http") {
+        item.portalHttpUrl = value;
+    } else if (key == "https") {
+        item.portalHttpsUrl = value;
+    } else if (key == "httpbak") {
+        item.portalBakHttpUrl = value;
+    } else if (key == "httpsbak") {
+        item.portalBakHttpsUrl = value;
     } else {
         LOGE("Invalid config key value");
         errorKeyValue++;
@@ -1344,7 +1353,7 @@ template <> std::string OutTClassString<WifiPortalConf>(WifiPortalConf &item)
 {
     std::ostringstream ss;
     ss << "    " <<"<WifiPortalConf>" << std::endl;
-    ss << "    " <<"url=" << ValidateString(item.portalUri) << std::endl;
+    ss << "    " <<"http=" << ValidateString(item.portalHttpUrl) << std::endl;
     return ss.str();
 }
 }  // namespace Wifi

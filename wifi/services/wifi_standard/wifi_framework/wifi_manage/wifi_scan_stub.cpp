@@ -32,6 +32,11 @@ WifiScanStub::WifiScanStub() : mSingleCallback(false)
     InitHandleMap();
 }
 
+WifiScanStub::WifiScanStub(int instId) : mSingleCallback(false), m_instId(instId)
+{
+    InitHandleMap();
+}
+
 WifiScanStub::~WifiScanStub()
 {}
 

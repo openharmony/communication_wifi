@@ -24,11 +24,18 @@ DEFINE_WIFILOG_SCAN_LABEL("WifiScan");
 
 namespace OHOS {
 namespace Wifi {
-NO_SANITIZE("cfi") std::shared_ptr<WifiScan> WifiScan::GetInstance(int systemAbilityId)
+NO_SANITIZE("cfi") std::shared_ptr<WifiScan> WifiScan::GetInstance(int systemAbilityId, int instId)
 {
-    std::shared_ptr<WifiScanImpl> pImpl = DelayedSingleton<WifiScanImpl>::GetInstance();
-    if (pImpl && pImpl->Init(systemAbilityId)) {
-        WIFI_LOGI("succeeded");
+#ifndef OHOS_ARCH_LITE
+    if (instId >= STA_INSTANCE_MAX_NUM) {
+        WIFI_LOGE("the max obj id is %{public}d, current id is %{public}d", STA_INSTANCE_MAX_NUM, instId);
+        return nullptr;
+    }
+#endif
+
+    std::shared_ptr<WifiScanImpl> pImpl = std::make_shared<WifiScanImpl>();
+    if (pImpl && pImpl->Init(systemAbilityId, instId)) {
+        WIFI_LOGI("init scan %{public}d successfully!", instId);
         return pImpl;
     }
 
@@ -37,8 +44,6 @@ NO_SANITIZE("cfi") std::shared_ptr<WifiScan> WifiScan::GetInstance(int systemAbi
 }
 
 WifiScan::~WifiScan()
-{
-    DelayedSingleton<WifiScanImpl>::DestroyInstance();
-}
+{}
 }  // namespace Wifi
 }  // namespace OHOS

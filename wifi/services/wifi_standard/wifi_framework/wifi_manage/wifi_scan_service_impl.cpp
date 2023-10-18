@@ -14,14 +14,10 @@
  */
 
 #include "wifi_scan_service_impl.h"
-#ifndef OHOS_ARCH_LITE
-#include <file_ex.h>
-#endif
 #include "define.h"
 #include "permission_def.h"
 #include "wifi_auth_center.h"
 #include "wifi_config_center.h"
-#include "wifi_dumper.h"
 #ifdef OHOS_ARCH_LITE
 #include "wifi_internal_event_dispatcher_lite.h"
 #else
@@ -39,40 +35,21 @@
 DEFINE_WIFILOG_SCAN_LABEL("WifiScanServiceImpl");
 namespace OHOS {
 namespace Wifi {
-std::mutex WifiScanServiceImpl::g_instanceLock;
+
 #ifdef OHOS_ARCH_LITE
-std::shared_ptr<WifiScanServiceImpl> WifiScanServiceImpl::g_instance;
+std::mutex WifiScanServiceImpl::g_instanceLock;
+std::shared_ptr<WifiScanServiceImpl> WifiScanServiceImpl::g_instance = nullptr;
 std::shared_ptr<WifiScanServiceImpl> WifiScanServiceImpl::GetInstance()
-#else
-sptr<WifiScanServiceImpl> WifiScanServiceImpl::g_instance;
-const bool REGISTER_RESULT = SystemAbility::MakeAndRegisterAbility(WifiScanServiceImpl::GetInstance().GetRefPtr());
-sptr<WifiScanServiceImpl> WifiScanServiceImpl::GetInstance()
-#endif
 {
     if (g_instance == nullptr) {
         std::lock_guard<std::mutex> autoLock(g_instanceLock);
         if (g_instance == nullptr) {
-#ifdef OHOS_ARCH_LITE
             std::shared_ptr<WifiScanServiceImpl> service = std::make_shared<WifiScanServiceImpl>();
-#else
-            sptr<WifiScanServiceImpl> service = new (std::nothrow) WifiScanServiceImpl;
-#endif
             g_instance = service;
         }
     }
     return g_instance;
 }
-
-WifiScanServiceImpl::WifiScanServiceImpl()
-#ifdef OHOS_ARCH_LITE
-    : mPublishFlag(false), mState(ServiceRunningState::STATE_NOT_START)
-#else
-    : SystemAbility(WIFI_SCAN_ABILITY_ID, true), mPublishFlag(false), mState(ServiceRunningState::STATE_NOT_START)
-#endif
-{}
-
-WifiScanServiceImpl::~WifiScanServiceImpl()
-{}
 
 void WifiScanServiceImpl::OnStart()
 {
@@ -80,43 +57,33 @@ void WifiScanServiceImpl::OnStart()
         WIFI_LOGW("Service has already started.");
         return;
     }
-    if (!Init()) {
-        WIFI_LOGE("Failed to init service");
-        OnStop();
-        return;
-    }
+
+    WifiManager::GetInstance();
     mState = ServiceRunningState::STATE_RUNNING;
     WIFI_LOGI("Start scan service!");
-    WifiManager::GetInstance();
-    WifiOprMidState scanState = WifiConfigCenter::GetInstance().GetScanMidState();
-    if (scanState == WifiOprMidState::CLOSED) {
-        WifiManager::GetInstance().StartUnloadScanSaTimer();
-    }
 }
 
 void WifiScanServiceImpl::OnStop()
 {
     mState = ServiceRunningState::STATE_NOT_START;
-    mPublishFlag = false;
     WIFI_LOGI("Stop scan service!");
 }
-
-bool WifiScanServiceImpl::Init()
-{
-    if (!mPublishFlag) {
-#ifdef OHOS_ARCH_LITE
-        bool ret = true;
-#else
-        bool ret = Publish(WifiScanServiceImpl::GetInstance());
 #endif
-        if (!ret) {
-            WIFI_LOGE("Failed to publish scan service!");
-            return false;
-        }
-        mPublishFlag = true;
-    }
-    return true;
-}
+
+
+WifiScanServiceImpl::WifiScanServiceImpl()
+#ifdef OHOS_ARCH_LITE
+    : mState(ServiceRunningState::STATE_NOT_START)
+#endif
+{}
+
+#ifndef OHOS_ARCH_LITE
+WifiScanServiceImpl::WifiScanServiceImpl(int instId) : WifiScanStub(instId)
+{}
+#endif
+
+WifiScanServiceImpl::~WifiScanServiceImpl()
+{}
 
 ErrCode WifiScanServiceImpl::SetScanControlInfo(const ScanControlInfo &info)
 {
@@ -446,26 +413,6 @@ void WifiScanServiceImpl::SaBasicDump(std::string& result)
     std::string strRunning = isRunning ? "true" : "false";
     result += strRunning + "\n";
 }
-
-#ifndef OHOS_ARCH_LITE
-int32_t WifiScanServiceImpl::Dump(int32_t fd, const std::vector<std::u16string>& args)
-{
-    WIFI_LOGI("Enter scan dump func.");
-    std::vector<std::string> vecArgs;
-    std::transform(args.begin(), args.end(), std::back_inserter(vecArgs), [](const std::u16string &arg) {
-        return Str16ToStr8(arg);
-    });
-
-    WifiDumper dumper;
-    std::string result;
-    dumper.ScanDump(SaBasicDump, vecArgs, result);
-    if (!SaveStringToFd(fd, result)) {
-        WIFI_LOGE("WiFi scan save string to fd failed.");
-        return ERR_OK;
-    }
-    return ERR_OK;
-}
-#endif
 
 bool WifiScanServiceImpl::IsRemoteDied(void)
 {

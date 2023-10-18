@@ -57,12 +57,12 @@ int HalCallbackNotify(const char* event);
 /**
  * @Description Get wpa interface about wpachba.
  *
- * @return WifiWpaHmlInterface*.
+ * @return WifiWpaChbaInterface*.
  */
 WifiWpaChbaInterface *GetWifiWpaChbaInterface();
 
 /**
- * @Description Release wpahml interface
+ * @Description Release wpachba interface
  */
 void ReleaseWpaChbaInterface(void);
 #ifdef __cplusplus

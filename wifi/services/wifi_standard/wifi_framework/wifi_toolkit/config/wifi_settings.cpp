@@ -24,6 +24,10 @@
 #ifdef FEATURE_ENCRYPTION_SUPPORT
 #include "wifi_encryption_util.h"
 #endif
+#ifndef OHOS_ARCH_LITE
+#include "wifi_country_code_define.h"
+#endif
+
 namespace OHOS {
 namespace Wifi {
 WifiSettings &WifiSettings::GetInstance()
@@ -136,17 +140,21 @@ int WifiSettings::ReloadPortalconf()
         if (tmp.size() > 0) {
             mPortalUri = tmp[0];
         } else {
-            mPortalUri.portalUri = "test";
+            mPortalUri.portalHttpUrl = "test";
         }
     } else {
-        mPortalUri.portalUri = "test";
+        mPortalUri.portalHttpUrl = "test";
     }
     return 0;
 }
 
 int WifiSettings::Init()
 {
-    mCountryCode = "CN";
+#ifndef OHOS_ARCH_LITE
+    m_countryCode = DEFAULT_WIFI_COUNTRY_CODE;
+#else
+    m_countryCode = "CN";
+#endif
     InitSettingsNum();
 
     /* read ini config */
@@ -815,21 +823,18 @@ bool WifiSettings::RemoveRandomMac(const std::string &bssid, const std::string &
     return false;
 }
 
+#ifndef OHOS_ARCH_LITE
 int WifiSettings::SetCountryCode(const std::string &countryCode)
 {
     std::unique_lock<std::mutex> lock(mStaMutex);
-    std::string tmpCode = countryCode;
-    std::transform(countryCode.begin(), countryCode.end(), tmpCode.begin(), ::toupper);
-    mCountryCode = tmpCode;
+    if (strcasecmp(m_countryCode.c_str(), countryCode.c_str()) == 0) {
+        return 0;
+    }
+    m_countryCode = countryCode;
+    StrToUpper(m_countryCode);
     return 0;
 }
-
-int WifiSettings::GetCountryCode(std::string &countryCode)
-{
-    std::unique_lock<std::mutex> lock(mStaMutex);
-    countryCode = mCountryCode;
-    return 0;
-}
+#endif
 
 int WifiSettings::GetHotspotState(int id)
 {
@@ -1764,13 +1769,8 @@ int WifiSettings::SetConnectTimeoutBssid(std::string &bssid)
 
 void WifiSettings::SetDefaultFrequenciesByCountryBand(const BandType band, std::vector<int> &frequencies)
 {
-    std::string countryCode;
-    if (GetCountryCode(countryCode)) {
-        return;
-    }
-
     for (auto& item : g_countryDefaultFreqs) {
-        if (item.countryCode == countryCode && item.band == band) {
+        if (item.countryCode == m_countryCode && item.band == band) {
             frequencies = item.freqs;
         }
     }
@@ -1851,9 +1851,12 @@ int WifiSettings::GetStaApExclusionType()
     return mWifiConfig.staApExclusionType;
 }
 
-void WifiSettings::GetPortalUri(std::string &portalUri)
+void WifiSettings::GetPortalUri(WifiPortalConf &urlInfo)
 {
-    portalUri = mPortalUri.portalUri;
+    urlInfo.portalHttpUrl = mPortalUri.portalHttpUrl;
+    urlInfo.portalHttpsUrl = mPortalUri.portalHttpsUrl;
+    urlInfo.portalBakHttpUrl = mPortalUri.portalBakHttpUrl;
+    urlInfo.portalBakHttpsUrl = mPortalUri.portalBakHttpsUrl;
 }
 
 int WifiSettings::SetStaApExclusionType(int type)

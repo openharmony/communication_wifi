@@ -771,7 +771,7 @@ static void *WpaReceiveCallback(void *arg)
     }
     char staIface[] = "IFNAME=wlan";
     char p2pIface[] = "IFNAME=p2p";
-    char hmlIface[] = "IFNAME=chba";
+    char chbaIface[] = "IFNAME=chba";
     WifiWpaInterface *pWpa = arg;
     char *buf = (char *)calloc(REPLY_BUF_LENGTH, sizeof(char));
     if (buf == NULL) {
@@ -815,7 +815,7 @@ static void *WpaReceiveCallback(void *arg)
         char *iface = strstr(buf, "IFNAME=");
         if (iface == NULL) {
             /* if 'IFNAME=' is not reported */
-            if (strstr(p, "P2P-GROUP-STARTED") != NULL || strstr(p, "chba0"), strstr(p, "p2p_device_address") != NULL) {
+            if (strstr(p, "chba0") != NULL) {
                 HalCallbackNotify(p);
                 continue;
             }
@@ -833,7 +833,7 @@ static void *WpaReceiveCallback(void *arg)
         if (strncmp(iface, staIface, strlen(staIface)) == 0) {
             WpaCallBackFunc(p);
         }
-        if (strncmp(iface, hmlIface, strlen(hmlIface)) == 0) {
+        if (strncmp(iface, chbaIface, strlen(chbaIface)) == 0 && (strstr(p, "chba0") != NULL)) {
             HalCallbackNotify(p);
         }
     }

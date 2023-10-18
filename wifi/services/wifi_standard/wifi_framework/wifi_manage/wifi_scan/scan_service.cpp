@@ -684,8 +684,8 @@ bool ScanService::StoreFullScanInfo(
         bool find = false;
         for (auto iter = results.begin(); iter != results.end(); ++iter) {
             if (iter->bssid == storedIter->bssid && iter->ssid == storedIter->ssid) {
+                iter = results.erase(iter);
                 find = true;
-                iter->disappearCount = 0;
                 break;
             }
         }
@@ -694,8 +694,8 @@ bool ScanService::StoreFullScanInfo(
             WifiSettings::GetInstance().StoreWifiMacAddrPairInfo(WifiMacAddrInfoType::WIFI_SCANINFO_MACADDR_INFO,
                 storedIter->bssid, "");
         #endif
-            results.push_back(*storedIter);
         }
+        results.push_back(*storedIter);
         WifiSettings::GetInstance().UpdateLinkedChannelWidth(storedIter->bssid, storedIter->channelWidth);
     }
 

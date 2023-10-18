@@ -75,6 +75,18 @@ WifiHdiProxy GetHdiProxy(const int32_t wlanType);
  * @return WifiErrorNo - operation result
  */
 WifiErrorNo ReleaseHdiProxy(const int32_t wlanType);
+
+/**
+ * @Description Is hdi remote died.
+ *
+ * @return bool - is hdi remote died
+ */
+bool IsHdiRemoteDied();
+
+/**
+ * @Description Clean local resources if remote died.
+ */
+void CleanLocalResources();
 #ifdef __cplusplus
 }
 #endif

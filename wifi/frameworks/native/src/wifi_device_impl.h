@@ -17,7 +17,6 @@
 
 #include <string>
 #include <vector>
-#include "singleton.h"
 #include "i_wifi_device.h"
 #include "i_wifi_device_callback.h"
 #include "refbase.h"
@@ -28,10 +27,10 @@
 namespace OHOS {
 namespace Wifi {
 class WifiDeviceImpl : public WifiDevice {
-    DECLARE_DELAYED_SINGLETON(WifiDeviceImpl)
-
 public:
-    bool Init(int systemAbilityId);
+    WifiDeviceImpl();
+    virtual ~WifiDeviceImpl();
+    bool Init(int systemAbilityId, int instId);
 
     /**
      * @Description Turn on Wi-Fi
@@ -348,6 +347,22 @@ public:
     bool SetLowLatencyMode(bool enabled) override;
 
     /**
+     * @Description set frozen app
+     *
+     * @param uid - uid of frozen app
+     * @param isFrozen - is app frozen
+     * @return ErrCode - operation result
+     */
+    ErrCode SetAppFrozen(int uid, bool isFrozen) override;
+
+    /**
+     * @Description reset all frozen app
+     *
+     * @return ErrCode - operation result
+     */
+    ErrCode ResetAllFrozenApp() override;
+
+    /**
      * @Description Check whether service is died.
      *
      * @return bool - true: service is died, false: service is not died.
@@ -357,6 +372,7 @@ public:
 private:
     bool GetWifiDeviceProxy();
     int systemAbilityId_;
+    int instId_;
     std::mutex mutex_;
 #ifdef OHOS_ARCH_LITE
     IWifiDevice *client_;

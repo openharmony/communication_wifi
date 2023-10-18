@@ -573,7 +573,7 @@ void WifiInternalEventDispatcher::InvokeScanCallbacks(const WifiEventCallbackMsg
 #ifdef FEATURE_APP_FROZEN
         int uid = mScanCallBackInfo[remote].callingUid;
         int pid = mScanCallBackInfo[remote].callingPid;
-        isFrozen = SuspendManager::SuspendManagerClient::GetInstance().GetAppHardwareProxyStatus(pid, uid);
+        isFrozen = IsAppFrozen(uid);
         WIFI_LOGI("Check calling APP is hardwareProxied, uid: %{public}d, pid: %{public}d, hardwareProxied: %{public}d",
             uid, pid, isFrozen);
 #endif
@@ -611,7 +611,7 @@ void WifiInternalEventDispatcher::InvokeDeviceCallbacks(const WifiEventCallbackM
 #ifdef FEATURE_APP_FROZEN
         int uid = mStaCallBackInfo[remote].callingUid;
         int pid = mStaCallBackInfo[remote].callingPid;
-        isFrozen = SuspendManager::SuspendManagerClient::GetInstance().GetAppHardwareProxyStatus(pid, uid);
+        isFrozen = IsAppFrozen(uid);
         WIFI_LOGD("Check calling APP is hardwareProxied, uid: %{public}d, pid: %{public}d, hardwareProxied: %{public}d",
             uid, pid, isFrozen);
 #endif
@@ -949,6 +949,38 @@ bool WifiInternalEventDispatcher::VerifyRegisterCallbackPermission(int callbackE
         }
     }
     return hasPermission;
+}
+
+void WifiInternalEventDispatcher::SetAppFrozen(int uid, bool isFrozen)
+{
+    WIFI_LOGI("WifiInternalEventDispatcher::Set App Frozen:%{private}d, isFrozen:%{public}d", uid, isFrozen);
+    auto it = std::find_if(vecFrozenAppInfo.begin(), vecFrozenAppInfo.end(),
+        [&uid](const int tmp) {
+            return tmp == uid;
+    });
+    if (isFrozen && it == vecFrozenAppInfo.end()) {
+        vecFrozenAppInfo.push_back(uid);
+    } else if (!isFrozen && it != vecFrozenAppInfo.end()) {
+        vecFrozenAppInfo.erase(it);
+    }
+}
+
+void WifiInternalEventDispatcher::ResetAllFrozenApp()
+{
+    WIFI_LOGI("WifiInternalEventDispatcher::Reset All Frozen App");
+    vecFrozenAppInfo.clear();
+}
+
+bool WifiInternalEventDispatcher::IsAppFrozen(int uid)
+{
+    auto it = std::find_if(vecFrozenAppInfo.begin(), vecFrozenAppInfo.end(),
+        [&uid](const int tmp) {
+            return tmp == uid;
+    });
+    if (it != vecFrozenAppInfo.end()) {
+        return true;
+    }
+    return false;
 }
 }  // namespace Wifi
 }  // namespace OHOS

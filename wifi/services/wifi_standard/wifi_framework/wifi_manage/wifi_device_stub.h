@@ -26,6 +26,7 @@ namespace Wifi {
 class WifiDeviceStub : public IRemoteStub<IWifiDevice> {
 public:
     WifiDeviceStub();
+    explicit WifiDeviceStub(int instId);
     virtual ~WifiDeviceStub();
 
     using handleFunc = void (WifiDeviceStub::*)(uint32_t code, MessageParcel &data, MessageParcel &reply);
@@ -74,6 +75,8 @@ private:
     void OnIsBandTypeSupported(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnGet5GHzChannelList(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnGetDisconnectedReason(uint32_t code, MessageParcel &data, MessageParcel &reply);
+    void OnSetFrozenApp(uint32_t code, MessageParcel& data, MessageParcel& reply);
+    void OnResetAllFrozenApp(uint32_t code, MessageParcel& data, MessageParcel& reply);
 
 private:
     void ReadWifiDeviceConfig(MessageParcel &data, WifiDeviceConfig &config);
@@ -107,6 +110,9 @@ private:
     HandleFuncMap handleFuncMap;
     sptr<IRemoteObject::DeathRecipient> deathRecipient_;
     bool mSingleCallback;
+
+protected:
+    int m_instId{0};
 };
 }  // namespace Wifi
 }  // namespace OHOS

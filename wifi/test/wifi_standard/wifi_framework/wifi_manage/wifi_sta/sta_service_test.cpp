@@ -85,8 +85,6 @@ public:
     void StaServiceDisconnectSuccess();
     void StaServiceStartWpsSuccess();
     void StaServiceCancelWpsSuccess();
-    void StaServiceSetCountryCodeSuccess();
-    void StaServiceSetCountryCodeFail();
     void StaServiceAutoConnectServiceSuccess();
     void StaServiceRegisterStaServiceCallbackSuccess();
     void StaServiceRegisterStaServiceCallbackFail();
@@ -138,8 +136,9 @@ void StaServiceTest::StaServiceInitStaServiceSuccess()
     EXPECT_CALL(WifiStaHalInterface::GetInstance(), ClearDeviceConfig()).Times(AtLeast(0));
     EXPECT_CALL(WifiStaHalInterface::GetInstance(), SaveDeviceConfig()).Times(AtLeast(0));
     EXPECT_CALL(WifiStaHalInterface::GetInstance(), GetDeviceConfig(_)).Times(AtLeast(0));
-
-    EXPECT_TRUE(pStaService->InitStaService(WifiManager::GetInstance().GetStaCallback()) == WIFI_OPT_SUCCESS);
+    std::vector<StaServiceCallback> callbacks;
+    callbacks.push_back(WifiManager::GetInstance().GetStaCallback());
+    EXPECT_TRUE(pStaService->InitStaService(callbacks) == WIFI_OPT_SUCCESS);
 }
 
 void StaServiceTest::StaServiceEnableWifiSuccess()
@@ -482,23 +481,6 @@ void StaServiceTest::StaServiceCancelWpsSuccess()
     EXPECT_TRUE(pStaService->CancelWps() == WIFI_OPT_SUCCESS);
 }
 
-void StaServiceTest::StaServiceSetCountryCodeSuccess()
-{
-    std::string countryCode = "123456";
-    EXPECT_CALL(WifiSupplicantHalInterface::GetInstance(), WpaSetCountryCode(_))
-        .WillRepeatedly(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
-    EXPECT_CALL(WifiSettings::GetInstance(), SetCountryCode(_)).Times(AtLeast(1));
-    EXPECT_TRUE(pStaService->SetCountryCode(countryCode) == WIFI_OPT_SUCCESS);
-}
-
-void StaServiceTest::StaServiceSetCountryCodeFail()
-{
-    std::string countryCode = "123456";
-    EXPECT_CALL(WifiSupplicantHalInterface::GetInstance(), WpaSetCountryCode(_))
-        .WillRepeatedly(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED));
-    EXPECT_TRUE(pStaService->SetCountryCode(countryCode) == WIFI_OPT_FAILED);
-}
-
 void StaServiceTest::StaServiceAutoConnectServiceSuccess()
 {
     std::vector<InterScanInfo> scanInfos;
@@ -514,14 +496,16 @@ void StaServiceTest::StaServiceAutoConnectServiceSuccess()
 
 void StaServiceTest::StaServiceRegisterStaServiceCallbackSuccess()
 {
-    WifiManager &instance = WifiManager::GetInstance();
-    pStaService->RegisterStaServiceCallback(instance.GetStaCallback());
+    std::vector<StaServiceCallback> callbacks;
+    callbacks.push_back(WifiManager::GetInstance().GetStaCallback());
+    pStaService->RegisterStaServiceCallback(callbacks);
 }
 
 void StaServiceTest::StaServiceRegisterStaServiceCallbackFail()
 {
-    WifiManager &instance = WifiManager::GetInstance();
-    pStaService->RegisterStaServiceCallback(instance.GetStaCallback());
+    std::vector<StaServiceCallback> callbacks;
+    callbacks.push_back(WifiManager::GetInstance().GetStaCallback());
+    pStaService->RegisterStaServiceCallback(callbacks);
 }
 
 void StaServiceTest::StaServiceAddCandidateConfigTestSucc()
@@ -823,16 +807,6 @@ HWTEST_F(StaServiceTest, StaServiceStartWpsSuccess, TestSize.Level1)
 HWTEST_F(StaServiceTest, StaServiceCancelWpsSuccess, TestSize.Level1)
 {
     StaServiceCancelWpsSuccess();
-}
-
-HWTEST_F(StaServiceTest, StaServiceSetCountryCodeSuccess, TestSize.Level1)
-{
-    StaServiceSetCountryCodeSuccess();
-}
-
-HWTEST_F(StaServiceTest, StaServiceSetCountryCodeFail, TestSize.Level1)
-{
-    StaServiceSetCountryCodeFail();
 }
 
 HWTEST_F(StaServiceTest, StaServiceAutoConnectServiceSuccess, TestSize.Level1)

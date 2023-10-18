@@ -31,6 +31,7 @@
 #include "common_timer_errors.h"
 #include "wifi_datashare_utils.h"
 #include "wifi_location_mode_observer.h"
+#include "wifi_country_code_manager.h"
 #endif
 #include "wifi_sta_hal_interface.h"
 #include "wifi_service_manager.h"
@@ -112,6 +113,14 @@ ErrCode WifiManager::AutoStartStaService(AutoStartOrStopServiceReason reason)
             WIFI_LOGE("Register sta service callback failed!");
             break;
         }
+#ifndef OHOS_ARCH_LITE
+        errCode = pService->RegisterStaServiceCallback(WifiCountryCodeManager::GetInstance().GetStaCallback());
+        if (errCode != WIFI_OPT_SUCCESS) {
+            WIFI_LOGE("wifiCountryCodeManager register sta service callback failed, ret=%{public}d!",
+                static_cast<int>(errCode));
+            break;
+        }
+#endif
         errCode = pService->EnableWifi();
         if (errCode != WIFI_OPT_SUCCESS) {
             WIFI_LOGE("service enable sta failed, ret %{public}d!", static_cast<int>(errCode));
@@ -343,12 +352,10 @@ ErrCode WifiManager::AutoStartApService(AutoStartOrStopServiceReason reason)
             return WIFI_OPT_OPEN_SUCC_WHEN_OPENED;
         }
     }
-
     if (!WifiConfigCenter::GetInstance().SetApMidState(apState, WifiOprMidState::OPENING, 0)) {
         WIFI_LOGI("AutoStartApService, set ap mid state opening failed!");
         return WIFI_OPT_OPEN_SUCC_WHEN_OPENED;
     }
-
     ErrCode errCode = WIFI_OPT_FAILED;
     do {
         if (WifiServiceManager::GetInstance().CheckAndEnforceService(WIFI_SERVICE_AP) < 0) {
@@ -365,6 +372,14 @@ ErrCode WifiManager::AutoStartApService(AutoStartOrStopServiceReason reason)
             WIFI_LOGE("Register ap service callback failed!");
             break;
         }
+#ifndef OHOS_ARCH_LITE
+        errCode = pService->RegisterApServiceCallbacks(WifiCountryCodeManager::GetInstance().GetApCallback());
+        if (errCode != WIFI_OPT_SUCCESS) {
+            WIFI_LOGE("WifiCountryCodeManager Register ap service callback failed! ret=%{public}d!",
+                static_cast<int>(errCode));
+            break;
+        }
+#endif
         errCode = pService->EnableHotspot();
         if (errCode != WIFI_OPT_SUCCESS) {
             WIFI_LOGE("service enable ap failed, ret %{public}d!", static_cast<int>(errCode));
@@ -376,7 +391,6 @@ ErrCode WifiManager::AutoStartApService(AutoStartOrStopServiceReason reason)
         WifiServiceManager::GetInstance().UnloadService(WIFI_SERVICE_AP, 0);
         return errCode;
     }
-
     StopUnloadApSaTimer();
     return WIFI_OPT_SUCCESS;
 }
@@ -531,6 +545,13 @@ void WifiManager::AutoStartScanService(void)
 
 int WifiManager::Init()
 {
+#ifndef OHOS_ARCH_LITE
+    if (WifiCountryCodeManager::GetInstance().Init() < 0) {
+        WIFI_LOGE("WifiCountryCodeManager Init failed!");
+        mInitStatus = WIFI_COUNTRY_CODE_MANAGER_INIT_FAILED;
+        return -1;
+    }
+#endif
     if (WifiConfigCenter::GetInstance().Init() < 0) {
         WIFI_LOGE("WifiConfigCenter Init failed!");
         mInitStatus = CONFIG_CENTER_INIT_FAILED;
@@ -931,6 +952,7 @@ void WifiManager::DealCloseServiceMsg(WifiManager &manager)
 
 void WifiManager::InitStaCallback(void)
 {
+    mStaCallback.callbackModuleName = "WifiManager";
     mStaCallback.OnStaOpenRes = DealStaOpenRes;
     mStaCallback.OnStaCloseRes = DealStaCloseRes;
     mStaCallback.OnStaConnChanged = DealStaConnChanged;
@@ -1494,6 +1516,7 @@ void WifiManager::DealAirplaneExceptionWhenStaClose(void)
 #ifdef FEATURE_AP_SUPPORT
 void WifiManager::InitApCallback(void)
 {
+    mApCallback.callbackModuleName = "WifiManager";
     mApCallback.OnApStateChangedEvent = DealApStateChanged;
     mApCallback.OnHotspotStaJoinEvent = DealApGetStaJoin;
     mApCallback.OnHotspotStaLeaveEvent = DealApGetStaLeave;

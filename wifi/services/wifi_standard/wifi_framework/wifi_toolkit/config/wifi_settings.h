@@ -505,7 +505,8 @@ public:
      * @return int - 1 success
      */
     bool RemoveRandomMac(const std::string &bssid, const std::string &randomMac);
-    
+
+#ifndef OHOS_ARCH_LITE
     /**
      * @Description Save the country code
      *
@@ -513,14 +514,7 @@ public:
      * @return int - 0 success
      */
     int SetCountryCode(const std::string &countryCode);
-
-    /**
-     * @Description Get the country code
-     *
-     * @param countryCode - output country code
-     * @return int - 0 success
-     */
-    int GetCountryCode(std::string &countryCode);
+#endif
 
     /**
      * @Description Get current hotspot state
@@ -1428,7 +1422,7 @@ private:
     IpV6Info mWifiIpV6Info;
     WifiLinkedInfo mWifiLinkedInfo;
     std::string mMacAddress;
-    std::string mCountryCode;
+    std::string m_countryCode;
     WifiPortalConf mPortalUri;
     std::map <int, std::atomic<int>> mHotspotState;
     std::map <int, HotspotConfig> mHotspotConfig;

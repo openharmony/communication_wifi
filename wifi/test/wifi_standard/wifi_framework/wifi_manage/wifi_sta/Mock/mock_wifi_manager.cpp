@@ -35,6 +35,7 @@ StaServiceCallback WifiManager::GetStaCallback()
 void WifiManager::InitStaCallback(void)
 {
     using namespace std::placeholders;
+    mStaCallback.callbackModuleName = "";
     mStaCallback.OnStaOpenRes = std::bind(&WifiManager::DealStaOpenRes, this, _1);
     mStaCallback.OnStaCloseRes = std::bind(&WifiManager::DealStaCloseRes, this, _1);
     mStaCallback.OnStaConnChanged = std::bind(&WifiManager::DealStaConnChanged, this, _1, _2);

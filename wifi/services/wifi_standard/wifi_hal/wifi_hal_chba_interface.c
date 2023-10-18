@@ -25,7 +25,7 @@
 #undef LOG_TAG
 #define LOG_TAG "WifiHalChbaInterface"
 
-const char *g_wpaSupplicantChba = "wpa_suplicant";
+const char *g_wpaSupplicantChba = "wpa_supplicant";
 const char *g_systemCmdWpaChbaStart = "wpa_supplicant -ichba0 -g/data/service/el1/public/wifi/sockets/wpa";
 static int g_hmlSupplicantConnectEvent = 0;
 

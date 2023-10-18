@@ -765,7 +765,13 @@ private:
 
 private:
     StaSmHandleFuncMap staSmHandleFuncMap;
-    StaServiceCallback staCallback;
+    struct CallbackModuleNameCmp {
+        bool operator() (const StaServiceCallback &cb1, const StaServiceCallback &cb2) const
+        {
+            return strcasecmp(cb1.callbackModuleName.c_str(), cb2.callbackModuleName.c_str()) < 0;
+        }
+    };
+    std::set<StaServiceCallback, CallbackModuleNameCmp> m_staCallback;
 #ifndef OHOS_ARCH_LITE
     sptr<NetManagerStandard::NetSupplierInfo> NetSupplierInfo;
 #endif
@@ -807,6 +813,12 @@ private:
      * @Description Replace empty dns
      */
     void ReplaceEmptyDns(DhcpResult *result);
+    void InvokeOnStaOpenRes(OperateResState state);
+    void InvokeOnStaCloseRes(OperateResState state);
+    void InvokeOnStaConnChanged(OperateResState state, const WifiLinkedInfo &info);
+    void InvokeOnWpsChanged(WpsStartState state, const int pinCode);
+    void InvokeOnStaStreamChanged(StreamDirection direction);
+    void InvokeOnStaRssiLevelChanged(int level);
 };
 }  // namespace Wifi
 }  // namespace OHOS

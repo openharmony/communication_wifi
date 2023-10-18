@@ -55,7 +55,7 @@ ErrCode StaInterface::EnableWifi()
             WIFI_LOGE("New StaService failed.\n");
             return WIFI_OPT_FAILED;
         }
-        if (pStaService->InitStaService(staCallback) != WIFI_OPT_SUCCESS) {
+        if (pStaService->InitStaService(m_staCallback) != WIFI_OPT_SUCCESS) {
             WIFI_LOGE("InitStaService failed.\n");
             delete pStaService;
             pStaService = nullptr;
@@ -277,22 +277,15 @@ ErrCode StaInterface::ConnectivityManager(const std::vector<InterScanInfo> &scan
     return WIFI_OPT_SUCCESS;
 }
 
-ErrCode StaInterface::SetCountryCode(const std::string &countryCode)
-{
-    LOGD("Enter StaInterface::SetCountryCode.\n");
-    std::lock_guard<std::mutex> lock(mutex);
-    CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
-    if (pStaService->SetCountryCode(countryCode) != WIFI_OPT_SUCCESS) {
-        LOGD("SetCountryCode failed.\n");
-        return WIFI_OPT_FAILED;
-    }
-    return WIFI_OPT_SUCCESS;
-}
-
 ErrCode StaInterface::RegisterStaServiceCallback(const StaServiceCallback &callbacks)
 {
     LOGD("Enter StaInterface::RegisterStaServiceCallback.\n");
-    staCallback = callbacks;
+    for (StaServiceCallback cb : m_staCallback) {
+        if (strcasecmp(callbacks.callbackModuleName.c_str(), cb.callbackModuleName.c_str()) == 0) {
+            return WIFI_OPT_SUCCESS;
+        }
+    }
+    m_staCallback.push_back(callbacks);
     return WIFI_OPT_SUCCESS;
 }
 

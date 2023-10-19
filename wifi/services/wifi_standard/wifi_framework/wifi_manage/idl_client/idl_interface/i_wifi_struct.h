@@ -324,6 +324,7 @@ typedef struct Hid2dConnectInfo {
     char bssid[WIFI_MAC_ADDR_LENGTH + 1];
     char passphrase[WIFI_P2P_TMP_MSG_LENGTH_128];
     int frequency;
+    int isLegacyGo;
 } Hid2dConnectInfo;
 /* ----------------p2p struct defines end--------------------------- */
 

@@ -38,6 +38,7 @@
 #ifndef CHECK_STA_HDI_PROXY_AND_RETURN
 #define CHECK_STA_HDI_PROXY_AND_RETURN(isRemoteDied) \
 if (isRemoteDied) { \
+    ReleaseLocalResources(); \
     if (HdiStart() != WIFI_HAL_SUCCESS) { \
         LOGE("[STA] Start hdi failed!"); \
         return WIFI_HAL_FAILED; \

@@ -47,7 +47,7 @@ public:
      *
      * @return WifiOprMidState - which can be a CLOSED/CLOSING/OPENING/RUNNING/UNKNOWN
      */
-    WifiOprMidState GetWifiMidState();
+    WifiOprMidState GetWifiMidState(int instId = 0);
 
     /**
      * @Description Set current wifi middle state
@@ -57,34 +57,34 @@ public:
      * @return true - set the state success
      * @return false - set state failed, current mid state is not equal to the expState
      */
-    bool SetWifiMidState(WifiOprMidState expState, WifiOprMidState state);
+    bool SetWifiMidState(WifiOprMidState expState, WifiOprMidState state, int instId = 0);
 
     /**
      * @Description Force to set current wifi middle state
      *
      * @param state - want to set state
      */
-    void SetWifiMidState(WifiOprMidState state);
+    void SetWifiMidState(WifiOprMidState state, int instId = 0);
 
     /**
      * @Description Set the wifi close time, just current timestamp
      *
      */
-    void SetWifiStaCloseTime();
+    void SetWifiStaCloseTime(int instId = 0);
 
     /**
      * @Description Get the interval since last wifi close time
      *
      * @return double - the interval, millisecond
      */
-    double GetWifiStaInterval();
+    double GetWifiStaInterval(int instId = 0);
 
     /**
      * @Description Get current wifi state
      *
      * @return int - the wifi state, DISABLING/DISABLED/ENABLING/ENABLED/UNKNOWN
      */
-    int GetWifiState();
+    int GetWifiState(int instId = 0);
 
     /**
      * @Description Get the ScanAlways switch state
@@ -100,7 +100,7 @@ public:
      * @param results - output scan results
      * @return int - 0 success
      */
-    int GetScanInfoList(std::vector<WifiScanInfo> &results);
+    int GetScanInfoList(std::vector<WifiScanInfo> &results, int instId = 0);
 
     /**
      * @Description Get the scan control policy info
@@ -108,7 +108,7 @@ public:
      * @param info - output scan control policy info struct
      * @return int - 0 success
      */
-    int GetScanControlInfo(ScanControlInfo &info);
+    int GetScanControlInfo(ScanControlInfo &info, int instId = 0);
 
     /**
      * @Description Save the scan control policy info
@@ -116,7 +116,7 @@ public:
      * @param info - input scan control policy info struct
      * @return int - 0 success
      */
-    int SetScanControlInfo(const ScanControlInfo &info);
+    int SetScanControlInfo(const ScanControlInfo &info, int instId = 0);
 
     /**
      * @Description Save a wifi device config
@@ -168,7 +168,7 @@ public:
      * @param info - output IpInfo struct
      * @return int - 0 success
      */
-    int GetIpInfo(IpInfo &info);
+    int GetIpInfo(IpInfo &info, int instId = 0);
 
     /**
      * @Description Get the dhcp inV6fo
@@ -176,7 +176,7 @@ public:
      * @param info - output IpV6Info struct
      * @return int - 0 success
      */
-    int GetIpv6Info(IpV6Info &info);
+    int GetIpv6Info(IpV6Info &info, int instId = 0);
 
     /**
      * @Description Get current link info
@@ -184,7 +184,7 @@ public:
      * @param info - output WifiLinkedInfo struct
      * @return int - 0 success
      */
-    int GetLinkedInfo(WifiLinkedInfo &info);
+    int GetLinkedInfo(WifiLinkedInfo &info, int instId = 0);
 
     /**
      * @Description Get the mac address
@@ -192,7 +192,7 @@ public:
      * @param macAddress - output mac address info
      * @return int - 0 success
      */
-    int GetMacAddress(std::string &macAddress);
+    int GetMacAddress(std::string &macAddress, int instId = 0);
 
     /**
      * @Description Obtaining Whether to Load the Configuration of the Standby STA.
@@ -324,7 +324,7 @@ public:
      *
      * @return WifiOprMidState - which can be a CLOSED/CLOSING/OPENING/RUNNING/UNKNOWN
      */
-    WifiOprMidState GetScanMidState();
+    WifiOprMidState GetScanMidState(int instId = 0);
 
     /**
      * @Description Set current scan service middle state
@@ -334,14 +334,14 @@ public:
      * @return true - set the state success
      * @return false - set state failed, current mid state is not equal to the expState
      */
-    bool SetScanMidState(WifiOprMidState expState, WifiOprMidState state);
+    bool SetScanMidState(WifiOprMidState expState, WifiOprMidState state, int instId = 0);
 
     /**
      * @Description Force to set the scan service middle state
      *
      * @param state - want to set state
      */
-    void SetScanMidState(WifiOprMidState state);
+    void SetScanMidState(WifiOprMidState state, int instId = 0);
 
     /**
      * @Description Get signal level about given rssi and band
@@ -549,28 +549,28 @@ public:
      * @param discReason - discReason
      * @return int - 0 success
      */
-    int GetDisconnectedReason(DisconnectedReason &discReason);
+    int GetDisconnectedReason(DisconnectedReason &discReason, int instId = 0);
 
     /**
      * @Description Get current scan only state
      *
      * @return WifiOprMidState - which can be a CLOSED/CLOSING/OPENING/RUNNING/UNKNOWN
      */
-    WifiOprMidState GetWifiScanOnlyMidState();
+    WifiOprMidState GetWifiScanOnlyMidState(int instId = 0);
 
     /**
      * @Description Force to set current scan only state
      *
      * @param state - want to set state
      */
-    bool SetWifiScanOnlyMidState(WifiOprMidState expState, WifiOprMidState state);
+    bool SetWifiScanOnlyMidState(WifiOprMidState expState, WifiOprMidState state, int instId = 0);
 
     /**
      * @Description Set current scan only state
      *
      * @param state - want to set state
      */
-    void SetWifiScanOnlyMidState(WifiOprMidState state);
+    void SetWifiScanOnlyMidState(WifiOprMidState state, int instId = 0);
 
     /**
      * @Description Get sta ap exclusion type
@@ -601,14 +601,16 @@ public:
     int GetDeviceProvisionState() const;
 
 private:
+    std::mutex mStaMutex;
+    std::mutex mScanMutex;
     std::mutex mApMutex;
-    std::atomic<WifiOprMidState> mStaMidState;
+    std::map<int, std::atomic<WifiOprMidState>> mStaMidState;
     std::map<int, std::atomic<WifiOprMidState>> mApMidState;
     std::atomic<WifiOprMidState> mP2pMidState;
-    std::atomic<WifiOprMidState> mScanMidState;
-    std::atomic<WifiOprMidState> mStaScanOnlyMidState;
+    std::map<int, std::atomic<WifiOprMidState>> mScanMidState;
+    std::map<int, std::atomic<WifiOprMidState>> mStaScanOnlyMidState;
     /* Time interval for disabling and re-enabling the STA */
-    std::chrono::steady_clock::time_point mWifiCloseTime;
+    std::map<int, std::chrono::steady_clock::time_point> mWifiCloseTime;
     std::atomic<bool> mWifiOpenedWhenAirplane;
 };
 } // namespace Wifi

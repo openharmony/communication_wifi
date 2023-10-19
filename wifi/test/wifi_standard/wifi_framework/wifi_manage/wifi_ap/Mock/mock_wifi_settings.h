@@ -51,9 +51,10 @@ public:
     virtual int GetValidChannels(ChannelsTable &channelsInfo) = 0;
     virtual int ClearValidChannels() = 0;
     virtual int GetApMaxConnNum() = 0;
-    virtual void SetDefaultFrequenciesByCountryBand(const BandType band, std::vector<int> &frequencies) = 0;
-    virtual std::string GetConnectTimeoutBssid() = 0;
-    virtual int SetConnectTimeoutBssid(std::string &bssid) = 0;
+    virtual void SetDefaultFrequenciesByCountryBand(const BandType band, std::vector<int> &frequencies,
+        int instId = 0) = 0;
+    virtual std::string GetConnectTimeoutBssid(int instId = 0) = 0;
+    virtual int SetConnectTimeoutBssid(std::string &bssid, int instId = 0) = 0;
     virtual int SyncHotspotConfig() = 0;
     virtual int SetPowerModel(const PowerModel& model, int id = 0) = 0;
     virtual int GetPowerModel(PowerModel& model, int id = 0) = 0;
@@ -81,9 +82,9 @@ public:
     MOCK_METHOD1(GetValidChannels, int(ChannelsTable &channelsInfo));
     MOCK_METHOD0(ClearValidChannels, int());
     MOCK_METHOD0(GetApMaxConnNum, int());
-    MOCK_METHOD2(SetDefaultFrequenciesByCountryBand, void(const BandType band, std::vector<int> &frequencies));
-    MOCK_METHOD0(GetConnectTimeoutBssid, std::string());
-    MOCK_METHOD1(SetConnectTimeoutBssid, int(std::string &bssid));
+    MOCK_METHOD3(SetDefaultFrequenciesByCountryBand, void(const BandType band, std::vector<int> &frequencies, int));
+    MOCK_METHOD1(GetConnectTimeoutBssid, std::string(int));
+    MOCK_METHOD2(SetConnectTimeoutBssid, int(std::string &bssid, int));
     MOCK_METHOD0(SyncHotspotConfig, int());
     MOCK_METHOD2(SetPowerModel, int(const PowerModel& model, int id));
     MOCK_METHOD2(GetPowerModel, int(PowerModel& model, int id));

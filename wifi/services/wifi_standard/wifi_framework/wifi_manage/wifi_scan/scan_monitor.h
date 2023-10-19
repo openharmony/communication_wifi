@@ -27,7 +27,7 @@ namespace Wifi {
 class ScanMonitor {
     FRIEND_GTEST(ScanMonitor);
 public:
-    ScanMonitor();
+    explicit ScanMonitor(int instId = 0);
     ~ScanMonitor();
     /**
      * @Description  Scan monitor initialization function.
@@ -76,6 +76,9 @@ private:
      * @param result - Received events[in]
      */
     void ProcessReceiveScanEvent(int result);
+
+private:
+    int m_instId;
 };
 }  // namespace Wifi
 }  // namespace OHOS

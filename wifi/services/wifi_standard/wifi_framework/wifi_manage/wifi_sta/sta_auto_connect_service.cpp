@@ -22,13 +22,14 @@ DEFINE_WIFILOG_LABEL("StaAutoConnectService");
 
 namespace OHOS {
 namespace Wifi {
-StaAutoConnectService::StaAutoConnectService(StaStateMachine *staStateMachine)
+StaAutoConnectService::StaAutoConnectService(StaStateMachine *staStateMachine, int instId)
     : pStaStateMachine(staStateMachine),
       pSavedDeviceAppraisal(nullptr),
       firmwareRoamFlag(true),
       maxBlockedBssidNum(BLOCKLIST_INVALID_SIZE),
       selectDeviceLastTime(0),
-      pAppraisals {nullptr, nullptr, nullptr, nullptr, nullptr, nullptr}
+      pAppraisals {nullptr, nullptr, nullptr, nullptr, nullptr, nullptr},
+      m_instId(instId)
 {}
 
 StaAutoConnectService::~StaAutoConnectService()
@@ -68,7 +69,7 @@ void StaAutoConnectService::OnScanInfosReadyHandler(const std::vector<InterScanI
     ClearOvertimeBlockedBssid(); /* Refreshing the BSSID Blocklist */
 
     WifiLinkedInfo info;
-    WifiSettings::GetInstance().GetLinkedInfo(info);
+    WifiSettings::GetInstance().GetLinkedInfo(info, m_instId);
     if (info.supplicantState == SupplicantState::ASSOCIATING ||
         info.supplicantState == SupplicantState::AUTHENTICATING ||
         info.supplicantState == SupplicantState::FOUR_WAY_HANDSHAKE ||
@@ -203,7 +204,7 @@ void StaAutoConnectService::ConnectElectedDevice(WifiDeviceConfig &electedDevice
     }
 
     WifiLinkedInfo currentConnectedNetwork;
-    WifiSettings::GetInstance().GetLinkedInfo(currentConnectedNetwork);
+    WifiSettings::GetInstance().GetLinkedInfo(currentConnectedNetwork, m_instId);
     if (currentConnectedNetwork.connState == ConnState::CONNECTED && electedDevice.networkId == INVALID_NETWORK_ID &&
         currentConnectedNetwork.ssid == electedDevice.ssid && currentConnectedNetwork.bssid != electedDevice.bssid) {
         /* Frameworks start roaming only when firmware is not supported */
@@ -491,9 +492,9 @@ bool StaAutoConnectService::CurrentDeviceGoodEnough(const std::vector<InterScanI
         return false;
     }
 
-    int userLastSelectedNetworkId = WifiSettings::GetInstance().GetUserLastSelectedNetworkId();
+    int userLastSelectedNetworkId = WifiSettings::GetInstance().GetUserLastSelectedNetworkId(m_instId);
     if (userLastSelectedNetworkId != INVALID_NETWORK_ID && userLastSelectedNetworkId == network.networkId) {
-        time_t userLastSelectedNetworkTimeVal = WifiSettings::GetInstance().GetUserLastSelectedNetworkTimeVal();
+        time_t userLastSelectedNetworkTimeVal = WifiSettings::GetInstance().GetUserLastSelectedNetworkTimeVal(m_instId);
         time_t now = time(0);
         int interval = static_cast<int>(now - userLastSelectedNetworkTimeVal);
         if (interval <= TIME_FROM_LAST_SELECTION) {

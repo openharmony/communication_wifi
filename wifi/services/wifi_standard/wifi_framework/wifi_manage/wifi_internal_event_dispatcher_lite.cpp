@@ -51,7 +51,7 @@ int WifiInternalEventDispatcher::SendSystemNotifyMsg() /* parameters */
 }
 
 int WifiInternalEventDispatcher::SetSingleStaCallback(const std::shared_ptr<IWifiDeviceCallBack> &callback,
-    const std::string &eventName)
+    const std::string &eventName, int instId)
 {
     auto iter = g_staCallBackNameEventIdMap.find(eventName);
     if (iter == g_staCallBackNameEventIdMap.end()) {
@@ -74,7 +74,7 @@ std::unordered_set<int>& WifiInternalEventDispatcher::GetStaSingleCallbackEvent(
 }
 
 int WifiInternalEventDispatcher::SetSingleScanCallback(const std::shared_ptr<IWifiScanCallback> &callback,
-    const std::string &eventName)
+    const std::string &eventName, int instId)
 {
     auto iter = g_staCallBackNameEventIdMap.find(eventName);
     if (iter == g_staCallBackNameEventIdMap.end()) {

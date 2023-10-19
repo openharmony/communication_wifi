@@ -23,12 +23,12 @@ namespace Wifi {
 class MockWifiManager {
 public:
     virtual ~MockWifiManager() = default;
-    virtual void DealStaOpenRes(OperateResState state) = 0;
-    virtual void DealStaCloseRes(OperateResState state) = 0;
-    virtual void DealStaConnChanged(OperateResState state, const WifiLinkedInfo &info) = 0;
-    virtual void DealWpsChanged(WpsStartState state, const int pinCode) = 0;
-    virtual void DealStreamChanged(StreamDirection state) = 0;
-    virtual void DealRssiChanged(int rssi) = 0;
+    virtual void DealStaOpenRes(OperateResState state, int instId = 0) = 0;
+    virtual void DealStaCloseRes(OperateResState state, int instId = 0) = 0;
+    virtual void DealStaConnChanged(OperateResState state, const WifiLinkedInfo &info, int instId = 0) = 0;
+    virtual void DealWpsChanged(WpsStartState state, const int pinCode, int instId = 0) = 0;
+    virtual void DealStreamChanged(StreamDirection state, int instId = 0) = 0;
+    virtual void DealRssiChanged(int rssi, int instId = 0) = 0;
 };
 
 class WifiManager : public MockWifiManager {
@@ -37,12 +37,12 @@ public:
     ~WifiManager() = default;
     static WifiManager &GetInstance();
     StaServiceCallback GetStaCallback();
-    MOCK_METHOD1(DealStaOpenRes, void(OperateResState state));
-    MOCK_METHOD1(DealStaCloseRes, void(OperateResState state));
-    MOCK_METHOD2(DealStaConnChanged, void(OperateResState type, const WifiLinkedInfo &info));
-    MOCK_METHOD2(DealWpsChanged, void(WpsStartState state, const int pinCode));
-    MOCK_METHOD1(DealStreamChanged, void(StreamDirection state));
-    MOCK_METHOD1(DealRssiChanged, void(int rssi));
+    MOCK_METHOD2(DealStaOpenRes, void(OperateResState state, int));
+    MOCK_METHOD2(DealStaCloseRes, void(OperateResState state, int));
+    MOCK_METHOD3(DealStaConnChanged, void(OperateResState type, const WifiLinkedInfo &info, int));
+    MOCK_METHOD3(DealWpsChanged, void(WpsStartState state, const int pinCode, int));
+    MOCK_METHOD2(DealStreamChanged, void(StreamDirection state, int));
+    MOCK_METHOD2(DealRssiChanged, void(int rssi, int));
 private:
     StaServiceCallback mStaCallback;
     void InitStaCallback(void);

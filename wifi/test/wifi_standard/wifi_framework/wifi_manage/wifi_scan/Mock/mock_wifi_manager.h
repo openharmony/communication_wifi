@@ -23,11 +23,11 @@ namespace Wifi {
 class MockWifiManager {
 public:
     virtual ~MockWifiManager() = default;
-    virtual void DealScanOpenRes() = 0;
-    virtual void DealScanCloseRes() = 0;
-    virtual void DealScanFinished(int state) = 0;
-    virtual void DealScanInfoNotify(std::vector<InterScanInfo> &results) = 0;
-    virtual void DealStoreScanInfoEvent(std::vector<InterScanInfo> &results) = 0;
+    virtual void DealScanOpenRes(int instId = 0) = 0;
+    virtual void DealScanCloseRes(int instId = 0) = 0;
+    virtual void DealScanFinished(int state, int instId = 0) = 0;
+    virtual void DealScanInfoNotify(std::vector<InterScanInfo> &results, int instId = 0) = 0;
+    virtual void DealStoreScanInfoEvent(std::vector<InterScanInfo> &results, int instId = 0) = 0;
 };
 
 class WifiManager : public MockWifiManager {
@@ -37,11 +37,11 @@ public:
     static WifiManager &GetInstance();
     IScanSerivceCallbacks GetScanCallback();
 
-    MOCK_METHOD0(DealScanOpenRes, void());
-    MOCK_METHOD0(DealScanCloseRes, void());
-    MOCK_METHOD1(DealScanFinished, void(int state));
-    MOCK_METHOD1(DealScanInfoNotify, void(std::vector<InterScanInfo> &results));
-    MOCK_METHOD1(DealStoreScanInfoEvent, void(std::vector<InterScanInfo> &results));
+    MOCK_METHOD1(DealScanOpenRes, void(int));
+    MOCK_METHOD1(DealScanCloseRes, void(int));
+    MOCK_METHOD2(DealScanFinished, void(int state, int));
+    MOCK_METHOD2(DealScanInfoNotify, void(std::vector<InterScanInfo> &results, int));
+    MOCK_METHOD2(DealStoreScanInfoEvent, void(std::vector<InterScanInfo> &results, int));
 
 private:
     IScanSerivceCallbacks mScanCallback;

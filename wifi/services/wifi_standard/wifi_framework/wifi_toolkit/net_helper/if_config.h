@@ -57,7 +57,7 @@ public:
      * @param ipType - ip type[in]
      * @return int
      */
-    int SetIfDnsAndRoute(const DhcpResult &dhcpInfo, int ipType);
+    int SetIfDnsAndRoute(const DhcpResult &dhcpInfo, int ipType, int instId = 0);
 
     void SetNetDns(const std::string &ifName, const std::string &dns1, const std::string &dns2);
 

@@ -46,7 +46,7 @@ const int MAX_RATES_24G = 24000000;
 class ScanStateMachine : public StateMachine {
     FRIEND_GTEST(ScanStateMachine);
 public:
-    ScanStateMachine();
+    explicit ScanStateMachine(int instId = 0);
     ~ScanStateMachine();
     /**
     * @Description  Initialize the scanning state machine,construct the state tree,
@@ -291,6 +291,7 @@ private:
     bool runningSwPnoFlag;                   /* Software PNO scanning is in progress. */
 
     static std::shared_mutex lock;                  /* data lock */
+    int m_instId;
 
     /**
      * @Description  Processing of Scan Requests Received in Idle State.

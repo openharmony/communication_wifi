@@ -69,7 +69,7 @@ public:
      * @param wifiIpV6Info wifi network link IPV6 data information
      * @param wifiProxyConfig wifi network link proxy information
      */
-    void UpdateNetLinkInfo(IpInfo &wifiIpInfo, IpV6Info &wifiIpV6Info, WifiProxyConfig &wifiProxyConfig);
+    void UpdateNetLinkInfo(IpInfo &wifiIpInfo, IpV6Info &wifiIpV6Info, WifiProxyConfig &wifiProxyConfig, int instId = 0);
 
     /**
      * Add route
@@ -87,7 +87,8 @@ public:
      * @param wifiIpV6Info wifi ipv6 network link data information
      * @param wifiProxyConfig wifi network link proxy information
      */
-    void OnStaMachineUpdateNetLinkInfo(IpInfo &wifiIpInfo, IpV6Info &wifiIpV6Info, WifiProxyConfig &wifiProxyConfig);
+    void OnStaMachineUpdateNetLinkInfo(IpInfo &wifiIpInfo, IpV6Info &wifiIpV6Info, WifiProxyConfig &wifiProxyConfig,
+        int instId = 0);
 
     /**
      * Add OnStaMachineUpdateNetSupplierInfo
@@ -108,7 +109,8 @@ public:
      *
      * @param netSupplierInfo net Supplier Info
      */
-    void OnStaMachineNetManagerRestart(const sptr<NetManagerStandard::NetSupplierInfo> &netSupplierInfo);
+    void OnStaMachineNetManagerRestart(const sptr<NetManagerStandard::NetSupplierInfo> &netSupplierInfo,
+        int instId = 0);
 
 public:
     class NetConnCallback : public NetManagerStandard::NetSupplierCallbackBase {
@@ -144,7 +146,7 @@ public:
     };
 private:
     void CreateNetLinkInfo(sptr<NetManagerStandard::NetLinkInfo> &netLinkInfo, IpInfo &wifiIpInfo,
-        IpV6Info &wifiIpV6Info, WifiProxyConfig &wifiProxyConfig);
+        IpV6Info &wifiIpV6Info, WifiProxyConfig &wifiProxyConfig, int instId = 0);
 
     void SetNetLinkIPInfo(sptr<NetManagerStandard::NetLinkInfo> &netLinkInfo, IpInfo &wifiIpInfo,
         IpV6Info &wifiIpV6Info);

@@ -34,10 +34,10 @@ namespace OHOS {
 namespace Wifi {
 struct StaServiceHandle {
     void *handle;
-    IStaService *(*create)();
+    IStaService *(*create)(int instId);
     void *(*destroy)(IStaService *);
-    IStaService *pService;
-    StaServiceHandle() : handle(nullptr), create(nullptr), destroy(nullptr), pService(nullptr)
+    std::map<int, IStaService *> pService;
+    StaServiceHandle() : handle(nullptr), create(nullptr), destroy(nullptr)
     {}
     ~StaServiceHandle()
     {}
@@ -46,16 +46,16 @@ struct StaServiceHandle {
         handle = nullptr;
         create = nullptr;
         destroy = nullptr;
-        pService = nullptr;
+        pService.clear();
     }
 };
 
 struct ScanServiceHandle {
     void *handle;
-    IScanService *(*create)();
+    IScanService *(*create)(int instId);
     void *(*destroy)(IScanService *);
-    IScanService *pService;
-    ScanServiceHandle() : handle(nullptr), create(nullptr), destroy(nullptr), pService(nullptr)
+    std::map<int, IScanService *> pService;
+    ScanServiceHandle() : handle(nullptr), create(nullptr), destroy(nullptr)
     {}
     ~ScanServiceHandle()
     {}
@@ -64,12 +64,11 @@ struct ScanServiceHandle {
         handle = nullptr;
         create = nullptr;
         destroy = nullptr;
-        pService = nullptr;
+        pService.clear();
     }
 };
 
 #ifdef FEATURE_AP_SUPPORT
-#define ALL_AP_ID 0xffff
 struct ApServiceHandle {
     void *handle;
     IApService *(*create)(int id);
@@ -158,14 +157,14 @@ public:
      *
      * @return IStaService* - sta service pointer, if sta not supported, nullptr is returned
      */
-    IStaService *GetStaServiceInst(void);
+    IStaService *GetStaServiceInst(int instId = 0);
 
     /**
      * @Description Get the Scan Service Inst object
      *
      * @return IScanService* - scan service pointer, if scan not supported, nullptr is returned
      */
-    IScanService *GetScanServiceInst(void);
+    IScanService *GetScanServiceInst(int instId = 0);
 
 #ifdef FEATURE_AP_SUPPORT
     /**
@@ -214,9 +213,9 @@ public:
 private:
     int GetServiceDll(const std::string &name, std::string &dlname);
     int LoadStaService(const std::string &dlname, bool bCreate);
-    int UnloadStaService(bool bPreLoad);
+    int UnloadStaService(bool bPreLoad, int instId = 0);
     int LoadScanService(const std::string &dlname, bool bCreate);
-    int UnloadScanService(bool bPreLoad);
+    int UnloadScanService(bool bPreLoad, int instId = 0);
 #ifdef FEATURE_AP_SUPPORT
     int LoadApService(const std::string &dlname, bool bCreate);
     int UnloadApService(bool bPreLoad, int id = 0);

@@ -39,7 +39,7 @@ WifiCountryCodePolicyNoMobile::WifiCountryCodePolicyNoMobile(
     const std::bitset<WIFI_COUNTRY_CODE_POLICE_DEF_LEN> &wifiCountryCodePolicy)
 {
     m_wifiCountryCodePolicy = wifiCountryCodePolicy;
-    Init();
+    InitPolicy();
 }
 
 WifiCountryCodePolicyNoMobile::~WifiCountryCodePolicyNoMobile()
@@ -49,7 +49,7 @@ WifiCountryCodePolicyNoMobile::~WifiCountryCodePolicyNoMobile()
     }
 }
 
-void WifiCountryCodePolicyNoMobile::Init()
+void WifiCountryCodePolicyNoMobile::InitPolicy()
 {
     if (m_wifiCountryCodePolicy[FEATURE_RCV_SCAN_RESLUT]) {
         OHOS::EventFwk::MatchingSkills matchingSkills;

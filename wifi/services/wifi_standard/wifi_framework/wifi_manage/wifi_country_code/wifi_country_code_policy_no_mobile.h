@@ -83,7 +83,7 @@ private:
     std::string m_wifiCountryCodeFromScanResults;
     std::bitset<WIFI_COUNTRY_CODE_POLICE_DEF_LEN> m_wifiCountryCodePolicy;
 
-    void Init();
+    void InitPolicy();
     void HandleScanResultAction(int scanStatus);
     ErrCode StatisticCountryCodeFromScanResult(std::vector<BssidAndCountryCode> &scanInfoList);
     ErrCode ParseCountryCodeElement(std::vector<WifiInfoElem> &infoElems, std::string &wifiCountryCode);

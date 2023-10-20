@@ -784,6 +784,7 @@ ErrCode WifiDeviceServiceImpl::ConnectToNetwork(int networkId, bool isCandidate)
             WIFI_LOGE("ConnectToNetwork CheckCallingUid failed!");
             return WIFI_OPT_INVALID_PARAM;
         }
+        WifiSettings::GetInstance().SetDeviceState(networkId, static_cast<int>(WifiDeviceConfigStatus::ENABLED), false);
         WifiLinkedInfo linkedInfo;
         WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
         if (linkedInfo.connState == ConnState::CONNECTING || linkedInfo.connState == ConnState::CONNECTED) {

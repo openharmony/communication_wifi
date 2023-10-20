@@ -70,6 +70,7 @@ ErrCode StaSavedDeviceAppraisal::DeviceAppraisals(
             highestScore = score;
             scanInfoElected.rssi = scanInfo.rssi;
             electedDevice = device;
+            electedDevice.bssid = scanInfo.bssid;
             sign = 1;
             WIFI_LOGD("set highestScore: %{public}d, ssid: %{public}s", highestScore, SsidAnonymize(device.ssid).c_str());
         } else {

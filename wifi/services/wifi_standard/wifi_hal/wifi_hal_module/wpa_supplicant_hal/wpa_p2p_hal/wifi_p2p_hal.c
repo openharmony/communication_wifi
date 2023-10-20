@@ -1237,8 +1237,8 @@ static P2pSupplicantErrCode WpaP2pHid2dCliCmdConnect(WifiWpaP2pInterface *this, 
 
     char buf[P2P_REPLY_BUF_SMALL_LENGTH] = {0};
     char cmd[P2P_CMD_BUF_LENGTH] = {0};
-    if (snprintf_s(cmd, sizeof(cmd), sizeof(cmd) - 1, "IFNAME=%s MAGICLINK \"%s\"\n%s\n\"%s\"\n%d", this->ifName,
-        info->ssid, info->bssid, info->passphrase, info->frequency) < 0) {
+    if (snprintf_s(cmd, sizeof(cmd), sizeof(cmd) - 1, "IFNAME=%s MAGICLINK \"%s\"\n%s\n\"%s\"\n%d\n%d", this->ifName,
+        info->ssid, info->bssid, info->passphrase, info->frequency, info->isLegacyGo) < 0) {
         LOGE("hid2d connect snprintf err");
         return P2P_SUP_ERRCODE_FAILED;
     }

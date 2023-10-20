@@ -421,6 +421,12 @@ public:
      * @param msg - Message body received by the state machine[in]
      */
     void DealRenewalTimeout(InternalMessage *msg);
+
+    /**
+     * @Description  start browser to login portal
+     *
+     */
+    void HandlePortalNetworkPorcess();
 private:
     /**
      * @Description  Destruct state.
@@ -809,6 +815,7 @@ private:
     GetIpState *pGetIpState;
     LinkedState *pLinkedState;
     ApRoamingState *pApRoamingState;
+    std::string mPortalUrl;
     /**
      * @Description Replace empty dns
      */

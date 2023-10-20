@@ -68,6 +68,8 @@ void WifiDeviceStub::InitHandleMapEx()
         &WifiDeviceStub::OnSetFrozenApp;
     handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_RESET_ALL_FROZEN_APP)] =
         &WifiDeviceStub::OnResetAllFrozenApp;
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_START_PORTAL_CERTIF)] =
+        &WifiDeviceStub::OnStartPortalCertification;
     return;
 }
 
@@ -855,6 +857,16 @@ void WifiDeviceStub::OnGet5GHzChannelList(uint32_t code, MessageParcel &data, Me
             reply.WriteInt32(channelList[i]);
         }
     }
+    return;
+}
+
+void WifiDeviceStub::OnStartPortalCertification(uint32_t code, MessageParcel &data, MessageParcel &reply)
+{
+    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+    std::vector<int> channelList;
+    ErrCode ret = StartPortalCertification();
+    reply.WriteInt32(0);
+    reply.WriteInt32(ret);
     return;
 }
 

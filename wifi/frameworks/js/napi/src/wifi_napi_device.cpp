@@ -1402,6 +1402,21 @@ NO_SANITIZE("cfi") napi_value Get5GHzChannelList(napi_env env, napi_callback_inf
     return arrayResult;
 }
 
+NO_SANITIZE("cfi") napi_value StartPortalCertification(napi_env env, napi_callback_info info)
+{
+    TRACE_FUNC_CALL;
+    WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
+
+    ErrCode ret = wifiDevicePtr->StartPortalCertification();
+    if (ret != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("StartPortalCertification fail: %{public}d", ret);
+        WIFI_NAPI_ASSERT(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_STA);
+    }
+    napi_value result;
+    napi_create_uint32(env, ret, &result);
+    return result;
+}
+
 NO_SANITIZE("cfi") napi_value SetScanOnlyAvailable(napi_env env, napi_callback_info info)
 {
     WIFI_LOGI("wifi napi In SetScanOnlyAvailable");

@@ -109,7 +109,6 @@ void StaNetworkCheck::CheckResponseCode(std::string url, int codeNum, int contLe
     } else if (isHttps && (lastNetState.load() != NETWORK_STATE_NOWORKING) &&
         (lastNetState.load() != NETWORK_CHECK_PORTAL)) {
         WIFI_LOGE("http detect network not working!");
-        netStateHandler(StaNetState::NETWORK_STATE_NOWORKING, "");
         lastNetState = NETWORK_STATE_NOWORKING;
     } else {
         WIFI_LOGE("http detect unknow network!");
@@ -181,7 +180,6 @@ void StaNetworkCheck::RegistHttpCallBack(std::shared_ptr<NetStack::HttpClient::H
 void StaNetworkCheck::RunNetCheckThreadFunc()
 {
     WIFI_LOGI("enter RunNetCheckThreadFunc!\n");
-    int timeoutMs = HTTP_DETECTION_TIMEOUT;
     isExited = false;
     for (;;) {
         while (isStopNetCheck && !isExitNetCheckThread) {
@@ -194,19 +192,34 @@ void StaNetworkCheck::RunNetCheckThreadFunc()
             isExited = true;
             break;
         }
+#ifndef OHOS_ARCH_LITE
+        if (mainDetectFinsh && mainNetState != NETWORK_CHECK_PORTAL && mainNetState != NETWORK_STATE_WORKING) {
+            WIFI_LOGE("http bak detect start!");
+            HttpPortalDetection(mUrlInfo.portalBakHttpUrl);
+            HttpPortalDetection(mUrlInfo.portalBakHttpsUrl);
+            DnsDetection(mUrlInfo.portalBakHttpUrl);
+        }
+#endif
         if (detectResultNum >= MAX_RESULT_NUM) {
             CheckResponseCode(httpUrl, httpCodeNum, httpResultLen);
             if (lastNetState != NETWORK_CHECK_PORTAL) {
                 CheckResponseCode(httpsUrl, httpsCodeNum, httpsResultLen);
             }
             detectResultNum = 0;
-#ifndef OHOS_ARCH_LITE
-            if (lastNetState == NETWORK_STATE_UNKNOWN) {
-                DnsDetection(mUrlInfo.portalBakHttpUrl);
-                HttpPortalDetection(mUrlInfo.portalBakHttpUrl);
-                HttpPortalDetection(mUrlInfo.portalBakHttpsUrl);
+            if (httpUrl == mUrlInfo.portalHttpUrl) {
+                mainNetState = lastNetState;
+                mainDetectFinsh = true;
+            } else {
+                bakNetState = lastNetState;
+                bakDetectFinsh = true;
             }
-#endif
+        }
+        if (bakDetectFinsh && mainDetectFinsh && ((mainNetState != NETWORK_CHECK_PORTAL &&
+            mainNetState != NETWORK_STATE_WORKING && bakNetState == NETWORK_STATE_NOWORKING) ||
+            (bakNetState != NETWORK_CHECK_PORTAL && bakNetState != NETWORK_STATE_WORKING &&
+            mainNetState == NETWORK_STATE_NOWORKING))) {
+            WIFI_LOGE("http detect result is not working!");
+            netStateHandler(StaNetState::NETWORK_STATE_NOWORKING, "");
         }
 
         std::chrono::steady_clock::time_point current = std::chrono::steady_clock::now();
@@ -218,7 +231,7 @@ void StaNetworkCheck::RunNetCheckThreadFunc()
 
         if (!isExitNetCheckThread) {
             std::unique_lock<std::mutex> lck(mMutex);
-            if (mCondition_timeout.wait_for(lck, std::chrono::milliseconds(timeoutMs)) == std::cv_status::timeout) {
+            if (mCondition_timeout.wait_for(lck, std::chrono::milliseconds(HTTP_BACKUP_TIMEOUT)) == std::cv_status::timeout) {
                 WIFI_LOGI("mCondition_timeout timeout.\n");
             } else {
                 WIFI_LOGI("Wake up, break the loop.\n");
@@ -268,13 +281,18 @@ void StaNetworkCheck::SignalNetCheckThread()
     lastNetState = NETWORK_STATE_UNKNOWN;
     isStopNetCheck = false;
     detectResultNum = 0;
+    mainDetectFinsh = false;
+    bakDetectFinsh = false;
     httpUrl = "";
     httpsUrl = "";
     httpCodeNum = 0;
     httpsCodeNum = 0;
     httpResultLen = 0;
     httpsResultLen = 0;
+    bakNetState = NETWORK_STATE_UNKNOWN;
+    mainNetState = NETWORK_STATE_UNKNOWN;
     lastArpDnsCheckTime = std::chrono::steady_clock::now();
+    lastHttpCheckTime = std::chrono::steady_clock::now();
     mCondition.notify_one();
 #ifndef OHOS_ARCH_LITE
     HttpPortalDetection(mUrlInfo.portalHttpUrl);

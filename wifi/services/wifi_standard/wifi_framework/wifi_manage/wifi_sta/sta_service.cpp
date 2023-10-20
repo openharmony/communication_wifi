@@ -545,5 +545,14 @@ void StaService::HandleScreenStatusChanged(int screenState)
 #endif
     return;
 }
+ErrCode StaService::StartPortalCertification()
+{
+    if (pStaStateMachine == nullptr) {
+        WIFI_LOGE("pStaStateMachine is null!");
+        return WIFI_OPT_FAILED;
+    }
+    pStaStateMachine->HandlePortalNetworkPorcess();
+    return WIFI_OPT_SUCCESS;
+}
 }  // namespace Wifi
 }  // namespace OHOS

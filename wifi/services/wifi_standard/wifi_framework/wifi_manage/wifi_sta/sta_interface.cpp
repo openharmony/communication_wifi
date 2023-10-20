@@ -327,5 +327,15 @@ ErrCode StaInterface::OnScreenStateChanged(int screenState)
     pStaService->HandleScreenStatusChanged(screenState);
     return WIFI_OPT_SUCCESS;
 }
+
+ErrCode StaInterface::StartPortalCertification()
+{
+    WIFI_LOGI("Enter StaInterface::StartPortalCertification");
+    std::lock_guard<std::mutex> lock(mutex);
+    CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
+    pStaService->StartPortalCertification();
+    return WIFI_OPT_SUCCESS;
+}
+
 }  // namespace Wifi
 }  // namespace OHOS

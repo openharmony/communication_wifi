@@ -1394,6 +1394,33 @@ ErrCode WifiDeviceServiceImpl::Get5GHzChannelList(std::vector<int> &result)
     return WIFI_OPT_SUCCESS;
 }
 
+ErrCode WifiDeviceServiceImpl::StartPortalCertification()
+{
+    WIFI_LOGI("Enter StartPortalCertification.");
+    if (!WifiAuthCenter::IsSystemAppByToken()) {
+        WIFI_LOGE("StartPortalCertification: NOT System APP, PERMISSION_DENIED!");
+        return WIFI_OPT_NON_SYSTEMAPP;
+    }
+
+    if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("WifiDeviceServiceImpl:StartPortalCertification() PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+
+    if (WifiPermissionUtils::VerifyGetWifiConfigPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("WifiDeviceServiceImpl:StartPortalCertification() PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+
+    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst();
+    if (pService == nullptr) {
+        WIFI_LOGE("pService is nullptr!");
+        return WIFI_OPT_STA_NOT_OPENED;
+    }
+
+    return WIFI_OPT_SUCCESS;
+}
+
 #ifndef OHOS_ARCH_LITE
 void WifiDeviceServiceImpl::StartWatchdog(void)
 {

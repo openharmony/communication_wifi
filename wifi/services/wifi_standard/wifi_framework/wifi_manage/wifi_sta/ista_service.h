@@ -219,6 +219,12 @@ public:
      * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
      */
     virtual ErrCode OnScreenStateChanged(int screenState) = 0;
+    /**
+     * @Description start portal certification.
+     *
+     * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
+     */
+    virtual ErrCode StartPortalCertification() = 0;
 };
 }  // namespace Wifi
 }  // namespace OHOS

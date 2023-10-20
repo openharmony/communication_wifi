@@ -319,6 +319,13 @@ public:
     virtual ErrCode Get5GHzChannelList(std::vector<int> &result) = 0;
 
     /**
+     * @Description start portal certification
+     *
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode StartPortalCertification() = 0;
+
+    /**
      * @Description set low latency mode
      *
      * @param enabled - true: enable low latency, false: disable low latency

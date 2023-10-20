@@ -219,6 +219,12 @@ public:
      * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
      */
     virtual ErrCode OnScreenStateChanged(int screenState) override;
+    /**
+     * @Description start portal certification.
+     *
+     * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
+     */
+    virtual ErrCode StartPortalCertification() override;
 private:
     std::vector<StaServiceCallback> m_staCallback;
     StaService *pStaService;

@@ -36,7 +36,8 @@
 #include "http_client.h"
 #endif
 
-#define HTTP_DETECTION_TIMEOUT 3000
+#define HTTP_DETECTION_TIMEOUT 10000
+#define HTTP_BACKUP_TIMEOUT 3000
 namespace OHOS {
 namespace Wifi {
 class StaNetworkCheck {
@@ -111,10 +112,15 @@ private:
     std::atomic<bool> isExitNetCheckThread;
     std::atomic<bool> isExited;
     std::atomic<int> detectResultNum;
+    std::atomic<bool> mainDetectFinsh;
+    std::atomic<bool> bakDetectFinsh;
     ArpChecker arpChecker;
     DnsChecker dnsChecker;
     std::chrono::steady_clock::time_point lastArpDnsCheckTime;
+    std::chrono::steady_clock::time_point lastHttpCheckTime;
     WifiPortalConf mUrlInfo;
+    StaNetState bakNetState;
+    StaNetState mainNetState;
 };
 }  // namespace Wifi
 }  // namespace OHOS

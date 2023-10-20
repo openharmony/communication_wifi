@@ -228,6 +228,12 @@ public:
      *
      */
     virtual void HandleScreenStatusChanged(int screenState);
+    /**
+     * @Description start portal certification.
+     *
+     * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
+     */
+    virtual ErrCode StartPortalCertification();
 private:
     void NotifyDeviceConfigChange(ConfigChange value) const;
 
@@ -240,7 +246,6 @@ private:
         ~WifiCountryCodeChangeObserver() override = default;
         ErrCode OnWifiCountryCodeChanged(const std::string &wifiCountryCode) override;
         std::string GetListenerModuleName() override;
-        // StateMachine GetStateMachineObj() override;
     };
     std::shared_ptr<IWifiCountryCodeChangeListener> m_staObserver;
 #endif

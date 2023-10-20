@@ -363,6 +363,12 @@ public:
      * @return ErrCode - operation result
      */
     virtual ErrCode ResetAllFrozenApp() = 0;
+    /**
+     * @Description start portal certification
+     *
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode StartPortalCertification() = 0;
 #ifndef OHOS_ARCH_LITE
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.wifi.IWifiDeviceService");

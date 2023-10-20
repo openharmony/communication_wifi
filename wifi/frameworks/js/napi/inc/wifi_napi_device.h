@@ -62,7 +62,7 @@ napi_value IsBandTypeSupported(napi_env env, napi_callback_info info);
 napi_value Get5GHzChannelList(napi_env env, napi_callback_info info);
 napi_value SetScanOnlyAvailable(napi_env env, napi_callback_info info);
 napi_value GetScanOnlyAvailable(napi_env env, napi_callback_info info);
-
+napi_value StartPortalCertification(napi_env env, napi_callback_info info);
 class ScanInfoAsyncContext : public AsyncContext {
 public:
     std::vector<WifiScanInfo> vecScanInfos;

@@ -26,7 +26,7 @@ class StaService;
 class StaInterface : public IStaService  {
     FRIEND_GTEST(StaInterface);
 public:
-    StaInterface();
+    explicit StaInterface(int instId = 0);
     virtual ~StaInterface() override;
 
     /**
@@ -223,6 +223,7 @@ private:
     std::vector<StaServiceCallback> m_staCallback;
     StaService *pStaService;
     std::mutex mutex;
+    int m_instId;
 };
 }  // namespace Wifi
 }  // namespace OHOS

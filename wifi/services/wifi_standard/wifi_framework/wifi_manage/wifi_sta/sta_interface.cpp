@@ -21,7 +21,7 @@ DEFINE_WIFILOG_LABEL("StaInterface");
 
 namespace OHOS {
 namespace Wifi {
-StaInterface::StaInterface() : pStaService(nullptr)
+StaInterface::StaInterface(int instId) : pStaService(nullptr), m_instId(instId)
 {}
 
 StaInterface::~StaInterface()
@@ -34,9 +34,9 @@ StaInterface::~StaInterface()
     }
 }
 
-extern "C" IStaService *Create(void)
+extern "C" IStaService *Create(int instId = 0)
 {
-    return new (std::nothrow)StaInterface();
+    return new (std::nothrow)StaInterface(instId);
 }
 
 extern "C" void Destroy(IStaService *pservice)
@@ -50,7 +50,7 @@ ErrCode StaInterface::EnableWifi()
     WIFI_LOGI("Enter StaInterface::EnableWifi.\n");
     std::lock_guard<std::mutex> lock(mutex);
     if(pStaService == nullptr) {
-        pStaService = new (std::nothrow) StaService();
+        pStaService = new (std::nothrow) StaService(m_instId);
         if (pStaService == nullptr) {
             WIFI_LOGE("New StaService failed.\n");
             return WIFI_OPT_FAILED;

@@ -127,7 +127,7 @@ ErrCode WifiDeviceServiceImpl::EnableWifi()
         return errCode;
     }
 
-    WifiOprMidState curState = WifiConfigCenter::GetInstance().GetWifiMidState();
+    WifiOprMidState curState = WifiConfigCenter::GetInstance().GetWifiMidState(m_instId);
     if (curState != WifiOprMidState::CLOSED) {
         WIFI_LOGI("current wifi state is %{public}d", static_cast<int>(curState));
         if (curState == WifiOprMidState::CLOSING) { /* when current wifi is closing, return */
@@ -153,7 +153,7 @@ ErrCode WifiDeviceServiceImpl::EnableWifi()
     }
 #endif
 
-    if (!WifiConfigCenter::GetInstance().SetWifiMidState(curState, WifiOprMidState::OPENING)) {
+    if (!WifiConfigCenter::GetInstance().SetWifiMidState(curState, WifiOprMidState::OPENING, m_instId)) {
         WIFI_LOGI("set wifi mid state opening failed!");
         return WIFI_OPT_OPEN_SUCC_WHEN_OPENED;
     }
@@ -163,7 +163,7 @@ ErrCode WifiDeviceServiceImpl::EnableWifi()
         if (WifiServiceManager::GetInstance().CheckAndEnforceService(WIFI_SERVICE_STA) < 0) {
             break;
         }
-        IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst();
+        IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(m_instId);
         if (pService == nullptr) {
             WIFI_LOGE("Create %{public}s service failed!", WIFI_SERVICE_STA);
             break;
@@ -189,8 +189,8 @@ ErrCode WifiDeviceServiceImpl::EnableWifi()
         }
     } while (false);
     if (errCode != WIFI_OPT_SUCCESS) {
-        WifiConfigCenter::GetInstance().SetWifiMidState(WifiOprMidState::OPENING, WifiOprMidState::CLOSED);
-        WifiServiceManager::GetInstance().UnloadService(WIFI_SERVICE_STA);
+        WifiConfigCenter::GetInstance().SetWifiMidState(WifiOprMidState::OPENING, WifiOprMidState::CLOSED, m_instId);
+        WifiServiceManager::GetInstance().UnloadService(WIFI_SERVICE_STA, m_instId);
         return errCode;
     }
 #ifdef FEATURE_P2P_SUPPORT
@@ -238,7 +238,7 @@ ErrCode WifiDeviceServiceImpl::DisableWifi()
         return WIFI_OPT_PERMISSION_DENIED;
     }
 
-    WifiOprMidState curState = WifiConfigCenter::GetInstance().GetWifiMidState();
+    WifiOprMidState curState = WifiConfigCenter::GetInstance().GetWifiMidState(m_instId);
     if (curState != WifiOprMidState::RUNNING) {
         WIFI_LOGI("current wifi state is %{public}d", static_cast<int>(curState));
         if (curState == WifiOprMidState::OPENING) { /* when current wifi is opening, return */
@@ -259,19 +259,19 @@ ErrCode WifiDeviceServiceImpl::DisableWifi()
     }
 #endif
 
-    if (!WifiConfigCenter::GetInstance().SetWifiMidState(curState, WifiOprMidState::CLOSING)) {
+    if (!WifiConfigCenter::GetInstance().SetWifiMidState(curState, WifiOprMidState::CLOSING, m_instId)) {
         WIFI_LOGI("set wifi mid state opening failed! may be other activity has been operated");
         return WIFI_OPT_CLOSE_SUCC_WHEN_CLOSED;
     }
-    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst();
+    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(m_instId);
     if (pService == nullptr) {
-        WifiConfigCenter::GetInstance().SetWifiMidState(WifiOprMidState::CLOSED);
-        WifiServiceManager::GetInstance().UnloadService(WIFI_SERVICE_STA);
+        WifiConfigCenter::GetInstance().SetWifiMidState(WifiOprMidState::CLOSED, m_instId);
+        WifiServiceManager::GetInstance().UnloadService(WIFI_SERVICE_STA, m_instId);
         return WIFI_OPT_SUCCESS;
     }
     ErrCode ret = pService->DisableWifi();
     if (ret != WIFI_OPT_SUCCESS) {
-        WifiConfigCenter::GetInstance().SetWifiMidState(WifiOprMidState::CLOSING, WifiOprMidState::RUNNING);
+        WifiConfigCenter::GetInstance().SetWifiMidState(WifiOprMidState::CLOSING, WifiOprMidState::RUNNING, m_instId);
     } else {
         WifiConfigCenter::GetInstance().SetStaLastRunState(false);
         WifiManager::GetInstance().GetAirplaneModeByDatashare();
@@ -427,7 +427,7 @@ ErrCode WifiDeviceServiceImpl::RemoveCandidateConfig(const WifiDeviceConfig &con
         WIFI_LOGE("CheckCallingUid failed!");
         return WIFI_OPT_INVALID_PARAM;
     }
-    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst();
+    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(m_instId);
     if (pService == nullptr) {
         WIFI_LOGE("pService is nullptr!");
         return WIFI_OPT_STA_NOT_OPENED;
@@ -466,7 +466,7 @@ ErrCode WifiDeviceServiceImpl::RemoveCandidateConfig(int networkId)
         WIFI_LOGE("CheckCallingUid failed!");
         return WIFI_OPT_INVALID_PARAM;
     }
-    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst();
+    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(m_instId);
     if (pService == nullptr) {
         WIFI_LOGE("pService is nullptr!");
         return WIFI_OPT_STA_NOT_OPENED;
@@ -515,7 +515,8 @@ ErrCode WifiDeviceServiceImpl::AddDeviceConfig(const WifiDeviceConfig &config, i
     macAddrInfo.bssid = config.bssid;
     macAddrInfo.bssidType = config.bssidType;
     std::string macAddr =
-        WifiSettings::GetInstance().GetMacAddrPairs(WifiMacAddrInfoType::WIFI_SCANINFO_MACADDR_INFO, macAddrInfo);
+        WifiSettings::GetInstance().GetMacAddrPairs(WifiMacAddrInfoType::WIFI_SCANINFO_MACADDR_INFO,
+            macAddrInfo, m_instId);
     if (macAddr.empty()) {
         WIFI_LOGW("%{public}s: record not found, bssid:%{private}s, bssidType:%{public}d",
             __func__, config.bssid.c_str(), config.bssidType);
@@ -532,7 +533,7 @@ ErrCode WifiDeviceServiceImpl::AddDeviceConfig(const WifiDeviceConfig &config, i
         }
     }
 #endif
-    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst();
+    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(m_instId);
     if (pService == nullptr) {
         return WIFI_OPT_STA_NOT_OPENED;
     }
@@ -574,7 +575,7 @@ ErrCode WifiDeviceServiceImpl::UpdateDeviceConfig(const WifiDeviceConfig &config
         return WIFI_OPT_STA_NOT_OPENED;
     }
 
-    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst();
+    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(m_instId);
     if (pService == nullptr) {
         return WIFI_OPT_STA_NOT_OPENED;
     }
@@ -611,7 +612,7 @@ ErrCode WifiDeviceServiceImpl::RemoveDevice(int networkId)
         return WIFI_OPT_INVALID_PARAM;
     }
 
-    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst();
+    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(m_instId);
     if (pService == nullptr) {
         return WIFI_OPT_STA_NOT_OPENED;
     }
@@ -638,7 +639,7 @@ ErrCode WifiDeviceServiceImpl::RemoveAllDevice()
         return WIFI_OPT_STA_NOT_OPENED;
     }
 
-    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst();
+    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(m_instId);
     if (pService == nullptr) {
         return WIFI_OPT_STA_NOT_OPENED;
     }
@@ -706,7 +707,7 @@ ErrCode WifiDeviceServiceImpl::EnableDeviceConfig(int networkId, bool attemptEna
         return WIFI_OPT_INVALID_PARAM;
     }
 
-    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst();
+    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(m_instId);
     if (pService == nullptr) {
         return WIFI_OPT_STA_NOT_OPENED;
     }
@@ -737,7 +738,7 @@ ErrCode WifiDeviceServiceImpl::DisableDeviceConfig(int networkId)
         return WIFI_OPT_INVALID_PARAM;
     }
 
-    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst();
+    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(m_instId);
     if (pService == nullptr) {
         return WIFI_OPT_STA_NOT_OPENED;
     }
@@ -772,7 +773,7 @@ ErrCode WifiDeviceServiceImpl::ConnectToNetwork(int networkId, bool isCandidate)
         return WIFI_OPT_INVALID_PARAM;
     }
 
-    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst();
+    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(m_instId);
     if (pService == nullptr) {
         WIFI_LOGE("ConnectToNetwork: pService is nullptr!");
         return WIFI_OPT_STA_NOT_OPENED;
@@ -786,7 +787,7 @@ ErrCode WifiDeviceServiceImpl::ConnectToNetwork(int networkId, bool isCandidate)
         }
         WifiSettings::GetInstance().SetDeviceState(networkId, static_cast<int>(WifiDeviceConfigStatus::ENABLED), false);
         WifiLinkedInfo linkedInfo;
-        WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
+        WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo, m_instId);
         if (linkedInfo.connState == ConnState::CONNECTING || linkedInfo.connState == ConnState::CONNECTED) {
             bool isSame = linkedInfo.networkId == networkId;
             WIFI_LOGE("ConnectToNetwork isCandidate isConnected isSame:%{public}s!", isSame ? "true" : "false");
@@ -839,7 +840,8 @@ ErrCode WifiDeviceServiceImpl::ConnectToDevice(const WifiDeviceConfig &config)
         macAddrInfo.bssid = config.bssid;
         macAddrInfo.bssidType = config.bssidType;
         std::string randomMacAddr =
-            WifiSettings::GetInstance().GetMacAddrPairs(WifiMacAddrInfoType::WIFI_SCANINFO_MACADDR_INFO, macAddrInfo);
+            WifiSettings::GetInstance().GetMacAddrPairs(WifiMacAddrInfoType::WIFI_SCANINFO_MACADDR_INFO,
+                macAddrInfo, m_instId);
         if (randomMacAddr.empty()) {
             WIFI_LOGW("%{public}s: record not found, bssid:%{private}s, bssidType:%{public}d",
                 __func__, macAddrInfo.bssid.c_str(), macAddrInfo.bssidType);
@@ -857,7 +859,7 @@ ErrCode WifiDeviceServiceImpl::ConnectToDevice(const WifiDeviceConfig &config)
     }
 #endif
 
-    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst();
+    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(m_instId);
     if (pService == nullptr) {
         WIFI_LOGE("ConnectToNetwork: pService is nullptr!");
         return WIFI_OPT_STA_NOT_OPENED;
@@ -874,7 +876,7 @@ ErrCode WifiDeviceServiceImpl::IsConnected(bool &isConnected)
         return WIFI_OPT_PERMISSION_DENIED;
     }
 
-    WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
+    WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo, m_instId);
     isConnected = (linkedInfo.connState == ConnState::CONNECTED);
     return WIFI_OPT_SUCCESS;
 }
@@ -899,7 +901,7 @@ ErrCode WifiDeviceServiceImpl::ReConnect()
         return WIFI_OPT_STA_NOT_OPENED;
     }
 
-    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst();
+    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(m_instId);
     if (pService == nullptr) {
         return WIFI_OPT_STA_NOT_OPENED;
     }
@@ -927,7 +929,7 @@ ErrCode WifiDeviceServiceImpl::ReAssociate(void)
         return WIFI_OPT_STA_NOT_OPENED;
     }
 
-    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst();
+    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(m_instId);
     if (pService == nullptr) {
         return WIFI_OPT_STA_NOT_OPENED;
     }
@@ -954,7 +956,7 @@ ErrCode WifiDeviceServiceImpl::Disconnect(void)
         return WIFI_OPT_STA_NOT_OPENED;
     }
 
-    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst();
+    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(m_instId);
     if (pService == nullptr) {
         return WIFI_OPT_STA_NOT_OPENED;
     }
@@ -972,7 +974,7 @@ ErrCode WifiDeviceServiceImpl::StartWps(const WpsConfig &config)
         return WIFI_OPT_STA_NOT_OPENED;
     }
 
-    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst();
+    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(m_instId);
     if (pService == nullptr) {
         return WIFI_OPT_STA_NOT_OPENED;
     }
@@ -990,7 +992,7 @@ ErrCode WifiDeviceServiceImpl::CancelWps(void)
         return WIFI_OPT_STA_NOT_OPENED;
     }
 
-    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst();
+    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(m_instId);
     if (pService == nullptr) {
         return WIFI_OPT_STA_NOT_OPENED;
     }
@@ -1015,7 +1017,7 @@ ErrCode WifiDeviceServiceImpl::GetWifiState(int &state)
         return WIFI_OPT_PERMISSION_DENIED;
     }
 
-    state = WifiConfigCenter::GetInstance().GetWifiState();
+    state = WifiConfigCenter::GetInstance().GetWifiState(m_instId);
     return WIFI_OPT_SUCCESS;
 }
 
@@ -1030,7 +1032,7 @@ ErrCode WifiDeviceServiceImpl::GetLinkedInfo(WifiLinkedInfo &info)
         return WIFI_OPT_STA_NOT_OPENED;
     }
 
-    WifiConfigCenter::GetInstance().GetLinkedInfo(info);
+    WifiConfigCenter::GetInstance().GetLinkedInfo(info, m_instId);
     if (WifiPermissionUtils::VerifyGetWifiLocalMacPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("GetLinkedInfo:VerifyGetWifiLocalMacPermission() PERMISSION_DENIED!");
         /* Clear mac addr */
@@ -1065,13 +1067,13 @@ ErrCode WifiDeviceServiceImpl::GetDisconnectedReason(DisconnectedReason &reason)
         return WIFI_OPT_STA_NOT_OPENED;
     }
     WifiLinkedInfo info;
-    WifiConfigCenter::GetInstance().GetLinkedInfo(info);
+    WifiConfigCenter::GetInstance().GetLinkedInfo(info, m_instId);
     WIFI_LOGI("%{public}s, connState=%{public}d, detailedState=%{public}d",
         __func__, info.connState, info.detailedState);
     if (info.connState == ConnState::CONNECTING || info.connState == ConnState::CONNECTED) {
         return WIFI_OPT_FAILED;
     }
-    WifiConfigCenter::GetInstance().GetDisconnectedReason(reason);
+    WifiConfigCenter::GetInstance().GetDisconnectedReason(reason, m_instId);
     return WIFI_OPT_SUCCESS;
 }
 
@@ -1082,7 +1084,7 @@ ErrCode WifiDeviceServiceImpl::GetIpInfo(IpInfo &info)
         return WIFI_OPT_PERMISSION_DENIED;
     }
 
-    WifiConfigCenter::GetInstance().GetIpInfo(info);
+    WifiConfigCenter::GetInstance().GetIpInfo(info, m_instId);
     return WIFI_OPT_SUCCESS;
 }
 
@@ -1093,7 +1095,7 @@ ErrCode WifiDeviceServiceImpl::GetIpv6Info(IpV6Info &info)
         return WIFI_OPT_PERMISSION_DENIED;
     }
 
-    WifiConfigCenter::GetInstance().GetIpv6Info(info);
+    WifiConfigCenter::GetInstance().GetIpv6Info(info, m_instId);
     return WIFI_OPT_SUCCESS;
 }
 
@@ -1150,7 +1152,7 @@ ErrCode WifiDeviceServiceImpl::RegisterCallBack(const sptr<IWifiDeviceCallBack> 
     }
 
     for (const auto &eventName : event) {
-        WifiInternalEventDispatcher::GetInstance().SetSingleStaCallback(callback, eventName);
+        WifiInternalEventDispatcher::GetInstance().SetSingleStaCallback(callback, eventName, m_instId);
     }
     return WIFI_OPT_SUCCESS;
 }
@@ -1248,7 +1250,7 @@ ErrCode WifiDeviceServiceImpl::CheckCanEnableWifi(void)
      * Check the interval between the last STA shutdown and the current STA
      * startup.
      */
-    double interval = WifiConfigCenter::GetInstance().GetWifiStaInterval();
+    double interval = WifiConfigCenter::GetInstance().GetWifiStaInterval(m_instId);
     if (interval <= REOPEN_STA_INTERVAL) {
         int waitMils = REOPEN_STA_INTERVAL - int(interval) + 1;
         WIFI_LOGI("open wifi too frequent, interval since last close is %{public}lf, and wait %{public}d ms",
@@ -1261,7 +1263,7 @@ ErrCode WifiDeviceServiceImpl::CheckCanEnableWifi(void)
 
 bool WifiDeviceServiceImpl::IsStaServiceRunning()
 {
-    WifiOprMidState curState = WifiConfigCenter::GetInstance().GetWifiMidState();
+    WifiOprMidState curState = WifiConfigCenter::GetInstance().GetWifiMidState(m_instId);
     if (curState != WifiOprMidState::RUNNING) {
         WIFI_LOGW("current wifi state is %{public}d", static_cast<int>(curState));
         return false;
@@ -1271,7 +1273,7 @@ bool WifiDeviceServiceImpl::IsStaServiceRunning()
 
 bool WifiDeviceServiceImpl::IsScanServiceRunning()
 {
-    WifiOprMidState curState = WifiConfigCenter::GetInstance().GetScanMidState();
+    WifiOprMidState curState = WifiConfigCenter::GetInstance().GetScanMidState(m_instId);
     if (curState != WifiOprMidState::RUNNING) {
         WIFI_LOGW("scan service does not started!");
         return false;
@@ -1518,21 +1520,23 @@ void AppEventSubscriber::OnReceiveEvent(const OHOS::EventFwk::CommonEventData &d
             return;
         }
         WIFI_LOGI("Package removed of uid %{public}d.", uid);
-        IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst();
-        if (pService == nullptr) {
-            WIFI_LOGI("Sta service not opend!");
-            std::vector<WifiDeviceConfig> tempConfigs;
-            WifiSettings::GetInstance().GetAllCandidateConfig(uid, tempConfigs);
-            for (const auto &config : tempConfigs) {
-                if (WifiSettings::GetInstance().RemoveDevice(config.networkId) != WIFI_OPT_SUCCESS) {
-                    WIFI_LOGE("RemoveAllCandidateConfig-RemoveDevice() failed!");
+        for (int i = 0; i < STA_INSTANCE_MAX_NUM; ++i) {
+            IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(i);
+            if (pService == nullptr) {
+                WIFI_LOGI("Sta service not opend!");
+                std::vector<WifiDeviceConfig> tempConfigs;
+                WifiSettings::GetInstance().GetAllCandidateConfig(uid, tempConfigs);
+                for (const auto &config : tempConfigs) {
+                    if (WifiSettings::GetInstance().RemoveDevice(config.networkId) != WIFI_OPT_SUCCESS) {
+                        WIFI_LOGE("RemoveAllCandidateConfig-RemoveDevice() failed!");
+                    }
                 }
+                WifiSettings::GetInstance().SyncDeviceConfig();
+                return;
             }
-            WifiSettings::GetInstance().SyncDeviceConfig();
-            return;
-        }
-        if (pService->RemoveAllCandidateConfig(uid) != WIFI_OPT_SUCCESS) {
-            WIFI_LOGE("RemoveAllCandidateConfig failed");
+            if (pService->RemoveAllCandidateConfig(uid) != WIFI_OPT_SUCCESS) {
+                WIFI_LOGE("RemoveAllCandidateConfig failed");
+            }
         }
     }
 }

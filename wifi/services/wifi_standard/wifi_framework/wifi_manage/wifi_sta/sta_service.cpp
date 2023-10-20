@@ -33,8 +33,8 @@ namespace OHOS {
 namespace Wifi {
 const std::string CLASS_NAME = "sta_service";
 
-StaService::StaService()
-    : pStaStateMachine(nullptr), pStaMonitor(nullptr), pStaAutoConnectService(nullptr)
+StaService::StaService(int instId)
+    : pStaStateMachine(nullptr), pStaMonitor(nullptr), pStaAutoConnectService(nullptr), m_instId(instId)
 {}
 
 StaService::~StaService()
@@ -60,7 +60,7 @@ StaService::~StaService()
 ErrCode StaService::InitStaService(const std::vector<StaServiceCallback> &callbacks)
 {
     WIFI_LOGI("Enter InitStaService.\n");
-    pStaStateMachine = new (std::nothrow) StaStateMachine();
+    pStaStateMachine = new (std::nothrow) StaStateMachine(m_instId);
     if (pStaStateMachine == nullptr) {
         WIFI_LOGE("Alloc pStaStateMachine failed.\n");
         return WIFI_OPT_FAILED;
@@ -73,7 +73,7 @@ ErrCode StaService::InitStaService(const std::vector<StaServiceCallback> &callba
 
     RegisterStaServiceCallback(callbacks);
 
-    pStaMonitor = new (std::nothrow) StaMonitor();
+    pStaMonitor = new (std::nothrow) StaMonitor(m_instId);
     if (pStaMonitor == nullptr) {
         WIFI_LOGE("Alloc pStaMonitor failed.\n");
         return WIFI_OPT_FAILED;
@@ -95,13 +95,13 @@ ErrCode StaService::InitStaService(const std::vector<StaServiceCallback> &callba
         WifiErrorNo ret = WifiStaHalInterface::GetInstance().GetSupportFrequencies(band, freqs2G);
         if (ret != WIFI_IDL_OPT_OK) {
             WIFI_LOGE("get 2g frequencies failed.");
-            WifiSettings::GetInstance().SetDefaultFrequenciesByCountryBand(BandType::BAND_2GHZ, freqs2G);
+            WifiSettings::GetInstance().SetDefaultFrequenciesByCountryBand(BandType::BAND_2GHZ, freqs2G, m_instId);
         }
         band = static_cast<int>(BandType::BAND_5GHZ);
         ret = WifiStaHalInterface::GetInstance().GetSupportFrequencies(band, freqs5G);
         if (ret != WIFI_IDL_OPT_OK) {
             WIFI_LOGE("get 5g frequencies failed.");
-            WifiSettings::GetInstance().SetDefaultFrequenciesByCountryBand(BandType::BAND_5GHZ, freqs5G);
+            WifiSettings::GetInstance().SetDefaultFrequenciesByCountryBand(BandType::BAND_5GHZ, freqs5G, m_instId);
         }
         std::vector<int32_t> supp2Gfreqs(freqs2G.begin(), freqs2G.end());
         std::vector<int32_t> supp5Gfreqs(freqs5G.begin(), freqs5G.end());
@@ -124,7 +124,7 @@ ErrCode StaService::InitStaService(const std::vector<StaServiceCallback> &callba
         }
     }
 
-    pStaAutoConnectService = new (std::nothrow) StaAutoConnectService(pStaStateMachine);
+    pStaAutoConnectService = new (std::nothrow) StaAutoConnectService(pStaStateMachine, m_instId);
     if (pStaAutoConnectService == nullptr) {
         WIFI_LOGE("Alloc pStaAutoConnectService failed.\n");
         return WIFI_OPT_FAILED;
@@ -257,6 +257,7 @@ int StaService::AddDeviceConfig(const WifiDeviceConfig &config) const
         LOGI("AddDeviceConfig alloc new id[%{public}d] succeed!", netWorkId);
     }
     tempDeviceConfig = config;
+    tempDeviceConfig.instanceId = m_instId;
     tempDeviceConfig.networkId = netWorkId;
     tempDeviceConfig.status = status;
     tempDeviceConfig.userSelectBssid = userSelectbssid;
@@ -422,7 +423,7 @@ ErrCode StaService::Disconnect() const
     CHECK_NULL_AND_RETURN(pStaAutoConnectService, WIFI_OPT_FAILED);
     CHECK_NULL_AND_RETURN(pStaStateMachine, WIFI_OPT_FAILED);
     WifiLinkedInfo linkedInfo;
-    WifiSettings::GetInstance().GetLinkedInfo(linkedInfo);
+    WifiSettings::GetInstance().GetLinkedInfo(linkedInfo, m_instId);
     if (pStaAutoConnectService->EnableOrDisableBssid(linkedInfo.bssid, false, AP_CANNOT_HANDLE_NEW_STA)) {
         WIFI_LOGI("The blocklist is updated.\n");
     }
@@ -496,6 +497,7 @@ void StaService::NotifyDeviceConfigChange(ConfigChange value) const
     WifiEventCallbackMsg cbMsg;
     cbMsg.msgCode = WIFI_CBK_MSG_DEVICE_CONFIG_CHANGE;
     cbMsg.msgData = static_cast<int>(value);
+    cbMsg.id = m_instId;
     WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
 #endif
 }

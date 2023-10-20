@@ -22,6 +22,7 @@ namespace OHOS {
 namespace Wifi {
 static void ClearWifiDeviceConfig(WifiDeviceConfig &item)
 {
+    item.instanceId = 0;
     item.networkId = 0;
     item.status = 0;
     item.bssid.clear();
@@ -127,7 +128,10 @@ static int SetWifiDeviceConfigFirst(WifiDeviceConfig &item, const std::string &k
     if (SetWifiDeviceConfigOutDated(item, key, value) == 0) {
         return 0;
     }
-    if (key == "networkId") {
+
+    if (key == "instanceId") {
+        item.instanceId = std::stoi(value);
+    } else if (key == "networkId") {
         item.networkId = std::stoi(value);
     } else if (key == "status") {
         item.status = std::stoi(value);
@@ -436,6 +440,7 @@ static std::string OutPutWifiDeviceConfig(WifiDeviceConfig &item)
 {
     std::ostringstream ss;
     ss << "    " <<"<WifiDeviceConfig>" << std::endl;
+    ss << "    " <<"instanceId=" << item.instanceId << std::endl;
     ss << "    " <<"uid=" << item.uid << std::endl;
     ss << "    " <<"status=" << item.status << std::endl;
     ss << "    " <<"bssid=" << item.bssid << std::endl;

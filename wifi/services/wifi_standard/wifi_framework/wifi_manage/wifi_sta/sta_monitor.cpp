@@ -24,7 +24,7 @@ DEFINE_WIFILOG_LABEL("StaMonitor");
 
 namespace OHOS {
 namespace Wifi {
-StaMonitor::StaMonitor() : pStaStateMachine(nullptr)
+StaMonitor::StaMonitor(int instId) : pStaStateMachine(nullptr), m_instId(instId)
 {}
 
 StaMonitor::~StaMonitor()

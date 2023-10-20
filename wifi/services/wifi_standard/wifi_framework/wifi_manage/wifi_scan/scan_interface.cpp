@@ -19,7 +19,7 @@ DEFINE_WIFILOG_SCAN_LABEL("ScanInterface");
 
 namespace OHOS {
 namespace Wifi {
-ScanInterface::ScanInterface() : pScanService(nullptr)
+ScanInterface::ScanInterface(int instId) : pScanService(nullptr), m_instId(instId)
 {}
 
 ScanInterface::~ScanInterface()
@@ -32,9 +32,9 @@ ScanInterface::~ScanInterface()
     }
 }
 
-extern "C" IScanService *Create(void)
+extern "C" IScanService *Create(int instId = 0)
 {
-    return new ScanInterface();
+    return new ScanInterface(instId);
 }
 extern "C" void Destroy(ScanInterface *scanInterface)
 {
@@ -47,17 +47,19 @@ ErrCode ScanInterface::Init()
     WIFI_LOGI("Enter ScanInterface::Init.\n");
 
     std::lock_guard<std::mutex> lock(mutex);
-    pScanService = new (std::nothrow)ScanService();
     if (pScanService == nullptr) {
-        WIFI_LOGE("New ScanService failed.\n");
-        return WIFI_OPT_INVALID_PARAM;
-    }
+        pScanService = new (std::nothrow)ScanService(m_instId);
+        if (pScanService == nullptr) {
+            WIFI_LOGE("New ScanService failed.\n");
+            return WIFI_OPT_INVALID_PARAM;
+        }
 
-    if (!(pScanService->InitScanService(mScanSerivceCallbacks))) {
-        WIFI_LOGE("InitScanService failed.\n");
-        delete pScanService;
-        pScanService = nullptr;
-        return WIFI_OPT_INVALID_PARAM;
+        if (!(pScanService->InitScanService(mScanSerivceCallbacks))) {
+            WIFI_LOGE("InitScanService failed.\n");
+            delete pScanService;
+            pScanService = nullptr;
+            return WIFI_OPT_INVALID_PARAM;
+        }
     }
 
     return WIFI_OPT_SUCCESS;

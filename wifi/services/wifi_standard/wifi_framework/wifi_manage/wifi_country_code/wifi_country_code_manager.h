@@ -156,8 +156,8 @@ private:
     void SendCountryCodeChangeCommonEvent(const std::string &wifiCountryCode);
     ErrCode UpdateWifiCountryCode(const std::string &externalCode = "");
 #ifdef FEATURE_STA_SUPPORT
-    static void DealStaOpenRes(OperateResState state);
-    static void DealStaConnChanged(OperateResState state, const WifiLinkedInfo &info);
+    static void DealStaOpenRes(OperateResState state, int instId = 0);
+    static void DealStaConnChanged(OperateResState state, const WifiLinkedInfo &info, int instId = 0);
 #endif
 #ifdef FEATURE_AP_SUPPORT
     static void DealApStateChanged(ApState state, int id = 0);

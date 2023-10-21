@@ -294,9 +294,9 @@ bool WifiConfigCenter::SetScanMidState(WifiOprMidState expState, WifiOprMidState
 void WifiConfigCenter::SetScanMidState(WifiOprMidState state, int instId)
 {
     std::unique_lock<std::mutex> lock(mScanMutex);
-    auto ret = mApMidState.emplace(instId, state);
+    auto ret = mScanMidState.emplace(instId, state);
     if (!ret.second) {
-        mApMidState[instId] = state;
+        mScanMidState[instId] = state;
     }
 }
 

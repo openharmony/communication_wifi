@@ -79,6 +79,7 @@ void ArpChecker::Stop()
 
 bool ArpChecker::DoArpCheck(int timeoutMillis, bool isFillSenderIp)
 {
+    LOGI("Enter DoArpCheck");
     if (!socketCreated) {
         LOGE("ArpChecker DoArpCheck failed, socket not created");
         return false;

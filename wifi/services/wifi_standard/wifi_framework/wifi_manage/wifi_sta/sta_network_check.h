@@ -43,7 +43,7 @@ namespace Wifi {
 class StaNetworkCheck {
     FRIEND_GTEST(StaNetworkCheck);
 public:
-    explicit StaNetworkCheck(NetStateHandler nethandle, ArpStateHandler arpHandle, DnsStateHandler dnsHandle);
+    StaNetworkCheck(NetStateHandler nethandle, ArpStateHandler arpHandle, DnsStateHandler dnsHandle, int instId = 0);
     virtual ~StaNetworkCheck();
     /**
      * @Description : Start NetCheck thread
@@ -117,10 +117,10 @@ private:
     ArpChecker arpChecker;
     DnsChecker dnsChecker;
     std::chrono::steady_clock::time_point lastArpDnsCheckTime;
-    std::chrono::steady_clock::time_point lastHttpCheckTime;
     WifiPortalConf mUrlInfo;
     StaNetState bakNetState;
     StaNetState mainNetState;
+    int m_instId;
 };
 }  // namespace Wifi
 }  // namespace OHOS

@@ -26,7 +26,7 @@ public:
      * @Description : Construct a new Sta Monitor object.
      *
      */
-    StaMonitor();
+    explicit StaMonitor(int instId = 0);
 
     /**
      * @Description Destroy the Sta Monitor object.
@@ -114,6 +114,7 @@ public:
 
 private:
     StaStateMachine *pStaStateMachine;
+    int m_instId;
 };
 }  // namespace Wifi
 }  // namespace OHOS

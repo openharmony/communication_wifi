@@ -80,10 +80,12 @@ public:
     static void Run(WifiInternalEventDispatcher &instance);
 
     static WifiInternalEventDispatcher &GetInstance();
-    int SetSingleStaCallback(const std::shared_ptr<IWifiDeviceCallBack> &callback, const std::string &eventName);
+    int SetSingleStaCallback(const std::shared_ptr<IWifiDeviceCallBack> &callback, const std::string &eventName,
+        int instId = 0);
     std::shared_ptr<IWifiDeviceCallBack> GetSingleStaCallback() const;
     std::unordered_set<int>& GetStaSingleCallbackEvent();
-    int SetSingleScanCallback(const std::shared_ptr<IWifiScanCallback> &callback, const std::string &eventName);
+    int SetSingleScanCallback(const std::shared_ptr<IWifiScanCallback> &callback, const std::string &eventName,
+        int instId = 0);
     std::shared_ptr<IWifiScanCallback> GetSingleScanCallback() const;
     std::unordered_set<int>& GetScanSingleCallbackEvent();
 private:

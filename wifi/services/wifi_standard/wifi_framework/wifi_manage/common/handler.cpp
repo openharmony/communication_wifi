@@ -140,7 +140,7 @@ void Handler::MessageExecutedLater(InternalMessage *msg, int64_t delayTimeMs)
         MessageManage::GetInstance().ReclaimMsg(msg);
         return;
     }
-    
+
     int64_t nowTime = static_cast<int64_t>(curTime.tv_sec) * USEC_1000 +
         curTime.tv_nsec / (USEC_1000 * USEC_1000);
 

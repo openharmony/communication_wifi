@@ -168,7 +168,7 @@ ErrCode WifiCountryCodeManager::UnregisterWifiCountryCodeChangeListener(
     return WIFI_OPT_FAILED;
 }
 
-void WifiCountryCodeManager::DealStaOpenRes(OperateResState state)
+void WifiCountryCodeManager::DealStaOpenRes(OperateResState state, int instId)
 {
     WIFI_LOGI("wifi open, state=%{public}d", state);
     if (state == OperateResState::OPEN_WIFI_SUCCEED) {
@@ -176,7 +176,7 @@ void WifiCountryCodeManager::DealStaOpenRes(OperateResState state)
     }
 }
 
-void WifiCountryCodeManager::DealStaConnChanged(OperateResState state, const WifiLinkedInfo &info)
+void WifiCountryCodeManager::DealStaConnChanged(OperateResState state, const WifiLinkedInfo &info, int instId)
 {
     WIFI_LOGI("wifi connection state change, state=%{public}d", state);
     if (state == OperateResState::CONNECT_AP_CONNECTED || state == OperateResState::DISCONNECT_DISCONNECTING) {

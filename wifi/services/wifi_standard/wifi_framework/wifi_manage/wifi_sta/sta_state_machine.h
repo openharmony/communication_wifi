@@ -84,12 +84,12 @@ constexpr int BLOCK_LIST_CLEAR_TIMER = 20 * 1000;
 /* Signal levels are classified into: 0 1 2 3 4 ,the max is 4. */
 constexpr int MAX_LEVEL = 4;
 const std::string WPA_BSSID_ANY = "any";
-const std::string IF_NAME = "wlan0";
+const std::string IF_NAME = "wlan";
 
 class StaStateMachine : public StateMachine {
     FRIEND_GTEST(StaStateMachine);
 public:
-    StaStateMachine();
+    explicit StaStateMachine(int instId = 0);
     ~StaStateMachine();
     using staSmHandleFunc = void (StaStateMachine::*)(InternalMessage *msg);
     using StaSmHandleFuncMap = std::map<int, staSmHandleFunc>;
@@ -427,6 +427,8 @@ public:
      *
      */
     void HandlePortalNetworkPorcess();
+
+    int GetInstanceId();
 private:
     /**
      * @Description  Destruct state.
@@ -816,6 +818,7 @@ private:
     LinkedState *pLinkedState;
     ApRoamingState *pApRoamingState;
     std::string mPortalUrl;
+    int m_instId;
     /**
      * @Description Replace empty dns
      */

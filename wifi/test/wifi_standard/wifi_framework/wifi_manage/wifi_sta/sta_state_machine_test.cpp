@@ -75,9 +75,9 @@ public:
 
     void DealConnectTimeOutCmd()
     {
-        EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_)).WillRepeatedly(Return(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_, _)).WillRepeatedly(Return(0));
         EXPECT_CALL(WifiStaHalInterface::GetInstance(), DisableNetwork(_)).WillRepeatedly(Return(WIFI_IDL_OPT_FAILED));
-        EXPECT_CALL(WifiManager::GetInstance(), DealStaConnChanged(_, _)).Times(testing::AtLeast(1));
+        EXPECT_CALL(WifiManager::GetInstance(), DealStaConnChanged(_, _, _)).Times(testing::AtLeast(1));
         InternalMessage msg;
         pStaStateMachine->DealConnectTimeOutCmd(&msg);
     }
@@ -115,15 +115,15 @@ public:
 
     void InitStateExeMsgSuccess()
     {
-        EXPECT_CALL(WifiSettings::GetInstance(), SetWifiState(_)).WillRepeatedly(Return(WIFI_IDL_OPT_OK));
+        EXPECT_CALL(WifiSettings::GetInstance(), SetWifiState(_, _)).WillRepeatedly(Return(WIFI_IDL_OPT_OK));
         EXPECT_CALL(WifiStaHalInterface::GetInstance(), StartWifi()).WillRepeatedly(Return(WIFI_IDL_OPT_OK));
         EXPECT_CALL(WifiStaHalInterface::GetInstance(), WpaAutoConnect(_)).WillRepeatedly(Return(WIFI_IDL_OPT_OK));
         EXPECT_CALL(WifiStaHalInterface::GetInstance(), ClearDeviceConfig()).WillRepeatedly(Return(WIFI_IDL_OPT_OK));
-        EXPECT_CALL(WifiManager::GetInstance(), DealStaOpenRes(_)).Times(testing::AtLeast(0));
-        EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_)).Times(testing::AtLeast(0));
+        EXPECT_CALL(WifiManager::GetInstance(), DealStaOpenRes(_, _)).Times(testing::AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_, _)).Times(testing::AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), ReloadDeviceConfig()).Times(testing::AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_)).Times(testing::AtLeast(0));
-        EXPECT_CALL(WifiSettings::GetInstance(), SetMacAddress(_)).Times(testing::AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), SetMacAddress(_, _)).Times(testing::AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), SetRealMacAddress(_)).Times(testing::AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), GetRealMacAddress(_)).Times(testing::AtLeast(0));
         InternalMessage msg;
@@ -186,12 +186,12 @@ public:
     void StartWifiProcessSuccess()
     {
         EXPECT_CALL(WifiStaHalInterface::GetInstance(), StartWifi()).WillRepeatedly(Return(WIFI_IDL_OPT_OK));
-        EXPECT_CALL(WifiManager::GetInstance(), DealStaOpenRes(_)).Times(testing::AtLeast(1));
+        EXPECT_CALL(WifiManager::GetInstance(), DealStaOpenRes(_, _)).Times(testing::AtLeast(1));
         EXPECT_CALL(WifiStaHalInterface::GetInstance(), WpaAutoConnect(_)).WillRepeatedly(Return(WIFI_IDL_OPT_OK));
         EXPECT_CALL(WifiStaHalInterface::GetInstance(), ClearDeviceConfig()).WillRepeatedly(Return(WIFI_IDL_OPT_OK));
-        EXPECT_CALL(WifiSettings::GetInstance(), SetMacAddress(_)).Times(testing::AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), SetMacAddress(_, _)).Times(testing::AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), ReloadDeviceConfig()).WillRepeatedly(Return(0));
-        EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_)).WillRepeatedly(Return(WIFI_IDL_OPT_OK));
+        EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_, _)).WillRepeatedly(Return(WIFI_IDL_OPT_OK));
         EXPECT_CALL(WifiSettings::GetInstance(), GetRealMacAddress(_)).Times(testing::AtLeast(0));
         WifiDeviceConfig wifiDeviceConfig;
         std::vector<WifiDeviceConfig> results;
@@ -204,7 +204,7 @@ public:
         EXPECT_CALL(WifiSettings::GetInstance(), SetRealMacAddress(_)).Times(testing::AtLeast(0));
         EXPECT_CALL(WifiStaHalInterface::GetInstance(), SetDeviceConfig(_, _)).WillRepeatedly(Return(WIFI_IDL_OPT_OK));
         EXPECT_CALL(WifiStaHalInterface::GetInstance(), SaveDeviceConfig()).WillRepeatedly(Return(WIFI_IDL_OPT_OK));
-        EXPECT_CALL(WifiSettings::GetInstance(), SetWifiState(_)).Times(testing::AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), SetWifiState(_, _)).Times(testing::AtLeast(0));
         pStaStateMachine->StartWifiProcess();
     }
 
@@ -212,23 +212,23 @@ public:
     {
         EXPECT_CALL(WifiStaHalInterface::GetInstance(), StartWifi()).WillRepeatedly(Return(WIFI_IDL_OPT_OK));
         EXPECT_CALL(WifiStaHalInterface::GetInstance(), WpaAutoConnect(_)).WillRepeatedly(Return(WIFI_IDL_OPT_FAILED));
-        EXPECT_CALL(WifiManager::GetInstance(), DealStaOpenRes(_)).Times(testing::AtLeast(1));
+        EXPECT_CALL(WifiManager::GetInstance(), DealStaOpenRes(_, _)).Times(testing::AtLeast(1));
         EXPECT_CALL(WifiSettings::GetInstance(), SetRealMacAddress(_)).Times(testing::AtLeast(0));
-        EXPECT_CALL(WifiSettings::GetInstance(), SetWifiState(_)).Times(testing::AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), SetWifiState(_, _)).Times(testing::AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), GetRealMacAddress(_)).Times(testing::AtLeast(0));
-        EXPECT_CALL(WifiSettings::GetInstance(), SetMacAddress(_)).Times(testing::AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), SetMacAddress(_, _)).Times(testing::AtLeast(0));
         pStaStateMachine->StartWifiProcess();
     }
 
     void StartWifiProcessFail1()
     {
         EXPECT_CALL(WifiStaHalInterface::GetInstance(), StartWifi()).WillRepeatedly(Return(WIFI_IDL_OPT_FAILED));
-        EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_)).WillRepeatedly(Return(WIFI_IDL_OPT_OK));
+        EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_, _)).WillRepeatedly(Return(WIFI_IDL_OPT_OK));
         EXPECT_CALL(WifiStaHalInterface::GetInstance(), WpaAutoConnect(_)).WillRepeatedly(Return(WIFI_IDL_OPT_OK));
-        EXPECT_CALL(WifiManager::GetInstance(), DealStaOpenRes(_)).Times(testing::AtLeast(0));
+        EXPECT_CALL(WifiManager::GetInstance(), DealStaOpenRes(_, _)).Times(testing::AtLeast(0));
         EXPECT_CALL(WifiStaHalInterface::GetInstance(), ClearDeviceConfig()).WillRepeatedly(Return(WIFI_IDL_OPT_OK));
         EXPECT_CALL(WifiSettings::GetInstance(), ReloadDeviceConfig()).WillRepeatedly(Return(0));
-        EXPECT_CALL(WifiSettings::GetInstance(), SetMacAddress(_)).Times(testing::AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), SetMacAddress(_, _)).Times(testing::AtLeast(0));
         WifiDeviceConfig wifiDeviceConfig;
         std::vector<WifiDeviceConfig> results;
         wifiDeviceConfig.networkId = 1;
@@ -240,7 +240,7 @@ public:
         EXPECT_CALL(WifiStaHalInterface::GetInstance(), ClearDeviceConfig()).WillRepeatedly(Return(WIFI_IDL_OPT_OK));
         EXPECT_CALL(WifiStaHalInterface::GetInstance(), SetDeviceConfig(_, _)).WillRepeatedly(Return(WIFI_IDL_OPT_OK));
         EXPECT_CALL(WifiStaHalInterface::GetInstance(), SaveDeviceConfig()).WillRepeatedly(Return(WIFI_IDL_OPT_OK));
-        EXPECT_CALL(WifiSettings::GetInstance(), SetWifiState(_)).Times(testing::AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), SetWifiState(_, _)).Times(testing::AtLeast(0));
         pStaStateMachine->StartWifiProcess();
     }
 
@@ -249,7 +249,7 @@ public:
         pStaStateMachine->pWpaStartingState->InitWpsSettings();
         pStaStateMachine->pWpaStartingState->GoInState();
         pStaStateMachine->pWpaStartingState->GoOutState();
-        EXPECT_CALL(WifiSettings::GetInstance(), SetWifiState(_)).Times(testing::AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), SetWifiState(_, _)).Times(testing::AtLeast(0));
         InternalMessage msg;
         msg.SetMessageName(WIFI_SVR_CMD_STA_SUP_CONNECTION_EVENT);
         EXPECT_TRUE(pStaStateMachine->pWpaStartingState->ExecuteStateMsg(&msg));
@@ -269,7 +269,7 @@ public:
 
     void WpaStartedStateGoInStateSuccess1()
     {
-        EXPECT_CALL(WifiSettings::GetInstance(), SetWifiState(_)).Times(testing::AtLeast(1));
+        EXPECT_CALL(WifiSettings::GetInstance(), SetWifiState(_, _)).Times(testing::AtLeast(1));
         pStaStateMachine->operationalMode = STA_CONNECT_MODE;
         pStaStateMachine->pWpaStartedState->GoInState();
     }
@@ -287,13 +287,13 @@ public:
 
     void WpaStartedStateExeMsgSuccess()
     {
-        EXPECT_CALL(WifiManager::GetInstance(), DealStaCloseRes(_)).Times(testing::AtLeast(0));
-        EXPECT_CALL(WifiSettings::GetInstance(), SetMacAddress(_)).Times(testing::AtLeast(0));
-        EXPECT_CALL(WifiSettings::GetInstance(), SaveIpInfo(_)).Times(testing::AtLeast(0));
-        EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_)).Times(testing::AtLeast(0));
+        EXPECT_CALL(WifiManager::GetInstance(), DealStaCloseRes(_, _)).Times(testing::AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), SetMacAddress(_, _)).Times(testing::AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), SaveIpInfo(_, _)).Times(testing::AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_, _)).Times(testing::AtLeast(0));
         EXPECT_CALL(IfConfig::GetInstance(), FlushIpAddr(_, _)).Times(AtLeast(0));
         EXPECT_CALL(WifiStaHalInterface::GetInstance(), StopWifi()).WillRepeatedly(Return(WIFI_IDL_OPT_OK));
-        EXPECT_CALL(WifiSettings::GetInstance(), SaveIpV6Info(_)).Times(testing::AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), SaveIpV6Info(_, _)).Times(testing::AtLeast(0));
         InternalMessage msg;
         msg.SetMessageName(WIFI_SVR_CMD_STA_DISABLE_WIFI);
         EXPECT_TRUE(pStaStateMachine->pWpaStartedState->ExecuteStateMsg(&msg));
@@ -314,36 +314,36 @@ public:
     void StopWifiProcessSuccess1()
     {
         pStaStateMachine->currentTpType = IPTYPE_IPV4;
-        EXPECT_CALL(WifiManager::GetInstance(), DealStaCloseRes(_)).Times(AtLeast(0));
-        EXPECT_CALL(WifiSettings::GetInstance(), SetMacAddress(_)).Times(testing::AtLeast(0));
-        EXPECT_CALL(WifiSettings::GetInstance(), SaveIpInfo(_));
-        EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_)).Times(testing::AtLeast(0));
+        EXPECT_CALL(WifiManager::GetInstance(), DealStaCloseRes(_, _)).Times(AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), SetMacAddress(_, _)).Times(testing::AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), SaveIpInfo(_, _));
+        EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_, _)).Times(testing::AtLeast(0));
         EXPECT_CALL(WifiStaHalInterface::GetInstance(), StopWifi()).WillRepeatedly(Return(WIFI_IDL_OPT_OK));
-        EXPECT_CALL(WifiSettings::GetInstance(), SaveIpV6Info(_)).Times(testing::AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), SaveIpV6Info(_, _)).Times(testing::AtLeast(0));
         pStaStateMachine->StopWifiProcess();
     }
 
     void StopWifiProcessSuccess2()
     {
         pStaStateMachine->currentTpType = IPTYPE_IPV6;
-        EXPECT_CALL(WifiManager::GetInstance(), DealStaCloseRes(_)).Times(AtLeast(0));
-        EXPECT_CALL(WifiSettings::GetInstance(), SetMacAddress(_)).Times(testing::AtLeast(0));
-        EXPECT_CALL(WifiSettings::GetInstance(), SaveIpInfo(_));
-        EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_)).Times(testing::AtLeast(0));
+        EXPECT_CALL(WifiManager::GetInstance(), DealStaCloseRes(_, _)).Times(AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), SetMacAddress(_, _)).Times(testing::AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), SaveIpInfo(_, _));
+        EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_, _)).Times(testing::AtLeast(0));
         EXPECT_CALL(WifiStaHalInterface::GetInstance(), StopWifi()).WillRepeatedly(Return(WIFI_IDL_OPT_OK));
-        EXPECT_CALL(WifiSettings::GetInstance(), SaveIpV6Info(_)).Times(testing::AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), SaveIpV6Info(_, _)).Times(testing::AtLeast(0));
         pStaStateMachine->StopWifiProcess();
     }
 
     void StopWifiProcessFail()
     {
         pStaStateMachine->currentTpType = IPTYPE_IPV6;
-        EXPECT_CALL(WifiManager::GetInstance(), DealStaCloseRes(_)).Times(AtLeast(0));
-        EXPECT_CALL(WifiSettings::GetInstance(), SetMacAddress(_)).Times(testing::AtLeast(0));
-        EXPECT_CALL(WifiSettings::GetInstance(), SaveIpInfo(_));
-        EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_)).Times(testing::AtLeast(0));
+        EXPECT_CALL(WifiManager::GetInstance(), DealStaCloseRes(_, _)).Times(AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), SetMacAddress(_, _)).Times(testing::AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), SaveIpInfo(_, _));
+        EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_, _)).Times(testing::AtLeast(0));
         EXPECT_CALL(WifiStaHalInterface::GetInstance(), StopWifi()).WillRepeatedly(Return(WIFI_IDL_OPT_FAILED));
-        EXPECT_CALL(WifiSettings::GetInstance(), SaveIpV6Info(_)).Times(testing::AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), SaveIpV6Info(_, _)).Times(testing::AtLeast(0));
         pStaStateMachine->StopWifiProcess();
     }
 
@@ -375,17 +375,17 @@ public:
 
     void DealConnectToUserSelectedNetworkSuccess()
     {
-        EXPECT_CALL(WifiSettings::GetInstance(), EnableNetwork(_, _)).Times(AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), EnableNetwork(_, _, _)).Times(AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), SetDeviceState(_, _, _)).Times(AtLeast(0));
-        EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_)).Times(testing::AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_, _)).Times(testing::AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), SetDeviceAfterConnect(_)).Times(AtLeast(0));
         EXPECT_CALL(WifiStaHalInterface::GetInstance(), EnableNetwork(_)).WillRepeatedly(Return(WIFI_IDL_OPT_OK));
         EXPECT_CALL(WifiStaHalInterface::GetInstance(), Connect(_)).WillRepeatedly(Return(WIFI_IDL_OPT_OK));
         EXPECT_CALL(WifiStaHalInterface::GetInstance(), SaveDeviceConfig()).WillRepeatedly(Return(WIFI_IDL_OPT_OK));
-        EXPECT_CALL(WifiSettings::GetInstance(), GetScanInfoList(_)).Times(AtLeast(0));
-        EXPECT_CALL(WifiManager::GetInstance(), DealStaConnChanged(_, _)).Times(AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), GetScanInfoList(_, _)).Times(AtLeast(0));
+        EXPECT_CALL(WifiManager::GetInstance(), DealStaConnChanged(_, _, _)).Times(AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _)).Times(AtLeast(0));
-        EXPECT_CALL(WifiSettings::GetInstance(), SetWifiState(_)).Times(testing::AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), SetWifiState(_, _)).Times(testing::AtLeast(0));
         InternalMessage msg;
         msg.SetParam1(-1);
         msg.SetParam2(0);
@@ -404,9 +404,9 @@ public:
         pStaStateMachine->linkedInfo.networkId = 1;
         pStaStateMachine->linkedInfo.connState = ConnState::CONNECTING;
         pStaStateMachine->linkedInfo.detailedState = DetailedState::OBTAINING_IPADDR;
-        EXPECT_CALL(WifiSettings::GetInstance(), EnableNetwork(_, _)).Times(AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), EnableNetwork(_, _, _)).Times(AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), SetDeviceState(_, _, _)).Times(AtLeast(0));
-        EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_)).Times(testing::AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_, _)).Times(testing::AtLeast(0));
         pStaStateMachine->DealConnectToUserSelectedNetwork(&msg);
         pStaStateMachine->DealConnectToUserSelectedNetwork(nullptr);
     }
@@ -432,9 +432,9 @@ public:
         pStaStateMachine->linkedInfo.networkId = 1;
         pStaStateMachine->linkedInfo.connState = ConnState::CONNECTING;
         pStaStateMachine->linkedInfo.detailedState = DetailedState::NOTWORKING;
-        EXPECT_CALL(WifiSettings::GetInstance(), EnableNetwork(_, _)).Times(AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), EnableNetwork(_, _, _)).Times(AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), SetDeviceState(_, _, _)).Times(AtLeast(0));
-        EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_)).Times(testing::AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_, _)).Times(testing::AtLeast(0));
         pStaStateMachine->DealConnectToUserSelectedNetwork(&msg);
     }
 
@@ -442,15 +442,15 @@ public:
     {
         InternalMessage msg;
         EXPECT_CALL(WifiStaHalInterface::GetInstance(), DisableNetwork(_)).WillRepeatedly(Return(WIFI_IDL_OPT_FAILED));
-        EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_)).Times(testing::AtLeast(0));
-        EXPECT_CALL(WifiManager::GetInstance(), DealStaConnChanged(_, _)).Times(testing::AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_, _)).Times(testing::AtLeast(0));
+        EXPECT_CALL(WifiManager::GetInstance(), DealStaConnChanged(_, _, _)).Times(testing::AtLeast(0));
         pStaStateMachine->DealConnectTimeOutCmd(&msg);
     }
 
     void DealConnectTimeOutCmdFail()
     {
         InternalMessage msg;
-        EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_)).Times(testing::AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_, _)).Times(testing::AtLeast(0));
         pStaStateMachine->linkedInfo.connState = ConnState::CONNECTED;
         pStaStateMachine->DealConnectTimeOutCmd(nullptr);
         pStaStateMachine->DealConnectTimeOutCmd(&msg);
@@ -458,12 +458,12 @@ public:
 
     void DealDisconnectEventSuccess1()
     {
-        EXPECT_CALL(WifiSettings::GetInstance(), SetMacAddress(_)).Times(testing::AtLeast(0));
-        EXPECT_CALL(WifiManager::GetInstance(), DealStaConnChanged(_, _)).Times(testing::AtLeast(0));
-        EXPECT_CALL(WifiSettings::GetInstance(), SaveIpInfo(_)).Times(testing::AtLeast(0));
-        EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_)).Times(testing::AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), SetMacAddress(_, _)).Times(testing::AtLeast(0));
+        EXPECT_CALL(WifiManager::GetInstance(), DealStaConnChanged(_, _, _)).Times(testing::AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), SaveIpInfo(_, _)).Times(testing::AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_, _)).Times(testing::AtLeast(0));
         EXPECT_CALL(IfConfig::GetInstance(), FlushIpAddr(_, _)).Times(AtLeast(0));
-        EXPECT_CALL(WifiSettings::GetInstance(), SaveIpV6Info(_)).Times(testing::AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), SaveIpV6Info(_, _)).Times(testing::AtLeast(0));
         pStaStateMachine->wpsState = SetupMethod::INVALID;
         pStaStateMachine->currentTpType = IPTYPE_IPV4;
         pStaStateMachine->lastLinkedInfo.detailedState = DetailedState::CONNECTING;
@@ -474,12 +474,12 @@ public:
 
     void DealDisconnectEventSuccess2()
     {
-        EXPECT_CALL(WifiSettings::GetInstance(), SetMacAddress(_)).Times(testing::AtLeast(0));
-        EXPECT_CALL(WifiManager::GetInstance(), DealStaConnChanged(_, _)).Times(testing::AtLeast(0));
-        EXPECT_CALL(WifiSettings::GetInstance(), SaveIpInfo(_));
-        EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_));
+        EXPECT_CALL(WifiSettings::GetInstance(), SetMacAddress(_, _)).Times(testing::AtLeast(0));
+        EXPECT_CALL(WifiManager::GetInstance(), DealStaConnChanged(_, _, _)).Times(testing::AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), SaveIpInfo(_, _));
+        EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_, _));
         EXPECT_CALL(IfConfig::GetInstance(), FlushIpAddr(_, _)).Times(AtLeast(0));
-        EXPECT_CALL(WifiSettings::GetInstance(), SaveIpV6Info(_)).Times(testing::AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), SaveIpV6Info(_, _)).Times(testing::AtLeast(0));
         pStaStateMachine->wpsState = SetupMethod::INVALID;
         pStaStateMachine->currentTpType = IPTYPE_IPV6;
         pStaStateMachine->lastLinkedInfo.detailedState = DetailedState::CONNECTED;
@@ -491,8 +491,8 @@ public:
 
     void DealWpaWrongPskEventFail1()
     {
-        EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_)).Times(testing::AtLeast(0));
-        EXPECT_CALL(WifiManager::GetInstance(), DealStaConnChanged(_, _)).Times(testing::AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_, _)).Times(testing::AtLeast(0));
+        EXPECT_CALL(WifiManager::GetInstance(), DealStaConnChanged(_, _, _)).Times(testing::AtLeast(0));
         InternalMessage msg;
         msg.SetMessageName(WIFI_SVR_CMD_STA_WPA_PASSWD_WRONG_EVENT);
         pStaStateMachine->DealWpaLinkFailEvent(&msg);
@@ -501,8 +501,8 @@ public:
 
     void DealWpaWrongPskEventFail2()
     {
-        EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_)).Times(testing::AtLeast(0));
-        EXPECT_CALL(WifiManager::GetInstance(), DealStaConnChanged(_, _)).Times(testing::AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_, _)).Times(testing::AtLeast(0));
+        EXPECT_CALL(WifiManager::GetInstance(), DealStaConnChanged(_, _, _)).Times(testing::AtLeast(0));
         InternalMessage msg;
         msg.SetMessageName(WIFI_SVR_CMD_STA_WPA_FULL_CONNECT_EVENT);
         pStaStateMachine->DealWpaLinkFailEvent(&msg);
@@ -510,8 +510,8 @@ public:
 
     void DealWpaWrongPskEventSuccess()
     {
-        EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_)).Times(testing::AtLeast(0));
-        EXPECT_CALL(WifiManager::GetInstance(), DealStaConnChanged(_, _)).Times(testing::AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_, _)).Times(testing::AtLeast(0));
+        EXPECT_CALL(WifiManager::GetInstance(), DealStaConnChanged(_, _, _)).Times(testing::AtLeast(0));
         InternalMessage msg;
         msg.SetMessageName(WIFI_SVR_CMD_STA_WPA_ASSOC_REJECT_EVENT);
         pStaStateMachine->DealWpaLinkFailEvent(&msg);
@@ -520,7 +520,7 @@ public:
     void DealReassociateCmdSuccess()
     {
         EXPECT_CALL(WifiStaHalInterface::GetInstance(), Reassociate()).WillRepeatedly(Return(WIFI_IDL_OPT_OK));
-        EXPECT_CALL(WifiManager::GetInstance(), DealStaConnChanged(_, _)).Times(testing::AtLeast(0));
+        EXPECT_CALL(WifiManager::GetInstance(), DealStaConnChanged(_, _, _)).Times(testing::AtLeast(0));
         InternalMessage msg;
         pStaStateMachine->DealReassociateCmd(&msg);
     }
@@ -528,7 +528,7 @@ public:
     void DealReassociateCmdFail1()
     {
         EXPECT_CALL(WifiStaHalInterface::GetInstance(), Reassociate()).WillRepeatedly(Return(WIFI_IDL_OPT_FAILED));
-        EXPECT_CALL(WifiManager::GetInstance(), DealStaConnChanged(_, _)).Times(testing::AtLeast(0));
+        EXPECT_CALL(WifiManager::GetInstance(), DealStaConnChanged(_, _, _)).Times(testing::AtLeast(0));
         pStaStateMachine->DealReassociateCmd(nullptr);
     }
 
@@ -541,7 +541,7 @@ public:
     void DealStartWpsCmdSuccess()
     {
         EXPECT_CALL(WifiStaHalInterface::GetInstance(), GetNetworkList(_)).Times(AtLeast(0));
-        EXPECT_CALL(WifiManager::GetInstance(), DealWpsChanged(_, _));
+        EXPECT_CALL(WifiManager::GetInstance(), DealWpsChanged(_, _, _));
         EXPECT_CALL(WifiStaHalInterface::GetInstance(), ClearDeviceConfig()).WillRepeatedly(Return(WIFI_IDL_OPT_OK));
         pStaStateMachine->wpsState = SetupMethod::INVALID;
         InternalMessage msg;
@@ -555,7 +555,7 @@ public:
             .WillOnce(Return(WIFI_IDL_OPT_FAILED))
             .WillOnce(Return(WIFI_IDL_OPT_OK))
             .WillOnce(Return(WIFI_IDL_OPT_OK));
-        EXPECT_CALL(WifiManager::GetInstance(), DealWpsChanged(_, _)).Times(AtLeast(0));
+        EXPECT_CALL(WifiManager::GetInstance(), DealWpsChanged(_, _, _)).Times(AtLeast(0));
         pStaStateMachine->wpsState = SetupMethod::KEYPAD;
         InternalMessage msg;
         msg.SetParam1(static_cast<int>(SetupMethod::INVALID));
@@ -568,7 +568,7 @@ public:
     void StartWpsModeSuccess1()
     {
         EXPECT_CALL(WifiStaHalInterface::GetInstance(), StartWpsPbcMode(_)).WillRepeatedly(Return(WIFI_IDL_OPT_OK));
-        EXPECT_CALL(WifiManager::GetInstance(), DealWpsChanged(_, _));
+        EXPECT_CALL(WifiManager::GetInstance(), DealWpsChanged(_, _, _));
         InternalMessage msg;
         msg.SetParam1(static_cast<int>(SetupMethod::PBC));
         pStaStateMachine->StartWpsMode(&msg);
@@ -577,7 +577,7 @@ public:
     void StartWpsModeSuccess2()
     {
         EXPECT_CALL(WifiStaHalInterface::GetInstance(), StartWpsPinMode(_, _)).WillRepeatedly(Return(WIFI_IDL_OPT_OK));
-        EXPECT_CALL(WifiManager::GetInstance(), DealWpsChanged(_, _));
+        EXPECT_CALL(WifiManager::GetInstance(), DealWpsChanged(_, _, _));
         InternalMessage msg;
         msg.SetParam1(static_cast<int>(SetupMethod::DISPLAY));
         msg.AddStringMessageBody("hmwifi1");
@@ -588,7 +588,7 @@ public:
     void StartWpsModeSuccess3()
     {
         EXPECT_CALL(WifiStaHalInterface::GetInstance(), StartWpsPinMode(_, _)).WillRepeatedly(Return(WIFI_IDL_OPT_OK));
-        EXPECT_CALL(WifiManager::GetInstance(), DealWpsChanged(_, _));
+        EXPECT_CALL(WifiManager::GetInstance(), DealWpsChanged(_, _, _));
         InternalMessage msg;
         msg.SetParam1(static_cast<int>(SetupMethod::KEYPAD));
         msg.AddStringMessageBody("hmwifi1");
@@ -598,7 +598,7 @@ public:
 
     void StartWpsModeSuccess4()
     {
-        EXPECT_CALL(WifiManager::GetInstance(), DealWpsChanged(_, _));
+        EXPECT_CALL(WifiManager::GetInstance(), DealWpsChanged(_, _, _));
         InternalMessage msg;
         msg.SetParam1(static_cast<int>(SetupMethod::INVALID));
         msg.AddStringMessageBody("hmwifi1");
@@ -656,7 +656,7 @@ public:
     {
         pStaStateMachine->wpsState = SetupMethod::INVALID;
         EXPECT_CALL(WifiStaHalInterface::GetInstance(), StopWps()).WillRepeatedly(Return((WIFI_IDL_OPT_FAILED)));
-        EXPECT_CALL(WifiManager::GetInstance(), DealWpsChanged(_, _));
+        EXPECT_CALL(WifiManager::GetInstance(), DealWpsChanged(_, _, _));
         InternalMessage msg;
         pStaStateMachine->DealWpsConnectTimeOutEvent(&msg);
     }
@@ -674,7 +674,7 @@ public:
         EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_)).WillRepeatedly(Return(-1));
         EXPECT_CALL(WifiStaHalInterface::GetInstance(), EnableNetwork(_)).WillRepeatedly(Return(WIFI_IDL_OPT_OK));
         EXPECT_CALL(WifiStaHalInterface::GetInstance(), SaveDeviceConfig()).WillRepeatedly(Return(WIFI_IDL_OPT_OK));
-        EXPECT_CALL(WifiManager::GetInstance(), DealWpsChanged(_, _));
+        EXPECT_CALL(WifiManager::GetInstance(), DealWpsChanged(_, _, _));
         pStaStateMachine->wpsState = SetupMethod::PBC;
         InternalMessage msg;
         pStaStateMachine->DealCancelWpsCmd(&msg);
@@ -686,7 +686,7 @@ public:
         EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_)).WillRepeatedly(Return(-1));
         EXPECT_CALL(WifiStaHalInterface::GetInstance(), EnableNetwork(_)).WillRepeatedly(Return(WIFI_IDL_OPT_OK));
         EXPECT_CALL(WifiStaHalInterface::GetInstance(), SaveDeviceConfig()).WillRepeatedly(Return(WIFI_IDL_OPT_FAILED));
-        EXPECT_CALL(WifiManager::GetInstance(), DealWpsChanged(_, _));
+        EXPECT_CALL(WifiManager::GetInstance(), DealWpsChanged(_, _, _));
         pStaStateMachine->wpsState = SetupMethod::DISPLAY;
         InternalMessage msg;
         pStaStateMachine->DealCancelWpsCmd(&msg);
@@ -698,7 +698,7 @@ public:
         EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_)).WillRepeatedly(Return(-1));
         EXPECT_CALL(WifiStaHalInterface::GetInstance(), EnableNetwork(_)).WillRepeatedly(Return(WIFI_IDL_OPT_OK));
         EXPECT_CALL(WifiStaHalInterface::GetInstance(), SaveDeviceConfig()).WillRepeatedly(Return(WIFI_IDL_OPT_FAILED));
-        EXPECT_CALL(WifiManager::GetInstance(), DealWpsChanged(_, _)).Times(AtLeast(0));
+        EXPECT_CALL(WifiManager::GetInstance(), DealWpsChanged(_, _, _)).Times(AtLeast(0));
         pStaStateMachine->wpsState = SetupMethod::KEYPAD;
         InternalMessage msg;
         pStaStateMachine->DealCancelWpsCmd(&msg);
@@ -707,7 +707,7 @@ public:
     void DealCancelWpsCmdFail1()
     {
         EXPECT_CALL(WifiStaHalInterface::GetInstance(), StopWps()).WillRepeatedly(Return(WIFI_IDL_OPT_FAILED));
-        EXPECT_CALL(WifiManager::GetInstance(), DealWpsChanged(_, _)).Times(AtLeast(0));
+        EXPECT_CALL(WifiManager::GetInstance(), DealWpsChanged(_, _, _)).Times(AtLeast(0));
         pStaStateMachine->wpsState = SetupMethod::PBC;
         InternalMessage msg;
         pStaStateMachine->DealCancelWpsCmd(&msg);
@@ -716,7 +716,7 @@ public:
     void DealCancelWpsCmdFail2()
     {
         EXPECT_CALL(WifiStaHalInterface::GetInstance(), StopWps()).WillRepeatedly(Return(WIFI_IDL_OPT_FAILED));
-        EXPECT_CALL(WifiManager::GetInstance(), DealWpsChanged(_, _)).Times(AtLeast(0));
+        EXPECT_CALL(WifiManager::GetInstance(), DealWpsChanged(_, _, _)).Times(AtLeast(0));
         pStaStateMachine->wpsState = SetupMethod::DISPLAY;
         InternalMessage msg;
         pStaStateMachine->DealCancelWpsCmd(&msg);
@@ -725,7 +725,7 @@ public:
     void DealCancelWpsCmdFail3()
     {
         EXPECT_CALL(WifiStaHalInterface::GetInstance(), StopWps()).WillRepeatedly(Return(WIFI_IDL_OPT_FAILED));
-        EXPECT_CALL(WifiManager::GetInstance(), DealWpsChanged(_, _)).Times(AtLeast(0));
+        EXPECT_CALL(WifiManager::GetInstance(), DealWpsChanged(_, _, _)).Times(AtLeast(0));
         pStaStateMachine->wpsState = SetupMethod::KEYPAD;
         InternalMessage msg;
         pStaStateMachine->DealCancelWpsCmd(&msg);
@@ -738,7 +738,7 @@ public:
         EXPECT_CALL(WifiStaHalInterface::GetInstance(), SetDeviceConfig(_, _)).WillRepeatedly(Return(WIFI_IDL_OPT_OK));
         EXPECT_CALL(WifiSettings::GetInstance(), AddDeviceConfig(_)).WillRepeatedly(Return(WIFI_IDL_OPT_OK));
         EXPECT_CALL(WifiSettings::GetInstance(), SyncDeviceConfig()).WillRepeatedly(Return(WIFI_IDL_OPT_OK));
-        EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_)).WillRepeatedly(Return(WIFI_IDL_OPT_OK));
+        EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_, _)).WillRepeatedly(Return(WIFI_IDL_OPT_OK));
         EXPECT_CALL(WifiStaHalInterface::GetInstance(), Reassociate()).WillRepeatedly(Return(WIFI_IDL_OPT_OK));
         InternalMessage msg;
         pStaStateMachine->DealStartRoamCmd(&msg);
@@ -756,9 +756,9 @@ public:
             .WillRepeatedly(Return(WIFI_IDL_OPT_FAILED));
         EXPECT_CALL(WifiSettings::GetInstance(), AddDeviceConfig(_)).WillRepeatedly(Return(WIFI_IDL_OPT_OK));
         EXPECT_CALL(WifiSettings::GetInstance(), SyncDeviceConfig()).WillRepeatedly(Return(WIFI_IDL_OPT_OK));
-        EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_)).WillRepeatedly(Return(WIFI_IDL_OPT_OK));
+        EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_, _)).WillRepeatedly(Return(WIFI_IDL_OPT_OK));
         EXPECT_CALL(WifiStaHalInterface::GetInstance(), Reassociate()).WillRepeatedly(Return(WIFI_IDL_OPT_OK));
-        EXPECT_CALL(WifiManager::GetInstance(), DealStaConnChanged(_, _)).Times(testing::AtLeast(0));
+        EXPECT_CALL(WifiManager::GetInstance(), DealStaConnChanged(_, _, _)).Times(testing::AtLeast(0));
         InternalMessage msg;
         pStaStateMachine->DealStartRoamCmd(&msg);
     }
@@ -769,7 +769,7 @@ public:
         EXPECT_CALL(WifiStaHalInterface::GetInstance(), SetDeviceConfig(_, _)).WillRepeatedly(Return(WIFI_IDL_OPT_OK));
         EXPECT_CALL(WifiSettings::GetInstance(), AddDeviceConfig(_)).WillRepeatedly(Return(WIFI_IDL_OPT_OK));
         EXPECT_CALL(WifiSettings::GetInstance(), SyncDeviceConfig()).WillRepeatedly(Return(WIFI_IDL_OPT_OK));
-        EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_)).WillRepeatedly(Return(WIFI_IDL_OPT_OK));
+        EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_, _)).WillRepeatedly(Return(WIFI_IDL_OPT_OK));
         EXPECT_CALL(WifiStaHalInterface::GetInstance(), Reassociate()).WillRepeatedly(Return(WIFI_IDL_OPT_FAILED));
         InternalMessage msg;
         pStaStateMachine->DealStartRoamCmd(&msg);
@@ -780,51 +780,51 @@ public:
         EXPECT_CALL(WifiStaHalInterface::GetInstance(), EnableNetwork(_)).WillRepeatedly(Return(WIFI_IDL_OPT_OK));
         EXPECT_CALL(WifiStaHalInterface::GetInstance(), Connect(_)).WillRepeatedly(Return(WIFI_IDL_OPT_OK));
         EXPECT_CALL(WifiStaHalInterface::GetInstance(), SaveDeviceConfig()).WillRepeatedly(Return(WIFI_IDL_OPT_OK));
-        EXPECT_CALL(WifiSettings::GetInstance(), GetScanInfoList(_)).Times(AtLeast(0));
-        EXPECT_CALL(WifiManager::GetInstance(), DealStaConnChanged(_, _)).Times(testing::AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), GetScanInfoList(_, _)).Times(AtLeast(0));
+        EXPECT_CALL(WifiManager::GetInstance(), DealStaConnChanged(_, _, _)).Times(testing::AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _)).Times(AtLeast(0));
-        EXPECT_CALL(WifiSettings::GetInstance(), SetWifiState(_)).Times(testing::AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), SetWifiState(_, _)).Times(testing::AtLeast(0));
         pStaStateMachine->StartConnectToNetwork(0);
     }
 
     void StartConnectToNetworkFail1()
     {
         EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _)).WillRepeatedly(Return(0));
-        EXPECT_CALL(WifiSettings::GetInstance(), GetScanInfoList(_)).Times(AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), GetScanInfoList(_, _)).Times(AtLeast(0));
         EXPECT_CALL(WifiStaHalInterface::GetInstance(), EnableNetwork(_)).WillRepeatedly(Return(WIFI_IDL_OPT_FAILED));
-        EXPECT_CALL(WifiSettings::GetInstance(), SetWifiState(_)).Times(testing::AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), SetWifiState(_, _)).Times(testing::AtLeast(0));
         EXPECT_TRUE(pStaStateMachine->StartConnectToNetwork(0) == WIFI_OPT_FAILED);
     }
 
     void StartConnectToNetworkFail4()
     {
         EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _)).WillRepeatedly(Return(1));
-        EXPECT_CALL(WifiSettings::GetInstance(), GetScanInfoList(_)).Times(AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), GetScanInfoList(_, _)).Times(AtLeast(0));
         EXPECT_CALL(WifiStaHalInterface::GetInstance(), EnableNetwork(_)).WillRepeatedly(Return(WIFI_IDL_OPT_FAILED));
-        EXPECT_CALL(WifiSettings::GetInstance(), SetWifiState(_)).Times(testing::AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), SetWifiState(_, _)).Times(testing::AtLeast(0));
         EXPECT_TRUE(pStaStateMachine->StartConnectToNetwork(0) == WIFI_OPT_FAILED);
     }
 
     void StartConnectToNetworkFail2()
     {
         EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _)).Times(AtLeast(0));
-        EXPECT_CALL(WifiSettings::GetInstance(), GetScanInfoList(_)).Times(AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), GetScanInfoList(_, _)).Times(AtLeast(0));
         EXPECT_CALL(WifiStaHalInterface::GetInstance(), EnableNetwork(_)).WillRepeatedly(Return(WIFI_IDL_OPT_OK));
         EXPECT_CALL(WifiStaHalInterface::GetInstance(), Connect(_)).WillRepeatedly(Return(WIFI_IDL_OPT_FAILED));
-        EXPECT_CALL(WifiManager::GetInstance(), DealStaConnChanged(_, _)).Times(testing::AtLeast(0));
-        EXPECT_CALL(WifiSettings::GetInstance(), SetWifiState(_)).Times(testing::AtLeast(0));
+        EXPECT_CALL(WifiManager::GetInstance(), DealStaConnChanged(_, _, _)).Times(testing::AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), SetWifiState(_, _)).Times(testing::AtLeast(0));
         pStaStateMachine->StartConnectToNetwork(0);
     }
 
     void StartConnectToNetworkFali3()
     {
         EXPECT_CALL(WifiStaHalInterface::GetInstance(), EnableNetwork(_)).WillRepeatedly(Return(WIFI_IDL_OPT_OK));
-        EXPECT_CALL(WifiSettings::GetInstance(), GetScanInfoList(_)).Times(AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), GetScanInfoList(_, _)).Times(AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _)).Times(AtLeast(0));
         EXPECT_CALL(WifiStaHalInterface::GetInstance(), Connect(_)).WillRepeatedly(Return(WIFI_IDL_OPT_OK));
         EXPECT_CALL(WifiStaHalInterface::GetInstance(), SaveDeviceConfig()).WillRepeatedly(Return(WIFI_IDL_OPT_FAILED));
-        EXPECT_CALL(WifiManager::GetInstance(), DealStaConnChanged(_, _)).Times(testing::AtLeast(0));
-        EXPECT_CALL(WifiSettings::GetInstance(), SetWifiState(_)).Times(testing::AtLeast(0));
+        EXPECT_CALL(WifiManager::GetInstance(), DealStaConnChanged(_, _, _)).Times(testing::AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), SetWifiState(_, _)).Times(testing::AtLeast(0));
         pStaStateMachine->StartConnectToNetwork(0);
     }
 
@@ -834,10 +834,10 @@ public:
         deviceConfig.wifiPrivacySetting = WifiPrivacyConfig::RANDOMMAC;
         EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _))
             .WillRepeatedly(DoAll(SetArgReferee<1>(deviceConfig), Return(0)));
-        EXPECT_CALL(WifiSettings::GetInstance(), GetScanInfoList(_)).Times(AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), GetScanInfoList(_, _)).Times(AtLeast(0));
         EXPECT_CALL(WifiStaHalInterface::GetInstance(), GetStaDeviceMacAddress(_))
             .WillRepeatedly(Return(WIFI_IDL_OPT_OK));
-        EXPECT_CALL(WifiSettings::GetInstance(), GetMacAddress(_)).Times(AtLeast(0)).WillOnce(Return(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), GetMacAddress(_, _)).Times(AtLeast(0)).WillOnce(Return(0));
         EXPECT_CALL(WifiStaHalInterface::GetInstance(), SetConnectMacAddr(_)).WillRepeatedly(Return(WIFI_IDL_OPT_OK));
         pStaStateMachine->SetRandomMac(0);
     }
@@ -854,7 +854,7 @@ public:
         pStaStateMachine->MacAddressGenerate(randomMacInfo);
         EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _))
             .WillRepeatedly(DoAll(SetArgReferee<1>(deviceConfig), Return(-1)));
-        EXPECT_CALL(WifiSettings::GetInstance(), GetMacAddress(_)).Times(AtLeast(0)).WillOnce(Return(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), GetMacAddress(_, _)).Times(AtLeast(0)).WillOnce(Return(0));
         pStaStateMachine->SetRandomMac(0);
     }
 
@@ -864,10 +864,10 @@ public:
         deviceConfig.wifiPrivacySetting = WifiPrivacyConfig::RANDOMMAC;
         EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _))
             .WillRepeatedly(DoAll(SetArgReferee<1>(deviceConfig), Return(0)));
-        EXPECT_CALL(WifiSettings::GetInstance(), GetScanInfoList(_)).Times(AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), GetScanInfoList(_, _)).Times(AtLeast(0));
         EXPECT_CALL(WifiStaHalInterface::GetInstance(), GetStaDeviceMacAddress(_))
             .WillRepeatedly(Return(WIFI_IDL_OPT_FAILED));
-        EXPECT_CALL(WifiSettings::GetInstance(), GetMacAddress(_)).Times(AtLeast(0)).WillOnce(Return(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), GetMacAddress(_, _)).Times(AtLeast(0)).WillOnce(Return(0));
         pStaStateMachine->SetRandomMac(0);
     }
 
@@ -921,7 +921,7 @@ public:
 
     void SeparatedStateExeMsgSuccess2()
     {
-        EXPECT_CALL(WifiManager::GetInstance(), DealStaOpenRes(_));
+        EXPECT_CALL(WifiManager::GetInstance(), DealStaOpenRes(_, _));
         InternalMessage msg;
         msg.SetMessageName(WIFI_SVR_CMD_STA_ENABLE_WIFI);
         EXPECT_TRUE(pStaStateMachine->pSeparatedState->ExecuteStateMsg(&msg));
@@ -944,7 +944,7 @@ public:
 
     void ApLinkedStateExeMsgSuccess1()
     {
-        EXPECT_CALL(WifiManager::GetInstance(), DealStaConnChanged(_, _)).Times(testing::AtLeast(1));
+        EXPECT_CALL(WifiManager::GetInstance(), DealStaConnChanged(_, _, _)).Times(testing::AtLeast(1));
         EXPECT_CALL(WifiStaHalInterface::GetInstance(), Disconnect()).WillRepeatedly(Return(WIFI_IDL_OPT_FAILED));
         InternalMessage msg;
         msg.SetMessageName(WIFI_SVR_CMD_STA_DISCONNECT);
@@ -994,12 +994,12 @@ public:
 
     void WpsStateExeMsgSuccess1()
     {
-        EXPECT_CALL(WifiSettings::GetInstance(), SetWifiState(_)).Times(AtLeast(0));
-        EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_)).Times(AtLeast(0)).WillRepeatedly(Return(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), SetWifiState(_, _)).Times(AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_, _)).Times(AtLeast(0)).WillRepeatedly(Return(0));
         EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_)).Times(AtLeast(0)).WillRepeatedly(Return(0));
         EXPECT_CALL(WifiSettings::GetInstance(), AddDeviceConfig(_)).Times(AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), SyncDeviceConfig()).Times(AtLeast(0));
-        EXPECT_CALL(WifiManager::GetInstance(), DealStaConnChanged(_, _)).Times(AtLeast(0));
+        EXPECT_CALL(WifiManager::GetInstance(), DealStaConnChanged(_, _, _)).Times(AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), SetDeviceState(_, _, _)).Times(AtLeast(0));
         EXPECT_CALL(WifiStaHalInterface::GetInstance(), GetDeviceConfig(_)).Times(AtLeast(0));
         InternalMessage msg;
@@ -1009,7 +1009,7 @@ public:
 
     void WpsStateExeMsgSuccess2()
     {
-        EXPECT_CALL(WifiManager::GetInstance(), DealWpsChanged(_, _));
+        EXPECT_CALL(WifiManager::GetInstance(), DealWpsChanged(_, _, _));
         InternalMessage msg;
         msg.SetMessageName(WIFI_SVR_CMD_STA_STARTWPS);
         msg.SetParam1(static_cast<int>(SetupMethod::PBC));
@@ -1018,7 +1018,7 @@ public:
 
     void WpsStateExeMsgSuccess3()
     {
-        EXPECT_CALL(WifiManager::GetInstance(), DealWpsChanged(_, _));
+        EXPECT_CALL(WifiManager::GetInstance(), DealWpsChanged(_, _, _));
         InternalMessage msg;
         msg.SetMessageName(WIFI_SVR_CMD_STA_STARTWPS);
         msg.SetParam1(static_cast<int>(SetupMethod::DISPLAY));
@@ -1027,7 +1027,7 @@ public:
 
     void WpsStateExeMsgSuccess4()
     {
-        EXPECT_CALL(WifiManager::GetInstance(), DealWpsChanged(_, _));
+        EXPECT_CALL(WifiManager::GetInstance(), DealWpsChanged(_, _, _));
         InternalMessage msg;
         msg.SetMessageName(WIFI_SVR_CMD_STA_WPS_OVERLAP_EVENT);
         msg.SetParam1(static_cast<int>(SetupMethod::DISPLAY));
@@ -1036,10 +1036,10 @@ public:
 
     void WpsStateExeMsgSuccess5()
     {
-        EXPECT_CALL(WifiManager::GetInstance(), DealWpsChanged(_, _));
+        EXPECT_CALL(WifiManager::GetInstance(), DealWpsChanged(_, _, _));
         EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_)).WillRepeatedly(Return(-1));
         EXPECT_CALL(WifiStaHalInterface::GetInstance(), StopWps()).WillRepeatedly(Return(WIFI_IDL_OPT_FAILED));
-        EXPECT_CALL(WifiSettings::GetInstance(), SetWifiState(_)).Times(testing::AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), SetWifiState(_, _)).Times(testing::AtLeast(0));
         InternalMessage msg;
         msg.SetMessageName(WIFI_SVR_CMD_STA_WPS_OVERLAP_EVENT);
         msg.SetParam1(static_cast<int>(SetupMethod::DISPLAY));
@@ -1142,44 +1142,44 @@ public:
 
     void ConfigStaticIpAddressSuccess1()
     {
-        EXPECT_CALL(WifiSettings::GetInstance(), GetIpInfo(_)).Times(AtLeast(0));
-        EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_)).Times(AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), GetIpInfo(_, _)).Times(AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_, _)).Times(AtLeast(0));
         pStaStateMachine->currentTpType = IPTYPE_IPV4;
         pStaStateMachine->getIpSucNum = 1;
         pStaStateMachine->isRoam = false;
         StaticIpAddress staticIpAddress;
-        EXPECT_CALL(WifiSettings::GetInstance(), SaveIpInfo(_)).Times(AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), SaveIpInfo(_, _)).Times(AtLeast(0));
         ;
-        EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_)).Times(AtLeast(0));
-        EXPECT_CALL(WifiManager::GetInstance(), DealStaConnChanged(_, _)).Times(AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_, _)).Times(AtLeast(0));
+        EXPECT_CALL(WifiManager::GetInstance(), DealStaConnChanged(_, _, _)).Times(AtLeast(0));
         EXPECT_TRUE(pStaStateMachine->ConfigStaticIpAddress(staticIpAddress));
     }
 
     void ConfigStaticIpAddressSuccess2()
     {
-        EXPECT_CALL(WifiSettings::GetInstance(), GetIpInfo(_)).Times(AtLeast(0));
-        EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_)).Times(AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), GetIpInfo(_, _)).Times(AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_, _)).Times(AtLeast(0));
         pStaStateMachine->currentTpType = IPTYPE_IPV6;
         pStaStateMachine->getIpSucNum = 1;
         pStaStateMachine->isRoam = false;
         StaticIpAddress staticIpAddress;
-        EXPECT_CALL(WifiSettings::GetInstance(), SaveIpInfo(_)).Times(AtLeast(0));
-        EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_)).Times(AtLeast(0));
-        EXPECT_CALL(WifiManager::GetInstance(), DealStaConnChanged(_, _)).Times(AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), SaveIpInfo(_, _)).Times(AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_, _)).Times(AtLeast(0));
+        EXPECT_CALL(WifiManager::GetInstance(), DealStaConnChanged(_, _, _)).Times(AtLeast(0));
         EXPECT_TRUE(pStaStateMachine->ConfigStaticIpAddress(staticIpAddress));
     }
 
     void ConfigStaticIpAddressSuccess3()
     {
-        EXPECT_CALL(WifiSettings::GetInstance(), GetIpInfo(_)).Times(AtLeast(0));
-        EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_)).Times(AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), GetIpInfo(_, _)).Times(AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_, _)).Times(AtLeast(0));
         pStaStateMachine->currentTpType = IPTYPE_MIX;
         pStaStateMachine->getIpSucNum = 1;
         pStaStateMachine->isRoam = false;
         StaticIpAddress staticIpAddress;
-        EXPECT_CALL(WifiSettings::GetInstance(), SaveIpInfo(_)).Times(AtLeast(0));
-        EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_)).Times(AtLeast(0));
-        EXPECT_CALL(WifiManager::GetInstance(), DealStaConnChanged(_, _)).Times(AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), SaveIpInfo(_, _)).Times(AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_, _)).Times(AtLeast(0));
+        EXPECT_CALL(WifiManager::GetInstance(), DealStaConnChanged(_, _, _)).Times(AtLeast(0));
         EXPECT_TRUE(pStaStateMachine->ConfigStaticIpAddress(staticIpAddress));
     }
 
@@ -1189,27 +1189,27 @@ public:
         StaticIpAddress staticIpAddress;
         pStaStateMachine->getIpSucNum = 1;
         pStaStateMachine->isRoam = false;
-        EXPECT_CALL(WifiSettings::GetInstance(), SaveIpInfo(_)).Times(AtLeast(0));
-        EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_)).Times(AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), SaveIpInfo(_, _)).Times(AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_, _)).Times(AtLeast(0));
         EXPECT_FALSE(pStaStateMachine->ConfigStaticIpAddress(staticIpAddress));
     }
 
     void HandleNetCheckResultSuccess1()
     {
-        EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_));
+        EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_, _));
         pStaStateMachine->linkedInfo.connState = ConnState::CONNECTED;
         pStaStateMachine->HandleNetCheckResult(StaNetState::NETWORK_STATE_WORKING, "");
     }
 
     void HandleNetCheckResultSuccess3()
     {
-        EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_));
+        EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_, _));
         pStaStateMachine->linkedInfo.connState = ConnState::CONNECTED;
         pStaStateMachine->HandleNetCheckResult(StaNetState::NETWORK_CHECK_PORTAL, "");
     }
     void HandleNetCheckResultSuccess4()
     {
-        EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_));
+        EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_, _));
         pStaStateMachine->linkedInfo.connState = ConnState::CONNECTED;
         pStaStateMachine->HandleNetCheckResult(StaNetState::NETWORK_STATE_UNKNOWN, "");
     }
@@ -1279,9 +1279,9 @@ public:
 
     void ApRoamingStateExeMsgSuccess()
     {
-        EXPECT_CALL(WifiSettings::GetInstance(), SetWifiState(_)).Times(testing::AtLeast(0));
-        EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_)).WillRepeatedly(Return(0));
-        EXPECT_CALL(WifiSettings::GetInstance(), GetMacAddress(_)).Times(AtLeast(0)).WillOnce(Return(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), SetWifiState(_, _)).Times(testing::AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_, _)).WillRepeatedly(Return(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), GetMacAddress(_, _)).Times(AtLeast(0)).WillOnce(Return(0));
         InternalMessage msg;
         msg.SetMessageName(WIFI_SVR_CMD_STA_NETWORK_CONNECTION_EVENT);
         EXPECT_TRUE(pStaStateMachine->pApRoamingState->ExecuteStateMsg(&msg));
@@ -1303,11 +1303,11 @@ public:
         config.value = "hmwifi";
         EXPECT_CALL(WifiStaHalInterface::GetInstance(), GetDeviceConfig(_))
             .WillRepeatedly(DoAll(SetArgReferee<0>(config), Return(WIFI_IDL_OPT_FAILED)));
-        EXPECT_CALL(WifiSettings::GetInstance(), GetMacAddress(_)).Times(AtLeast(0)).WillOnce(Return(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), GetMacAddress(_, _)).Times(AtLeast(0)).WillOnce(Return(0));
         EXPECT_CALL(WifiSettings::GetInstance(), SyncDeviceConfig());
-        EXPECT_CALL(WifiSettings::GetInstance(), SetWifiState(_)).Times(AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), SetWifiState(_, _)).Times(AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_)).Times(AtLeast(0));
-        EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_)).Times(AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_, _)).Times(AtLeast(0));
         InternalMessage msg;
         pStaStateMachine->ConnectToNetworkProcess(&msg);
     }
@@ -1320,11 +1320,11 @@ public:
         config.value = "hmwifi";
         EXPECT_CALL(WifiStaHalInterface::GetInstance(), GetDeviceConfig(_))
             .WillRepeatedly(DoAll(SetArgReferee<0>(config), Return(WIFI_IDL_OPT_FAILED)));
-        EXPECT_CALL(WifiSettings::GetInstance(), GetMacAddress(_)).Times(AtLeast(0)).WillOnce(Return(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), GetMacAddress(_, _)).Times(AtLeast(0)).WillOnce(Return(0));
         EXPECT_CALL(WifiSettings::GetInstance(), SyncDeviceConfig());
-        EXPECT_CALL(WifiSettings::GetInstance(), SetWifiState(_)).Times(AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), SetWifiState(_, _)).Times(AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_)).Times(AtLeast(0));
-        EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_)).Times(AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_, _)).Times(AtLeast(0));
         InternalMessage msg;
         pStaStateMachine->ConnectToNetworkProcess(&msg);
     }
@@ -1337,11 +1337,11 @@ public:
         config.value = "hmwifi";
         EXPECT_CALL(WifiStaHalInterface::GetInstance(), GetDeviceConfig(_))
             .WillRepeatedly(DoAll(SetArgReferee<0>(config), Return(WIFI_IDL_OPT_OK)));
-        EXPECT_CALL(WifiSettings::GetInstance(), GetMacAddress(_)).Times(AtLeast(0)).WillOnce(Return(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), GetMacAddress(_, _)).Times(AtLeast(0)).WillOnce(Return(0));
         EXPECT_CALL(WifiSettings::GetInstance(), SyncDeviceConfig());
-        EXPECT_CALL(WifiSettings::GetInstance(), SetWifiState(_)).Times(AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), SetWifiState(_, _)).Times(AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_)).Times(AtLeast(0));
-        EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_)).Times(AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_, _)).Times(AtLeast(0));
         InternalMessage msg;
         pStaStateMachine->ConnectToNetworkProcess(&msg);
     }
@@ -1354,11 +1354,11 @@ public:
         config.value = "hmwifi";
         EXPECT_CALL(WifiStaHalInterface::GetInstance(), GetDeviceConfig(_))
             .WillRepeatedly(DoAll(SetArgReferee<0>(config), Return(WIFI_IDL_OPT_FAILED)));
-        EXPECT_CALL(WifiSettings::GetInstance(), GetMacAddress(_)).Times(AtLeast(0)).WillOnce(Return(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), GetMacAddress(_, _)).Times(AtLeast(0)).WillOnce(Return(0));
         EXPECT_CALL(WifiSettings::GetInstance(), SyncDeviceConfig());
-        EXPECT_CALL(WifiSettings::GetInstance(), SetWifiState(_)).Times(AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), SetWifiState(_, _)).Times(AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_)).Times(AtLeast(0));
-        EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_)).Times(AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_, _)).Times(AtLeast(0));
         InternalMessage msg;
         pStaStateMachine->ConnectToNetworkProcess(&msg);
     }
@@ -1391,12 +1391,12 @@ public:
         IpInfo ipInfo;
         ipInfo.ipAddress = IpTools::ConvertIpv4Address("192.168.0.2");
         ipInfo.gateway = IpTools::ConvertIpv4Address("192.168.0.1");
-        EXPECT_CALL(WifiSettings::GetInstance(), GetIpInfo(_))
+        EXPECT_CALL(WifiSettings::GetInstance(), GetIpInfo(_, _))
             .WillRepeatedly(DoAll(SetArgReferee<0>(ipInfo), Return(0)));
-        EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_)).Times(AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_, _)).Times(AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), GetStrDnsBak()).Times(AtLeast(0));
-        EXPECT_CALL(WifiSettings::GetInstance(), SaveIpV6Info(_)).Times(testing::AtLeast(0));
-        EXPECT_CALL(WifiSettings::GetInstance(), GetIpv6Info(_)).Times(testing::AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), SaveIpV6Info(_, _)).Times(testing::AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), GetIpv6Info(_, _)).Times(testing::AtLeast(0));
         std::string ifname = "wlan0";
         DhcpResult result;
         result.strYourCli = "192.168.0.0";
@@ -1412,8 +1412,8 @@ public:
         pStaStateMachine->getIpSucNum = 0;
         pStaStateMachine->getIpFailNum = 1;
         EXPECT_CALL(WifiStaHalInterface::GetInstance(), Disconnect()).WillRepeatedly(Return(WIFI_IDL_OPT_FAILED));
-        EXPECT_CALL(WifiSettings::GetInstance(), SaveIpV6Info(_)).Times(testing::AtLeast(0));
-        EXPECT_CALL(WifiSettings::GetInstance(), GetIpv6Info(_)).Times(testing::AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), SaveIpV6Info(_, _)).Times(testing::AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), GetIpv6Info(_, _)).Times(testing::AtLeast(0));
         std::string ifname = "wlan0";
         std::string reason = "test";
         pStaStateMachine->pDhcpResultNotify->OnFailed(0, ifname, reason);
@@ -1424,8 +1424,8 @@ public:
         pStaStateMachine->linkedInfo.detailedState = DetailedState::DISCONNECTING;
         pStaStateMachine->isRoam = false;
         EXPECT_CALL(WifiStaHalInterface::GetInstance(), Disconnect()).WillRepeatedly(Return(WIFI_IDL_OPT_FAILED));
-        EXPECT_CALL(WifiSettings::GetInstance(), SaveIpV6Info(_)).Times(testing::AtLeast(0));
-        EXPECT_CALL(WifiSettings::GetInstance(), GetIpv6Info(_)).Times(testing::AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), SaveIpV6Info(_, _)).Times(testing::AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), GetIpv6Info(_, _)).Times(testing::AtLeast(0));
         std::string ifname = "wlan1";
         std::string reason = "test";
         pStaStateMachine->pDhcpResultNotify->OnFailed(0, ifname, reason);
@@ -1443,7 +1443,7 @@ public:
 
     void SaveLinkstateSuccess()
     {
-        EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_));
+        EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_, _));
         pStaStateMachine->SaveLinkstate(ConnState::CONNECTED, DetailedState::CONNECTED);
     }
 
@@ -1509,13 +1509,13 @@ public:
     }
     void OnNetManagerRestartSuccess()
     {
-        EXPECT_CALL(WifiSettings::GetInstance(), GetWifiState()).WillRepeatedly(Return(1));
+        EXPECT_CALL(WifiSettings::GetInstance(), GetWifiState(_)).WillRepeatedly(Return(1));
         pStaStateMachine->OnNetManagerRestart();
     }
 
     void OnNetManagerRestartFail()
     {
-        EXPECT_CALL(WifiSettings::GetInstance(), GetWifiState()).WillRepeatedly(Return(FAILEDNUM));
+        EXPECT_CALL(WifiSettings::GetInstance(), GetWifiState(_)).WillRepeatedly(Return(FAILEDNUM));
         pStaStateMachine->OnNetManagerRestart();
     }
 
@@ -1575,8 +1575,8 @@ public:
         EXPECT_CALL(WifiSettings::GetInstance(), SetDeviceAfterConnect(_)).Times(testing::AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), SetDeviceState(_, _, _)).Times(testing::AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), SyncDeviceConfig()).Times(testing::AtLeast(0));
-        EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_));
-        EXPECT_CALL(WifiSettings::GetInstance(), SetUserLastSelectedNetworkId(_)).Times(testing::AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_, _));
+        EXPECT_CALL(WifiSettings::GetInstance(), SetUserLastSelectedNetworkId(_, _)).Times(testing::AtLeast(0));
         pStaStateMachine->wpsState = SetupMethod::INVALID;
         InternalMessage msg;
         pStaStateMachine->DealConnectionEvent(&msg);
@@ -1587,8 +1587,8 @@ public:
         EXPECT_CALL(WifiSettings::GetInstance(), SetDeviceAfterConnect(_)).Times(testing::AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), SetDeviceState(_, _, _)).Times(testing::AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), SyncDeviceConfig()).Times(testing::AtLeast(0));
-        EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_));
-        EXPECT_CALL(WifiSettings::GetInstance(), SetUserLastSelectedNetworkId(_)).Times(testing::AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_, _));
+        EXPECT_CALL(WifiSettings::GetInstance(), SetUserLastSelectedNetworkId(_, _)).Times(testing::AtLeast(0));
         pStaStateMachine->wpsState = SetupMethod::LABEL;
         InternalMessage msg;
         pStaStateMachine->DealConnectionEvent(&msg);
@@ -1598,7 +1598,7 @@ public:
     void OnConnectFailed()
     {
         int networkId = 15;
-        EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_));
+        EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_, _));
         pStaStateMachine->OnConnectFailed(networkId);
     }
     void ComparedKeymgmtTest()
@@ -1622,7 +1622,7 @@ public:
         pStaStateMachine->linkedInfo.connState = ConnState::CONNECTED;
         pStaStateMachine->linkedInfo.bssid = RANDOMMAC_BSSID;
         pStaStateMachine->linkedInfo.ssid = RANDOMMAC_SSID;
-        EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_)).WillRepeatedly(Return(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_, _)).WillRepeatedly(Return(0));
         WifiDeviceConfig config;
         config.bssid = RANDOMMAC_BSSID;
         config.ssid = RANDOMMAC_SSID;
@@ -1633,7 +1633,7 @@ public:
     {
         pStaStateMachine->linkedInfo.detailedState = DetailedState::NOTWORKING;
         pStaStateMachine->linkedInfo.connState = ConnState::CONNECTED;
-        EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_)).WillRepeatedly(Return(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_, _)).WillRepeatedly(Return(0));
         WifiDeviceConfig config;
         pStaStateMachine->ReUpdateNetLinkInfo(config);
     }
@@ -1641,7 +1641,7 @@ public:
     void DealSignalPollResultTest()
     {
         InternalMessage msg;
-        EXPECT_CALL(WifiSettings::GetInstance(), SetWifiLinkedStandardAndMaxSpeed(_)).Times(testing::AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), SetWifiLinkedStandardAndMaxSpeed(_, _)).Times(testing::AtLeast(0));
         pStaStateMachine->DealSignalPollResult(nullptr);
         pStaStateMachine->DealSignalPollResult(&msg);
         pStaStateMachine->linkedInfo.lastTxPackets = 1;

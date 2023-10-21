@@ -29,7 +29,7 @@ namespace Wifi {
 class StaService {
     FRIEND_GTEST(StaService);
 public:
-    StaService();
+    explicit StaService(int instId = 0);
     virtual ~StaService();
     /**
      * @Description  Initialize StaService module.
@@ -252,6 +252,7 @@ private:
     StaStateMachine *pStaStateMachine;
     StaMonitor *pStaMonitor;
     StaAutoConnectService *pStaAutoConnectService;
+    int m_instId;
 };
 }  // namespace Wifi
 }  // namespace OHOS

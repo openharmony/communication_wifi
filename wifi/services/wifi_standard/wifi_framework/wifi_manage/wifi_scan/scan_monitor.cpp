@@ -20,7 +20,7 @@ DEFINE_WIFILOG_SCAN_LABEL("ScanMonitor");
 
 namespace OHOS {
 namespace Wifi {
-ScanMonitor::ScanMonitor() : pScanStateMachine(nullptr)
+ScanMonitor::ScanMonitor(int instId) : pScanStateMachine(nullptr), m_instId(instId)
 {}
 
 ScanMonitor::~ScanMonitor()

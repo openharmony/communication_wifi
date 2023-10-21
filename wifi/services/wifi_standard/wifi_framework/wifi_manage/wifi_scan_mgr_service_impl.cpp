@@ -65,10 +65,18 @@ void WifiScanMgrServiceImpl::OnStart()
     mState = ServiceRunningState::STATE_RUNNING;
     WIFI_LOGI("Start scan service!");
     WifiManager::GetInstance();
-    WifiOprMidState scanState = WifiConfigCenter::GetInstance().GetScanMidState();
-    if (scanState == WifiOprMidState::CLOSED) {
+    bool isStartUnloadScanSaTimer = true;
+    for (int i = 0; i < STA_INSTANCE_MAX_NUM; ++i) {
+        WifiOprMidState scanState = WifiConfigCenter::GetInstance().GetScanMidState(i);
+        if (scanState == WifiOprMidState::OPENING || scanState == WifiOprMidState::RUNNING) {
+            isStartUnloadScanSaTimer = false;
+        }
+    }
+
+    if (isStartUnloadScanSaTimer) {
         WifiManager::GetInstance().StartUnloadScanSaTimer();
     }
+    return;
 }
 
 void WifiScanMgrServiceImpl::OnStop()

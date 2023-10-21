@@ -25,12 +25,12 @@ namespace OHOS {
 namespace Wifi {
 struct StaServiceCallback {
     std::string callbackModuleName;
-    std::function<void(OperateResState)> OnStaOpenRes;
-    std::function<void(OperateResState)> OnStaCloseRes;
-    std::function<void(OperateResState, const WifiLinkedInfo &)> OnStaConnChanged;
-    std::function<void(WpsStartState, const int)> OnWpsChanged;
-    std::function<void(StreamDirection)> OnStaStreamChanged;
-    std::function<void(int)> OnStaRssiLevelChanged;
+    std::function<void(OperateResState, int)> OnStaOpenRes;
+    std::function<void(OperateResState, int)> OnStaCloseRes;
+    std::function<void(OperateResState, const WifiLinkedInfo &, int)> OnStaConnChanged;
+    std::function<void(WpsStartState, const int, int)> OnWpsChanged;
+    std::function<void(StreamDirection, int)> OnStaStreamChanged;
+    std::function<void(int, int)> OnStaRssiLevelChanged;
 };
 }  // namespace Wifi
 }  // namespace OHOS

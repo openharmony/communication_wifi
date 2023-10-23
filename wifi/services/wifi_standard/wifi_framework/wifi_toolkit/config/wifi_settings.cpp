@@ -49,7 +49,7 @@ WifiSettings::WifiSettings()
       mLastSelectedTimeVal(0),
       mScreenState(MODE_STATE_OPEN),
       mAirplaneModeState(MODE_STATE_CLOSE),
-      mDeviceProvision(MODE_STATE_CLOSE),
+      mDeviceProvision(MODE_STATE_OPEN),
       mAppRunningModeState(ScanMode::SYS_FOREGROUND_SCAN),
       mPowerSavingModeState(MODE_STATE_CLOSE),
       mFreezeModeState(MODE_STATE_CLOSE),

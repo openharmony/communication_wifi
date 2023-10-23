@@ -119,10 +119,10 @@ public:
     EventRegister()
     {
         mSaStatusListener = new WifiNapiAbilityStatusChange();
-        mSaStatusListener->Init(WIFI_DEVICE_ABILITY_ID);
-        mSaStatusListener->Init(WIFI_SCAN_ABILITY_ID);
-        mSaStatusListener->Init(WIFI_HOTSPOT_ABILITY_ID);
-        mSaStatusListener->Init(WIFI_P2P_ABILITY_ID);
+        mSaStatusListener->Init((int32_t)WIFI_DEVICE_ABILITY_ID);
+        mSaStatusListener->Init((int32_t)WIFI_SCAN_ABILITY_ID);
+        mSaStatusListener->Init((int32_t)WIFI_HOTSPOT_ABILITY_ID);
+        mSaStatusListener->Init((int32_t)WIFI_P2P_ABILITY_ID);
     }
     ~EventRegister() {
     }

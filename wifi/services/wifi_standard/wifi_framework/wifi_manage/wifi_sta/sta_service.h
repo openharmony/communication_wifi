@@ -20,20 +20,24 @@
 #include "sta_auto_connect_service.h"
 #include "sta_monitor.h"
 #include "sta_state_machine.h"
+#ifndef OHOS_ARCH_LITE
+#include "i_wifi_country_code_change_listener.h"
+#endif
 
 namespace OHOS {
 namespace Wifi {
 class StaService {
     FRIEND_GTEST(StaService);
 public:
-    StaService();
+    explicit StaService(int instId = 0);
     virtual ~StaService();
     /**
      * @Description  Initialize StaService module.
      *
+     * @param callbacks - sta service callback
      * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
      */
-    virtual ErrCode InitStaService(const StaServiceCallback &callbacks);
+    virtual ErrCode InitStaService(const std::vector<StaServiceCallback> &callbacks);
     /**
      * @Description  Enable wifi
      *
@@ -42,7 +46,7 @@ public:
                result immediately.
      * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
      */
-    virtual ErrCode EnableWifi() const;
+    virtual ErrCode EnableWifi();
     /**
      * @Description  Disable wifi
      *
@@ -179,12 +183,7 @@ public:
      * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
      */
     virtual ErrCode CancelWps() const;
-    /**
-     * @Description  Set country code
-     *
-     * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
-     */
-    virtual ErrCode SetCountryCode(const std::string &countryCode) const;
+
     /**
      * @Description  ConnectivityManager process scan results.
      *
@@ -199,7 +198,7 @@ public:
      *
      * @param callbacks - Callback function pointer storage structure
      */
-    virtual void RegisterStaServiceCallback(const StaServiceCallback &callbacks) const;
+    virtual void RegisterStaServiceCallback(const std::vector<StaServiceCallback> &callbacks) const;
 
     /**
      * @Description  Reconnect network
@@ -224,14 +223,31 @@ public:
      * @return WifiErrorNo
      */
     virtual ErrCode OnSystemAbilityChanged(int systemAbilityid, bool add);
-
+    /**
+     * @Description Screen State (On/Off) Change Handler
+     *
+     */
+    virtual void HandleScreenStatusChanged(int screenState);
 private:
     void NotifyDeviceConfigChange(ConfigChange value) const;
 
 private:
+#ifndef OHOS_ARCH_LITE
+    class WifiCountryCodeChangeObserver : public IWifiCountryCodeChangeListener {
+    public:
+        WifiCountryCodeChangeObserver(const std::string &name, StateMachine &stateMachineObj)
+            : IWifiCountryCodeChangeListener(name, stateMachineObj) {}
+        ~WifiCountryCodeChangeObserver() override = default;
+        ErrCode OnWifiCountryCodeChanged(const std::string &wifiCountryCode) override;
+        std::string GetListenerModuleName() override;
+        // StateMachine GetStateMachineObj() override;
+    };
+    std::shared_ptr<IWifiCountryCodeChangeListener> m_staObserver;
+#endif
     StaStateMachine *pStaStateMachine;
     StaMonitor *pStaMonitor;
     StaAutoConnectService *pStaAutoConnectService;
+    int m_instId;
 };
 }  // namespace Wifi
 }  // namespace OHOS

@@ -83,6 +83,7 @@ if (defined(ohos_lite)) {
 
     defines = [
       "OHOS_ARCH_LITE",
+      "STA_INSTANCE_MAX_NUM=$wifi_feature_with_sta_num",
       "AP_INSTANCE_MAX_NUM=$wifi_feature_with_ap_num",
     ]
 
@@ -175,6 +176,7 @@ if (defined(ohos_lite)) {
       "//base/notification/common_event_service/interfaces/inner_api",
       "//base/security/access_token/interfaces/innerkits/accesstoken/include",
       "$WIFI_ROOT_DIR/services/wifi_standard/include",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_country_code",
     ]
   }
 
@@ -200,6 +202,8 @@ if (defined(ohos_lite)) {
     sources = [
       "wifi_scan_callback_proxy.cpp",
       "wifi_scan_death_recipient.cpp",
+      "wifi_scan_mgr_service_impl.cpp",
+      "wifi_scan_mgr_stub.cpp",
       "wifi_scan_service_impl.cpp",
       "wifi_scan_stub.cpp",
     ]
@@ -212,7 +216,11 @@ if (defined(ohos_lite)) {
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/idl_client:wifi_idl_client",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit:wifi_toolkit",
     ]
-    defines = []
+    defines = [
+      "STA_INSTANCE_MAX_NUM=$wifi_feature_with_sta_num",
+      "FEATURE_AP_SUPPORT",
+      "FEATURE_STA_SUPPORT",
+    ]
     if (wifi_feature_with_random_mac_addr) {
       defines += [ "SUPPORT_RANDOM_MAC_ADDR" ]
     }
@@ -231,6 +239,8 @@ if (defined(ohos_lite)) {
     sources = [
       "wifi_device_callback_proxy.cpp",
       "wifi_device_death_recipient.cpp",
+      "wifi_device_mgr_service_impl.cpp",
+      "wifi_device_mgr_stub.cpp",
       "wifi_device_service_impl.cpp",
       "wifi_device_stub.cpp",
     ]
@@ -239,7 +249,11 @@ if (defined(ohos_lite)) {
       ":wifi_manager_service_header",
     ]
 
-    defines = []
+    defines = [
+      "STA_INSTANCE_MAX_NUM=$wifi_feature_with_sta_num",
+      "FEATURE_STA_SUPPORT",
+    ]
+
     if (wifi_feature_with_ap_num > 0) {
       defines += [ "FEATURE_AP_SUPPORT" ]
     }
@@ -249,6 +263,7 @@ if (defined(ohos_lite)) {
     }
 
     deps = [
+      ":wifi_manager_service",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit:wifi_toolkit",
       "$WIFI_ROOT_DIR/utils:wifi_utils",
     ]
@@ -294,6 +309,7 @@ if (defined(ohos_lite)) {
     ]
 
     deps = [
+      ":wifi_manager_service",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit:wifi_toolkit",
       "$WIFI_ROOT_DIR/utils:wifi_utils",
     ]
@@ -353,7 +369,11 @@ if (defined(ohos_lite)) {
       "netmanager_base:net_conn_manager_if",
       "safwk:system_ability_fwk",
     ]
-    defines = [ "FEATURE_P2P_SUPPORT" ]
+    defines = [
+      "FEATURE_P2P_SUPPORT",
+      "FEATURE_AP_SUPPORT",
+      "FEATURE_STA_SUPPORT",
+    ]
     if (wifi_feature_with_random_mac_addr) {
       defines += [ "SUPPORT_RANDOM_MAC_ADDR" ]
     }
@@ -371,6 +391,11 @@ if (defined(ohos_lite)) {
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/common/wifi_datashare_utils.cpp",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/common/wifi_permission_helper.cpp",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/common/wifi_permission_utils.cpp",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_country_code/wifi_country_code_manager.cpp",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_country_code/wifi_country_code_policy_base.cpp",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_country_code/wifi_country_code_policy_factory.cpp",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_country_code/wifi_country_code_policy_mobile.cpp",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_country_code/wifi_country_code_policy_no_mobile.cpp",
       "wifi_auth_center.cpp",
       "wifi_config_center.cpp",
       "wifi_dumper.cpp",
@@ -385,6 +410,8 @@ if (defined(ohos_lite)) {
 
     deps = [
       "$WIFI_ROOT_DIR/services/wifi_standard/etc/init:etc",
+      "$WIFI_ROOT_DIR/services/wifi_standard/etc/param:etc",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/idl_client:wifi_idl_client",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit:wifi_toolkit",
       "$WIFI_ROOT_DIR/utils:wifi_utils",
     ]
@@ -401,11 +428,14 @@ if (defined(ohos_lite)) {
       "bundle_framework:appexecfwk_base",
       "c_utils:utils",
       "common_event_service:cesfwk_innerkits",
+      "core_service:tel_core_service_api",
       "data_share:datashare_common",
       "data_share:datashare_consumer",
       "eventhandler:libeventhandler",
       "hilog:libhilog",
       "huks:libhukssdk",
+      "i18n:intl_util",
+      "init:libbegetutil",
       "ipc:ipc_single",
       "netmanager_base:net_conn_manager_if",
       "netmanager_base:net_native_manager_if",
@@ -417,6 +447,8 @@ if (defined(ohos_lite)) {
     }
     defines = [
       "FEATURE_AP_SUPPORT",
+      "FEATURE_STA_SUPPORT",
+      "STA_INSTANCE_MAX_NUM=$wifi_feature_with_sta_num",
       "AP_INSTANCE_MAX_NUM=$wifi_feature_with_ap_num",
     ]
 

@@ -31,7 +31,7 @@ namespace Wifi {
         }                                             \
     } while (0)
 
-WifiP2pImpl::WifiP2pImpl() : client_(nullptr)
+WifiP2pImpl::WifiP2pImpl() : systemAbilityId_(0), client_(nullptr)
 {}
 
 WifiP2pImpl::~WifiP2pImpl()

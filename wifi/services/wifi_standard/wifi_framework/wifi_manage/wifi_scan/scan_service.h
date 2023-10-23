@@ -100,7 +100,7 @@ int WifiMaxThroughput(int wifiStandard, bool is11bMode,
 class ScanService {
     FRIEND_GTEST(ScanService);
 public:
-    ScanService();
+    explicit ScanService(int instId = 0);
     virtual ~ScanService();
     /**
      * @Description  Initializing the Scan Service.
@@ -335,6 +335,7 @@ private:
 #ifndef OHOS_ARCH_LITE
     StandByListerner standByListerner;         /* standby Listerner*/
 #endif
+    int m_instId;
     /**
      * @Description Obtains the frequency of a specified band.
      *

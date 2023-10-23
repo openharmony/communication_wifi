@@ -113,13 +113,14 @@ void WifiNetAgent::UpdateNetSupplierInfo(const sptr<NetManagerStandard::NetSuppl
     WIFI_LOGI("Update network result:%{public}d", result);
 }
 
-void WifiNetAgent::UpdateNetLinkInfo(IpInfo &wifiIpInfo, IpV6Info &wifiIpV6Info, WifiProxyConfig &wifiProxyConfig)
+void WifiNetAgent::UpdateNetLinkInfo(IpInfo &wifiIpInfo, IpV6Info &wifiIpV6Info, WifiProxyConfig &wifiProxyConfig,
+    int instId)
 {
     TimeStats timeStats(__func__);
     WIFI_LOGI("Enter UpdateNetLinkInfo.");
     
     sptr<NetManagerStandard::NetLinkInfo> netLinkInfo = (std::make_unique<NetManagerStandard::NetLinkInfo>()).release();
-    CreateNetLinkInfo(netLinkInfo, wifiIpInfo, wifiIpV6Info, wifiProxyConfig);
+    CreateNetLinkInfo(netLinkInfo, wifiIpInfo, wifiIpV6Info, wifiProxyConfig, instId);
     int32_t result = NetConnClient::GetInstance().UpdateNetLinkInfo(supplierId, netLinkInfo);
     WIFI_LOGI("UpdateNetLinkInfo result:%{public}d", result);
 }
@@ -157,12 +158,12 @@ bool WifiNetAgent::AddRoute(const std::string interface, const std::string ipAdd
 }
 
 void WifiNetAgent::OnStaMachineUpdateNetLinkInfo(IpInfo &wifiIpInfo, IpV6Info &wifiIpV6Info,
-    WifiProxyConfig &wifiProxyConfig)
+    WifiProxyConfig &wifiProxyConfig, int instId)
 {
     if (netConnEventHandler_) {
         netConnEventHandler_->PostSyncTask(
-            [this, &wifiIpInfo, &wifiIpV6Info, &wifiProxyConfig]() {
-                this->UpdateNetLinkInfo(wifiIpInfo, wifiIpV6Info, wifiProxyConfig);
+            [this, &wifiIpInfo, &wifiIpV6Info, &wifiProxyConfig, &instId]() {
+                this->UpdateNetLinkInfo(wifiIpInfo, wifiIpV6Info, wifiProxyConfig, instId);
             });
     }
 }
@@ -186,14 +187,15 @@ void WifiNetAgent::OnStaMachineWifiStart()
     }
 }
 
-void WifiNetAgent::OnStaMachineNetManagerRestart(const sptr<NetManagerStandard::NetSupplierInfo> &netSupplierInfo)
+void WifiNetAgent::OnStaMachineNetManagerRestart(const sptr<NetManagerStandard::NetSupplierInfo> &netSupplierInfo,
+    int instId)
 {
     if (netConnEventHandler_) {
-        netConnEventHandler_->PostSyncTask([this, supplierInfo = netSupplierInfo]() {
+        netConnEventHandler_->PostSyncTask([this, supplierInfo = netSupplierInfo, m_instId = instId]() {
             this->RegisterNetSupplier();
             this->RegisterNetSupplierCallback();
             WifiLinkedInfo linkedInfo;
-            WifiSettings::GetInstance().GetLinkedInfo(linkedInfo);
+            WifiSettings::GetInstance().GetLinkedInfo(linkedInfo, m_instId);
             if ((linkedInfo.detailedState == DetailedState::NOTWORKING)
                 && (linkedInfo.connState == ConnState::CONNECTED)) {
 #ifndef OHOS_ARCH_LITE
@@ -203,21 +205,21 @@ void WifiNetAgent::OnStaMachineNetManagerRestart(const sptr<NetManagerStandard::
                 }
 #endif
                 IpInfo wifiIpInfo;
-                WifiSettings::GetInstance().GetIpInfo(wifiIpInfo);
+                WifiSettings::GetInstance().GetIpInfo(wifiIpInfo, m_instId);
                 IpV6Info wifiIpV6Info;
-                WifiSettings::GetInstance().GetIpv6Info(wifiIpV6Info);
+                WifiSettings::GetInstance().GetIpv6Info(wifiIpV6Info, m_instId);
                 WifiDeviceConfig config;
                 WifiSettings::GetInstance().GetDeviceConfig(linkedInfo.networkId, config);
-                this->UpdateNetLinkInfo(wifiIpInfo, wifiIpV6Info, config.wifiProxyconfig);
+                this->UpdateNetLinkInfo(wifiIpInfo, wifiIpV6Info, config.wifiProxyconfig, m_instId);
             }
         });
     }
 }
 
 void WifiNetAgent::CreateNetLinkInfo(sptr<NetManagerStandard::NetLinkInfo> &netLinkInfo, IpInfo &wifiIpInfo,
-    IpV6Info &wifiIpV6Info, WifiProxyConfig &wifiProxyConfig)
+    IpV6Info &wifiIpV6Info, WifiProxyConfig &wifiProxyConfig, int instId)
 {
-    netLinkInfo->ifaceName_ = "wlan0";
+    netLinkInfo->ifaceName_ = "wlan" + std::to_string(instId);
 
     SetNetLinkIPInfo(netLinkInfo, wifiIpInfo, wifiIpV6Info);
     SetNetLinkRouteInfo(netLinkInfo, wifiIpInfo, wifiIpV6Info);
@@ -292,7 +294,7 @@ void WifiNetAgent::SetNetLinkRouteInfo(sptr<NetManagerStandard::NetLinkInfo> &ne
     IpV6Info &wifiIpV6Info)
 {
     sptr<NetManagerStandard::Route> route = (std::make_unique<NetManagerStandard::Route>()).release();
-    route->iface_ = "wlan0";
+    route->iface_ = netLinkInfo->ifaceName_;
     route->destination_.type_ = NetManagerStandard::INetAddr::IPV4;
     route->destination_.address_ = "0.0.0.0";
     route->gateway_.address_ = IpTools::ConvertIpv4Address(wifiIpInfo.gateway);
@@ -301,7 +303,7 @@ void WifiNetAgent::SetNetLinkRouteInfo(sptr<NetManagerStandard::NetLinkInfo> &ne
         wifiIpV6Info.gateway.c_str(), route->gateway_.address_.c_str());
     if (!wifiIpV6Info.gateway.empty()) {
         sptr<NetManagerStandard::Route> ipv6route = (std::make_unique<NetManagerStandard::Route>()).release();
-        ipv6route->iface_ = "wlan0";
+        ipv6route->iface_ = netLinkInfo->ifaceName_;
         ipv6route->destination_.type_ = NetManagerStandard::INetAddr::IPV6;
         ipv6route->destination_.address_ = "::";
         ipv6route->destination_.prefixlen_ = 0;
@@ -316,7 +318,7 @@ void WifiNetAgent::SetNetLinkLocalRouteInfo(sptr<NetManagerStandard::NetLinkInfo
     unsigned int prefixLength = IpTools::GetMaskLength(IpTools::ConvertIpv4Address(wifiIpInfo.netmask));
     sptr<NetManagerStandard::Route> localRoute = (std::make_unique<NetManagerStandard::Route>()).release();
     std::string strLocalRoute = IpTools::ConvertIpv4Address(wifiIpInfo.ipAddress & wifiIpInfo.netmask);
-    localRoute->iface_ = "wlan0";
+    localRoute->iface_ = netLinkInfo->ifaceName_;
     localRoute->destination_.type_ = NetManagerStandard::INetAddr::IPV4;
     localRoute->destination_.address_ = strLocalRoute;
     localRoute->destination_.prefixlen_ = prefixLength;
@@ -325,7 +327,7 @@ void WifiNetAgent::SetNetLinkLocalRouteInfo(sptr<NetManagerStandard::NetLinkInfo
     if (!wifiIpV6Info.netmask.empty()) {
         unsigned int ipv6PrefixLength = IpTools::GetIPV6MaskLength(wifiIpV6Info.netmask);
         sptr<NetManagerStandard::Route> ipv6route = (std::make_unique<NetManagerStandard::Route>()).release();
-        ipv6route->iface_ = "wlan0";
+        ipv6route->iface_ = netLinkInfo->ifaceName_;
         ipv6route->destination_.type_ = NetManagerStandard::INetAddr::IPV6;
         ipv6route->destination_.address_ =
             Ipv6Address::GetPrefixByAddr(wifiIpV6Info.globalIpV6Address, ipv6PrefixLength);

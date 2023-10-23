@@ -84,12 +84,12 @@ constexpr int BLOCK_LIST_CLEAR_TIMER = 20 * 1000;
 /* Signal levels are classified into: 0 1 2 3 4 ,the max is 4. */
 constexpr int MAX_LEVEL = 4;
 const std::string WPA_BSSID_ANY = "any";
-const std::string IF_NAME = "wlan0";
+const std::string IF_NAME = "wlan";
 
 class StaStateMachine : public StateMachine {
     FRIEND_GTEST(StaStateMachine);
 public:
-    StaStateMachine();
+    explicit StaStateMachine(int instId = 0);
     ~StaStateMachine();
     using staSmHandleFunc = void (StaStateMachine::*)(InternalMessage *msg);
     using StaSmHandleFuncMap = std::map<int, staSmHandleFunc>;
@@ -421,6 +421,8 @@ public:
      * @param msg - Message body received by the state machine[in]
      */
     void DealRenewalTimeout(InternalMessage *msg);
+
+    int GetInstanceId();
 private:
     /**
      * @Description  Destruct state.
@@ -559,7 +561,6 @@ private:
      * @param staticIpAddress- static ip address(in)
      */
     bool ConfigStaticIpAddress(StaticIpAddress &staticIpAddress);
-    int PortalHttpDetection();
     /**
      * @Description  the process of handling network check results.
      *
@@ -766,7 +767,13 @@ private:
 
 private:
     StaSmHandleFuncMap staSmHandleFuncMap;
-    StaServiceCallback staCallback;
+    struct CallbackModuleNameCmp {
+        bool operator() (const StaServiceCallback &cb1, const StaServiceCallback &cb2) const
+        {
+            return strcasecmp(cb1.callbackModuleName.c_str(), cb2.callbackModuleName.c_str()) < 0;
+        }
+    };
+    std::set<StaServiceCallback, CallbackModuleNameCmp> m_staCallback;
 #ifndef OHOS_ARCH_LITE
     sptr<NetManagerStandard::NetSupplierInfo> NetSupplierInfo;
 #endif
@@ -784,6 +791,7 @@ private:
     int getIpFailNum;
     bool isRoam;
     int netNoWorkNum;
+    bool portalFlag;
     WifiLinkedInfo linkedInfo;
     WifiLinkedInfo lastLinkedInfo;
     std::unique_ptr<IDhcpService> pDhcpService;
@@ -803,10 +811,17 @@ private:
     GetIpState *pGetIpState;
     LinkedState *pLinkedState;
     ApRoamingState *pApRoamingState;
+    int m_instId;
     /**
      * @Description Replace empty dns
      */
     void ReplaceEmptyDns(DhcpResult *result);
+    void InvokeOnStaOpenRes(OperateResState state);
+    void InvokeOnStaCloseRes(OperateResState state);
+    void InvokeOnStaConnChanged(OperateResState state, const WifiLinkedInfo &info);
+    void InvokeOnWpsChanged(WpsStartState state, const int pinCode);
+    void InvokeOnStaStreamChanged(StreamDirection direction);
+    void InvokeOnStaRssiLevelChanged(int level);
 };
 }  // namespace Wifi
 }  // namespace OHOS

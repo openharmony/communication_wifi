@@ -19,6 +19,7 @@
 #include "wifi_internal_msg.h"
 #include "i_ap_service.h"
 #include "i_ap_service_callbacks.h"
+#include "i_wifi_country_code_change_listener.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -47,7 +48,7 @@ public:
      * @param None
      * @return ErrCode - success: WIFI_OPT_SUCCESS    failed: ERROR_CODE
      */
-    ErrCode EnableHotspot() const;
+    ErrCode EnableHotspot();
 
     /**
      * @Description  close hotspot.
@@ -150,8 +151,17 @@ public:
     ErrCode SetPowerModel(const PowerModel& model);
 
 private:
+    class WifiCountryCodeChangeObserver : public IWifiCountryCodeChangeListener {
+    public:
+        WifiCountryCodeChangeObserver(const std::string &name, StateMachine &stateMachineObj)
+            : IWifiCountryCodeChangeListener(name, stateMachineObj) {}
+        ~WifiCountryCodeChangeObserver() override = default;
+        ErrCode OnWifiCountryCodeChanged(const std::string &wifiCountryCode) override;
+        std::string GetListenerModuleName() override;
+    };
     ApStateMachine &m_ApStateMachine;
     int m_id;
+    std::shared_ptr<IWifiCountryCodeChangeListener> m_apObserver;
 };
 }  // namespace Wifi
 }  // namespace OHOS

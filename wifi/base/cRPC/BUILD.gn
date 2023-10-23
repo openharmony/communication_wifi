@@ -22,6 +22,7 @@ crpc_server_sources = [
 
 crpc_client_sources = [
   "./src/client.c",
+  "./src/client_updater.c",
   "./src/context.c",
   "./src/net.c",
   "./src/serial.c",

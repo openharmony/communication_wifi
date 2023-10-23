@@ -21,7 +21,7 @@ DEFINE_WIFILOG_LABEL("StaInterface");
 
 namespace OHOS {
 namespace Wifi {
-StaInterface::StaInterface() : pStaService(nullptr)
+StaInterface::StaInterface(int instId) : pStaService(nullptr), m_instId(instId)
 {}
 
 StaInterface::~StaInterface()
@@ -34,9 +34,9 @@ StaInterface::~StaInterface()
     }
 }
 
-extern "C" IStaService *Create(void)
+extern "C" IStaService *Create(int instId = 0)
 {
-    return new (std::nothrow)StaInterface();
+    return new (std::nothrow)StaInterface(instId);
 }
 
 extern "C" void Destroy(IStaService *pservice)
@@ -50,12 +50,12 @@ ErrCode StaInterface::EnableWifi()
     WIFI_LOGI("Enter StaInterface::EnableWifi.\n");
     std::lock_guard<std::mutex> lock(mutex);
     if(pStaService == nullptr) {
-        pStaService = new (std::nothrow) StaService();
+        pStaService = new (std::nothrow) StaService(m_instId);
         if (pStaService == nullptr) {
             WIFI_LOGE("New StaService failed.\n");
             return WIFI_OPT_FAILED;
         }
-        if (pStaService->InitStaService(staCallback) != WIFI_OPT_SUCCESS) {
+        if (pStaService->InitStaService(m_staCallback) != WIFI_OPT_SUCCESS) {
             WIFI_LOGE("InitStaService failed.\n");
             delete pStaService;
             pStaService = nullptr;
@@ -277,22 +277,15 @@ ErrCode StaInterface::ConnectivityManager(const std::vector<InterScanInfo> &scan
     return WIFI_OPT_SUCCESS;
 }
 
-ErrCode StaInterface::SetCountryCode(const std::string &countryCode)
-{
-    LOGD("Enter StaInterface::SetCountryCode.\n");
-    std::lock_guard<std::mutex> lock(mutex);
-    CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
-    if (pStaService->SetCountryCode(countryCode) != WIFI_OPT_SUCCESS) {
-        LOGD("SetCountryCode failed.\n");
-        return WIFI_OPT_FAILED;
-    }
-    return WIFI_OPT_SUCCESS;
-}
-
 ErrCode StaInterface::RegisterStaServiceCallback(const StaServiceCallback &callbacks)
 {
     LOGD("Enter StaInterface::RegisterStaServiceCallback.\n");
-    staCallback = callbacks;
+    for (StaServiceCallback cb : m_staCallback) {
+        if (strcasecmp(callbacks.callbackModuleName.c_str(), cb.callbackModuleName.c_str()) == 0) {
+            return WIFI_OPT_SUCCESS;
+        }
+    }
+    m_staCallback.push_back(callbacks);
     return WIFI_OPT_SUCCESS;
 }
 
@@ -318,6 +311,20 @@ ErrCode StaInterface::OnSystemAbilityChanged(int systemAbilityid, bool add)
         LOGE("OnSystemAbilityChanged() failed!");
         return WIFI_OPT_FAILED;
     }
+    return WIFI_OPT_SUCCESS;
+}
+
+ErrCode StaInterface::OnScreenStateChanged(int screenState)
+{
+    WIFI_LOGI("Enter StaInterface::OnScreenStateChanged, screenState=%{public}d.", screenState);
+
+    if (screenState != MODE_STATE_OPEN && screenState != MODE_STATE_CLOSE) {
+        WIFI_LOGE("screenState param is error");
+        return WIFI_OPT_INVALID_PARAM;
+    }
+    std::lock_guard<std::mutex> lock(mutex);
+    CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
+    pStaService->HandleScreenStatusChanged(screenState);
     return WIFI_OPT_SUCCESS;
 }
 }  // namespace Wifi

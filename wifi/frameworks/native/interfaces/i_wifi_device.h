@@ -348,6 +348,21 @@ public:
      */
     virtual ErrCode Get5GHzChannelList(std::vector<int> &result) = 0;
 
+    /**
+     * @Description set frozen app
+     *
+     * @param uid - uid of frozen app
+     * @param isFrozen - is app frozen
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode SetAppFrozen(int uid, bool isFrozen) = 0;
+
+    /**
+     * @Description reset all frozen app
+     *
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode ResetAllFrozenApp() = 0;
 #ifndef OHOS_ARCH_LITE
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.wifi.IWifiDeviceService");

@@ -259,10 +259,10 @@ NO_SANITIZE("cfi") WifiErrorCode EventManager::RegisterWifiEvents()
 {
     if (mSaStatusListener == nullptr) {
         mSaStatusListener = new OHOS::Wifi::WifiAbilityStatusChange();
-        mSaStatusListener->Init(WIFI_DEVICE_ABILITY_ID);
-        mSaStatusListener->Init(WIFI_SCAN_ABILITY_ID);
-        mSaStatusListener->Init(WIFI_HOTSPOT_ABILITY_ID);
-        mSaStatusListener->Init(WIFI_P2P_ABILITY_ID);
+        mSaStatusListener->Init((int32_t)WIFI_DEVICE_ABILITY_ID);
+        mSaStatusListener->Init((int32_t)WIFI_SCAN_ABILITY_ID);
+        mSaStatusListener->Init((int32_t)WIFI_HOTSPOT_ABILITY_ID);
+        mSaStatusListener->Init((int32_t)WIFI_P2P_ABILITY_ID);
     }
 
     WifiErrorCode ret = WIFI_SUCCESS;

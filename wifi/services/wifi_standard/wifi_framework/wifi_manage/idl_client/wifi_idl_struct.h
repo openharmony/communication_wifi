@@ -51,7 +51,10 @@ struct WifiIdlDeviceConfig {
     std::string privateKey;
     std::string bssid;
     int phase2Method;
-
+    bool isRequirePmf;
+    int allowedProtocols;
+    int allowedPairwiseCiphers;
+    int allowedGroupCiphers;
     WifiIdlDeviceConfig() : networkId(-1), priority(-1), scanSsid(-1), authAlgorithms(-1), wepKeyIdx(-1),
         phase2Method(0)
     {}

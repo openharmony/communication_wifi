@@ -18,6 +18,7 @@
 #include "sta_service_callback.h"
 #ifndef OHOS_ARCH_LITE
 #include "wifi_internal_event_dispatcher.h"
+#include "wifi_country_code_manager.h"
 #endif
 #include "wifi_logger.h"
 #include "wifi_settings.h"
@@ -27,10 +28,13 @@
 #include "wifi_common_util.h"
 
 DEFINE_WIFILOG_LABEL("StaService");
+
 namespace OHOS {
 namespace Wifi {
-StaService::StaService()
-    : pStaStateMachine(nullptr), pStaMonitor(nullptr), pStaAutoConnectService(nullptr)
+const std::string CLASS_NAME = "sta_service";
+
+StaService::StaService(int instId)
+    : pStaStateMachine(nullptr), pStaMonitor(nullptr), pStaAutoConnectService(nullptr), m_instId(instId)
 {}
 
 StaService::~StaService()
@@ -53,10 +57,10 @@ StaService::~StaService()
     }
 }
 
-ErrCode StaService::InitStaService(const StaServiceCallback &callbacks)
+ErrCode StaService::InitStaService(const std::vector<StaServiceCallback> &callbacks)
 {
     WIFI_LOGI("Enter InitStaService.\n");
-    pStaStateMachine = new (std::nothrow) StaStateMachine();
+    pStaStateMachine = new (std::nothrow) StaStateMachine(m_instId);
     if (pStaStateMachine == nullptr) {
         WIFI_LOGE("Alloc pStaStateMachine failed.\n");
         return WIFI_OPT_FAILED;
@@ -69,7 +73,7 @@ ErrCode StaService::InitStaService(const StaServiceCallback &callbacks)
 
     RegisterStaServiceCallback(callbacks);
 
-    pStaMonitor = new (std::nothrow) StaMonitor();
+    pStaMonitor = new (std::nothrow) StaMonitor(m_instId);
     if (pStaMonitor == nullptr) {
         WIFI_LOGE("Alloc pStaMonitor failed.\n");
         return WIFI_OPT_FAILED;
@@ -91,13 +95,13 @@ ErrCode StaService::InitStaService(const StaServiceCallback &callbacks)
         WifiErrorNo ret = WifiStaHalInterface::GetInstance().GetSupportFrequencies(band, freqs2G);
         if (ret != WIFI_IDL_OPT_OK) {
             WIFI_LOGE("get 2g frequencies failed.");
-            WifiSettings::GetInstance().SetDefaultFrequenciesByCountryBand(BandType::BAND_2GHZ, freqs2G);
+            WifiSettings::GetInstance().SetDefaultFrequenciesByCountryBand(BandType::BAND_2GHZ, freqs2G, m_instId);
         }
         band = static_cast<int>(BandType::BAND_5GHZ);
         ret = WifiStaHalInterface::GetInstance().GetSupportFrequencies(band, freqs5G);
         if (ret != WIFI_IDL_OPT_OK) {
             WIFI_LOGE("get 5g frequencies failed.");
-            WifiSettings::GetInstance().SetDefaultFrequenciesByCountryBand(BandType::BAND_5GHZ, freqs5G);
+            WifiSettings::GetInstance().SetDefaultFrequenciesByCountryBand(BandType::BAND_5GHZ, freqs5G, m_instId);
         }
         std::vector<int32_t> supp2Gfreqs(freqs2G.begin(), freqs2G.end());
         std::vector<int32_t> supp5Gfreqs(freqs5G.begin(), freqs5G.end());
@@ -120,7 +124,7 @@ ErrCode StaService::InitStaService(const StaServiceCallback &callbacks)
         }
     }
 
-    pStaAutoConnectService = new (std::nothrow) StaAutoConnectService(pStaStateMachine);
+    pStaAutoConnectService = new (std::nothrow) StaAutoConnectService(pStaStateMachine, m_instId);
     if (pStaAutoConnectService == nullptr) {
         WIFI_LOGE("Alloc pStaAutoConnectService failed.\n");
         return WIFI_OPT_FAILED;
@@ -133,9 +137,14 @@ ErrCode StaService::InitStaService(const StaServiceCallback &callbacks)
     return WIFI_OPT_SUCCESS;
 }
 
-ErrCode StaService::EnableWifi() const
+ErrCode StaService::EnableWifi()
 {
     WIFI_LOGI("Enter EnableWifi.\n");
+#ifndef OHOS_ARCH_LITE
+    // notification of registration country code change
+    m_staObserver = std::make_shared<WifiCountryCodeChangeObserver>(CLASS_NAME, *pStaStateMachine);
+    WifiCountryCodeManager::GetInstance().RegisterWifiCountryCodeChangeListener(m_staObserver);
+#endif
     CHECK_NULL_AND_RETURN(pStaStateMachine, WIFI_OPT_FAILED);
     pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_ENABLE_WIFI, STA_CONNECT_MODE);
     return WIFI_OPT_SUCCESS;
@@ -144,6 +153,10 @@ ErrCode StaService::EnableWifi() const
 ErrCode StaService::DisableWifi() const
 {
     WIFI_LOGI("Enter DisableWifi.\n");
+#ifndef OHOS_ARCH_LITE
+    // deregistration country code change notification
+    WifiCountryCodeManager::GetInstance().UnregisterWifiCountryCodeChangeListener(m_staObserver);
+#endif
     CHECK_NULL_AND_RETURN(pStaStateMachine, WIFI_OPT_FAILED);
     pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_DISABLE_WIFI);
     return WIFI_OPT_SUCCESS;
@@ -244,6 +257,7 @@ int StaService::AddDeviceConfig(const WifiDeviceConfig &config) const
         LOGI("AddDeviceConfig alloc new id[%{public}d] succeed!", netWorkId);
     }
     tempDeviceConfig = config;
+    tempDeviceConfig.instanceId = m_instId;
     tempDeviceConfig.networkId = netWorkId;
     tempDeviceConfig.status = status;
     tempDeviceConfig.userSelectBssid = userSelectbssid;
@@ -409,7 +423,7 @@ ErrCode StaService::Disconnect() const
     CHECK_NULL_AND_RETURN(pStaAutoConnectService, WIFI_OPT_FAILED);
     CHECK_NULL_AND_RETURN(pStaStateMachine, WIFI_OPT_FAILED);
     WifiLinkedInfo linkedInfo;
-    WifiSettings::GetInstance().GetLinkedInfo(linkedInfo);
+    WifiSettings::GetInstance().GetLinkedInfo(linkedInfo, m_instId);
     if (pStaAutoConnectService->EnableOrDisableBssid(linkedInfo.bssid, false, AP_CANNOT_HANDLE_NEW_STA)) {
         WIFI_LOGI("The blocklist is updated.\n");
     }
@@ -438,18 +452,6 @@ ErrCode StaService::CancelWps() const
     return WIFI_OPT_SUCCESS;
 }
 
-ErrCode StaService::SetCountryCode(const std::string &countryCode) const
-{
-    LOGI("Enter SetCountryCode, countryCode=[%{public}s]!", countryCode.c_str());
-    if (WifiSupplicantHalInterface::GetInstance().WpaSetCountryCode(countryCode) != WIFI_IDL_OPT_OK) {
-        LOGE("WpaSetCountryCode() failed!");
-        return WIFI_OPT_FAILED;
-    }
-    LOGI("WpaSetCountryCode() succeed!");
-    WifiSettings::GetInstance().SetCountryCode(countryCode);
-    return WIFI_OPT_SUCCESS;
-}
-
 ErrCode StaService::AutoConnectService(const std::vector<InterScanInfo> &scanInfos)
 {
     WIFI_LOGI("Enter AutoConnectService.\n");
@@ -458,14 +460,16 @@ ErrCode StaService::AutoConnectService(const std::vector<InterScanInfo> &scanInf
     return WIFI_OPT_SUCCESS;
 }
 
-void StaService::RegisterStaServiceCallback(const StaServiceCallback &callbacks) const
+void StaService::RegisterStaServiceCallback(const std::vector<StaServiceCallback> &callbacks) const
 {
     LOGI("Enter RegisterStaServiceCallback.");
     if (pStaStateMachine == nullptr) {
         LOGE("pStaStateMachine is null.\n");
         return;
     }
-    pStaStateMachine->RegisterStaServiceCallback(callbacks);
+    for (StaServiceCallback cb : callbacks) {
+        pStaStateMachine->RegisterStaServiceCallback(cb);
+    }
 }
 
 ErrCode StaService::ReConnect() const
@@ -493,6 +497,7 @@ void StaService::NotifyDeviceConfigChange(ConfigChange value) const
     WifiEventCallbackMsg cbMsg;
     cbMsg.msgCode = WIFI_CBK_MSG_DEVICE_CONFIG_CHANGE;
     cbMsg.msgData = static_cast<int>(value);
+    cbMsg.id = m_instId;
     WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
 #endif
 }
@@ -507,6 +512,40 @@ ErrCode StaService::OnSystemAbilityChanged(int systemAbilityid, bool add)
     }
 #endif
     return WIFI_OPT_SUCCESS;
+}
+
+#ifndef OHOS_ARCH_LITE
+ErrCode StaService::WifiCountryCodeChangeObserver::OnWifiCountryCodeChanged(const std::string &wifiCountryCode)
+{
+    WIFI_LOGI("deal wifi country code changed, code=%{public}s", wifiCountryCode.c_str());
+    InternalMessage *msg = m_stateMachineObj.CreateMessage();
+    msg->SetMessageName(static_cast<int>(WIFI_SVR_CMD_UPDATE_COUNTRY_CODE));
+    msg->AddStringMessageBody(wifiCountryCode);
+    m_stateMachineObj.SendMessage(msg);
+    return WIFI_OPT_SUCCESS;
+}
+
+std::string StaService::WifiCountryCodeChangeObserver::GetListenerModuleName()
+{
+    return m_listenerModuleName;
+}
+#endif
+ 
+void StaService::HandleScreenStatusChanged(int screenState)
+{
+    WIFI_LOGI("Enter StaService::HandleScreenStatusChanged screenState:%{public}d.", screenState);
+#ifndef OHOS_ARCH_LITE
+    if (pStaStateMachine == nullptr) {
+        WIFI_LOGE("pStaStateMachine is null!");
+        return;
+    }
+    if (screenState == MODE_STATE_OPEN) {
+        pStaStateMachine->StartTimer(static_cast<int>(CMD_START_NETCHECK), 0);
+    } else {
+        pStaStateMachine->StopTimer(static_cast<int>(CMD_START_NETCHECK));
+    }
+#endif
+    return;
 }
 }  // namespace Wifi
 }  // namespace OHOS

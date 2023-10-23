@@ -32,6 +32,11 @@ WifiScanStub::WifiScanStub() : mSingleCallback(false)
     InitHandleMap();
 }
 
+WifiScanStub::WifiScanStub(int instId) : mSingleCallback(false), m_instId(instId)
+{
+    InitHandleMap();
+}
+
 WifiScanStub::~WifiScanStub()
 {}
 
@@ -258,7 +263,8 @@ int WifiScanStub::OnRegisterCallBack(uint32_t code, MessageParcel &data, Message
             }
             if (callback_ != nullptr) {
                 for (const auto &eventName : event) {
-                    ret = WifiInternalEventDispatcher::GetInstance().AddScanCallback(remote, callback_, pid, eventName, tokenId);
+                    ret = WifiInternalEventDispatcher::GetInstance().AddScanCallback(remote, callback_, pid, eventName,
+                        tokenId, m_instId);
                 }
             }
         }

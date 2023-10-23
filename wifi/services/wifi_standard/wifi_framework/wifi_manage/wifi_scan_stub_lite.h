@@ -39,6 +39,9 @@ private:
     int OnGetScanInfoList(uint32_t code, IpcIo *req, IpcIo *reply);
     int OnRegisterCallBack(uint32_t code, IpcIo *req, IpcIo *reply);
     int OnGetSupportedFeatures(uint32_t code, IpcIo *req, IpcIo *reply);
+
+protected:
+    int m_instId{0};
 };
 }  // namespace Wifi
 }  // namespace OHOS

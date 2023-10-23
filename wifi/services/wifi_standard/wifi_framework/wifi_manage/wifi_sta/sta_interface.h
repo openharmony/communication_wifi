@@ -19,14 +19,14 @@
 #include "sta_define.h"
 #include "ista_service.h"
 #include "wifi_errcode.h"
-
+#include "define.h"
 namespace OHOS {
 namespace Wifi {
 class StaService;
 class StaInterface : public IStaService  {
     FRIEND_GTEST(StaInterface);
 public:
-    StaInterface();
+    explicit StaInterface(int instId = 0);
     virtual ~StaInterface() override;
 
     /**
@@ -189,12 +189,7 @@ public:
      * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
      */
     virtual ErrCode ConnectivityManager(const std::vector<InterScanInfo> &scanInfos) override;
-    /**
-     * @Description  Set country code
-     *
-     * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
-     */
-    virtual ErrCode SetCountryCode(const std::string &countryCode) override;
+
     /**
      * @Description Register sta callback function
      *
@@ -217,10 +212,18 @@ public:
      * @return WifiErrorNo
      */
     virtual ErrCode OnSystemAbilityChanged(int systemAbilityid, bool add) override;
+    /**
+     * @Description Processes interface service screen change request.
+     *
+     * @param screenState screen state[in]
+     * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
+     */
+    virtual ErrCode OnScreenStateChanged(int screenState) override;
 private:
-    StaServiceCallback staCallback;
+    std::vector<StaServiceCallback> m_staCallback;
     StaService *pStaService;
     std::mutex mutex;
+    int m_instId;
 };
 }  // namespace Wifi
 }  // namespace OHOS

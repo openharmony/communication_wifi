@@ -29,7 +29,7 @@ NO_SANITIZE("cfi") std::shared_ptr<WifiHotspot> WifiHotspot::GetInstance(int sys
         return nullptr;
     }
 
-    std::shared_ptr<WifiHotspotImpl> hotspot = DelayedSingleton<WifiHotspotImpl>::GetInstance();
+    std::shared_ptr<WifiHotspotImpl> hotspot = std::make_shared<WifiHotspotImpl>();
     if (hotspot && hotspot->Init(systemAbilityId, id)) {
         WIFI_LOGI("ap obj id:%{public}d succeeded, sa id:%{public}d", id, systemAbilityId);
         return hotspot;
@@ -40,8 +40,6 @@ NO_SANITIZE("cfi") std::shared_ptr<WifiHotspot> WifiHotspot::GetInstance(int sys
 }
 
 WifiHotspot::~WifiHotspot()
-{
-    DelayedSingleton<WifiHotspotImpl>::DestroyInstance();
-}
+{}
 }  // namespace Wifi
 }  // namespace OHOS

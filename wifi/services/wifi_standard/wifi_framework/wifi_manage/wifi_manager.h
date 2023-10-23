@@ -53,6 +53,7 @@ enum InitStatus {
     SERVICE_MANAGER_INIT_FAILED = 3,
     EVENT_BROADCAST_INIT_FAILED = 4,
     TASK_THREAD_INIT_FAILED = 5,
+    WIFI_COUNTRY_CODE_MANAGER_INIT_FAILED = 6,
 };
 
 enum class WifiCloseServiceCode {
@@ -61,6 +62,12 @@ enum class WifiCloseServiceCode {
     AP_SERVICE_CLOSE,
     P2P_SERVICE_CLOSE,
     SERVICE_THREAD_EXIT,
+};
+
+struct WifiCloseServiceMsg
+{
+    WifiCloseServiceCode code;
+    int instId;
 };
 
 struct WifiCfgMonitorEventCallback {
@@ -140,8 +147,8 @@ public:
      */
     IScanSerivceCallbacks GetScanCallback(void);
     
-    ErrCode AutoStartStaService(AutoStartOrStopServiceReason reason);
-    ErrCode AutoStopStaService(AutoStartOrStopServiceReason reason);
+    ErrCode AutoStartStaService(AutoStartOrStopServiceReason reason, int instId = 0);
+    ErrCode AutoStopStaService(AutoStartOrStopServiceReason reason, int instId = 0);
     void StopUnloadStaSaTimer(void);
     void StartUnloadStaSaTimer(void);
     void StopUnloadScanSaTimer(void);
@@ -201,10 +208,10 @@ public:
     void DealCloseAirplaneModeEvent();
     void DealLocationModeChangeEvent();
     bool GetLocationModeByDatashare();
-    static void CheckAndStartScanService(void);
+    static void CheckAndStartScanService(int instId = 0);
 
 private:
-    void PushServiceCloseMsg(WifiCloseServiceCode code);
+    void PushServiceCloseMsg(WifiCloseServiceCode code, int instId = 0);
     void InitStaCallback(void);
     void InitScanCallback(void);
     void InitSubscribeListener();
@@ -216,34 +223,34 @@ private:
 #endif
     InitStatus GetInitStatus();
     static void DealCloseServiceMsg(WifiManager &manager);
-    static void CloseStaService(void);
+    static void CloseStaService(int instId = 0);
     static void UnloadStaSaTimerCallback();
     static void UnloadScanSaTimerCallback();
 #ifdef FEATURE_AP_SUPPORT
     static void CloseApService(int id = 0);
     static void UnloadHotspotSaTimerCallback();
 #endif
-    static void CloseScanService(void);
+    static void CloseScanService(int instId = 0);
 #ifdef FEATURE_P2P_SUPPORT
     static void CloseP2pService(void);
     static void UnloadP2PSaTimerCallback();
 #endif
-    static void DealStaOpenRes(OperateResState state);
-    static void DealStaCloseRes(OperateResState state);
-    static void DealStaConnChanged(OperateResState state, const WifiLinkedInfo &info);
-    static void DealWpsChanged(WpsStartState state, const int pinCode);
-    static void DealStreamChanged(StreamDirection direction);
-    static void DealRssiChanged(int rssi);
-    static void CheckAndStopScanService(void);
-    static void DealScanOpenRes(void);
-    static void DealScanCloseRes(void);
-    static void DealScanFinished(int state);
-    static void DealScanInfoNotify(std::vector<InterScanInfo> &results);
-    static void DealStoreScanInfoEvent(std::vector<InterScanInfo> &results);
-    static void DealOpenScanOnlyRes(OperateResState state);
-    static void DealCloseScanOnlyRes(OperateResState state);
-    static void DealAirplaneExceptionWhenStaOpen(void);
-    static void DealAirplaneExceptionWhenStaClose(void);
+    static void DealStaOpenRes(OperateResState state, int instId = 0);
+    static void DealStaCloseRes(OperateResState state, int instId = 0);
+    static void DealStaConnChanged(OperateResState state, const WifiLinkedInfo &info, int instId = 0);
+    static void DealWpsChanged(WpsStartState state, const int pinCode, int instId = 0);
+    static void DealStreamChanged(StreamDirection direction, int instId = 0);
+    static void DealRssiChanged(int rssi, int instId = 0);
+    static void CheckAndStopScanService(int instId = 0);
+    static void DealScanOpenRes(int instId = 0);
+    static void DealScanCloseRes(int instId = 0);
+    static void DealScanFinished(int state, int instId = 0);
+    static void DealScanInfoNotify(std::vector<InterScanInfo> &results, int instId = 0);
+    static void DealStoreScanInfoEvent(std::vector<InterScanInfo> &results, int instId = 0);
+    static void DealOpenScanOnlyRes(OperateResState state, int instId = 0);
+    static void DealCloseScanOnlyRes(OperateResState state, int instId = 0);
+    static void DealAirplaneExceptionWhenStaOpen(int instId = 0);
+    static void DealAirplaneExceptionWhenStaClose(int instId = 0);
 #ifdef FEATURE_AP_SUPPORT
     static void DealApStateChanged(ApState bState, int id = 0);
     static void DealApGetStaJoin(const StationInfo &info, int id = 0);
@@ -260,10 +267,10 @@ private:
     static void DealP2pActionResult(P2pActionCallback action, ErrCode code);
     static void DealConfigChanged(CfgType type, char* data, int dataLen);
 #endif
-    static void AutoStartScanOnly(void);
-    static void AutoStopScanOnly(void);
-    static void ForceStopWifi(void);
-    static void AutoStartScanService(void);
+    static void AutoStartScanOnly(int instId = 0);
+    static void AutoStopScanOnly(int instId = 0);
+    static void ForceStopWifi(int instId = 0);
+    static void AutoStartScanService(int instId = 0);
     static void AutoStartEnhanceService(void);
     static void CheckAndStartSta(AutoStartOrStopServiceReason reason);
     static void AutoStartServiceThread(AutoStartOrStopServiceReason reason);
@@ -276,7 +283,7 @@ private:
     std::mutex airplaneModeEventMutex;
     std::mutex locationEventMutex;
     std::condition_variable mCondition;
-    std::deque<WifiCloseServiceCode> mEventQue;
+    std::deque<WifiCloseServiceMsg> mEventQue;
     StaServiceCallback mStaCallback;
     IScanSerivceCallbacks mScanCallback;
 #ifndef OHOS_ARCH_LITE

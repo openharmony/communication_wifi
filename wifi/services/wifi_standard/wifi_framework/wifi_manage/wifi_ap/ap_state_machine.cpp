@@ -94,17 +94,21 @@ void ApStateMachine::OnApStateChange(ApState state)
         WIFI_LOGE("WifiSetting change state fail.");
     }
 
-    if (m_Callbacks.OnApStateChangedEvent != nullptr &&
-        (state == ApState::AP_STATE_IDLE || state == ApState::AP_STATE_STARTED || state == ApState::AP_STATE_STARTING ||
-            state == ApState::AP_STATE_CLOSING)) {
-        m_Callbacks.OnApStateChangedEvent(state, m_id);
+    if (state == ApState::AP_STATE_IDLE || state == ApState::AP_STATE_STARTED || state == ApState::AP_STATE_STARTING ||
+            state == ApState::AP_STATE_CLOSING) {
+        for (const auto &callBackItem : m_callbacks) {
+            if (callBackItem.OnApStateChangedEvent != nullptr) {
+                callBackItem.OnApStateChangedEvent(state, m_id);
+            }
+        }
     }
     return;
 }
 
-ErrCode ApStateMachine::RegisterApServiceCallbacks(const IApServiceCallbacks &callbacks)
+ErrCode ApStateMachine::RegisterApServiceCallbacks(const IApServiceCallbacks &callback)
 {
-    m_Callbacks = callbacks;
+    WIFI_LOGI("RegisterApServiceCallbacks, callback module name: %{public}s", callback.callbackModuleName.c_str());
+    m_callbacks.insert(callback);
     return ErrCode::WIFI_OPT_SUCCESS;
 }
 
@@ -112,13 +116,17 @@ void ApStateMachine::BroadCastStationChange(const StationInfo &staInfo, ApStatem
 {
     switch (act) {
         case ApStatemachineEvent::CMD_STATION_JOIN:
-            if (m_Callbacks.OnHotspotStaJoinEvent) {
-                m_Callbacks.OnHotspotStaJoinEvent(staInfo, m_id);
+            for (const auto &callBackItem : m_callbacks) {
+                if (callBackItem.OnHotspotStaJoinEvent != nullptr) {
+                    callBackItem.OnHotspotStaJoinEvent(staInfo, m_id);
+                }
             }
             break;
         case ApStatemachineEvent::CMD_STATION_LEAVE:
-            if (m_Callbacks.OnHotspotStaLeaveEvent) {
-                m_Callbacks.OnHotspotStaLeaveEvent(staInfo, m_id);
+            for (const auto &callBackItem : m_callbacks) {
+                if (callBackItem.OnHotspotStaLeaveEvent != nullptr) {
+                    callBackItem.OnHotspotStaLeaveEvent(staInfo, m_id);
+                }
             }
             break;
         default:
@@ -129,7 +137,7 @@ void ApStateMachine::BroadCastStationChange(const StationInfo &staInfo, ApStatem
 
 bool ApStateMachine::StartDhcpServer(const std::string &ipAddress, const int32_t &leaseTime)
 {
-    WIFI_LOGI("Enter:StartDhcpServer");
+    WIFI_LOGI("Enter:StartDhcpServer leaseTime:%{public}d", leaseTime);
 #ifndef WIFI_DHCP_DISABLED
     Ipv4Address ipv4(Ipv4Address::INVALID_INET_ADDRESS);
     Ipv6Address ipv6(Ipv6Address::INVALID_INET6_ADDRESS);

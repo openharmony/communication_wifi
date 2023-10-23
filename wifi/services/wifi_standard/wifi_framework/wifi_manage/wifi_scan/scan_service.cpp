@@ -30,7 +30,7 @@ DEFINE_WIFILOG_SCAN_LABEL("ScanService");
 
 namespace OHOS {
 namespace Wifi {
-ScanService::ScanService()
+ScanService::ScanService(int instId)
     : pScanStateMachine(nullptr),
       pScanMonitor(nullptr),
       scanStartedFlag(false),
@@ -50,7 +50,8 @@ ScanService::ScanService()
       isAbsFreezeState(false),
       isAbsFreezeScaned(false),
       scanResultBackup(-1),
-      mEnhanceService(nullptr)
+      mEnhanceService(nullptr),
+      m_instId(instId)
 {}
 
 ScanService::~ScanService()
@@ -58,6 +59,7 @@ ScanService::~ScanService()
     WIFI_LOGI("Enter ScanService::~ScanService.\n");
 
     if (pScanMonitor != nullptr) {
+        pScanMonitor->SetScanStateMachine(nullptr);
         delete pScanMonitor;
         pScanMonitor = nullptr;
     }
@@ -66,7 +68,7 @@ ScanService::~ScanService()
         delete pScanStateMachine;
         pScanStateMachine = nullptr;
     }
-    WifiSettings::GetInstance().ClearScanInfoList();
+    WifiSettings::GetInstance().ClearScanInfoList(m_instId);
 }
 
 bool ScanService::InitScanService(const IScanSerivceCallbacks &scanSerivceCallbacks)
@@ -74,7 +76,7 @@ bool ScanService::InitScanService(const IScanSerivceCallbacks &scanSerivceCallba
     WIFI_LOGI("Enter ScanService::InitScanService.\n");
 
     mScanSerivceCallbacks = scanSerivceCallbacks;
-    pScanStateMachine = new (std::nothrow) ScanStateMachine();
+    pScanStateMachine = new (std::nothrow) ScanStateMachine(m_instId);
     if (pScanStateMachine == nullptr) {
         WIFI_LOGE("Alloc pScanStateMachine failed.\n");
         return false;
@@ -90,7 +92,7 @@ bool ScanService::InitScanService(const IScanSerivceCallbacks &scanSerivceCallba
         WIFI_LOGE("ScanStateMachine_->EnrollScanStatusListener failed.\n");
         return false;
     }
-    pScanMonitor = new (std::nothrow) ScanMonitor();
+    pScanMonitor = new (std::nothrow) ScanMonitor(m_instId);
     if (pScanMonitor == nullptr) {
         WIFI_LOGE("Alloc pScanMonitor failed.\n");
         return false;
@@ -180,12 +182,12 @@ void ScanService::HandleScanStatusReport(ScanStatusReport &scanStatusReport)
             scanStartedFlag = true;
             /* Pno scan maybe has started, stop it first. */
             pScanStateMachine->SendMessage(CMD_STOP_PNO_SCAN);
-            mScanSerivceCallbacks.OnScanStartEvent();
+            mScanSerivceCallbacks.OnScanStartEvent(m_instId);
             SystemScanProcess(true);
             break;
         }
         case SCAN_FINISHED_STATUS: {
-            mScanSerivceCallbacks.OnScanStopEvent();
+            mScanSerivceCallbacks.OnScanStopEvent(m_instId);
             break;
         }
         case COMMON_SCAN_SUCCESS: {
@@ -552,7 +554,7 @@ void ScanService::HandleCommonScanFailed(std::vector<int> &requestIndexList)
         }
 
         /* Notification of the end of scanning. */
-        mScanSerivceCallbacks.OnScanFinishEvent(static_cast<int>(ScanHandleNotify::SCAN_FAIL));
+        mScanSerivceCallbacks.OnScanFinishEvent(static_cast<int>(ScanHandleNotify::SCAN_FAIL), m_instId);
         scanResultBackup = static_cast<int>(ScanHandleNotify::SCAN_FAIL);
 
         scanConfigMap.erase(*reqIter);
@@ -586,7 +588,7 @@ void ScanService::HandleCommonScanInfo(
 
                 if (StoreFullScanInfo(configIter->second, scanInfoList)) {
                     fullScanStored = true;
-                    mScanSerivceCallbacks.OnScanFinishEvent(static_cast<int>(ScanHandleNotify::SCAN_OK));
+                    mScanSerivceCallbacks.OnScanFinishEvent(static_cast<int>(ScanHandleNotify::SCAN_OK), m_instId);
                     scanResultBackup = static_cast<int>(ScanHandleNotify::SCAN_OK);
                 } else {
                     WIFI_LOGE("StoreFullScanInfo failed.\n");
@@ -596,7 +598,7 @@ void ScanService::HandleCommonScanInfo(
                 if (!StoreUserScanInfo(configIter->second, scanInfoList)) {
                     WIFI_LOGE("StoreUserScanInfo failed.\n");
                 }
-                mScanSerivceCallbacks.OnScanFinishEvent(static_cast<int>(ScanHandleNotify::SCAN_OK));
+                mScanSerivceCallbacks.OnScanFinishEvent(static_cast<int>(ScanHandleNotify::SCAN_OK), m_instId);
                 scanResultBackup = static_cast<int>(ScanHandleNotify::SCAN_OK);
             }
 
@@ -673,7 +675,7 @@ bool ScanService::StoreFullScanInfo(
     }
 
     std::vector<WifiScanInfo> results;
-    int ret = WifiSettings::GetInstance().GetScanInfoList(results);
+    int ret = WifiSettings::GetInstance().GetScanInfoList(results, m_instId);
     if (ret != 0) {
         WIFI_LOGW("GetScanInfoList return error. \n");
     }
@@ -684,23 +686,23 @@ bool ScanService::StoreFullScanInfo(
         bool find = false;
         for (auto iter = results.begin(); iter != results.end(); ++iter) {
             if (iter->bssid == storedIter->bssid && iter->ssid == storedIter->ssid) {
+                iter = results.erase(iter);
                 find = true;
-                iter->disappearCount = 0;
                 break;
             }
         }
         if (!find) {
         #ifdef SUPPORT_RANDOM_MAC_ADDR
             WifiSettings::GetInstance().StoreWifiMacAddrPairInfo(WifiMacAddrInfoType::WIFI_SCANINFO_MACADDR_INFO,
-                storedIter->bssid, "");
+                storedIter->bssid, "", m_instId);
         #endif
-            results.push_back(*storedIter);
         }
-        WifiSettings::GetInstance().UpdateLinkedChannelWidth(storedIter->bssid, storedIter->channelWidth);
+        results.push_back(*storedIter);
+        WifiSettings::GetInstance().UpdateLinkedChannelWidth(storedIter->bssid, storedIter->channelWidth, m_instId);
     }
 
     WIFI_LOGI("Save %{public}d scan results.", (int)(results.size()));
-    if (WifiSettings::GetInstance().SaveScanInfoList(results) != 0) {
+    if (WifiSettings::GetInstance().SaveScanInfoList(results, m_instId) != 0) {
         WIFI_LOGE("WifiSettings::GetInstance().SaveScanInfoList failed.\n");
         return false;
     }
@@ -751,7 +753,7 @@ void ScanService::ReportScanInfos(std::vector<InterScanInfo> &interScanList)
 {
     WIFI_LOGI("Enter ScanService::ReportScanInfos.\n");
 
-    mScanSerivceCallbacks.OnScanInfoEvent(interScanList);
+    mScanSerivceCallbacks.OnScanInfoEvent(interScanList, m_instId);
     return;
 }
 
@@ -759,7 +761,7 @@ void ScanService::ReportStoreScanInfos(std::vector<InterScanInfo> &interScanList
 {
     WIFI_LOGI("Enter ScanService::ReportStoreScanInfos.\n");
 
-    mScanSerivceCallbacks.OnStoreScanInfoEvent(interScanList);
+    mScanSerivceCallbacks.OnStoreScanInfoEvent(interScanList, m_instId);
     return;
 }
 
@@ -1163,7 +1165,7 @@ void ScanService::GetScanControlInfo()
     WIFI_LOGI("Enter ScanService::GetScanControlInfo.\n");
 
     std::unique_lock<std::mutex> lock(scanControlInfoMutex);
-    if (WifiSettings::GetInstance().GetScanControlInfo(scanControlInfo) != 0) {
+    if (WifiSettings::GetInstance().GetScanControlInfo(scanControlInfo, m_instId) != 0) {
         WIFI_LOGE("WifiSettings::GetInstance().GetScanControlInfo failed");
     }
     return;
@@ -1439,7 +1441,7 @@ ErrCode ScanService::ApplyScanPolices(ScanType type)
         rlt = AllowScanByType(type);
         WIFI_LOGW("appPackageName empty, apply scan polices rlt: %{public}d.", static_cast<int>(rlt));
         if (scanResultBackup != -1 && rlt == WIFI_OPT_MOVING_FREEZE_CTRL) {
-            mScanSerivceCallbacks.OnScanFinishEvent(scanResultBackup);
+            mScanSerivceCallbacks.OnScanFinishEvent(scanResultBackup, m_instId);
         }
         return rlt;
     }
@@ -1460,7 +1462,7 @@ ErrCode ScanService::ApplyScanPolices(ScanType type)
     if (rlt != WIFI_OPT_SUCCESS) {
         if (scanResultBackup != -1 && rlt == WIFI_OPT_MOVING_FREEZE_CTRL) {
             WIFI_LOGE("trust list policy, but moving freeze ctrl failed.");
-            mScanSerivceCallbacks.OnScanFinishEvent(scanResultBackup);
+            mScanSerivceCallbacks.OnScanFinishEvent(scanResultBackup, m_instId);
         }
         return rlt;
     }
@@ -2338,14 +2340,14 @@ ErrCode ScanService::CloseWpa()
 ErrCode ScanService::OpenScanOnly() const
 {
     WIFI_LOGI("Enter ScanService::OpenScanOnly.\n");
-    mScanSerivceCallbacks.OnOpenScanOnlyRes(OperateResState::OPEN_SCAN_ONLY_SUCCEED);
+    mScanSerivceCallbacks.OnOpenScanOnlyRes(OperateResState::OPEN_SCAN_ONLY_SUCCEED, m_instId);
     return WIFI_OPT_SUCCESS;
 }
 
 ErrCode ScanService::CloseScanOnly() const
 {
     WIFI_LOGI("Enter ScanService::CloseScanOnly.\n");
-    mScanSerivceCallbacks.OnCloseScanOnlyRes(OperateResState::CLOSE_SCAN_ONLY_SUCCEED);
+    mScanSerivceCallbacks.OnCloseScanOnlyRes(OperateResState::CLOSE_SCAN_ONLY_SUCCEED, m_instId);
     return WIFI_OPT_SUCCESS;
 }
 

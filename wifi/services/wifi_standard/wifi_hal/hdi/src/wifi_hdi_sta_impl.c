@@ -33,7 +33,26 @@
 #undef LOG_TAG
 #define LOG_TAG "WifiHdiStaImpl"
 
+#define WIFI_PNO_SCAN_ITERATIONS 3
+#define WIFI_PNO_SCAN_SECOND_TO_MS 1000
+
 #define WIFI_IDL_GET_MAX_SCAN_INFO 256 /* Maximum number of scan infos obtained at a time */
+
+#ifndef CHECK_STA_HDI_PROXY_AND_RETURN
+#define CHECK_STA_HDI_PROXY_AND_RETURN(isRemoteDied) \
+if (isRemoteDied) { \
+    ReleaseLocalResources(); \
+    if (HdiStart() != WIFI_HAL_SUCCESS) { \
+        LOGE("[STA] Start hdi failed!"); \
+        return WIFI_HAL_FAILED; \
+    } \
+    if (RegisterHdiStaCallbackEvent() != WIFI_HAL_SUCCESS) { \
+        LOGE("[STA] RegisterHdiStaCallbackEvent failed!"); \
+        return WIFI_HAL_FAILED; \
+    } \
+}
+#endif
+
 struct IWlanCallback* g_hdiWanCallbackObj = NULL;
 static pthread_mutex_t g_hdiCallbackMutex;
 ScanInfo* g_hdiScanResults = NULL;
@@ -115,6 +134,7 @@ int32_t HdiScanResultsCallback(struct IWlanCallback *self, uint32_t event,
 WifiErrorNo HdiStartScan(const ScanSettings *settings)
 {
     LOGI("HdiStartScan enter.");
+    CHECK_STA_HDI_PROXY_AND_RETURN(IsHdiRemoteDied());
     int32_t ret = 0;
     WifiHdiProxy proxy = GetHdiProxy(PROTOCOL_80211_IFTYPE_STATION);
     CHECK_HDI_PROXY_AND_RETURN(proxy, WIFI_HAL_FAILED);
@@ -171,6 +191,66 @@ finish:
     return (ret == 0) ? WIFI_HAL_SUCCESS : WIFI_HAL_FAILED;
 }
 
+WifiErrorNo HdiStartPnoScan(const PnoScanSettings * settings)
+{
+    LOGI("HdiStartPnoScan enter.");
+    int32_t ret = 0;
+    WifiHdiProxy proxy = GetHdiProxy(PROTOCOL_80211_IFTYPE_STATION);
+    CHECK_HDI_PROXY_AND_RETURN(proxy, WIFI_HAL_FAILED);
+    const char *ifName = "wlan0";
+    struct PnoSettings pnoSettings;
+    (void)memset_s(&pnoSettings, sizeof(struct PnoSettings), 0, sizeof(struct PnoSettings));
+    if (settings->savedSsidSize > 0) {
+        pnoSettings.min2gRssi = settings->minRssi2Dot4Ghz;
+        pnoSettings.min5gRssi = settings->minRssi5Ghz;
+        pnoSettings.scanIntervalMs = settings->scanInterval * WIFI_PNO_SCAN_SECOND_TO_MS;
+        pnoSettings.scanIterations = WIFI_PNO_SCAN_ITERATIONS;
+
+        pnoSettings.pnoNetworksLen = settings->savedSsidSize;
+        int size = sizeof(struct PnoNetwork) * pnoSettings.pnoNetworksLen;
+        pnoSettings.pnoNetworks = (struct PnoNetwork *)malloc(size);
+        if (pnoSettings.pnoNetworks == NULL) {
+            LOGE("HdiStartPnoScan malloc pno network failed.");
+            return WIFI_HAL_FAILED;
+        }
+        (void)memset_s(pnoSettings.pnoNetworks, size, 0, size);
+        for (size_t i = 0; i < pnoSettings.pnoNetworksLen; i++) {
+            pnoSettings.pnoNetworks[i].isHidden = 0;
+            pnoSettings.pnoNetworks[i].ssid.ssidLen = strlen(settings->savedSsid[i]) + 1;
+            pnoSettings.pnoNetworks[i].ssid.ssid = settings->savedSsid[i];
+            pnoSettings.pnoNetworks[i].freqsLen = settings->freqSize;
+            pnoSettings.pnoNetworks[i].freqs = settings->freqs;
+        }
+    }
+
+    ret = proxy.wlanObj->StartPnoScan(proxy.wlanObj, ifName, &pnoSettings);
+    if (ret != 0) {
+        LOGE("HdiStartPnoScan failed ret:%{public}d.", ret);
+    }
+    if (pnoSettings.pnoNetworks != NULL) {
+        free(pnoSettings.pnoNetworks);
+        pnoSettings.pnoNetworks = NULL;
+    }
+
+    return (ret == 0) ? WIFI_HAL_SUCCESS : WIFI_HAL_FAILED;
+}
+
+WifiErrorNo HdiStopPnoScan(void)
+{
+    LOGI("HdiStopPnoScan enter.");
+    int32_t ret = 0;
+    WifiHdiProxy proxy = GetHdiProxy(PROTOCOL_80211_IFTYPE_STATION);
+    CHECK_HDI_PROXY_AND_RETURN(proxy, WIFI_HAL_FAILED);
+    const char *ifName = "wlan0";
+    ret = proxy.wlanObj->StopPnoScan(proxy.wlanObj, ifName);
+    if (ret != 0) {
+        LOGE("HdiStopPnoScan failed ret:%{public}d.", ret);
+        return WIFI_HAL_FAILED;
+    }
+
+    return WIFI_HAL_SUCCESS;
+}
+
 WifiErrorNo GetHdiScanInfos(ScanInfo* infos, int *size)
 {
     if (infos == NULL || size == NULL || *size == 0) {
@@ -206,6 +286,7 @@ WifiErrorNo GetHdiSignalInfo(WpaSignalInfo *info)
     }
 
     LOGI("GetHdiSignalInfo enter.");
+    CHECK_STA_HDI_PROXY_AND_RETURN(IsHdiRemoteDied());
     int32_t ret = 0;
     WifiHdiProxy proxy = GetHdiProxy(PROTOCOL_80211_IFTYPE_STATION);
     CHECK_HDI_PROXY_AND_RETURN(proxy, WIFI_HAL_FAILED);
@@ -373,6 +454,7 @@ WifiErrorNo SetAssocMacAddr(const unsigned char *mac, int lenMac)
         return WIFI_HAL_FAILED;
     }
     LOGI("SetAssocMacAddr enter.");
+    CHECK_STA_HDI_PROXY_AND_RETURN(IsHdiRemoteDied());
     if (strlen((const char *)mac) != WIFI_MAC_LENGTH || lenMac != WIFI_MAC_LENGTH) {
         LOGE("Mac size not correct! mac len %{public}zu, request lenMac %{public}d", strlen((const char *)mac), lenMac);
         return WIFI_HAL_FAILED;
@@ -397,6 +479,17 @@ WifiErrorNo SetAssocMacAddr(const unsigned char *mac, int lenMac)
     }
     UpDownLink(1);
     return (ret == 0) ? WIFI_HAL_SUCCESS : WIFI_HAL_FAILED;
+}
+
+void ReleaseLocalResources()
+{
+    LOGI("ReleaseLocalResources enter.");
+    ClearHdiScanResults();
+    if (g_hdiWanCallbackObj != NULL) {
+        StubCollectorRemoveObject(IWLANCALLBACK_INTERFACE_DESC, g_hdiWanCallbackObj);
+        free(g_hdiWanCallbackObj);
+        g_hdiWanCallbackObj = NULL;
+    }
 }
 #endif
 

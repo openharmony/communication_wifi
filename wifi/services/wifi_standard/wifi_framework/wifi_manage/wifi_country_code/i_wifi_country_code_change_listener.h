@@ -18,7 +18,7 @@
 
 #include <functional>
 #include "wifi_internal_msg.h"
-#include "wifi_msg.h"
+#include "wifi_errcode.h"
 #include "state_machine.h"
 
 namespace OHOS {

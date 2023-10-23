@@ -251,12 +251,12 @@ bool WifiProtectManager::AddProtect(
     const WifiProtectMode &protectMode,
     const std::string &name)
 {
-#ifndef OHOS_ARCH_LITE
     WifiProtect *pProtect = new WifiProtect(name);
     if (pProtect == nullptr) {
         LOGE("Wifi protect pointer is null.");
         return false;
     }
+#ifndef OHOS_ARCH_LITE
     int state = static_cast<int>(AppExecFwk::ApplicationState::APP_STATE_END);
     if (IsForegroundApplication(name)) {
         state = static_cast<int>(AppExecFwk::ApplicationState::APP_STATE_FOREGROUND);

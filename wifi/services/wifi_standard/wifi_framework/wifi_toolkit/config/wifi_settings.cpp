@@ -49,6 +49,7 @@ WifiSettings::WifiSettings()
       mLastSelectedTimeVal(0),
       mScreenState(MODE_STATE_OPEN),
       mAirplaneModeState(MODE_STATE_CLOSE),
+      mDeviceProvision(MODE_STATE_CLOSE),
       mAppRunningModeState(ScanMode::SYS_FOREGROUND_SCAN),
       mPowerSavingModeState(MODE_STATE_CLOSE),
       mFreezeModeState(MODE_STATE_CLOSE),
@@ -56,7 +57,6 @@ WifiSettings::WifiSettings()
       mHotspotIdleTimeout(HOTSPOT_IDLE_TIMEOUT_INTERVAL_MS),
       mLastDiscReason(DisconnectedReason::DISC_REASON_DEFAULT),
       explicitGroup(false)
-      mDeviceProvision(MODE_STATE_CLOSE),
 {
     mHotspotState[0] = static_cast<int>(ApState::AP_STATE_CLOSED);
     powerModel[0] = PowerModel::GENERAL;

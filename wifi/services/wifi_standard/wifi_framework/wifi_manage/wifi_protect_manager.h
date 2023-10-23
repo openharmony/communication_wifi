@@ -127,7 +127,7 @@ private:
     WifiProtect *RemoveProtect(const std::string &name);
 #ifndef OHOS_ARCH_LITE
     int GetFgLowlatyProtectCount();
-    bool IsForegroundApp(const std::string &BundleName);
+    bool IsForegroundApplication(const std::string &BundleName);
 #endif
 private:
     std::vector<WifiProtect *> mWifiProtects;

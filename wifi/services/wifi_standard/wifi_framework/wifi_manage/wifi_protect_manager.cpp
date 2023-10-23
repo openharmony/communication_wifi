@@ -207,25 +207,6 @@ bool WifiProtectManager::GetWifiProtect(
     return AddProtect(protectMode, name);
 }
 
-bool WifiProtectManager::IsForegroundApp(const std::string &BundleName)
-{
-    bool isForegroud = false;
-    std::vector<AppExecFwk::AppStateData> fgList;
-    if (mAppObject &&
-        mAppObject->GetForegroundApplications(fgList) == static_cast<int32_t>(WIFI_OPT_SUCCESS)) {
-        std::vector<AppExecFwk::AppStateData>::iterator itor = fgList.begin();
-        while (itor != fgList.end()) {
-            LOGD("Match foreground bundle name = %{public}s", (*itor).bundleName.c_str());
-            if ((*itor).bundleName == BundleName) {
-                isForegroud = true;
-                break;
-            }
-            itor++;
-        }
-    }
-    return isForegroud;
-}
-
 bool WifiProtectManager::ChangeToPerfMode(bool isEnabled)
 {
     std::unique_lock<std::mutex> lock(mMutex);
@@ -277,7 +258,7 @@ bool WifiProtectManager::AddProtect(
         return false;
     }
     int state = static_cast<int>(AppExecFwk::ApplicationState::APP_STATE_END);
-    if (IsForegroundApp(name)) {
+    if (IsForegroundApplication(name)) {
         state = static_cast<int>(AppExecFwk::ApplicationState::APP_STATE_FOREGROUND);
     }
     LOGD("%{public}s bundle name: %{public}s state: %{public}d",
@@ -424,6 +405,25 @@ bool WifiProtectManager::SetLowLatencyMode(bool enabled)
     return true;
 }
 #ifndef OHOS_ARCH_LITE
+bool WifiProtectManager::IsForegroundApplication(const std::string &BundleName)
+{
+    bool isForegroud = false;
+    std::vector<AppExecFwk::AppStateData> fgList;
+    if (mAppObject &&
+        mAppObject->GetForegroundApplications(fgList) == static_cast<int32_t>(WIFI_OPT_SUCCESS)) {
+        std::vector<AppExecFwk::AppStateData>::iterator itor = fgList.begin();
+        while (itor != fgList.end()) {
+            LOGD("Match foreground bundle name = %{public}s", (*itor).bundleName.c_str());
+            if ((*itor).bundleName == BundleName) {
+                isForegroud = true;
+                break;
+            }
+            itor++;
+        }
+    }
+    return isForegroud;
+}
+
 int WifiProtectManager::GetFgLowlatyProtectCount()
 {
     int count = 0;

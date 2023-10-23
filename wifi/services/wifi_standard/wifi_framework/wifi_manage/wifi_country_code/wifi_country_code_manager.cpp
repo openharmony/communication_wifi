@@ -41,13 +41,6 @@ constexpr int32_t SYSTEM_PARAMETER_ERROR_CODE = 0;
 constexpr int32_t WIFI_COUNTRY_CODE_SIZE = 16;
 const std::string CLASS_NAME = "WifiCountryCodeManager";
 
-WifiCountryCodeManager::~WifiCountryCodeManager()
-{
-    if (m_telephoneNetworkSearchStateChangeListener != nullptr) {
-        OHOS::EventFwk::CommonEventManager::UnSubscribeCommonEvent(m_telephoneNetworkSearchStateChangeListener);
-    }
-}
-
 WifiCountryCodeManager &WifiCountryCodeManager::GetInstance()
 {
     static WifiCountryCodeManager instance;
@@ -68,14 +61,6 @@ ErrCode WifiCountryCodeManager::Init()
 
     std::unique_ptr<WifiCountryCodePolicyFactory> policyFactory = std::make_unique<WifiCountryCodePolicyFactory>();
     m_wifiCountryCodePolicy = policyFactory->CreatePolicy(std::bitset<WIFI_COUNTRY_CODE_POLICE_DEF_LEN>(policyConf));
-
-    // Subscribe to public events of network camping status change.
-    OHOS::EventFwk::MatchingSkills matchingSkills;
-    matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_NETWORK_STATE_CHANGED);
-    OHOS::EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
-    std::shared_ptr<TelephoneNetworkSearchStateChangeListener> m_telephoneNetworkSearchStateChangeListener
-        = std::make_shared<TelephoneNetworkSearchStateChangeListener>(subscriberInfo);
-    OHOS::EventFwk::CommonEventManager::SubscribeCommonEvent(m_telephoneNetworkSearchStateChangeListener);
 
     m_staCallback.callbackModuleName = CLASS_NAME;
     m_staCallback.OnStaOpenRes = DealStaOpenRes;
@@ -188,20 +173,6 @@ void WifiCountryCodeManager::DealApStateChanged(ApState state, int id)
 {
     WIFI_LOGI("ap state change, state=%{public}d, id=%{public}d", state, id);
     if (state == ApState::AP_STATE_STARTED) {
-        WifiCountryCodeManager::GetInstance().UpdateWifiCountryCode();
-    }
-}
-
-WifiCountryCodeManager::TelephoneNetworkSearchStateChangeListener::TelephoneNetworkSearchStateChangeListener(
-    const OHOS::EventFwk::CommonEventSubscribeInfo &subscriberInfo) : CommonEventSubscriber(subscriberInfo)
-{}
-
-void WifiCountryCodeManager::TelephoneNetworkSearchStateChangeListener::OnReceiveEvent(
-    const OHOS::EventFwk::CommonEventData &eventData)
-{
-    const auto &action = eventData.GetWant().GetAction();
-    WIFI_LOGI("receive telephone network state change common event: %{public}s", action.c_str());
-    if (action == EventFwk::CommonEventSupport::COMMON_EVENT_NETWORK_STATE_CHANGED) {
         WifiCountryCodeManager::GetInstance().UpdateWifiCountryCode();
     }
 }

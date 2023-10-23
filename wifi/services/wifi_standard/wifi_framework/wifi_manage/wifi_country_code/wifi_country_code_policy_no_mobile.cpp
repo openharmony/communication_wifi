@@ -27,11 +27,9 @@ DEFINE_WIFILOG_LABEL("WifiCountryCodePolicyNoMobile");
 namespace OHOS {
 namespace Wifi {
 constexpr int MAX_SCAN_SAVED_SIZE = 3;
-constexpr int COUNTRY_CODE_INDEX_IN_REGION = 2;
 constexpr int FEATURE_RCV_AP_CONNECTED = 0;
 constexpr int FEATURE_RCV_SCAN_RESLUT = 1;
 constexpr int FEATURE_RCV_REGION_CHANGE = 2;
-constexpr int REGION_LEN = 3;
 constexpr unsigned int COUNTRY_CODE_EID = 7;
 constexpr unsigned long COUNTRY_CODE_LENGTH = 2;
 
@@ -75,8 +73,8 @@ void WifiCountryCodePolicyNoMobile::InitPolicy()
 
 ErrCode WifiCountryCodePolicyNoMobile::CalculateWifiCountryCode(std::string &wifiCountryCode)
 {
-    for (const auto &policy : m_policyList) {
-        if (policy(wifiCountryCode) == WIFI_OPT_SUCCESS) {
+    for (const auto &ploicy : m_policyList) {
+        if (ploicy(wifiCountryCode) == WIFI_OPT_SUCCESS) {
             return WIFI_OPT_SUCCESS;
         }
     }
@@ -96,6 +94,7 @@ void WifiCountryCodePolicyNoMobile::WifiCcpCommonEventListener::OnReceiveEvent(
     WIFI_LOGI("receive wifi scan finish common event, action = %{public}s", action.c_str());
     if (action == OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_WIFI_SCAN_FINISHED) {
         m_wifiCountryCodePolicyNoMobile->HandleScanResultAction(eventData.GetCode());
+        WifiCountryCodeManager::GetInstance().SetWifiCountryCodeFromExternal();
     }
 }
 
@@ -109,12 +108,18 @@ void WifiCountryCodePolicyNoMobile::WifiCcpCommonEventListener::OnReceiveEvent(
 void WifiCountryCodePolicyNoMobile::HandleScanResultAction(int scanStatus)
 {
     if (static_cast<int>(ScanHandleNotify::SCAN_OK) != scanStatus) {
+        WIFI_LOGE("scan fail");
+        m_wifiCountryCodeFromScanResults = "";
         return;
     }
+
+    // count the latest scan results
     std::vector<BssidAndCountryCode> scanInfoList;
     if (StatisticCountryCodeFromScanResult(scanInfoList) != WIFI_OPT_SUCCESS) {
+        m_wifiCountryCodeFromScanResults = "";
         return;
     }
+
     m_allScanInfoList.push_back(scanInfoList);
     if (m_allScanInfoList.size() > MAX_SCAN_SAVED_SIZE) {
         m_allScanInfoList.pop_front();
@@ -131,7 +136,7 @@ void WifiCountryCodePolicyNoMobile::HandleScanResultAction(int scanStatus)
         return a.second > b.second;
     });
     std::pair<std::string, int> firstCode = vec.front();
-    WIFI_LOGI("the country code with the highest quantity is %{public}s, count is %{public}d",
+    WIFI_LOGI("the country code with the highest quantity is %{public}s, count is %{public}d(3 times)",
         firstCode.first.c_str(), firstCode.second);
 
     if (!IsValidCountryCode(firstCode.first)) {
@@ -140,7 +145,6 @@ void WifiCountryCodePolicyNoMobile::HandleScanResultAction(int scanStatus)
         return;
     }
     m_wifiCountryCodeFromScanResults = firstCode.first;
-    WifiCountryCodeManager::GetInstance().SetWifiCountryCodeFromExternal();
 }
 
 ErrCode WifiCountryCodePolicyNoMobile::StatisticCountryCodeFromScanResult(
@@ -173,19 +177,19 @@ ErrCode WifiCountryCodePolicyNoMobile::StatisticCountryCodeFromScanResult(
 ErrCode WifiCountryCodePolicyNoMobile::ParseCountryCodeElement(
     std::vector<WifiInfoElem> &infoElems, std::string &wifiCountryCode)
 {
-    if (infoElems.size()) {
+    if (infoElems.empty()) {
         return WIFI_OPT_FAILED;
     }
     for (const auto &ie : infoElems) {
-        if (ie.id != COUNTRY_CODE_EID) {
-            continue;
-        }
-        if (ie.content.size() < COUNTRY_CODE_LENGTH) {
+        if (ie.id != COUNTRY_CODE_EID || ie.content.size() < COUNTRY_CODE_LENGTH) {
             continue;
         }
         std::string tempWifiCountryCode;
-        for (char c : ie.content) {
-            tempWifiCountryCode.push_back(c);
+        for (int i = 0 ; i < COUNTRY_CODE_LENGTH; i++) {
+            tempWifiCountryCode.push_back(ie.content[i]);
+        }
+        if (!IsValidCountryCode(tempWifiCountryCode)) {
+            continue;
         }
         wifiCountryCode = tempWifiCountryCode;
         return WIFI_OPT_SUCCESS;
@@ -224,7 +228,7 @@ ErrCode WifiCountryCodePolicyNoMobile::GetWifiCountryCodeByScanResult(std::strin
         return WIFI_OPT_FAILED;
     }
     wifiCountryCode = m_wifiCountryCodeFromScanResults;
-    WIFI_LOGI("get country code by scan result is success, code=%{public}s", wifiCountryCode.c_str());
+    WIFI_LOGI("get wifi country code by scan result is success, code=%{public}s", wifiCountryCode.c_str());
     return WIFI_OPT_SUCCESS;
 }
 
@@ -233,19 +237,13 @@ ErrCode WifiCountryCodePolicyNoMobile::GetWifiCountryCodeByRegion(std::string &w
     if (!m_wifiCountryCodePolicy[FEATURE_RCV_REGION_CHANGE]) {
         return WIFI_OPT_FAILED;
     }
-    std::string wifiCountryCodeStr = Global::I18n::LocaleConfig::GetSystemRegion();  // eg: zh-Hans-CN
-    if (wifiCountryCodeStr.empty()) {
-        WIFI_LOGE("get country code by region is fail, GetSystemRegion is empty");
+    std::string tempWifiCountryCode = Global::I18n::LocaleConfig::GetSystemRegion();
+    if (tempWifiCountryCode.empty() || !IsValidCountryCode(tempWifiCountryCode)) {
+        WIFI_LOGE("get wifi country code by region is fail, code=%{public}s", tempWifiCountryCode.c_str());
         return WIFI_OPT_FAILED;
     }
-    std::vector<std::string> result;
-    SplitString(wifiCountryCodeStr, "-", result);
-    if (result.size() != REGION_LEN || !IsValidCountryCode(result[COUNTRY_CODE_INDEX_IN_REGION])) {
-        WIFI_LOGE("get country code by region is fail, the format is incorrect");
-        return WIFI_OPT_FAILED;
-    }
-    wifiCountryCode = result[COUNTRY_CODE_INDEX_IN_REGION];
-    WIFI_LOGI("get country code by region is success, code=%{public}s", wifiCountryCode.c_str());
+    wifiCountryCode = tempWifiCountryCode;
+    WIFI_LOGI("get wifi country code by region is success, code=%{public}s", wifiCountryCode.c_str());
     return WIFI_OPT_SUCCESS;
 }
 }

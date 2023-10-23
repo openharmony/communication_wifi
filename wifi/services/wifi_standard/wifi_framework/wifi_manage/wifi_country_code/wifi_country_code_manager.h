@@ -18,9 +18,6 @@
 
 #include <memory>
 #include <string>
-#include "common_event_manager.h"
-#include "common_event_support.h"
-#include "common_event_subscriber.h"
 #include "i_wifi_country_code_change_listener.h"
 #include "i_wifi_country_code_policy.h"
 #ifdef FEATURE_AP_SUPPORT
@@ -106,33 +103,13 @@ public:
     /**
      * @Description WifiCountryCodeManager deconstruct
      */
-    ~WifiCountryCodeManager();
+    ~WifiCountryCodeManager() = default;
 
     /**
      * @Description disable WifiCountryCodeManager equals sign opertaor
      */
     WifiCountryCodeManager &operator=(const WifiCountryCodeManager &) = delete;
 private:
-    class TelephoneNetworkSearchStateChangeListener : public OHOS::EventFwk::CommonEventSubscriber {
-    public:
-        /**
-         * @Description TelephoneNetworkSearchStateChangeListener constructor
-         */
-        explicit TelephoneNetworkSearchStateChangeListener(
-            const OHOS::EventFwk::CommonEventSubscribeInfo &subscriberInfo);
-
-        /**
-         * @Description TelephoneNetworkSearchStateChangeListener destructor
-         */
-        ~TelephoneNetworkSearchStateChangeListener() = default;
-
-        /**
-        * @Description on receive telephone network search state change event
-        *
-        * @param direction - event data
-        */
-        void OnReceiveEvent(const OHOS::EventFwk::CommonEventData &eventData) override;
-    };
 #ifdef FEATURE_STA_SUPPORT
     StaServiceCallback m_staCallback;
 #endif
@@ -149,7 +126,6 @@ private:
     };
     std::set<std::shared_ptr<IWifiCountryCodeChangeListener>, ListenerNameCmp> m_wifiCountryCodeChangeListeners;
     std::string m_wifiCountryCode = DEFAULT_WIFI_COUNTRY_CODE;
-    std::shared_ptr<TelephoneNetworkSearchStateChangeListener> m_telephoneNetworkSearchStateChangeListener;
     std::shared_ptr<IWifiCountryCodePolicy> m_wifiCountryCodePolicy;
 
     WifiCountryCodeManager() = default;

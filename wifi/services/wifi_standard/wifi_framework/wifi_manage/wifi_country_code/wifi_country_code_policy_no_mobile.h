@@ -39,6 +39,7 @@ class WifiCountryCodePolicyNoMobile : public WifiCountryCodePolicyBase {
 public:
     /**
      * @Description WifiCountryCodePolicyNoMobile constructor
+     * @param wifiCountryCodePolicy - Monitoring effectiveness strategy
      */
     explicit WifiCountryCodePolicyNoMobile(
         const std::bitset<WIFI_COUNTRY_CODE_POLICE_DEF_LEN> &wifiCountryCodePolicy);

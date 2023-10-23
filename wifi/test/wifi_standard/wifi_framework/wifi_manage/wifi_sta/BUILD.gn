@@ -121,7 +121,6 @@ ohos_unittest("wifi_sta_unittest") {
     "ability_runtime:wantagent_innerkits",
     "c_utils:utils",
     "dhcp:dhcp_manager_service",
-    "distributed_notification_service:ans_innerkits",
     "hilog:libhilog",
     "ipc:ipc_single",
     "netmanager_base:net_conn_manager_if",

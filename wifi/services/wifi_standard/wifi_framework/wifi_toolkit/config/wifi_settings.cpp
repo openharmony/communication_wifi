@@ -1770,7 +1770,7 @@ int WifiSettings::SetConnectTimeoutBssid(std::string &bssid, int instId)
 void WifiSettings::SetDefaultFrequenciesByCountryBand(const BandType band, std::vector<int> &frequencies, int instId)
 {
     for (auto& item : g_countryDefaultFreqs) {
-        if (item.countryCode == m_countryCode && item.band == band) {
+        if (item.band == band) {
             frequencies = item.freqs;
         }
     }

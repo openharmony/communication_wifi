@@ -17,6 +17,7 @@
 #define OHOS_WIFIPROTECT_H
 
 #include <string>
+#include <mutex>
 #include "wifi_msg.h"
 
 namespace OHOS {
@@ -99,13 +100,31 @@ public:
      * @return long - timestamp
      */
     long GetAcqTimestamp() const;
+#ifndef OHOS_ARCH_LITE
+    /**
+     * @Description Set the Protect app state
+     *
+     * @param state - app state
+     */
+    void SetAppState(int state);
 
+    /**
+     * @Description Get the Protect app state
+     *
+     * @param state - app state
+     */
+    int GetAppState() const;
+#endif
 private:
     std::string mName;
     /* not used: int mUid; */
     WifiProtectType mType;
     WifiProtectMode mMode;
     long mAcqTimestamp;
+    std::mutex mMutex;
+#ifndef OHOS_ARCH_LITE
+    int mAppState;
+#endif
 };
 }  // namespace Wifi
 }  // namespace OHOS

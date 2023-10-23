@@ -93,6 +93,7 @@ if (defined(ohos_lite)) {
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/include",
       "$WIFI_ROOT_DIR/interfaces/innerkits",
       "$WIFI_ROOT_DIR/utils/inc",
+      "//foundation/bundlemanager/bundle_framework/interfaces/inner_api/appexecfwk_core/include/bundlemgr",
     ]
   }
 

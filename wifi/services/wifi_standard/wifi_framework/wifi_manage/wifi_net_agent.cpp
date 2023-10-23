@@ -34,6 +34,12 @@ namespace Wifi {
 constexpr const char *WIFI_NET_CONN_MGR_WORK_THREAD = "WIFI_NET_CONN_MGR_WORK_THREAD";
 using namespace NetManagerStandard;
 
+WifiNetAgent &WifiNetAgent::GetInstance()
+{
+    static WifiNetAgent gWifiNetAgent;
+    return gWifiNetAgent;
+}
+
 WifiNetAgent::WifiNetAgent()
 {
     netConnEventRunner_ = AppExecFwk::EventRunner::Create(WIFI_NET_CONN_MGR_WORK_THREAD);

@@ -124,7 +124,7 @@ public:
             WIFI_LOGI("samgrProxy is nullptr!");
             return;
         }
-        mSaStatusListener = new OHOS::Wifi::WifiAbilityStatusChange();
+        mSaStatusListener = new OHOS::Wifi::WifiNapiAbilityStatusChange();
         if (mSaStatusListener == nullptr) {
             WIFI_LOGI("mSaStatusListener is nullptr!");
             return;
@@ -134,7 +134,6 @@ public:
         samgrProxy->SubscribeSystemAbility((int32_t)WIFI_HOTSPOT_ABILITY_ID, mSaStatusListener);
         samgrProxy->SubscribeSystemAbility((int32_t)WIFI_P2P_ABILITY_ID, mSaStatusListener);
         WIFI_LOGI("EventRegister, SubscribeSystemAbility return ret:%{public}d!", ret);
-
     }
     ~EventRegister() {
     }

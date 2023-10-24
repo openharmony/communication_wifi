@@ -188,6 +188,6 @@ private:
     static bool m_isEventRegistered;
     std::set<std::string> p2pRegisteredCallbackEvent;
     OHOS::sptr<WifiP2pCEventCallback> sptrP2PCallback = nullptr;
-    OHOS::sptr<OHOS::Wifi::WifiAbilityStatusChange> mSaStatusListener = nullptr;
+    sptr<ISystemAbilityStatusChange> mSaStatusListener = nullptr;
 };
 #endif

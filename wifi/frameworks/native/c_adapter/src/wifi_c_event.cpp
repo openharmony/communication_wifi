@@ -264,7 +264,7 @@ NO_SANITIZE("cfi") WifiErrorCode EventManager::RegisterWifiEvents()
             WIFI_LOGI("samgrProxy is nullptr!");
             return ERROR_WIFI_UNKNOWN;
         }
-        mSaStatusListener = new (std::nothrow)OHOS::Wifi::WifiAbilityStatusChange();
+        mSaStatusListener = new OHOS::Wifi::WifiAbilityStatusChange();
         if (mSaStatusListener == nullptr) {
             WIFI_LOGI("mSaStatusListener is nullptr!");
             return ERROR_WIFI_UNKNOWN;
@@ -345,7 +345,7 @@ void EventManager::Init()
             WIFI_LOGI("samgrProxy is nullptr!");
             return;
         }
-        mSaStatusListener = new (std::nothrow)OHOS::Wifi::WifiAbilityStatusChange();
+        mSaStatusListener = new OHOS::Wifi::WifiAbilityStatusChange();
         if (mSaStatusListener == nullptr) {
             WIFI_LOGI("mSaStatusListener is nullptr!");
             return;

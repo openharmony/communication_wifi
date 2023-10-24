@@ -131,22 +131,22 @@ private:
 #endif
 private:
     std::vector<WifiProtect *> mWifiProtects;
-    WifiProtectMode mCurrentOpMode;
-    int mFullHighPerfProtectsAcquired;
-    int mFullHighPerfProtectsReleased;
-    int mFullLowLatencyProtectsAcquired;
-    int mFullLowLatencyProtectsReleased;
+    WifiProtectMode mCurrentOpMode {WifiProtectMode::WIFI_PROTECT_NO_HELD};
+    int mFullHighPerfProtectsAcquired {0};
+    int mFullHighPerfProtectsReleased {0};
+    int mFullLowLatencyProtectsAcquired {0};
+    int mFullLowLatencyProtectsReleased {0};
     /* Not used: long mCurrentSessionStartTimeMs; */
-    bool mWifiConnected;
-    bool mScreenOn;
-    bool mForceHiPerfMode;
-    bool mForceLowLatencyMode;
+    bool mWifiConnected {false};
+    bool mScreenOn {false};
+    bool mForceHiPerfMode {false};
+    bool mForceLowLatencyMode {false};
     std::mutex mMutex;
 #ifndef OHOS_ARCH_LITE
-    std::shared_ptr<AppExecFwk::EventRunner> mAppChangeEventRunner = nullptr;
-    std::shared_ptr<AppExecFwk::EventHandler> mAppChangeEventHandler = nullptr;
-    sptr<AppStateObserver> mAppStateObserver;
-    sptr<AppExecFwk::IAppMgr> mAppObject;
+    std::shared_ptr<AppExecFwk::EventRunner> mAppChangeEventRunner {nullptr};
+    std::shared_ptr<AppExecFwk::EventHandler> mAppChangeEventHandler {nullptr};
+    sptr<AppStateObserver> mAppStateObserver {nullptr};
+    sptr<AppExecFwk::IAppMgr> mAppObject {nullptr};
 #endif
 };
 

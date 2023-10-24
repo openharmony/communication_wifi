@@ -445,7 +445,7 @@ void WifiProtectManager::RegisterAppStateObserver()
 {
     LOGD("%{public}s called", __func__);
     auto appMgrClient = std::make_unique<AppExecFwk::AppMgrClient>();
-    mAppStateObserver = new (std::nothrow) AppStateObserver();
+    mAppStateObserver = sptr<AppStateObserver>(new (std::nothrow) AppStateObserver());
     int regAppStatusObsRetry = 0;
     while (appMgrClient->ConnectAppMgrService() != AppExecFwk::AppMgrResultCode::RESULT_OK) {
         LOGE("ConnectAppMgrService fail, try again! retryTimes=%{public}d", ++regAppStatusObsRetry);

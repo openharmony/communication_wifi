@@ -118,12 +118,12 @@ public:
 private:
     std::string mName;
     /* not used: int mUid; */
-    WifiProtectType mType;
-    WifiProtectMode mMode;
-    long mAcqTimestamp;
+    WifiProtectType mType {WifiProtectType::WIFI_PROTECT_COMMON};
+    WifiProtectMode mMode {WifiProtectMode::WIFI_PROTECT_NO_HELD};
+    long mAcqTimestamp {0};
     std::mutex mMutex;
 #ifndef OHOS_ARCH_LITE
-    int mAppState;
+    int mAppState {6};
 #endif
 };
 }  // namespace Wifi

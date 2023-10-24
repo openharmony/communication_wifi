@@ -36,14 +36,14 @@ WifiProtect::WifiProtect(
 WifiProtect::WifiProtect(const std::string &name)
     : mName(name),
       mType(WifiProtectType::WIFI_PROTECT_COMMON),
-      mMode(WifiProtectMode::WIFI_PROTECT_FULL),
+      mMode(WifiProtectMode::WIFI_PROTECT_NO_HELD),
       mAcqTimestamp(0)
 {}
 
 WifiProtect::WifiProtect()
     : mName(""),
       mType(WifiProtectType::WIFI_PROTECT_COMMON),
-      mMode(WifiProtectMode::WIFI_PROTECT_FULL),
+      mMode(WifiProtectMode::WIFI_PROTECT_NO_HELD),
       mAcqTimestamp(0)
 {}
 

@@ -33,6 +33,7 @@ constexpr int MAX_ARP_DNS_CHECK_TIME = 1000;
 constexpr int MAX_RESULT_NUM = 2;
 constexpr int PORTAL_CONTENT_LENGTH_MIN = 4;
 constexpr int TIME_OUT_COUNT = 4000;
+
 StaNetworkCheck::StaNetworkCheck(NetStateHandler nethandle, ArpStateHandler arpHandle, DnsStateHandler dnsHandle,
     int instId)
 {

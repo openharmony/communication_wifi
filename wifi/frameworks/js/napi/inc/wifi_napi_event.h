@@ -120,7 +120,7 @@ public:
     {
         int32_t ret;
         mSaStatusListener = new WifiNapiAbilityStatusChange();
-        sptr<ISystemAbilityManager> samgrProxy = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+        OHOS::sptr<OHOS::ISystemAbilityManager> samgrProxy = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
         ret = samgrProxy->SubscribeSystemAbility(WIFI_DEVICE_ABILITY_ID, mSaStatusListener);
         samgrProxy->SubscribeSystemAbility(WIFI_SCAN_ABILITY_ID, mSaStatusListener);
         samgrProxy->SubscribeSystemAbility(WIFI_HOTSPOT_ABILITY_ID, mSaStatusListener);

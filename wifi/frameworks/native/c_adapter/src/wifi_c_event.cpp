@@ -258,11 +258,14 @@ WifiErrorCode EventManager::RegisterP2PEvent(const std::vector<std::string> &eve
 NO_SANITIZE("cfi") WifiErrorCode EventManager::RegisterWifiEvents()
 {
     if (mSaStatusListener == nullptr) {
+        int32_t ret;
         mSaStatusListener = new OHOS::Wifi::WifiAbilityStatusChange();
-        mSaStatusListener->Init((int32_t)WIFI_DEVICE_ABILITY_ID);
-        mSaStatusListener->Init((int32_t)WIFI_SCAN_ABILITY_ID);
-        mSaStatusListener->Init((int32_t)WIFI_HOTSPOT_ABILITY_ID);
-        mSaStatusListener->Init((int32_t)WIFI_P2P_ABILITY_ID);
+        sptr<ISystemAbilityManager> samgrProxy = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+        ret = samgrProxy->SubscribeSystemAbility(WIFI_DEVICE_ABILITY_ID, mSaStatusListener);
+        samgrProxy->SubscribeSystemAbility(WIFI_SCAN_ABILITY_ID, mSaStatusListener);
+        samgrProxy->SubscribeSystemAbility(WIFI_HOTSPOT_ABILITY_ID, mSaStatusListener);
+        samgrProxy->SubscribeSystemAbility(WIFI_P2P_ABILITY_ID, mSaStatusListener);
+        WIFI_LOGI("RegisterWifiEvents, SubscribeSystemAbility return ret:%{public}d!", ret);
     }
 
     WifiErrorCode ret = WIFI_SUCCESS;
@@ -327,12 +330,15 @@ EventManager& EventManager::GetInstance()
 void EventManager::Init()
 {
     if (mSaStatusListener == nullptr) {
+        int32_t ret;
         WIFI_LOGI("EventManager Listener Init!");
         mSaStatusListener = new OHOS::Wifi::WifiAbilityStatusChange();
-        mSaStatusListener->Init((int32_t)WIFI_DEVICE_ABILITY_ID);
-        mSaStatusListener->Init((int32_t)WIFI_SCAN_ABILITY_ID);
-        mSaStatusListener->Init((int32_t)WIFI_HOTSPOT_ABILITY_ID);
-        mSaStatusListener->Init((int32_t)WIFI_P2P_ABILITY_ID);
+        sptr<ISystemAbilityManager> samgrProxy = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+        ret = samgrProxy->SubscribeSystemAbility(WIFI_DEVICE_ABILITY_ID, mSaStatusListener);
+        samgrProxy->SubscribeSystemAbility(WIFI_SCAN_ABILITY_ID, mSaStatusListener);
+        samgrProxy->SubscribeSystemAbility(WIFI_HOTSPOT_ABILITY_ID, mSaStatusListener);
+        samgrProxy->SubscribeSystemAbility(WIFI_P2P_ABILITY_ID, mSaStatusListener);
+        WIFI_LOGI("SubscribeSystemAbility return ret:%{public}d!", ret);
     }
     return;
 }

@@ -47,7 +47,7 @@ void WifiCountryCodePolicyMobile::InitPolicy()
     OHOS::EventFwk::MatchingSkills matchingSkills;
     matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_NETWORK_STATE_CHANGED);
     OHOS::EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
-    std::shared_ptr<TelephoneNetworkSearchStateChangeListener> m_telephoneNetworkSearchStateChangeListener
+    m_telephoneNetworkSearchStateChangeListener
         = std::make_shared<TelephoneNetworkSearchStateChangeListener>(subscriberInfo);
     OHOS::EventFwk::CommonEventManager::SubscribeCommonEvent(m_telephoneNetworkSearchStateChangeListener);
 

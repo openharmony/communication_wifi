@@ -124,7 +124,7 @@ public:
             WIFI_LOGI("samgrProxy is nullptr!");
             return;
         }
-        mSaStatusListener = new (std::nothrow)OHOS::Wifi::WifiAbilityStatusChange();
+        mSaStatusListener = new OHOS::Wifi::WifiAbilityStatusChange();
         if (mSaStatusListener == nullptr) {
             WIFI_LOGI("mSaStatusListener is nullptr!");
             return;

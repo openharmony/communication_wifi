@@ -141,7 +141,7 @@ private:
     bool IsEventSupport(const std::string& type);
     void DeleteRegisterObj(const napi_env& env, std::vector<RegObj>& vecRegObjs, napi_value& handler);
     void DeleteAllRegisterObj(const napi_env& env, std::vector<RegObj>& vecRegObjs);
-    sptr<OHOS::ISystemAbilityStatusChange> mSaStatusListener = nullptr;
+    OHOS::sptr<OHOS::ISystemAbilityStatusChange> mSaStatusListener = nullptr;
 };
 
 napi_value On(napi_env env, napi_callback_info cbinfo);

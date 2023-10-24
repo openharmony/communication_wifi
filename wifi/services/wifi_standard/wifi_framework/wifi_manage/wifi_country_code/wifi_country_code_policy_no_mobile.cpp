@@ -35,8 +35,8 @@ constexpr unsigned long COUNTRY_CODE_LENGTH = 2;
 
 WifiCountryCodePolicyNoMobile::WifiCountryCodePolicyNoMobile(
     const std::bitset<WIFI_COUNTRY_CODE_POLICE_DEF_LEN> &wifiCountryCodePolicy)
+    ：m_wifiCountryCodePolicy(wifiCountryCodePolicy)
 {
-    m_wifiCountryCodePolicy = wifiCountryCodePolicy;
     InitPolicy();
 }
 

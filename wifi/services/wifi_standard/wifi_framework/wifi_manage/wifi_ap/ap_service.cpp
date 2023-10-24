@@ -36,7 +36,6 @@ ApService::~ApService()
 ErrCode ApService::EnableHotspot()
 {
     WIFI_LOGI("Instance %{public}d %{public}s", m_id, __func__);
-
     // notification of registration country code change
     m_apObserver = std::make_shared<WifiCountryCodeChangeObserver>(CLASS_NAME, m_ApStateMachine);
     WifiCountryCodeManager::GetInstance().RegisterWifiCountryCodeChangeListener(m_apObserver);

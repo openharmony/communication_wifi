@@ -14,3 +14,4 @@
 [cfi]
 # xmlFree check failed for CFI.
 type:OHOS::Wifi::*
+type:OHOS::ISystemAbilityStatusChange::*

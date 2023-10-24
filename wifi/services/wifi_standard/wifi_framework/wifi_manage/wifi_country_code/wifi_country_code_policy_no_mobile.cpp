@@ -53,7 +53,7 @@ void WifiCountryCodePolicyNoMobile::InitPolicy()
         OHOS::EventFwk::MatchingSkills matchingSkills;
         matchingSkills.AddEvent(OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_WIFI_SCAN_FINISHED);
         OHOS::EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
-        std::shared_ptr<WifiCcpCommonEventListener> m_wifiCcpCommonEventListener
+        m_wifiCcpCommonEventListener
             = std::make_shared<WifiCcpCommonEventListener>(subscriberInfo, this);
         OHOS::EventFwk::CommonEventManager::SubscribeCommonEvent(m_wifiCcpCommonEventListener);
     }
@@ -132,7 +132,7 @@ void WifiCountryCodePolicyNoMobile::HandleScanResultAction(int scanStatus)
         }
     }
     std::vector<std::pair<std::string, int>> vec(codeCount.begin(), codeCount.end());
-    sort(vec.begin(), vec.end(), [](std::pair<std::string, int> a, std::pair<std::string, int> b) {
+    sort(vec.begin(), vec.end(), [](const std::pair<std::string, int> &a, const std::pair<std::string, int> &b) {
         return a.second > b.second;
     });
     std::pair<std::string, int> firstCode = vec.front();
@@ -166,7 +166,7 @@ ErrCode WifiCountryCodePolicyNoMobile::StatisticCountryCodeFromScanResult(
         StrToUpper(tempWifiCountryCode);
         tempScanInfoList.push_back({scanInfo.bssid, tempWifiCountryCode});
     }
-    if (tempScanInfoList.size() == 0) {
+    if (tempScanInfoList.empty()) {
         WIFI_LOGI("get country code from scanResult size is 0");
         return WIFI_OPT_FAILED;
     }

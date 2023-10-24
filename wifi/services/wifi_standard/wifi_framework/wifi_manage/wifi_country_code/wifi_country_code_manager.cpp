@@ -164,7 +164,7 @@ void WifiCountryCodeManager::DealStaOpenRes(OperateResState state)
 void WifiCountryCodeManager::DealStaConnChanged(OperateResState state, const WifiLinkedInfo &info)
 {
     WIFI_LOGI("wifi connection state change, state=%{public}d", state);
-    if (state == OperateResState::CONNECT_AP_CONNECTED || state == OperateResState::DISCONNECT_DISCONNECTING) {
+    if (state == OperateResState::CONNECT_AP_CONNECTED) {
         WifiCountryCodeManager::GetInstance().UpdateWifiCountryCode();
     }
 }

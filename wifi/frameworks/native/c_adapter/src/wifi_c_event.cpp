@@ -260,7 +260,8 @@ NO_SANITIZE("cfi") WifiErrorCode EventManager::RegisterWifiEvents()
     if (mSaStatusListener == nullptr) {
         int32_t ret;
         mSaStatusListener = new OHOS::Wifi::WifiAbilityStatusChange();
-        OHOS::sptr<OHOS::ISystemAbilityManager> samgrProxy = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+        OHOS::sptr<OHOS::ISystemAbilityManager> samgrProxy =
+            OHOS::SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
         ret = samgrProxy->SubscribeSystemAbility(WIFI_DEVICE_ABILITY_ID, mSaStatusListener);
         samgrProxy->SubscribeSystemAbility(WIFI_SCAN_ABILITY_ID, mSaStatusListener);
         samgrProxy->SubscribeSystemAbility(WIFI_HOTSPOT_ABILITY_ID, mSaStatusListener);
@@ -333,7 +334,8 @@ void EventManager::Init()
         int32_t ret;
         WIFI_LOGI("EventManager Listener Init!");
         mSaStatusListener = new OHOS::Wifi::WifiAbilityStatusChange();
-        OHOS::sptr<OHOS::ISystemAbilityManager> samgrProxy = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+        OHOS::sptr<OHOS::ISystemAbilityManager> samgrProxy =
+            OHOS::SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
         ret = samgrProxy->SubscribeSystemAbility(WIFI_DEVICE_ABILITY_ID, mSaStatusListener);
         samgrProxy->SubscribeSystemAbility(WIFI_SCAN_ABILITY_ID, mSaStatusListener);
         samgrProxy->SubscribeSystemAbility(WIFI_HOTSPOT_ABILITY_ID, mSaStatusListener);

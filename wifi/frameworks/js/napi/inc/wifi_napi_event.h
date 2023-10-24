@@ -119,13 +119,20 @@ public:
     EventRegister()
     {
         int32_t ret;
-        mSaStatusListener = new WifiNapiAbilityStatusChange();
-        OHOS::sptr<OHOS::ISystemAbilityManager> samgrProxy =
-            OHOS::SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-        ret = samgrProxy->SubscribeSystemAbility(WIFI_DEVICE_ABILITY_ID, mSaStatusListener);
-        samgrProxy->SubscribeSystemAbility(WIFI_SCAN_ABILITY_ID, mSaStatusListener);
-        samgrProxy->SubscribeSystemAbility(WIFI_HOTSPOT_ABILITY_ID, mSaStatusListener);
-        samgrProxy->SubscribeSystemAbility(WIFI_P2P_ABILITY_ID, mSaStatusListener);
+        auto samgrProxy = OHOS::SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+        if (samgrProxy == nullptr) {
+            WIFI_LOGI("samgrProxy is nullptr!");
+            return;
+        }
+        mSaStatusListener = new (std::nothrow)OHOS::Wifi::WifiAbilityStatusChange();
+        if (mSaStatusListener == nullptr) {
+            WIFI_LOGI("mSaStatusListener is nullptr!");
+            return;
+        }
+        ret = samgrProxy->SubscribeSystemAbility((int32_t)WIFI_DEVICE_ABILITY_ID, mSaStatusListener);
+        samgrProxy->SubscribeSystemAbility((int32_t)WIFI_SCAN_ABILITY_ID, mSaStatusListener);
+        samgrProxy->SubscribeSystemAbility((int32_t)WIFI_HOTSPOT_ABILITY_ID, mSaStatusListener);
+        samgrProxy->SubscribeSystemAbility((int32_t)WIFI_P2P_ABILITY_ID, mSaStatusListener);
         WIFI_LOGI("EventRegister, SubscribeSystemAbility return ret:%{public}d!", ret);
 
     }

@@ -262,12 +262,12 @@ NO_SANITIZE("cfi") WifiErrorCode EventManager::RegisterWifiEvents()
         auto samgrProxy = OHOS::SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
         if (samgrProxy == nullptr) {
             WIFI_LOGI("samgrProxy is nullptr!");
-            return;
+            return ERROR_WIFI_UNKNOWN;
         }
         mSaStatusListener = new (std::nothrow)OHOS::Wifi::WifiAbilityStatusChange();
         if (mSaStatusListener == nullptr) {
             WIFI_LOGI("mSaStatusListener is nullptr!");
-            return;
+            return ERROR_WIFI_UNKNOWN;
         }
         ret = samgrProxy->SubscribeSystemAbility((int32_t)WIFI_DEVICE_ABILITY_ID, mSaStatusListener);
         samgrProxy->SubscribeSystemAbility((int32_t)WIFI_SCAN_ABILITY_ID, mSaStatusListener);

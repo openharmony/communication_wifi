@@ -286,9 +286,20 @@ void StaNetworkCheck::SignalNetCheckThread()
 
 void StaNetworkCheck::ExitNetCheckThread()
 {
+    WIFI_LOGI("enter StaNetworkCheck::ExitNetCheckThread");
+    int TIME_OUT_COUNT = 4000;
     isStopNetCheck = false;
     isExitNetCheckThread = true;
     while (!isExited) {
+        TIME_OUT_COUNT--;
+        if (TIME_OUT_COUNT < 0) {
+            if (pDealNetCheckThread != nullptr) {
+                delete pDealNetCheckThread;
+                pDealNetCheckThread = nullptr;
+            }
+            WIFI_LOGI("StaNetworkCheck::ExitNetCheckThread TimeOut Exit");
+            return;
+        }
         isExitNetCheckThread = true;
         mCondition.notify_one();
         mCondition_timeout.notify_one();

@@ -157,13 +157,7 @@ private:
 
 private:
     std::string m_iface;
-    struct CallbackModuleNameCmp {
-        bool operator() (const IApServiceCallbacks &cb1, const IApServiceCallbacks &cb2) const
-        {
-            return strcasecmp(cb1.callbackModuleName.c_str(), cb2.callbackModuleName.c_str()) < 0;
-        }
-    };
-    std::set<IApServiceCallbacks, CallbackModuleNameCmp> m_callbacks;
+    std::map<std::string, IApServiceCallbacks> m_callbacks;
     /* STA Manager */
     ApStationsManager &m_ApStationsManager;
     /* The reference of RootState */

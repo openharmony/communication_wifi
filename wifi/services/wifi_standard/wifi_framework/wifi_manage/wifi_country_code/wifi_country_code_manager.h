@@ -145,6 +145,7 @@ private:
     std::string m_wifiCountryCode = DEFAULT_WIFI_COUNTRY_CODE;
     std::shared_ptr<TelephoneNetworkSearchStateChangeListener> m_telephoneNetworkSearchStateChangeListener;
     std::shared_ptr<IWifiCountryCodePolicy> m_wifiCountryCodePolicy;
+    std::mutex m_countryCodeMutex;
 
     WifiCountryCodeManager() = default;
     void SendCountryCodeChangeCommonEvent(const std::string &wifiCountryCode);
@@ -159,7 +160,7 @@ private:
 #endif
     ErrCode UpdateWifiCountryCodeCache(const std::string &wifiCountryCode);
     void NotifyWifiCountryCodeChangeListeners(const std::string &wifiCountryCode);
-    ErrCode UnregisterWifiCountryCodeChangeListener(std::string moduleName);
+    ErrCode UnregisterWifiCountryCodeChangeListener(const std::string &moduleName);
 };
 }
 }

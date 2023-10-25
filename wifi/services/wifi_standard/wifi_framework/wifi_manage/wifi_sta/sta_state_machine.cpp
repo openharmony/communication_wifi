@@ -839,6 +839,7 @@ void StaStateMachine::DealSignalPollResult(InternalMessage *msg)
         LOGI("DealSignalPollResult currentSignalLevel:%{public}d, lastSignalLevel:%{public}d.\n",
             currentSignalLevel, lastSignalLevel);
         if (currentSignalLevel != lastSignalLevel) {
+            WifiSettings::GetInstance().SaveLinkedInfo(linkedInfo, m_instId);
             InvokeOnStaRssiLevelChanged(linkedInfo.rssi);
 #ifndef OHOS_ARCH_LITE
             if (NetSupplierInfo != nullptr) {

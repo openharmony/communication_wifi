@@ -24,8 +24,6 @@
 DEFINE_WIFILOG_HOTSPOT_LABEL("WifiApService");
 namespace OHOS {
 namespace Wifi {
-const std::string CLASS_NAME = "ApService";
-
 ApService::ApService(ApStateMachine &apStateMachine, int id)
     : m_ApStateMachine(apStateMachine), m_id(id)
 {}
@@ -36,8 +34,10 @@ ApService::~ApService()
 ErrCode ApService::EnableHotspot()
 {
     WIFI_LOGI("Instance %{public}d %{public}s", m_id, __func__);
+
     // notification of registration country code change
-    m_apObserver = std::make_shared<WifiCountryCodeChangeObserver>(CLASS_NAME, m_ApStateMachine);
+    std::string moduleName = "ApService_" + std::to_string(m_id);
+    m_apObserver = std::make_shared<WifiCountryCodeChangeObserver>(moduleName, m_ApStateMachine);
     WifiCountryCodeManager::GetInstance().RegisterWifiCountryCodeChangeListener(m_apObserver);
 
     m_ApStateMachine.SendMessage(static_cast<int>(ApStatemachineEvent::CMD_START_HOTSPOT));

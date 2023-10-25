@@ -97,8 +97,8 @@ void ApStateMachine::OnApStateChange(ApState state)
     if (state == ApState::AP_STATE_IDLE || state == ApState::AP_STATE_STARTED || state == ApState::AP_STATE_STARTING ||
             state == ApState::AP_STATE_CLOSING) {
         for (const auto &callBackItem : m_callbacks) {
-            if (callBackItem.OnApStateChangedEvent != nullptr) {
-                callBackItem.OnApStateChangedEvent(state, m_id);
+            if (callBackItem.second.OnApStateChangedEvent != nullptr) {
+                callBackItem.second.OnApStateChangedEvent(state, m_id);
             }
         }
     }
@@ -108,7 +108,7 @@ void ApStateMachine::OnApStateChange(ApState state)
 ErrCode ApStateMachine::RegisterApServiceCallbacks(const IApServiceCallbacks &callback)
 {
     WIFI_LOGI("RegisterApServiceCallbacks, callback module name: %{public}s", callback.callbackModuleName.c_str());
-    m_callbacks.insert(callback);
+    m_callbacks.insert_or_assign(callback.callbackModuleName, callback);
     return ErrCode::WIFI_OPT_SUCCESS;
 }
 
@@ -117,15 +117,15 @@ void ApStateMachine::BroadCastStationChange(const StationInfo &staInfo, ApStatem
     switch (act) {
         case ApStatemachineEvent::CMD_STATION_JOIN:
             for (const auto &callBackItem : m_callbacks) {
-                if (callBackItem.OnHotspotStaJoinEvent != nullptr) {
-                    callBackItem.OnHotspotStaJoinEvent(staInfo, m_id);
+                if (callBackItem.second.OnHotspotStaJoinEvent != nullptr) {
+                    callBackItem.second.OnHotspotStaJoinEvent(staInfo, m_id);
                 }
             }
             break;
         case ApStatemachineEvent::CMD_STATION_LEAVE:
             for (const auto &callBackItem : m_callbacks) {
-                if (callBackItem.OnHotspotStaLeaveEvent != nullptr) {
-                    callBackItem.OnHotspotStaLeaveEvent(staInfo, m_id);
+                if (callBackItem.second.OnHotspotStaLeaveEvent != nullptr) {
+                    callBackItem.second.OnHotspotStaLeaveEvent(staInfo, m_id);
                 }
             }
             break;

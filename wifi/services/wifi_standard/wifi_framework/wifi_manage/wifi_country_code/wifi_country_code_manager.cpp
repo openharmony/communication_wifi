@@ -46,6 +46,7 @@ WifiCountryCodeManager::~WifiCountryCodeManager()
     if (m_telephoneNetworkSearchStateChangeListener != nullptr) {
         OHOS::EventFwk::CommonEventManager::UnSubscribeCommonEvent(m_telephoneNetworkSearchStateChangeListener);
     }
+    std::lock_guard<std::mutex> lock(m_countryCodeMutex);
     m_codeChangeListeners.clear();
 }
 
@@ -140,6 +141,7 @@ ErrCode WifiCountryCodeManager::UpdateWifiCountryCode(const std::string &externa
 
 void WifiCountryCodeManager::NotifyWifiCountryCodeChangeListeners(const std::string &wifiCountryCode)
 {
+    std::lock_guard<std::mutex> lock(m_countryCodeMutex);
     if (!m_codeChangeListeners.empty()) {
         for (auto &callBackItem : m_codeChangeListeners) {
             callBackItem.second->OnWifiCountryCodeChanged(wifiCountryCode);
@@ -150,7 +152,7 @@ void WifiCountryCodeManager::NotifyWifiCountryCodeChangeListeners(const std::str
 ErrCode WifiCountryCodeManager::RegisterWifiCountryCodeChangeListener(
     const std::shared_ptr<IWifiCountryCodeChangeListener> &listener)
 {
-    std::unique_lock<std::mutex> lock(mCountryCodeMutex);
+    std::lock_guard<std::mutex> lock(m_countryCodeMutex);
     if (listener->GetListenerModuleName().empty()) {
         WIFI_LOGE("register fail, listener module name is null");
         return WIFI_OPT_FAILED;
@@ -166,9 +168,9 @@ ErrCode WifiCountryCodeManager::UnregisterWifiCountryCodeChangeListener(
     return UnregisterWifiCountryCodeChangeListener(listener->GetListenerModuleName());
 }
 
-ErrCode WifiCountryCodeManager::UnregisterWifiCountryCodeChangeListener(std::string moduleName)
+ErrCode WifiCountryCodeManager::UnregisterWifiCountryCodeChangeListener(const std::string &moduleName)
 {
-    std::unique_lock<std::mutex> lock(mCountryCodeMutex);
+    std::lock_guard<std::mutex> lock(m_countryCodeMutex);
     if (moduleName.empty()) {
         WIFI_LOGE("unregister fail, listener module name is null");
         return WIFI_OPT_FAILED;

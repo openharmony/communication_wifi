@@ -46,6 +46,8 @@ WifiCountryCodeManager::~WifiCountryCodeManager()
     if (m_telephoneNetworkSearchStateChangeListener != nullptr) {
         OHOS::EventFwk::CommonEventManager::UnSubscribeCommonEvent(m_telephoneNetworkSearchStateChangeListener);
     }
+    std::lock_guard<std::mutex> lock(m_countryCodeMutex);
+    m_codeChangeListeners.clear();
 }
 
 WifiCountryCodeManager &WifiCountryCodeManager::GetInstance()
@@ -79,6 +81,7 @@ ErrCode WifiCountryCodeManager::Init()
 
     m_staCallback.callbackModuleName = CLASS_NAME;
     m_staCallback.OnStaOpenRes = DealStaOpenRes;
+    m_staCallback.OnStaCloseRes = DealStaCloseRes;
     m_staCallback.OnStaConnChanged = DealStaConnChanged;
     m_apCallback.callbackModuleName = CLASS_NAME;
     m_apCallback.OnApStateChangedEvent = DealApStateChanged;
@@ -138,9 +141,10 @@ ErrCode WifiCountryCodeManager::UpdateWifiCountryCode(const std::string &externa
 
 void WifiCountryCodeManager::NotifyWifiCountryCodeChangeListeners(const std::string &wifiCountryCode)
 {
-    if (!m_wifiCountryCodeChangeListeners.empty()) {
-        for (auto &callBackItem : m_wifiCountryCodeChangeListeners) {
-            callBackItem->OnWifiCountryCodeChanged(wifiCountryCode);
+    std::lock_guard<std::mutex> lock(m_countryCodeMutex);
+    if (!m_codeChangeListeners.empty()) {
+        for (auto &callBackItem : m_codeChangeListeners) {
+            callBackItem.second->OnWifiCountryCodeChanged(wifiCountryCode);
         }
     }
 }
@@ -148,7 +152,12 @@ void WifiCountryCodeManager::NotifyWifiCountryCodeChangeListeners(const std::str
 ErrCode WifiCountryCodeManager::RegisterWifiCountryCodeChangeListener(
     const std::shared_ptr<IWifiCountryCodeChangeListener> &listener)
 {
-    m_wifiCountryCodeChangeListeners.insert(listener);
+    std::lock_guard<std::mutex> lock(m_countryCodeMutex);
+    if (listener->GetListenerModuleName().empty()) {
+        WIFI_LOGE("register fail, listener module name is null");
+        return WIFI_OPT_FAILED;
+    }
+    m_codeChangeListeners.insert_or_assign(listener->GetListenerModuleName(), listener);
     WIFI_LOGI("register success, listener module name: %{public}s", listener->GetListenerModuleName().c_str());
     return WIFI_OPT_SUCCESS;
 }
@@ -156,29 +165,45 @@ ErrCode WifiCountryCodeManager::RegisterWifiCountryCodeChangeListener(
 ErrCode WifiCountryCodeManager::UnregisterWifiCountryCodeChangeListener(
     const std::shared_ptr<IWifiCountryCodeChangeListener> &listener)
 {
-    for (auto it = m_wifiCountryCodeChangeListeners.begin(); it != m_wifiCountryCodeChangeListeners.end(); ++it) {
-        if (strcasecmp(listener->GetListenerModuleName().c_str(), (*it)->GetListenerModuleName().c_str()) == 0) {
-            m_wifiCountryCodeChangeListeners.erase(it);
-            WIFI_LOGI("unregister success, listener module name: %{public}s",
-                listener->GetListenerModuleName().c_str());
-            return WIFI_OPT_SUCCESS;
-        }
+    return UnregisterWifiCountryCodeChangeListener(listener->GetListenerModuleName());
+}
+
+ErrCode WifiCountryCodeManager::UnregisterWifiCountryCodeChangeListener(const std::string &moduleName)
+{
+    std::lock_guard<std::mutex> lock(m_countryCodeMutex);
+    if (moduleName.empty()) {
+        WIFI_LOGE("unregister fail, listener module name is null");
+        return WIFI_OPT_FAILED;
     }
-    WIFI_LOGE("unregister fail, listener module name: %{public}s", listener->GetListenerModuleName().c_str());
-    return WIFI_OPT_FAILED;
+    int ret = m_codeChangeListeners.erase(moduleName);
+    WIFI_LOGI("unregister ret=%{public}d, listener module name: %{public}s", ret, moduleName.c_str());
+    return ret > 0 ? WIFI_OPT_SUCCESS : WIFI_OPT_FAILED;
 }
 
 void WifiCountryCodeManager::DealStaOpenRes(OperateResState state, int instId)
 {
-    WIFI_LOGI("wifi open, state=%{public}d", state);
+    WIFI_LOGI("wifi open result, state=%{public}d, id=%{public}d", state, instId);
     if (state == OperateResState::OPEN_WIFI_SUCCEED) {
         WifiCountryCodeManager::GetInstance().UpdateWifiCountryCode();
+    } else if (state == OperateResState::OPEN_WIFI_FAILED) {
+        std::string moduleName = "StaService_" + std::to_string(instId);
+        WifiCountryCodeManager::GetInstance().UnregisterWifiCountryCodeChangeListener(moduleName);
     }
 }
 
+void WifiCountryCodeManager::DealStaCloseRes(OperateResState state, int instId)
+{
+    WIFI_LOGI("wifi close result, state=%{public}d, id=%{public}d", state, instId);
+    if (state == OperateResState::CLOSE_WIFI_FAILED || state == OperateResState::CLOSE_WIFI_SUCCEED) {
+        std::string moduleName = "StaService_" + std::to_string(instId);
+        WifiCountryCodeManager::GetInstance().UnregisterWifiCountryCodeChangeListener(moduleName);
+    }
+}
+
+
 void WifiCountryCodeManager::DealStaConnChanged(OperateResState state, const WifiLinkedInfo &info, int instId)
 {
-    WIFI_LOGI("wifi connection state change, state=%{public}d", state);
+    WIFI_LOGI("wifi connection state change, state=%{public}d, id=%{public}d", state, instId);
     if (state == OperateResState::CONNECT_AP_CONNECTED || state == OperateResState::DISCONNECT_DISCONNECTING) {
         WifiCountryCodeManager::GetInstance().UpdateWifiCountryCode();
     }
@@ -189,6 +214,9 @@ void WifiCountryCodeManager::DealApStateChanged(ApState state, int id)
     WIFI_LOGI("ap state change, state=%{public}d, id=%{public}d", state, id);
     if (state == ApState::AP_STATE_STARTED) {
         WifiCountryCodeManager::GetInstance().UpdateWifiCountryCode();
+    } else if (state != ApState::AP_STATE_STARTING && state != ApState::AP_STATE_STARTED) {
+        std::string moduleName = "ApService_" + std::to_string(id);
+        WifiCountryCodeManager::GetInstance().UnregisterWifiCountryCodeChangeListener(moduleName);
     }
 }
 

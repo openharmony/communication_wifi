@@ -31,8 +31,6 @@ DEFINE_WIFILOG_LABEL("StaService");
 
 namespace OHOS {
 namespace Wifi {
-const std::string CLASS_NAME = "sta_service";
-
 StaService::StaService(int instId)
     : pStaStateMachine(nullptr), pStaMonitor(nullptr), pStaAutoConnectService(nullptr), m_instId(instId)
 {}
@@ -142,7 +140,8 @@ ErrCode StaService::EnableWifi()
     WIFI_LOGI("Enter EnableWifi.\n");
 #ifndef OHOS_ARCH_LITE
     // notification of registration country code change
-    m_staObserver = std::make_shared<WifiCountryCodeChangeObserver>(CLASS_NAME, *pStaStateMachine);
+    std::string moduleName = "StaService_" + std::to_string(m_instId);
+    m_staObserver = std::make_shared<WifiCountryCodeChangeObserver>(moduleName, *pStaStateMachine);
     WifiCountryCodeManager::GetInstance().RegisterWifiCountryCodeChangeListener(m_staObserver);
 #endif
     CHECK_NULL_AND_RETURN(pStaStateMachine, WIFI_OPT_FAILED);

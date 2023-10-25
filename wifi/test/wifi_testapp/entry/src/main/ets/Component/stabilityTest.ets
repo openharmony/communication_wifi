@@ -19,11 +19,11 @@ import { TestData } from '../MainAbility/model/testData'
 import { TestList } from './testList';
 
 /**
- * Benchmark-Test Of Wifi test
+ * StabilityTest Of WIFI test
  */
 
 @Component
-export struct BenchmarkTest {
+export struct StabilityTest {
   private testItems: TestData[]
 
   build() {

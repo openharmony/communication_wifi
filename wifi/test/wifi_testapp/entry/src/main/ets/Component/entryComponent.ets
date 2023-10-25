@@ -99,8 +99,8 @@ export default struct EntryComponentTable {
             .visibility( null === this.settingArrow ? Visibility.None : Visibility.Visible )
             .width( $r( 'app.float.wh_value_48' ) )
             .height( $r( 'app.float.wh_value_48' ) )
-            .padding( $r( 'app.float.wh_value_4' ) )
-            .margin( { left : $r( 'app.float.wh_value_4' ) , right : $r( 'app.float.wh_value_4' ) } )
+            .padding( $r( 'app.float.distance_4' ) )
+            .margin( { left : $r( 'app.float.distance_4' ) , right : $r( 'app.float.distance_4' ) } )
             .borderRadius( $r( "sys.float.ohos_id_corner_radius_default_l" ) )
             .onClick( this.onArrowClick );
         }

@@ -682,9 +682,16 @@ void StaStateMachine::StopWifiProcess()
     IfConfig::GetInstance().FlushIpAddr(IF_NAME + std::to_string(m_instId), IPTYPE_IPV4);
 #endif
 
+    ConnState curConnState = linkedInfo.connState;
+    WIFI_LOGI("current connect state is %{public}d\n", curConnState);
+
     /* clear connection information. */
     InitWifiLinkedInfo();
     WifiSettings::GetInstance().SaveLinkedInfo(linkedInfo, m_instId);
+    if (curConnState == ConnState::CONNECTED) {
+        /* Callback result to InterfaceService. */
+        InvokeOnStaConnChanged(OperateResState::DISCONNECT_DISCONNECTED, linkedInfo);
+    }
     
     if (WifiOprMidState::RUNNING == WifiConfigCenter::GetInstance().GetWifiScanOnlyMidState(m_instId) \
         || WifiStaHalInterface::GetInstance().StopWifi() == WIFI_IDL_OPT_OK) {

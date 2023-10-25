@@ -272,59 +272,59 @@ void StaStateMachine::BuildStateTree()
 void StaStateMachine::RegisterStaServiceCallback(const StaServiceCallback &callback)
 {
     WIFI_LOGI("RegisterStaServiceCallback, callback module name: %{public}s", callback.callbackModuleName.c_str());
-    m_staCallback.insert(callback);
+    m_staCallback.insert_or_assign(callback.callbackModuleName, callback);
 }
 
 void StaStateMachine::InvokeOnStaOpenRes(OperateResState state)
 {
     for (const auto &callBackItem : m_staCallback) {
-        if (callBackItem.OnStaOpenRes != nullptr) {
-            callBackItem.OnStaOpenRes(state, m_instId);
+        if (callBackItem.second.OnStaOpenRes != nullptr) {
+            callBackItem.second.OnStaOpenRes(state, m_instId);
         }
     }
 }
 
 void StaStateMachine::InvokeOnStaCloseRes(OperateResState state)
 {
-for (const auto &callBackItem : m_staCallback) {
-        if (callBackItem.OnStaCloseRes != nullptr) {
-            callBackItem.OnStaCloseRes(state, m_instId);
+    for (const auto &callBackItem : m_staCallback) {
+        if (callBackItem.second.OnStaCloseRes != nullptr) {
+            callBackItem.second.OnStaCloseRes(state, m_instId);
         }
     }
 }
 
 void StaStateMachine::InvokeOnStaConnChanged(OperateResState state, const WifiLinkedInfo &info)
 {
-for (const auto &callBackItem : m_staCallback) {
-        if (callBackItem.OnStaConnChanged != nullptr) {
-            callBackItem.OnStaConnChanged(state, info, m_instId);
+    for (const auto &callBackItem : m_staCallback) {
+        if (callBackItem.second.OnStaConnChanged != nullptr) {
+            callBackItem.second.OnStaConnChanged(state, info, m_instId);
         }
     }
 }
 
 void StaStateMachine::InvokeOnWpsChanged(WpsStartState state, const int code)
 {
-for (const auto &callBackItem : m_staCallback) {
-        if (callBackItem.OnWpsChanged != nullptr) {
-            callBackItem.OnWpsChanged(state, code, m_instId);
+    for (const auto &callBackItem : m_staCallback) {
+        if (callBackItem.second.OnWpsChanged != nullptr) {
+            callBackItem.second.OnWpsChanged(state, code, m_instId);
         }
     }
 }
 
 void StaStateMachine::InvokeOnStaStreamChanged(StreamDirection direction)
 {
-for (const auto &callBackItem : m_staCallback) {
-        if (callBackItem.OnStaStreamChanged != nullptr) {
-            callBackItem.OnStaStreamChanged(direction, m_instId);
+    for (const auto &callBackItem : m_staCallback) {
+        if (callBackItem.second.OnStaStreamChanged != nullptr) {
+            callBackItem.second.OnStaStreamChanged(direction, m_instId);
         }
     }
 }
 
 void StaStateMachine::InvokeOnStaRssiLevelChanged(int level)
 {
-for (const auto &callBackItem : m_staCallback) {
-        if (callBackItem.OnStaRssiLevelChanged != nullptr) {
-            callBackItem.OnStaRssiLevelChanged(level, m_instId);
+    for (const auto &callBackItem : m_staCallback) {
+        if (callBackItem.second.OnStaRssiLevelChanged != nullptr) {
+            callBackItem.second.OnStaRssiLevelChanged(level, m_instId);
         }
     }
 }

@@ -1323,8 +1323,15 @@ const TestComposition: any[] = [
     'category' : Category.App
   },
   {
-    'name' : 'p2p' ,
-    'detail' : 'p2p发现' ,
+    'name' : 'WIFI候选网络' ,
+    'detail' : 'wifi候选网络' ,
+    'url' : 'pages/subAppTest/wifiCandidateTest' ,
+    'image' : $r( 'app.media.wifi' ) ,
+    'category' : Category.App
+  },
+  {
+    'name' : 'p2p扫描' ,
+    'detail' : 'p2p扫描结果' ,
     'url' : 'pages/subAppTest/p2pDiscoveryTest' ,
     'image' : $r( 'app.media.WLAN' ) ,
     'category' : Category.App
@@ -1455,6 +1462,27 @@ const TestComposition: any[] = [
     'url' : 'pages/subScenarioTest/p2pManagerConnectScenarioTest' ,
     'image' : $r( 'app.media.ScenarioTest' ) ,
     'category' : Category.Scenario
+  },
+  {
+    'name' : 'WiFiSwitchStabilityTest' ,
+    'detail' : 'WiFi开关稳定性测试' ,
+    'url' : 'pages/subStabilityTest/wifiSwitchStabilityTest' ,
+    'image' : $r( 'app.media.ScenarioTest' ) ,
+    'category' : Category.Stability
+  },
+  {
+    'name' : 'WiFiScanStabilityTest' ,
+    'detail' : 'WiFi搜索稳定性测试' ,
+    'url' : 'pages/subStabilityTest/wifiScanStabilityTest' ,
+    'image' : $r( 'app.media.ScenarioTest' ) ,
+    'category' : Category.Stability
+  },
+  {
+    'name' : 'WiFiConnectStabilityTest' ,
+    'detail' : 'WiFi连接稳定性测试' ,
+    'url' : 'pages/subStabilityTest/wifiConnectStabilityTest' ,
+    'image' : $r( 'app.media.ScenarioTest' ) ,
+    'category' : Category.Stability
   },
   {
     'name' : 'WifiBenchmarkTest' ,

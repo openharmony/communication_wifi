@@ -172,17 +172,17 @@ ErrCode WifiCountryCodeManager::UnregisterWifiCountryCodeChangeListener(std::str
     if (moduleName.empty()) {
         WIFI_LOGE("unregister fail, listener module name is null");
         return WIFI_OPT_FAILED;
-     }
+    }
     int ret = m_codeChangeListeners.erase(moduleName);
     WIFI_LOGI("unregister ret=%{public}d, listener module name: %{public}s", ret, moduleName.c_str());
     return ret > 0 ? WIFI_OPT_SUCCESS : WIFI_OPT_FAILED;
- }
+}
 
 void WifiCountryCodeManager::DealStaOpenRes(OperateResState state, int instId)
 {
     WIFI_LOGI("wifi open result, state=%{public}d, id=%{public}d", state, instId);
     if (state == OperateResState::OPEN_WIFI_SUCCEED) {
-         WifiCountryCodeManager::GetInstance().UpdateWifiCountryCode();
+        WifiCountryCodeManager::GetInstance().UpdateWifiCountryCode();
     } else if (state == OperateResState::OPEN_WIFI_FAILED) {
         std::string moduleName = "StaService_" + std::to_string(instId);
         WifiCountryCodeManager::GetInstance().UnregisterWifiCountryCodeChangeListener(moduleName);

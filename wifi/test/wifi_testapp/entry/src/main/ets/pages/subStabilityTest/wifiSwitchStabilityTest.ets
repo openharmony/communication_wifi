@@ -82,38 +82,38 @@ struct WiFiSwitchStabilityTest {
         Column() {
           Text( "测试结果：" )
             .fontSize( "22vp" )
-            .width( '95%' )
+            .width( ConfigData.WH_95_100 )
             .align( Alignment.TopStart )
             .padding( { top : "10vp" } )
           Scroll() {
             Column() {
               Text( "测试次数：" + this.testNumbers )
-                .fontSize( "17vp" )
+                .fontSize( "18vp" )
                 .margin( { top : "5vp" , left : "10vp" , right : "5vp" } )
                 .textAlign( TextAlign.Start )
                 .width( ConfigData.WH_90_100 )
               Text( "打开WiFi的成功次数：" + this.openSuccessNumber )
-                .fontSize( "17vp" )
+                .fontSize( "18vp" )
                 .margin( { top : "5vp" , left : "10vp" , right : "5vp" } )
                 .textAlign( TextAlign.Start )
                 .width( ConfigData.WH_90_100 )
               Text( "打开WiFi的失败次数：" + this.openFailNumber )
-                .fontSize( "17vp" )
+                .fontSize( "18vp" )
                 .margin( { top : "5vp" , left : "10vp" , right : "5vp" } )
                 .textAlign( TextAlign.Start )
                 .width( ConfigData.WH_90_100 )
               Text( "关闭WiFi的成功次数：" + this.closeSuccessNumber )
-                .fontSize( "17vp" )
+                .fontSize( "18vp" )
                 .margin( { top : "5vp" , left : "10vp" , right : "5vp" } )
                 .textAlign( TextAlign.Start )
                 .width( ConfigData.WH_90_100 )
               Text( "关闭WiFi的失败次数：" + this.closeFailNumber )
-                .fontSize( "17vp" )
+                .fontSize( "18vp" )
                 .margin( { top : "5vp" , left : "10vp" , right : "5vp" } )
                 .textAlign( TextAlign.Start )
                 .width( ConfigData.WH_90_100 )
             }
-            .width( ConfigData.WH_100_100 )
+            .width( ConfigData.WH_95_100 )
             .backgroundColor( $r( "sys.color.ohos_id_color_foreground_contrary" ) )
           }
           .scrollBarWidth( 10 )
@@ -124,22 +124,23 @@ struct WiFiSwitchStabilityTest {
         Column() {
           Text( "log显示：" )
             .fontSize( "22vp" )
-            .width( '95%' )
+            .height( ConfigData.WH_15_100 )
+            .width( ConfigData.WH_95_100 )
             .align( Alignment.TopStart )
-            .padding( { top : "10vp" } )
+            .padding( { top : "18vp" } )
           List() {
             ListItem() {
               Text( this.stateMessageLog )
-                .fontSize( "20vp" )
-                .margin( { top : "5vp" , left : "30vp" , right : "10vp" } )
+                .fontSize( "18vp" )
+                .margin( { top : "5vp" , left : "20vp" , right : "5vp" } )
                 .textAlign( TextAlign.Start )
                 .width( ConfigData.WH_90_100 )
             }
           }
-          .height( ConfigData.WH_80_100 )
-          .width( ConfigData.WH_90_100 )
+          .height( ConfigData.WH_83_100 )
+          .width( ConfigData.WH_95_100 )
           .backgroundColor( $r( "sys.color.ohos_id_color_foreground_contrary" ) )
-        }.width( "100%" ).height( "60%" )
+        }.width( ConfigData.WH_100_100 ).height( ConfigData.WH_60_100 )
 
       }.width( "100%" ).height( "67%" ).backgroundColor( $r( "app.color.lead" ) )
 
@@ -216,7 +217,7 @@ struct WiFiSwitchStabilityTest {
                       self.openFailNumber = self.openFailNumber + 1
                       break;
                     } else {
-                      console.log( "第" + m + "次开wifi后状态不清楚" );
+                      console.log( "第" + ( self.openWifiNumber + 1 ) + "次开wifi后状态不清楚" );
                       break;
                     }
                   }
@@ -246,7 +247,7 @@ struct WiFiSwitchStabilityTest {
   onWifiState() {
     console.log( TAG , "on.wifiStateChange start--------" )
     wifi.on( "wifiStateChange" , ( number ) => {
-      console.log( TAG , " on.wifiStateChange success--------" )
+      console.log( TAG , " on.wifiStateChange --------" )
       let wifiStateMessage = ""
       switch ( number ) {
         case 0:
@@ -265,6 +266,7 @@ struct WiFiSwitchStabilityTest {
           wifiStateMessage = '未知状态';
           break;
       }
+      console.log( TAG , "WiFi开关状态为:" + wifiStateMessage )
       if ( number == 1 ) {
         // 打时间戳
         this.open_EndTime = new Date().getTime()
@@ -273,12 +275,11 @@ struct WiFiSwitchStabilityTest {
         this.close_EndTime = new Date().getTime()
         console.log( TAG , "WIFI去使能结束时间: " + this.close_EndTime + "ms" )
       }
-      console.log( TAG , " on.wifiStateChange  callback success --------" )
+      console.log( TAG , " on.wifiStateChange callback success --------" )
       prompt.showToast( { message : "wifi状态: " + wifiStateMessage } )
       this.stateMessage = wifiStateMessage
-      console.log( TAG , "wifiStateMessage:" + this.stateMessage )
       AppStorage.SetOrCreate( "stateMessage" , this.stateMessage )
-      console.log( TAG , " on.wifiStateChange end--------" )
+      console.log( TAG , " on.wifiStateChange callback end--------" )
       return this.stateMessage
     } )
     return this.stateMessage

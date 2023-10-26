@@ -279,7 +279,7 @@ ErrCode WifiP2pService::Hid2dConnect(const Hid2dConnectConfig& config)
 {
     WIFI_LOGI("Hid2dConnect");
 
-    bool isNeedDhcp = DHCPTYPE::DHCP_LEGACEGO;
+    DHCPTYPE dhcpType = DHCPTYPE::DHCP_LEGACEGO;
     if (config.GetDhcpMode() == DhcpMode::CONNECT_GO_NODHCP ||
         config.GetDhcpMode() == DhcpMode::CONNECT_AP_NODHCP) {
         dhcpType = DHCPTYPE::NO_DHCP;

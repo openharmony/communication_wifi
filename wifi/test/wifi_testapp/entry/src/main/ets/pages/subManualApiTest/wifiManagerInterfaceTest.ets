@@ -36,7 +36,7 @@ struct WifiManagerDeviceSetting {
   @StorageLink( 'wifiDeviceConfigManager' ) wifiDeviceConfigManager: Object = {
     ssid : String = "TP-LINK_6365" ,
     bssid : String = "6C:B1:58:75:63:65" ,
-    preSharedKey : String = "kaihong123" ,
+    preSharedKey : String = "12345678" ,
     isHiddenSsid : Boolean = false ,
     securityType : Number = 3 ,
     creatorUid : Number = 1 ,
@@ -101,7 +101,7 @@ struct WifiManagerDeviceSetting {
 
             Row() {
               Text( "preSharedKeyM:" ).fontSize( "15vp" ).width( 110 );
-              TextInput( { text : this.wifiDeviceConfigManager.preSharedKey , placeholder : "kaihong123" } )
+              TextInput( { text : this.wifiDeviceConfigManager.preSharedKey , placeholder : "12345678" } )
                 .fontSize( "15vp" )
                 .onChange( ( strInput ) => {
                   //判断合法性
@@ -372,7 +372,7 @@ struct WifiManagerInterfaceTest {
   @StorageLink( 'wifiDeviceConfigManager' ) wifiDeviceConfigManager: Object = {
     ssid : String = "TP-LINK_6365" ,
     bssid : String = "6C:B1:58:75:63:65" ,
-    preSharedKey : String = "kaihong123" ,
+    preSharedKey : String = "12345678" ,
     isHiddenSsid : Boolean = false ,
     securityType : Number = 3 ,
     creatorUid : Number = 1 ,

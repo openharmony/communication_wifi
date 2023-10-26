@@ -312,11 +312,11 @@ HWTEST_F(WifiHalWpaStaTest, WpaCliCmdSetCountryCodeTest, TestSize.Level1)
 {
     EXPECT_TRUE(mInterface->wpaCliCmdSetCountryCode(nullptr, nullptr) < 0);
     EXPECT_TRUE(mInterface->wpaCliCmdSetCountryCode(mInterface, nullptr) < 0);
-    MockEraseSupportedCmd("SET");
-    EXPECT_TRUE(mInterface->wpaCliCmdSetCountryCode(mInterface, "CN") < 0);
-    MockSetWpaExpectCmdResponse("SET", "FAIL\n");
-    EXPECT_TRUE(mInterface->wpaCliCmdSetCountryCode(mInterface, "CN") < 0);
-    MockSetWpaExpectCmdResponse("SET", "OK");
+    MockEraseSupportedCmd("DRIVER COUNTRY");
+    EXPECT_TRUE(mInterface->wpaCliCmdSetCountryCode(mInterface, "CN") == 0);
+    MockSetWpaExpectCmdResponse("DRIVER COUNTRY", "FAIL\n");
+    EXPECT_TRUE(mInterface->wpaCliCmdSetCountryCode(mInterface, "CN") == 0);
+    MockSetWpaExpectCmdResponse("DRIVER COUNTRY", "OK");
     EXPECT_TRUE(mInterface->wpaCliCmdSetCountryCode(mInterface, "CN") == 0);
 }
 

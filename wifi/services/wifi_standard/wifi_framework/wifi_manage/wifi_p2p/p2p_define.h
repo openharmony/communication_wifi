@@ -153,6 +153,12 @@ enum class P2P_STATE_MACHINE_CMD {
     REMOVE_SERVICE_REQUEST_RECORD,
 };
 
+enum class DHCPTYPE {
+    NO_DHCP = 0,
+    DHCP_P2P,
+    DHCP_LEGACEGO,
+};
+
 using HandlerMethod = void(P2P_STATE_MACHINE_CMD, int, int, const std::any &);
 } // namespace Wifi
 } // namespace OHOS

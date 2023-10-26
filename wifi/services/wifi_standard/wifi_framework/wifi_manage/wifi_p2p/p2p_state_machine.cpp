@@ -661,9 +661,9 @@ void P2pStateMachine::ChangeConnectedStatus(P2pConnectedState connectedState)
         std::string deviceAddress;
         savedP2pConfig.SetDeviceAddress(deviceAddress);
         UpdateOwnDevice(P2pDeviceStatus::PDS_CONNECTED);
-    if (GetIsNeedDhcp() != DHCPTYPE::DHCP_LEGACEGO) {
-        BroadcastP2pConnectionChanged();
-    }
+        if (GetIsNeedDhcp() != DHCPTYPE::DHCP_LEGACEGO) {
+            BroadcastP2pConnectionChanged();
+        }
     }
 
     if (connectedState == P2pConnectedState::P2P_DISCONNECTED) {

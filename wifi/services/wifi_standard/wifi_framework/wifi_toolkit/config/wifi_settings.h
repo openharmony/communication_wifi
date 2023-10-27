@@ -1408,6 +1408,10 @@ private:
     void InitScanControlIntervalList();
     void InitScanControlInfo();
     void GetLinkedChannelWidth();
+#ifndef OHOS_ARCH_LITE
+    bool MergeSoftapConfig();
+    bool MergeWifiConfig();
+#endif
 
 private:
     int mWifiStaCapabilities;            /* Sta capability */

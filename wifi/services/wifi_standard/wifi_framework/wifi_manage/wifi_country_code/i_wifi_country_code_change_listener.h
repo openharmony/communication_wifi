@@ -32,6 +32,7 @@ public:
     virtual std::string GetListenerModuleName() = 0;
     StateMachine &m_stateMachineObj;
 protected:
+    std::string m_lastWifiCountryCode;
     std::string m_listenerModuleName;
 };
 }

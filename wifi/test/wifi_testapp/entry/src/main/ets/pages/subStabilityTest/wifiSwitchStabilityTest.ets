@@ -23,6 +23,7 @@ import ConfigData from '../../Utils/ConfigData';
 import { initWifiApiData } from '../../MainAbility/model/testDataModels'
 import { TestData } from '../../MainAbility/model/testData'
 import wifi from '@ohos.wifi';
+import wifiManager from '@ohos.wifiManager';
 import prompt from '@system.prompt';
 
 /**
@@ -118,7 +119,6 @@ struct WiFiSwitchStabilityTest {
           }
           .scrollBarWidth( 10 )
           .scrollBar( BarState.Auto )
-
         }.width( "100%" ).height( "30%" )
 
         Column() {
@@ -165,7 +165,7 @@ struct WiFiSwitchStabilityTest {
                     console.log( TAG , "测试结束------------" )
                     break;
                   } else {
-                    let wifiState = wifi.isWifiActive()
+                    let wifiState = wifiManager.isWifiActive()
                     if ( wifiState ) {
                       wifi.disableWifi()
                       console.log( TAG , "wifi当前已使能，已经去使能，正常开始测试------" )
@@ -246,7 +246,7 @@ struct WiFiSwitchStabilityTest {
 
   onWifiState() {
     console.log( TAG , "on.wifiStateChange start--------" )
-    wifi.on( "wifiStateChange" , ( number ) => {
+    wifiManager.on( "wifiStateChange" , ( number ) => {
       console.log( TAG , " on.wifiStateChange --------" )
       let wifiStateMessage = ""
       switch ( number ) {

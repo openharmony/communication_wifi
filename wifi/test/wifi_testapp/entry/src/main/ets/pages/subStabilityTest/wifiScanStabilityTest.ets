@@ -23,6 +23,7 @@ import ConfigData from '../../Utils/ConfigData';
 import { initWifiApiData } from '../../MainAbility/model/testDataModels'
 import { TestData } from '../../MainAbility/model/testData'
 import wifi from '@ohos.wifi';
+import wifiManager from '@ohos.wifiManager';
 import prompt from '@system.prompt';
 
 /**
@@ -34,12 +35,19 @@ const TAG = '[WiFiScanStabilityTest]'
 @Component
 struct WiFiScanStabilityTest {
   private testItem: TestData = Router.getParams().testId;
+  @State scan_StartTime: Number = 0
+  @State scan_EndTime: Number = 0
+  @State scan_SpendTime: Number = 0
+  @State stop_StartTime: Number = 0
+  @State stop_EndTime: Number = 0
+  @State stop_SpendTime: Number = 0
   @State openScanNumber: Number = 0
   @State closeScanNumber: Number = 0
   @State openScanSuccessNumber: Number = 0
   @State openScanFailNumber: Number = 0
   @State closeScanSuccessNumber: Number = 0
   @State closeScanFailNumber: Number = 0
+  @State scanInfo: String = 0
   @State message: string = "测试结果"
   @State testNumbers: Number = 30 //测试次数
   @State successTimes: Number = 0
@@ -78,17 +86,46 @@ struct WiFiScanStabilityTest {
             .width( ConfigData.WH_95_100 )
             .align( Alignment.TopStart )
             .padding( { top : "10vp" } )
+          Scroll() {
+            Column() {
+              Text( "测试次数：" + this.testNumbers )
+                .fontSize( "18vp" )
+                .margin( { top : "5vp" , left : "10vp" , right : "5vp" } )
+                .textAlign( TextAlign.Start )
+                .width( ConfigData.WH_90_100 )
+              Text( "scan的成功次数：" + this.openScanSuccessNumber )
+                .fontSize( "18vp" )
+                .margin( { top : "5vp" , left : "10vp" , right : "5vp" } )
+                .textAlign( TextAlign.Start )
+                .width( ConfigData.WH_90_100 )
+              Text( "scan的失败次数：" + this.openScanFailNumber )
+                .fontSize( "18vp" )
+                .margin( { top : "5vp" , left : "10vp" , right : "5vp" } )
+                .textAlign( TextAlign.Start )
+                .width( ConfigData.WH_90_100 )
+              Text( "scan的扫描个数：" + this.scanInfo )
+                .fontSize( "18vp" )
+                .margin( { top : "5vp" , left : "10vp" , right : "5vp" } )
+                .textAlign( TextAlign.Start )
+                .width( ConfigData.WH_90_100 )
+            }
+            .width( ConfigData.WH_95_100 )
+            .backgroundColor( $r( "sys.color.ohos_id_color_foreground_contrary" ) )
+          }
+          .scrollBarWidth( 10 )
+          .scrollBar( BarState.Auto )
         }.width( "100%" ).height( "30%" )
 
         Column() {
           Text( "log显示：" )
             .fontSize( "22vp" )
+            .height( ConfigData.WH_15_100 )
             .width( ConfigData.WH_95_100 )
             .align( Alignment.TopStart )
             .padding( { top : "10vp" } )
           List() {
             ListItem() {
-              Text( this.stateMessageLog )
+              Text( this.scanStateMessageLog )
                 .fontSize( "18vp" )
                 .margin( { top : "5vp" , left : "10vp" , right : "5vp" } )
                 .textAlign( TextAlign.Start )
@@ -115,15 +152,18 @@ struct WiFiScanStabilityTest {
               self.scanLoopState = true
 
               async function forLoop() {
-                self.stateMessageLog = ""
+                self.scanStateMessageLog = ""
                 self.onWifiScanState()
+                wifiManager.setScanAlwaysAllowed( false )
                 let funcMessage = ""
+                funcMessage = wifiManager.getScanAlwaysAllowed
+                console.log( TAG , "getScanAlwaysAllowed:" + funcMessage )
                 for ( self.openScanNumber ; self.openScanNumber < self.testNumbers ; self.openScanNumber ++ ) {
                   if ( !self.scanLoopState ) {
                     console.log( TAG , "测试结束------------" )
                     break;
                   } else {
-                    let wifiState = wifi.isWifiActive()
+                    let wifiState = wifiManager.isWifiActive()
                     if ( !wifiState ) {
                       wifi.enableWifi()
                       console.log( TAG , "wifi当前未使能，已经使能，正常开始测试------" )
@@ -133,20 +173,26 @@ struct WiFiScanStabilityTest {
                     await sleep( 3 )
 
                     funcMessage = wifi.scan()
-
+                    self.scan_StartTime = new Date().getTime()
+                    console.log( TAG , "第" + ( self.openScanNumber + 1 ) + "次WIFI使能-----" )
+                    console.log( TAG , "第" + ( self.openScanNumber + 1 ) + "次WIFI使能开始时间: " + self.scan_StartTime + "ms" )
                     self.scanStateMessageLog += "第" + ( self.openScanNumber + 1 ) + "次WIFI扫描结果：" + funcMessage + "\n"
                     console.log( TAG , "第" + ( self.openScanNumber + 1 ) + "次WIFI扫描结果：" + funcMessage )
                     await sleep( 10 )
                     self.scanStateMessage = AppStorage.Get( "scanStateMessage" )
                     // prompt.showToast( { message : funcMessage } )
                     if ( self.scanStateMessage == "scan success" ) {
-                      self.openSuccessNumber = self.openSuccessNumber + 1
-                      self.scanStateMessageLog += "扫描成功的次数：" + self.openSuccessNumber + "\n"
-                      console.log( TAG , "扫描成功的次数：" + self.openSuccessNumber )
+                      self.scan_SpendTime = self.scan_EndTime - self.scan_StartTime
+                      self.scanStateMessageLog += "第" + ( self.openScanNumber + 1 ) + "次WIFI扫描耗时: " + self.scan_SpendTime + "ms" + "\n"
+                      self.scanStateMessageLog += "第" + ( self.openScanNumber + 1 ) + "次WIFI扫描结果个数: " + self.scanInfo + "\n"
+                      console.log( TAG , "第" + ( self.openScanNumber + 1 ) + "次WIFI扫描耗时: " + self.scan_SpendTime + "ms" )
+                      self.openScanSuccessNumber = self.openScanSuccessNumber + 1
+                      self.scanStateMessageLog += "扫描成功的次数：" + self.openScanSuccessNumber + "\n"
+                      console.log( TAG , "扫描成功的次数：" + self.openScanSuccessNumber )
                       funcMessage = wifi.disableWifi()
                       self.closeScanNumber = self.closeScanNumber + 1
-                      self.scanStateMessageLog += "第" + ( self.closeScanNumber + 1 ) + "次WIFI去使能结果：" + funcMessage + "\n"
-                      console.log( TAG , "第" + ( self.closeScanNumber + 1 ) + "次WIFI去使能结果：" + funcMessage )
+                      self.scanStateMessageLog += "第" + self.closeScanNumber + "次WIFI去使能结果：" + funcMessage + "\n"
+                      console.log( TAG , "第" + self.closeScanNumber + "次WIFI去使能结果：" + funcMessage )
                       console.log( TAG , "closeScanNumber: " + self.closeScanNumber )
                       await sleep( 10 )
                       // prompt.showToast( { message : funcMessage } )
@@ -163,7 +209,7 @@ struct WiFiScanStabilityTest {
                       self.openScanFailNumber = self.openScanFailNumber + 1
                       break;
                     } else {
-                      console.log( "第" + ( self.openScanNumber + 1 ) + "次开wifi后状态不清楚" );
+                      console.log( "第" + ( self.openScanNumber + 1 ) + "次扫描后状态不清楚" );
                       break;
                     }
                   }
@@ -192,7 +238,7 @@ struct WiFiScanStabilityTest {
 
   onWifiScanState() {
     console.log( TAG , "on.wifiScanStateChange start--------" )
-    wifi.on( "wifiScanStateChange" , ( number ) => {
+    wifiManager.on( "wifiScanStateChange" , ( number ) => {
       console.log( TAG , " on.wifiScanStateChange success--------" )
       let wifiScanStateMessage = ""
       switch ( number ) {
@@ -206,12 +252,21 @@ struct WiFiScanStabilityTest {
           wifiScanStateMessage = '未知状态';
           break;
       }
+      console.log( TAG , "WiFi扫描状态为:" + wifiScanStateMessage )
+      if ( number == 1 ) {
+        // 打时间戳
+        this.scan_EndTime = new Date().getTime()
+        console.log( TAG , "WIFI扫描成功时间: " + this.scan_EndTime + "ms" )
+        this.scanInfo = wifiManager.getScanResultsSync().length
+        console.log( TAG , "WIFI扫描结果个数: " + this.scanInfo + "; WIFI扫描结果个数: " + JSON.stringify( wifiManager.getScanResultsSync() ) )
+      } else {
+        console.log( TAG , "WIFI扫描还未成功------" )
+      }
       console.log( TAG , " on.wifiScanStateChange  callback success --------" )
       prompt.showToast( { message : "wifiScan状态: " + wifiScanStateMessage } )
       this.scanStateMessage = wifiScanStateMessage
-      console.log( TAG , "wifiStateMessage:" + this.scanStateMessage )
       AppStorage.SetOrCreate( "scanStateMessage" , this.scanStateMessage )
-      console.log( TAG , " on.wifiStateChange end--------" )
+      console.log( TAG , " on.wifiStateChange callback end--------" )
       return this.scanStateMessage
     } )
     return this.scanStateMessage

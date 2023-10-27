@@ -20,46 +20,6 @@
 #include "wifi_msg.h"
 #include "wifi_internal_msg.h"
 
-constexpr auto XML_TAG_SECTION_HEADER_NETWORK_LIST = "NetworkList";
-constexpr auto XML_TAG_SECTION_HEADER_NETWORK = "Network";
-constexpr auto XML_TAG_SECTION_HEADER_WIFI_CONFIGURATION = "WifiConfiguration";
-constexpr auto XML_TAG_SECTION_HEADER_NETWORK_STATUS = "NetworkStatus";
-constexpr auto XML_TAG_SECTION_HEADER_IP_CONFIGURATION = "IpConfiguration";
-constexpr auto XML_TAG_SECTION_HEADER_WIFI_ENTERPRISE_CONFIGURATION = "WifiEnterpriseConfiguration";
-constexpr auto XML_TAG_SSID = "SSID";
-constexpr auto XML_TAG_BSSID = "BSSID";
-constexpr auto XML_TAG_CONFIG_KEY = "ConfigKey";
-constexpr auto XML_TAG_PRE_SHARED_KEY = "PreSharedKey";
-constexpr auto XML_TAG_ORI_SSID = "OriSsid";
-constexpr auto XML_TAG_WEP_KEYS = "WEPKeys";
-constexpr auto XML_TAG_WEP_TX_KEY_INDEX = "WEPTxKeyIndex";
-constexpr auto XML_TAG_HIDDEN_SSID = "HiddenSSID";
-constexpr auto XML_TAG_ALLOWED_KEY_MGMT = "AllowedKeyMgmt";
-constexpr auto XML_TAG_RANDOMIZED_MAC_ADDRESS = "RandomizedMacAddress";
-constexpr auto XML_TAG_MAC_RANDOMIZATION_SETTING = "MacRandomizationSetting";
-constexpr auto XML_TAG_STATUS = "Status";
-constexpr auto XML_TAG_IP_ASSIGNMENT = "IpAssignment";
-constexpr auto XML_TAG_LINK_ADDRESS = "LinkAddress";
-constexpr auto XML_TAG_LINK_PREFIX_LENGTH = "LinkPrefixLength";
-constexpr auto XML_TAG_GATEWAY_ADDRESS = "GatewayAddress";
-constexpr auto XML_TAG_DNS_SERVER_ADDRESSES = "DNSServers";
-constexpr auto XML_TAG_PROXY_SETTINGS = "ProxySettings";
-constexpr auto XML_TAG_PROXY_HOST = "ProxyHost";
-constexpr auto XML_TAG_PROXY_PORT = "ProxyPort";
-constexpr auto XML_TAG_PROXY_PAC_FILE = "ProxyPac";
-constexpr auto XML_TAG_PROXY_EXCLUSION_LIST = "ProxyExclusionList";
-constexpr auto XML_TAG_SECTION_HEADER_MAC_ADDRESS_MAP = "MacAddressMap";
-constexpr auto XML_TAG_MAC_MAP = "MacMapEntry";
-constexpr auto XML_TAG_MAC_MAP_PLUS = "MacMapEntryPlus";
-constexpr auto XML_TAG_DEFAULT_GW_MAC_ADDRESS = "DefaultGwMacAddress";
-
-constexpr auto IP_DHCP = "DHCP";
-constexpr auto IP_STATIC = "STATIC";
-constexpr auto PROXY_STATIC = "STATIC";
-constexpr auto PROXY_NONE = "NONE";
-constexpr auto PROXY_PAC = "PAC";
-constexpr auto PROXY_UNASSIGNED = "UNASSIGNED";
-
 const unsigned int MGMT_NONE = 1 << 0;
 const unsigned int MGMT_WPA_PSK = 1 << 1;
 const unsigned int MGMT_WPA_EAP = 1 << 2;
@@ -79,7 +39,7 @@ const unsigned int MGMT_FILS_SHA384 = 1 << 15;
 const unsigned int MGMT_Q_WAPI_PSK = 1 << 16;
 const unsigned int MGMT_Q_WAPI_CERT = 1 << 17;
 
-enum WifiConfigType {
+enum class WifiConfigType {
     SSID = 0,
     PRESHAREDKEY,
     HIDDENSSID,
@@ -101,29 +61,6 @@ enum WifiConfigType {
     PROXYPORT,
     PROXYEXCLUSIONLIST,
     UNVALID,
-};
-
-const std::unordered_map<std::string, WifiConfigType> g_wifiConfigMap = {
-    {XML_TAG_SSID, SSID},
-    {XML_TAG_PRE_SHARED_KEY, PRESHAREDKEY},
-    {XML_TAG_HIDDEN_SSID, HIDDENSSID},
-    {XML_TAG_ALLOWED_KEY_MGMT, ALLOWEDKEYMGMT},
-    {XML_TAG_MAC_RANDOMIZATION_SETTING, RANDOMIZATIONSETTING},
-    {XML_TAG_RANDOMIZED_MAC_ADDRESS, RANDOMIZEDMACADDRESS},
-    {XML_TAG_STATUS, STATUS},
-    {XML_TAG_WEP_TX_KEY_INDEX, WEPKEYINDEX},
-    {XML_TAG_WEP_KEYS, WEPKEYS},
-    {XML_TAG_DEFAULT_GW_MAC_ADDRESS, GWMACADDRESS},
-    {XML_TAG_IP_ASSIGNMENT, IPASSIGNMENT},
-    {XML_TAG_LINK_ADDRESS, LINKADDRESS},
-    {XML_TAG_LINK_PREFIX_LENGTH, PREFIXLENGTH},
-    {XML_TAG_GATEWAY_ADDRESS, GATEWAYADDRESS},
-    {XML_TAG_DNS_SERVER_ADDRESSES, DNSSERVERADDRESSES},
-    {XML_TAG_PROXY_SETTINGS, PROXYSETTINGS},
-    {XML_TAG_PROXY_PAC_FILE, PROXYPAC},
-    {XML_TAG_PROXY_HOST, PROXYHOST},
-    {XML_TAG_PROXY_PORT, PROXYPORT},
-    {XML_TAG_PROXY_EXCLUSION_LIST, PROXYEXCLUSIONLIST},
 };
 
 enum class NetworkSection {
@@ -177,6 +114,7 @@ private:
     void SetMacMap(std::map<std::string, std::string> macMap);
     void ParseWepKeys(xmlNodePtr node, WifiDeviceConfig& wifiDeviceConfig);
     void ParseStatus(xmlNodePtr node, WifiDeviceConfig& wifiDeviceConfig);
+    bool IsWifiConfigValid(WifiDeviceConfig wifiConfig);
 };
 }
 }

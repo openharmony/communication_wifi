@@ -139,12 +139,7 @@ std::map<std::string, std::string> XmlParser::GetStringMapValue(xmlNodePtr innod
 
 bool XmlParser::IsDocValid(xmlNodePtr node)
 {
-    if (xmlStrcmp(node->name, BAD_CAST(XML_TAG_DOCUMENT_HEADER))  == 0) {
-        return true;
-    } else {
-        return false;
-    }
+    return (xmlStrcmp(node->name, BAD_CAST(XML_TAG_DOCUMENT_HEADER))  == 0);
 }
-
 }
 }

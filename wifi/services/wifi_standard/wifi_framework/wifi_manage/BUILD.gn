@@ -427,7 +427,6 @@ if (defined(ohos_lite)) {
       "bundle_framework:appexecfwk_base",
       "c_utils:utils",
       "common_event_service:cesfwk_innerkits",
-      "core_service:tel_core_service_api",
       "data_share:datashare_common",
       "data_share:datashare_consumer",
       "eventhandler:libeventhandler",
@@ -450,6 +449,12 @@ if (defined(ohos_lite)) {
       "STA_INSTANCE_MAX_NUM=$wifi_feature_with_sta_num",
       "AP_INSTANCE_MAX_NUM=$wifi_feature_with_ap_num",
     ]
+
+    if (defined(global_parts_info) &&
+      defined(global_parts_info.telephony_core_service)) {
+      external_deps += [ "core_service:tel_core_service_api" ]
+      defines += [ "CORE_SERVICE_ENABLE" ]
+    }
 
     if (wifi_feature_with_app_frozen) {
       external_deps += [ "efficiency_manager:suspend_manager_client" ]

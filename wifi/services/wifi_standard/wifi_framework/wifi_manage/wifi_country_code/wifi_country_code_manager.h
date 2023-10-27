@@ -16,8 +16,13 @@
 #ifndef WIFI_COUNTRY_CODE_MANAGER
 #define WIFI_COUNTRY_CODE_MANAGER
 
+#include <map>
 #include <memory>
+#include <mutex>
 #include <string>
+#include "common_event_manager.h"
+#include "common_event_support.h"
+#include "common_event_subscriber.h"
 #include "i_wifi_country_code_change_listener.h"
 #include "i_wifi_country_code_policy.h"
 #ifdef FEATURE_AP_SUPPORT
@@ -103,7 +108,7 @@ public:
     /**
      * @Description WifiCountryCodeManager deconstruct
      */
-    ~WifiCountryCodeManager() = default;
+    ~WifiCountryCodeManager();
 
     /**
      * @Description disable WifiCountryCodeManager equals sign opertaor
@@ -116,30 +121,25 @@ private:
 #ifdef FEATURE_AP_SUPPORT
     IApServiceCallbacks m_apCallback;
 #endif
-    struct ListenerNameCmp {
-        bool operator() (const std::shared_ptr<IWifiCountryCodeChangeListener> &listener1,
-            const std::shared_ptr<IWifiCountryCodeChangeListener> &listener2) const
-        {
-            return strcasecmp(listener1->GetListenerModuleName().c_str(),
-                listener2->GetListenerModuleName().c_str()) < 0;
-        }
-    };
-    std::set<std::shared_ptr<IWifiCountryCodeChangeListener>, ListenerNameCmp> m_wifiCountryCodeChangeListeners;
+    std::map<std::string, std::shared_ptr<IWifiCountryCodeChangeListener>> m_codeChangeListeners;
     std::string m_wifiCountryCode = DEFAULT_WIFI_COUNTRY_CODE;
     std::shared_ptr<IWifiCountryCodePolicy> m_wifiCountryCodePolicy;
+    std::mutex m_countryCodeMutex;
 
     WifiCountryCodeManager() = default;
     void SendCountryCodeChangeCommonEvent(const std::string &wifiCountryCode);
     ErrCode UpdateWifiCountryCode(const std::string &externalCode = "");
 #ifdef FEATURE_STA_SUPPORT
-    static void DealStaOpenRes(OperateResState state);
-    static void DealStaConnChanged(OperateResState state, const WifiLinkedInfo &info);
+    static void DealStaOpenRes(OperateResState state, int instId = 0);
+    static void DealStaCloseRes(OperateResState state, int instId = 0);
+    static void DealStaConnChanged(OperateResState state, const WifiLinkedInfo &info, int instId = 0);
 #endif
 #ifdef FEATURE_AP_SUPPORT
     static void DealApStateChanged(ApState state, int id = 0);
 #endif
     ErrCode UpdateWifiCountryCodeCache(const std::string &wifiCountryCode);
     void NotifyWifiCountryCodeChangeListeners(const std::string &wifiCountryCode);
+    ErrCode UnregisterWifiCountryCodeChangeListener(const std::string &moduleName);
 };
 }
 }

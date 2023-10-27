@@ -19,17 +19,81 @@
 DEFINE_WIFILOG_LABEL("NetworkXmlParser");
 namespace OHOS {
 namespace Wifi {
+constexpr auto XML_TAG_SECTION_HEADER_NETWORK_LIST = "NetworkList";
+constexpr auto XML_TAG_SECTION_HEADER_NETWORK = "Network";
+constexpr auto XML_TAG_SECTION_HEADER_WIFI_CONFIGURATION = "WifiConfiguration";
+constexpr auto XML_TAG_SECTION_HEADER_NETWORK_STATUS = "NetworkStatus";
+constexpr auto XML_TAG_SECTION_HEADER_IP_CONFIGURATION = "IpConfiguration";
+constexpr auto XML_TAG_SECTION_HEADER_WIFI_ENTERPRISE_CONFIGURATION = "WifiEnterpriseConfiguration";
+constexpr auto XML_TAG_SSID = "SSID";
+constexpr auto XML_TAG_PRE_SHARED_KEY = "PreSharedKey";
+constexpr auto XML_TAG_WEP_KEYS = "WEPKeys";
+constexpr auto XML_TAG_WEP_TX_KEY_INDEX = "WEPTxKeyIndex";
+constexpr auto XML_TAG_HIDDEN_SSID = "HiddenSSID";
+constexpr auto XML_TAG_ALLOWED_KEY_MGMT = "AllowedKeyMgmt";
+constexpr auto XML_TAG_RANDOMIZED_MAC_ADDRESS = "RandomizedMacAddress";
+constexpr auto XML_TAG_MAC_RANDOMIZATION_SETTING = "MacRandomizationSetting";
+constexpr auto XML_TAG_STATUS = "Status";
+constexpr auto XML_TAG_IP_ASSIGNMENT = "IpAssignment";
+constexpr auto XML_TAG_LINK_ADDRESS = "LinkAddress";
+constexpr auto XML_TAG_LINK_PREFIX_LENGTH = "LinkPrefixLength";
+constexpr auto XML_TAG_GATEWAY_ADDRESS = "GatewayAddress";
+constexpr auto XML_TAG_DNS_SERVER_ADDRESSES = "DNSServers";
+constexpr auto XML_TAG_PROXY_SETTINGS = "ProxySettings";
+constexpr auto XML_TAG_PROXY_HOST = "ProxyHost";
+constexpr auto XML_TAG_PROXY_PORT = "ProxyPort";
+constexpr auto XML_TAG_PROXY_PAC_FILE = "ProxyPac";
+constexpr auto XML_TAG_PROXY_EXCLUSION_LIST = "ProxyExclusionList";
+constexpr auto XML_TAG_SECTION_HEADER_MAC_ADDRESS_MAP = "MacAddressMap";
+constexpr auto XML_TAG_MAC_MAP_PLUS = "MacMapEntryPlus";
+constexpr auto XML_TAG_DEFAULT_GW_MAC_ADDRESS = "DefaultGwMacAddress";
+constexpr auto IP_DHCP = "DHCP";
+constexpr auto IP_STATIC = "STATIC";
+constexpr auto PROXY_STATIC = "STATIC";
+constexpr auto PROXY_PAC = "PAC";
+
+const std::unordered_map<std::string, WifiConfigType> g_wifiConfigMap = {
+    {XML_TAG_SSID, WifiConfigType::SSID},
+    {XML_TAG_PRE_SHARED_KEY, WifiConfigType::PRESHAREDKEY},
+    {XML_TAG_HIDDEN_SSID, WifiConfigType::HIDDENSSID},
+    {XML_TAG_ALLOWED_KEY_MGMT, WifiConfigType::ALLOWEDKEYMGMT},
+    {XML_TAG_MAC_RANDOMIZATION_SETTING, WifiConfigType::RANDOMIZATIONSETTING},
+    {XML_TAG_RANDOMIZED_MAC_ADDRESS, WifiConfigType::RANDOMIZEDMACADDRESS},
+    {XML_TAG_STATUS, WifiConfigType::STATUS},
+    {XML_TAG_WEP_TX_KEY_INDEX, WifiConfigType::WEPKEYINDEX},
+    {XML_TAG_WEP_KEYS, WifiConfigType::WEPKEYS},
+    {XML_TAG_DEFAULT_GW_MAC_ADDRESS, WifiConfigType::GWMACADDRESS},
+    {XML_TAG_IP_ASSIGNMENT, WifiConfigType::IPASSIGNMENT},
+    {XML_TAG_LINK_ADDRESS, WifiConfigType::LINKADDRESS},
+    {XML_TAG_LINK_PREFIX_LENGTH, WifiConfigType::PREFIXLENGTH},
+    {XML_TAG_GATEWAY_ADDRESS, WifiConfigType::GATEWAYADDRESS},
+    {XML_TAG_DNS_SERVER_ADDRESSES, WifiConfigType::DNSSERVERADDRESSES},
+    {XML_TAG_PROXY_SETTINGS, WifiConfigType::PROXYSETTINGS},
+    {XML_TAG_PROXY_PAC_FILE, WifiConfigType::PROXYPAC},
+    {XML_TAG_PROXY_HOST, WifiConfigType::PROXYHOST},
+    {XML_TAG_PROXY_PORT, WifiConfigType::PROXYPORT},
+    {XML_TAG_PROXY_EXCLUSION_LIST, WifiConfigType::PROXYEXCLUSIONLIST},
+};
+
+const std::unordered_map<std::string, NetworkSection> g_networkSectionMap = {
+    {XML_TAG_SECTION_HEADER_WIFI_CONFIGURATION, NetworkSection::WIFI_CONFIGURATION},
+    {XML_TAG_SECTION_HEADER_NETWORK_STATUS, NetworkSection::NETWORK_STATUS},
+    {XML_TAG_SECTION_HEADER_IP_CONFIGURATION, NetworkSection::IP_CONFIGURATION},
+    {XML_TAG_SECTION_HEADER_WIFI_ENTERPRISE_CONFIGURATION, NetworkSection::ENTERPRISE_CONFIGURATION},
+};
+
 AssignIpMethod NetworkXmlParser::GetIpConfig(xmlNodePtr innode)
 {
     for (xmlNodePtr node = innode->children; node != nullptr; node = node->next) {
-        if (GetConfigNameAsInt(node) == WifiConfigType::IPASSIGNMENT) {
-            if (GetStringValue(node) == IP_DHCP) {
-                return AssignIpMethod::DHCP;
-            } else if (GetStringValue(node) == IP_STATIC) {
-                return AssignIpMethod::STATIC;
-            }
-            break;
+        if (GetConfigNameAsInt(node) != WifiConfigType::IPASSIGNMENT) {
+            continue;
         }
+        if (GetStringValue(node) == IP_DHCP) {
+            return AssignIpMethod::DHCP;
+        } else if (GetStringValue(node) == IP_STATIC) {
+            return AssignIpMethod::STATIC;
+        }
+        break;
     }
     return AssignIpMethod::UNASSIGNED;
 }
@@ -61,17 +125,10 @@ WifiConfigType NetworkXmlParser::GetConfigNameAsInt(xmlNodePtr node)
 NetworkSection NetworkXmlParser::GetNodeNameAsInt(xmlNodePtr node)
 {
     std::string tagName = GetNodeValue(node);
-    if (tagName == XML_TAG_SECTION_HEADER_WIFI_CONFIGURATION) {
-        return NetworkSection::WIFI_CONFIGURATION;
-    } else if (tagName == XML_TAG_SECTION_HEADER_NETWORK_STATUS) {
-        return NetworkSection::NETWORK_STATUS;
-    } else if (tagName == XML_TAG_SECTION_HEADER_IP_CONFIGURATION) {
-        return NetworkSection::IP_CONFIGURATION;
-    } else if (tagName == XML_TAG_SECTION_HEADER_WIFI_ENTERPRISE_CONFIGURATION) {
-        return NetworkSection::ENTERPRISE_CONFIGURATION;
-    } else {
-        return NetworkSection::UNVALID;
+    if (g_networkSectionMap.find(tagName) != g_networkSectionMap.end()) {
+        return g_networkSectionMap.at(tagName);
     }
+    return NetworkSection::UNVALID;
 }
 
 WifiIpConfig NetworkXmlParser::ParseIpConfig(xmlNodePtr innode)
@@ -116,14 +173,15 @@ WifiIpConfig NetworkXmlParser::ParseIpConfig(xmlNodePtr innode)
 ConfigureProxyMethod NetworkXmlParser::GetProxyMethod(xmlNodePtr innode)
 {
     for (xmlNodePtr node = innode->children; node != nullptr; node = node->next) {
-        if (GetConfigNameAsInt(node) == WifiConfigType::PROXYSETTINGS) {
-            if (GetStringValue(node) == PROXY_STATIC) {
-                return ConfigureProxyMethod::MANUALCONFIGUE;
-            } else if (GetStringValue(node) == PROXY_PAC) {
-                return ConfigureProxyMethod::AUTOCONFIGUE;
-            }
-            break;
+        if (GetConfigNameAsInt(node) != WifiConfigType::PROXYSETTINGS) {
+            continue;
         }
+        if (GetStringValue(node) == PROXY_STATIC) {
+            return ConfigureProxyMethod::MANUALCONFIGUE;
+        } else if (GetStringValue(node) == PROXY_PAC) {
+            return ConfigureProxyMethod::AUTOCONFIGUE;
+        }
+        break;
     }
     return ConfigureProxyMethod::CLOSED;
 }
@@ -137,10 +195,9 @@ WifiProxyConfig NetworkXmlParser::ParseProxyConfig(xmlNodePtr innode)
     }
     for (xmlNodePtr node = innode->children; node != nullptr; node = node->next) {
         switch (GetConfigNameAsInt(node)) {
-            case WifiConfigType::PROXYPAC: {
+            case WifiConfigType::PROXYPAC:
                 wifiProxyConfig.autoProxyConfig.pacWebAddress = GetStringValue(node);
                 break;
-            }
             case WifiConfigType::PROXYHOST: {
                 wifiProxyConfig.manualProxyConfig.serverHostName = GetStringValue(node);
                 break;
@@ -179,18 +236,18 @@ void NetworkXmlParser::GetKeyMgmt(xmlNodePtr node, WifiDeviceConfig& wifiConfig)
         return;
     }
     unsigned int keyMgmtInt = 0;
-    for (int i = 0; i < keyMgmtByte.size(); i++) {
+    for (size_t i = 0; i < keyMgmtByte.size(); i++) {
         keyMgmtInt |= (keyMgmtByte[i] << (8 * i)); // trans byte to int
     }
     if (keyMgmtInt & MGMT_SAE) {
-        wifiConfig.keyMgmt = OHOS::Wifi::KEY_MGMT_SAE;
+        wifiConfig.keyMgmt = KEY_MGMT_SAE;
     } else if (keyMgmtInt & MGMT_WPA_PSK || keyMgmtInt & MGMT_WPA2_PSK || keyMgmtInt & MGMT_FT_PSK) {
-        wifiConfig.keyMgmt = OHOS::Wifi::KEY_MGMT_WPA_PSK;
+        wifiConfig.keyMgmt = KEY_MGMT_WPA_PSK;
     } else if (keyMgmtInt & MGMT_NONE) {
         if (HasWepKeys(wifiConfig)) {
-            wifiConfig.keyMgmt = OHOS::Wifi::KEY_MGMT_WEP;
+            wifiConfig.keyMgmt = KEY_MGMT_WEP;
         } else {
-            wifiConfig.keyMgmt = OHOS::Wifi::KEY_MGMT_NONE;
+            wifiConfig.keyMgmt = KEY_MGMT_NONE;
         }
     } else {
         wifiConfig.keyMgmt = "";
@@ -259,7 +316,7 @@ void NetworkXmlParser::ParseWepKeys(xmlNodePtr node, WifiDeviceConfig& wifiDevic
 {
     std::vector<std::string> wepKeys = GetStringArrValue(node);
     if (wepKeys.size() == WEPKEYS_SIZE) {
-        for (auto i = 0; i < wepKeys.size(); i++) {
+        for (size_t i = 0; i < wepKeys.size(); i++) {
             wifiDeviceConfig.wepKeys[i] = wepKeys[i];
         }
     }
@@ -303,10 +360,13 @@ void NetworkXmlParser::ParseNetworkList(xmlNodePtr innode)
     xmlNodePtr networkNodeList = GotoNetworkList(innode);
     for (xmlNodePtr node = networkNodeList->children; node != nullptr; node = node->next) {
         if (xmlStrcmp(node->name, BAD_CAST(XML_TAG_SECTION_HEADER_NETWORK)) == 0) {
-            wifiConfigs.push_back(ParseNetwork(node));
+            WifiDeviceConfig wifiDeviceConfig = ParseNetwork(node);
+            if (IsWifiConfigValid(wifiDeviceConfig)) {
+                wifiConfigs.push_back(wifiDeviceConfig);
+            }
         }
     }
-    WIFI_LOGI("ParseNetworkList size[%{public}lu]", wifiConfigs.size());
+    WIFI_LOGI("ParseNetworkList size[%{public}lu]", (unsigned long) wifiConfigs.size());
 }
 
 xmlNodePtr NetworkXmlParser::GotoMacAddressMap(xmlNodePtr innode)
@@ -345,7 +405,7 @@ void NetworkXmlParser::ParseMacMapPlus(xmlNodePtr innode)
             SetMacMap(macMap);
         }
     }
-    WIFI_LOGI("ParseMacMapPlus size[%{public}lu]", wifiStoreRandomMacs.size());
+    WIFI_LOGI("ParseMacMapPlus size[%{public}lu]", (unsigned long) wifiStoreRandomMacs.size());
 }
 
 bool NetworkXmlParser::ParseInternal(xmlNodePtr node)
@@ -359,7 +419,7 @@ bool NetworkXmlParser::ParseInternal(xmlNodePtr node)
     return true;
 }
 
-bool IsWifiConfigValid(WifiDeviceConfig wifiConfig)
+bool NetworkXmlParser::IsWifiConfigValid(WifiDeviceConfig wifiConfig)
 {
     if (wifiConfig.keyMgmt == OHOS::Wifi::KEY_MGMT_SAE || wifiConfig.keyMgmt == OHOS::Wifi::KEY_MGMT_NONE
         || wifiConfig.keyMgmt == OHOS::Wifi::KEY_MGMT_WEP || wifiConfig.keyMgmt == OHOS::Wifi::KEY_MGMT_WPA_PSK) {

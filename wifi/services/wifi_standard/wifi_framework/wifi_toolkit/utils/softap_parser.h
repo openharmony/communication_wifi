@@ -27,7 +27,7 @@ constexpr auto XML_BAND_CHANNEL = "BandChannel";
 constexpr auto XML_BAND = "Band";
 constexpr auto XML_CHANNEL = "Channel";
 
-enum HotspotConfigType {
+enum class HotspotConfigType {
     SOFTAP_SSID = 0,
     SECURITYTYPE,
     PASSPHRASE,
@@ -35,9 +35,9 @@ enum HotspotConfigType {
 };
 
 const std::unordered_map<std::string, HotspotConfigType> g_hotspotConfigMap = {
-    {XML_TAG_SOFTAP_SSID, SOFTAP_SSID},
-    {XML_SECURITY_TYPE, SECURITYTYPE},
-    {XML_PASSPHRASE, PASSPHRASE},
+    {XML_TAG_SOFTAP_SSID, HotspotConfigType::SOFTAP_SSID},
+    {XML_SECURITY_TYPE, HotspotConfigType::SECURITYTYPE},
+    {XML_PASSPHRASE, HotspotConfigType::PASSPHRASE},
 };
 
 namespace OHOS {

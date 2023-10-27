@@ -23,6 +23,7 @@ import ConfigData from '../../Utils/ConfigData';
 import { initWifiApiData } from '../../MainAbility/model/testDataModels'
 import { TestData } from '../../MainAbility/model/testData'
 import wifi from '@ohos.wifi';
+import wifiManager from '@ohos.wifiManager';
 import prompt from '@system.prompt';
 
 /**
@@ -198,7 +199,7 @@ struct WiFiConnectStabilityTest {
                       console.log( TAG , "测试结束------------" )
                       break;
                     } else {
-                      let wifiState = wifi.isWifiActive()
+                      let wifiState = wifiManager.isWifiActive()
                       if ( !wifiState ) {
                         wifi.enableWifi()
                         console.log( TAG , "wifi当前未使能，已经使能，正常开始测试------" )
@@ -283,7 +284,7 @@ struct WiFiConnectStabilityTest {
 
   onConnectionState() {
     console.log( TAG , "on.wifiConnectionChange start--------" )
-    wifi.on( "wifiConnectionChange" , ( number ) => {
+    wifiManager.on( "wifiConnectionChange" , ( number ) => {
       console.log( TAG , " on.wifiConnectionChange --------" )
       let wifiConnectionMessage = ""
       switch ( number ) {
@@ -302,7 +303,7 @@ struct WiFiConnectStabilityTest {
         // 打时间戳
         this.connect_EndTime = new Date().getTime()
         console.log( TAG , "WIFI连接结束时间: " + this.connect_EndTime + "ms" )
-        this.ipInfo = wifi.getIpInfo().ipAddress
+        this.ipInfo = wifiManager.getIpInfo().ipAddress
       } else if ( number == 0 ) {
         this.disconnect_EndTime = new Date().getTime()
         console.log( TAG , "WIFI断连结束时间: " + this.disconnect_EndTime + "ms" )

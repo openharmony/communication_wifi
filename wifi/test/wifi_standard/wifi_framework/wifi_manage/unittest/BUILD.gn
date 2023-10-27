@@ -115,7 +115,6 @@ ohos_unittest("manager_unittest") {
     "bundle_framework:appexecfwk_base",
     "c_utils:utils",
     "common_event_service:cesfwk_innerkits",
-    "core_service:tel_core_service_api",
     "data_share:datashare_common",
     "data_share:datashare_consumer",
     "dhcp:dhcp_manager_service",
@@ -138,6 +137,12 @@ ohos_unittest("manager_unittest") {
 
   if (wifi_feature_with_p2p) {
     defines += [ "FEATURE_P2P_SUPPORT" ]
+  }
+
+  if (defined(global_parts_info) &&
+    defined(global_parts_info.telephony_core_service)) {
+    external_deps += [ "core_service:tel_core_service_api" ]
+    defines += [ "CORE_SERVICE_ENABLE" ]
   }
 
   defines += [

@@ -377,7 +377,7 @@ bool StaStateMachine::RootState::ExecuteStateMsg(InternalMessage *msg)
             WIFI_LOGI("RootState-msgCode=%{public}d not handled.\n", msg->GetMessageName());
             break;
     }
-    return true;
+    return ret;
 }
 
 /* --------------------------- state machine Init State ------------------------------ */

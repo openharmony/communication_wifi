@@ -12,6 +12,7 @@
 # limitations under the License.
 
 ability_runtime_path = "//foundation/ability/ability_runtime"
+fuzz_test_output_path = "wifi/wifi/wifi_sta"
 SUBSYSTEM_DIR = "//foundation/communication"
 WIFI_ROOT_DIR = "$SUBSYSTEM_DIR/wifi/wifi"
 DHCP_ROOT_DIR = "$SUBSYSTEM_DIR/dhcp"

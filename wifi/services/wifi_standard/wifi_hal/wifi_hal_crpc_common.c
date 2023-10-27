@@ -21,6 +21,8 @@
 #include "wifi_hal_p2p_interface.h"
 #include "wifi_hal_define.h"
 #include "wifi_hostapd_hal.h"
+#include "wifi_common_hal.h"
+#include "wifi_hal_chba_interface.h"
 
 int RpcRegisterEventCallback(RpcServer *server, Context *context)
 {
@@ -82,6 +84,46 @@ int RpcNotifyClear(RpcServer *server, Context *context)
     P2pForceStop();
     WriteBegin(context, 0);
     WriteInt(context, 0);
+    WriteEnd(context);
+    return HAL_SUCCESS;
+}
+
+int RpcGetCommonCmd(RpcServer *server, Context *context)
+{
+    if (server == NULL || context == NULL) {
+        return HAL_FAILURE;
+    }
+    char recvCmd[WIFI_CMD_STR_LENGTH + 1] = {0};
+    if (ReadStr(context, recvCmd, sizeof(recvCmd)) != 0) {
+        return HAL_FAILURE;
+    }
+    WifiErrorNo err = SendComCmd(recvCmd);
+    WriteBegin(context, 0);
+    WriteInt(context, err);
+    WriteEnd(context);
+    return HAL_SUCCESS;
+}
+
+int RpcChbaStart(RpcServer *server, Context *context)
+{
+    if (server == NULL || context == NULL) {
+        return HAL_FAILURE;
+    }
+    WifiErrorNo err = ChbaStart();
+    WriteBegin(context, 0);
+    WriteInt(context, err);
+    WriteEnd(context);
+    return HAL_SUCCESS;
+}
+
+int RpcChbaStop(RpcServer *server, Context *context)
+{
+    if (server == NULL || context == NULL) {
+        return HAL_FAILURE;
+    }
+    WifiErrorNo err = ChbaStop();
+    WriteBegin(context, 0);
+    WriteInt(context, err);
     WriteEnd(context);
     return HAL_SUCCESS;
 }

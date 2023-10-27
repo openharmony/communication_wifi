@@ -33,6 +33,8 @@
 namespace OHOS {
 namespace Wifi {
 const int BUFFER_SIZE = 4096;
+const int PMF_OPTIONAL = 1;
+const int PMF_REQUIRED = 2;
 
 #define CHECK_CLIENT_NOT_NULL           \
     do {                                \
@@ -489,6 +491,21 @@ int WifiIdlClient::PushDeviceConfigAuthAlgorithm(
     return 1;
 }
 
+int WifiIdlClient::PushDeviceConfigParseMask(
+    SetNetworkConfig *pConfig, DeviceConfigType type,
+    unsigned int mask, const std::string parseStr[], int size) const
+{
+    pConfig->cfgParam = type;
+    for (int i = 0; i < size; i++) {
+        if (mask & (0x1 << i)) {
+            if (strcat_s(pConfig->cfgValue, sizeof(pConfig->cfgValue), parseStr[i].c_str()) != EOK) {
+                return 0;
+            }
+        }
+    }
+    return 1;
+}
+
 WifiErrorNo WifiIdlClient::CheckValidDeviceConfig(const WifiIdlDeviceConfig &config) const
 {
     if (config.psk.length() > 0) {
@@ -517,6 +534,9 @@ WifiErrorNo WifiIdlClient::SetDeviceConfig(int networkId, const WifiIdlDeviceCon
     int num = 0;
     num += PushDeviceConfigString(conf + num, DEVICE_CONFIG_SSID, config.ssid);
     num += PushDeviceConfigString(conf + num, DEVICE_CONFIG_PSK, config.psk);
+    if (config.keyMgmt.find(KEY_MGMT_SAE) != std::string::npos) {
+        num += PushDeviceConfigString(conf + num, DEVICE_CONFIG_SAE_PASSWD, config.psk);
+    }
     if (config.keyMgmt == KEY_MGMT_NONE || config.keyMgmt == KEY_MGMT_WEP) {
         num += PushDeviceConfigString(conf + num, DEVICE_CONFIG_KEYMGMT, KEY_MGMT_NONE);
     } else {
@@ -548,6 +568,26 @@ WifiErrorNo WifiIdlClient::SetDeviceConfig(int networkId, const WifiIdlDeviceCon
     if (config.phase2Method != static_cast<int>(Phase2Method::NONE)) {
         std::string strPhase2Method = WifiEapConfig::Phase2MethodToStr(config.eap, config.phase2Method);
         num += PushDeviceConfigString(conf + num, DEVICE_CONFIG_EAP_PHASE2METHOD, strPhase2Method);
+    }
+    if (config.isRequirePmf) {
+        num += PushDeviceConfigInt(conf + num, DEVICE_CONFIG_IEEE80211W, PMF_REQUIRED);
+    } else {
+        num += PushDeviceConfigInt(conf + num, DEVICE_CONFIG_IEEE80211W, PMF_OPTIONAL);
+    }
+    if (config.allowedProtocols > 0) {
+        std::string protocolsStr[] = {"WPA ", "RSN ", "WPA2 ", "OSEN "};
+        num += PushDeviceConfigParseMask(conf + num, DEVICE_CONFIG_ALLOW_PROTOCOLS, config.allowedProtocols,
+                                         protocolsStr, sizeof(protocolsStr)/sizeof(protocolsStr[0]));
+    }
+    if (config.allowedPairwiseCiphers > 0) {
+        std::string pairwiseCipherStr[] = {"NONE ", "TKIP ", "CCMP ", "GCMP ", "CCMP-256 ", "GCMP-256 "};
+        num += PushDeviceConfigParseMask(conf + num, DEVICE_CONFIG_PAIRWISE_CIPHERS, config.allowedPairwiseCiphers,
+                                         pairwiseCipherStr, sizeof(pairwiseCipherStr)/sizeof(pairwiseCipherStr[0]));
+    }
+    if (config.allowedGroupCiphers > 0) {
+        std::string groupCipherStr[] = {"GTK_NOT_USED ", "TKIP ", "CCMP ", "GCMP ", "CCMP-256 ", "GCMP-256 "};
+        num += PushDeviceConfigParseMask(conf + num, DEVICE_CONFIG_GROUP_CIPHERS, config.allowedGroupCiphers,
+                                         groupCipherStr, sizeof(groupCipherStr)/sizeof(groupCipherStr[0]));
     }
     if (num == 0) {
         return WIFI_IDL_OPT_OK;
@@ -1721,6 +1761,11 @@ WifiErrorNo WifiIdlClient::ReqP2pHid2dConnect(const Hid2dConnectConfig &config) 
         return WIFI_IDL_OPT_FAILED;
     }
     info.frequency = config.GetFrequency();
+    if (config.GetDhcpMode() == DhcpMode::CONNECT_AP_DHCP) {
+        info.isLegacyGo = 1;
+    } else {
+        info.isLegacyGo = 0;
+    }
     WifiErrorNo ret = Hid2dConnect(&info);
     return ret;
 }

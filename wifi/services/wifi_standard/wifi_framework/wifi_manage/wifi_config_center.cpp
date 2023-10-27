@@ -29,10 +29,12 @@ WifiConfigCenter &WifiConfigCenter::GetInstance()
 
 WifiConfigCenter::WifiConfigCenter()
 {
-    mStaMidState = WifiOprMidState::CLOSED;
+    mStaMidState.emplace(0, WifiOprMidState::CLOSED);
     mApMidState.emplace(0, WifiOprMidState::CLOSED);
     mP2pMidState = WifiOprMidState::CLOSED;
-    mScanMidState = WifiOprMidState::CLOSED;
+    mScanMidState.emplace(0, WifiOprMidState::CLOSED);
+    mStaScanOnlyMidState.emplace(0, WifiOprMidState::CLOSED);
+    mWifiCloseTime.emplace(0, std::chrono::steady_clock::now());
     mWifiOpenedWhenAirplane = false;
 }
 
@@ -48,36 +50,59 @@ int WifiConfigCenter::Init()
     return 0;
 }
 
-WifiOprMidState WifiConfigCenter::GetWifiMidState()
+WifiOprMidState WifiConfigCenter::GetWifiMidState(int instId)
 {
-    return mStaMidState.load();
+    std::unique_lock<std::mutex> lock(mStaMutex);
+    auto iter = mStaMidState.find(instId);
+    if (iter != mStaMidState.end()) {
+        return iter->second.load();
+    } else {
+        mStaMidState.emplace(instId, WifiOprMidState::CLOSED);
+        return mStaMidState[instId].load();
+    }
 }
 
-bool WifiConfigCenter::SetWifiMidState(WifiOprMidState expState, WifiOprMidState state)
+bool WifiConfigCenter::SetWifiMidState(WifiOprMidState expState, WifiOprMidState state, int instId)
 {
-    return mStaMidState.compare_exchange_strong(expState, state);
+    WIFI_LOGI("SetWifiMidState expState:%{public}d,state:%{public}d,instId:%{public}d",
+        (int)expState, (int)state, instId);
+    std::unique_lock<std::mutex> lock(mStaMutex);
+    auto iter = mStaMidState.find(instId);
+    if (iter != mStaMidState.end()) {
+        return iter->second.compare_exchange_strong(expState, state);
+    } else {
+        mStaMidState.emplace(instId, state);
+        return true;
+    }
+    return false;
 }
 
-void WifiConfigCenter::SetWifiMidState(WifiOprMidState state)
+void WifiConfigCenter::SetWifiMidState(WifiOprMidState state, int instId)
 {
-    mStaMidState = state;
+    WIFI_LOGI("SetWifiMidState ,state:%{public}d,instId:%{public}d", (int)state, instId);
+    std::unique_lock<std::mutex> lock(mStaMutex);
+    auto ret = mStaMidState.emplace(instId, state);
+    if (!ret.second) {
+        mStaMidState[instId] = state;
+    }
 }
 
-void WifiConfigCenter::SetWifiStaCloseTime()
+void WifiConfigCenter::SetWifiStaCloseTime(int instId)
 {
-    mWifiCloseTime = std::chrono::steady_clock::now();
+    std::unique_lock<std::mutex> lock(mStaMutex);
+    mWifiCloseTime[instId] = std::chrono::steady_clock::now();
 }
 
-double WifiConfigCenter::GetWifiStaInterval()
+double WifiConfigCenter::GetWifiStaInterval(int instId)
 {
     std::chrono::steady_clock::time_point curr = std::chrono::steady_clock::now();
-    double drMs = std::chrono::duration<double, std::milli>(curr - mWifiCloseTime).count();
+    double drMs = std::chrono::duration<double, std::milli>(curr - mWifiCloseTime[instId]).count();
     return drMs;
 }
 
-int WifiConfigCenter::GetWifiState()
+int WifiConfigCenter::GetWifiState(int instId)
 {
-    return WifiSettings::GetInstance().GetWifiState();
+    return WifiSettings::GetInstance().GetWifiState(instId);
 }
 
 bool WifiConfigCenter::IsScanAlwaysActive()
@@ -85,19 +110,19 @@ bool WifiConfigCenter::IsScanAlwaysActive()
     return WifiSettings::GetInstance().GetScanAlwaysState();
 }
 
-int WifiConfigCenter::GetScanInfoList(std::vector<WifiScanInfo> &results)
+int WifiConfigCenter::GetScanInfoList(std::vector<WifiScanInfo> &results, int instId)
 {
-    return WifiSettings::GetInstance().GetScanInfoList(results);
+    return WifiSettings::GetInstance().GetScanInfoList(results, instId);
 }
 
-int WifiConfigCenter::GetScanControlInfo(ScanControlInfo &info)
+int WifiConfigCenter::GetScanControlInfo(ScanControlInfo &info, int instId)
 {
-    return WifiSettings::GetInstance().GetScanControlInfo(info);
+    return WifiSettings::GetInstance().GetScanControlInfo(info, instId);
 }
 
-int WifiConfigCenter::SetScanControlInfo(const ScanControlInfo &info)
+int WifiConfigCenter::SetScanControlInfo(const ScanControlInfo &info, int instId)
 {
-    return WifiSettings::GetInstance().SetScanControlInfo(info);
+    return WifiSettings::GetInstance().SetScanControlInfo(info, instId);
 }
 
 int WifiConfigCenter::AddDeviceConfig(const WifiDeviceConfig &config)
@@ -125,24 +150,24 @@ int WifiConfigCenter::SetDeviceState(int networkId, int state, bool bSetOther)
     return WifiSettings::GetInstance().SetDeviceState(networkId, state, bSetOther);
 }
 
-int WifiConfigCenter::GetIpInfo(IpInfo &info)
+int WifiConfigCenter::GetIpInfo(IpInfo &info, int instId)
 {
-    return WifiSettings::GetInstance().GetIpInfo(info);
+    return WifiSettings::GetInstance().GetIpInfo(info, instId);
 }
 
-int WifiConfigCenter::GetIpv6Info(IpV6Info &info)
+int WifiConfigCenter::GetIpv6Info(IpV6Info &info, int instId)
 {
-    return WifiSettings::GetInstance().GetIpv6Info(info);
+    return WifiSettings::GetInstance().GetIpv6Info(info, instId);
 }
 
-int WifiConfigCenter::GetLinkedInfo(WifiLinkedInfo &info)
+int WifiConfigCenter::GetLinkedInfo(WifiLinkedInfo &info, int instId)
 {
-    return WifiSettings::GetInstance().GetLinkedInfo(info);
+    return WifiSettings::GetInstance().GetLinkedInfo(info, instId);
 }
 
-int WifiConfigCenter::GetMacAddress(std::string &macAddress)
+int WifiConfigCenter::GetMacAddress(std::string &macAddress, int instId)
 {
-    return WifiSettings::GetInstance().GetMacAddress(macAddress);
+    return WifiSettings::GetInstance().GetMacAddress(macAddress, instId);
 }
 
 bool WifiConfigCenter::IsLoadStabak()
@@ -244,19 +269,38 @@ int WifiConfigCenter::GetValidChannels(ChannelsTable &channelsInfo)
     return WifiSettings::GetInstance().GetValidChannels(channelsInfo);
 }
 
-WifiOprMidState WifiConfigCenter::GetScanMidState()
+WifiOprMidState WifiConfigCenter::GetScanMidState(int instId)
 {
-    return mScanMidState.load();
+    std::unique_lock<std::mutex> lock(mScanMutex);
+    auto iter = mScanMidState.find(instId);
+    if (iter != mScanMidState.end()) {
+        return iter->second.load();
+    } else {
+        mScanMidState.emplace(instId, WifiOprMidState::CLOSED);
+        return mScanMidState[instId].load();
+    }
 }
 
-bool WifiConfigCenter::SetScanMidState(WifiOprMidState expState, WifiOprMidState state)
+bool WifiConfigCenter::SetScanMidState(WifiOprMidState expState, WifiOprMidState state, int instId)
 {
-    return mScanMidState.compare_exchange_strong(expState, state);
+    std::unique_lock<std::mutex> lock(mScanMutex);
+    auto iter = mScanMidState.find(instId);
+    if (iter != mScanMidState.end()) {
+        return iter->second.compare_exchange_strong(expState, state);
+    } else {
+        mScanMidState.emplace(instId, state);
+        return true;
+    }
+    return false;
 }
 
-void WifiConfigCenter::SetScanMidState(WifiOprMidState state)
+void WifiConfigCenter::SetScanMidState(WifiOprMidState state, int instId)
 {
-    mScanMidState = state;
+    std::unique_lock<std::mutex> lock(mScanMutex);
+    auto ret = mScanMidState.emplace(instId, state);
+    if (!ret.second) {
+        mScanMidState[instId] = state;
+    }
 }
 
 int WifiConfigCenter::GetSignalLevel(const int &rssi, const int &band)
@@ -394,24 +438,45 @@ int WifiConfigCenter::SetP2pDeviceName(const std::string &deviceName)
     return WifiSettings::GetInstance().SetP2pDeviceName(deviceName);
 }
 
-int WifiConfigCenter::GetDisconnectedReason(DisconnectedReason &discReason)
+int WifiConfigCenter::GetDisconnectedReason(DisconnectedReason &discReason, int instId)
 {
-    return WifiSettings::GetInstance().GetDisconnectedReason(discReason);
+    return WifiSettings::GetInstance().GetDisconnectedReason(discReason, instId);
 }
 
-WifiOprMidState WifiConfigCenter::GetWifiScanOnlyMidState()
+WifiOprMidState WifiConfigCenter::GetWifiScanOnlyMidState(int instId)
 {
-    return mStaScanOnlyMidState.load();
+    std::unique_lock<std::mutex> lock(mScanMutex);
+    auto iter = mStaScanOnlyMidState.find(instId);
+    if (iter != mStaScanOnlyMidState.end()) {
+        return iter->second.load();
+    } else {
+        mStaScanOnlyMidState.emplace(instId, WifiOprMidState::CLOSED);
+        return mStaScanOnlyMidState[instId].load();
+    }
 }
 
-bool WifiConfigCenter::SetWifiScanOnlyMidState(WifiOprMidState expState, WifiOprMidState state)
+bool WifiConfigCenter::SetWifiScanOnlyMidState(WifiOprMidState expState, WifiOprMidState state, int instId)
 {
-    return mStaScanOnlyMidState.compare_exchange_strong(expState, state);
+    std::unique_lock<std::mutex> lock(mScanMutex);
+    auto iter = mStaScanOnlyMidState.find(instId);
+    if (iter != mStaScanOnlyMidState.end()) {
+        return iter->second.compare_exchange_strong(expState, state);
+    } else {
+        mStaScanOnlyMidState.emplace(instId, state);
+        return true;
+    }
+    return false;
 }
-void WifiConfigCenter::SetWifiScanOnlyMidState(WifiOprMidState state)
+
+void WifiConfigCenter::SetWifiScanOnlyMidState(WifiOprMidState state, int instId)
 {
-    mStaScanOnlyMidState = state;
+    std::unique_lock<std::mutex> lock(mScanMutex);
+    auto ret = mStaScanOnlyMidState.emplace(instId, state);
+    if (!ret.second) {
+        mStaScanOnlyMidState[instId] = state;
+    }
 }
+
 int WifiConfigCenter::GetStaApExclusionType()
 {
     return WifiSettings::GetInstance().GetStaApExclusionType();

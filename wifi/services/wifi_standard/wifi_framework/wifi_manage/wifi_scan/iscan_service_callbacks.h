@@ -22,13 +22,13 @@
 namespace OHOS {
 namespace Wifi {
 struct IScanSerivceCallbacks {
-    std::function<void()> OnScanStartEvent;
-    std::function<void()> OnScanStopEvent;
-    std::function<void(int)> OnScanFinishEvent;
-    std::function<void(std::vector<InterScanInfo> &)> OnScanInfoEvent;
-    std::function<void(std::vector<InterScanInfo> &)> OnStoreScanInfoEvent;
-    std::function<void(OperateResState)> OnOpenScanOnlyRes;
-    std::function<void(OperateResState)> OnCloseScanOnlyRes;
+    std::function<void(int)> OnScanStartEvent;
+    std::function<void(int)> OnScanStopEvent;
+    std::function<void(int, int)> OnScanFinishEvent;
+    std::function<void(std::vector<InterScanInfo> &, int)> OnScanInfoEvent;
+    std::function<void(std::vector<InterScanInfo> &, int)> OnStoreScanInfoEvent;
+    std::function<void(OperateResState, int)> OnOpenScanOnlyRes;
+    std::function<void(OperateResState, int)> OnCloseScanOnlyRes;
 };
 }  // namespace Wifi
 }  // namespace OHOS

@@ -24,7 +24,8 @@ export enum Category {
   AutoTest ,
   BenchMark ,
   Stress,
-  App
+  App,
+  Stability
 }
 
 let NextId = 0;

@@ -98,17 +98,17 @@ public:
 
     static WifiInternalEventDispatcher &GetInstance();
     ErrCode AddStaCallback(const sptr<IRemoteObject> &remote, const sptr<IWifiDeviceCallBack> &callback, int pid,
-        const std::string &eventName, int tokenId);
-    int SetSingleStaCallback(const sptr<IWifiDeviceCallBack> &callback, const std::string &eventName);
-    sptr<IWifiDeviceCallBack> GetSingleStaCallback() const;
-    int RemoveStaCallback(const sptr<IRemoteObject> &remote);
-    bool HasStaRemote(const sptr<IRemoteObject> &remote);
+        const std::string &eventName, int tokenId, int instId = 0);
+    int SetSingleStaCallback(const sptr<IWifiDeviceCallBack> &callback, const std::string &eventName, int instId = 0);
+    sptr<IWifiDeviceCallBack> GetSingleStaCallback(int instId = 0) const;
+    int RemoveStaCallback(const sptr<IRemoteObject> &remote, int instId = 0);
+    bool HasStaRemote(const sptr<IRemoteObject> &remote, int instId = 0);
     ErrCode AddScanCallback(const sptr<IRemoteObject> &remote, const sptr<IWifiScanCallback> &callback, int pid,
-        const std::string &eventName, int tokenId);
-    int SetSingleScanCallback(const sptr<IWifiScanCallback> &callback, const std::string &eventName);
-    sptr<IWifiScanCallback> GetSingleScanCallback() const;
-    int RemoveScanCallback(const sptr<IRemoteObject> &remote);
-    bool HasScanRemote(const sptr<IRemoteObject> &remote);
+        const std::string &eventName, int tokenId, int instId = 0);
+    int SetSingleScanCallback(const sptr<IWifiScanCallback> &callback, const std::string &eventName, int instId = 0);
+    sptr<IWifiScanCallback> GetSingleScanCallback(int instId = 0) const;
+    int RemoveScanCallback(const sptr<IRemoteObject> &remote, int instId = 0);
+    bool HasScanRemote(const sptr<IRemoteObject> &remote, int instId = 0);
     ErrCode AddHotspotCallback(const sptr<IRemoteObject> &remote, const sptr<IWifiHotspotCallback> &callback,
         const std::string &eventName, int id = 0);
     int SetSingleHotspotCallback(const sptr<IWifiHotspotCallback> &callback, int id = 0);
@@ -151,13 +151,13 @@ private:
     std::condition_variable mCondition;
     std::deque<WifiEventCallbackMsg> mEventQue;
     std::mutex mStaCallbackMutex;
-    StaCallbackMapType mStaCallbacks;
-    StaCallbackInfo mStaCallBackInfo;
-    sptr<IWifiDeviceCallBack> mStaSingleCallback;
+    std::map<int, StaCallbackMapType> mStaCallbacks;
+    std::map<int, StaCallbackInfo> mStaCallBackInfo;
+    std::map<int, sptr<IWifiDeviceCallBack>> mStaSingleCallback;
     std::mutex mScanCallbackMutex;
-    ScanCallbackMapType mScanCallbacks;
-    ScanCallbackInfo mScanCallBackInfo;
-    sptr<IWifiScanCallback> mScanSingleCallback;
+    std::map<int, ScanCallbackMapType> mScanCallbacks;
+    std::map<int, ScanCallbackInfo> mScanCallBackInfo;
+    std::map<int, sptr<IWifiScanCallback>> mScanSingleCallback;
     std::mutex mHotspotCallbackMutex;
     std::map<int, HotspotCallbackMapType> mHotspotCallbacks;
     std::map<int, HotspotCallbackInfo> mHotspotCallbackInfo;

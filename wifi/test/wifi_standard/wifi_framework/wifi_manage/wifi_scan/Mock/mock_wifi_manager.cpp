@@ -35,11 +35,11 @@ IScanSerivceCallbacks WifiManager::GetScanCallback(void)
 void WifiManager::InitScanCallback(void)
 {
     using namespace std::placeholders;
-    mScanCallback.OnScanStartEvent = std::bind(&WifiManager::DealScanOpenRes, this);
-    mScanCallback.OnScanStopEvent = std::bind(&WifiManager::DealScanCloseRes, this);
-    mScanCallback.OnScanFinishEvent = std::bind(&WifiManager::DealScanFinished, this, _1);
-    mScanCallback.OnScanInfoEvent = std::bind(&WifiManager::DealScanInfoNotify, this, _1);
-    mScanCallback.OnStoreScanInfoEvent = std::bind(&WifiManager::DealStoreScanInfoEvent, this, _1);
+    mScanCallback.OnScanStartEvent = std::bind(&WifiManager::DealScanOpenRes, this, _1);
+    mScanCallback.OnScanStopEvent = std::bind(&WifiManager::DealScanCloseRes, this, _1);
+    mScanCallback.OnScanFinishEvent = std::bind(&WifiManager::DealScanFinished, this, _1, _2);
+    mScanCallback.OnScanInfoEvent = std::bind(&WifiManager::DealScanInfoNotify, this, _1, _2);
+    mScanCallback.OnStoreScanInfoEvent = std::bind(&WifiManager::DealStoreScanInfoEvent, this, _1, _2);
     return;
 }
 } // namespace Wifi

@@ -96,7 +96,12 @@ if (defined(ohos_lite)) {
     }
     install_enable = true
     sources = local_base_sources
-    sources += [ "utils/wifi_cert_utils.cpp" ]
+    sources += [
+      "utils/wifi_cert_utils.cpp"
+      "utils/xml_parser.cpp",
+      "utils/network_parser.cpp",
+      "utils/softap_parser.cpp",
+    ]
 
     include_dirs = local_base_include_dirs
     include_dirs += [
@@ -105,7 +110,7 @@ if (defined(ohos_lite)) {
       "//base/security/certificate_manager/interfaces/innerkits/cert_manager_standard/main/include",
     ]
 
-    deps = []
+    deps = [ "//third_party/libxml2:xml2" ]
 
     defines = [
       "STA_INSTANCE_MAX_NUM=$wifi_feature_with_sta_num",

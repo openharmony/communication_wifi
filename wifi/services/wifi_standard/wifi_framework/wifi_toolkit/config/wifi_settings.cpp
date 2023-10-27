@@ -26,6 +26,8 @@
 #endif
 #ifndef OHOS_ARCH_LITE
 #include "wifi_country_code_define.h"
+#include "network_parser.h"
+#include "softap_parser.h"
 #endif
 
 namespace OHOS {
@@ -169,6 +171,10 @@ int WifiSettings::Init()
     mMovingFreezePolicy.SetConfigFilePath(WIFI_MOVING_FREEZE_POLICY_FILE_PATH);
     mSavedWifiStoreRandomMac.SetConfigFilePath(WIFI_STA_RANDOM_MAC_FILE_PATH);
     mSavedPortal.SetConfigFilePath(PORTAL_CONFIG_FILE_PATH);
+#ifndef OHOS_ARCH_LITE
+    MergeWifiConfig();
+    MergeSoftapConfig();
+#endif
     InitWifiConfig();
     ReloadDeviceConfig();
     InitHotspotConfig();
@@ -185,6 +191,71 @@ int WifiSettings::Init()
     IncreaseNumRebootsSinceLastUse();
     return 0;
 }
+
+#ifndef OHOS_ARCH_LITE
+bool WifiSettings::MergeWifiConfig()
+{
+    LOGE("MergeWifiConfig enter");
+    if (std::filesystem::exists(WIFI_CONFIG_FILE_PATH) || std::filesystem::exists(DEVICE_CONFIG_FILE_PATH)) {
+        LOGI("file exists don't need to merge");
+        return true;
+    }
+    if (!std::filesystem::exists(DUAL_WIFI_CONFIG_FILE_PATH)) {
+        LOGI("dual frame file do not exists, don't need to merge");
+        return true;
+    }
+    std::shared_ptr<NetworkXmlParser> xmlParser = std::make_shared<NetworkXmlParser>();
+    bool ret = xmlParser->LoadConfiguration(DUAL_WIFI_CONFIG_FILE_PATH);
+    if (!ret) {
+        LOGE("MergeWifiConfig fail");
+        return false;
+    }
+    ret = xmlParser->Parse();
+    if (!ret) {
+        LOGE("MergeWifiConfig Parse fail");
+        return false;
+    }
+    std::vector<WifiDeviceConfig> wifideviceConfig =  xmlParser->GetNetworks();
+    LOGE("zhoupeng MergeWifiConfig %{public}lu", wifideviceConfig.size());
+    mSavedDeviceConfig.SetValue(wifideviceConfig);
+    mSavedDeviceConfig.SaveConfig();
+    std::vector<WifiStoreRandomMac> wifiStoreRandomMac = xmlParser->GetRandomMacmap();
+    LOGE("zhoupeng MergeWifiConfig %{public}lu", wifiStoreRandomMac.size());
+    mSavedWifiStoreRandomMac.SetValue(wifiStoreRandomMac);
+    mSavedWifiStoreRandomMac.SaveConfig();
+    LOGE("MergeWifiConfig end");
+    return true;
+}
+
+bool WifiSettings::MergeSoftapConfig()
+{
+    LOGE("MergeSoftapConfig enter");
+    if (std::filesystem::exists(WIFI_CONFIG_FILE_PATH) || std::filesystem::exists(HOTSPOT_CONFIG_FILE_PATH)) {
+        LOGI("MergeSoftapConfig file exists don't need to merge");
+        return true;
+    }
+    if (!std::filesystem::exists(DUAL_SOFTAP_CONFIG_FILE_PATH)) {
+        LOGI("MergeSoftapConfig dual frame file do not exists, don't need to merge");
+        return true;
+    }
+    std::shared_ptr<SoftapXmlParser> xmlParser = std::make_shared<SoftapXmlParser>();
+    bool ret = xmlParser->LoadConfiguration(DUAL_SOFTAP_CONFIG_FILE_PATH);
+    if (!ret) {
+        LOGE("MergeSoftapConfig fail");
+        return false;
+    }
+    ret = xmlParser->Parse();
+    if (!ret) {
+        LOGE("MergeSoftapConfig Parse fail");
+        return false;
+    }
+    std::vector<HotspotConfig> hotspotConfig =  xmlParser->GetSoftapConfigs();
+    mSavedHotspotConfig.SetValue(hotspotConfig);
+    mSavedHotspotConfig.SaveConfig();
+    LOGE("MergeSoftapConfig end");
+    return true;
+}
+#endif
 
 int WifiSettings::GetWifiStaCapabilities() const
 {

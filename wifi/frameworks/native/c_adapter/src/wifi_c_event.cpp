@@ -258,11 +258,22 @@ WifiErrorCode EventManager::RegisterP2PEvent(const std::vector<std::string> &eve
 NO_SANITIZE("cfi") WifiErrorCode EventManager::RegisterWifiEvents()
 {
     if (mSaStatusListener == nullptr) {
+        int32_t ret;
+        auto samgrProxy = OHOS::SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+        if (samgrProxy == nullptr) {
+            WIFI_LOGI("samgrProxy is nullptr!");
+            return ERROR_WIFI_UNKNOWN;
+        }
         mSaStatusListener = new OHOS::Wifi::WifiAbilityStatusChange();
-        mSaStatusListener->Init(WIFI_DEVICE_ABILITY_ID);
-        mSaStatusListener->Init(WIFI_SCAN_ABILITY_ID);
-        mSaStatusListener->Init(WIFI_HOTSPOT_ABILITY_ID);
-        mSaStatusListener->Init(WIFI_P2P_ABILITY_ID);
+        if (mSaStatusListener == nullptr) {
+            WIFI_LOGI("mSaStatusListener is nullptr!");
+            return ERROR_WIFI_UNKNOWN;
+        }
+        ret = samgrProxy->SubscribeSystemAbility((int32_t)WIFI_DEVICE_ABILITY_ID, mSaStatusListener);
+        samgrProxy->SubscribeSystemAbility((int32_t)WIFI_SCAN_ABILITY_ID, mSaStatusListener);
+        samgrProxy->SubscribeSystemAbility((int32_t)WIFI_HOTSPOT_ABILITY_ID, mSaStatusListener);
+        samgrProxy->SubscribeSystemAbility((int32_t)WIFI_P2P_ABILITY_ID, mSaStatusListener);
+        WIFI_LOGI("SubscribeSystemAbility return ret:%{public}d!", ret);
     }
 
     WifiErrorCode ret = WIFI_SUCCESS;
@@ -327,12 +338,23 @@ EventManager& EventManager::GetInstance()
 void EventManager::Init()
 {
     if (mSaStatusListener == nullptr) {
+        int32_t ret;
         WIFI_LOGI("EventManager Listener Init!");
+        auto samgrProxy = OHOS::SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+        if (samgrProxy == nullptr) {
+            WIFI_LOGI("samgrProxy is nullptr!");
+            return;
+        }
         mSaStatusListener = new OHOS::Wifi::WifiAbilityStatusChange();
-        mSaStatusListener->Init(WIFI_DEVICE_ABILITY_ID);
-        mSaStatusListener->Init(WIFI_SCAN_ABILITY_ID);
-        mSaStatusListener->Init(WIFI_HOTSPOT_ABILITY_ID);
-        mSaStatusListener->Init(WIFI_P2P_ABILITY_ID);
+        if (mSaStatusListener == nullptr) {
+            WIFI_LOGI("mSaStatusListener is nullptr!");
+            return;
+        }
+        ret = samgrProxy->SubscribeSystemAbility((int32_t)WIFI_DEVICE_ABILITY_ID, mSaStatusListener);
+        samgrProxy->SubscribeSystemAbility((int32_t)WIFI_SCAN_ABILITY_ID, mSaStatusListener);
+        samgrProxy->SubscribeSystemAbility((int32_t)WIFI_HOTSPOT_ABILITY_ID, mSaStatusListener);
+        samgrProxy->SubscribeSystemAbility((int32_t)WIFI_P2P_ABILITY_ID, mSaStatusListener);
+        WIFI_LOGI("Init, SubscribeSystemAbility return ret:%{public}d!", ret);
     }
     return;
 }

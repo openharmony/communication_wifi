@@ -83,6 +83,7 @@ if (defined(ohos_lite)) {
 
     defines = [
       "OHOS_ARCH_LITE",
+      "STA_INSTANCE_MAX_NUM=$wifi_feature_with_sta_num",
       "AP_INSTANCE_MAX_NUM=$wifi_feature_with_ap_num",
     ]
 

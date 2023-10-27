@@ -426,6 +426,7 @@ enum class WifiPrivacyConfig { RANDOMMAC, DEVICEMAC };
 
 /* Network configuration information */
 struct WifiDeviceConfig {
+    int instanceId;
     int networkId;
     /* 0: CURRENT, using 1: DISABLED 2: ENABLED */
     int status;
@@ -481,6 +482,7 @@ struct WifiDeviceConfig {
 
     WifiDeviceConfig()
     {
+        instanceId = 0;
         networkId = INVALID_NETWORK_ID;
         status = static_cast<int>(WifiDeviceConfigStatus::DISABLED);
         bssidType = REAL_DEVICE_ADDRESS;

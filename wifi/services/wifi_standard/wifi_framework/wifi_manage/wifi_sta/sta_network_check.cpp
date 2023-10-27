@@ -32,8 +32,10 @@ constexpr int MAX_ARP_DNS_CHECK_INTERVAL = 5;
 constexpr int MAX_ARP_DNS_CHECK_TIME = 1000;
 constexpr int MAX_RESULT_NUM = 2;
 constexpr int PORTAL_CONTENT_LENGTH_MIN = 4;
+constexpr int TIME_OUT_COUNT = 4000;
 
-StaNetworkCheck::StaNetworkCheck(NetStateHandler nethandle, ArpStateHandler arpHandle, DnsStateHandler dnsHandle)
+StaNetworkCheck::StaNetworkCheck(NetStateHandler nethandle, ArpStateHandler arpHandle, DnsStateHandler dnsHandle,
+    int instId)
 {
     WIFI_LOGI("StaNetworkCheck constructor\n");
     pDealNetCheckThread = nullptr;
@@ -46,6 +48,7 @@ StaNetworkCheck::StaNetworkCheck(NetStateHandler nethandle, ArpStateHandler arpH
     isExited = true;
     lastArpDnsCheckTime = std::chrono::steady_clock::now();
     WifiSettings::GetInstance().GetPortalUri(mUrlInfo);
+    m_instId = instId;
     WIFI_LOGI("HttpPortalDetection http=%{public}s, https=%{public}s, httpbak=%{public}s, httpsbak=%{public}s,",
         mUrlInfo.portalHttpUrl.c_str(), mUrlInfo.portalHttpsUrl.c_str(), mUrlInfo.portalBakHttpUrl.c_str(),
         mUrlInfo.portalBakHttpsUrl.c_str());
@@ -251,15 +254,15 @@ void StaNetworkCheck::SignalNetCheckThread()
     WIFI_LOGI("enter SignalNetCheckThread!\n");
     // get mac address
     std::string macAddress;
-    WifiSettings::GetInstance().GetMacAddress(macAddress);
+    WifiSettings::GetInstance().GetMacAddress(macAddress, m_instId);
     // get ip,gateway address
     WifiLinkedInfo linkedInfo;
-    WifiSettings::GetInstance().GetLinkedInfo(linkedInfo);
+    WifiSettings::GetInstance().GetLinkedInfo(linkedInfo, m_instId);
     std::string ipAddress = IpTools::ConvertIpv4Address(linkedInfo.ipAddress);
-    std::string ifname = "wlan0";
+    std::string ifname = "wlan" + std::to_string(m_instId);
     // get dns address
     IpInfo ipinfo;
-    WifiSettings::GetInstance().GetIpInfo(ipinfo);
+    WifiSettings::GetInstance().GetIpInfo(ipinfo, m_instId);
     std::string priDns = IpTools::ConvertIpv4Address(ipinfo.primaryDns);
     std::string secondDns = IpTools::ConvertIpv4Address(ipinfo.secondDns);
     std::string gateway = IpTools::ConvertIpv4Address(ipinfo.gateway);
@@ -284,9 +287,20 @@ void StaNetworkCheck::SignalNetCheckThread()
 
 void StaNetworkCheck::ExitNetCheckThread()
 {
+    WIFI_LOGI("enter StaNetworkCheck::ExitNetCheckThread");
+    int timeout = TIME_OUT_COUNT;
     isStopNetCheck = false;
     isExitNetCheckThread = true;
     while (!isExited) {
+        timeout--;
+        if (timeout < 0) {
+            if (pDealNetCheckThread != nullptr) {
+                delete pDealNetCheckThread;
+                pDealNetCheckThread = nullptr;
+            }
+            WIFI_LOGI("StaNetworkCheck::ExitNetCheckThread TimeOut Exit");
+            return;
+        }
         isExitNetCheckThread = true;
         mCondition.notify_one();
         mCondition_timeout.notify_one();

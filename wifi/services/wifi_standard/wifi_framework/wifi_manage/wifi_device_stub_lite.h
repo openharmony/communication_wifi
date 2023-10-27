@@ -78,6 +78,9 @@ private:
 
 private:
     HandleFuncMap handleFuncMap_;
+
+protected:
+    int m_instId{0};
 };
 }  // namespace Wifi
 }  // namespace OHOS

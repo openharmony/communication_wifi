@@ -118,7 +118,7 @@ struct WifiScan {
   build() {
     Column() {
       Stack( { alignContent : Alignment.TopStart } ) {
-        TitleBar( { testItem : this.testItem } )
+        TitleBar( "wlan" )
       }
 
       Row() {

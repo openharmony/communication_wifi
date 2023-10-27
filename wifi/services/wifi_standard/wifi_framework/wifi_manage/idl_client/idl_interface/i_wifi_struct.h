@@ -153,6 +153,11 @@ typedef enum DeviceConfigType {
     DEVICE_CONFIG_EAP_CLIENT_CERT = 15,
     DEVICE_CONFIG_EAP_PRIVATE_KEY = 16,
     DEVICE_CONFIG_EAP_PHASE2METHOD = 17,
+    DEVICE_CONFIG_IEEE80211W = 18,
+    DEVICE_CONFIG_ALLOW_PROTOCOLS = 19,
+    DEVICE_CONFIG_GROUP_CIPHERS = 20,
+    DEVICE_CONFIG_PAIRWISE_CIPHERS = 21,
+    DEVICE_CONFIG_SAE_PASSWD = 22,
     DEVICE_CONFIG_END_POS, /* Number of network configuration parameters, which is used as the last parameter. */
 } DeviceConfigType;
 
@@ -324,6 +329,7 @@ typedef struct Hid2dConnectInfo {
     char bssid[WIFI_MAC_ADDR_LENGTH + 1];
     char passphrase[WIFI_P2P_TMP_MSG_LENGTH_128];
     int frequency;
+    int isLegacyGo;
 } Hid2dConnectInfo;
 /* ----------------p2p struct defines end--------------------------- */
 

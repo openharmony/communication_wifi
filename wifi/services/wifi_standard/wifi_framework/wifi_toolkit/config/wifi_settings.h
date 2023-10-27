@@ -1411,8 +1411,8 @@ private:
     void InitScanControlInfo();
     void GetLinkedChannelWidth();
 #ifndef OHOS_ARCH_LITE
-    bool MergeSoftapConfig();
-    bool MergeWifiConfig();
+    void MergeSoftapConfig();
+    void MergeWifiConfig();
 #endif
 
 private:

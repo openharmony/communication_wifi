@@ -51,7 +51,7 @@ public:
      *
      * @return callBack obj
      */
-    StaServiceCallback GetStaCallback();
+    StaServiceCallback GetStaCallback() const;
 #endif
 #ifdef FEATURE_AP_SUPPORT
     /**
@@ -59,7 +59,7 @@ public:
      *
      * @return callBack obj
      */
-    IApServiceCallbacks GetApCallback();
+    IApServiceCallbacks GetApCallback() const;
 #endif
 
     /**
@@ -67,7 +67,7 @@ public:
      *
      * @param wifiCountryCode - wifi country code
      */
-    void GetWifiCountryCode(std::string &wifiCountryCode);
+    void GetWifiCountryCode(std::string &wifiCountryCode) const;
 
     /**
      * @Description provides the set wifiCountryCode interface for external systems

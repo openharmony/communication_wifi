@@ -29,21 +29,22 @@ namespace Wifi {
 constexpr int MAX_SCAN_SAVED_SIZE = 3;
 constexpr int FEATURE_RCV_AP_CONNECTED = 0;
 constexpr int FEATURE_RCV_SCAN_RESLUT = 1;
-constexpr int FEATURE_RCV_REGION_CHANGE = 2;
+constexpr int FEATURE_USE_REGION = 2;
+constexpr int FEATURE_USE_ZZ = 3;
 constexpr unsigned int COUNTRY_CODE_EID = 7;
 constexpr unsigned long COUNTRY_CODE_LENGTH = 2;
 
 WifiCountryCodePolicyNoMobile::WifiCountryCodePolicyNoMobile(
     const std::bitset<WIFI_COUNTRY_CODE_POLICE_DEF_LEN> &wifiCountryCodePolicy)
-    ：m_wifiCountryCodePolicy(wifiCountryCodePolicy)
+    : m_wifiCountryCodePolicy(wifiCountryCodePolicy)
 {
     InitPolicy();
 }
 
 WifiCountryCodePolicyNoMobile::~WifiCountryCodePolicyNoMobile()
 {
-    if (m_wifiCcpCommonEventListener != nullptr) {
-        OHOS::EventFwk::CommonEventManager::UnSubscribeCommonEvent(m_wifiCcpCommonEventListener);
+    if (m_wifiScanFinishCommonEventListener != nullptr) {
+        OHOS::EventFwk::CommonEventManager::UnSubscribeCommonEvent(m_wifiScanFinishCommonEventListener);
     }
 }
 
@@ -53,9 +54,9 @@ void WifiCountryCodePolicyNoMobile::InitPolicy()
         OHOS::EventFwk::MatchingSkills matchingSkills;
         matchingSkills.AddEvent(OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_WIFI_SCAN_FINISHED);
         OHOS::EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
-        m_wifiCcpCommonEventListener
+        m_wifiScanFinishCommonEventListener
             = std::make_shared<WifiCcpCommonEventListener>(subscriberInfo, this);
-        OHOS::EventFwk::CommonEventManager::SubscribeCommonEvent(m_wifiCcpCommonEventListener);
+        OHOS::EventFwk::CommonEventManager::SubscribeCommonEvent(m_wifiScanFinishCommonEventListener);
     }
     m_policyList.emplace_back(
         std::bind(&WifiCountryCodePolicyBase::GetWifiCountryCodeByFactory, this, std::placeholders::_1));
@@ -65,6 +66,8 @@ void WifiCountryCodePolicyNoMobile::InitPolicy()
         std::bind(&WifiCountryCodePolicyNoMobile::GetWifiCountryCodeByScanResult, this, std::placeholders::_1));
     m_policyList.emplace_back(
         std::bind(&WifiCountryCodePolicyNoMobile::GetWifiCountryCodeByRegion, this, std::placeholders::_1));
+    m_policyList.emplace_back(
+        std::bind(&WifiCountryCodePolicyNoMobile::GetWifiCountryCodeByDefaultZZ, this, std::placeholders::_1));
     m_policyList.emplace_back(
         std::bind(&WifiCountryCodePolicyBase::GetWifiCountryCodeByCache, this, std::placeholders::_1));
     m_policyList.emplace_back(
@@ -218,7 +221,7 @@ ErrCode WifiCountryCodePolicyNoMobile::GetWifiCountryCodeByAP(std::string &wifiC
             break;
         }
     }
-    WIFI_LOGI("get wifi country code by ap is success, code=%{public}s", wifiCountryCode.c_str());
+    WIFI_LOGI("get wifi country code by ap success, code=%{public}s", wifiCountryCode.c_str());
     return WIFI_OPT_SUCCESS;
 }
 
@@ -228,22 +231,34 @@ ErrCode WifiCountryCodePolicyNoMobile::GetWifiCountryCodeByScanResult(std::strin
         return WIFI_OPT_FAILED;
     }
     wifiCountryCode = m_wifiCountryCodeFromScanResults;
-    WIFI_LOGI("get wifi country code by scan result is success, code=%{public}s", wifiCountryCode.c_str());
+    WIFI_LOGI("get wifi country code by scan result success, code=%{public}s", wifiCountryCode.c_str());
     return WIFI_OPT_SUCCESS;
 }
 
 ErrCode WifiCountryCodePolicyNoMobile::GetWifiCountryCodeByRegion(std::string &wifiCountryCode)
 {
-    if (!m_wifiCountryCodePolicy[FEATURE_RCV_REGION_CHANGE]) {
+    if (!m_wifiCountryCodePolicy[FEATURE_USE_REGION]) {
         return WIFI_OPT_FAILED;
     }
     std::string tempWifiCountryCode = Global::I18n::LocaleConfig::GetSystemRegion();
     if (tempWifiCountryCode.empty() || !IsValidCountryCode(tempWifiCountryCode)) {
-        WIFI_LOGE("get wifi country code by region is fail, code=%{public}s", tempWifiCountryCode.c_str());
+        WIFI_LOGE("get wifi country code by region fail, code=%{public}s", tempWifiCountryCode.c_str());
         return WIFI_OPT_FAILED;
     }
     wifiCountryCode = tempWifiCountryCode;
-    WIFI_LOGI("get wifi country code by region is success, code=%{public}s", wifiCountryCode.c_str());
+    WIFI_LOGI("get wifi country code by region success, code=%{public}s", wifiCountryCode.c_str());
+    return WIFI_OPT_SUCCESS;
+}
+
+ErrCode WifiCountryCodePolicyNoMobile::GetWifiCountryCodeByDefaultZZ(std::string &wifiCountryCode)
+{
+    if (!m_wifiCountryCodePolicy[FEATURE_USE_ZZ]) {
+        return WIFI_OPT_FAILED;
+    }
+
+    wifiCountryCode = DEFAULT_WIFI_COUNTRY_CODE_ZZ;
+    WIFI_LOGI("get wifi country code by default ZZ success, code=%{public}s",
+        DEFAULT_WIFI_COUNTRY_CODE_ZZ);
     return WIFI_OPT_SUCCESS;
 }
 }

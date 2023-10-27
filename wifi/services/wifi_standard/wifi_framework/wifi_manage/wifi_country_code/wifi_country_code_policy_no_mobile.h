@@ -39,6 +39,7 @@ class WifiCountryCodePolicyNoMobile : public WifiCountryCodePolicyBase {
 public:
     /**
      * @Description WifiCountryCodePolicyNoMobile constructor
+     *
      * @param wifiCountryCodePolicy - Monitoring effectiveness strategy
      */
     explicit WifiCountryCodePolicyNoMobile(
@@ -79,7 +80,7 @@ private:
     private:
         WifiCountryCodePolicyNoMobile *m_wifiCountryCodePolicyNoMobile;
     };
-    std::shared_ptr<WifiCcpCommonEventListener> m_wifiCcpCommonEventListener;
+    std::shared_ptr<WifiCcpCommonEventListener> m_wifiScanFinishCommonEventListener;
     std::list<std::vector<BssidAndCountryCode>> m_allScanInfoList;
     std::string m_wifiCountryCodeFromScanResults;
     std::bitset<WIFI_COUNTRY_CODE_POLICE_DEF_LEN> m_wifiCountryCodePolicy;
@@ -92,6 +93,7 @@ private:
     ErrCode GetWifiCountryCodeByRegion(std::string &wifiCountryCode);
     ErrCode GetWifiCountryCodeByAP(std::string &wifiCountryCode);
     ErrCode GetWifiCountryCodeByScanResult(std::string &wifiCountryCode);
+    ErrCode GetWifiCountryCodeByDefaultZZ(std::string &wifiCountryCode);
 };
 }
 }

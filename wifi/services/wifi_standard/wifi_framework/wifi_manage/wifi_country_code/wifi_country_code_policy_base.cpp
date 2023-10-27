@@ -87,7 +87,8 @@ ErrCode WifiCountryCodePolicyBase::GetWifiCountryCodeByCache(std::string &wifiCo
 ErrCode WifiCountryCodePolicyBase::GetWifiCountryCodeByDefault(std::string &wifiCountryCode)
 {
     wifiCountryCode = DEFAULT_WIFI_COUNTRY_CODE;
-    WIFI_LOGI("get wifi country code by default success, use default code=HK");
+    WIFI_LOGI("get wifi country code by default success, use default code=%{public}s",
+        DEFAULT_WIFI_COUNTRY_CODE);
     return WIFI_OPT_SUCCESS;
 }
 ErrCode WifiCountryCodePolicyBase::UpdateWifiCountryCodeCache(const std::string &wifiCountryCode)

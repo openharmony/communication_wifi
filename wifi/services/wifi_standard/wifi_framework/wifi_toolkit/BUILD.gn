@@ -97,10 +97,10 @@ if (defined(ohos_lite)) {
     install_enable = true
     sources = local_base_sources
     sources += [
-      "utils/wifi_cert_utils.cpp",
-      "utils/xml_parser.cpp",
       "utils/network_parser.cpp",
       "utils/softap_parser.cpp",
+      "utils/wifi_cert_utils.cpp",
+      "utils/xml_parser.cpp",
     ]
 
     include_dirs = local_base_include_dirs

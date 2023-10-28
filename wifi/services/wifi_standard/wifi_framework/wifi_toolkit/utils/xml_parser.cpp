@@ -81,6 +81,9 @@ std::string XmlParser::GetNodeValue(xmlNodePtr node)
 
 std::string XmlParser::GetStringValue(xmlNodePtr node)
 {
+    if (node == nullptr) {
+        return "";
+    }
     xmlChar *value = xmlNodeGetContent(node);
     return std::string(reinterpret_cast<char *>(value));
 }
@@ -88,6 +91,9 @@ std::string XmlParser::GetStringValue(xmlNodePtr node)
 std::vector<std::string> XmlParser::GetStringArrValue(xmlNodePtr innode)
 {
     std::vector<std::string> stringArr{};
+    if (innode == nullptr) {
+        return stringArr;
+    }
     xmlChar* numChar = xmlGetProp(innode, BAD_CAST"num");
     int num = std::stoi(std::string(reinterpret_cast<char *>(numChar)));
     if (num == 0) {
@@ -105,6 +111,9 @@ std::vector<std::string> XmlParser::GetStringArrValue(xmlNodePtr innode)
 std::vector<unsigned char> XmlParser::GetByteArrValue(xmlNodePtr node)
 {
     std::vector<unsigned char> byteArr{};
+    if (node == nullptr) {
+        return byteArr;
+    }
     xmlChar* numChar = xmlGetProp(node, BAD_CAST"num");
     int num = std::stoi(std::string(reinterpret_cast<char *>(numChar)));
     xmlChar *value = xmlNodeGetContent(node);
@@ -112,7 +121,7 @@ std::vector<unsigned char> XmlParser::GetByteArrValue(xmlNodePtr node)
     if (valueStr.length() != 2 * num) { // byte length check
         return byteArr;
     }
-    for (int i = 0; i < valueStr.length(); i += 2) { // trans string to byte
+    for (size_t i = 0; i < valueStr.length(); i += 2) { // trans string to byte
         std::string byteString = valueStr.substr(i, 2);
         unsigned char byte = static_cast<unsigned char>(std::stoi(byteString, nullptr, 16)); // hex
         byteArr.push_back(byte);
@@ -123,6 +132,9 @@ std::vector<unsigned char> XmlParser::GetByteArrValue(xmlNodePtr node)
 std::map<std::string, std::string> XmlParser::GetStringMapValue(xmlNodePtr innode)
 {
     std::map<std::string, std::string> strMap{};
+    if (innode == nullptr) {
+        return strMap;
+    }
     for (xmlNodePtr node = innode->children; node != nullptr; node = node->next) {
         std::string name;
         std::string value;
@@ -139,6 +151,9 @@ std::map<std::string, std::string> XmlParser::GetStringMapValue(xmlNodePtr innod
 
 bool XmlParser::IsDocValid(xmlNodePtr node)
 {
+    if (node == nullptr) {
+        return false;
+    }
     return (xmlStrcmp(node->name, BAD_CAST(XML_TAG_DOCUMENT_HEADER))  == 0);
 }
 }

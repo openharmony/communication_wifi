@@ -195,7 +195,8 @@ int WifiSettings::Init()
 #ifndef OHOS_ARCH_LITE
 void WifiSettings::MergeWifiConfig()
 {
-    if (std::filesystem::exists(WIFI_CONFIG_FILE_PATH) || std::filesystem::exists(DEVICE_CONFIG_FILE_PATH)) {
+    if (std::filesystem::exists(WIFI_CONFIG_FILE_PATH) || std::filesystem::exists(DEVICE_CONFIG_FILE_PATH)
+        || std::filesystem::exists(WIFI_STA_RANDOM_MAC_FILE_PATH)) {) {
         LOGI("file exists don't need to merge");
         return;
     }
@@ -215,6 +216,10 @@ void WifiSettings::MergeWifiConfig()
         return;
     }
     std::vector<WifiDeviceConfig> wifideviceConfig =  xmlParser->GetNetworks();
+    if (wifideviceConfig.size() == 0) {
+        LOGE("MergeWifiConfig wifideviceConfig empty");
+        return;
+    }
     mSavedDeviceConfig.SetValue(wifideviceConfig);
     mSavedDeviceConfig.SaveConfig();
     std::vector<WifiStoreRandomMac> wifiStoreRandomMac = xmlParser->GetRandomMacmap();
@@ -244,6 +249,10 @@ void WifiSettings::MergeSoftapConfig()
         return;
     }
     std::vector<HotspotConfig> hotspotConfig =  xmlParser->GetSoftapConfigs();
+    if (hotspotConfig.size() == 0) {
+        LOGE("MergeSoftapConfig hotspotConfig empty");
+        return;
+    }
     mSavedHotspotConfig.SetValue(hotspotConfig);
     mSavedHotspotConfig.SaveConfig();
 }

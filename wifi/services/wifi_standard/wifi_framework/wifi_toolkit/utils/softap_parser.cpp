@@ -20,12 +20,19 @@
 DEFINE_WIFILOG_LABEL("SoftapParser");
 namespace OHOS {
 namespace Wifi {
+const int BAND_2GHZ = 1 << 0;
+const int SECURITY_TYPE_WPA2_PSK = 1;
+
 SoftapXmlParser::~SoftapXmlParser()
 {
 }
 
 bool SoftapXmlParser::ParseInternal(xmlNodePtr node)
 {
+    if (node == nullptr) {
+        WIFI_LOGE("ParseInternal node null");
+        return false;
+    }
     if (IsDocValid(node) != true) {
         WIFI_LOGI("ParseInternal error");
         return false;
@@ -37,6 +44,10 @@ bool SoftapXmlParser::ParseInternal(xmlNodePtr node)
 
 xmlNodePtr SoftapXmlParser::GotoSoftApNode(xmlNodePtr innode)
 {
+    if (innode == nullptr) {
+        WIFI_LOGE("GotoSoftApNode node null");
+        return nullptr;
+    }
     for (xmlNodePtr node = innode->children; node != nullptr; node = node->next) {
         if (GetNodeValue(node) == XML_TAG_HEADER_SOFTAP) {
             return node;
@@ -47,6 +58,10 @@ xmlNodePtr SoftapXmlParser::GotoSoftApNode(xmlNodePtr innode)
 
 void SoftapXmlParser::ParseSoftap(xmlNodePtr innode)
 {
+    if (innode == nullptr) {
+        WIFI_LOGE("ParseSoftap node null");
+        return;
+    }
     for (xmlNodePtr node = innode->children; node != nullptr; node = node->next) {
         switch (GetConfigNameAsInt(node)) {
             case HotspotConfigType::SOFTAP_SSID: {
@@ -54,7 +69,7 @@ void SoftapXmlParser::ParseSoftap(xmlNodePtr innode)
                 break;
             }
             case HotspotConfigType::SECURITYTYPE: {
-                if (GetPrimValue<int>(node, PrimType::INT) == 1) {
+                if (GetPrimValue<int>(node, PrimType::INT) == SECURITY_TYPE_WPA2_PSK) {
                     hotspotConfig.SetSecurityType(KeyMgmt::WPA2_PSK);
                 } else {
                     hotspotConfig.SetSecurityType(KeyMgmt::NONE);
@@ -75,25 +90,15 @@ void SoftapXmlParser::ParseSoftap(xmlNodePtr innode)
 
 HotspotConfigType SoftapXmlParser::GetConfigNameAsInt(xmlNodePtr node)
 {
+    if (node == nullptr) {
+        WIFI_LOGE("GetConfigNameAsInt node null");
+        return HotspotConfigType::UNUSED;
+    }
     std::string tagName = GetNameValue(node);
     if (g_hotspotConfigMap.find(tagName) != g_hotspotConfigMap.end()) {
         return g_hotspotConfigMap.at(tagName);
     }
     return HotspotConfigType::UNUSED;
-}
-
-void SoftapXmlParser::TransBandinfo(xmlNodePtr innode)
-{
-    for (xmlNodePtr node = innode->children; node != nullptr; node = node->next) {
-        if (GetNameValue(node) == XML_BAND) {
-            int band = GetPrimValue<int>(node, PrimType::INT);
-            if (band == 1) {
-                hotspotConfig.SetBand(BandType::BAND_2GHZ);
-            } else {
-                hotspotConfig.SetBand(BandType::BAND_5GHZ);
-            }
-        }
-    }
 }
 
 void SoftapXmlParser::GetBandInfo(xmlNodePtr innode)
@@ -108,9 +113,30 @@ void SoftapXmlParser::GetBandInfo(xmlNodePtr innode)
     }
 }
 
+void SoftapXmlParser::TransBandinfo(xmlNodePtr innode)
+{
+    if (innode == nullptr) {
+        WIFI_LOGE("TransBandinfo node null");
+        return;
+    }
+    for (xmlNodePtr node = innode->children; node != nullptr; node = node->next) {
+        if (GetNameValue(node) == XML_BAND) {
+            int band = GetPrimValue<int>(node, PrimType::INT);
+            if (band == BAND_2GHZ) {
+                hotspotConfig.SetBand(BandType::BAND_2GHZ);
+            } else {
+                hotspotConfig.SetBand(BandType::BAND_5GHZ);
+            }
+        }
+    }
+}
+
 std::vector<HotspotConfig> SoftapXmlParser::GetSoftapConfigs()
 {
     std::vector<HotspotConfig> hotspotConfigs{};
+    if (hotspotConfig.GetSecurityType() == KeyMgmt::NONE) {
+        return hotspotConfigs;
+    }
     hotspotConfigs.push_back(hotspotConfig);
     return hotspotConfigs;
 }

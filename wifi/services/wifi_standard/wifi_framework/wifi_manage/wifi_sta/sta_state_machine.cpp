@@ -1040,6 +1040,9 @@ void StaStateMachine::DealConnectionEvent(InternalMessage *msg)
     /* Callback result to InterfaceService. */
     InvokeOnStaConnChanged(OperateResState::CONNECT_OBTAINING_IP, linkedInfo);
 
+    if (WifiSupplicantHalInterface::GetInstance().WpaSetSuspendMode(true) != WIFI_IDL_OPT_OK) {
+        LOGE("DealConnectionEvent WpaSetSuspendMode() failed!");
+    }
     /* The current state of StaStateMachine transfers to GetIpState. */
     SwitchState(pGetIpState);
     WifiSettings::GetInstance().SetUserLastSelectedNetworkId(INVALID_NETWORK_ID, m_instId);
@@ -2457,6 +2460,10 @@ void StaStateMachine::DhcpResultNotify::OnSuccess(int status, const std::string 
         int64_t interval = result.uLeaseTime / 2 * TIME_USEC_1000; // s->ms
         LOGI("StartTimer CMD_START_RENEWAL_TIMEOUT interval=%{public}lld", interval);
         pStaStateMachine->StartTimer(static_cast<int>(CMD_START_RENEWAL_TIMEOUT), interval);
+    }
+
+    if (WifiSupplicantHalInterface::GetInstance().WpaSetSuspendMode(false) != WIFI_IDL_OPT_OK) {
+        LOGE("DhcpResultNotify OnSuccess WpaSetSuspendMode() failed!");
     }
     return;
 }

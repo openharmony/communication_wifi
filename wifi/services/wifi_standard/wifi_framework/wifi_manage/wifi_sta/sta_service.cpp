@@ -489,6 +489,16 @@ ErrCode StaService::SetSuspendMode(bool mode) const
     return WIFI_OPT_SUCCESS;
 }
 
+ErrCode StaService::SetPowerMode(bool mode) const
+{
+    LOGI("Enter SetPowerMode, mode=[%{public}d]!", mode);
+    if (WifiSupplicantHalInterface::GetInstance().WpaSetPowerMode(mode) != WIFI_IDL_OPT_OK) {
+        LOGE("SetPowerMode() failed!");
+        return WIFI_OPT_FAILED;
+    }
+    return WIFI_OPT_SUCCESS;
+}
+
 void StaService::NotifyDeviceConfigChange(ConfigChange value) const
 {
     WIFI_LOGI("Notify device config change: %{public}d\n", static_cast<int>(value));

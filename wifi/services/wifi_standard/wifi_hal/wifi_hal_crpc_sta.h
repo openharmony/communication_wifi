@@ -379,6 +379,14 @@ int RpcGetConnectSignalInfo(RpcServer *server, Context *context);
  * @return int - 0 Success, -1 Failed.
  */
 int RpcSetSuspendMode(RpcServer *server, Context *context);
+
+/**
+ * @Description Send power mode to wpa
+ *
+ * @param mode - true for power mode, false for resume mode.
+ * @return int - 0 Success, -1 Failed.
+ */
+int RpcSetPowerMode(RpcServer *server, Context *context);
 #ifdef __cplusplus
 }
 #endif

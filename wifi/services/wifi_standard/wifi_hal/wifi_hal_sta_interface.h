@@ -398,6 +398,14 @@ WifiErrorNo GetConnectSignalInfo(const char *endBssid, WpaSignalInfo *info);
  * @return WifiErrorNo
  */
 WifiErrorNo SetSuspendMode(bool mode);
+
+/**
+ * @Description Send power mode to wpa
+ *
+ * @param mode - true for power mode, false for resume mode.
+ * @return WifiErrorNo
+ */
+WifiErrorNo SetPowerMode(bool mode);
 #ifdef __cplusplus
 }
 #endif

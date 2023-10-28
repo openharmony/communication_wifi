@@ -554,6 +554,7 @@ private:
      */
     void SetOperationalMode(int mode);
     void SetSuspendMode(bool enabled);
+    void SetPowerMode(bool mode);
     void SetPowerSave(bool enabled);
     /**
      * @Description  Configure static ipaddress.

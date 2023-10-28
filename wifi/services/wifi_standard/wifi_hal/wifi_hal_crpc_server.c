@@ -167,6 +167,7 @@ static int InitRpcFuncMapSta(void)
     ret += PushRpcFunc("GetNetworkList", RpcGetNetworkList);
     ret += PushRpcFunc("GetConnectSignalInfo", RpcGetConnectSignalInfo);
     ret += PushRpcFunc("SetSuspendMode", RpcSetSuspendMode);
+    ret += PushRpcFunc("SetPowerMode", RpcSetPowerMode);
     return ret;
 }
 

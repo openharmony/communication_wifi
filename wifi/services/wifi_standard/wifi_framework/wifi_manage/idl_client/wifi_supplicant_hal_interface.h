@@ -123,6 +123,15 @@ public:
      * @Return success: WIFI_OPT_SUCCESS, fail: WIFI_OPT_FAILED
      */
     WifiErrorNo WpaSetSuspendMode(bool mode) const;
+
+    /**
+     * @Description  Set power mode to wpa
+     *
+     * @param mode - true for power mode, false for resume mode
+     *
+     * @Return success: WIFI_OPT_SUCCESS, fail: WIFI_OPT_FAILED
+     */
+    WifiErrorNo WpaSetPowerMode(bool mode) const;
 private:
     SupplicantEventCallback mCallback;
 };

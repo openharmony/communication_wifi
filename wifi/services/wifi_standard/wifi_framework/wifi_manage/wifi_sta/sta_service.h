@@ -217,6 +217,15 @@ public:
     virtual ErrCode SetSuspendMode(bool mode) const;
 
     /**
+     * @Description  Set power mode to wpa
+     *
+     * @param mode - true for power mode, false for resume mode
+     *
+     * @Return success: WIFI_OPT_SUCCESS, fail: WIFI_OPT_FAILED
+     */
+    virtual ErrCode SetPowerMode(bool mode) const;
+
+    /**
      * @Description systemabilitychanged
      *
      * @param mode: true for setup, false for shutdown.

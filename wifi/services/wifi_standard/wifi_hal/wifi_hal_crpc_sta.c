@@ -944,3 +944,20 @@ int RpcSetSuspendMode(RpcServer *server, Context *context)
     WriteEnd(context);
     return HAL_SUCCESS;
 }
+
+int RpcSetPowerMode(RpcServer *server, Context *context)
+{
+    if (server == NULL || context == NULL) {
+        return HAL_FAILURE;
+    }
+    int tmpMode = 0;
+    if (ReadInt(context, &tmpMode) < 0) {
+        return HAL_FAILURE;
+    }
+    bool mode = (tmpMode == 0) ? false : true;
+    WifiErrorNo err = SetPowerMode(mode);
+    WriteBegin(context, 0);
+    WriteInt(context, err);
+    WriteEnd(context);
+    return HAL_SUCCESS;
+}

@@ -1775,5 +1775,11 @@ WifiErrorNo WifiIdlClient::ReqWpaSetSuspendMode(bool mode) const
     CHECK_CLIENT_NOT_NULL;
     return SetSuspendMode(mode);
 }
+
+WifiErrorNo WifiIdlClient::ReqWpaSetPowerMode(bool mode) const
+{
+    CHECK_CLIENT_NOT_NULL;
+    return SetPowerMode(mode);
+}
 }  // namespace Wifi
 }  // namespace OHOS

@@ -918,3 +918,19 @@ WifiErrorNo SetSuspendMode(bool mode)
     }
     return WIFI_HAL_SUCCESS;
 }
+
+WifiErrorNo SetPowerMode(bool mode)
+{
+    LOGI("SetPowerMode() mode: %{public}d", mode);
+    WifiWpaStaInterface *pStaIfc = GetWifiStaInterface(0);
+    if (pStaIfc == NULL) {
+        LOGE("GetWifiStaInterface return failed");
+        return WIFI_HAL_SUPPLICANT_NOT_INIT;
+    }
+    int ret = pStaIfc->wpaCliCmdWpaSetPowerMode(pStaIfc, mode);
+    if (ret != WIFI_HAL_SUCCESS) {
+        LOGE("wpaCliCmdWpaSetPowerMode return failed! ret = %{public}d", ret);
+        return WIFI_HAL_FAILED;
+    }
+    return WIFI_HAL_SUCCESS;
+}

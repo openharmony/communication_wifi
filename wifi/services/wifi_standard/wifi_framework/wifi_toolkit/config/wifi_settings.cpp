@@ -196,7 +196,7 @@ int WifiSettings::Init()
 void WifiSettings::MergeWifiConfig()
 {
     if (std::filesystem::exists(WIFI_CONFIG_FILE_PATH) || std::filesystem::exists(DEVICE_CONFIG_FILE_PATH)
-        || std::filesystem::exists(WIFI_STA_RANDOM_MAC_FILE_PATH)) {) {
+        || std::filesystem::exists(WIFI_STA_RANDOM_MAC_FILE_PATH)) {
         LOGI("file exists don't need to merge");
         return;
     }

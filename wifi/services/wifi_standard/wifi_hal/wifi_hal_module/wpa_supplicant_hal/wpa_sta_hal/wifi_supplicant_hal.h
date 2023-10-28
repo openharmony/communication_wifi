@@ -106,6 +106,7 @@ struct WifiWpaStaInterface {
     int (*wpaCliCmdScanInfo)(WifiWpaStaInterface *p, ScanInfo *pcmd, int *size);
     int (*wpaCliCmdGetSignalInfo)(WifiWpaStaInterface *p, WpaSignalInfo *info);
     int (*wpaCliCmdWpaSetSuspendMode)(WifiWpaStaInterface *p, bool mode);
+    int (*wpaCliCmdWpaSetPowerMode)(WifiWpaStaInterface *p, bool mode);
 };
 
 /**

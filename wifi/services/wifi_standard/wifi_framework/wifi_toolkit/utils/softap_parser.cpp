@@ -86,6 +86,7 @@ void SoftapXmlParser::ParseSoftap(xmlNodePtr innode)
         }
         GetBandInfo(node);
     }
+    hotspotConfig.SetMaxConn(MAX_AP_CONN);
 }
 
 HotspotConfigType SoftapXmlParser::GetConfigNameAsInt(xmlNodePtr node)

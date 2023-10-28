@@ -84,6 +84,10 @@ const std::unordered_map<std::string, NetworkSection> g_networkSectionMap = {
 
 AssignIpMethod NetworkXmlParser::GetIpConfig(xmlNodePtr innode)
 {
+    if (innode == nullptr) {
+        WIFI_LOGE("GetIpConfig node null");
+        return AssignIpMethod::UNASSIGNED;
+    }
     for (xmlNodePtr node = innode->children; node != nullptr; node = node->next) {
         if (GetConfigNameAsInt(node) != WifiConfigType::IPASSIGNMENT) {
             continue;
@@ -105,6 +109,10 @@ NetworkXmlParser::~NetworkXmlParser()
 
 xmlNodePtr NetworkXmlParser::GotoNetworkList(xmlNodePtr innode)
 {
+    if (innode == nullptr) {
+        WIFI_LOGE("GotoNetworkList node null");
+        return nullptr;
+    }
     for (xmlNodePtr node = innode->children; node != nullptr; node = node->next) {
         if (xmlStrcmp(node->name, BAD_CAST(XML_TAG_SECTION_HEADER_NETWORK_LIST)) == 0) {
             return node;
@@ -115,6 +123,10 @@ xmlNodePtr NetworkXmlParser::GotoNetworkList(xmlNodePtr innode)
 
 WifiConfigType NetworkXmlParser::GetConfigNameAsInt(xmlNodePtr node)
 {
+    if (node == nullptr) {
+        WIFI_LOGE("GetConfigNameAsInt node null");
+        return WifiConfigType::UNVALID;
+    }
     std::string tagName = GetNameValue(node);
     if (g_wifiConfigMap.find(tagName) != g_wifiConfigMap.end()) {
         return g_wifiConfigMap.at(tagName);
@@ -124,6 +136,10 @@ WifiConfigType NetworkXmlParser::GetConfigNameAsInt(xmlNodePtr node)
 
 NetworkSection NetworkXmlParser::GetNodeNameAsInt(xmlNodePtr node)
 {
+    if (node == nullptr) {
+        WIFI_LOGE("GetNodeNameAsInt node null");
+        return NetworkSection::UNVALID;
+    }
     std::string tagName = GetNodeValue(node);
     if (g_networkSectionMap.find(tagName) != g_networkSectionMap.end()) {
         return g_networkSectionMap.at(tagName);
@@ -134,6 +150,10 @@ NetworkSection NetworkXmlParser::GetNodeNameAsInt(xmlNodePtr node)
 WifiIpConfig NetworkXmlParser::ParseIpConfig(xmlNodePtr innode)
 {
     WifiIpConfig ipConfig{};
+    if (innode == nullptr) {
+        WIFI_LOGE("ParseIpConfig node null");
+        return ipConfig;
+    }
     ipConfig.assignMethod = GetIpConfig(innode);
 
     if (ipConfig.assignMethod != AssignIpMethod::STATIC) {
@@ -172,6 +192,10 @@ WifiIpConfig NetworkXmlParser::ParseIpConfig(xmlNodePtr innode)
 
 ConfigureProxyMethod NetworkXmlParser::GetProxyMethod(xmlNodePtr innode)
 {
+    if (innode == nullptr) {
+        WIFI_LOGE("GetProxyMethod node null");
+        return ConfigureProxyMethod::CLOSED;
+    }
     for (xmlNodePtr node = innode->children; node != nullptr; node = node->next) {
         if (GetConfigNameAsInt(node) != WifiConfigType::PROXYSETTINGS) {
             continue;
@@ -189,6 +213,10 @@ ConfigureProxyMethod NetworkXmlParser::GetProxyMethod(xmlNodePtr innode)
 WifiProxyConfig NetworkXmlParser::ParseProxyConfig(xmlNodePtr innode)
 {
     WifiProxyConfig wifiProxyConfig{};
+    if (innode == nullptr) {
+        WIFI_LOGE("ParseProxyConfig node null");
+        return wifiProxyConfig;
+    }
     wifiProxyConfig.configureMethod = GetProxyMethod(innode);
     if (wifiProxyConfig.configureMethod == ConfigureProxyMethod::CLOSED) {
         return wifiProxyConfig;
@@ -230,6 +258,10 @@ bool NetworkXmlParser::HasWepKeys(WifiDeviceConfig wifiConfig)
 
 void NetworkXmlParser::GetKeyMgmt(xmlNodePtr node, WifiDeviceConfig& wifiConfig)
 {
+    if (node == nullptr) {
+        WIFI_LOGE("GetKeyMgmt node null");
+        return;
+    }
     std::vector<unsigned char> keyMgmtByte = GetByteArrValue(node);
     if (keyMgmtByte.size() > 4) { // trans byte to int always < 4
         wifiConfig.keyMgmt = "";
@@ -257,6 +289,10 @@ void NetworkXmlParser::GetKeyMgmt(xmlNodePtr node, WifiDeviceConfig& wifiConfig)
 
 OHOS::Wifi::WifiPrivacyConfig NetworkXmlParser::GetRandMacSetting(xmlNodePtr node)
 {
+    if (node == nullptr) {
+        WIFI_LOGE("GetRandMacSetting node null");
+        return OHOS::Wifi::WifiPrivacyConfig::RANDOMMAC;
+    }
     int randMacSetting = GetPrimValue<int>(node, PrimType::INT);
     if (randMacSetting == 0) {
         return OHOS::Wifi::WifiPrivacyConfig::DEVICEMAC;
@@ -267,6 +303,10 @@ OHOS::Wifi::WifiPrivacyConfig NetworkXmlParser::GetRandMacSetting(xmlNodePtr nod
 WifiDeviceConfig NetworkXmlParser::ParseWifiConfig(xmlNodePtr innode)
 {
     WifiDeviceConfig wifiConfig;
+    if (innode == nullptr) {
+        WIFI_LOGE("ParseWifiConfig node null");
+        return wifiConfig;
+    }
     for (xmlNodePtr node = innode->children; node != nullptr; node = node->next) {
         switch (GetConfigNameAsInt(node)) {
             case WifiConfigType::SSID: {
@@ -314,6 +354,10 @@ WifiDeviceConfig NetworkXmlParser::ParseWifiConfig(xmlNodePtr innode)
 
 void NetworkXmlParser::ParseWepKeys(xmlNodePtr node, WifiDeviceConfig& wifiDeviceConfig)
 {
+    if (node == nullptr) {
+        WIFI_LOGE("ParseWepKeys node null");
+        return;
+    }
     std::vector<std::string> wepKeys = GetStringArrValue(node);
     if (wepKeys.size() == WEPKEYS_SIZE) {
         for (size_t i = 0; i < wepKeys.size(); i++) {
@@ -324,6 +368,10 @@ void NetworkXmlParser::ParseWepKeys(xmlNodePtr node, WifiDeviceConfig& wifiDevic
 
 void NetworkXmlParser::ParseStatus(xmlNodePtr node, WifiDeviceConfig& wifiDeviceConfig)
 {
+    if (node == nullptr) {
+        WIFI_LOGE("ParseStatus node null");
+        return;
+    }
     int status = GetPrimValue<int>(node, PrimType::INT);
     if (status == 1) { // 1 means DISABLED else enable
         wifiDeviceConfig.status = static_cast<int>(WifiDeviceConfigStatus::DISABLED);
@@ -336,6 +384,10 @@ void NetworkXmlParser::ParseStatus(xmlNodePtr node, WifiDeviceConfig& wifiDevice
 WifiDeviceConfig NetworkXmlParser::ParseNetwork(xmlNodePtr innode)
 {
     WifiDeviceConfig wifiConfig;
+    if (innode == nullptr) {
+        WIFI_LOGE("ParseNetwork node null");
+        return wifiConfig;
+    }
     for (xmlNodePtr node = innode->children; node != nullptr; node = node->next) {
         switch (GetNodeNameAsInt(node)) {
             case NetworkSection::WIFI_CONFIGURATION: {
@@ -357,6 +409,10 @@ WifiDeviceConfig NetworkXmlParser::ParseNetwork(xmlNodePtr innode)
 
 void NetworkXmlParser::ParseNetworkList(xmlNodePtr innode)
 {
+    if (innode == nullptr) {
+        WIFI_LOGE("ParseNetworkList node null");
+        return;
+    }
     xmlNodePtr networkNodeList = GotoNetworkList(innode);
     for (xmlNodePtr node = networkNodeList->children; node != nullptr; node = node->next) {
         if (xmlStrcmp(node->name, BAD_CAST(XML_TAG_SECTION_HEADER_NETWORK)) == 0) {
@@ -371,6 +427,10 @@ void NetworkXmlParser::ParseNetworkList(xmlNodePtr innode)
 
 xmlNodePtr NetworkXmlParser::GotoMacAddressMap(xmlNodePtr innode)
 {
+    if (innode == nullptr) {
+        WIFI_LOGE("GotoMacAddressMap node null");
+        return nullptr;
+    }
     for (xmlNodePtr node = innode->children; node != nullptr; node = node->next) {
         if (xmlStrcmp(node->name, BAD_CAST(XML_TAG_SECTION_HEADER_MAC_ADDRESS_MAP)) == 0) {
             return node;
@@ -398,6 +458,10 @@ void NetworkXmlParser::SetMacMap(std::map<std::string, std::string> macMap)
 
 void NetworkXmlParser::ParseMacMapPlus(xmlNodePtr innode)
 {
+    if (innode == nullptr) {
+        WIFI_LOGE("ParseMacMapPlus node null");
+        return;
+    }
     xmlNodePtr macAddrNode = GotoMacAddressMap(innode);
     for (xmlNodePtr node = macAddrNode->children; node != nullptr; node = node->next) {
         if (GetNameValue(node) == XML_TAG_MAC_MAP_PLUS) {
@@ -410,6 +474,10 @@ void NetworkXmlParser::ParseMacMapPlus(xmlNodePtr innode)
 
 bool NetworkXmlParser::ParseInternal(xmlNodePtr node)
 {
+    if (node == nullptr) {
+        WIFI_LOGE("ParseInternal node null");
+        return false;
+    }
     if (IsDocValid(node) != true) {
         WIFI_LOGE("ParseInternal Doc invalid");
         return false;

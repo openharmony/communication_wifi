@@ -20,8 +20,20 @@
 #include "wifi_protect.h"
 #include "wifi_msg.h"
 
+#ifndef OHOS_ARCH_LITE
+#include "application_state_observer_stub.h"
+#include "app_state_data.h"
+#include "ipc_skeleton.h"
+#include "event_handler.h"
+#include "event_runner.h"
+#include "app_mgr_interface.h"
+#endif
+
 namespace OHOS {
 namespace Wifi {
+#ifndef OHOS_ARCH_LITE
+class AppStateObserver;
+#endif
 class WifiProtectManager {
 public:
     ~WifiProtectManager();
@@ -34,7 +46,7 @@ public:
      * @return true - valid
      * @return false - invalid
      */
-    static bool IsValidProtectMode(WifiProtectMode &protectMode);
+    static bool IsValidProtectMode(const WifiProtectMode &protectMode);
 
     /**
      * @Description Get the nearly protect type currently held by the WifiProtectManager
@@ -102,27 +114,68 @@ public:
      * @return bool - operation result
      */
     bool SetLowLatencyMode(bool enabled);
-
+    bool ChangeWifiPowerMode();
+#ifndef OHOS_ARCH_LITE
+    void RegisterAppStateObserver();
+    void OnAppDied(const std::string bundlename);
+    void OnAppForegroudChanged(const std::string &bundleName, int state);
+#endif
 private:
     WifiProtectManager();
-    bool AddProtect(WifiProtect *pProtect);
+    bool AddProtect(const WifiProtectMode &protectMode, const std::string &name);
     bool ReleaseProtect(const std::string &name);
     WifiProtect *RemoveProtect(const std::string &name);
-    bool ChangeWifiPowerMode();
-
+#ifndef OHOS_ARCH_LITE
+    int GetFgLowlatyProtectCount();
+    bool IsForegroundApplication(const std::string &BundleName);
+#endif
 private:
     std::vector<WifiProtect *> mWifiProtects;
-    WifiProtectMode mCurrentOpMode;
-    int mFullHighPerfProtectsAcquired;
-    int mFullHighPerfProtectsReleased;
-    int mFullLowLatencyProtectsAcquired;
-    int mFullLowLatencyProtectsReleased;
+    WifiProtectMode mCurrentOpMode {WifiProtectMode::WIFI_PROTECT_NO_HELD};
+    int mFullHighPerfProtectsAcquired {0};
+    int mFullHighPerfProtectsReleased {0};
+    int mFullLowLatencyProtectsAcquired {0};
+    int mFullLowLatencyProtectsReleased {0};
     /* Not used: long mCurrentSessionStartTimeMs; */
-    bool mWifiConnected;
-    bool mScreenOn;
-    bool mForceHiPerfMode;
-    bool mForceLowLatencyMode;
+    bool mWifiConnected {false};
+    bool mScreenOn {false};
+    bool mForceHiPerfMode {false};
+    bool mForceLowLatencyMode {false};
+    std::mutex mMutex;
+#ifndef OHOS_ARCH_LITE
+    std::shared_ptr<AppExecFwk::EventRunner> mAppChangeEventRunner {nullptr};
+    std::shared_ptr<AppExecFwk::EventHandler> mAppChangeEventHandler {nullptr};
+    sptr<AppStateObserver> mAppStateObserver {nullptr};
+    sptr<AppExecFwk::IAppMgr> mAppObject {nullptr};
+#endif
 };
+
+#ifndef OHOS_ARCH_LITE
+class AppStateObserver : public AppExecFwk::ApplicationStateObserverStub {
+public:
+    /**
+     * Will be called when the application start.
+     *
+     * @param appStateData Application state data.
+     */
+    virtual void OnAppStarted(const AppExecFwk::AppStateData &appStateData) override;
+
+    /**
+     * Will be called when the application stop.
+     *
+     * @param appStateData Application state data.
+     */
+    virtual void OnAppStopped(const AppExecFwk::AppStateData &appStateData) override;
+
+    /**
+     * Application foreground state changed callback.
+     *
+     * @param appStateData Application Process data.
+     */
+    virtual void OnForegroundApplicationChanged(const AppExecFwk::AppStateData &appStateData) override;
+};
+#endif
+
 } // namespace Wifi
 } // namespace OHOS
 

@@ -298,14 +298,31 @@ ErrCode WifiDeviceServiceImpl::InitWifiProtect(const WifiProtectType &protectTyp
 
 ErrCode WifiDeviceServiceImpl::GetWifiProtectRef(const WifiProtectMode &protectMode, const std::string &protectName)
 {
+#ifdef OHOS_ARCH_LITE
     /* refer to WifiProtectManager::GetInstance().GetWifiProtect, DO NOT support now! */
     return WIFI_OPT_SUCCESS;
+#else
+    if (!WifiProtectManager::GetInstance().GetWifiProtect(protectMode, protectName)) {
+        WIFI_LOGE("App %{public}s set protect mode %{public}d failed.",
+            protectName.c_str(), static_cast<int>(protectMode));
+        return WIFI_OPT_FAILED;
+    }
+    return WIFI_OPT_SUCCESS;
+#endif
 }
 
 ErrCode WifiDeviceServiceImpl::PutWifiProtectRef(const std::string &protectName)
 {
+#ifdef OHOS_ARCH_LITE
     /* refer to WifiProtectManager::GetInstance().PutWifiProtect, DO NOT support now! */
     return WIFI_OPT_SUCCESS;
+#else
+    if (!WifiProtectManager::GetInstance().PutWifiProtect(protectName)) {
+        WIFI_LOGE("App %{public}s remove protect mode failed.", protectName.c_str());
+        return WIFI_OPT_FAILED;
+    }
+    return WIFI_OPT_SUCCESS;
+#endif
 }
 
 bool WifiDeviceServiceImpl::CheckConfigEap(const WifiDeviceConfig &config)

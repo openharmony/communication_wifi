@@ -81,6 +81,9 @@ constexpr int MULTI_AP = 0;
  */
 constexpr int BLOCK_LIST_CLEAR_TIMER = 20 * 1000;
 
+/* Wpa3 selfcure failreason num*/
+constexpr int WPA3_SELFCURE_FAILREASON_NUM = 2;
+
 /* Signal levels are classified into: 0 1 2 3 4 ,the max is 4. */
 constexpr int MAX_LEVEL = 4;
 const std::string WPA_BSSID_ANY = "any";
@@ -748,6 +751,58 @@ private:
      * @param msg - Message body received by the state machine[in]
      */
     void DealGetDhcpIpTimeout(InternalMessage *msg);
+
+    /**
+     * @Description : is wpa3 transition mode.
+     *
+     * @param networkId - networkId
+     */
+    bool IsWpa3Transition(int networkId) const;
+
+    /**
+     * @Description : get wpa3 failreason connect fail count
+     *
+     * @param failreason - auth or assoc fail
+     * @param ssid - ssid
+     */
+    int GetWpa3FailCount(int failreason, std::string ssid) const;
+
+    /**
+     * @Description : add wpa3 failreason connect fail count
+     *
+     * @param failreason - auth or assoc fail
+     * @param ssid - ssid
+     */
+    void AddWpa3FailCount(int failreason, std::string ssid);
+
+    /**
+     * @Description : add wpa3 blacklist
+     *
+     * @param ssid - ssid
+     */
+    void AddWpa3BlackList(std::string ssid);
+
+    /**
+     * @Description : is in wpa3 blacklist
+     *
+     * @param ssid - ssid
+     */
+    bool IsInWpa3BlackList(std::string ssid) const;
+
+    /**
+     * @Description : wpa3 transition selfcure
+     *
+     * @param failreason - auth or assoc fail
+     * @param networkId - networkId
+     */
+    void OnWifiWpa3SelfCure(int failreason, int networkId);
+
+    /**
+     * @Description : wpa3 transition change keymgmt
+     *
+     * @param networkId - networkId
+     */
+    void Wpa3TransitionChangeIfNeed(int networkId);
 #ifndef OHOS_ARCH_LITE
     /**
      * @Description Subscribe system ability changed.
@@ -807,6 +862,8 @@ private:
     LinkedState *pLinkedState;
     ApRoamingState *pApRoamingState;
     int m_instId;
+    std::map<std::string, time_t> wpa3BlackMap;
+    std::map<std::string, int> wpa3ConnectFailCountMapArray[WPA3_SELFCURE_FAILREASON_NUM];
     /**
      * @Description Replace empty dns
      */

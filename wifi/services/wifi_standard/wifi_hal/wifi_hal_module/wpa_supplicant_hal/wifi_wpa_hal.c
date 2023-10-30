@@ -54,6 +54,10 @@
 #define REPLY_BUF_LENGTH 4096
 #define CONNECTION_FULL_STATUS 17
 #define CONNECTION_REJECT_STATUS 37
+#define WLAN_STATUS_AUTH_TIMEOUT 16
+#define MAC_AUTH_RSP2_TIMEOUT 5201
+#define MAC_AUTH_RSP4_TIMEOUT 5202
+#define MAC_ASSOC_RSP_TIMEOUT 5203
 #define SSID_EMPTY_LENGTH 1
 
 #ifdef WPA_CTRL_IFACE_UNIX
@@ -603,7 +607,11 @@ static void WpaCallBackFuncTwo(const char *p)
             int status = atoi(connectionStatus);
             if (status == CONNECTION_FULL_STATUS) {
                 WifiHalCbNotifyConnectionFull(status);
-            } else if (status == CONNECTION_REJECT_STATUS) {
+            } else if (status == CONNECTION_REJECT_STATUS
+                       || status == WLAN_STATUS_AUTH_TIMEOUT
+                       || status == MAC_AUTH_RSP2_TIMEOUT
+                       || status == MAC_AUTH_RSP4_TIMEOUT
+                       || status == MAC_ASSOC_RSP_TIMEOUT) {
                 WifiHalCbNotifyConnectionReject(status);
             }
         }

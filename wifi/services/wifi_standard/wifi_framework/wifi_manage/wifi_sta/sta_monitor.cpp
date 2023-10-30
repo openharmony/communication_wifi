@@ -204,7 +204,7 @@ void StaMonitor::OnWpsTimeOutCallBack(int status)
         return;
     }
     /* Notification state machine WPS timeout event */
-    pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_WPS_TIMEOUT_EVNET);
+    pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_WPS_TIMEOUT_EVNET, status);
 }
 }  // namespace Wifi
 }  // namespace OHOS

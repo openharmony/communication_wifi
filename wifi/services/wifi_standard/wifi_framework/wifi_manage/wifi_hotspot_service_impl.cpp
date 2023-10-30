@@ -184,10 +184,12 @@ ErrCode WifiHotspotServiceImpl::SetHotspotConfig(const HotspotConfig &config)
     }
 
     WifiLinkedInfo linkInfo;
-    WifiConfigCenter::GetInstance().GetLinkedInfo(linkInfo);
-    if (!linkInfo.ssid.empty() && linkInfo.ssid == config.GetSsid()) {
-        WIFI_LOGE("set ssid equal current linked ap ssid, no permission!");
-        return WIFI_OPT_INVALID_PARAM;
+    for (int i = 0; i < STA_INSTANCE_MAX_NUM; ++i) {
+        WifiConfigCenter::GetInstance().GetLinkedInfo(linkInfo, i);
+        if (!linkInfo.ssid.empty() && linkInfo.ssid == config.GetSsid()) {
+            WIFI_LOGE("set ssid equal current linked ap ssid, no permission!");
+            return WIFI_OPT_INVALID_PARAM;
+        }
     }
 
     if (!IsApServiceRunning() ||

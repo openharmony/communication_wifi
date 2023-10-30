@@ -44,7 +44,7 @@ public:
     static void TearDownTestCase() {}
     void SetUp() override
     {
-        EXPECT_CALL(WifiSettings::GetInstance(), GetSupportHwPnoFlag()).Times(AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), GetSupportHwPnoFlag(_)).Times(AtLeast(0));
         pScanStateMachine = std::make_unique<ScanStateMachine>();
         pScanStateMachine->InitScanStateMachine();
         pScanStateMachine->EnrollScanStatusListener(

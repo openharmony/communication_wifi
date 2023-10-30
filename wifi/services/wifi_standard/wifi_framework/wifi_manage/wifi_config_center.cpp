@@ -95,9 +95,15 @@ void WifiConfigCenter::SetWifiStaCloseTime(int instId)
 
 double WifiConfigCenter::GetWifiStaInterval(int instId)
 {
-    std::chrono::steady_clock::time_point curr = std::chrono::steady_clock::now();
-    double drMs = std::chrono::duration<double, std::milli>(curr - mWifiCloseTime[instId]).count();
-    return drMs;
+    std::unique_lock<std::mutex> lock(mStaMutex);
+    auto iter = mWifiCloseTime.find(instId);
+    if (iter != mWifiCloseTime.end()) {
+        std::chrono::steady_clock::time_point curr = std::chrono::steady_clock::now();
+        double drMs = std::chrono::duration<double, std::milli>(curr - iter->second).count();
+        return drMs;
+    }
+
+    return 0;
 }
 
 int WifiConfigCenter::GetWifiState(int instId)
@@ -105,14 +111,14 @@ int WifiConfigCenter::GetWifiState(int instId)
     return WifiSettings::GetInstance().GetWifiState(instId);
 }
 
-bool WifiConfigCenter::IsScanAlwaysActive()
+bool WifiConfigCenter::IsScanAlwaysActive(int instId)
 {
-    return WifiSettings::GetInstance().GetScanAlwaysState();
+    return WifiSettings::GetInstance().GetScanAlwaysState(instId);
 }
 
-int WifiConfigCenter::GetScanInfoList(std::vector<WifiScanInfo> &results, int instId)
+int WifiConfigCenter::GetScanInfoList(std::vector<WifiScanInfo> &results)
 {
-    return WifiSettings::GetInstance().GetScanInfoList(results, instId);
+    return WifiSettings::GetInstance().GetScanInfoList(results);
 }
 
 int WifiConfigCenter::GetScanControlInfo(ScanControlInfo &info, int instId)
@@ -170,9 +176,9 @@ int WifiConfigCenter::GetMacAddress(std::string &macAddress, int instId)
     return WifiSettings::GetInstance().GetMacAddress(macAddress, instId);
 }
 
-bool WifiConfigCenter::IsLoadStabak()
+bool WifiConfigCenter::IsLoadStabak(int instId)
 {
-    return WifiSettings::GetInstance().IsLoadStabak();
+    return WifiSettings::GetInstance().IsLoadStabak(instId);
 }
 
 WifiOprMidState WifiConfigCenter::GetApMidState(int id)
@@ -303,9 +309,9 @@ void WifiConfigCenter::SetScanMidState(WifiOprMidState state, int instId)
     }
 }
 
-int WifiConfigCenter::GetSignalLevel(const int &rssi, const int &band)
+int WifiConfigCenter::GetSignalLevel(const int &rssi, const int &band, int instId)
 {
-    return WifiSettings::GetInstance().GetSignalLevel(rssi, band);
+    return WifiSettings::GetInstance().GetSignalLevel(rssi, band, instId);
 }
 
 WifiOprMidState WifiConfigCenter::GetP2pMidState()
@@ -328,19 +334,19 @@ int WifiConfigCenter::GetP2pState()
     return WifiSettings::GetInstance().GetP2pState();
 }
 
-int WifiConfigCenter::GetOperatorWifiType()
+int WifiConfigCenter::GetOperatorWifiType(int instId)
 {
-    return WifiSettings::GetInstance().GetOperatorWifiType();
+    return WifiSettings::GetInstance().GetOperatorWifiType(instId);
 }
 
-int WifiConfigCenter::SetOperatorWifiType(int type)
+int WifiConfigCenter::SetOperatorWifiType(int type, int instId)
 {
-    return WifiSettings::GetInstance().SetOperatorWifiType(type);
+    return WifiSettings::GetInstance().SetOperatorWifiType(type, instId);
 }
 
-bool WifiConfigCenter::GetCanOpenStaWhenAirplaneMode()
+bool WifiConfigCenter::GetCanOpenStaWhenAirplaneMode(int instId)
 {
-    return WifiSettings::GetInstance().GetCanOpenStaWhenAirplaneMode();
+    return WifiSettings::GetInstance().GetCanOpenStaWhenAirplaneMode(instId);
 }
 
 bool WifiConfigCenter::GetWifiStateWhenAirplaneMode()
@@ -353,14 +359,14 @@ void WifiConfigCenter::SetWifiStateWhenAirplaneMode(bool bState)
     mWifiOpenedWhenAirplane = bState;
 }
 
-bool WifiConfigCenter::GetStaLastRunState()
+bool WifiConfigCenter::GetStaLastRunState(int instId)
 {
-    return WifiSettings::GetInstance().GetStaLastRunState();
+    return WifiSettings::GetInstance().GetStaLastRunState(instId);
 }
 
-int WifiConfigCenter::SetStaLastRunState(bool bRun)
+int WifiConfigCenter::SetStaLastRunState(bool bRun, int instId)
 {
-    return WifiSettings::GetInstance().SetStaLastRunState(bRun);
+    return WifiSettings::GetInstance().SetStaLastRunState(bRun, instId);
 }
 
 void WifiConfigCenter::SetScreenState(const int &state)

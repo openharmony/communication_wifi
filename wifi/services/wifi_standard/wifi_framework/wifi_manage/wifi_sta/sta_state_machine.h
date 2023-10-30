@@ -379,9 +379,9 @@ public:
     /**
      * @Description Register sta callback function
      *
-     * @param callbacks - Callback function pointer storage structure
+     * @param callback - Callback function pointer storage structure
      */
-    void RegisterStaServiceCallback(const StaServiceCallback &callbacks);
+    void RegisterStaServiceCallback(const StaServiceCallback &callback);
 
     /**
      * @Description  Convert the deviceConfig structure and set it to wpa_supplicant
@@ -814,7 +814,7 @@ private:
     void InvokeOnStaOpenRes(OperateResState state);
     void InvokeOnStaCloseRes(OperateResState state);
     void InvokeOnStaConnChanged(OperateResState state, const WifiLinkedInfo &info);
-    void InvokeOnWpsChanged(WpsStartState state, const int pinCode);
+    void InvokeOnWpsChanged(WpsStartState state, const int code);
     void InvokeOnStaStreamChanged(StreamDirection direction);
     void InvokeOnStaRssiLevelChanged(int level);
 };

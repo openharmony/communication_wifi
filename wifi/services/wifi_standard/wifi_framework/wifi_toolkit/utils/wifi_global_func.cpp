@@ -343,13 +343,11 @@ bool ConvertMncToIso(int mnc, std::string &wifiCountryCode)
 }
 #endif
 
-std::string StrToUpper(const std::string &str)
+void StrToUpper(std::string &str)
 {
-    std::string capitalLetters = str;
-    std::for_each(std::begin(capitalLetters), std::end(capitalLetters), [](auto &c) {
+    std::for_each(std::begin(str), std::end(str), [](auto &c) {
         c = std::toupper(c);
     });
-    return capitalLetters;
 }
 
 int ConvertCharToInt(const char &c)

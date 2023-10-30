@@ -25,14 +25,14 @@ DEFINE_WIFILOG_LABEL("StaSavedDeviceAppraisal");
 namespace OHOS {
 namespace Wifi {
 StaSavedDeviceAppraisal::StaSavedDeviceAppraisal(bool supportFmRoamingFlag, int instId)
-    : signalScorePerLevel(WifiSettings::GetInstance().GetScoretacticsScoreSlope()),
-      signalBaseScore(WifiSettings::GetInstance().GetScoretacticsInitScore()),
-      sameBssidScore(WifiSettings::GetInstance().GetScoretacticsSameBssidScore()),
-      sameDeviceScore(WifiSettings::GetInstance().GetScoretacticsSameNetworkScore()),
-      frequency5GHzScore(WifiSettings::GetInstance().GetScoretacticsFrequency5GHzScore()),
-      userSelectedDeviceScore(WifiSettings::GetInstance().GetScoretacticsLastSelectionScore()),
-      safetyDeviceScore(WifiSettings::GetInstance().GetScoretacticsSecurityScore()),
-      normalDeviceScore(WifiSettings::GetInstance().GetScoretacticsNormalScore()),
+    : signalScorePerLevel(WifiSettings::GetInstance().GetScoretacticsScoreSlope(instId)),
+      signalBaseScore(WifiSettings::GetInstance().GetScoretacticsInitScore(instId)),
+      sameBssidScore(WifiSettings::GetInstance().GetScoretacticsSameBssidScore(instId)),
+      sameDeviceScore(WifiSettings::GetInstance().GetScoretacticsSameNetworkScore(instId)),
+      frequency5GHzScore(WifiSettings::GetInstance().GetScoretacticsFrequency5GHzScore(instId)),
+      userSelectedDeviceScore(WifiSettings::GetInstance().GetScoretacticsLastSelectionScore(instId)),
+      safetyDeviceScore(WifiSettings::GetInstance().GetScoretacticsSecurityScore(instId)),
+      normalDeviceScore(WifiSettings::GetInstance().GetScoretacticsNormalScore(instId)),
       firmwareRoamFlag(supportFmRoamingFlag),
       m_instId(instId)
 {}

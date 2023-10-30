@@ -92,7 +92,7 @@ public:
      * @return true - the ScanAlways switch is on
      * @return false - the ScanAlways switch is off
      */
-    bool IsScanAlwaysActive();
+    bool IsScanAlwaysActive(int instId = 0);
 
     /**
      * @Description Get scan results
@@ -100,7 +100,7 @@ public:
      * @param results - output scan results
      * @return int - 0 success
      */
-    int GetScanInfoList(std::vector<WifiScanInfo> &results, int instId = 0);
+    int GetScanInfoList(std::vector<WifiScanInfo> &results);
 
     /**
      * @Description Get the scan control policy info
@@ -199,7 +199,7 @@ public:
      *
      * @return bool - Indicates whether to load the configuration of the standby STA.
      */
-    bool IsLoadStabak();
+    bool IsLoadStabak(int instId = 0);
 
     /**
      * @Description Get current hotspot middle state
@@ -350,7 +350,7 @@ public:
      * @param band - band info
      * @return int - 0 or the level
      */
-    int GetSignalLevel(const int &rssi, const int &band);
+    int GetSignalLevel(const int &rssi, const int &band, int instId = 0);
 
     /**
      * @Description Get current p2p middle state
@@ -388,7 +388,7 @@ public:
      *
      * @return type - enum OperatorWifiType
      */
-    int GetOperatorWifiType();
+    int GetOperatorWifiType(int instId = 0);
 
     /**
      * @Description Set operator wifi state
@@ -396,7 +396,7 @@ public:
      * @param type - enum OperatorWifiType
      * @return int - 0 success
      */
-    int SetOperatorWifiType(int type);
+    int SetOperatorWifiType(int type, int instId = 0);
 
     /**
      * @Description Get the config whether can open sta when airplane mode opened
@@ -404,7 +404,7 @@ public:
      * @return true - can open
      * @return false - can't open
      */
-    bool GetCanOpenStaWhenAirplaneMode();
+    bool GetCanOpenStaWhenAirplaneMode(int instId = 0);
 
     /**
      * @Description when last airplane mode, get sta state, open or close
@@ -427,7 +427,7 @@ public:
      * @return true - sta is running
      * @return false - sta not running
      */
-    bool GetStaLastRunState();
+    bool GetStaLastRunState(int instId = 0);
 
     /**
      * @Description Set the STA service running state
@@ -435,7 +435,7 @@ public:
      * @param bRun - true / false
      * @return int - 0 success
      */
-    int SetStaLastRunState(bool bRun);
+    int SetStaLastRunState(bool bRun, int instId = 0);
 
     /**
      * @Description Set current phone screen state

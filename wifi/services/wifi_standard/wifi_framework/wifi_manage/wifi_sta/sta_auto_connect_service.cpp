@@ -56,7 +56,7 @@ ErrCode StaAutoConnectService::InitAutoConnectService()
         return WIFI_OPT_FAILED;
     }
 
-    int savedPriority = WifiSettings::GetInstance().GetSavedDeviceAppraisalPriority();
+    int savedPriority = WifiSettings::GetInstance().GetSavedDeviceAppraisalPriority(m_instId);
     if (RegisterDeviceAppraisal(pSavedDeviceAppraisal, savedPriority)) {
         WIFI_LOGI("RegisterSavedDeviceAppraisal succeeded.\n");
     }
@@ -433,7 +433,7 @@ bool StaAutoConnectService::AllowAutoSelectDevice(const std::vector<InterScanInf
     switch (info.detailedState) {
         case DetailedState::WORKING:
             /* Configure whether to automatically switch the network. */
-            if (!WifiSettings::GetInstance().GetWhetherToAllowNetworkSwitchover()) {
+            if (!WifiSettings::GetInstance().GetWhetherToAllowNetworkSwitchover(m_instId)) {
                 WIFI_LOGE("Automatic network switching is not allowed in user configuration.\n");
                 return false;
             }
@@ -467,7 +467,7 @@ bool StaAutoConnectService::AllowAutoSelectDevice(const std::vector<InterScanInf
         case DetailedState::NOTWORKING:
             WIFI_LOGI("The current network cannot access the Internet.\n");
             /* Configure whether to automatically switch the network. */
-            if (!WifiSettings::GetInstance().GetWhetherToAllowNetworkSwitchover()) {
+            if (!WifiSettings::GetInstance().GetWhetherToAllowNetworkSwitchover(m_instId)) {
                 WIFI_LOGE("Automatic network switching is not allowed in user configuration.\n");
                 return false;
             }

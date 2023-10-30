@@ -1475,5 +1475,19 @@ NO_SANITIZE("cfi") napi_value PutWifiProtect(napi_env env, napi_callback_info in
     WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_STA);
 }
 
+NO_SANITIZE("cfi") napi_value IsHeldWifiProtect(napi_env env, napi_callback_info info)
+{
+    TRACE_FUNC_CALL;
+    WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
+    bool isHeld = false;
+    ErrCode ret = wifiDevicePtr->IsHeldWifiProtect(isHeld);
+    if (ret != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("Query application whether or not held wifi protect fail: %{public}d", ret);
+        WIFI_NAPI_ASSERT(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_STA);
+    }
+    napi_value result;
+    napi_get_boolean(env, isHeld, &result);
+    return result;
+}
 }  // namespace Wifi
 }  // namespace OHOS

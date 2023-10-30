@@ -82,6 +82,14 @@ public:
     ErrCode PutWifiProtectRef(const std::string &protectName) override;
 
     /**
+     * @Description Query application whether or not acquired the Wi-Fi protect.
+     *
+     * @param protectName - the protect name
+     * @param isHoldProtect - out Whether or not acquired the Wi-Fi protect
+     * @return ErrCode - operation result
+     */
+    ErrCode IsHeldWifiProtectRef(const std::string &protectName, bool &isHoldProtect) override;
+    /**
      * @Description Remove a specified untrusted hotspot configuration.
      *
      * @param config - WifiDeviceConfig object

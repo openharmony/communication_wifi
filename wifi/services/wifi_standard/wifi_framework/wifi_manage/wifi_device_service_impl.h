@@ -75,6 +75,8 @@ public:
 
     ErrCode PutWifiProtectRef(const std::string &protectName) override;
 
+    ErrCode IsHeldWifiProtectRef(const std::string &protectName, bool &isHoldProtect) override;
+
     ErrCode AddDeviceConfig(const WifiDeviceConfig &config, int &result, bool isCandidate) override;
 
     ErrCode UpdateDeviceConfig(const WifiDeviceConfig &config, int &result) override;

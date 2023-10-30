@@ -66,6 +66,13 @@ public:
      */
     virtual ErrCode PutWifiProtectRef(const std::string &protectName) = 0;
 
+    /**
+     * @Description Query application whether or not has held the Wi-Fi protect.
+     *
+     * @param isHeld - out whether or not has held the Wi-Fi protect
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode IsHeldWifiProtect(bool &isHeld) = 0;
 #ifndef OHOS_ARCH_LITE
     /**
      * @Description Acquire the Wi-Fi protect mode.

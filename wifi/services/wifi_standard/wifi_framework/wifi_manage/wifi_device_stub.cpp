@@ -81,6 +81,8 @@ void WifiDeviceStub::InitHandleMap()
         &WifiDeviceStub::OnGetWifiProtectRef;
     handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_PUT_WIFI_PROTECT)] =
         &WifiDeviceStub::OnPutWifiProtectRef;
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_IS_HELD_WIFI_PROTECT)] =
+        &WifiDeviceStub::OnIsHeldWifiProtectRef;
     handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_ADD_DEVICE_CONFIG)] =
         &WifiDeviceStub::OnAddDeviceConfig;
     handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_UPDATE_DEVICE_CONFIG)] =
@@ -250,6 +252,26 @@ void WifiDeviceStub::OnPutWifiProtectRef(uint32_t code, MessageParcel &data, Mes
     }
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
+    return;
+}
+
+void WifiDeviceStub::OnIsHeldWifiProtectRef(uint32_t code, MessageParcel &data, MessageParcel &reply)
+{
+    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+    ErrCode ret = WIFI_OPT_FAILED;
+    const char *readStr = data.ReadCString();
+    bool isHoldProtect = false;
+    if (readStr == nullptr) {
+        ret = WIFI_OPT_INVALID_PARAM;
+    } else {
+        std::string protectName = readStr;
+        ret = IsHeldWifiProtectRef(protectName, isHoldProtect);
+    }
+    reply.WriteInt32(0);
+    reply.WriteInt32(ret);
+    if (ret == WIFI_OPT_SUCCESS) {
+        reply.WriteBool(isHoldProtect);
+    }
     return;
 }
 

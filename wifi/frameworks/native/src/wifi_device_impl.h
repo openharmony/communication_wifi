@@ -75,11 +75,14 @@ public:
     /**
      * @Description Query application whether or not has held the Wi-Fi protect.
      *
+     * @param protectName - the protect name
      * @param isHeld - out whether or not has held the Wi-Fi protect
      * @return ErrCode - operation result
      */
-    ErrCode IsHeldWifiProtect(bool &isHeld) override;
+    ErrCode IsHeldWifiProtectRef(const std::string &protectName, bool &isHeld) override;
+
 #ifndef OHOS_ARCH_LITE
+    ErrCode IsHeldWifiProtect(bool &isHeld) override;
     /**
      * @Description Acquire the Wi-Fi protect mode.
      *

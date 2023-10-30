@@ -1483,7 +1483,6 @@ NO_SANITIZE("cfi") napi_value IsHeldWifiProtect(napi_env env, napi_callback_info
     ErrCode ret = wifiDevicePtr->IsHeldWifiProtect(isHeld);
     if (ret != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("Query application whether or not held wifi protect fail: %{public}d", ret);
-        WIFI_NAPI_ASSERT(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_STA);
     }
     napi_value result;
     napi_get_boolean(env, isHeld, &result);

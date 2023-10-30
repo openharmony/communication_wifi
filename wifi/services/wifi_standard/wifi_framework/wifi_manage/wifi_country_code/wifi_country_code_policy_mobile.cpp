@@ -74,7 +74,7 @@ ErrCode WifiCountryCodePolicyMobile::CalculateWifiCountryCode(std::string &wifiC
 ErrCode WifiCountryCodePolicyMobile::GetWifiCountryCodeByMcc(std::string &wifiCountryCode)
 {
     std::string regPlmn1;
-#ifdef CORE_SERVICE_ENABLE
+#ifdef TELEPHONE_CORE_SERVICE_ENABLE
     regPlmn1 = Str16ToStr8(Telephony::CoreServiceClient::GetInstance().GetOperatorNumeric(SLOT_ID));
 #endif
     if (regPlmn1.empty() || regPlmn1.length() < PLMN_LEN) {

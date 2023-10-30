@@ -89,6 +89,13 @@ public:
     void OnReceiveEvent(const OHOS::EventFwk::CommonEventData &eventData) override;
 };
 
+class BatteryEventSubscriber : public OHOS::EventFwk::CommonEventSubscriber {
+public:
+    explicit BatteryEventSubscriber(const OHOS::EventFwk::CommonEventSubscribeInfo &subscriberInfo);
+    ~BatteryEventSubscriber();
+    void OnReceiveEvent(const OHOS::EventFwk::CommonEventData &eventData) override;
+};
+
 class WifiTimer {
 public:
     using TimerCallback = std::function<void()>;
@@ -282,6 +289,7 @@ private:
     std::mutex screenEventMutex;
     std::mutex airplaneModeEventMutex;
     std::mutex locationEventMutex;
+    std::mutex batteryEventMutex;
     std::condition_variable mCondition;
     std::deque<WifiCloseServiceMsg> mEventQue;
     StaServiceCallback mStaCallback;
@@ -321,6 +329,10 @@ private:
     void RegisterDeviceProvisionEvent();
     void UnRegisterDeviceProvisionEvent();
     uint32_t locationTimerId{0};
+    std::shared_ptr<BatteryEventSubscriber> batterySubscriber_ = nullptr;
+    uint32_t batteryTimerId{0};
+    void RegisterBatteryEvent();
+    void UnRegisterBatteryEvent();
 #endif
     InitStatus mInitStatus;
     long mSupportedFeatures;

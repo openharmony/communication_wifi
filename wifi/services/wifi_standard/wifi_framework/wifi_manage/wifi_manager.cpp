@@ -51,6 +51,7 @@ const uint32_t TIMEOUT_SCREEN_EVENT = 3000;
 const uint32_t TIMEOUT_AIRPLANE_MODE_EVENT = 3000;
 const uint32_t TIMEOUT_LOCATION_EVENT = 3000;
 const uint32_t TIMEOUT_UNLOAD_WIFI_SA = 5 * 60 * 1000;
+const uint32_t TIMEOUT_BATTERY_EVENT = 3000;
 using TimeOutCallback = std::function<void()>;
 
 static sptr<WifiLocationModeObserver> locationModeObserver_ = nullptr;
@@ -594,6 +595,11 @@ int WifiManager::Init()
         WifiTimer::GetInstance()->Register(timeoutCallback, locationTimerId, TIMEOUT_LOCATION_EVENT, false);
         WIFI_LOGI("RegisterLocationEvent success! locationTimerId:%{public}u", locationTimerId);
     }
+    if (batterySubscriber_ == nullptr && batteryTimerId == 0) {
+        TimeOutCallback timeoutCallback = std::bind(&WifiManager::RegisterBatteryEvent, this);
+        WifiTimer::GetInstance()->Register(timeoutCallback, batteryTimerId, TIMEOUT_BATTERY_EVENT, false);
+        WIFI_LOGI("RegisterBatteryEvent success! locationTimerId:%{public}u", batteryTimerId);
+    }
 #endif
     mInitStatus = INIT_OK;
     InitStaCallback();
@@ -667,6 +673,9 @@ void WifiManager::Exit()
     }
     if (deviceProvisionObserver_ != nullptr) {
         UnRegisterDeviceProvisionEvent();
+    }
+    if (batterySubscriber_ != nullptr) {
+        UnRegisterBatteryEvent();
     }
 #endif
     return;
@@ -2091,6 +2100,74 @@ void WifiManager::UnRegisterLocationEvent()
     }
     Uri uri(SETTINGS_DATASHARE_URI_LOCATION_MODE);
     datashareHelper->UnRegisterObserver(uri, locationModeObserver_);
+}
+
+void WifiManager::RegisterBatteryEvent()
+{
+    std::unique_lock<std::mutex> lock(batteryEventMutex);
+    if (batterySubscriber_) {
+        return;
+    }
+    OHOS::EventFwk::MatchingSkills matchingSkills;
+    matchingSkills.AddEvent(OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_POWER_CONNECTED);
+    matchingSkills.AddEvent(OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_POWER_DISCONNECTED);
+    EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
+    batterySubscriber_ = std::make_shared<BatteryEventSubscriber>(subscriberInfo);
+    if (!EventFwk::CommonEventManager::SubscribeCommonEvent(batterySubscriber_)) {
+        WIFI_LOGE("BatteryEvent SubscribeCommonEvent() failed");
+    } else {
+        WIFI_LOGI("BatteryEvent SubscribeCommonEvent() OK");
+        WifiTimer::GetInstance()->UnRegister(batteryTimerId);
+    }
+}
+
+void WifiManager::UnRegisterBatteryEvent()
+{
+    std::unique_lock<std::mutex> lock(batteryEventMutex);
+    if (!batterySubscriber_) {
+        return;
+    }
+    if (!EventFwk::CommonEventManager::UnSubscribeCommonEvent(batterySubscriber_)) {
+        WIFI_LOGE("BatteryEvent UnSubscribeCommonEvent() failed");
+    } else {
+        WIFI_LOGI("BatteryEvent UnSubscribeCommonEvent() OK");
+    }
+}
+
+void BatteryEventSubscriber::OnReceiveEvent(const OHOS::EventFwk::CommonEventData &data)
+{
+    std::string action = data.GetWant().GetAction();
+    WIFI_LOGI("BatteryEventSubscriber::OnReceiveEvent: %{public}s.", action.c_str());
+    for (int i = 0; i < AP_INSTANCE_MAX_NUM; ++i) {
+        IApService *pService = WifiServiceManager::GetInstance().GetApServiceInst(i);
+        if (pService == nullptr) {
+            WIFI_LOGE("ap service is NOT start!");
+            return;
+        }
+
+        if (action == OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_POWER_CONNECTED) {
+            WIFI_LOGE("usb connect do not stop hostapd!");
+            pService->SetHotspotIdleTimeout(0);
+            return;
+        }
+
+        if (action == OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_POWER_DISCONNECTED) {
+            WIFI_LOGE("usb disconnect stop hostapd!");
+            pService->SetHotspotIdleTimeout(HOTSPOT_IDLE_TIMEOUT_INTERVAL_MS);
+            return;
+        }
+    }
+}
+
+BatteryEventSubscriber::BatteryEventSubscriber(const OHOS::EventFwk::CommonEventSubscribeInfo &subscriberInfo)
+    : CommonEventSubscriber(subscriberInfo)
+{
+    WIFI_LOGI("BatteryEventSubscriber enter");
+}
+
+BatteryEventSubscriber::~BatteryEventSubscriber()
+{
+    WIFI_LOGI("~BatteryEventSubscriber exit");
 }
 
 void WifiManager::RegisterDeviceProvisionEvent()

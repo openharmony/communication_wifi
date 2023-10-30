@@ -1373,11 +1373,7 @@ static int WpaCliCmdWpaSetSuspendMode(WifiWpaStaInterface *this, bool mode)
         LOGE("WpaCliCmdWpaSetSuspendMode, snprintf_s err");
         return -1;
     }
-
-    if (WpaCliCmd(cmd, buf, sizeof(buf)) != 0) {
-        LOGE("WpaCliCmdWpaSetSuspendMode, WpaCliCmd return failed!");
-    }
-    return WpaCliCmdWpaSetPowerMode(this, mode == false);
+    return WpaCliCmd(cmd, buf, sizeof(buf));
 }
 
 WifiWpaStaInterface *GetWifiStaInterface(int staNo)
@@ -1427,6 +1423,7 @@ WifiWpaStaInterface *GetWifiStaInterface(int staNo)
     p->wpaCliCmdScanInfo = WpaCliCmdScanInfo;
     p->wpaCliCmdGetSignalInfo = WpaCliCmdGetSignalInfo;
     p->wpaCliCmdWpaSetSuspendMode = WpaCliCmdWpaSetSuspendMode;
+    p->wpaCliCmdWpaSetPowerMode = WpaCliCmdWpaSetPowerMode;
     p->next = g_wpaStaInterface;
     g_wpaStaInterface = p;
 

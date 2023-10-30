@@ -65,6 +65,10 @@
       "value": "场景测试"
     },
     {
+      "name": "stability",
+      "value": "稳定性测试"
+    },
+    {
       "name": "autotest",
       "value": "自动测试"
     },
@@ -1711,6 +1715,105 @@
     {
       "name": "p2p_available",
       "value": "对等设备"
+    },
+    {
+      "name": "candidateWifiGroup",
+      "value": "可选的候选网络"
+    },
+    {
+      "name": "candidateWifi",
+      "value": "candidateWifi"
+    },    {
+      "name": "module_desc",
+      "value": "module description"
+    },
+    {
+      "name": "EntryAbility_desc",
+      "value": "description"
+    },
+    {
+      "name": "EntryAbility_label",
+      "value": "目标管理"
+    },
+    {
+      "name": "title",
+      "value": "工作目标"
+    },
+    {
+      "name": "add_task",
+      "value": "添加候选wifi"
+    },
+    {
+      "name": "target_name",
+      "value": "目标"
+    },
+    {
+      "name": "target_info",
+      "value": "点击按钮添加候选网络"
+    },
+    {
+      "name": "overall_progress",
+      "value": "整体进度"
+    },
+    {
+      "name": "add_task_dialog",
+      "value": "添加候选WiFi"
+    },
+    {
+      "name": "latest_updateTime",
+      "value": "更新时间: "
+    },
+    {
+      "name": "sub_goals",
+      "value": "候选WiFi列表"
+    },
+    {
+      "name": "cancel_button",
+      "value": "取消"
+    },
+    {
+      "name": "confirm_button",
+      "value": "确定"
+    },
+    {
+      "name": "delete_button",
+      "value": "删除"
+    },
+    {
+      "name": "edit_button",
+      "value": "编辑"
+    },
+    {
+      "name": "select_all_button",
+      "value": "全选"
+    },
+    {
+      "name": "cannot_input_empty",
+      "value": "WiFi名称不能为空！"
+    },
+    {
+      "name": "input_candidate_wifi",
+      "value": "输入候选WiFi的配置"
+    },
+    {
+      "name": "input_candidate_wifi_ssid",
+      "value": "输入候选WiFi的SSID"
+    },
+    {
+      "name": "input_candidate_wifi_bssid",
+      "value": "输入候选WiFi的bssid(MAC) (可不填)"
+    },
+    {
+      "name": "input_candidate_wifi_preSharedKey",
+      "value": "输入候选WiFi密码"
+    },
+    {
+      "name": "input_candidate_wifi_isHiddenSsid",
+      "value": "输入1或0 (可不填;1:ture,0:false)"
+    },
+    {
+      "name": "input_candidate_wifi_securityType",
+      "value": "选择securityType"
     }
   ]
 }

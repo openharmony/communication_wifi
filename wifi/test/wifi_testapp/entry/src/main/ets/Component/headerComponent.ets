@@ -36,7 +36,7 @@ export default struct HeadTableComponent {
           .width( $r( 'app.float.wh_value_30' ) )
           .height( $r( 'app.float.wh_value_30' ) )
       }
-      .margin( { left : $r( 'app.float.wh_value_4' ) , right : $r( 'app.float.wh_value_16' ) } )
+      .margin( { left : $r( 'app.float.distance_4' ) , right : $r( 'app.float.distance_16' ) } )
       .backgroundColor( this.isTouch ? $r( 'app.color.color_E3E3E3_grey' ) : $r( 'app.color.color_00000000_transparent' ) )
       .visibility( this.icBackIsVisibility ? Visibility.Visible : Visibility.None )
       .onClick( () => {
@@ -64,10 +64,10 @@ export default struct HeadTableComponent {
         .maxLines( ConfigData.MAX_LINES_1 )
         .textOverflow( { overflow : TextOverflow.Ellipsis } )
         .textAlign( TextAlign.Start )
-        .margin( { top : $r( 'app.float.wh_value_13' ) , bottom : $r( 'app.float.wh_value_15' ) } );
+        .margin( { top : $r( 'app.float.distance_13' ) , bottom : $r( 'app.float.distance_15' ) } );
     }
     .width( ConfigData.WH_100_100 )
-    .padding( { left : $r( 'app.float.wh_value_8' ) } )
+    .padding( { left : $r( 'app.float.distance_8' ) } )
     .height( $r( 'app.float.wh_value_56' ) )
     .alignItems( VerticalAlign.Center )
     .align( Alignment.Start );

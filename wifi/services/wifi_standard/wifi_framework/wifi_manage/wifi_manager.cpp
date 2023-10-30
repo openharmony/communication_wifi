@@ -32,6 +32,7 @@
 #include "wifi_datashare_utils.h"
 #include "wifi_location_mode_observer.h"
 #include "wifi_country_code_manager.h"
+#include "wifi_protect_manager.h"
 #endif
 #include "wifi_sta_hal_interface.h"
 #include "wifi_service_manager.h"
@@ -1027,6 +1028,9 @@ void WifiManager::DealStaOpenRes(OperateResState state, int instId)
 void WifiManager::DealStaCloseRes(OperateResState state, int instId)
 {
     WIFI_LOGD("Enter DealStaCloseRes: %{public}d", static_cast<int>(state));
+#ifndef OHOS_ARCH_LITE
+    WifiProtectManager::GetInstance().UpdateWifiClientConnected(false);
+#endif
     WifiEventCallbackMsg cbMsg;
     cbMsg.msgCode = WIFI_CBK_MSG_STATE_CHANGE;
     cbMsg.id = instId;
@@ -1125,6 +1129,10 @@ void WifiManager::DealStaConnChanged(OperateResState state, const WifiLinkedInfo
     if (cfgMonitorCallback.onStaConnectionChange != nullptr) {
         cfgMonitorCallback.onStaConnectionChange(static_cast<int>(state));
     }
+#endif
+#ifndef OHOS_ARCH_LITE
+    bool isConnected = (info.connState == CONNECTED) ? true : false;
+    WifiProtectManager::GetInstance().UpdateWifiClientConnected(isConnected);
 #endif
     return;
 }
@@ -1808,6 +1816,10 @@ void ScreenEventSubscriber::OnReceiveEvent(const OHOS::EventFwk::CommonEventData
             WIFI_LOGE("scan service is NOT start!");
             return;
         }
+    #ifndef OHOS_ARCH_LITE
+        bool isScreenOn = (action == OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON) ? true : false;
+        WifiProtectManager::GetInstance().HandleScreenStateChanged(isScreenOn);
+    #endif
         if (action == OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF &&
             screenState == MODE_STATE_OPEN) {
             WifiSettings::GetInstance().SetScreenState(MODE_STATE_CLOSE);

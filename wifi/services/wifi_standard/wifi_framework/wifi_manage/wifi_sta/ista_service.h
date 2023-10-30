@@ -205,6 +205,15 @@ public:
      * @return WifiErrorNo
      */
     virtual ErrCode SetSuspendMode(bool mode) = 0;
+
+    /**
+     * @Description send power mode for wpa.
+     *
+     * @param mode: true for power, false for resume.
+     * @return WifiErrorNo
+     */
+    virtual ErrCode SetPowerMode(bool mode) = 0;
+
     /**
      * @Description systemabilitychanged
      *

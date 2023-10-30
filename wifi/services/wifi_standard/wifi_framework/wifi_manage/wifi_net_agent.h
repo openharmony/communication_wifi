@@ -32,10 +32,10 @@
 
 namespace OHOS {
 namespace Wifi {
-class WifiNetAgent : public DelayedRefSingleton<WifiNetAgent> {
-    DECLARE_DELAYED_REF_SINGLETON(WifiNetAgent);
-
+class WifiNetAgent {
 public:
+    ~WifiNetAgent();
+    static WifiNetAgent &GetInstance();
     /**
      * Register the network information with the network management module
      *
@@ -145,6 +145,7 @@ public:
         void LogNetCaps(const std::string &ident, const std::set<NetManagerStandard::NetCap> &netCaps) const;
     };
 private:
+    WifiNetAgent();
     void CreateNetLinkInfo(sptr<NetManagerStandard::NetLinkInfo> &netLinkInfo, IpInfo &wifiIpInfo,
         IpV6Info &wifiIpV6Info, WifiProxyConfig &wifiProxyConfig, int instId = 0);
 

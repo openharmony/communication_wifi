@@ -41,11 +41,15 @@ public:
     void StopNetCheckThreadSuccess();
     bool HttpDetectionSuccess();
     int HttpCheckResponseCode(std::string url, int codeNum);
+    void HandleNetCheckResult(StaNetState netState, const std::string portalUrl);
+    void HandleArpCheckResult(StaArpState arpState);
+    void HandleDnsCheckResult(StaDnsState dnsState);
 public:
     std::unique_ptr<StaNetworkCheck> pStaNetworkCheck;
-    NetStateHandler nethandle = nullptr;
-    ArpStateHandler arpHandle = nullptr;
-    DnsStateHandler dnsHandle = nullptr;
+    NetStateHandler nethandle = std::bind(&StaNetworkCheckTest::HandleNetCheckResult, this,
+        std::placeholders::_1, std::placeholders::_2);
+    ArpStateHandler arpHandle = std::bind(&StaNetworkCheckTest::HandleArpCheckResult, this, std::placeholders::_1);
+    DnsStateHandler dnsHandle = std::bind(&StaNetworkCheckTest::HandleDnsCheckResult, this, std::placeholders::_1);
     WifiPortalConf mUrlInfo;
 };
 
@@ -59,6 +63,15 @@ int StaNetworkCheckTest::HttpCheckResponseCode(std::string url, int codeNum)
     pStaNetworkCheck->CheckResponseCode(url, codeNum, mUrlInfo.portalHttpUrl.size());
     return 0;
 }
+
+void StaNetworkCheckTest::HandleNetCheckResult(StaNetState netState, const std::string portalUrl)
+{}
+
+void StaNetworkCheckTest::HandleArpCheckResult(StaArpState arpState)
+{}
+
+void StaNetworkCheckTest::HandleDnsCheckResult(StaDnsState dnsState)
+{}
 
 HWTEST_F(StaNetworkCheckTest, HttpDetectionSuccess, TestSize.Level1)
 {

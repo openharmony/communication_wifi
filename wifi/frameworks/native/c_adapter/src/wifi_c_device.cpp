@@ -21,6 +21,7 @@
 #include "wifi_logger.h"
 #include "wifi_c_utils.h"
 #include "wifi_common_util.h"
+#include "../../../interfaces/inner_api/wifi_msg.h"
 
 DEFINE_WIFILOG_LABEL("WifiCDevice");
 
@@ -513,6 +514,12 @@ NO_SANITIZE("cfi") WifiErrorCode Get5GHzChannelList(int *result, int *size)
     }
     return GetCErrorCode(ret);
 }
+#ifndef OHOS_ARCH_LITE
+NO_SANITIZE("cfi") WifiErrorCode GetWifiProtect(OHOS::Wifi::WifiProtectMode mode)
+{
+    CHECK_PTR_RETURN(wifiDevicePtr, ERROR_WIFI_NOT_AVAILABLE);
+    return GetCErrorCode(wifiDevicePtr->GetWifiProtect(mode));
+}
 
 NO_SANITIZE("cfi") WifiErrorCode StartPortalCertification(int *result, int *size)
 {
@@ -527,3 +534,9 @@ NO_SANITIZE("cfi") WifiErrorCode StartPortalCertification(int *result, int *size
     return GetCErrorCode(ret);
 }
 
+NO_SANITIZE("cfi") WifiErrorCode PutWifiProtect()
+{
+    CHECK_PTR_RETURN(wifiDevicePtr, ERROR_WIFI_NOT_AVAILABLE);
+    return GetCErrorCode(wifiDevicePtr->PutWifiProtect());
+}
+#endif

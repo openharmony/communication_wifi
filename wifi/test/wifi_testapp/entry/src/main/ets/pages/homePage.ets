@@ -22,7 +22,9 @@ import { ManualApiTest } from '../Component/manualApiTestComponent';
 import { ManualSceneTest } from '../Component/manualSceneTest';
 import { AutoTest } from '../Component/autoTest';
 import { AppTest } from '../Component/appTest';
+import { StabilityTest } from "../Component/stabilityTest"
 import { BenchmarkTest } from '../Component/benchmarkTest';
+import { StressTest } from "../Component/stressTest"
 import ConfigData from '../Utils/ConfigData';
 
 const TAG = '[homePage]'
@@ -40,30 +42,35 @@ struct TestCategory {
       Tabs() {
         TabContent() {
           AppTest( { testItems : this.testItems.filter( item => ( item.category === Category.App ) ) } )
-        }.tabBar( $r( "app.string.App" ) ).margin( { top : 20 } )
+        }.tabBar( $r( "app.string.App" ) ).margin( { top : $r( "app.float.distance_20" ) } )
 
         TabContent() {
           ManualApiTest( { testItems : this.testItems.filter( item => ( item.category === Category.API ) ) } )
-        }.tabBar( $r( "app.string.api" ) ).margin( { top : 20 } )
+        }.tabBar( $r( "app.string.api" ) ).margin( { top : $r( "app.float.distance_20" ) } )
+
         TabContent() {
           AutoTest( { testItems : this.testItems.filter( item => ( item.category === Category.AutoTest ) ) } )
-        }.tabBar( $r( "app.string.autotest" ) ).margin( { top : 5 } )
+        }.tabBar( $r( "app.string.autotest" ) ).margin( { top : $r( "app.float.distance_5" ) } )
 
         TabContent() {
           ManualSceneTest( { testItems : this.testItems.filter( item => ( item.category === Category.Scenario ) ) } )
-        }.tabBar( $r( "app.string.scenario" ) ).margin( { top : 5 } )
+        }.tabBar( $r( "app.string.scenario" ) ).margin( { top : $r( "app.float.distance_5" ) } )
+
+        TabContent() {
+          StabilityTest( { testItems : this.testItems.filter( item => ( item.category === Category.Stability ) ) } )
+        }.tabBar( $r( "app.string.stability" ) ).margin( { top : $r( "app.float.distance_5" ) } )
 
         TabContent() {
           BenchmarkTest( { testItems : this.testItems.filter( item => ( item.category === Category.BenchMark ) ) } )
-        }.tabBar( $r( "app.string.benchmark" ) ).margin( { top : 5 } )
+        }.tabBar( $r( "app.string.benchmark" ) ).margin( { top : $r( "app.float.distance_5" ) } )
 
         TabContent() {
-          BenchmarkTest( { testItems : this.testItems.filter( item => ( item.category === Category.Stress ) ) } )
-        }.tabBar( $r( "app.string.stress" ) ).margin( { top : 5 } )
+          StressTest( { testItems : this.testItems.filter( item => ( item.category === Category.Stress ) ) } )
+        }.tabBar( $r( "app.string.stress" ) ).margin( { top : $r( "app.float.distance_5" ) } )
       }
       .barWidth( ConfigData.WH_80_100 )
       .barHeight( "40vp" )
-      .align(Alignment.TopStart)
+      .align( Alignment.TopStart )
       .barMode( BarMode.Scrollable )
       .backgroundColor( $r( "app.color.white" ) )
     }
@@ -86,7 +93,7 @@ struct HomePage {
         Image( $r( 'app.media.Switch' ) )
           .height( 30 )
           .width( 30 )
-          .margin( { top : 5 , right : 10 } )
+          .margin( { top : $r( "app.float.distance_5" ) , right : $r( "app.float.distance_10" ) } )
           .onClick( () => {
           } )
       }

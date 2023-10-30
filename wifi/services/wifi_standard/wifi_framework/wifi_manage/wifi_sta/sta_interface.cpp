@@ -301,6 +301,18 @@ ErrCode StaInterface::SetSuspendMode(bool mode)
     return WIFI_OPT_SUCCESS;
 }
 
+ErrCode StaInterface::SetPowerMode(bool mode)
+{
+    LOGI("Enter StaInterface::SetPowerMode, mode=[%{public}d]!", mode);
+    std::lock_guard<std::mutex> lock(mutex);
+    CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
+    if (pStaService->SetPowerMode(mode) != WIFI_OPT_SUCCESS) {
+        LOGE("SetPowerMode() failed!");
+        return WIFI_OPT_FAILED;
+    }
+    return WIFI_OPT_SUCCESS;
+}
+
 ErrCode StaInterface::OnSystemAbilityChanged(int systemAbilityid, bool add)
 {
     LOGI("Enter StaInterface::OnSystemAbilityChanged, id[%{public}d], mode=[%{public}d]!",

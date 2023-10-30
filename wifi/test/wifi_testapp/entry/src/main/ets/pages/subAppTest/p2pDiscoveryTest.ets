@@ -18,8 +18,11 @@
 import featureAbility from '@ohos.ability.featureAbility'
 import wifi from '@ohos.wifi'
 import { AvailableP2p } from '../../Component/availableP2p'
-
+import { TestData } from '../../MainAbility/model/testData'
+import router from '@system.router';
 import { P2pTitleBar } from '../../Component/p2pTitleBar'
+import { PageTitle } from '../../Component/pageTitle'
+import { TestImageDisplay } from '../../Component/testImageDisplay'
 import { P2pModel } from '../../MainAbility/model/p2pModel'
 
 const TAG = '[p2pScan]'
@@ -31,11 +34,12 @@ const PERMISSION_P2P_NAME: string = 'ohos.permission.LOCATION'
 @Component
 struct P2pFound {
   private p2pModel: P2pModel = new P2pModel()
-  private testItem: string = "p2p扫描"
+  private testItem: TestData = router.getParams().testId;
+  // private testItem: string = "p2p扫描"
   @State p2pLinkedInfo: any = {
     deviceName : "" ,
     deviceAddress : "" ,
-    groupOwnerAddr: "" ,
+    groupOwnerAddr : "" ,
     groupName : "" ,
     goBand : 0
   }
@@ -47,7 +51,7 @@ struct P2pFound {
     this.p2pModel.getP2pPeerDevices( ( result ) => {
       if ( this.p2pIsSwitchOn ) {
         this.p2pList = result
-        console.log( 'scan p2pList:' + JSON.stringify(this.p2pList ))
+        console.log( 'scan p2pList:' + JSON.stringify( this.p2pList ) )
         setTimeout( () => {
           this.scan()
         } , 2000 )
@@ -67,7 +71,7 @@ struct P2pFound {
         this.p2pLinkedInfo = {
           deviceName : "" ,
           deviceAddress : "" ,
-          groupOwnerAddr: "" ,
+          groupOwnerAddr : "" ,
           groupName : "" ,
           goBand : 0
         }
@@ -80,7 +84,7 @@ struct P2pFound {
 
   addP2pListener() {
     wifi.on( 'p2pConnectionChange' , wifiP2pLinkedInfo => {
-      let state =wifiP2pLinkedInfo.connectState
+      let state = wifiP2pLinkedInfo.connectState
       console.log( TAG , `p2pConnectionChange: ${ state }` )
       this.getP2pLinkedInfo()
     } )
@@ -108,7 +112,9 @@ struct P2pFound {
   build() {
     Column() {
       Stack( { alignContent : Alignment.TopStart } ) {
-        P2pTitleBar( { testItem : this.testItem } )
+        TestImageDisplay( { testItem : this.testItem } )
+        PageTitle( { testItem : this.testItem } )
+        // P2pTitleBar( { testItem : this.testItem } )
       }
 
       Row() {
@@ -116,7 +122,7 @@ struct P2pFound {
           .fontSize( 22 )
           .fontWeight( FontWeight.Bold )
           .layoutWeight( 1 )
-          .align(Alignment.TopStart)
+          .align( Alignment.TopStart )
         Column() {
           Toggle( { type : ToggleType.Switch , isOn : this.p2pIsSwitchOn } )
             .onChange( ( isOn: boolean ) => {

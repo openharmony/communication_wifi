@@ -1627,7 +1627,7 @@ bool StaStateMachine::IsWpa3Transition(int networkId) const
 {
     WifiDeviceConfig deviceConfig;
     std::vector<WifiScanInfo> scanInfoList;
-    if (WifiSettings::GetInstance().GetDeviceConfig(networkId, deviceConfig) ！= 0) {
+    if (WifiSettings::GetInstance().GetDeviceConfig(networkId, deviceConfig) != 0) {
         LOGE("IsWpa3Transition, GetDeviceConfig failed!");
         return false;
     }

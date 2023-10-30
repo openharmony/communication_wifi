@@ -526,11 +526,16 @@ ErrCode StaService::OnSystemAbilityChanged(int systemAbilityid, bool add)
 #ifndef OHOS_ARCH_LITE
 ErrCode StaService::WifiCountryCodeChangeObserver::OnWifiCountryCodeChanged(const std::string &wifiCountryCode)
 {
+    if (strcasecmp(m_lastWifiCountryCode.c_str(), wifiCountryCode.c_str()) == 0) {
+        WIFI_LOGI("wifi country code is same, sta not update, code=%{public}s", wifiCountryCode.c_str());
+        return WIFI_OPT_SUCCESS;
+    }
     WIFI_LOGI("deal wifi country code changed, code=%{public}s", wifiCountryCode.c_str());
     InternalMessage *msg = m_stateMachineObj.CreateMessage();
     msg->SetMessageName(static_cast<int>(WIFI_SVR_CMD_UPDATE_COUNTRY_CODE));
     msg->AddStringMessageBody(wifiCountryCode);
     m_stateMachineObj.SendMessage(msg);
+    m_lastWifiCountryCode = wifiCountryCode;
     return WIFI_OPT_SUCCESS;
 }
 

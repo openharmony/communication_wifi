@@ -56,7 +56,7 @@ public:
      *
      * @return callBack obj
      */
-    StaServiceCallback GetStaCallback();
+    StaServiceCallback GetStaCallback() const;
 #endif
 #ifdef FEATURE_AP_SUPPORT
     /**
@@ -64,7 +64,7 @@ public:
      *
      * @return callBack obj
      */
-    IApServiceCallbacks GetApCallback();
+    IApServiceCallbacks GetApCallback() const;
 #endif
 
     /**
@@ -72,7 +72,7 @@ public:
      *
      * @param wifiCountryCode - wifi country code
      */
-    void GetWifiCountryCode(std::string &wifiCountryCode);
+    void GetWifiCountryCode(std::string &wifiCountryCode) const;
 
     /**
      * @Description provides the set wifiCountryCode interface for external systems
@@ -115,26 +115,6 @@ public:
      */
     WifiCountryCodeManager &operator=(const WifiCountryCodeManager &) = delete;
 private:
-    class TelephoneNetworkSearchStateChangeListener : public OHOS::EventFwk::CommonEventSubscriber {
-    public:
-        /**
-         * @Description TelephoneNetworkSearchStateChangeListener constructor
-         */
-        explicit TelephoneNetworkSearchStateChangeListener(
-            const OHOS::EventFwk::CommonEventSubscribeInfo &subscriberInfo);
-
-        /**
-         * @Description TelephoneNetworkSearchStateChangeListener destructor
-         */
-        ~TelephoneNetworkSearchStateChangeListener() = default;
-
-        /**
-        * @Description on receive telephone network search state change event
-        *
-        * @param direction - event data
-        */
-        void OnReceiveEvent(const OHOS::EventFwk::CommonEventData &eventData) override;
-    };
 #ifdef FEATURE_STA_SUPPORT
     StaServiceCallback m_staCallback;
 #endif
@@ -143,7 +123,6 @@ private:
 #endif
     std::map<std::string, std::shared_ptr<IWifiCountryCodeChangeListener>> m_codeChangeListeners;
     std::string m_wifiCountryCode = DEFAULT_WIFI_COUNTRY_CODE;
-    std::shared_ptr<TelephoneNetworkSearchStateChangeListener> m_telephoneNetworkSearchStateChangeListener;
     std::shared_ptr<IWifiCountryCodePolicy> m_wifiCountryCodePolicy;
     std::mutex m_countryCodeMutex;
 

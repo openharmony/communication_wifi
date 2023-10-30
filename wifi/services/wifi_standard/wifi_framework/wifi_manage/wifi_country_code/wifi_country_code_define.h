@@ -20,10 +20,11 @@
 
 namespace OHOS {
 namespace Wifi {
-constexpr int WIFI_COUNTRY_CODE_POLICE_DEF_LEN = 3;
+constexpr int WIFI_COUNTRY_CODE_POLICE_DEF_LEN = 4;
 const std::string SETTINGS_DATASHARE_KEY_WIFI_COUNTRY_CODE = "wifi_country_code";
 const std::string SETTINGS_DATASHARE_URI_WIFI_COUNTRY_CODE =
     "datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?Proxy=true&key=wifi_country_code";
+constexpr const char* DEFAULT_WIFI_COUNTRY_CODE_ZZ = "ZZ";  // for tablets only, priority greater than HK
 constexpr const char* DEFAULT_WIFI_COUNTRY_CODE = "HK";
 
 struct MccEntry {
@@ -762,7 +763,10 @@ const MccEntry MCC_TABLE[] = {
     {748, "uy", 2},
 
     // Falkland Islands Malvinas
-    {750, "fk", 2}
+    {750, "fk", 2},
+
+    // Fake country code, which is the default value^M
+    {0, "zz", 0}
 };
 }
 }

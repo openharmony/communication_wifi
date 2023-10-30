@@ -241,8 +241,16 @@
       "value": "10fp"
     },
     {
+      "name": "font_12",
+      "value": "12fp"
+    },
+    {
       "name": "font_14",
       "value": "14fp"
+    },
+    {
+      "name": "font_15",
+      "value": "15fp"
     },
     {
       "name": "font_16",
@@ -311,6 +319,10 @@
     {
       "name": "distance_4",
       "value": "4vp"
+    },
+    {
+      "name": "distance_5",
+      "value": "5vp"
     },
     {
       "name": "distance_6",
@@ -403,6 +415,10 @@
     {
       "name": "distance_36",
       "value": "36vp"
+    },
+    {
+      "name": "distance_54",
+      "value": "54vp"
     },
     {
       "name": "distance_64",
@@ -855,6 +871,50 @@
     {
       "name": "passwordSetting_button_width",
       "value": "261vp"
+    },
+    {
+      "name": "secondary_title",
+      "value": "20fp"
+    },
+    {
+      "name": "button_width",
+      "value": "156vp"
+    },
+    {
+      "name": "button_height",
+      "value": "40vp"
+    },
+    {
+      "name": "target_info_height",
+      "value": "135vp"
+    },
+    {
+      "name": "expanded_item_height",
+      "value": "148vp"
+    },
+    {
+      "name": "list_item_height",
+      "value": "64vp"
+    },
+    {
+      "name": "edit_panel_height",
+      "value": "84vp"
+    },
+    {
+      "name": "dialog_btn_height",
+      "value": "32vp"
+    },
+    {
+      "name": "dialog_btn_width",
+      "value": "96vp"
+    },
+    {
+      "name": "dialog_offset_y",
+      "value": "-16vp"
+    },
+    {
+      "name": "dialog_height",
+      "value": "168vp"
     }
   ]
 }

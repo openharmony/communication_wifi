@@ -24,6 +24,7 @@
 #include "wifi_device_proxy.h"
 #include "wifi_device_mgr_proxy.h"
 #include "wifi_logger.h"
+#include "wifi_common_util.h"
 
 DEFINE_WIFILOG_LABEL("WifiDeviceImpl");
 
@@ -152,7 +153,19 @@ ErrCode WifiDeviceImpl::PutWifiProtectRef(const std::string &protectName)
     RETURN_IF_FAIL(GetWifiDeviceProxy());
     return client_->PutWifiProtectRef(protectName);
 }
+#ifndef OHOS_ARCH_LITE
+ErrCode WifiDeviceImpl::GetWifiProtect(const WifiProtectMode &protectMode)
+{
+    std::string bundleName = GetBundleName();
+    return GetWifiProtectRef(protectMode, bundleName);
+}
 
+ErrCode WifiDeviceImpl::PutWifiProtect()
+{
+    std::string bundleName = GetBundleName();
+    return PutWifiProtectRef(bundleName);
+}
+#endif
 ErrCode WifiDeviceImpl::RemoveCandidateConfig(int networkId)
 {
     std::lock_guard<std::mutex> lock(mutex_);

@@ -49,6 +49,7 @@ WifiSettings::WifiSettings()
       mLastSelectedTimeVal(0),
       mScreenState(MODE_STATE_OPEN),
       mAirplaneModeState(MODE_STATE_CLOSE),
+      mDeviceProvision(MODE_STATE_OPEN),
       mAppRunningModeState(ScanMode::SYS_FOREGROUND_SCAN),
       mPowerSavingModeState(MODE_STATE_CLOSE),
       mFreezeModeState(MODE_STATE_CLOSE),
@@ -1770,7 +1771,7 @@ int WifiSettings::SetConnectTimeoutBssid(std::string &bssid, int instId)
 void WifiSettings::SetDefaultFrequenciesByCountryBand(const BandType band, std::vector<int> &frequencies, int instId)
 {
     for (auto& item : g_countryDefaultFreqs) {
-        if (item.countryCode == m_countryCode && item.band == band) {
+        if (item.band == band) {
             frequencies = item.freqs;
         }
     }

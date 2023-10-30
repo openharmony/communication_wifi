@@ -32,6 +32,7 @@ constexpr int MAX_ARP_DNS_CHECK_INTERVAL = 5;
 constexpr int MAX_ARP_DNS_CHECK_TIME = 1000;
 constexpr int MAX_RESULT_NUM = 2;
 constexpr int PORTAL_CONTENT_LENGTH_MIN = 4;
+constexpr int TIME_OUT_COUNT = 4000;
 
 StaNetworkCheck::StaNetworkCheck(NetStateHandler nethandle, ArpStateHandler arpHandle, DnsStateHandler dnsHandle,
     int instId)
@@ -108,10 +109,10 @@ void StaNetworkCheck::CheckResponseCode(std::string url, int codeNum, int contLe
         WIFI_LOGI("This network is portal AP, need certification!");
         netStateHandler(StaNetState::NETWORK_CHECK_PORTAL, url);
         lastNetState = NETWORK_CHECK_PORTAL;
-    } else if (isHttps && (lastNetState.load() != NETWORK_STATE_NOWORKING) &&
+    } else if (isHttps && (lastNetState.load() != NETWORK_STATE_NOINTERNET) &&
         (lastNetState.load() != NETWORK_CHECK_PORTAL)) {
         WIFI_LOGE("http detect network not working!");
-        lastNetState = NETWORK_STATE_NOWORKING;
+        lastNetState = NETWORK_STATE_NOINTERNET;
     } else {
         WIFI_LOGE("http detect unknow network!");
     }
@@ -227,11 +228,11 @@ void StaNetworkCheck::RunNetCheckThreadFunc()
             static_cast<int>(bakNetState));
         if (bakDetectFinsh && mainDetectFinsh &&
             ((mainNetState != NETWORK_CHECK_PORTAL && mainNetState != NETWORK_STATE_WORKING &&
-            bakNetState == NETWORK_STATE_NOWORKING) ||
+            bakNetState == NETWORK_STATE_NOINTERNET) ||
             (bakNetState != NETWORK_CHECK_PORTAL && bakNetState != NETWORK_STATE_WORKING &&
-            mainNetState == NETWORK_STATE_NOWORKING))) {
+            mainNetState == NETWORK_STATE_NOINTERNET))) {
             WIFI_LOGE("http detect result is not working!");
-            netStateHandler(StaNetState::NETWORK_STATE_NOWORKING, "");
+            netStateHandler(StaNetState::NETWORK_STATE_NOINTERNET, "");
             if (!arpChecker.DoArpCheck(MAX_ARP_DNS_CHECK_TIME, true)) {
                 LOGI("RunNetCheckThreadFunc arp check failed.");
                 arpStateHandler(StaArpState::ARP_STATE_UNREACHABLE);
@@ -322,9 +323,20 @@ void StaNetworkCheck::SignalNetCheckThread()
 
 void StaNetworkCheck::ExitNetCheckThread()
 {
+    WIFI_LOGI("enter StaNetworkCheck::ExitNetCheckThread");
+    int timeout = TIME_OUT_COUNT;
     isStopNetCheck = false;
     isExitNetCheckThread = true;
     while (!isExited) {
+        timeout--;
+        if (timeout < 0) {
+            if (pDealNetCheckThread != nullptr) {
+                delete pDealNetCheckThread;
+                pDealNetCheckThread = nullptr;
+            }
+            WIFI_LOGI("StaNetworkCheck::ExitNetCheckThread TimeOut Exit");
+            return;
+        }
         isExitNetCheckThread = true;
         mCondition.notify_one();
         mCondition_timeout.notify_one();

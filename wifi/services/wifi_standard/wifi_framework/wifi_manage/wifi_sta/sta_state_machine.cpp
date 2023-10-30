@@ -272,59 +272,59 @@ void StaStateMachine::BuildStateTree()
 void StaStateMachine::RegisterStaServiceCallback(const StaServiceCallback &callback)
 {
     WIFI_LOGI("RegisterStaServiceCallback, callback module name: %{public}s", callback.callbackModuleName.c_str());
-    m_staCallback.insert(callback);
+    m_staCallback.insert_or_assign(callback.callbackModuleName, callback);
 }
 
 void StaStateMachine::InvokeOnStaOpenRes(OperateResState state)
 {
     for (const auto &callBackItem : m_staCallback) {
-        if (callBackItem.OnStaOpenRes != nullptr) {
-            callBackItem.OnStaOpenRes(state, m_instId);
+        if (callBackItem.second.OnStaOpenRes != nullptr) {
+            callBackItem.second.OnStaOpenRes(state, m_instId);
         }
     }
 }
 
 void StaStateMachine::InvokeOnStaCloseRes(OperateResState state)
 {
-for (const auto &callBackItem : m_staCallback) {
-        if (callBackItem.OnStaCloseRes != nullptr) {
-            callBackItem.OnStaCloseRes(state, m_instId);
+    for (const auto &callBackItem : m_staCallback) {
+        if (callBackItem.second.OnStaCloseRes != nullptr) {
+            callBackItem.second.OnStaCloseRes(state, m_instId);
         }
     }
 }
 
 void StaStateMachine::InvokeOnStaConnChanged(OperateResState state, const WifiLinkedInfo &info)
 {
-for (const auto &callBackItem : m_staCallback) {
-        if (callBackItem.OnStaConnChanged != nullptr) {
-            callBackItem.OnStaConnChanged(state, info, m_instId);
+    for (const auto &callBackItem : m_staCallback) {
+        if (callBackItem.second.OnStaConnChanged != nullptr) {
+            callBackItem.second.OnStaConnChanged(state, info, m_instId);
         }
     }
 }
 
 void StaStateMachine::InvokeOnWpsChanged(WpsStartState state, const int code)
 {
-for (const auto &callBackItem : m_staCallback) {
-        if (callBackItem.OnWpsChanged != nullptr) {
-            callBackItem.OnWpsChanged(state, code, m_instId);
+    for (const auto &callBackItem : m_staCallback) {
+        if (callBackItem.second.OnWpsChanged != nullptr) {
+            callBackItem.second.OnWpsChanged(state, code, m_instId);
         }
     }
 }
 
 void StaStateMachine::InvokeOnStaStreamChanged(StreamDirection direction)
 {
-for (const auto &callBackItem : m_staCallback) {
-        if (callBackItem.OnStaStreamChanged != nullptr) {
-            callBackItem.OnStaStreamChanged(direction, m_instId);
+    for (const auto &callBackItem : m_staCallback) {
+        if (callBackItem.second.OnStaStreamChanged != nullptr) {
+            callBackItem.second.OnStaStreamChanged(direction, m_instId);
         }
     }
 }
 
 void StaStateMachine::InvokeOnStaRssiLevelChanged(int level)
 {
-for (const auto &callBackItem : m_staCallback) {
-        if (callBackItem.OnStaRssiLevelChanged != nullptr) {
-            callBackItem.OnStaRssiLevelChanged(level, m_instId);
+    for (const auto &callBackItem : m_staCallback) {
+        if (callBackItem.second.OnStaRssiLevelChanged != nullptr) {
+            callBackItem.second.OnStaRssiLevelChanged(level, m_instId);
         }
     }
 }
@@ -839,6 +839,7 @@ void StaStateMachine::DealSignalPollResult(InternalMessage *msg)
         LOGI("DealSignalPollResult currentSignalLevel:%{public}d, lastSignalLevel:%{public}d.\n",
             currentSignalLevel, lastSignalLevel);
         if (currentSignalLevel != lastSignalLevel) {
+            WifiSettings::GetInstance().SaveLinkedInfo(linkedInfo, m_instId);
             InvokeOnStaRssiLevelChanged(linkedInfo.rssi);
 #ifndef OHOS_ARCH_LITE
             if (NetSupplierInfo != nullptr) {
@@ -1039,6 +1040,9 @@ void StaStateMachine::DealConnectionEvent(InternalMessage *msg)
     /* Callback result to InterfaceService. */
     InvokeOnStaConnChanged(OperateResState::CONNECT_OBTAINING_IP, linkedInfo);
 
+    if (WifiSupplicantHalInterface::GetInstance().WpaSetPowerMode(true) != WIFI_IDL_OPT_OK) {
+        LOGE("DealConnectionEvent WpaSetPowerMode() failed!");
+    }
     /* The current state of StaStateMachine transfers to GetIpState. */
     SwitchState(pGetIpState);
     WifiSettings::GetInstance().SetUserLastSelectedNetworkId(INVALID_NETWORK_ID, m_instId);
@@ -1766,6 +1770,7 @@ void StaStateMachine::DisConnectProcess()
     InvokeOnStaConnChanged(OperateResState::DISCONNECT_DISCONNECTING, linkedInfo);
     if (WifiStaHalInterface::GetInstance().Disconnect() == WIFI_IDL_OPT_OK) {
         WIFI_LOGI("Disconnect() succeed!");
+        mPortalUrl = "";
 #ifndef OHOS_ARCH_LITE
         if (NetSupplierInfo != nullptr) {
             NetSupplierInfo->isAvailable_ = false;
@@ -2106,7 +2111,7 @@ void StaStateMachine::HandleNetCheckResult(StaNetState netState, const std::stri
         WIFI_LOGE("connState is NOT in connected state, connState:%{public}d\n", linkedInfo.connState);
         return;
     }
-
+    mPortalUrl = portalUrl;
     if (netState == StaNetState::NETWORK_STATE_WORKING) {
         WIFI_LOGI("HandleNetCheckResult network state is working\n");
         /* Save connection information to WifiSettings. */
@@ -2119,7 +2124,6 @@ void StaStateMachine::HandleNetCheckResult(StaNetState netState, const std::stri
     } else if (netState == StaNetState::NETWORK_CHECK_PORTAL) {
         WifiLinkedInfo linkedInfo;
         GetLinkedInfo(linkedInfo);
-        mPortalUrl = portalUrl;
         if (linkedInfo.detailedState != DetailedState::CAPTIVE_PORTAL_CHECK) {
             HandlePortalNetworkPorcess();
         }
@@ -2382,6 +2386,10 @@ void StaStateMachine::DealNetworkCheck(InternalMessage *msg)
         LOGE("pNetcheck is null.");
         return;
     }
+    if (linkedInfo.connState != ConnState::CONNECTED) {
+        WIFI_LOGE("DealNetworkCheck NOT in connected state, connState:%{public}d\n", linkedInfo.connState);
+        return;
+    }
     pNetcheck->SignalNetCheckThread();
 }
 
@@ -2461,6 +2469,10 @@ void StaStateMachine::DhcpResultNotify::OnSuccess(int status, const std::string 
         int64_t interval = result.uLeaseTime / 2 * TIME_USEC_1000; // s->ms
         LOGI("StartTimer CMD_START_RENEWAL_TIMEOUT interval=%{public}lld", interval);
         pStaStateMachine->StartTimer(static_cast<int>(CMD_START_RENEWAL_TIMEOUT), interval);
+    }
+
+    if (WifiSupplicantHalInterface::GetInstance().WpaSetPowerMode(false) != WIFI_IDL_OPT_OK) {
+        LOGE("DhcpResultNotify OnSuccess WpaSetPowerMode() failed!");
     }
     return;
 }

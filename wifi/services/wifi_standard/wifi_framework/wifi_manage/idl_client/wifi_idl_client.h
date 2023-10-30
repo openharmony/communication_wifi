@@ -1067,6 +1067,14 @@ public:
      * @return WifiErrorNo
      */
     WifiErrorNo ReqWpaSetSuspendMode(bool mode) const;
+
+    /**
+     * @Description Send power mode to wpa
+     *
+     * @param mode: true for power, false for resume
+     * @return WifiErrorNo
+     */
+    WifiErrorNo ReqWpaSetPowerMode(bool mode) const;
 public:
     RpcClient *pRpcClient;
 

@@ -859,3 +859,22 @@ WifiErrorNo SetSuspendMode(bool mode)
     return result;
 }
 
+WifiErrorNo SetPowerMode(bool mode)
+{
+    RpcClient *client = GetStaRpcClient();
+    LockRpcClient(client);
+    Context *context = client->context;
+    WriteBegin(context, 0);
+    WriteFunc(context, "SetPowerMode");
+    WriteInt(context, mode);
+    WriteEnd(context);
+    if (RpcClientCall(client, "SetPowerMode") != WIFI_IDL_OPT_OK) {
+        return WIFI_IDL_OPT_FAILED;
+    }
+    int result = WIFI_IDL_OPT_FAILED;
+    ReadInt(context, &result);
+    ReadClientEnd(client);
+    UnlockRpcClient(client);
+    return result;
+}
+

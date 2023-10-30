@@ -118,11 +118,22 @@ class EventRegister {
 public:
     EventRegister()
     {
-        mSaStatusListener = new WifiNapiAbilityStatusChange();
-        mSaStatusListener->Init(WIFI_DEVICE_ABILITY_ID);
-        mSaStatusListener->Init(WIFI_SCAN_ABILITY_ID);
-        mSaStatusListener->Init(WIFI_HOTSPOT_ABILITY_ID);
-        mSaStatusListener->Init(WIFI_P2P_ABILITY_ID);
+        int32_t ret;
+        auto samgrProxy = OHOS::SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+        if (samgrProxy == nullptr) {
+            WIFI_LOGI("samgrProxy is nullptr!");
+            return;
+        }
+        mSaStatusListener = new OHOS::Wifi::WifiNapiAbilityStatusChange();
+        if (mSaStatusListener == nullptr) {
+            WIFI_LOGI("mSaStatusListener is nullptr!");
+            return;
+        }
+        ret = samgrProxy->SubscribeSystemAbility((int32_t)WIFI_DEVICE_ABILITY_ID, mSaStatusListener);
+        samgrProxy->SubscribeSystemAbility((int32_t)WIFI_SCAN_ABILITY_ID, mSaStatusListener);
+        samgrProxy->SubscribeSystemAbility((int32_t)WIFI_HOTSPOT_ABILITY_ID, mSaStatusListener);
+        samgrProxy->SubscribeSystemAbility((int32_t)WIFI_P2P_ABILITY_ID, mSaStatusListener);
+        WIFI_LOGI("EventRegister, SubscribeSystemAbility return ret:%{public}d!", ret);
     }
     ~EventRegister() {
     }
@@ -141,7 +152,7 @@ private:
     bool IsEventSupport(const std::string& type);
     void DeleteRegisterObj(const napi_env& env, std::vector<RegObj>& vecRegObjs, napi_value& handler);
     void DeleteAllRegisterObj(const napi_env& env, std::vector<RegObj>& vecRegObjs);
-    WifiNapiAbilityStatusChange* mSaStatusListener;
+    OHOS::sptr<OHOS::ISystemAbilityStatusChange> mSaStatusListener = nullptr;
 };
 
 napi_value On(napi_env env, napi_callback_info cbinfo);

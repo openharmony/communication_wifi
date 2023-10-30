@@ -64,6 +64,8 @@ WifiOprMidState WifiConfigCenter::GetWifiMidState(int instId)
 
 bool WifiConfigCenter::SetWifiMidState(WifiOprMidState expState, WifiOprMidState state, int instId)
 {
+    WIFI_LOGI("SetWifiMidState expState:%{public}d,state:%{public}d,instId:%{public}d",
+        (int)expState, (int)state, instId);
     std::unique_lock<std::mutex> lock(mStaMutex);
     auto iter = mStaMidState.find(instId);
     if (iter != mStaMidState.end()) {
@@ -77,6 +79,7 @@ bool WifiConfigCenter::SetWifiMidState(WifiOprMidState expState, WifiOprMidState
 
 void WifiConfigCenter::SetWifiMidState(WifiOprMidState state, int instId)
 {
+    WIFI_LOGI("SetWifiMidState ,state:%{public}d,instId:%{public}d", (int)state, instId);
     std::unique_lock<std::mutex> lock(mStaMutex);
     auto ret = mStaMidState.emplace(instId, state);
     if (!ret.second) {
@@ -294,9 +297,9 @@ bool WifiConfigCenter::SetScanMidState(WifiOprMidState expState, WifiOprMidState
 void WifiConfigCenter::SetScanMidState(WifiOprMidState state, int instId)
 {
     std::unique_lock<std::mutex> lock(mScanMutex);
-    auto ret = mApMidState.emplace(instId, state);
+    auto ret = mScanMidState.emplace(instId, state);
     if (!ret.second) {
-        mApMidState[instId] = state;
+        mScanMidState[instId] = state;
     }
 }
 

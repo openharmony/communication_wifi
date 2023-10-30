@@ -71,7 +71,22 @@ public:
      * @return ErrCode - operation result
      */
     ErrCode PutWifiProtectRef(const std::string &protectName) override;
+#ifndef OHOS_ARCH_LITE
+    /**
+     * @Description Acquire the Wi-Fi protect mode.
+     *
+     * @param protectMode - WifiProtectMode object
+     * @return ErrCode - operation result
+     */
+    ErrCode GetWifiProtect(const WifiProtectMode &protectMode) override;
 
+    /**
+     * @Description Release the Wi-Fi protect mode.
+     *
+     * @return ErrCode - operation result
+     */
+    ErrCode PutWifiProtect() override;
+#endif
     /**
      * @Description Remove the wifi candidate device config equals to input network id
      *

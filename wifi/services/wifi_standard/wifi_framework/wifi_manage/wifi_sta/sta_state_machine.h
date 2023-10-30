@@ -560,6 +560,7 @@ private:
      */
     void SetOperationalMode(int mode);
     void SetSuspendMode(bool enabled);
+    void SetPowerMode(bool mode);
     void SetPowerSave(bool enabled);
     /**
      * @Description  Configure static ipaddress.
@@ -773,13 +774,7 @@ private:
 
 private:
     StaSmHandleFuncMap staSmHandleFuncMap;
-    struct CallbackModuleNameCmp {
-        bool operator() (const StaServiceCallback &cb1, const StaServiceCallback &cb2) const
-        {
-            return strcasecmp(cb1.callbackModuleName.c_str(), cb2.callbackModuleName.c_str()) < 0;
-        }
-    };
-    std::set<StaServiceCallback, CallbackModuleNameCmp> m_staCallback;
+    std::map<std::string, StaServiceCallback> m_staCallback;
 #ifndef OHOS_ARCH_LITE
     sptr<NetManagerStandard::NetSupplierInfo> NetSupplierInfo;
 #endif

@@ -306,10 +306,13 @@ enum class OperatorWifiType {
 };
 
 enum class StaApExclusionType {
-    USER_OPEN_WIFI_AUTO_STOP_AP,      /* User open wifi auto stop ap */
-    USER_OPEN_AP_AUTO_STOP_WIFI,      /* User open ap auto stop wifi */
-    USER_CLOSE_AP_AUTO_START_WIFI,    /* User close ap auto start wifi */
-    INITIAL_TYPE,                     /* initial type */
+    USER_OPEN_WIFI_AUTO_STOP_AP,         /* User open wifi auto stop ap */
+    USER_OPEN_AP_AUTO_STOP_WIFI,         /* User open ap auto stop wifi */
+    USER_CLOSE_AP_AUTO_START_WIFI,       /* User close ap auto start wifi */
+#ifndef OHOS_ARCH_LITE
+    USER_CLOSE_AP_IN_CLOSING_OR_OPENING, /*User close ap in ap closing */
+#endif
+    INITIAL_TYPE,                        /* initial type */
 };
 
 /* wifi config store */

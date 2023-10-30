@@ -153,6 +153,14 @@ ErrCode WifiDeviceImpl::PutWifiProtectRef(const std::string &protectName)
     RETURN_IF_FAIL(GetWifiDeviceProxy());
     return client_->PutWifiProtectRef(protectName);
 }
+
+ErrCode WifiDeviceImpl::IsHeldWifiProtect(bool &isHeld)
+{
+    std::string bundleName = GetBundleName();
+    RETURN_IF_FAIL(GetWifiDeviceProxy());
+    return client_->IsHeldWifiProtectRef(bundleName, isHeld);
+}
+
 #ifndef OHOS_ARCH_LITE
 ErrCode WifiDeviceImpl::GetWifiProtect(const WifiProtectMode &protectMode)
 {

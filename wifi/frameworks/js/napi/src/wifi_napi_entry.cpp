@@ -22,6 +22,17 @@
 namespace OHOS {
 namespace Wifi {
 #ifndef ENABLE_NAPI_COMPATIBLE
+static napi_value ProtectModeInit(napi_env env)
+{
+    napi_value protectMode = nullptr;
+    napi_create_object(env, &protectMode);
+    SetNamedPropertyByInteger(env, protectMode, static_cast<int>(ProtectModeJs::WIFI_PROTECT_FULL), "FULL_PROTECT");
+    SetNamedPropertyByInteger(env, protectMode, static_cast<int>(ProtectModeJs::WIFI_PROTECT_SCAN_ONLY), "SCAN_ONLY");
+    SetNamedPropertyByInteger(env, protectMode, static_cast<int>(ProtectModeJs::WIFI_PROTECT_FULL_HIGH_PERF), "HIGH_PERF");
+    SetNamedPropertyByInteger(env, protectMode, static_cast<int>(ProtectModeJs::WIFI_PROTECT_FULL_LOW_LATENCY), "LOW_LATENCY");
+    SetNamedPropertyByInteger(env, protectMode, static_cast<int>(ProtectModeJs::WIFI_PROTECT_NO_HELD), "NO_HELD");
+    return protectMode;
+}
 
 static napi_value SuppStateInit(napi_env env)
 {
@@ -261,6 +272,7 @@ static napi_value PropertyValueInit(napi_env env, napi_value exports)
     napi_value bandTypeObj = WifiBandTypeInit(env);
     napi_value proxyMethodObj = ProxyMethodInit(env);
 #endif
+    napi_value protectModeObj = ProtectModeInit(env);
     napi_property_descriptor exportFuncs[] = {
 #ifdef ENABLE_NAPI_WIFI_MANAGER
         DECLARE_NAPI_PROPERTY("Phase2Method", phase2MethodObj),
@@ -281,6 +293,7 @@ static napi_value PropertyValueInit(napi_env env, napi_value exports)
         DECLARE_NAPI_PROPERTY("P2pDeviceStatus", P2pDeviceStatusObj),
         DECLARE_NAPI_PROPERTY("GroupOwnerBand", groupOwnerBandObj),
         DECLARE_NAPI_PROPERTY("DisconnectedReason", disconnectedReasonObj),
+        DECLARE_NAPI_PROPERTY("ProtectMode", protectModeObj),
     };
     napi_define_properties(env, exports, sizeof(exportFuncs) / sizeof(napi_property_descriptor), exportFuncs);
     return exports;
@@ -372,6 +385,7 @@ static napi_value Init(napi_env env, napi_value exports) {
         DECLARE_NAPI_FUNCTION("off", Off),
         DECLARE_NAPI_FUNCTION("getWifiProtect", GetWifiProtect),
         DECLARE_NAPI_FUNCTION("putWifiProtect", PutWifiProtect),
+        DECLARE_NAPI_FUNCTION("isHeldWifiProtect", IsHeldWifiProtect),
     };
 
     NAPI_CALL(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(napi_property_descriptor), desc));

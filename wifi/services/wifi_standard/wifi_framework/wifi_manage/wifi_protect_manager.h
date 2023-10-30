@@ -85,6 +85,14 @@ public:
     bool PutWifiProtect(const std::string &name);
 
     /**
+     * @Description Applications whether or not hold WiFi protect
+     *
+     * @param name - represent the protect
+     * @return true - app has held wifi protect
+     * @return false - app has not held wifi protect
+     */
+    bool IsHeldWifiProtect(const std::string &name);
+    /**
      * @Description Set hi-perf mode protect state
      *
      * @param isEnabled - True to force hi-perf mode, false to leave it up to acquired wifiProtects
@@ -124,13 +132,13 @@ private:
     WifiProtectManager();
     bool AddProtect(const WifiProtectMode &protectMode, const std::string &name);
     bool ReleaseProtect(const std::string &name);
-    WifiProtect *RemoveProtect(const std::string &name);
+    std::shared_ptr<WifiProtect> RemoveProtect(const std::string &name);
 #ifndef OHOS_ARCH_LITE
     int GetFgLowlatyProtectCount();
     bool IsForegroundApplication(const std::string &BundleName);
 #endif
 private:
-    std::vector<WifiProtect *> mWifiProtects;
+    std::vector<std::shared_ptr<WifiProtect>> mWifiProtects;
     WifiProtectMode mCurrentOpMode {WifiProtectMode::WIFI_PROTECT_NO_HELD};
     int mFullHighPerfProtectsAcquired {0};
     int mFullHighPerfProtectsReleased {0};

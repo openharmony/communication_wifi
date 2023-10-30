@@ -335,6 +335,19 @@ public:
         pStaStateMachine->StopWifiProcess();
     }
 
+    void StopWifiProcessSuccess3()
+    {
+        pStaStateMachine->currentTpType = IPTYPE_IPV6;
+        pStaStateMachine->linkedInfo.connState = ConnState::CONNECTED;
+        EXPECT_CALL(WifiManager::GetInstance(), DealStaCloseRes(_, _)).Times(AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), SetMacAddress(_, _)).Times(testing::AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), SaveIpInfo(_, _));
+        EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_, _)).Times(testing::AtLeast(0));
+        EXPECT_CALL(WifiStaHalInterface::GetInstance(), StopWifi()).WillRepeatedly(Return(WIFI_IDL_OPT_OK));
+        EXPECT_CALL(WifiSettings::GetInstance(), SaveIpV6Info(_, _)).Times(testing::AtLeast(0));
+        pStaStateMachine->StopWifiProcess();
+    }
+
     void StopWifiProcessFail()
     {
         pStaStateMachine->currentTpType = IPTYPE_IPV6;
@@ -1802,6 +1815,11 @@ HWTEST_F(StaStateMachineTest, StopWifiProcessSuccess1, TestSize.Level1)
 HWTEST_F(StaStateMachineTest, StopWifiProcessSuccess2, TestSize.Level1)
 {
     StopWifiProcessSuccess2();
+}
+
+HWTEST_F(StaStateMachineTest, StopWifiProcessSuccess3, TestSize.Level1)
+{
+    StopWifiProcessSuccess3();
 }
 
 HWTEST_F(StaStateMachineTest, StopWifiProcessFail, TestSize.Level1)

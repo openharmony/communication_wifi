@@ -135,6 +135,18 @@ void WifiSettings::InitP2pVendorConfig()
     return;
 }
 
+void WifiSettings::InitPackageFilterConfig()
+{
+    if (mPackageFilterConfig.LoadConfig() >= 0) {
+        std::vector<PackageFilterConf> tmp;
+        mPackageFilterConfig.GetValue(tmp);
+        for (int i = 0; i < tmp.size(); i++) {
+            mFilterMap.insert(std::make_pair(tmp[i].filterName, tmp[i].packageList));
+        }
+    }
+    return;
+}
+
 int WifiSettings::ReloadPortalconf()
 {
     if (mSavedPortal.LoadConfig() >= 0) {
@@ -185,6 +197,7 @@ int WifiSettings::Init()
     ReloadMovingFreezePolicy();
     ReloadStaRandomMac();
     ReloadPortalconf();
+    InitPackageFilterConfig();
 #ifdef FEATURE_ENCRYPTION_SUPPORT
     SetUpHks();
 #endif
@@ -347,6 +360,13 @@ int WifiSettings::GetScanControlInfo(ScanControlInfo &info, int instId)
 {
     std::unique_lock<std::mutex> lock(mInfoMutex);
     info = mScanControlInfo;
+    return 0;
+}
+
+int WifiSettings::GetPackageFilterMap(std::map<std::string, std::vector<std::string>> &filterMap)
+{
+    std::unique_lock<std::mutex> lock(mInfoMutex);
+    filterMap = mFilterMap;
     return 0;
 }
 

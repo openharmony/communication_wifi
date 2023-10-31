@@ -1957,6 +1957,16 @@ public:
         EXPECT_TRUE(pScanService->IsPackageInTrustList("123456|", 0, "1234") == false);
     }
 
+    void IsAppInPackageFilterTest()
+    {
+        std::vector<std::string> packageFilter;
+        packageFilter.push_back("com.test.test");
+        EXPECT_CALL(WifiSettings::GetInstance(), SetAppPackageName("com.test.test"));
+        EXPECT_TRUE(pScanService->IsAppInPackageFilter(packageFilter) == true);
+        EXPECT_CALL(WifiSettings::GetInstance(), SetAppPackageName("com.test.test1"));
+        EXPECT_TRUE(pScanService->IsAppInPackageFilter(packageFilter) == false);
+    }
+
     void StartWpaSuccessTest()
     {
         EXPECT_CALL(WifiStaHalInterface::GetInstance(), StartWifi()).WillOnce(Return(WIFI_IDL_OPT_OK));
@@ -3091,6 +3101,16 @@ HWTEST_F(ScanServiceTest, WifiMaxThroughputTest, TestSize.Level1)
 HWTEST_F(ScanServiceTest, IsPackageInTrustListTest, TestSize.Level1)
 {
     IsPackageInTrustListTest();
+}
+/**
+ * @tc.name: IsAppInPackageFilterTest
+ * @tc.desc: IsAppInPackageFilter()
+ * @tc.type: FUNC
+ * @tc.require: issue
+*/
+HWTEST_F(ScanServiceTest, IsAppInPackageFilterTest, TestSize.Level1)
+{
+    IsAppInPackageFilterTest();
 }
 /**
  * @tc.name: AllowScanByMovingFreeze_001

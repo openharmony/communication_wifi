@@ -965,7 +965,7 @@ void StaStateMachine::Wpa3TransitionChangeIfNeed(int networkId)
         deviceConfig.keyMgmt = "SAE";
         WifiSettings::GetInstance().AddDeviceConfig(deviceConfig);
         WifiSettings::GetInstance().SyncDeviceConfig();
-        SyncDeviceConfigToWpa();        
+        SyncDeviceConfigToWpa();
     }
 }
 
@@ -1544,7 +1544,8 @@ int StaStateMachine::GetWpa3FailCount(int failreason, std::string ssid) const
         WIFI_LOGI("GetWpa3FailCount, no failreason count");
         return 0;
     }
-    WIFI_LOGI("GetWpa3FailCount ssid=%{public}s, failreason=%{public}d, count=%{public}d", ssid.c_str(), failreason, iter->second);
+    WIFI_LOGI("GetWpa3FailCount ssid=%{public}s, failreason=%{public}d, count=%{public}d",
+        ssid.c_str(), failreason, iter->second);
     return iter->second;
 }
 

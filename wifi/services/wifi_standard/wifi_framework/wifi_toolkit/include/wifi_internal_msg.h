@@ -443,6 +443,11 @@ struct WifiPortalConf {
     std::string portalBakHttpUrl;
     std::string portalBakHttpsUrl;
 };
+
+struct PackageFilterConf {
+    std::string filterName;
+    std::vector<std::string> packageList;
+};
 }  // namespace Wifi
 }  // namespace OHOS
 #endif

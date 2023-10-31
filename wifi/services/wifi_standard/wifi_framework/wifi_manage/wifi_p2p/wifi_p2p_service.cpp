@@ -153,7 +153,7 @@ ErrCode WifiP2pService::P2pConnect(const WifiP2pConfig &config)
     WpsInfo wps;
     wps.SetWpsMethod(WpsMethod::WPS_METHOD_PBC);
     configInternal.SetWpsInfo(wps);
-    p2pStateMachine.SetIsNeedDhcp(true);
+    p2pStateMachine.SetIsNeedDhcp(DHCPTYPE::DHCP_P2P);
     const std::any info = configInternal;
     p2pStateMachine.SendMessage(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_CONNECT), info);
 
@@ -279,12 +279,12 @@ ErrCode WifiP2pService::Hid2dConnect(const Hid2dConnectConfig& config)
 {
     WIFI_LOGI("Hid2dConnect");
 
-    bool isNeedDhcp = true;
+    DHCPTYPE dhcpType = DHCPTYPE::DHCP_LEGACEGO;
     if (config.GetDhcpMode() == DhcpMode::CONNECT_GO_NODHCP ||
         config.GetDhcpMode() == DhcpMode::CONNECT_AP_NODHCP) {
-        isNeedDhcp = false;
+        dhcpType = DHCPTYPE::NO_DHCP;
     }
-    p2pStateMachine.SetIsNeedDhcp(isNeedDhcp);
+    p2pStateMachine.SetIsNeedDhcp(dhcpType);
     const std::any info = config;
     p2pStateMachine.SendMessage(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_HID2D_CONNECT), info);
     return ErrCode::WIFI_OPT_SUCCESS;

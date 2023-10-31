@@ -67,25 +67,6 @@ bool IsProcessNeedToRestart()
 void SigHandler(int sig)
 {
     WIFI_LOGI("[Ap] Recv SIG: %{public}d\n", sig);
-    switch (sig) {
-        case SIGUSR2:
-            if (IsProcessNeedToRestart()) {
-                IApServiceCallbacks cb = WifiManager::GetInstance().GetApCallback();
-                sptr<WifiHotspotMgrServiceImpl> instancePtr = WifiHotspotMgrServiceImpl::GetInstance();
-                if (cb.OnApStateChangedEvent != nullptr && instancePtr != nullptr) {
-                    for (auto it = instancePtr->mWifiService.begin(); it != instancePtr->mWifiService.end(); it++) {
-                        int id = it->first;
-                        cb.OnApStateChangedEvent(ApState::AP_STATE_IDLE, id);
-                    }
-                }
-                WIFI_LOGE("[AP] --------------Abort process to restart!!!--------------\n");
-                abort();
-            }
-            break;
-
-        default:
-            break;
-    }
 }
 
 void WifiHotspotMgrServiceImpl::OnStart()

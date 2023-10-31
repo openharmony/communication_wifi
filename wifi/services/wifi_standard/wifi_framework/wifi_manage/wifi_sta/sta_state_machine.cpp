@@ -693,8 +693,14 @@ void StaStateMachine::StopWifiProcess()
         InvokeOnStaConnChanged(OperateResState::DISCONNECT_DISCONNECTED, linkedInfo);
     }
     
+#ifdef OHOS_ARCH_LITE
     if (WifiOprMidState::RUNNING == WifiConfigCenter::GetInstance().GetWifiScanOnlyMidState(m_instId) \
         || WifiStaHalInterface::GetInstance().StopWifi() == WIFI_IDL_OPT_OK) {
+#else
+    if ((WifiOprMidState::RUNNING == WifiConfigCenter::GetInstance().GetWifiScanOnlyMidState(m_instId) &&
+        WifiStaHalInterface::GetInstance().Disconnect() == WIFI_IDL_OPT_OK)
+        || WifiStaHalInterface::GetInstance().StopWifi() == WIFI_IDL_OPT_OK) {
+#endif
         /* Callback result to InterfaceService. */
         WifiSettings::GetInstance().SetWifiState(static_cast<int>(WifiState::DISABLED), m_instId);
         InvokeOnStaCloseRes(OperateResState::CLOSE_WIFI_SUCCEED);

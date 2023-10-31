@@ -15,8 +15,6 @@
 
 #include "wifi_protect.h"
 #ifndef OHOS_ARCH_LITE
-#include "app_mgr_client.h"
-#include "wifi_common_util.h"
 #include "wifi_log.h"
 
 #undef LOG_TAG

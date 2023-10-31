@@ -74,6 +74,7 @@ private:
     void OnRemoveCandidateConfig(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnIsBandTypeSupported(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnGet5GHzChannelList(uint32_t code, MessageParcel &data, MessageParcel &reply);
+    void OnStartPortalCertification(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnGetDisconnectedReason(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnSetFrozenApp(uint32_t code, MessageParcel& data, MessageParcel& reply);
     void OnResetAllFrozenApp(uint32_t code, MessageParcel& data, MessageParcel& reply);

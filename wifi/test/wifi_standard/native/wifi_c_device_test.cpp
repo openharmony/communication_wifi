@@ -356,6 +356,11 @@ public:
         int size = ZERO;
         EXPECT_TRUE(Get5GHzChannelList(&result, &size) != WIFI_SUCCESS);
     }
+
+    void StartPortalCertificationTest()
+    {
+        EXPECT_TRUE(StartPortalCertification() != WIFI_SUCCESS);
+    }
 };
 
 HWTEST_F(WifiCDeviceTest, EnableWifiSuccess, TestSize.Level1)

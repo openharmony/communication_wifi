@@ -402,6 +402,13 @@ ErrCode WifiDeviceImpl::Get5GHzChannelList(std::vector<int> &result)
     return client_->Get5GHzChannelList(result);
 }
 
+ErrCode WifiDeviceImpl::StartPortalCertification()
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    RETURN_IF_FAIL(GetWifiDeviceProxy());
+    return client_->StartPortalCertification();
+}
+
 bool WifiDeviceImpl::SetLowLatencyMode(bool enabled)
 {
     std::lock_guard<std::mutex> lock(mutex_);

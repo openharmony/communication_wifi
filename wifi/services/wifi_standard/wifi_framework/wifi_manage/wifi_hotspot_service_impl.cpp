@@ -350,7 +350,7 @@ ErrCode WifiHotspotServiceImpl::EnableHotspot(const ServiceType type)
     if (errCode != WIFI_OPT_SUCCESS) {
         return errCode;
     }
-
+#ifdef OHOS_ARCH_LITE
     WifiOprMidState staState = WifiConfigCenter::GetInstance().GetWifiMidState();
     if (staState != WifiOprMidState::CLOSED) {
 #ifdef FEATURE_STA_AP_EXCLUSION
@@ -414,6 +414,9 @@ ErrCode WifiHotspotServiceImpl::EnableHotspot(const ServiceType type)
         WifiManager::GetInstance().StopUnloadApSaTimer();
         WifiConfigCenter::GetInstance().SetStaApExclusionType(static_cast<int>(StaApExclusionType::INITIAL_TYPE));
     }
+#else
+    errCode = WifiManager::GetInstance().SoftapToggled(1, m_id);
+#endif
     return errCode;
 }
 
@@ -428,7 +431,7 @@ ErrCode WifiHotspotServiceImpl::DisableHotspot(const ServiceType type)
         WIFI_LOGE("EnableHotspot:VerifyManageWifiHotspotPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
-
+#ifdef OHOS_ARCH_LITE
     WifiOprMidState curState = WifiConfigCenter::GetInstance().GetApMidState(m_id);
     if (curState != WifiOprMidState::RUNNING) {
         WIFI_LOGI("current ap state is %{public}d", static_cast<int>(curState));
@@ -462,6 +465,10 @@ ErrCode WifiHotspotServiceImpl::DisableHotspot(const ServiceType type)
     }
 #endif
     return WIFI_OPT_SUCCESS;
+#else
+    ErrCode errCode = WifiManager::GetInstance().SoftapToggled(0, m_id);
+    return errCode;
+#endif
 }
 
 ErrCode WifiHotspotServiceImpl::AddBlockList(const StationInfo &info)

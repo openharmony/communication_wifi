@@ -232,7 +232,7 @@ export function testGetScanInfosCallback(): string {
 //TODO: 设备调试时候需要打开
 //let ssid = "TP-LINK_6365"
 //let bssid = "6C:B1:58:75:63:65"
-//let preSharedKey = "kaihong123"
+//let preSharedKey = "12345678"
 //let isHiddenSsid = false
 //let securityType = 3
 //let creatorUid = 1
@@ -1045,7 +1045,7 @@ export function testOnWifiConnectionChange(): string {
         prompt.showToast( { message : "连接状态: " + wifiConnectionMessage } )
         console.log( TAG , LogData.testOnWifiConnectionChange_EndLog );
       } )
-      message = ( MessageData.onP2pConnectionChangeTest )
+      message = ( MessageData.onWifiConnectionChangeTest )
       prompt.showToast( { message : message } )
     }
     wifiConnectionChange = !wifiConnectionChange

@@ -256,10 +256,9 @@ bool ConvertMncToIso(int mnc, std::string &wifiCountryCode);
 /**
  * @Description Convert the letters to upper.
  *
- * @param str - lowercase letters
- * @return capital letters
+ * @param str - input lowercase letters and output upper letters
  */
-std::string StrToUpper(const std::string &str);
+void StrToUpper(std::string &str);
 
 /**
  * @Description Converting char to numbers

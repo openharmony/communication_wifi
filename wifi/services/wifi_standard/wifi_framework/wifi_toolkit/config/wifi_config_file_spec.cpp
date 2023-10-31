@@ -1330,6 +1330,14 @@ template <> void ClearTClass<WifiPortalConf>(WifiPortalConf &item)
     return;
 }
 
+template <> 
+void ClearTClass<PackageFilterConf>(PackageFilterConf &item)
+{
+    item.filterName.clear();
+    item.packageList.clear();
+    return;
+}
+
 template <>
 int SetTClassKeyValue<WifiPortalConf>(WifiPortalConf &item, const std::string &key, const std::string &value)
 {
@@ -1342,6 +1350,21 @@ int SetTClassKeyValue<WifiPortalConf>(WifiPortalConf &item, const std::string &k
         item.portalBakHttpUrl = value;
     } else if (key == "httpsbak") {
         item.portalBakHttpsUrl = value;
+    } else {
+        LOGE("Invalid config key value");
+        errorKeyValue++;
+    }
+    return errorKeyValue;
+}
+
+template <>
+int SetTClassKeyValue<PackageFilterConf>(PackageFilterConf &item, const std::string &key, const std::string &value)
+{
+    int errorKeyValue = 0;
+    if (key == "filterName") {
+        item.filterName = value;
+    } else if (key == "package") {
+        item.packageList.push_back(value);
     } else {
         LOGE("Invalid config key value");
         errorKeyValue++;

@@ -18,6 +18,9 @@
 
 #include <cstdint>
 #include <string>
+#include "common_event_manager.h"
+#include "common_event_support.h"
+#include "common_event_subscriber.h"
 #include "wifi_country_code_policy_base.h"
 #include "wifi_errcode.h"
 
@@ -33,7 +36,7 @@ public:
     /**
      * @Description WifiCountryCodePolicyMobile destructor
      */
-    ~WifiCountryCodePolicyMobile() override = default;
+    ~WifiCountryCodePolicyMobile() override;
 
     /**
      * @Description calculate and get wifi country code
@@ -42,6 +45,28 @@ public:
      */
     ErrCode CalculateWifiCountryCode(std::string &wifiCountryCode) override;
 private:
+    class TelephoneNetworkSearchStateChangeListener : public OHOS::EventFwk::CommonEventSubscriber {
+    public:
+        /**
+         * @Description TelephoneNetworkSearchStateChangeListener constructor
+         */
+        explicit TelephoneNetworkSearchStateChangeListener(
+            const OHOS::EventFwk::CommonEventSubscribeInfo &subscriberInfo);
+
+        /**
+         * @Description TelephoneNetworkSearchStateChangeListener destructor
+         */
+        ~TelephoneNetworkSearchStateChangeListener() = default;
+
+        /**
+        * @Description on receive telephone network search state change event
+        *
+        * @param direction - event data
+        */
+        void OnReceiveEvent(const OHOS::EventFwk::CommonEventData &eventData) override;
+    };
+    std::shared_ptr<TelephoneNetworkSearchStateChangeListener> m_telephoneNetworkSearchStateChangeListener;
+
     void InitPolicy();
     ErrCode GetWifiCountryCodeByMcc(std::string &wifiCountryCode);
 };

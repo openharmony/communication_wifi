@@ -23,6 +23,7 @@ import ConfigData from '../../Utils/ConfigData';
 import { initWifiApiData } from '../../MainAbility/model/testDataModels'
 import { TestData } from '../../MainAbility/model/testData'
 import wifi from '@ohos.wifi';
+import wifiManager from '@ohos.wifiManager';
 import prompt from '@system.prompt';
 
 /**
@@ -55,6 +56,7 @@ struct WiFiConnectStabilityTest {
   @State connectionMessageLog: String = ""
   @State connectionLoopState: Boolean = true
   @State showList: boolean = false;
+  @State ipInfo: string = ""
   @StorageLink( 'wifiConfig' ) wifiConfig: Object = {
     ssid : String = "TP-LINK_6365" ,
     bssid : String = "6C:B1:58:75:63:65" ,
@@ -115,38 +117,38 @@ struct WiFiConnectStabilityTest {
           Column() {
             Text( "测试结果：" )
               .fontSize( "22vp" )
-              .width( '95%' )
+              .width( ConfigData.WH_95_100 )
               .align( Alignment.TopStart )
               .padding( { top : "10vp" } )
             Scroll() {
               Column() {
                 Text( "测试次数：" + this.testNumbers )
-                  .fontSize( "17vp" )
+                  .fontSize( "18vp" )
                   .margin( { top : "5vp" , left : "10vp" , right : "5vp" } )
                   .textAlign( TextAlign.Start )
                   .width( ConfigData.WH_90_100 )
                 Text( "连接的成功次数：" + this.connectSuccessNumber )
-                  .fontSize( "17vp" )
+                  .fontSize( "18vp" )
                   .margin( { top : "5vp" , left : "10vp" , right : "5vp" } )
                   .textAlign( TextAlign.Start )
                   .width( ConfigData.WH_90_100 )
                 Text( "连接的失败次数：" + this.connectFailNumber )
-                  .fontSize( "17vp" )
+                  .fontSize( "18vp" )
                   .margin( { top : "5vp" , left : "10vp" , right : "5vp" } )
                   .textAlign( TextAlign.Start )
                   .width( ConfigData.WH_90_100 )
                 Text( "断连的成功次数：" + this.disconnectSuccessNumber )
-                  .fontSize( "17vp" )
+                  .fontSize( "18vp" )
                   .margin( { top : "5vp" , left : "10vp" , right : "5vp" } )
                   .textAlign( TextAlign.Start )
                   .width( ConfigData.WH_90_100 )
                 Text( "断连的失败次数：" + this.disconnectFailNumber )
-                  .fontSize( "17vp" )
+                  .fontSize( "18vp" )
                   .margin( { top : "5vp" , left : "10vp" , right : "5vp" } )
                   .textAlign( TextAlign.Start )
                   .width( ConfigData.WH_90_100 )
               }
-              .width( ConfigData.WH_100_100 )
+              .width( ConfigData.WH_95_100 )
               .backgroundColor( $r( "sys.color.ohos_id_color_foreground_contrary" ) )
             }
             .scrollBarWidth( 10 )
@@ -156,23 +158,23 @@ struct WiFiConnectStabilityTest {
 
           Column() {
             Text( "log显示：" )
-              .fontSize( 22 )
-              .width( '95%' )
+              .fontSize( "22vp" )
+              .width( ConfigData.WH_95_100 )
               .align( Alignment.TopStart )
               .padding( { top : "10vp" } )
             List() {
               ListItem() {
                 Text( this.connectionMessageLog )
-                  .fontSize( "20vp" )
-                  .margin( { top : "5vp" , left : "30vp" , right : "10vp" } )
+                  .fontSize( "18vp" )
+                  .margin( { top : "5vp" , left : "10vp" , right : "5vp" } )
                   .textAlign( TextAlign.Start )
                   .width( ConfigData.WH_90_100 )
               }
             }
-            .height( ConfigData.WH_80_100 )
-            .width( ConfigData.WH_90_100 )
+            .height( ConfigData.WH_83_100 )
+            .width( ConfigData.WH_95_100 )
             .backgroundColor( $r( "sys.color.ohos_id_color_foreground_contrary" ) )
-          }.width( "100%" ).height( "60%" )
+          }.width( ConfigData.WH_100_100 ).height( ConfigData.WH_60_100 )
 
         }.width( "100%" ).height( "60%" ).backgroundColor( $r( "app.color.lead" ) )
 
@@ -197,7 +199,7 @@ struct WiFiConnectStabilityTest {
                       console.log( TAG , "测试结束------------" )
                       break;
                     } else {
-                      let wifiState = wifi.isWifiActive()
+                      let wifiState = wifiManager.isWifiActive()
                       if ( !wifiState ) {
                         wifi.enableWifi()
                         console.log( TAG , "wifi当前未使能，已经使能，正常开始测试------" )
@@ -218,8 +220,8 @@ struct WiFiConnectStabilityTest {
                       // prompt.showToast( { message : funcMessage } )
                       if ( self.connectionMessage == "connected" ) {
                         self.connect_SpendTime = self.connect_EndTime - self.connect_StartTime
-                        self.connectionMessageLog += "第" + ( self.connectNumber + 1 ) + "次WIFI连接耗时: " + self.connect_SpendTime + "ms" + "\n"
-                        console.log( TAG , "第" + ( self.connectNumber + 1 ) + "次WIFI连接耗时: " + self.connect_SpendTime + "ms" )
+                        self.connectionMessageLog += "第" + ( self.connectNumber + 1 ) + "次WIFI连接耗时: " + self.connect_SpendTime + "ms; IP: " + self.ipInfo + "\n"
+                        console.log( TAG , "第" + ( self.connectNumber + 1 ) + "次WIFI连接耗时: " + self.connect_SpendTime + "ms; IP: " + self.ipInfo )
                         self.connectSuccessNumber = self.connectSuccessNumber + 1
                         self.connectionMessageLog += "连接成功的次数：" + self.connectSuccessNumber + "\n"
                         console.log( TAG , "连接成功的次数：" + self.connectSuccessNumber )
@@ -249,7 +251,7 @@ struct WiFiConnectStabilityTest {
                         self.connectFailNumber = self.connectFailNumber + 1
                         break;
                       } else {
-                        console.log( "第" + m + "次连接后状态不清楚" );
+                        console.log( "第" + ( self.connectNumber + 1 ) + "次连接后状态不清楚" );
                         break;
                       }
                     }
@@ -282,8 +284,8 @@ struct WiFiConnectStabilityTest {
 
   onConnectionState() {
     console.log( TAG , "on.wifiConnectionChange start--------" )
-    wifi.on( "wifiConnectionChange" , ( number ) => {
-      console.log( TAG , " on.wifiConnectionChange success--------" )
+    wifiManager.on( "wifiConnectionChange" , ( number ) => {
+      console.log( TAG , " on.wifiConnectionChange --------" )
       let wifiConnectionMessage = ""
       switch ( number ) {
         case 0:
@@ -296,20 +298,23 @@ struct WiFiConnectStabilityTest {
           wifiConnectionMessage = '未知状态';
           break;
       }
+      console.log( TAG , "wifi连接状态为:" + wifiConnectionMessage )
       if ( number == 1 ) {
         // 打时间戳
         this.connect_EndTime = new Date().getTime()
         console.log( TAG , "WIFI连接结束时间: " + this.connect_EndTime + "ms" )
+        this.ipInfo = wifiManager.getIpInfo().ipAddress
       } else if ( number == 0 ) {
         this.disconnect_EndTime = new Date().getTime()
         console.log( TAG , "WIFI断连结束时间: " + this.disconnect_EndTime + "ms" )
+        let removeMessage = wifi.removeAllNetwork()
+        console.log( TAG , "移除网络配置的结果: " + removeMessage )
       }
-      console.log( TAG , " on.wifiConnectionChange  callback success --------" )
+      console.log( TAG , " on.wifiConnectionChange callback success --------" )
       prompt.showToast( { message : "wifi连接状态: " + wifiConnectionMessage } )
       this.connectionMessage = wifiConnectionMessage
-      console.log( TAG , "wifiConnectionChange:" + this.connectionMessage )
       AppStorage.SetOrCreate( "connectionMessage" , this.connectionMessage )
-      console.log( TAG , " on.wifiConnectionChange end--------" )
+      console.log( TAG , " on.wifiConnectionChange callback end--------" )
       return this.connectionMessage
     } )
     return this.connectionMessage
@@ -323,7 +328,7 @@ struct setWifiDevice {
   @StorageLink( 'wifiConfig' ) wifiConfig: Object = {
     ssid : String = "TP-LINK_6365" ,
     bssid : String = "6C:B1:58:75:63:65" ,
-    preSharedKey : String = "kaihong123" ,
+    preSharedKey : String = "12345678" ,
     isHiddenSsid : Boolean = false ,
     securityType : Number = 3 ,
     creatorUid : Number = 1 ,
@@ -388,7 +393,7 @@ struct setWifiDevice {
 
             Row() {
               Text( "preSharedKeyM:" ).fontSize( "15vp" ).width( 110 );
-              TextInput( { text : this.wifiConfig.preSharedKey , placeholder : "kaihong123" } )
+              TextInput( { text : this.wifiConfig.preSharedKey , placeholder : "12345678" } )
                 .fontSize( "15vp" )
                 .onChange( ( strInput ) => {
                   //判断合法性

@@ -1168,6 +1168,14 @@ void ScanService::GetScanControlInfo()
     if (WifiSettings::GetInstance().GetScanControlInfo(scanControlInfo, m_instId) != 0) {
         WIFI_LOGE("WifiSettings::GetInstance().GetScanControlInfo failed");
     }
+    std::map<std::string, std::vector<std::string>> filterMap;
+    if (WifiSettings::GetInstance().GetPackageFilterMap(filterMap) != 0) {
+        WIFI_LOGE("WifiSettings::GetInstance().GetPackageFilterMap failed");
+    }
+    scan_thermal_trust_list = filterMap["scan_thermal_filter"];
+    scan_frequency_trust_list = filterMap["scan_frequency_filter"];
+    scan_screen_off_trust_list = filterMap["scan_screen_off_filter"];
+    scan_gps_block_list = filterMap["scan_gps_filter"];
     return;
 }
 
@@ -1473,9 +1481,12 @@ ErrCode ScanService::ApplyScanPolices(ScanType type)
 bool ScanService::AllowExternScanByThermal()
 {
     WIFI_LOGI("Enter ScanService::AllowExternScanByThermal.\n");
-
+    if (IsAppInPackageFilter(scan_thermal_trust_list)) {
+        WIFI_LOGI("no need to control this scan");
+        return true;
+    }
     auto level = WifiSettings::GetInstance().GetThermalLevel();
-    static const int THERMAL_LEVEL_HOT = 3;
+    static const int THERMAL_LEVEL_HOT = 4;
     if (level >= THERMAL_LEVEL_HOT) {
         WIFI_LOGW("ScanService::AllowExternScanByThermal, level=%{public}d is higher than hot\n", level);
         return false;
@@ -1499,6 +1510,9 @@ bool ScanService::AllowExternScanByForbid(int staScene, ScanMode scanMode)
 
     int state = WifiSettings::GetInstance().GetScreenState();
     if (state == MODE_STATE_CLOSE) {
+        if (IsAppInPackageFilter(scan_screen_off_trust_list)) {
+            return true;
+        }
         if (!AllowScanDuringScreenOff(scanMode)) {
             return false;
         }
@@ -1526,6 +1540,9 @@ bool ScanService::AllowExternScanByInterval(int appId, int staScene, ScanMode sc
 {
     WIFI_LOGI("Enter ScanService::AllowExternScanByInterval.\n");
 
+    if (IsAppInPackageFilter(scan_frequency_trust_list)) {
+        return true;
+    }
     if (!AllowExternScanByIntervalMode(appId, staScene, scanMode)) {
         return false;
     }
@@ -2340,14 +2357,12 @@ ErrCode ScanService::CloseWpa()
 ErrCode ScanService::OpenScanOnly() const
 {
     WIFI_LOGI("Enter ScanService::OpenScanOnly.\n");
-    mScanSerivceCallbacks.OnOpenScanOnlyRes(OperateResState::OPEN_SCAN_ONLY_SUCCEED, m_instId);
     return WIFI_OPT_SUCCESS;
 }
 
 ErrCode ScanService::CloseScanOnly() const
 {
     WIFI_LOGI("Enter ScanService::CloseScanOnly.\n");
-    mScanSerivceCallbacks.OnCloseScanOnlyRes(OperateResState::CLOSE_SCAN_ONLY_SUCCEED, m_instId);
     return WIFI_OPT_SUCCESS;
 }
 
@@ -2369,6 +2384,15 @@ ErrCode ScanService::OnSystemAbilityChanged(int systemAbilityId, bool add)
 #endif
 
     return WIFI_OPT_SUCCESS;
+}
+
+bool ScanService::IsAppInPackageFilter(std::vector<std::string> &packageFilter) 
+{
+    std::string packageName = WifiSettings::GetInstance().GetAppPackageName();
+    if (std::find(packageFilter.begin(), packageFilter.end(), packageName) != packageFilter.end()) {
+        return true;
+    }
+    return false;
 }
 
 int CalculateBitPerTone(int snrDb)

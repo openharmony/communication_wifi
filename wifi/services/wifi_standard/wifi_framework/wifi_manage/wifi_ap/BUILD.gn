@@ -80,6 +80,11 @@ ohos_shared_library("wifi_ap_service") {
     "hilog:libhilog",
   ]
 
+  if (defined(global_parts_info.powermgr_battery_manager)) {
+    external_deps += [ "battery_manager:batterysrv_client" ]
+    cflags_cc += [ "-DHAS_BATTERY_MANAGER_PART" ]
+  }
+
   deps = [
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage:wifi_manager_service",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/idl_client:wifi_idl_client",

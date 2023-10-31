@@ -376,7 +376,12 @@ public:
      * @return ErrCode - operation result
      */
     ErrCode ResetAllFrozenApp() override;
-
+    /**
+     * @Description start portal certification
+     *
+     * @return ErrCode - operation result
+     */
+    ErrCode StartPortalCertification() override;
 #ifdef OHOS_ARCH_LITE
     /**
     * @Description Handle remote object died event.

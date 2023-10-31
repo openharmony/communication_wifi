@@ -56,8 +56,8 @@ DEFINE_WIFILOG_LABEL("StaStateMachine");
 #define MAC_ASSOC_RSP_TIMEOUT 5203
 #define WPA3_AUTH_TIMEOUT 1
 #define WPA3_ASSOC_TIMEOUT 2
-#define WPA3_BLACKLIST_MAX_NUM 20
-#define WPA3_BLACKLIST_RSSI_THRESHOLD (-70)
+#define WPA3_BLACKMAP_MAX_NUM 20
+#define WPA3_BLACKMAP_RSSI_THRESHOLD (-70)
 #define WPA3_CONNECT_FAIL_COUNT_THRESHOLD 2
 StaStateMachine::StaStateMachine(int instId)
     : StateMachine("StaStateMachine"),
@@ -1566,7 +1566,7 @@ void StaStateMachine::AddWpa3FailCount(int failreason, std::string ssid)
 
 void StaStateMachine::AddWpa3BlackMap(std::string ssid)
 {
-    if (wpa3BlackMap.size() == WPA3_BLACKLIST_MAX_NUM) {
+    if (wpa3BlackMap.size() == WPA3_BLACKMAP_MAX_NUM) {
         auto iter = wpa3BlackMap.begin();
         auto oldestIter = wpa3BlackMap.begin();
         for (; iter != wpa3BlackMap.end(); iter++) {
@@ -1603,7 +1603,7 @@ void StaStateMachine::OnWifiWpa3SelfCure(int failreason, int networkId)
         WIFI_LOGE("OnWifiWpa3SelfCure, is not wpa3 transition");
         return;
     }
-    if (linkedInfo.rssi <= WPA3_BLACKLIST_RSSI_THRESHOLD) {
+    if (linkedInfo.rssi <= WPA3_BLACKMAP_RSSI_THRESHOLD) {
         WIFI_LOGE("OnWifiWpa3SelfCure, rssi less then -70");
         return;
     }

@@ -471,6 +471,15 @@ template <>
 void ClearTClass<WifiPortalConf>(WifiPortalConf &item);
 
 /**
+ * @Description Clear and init PackageFilterConf
+ *
+ * @tparam
+ * @param item - PackageFilterConf &item
+ */
+template <>
+void ClearTClass<PackageFilterConf>(PackageFilterConf &item);
+
+/**
  * @Description Set WifiPortalConf item data
  *
  * @tparam
@@ -481,6 +490,18 @@ void ClearTClass<WifiPortalConf>(WifiPortalConf &item);
  */
 template <>
 int SetTClassKeyValue<WifiPortalConf>(WifiPortalConf &item, const std::string &key, const std::string &value);
+
+/**
+ * @Description Set PackageFilterConf item data
+ *
+ * @tparam
+ * @param item - PackageFilterConf &item
+ * @param key - PackageFilterConf struct member name
+ * @param value - the PackageFilterConf item member value
+ * @return int - parse error: 0 Success, >0 parse failed
+ */
+template <>
+int SetTClassKeyValue<PackageFilterConf>(PackageFilterConf &item, const std::string &key, const std::string &value);
 
 /**
  * @Description Output WifiPortalConf class name

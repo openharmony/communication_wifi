@@ -57,6 +57,7 @@ constexpr char WIFI_STA_RANDOM_MAC_FILE_PATH[] = CONFIG_ROOR_DIR"/sta_randomMac.
 constexpr char PORTAL_CONFIG_FILE_PATH[] = "/system/etc/wifi/wifi_portal.conf";
 constexpr char DUAL_WIFI_CONFIG_FILE_PATH[] = CONFIG_ROOR_DIR"/WifiConfigStore.xml";
 constexpr char DUAL_SOFTAP_CONFIG_FILE_PATH[] = CONFIG_ROOR_DIR"/WifiConfigStoreSoftAp.xml";
+constexpr char PACKAGE_FILTER_CONFIG_FILE_PATH[] = "/system/etc/wifi/wifi_package_filter.cfg";
 
 namespace OHOS {
 namespace Wifi {
@@ -204,6 +205,14 @@ public:
      * @return int - 0 success
      */
     int SetScanControlInfo(const ScanControlInfo &info, int instId = 0);
+
+    /**
+     * @Description Get the filter info
+     *
+     * @param filterMap - output package map
+     * @return int - 0 success
+     */
+    int GetPackageFilterMap(std::map<std::string, std::vector<std::string>> &filterMap);
 
     /**
      * @Description Add Device Configuration
@@ -1414,6 +1423,7 @@ private:
     void MergeSoftapConfig();
     void MergeWifiConfig();
 #endif
+    void InitPackageFilterConfig();
 
 private:
     int mWifiStaCapabilities;            /* Sta capability */
@@ -1487,9 +1497,11 @@ private:
     MovingFreezePolicy mFPolicy;
     WifiConfigFileImpl<WifiStoreRandomMac> mSavedWifiStoreRandomMac;
     WifiConfigFileImpl<WifiPortalConf> mSavedPortal;
+    WifiConfigFileImpl<PackageFilterConf> mPackageFilterConfig;
     bool explicitGroup;
     std::atomic_bool mThreadStatusFlag_ { false };
     std::atomic_uint64_t mThreadStartTime { 0 };
+    std::map<std::string, std::vector<std::string>> mFilterMap;
 };
 }  // namespace Wifi
 }  // namespace OHOS

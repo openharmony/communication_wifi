@@ -55,6 +55,9 @@ const std::string WIFI_TRUST_LIST_POLICY_FILE_PATH = CONFIG_ROOR_DIR"/trust_list
 const std::string WIFI_MOVING_FREEZE_POLICY_FILE_PATH = CONFIG_ROOR_DIR"/moving_freeze_policy.conf";
 constexpr char WIFI_STA_RANDOM_MAC_FILE_PATH[] = CONFIG_ROOR_DIR"/sta_randomMac.conf";
 constexpr char PORTAL_CONFIG_FILE_PATH[] = "/system/etc/wifi/wifi_portal.conf";
+constexpr char DUAL_WIFI_CONFIG_FILE_PATH[] = CONFIG_ROOR_DIR"/WifiConfigStore.xml";
+constexpr char DUAL_SOFTAP_CONFIG_FILE_PATH[] = CONFIG_ROOR_DIR"/WifiConfigStoreSoftAp.xml";
+constexpr char PACKAGE_FILTER_CONFIG_FILE_PATH[] = "/system/etc/wifi/wifi_package_filter.cfg";
 
 namespace OHOS {
 namespace Wifi {
@@ -118,7 +121,12 @@ public:
      * @return int - 0 success
      */
     int SetWifiState(int state, int instId = 0);
-
+#ifndef OHOS_ARCH_LITE
+    void SetWifiToggledState(bool state);
+    bool GetWifiToggledState() const;
+    void SetWifiStopState(bool state);
+    bool GetWifiStopState() const;
+#endif
     /**
      * @Description Get the ScanAlways switch state
      *
@@ -202,6 +210,14 @@ public:
      * @return int - 0 success
      */
     int SetScanControlInfo(const ScanControlInfo &info, int instId = 0);
+
+    /**
+     * @Description Get the filter info
+     *
+     * @param filterMap - output package map
+     * @return int - 0 success
+     */
+    int GetPackageFilterMap(std::map<std::string, std::vector<std::string>> &filterMap);
 
     /**
      * @Description Add Device Configuration
@@ -1408,10 +1424,19 @@ private:
     void InitScanControlIntervalList();
     void InitScanControlInfo();
     void GetLinkedChannelWidth();
+#ifndef OHOS_ARCH_LITE
+    void MergeSoftapConfig();
+    void MergeWifiConfig();
+#endif
+    void InitPackageFilterConfig();
 
 private:
     int mWifiStaCapabilities;            /* Sta capability */
     std::atomic<int> mWifiState;         /* Sta service state */
+#ifndef OHOS_ARCH_LITE
+    bool mWifiToggled;
+    bool mWifiStoping;
+#endif
     std::atomic<bool> mScanAlwaysActive; /* if scan always */
     std::vector<WifiScanInfo> mWifiScanInfoList;
     std::vector<WifiP2pGroupInfo> mGroupInfoList;
@@ -1467,6 +1492,10 @@ private:
     std::mutex mInfoMutex;
     std::mutex mP2pMutex;
     std::mutex mWifiConfigMutex;
+#ifndef OHOS_ARCH_LITE
+    std::mutex mWifiToggledMutex;
+    std::mutex mWifiStopMutex;
+#endif
 
     std::atomic_flag deviceConfigLoadFlag = ATOMIC_FLAG_INIT;
 
@@ -1481,9 +1510,11 @@ private:
     MovingFreezePolicy mFPolicy;
     WifiConfigFileImpl<WifiStoreRandomMac> mSavedWifiStoreRandomMac;
     WifiConfigFileImpl<WifiPortalConf> mSavedPortal;
+    WifiConfigFileImpl<PackageFilterConf> mPackageFilterConfig;
     bool explicitGroup;
     std::atomic_bool mThreadStatusFlag_ { false };
     std::atomic_uint64_t mThreadStartTime { 0 };
+    std::map<std::string, std::vector<std::string>> mFilterMap;
 };
 }  // namespace Wifi
 }  // namespace OHOS

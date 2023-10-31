@@ -39,6 +39,8 @@ class WifiCountryCodePolicyNoMobile : public WifiCountryCodePolicyBase {
 public:
     /**
      * @Description WifiCountryCodePolicyNoMobile constructor
+     *
+     * @param wifiCountryCodePolicy - Monitoring effectiveness strategy
      */
     explicit WifiCountryCodePolicyNoMobile(
         const std::bitset<WIFI_COUNTRY_CODE_POLICE_DEF_LEN> &wifiCountryCodePolicy);
@@ -56,7 +58,34 @@ public:
      */
     ErrCode CalculateWifiCountryCode(std::string &wifiCountryCode) override;
 private:
-    void Init();
+    class WifiCcpCommonEventListener : public OHOS::EventFwk::CommonEventSubscriber {
+    public:
+        /**
+         * @Description WifiCcpCommonEventListener constructor
+         */
+        WifiCcpCommonEventListener(const OHOS::EventFwk::CommonEventSubscribeInfo &subscriberInfo,
+            WifiCountryCodePolicyNoMobile *wifiCountryCodePolicyNoMobile);
+
+        /**
+         * @Description WifiCcpCommonEventListener destructor
+         */
+        ~WifiCcpCommonEventListener() = default;
+
+        /**
+         * @Description on receive change event
+         *
+         * @param direction - event data
+         */
+        void OnReceiveEvent(const OHOS::EventFwk::CommonEventData &eventData) override;
+    private:
+        WifiCountryCodePolicyNoMobile *m_wifiCountryCodePolicyNoMobile;
+    };
+    std::shared_ptr<WifiCcpCommonEventListener> m_wifiScanFinishCommonEventListener;
+    std::list<std::vector<BssidAndCountryCode>> m_allScanInfoList;
+    std::string m_wifiCountryCodeFromScanResults;
+    std::bitset<WIFI_COUNTRY_CODE_POLICE_DEF_LEN> m_wifiCountryCodePolicy;
+
+    void InitPolicy();
     void HandleScanResultAction(int scanStatus);
     ErrCode StatisticCountryCodeFromScanResult(std::vector<BssidAndCountryCode> &scanInfoList);
     ErrCode ParseCountryCodeElement(std::vector<WifiInfoElem> &infoElems, std::string &wifiCountryCode);
@@ -64,6 +93,7 @@ private:
     ErrCode GetWifiCountryCodeByRegion(std::string &wifiCountryCode);
     ErrCode GetWifiCountryCodeByAP(std::string &wifiCountryCode);
     ErrCode GetWifiCountryCodeByScanResult(std::string &wifiCountryCode);
+    ErrCode GetWifiCountryCodeByDefaultZZ(std::string &wifiCountryCode);
 };
 }
 }

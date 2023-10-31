@@ -22,7 +22,7 @@ export default struct AddTargetDialog {
   @State wifiCandidateConfig : Object = {
     ssid : "TP-LINK_6365" ,
     bssid : "6C:B1:58:75:63:65" ,
-    preSharedKey : "kaihong123" ,
+    preSharedKey : "12345678" ,
     isHiddenSsid : false ,
     securityType : 3
   }

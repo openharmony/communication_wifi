@@ -72,6 +72,7 @@
                 "ability_base",
                 "ability_runtime",
                 "access_token",
+                "battery_manager",
                 "bundle_framework",
                 "c_utils",
                 "certificate_manager",
@@ -100,7 +101,8 @@
             "third_party": [
                 "bounds_checking_function",
                 "wpa_supplicant",
-                "jsoncpp"
+                "jsoncpp",
+                "libxml2"
             ]
         },
         "build": {

@@ -43,7 +43,7 @@ struct WifiAutoTest {
   @StorageLink( "wifiAutoTestMessage" ) wifiAutoTestMessage: string = ""
   @State w_ssid: string = "TP-LINK_6365";
   @State w_bssid: string = "6C:B1:58:75:63:65";
-  @State w_preSharedKey: string = "kaihong123";
+  @State w_preSharedKey: string = "12345678";
   @State w_isHiddenSsid: boolean = false;
   @State w_securityType: number = 3
   @State w_creatorUid: number = 1;

@@ -60,6 +60,7 @@
         Get5GHzChannelList;
         RegisterWifiEvent;
         UnRegisterWifiEvent;
+        StartPortalCertification;
         extern "C++" {
             "OHOS::Wifi::WifiDevice::GetInstance(int, int)";
             "OHOS::Wifi::WifiScan::GetInstance(int, int)";

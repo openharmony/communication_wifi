@@ -153,6 +153,8 @@ public:
     ErrCode Get5GHzChannelList(std::vector<int> &result) override;
 
     static void SaBasicDump(std::string& result);
+    
+    ErrCode StartPortalCertification() override;
 
 private:
     bool Init();

@@ -290,6 +290,12 @@ WifiErrorCode IsBandTypeSupported(int bandType, bool *supported);
 WifiErrorCode Get5GHzChannelList(int *result, int *size);
 
 /**
+* @Description start portal certification
+*
+* @return ErrCode - operation result
+*/
+WifiErrorCode StartPortalCertification();
+/**
  * @brief Registers a callback for a specified Wi-Fi event.
  *
  * The registered callback will be invoked when the Wi-Fi event defined in {@link WifiEvent} occurs. \n

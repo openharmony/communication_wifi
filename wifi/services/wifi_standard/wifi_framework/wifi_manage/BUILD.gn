@@ -217,6 +217,7 @@ if (defined(ohos_lite)) {
     deps = [
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/idl_client:wifi_idl_client",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit:wifi_toolkit",
+      "$WIFI_ROOT_DIR/utils:wifi_utils",
     ]
     defines = [
       "STA_INSTANCE_MAX_NUM=$wifi_feature_with_sta_num",
@@ -398,8 +399,13 @@ if (defined(ohos_lite)) {
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_country_code/wifi_country_code_policy_factory.cpp",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_country_code/wifi_country_code_policy_mobile.cpp",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_country_code/wifi_country_code_policy_no_mobile.cpp",
+      "concrete_clientmode_manager.cpp",
+      "concrete_manager_state_machine.cpp",
+      "softap_manager.cpp",
+      "softap_manager_state_machine.cpp",
       "wifi_auth_center.cpp",
       "wifi_config_center.cpp",
+      "wifi_controller_state_machine.cpp",
       "wifi_dumper.cpp",
       "wifi_internal_event_dispatcher.cpp",
       "wifi_location_mode_observer.cpp",
@@ -413,6 +419,7 @@ if (defined(ohos_lite)) {
     ]
 
     deps = [
+      "$WIFI_ROOT_DIR/base:wifi_base",
       "$WIFI_ROOT_DIR/services/wifi_standard/etc/init:etc",
       "$WIFI_ROOT_DIR/services/wifi_standard/etc/param:etc",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/idl_client:wifi_idl_client",
@@ -435,7 +442,6 @@ if (defined(ohos_lite)) {
       "bundle_framework:appexecfwk_base",
       "c_utils:utils",
       "common_event_service:cesfwk_innerkits",
-      "core_service:tel_core_service_api",
       "data_share:datashare_common",
       "data_share:datashare_consumer",
       "eventhandler:libeventhandler",
@@ -458,6 +464,12 @@ if (defined(ohos_lite)) {
       "STA_INSTANCE_MAX_NUM=$wifi_feature_with_sta_num",
       "AP_INSTANCE_MAX_NUM=$wifi_feature_with_ap_num",
     ]
+
+    if (defined(global_parts_info) &&
+        defined(global_parts_info.telephony_core_service)) {
+      external_deps += [ "core_service:tel_core_service_api" ]
+      defines += [ "TELEPHONE_CORE_SERVICE_ENABLE" ]
+    }
 
     if (wifi_feature_with_app_frozen) {
       external_deps += [ "efficiency_manager:suspend_manager_client" ]

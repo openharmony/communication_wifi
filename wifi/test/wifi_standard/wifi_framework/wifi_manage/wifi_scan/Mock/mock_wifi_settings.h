@@ -51,6 +51,7 @@ public:
     virtual int SetWhetherToAllowNetworkSwitchover(bool bSwitch) = 0;
     virtual int GetValidChannels(ChannelsTable &channelsInfo) = 0;
     virtual int ClearScanInfoList(int instId = 0) = 0;
+    virtual void SetAppPackageName(const std::string &name) = 0;
 };
 
 class WifiSettings : public MockWifiSettings {
@@ -81,6 +82,7 @@ public:
     MOCK_METHOD1(SetWhetherToAllowNetworkSwitchover, int(bool bSwitch));
     MOCK_METHOD1(GetValidChannels, int(ChannelsTable &channelsInfo));
     MOCK_METHOD1(ClearScanInfoList, int(int));
+    MOCK_METHOD1(SetAppPackageName, void(const std::string &name));
 };
 }  // namespace Wifi
 }  // namespace OHOS

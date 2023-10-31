@@ -126,7 +126,7 @@ ErrCode WifiDeviceServiceImpl::EnableWifi()
     if (errCode != WIFI_OPT_SUCCESS) {
         return errCode;
     }
-
+#ifdef OHOS_ARCH_LITE
     WifiOprMidState curState = WifiConfigCenter::GetInstance().GetWifiMidState(m_instId);
     if (curState != WifiOprMidState::CLOSED) {
         WIFI_LOGI("current wifi state is %{public}d", static_cast<int>(curState));
@@ -174,14 +174,6 @@ ErrCode WifiDeviceServiceImpl::EnableWifi()
             WIFI_LOGE("Register sta service callback failed!");
             break;
         }
-#ifndef OHOS_ARCH_LITE
-        errCode = pService->RegisterStaServiceCallback(WifiCountryCodeManager::GetInstance().GetStaCallback());
-        if (errCode != WIFI_OPT_SUCCESS) {
-            WIFI_LOGE("wifiCountryCodeManager register sta service callback failed, ret=%{public}d!",
-                static_cast<int>(errCode));
-            break;
-        }
-#endif
         errCode = pService->EnableWifi();
         if (errCode != WIFI_OPT_SUCCESS) {
             WIFI_LOGE("service enable sta failed, ret %{public}d!", static_cast<int>(errCode));
@@ -194,10 +186,6 @@ ErrCode WifiDeviceServiceImpl::EnableWifi()
         return errCode;
     }
 #ifdef FEATURE_P2P_SUPPORT
-#ifndef OHOS_ARCH_LITE
-    WifiSaLoadManager::GetInstance().LoadWifiSa(WIFI_P2P_ABILITY_ID);
-    WifiManager::GetInstance().StopUnloadP2PSaTimer();
-#endif
     sptr<WifiP2pServiceImpl> p2pService = WifiP2pServiceImpl::GetInstance();
     if (p2pService != nullptr && p2pService->EnableP2p() != WIFI_OPT_SUCCESS) {
         // only record to log
@@ -220,6 +208,13 @@ ErrCode WifiDeviceServiceImpl::EnableWifi()
     }
     WifiConfigCenter::GetInstance().SetOperatorWifiType(operatorWifiType);
     return WIFI_OPT_SUCCESS;
+#else
+    if (m_instId == 0) {
+        WifiSettings::GetInstance().SetWifiToggledState(true);
+    }
+    errCode = WifiManager::GetInstance().WifiToggled(1, m_instId);
+    return errCode;
+#endif
 }
 
 ErrCode WifiDeviceServiceImpl::DisableWifi()
@@ -237,7 +232,7 @@ ErrCode WifiDeviceServiceImpl::DisableWifi()
         WIFI_LOGE("DisableWifi:VerifyWifiConnectionPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
-
+#ifdef OHOS_ARCH_LITE
     WifiOprMidState curState = WifiConfigCenter::GetInstance().GetWifiMidState(m_instId);
     if (curState != WifiOprMidState::RUNNING) {
         WIFI_LOGI("current wifi state is %{public}d", static_cast<int>(curState));
@@ -288,6 +283,13 @@ ErrCode WifiDeviceServiceImpl::DisableWifi()
         }
     }
     return ret;
+#else
+    if (m_instId == 0) {
+        WifiSettings::GetInstance().SetWifiToggledState(false);
+    }
+    ErrCode errCode = WifiManager::GetInstance().WifiToggled(0, m_instId);
+    return errCode;
+#endif
 }
 
 ErrCode WifiDeviceServiceImpl::InitWifiProtect(const WifiProtectType &protectType, const std::string &protectName)
@@ -1436,6 +1438,33 @@ ErrCode WifiDeviceServiceImpl::Get5GHzChannelList(std::vector<int> &result)
     }
     
     return WIFI_OPT_SUCCESS;
+}
+
+ErrCode WifiDeviceServiceImpl::StartPortalCertification()
+{
+    WIFI_LOGI("Enter StartPortalCertification.");
+    if (!WifiAuthCenter::IsSystemAppByToken()) {
+        WIFI_LOGE("StartPortalCertification: NOT System APP, PERMISSION_DENIED!");
+        return WIFI_OPT_NON_SYSTEMAPP;
+    }
+
+    if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("WifiDeviceServiceImpl:StartPortalCertification() PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+
+    if (WifiPermissionUtils::VerifyGetWifiConfigPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("WifiDeviceServiceImpl:StartPortalCertification() PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+
+    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst();
+    if (pService == nullptr) {
+        WIFI_LOGE("pService is nullptr!");
+        return WIFI_OPT_STA_NOT_OPENED;
+    }
+
+    return pService->StartPortalCertification();
 }
 
 #ifndef OHOS_ARCH_LITE

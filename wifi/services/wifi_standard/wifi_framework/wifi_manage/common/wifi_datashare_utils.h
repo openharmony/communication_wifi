@@ -74,7 +74,7 @@ public:
      * @return Insert error code
      */
     ErrCode Insert(Uri &uri, const std::string &key, const std::string &value);
- 
+
     /**
      * @Description : Update function
      *
@@ -84,7 +84,7 @@ public:
      * @return Update error code
      */
     ErrCode Update(Uri &uri, const std::string &key, const std::string &value);
- 
+
     /**
      * @Description : Register observer function
      *

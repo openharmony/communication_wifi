@@ -18,8 +18,6 @@
 
 #include <vector>
 #include "wifi_protect.h"
-#include "wifi_msg.h"
-
 #ifndef OHOS_ARCH_LITE
 #include "application_state_observer_stub.h"
 #include "app_state_data.h"

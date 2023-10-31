@@ -307,8 +307,7 @@ ErrCode WifiDeviceServiceImpl::IsHeldWifiProtectRef(
         WIFI_LOGE("DisableWifi:VerifySetWifiInfoPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
-    bool ret = WifiProtectManager::GetInstance().IsHeldWifiProtect(protectName);
-    isHoldProtect = ret;
+    isHoldProtect = WifiProtectManager::GetInstance().IsHeldWifiProtect(protectName);
     WIFI_LOGD("App %{public}s hold protect is %{public}d", protectName.c_str(), isHoldProtect);
     return WIFI_OPT_SUCCESS;
 #endif

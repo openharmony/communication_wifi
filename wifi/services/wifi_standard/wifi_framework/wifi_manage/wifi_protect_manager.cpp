@@ -21,11 +21,10 @@
 #include "system_ability_definition.h"
 #include "connection_observer_client.h"
 #include "app_mgr_client.h"
-#include "app_mgr_interface.h"
 #include "app_process_data.h"
 #include "iservice_registry.h"
 #include "app_mgr_constants.h"
-#include "wifi_common_util.h"
+#include "define.h"
 #endif
 
 #undef LOG_TAG
@@ -272,7 +271,7 @@ bool WifiProtectManager::AddProtect(
     const std::string &name)
 {
     std::shared_ptr<WifiProtect> pProtect = std::make_shared<WifiProtect>(name);
-    if (pProtect == nullptr) {
+    if (!pProtect) {
         LOGE("Wifi protect pointer is null.");
         return false;
     }
@@ -310,8 +309,9 @@ bool WifiProtectManager::PutWifiProtect(const std::string &name)
     }
     std::unique_lock<std::mutex> lock(mMutex);
     std::shared_ptr<WifiProtect> pWifiProtect = RemoveProtect(name);
-    if (pWifiProtect == nullptr) {
-        /* attempting to release a protect that does not exist. */
+    if (!pWifiProtect) {
+        LOGE("attempting to release a protect that does not exist, protect name: %{public}s.",
+            name.c_str());
         return false;
     }
     switch (pWifiProtect->GetProtectMode()) {

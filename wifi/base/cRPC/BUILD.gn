@@ -73,6 +73,8 @@ if (defined(ohos_lite)) {
   import("//foundation/communication/wifi/wifi/wifi.gni")
 
   ohos_static_library("rpc_server") {
+    branch_protector_ret = "pac_ret"
+
     sources = crpc_server_sources
 
     include_dirs = [ "include" ]
@@ -87,6 +89,8 @@ if (defined(ohos_lite)) {
   }
 
   ohos_static_library("rpc_client") {
+    branch_protector_ret = "pac_ret"
+
     sources = crpc_client_sources
     include_dirs = [
       "include",

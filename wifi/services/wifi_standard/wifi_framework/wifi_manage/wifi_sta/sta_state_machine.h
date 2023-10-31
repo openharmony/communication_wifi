@@ -776,18 +776,18 @@ private:
     void AddWpa3FailCount(int failreason, std::string ssid);
 
     /**
-     * @Description : add wpa3 blacklist
+     * @Description : add wpa3 black map
      *
      * @param ssid - ssid
      */
-    void AddWpa3BlackList(std::string ssid);
+    void AddWpa3BlackMap(std::string ssid);
 
     /**
-     * @Description : is in wpa3 blacklist
+     * @Description : is in wpa3 black map
      *
      * @param ssid - ssid
      */
-    bool IsInWpa3BlackList(std::string ssid) const;
+    bool IsInWpa3BlackMap(std::string ssid) const;
 
     /**
      * @Description : wpa3 transition selfcure

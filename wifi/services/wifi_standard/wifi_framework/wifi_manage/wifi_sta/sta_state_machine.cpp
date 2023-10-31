@@ -954,14 +954,14 @@ void StaStateMachine::Wpa3TransitionChangeIfNeed(int networkId)
     }
     if (IsWpa3Transition(networkId)
             && deviceConfig.keyMgmt.find("SAE") != std::string::npos
-            && IsInWpa3BlackList(deviceConfig.ssid)) {
+            && IsInWpa3BlackMap(deviceConfig.ssid)) {
         deviceConfig.keyMgmt = "WPA-PSK";
         WifiSettings::GetInstance().AddDeviceConfig(deviceConfig);
         WifiSettings::GetInstance().SyncDeviceConfig();
         SyncDeviceConfigToWpa();
     } else if (IsWpa3Transition(networkId)
                    && deviceConfig.keyMgmt.find("PSK") != std::string::npos
-                   && !IsInWpa3BlackList(deviceConfig.ssid)) {
+                   && !IsInWpa3BlackMap(deviceConfig.ssid)) {
         deviceConfig.keyMgmt = "SAE";
         WifiSettings::GetInstance().AddDeviceConfig(deviceConfig);
         WifiSettings::GetInstance().SyncDeviceConfig();
@@ -1355,7 +1355,7 @@ void StaStateMachine::DealWpsConnectTimeOutEvent(InternalMessage *msg)
     int failreason = msg->GetParam1();
     if (failreason > 0) {
         DisConnectProcess();
-        if (failreason == WLANSTATUS_AUTH_TIMEOUT ||
+        if (failreason == WLAN_STATUS_AUTH_TIMEOUT ||
             failreason == MAC_AUTH_RSP2_TIMEOUT ||
             failreason == MAC_AUTH_RSP4_TIMEOUT) {
             OnWifiWpa3SelfCure(WPA3_AUTH_TIMEOUT, targetNetworkId);
@@ -1564,7 +1564,7 @@ void StaStateMachine::AddWpa3FailCount(int failreason, std::string ssid)
     }
 }
 
-void StaStateMachine::AddWpa3BlackList(std::string ssid)
+void StaStateMachine::AddWpa3BlackMap(std::string ssid)
 {
     if (wpa3BlackMap.size() == WPA3_BLACKLIST_MAX_NUM) {
         auto iter = wpa3BlackMap.begin();
@@ -1574,18 +1574,18 @@ void StaStateMachine::AddWpa3BlackList(std::string ssid)
                 oldestIter = iter;
             }
         }
-        WIFI_LOGI("AddWpa3BlackList, blacklist full, delete ssid=%{public}s", oldestIter->first.c_str());
+        WIFI_LOGI("AddWpa3BlackMap, map full, delete ssid=%{public}s", oldestIter->first.c_str());
         wpa3BlackMap.erase(oldestIter);
     }
-    WIFI_LOGI("AddWpa3BlackList, ssid=%{public}s", ssid.c_str());
+    WIFI_LOGI("AddWpa3BlackMap, ssid=%{public}s", ssid.c_str());
     wpa3BlackMap.insert(std::make_pair(ssid, time(0)));
 }
 
-bool StaStateMachine::IsInWpa3BlackList(std::string ssid) const
+bool StaStateMachine::IsInWpa3BlackMap(std::string ssid) const
 {
     auto iter = wpa3BlackMap.find(ssid);
     if (iter != wpa3BlackMap.end()) {
-        WIFI_LOGI("IsInWpa3BlackList, ssid=%{public}s", ssid.c_str());
+        WIFI_LOGI("IsInWpa3BlackMap, ssid=%{public}s", ssid.c_str());
         return true;
     }
     return false;
@@ -1620,7 +1620,7 @@ void StaStateMachine::OnWifiWpa3SelfCure(int failreason, int networkId)
         WIFI_LOGI("OnWifiWpa3SelfCure, fail count not enough.");
         return;
     }
-    AddWpa3BlackList(config.ssid);
+    AddWpa3BlackMap(config.ssid);
 }
 
 bool StaStateMachine::IsWpa3Transition(int networkId) const
@@ -1631,7 +1631,7 @@ bool StaStateMachine::IsWpa3Transition(int networkId) const
         LOGE("IsWpa3Transition, GetDeviceConfig failed!");
         return false;
     }
-    WifiSettings::GetInstance.GetScanInfoList(scanInfoList);
+    WifiSettings::GetInstance().GetScanInfoList(scanInfoList);
     for (auto scanInfo : scanInfoList) {
         if ((deviceConfig.ssid == scanInfo.ssid) &&
             (scanInfo.capabilities.find("PSK+SAE") != std::string::npos)) {

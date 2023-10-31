@@ -354,6 +354,13 @@ public:
     ErrCode Get5GHzChannelList(std::vector<int> &result) override;
 
     /**
+     * @Description start portal certification
+     *
+     * @return ErrCode - operation result
+     */
+    ErrCode StartPortalCertification() override;
+
+    /**
      * @Description set low latency mode
      *
      * @param enabled - true: enable low latency, false: disable low latency

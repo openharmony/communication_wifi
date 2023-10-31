@@ -521,6 +521,19 @@ NO_SANITIZE("cfi") WifiErrorCode GetWifiProtect(OHOS::Wifi::WifiProtectMode mode
     return GetCErrorCode(wifiDevicePtr->GetWifiProtect(mode));
 }
 
+NO_SANITIZE("cfi") WifiErrorCode StartPortalCertification(int *result, int *size)
+{
+    CHECK_PTR_RETURN(wifiDevicePtr, ERROR_WIFI_NOT_AVAILABLE);
+    CHECK_PTR_RETURN(result, ERROR_WIFI_INVALID_ARGS);
+    CHECK_PTR_RETURN(size, ERROR_WIFI_INVALID_ARGS);
+    OHOS::Wifi::ErrCode ret = wifiDevicePtr->StartPortalCertification();
+    if (ret != OHOS::Wifi::WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("StartPortalCertification failed!");
+        return GetCErrorCode(ret);
+    }
+    return GetCErrorCode(ret);
+}
+
 NO_SANITIZE("cfi") WifiErrorCode PutWifiProtect()
 {
     CHECK_PTR_RETURN(wifiDevicePtr, ERROR_WIFI_NOT_AVAILABLE);

@@ -422,6 +422,12 @@ public:
      */
     void DealRenewalTimeout(InternalMessage *msg);
 
+    /**
+     * @Description  start browser to login portal
+     *
+     */
+    void HandlePortalNetworkPorcess();
+
     int GetInstanceId();
 private:
     /**
@@ -806,6 +812,7 @@ private:
     GetIpState *pGetIpState;
     LinkedState *pLinkedState;
     ApRoamingState *pApRoamingState;
+    std::string mPortalUrl;
     int m_instId;
     /**
      * @Description Replace empty dns

@@ -1783,6 +1783,7 @@ void StaStateMachine::DisConnectProcess()
     InvokeOnStaConnChanged(OperateResState::DISCONNECT_DISCONNECTING, linkedInfo);
     if (WifiStaHalInterface::GetInstance().Disconnect() == WIFI_IDL_OPT_OK) {
         WIFI_LOGI("Disconnect() succeed!");
+        mPortalUrl = "";
 #ifndef OHOS_ARCH_LITE
         if (NetSupplierInfo != nullptr) {
             NetSupplierInfo->isAvailable_ = false;
@@ -2099,6 +2100,23 @@ bool StaStateMachine::ConfigStaticIpAddress(StaticIpAddress &staticIpAddress)
     return true;
 }
 
+void StaStateMachine::HandlePortalNetworkPorcess()
+{
+#ifndef OHOS_ARCH_LITE
+    WIFI_LOGI("portal uri is %{public}s\n", mPortalUrl.c_str());
+    if (WifiSettings::GetInstance().GetDeviceProvisionState() == MODE_STATE_CLOSE) {
+        AAFwk::Want want;
+        want.SetAction(PORTAL_ACTION);
+        want.SetUri(mPortalUrl);
+        want.AddEntity(PORTAL_ENTITY);
+        OHOS::ErrCode err = AAFwk::AbilityManagerClient::GetInstance()->StartAbility(want);
+        if (err != ERR_OK) {
+            WIFI_LOGI("StartAbility is failed %{public}d", err);
+        }
+    }
+#endif
+}
+
 void StaStateMachine::HandleNetCheckResult(StaNetState netState, const std::string portalUrl)
 {
     WIFI_LOGI("Enter HandleNetCheckResult, netState:%{public}d.", netState);
@@ -2106,7 +2124,7 @@ void StaStateMachine::HandleNetCheckResult(StaNetState netState, const std::stri
         WIFI_LOGE("connState is NOT in connected state, connState:%{public}d\n", linkedInfo.connState);
         return;
     }
-
+    mPortalUrl = portalUrl;
     if (netState == StaNetState::NETWORK_STATE_WORKING) {
         WIFI_LOGI("HandleNetCheckResult network state is working\n");
         /* Save connection information to WifiSettings. */
@@ -2119,24 +2137,11 @@ void StaStateMachine::HandleNetCheckResult(StaNetState netState, const std::stri
     } else if (netState == StaNetState::NETWORK_CHECK_PORTAL) {
         WifiLinkedInfo linkedInfo;
         GetLinkedInfo(linkedInfo);
-        portalFlag = true;
-#ifndef OHOS_ARCH_LITE
         if (linkedInfo.detailedState != DetailedState::CAPTIVE_PORTAL_CHECK) {
-            WIFI_LOGI("portal uri is %{public}s\n", portalUrl.c_str());
-            if (WifiSettings::GetInstance().GetDeviceProvisionState() == MODE_STATE_CLOSE) {
-                AAFwk::Want want;
-                want.SetAction(PORTAL_ACTION);
-                want.SetUri(portalUrl);
-                want.AddEntity(PORTAL_ENTITY);
-                OHOS::ErrCode err = AAFwk::AbilityManagerClient::GetInstance()->StartAbility(want);
-                if (err != ERR_OK) {
-                    WIFI_LOGI("StartAbility is failed %{public}d", err);
-                }
-            }
+            HandlePortalNetworkPorcess();
         }
+        portalFlag = true;
         StartTimer(static_cast<int>(CMD_START_NETCHECK), PORTAL_CHECK_TIME * PORTAL_MILLSECOND);
-#endif
-        linkedInfo.portalUrl = portalUrl;
         SaveLinkstate(ConnState::CONNECTED, DetailedState::CAPTIVE_PORTAL_CHECK);
         InvokeOnStaConnChanged(OperateResState::CONNECT_CHECK_PORTAL, linkedInfo);
     } else {
@@ -2392,6 +2397,10 @@ void StaStateMachine::DealNetworkCheck(InternalMessage *msg)
 
     if (pNetcheck == nullptr) {
         LOGE("pNetcheck is null.");
+        return;
+    }
+    if (linkedInfo.connState != ConnState::CONNECTED) {
+        WIFI_LOGE("DealNetworkCheck NOT in connected state, connState:%{public}d\n", linkedInfo.connState);
         return;
     }
     pNetcheck->SignalNetCheckThread();

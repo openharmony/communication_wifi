@@ -603,7 +603,7 @@ int WifiManager::Init()
         WIFI_LOGI("RegisterBatteryEvent success! locationTimerId:%{public}u", batteryTimerId);
     }
     if (!std::filesystem::exists(WIFI_CONFIG_FILE_PATH) && migrateTimerId == 0) {
-        RegisteSettingsMigrateEvent();
+        RegisterSettingsMigrateEvent();
         TimeOutCallback timeoutCallback = std::bind(&WifiManager::CheckAndStartStaByDatashare, this);
         WifiTimer::GetInstance()->Register(timeoutCallback, migrateTimerId, TIMEOUT_CHECK_LAST_STA_STATE_EVENT);
         WIFI_LOGI("CheckAndStartStaByDatashare register success! migrateTimerId:%{public}u", migrateTimerId);
@@ -2128,6 +2128,7 @@ void WifiManager::UnRegisterSettingsMigrateEvent()
     }
     Uri uri(SETTINGS_DATASHARE_URI_SETTINGS_MIGRATE);
     datashareHelper->UnRegisterObserver(uri, settingsMigrateObserver_);
+    settingsMigrateObserver_ = nullptr;
 }
 
 void WifiManager::RegisterLocationEvent()
